@@ -11,28 +11,18 @@ import {
   preferredExternalLocation,
   sourceLabel,
 } from "./external-media-contract.js";
+import {
+  resolveVideoSourceSelection,
+  videoSourceIsRefreshing,
+  videoSourceSelectionValue,
+  workspaceSourceValue,
+} from "./video-library-source-contract.js";
 
 function workspaceLabel(item) {
   if (!item?.workspace) return "未知工作区";
   const prefix = `${item.run_id}/`;
   const suffix = item.workspace.startsWith(prefix) ? item.workspace.slice(prefix.length) : item.workspace;
   return suffix === "project.yaml" || suffix === "manifest.json" ? item.run_id : `${item.run_id} · ${suffix.replace(/\/project\.yaml$/, "")}`;
-}
-
-function WorkspaceSelector({ catalog, selected, loading, onSelect, onRefresh }) {
-  return (
-    <div className="workspace-picker">
-      <label htmlFor="workspace-select">runs 工作区</label>
-      <div>
-        <select id="workspace-select" value={selected} disabled={loading || !catalog.length} onChange={(event) => onSelect(event.target.value)}>
-          {!catalog.length && <option value="">暂无工作区</option>}
-          {catalog.map((item) => <option key={item.workspace} value={item.workspace}>{workspaceLabel(item)}</option>)}
-        </select>
-        <button type="button" onClick={onRefresh} disabled={loading} aria-label="刷新 runs 工作区"><ArrowsClockwise size={16} className={loading ? "is-spinning" : ""} /></button>
-      </div>
-      <small title={selected}>{selected || "仅连接本机 repository/runs"}</small>
-    </div>
-  );
 }
 
 export function VideoLibraryRail({
@@ -67,10 +57,18 @@ export function VideoLibraryRail({
   const visible = sourceGroups.filter((group) => groupMatchesQuery(group, query));
   const sourceOptions = [
     { id: "all", label: "全部视频来源", count: attempts.length + groups.length, disabled: false },
-    { id: "runs", label: "Runs 工作区", count: attempts.length, disabled: false },
     ...externalSourceOptions(externalCatalog).slice(1),
   ];
-  const refreshing = runsLoading || externalLoading;
+  const selectedSourceValue = videoSourceSelectionValue(selectedSource, workspace);
+  const workspaceUnavailable = selectedSource === "runs"
+    && workspace
+    && !runsCatalog.some((item) => item.workspace === workspace);
+  const changeSource = (value) => {
+    const selection = resolveVideoSourceSelection(value, runsCatalog);
+    if (selection.workspace) onWorkspace(selection.workspace);
+    else onSource(selection.sourceId);
+  };
+  const refreshing = videoSourceIsRefreshing(selectedSource, runsLoading, externalLoading);
   const liveLabel = liveStatus === "live"
     ? "实时更新已连接"
     : liveStatus === "reconnecting"
@@ -85,11 +83,18 @@ export function VideoLibraryRail({
       <header className="lane-rail-header"><h2>视频生成记录</h2><p>Runs + 外部媒体 · exact evidence</p></header>
       <div className="external-source-filter">
         <div className="external-filter-heading"><label htmlFor="video-source-select">来源</label><button type="button" onClick={onRefresh} disabled={refreshing} aria-label="刷新当前视频来源"><ArrowsClockwise size={15} className={refreshing ? "is-spinning" : ""} /></button></div>
-        <select id="video-source-select" name="video-source" value={selectedSource} onChange={(event) => onSource(event.target.value)} aria-label="选择视频来源">
-          {sourceOptions.map((option) => <option key={option.id} value={option.id} disabled={option.disabled}>{option.label} · {option.disabled ? "不可用" : option.count}</option>)}
+        <select id="video-source-select" name="video-source" value={selectedSourceValue} onChange={(event) => changeSource(event.target.value)} aria-label="选择视频来源">
+          <option value="all">全部视频来源 · {attempts.length + groups.length}</option>
+          <optgroup label="Runs 工作区">
+            {!runsCatalog.length && <option value={workspaceSourceValue("")} disabled>暂无工作区</option>}
+            {workspaceUnavailable && <option value={workspaceSourceValue(workspace)} disabled>{workspace} · 当前不可用</option>}
+            {runsCatalog.map((item) => <option key={item.workspace} value={workspaceSourceValue(item.workspace)} disabled={runsLoading}>{workspaceLabel(item)}{item.workspace === workspace ? ` · ${attempts.length}` : ""}</option>)}
+          </optgroup>
+          <optgroup label="外部视频来源">
+            {sourceOptions.slice(1).map((option) => <option key={option.id} value={option.id} disabled={option.disabled}>{option.label} · {option.disabled ? "不可用" : option.count}</option>)}
+          </optgroup>
         </select>
       </div>
-      {showRuns && <WorkspaceSelector catalog={runsCatalog} selected={workspace} loading={runsLoading} onSelect={onWorkspace} onRefresh={onRefresh} />}
       {showExternal && <label className="external-search" htmlFor="external-media-search"><span>筛选视频</span><input id="external-media-search" name="external-media-search" type="search" value={query} onChange={(event) => onQuery(event.target.value)} placeholder="文件名 / Shot / Prompt" /><small>{visible.length} / {sourceGroups.length} unique SHA</small></label>}
       {showExternal && externalError && <div className="rail-stale-warning" role="status"><WarningCircle size={16} weight="fill" /><span>刷新失败；当前外部视频列表可能已过期。</span></div>}
       <div className="lane-list external-group-list" aria-label="视频与生成尝试列表">

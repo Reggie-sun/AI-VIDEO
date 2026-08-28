@@ -120,14 +120,6 @@ img { display: block; }
 .lane-rail-header { padding: 20px 22px 16px; border-bottom: 1px solid var(--border); }
 .lane-rail-header h2 { margin: 0 0 5px; color: var(--text); font-size: 16px; font-weight: 650; }
 .lane-rail-header p { margin: 0; color: #b1b7bf; font-size: 13px; }
-.workspace-picker { padding: 12px 11px 10px; border-bottom: 1px solid var(--border-soft); }
-.workspace-picker label { display: block; margin: 0 0 7px; color: #aab2bc; font-size: 11px; }
-.workspace-picker > div { display: grid; grid-template-columns: minmax(0, 1fr) 36px; gap: 6px; }
-.workspace-picker select, .workspace-picker button { height: 36px; border: 1px solid #35414d; border-radius: 4px; background: #111c27; color: #e0e4e9; }
-.workspace-picker select { min-width: 0; padding: 0 28px 0 9px; font-size: 11px; }
-.workspace-picker button { display: grid; place-items: center; padding: 0; cursor: pointer; }
-.workspace-picker button:disabled, .workspace-picker select:disabled { color: #6e7883; cursor: wait; }
-.workspace-picker small { display: block; margin-top: 6px; overflow: hidden; color: #76808c; font-family: "SFMono-Regular", Consolas, monospace; font-size: 9px; white-space: nowrap; text-overflow: ellipsis; }
 .is-spinning { animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .lane-list { display: grid; flex: 1; align-content: start; gap: 12px; min-height: 0; padding: 10px 11px; overflow-y: auto; }

@@ -749,6 +749,7 @@ export function App() {
   }, []);
 
   const selectWorkspaceAndShowRuns = useCallback(async (key) => {
+    setSelectedSource("runs");
     setActiveSurface("runs");
     await selectWorkspace(key);
   }, [selectWorkspace]);

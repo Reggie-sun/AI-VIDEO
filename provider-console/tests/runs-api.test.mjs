@@ -5,6 +5,11 @@ import { mkdtemp, mkdir, symlink, unlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
+import { fileURLToPath } from "node:url";
+
+import React from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { createServer } from "vite";
 
 import { createCatalogChangeFeed, createRunsApiHandler, RunsApiError } from "../scripts/runs-api.mjs";
 import { configuredExternalMediaSources } from "../vite.config.mjs";
@@ -38,6 +43,107 @@ import {
   libraryLiveStatus,
 } from "../src/library-refresh-contract.js";
 import { formatShotTimecode, shotTiming } from "../src/shot-time-contract.js";
+import {
+  resolveVideoSourceSelection,
+  videoSourceIsRefreshing,
+  videoSourceSelectionValue,
+  workspaceSourceValue,
+} from "../src/video-library-source-contract.js";
+
+test("video source selection represents each Runs workspace in the single source control", () => {
+  const runsCatalog = [
+    { workspace: "run-a/project.yaml", run_id: "run-a" },
+    { workspace: "run-b/manifest.json", run_id: "run-b" },
+  ];
+
+  assert.equal(videoSourceSelectionValue("all", "run-a/project.yaml"), "all");
+  assert.equal(
+    videoSourceSelectionValue("runs", "run-a/project.yaml"),
+    workspaceSourceValue("run-a/project.yaml"),
+  );
+  assert.deepEqual(
+    resolveVideoSourceSelection(workspaceSourceValue("run-b/manifest.json"), runsCatalog),
+    { sourceId: "runs", workspace: "run-b/manifest.json" },
+  );
+  assert.deepEqual(resolveVideoSourceSelection("comfyui-output", runsCatalog), {
+    sourceId: "comfyui-output",
+    workspace: null,
+  });
+  assert.deepEqual(resolveVideoSourceSelection(workspaceSourceValue("missing/project.yaml"), runsCatalog), {
+    sourceId: "runs",
+    workspace: null,
+  });
+  assert.equal(videoSourceIsRefreshing("runs", false, true), false);
+  assert.equal(videoSourceIsRefreshing("all", false, true), true);
+  assert.equal(videoSourceIsRefreshing("comfyui-output", true, false), false);
+});
+
+test("video library rail renders one unified source selector", async () => {
+  const server = await createServer({
+    root: fileURLToPath(new URL("..", import.meta.url)),
+    server: { middlewareMode: true },
+    appType: "custom",
+    optimizeDeps: { noDiscovery: true },
+  });
+  try {
+    const { VideoLibraryRail } = await server.ssrLoadModule("/src/video-library-rail.jsx");
+    const markup = renderToStaticMarkup(React.createElement(VideoLibraryRail, {
+      runsCatalog: [{ workspace: "run-a/project.yaml", run_id: "run-a" }],
+      workspace: "run-a/project.yaml",
+      attempts: [],
+      selectedId: "",
+      runsLoading: false,
+      runsError: "",
+      externalCatalog: { sources: [], groups: [] },
+      selectedSha: "",
+      selectedSource: "all",
+      query: "",
+      externalLoading: false,
+      externalError: "",
+      activeSurface: "runs",
+      liveStatus: "live",
+      onWorkspace() {},
+      onSelectAttempt() {},
+      onSelectExternal() {},
+      onSource() {},
+      onQuery() {},
+      onRefresh() {},
+    }));
+
+    assert.equal((markup.match(/<select/g) || []).length, 1);
+    assert.match(markup, /id="video-source-select"/);
+    assert.match(markup, /<optgroup label="Runs 工作区">/);
+    assert.match(markup, /<optgroup label="外部视频来源">/);
+    assert.doesNotMatch(markup, /workspace-select|workspace-picker/);
+
+    const staleMarkup = renderToStaticMarkup(React.createElement(VideoLibraryRail, {
+      runsCatalog: [{ workspace: "run-b/project.yaml", run_id: "run-b" }],
+      workspace: "run-a/project.yaml",
+      attempts: [],
+      selectedId: "",
+      runsLoading: false,
+      runsError: "工作区不存在",
+      externalCatalog: { sources: [], groups: [] },
+      selectedSha: "",
+      selectedSource: "runs",
+      query: "",
+      externalLoading: false,
+      externalError: "",
+      activeSurface: "runs",
+      liveStatus: "live",
+      onWorkspace() {},
+      onSelectAttempt() {},
+      onSelectExternal() {},
+      onSource() {},
+      onQuery() {},
+      onRefresh() {},
+    }));
+    assert.match(staleMarkup, /run-a\/project.yaml · 当前不可用/);
+    assert.equal((staleMarkup.match(/<select/g) || []).length, 1);
+  } finally {
+    await server.close();
+  }
+});
 
 test("default external media sources include the AI-VIDEO experiments directory", () => {
   assert.deepEqual(configuredExternalMediaSources({ repoRoot: "/repo", homeRoot: "/home/operator" }), [
