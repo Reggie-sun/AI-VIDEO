@@ -53,8 +53,9 @@ raw-baseline regression floor。
 3. 任一关键维度低于 baseline 即 `FAIL`，不得由 causal-state、endpoint SSIM、decode PASS 或 compatible
    conditioning 抵消。
 
-本次诊断没有生成、编辑、重试或删除媒体，没有调用 H3 / ComfyUI / Provider，也没有改变任何 repo-external
-artifact。Automatic learning evaluation outcome 为 `no_candidate`：当前只有一个 failed assembly 与一个
+本次诊断没有生成、编辑、重试或删除 source / experiment 媒体，没有调用 H3 / ComfyUI / Provider；只在
+`/tmp` 创建 disposable diagnostic contact sheets，没有改变任何既有 repo-external artifact。Automatic learning
+evaluation outcome 为 `no_candidate`：当前只有一个 failed assembly 与一个
 多变量 raw-vs-experiment comparison，无法隔离 resolution、anchor、camera、performance 与 edit coverage 中任一
 变量的独立 causal effect；现有 learning claims 也没有同一 scoped claim 可由本 evidence 直接更新。不得把这个
 single case 扩张成 Provider-wide 或 model-wide rule。
