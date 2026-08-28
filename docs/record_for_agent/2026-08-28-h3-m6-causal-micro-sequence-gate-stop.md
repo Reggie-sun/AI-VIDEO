@@ -138,10 +138,11 @@ V6 task-scoped authorization 已按 exact scope 消耗完毕，未留下 later P
 或 assembly authorization。ComfyUI queue 在 cleanup 前为空；repository supervisor 已停止，listener 已关闭，
 checkout 已恢复为 clean `e01fb4c56b7a88149d469b99cbbfe3223d715054`。
 
-M6 Shot A、Shot B 与 Shot C technical Gates 均为 `PASS`。`15.5s` review assembly 的独立 read-only exact
-preview 已完成，但尚未获得绑定该 preview SHA-256 的 task-scoped authorization；不得从 per-Shot technical
-PASS 自动串联 assembly。`30s` assembly、M7–M9、qualification、aggregate Gate expansion、HUMAN verdict、
-P6、Final Acceptance、Production qualification、commercial acceptance 与 release 继续 deferred。
+M6 Shot A、Shot B 与 Shot C technical Gates 均为 `PASS`。用户已精确授权 `15.5s` review assembly preview，
+exact one-shot hard-cut stream-copy assembly 与预授权 local verification 已完成；micro-sequence
+`human_verdict=NOT_EVALUATED`，必须停在用户 uninterrupted `1.0x` full-speed/full-audio review。`30s`
+assembly、M7–M9、qualification、aggregate Gate expansion、P6、Final Acceptance、Production qualification、
+commercial acceptance 与 release 继续 deferred。
 
 ### 15.5s Review Assembly Exact Authorization Preview
 
@@ -183,6 +184,45 @@ P6、Final Acceptance、Production qualification、commercial acceptance 与 rel
   与本地 verification，然后停止并交付用户 HUMAN review；不得自动继续 30s assembly 或 M7–M9。
 - Automatic learning evaluation: `no_candidate`。本 checkpoint 只有 deterministic assembly preview，没有新的
   independent media attempt、controlled comparison 或 HUMAN verdict，不创建 Learning Claim placeholder。
+
+### 15.5s Review Assembly Exact Output And HUMAN Stop
+
+- Authorization sidecar:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-review-assembly-v1/sidecars/assembly-authorization.json`；
+  SHA-256 `0ea38e920c37ab84e52b379248042b656bf7bf238131687b17f884c630081f3d`。用户授权精确绑定 preview
+  SHA-256 `3aa952fb81843bf968336b625ad4a6e9d12fb9d63c3b8c18f65f27e1a8ca5226`。
+- Exact concat list SHA-256:
+  `02fb464b53455fa720a419ca5839030ee594d8172bd09f0a5c6be12bb173ad44`；顺序严格为 Shot A v1 → Shot B
+  v3 → Shot C v6。
+- Exactly one FFmpeg concat-demuxer assembly call 使用 `-c copy`、hard cuts only、`-n` no-overwrite；没有
+  re-encode、trim、retime、xfade、interpolation、padding、audio mix 或第二次 assembly call。
+- Exact output:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-review-assembly-v1/outputs/m6-causal-micro-sequence-15.5s-review-v1.mp4`
+  - SHA-256: `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07`
+  - Size: `4,330,639 bytes`
+  - Video: H.264 High、`768x768`、`yuv420p`、`r_frame_rate=24/1`、`372 frames`、start
+    `0.031006s`、duration `15.500651s`。
+  - Audio: AAC LC、`32kHz` stereo、`489 frames`、start `0.000000s`、duration `15.533s`；container
+    duration `15.533s`。
+- Exactly one `ffprobe` 与 exactly one full video/audio decode 已完成；full decode `PASS`。Project-local
+  `video-analysis`、Provider/H3、ComfyUI、image generation/edit、retry、variant、fallback、remote/paid、30s
+  assembly 与 M7–M9 action 均为 `0`。
+- FFmpeg 在 A→B 与 B→C 两个 boundary 各报告一次 audio `Non-monotonous DTS`，分别将 current DTS
+  `165344 -> 165889` 与 `330688 -> 331233`。Muxer 自动前移时间戳；没有 retry 或 alternate remux。由于 video
+  比 audio 晚 `0.031006s` 起始且 audio/container 比 video 长约 `0.032s`，exact boundary 是否存在 audible
+  discontinuity 或 perceptible sync issue 必须由 full-audio HUMAN review 判定。
+- Result sidecar:
+  `/home/reggie/ai-video-experiments/h3-causal-micro-sequence-20260828-m6-review-assembly-v1/sidecars/assembly-result.json`；
+  SHA-256 `19335d8402fe0317973989bcd1d0a6e1dc5deaecd7b86408ce37b756d58856a2`。
+- Technical status: `PASS_WITH_CONCERNS`；它只说明 exact identity、stream structure、frame count 与 full decode
+  到达预览 contract，同时保留 timestamp/audio-seam concern。它不是 HUMAN PASS 或 HUMAN FAIL。
+- Current stop: `human_verdict=NOT_EVALUATED`。必须由用户对 exact SHA-256
+  `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 做 uninterrupted `1.0x`
+  full-speed/full-audio review，逐项判断 A→B、B→C causal continuity、camera/conditioning、performance、
+  no-dialogue Dialogue Performance/Lip-sync、readability/pacing 与两个 audio seams。当前授权已耗尽，不得自动
+  repair、retry、30s assembly 或继续 M7–M9。
+- Automatic learning evaluation remains `no_candidate`：这是同一 exact input set 的单次 deterministic review
+  remux，尚无 HUMAN verdict，也没有 independent generative attempt 或 controlled comparison。
 
 Durable `15.5s` review assembly preview checkpoint:
 `fdbbf1238ef6114b638d2a01d62670a9694742a0`。
