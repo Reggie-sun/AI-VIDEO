@@ -61,7 +61,7 @@ def test_dispatch_keeps_modes_as_profiles_and_versions_fail_closed() -> None:
     assert "exactly one version overlay" in text
     assert "references/seedance-2.0.md" in text
     assert "references/seedance-2.5.md" in text
-    assert "Seedance 1.5/1.0 are intentionally unsupported" in text
+    assert "第一版 authoring package 有意不支持 Seedance 1.5/1.0" in text
     assert "unknown, future, mixed, or stale" in normalized
     assert "fail closed" in text
 
