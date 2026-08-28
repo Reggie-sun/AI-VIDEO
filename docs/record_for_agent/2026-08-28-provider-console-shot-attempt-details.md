@@ -272,6 +272,49 @@ Independent native `reviewer_xhigh` 最终 verdict 为 `accept with concerns`，
 本 follow-up 没有执行 Provider submit、paid/cloud call、媒体生成、Manifest mutation、activation、P6、
 Final Acceptance、push、deploy 或 release。实现与本记录均只形成 local Git checkpoint。
 
+## Unified Source Selector Correction — 2026-08-28
+
+用户通过当前页面截图指出“来源”与 `runs 工作区` 两个下拉控件表达重复。上方
+`Live Refresh, Unified Sources, And Prompt Recovery Follow-up` 记录了“来源现在只有一个可展开
+selector”的目标状态，但当时实际 DOM 仍同时渲染 `video-source-select` 与 `workspace-select`；该描述在
+本修复前并不准确。本节以当前 code、tests 与 live browser evidence 修正该界面事实，历史实现证据继续
+保留。
+
+当前实现行为：
+
+- `provider-console/src/video-library-rail.jsx` 现在只渲染一个 `video-source-select`。Runs workspaces 作为
+  `Runs 工作区` `optgroup` 的 exact catalog options，与 `外部视频来源` 分组共同进入同一 selector；旧
+  `WorkspaceSelector`、`workspace-select`、第二个 refresh button 及对应 CSS 已退休。
+- 选择 exact Runs workspace 会同时把 `selectedSource` 切换为 `runs` 并通过既有
+  `selectWorkspace()` strict reopen path 加载 detail；没有引入第二 reader、缓存、lifecycle owner 或
+  mutation path。
+- 唯一 refresh button 的 disabled/spinner 状态与实际 refresh scope 对齐：Runs 只受 `runsLoading`
+  约束，external source 只受 `externalLoading` 约束，`all` 才受二者共同约束。无关 source scan 不再阻止
+  当前来源的 manual refresh。
+- `runs-workspace:*` selector value 只在当前 catalog exact match 时解析为 workspace。保留前缀但未匹配
+  catalog 的值 fail closed 在 Runs 域；已选 workspace 若在 refresh 后消失，selector 显示 disabled
+  `当前不可用` option，而不是空白或误判为 external source。
+
+Verification：
+
+- Focused Node test：`provider-console/tests/runs-api.test.mjs`，`33 passed`；包含 helper/state assertions、
+  SSR component regression（rail 只有一个 `<select>`、两个 `optgroup`、无 `workspace-select` /
+  `workspace-picker`）及 stale catalog display coverage。
+- Full Provider Console Node suite：`59 passed`；Provider Console Python suite：`32 passed`。
+- Vite production build：`4582 modules transformed`，通过。
+- Isolated Chrome live QA：默认 `all` 与切换真实 Runs workspace 后 rail 均只有一个 selector，旧 picker 为
+  `0`；workspace strict reopen 后展示 `1 attempts`，console 无 warning/error。
+- Independent native `reviewer_high` scoped re-review：`accept`，无 blocking 或 non-blocking concern。
+- Implementation commit：`749be6ceeedd428f418aeaa70eb38343c84275b9`。
+- Exact commit-range Harness：
+  `b9d972bebe6a1180cf6dbab134bb17eabf4c0dfc..749be6ceeedd428f418aeaa70eb38343c84275b9`；
+  receipt：`.agent/harness/runs/provider-console-source-selector-20260828-v1/receipt.json`。Receipt verifier
+  确认 `passed`、`fresh`、`snapshot_matches`、`scope_paths_match`、`scope_worktree_clean`、artifact integrity
+  与 `complete_completion_proof` 均为 true。
+
+本修复没有执行 Provider submit、paid/cloud call、媒体生成、Manifest mutation、activation、P6、
+Final Acceptance、push、deploy 或 release；只形成 local Git checkpoint 与 read-only browser evidence。
+
 ## AI-VIDEO Experiments Source Follow-up — 2026-08-28
 
 用户随后补充 repository 外历史实验目录 `/home/reggie/ai-video-experiments`。本节取代本记录上方将
@@ -450,9 +493,9 @@ human visual PASS；同样，`failed` 但存在 fetched video 只表示已有 ex
   合并，但缓存不得降低 exact-byte revalidation。
 - 达到 scan limits 或遇到不可读子目录时，目前不会向 UI 投影精确 `truncated/skipped` count；当前三个
   source 未触发已知限制，但后续要声称“完整覆盖”前应补该可观察性。
-- `全部视频来源` 当前不会一次展开所有 Runs workspaces；操作员需要通过 workspace selector 切换。若未来
-  要建立跨 workspace history index，必须继续从 canonical read-only projection 汇总，不能另建 lifecycle
-  owner。
+- `全部视频来源` 当前不会一次展开所有 Runs workspaces；操作员需要通过统一来源 selector 中的
+  `Runs 工作区` 分组切换。若未来要建立跨 workspace history index，必须继续从 canonical read-only
+  projection 汇总，不能另建 lifecycle owner。
 - 应用层音轨、播放状态与 default HDMI sink 已验证，但实体显示器出声仍需要用户实际 Chrome playback
   stream 与硬件侧确认。若用户仍听不到，应先观察真实 Chrome PipeWire stream 和显示器 OSD，而不是改写
   媒体或引入第二套 audio path。
