@@ -160,6 +160,25 @@ Safety / Applicable Authorization Or Local Exemption
 
 `development_experiment` 只是 evidence / reporting classification 与 sequencing policy，不是新的 execution plane、API、schema enum、registry record 或 persistent lifecycle state。实验复用所选工具当前已批准或按`Local ComfyUI Authorization Exemption`免授权的execution seam：AI-VIDEO local video Provider仍必须经`VideoGenerationService`、sealed profile、preflight、local permit、唯一 committer、recovery与media verification，禁止直接调用Comfy transport或Provider `submit()`；remote / paid experiment仍须满足当前用户授权、budget、cloud-egress、secret、durable intent、one-use permit与unknown-outcome rules。实验 output / metadata 必须与 active Production truth隔离，结果只接受bounded technical / human triage，不得直接产生active capability、Production qualification、Manifest / Registry activation、P6 / Final Acceptance或release truth。Development experiment PASS / FAIL 均不得偷换frozen rubric或Production contract。
 
+### HyperFrames Caption Source Readiness
+
+- 每次改变 pinned HyperFrames version 前，必须重新打开该 exact version 的 bundled/generic
+  font-family tables，并同步 AI-VIDEO 的 same-name font-family preflight。不得把 alias、OS-local
+  substitution、`@font-face local()`、silent fallback、disabled lint 或 alternate renderer path
+  当作 renderer caption readiness。
+- Readiness evidence 必须同时包含 exact materialized Production source 的 lint/render PASS；raw
+  generic-font arm、source-string assertion、browser availability 或 renderer binary 可执行都不能单独
+  关闭该 Gate。Unknown、alias-substituted 或未验证 custom family 必须 fail closed。
+- 同步后必须使用 pinned binary/browser paths 运行
+  `tests/test_production_hyperframes.py::test_p4_source_rejects_caption_font_outside_pinned_renderer_contract`
+  与
+  `tests/test_production_hyperframes.py::test_p4_production_renderer_gate_renders_resolved_audio_and_captions`。
+  前者必须证明 unsupported family 在 staging effect 前以 typed failure 停止；后者必须证明 exact
+  Production source 通过 selected renderer 的 materialization、lint、render 与 verification seam。
+- 本规则不改变 `ResolvedTimeline`、HyperFrames selection、`ProductionStateCommitter`、caption truth、
+  activation、CAPTION P6、Final Acceptance 或 Provider authorization ownership，也不把某一组已验证
+  Chinese cues 外推为 broad glyph coverage。
+
 ## 5. Repository-Specific Don't Repeat This
 
 本 section 保存可复用的 implementation pitfall 与工具选择；已经真实发生、可复现且值得

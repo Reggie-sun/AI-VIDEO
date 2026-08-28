@@ -14,13 +14,13 @@ active_candidate_commit:
 active_adoption_commit:
 pending_claim_version: 3
 pending_evidence_status: SUPPORTED
-pending_approval_status: PENDING_CONFIRMATION
-pending_adoption_status: NOT_ADOPTED
-confirmed_candidate_sha256:
-confirmed_candidate_commit:
-confirmed_by:
-confirmed_at:
-confirmation_evidence:
+pending_approval_status: CONFIRMED
+pending_adoption_status: APPLYING
+confirmed_candidate_sha256: f845f5d1aa589527f6987156cd07f79769220a75c16e372aabca7318574ceb17
+confirmed_candidate_commit: 0d01a97f7c340baf350c6681274c0dde9fce5b96
+confirmed_by: user
+confirmed_at: 2026-08-29T03:40:12+08:00
+confirmation_evidence: conversation-confirmation:2026-08-29:hyperframes-caption-exact-source-readiness-v3
 supersedes: 692e8b2fa5eaf3a24d0d288b08eb95dc89bddd79 / e5a9a65aaa6d98a29879f0afaafb0cb392f9b0d1fb562c8cfe6b681af2d008ba
 retired_by:
 ---
@@ -214,18 +214,21 @@ No adoption target has been modified before confirmation.
 
 ### Confirmation
 
-`pending_approval_status`: `PENDING_CONFIRMATION`.
+`pending_approval_status`: `CONFIRMED`.
 
-The path-only candidate checkpoint commit and SHA-256 of its exact committed bytes will be
-presented after this revision is committed. Any change to evidence, scope, recommendation, target,
-or candidate bytes invalidates that confirmation identity.
+用户确认了 commit `0d01a97f7c340baf350c6681274c0dde9fce5b96` 中 SHA-256
+`f845f5d1aa589527f6987156cd07f79769220a75c16e372aabca7318574ceb17` 的 exact candidate。
+本次 adoption 只覆盖预览中声明的 Gate owner、target path、behavior change 与 verification；
+evidence、scope、recommendation、target 或 candidate bytes 发生变化时必须重新确认。
 
 ### Adoption Evidence
 
-`pending_adoption_status`: `NOT_ADOPTED`.
+`pending_adoption_status`: `APPLYING`.
 
-There is no target mutation, adoption commit, adoption Harness receipt, Product state change,
-Provider action, activation, CAPTION P6, Final Acceptance, push, or release evidence.
+已开始向 `.agent/context/control-plane-playbook.md` 应用确认过的 bounded Gate maintenance rule。
+在 target owner checks 与 exact-range Harness 通过前，v3 仍不构成 `ADOPTED`。本次 application
+不写 Product state，不调用 Provider，不生成媒体，不改变 activation、CAPTION P6、Final Acceptance，
+也不执行 push 或 release。
 
 ## Supersession And Reopen Conditions
 
