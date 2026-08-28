@@ -69,7 +69,8 @@ single case 扩张成 Provider-wide 或 model-wide rule。
 后续 task-relevant local ComfyUI lifecycle、generation、repair/retry、variant 与 benchmark 无需 user
 authorization，但仍必须形成新的 exact identity、通过全部适用 Provider / media gates，并在 unknown outcome
 时 fail closed。Per-Shot `FAIL` / `NOT_EVALUATED` 仍终止当前 batch；新 attempt 不得自动串联。V6 technical
-PASS、HUMAN `NOT_EVALUATED`、M7–M9 deferred、P6 / Final Acceptance 与 publication boundary 均未改变。
+PASS 及 M7–M9 deferred、P6 / Final Acceptance 与 publication boundary 均未改变；V6 当时的 HUMAN
+`NOT_EVALUATED` 已由本记录顶部 exact assembly playback `FAIL` supersession 取代。
 
 ## V6 Current Checkpoint — 2026-08-28
 
@@ -198,10 +199,11 @@ Production qualification、commercial acceptance 或 release truth。
 | `readability` | PASS | cap placement、correct hand assignment、nozzle-to-underarm plume、plume stop、clean no-mist gap 与 terminal relief 在 single take 中可区分；无 terminal spray persistence |
 
 Shot C `technical_gate=PASS`，`all_required_findings_pass=true`；Shot B 与 Shot C 现在均有 exact-byte technical
-Gate `PASS` evidence。`human_verdict=NOT_EVALUATED` 保持不变，technical PASS 不等于 HUMAN PASS、P6、
-Final Acceptance、Production qualification、commercial acceptance 或 release truth。
+Gate `PASS` evidence。在该 Shot-level checkpoint 时 `human_verdict=NOT_EVALUATED`；后续 exact assembly human
+playback 已按本记录顶部 supersession 判为 `FAIL`。Technical PASS 不等于 HUMAN PASS、P6、Final Acceptance、
+Production qualification、commercial acceptance 或 release truth。
 
-### V6 Current Stop
+### Historical V6 Stop Before Human Playback
 
 V6 task-scoped authorization 已按 exact scope 消耗完毕，未留下 later Provider submit、retry、variant、fallback
 或 assembly authorization。ComfyUI queue 在 cleanup 前为空；repository supervisor 已停止，listener 已关闭，
@@ -209,9 +211,9 @@ checkout 已恢复为 clean `e01fb4c56b7a88149d469b99cbbfe3223d715054`。
 
 M6 Shot A、Shot B 与 Shot C technical Gates 均为 `PASS`。用户已精确授权 `15.5s` review assembly preview，
 exact one-shot hard-cut stream-copy assembly 与预授权 local verification 已完成；micro-sequence
-`human_verdict=NOT_EVALUATED`，必须停在用户 uninterrupted `1.0x` full-speed/full-audio review。`30s`
-assembly、M7–M9、qualification、aggregate Gate expansion、P6、Final Acceptance、Production qualification、
-commercial acceptance 与 release 继续 deferred。
+当时的 `human_verdict=NOT_EVALUATED` stop 已由本记录顶部用户 playback `FAIL` 关闭。`30s` assembly、M7–M9、
+qualification、aggregate Gate expansion、P6、Final Acceptance、Production qualification、commercial
+acceptance 与 release 继续 deferred。
 
 ### 15.5s Review Assembly Exact Authorization Preview
 
@@ -285,13 +287,11 @@ commercial acceptance 与 release 继续 deferred。
   SHA-256 `19335d8402fe0317973989bcd1d0a6e1dc5deaecd7b86408ce37b756d58856a2`。
 - Technical status: `PASS_WITH_CONCERNS`；它只说明 exact identity、stream structure、frame count 与 full decode
   到达预览 contract，同时保留 timestamp/audio-seam concern。它不是 HUMAN PASS 或 HUMAN FAIL。
-- Current stop: `human_verdict=NOT_EVALUATED`。必须由用户对 exact SHA-256
-  `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 做 uninterrupted `1.0x`
-  full-speed/full-audio review，逐项判断 A→B、B→C causal continuity、camera/conditioning、performance、
-  no-dialogue Dialogue Performance/Lip-sync、readability/pacing 与两个 audio seams。当前授权已耗尽，不得自动
+- Historical stop: `human_verdict=NOT_EVALUATED`。用户随后已对该 exact SHA-256 完成 playback 并判定
+  watchability / commercial baseline / assembly acceptance 为 `FAIL`，以本记录顶部 supersession 为准。不得自动
   repair、retry、30s assembly 或继续 M7–M9。
-- Automatic learning evaluation remains `no_candidate`：这是同一 exact input set 的单次 deterministic review
-  remux，尚无 HUMAN verdict，也没有 independent generative attempt 或 controlled comparison。
+- 当时的 automatic learning evaluation 为 `no_candidate`；本轮 HUMAN `FAIL` 后重新评估仍为
+  `no_candidate`，原因与多变量 comparison boundary 见顶部 supersession。
 
 Durable `15.5s` exact review assembly output checkpoint:
 `f9c2a410ccfafa53f850e23f3e4705dd19e32d30`。
