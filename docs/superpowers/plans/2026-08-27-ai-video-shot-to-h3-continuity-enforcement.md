@@ -114,7 +114,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / blocked before media | Drama owner/rubric spec与exact fixture已accepted；baseline与authoring package仍未exact accepted/sealed，且没有Drama HUMAN media evidence；不得从 Commercial evidence 推断 |
+| `M6-D Drama` | `NOT_EVALUATED` / blocked before media | Drama owner/rubric spec与exact fixture已accepted；一次baseline-reference acquisition只生成了Shot 1 exact bytes，但required HUMAN per-Shot findings仍为`NOT_EVALUATED`并在Shot 2前停止；baseline与authoring package仍未exact accepted/sealed，不得从该reference或Commercial evidence推断M6-D PASS |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -783,6 +783,12 @@ Current status is B-D0 `BLOCKED_BEFORE_MEDIA`（spec + fixture accepted；baseli
 post-media productization、M8 adapter/qualification expansion and M9 routing/Harness completion remain explicitly
 deferred。The existing v12/v13/M6-C bytes remain Commercial/shared regression evidence；none can be promoted to Drama
 or dual-domain PASS by relabeling technical receipts。
+
+The local baseline-reference acquisition recorded in
+`docs/record_for_agent/2026-08-29-drama-baseline-reference-shot-01-gate-stop.md` is not M6-D execution。It produced one
+exact development-reference MP4, then stopped before Shot 2 because exact `1.0x` HUMAN authority had not accepted the
+required per-Shot findings。Those bytes are only a proposed reference input；they do not seal the baseline or authoring
+package, do not clear B-D0, and do not authorize retry, continuation, P6 or Final Acceptance。
 
 Stop immediately and report rather than expanding scope when：
 
