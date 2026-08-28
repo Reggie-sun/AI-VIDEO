@@ -22,6 +22,17 @@ Date: 2026-08-28
 - target-owner focused evidence：unsupported-font/no-staging regression PASS；pinned
   `hyperframes@0.7.103` + Chrome `152.0.7928.2` exact Production renderer Gate PASS。
 
+Exact renderer Gate 在 `/tmp/ai-video-caption-adoption.OODyl5/` 生成了隔离的 ephemeral
+fixture/evidence，其中 `caption-frames.json` SHA-256 为
+`a241daac5c5a326de70adfed93270b0b265c4267eb8c98d40db3d804103ac7f1`。这属于 mandatory local
+renderer test effect，不是 Provider 或 Production media，不进入 Registry、Manifest、P6、Final
+Acceptance 或 delivery truth。Active Claim 随后的 boundary clarification commit 为 `299a269`。
+
+上述 adoption 与 active-claim receipts 创建时均对各自 exact commit snapshot 验证为 fresh、
+snapshot-matching。之后 concurrent Agent Memory commit 推进了 shared `HEAD`，所以从更晚的 current
+HEAD 重跑 `verify-receipt` 会显示旧 receipt `fresh=false` / `snapshot_matches=false`；这不应被改写成
+current-HEAD completion proof，也不授权把无关 commit 归入本任务。
+
 Active v3 只采用“HyperFrames version change 必须同步 exact bundled/generic font table、preflight
 与两条 executable seams”的维护规则。它不改变 Runtime、`ResolvedTimeline`、renderer selection、
 `ProductionStateCommitter`、CAPTION P6、Final Acceptance 或 Provider authorization，也不授权媒体、
