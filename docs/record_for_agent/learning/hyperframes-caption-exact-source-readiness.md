@@ -7,7 +7,7 @@ active_adoption_status: NOT_ADOPTED
 active_candidate_sha256:
 active_candidate_commit:
 active_adoption_commit:
-pending_claim_version: 1
+pending_claim_version: 2
 pending_evidence_status: SUPPORTED
 pending_approval_status: PENDING_CONFIRMATION
 pending_adoption_status: NOT_ADOPTED
@@ -16,169 +16,173 @@ confirmed_candidate_commit:
 confirmed_by:
 confirmed_at:
 confirmation_evidence:
-supersedes:
+supersedes: bcd2215 / 14012cdb907b5bf29cd7359fa96676db84785d4d263c67f18b691578a00748f9
 retired_by:
 ---
 
-# Exact Production Source Is Required for HyperFrames Caption Readiness
+# Exact Production Source And Pinned Font Contract Determine HyperFrames Caption Readiness
 
-Date: 2026-08-28
+Date: 2026-08-29
 
 ## Active Claim
 
-None. This is the first candidate (`active_claim_version: 0`) and no target
-currently consumes an adopted version.
+None. `active_claim_version: 0`; no target consumes an adopted version. Pending v1 was never
+confirmed or adopted, and its exact preimage remains preserved by commit `bcd2215` with SHA-256
+`14012cdb907b5bf29cd7359fa96676db84785d4d263c67f18b691578a00748f9`.
 
 ## Pending Candidate
 
 ### Failure Pattern
 
-`failure_pattern`: A raw pinned-HyperFrames caption capability render can pass
-while the exact AI-VIDEO Production source fails before rendering. In the
-observed controlled comparison, the raw source used generic `sans-serif`, but
-the Production source emitted selected custom `font_family: "Fixture Sans"`
-without a matching `@font-face`; HyperFrames lint rejected the exact source as
-`font_family_without_font_face`.
+`failure_pattern`: Raw pinned-HyperFrames caption capability can pass while exact AI-VIDEO
+Production source fails before rendering. After replacing a fictional fixture family with a
+renderer-bundled canonical family, exact Production source can pass; without an early runtime
+font contract, however, arbitrary or alias-substituted families can still reach source lint and
+fail after materialization begins.
 
-Therefore a raw renderer capability PASS, source-string unit assertion, or
-successful browser launch is insufficient evidence of Production caption
-render readiness. Readiness requires the exact materialized Production source
-to pass the selected renderer's current lint/render contract.
+Therefore renderer readiness cannot be inferred from a raw generic-font arm, a source-string unit
+assertion, or browser availability. It requires both a fail-closed pinned font-family preflight and
+the exact materialized Production source passing the selected renderer's lint/render gate.
 
 ### Hypothesis
 
-`hypothesis`: The observed failure is a contract mismatch between AI-VIDEO's
-caption-style/source policy and the pinned renderer, not a general failure of
-the renderer binary, browser, local audio path, or network isolation.
+`hypothesis`: The observed failure was caused by a fictional `Fixture Sans` family outside the
+same-name canonical bundled/generic tables accepted by `hyperframes@0.7.103`, combined with a
+missing AI-VIDEO preflight. It was not a general failure of the renderer binary, Chrome, local
+audio, caption timing, or network isolation.
 
-Held constants were repository checkout, `hyperframes@0.7.103`, Chrome
-Headless Shell `152.0.7928.2`, local execution, and a network namespace with
-only `lo`. The isolated candidate variable was source/font construction:
-generic `sans-serif` in the raw arm versus selected custom `Fixture Sans` in
-the Production arm. AI-VIDEO emits the custom family but forbids `@font-face`;
-the pinned renderer requires `@font-face` for a non-auto-resolved family.
+Held constants across the fail/pass evidence were the AI-VIDEO P3/P4 source path, pinned
+HyperFrames/Chrome runtime, local isolated execution, deterministic audio/timeline inputs, and
+the same Production renderer gate. The relevant changes were font identity (`Fixture Sans` to
+canonical `Inter`) and the addition of pre-staging validation. A public-seam mutation experiment
+isolated the validation behavior: deleting the allowlist check made the unsupported-font
+regression fail with `DID NOT RAISE`; restoring it made the test pass.
 
-The comparison does not yet distinguish every possible repair: an explicit
-content-addressed local font asset contract, a narrower renderer-resolvable
-font policy, or another contract-preserving source representation remain
-uncompared.
+This does not prove that the hard-coded set will remain correct after a HyperFrames upgrade, that
+all bundled families contain every required glyph, or that content-addressed custom font assets
+are supported.
 
 ### Supporting Evidence
 
 `supporting_evidence`:
 
 1. Stable session record
-   `docs/record_for_agent/2026-08-28-caption-quality-gate-implementation-plan.md`
-   at commit `6bdca35cb6b6e35ddbf1fc60cbd236e64b89aa1b`, committed bytes SHA-256
-   `73aa8f64510f00a79df20aa519d29c38220534cef70f2322a0e6502e8e95d205`.
-   It records commands, exact artifacts, proof-layer boundaries, and the
-   fail-closed Production verdict.
-2. Controlled-comparison summary
-   `runs/caption-quality-gate-real-validation-20260828-v1/validation-summary.json`,
-   SHA-256
-   `f4d09142a8dc636f7e23f9a50c5c93eec6085a2ea5cb59236ffe73f71a09247d`.
-3. Raw arm PASS artifact
-   `runs/caption-quality-gate-real-validation-20260828-v1/media/raw-p4-caption-capability.mp4`,
-   SHA-256
-   `5e9278b39c3fa52adfb2664423a35aadbe05022ca404385dd6aeb0a9a6df129f`.
-   The real renderer test passed, audio was present, and exact half-open caption
-   visibility `[15,45)` was observed at frames `14/15/44/45`.
-4. Production arm FAIL source
-   `runs/caption-quality-gate-real-validation-20260828-v1/production-failure/index.html`,
-   SHA-256
-   `f721aa805e6a6c034cded08fa6369c18c41252b2ee898b66bfcff916ec0b6dbd`,
-   and failed Manifest
-   `runs/caption-quality-gate-real-validation-20260828-v1/production-failure/manifest.json`,
-   SHA-256
-   `d6a3a351cdffff499d4012bf303ea6201df5da1ca77289802cca102b310f4407`.
-   The durable attempt stopped at `render_phase=lint` with
-   `renderer_source_invalid`; no MP4, active render, or CAPTION P6 receipt was
-   produced.
-5. Current code evidence at the same checkout:
-   `src/ai_video/production/_hyperframes_source.py::_caption_style_css()`
-   emits the arbitrary selected family (file SHA-256
-   `b225a9476c35616c12411ff01a5b05bab40f9f277fab447d6d308d778a5242b9`),
-   while
-   `src/ai_video/production/hyperframes.py::_parse_source_document()` marks
-   `@font-face` as an external style/font surface (file SHA-256
-   `8736a74e4baeef34e3caf3a1524a967a1770e272f80c1130b67062bb4a323754`).
+   `docs/record_for_agent/2026-08-28-caption-quality-gate-implementation-plan.md` at commit
+   `ccb3e4bd6891552ce8f5a0986bdc9b174bda3ff1`, committed bytes SHA-256
+   `6916c679f2d9e1cf313d68a1d7e4cd3a570fe3939f9d6718deb2b42b2455dadb`. It reconciles the
+   pre-fix FAIL with the post-fix exact Production PASS and preserves proof-layer boundaries.
+2. Pre-fix controlled comparison
+   `runs/caption-quality-gate-real-validation-20260828-v1/validation-summary.json`, SHA-256
+   `f4d09142a8dc636f7e23f9a50c5c93eec6085a2ea5cb59236ffe73f71a09247d`: raw generic
+   `sans-serif` PASS versus exact Production `Fixture Sans` lint FAIL
+   `font_family_without_font_face`.
+3. Post-fix validation summary
+   `runs/caption-quality-gate-font-fixture-fix-20260828-v1/validation-summary.json`, SHA-256
+   `4174a7bd3debece5781a675583fa5869057aa3fe1bfc7097bc4861efa6cc539e`. The exact
+   Production fixture using `Inter` passed materialization, lint, check, render, verification,
+   test-fixture activation, audio measurement, and caption frame-boundary checks.
+4. Post-fix exact MP4
+   `runs/caption-quality-gate-font-fixture-fix-20260828-v1/media/production-caption-inter.mp4`,
+   SHA-256 `e3b319bd2ed6d47ce382a34bef97edd724ddb3a49d40f301e878853e21709ab4`.
+   It is H.264 `1280x720`, `24fps`, `2.022s`, contains AAC audio, and project-local
+   `video-analysis video_review` reported `96/96` unique sampled frames and `issues=[]`.
+5. Exact caption boundary evidence
+   `runs/caption-quality-gate-font-fixture-fix-20260828-v1/renderer-evidence/caption-frames.json`,
+   SHA-256 `a241daac5c5a326de70adfed93270b0b265c4267eb8c98d40db3d804103ac7f1`:
+   caption pixels are present on frames `0/11/13/23` and absent on `12/24`, matching `[0,12)`
+   and `[13,24)`.
+6. Runtime fix commit `0ed672e8dcff68ff8e55e9e736f1361611d7783a`; committed
+   `src/ai_video/production/_hyperframes_source.py` SHA-256
+   `cceb6cb88219204a8c5bf674e0357a40b2d97d63eeb434d8e11f19c1637fdde7`. The public
+   materializer regression verifies typed `RENDERER_SOURCE_INVALID` and no `staging_root` for an
+   unsupported family. Mutation removal produced RED before restoration.
+7. Fresh exact-range Harness receipt
+   `.agent/harness/runs/caption-font-contract-fix-20260828/receipt.json` for
+   `ad7ce081..0ed672e`: Architecture Gate PASS, Harness `204 passed`, Production contract
+   `2900 passed, 3 skipped, 1225 deselected`, CLI/config `13 passed`; receipt verification reports
+   complete, fresh, snapshot-matching proof.
 
 ### Counter Evidence
 
 `counter_evidence`:
 
-- The raw generic `sans-serif` arm rendered successfully. This directly
-  counters any broader claim that the pinned renderer/browser or all caption
-  fonts are broken.
-- Only one non-auto-resolved family (`Fixture Sans`) was exercised against the
-  exact Production source. No controlled local `@font-face`, known
-  renderer-auto-resolved custom family, or cross-platform arm was run.
-- Repository records and current tests were searched for an exact successful
-  pinned-version Production render using the same custom-font construction;
-  none was found. This absence is a coverage limitation, not proof that no
-  environment could resolve the family.
-- The Qingyan V4 review-only MP4 contains readable burned-in Chinese captions,
-  but it is not bound to the current canonical CaptionTrack/ResolvedTimeline
-  and does not exercise this Production source path, so it neither supports nor
-  refutes custom-font Production readiness.
+- The raw generic `sans-serif` arm and post-fix canonical `Inter` Production arm both pass. This
+  refutes the broader v1 reading that all selected non-generic families require a new local
+  `@font-face` asset contract or that the pinned renderer cannot render Production captions.
+- The live Production arm exercised only `Inter`; `EB Garamond` is covered by deterministic tests
+  but not a separate real-render arm. No cross-host or renderer-upgrade comparison was executed.
+- A same-name bundled family can still lack a required language glyph. The current evidence does
+  not establish Chinese, bilingual, emoji, or rare-glyph coverage and does not measure perceptual
+  readability.
+- Custom content-addressed font assets remain outside the implemented contract. The fix rejects
+  arbitrary custom family names; it does not add a secure font asset schema or prove that
+  `@font-face local()` would preserve authored identity.
+- Qingyan V4 review-only captions remain outside the canonical active
+  CaptionTrack/ResolvedTimeline/final-media chain, so they do not establish CAPTION P6 or refute
+  this source-readiness rule.
+- A focused `experience` RAG follow-up returned the pre-fix claim and record as fresh indexed
+  advisory sources; current code, committed record, exact artifacts, and receipt were reopened
+  directly because retrieval excerpts do not establish current runtime truth.
 
 ### Scope And Exclusions
 
-`scope`: AI-VIDEO's current P3/P4 HyperFrames path as observed on 2026-08-28,
-with `hyperframes@0.7.103`, Chrome Headless Shell `152.0.7928.2`, exact
-materialized caption source, and a caption style selecting a non-auto-resolved
-font family without an accepted local font declaration.
+`scope`: AI-VIDEO's P3/P4 HyperFrames caption source path using `hyperframes@0.7.103`, Chrome
+Headless Shell `152.0.7928.2`, the same-name canonical bundled/generic family contract implemented
+at commit `0ed672e`, and local isolated exact-source lint/render evidence from 2026-08-28 through
+2026-08-29.
 
-`exclusions`: Do not extrapolate this claim to generic CSS families, every
-installed font, other HyperFrames versions, other renderers, Provider output,
-caption semantic correctness, perceptual readability, CAPTION P6, Final
-Acceptance, activation, release, or Qingyan V4 quality. The claim does not
-select a font-asset schema or authorize a Product Runtime fix.
+`exclusions`: Do not extrapolate to future HyperFrames versions, other renderers, installed OS font
+aliases, custom font assets, cross-host reproducibility, required-language glyph coverage, caption
+semantics, perceptual readability, Provider output, CAPTION P6, Final Acceptance, activation,
+release, or Qingyan V4 quality. This candidate does not authorize Product Runtime changes or
+reclassify the P4 test Manifest as Production acceptance.
 
 ### Evidence Assessment
 
 `pending_evidence_status`: `SUPPORTED`.
 
-The threshold is met by one controlled two-arm comparison that held the
-renderer/browser/local execution boundary constant and isolated source/font
-construction. The claim is intentionally limited to readiness evidence and the
-observed source contract. A successful exact Production custom-font render at
-the same pinned versions would materially counter it; a controlled local-font
-declaration arm would narrow the recommended contract repair.
+Admission is satisfied because new exact evidence materially narrows the existing pending claim:
+the original raw/Production comparison identified the boundary, and the fix plus exact Production
+PASS, public fail-closed regression, mutation RED, and fresh Harness receipt distinguish a fictional
+unsupported family from a canonical bundled family. Evidence remains bounded to the pinned
+runtime and one live canonical-family arm. A same-version exact-source failure using `Inter`, an
+allowlisted alias that silently substitutes, or a mismatch between the allowlist and renderer
+tables would make this claim `CONTESTED`.
 
 ### Recommended Action
 
-`recommended_action`: Adopt a fail-closed readiness rule: whenever Production
-captions select a non-generic font, only the exact materialized Production
-source passing the pinned HyperFrames lint and real render gate may establish
-renderer readiness. Raw generic-font capability evidence must remain scoped to
-the raw arm. Until a separate content-addressed local-font contract is accepted
-and verified, a custom-font lint failure must stop before CAPTION P6 and must
-not be hidden by silent font substitution, disabled lint, or an alternate
-renderer path.
+`recommended_action`: Adopt a maintenance Gate rule: any HyperFrames version change must reopen
+the exact renderer bundled/generic font tables, synchronize the AI-VIDEO preflight without admitting
+aliases, and rerun both the public unsupported-font/no-staging regression and the exact Production
+renderer gate. Readiness evidence must continue to distinguish raw capability from exact
+Production-source lint/render evidence. Unknown, alias-substituted, or unverified custom families
+must fail closed and must not be hidden by `@font-face local()`, silent fallback, disabled lint, or
+an alternate renderer path.
 
-This candidate requests confirmation of the readiness rule only. It does not
-authorize choosing or implementing the later font-asset repair.
+The current runtime fix was directly authorized by the user and is already verified; it is not an
+automatic adoption of this Learning Claim. Confirmation would authorize only the bounded durable
+maintenance rule below.
 
 ### Adoption Target
 
 `adoption_target`: `Gate`.
 
-- Canonical owner and target paths:
-  `docs/agent-primary-contract-matrix.md` P3/P4 verification contract and
-  `.agent/context/control-plane-playbook.md` empirical final-composition
-  preflight; the executable seam remains
+- Canonical owner and exact target path:
+  `.agent/context/control-plane-playbook.md`, under the existing empirical final-composition /
+  renderer preflight guidance.
+- Expected behavior change: document that a pinned HyperFrames version change must synchronize the
+  same-name font-family contract and rerun the two existing executable seams before claiming caption
+  source readiness.
+- Executable seams remain
+  `tests/test_production_hyperframes.py::test_p4_source_rejects_caption_font_outside_pinned_renderer_contract`
+  and
   `tests/test_production_hyperframes.py::test_p4_production_renderer_gate_renders_resolved_audio_and_captions`.
-- Expected behavior change: readiness records must distinguish raw capability
-  from exact Production-source lint/render evidence and stop fail closed on the
-  latter's custom-font incompatibility.
-- Unchanged contracts: `ResolvedTimeline`, HyperFrames selection,
-  `ProductionStateCommitter`, caption source truth, activation, CAPTION P6, and
-  Final Acceptance ownership remain unchanged; no Provider or network effect.
-- Planned verification after confirmation: documentation contract checks,
-  policy audit, the raw real-renderer gate, and the exact Production renderer
-  gate using pinned binary/browser paths. A Production gate failure remains a
-  truthful blocker, not an adopted PASS.
+- Unchanged contracts: `ResolvedTimeline`, HyperFrames selection, `ProductionStateCommitter`,
+  caption truth, activation, CAPTION P6, Final Acceptance, Provider authorization, and current
+  Product Runtime code remain unchanged.
+- Planned verification after confirmation: documentation contract check, policy audit, task-delta
+  Architecture Gate, the public unsupported-font regression, and the exact Production renderer
+  gate with pinned binary/browser paths.
 
 No adoption target has been modified before confirmation.
 
@@ -186,26 +190,23 @@ No adoption target has been modified before confirmation.
 
 `pending_approval_status`: `PENDING_CONFIRMATION`.
 
-The candidate checkpoint commit and SHA-256 of the exact committed claim bytes
-will be presented out-of-band after the path-only checkpoint commit. Any change
-to this claim, its evidence, scope, recommendation, or target invalidates that
-confirmation identity.
+The path-only candidate checkpoint commit and SHA-256 of its exact committed bytes will be
+presented after this revision is committed. Any change to evidence, scope, recommendation, target,
+or candidate bytes invalidates that confirmation identity.
 
 ### Adoption Evidence
 
 `pending_adoption_status`: `NOT_ADOPTED`.
 
-There is no target mutation, adoption commit, Harness receipt, Production
-state change, Provider action, activation, CAPTION P6, or Final Acceptance
-evidence.
+There is no target mutation, adoption commit, adoption Harness receipt, Product state change,
+Provider action, activation, CAPTION P6, Final Acceptance, push, or release evidence.
 
 ## Supersession And Reopen Conditions
 
-Reopen or reconfirm this claim if the pinned renderer/browser changes, the
-caption-style/source policy accepts a verified content-addressed local font,
-the exact Production custom-font arm passes, or new evidence shows that the
-failure came from a held-constant runtime component. Mark it `CONTESTED` if an
-exact same-version/same-source counterexample appears, `REFUTED` if exact
-Production source no longer requires this distinction, and `RETIRED` if the
-selected renderer or caption source owner changes. `supersedes` and
-`retired_by` remain empty for this first version.
+Pending v2 supersedes only the unconfirmed pending v1 preimage at `bcd2215`; there is no active
+adopted claim to retire. Reopen or reconfirm if HyperFrames/Chrome changes, the bundled/generic
+tables change, a content-addressed custom-font contract is accepted, required-language glyph
+coverage becomes part of readiness, or exact same-version evidence contradicts the preflight.
+Mark `CONTESTED` for an unresolved exact counterexample, `REFUTED` if the preflight/source
+distinction no longer predicts renderer behavior, and `RETIRED` if HyperFrames or the caption
+source owner changes.
