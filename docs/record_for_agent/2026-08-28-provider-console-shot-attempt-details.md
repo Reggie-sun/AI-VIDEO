@@ -311,6 +311,10 @@ Verification：
   receipt：`.agent/harness/runs/provider-console-source-selector-20260828-v1/receipt.json`。Receipt verifier
   确认 `passed`、`fresh`、`snapshot_matches`、`scope_paths_match`、`scope_worktree_clean`、artifact integrity
   与 `complete_completion_proof` 均为 true。
+- Primary durable record update commit：`783b882b96d2bf0eef9349a00331cf28b828fbe4`。
+- `distill-ai-video-learning` automatic evaluation：`no_candidate`。本次只有一个 UI regression 与其修复，
+  不满足两个 independent attempts、controlled multi-arm comparison 或 existing-claim material update 门槛；
+  未创建 placeholder Learning Claim。
 
 本修复没有执行 Provider submit、paid/cloud call、媒体生成、Manifest mutation、activation、P6、
 Final Acceptance、push、deploy 或 release；只形成 local Git checkpoint 与 read-only browser evidence。
