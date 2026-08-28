@@ -1,13 +1,18 @@
 ---
 document_kind: learning_claim
 claim_id: hyperframes-caption-exact-source-readiness
+evidence_index_version: "1"
+admission_basis: MATERIAL_EXISTING_CLAIM_UPDATE
+material_update_target_claim: hyperframes-caption-exact-source-readiness
+material_update_previous_evidence: docs/record_for_agent/2026-08-29-qingyan-caption-final-acceptance.md#caption-readiness-v2-previous
+material_update_delta: V9 exact generic-sans Chinese Production evidence supersedes V4 NOT_EVALUATED and adds CAPTION_P6 plus FINAL_ACCEPTANCE proof
 active_claim_version: 0
 active_evidence_status: NONE
 active_adoption_status: NOT_ADOPTED
 active_candidate_sha256:
 active_candidate_commit:
 active_adoption_commit:
-pending_claim_version: 2
+pending_claim_version: 3
 pending_evidence_status: SUPPORTED
 pending_approval_status: PENDING_CONFIRMATION
 pending_adoption_status: NOT_ADOPTED
@@ -16,7 +21,7 @@ confirmed_candidate_commit:
 confirmed_by:
 confirmed_at:
 confirmation_evidence:
-supersedes: bcd2215 / 14012cdb907b5bf29cd7359fa96676db84785d4d263c67f18b691578a00748f9
+supersedes: 692e8b2fa5eaf3a24d0d288b08eb95dc89bddd79 / e5a9a65aaa6d98a29879f0afaafb0cb392f9b0d1fb562c8cfe6b681af2d008ba
 retired_by:
 ---
 
@@ -66,6 +71,12 @@ are supported.
 
 `supporting_evidence`:
 
+| evidence_ref | independence_key | experiment_id | attempt_id | arm_id | artifact_sha256 | proof_layer | verdict | source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| docs/record_for_agent/2026-08-29-qingyan-caption-final-acceptance.md#qingyan-v9-exact-media | qingyan-v9-canonical-artifact | qingyan-final-acceptance-canonicalization-20260829 | production-final-v9 | claim-safe-continuity | 9f3534ce93084a4f9b5e6b70b3d60e0599302202f73ef28d92bc762db1e78bd2 | EXACT_MEDIA_ANALYZER_AND_VISUAL | PASS | `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/evidence/final-acceptance-canonicalization-20260829/` |
+| docs/record_for_agent/2026-08-29-qingyan-caption-final-acceptance.md#qingyan-v9-caption-p6 | qingyan-v9-canonical-artifact | qingyan-final-acceptance-canonicalization-20260829 | production-final-v9 | claim-safe-continuity | 9f3534ce93084a4f9b5e6b70b3d60e0599302202f73ef28d92bc762db1e78bd2 | CAPTION_P6 | PASS | `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/production-final-v9/state/reviews/` |
+| docs/record_for_agent/2026-08-29-qingyan-caption-final-acceptance.md#qingyan-v9-final-acceptance | qingyan-v9-canonical-artifact | qingyan-final-acceptance-canonicalization-20260829 | production-final-v9 | claim-safe-continuity | 9f3534ce93084a4f9b5e6b70b3d60e0599302202f73ef28d92bc762db1e78bd2 | FINAL_ACCEPTANCE | PASS | `runs/qingyan-seedance2-fast-supported-hero-image-tail-20260828-001/production-final-v9/state/acceptance/final.2ac31c13692c47eeca778def2c0a4d6bad2921da2ed64d88a3275c8f91566e90.json` |
+
 1. Stable session record
    `docs/record_for_agent/2026-08-28-caption-quality-gate-implementation-plan.md` at commit
    `ccb3e4bd6891552ce8f5a0986bdc9b174bda3ff1`, committed bytes SHA-256
@@ -101,25 +112,35 @@ are supported.
    `ad7ce081..0ed672e`: Architecture Gate PASS, Harness `204 passed`, Production contract
    `2900 passed, 3 skipped, 1225 deselected`, CLI/config `13 passed`; receipt verification reports
    complete, fresh, snapshot-matching proof.
+8. Qingyan V9 stable record
+   `docs/record_for_agent/2026-08-29-qingyan-caption-final-acceptance.md` at commit
+   `18c0f9f8ce3de2c8caba56f5727ee501c54ab9d8`, committed bytes SHA-256
+   `b114e9bbad18116ff01d3d77b75b76c873a8373dd9c4d5d6a684d958819ac31a`. It binds the
+   exact generic `sans-serif` Chinese caption source to the V9 MP4, all four PASS review receipts,
+   CAPTION P6, and Final Acceptance without treating those proof layers as independent attempts.
 
 ### Counter Evidence
 
 `counter_evidence`:
+
+| evidence_ref | independence_key | experiment_id | attempt_id | arm_id | artifact_sha256 | proof_layer | verdict | source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| docs/record_for_agent/2026-08-29-qingyan-caption-final-acceptance.md#qingyan-v4-production-entry | qingyan-v4-review-only | qingyan-final-acceptance-canonicalization-20260829 | caption-repaired-v4 | review-only-source | 087497ae1b4be12b260899706c19698c8d7d88635708528a6b8cf0d1fd7ac4e1 | PRODUCTION_GATE | NOT_EVALUATED | `docs/record_for_agent/2026-08-28-caption-quality-gate-implementation-plan.md` |
 
 - The raw generic `sans-serif` arm and post-fix canonical `Inter` Production arm both pass. This
   refutes the broader v1 reading that all selected non-generic families require a new local
   `@font-face` asset contract or that the pinned renderer cannot render Production captions.
 - The live Production arm exercised only `Inter`; `EB Garamond` is covered by deterministic tests
   but not a separate real-render arm. No cross-host or renderer-upgrade comparison was executed.
-- A same-name bundled family can still lack a required language glyph. The current evidence does
-  not establish Chinese, bilingual, emoji, or rare-glyph coverage and does not measure perceptual
-  readability.
+- A same-name bundled family can still lack a required language glyph. V9 establishes the exact
+  selected Chinese cue set under generic `sans-serif`, not broad Chinese, bilingual, emoji, or
+  rare-glyph coverage, and not a reusable perceptual-readability guarantee.
 - Custom content-addressed font assets remain outside the implemented contract. The fix rejects
   arbitrary custom family names; it does not add a secure font asset schema or prove that
   `@font-face local()` would preserve authored identity.
 - Qingyan V4 review-only captions remain outside the canonical active
-  CaptionTrack/ResolvedTimeline/final-media chain, so they do not establish CAPTION P6 or refute
-  this source-readiness rule.
+  CaptionTrack/ResolvedTimeline/final-media chain. V9 supersedes that NOT_EVALUATED boundary with
+  one separate canonical chain; it does not retroactively upgrade V4.
 - A focused `experience` RAG follow-up returned the pre-fix claim and record as fresh indexed
   advisory sources; current code, committed record, exact artifacts, and receipt were reopened
   directly because retrieval excerpts do not establish current runtime truth.
@@ -129,13 +150,15 @@ are supported.
 `scope`: AI-VIDEO's P3/P4 HyperFrames caption source path using `hyperframes@0.7.103`, Chrome
 Headless Shell `152.0.7928.2`, the same-name canonical bundled/generic family contract implemented
 at commit `0ed672e`, and local isolated exact-source lint/render evidence from 2026-08-28 through
-2026-08-29.
+2026-08-29, including Qingyan V9's exact generic `sans-serif` Chinese cue set through CAPTION P6 and
+Final Acceptance.
 
 `exclusions`: Do not extrapolate to future HyperFrames versions, other renderers, installed OS font
 aliases, custom font assets, cross-host reproducibility, required-language glyph coverage, caption
-semantics, perceptual readability, Provider output, CAPTION P6, Final Acceptance, activation,
-release, or Qingyan V4 quality. This candidate does not authorize Product Runtime changes or
-reclassify the P4 test Manifest as Production acceptance.
+semantics outside the accepted V9 cues, reusable perceptual readability, other Provider outputs,
+other CAPTION P6 or Final Acceptance decisions, release, publication, or Qingyan V4 quality. This
+candidate does not authorize Product Runtime changes or reclassify the P4 test Manifest as
+Production acceptance.
 
 ### Evidence Assessment
 
@@ -144,9 +167,12 @@ reclassify the P4 test Manifest as Production acceptance.
 Admission is satisfied because new exact evidence materially narrows the existing pending claim:
 the original raw/Production comparison identified the boundary, and the fix plus exact Production
 PASS, public fail-closed regression, mutation RED, and fresh Harness receipt distinguish a fictional
-unsupported family from a canonical bundled family. Evidence remains bounded to the pinned
-runtime and one live canonical-family arm. A same-version exact-source failure using `Inter`, an
-allowlisted alias that silently substitutes, or a mismatch between the allowlist and renderer
+unsupported family from a canonical bundled family. Qingyan V9 additionally supersedes the earlier
+V4 `NOT_EVALUATED` boundary with exact generic `sans-serif` Chinese Production evidence reaching
+CAPTION P6 and Final Acceptance. This is a `MATERIAL_EXISTING_CLAIM_UPDATE`, not a second independent
+attempt: all V9 proof layers share one artifact identity. Evidence remains bounded to the pinned
+runtime and the exact accepted cue/artifact sets. A same-version exact-source failure using `Inter`,
+an allowlisted alias that silently substitutes, or a mismatch between the allowlist and renderer
 tables would make this claim `CONTESTED`.
 
 ### Recommended Action
@@ -203,7 +229,7 @@ Provider action, activation, CAPTION P6, Final Acceptance, push, or release evid
 
 ## Supersession And Reopen Conditions
 
-Pending v2 supersedes only the unconfirmed pending v1 preimage at `bcd2215`; there is no active
+Pending v3 supersedes only the unconfirmed pending v2 preimage at `692e8b2`; there is no active
 adopted claim to retire. Reopen or reconfirm if HyperFrames/Chrome changes, the bundled/generic
 tables change, a content-addressed custom-font contract is accepted, required-language glyph
 coverage becomes part of readiness, or exact same-version evidence contradicts the preflight.
