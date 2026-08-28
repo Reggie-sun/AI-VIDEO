@@ -18,6 +18,10 @@ nested Legacy reopen 和 workspace overview，strict Production invalid contract
 storyboard、normalized lifecycle outcome、安全 `error_code`，并把 strict fetched video 与 Registry
 candidate 分层显示。不得用 active Shot 代替历史 Shot，也不得从 Prompt 文本解析伪造 Shots。
 
+2026-08-28 external-media follow-up：在不改变 `/api/runs*` owner 的前提下，增加 local-only、read-only
+External Media Library，覆盖 `artifacts`、server allowlist ComfyUI output 与青颜项目目录。External bytes
+按 exact SHA-256 聚合；metadata 必须 exact-bound，所有 Production lifecycle 字段保持 `NOT_EVALUATED`。
+
 ## Contract Checkpoint Before Code
 
 - **Problem boundary:** 当前 Provider Console 是硬编码 demo，没有消费 `runs/`。
@@ -34,6 +38,10 @@ candidate 分层显示。不得用 active Shot 代替历史 Shot，也不得从 
   current workspace overview。
 - **Outcome/media separation:** Manifest attempt `status` 决定 lifecycle outcome；fetch receipt 只决定
   `fetched_media`，Registry identity 只决定 `candidate_media`。两者都不产生 QA/activation truth。
+- **External media owner:** dependency-free Node catalog 只拥有 allowlisted external file discovery、SHA grouping、
+  exact-bound sidecar projection 与 descriptor-bound media reads；它不拥有 Production lifecycle 或 import。
+- **Old external path:** 不存在可退休的 canonical path；新增 view 与 `/api/runs*` 平行，现有 strict runs flow
+  保持不变。
 - **Focused verification:**
   `python -m pytest -p no:cacheprovider tests/test_provider_console.py -q`。
 
@@ -46,6 +54,9 @@ candidate 分层显示。不得用 active Shot 代替历史 Shot，也不得从 
 - `provider-console/scripts/runs-api.mjs`
 - `provider-console/tests/runs-api.test.mjs`
 - `provider-console/src/run-detail-contract.js`
+- `provider-console/scripts/external-media.mjs`
+- `provider-console/tests/external-media.test.mjs`
+- `provider-console/src/external-media-contract.js`
 
 ### Modify
 
@@ -54,7 +65,8 @@ candidate 分层显示。不得用 active Shot 代替历史 Shot，也不得从 
 - `provider-console/src/styles.css`
 - `provider-console/design-qa.md`
 - `provider-console/AGENTS.md`，记录 durable “real runs, no static demo fallback” rule。
-- canonical runtime docs / Harness policy only if exact changed-path inspection requires routing updates。
+- `.agent/harness/policy.yaml` 与 `tests/test_agent_harness.py`，把 external catalog/test 纳入既有
+  `provider_console_node_tests`，避免 unmapped fallback。
 
 ### Must Not Modify
 
@@ -88,6 +100,12 @@ Attempt-detail extension：rail 直接显示 outcome/phase/media/prompt 摘要�
 sealed Prompt、inputs、fetched/candidate video 和 lifecycle evidence 分层。`failed`、`interrupted`、
 `outcome_unknown` 与 `running` 使用不同状态语义，且 `failed + fetched_media` 仍可播放用于人工判断。
 
+External-media extension：新增独立 mode switch、source filter、search 与 SHA group rail。Node catalog 只扫描
+server allowlist regular non-symlink videos，按 exact SHA 去重，保留所有 source-relative locations；只投影
+`ai-video-external-media-metadata/1` direct path/SHA binding 或通过 cross-fingerprint verification 的 evidence chain。外部状态必须标记为
+external reported status，canonical lifecycle 固定 `NOT_EVALUATED`；未知 sidecar schema 只保留 evidence ref，
+不解释通用 `type` / `state` / `status` 字段。
+
 ### T4 — Verification And Review
 
 运行：
@@ -97,6 +115,7 @@ python -m pytest -p no:cacheprovider tests/test_provider_console.py -q
 npm --prefix provider-console run test:sites
 npm --prefix provider-console run build
 node --test provider-console/tests/runs-api.test.mjs
+node --test provider-console/tests/external-media.test.mjs
 ```
 
 启动 local preview，用用户已选择的 Chrome 检查真实 catalog、Local H3 workspace、cloud workspace、媒体、
@@ -109,4 +128,5 @@ commit-range Harness/receipt verification。报告 local commit、receipt、未 
 
 ## Rollback
 
-回滚仅删除/恢复本 task tracked files与frontend integration；不删除任何 `runs/` artifact或Harness history。
+回滚仅删除/恢复本 task tracked files与frontend integration；不删除任何 `runs/`、`artifacts/`、ComfyUI output、
+外部项目媒体或 Harness history。

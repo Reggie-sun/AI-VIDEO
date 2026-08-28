@@ -12,6 +12,15 @@ import {
   outputState,
   shotForAttempt,
 } from "../src/run-detail-contract.js";
+import {
+  externalGroupTitle,
+  externalMediaUrl,
+  externalStatus,
+  groupMatchesQuery,
+  groupMatchesSource,
+  preferredExternalLocation,
+  readExternalCatalogResponse,
+} from "../src/external-media-contract.js";
 
 test("run detail contract keeps lifecycle outcome separate from phase and media", () => {
   assert.deepEqual(attemptOutcome({ status: "succeeded", phase: "activate" }), {
@@ -95,6 +104,44 @@ test("run detail contract derives generation mode and exact-attempt Shot only", 
   assert.deepEqual(shotForAttempt(detail, {
     target_shot_id: "shot-1",
   }), activeShot);
+});
+
+test("external media UI contract keeps non-canonical unknowns explicit", () => {
+  const group = {
+    sha256: "a".repeat(64),
+    status: "NOT_EVALUATED",
+    preview_token: "external_artifacts_preview",
+    locations: [
+      { source_id: "comfyui-output", relative_path: "raw/clip.mp4", file_name: "clip.mp4", token: "external_comfy_copy" },
+      { source_id: "artifacts", relative_path: "runtime/shot.mp4", file_name: "shot.mp4", token: "external_artifacts_preview" },
+    ],
+  };
+
+  assert.deepEqual(externalStatus(group), {
+    raw: "NOT_EVALUATED", label: "状态未评估", tone: "unknown", evaluated: false,
+  });
+  assert.equal(preferredExternalLocation(group).source_id, "artifacts");
+  assert.equal(externalMediaUrl(group), "/api/external-media/media/external_artifacts_preview");
+  assert.equal(externalGroupTitle(group), "shot.mp4");
+  assert.equal(groupMatchesSource(group, "artifacts"), true);
+  assert.equal(groupMatchesSource(group, "qingyan-project"), false);
+  assert.equal(groupMatchesSource(group, "all"), true);
+  assert.equal(groupMatchesQuery(group, "shot.mp4"), true);
+  assert.equal(groupMatchesQuery({ ...group, shot_id: "shot-07", prompt_text: "yellow bottle" }, "YELLOW BOTTLE"), true);
+  assert.equal(groupMatchesQuery(group, "missing"), false);
+  assert.equal(externalStatus({ status: "succeeded" }).tone, "unknown");
+  assert.equal(externalStatus({ status: "failed" }).tone, "unknown");
+  assert.equal(externalStatus({ status: "NOT_EVALUATED", reported_status: "succeeded" }).tone, "ready");
+  assert.equal(externalStatus({ status: "NOT_EVALUATED", reported_status: false }).tone, "blocked");
+});
+
+test("external catalog response maps static non-JSON failures to a stable Chinese unavailable state", async () => {
+  const catalog = { groups: [], sources: [] };
+  assert.deepEqual(await readExternalCatalogResponse({ ok: true, json: async () => catalog }), catalog);
+  await assert.rejects(
+    readExternalCatalogResponse({ ok: false, json: async () => { throw new SyntaxError("Unexpected token"); } }),
+    /外部媒体数据源不可用/,
+  );
 });
 
 function canonicalJson(value) {
@@ -181,6 +228,111 @@ test("catalog and detail are GET-only, no-store, and sanitize internal media pat
   const method = await invoke(handler, request("POST", "/api/runs"));
   assert.equal(method.res.statusCode, 405);
   assert.equal(method.res.headers.get("allow"), "GET");
+});
+
+test("external media catalog is parallel to runs, source-qualified, and never leaks allowlist roots", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-external-api-"));
+  const sourceRoot = path.join(root, "artifacts");
+  const media = path.join(sourceRoot, "qingyan", "shot-01.mp4");
+  const bytes = Buffer.from("external-video-bytes");
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  await mkdir(path.dirname(media), { recursive: true });
+  await writeFile(media, bytes);
+  const calls = [];
+  const projection = {
+    status: "ok",
+    boundary: { read_only: true, canonical: false },
+    sources: [{ id: "artifacts", label: "AI-VIDEO Artifacts", kind: "development_artifact", status: "available" }],
+    groups: [{
+      sha256,
+      status: "NOT_EVALUATED",
+      evidence_level: "non_canonical",
+      locations: [{ source_id: "artifacts", relative_path: "qingyan/shot-01.mp4", token: "external_artifacts_token" }],
+    }],
+    _media: {
+      external_artifacts_token: {
+        source_id: "artifacts",
+        source_path: media,
+        mime_type: "video/mp4",
+        bytes: bytes.length,
+        sha256,
+      },
+      external_unknown_token: {
+        source_id: "unknown",
+        source_path: media,
+        mime_type: "video/mp4",
+        bytes: bytes.length,
+        sha256,
+      },
+    },
+  };
+  const handler = createRunsApiHandler({
+    repoRoot: root,
+    runProjector: async () => ({ workspaces: [] }),
+    externalSources: [{ id: "artifacts", label: "AI-VIDEO Artifacts", kind: "development_artifact", root: sourceRoot }],
+    externalCatalog: async (options) => { calls.push(options); return projection; },
+  });
+
+  const catalog = await invoke(handler, request("GET", "/api/external-media"));
+  assert.equal(catalog.res.statusCode, 200);
+  assert.equal(catalog.res.headers.get("cache-control"), "no-store");
+  assert.equal(catalog.res.body.toString().includes(sourceRoot), false);
+  assert.equal(catalog.res.body.toString().includes("source_path"), false);
+  assert.equal(JSON.parse(catalog.res.body).groups[0].status, "NOT_EVALUATED");
+  assert.equal(calls.length, 1);
+  assert.equal(calls[0].sources[0].root, sourceRoot);
+
+  const ranged = await invoke(handler, request("GET", "/api/external-media/media/external_artifacts_token", { range: "bytes=0-7" }));
+  assert.equal(ranged.res.statusCode, 206);
+  assert.deepEqual(ranged.res.body, bytes.subarray(0, 8));
+  assert.equal(ranged.res.headers.get("content-type"), "video/mp4");
+
+  const head = await invoke(handler, request("HEAD", "/api/external-media/media/external_artifacts_token"));
+  assert.equal(head.res.statusCode, 200);
+  assert.equal(head.res.body.length, 0);
+
+  const unknownSource = await invoke(handler, request("GET", "/api/external-media/media/external_unknown_token"));
+  assert.equal(unknownSource.res.statusCode, 404);
+  const method = await invoke(handler, request("POST", "/api/external-media"));
+  assert.equal(method.res.statusCode, 405);
+  assert.equal(method.res.headers.get("allow"), "GET");
+});
+
+test("external media serving revalidates containment and exact bytes", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-external-swap-"));
+  const sourceRoot = path.join(root, "comfy-output");
+  const media = path.join(sourceRoot, "clip.mp4");
+  const outside = path.join(root, "outside.mp4");
+  const bytes = Buffer.from("0123456789");
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  await mkdir(sourceRoot, { recursive: true });
+  await writeFile(media, bytes);
+  await writeFile(outside, bytes);
+  const descriptor = {
+    source_id: "comfyui-output",
+    source_path: media,
+    mime_type: "video/mp4",
+    bytes: bytes.length,
+    sha256,
+  };
+  const handler = createRunsApiHandler({
+    repoRoot: root,
+    runProjector: async () => ({ workspaces: [] }),
+    externalSources: [{ id: "comfyui-output", label: "ComfyUI Output", kind: "raw_provider_output", root: sourceRoot }],
+    externalCatalog: async () => ({ status: "ok", sources: [], groups: [], _media: { external_comfy_token: descriptor } }),
+  });
+  await invoke(handler, request("GET", "/api/external-media"));
+
+  await unlink(media);
+  await symlink(outside, media);
+  const escaped = await invoke(handler, request("GET", "/api/external-media/media/external_comfy_token"));
+  assert.equal(escaped.res.statusCode, 503);
+  assert.equal(escaped.res.body.toString().includes(outside), false);
+
+  await unlink(media);
+  await writeFile(media, "abcdefghij");
+  const replaced = await invoke(handler, request("GET", "/api/external-media/media/external_comfy_token"));
+  assert.equal(replaced.res.statusCode, 503);
 });
 
 test("detail rejects missing or traversal workspace keys and projector failures are sanitized", async () => {

@@ -26,6 +26,15 @@ import {
   outputState,
   shotForAttempt,
 } from "./run-detail-contract.js";
+import {
+  externalGroupTitle,
+  externalMediaUrl,
+  externalStatus,
+  groupMatchesQuery,
+  groupMatchesSource,
+  preferredExternalLocation,
+  readExternalCatalogResponse,
+} from "./external-media-contract.js";
 
 const NAV_ITEMS = [
   ["projects", "项目", FolderSimple],
@@ -113,6 +122,15 @@ function Sidebar() {
   );
 }
 
+function ConsoleModeSwitch({ mode, onChange }) {
+  return (
+    <div className="console-mode-switch" aria-label="Provider Console 数据视图">
+      <button type="button" className={mode === "runs" ? "is-active" : ""} aria-pressed={mode === "runs"} onClick={() => onChange("runs")}>运行详情</button>
+      <button type="button" className={mode === "external" ? "is-active" : ""} aria-pressed={mode === "external"} onClick={() => onChange("external")}>外部媒体</button>
+    </div>
+  );
+}
+
 function WorkspaceSelector({ catalog, selected, loading, onSelect, onRefresh }) {
   return (
     <div className="workspace-picker">
@@ -129,10 +147,11 @@ function WorkspaceSelector({ catalog, selected, loading, onSelect, onRefresh }) 
   );
 }
 
-function AttemptRail({ catalog, workspace, attempts, selectedId, loading, error, onWorkspace, onRefresh, onSelect }) {
+function AttemptRail({ catalog, workspace, attempts, selectedId, loading, error, onWorkspace, onRefresh, onSelect, mode, onMode }) {
   return (
     <aside className="lane-rail" aria-label="真实生成尝试">
       <header className="lane-rail-header"><h2>Provider 记录</h2><p>来自已选 runs 工作区</p></header>
+      <ConsoleModeSwitch mode={mode} onChange={onMode} />
       <WorkspaceSelector catalog={catalog} selected={workspace} loading={loading} onSelect={onWorkspace} onRefresh={onRefresh} />
       <div className="lane-list" aria-label="真实 video generation attempts">
         {attempts.map((attempt, index) => {
@@ -156,6 +175,50 @@ function AttemptRail({ catalog, workspace, attempts, selectedId, loading, error,
       </div>
       <div className="lane-rail-note"><Info size={17} /><p>只读查看真实记录。<br />不提交、不重试、不自动回退。</p></div>
       <div className="local-status"><span className="local-dot" /><span>本地 runs 数据源<br />只读连接</span></div>
+    </aside>
+  );
+}
+
+function sourceLabel(source, fallback) {
+  return source?.label || fallback || source?.id || "未知来源";
+}
+
+function ExternalMediaRail({ catalog, selectedSha, selectedSource, query, loading, error, onSelect, onSource, onQuery, onRefresh, mode, onMode }) {
+  const sources = catalog?.sources || [];
+  const groups = catalog?.groups || [];
+  const sourceGroups = groups.filter((group) => groupMatchesSource(group, selectedSource));
+  const visible = sourceGroups.filter((group) => groupMatchesQuery(group, query));
+  return (
+    <aside className="lane-rail external-rail" aria-label="外部视频媒体库">
+      <header className="lane-rail-header"><h2>视频媒体库</h2><p>SHA 去重 · 三类外部证据</p></header>
+      <ConsoleModeSwitch mode={mode} onChange={onMode} />
+      <div className="external-source-filter">
+        <div className="external-filter-heading"><span>来源</span><button type="button" onClick={onRefresh} disabled={loading} aria-label="刷新外部媒体"><ArrowsClockwise size={15} className={loading ? "is-spinning" : ""} /></button></div>
+        <button type="button" className={selectedSource === "all" ? "is-active" : ""} onClick={() => onSource("all")}><span>全部外部来源</span><b>{groups.length}</b></button>
+        {sources.map((source) => {
+          const count = groups.filter((group) => groupMatchesSource(group, source.id)).length;
+          return <button type="button" key={source.id} className={selectedSource === source.id ? "is-active" : ""} onClick={() => onSource(source.id)} disabled={source.status !== "available"}><span>{sourceLabel(source)}</span><b>{source.status === "available" ? count : "不可用"}</b></button>;
+        })}
+      </div>
+      <label className="external-search" htmlFor="external-media-search"><span>筛选视频</span><input id="external-media-search" name="external-media-search" type="search" value={query} onChange={(event) => onQuery(event.target.value)} placeholder="文件名 / Shot / Prompt" /><small>{visible.length} / {sourceGroups.length} unique SHA</small></label>
+      <div className="lane-list external-group-list" aria-label="SHA 去重后的视频列表">
+        {visible.map((group) => {
+          const status = externalStatus(group);
+          const selected = group.sha256 === selectedSha;
+          const location = preferredExternalLocation(group);
+          return (
+            <button type="button" key={group.sha256} aria-pressed={selected} className={`external-group-card external-group-card--${status.tone}${selected ? " is-selected" : ""}`} onClick={() => onSelect(group.sha256)}>
+              <span className="external-group-top"><strong title={externalGroupTitle(group)}>{externalGroupTitle(group)}</strong><span className={`provider-badge provider-badge--${status.tone}`}>{status.evaluated ? status.raw : "N/E"}</span></span>
+              <span className="external-group-source">{sourceLabel(sources.find((source) => source.id === location?.source_id), location?.source_label)} · {(group.locations || []).length} 个位置</span>
+              <span className="external-group-meta">{group.shot_id || "Shot 未绑定"} · {group.generation_type || group.shot_type || "类型未绑定"}</span>
+              <span className="lane-option-prompt" title={group.prompt_text}>{group.prompt_text || "没有与 exact bytes 绑定的 Prompt"}</span>
+            </button>
+          );
+        })}
+        {!loading && !visible.length && <div className={`rail-empty${error ? " rail-empty--error" : ""}`}><WarningCircle size={18} weight="fill" /><span>{error || "该来源没有可读取的视频。"}</span></div>}
+      </div>
+      <div className="lane-rail-note"><Info size={17} /><p>外部文件只读浏览。<br />不等于 candidate、QA 或 activation。</p></div>
+      <div className="local-status"><span className="local-dot local-dot--external" /><span>Server allowlist<br />不向 Browser 暴露绝对路径</span></div>
     </aside>
   );
 }
@@ -413,6 +476,97 @@ function DetailPane({ detail, attempt, onEvidence, continuityContent }) {
   );
 }
 
+function formatBytes(value) {
+  const numeric = Number(value);
+  if (!Number.isFinite(numeric) || numeric < 0) return "—";
+  if (numeric >= 1024 ** 3) return `${(numeric / (1024 ** 3)).toFixed(2)} GiB`;
+  if (numeric >= 1024 ** 2) return `${(numeric / (1024 ** 2)).toFixed(1)} MiB`;
+  if (numeric >= 1024) return `${(numeric / 1024).toFixed(1)} KiB`;
+  return `${numeric} bytes`;
+}
+
+function ExternalSummary({ group, sources }) {
+  const location = preferredExternalLocation(group);
+  const source = sources.find((item) => item.id === location?.source_id);
+  const status = externalStatus(group);
+  return (
+    <header className="shot-summary external-summary">
+      <div className="summary-project external-summary-title"><div><span>外部媒体</span><strong title={externalGroupTitle(group)}>{externalGroupTitle(group)}</strong></div></div>
+      <div className="summary-field"><span>首选来源</span><strong>{sourceLabel(source, location?.source_label)}</strong></div>
+      <div className="summary-field summary-field--wide"><span>生成类型</span><strong>{group.generation_type || group.shot_type || "NOT_EVALUATED"}</strong></div>
+      <div className={`summary-field summary-field--${status.tone}`}><span>生成状态</span><strong>{status.label}</strong></div>
+      <div className="summary-field summary-field--updated"><span>文件时间</span><strong>{formatTime(group.modified_at || location?.modified_at)}</strong></div>
+    </header>
+  );
+}
+
+function ExternalMediaDetail({ group, sources }) {
+  const url = externalMediaUrl(group);
+  const status = externalStatus(group);
+  const locations = group.locations || [];
+  const evidenceRefs = group.evidence_refs || [];
+  const hasBoundMetadata = group.metadata_status && group.metadata_status !== "not_evaluated";
+  return (
+    <>
+      <section className="external-detail-grid">
+        <div className="external-detail-main">
+          <header className="external-boundary-heading">
+            <div><span>External Media Evidence</span><h1>同一视频的可验证信息</h1><p>按 exact SHA-256 合并重复文件；来源与 sidecar 证据保留，但不冒充 Production lifecycle。</p></div>
+            <span className="external-proof-badge">NON-CANONICAL</span>
+          </header>
+          <div className="external-preview-wrap">
+            {url ? <video src={url} controls preload="metadata" aria-label={`外部视频 ${externalGroupTitle(group)}`} /> : <div className="media-empty"><FilmStrip size={28} /><p>该文件当前无法安全预览。</p></div>}
+          </div>
+          <section className={`external-status-callout external-status-callout--${status.tone}`}>
+            <StatusIcon tone={status.tone} size={21} />
+            <div><strong>{status.label}</strong><p>{status.evaluated ? "状态来自受支持 schema 或完整 cross-fingerprint chain；它不是 Manifest attempt、candidate 或质量验收。" : "没有找到语义受支持且与 exact bytes 绑定的状态证据，因此不会把“文件存在”解释为生成成功。"}</p></div>
+          </section>
+          <section className="external-storyboard-card">
+            <header><div><span>Shot / Prompt</span><h2>{group.shot_id || "Shot 未绑定"}</h2></div><span>{group.generation_type || group.shot_type || "类型未评估"}</span></header>
+            <div className="external-prompt"><span>Prompt</span><p>{group.prompt_text || "没有与该视频 exact path / SHA 直接绑定的 Prompt；不会从文件名或相邻文本猜测。"}</p></div>
+            <dl className="external-storyboard-facts">
+              <Fact label="Metadata binding" value={group.metadata_status || "not_evaluated"} />
+              <Fact label="Evidence level" value={group.evidence_level || "non_canonical"} />
+              <Fact label="Shot ID" value={group.shot_id || "NOT_EVALUATED"} />
+              <Fact label="Shot type" value={group.shot_type || "NOT_EVALUATED"} />
+              <Fact label="Generation type" value={group.generation_type || "NOT_EVALUATED"} />
+            </dl>
+            {!hasBoundMetadata && <p className="external-metadata-note"><WarningCircle size={16} weight="fill" />该视频只有文件级 identity；分镜、Prompt、类型和成功/失败均保持 `NOT_EVALUATED`。</p>}
+          </section>
+          <section className="external-location-section">
+            <header><div><span>SHA duplicate group</span><h2>{locations.length} 个物理位置</h2></div><code>{String(group.sha256 || "").slice(0, 16)}…</code></header>
+            <div className="external-location-list">
+              {locations.map((location) => {
+                const source = sources.find((item) => item.id === location.source_id);
+                const locationUrl = location.token ? `/api/external-media/media/${encodeURIComponent(location.token)}` : null;
+                return (
+                  <article key={`${location.source_id}:${location.relative_path}`}>
+                    <div><strong>{sourceLabel(source, location.source_label)}</strong><span>{location.source_kind || source?.kind || "external"}</span></div>
+                    <code title={location.relative_path}>{location.relative_path || location.file_name || "相对路径不可用"}</code>
+                    <span>{formatBytes(location.bytes)} · {formatTime(location.modified_at)}</span>
+                    {locationUrl ? <a href={locationUrl} target="_blank" rel="noreferrer">打开</a> : <span>不可预览</span>}
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        </div>
+        <aside className="detail-aside external-detail-aside">
+          <section className="detail-section"><h3>Exact file identity</h3><dl className="identity-list"><Fact label="SHA-256" value={group.sha256} /><Fact label="MIME" value={group.mime_type} /><Fact label="大小" value={formatBytes(group.bytes)} /><Fact label="物理副本" value={locations.length} /></dl></section>
+          <section className="detail-section"><h3>判断边界</h3><p className={`evidence-state evidence-state--${status.tone}`}><span />{status.label}<br /><small>External evidence 不产生 candidate、P6、Final Acceptance 或 activation。</small></p></section>
+          <section className="detail-section"><h3>Evidence refs</h3>{evidenceRefs.length ? <div className="external-evidence-list">{evidenceRefs.map((ref, index) => <code key={`${typeof ref === "string" ? ref : ref?.relative_path || "evidence"}-${index}`}>{typeof ref === "string" ? ref : ref?.relative_path || ref?.kind || "已绑定 JSON evidence"}</code>)}</div> : <p className="external-no-evidence">没有可公开的 exact-bound sidecar reference。</p>}</section>
+          <section className="detail-section"><h3>与 runs 的关系</h3><p className="external-no-evidence">要判断 canonical attempt、历史 Shot snapshot、candidate 与 lifecycle，请切回“运行详情”。外部媒体库不会补造缺失 Production state。</p></section>
+        </aside>
+      </section>
+      <section className="action-bar external-action-bar">
+        <div className="action-note">只读外部证据 · SHA 去重 <Info size={16} /></div>
+        <a className={`primary-action${url ? "" : " is-disabled"}`} href={url || undefined} target="_blank" rel="noreferrer" aria-disabled={!url}><Play size={20} weight="fill" />查看 exact 视频</a>
+        <div className="secondary-action workspace-read-state"><Info size={18} />非 Production 状态</div>
+      </section>
+    </>
+  );
+}
+
 function EmptyState({ title, detail, retry }) {
   return <section className="console-state"><WarningCircle size={36} /><h1>{title}</h1><p>{detail}</p>{retry && <button type="button" onClick={retry}><ArrowsClockwise size={17} />重新读取</button>}</section>;
 }
@@ -451,6 +605,7 @@ function EvidenceDialog({ open, detail, attempt, onClose }) {
 }
 
 export function App() {
+  const [mode, setMode] = useState("runs");
   const [catalog, setCatalog] = useState([]);
   const [workspace, setWorkspace] = useState("");
   const [detail, setDetail] = useState(null);
@@ -461,6 +616,12 @@ export function App() {
   const [continuityProjection, setContinuityProjection] = useState(null);
   const [continuityLoading, setContinuityLoading] = useState(false);
   const [continuityError, setContinuityError] = useState("");
+  const [externalCatalog, setExternalCatalog] = useState(null);
+  const [externalSelectedSha, setExternalSelectedSha] = useState("");
+  const [externalSource, setExternalSource] = useState("all");
+  const [externalQuery, setExternalQuery] = useState("");
+  const [externalLoading, setExternalLoading] = useState(false);
+  const [externalError, setExternalError] = useState("");
   const continuityRequestEpoch = useRef(0);
 
   const loadDetail = useCallback(async (key) => {
@@ -548,12 +709,73 @@ export function App() {
 
   useEffect(() => { loadContinuityReview(); }, [loadContinuityReview]);
 
+  const refreshExternal = useCallback(async () => {
+    setExternalLoading(true);
+    setExternalError("");
+    try {
+      const response = await fetch("/api/external-media", { cache: "no-store" });
+      const body = await readExternalCatalogResponse(response);
+      const groups = body.groups || [];
+      setExternalCatalog(body);
+      setExternalSelectedSha((current) => groups.some((item) => item.sha256 === current) ? current : (groups[0]?.sha256 || ""));
+    } catch (cause) {
+      setExternalCatalog(null);
+      setExternalSelectedSha("");
+      setExternalError(cause instanceof Error ? cause.message : "外部媒体数据源不可用。");
+    } finally {
+      setExternalLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (mode === "external" && !externalCatalog && !externalLoading && !externalError) refreshExternal();
+  }, [externalCatalog, externalError, externalLoading, mode, refreshExternal]);
+
+  const visibleExternalGroups = (externalCatalog?.groups || [])
+    .filter((group) => groupMatchesSource(group, externalSource))
+    .filter((group) => groupMatchesQuery(group, externalQuery));
+  const externalGroup = visibleExternalGroups.find((group) => group.sha256 === externalSelectedSha) || visibleExternalGroups[0];
+
+  const selectExternalSource = useCallback((sourceId) => {
+    setExternalSource(sourceId);
+    const groups = (externalCatalog?.groups || []).filter((group) => groupMatchesSource(group, sourceId));
+    setExternalSelectedSha(groups[0]?.sha256 || "");
+  }, [externalCatalog]);
+
+  const changeMode = useCallback((nextMode) => {
+    setMode(nextMode);
+    setEvidenceOpen(false);
+  }, []);
+
+  const continuityContent = (
+    <>
+      {continuityEligible && continuityLoading && <section className="continuity-review-loading" aria-live="polite">正在严格打开 continuity review request…</section>}
+      {continuityEligible && continuityError && <section className="continuity-review-error"><WarningCircle size={20} weight="fill" /><div><strong>Human continuity review 不可用</strong><p>{continuityError}</p><button type="button" onClick={loadContinuityReview}>重新读取</button></div></section>}
+      {continuityProjection && <ContinuityReviewPanel key={continuityProjection.review_request.content_hash} projection={continuityProjection} />}
+    </>
+  );
+
+  let runsContent;
+  if (loading && !detail) runsContent = <EmptyState title="正在读取 runs" detail="正在通过 canonical reader 打开本机工作区…" />;
+  else if (error) runsContent = <EmptyState title="工作区不可用" detail={error} retry={refresh} />;
+  else if (!detail) runsContent = <EmptyState title="没有 runs 工作区" detail="repository/runs 下没有可读取的 Production 或 Legacy 工作区。" retry={refresh} />;
+  else if (!attempt) runsContent = <><ShotSummary detail={detail} /><WorkspaceOverview detail={detail} /></>;
+  else runsContent = <><ShotSummary detail={detail} attempt={attempt} /><DetailPane detail={detail} attempt={attempt} onEvidence={() => setEvidenceOpen(true)} continuityContent={continuityContent} /></>;
+
+  let externalContent;
+  if (externalLoading && !externalCatalog) externalContent = <EmptyState title="正在扫描外部视频" detail="正在计算 exact SHA 并读取直接绑定的 JSON evidence…" />;
+  else if (externalError) externalContent = <EmptyState title="外部媒体不可用" detail={externalError} retry={refreshExternal} />;
+  else if (!externalGroup) externalContent = <EmptyState title="没有外部视频" detail="当前 server allowlist 中没有可读取的常规视频文件。" retry={refreshExternal} />;
+  else externalContent = <><ExternalSummary group={externalGroup} sources={externalCatalog?.sources || []} /><ExternalMediaDetail group={externalGroup} sources={externalCatalog?.sources || []} /></>;
+
   return (
     <div className="app-shell">
       <Sidebar />
-      <AttemptRail catalog={catalog} workspace={workspace} attempts={attempts} selectedId={selectedId} loading={loading} error={error} onWorkspace={selectWorkspace} onRefresh={refresh} onSelect={setSelectedId} />
+      {mode === "runs"
+        ? <AttemptRail catalog={catalog} workspace={workspace} attempts={attempts} selectedId={selectedId} loading={loading} error={error} onWorkspace={selectWorkspace} onRefresh={refresh} onSelect={setSelectedId} mode={mode} onMode={changeMode} />
+        : <ExternalMediaRail catalog={externalCatalog || {}} selectedSha={externalGroup?.sha256 || externalSelectedSha} selectedSource={externalSource} query={externalQuery} loading={externalLoading} error={externalError} onSelect={setExternalSelectedSha} onSource={selectExternalSource} onQuery={setExternalQuery} onRefresh={refreshExternal} mode={mode} onMode={changeMode} />}
       <main className="provider-console">
-        {loading && !detail ? <EmptyState title="正在读取 runs" detail="正在通过 canonical reader 打开本机工作区…" /> : error ? <EmptyState title="工作区不可用" detail={error} retry={refresh} /> : !detail ? <EmptyState title="没有 runs 工作区" detail="repository/runs 下没有可读取的 Production 或 Legacy 工作区。" retry={refresh} /> : !attempt ? <><ShotSummary detail={detail} /><WorkspaceOverview detail={detail} /></> : <><ShotSummary detail={detail} attempt={attempt} /><DetailPane detail={detail} attempt={attempt} onEvidence={() => setEvidenceOpen(true)} continuityContent={<>{continuityEligible && continuityLoading && <section className="continuity-review-loading" aria-live="polite">正在严格打开 continuity review request…</section>}{continuityEligible && continuityError && <section className="continuity-review-error"><WarningCircle size={20} weight="fill" /><div><strong>Human continuity review 不可用</strong><p>{continuityError}</p><button type="button" onClick={loadContinuityReview}>重新读取</button></div></section>}{continuityProjection && <ContinuityReviewPanel key={continuityProjection.review_request.content_hash} projection={continuityProjection} />}</>} /></>}
+        {mode === "external" ? externalContent : runsContent}
       </main>
       <EvidenceDialog open={evidenceOpen} detail={detail || {}} attempt={attempt || {}} onClose={() => setEvidenceOpen(false)} />
     </div>

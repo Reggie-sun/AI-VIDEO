@@ -5,6 +5,8 @@ import { open, realpath } from "node:fs/promises";
 import path from "node:path";
 import { promisify } from "node:util";
 
+import { catalogExternalMedia } from "./external-media.mjs";
+
 const execFileAsync = promisify(execFile);
 const JSON_HEADERS = { "Content-Type": "application/json; charset=utf-8" };
 
@@ -295,22 +297,76 @@ async function sendMedia(req, res, media) {
   }
 }
 
-export function createRunsApiHandler({ repoRoot, runProjector = createPythonProjector(repoRoot) }) {
+export function createRunsApiHandler({
+  repoRoot,
+  runProjector = createPythonProjector(repoRoot),
+  externalSources = [],
+  externalCatalog = catalogExternalMedia,
+}) {
   const runsRoot = path.join(repoRoot, "runs");
   const mediaCache = new Map();
+  const externalDescriptors = new Map();
+  const externalMediaCache = new Map();
+  const externalSourceRoots = new Map();
+  const configuredExternalSources = [];
+  for (const source of externalSources) {
+    if (!/^[A-Za-z0-9_-]{1,64}$/.test(source?.id || "") || typeof source?.root !== "string" || externalSourceRoots.has(source.id)) continue;
+    externalSourceRoots.set(source.id, source.root);
+    configuredExternalSources.push(source);
+  }
 
   return async function runsApi(req, res, next) {
     const parsed = new URL(req.url || "/", "http://127.0.0.1");
-    if (!parsed.pathname.startsWith("/api/runs")) {
+    const isRunsRequest = parsed.pathname.startsWith("/api/runs");
+    const isExternalRequest = parsed.pathname.startsWith("/api/external-media");
+    if (!isRunsRequest && !isExternalRequest) {
       next();
       return;
     }
     if (!isLoopbackRequest(req)) {
-      send(res, 403, { error: { code: "LOCAL_ONLY", message: "runs API 仅允许本机访问。" } });
+      send(res, 403, { error: { code: "LOCAL_ONLY", message: "Provider Console 只读 API 仅允许本机访问。" } });
       return;
     }
 
     try {
+      if (parsed.pathname === "/api/external-media") {
+        if (req.method !== "GET") return methodNotAllowed(res, "GET");
+        const result = await externalCatalog({ sources: configuredExternalSources });
+        externalDescriptors.clear();
+        externalMediaCache.clear();
+        const entries = result?._media && typeof result._media === "object" ? Object.entries(result._media) : [];
+        for (const [token, entry] of entries) {
+          if (!/^[A-Za-z0-9_-]{6,128}$/.test(token) || !externalSourceRoots.has(entry?.source_id)) continue;
+          externalDescriptors.set(token, entry);
+        }
+        send(res, 200, publicProjection(result));
+        return;
+      }
+
+      const externalMediaMatch = /^\/api\/external-media\/media\/([A-Za-z0-9_-]{6,128})$/.exec(parsed.pathname);
+      if (externalMediaMatch) {
+        if (req.method !== "GET" && req.method !== "HEAD") return methodNotAllowed(res, "GET, HEAD");
+        const token = externalMediaMatch[1];
+        const descriptor = externalDescriptors.get(token);
+        if (!descriptor) {
+          send(res, 404, { error: { code: "EXTERNAL_MEDIA_NOT_FOUND", message: "外部媒体不存在或尚未扫描。" } });
+          return;
+        }
+        let media = externalMediaCache.get(token);
+        if (!media) {
+          media = await validatedMedia(descriptor, externalSourceRoots.get(descriptor.source_id));
+          if (!media) throw new RunsApiError(503, "EXTERNAL_MEDIA_CHANGED");
+          externalMediaCache.set(token, media);
+        }
+        await sendMedia(req, res, media);
+        return;
+      }
+
+      if (isExternalRequest) {
+        send(res, 404, { error: { code: "NOT_FOUND", message: "接口不存在。" } });
+        return;
+      }
+
       if (parsed.pathname === "/api/runs") {
         if (req.method !== "GET") return methodNotAllowed(res, "GET");
         const result = await runProjector("catalog");
@@ -411,7 +467,10 @@ export function createRunsApiHandler({ repoRoot, runProjector = createPythonProj
 
       send(res, 404, { error: { code: "NOT_FOUND", message: "接口不存在。" } });
     } catch {
-      send(res, 503, { error: { code: "RUNS_SOURCE_UNAVAILABLE", message: "本地 runs 数据源不可用。" } });
+      const external = parsed.pathname.startsWith("/api/external-media");
+      send(res, 503, { error: external
+        ? { code: "EXTERNAL_MEDIA_SOURCE_UNAVAILABLE", message: "外部媒体数据源不可用或文件已变化。" }
+        : { code: "RUNS_SOURCE_UNAVAILABLE", message: "本地 runs 数据源不可用。" } });
     }
   };
 }

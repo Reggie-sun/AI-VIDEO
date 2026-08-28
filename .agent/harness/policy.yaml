@@ -230,10 +230,10 @@ checks:
     cwd: .
     description: Verify bounded local-only runs discovery, canonical read projection, sanitization, and no-write contracts.
   provider_console_node_tests:
-    argv: [node, --test, provider-console/tests/runs-api.test.mjs, provider-console/tests/continuity-review-contract.test.mjs, provider-console/tests/continuity-review.test.mjs]
+    argv: [node, --test, provider-console/tests/runs-api.test.mjs, provider-console/tests/external-media.test.mjs, provider-console/tests/continuity-review-contract.test.mjs, provider-console/tests/continuity-review.test.mjs]
     cwd: .
     npm_workspace_dependency_paths: [provider-console/node_modules]
-    description: Verify the loopback-only runs bridge, exact-bound human decision authoring, opaque media tokens, and descriptor-bound media reads.
+    description: Verify the loopback-only runs/external-media bridge, exact-bound human decision authoring, opaque media tokens, and descriptor-bound media reads.
   provider_console_web_build:
     argv: [npm, exec, --offline, --, vite, build]
     cwd: provider-console
@@ -824,7 +824,9 @@ categories:
       - src/ai_video/provider_console.py
       - src/ai_video/provider_console_continuity.py
       - tests/test_provider_console.py
+      - provider-console/scripts/external-media.mjs
       - provider-console/scripts/runs-api.mjs
+      - provider-console/tests/external-media.test.mjs
       - provider-console/tests/runs-api.test.mjs
     check_ids:
       - provider_console_python_tests

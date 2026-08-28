@@ -12,6 +12,10 @@ QualityExperienceRecord capture、云端访问、secret lookup、自动选路或
 sealed prompt、生成类型与成功/失败状态，以便人工判断。该 follow-up 只扩展 strict read projection
 和 Browser 展示；不改变 Production lifecycle、candidate、QA acceptance 或 activation truth。
 
+2026-08-28 external-media follow-up：用户确认历史视频同时分布在 repository `artifacts/`、本机
+ComfyUI output 与 repository 外青颜项目目录。它们作为平行的只读 External Media Library 接入，
+不得作为额外 `runs/` root 或补造 Production state；现有 `/api/runs*` strict projection 保持不变。
+
 ## Goal
 
 把 `provider-console/` 从硬编码 Alice/Shot 12 的视觉原型升级为 local-only、no-network、
@@ -37,6 +41,21 @@ evidence pointers。
 - `provider-console/scripts/runs-api.mjs` 只把 loopback Vite `GET/HEAD` 请求桥接到 Python projector，
   并按 projector 生成的 opaque media token 提供已验证的 image/video bytes。
 - Browser 只消费 sanitized JSON 与 media URLs，不读取任意 filesystem path。
+
+### External Media Library Boundary
+
+- server 只接受启动配置提供的 stable source ID allowlist；Browser 不得指定或扩展 filesystem root。
+- 只扫描 regular non-symlink video files，并以 measured SHA-256 聚合 exact duplicates；所有物理位置继续以
+  source-relative path 保留，不移动、复制、导入、删除或激活媒体。
+- `artifacts`、ComfyUI output 与外部项目目录分别标记为 `development_artifact`、
+  `raw_provider_output` 与 `external_project_asset`。这些 evidence 固定为 `non_canonical`。
+- Prompt、Shot identity、generation type 与 external reported status 只有在受支持的
+  `ai-video-external-media-metadata/1` sidecar 直接绑定 exact path/SHA，或完整 evidence chain 通过
+  exact SHA 与 cross-fingerprint verification 时才可投影。
+  未知 schema 即使绑定 exact bytes 也只保留 evidence reference；文件名推断、目录邻近、模糊匹配或裸
+  Provider response 都不能成为 metadata truth。
+- canonical lifecycle、candidate、QA、P6、Final Acceptance 与 activation 始终为 `NOT_EVALUATED`；外部
+  `succeeded` / `failed` 只能显示为 external reported status，不得与 `/api/runs*` attempt outcome 合并。
 
 ## Discovery Contract
 
@@ -96,6 +115,10 @@ traceback 或 arbitrary evidence JSON 返回 Browser。
 - `GET /api/runs/detail?workspace=<relative-key>`：返回一个 strict-selected workspace projection。
 - `GET|HEAD /api/runs/media/<opaque-token>`：只返回本进程已缓存、已由 selected Registry 验证的
   `image/*` 或 `video/*` regular bytes；支持 video byte range。
+- `GET /api/external-media`：返回 allowlisted sources、exact SHA groups、sanitized metadata 与 source-relative
+  locations；不得返回 absolute path 或私有 descriptor。
+- `GET|HEAD /api/external-media/media/<source-qualified-token>`：只返回 catalog 已验证且仍满足 exact file
+  identity、root containment 与 no-follow 约束的视频 bytes；支持 byte range。
 - 其它 method 返回 `405`；unknown workspace/token 返回 `404`；invalid input 返回 `400`。
 - API 必须发送 `Cache-Control: no-store`，不得监听或调用 remote Provider。Sites/static deployment 没有
   local filesystem 时显示“本地 runs 数据源不可用”，不得注入 build-time runtime snapshot。
@@ -122,6 +145,8 @@ traceback 或 arbitrary evidence JSON 返回 Browser。
   proof layer，必须分别表达。尤其 `failed + fetched_media` 仍应允许人工播放，但不能显示为成功或已验收。
 - 主 CTA 改为只读动作（查看输出/证据）；不得生成持久化意图或暗示已授权执行。
 - loading、invalid workspace、API unavailable、empty attempts 和 media unavailable 都必须有中文状态。
+- “运行详情 / 外部媒体”必须是显式分开的视图。External view 提供 source filter、文件名/Shot/Prompt 搜索、
+  SHA duplicate locations、Prompt/Shot/type/status/evidence 展示与判断边界；不能把未绑定字段推断成成功或失败。
 
 ## Unchanged Contracts
 
@@ -143,8 +168,14 @@ Router、Provider、P6/P7、QualityExperienceRecord、ResolvedTimeline、HyperFr
 8. selected attempt 显示 exact-at-time Shot snapshot、完整 sealed prompt、generation type、normalized
    outcome、raw phase 与安全 `error_code`；历史 Shot 无法 strict reopen 时明确 unavailable，绝不回退
    到 current active Shot。
+9. 外部目录按 exact SHA 去重、可搜索并播放；跨 source duplicates 保留所有 source-relative locations，
+   absolute path、arbitrary root、symlink swap 与 unbound sidecar 均 fail closed。
+10. supported schema-specific exact-bound external evidence 可以显示 Prompt、Shot identity、generation type 与 external reported status；
+    未严格绑定的数据保持 `NOT_EVALUATED`，且任何 external success 都不产生 Production acceptance truth。
 
 ## Out Of Scope
 
 Provider selection mutation、submit/retry/recovery、Quality dataset UI、跨机器 run registry、database、queue、
 authentication、remote deployment读取本机 `runs/`、编辑 evidence、删除/修复历史 run。
+External Media Library 也不执行 historical import/migration、不重建缺失 lineage、不扫描未 allowlist 的目录，
+不把 local-only filesystem data 嵌入 Sites/static bundle。

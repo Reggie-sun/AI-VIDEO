@@ -623,7 +623,9 @@ def test_provider_console_bridge_routes_to_python_and_node_contracts() -> None:
         "src/ai_video/provider_console.py",
         "src/ai_video/provider_console_continuity.py",
         "tests/test_provider_console.py",
+        "provider-console/scripts/external-media.mjs",
         "provider-console/scripts/runs-api.mjs",
+        "provider-console/tests/external-media.test.mjs",
         "provider-console/tests/runs-api.test.mjs",
     ):
         report = agent_harness.inspect_paths([path], policy)
@@ -693,6 +695,7 @@ def test_provider_console_web_routes_to_node_contracts() -> None:
         "node",
         "--test",
         "provider-console/tests/runs-api.test.mjs",
+        "provider-console/tests/external-media.test.mjs",
         "provider-console/tests/continuity-review-contract.test.mjs",
         "provider-console/tests/continuity-review.test.mjs",
     ]

@@ -70,4 +70,23 @@
 - 极长 evidence hashes 在窄右栏按字符换行，信息完整但视觉密度较高。
 - 字体 rasterization 与 CJK weight 会随本机字体栈产生轻微差异。
 
+## External Media Library QA — 2026-08-28
+
+- Live catalog：Chrome fresh reload 后读取 3 个 server allowlist sources，共 485 个 physical video locations、
+  392 个 unique SHA groups；页面不接收 filesystem root，也不显示 absolute path。
+- Search / filter：`shot01_seed240801` 将 rail 从 392 组精确筛为 1 组；source filters 分别显示
+  AI-VIDEO Artifacts、ComfyUI Output 与青颜项目目录，并保留 SHA duplicate locations。
+- Exact evidence：青颜 `shot01` 显示 exact-bound full Prompt、`text_to_video`、external reported
+  `succeeded`、Shot ID、SHA-256 与 6 条去重 evidence refs；`SHOT TYPE` 仍诚实显示 `NOT_EVALUATED`。
+- Duplicate proof：抽查同 SHA group 可同时列出 5 个 artifacts locations 与 1 个 ComfyUI raw location，
+  preview 优先级不删除或隐藏其它 physical copies。
+- Boundary：页面持续标记 `NON-CANONICAL`，并说明 external success 不等于 candidate、QA、P6、
+  Final Acceptance 或 activation；切回“运行详情”后 canonical runs detail 仍正常显示。
+- Media / network：external media preview 和 exact link 均通过 source-qualified opaque token；observed local
+  requests 均为 HTTP `200` / `206`，未观察到 remote Provider request。
+- Accessibility：source、SHA group 与 mode controls 使用 buttons/`aria-pressed`；search 有显式 label、
+  `id` 与 `name`；video 使用原生 controls 与 accessible name。
+- Visual：宽屏三栏 hierarchy、dark surfaces、violet selection、green external-reported state 与底部只读 action
+  bar保持现有 Provider Console 视觉系统；长 Prompt/evidence 可滚动和换行，无可见布局破损。
+
 final result: passed
