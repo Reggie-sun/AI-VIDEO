@@ -1,3 +1,5 @@
+"""Reopen one sealed Shot overlay and emit immutable request evidence only."""
+
 from __future__ import annotations
 
 import hashlib
