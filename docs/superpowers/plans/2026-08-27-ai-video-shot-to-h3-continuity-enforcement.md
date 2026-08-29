@@ -115,7 +115,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | B-D0 prerequisite complete后已获独立M6-D启动授权；sealed Drama package现已通过唯一`ProductionStateCommitter.bootstrap_initial_state()` materialize为Project/Registry-selected Character/Scene/Shot revisions，Shot 01 current `VideoPlanningRequest` / plan / verified requirement为READY。Active pre-generation Dependency Graph仍未materialize，故canonical Provider lifecycle尚不可进入；候选H3 Quality profile仍只是未到达的advisory inspection，且与current ComfyUI checkout identity不匹配。没有Provider selection、submit、media或`DRAMA-MEDIA-*` verdict |
+| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | B-D0 prerequisite complete后已获独立M6-D启动授权；sealed Drama package现已通过唯一committer materialize为Project/Registry-selected revisions，Shot 01 Planner requirement与asset-free pre-generation graph均READY。Manifest现为2.7，canonical video lifecycle entry可达但未进入；Provider profile、native prompt与exact request尚未selected/sealed，所以submit仍禁止。没有Provider selection、request persistence、submit、media或`DRAMA-MEDIA-*` verdict |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -824,15 +824,20 @@ Git bytes投影typed artifacts，仅调用`ProductionStateCommitter.bootstrap_in
 `9481519d2b4929e6abd9b0826cc5731ea54f60526ec414ffa07279d32f0a57fb`。Exact bootstrap replay已验证14个
 Production files零写入。
 
-Current stop已推进到`ACTIVE_PRE_GENERATION_DEPENDENCY_GRAPH_NOT_MATERIALIZED`：Manifest仍为2.0且没有active
-Dependency Graph；`begin_video_generation()`要求Manifest >=2.7与active graph，不能用empty graph、fake composition
-asset或run-local第二writer旁路。候选
+Current stop已推进到`PROVIDER_PROFILE_NATIVE_PROMPT_AND_EXACT_REQUEST_NOT_SELECTED`。Implementation commit
+`6a5bbbf65d175eb58e1fbe2e6753a2965705b8d8`新增显式`GENERATION_TARGET` projection与in-lock exact-current
+guard；run-local driver只经`ProductionStateCommitter.bootstrap_dependency_graph()`与
+`upgrade_manifest_schema("2.7")`激活graph `761c92a0a8507ae2b8f14de5338b337e0d567e78b654e36403d3428a0da47ff1`。
+15个creative states全部`FRESH`，唯一Shot 01 target为无applied media evidence、无blocker的`STALE` ready frontier。
+Exact evidence位于`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-pre-generation-graph.json`
+（SHA-256 `4bd08f0a6ce3a8e666816f264a1a7a20acfd3897b4ce58f264bd4f17fb4f4115`），accepted checkpoint为
+`docs/superpowers/artifacts/drama/b-d0/execution-gate/key-at-the-waiting-room-v2.accepted.json`。候选
 `minimax-h3-t8-t2va-quality-v1` profile另要求ComfyUI commit
 `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`，current clean checkout为
 `e01fb4c56b7a88149d469b99cbbfe3223d715054`，即使上游readiness未来解除也仍须重新通过exact runtime
-identity preflight；该inspection不是Router decision或current primary blocker。Source-audio当前只保留从sealed
+identity preflight；该inspection不是Router decision，且当前未选择该profile。Source-audio当前只保留从sealed
 Shot facts推导的`GENERATED + KEEP` authoring-intent proposal，因Provider未selected而没有accepted SourceAudioPolicy
-或resolved request binding。该stop没有选择或改变fixture/baseline，没有启动ComfyUI、编写Provider-native prompt、submit、
+或resolved request binding。该stop没有选择或改变fixture/baseline，没有启动ComfyUI、编写Provider-native prompt、持久化request、submit、
 生成media或调用`video-analysis`；`M6-D`保持`NOT_EVALUATED`，下一Shot submit不允许。
 
 Stop immediately and report rather than expanding scope when：

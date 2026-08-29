@@ -2,7 +2,7 @@
 surface_id: drama_authoring_and_acceptance
 canonical: true
 spec_status: accepted
-implementation_status: not_started
+implementation_status: foundation_only
 live_status: not_run
 quality_status: not_evaluated
 release_status: unreleased
@@ -44,8 +44,9 @@ code、tests、contracts与project-local Skills完成execution-gate/exact-eviden
 - `M6-D Drama` 继续为 `NOT_EVALUATED`；
 - spec、fixture、baseline、无`BLOCKER`的authoring package与execution path均已形成separate content-addressed
   acceptance identities；
-- 后续明确授权已进入M6-D pre-submit；typed pending-generated target与Project-selected Planner seam已实现，但active
-  pre-generation Dependency Graph / canonical Provider lifecycle仍未完成；未执行HUMAN media review或media submit。
+- 后续明确授权已进入M6-D pre-submit；typed pending-generated target、Project-selected Planner与active
+  pre-generation Dependency Graph已实现并exact materialize，canonical Provider lifecycle entry可达但未进入；
+  Provider profile、native prompt与exact request尚未selected/sealed，未执行HUMAN media review或media submit。
 
 ### V2 Delegation Acceptance Binding
 
@@ -432,8 +433,8 @@ exact evidence，作出独立判断并写入content-addressed acceptance envelop
 Spec owner/rubric、exact bounded fixture、exact Drama baseline、无`BLOCKER`的authoring package与current
 execution-gate/exact-evidence-path现已全部accepted/sealed，因此continuity plan可将B-D0标记为`PASS`。该结论只
 接受Agent-controlled Development evidence path。后续M6-D authorization已实现asset-free pending-generated Shot的
-strict Project/Registry materialization与current Planner/readiness projection；active pre-generation Dependency Graph、
-Provider lifecycle与Gate 2仍未完成。B-D0 PASS不产生任何`DRAMA-MEDIA-*` verdict。
+strict Project/Registry、current Planner与active pre-generation Dependency Graph materialization；Provider lifecycle
+entry可达但未进入，Gate 2仍未完成。B-D0 PASS不产生任何`DRAMA-MEDIA-*` verdict。
 
 ## Verification Contract
 
@@ -468,5 +469,6 @@ python -m scripts.agent_harness policy-audit
 
 当前checkpoint完成Drama prerequisite contract、fixture、baseline、authoring package与current
 execution-gate/exact-evidence-path的exact acceptance，因此B-D0为`PASS`。后续M6-D pre-submit已获明确授权并完成
-canonical Project/Registry + Planner materialization，但仍停在active pre-generation Dependency Graph之前。它不产生
+canonical Project/Registry + Planner + active pre-generation Dependency Graph materialization，但仍停在Provider
+profile、native prompt与exact request selection之前。它不产生
 任何media/HUMAN verdict，也不表示完整typed Drama Product Runtime或canonical Provider lifecycle已实现。

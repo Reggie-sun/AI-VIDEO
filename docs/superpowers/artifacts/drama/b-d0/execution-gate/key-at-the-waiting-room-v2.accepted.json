@@ -1,0 +1,95 @@
+{
+  "schema_version": "drama-pre-submit-graph-readiness-acceptance/1",
+  "record_kind": "drama_pre_submit_graph_readiness_acceptance",
+  "checkpoint_id": "drama.pre-submit.key-at-the-waiting-room",
+  "checkpoint_version": 2,
+  "status": "accepted",
+  "domain_id": "drama",
+  "lane_id": "M6-D",
+  "prior_execution_path_acceptance": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/execution-gate/key-at-the-waiting-room-v1.accepted.json",
+    "role": "accepted B-D0 execution-gate and exact-evidence-path prerequisite"
+  },
+  "implementation_binding": {
+    "commit": "6a5bbbf65d175eb58e1fbe2e6753a2965705b8d8",
+    "canonical_graph_builder": "ai_video.production.video_pre_generation.build_video_pre_generation_dependency_graph",
+    "canonical_graph_writer": "ProductionStateCommitter.bootstrap_dependency_graph",
+    "canonical_schema_writer": "ProductionStateCommitter.upgrade_manifest_schema",
+    "pre_request_guard": "ai_video.production.video_pre_generation.verify_current_video_generation_lineage"
+  },
+  "exact_runtime_evidence": {
+    "path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-pre-generation-graph.json",
+    "sha256": "4bd08f0a6ce3a8e666816f264a1a7a20acfd3897b4ce58f264bd4f17fb4f4115",
+    "driver_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/pre_generation_graph_driver.py",
+    "driver_sha256": "d2275efdf68b0e079c4889686c21fc1010996d29f3c4368cc7025958551d64f0",
+    "source_materialization_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-canonical-materialization.json",
+    "source_materialization_sha256": "75be2e494e44b5b253d730f9c9daca366806e09209c7e5e5e231c014a1b09f71"
+  },
+  "selected_identity": {
+    "project_content_hash": "940f0ceee3148ba1d4dab4a5b7bcbc2adc3229c5964f1705149bec1e9d14dfc1",
+    "registry_content_hash": "13a9404d3ec6bb3de0ec00871cd22dd5ca861ca8ea413fdfe13ea145e6c2ec1b",
+    "target_shot_id": "drama.shot.waiting-room.001",
+    "target_shot_revision": 1,
+    "target_shot_content_hash": "4cf53970d6642d4bfe73c23e5c12f9714c069843b0a7b47069dfb2519c47253b",
+    "target_asset_role": "final_visual",
+    "planning_request_hash": "92e6de89a72730da3beb58638dd54c637cad5162aab94a3259d3413a9a50931f",
+    "requirement_hash": "d07dba76f19e2a1d998d9bf087df8583a1a99653cc7c1d9760935f72534c9b81",
+    "verified_projection_hash": "9481519d2b4929e6abd9b0826cc5731ea54f60526ec414ffa07279d32f0a57fb"
+  },
+  "active_graph": {
+    "revision_id": "761c92a0a8507ae2b8f14de5338b337e0d567e78b654e36403d3428a0da47ff1",
+    "content_hash": "761c92a0a8507ae2b8f14de5338b337e0d567e78b654e36403d3428a0da47ff1",
+    "file_sha256": "43963d9aec151c3b1b39891cb608989455480ff6211ba56f57090e83c2a0f8d9",
+    "path": "state/dependency_graph.761c92a0a8507ae2b8f14de5338b337e0d567e78b654e36403d3428a0da47ff1.json",
+    "creative_node_count": 15,
+    "generation_target_node_id": "generation-target:drama.shot.waiting-room.001:final_visual",
+    "generation_target_lifecycle": "stale",
+    "generation_target_applied_evidence": null,
+    "ready_node_ids": [
+      "generation-target:drama.shot.waiting-room.001:final_visual"
+    ]
+  },
+  "canonical_manifest_state": {
+    "schema_version": "2.7",
+    "manifest_revision": 4,
+    "graph_bootstrap_attempt_id": "drama-m6-d-bootstrap-pre-generation-graph",
+    "graph_bootstrap_attempt_status": "succeeded",
+    "video_request_persisted": false
+  },
+  "independent_review": {
+    "reviewer": "native reviewer_xhigh",
+    "initial_verdict": "reject",
+    "blocking_finding": "a content-addressed graph missing an authoring edge could pass the first guard",
+    "resolution": "the guard now rebuilds and requires exact canonical graph equality; adversarial before-write coverage added",
+    "final_verdict": "accept with concerns",
+    "remaining_blocking_issues": []
+  },
+  "adjudication": {
+    "adjudicator_identity": "codex_primary_agent",
+    "authority_role": "primary_runtime_checkpoint_owner",
+    "decision": "CONFIRM",
+    "rationale": "Current code, adversarial tests, independent review and exact strict-reopen evidence prove the asset-free pre-generation graph and pre-request lineage guard without inventing media, CompositionSpec, Registry assets or a second state writer."
+  },
+  "current_gate_state": {
+    "b_d0": "PASS",
+    "m6_d": "NOT_EVALUATED",
+    "pre_generation_graph": "READY",
+    "canonical_video_lifecycle_entry": "REACHABLE_BUT_NOT_ENTERED",
+    "next_submit_allowed": false,
+    "remaining_blocker": "PROVIDER_PROFILE_NATIVE_PROMPT_AND_EXACT_REQUEST_NOT_SELECTED",
+    "m6_c": "HUMAN_FAIL",
+    "b_x": "FAIL",
+    "m7_through_m9": "DEFERRED"
+  },
+  "forbidden_effects_confirmed_absent": [
+    "fixture or baseline change",
+    "Provider selection",
+    "Provider-native prompt authoring",
+    "ComfyUI or H3 invocation",
+    "video-analysis invocation",
+    "video request persistence or submit",
+    "media generation, retry, repair or assembly",
+    "Manifest candidate activation, P6 or Final Acceptance",
+    "Commercial-to-Drama verdict inheritance"
+  ]
+}

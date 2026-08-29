@@ -134,16 +134,25 @@ surfaces:
     canonical_spec: docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md
     canonical: true
     spec_status: accepted
-    implementation_status: not_started
+    implementation_status: foundation_only
     live_status: not_run
     quality_status: not_evaluated
     release_status: unreleased
     runtime_status_owner: docs/v0.2-runtime-baseline.md
     roadmap_owner: docs/v0.2-agentic-production-roadmap.md
     contract_version: drama-authoring-and-acceptance/2
-    implementation_paths: []
-    test_paths: []
-    harness_check_ids: []
+    implementation_paths:
+      - src/ai_video/production/_dependency_authoring.py
+      - src/ai_video/production/_dependency_primitives.py
+      - src/ai_video/production/_dependency_types.py
+      - src/ai_video/production/video_pre_generation.py
+      - src/ai_video/production/_state_commit_video.py
+    test_paths:
+      - tests/test_production_video_pre_generation.py
+      - tests/test_production_selective_rebuild.py
+    harness_check_ids:
+      - production_dependency_tests
+      - production_video_provider_tests
     assertions:
       - type: text_contains
         path: docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md

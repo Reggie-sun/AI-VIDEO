@@ -2,6 +2,33 @@
 
 Date: 2026-08-29
 
+## Supersession Notice — 2026-08-29 Pre-Generation Graph Ready
+
+Current M6-D pre-submit stop已从`ACTIVE_PRE_GENERATION_DEPENDENCY_GRAPH_NOT_MATERIALIZED`推进到
+`PROVIDER_PROFILE_NATIVE_PROMPT_AND_EXACT_REQUEST_NOT_SELECTED`。Implementation commit
+`6a5bbbf65d175eb58e1fbe2e6753a2965705b8d8`新增asset-free canonical pre-generation graph projection、共享
+authoring dependency owner与`begin_video_generation()`写request receipt前的in-lock exact-current guard。Independent
+`reviewer_xhigh`初审通过adversarial proof发现缺失authoring edge仍可通过；修复后guard从sealed target lineage重建
+canonical graph并要求exact equality，同时要求全部active creative states为`FRESH`。同tier re-review最终为
+`accept with concerns`且无blocking issue；其重复guard concern也已在checkpoint前删除。
+
+Exact Drama root只通过`ProductionStateCommitter.bootstrap_dependency_graph()`与既有
+`upgrade_manifest_schema("2.7")`materialize graph。Strict reopen evidence：
+
+- Manifest `2.7` revision `4`；graph bootstrap attempt `SUCCEEDED`；
+- active graph content hash `761c92a0a8507ae2b8f14de5338b337e0d567e78b654e36403d3428a0da47ff1`；
+- 15个creative nodes全部为exact Project-evidenced `FRESH`；
+- 唯一`generation-target:drama.shot.waiting-room.001:final_visual`为无applied media evidence、无blocker的
+  `STALE` ready frontier；
+- evidence `runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-pre-generation-graph.json`，
+  SHA-256 `4bd08f0a6ce3a8e666816f264a1a7a20acfd3897b4ce58f264bd4f17fb4f4115`；
+- accepted checkpoint
+  `docs/superpowers/artifacts/drama/b-d0/execution-gate/key-at-the-waiting-room-v2.accepted.json`。
+
+本checkpoint没有选择或改变fixture/baseline，没有选择Provider或编写native prompt，没有调用ComfyUI、H3或
+`video-analysis`，没有持久化video request、submit、生成、retry、repair、拼接、candidate activation、HUMAN media
+verdict、P6或Final Acceptance。`B-D0=PASS`不变；`M6-D=NOT_EVALUATED`且下一次submit仍禁止。
+
 ## Supersession Notice — 2026-08-29 Execution Path Accepted
 
 下方所有“B-D0仍为`BLOCKED_BEFORE_MEDIA`”、“current execution gates / exact evidence path尚未验证”与旧
