@@ -735,6 +735,66 @@ Verification 与 publication state：
 activation、P6、Final Acceptance、push、deploy 或 release。`16` 个“旁证待解析”是当前 unsupported evidence
 schema 的真实边界，不应回退成含糊的 Runs coverage failure，也不得通过邻近文件或 filename 猜测补齐。
 
+## Qingyan Derived Clip Evidence Binding — 2026-08-29
+
+用户在 External rail 中指出 `artifacts/qingyan-miao-ad-20260826-v8/work/` 下三个剪辑仍显示“无绑定证据”，
+因此无法在卡片与详情中查看 Prompt、Shot 与类型。根因不是播放器或 catalog 丢失文件，而是这些 `work/*.mp4`
+是 `compose_t8_canvas_v8.sh` 对上游 Provider output 执行 crop、scale、retime 与文字合成后产生的新 exact bytes；
+既有 runtime receipt 只绑定上游 output，不能合法覆盖派生剪辑。
+
+本 follow-up 新增
+`artifacts/qingyan-miao-ad-20260826-v8/work/external-media-metadata.json`，只为以下三个派生文件声明
+exact path、SHA-256、bytes、trimmed Prompt hash、Shot ID、`editorial_derived_clip` 与
+`FL2VA-derived`：
+
+- `01-underarm-deodorizing.mp4`：`0122cef3b583e65c8d6442cdf5b5c7baa00325d028f98fb5021d57ffa4759fc3`，
+  `6946221` bytes，Shot `01_underarm_deodorizing_repair`；
+- `02-elder-dialogue.mp4`：`b9e815801783df59e4f9a52ee320875e00bd21662e18d268fce8b814adfa3faa`，
+  `5171503` bytes，Shot `02_elder_dialogue_repair`；
+- `03-leave-together.mp4`：`8b468de8d72cd441c78155105c07b779c77c2b731f1c26b322008fc334af7bb6`，
+  `15139693` bytes，Shot `03_leave_together`。
+
+`provider-console/scripts/external-media.mjs` 现在只在 `prompt_sha256` 匹配 trimmed Prompt text 时读取
+`prompt_path`。一个 metadata node 声明的所有 path、SHA 与 size constraints 必须同时匹配；其中
+`size_bytes` 只能约束 identity，不能单独建立 exact binding。回归测试已证明 wrong SHA + correct path、
+size-only metadata 与 wrong Prompt hash 全部 fail closed。Public sanitizer 同时保留 H3 Prompt 中正常的
+`</d>` closing tag，并继续拒绝紧跟 closing tag 的 absolute path，防止为了展示对白而放宽 path disclosure。
+
+`provider-console/src/external-media-contract.js` 将这种“有 exact-bound Prompt/Shot/type，但没有生成结果
+receipt”的状态显示为“旁证已关联”，raw status、`generation_status` 与 `lifecycle_status` 仍为
+`NOT_EVALUATED`。`source_receipt` 只是 sidecar 中未被解释的 provenance pointer，不产生 succeeded、candidate、
+QA、P6、Final Acceptance 或 activation claim。
+
+Live browser verification：
+
+- fresh reload 后三个 v8 目标卡片均显示“旁证已关联”、各自 Shot ID、`FL2VA-derived` 与完整 Prompt；
+- 点开 `02-elder-dialogue.mp4` 后，详情同时显示 `02_elder_dialogue_repair`、
+  `editorial_derived_clip`、Prompt 对白“姑娘，喷的什么？”与“青颜抑汗净味喷雾，清爽舒适。”；
+- inline video 为 `readyState=4`、`duration=6.458333`、`error=null`；Chrome console 无 warning/error；
+- 当前筛选计数为 `已关联 (94)`、`Runs 待恢复 (0)`、`旁证待解析 (9)`、`无绑定证据 (303)`。
+
+同名文件仍必须按 bytes 区分：
+`artifacts/qingyan-miao-ad-20260826-v9/work/02-elder-dialogue.mp4` 的 SHA-256 为
+`8ea45a485b51f2b5a44339420bb807d07c935f65a667c9b54b2e782922131786`、`5207193` bytes；它不是本次 v8
+sidecar 的 target，仍保持“无绑定证据”。不得因 filename 相同而复用 v8 metadata。
+
+Verification 与 publication state：
+
+- implementation commit：`ba03d6db79efe6664bd7faec810a384f7ae23515`；
+- full Provider Console Node suite：`76 passed`；Vite/Sites production build：`4582 modules transformed`；
+- native `reviewer_xhigh` 在三轮 exact-identity/sanitizer negative repro 修复后最终 verdict 为 `accept`，无
+  blocking issue 或 concern；
+- exact range：
+  `299daf658f4d3fffebd90bffb970f00ebb544b41..ba03d6db79efe6664bd7faec810a384f7ae23515`；receipt：
+  `.agent/harness/runs/qingyan-derived-evidence-20260829/receipt.json`。Receipt 内 Architecture Gate PASS、
+  full Python `4157 passed, 4 skipped`、policy Node `71 passed`、Vite build 通过；verifier 的 `passed`、
+  `fresh`、`fresh_for_snapshot`、`scope_paths_match`、`scope_worktree_clean`、
+  `complete_completion_proof`、`integrity` 与 `artifact_integrity` 全部为 `true`。
+
+本 follow-up 只新增 metadata sidecar 并修改 local read-only Console；没有修改 MP4 bytes、执行 Provider
+submit、paid/cloud call、媒体生成、Manifest mutation、candidate activation、P6、Final Acceptance、push、
+deploy 或 release。
+
 ## Assessment
 
 该 slice 已满足“逐生成视频查看用于判断的详细信息”这一工程目标：操作员能在一个真实 attempt 视图中
