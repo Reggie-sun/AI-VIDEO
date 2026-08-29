@@ -23,6 +23,7 @@ import pytest
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import StateCommitStatus, VideoAttemptPhase
 from ai_video.production.video_generation import VideoGenerationService
+from ai_video.production.video import VideoSubmission
 
 
 @contextmanager
@@ -103,6 +104,115 @@ def test_video_generation_service_exposes_validate_once_and_activate_once() -> N
     for name in ("validate_once", "activate_once"):
         method = getattr(VideoGenerationService, name)
         assert callable(method), f"{name} must be callable"
+
+
+def test_remote_reference_lease_reopens_only_activated_source_evidence(
+    monkeypatch,
+) -> None:
+    request = object()
+    submit_receipt = object()
+    submission = SimpleNamespace(submission_fingerprint="a" * 64)
+    observation = SimpleNamespace(observation_fingerprint="b" * 64)
+    fetch_receipt = SimpleNamespace(
+        fetch_fingerprint="c" * 64,
+        remote_materialization=SimpleNamespace(content_hash="d" * 64),
+    )
+    lease = object()
+    replay_calls = []
+    state = SimpleNamespace(
+        phase=VideoAttemptPhase.ACTIVATE,
+        request="request-pointer",
+        latest_observation="observation-pointer",
+        fetch_receipt="fetch-pointer",
+    )
+    attempt = SimpleNamespace(
+        attempt_id="attempt-1",
+        status=StateCommitStatus.SUCCEEDED,
+        video_generation_state=state,
+        paid_provider_state=SimpleNamespace(submit_receipt="submit-pointer"),
+    )
+
+    class Committer:
+        def replay_active_video_generation(self, *, attempt_id):
+            replay_calls.append(attempt_id)
+            return object()
+
+        def _read_manifest(self):
+            return object()
+
+        def _video_attempt(self, _manifest, attempt_id):
+            assert attempt_id == "attempt-1"
+            return attempt
+
+        def _reopen_video_request(self, pointer):
+            assert pointer == "request-pointer"
+            return request
+
+        def _reopen_paid_submit(self, pointer):
+            assert pointer == "submit-pointer"
+            return submit_receipt
+
+        def _reopen_video_status(self, pointer):
+            assert pointer == "observation-pointer"
+            return observation
+
+        def _reopen_video_fetch(self, pointer):
+            assert pointer == "fetch-pointer"
+            return fetch_receipt
+
+    class Provider:
+        def refresh_provider_output_reference_lease(self, *values):
+            assert values[:4] == (
+                submission,
+                submit_receipt,
+                observation,
+                fetch_receipt,
+            )
+            refresh_permit = values[4]
+            assert refresh_permit._consume(
+                submission_fingerprint=submission.submission_fingerprint,
+                observation_fingerprint=observation.observation_fingerprint,
+                fetch_fingerprint=fetch_receipt.fetch_fingerprint,
+                materialization_receipt_id=(
+                    fetch_receipt.remote_materialization.content_hash
+                ),
+            )
+            return lease
+
+    monkeypatch.setattr(
+        VideoSubmission,
+        "from_paid_submit_receipt",
+        lambda **_kwargs: submission,
+    )
+    service = VideoGenerationService(committer=Committer(), provider=Provider())
+
+    assert (
+        service.refresh_remote_reference_lease_once(attempt_id="attempt-1")
+        is lease
+    )
+    assert replay_calls == ["attempt-1", "attempt-1"]
+
+
+def test_remote_reference_lease_rejects_superseded_active_source_before_provider():
+    class Committer:
+        def replay_active_video_generation(self, *, attempt_id):
+            assert attempt_id == "historical-attempt"
+            raise AiVideoError(
+                code=ErrorCode.PRODUCTION_STATE_INVALID,
+                user_message="Video generation success is not exact active evidence.",
+                retryable=False,
+            )
+
+    class Provider:
+        def refresh_provider_output_reference_lease(self, *_values):
+            raise AssertionError("stale source must stop before Provider access")
+
+    service = VideoGenerationService(committer=Committer(), provider=Provider())
+
+    with pytest.raises(AiVideoError) as exc_info:
+        service.refresh_remote_reference_lease_once(attempt_id="historical-attempt")
+
+    assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
 
 
 def test_validate_once_signature_accepts_continuity_reviewer() -> None:

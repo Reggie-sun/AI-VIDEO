@@ -6,9 +6,11 @@ import base64
 import hashlib
 import json
 from collections.abc import Mapping
-from datetime import datetime
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
 from types import MappingProxyType
 from typing import Callable, Literal
+from urllib.parse import urlsplit
 
 from pydantic import ConfigDict, Field, model_validator
 
@@ -28,6 +30,7 @@ from ai_video.production.paid_provider import (
     PaidProviderCallPreview,
 )
 from ai_video.production.video import (
+    RemoteMediaMaterializationReceipt,
     ResolvedVideoGenerationRequest,
     VideoImageReferenceBinding,
     VideoMediaReferenceBinding,
@@ -36,6 +39,8 @@ from ai_video.production.registry import registry_semantic_sha256
 
 
 SEEDANCE_MAX_SYNTHETIC_IMAGE_BYTES = 30_000_000
+_MAX_REMOTE_REFERENCE_LEASE = timedelta(minutes=5)
+_REMOTE_REFERENCE_LEASE_TOKEN = object()
 _SYNTHETIC_EGRESS_ID_PREFIX = "seedance-synthetic-egress:"
 _SYNTHETIC_IMAGE_ID_PREFIX = "seedance-synthetic-image:"
 _IMAGE_ROLE_ORDER = {"first_frame": 0, "last_frame": 1, "reference": 2}
@@ -191,6 +196,157 @@ class SeedanceAssetReferenceResolver:
         ):
             raise _invalid("Seedance Ark asset receipt does not match the exact local input.")
         return f"asset://{receipt.provider_asset_id}"
+
+
+@dataclass(frozen=True, slots=True, init=False)
+class SeedanceRemoteReferenceLease:
+    """In-memory capability URL; the signed locator is never serialized."""
+
+    materialization_receipt_id: str
+    remote_locator_sha256: str
+    remote_origin: str
+    issued_at: datetime
+    not_after: datetime
+    _url: str = field(repr=False)
+    _durability_validator: Callable[[], bool] = field(repr=False)
+
+    def __init__(
+        self,
+        token: object,
+        *,
+        materialization: RemoteMediaMaterializationReceipt,
+        url: str,
+        issued_at: datetime,
+        not_after: datetime,
+        durability_validator: Callable[[], bool],
+    ) -> None:
+        if token is not _REMOTE_REFERENCE_LEASE_TOKEN:
+            raise TypeError(
+                "Seedance remote reference leases are minted only after verified refresh."
+            )
+        if type(materialization) is not RemoteMediaMaterializationReceipt:
+            raise _invalid("Seedance remote materialization receipt is invalid.")
+        if (
+            issued_at.tzinfo is None
+            or not_after.tzinfo is None
+            or not_after <= issued_at
+            or not_after - issued_at > _MAX_REMOTE_REFERENCE_LEASE
+        ):
+            raise _invalid("Seedance remote reference lease time is invalid.")
+        try:
+            parsed = urlsplit(url)
+            port = parsed.port
+        except ValueError:
+            raise _invalid("Seedance remote reference URL is invalid.") from None
+        if (
+            parsed.scheme != "https"
+            or parsed.hostname is None
+            or parsed.username is not None
+            or parsed.password is not None
+            or not parsed.path
+            or parsed.fragment
+        ):
+            raise _invalid("Seedance remote reference URL is invalid.")
+        host = parsed.hostname.lower()
+        origin = f"https://{host}"
+        if port is not None and port != 443:
+            origin = f"{origin}:{port}"
+        if (
+            materialization.provider_kind != "volcengine_ark_seedance"
+            or materialization.transport_kind != "provider_output_https"
+            or materialization.remote_origin != origin
+            or materialization.remote_locator_sha256
+            != hashlib.sha256(url.encode()).hexdigest()
+        ):
+            raise _invalid("Seedance remote reference lease does not match materialization.")
+        object.__setattr__(self, "materialization_receipt_id", materialization.content_hash)
+        object.__setattr__(
+            self, "remote_locator_sha256", materialization.remote_locator_sha256
+        )
+        object.__setattr__(self, "remote_origin", origin)
+        object.__setattr__(self, "issued_at", issued_at)
+        object.__setattr__(self, "not_after", not_after)
+        object.__setattr__(self, "_url", url)
+        object.__setattr__(self, "_durability_validator", durability_validator)
+
+    def resolve(
+        self,
+        *,
+        materialization: RemoteMediaMaterializationReceipt,
+        now: datetime,
+    ) -> str:
+        try:
+            parsed = urlsplit(self._url)
+            port = parsed.port
+        except ValueError:
+            raise _invalid("Seedance remote reference lease is invalid.") from None
+        origin = f"https://{parsed.hostname.lower()}" if parsed.hostname else ""
+        if port is not None and port != 443:
+            origin = f"{origin}:{port}"
+        if (
+            type(materialization) is not RemoteMediaMaterializationReceipt
+            or self.materialization_receipt_id != materialization.content_hash
+            or self.remote_locator_sha256 != materialization.remote_locator_sha256
+            or self.remote_origin != materialization.remote_origin
+            or origin != materialization.remote_origin
+            or hashlib.sha256(self._url.encode()).hexdigest()
+            != materialization.remote_locator_sha256
+            or self.not_after - self.issued_at > _MAX_REMOTE_REFERENCE_LEASE
+        ):
+            raise _invalid("Seedance remote reference lease does not match materialization.")
+        if (
+            now.tzinfo is None
+            or now < self.issued_at
+            or now >= self.not_after
+            or not self._durability_validator()
+        ):
+            raise _invalid("Seedance remote reference lease is not current.")
+        return self._url
+
+
+class SeedanceRemoteReferenceResolver:
+    """Resolve exact fetched Seedance bytes through one short-lived HTTPS lease."""
+
+    def __init__(
+        self,
+        *,
+        materializations: tuple[RemoteMediaMaterializationReceipt, ...],
+        leases: tuple[SeedanceRemoteReferenceLease, ...],
+        now: Callable[[], datetime],
+    ) -> None:
+        by_receipt = {lease.materialization_receipt_id: lease for lease in leases}
+        if len(by_receipt) != len(leases):
+            raise _invalid("Seedance remote reference leases are ambiguous.")
+        by_artifact: dict[str, tuple[RemoteMediaMaterializationReceipt, SeedanceRemoteReferenceLease]] = {}
+        for materialization in materializations:
+            if type(materialization) is not RemoteMediaMaterializationReceipt:
+                raise _invalid("Seedance remote materialization receipt is invalid.")
+            lease = by_receipt.get(materialization.content_hash)
+            if lease is None or materialization.artifact_sha256 in by_artifact:
+                raise _invalid("Seedance remote materialization identities are ambiguous.")
+            by_artifact[materialization.artifact_sha256] = (materialization, lease)
+        if len(by_receipt) != len(by_artifact):
+            raise _invalid("Seedance remote reference lease has no materialization.")
+        self._by_artifact = by_artifact
+        self._now = now
+
+    def __call__(self, binding: VideoMediaReferenceBinding) -> str:
+        if (
+            type(binding) is not VideoMediaReferenceBinding
+            or binding.kind != "video"
+            or binding.role != "reference_video"
+        ):
+            raise _invalid("Seedance remote references only support reference video.")
+        selected = self._by_artifact.get(binding.asset_sha256)
+        if selected is None:
+            raise _invalid("Seedance input has no remote materialization receipt.")
+        materialization, lease = selected
+        if (
+            materialization.artifact_size_bytes != binding.size_bytes
+            or materialization.artifact_mime_type != binding.mime_type
+        ):
+            raise _invalid("Seedance remote materialization does not match exact input bytes.")
+        return lease.resolve(materialization=materialization, now=self._now())
 
 
 class SeedanceSyntheticImageReferenceReceipt(StrictModel):

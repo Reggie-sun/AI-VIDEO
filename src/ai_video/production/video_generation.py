@@ -25,6 +25,8 @@ from ai_video.production.paid_provider import (
     PaidProviderSubmitReceipt,
 )
 from ai_video.production.video import (
+    _REMOTE_REFERENCE_REFRESH_PERMIT_TOKEN,
+    _RemoteReferenceRefreshPermit,
     ResolvedVideoGenerationRequest,
     VideoFetchReceipt,
     VideoProvider,
@@ -480,6 +482,77 @@ class VideoGenerationService:
             relative_path=pointer.artifact_path,
             receipt=fetch_receipt,
         )
+
+    def refresh_remote_reference_lease_once(self, *, attempt_id: str):
+        """Reopen one accepted remote Shot and refresh its transient input lease."""
+
+        self._committer.replay_active_video_generation(attempt_id=attempt_id)
+        attempt, state = self._state(attempt_id)
+        paid_state = attempt.paid_provider_state
+        refresh = getattr(
+            self._provider,
+            "refresh_provider_output_reference_lease",
+            None,
+        )
+        if (
+            attempt.status is not StateCommitStatus.SUCCEEDED
+            or state.phase is not VideoAttemptPhase.ACTIVATE
+            or state.latest_observation is None
+            or state.fetch_receipt is None
+            or paid_state is None
+            or paid_state.submit_receipt is None
+            or not callable(refresh)
+        ):
+            raise AiVideoError(
+                code=ErrorCode.PRODUCTION_STATE_INVALID,
+                user_message=(
+                    "Remote reference lease requires one activated remote video attempt."
+                ),
+                retryable=False,
+            )
+        request = self._committer._reopen_video_request(state.request)
+        submit_receipt = self._committer._reopen_paid_submit(
+            paid_state.submit_receipt
+        )
+        submission = VideoSubmission.from_paid_submit_receipt(
+            resolved=request,
+            receipt=submit_receipt,
+        )
+        observation = self._committer._reopen_video_status(
+            state.latest_observation
+        )
+        fetch_receipt = self._committer._reopen_video_fetch(state.fetch_receipt)
+        materialization = fetch_receipt.remote_materialization
+        if materialization is None:
+            raise AiVideoError(
+                code=ErrorCode.PRODUCTION_STATE_INVALID,
+                user_message="Active remote video has no materialization evidence.",
+                retryable=False,
+            )
+        refresh_permit = _RemoteReferenceRefreshPermit(
+            _REMOTE_REFERENCE_REFRESH_PERMIT_TOKEN,
+            submission_fingerprint=submission.submission_fingerprint,
+            observation_fingerprint=observation.observation_fingerprint,
+            fetch_fingerprint=fetch_receipt.fetch_fingerprint,
+            materialization_receipt_id=materialization.content_hash,
+            durability_validator=lambda: self._remote_reference_source_is_active(
+                attempt_id
+            ),
+        )
+        return refresh(
+            submission,
+            submit_receipt,
+            observation,
+            fetch_receipt,
+            refresh_permit,
+        )
+
+    def _remote_reference_source_is_active(self, attempt_id: str) -> bool:
+        try:
+            self._committer.replay_active_video_generation(attempt_id=attempt_id)
+        except Exception:
+            return False
+        return True
 
     def resume_next_action(self, *, attempt_id: str) -> str:
         return self._committer.video_resume_next_action(attempt_id=attempt_id)

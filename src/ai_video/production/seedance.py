@@ -15,7 +15,7 @@ import re
 from collections.abc import Callable, Iterator, Mapping
 from contextlib import AbstractContextManager
 from dataclasses import dataclass, field
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from typing import BinaryIO, Literal, Protocol
 from urllib.parse import quote, urlsplit
 
@@ -41,10 +41,15 @@ from ai_video.production.seedance_profile import (
     SeedanceProviderProfile,
 )
 from ai_video.production.seedance_asset import (
+    _REMOTE_REFERENCE_LEASE_TOKEN,
     SeedanceAssetReferenceResolver,
+    SeedanceRemoteReferenceLease,
+    SeedanceRemoteReferenceResolver,
     SeedanceSyntheticImageReferenceResolver,
 )
 from ai_video.production.video import (
+    _RemoteReferenceRefreshPermit,
+    RemoteMediaMaterializationReceipt,
     ResolvedVideoGenerationRequest,
     VideoFetchReceipt,
     VideoFlexibleOutputRequirement,
@@ -80,6 +85,7 @@ SEEDANCE_MAX_REQUEST_BODY_BYTES = 64_000_000
 _SAFE_TASK_ID = re.compile(r"^[A-Za-z0-9._:-]{1,256}$")
 _SAFE_ASSET_REFERENCE = re.compile(r"^asset://asset-[A-Za-z0-9._:-]{1,250}$")
 _FILE_ID_PREFIX = "seedance-content-"
+_REMOTE_REFERENCE_LEASE_SECONDS = 300
 _MP4_MAJOR_BRANDS = {
     b"M4V ",
     b"avc1",
@@ -265,7 +271,9 @@ class SeedanceVideoProvider:
         transport: SeedanceTransport,
         credential: CredentialResolver,
         input_reference: (
-            SeedanceAssetReferenceResolver | SeedanceSyntheticImageReferenceResolver
+            SeedanceAssetReferenceResolver
+            | SeedanceRemoteReferenceResolver
+            | SeedanceSyntheticImageReferenceResolver
         ),
         now: Callable[[], datetime] | None = None,
     ) -> None:
@@ -511,6 +519,20 @@ class SeedanceVideoProvider:
                     ErrorCode.VIDEO_REQUEST_INVALID,
                     "Seedance synthetic input reference is unavailable.",
                 ) from None
+        if type(self._input_reference) is SeedanceRemoteReferenceResolver:
+            if type(binding) is not VideoMediaReferenceBinding:
+                raise _error(
+                    ErrorCode.VIDEO_REQUEST_INVALID,
+                    "Seedance remote output cannot resolve image bindings.",
+                )
+            try:
+                value = self._input_reference(binding)
+            except Exception:
+                raise _error(
+                    ErrorCode.VIDEO_REQUEST_INVALID,
+                    "Seedance remote input reference is unavailable.",
+                ) from None
+            return self._result_url(value)
         if type(self._input_reference) is not SeedanceAssetReferenceResolver:
             raise _error(
                 ErrorCode.VIDEO_REQUEST_INVALID,
@@ -529,6 +551,146 @@ class SeedanceVideoProvider:
                 "Seedance input reference must be an explicit provider asset reference.",
             )
         return value
+
+    def _validate_remote_reference_lease(
+        self, request: ResolvedVideoGenerationRequest
+    ) -> None:
+        if type(self._input_reference) is SeedanceRemoteReferenceResolver:
+            for binding in request.media_bindings:
+                self._asset_reference(binding)
+
+    def refresh_provider_output_reference_lease(
+        self,
+        submission: VideoSubmission,
+        submit_receipt: PaidProviderSubmitReceipt,
+        observation: VideoTaskObservation,
+        fetch_receipt: VideoFetchReceipt,
+        refresh_permit: object,
+    ) -> SeedanceRemoteReferenceLease:
+        """Re-query one exact fetched task and issue a bounded in-memory URL lease."""
+
+        task_id = _validate_submission(submission, submit_receipt)
+        materialization = fetch_receipt.remote_materialization
+        if (
+            submission.provider_task_binding is None
+            or observation.state is not VideoTaskState.SUCCEEDED
+            or observation.submission_fingerprint != submission.submission_fingerprint
+            or observation.paid_submit_receipt_fingerprint
+            != submit_receipt.submit_receipt_fingerprint
+            or fetch_receipt.observation_fingerprint
+            != observation.observation_fingerprint
+            or fetch_receipt.submission_fingerprint
+            != submission.submission_fingerprint
+            or fetch_receipt.paid_submit_receipt_fingerprint
+            != submit_receipt.submit_receipt_fingerprint
+            or fetch_receipt.provider_file_id != observation.provider_file_id
+            or type(materialization) is not RemoteMediaMaterializationReceipt
+            or materialization.provider_kind != _PROVIDER_KIND
+            or materialization.model_id
+            != submission.provider_task_binding.response_model_id
+            or materialization.remote_origin not in self._profile.result_origins
+        ):
+            raise _error(
+                ErrorCode.VIDEO_REQUEST_INVALID,
+                "Seedance remote reference requires exact fetched source evidence.",
+            )
+        if type(refresh_permit) is not _RemoteReferenceRefreshPermit or not (
+            refresh_permit._consume(
+                submission_fingerprint=submission.submission_fingerprint,
+                observation_fingerprint=observation.observation_fingerprint,
+                fetch_fingerprint=fetch_receipt.fetch_fingerprint,
+                materialization_receipt_id=materialization.content_hash,
+            )
+        ):
+            raise _error(
+                ErrorCode.VIDEO_REQUEST_INVALID,
+                "Seedance remote reference refresh requires activated-source authority.",
+            )
+        state, result_url = self._query(
+            task_id,
+            expected_model_id=submission.provider_task_binding.response_model_id,
+        )
+        if state is not VideoTaskState.SUCCEEDED or result_url is None:
+            raise _error(
+                ErrorCode.VIDEO_PROVIDER_FAILED,
+                "Seedance source task no longer exposes a reference URL.",
+            )
+        value = self._result_url(result_url)
+        if hashlib.sha256(value.encode()).hexdigest() != materialization.remote_locator_sha256:
+            raise _error(
+                ErrorCode.VIDEO_REQUEST_INVALID,
+                "Seedance source reference locator changed after exact fetch.",
+            )
+        self._verify_remote_reference_bytes(value, materialization)
+        issued_at = self._now()
+        return SeedanceRemoteReferenceLease(
+            _REMOTE_REFERENCE_LEASE_TOKEN,
+            materialization=materialization,
+            url=value,
+            issued_at=issued_at,
+            not_after=issued_at + timedelta(seconds=_REMOTE_REFERENCE_LEASE_SECONDS),
+            durability_validator=refresh_permit._durability_is_current,
+        )
+
+    def _verify_remote_reference_bytes(
+        self,
+        value: str,
+        materialization: RemoteMediaMaterializationReceipt,
+    ) -> None:
+        request = SeedanceTransportRequest(
+            method="GET",
+            url=value,
+            headers={"accept": materialization.artifact_mime_type},
+        )
+        digest = hashlib.sha256()
+        size = 0
+        prefix = bytearray()
+        try:
+            with self._transport.stream(request) as response:
+                if not 200 <= response.status_code < 300:
+                    raise _error(
+                        ErrorCode.VIDEO_PROVIDER_FAILED,
+                        "Seedance remote reference is not accessible.",
+                    )
+                content_type = response.headers.get("content-type", "").split(";", 1)[0].lower()
+                if content_type != materialization.artifact_mime_type:
+                    raise _error(
+                        ErrorCode.VIDEO_ARTIFACT_INVALID,
+                        "Seedance remote reference content type changed.",
+                    )
+                for chunk in response.iter_bytes():
+                    if not isinstance(chunk, bytes) or not chunk:
+                        continue
+                    size += len(chunk)
+                    if size > self._profile.max_download_bytes:
+                        raise _error(
+                            ErrorCode.VIDEO_ARTIFACT_INVALID,
+                            "Seedance remote reference exceeds the byte ceiling.",
+                        )
+                    if len(prefix) < 64:
+                        prefix.extend(chunk[: 64 - len(prefix)])
+                    digest.update(chunk)
+        except AiVideoError:
+            raise
+        except Exception:
+            raise _error(
+                ErrorCode.VIDEO_PROVIDER_FAILED,
+                "Seedance remote reference verification failed.",
+                retryable=True,
+            ) from None
+        if (
+            size != materialization.artifact_size_bytes
+            or digest.hexdigest() != materialization.artifact_sha256
+            or not _matches_iso_bmff_container(
+                content_type=materialization.artifact_mime_type,
+                prefix=bytes(prefix),
+                size_bytes=size,
+            )
+        ):
+            raise _error(
+                ErrorCode.VIDEO_ARTIFACT_INVALID,
+                "Seedance remote reference bytes changed after materialization.",
+            )
 
     def _payload(self, request: ResolvedVideoGenerationRequest) -> dict[str, object]:
         profile = self._profiles_by_capability[request.capability_id]
@@ -627,6 +789,7 @@ class SeedanceVideoProvider:
             headers=self._credential_headers(json_body=True),
             body=body,
         )
+        self._validate_remote_reference_lease(request)
         if not _consume_permit(permit, binding):
             raise _error(
                 ErrorCode.PAID_PROVIDER_AUTHORIZATION_REQUIRED,
@@ -784,9 +947,10 @@ class SeedanceVideoProvider:
         )
         if state is not VideoTaskState.SUCCEEDED or result_url is None:
             raise _error(ErrorCode.VIDEO_PROVIDER_FAILED, "Seedance task is not fetchable.")
+        verified_result_url = self._result_url(result_url)
         request = SeedanceTransportRequest(
             method="GET",
-            url=self._result_url(result_url),
+            url=verified_result_url,
             headers={"accept": "video/mp4, video/quicktime"},
         )
         digest = hashlib.sha256()
@@ -843,13 +1007,38 @@ class SeedanceVideoProvider:
                 ErrorCode.VIDEO_ARTIFACT_INVALID,
                 "Seedance download is not a measured MP4/MOV artifact.",
             )
+        fetched_at = self._now()
+        parsed_result = urlsplit(verified_result_url)
+        remote_origin = f"https://{parsed_result.hostname.lower()}"
+        if parsed_result.port is not None and parsed_result.port != 443:
+            remote_origin = f"{remote_origin}:{parsed_result.port}"
+        remote_materialization = RemoteMediaMaterializationReceipt.create(
+            transport_kind="provider_output_https",
+            provider_kind=_PROVIDER_KIND,
+            model_id=submission.provider_task_binding.response_model_id,
+            submission_fingerprint=submission.submission_fingerprint,
+            paid_submit_receipt_fingerprint=(
+                submit_receipt.submit_receipt_fingerprint
+            ),
+            provider_file_id=observation.provider_file_id,
+            remote_origin=remote_origin,
+            remote_locator_sha256=hashlib.sha256(
+                verified_result_url.encode()
+            ).hexdigest(),
+            artifact_sha256=digest.hexdigest(),
+            artifact_size_bytes=size,
+            artifact_mime_type=raw_type,
+            accessibility_verification="exact_get",
+            verified_at=fetched_at,
+        )
         return VideoFetchReceipt.create(
             submission=submission,
             observation=observation,
             content_type=raw_type,  # type: ignore[arg-type]
             size_bytes=size,
             artifact_sha256=digest.hexdigest(),
-            fetched_at=self._now(),
+            fetched_at=fetched_at,
+            remote_materialization=remote_materialization,
         )
 
 
