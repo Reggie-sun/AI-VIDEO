@@ -249,7 +249,11 @@ def _request(
     base_registry: RegistrySnapshotPointer | None = None,
 ) -> VideoGenerationRequest:
     selected_output = output or VideoFlexibleOutputRequirement(
-        timing_mode="exact_seconds",
+        timing_mode=(
+            "nominal_seconds"
+            if model_id == "doubao-seedance-2-0-mini-260615"
+            else "exact_seconds"
+        ),
         duration_seconds=5,
         dimension_mode="exact",
         width=1280,
@@ -1431,7 +1435,7 @@ def test_local_registry_asset_id_cannot_masquerade_as_ark_asset_uri():
         mode=VideoGenerationMode.IMAGE_TO_VIDEO,
         image_bindings=(first_frame,),
         output=VideoFlexibleOutputRequirement(
-            timing_mode="exact_seconds",
+            timing_mode="nominal_seconds",
             duration_seconds=5,
             dimension_mode="exact",
             width=864,
@@ -2360,7 +2364,7 @@ def _synthetic_submit_fixture(
             )
         ),
         output=VideoFlexibleOutputRequirement(
-            timing_mode="exact_seconds",
+            timing_mode="nominal_seconds",
             duration_seconds=5,
             dimension_mode="exact",
             width=864,
@@ -3095,7 +3099,7 @@ def test_mini_default_payload_omits_optional_defaults_but_preserves_audio_opt_ou
         profile,
         model_id="doubao-seedance-2-0-mini-260615",
         output=VideoFlexibleOutputRequirement(
-            timing_mode="exact_seconds",
+            timing_mode="nominal_seconds",
             duration_seconds=5,
             dimension_mode="exact",
             width=864,
@@ -3129,6 +3133,17 @@ def test_mini_default_payload_omits_optional_defaults_but_preserves_audio_opt_ou
         "generate_audio": False,
         "duration": 5,
     }
+
+    mini_profile = next(
+        entry
+        for entry in profile.capabilities
+        if entry.variant.model_id == "doubao-seedance-2-0-mini-260615"
+        and entry.variant.mode is VideoGenerationMode.TEXT_TO_VIDEO
+    )
+    assert mini_profile.variant.output_capability.timing_modes == (
+        "nominal_seconds",
+        "provider_selected",
+    )
 
 
 def test_seedance_2_0_mini_continuity_binds_exact_terminal_frame_payload():
@@ -3227,7 +3242,7 @@ def test_seedance_2_0_mini_continuity_binds_exact_terminal_frame_payload():
             terminal.extracted_asset_id,
         ),
         output=VideoFlexibleOutputRequirement(
-            timing_mode="exact_seconds",
+            timing_mode="nominal_seconds",
             duration_seconds=5,
             dimension_mode="exact",
             width=864,
@@ -3419,7 +3434,11 @@ def test_non_default_provider_fields_remain_explicit(
             profile,
             model_id=model_id,
             output=VideoFlexibleOutputRequirement(
-                timing_mode="exact_seconds",
+                timing_mode=(
+                    "nominal_seconds"
+                    if model_id == "doubao-seedance-2-0-mini-260615"
+                    else "exact_seconds"
+                ),
                 duration_seconds=5,
                 dimension_mode="exact",
                 width=1280,
@@ -3722,7 +3741,7 @@ def test_seedance_provider_output_lease_drives_exact_video_extend_without_ark_as
         mode=VideoGenerationMode.VIDEO_EXTEND,
         media_bindings=(source_binding,),
         output=VideoFlexibleOutputRequirement(
-            timing_mode="exact_seconds",
+            timing_mode="nominal_seconds",
             duration_seconds=15,
             dimension_mode="adaptive",
             resolution_label="720p",
@@ -3815,7 +3834,7 @@ def test_seedance_remote_reference_lease_expiry_stops_before_submit_effect():
             mode=VideoGenerationMode.VIDEO_EXTEND,
             media_bindings=(binding,),
             output=VideoFlexibleOutputRequirement(
-                timing_mode="exact_seconds",
+                timing_mode="nominal_seconds",
                 duration_seconds=15,
                 dimension_mode="adaptive",
                 resolution_label="720p",
@@ -4019,7 +4038,7 @@ def test_seedance_remote_reference_lease_is_rechecked_immediately_before_permit(
             mode=VideoGenerationMode.VIDEO_EXTEND,
             media_bindings=(binding,),
             output=VideoFlexibleOutputRequirement(
-                timing_mode="exact_seconds",
+                timing_mode="nominal_seconds",
                 duration_seconds=15,
                 dimension_mode="adaptive",
                 resolution_label="720p",
@@ -4621,7 +4640,11 @@ def test_base_active_profile_rejects_cross_model_request_before_any_effect(
         profile,
         model_id=unentitled_model_id,
         output=VideoFlexibleOutputRequirement(
-            timing_mode="exact_seconds",
+            timing_mode=(
+                "nominal_seconds"
+                if unentitled_model_id == "doubao-seedance-2-0-mini-260615"
+                else "exact_seconds"
+            ),
             duration_seconds=5,
             dimension_mode="exact",
             width=3840,
@@ -4671,7 +4694,11 @@ def test_fast_and_mini_profiles_reject_base_only_output_bounds_before_effect(
                 profile,
                 model_id=model_id,
                 output=VideoFlexibleOutputRequirement(
-                    timing_mode="exact_seconds",
+                    timing_mode=(
+                        "nominal_seconds"
+                        if model_id == "doubao-seedance-2-0-mini-260615"
+                        else "exact_seconds"
+                    ),
                     duration_seconds=5,
                     dimension_mode="exact",
                     width=width,

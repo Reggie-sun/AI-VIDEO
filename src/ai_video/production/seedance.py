@@ -731,7 +731,7 @@ class SeedanceVideoProvider:
             payload["service_tier"] = profile.service_tier
         if output.container != "mp4":
             payload["output_format"] = output.container
-        if output.timing_mode == "exact_seconds":
+        if output.timing_mode in {"exact_seconds", "nominal_seconds"}:
             payload["duration"] = output.duration_seconds
         elif output.timing_mode == "provider_selected":
             payload["duration"] = -1

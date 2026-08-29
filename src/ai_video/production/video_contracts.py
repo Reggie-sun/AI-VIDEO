@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from enum import Enum
-from typing import Literal, Self
+from typing import Literal, Protocol, Self
 
 from pydantic import (
     ConfigDict,
@@ -230,7 +230,9 @@ class VideoMediaReferenceBinding(_VideoContractModel):
 
 
 class VideoFlexibleOutputRequirement(_VideoContractModel):
-    timing_mode: Literal["exact_seconds", "provider_selected", "frame_count"]
+    timing_mode: Literal[
+        "exact_seconds", "nominal_seconds", "provider_selected", "frame_count"
+    ]
     duration_seconds: int | None = Field(default=None, strict=True, gt=0, le=600)
     frame_count: int | None = Field(default=None, strict=True, gt=0, le=144_000)
     dimension_mode: Literal["exact", "adaptive"]
@@ -245,7 +247,7 @@ class VideoFlexibleOutputRequirement(_VideoContractModel):
 
     @model_validator(mode="after")
     def _validate_output(self) -> "VideoFlexibleOutputRequirement":
-        if self.timing_mode == "exact_seconds":
+        if self.timing_mode in {"exact_seconds", "nominal_seconds"}:
             timing_valid = self.duration_seconds is not None and self.frame_count is None
         elif self.timing_mode == "frame_count":
             timing_valid = self.duration_seconds is None and self.frame_count is not None
@@ -274,11 +276,64 @@ class VideoFlexibleOutputRequirement(_VideoContractModel):
         return self
 
     def exact_duration_milliseconds(self) -> int | None:
-        if self.duration_seconds is not None:
+        if self.timing_mode == "exact_seconds" and self.duration_seconds is not None:
             return self.duration_seconds * 1000
         if self.frame_count is not None:
             return round(self.frame_count * 1000 / self.fps)
         return None
+
+    def matches_timing_measurement(
+        self, *, duration_milliseconds: int, frame_count: int
+    ) -> bool:
+        if self.timing_mode == "provider_selected":
+            return True
+        if self.timing_mode == "frame_count":
+            return frame_count == self.frame_count
+        if self.duration_seconds is None:
+            return False
+        expected_duration_milliseconds = self.duration_seconds * 1000
+        expected_frames = self.duration_seconds * self.fps
+        if self.timing_mode == "exact_seconds":
+            return (
+                duration_milliseconds == expected_duration_milliseconds
+                and frame_count == expected_frames
+            )
+        endpoint_duration_milliseconds = (
+            expected_duration_milliseconds + (1000 + self.fps - 1) // self.fps
+        )
+        return (
+            duration_milliseconds == expected_duration_milliseconds
+            and frame_count == expected_frames
+        ) or (
+            expected_duration_milliseconds
+            < duration_milliseconds
+            <= endpoint_duration_milliseconds
+            and frame_count == expected_frames + 1
+        )
+
+
+class _FixedVideoTimingRequirement(Protocol):
+    duration_seconds: int
+    fps: int | None
+
+
+def matches_video_timing_measurement(
+    output: VideoFlexibleOutputRequirement | _FixedVideoTimingRequirement,
+    *,
+    duration_milliseconds: int,
+    frame_count: int,
+) -> bool:
+    if isinstance(output, VideoFlexibleOutputRequirement):
+        return output.matches_timing_measurement(
+            duration_milliseconds=duration_milliseconds,
+            frame_count=frame_count,
+        )
+    expected_frames = (
+        None if output.fps is None else output.duration_seconds * output.fps
+    )
+    return duration_milliseconds == output.duration_seconds * 1000 and (
+        expected_frames is None or frame_count == expected_frames
+    )
 
 
 class VideoOutputCapability(_VideoContractModel):
@@ -286,7 +341,10 @@ class VideoOutputCapability(_VideoContractModel):
     max_duration_seconds: int = Field(strict=True, gt=0, le=600)
     provider_selected_duration: bool
     timing_modes: tuple[
-        Literal["exact_seconds", "provider_selected", "frame_count"], ...
+        Literal[
+            "exact_seconds", "nominal_seconds", "provider_selected", "frame_count"
+        ],
+        ...,
     ] | None = None
     frame_count_min: int | None = Field(default=None, strict=True, gt=0)
     frame_count_max: int | None = Field(default=None, strict=True, gt=0)
@@ -395,7 +453,7 @@ class VideoOutputCapability(_VideoContractModel):
         )
         if output.timing_mode not in timing_modes:
             return False
-        if output.timing_mode == "exact_seconds":
+        if output.timing_mode in {"exact_seconds", "nominal_seconds"}:
             timing_supported = (
                 output.duration_seconds is not None
                 and self.min_duration_seconds

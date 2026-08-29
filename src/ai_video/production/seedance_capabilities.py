@@ -349,13 +349,19 @@ def _output_capability(model_id: str, mode: VideoGenerationMode) -> VideoOutputC
     )
     frame = spec.frame_contract or (None, None, None, None)
     timing_modes: list[
-        Literal["exact_seconds", "provider_selected", "frame_count"]
+        Literal[
+            "exact_seconds", "nominal_seconds", "provider_selected", "frame_count"
+        ]
     ] = []
     if not (
         model_id == "doubao-seedance-2-5-260628"
         and mode is VideoGenerationMode.VIDEO_EDIT
     ):
-        timing_modes.append("exact_seconds")
+        timing_modes.append(
+            "nominal_seconds"
+            if model_id == "doubao-seedance-2-0-mini-260615"
+            else "exact_seconds"
+        )
     if spec.provider_selected_duration:
         timing_modes.append("provider_selected")
     if spec.frame_contract is not None:

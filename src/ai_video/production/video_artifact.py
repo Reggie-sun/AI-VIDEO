@@ -49,6 +49,7 @@ from ai_video.production.review import (
     TrackedGeneratedShotContinuityMeasurements,
     adjudicate_generated_shot_continuity,
 )
+from ai_video.production.video_contracts import matches_video_timing_measurement
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
     TerminalFrameEvidence,
@@ -897,19 +898,14 @@ def _probe_generated_video_candidate(
         raise _video_artifact_error("Generated video probe evidence is invalid.") from exc
 
     output = expected_request.effective_output
-    expected_duration = getattr(output, "duration_seconds", None)
-    expected_frames = getattr(output, "frame_count", None)
     expected_width = getattr(output, "width", None)
     expected_height = getattr(output, "height", None)
     expected_fps = getattr(output, "fps", None)
-    if (
-        expected_frames is None
-        and expected_duration is not None
-        and expected_fps is not None
-    ):
-        derived_frames = Fraction(str(expected_duration)) * Fraction(str(expected_fps))
-        if derived_frames.denominator == 1:
-            expected_frames = derived_frames.numerator
+    timing_matches = matches_video_timing_measurement(
+        output,
+        duration_milliseconds=measured.duration_milliseconds,
+        frame_count=measured.frame_count,
+    )
     if (
         output.container != "mp4"
         or output.mime_type != "video/mp4"
@@ -919,14 +915,11 @@ def _probe_generated_video_candidate(
         and measured.height != expected_height
         or expected_fps is not None
         and Fraction(measured.fps_numerator, measured.fps_denominator) != expected_fps
-        or expected_duration is not None
-        and measured.duration_milliseconds != expected_duration * 1000
-        or expected_frames is not None
-        and measured.frame_count != expected_frames
+        or not timing_matches
         or output.native_audio != (measured.audio_stream_count > 0)
     ):
         raise _video_artifact_error(
-            "Measured video does not match the exact resolved output contract."
+            "Measured video does not match the resolved output contract."
         )
     continuity_evidence = (
         None

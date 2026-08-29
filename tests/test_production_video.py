@@ -1527,6 +1527,131 @@ def test_flexible_output_rejects_ambiguous_timing_and_container_mime_pairs():
         )
 
 
+def test_nominal_seconds_accepts_one_inclusive_endpoint_frame_without_weakening_exact(
+    tmp_path: Path,
+):
+    nominal = video_contracts.VideoFlexibleOutputRequirement(
+        timing_mode="nominal_seconds",
+        duration_seconds=15,
+        dimension_mode="exact",
+        width=1280,
+        height=720,
+        resolution_label="720p",
+        ratio="16:9",
+        fps=24,
+        container="mp4",
+        mime_type="video/mp4",
+        native_audio=False,
+    )
+    nominal_capability = video_contracts.VideoOutputCapability(
+        min_duration_seconds=4,
+        max_duration_seconds=15,
+        provider_selected_duration=True,
+        timing_modes=("nominal_seconds", "provider_selected"),
+        dimension_modes=("exact",),
+        min_width=1280,
+        max_width=1280,
+        min_height=720,
+        max_height=720,
+        dimension_multiple=8,
+        resolution_labels=("720p",),
+        ratios=("16:9",),
+        fps_values=(24,),
+        containers=("mp4",),
+        native_audio_options=(False,),
+    )
+    nominal_request = _request(output_requirement=nominal)
+    nominal_resolved = ResolvedVideoGenerationRequest.create(
+        request=nominal_request,
+        capability=_variant(output=None, output_capability=nominal_capability),
+        effective_output=nominal,
+        effective_seed=17,
+        effective_negative_prompt_text="flicker",
+    )
+    artifact_bytes = b"nominal-seedance-video"
+    source = tmp_path / "nominal.mp4"
+    source.write_bytes(artifact_bytes)
+    receipt = _continuity_fetch_receipt(nominal_resolved, artifact_bytes)
+    inclusive_endpoint_probe = {
+        "streams": [
+            {
+                "codec_type": "video",
+                "codec_name": "h264",
+                "width": 1280,
+                "height": 720,
+                "avg_frame_rate": "24/1",
+                "duration": "15.041667",
+                "nb_frames": "361",
+            }
+        ],
+        "format": {"format_name": "mov,mp4", "duration": "15.041667"},
+    }
+
+    with source.open("rb") as held:
+        _, measured, _ = probe_generated_video_candidate(
+            held.fileno(),
+            nominal_resolved,
+            receipt,
+            probe=lambda _: inclusive_endpoint_probe,
+        )
+
+    assert nominal.exact_duration_milliseconds() is None
+    assert measured.duration_milliseconds == 15_042
+    assert measured.frame_count == 361
+
+    for mismatched_pair in (
+        {
+            **inclusive_endpoint_probe,
+            "streams": [
+                {
+                    **inclusive_endpoint_probe["streams"][0],
+                    "duration": "15.041667",
+                    "nb_frames": "360",
+                }
+            ],
+        },
+        {
+            **inclusive_endpoint_probe,
+            "streams": [
+                {
+                    **inclusive_endpoint_probe["streams"][0],
+                    "duration": "15",
+                    "nb_frames": "361",
+                }
+            ],
+        },
+    ):
+        with source.open("rb") as held, pytest.raises(AiVideoError) as mismatch:
+            probe_generated_video_candidate(
+                held.fileno(),
+                nominal_resolved,
+                receipt,
+                probe=lambda _, evidence=mismatched_pair: evidence,
+            )
+        assert mismatch.value.code is ErrorCode.VIDEO_ARTIFACT_INVALID
+
+    exact = nominal.model_copy(update={"timing_mode": "exact_seconds"})
+    exact_capability = nominal_capability.model_copy(
+        update={"timing_modes": ("exact_seconds", "provider_selected")}
+    )
+    exact_resolved = ResolvedVideoGenerationRequest.create(
+        request=_request(output_requirement=exact),
+        capability=_variant(output=None, output_capability=exact_capability),
+        effective_output=exact,
+        effective_seed=17,
+        effective_negative_prompt_text="flicker",
+    )
+    exact_receipt = _continuity_fetch_receipt(exact_resolved, artifact_bytes)
+    with source.open("rb") as held, pytest.raises(AiVideoError) as exc_info:
+        probe_generated_video_candidate(
+            held.fileno(),
+            exact_resolved,
+            exact_receipt,
+            probe=lambda _: inclusive_endpoint_probe,
+        )
+    assert exc_info.value.code is ErrorCode.VIDEO_ARTIFACT_INVALID
+
+
 def test_resolved_hash_binds_generation_capability_profile_and_effective_settings():
     request = _request()
     baseline = _resolved(request)
