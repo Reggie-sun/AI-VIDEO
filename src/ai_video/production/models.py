@@ -329,7 +329,7 @@ class AssetType(str, Enum):
 
 class AssetRoleRequirement(StrictModel):
     role: str
-    asset_ids: tuple[str, ...] = Field(min_length=1)
+    asset_ids: tuple[str, ...]
     allowed_asset_types: tuple[AssetType, ...] = Field(min_length=1)
 
 

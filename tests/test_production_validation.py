@@ -180,6 +180,67 @@ def test_all_visual_strategies_accept_concrete_assets(
     validate_shot_strategy(shot, assets)
 
 
+def test_generated_video_accepts_one_unbound_pre_generation_target_role():
+    shot = make_shot(
+        VisualStrategy.GENERATED_VIDEO,
+        required_asset_roles=(
+            AssetRoleRequirement(
+                role="final_visual",
+                asset_ids=(),
+                allowed_asset_types=(AssetType.VIDEO,),
+            ),
+        ),
+        generated_video_rationale="The sealed Shot requires a generated performance.",
+    )
+
+    validate_shot_strategy(shot, {})
+
+
+@pytest.mark.parametrize(
+    ("roles", "message"),
+    [
+        ((), "one pending video target role"),
+        (
+            (
+                AssetRoleRequirement(
+                    role="first_visual",
+                    asset_ids=(),
+                    allowed_asset_types=(AssetType.VIDEO,),
+                ),
+                AssetRoleRequirement(
+                    role="second_visual",
+                    asset_ids=(),
+                    allowed_asset_types=(AssetType.VIDEO,),
+                ),
+            ),
+            "one pending video target role",
+        ),
+        (
+            (
+                AssetRoleRequirement(
+                    role="final_visual",
+                    asset_ids=(),
+                    allowed_asset_types=(AssetType.IMAGE,),
+                ),
+            ),
+            "pending target role must allow only video",
+        ),
+    ],
+)
+def test_generated_video_rejects_ambiguous_or_non_video_pending_target_role(
+    roles: tuple[AssetRoleRequirement, ...],
+    message: str,
+):
+    shot = make_shot(
+        VisualStrategy.GENERATED_VIDEO,
+        required_asset_roles=roles,
+        generated_video_rationale="The sealed Shot requires a generated performance.",
+    )
+
+    with pytest.raises(AiVideoError, match=message):
+        validate_shot_strategy(shot, {})
+
+
 @pytest.mark.parametrize(
     ("shot", "assets", "message"),
     [

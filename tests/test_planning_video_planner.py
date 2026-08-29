@@ -336,32 +336,37 @@ def test_v3_exact_terminal_is_preserved_with_declared_video_reference():
 @pytest.mark.parametrize(
     ("operation", "expected_mode"),
     [
+        (GenerationOperation.TEXT_TO_VIDEO, GenerationMode.TEXT_TO_VIDEO),
         (GenerationOperation.VIDEO_EDIT, GenerationMode.VIDEO_EDIT),
         (GenerationOperation.VIDEO_EXTEND, GenerationMode.VIDEO_EXTEND),
     ],
 )
-def test_v3_video_edit_and_extend_are_reachable_neutral_modes(
+def test_v3_explicit_generation_operations_are_reachable_neutral_modes(
     operation: GenerationOperation,
     expected_mode: GenerationMode,
 ):
     shot = _generated_shot(character_ids=())
-    video = AvailableAsset(
-        role=AssetRole.EXISTING_VIDEO,
-        asset_id="reference-video-1",
-        asset_sha256="3" * 64,
-        canonical_owner_id="reference-shot",
-        canonical_owner_content_hash="4" * 64,
-        mime_type="video/mp4",
-        width=1280,
-        height=720,
-        size_bytes=4096,
-        duration_millis=5000,
-        fps=24,
-    )
+    assets = ()
+    if operation is not GenerationOperation.TEXT_TO_VIDEO:
+        assets = (
+            AvailableAsset(
+                role=AssetRole.EXISTING_VIDEO,
+                asset_id="reference-video-1",
+                asset_sha256="3" * 64,
+                canonical_owner_id="reference-shot",
+                canonical_owner_content_hash="4" * 64,
+                mime_type="video/mp4",
+                width=1280,
+                height=720,
+                size_bytes=4096,
+                duration_millis=5000,
+                fps=24,
+            ),
+        )
     request = make_request(
         target_shot=shot,
         character_context=(),
-        available_assets=(video,),
+        available_assets=assets,
         shot_intent_evidence=make_intent_evidence(target_shot=shot),
         review_decision=None,
         planning_contract_version="video-planner/3",
@@ -376,8 +381,54 @@ def test_v3_video_edit_and_extend_are_reachable_neutral_modes(
     assert plan.generation_mode is expected_mode
     assert plan.generation_requirement is not None
     assert plan.generation_requirement.semantic_reference_roles == (
-        SemanticReferenceRole.VIDEO_REFERENCE,
+        ()
+        if operation is GenerationOperation.TEXT_TO_VIDEO
+        else (SemanticReferenceRole.VIDEO_REFERENCE,)
     )
+
+
+def test_v3_explicit_text_to_video_keeps_character_semantics_without_fake_assets():
+    shot = _generated_shot()
+    request = make_request(
+        target_shot=shot,
+        available_assets=(),
+        shot_intent_evidence=make_intent_evidence(target_shot=shot),
+        review_decision=None,
+        planning_contract_version="video-planner/3",
+        generation_intent=_neutral_generation_intent(
+            generation_operation=GenerationOperation.TEXT_TO_VIDEO,
+        ),
+    )
+
+    plan = VideoPlanner().plan(request)
+
+    assert plan.outcome is PlanOutcome.PROPOSED
+    assert plan.generation_mode is GenerationMode.TEXT_TO_VIDEO
+    assert plan.generation_requirement is not None
+    assert plan.generation_requirement.characters == request.character_context
+    assert plan.generation_requirement.semantic_reference_roles == ()
+    assert plan.generation_requirement.asset_evidence == ()
+
+
+def test_v3_explicit_text_to_video_blocks_reference_continuity_without_assets():
+    shot = _generated_shot()
+    request = make_request(
+        target_shot=shot,
+        available_assets=(),
+        previous_shot_state=make_previous_state(),
+        shot_intent_evidence=make_intent_evidence(target_shot=shot),
+        review_decision=None,
+        planning_contract_version="video-planner/3",
+        generation_intent=_neutral_generation_intent(
+            generation_operation=GenerationOperation.TEXT_TO_VIDEO,
+        ),
+    )
+
+    plan = VideoPlanner().plan(request)
+
+    assert plan.outcome is PlanOutcome.BLOCKED
+    assert ReasonCode.MISSING_REFERENCES in plan.reason_codes
+    assert PlanWarning.REQUIRES_HUMAN_REVIEW in plan.warnings
 
 
 def test_v3_requirement_excludes_unrelated_same_role_asset():

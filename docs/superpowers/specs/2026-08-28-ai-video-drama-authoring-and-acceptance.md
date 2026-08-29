@@ -44,7 +44,8 @@ code、tests、contracts与project-local Skills完成execution-gate/exact-eviden
 - `M6-D Drama` 继续为 `NOT_EVALUATED`；
 - spec、fixture、baseline、无`BLOCKER`的authoring package与execution path均已形成separate content-addressed
   acceptance identities；
-- 未实现typed Drama workflow/schema/runtime adapter，未执行HUMAN media review，不授权或进入M6-D。
+- 后续明确授权已进入M6-D pre-submit；typed pending-generated target与Project-selected Planner seam已实现，但active
+  pre-generation Dependency Graph / canonical Provider lifecycle仍未完成；未执行HUMAN media review或media submit。
 
 ### V2 Delegation Acceptance Binding
 
@@ -430,8 +431,9 @@ exact evidence，作出独立判断并写入content-addressed acceptance envelop
 
 Spec owner/rubric、exact bounded fixture、exact Drama baseline、无`BLOCKER`的authoring package与current
 execution-gate/exact-evidence-path现已全部accepted/sealed，因此continuity plan可将B-D0标记为`PASS`。该结论只
-接受Agent-controlled Development evidence path；typed Drama Product Runtime / Gate 2仍未实现，且B-D0 PASS不产生
-任何`DRAMA-MEDIA-*` verdict，也不授权M6-D media execution。
+接受Agent-controlled Development evidence path。后续M6-D authorization已实现asset-free pending-generated Shot的
+strict Project/Registry materialization与current Planner/readiness projection；active pre-generation Dependency Graph、
+Provider lifecycle与Gate 2仍未完成。B-D0 PASS不产生任何`DRAMA-MEDIA-*` verdict。
 
 ## Verification Contract
 
@@ -465,5 +467,6 @@ python -m scripts.agent_harness policy-audit
 ## Delivery Boundary
 
 当前checkpoint完成Drama prerequisite contract、fixture、baseline、authoring package与current
-execution-gate/exact-evidence-path的exact acceptance，因此B-D0为`PASS`。它不产生任何media/HUMAN verdict，
-不表示typed Drama Product Runtime已实现，也不授权进入M6-D empirical execution。
+execution-gate/exact-evidence-path的exact acceptance，因此B-D0为`PASS`。后续M6-D pre-submit已获明确授权并完成
+canonical Project/Registry + Planner materialization，但仍停在active pre-generation Dependency Graph之前。它不产生
+任何media/HUMAN verdict，也不表示完整typed Drama Product Runtime或canonical Provider lifecycle已实现。

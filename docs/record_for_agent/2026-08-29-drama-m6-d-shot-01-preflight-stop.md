@@ -21,7 +21,7 @@ Current user已明确授权“开始M6-D”。该授权允许进入accepted exec
 `VideoPlanningRequest -> VideoPlanner.plan -> require_current_video_plan -> ShotReadinessGate`、Router、adapter、
 canonical Provider lifecycle或per-Shot post-media gate。
 
-Current canonical pre-submit在进入Planner前缺少Project/Registry materialization：没有selected Project/Registry
+Initial canonical pre-submit在进入Planner前缺少Project/Registry materialization：没有selected Project/Registry
 revision/content hashes，也没有Project-selected Drama Character/Scene/Shot revisions。当前只可重新打开sealed
 Shot 01 authoring facts：
 
@@ -78,10 +78,10 @@ runtime boundary；reviewer拒绝了含test-template facts的早期diagnostic pr
 
 ## Assessment
 
-`B-D0=PASS`保持不变；`M6-D=NOT_EVALUATED`并处于`STOP_BEFORE_SUBMIT`。这不是per-Shot HUMAN FAIL，因为没有
+At the initial stop，`B-D0=PASS`保持不变；`M6-D=NOT_EVALUATED`并处于`STOP_BEFORE_SUBMIT`。这不是per-Shot HUMAN FAIL，因为没有
 exact Shot MP4可以播放或判定。Commercial `M6-C=HUMAN_FAIL`与`B-X=FAIL`也不向Drama继承任何finding。
 
-Primary blocker是sealed Drama package尚未通过current canonical seam materialize为Project/Registry-selected Shot；
+At the initial stop，primary blocker是sealed Drama package尚未通过current canonical seam materialize为Project/Registry-selected Shot；
 historical baseline helper创建的test project加in-memory Shot copy不能替代该authority。该缺口不能在本slice内通过
 手工构造runtime models、借用Commercial media、把baseline reference MP4改作conditioning input、修改sealed
 fixture/baseline或绕过canonical authoring/loading seam来处理。future selected Provider/runtime也须从新的canonical
@@ -89,10 +89,64 @@ projection开始重新取得current executable proof。
 
 ## Remaining Work And Guardrails
 
-下一步必须先由独立owner选择并批准canonical Drama Project/Registry materialization seam；随后再决定是否形成并
-accept新的exact input revision，或实现能够在不降低identity contract的情况下表达sealed Drama intent的current
-Planner/adapter seam。本次task禁止改变fixture/baseline或修改runtime/code/tests，因此停在这里。
+Initial next step要求独立owner选择并批准canonical Drama Project/Registry materialization seam；该授权已由current
+user在后续turn明确给出。Initial slice本身禁止修改runtime/code/tests，因此当时正确停在这里。
 
 任何未来resume必须重新打开本record与exact preflight JSON，重跑fresh Planner/readiness，并在得到current
 `VerifiedGenerationRequirementProjection`之后才可进入Router selection。新run、new Shot bytes或任何input/profile/
 rubric/runtime identity变化都不得继承本次blocked decision之外的evidence。
+
+## Authorized Materialization Follow-up
+
+Current user随后明确授权且只授权canonical Drama Project/Registry materialization seam：不得改变fixture/baseline，
+不得选择Provider、编写native prompt、启动ComfyUI、submit或生成media。Implementation保持
+`ProductionStateCommitter.bootstrap_initial_state()`为唯一初始writer，并新增最小additive pre-generation contract：
+
+- `AssetRoleRequirement.asset_ids`可以显式为空，但strict `generated_video` validation只接受一个empty target role，且
+  `allowed_asset_types`必须exact为`VIDEO`；其他visual strategies仍须绑定concrete assets；
+- existing generated-video candidate path继续把该same target role替换为exact output asset ID，并由existing committer
+  原子选择Project/Registry/Graph candidate；pending state不注册fake MP4或placeholder AssetRecord；
+- provider-neutral intent新增显式`GenerationOperation.TEXT_TO_VIDEO`。它不能携带media reference role/asset，且在
+  exact-terminal/reference continuity存在时fail closed；Character/Scene只作为exact typed semantic context，不冒充media
+  evidence。
+
+Run-local driver从accepted package envelope绑定的exact Git blobs读取package与fixture，忠实投影Brief、Story、两个
+Character、Scene、Storyboard与三个ordered Shots，再以empty content-addressed Registry完成canonical bootstrap。它没有
+import或复用`tests/production_project_factory.py`，没有手写Manifest/Registry，也没有读取historical baseline helper。
+
+Current exact evidence：
+
+```text
+runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-canonical-materialization.json
+SHA-256: 75be2e494e44b5b253d730f9c9daca366806e09209c7e5e5e231c014a1b09f71
+
+selected Project content hash:
+940f0ceee3148ba1d4dab4a5b7bcbc2adc3229c5964f1705149bec1e9d14dfc1
+
+selected empty Registry identity:
+13a9404d3ec6bb3de0ec00871cd22dd5ca861ca8ea413fdfe13ea145e6c2ec1b
+
+Shot 01 VideoPlanningRequest hash:
+92e6de89a72730da3beb58638dd54c637cad5162aab94a3259d3413a9a50931f
+
+Shot 01 verified generation projection hash:
+9481519d2b4929e6abd9b0826cc5731ea54f60526ec414ffa07279d32f0a57fb
+```
+
+Strict reopen得到exact selected Character/Scene/ordered Shot content hashes；Planner outcome为`proposed`、generation mode
+为`text_to_video`，Shot Readiness返回verified requirement。Canonical bootstrap exact replay对14个Production files验证
+为zero-write。最新focused contract组合为`218 passed`；扩展Production compatibility组合为`1040 passed`。此外，
+`python -m scripts.architecture_gate check`、`python -m scripts.docs_contract_gate check`、
+`python -m scripts.agent_harness policy-audit`与`git diff --check`均通过；Architecture Gate只报告pre-existing warning/info，
+没有error。
+
+## Current Assessment After Follow-up
+
+原`CANONICAL_PROJECT_REGISTRY_PROJECTION_NOT_MATERIALIZED` blocker已由current executable evidence解除，但M6-D仍为
+`NOT_EVALUATED / STOP_BEFORE_SUBMIT`。新的唯一primary blocker是
+`ACTIVE_PRE_GENERATION_DEPENDENCY_GRAPH_NOT_MATERIALIZED`：current Manifest为2.0且没有active Dependency Graph；
+`begin_video_generation()`要求Manifest >=2.7与active graph。Current generic graph/composition path仍要求concrete visual
+layer asset，不能用empty graph、fake asset、baseline MP4或第二writer补造。
+
+本follow-up effects仍为零：未选择Provider，未写native prompt，未启动ComfyUI，未submit/fetch，未生成、repair或拼接
+media，未调用`video-analysis`，未产生`DRAMA-MEDIA-*` HUMAN verdict、P6或Final Acceptance；下一Shot submit仍禁止。

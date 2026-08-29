@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import hashlib
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -15,11 +16,15 @@ from ai_video.production.dependency import (
     renderer_source_node_id,
 )
 from ai_video.production.models import (
+    ArtifactReference,
+    AssetRoleRequirement,
     AssetSourceKind,
     AssetType,
     DependencyReason,
+    VisualStrategy,
     VideoAssetMetadata,
 )
+from ai_video.production.hashing import seal_artifact
 from ai_video.production.video_candidate import make_video_candidate_preparer
 from production_project_factory import (
     make_p8_video_generation_base,
@@ -170,6 +175,72 @@ def test_production_preparer_builds_deterministic_candidate_contract(
     output = asset_node_id(request.output_asset_id)
     assert (output, composition, DependencyReason.ASSET_BINDING) in graph_edges
     assert (output, source, DependencyReason.ASSET_BINDING) in graph_edges
+
+
+def test_preparer_materializes_pending_generated_video_target_role(
+    candidate_inputs,
+) -> None:
+    base_inputs, base_project, request, provenance, asset_record, _ = candidate_inputs
+    base_shot = base_project.shots[0]
+    pending_shot = seal_artifact(
+        base_shot.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "visual_strategy": VisualStrategy.GENERATED_VIDEO,
+                "required_asset_roles": (
+                    AssetRoleRequirement(
+                        role=request.activation_scope.request.target_asset_role,
+                        asset_ids=(),
+                        allowed_asset_types=(AssetType.VIDEO,),
+                    ),
+                ),
+                "generated_video_rationale": "Sealed pre-generation target.",
+            }
+        )
+    )
+    pending_ref = ArtifactReference(
+        artifact_id=pending_shot.artifact_id,
+        revision=pending_shot.revision,
+        content_hash=pending_shot.content_hash,
+        path=base_project.project.artifacts.shots[0].path,
+    )
+    pending_project_artifact = seal_artifact(
+        base_project.project.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "artifacts": base_project.project.artifacts.model_copy(
+                    update={
+                        "shots": (
+                            pending_ref,
+                            *base_project.project.artifacts.shots[1:],
+                        )
+                    }
+                ),
+            }
+        )
+    )
+    pending_project = base_project.model_copy(
+        update={
+            "project": pending_project_artifact,
+            "shots": (pending_shot, *base_project.shots[1:]),
+        }
+    )
+    pending_inputs = replace(base_inputs, project=pending_project)
+
+    prepared = make_video_candidate_preparer(pending_inputs)(
+        pending_project,
+        request,
+        None,
+        None,
+        provenance,
+        asset_record,
+    )
+
+    candidate_shot = prepared.candidate_project.shots[0]
+    target_role = candidate_shot.required_asset_roles[0]
+    assert candidate_shot.visual_strategy is VisualStrategy.GENERATED_VIDEO
+    assert target_role.asset_ids == (request.output_asset_id,)
+    assert target_role.allowed_asset_types == (AssetType.VIDEO,)
 
 
 def test_test_factory_compatibility_name_delegates_to_production_owner(

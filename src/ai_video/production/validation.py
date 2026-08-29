@@ -121,13 +121,32 @@ def validate_shot_strategy(
             )
         _validate_deterministic_motion(shot)
     if shot.visual_strategy is VisualStrategy.GENERATED_VIDEO:
+        if not roles:
+            raise _invalid(
+                f"Shot {shot.shot_id} generated_video requires exactly one "
+                "pending video target role."
+            )
+        pending_roles = tuple(
+            role for role in roles.values() if not role.asset_ids
+        )
+        if pending_roles:
+            if len(roles) != 1 or len(pending_roles) != 1:
+                raise _invalid(
+                    f"Shot {shot.shot_id} generated_video requires exactly one "
+                    "pending video target role."
+                )
+            if pending_roles[0].allowed_asset_types != (AssetType.VIDEO,):
+                raise _invalid(
+                    f"Shot {shot.shot_id} generated_video pending target role "
+                    "must allow only video."
+                )
         generated_videos = [
             asset
             for asset in bound.values()
             if asset.asset_type is AssetType.VIDEO
             and asset.source_kind is AssetSourceKind.GENERATED
         ]
-        if not generated_videos:
+        if not pending_roles and not generated_videos:
             raise _invalid(
                 f"Shot {shot.shot_id} generated_video requires a generated video role."
             )

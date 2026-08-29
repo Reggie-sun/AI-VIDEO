@@ -256,9 +256,32 @@ def _dynamic_decision(
         if request.generation_intent is not None
         else GenerationOperation.AUTO
     )
+    if generation_operation is GenerationOperation.TEXT_TO_VIDEO:
+        if declared_roles or (
+            request.generation_intent is not None
+            and request.generation_intent.media_reference_asset_ids
+        ):
+            _append_unique(reasons, ReasonCode.MISSING_REFERENCES)
+            _append_unique(warnings, PlanWarning.REQUIRES_HUMAN_REVIEW)
+            return GenerationMode.TEXT_TO_VIDEO, PlanOutcome.BLOCKED, ()
+        if continuity not in {ContinuityMode.NONE, ContinuityMode.SEMANTIC}:
+            if continuity is ContinuityMode.EXACT_TERMINAL:
+                _append_unique(reasons, ReasonCode.MISSING_TERMINAL)
+                _append_unique(warnings, PlanWarning.MISSING_TERMINAL_FRAME)
+            else:
+                _append_unique(reasons, ReasonCode.MISSING_REFERENCES)
+                _append_unique(warnings, PlanWarning.REQUIRES_HUMAN_REVIEW)
+            return GenerationMode.TEXT_TO_VIDEO, PlanOutcome.BLOCKED, ()
+        if important_character:
+            _append_unique(reasons, ReasonCode.IMPORTANT_CHARACTER)
+        _append_unique(reasons, ReasonCode.TEXT_TO_VIDEO_EXPLICIT)
+        return GenerationMode.TEXT_TO_VIDEO, PlanOutcome.PROPOSED, ()
     if declared_roles or generation_operation is not GenerationOperation.AUTO:
         roles = list(declared_roles)
-        if generation_operation is not GenerationOperation.AUTO and (
+        if generation_operation in {
+            GenerationOperation.VIDEO_EDIT,
+            GenerationOperation.VIDEO_EXTEND,
+        } and (
             SemanticReferenceRole.VIDEO_REFERENCE not in roles
         ):
             roles.append(SemanticReferenceRole.VIDEO_REFERENCE)

@@ -122,6 +122,7 @@ class ReasonCode(str, Enum):
     REQUEST_NOT_CURRENT = "request_not_current"
     EXISTING_VIDEO_UNSUPPORTED = "existing_video_unsupported"
     PRODUCT_FIDELITY_APPROVED_FIRST_FRAME = "product_fidelity_approved_first_frame"
+    TEXT_TO_VIDEO_EXPLICIT = "text_to_video_explicit"
 
 
 class PlanWarning(str, Enum):

@@ -115,7 +115,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | B-D0 prerequisite complete后已获独立M6-D启动授权；sealed Drama package尚未通过current canonical seam materialize为Project/Registry-selected Character/Scene/Shot revisions。候选H3 Quality profile仅做了未到达的advisory inspection，且与current ComfyUI checkout identity不匹配。没有canonical Planner entry、Provider selection、submit、media或`DRAMA-MEDIA-*` verdict |
+| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | B-D0 prerequisite complete后已获独立M6-D启动授权；sealed Drama package现已通过唯一`ProductionStateCommitter.bootstrap_initial_state()` materialize为Project/Registry-selected Character/Scene/Shot revisions，Shot 01 current `VideoPlanningRequest` / plan / verified requirement为READY。Active pre-generation Dependency Graph仍未materialize，故canonical Provider lifecycle尚不可进入；候选H3 Quality profile仍只是未到达的advisory inspection，且与current ComfyUI checkout identity不匹配。没有Provider selection、submit、media或`DRAMA-MEDIA-*` verdict |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -803,11 +803,30 @@ Shot/pair/assembly SHAs、explicit project-local `video-analysis` raw evidence�
 sequential stop、identity invalidation、unknown-outcome stop与cross-lane no-inheritance。它不声称typed Drama Product
 Runtime、Gate 2、M6-D、P6或Final Acceptance已实现；M6-D仍须作为独立 empirical slice 另行进入。
 
-M6-D已在2026-08-29由current user明确启动，但fresh Shot 01在canonical Planner entry前停止。Blocker evidence位于
+M6-D已在2026-08-29由current user明确启动；fresh Shot 01最初在canonical Planner entry前停止。历史blocker evidence位于
 `runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-execution-preflight.json`，SHA-256为
-`8c7031f42a068b953a75a7f7b0bb9dfd5611d516c0821657dc34d94723683d5c`。当前没有Project/Registry-selected
-Drama Character/Scene/Shot revision/content hashes，故不存在canonical `VideoPlanningRequest`；historical baseline
-test helper或in-memory copies不能替代该authority。候选
+`8c7031f42a068b953a75a7f7b0bb9dfd5611d516c0821657dc34d94723683d5c`。当时没有Project/Registry-selected
+Drama Character/Scene/Shot revision/content hashes，故当时不存在canonical `VideoPlanningRequest`；historical baseline
+test helper或in-memory copies不能替代该authority。
+
+Current user随后明确授权实现canonical Drama Project/Registry materialization seam。Current runtime采用additive
+pre-generation target contract：`generated_video` Shot必须显式携带唯一empty `VIDEO` target role，不能注册placeholder
+asset；candidate activation仍由existing committer把该role替换为exact generated MP4 binding。Provider-neutral
+`GenerationOperation.TEXT_TO_VIDEO`只在无media reference且continuity不要求exact/reference anchor时可得到proposed
+plan，避免把Character/Scene semantic context伪装成media evidence。Run-local driver从accepted package/fixture的exact
+Git bytes投影typed artifacts，仅调用`ProductionStateCommitter.bootstrap_initial_state()`；canonical state与Planner evidence
+位于`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/production-project/`及
+`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-canonical-materialization.json`，后者SHA-256为
+`75be2e494e44b5b253d730f9c9daca366806e09209c7e5e5e231c014a1b09f71`。Selected Project content hash为
+`940f0ceee3148ba1d4dab4a5b7bcbc2adc3229c5964f1705149bec1e9d14dfc1`，empty Registry identity为
+`13a9404d3ec6bb3de0ec00871cd22dd5ca861ca8ea413fdfe13ea145e6c2ec1b`，Shot 01 request hash为
+`92e6de89a72730da3beb58638dd54c637cad5162aab94a3259d3413a9a50931f`，verified projection hash为
+`9481519d2b4929e6abd9b0826cc5731ea54f60526ec414ffa07279d32f0a57fb`。Exact bootstrap replay已验证14个
+Production files零写入。
+
+Current stop已推进到`ACTIVE_PRE_GENERATION_DEPENDENCY_GRAPH_NOT_MATERIALIZED`：Manifest仍为2.0且没有active
+Dependency Graph；`begin_video_generation()`要求Manifest >=2.7与active graph，不能用empty graph、fake composition
+asset或run-local第二writer旁路。候选
 `minimax-h3-t8-t2va-quality-v1` profile另要求ComfyUI commit
 `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`，current clean checkout为
 `e01fb4c56b7a88149d469b99cbbfe3223d715054`，即使上游readiness未来解除也仍须重新通过exact runtime

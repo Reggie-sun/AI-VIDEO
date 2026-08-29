@@ -46,6 +46,7 @@ class GenerationMode(str, Enum):
 
 class GenerationOperation(str, Enum):
     AUTO = "auto"
+    TEXT_TO_VIDEO = "text_to_video"
     VIDEO_EDIT = "video_edit"
     VIDEO_EXTEND = "video_extend"
 
@@ -742,6 +743,13 @@ class ProviderNeutralGenerationIntentProjection(StrictModel):
                 "exact media selection requires a media role or video operation"
             )
         if (
+            self.generation_operation is GenerationOperation.TEXT_TO_VIDEO
+            and (self.semantic_reference_roles or self.media_reference_asset_ids)
+        ):
+            raise ValueError(
+                "text-to-video generation cannot carry media reference roles or assets"
+            )
+        if (
             self.generation_intent.primary_camera_motion is not None
             and self.conditioning_compatibility is None
         ):
@@ -779,7 +787,9 @@ class ProviderNeutralGenerationIntentProjection(StrictModel):
     def _hash_payload(self) -> dict[str, object]:
         return {
             "schema": (
-                "provider-neutral-generation-intent/2"
+                "provider-neutral-generation-intent/3"
+                if self.generation_operation is GenerationOperation.TEXT_TO_VIDEO
+                else "provider-neutral-generation-intent/2"
                 if self.generation_intent.primary_camera_motion is not None
                 else "provider-neutral-generation-intent/1"
             ),

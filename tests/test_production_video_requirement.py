@@ -29,6 +29,7 @@ from ai_video.production.video_requirement import (
     ExpressionStrength,
     GenerationIntent,
     GenerationMode,
+    GenerationOperation,
     IdentityContinuity,
     IdentityPreservation,
     MotionEnvelope,
@@ -306,6 +307,31 @@ def test_historical_generation_intent_projection_hash_stays_bit_for_bit() -> Non
     assert "camera_motion" not in projection.model_dump(mode="json")[
         "generation_intent"
     ]
+
+
+@pytest.mark.parametrize(
+    ("semantic_roles", "media_asset_ids"),
+    [
+        ((SemanticReferenceRole.IDENTITY,), ()),
+        ((), ("reference-video-1",)),
+    ],
+)
+def test_explicit_text_to_video_projection_rejects_media_references(
+    semantic_roles: tuple[SemanticReferenceRole, ...],
+    media_asset_ids: tuple[str, ...],
+) -> None:
+    requirement = ProviderNeutralVideoRequirement.create(**_requirement_kwargs())
+
+    with pytest.raises(ValidationError, match="cannot carry media reference"):
+        ProviderNeutralGenerationIntentProjection.create(
+            generation_intent=requirement.generation_intent,
+            generation_operation=GenerationOperation.TEXT_TO_VIDEO,
+            output_need=requirement.output_need,
+            audio_need=requirement.audio_need,
+            quality_need=requirement.quality_need,
+            semantic_reference_roles=semantic_roles,
+            media_reference_asset_ids=media_asset_ids,
+        )
 
 
 def _v4_requirement_kwargs() -> dict[str, object]:
