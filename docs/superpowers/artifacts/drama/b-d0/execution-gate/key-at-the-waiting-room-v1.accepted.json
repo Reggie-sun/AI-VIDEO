@@ -1,0 +1,101 @@
+{
+  "schema_version": "drama-execution-gate-evidence-path-acceptance/1",
+  "record_kind": "drama_execution_gate_evidence_path_acceptance",
+  "path_id": "drama.execution-gate.key-at-the-waiting-room",
+  "path_version": 1,
+  "status": "accepted",
+  "domain_id": "drama",
+  "lane_id": "B-D0",
+  "accepted_path_payload": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/execution-gate/key-at-the-waiting-room-v1.proposed.json",
+    "commit": "c8235d5fbb9f3f29848b43deaaa0b5085407d6cb",
+    "git_blob_oid": "ffa5fd4ee109c9ec873bd824bb3b4491831d23b5",
+    "byte_size": 15905,
+    "accepted_record_sha256": "7744874fee4285ceefaf49ba6bcd66e4c75400d10fe428e6f797904679625621",
+    "candidate_status_at_acceptance": "proposed",
+    "content_address_semantics": "The immutable candidate payload at the bound commit, blob OID, byte size and SHA-256 is the accepted B-D0 execution-gate and exact-evidence-path prerequisite. This envelope records delegated adjudication without modifying the candidate bytes."
+  },
+  "delegated_authority_binding": {
+    "contract_version": "drama-authoring-and-acceptance/2",
+    "authority_preimage_commit": "0eda3502708384516d85e33686d8ca9c25f7da3e",
+    "authority_preimage_path": "docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md",
+    "authority_preimage_git_blob_oid": "db5bff3f7b63fee02c86f8d8918079f6daf1a23b",
+    "authority_preimage_byte_size": 32092,
+    "authority_preimage_sha256": "e00f45f173cd48bcc1e786c3b60c442fb9a233734ebfa96e3f74deaa6d878e9b",
+    "promotion_commit": "a01b806437eef5434b4f88f08e9be648cb7f59b4",
+    "delegation_source_id": "current-session:user-rule-change-2026-08-29",
+    "delegation_recorded_at": "2026-08-29T09:42:14+08:00",
+    "normalized_delegation_tuple": "delegation_decision=AUTHORIZE_PRIMARY_AGENT_CONFIRM;scope=B-D0_PREREQUISITE_DOCUMENTATION_ARTIFACTS;manual_confirm_required=false;effective_date=2026-08-29",
+    "delegation_source_sha256": "1fa6d81ffbaf4734349a78febe4a90080ec8951bbdc369e2d8722da3679f000c",
+    "scope": "B-D0 prerequisite documentation artifacts only"
+  },
+  "adjudication": {
+    "adjudicator_identity": "codex_primary_agent",
+    "authority_role": "delegated_primary_agent",
+    "decision": "CONFIRM",
+    "decided_at": "2026-08-29T10:56:56+08:00",
+    "decision_source_id": "current-session:drama-execution-path-v1-autonomous-adjudication",
+    "canonical_decision_tuple": "execution_path_decision=CONFIRM;authority_preimage_commit=0eda3502708384516d85e33686d8ca9c25f7da3e;authority_preimage_sha256=e00f45f173cd48bcc1e786c3b60c442fb9a233734ebfa96e3f74deaa6d878e9b;candidate_commit=c8235d5fbb9f3f29848b43deaaa0b5085407d6cb;candidate_sha256=7744874fee4285ceefaf49ba6bcd66e4c75400d10fe428e6f797904679625621;adjudicator=codex_primary_agent",
+    "decision_source_sha256": "e2640d798e9b34ad9b2bbc4f58506cdfaad37e2a9d79a4303c678aca8dd1aaed",
+    "rationale": "Current code, tests, contracts and project-local Skills prove a callable readiness and canonical Provider lifecycle plus an Agent-controlled exact Development evidence path for per-Shot, pairwise and whole-scene HUMAN review. The candidate binds exact attempts and media SHAs, stops on FAIL, NOT_EVALUATED, identity drift and unknown outcome, and forbids cross-lane inheritance. The absent typed Drama Product Runtime is explicitly outside B-D0 and remains future productization work after dual-domain empirical closure."
+  },
+  "independent_review_evidence": {
+    "reviewer_role": "reviewer",
+    "reviewer_tier": "xhigh",
+    "reviewer_identity": "native:drama_execution_path_review_retry",
+    "review_source_id": "current-session:drama-execution-path-v1-scoped-rereview",
+    "candidate_commit": "c8235d5fbb9f3f29848b43deaaa0b5085407d6cb",
+    "candidate_sha256": "7744874fee4285ceefaf49ba6bcd66e4c75400d10fe428e6f797904679625621",
+    "verdict": "accept",
+    "blocking_issues": [],
+    "non_blocking_concerns": [],
+    "normalized_review_tuple": "reviewer_role=reviewer;reviewer_tier=xhigh;candidate_commit=c8235d5fbb9f3f29848b43deaaa0b5085407d6cb;candidate_sha256=7744874fee4285ceefaf49ba6bcd66e4c75400d10fe428e6f797904679625621;verdict=accept;blocking_issues=none;non_blocking_concerns=none",
+    "review_evidence_sha256": "50120985bbe1f9e921528ef2531f1b8447c58f662f79a4791151acc11d51d294"
+  },
+  "harness_evidence": {
+    "candidate_checkpoint": {
+      "receipt_path": ".agent/harness/runs/drama-b-d0-execution-path-candidate-20260829/receipt.json",
+      "receipt_sha256": "229934f30c23f8c9822cfaf219605f545c5c61f01a62bd64683ec6922581f27c",
+      "scope_mode": "commit_range",
+      "base_oid": "67616e68460fd2a895dee0168090b1489d5dd5a1",
+      "head_oid": "c8235d5fbb9f3f29848b43deaaa0b5085407d6cb",
+      "status": "passed",
+      "complete_completion_proof": true,
+      "artifact_integrity_reverified": true,
+      "fresh_at_checkpoint": true,
+      "snapshot_matches_at_checkpoint": true
+    }
+  },
+  "accepted_scope": {
+    "includes": [
+      "the exact Agent-controlled Development pre-submit and canonical Provider lifecycle path",
+      "attempt-qualified exact Shot MP4/SHA to explicit project-local video-analysis raw evidence to technical and HUMAN per-Shot verdict paths",
+      "attempt-qualified exact adjacent source/target SHAs, review windows and HUMAN pairwise verdict paths",
+      "attempt-qualified exact assembled scene SHA, ordered component SHAs, cut and transition identity, baseline binding and uninterrupted 1.0x full-audio HUMAN whole-scene verdict path",
+      "fail-closed stop, invalidation, new-SHA re-evaluation, unknown-outcome and cross-lane no-inheritance rules"
+    ],
+    "excludes": [
+      "Provider, model, workflow or native prompt selection",
+      "ComfyUI, H3, video-analysis invocation or any media generation",
+      "automatic retry, repair, assembly or next-Shot submission",
+      "any DRAMA-MEDIA HUMAN verdict or M6-D PASS",
+      "typed Drama Product Runtime, Gate 2, Manifest, Registry, candidate activation, P6 or Final Acceptance",
+      "Commercial or dual-domain PASS",
+      "publication, release or audience outcome"
+    ]
+  },
+  "current_gate_state": {
+    "drama_spec": "ACCEPTED",
+    "fixture_selection": "ACCEPTED",
+    "baseline_selection": "ACCEPTED",
+    "authoring_package": "ACCEPTED_AND_SEALED",
+    "execution_gate_and_exact_evidence_path": "ACCEPTED_AND_SEALED",
+    "remaining_b_d0_blockers": [],
+    "b_d0": "PASS",
+    "m6_d": "NOT_EVALUATED",
+    "m6_c": "HUMAN_FAIL",
+    "b_x": "FAIL",
+    "m7_through_m9": "DEFERRED",
+    "next_lane": "A separately authorized M6-D empirical slice may start from a fresh exact pre-submit record. This envelope itself authorizes no Provider, prompt, media, HUMAN verdict, P6 or Final Acceptance action."
+  }
+}

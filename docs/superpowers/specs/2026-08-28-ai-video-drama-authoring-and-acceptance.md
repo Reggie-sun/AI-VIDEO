@@ -34,15 +34,17 @@ V2 authority overlay已绑定下文immutable preimage与用户委托source。Pri
 authoring-package v3的exact commit/blob/size/SHA、lineage、authoring requirements、independent review与Harness
 evidence，给出`CONFIRM`并写入
 `docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.accepted.json`
-（SHA-256 `f81365c1d084d6c096d7bcbf83c06beff75100f34b6ed90bafc9341dfb247cac`）。因此：
+（SHA-256 `f81365c1d084d6c096d7bcbf83c06beff75100f34b6ed90bafc9341dfb247cac`）。Primary agent随后也对current
+code、tests、contracts与project-local Skills完成execution-gate/exact-evidence-path核验，并将exact candidate
+自主判定为`CONFIRM`，sealed acceptance envelope位于
+`docs/superpowers/artifacts/drama/b-d0/execution-gate/key-at-the-waiting-room-v1.accepted.json`。因此：
 
 - authoring-package v3的documentation acceptance/seal已完成；
-- `B-D0 — Drama owner prerequisite = BLOCKED_BEFORE_MEDIA`，remaining blocker为
-  `CURRENT_EXECUTION_GATES_AND_EXACT_EVIDENCE_PATH_NOT_VERIFIED`；
+- current execution-gate/exact-evidence-path prerequisite已accepted/sealed，`B-D0 — Drama owner prerequisite = PASS`；
 - `M6-D Drama` 继续为 `NOT_EVALUATED`；
-- spec、fixture、baseline与无`BLOCKER`的authoring package均已形成separate content-addressed
-  acceptance identities，但本轮未验证current execution gates与exact evidence path；
-- 未实现workflow/schema/runtime adapter，未执行HUMAN media review，不授权或进入M6-D。
+- spec、fixture、baseline、无`BLOCKER`的authoring package与execution path均已形成separate content-addressed
+  acceptance identities；
+- 未实现typed Drama workflow/schema/runtime adapter，未执行HUMAN media review，不授权或进入M6-D。
 
 ### V2 Delegation Acceptance Binding
 
@@ -426,10 +428,10 @@ preimage与delegation source完promotion，当前为`canonical: true` / `spec_st
 reviewer accept、commit或plan引用单独都不能自动产生artifact acceptance；primary agent必须重新打开
 exact evidence，作出独立判断并写入content-addressed acceptance envelope。
 
-Spec owner/rubric、exact bounded fixture、exact Drama baseline与无`BLOCKER`的authoring package现已全部
-accepted/sealed。Accepted semantic contract还要求current execution gates与exact evidence path可用；本轮未验证
-该条件，因此continuity plan仍须保持B-D0 `BLOCKED_BEFORE_MEDIA`。该blocker不能由package acceptance
-消除，也不授权M6-D media execution。
+Spec owner/rubric、exact bounded fixture、exact Drama baseline、无`BLOCKER`的authoring package与current
+execution-gate/exact-evidence-path现已全部accepted/sealed，因此continuity plan可将B-D0标记为`PASS`。该结论只
+接受Agent-controlled Development evidence path；typed Drama Product Runtime / Gate 2仍未实现，且B-D0 PASS不产生
+任何`DRAMA-MEDIA-*` verdict，也不授权M6-D media execution。
 
 ## Verification Contract
 
@@ -457,11 +459,11 @@ python -m scripts.agent_harness policy-audit
 - B-D0 prerequisite documentation candidate只能在delegated primary-agent contract全部成立时自主
   `CONFIRM`；subjective media verdict仍不得由Agent代签；
 - Drama、Shared Core、Ecommerce、Provider与Production/P6/Final Acceptance边界无duplicate owner；
-- 只可宣称authoring-package documentation acceptance/seal完成；不宣称B-D0、M6-D、
-  dual-domain、Production、P6、Final Acceptance或audience outcome PASS。
+- 只可宣称B-D0 prerequisite documentation/evidence-path acceptance完成；不宣称M6-D、dual-domain、
+  Production、P6、Final Acceptance或audience outcome PASS。
 
 ## Delivery Boundary
 
-当前checkpoint完成Drama prerequisite contract、fixture、baseline与authoring package的exact acceptance；因current
-execution gates与exact evidence path未验证，B-D0仍为`BLOCKED_BEFORE_MEDIA`。它不产生任何
-media/HUMAN verdict，也不授权进入M6-D empirical execution。
+当前checkpoint完成Drama prerequisite contract、fixture、baseline、authoring package与current
+execution-gate/exact-evidence-path的exact acceptance，因此B-D0为`PASS`。它不产生任何media/HUMAN verdict，
+不表示typed Drama Product Runtime已实现，也不授权进入M6-D empirical execution。

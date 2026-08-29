@@ -2,6 +2,46 @@
 
 Date: 2026-08-29
 
+## Supersession Notice — 2026-08-29 Execution Path Accepted
+
+下方所有“B-D0仍为`BLOCKED_BEFORE_MEDIA`”、“current execution gates / exact evidence path尚未验证”与旧
+next-work描述现为historical。Primary agent依据accepted v2 delegated authority，重新打开commit
+`c8235d5fbb9f3f29848b43deaaa0b5085407d6cb`中SHA-256
+`7744874fee4285ceefaf49ba6bcd66e4c75400d10fe428e6f797904679625621`的execution-gate/evidence-path candidate，
+核对current code、tests、contracts与project-local Skills，并在`reviewer_xhigh=accept`、无remaining concern与
+exact-range Harness completion proof后自主给出`CONFIRM`。Acceptance envelope：
+
+- `docs/superpowers/artifacts/drama/b-d0/execution-gate/key-at-the-waiting-room-v1.accepted.json`；
+- accepted candidate Git blob `ffa5fd4ee109c9ec873bd824bb3b4491831d23b5`，byte size `15905`；
+- candidate Harness receipt
+  `.agent/harness/runs/drama-b-d0-execution-path-candidate-20260829/receipt.json`，SHA-256
+  `229934f30c23f8c9822cfaf219605f545c5c61f01a62bd64683ec6922581f27c`；
+- `B-D0 = PASS`，remaining blocker `CURRENT_EXECUTION_GATES_AND_EXACT_EVIDENCE_PATH_NOT_VERIFIED`已解除；
+- `M6-D Drama = NOT_EVALUATED`；
+- `M6-C Commercial = HUMAN_FAIL`，`B-X = FAIL`，M7–M9仍deferred。
+
+Accepted path固定以下current executable boundary：
+
+- pre-submit readiness与`VideoGenerationService` canonical Provider lifecycle；
+- exact attempt-qualified Shot MP4/SHA → explicit project-local `video-analysis` raw evidence → independent technical
+  findings → requirement-level HUMAN per-Shot verdict，全部required PASS前禁止下一次submit；
+- adjacent pair exact source/target attempt/SHA、review windows与requirement-level HUMAN pairwise verdict；
+- exact assembly attempt/SHA、ordered component SHAs、cut/transition identity、baseline binding与不中断`1.0x`
+  full-audio HUMAN whole-scene verdict；
+- `FAIL` / `NOT_EVALUATED`、identity drift、new media SHA、unknown outcome与cross-lane no-inheritance stop semantics。
+
+仓库当前没有typed Drama Product Runtime / `DRAMA-MEDIA-*` adjudicator。该gap不构成B-D0 blocker：M6-D是由
+Agent控制的Development empirical lane，而exact pairwise Product Runtime productization由M7在dual-domain
+closure之后拥有；把M7 seam设为M6-D前置条件会倒置accepted execution order。这个B-D0 PASS不选择Provider、
+不编写prompt、不调用ComfyUI/H3/`video-analysis`、不生成或拼接media、不执行HUMAN review、不进入M6-D，也不产生
+Manifest/Registry、Gate 2、P6、Final Acceptance、publication或release truth。
+
+Experience retrieval返回stale tagged last-good fragments并异步queue refresh；本判定以current repository bytes、
+focused tests、independent native review与exact receipts为准，未等待或前台重建RAG index。
+`distill-ai-video-learning` automatic evaluation结果为`no_candidate`：本checkpoint只封存current
+documentation/evidence-path contract，没有新Provider/media attempt、controlled multi-arm comparison，也没有对
+existing Learning Claim的material exact-evidence update，因此不创建placeholder Learning Claim或进入adoption flow。
+
 ## Supersession Notice — 2026-08-29 Package Accepted
 
 下方所有“package v3仍需用户单独确认”、“B-D0仍为`BLOCKED_BEFORE_MEDIA`”与baseline/package
