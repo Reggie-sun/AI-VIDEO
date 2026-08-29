@@ -12,9 +12,11 @@ from ai_video.provider_console import (
     _invalid_production_detail,
     _legacy_detail,
     _production_detail,
-    _read_production_manifest_nofollow as _read_manifest_for_evidence,
     _runs_root,
     _selected_workspace,
+)
+from ai_video.provider_console_manifest import (
+    read_production_manifest_nofollow as _read_manifest_for_evidence,
 )
 
 def project_workspace_video_evidence(
