@@ -520,6 +520,55 @@ Verification：
 本恢复没有执行 Provider submit、paid/cloud call、媒体生成或修改、Manifest mutation、activation、P6、
 Final Acceptance、push、deploy 或 release。
 
+## Inline Attempt Video Layout Recovery — 2026-08-29
+
+用户在最新 Runs attempt 判断面中只能通过底部“查看可播放视频”打开媒体，主详情区域没有显示原本已经
+渲染的 inline player。Exact media path 与 bytes 并未失效：当前 detail projection 仍选择
+`fetched_media`，浏览器加载 `/api/runs/media/87189fec1c42b1282a6530d2fa42e619285f95cb`
+后得到 `readyState=4`、`networkState=1`、`error=null` 与 `duration=5.166667`。
+
+根因是 Runs selected-attempt view 把 `ShotSummary`、`details-grid`、`action-bar` 与
+`ProjectShotBreakdown` 展开成 `.provider-console` 的四个 top-level grid items，但 container 只定义
+`86px minmax(0, 1fr) 106px` 三行并设置 `overflow: hidden`。隐式第四行挤压了中间
+`details-grid`，使其中的 `AudibleVideo` 虽然存在于 DOM，却在目标 viewport 中不可见；no-attempt
+workspace view 存在相同结构风险。该故障不是 MP4 codec、media token、API、candidate lifecycle 或
+Provider 状态问题。
+
+修复建立 `RunsAttemptView` 与 `RunsWorkspaceView` 两个纯 view boundary，使两个 Runs 状态都只向
+`.provider-console` 输出三个 top-level grid items，并把 `ProjectShotBreakdown` 放入对应的
+`.readiness-pane` 或 `.workspace-overview` 可滚动主内容。External source 保持原有三行结构；media
+selection、token URL、read-only API、Manifest、activation 与 QA contract 均未改变。
+
+Live Browser evidence：
+
+- selected attempt 的 top-level classes 为 `shot-summary`、`details-grid`、`action-bar`，主详情高度
+  `824px`；inline video 为 `readyState=4`、`error=null`，实际播放时间从 `0` 推进到 `1.141114s`。
+- no-attempt workspace 的 top-level classes 为 `shot-summary`、`workspace-overview`、
+  `action-bar workspace-action-bar`；overview 高度 `824px`，Shot breakdown 的 parent 是
+  `workspace-overview`。
+- external source 的 top-level classes 仍为 `shot-summary external-summary`、
+  `external-detail-grid`、`action-bar external-action-bar`；video 为 `readyState=4`、`error=null`。
+
+Verification：
+
+- Regression test 先因缺少新的 view boundary 失败，修复后 focused test `1 passed`。
+- Provider Console Node contracts：`61 passed`；Vite production build：`4582 modules transformed`；
+  `git diff --check` 通过。
+- Native `reviewer_high` verdict 为 `accept with concerns`，无 blocking issue；其唯一 concern 是尚缺真实
+  browser smoke，随后以上三个状态的 integrated browser verification 已补齐并关闭该 concern。
+- Implementation commit：`77a16a5e80e83c56afbd9372cdb69bc82f190495`。
+- Exact commit range：
+  `18425222e8ffc27a3995001807f1741a835afe18..77a16a5e80e83c56afbd9372cdb69bc82f190495`；
+  receipt：`.agent/harness/runs/provider-console-inline-video-20260829-v1/receipt.json`。
+- Receipt 内 Architecture Gate PASS、Provider Console Python `32 passed`、Node `61 passed`、Vite build
+  通过；receipt verification 为 `passed=true`、`fresh=true`、`fresh_for_snapshot=true`、
+  `snapshot_matches=true`、`scope_paths_match=true`、`scope_worktree_clean=true`、
+  `complete_completion_proof=true`、`integrity=true` 与 `artifact_integrity=true`。
+
+本恢复没有执行 Provider submit、paid/cloud call、媒体生成或修改、Manifest mutation、activation、P6、
+Final Acceptance、push、deploy 或 release；实现仅形成 local Git checkpoint，当前 live Vite server 的
+HMR 可见性不构成部署或发布。
+
 ## Assessment
 
 该 slice 已满足“逐生成视频查看用于判断的详细信息”这一工程目标：操作员能在一个真实 attempt 视图中
