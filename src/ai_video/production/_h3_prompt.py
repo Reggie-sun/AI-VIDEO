@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import json
 import re
 import unicodedata
 from typing import Literal
@@ -15,7 +14,6 @@ from ai_video.production._video_intent_validation import (
 from ai_video.production.models import StrictModel
 from ai_video.production.video_requirement import (
     ContinuityMode,
-    GenerationIntent,
     GenerationMode,
     ProviderNeutralVideoRequirement,
 )
@@ -59,6 +57,10 @@ _RESERVED_TRANSITION_INSTRUCTION = re.compile(
     r"(?:cut|dissolve|flash|transition)\b",
     flags=re.IGNORECASE,
 )
+_H3_DIALOGUE_LANGUAGE_BY_PRIMARY_TAG = {
+    "en": "English",
+    "zh": "Chinese",
+}
 _RESERVED_H3_DIALOGUE_TAG = re.compile(r"</?d(?:\s[^>]*)?>", flags=re.IGNORECASE)
 
 
@@ -118,54 +120,10 @@ def _state_text(state: object) -> str:
     return "unspecified"
 
 
-def _readable_structured_text(value: str) -> str:
-    stripped = value.strip()
-    if not stripped.startswith(("{", "[")):
-        return value
-    try:
-        parsed = json.loads(stripped)
-    except (TypeError, ValueError):
-        return value
-
-    def render(item: object) -> str:
-        if isinstance(item, dict):
-            return "; ".join(
-                f"{str(key).replace('_', ' ')}: {render(item[key])}"
-                for key in sorted(item)
-            )
-        if isinstance(item, list):
-            return ", ".join(render(entry) for entry in item)
-        if item is None:
-            return "none"
-        if isinstance(item, bool):
-            return str(item).lower()
-        return str(item)
-
-    return render(parsed)
-
-
-def _identity_scene_prompt_text(intent: GenerationIntent) -> str:
-    identity = intent.identity_continuity
-    identity_characters = ", ".join(identity.character_ids) or "none"
-    identity_variation = ", ".join(identity.allowed_variation) or "none"
-    scene = intent.scene_continuity
-    scene_text = "scene continuity none"
-    if scene is not None:
-        scene_constraints = " / ".join(
-            _readable_structured_text(item) for item in scene.state_constraints
-        ) or "none"
-        scene_text = (
-            f"scene continuity {scene.scene_id}; "
-            f"time of day {_readable_structured_text(scene.time_of_day or 'unspecified')}; "
-            f"mood {_readable_structured_text(scene.mood or 'unspecified')}; "
-            f"constraints {scene_constraints}"
-        )
-    return (
-        f"identity preservation {identity.preservation.value}; "
-        f"identity characters {identity_characters}; "
-        f"allowed identity variation {identity_variation}; "
-        f"{scene_text}"
-    )
+def _h3_dialogue_language(language: str | None) -> str | None:
+    if language is None:
+        return None
+    return _H3_DIALOGUE_LANGUAGE_BY_PRIMARY_TAG.get(language.split("-", 1)[0])
 
 
 def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptResult:
@@ -177,11 +135,6 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptR
         return _compile_h3_t2va_prompt(requirement)
 
     intent = requirement.generation_intent
-    t2v_context = (
-        _identity_scene_prompt_text(intent)
-        if requirement.generation_mode is GenerationMode.TEXT_TO_VIDEO
-        else ""
-    )
     diagnostics = list(
         validate_generation_intent_for_continuity(intent, audio_need=requirement.audio_need)
     )
@@ -199,14 +152,6 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptR
             path="generation_intent",
         )
     )
-    if t2v_context:
-        diagnostics.extend(
-            _reserved_field_paths(
-                t2v_context,
-                path="generation_intent.scene_continuity.rendered",
-                reject_h3_dialogue_tags=True,
-            )
-        )
     if (
         _RESERVED_PROMPT_STRUCTURE.search(requirement.target_shot.intent)
         or _RESERVED_TRANSITION_INSTRUCTION.search(requirement.target_shot.intent)
@@ -278,7 +223,6 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptR
     visual = (
         "[Shot 1] "
         f"scene {requirement.scene.scene_id}; open state {_state_text(intent.open_state)}; "
-        f"{t2v_context + '; ' if t2v_context else ''}"
         f"action {intent.subject_action.start_state} -> {intent.subject_action.progression} "
         f"-> {_state_text(intent.subject_action.endpoint)}; "
         f"close state {_state_text(intent.close_state)}; "
@@ -337,8 +281,9 @@ def _compile_h3_t2va_prompt(
 
     The local T8 T2VA lanes have no image-conditioning surface, so they cannot
     use the conditioning-bound v4 compiler.  This compiler emits only authored
-    visible action, identity, readable scene continuity, camera, lighting,
-    ambience, and exact dialogue without exposing raw structured JSON.
+    visible current-Shot action, performance, motion, camera, lighting, ambience,
+    and exact dialogue. Story/scene bookkeeping, future beats, identity IDs, and
+    abstract objectives are deliberately not provider prompt fields.
     """
 
     intent = requirement.generation_intent
@@ -372,23 +317,15 @@ def _compile_h3_t2va_prompt(
         diagnostics.append("semantic_reference_roles")
     if requirement.asset_evidence:
         diagnostics.append("asset_evidence")
-    if intent.camera_intent.movement not in {"locked", "unspecified"}:
+    if intent.camera_intent.movement not in {"locked", "locked-off", "unspecified"}:
         diagnostics.append("generation_intent.camera_intent.movement")
+    dialogue_language = None
+    if dialogue is not None and dialogue.mode == "dialogue":
+        dialogue_language = _h3_dialogue_language(dialogue.language)
+        if dialogue_language is None:
+            diagnostics.append("generation_intent.dialogue_intent.language")
     emitted_values = {
         "target_shot.intent": requirement.target_shot.intent,
-        "generation_intent.open_state": _state_text(intent.open_state),
-        "generation_intent.close_state": _state_text(intent.close_state),
-        "generation_intent.identity_continuity": (
-            intent.identity_continuity.model_dump(mode="python")
-        ),
-        "generation_intent.scene_continuity": (
-            intent.scene_continuity.model_dump(mode="python")
-            if intent.scene_continuity is not None
-            else None
-        ),
-        "generation_intent.scene_continuity.rendered": (
-            _identity_scene_prompt_text(intent)
-        ),
         "generation_intent.camera_intent": intent.camera_intent.model_dump(mode="python"),
         "generation_intent.camera_endpoint": endpoint.model_dump(mode="python"),
         "generation_intent.subject_action": intent.subject_action.model_dump(
@@ -446,26 +383,18 @@ def _compile_h3_t2va_prompt(
     camera = intent.camera_intent
     camera_text = (
         "locked-off camera"
-        if camera.movement == "locked"
+        if camera.movement in {"locked", "locked-off"}
         else f"{camera.movement.replace('_', ' ')} camera"
     )
     prohibited = ", ".join(treatment.prohibited_visual_drift) or "none"
-    identity_scene_text = _identity_scene_prompt_text(intent)
     visual = (
-        f"[Shot 1] {treatment.medium_look}; scene {requirement.scene.scene_id}; "
+        f"[Shot 1] {treatment.medium_look}; "
         f"shot intent {requirement.target_shot.intent}; "
-        f"{identity_scene_text}; "
-        f"open state {intent.open_state.kind.value} "
-        f"{_state_text(intent.open_state)}; "
-        f"open state change required {str(intent.open_state.required_change).lower()}; "
         f"action {intent.subject_action.start_state} -> "
         f"{intent.subject_action.progression} -> "
         f"{_state_text(intent.subject_action.endpoint)}; "
         f"action endpoint change required "
         f"{str(intent.subject_action.endpoint.required_change).lower()}; "
-        f"close state {intent.close_state.kind.value} "
-        f"{_state_text(intent.close_state)}; "
-        f"close state change required {str(intent.close_state.required_change).lower()}; "
         f"performance trigger {performance.trigger}; "
         f"visible response {performance.visible_response}; "
         f"gaze {performance.gaze_target}; body {performance.body_behavior}; "
@@ -500,14 +429,10 @@ def _compile_h3_t2va_prompt(
     foley = ", ".join(ambience.foley_cues) if ambience.foley_cues else "none"
     if dialogue.mode == "dialogue":
         assert dialogue.verbatim_text is not None
-        language = (
-            "Chinese"
-            if any("\u4e00" <= character <= "\u9fff" for character in dialogue.verbatim_text)
-            else "English"
-        )
+        assert dialogue_language is not None
         dialogue_text = (
             f"speaker {dialogue.speaker_id} says once "
-            f"<d>[{language}]{dialogue.verbatim_text}</d> "
+            f"<d>[{dialogue_language}]{dialogue.verbatim_text}</d> "
             f"from {dialogue.start_seconds:.3f}s to {dialogue.end_seconds:.3f}s; "
             f"on_screen={str(dialogue.on_screen).lower()}; "
             f"response obligation {dialogue.response_obligation}; "

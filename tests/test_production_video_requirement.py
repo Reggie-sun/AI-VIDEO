@@ -26,6 +26,7 @@ from ai_video.production.video_requirement import (
     ConditioningLane,
     ContinuityMode,
     ContinuityStateKind,
+    DialogueIntent,
     ExpressionStrength,
     GenerationIntent,
     GenerationMode,
@@ -676,6 +677,83 @@ def test_t1_requirement_hash_is_deterministic_for_same_input():
     assert first.requirement_hash == second.requirement_hash
     assert first.requirement_id == second.requirement_id
     assert first == second
+
+
+def test_dialogue_language_is_sealed_without_rehashing_historical_missing_field() -> None:
+    historical = DialogueIntent(
+        mode="dialogue",
+        speaker_id="hero",
+        verbatim_text="Hello.",
+        start_seconds=0.5,
+        end_seconds=1.5,
+        on_screen=True,
+        response_obligation="listener attends",
+    )
+    historical_intent = GenerationIntent(dialogue_intent=historical)
+
+    historical_dump = historical_intent.model_dump(mode="json")
+    assert "language" not in historical_dump["dialogue_intent"]
+    assert canonical_sha256(historical_dump) == (
+        "077e9b41fd5109d96e12bf014ba3c511b01be0ea3e9d20dde4bb0ababf614053"
+    )
+
+    payload = _requirement_kwargs()
+    payload["generation_intent"] = historical_intent
+    payload["generation_intent_hash"] = canonical_sha256(
+        historical_intent.model_dump(mode="json")
+    )
+    historical_requirement = ProviderNeutralVideoRequirement.create(**payload)
+    assert (
+        ProviderNeutralVideoRequirement.model_validate_json(
+            historical_requirement.model_dump_json()
+        )
+        == historical_requirement
+    )
+
+    sealed = historical.model_copy(update={"language": "en-US"})
+    sealed_dump = GenerationIntent(dialogue_intent=sealed).model_dump(mode="json")
+    assert sealed_dump["dialogue_intent"]["language"] == "en-US"
+
+    with pytest.raises(ValidationError, match="none dialogue boundary"):
+        DialogueIntent(mode="none", language="en-US")
+
+
+@pytest.mark.parametrize("language", ("zh-Hans-CN", "es-419"))
+def test_dialogue_language_accepts_canonical_core_tags(language: str) -> None:
+    assert DialogueIntent(
+        mode="dialogue",
+        language=language,
+        speaker_id="hero",
+        verbatim_text="Exact speech.",
+        start_seconds=0.5,
+        end_seconds=1.5,
+        on_screen=True,
+        response_obligation="listener attends",
+    ).language == language
+
+
+@pytest.mark.parametrize(
+    "language",
+    (
+        "EN-US",
+        "en-US-u-ca-gregory",
+        "en-12",
+        "en-ABCDE",
+        "en-abcde-abcde",
+    ),
+)
+def test_dialogue_language_rejects_noncanonical_or_extended_tags(language: str) -> None:
+    with pytest.raises(ValidationError, match="language"):
+        DialogueIntent(
+            mode="dialogue",
+            language=language,
+            speaker_id="hero",
+            verbatim_text="Exact speech.",
+            start_seconds=0.5,
+            end_seconds=1.5,
+            on_screen=True,
+            response_obligation="listener attends",
+        )
 
 
 def test_t1_requirement_rejects_non_nfc_nested_text() -> None:

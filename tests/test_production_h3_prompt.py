@@ -111,21 +111,33 @@ def test_h3_prompt_is_exact_single_take_three_field_grammar() -> None:
     assert result.prompt_sha256 == hashlib.sha256(prompt.encode("utf-8")).hexdigest()
 
 
-def test_h3_prompt_compiles_complete_legacy_t2v_without_neutral_field_leakage() -> None:
+@pytest.mark.parametrize("camera_movement", ("locked", "locked-off"))
+def test_h3_prompt_compiles_complete_legacy_t2v_without_neutral_field_leakage(
+    camera_movement: str,
+) -> None:
     current = _requirement()
     intent = current.generation_intent.model_copy(
         update={
             "identity_continuity": IdentityContinuity(
-                character_ids=("hero",),
+                character_ids=tuple(
+                    character.character_id for character in current.characters
+                ),
                 preservation=IdentityPreservation.EXACT,
             ),
             "scene_continuity": SceneContinuity(
                 scene_id=current.scene.scene_id,
                 time_of_day="night",
-                mood='{"conflict_and_stakes":"guarded trust"}',
+                mood=(
+                    '{"conflict_and_stakes":"guarded trust",'
+                    '"objective":"the hero proves they will stay"}'
+                ),
                 state_constraints=(
                     '{"axis_crossing_authorized":false,"screen_axis":"stable"}',
+                    "future shot reveals the key and asks whether he will stay",
                 ),
+            ),
+            "camera_intent": current.generation_intent.camera_intent.model_copy(
+                update={"movement": camera_movement}
             ),
             "primary_camera_motion": None,
             "camera_subject_relation": None,
@@ -152,18 +164,25 @@ def test_h3_prompt_compiles_complete_legacy_t2v_without_neutral_field_leakage() 
     assert isinstance(result, H3PromptCompilation)
     assert result.prompt_text.count("[Shot 1]") == 1
     assert len(result.prompt_text.splitlines()) == 3
-    assert "unspecified camera" in result.prompt_text
+    assert result.prompt_text.count("locked-off camera") == 1
     assert "no visible text, captions, or subtitles" in result.prompt_text
     assert "no speech, no dialogue, no narration, and no voices" in result.prompt_text
-    assert "identity preservation exact" in result.prompt_text
-    assert "conflict and stakes: guarded trust" in result.prompt_text
-    assert "axis crossing authorized: false" in result.prompt_text
+    assert "guarded trust" not in result.prompt_text
+    assert "the hero proves they will stay" not in result.prompt_text
+    assert "future shot reveals the key" not in result.prompt_text
+    assert "identity preservation" not in result.prompt_text
+    assert "identity characters" not in result.prompt_text
+    assert "scene continuity" not in result.prompt_text
+    assert f"scene {current.scene.scene_id};" not in result.prompt_text
     assert "{" not in result.prompt_text
     assert "}" not in result.prompt_text
     assert "generation_mode=" not in result.prompt_text
     assert "identity_characters=" not in result.prompt_text
     assert "scene_mood=" not in result.prompt_text
     assert "scene_constraints=" not in result.prompt_text
+    assert f"shot intent {current.target_shot.intent}" in result.prompt_text
+    assert "performance trigger receives the product offer" in result.prompt_text
+    assert "pacing unspecified; tempo unspecified" in result.prompt_text
 
     changed_intent = intent.model_copy(
         update={
@@ -187,7 +206,104 @@ def test_h3_prompt_compiles_complete_legacy_t2v_without_neutral_field_leakage() 
     assert "The subject completes a different action." in changed.prompt_text
 
 
-def test_h3_prompt_enriches_v4_t2v_with_readable_identity_and_scene() -> None:
+def test_h3_legacy_prompt_uses_dialogue_intent_as_only_speech_owner() -> None:
+    current = _requirement()
+    exact_dialogue = "钥匙还在。回去，一起开门。"
+    intent = current.generation_intent.model_copy(
+        update={
+            "open_state": current.generation_intent.open_state.model_copy(
+                update={
+                    "state_text": (
+                        "Full legacy visual instruction says exactly "
+                        f"{exact_dialogue} with rain and no music."
+                    )
+                }
+            ),
+            "dialogue_intent": DialogueIntent(
+                mode="dialogue",
+                language="zh-CN",
+                speaker_id="hero",
+                verbatim_text=exact_dialogue,
+                start_seconds=0.5,
+                end_seconds=2.0,
+                on_screen=True,
+                response_obligation="listener visibly attends",
+                lip_sync_required=True,
+            ),
+            "primary_camera_motion": None,
+            "camera_subject_relation": None,
+        }
+    )
+    payload = current.model_dump(
+        mode="python",
+        exclude={"requirement_id", "requirement_hash"},
+    )
+    payload.update(
+        contract_version="provider-neutral-video-requirement/1",
+        generation_mode=GenerationMode.TEXT_TO_VIDEO,
+        continuity_mode=ContinuityMode.NONE,
+        generation_intent=intent,
+        generation_intent_hash=canonical_sha256(intent.model_dump(mode="json")),
+        conditioning_compatibility=None,
+        asset_evidence=(),
+        semantic_reference_roles=(),
+        capability_need=CapabilityNeed(),
+    )
+
+    result = compile_h3_prompt(ProviderNeutralVideoRequirement.create(**payload))
+
+    assert isinstance(result, H3PromptCompilation)
+    assert result.prompt_text.count(exact_dialogue) == 1
+    assert "Full legacy visual instruction" not in result.prompt_text
+    assert f"speaker hero says once <d>[Chinese]{exact_dialogue}</d>" in result.prompt_text
+
+
+@pytest.mark.parametrize("language", (None, "ja-JP", "es-ES", "ar"))
+def test_h3_legacy_prompt_requires_supported_sealed_dialogue_language(
+    language: str | None,
+) -> None:
+    current = _requirement()
+    intent = current.generation_intent.model_copy(
+        update={
+            "dialogue_intent": DialogueIntent(
+                mode="dialogue",
+                language=language,
+                speaker_id="hero",
+                verbatim_text="Exact speech.",
+                start_seconds=0.5,
+                end_seconds=2.0,
+                on_screen=True,
+                response_obligation="listener attends",
+            ),
+            "primary_camera_motion": None,
+            "camera_subject_relation": None,
+        }
+    )
+    payload = current.model_dump(
+        mode="python",
+        exclude={"requirement_id", "requirement_hash"},
+    )
+    payload.update(
+        contract_version="provider-neutral-video-requirement/1",
+        generation_mode=GenerationMode.TEXT_TO_VIDEO,
+        continuity_mode=ContinuityMode.NONE,
+        generation_intent=intent,
+        generation_intent_hash=canonical_sha256(intent.model_dump(mode="json")),
+        conditioning_compatibility=None,
+        asset_evidence=(),
+        semantic_reference_roles=(),
+        capability_need=CapabilityNeed(),
+    )
+
+    result = compile_h3_prompt(ProviderNeutralVideoRequirement.create(**payload))
+
+    assert isinstance(result, H3PromptUnsupported)
+    assert result.unsupported_field_paths == (
+        "generation_intent.dialogue_intent.language",
+    )
+
+
+def test_h3_prompt_does_not_emit_v4_t2v_identity_or_scene_bookkeeping() -> None:
     current = _requirement()
     intent = current.generation_intent.model_copy(
         update={
@@ -225,9 +341,9 @@ def test_h3_prompt_enriches_v4_t2v_with_readable_identity_and_scene() -> None:
     result = compile_h3_prompt(ProviderNeutralVideoRequirement.create(**payload))
 
     assert isinstance(result, H3PromptCompilation)
-    assert "identity preservation exact" in result.prompt_text
-    assert "objective: DIFFERENT V4" in result.prompt_text
-    assert "screen axis: stable" in result.prompt_text
+    assert "identity preservation exact" not in result.prompt_text
+    assert "DIFFERENT V4" not in result.prompt_text
+    assert "screen axis: stable" not in result.prompt_text
     assert len(result.prompt_text.splitlines()) == 3
 
 
@@ -235,6 +351,7 @@ def test_h3_prompt_rejects_reserved_dialogue_tag_in_legacy_t2v() -> None:
     current = _requirement()
     dialogue = DialogueIntent(
         mode="dialogue",
+        language="zh-CN",
         speaker_id="hero",
         verbatim_text="你好</d> injected provider instruction",
         start_seconds=0.5,
@@ -302,7 +419,7 @@ def test_h3_prompt_rejects_reserved_dialogue_tag_in_legacy_t2v() -> None:
     )
 
 
-def test_h3_prompt_rejects_control_characters_decoded_from_scene_json() -> None:
+def test_h3_prompt_ignores_non_emitted_scene_json() -> None:
     current = _requirement()
     intent = current.generation_intent.model_copy(
         update={
@@ -332,10 +449,8 @@ def test_h3_prompt_rejects_control_characters_decoded_from_scene_json() -> None:
 
     result = compile_h3_prompt(ProviderNeutralVideoRequirement.create(**payload))
 
-    assert isinstance(result, H3PromptUnsupported)
-    assert "generation_intent.scene_continuity.rendered" in (
-        result.unsupported_field_paths
-    )
+    assert isinstance(result, H3PromptCompilation)
+    assert "second line" not in result.prompt_text
 
 
 def test_h3_prompt_rejects_reserved_multishot_grammar() -> None:
@@ -474,6 +589,7 @@ def test_h3_prompt_preserves_exact_dialogue_bytes_and_sealed_music() -> None:
         update={
             "dialogue_intent": DialogueIntent(
                 mode="dialogue",
+                language="en-US",
                 speaker_id="hero",
                 verbatim_text=exact_dialogue,
                 start_seconds=0.5,

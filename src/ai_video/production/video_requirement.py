@@ -28,6 +28,12 @@ _UNSEALED_HASH = "0" * 64
 _SAFE_ID = r"^[A-Za-z0-9._:/-]{1,256}$"
 _SHA256 = r"^[0-9a-f]{64}$"
 _MIME_TYPE = r"^[A-Za-z0-9.+-]+/[A-Za-z0-9.+-]+$"
+_LANGUAGE_TAG = (
+    r"^[a-z]{2,3}"
+    r"(?:-[A-Z][a-z]{3})?"
+    r"(?:-(?:[A-Z]{2}|[0-9]{3}))?"
+    r"(?:-(?:[A-Za-z0-9]{5,8}|[0-9][A-Za-z0-9]{3}))*$"
+)
 
 UNSPECIFIED: Literal["unspecified"] = "unspecified"
 
@@ -431,6 +437,15 @@ class AmbienceIntent(StrictModel):
 
 class DialogueIntent(StrictModel):
     mode: Literal["none", "dialogue"]
+    language: str | None = Field(
+        default=None,
+        pattern=_LANGUAGE_TAG,
+        description=(
+            "Canonical BCP-47 core language tag without extensions or private-use; "
+            "historical dialogue may omit it for read compatibility, but provider "
+            "compilers must fail closed"
+        ),
+    )
     speaker_id: str | None = Field(default=None, pattern=_SAFE_ID)
     verbatim_text: str | None = None
     start_seconds: float | None = Field(default=None, ge=0)
@@ -439,9 +454,30 @@ class DialogueIntent(StrictModel):
     response_obligation: str | None = None
     lip_sync_required: bool = False
 
+    @field_validator("language")
+    @classmethod
+    def _validate_canonical_language_variants(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        subtags = value.split("-")[1:]
+        index = 0
+        if subtags and re.fullmatch(r"[A-Z][a-z]{3}", subtags[0]):
+            index += 1
+        if index < len(subtags) and re.fullmatch(
+            r"(?:[A-Z]{2}|[0-9]{3})", subtags[index]
+        ):
+            index += 1
+        variants = subtags[index:]
+        if any(variant != variant.lower() for variant in variants):
+            raise ValueError("language variants must use canonical lowercase")
+        if len(variants) != len(set(variants)):
+            raise ValueError("language variants must be unique")
+        return value
+
     @model_validator(mode="after")
     def _validate_dialogue_boundary(self) -> "DialogueIntent":
         payload = (
+            self.language,
             self.speaker_id,
             self.verbatim_text,
             self.start_seconds,
@@ -453,7 +489,8 @@ class DialogueIntent(StrictModel):
             if any(value is not None for value in payload) or self.lip_sync_required:
                 raise ValueError("none dialogue boundary cannot carry dialogue facts")
             return self
-        if any(value is None for value in payload):
+        historical_payload = payload[1:]
+        if any(value is None for value in historical_payload):
             raise ValueError("dialogue mode requires complete sealed dialogue facts")
         assert self.start_seconds is not None and self.end_seconds is not None
         if self.end_seconds <= self.start_seconds:
@@ -538,6 +575,13 @@ class GenerationIntent(StrictModel):
         ):
             if getattr(self, field) is None:
                 data.pop(field, None)
+        dialogue = data.get("dialogue_intent")
+        if (
+            isinstance(dialogue, dict)
+            and self.dialogue_intent is not None
+            and self.dialogue_intent.language is None
+        ):
+            dialogue.pop("language", None)
         return data
 
     @property
