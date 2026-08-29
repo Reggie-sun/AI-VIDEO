@@ -115,7 +115,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | B-D0 prerequisite complete后已获独立M6-D启动授权；canonical Shot 01 execution-intent overlay与three-line H3 prompt保持accepted/sealed。当前已显式选择local H3 quality candidate且runtime identity exact match，但canonical Router因sealed fixed `5.0s` requirement无法由profile的`124`-frame output contract表达而`blocked_capability`；没有生成exact request preview、persist/submit request或media/Production-state effect。详见`docs/record_for_agent/2026-08-29-drama-m6-d-shot-01-request-readiness-gate-stop.md` |
+| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | B-D0 prerequisite complete后已获独立M6-D启动授权；canonical Shot 01 versioned timing repair已accepted/sealed为`124 frames @ 24fps`，Router、adapter compiler、resolver与exact non-persisted request preview现已贯通。Current selected profile要求ComfyUI commit `7cee3ceb...`，read-only inspection观察到clean checkout `e01fb4c...`，故runtime identity `MISMATCH`且Provider preflight未调用；SourceAudioPolicy仍未由canonical authoring owner封存。没有persist/submit request、permit、media或Production-state effect。详见`docs/record_for_agent/2026-08-29-drama-m6-d-shot-01-request-readiness-gate-stop.md` |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -854,7 +854,7 @@ canonical identity、abstract objective或`unspecified`。Accepted evidence位�
 `runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-authoring-to-request-accepted-v1.json`
 （SHA-256 `1e38b731b31b4866720d5b80bfb2dd40da04ebe56dea8656f3d7219d15298cb6`）。
 
-Provider/profile/runtime/exact-request readiness prerequisite已通过current canonical Router执行。显式quality-first candidate为
+Historical Provider/profile/runtime/exact-request readiness v1 prerequisite曾通过canonical Router执行。显式quality-first candidate为
 `comfy-local-h3-t8` / `minimax-h3-t8-t2va-quality-v1` / profile
 `4b299a689723bb856026776500119774ee9490c777a6460e932007be022e05e7`，required runtime identity当前exact match且checkout
 clean；但sealed requirement要求fixed `5.0s`，selected profile只声明`frame_count=124`，Router因此返回
@@ -862,9 +862,33 @@ clean；但sealed requirement要求fixed `5.0s`，selected profile只声明`fram
 `runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-provider-profile-runtime-request-readiness-blocked-v1.json`
 （SHA-256 `f214645086e11c41d698190ac0ff4418278da9c02aae6ca1605b964d304b2cb1`），封存 envelope 位于
 `docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v1.blocked.json`。
-Current blocker为`FIXED_5S_REQUIREMENT_NOT_EXPRESSIBLE_BY_SELECTED_T8_PROFILE`；`M6-D`仍保持
+该historical blocker为`FIXED_5S_REQUIREMENT_NOT_EXPRESSIBLE_BY_SELECTED_T8_PROFILE`；当时`M6-D`保持
 `NOT_EVALUATED / STOP_BEFORE_SUBMIT`，`next_shot_submit_allowed=false`。没有exact request preview、SourceAudio binding、
 Provider preflight、permit、submit或per-Shot media Gate。
+
+Current user于2026-08-30授权一个独立versioned timing repair。Accepted v2 overlay只把Planner input从fixed `5.0s`
+改为exact `124 frames @ 24fps`，并把GenerationIntent的duration及两个对应display endpoint更新为`5.167s`；其它
+execution intent、dialogue、fixture/baseline/Story/Scene/Character/Shot semantic bytes、profile/workflow/binding与
+SourceAudioPolicy均未改变。Acceptance envelope
+`docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v2.accepted.json`
+SHA-256为`b508cb375b6c326cbaaa5342d6aec051d20276f2d652e094f9cbca3a48efee10`。
+
+Canonical Planner重新生成request `6dd31121a17d0178f4372bb4fa764f350216133b18f91d476675137af1480047`、verified
+projection `e201aebeb90a324549138163c0d0f4f93405ad7755f3645b1a9bd99c5413ea21`、requirement
+`735c670eeee9bef29f9e9980ae8e476bde7bfff8786a78edf54af644d9eed924`与prompt
+`e6cc74114e4dd41db284a29a83db228cbd9a034370fb5577a0e534d560139b47`。Router现为`selected`；adapter
+compiler、resolver与non-persisted preview均exact reopen，preview fingerprint为
+`4ba6861de793286c47215d480d94237ab7202c966f9c4836716144008d7ecb76`。Accepted evidence
+`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-timing-request-readiness-accepted-v1.json`
+SHA-256为`e3463ca9acc9ac381d0c2cc350f9b449214c588bcbade6f74fa7438c86b6f113`。
+
+Current read-only runtime inspection观察到selected profile要求ComfyUI commit
+`7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`，current clean checkout为
+`e01fb4c56b7a88149d469b99cbbfe3223d715054`；因此runtime identity为`MISMATCH`，Provider component/object-info
+preflight fail closed为未调用。Exact request声明`native_audio=true`，但accepted SourceAudioPolicy仍为`null`且没有
+推断`GENERATED + KEEP`。Current blockers为`SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH`与
+`SOURCE_AUDIO_POLICY_NOT_SEALED_FOR_NATIVE_AUDIO_REQUEST`；`M6-D`继续
+`NOT_EVALUATED / STOP_BEFORE_SUBMIT`，没有request persistence、permit、submit、media或per-Shot Gate。
 
 Stop immediately and report rather than expanding scope when：
 

@@ -15,9 +15,10 @@ Date: 2026-08-29
 已在不修改accepted semantic bytes或旧request/requirement evidence的前提下accepted/sealed，并经current canonical
 Planner/requirement seam生成完整typed requirement与exact three-line H3 prompt。
 
-Current state仍是`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`。Provider/profile/runtime/exact-request prerequisite现已
-执行到canonical Router的fail-closed stop：显式选择的quality profile无法表达sealed fixed `5.0s` requirement，因此
-remaining blocker为`FIXED_5S_REQUIREMENT_NOT_EXPRESSIBLE_BY_SELECTED_T8_PROFILE`。本记录不授权submit或进入per-Shot media Gate。
+Current state仍是`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`。2026-08-30 versioned timing repair已把canonical
+requirement改为selected profile可表达的exact `124 frames @ 24fps`，并贯通Router、adapter compiler、resolver与
+non-persisted exact request preview。Current blockers已推进为`SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH`与
+`SOURCE_AUDIO_POLICY_NOT_SEALED_FOR_NATIVE_AUDIO_REQUEST`。本记录不授权runtime切换、SourceAudioPolicy补造、submit或进入per-Shot media Gate。
 
 ## Purpose
 
@@ -190,3 +191,65 @@ Current boundary为：
 - remaining blocker：`FIXED_5S_REQUIREMENT_NOT_EXPRESSIBLE_BY_SELECTED_T8_PROFILE`；
 - Provider/profile/workflow/runtime identity已显式检查；exact request preview因Router stop未创建，未persist或submit request，未进入per-Shot media Gate；
 - 未产生M6-D PASS、P6、Final Acceptance或Commercial verdict inheritance。
+
+## Versioned Timing Repair And Current Stop — 2026-08-30
+
+Current user明确授权一个独立pre-media versioned timing repair。Accepted overlay：
+
+- payload：`docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v2.proposed.json`；
+- payload commit：`2661309dfa8e29896508fae0487a2b4fb2ce38c4`；
+- payload SHA-256：`9e37a8a6c6e14f4c82c356294fbf781332324bacee693fcc768496d14582f56e`；
+- acceptance envelope：`docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v2.accepted.json`；
+- acceptance envelope SHA-256：`b508cb375b6c326cbaaa5342d6aec051d20276f2d652e094f9cbca3a48efee10`。
+
+Overlay只把Planner-owned `OutputNeed`从fixed `5.0s`变为exact `frame_count=124` / `fps=24`，并把
+`GenerationIntent.pacing.shot_duration_seconds`设为`124/24 = 5.166666666666667`。Prompt中仅三个对应timing token
+从`5.000s`更新为`5.167s`：lighting endpoint、terminal hold与duration。Dialogue text/timing、其余execution intent、
+fixture、baseline、Story、Scene、Character、Shot semantic bytes、profile、workflow、binding与SourceAudioPolicy均未改变；
+accepted SourceAudioPolicy仍显式为`null`。
+
+Canonical Planner、Router与adapter seam重新生成并严格重开：
+
+- request：`6dd31121a17d0178f4372bb4fa764f350216133b18f91d476675137af1480047`；
+- generation-intent projection：`8ab9bc42ed01add3080a7a6550246d370109a4489275e3c6fac35b557ca3922b`；
+- verified projection：`e201aebeb90a324549138163c0d0f4f93405ad7755f3645b1a9bd99c5413ea21`；
+- requirement：`735c670eeee9bef29f9e9980ae8e476bde7bfff8786a78edf54af644d9eed924`；
+- prompt：`e6cc74114e4dd41db284a29a83db228cbd9a034370fb5577a0e534d560139b47`；
+- Provider-bound request：`69b470cd4a188fc31a73b04d69c59bba9b0efe8ab1f1eb9bde994f7999e951aa`；
+- compiled request：`56a6a21750a93ea392139a1e98a0558d9e7d5ae0576e1210f7b744e3118b7656`；
+- request input：`de4b222eef59e867eaa30c591a10f98808558a19fa9b5d8973c7aece366b27d2`；
+- resolved generation：`5a9ee2722103a6cee533b36cd5ca2d6254f3ca2bf4c7e0e22da752bd48fecc95`；
+- preview：`4ba6861de793286c47215d480d94237ab7202c966f9c4836716144008d7ecb76`。
+
+Router decision现为`selected`，exact output为`124` frames、`24fps`、`1344x768`、`video/mp4`、
+`native_audio=true`，且无image/media bindings。Preview只在内存中创建；没有把`VideoGenerationRequest`写入Production
+state，没有durable submit intent、permit或Provider effect。Prompt继续exactly three lines、exact dialogue once、
+`<d>[Chinese]`与`non_diegetic_music: none`，且无raw JSON、Story/Scene/future bookkeeping、opaque identity、abstract
+objective或`unspecified`。
+
+Read-only runtime inspection观察到profile要求ComfyUI commit
+`7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`，current clean checkout为
+`e01fb4c56b7a88149d469b99cbbfe3223d715054`。T8 `977df788fcf8b971dc3d0fc7d6baa79a0edfaf40` / `1.36.2`、
+VideoHelperSuite `4ee72c065db22c9d96c2427954dc69e7b908444b`、SageAttention `2.2.0`与current
+`sage_attention` launch capability匹配，但ComfyUI commit mismatch使overall runtime identity为`MISMATCH`。
+Canonical Provider component/object-info preflight因此未调用；没有修改或重启ComfyUI。
+
+Exact request要求native audio，但本slice未获授权选择SourceAudioPolicy，也没有从dialogue/rain/no-music facts推断
+`GENERATED + KEEP`。因此submit readiness同时保留：
+
+- `SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH`；
+- `SOURCE_AUDIO_POLICY_NOT_SEALED_FOR_NATIVE_AUDIO_REQUEST`。
+
+Immutable evidence：
+
+- driver：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/shot01_timing_request_readiness_driver.py`，SHA-256 `668712bedae6419dac88669a8c1215d72c1b6d13b5c5a64990b196579671ee88`；
+- candidate evidence：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-timing-request-readiness-candidate-v1.json`，SHA-256 `63e81fbc65a121a6f13b07531f2d53a861bddd0c1a51afa95ab3b7fb44e236b7`；
+- accepted evidence：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-timing-request-readiness-accepted-v1.json`，SHA-256 `e3463ca9acc9ac381d0c2cc350f9b449214c588bcbade6f74fa7438c86b6f113`；
+- blocked envelope：`docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v2.blocked.json`，SHA-256 `5fde388ce6b46225ed68031d79edca79d83b988ef7a4b391e28c6be4eea82f5e`。
+
+Focused Planner/requirement/Router/T8 suite为`276 passed`；native `reviewer_xhigh`对candidate commit
+`2661309dfa8e29896508fae0487a2b4fb2ce38c4`的verdict为`accept`，无blocking或non-blocking concern。Current
+boundary保持`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`、`next_shot_submit_allowed=false`；未产生M6-D PASS、
+P6、Final Acceptance或Commercial verdict inheritance。`distill-ai-video-learning` automatic evaluation为
+`no_candidate`：本记录保持`learning_eligibility: ineligible`，且当前single pre-artifact readiness stop不足以形成
+跨实验Learning Claim；未创建candidate或placeholder。

@@ -1,0 +1,89 @@
+{
+  "schema_version": "drama-shot-timing-repair-acceptance/1",
+  "record_kind": "drama_shot_timing_repair_acceptance",
+  "overlay_id": "drama.execution-intent.key-at-the-waiting-room.shot-01",
+  "overlay_version": 2,
+  "status": "accepted",
+  "domain_id": "drama",
+  "lane_id": "M6-D",
+  "accepted_timing_repair_payload": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v2.proposed.json",
+    "commit": "2661309dfa8e29896508fae0487a2b4fb2ce38c4",
+    "git_blob_oid": "1943d3d3624b6fec934792cfe74de588dd885c47",
+    "byte_size": 5256,
+    "accepted_record_sha256": "9e37a8a6c6e14f4c82c356294fbf781332324bacee693fcc768496d14582f56e",
+    "candidate_status_at_acceptance": "proposed",
+    "content_address_semantics": "Only the exact timing-repair bytes at the bound commit, blob OID, byte size and SHA-256 are accepted. Parent execution-intent and all non-timing semantic owners remain immutable."
+  },
+  "parent_lineage": {
+    "accepted_execution_intent_envelope_sha256": "8b50b61b152b59542fc4521c870cc060b9b6469fc18db5e3a14248cf05de7efd",
+    "accepted_authoring_evidence_sha256": "1e38b731b31b4866720d5b80bfb2dd40da04ebe56dea8656f3d7219d15298cb6",
+    "blocked_readiness_envelope_sha256": "3e28032c7977579d2d53cf3650352c603547d219022429cdb5a886407c86bbcf",
+    "blocked_readiness_evidence_sha256": "f214645086e11c41d698190ac0ff4418278da9c02aae6ca1605b964d304b2cb1",
+    "parent_request_hash": "01c329aa22b898521d0611bd4fbcfcbba912babb81b4ce85a88582985704fe7c",
+    "parent_verified_projection_hash": "f2292b67f3616a5b4757c6c3e45301b971230bb59a3b683207d8a6d6cb412b1d",
+    "parent_requirement_hash": "d234cd95b712ca8d966132d28c6ee15a49831b412305b795c8c8eb9a2491b34d",
+    "parent_prompt_sha256": "3676c9998a63e7ddc024faff7d18f07f5e48722046ee7193201f490ee57c750d",
+    "active_pre_generation_graph_hash": "761c92a0a8507ae2b8f14de5338b337e0d567e78b654e36403d3428a0da47ff1"
+  },
+  "delegated_authority_binding": {
+    "delegation_source_id": "current-session:user-versioned-timing-repair-authorization-20260830",
+    "delegation_recorded_at": "2026-08-30T07:30:24+08:00",
+    "normalized_delegation_tuple": "authorization_decision=AUTHORIZE;scope=M6-D_CANONICAL_SHOT_01_VERSIONED_124_FRAME_TIMING_REPAIR;source=current-user-message;effective_date=2026-08-30",
+    "delegation_source_sha256": "f98cd9dcefd734e0b2f6009ca39ac73647b26f6f7c39a041348f6c708a4c8791",
+    "scope": "one pre-media canonical Shot 01 timing repair from fixed 5.0 seconds to exact 124 frames at 24fps, followed by regenerated request lineage and non-persisted exact preview"
+  },
+  "adjudication": {
+    "adjudicator_identity": "codex_primary_agent",
+    "authority_role": "delegated_primary_agent",
+    "decision": "CONFIRM",
+    "decided_at": "2026-08-30T07:30:24+08:00",
+    "decision_source_id": "current-session:drama-shot01-timing-v2-autonomous-adjudication",
+    "rationale": "The exact candidate changes only the author-owned timing fields needed to express the selected H3 124-frame grid, preserves all parent semantic and Provider contracts, regenerates Planner and request lineage through canonical constructors, and remains fail closed before submit."
+  },
+  "independent_review_evidence": {
+    "reviewer_role": "reviewer",
+    "reviewer_tier": "xhigh",
+    "reviewer_identity": "native:drama_m6d_readiness_review",
+    "review_source_id": "current-session:drama-shot01-timing-v2-scoped-review",
+    "candidate_commit": "2661309dfa8e29896508fae0487a2b4fb2ce38c4",
+    "candidate_overlay_sha256": "9e37a8a6c6e14f4c82c356294fbf781332324bacee693fcc768496d14582f56e",
+    "candidate_driver_sha256": "668712bedae6419dac88669a8c1215d72c1b6d13b5c5a64990b196579671ee88",
+    "candidate_evidence_sha256": "63e81fbc65a121a6f13b07531f2d53a861bddd0c1a51afa95ab3b7fb44e236b7",
+    "verdict": "accept",
+    "blocking_issues": [],
+    "non_blocking_concerns": [],
+    "normalized_review_tuple": "reviewer_role=reviewer;reviewer_tier=xhigh;candidate_commit=2661309dfa8e29896508fae0487a2b4fb2ce38c4;candidate_overlay_sha256=9e37a8a6c6e14f4c82c356294fbf781332324bacee693fcc768496d14582f56e;candidate_driver_sha256=668712bedae6419dac88669a8c1215d72c1b6d13b5c5a64990b196579671ee88;candidate_evidence_sha256=63e81fbc65a121a6f13b07531f2d53a861bddd0c1a51afa95ab3b7fb44e236b7;verdict=accept;blocking_issues=none;non_blocking_concerns=none",
+    "review_evidence_sha256": "0575f4db17fbf5e740f130fb7aca2807a989ca6d1854a2269c64337a18232652"
+  },
+  "accepted_scope": {
+    "includes": [
+      "OutputNeed timing_mode=frame_count with exact frame_count=124 and fps=24",
+      "GenerationIntent pacing duration 124/24 seconds and the two corresponding displayed endpoint tokens",
+      "new canonical Planner request, verified projection and requirement hashes",
+      "offline Router, adapter compiler, resolver and non-persisted preview evidence"
+    ],
+    "excludes": [
+      "any parent fixture, baseline, Story, Scene, Character or Shot semantic-byte change",
+      "any non-timing execution-intent or dialogue change",
+      "SourceAudioPolicy selection or inference",
+      "Provider/profile/workflow/runtime contract modification or fallback",
+      "request persistence, preflight under mismatched runtime, permit, submit or media",
+      "Manifest, Registry, candidate activation, video-analysis, M6-D PASS, P6 or Final Acceptance"
+    ]
+  },
+  "current_gate_state": {
+    "timing_repair": "ACCEPTED_AND_SEALED",
+    "canonical_requirement_output_match": true,
+    "exact_request_preview": "READY_TO_REOPEN_IN_MEMORY",
+    "runtime_identity": "MISMATCH",
+    "source_audio_policy": "NOT_SEALED",
+    "m6_d": "NOT_EVALUATED",
+    "execution": "STOP_BEFORE_SUBMIT",
+    "next_shot_submit_allowed": false,
+    "remaining_blockers": [
+      "SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH",
+      "SOURCE_AUDIO_POLICY_NOT_SEALED_FOR_NATIVE_AUDIO_REQUEST"
+    ]
+  }
+}

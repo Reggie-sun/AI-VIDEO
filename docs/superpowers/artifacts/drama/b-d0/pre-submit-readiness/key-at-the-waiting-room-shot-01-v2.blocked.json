@@ -1,0 +1,116 @@
+{
+  "schema_version": "drama-m6-d-shot01-pre-submit-readiness-envelope/2",
+  "decision": "blocked",
+  "domain_id": "drama",
+  "lane_id": "M6-D",
+  "target_shot": {
+    "shot_id": "drama.shot.waiting-room.001",
+    "revision": 1,
+    "content_hash": "4cf53970d6642d4bfe73c23e5c12f9714c069843b0a7b47069dfb2519c47253b"
+  },
+  "accepted_lineage": {
+    "timing_repair_envelope_sha256": "b508cb375b6c326cbaaa5342d6aec051d20276f2d652e094f9cbca3a48efee10",
+    "timing_repair_payload_commit": "2661309dfa8e29896508fae0487a2b4fb2ce38c4",
+    "timing_repair_payload_sha256": "9e37a8a6c6e14f4c82c356294fbf781332324bacee693fcc768496d14582f56e",
+    "timing_request_readiness_evidence_sha256": "e3463ca9acc9ac381d0c2cc350f9b449214c588bcbade6f74fa7438c86b6f113",
+    "parent_request_hash": "01c329aa22b898521d0611bd4fbcfcbba912babb81b4ce85a88582985704fe7c",
+    "request_hash": "6dd31121a17d0178f4372bb4fa764f350216133b18f91d476675137af1480047",
+    "verified_projection_hash": "e201aebeb90a324549138163c0d0f4f93405ad7755f3645b1a9bd99c5413ea21",
+    "requirement_hash": "735c670eeee9bef29f9e9980ae8e476bde7bfff8786a78edf54af644d9eed924",
+    "prompt_sha256": "e6cc74114e4dd41db284a29a83db228cbd9a034370fb5577a0e534d560139b47",
+    "active_pre_generation_graph_hash": "761c92a0a8507ae2b8f14de5338b337e0d567e78b654e36403d3428a0da47ff1"
+  },
+  "timing_repair": {
+    "parent_timing": {
+      "timing_mode": "fixed",
+      "duration_seconds": 5.0,
+      "fps": 24
+    },
+    "accepted_timing": {
+      "timing_mode": "frame_count",
+      "frame_count": 124,
+      "fps": 24,
+      "effective_duration_seconds": 5.166666666666667
+    },
+    "canonical_requirement_output_matches": true,
+    "original_blocker_resolved": "FIXED_5S_REQUIREMENT_NOT_EXPRESSIBLE_BY_SELECTED_T8_PROFILE"
+  },
+  "explicit_candidate": {
+    "selection_intent": "quality-first local H3 candidate; no ranking or fallback",
+    "provider_name": "comfy-local-h3-t8",
+    "model_id": "minimax-h3-t8-t2va-quality",
+    "capability_id": "minimax-h3-t8-t2va-quality-v1",
+    "profile_id": "minimax-h3-t8-t2va-quality",
+    "profile_version": "v1",
+    "profile_content_hash": "4b299a689723bb856026776500119774ee9490c777a6460e932007be022e05e7",
+    "workflow_sha256": "6a508f8522694297c2e3ce1157dd1b235cd34514d85bf3c2908f55020cd990a5",
+    "binding_sha256": "3af2ab9928d832253e22aaf14f47bf70ef80949f56a1664817accb8acacfd564",
+    "compiler_id": "comfy-local-h3-t8-video-compiler",
+    "compiler_version": "3",
+    "compiler_hash": "c0ff7a9881e66159ebe6c01e4bd109c6a9227587c428587f8fff01417bcac47d",
+    "family_capabilities_fingerprint": "d3b8e5cc31570763aae6f7454ca794737634c345ec3ea6bbbcaadc36196381dd"
+  },
+  "exact_non_persisted_request_preview": {
+    "provider_bound_request_hash": "69b470cd4a188fc31a73b04d69c59bba9b0efe8ab1f1eb9bde994f7999e951aa",
+    "compiled_request_hash": "56a6a21750a93ea392139a1e98a0558d9e7d5ae0576e1210f7b744e3118b7656",
+    "payload_projection_hash": "cc11fec441e3c1914a6445402fa9cc4b23a41dc6c3ded2b53cb27bb19b9f3aff",
+    "request_input_hash": "de4b222eef59e867eaa30c591a10f98808558a19fa9b5d8973c7aece366b27d2",
+    "resolved_generation_hash": "5a9ee2722103a6cee533b36cd5ca2d6254f3ca2bf4c7e0e22da752bd48fecc95",
+    "preview_fingerprint": "4ba6861de793286c47215d480d94237ab7202c966f9c4836716144008d7ecb76",
+    "mode": "text_to_video",
+    "frame_count": 124,
+    "fps": 24,
+    "native_audio": true,
+    "persisted": false
+  },
+  "runtime_identity": {
+    "result": "MISMATCH",
+    "required_comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+    "current_comfyui_commit": "e01fb4c56b7a88149d469b99cbbfe3223d715054",
+    "t8_commit": "977df788fcf8b971dc3d0fc7d6baa79a0edfaf40",
+    "t8_version": "1.36.2",
+    "videohelpersuite_commit": "4ee72c065db22c9d96c2427954dc69e7b908444b",
+    "sageattention_version": "2.2.0",
+    "checkout_clean": true,
+    "launch_capabilities": [
+      "sage_attention"
+    ],
+    "inspection_mode": "read_only_checkout_package_and_systemd_launch_identity",
+    "provider_preflight": "NOT_INVOKED_RUNTIME_IDENTITY_MISMATCH"
+  },
+  "source_audio_resolution": {
+    "accepted_source_audio_policy": null,
+    "request_native_audio": true,
+    "default_or_inference_used": false,
+    "status": "BLOCKED_EXPLICIT_POLICY_NOT_SEALED"
+  },
+  "submit_readiness": {
+    "budget": "NOT_APPLICABLE_LOCAL_UNMETERED",
+    "cloud_egress": "DENIED_AND_NOT_USED",
+    "durable_submit_intent_created": false,
+    "one_use_permit_minted": false,
+    "provider_submit_count": 0,
+    "media_generated": false,
+    "video_analysis_invoked": false,
+    "ready": false,
+    "blockers": [
+      "SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH",
+      "SOURCE_AUDIO_POLICY_NOT_SEALED_FOR_NATIVE_AUDIO_REQUEST"
+    ]
+  },
+  "evidence": {
+    "driver_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/shot01_timing_request_readiness_driver.py",
+    "driver_sha256": "668712bedae6419dac88669a8c1215d72c1b6d13b5c5a64990b196579671ee88",
+    "candidate_evidence_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-timing-request-readiness-candidate-v1.json",
+    "candidate_evidence_sha256": "63e81fbc65a121a6f13b07531f2d53a861bddd0c1a51afa95ab3b7fb44e236b7",
+    "accepted_evidence_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-timing-request-readiness-accepted-v1.json",
+    "accepted_evidence_sha256": "e3463ca9acc9ac381d0c2cc350f9b449214c588bcbade6f74fa7438c86b6f113"
+  },
+  "status_boundary": {
+    "m6_d": "NOT_EVALUATED",
+    "execution": "STOP_BEFORE_SUBMIT",
+    "next_shot_submit_allowed": false,
+    "p6": "NOT_EVALUATED",
+    "final_acceptance": "NOT_EVALUATED"
+  }
+}
