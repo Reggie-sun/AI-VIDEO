@@ -1,0 +1,235 @@
+{
+  "schema_version": "drama-execution-gate-evidence-path/1",
+  "record_kind": "drama_execution_gate_evidence_path",
+  "path_id": "drama.execution-gate.key-at-the-waiting-room",
+  "path_version": 1,
+  "status": "proposed",
+  "domain_id": "drama",
+  "lane_id": "B-D0",
+  "inspection_snapshot": {
+    "commit": "6344d29269f99f8918778796aff23a9278549fc7",
+    "branch": "main",
+    "scope": "current repository code, tests, contracts, current-session MCP inventory and exact prior Drama development evidence",
+    "negative_runtime_search": {
+      "command": "rg -n \"Drama|drama|DRAMA-MEDIA|drama_authoring\" src tests",
+      "result": "NO_MATCHES",
+      "meaning": "No typed Drama Product Runtime or DRAMA-MEDIA adjudicator exists; this does not negate the separately owned Agent/HUMAN Development path."
+    }
+  },
+  "accepted_input_binding": {
+    "package_id": "drama.package.key-at-the-waiting-room",
+    "package_version": 3,
+    "acceptance_record_path": "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.accepted.json",
+    "acceptance_record_sha256": "f81365c1d084d6c096d7bcbf83c06beff75100f34b6ed90bafc9341dfb247cac",
+    "accepted_payload_path": "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.proposed.json",
+    "accepted_payload_commit": "1175c8270ffba6ff136d54cc0eb9390a96d6bf29",
+    "accepted_payload_sha256": "a5ec4f78b05ce189d9eaa0cf694ffaba0747b499f4e85fd1ac1ac4221ec61331",
+    "fixture_acceptance_sha256": "e2601e8ac7af4686c3a4290a05d956c87d8bcea73bc146f16bad4ee5fad52e1d",
+    "baseline_acceptance_sha256": "3056fd344cc2485fe6ddf089d7d50d6461b27b62756f293c9b1968d69a5d08f5",
+    "ordered_shot_revisions": [
+      "drama.shot.waiting-room.001@1",
+      "drama.shot.waiting-room.002@1",
+      "drama.shot.waiting-room.003@1"
+    ],
+    "provider_selected": false,
+    "provider_native_wording_present": false
+  },
+  "authority_boundary": {
+    "development_execution_owner": "current primary Agent following accepted Drama Spec and repository gates",
+    "subjective_verdict_owner": "current user or a HUMAN designee explicitly authorized before playback",
+    "provider_lifecycle_owner": "VideoGenerationService with ProductionStateCommitter as sole durable writer",
+    "raw_analysis_authority": "project-local video-analysis MCP, advisory raw evidence only",
+    "product_runtime_status": "DRAMA_TYPED_GATE_2_AND_P6_NOT_IMPLEMENTED",
+    "product_runtime_gap_is_b_d0_blocker": false,
+    "reason": "Milestone 6 is a bounded Development empirical lane; Milestone 7 separately productizes exact pairwise media evidence only after dual-domain closure. Requiring the M7 seam before M6-D would invert the accepted execution order.",
+    "forbidden_promotion": "This path cannot write or imply Manifest/Registry activation, ReviewReceipt, P6, Final Acceptance, publication or release."
+  },
+  "exact_run_evidence_paths": {
+    "run_root_template": "runs/drama-m6-d-key-at-the-waiting-room-<run_id>/",
+    "pre_submit": "evidence/drama-execution-preflight.json",
+    "shot_generation": "evidence/shot-<ordinal>-take-<attempt-id>-<shot-media-sha256>-generation.json",
+    "shot_raw_analysis": "evidence/shot-<ordinal>-take-<attempt-id>-<shot-media-sha256>-video-analysis.json",
+    "shot_agent_gate": "evidence/shot-<ordinal>-take-<attempt-id>-<shot-media-sha256>-agent-gate.json",
+    "shot_human_verdict": "evidence/shot-<ordinal>-take-<attempt-id>-<shot-media-sha256>-human-verdict.json",
+    "pairwise_human_verdict": "evidence/pair-<source-ordinal>-take-<source-attempt-id>-<source-media-sha256>-to-<target-ordinal>-take-<target-attempt-id>-<target-media-sha256>-human-verdict.json",
+    "scene_assembly": "evidence/scene-assembly-<assembly-attempt-id>-<assembly-sha256>.json",
+    "whole_scene_human_verdict": "evidence/whole-scene-<assembly-attempt-id>-<assembly-sha256>-human-verdict.json",
+    "identity_rule": "Every record must bind its own schema/version, exact accepted package/profile/rubric/fixture/baseline identities, unique attempt identity, target media size/SHA/stream facts, authority/tool identities, timestamps and all input-record SHA-256 values. Records are immutable and must be created exclusively: a new Shot or assembly SHA requires a new unique attempt-qualified path or a new run_id, and existing evidence must never be overwritten. A referenced path without a matching SHA is NOT_EVALUATED."
+  },
+  "execution_layers": [
+    {
+      "layer_id": "B-D0-GATE-01-PRE-SUBMIT",
+      "authority_class": "CURRENT_CALLABLE_RUNTIME_BACKED",
+      "canonical_path": [
+        "Project/Registry-backed Shot and selected revision",
+        "VideoPlanningRequest",
+        "VideoPlanner.plan",
+        "require_current_video_plan or prepare_shot_for_existing_production",
+        "ShotReadinessGate READY with exact VerifiedGenerationRequirementProjection",
+        "Shot Router-selected exact capability",
+        "adapter-compiled ResolvedVideoGenerationRequest",
+        "VideoGenerationService.start"
+      ],
+      "current_evidence": [
+        "src/ai_video/planning/video_planner.py::require_current_video_plan",
+        "src/ai_video/planning/video_planner.py::prepare_shot_for_existing_production",
+        "src/ai_video/quality_gates/shot_readiness_gate.py::ShotReadinessGate.evaluate",
+        "src/ai_video/quality_gates/shot_readiness_gate.py::require_ready",
+        "docs/agent-primary-contract-matrix.md::Canonical API Entry Points"
+      ],
+      "exact_preflight_record_requirements": [
+        "accepted package/profile/rubric/fixture/baseline IDs and SHAs",
+        "canonical Drama Shot revision to runtime Shot ID/revision/content-hash projection",
+        "Project/Registry selected revisions and content hashes",
+        "VideoPlanningRequest, plan, generation requirement, readiness result and verified projection hashes",
+        "selected Provider/capability/profile/workflow/binding/compiler and resolved request hashes",
+        "per-Shot SourceAudioPolicy resolved against the selected Provider output capability",
+        "output destination, exact one-attempt identity, local or paid authorization/gate identity and unknown-outcome stop",
+        "OPEN_VIDEO_JUDGE_RETRIES=0 or equivalent proof that no internal un-Gated extra take is possible"
+      ],
+      "stop_rule": "Any missing, stale, mismatched or BLOCKED input stops before preview, permit, upload or submit. The accepted package does not auto-load into Product Runtime; the preflight record must explicitly bind the projection without inventing Story/Scene/Character/Shot facts.",
+      "status": "VERIFIED_FOR_AGENT_CONTROLLED_DEVELOPMENT"
+    },
+    {
+      "layer_id": "B-D0-GATE-02-PROVIDER-LIFECYCLE",
+      "authority_class": "CURRENT_CALLABLE_RUNTIME_BACKED",
+      "canonical_path": [
+        "VideoGenerationService.start",
+        "submit_local_once or submit_once",
+        "refresh_local_once or refresh_once",
+        "fetch_local_once or fetch_once",
+        "exact fetched MP4 path/SHA/size/probe/provenance",
+        "validate_once without automatic activation"
+      ],
+      "current_evidence": [
+        "src/ai_video/production/video_generation.py::VideoGenerationService",
+        "src/ai_video/production/video_artifact.py::MeasuredVideoMetadata",
+        "tests/test_video_generation.py",
+        "tests/test_production_local_video_state.py",
+        "tests/test_production_generated_video_e2e.py"
+      ],
+      "stop_rule": "Known failure and unknown outcome are durably distinct. Unknown outcome, incomplete durable phase, identity drift or fetch/probe mismatch stops without blind retry, permit remint or next Shot submit. No candidate activation occurs in this Development lane.",
+      "status": "VERIFIED"
+    },
+    {
+      "layer_id": "B-D0-GATE-03-PER-SHOT",
+      "authority_class": "CANONICAL_AGENT_SIDE_GATE_PLUS_HUMAN_DEVELOPMENT_EVIDENCE",
+      "sequence": [
+        "Generate exactly one Shot once through the canonical Provider lifecycle.",
+        "Fix exact MP4 path, size, SHA-256 and measured stream identity.",
+        "Explicitly call project-local video-analysis on the exact path; at minimum bind probe and sampled visual evidence, plus transcription/audio/scene/lip-sync evidence whenever required.",
+        "Record raw MCP output references and tool identities in shot_raw_analysis.",
+        "Map raw evidence to independent technical findings in shot_agent_gate; MCP output does not self-verdict Drama requirements.",
+        "Present the exact full Shot at 1.0x with full audio to the authorized HUMAN and record every applicable DRAMA-MEDIA-SHOT finding with rationale and playback attestation.",
+        "Permit the next submit only when all technical findings and all required HUMAN findings are PASS."
+      ],
+      "current_evidence": [
+        "AGENTS.md::Per-Shot Post-Media Gate",
+        ".agent/context/control-plane-playbook.md::Per-Shot Post-Media Gate",
+        ".agents/skills/open-video/SKILL.md::Step 6",
+        ".agents/skills/h3-video/SKILL.md::Mandatory per-Shot post-media Gate",
+        "src/ai_video_mcp/server.py",
+        "runs/drama-baseline-reference-20260829/evidence/shot-01-take-01-generation.json",
+        "runs/drama-baseline-reference-20260829/evidence/shot-01-take-01-agent-gate.json"
+      ],
+      "current_session_tool_inventory": {
+        "project_local_video_analysis_exposed": true,
+        "tools_observed": [
+          "video_probe",
+          "video_analyze",
+          "video_extract_frames",
+          "video_transcribe",
+          "video_scene_detect",
+          "video_review"
+        ],
+        "invoked_in_this_slice": false
+      },
+      "stop_rule": "FAIL, NOT_EVALUATED, stale/missing evidence, identity mismatch or incomplete HUMAN playback sets next_shot_submit_allowed=false. A later repair is a new exact attempt and cannot be automatically chained.",
+      "status": "VERIFIED_FOR_AGENT_CONTROLLED_DEVELOPMENT"
+    },
+    {
+      "layer_id": "B-D0-GATE-04-PAIRWISE",
+      "authority_class": "HUMAN_DEVELOPMENT_EVIDENCE_ONLY",
+      "sequence": [
+        "After target Shot per-Shot PASS, bind complete source and target MP4 paths, sizes, SHAs and stream identities.",
+        "Record numeric source terminal and target opening review-window boundaries and the exact extraction/playback method without changing either source file.",
+        "Play source terminal context continuously into target opening context at 1.0x with full audio.",
+        "Record HUMAN authority, authorization source/timestamp, playback attestation and every applicable DRAMA-MEDIA-PAIR finding.",
+        "Only pairwise all-required PASS permits the submit after the target Shot or whole-scene assembly after the final pair."
+      ],
+      "current_boundary": "GeneratedShotContinuityEvidence currently binds source_shot_id and target artifact SHA but not complete source MP4 SHA or reviewed source/target windows. Milestone 7 owns future Product Runtime productization; the M6-D record is content-addressed Development evidence and cannot become a P6 receipt.",
+      "stop_rule": "Any required pairwise FAIL/NOT_EVALUATED, source/target SHA drift, window mismatch, missing full-audio playback or unauthorized reviewer stops M6-D before another submit or assembly.",
+      "status": "VERIFIED_AS_DEVELOPMENT_EVIDENCE_PATH"
+    },
+    {
+      "layer_id": "B-D0-GATE-05-WHOLE-SCENE",
+      "authority_class": "HUMAN_DEVELOPMENT_EVIDENCE_ONLY",
+      "sequence": [
+        "Assemble only per-Shot and adjacent-pair PASS media in sealed Shot order.",
+        "Record ordered component paths/sizes/SHAs, exact cut/transition semantics, concat/compositor/tool identity, audio handling and output assembly path/size/SHA/stream identity.",
+        "Bind the accepted baseline payload and acceptance SHAs plus every selected baseline dimension/floor.",
+        "Play the exact assembled scene once, uninterrupted, at 1.0x with full audio and no scrubbing during the primary verdict.",
+        "Record HUMAN authority, authorization source/timestamp, playback attestation, all DRAMA-MEDIA-SCENE findings and each baseline-dimension verdict."
+      ],
+      "current_boundary": "The exact assembly is a bounded M6-D Development review artifact. It does not claim canonical P4 ingestion of generated Provider audio, Production render activation, Drama Gate 2, P6 or Final Acceptance. Any post-assembly edit, re-encode, retime, transition or audio replacement creates a new SHA and requires fresh whole-scene evidence.",
+      "stop_rule": "Any required whole-scene or baseline FAIL/NOT_EVALUATED, component mismatch, undeclared transition, interrupted/non-1.0x/non-full-audio playback or identity drift keeps M6-D not passed.",
+      "status": "VERIFIED_AS_DEVELOPMENT_EVIDENCE_PATH"
+    },
+    {
+      "layer_id": "B-D0-GATE-06-INVALIDATION-AND-NO-INHERITANCE",
+      "authority_class": "MIXED_RUNTIME_AND_ACCEPTED_CONTRACT",
+      "rules": [
+        "Provider outcome unknown is a durable STOP and never authorizes blind retry or permit remint.",
+        "New Shot media SHA invalidates that Shot's per-Shot evidence, both adjacent pair records and whole-scene evidence.",
+        "New assembly SHA invalidates the whole-scene and baseline verdicts even when component Shot SHAs are unchanged.",
+        "Authoring package/profile/rubric/fixture/baseline/HUMAN authority identity drift invalidates every evidence record in its declared coverage.",
+        "Drama, Commercial, Base AI Comic, technical and historical verdicts never fill one another's findings.",
+        "Shared Core identity change requires both domain lanes to revalidate applicable shared findings; it does not rewrite preserved historical observations."
+      ],
+      "status": "VERIFIED"
+    }
+  ],
+  "shot_sequence_barrier": {
+    "shot_1_to_shot_2": "Shot 1 technical findings PASS and all required Shot 1 HUMAN findings PASS.",
+    "shot_2_to_shot_3": "Shot 2 technical findings PASS, all required Shot 2 HUMAN findings PASS and pair 1->2 all-required HUMAN findings PASS.",
+    "shot_3_to_assembly": "Shot 3 technical findings PASS, all required Shot 3 HUMAN findings PASS and pair 2->3 all-required HUMAN findings PASS.",
+    "assembly_to_m6_d_verdict": "Whole-scene and every applicable baseline dimension receive exact all-required HUMAN PASS with all identities current."
+  },
+  "verification_evidence": {
+    "focused_tests": {
+      "command": "python -m pytest -p no:cacheprovider tests/test_shot_readiness_gate.py tests/test_video_generation.py tests/test_mcp_analyze.py -q",
+      "result": "80 passed",
+      "meaning": "Current generic readiness, lifecycle guards and project-local MCP/hook behavior pass; no Drama Product Runtime is inferred."
+    },
+    "harness_inspection": {
+      "category": "documentation",
+      "required_checks": [
+        "scope_diff_check",
+        "docs_contract_check",
+        "policy_audit_check",
+        "product_runtime_skill_boundary_tests"
+      ],
+      "fallback_paths": []
+    }
+  },
+  "aggregate_decision": {
+    "b_d0": "READY_FOR_DELEGATED_DOCUMENTATION_ADJUDICATION",
+    "m6_d": "NOT_EVALUATED",
+    "m6_c": "HUMAN_FAIL",
+    "b_x": "FAIL",
+    "m7_through_m9": "DEFERRED",
+    "adjudication_recommendation": "CONFIRM",
+    "remaining_b_d0_blockers_if_exactly_accepted": [],
+    "next_action_if_exactly_accepted": "B-D0 may become PASS. M6-D remains a separately authorized empirical slice and must begin with a fresh exact pre-submit record; no Provider, prompt or media action is authorized by this artifact."
+  },
+  "forbidden_effects": [
+    "provider_or_model_selection",
+    "provider_native_prompt_authoring",
+    "comfyui_h3_or_video_analysis_invocation",
+    "media_generation_retry_repair_or_assembly",
+    "manifest_registry_or_candidate_activation",
+    "p6_or_final_acceptance",
+    "commercial_or_cross_lane_verdict_inheritance",
+    "m6_d_or_dual_domain_pass_claim"
+  ]
+}
