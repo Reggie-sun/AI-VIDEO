@@ -3,7 +3,10 @@ HEAD_REF ?= HEAD
 RECEIPT ?=
 RUN_ID ?=
 
-.PHONY: harness-inspect harness-verify harness-verify-range harness-receipt harness-audit harness-repository harness-test
+.PHONY: frontend harness-inspect harness-verify harness-verify-range harness-receipt harness-audit harness-repository harness-test
+
+frontend:
+	cd provider-console && npm run dev -- --host 127.0.0.1
 
 harness-inspect:
 	python scripts/agent_harness.py inspect
