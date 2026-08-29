@@ -1,0 +1,100 @@
+{
+  "schema_version": "drama-shot-timing-repair-overlay/1",
+  "record_kind": "drama_shot_timing_repair_overlay",
+  "overlay_id": "drama.execution-intent.key-at-the-waiting-room.shot-01",
+  "overlay_version": 2,
+  "status": "proposed",
+  "domain_id": "drama",
+  "lane_id": "M6-D",
+  "target_shot": {
+    "shot_id": "drama.shot.waiting-room.001",
+    "revision": 1,
+    "content_hash": "4cf53970d6642d4bfe73c23e5c12f9714c069843b0a7b47069dfb2519c47253b"
+  },
+  "parent_lineage": {
+    "accepted_execution_intent_envelope_path": "docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v1.accepted.json",
+    "accepted_execution_intent_envelope_sha256": "8b50b61b152b59542fc4521c870cc060b9b6469fc18db5e3a14248cf05de7efd",
+    "accepted_authoring_evidence_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-authoring-to-request-accepted-v1.json",
+    "accepted_authoring_evidence_sha256": "1e38b731b31b4866720d5b80bfb2dd40da04ebe56dea8656f3d7219d15298cb6",
+    "blocked_readiness_envelope_path": "docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v1.blocked.json",
+    "blocked_readiness_envelope_sha256": "3e28032c7977579d2d53cf3650352c603547d219022429cdb5a886407c86bbcf",
+    "blocked_readiness_evidence_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-provider-profile-runtime-request-readiness-blocked-v1.json",
+    "blocked_readiness_evidence_sha256": "f214645086e11c41d698190ac0ff4418278da9c02aae6ca1605b964d304b2cb1",
+    "parent_request_hash": "01c329aa22b898521d0611bd4fbcfcbba912babb81b4ce85a88582985704fe7c",
+    "parent_verified_projection_hash": "f2292b67f3616a5b4757c6c3e45301b971230bb59a3b683207d8a6d6cb412b1d",
+    "parent_requirement_hash": "d234cd95b712ca8d966132d28c6ee15a49831b412305b795c8c8eb9a2491b34d",
+    "parent_prompt_sha256": "3676c9998a63e7ddc024faff7d18f07f5e48722046ee7193201f490ee57c750d",
+    "active_pre_generation_graph_hash": "761c92a0a8507ae2b8f14de5338b337e0d567e78b654e36403d3428a0da47ff1"
+  },
+  "authorization_binding": {
+    "source_id": "current-session:versioned-shot01-timing-repair-authorization-20260830",
+    "authorized_scope": "one versioned pre-media canonical Shot 01 timing repair from fixed 5.0 seconds to the selected H3 profile's exact 124-frame grid, followed by regenerated canonical request, projection, requirement and non-persisted readiness preview",
+    "forbidden_scope": [
+      "profile contract modification",
+      "runtime, source-code or test modification to manufacture readiness",
+      "source-audio policy invention or default",
+      "request persistence, permit minting or Provider submit",
+      "ComfyUI lifecycle change or media generation",
+      "Manifest, Registry, candidate activation, video-analysis, P6 or Final Acceptance"
+    ]
+  },
+  "timing_repair": {
+    "reason": "FIXED_5S_REQUIREMENT_NOT_EXPRESSIBLE_BY_SELECTED_T8_PROFILE",
+    "parent_output_need": {
+      "timing_mode": "fixed",
+      "duration_seconds": 5.0,
+      "frame_count": null,
+      "geometry_policy": "exact",
+      "width": 1344,
+      "height": 768,
+      "aspect_ratio": "16:9",
+      "fps": 24,
+      "container_mime": "video/mp4"
+    },
+    "repaired_output_need": {
+      "timing_mode": "frame_count",
+      "duration_seconds": null,
+      "frame_count": 124,
+      "geometry_policy": "exact",
+      "width": 1344,
+      "height": 768,
+      "aspect_ratio": "16:9",
+      "fps": 24,
+      "container_mime": "video/mp4"
+    },
+    "repaired_shot_duration_seconds": 5.166666666666667,
+    "repaired_prompt_display_duration_seconds": 5.167,
+    "generation_intent_replacements": [
+      {
+        "field": "pacing.cadence",
+        "from": "0.000-1.400s entrance and stop; 1.400-1.700s key lift; 1.700-3.900s exact dialogue once while Lin-Lan raises her gaze; 3.900-5.000s breath pause, eye contact and endpoint hold.",
+        "to": "0.000-1.400s entrance and stop; 1.400-1.700s key lift; 1.700-3.900s exact dialogue once while Lin-Lan raises her gaze; 3.900-5.167s breath pause, eye contact and endpoint hold."
+      },
+      {
+        "field": "pacing.shot_duration_seconds",
+        "from": 5.0,
+        "to": 5.166666666666667
+      },
+      {
+        "field": "lighting_intent.continuity_state",
+        "from": "the same cool window spill, dim warm practical, restrained contrast and wet-surface response remain constant from first frame through the 5.000s endpoint",
+        "to": "the same cool window spill, dim warm practical, restrained contrast and wet-surface response remain constant from first frame through the 5.167s endpoint"
+      }
+    ]
+  },
+  "unchanged_contract": {
+    "fixture_baseline_story_scene_character_shot_semantic_bytes_changed": false,
+    "non_timing_execution_intent_changed": false,
+    "dialogue_text_or_timing_changed": false,
+    "prompt_grammar_changed": false,
+    "provider_profile_workflow_binding_changed": false,
+    "source_audio_policy_changed": false,
+    "source_audio_policy_after_repair": null
+  },
+  "status_boundary": {
+    "m6_d": "NOT_EVALUATED",
+    "execution": "STOP_BEFORE_SUBMIT",
+    "next_shot_submit_allowed": false,
+    "candidate_acceptance_required_before_current_readiness_claim": true
+  }
+}
