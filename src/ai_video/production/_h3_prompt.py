@@ -325,7 +325,6 @@ def _compile_h3_t2va_prompt(
         if dialogue_language is None:
             diagnostics.append("generation_intent.dialogue_intent.language")
     emitted_values = {
-        "target_shot.intent": requirement.target_shot.intent,
         "generation_intent.camera_intent": intent.camera_intent.model_dump(mode="python"),
         "generation_intent.camera_endpoint": endpoint.model_dump(mode="python"),
         "generation_intent.subject_action": intent.subject_action.model_dump(
@@ -389,7 +388,6 @@ def _compile_h3_t2va_prompt(
     prohibited = ", ".join(treatment.prohibited_visual_drift) or "none"
     visual = (
         f"[Shot 1] {treatment.medium_look}; "
-        f"shot intent {requirement.target_shot.intent}; "
         f"action {intent.subject_action.start_state} -> "
         f"{intent.subject_action.progression} -> "
         f"{_state_text(intent.subject_action.endpoint)}; "

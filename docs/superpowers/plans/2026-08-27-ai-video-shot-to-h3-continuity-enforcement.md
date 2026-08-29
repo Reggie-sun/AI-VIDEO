@@ -115,7 +115,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | B-D0 prerequisite complete后已获独立M6-D启动授权；sealed Drama package现已通过唯一committer materialize为Project/Registry-selected revisions，Shot 01 Planner requirement与asset-free pre-generation graph均READY。Manifest现为2.7，canonical video lifecycle entry可达但未进入；Provider profile、native prompt与exact request尚未selected/sealed，所以submit仍禁止。没有Provider selection、request persistence、submit、media或`DRAMA-MEDIA-*` verdict |
+| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | B-D0 prerequisite complete后已获独立M6-D启动授权；sealed Drama package已通过唯一committer materialize为Project/Registry-selected revisions，Shot 01 Planner requirement与asset-free pre-generation graph均READY。Canonical requirement `d07dba76...` strict reopen后由current H3 compiler返回exact 13-path `H3PromptUnsupported`，没有native prompt bytes、resolved request或Provider effect；缺失execution facts不能由默认值、historical preview或baseline补造。详见`docs/record_for_agent/2026-08-29-drama-m6-d-shot-01-request-readiness-gate-stop.md` |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -824,7 +824,7 @@ Git bytes投影typed artifacts，仅调用`ProductionStateCommitter.bootstrap_in
 `9481519d2b4929e6abd9b0826cc5731ea54f60526ec414ffa07279d32f0a57fb`。Exact bootstrap replay已验证14个
 Production files零写入。
 
-Current stop已推进到`PROVIDER_PROFILE_NATIVE_PROMPT_AND_EXACT_REQUEST_NOT_SELECTED`。Implementation commit
+Historical pre-generation graph checkpoint曾停在`PROVIDER_PROFILE_NATIVE_PROMPT_AND_EXACT_REQUEST_NOT_SELECTED`。Implementation commit
 `6a5bbbf65d175eb58e1fbe2e6753a2965705b8d8`新增显式`GENERATION_TARGET` projection与in-lock exact-current
 guard；run-local driver只经`ProductionStateCommitter.bootstrap_dependency_graph()`与
 `upgrade_manifest_schema("2.7")`激活graph `761c92a0a8507ae2b8f14de5338b337e0d567e78b654e36403d3428a0da47ff1`。
@@ -837,8 +837,17 @@ Exact evidence位于`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidenc
 `e01fb4c56b7a88149d469b99cbbfe3223d715054`，即使上游readiness未来解除也仍须重新通过exact runtime
 identity preflight；该inspection不是Router decision，且当前未选择该profile。Source-audio当前只保留从sealed
 Shot facts推导的`GENERATED + KEEP` authoring-intent proposal，因Provider未selected而没有accepted SourceAudioPolicy
-或resolved request binding。该stop没有选择或改变fixture/baseline，没有启动ComfyUI、编写Provider-native prompt、持久化request、submit、
-生成media或调用`video-analysis`；`M6-D`保持`NOT_EVALUATED`，下一Shot submit不允许。
+或resolved request binding。该historical checkpoint没有选择或改变fixture/baseline，没有启动ComfyUI、编写Provider-native prompt、持久化request、submit、
+生成media或调用`video-analysis`。
+
+Current stop为`CANONICAL_SHOT_01_EXECUTION_INTENT_INCOMPLETE`。Planning request
+`92e6de89a72730da3beb58638dd54c637cad5162aab94a3259d3413a9a50931f`绑定的canonical requirement
+`d07dba76f19e2a1d998d9bf087df8583a1a99653cc7c1d9760935f72534c9b81` strict reopen后返回exact 13-path
+`H3PromptUnsupported`且`prompt_text=null`。另有sealed language仍为`und`、visual/lighting、dialogue timing/lip-sync及
+motion/pacing categorical facts未由current authoring truth完整决定；这些facts不得用默认值、baseline或historical preview补造。
+Current evidence与separately required authoring-to-request repair详见
+`docs/record_for_agent/2026-08-29-drama-m6-d-shot-01-request-readiness-gate-stop.md`。`M6-D`保持
+`NOT_EVALUATED / STOP_BEFORE_SUBMIT`，下一Shot submit不允许。
 
 Stop immediately and report rather than expanding scope when：
 

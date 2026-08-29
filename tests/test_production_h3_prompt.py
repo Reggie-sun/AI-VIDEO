@@ -151,6 +151,14 @@ def test_h3_prompt_compiles_complete_legacy_t2v_without_neutral_field_leakage(
         contract_version="provider-neutral-video-requirement/1",
         generation_mode=GenerationMode.TEXT_TO_VIDEO,
         continuity_mode=ContinuityMode.NONE,
+        target_shot=current.target_shot.model_copy(
+            update={
+                "intent": (
+                    '{"dramatic_function":"establish_offer",'
+                    '"next_shot_obligation":"future shot reveals the key"}'
+                )
+            }
+        ),
         generation_intent=intent,
         generation_intent_hash=canonical_sha256(intent.model_dump(mode="json")),
         conditioning_compatibility=None,
@@ -180,7 +188,9 @@ def test_h3_prompt_compiles_complete_legacy_t2v_without_neutral_field_leakage(
     assert "identity_characters=" not in result.prompt_text
     assert "scene_mood=" not in result.prompt_text
     assert "scene_constraints=" not in result.prompt_text
-    assert f"shot intent {current.target_shot.intent}" in result.prompt_text
+    assert "dramatic_function" not in result.prompt_text
+    assert "next_shot_obligation" not in result.prompt_text
+    assert "shot intent" not in result.prompt_text
     assert "performance trigger receives the product offer" in result.prompt_text
     assert "pacing unspecified; tempo unspecified" in result.prompt_text
 
