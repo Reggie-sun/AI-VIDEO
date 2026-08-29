@@ -889,3 +889,47 @@ artifact family 的 deterministic composition/input receipt 绑定 exact bytes�
 本 checkpoint 没有修改 MP4、生成媒体、调用 Provider、执行 paid/cloud action、写 Manifest、激活
 candidate、签发 P6 / Final Acceptance、push、deploy 或 release。现有 unrelated staged/dirty work 未被
 纳入 implementation commit。
+
+## 2026-08-29 External Catalog Process Cache
+
+`GET /api/external-media` 原先在每次页面 reload 时调用 `catalogExternalMedia()`，对当前 `524` 个 video
+locations 重新执行 directory scan、exact SHA-256 与 MP4 metadata probe。该行为没有破坏证据正确性，
+但让同一 server process 内的重复读取持续等待完整扫描。
+
+implementation commit `f8a7a6dbb3ca458ece2da0c269d0ca50def82dc1` 在
+`provider-console/scripts/runs-api.mjs` 建立唯一 server-process catalog cache：
+
+- 第一次读取仍执行完整 exact scan，并同时原子替换 private media descriptors；后续普通 GET 复用同一
+  projection，不重复 hash 或 `ffprobe`。
+- external source watcher event 只失效 External cache；Runs-only event 不会导致 External 重扫。
+- `GET /api/external-media?refresh=1` 显式失效 cache。`provider-console/src/App.jsx` 只在操作员点击
+  “刷新当前视频来源”时使用该参数；initial load 与 live-update follow-up 使用普通 GET。
+- 并发请求共享一个 in-flight scan。若扫描期间收到 source invalidation，旧 generation 不会进入 cache，
+  waiters 只共享一次新扫描；若 shared scan 失败，所有 waiters 接收同一次失败，不会各自放大重试，后续
+  独立请求仍可重新尝试。
+- HTTP response 继续使用 `Cache-Control: no-store`；cache 不进入 Browser、不写磁盘、不跨 server restart，
+  也不改变 exact-byte media serving 的 containment、identity 与 size revalidation。
+
+Live Chrome measurement：对当前 `406` 个 unique SHA / `524` 个 locations，显式强制扫描约
+`7.54–8.55s`；同一 server process 的后续普通 GET 为约 `11.9–26.2ms`。Browser reload 的两次
+External requests 均命中 cache；点击刷新按钮产生 `?refresh=1` 并完成完整重扫。刷新前后证据计数保持
+`已关联 (220)`、`旁证待解析 (4)`、`无绑定证据 (182)`，Chrome console 无 warning/error。
+
+Verification：
+
+- full local Provider Console Node suite：`84 passed`；Provider Console Python：`34 passed`；
+  Vite/Sites production build：`4582 modules transformed`。
+- cache-focused tests 覆盖 repeated read、manual/watcher invalidation、in-flight invalidation，以及 shared
+  failure 不放大重试。
+- native `reviewer_xhigh` 首轮确认 concurrent failure amplification defect；修复后的 scoped re-review
+  verdict 为 `accept`，无 blocking issue 或 concern。
+- exact-range：
+  `9fd4407edf1433de6dc080434e2d7db20951a8be..f8a7a6dbb3ca458ece2da0c269d0ca50def82dc1`；
+  receipt：`.agent/harness/runs/provider-console-external-cache-f8a7a6d/receipt.json`。Receipt verifier 的
+  `passed`、`fresh`、`fresh_for_snapshot`、`scope_paths_match`、`scope_worktree_clean`、
+  `complete_completion_proof`、`integrity` 与 `artifact_integrity` 全部为 `true`。
+
+该 cache 是 read-only performance optimization，不是第二套 lifecycle/evidence owner。它没有修改媒体、
+调用 Provider、生成视频、写 Manifest、激活 candidate、签发 P6 / Final Acceptance、push、deploy 或
+release。Server restart 后的第一次读取仍会进行完整扫描；这保留了无需持久 cache migration 或磁盘
+state recovery 的简单边界。
