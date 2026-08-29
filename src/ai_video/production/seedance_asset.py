@@ -207,6 +207,7 @@ class SeedanceRemoteReferenceLease:
     remote_origin: str
     issued_at: datetime
     not_after: datetime
+    source_nominal_duration_millis: int | None
     _url: str = field(repr=False)
     _durability_validator: Callable[[], bool] = field(repr=False)
 
@@ -219,6 +220,7 @@ class SeedanceRemoteReferenceLease:
         issued_at: datetime,
         not_after: datetime,
         durability_validator: Callable[[], bool],
+        source_nominal_duration_millis: int | None = None,
     ) -> None:
         if token is not _REMOTE_REFERENCE_LEASE_TOKEN:
             raise TypeError(
@@ -233,6 +235,14 @@ class SeedanceRemoteReferenceLease:
             or not_after - issued_at > _MAX_REMOTE_REFERENCE_LEASE
         ):
             raise _invalid("Seedance remote reference lease time is invalid.")
+        if (
+            source_nominal_duration_millis is not None
+            and (
+                type(source_nominal_duration_millis) is not int
+                or source_nominal_duration_millis <= 0
+            )
+        ):
+            raise _invalid("Seedance source nominal duration proof is invalid.")
         try:
             parsed = urlsplit(url)
             port = parsed.port
@@ -266,6 +276,11 @@ class SeedanceRemoteReferenceLease:
         object.__setattr__(self, "remote_origin", origin)
         object.__setattr__(self, "issued_at", issued_at)
         object.__setattr__(self, "not_after", not_after)
+        object.__setattr__(
+            self,
+            "source_nominal_duration_millis",
+            source_nominal_duration_millis,
+        )
         object.__setattr__(self, "_url", url)
         object.__setattr__(self, "_durability_validator", durability_validator)
 
@@ -347,6 +362,37 @@ class SeedanceRemoteReferenceResolver:
         ):
             raise _invalid("Seedance remote materialization does not match exact input bytes.")
         return lease.resolve(materialization=materialization, now=self._now())
+
+    def verified_nominal_duration_millis(
+        self,
+        binding: VideoMediaReferenceBinding,
+        *,
+        family_limit_millis: int,
+    ) -> int | None:
+        """Return sealed nominal timing for one exact current provider output."""
+
+        if (
+            type(binding) is not VideoMediaReferenceBinding
+            or binding.kind != "video"
+            or binding.role != "reference_video"
+            or binding.fps is None
+        ):
+            return None
+        selected = self._by_artifact.get(binding.asset_sha256)
+        if selected is None:
+            return None
+        materialization, lease = selected
+        nominal = lease.source_nominal_duration_millis
+        if (
+            nominal is None
+            or nominal > family_limit_millis
+            or binding.duration_millis != nominal
+            or materialization.artifact_size_bytes != binding.size_bytes
+            or materialization.artifact_mime_type != binding.mime_type
+        ):
+            return None
+        lease.resolve(materialization=materialization, now=self._now())
+        return nominal
 
 
 class SeedanceSyntheticImageReferenceReceipt(StrictModel):

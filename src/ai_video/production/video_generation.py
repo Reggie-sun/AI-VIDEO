@@ -31,6 +31,7 @@ from ai_video.production.remote_media import (
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
     VideoFetchReceipt,
+    VideoFlexibleOutputRequirement,
     VideoProvider,
     VideoSubmission,
     VideoTaskObservation,
@@ -539,6 +540,14 @@ class VideoGenerationService:
             materialization_receipt_id=materialization.content_hash,
             durability_validator=lambda: self._remote_reference_source_is_active(
                 attempt_id
+            ),
+            source_nominal_duration_millis=(
+                request.effective_output.duration_seconds * 1_000
+                if isinstance(
+                    request.effective_output, VideoFlexibleOutputRequirement
+                )
+                and request.effective_output.timing_mode == "nominal_seconds"
+                else None
             ),
         )
         return refresh(

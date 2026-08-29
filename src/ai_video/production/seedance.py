@@ -39,6 +39,9 @@ from ai_video.production.seedance_capabilities import (
     SeedanceCapabilityProfile,
     SeedanceOutputRaster,
 )
+from ai_video.production.seedance_reference_duration import (
+    seedance_reference_media_within_family_limit,
+)
 from ai_video.production.seedance_profile import (
     SEEDANCE_ORIGIN,
     SeedancePricingSnapshot,
@@ -384,21 +387,16 @@ class SeedanceVideoProvider:
                 ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                 "Seedance reference-video measurements are outside the supported range.",
             )
-        family_total_limit = (
-            30_000
-            if request.model_id == "doubao-seedance-2-5-260628"
-            else 15_000
-            if request.model_id.startswith("doubao-seedance-2-0")
-            else None
-        )
-        if family_total_limit is not None and any(
-            sum(
-                binding.duration_millis
-                for binding in request.media_bindings
-                if binding.kind == kind
+        if not (
+            seedance_reference_media_within_family_limit(
+                request.model_id,
+                request.media_bindings,
+                nominal_duration_resolver=(
+                    self._input_reference
+                    if type(self._input_reference) is SeedanceRemoteReferenceResolver
+                    else None
+                ),
             )
-            > family_total_limit
-            for kind in ("video", "audio")
         ):
             raise _error(
                 ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
@@ -632,6 +630,7 @@ class SeedanceVideoProvider:
             issued_at=issued_at,
             not_after=issued_at + timedelta(seconds=_REMOTE_REFERENCE_LEASE_SECONDS),
             durability_validator=refresh_permit._durability_is_current,
+            source_nominal_duration_millis=refresh_permit._consumed_source_nominal_duration_millis(),
         )
 
     def _verify_remote_reference_bytes(

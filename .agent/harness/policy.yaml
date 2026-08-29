@@ -684,6 +684,7 @@ categories:
       - src/ai_video/production/seedance.py
       - src/ai_video/production/seedance_asset.py
       - src/ai_video/production/seedance_capabilities.py
+      - src/ai_video/production/seedance_reference_duration.py
       - src/ai_video/production/seedance_profile.py
       - src/ai_video/production/remote_media.py
       - src/ai_video/production/paid_provider.py

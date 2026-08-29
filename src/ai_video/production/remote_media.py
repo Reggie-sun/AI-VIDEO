@@ -110,7 +110,13 @@ _REMOTE_REFERENCE_REFRESH_PERMIT_TOKEN = object()
 class _RemoteReferenceRefreshPermit:
     """Process-local one-use proof that Service reopened an activated source."""
 
-    __slots__ = ("_binding", "_durability_validator", "_consumed", "_lock")
+    __slots__ = (
+        "_binding",
+        "_durability_validator",
+        "_source_nominal_duration_millis",
+        "_consumed",
+        "_lock",
+    )
 
     def __init__(
         self,
@@ -121,6 +127,7 @@ class _RemoteReferenceRefreshPermit:
         fetch_fingerprint: str,
         materialization_receipt_id: str,
         durability_validator: Callable[[], bool],
+        source_nominal_duration_millis: int | None = None,
     ) -> None:
         if token is not _REMOTE_REFERENCE_REFRESH_PERMIT_TOKEN:
             raise TypeError(
@@ -133,6 +140,15 @@ class _RemoteReferenceRefreshPermit:
             materialization_receipt_id,
         )
         self._durability_validator = durability_validator
+        if (
+            source_nominal_duration_millis is not None
+            and (
+                type(source_nominal_duration_millis) is not int
+                or source_nominal_duration_millis <= 0
+            )
+        ):
+            raise ValueError("source nominal duration must be positive milliseconds")
+        self._source_nominal_duration_millis = source_nominal_duration_millis
         self._consumed = False
         self._lock = threading.Lock()
 
@@ -162,6 +178,11 @@ class _RemoteReferenceRefreshPermit:
 
     def _durability_is_current(self) -> bool:
         return self._consumed and self._durability_validator()
+
+    def _consumed_source_nominal_duration_millis(self) -> int | None:
+        if not self._consumed:
+            return None
+        return self._source_nominal_duration_millis
 
     def __reduce__(self) -> object:
         raise TypeError("Remote reference refresh permits cannot be serialized.")

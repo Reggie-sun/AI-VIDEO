@@ -23,7 +23,7 @@ import pytest
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import StateCommitStatus, VideoAttemptPhase
 from ai_video.production.video_generation import VideoGenerationService
-from ai_video.production.video import VideoSubmission
+from ai_video.production.video import VideoFlexibleOutputRequirement, VideoSubmission
 
 
 @contextmanager
@@ -109,7 +109,19 @@ def test_video_generation_service_exposes_validate_once_and_activate_once() -> N
 def test_remote_reference_lease_reopens_only_activated_source_evidence(
     monkeypatch,
 ) -> None:
-    request = object()
+    request = SimpleNamespace(
+        effective_output=VideoFlexibleOutputRequirement(
+            timing_mode="nominal_seconds",
+            duration_seconds=15,
+            dimension_mode="adaptive",
+            resolution_label="720p",
+            ratio="adaptive",
+            fps=24,
+            container="mp4",
+            mime_type="video/mp4",
+            native_audio=False,
+        )
+    )
     submit_receipt = object()
     submission = SimpleNamespace(submission_fingerprint="a" * 64)
     observation = SimpleNamespace(observation_fingerprint="b" * 64)
@@ -177,6 +189,7 @@ def test_remote_reference_lease_reopens_only_activated_source_evidence(
                     fetch_receipt.remote_materialization.content_hash
                 ),
             )
+            assert refresh_permit._consumed_source_nominal_duration_millis() == 15_000
             return lease
 
     monkeypatch.setattr(

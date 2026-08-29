@@ -384,7 +384,13 @@ def _accepted_receipt(resolved, paid_preview, *, task_id: str = "task-seedance-1
     )
 
 
-def _remote_refresh_permit(submission, observation, fetch_receipt):
+def _remote_refresh_permit(
+    submission,
+    observation,
+    fetch_receipt,
+    *,
+    source_nominal_duration_millis=None,
+):
     video_module = importlib.import_module("ai_video.production.remote_media")
     materialization = fetch_receipt.remote_materialization
     assert materialization is not None
@@ -395,6 +401,7 @@ def _remote_refresh_permit(submission, observation, fetch_receipt):
         fetch_fingerprint=fetch_receipt.fetch_fingerprint,
         materialization_receipt_id=materialization.content_hash,
         durability_validator=lambda: True,
+        source_nominal_duration_millis=source_nominal_duration_millis,
     )
 
 
@@ -1097,6 +1104,29 @@ def test_reference_media_total_duration_fails_closed():
             )
         )
     assert exc_info.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+
+    over_limit = VideoMediaReferenceBinding(
+        kind="video",
+        role="reference_video",
+        asset_id="video-over-limit",
+        asset_sha256=HASH_B,
+        mime_type="video/mp4",
+        duration_millis=15_042,
+        size_bytes=20_000_000,
+        width=1280,
+        height=720,
+        fps=24,
+    )
+    with pytest.raises(AiVideoError) as ordinary_reference:
+        provider.resolve(
+            _request(
+                profile,
+                model_id="doubao-seedance-2-0-260128",
+                mode=VideoGenerationMode.REFERENCE_TO_VIDEO,
+                media_bindings=(over_limit,),
+            )
+        )
+    assert ordinary_reference.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
 
 
 def test_reference_video_geometry_fails_closed():
@@ -3689,6 +3719,7 @@ def test_seedance_provider_output_lease_drives_exact_video_extend_without_ark_as
             source_submission,
             source_observation,
             source_fetch,
+            source_nominal_duration_millis=15_000,
         ),
     )
     original_stream = transport.stream_response
@@ -3752,6 +3783,29 @@ def test_seedance_provider_output_lease_drives_exact_video_extend_without_ark_as
             native_audio=True,
         ),
     )
+    proofless_lease = asset_module.SeedanceRemoteReferenceLease(
+        asset_module._REMOTE_REFERENCE_LEASE_TOKEN,
+        materialization=source_fetch.remote_materialization,
+        url=result_url,
+        issued_at=FIXED_NOW,
+        not_after=FIXED_NOW + timedelta(minutes=5),
+        durability_validator=lambda: True,
+    )
+    proofless_provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=transport,
+        credential=lambda: "must-not-be-read",
+        input_reference=asset_module.SeedanceRemoteReferenceResolver(
+            materializations=(source_fetch.remote_materialization,),
+            leases=(proofless_lease,),
+            now=lambda: FIXED_NOW,
+        ),
+        now=lambda: FIXED_NOW,
+    )
+    with pytest.raises(AiVideoError) as missing_nominal_proof:
+        proofless_provider.resolve(target_request)
+    assert missing_nominal_proof.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+
     target_resolved = target_provider.resolve(target_request)
     target_preview = target_provider.preview(target_resolved)
     target_paid = _paid_preview(target_resolved, target_preview)
@@ -3772,6 +3826,7 @@ def test_seedance_provider_output_lease_drives_exact_video_extend_without_ark_as
         "role": "reference_video",
     }
     assert target_resolved.mode is VideoGenerationMode.VIDEO_EXTEND
+    assert lease.source_nominal_duration_millis == 15_000
     assert result_url not in repr(lease)
     assert result_url not in repr(resolver)
 
@@ -3800,6 +3855,7 @@ def test_seedance_remote_reference_lease_expiry_stops_before_submit_effect():
         issued_at=FIXED_NOW - timedelta(minutes=10),
         not_after=FIXED_NOW - timedelta(minutes=5),
         durability_validator=lambda: True,
+        source_nominal_duration_millis=15_000,
     )
     resolver = asset_module.SeedanceRemoteReferenceResolver(
         materializations=(materialization,),
@@ -3827,8 +3883,7 @@ def test_seedance_remote_reference_lease_expiry_stops_before_submit_effect():
         input_reference=resolver,
         now=lambda: FIXED_NOW,
     )
-    resolved = provider.resolve(
-        _request(
+    request = _request(
             profile,
             model_id="doubao-seedance-2-0-mini-260615",
             mode=VideoGenerationMode.VIDEO_EXTEND,
@@ -3845,19 +3900,9 @@ def test_seedance_remote_reference_lease_expiry_stops_before_submit_effect():
                 native_audio=True,
             ),
         )
-    )
-    video_preview = provider.preview(resolved)
-    paid_preview = _paid_preview(resolved, video_preview)
-    authorization = _authorization(paid_preview)
 
     with pytest.raises(AiVideoError) as exc_info:
-        provider.submit(
-            resolved,
-            video_preview,
-            paid_preview,
-            authorization,
-            _permit(resolved, video_preview, paid_preview, authorization),
-        )
+        provider.resolve(request)
 
     assert exc_info.value.code is ErrorCode.VIDEO_REQUEST_INVALID
     assert transport.requests == []
@@ -4003,6 +4048,7 @@ def test_seedance_remote_reference_lease_is_rechecked_immediately_before_permit(
         issued_at=FIXED_NOW,
         not_after=FIXED_NOW + timedelta(minutes=5),
         durability_validator=lambda: True,
+        source_nominal_duration_millis=15_000,
     )
     lease_times = iter((FIXED_NOW, FIXED_NOW + timedelta(minutes=5)))
     resolver = asset_module.SeedanceRemoteReferenceResolver(
