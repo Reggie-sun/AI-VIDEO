@@ -9,6 +9,10 @@ evidence_index_version: "1"
 
 Date: 2026-08-29
 
+## Supersession Notice — 2026-08-30
+
+本记录的 run `...-001` artifact、Gate FAIL、未激活状态与 Shot 2 未执行事实继续有效。其“用户要求的两段连续 15 秒未完成”与“没有 live remote-identity R2V evidence”的 project-wide current-facing 状态，已被独立 repair run `runs/seedance-mini-r2v-epic-skyship-20260829-002/` 及 `docs/record_for_agent/2026-08-30-seedance-mini-remote-r2v-live-chain.md` 取代。新 run 没有追认、覆盖或激活本记录失败的 Shot 1；它使用新的 request/artifact identities，完成两次独立 settled attempts 与两个 exact-byte Per-Shot Gates。
+
 ## Purpose
 
 本文记录一次用户明确授权的 Seedance 2.0 Mini 两段连续 15 秒电影感视频执行。冻结目标为：Shot 1 使用 T2V，Shot 2 必须复用 Shot 1 完整 remote Provider output 执行 `VIDEO_EXTEND`，不得退化为尾帧 I2V。

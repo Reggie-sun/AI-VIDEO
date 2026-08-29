@@ -9,6 +9,10 @@ evidence_index_version: "1"
 
 Date: 2026-08-29
 
+## Supersession Notice — 2026-08-30
+
+本记录关于 provider-output lease 的 architecture implementation 与 offline verification 继续有效；“尚未执行真实 Shot 1 -> Shot 2 R2V chain”以及“只有 offline evidence”的 current-facing 状态已被 `docs/record_for_agent/2026-08-30-seedance-mini-remote-r2v-live-chain.md` 取代。新 evidence 使用 Manifest exact-active Shot 1 刷新相同 locator、完整 GET 复核相同 bytes，并由唯一一次 Mini `VIDEO_EXTEND` POST 直接消费 HTTPS `reference_video`；Shot 2 fetched、Per-Shot Gate PASS 并 activation。该 supersession 只关闭本次 Mini live-chain uncertainty，不产生其他模型、P6、Final Acceptance 或 Provider-wide quality 结论。
+
 ## Purpose
 
 本文记录 Seedance 生成结果直接作为后续 Shot `reference_video` 的 provider-output
