@@ -1,11 +1,13 @@
-import React from "react";
 import { ArrowsClockwise, CheckCircle, Info, WarningCircle } from "@phosphor-icons/react";
 
 import { attemptId, attemptOutcome, generationTypeOf, outputState, providerOf } from "./run-detail-contract.js";
 import {
+  externalDisplayMetadata,
+  externalEvidenceFilterOptions,
   externalGroupTitle,
   externalSourceOptions,
   externalStatus,
+  groupMatchesEvidenceFilter,
   groupMatchesQuery,
   groupMatchesSource,
   preferredExternalLocation,
@@ -48,8 +50,11 @@ export function VideoLibraryRail({
   selectedSha,
   selectedSource,
   query,
+  evidenceFilter = "all",
   externalLoading,
   externalError,
+  runsContextLoading,
+  runsContextError,
   activeSurface,
   liveStatus,
   onWorkspace,
@@ -57,6 +62,7 @@ export function VideoLibraryRail({
   onSelectExternal,
   onSource,
   onQuery,
+  onEvidenceFilter = () => {},
   onRefresh,
 }) {
   const sources = externalCatalog?.sources || [];
@@ -66,7 +72,10 @@ export function VideoLibraryRail({
   const sourceGroups = showExternal
     ? groups.filter((group) => groupMatchesSource(group, selectedSource))
     : [];
-  const visible = sourceGroups.filter((group) => groupMatchesQuery(group, query));
+  const visible = sourceGroups
+    .filter((group) => groupMatchesEvidenceFilter(group, evidenceFilter))
+    .filter((group) => groupMatchesQuery(group, query));
+  const evidenceOptions = externalEvidenceFilterOptions(sourceGroups);
   const sourceOptions = externalSourceOptions(externalCatalog).slice(1);
   const selectedSourceValue = videoSourceSelectionValue(selectedSource);
   const currentWorkspace = runsCatalog.find((item) => item.workspace === workspace);
@@ -98,7 +107,10 @@ export function VideoLibraryRail({
           </optgroup>
         </select>
       </div>
+      {showExternal && <label className="external-evidence-filter" htmlFor="external-evidence-filter"><span>证据状态</span><select id="external-evidence-filter" name="external-evidence-filter" value={evidenceFilter} onChange={(event) => onEvidenceFilter(event.target.value)}>{evidenceOptions.map((option) => <option key={option.id} value={option.id}>{option.label} ({option.count})</option>)}</select></label>}
       {showExternal && <label className="external-search" htmlFor="external-media-search"><span>筛选视频</span><input id="external-media-search" name="external-media-search" type="search" value={query} onChange={(event) => onQuery(event.target.value)} placeholder="文件名 / Shot / Prompt" /><small>{visible.length} / {sourceGroups.length} unique SHA</small></label>}
+      {showExternal && runsContextLoading && <div className="runs-context-status" role="status">正在按 exact SHA + bytes 关联 Runs Prompt 与 Shot…</div>}
+      {showExternal && runsContextError && <div className="rail-stale-warning" role="status"><WarningCircle size={16} weight="fill" /><span>{runsContextError}</span></div>}
       {showExternal && externalError && <div className="rail-stale-warning" role="status"><WarningCircle size={16} weight="fill" /><span>刷新失败；当前外部视频列表可能已过期。</span></div>}
       <div className="lane-list external-group-list" aria-label="视频与生成尝试列表">
         {selectedSource === "runs" && currentWorkspace && <><div className="rail-section-heading"><span>RUNS · 当前工作区</span><b>目录详情</b></div><WorkspaceOption item={currentWorkspace} selected={activeSurface === "runs"} disabled={runsLoading} onSelect={onWorkspace} /></>}
@@ -126,19 +138,20 @@ export function VideoLibraryRail({
         {showExternal && <div className="rail-section-heading"><span>EXTERNAL · SHA 去重</span><b>{visible.length} videos</b></div>}
         {showExternal && visible.map((group) => {
           const status = externalStatus(group);
+          const metadata = externalDisplayMetadata(group);
           const selected = activeSurface === "external" && group.sha256 === selectedSha;
           const location = preferredExternalLocation(group);
           const compositionShotCount = group.composition?.ordered_shots?.length || 0;
           return (
             <button type="button" key={group.sha256} aria-pressed={selected} className={`external-group-card external-group-card--${status.tone}${selected ? " is-selected" : ""}`} onClick={() => onSelectExternal(group.sha256)}>
-              <span className="external-group-top"><strong title={externalGroupTitle(group)}>{externalGroupTitle(group)}</strong><span className={`provider-badge provider-badge--${status.tone}`}>{status.evaluated ? status.raw : "N/E"}</span></span>
+              <span className="external-group-top"><strong title={externalGroupTitle(group)}>{externalGroupTitle(group)}</strong><span className={`provider-badge provider-badge--${status.tone}`}>{status.badge}</span></span>
               <span className="external-group-source">{sourceLabel(sources.find((source) => source.id === location?.source_id), location?.source_label)} · {(group.locations || []).length} 个位置</span>
-              <span className="external-group-meta">{compositionShotCount ? `${compositionShotCount} Shots · 同目录声明` : `${group.shot_id || "Shot 未绑定"} · ${group.generation_type || group.shot_type || "类型未绑定"}`}</span>
-              <span className="lane-option-prompt" title={group.prompt_text}>{compositionShotCount ? `已展开同项目目录声明的 ${compositionShotCount} 个 Shot` : (group.prompt_text || "没有与 exact bytes 绑定的 Prompt")}</span>
+              <span className="external-group-meta">{compositionShotCount ? `${compositionShotCount} Shots · 同目录声明` : `${metadata.shot_id || "Shot 未绑定"} · ${metadata.generation_type || metadata.shot_type || "类型未绑定"}`}</span>
+              <span className="lane-option-prompt" title={metadata.prompt_text}>{compositionShotCount ? `已展开同项目目录声明的 ${compositionShotCount} 个 Shot` : (metadata.prompt_text || "没有与 exact bytes 绑定的 Prompt")}</span>
             </button>
           );
         })}
-        {showExternal && !externalLoading && !visible.length && <div className={`rail-empty${externalError ? " rail-empty--error" : ""}`}><WarningCircle size={18} weight="fill" /><span>{externalError || "该来源没有可读取的视频。"}</span></div>}
+        {showExternal && !externalLoading && !visible.length && <div className={`rail-empty${externalError ? " rail-empty--error" : ""}`}><WarningCircle size={18} weight="fill" /><span>{externalError || (sourceGroups.length ? "没有符合当前证据状态或搜索条件的视频。" : "该来源没有可读取的视频。")}</span></div>}
       </div>
       <div className="lane-rail-note"><Info size={17} /><p>只读查看真实记录。<br />不提交、不重试、不自动回退。</p></div>
       <div className="local-status"><span className={`local-dot${liveStatus === "reconnecting" || liveStatus === "partial" ? " local-dot--reconnecting" : liveStatus === "unavailable" || liveStatus === "stale" ? " local-dot--unavailable" : ""}`} /><span>{liveLabel}<br />Server allowlist · 不暴露绝对路径</span></div>

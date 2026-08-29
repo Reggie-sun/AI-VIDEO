@@ -21,12 +21,17 @@ import {
   shotForAttempt,
 } from "../src/run-detail-contract.js";
 import {
+  attachRunsMediaIndex,
+  externalEvidenceFilterOptions,
+  externalEvidenceState,
+  externalDisplayMetadata,
   externalSourceOptions,
   externalGroupTitle,
   externalMediaUrl,
   externalReferenceUrl,
   externalStatus,
   externalStoryboardShots,
+  groupMatchesEvidenceFilter,
   groupMatchesQuery,
   groupMatchesSource,
   preferredExternalGroup,
@@ -109,7 +114,7 @@ test("video library rail renders one unified source selector", async () => {
       onRefresh() {},
     }));
 
-    assert.equal((markup.match(/<select/g) || []).length, 1);
+    assert.equal((markup.match(/id="video-source-select"/g) || []).length, 1);
     assert.match(markup, /id="video-source-select"/);
     assert.match(markup, /<optgroup label="视频目录">/);
     assert.match(markup, /<option value="all"[^>]*>全部视频来源<\/option>/);
@@ -177,6 +182,81 @@ test("video library rail renders one unified source selector", async () => {
     assert.match(runsMarkup, /RUNS · 其他工作区/);
     assert.match(runsMarkup, />run-b<\/strong>/);
     assert.match(runsMarkup, />manifest\.json<\/span>/);
+  } finally {
+    await server.close();
+  }
+});
+
+test("video library rail labels and filters External evidence states without N/E", async () => {
+  const server = await createServer({
+    root: fileURLToPath(new URL("..", import.meta.url)),
+    server: { middlewareMode: true },
+    appType: "custom",
+    optimizeDeps: { noDiscovery: true },
+  });
+  try {
+    const { VideoLibraryRail } = await server.ssrLoadModule("/src/video-library-rail.jsx");
+    const markup = renderToStaticMarkup(React.createElement(VideoLibraryRail, {
+      runsCatalog: [],
+      workspace: "",
+      attempts: [],
+      selectedId: "",
+      runsLoading: false,
+      runsError: "",
+      externalCatalog: {
+        sources: [{ id: "comfyui-output", label: "ComfyUI Output", status: "available" }],
+        groups: [
+          {
+            sha256: "a".repeat(64),
+            bytes: 100,
+            locations: [{ source_id: "comfyui-output", file_name: "linked.mp4", token: "external_linked" }],
+            run_bindings: [{
+              target_shot_id: "shot-linked",
+              generation_type: "T2V",
+              prompt_text: "Exact Runs prompt",
+              shot_snapshot_status: "unavailable",
+            }],
+          },
+          {
+            sha256: "b".repeat(64),
+            bytes: 101,
+            locations: [{ source_id: "comfyui-output", file_name: "incomplete.mp4", token: "external_incomplete" }],
+            evidence_refs: [{ relative_path: "result.json" }],
+          },
+          {
+            sha256: "c".repeat(64),
+            bytes: 102,
+            locations: [{ source_id: "comfyui-output", file_name: "unbound.mp4", token: "external_unbound" }],
+          },
+        ],
+      },
+      selectedSha: "",
+      selectedSource: "comfyui-output",
+      query: "",
+      externalLoading: false,
+      externalError: "",
+      runsContextLoading: false,
+      runsContextError: "",
+      activeSurface: "external",
+      liveStatus: "live",
+      onWorkspace() {},
+      onSelectAttempt() {},
+      onSelectExternal() {},
+      onSource() {},
+      onQuery() {},
+      onRefresh() {},
+    }));
+
+    assert.match(markup, /id="external-evidence-filter"/);
+    assert.match(markup, /已关联 \(1\)/);
+    assert.match(markup, /证据不完整 \(1\)/);
+    assert.match(markup, /无绑定证据 \(1\)/);
+    assert.match(markup, />Runs 已关联<\/span>/);
+    assert.match(markup, />证据不完整<\/span>/);
+    assert.match(markup, />无绑定证据<\/span>/);
+    assert.match(markup, /shot-linked · T2V/);
+    assert.match(markup, /Exact Runs prompt/);
+    assert.doesNotMatch(markup, />N\/E<\/span>/);
   } finally {
     await server.close();
   }
@@ -419,6 +499,36 @@ test("external reference previews load eagerly inside the nested detail scroller
   }
 });
 
+test("external Runs detail labels Prompt separately when the structured Shot snapshot is unavailable", async () => {
+  const server = await createServer({
+    root: fileURLToPath(new URL("..", import.meta.url)),
+    server: { middlewareMode: true },
+    appType: "custom",
+    optimizeDeps: { noDiscovery: true },
+  });
+  try {
+    const { ExternalShotBreakdown } = await server.ssrLoadModule("/src/shot-breakdown.jsx");
+    const markup = renderToStaticMarkup(React.createElement(ExternalShotBreakdown, {
+      group: {
+        run_bindings: [{
+          target_shot_id: "shot-unavailable",
+          generation_type: "T2V",
+          prompt_text: "Exact submitted Prompt.",
+          shot_snapshot_status: "unavailable",
+          shot_snapshot: null,
+        }],
+      },
+    }));
+
+    assert.match(markup, /structured Shot snapshot 不可用/);
+    assert.match(markup, />实际提交 Prompt<\/span>/);
+    assert.match(markup, /Exact submitted Prompt/);
+    assert.doesNotMatch(markup, /分镜脚本参考/);
+  } finally {
+    await server.close();
+  }
+});
+
 test("external experiment ambiguity stays fail-closed and visible", () => {
   const status = externalStatus({
     association_ambiguity: true,
@@ -429,8 +539,10 @@ test("external experiment ambiguity stays fail-closed and visible", () => {
   assert.deepEqual(status, {
     raw: "AMBIGUOUS_EXPERIMENT_EVIDENCE",
     label: "证据关联冲突",
+    badge: "证据冲突",
     tone: "blocked",
     evaluated: false,
+    evidence_state: "conflict",
     ambiguous: true,
   });
 });
@@ -578,7 +690,12 @@ test("external media UI contract keeps non-canonical unknowns explicit", () => {
   };
 
   assert.deepEqual(externalStatus(group), {
-    raw: "NOT_EVALUATED", label: "状态未评估", tone: "unknown", evaluated: false,
+    raw: "NOT_EVALUATED",
+    label: "没有与 exact bytes 绑定的证据",
+    badge: "无绑定证据",
+    tone: "unknown",
+    evaluated: false,
+    evidence_state: "unbound",
   });
   assert.equal(preferredExternalLocation(group).source_id, "artifacts");
   assert.equal(externalMediaUrl(group), "/api/external-media/media/external_artifacts_preview");
@@ -595,6 +712,131 @@ test("external media UI contract keeps non-canonical unknowns explicit", () => {
   assert.equal(externalStatus({ status: "failed" }).tone, "unknown");
   assert.equal(externalStatus({ status: "NOT_EVALUATED", reported_status: "succeeded" }).tone, "ready");
   assert.equal(externalStatus({ status: "NOT_EVALUATED", reported_status: false }).tone, "blocked");
+});
+
+test("external evidence states distinguish linked, incomplete, and unbound groups", () => {
+  const linked = { reported_status: "OUTPUT_RECORDED", evidence_refs: [{ relative_path: "receipt.json" }] };
+  const incomplete = { evidence_refs: [{ relative_path: "result.json" }] };
+  const unbound = { evidence_refs: [] };
+
+  assert.equal(externalEvidenceState(linked), "linked");
+  assert.equal(externalEvidenceState(incomplete), "incomplete");
+  assert.equal(externalEvidenceState(unbound), "unbound");
+  assert.deepEqual(externalStatus(incomplete), {
+    raw: "NOT_EVALUATED",
+    label: "存在 exact-bound evidence，但关联链不完整",
+    badge: "证据不完整",
+    tone: "gated",
+    evaluated: false,
+    evidence_state: "incomplete",
+  });
+  assert.equal(groupMatchesEvidenceFilter(linked, "linked"), true);
+  assert.equal(groupMatchesEvidenceFilter(incomplete, "linked"), false);
+  assert.equal(groupMatchesEvidenceFilter(unbound, "unbound"), true);
+  assert.deepEqual(externalEvidenceFilterOptions([linked, incomplete, unbound]), [
+    { id: "all", label: "全部证据状态", count: 3 },
+    { id: "linked", label: "已关联", count: 1 },
+    { id: "incomplete", label: "证据不完整", count: 1 },
+    { id: "unbound", label: "无绑定证据", count: 1 },
+  ]);
+});
+
+test("external evidence reuses a semantically unambiguous exact Runs binding", () => {
+  const runBinding = {
+    workspace: "run-a/project.yaml",
+    attempt_id: "attempt-a",
+    target_shot_id: "shot-7",
+    generation_type: "I2V",
+    prompt_text: "Exact Runs prompt.",
+    shot_snapshot_status: "verified",
+    shot_snapshot: {
+      shot_id: "shot-7",
+      intent: "Reveal the product.",
+      visual_strategy: "generated_video",
+      revision: 2,
+      content_hash: "b".repeat(64),
+    },
+  };
+  const group = { run_bindings: [runBinding], evidence_refs: [] };
+
+  assert.equal(externalEvidenceState(group), "linked");
+  assert.deepEqual(externalDisplayMetadata(group), {
+    shot_id: "shot-7",
+    shot_type: null,
+    generation_type: "I2V",
+    prompt_text: "Exact Runs prompt.",
+    run_binding: runBinding,
+    source: "runs_exact_sha",
+  });
+  assert.deepEqual(externalStoryboardShots(group), [{
+    ...runBinding.shot_snapshot,
+    prompt_text: "Exact Runs prompt.",
+    generation_type: "I2V",
+    evidence_source: "runs_exact_sha",
+    snapshot_available: true,
+  }]);
+  assert.equal(externalStatus(group).badge, "Runs 已关联");
+});
+
+test("conflicting Runs Shot bindings stay fail-closed even when External has a reported status", () => {
+  const base = {
+    target_shot_id: "shot-7",
+    target_shot_revision: 1,
+    target_shot_content_hash: "a".repeat(64),
+    generation_type: "T2V",
+    prompt_text: "Same prompt.",
+    shot_snapshot_status: "unavailable",
+  };
+  const group = {
+    reported_status: "OUTPUT_RECORDED",
+    run_bindings: [base, {
+      ...base,
+      target_shot_revision: 2,
+      target_shot_content_hash: "b".repeat(64),
+    }],
+  };
+
+  assert.equal(externalStatus(group).badge, "Runs 关联冲突");
+  assert.equal(externalStatus(group).evidence_state, "conflict");
+  assert.equal(externalDisplayMetadata(group).run_binding, null);
+  assert.deepEqual(externalStoryboardShots(group), []);
+});
+
+test("Runs media index joins External only on exact SHA and bytes", () => {
+  const sha256 = "d".repeat(64);
+  const binding = { sha256, bytes: 123, workspace: "run-a/project.yaml", attempt_id: "attempt-a" };
+  const catalog = {
+    groups: [
+      { sha256, bytes: 123, reported_status: null },
+      { sha256, bytes: 124, reported_status: null },
+    ],
+  };
+
+  const joined = attachRunsMediaIndex(catalog, {
+    boundary: { read_only: true, association: "exact_sha256_and_bytes", lifecycle_projection: false, complete: true },
+    bindings: [binding],
+  });
+
+  assert.deepEqual(joined.groups[0].run_bindings, [binding]);
+  assert.deepEqual(joined.groups[1].run_bindings, []);
+  assert.equal(joined.groups[0].reported_status, null);
+  assert.equal(joined.runs_media_context.association, "exact_sha256_and_bytes");
+
+  const incomplete = attachRunsMediaIndex(catalog, {
+    boundary: { read_only: true, association: "exact_sha256_and_bytes", lifecycle_projection: false, complete: false },
+    bindings: [binding],
+  });
+  assert.deepEqual(incomplete.groups[0].run_bindings, [binding]);
+  assert.equal(incomplete.groups[0].runs_context_complete, false);
+  assert.equal(incomplete.groups[1].runs_context_complete, false);
+  assert.equal(externalStatus(incomplete.groups[1]).raw, "INCOMPLETE_RUNS_CONTEXT");
+  assert.equal(incomplete.runs_media_context.complete, false);
+
+  const pending = attachRunsMediaIndex(catalog, null);
+  assert.equal(pending.groups[0].runs_context_complete, false);
+  assert.equal(pending.groups[1].runs_context_complete, false);
+  assert.equal(externalStatus(pending.groups[0]).raw, "INCOMPLETE_RUNS_CONTEXT");
+  assert.equal(externalStatus(pending.groups[1]).badge, "证据不完整");
 });
 
 test("external source selector stays compact and defaults to all sources", () => {
@@ -932,6 +1174,93 @@ test("external media catalog is parallel to runs, source-qualified, and never le
   const method = await invoke(handler, request("POST", "/api/external-media"));
   assert.equal(method.res.statusCode, 405);
   assert.equal(method.res.headers.get("allow"), "GET");
+});
+
+test("Runs media context index is read-only, GET-only, and sanitized", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-runs-media-index-"));
+  const secretRoot = path.join(root, "private");
+  let projectorCalls = 0;
+  let onCatalogChange = null;
+  const handler = createRunsApiHandler({
+    repoRoot: root,
+    runProjector: async () => ({ workspaces: [] }),
+    runsMediaIndexProjector: async () => { projectorCalls += 1; return ({
+      boundary: { read_only: true, association: "exact_sha256_and_bytes", lifecycle_projection: false, complete: true },
+      bindings: [{
+        sha256: "a".repeat(64),
+        bytes: 123,
+        workspace: "run-a/project.yaml",
+        attempt_id: "attempt-a",
+        prompt_text: "Exact prompt.",
+        unsafe_path: secretRoot,
+      }],
+    }); },
+    changeFeed: {
+      subscribe(callback) { onCatalogChange = callback; return () => { onCatalogChange = null; }; },
+    },
+  });
+
+  const response = await invoke(handler, request("GET", "/api/runs/media-context-index"));
+  assert.equal(response.res.statusCode, 200);
+  const body = JSON.parse(response.res.body);
+  assert.equal(body.boundary.association, "exact_sha256_and_bytes");
+  assert.equal(body.bindings[0].workspace, "run-a/project.yaml");
+  assert.equal(body.bindings[0].unsafe_path, null);
+  assert.equal(response.res.body.toString().includes(secretRoot), false);
+  const cached = await invoke(handler, request("GET", "/api/runs/media-context-index"));
+  assert.equal(cached.res.statusCode, 200);
+  assert.equal(projectorCalls, 1);
+  onCatalogChange({ sources: ["runs"] });
+  const refreshed = await invoke(handler, request("GET", "/api/runs/media-context-index"));
+  assert.equal(refreshed.res.statusCode, 200);
+  assert.equal(projectorCalls, 2);
+
+  const method = await invoke(handler, request("POST", "/api/runs/media-context-index"));
+  assert.equal(method.res.statusCode, 405);
+  assert.equal(method.res.headers.get("allow"), "GET");
+});
+
+test("Runs media context invalidation serializes an in-flight full index rebuild", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-runs-media-serial-"));
+  let onCatalogChange = null;
+  let projectorCalls = 0;
+  let releaseFirst;
+  const firstProjection = new Promise((resolve) => { releaseFirst = resolve; });
+  const staleIndex = {
+    boundary: { read_only: true, association: "exact_sha256_and_bytes", lifecycle_projection: false, complete: true },
+    bindings: [{ sha256: "a".repeat(64), bytes: 1, attempt_id: "stale" }],
+  };
+  const completeIndex = {
+    ...staleIndex,
+    bindings: [{ sha256: "a".repeat(64), bytes: 1, attempt_id: "fresh" }],
+  };
+  const handler = createRunsApiHandler({
+    repoRoot: root,
+    runProjector: async () => ({ workspaces: [] }),
+    runsMediaIndexProjector: async () => {
+      projectorCalls += 1;
+      return projectorCalls === 1 ? firstProjection : completeIndex;
+    },
+    changeFeed: {
+      subscribe(callback) { onCatalogChange = callback; return () => { onCatalogChange = null; }; },
+    },
+  });
+
+  const first = invoke(handler, request("GET", "/api/runs/media-context-index"));
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(projectorCalls, 1);
+  onCatalogChange({ sources: ["runs"] });
+  const second = invoke(handler, request("GET", "/api/runs/media-context-index"));
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(projectorCalls, 1);
+
+  releaseFirst(staleIndex);
+  const [refreshedFirst, refreshedSecond] = await Promise.all([first, second]);
+  assert.equal(refreshedFirst.res.statusCode, 200);
+  assert.equal(refreshedSecond.res.statusCode, 200);
+  assert.equal(JSON.parse(refreshedFirst.res.body).bindings[0].attempt_id, "fresh");
+  assert.equal(JSON.parse(refreshedSecond.res.body).bindings[0].attempt_id, "fresh");
+  assert.equal(projectorCalls, 2);
 });
 
 test("external media serving revalidates containment and exact bytes", async () => {

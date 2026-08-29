@@ -6,8 +6,21 @@ export function externalStatus(group) {
     return {
       raw: "AMBIGUOUS_EXPERIMENT_EVIDENCE",
       label: "证据关联冲突",
+      badge: "证据冲突",
       tone: "blocked",
       evaluated: false,
+      evidence_state: "conflict",
+      ambiguous: true,
+    };
+  }
+  if ((group?.run_bindings || []).length > 0 && !preferredRunBinding(group)) {
+    return {
+      raw: "AMBIGUOUS_RUNS_CONTEXT",
+      label: "同一 exact media 关联到不同 Runs 语义",
+      badge: "Runs 关联冲突",
+      tone: "blocked",
+      evaluated: false,
+      evidence_state: "conflict",
       ambiguous: true,
     };
   }
@@ -15,15 +28,135 @@ export function externalStatus(group) {
   const raw = String(reported ?? "NOT_EVALUATED").trim();
   const normalized = raw.toLowerCase();
   if (reported === true || SUCCESS_STATES.has(normalized)) {
-    return { raw, label: `外部报告：${raw}`, tone: "ready", evaluated: true };
+    return { raw, label: `外部报告：${raw}`, badge: raw, tone: "ready", evaluated: true, evidence_state: "linked" };
   }
   if (reported === false || FAILURE_STATES.has(normalized)) {
-    return { raw, label: `外部报告：${raw}`, tone: "blocked", evaluated: true };
+    return { raw, label: `外部报告：${raw}`, badge: raw, tone: "blocked", evaluated: true, evidence_state: "linked" };
   }
   if (reported !== undefined && reported !== null && normalized && normalized !== "not_evaluated") {
-    return { raw, label: `外部报告：${raw}`, tone: "gated", evaluated: true };
+    return { raw, label: `外部报告：${raw}`, badge: raw, tone: "gated", evaluated: true, evidence_state: "linked" };
   }
-  return { raw: "NOT_EVALUATED", label: "状态未评估", tone: "unknown", evaluated: false };
+  if ((group?.run_bindings || []).length > 0) {
+    return {
+      raw: "NOT_EVALUATED",
+      label: "Runs exact SHA 已关联；生成状态未评估",
+      badge: "Runs 已关联",
+      tone: "interrupted",
+      evaluated: false,
+      evidence_state: "linked",
+    };
+  }
+  if (group?.runs_context_complete === false) {
+    return {
+      raw: "INCOMPLETE_RUNS_CONTEXT",
+      label: "Runs 关联证据尚不完整，无法证明该视频没有绑定",
+      badge: "证据不完整",
+      tone: "gated",
+      evaluated: false,
+      evidence_state: "incomplete",
+    };
+  }
+  if ((group?.evidence_refs || []).length > 0) {
+    return {
+      raw: "NOT_EVALUATED",
+      label: "存在 exact-bound evidence，但关联链不完整",
+      badge: "证据不完整",
+      tone: "gated",
+      evaluated: false,
+      evidence_state: "incomplete",
+    };
+  }
+  return {
+    raw: "NOT_EVALUATED",
+    label: "没有与 exact bytes 绑定的证据",
+    badge: "无绑定证据",
+    tone: "unknown",
+    evaluated: false,
+    evidence_state: "unbound",
+  };
+}
+
+export function externalEvidenceState(group) {
+  return externalStatus(group).evidence_state;
+}
+
+export function groupMatchesEvidenceFilter(group, filter) {
+  return !filter || filter === "all" || externalEvidenceState(group) === filter;
+}
+
+export function externalEvidenceFilterOptions(groups) {
+  const candidates = Array.isArray(groups) ? groups : [];
+  const definitions = [
+    ["all", "全部证据状态"],
+    ["linked", "已关联"],
+    ["incomplete", "证据不完整"],
+    ["unbound", "无绑定证据"],
+    ["conflict", "证据冲突"],
+  ];
+  return definitions
+    .map(([id, label]) => ({
+      id,
+      label,
+      count: id === "all" ? candidates.length : candidates.filter((group) => externalEvidenceState(group) === id).length,
+    }))
+    .filter((option) => option.id !== "conflict" || option.count > 0);
+}
+
+export function attachRunsMediaIndex(catalog, index) {
+  if (!catalog || typeof catalog !== "object") return catalog;
+  const boundary = index?.boundary;
+  const indexIsTrusted = boundary?.read_only === true
+    && boundary?.association === "exact_sha256_and_bytes"
+    && boundary?.lifecycle_projection === false
+    && typeof boundary?.complete === "boolean";
+  const bindings = indexIsTrusted && Array.isArray(index?.bindings) ? index.bindings : [];
+  const byIdentity = new Map();
+  for (const binding of bindings) {
+    if (!/^[0-9a-f]{64}$/.test(binding?.sha256 || "") || !Number.isSafeInteger(binding?.bytes) || binding.bytes < 0) continue;
+    const identity = `${binding.sha256}:${binding.bytes}`;
+    const existing = byIdentity.get(identity) || [];
+    existing.push(binding);
+    byIdentity.set(identity, existing);
+  }
+  return {
+    ...catalog,
+    groups: (catalog.groups || []).map((group) => ({
+      ...group,
+      run_bindings: byIdentity.get(`${group.sha256}:${group.bytes}`) || [],
+      runs_context_complete: indexIsTrusted ? boundary.complete : false,
+    })),
+    runs_media_context: indexIsTrusted ? boundary : null,
+  };
+}
+
+function runBindingSemanticKey(binding) {
+  return JSON.stringify([
+    binding?.target_shot_id || null,
+    binding?.target_shot_revision ?? null,
+    binding?.target_shot_content_hash || null,
+    binding?.generation_type || null,
+    binding?.prompt_text || null,
+    binding?.shot_snapshot_status || null,
+    binding?.shot_snapshot?.content_hash || null,
+  ]);
+}
+
+export function preferredRunBinding(group) {
+  const bindings = Array.isArray(group?.run_bindings) ? group.run_bindings : [];
+  if (!bindings.length) return null;
+  return new Set(bindings.map(runBindingSemanticKey)).size === 1 ? bindings[0] : null;
+}
+
+export function externalDisplayMetadata(group) {
+  const runBinding = preferredRunBinding(group);
+  return {
+    shot_id: group?.shot_id ?? runBinding?.target_shot_id ?? null,
+    shot_type: group?.shot_type ?? null,
+    generation_type: group?.generation_type ?? runBinding?.generation_type ?? null,
+    prompt_text: group?.prompt_text ?? runBinding?.prompt_text ?? null,
+    run_binding: runBinding,
+    source: group?.shot_id || group?.generation_type || group?.prompt_text ? "external_evidence" : runBinding ? "runs_exact_sha" : "none",
+  };
 }
 
 export function preferredExternalLocation(group) {
@@ -72,12 +205,24 @@ export function externalStoryboardShots(group) {
   if (Array.isArray(exactShots) && exactShots.length > 0) return exactShots;
   const compositionShots = group?.composition?.ordered_shots;
   if (Array.isArray(compositionShots) && compositionShots.length > 0) return compositionShots;
-  if (!group?.shot_id) return [];
+  const metadata = externalDisplayMetadata(group);
+  if (metadata.run_binding) {
+    const binding = metadata.run_binding;
+    const snapshot = binding.shot_snapshot_status === "verified" ? binding.shot_snapshot : null;
+    return [{
+      ...(snapshot || { shot_id: binding.target_shot_id }),
+      prompt_text: binding.prompt_text,
+      generation_type: binding.generation_type,
+      evidence_source: "runs_exact_sha",
+      snapshot_available: Boolean(snapshot),
+    }];
+  }
+  if (!metadata.shot_id) return [];
   return [{
-    shot_id: group.shot_id,
-    prompt_text: group.prompt_text,
-    shot_type: group.shot_type,
-    generation_type: group.generation_type,
+    shot_id: metadata.shot_id,
+    prompt_text: metadata.prompt_text,
+    shot_type: group?.shot_type,
+    generation_type: metadata.generation_type,
     reported_status: group.reported_status,
   }];
 }
@@ -138,6 +283,18 @@ export function groupMatchesQuery(group, query) {
     ...(shot?.copy || []),
     ...(shot?.dialogue || []),
   ]);
+  const runsValues = (group?.run_bindings || []).flatMap((binding) => [
+    binding?.workspace,
+    binding?.attempt_id,
+    binding?.target_shot_id,
+    binding?.generation_type,
+    binding?.prompt_text,
+    binding?.shot_snapshot?.intent,
+    binding?.shot_snapshot?.dialogue,
+    binding?.shot_snapshot?.narration,
+    binding?.shot_snapshot?.visual_strategy,
+    ...(binding?.shot_snapshot?.continuity_constraints || []),
+  ]);
   const values = [
     externalGroupTitle(group),
     group?.shot_id,
@@ -147,6 +304,7 @@ export function groupMatchesQuery(group, query) {
     group?.prompt_text,
     ...shotEvidenceValues,
     ...compositionValues,
+    ...runsValues,
     ...(group?.locations || []).flatMap((item) => [item?.relative_path, item?.source_label, item?.source_id]),
   ];
   return values.some((value) => String(value || "").toLocaleLowerCase().includes(needle));

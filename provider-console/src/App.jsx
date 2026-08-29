@@ -29,9 +29,12 @@ import {
   shotForAttempt,
 } from "./run-detail-contract.js";
 import {
+  attachRunsMediaIndex,
+  externalDisplayMetadata,
   externalGroupTitle,
   externalMediaUrl,
   externalStatus,
+  groupMatchesEvidenceFilter,
   groupMatchesQuery,
   groupMatchesSource,
   preferredExternalGroup,
@@ -428,9 +431,10 @@ function ExternalSummary({ group, sources }) {
   const location = preferredExternalLocation(group);
   const source = sources.find((item) => item.id === location?.source_id);
   const status = externalStatus(group);
+  const metadata = externalDisplayMetadata(group);
   const compositionShotCount = group.composition?.ordered_shots?.length || 0;
-  const typeLabel = compositionShotCount ? "Shot 信息" : group.generation_type ? "生成类型" : group.shot_type ? "Shot 类型" : "生成类型";
-  const typeValue = compositionShotCount ? `同目录 Shot 计划 · ${compositionShotCount}` : (group.generation_type || group.shot_type || "NOT_EVALUATED");
+  const typeLabel = compositionShotCount ? "Shot 信息" : metadata.generation_type ? "生成类型" : metadata.shot_type ? "Shot 类型" : "生成类型";
+  const typeValue = compositionShotCount ? `同目录 Shot 计划 · ${compositionShotCount}` : (metadata.generation_type || metadata.shot_type || "NOT_EVALUATED");
   return (
     <header className="shot-summary external-summary">
       <div className="summary-project external-summary-title"><div><span>外部媒体</span><strong title={externalGroupTitle(group)}>{externalGroupTitle(group)}</strong></div></div>
@@ -445,11 +449,13 @@ function ExternalSummary({ group, sources }) {
 function ExternalMediaDetail({ group, sources }) {
   const url = externalMediaUrl(group);
   const status = externalStatus(group);
+  const metadata = externalDisplayMetadata(group);
   const locations = group.locations || [];
   const evidenceRefs = group.evidence_refs || [];
-  const hasBoundMetadata = group.metadata_status && group.metadata_status !== "not_evaluated";
+  const hasBoundMetadata = metadata.source !== "none";
   const hasComposition = (group.composition?.ordered_shots?.length || 0) > 0;
   const hasExactShotEvidence = (group.shot_evidence?.length || 0) > 0;
+  const hasRunsContext = metadata.source === "runs_exact_sha";
   return (
     <>
       <section className="external-detail-grid">
@@ -463,18 +469,18 @@ function ExternalMediaDetail({ group, sources }) {
           </div>
           <section className={`external-status-callout external-status-callout--${status.tone}`}>
             <StatusIcon tone={status.tone} size={21} />
-            <div><strong>{status.label}</strong><p>{status.ambiguous ? "同一视频 bytes 关联到互相冲突的 verified experiment evidence；所有分镜、Prompt、References 与 verdict 均保持未绑定，需先核对 Evidence refs。" : status.evaluated ? "状态来自受支持且经 exact identity 绑定的证据链；它不是 Manifest attempt、candidate 或质量验收。" : "没有找到语义受支持且与 exact bytes 绑定的状态证据，因此不会把“文件存在”解释为生成成功。"}</p></div>
+            <div><strong>{status.label}</strong><p>{status.ambiguous ? "同一视频 bytes 关联到互相冲突的 exact evidence；不会选择最新记录或猜测语义。" : status.evaluated ? "状态来自受支持且经 exact identity 绑定的证据链；它不是 Manifest attempt、candidate 或质量验收。" : metadata.source === "runs_exact_sha" ? "Prompt、生成类型与可用的 Shot snapshot 来自 canonical Runs 的 exact SHA-256 + bytes 关联；External generation status 仍保持 NOT_EVALUATED。" : status.raw === "INCOMPLETE_RUNS_CONTEXT" ? "Runs context 正在加载、当前不可用或部分 workspace 无法严格重开；该视频没有已确认 match，但不能据此断言完全没有绑定。" : status.evidence_state === "incomplete" ? "已找到 exact-bound evidence ref，但 schema 或完整关联链不足，因此不会解释其中的 Prompt、Shot 或状态。" : "没有找到语义受支持且与 exact bytes 绑定的生成记录，因此不会把文件名或文件存在解释为 Prompt、Shot 或成功状态。"}</p></div>
           </section>
           <ExternalShotBreakdown group={group} />
-          {!hasComposition && !hasExactShotEvidence && <section className="external-storyboard-card">
-            <header><div><span>Shot / Prompt</span><h2>{group.shot_id || "Shot 未绑定"}</h2></div><span>{group.generation_type || group.shot_type || "类型未评估"}</span></header>
-            <div className="external-prompt"><span>Prompt</span><p>{group.prompt_text || "没有与该视频 exact path / SHA 直接绑定的 Prompt；不会从文件名或相邻文本猜测。"}</p></div>
+          {!hasComposition && !hasExactShotEvidence && !hasRunsContext && <section className="external-storyboard-card">
+            <header><div><span>Shot / Prompt</span><h2>{metadata.shot_id || "Shot 未绑定"}</h2></div><span>{metadata.generation_type || metadata.shot_type || "类型未评估"}</span></header>
+            <div className="external-prompt"><span>Prompt</span><p>{metadata.prompt_text || "没有与该视频 exact path / SHA 直接绑定的 Prompt；不会从文件名或相邻文本猜测。"}</p></div>
             <dl className="external-storyboard-facts">
               <Fact label="Metadata binding" value={group.metadata_status || "not_evaluated"} />
               <Fact label="Evidence level" value={group.evidence_level || "non_canonical"} />
-              <Fact label="Shot ID" value={group.shot_id || "NOT_EVALUATED"} />
-              <Fact label="Shot type" value={group.shot_type || "NOT_EVALUATED"} />
-              <Fact label="Generation type" value={group.generation_type || "NOT_EVALUATED"} />
+              <Fact label="Shot ID" value={metadata.shot_id || "NOT_EVALUATED"} />
+              <Fact label="Shot type" value={metadata.shot_type || "NOT_EVALUATED"} />
+              <Fact label="Generation type" value={metadata.generation_type || "NOT_EVALUATED"} />
             </dl>
             {!hasBoundMetadata && <p className="external-metadata-note"><WarningCircle size={16} weight="fill" />该视频只有文件级 identity；分镜、Prompt、类型和成功/失败均保持 `NOT_EVALUATED`。</p>}
           </section>}
@@ -500,7 +506,7 @@ function ExternalMediaDetail({ group, sources }) {
           <section className="detail-section"><h3>Exact file identity</h3><dl className="identity-list"><Fact label="SHA-256" value={group.sha256} /><Fact label="MIME" value={group.mime_type} /><Fact label="大小" value={formatBytes(group.bytes)} /><Fact label="物理副本" value={locations.length} /></dl></section>
           <section className="detail-section"><h3>判断边界</h3><p className={`evidence-state evidence-state--${status.tone}`}><span />{status.label}<br /><small>External evidence 不产生 candidate、P6、Final Acceptance 或 activation。</small></p></section>
           <section className="detail-section"><h3>Evidence refs</h3>{evidenceRefs.length ? <div className="external-evidence-list">{evidenceRefs.map((ref, index) => <code key={`${typeof ref === "string" ? ref : ref?.relative_path || "evidence"}-${index}`}>{typeof ref === "string" ? ref : [ref?.source_id, ref?.relative_path || ref?.kind].filter(Boolean).join(" · ") || "已绑定 JSON evidence"}</code>)}</div> : <p className="external-no-evidence">没有可公开的 exact-bound sidecar reference。</p>}</section>
-          <section className="detail-section"><h3>与 runs 的关系</h3><p className="external-no-evidence">要判断 canonical attempt、历史 Shot snapshot、candidate 与 lifecycle，请在来源中选择“Runs 工作区”。外部媒体库不会补造缺失 Production state。</p></section>
+          <section className="detail-section"><h3>Canonical Runs exact match</h3>{(group.run_bindings || []).length ? <div className="external-evidence-list">{group.run_bindings.map((binding, index) => <code key={`${binding.workspace || "runs"}-${binding.attempt_id || index}`}>{[binding.workspace, binding.attempt_id, binding.shot_snapshot_status].filter(Boolean).join(" · ")}</code>)}</div> : <p className="external-no-evidence">没有与 exact SHA-256 + bytes 匹配的 canonical Runs output。外部媒体库不会补造缺失 Production state。</p>}</section>
         </aside>
       </section>
       <section className="action-bar external-action-bar">
@@ -565,14 +571,20 @@ export function App() {
   const [externalSelectedSha, setExternalSelectedSha] = useState("");
   const [selectedSource, setSelectedSource] = useState("all");
   const [externalQuery, setExternalQuery] = useState("");
+  const [externalEvidenceFilter, setExternalEvidenceFilter] = useState("all");
   const [externalLoading, setExternalLoading] = useState(false);
   const [externalError, setExternalError] = useState("");
+  const [runsMediaIndex, setRunsMediaIndex] = useState(null);
+  const [runsContextLoading, setRunsContextLoading] = useState(false);
+  const [runsContextError, setRunsContextError] = useState("");
   const continuityRequestEpoch = useRef(0);
   const workspaceRef = useRef("");
   const workspaceSelectionGuard = useRef(null);
   const detailRequestGuard = useRef(null);
+  const runsContextRequestGuard = useRef(null);
   if (!workspaceSelectionGuard.current) workspaceSelectionGuard.current = createWorkspaceSelectionGuard();
   if (!detailRequestGuard.current) detailRequestGuard.current = createLatestRequestGuard();
+  if (!runsContextRequestGuard.current) runsContextRequestGuard.current = createLatestRequestGuard();
   const runsRefreshInFlight = useRef(false);
   const runsRefreshQueued = useRef(false);
   const externalRefreshInFlight = useRef(false);
@@ -753,10 +765,38 @@ export function App() {
   }, []);
 
   useEffect(() => { refreshExternal(); }, [refreshExternal]);
-  const liveConnection = useLibraryLiveUpdates({ refreshRuns: refresh, refreshExternal });
+  const refreshRunsMediaIndex = useCallback(async () => {
+    const requestToken = runsContextRequestGuard.current.beginRequest();
+    setRunsMediaIndex(null);
+    setRunsContextLoading(true);
+    try {
+      const response = await fetch("/api/runs/media-context-index", { cache: "no-store" });
+      const body = await response.json();
+      if (!response.ok || body?.error) throw new Error(body?.error?.message || "Runs exact media context 当前不可用。");
+      if (!runsContextRequestGuard.current.canCommit(requestToken)) return;
+      setRunsMediaIndex(body);
+      setRunsContextError(body?.boundary?.complete === true ? "" : `Runs context 部分可用：${body?.summary?.failed_workspace_count ?? "部分"} 个 workspace 无法严格重开；仅展示已确认的 exact match。`);
+    } catch (cause) {
+      if (!runsContextRequestGuard.current.canCommit(requestToken)) return;
+      setRunsMediaIndex(null);
+      setRunsContextError(cause instanceof Error ? cause.message : "Runs exact media context 当前不可用。");
+    } finally {
+      if (runsContextRequestGuard.current.canCommit(requestToken)) setRunsContextLoading(false);
+    }
+  }, []);
+  useEffect(() => { refreshRunsMediaIndex(); }, [refreshRunsMediaIndex]);
+  const refreshRunsAndContext = useCallback(async () => {
+    await Promise.all([refresh(), refreshRunsMediaIndex()]);
+  }, [refresh, refreshRunsMediaIndex]);
+  const liveConnection = useLibraryLiveUpdates({ refreshRuns: refreshRunsAndContext, refreshExternal });
+  const enrichedExternalCatalog = useMemo(
+    () => attachRunsMediaIndex(externalCatalog, runsMediaIndex),
+    [externalCatalog, runsMediaIndex],
+  );
 
-  const visibleExternalGroups = (externalCatalog?.groups || [])
+  const visibleExternalGroups = (enrichedExternalCatalog?.groups || [])
     .filter((group) => selectedSource !== "runs" && groupMatchesSource(group, selectedSource))
+    .filter((group) => groupMatchesEvidenceFilter(group, externalEvidenceFilter))
     .filter((group) => groupMatchesQuery(group, externalQuery));
   const externalGroup = visibleExternalGroups.find((group) => group.sha256 === externalSelectedSha)
     || preferredExternalGroup(visibleExternalGroups);
@@ -778,10 +818,12 @@ export function App() {
       setActiveSurface("runs");
       return;
     }
-    const groups = (externalCatalog?.groups || []).filter((group) => groupMatchesSource(group, sourceId));
+    const groups = (enrichedExternalCatalog?.groups || [])
+      .filter((group) => groupMatchesSource(group, sourceId))
+      .filter((group) => groupMatchesEvidenceFilter(group, externalEvidenceFilter));
     setExternalSelectedSha(preferredExternalGroup(groups)?.sha256 || "");
     setActiveSurface("external");
-  }, [externalCatalog]);
+  }, [enrichedExternalCatalog, externalEvidenceFilter]);
 
   const selectAttempt = useCallback((id) => {
     setSelectedId(id);
@@ -802,10 +844,10 @@ export function App() {
   }, [selectWorkspace]);
 
   const refreshSelectedSource = useCallback(async () => {
-    if (selectedSource === "runs") await refresh();
-    else if (selectedSource === "all") await Promise.all([refresh(), refreshExternal()]);
+    if (selectedSource === "runs") await refreshRunsAndContext();
+    else if (selectedSource === "all") await Promise.all([refreshRunsAndContext(), refreshExternal()]);
     else await refreshExternal();
-  }, [refresh, refreshExternal, selectedSource]);
+  }, [refreshExternal, refreshRunsAndContext, selectedSource]);
 
   const continuityContent = (
     <>
@@ -825,13 +867,14 @@ export function App() {
   let externalContent;
   if (externalLoading && !externalCatalog) externalContent = <EmptyState title="正在扫描外部视频" detail="正在计算 exact SHA 并读取直接绑定的 JSON evidence…" />;
   else if (externalError && !externalCatalog) externalContent = <EmptyState title="外部媒体不可用" detail={externalError} retry={refreshExternal} />;
+  else if (!externalGroup && (externalCatalog?.groups || []).length > 0) externalContent = <EmptyState title="没有符合筛选的视频" detail="请调整视频来源、证据状态或搜索条件。" />;
   else if (!externalGroup) externalContent = <EmptyState title="没有外部视频" detail="当前 server allowlist 中没有可读取的常规视频文件。" retry={refreshExternal} />;
-  else externalContent = <>{externalError && <section className="catalog-stale-warning" role="status"><WarningCircle size={18} weight="fill" /><div><strong>外部视频刷新失败，当前内容可能已过期</strong><p>{externalError}</p></div></section>}<ExternalSummary group={externalGroup} sources={externalCatalog?.sources || []} /><ExternalMediaDetail group={externalGroup} sources={externalCatalog?.sources || []} /></>;
+  else externalContent = <>{externalError && <section className="catalog-stale-warning" role="status"><WarningCircle size={18} weight="fill" /><div><strong>外部视频刷新失败，当前内容可能已过期</strong><p>{externalError}</p></div></section>}<ExternalSummary group={externalGroup} sources={enrichedExternalCatalog?.sources || []} /><ExternalMediaDetail group={externalGroup} sources={enrichedExternalCatalog?.sources || []} /></>;
 
   return (
     <div className="app-shell">
       <Sidebar />
-      <VideoLibraryRail runsCatalog={catalog} workspace={workspace} attempts={attempts} selectedId={selectedId} runsLoading={loading} runsError={error} externalCatalog={externalCatalog || {}} selectedSha={externalGroup?.sha256 || externalSelectedSha} selectedSource={selectedSource} query={externalQuery} externalLoading={externalLoading} externalError={externalError} activeSurface={activeSurface} liveStatus={liveStatus} onWorkspace={selectWorkspaceAndShowRuns} onSelectAttempt={selectAttempt} onSelectExternal={selectExternal} onSource={selectSource} onQuery={setExternalQuery} onRefresh={refreshSelectedSource} />
+      <VideoLibraryRail runsCatalog={catalog} workspace={workspace} attempts={attempts} selectedId={selectedId} runsLoading={loading} runsError={error} externalCatalog={enrichedExternalCatalog || {}} selectedSha={externalGroup?.sha256 || externalSelectedSha} selectedSource={selectedSource} query={externalQuery} evidenceFilter={externalEvidenceFilter} externalLoading={externalLoading} externalError={externalError} runsContextLoading={runsContextLoading} runsContextError={runsContextError} activeSurface={activeSurface} liveStatus={liveStatus} onWorkspace={selectWorkspaceAndShowRuns} onSelectAttempt={selectAttempt} onSelectExternal={selectExternal} onSource={selectSource} onQuery={setExternalQuery} onEvidenceFilter={setExternalEvidenceFilter} onRefresh={refreshSelectedSource} />
       <main className="provider-console">
         {activeSurface === "external" ? externalContent : runsContent}
       </main>

@@ -171,24 +171,27 @@ export function ExternalShotBreakdown({ group }) {
   const status = externalStatus(group);
   const coLocatedDeclaration = group?.composition?.association_status === "co_located_declared_package";
   const exactExperimentEvidence = (group?.shot_evidence || []).length > 0;
+  const exactRunsEvidence = (group?.run_bindings || []).length > 0;
   const shots = externalStoryboardShots(group);
   return (
     <section className="external-shot-breakdown">
       <header><div><FilmStrip size={22} /><div><span>SHOT EVIDENCE</span><h2>{coLocatedDeclaration ? "同目录声明的 Shot 分镜" : exactExperimentEvidence ? "视频、References、分镜与结果" : "该视频关联的 Shot 分镜"}</h2></div></div><b>{shots.length} Records</b></header>
-      {(group?.composition || exactExperimentEvidence) && <p className="external-shot-breakdown__boundary">{coLocatedDeclaration ? "成片 SHA 已验证；Shot 计划与声明时间来自同项目目录的 ecommerce package。缺少结构化 composition receipt，因此不证明这些 Shot 构成该 exact MP4，也不升级为 canonical timeline、candidate、QA、P6 或 Final Acceptance。" : "以下信息由 exact MP4 bytes 与受支持的结构化 evidence 绑定；视频内时间只描述该 exact 单 Shot clip，不冒充最终成片的 ResolvedTimeline。只有具备 exact input receipt 的 Reference 才标为生成输入，缺少 upload receipt 时明确显示 NOT_EVALUATED。Technical Gate、Human Verdict 和 Production lifecycle 保持分层。"}</p>}
+      {(group?.composition || exactExperimentEvidence || exactRunsEvidence) && <p className="external-shot-breakdown__boundary">{coLocatedDeclaration ? "成片 SHA 已验证；Shot 计划与声明时间来自同项目目录的 ecommerce package。缺少结构化 composition receipt，因此不证明这些 Shot 构成该 exact MP4，也不升级为 canonical timeline、candidate、QA、P6 或 Final Acceptance。" : exactRunsEvidence ? "以下 Prompt、生成类型和可用的 Shot snapshot 来自 canonical Runs output 的 exact SHA-256 + bytes 关联。它不改变 External reported status、candidate、QA、P6、Final Acceptance 或 activation truth。" : "以下信息由 exact MP4 bytes 与受支持的结构化 evidence 绑定；视频内时间只描述该 exact 单 Shot clip，不冒充最终成片的 ResolvedTimeline。只有具备 exact input receipt 的 Reference 才标为生成输入，缺少 upload receipt 时明确显示 NOT_EVALUATED。Technical Gate、Human Verdict 和 Production lifecycle 保持分层。"}</p>}
       {shots.length ? <div className="external-shot-breakdown__list">{shots.map((shot, index) => (
         <article key={`${shot.shot_id || "shot"}-${index}`}>
           <header><span>{shot.entity_kind === "experiment_arm" ? "ARM" : "SHOT"} {index + 1}</span><h3>{shot.shot_id || "记录未命名"}</h3><b>{shot.generation_result || shot.reported_status || (status.evaluated ? status.raw : "NOT_EVALUATED")}</b></header>
           <div className="external-shot-breakdown__facts">
             <ShotTimeBadge shot={shot} />
             <span>{shot.shot_type ? `Shot 类型 · ${shot.shot_type}` : shot.generation_type ? `生成类型 · ${shot.generation_type}` : "Shot 类型未绑定"}</span>
+            {shot.visual_strategy && <span>分镜策略 · {shot.visual_strategy}</span>}
             {shot.provider_name && <span>Provider · {shot.provider_name}</span>}
             {shot.model_id && <span>Model · {shot.model_id}</span>}
             {shot.duration_basis && <span>时长依据 · {shot.duration_basis}</span>}
             {shot.frame_count && <span>{shot.frame_count} frames{shot.fps ? ` · ${shot.fps} fps` : ""}</span>}
           </div>
+          {shot.snapshot_available === false && <div className="external-reference-empty"><WarningCircle size={15} /><span>生成当时的 structured Shot snapshot 不可用；这里只显示 exact target Shot、Prompt 与生成类型，不从 Prompt 反推分镜脚本。</span></div>}
           {exactExperimentEvidence && <ResultLayers shot={shot} />}
-          <div className="external-shot-breakdown__script"><span>{shot.purpose || shot.intent || shot.talent_action ? "分镜脚本" : shot.prompt_text ? "分镜脚本参考（来自 exact Prompt）" : "分镜脚本"}</span><p>{shot.purpose || shot.intent || shot.talent_action || shot.prompt_text || "没有与该视频绑定的 Shot 脚本"}</p></div>
+          <div className="external-shot-breakdown__script"><span>{shot.purpose || shot.intent || shot.talent_action ? "分镜脚本" : shot.prompt_text ? "实际提交 Prompt" : "分镜脚本"}</span><p>{shot.purpose || shot.intent || shot.talent_action || shot.prompt_text || "没有与该视频绑定的 Shot 脚本"}</p></div>
           {shot.talent_action && <div className="external-shot-breakdown__script"><span>人物动作</span><p>{shot.talent_action}</p></div>}
           {shot.product_state && <div className="external-shot-breakdown__script"><span>产品状态</span><p>{shot.product_state}</p></div>}
           {shot.camera_intent && <div className="external-shot-breakdown__script"><span>镜头意图</span><p>{shot.camera_intent}</p></div>}

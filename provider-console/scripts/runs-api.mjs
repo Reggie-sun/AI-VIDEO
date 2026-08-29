@@ -212,6 +212,29 @@ function createPythonProjector(repoRoot) {
   };
 }
 
+function createPythonRunsMediaIndex(repoRoot) {
+  const runsRoot = path.join(repoRoot, "runs");
+  const python = process.env.AI_VIDEO_PYTHON || "python";
+  return async () => {
+    const env = {
+      PATH: process.env.PATH,
+      LANG: process.env.LANG || "C.UTF-8",
+      LC_ALL: process.env.LC_ALL || "C.UTF-8",
+      PYTHONPATH: path.join(repoRoot, "src"),
+    };
+    try {
+      const { stdout } = await execFileAsync(
+        python,
+        ["-m", "ai_video.provider_console_media_index", "--runs-root", runsRoot],
+        { cwd: repoRoot, env, maxBuffer: 40 * 1024 * 1024 },
+      );
+      return JSON.parse(stdout);
+    } catch {
+      throw new RunsApiError(503, "RUNS_MEDIA_INDEX_UNAVAILABLE");
+    }
+  };
+}
+
 async function validatedMedia(entry, runsRoot) {
   if (!entry || typeof entry.source_path !== "string" || typeof entry.mime_type !== "string") return null;
   if (!/^(image|video)\//.test(entry.mime_type)) return null;
@@ -415,6 +438,7 @@ async function sendMedia(req, res, media) {
 export function createRunsApiHandler({
   repoRoot,
   runProjector = createPythonProjector(repoRoot),
+  runsMediaIndexProjector = createPythonRunsMediaIndex(repoRoot),
   externalSources = [],
   externalCatalog = catalogExternalMedia,
   changeFeed = null,
@@ -431,7 +455,37 @@ export function createRunsApiHandler({
     configuredExternalSources.push(source);
   }
 
-  return async function runsApi(req, res, next) {
+  let runsMediaIndexCache = null;
+  let runsMediaIndexPromise = null;
+  let runsMediaIndexGeneration = 0;
+  const invalidateRunsMediaIndex = () => {
+    runsMediaIndexGeneration += 1;
+    runsMediaIndexCache = null;
+  };
+  const unsubscribeIndexInvalidation = changeFeed?.subscribe?.((event) => {
+    if ((event?.sources || []).includes("runs")) invalidateRunsMediaIndex();
+  }) || (() => {});
+  const readRunsMediaIndex = async () => {
+    if (runsMediaIndexCache) return runsMediaIndexCache;
+    if (runsMediaIndexPromise) {
+      await runsMediaIndexPromise.catch(() => undefined);
+      return readRunsMediaIndex();
+    }
+    const generation = runsMediaIndexGeneration;
+    const pending = runsMediaIndexProjector();
+    runsMediaIndexPromise = pending;
+    let result;
+    try {
+      result = await pending;
+    } finally {
+      if (runsMediaIndexPromise === pending) runsMediaIndexPromise = null;
+    }
+    if (generation !== runsMediaIndexGeneration) return readRunsMediaIndex();
+    runsMediaIndexCache = result;
+    return result;
+  };
+
+  const runsApi = async function runsApi(req, res, next) {
     const parsed = new URL(req.url || "/", "http://127.0.0.1");
     const isRunsRequest = parsed.pathname.startsWith("/api/runs");
     const isExternalRequest = parsed.pathname.startsWith("/api/external-media");
@@ -513,6 +567,13 @@ export function createRunsApiHandler({
 
       if (isExternalRequest) {
         send(res, 404, { error: { code: "NOT_FOUND", message: "接口不存在。" } });
+        return;
+      }
+
+      if (parsed.pathname === "/api/runs/media-context-index") {
+        if (req.method !== "GET") return methodNotAllowed(res, "GET");
+        const result = await readRunsMediaIndex();
+        send(res, 200, publicProjection(result));
         return;
       }
 
@@ -622,6 +683,8 @@ export function createRunsApiHandler({
         : { code: "RUNS_SOURCE_UNAVAILABLE", message: "本地 runs 数据源不可用。" } });
     }
   };
+  runsApi.close = unsubscribeIndexInvalidation;
+  return runsApi;
 }
 
 export function createRunsApiPlugin(options) {
@@ -636,6 +699,7 @@ export function createRunsApiPlugin(options) {
     const handler = createRunsApiHandler({ ...options, changeFeed });
     server.middlewares.use(handler);
     server.httpServer?.once("close", () => {
+      handler.close?.();
       changeFeed.close();
       feeds.delete(changeFeed);
     });
