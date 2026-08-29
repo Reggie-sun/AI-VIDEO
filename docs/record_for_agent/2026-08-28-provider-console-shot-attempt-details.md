@@ -569,6 +569,44 @@ Verification：
 Final Acceptance、push、deploy 或 release；实现仅形成 local Git checkpoint，当前 live Vite server 的
 HMR 可见性不构成部署或发布。
 
+## External `N/E` Catalog Diagnosis — 2026-08-29
+
+用户观察到 External Media rail 中大量卡片显示 `N/E`。本次只读调用当前
+`GET /api/external-media` 得到 `524` 个 physical locations、按 exact SHA-256 聚合后的 `406` 个 groups；
+四个 allowlisted sources 均为 `available`。其中 `361` 个 groups 没有可验证的 `reported_status`，因此
+前端按 contract 显示 `N/E`；另外 `45` 个 groups 已通过现有 adapter 显示外部报告状态：
+
+- `verified_artifact_receipt`: `27`；
+- `verified_experiment_evidence`: `11`；
+- `verified_evidence_chain`: `7`。
+
+`361` 个 `N/E` groups 中，`345` 个没有任何 exact-bound evidence ref；`16` 个虽然存在绑定 exact bytes
+的 JSON ref，但 schema 不受支持或完整 identity/request/result/gate chain 不成立。当前没有
+`association_ambiguity`。这证明 external association path 正在工作，同时也证明 `N/E` 主要是历史媒体
+缺少可信生成上下文，而不是播放器、SHA 去重或 catalog 全局失效。
+
+截图中的代表性边界：
+
+- `ai_video_h3_t8_44105e30484a2814_00001-audio.mp4` 只有 ComfyUI raw-output location，没有
+  direct-bound sidecar。相同 exact bytes 已在 Runs Production workspace 中作为 `fetched_media` 正确投影；
+  External library 不跨 ownership boundary 借用 Runs lifecycle 来补 raw-output metadata。
+- `m6-causal-micro-sequence-15.5s-review-v1.mp4` 有 exact-bound `assembly-result.json`，但 schema
+  `m6-causal-micro-sequence-review-assembly-result/1` 尚无 semantic adapter，所以只保留 evidence ref，
+  不解释 Shot、Prompt 或 status。
+- `shot-c-open-use-effect-v3.mp4` 与 `v4.mp4` 具备完整 request/prompt/gate chain，已显示
+  `OUTPUT_RECORDED`；`v5.mp4` 与 `v6.mp4` 缺少现有 M6 adapter 所要求的 `requests/*` 完整链，因此
+  保持 `N/E`。不得从相似文件名、同目录或后续版本猜测补齐。
+
+Current runtime contract 保持不变：External group 的 canonical `status`、`generation_status` 与
+`lifecycle_status` 始终为 `NOT_EVALUATED`；卡片 badge 只解释 exact-bound adapter 产生的
+`reported_status`。若后续要减少视觉上的 `N/E`，属于 product presentation 或 evidence-backfill 决策：
+可以把状态分类为“无绑定证据 / 关联链不完整 / 已关联”，或默认过滤无证据历史媒体；新增 assembly
+adapter 或历史 backfill 必须继续要求 exact SHA/path 与完整 chain，不能放宽为相信任意邻近 JSON。
+
+本诊断没有修改 frontend、catalog adapter、external media、sidecar、Production state 或 lifecycle，也没有
+执行 Provider submit、媒体生成、paid/cloud call、push、deploy 或 release。Project-local Agent Memory 查询
+返回 stale last-good fragments 并已由其 owner 排队后台 refresh；本 session 没有等待、重试或手工重建索引。
+
 ## Assessment
 
 该 slice 已满足“逐生成视频查看用于判断的详细信息”这一工程目标：操作员能在一个真实 attempt 视图中
