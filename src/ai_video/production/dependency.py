@@ -29,6 +29,16 @@ from types import MappingProxyType
 from typing import Final
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production._dependency_authoring import (
+    build_authoring_dependency_projection,
+    shot_projection_fingerprints as _shot_projection_fingerprints,
+)
+from ai_video.production._dependency_primitives import (
+    creative_node_id,
+    fingerprint_items as _items,
+    fingerprint_value as _fp,
+    shot_projection_node_id,
+)
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import (
     AssetRecord,
@@ -52,7 +62,6 @@ from ai_video.production.models import (
     RenderReceipt,
     RenderStateSnapshot,
     ResolvedTimeline,
-    Shot,
     StateCommitStatus,
 )
 from ai_video.production.audio import VoiceGenerationRequest
@@ -93,22 +102,6 @@ _EPOCH: Final[float] = 0.0
 # ---------------------------------------------------------------------------
 # Canonical node ID helpers (no parsing here; resolver never depends on them)
 # ---------------------------------------------------------------------------
-
-
-def creative_node_id(artifact_kind: str, artifact_id: str) -> str:
-    """Return the canonical node id for a non-Shot creative artifact."""
-
-    if not artifact_kind or not artifact_id:
-        raise ValueError("creative_node_id requires non-empty kind and id")
-    return f"creative:{artifact_kind}:{artifact_id}"
-
-
-def shot_projection_node_id(shot_id: str, semantic_role: str) -> str:
-    """Return the canonical node id for one Shot semantic projection."""
-
-    if not shot_id or not semantic_role:
-        raise ValueError("shot_projection_node_id requires non-empty shot id and role")
-    return f"creative:shot:{shot_id}:{semantic_role}"
 
 
 def asset_node_id(asset_id: str) -> str:
@@ -165,6 +158,7 @@ _EDGE_ALLOWLIST: Final[frozenset[tuple[DependencyNodeKind, DependencySemanticRol
             (DependencyNodeKind.CREATIVE_ARTIFACT, DependencySemanticRole.NONE, DependencyReason.AUTHORING_INPUT, DependencyNodeKind.CREATIVE_ARTIFACT, DependencySemanticRole.COMPOSITION),
             (DependencyNodeKind.CREATIVE_ARTIFACT, DependencySemanticRole.VOICE, DependencyReason.GENERATION_INPUT, DependencyNodeKind.ASSET, DependencySemanticRole.VOICE),
             (DependencyNodeKind.CREATIVE_ARTIFACT, DependencySemanticRole.VISUAL, DependencyReason.GENERATION_INPUT, DependencyNodeKind.ASSET, DependencySemanticRole.VISUAL),
+            (DependencyNodeKind.CREATIVE_ARTIFACT, DependencySemanticRole.VISUAL, DependencyReason.GENERATION_INPUT, DependencyNodeKind.GENERATION_TARGET, DependencySemanticRole.VISUAL),
             (DependencyNodeKind.CREATIVE_ARTIFACT, DependencySemanticRole.VISUAL, DependencyReason.ASSET_BINDING, DependencyNodeKind.ASSET, DependencySemanticRole.VISUAL),
             (DependencyNodeKind.ASSET, DependencySemanticRole.VISUAL, DependencyReason.GENERATION_INPUT, DependencyNodeKind.ASSET, DependencySemanticRole.VISUAL),
             (DependencyNodeKind.CREATIVE_ARTIFACT, DependencySemanticRole.COMPOSITION, DependencyReason.COMPOSITION_RESOLUTION, DependencyNodeKind.COMPOSITION_SPEC, DependencySemanticRole.COMPOSITION),
@@ -1119,17 +1113,6 @@ def voice_semantic_projection_fingerprint(request: VoiceGenerationRequest) -> st
     )
 
 
-def _fp(schema: str, value: object) -> str:
-    return canonical_sha256({"schema": schema, "value": value})
-
-
-def _items(**values: str) -> tuple[FingerprintContribution, ...]:
-    return tuple(
-        FingerprintContribution(key=key, fingerprint=fingerprint)
-        for key, fingerprint in sorted(values.items())
-    )
-
-
 def _asset_role(asset: AssetRecord) -> DependencySemanticRole:
     if asset.asset_type in {AssetType.IMAGE, AssetType.VIDEO}:
         return DependencySemanticRole.VISUAL
@@ -1142,50 +1125,6 @@ def _asset_role(asset: AssetRecord) -> DependencySemanticRole:
     return DependencySemanticRole.NONE
 
 
-def _shot_projection_fingerprints(shot: Shot) -> dict[DependencySemanticRole, str]:
-    return {
-        DependencySemanticRole.VOICE: _fp(
-            "ai-video-shot-voice/1",
-            {
-                "dialogue": shot.dialogue,
-                "narration": shot.narration,
-                "duration_policy": shot.duration_policy.model_dump(mode="json"),
-            },
-        ),
-        DependencySemanticRole.VISUAL: _fp(
-            "ai-video-shot-visual/1",
-            {
-                "intent": shot.intent,
-                "character_ids": shot.character_ids,
-                "continuity_constraints": shot.continuity_constraints,
-                "visual_strategy": shot.visual_strategy.value,
-                "required_asset_roles": tuple(
-                    item.model_dump(mode="json") for item in shot.required_asset_roles
-                ),
-                "motion_directives": tuple(
-                    item.model_dump(mode="json") for item in shot.motion_directives
-                ),
-                "generated_video_rationale": shot.generated_video_rationale,
-                "hybrid_layers": tuple(
-                    item.model_dump(mode="json") for item in shot.hybrid_layers
-                ),
-            },
-        ),
-        DependencySemanticRole.COMPOSITION: _fp(
-            "ai-video-shot-composition/1",
-            {
-                "scene_id": shot.scene_id,
-                "storyboard_beat_id": shot.storyboard_beat_id,
-                "duration_policy": shot.duration_policy.model_dump(mode="json"),
-                "composition_directives": tuple(
-                    item.model_dump(mode="json")
-                    for item in shot.composition_directives
-                ),
-            },
-        ),
-    }
-
-
 def build_production_dependency_graph(
     inputs: ProductionDependencyInputs,
 ) -> DependencyGraphSnapshot:
@@ -1193,9 +1132,10 @@ def build_production_dependency_graph(
 
     project = inputs.project
     spec = inputs.composition_spec
-    nodes: list[DependencyNode] = []
-    edges: list[DependencyEdge] = []
-    node_by_id: dict[str, DependencyNode] = {}
+    authoring = build_authoring_dependency_projection(project)
+    nodes = list(authoring.nodes)
+    edges = list(authoring.edges)
+    node_by_id = {node.node_id: node for node in nodes}
 
     def add_node(node: DependencyNode) -> None:
         if node.node_id in node_by_id:
@@ -1216,89 +1156,7 @@ def build_production_dependency_graph(
             )
         )
 
-    creative = (
-        ("brief", project.brief),
-        ("story", project.story),
-        *(("character", item) for item in project.characters),
-        *(("scene", item) for item in project.scenes),
-        ("storyboard", project.storyboard),
-    )
-    creative_ids: dict[tuple[str, str], str] = {}
-    for kind, artifact in creative:
-        node_id = creative_node_id(kind, artifact.artifact_id)
-        creative_ids[(kind, artifact.artifact_id)] = node_id
-        add_node(
-            DependencyNode(
-                node_id=node_id,
-                kind=DependencyNodeKind.CREATIVE_ARTIFACT,
-                semantic_role=DependencySemanticRole.NONE,
-                artifact_id=artifact.artifact_id,
-                artifact_revision=artifact.revision,
-                contributions=_items(**{f"{kind}.semantic": artifact.content_hash}),
-            )
-        )
-
-    add_edge(
-        creative_ids[("brief", project.brief.artifact_id)],
-        creative_ids[("story", project.story.artifact_id)],
-        DependencyReason.AUTHORING_INPUT,
-        "authoring.brief_story",
-        project.project.artifacts.brief.model_dump(mode="json"),
-    )
-    add_edge(
-        creative_ids[("story", project.story.artifact_id)],
-        creative_ids[("storyboard", project.storyboard.artifact_id)],
-        DependencyReason.AUTHORING_INPUT,
-        "authoring.story_storyboard",
-        project.project.artifacts.story.model_dump(mode="json"),
-    )
-
-    character_by_domain_id = {item.character_id: item for item in project.characters}
-    scene_by_domain_id = {item.scene_id: item for item in project.scenes}
-    storyboard_id = creative_ids[("storyboard", project.storyboard.artifact_id)]
-    shot_projection_ids: dict[tuple[str, DependencySemanticRole], str] = {}
-    for scene in project.scenes:
-        scene_node_id = creative_ids[("scene", scene.artifact_id)]
-        for participant_id in scene.participant_ids:
-            character = character_by_domain_id[participant_id]
-            add_edge(
-                creative_ids[("character", character.artifact_id)],
-                scene_node_id,
-                DependencyReason.AUTHORING_INPUT,
-                "authoring.character_scene",
-                {"character_id": participant_id, "scene_id": scene.scene_id},
-            )
-
-    for shot in project.shots:
-        projections = _shot_projection_fingerprints(shot)
-        for role, fingerprint in projections.items():
-            node_id = shot_projection_node_id(shot.shot_id, role.value)
-            shot_projection_ids[(shot.shot_id, role)] = node_id
-            add_node(
-                DependencyNode(
-                    node_id=node_id,
-                    kind=DependencyNodeKind.CREATIVE_ARTIFACT,
-                    semantic_role=role,
-                    artifact_id=shot.artifact_id,
-                    artifact_revision=shot.revision,
-                    contributions=_items(**{f"shot.{role.value}": fingerprint}),
-                )
-            )
-        scene = scene_by_domain_id[shot.scene_id]
-        add_edge(
-            creative_ids[("scene", scene.artifact_id)],
-            shot_projection_ids[(shot.shot_id, DependencySemanticRole.VISUAL)],
-            DependencyReason.AUTHORING_INPUT,
-            "authoring.scene_visual",
-            {"scene_id": shot.scene_id, "shot_id": shot.shot_id},
-        )
-        add_edge(
-            storyboard_id,
-            shot_projection_ids[(shot.shot_id, DependencySemanticRole.COMPOSITION)],
-            DependencyReason.AUTHORING_INPUT,
-            "authoring.storyboard_composition",
-            {"beat_id": shot.storyboard_beat_id, "shot_id": shot.shot_id},
-        )
+    shot_projection_ids = authoring.shot_projection_ids
 
     requests_by_shot: dict[str, VoiceGenerationRequest] = {}
     for request in inputs.voice_requests:

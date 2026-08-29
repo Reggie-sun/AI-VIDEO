@@ -661,7 +661,9 @@ def test_scope_boundaries_remain_absent_and_generated_image_uses_asset_seam(tmp_
 
     assert inputs.renderer.kind is RendererKind.HYPERFRAMES
     assert inputs.composition_spec.requested_renderer is RendererKind.HYPERFRAMES
-    assert {node.kind for node in graph.nodes} == set(DependencyNodeKind)
+    assert {node.kind for node in graph.nodes} == set(DependencyNodeKind) - {
+        DependencyNodeKind.GENERATION_TARGET
+    }
     forbidden = ("qa", "review", "repair", "provider", "cloud", "remotion")
     assert not any(
         token in node.node_id.lower()

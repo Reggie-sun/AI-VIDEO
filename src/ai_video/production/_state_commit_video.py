@@ -83,6 +83,9 @@ from ai_video.production.video import (
     VideoTaskObservation,
     VideoTaskState,
 )
+from ai_video.production.video_pre_generation import (
+    verify_current_video_generation_lineage,
+)
 
 from ._state_commit_common import (
     _candidate_artifacts_hash,
@@ -354,6 +357,18 @@ class _StateCommitVideoMixin:
                 raise _state_invalid(
                     "Video generation requires an active dependency graph."
                 )
+            try:
+                loaded = self._load_production_project(
+                    self._project_root / "project.yaml"
+                )
+                if loaded.manifest != manifest:
+                    raise ValueError("active Manifest changed during video validation")
+                verify_current_video_generation_lineage(loaded, request)
+            except (AiVideoError, OSError, ValueError) as exc:
+                raise _state_invalid(
+                    "Video generation request lineage is not current and exact.",
+                    str(exc),
+                ) from exc
             if any(
                 item.attempt_id == attempt_id
                 or (

@@ -16,6 +16,8 @@ from pydantic import (
     model_validator,
 )
 
+from ai_video.production._dependency_types import DependencyNodeKind
+
 from ai_video.production.artifact_contracts import (
     SourceReference,
     StrictModel,
@@ -2022,22 +2024,13 @@ class LoadedProductionProject(StrictModel):
 # ---------------------------------------------------------------------------
 # P5 Dependency Graph immutable input contracts
 #
-# Graph snapshots are pure, content-addressed resolver inputs. They MUST NOT
-# carry mutable desired/applied fingerprints, lifecycle status, timestamps or
+# Graph snapshots are pure, content-addressed resolver inputs and MUST NOT carry
+# mutable desired/applied fingerprints, lifecycle status, timestamps or
 # active selection. Lifecycle ownership belongs to ``ProductionManifest`` 2.3
 # and ``StateCommitAttempt`` P5-aware fields; graph validation, DAG traversal,
 # topological order, semantic hashing and rebuild decisions are owned by
 # ``src/ai_video/production/dependency.py`` (Task 2, not implemented here).
 # ---------------------------------------------------------------------------
-
-
-class DependencyNodeKind(str, Enum):
-    CREATIVE_ARTIFACT = "creative_artifact"
-    ASSET = "asset"
-    COMPOSITION_SPEC = "composition_spec"
-    RESOLVED_TIMELINE = "resolved_timeline"
-    RENDERER_SOURCE = "renderer_source"
-    RENDER = "render"
 
 
 class DependencySemanticRole(str, Enum):
