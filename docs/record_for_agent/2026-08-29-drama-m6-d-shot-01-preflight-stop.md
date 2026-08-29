@@ -131,6 +131,9 @@ Shot 01 VideoPlanningRequest hash:
 
 Shot 01 verified generation projection hash:
 9481519d2b4929e6abd9b0826cc5731ea54f60526ec414ffa07279d32f0a57fb
+
+materialization driver SHA-256:
+33de138c1bdb791bda8eef9f7e4de0f4e9d8388ae165029804e941a6aeba10bc
 ```
 
 Strict reopen得到exact selected Character/Scene/ordered Shot content hashes；Planner outcome为`proposed`、generation mode
@@ -139,6 +142,21 @@ Strict reopen得到exact selected Character/Scene/ordered Shot content hashes；
 `python -m scripts.architecture_gate check`、`python -m scripts.docs_contract_gate check`、
 `python -m scripts.agent_harness policy-audit`与`git diff --check`均通过；Architecture Gate只报告pre-existing warning/info，
 没有error。
+
+Independent native `reviewer_xhigh`完成initial review与concern-fix scoped re-review，最终verdict为`accept`：acceptance
+envelope/package identity、byte size、SHA-256与Git blob OID均fail closed；evidence绑定current driver SHA；T2V media
+role/asset negative coverage与projection source mapping均已补齐。Stable implementation commit为
+`e1f56e410ba2426a741ccf5f586eb14e8ad19986`。
+
+Exact commit-range Harness绑定`9c40762a9caf2f2424ab826a3958a2df7fedab00..e1f56e410ba2426a741ccf5f586eb14e8ad19986`：
+
+```text
+.agent/harness/runs/drama-m6-d-pending-target-materialization-20260829/receipt.json
+SHA-256: c1efc9d94242220106747ae1760e4fe441ea125019bc4c8d11dd08415f7e52f3
+status: passed
+production_contract_tests: 2908 passed, 3 skipped, 1261 deselected
+verify-receipt: fresh=true, integrity=true, complete_completion_proof=true
+```
 
 ## Current Assessment After Follow-up
 
