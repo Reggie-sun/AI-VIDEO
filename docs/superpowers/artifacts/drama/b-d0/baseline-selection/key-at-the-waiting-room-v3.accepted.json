@@ -1,0 +1,58 @@
+{
+  "schema_version": "drama-baseline-selection-acceptance/1",
+  "record_kind": "drama_baseline_selection_acceptance",
+  "baseline_id": "drama.baseline.key-at-the-waiting-room",
+  "baseline_version": 3,
+  "status": "accepted",
+  "domain_id": "drama",
+  "accepted_selection_payload": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/baseline-selection/key-at-the-waiting-room-v3.proposed.json",
+    "commit": "f9329547c0f59111838b64fafa7b7261ddfce991",
+    "accepted_record_sha256": "bab68c8e43a36e33e12d8c3c5b8e0aea683db2b9889e8ef417a261ca77fd06bb",
+    "byte_size": 13971,
+    "git_blob_oid": "d981a8c5540fb010d838ff5c732822da6f74bb54",
+    "candidate_status_at_acceptance": "proposed",
+    "content_address_semantics": "The immutable candidate payload at the bound commit and SHA-256 is the accepted baseline-selection record; this envelope adds authority and acceptance lineage without modifying the accepted payload bytes."
+  },
+  "contract_binding": {
+    "spec_path": "docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md",
+    "spec_commit": "01483ec1f434661984ca009fffa85960310dedd6",
+    "spec_sha256": "239573a700fe987eb76282cb3c89f4ee666721646ec90b4e1398527e65c6801b",
+    "contract_version": "drama-authoring-and-acceptance/1"
+  },
+  "approval": {
+    "approver_authority_identity": "current_user",
+    "authority_basis": "explicit exact baseline-selection candidate confirmation in the current task",
+    "accepted_at": "2026-08-29T09:22:45+08:00",
+    "acceptance_source_id": "current-session:baseline-selection-decision",
+    "normalized_decision": "CONFIRM_EXACT_BASELINE_SELECTION",
+    "canonical_confirmation_tuple": "baseline_decision=CONFIRM;candidate_commit=f9329547c0f59111838b64fafa7b7261ddfce991;candidate_sha256=bab68c8e43a36e33e12d8c3c5b8e0aea683db2b9889e8ef417a261ca77fd06bb",
+    "acceptance_source_sha256": "464ee5f9eb271aa602760d2b088a544eef6443a9f9e1ab1fc51681bdeef29f51"
+  },
+  "accepted_scope": {
+    "includes": [
+      "the exact local Shot 1 reference media identity and generation provenance",
+      "internal-development-only rights and provenance scope",
+      "intended Drama fixture, format and selection timing bindings",
+      "directly comparable and known non-comparable dimensions",
+      "all nine unchanged minimum floors and comparison procedures",
+      "1.0x full-audio HUMAN playback authority and no post-hoc reference swap"
+    ],
+    "excludes": [
+      "formal DRAMA-MEDIA-SHOT, pairwise or whole-scene HUMAN PASS",
+      "authoring-package acceptance or seal",
+      "Provider, model, workflow or native prompt selection for M6-D",
+      "additional media generation, retry or repair",
+      "B-D0, M6-D, P6 or Final Acceptance PASS",
+      "publication, release or external distribution rights"
+    ]
+  },
+  "current_gate_state": {
+    "fixture_selection": "ACCEPTED",
+    "baseline_selection": "ACCEPTED",
+    "authoring_package": "BLOCKED_PENDING_NEW_EXACT_PACKAGE",
+    "b_d0": "BLOCKED_BEFORE_MEDIA",
+    "m6_d": "NOT_EVALUATED",
+    "next_required_evidence": "A new exact authoring-package candidate bound to this accepted baseline-selection envelope, followed by separate explicit acceptance."
+  }
+}
