@@ -11,6 +11,7 @@ import {
   groupMatchesQuery,
   groupMatchesSource,
   preferredExternalLocation,
+  sortExternalGroupsNewest,
   sourceLabel,
 } from "./external-media-contract.js";
 import {
@@ -72,9 +73,12 @@ export function VideoLibraryRail({
   const sourceGroups = showExternal
     ? groups.filter((group) => groupMatchesSource(group, selectedSource))
     : [];
-  const visible = sourceGroups
-    .filter((group) => groupMatchesEvidenceFilter(group, evidenceFilter))
-    .filter((group) => groupMatchesQuery(group, query));
+  const visible = sortExternalGroupsNewest(
+    sourceGroups
+      .filter((group) => groupMatchesEvidenceFilter(group, evidenceFilter))
+      .filter((group) => groupMatchesQuery(group, query)),
+    selectedSource,
+  );
   const evidenceOptions = externalEvidenceFilterOptions(sourceGroups);
   const sourceOptions = externalSourceOptions(externalCatalog).slice(1);
   const selectedSourceValue = videoSourceSelectionValue(selectedSource);

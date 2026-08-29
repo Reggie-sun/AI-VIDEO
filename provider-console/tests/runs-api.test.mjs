@@ -38,6 +38,7 @@ import {
   preferredExternalLocation,
   readExternalCatalogResponse,
   runsMediaContextNotice,
+  sortExternalGroupsNewest,
 } from "../src/external-media-contract.js";
 import {
   enableMediaSound,
@@ -738,6 +739,33 @@ test("external media UI contract keeps non-canonical unknowns explicit", () => {
   assert.equal(externalStatus({ status: "failed" }).tone, "unknown");
   assert.equal(externalStatus({ status: "NOT_EVALUATED", reported_status: "succeeded" }).tone, "ready");
   assert.equal(externalStatus({ status: "NOT_EVALUATED", reported_status: false }).tone, "blocked");
+});
+
+test("external groups sort newest-first by the currently filtered source time", () => {
+  const groups = [
+    {
+      sha256: "b".repeat(64),
+      modified_at: "2026-08-29T11:00:00.000Z",
+      locations: [
+        { source_id: "artifacts", modified_at: "2026-08-29T08:00:00.000Z" },
+        { source_id: "comfyui-output", modified_at: "2026-08-29T11:00:00.000Z" },
+      ],
+    },
+    {
+      sha256: "a".repeat(64),
+      modified_at: "2026-08-29T10:00:00.000Z",
+      locations: [{ source_id: "artifacts", modified_at: "2026-08-29T10:00:00.000Z" }],
+    },
+    {
+      sha256: "c".repeat(64),
+      modified_at: "invalid",
+      locations: [{ source_id: "artifacts", modified_at: "invalid" }],
+    },
+  ];
+
+  assert.deepEqual(sortExternalGroupsNewest(groups, "all").map((group) => group.sha256[0]), ["b", "a", "c"]);
+  assert.deepEqual(sortExternalGroupsNewest(groups, "artifacts").map((group) => group.sha256[0]), ["a", "b", "c"]);
+  assert.deepEqual(groups.map((group) => group.sha256[0]), ["b", "a", "c"]);
 });
 
 test("external evidence states distinguish linked, incomplete, and unbound groups", () => {

@@ -275,6 +275,24 @@ export function groupMatchesSource(group, sourceId) {
   return (group?.locations || []).some((item) => item?.source_id === sourceId);
 }
 
+function externalGroupTimestamp(group, sourceId) {
+  const locations = Array.isArray(group?.locations) ? group.locations : [];
+  const candidates = (!sourceId || sourceId === "all")
+    ? [group?.modified_at, ...locations.map((location) => location?.modified_at)]
+    : locations.filter((location) => location?.source_id === sourceId).map((location) => location?.modified_at);
+  return candidates.reduce((latest, value) => {
+    const timestamp = Date.parse(value || "");
+    return Number.isFinite(timestamp) ? Math.max(latest, timestamp) : latest;
+  }, Number.NEGATIVE_INFINITY);
+}
+
+export function sortExternalGroupsNewest(groups, sourceId = "all") {
+  return [...(Array.isArray(groups) ? groups : [])].sort((left, right) => (
+    externalGroupTimestamp(right, sourceId) - externalGroupTimestamp(left, sourceId)
+    || String(left?.sha256 || "").localeCompare(String(right?.sha256 || ""))
+  ));
+}
+
 export function externalSourceOptions(catalog) {
   const groups = Array.isArray(catalog?.groups) ? catalog.groups : [];
   const sources = Array.isArray(catalog?.sources) ? catalog.sources : [];

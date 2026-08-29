@@ -41,6 +41,7 @@ import {
   preferredExternalLocation,
   readExternalCatalogResponse,
   runsMediaContextNotice,
+  sortExternalGroupsNewest,
   sourceLabel,
 } from "./external-media-contract.js";
 import { AudibleVideo } from "./media-player.jsx";
@@ -799,12 +800,15 @@ export function App() {
     [externalCatalog, runsMediaIndex],
   );
 
-  const visibleExternalGroups = (enrichedExternalCatalog?.groups || [])
-    .filter((group) => selectedSource !== "runs" && groupMatchesSource(group, selectedSource))
-    .filter((group) => groupMatchesEvidenceFilter(group, externalEvidenceFilter))
-    .filter((group) => groupMatchesQuery(group, externalQuery));
+  const visibleExternalGroups = sortExternalGroupsNewest(
+    (enrichedExternalCatalog?.groups || [])
+      .filter((group) => selectedSource !== "runs" && groupMatchesSource(group, selectedSource))
+      .filter((group) => groupMatchesEvidenceFilter(group, externalEvidenceFilter))
+      .filter((group) => groupMatchesQuery(group, externalQuery)),
+    selectedSource,
+  );
   const externalGroup = visibleExternalGroups.find((group) => group.sha256 === externalSelectedSha)
-    || preferredExternalGroup(visibleExternalGroups);
+    || visibleExternalGroups[0];
   const refreshFailed = selectedSource === "runs"
     ? Boolean(error)
     : selectedSource === "all" ? Boolean(error || externalError) : Boolean(externalError);
@@ -823,10 +827,13 @@ export function App() {
       setActiveSurface("runs");
       return;
     }
-    const groups = (enrichedExternalCatalog?.groups || [])
-      .filter((group) => groupMatchesSource(group, sourceId))
-      .filter((group) => groupMatchesEvidenceFilter(group, externalEvidenceFilter));
-    setExternalSelectedSha(preferredExternalGroup(groups)?.sha256 || "");
+    const groups = sortExternalGroupsNewest(
+      (enrichedExternalCatalog?.groups || [])
+        .filter((group) => groupMatchesSource(group, sourceId))
+        .filter((group) => groupMatchesEvidenceFilter(group, externalEvidenceFilter)),
+      sourceId,
+    );
+    setExternalSelectedSha(groups[0]?.sha256 || "");
     setActiveSurface("external");
   }, [enrichedExternalCatalog, externalEvidenceFilter]);
 
