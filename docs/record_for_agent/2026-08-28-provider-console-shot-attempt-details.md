@@ -676,6 +676,65 @@ Verification 与 publication state：
 本恢复只形成 local `main` commits 和本地 Vite live proof；没有 Provider submit、paid/cloud call、媒体生成
 或修改、Manifest mutation、candidate activation、P6、Final Acceptance、push、deploy 或 release。
 
+## Invalid Workspace Evidence Isolation Follow-up — 2026-08-29
+
+用户在 live Console 中确认上一 checkpoint 的全局 fail-closed presentation 仍然过宽：`5` 个无法 strict
+reopen 的历史 workspace 使 `318` 个没有 exact Runs match 的视频全部显示为“证据不完整”，其中包括与这些
+workspace 无关的视频。该状态没有丢失已存在的 exact binding，但它把 workspace-level uncertainty 错误扩大
+成了 catalog-level uncertainty。
+
+本 follow-up 将不确定性收窄到 exact media identity，同时保持原 strict reader 不变：
+
+- `project_workspace_detail()` 继续对 invalid Production workspace 返回 sanitized `status=invalid`；没有放宽
+  strict reopen、render activation audit、project/registry validation 或 lifecycle contract。
+- 新的 `src/ai_video/provider_console_video_evidence.py` 只在 normal strict reopen 失败后读取 Manifest-selected
+  project/registry candidate，并复用既有 Projection。该 reader 为 bounded、no-follow、read-only seam；返回
+  `recovered_video_evidence` 与 `workspace_strict_status=invalid`，不得声称 workspace 已恢复为 valid。
+- `src/ai_video/provider_console_media_index.py` 对仍无法恢复的 workspace 做 bounded、no-follow video identity
+  scan，只输出 exact `SHA-256 + bytes` unresolved set。只有 scan 完整时才设置
+  `identity_coverage_complete=true`；malformed、truncated、unreadable 或 identity 不合法均 fail closed。
+- Browser 只有在 index contract、全部 unresolved identities 与 identity coverage 都通过验证时，才把未命中
+  unresolved set 的 group 判为“无绑定证据”。Global `boundary.complete` 仍为 `false`，因此 strict workspace
+  完整性没有被 UI 偷换。
+- exact-bound 但 schema 尚未支持的 sidecar 从“证据不完整”独立为“旁证待解析”；它只保留 evidence ref，
+  不解释 Prompt、Shot 或状态。真正的 Runs coverage gap 使用“Runs 待恢复”，不再与 sidecar schema gap 混为
+  一类。
+
+Current live index：`132` 个 workspaces 中 `127` 个 strict reopen、`3` 个恢复封存视频证据、`2` 个仍 invalid；
+后两者的 bounded scan 没有发现 unresolved video identity。Index 投影 `82` 个 exact Runs bindings，External
+catalog 的 `406` 个 unique SHA groups 现在分为：
+
+- `已关联 (91)`；
+- `Runs 待恢复 (0)`；
+- `旁证待解析 (16)`；
+- `无绑定证据 (299)`。
+
+Chrome integrated QA 点开 recovered
+`ai_video_h3_56491679ff72775a_00001_.mp4` 后确认 `shot-013`、`I2V`、完整 exact Prompt 与 verified Shot
+snapshot 同屏；inline video 为 `readyState=4`、`duration=8`、`error=null`。证据筛选切到“旁证待解析”时
+准确显示 `16` 个 groups 及 unsupported-schema boundary；页面不再出现笼统的“证据不完整”，console 无
+warning/error。
+
+Verification 与 publication state：
+
+- Implementation commit：`67616e68460fd2a895dee0168090b1489d5dd5a1`。
+- Focused current-tree verification：Python `173 passed`；full Provider Console Node suite `75 passed`；Vite/Sites
+  build 通过；`git diff --check` 通过。
+- 第一次 exact task range Harness 的全部 executable checks 通过，但验证期间另一个 session 将 `main` 推进，
+  receipt 因 `source scope changed during verification` 正确标记为 failed，不能作为 completion proof。
+- Passing current-head superset range：
+  `6344d29269f99f8918778796aff23a9278549fc7..c8235d5fbb9f3f29848b43deaaa0b5085407d6cb`；
+  它包含 implementation commit 与一个并发 Drama docs-only commit，后者没有修改本任务任一 path。
+  Receipt：`.agent/harness/runs/provider-console-evidence-recovery-20260829-r3/receipt.json`；verifier 确认
+  `passed=true`、`fresh=true`、`fresh_for_snapshot=true`、`scope_paths_match=true`、
+  `workspace_stable_confirmed=true`、`complete_completion_proof=true`、`integrity=true` 与
+  `artifact_integrity=true`。Receipt 内 Architecture Gate PASS、Harness `204 passed`、Provider Console
+  Python `40 passed`、Node `70 passed` 与 Vite build 全部通过。
+
+本 follow-up 没有执行 Provider submit、paid/cloud call、媒体生成或修改、Manifest mutation、candidate
+activation、P6、Final Acceptance、push、deploy 或 release。`16` 个“旁证待解析”是当前 unsupported evidence
+schema 的真实边界，不应回退成含糊的 Runs coverage failure，也不得通过邻近文件或 filename 猜测补齐。
+
 ## Assessment
 
 该 slice 已满足“逐生成视频查看用于判断的详细信息”这一工程目标：操作员能在一个真实 attempt 视图中
