@@ -588,6 +588,7 @@ img { display: block; }
 .external-prompt span { color: #8e98a5; font-size: 9px; font-weight: 700; text-transform: uppercase; }
 .external-prompt p { margin: 7px 0 0; color: #d2d7dd; font-size: 11px; line-height: 1.65; white-space: pre-wrap; }
 .shot-breakdown { margin: 18px 28px 28px; padding: 18px; border: 1px solid #34424e; border-radius: 5px; background: #0b151e; }
+.readiness-pane > .shot-breakdown, .workspace-overview > .shot-breakdown { margin: 22px 0 8px; }
 .shot-breakdown__heading, .shot-breakdown__heading > div { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .shot-breakdown__heading > div { justify-content: flex-start; }
 .shot-breakdown__heading svg { color: #8f7ef4; }

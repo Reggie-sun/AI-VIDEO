@@ -182,6 +182,63 @@ test("video library rail renders one unified source selector", async () => {
   }
 });
 
+test("Runs attempt keeps the inline player and Project Shot breakdown in the main detail row", async () => {
+  const server = await createServer({
+    root: fileURLToPath(new URL("..", import.meta.url)),
+    server: { middlewareMode: true },
+    appType: "custom",
+    optimizeDeps: { noDiscovery: true },
+  });
+  try {
+    const { RunsAttemptView, RunsWorkspaceView } = await server.ssrLoadModule("/src/App.jsx");
+    assert.equal(typeof RunsAttemptView, "function");
+    assert.equal(typeof RunsWorkspaceView, "function");
+    const attempt = {
+      attempt_id: "attempt-inline-video",
+      status: "running",
+      phase: "validate",
+      mode: "text_to_video",
+      target_shot_id: "shot-1",
+      prompt_text: "sealed prompt",
+      fetched_media: {
+        token: "fetched-video-token",
+        mime_type: "video/mp4",
+        bytes: 1234,
+        source_kind: "fetched_evidence",
+      },
+    };
+    const detail = {
+      workspace: "demo/project.yaml",
+      manifest: { revision: 1 },
+      project: { title: "Demo" },
+      shots: [{ shot_id: "shot-1", intent: "Show the result", revision: 1 }],
+      attempts: [attempt],
+    };
+    const markup = renderToStaticMarkup(React.createElement(RunsAttemptView, {
+      detail,
+      attempt,
+      selectedAttemptId: attempt.attempt_id,
+      onSelectAttempt() {},
+      onEvidence() {},
+      continuityContent: null,
+    }));
+
+    assert.match(markup, /<video[^>]+src="\/api\/runs\/media\/fetched-video-token"[^>]*controls/);
+    assert.match(markup, /<div class="readiness-pane">[\s\S]*<section class="shot-breakdown"[\s\S]*<\/div><aside class="detail-aside">/);
+    assert.doesNotMatch(markup, /<section class="action-bar">[\s\S]*<section class="shot-breakdown"/);
+
+    const workspaceMarkup = renderToStaticMarkup(React.createElement(RunsWorkspaceView, {
+      detail: { ...detail, attempts: [] },
+      selectedAttemptId: "",
+      onSelectAttempt() {},
+    }));
+    assert.match(workspaceMarkup, /<section class="workspace-overview">[\s\S]*<section class="shot-breakdown"/);
+    assert.doesNotMatch(workspaceMarkup, /<section class="action-bar workspace-action-bar">[\s\S]*<section class="shot-breakdown"/);
+  } finally {
+    await server.close();
+  }
+});
+
 test("default external media sources include the AI-VIDEO experiments directory", () => {
   assert.deepEqual(configuredExternalMediaSources({ repoRoot: "/repo", homeRoot: "/home/operator" }), [
     { id: "artifacts", label: "AI-VIDEO Artifacts", kind: "development_artifact", root: "/repo/artifacts" },

@@ -285,7 +285,7 @@ function WorkspaceMediaGrid({ media = [], limit = 12 }) {
   );
 }
 
-function WorkspaceOverview({ detail }) {
+function WorkspaceOverview({ detail, projectShotsContent }) {
   const shots = detail?.shots || [];
   const operations = detail?.operation_summary || [];
   const media = detail?.workspace_media || [];
@@ -303,6 +303,7 @@ function WorkspaceOverview({ detail }) {
           <div><span>镜头</span><strong>{shots.length}</strong></div>
           <div><span>Registry 媒体</span><strong>{media.length}{detail?.workspace_media_truncated ? "+" : ""}</strong></div>
         </div>
+        {projectShotsContent}
         <section className="workspace-overview-section">
           <h2>Manifest 操作</h2>
           <div className="operation-list">
@@ -324,7 +325,7 @@ function WorkspaceOverview({ detail }) {
   );
 }
 
-function DetailPane({ detail, attempt, onEvidence, continuityContent }) {
+function DetailPane({ detail, attempt, onEvidence, continuityContent, projectShotsContent }) {
   const provider = providerOf(attempt);
   const output = outputOf(attempt);
   const shot = shotForAttempt(detail, attempt);
@@ -351,6 +352,7 @@ function DetailPane({ detail, attempt, onEvidence, continuityContent }) {
             <li className="sequence-step"><div className={`sequence-marker sequence-marker--${tone}`}><StatusIcon tone={tone} size={24} /></div><div className="sequence-content"><div className="sequence-title-row"><h4>4. Attempt lifecycle</h4><span className={`ready-tag ready-tag--${tone}`}>{outcome.label}</span></div><p className="step-description">Raw status：{attempt?.status || "—"} · phase：{attempt?.phase || "—"}{attempt?.error_code ? ` · error code：${attempt.error_code}` : ""}</p><div className={`intent-box intent-box--${tone}`}><Info size={20} /><div><strong>状态不等于质量验收</strong><p>“成功”只表示该 lifecycle 已成功结束；fetched video、candidate、QA acceptance 与 activation 会分别标注。控制台不会推进任何状态。</p></div></div></div></li>
           </ol>
           {continuityContent}
+          {projectShotsContent}
         </div>
         <aside className="detail-aside">
           <section className="detail-section"><h3>Attempt lifecycle</h3><dl className="identity-list"><Fact label="结果" value={`${outcome.label} · ${attempt?.status || "—"}`} /><Fact label="Phase" value={attempt?.phase} /><Fact label="Error code" value={attempt?.error_code} /><Fact label="Started" value={formatTime(attempt?.started_at)} /><Fact label="Finished" value={formatTime(attempt?.finished_at)} /><Fact label="视频状态" value={mediaState.label} /></dl></section>
@@ -364,6 +366,51 @@ function DetailPane({ detail, attempt, onEvidence, continuityContent }) {
         <a className={`primary-action${mediaUrl(media) ? "" : " is-disabled"}`} href={mediaUrl(media) || undefined} target="_blank" rel="noreferrer" aria-disabled={!mediaUrl(media)}><Play size={20} weight="fill" />查看可播放视频</a>
         <button type="button" className="secondary-action" onClick={onEvidence}>查看证据 <ArrowSquareOut size={18} /></button>
       </section>
+    </>
+  );
+}
+
+export function RunsAttemptView({
+  detail,
+  attempt,
+  selectedAttemptId,
+  onSelectAttempt,
+  onEvidence,
+  continuityContent,
+}) {
+  const projectShotsContent = (
+    <ProjectShotBreakdown
+      detail={detail}
+      selectedAttemptId={selectedAttemptId}
+      onSelectAttempt={onSelectAttempt}
+    />
+  );
+  return (
+    <>
+      <ShotSummary detail={detail} attempt={attempt} />
+      <DetailPane
+        detail={detail}
+        attempt={attempt}
+        onEvidence={onEvidence}
+        continuityContent={continuityContent}
+        projectShotsContent={projectShotsContent}
+      />
+    </>
+  );
+}
+
+export function RunsWorkspaceView({ detail, selectedAttemptId, onSelectAttempt }) {
+  const projectShotsContent = (
+    <ProjectShotBreakdown
+      detail={detail}
+      selectedAttemptId={selectedAttemptId}
+      onSelectAttempt={onSelectAttempt}
+    />
+  );
+  return (
+    <>
+      <ShotSummary detail={detail} />
+      <WorkspaceOverview detail={detail} projectShotsContent={projectShotsContent} />
     </>
   );
 }
@@ -772,8 +819,8 @@ export function App() {
   if (loading && !detail) runsContent = <EmptyState title="正在读取 runs" detail="正在通过 canonical reader 打开本机工作区…" />;
   else if (error) runsContent = <EmptyState title="工作区不可用" detail={error} retry={refresh} />;
   else if (!detail) runsContent = <EmptyState title="没有 runs 工作区" detail="repository/runs 下没有可读取的 Production 或 Legacy 工作区。" retry={refresh} />;
-  else if (!attempt) runsContent = <><ShotSummary detail={detail} /><ProjectShotBreakdown detail={detail} selectedAttemptId={selectedId} onSelectAttempt={selectAttempt} /><WorkspaceOverview detail={detail} /></>;
-  else runsContent = <><ShotSummary detail={detail} attempt={attempt} /><DetailPane detail={detail} attempt={attempt} onEvidence={() => setEvidenceOpen(true)} continuityContent={continuityContent} /><ProjectShotBreakdown detail={detail} selectedAttemptId={selectedId} onSelectAttempt={selectAttempt} /></>;
+  else if (!attempt) runsContent = <RunsWorkspaceView detail={detail} selectedAttemptId={selectedId} onSelectAttempt={selectAttempt} />;
+  else runsContent = <RunsAttemptView detail={detail} attempt={attempt} selectedAttemptId={selectedId} onSelectAttempt={selectAttempt} onEvidence={() => setEvidenceOpen(true)} continuityContent={continuityContent} />;
 
   let externalContent;
   if (externalLoading && !externalCatalog) externalContent = <EmptyState title="正在扫描外部视频" detail="正在计算 exact SHA 并读取直接绑定的 JSON evidence…" />;
