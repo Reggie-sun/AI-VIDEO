@@ -1440,7 +1440,6 @@ def test_seedance_adapter_and_extended_contracts_route_to_video_provider_suite()
         "src/ai_video/production/seedance_asset.py",
         "src/ai_video/production/seedance_capabilities.py",
         "src/ai_video/production/seedance_profile.py",
-        "src/ai_video/production/remote_media.py",
         "src/ai_video/production/video_contracts.py",
         "tests/test_production_seedance.py",
     ):

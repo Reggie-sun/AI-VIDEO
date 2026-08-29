@@ -12,15 +12,12 @@ from urllib.parse import urlsplit
 from pydantic import (
     ConfigDict,
     Field,
-    SerializerFunctionWrapHandler,
     field_validator,
-    model_serializer,
     model_validator,
 )
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
-from ai_video.production.remote_media import RemoteMediaMaterializationReceipt
 from ai_video.production.commercial_video_contracts import (
     CommercialVideoBindingMixin,
     GeneratedCommercialShotBinding as GeneratedCommercialShotBinding,
@@ -1334,7 +1331,6 @@ class VideoFetchReceipt(_VideoStrictModel):
     size_bytes: int = Field(strict=True, gt=0)
     artifact_sha256: str = Field(pattern=_SHA256)
     fetched_at: datetime
-    remote_materialization: RemoteMediaMaterializationReceipt | None = None
     fetch_fingerprint: str = Field(pattern=_SHA256)
 
     @field_validator("fetched_at")
@@ -1344,36 +1340,11 @@ class VideoFetchReceipt(_VideoStrictModel):
 
     @model_validator(mode="after")
     def _validate_seal(self) -> "VideoFetchReceipt":
-        if self.remote_materialization is not None and (
-            self.remote_materialization.submission_fingerprint
-            != self.submission_fingerprint
-            or self.remote_materialization.paid_submit_receipt_fingerprint
-            != self.paid_submit_receipt_fingerprint
-            or self.remote_materialization.provider_file_id != self.provider_file_id
-            or self.remote_materialization.artifact_sha256 != self.artifact_sha256
-            or self.remote_materialization.artifact_size_bytes != self.size_bytes
-            or self.remote_materialization.artifact_mime_type != self.content_type
-            or self.remote_materialization.verified_at != self.fetched_at
+        if self.fetch_fingerprint != canonical_sha256(
+            self.model_dump(mode="json", exclude={"fetch_fingerprint"})
         ):
-            raise ValueError("remote media materialization does not match fetch receipt")
-        if self.fetch_fingerprint != canonical_sha256(self._fingerprint_payload()):
             raise ValueError("fetch_fingerprint does not match video fetch receipt")
         return self
-
-    def _fingerprint_payload(self) -> dict[str, object]:
-        data = self.model_dump(mode="json", exclude={"fetch_fingerprint"})
-        if self.remote_materialization is None:
-            data.pop("remote_materialization", None)
-        return data
-
-    @model_serializer(mode="wrap")
-    def _serialize_compatible_variant(
-        self, handler: SerializerFunctionWrapHandler
-    ) -> dict[str, object]:
-        data = handler(self)
-        if self.remote_materialization is None:
-            data.pop("remote_materialization", None)
-        return data
 
     @classmethod
     def create(
@@ -1385,7 +1356,6 @@ class VideoFetchReceipt(_VideoStrictModel):
         size_bytes: int,
         artifact_sha256: str,
         fetched_at: datetime,
-        remote_materialization: RemoteMediaMaterializationReceipt | None = None,
     ) -> "VideoFetchReceipt":
         if (
             observation.submission_fingerprint != submission.submission_fingerprint
@@ -1415,10 +1385,13 @@ class VideoFetchReceipt(_VideoStrictModel):
             "size_bytes": size_bytes,
             "artifact_sha256": artifact_sha256,
             "fetched_at": fetched_at,
-            "remote_materialization": remote_materialization,
         }
         candidate = cls.model_construct(**data, fetch_fingerprint="0" * 64)
-        data["fetch_fingerprint"] = canonical_sha256(candidate._fingerprint_payload())
+        data["fetch_fingerprint"] = canonical_sha256(
+            candidate.model_dump(
+                mode="json", exclude={"fetch_fingerprint"}, warnings=False
+            )
+        )
         return cls.model_validate(data)
 
 

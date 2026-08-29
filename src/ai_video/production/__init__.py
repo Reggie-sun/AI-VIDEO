@@ -257,15 +257,12 @@ from ai_video.production.commercial_image_import import (
 from ai_video.production.seedance_asset import (
     SeedanceAssetMaterializationReceipt,
     SeedanceAssetReferenceResolver,
-    SeedanceRemoteReferenceLease,
-    SeedanceRemoteReferenceResolver,
     SeedanceSyntheticImageAuthorizer,
     SeedanceSyntheticImageEgressPolicyReceipt,
     SeedanceSyntheticImageReceiptBinding,
     SeedanceSyntheticImageReferenceReceipt,
     SeedanceSyntheticImageReferenceResolver,
 )
-from ai_video.production.remote_media import RemoteMediaMaterializationReceipt
 from ai_video.production.video import (
     ContinuityArtifactIdentity,
     ContinuityConstraintSet,
@@ -533,8 +530,6 @@ __all__ = [
     "Scene",
     "SeedanceAssetMaterializationReceipt",
     "SeedanceAssetReferenceResolver",
-    "SeedanceRemoteReferenceLease",
-    "SeedanceRemoteReferenceResolver",
     "SeedanceSyntheticImageAuthorizer",
     "SeedanceSyntheticImageEgressPolicyReceipt",
     "SeedanceSyntheticImageReceiptBinding",
@@ -558,7 +553,6 @@ __all__ = [
     "ContinuityReferenceBinding",
     "HardCutKeyframeBinding",
     "ResolvedVideoGenerationRequest",
-    "RemoteMediaMaterializationReceipt",
     "TerminalFrameEvidence",
     "VideoFetchReceipt",
     "VideoGenerationPreview",
