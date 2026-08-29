@@ -3,11 +3,10 @@
 from __future__ import annotations
 
 import re
-import threading
 import unicodedata
 from datetime import datetime
 from enum import Enum
-from typing import BinaryIO, Callable, Iterable, Literal, Protocol
+from typing import BinaryIO, Iterable, Literal, Protocol
 from urllib.parse import urlsplit
 
 from pydantic import (
@@ -21,6 +20,7 @@ from pydantic import (
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.remote_media import RemoteMediaMaterializationReceipt
 from ai_video.production.commercial_video_contracts import (
     CommercialVideoBindingMixin,
     GeneratedCommercialShotBinding as GeneratedCommercialShotBinding,
@@ -1321,120 +1321,6 @@ class VideoTaskObservation(_VideoStrictModel):
             )
         )
         return cls.model_validate(data)
-
-
-class RemoteMediaMaterializationReceipt(_VideoStrictModel):
-    """Exact remote locator-to-byte binding without persisting the locator."""
-
-    schema_version: Literal["1"] = "1"
-    transport_kind: Literal["provider_output_https"]
-    provider_kind: str = Field(pattern=_SAFE_ID.pattern)
-    model_id: str = Field(pattern=_SAFE_ID.pattern)
-    submission_fingerprint: str = Field(pattern=_SHA256)
-    paid_submit_receipt_fingerprint: str = Field(pattern=_SHA256)
-    provider_file_id: str = Field(pattern=_SAFE_ID.pattern)
-    remote_origin: str
-    remote_locator_sha256: str = Field(pattern=_SHA256)
-    artifact_sha256: str = Field(pattern=_SHA256)
-    artifact_size_bytes: int = Field(strict=True, gt=0)
-    artifact_mime_type: Literal["video/mp4", "video/quicktime"]
-    accessibility_verification: Literal["exact_get"]
-    verified_at: datetime
-    content_hash: str = Field(pattern=_SHA256)
-
-    @field_validator("remote_origin")
-    @classmethod
-    def _canonical_origin(cls, value: str) -> str:
-        return _canonical_https_origin(value)
-
-    @field_validator("verified_at")
-    @classmethod
-    def _aware_time(cls, value: datetime) -> datetime:
-        return _require_aware(value, "remote media materialization timestamp")
-
-    @model_validator(mode="after")
-    def _validate_seal(self) -> "RemoteMediaMaterializationReceipt":
-        if self.content_hash != canonical_sha256(
-            self.model_dump(mode="json", exclude={"content_hash"})
-        ):
-            raise ValueError("remote media materialization receipt seal does not match")
-        return self
-
-    @classmethod
-    def create(cls, **values: object) -> "RemoteMediaMaterializationReceipt":
-        data = dict(values)
-        data.setdefault("schema_version", "1")
-        data.pop("content_hash", None)
-        candidate = cls.model_construct(**data, content_hash="0" * 64)
-        data["content_hash"] = canonical_sha256(
-            candidate.model_dump(
-                mode="json", exclude={"content_hash"}, warnings=False
-            )
-        )
-        return cls.model_validate(data)
-
-
-_REMOTE_REFERENCE_REFRESH_PERMIT_TOKEN = object()
-
-
-class _RemoteReferenceRefreshPermit:
-    """Process-local one-use proof that Service reopened an activated source."""
-
-    __slots__ = ("_binding", "_durability_validator", "_consumed", "_lock")
-
-    def __init__(
-        self,
-        token: object,
-        *,
-        submission_fingerprint: str,
-        observation_fingerprint: str,
-        fetch_fingerprint: str,
-        materialization_receipt_id: str,
-        durability_validator: Callable[[], bool],
-    ) -> None:
-        if token is not _REMOTE_REFERENCE_REFRESH_PERMIT_TOKEN:
-            raise TypeError(
-                "Remote reference refresh permits are minted only by VideoGenerationService."
-            )
-        self._binding = (
-            submission_fingerprint,
-            observation_fingerprint,
-            fetch_fingerprint,
-            materialization_receipt_id,
-        )
-        self._durability_validator = durability_validator
-        self._consumed = False
-        self._lock = threading.Lock()
-
-    def _consume(
-        self,
-        *,
-        submission_fingerprint: str,
-        observation_fingerprint: str,
-        fetch_fingerprint: str,
-        materialization_receipt_id: str,
-    ) -> bool:
-        binding = (
-            submission_fingerprint,
-            observation_fingerprint,
-            fetch_fingerprint,
-            materialization_receipt_id,
-        )
-        with self._lock:
-            if (
-                self._consumed
-                or binding != self._binding
-                or not self._durability_validator()
-            ):
-                return False
-            self._consumed = True
-            return True
-
-    def _durability_is_current(self) -> bool:
-        return self._consumed and self._durability_validator()
-
-    def __reduce__(self) -> object:
-        raise TypeError("Remote reference refresh permits cannot be serialized.")
 
 
 class VideoFetchReceipt(_VideoStrictModel):

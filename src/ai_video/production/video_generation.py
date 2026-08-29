@@ -24,9 +24,11 @@ from ai_video.production.paid_provider import (
     PaidProviderSubmitOutcome,
     PaidProviderSubmitReceipt,
 )
-from ai_video.production.video import (
+from ai_video.production.remote_media import (
     _REMOTE_REFERENCE_REFRESH_PERMIT_TOKEN,
     _RemoteReferenceRefreshPermit,
+)
+from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
     VideoFetchReceipt,
     VideoProvider,

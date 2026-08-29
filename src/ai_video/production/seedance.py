@@ -29,6 +29,10 @@ from ai_video.production.paid_provider import (
     PaidProviderSubmitReceipt,
     validate_paid_provider_authorization,
 )
+from ai_video.production.remote_media import (
+    _RemoteReferenceRefreshPermit,
+    RemoteMediaMaterializationReceipt,
+)
 from ai_video.production.state_commit import _DurablePaidProviderSubmitPermit
 from ai_video.production.seedance_capabilities import (
     SEEDANCE_MODEL_IDS,
@@ -48,8 +52,6 @@ from ai_video.production.seedance_asset import (
     SeedanceSyntheticImageReferenceResolver,
 )
 from ai_video.production.video import (
-    _RemoteReferenceRefreshPermit,
-    RemoteMediaMaterializationReceipt,
     ResolvedVideoGenerationRequest,
     VideoFetchReceipt,
     VideoFlexibleOutputRequirement,

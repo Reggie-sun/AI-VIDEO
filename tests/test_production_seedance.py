@@ -381,7 +381,7 @@ def _accepted_receipt(resolved, paid_preview, *, task_id: str = "task-seedance-1
 
 
 def _remote_refresh_permit(submission, observation, fetch_receipt):
-    video_module = importlib.import_module("ai_video.production.video")
+    video_module = importlib.import_module("ai_video.production.remote_media")
     materialization = fetch_receipt.remote_materialization
     assert materialization is not None
     return video_module._RemoteReferenceRefreshPermit(

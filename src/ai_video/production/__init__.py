@@ -265,12 +265,12 @@ from ai_video.production.seedance_asset import (
     SeedanceSyntheticImageReferenceReceipt,
     SeedanceSyntheticImageReferenceResolver,
 )
+from ai_video.production.remote_media import RemoteMediaMaterializationReceipt
 from ai_video.production.video import (
     ContinuityArtifactIdentity,
     ContinuityConstraintSet,
     ContinuityReferenceBinding,
     HardCutKeyframeBinding,
-    RemoteMediaMaterializationReceipt,
     ResolvedVideoGenerationRequest,
     TerminalFrameEvidence,
     VideoFetchReceipt,

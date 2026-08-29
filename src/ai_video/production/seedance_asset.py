@@ -29,8 +29,8 @@ from ai_video.production.paid_provider import (
     PaidProviderAuthorizationDecision,
     PaidProviderCallPreview,
 )
+from ai_video.production.remote_media import RemoteMediaMaterializationReceipt
 from ai_video.production.video import (
-    RemoteMediaMaterializationReceipt,
     ResolvedVideoGenerationRequest,
     VideoImageReferenceBinding,
     VideoMediaReferenceBinding,
