@@ -794,6 +794,8 @@ candidate was independently adjudicated `CONFIRM` under the accepted v2 delegate
 `docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.accepted.json`。This clears the
 package exact-acceptance blocker only；B-D0 remains blocked on current execution-gate/evidence-path proof and this does not
 authorize retry, additional Shots, M6-D, P6 or Final Acceptance。
+The acceptance content first entered history at commit `02b03f65e09f0135c71bb8ee4e1ff1653fdf5167`；the later
+task-owned finalization checkpoint only refreshes exact closure evidence after an unrelated concurrent HEAD advance。
 
 Stop immediately and report rather than expanding scope when：
 

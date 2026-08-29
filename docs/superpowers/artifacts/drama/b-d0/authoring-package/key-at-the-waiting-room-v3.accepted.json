@@ -48,6 +48,11 @@
     "decision_source_sha256": "a1e309df0d27b364c2d9c3256d123b6719217431649dae50cb19e80766094988",
     "rationale": "Exact candidate identity and all lineage bindings were reopened without drift; all nine required DRAMA-AUTH requirements are PASS; no media verdict exists; the independent xhigh reviewer accepted with no issues; mandatory candidate and authority Harness receipts passed; the accepted scope remains documentation-only."
   },
+  "acceptance_checkpoint_lineage": {
+    "acceptance_content_commit": "02b03f65e09f0135c71bb8ee4e1ff1653fdf5167",
+    "acceptance_content_commit_message": "docs: accept exact drama authoring package",
+    "finalization_reason": "An unrelated concurrent commit advanced main immediately after the acceptance content commit, so a separate task-owned tip checkpoint is used for fresh exact-range closure verification without rewriting either commit."
+  },
   "independent_review_evidence": {
     "reviewer_role": "reviewer",
     "reviewer_tier": "xhigh",

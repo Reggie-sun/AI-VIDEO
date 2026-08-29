@@ -14,8 +14,12 @@ Primary agent重新打开commit `1175c8270ffba6ff136d54cc0eb9390a96d6bf29`中SHA
 exact blob/size/SHA、全部lineage、九个required `DRAMA-AUTH-*` PASS、无media verdict、independent
 `reviewer_xhigh=accept`与exact-range Harness evidence后，自主给出`CONFIRM`。Acceptance envelope：
 
+Acceptance content commit为`02b03f65e09f0135c71bb8ee4e1ff1653fdf5167`（`docs: accept exact drama authoring
+package`）。该commit后有unrelated concurrent writer推进`main`，因此后续以只含当前task-owned paths的
+tip finalization checkpoint生成fresh exact-range closure receipt，不重写任何已有commit。
+
 - `docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.accepted.json`；
-- SHA-256 `e36a1338fcec94fc6b3a7ecae08bfaab3ee6f54d6d91c065c986eefa02913edd`；
+- SHA-256 `f81365c1d084d6c096d7bcbf83c06beff75100f34b6ed90bafc9341dfb247cac`；
 - `B-D0 = BLOCKED_BEFORE_MEDIA`，remaining blocker为
   `CURRENT_EXECUTION_GATES_AND_EXACT_EVIDENCE_PATH_NOT_VERIFIED`；
 - `M6-D Drama = NOT_EVALUATED`；

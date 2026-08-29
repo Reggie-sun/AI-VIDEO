@@ -34,7 +34,7 @@ V2 authority overlay已绑定下文immutable preimage与用户委托source。Pri
 authoring-package v3的exact commit/blob/size/SHA、lineage、authoring requirements、independent review与Harness
 evidence，给出`CONFIRM`并写入
 `docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.accepted.json`
-（SHA-256 `e36a1338fcec94fc6b3a7ecae08bfaab3ee6f54d6d91c065c986eefa02913edd`）。因此：
+（SHA-256 `f81365c1d084d6c096d7bcbf83c06beff75100f34b6ed90bafc9341dfb247cac`）。因此：
 
 - authoring-package v3的documentation acceptance/seal已完成；
 - `B-D0 — Drama owner prerequisite = BLOCKED_BEFORE_MEDIA`，remaining blocker为

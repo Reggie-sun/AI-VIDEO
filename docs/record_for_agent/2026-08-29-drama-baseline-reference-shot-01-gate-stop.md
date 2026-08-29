@@ -15,11 +15,13 @@ Date: 2026-08-29
 historical。Primary agent已根据用户委托的accepted v2 documentation-authority overlay自主确认exact
 package candidate，acceptance envelope为
 `docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.accepted.json`，SHA-256
-`e36a1338fcec94fc6b3a7ecae08bfaab3ee6f54d6d91c065c986eefa02913edd`。Current state：
+`f81365c1d084d6c096d7bcbf83c06beff75100f34b6ed90bafc9341dfb247cac`。Current state：
 authoring package已accepted/sealed；`B-D0=BLOCKED_BEFORE_MEDIA`，remaining blocker为
 `CURRENT_EXECUTION_GATES_AND_EXACT_EVIDENCE_PATH_NOT_VERIFIED`；`M6-D=NOT_EVALUATED`。原baseline reference
 取得过程、media identity与当时gate-stop作为
 historical evidence保留；本次supersession不授权任何Provider/media/P6行为。
+Package acceptance content commit为`02b03f65e09f0135c71bb8ee4e1ff1653fdf5167`；后续tip finalization只用于
+在unrelated concurrent HEAD advance后重建fresh exact-range closure proof，不改变本记录的media gate-stop事实。
 
 ## Supersession Notice — 2026-08-29 Reference Review PASS
 
