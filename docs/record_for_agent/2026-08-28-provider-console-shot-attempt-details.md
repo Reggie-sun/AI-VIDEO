@@ -607,6 +607,75 @@ adapter 或历史 backfill 必须继续要求 exact SHA/path 与完整 chain，�
 执行 Provider submit、媒体生成、paid/cloud call、push、deploy 或 release。Project-local Agent Memory 查询
 返回 stale last-good fragments 并已由其 owner 排队后台 refresh；本 session 没有等待、重试或手工重建索引。
 
+## Exact Runs Context Recovery For External Media — 2026-08-29
+
+本 follow-up 实施了上方诊断提出的 presentation 决策，并取代“External rail 统一显示 `N/E`”这一
+current-facing UI 状态。External 仍保持 non-canonical、read-only evidence observer；新实现只用 exact
+`SHA-256 + bytes` 将 External group 与 canonical Runs output 关联，绝不把 Runs lifecycle、candidate、QA、
+P6、Final Acceptance 或 activation 写回 External truth。
+
+当前 live catalog 为 `406` 个 unique SHA groups。只读索引扫描 `132` 个 catalogued Runs workspaces：
+
+- `127` 个通过 strict reopen，投影 `79` 个 candidate/fetched media bindings；
+- `5` 个历史 rejected-preflight、pytest 或旧无效 Production workspace 返回 sanitized `status=invalid`；
+- External 中 `43` 个 groups 与 Runs output exact identity 匹配；`43/43` 可恢复 exact Prompt、generation
+  type 与 target Shot；
+- `42/43` 具有 verified structured Shot snapshot，可以显示画面脚本、对白、旁白、策略与 sealed Prompt；
+- 最新 Drama SHA `6a9e0504fe946c7320b93895c66e8c5423db7cc1eff0f46bbe9e7b3712259331`
+  只有 exact Prompt、`T2V` 与 `drama-shot-waiting-room-001`，`shot_snapshot_status=unavailable`。UI 将其
+  标为“实际提交 Prompt”，并明确不从 Prompt 反推分镜脚本。
+
+Rail 不再使用含糊的 `N/E` badge，而是显示并可筛选“已关联 / 证据不完整 / 无绑定证据 / 证据冲突”。
+当前因 5 个 workspace 无法 strict reopen，索引是 partial-but-trusted：`88` 个 groups 已关联（原有
+`45` 个 supported External evidence + `43` 个 exact Runs matches），其余 `318` 个保持“证据不完整”，
+`0` 个声称“无绑定证据”。只有 trusted 且 `complete=true` 的 Runs index 才能对未匹配 group 使用
+“无绑定证据”；initial loading、refresh、API unavailable 与 partial index 都 fail closed 为“证据不完整”。
+
+实现边界：
+
+- `src/ai_video/provider_console_media_index.py` 是独立 read-only cross-workspace index owner，复用
+  `catalog_runs()` 与 `project_workspace_detail()`；不读取 raw Manifest 旁路 strict reopen，也不保存第二份
+  lifecycle。
+- `GET /api/runs/media-context-index` 为 loopback、GET-only、sanitized projection。首次 current live rebuild
+  实测约 `17.8–20.8s`，同进程 cache hit 为 `0.00s`。
+- Runs change feed 使 cache generation 失效；single-flight rebuild 不并发启动多个全量 Python scan，且
+  invalidation 前的原 caller 与 joining caller 都等待并返回 fresh generation。
+- React 在 refresh 开始立即撤下旧 Runs context，latest-request guard 阻止旧响应覆盖新状态；同一个 App
+  state 同时约束 rail 筛选与右侧 detail，避免选中卡片被隐藏而详情仍显示旧视频。
+- 多个 exact bindings 只有 target Shot ID/revision/content hash、generation type、Prompt、snapshot status 与
+  snapshot content hash 语义一致时才可共享显示；否则明确标为 `Runs 关联冲突`，不得选择“最新”记录。
+
+Live browser verification：
+
+- Chrome 确认筛选计数为 `已关联 (88)`、`证据不完整 (318)`、`无绑定证据 (0)`，页面没有 `N/E` badge，
+  并显示 `5` 个 workspace 无法严格重开的 partial-index warning。
+- Drama external video 显示 exact Prompt、`T2V`、target Shot 与 snapshot-unavailable boundary；视频
+  `readyState=4`、`error=null`、`duration=5.166667`。
+- `ai_video_shot_continuity_m0_d1908a513df0e221_00002-audio.mp4` 显示
+  `rainy-station-4`、`FL2V`、verified 分镜脚本与 Prompt，视频 `readyState=4`、`error=null`。
+- 从“已关联”切到“无绑定/不完整”筛选时，selected card 与右侧 detail 同步改变；Chrome console 无
+  warning/error。
+
+Verification 与 publication state：
+
+- Provider Console Node contracts：`69 passed`；Provider Console Python projection：`35 passed`；Vite
+  production build：`4582 modules transformed`；`git diff --check` 通过。
+- Native `reviewer_xhigh` 在修复 invalid workspace、stale response、single-flight invalidation、filter/detail
+  ownership 与 pending/partial absence semantics 后最终 verdict 为 `accept`，无 blocking issue 或 concern。
+- Implementation commit：`387d5d26d2bb5ffc7186fd110bc89ae77e8e1705`；Harness routing commit：
+  `f274bdd83374681e9c92ada13d14f785625dc78d`。
+- 首次 exact-range Harness 在 policy audit 因两个新路径尚未映射而 fail closed，未运行后续 expensive checks；
+  随后的最小 policy routing 将新 source/test 归入既有 `provider_console` owner。
+- 最终 exact range：
+  `02b03f65e09f0135c71bb8ee4e1ff1653fdf5167..f274bdd83374681e9c92ada13d14f785625dc78d`；
+  receipt：`.agent/harness/runs/provider-console-runs-context-20260829-v2/receipt.json`。Receipt 内
+  Architecture Gate PASS、Harness `204 passed`、Provider Console Python `35 passed`、Node `69 passed`、
+  Vite build 通过；verification 的 `passed`、`fresh`、`fresh_for_snapshot`、`scope_paths_match`、
+  `scope_worktree_clean`、`complete_completion_proof`、`integrity` 与 `artifact_integrity` 全部为 `true`。
+
+本恢复只形成 local `main` commits 和本地 Vite live proof；没有 Provider submit、paid/cloud call、媒体生成
+或修改、Manifest mutation、candidate activation、P6、Final Acceptance、push、deploy 或 release。
+
 ## Assessment
 
 该 slice 已满足“逐生成视频查看用于判断的详细信息”这一工程目标：操作员能在一个真实 attempt 视图中
