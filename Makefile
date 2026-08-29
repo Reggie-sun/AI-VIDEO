@@ -3,9 +3,9 @@ HEAD_REF ?= HEAD
 RECEIPT ?=
 RUN_ID ?=
 
-.PHONY: frontend harness-inspect harness-verify harness-verify-range harness-receipt harness-audit harness-repository harness-test
+.PHONY: reload harness-inspect harness-verify harness-verify-range harness-receipt harness-audit harness-repository harness-test
 
-frontend:
+reload:
 	cd provider-console && npm run dev -- --host 127.0.0.1
 
 harness-inspect:
