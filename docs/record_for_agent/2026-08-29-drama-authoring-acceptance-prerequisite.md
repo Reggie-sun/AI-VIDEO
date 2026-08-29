@@ -2,6 +2,18 @@
 
 Date: 2026-08-29
 
+## Supersession Notice — 2026-08-29 Baseline Accepted
+
+下方`Current Status Truth`与`Remaining Blockers And Next Work`中“baseline仍blocked / 下一步取得reference”的描述
+现为historical。Current user已接受commit `f9329547c0f59111838b64fafa7b7261ddfce991`中SHA-256
+`bab68c8e43a36e33e12d8c3c5b8e0aea683db2b9889e8ef417a261ca77fd06bb`的exact baseline-selection payload；
+独立acceptance envelope已在commit `db03d6154c4b2f00c1baf0dd6c48b1a32011c209`形成，envelope SHA-256为
+`3056fd344cc2485fe6ddf089d7d50d6461b27b62756f293c9b1968d69a5d08f5`。
+
+当前唯一remaining prerequisite是
+`docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.proposed.json`的exact acceptance。
+在该package另行accepted/sealed前，`B-D0=BLOCKED_BEFORE_MEDIA`、`M6-D=NOT_EVALUATED`仍不变。
+
 ## Purpose
 
 本文记录dual-domain Shot-to-H3 continuity plan的`B-D0 — Drama owner prerequisite` documentation checkpoint，

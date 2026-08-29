@@ -21,6 +21,18 @@ Current baseline-selection candidate为
 `docs/superpowers/artifacts/drama/b-d0/baseline-selection/key-at-the-waiting-room-v3.proposed.json`。它仍需current
 user对其exact committed bytes单独accept；在此之前`B-D0=BLOCKED_BEFORE_MEDIA`、`M6-D=NOT_EVALUATED`不变。
 
+## Supersession Notice — 2026-08-29 Baseline Selection Accepted
+
+Current user随后确认exact baseline-selection candidate commit `f9329547c0f59111838b64fafa7b7261ddfce991`、SHA-256
+`bab68c8e43a36e33e12d8c3c5b8e0aea683db2b9889e8ef417a261ca77fd06bb`。Acceptance envelope位于
+`docs/superpowers/artifacts/drama/b-d0/baseline-selection/key-at-the-waiting-room-v3.accepted.json`，commit
+`db03d6154c4b2f00c1baf0dd6c48b1a32011c209`，SHA-256
+`3056fd344cc2485fe6ddf089d7d50d6461b27b62756f293c9b1968d69a5d08f5`。
+
+Baseline现为`ACCEPTED`；current remaining blocker只剩new exact authoring-package candidate尚未accepted。该变化不
+retroactively创建formal `DRAMA-MEDIA-*` verdict，也不改变`M6-D=NOT_EVALUATED`。在package另行accepted前，
+`B-D0=BLOCKED_BEFORE_MEDIA`。
+
 ## Purpose
 
 本文记录dual-domain Shot-to-H3 continuity plan的独立Drama baseline-reference acquisition checkpoint。用户明确要求
@@ -33,12 +45,12 @@ composition、P6或Final Acceptance。
 
 ## Current Gate Truth
 
-- `B-D0 = BLOCKED_BEFORE_MEDIA`；accepted Drama spec与fixture不变，baseline与authoring package仍未exact
-  accepted/sealed。
+- `B-D0 = BLOCKED_BEFORE_MEDIA`；Drama spec、fixture与baseline selection已accepted，authoring-package v3
+  candidate仍未exact accepted/sealed。
 - reference-review layer：exact Shot 1为current-user `HUMAN_PASS`，只可作为usable baseline-reference component。
 - `M6-D Drama = NOT_EVALUATED`；本reference不是M6-D candidate，formal `DRAMA-MEDIA-*` findings没有取得PASS。
 - `M6-C Commercial = HUMAN_FAIL`；本地Drama reference不改变或继承Commercial verdict。
-- minimum reference count已满足；本轮不需要、也未提交Shot 2。Baseline-selection candidate仍需exact acceptance。
+- minimum reference count已满足；本轮不需要、也未提交Shot 2。当前只剩authoring-package v3 exact acceptance。
 - M7–M9继续deferred；单个technical PASS或reference bytes不能解除dual-domain gate。
 
 ## Exact Generation Identity
@@ -114,8 +126,9 @@ Whisper small返回两段中文transcription：`要是还在`与`回去一起开
 - `DRAMA-MEDIA-SHOT-EMOTION-001`。
 
 在initial gate时，exact HUMAN authority尚未完成，因此Per-Shot Post-Media Gate正确停止。后续current-user
-reference-review PASS只关闭baseline-reference component review，不补齐尚不存在的accepted baseline/package
-bindings；technical analyzer、contact sheet、single score或Agent visual observation仍不得替代formal HUMAN verdict。
+reference-review PASS只关闭baseline-reference component review，不补齐initial gate时尚不存在的accepted
+baseline/package bindings；technical analyzer、contact sheet、single score或Agent visual observation仍不得替代
+formal HUMAN verdict。
 
 ## Evidence Index
 
@@ -129,9 +142,10 @@ bindings；technical analyzer、contact sheet、single score或Agent visual obse
 四个rows属于同一attempt，不能计为四次independent evidence；technical、formal per-Shot HUMAN与reference-review
 proof layers不得互换。
 
-`distill-ai-video-learning` automatic evaluation结果为`no_candidate`。Evidence identity validator通过，但本topic
-只有一个`independence_key`、没有controlled multi-arm，也没有需要由本次evidence materially update的existing
-Learning Claim；因此不创建placeholder claim，不进入confirmation或adoption flow。
+`distill-ai-video-learning` automatic evaluation与baseline acceptance / package-candidate checkpoint后的re-evaluation
+结果均为`no_candidate`。Evidence identity validator通过，但本topic只有一个`independence_key`、没有controlled
+multi-arm，也没有需要由本次evidence materially update的existing Learning Claim；因此不创建placeholder claim，
+不进入confirmation或adoption flow。
 
 ## Runtime Restoration And Boundaries
 
@@ -145,9 +159,8 @@ audio replacement或bytes变化都会产生new SHA并要求新的HUMAN verdict�
 
 ## Remaining Work
 
-Shot 1 reference review已经PASS；minimum reference count因此满足，不需要为了流程完整性继续生成Shot 2/3。
-自然停止点改为current user对exact committed baseline-selection candidate bytes给出accept/revise/reject。只有
-baseline selection独立accepted后，才能生成引用accepted fixture与baseline的新SHA authoring package并请求单独
-acceptance；在package无`BLOCKER`且exact accepted前，B-D0仍不能解除blocker。
+Shot 1 reference review与baseline selection均已accepted；minimum reference count满足，不需要为了流程完整性继续
+生成Shot 2/3。自然停止点改为current user对new exact authoring-package candidate bytes给出
+accept/revise/reject。在package无`BLOCKER`且exact accepted前，B-D0仍不能解除blocker。
 
 本记录自身不是acceptance envelope，也不把generated reference、continuity plan或technical PASS写成Drama truth。

@@ -1,0 +1,161 @@
+{
+  "schema_version": "drama-authoring-package/3",
+  "record_kind": "drama_authoring_package",
+  "package_id": "drama.package.key-at-the-waiting-room",
+  "package_version": 3,
+  "status": "proposed",
+  "domain_id": "drama",
+  "contract_binding": {
+    "spec_path": "docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md",
+    "spec_commit": "01483ec1f434661984ca009fffa85960310dedd6",
+    "spec_sha256": "239573a700fe987eb76282cb3c89f4ee666721646ec90b4e1398527e65c6801b",
+    "contract_version": "drama-authoring-and-acceptance/1"
+  },
+  "authoring_profile": {
+    "profile_id": "drama-authoring-and-acceptance",
+    "profile_version": "1",
+    "profile_path": "docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md",
+    "profile_sha256": "239573a700fe987eb76282cb3c89f4ee666721646ec90b4e1398527e65c6801b"
+  },
+  "rubric": {
+    "rubric_id": "drama-authoring-and-acceptance",
+    "rubric_version": "1",
+    "rubric_path": "docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md",
+    "rubric_sha256": "239573a700fe987eb76282cb3c89f4ee666721646ec90b4e1398527e65c6801b"
+  },
+  "authoring_payload_source": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v1.blocked.json",
+    "commit": "3b436195e939f7bc8fff5999438e9018030a38fe",
+    "sha256": "6f77f095a4c034d50f776c6c8e2b58e744c7e1bd69fd6b6e836f3bcc7251060e",
+    "authoring_content_assessment": "PASS",
+    "inherited_content": [
+      "content-addressed authoring profile and rubric",
+      "Story, Scene, Character and ordered Shot revisions",
+      "prior-context and on-screen allocation",
+      "decision, appearance, wardrobe and prop continuity facts",
+      "exact dialogue, performance, blocking, eyeline and emotional progression",
+      "direct-continuity pair semantics and prop state chain",
+      "all nine DRAMA-AUTH requirement assessments",
+      "per-Shot, pairwise and whole-scene DRAMA-MEDIA requirement instances"
+    ],
+    "immutability_rule": "This package does not reinterpret or mutate the v1 semantic payload; any source SHA mismatch is a BLOCKER and requires a new package candidate."
+  },
+  "prior_package_lineage": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v2.blocked.json",
+    "commit": "061df5b0e2427c1fd72c3fd4d21a7443757db1b8",
+    "sha256": "7a1009bb221cd8fbe5d30f318acb5ba5c75bc111aacdfb7d0117a603ce058323",
+    "resolved_blockers": [
+      "BASELINE_EXACT_REFERENCE_MISSING",
+      "BASELINE_SELECTION_NOT_ACCEPTED"
+    ],
+    "remaining_blocker": "AUTHORING_PACKAGE_V3_EXACT_BYTES_NOT_ACCEPTED"
+  },
+  "fixture_selection_binding": {
+    "fixture_id": "drama.fixture.key-at-the-waiting-room",
+    "fixture_version": 1,
+    "accepted_payload_path": "docs/superpowers/artifacts/drama/b-d0/fixture-selection/key-at-the-waiting-room-v1.proposed.json",
+    "accepted_payload_commit": "3b436195e939f7bc8fff5999438e9018030a38fe",
+    "accepted_payload_sha256": "73a3a57e78859f8a508dd21cea3493a8d2a32ccb8a08c173a304b516fc5d34ab",
+    "acceptance_record_path": "docs/superpowers/artifacts/drama/b-d0/fixture-selection/key-at-the-waiting-room-v1.accepted.json",
+    "acceptance_record_commit": "3cb778a9dd4fa75a6c610bf8f16160d5de44831d",
+    "acceptance_record_sha256": "e2601e8ac7af4686c3a4290a05d956c87d8bcea73bc146f16bad4ee5fad52e1d",
+    "status": "accepted"
+  },
+  "baseline_selection_binding": {
+    "baseline_id": "drama.baseline.key-at-the-waiting-room",
+    "baseline_version": 3,
+    "accepted_payload_path": "docs/superpowers/artifacts/drama/b-d0/baseline-selection/key-at-the-waiting-room-v3.proposed.json",
+    "accepted_payload_commit": "f9329547c0f59111838b64fafa7b7261ddfce991",
+    "accepted_payload_sha256": "bab68c8e43a36e33e12d8c3c5b8e0aea683db2b9889e8ef417a261ca77fd06bb",
+    "acceptance_record_path": "docs/superpowers/artifacts/drama/b-d0/baseline-selection/key-at-the-waiting-room-v3.accepted.json",
+    "acceptance_record_commit": "db03d6154c4b2f00c1baf0dd6c48b1a32011c209",
+    "acceptance_record_sha256": "3056fd344cc2485fe6ddf089d7d50d6461b27b62756f293c9b1968d69a5d08f5",
+    "acceptance_record_byte_size": 3193,
+    "acceptance_record_git_blob_oid": "dffc9438d37bda9f5687acd492ff797a6646751a",
+    "status": "accepted"
+  },
+  "sealed_authoring_truth_candidate": {
+    "source_contract": "The exact v1 authoring payload is the immutable semantic source; the accepted fixture and baseline records above close its external selection bindings without changing Story, Scene, Character, Shot, requirement or applicability semantics.",
+    "domain_id": "drama",
+    "story_revision": "drama.story.return-the-key@1",
+    "scene_revision": "drama.scene.rainy-waiting-room@1",
+    "character_revisions": [
+      "drama.character.lin-lan@1",
+      "drama.character.lin-jun@1"
+    ],
+    "ordered_shot_revisions": [
+      "drama.shot.waiting-room.001@1",
+      "drama.shot.waiting-room.002@1",
+      "drama.shot.waiting-room.003@1"
+    ],
+    "format": {
+      "aspect_ratio": "16:9",
+      "resolution": "1344x768",
+      "frame_rate_fps": 24,
+      "scene_duration_seconds": "14.0-18.0; target 16.0",
+      "ordered_shot_count": 3
+    },
+    "coverage_grammar": "establish_offer -> question_and_choice -> acceptance_and_continuation",
+    "edit_grammar": "two straight cuts with direct continuity",
+    "authorized_release_semantics": [],
+    "payoff_required": true,
+    "continuation_required": true,
+    "cliffhanger_required": false,
+    "provider_native_wording": null,
+    "provider_selected": false
+  },
+  "requirement_catalog_binding": {
+    "authoring_required_ids": [
+      "DRAMA-AUTH-STORY-001",
+      "DRAMA-AUTH-RELATIONSHIP-001",
+      "DRAMA-AUTH-MOTIVATION-001",
+      "DRAMA-AUTH-DIALOGUE-001",
+      "DRAMA-AUTH-PERFORMANCE-001",
+      "DRAMA-AUTH-BLOCKING-001",
+      "DRAMA-AUTH-EMOTION-001",
+      "DRAMA-AUTH-PAYOFF-001",
+      "DRAMA-AUTH-COVERAGE-001"
+    ],
+    "authoring_assessment_source": "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v1.blocked.json#authoring_requirement_assessments",
+    "authoring_assessment": "PASS",
+    "media_requirement_instance_source": "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v1.blocked.json#media_requirement_instances",
+    "media_verdicts_created": false
+  },
+  "readiness": {
+    "authoring_content_assessment": "PASS",
+    "fixture_selection": "ACCEPTED",
+    "baseline_selection": "ACCEPTED",
+    "package_acceptance": "PENDING_EXACT_ACCEPTANCE",
+    "seal_readiness": "READY_PENDING_EXACT_ACCEPTANCE",
+    "b_d0_status": "BLOCKED_BEFORE_MEDIA",
+    "m6_d_status": "NOT_EVALUATED",
+    "blocking_reasons": [
+      "AUTHORING_PACKAGE_V3_EXACT_BYTES_NOT_ACCEPTED"
+    ]
+  },
+  "acceptance": {
+    "accepted_package_sha256": null,
+    "approver_authority_identity": null,
+    "accepted_at": null,
+    "acceptance_source_id": null,
+    "acceptance_source_sha256": null
+  },
+  "confirmation_effect_if_exactly_accepted": {
+    "package_status": "ACCEPTED_AND_SEALED",
+    "b_d0_reassessment": "All named prerequisite components would have exact accepted identities; B-D0 may then be promoted to PASS in the canonical continuity plan without entering M6-D.",
+    "m6_d_status": "NOT_EVALUATED",
+    "next_lane": "B-D Drama empirical execution remains a separate user-authorized runtime slice."
+  },
+  "forbidden_effects": [
+    "provider_selection",
+    "provider_native_prompt_authoring",
+    "comfyui_or_h3_execution",
+    "video_analysis",
+    "media_generation",
+    "automatic_retry_or_repair",
+    "manifest_or_registry_mutation",
+    "m6_d_or_dual_domain_pass_claim",
+    "p6_or_final_acceptance_claim",
+    "cross_lane_verdict_inheritance"
+  ]
+}
