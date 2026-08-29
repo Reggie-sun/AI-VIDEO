@@ -772,14 +772,15 @@ Execution is deliberately gated：
 | --- | --- | --- |
 | R0 — Commercial/shared reconnaissance | Complete；four-arm attribution + one handoff Shot + v13 30s recut + M6-C causal assembly | Supports incompatible-anchor attribution and visible holder transfer；Qingyan HUMAN watchability/commercial baseline FAIL；does not prove Drama or authorize productization |
 | A — Minimum offline hypothesis | Milestones 1–5 only | Proves exact typed causal intent plus compatible conditioning can reach one pilot adapter prompt；does not prove model quality |
-| B-D0 — Drama owner prerequisite | Accepted Drama spec、exact accepted/sealed fixture and baseline、无`BLOCKER`的sealed authoring package | Spec已accepted；fixture、baseline或package缺少exact acceptance/identity时仍为`BLOCKED_BEFORE_MEDIA`；this plan must not invent Drama acceptance |
+| B-D0 — Drama owner prerequisite | Accepted Drama spec、exact accepted/sealed fixture and baseline、无`BLOCKER`的sealed authoring package | Spec已accepted；fixture、baseline或package缺少exact acceptance/identity时仍为`BLOCKED_BEFORE_MEDIA`；其documentation candidate由用户或Spec委托的primary agent按exact fail-closed contract判定，this plan must not invent Drama acceptance |
 | B-D — Drama empirical lane | One bounded dramatic scene plus exact whole-scene HUMAN verdict | All applicable shared + Drama findings and Drama baseline must PASS；otherwise stop only this lane unless Shared Core failed |
 | B-C — Commercial empirical lane | Reopen only through a new accepted Commercial attempt；current Qingyan M6-C is HUMAN FAIL | All applicable shared + Commercial findings and source-quality baseline must PASS；old assembly cannot be repaired or expanded |
 | B-X — Dual-domain closure | Reopen both exact lane records against unchanged Shared Core identity | Both lanes PASS independently；one lane cannot qualify the other |
 | C — Productize dual-domain proven behavior | Milestones 7–9 | Add generic post-media enforcement、remaining adapters/qualification、routing/Harness only after B-X PASS |
 
-Current status is B-D0 `BLOCKED_BEFORE_MEDIA`（spec + fixture + baseline selection accepted；authoring-package v3
-candidate still requires exact acceptance）、B-D
+Current status is B-D0 `BLOCKED_BEFORE_MEDIA`（accepted v1 semantic spec + fixture + baseline selection已就绪；
+v2 delegated-authority overlay必须先以exact preimage获得promotion，authoring-package v3随后才能进入delegated
+primary-agent exact adjudication）、B-D
 `NOT_EVALUATED`、B-C `HUMAN_FAIL` and B-X `FAIL`。M7 pairwise
 post-media productization、M8 adapter/qualification expansion and M9 routing/Harness completion remain explicitly
 deferred。The existing v12/v13/M6-C bytes remain Commercial/shared regression evidence；none can be promoted to Drama
@@ -788,7 +789,7 @@ or dual-domain PASS by relabeling technical receipts。
 The local baseline-reference acquisition recorded in
 `docs/record_for_agent/2026-08-29-drama-baseline-reference-shot-01-gate-stop.md` is not M6-D execution。Current user has
 accepted both its exact Shot 1 reference component and the exact baseline-selection record；the new authoring-package v3
-candidate still requires separate exact-record acceptance。Those accepted reference bytes do not themselves seal the
+candidate still requires a separate exact-record acceptance envelope under the Drama Spec。Those accepted reference bytes do not themselves seal the
 authoring package, do not clear B-D0, and do not authorize retry, additional Shots, M6-D, P6 or Final Acceptance。
 
 Stop immediately and report rather than expanding scope when：

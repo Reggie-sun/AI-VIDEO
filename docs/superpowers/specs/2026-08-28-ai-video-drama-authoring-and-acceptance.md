@@ -1,36 +1,44 @@
 ---
 surface_id: drama_authoring_and_acceptance
-canonical: true
-spec_status: accepted
+canonical: false
+spec_status: proposed
 implementation_status: not_started
 live_status: not_run
 quality_status: not_evaluated
 release_status: unreleased
 runtime_status_owner: docs/v0.2-runtime-baseline.md
 roadmap_owner: docs/v0.2-agentic-production-roadmap.md
-contract_version: drama-authoring-and-acceptance/1
+contract_version: drama-authoring-and-acceptance/2
 ---
 
 # AI-VIDEO Drama Authoring And Acceptance Specification
 
 ## Status
 
-Accepted prerequisite contract。用户于`2026-08-29`明确选择`A`，接受commit
+Proposed v2 acceptance-authority overlay on the accepted v1 prerequisite contract。用户于`2026-08-29`
+明确选择`A`，接受commit
 `b546142289071b801a34ddab7e48f257f2235666`中SHA-256
 `1244b4d73f17f331353ba32cc9f37d3c2d8bf7222d62dfa85936e2601ec4735f`的exact semantic preimage；
-本次promotion只同步acceptance metadata、canonical registration与status wording，不改变该preimage的contract
-semantics。本文独立定义 Drama Story / Scene / Character / Shot authoring truth、
+当时promotion只同步acceptance metadata、canonical registration与status wording，不改变该preimage的contract
+semantics。当前proposed `drama-authoring-and-acceptance/2`只更改B-D0 prerequisite documentation artifacts的
+acceptance authority：用户已委托primary agent基于exact evidence独立判定`CONFIRM` / `REVISE` / `REJECT`，
+不再要求
+每个candidate等待额外用户手动确认。该变更不改变Story / Scene / Character / Shot、requirement、rubric、
+fixture、baseline或HUMAN media evidence semantics。本文独立定义 Drama Story / Scene / Character / Shot authoring truth、
 Drama requirement taxonomy、bounded fixture selection、baseline selection与development HUMAN acceptance；
 它不是 `docs/superpowers/plans/2026-08-27-ai-video-shot-to-h3-continuity-enforcement.md` 的附属 rubric，
 也不允许该 continuity plan 反向成为 Drama truth owner。
 
-本文已是accepted spec，但未接受或seal fixture、baseline与authoring package，未实现workflow/schema/runtime adapter，未执行
-HUMAN review。因此：
+V1 semantic/profile/rubric preimage仍是accepted identity；fixture与baseline selection已有exact accepted envelopes。
+V2 authority overlay必须先提交immutable preimage，再以本次用户委托的source ID/hash/timestamp与exact
+preimage commit/SHA进行promotion；在promotion前不得使用delegated authority接受authoring-package v3。
+未实现workflow/schema/runtime adapter，未执行HUMAN media review。因此：
 
 - `B-D0 — Drama owner prerequisite` 继续为 `BLOCKED_BEFORE_MEDIA`；
 - `M6-D Drama` 继续为 `NOT_EVALUATED`；
-- spec acceptance只解除Drama owner/rubric缺失这一项blocker，不接受任何尚不存在的artifact bytes；
-- 仍须另行接受并seal exact fixture、baseline与无`BLOCKER`的authoring package，才能满足完整B-D0 exit。
+- v1 spec acceptance只解除Drama owner/rubric缺失这一项blocker，不自动接受之后产生的artifact bytes；
+- fixture、baseline与无`BLOCKER`的authoring package仍必须分别形成content-addressed acceptance envelope，
+  但符合下文contract时由delegated primary agent自主签发。
 
 ## Goal
 
@@ -47,6 +55,7 @@ P6 / Final Acceptance verdict。
 - stable Drama requirement IDs、rubric versioning与applicability rules；
 - 一个`2–3` generated-Shot fixture的selection contract，但不选择fixture；
 - Drama cinematic/quality baseline的selection contract，但不选择baseline；
+- B-D0 prerequisite documentation artifacts的exact autonomous acceptance contract；
 - exact per-Shot、pairwise与whole-scene `1.0x` HUMAN development evidence authority；
 - Drama-only verdict aggregation、invalidation与stop rules。
 
@@ -59,6 +68,7 @@ media analyzer、Manifest writer、P6 review或Final Acceptance caller。
 | --- | --- | --- |
 | Drama Story / Scene / Character / Shot truth | 本Spec被明确accepted后定义的Drama authoring contract；future implementation只能忠实materialize该contract | continuity plan、Provider、adapter与evaluator不得补写或改写剧情事实 |
 | Drama narrative rubric与development HUMAN verdict | 本Spec的stable requirement catalog与future exact evidence records | 只产生Drama authoring/development evidence，不产生Production verdict |
+| B-D0 prerequisite documentation acceptance | 用户委托的primary agent，通过content-addressed acceptance envelope行使 | 只能在exact identity、required authoring PASS、independent review、Harness与scope boundary成立时签发；不能代替HUMAN media verdict |
 | Shared physical/perceptual continuity | Existing Shared Continuity Core、generic continuity/review contracts与其canonical owners | 可消费sealed Drama facts并验证identity、state、space、axis、action、gaze/audio bridge与camera endpoint；不拥有motivation、relationship causality、dialogue semantics、emotion或payoff |
 | Ecommerce authoring与commercial acceptance | `.agents/skills/ecommerce-ad-workflow/`与existing Ecommerce Gate 2 seam | Product Truth/claims、Hook、demo/proof、CTA、brand closure与commercial baseline不得进入Drama verdict |
 | Provider selection、native prompt与execution | Existing Router、selected adapter、Provider lifecycle与execution gates | 本Spec不选择model/profile，不生成prompt，不授权或执行media effect |
@@ -66,8 +76,10 @@ media analyzer、Manifest writer、P6 review或Final Acceptance caller。
 | Durable P6 / Final Acceptance | Existing P6 lifecycle与`ProductionStateCommitter` | Drama artifact、Skill、human reviewer或evaluator不得写Manifest、创建active `ReviewReceipt`、激活candidate或签发`FinalAcceptanceReceipt` |
 | Audience/business outcome | Future separately approved empirical owner | Drama development PASS不预测retention、continuation、audience success或release performance |
 
-`Old Path To Retire = none`。本文不删除、迁移或重解释historical Story、Character、Scene、Shot、
-`GenerationIntent`、review receipt、Manifest或media bytes。所有existing Product Runtime contracts保持不变。
+`Old Path To Retire = every B-D0 prerequisite documentation candidate waits for a new manual user Confirm`。
+该old path被下文delegated primary-agent adjudication取代；既有user-signed fixture/baseline envelopes仍保持有效。
+本文不删除、迁移或重解释historical Story、Character、Scene、Shot、`GenerationIntent`、review receipt、
+Manifest或media bytes。所有existing Product Runtime contracts保持不变。
 
 ## Drama Authoring Truth Contract
 
@@ -206,7 +218,8 @@ calibration与exact target；不得建立跨requirement或跨domain总分，也�
 ## Bounded Fixture Selection Contract
 
 本文只定义eligible fixture，不选择任何plot、asset、Shot或Provider。Future fixture selection必须在prompt
-authoring和media effect前获得separate explicit acceptance并seal exact identity。
+authoring和media effect前获得separate exact acceptance并seal identity；该acceptance可由用户签发，或由下文委托的
+primary agent按fail-closed contract签发。
 
 Eligible fixture必须：
 
@@ -244,6 +257,29 @@ source ID/hash与accepted record SHA。缺少exact accepted current record时bas
 为迁就anchor、Provider或first output而降低baseline、删除failed dimension或更换reference是new selection，
 会使该fixture attempt的existing acceptance evidence全部失效。任何required dimension低于baseline即`FAIL`，
 不得用其他dimension的PASS或aggregate score抵消。
+
+## Prerequisite Artifact Acceptance Authority
+
+用户已将B-D0 prerequisite documentation artifacts的exact acceptance判定委托给current primary agent。Agent
+必须自主给出`CONFIRM` / `REVISE` / `REJECT`，不得仅因candidate已进入确认阶段就再要求用户手动
+点击或回复`Confirm`。`CONFIRM`只能在以下条件全部成立时签发：
+
+1. candidate已在immutable commit中存在，exact path、Git blob OID、byte size与SHA-256已重新打开并匹配；
+2. spec、fixture、baseline、prior package与semantic source lineage全部可重新打开且绑定无漂移；
+3. 所有applicable required `DRAMA-AUTH-*`为`PASS`，无`BLOCKER`，且没有伪造media verdict；
+4. 独立native reviewer给出`accept`，无blocking issue；
+5. exact staged snapshot或immutable commit range的mandatory Harness通过，且receipt identity/integrity可验证；
+6. acceptance envelope必须durably绑定：delegation authority preimage commit/path/SHA与source ID/hash/timestamp；
+   adjudicator identity与decision timestamp；candidate commit/path/blob OID/byte size/SHA；independent reviewer
+   role/tier/verdict/evidence source ID/hash；Harness receipt path/file SHA、scope mode、base/head或staged snapshot identity与
+   verification result；
+7. acceptance envelope明确限定为对candidate exact bytes的documentation acceptance，不扩张到Provider、
+   prompt、media execution、HUMAN media verdict、M6-D、P6或Final Acceptance。
+
+任一条缺失、stale、mismatch或无法判定时不得`CONFIRM`：可修复的contract/content defect为`REVISE`，
+无法在accepted scope内成立为`REJECT`。Agent不得通过降低rubric、忽略identity、借用Commercial verdict或
+制造aggregate score来获得`CONFIRM`。本委托只适用于B-D0 prerequisite documentation artifacts；下文subjective
+Drama media acceptance仍是exact `1.0x` HUMAN authority。
 
 ## HUMAN Evidence Authority
 
@@ -296,7 +332,7 @@ Optional finding不能补偿required failure。Drama development acceptance不�
 
 ## Invalidation And Stop Rules
 
-1. 本Spec未明确accepted、fixture未accepted/sealed或baseline未accepted/sealed：保持
+1. 本Spec未accepted、fixture未accepted/sealed或baseline未accepted/sealed：保持
    `B-D0=BLOCKED_BEFORE_MEDIA`，不得选择prompt、Provider或生成media。
 2. 任一required authoring `BLOCKER`：停止于Drama authoring owner，不进入media。
 3. 任一required per-Shot `FAIL` / `NOT_EVALUATED`：停止M6-D且不得提交下一Shot；不自动retry/repair。
@@ -307,8 +343,10 @@ Optional finding不能补偿required failure。Drama development acceptance不�
 7. 一个Shot bytes或sealed authoring revision变化，至少使该Shot per-Shot evidence、两侧adjacent pairwise
    evidence、whole-scene evidence与baseline comparison失效；Story/Scene/Character/rubric/baseline变化按其
    declared coverage使所有受影响findings失效。
-   Authoring package、Drama profile/rubric、fixture-selection record、baseline-selection record或HUMAN
+   Authoring package、Drama semantic profile/rubric、fixture-selection record、baseline-selection record或HUMAN
    authorization任一bound identity变化时，所有引用旧identity的evidence一律stale，不得仅凭media SHA相同复用。
+   只改变documentation acceptance authority overlay且v1 semantic/profile/rubric SHA不变时，不得伪称
+   semantic identity已变；但新的delegated envelope必须绑定current accepted authority overlay。
 8. Shared Continuity Core finding失败时，返回smallest shared owner；若shared contract/compiler/conditioning
    identity改变，Drama与Commercial两条lane的applicable shared findings都必须重新验证。Drama rubric不自行修复shared owner。
 9. Drama与Commercial的fixture、baseline、requirement coverage与verdict互不继承。任一Commercial、Base AI Comic、
@@ -350,26 +388,29 @@ Development HUMAN PASS不等于candidate activation、P6、Final Acceptance、pu
 
 - Schema migration：`none`；
 - Runtime/data migration：`none`；
-- Old path retirement：`none`；
+- Old path retirement：后续B-D0 prerequisite documentation candidates不再等待新的manual user Confirm；
+  historical user-signed acceptance envelopes不受影响；
 - Historical artifact/hash reinterpretation：forbidden；
 - Rollback / supersession：必须保留本accepted preimage与acceptance lineage，并通过new exact spec version或明确
   supersession处理；不得删除historical evidence，也不得修改existing Product/Development state。
 
 ## Acceptance Of This Specification
 
-用户已对上方记录的exact semantic preimage给出明确acceptance；本文件现为`canonical: true` /
-`spec_status: accepted`并登记于repository documentation contract。Harness PASS、reviewer accept、commit或plan
-引用仍不能代替这次明确acceptance，也不能扩张到之后产生的fixture、baseline或authoring package bytes。
+用户已对v1 exact semantic preimage给出明确acceptance。当前文件中的v2 authority overlay仍是
+`canonical: false` / `spec_status: proposed`；只有它先获得immutable commit/path/SHA-256，再promotion并绑定本次
+用户委托的source ID/hash/timestamp后，才能成为current accepted overlay。Harness PASS、reviewer accept、commit或
+plan引用单独都不能自动产生artifact acceptance；primary agent必须重新打开exact evidence，作出独立
+判断并写入content-addressed acceptance envelope。
 
 Spec acceptance最多满足B-D0中的Drama owner/rubric prerequisite；以下仍是separate blockers：
 
-- exact bounded fixture的explicit selection、acceptance与seal；
-- exact Drama baseline的explicit selection、acceptance与seal；
+- exact bounded fixture的separate selection、acceptance与seal；
+- exact Drama baseline的separate selection、acceptance与seal；
 - required authoring package无`BLOCKER`；
 - current execution gates与exact evidence path可用。
 
-只有这些条件全部满足，continuity plan才能把B-D0从`BLOCKED_BEFORE_MEDIA`重新判定为PASS；该判定不由本文
-自我签发，也不授权M6-D media execution。
+只有这些条件全部满足，continuity plan才能把B-D0从`BLOCKED_BEFORE_MEDIA`重新判定为PASS；该状态更新
+必须引用exact acceptance envelopes，且不授权M6-D media execution。
 
 ## Verification Contract
 
@@ -394,11 +435,12 @@ python -m scripts.agent_harness policy-audit
 - baseline contract要求preselected exact identity、dimension floors与`1.0x` HUMAN comparison，不选择baseline；
 - per-Shot、pairwise、whole-scene HUMAN evidence分别绑定exact bytes、coverage与requirement-level verdict；
 - required `FAIL` / `NOT_EVALUATED` fail closed，任何repair/media change要求new SHA与fresh evidence；
+- B-D0 prerequisite documentation candidate只能在delegated primary-agent contract全部成立时自主
+  `CONFIRM`；subjective media verdict仍不得由Agent代签；
 - Drama、Shared Core、Ecommerce、Provider与Production/P6/Final Acceptance边界无duplicate owner；
 - 不宣称B-D0、M6-D、dual-domain、Production、P6、Final Acceptance或audience outcome PASS。
 
 ## Delivery Boundary
 
-完成本promotion只表示accepted Drama prerequisite spec及其canonical registration已形成并通过exact docs
-verification。它不表示fixture/baseline/authoring package已accepted或sealed，不表示B-D0已通过，也不授权进入
-M6-D empirical execution。
+本Spec的accepted state只表示Drama prerequisite contract及其canonical registration有效。它不自动接受
+fixture/baseline/authoring package，不自动产生B-D0 PASS，也不授权进入M6-D empirical execution。

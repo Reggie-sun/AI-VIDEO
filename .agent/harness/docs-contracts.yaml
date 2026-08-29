@@ -132,15 +132,15 @@ surfaces:
 
   - surface_id: drama_authoring_and_acceptance
     canonical_spec: docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md
-    canonical: true
-    spec_status: accepted
+    canonical: false
+    spec_status: proposed
     implementation_status: not_started
     live_status: not_run
     quality_status: not_evaluated
     release_status: unreleased
     runtime_status_owner: docs/v0.2-runtime-baseline.md
     roadmap_owner: docs/v0.2-agentic-production-roadmap.md
-    contract_version: drama-authoring-and-acceptance/1
+    contract_version: drama-authoring-and-acceptance/2
     implementation_paths: []
     test_paths: []
     harness_check_ids: []
@@ -151,6 +151,12 @@ surfaces:
       - type: text_contains
         path: docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md
         text: "Drama development acceptance不是Production Gate 2/P6/Final Acceptance"
+      - type: text_contains
+        path: docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md
+        text: "本委托只适用于B-D0 prerequisite documentation artifacts"
+      - type: text_contains
+        path: docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md
+        text: "Drama subjective acceptance的最终development authority只能是当前用户"
       - type: text_contains
         path: docs/agent-primary-contract-matrix.md
         text: "Drama Development authoring/rubric与exact HUMAN evidence contract"
