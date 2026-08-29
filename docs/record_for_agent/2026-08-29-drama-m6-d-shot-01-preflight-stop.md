@@ -168,3 +168,16 @@ layer asset，不能用empty graph、fake asset、baseline MP4或第二writer补
 
 本follow-up effects仍为零：未选择Provider，未写native prompt，未启动ComfyUI，未submit/fetch，未生成、repair或拼接
 media，未调用`video-analysis`，未产生`DRAMA-MEDIA-*` HUMAN verdict、P6或Final Acceptance；下一Shot submit仍禁止。
+
+## Closure Checkpoint
+
+`record-ai-video-session`已将本checkpoint更新到本record；automatic `distill-ai-video-learning` evaluation为
+`no_candidate`。本record是`learning_eligibility: ineligible`的单次architecture/materialization checkpoint，不构成两个
+independent attempts、controlled multi-arm comparison或existing Learning Claim的material update，因此未创建placeholder
+Learning Claim，也没有adoption/confirmation动作。
+
+一次完整`9c40762..9fd4407` closure rerun的所有executable checks通过，包括`2908 passed, 3 skipped`，但其receipt
+`.agent/harness/runs/drama-m6-d-materialization-final-20260829/receipt.json`正确标记为`failed`：运行期间无关
+Provider Console commits推进了shared `main`，使`workspace_stable_confirmed=false`。该receipt不是completion proof，不能
+替代上方exact implementation receipt。Final handoff使用immutable implementation commit/receipt，加上当前tip的独立
+documentation checkpoint receipt；无关commits与staged/dirty work不归本slice所有。
