@@ -37,7 +37,15 @@ PACKAGE_ACCEPTANCE_PATH = Path(
     "docs/superpowers/artifacts/drama/b-d0/authoring-package/"
     "key-at-the-waiting-room-v3.accepted.json"
 )
-EVIDENCE_PATH = RUN_ROOT / "evidence/drama-shot-01-authoring-to-request.json"
+HISTORICAL_CANDIDATE_EVIDENCE_PATH = (
+    RUN_ROOT / "evidence/drama-shot-01-authoring-to-request.json"
+)
+CANDIDATE_EVIDENCE_PATH = (
+    RUN_ROOT / "evidence/drama-shot-01-authoring-to-request-candidate-v2.json"
+)
+ACCEPTED_EVIDENCE_PATH = (
+    RUN_ROOT / "evidence/drama-shot-01-authoring-to-request-accepted-v1.json"
+)
 
 
 def _sha256(payload: bytes) -> str:
@@ -86,10 +94,21 @@ def _tree_snapshot(root: Path) -> dict[str, str]:
     }
 
 
+def _write_immutable(path: Path, payload: bytes) -> None:
+    if path.exists():
+        if path.read_bytes() != payload:
+            raise RuntimeError(f"immutable evidence path already exists with other bytes: {path}")
+        return
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("xb") as stream:
+        stream.write(payload)
+
+
 def _load_overlay() -> tuple[dict[str, object], dict[str, object]]:
     if not (REPO_ROOT / ACCEPTANCE_PATH).exists():
         payload_bytes = (REPO_ROOT / OVERLAY_PATH).read_bytes()
         payload = json.loads(payload_bytes)
+        _validate_overlay_identity(payload)
         return payload, {
             "authority_status": "PROPOSED_PENDING_DELEGATED_ACCEPTANCE",
             "payload_path": OVERLAY_PATH.as_posix(),
@@ -121,6 +140,7 @@ def _load_overlay() -> tuple[dict[str, object], dict[str, object]]:
     ):
         raise RuntimeError("accepted execution-intent overlay bytes do not match")
     payload = json.loads(payload_bytes)
+    _validate_overlay_identity(payload)
     return payload, {
         "authority_status": "ACCEPTED_AND_SEALED",
         "payload_path": accepted["path"],
@@ -133,6 +153,20 @@ def _load_overlay() -> tuple[dict[str, object], dict[str, object]]:
     }
 
 
+def _validate_overlay_identity(payload: dict[str, object]) -> None:
+    expected = {
+        "schema_version": "drama-shot-execution-intent-overlay/1",
+        "record_kind": "drama_shot_execution_intent_overlay",
+        "overlay_id": "drama.execution-intent.key-at-the-waiting-room.shot-01",
+        "overlay_version": 1,
+        "status": "proposed",
+        "domain_id": "drama",
+        "lane_id": "M6-D",
+    }
+    if any(payload.get(key) != value for key, value in expected.items()):
+        raise RuntimeError("execution-intent overlay payload identity is not canonical")
+
+
 def _assert_source_binding(
     overlay: dict[str, object], materialization_bytes: bytes, materialization: dict[str, object]
 ) -> None:
@@ -140,9 +174,51 @@ def _assert_source_binding(
     if not isinstance(binding, dict):
         raise RuntimeError("overlay canonical source binding is not an object")
     package_acceptance_bytes = (REPO_ROOT / PACKAGE_ACCEPTANCE_PATH).read_bytes()
+    package_acceptance = json.loads(package_acceptance_bytes)
+    package_acceptance_identity = {
+        "schema_version": "drama-authoring-package-acceptance/1",
+        "record_kind": "drama_authoring_package_acceptance",
+        "package_id": "drama.package.key-at-the-waiting-room",
+        "package_version": 3,
+        "status": "accepted",
+        "domain_id": "drama",
+    }
+    if any(
+        package_acceptance.get(key) != value
+        for key, value in package_acceptance_identity.items()
+    ):
+        raise RuntimeError("accepted authoring-package envelope identity is not canonical")
+    accepted_package = package_acceptance["accepted_package_payload"]
+    package_payload_bytes = _git_blob(
+        accepted_package["commit"], accepted_package["path"]
+    )
+    package_payload = json.loads(package_payload_bytes)
+    if (
+        len(package_payload_bytes) != accepted_package["byte_size"]
+        or _sha256(package_payload_bytes) != accepted_package["accepted_record_sha256"]
+        or _git_blob_oid(accepted_package["commit"], accepted_package["path"])
+        != accepted_package["git_blob_oid"]
+    ):
+        raise RuntimeError("accepted authoring-package payload bytes do not match")
+    fixture_binding = package_payload["fixture_selection_binding"]
+    fixture_payload_bytes = _git_blob(
+        fixture_binding["accepted_payload_commit"],
+        fixture_binding["accepted_payload_path"],
+    )
+    if _sha256(fixture_payload_bytes) != fixture_binding["accepted_payload_sha256"]:
+        raise RuntimeError("accepted fixture payload bytes do not match package lineage")
     manifest = json.loads((PROJECT_ROOT / "state/manifest.json").read_bytes())
     expected = {
+        "accepted_package_acceptance_path": PACKAGE_ACCEPTANCE_PATH.as_posix(),
         "accepted_package_acceptance_sha256": _sha256(package_acceptance_bytes),
+        "accepted_package_payload_path": accepted_package["path"],
+        "accepted_package_payload_commit": accepted_package["commit"],
+        "accepted_package_payload_sha256": _sha256(package_payload_bytes),
+        "accepted_fixture_payload_path": fixture_binding["accepted_payload_path"],
+        "accepted_fixture_payload_commit": fixture_binding[
+            "accepted_payload_commit"
+        ],
+        "accepted_fixture_payload_sha256": _sha256(fixture_payload_bytes),
         "canonical_materialization_sha256": _sha256(materialization_bytes),
         "project_content_hash": materialization["project"]["content_hash"],
         "registry_content_hash": materialization["registry"]["content_hash"],
@@ -225,6 +301,8 @@ def _prompt_audit(prompt: str, exact_dialogue: str) -> dict[str, object]:
         or not lines[1].startswith("overall_soundscape: ")
         or not lines[2].startswith("non_diegetic_music: ")
         or prompt.count(exact_dialogue) != 1
+        or "<d>[Chinese]" not in prompt
+        or lines[2] != "non_diegetic_music: none"
         or found
     ):
         raise RuntimeError(
@@ -259,9 +337,19 @@ def main() -> None:
     original_requirement = ProviderNeutralVideoRequirement.model_validate(
         materialization["planner"]["plan"]["generation_requirement"]
     )
+    overlay_target = overlay.get("target_shot")
+    expected_target = {
+        "shot_id": loaded.shots[0].shot_id,
+        "revision": loaded.shots[0].revision,
+        "content_hash": loaded.shots[0].content_hash,
+    }
     if (
         original_request.target_shot != loaded.shots[0]
         or original_request.scene_context != loaded.scenes[0]
+        or overlay_target != expected_target
+        or original_request.target_shot.shot_id != expected_target["shot_id"]
+        or original_request.target_shot.revision != expected_target["revision"]
+        or original_request.target_shot.content_hash != expected_target["content_hash"]
         or original_requirement.requirement_hash
         != "d07dba76f19e2a1d998d9bf087df8583a1a99653cc7c1d9760935f72534c9b81"
     ):
@@ -291,17 +379,34 @@ def main() -> None:
     after = _tree_snapshot(PROJECT_ROOT)
     if before != after:
         raise RuntimeError("authoring-to-request driver mutated canonical production state")
+    accepted_overlay = overlay_identity["authority_status"] == "ACCEPTED_AND_SEALED"
+    prior_evidence = {
+        "historical_candidate_v1": {
+            "path": HISTORICAL_CANDIDATE_EVIDENCE_PATH.relative_to(
+                REPO_ROOT
+            ).as_posix(),
+            "sha256": _sha256(HISTORICAL_CANDIDATE_EVIDENCE_PATH.read_bytes()),
+            "preserved_without_overwrite": True,
+        }
+    }
+    if accepted_overlay:
+        prior_evidence["accepted_candidate_v2"] = {
+            "path": CANDIDATE_EVIDENCE_PATH.relative_to(REPO_ROOT).as_posix(),
+            "sha256": _sha256(CANDIDATE_EVIDENCE_PATH.read_bytes()),
+            "preserved_without_overwrite": True,
+        }
     evidence = {
         "schema_version": "drama-m6-d-shot-authoring-to-request/1",
         "status": (
             "CANONICAL_SHOT_01_EXECUTION_INTENT_READY"
-            if overlay_identity["authority_status"] == "ACCEPTED_AND_SEALED"
+            if accepted_overlay
             else "CANDIDATE_EXECUTION_INTENT_COMPILES_PENDING_ACCEPTANCE"
         ),
         "domain_id": "drama",
         "lane_id": "M6-D",
         "target_shot": overlay["target_shot"],
         "overlay_identity": overlay_identity,
+        "prior_evidence": prior_evidence,
         "canonical_lineage": {
             "accepted_package_acceptance_sha256": overlay[
                 "canonical_source_binding"
@@ -360,11 +465,19 @@ def main() -> None:
         },
         "m6_d_status": "NOT_EVALUATED",
         "next_shot_submit_allowed": False,
-        "remaining_gate": "PROVIDER_PROFILE_RUNTIME_IDENTITY_AND_EXACT_REQUEST_NOT_SELECTED",
+        "remaining_gate": (
+            "PROVIDER_PROFILE_RUNTIME_IDENTITY_AND_EXACT_REQUEST_NOT_SELECTED"
+            if accepted_overlay
+            else "EXECUTION_INTENT_OVERLAY_DELEGATED_ACCEPTANCE_PENDING"
+        ),
     }
-    EVIDENCE_PATH.write_bytes(_json_bytes(evidence))
-    print(EVIDENCE_PATH.relative_to(REPO_ROOT).as_posix())
-    print(_sha256(EVIDENCE_PATH.read_bytes()))
+    evidence_path = (
+        ACCEPTED_EVIDENCE_PATH if accepted_overlay else CANDIDATE_EVIDENCE_PATH
+    )
+    evidence_bytes = _json_bytes(evidence)
+    _write_immutable(evidence_path, evidence_bytes)
+    print(evidence_path.relative_to(REPO_ROOT).as_posix())
+    print(_sha256(evidence_path.read_bytes()))
 
 
 if __name__ == "__main__":
