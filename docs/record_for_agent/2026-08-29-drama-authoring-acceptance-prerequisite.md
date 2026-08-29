@@ -42,6 +42,22 @@ focused tests、independent native review与exact receipts为准，未等待或�
 documentation/evidence-path contract，没有新Provider/media attempt、controlled multi-arm comparison，也没有对
 existing Learning Claim的material exact-evidence update，因此不创建placeholder Learning Claim或进入adoption flow。
 
+### Acceptance And Closure Evidence
+
+```text
+f7ff3fc754cdf41d9d01d48af82599bbad087a9d
+docs: accept drama execution evidence path
+receipt: .agent/harness/runs/drama-b-d0-execution-path-acceptance-exact-20260829/receipt.json
+receipt_sha256: 95d07bb09a0a92473313ffdbd4a4da727e692aa1cce1ea53ae78c0cbbc4ad130
+```
+
+Acceptance envelope Git blob为`56a88e34030db96a516d1250b057ae07d63f79dd`，byte size `6714`，SHA-256为
+`ef3152148174047aba089bb6d99ac9e87a376516a837cd7e3e8797c418645bd4`。Receipt绑定exact range
+`4c10367f0ee9248638bd0bf2e4ddb5edf04b5851..f7ff3fc754cdf41d9d01d48af82599bbad087a9d`与四个task-owned
+paths，status=`passed`；`verify-receipt`确认integrity、scope、snapshot、freshness与same-run closure全部为true。
+较早的`drama-b-d0-execution-path-acceptance-final-20260829` run跨过并发commit并多含一个unrelated path，因此不作为
+本slice completion evidence。
+
 ## Supersession Notice — 2026-08-29 Package Accepted
 
 下方所有“package v3仍需用户单独确认”、“B-D0仍为`BLOCKED_BEFORE_MEDIA`”与baseline/package
