@@ -174,7 +174,12 @@ def test_h3_prompt_compiles_complete_legacy_t2v_without_neutral_field_leakage(
     assert len(result.prompt_text.splitlines()) == 3
     assert result.prompt_text.count("locked-off camera") == 1
     assert "no visible text, captions, or subtitles" in result.prompt_text
-    assert "no speech, no dialogue, no narration, and no voices" in result.prompt_text
+    assert (
+        "soundscape consists only of the authored ambience and physical foley"
+        in result.prompt_text
+    )
+    for speech_token in ("speech", "dialogue", "narration", "voices", "<d>"):
+        assert speech_token not in result.prompt_text.lower()
     assert "guarded trust" not in result.prompt_text
     assert "the hero proves they will stay" not in result.prompt_text
     assert "future shot reveals the key" not in result.prompt_text
@@ -214,6 +219,30 @@ def test_h3_prompt_compiles_complete_legacy_t2v_without_neutral_field_leakage(
     assert isinstance(changed, H3PromptCompilation)
     assert changed.prompt_text != result.prompt_text
     assert "The subject completes a different action." in changed.prompt_text
+
+    ambience = intent.ambience_intent
+    assert ambience is not None
+    tainted_intent = intent.model_copy(
+        update={
+            "ambience_intent": ambience.model_copy(
+                update={"environment_bed": "steady rain with distant voices"}
+            )
+        }
+    )
+    tainted_payload = dict(payload)
+    tainted_payload.update(
+        generation_intent=tainted_intent,
+        generation_intent_hash=canonical_sha256(
+            tainted_intent.model_dump(mode="json")
+        ),
+    )
+    tainted = compile_h3_prompt(
+        ProviderNeutralVideoRequirement.create(**tainted_payload)
+    )
+    assert isinstance(tainted, H3PromptUnsupported)
+    assert tainted.unsupported_field_paths == (
+        "generation_intent.ambience_intent.environment_bed",
+    )
 
 
 def test_h3_legacy_prompt_uses_dialogue_intent_as_only_speech_owner() -> None:

@@ -770,7 +770,7 @@ def test_local_t8_family_compiles_both_exact_lanes_without_runtime_execution() -
             lifecycle=_lifecycle(context),
             compiler_contract=AdapterCompilerContract.create(
                 compiler_id=compiler_id,
-                compiler_version="2",
+                compiler_version="3",
             ),
         )
 
@@ -781,6 +781,7 @@ def test_local_t8_family_compiles_both_exact_lanes_without_runtime_execution() -
             projection.requirement,
         )
         assert isinstance(compiled, CompiledProviderVideoRequest)
+        assert compiled.adapter_compiler_version == "3"
         assert "integrated_multimodal_description:" in compiled.provider_native_prompt
         assert "overall_soundscape:" in compiled.provider_native_prompt
         assert "non_diegetic_music:" in compiled.provider_native_prompt
@@ -811,7 +812,7 @@ def test_local_t8_family_compiles_both_exact_lanes_without_runtime_execution() -
             lifecycle=_lifecycle(context),
             compiler_contract=AdapterCompilerContract.create(
                 compiler_id=compiler_id,
-                compiler_version="2",
+                compiler_version="3",
             ),
         )
         assert legacy_routing.provider_bound_request is not None
@@ -904,7 +905,7 @@ def test_t8_quality_native_compiler_uses_h3_three_field_prompt_without_neutral_f
         lifecycle=_lifecycle(context),
         compiler_contract=AdapterCompilerContract.create(
             compiler_id="comfy-local-h3-t8-video-compiler",
-            compiler_version="2",
+            compiler_version="3",
         ),
     )
     assert routing.provider_bound_request is not None
@@ -915,7 +916,7 @@ def test_t8_quality_native_compiler_uses_h3_three_field_prompt_without_neutral_f
     )
 
     assert isinstance(compiled, CompiledProviderVideoRequest)
-    assert compiled.adapter_compiler_version == "2"
+    assert compiled.adapter_compiler_version == "3"
     assert compiled.provider_native_prompt.count("[Shot 1]") == 1
     assert "integrated_multimodal_description:" in compiled.provider_native_prompt
     assert "overall_soundscape:" in compiled.provider_native_prompt
@@ -963,7 +964,7 @@ def test_t8_quality_native_compiler_uses_h3_three_field_prompt_without_neutral_f
         lifecycle=_lifecycle(context),
         compiler_contract=AdapterCompilerContract.create(
             compiler_id="comfy-local-h3-t8-video-compiler",
-            compiler_version="1",
+            compiler_version="2",
         ),
     )
     assert legacy_compiler_routing.provider_bound_request is not None

@@ -67,6 +67,7 @@ _CAPABILITY_ID = "minimax-h3-t8-t2va-quality-v1"
 _PROVIDER_KIND = "minimax_h3_t8_t2va"
 _MODEL_ID = "minimax-h3-t8-t2va-quality"
 _COMPILER_ID = "comfy-local-h3-t8-video-compiler"
+_T2VA_COMPILER_VERSION = "3"
 
 
 def _preflight_t8_compiler_request(
@@ -93,7 +94,7 @@ def _preflight_t8_compiler_request(
     compiler_contract = provider_bound.compiler_contract
     if (
         compiler_contract.compiler_id != compiler_id
-        or compiler_contract.compiler_version != "2"
+        or compiler_contract.compiler_version != _T2VA_COMPILER_VERSION
     ):
         return ProviderRequirementUnsupported(
             requirement_hash=requirement.requirement_hash,
@@ -722,7 +723,7 @@ class ComfyUIT8VideoProvider:
             provider_bound=provider_bound,
             requirement=requirement,
             compiler_id=_COMPILER_ID,
-            compiler_version="2",
+            compiler_version=_T2VA_COMPILER_VERSION,
             capabilities=self.capabilities(),
             native_prompt=ProviderNativePrompt(
                 grammar_contract="h3-three-field-v1",

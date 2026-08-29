@@ -62,6 +62,10 @@ _H3_DIALOGUE_LANGUAGE_BY_PRIMARY_TAG = {
     "zh": "Chinese",
 }
 _RESERVED_H3_DIALOGUE_TAG = re.compile(r"</?d(?:\s[^>]*)?>", flags=re.IGNORECASE)
+_NO_DIALOGUE_SPEECH_CUE = re.compile(
+    r"</?d(?:\s[^>]*)?>|\b(?:speech|dialogue|narration|voices?)\b",
+    flags=re.IGNORECASE,
+)
 
 
 def _reserved_field_paths(
@@ -108,6 +112,24 @@ def _reserved_field_paths(
                 path=f"{path}.{index}",
                 reject_h3_dialogue_tags=reject_h3_dialogue_tags,
             )
+        )
+    return ()
+
+
+def _speech_cue_field_paths(value: object, *, path: str) -> tuple[str, ...]:
+    if isinstance(value, str):
+        return (path,) if _NO_DIALOGUE_SPEECH_CUE.search(value) else ()
+    if isinstance(value, dict):
+        return tuple(
+            field_path
+            for key, item in value.items()
+            for field_path in _speech_cue_field_paths(item, path=f"{path}.{key}")
+        )
+    if isinstance(value, (list, tuple)):
+        return tuple(
+            field_path
+            for index, item in enumerate(value)
+            for field_path in _speech_cue_field_paths(item, path=f"{path}.{index}")
         )
     return ()
 
@@ -368,6 +390,13 @@ def _compile_h3_t2va_prompt(
             reject_h3_dialogue_tags=True,
         )
     )
+    if dialogue is not None and dialogue.mode == "none":
+        diagnostics.extend(
+            field_path
+            for path, value in emitted_values.items()
+            if path != "generation_intent.dialogue_intent"
+            for field_path in _speech_cue_field_paths(value, path=path)
+        )
     if diagnostics:
         return H3PromptUnsupported(
             unsupported_field_paths=tuple(dict.fromkeys(diagnostics))
@@ -438,7 +467,9 @@ def _compile_h3_t2va_prompt(
             "no narration and no extra speech"
         )
     else:
-        dialogue_text = "no speech, no dialogue, no narration, and no voices"
+        dialogue_text = (
+            "soundscape consists only of the authored ambience and physical foley"
+        )
     music_text = "none"
     if music.mode == "music":
         music_text = f"{music.instrumentation}; {music.tempo_rhythm}; {music.dynamics}"

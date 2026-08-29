@@ -23,6 +23,7 @@ from ai_video.production.comfy_t8_video import (
     ComfyUIT8VideoProvider,
     T8ModelComponent,
     T8VideoTransport,
+    _T2VA_COMPILER_VERSION,
     _preflight_t8_compiler_request,
     t8_node_input_schema_sha256,
 )
@@ -611,7 +612,7 @@ class ComfyUIT8TurboVideoProvider(ComfyUIT8VideoProvider):
             provider_bound=provider_bound,
             requirement=requirement,
             compiler_id=_COMPILER_ID,
-            compiler_version="2",
+            compiler_version=_T2VA_COMPILER_VERSION,
             capabilities=self.capabilities(),
             native_prompt=ProviderNativePrompt(
                 grammar_contract="h3-three-field-v1",
