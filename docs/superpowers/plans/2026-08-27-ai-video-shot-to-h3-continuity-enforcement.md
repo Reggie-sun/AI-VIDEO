@@ -115,7 +115,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / B-D0 prerequisite complete | Drama owner/rubric spec、exact fixture、baseline selection、authoring-package v3与current execution-gate/exact-evidence-path均已accepted/sealed；这只使`B-D0=PASS`，formal `DRAMA-MEDIA-*` findings仍为`NOT_EVALUATED`；不得从reference review、documentation gate或Commercial evidence推断M6-D PASS |
+| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | B-D0 prerequisite complete后已获独立M6-D启动授权；sealed Drama package尚未通过current canonical seam materialize为Project/Registry-selected Character/Scene/Shot revisions。候选H3 Quality profile仅做了未到达的advisory inspection，且与current ComfyUI checkout identity不匹配。没有canonical Planner entry、Provider selection、submit、media或`DRAMA-MEDIA-*` verdict |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -802,6 +802,19 @@ callable readiness/Provider lifecycle与Agent-controlled Development evidence pa
 Shot/pair/assembly SHAs、explicit project-local `video-analysis` raw evidence、requirement-level HUMAN verdict、
 sequential stop、identity invalidation、unknown-outcome stop与cross-lane no-inheritance。它不声称typed Drama Product
 Runtime、Gate 2、M6-D、P6或Final Acceptance已实现；M6-D仍须作为独立 empirical slice 另行进入。
+
+M6-D已在2026-08-29由current user明确启动，但fresh Shot 01在canonical Planner entry前停止。Blocker evidence位于
+`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-execution-preflight.json`，SHA-256为
+`8c7031f42a068b953a75a7f7b0bb9dfd5611d516c0821657dc34d94723683d5c`。当前没有Project/Registry-selected
+Drama Character/Scene/Shot revision/content hashes，故不存在canonical `VideoPlanningRequest`；historical baseline
+test helper或in-memory copies不能替代该authority。候选
+`minimax-h3-t8-t2va-quality-v1` profile另要求ComfyUI commit
+`7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`，current clean checkout为
+`e01fb4c56b7a88149d469b99cbbfe3223d715054`，即使上游readiness未来解除也仍须重新通过exact runtime
+identity preflight；该inspection不是Router decision或current primary blocker。Source-audio当前只保留从sealed
+Shot facts推导的`GENERATED + KEEP` authoring-intent proposal，因Provider未selected而没有accepted SourceAudioPolicy
+或resolved request binding。该stop没有选择或改变fixture/baseline，没有启动ComfyUI、编写Provider-native prompt、submit、
+生成media或调用`video-analysis`；`M6-D`保持`NOT_EVALUATED`，下一Shot submit不允许。
 
 Stop immediately and report rather than expanding scope when：
 
