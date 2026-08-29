@@ -48,6 +48,11 @@ import {
   createLatestRequestGuard,
   createWorkspaceSelectionGuard,
   libraryLiveStatus,
+  refreshOrder,
+  refreshSelectionKey,
+  selectionTracksNewest,
+  sortAttemptsNewest,
+  sortVideoWorkspacesNewest,
 } from "../src/library-refresh-contract.js";
 import { formatShotTimecode, shotTiming } from "../src/shot-time-contract.js";
 import {
@@ -631,6 +636,54 @@ test("live status reflects selected-source coverage and stale refreshes", () => 
   assert.equal(libraryLiveStatus({ ...connected, selectedSource: "all" }), "partial");
   assert.equal(libraryLiveStatus({ ...connected, selectedSource: "runs", refreshFailed: true }), "stale");
   assert.equal(libraryLiveStatus({ ...connected, selectedSource: "runs", connectionState: "reconnecting" }), "reconnecting");
+});
+
+test("live refresh follows newest video until the operator pins history", () => {
+  const attempts = sortAttemptsNewest([
+    { attempt_id: "attempt-old", started_at: "2026-08-30T01:00:00Z" },
+    { attempt_id: "attempt-new", started_at: "2026-08-30T02:00:00Z" },
+  ]);
+  assert.deepEqual(attempts.map((item) => item.attempt_id), ["attempt-new", "attempt-old"]);
+  assert.deepEqual(
+    sortAttemptsNewest([{ attempt_id: "manifest-old" }, { attempt_id: "manifest-new" }])
+      .map((item) => item.attempt_id),
+    ["manifest-new", "manifest-old"],
+  );
+
+  const workspaces = [
+    { workspace: "run-recently-edited/project.yaml" },
+    { workspace: "run-old/project.yaml", latest_video_attempt_at: "2026-08-30T01:00:00Z" },
+    { workspace: "run-new/project.yaml", latest_video_attempt_at: "2026-08-30T02:00:00Z" },
+  ];
+  const videoWorkspaces = sortVideoWorkspacesNewest(workspaces);
+  assert.deepEqual(
+    videoWorkspaces.map((item) => item.workspace),
+    ["run-new/project.yaml", "run-old/project.yaml"],
+  );
+  const keyOf = (item) => item.workspace;
+  assert.deepEqual(
+    refreshOrder({ items: videoWorkspaces, currentKey: "run-old/project.yaml", followLatest: true, keyOf }),
+    videoWorkspaces,
+  );
+  assert.deepEqual(
+    refreshOrder({ items: videoWorkspaces, currentKey: "run-old/project.yaml", followLatest: false, keyOf })
+      .map((item) => item.workspace),
+    ["run-old/project.yaml", "run-new/project.yaml"],
+  );
+  assert.equal(selectionTracksNewest({ items: videoWorkspaces, selectedKey: "run-new/project.yaml", keyOf }), true);
+  assert.equal(selectionTracksNewest({ items: videoWorkspaces, selectedKey: "run-old/project.yaml", keyOf }), false);
+  assert.equal(refreshSelectionKey({
+    items: attempts,
+    currentKey: "attempt-old",
+    followLatest: false,
+    keyOf: (item) => item.attempt_id,
+  }), "attempt-old");
+  assert.equal(refreshSelectionKey({
+    items: attempts,
+    currentKey: "attempt-old",
+    followLatest: true,
+    keyOf: (item) => item.attempt_id,
+  }), "attempt-new");
 });
 
 test("run detail contract derives generation mode and exact-attempt Shot only", () => {

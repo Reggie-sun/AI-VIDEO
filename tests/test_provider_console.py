@@ -129,6 +129,55 @@ def test_catalog_is_bounded_deterministic_and_does_not_follow_symlinks(tmp_path:
     assert all("linked" not in item["workspace"] for item in result["workspaces"])
 
 
+def test_catalog_exposes_typed_latest_video_attempt_without_reordering_by_generic_mtime(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    runs = tmp_path / "runs"
+    video_project = _production_workspace(runs, "run-video/project")
+    edited_project = _production_workspace(runs, "run-edited/project")
+    os.utime(video_project, ns=(1_000_000_000, 1_000_000_000))
+    os.utime(video_project.parent / "state" / "manifest.json", ns=(1_000_000_000, 1_000_000_000))
+    os.utime(edited_project, ns=(2_000_000_000, 2_000_000_000))
+    os.utime(edited_project.parent / "state" / "manifest.json", ns=(2_000_000_000, 2_000_000_000))
+
+    video_attempt = _ns(
+        operation="video_generation",
+        video_generation_state=_ns(),
+        started_at="2026-08-30T04:05:06+00:00",
+    )
+    manifests = {
+        "run-video": _ns(attempts=(video_attempt,)),
+        "run-edited": _ns(attempts=()),
+    }
+    monkeypatch.setattr(
+        provider_console,
+        "_read_production_manifest_nofollow",
+        lambda root: manifests[root.parent.name],
+    )
+
+    result = provider_console.catalog_runs(runs)
+
+    assert [item["workspace"] for item in result["workspaces"]] == [
+        "run-edited/project/project.yaml",
+        "run-video/project/project.yaml",
+    ]
+    by_workspace = {item["workspace"]: item for item in result["workspaces"]}
+    assert by_workspace["run-video/project/project.yaml"]["latest_video_attempt_at"] == (
+        "2026-08-30T04:05:06+00:00"
+    )
+    assert "latest_video_attempt_at" not in by_workspace["run-edited/project/project.yaml"]
+
+
+def test_catalog_does_not_claim_latest_video_from_invalid_manifest(tmp_path: Path):
+    runs = tmp_path / "runs"
+    _production_workspace(runs, "invalid/project")
+
+    result = provider_console.catalog_runs(runs)
+
+    assert len(result["workspaces"]) == 1
+    assert "latest_video_attempt_at" not in result["workspaces"][0]
+
+
 def test_catalog_and_detail_support_nested_legacy_output_manifests(tmp_path: Path):
     runs = tmp_path / "runs"
     manifest_path = runs / "legacy-capture" / "output" / "take-r2" / "manifest.json"

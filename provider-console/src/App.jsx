@@ -37,7 +37,6 @@ import {
   groupMatchesEvidenceFilter,
   groupMatchesQuery,
   groupMatchesSource,
-  preferredExternalGroup,
   preferredExternalLocation,
   readExternalCatalogResponse,
   runsMediaContextNotice,
@@ -46,7 +45,16 @@ import {
 } from "./external-media-contract.js";
 import { AudibleVideo } from "./media-player.jsx";
 import { useLibraryLiveUpdates } from "./library-live-updates.js";
-import { createLatestRequestGuard, createWorkspaceSelectionGuard, libraryLiveStatus } from "./library-refresh-contract.js";
+import {
+  createLatestRequestGuard,
+  createWorkspaceSelectionGuard,
+  libraryLiveStatus,
+  refreshOrder,
+  refreshSelectionKey,
+  selectionTracksNewest,
+  sortAttemptsNewest,
+  sortVideoWorkspacesNewest,
+} from "./library-refresh-contract.js";
 import { ExternalShotBreakdown, ProjectShotBreakdown } from "./shot-breakdown.jsx";
 import { shotTiming } from "./shot-time-contract.js";
 import { VideoLibraryRail } from "./video-library-rail.jsx";
@@ -584,6 +592,8 @@ export function App() {
   const workspaceSelectionGuard = useRef(null);
   const detailRequestGuard = useRef(null);
   const runsContextRequestGuard = useRef(null);
+  const runsFollowLatest = useRef(true);
+  const externalFollowLatest = useRef(true);
   if (!workspaceSelectionGuard.current) workspaceSelectionGuard.current = createWorkspaceSelectionGuard();
   if (!detailRequestGuard.current) detailRequestGuard.current = createLatestRequestGuard();
   if (!runsContextRequestGuard.current) runsContextRequestGuard.current = createLatestRequestGuard();
@@ -593,7 +603,7 @@ export function App() {
   const externalRefreshQueued = useRef(false);
   const externalForceRefreshQueued = useRef(false);
 
-  const loadDetail = useCallback(async (key, { preserveAttempt = false, selectionToken, requestToken } = {}) => {
+  const loadDetail = useCallback(async (key, { selectionToken, requestToken } = {}) => {
     const response = await fetch(`/api/runs/detail?workspace=${encodeURIComponent(key)}`, { cache: "no-store" });
     const body = await response.json();
     if (!requestsCanCommit(workspaceSelectionGuard.current, selectionToken, detailRequestGuard.current, requestToken)) return null;
@@ -605,12 +615,13 @@ export function App() {
     workspaceRef.current = key;
     setWorkspace(key);
     setDetail(body);
-    const attempts = body.attempts || body.video_generation_attempts || [];
-    setSelectedId((current) => (
-      preserveAttempt && attempts.some((item, index) => attemptId(item, index) === current)
-        ? current
-        : (attempts.length ? attemptId(attempts[0], 0) : "")
-    ));
+    const attempts = sortAttemptsNewest(body.attempts || body.video_generation_attempts || []);
+    setSelectedId((current) => refreshSelectionKey({
+      items: attempts,
+      currentKey: current,
+      followLatest: runsFollowLatest.current,
+      keyOf: (item) => attemptId(item, 0),
+    }));
     return body;
   }, []);
 
@@ -643,18 +654,28 @@ export function App() {
             continue;
           }
           const current = workspaceRef.current;
-          const ordered = current
-            ? [...items.filter((item) => item.workspace === current), ...items.filter((item) => item.workspace !== current)]
-            : items;
+          const videoWorkspaces = sortVideoWorkspacesNewest(items);
+          const videoWorkspaceKeys = new Set(videoWorkspaces.map((item) => item.workspace));
+          const newestFirst = [
+            ...videoWorkspaces,
+            ...items.filter((item) => !videoWorkspaceKeys.has(item.workspace)),
+          ];
+          const ordered = refreshOrder({
+            items: newestFirst,
+            currentKey: current,
+            followLatest: runsFollowLatest.current,
+            keyOf: (item) => item.workspace,
+          });
           let lastError;
           for (const item of ordered) {
             try {
-              const loaded = await loadDetail(item.workspace, {
-                preserveAttempt: item.workspace === current,
-                selectionToken,
-                requestToken,
-              });
+              const loaded = await loadDetail(item.workspace, { selectionToken, requestToken });
               if (!loaded) break;
+              if (
+                runsFollowLatest.current
+                && videoWorkspaceKeys.has(item.workspace)
+                && !(loaded.attempts || loaded.video_generation_attempts || []).length
+              ) continue;
               lastError = null;
               break;
             } catch (cause) {
@@ -680,6 +701,7 @@ export function App() {
     const selectionToken = workspaceSelectionGuard.current.beginSelection();
     const requestToken = detailRequestGuard.current.beginRequest();
     workspaceRef.current = key;
+    setSelectedId("");
     setLoading(true);
     setError(null);
     try {
@@ -697,7 +719,10 @@ export function App() {
 
   useEffect(() => { refresh(); }, [refresh]);
 
-  const attempts = detail?.attempts || detail?.video_generation_attempts || [];
+  const attempts = useMemo(
+    () => sortAttemptsNewest(detail?.attempts || detail?.video_generation_attempts || []),
+    [detail],
+  );
   const attempt = useMemo(() => attempts.find((item, index) => attemptId(item, index) === selectedId) || attempts[0], [attempts, selectedId]);
   const continuityEligible = Boolean(
     attempt?.continuity_role && String(attempt?.phase || "").toLowerCase() === "validate"
@@ -753,13 +778,15 @@ export function App() {
           const response = await fetch(forceRequest ? "/api/external-media?refresh=1" : "/api/external-media", { cache: "no-store" });
           const body = await readExternalCatalogResponse(response);
           const groups = body.groups || [];
+          const ordered = sortExternalGroupsNewest(groups);
           setExternalCatalog(body);
           setExternalError("");
-          setExternalSelectedSha((current) => (
-            groups.some((item) => item.sha256 === current)
-              ? current
-              : (preferredExternalGroup(groups)?.sha256 || "")
-          ));
+          setExternalSelectedSha((current) => refreshSelectionKey({
+            items: ordered,
+            currentKey: current,
+            followLatest: externalFollowLatest.current,
+            keyOf: (item) => item.sha256,
+          }));
         } catch (cause) {
           setExternalError(cause instanceof Error ? cause.message : "外部媒体数据源不可用。");
         }
@@ -824,9 +851,12 @@ export function App() {
     setSelectedSource(sourceId);
     setEvidenceOpen(false);
     if (sourceId === "runs" || sourceId === "all") {
+      runsFollowLatest.current = true;
       setActiveSurface("runs");
+      void refresh();
       return;
     }
+    externalFollowLatest.current = true;
     const groups = sortExternalGroupsNewest(
       (enrichedExternalCatalog?.groups || [])
         .filter((group) => groupMatchesSource(group, sourceId))
@@ -835,25 +865,46 @@ export function App() {
     );
     setExternalSelectedSha(groups[0]?.sha256 || "");
     setActiveSurface("external");
-  }, [enrichedExternalCatalog, externalEvidenceFilter]);
+  }, [enrichedExternalCatalog, externalEvidenceFilter, refresh]);
 
   const selectAttempt = useCallback((id) => {
+    workspaceSelectionGuard.current.beginSelection();
+    runsFollowLatest.current = selectionTracksNewest({
+      items: sortVideoWorkspacesNewest(catalog),
+      selectedKey: workspace,
+      keyOf: (item) => item.workspace,
+    }) && selectionTracksNewest({
+      items: attempts,
+      selectedKey: id,
+      keyOf: (item) => attemptId(item, 0),
+    });
     setSelectedId(id);
+    setLoading(false);
     setActiveSurface("runs");
     setEvidenceOpen(false);
-  }, []);
+  }, [attempts, catalog, workspace]);
 
   const selectExternal = useCallback((sha256) => {
+    externalFollowLatest.current = selectionTracksNewest({
+      items: visibleExternalGroups,
+      selectedKey: sha256,
+      keyOf: (item) => item.sha256,
+    });
     setExternalSelectedSha(sha256);
     setActiveSurface("external");
     setEvidenceOpen(false);
-  }, []);
+  }, [visibleExternalGroups]);
 
   const selectWorkspaceAndShowRuns = useCallback(async (key) => {
+    runsFollowLatest.current = selectionTracksNewest({
+      items: sortVideoWorkspacesNewest(catalog),
+      selectedKey: key,
+      keyOf: (item) => item.workspace,
+    });
     setSelectedSource("runs");
     setActiveSurface("runs");
     await selectWorkspace(key);
-  }, [selectWorkspace]);
+  }, [catalog, selectWorkspace]);
 
   const refreshSelectedSource = useCallback(async () => {
     if (selectedSource === "runs") await refreshRunsAndContext();
