@@ -622,6 +622,7 @@ def test_provider_console_bridge_routes_to_python_and_node_contracts() -> None:
     for path in (
         "src/ai_video/provider_console.py",
         "src/ai_video/provider_console_continuity.py",
+        "src/ai_video/provider_console_manifest.py",
         "src/ai_video/provider_console_media_index.py",
         "src/ai_video/provider_console_video_evidence.py",
         "tests/test_provider_console.py",
