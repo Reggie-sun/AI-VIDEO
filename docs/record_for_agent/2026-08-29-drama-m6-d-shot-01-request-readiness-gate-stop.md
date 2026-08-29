@@ -8,9 +8,19 @@ learning_eligibility: ineligible
 
 Date: 2026-08-29
 
+## Supersession Notice — 2026-08-29
+
+本文原始`CANONICAL_SHOT_01_EXECUTION_INTENT_INCOMPLETE` stop及13-path diagnostics保留为commit
+`71fc4e7ddc3174150283088030b3039fe32d963c`时的historical executable truth。新的versioned execution-intent overlay
+已在不修改accepted semantic bytes或旧request/requirement evidence的前提下accepted/sealed，并经current canonical
+Planner/requirement seam生成完整typed requirement与exact three-line H3 prompt。
+
+Current state仍是`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`；被替换的只是pre-media authoring blocker。新的remaining
+blocker为`PROVIDER_PROFILE_RUNTIME_IDENTITY_AND_EXACT_REQUEST_NOT_SELECTED`，本记录不授权submit或进入per-Shot media Gate。
+
 ## Purpose
 
-本文固定 canonical M6-D Shot 01 从 accepted Drama package 到 H3 native prompt 之间的当前 executable boundary。结论是 `STOP_BEFORE_SUBMIT`：canonical source binding 正确，但 executable `GenerationIntent` 尚不完整，current H3 compiler 对 exact requirement 返回 typed `H3PromptUnsupported`。
+本文固定 canonical M6-D Shot 01 从 accepted Drama package 到 H3 native prompt 之间的 executable boundary。原始checkpoint因`GenerationIntent`不完整而`STOP_BEFORE_SUBMIT`；本轮只解除该authoring blocker，并把current stop推进到Provider/profile/runtime identity与exact request selection之前。
 
 本文不修改 accepted fixture、baseline、Project、Registry、Manifest、historical request 或媒体 evidence，也不授权手写 prompt、默认值补全、Provider submit、retry、`video-analysis`、candidate activation、P6 或 Final Acceptance。
 
@@ -25,7 +35,7 @@ Date: 2026-08-29
 
 Independent xhigh re-review 对 accepted fixture Shot 01 的 14 个核心 source fields 逐项比较为 exact match，包括 visible key presentation、exact dialogue、blocking、performance、emotion、prop close 与 camera intent。Canonical Shot identity 与 authoring lineage 没有 drift。
 
-## Current Executable Stop
+## Historical Executable Stop
 
 Strict reopen exact canonical requirement 后，`compile_h3_prompt()` 返回：
 
@@ -68,7 +78,9 @@ Historical 6-Shot Development preview `runs/drama-h3-t8-30s-preview-20260829-v1/
 - broader H3/T8/planner/video suite：`325 passed`。
 - native `reviewer_xhigh` revised verdict：`reject` pre-submit readiness；canonical source binding正确，executable intent不完整。
 
-## Remaining Repair Boundary
+## Historical Remaining Repair Boundary (Resolved)
+
+以下内容解释为什么`71fc4e7` checkpoint必须停止，以及本轮overlay必须显式拥有哪些facts；它不再是current blocker。
 
 继续 M6-D 前需要 separately sealed authoring-to-request repair。它可以保持 fixture/baseline bytes 不变，但必须由 canonical owner明确新增当前缺失的 execution-intent facts，并生成新的 projection/request/requirement hashes。
 
@@ -80,3 +92,56 @@ Historical 6-Shot Development preview `runs/drama-h3-t8-30s-preview-20260829-v1/
 - `next_shot_submit_allowed=false`；
 - 不得手写 prompt、使用默认值、fallback、修补历史 requirement或复用 preview request；
 - 不得调用 Provider、ComfyUI或`video-analysis`。
+
+## Accepted Authoring-To-Request Repair
+
+Accepted overlay：
+
+- payload：`docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v1.proposed.json`；
+- payload commit：`68863c9a34c0b7d20063d80dce07bc311aba3846`；
+- payload SHA-256：`4d8fa775ba9cf51d0b0d82637cc13c0f689657559b0f08447c2f6e9a868ac0db`；
+- acceptance envelope：`docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v1.accepted.json`；
+- acceptance envelope SHA-256：`8b50b61b152b59542fc4521c870cc060b9b6469fc18db5e3a14248cf05de7efd`。
+
+Overlay显式而非推断地拥有action endpoint/prop close、space/axis/no-crossing/locked framing、visible
+performance/gaze/body/hand、visual treatment、lighting、steady-rain/no-music、exact dialogue、`zh-Hans`、
+`1.700s–3.900s` timing、on-screen lip sync、camera endpoint、motion direction/amplitude、cadence/tempo与`5.0s` target。
+`zh-Hans`由overlay直接author，不是从中文字形猜测locale；accepted fixture、baseline、Story、Scene、Character与Shot
+semantic bytes均未改变。
+
+Canonical accepted evidence：
+
+- path：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-authoring-to-request-accepted-v1.json`；
+- SHA-256：`1e38b731b31b4866720d5b80bfb2dd40da04ebe56dea8656f3d7219d15298cb6`；
+- new request hash：`01c329aa22b898521d0611bd4fbcfcbba912babb81b4ce85a88582985704fe7c`；
+- generation-intent projection hash：`9c1b1c633bef7cf9d2c26343e3f5dc84b0399269ecc4770cc879b6806fead419`；
+- plan hash：`50af2a2b5df126ded8958f7d09d587a90c108a34567c15d093a9f649e88e8e24`；
+- verified projection hash：`f2292b67f3616a5b4757c6c3e45301b971230bb59a3b683207d8a6d6cb412b1d`；
+- new requirement hash：`d234cd95b712ca8d966132d28c6ee15a49831b412305b795c8c8eb9a2491b34d`；
+- prompt SHA-256：`3676c9998a63e7ddc024faff7d18f07f5e48722046ee7193201f490ee57c750d`。
+
+Strict request、requirement与verified projection reopen全部PASS。`compile_h3_prompt()`生成exactly three lines；exact
+dialogue只出现一次，`<d>[Chinese]`与`non_diegetic_music: none`均为executable assertions。Audit确认无raw JSON、
+Story/Scene/future bookkeeping、opaque canonical identity ID、abstract objective或`unspecified`。
+
+Historical candidate evidence SHA-256 `747ec812a35eff69dc2cc20580c562cfe87165094d43127aa21712facb6d3977`与
+accepted candidate-v2 SHA-256 `8d3256ab3d081820e67f727e8842fffe474a1f606ef074fa5ea09759118d13f2`在accepted rerun前后不变；
+accepted-v1使用独立immutable path。Project tree before/after均为15 files，写入计数、Provider submit、媒体生成、
+`video-analysis`、Manifest/Registry mutation与candidate activation全部为0。
+
+## Current Verification And Stop
+
+- focused Planner/requirement/H3 suite：`230 passed`；
+- native `reviewer_xhigh` scoped re-review：`accept`，无blocking或non-blocking concern；
+- detached exact-range Harness：`.agent/harness/runs/drama-m6-d-shot01-execution-intent-driver-v2-detached-20260829/receipt.json`；
+- receipt SHA-256：`b9fff5a11907769bbc3c36fe16cf9136f65593675df60ec0f395e77cd01e2379`；
+- Architecture Gate：PASS；full suite：`4206 passed, 4 skipped`；receipt status：`passed`。
+
+该receipt在detached checkpoint上fresh且workspace stable；主checkout随后推进，因此current generic freshness不被写成true，
+但immutable receipt与artifact integrity已重验。Current boundary为：
+
+- `M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`；
+- `next_shot_submit_allowed=false`；
+- remaining blocker：`PROVIDER_PROFILE_RUNTIME_IDENTITY_AND_EXACT_REQUEST_NOT_SELECTED`；
+- 未选择Provider/profile/workflow/runtime identity，未persist或submit request，未进入per-Shot media Gate；
+- 未产生M6-D PASS、P6、Final Acceptance或Commercial verdict inheritance。

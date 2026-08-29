@@ -115,7 +115,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | B-D0 prerequisite complete后已获独立M6-D启动授权；sealed Drama package已通过唯一committer materialize为Project/Registry-selected revisions，Shot 01 Planner requirement与asset-free pre-generation graph均READY。Canonical requirement `d07dba76...` strict reopen后由current H3 compiler返回exact 13-path `H3PromptUnsupported`，没有native prompt bytes、resolved request或Provider effect；缺失execution facts不能由默认值、historical preview或baseline补造。详见`docs/record_for_agent/2026-08-29-drama-m6-d-shot-01-request-readiness-gate-stop.md` |
+| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | B-D0 prerequisite complete后已获独立M6-D启动授权；canonical Shot 01 execution-intent overlay现已accepted/sealed，并通过current Planner/requirement seam生成新request `01c329aa...fe7c`、requirement `d234cd95...34d`与exact three-line H3 prompt。旧request/requirement仍immutable；未选择Provider/profile/runtime identity，未persist或submit request，也没有media/Production-state effect。详见`docs/record_for_agent/2026-08-29-drama-m6-d-shot-01-request-readiness-gate-stop.md` |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -840,14 +840,21 @@ Shot facts推导的`GENERATED + KEEP` authoring-intent proposal，因Provider未
 或resolved request binding。该historical checkpoint没有选择或改变fixture/baseline，没有启动ComfyUI、编写Provider-native prompt、持久化request、submit、
 生成media或调用`video-analysis`。
 
-Current stop为`CANONICAL_SHOT_01_EXECUTION_INTENT_INCOMPLETE`。Planning request
-`92e6de89a72730da3beb58638dd54c637cad5162aab94a3259d3413a9a50931f`绑定的canonical requirement
-`d07dba76f19e2a1d998d9bf087df8583a1a99653cc7c1d9760935f72534c9b81` strict reopen后返回exact 13-path
-`H3PromptUnsupported`且`prompt_text=null`。另有sealed language仍为`und`、visual/lighting、dialogue timing/lip-sync及
-motion/pacing categorical facts未由current authoring truth完整决定；这些facts不得用默认值、baseline或historical preview补造。
-Current evidence与separately required authoring-to-request repair详见
-`docs/record_for_agent/2026-08-29-drama-m6-d-shot-01-request-readiness-gate-stop.md`。`M6-D`保持
-`NOT_EVALUATED / STOP_BEFORE_SUBMIT`，下一Shot submit不允许。
+Historical stop `CANONICAL_SHOT_01_EXECUTION_INTENT_INCOMPLETE` 已由versioned additive overlay prerequisite解除，
+没有覆盖其request `92e6de89a72730da3beb58638dd54c637cad5162aab94a3259d3413a9a50931f`、requirement
+`d07dba76f19e2a1d998d9bf087df8583a1a99653cc7c1d9760935f72534c9b81`或unsupported evidence。Accepted overlay
+`docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v1.accepted.json`（SHA-256
+`8b50b61b152b59542fc4521c870cc060b9b6469fc18db5e3a14248cf05de7efd`）显式拥有当前Shot所需execution choices；
+strict canonical reopen生成新request `01c329aa22b898521d0611bd4fbcfcbba912babb81b4ce85a88582985704fe7c`、
+verified projection `f2292b67f3616a5b4757c6c3e45301b971230bb59a3b683207d8a6d6cb412b1d`、requirement
+`d234cd95b712ca8d966132d28c6ee15a49831b412305b795c8c8eb9a2491b34d`与prompt
+`3676c9998a63e7ddc024faff7d18f07f5e48722046ee7193201f490ee57c750d`。Prompt audit为exactly three lines、exact
+dialogue once、explicit Chinese tag、`non_diegetic_music: none`，且无raw JSON、Story/Scene/future bookkeeping、opaque
+canonical identity、abstract objective或`unspecified`。Accepted evidence位于
+`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-authoring-to-request-accepted-v1.json`
+（SHA-256 `1e38b731b31b4866720d5b80bfb2dd40da04ebe56dea8656f3d7219d15298cb6`）。Current stop转为
+`PROVIDER_PROFILE_RUNTIME_IDENTITY_AND_EXACT_REQUEST_NOT_SELECTED`；`M6-D`仍保持`NOT_EVALUATED / STOP_BEFORE_SUBMIT`，
+`next_shot_submit_allowed=false`，本prerequisite未进入Provider submit或per-Shot media Gate。
 
 Stop immediately and report rather than expanding scope when：
 

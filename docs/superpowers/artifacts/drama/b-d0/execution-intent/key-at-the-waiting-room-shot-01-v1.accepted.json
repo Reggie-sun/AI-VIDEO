@@ -1,0 +1,108 @@
+{
+  "schema_version": "drama-shot-execution-intent-overlay-acceptance/1",
+  "record_kind": "drama_shot_execution_intent_overlay_acceptance",
+  "overlay_id": "drama.execution-intent.key-at-the-waiting-room.shot-01",
+  "overlay_version": 1,
+  "status": "accepted",
+  "domain_id": "drama",
+  "lane_id": "M6-D",
+  "accepted_overlay_payload": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v1.proposed.json",
+    "commit": "68863c9a34c0b7d20063d80dce07bc311aba3846",
+    "git_blob_oid": "d53477f55c93cca4dc013fa93e6e85a15794aa15",
+    "byte_size": 14842,
+    "accepted_record_sha256": "4d8fa775ba9cf51d0b0d82637cc13c0f689657559b0f08447c2f6e9a868ac0db",
+    "candidate_status_at_acceptance": "proposed",
+    "content_address_semantics": "The exact overlay bytes at the bound commit, blob OID, byte size and SHA-256 are accepted and sealed. This envelope does not modify accepted semantic owners or historical request evidence."
+  },
+  "semantic_contract_binding": {
+    "contract_version": "drama-authoring-and-acceptance/2",
+    "spec_commit": "e2dafe00ab1f8aa8e8faa95aaebb04cfa3090b53",
+    "spec_git_blob_oid": "a02c3592609061641d72973cd6ee7268c60a5568",
+    "spec_byte_size": 34499,
+    "spec_sha256": "97acc60d478d1e4fe8d326b99e16effc7482e563302cf02797b434e6cd0879ec",
+    "accepted_package_acceptance_sha256": "f81365c1d084d6c096d7bcbf83c06beff75100f34b6ed90bafc9341dfb247cac",
+    "accepted_package_payload_sha256": "a5ec4f78b05ce189d9eaa0cf694ffaba0747b499f4e85fd1ac1ac4221ec61331",
+    "accepted_fixture_payload_sha256": "73a3a57e78859f8a508dd21cea3493a8d2a32ccb8a08c173a304b516fc5d34ab",
+    "project_content_hash": "940f0ceee3148ba1d4dab4a5b7bcbc2adc3229c5964f1705149bec1e9d14dfc1",
+    "registry_content_hash": "13a9404d3ec6bb3de0ec00871cd22dd5ca861ca8ea413fdfe13ea145e6c2ec1b",
+    "target_shot_id": "drama.shot.waiting-room.001",
+    "target_shot_revision": 1,
+    "target_shot_content_hash": "4cf53970d6642d4bfe73c23e5c12f9714c069843b0a7b47069dfb2519c47253b",
+    "active_pre_generation_graph_hash": "761c92a0a8507ae2b8f14de5338b337e0d567e78b654e36403d3428a0da47ff1",
+    "accepted_fixture_baseline_story_scene_character_shot_semantic_bytes_changed": false
+  },
+  "delegated_authority_binding": {
+    "delegation_source_id": "current-session:drama-m6-d-shot01-authoring-to-request-repair-20260829",
+    "delegation_recorded_at": "2026-08-29T22:04:31+08:00",
+    "normalized_delegation_tuple": "delegation_decision=AUTHORIZE_PRIMARY_AGENT_CONFIRM;scope=M6-D_CANONICAL_SHOT_01_AUTHORING_TO_REQUEST_REPAIR_PREREQUISITE;manual_confirm_required=false;effective_date=2026-08-29",
+    "delegation_source_sha256": "ba22c5d45cf20ca3a085385d9d3c4cccd940f6092e1ac6e8ce8127466124629a",
+    "scope": "one pre-media canonical Shot 01 execution-intent authoring-to-request repair prerequisite only"
+  },
+  "adjudication": {
+    "adjudicator_identity": "codex_primary_agent",
+    "authority_role": "delegated_primary_agent",
+    "decision": "CONFIRM",
+    "decided_at": "2026-08-29T22:04:31+08:00",
+    "decision_source_id": "current-session:drama-shot01-execution-intent-v1-autonomous-adjudication",
+    "canonical_decision_tuple": "execution_intent_decision=CONFIRM;candidate_commit=68863c9a34c0b7d20063d80dce07bc311aba3846;candidate_sha256=4d8fa775ba9cf51d0b0d82637cc13c0f689657559b0f08447c2f6e9a868ac0db;review_checkpoint=d82e5c31f4c0e9466ec8337640e3648b48fc05b6;adjudicator=codex_primary_agent",
+    "decision_source_sha256": "54d11a0dfeafa78b527308bea66198609cc89a4b4c16fa18d203543e92775883",
+    "rationale": "The overlay explicitly owns every missing current-Shot execution choice, preserves the sealed semantic sources, reopens through the canonical Planner and requirement seam, compiles to the exact three-line H3 grammar, and has no Provider, media or Production-state effect."
+  },
+  "independent_review_evidence": {
+    "reviewer_role": "reviewer",
+    "reviewer_tier": "xhigh",
+    "reviewer_identity": "native:drama_shot01_overlay_review",
+    "review_source_id": "current-session:drama-shot01-execution-intent-scoped-rereview",
+    "candidate_commits": [
+      "68863c9a34c0b7d20063d80dce07bc311aba3846",
+      "d82e5c31f4c0e9466ec8337640e3648b48fc05b6"
+    ],
+    "candidate_overlay_sha256": "4d8fa775ba9cf51d0b0d82637cc13c0f689657559b0f08447c2f6e9a868ac0db",
+    "candidate_evidence_sha256": "8d3256ab3d081820e67f727e8842fffe474a1f606ef074fa5ea09759118d13f2",
+    "verdict": "accept",
+    "blocking_issues": [],
+    "non_blocking_concerns": [],
+    "normalized_review_tuple": "reviewer_role=reviewer;reviewer_tier=xhigh;candidate_commits=68863c9a34c0b7d20063d80dce07bc311aba3846,d82e5c31f4c0e9466ec8337640e3648b48fc05b6;candidate_overlay_sha256=4d8fa775ba9cf51d0b0d82637cc13c0f689657559b0f08447c2f6e9a868ac0db;candidate_evidence_sha256=8d3256ab3d081820e67f727e8842fffe474a1f606ef074fa5ea09759118d13f2;verdict=accept;blocking_issues=none;non_blocking_concerns=none",
+    "review_evidence_sha256": "f5116ddfbd42f2332effaaa9c6ffbfce8abe30011f6af767ea7f2543efe506a4"
+  },
+  "harness_evidence": {
+    "driver_verification_checkpoint": {
+      "receipt_path": ".agent/harness/runs/drama-m6-d-shot01-execution-intent-driver-v2-detached-20260829/receipt.json",
+      "receipt_sha256": "b9fff5a11907769bbc3c36fe16cf9136f65593675df60ec0f395e77cd01e2379",
+      "scope_mode": "commit_range",
+      "base_oid": "416df806296b124a672107307566a4caa2a3a852",
+      "head_oid": "c7f39e03ad4de30bcc1c04d1065a9472248d4221",
+      "status": "passed",
+      "workspace_stable": true,
+      "architecture_gate": "passed",
+      "full_tests": "4206 passed, 4 skipped",
+      "artifact_integrity_reverified": true,
+      "fresh_at_detached_checkpoint": true,
+      "current_generic_freshness_note": "The main checkout advanced after the detached checkpoint. The immutable receipt remains passed and artifact-integrity-valid; current generic freshness is not promoted to true."
+    }
+  },
+  "accepted_scope": {
+    "includes": [
+      "the exact versioned Shot 01 execution-intent overlay bytes",
+      "explicit action endpoint, prop close, space, axis, locked framing, performance, visual, lighting, ambience, dialogue, camera, motion and pacing choices",
+      "explicit zh-Hans language selection, exact dialogue once, on-screen timing and lip-sync policy",
+      "a new canonical Planner projection, request and requirement without rewriting the historical requirement",
+      "offline current compile_h3_prompt three-line readiness evidence"
+    ],
+    "excludes": [
+      "any accepted fixture, baseline, Story, Scene, Character or Shot semantic-byte change",
+      "Provider, profile, workflow, runtime identity, request persistence or submit",
+      "ComfyUI, H3 runtime, video-analysis, media generation, retry, repair or assembly",
+      "Manifest, Registry, candidate activation, P6 or Final Acceptance",
+      "M6-D PASS, Commercial verdict borrowing or dual-domain PASS"
+    ]
+  },
+  "current_gate_state": {
+    "execution_intent_overlay": "ACCEPTED_AND_SEALED",
+    "authoring_to_request_prerequisite": "READY",
+    "m6_d": "NOT_EVALUATED",
+    "next_shot_submit_allowed": false,
+    "remaining_blocker": "PROVIDER_PROFILE_RUNTIME_IDENTITY_AND_EXACT_REQUEST_NOT_SELECTED"
+  }
+}
