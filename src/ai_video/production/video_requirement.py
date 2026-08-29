@@ -708,7 +708,10 @@ class ProviderNeutralGenerationIntentProjection(StrictModel):
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, object]:
         data = handler(self)
-        if self.generation_intent.primary_camera_motion is None:
+        if (
+            self.generation_intent.primary_camera_motion is None
+            or self.generation_operation is GenerationOperation.TEXT_TO_VIDEO
+        ):
             data.pop("conditioning_compatibility", None)
         return data
 
@@ -752,13 +755,19 @@ class ProviderNeutralGenerationIntentProjection(StrictModel):
         if (
             self.generation_intent.primary_camera_motion is not None
             and self.conditioning_compatibility is None
+            and self.generation_operation is not GenerationOperation.TEXT_TO_VIDEO
         ):
             raise ValueError("rich generation intent requires conditioning compatibility")
         if (
-            self.generation_intent.primary_camera_motion is None
+            (
+                self.generation_intent.primary_camera_motion is None
+                or self.generation_operation is GenerationOperation.TEXT_TO_VIDEO
+            )
             and self.conditioning_compatibility is not None
         ):
-            raise ValueError("historical intent cannot carry conditioning compatibility")
+            raise ValueError(
+                "historical or text-to-video intent cannot carry conditioning compatibility"
+            )
         if self.generation_intent.primary_camera_motion is not None:
             from ai_video.production._video_intent_validation import (
                 validate_conditioning_compatibility,
@@ -774,14 +783,15 @@ class ProviderNeutralGenerationIntentProjection(StrictModel):
                     "projection requires complete rich generation intent: "
                     + ", ".join(diagnostics)
                 )
-            conditioning_diagnostics = validate_conditioning_compatibility(
-                self.conditioning_compatibility
-            )
-            if conditioning_diagnostics:
-                raise ValueError(
-                    "projection requires compatible conditioning: "
-                    + ", ".join(conditioning_diagnostics)
+            if self.generation_operation is not GenerationOperation.TEXT_TO_VIDEO:
+                conditioning_diagnostics = validate_conditioning_compatibility(
+                    self.conditioning_compatibility
                 )
+                if conditioning_diagnostics:
+                    raise ValueError(
+                        "projection requires compatible conditioning: "
+                        + ", ".join(conditioning_diagnostics)
+                    )
         return self
 
     def _hash_payload(self) -> dict[str, object]:

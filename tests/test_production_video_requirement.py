@@ -334,6 +334,25 @@ def test_explicit_text_to_video_projection_rejects_media_references(
         )
 
 
+def test_explicit_rich_text_to_video_projection_requires_no_conditioning() -> None:
+    payload = _v4_requirement_kwargs()
+
+    projection = ProviderNeutralGenerationIntentProjection.create(
+        generation_intent=payload["generation_intent"],
+        generation_operation=GenerationOperation.TEXT_TO_VIDEO,
+        conditioning_compatibility=None,
+        output_need=payload["output_need"],
+        audio_need=payload["audio_need"],
+        quality_need=payload["quality_need"],
+        semantic_reference_roles=(),
+        media_reference_asset_ids=(),
+    )
+
+    assert projection.generation_intent.primary_camera_motion is not None
+    assert projection.conditioning_compatibility is None
+    assert "conditioning_compatibility" not in projection.model_dump(mode="json")
+
+
 def _v4_requirement_kwargs() -> dict[str, object]:
     from tests.test_production_video_intent_validation import (
         _compatible_fl2va,
@@ -377,26 +396,60 @@ def test_camera_motion_contract_is_singular_and_versioned_under_v4() -> None:
     assert requirement.requirement_hash == canonical_sha256(requirement._hash_payload())
 
 
-@pytest.mark.parametrize(
-    ("field", "value", "match"),
-    (
-        ("generation_mode", GenerationMode.TEXT_TO_VIDEO, "generation_mode"),
-        (
-            "conditioning_compatibility",
-            None,
-            "conditioning_compatibility",
-        ),
-    ),
-)
-def test_v4_conditioning_is_bound_to_generation_mode_and_evidence(
-    field: str,
-    value: object,
-    match: str,
-) -> None:
+def test_v4_generation_modes_enforce_conditioning_and_reference_boundaries() -> None:
     payload = _v4_requirement_kwargs()
-    payload[field] = value
+    payload["conditioning_compatibility"] = None
 
-    with pytest.raises(ValidationError, match=match):
+    with pytest.raises(ValidationError, match="conditioning_compatibility"):
+        ProviderNeutralVideoRequirement.create(**payload)
+
+    payload = _v4_requirement_kwargs()
+    payload.update(
+        generation_mode=GenerationMode.TEXT_TO_VIDEO,
+        continuity_mode=ContinuityMode.NONE,
+        conditioning_compatibility=None,
+    )
+    with pytest.raises(ValidationError, match="asset_evidence"):
+        ProviderNeutralVideoRequirement.create(**payload)
+
+    payload.update(
+        asset_evidence=(),
+        semantic_reference_roles=(),
+        capability_need=CapabilityNeed(),
+        continuity_mode=ContinuityMode.EXACT_TERMINAL,
+    )
+    with pytest.raises(ValidationError, match="continuity_mode"):
+        ProviderNeutralVideoRequirement.create(**payload)
+
+    payload.update(
+        continuity_mode=ContinuityMode.SEMANTIC,
+        capability_need=CapabilityNeed(needs_first_frame=True),
+    )
+    with pytest.raises(ValidationError, match="capability_need.needs_first_frame"):
+        ProviderNeutralVideoRequirement.create(**payload)
+
+
+def test_v4_text_to_video_requires_no_conditioning_evidence() -> None:
+    payload = _v4_requirement_kwargs()
+    payload.update(
+        generation_mode=GenerationMode.TEXT_TO_VIDEO,
+        continuity_mode=ContinuityMode.NONE,
+        conditioning_compatibility=None,
+        asset_evidence=(),
+        semantic_reference_roles=(),
+        capability_need=CapabilityNeed(),
+    )
+
+    requirement = ProviderNeutralVideoRequirement.create(**payload)
+
+    assert requirement.contract_version == "provider-neutral-video-requirement/4"
+    assert requirement.generation_mode is GenerationMode.TEXT_TO_VIDEO
+    assert requirement.conditioning_compatibility is None
+
+    payload["conditioning_compatibility"] = _v4_requirement_kwargs()[
+        "conditioning_compatibility"
+    ]
+    with pytest.raises(ValidationError, match="conditioning_compatibility"):
         ProviderNeutralVideoRequirement.create(**payload)
 
 

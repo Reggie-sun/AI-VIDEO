@@ -9,6 +9,7 @@ import ai_video.production.minimax_hailuo as hailuo_module
 import pytest
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.hashing import canonical_sha256
 from ai_video.production._video_requirement_routing import requirement_output_matches
 from ai_video.production.comfy_video import ComfyUIVideoProvider
 from ai_video.production.comfy_t8_video import (
@@ -56,6 +57,7 @@ from ai_video.production.video_requirement import (
     GenerationMode as RequirementGenerationMode,
     OutputGeometryPolicy,
     OutputNeed,
+    Pacing,
     ProviderNeutralVideoRequirement,
     QualityNeed,
     SemanticReferenceRole,
@@ -687,10 +689,40 @@ def test_local_t8_family_compiles_both_exact_lanes_without_runtime_execution() -
         mime_type="video/mp4",
         native_audio=True,
     )
-    projection = _replace_requirement(
+    legacy_projection = _replace_requirement(
         _verified_requirement(context),
         generation_mode=RequirementGenerationMode.TEXT_TO_VIDEO,
         continuity_mode=RequirementContinuityMode.NONE,
+        semantic_reference_roles=(),
+        asset_evidence=(),
+        output_need=OutputNeed(
+            timing_mode="frame_count",
+            frame_count=124,
+            geometry_policy=OutputGeometryPolicy.EXACT,
+            width=1344,
+            height=768,
+            aspect_ratio="16:9",
+            fps=24,
+            container_mime="video/mp4",
+        ),
+        audio_need=AudioNeed.REQUIRED,
+    )
+    intent = _complete_intent().model_copy(
+        update={"pacing": Pacing(shot_duration_seconds=124 / 24)}
+    )
+    projection = _replace_requirement(
+        legacy_projection,
+        contract_version="provider-neutral-video-requirement/4",
+        generation_mode=RequirementGenerationMode.TEXT_TO_VIDEO,
+        continuity_mode=RequirementContinuityMode.NONE,
+        generation_intent=intent,
+        generation_intent_hash=canonical_sha256(
+            {
+                "schema": "provider-neutral-generation-intent/2",
+                "generation_intent": intent.model_dump(mode="json"),
+            }
+        ),
+        conditioning_compatibility=None,
         semantic_reference_roles=(),
         asset_evidence=(),
         output_need=OutputNeed(
@@ -738,7 +770,7 @@ def test_local_t8_family_compiles_both_exact_lanes_without_runtime_execution() -
             lifecycle=_lifecycle(context),
             compiler_contract=AdapterCompilerContract.create(
                 compiler_id=compiler_id,
-                compiler_version="1",
+                compiler_version="2",
             ),
         )
 
@@ -749,12 +781,200 @@ def test_local_t8_family_compiles_both_exact_lanes_without_runtime_execution() -
             projection.requirement,
         )
         assert isinstance(compiled, CompiledProviderVideoRequest)
+        assert "integrated_multimodal_description:" in compiled.provider_native_prompt
+        assert "overall_soundscape:" in compiled.provider_native_prompt
+        assert "non_diegetic_music:" in compiled.provider_native_prompt
+        assert "generation_mode=" not in compiled.provider_native_prompt
+        assert "scene_mood={" not in compiled.provider_native_prompt
         assert compiled.request.image_bindings == ()
         assert compiled.request.media_bindings == ()
         resolved = family.resolve(compiled.request)
         assert resolved.provider_name == "comfy-local-h3-t8"
         assert resolved.capability_id == capability_id
         assert resolved.effective_output.native_audio is True
+
+        legacy_routing = VideoGenerationResolver().resolve_requirement(
+            projection=legacy_projection,
+            context=context,
+            policy=_policy(),
+            provider_profile=ProviderProfilePointer(
+                profile_id=profile_id,
+                profile_version="v1",
+                profile_path=Path(
+                    f"provider-profiles/{selected_profile.profile_content_hash}.json"
+                ),
+                profile_sha256=selected_profile.profile_content_hash,
+            ),
+            capabilities=family.capabilities(),
+            selected_capability_id=capability_id,
+            output_requirement=output,
+            lifecycle=_lifecycle(context),
+            compiler_contract=AdapterCompilerContract.create(
+                compiler_id=compiler_id,
+                compiler_version="2",
+            ),
+        )
+        assert legacy_routing.provider_bound_request is not None
+        unsupported = family.compile_request(
+            legacy_routing.provider_bound_request,
+            legacy_projection.requirement,
+        )
+        assert isinstance(unsupported, ProviderRequirementUnsupported)
+        assert unsupported.reason is (
+            ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED
+        )
+        assert "generation_intent.open_state" in unsupported.unsupported_field_paths
+
+
+def test_t8_quality_native_compiler_uses_h3_three_field_prompt_without_neutral_field_leakage() -> None:
+    root = Path(__file__).resolve().parents[1]
+    profile = load_t8_video_execution_profile(
+        root / "workflows/profiles/minimax_h3_t8_t2va_quality.json",
+        artifact_root=root,
+    )
+    provider = ComfyUIT8VideoProvider(
+        profile,
+        artifact_root=root,
+        comfy_root=root,
+        runtime_inspector=lambda: (_ for _ in ()).throw(
+            AssertionError("offline compiler mapping must not inspect runtime")
+        ),
+        transport=object(),
+    )
+    context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
+    output = VideoFlexibleOutputRequirement(
+        timing_mode="frame_count",
+        frame_count=124,
+        dimension_mode="exact",
+        width=1344,
+        height=768,
+        resolution_label="h3_t8_native",
+        ratio="16:9",
+        fps=24,
+        container="mp4",
+        mime_type="video/mp4",
+        native_audio=True,
+    )
+    native_intent = _complete_intent().model_copy(
+        update={
+            "primary_camera_motion": None,
+            "camera_subject_relation": None,
+        }
+    )
+    projection = _replace_requirement(
+        _verified_requirement(context),
+        contract_version="provider-neutral-video-requirement/1",
+        generation_mode=RequirementGenerationMode.TEXT_TO_VIDEO,
+        continuity_mode=RequirementContinuityMode.NONE,
+        generation_intent=native_intent,
+        capability_need=CapabilityNeed(
+            needs_native_audio=True,
+            accepts_local_execution=True,
+            accepts_remote_execution=False,
+        ),
+        semantic_reference_roles=(),
+        asset_evidence=(),
+        output_need=OutputNeed(
+            timing_mode="frame_count",
+            frame_count=124,
+            geometry_policy=OutputGeometryPolicy.EXACT,
+            width=1344,
+            height=768,
+            aspect_ratio="16:9",
+            fps=24,
+            container_mime="video/mp4",
+        ),
+        audio_need=AudioNeed.REQUIRED,
+    )
+    routing = VideoGenerationResolver().resolve_requirement(
+        projection=projection,
+        context=context,
+        policy=_policy(),
+        provider_profile=ProviderProfilePointer(
+            profile_id="minimax-h3-t8-t2va-quality",
+            profile_version="v1",
+            profile_path=Path(
+                f"provider-profiles/{profile.profile_content_hash}.json"
+            ),
+            profile_sha256=profile.profile_content_hash,
+        ),
+        capabilities=provider.capabilities(),
+        selected_capability_id="minimax-h3-t8-t2va-quality-v1",
+        output_requirement=output,
+        lifecycle=_lifecycle(context),
+        compiler_contract=AdapterCompilerContract.create(
+            compiler_id="comfy-local-h3-t8-video-compiler",
+            compiler_version="2",
+        ),
+    )
+    assert routing.provider_bound_request is not None
+
+    compiled = provider.compile_request(
+        routing.provider_bound_request,
+        projection.requirement,
+    )
+
+    assert isinstance(compiled, CompiledProviderVideoRequest)
+    assert compiled.adapter_compiler_version == "2"
+    assert compiled.provider_native_prompt.count("[Shot 1]") == 1
+    assert "integrated_multimodal_description:" in compiled.provider_native_prompt
+    assert "overall_soundscape:" in compiled.provider_native_prompt
+    assert "non_diegetic_music:" in compiled.provider_native_prompt
+    assert "generation_mode=" not in compiled.provider_native_prompt
+    assert "scene_mood=" not in compiled.provider_native_prompt
+    assert "scene_constraints=" not in compiled.provider_native_prompt
+
+    malformed_requirement = projection.requirement.model_copy(
+        update={"generation_intent": "oops"}
+    )
+    malformed = provider.compile_request(
+        routing.provider_bound_request,
+        malformed_requirement,
+    )
+    assert isinstance(malformed, ProviderRequirementUnsupported)
+    assert malformed.reason is ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH
+
+    stale_projection = _replace_requirement(
+        projection,
+        source_request_content_hash="e" * 64,
+    )
+    stale = provider.compile_request(
+        routing.provider_bound_request,
+        stale_projection.requirement,
+    )
+    assert isinstance(stale, ProviderRequirementUnsupported)
+    assert stale.reason is ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH
+
+    legacy_compiler_routing = VideoGenerationResolver().resolve_requirement(
+        projection=projection,
+        context=context,
+        policy=_policy(),
+        provider_profile=ProviderProfilePointer(
+            profile_id="minimax-h3-t8-t2va-quality",
+            profile_version="v1",
+            profile_path=Path(
+                f"provider-profiles/{profile.profile_content_hash}.json"
+            ),
+            profile_sha256=profile.profile_content_hash,
+        ),
+        capabilities=provider.capabilities(),
+        selected_capability_id="minimax-h3-t8-t2va-quality-v1",
+        output_requirement=output,
+        lifecycle=_lifecycle(context),
+        compiler_contract=AdapterCompilerContract.create(
+            compiler_id="comfy-local-h3-t8-video-compiler",
+            compiler_version="1",
+        ),
+    )
+    assert legacy_compiler_routing.provider_bound_request is not None
+    legacy_compiler = provider.compile_request(
+        legacy_compiler_routing.provider_bound_request,
+        projection.requirement,
+    )
+    assert isinstance(legacy_compiler, ProviderRequirementUnsupported)
+    assert legacy_compiler.reason is (
+        ProviderRequirementUnsupportedReason.COMPILER_VERSION_UNSUPPORTED
+    )
 
 
 def test_hailuo_compiles_first_frame_to_adaptive_i2v_without_fixed_pixels() -> None:

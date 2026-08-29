@@ -16,6 +16,7 @@ from ai_video.production.video_requirement import (
     ConditioningCompatibilityEvidence,
     ConditioningLane,
     CameraSubjectRelation,
+    ContinuityMode,
     ContinuityStateKind,
     GenerationIntent,
     GenerationMode,
@@ -130,6 +131,32 @@ def validate_requirement_conditioning_compatibility(
     requirement: ProviderNeutralVideoRequirement,
 ) -> tuple[str, ...]:
     evidence = requirement.conditioning_compatibility
+    if requirement.generation_mode is GenerationMode.TEXT_TO_VIDEO:
+        diagnostics: list[str] = []
+        if evidence is not None:
+            diagnostics.append("conditioning_compatibility")
+        if requirement.asset_evidence:
+            diagnostics.append("asset_evidence")
+        if requirement.semantic_reference_roles:
+            diagnostics.append("semantic_reference_roles")
+        if requirement.continuity_mode not in {
+            ContinuityMode.NONE,
+            ContinuityMode.SEMANTIC,
+        }:
+            diagnostics.append("continuity_mode")
+        capability = requirement.capability_need
+        for field in (
+            "needs_identity_reference",
+            "needs_scene_reference",
+            "needs_first_frame",
+            "needs_last_frame",
+            "needs_terminal_reference",
+        ):
+            if getattr(capability, field):
+                diagnostics.append(f"capability_need.{field}")
+        if capability.max_reference_count not in {None, 0}:
+            diagnostics.append("capability_need.max_reference_count")
+        return tuple(diagnostics)
     diagnostics = list(validate_conditioning_compatibility(evidence))
     if evidence is None:
         return tuple(diagnostics)

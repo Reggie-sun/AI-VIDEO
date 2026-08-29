@@ -10,10 +10,12 @@ from typing import Any, BinaryIO, Callable, Literal, Protocol
 
 import httpx
 import yaml
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, ValidationError, field_validator, model_validator
+from pydantic_core import PydanticSerializationError
 
 from ai_video.comfy_client import ComfyClient, JobStatus
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production._h3_prompt import H3PromptCompilation, compile_h3_prompt
 from ai_video.production.comfy_image import (
     _missing_required_node_inputs,
     validate_loopback_endpoint,
@@ -41,7 +43,10 @@ from ai_video.production.video import (
     VideoTaskState,
 )
 from ai_video.production.video_compiler import (
+    ProviderNativePrompt,
     ProviderRequestCompilationResult,
+    ProviderRequirementUnsupported,
+    ProviderRequirementUnsupportedReason,
     compile_provider_video_request,
 )
 from ai_video.production.video_contracts import (
@@ -62,6 +67,50 @@ _CAPABILITY_ID = "minimax-h3-t8-t2va-quality-v1"
 _PROVIDER_KIND = "minimax_h3_t8_t2va"
 _MODEL_ID = "minimax-h3-t8-t2va-quality"
 _COMPILER_ID = "comfy-local-h3-t8-video-compiler"
+
+
+def _preflight_t8_compiler_request(
+    *,
+    provider_bound: ProviderBoundVideoRequest,
+    requirement: ProviderNeutralVideoRequirement,
+    compiler_id: str,
+) -> ProviderRequirementUnsupported | None:
+    try:
+        ProviderBoundVideoRequest.model_validate(
+            provider_bound.model_dump(mode="python", warnings="error")
+        )
+        ProviderNeutralVideoRequirement.model_validate(
+            requirement.model_dump(mode="python", warnings="error")
+        )
+    except (PydanticSerializationError, ValidationError):
+        return ProviderRequirementUnsupported(
+            requirement_hash=requirement.requirement_hash,
+            provider_bound_request_hash=provider_bound.provider_bound_request_hash,
+            selected_capability_id=provider_bound.capability_id,
+            reason=ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH,
+            unsupported_field_paths=("requirement_hash",),
+        )
+    compiler_contract = provider_bound.compiler_contract
+    if (
+        compiler_contract.compiler_id != compiler_id
+        or compiler_contract.compiler_version != "2"
+    ):
+        return ProviderRequirementUnsupported(
+            requirement_hash=requirement.requirement_hash,
+            provider_bound_request_hash=provider_bound.provider_bound_request_hash,
+            selected_capability_id=provider_bound.capability_id,
+            reason=ProviderRequirementUnsupportedReason.COMPILER_VERSION_UNSUPPORTED,
+            unsupported_field_paths=("compiler_contract",),
+        )
+    if requirement.requirement_hash != provider_bound.requirement_hash:
+        return ProviderRequirementUnsupported(
+            requirement_hash=requirement.requirement_hash,
+            provider_bound_request_hash=provider_bound.provider_bound_request_hash,
+            selected_capability_id=provider_bound.capability_id,
+            reason=ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH,
+            unsupported_field_paths=("requirement_hash",),
+        )
+    return None
 
 
 def _invalid(message: str, detail: str | None = None) -> AiVideoError:
@@ -653,12 +702,33 @@ class ComfyUIT8VideoProvider:
         provider_bound: ProviderBoundVideoRequest,
         requirement: ProviderNeutralVideoRequirement,
     ) -> ProviderRequestCompilationResult:
+        unsupported = _preflight_t8_compiler_request(
+            provider_bound=provider_bound,
+            requirement=requirement,
+            compiler_id=_COMPILER_ID,
+        )
+        if unsupported is not None:
+            return unsupported
+        prompt = compile_h3_prompt(requirement)
+        if not isinstance(prompt, H3PromptCompilation):
+            return ProviderRequirementUnsupported(
+                requirement_hash=requirement.requirement_hash,
+                provider_bound_request_hash=provider_bound.provider_bound_request_hash,
+                selected_capability_id=provider_bound.capability_id,
+                reason=ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+                unsupported_field_paths=prompt.unsupported_field_paths,
+            )
         return compile_provider_video_request(
             provider_bound=provider_bound,
             requirement=requirement,
             compiler_id=_COMPILER_ID,
-            compiler_version="1",
+            compiler_version="2",
             capabilities=self.capabilities(),
+            native_prompt=ProviderNativePrompt(
+                grammar_contract="h3-three-field-v1",
+                prompt_text=prompt.prompt_text,
+                prompt_sha256=prompt.prompt_sha256,
+            ),
         )
 
     def resolve(

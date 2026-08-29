@@ -43,6 +43,7 @@ from ai_video.production.video_requirement import (
     GenerationOperation,
     OutputGeometryPolicy,
     OutputNeed,
+    Pacing,
     ProviderNeutralGenerationIntentProjection,
     ProviderNeutralVideoRequirement,
     QualityNeed,
@@ -407,6 +408,49 @@ def test_v3_explicit_text_to_video_keeps_character_semantics_without_fake_assets
     assert plan.generation_requirement is not None
     assert plan.generation_requirement.characters == request.character_context
     assert plan.generation_requirement.semantic_reference_roles == ()
+    assert plan.generation_requirement.asset_evidence == ()
+
+
+def test_v3_explicit_rich_text_to_video_reaches_v4_requirement_without_conditioning():
+    shot = _generated_shot()
+    intent = _complete_intent().model_copy(
+        update={"pacing": Pacing(shot_duration_seconds=3.0)}
+    )
+    projection = ProviderNeutralGenerationIntentProjection.create(
+        generation_intent=intent,
+        generation_operation=GenerationOperation.TEXT_TO_VIDEO,
+        conditioning_compatibility=None,
+        output_need=OutputNeed(
+            timing_mode="fixed",
+            duration_seconds=3.0,
+            geometry_policy=OutputGeometryPolicy.ADAPTIVE,
+            aspect_ratio="16:9",
+            fps=24,
+            container_mime="video/mp4",
+        ),
+        audio_need=AudioNeed.OPTIONAL,
+        quality_need=QualityNeed(objective_tier="production"),
+        semantic_reference_roles=(),
+        media_reference_asset_ids=(),
+    )
+    request = make_request(
+        target_shot=shot,
+        available_assets=(),
+        shot_intent_evidence=make_intent_evidence(target_shot=shot),
+        review_decision=None,
+        planning_contract_version="video-planner/3",
+        generation_intent=projection,
+    )
+
+    plan = VideoPlanner().plan(request)
+
+    assert plan.outcome is PlanOutcome.PROPOSED
+    assert plan.generation_requirement is not None
+    assert plan.generation_requirement.contract_version == (
+        "provider-neutral-video-requirement/4"
+    )
+    assert plan.generation_requirement.generation_mode.value == "text_to_video"
+    assert plan.generation_requirement.conditioning_compatibility is None
     assert plan.generation_requirement.asset_evidence == ()
 
 
