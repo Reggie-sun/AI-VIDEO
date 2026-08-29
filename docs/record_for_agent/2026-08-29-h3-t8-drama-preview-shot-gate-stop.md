@@ -46,6 +46,52 @@ assembly。
   queue 清空后 service 已停止，`127.0.0.1:8188` 不再监听；`/home/reggie/ComfyUI`
   已恢复到 clean detached checkout `e01fb4c56b7a88149d469b99cbbfe3223d715054`。
 
+## Composition Repair — 2026-08-30
+
+用户在 1.0× 观看旧 development preview 后报告五处 Shot seam 明显卡顿且没有字幕。检查确认
+旧文件是连续 `24 fps` / 720-frame PTS，并非编码丢帧；问题来自五处全幅 hard cut 的感知跳变，
+同时旧合成确实没有烧录已封存台词。此次只执行 deterministic local composition repair，没有
+重新生成 Shot、调用 ComfyUI、使用 remote/cloud egress 或产生 paid Provider call。
+
+新的 development preview：
+
+- output：`runs/drama-h3-t8-30s-preview-20260830-final-v2/outputs/key-at-the-waiting-room-development-preview-v2-30.000s.mp4`
+- SHA-256：`c4ca36017f48a398eb15765b8342e4f198a3c7e79fa06de13a2450e9b56ef5a0`
+- exact media facts：H.264 High、`1344x768`、`24 fps`、720 frames、container/video
+  `30.000s`；AAC `32000 Hz` stereo、audio `29.968s`，末尾为 32 ms silent video tail
+- cadence evidence：720 个连续 frame PTS，相邻 interval anomaly 为 0；full ffmpeg decode PASS
+
+五处 hard cut 被替换为每处 6-frame linear dissolve，并在相同边界加入 0.25 秒 triangular audio
+crossfade。选择手工 linear blend 是因为本机旧 ffmpeg `xfade` 实验分别产生 duplicated/dropped
+frames 或提前结束，不满足 exact 720-frame contract。四段字幕直接来自 sealed authored
+requirement，不来自 ASR 推测：
+
+- Shot 2：`钥匙还在。回去，一起开门。`
+- Shot 3：`你这次，会留下吗？`
+- Shot 4：`我会留下。你来决定。`
+- Shot 6：`等你开门。`
+
+字幕以白字、黑色描边和半透明底板烧录在 bottom-center safe area。Exact control/evidence identity：
+
+- `compose.sh` SHA-256：`f1e174ebb6ac5b12c56af3ea8f0a2f3da6bd5d702f8fbfdb4af57b930ce4f29f`
+- `filtergraph.txt` SHA-256：`8215386f70d111c6d28fc4bf656b2cef8ac3e328d1c56f835de929d7e37295a2`
+- `subtitle-cues.json` SHA-256：`608a68a248e22953c761f7ae4b0e3578b504ed509cd549707c561b35b9d1b8d0`
+- subtitle contact SHA-256：`708d26c253d244a74c583f3e560f2f5b452685dcd5f9ab25df8b59554ee4d985`
+- seam contact SHA-256：`f0244d683f69b2a4575b5aeb04c8837ab99bd88098dc56d26a3b4e56879215d7`
+
+Project-local `video-analysis` MCP 绑定 exact output 返回 `30.0s`、`1344x768`、audio present、
+60-frame extraction、`unique_frame_ratio=0.992`、`issues=[]`。逐边界 contact sheet 显示 6 帧
+渐变连续推进，无 black flash 或 axis inversion；字幕 contact sheet 显示四段 exact copy 均出现，
+未遮挡人物面部。Independent `reviewer_high` verdict 为 `accept with concerns`：技术上可交付为
+development preview，但静态 contact sheet 与 cadence metrics 不能替代 1.0× 人类观看；短 dissolve
+可能存在预期的双影，因此 seam 的最终主观舒适度仍为 `PENDING`。
+
+Exact Gate：`runs/drama-h3-t8-30s-preview-20260830-final-v2/sidecars/gates/composition-repair-gate.json`，
+SHA-256 `24f6c41e8d3a8aa8fee423dc499433527fb9a10548df4694435a883ca57d3274`。Gate verdict 为
+`PASS_FOR_HUMAN_REVIEW`，不产生 Production activation、P6 或 Final Acceptance。Shot 6 native audio
+中首音节的 fidelity 仍为 `NOT_EVALUATED`；烧录正确 authored subtitle 只修复观看层字幕缺失，不能
+倒推出原生对白 Gate PASS。
+
 ## Current Shot 6 Evidence Boundary
 
 v21–v24 每个 attempt 仅修改一个可归因变量：dialogue boundary timing、首字符/四音节约束、
@@ -174,6 +220,7 @@ V2 finding、output identity 与停止决定位于
 | h3-t8-drama-shot06-v22-gate-20260830 | local-comfyui:h3-t8:drama-shot06-dialogue-v22:20260830 | drama-h3-t8-30s-preview-20260830-shot06-dialogue | drama-preview-shot-06-submit-v22 | v22-dialogue-timing | 82d48e32e033f45694e102f5b4767ba1030351da6513eff4c5faa90bc00d799b | EXACT_MEDIA_GATE | NOT_EVALUATED | CONFLICTING_FIRST_SYLLABLE_TRANSCRIPTION | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-v22/sidecars/gates/shot-06-gate.json` |
 | h3-t8-drama-shot06-v23-gate-20260830 | local-comfyui:h3-t8:drama-shot06-dialogue-v23:20260830 | drama-h3-t8-30s-preview-20260830-shot06-dialogue | drama-preview-shot-06-submit-v23 | v23-four-syllable-anchor | bc62c5cb4f560a50cf0397b24696bd644e501fdf50302b29c1d809c0575b6ab6 | EXACT_MEDIA_GATE | NOT_EVALUATED | CONFLICTING_FIRST_SYLLABLE_TRANSCRIPTION | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-v23/sidecars/gates/shot-06-gate.json` |
 | h3-t8-drama-shot06-v24-gate-20260830 | local-comfyui:h3-t8:drama-shot06-dialogue-v24:20260830 | drama-h3-t8-30s-preview-20260830-shot06-dialogue | drama-preview-shot-06-submit-v24 | v24-deng3-phonetic-anchor | 28b2817a023863ba9b0553f42f14867435bf323a84b58f54d0146724d7f58ff1 | EXACT_MEDIA_GATE | NOT_EVALUATED | CONFLICTING_FIRST_SYLLABLE_AND_LARGE_MODEL_UNAVAILABLE | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-v24/sidecars/gates/shot-06-gate.json` |
+| h3-t8-drama-composition-v2-20260830 | local-composition:h3-t8:drama-preview-v2:20260830 | drama-h3-t8-30s-preview-20260830-composition | composition-repair-v2 | manual-six-frame-blend-authored-subtitles | c4ca36017f48a398eb15765b8342e4f198a3c7e79fa06de13a2450e9b56ef5a0 | DEVELOPMENT_COMPOSITION_REPAIR_GATE | PASS_FOR_HUMAN_REVIEW | HUMAN_FULL_SPEED_WATCH_PENDING | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-final-v2/sidecars/gates/composition-repair-gate.json` |
 
 ## Historical Assessment Before 2026-08-30
 
