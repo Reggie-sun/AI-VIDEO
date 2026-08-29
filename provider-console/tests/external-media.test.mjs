@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
+import { spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdtemp, mkdir, symlink, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import test from "node:test";
 
-import { catalogExternalMedia, publicExternalMediaProjection } from "../scripts/external-media.mjs";
+import { __test__, catalogExternalMedia, publicExternalMediaProjection } from "../scripts/external-media.mjs";
 
 async function fixture() {
   const root = await mkdtemp(path.join(tmpdir(), "provider-console-external-media-"));
@@ -26,6 +27,22 @@ function sources(paths) {
 
 function sha256(value) {
   return createHash("sha256").update(value).digest("hex");
+}
+
+function writeTaggedMp4(outputPath, graph) {
+  const result = spawnSync("ffmpeg", [
+    "-loglevel", "error",
+    "-y",
+    "-f", "lavfi",
+    "-i", "color=c=black:s=16x16:r=1",
+    "-frames:v", "1",
+    "-c:v", "libx264",
+    "-pix_fmt", "yuv420p",
+    "-metadata", `prompt=${JSON.stringify(graph)}`,
+    "-movflags", "use_metadata_tags",
+    outputPath,
+  ], { encoding: "utf8" });
+  assert.equal(result.status, 0, result.stderr);
 }
 
 function pngBytes(width, height, marker) {
@@ -635,6 +652,247 @@ test("unknown sidecar schemas retain exact evidence refs without interpreting ge
   assert.equal(group.shot_type, null);
   assert.equal(group.reported_status, null);
   assert.deepEqual(group.evidence_refs, [{ source_id: "raw", relative_path: "unknown.json" }]);
+});
+
+test("embedded ComfyUI graph metadata binds Prompt and generation type to the exact MP4 bytes", async () => {
+  const paths = await fixture();
+  const media = path.join(paths.raw, "opaque.mp4");
+  writeTaggedMp4(media, {
+    5: {
+      class_type: "MiniMaxH3AudioConditioningT8",
+      inputs: {
+        prompt: "exact embedded prompt",
+        task_type: "FL2VA",
+      },
+    },
+  });
+
+  const result = await catalogExternalMedia({ sources: sources(paths) });
+  const group = result.groups.find((item) => item.preview.file_name === "opaque.mp4");
+
+  assert.equal(group.metadata_status, "bound");
+  assert.equal(group.prompt_text, "exact embedded prompt");
+  assert.equal(group.generation_type, "FL2VA");
+  assert.equal(group.shot_id, null);
+  assert.equal(group.reported_status, null);
+  assert.deepEqual(group.evidence_refs, [{ source_id: "raw", relative_path: "opaque.mp4" }]);
+});
+
+test("embedded ComfyUI graph parsing is allowlisted and conflicting prompt nodes fail closed", () => {
+  assert.deepEqual(__test__.embeddedComfyMetadata(JSON.stringify({
+    1: { class_type: "UnknownPromptNode", inputs: { prompt: "must not bind" } },
+    2: { class_type: "MiniMaxH3ImageToVideo", inputs: { prompt: "known prompt" } },
+  })), {
+    prompt: "known prompt",
+    generation_type: "MiniMaxH3ImageToVideo",
+  });
+  assert.equal(__test__.embeddedComfyMetadata(JSON.stringify({
+    1: { class_type: "MiniMaxH3AudioConditioningT8", inputs: { prompt: "first", task_type: "T2VA" } },
+    2: { class_type: "MiniMaxH3ImageToVideo", inputs: { prompt: "second", task_type: "I2VA" } },
+  })), null);
+  assert.equal(__test__.embeddedComfyMetadata("not-json"), null);
+});
+
+test("known Long Video candidate and accepted manifest bind exact path plus SHA without inventing a Shot", async () => {
+  const paths = await fixture();
+  const chain = path.join(paths.raw, "chain-a");
+  const candidateDirectory = path.join(chain, "candidates", "segment_00000", "candidate-a");
+  const acceptedDirectory = path.join(chain, "accepted");
+  const candidateVideo = path.join(candidateDirectory, "candidate.mp4");
+  const acceptedVideo = path.join(acceptedDirectory, "segment_00000.mp4");
+  const bytes = Buffer.from("long-video-candidate");
+  const videoSha256 = sha256(bytes);
+  await Promise.all([
+    mkdir(candidateDirectory, { recursive: true }),
+    mkdir(acceptedDirectory, { recursive: true }),
+  ]);
+  await Promise.all([writeFile(candidateVideo, bytes), writeFile(acceptedVideo, bytes)]);
+  await writeFile(path.join(candidateDirectory, "candidate.json"), JSON.stringify({
+    schema: 1,
+    status: "candidate",
+    video_path: "candidates/segment_00000/candidate-a/candidate.mp4",
+    video_sha256: videoSha256,
+    prompt: "exact long-video prompt",
+    model_id: "minimax-h3-test",
+    candidate_id: "candidate-a",
+    chain_id: "chain-a",
+    index: 0,
+  }));
+  await writeFile(path.join(chain, "manifest.json"), JSON.stringify({
+    schema: 2,
+    format: "minimax_h3_t8_accepted_manifest",
+    segments: [{
+      index: 0,
+      video_path: "accepted/segment_00000.mp4",
+      video_sha256: videoSha256,
+      prompt: "exact long-video prompt",
+      model_id: "minimax-h3-test",
+      candidate_id: "candidate-a",
+    }],
+  }));
+
+  const result = await catalogExternalMedia({ sources: sources(paths) });
+  const group = result.groups.find((item) => item.sha256 === videoSha256);
+
+  assert.equal(group.locations.length, 2);
+  assert.equal(group.metadata_status, "bound");
+  assert.equal(group.prompt_text, "exact long-video prompt");
+  assert.equal(group.shot_type, "long_video_segment");
+  assert.equal(group.shot_id, null);
+  assert.deepEqual(group.evidence_refs, [
+    { source_id: "raw", relative_path: "chain-a/candidates/segment_00000/candidate-a/candidate.json" },
+    { source_id: "raw", relative_path: "chain-a/manifest.json" },
+  ]);
+
+  await writeFile(path.join(chain, "manifest.json"), JSON.stringify({
+    schema: 2,
+    format: "minimax_h3_t8_accepted_manifest",
+    segments: [{
+      index: 0,
+      video_path: "accepted/segment_00000.mp4",
+      video_sha256: "0".repeat(64),
+      prompt: "must not bind",
+      model_id: "minimax-h3-test",
+      candidate_id: "candidate-a",
+    }],
+  }));
+  const rejected = await catalogExternalMedia({ sources: sources(paths) });
+  const acceptedLocation = rejected.groups.find((item) => item.sha256 === videoSha256);
+  assert.equal(acceptedLocation.prompt_text, "exact long-video prompt");
+  assert.deepEqual(acceptedLocation.evidence_refs, [
+    { source_id: "raw", relative_path: "chain-a/candidates/segment_00000/candidate-a/candidate.json" },
+  ]);
+
+  await writeFile(path.join(candidateDirectory, "candidate.json"), JSON.stringify({
+    schema: 1,
+    status: "unrelated",
+    video_path: "candidates/segment_00000/candidate-a/candidate.mp4",
+    video_sha256: videoSha256,
+    prompt: "must not bind",
+    model_id: "minimax-h3-test",
+    candidate_id: "candidate-a",
+    chain_id: "chain-a",
+    index: 0,
+  }));
+  const rejectedCandidate = await catalogExternalMedia({ sources: sources(paths) });
+  const rejectedCandidateGroup = rejectedCandidate.groups.find((item) => item.sha256 === videoSha256);
+  assert.equal(rejectedCandidateGroup.metadata_status, "not_evaluated");
+  assert.equal(rejectedCandidateGroup.prompt_text, null);
+  assert.deepEqual(rejectedCandidateGroup.evidence_refs, []);
+});
+
+test("conflicting Long Video semantics for duplicate exact bytes fail closed at the SHA group", async () => {
+  const paths = await fixture();
+  const bytes = Buffer.from("reused-long-video-bytes");
+  const videoSha256 = sha256(bytes);
+  for (const [chainId, prompt] of [["chain-a", "prompt A"], ["chain-b", "prompt B"]]) {
+    const candidateId = `${chainId}-candidate`;
+    const directory = path.join(paths.raw, chainId, "candidates", "segment_00000", candidateId);
+    await mkdir(directory, { recursive: true });
+    await writeFile(path.join(directory, "candidate.mp4"), bytes);
+    await writeFile(path.join(directory, "candidate.json"), JSON.stringify({
+      schema: 1,
+      status: "candidate",
+      video_path: `candidates/segment_00000/${candidateId}/candidate.mp4`,
+      video_sha256: videoSha256,
+      prompt,
+      model_id: "minimax-h3-test",
+      candidate_id: candidateId,
+      chain_id: chainId,
+      index: 0,
+    }));
+  }
+
+  const result = await catalogExternalMedia({ sources: sources(paths) });
+  const group = result.groups.find((item) => item.sha256 === videoSha256);
+
+  assert.equal(group.association_ambiguity, true);
+  assert.equal(group.metadata_status, "ambiguous_bound_evidence");
+  assert.equal(group.prompt_text, null);
+  assert.equal(group.shot_type, null);
+  assert.deepEqual(group.evidence_refs, [
+    { source_id: "raw", relative_path: "chain-a/candidates/segment_00000/chain-a-candidate/candidate.json" },
+    { source_id: "raw", relative_path: "chain-b/candidates/segment_00000/chain-b-candidate/candidate.json" },
+  ]);
+});
+
+test("a weaker internally ambiguous record cannot override stronger verified experiment evidence", () => {
+  const shared = {
+    sha256: "a".repeat(64),
+    bytes: 10,
+    mime_type: "video/mp4",
+    mtime_ms: 1,
+    identity: ["1", "2", "3", "4"],
+    evidence_refs: [],
+    composition: null,
+    shot_evidence: [],
+    technical_gate: null,
+    human_verdict: null,
+    reference_descriptors: {},
+  };
+  const strong = {
+    ...shared,
+    source_path: "/source/experiment.mp4",
+    source_root: "/source",
+    source_id: "experiment",
+    source_label: "Experiment",
+    source_kind: "development_artifact",
+    metadata: { prompt: "verified experiment Prompt", generation_type: "image_to_video" },
+    metadata_status: "verified_experiment_evidence",
+    experiment_signature: "verified-signature",
+    association_ambiguity: false,
+  };
+  const weak = {
+    ...shared,
+    source_path: "/raw/copy.mp4",
+    source_root: "/raw",
+    source_id: "raw",
+    source_label: "Raw",
+    source_kind: "raw_provider_output",
+    metadata: { prompt: "weaker conflicting Prompt", generation_type: "T2VA" },
+    metadata_status: "bound",
+    experiment_signature: null,
+    association_ambiguity: true,
+    association_ambiguity_tiers: ["bound"],
+  };
+
+  const group = __test__.groupProjection([strong, weak]).groups[0];
+
+  assert.equal(group.association_ambiguity, false);
+  assert.equal(group.metadata_status, "verified_experiment_evidence");
+  assert.equal(group.prompt_text, "verified experiment Prompt");
+  assert.equal(group.generation_type, "image_to_video");
+
+  const normalBound = {
+    ...weak,
+    source_path: "/raw/normal.mp4",
+    metadata: { prompt: "normal bound Prompt", generation_type: "T2VA" },
+    association_ambiguity: false,
+    association_ambiguity_tiers: [],
+  };
+  const internallyAmbiguousBound = {
+    ...weak,
+    source_path: "/raw/ambiguous.mp4",
+    metadata: {},
+    metadata_status: "not_evaluated",
+  };
+  const ambiguousGroup = __test__.groupProjection([normalBound, internallyAmbiguousBound]).groups[0];
+  assert.equal(ambiguousGroup.association_ambiguity, true);
+  assert.equal(ambiguousGroup.metadata_status, "ambiguous_bound_evidence");
+  assert.equal(ambiguousGroup.prompt_text, null);
+
+  const internallyAmbiguousExperiment = {
+    ...strong,
+    metadata: {},
+    metadata_status: "ambiguous_verified_experiment_evidence",
+    experiment_signature: null,
+    association_ambiguity: true,
+    association_ambiguity_tiers: ["experiment"],
+  };
+  const ambiguousExperimentGroup = __test__.groupProjection([internallyAmbiguousExperiment]).groups[0];
+  assert.equal(ambiguousExperimentGroup.association_ambiguity, true);
+  assert.equal(ambiguousExperimentGroup.metadata_status, "ambiguous_verified_experiment_evidence");
+  assert.equal(ambiguousExperimentGroup.prompt_text, null);
 });
 
 test("unbound sidecars fail closed and scan limits are deterministic", async () => {

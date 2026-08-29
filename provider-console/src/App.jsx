@@ -447,7 +447,7 @@ function ExternalSummary({ group, sources }) {
   );
 }
 
-function ExternalMediaDetail({ group, sources }) {
+export function ExternalMediaDetail({ group, sources }) {
   const url = externalMediaUrl(group);
   const status = externalStatus(group);
   const metadata = externalDisplayMetadata(group);
@@ -470,7 +470,7 @@ function ExternalMediaDetail({ group, sources }) {
           </div>
           <section className={`external-status-callout external-status-callout--${status.tone}`}>
             <StatusIcon tone={status.tone} size={21} />
-            <div><strong>{status.label}</strong><p>{status.ambiguous ? "同一视频 bytes 关联到互相冲突的 exact evidence；不会选择最新记录或猜测语义。" : status.evaluated ? "状态来自受支持且经 exact identity 绑定的证据链；它不是 Manifest attempt、candidate 或质量验收。" : metadata.source === "runs_exact_sha" ? "Prompt、生成类型与可用的 Shot snapshot 来自 canonical Runs 的 exact SHA-256 + bytes 关联；External generation status 仍保持 NOT_EVALUATED。" : status.raw === "INCOMPLETE_RUNS_CONTEXT" ? "Runs context 正在加载、当前不可用或部分 workspace 无法严格重开；该视频没有已确认 match，但不能据此断言完全没有绑定。" : status.evidence_state === "unparsed" ? "已找到 exact-bound evidence ref，但 schema 或完整关联链尚未支持，因此不会解释其中的 Prompt、Shot 或状态。" : "没有找到语义受支持且与 exact bytes 绑定的生成记录，因此不会把文件名或文件存在解释为 Prompt、Shot 或成功状态。"}</p></div>
+            <div><strong>{status.label}</strong><p>{status.ambiguous ? "同一视频 bytes 关联到互相冲突的 exact evidence；不会选择最新记录或猜测语义。" : status.evaluated ? "状态来自受支持且经 exact identity 绑定的证据链；它不是 Manifest attempt、candidate 或质量验收。" : metadata.source === "runs_exact_sha" ? "Prompt、生成类型与可用的 Shot snapshot 来自 canonical Runs 的 exact SHA-256 + bytes 关联；External generation status 仍保持 NOT_EVALUATED。" : status.raw === "INCOMPLETE_RUNS_CONTEXT" ? "Runs context 正在加载、当前不可用或部分 workspace 无法严格重开；该视频没有已确认 match，但不能据此断言完全没有绑定。" : status.evidence_state === "unparsed" ? "已找到 exact-bound evidence ref，但 schema 或完整关联链尚未支持，因此不会解释其中的 Prompt、Shot 或状态。" : status.evidence_state === "linked" ? "Prompt 或类型来自受支持且与 exact bytes 绑定的 metadata；没有 direct Shot ID 时只显示 Prompt/type，不从内容反推 canonical 分镜。生成状态仍保持 NOT_EVALUATED。" : "没有找到语义受支持且与 exact bytes 绑定的生成记录，因此不会把文件名或文件存在解释为 Prompt、Shot 或成功状态。"}</p></div>
           </section>
           <ExternalShotBreakdown group={group} />
           {!hasComposition && !hasExactShotEvidence && !hasRunsContext && <section className="external-storyboard-card">
@@ -572,7 +572,7 @@ export function App() {
   const [externalSelectedSha, setExternalSelectedSha] = useState("");
   const [selectedSource, setSelectedSource] = useState("all");
   const [externalQuery, setExternalQuery] = useState("");
-  const [externalEvidenceFilter, setExternalEvidenceFilter] = useState("all");
+  const [externalEvidenceFilter, setExternalEvidenceFilter] = useState("linked");
   const [externalLoading, setExternalLoading] = useState(false);
   const [externalError, setExternalError] = useState("");
   const [runsMediaIndex, setRunsMediaIndex] = useState(null);

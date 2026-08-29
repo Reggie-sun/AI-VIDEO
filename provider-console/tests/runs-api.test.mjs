@@ -253,9 +253,10 @@ test("video library rail labels and filters External evidence states without N/E
     assert.match(markup, /Runs 待恢复 \(0\)/);
     assert.match(markup, /旁证待解析 \(1\)/);
     assert.match(markup, /无绑定证据 \(1\)/);
+    assert.match(markup, /<option value="linked" selected="">已关联 \(1\)<\/option>/);
     assert.match(markup, />Runs 已关联<\/span>/);
-    assert.match(markup, />旁证待解析<\/span>/);
-    assert.match(markup, />无绑定证据<\/span>/);
+    assert.doesNotMatch(markup, />旁证待解析<\/span>/);
+    assert.doesNotMatch(markup, />无绑定证据<\/span>/);
     assert.match(markup, /shot-linked · T2V/);
     assert.match(markup, /Exact Runs prompt/);
     assert.doesNotMatch(markup, />N\/E<\/span>/);
@@ -478,6 +479,7 @@ test("external reference previews load eagerly inside the nested detail scroller
   });
   try {
     const { ExternalShotBreakdown } = await server.ssrLoadModule("/src/shot-breakdown.jsx");
+    const { ExternalMediaDetail } = await server.ssrLoadModule("/src/App.jsx");
     const markup = renderToStaticMarkup(React.createElement(ExternalShotBreakdown, {
       group: {
         reported_status: "OUTPUT_RECORDED",
@@ -496,6 +498,28 @@ test("external reference previews load eagerly inside the nested detail scroller
     assert.match(referenceImage, /src="\/api\/external-media\/media\/external_ai-video-experiments_reference_first"/);
     assert.match(referenceImage, /loading="eager"/);
     assert.doesNotMatch(markup, /loading="lazy"/);
+
+    const boundMetadataGroup = {
+      sha256: "a".repeat(64),
+      token: "external_raw_exact",
+      status: "NOT_EVALUATED",
+      metadata_status: "bound",
+      prompt_text: "Exact embedded Prompt.",
+      shot_type: "long_video_segment",
+      evidence_refs: [{ source_id: "raw", relative_path: "manifest.json" }],
+      locations: [{ source_id: "raw", source_label: "Raw", relative_path: "segment.mp4", file_name: "segment.mp4" }],
+    };
+    const emptyShotMarkup = renderToStaticMarkup(React.createElement(ExternalShotBreakdown, { group: boundMetadataGroup }));
+    assert.match(emptyShotMarkup, /已有 exact-bound Prompt 或类型/);
+    assert.doesNotMatch(emptyShotMarkup, /不会从文件名或目录猜测脚本与 Prompt/);
+
+    const detailMarkup = renderToStaticMarkup(React.createElement(ExternalMediaDetail, {
+      group: boundMetadataGroup,
+      sources: [{ id: "raw", label: "Raw" }],
+    }));
+    assert.match(detailMarkup, /Prompt 或类型来自受支持且与 exact bytes 绑定的 metadata/);
+    assert.match(detailMarkup, /Exact embedded Prompt/);
+    assert.doesNotMatch(detailMarkup, /没有找到语义受支持且与 exact bytes 绑定的生成记录/);
   } finally {
     await server.close();
   }

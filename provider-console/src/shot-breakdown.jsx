@@ -203,7 +203,7 @@ export function ExternalShotBreakdown({ group }) {
           <div className="external-shot-breakdown__script"><span>Prompt</span><p>{shot.prompt_text || "没有可验证绑定的生成 Prompt"}</p></div>
           {exactExperimentEvidence && <EvidenceFindings findings={shot.findings} />}
         </article>
-      ))}</div> : <div className="shot-breakdown__empty"><WarningCircle size={16} />{group?.association_ambiguity ? "检测到互相冲突的 exact experiment evidence；为避免误关联，分镜、Prompt、References 与 verdict 均未投影。" : "该文件没有可验证的 Shot 绑定；不会从文件名或目录猜测脚本与 Prompt。"}</div>}
+      ))}</div> : <div className="shot-breakdown__empty"><WarningCircle size={16} />{group?.association_ambiguity ? "检测到互相冲突的 exact evidence；为避免误关联，分镜、Prompt、References 与 verdict 均未投影。" : group?.metadata_status === "bound" && (group?.prompt_text || group?.shot_type || group?.generation_type) ? "该文件已有 exact-bound Prompt 或类型，但没有可验证的 canonical Shot 绑定；不会从 Prompt、文件名或目录反推分镜脚本。" : "该文件没有可验证的 Shot 绑定；不会从文件名或目录猜测脚本与 Prompt。"}</div>}
       {shots.length > 0 && <div className="external-shot-breakdown__verified"><CheckCircle size={15} weight="fill" />仅显示已绑定或明确声明的字段</div>}
     </section>
   );

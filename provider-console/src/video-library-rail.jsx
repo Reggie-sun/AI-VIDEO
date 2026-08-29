@@ -50,7 +50,7 @@ export function VideoLibraryRail({
   selectedSha,
   selectedSource,
   query,
-  evidenceFilter = "all",
+  evidenceFilter = "linked",
   externalLoading,
   externalError,
   runsContextLoading,

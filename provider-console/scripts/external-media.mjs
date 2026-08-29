@@ -1,3 +1,4 @@
+import { spawn } from "node:child_process";
 import { createHash } from "node:crypto";
 import { constants } from "node:fs";
 import { lstat, open, realpath, readdir } from "node:fs/promises";
@@ -23,6 +24,14 @@ const SOURCE_PRIORITY = Object.freeze({
   raw_provider_output: 2,
 });
 const EXTERNAL_METADATA_SCHEMA = "ai-video-external-media-metadata/1";
+const LONG_VIDEO_MANIFEST_FORMAT = "minimax_h3_t8_accepted_manifest";
+const MEDIA_SCAN_CONCURRENCY = 8;
+const EMBEDDED_METADATA_MAX_BYTES = 2 * 1024 * 1024;
+const EMBEDDED_METADATA_TIMEOUT_MS = 5_000;
+const COMFY_PROMPT_NODE_TYPES = new Set([
+  "MiniMaxH3AudioConditioningT8",
+  "MiniMaxH3ImageToVideo",
+]);
 const METADATA_ALIASES = Object.freeze({
   prompt: ["prompt", "prompt_text", "positive_prompt"],
   shot: ["shot", "shot_id"],
@@ -98,6 +107,80 @@ async function digestOpenedFile(file, size) {
   return digest.digest("hex");
 }
 
+function openedIdentity(stat) {
+  return [stat.dev, stat.ino, stat.mtimeNs, stat.ctimeNs].map(String);
+}
+
+function sameIdentity(left, right) {
+  return left.length === right.length && left.every((value, index) => value === right[index]);
+}
+
+function embeddedComfyMetadata(promptTag) {
+  if (typeof promptTag !== "string" || !promptTag || Buffer.byteLength(promptTag) > EMBEDDED_METADATA_MAX_BYTES) return null;
+  let graph;
+  try {
+    graph = JSON.parse(promptTag);
+  } catch {
+    return null;
+  }
+  if (!graph || typeof graph !== "object" || Array.isArray(graph)) return null;
+  const candidates = new Map();
+  for (const node of Object.values(graph)) {
+    if (!node || typeof node !== "object" || Array.isArray(node) || !COMFY_PROMPT_NODE_TYPES.has(node.class_type)) continue;
+    const prompt = primitiveMetadataValue(node.inputs?.prompt);
+    if (typeof prompt !== "string") continue;
+    const declaredType = typeof node.inputs?.task_type === "string" && /^[A-Za-z0-9_-]{1,64}$/.test(node.inputs.task_type)
+      ? node.inputs.task_type
+      : node.class_type;
+    const metadata = { prompt, generation_type: declaredType };
+    candidates.set(JSON.stringify(metadata), metadata);
+  }
+  return candidates.size === 1 ? [...candidates.values()][0] : null;
+}
+
+async function probeEmbeddedComfyMetadata(file) {
+  return new Promise((resolve) => {
+    const child = spawn("ffprobe", [
+      "-v", "error",
+      "-show_entries", "format_tags=prompt",
+      "-of", "json",
+      "/proc/self/fd/3",
+    ], { stdio: ["ignore", "pipe", "ignore", file.fd] });
+    const chunks = [];
+    let bytes = 0;
+    let settled = false;
+    const finish = (value) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timer);
+      resolve(value);
+    };
+    const timer = setTimeout(() => {
+      child.kill("SIGKILL");
+      finish(null);
+    }, EMBEDDED_METADATA_TIMEOUT_MS);
+    child.stdout.on("data", (chunk) => {
+      bytes += chunk.length;
+      if (bytes > EMBEDDED_METADATA_MAX_BYTES) {
+        child.kill("SIGKILL");
+        finish(null);
+        return;
+      }
+      chunks.push(chunk);
+    });
+    child.on("error", () => finish(null));
+    child.on("close", (code) => {
+      if (settled || code !== 0) return finish(null);
+      try {
+        const value = JSON.parse(Buffer.concat(chunks).toString("utf8"));
+        finish(embeddedComfyMetadata(value?.format?.tags?.prompt));
+      } catch {
+        finish(null);
+      }
+    });
+  });
+}
+
 async function inspectMedia(root, sourcePath) {
   const file = await open(sourcePath, constants.O_RDONLY | constants.O_NOFOLLOW);
   try {
@@ -108,11 +191,27 @@ async function inspectMedia(root, sourcePath) {
     if (!stat.isFile() || openedPath !== sourcePath || !containedPath(root, openedPath)) return null;
     const size = Number(stat.size);
     if (!Number.isSafeInteger(size) || size < 0) return null;
+    const identity = openedIdentity(stat);
+    const sha256 = await digestOpenedFile(file, size);
+    const embedded_metadata = path.extname(sourcePath).toLowerCase() === ".mp4"
+      ? await probeEmbeddedComfyMetadata(file)
+      : null;
+    const [finalStat, finalOpenedPath] = await Promise.all([
+      file.stat({ bigint: true }),
+      realpath(`/proc/self/fd/${file.fd}`),
+    ]);
+    if (
+      !finalStat.isFile()
+      || Number(finalStat.size) !== size
+      || finalOpenedPath !== sourcePath
+      || !sameIdentity(identity, openedIdentity(finalStat))
+    ) return null;
     return {
       bytes: size,
       mtime_ms: Number(stat.mtimeMs),
-      sha256: await digestOpenedFile(file, size),
-      identity: [stat.dev, stat.ino, stat.mtimeNs, stat.ctimeNs].map(String),
+      sha256,
+      identity,
+      embedded_metadata,
     };
   } finally {
     await file.close();
@@ -232,10 +331,94 @@ async function externalMetadataForMedia(value, sidecarPath, media, limits, colle
   return null;
 }
 
+function exactRelativeBinding(base, reference, root, mediaPath) {
+  if (typeof reference !== "string" || !reference || reference.includes("\0") || path.isAbsolute(reference)) return false;
+  const parts = reference.split(/[\\/]/);
+  if (parts.some((part) => !part || part === "." || part === "..")) return false;
+  const resolved = path.resolve(base, ...parts);
+  return containedPath(root, resolved) && resolved === mediaPath;
+}
+
+function longVideoMetadata(node) {
+  const prompt = primitiveMetadataValue(node?.prompt);
+  if (
+    typeof prompt !== "string"
+    || typeof node?.model_id !== "string"
+    || !node.model_id.trim()
+    || typeof node?.candidate_id !== "string"
+    || !node.candidate_id.trim()
+    || !Number.isSafeInteger(node?.index)
+    || node.index < 0
+  ) return null;
+  return { prompt, shot_type: "long_video_segment" };
+}
+
+function longVideoCandidateEvidence(sidecarPath, value, media) {
+  if (
+    path.basename(sidecarPath) !== "candidate.json"
+    || value?.schema !== 1
+    || value?.status !== "candidate"
+    || !/^[A-Za-z0-9_-]{1,256}$/.test(value?.chain_id || "")
+    || !/^[A-Za-z0-9_-]{1,256}$/.test(value?.candidate_id || "")
+    || !Number.isSafeInteger(value?.index)
+    || value.index < 0
+    || String(value?.video_sha256 || "").toLowerCase() !== media.sha256
+  ) return null;
+  let chainRoot = path.dirname(sidecarPath);
+  while (containedPath(media.source_root, chainRoot) && path.basename(chainRoot) !== value.chain_id) {
+    const parent = path.dirname(chainRoot);
+    if (parent === chainRoot) return null;
+    chainRoot = parent;
+  }
+  const expectedDirectory = path.join(chainRoot, "candidates", `segment_${String(value.index).padStart(5, "0")}`, value.candidate_id);
+  if (
+    path.basename(chainRoot) !== value.chain_id
+    || path.dirname(sidecarPath) !== expectedDirectory
+    || sidecarPath !== path.join(expectedDirectory, "candidate.json")
+    || media.source_path !== path.join(expectedDirectory, "candidate.mp4")
+    || !exactRelativeBinding(chainRoot, value.video_path, media.source_root, media.source_path)
+  ) return null;
+  const metadata = longVideoMetadata(value);
+  return metadata ? {
+    status: "bound",
+    metadata,
+    evidence_refs: [path.relative(media.source_root, sidecarPath).split(path.sep).join("/")],
+  } : null;
+}
+
+function longVideoManifestEvidence(sidecarPath, value, media) {
+  if (
+    path.basename(sidecarPath) !== "manifest.json"
+    || value?.schema !== 2
+    || value?.format !== LONG_VIDEO_MANIFEST_FORMAT
+    || !Array.isArray(value?.segments)
+  ) return null;
+  const matches = value.segments
+    .filter((segment) => (
+      String(segment?.video_sha256 || "").toLowerCase() === media.sha256
+      && exactRelativeBinding(path.dirname(sidecarPath), segment?.video_path, media.source_root, media.source_path)
+    ))
+    .map(longVideoMetadata)
+    .filter(Boolean);
+  const unique = new Map(matches.map((metadata) => [JSON.stringify(metadata), metadata]));
+  if (unique.size !== 1) return null;
+  return {
+    status: "bound",
+    metadata: [...unique.values()][0],
+    evidence_refs: [path.relative(media.source_root, sidecarPath).split(path.sep).join("/")],
+  };
+}
+
+function longVideoEvidence(sidecarPath, value, media) {
+  return longVideoCandidateEvidence(sidecarPath, value, media)
+    || longVideoManifestEvidence(sidecarPath, value, media);
+}
+
 async function metadataForMedia(sidecars, media, limits, experimentImages) {
   const metadata = {};
   const evidenceRefs = [];
   const parsedSidecars = [];
+  const longVideoChains = [];
   let verifiedChain = null;
   let composition = null;
   for (const sidecarPath of sidecars) {
@@ -259,6 +442,11 @@ async function metadataForMedia(sidecars, media, limits, experimentImages) {
         const promptPath = await externalMetadataForMedia(parsed, sidecarPath, media, limits, metadata);
         if (promptPath) evidenceRefs.push(path.relative(media.source_root, promptPath).split(path.sep).join("/"));
       }
+      const longVideoChain = longVideoEvidence(sidecarPath, parsed, media);
+      if (longVideoChain) {
+        longVideoChains.push(longVideoChain);
+        evidenceRefs.push(...longVideoChain.evidence_refs);
+      }
     } catch {
       // Sidecars are advisory. Their parse errors are deliberately not projected.
     }
@@ -266,7 +454,22 @@ async function metadataForMedia(sidecars, media, limits, experimentImages) {
   const experimentChain = media.source_id === EXPERIMENT_SOURCE_ID
     ? await experimentEvidenceForMedia(parsedSidecars, media, limits, experimentImages, experimentEvidenceHelpers)
     : null;
-  const selectedChain = experimentChain || verifiedChain;
+  const longVideoSignatures = new Set(longVideoChains.map((chain) => JSON.stringify(chain.metadata)));
+  const longVideoAmbiguity = longVideoSignatures.size > 1;
+  const longVideoChain = longVideoAmbiguity ? null : longVideoChains[0];
+  const embeddedChain = media.embedded_metadata && !Object.keys(metadata).length
+    ? {
+        status: "bound",
+        metadata: media.embedded_metadata,
+        evidence_refs: [relativeLocation(media.source_root, media.source_path).relative_path],
+      }
+    : null;
+  const selectedChain = experimentChain || verifiedChain || longVideoChain || embeddedChain;
+  const associationAmbiguityTiers = [];
+  if (longVideoAmbiguity) associationAmbiguityTiers.push("bound");
+  if (selectedChain?.association_ambiguity === true) {
+    associationAmbiguityTiers.push(experimentChain ? "experiment" : selectedChain.status?.startsWith("verified_") ? "verified" : "bound");
+  }
   return {
     metadata: { ...metadata, ...(selectedChain?.metadata || {}) },
     metadata_status: selectedChain?.status || (Object.keys(metadata).length ? "bound" : "not_evaluated"),
@@ -276,7 +479,8 @@ async function metadataForMedia(sidecars, media, limits, experimentImages) {
     technical_gate: selectedChain?.technical_gate ?? null,
     human_verdict: selectedChain?.human_verdict ?? null,
     experiment_signature: selectedChain?.experiment_signature || null,
-    association_ambiguity: selectedChain?.association_ambiguity === true,
+    association_ambiguity: associationAmbiguityTiers.length > 0,
+    association_ambiguity_tiers: [...new Set(associationAmbiguityTiers)],
     reference_descriptors: selectedChain?.reference_descriptors || {},
   };
 }
@@ -506,6 +710,23 @@ async function declaredEcommerceComposition(packagePath, packageValue, media, li
   }
 }
 
+async function mapWithConcurrency(values, concurrency, mapper) {
+  const results = new Array(values.length);
+  let nextIndex = 0;
+  async function worker() {
+    while (nextIndex < values.length) {
+      const index = nextIndex;
+      nextIndex += 1;
+      results[index] = await mapper(values[index]);
+    }
+  }
+  await Promise.all(Array.from(
+    { length: Math.min(Math.max(concurrency, 1), values.length) },
+    () => worker(),
+  ));
+  return results;
+}
+
 async function scanSource(source, limits) {
   const sourceId = safeSourceId(source);
   if (!sourceId || !["development_artifact", "raw_provider_output", "external_project_asset"].includes(source?.kind)) {
@@ -525,14 +746,14 @@ async function scanSource(source, limits) {
   const sidecars = files
     .filter((file) => path.extname(file).toLowerCase() === ".json")
     .slice(0, limits.maxSidecarsPerRoot);
-  const records = [];
-  for (const sourcePath of files) {
-    if (records.length >= limits.maxMediaPerRoot) break;
+  const mediaFiles = files
+    .filter((sourcePath) => VIDEO_MIME_TYPES.has(path.extname(sourcePath).toLowerCase()))
+    .slice(0, limits.maxMediaPerRoot);
+  const scannedRecords = await mapWithConcurrency(mediaFiles, MEDIA_SCAN_CONCURRENCY, async (sourcePath) => {
     const mime_type = VIDEO_MIME_TYPES.get(path.extname(sourcePath).toLowerCase());
-    if (!mime_type) continue;
     try {
       const inspected = await inspectMedia(root, sourcePath);
-      if (!inspected) continue;
+      if (!inspected) return null;
       const media = {
         source_path: sourcePath,
         source_id: sourceId,
@@ -551,9 +772,10 @@ async function scanSource(source, limits) {
         human_verdict,
         experiment_signature,
         association_ambiguity,
+        association_ambiguity_tiers,
         reference_descriptors,
       } = await metadataForMedia(sidecars, media, limits, experimentImages);
-      records.push({
+      return {
         ...media,
         source_label: sourceLabel,
         metadata,
@@ -565,12 +787,15 @@ async function scanSource(source, limits) {
         human_verdict,
         experiment_signature,
         association_ambiguity,
+        association_ambiguity_tiers,
         reference_descriptors,
-      });
+      };
     } catch {
       // A file that changes while being inspected is omitted rather than guessed.
+      return null;
     }
-  }
+  });
+  const records = scannedRecords.filter(Boolean);
   return { source: publicSource(source, "available", { media_count: records.length }), records };
 }
 
@@ -594,6 +819,24 @@ const experimentEvidenceHelpers = Object.freeze({
   relativeLocation,
 });
 
+function metadataRecordsConflict(records) {
+  return ["prompt", "shot", "shot_type", "generation_type", "status"].some((field) => {
+    const values = new Set(records
+      .map((record) => record.metadata?.[field])
+      .filter((value) => value !== undefined && value !== null && value !== "")
+      .map((value) => JSON.stringify(value)));
+    return values.size > 1;
+  });
+}
+
+function recordAmbiguousAtTier(record, tier) {
+  if (!record.association_ambiguity) return false;
+  if (Array.isArray(record.association_ambiguity_tiers)) return record.association_ambiguity_tiers.includes(tier);
+  if (tier === "experiment") return Boolean(record.experiment_signature);
+  if (tier === "verified") return record.metadata_status.startsWith("verified_");
+  return record.metadata_status === "bound";
+}
+
 function groupProjection(records) {
   const bySha = new Map();
   for (const record of records) {
@@ -609,8 +852,17 @@ function groupProjection(records) {
       return compareRecords(left, right);
     });
     const preview = duplicates[0];
-    const experimentSignatures = new Set(duplicates.map((record) => record.experiment_signature).filter(Boolean));
-    const associationAmbiguity = duplicates.some((record) => record.association_ambiguity) || experimentSignatures.size > 1;
+    const experimentRecords = duplicates.filter((record) => record.experiment_signature || recordAmbiguousAtTier(record, "experiment"));
+    const verifiedRecords = duplicates.filter((record) => record.metadata_status.startsWith("verified_") || recordAmbiguousAtTier(record, "verified"));
+    const boundRecords = duplicates.filter((record) => record.metadata_status === "bound" || recordAmbiguousAtTier(record, "bound"));
+    const selectedTier = experimentRecords.length ? "experiment" : verifiedRecords.length ? "verified" : "bound";
+    const selectedEvidenceTier = selectedTier === "experiment"
+      ? experimentRecords
+      : selectedTier === "verified" ? verifiedRecords : boundRecords;
+    const experimentSignatures = new Set(experimentRecords.map((record) => record.experiment_signature));
+    const associationAmbiguity = selectedEvidenceTier.some((record) => recordAmbiguousAtTier(record, selectedTier))
+      || experimentSignatures.size > 1
+      || metadataRecordsConflict(selectedEvidenceTier);
     const experimentSource = associationAmbiguity ? null : duplicates.find((record) => record.experiment_signature);
     const metadataSource = experimentSource
       || duplicates.find((record) => record.metadata_status.startsWith("verified_"))
@@ -659,7 +911,9 @@ function groupProjection(records) {
       },
       locations,
       metadata: associationAmbiguity ? {} : metadataSource.metadata,
-      metadata_status: associationAmbiguity ? "ambiguous_verified_experiment_evidence" : metadataSource.metadata_status,
+      metadata_status: associationAmbiguity
+        ? (experimentRecords.length ? "ambiguous_verified_experiment_evidence" : "ambiguous_bound_evidence")
+        : metadataSource.metadata_status,
       prompt_text: associationAmbiguity ? null : (metadataSource.metadata.prompt ?? null),
       shot_id: associationAmbiguity ? null : (metadataSource.metadata.shot ?? null),
       shot_type: associationAmbiguity ? null : (metadataSource.metadata.shot_type ?? null),
@@ -728,4 +982,4 @@ export async function catalogExternalMedia({ sources = [], limits = {} } = {}) {
   };
 }
 
-export const __test__ = { configuredLimits, collectMetadata, isDirectBinding, safeSourceId };
+export const __test__ = { configuredLimits, collectMetadata, embeddedComfyMetadata, groupProjection, isDirectBinding, safeSourceId };
