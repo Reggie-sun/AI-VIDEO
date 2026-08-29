@@ -1,0 +1,117 @@
+{
+  "schema_version": "drama-authoring-package-acceptance/1",
+  "record_kind": "drama_authoring_package_acceptance",
+  "package_id": "drama.package.key-at-the-waiting-room",
+  "package_version": 3,
+  "status": "accepted",
+  "domain_id": "drama",
+  "accepted_package_payload": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.proposed.json",
+    "commit": "1175c8270ffba6ff136d54cc0eb9390a96d6bf29",
+    "git_blob_oid": "02cb912ed03ee74b6ae2bc8b672ec80a36ee229b",
+    "byte_size": 7754,
+    "accepted_record_sha256": "a5ec4f78b05ce189d9eaa0cf694ffaba0747b499f4e85fd1ac1ac4221ec61331",
+    "candidate_status_at_acceptance": "proposed",
+    "content_address_semantics": "The immutable candidate payload at the bound commit, blob OID, byte size and SHA-256 is the accepted and sealed authoring package; this envelope adds delegated acceptance lineage without modifying the candidate bytes."
+  },
+  "semantic_contract_binding": {
+    "contract_version": "drama-authoring-and-acceptance/1",
+    "accepted_v1_spec_commit": "01483ec1f434661984ca009fffa85960310dedd6",
+    "accepted_v1_spec_sha256": "239573a700fe987eb76282cb3c89f4ee666721646ec90b4e1398527e65c6801b",
+    "candidate_binding_status": "MATCHED",
+    "semantic_identity_changed_by_v2_authority_overlay": false
+  },
+  "delegated_authority_binding": {
+    "contract_version": "drama-authoring-and-acceptance/2",
+    "authority_preimage_commit": "0eda3502708384516d85e33686d8ca9c25f7da3e",
+    "authority_preimage_path": "docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md",
+    "authority_preimage_git_blob_oid": "db5bff3f7b63fee02c86f8d8918079f6daf1a23b",
+    "authority_preimage_byte_size": 32092,
+    "authority_preimage_sha256": "e00f45f173cd48bcc1e786c3b60c442fb9a233734ebfa96e3f74deaa6d878e9b",
+    "promotion_commit": "a01b806437eef5434b4f88f08e9be648cb7f59b4",
+    "promoted_spec_git_blob_oid": "ffdb68c380bb946df2b0c19fcedbd09a2fc1283d",
+    "promoted_spec_byte_size": 33291,
+    "promoted_spec_sha256": "0285b5bd2ce2f462547dd079cdcf7ea6e5b6bbf7d3377ae6a124ac9ade501f38",
+    "delegation_source_id": "current-session:user-rule-change-2026-08-29",
+    "delegation_recorded_at": "2026-08-29T09:42:14+08:00",
+    "normalized_delegation_tuple": "delegation_decision=AUTHORIZE_PRIMARY_AGENT_CONFIRM;scope=B-D0_PREREQUISITE_DOCUMENTATION_ARTIFACTS;manual_confirm_required=false;effective_date=2026-08-29",
+    "delegation_source_sha256": "1fa6d81ffbaf4734349a78febe4a90080ec8951bbdc369e2d8722da3679f000c",
+    "scope": "B-D0 prerequisite documentation artifacts only"
+  },
+  "adjudication": {
+    "adjudicator_identity": "codex_primary_agent",
+    "authority_role": "delegated_primary_agent",
+    "decision": "CONFIRM",
+    "decided_at": "2026-08-29T09:58:49+08:00",
+    "decision_source_id": "current-session:drama-authoring-package-v3-autonomous-adjudication",
+    "canonical_decision_tuple": "package_decision=CONFIRM;authority_preimage_commit=0eda3502708384516d85e33686d8ca9c25f7da3e;authority_preimage_sha256=e00f45f173cd48bcc1e786c3b60c442fb9a233734ebfa96e3f74deaa6d878e9b;candidate_commit=1175c8270ffba6ff136d54cc0eb9390a96d6bf29;candidate_sha256=a5ec4f78b05ce189d9eaa0cf694ffaba0747b499f4e85fd1ac1ac4221ec61331;adjudicator=codex_primary_agent",
+    "decision_source_sha256": "a1e309df0d27b364c2d9c3256d123b6719217431649dae50cb19e80766094988",
+    "rationale": "Exact candidate identity and all lineage bindings were reopened without drift; all nine required DRAMA-AUTH requirements are PASS; no media verdict exists; the independent xhigh reviewer accepted with no issues; mandatory candidate and authority Harness receipts passed; the accepted scope remains documentation-only."
+  },
+  "independent_review_evidence": {
+    "reviewer_role": "reviewer",
+    "reviewer_tier": "xhigh",
+    "reviewer_identity": "native:drama_spec_review",
+    "review_source_id": "current-session:drama-authoring-package-v3-review",
+    "candidate_commit": "1175c8270ffba6ff136d54cc0eb9390a96d6bf29",
+    "candidate_sha256": "a5ec4f78b05ce189d9eaa0cf694ffaba0747b499f4e85fd1ac1ac4221ec61331",
+    "verdict": "accept",
+    "blocking_issues": [],
+    "non_blocking_concerns": [],
+    "normalized_review_tuple": "reviewer_role=reviewer;reviewer_tier=xhigh;candidate_commit=1175c8270ffba6ff136d54cc0eb9390a96d6bf29;candidate_sha256=a5ec4f78b05ce189d9eaa0cf694ffaba0747b499f4e85fd1ac1ac4221ec61331;verdict=accept;blocking_issues=none;non_blocking_concerns=none",
+    "review_evidence_sha256": "6044372e783f01432418bd8f4b1b0d5587d33f7e370da8d437d82da2f0f1d24c"
+  },
+  "harness_evidence": {
+    "candidate_checkpoint": {
+      "receipt_path": ".agent/harness/runs/drama-authoring-package-v3-20260829/receipt.json",
+      "receipt_sha256": "20f2d7278a36a57c4d7bd9fb3aa950450ef96f914684ede9a88961150a60bba8",
+      "scope_mode": "commit_range",
+      "base_oid": "0efe36305bf03caf9a98e82c4253c58737d20606",
+      "head_oid": "1175c8270ffba6ff136d54cc0eb9390a96d6bf29",
+      "status": "passed",
+      "complete_completion_proof": true,
+      "artifact_integrity_reverified": true,
+      "freshness_note": "The receipt was fresh and snapshot-matched at candidate checkpoint creation. Current generic freshness is false only because repository HEAD advanced; the immutable candidate commit, blob, size and SHA-256 were independently reopened and remain exact."
+    },
+    "authority_promotion": {
+      "receipt_path": ".agent/harness/runs/drama-b-d0-delegated-acceptance-v2-promotion-20260829/receipt.json",
+      "receipt_sha256": "ac0f61b1638bf76aa1177daf6295f2d8e479b811a5ff4f3b1c7951381fd70de6",
+      "scope_mode": "commit_range",
+      "base_oid": "0eda3502708384516d85e33686d8ca9c25f7da3e",
+      "head_oid": "a01b806437eef5434b4f88f08e9be648cb7f59b4",
+      "status": "passed",
+      "fresh_at_promotion": true,
+      "snapshot_matches_at_promotion": true
+    }
+  },
+  "accepted_scope": {
+    "includes": [
+      "the exact v3 authoring-package candidate bytes and immutable lineage",
+      "the bound accepted fixture and baseline-selection envelopes",
+      "the unchanged Story, Scene, Character and ordered three-Shot semantic payload",
+      "all nine required DRAMA-AUTH PASS assessments",
+      "the sealed per-Shot, pairwise and whole-scene DRAMA-MEDIA requirement instances without media verdicts"
+    ],
+    "excludes": [
+      "Provider, model, workflow or native prompt selection",
+      "ComfyUI, H3, video-analysis or any media generation",
+      "automatic retry, repair or new Shot creation",
+      "any DRAMA-MEDIA HUMAN verdict or M6-D PASS",
+      "Manifest, Registry, candidate activation, P6 or Final Acceptance",
+      "Commercial or dual-domain PASS",
+      "publication, release or audience outcome"
+    ]
+  },
+  "current_gate_state": {
+    "drama_spec": "ACCEPTED",
+    "fixture_selection": "ACCEPTED",
+    "baseline_selection": "ACCEPTED",
+    "authoring_package": "ACCEPTED_AND_SEALED",
+    "remaining_b_d0_blockers": [
+      "CURRENT_EXECUTION_GATES_AND_EXACT_EVIDENCE_PATH_NOT_VERIFIED"
+    ],
+    "b_d0": "BLOCKED_BEFORE_MEDIA",
+    "m6_d": "NOT_EVALUATED",
+    "next_lane": "Verify the current Drama execution gates and exact evidence path in a separately scoped prerequisite; B-D empirical execution remains unentered and unauthorized by this envelope."
+  }
+}

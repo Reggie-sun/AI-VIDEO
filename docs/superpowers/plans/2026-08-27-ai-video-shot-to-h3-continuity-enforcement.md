@@ -33,8 +33,9 @@ pairwise readiness -> exact H3 three-field prompt -> bounded real-media experime
 exactly one selected domain verdict`。四臂实验已把 forced scale transition / terminal snap 的主要原因收敛到
 incompatible last anchor；随后 one-Shot causal handoff 又证明 compatible anchors 与明确动作链可完成可见
 holder transfer。原 M6 Qingyan micro-sequence 最终得到 HUMAN watchability / commercial-baseline / assembly
-acceptance `FAIL`，只构成 Commercial lane counterevidence；Drama lane 尚无 accepted workflow/spec、fixture 或
-HUMAN verdict。目标状态必须分别关闭两条 lane，不得用广告状态链证明剧情叙事，也不得用剧情 continuity PASS
+acceptance `FAIL`，只构成 Commercial lane counterevidence；Drama lane已有accepted spec、fixture、baseline与
+authoring package，但current execution gates / exact evidence path尚未验证且没有HUMAN media verdict。目标状态必须
+分别关闭两条 lane，不得用广告状态链证明剧情叙事，也不得用剧情 continuity PASS
 证明产品呈现、claim、Hook、CTA 或 brand closure。
 
 **Compatibility:** Historical `provider-neutral-video-requirement/1`–`/3`、existing compiled request、resolved
@@ -114,7 +115,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / blocked before media | Drama owner/rubric spec、exact fixture与baseline selection已accepted；new authoring-package v3 candidate仍需exact acceptance，formal `DRAMA-MEDIA-*` findings仍为`NOT_EVALUATED`；不得从reference review或Commercial evidence推断M6-D PASS |
+| `M6-D Drama` | `NOT_EVALUATED` / blocked before media | Drama owner/rubric spec、exact fixture、baseline selection与authoring-package v3已accepted/sealed；current execution gates / exact evidence path尚未验证，formal `DRAMA-MEDIA-*` findings仍为`NOT_EVALUATED`；不得从reference review或Commercial evidence推断M6-D PASS |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -772,14 +773,15 @@ Execution is deliberately gated：
 | --- | --- | --- |
 | R0 — Commercial/shared reconnaissance | Complete；four-arm attribution + one handoff Shot + v13 30s recut + M6-C causal assembly | Supports incompatible-anchor attribution and visible holder transfer；Qingyan HUMAN watchability/commercial baseline FAIL；does not prove Drama or authorize productization |
 | A — Minimum offline hypothesis | Milestones 1–5 only | Proves exact typed causal intent plus compatible conditioning can reach one pilot adapter prompt；does not prove model quality |
-| B-D0 — Drama owner prerequisite | Accepted Drama spec、exact accepted/sealed fixture and baseline、无`BLOCKER`的sealed authoring package | Spec已accepted；fixture、baseline或package缺少exact acceptance/identity时仍为`BLOCKED_BEFORE_MEDIA`；其documentation candidate由用户或Spec委托的primary agent按exact fail-closed contract判定，this plan must not invent Drama acceptance |
+| B-D0 — Drama owner prerequisite | Accepted Drama spec、exact accepted/sealed fixture and baseline、无`BLOCKER`的sealed authoring package、verified current execution gates and exact evidence path | 任一documentation identity/acceptance缺失，或current execution gates / exact evidence path未验证时，仍为`BLOCKED_BEFORE_MEDIA`；documentation candidate由用户或Spec委托的primary agent按exact fail-closed contract判定，this plan must not invent Drama acceptance |
 | B-D — Drama empirical lane | One bounded dramatic scene plus exact whole-scene HUMAN verdict | All applicable shared + Drama findings and Drama baseline must PASS；otherwise stop only this lane unless Shared Core failed |
 | B-C — Commercial empirical lane | Reopen only through a new accepted Commercial attempt；current Qingyan M6-C is HUMAN FAIL | All applicable shared + Commercial findings and source-quality baseline must PASS；old assembly cannot be repaired or expanded |
 | B-X — Dual-domain closure | Reopen both exact lane records against unchanged Shared Core identity | Both lanes PASS independently；one lane cannot qualify the other |
 | C — Productize dual-domain proven behavior | Milestones 7–9 | Add generic post-media enforcement、remaining adapters/qualification、routing/Harness only after B-X PASS |
 
 Current status is B-D0 `BLOCKED_BEFORE_MEDIA`（accepted v1 semantic spec + accepted v2 delegated-authority overlay +
-fixture + baseline selection已就绪；authoring-package v3当前可进入delegated primary-agent exact adjudication）、B-D
+accepted/sealed fixture + baseline selection + authoring-package v3；current execution gates and exact evidence path尚未
+验证）、B-D
 `NOT_EVALUATED`、B-C `HUMAN_FAIL` and B-X `FAIL`。M7 pairwise
 post-media productization、M8 adapter/qualification expansion and M9 routing/Harness completion remain explicitly
 deferred。The existing v12/v13/M6-C bytes remain Commercial/shared regression evidence；none can be promoted to Drama
@@ -788,8 +790,10 @@ or dual-domain PASS by relabeling technical receipts。
 The local baseline-reference acquisition recorded in
 `docs/record_for_agent/2026-08-29-drama-baseline-reference-shot-01-gate-stop.md` is not M6-D execution。Current user has
 accepted both its exact Shot 1 reference component and the exact baseline-selection record；the new authoring-package v3
-candidate still requires a separate exact-record acceptance envelope under the Drama Spec。Those accepted reference bytes do not themselves seal the
-authoring package, do not clear B-D0, and do not authorize retry, additional Shots, M6-D, P6 or Final Acceptance。
+candidate was independently adjudicated `CONFIRM` under the accepted v2 delegated-authority overlay and is sealed by
+`docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.accepted.json`。This clears the
+package exact-acceptance blocker only；B-D0 remains blocked on current execution-gate/evidence-path proof and this does not
+authorize retry, additional Shots, M6-D, P6 or Final Acceptance。
 
 Stop immediately and report rather than expanding scope when：
 

@@ -30,15 +30,19 @@ Drama requirement taxonomy、bounded fixture selection、baseline selection与de
 也不允许该 continuity plan 反向成为 Drama truth owner。
 
 V1 semantic/profile/rubric preimage仍是accepted identity；fixture与baseline selection已有exact accepted envelopes。
-V2 authority overlay已绑定下文immutable preimage与用户委托source，因此primary agent可按本contract自主
-判定authoring-package v3；这不是对package本身的自动acceptance。
-未实现workflow/schema/runtime adapter，未执行HUMAN media review。因此：
+V2 authority overlay已绑定下文immutable preimage与用户委托source。Primary agent随后重新打开
+authoring-package v3的exact commit/blob/size/SHA、lineage、authoring requirements、independent review与Harness
+evidence，给出`CONFIRM`并写入
+`docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.accepted.json`
+（SHA-256 `e36a1338fcec94fc6b3a7ecae08bfaab3ee6f54d6d91c065c986eefa02913edd`）。因此：
 
-- `B-D0 — Drama owner prerequisite` 继续为 `BLOCKED_BEFORE_MEDIA`；
+- authoring-package v3的documentation acceptance/seal已完成；
+- `B-D0 — Drama owner prerequisite = BLOCKED_BEFORE_MEDIA`，remaining blocker为
+  `CURRENT_EXECUTION_GATES_AND_EXACT_EVIDENCE_PATH_NOT_VERIFIED`；
 - `M6-D Drama` 继续为 `NOT_EVALUATED`；
-- v1 spec acceptance只解除Drama owner/rubric缺失这一项blocker，不自动接受之后产生的artifact bytes；
-- fixture、baseline与无`BLOCKER`的authoring package仍必须分别形成content-addressed acceptance envelope，
-  但符合下文contract时由delegated primary agent自主签发。
+- spec、fixture、baseline与无`BLOCKER`的authoring package均已形成separate content-addressed
+  acceptance identities，但本轮未验证current execution gates与exact evidence path；
+- 未实现workflow/schema/runtime adapter，未执行HUMAN media review，不授权或进入M6-D。
 
 ### V2 Delegation Acceptance Binding
 
@@ -422,15 +426,10 @@ preimage与delegation source完promotion，当前为`canonical: true` / `spec_st
 reviewer accept、commit或plan引用单独都不能自动产生artifact acceptance；primary agent必须重新打开
 exact evidence，作出独立判断并写入content-addressed acceptance envelope。
 
-Spec acceptance最多满足B-D0中的Drama owner/rubric prerequisite；以下仍是separate blockers：
-
-- exact bounded fixture的separate selection、acceptance与seal；
-- exact Drama baseline的separate selection、acceptance与seal；
-- required authoring package无`BLOCKER`；
-- current execution gates与exact evidence path可用。
-
-只有这些条件全部满足，continuity plan才能把B-D0从`BLOCKED_BEFORE_MEDIA`重新判定为PASS；该状态更新
-必须引用exact acceptance envelopes，且不授权M6-D media execution。
+Spec owner/rubric、exact bounded fixture、exact Drama baseline与无`BLOCKER`的authoring package现已全部
+accepted/sealed。Accepted semantic contract还要求current execution gates与exact evidence path可用；本轮未验证
+该条件，因此continuity plan仍须保持B-D0 `BLOCKED_BEFORE_MEDIA`。该blocker不能由package acceptance
+消除，也不授权M6-D media execution。
 
 ## Verification Contract
 
@@ -458,9 +457,11 @@ python -m scripts.agent_harness policy-audit
 - B-D0 prerequisite documentation candidate只能在delegated primary-agent contract全部成立时自主
   `CONFIRM`；subjective media verdict仍不得由Agent代签；
 - Drama、Shared Core、Ecommerce、Provider与Production/P6/Final Acceptance边界无duplicate owner；
-- 不宣称B-D0、M6-D、dual-domain、Production、P6、Final Acceptance或audience outcome PASS。
+- 只可宣称authoring-package documentation acceptance/seal完成；不宣称B-D0、M6-D、
+  dual-domain、Production、P6、Final Acceptance或audience outcome PASS。
 
 ## Delivery Boundary
 
-本Spec的accepted state只表示Drama prerequisite contract及其canonical registration有效。它不自动接受
-fixture/baseline/authoring package，不自动产生B-D0 PASS，也不授权进入M6-D empirical execution。
+当前checkpoint完成Drama prerequisite contract、fixture、baseline与authoring package的exact acceptance；因current
+execution gates与exact evidence path未验证，B-D0仍为`BLOCKED_BEFORE_MEDIA`。它不产生任何
+media/HUMAN verdict，也不授权进入M6-D empirical execution。

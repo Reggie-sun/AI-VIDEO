@@ -9,6 +9,18 @@ evidence_index_version: "1"
 
 Date: 2026-08-29
 
+## Supersession Notice — 2026-08-29 Package Accepted
+
+下方“authoring-package v3仍等待exact acceptance”与`B-D0=BLOCKED_BEFORE_MEDIA`的current-facing描述现为
+historical。Primary agent已根据用户委托的accepted v2 documentation-authority overlay自主确认exact
+package candidate，acceptance envelope为
+`docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.accepted.json`，SHA-256
+`e36a1338fcec94fc6b3a7ecae08bfaab3ee6f54d6d91c065c986eefa02913edd`。Current state：
+authoring package已accepted/sealed；`B-D0=BLOCKED_BEFORE_MEDIA`，remaining blocker为
+`CURRENT_EXECUTION_GATES_AND_EXACT_EVIDENCE_PATH_NOT_VERIFIED`；`M6-D=NOT_EVALUATED`。原baseline reference
+取得过程、media identity与当时gate-stop作为
+historical evidence保留；本次supersession不授权任何Provider/media/P6行为。
+
 ## Supersession Notice — 2026-08-29 Reference Review PASS
 
 Current user已在收到exact MP4 path、SHA-256与`1.0x` full-audio instruction后明确返回PASS decision。该决定绑定

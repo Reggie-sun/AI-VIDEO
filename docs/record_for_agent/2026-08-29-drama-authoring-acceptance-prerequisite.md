@@ -2,6 +2,30 @@
 
 Date: 2026-08-29
 
+## Supersession Notice — 2026-08-29 Package Accepted
+
+下方所有“package v3仍需用户单独确认”、“B-D0仍为`BLOCKED_BEFORE_MEDIA`”与baseline/package
+next-work描述现为historical。用户已将B-D0 prerequisite documentation artifacts的`CONFIRM` / `REVISE` /
+`REJECT`判定委托给primary agent；accepted v2 authority overlay保留v1 semantic/profile/rubric identity不变，
+且不扩张到subjective media acceptance。
+
+Primary agent重新打开commit `1175c8270ffba6ff136d54cc0eb9390a96d6bf29`中SHA-256
+`a5ec4f78b05ce189d9eaa0cf694ffaba0747b499f4e85fd1ac1ac4221ec61331`的authoring-package v3，验证
+exact blob/size/SHA、全部lineage、九个required `DRAMA-AUTH-*` PASS、无media verdict、independent
+`reviewer_xhigh=accept`与exact-range Harness evidence后，自主给出`CONFIRM`。Acceptance envelope：
+
+- `docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.accepted.json`；
+- SHA-256 `e36a1338fcec94fc6b3a7ecae08bfaab3ee6f54d6d91c065c986eefa02913edd`；
+- `B-D0 = BLOCKED_BEFORE_MEDIA`，remaining blocker为
+  `CURRENT_EXECUTION_GATES_AND_EXACT_EVIDENCE_PATH_NOT_VERIFIED`；
+- `M6-D Drama = NOT_EVALUATED`；
+- `M6-C Commercial = HUMAN_FAIL`，`B-X = FAIL`；
+- M7–M9仍deferred。
+
+该checkpoint只解除package exact-acceptance blocker，不解除execution-gate/evidence-path blocker。它没有
+选择Provider、编写native prompt、调用ComfyUI/H3/`video-analysis`、生成media、执行
+retry/repair、写Manifest/Registry、进入M6-D或产生P6 / Final Acceptance。
+
 ## Supersession Notice — 2026-08-29 Baseline Accepted
 
 下方`Current Status Truth`与`Remaining Blockers And Next Work`中“baseline仍blocked / 下一步取得reference”的描述
