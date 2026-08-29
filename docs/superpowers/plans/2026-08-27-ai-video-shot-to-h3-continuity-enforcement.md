@@ -778,9 +778,8 @@ Execution is deliberately gated：
 | B-X — Dual-domain closure | Reopen both exact lane records against unchanged Shared Core identity | Both lanes PASS independently；one lane cannot qualify the other |
 | C — Productize dual-domain proven behavior | Milestones 7–9 | Add generic post-media enforcement、remaining adapters/qualification、routing/Harness only after B-X PASS |
 
-Current status is B-D0 `BLOCKED_BEFORE_MEDIA`（accepted v1 semantic spec + fixture + baseline selection已就绪；
-v2 delegated-authority overlay必须先以exact preimage获得promotion，authoring-package v3随后才能进入delegated
-primary-agent exact adjudication）、B-D
+Current status is B-D0 `BLOCKED_BEFORE_MEDIA`（accepted v1 semantic spec + accepted v2 delegated-authority overlay +
+fixture + baseline selection已就绪；authoring-package v3当前可进入delegated primary-agent exact adjudication）、B-D
 `NOT_EVALUATED`、B-C `HUMAN_FAIL` and B-X `FAIL`。M7 pairwise
 post-media productization、M8 adapter/qualification expansion and M9 routing/Harness completion remain explicitly
 deferred。The existing v12/v13/M6-C bytes remain Commercial/shared regression evidence；none can be promoted to Drama

@@ -132,8 +132,8 @@ surfaces:
 
   - surface_id: drama_authoring_and_acceptance
     canonical_spec: docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md
-    canonical: false
-    spec_status: proposed
+    canonical: true
+    spec_status: accepted
     implementation_status: not_started
     live_status: not_run
     quality_status: not_evaluated

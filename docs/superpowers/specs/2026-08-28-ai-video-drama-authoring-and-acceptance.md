@@ -1,7 +1,7 @@
 ---
 surface_id: drama_authoring_and_acceptance
-canonical: false
-spec_status: proposed
+canonical: true
+spec_status: accepted
 implementation_status: not_started
 live_status: not_run
 quality_status: not_evaluated
@@ -15,12 +15,12 @@ contract_version: drama-authoring-and-acceptance/2
 
 ## Status
 
-Proposed v2 acceptance-authority overlay on the accepted v1 prerequisite contract。用户于`2026-08-29`
+Accepted v2 acceptance-authority overlay on the accepted v1 prerequisite contract。用户于`2026-08-29`
 明确选择`A`，接受commit
 `b546142289071b801a34ddab7e48f257f2235666`中SHA-256
 `1244b4d73f17f331353ba32cc9f37d3c2d8bf7222d62dfa85936e2601ec4735f`的exact semantic preimage；
 当时promotion只同步acceptance metadata、canonical registration与status wording，不改变该preimage的contract
-semantics。当前proposed `drama-authoring-and-acceptance/2`只更改B-D0 prerequisite documentation artifacts的
+semantics。Accepted `drama-authoring-and-acceptance/2`只更改B-D0 prerequisite documentation artifacts的
 acceptance authority：用户已委托primary agent基于exact evidence独立判定`CONFIRM` / `REVISE` / `REJECT`，
 不再要求
 每个candidate等待额外用户手动确认。该变更不改变Story / Scene / Character / Shot、requirement、rubric、
@@ -30,8 +30,8 @@ Drama requirement taxonomy、bounded fixture selection、baseline selection与de
 也不允许该 continuity plan 反向成为 Drama truth owner。
 
 V1 semantic/profile/rubric preimage仍是accepted identity；fixture与baseline selection已有exact accepted envelopes。
-V2 authority overlay必须先提交immutable preimage，再以本次用户委托的source ID/hash/timestamp与exact
-preimage commit/SHA进行promotion；在promotion前不得使用delegated authority接受authoring-package v3。
+V2 authority overlay已绑定下文immutable preimage与用户委托source，因此primary agent可按本contract自主
+判定authoring-package v3；这不是对package本身的自动acceptance。
 未实现workflow/schema/runtime adapter，未执行HUMAN media review。因此：
 
 - `B-D0 — Drama owner prerequisite` 继续为 `BLOCKED_BEFORE_MEDIA`；
@@ -39,6 +39,27 @@ preimage commit/SHA进行promotion；在promotion前不得使用delegated author
 - v1 spec acceptance只解除Drama owner/rubric缺失这一项blocker，不自动接受之后产生的artifact bytes；
 - fixture、baseline与无`BLOCKER`的authoring package仍必须分别形成content-addressed acceptance envelope，
   但符合下文contract时由delegated primary agent自主签发。
+
+### V2 Delegation Acceptance Binding
+
+- authority preimage commit：`0eda3502708384516d85e33686d8ca9c25f7da3e`；
+- authority preimage path：
+  `docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md`；
+- authority preimage Git blob OID：`db5bff3f7b63fee02c86f8d8918079f6daf1a23b`；
+- authority preimage byte size：`32092`；
+- authority preimage SHA-256：`e00f45f173cd48bcc1e786c3b60c442fb9a233734ebfa96e3f74deaa6d878e9b`；
+- delegation source ID：`current-session:user-rule-change-2026-08-29`；
+- normalized delegation tuple：
+  `delegation_decision=AUTHORIZE_PRIMARY_AGENT_CONFIRM;scope=B-D0_PREREQUISITE_DOCUMENTATION_ARTIFACTS;manual_confirm_required=false;effective_date=2026-08-29`；
+- delegation source SHA-256：`1fa6d81ffbaf4734349a78febe4a90080ec8951bbdc369e2d8722da3679f000c`；
+- delegation recorded at：`2026-08-29T09:42:14+08:00`；
+- preimage Harness receipt：
+  `.agent/harness/runs/drama-b-d0-delegated-acceptance-v2-proposal-20260829/receipt.json`，
+  SHA-256 `43b8db2560cfee0daaaa5cd49fdbf178637c8fc3ee76475cf4f023ca11553f9d`，
+  exact range `0eda350^..0eda350`，`status=passed`，`fresh=true`，`snapshot_matches=true`。
+
+该binding只accept上述v2 authority overlay，不修改v1 semantic/profile/rubric identity，不接受任何
+fixture、baseline或authoring-package candidate bytes。
 
 ## Goal
 
@@ -396,11 +417,10 @@ Development HUMAN PASS不等于candidate activation、P6、Final Acceptance、pu
 
 ## Acceptance Of This Specification
 
-用户已对v1 exact semantic preimage给出明确acceptance。当前文件中的v2 authority overlay仍是
-`canonical: false` / `spec_status: proposed`；只有它先获得immutable commit/path/SHA-256，再promotion并绑定本次
-用户委托的source ID/hash/timestamp后，才能成为current accepted overlay。Harness PASS、reviewer accept、commit或
-plan引用单独都不能自动产生artifact acceptance；primary agent必须重新打开exact evidence，作出独立
-判断并写入content-addressed acceptance envelope。
+用户已对v1 exact semantic preimage给出明确acceptance。V2 authority overlay已按上述immutable
+preimage与delegation source完promotion，当前为`canonical: true` / `spec_status: accepted`。Harness PASS、
+reviewer accept、commit或plan引用单独都不能自动产生artifact acceptance；primary agent必须重新打开
+exact evidence，作出独立判断并写入content-addressed acceptance envelope。
 
 Spec acceptance最多满足B-D0中的Drama owner/rubric prerequisite；以下仍是separate blockers：
 
