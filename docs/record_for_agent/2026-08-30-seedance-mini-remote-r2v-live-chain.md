@@ -9,6 +9,17 @@ evidence_index_version: "1"
 
 Date: 2026-08-30
 
+## Review Supersession Notice — 2026-08-30
+
+用户对原 stream-copy review derivative
+`output/epic-skyship-two-shot-30s.mp4` 给出明确 `FAIL`：跨 Shot seam 明显卡顿，且成片没有声音和字幕。
+该文件继续保留为历史 derivative 与失败证据，但不再是 current review artifact；此前单靠 boundary
+SSIM `0.903748` 的技术描述不能代表 seam 已获人工接受。
+
+当前 review artifact 已由同一两份 exact Provider MP4 本地确定性重组为
+`output/epic-skyship-two-shot-29p79s-captioned-sound-v2.mp4`。本次修复没有重新生成 Shot、没有
+Provider call，也没有改变两次 live Provider attempts、remote R2V provenance 或 Manifest activation truth。
+
 ## Purpose
 
 本文记录 `doubao-seedance-2-0-mini-260615` 首次由 AI-VIDEO canonical remote-output materialization lane 完成的真实两 Shot live chain：Shot 1 T2V 在 exact-byte Gate PASS 后 activation，Shot 2 不经 manual Ark Asset upload、不退化为 last-frame I2V，直接复用 Shot 1 的 current remote Provider output 执行 `VIDEO_EXTEND` / R2V。
@@ -79,6 +90,50 @@ submit payload 的 sanitized audit 证明 mode 为 `video_extend`，含 exactly 
 
 该文件是 review derivative，不是第三个 Provider artifact、Manifest active asset、P6 或 final delivery activation。
 
+用户实际播放后将其判为 `FAIL`：无声、无字幕，且硬切处明显卡顿。该 verdict 只否决这个 combined
+review derivative，不回写为 Shot 1 / Shot 2 Provider artifact 或 remote R2V API execution failure。
+
+### Review V2 — Local Seam, Audio And Caption Repair
+
+current main review artifact：
+
+- path：`output/epic-skyship-two-shot-29p79s-captioned-sound-v2.mp4`
+- SHA-256：`5a34bf149a739959ccaa1b0953cda9f6fcf6b3275818960a104814b1f47774fa`
+- size：`20,232,859` bytes
+- H.264 High、`1280x720@24fps`、715 frames、29.813s
+- AAC LC、48 kHz、stereo、约 255 kbps
+- `volumedetect`：mean `-14.0 dB`、max `-1.0 dB`
+- `silencedetect=noise=-40dB:d=0.5`：未检出连续 0.5s 以上静音
+
+视觉 seam 使用 6 frames / 0.25s xfade，offset 为 `14.791666667s`。旧硬切 exact frame-pair
+luma MAD 为 `9.893455`；修复版 encoded overlap 最大值为 `3.761`，峰值下降约 62%。移除
+pre-xfade `fps=24` 后，exact 715-frame 输出的 near-duplicate frame count 为 `0`。15-frame seam
+sheet 未见 double-ship ghosting：
+
+`evidence/review-v2/seam-sheet.jpg`
+
+音频由本地、可归因的 Mixkit BGM / ambience / whoosh / impact / shimmer assets 确定性混合；它不是
+Seedance native audio，也不声称存在 Provider dialogue。字幕是四组手工编写的中文叙事字幕，以
+Noto Sans CJK SC 48px、白字黑边烧录在 bottom safe area；它不是 Whisper transcription 或对白同步证明。
+字幕 visual sheet：
+
+`evidence/review-v2/caption-sheet.jpg`
+
+project-local `video-analysis` MCP 绑定 current exact SHA-256，以 2.5s interval 采样 12 frames，返回
+`has_audio=true`、threshold `0.3` 下 `scene_count=1`。Agent-side requirements 对 seam continuity、
+audio presence/continuity、caption presence/legibility/safe-area 给出 `PASS`；current artifact 的用户主观
+验收仍为 `NOT_EVALUATED`。完整本地 receipt：
+
+`evidence/review-v2/gate.json`
+
+另保留一个无 BGM、仅 ambience / SFX 的选择版本：
+
+- path：`output/epic-skyship-two-shot-29p79s-captioned-sfx-only-v2.mp4`
+- SHA-256：`c81a0f132359806676b3b39d4beb3e219baba780dcc554fec6b3a8492c418c2e`
+
+V2 derivative 与 Gate 是同一两次 Provider evidence 的本地新 proof layer，不是独立 Provider attempt，
+因此不增加下方 `Evidence Index` 的 independent evidence 数量。
+
 ## Provider And Budget Boundary
 
 run `...-002` 只发生两个 submit POST：Shot 1 T2V 一次、Shot 2 R2V 一次。Shot 2 resume 在 local profile compatibility preflight 曾 fail closed 一次，位于 credential/network/POST 之前；修正后只消费剩余一次授权 POST。全程 blind retry `0`、Provider fallback `0`、I2V fallback `0`、manual Ark Asset upload `0`。
@@ -106,7 +161,7 @@ Manifest revision `56` 中两 attempts 均为 `status=succeeded`、`video_genera
 
 - local H3/T8 output 自动上传受控 object storage、presigned URL lifecycle、cloud-egress approval 与 provider-neutral materialization proof 尚未实现；不得把 Seedance-output refresh permit 泛化为 uploader authority。
 - 本次只有一个真实 Mini R2V attempt，不能自动形成 Provider-wide Learning Claim，也不能外推 Seedance 2.0 base/fast/2.5。
-- Agent Per-Shot Gate 与 boundary SSIM 不是独立 human P6 / Final Acceptance；用户仍可对电影感、叙事或审美作最终取舍。
+- Agent Per-Shot Gate、boundary SSIM 与 Review V2 local Gate 都不是独立 human P6 / Final Acceptance；用户仍需对 current V2 的电影感、配乐、字幕文案与 seam 作最终取舍。
 - RAG index 未刷新；committed record bytes 不等于 retrieval index 已包含本次 evidence。
 
 ## Agent Guardrails
