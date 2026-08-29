@@ -3113,6 +3113,7 @@ def test_p5_error_codes_are_typed_and_non_retryable_by_default():
 def test_dependency_node_kind_enum_values_are_exact():
     assert {item.value for item in DependencyNodeKind} == {
         "creative_artifact",
+        "generation_target",
         "asset",
         "composition_spec",
         "resolved_timeline",
