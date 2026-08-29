@@ -1,0 +1,38 @@
+{
+  "schema": "ai-video-external-media-metadata/1",
+  "entries": [
+    {
+      "output_path": "01-underarm-deodorizing.mp4",
+      "sha256": "0122cef3b583e65c8d6442cdf5b5c7baa00325d028f98fb5021d57ffa4759fc3",
+      "size_bytes": 6946221,
+      "prompt_path": "artifacts/qingyan-miao-ad-20260826-v8/prompts/01_underarm_deodorizing_repair.txt",
+      "prompt_sha256": "8c7efbf61dcc51c6d5923c3b46c80876d2a8c057f488eedb07bde03c21fe49c5",
+      "shot_id": "01_underarm_deodorizing_repair",
+      "shot_type": "editorial_derived_clip",
+      "generation_type": "FL2VA-derived",
+      "source_receipt": "artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/01_underarm_deodorizing_repair.receipt.json"
+    },
+    {
+      "output_path": "02-elder-dialogue.mp4",
+      "sha256": "b9e815801783df59e4f9a52ee320875e00bd21662e18d268fce8b814adfa3faa",
+      "size_bytes": 5171503,
+      "prompt_path": "artifacts/qingyan-miao-ad-20260826-v8/prompts/02_elder_dialogue_repair.txt",
+      "prompt_sha256": "ee15a6eff86ce8b9efdc2e270890754f748e45e888fb6c4a1b5980c4328155d7",
+      "shot_id": "02_elder_dialogue_repair",
+      "shot_type": "editorial_derived_clip",
+      "generation_type": "FL2VA-derived",
+      "source_receipt": "artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/02_elder_dialogue_repair.receipt.json"
+    },
+    {
+      "output_path": "03-leave-together.mp4",
+      "sha256": "8b468de8d72cd441c78155105c07b779c77c2b731f1c26b322008fc334af7bb6",
+      "size_bytes": 15139693,
+      "prompt_path": "artifacts/qingyan-miao-ad-20260826-v8/prompts/03_leave_together.txt",
+      "prompt_sha256": "ec7b6a8de374e280287041b6c2f06475fc0b80d7891aef7ea70b75332806ab3e",
+      "shot_id": "03_leave_together",
+      "shot_type": "editorial_derived_clip",
+      "generation_type": "FL2VA-derived",
+      "source_receipt": "artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/03_leave_together.receipt.json"
+    }
+  ]
+}

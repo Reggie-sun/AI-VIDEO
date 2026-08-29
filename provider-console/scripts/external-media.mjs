@@ -37,6 +37,7 @@ const WINDOWS_ABSOLUTE_PATH = /(^|[^A-Za-z0-9_:/\\])(?:[A-Za-z]:[\\/]|\\\\)[^\s"
 const SIGNED_URL = /\b(?:https?|s3):\/\/\S*[?&](?:x-amz-|x-goog-|signature=|sig=|token=|access[_-]?key|expires=)/i;
 const SECRET_TEXT = /\b(?:bearer\s+[A-Za-z0-9._~-]{12,}|(?:api[_-]?key|secret|access[_-]?token)\s*[:=]\s*\S+)/i;
 const TRACEBACK_TEXT = /Traceback \(most recent call last\):|(?:^|\n)\s*File\s+"[^"]+",\s+line\s+\d+|(?:^|\n)\s*at\s+\S+\s+\([^\n)]+:\d+:\d+\)/;
+const MARKUP_CLOSING_TAG = /<\/[A-Za-z][A-Za-z0-9_-]{0,63}>/g;
 
 function containedPath(root, candidate) {
   return candidate === root || candidate.startsWith(`${root}${path.sep}`);
@@ -154,8 +155,20 @@ function isExactPathBinding(value, sidecarPath, mediaPath) {
 
 function isDirectBinding(node, sidecarPath, media) {
   if (!node || typeof node !== "object" || Array.isArray(node)) return false;
-  if (typeof node.sha256 === "string" && node.sha256.toLowerCase() === media.sha256) return true;
-  return [...BINDING_KEYS].some((key) => isExactPathBinding(node[key], sidecarPath, media.source_path));
+  let strongIdentity = false;
+  if (Object.hasOwn(node, "sha256")) {
+    if (typeof node.sha256 !== "string" || node.sha256.toLowerCase() !== media.sha256) return false;
+    strongIdentity = true;
+  }
+  if (Object.hasOwn(node, "size_bytes")) {
+    if (!Number.isSafeInteger(node.size_bytes) || node.size_bytes !== media.bytes) return false;
+  }
+  for (const key of BINDING_KEYS) {
+    if (!Object.hasOwn(node, key)) continue;
+    if (!isExactPathBinding(node[key], sidecarPath, media.source_path)) return false;
+    strongIdentity = true;
+  }
+  return strongIdentity;
 }
 
 function primitiveMetadataValue(value) {
@@ -194,6 +207,31 @@ function hasDirectBinding(value, sidecarPath, media) {
   return Object.values(value).some((child) => hasDirectBinding(child, sidecarPath, media));
 }
 
+function collectDirectBindingNodes(value, sidecarPath, media, collected = []) {
+  if (!value || typeof value !== "object") return collected;
+  if (Array.isArray(value)) {
+    for (const item of value) collectDirectBindingNodes(item, sidecarPath, media, collected);
+    return collected;
+  }
+  if (isDirectBinding(value, sidecarPath, media)) collected.push(value);
+  for (const child of Object.values(value)) collectDirectBindingNodes(child, sidecarPath, media, collected);
+  return collected;
+}
+
+async function externalMetadataForMedia(value, sidecarPath, media, limits, collected) {
+  collectMetadata(value, sidecarPath, media, false, collected);
+  if (collected.prompt !== undefined) return null;
+  for (const node of collectDirectBindingNodes(value, sidecarPath, media)) {
+    const promptPath = resolveSourceReference(media.source_root, node.prompt_path);
+    if (!promptPath) continue;
+    const prompt = await readBoundPrompt(promptPath, node.prompt_sha256, limits, media.source_root);
+    if (!prompt) continue;
+    collected.prompt = prompt;
+    return promptPath;
+  }
+  return null;
+}
+
 async function metadataForMedia(sidecars, media, limits, experimentImages) {
   const metadata = {};
   const evidenceRefs = [];
@@ -218,7 +256,8 @@ async function metadataForMedia(sidecars, media, limits, experimentImages) {
         composition = await declaredEcommerceComposition(sidecarPath, parsed, media, limits) || composition;
       }
       if (parsed.schema === EXTERNAL_METADATA_SCHEMA) {
-        collectMetadata(parsed, sidecarPath, media, false, metadata);
+        const promptPath = await externalMetadataForMedia(parsed, sidecarPath, media, limits, metadata);
+        if (promptPath) evidenceRefs.push(path.relative(media.source_root, promptPath).split(path.sep).join("/"));
       }
     } catch {
       // Sidecars are advisory. Their parse errors are deliberately not projected.
@@ -650,9 +689,10 @@ function groupProjection(records) {
 
 export function publicExternalMediaProjection(value) {
   if (typeof value === "string") {
+    const pathScanValue = value.replace(MARKUP_CLOSING_TAG, " ");
     if (
       value.includes("\0")
-      || POSIX_ABSOLUTE_PATH.test(value)
+      || POSIX_ABSOLUTE_PATH.test(pathScanValue)
       || WINDOWS_ABSOLUTE_PATH.test(value)
       || SIGNED_URL.test(value)
       || SECRET_TEXT.test(value)

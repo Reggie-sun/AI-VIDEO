@@ -744,6 +744,23 @@ test("external evidence states distinguish linked, incomplete, and unbound group
   ]);
 });
 
+test("exact-bound metadata without a reported outcome is linked but not evaluated", () => {
+  const status = externalStatus({
+    metadata_status: "bound",
+    evidence_refs: [{ relative_path: "work/external-media-metadata.json" }],
+    reported_status: null,
+  });
+
+  assert.deepEqual(status, {
+    raw: "NOT_EVALUATED",
+    label: "Prompt、Shot 或类型已与 exact bytes 绑定；生成状态未评估",
+    badge: "旁证已关联",
+    tone: "interrupted",
+    evaluated: false,
+    evidence_state: "linked",
+  });
+});
+
 test("Runs media context notice distinguishes identity coverage from global strict validity", () => {
   assert.equal(runsMediaContextNotice({ boundary: { complete: true } }), "");
   assert.match(runsMediaContextNotice({

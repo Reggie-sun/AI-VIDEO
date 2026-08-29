@@ -256,6 +256,8 @@ test("public projection recursively redacts unsafe sidecar text even if an adapt
       aspectRatio: "画面比例 16/9",
       playbackSpeed: "速度 1/2x",
       relativePath: "folder/subfolder",
+      taggedDialogue: "<d>[Chinese] 青颜抑汗净味喷雾。</d>",
+      taggedPath: "<d>safe</d>/home/operator/private.txt",
       nested: { source_path: "/home/operator/media.mp4" },
     }],
     _media: { token: { source_path: "/home/operator/media.mp4" } },
@@ -274,6 +276,8 @@ test("public projection recursively redacts unsafe sidecar text even if an adapt
       aspectRatio: "画面比例 16/9",
       playbackSpeed: "速度 1/2x",
       relativePath: "folder/subfolder",
+      taggedDialogue: "<d>[Chinese] 青颜抑汗净味喷雾。</d>",
+      taggedPath: null,
       nested: {},
     }],
   });
@@ -318,11 +322,20 @@ test("deduplicates repeated exact-byte evidence references within a SHA group", 
 test("metadata is accepted only when a sidecar directly binds the exact path or sha256", async () => {
   const paths = await fixture();
   const media = path.join(paths.external, "shot-7.mp4");
-  await writeFile(media, "bound media");
+  const prompt = path.join(paths.external, "prompts", "shot-7.txt");
+  const promptText = "a verified prompt";
+  const mediaBytes = "bound media";
+  const mediaSha256 = createHash("sha256").update(mediaBytes).digest("hex");
+  await writeFile(media, mediaBytes);
+  await mkdir(path.dirname(prompt), { recursive: true });
+  await writeFile(prompt, `\n${promptText}\n`);
   await writeFile(path.join(paths.external, "bound.json"), JSON.stringify({
     schema: "ai-video-external-media-metadata/1",
     output_path: "shot-7.mp4",
-    prompt_text: "a verified prompt",
+    sha256: mediaSha256,
+    size_bytes: Buffer.byteLength(mediaBytes),
+    prompt_path: "prompts/shot-7.txt",
+    prompt_sha256: createHash("sha256").update(promptText).digest("hex"),
     shot_id: "shot-7",
     generation_type: "T2V",
     state: "completed",
@@ -346,7 +359,55 @@ test("metadata is accepted only when a sidecar directly binds the exact path or 
   assert.equal(group.prompt_text, "a verified prompt");
   assert.equal(group.shot_id, "shot-7");
   assert.equal(group.generation_type, "T2V");
-  assert.deepEqual(group.evidence_refs, [{ source_id: "qingyan", relative_path: "bound.json" }]);
+  assert.deepEqual(group.evidence_refs, [
+    { source_id: "qingyan", relative_path: "bound.json" },
+    { source_id: "qingyan", relative_path: "prompts/shot-7.txt" },
+  ]);
+
+  await writeFile(path.join(paths.external, "bound.json"), JSON.stringify({
+    schema: "ai-video-external-media-metadata/1",
+    size_bytes: Buffer.byteLength(mediaBytes),
+    prompt_text: "must not bind by size alone",
+    shot_id: "wrong-shot",
+  }));
+  const rejectedSizeOnly = await catalogExternalMedia({ sources: sources(paths) });
+  const rejectedSizeOnlyGroup = rejectedSizeOnly.groups[0];
+  assert.equal(rejectedSizeOnlyGroup.metadata_status, "not_evaluated");
+  assert.equal(rejectedSizeOnlyGroup.prompt_text, null);
+  assert.deepEqual(rejectedSizeOnlyGroup.evidence_refs, []);
+
+  await writeFile(path.join(paths.external, "bound.json"), JSON.stringify({
+    schema: "ai-video-external-media-metadata/1",
+    output_path: "shot-7.mp4",
+    sha256: "0".repeat(64),
+    size_bytes: Buffer.byteLength(mediaBytes),
+    prompt_path: "prompts/shot-7.txt",
+    prompt_sha256: createHash("sha256").update(promptText).digest("hex"),
+    shot_id: "shot-7",
+    generation_type: "T2V",
+    state: "completed",
+  }));
+  const rejectedIdentity = await catalogExternalMedia({ sources: sources(paths) });
+  const rejectedIdentityGroup = rejectedIdentity.groups[0];
+  assert.equal(rejectedIdentityGroup.metadata_status, "not_evaluated");
+  assert.equal(rejectedIdentityGroup.prompt_text, null);
+  assert.deepEqual(rejectedIdentityGroup.evidence_refs, []);
+
+  await writeFile(path.join(paths.external, "bound.json"), JSON.stringify({
+    schema: "ai-video-external-media-metadata/1",
+    output_path: "shot-7.mp4",
+    sha256: mediaSha256,
+    size_bytes: Buffer.byteLength(mediaBytes),
+    prompt_path: "prompts/shot-7.txt",
+    prompt_sha256: "0".repeat(64),
+    shot_id: "shot-7",
+    generation_type: "T2V",
+    state: "completed",
+  }));
+  const rejectedPrompt = await catalogExternalMedia({ sources: sources(paths) });
+  const rejectedGroup = rejectedPrompt.groups[0];
+  assert.equal(rejectedGroup.prompt_text, null);
+  assert.deepEqual(rejectedGroup.evidence_refs, [{ source_id: "qingyan", relative_path: "bound.json" }]);
 });
 
 test("external project evidence chain joins exact result bytes to sealed prompt, mode, and provider outcome", async () => {

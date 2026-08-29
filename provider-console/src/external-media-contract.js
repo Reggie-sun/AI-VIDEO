@@ -46,6 +46,16 @@ export function externalStatus(group) {
       evidence_state: "linked",
     };
   }
+  if (group?.metadata_status === "bound" && (group?.evidence_refs || []).length > 0) {
+    return {
+      raw: "NOT_EVALUATED",
+      label: "Prompt、Shot 或类型已与 exact bytes 绑定；生成状态未评估",
+      badge: "旁证已关联",
+      tone: "interrupted",
+      evaluated: false,
+      evidence_state: "linked",
+    };
+  }
   if (group?.runs_context_complete === false) {
     return {
       raw: "INCOMPLETE_RUNS_CONTEXT",
