@@ -458,12 +458,20 @@ export function createRunsApiHandler({
   let runsMediaIndexCache = null;
   let runsMediaIndexPromise = null;
   let runsMediaIndexGeneration = 0;
+  let externalCatalogCache = null;
+  let externalCatalogPromise = null;
+  let externalCatalogGeneration = 0;
   const invalidateRunsMediaIndex = () => {
     runsMediaIndexGeneration += 1;
     runsMediaIndexCache = null;
   };
-  const unsubscribeIndexInvalidation = changeFeed?.subscribe?.((event) => {
+  const invalidateExternalCatalog = () => {
+    externalCatalogGeneration += 1;
+    externalCatalogCache = null;
+  };
+  const unsubscribeCatalogInvalidation = changeFeed?.subscribe?.((event) => {
     if ((event?.sources || []).includes("runs")) invalidateRunsMediaIndex();
+    if ((event?.sources || []).some((sourceId) => externalSourceRoots.has(sourceId))) invalidateExternalCatalog();
   }) || (() => {});
   const readRunsMediaIndex = async () => {
     if (runsMediaIndexCache) return runsMediaIndexCache;
@@ -482,6 +490,33 @@ export function createRunsApiHandler({
     }
     if (generation !== runsMediaIndexGeneration) return readRunsMediaIndex();
     runsMediaIndexCache = result;
+    return result;
+  };
+  const readExternalCatalog = async ({ force = false } = {}) => {
+    if (force) invalidateExternalCatalog();
+    if (externalCatalogCache) return externalCatalogCache;
+    if (externalCatalogPromise) {
+      await externalCatalogPromise;
+      return readExternalCatalog();
+    }
+    const generation = externalCatalogGeneration;
+    const pending = externalCatalog({ sources: configuredExternalSources });
+    externalCatalogPromise = pending;
+    let result;
+    try {
+      result = await pending;
+    } finally {
+      if (externalCatalogPromise === pending) externalCatalogPromise = null;
+    }
+    if (generation !== externalCatalogGeneration) return readExternalCatalog();
+    externalDescriptors.clear();
+    externalMediaCache.clear();
+    const entries = result?._media && typeof result._media === "object" ? Object.entries(result._media) : [];
+    for (const [token, entry] of entries) {
+      if (!/^[A-Za-z0-9_-]{6,128}$/.test(token) || !externalSourceRoots.has(entry?.source_id)) continue;
+      externalDescriptors.set(token, entry);
+    }
+    externalCatalogCache = result;
     return result;
   };
 
@@ -534,14 +569,7 @@ export function createRunsApiHandler({
 
       if (parsed.pathname === "/api/external-media") {
         if (req.method !== "GET") return methodNotAllowed(res, "GET");
-        const result = await externalCatalog({ sources: configuredExternalSources });
-        externalDescriptors.clear();
-        externalMediaCache.clear();
-        const entries = result?._media && typeof result._media === "object" ? Object.entries(result._media) : [];
-        for (const [token, entry] of entries) {
-          if (!/^[A-Za-z0-9_-]{6,128}$/.test(token) || !externalSourceRoots.has(entry?.source_id)) continue;
-          externalDescriptors.set(token, entry);
-        }
+        const result = await readExternalCatalog({ force: parsed.searchParams.get("refresh") === "1" });
         send(res, 200, publicProjection(result));
         return;
       }
@@ -683,7 +711,7 @@ export function createRunsApiHandler({
         : { code: "RUNS_SOURCE_UNAVAILABLE", message: "本地 runs 数据源不可用。" } });
     }
   };
-  runsApi.close = unsubscribeIndexInvalidation;
+  runsApi.close = unsubscribeCatalogInvalidation;
   return runsApi;
 }
 

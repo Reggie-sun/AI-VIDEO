@@ -1267,6 +1267,121 @@ test("external media catalog is parallel to runs, source-qualified, and never le
   assert.equal(method.res.headers.get("allow"), "GET");
 });
 
+test("external media catalog caches repeated reads and invalidates on explicit refresh or source changes", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-external-cache-"));
+  const sourceRoot = path.join(root, "artifacts");
+  await mkdir(sourceRoot);
+  let onCatalogChange = null;
+  let catalogCalls = 0;
+  const handler = createRunsApiHandler({
+    repoRoot: root,
+    runProjector: async () => ({ workspaces: [] }),
+    externalSources: [{ id: "artifacts", label: "Artifacts", kind: "development_artifact", root: sourceRoot }],
+    externalCatalog: async () => ({
+      boundary: { read_only: true },
+      sources: [],
+      groups: [{ sha256: String(catalogCalls += 1).padStart(64, "0") }],
+      _media: {},
+    }),
+    changeFeed: {
+      subscribe(callback) { onCatalogChange = callback; return () => { onCatalogChange = null; }; },
+    },
+  });
+
+  const first = await invoke(handler, request("GET", "/api/external-media"));
+  const cached = await invoke(handler, request("GET", "/api/external-media"));
+  assert.equal(catalogCalls, 1);
+  assert.deepEqual(JSON.parse(cached.res.body), JSON.parse(first.res.body));
+
+  onCatalogChange({ sources: ["runs"] });
+  await invoke(handler, request("GET", "/api/external-media"));
+  assert.equal(catalogCalls, 1);
+
+  const forced = await invoke(handler, request("GET", "/api/external-media?refresh=1"));
+  assert.equal(catalogCalls, 2);
+  assert.equal(JSON.parse(forced.res.body).groups[0].sha256, "2".padStart(64, "0"));
+
+  onCatalogChange({ sources: ["artifacts"] });
+  const changed = await invoke(handler, request("GET", "/api/external-media"));
+  assert.equal(catalogCalls, 3);
+  assert.equal(JSON.parse(changed.res.body).groups[0].sha256, "3".padStart(64, "0"));
+  handler.close();
+});
+
+test("external media cache discards an in-flight scan invalidated by a source change", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-external-cache-serial-"));
+  const sourceRoot = path.join(root, "artifacts");
+  await mkdir(sourceRoot);
+  let onCatalogChange = null;
+  let catalogCalls = 0;
+  let releaseFirst;
+  const firstProjection = new Promise((resolve) => { releaseFirst = resolve; });
+  const projection = (label) => ({
+    boundary: { read_only: true },
+    sources: [],
+    groups: [{ sha256: label.repeat(64) }],
+    _media: {},
+  });
+  const handler = createRunsApiHandler({
+    repoRoot: root,
+    runProjector: async () => ({ workspaces: [] }),
+    externalSources: [{ id: "artifacts", label: "Artifacts", kind: "development_artifact", root: sourceRoot }],
+    externalCatalog: async () => {
+      catalogCalls += 1;
+      return catalogCalls === 1 ? firstProjection : projection("b");
+    },
+    changeFeed: {
+      subscribe(callback) { onCatalogChange = callback; return () => { onCatalogChange = null; }; },
+    },
+  });
+
+  const first = invoke(handler, request("GET", "/api/external-media"));
+  onCatalogChange({ sources: ["artifacts"] });
+  const concurrent = invoke(handler, request("GET", "/api/external-media"));
+  releaseFirst(projection("a"));
+  const [firstResponse, concurrentResponse] = await Promise.all([first, concurrent]);
+
+  assert.equal(catalogCalls, 2);
+  assert.equal(JSON.parse(firstResponse.res.body).groups[0].sha256, "b".repeat(64));
+  assert.equal(JSON.parse(concurrentResponse.res.body).groups[0].sha256, "b".repeat(64));
+  await invoke(handler, request("GET", "/api/external-media"));
+  assert.equal(catalogCalls, 2);
+  handler.close();
+});
+
+test("external media cache shares an in-flight scan failure without retry amplification", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-external-cache-failure-"));
+  const sourceRoot = path.join(root, "artifacts");
+  await mkdir(sourceRoot);
+  let catalogCalls = 0;
+  let rejectFirst;
+  const firstProjection = new Promise((resolve, reject) => { rejectFirst = reject; });
+  const handler = createRunsApiHandler({
+    repoRoot: root,
+    runProjector: async () => ({ workspaces: [] }),
+    externalSources: [{ id: "artifacts", label: "Artifacts", kind: "development_artifact", root: sourceRoot }],
+    externalCatalog: async () => {
+      catalogCalls += 1;
+      if (catalogCalls === 1) return firstProjection;
+      return { boundary: { read_only: true }, sources: [], groups: [], _media: {} };
+    },
+  });
+
+  const requests = [
+    invoke(handler, request("GET", "/api/external-media")),
+    invoke(handler, request("GET", "/api/external-media")),
+    invoke(handler, request("GET", "/api/external-media")),
+  ];
+  rejectFirst(new Error("source unavailable"));
+  const failed = await Promise.all(requests);
+
+  assert.equal(catalogCalls, 1);
+  assert.deepEqual(failed.map(({ res }) => res.statusCode), [503, 503, 503]);
+  const retried = await invoke(handler, request("GET", "/api/external-media"));
+  assert.equal(retried.res.statusCode, 200);
+  assert.equal(catalogCalls, 2);
+});
+
 test("Runs media context index is read-only, GET-only, and sanitized", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "provider-console-runs-media-index-"));
   const secretRoot = path.join(root, "private");

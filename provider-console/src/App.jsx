@@ -590,6 +590,7 @@ export function App() {
   const runsRefreshQueued = useRef(false);
   const externalRefreshInFlight = useRef(false);
   const externalRefreshQueued = useRef(false);
+  const externalForceRefreshQueued = useRef(false);
 
   const loadDetail = useCallback(async (key, { preserveAttempt = false, selectionToken, requestToken } = {}) => {
     const response = await fetch(`/api/runs/detail?workspace=${encodeURIComponent(key)}`, { cache: "no-store" });
@@ -734,7 +735,8 @@ export function App() {
 
   useEffect(() => { loadContinuityReview(); }, [loadContinuityReview]);
 
-  const refreshExternal = useCallback(async () => {
+  const refreshExternal = useCallback(async ({ force = false } = {}) => {
+    if (force) externalForceRefreshQueued.current = true;
     if (externalRefreshInFlight.current) {
       externalRefreshQueued.current = true;
       return;
@@ -744,8 +746,10 @@ export function App() {
     try {
       do {
         externalRefreshQueued.current = false;
+        const forceRequest = externalForceRefreshQueued.current;
+        externalForceRefreshQueued.current = false;
         try {
-          const response = await fetch("/api/external-media", { cache: "no-store" });
+          const response = await fetch(forceRequest ? "/api/external-media?refresh=1" : "/api/external-media", { cache: "no-store" });
           const body = await readExternalCatalogResponse(response);
           const groups = body.groups || [];
           setExternalCatalog(body);
@@ -846,8 +850,8 @@ export function App() {
 
   const refreshSelectedSource = useCallback(async () => {
     if (selectedSource === "runs") await refreshRunsAndContext();
-    else if (selectedSource === "all") await Promise.all([refreshRunsAndContext(), refreshExternal()]);
-    else await refreshExternal();
+    else if (selectedSource === "all") await Promise.all([refreshRunsAndContext(), refreshExternal({ force: true })]);
+    else await refreshExternal({ force: true });
   }, [refreshExternal, refreshRunsAndContext, selectedSource]);
 
   const continuityContent = (
