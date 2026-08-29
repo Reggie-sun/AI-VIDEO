@@ -92,6 +92,10 @@ SHA-256 `24f6c41e8d3a8aa8fee423dc499433527fb9a10548df4694435a883ca57d3274`。Gat
 中首音节的 fidelity 仍为 `NOT_EVALUATED`；烧录正确 authored subtitle 只修复观看层字幕缺失，不能
 倒推出原生对白 Gate PASS。
 
+`record-ai-video-session` checkpoint 后的 automatic `distill-ai-video-learning` evaluation 为
+`no_candidate`：本次是一个 deterministic composition repair，没有形成满足 admission threshold 的
+跨实验 Learning Claim，因此未创建 placeholder 或修改任何 Skill / Policy / Preflight / Gate target。
+
 ## Current Shot 6 Evidence Boundary
 
 v21–v24 每个 attempt 仅修改一个可归因变量：dialogue boundary timing、首字符/四音节约束、
