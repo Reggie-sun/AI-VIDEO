@@ -88,8 +88,9 @@ Plans、specs、roadmaps、console text、Agent memory 或历史 receipts 本身
 ### Per-Shot Post-Media Gate
 
 - Agent 控制 sequential multi-Shot generation 时，每个 Shot 的 exact MP4 落盘后，必须在提交下一 Shot 前显式调用 project-local `video-analysis` MCP，并按该 Shot 的 sealed intent、applicable requirements 与前序已接受状态给出 requirement-level `PASS` / `FAIL` / `NOT_EVALUATED`。
-- 只有 exact current Shot 的全部 required findings 为 `PASS` 才允许下一次 Provider submit。MCP 不可用、证据缺失或陈旧、文件 identity 不匹配、required requirement 无法判定均为 `NOT_EVALUATED` 并立即停止；不得等待整个 batch 完成、依赖用户提醒、用 background analysis hook、tool success、单一总分或自动 VLM stub 代替该阻断 Gate。
-- `video-analysis` MCP 只提供绑定 exact bytes 的 raw evidence；Agent-side Gate 不得写 Manifest、激活 candidate、签发 P6 / Final Acceptance 或自动 retry。详细顺序与 evidence contract 由 `.agent/context/control-plane-playbook.md` 的 `Per-Shot Post-Media Gate` 独占。
+- 只有 exact current Shot 的全部 required findings 为 `PASS` 才允许提交下一 Shot。MCP 不可用、证据缺失或陈旧、文件 identity 不匹配、required requirement 无法判定均为 `NOT_EVALUATED`，并阻断任何下一 Shot submit；不得等待整个 batch 完成、依赖用户提醒、用 background analysis hook、tool success、单一总分或自动 VLM stub 代替该阻断 Gate。
+- `FAIL` / `NOT_EVALUATED` 终止的是 current Shot attempt 和向下一 Shot 的推进，不自动终止仍在 accepted scope 内的整个用户任务。严格 local/loopback、unmetered、outcome-known 且适用 `Local ComfyUI Authorization Exemption` 时，Agent orchestration 必须采用 `LOCAL_BOUNDED_REPAIR_LOOP`：保存失败 Gate，先封存有限的 task-scoped attempt / elapsed-time / GPU budget，基于 evidence 每次只选择一个可归因 repair variable，以新 exact identity / intent / one-use permit 重新执行同一 Shot，并再次通过完整 Gate；不得复用旧 permit、blind retry、fallback 或跳到下一 Shot。若 `NOT_EVALUATED` 来自 MCP / analyzer / stale evidence 而非媒体本身，必须采用 `EVIDENCE_REPAIR_FIRST`，先修复或重取 evidence，不得无理由重新生成媒体。
+- `video-analysis` MCP 只提供绑定 exact bytes 的 raw evidence；Agent-side Gate 本身不得写 Manifest、激活 candidate、签发 P6 / Final Acceptance 或自行重试。只有 orchestration 层可按上一条启动独立 repair attempt。真正停止整个任务只允许在 outcome unknown、没有新的 evidence-backed repair variable、同类失败重复且无法进一步隔离、MCP/evidence 持续不可恢复、scope/Provider/egress 改变，或出现其他真实 blocker 时发生。详细顺序与 evidence contract 由 `.agent/context/control-plane-playbook.md` 的 `Per-Shot Post-Media Gate` 独占。
 
 ## Canonical Ownership
 
@@ -216,7 +217,7 @@ alternate path 与 focused verification 的唯一 human-readable owner。实现�
 
 - 连接严格限制为 loopback、执行完全 local/unmetered 且无 cloud egress 的 ComfyUI lifecycle 与 media actions 不需要 user authorization、task-scoped authorization 或额外 confirmation；该豁免包括为任务所需的 `status` / `start` / `stop`、image/video generation、retry、variant 与 benchmark。
 - 该豁免只移除 authorization gate，不扩大用户 task scope，也不覆盖用户明确的 read-only、禁止 live generation / media effects 或更高优先级限制。Exact request identity、sealed profile/workflow/binding、preflight、适用的 local intent/one-use permit、canonical execution seam、唯一 committer、content-addressed provenance、recovery 与 media verification gates 保持不变。
-- Retry、variant 与 benchmark 可以无需询问用户，但必须是 bounded、task-relevant 的新 exact attempt；上一次 outcome unknown 时仍须 fail closed，禁止 blind retry、fallback、permit remint 或重复 side effect。Per-Shot Gate 的 `FAIL` / `NOT_EVALUATED` 仍会停止当前 batch，后续 repair attempt 不得被自动串联。
+- Retry、variant 与 benchmark 可以无需询问用户，但必须是 bounded、task-relevant 的新 exact attempt；上一次 outcome unknown 时仍须 fail closed，禁止 blind retry、fallback、permit remint 或重复 side effect。Per-Shot Gate 的 `FAIL` / `NOT_EVALUATED` 必须停止 current attempt 并阻断下一 Shot；当用户目标仍未完成且 outcome known 时，后续同一 Shot repair 按 `LOCAL_BOUNDED_REPAIR_LOOP` 继续，无需额外 confirmation。该 loop 不得改变 accepted scope、Provider、egress、paid 状态或 Gate requirement。
 - Exact preview 在既有 seam 要求时继续作为 readiness/provenance evidence，但不得充当 local ComfyUI 的 user-approval gate。任何非 loopback、可能 cloud egress、metered、remote 或 paid execution 均不适用本豁免。
 
 ## Decision Gates

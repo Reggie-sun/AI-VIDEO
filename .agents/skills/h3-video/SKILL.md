@@ -193,8 +193,15 @@ For AI-VIDEO multi-Shot work, generation is an atomic loop, never an unattended 
    `PASS` / `FAIL` / `NOT_EVALUATED` findings. From Shot 2 onward, include the previous accepted
    end-state evidence when continuity applies.
 4. Submit the next Shot only when every required finding for the current Shot is `PASS`.
-   `FAIL`, `NOT_EVALUATED`, missing/stale evidence, identity drift, or unavailable MCP stops the
-   sequence before any next submit.
+   `FAIL`, `NOT_EVALUATED`, missing/stale evidence, identity drift, or unavailable MCP always
+   blocks Shot N+1 and closes the current attempt.
+5. For a local loopback, unmetered, outcome-known task that remains inside the accepted scope,
+   do not treat that attempt stop as the end of the user's deliverable. Use
+   `LOCAL_BOUNDED_REPAIR_LOOP`: preserve the failed Gate, seal finite task-scoped attempt-count,
+   elapsed-time, and GPU budgets in run evidence, isolate one evidence-backed repair
+   variable, create a new exact request/intent/one-use permit for the same Shot, and run the full
+   Gate again. When only the MCP/analyzer/evidence failed, use `EVIDENCE_REPAIR_FIRST` and repair
+   the evidence path without regenerating otherwise unfailed media.
 
 The background analysis hook, command exit code, file existence, OpenVideo judge score, and the
 env-unset auto-PASS stub do not satisfy this Gate. Do not collapse identity, action, product/object,
@@ -202,8 +209,13 @@ camera, prompt adherence, audio, and continuity into one score. Follow the canon
 `.agent/context/control-plane-playbook.md` `Per-Shot Post-Media Gate`; MCP evidence remains advisory
 raw evidence and cannot write Manifest, P6, activation, or Final Acceptance.
 
-After a stopped Shot, diagnose a targeted repair. Re-run only when the accepted task scope and
-Provider gates authorize that new attempt; never silently retry, fallback, or continue the batch.
+After a stopped Shot, diagnose a targeted repair. Under the local exemption, the agent orchestration
+must continue the same Shot through `LOCAL_BOUNDED_REPAIR_LOOP` while the accepted goal remains
+unmet and a new evidence-backed variable exists; this needs no extra confirmation. Never repeat the
+same request, blind retry, reuse/remint the old permit, fallback, weaken requirements, change
+Provider/scope, or continue to Shot N+1. Stop the whole task only for unknown outcome, exhausted
+sealed repair budget or causal repair hypotheses, repeated unisolatable failure, persistent evidence unavailability, scope
+change, or another real blocker. Remote/paid attempts retain their authorization gates.
 For a single-Shot delivery, the same Gate runs before delivery. Shipping/public claims may still
 require the separate human or Production acceptance gates.
 

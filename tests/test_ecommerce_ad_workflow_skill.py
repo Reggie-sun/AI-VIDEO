@@ -1109,7 +1109,11 @@ def test_source_audio_measurement_flag_requires_matching_requirement(
 
 
 def test_native_audio_gate_documents_provider_capability_branch() -> None:
+    agents = (ROOT / "AGENTS.md").read_text(encoding="utf-8")
     playbook = (ROOT / ".agent/context/control-plane-playbook.md").read_text(
+        encoding="utf-8"
+    )
+    h3_skill = (ROOT / ".agents/skills/h3-video/SKILL.md").read_text(
         encoding="utf-8"
     )
     audio_reference = (
@@ -1134,6 +1138,22 @@ def test_native_audio_gate_documents_provider_capability_branch() -> None:
     assert "REQUIRES_RUNTIME_CAPABILITY" in runtime_reference
     assert "ResolvedTimeline" in runtime_reference
     assert "Final-composition audio Gate" in playbook
+    for policy_text in (agents, playbook, h3_skill):
+        assert "LOCAL_BOUNDED_REPAIR_LOOP" in policy_text
+        assert "EVIDENCE_REPAIR_FIRST" in policy_text
+        assert "outcome-known" in policy_text
+    assert "阻断下一 Shot" in agents
+    assert "新 exact identity / intent / one-use permit" in agents
+    assert "task-scoped attempt / elapsed-time / GPU budget" in agents
+    assert "绝不允许提交下一 Shot" in playbook
+    assert "新 exact identity" in playbook
+    assert "durable intent" in playbook
+    assert "one-use permit" in playbook
+    assert "Remote / paid retry" in playbook
+    assert "blocks Shot N+1" in h3_skill
+    assert "same Shot" in h3_skill
+    assert "Remote/paid attempts retain their authorization gates" in h3_skill
+    assert "repair attempt 不得自动串联" not in playbook
 
 
 @pytest.mark.skipif(not SCRIPT_PATH.is_file(), reason="Validator not implemented yet")

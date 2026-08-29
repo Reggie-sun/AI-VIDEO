@@ -118,7 +118,7 @@ code/tests；`AGENTS.md` 的 `Canonical Ownership` 继续提供顶层 durable bo
 - Credential 存在不证明 access、pricing、余额或当前 task authorization。
 - 严格 loopback、完全 local/unmetered 且无 cloud egress 的 ComfyUI lifecycle 与 media actions 全部适用 `AGENTS.md` 的 `Local ComfyUI Authorization Exemption`：为任务所需的 `status` / `start` / `stop`、image/video generation、retry、variant 与 benchmark 均不需要 user authorization、task-scoped authorization 或额外 confirmation。该规则不要求用户先点名 local ComfyUI，但 action 必须仍与 accepted task 直接相关；用户明确要求 read-only、禁止 live generation / media effects，或 endpoint / effect 无法证明满足 exemption 时必须停止。
 - 豁免只移除 user-approval layer。执行必须使用所涉 surface 的既有 canonical seam；AI-VIDEO local video Provider 仍经 `VideoGenerationService`、sealed profile、preflight、durable local intent、committer-issued one-use permit、唯一 committer、recovery 与 media verification，禁止直接调用 Comfy transport 或 Provider `submit()`。Agent-side local image authoring也不得绕过其既有 tool/provider identity、input/output provenance 与 image-level Gate。Exact preview 在既有 seam 要求时仍是 readiness/provenance evidence，但不是 local ComfyUI 的 user-approval gate。
-- Retry、variant 与 benchmark 可以不询问用户，但必须是 bounded、task-relevant、具有新 exact identity 的 attempt。上一次 outcome unknown 时仍须 fail closed，禁止 blind retry、fallback、permit remint 或重复 side effect；Per-Shot Gate 的 `FAIL` / `NOT_EVALUATED` 仍终止当前 batch，repair attempt 不得自动串联。任何非 loopback、可能 cloud egress、metered、remote 或 paid execution 均回到对应 authorization 与 Provider gates。
+- Retry、variant 与 benchmark 可以不询问用户，但必须是 bounded、task-relevant、具有新 exact identity 的 attempt。上一次 outcome unknown 时仍须 fail closed，禁止 blind retry、fallback、permit remint 或重复 side effect；Per-Shot Gate 的 `FAIL` / `NOT_EVALUATED` 终止 current attempt 并阻断下一 Shot，但用户目标仍未完成且 outcome known 时，Agent orchestration 必须按 `LOCAL_BOUNDED_REPAIR_LOOP` 继续同一 Shot。任何非 loopback、可能 cloud egress、metered、remote 或 paid execution 均回到对应 authorization 与 Provider gates。
 - 用户明确要求执行一个必然包含 remote/paid call 的任务时，该请求构成该 accepted scope 的 task-scoped authorization；Docs-only、plan、review、可行性分析或“能否执行”不构成 live authorization。
 - Authorization 仅覆盖 accepted Provider/model、inputs、budget 与完成目标所需的最少调用；不得复用于 benchmark、额外 variants、不同 Provider/model 或扩大后的 scope。
 - Task-scoped authorization 不替代 Paid Provider Gate。调用前仍需 exact preview、finite budget ceiling/reservation、cloud-egress approval、secret reference、durable submit intent 与 one-use permit。
@@ -207,7 +207,11 @@ resolve Shot N SourceAudioPolicy against the already-selected Provider capabilit
   -> call project-local video-analysis MCP on that exact path
   -> map raw evidence to exact Shot requirements
   -> PASS: allow submit of Shot N+1
-  -> FAIL / NOT_EVALUATED: stop before any next submit
+  -> FAIL / NOT_EVALUATED: persist current-attempt STOP; never submit Shot N+1
+  -> local + loopback + outcome-known + accepted scope remains unmet:
+       diagnose one evidence-backed repair variable
+       -> new exact identity / intent / one-use permit for Shot N
+       -> re-enter generation and the complete Gate (`LOCAL_BOUNDED_REPAIR_LOOP`)
 ```
 
 - 多 Shot task 必须按 one-Shot-at-a-time orchestration 执行；不得先提交整个 batch，再补分析。
@@ -245,10 +249,20 @@ resolve Shot N SourceAudioPolicy against the already-selected Provider capabilit
 - 只有全部required findings为`PASS`时，Agent才可提交下一Shot。MCP unavailable/error、
   output identity drift、missing/stale evidence或任何required finding无法可靠判断都必须
   `NOT_EVALUATED`并fail closed。
-- `FAIL`或`NOT_EVALUATED`后只允许报告诊断与建议的targeted repair，当前batch必须停止。符合
-  `Local ComfyUI Authorization Exemption`的后续bounded repair/retry无需用户授权，但必须作为具有
-  新exact identity的独立attempt重新进入全部Provider与media gates；不得自动串联重生成、fallback
-  或继续batch。Remote / paid retry仍须具备适用authorization。
+- `FAIL`或`NOT_EVALUATED`后必须持久化当前 attempt 的 STOP，且绝不允许提交下一 Shot。该 STOP
+  不是整个用户任务的默认终点。符合 `Local ComfyUI Authorization Exemption`、outcome known、用户
+  目标仍未完成且 accepted scope 未变化时，Agent orchestration 必须执行
+  `LOCAL_BOUNDED_REPAIR_LOOP`：先在 run evidence 中封存有限的 task-scoped attempt count、elapsed-time
+  与 GPU budget；再从 exact Gate evidence 每次诊断一个可归因变量，建立新 exact identity、
+  durable intent 与 one-use permit，只重做当前 Shot，并重新进入全部 Provider 与 media gates。
+- `LOCAL_BOUNDED_REPAIR_LOOP`不得重复同一 request、blind retry、fallback、复用或 remint 旧 permit、
+  放宽 requirement、切换 Provider，或绕过完整 Gate。若 `NOT_EVALUATED`只由 MCP unavailable/error、
+  analyzer failure、missing/stale evidence 或 identity mismatch 导致，必须先执行
+  `EVIDENCE_REPAIR_FIRST`，重取/修复 evidence；媒体本身没有失败证据时不得重新生成。
+- 只有 outcome unknown、sealed repair budget 耗尽、没有新的 evidence-backed repair variable、同类失败
+  重复且无法进一步隔离、MCP/evidence 持续不可恢复、scope/Provider/egress/paid 状态变化，或其他真实 blocker 才停止整个
+  task 并报告。Remote / paid retry仍须具备适用 authorization；任何 repair 都不得自动推进 P6、
+  activation、Final Acceptance 或 Shot N+1。
 - MCP raw evidence与Agent verdict不得直接写Manifest、Registry、activation、P6 receipt或
   Final Acceptance。进入Production acceptance时，仍须由existing review contract与
   `ProductionStateCommitter`重新绑定、adjudicate和持久化。
