@@ -37,6 +37,7 @@ import {
   preferredExternalGroup,
   preferredExternalLocation,
   readExternalCatalogResponse,
+  runsMediaContextNotice,
 } from "../src/external-media-contract.js";
 import {
   enableMediaSound,
@@ -249,10 +250,11 @@ test("video library rail labels and filters External evidence states without N/E
 
     assert.match(markup, /id="external-evidence-filter"/);
     assert.match(markup, /已关联 \(1\)/);
-    assert.match(markup, /证据不完整 \(1\)/);
+    assert.match(markup, /Runs 待恢复 \(0\)/);
+    assert.match(markup, /旁证待解析 \(1\)/);
     assert.match(markup, /无绑定证据 \(1\)/);
     assert.match(markup, />Runs 已关联<\/span>/);
-    assert.match(markup, />证据不完整<\/span>/);
+    assert.match(markup, />旁证待解析<\/span>/);
     assert.match(markup, />无绑定证据<\/span>/);
     assert.match(markup, /shot-linked · T2V/);
     assert.match(markup, /Exact Runs prompt/);
@@ -720,15 +722,15 @@ test("external evidence states distinguish linked, incomplete, and unbound group
   const unbound = { evidence_refs: [] };
 
   assert.equal(externalEvidenceState(linked), "linked");
-  assert.equal(externalEvidenceState(incomplete), "incomplete");
+  assert.equal(externalEvidenceState(incomplete), "unparsed");
   assert.equal(externalEvidenceState(unbound), "unbound");
   assert.deepEqual(externalStatus(incomplete), {
-    raw: "NOT_EVALUATED",
-    label: "存在 exact-bound evidence，但关联链不完整",
-    badge: "证据不完整",
+    raw: "UNPARSED_BOUND_EVIDENCE",
+    label: "存在 exact-bound 旁证，但当前 schema 尚未支持",
+    badge: "旁证待解析",
     tone: "gated",
     evaluated: false,
-    evidence_state: "incomplete",
+    evidence_state: "unparsed",
   });
   assert.equal(groupMatchesEvidenceFilter(linked, "linked"), true);
   assert.equal(groupMatchesEvidenceFilter(incomplete, "linked"), false);
@@ -736,9 +738,22 @@ test("external evidence states distinguish linked, incomplete, and unbound group
   assert.deepEqual(externalEvidenceFilterOptions([linked, incomplete, unbound]), [
     { id: "all", label: "全部证据状态", count: 3 },
     { id: "linked", label: "已关联", count: 1 },
-    { id: "incomplete", label: "证据不完整", count: 1 },
+    { id: "incomplete", label: "Runs 待恢复", count: 0 },
+    { id: "unparsed", label: "旁证待解析", count: 1 },
     { id: "unbound", label: "无绑定证据", count: 1 },
   ]);
+});
+
+test("Runs media context notice distinguishes identity coverage from global strict validity", () => {
+  assert.equal(runsMediaContextNotice({ boundary: { complete: true } }), "");
+  assert.match(runsMediaContextNotice({
+    boundary: { complete: false, identity_coverage_complete: true },
+    summary: { recovered_workspace_count: 3, failed_workspace_count: 2 },
+  }), /3 个 workspace 恢复了封存视频证据，2 个 workspace 无法完整重开/);
+  assert.match(runsMediaContextNotice({
+    boundary: { complete: false, identity_coverage_complete: false },
+    summary: { failed_workspace_count: 5 },
+  }), /仅展示已确认的 exact match/);
 });
 
 test("external evidence reuses a semantically unambiguous exact Runs binding", () => {
@@ -832,11 +847,46 @@ test("Runs media index joins External only on exact SHA and bytes", () => {
   assert.equal(externalStatus(incomplete.groups[1]).raw, "INCOMPLETE_RUNS_CONTEXT");
   assert.equal(incomplete.runs_media_context.complete, false);
 
+  const unresolvedSha = "e".repeat(64);
+  const identityScoped = attachRunsMediaIndex({
+    groups: [
+      { sha256, bytes: 124, reported_status: null },
+      { sha256: unresolvedSha, bytes: 456, reported_status: null },
+    ],
+  }, {
+    boundary: {
+      read_only: true,
+      association: "exact_sha256_and_bytes",
+      lifecycle_projection: false,
+      complete: false,
+      identity_coverage_complete: true,
+    },
+    bindings: [],
+    unresolved_media: [{ sha256: unresolvedSha, bytes: 456 }],
+  });
+  assert.equal(identityScoped.groups[0].runs_context_complete, true);
+  assert.equal(externalStatus(identityScoped.groups[0]).evidence_state, "unbound");
+  assert.equal(identityScoped.groups[1].runs_context_complete, false);
+  assert.equal(externalStatus(identityScoped.groups[1]).raw, "INCOMPLETE_RUNS_CONTEXT");
+
+  const malformedCoverage = attachRunsMediaIndex(catalog, {
+    boundary: {
+      read_only: true,
+      association: "exact_sha256_and_bytes",
+      lifecycle_projection: false,
+      complete: false,
+      identity_coverage_complete: true,
+    },
+    bindings: [],
+    unresolved_media: [{ sha256: "invalid", bytes: 1 }],
+  });
+  assert.equal(malformedCoverage.groups[0].runs_context_complete, false);
+
   const pending = attachRunsMediaIndex(catalog, null);
   assert.equal(pending.groups[0].runs_context_complete, false);
   assert.equal(pending.groups[1].runs_context_complete, false);
   assert.equal(externalStatus(pending.groups[0]).raw, "INCOMPLETE_RUNS_CONTEXT");
-  assert.equal(externalStatus(pending.groups[1]).badge, "证据不完整");
+  assert.equal(externalStatus(pending.groups[1]).badge, "Runs 待恢复");
 });
 
 test("external source selector stays compact and defaults to all sources", () => {

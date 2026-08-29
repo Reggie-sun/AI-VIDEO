@@ -840,6 +840,7 @@ categories:
       - src/ai_video/provider_console.py
       - src/ai_video/provider_console_continuity.py
       - src/ai_video/provider_console_media_index.py
+      - src/ai_video/provider_console_video_evidence.py
       - tests/test_provider_console.py
       - tests/test_provider_console_media_index.py
       - provider-console/scripts/experiment-evidence.mjs

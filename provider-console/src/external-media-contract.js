@@ -50,7 +50,7 @@ export function externalStatus(group) {
     return {
       raw: "INCOMPLETE_RUNS_CONTEXT",
       label: "Runs 关联证据尚不完整，无法证明该视频没有绑定",
-      badge: "证据不完整",
+      badge: "Runs 待恢复",
       tone: "gated",
       evaluated: false,
       evidence_state: "incomplete",
@@ -58,12 +58,12 @@ export function externalStatus(group) {
   }
   if ((group?.evidence_refs || []).length > 0) {
     return {
-      raw: "NOT_EVALUATED",
-      label: "存在 exact-bound evidence，但关联链不完整",
-      badge: "证据不完整",
+      raw: "UNPARSED_BOUND_EVIDENCE",
+      label: "存在 exact-bound 旁证，但当前 schema 尚未支持",
+      badge: "旁证待解析",
       tone: "gated",
       evaluated: false,
-      evidence_state: "incomplete",
+      evidence_state: "unparsed",
     };
   }
   return {
@@ -89,7 +89,8 @@ export function externalEvidenceFilterOptions(groups) {
   const definitions = [
     ["all", "全部证据状态"],
     ["linked", "已关联"],
-    ["incomplete", "证据不完整"],
+    ["incomplete", "Runs 待恢复"],
+    ["unparsed", "旁证待解析"],
     ["unbound", "无绑定证据"],
     ["conflict", "证据冲突"],
   ];
@@ -102,6 +103,17 @@ export function externalEvidenceFilterOptions(groups) {
     .filter((option) => option.id !== "conflict" || option.count > 0);
 }
 
+export function runsMediaContextNotice(index) {
+  const boundary = index?.boundary;
+  if (boundary?.complete === true) return "";
+  const failed = index?.summary?.failed_workspace_count ?? "部分";
+  if (boundary?.identity_coverage_complete === true) {
+    const recovered = index?.summary?.recovered_workspace_count ?? 0;
+    return `Runs context 已按 exact media identity 隔离：${recovered} 个 workspace 恢复了封存视频证据，${failed} 个 workspace 无法完整重开；未命中 unresolved media 的视频可判定为无绑定。`;
+  }
+  return `Runs context 部分可用：${failed} 个 workspace 无法严格重开；仅展示已确认的 exact match。`;
+}
+
 export function attachRunsMediaIndex(catalog, index) {
   if (!catalog || typeof catalog !== "object") return catalog;
   const boundary = index?.boundary;
@@ -110,6 +122,15 @@ export function attachRunsMediaIndex(catalog, index) {
     && boundary?.lifecycle_projection === false
     && typeof boundary?.complete === "boolean";
   const bindings = indexIsTrusted && Array.isArray(index?.bindings) ? index.bindings : [];
+  const unresolvedMedia = Array.isArray(index?.unresolved_media) ? index.unresolved_media : null;
+  const identityCoverageIsTrusted = indexIsTrusted
+    && boundary?.identity_coverage_complete === true
+    && unresolvedMedia !== null
+    && unresolvedMedia.every((identity) => (
+      /^[0-9a-f]{64}$/.test(identity?.sha256 || "")
+      && Number.isSafeInteger(identity?.bytes)
+      && identity.bytes >= 0
+    ));
   const byIdentity = new Map();
   for (const binding of bindings) {
     if (!/^[0-9a-f]{64}$/.test(binding?.sha256 || "") || !Number.isSafeInteger(binding?.bytes) || binding.bytes < 0) continue;
@@ -118,13 +139,25 @@ export function attachRunsMediaIndex(catalog, index) {
     existing.push(binding);
     byIdentity.set(identity, existing);
   }
+  const unresolvedIdentities = new Set();
+  if (identityCoverageIsTrusted) {
+    for (const identity of unresolvedMedia) {
+      unresolvedIdentities.add(`${identity.sha256}:${identity.bytes}`);
+    }
+  }
   return {
     ...catalog,
-    groups: (catalog.groups || []).map((group) => ({
-      ...group,
-      run_bindings: byIdentity.get(`${group.sha256}:${group.bytes}`) || [],
-      runs_context_complete: indexIsTrusted ? boundary.complete : false,
-    })),
+    groups: (catalog.groups || []).map((group) => {
+      const identity = `${group.sha256}:${group.bytes}`;
+      return {
+        ...group,
+        run_bindings: byIdentity.get(identity) || [],
+        runs_context_complete: indexIsTrusted && (
+          boundary.complete === true
+          || (identityCoverageIsTrusted && !unresolvedIdentities.has(identity))
+        ),
+      };
+    }),
     runs_media_context: indexIsTrusted ? boundary : null,
   };
 }

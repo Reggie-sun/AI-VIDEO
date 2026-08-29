@@ -40,6 +40,7 @@ import {
   preferredExternalGroup,
   preferredExternalLocation,
   readExternalCatalogResponse,
+  runsMediaContextNotice,
   sourceLabel,
 } from "./external-media-contract.js";
 import { AudibleVideo } from "./media-player.jsx";
@@ -469,7 +470,7 @@ function ExternalMediaDetail({ group, sources }) {
           </div>
           <section className={`external-status-callout external-status-callout--${status.tone}`}>
             <StatusIcon tone={status.tone} size={21} />
-            <div><strong>{status.label}</strong><p>{status.ambiguous ? "同一视频 bytes 关联到互相冲突的 exact evidence；不会选择最新记录或猜测语义。" : status.evaluated ? "状态来自受支持且经 exact identity 绑定的证据链；它不是 Manifest attempt、candidate 或质量验收。" : metadata.source === "runs_exact_sha" ? "Prompt、生成类型与可用的 Shot snapshot 来自 canonical Runs 的 exact SHA-256 + bytes 关联；External generation status 仍保持 NOT_EVALUATED。" : status.raw === "INCOMPLETE_RUNS_CONTEXT" ? "Runs context 正在加载、当前不可用或部分 workspace 无法严格重开；该视频没有已确认 match，但不能据此断言完全没有绑定。" : status.evidence_state === "incomplete" ? "已找到 exact-bound evidence ref，但 schema 或完整关联链不足，因此不会解释其中的 Prompt、Shot 或状态。" : "没有找到语义受支持且与 exact bytes 绑定的生成记录，因此不会把文件名或文件存在解释为 Prompt、Shot 或成功状态。"}</p></div>
+            <div><strong>{status.label}</strong><p>{status.ambiguous ? "同一视频 bytes 关联到互相冲突的 exact evidence；不会选择最新记录或猜测语义。" : status.evaluated ? "状态来自受支持且经 exact identity 绑定的证据链；它不是 Manifest attempt、candidate 或质量验收。" : metadata.source === "runs_exact_sha" ? "Prompt、生成类型与可用的 Shot snapshot 来自 canonical Runs 的 exact SHA-256 + bytes 关联；External generation status 仍保持 NOT_EVALUATED。" : status.raw === "INCOMPLETE_RUNS_CONTEXT" ? "Runs context 正在加载、当前不可用或部分 workspace 无法严格重开；该视频没有已确认 match，但不能据此断言完全没有绑定。" : status.evidence_state === "unparsed" ? "已找到 exact-bound evidence ref，但 schema 或完整关联链尚未支持，因此不会解释其中的 Prompt、Shot 或状态。" : "没有找到语义受支持且与 exact bytes 绑定的生成记录，因此不会把文件名或文件存在解释为 Prompt、Shot 或成功状态。"}</p></div>
           </section>
           <ExternalShotBreakdown group={group} />
           {!hasComposition && !hasExactShotEvidence && !hasRunsContext && <section className="external-storyboard-card">
@@ -775,7 +776,7 @@ export function App() {
       if (!response.ok || body?.error) throw new Error(body?.error?.message || "Runs exact media context 当前不可用。");
       if (!runsContextRequestGuard.current.canCommit(requestToken)) return;
       setRunsMediaIndex(body);
-      setRunsContextError(body?.boundary?.complete === true ? "" : `Runs context 部分可用：${body?.summary?.failed_workspace_count ?? "部分"} 个 workspace 无法严格重开；仅展示已确认的 exact match。`);
+      setRunsContextError(runsMediaContextNotice(body));
     } catch (cause) {
       if (!runsContextRequestGuard.current.canCommit(requestToken)) return;
       setRunsMediaIndex(null);

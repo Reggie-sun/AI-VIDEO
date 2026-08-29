@@ -506,23 +506,35 @@ def _workspace_media_projection(
     return projected, truncated
 
 
-def _production_detail(root: Path, entry: Path, workspace: str) -> dict[str, object]:
-    try:
-        loaded = load_production_project(entry)
-    except Exception:
-        return {
-            "boundary": dict(_BOUNDARY),
-            "workspace": workspace,
-            "run_id": PurePosixPath(workspace).parts[0],
-            "kind": "production",
-            "status": "invalid",
-            "error": {
-                "code": "PRODUCTION_PROJECT_INVALID",
-                "message": "该 Production workspace 无法通过严格校验。",
-            },
-            "attempts": [],
-            "_media": {},
-        }
+def _invalid_production_detail(workspace: str) -> dict[str, object]:
+    return {
+        "boundary": dict(_BOUNDARY),
+        "workspace": workspace,
+        "run_id": PurePosixPath(workspace).parts[0],
+        "kind": "production",
+        "status": "invalid",
+        "error": {
+            "code": "PRODUCTION_PROJECT_INVALID",
+            "message": "该 Production workspace 无法通过严格校验。",
+        },
+        "attempts": [],
+        "_media": {},
+    }
+
+
+def _production_detail(
+    root: Path,
+    entry: Path,
+    workspace: str,
+    *,
+    loaded: object | None = None,
+    status: str = "valid",
+) -> dict[str, object]:
+    if loaded is None:
+        try:
+            loaded = load_production_project(entry)
+        except Exception:
+            return _invalid_production_detail(workspace)
     assets = {asset.asset_id: asset for asset in loaded.registry.assets}
     media_map: dict[str, dict[str, object]] = {}
     attempts: list[dict[str, object]] = []
@@ -661,7 +673,7 @@ def _production_detail(root: Path, entry: Path, workspace: str) -> dict[str, obj
         "workspace": workspace,
         "run_id": PurePosixPath(workspace).parts[0],
         "kind": "production",
-        "status": "valid",
+        "status": status,
         "updated_at": _iso_mtime(entry.parent / "state" / "manifest.json"),
         "project": {
             "project_id": project.project_id,

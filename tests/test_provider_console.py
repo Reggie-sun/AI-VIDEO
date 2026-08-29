@@ -10,7 +10,11 @@ import pytest
 
 from ai_video.errors import AiVideoError
 from ai_video.manifest import RunManifest, ShotRecord
-from ai_video import provider_console, provider_console_continuity
+from ai_video import (
+    provider_console,
+    provider_console_continuity,
+    provider_console_video_evidence,
+)
 from ai_video.production._video_continuity import (
     ContinuityArtifactIdentity,
     ContinuityConstraintSet,
@@ -1127,6 +1131,91 @@ def test_invalid_selected_production_fails_closed_with_sanitized_error(
         "message": "该 Production workspace 无法通过严格校验。",
     }
     assert "private" not in json.dumps(result)
+
+
+def test_video_evidence_detail_recovers_active_candidate_without_validating_workspace(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    runs = tmp_path / "runs"
+    project_path = _production_workspace(runs, "historical")
+    active_project = _ns(path=Path("state/projects/project.1.yaml"))
+    active_registry = _ns(path=Path("assets/registry.1.json"))
+    manifest = _ns(
+        active_project=active_project,
+        active_registry=active_registry,
+        attempts=(),
+        schema_version="2.8",
+        manifest_revision=7,
+    )
+    loaded = _ns(
+        root=project_path.parent,
+        registry=_ns(assets=()),
+        manifest=manifest,
+        asset_paths={},
+        shots=(),
+        project=_ns(
+            project_id="historical",
+            title="Historical project",
+            revision=1,
+            content_hash=ZERO,
+        ),
+    )
+
+    monkeypatch.setattr(
+        provider_console,
+        "load_production_project",
+        lambda _path: (_ for _ in ()).throw(AiVideoError(
+            code="manifest_invalid",
+            user_message="invalid",
+            technical_detail="active render audit failed",
+            retryable=False,
+        )),
+    )
+    monkeypatch.setattr(
+        provider_console_video_evidence,
+        "load_production_project",
+        lambda _path: (_ for _ in ()).throw(AiVideoError(
+            code="manifest_invalid",
+            user_message="invalid",
+            technical_detail="active render audit failed",
+            retryable=False,
+        )),
+    )
+    monkeypatch.setattr(
+        provider_console_video_evidence,
+        "_read_manifest_for_evidence",
+        lambda _root: manifest,
+    )
+    monkeypatch.setattr(
+        provider_console_video_evidence,
+        "load_production_project_candidate",
+        lambda root, selected_manifest, project, registry: loaded,
+    )
+
+    strict = provider_console.project_workspace_detail(runs, "historical/project.yaml")
+    recovered = provider_console_video_evidence.project_workspace_video_evidence(
+        runs, "historical/project.yaml"
+    )
+
+    assert strict["status"] == "invalid"
+    assert recovered["status"] == "recovered_video_evidence"
+    assert recovered["workspace_strict_status"] == "invalid"
+    assert recovered["attempts"] == []
+    assert str(tmp_path) not in json.dumps(recovered)
+
+
+def test_video_evidence_recovery_rejects_symlinked_manifest(tmp_path: Path):
+    runs = tmp_path / "runs"
+    project_path = _production_workspace(runs, "historical")
+    manifest_path = project_path.parent / "state" / "manifest.json"
+    outside = _write(tmp_path / "outside-manifest.json")
+    manifest_path.unlink()
+    manifest_path.symlink_to(outside)
+
+    with pytest.raises(ValueError, match="contained regular file"):
+        provider_console_video_evidence._read_manifest_for_evidence(
+            project_path.parent
+        )
 
 
 def test_invalid_video_request_receipt_fails_closed_instead_of_hiding_attempt(
