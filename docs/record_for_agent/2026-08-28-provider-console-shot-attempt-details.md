@@ -835,3 +835,57 @@ human visual PASS；同样，`failed` 但存在 fetched video 只表示已有 ex
 - External `reported_status` 只能来自受支持 schema 或完整 verified chain；不得从文件存在、filename、
   unknown JSON schema 或 review/gate state 推导生成成功/失败。
 - 本记录与实现仅形成 local Git checkpoint；没有 push、deploy 或 release。
+
+## 2026-08-29 Exact External Evidence Recovery Supersession
+
+本 checkpoint supersede 上文以 `已关联 (94)`、`旁证待解析 (9)`、`无绑定证据 (303)` 描述的
+current-facing inventory；这些数字仍保留为修复前历史快照。修复后的 live catalog 有 `406` 个 unique
+SHA、`524` 个 locations：`已关联 (220)`、`旁证待解析 (4)`、`无绑定证据 (182)`，没有 evidence
+ambiguity。新增的 `126` 个已关联 SHA 中，`121` 个来自原先 unbound 集合，另外 `5` 个来自原先
+unparsed 集合。
+
+### Implementation And Decisions
+
+- `provider-console/scripts/external-media.mjs` 新增 bounded、read-only 的 embedded ComfyUI MP4 metadata
+  adapter。它通过同一 opened file descriptor hash 与 `ffprobe` exact bytes，并在读取后重验
+  device/inode/size/mtime/ctime；只接受 allowlisted `MiniMaxH3AudioConditioningT8` 与
+  `MiniMaxH3ImageToVideo` node，metadata 超限、timeout、unsupported/conflicting Prompt 均 fail closed。
+- 同一 scanner 新增 MiniMax H3 Long Video adapter，只接受 exact `candidate.json schema=1`、
+  `status=candidate`、canonical candidate topology，以及 `manifest.json schema=2`、
+  `format=minimax_h3_t8_accepted_manifest`；path、SHA、chain/candidate identity 或 segment index 不匹配
+  时不建立 binding。
+- duplicate SHA 按 `experiment > verified > bound` 选择最强 evidence tier；只在所选 tier 内比较 Prompt、
+  Shot、type 与 status。same-tier semantic conflict 继续 fail closed，不让较弱 evidence 污染更强的 exact
+  association。
+- Embedded graph 与 Long Video chain 都没有 canonical Production `target_shot_id`，因此 Console 只显示
+  exact-bound Prompt、generation type/class 或 `long_video_segment`，并保持 `Shot 未绑定`；不得从 Prompt
+  文本、文件名或 segment index 发明 Shot ID。
+- External rail 默认筛选改为 `已关联`，让操作员直接看到可判断的 Prompt/type/video；`无绑定证据`
+  仍可显式筛选和审计，没有被删除或伪装成完整证据。
+
+### Verification And Evidence
+
+- implementation commit：`c7b9be8`（exact parent：
+  `2ce338f35a1bff7b30aa0c9ccf980693975e5f0f`）。
+- Provider Console Node suite：`76 passed`；Provider Console Python suite：`40 passed`；
+  `npm --prefix provider-console run build` 成功，`4582 modules transformed`。
+- Chrome integrated verification 确认默认选择 `已关联 (220)`；embedded ComfyUI 与 Long Video 卡片、详情均
+  展示 exact Prompt 和生成类型，`Shot 未绑定` 文案保持准确；浏览器 console 无 warning/error。
+- native `reviewer_xhigh` 对 exact-byte identity、Long Video topology、duplicate-SHA tier/conflict 与 UI
+  semantics 完成 independent review，最终 verdict 为 `accept`，无 blocking issue。
+- exact-range Harness receipt：
+  `.agent/harness/runs/provider-console-external-evidence-c7b9be8/receipt.json`。Verifier 的 `passed`、
+  `fresh`、`fresh_for_snapshot`、`scope_paths_match`、`scope_worktree_clean`、
+  `complete_completion_proof`、`integrity` 与 `artifact_integrity` 均为 `true`。
+
+### Remaining Evidence Boundary
+
+剩余 `182` 个“无绑定证据”不是前端漏展示：read-only inventory 中，`25` 个 SHA 只有 review、record、
+receipt 或 derivative-chain partial evidence，仍缺受支持的完整 Prompt/Shot/type binding；另外 `157` 个
+历史 FFmpeg-derived `work`、`segments`、`final` 文件没有 exact-bound Prompt 或结构化 provenance。
+它们不能因同目录 Prompt、相似 filename 或 compose script 被批量补齐。未来若要恢复，必须由每个
+artifact family 的 deterministic composition/input receipt 绑定 exact bytes。
+
+本 checkpoint 没有修改 MP4、生成媒体、调用 Provider、执行 paid/cloud action、写 Manifest、激活
+candidate、签发 P6 / Final Acceptance、push、deploy 或 release。现有 unrelated staged/dirty work 未被
+纳入 implementation commit。
