@@ -1,0 +1,244 @@
+{
+  "schema_version": "drama-baseline-selection/3",
+  "record_kind": "drama_baseline_selection",
+  "baseline_id": "drama.baseline.key-at-the-waiting-room",
+  "baseline_version": 3,
+  "status": "proposed",
+  "domain_id": "drama",
+  "contract_binding": {
+    "spec_path": "docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md",
+    "spec_commit": "01483ec1f434661984ca009fffa85960310dedd6",
+    "spec_sha256": "239573a700fe987eb76282cb3c89f4ee666721646ec90b4e1398527e65c6801b",
+    "rubric_id": "drama-authoring-and-acceptance",
+    "rubric_version": "1",
+    "rubric_sha256": "239573a700fe987eb76282cb3c89f4ee666721646ec90b4e1398527e65c6801b"
+  },
+  "accepted_fixture_binding": {
+    "fixture_id": "drama.fixture.key-at-the-waiting-room",
+    "fixture_version": 1,
+    "accepted_payload_commit": "3b436195e939f7bc8fff5999438e9018030a38fe",
+    "accepted_payload_sha256": "73a3a57e78859f8a508dd21cea3493a8d2a32ccb8a08c173a304b516fc5d34ab",
+    "acceptance_record_path": "docs/superpowers/artifacts/drama/b-d0/fixture-selection/key-at-the-waiting-room-v1.accepted.json",
+    "acceptance_record_commit": "3cb778a9dd4fa75a6c610bf8f16160d5de44831d",
+    "acceptance_record_sha256": "e2601e8ac7af4686c3a4290a05d956c87d8bcea73bc146f16bad4ee5fad52e1d",
+    "status": "accepted"
+  },
+  "prior_blocker_lineage": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/baseline-selection/missing-cinematic-reference-v2.blocked.json",
+    "commit": "061df5b0e2427c1fd72c3fd4d21a7443757db1b8",
+    "sha256": "c22dfb3f95fa58e34d2708d7b89818e63d6e05ca4d25da12b0dfb3b630e6ca27",
+    "resolved_blocker": "NO_EXACT_DRAMA_CINEMATIC_REFERENCE",
+    "remaining_blocker": "BASELINE_SELECTION_EXACT_BYTES_NOT_ACCEPTED"
+  },
+  "intended_fixture": {
+    "genre_and_scene_grammar": "restrained contemporary family drama; one-room two-character dialogue and object-choice beat",
+    "aspect_ratio": "16:9",
+    "resolution": {
+      "width": 1344,
+      "height": 768
+    },
+    "whole_scene_duration_seconds": {
+      "minimum": 14.0,
+      "target": 16.0,
+      "maximum": 18.0
+    },
+    "story_revision": "drama.story.return-the-key@1",
+    "scene_revision": "drama.scene.rainy-waiting-room@1",
+    "character_revisions": [
+      "drama.character.lin-lan@1",
+      "drama.character.lin-jun@1"
+    ],
+    "ordered_shot_revisions": [
+      "drama.shot.waiting-room.001@1",
+      "drama.shot.waiting-room.002@1",
+      "drama.shot.waiting-room.003@1"
+    ],
+    "coverage_and_edit_grammar": "three single-take generated Shots with direct cuts; stable left-right axis; visible entrance, listening response, neutral key placement, voluntary pickup and terminal eyeline"
+  },
+  "reference_set": [
+    {
+      "reference_id": "drama.reference.key-at-the-waiting-room.shot01@1",
+      "repository_or_explicit_external_identity": "runs/drama-baseline-reference-20260829/raw/shot-01-take-01-audio.mp4",
+      "availability": "local_worktree_only",
+      "publication_state": "not_published",
+      "media_identity": {
+        "sha256": "6a9e0504fe946c7320b93895c66e8c5423db7cc1eff0f46bbe9e7b3712259331",
+        "byte_size": 1774445,
+        "container": "mov,mp4,m4a,3gp,3g2,mj2",
+        "duration_seconds": 5.167,
+        "video": {
+          "codec": "h264",
+          "profile": "High",
+          "width": 1344,
+          "height": 768,
+          "pixel_format": "yuv420p",
+          "frame_rate": "24/1",
+          "frame_count": 124,
+          "bit_rate": 2600437
+        },
+        "audio": {
+          "codec": "aac",
+          "profile": "LC",
+          "sample_rate_hz": 32000,
+          "channels": 2,
+          "channel_layout": "stereo",
+          "bit_rate": 128084
+        }
+      },
+      "fixture_origin": {
+        "canonical_shot_revision_id": "drama.shot.waiting-room.001@1",
+        "runtime_shot_id": "drama-shot-waiting-room-001",
+        "mapping_evidence_path": "runs/drama-baseline-reference-20260829/evidence/shot-01-take-01-generation.json",
+        "mapping_evidence_sha256": "29504670a5c6a891c5da27702c7e00ad87314b0651cfd5782d0c7d68c265c69d"
+      },
+      "generation_provenance": {
+        "provider": "comfy-local-h3-t8",
+        "model": "minimax-h3-t8-t2va-quality",
+        "capability_id": "minimax-h3-t8-t2va-quality-v1",
+        "profile_sha256": "4b299a689723bb856026776500119774ee9490c777a6460e932007be022e05e7",
+        "provider_request_id": "b27178a4-23b3-4df5-beee-8b668c72893f",
+        "provider_bound_request_hash": "fe1892016820290eadc854af8e35f6b59b77fe0f83201eb27182fab6f2f94f0c",
+        "resolved_generation_hash": "44105e30484a2814c781dfc182d9a07dd97c8c0bc89a12343e7cf54a592e491a",
+        "prompt_sha256": "587a82cb43e705f66c2ea7782b026b8fe5e9f53d4eb7d4bb782b9b94818c43ee",
+        "local_submit_count": 1,
+        "remote_submit_count": 0,
+        "m6_d_candidate": false,
+        "production_activation": false
+      },
+      "rights_and_provenance": {
+        "origin": "locally_generated_from_original_ai_video_fixture",
+        "external_story_character_image_video_or_audio_assets": [],
+        "commercial_or_qingyan_lineage": false,
+        "qualified_use_scope": "internal AI-VIDEO Drama development comparison only",
+        "external_publication_or_release_rights": "not_asserted",
+        "model_and_tool_obligations": "Any later external publication must independently verify applicable MiniMax model terms and AI-VIDEO release policy; this selection grants no publication right.",
+        "provenance_limit": "The exact MP4 is local-only ignored run evidence; if these bytes are missing or hash-mismatched, the reference becomes NOT_EVALUATED and baseline acceptance cannot be reused."
+      },
+      "selection_rationale": "The exact locally generated Shot 1 matches the accepted fixture's restrained two-character waiting-room grammar, 16:9 geometry and 1344x768 target. It provides an exact human-reviewed comparator for initial performance, dialogue delivery, key presentation, eyeline, locked coverage and image fidelity without borrowing Commercial or test media.",
+      "reference_review": {
+        "authority_identity": "current_user",
+        "reviewed_at": "2026-08-29T08:42:45+08:00",
+        "authorization_source_id": "current-session:drama-baseline-reference-shot01-decision",
+        "playback_attestation": "The exact path and SHA-256 were presented with an explicit 1.0x full-audio instruction; the current user then returned a PASS decision.",
+        "normalized_verdict": "PASS",
+        "accepted_scope": "usable Drama baseline reference component",
+        "excluded_scope": [
+          "formal DRAMA-MEDIA-SHOT requirement PASS",
+          "baseline-selection record acceptance",
+          "authoring-package acceptance",
+          "B-D0 or M6-D PASS",
+          "P6 or Final Acceptance"
+        ],
+        "canonical_confirmation_tuple": "reference_decision=PASS;media_sha256=6a9e0504fe946c7320b93895c66e8c5423db7cc1eff0f46bbe9e7b3712259331;reviewer=current_user;playback=1.0x_full_audio;scope=baseline_reference_component_only",
+        "authorization_source_sha256": "33fe3eb3e15510d776d1db37a5b2b937aed1f2c9d52353e5c2b00ae3b820b1ba"
+      }
+    }
+  ],
+  "selection_timing": {
+    "m6_d_candidate_outputs_observed_before_selection": 0,
+    "post_hoc_candidate_baseline_swap": false,
+    "reference_acquisition_was_not_m6_d_execution": true
+  },
+  "comparability": {
+    "directly_comparable": [
+      "16:9 composition and exact 1344x768 image fidelity",
+      "restrained two-character contemporary family-drama performance",
+      "Shot 1 dialogue delivery and listening reaction",
+      "screen-left seated versus screen-right standing geography and eyeline",
+      "right-hand brass-key presentation and locked medium-wide camera"
+    ],
+    "known_non_comparable": [
+      "whole-scene 14-18 second duration and multi-Shot pacing",
+      "Shot 2 neutral key placement, release and two-speaker question-answer turn",
+      "Shot 3 voluntary left-hand pickup, half-step reposition and terminal mutual eyeline",
+      "complete relationship causality, emotional arc, payoff and continuation"
+    ],
+    "non_comparable_policy": "A known non-comparable dimension retains its absolute minimum floor below and must be judged independently; it may not be deleted, waived or inferred PASS from this Shot 1 reference."
+  },
+  "dimension_contract": [
+    {
+      "dimension": "performance_naturalness",
+      "reference_applicability": "direct for Shot 1 restraint, key presentation and listening reaction; later decision and pickup performances remain non-comparable",
+      "minimum_floor": "Both characters communicate listening, restraint and the emotional turn without exaggerated or mechanically timed acting.",
+      "comparison_procedure": "Uninterrupted side-by-side HUMAN playback at 1.0x with full audio against the selected exact reference."
+    },
+    {
+      "dimension": "dialogue_delivery",
+      "reference_applicability": "direct for the Shot 1 line and response timing; Shot 2 and Shot 3 lines remain non-comparable",
+      "minimum_floor": "Short lines remain intelligible, character-specific, naturally paced and synchronized enough not to break the beat.",
+      "comparison_procedure": "Uninterrupted side-by-side HUMAN playback at 1.0x with full audio against the selected exact reference."
+    },
+    {
+      "dimension": "blocking_and_eyeline",
+      "reference_applicability": "direct for entrance, safe distance, stable sides, key presentation and Shot 1 eyeline; neutral placement, pickup and half-step remain non-comparable",
+      "minimum_floor": "Entrance, safe distance, neutral key placement, pickup, half-step and mutual eyeline are spatially legible without destructive axis confusion.",
+      "comparison_procedure": "Uninterrupted side-by-side HUMAN playback at 1.0x with full audio against the selected exact reference."
+    },
+    {
+      "dimension": "camera_and_motion",
+      "reference_applicability": "direct for locked Shot 1 coverage; cross-Shot cut rhythm remains non-comparable",
+      "minimum_floor": "Coverage preserves the dramatic action and reaction without distracting drift, unstable framing or motion that obscures causal information.",
+      "comparison_procedure": "Uninterrupted side-by-side HUMAN playback at 1.0x with full audio against the selected exact reference."
+    },
+    {
+      "dimension": "image_fidelity",
+      "reference_applicability": "direct for faces, key, wardrobe, room geometry and rain-lit ambience at 1344x768",
+      "minimum_floor": "Faces, hands, key, wardrobe, room geometry and rain-lit ambience remain coherent enough for the dramatic choice to read.",
+      "comparison_procedure": "Uninterrupted side-by-side HUMAN playback at 1.0x with full audio against the selected exact reference."
+    },
+    {
+      "dimension": "narrative_readability",
+      "reference_applicability": "partial for the opening offer and key setup; doubt, returned choice and acceptance remain non-comparable",
+      "minimum_floor": "Offer, doubt, returned choice and acceptance are understandable without external explanation.",
+      "comparison_procedure": "Uninterrupted side-by-side HUMAN playback at 1.0x with full audio against the selected exact reference."
+    },
+    {
+      "dimension": "emotional_progression",
+      "reference_applicability": "partial for guarded separation becoming alert attention; the complete trust test and cautious connection remain non-comparable",
+      "minimum_floor": "Guarded separation moves through a visible trust test into cautious connection without an unmotivated reset.",
+      "comparison_procedure": "Uninterrupted side-by-side HUMAN playback at 1.0x with full audio against the selected exact reference."
+    },
+    {
+      "dimension": "pacing",
+      "reference_applicability": "partial for the opening beat only; whole-scene pauses, cuts and key-transfer pacing remain non-comparable",
+      "minimum_floor": "Every pause has a dramatic function and the key transfer remains readable within the bounded duration.",
+      "comparison_procedure": "Uninterrupted side-by-side HUMAN playback at 1.0x with full audio against the selected exact reference."
+    },
+    {
+      "dimension": "payoff_and_continuation",
+      "reference_applicability": "non-comparable; no inference is allowed from Shot 1 reference review",
+      "minimum_floor": "The key setup pays off through Lin Lan's voluntary pickup and the terminal state clearly supports returning home together.",
+      "comparison_procedure": "Uninterrupted side-by-side HUMAN playback at 1.0x with full audio against the selected exact reference."
+    }
+  ],
+  "playback_authority": {
+    "authority": "current_user_or_pre_authorized_human_designee",
+    "speed": "1.0x",
+    "audio": "full_audio",
+    "primary_verdict_scrubbing": false,
+    "analyzer_or_score_may_replace_human": false,
+    "reference_swap_after_candidate_observation": false
+  },
+  "acceptance": {
+    "accepted_record_sha256": null,
+    "approver_authority_identity": null,
+    "accepted_at": null,
+    "acceptance_source_id": null,
+    "acceptance_source_sha256": null
+  },
+  "current_gate_state": {
+    "fixture_selection": "ACCEPTED",
+    "reference_component_review": "HUMAN_PASS",
+    "baseline_selection": "PROPOSED_PENDING_EXACT_RECORD_ACCEPTANCE",
+    "authoring_package": "BLOCKED",
+    "b_d0": "BLOCKED_BEFORE_MEDIA",
+    "m6_d": "NOT_EVALUATED",
+    "required_next_evidence": "Explicit current-user acceptance of this exact baseline-selection candidate commit and SHA-256."
+  },
+  "forbidden_inferences": [
+    "Reference review PASS is not formal DRAMA-MEDIA-SHOT PASS because accepted baseline and authoring-package identities do not yet exist.",
+    "This proposed record is not an accepted or sealed baseline.",
+    "No Commercial, Base AI Comic, technical analyzer or historical verdict is inherited.",
+    "No Provider retry, additional Shot, M6-D execution, P6, Final Acceptance, publication or release is authorized."
+  ]
+}

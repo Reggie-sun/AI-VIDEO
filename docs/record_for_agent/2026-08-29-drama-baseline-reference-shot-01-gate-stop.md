@@ -9,6 +9,18 @@ evidence_index_version: "1"
 
 Date: 2026-08-29
 
+## Supersession Notice — 2026-08-29 Reference Review PASS
+
+Current user已在收到exact MP4 path、SHA-256与`1.0x` full-audio instruction后明确返回PASS decision。该决定绑定
+SHA-256 `6a9e0504fe946c7320b93895c66e8c5423db7cc1eff0f46bbe9e7b3712259331`，并将Shot 1提升为
+`HUMAN_PASS`的usable baseline-reference component。Original gate stop与下方五项`DRAMA-MEDIA-SHOT-* =
+NOT_EVALUATED`仍作为历史且正确的M6-D proof-layer结论保留：当时以及当前都缺少accepted baseline selection和
+sealed authoring package identities，因此reference review PASS不得改写成formal M6-D HUMAN PASS。
+
+Current baseline-selection candidate为
+`docs/superpowers/artifacts/drama/b-d0/baseline-selection/key-at-the-waiting-room-v3.proposed.json`。它仍需current
+user对其exact committed bytes单独accept；在此之前`B-D0=BLOCKED_BEFORE_MEDIA`、`M6-D=NOT_EVALUATED`不变。
+
 ## Purpose
 
 本文记录dual-domain Shot-to-H3 continuity plan的独立Drama baseline-reference acquisition checkpoint。用户明确要求
@@ -23,10 +35,10 @@ composition、P6或Final Acceptance。
 
 - `B-D0 = BLOCKED_BEFORE_MEDIA`；accepted Drama spec与fixture不变，baseline与authoring package仍未exact
   accepted/sealed。
-- `M6-D Drama = NOT_EVALUATED`；本reference不是M6-D candidate，也没有取得Drama HUMAN PASS。
+- reference-review layer：exact Shot 1为current-user `HUMAN_PASS`，只可作为usable baseline-reference component。
+- `M6-D Drama = NOT_EVALUATED`；本reference不是M6-D candidate，formal `DRAMA-MEDIA-*` findings没有取得PASS。
 - `M6-C Commercial = HUMAN_FAIL`；本地Drama reference不改变或继承Commercial verdict。
-- `next_shot_submit_allowed = false`；required Shot 1 HUMAN findings尚未由current user在exact full Shot、`1.0x`、
-  full-audio条件下裁决。
+- minimum reference count已满足；本轮不需要、也未提交Shot 2。Baseline-selection candidate仍需exact acceptance。
 - M7–M9继续deferred；单个technical PASS或reference bytes不能解除dual-domain gate。
 
 ## Exact Generation Identity
@@ -83,7 +95,7 @@ Exact evidence files：
 - `runs/drama-baseline-reference-20260829/evidence/shot-01-take-01-contact-sheet.png`，SHA-256
   `48801b395936717a31f2de888b883464dce0f13a4e13ebdaab22b29206adb7c4`。
 
-## Per-Shot Evidence Assessment
+## Original Pre-Review Per-Shot Evidence Assessment
 
 Visual sampled evidence可观察到locked medium-wide、Lan在screen-left seated、Jun在screen-right standing、Jun右手
 展示钥匙、Lan由低头转为看向钥匙/Jun、没有伸手、没有cut或axis cross。这些observations支持后续HUMAN review，
@@ -101,9 +113,9 @@ Whisper small返回两段中文transcription：`要是还在`与`回去一起开
 - `DRAMA-MEDIA-SHOT-BLOCKING-001`；
 - `DRAMA-MEDIA-SHOT-EMOTION-001`。
 
-Exact HUMAN authority必须由current user观看上述SHA绑定的完整Shot，使用`1.0x`与full audio，逐requirement给出
-`PASS` / `FAIL` / `NOT_EVALUATED`。在此之前，Per-Shot Post-Media Gate要求停止；不得用technical analyzer、
-contact sheet、single score或Agent visual observation代替HUMAN verdict。
+在initial gate时，exact HUMAN authority尚未完成，因此Per-Shot Post-Media Gate正确停止。后续current-user
+reference-review PASS只关闭baseline-reference component review，不补齐尚不存在的accepted baseline/package
+bindings；technical analyzer、contact sheet、single score或Agent visual observation仍不得替代formal HUMAN verdict。
 
 ## Evidence Index
 
@@ -112,8 +124,10 @@ contact sheet、single score或Agent visual observation代替HUMAN verdict。
 | DRAMA-BASELINE-S01-E1 | drama-baseline-reference-20260829-shot01-take01 | drama-baseline-reference-20260829 | shot01-take01 | quality-t8-v1 | 6a9e0504fe946c7320b93895c66e8c5423db7cc1eff0f46bbe9e7b3712259331 | PROVIDER_FETCH | PASS | NONE | NEW_ATTEMPT | NONE | runs/drama-baseline-reference-20260829/evidence/shot-01-take-01-generation.json |
 | DRAMA-BASELINE-S01-E2 | drama-baseline-reference-20260829-shot01-take01 | drama-baseline-reference-20260829 | shot01-take01 | quality-t8-v1 | 6a9e0504fe946c7320b93895c66e8c5423db7cc1eff0f46bbe9e7b3712259331 | TECHNICAL_MEDIA_VALIDITY | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | DRAMA-BASELINE-S01-E1 | runs/drama-baseline-reference-20260829/evidence/shot-01-take-01-agent-gate.json |
 | DRAMA-BASELINE-S01-E3 | drama-baseline-reference-20260829-shot01-take01 | drama-baseline-reference-20260829 | shot01-take01 | quality-t8-v1 | 6a9e0504fe946c7320b93895c66e8c5423db7cc1eff0f46bbe9e7b3712259331 | HUMAN_PER_SHOT | NOT_EVALUATED | HUMAN_REVIEW_MISSING | SAME_EVIDENCE_NEW_PROOF_LAYER | DRAMA-BASELINE-S01-E1 | runs/drama-baseline-reference-20260829/raw/shot-01-take-01-audio.mp4 |
+| DRAMA-BASELINE-S01-E4 | drama-baseline-reference-20260829-shot01-take01 | drama-baseline-reference-20260829 | shot01-take01 | quality-t8-v1 | 6a9e0504fe946c7320b93895c66e8c5423db7cc1eff0f46bbe9e7b3712259331 | HUMAN_REFERENCE_REVIEW | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | DRAMA-BASELINE-S01-E1 | docs/superpowers/artifacts/drama/b-d0/baseline-selection/key-at-the-waiting-room-v3.proposed.json |
 
-三个rows属于同一attempt，不能计为三次independent evidence；technical与HUMAN proof layers不得互换。
+四个rows属于同一attempt，不能计为四次independent evidence；technical、formal per-Shot HUMAN与reference-review
+proof layers不得互换。
 
 `distill-ai-video-learning` automatic evaluation结果为`no_candidate`。Evidence identity validator通过，但本topic
 只有一个`independence_key`、没有controlled multi-arm，也没有需要由本次evidence materially update的existing
@@ -131,9 +145,9 @@ audio replacement或bytes变化都会产生new SHA并要求新的HUMAN verdict�
 
 ## Remaining Work
 
-自然停止点是current user对exact Shot 1执行`1.0x` full-audio per-Shot review。若任一required finding为`FAIL`或
-`NOT_EVALUATED`，baseline acquisition继续停止，不生成Shot 2。只有Shot 1全部required findings为exact HUMAN
-PASS，才可在新的authorized turn按sequential gate考虑下一Shot；即使未来形成accepted reference set，仍需独立
-接受baseline selection与new-SHA authoring package，B-D0才可能解除blocker。
+Shot 1 reference review已经PASS；minimum reference count因此满足，不需要为了流程完整性继续生成Shot 2/3。
+自然停止点改为current user对exact committed baseline-selection candidate bytes给出accept/revise/reject。只有
+baseline selection独立accepted后，才能生成引用accepted fixture与baseline的新SHA authoring package并请求单独
+acceptance；在package无`BLOCKER`且exact accepted前，B-D0仍不能解除blocker。
 
 本记录自身不是acceptance envelope，也不把generated reference、continuity plan或technical PASS写成Drama truth。
