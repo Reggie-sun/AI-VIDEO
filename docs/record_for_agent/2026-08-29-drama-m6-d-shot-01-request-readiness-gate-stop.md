@@ -15,8 +15,9 @@ Date: 2026-08-29
 已在不修改accepted semantic bytes或旧request/requirement evidence的前提下accepted/sealed，并经current canonical
 Planner/requirement seam生成完整typed requirement与exact three-line H3 prompt。
 
-Current state仍是`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`；被替换的只是pre-media authoring blocker。新的remaining
-blocker为`PROVIDER_PROFILE_RUNTIME_IDENTITY_AND_EXACT_REQUEST_NOT_SELECTED`，本记录不授权submit或进入per-Shot media Gate。
+Current state仍是`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`。Provider/profile/runtime/exact-request prerequisite现已
+执行到canonical Router的fail-closed stop：显式选择的quality profile无法表达sealed fixed `5.0s` requirement，因此
+remaining blocker为`FIXED_5S_REQUIREMENT_NOT_EXPRESSIBLE_BY_SELECTED_T8_PROFILE`。本记录不授权submit或进入per-Shot media Gate。
 
 ## Purpose
 
@@ -138,10 +139,54 @@ accepted-v1使用独立immutable path。Project tree before/after均为15 files�
 - Architecture Gate：PASS；full suite：`4206 passed, 4 skipped`；receipt status：`passed`。
 
 该receipt在detached checkpoint上fresh且workspace stable；主checkout随后推进，因此current generic freshness不被写成true，
-但immutable receipt与artifact integrity已重验。Current boundary为：
+但immutable receipt与artifact integrity已重验。
+
+### Provider/Profile/Runtime/Exact-Request Readiness — Current
+
+Current canonical seam显式检查了唯一quality-first candidate，不运行ranking或fallback：
+
+- Provider：`comfy-local-h3-t8`；model：`minimax-h3-t8-t2va-quality`；capability：`minimax-h3-t8-t2va-quality-v1`；
+- profile：`minimax-h3-t8-t2va-quality@v1`，content hash `4b299a689723bb856026776500119774ee9490c777a6460e932007be022e05e7`；
+- workflow SHA-256：`6a508f8522694297c2e3ce1157dd1b235cd34514d85bf3c2908f55020cd990a5`；binding SHA-256：`3af2ab9928d832253e22aaf14f47bf70ef80949f56a1664817accb8acacfd564`；
+- compiler：`comfy-local-h3-t8-video-compiler@3`；family capabilities fingerprint：`d3b8e5cc31570763aae6f7454ca794737634c345ec3ea6bbbcaadc36196381dd`。
+
+Read-only checkout/package inspection确认required与current ComfyUI commit
+`7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`、T8 commit
+`977df788fcf8b971dc3d0fc7d6baa79a0edfaf40` / version `1.36.2`、VideoHelperSuite commit
+`4ee72c065db22c9d96c2427954dc69e7b908444b`与SageAttention `2.2.0`全部exact match，三个checkout均clean。
+Inspection还经systemd `ExecStart` read-only identity观察到current process包含required `sage_attention` launch capability。
+期间既有ComfyUI supervisor为active；本driver没有start、stop、transport或generation调用，也没有把既有进程状态当成request readiness。
+
+Canonical Router重新打开accepted overlay、Project/Registry、Shot revision/content hash、active pre-generation graph、new request/
+projection/requirement lineage与prompt `3676c9998a63e7ddc024faff7d18f07f5e48722046ee7193201f490ee57c750d`。Prompt保持exactly
+three lines且未改写。Router随后按exact output contracts比较：sealed requirement是fixed `5.0s` / `24fps`，selected
+profile是`124` frames / `24fps`。`requirement_output_matches=false`，decision为
+`blocked_capability / PROVIDER_CAPABILITY_DENIED`，因此没有`ProviderBoundVideoRequest`。
+
+这也使current canonical seam无法产生或封存exact non-persisted request preview。Accepted requirement只拥有
+`audio_need=required`与sealed dialogue/rain/no-music facts；native audio capability明确为`true`，但没有Provider-bound
+request就没有accepted source type、SourceAudioPolicy或request binding，且没有使用default或inference。Provider preflight、durable intent、one-use permit、submit、
+media、`video-analysis`、Manifest/Registry mutation与candidate activation均未发生。
+
+Immutable blocked evidence：
+
+- driver：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/provider_request_readiness_driver.py`，SHA-256 `9fd7aa85254ed46ff0543f06596ba0ac41545bea42a4f45a15a96266a9a66402`；
+- evidence：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-provider-profile-runtime-request-readiness-blocked-v1.json`，SHA-256 `f214645086e11c41d698190ac0ff4418278da9c02aae6ca1605b964d304b2cb1`；
+- blocked envelope：`docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v1.blocked.json`，SHA-256 `3e28032c7977579d2d53cf3650352c603547d219022429cdb5a886407c86bbcf`。
+
+Current verification：
+
+- immutable driver replay两次均保持evidence SHA-256 `f214645086e11c41d698190ac0ff4418278da9c02aae6ca1605b964d304b2cb1`；
+- dirty-checkout与missing `sage_attention` launch-capability negative probes均fail closed为`MISMATCH`；
+- focused requirement/H3/planner/readiness/Router/T8 family suite：`312 passed`；
+- docs contract：PASS；Architecture Gate：PASS；
+- native `reviewer_xhigh`初审指出SourceAudio inference与launch/dirty identity两个truth defects，修正后scoped re-review verdict：`accept`，无blocking或non-blocking concern；
+- `distill-ai-video-learning` automatic evaluation：`no_candidate`。本记录为single pre-artifact architecture/readiness stop，保持`learning_eligibility: ineligible`，未创建Learning Claim placeholder。
+
+Current boundary为：
 
 - `M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`；
 - `next_shot_submit_allowed=false`；
-- remaining blocker：`PROVIDER_PROFILE_RUNTIME_IDENTITY_AND_EXACT_REQUEST_NOT_SELECTED`；
-- 未选择Provider/profile/workflow/runtime identity，未persist或submit request，未进入per-Shot media Gate；
+- remaining blocker：`FIXED_5S_REQUIREMENT_NOT_EXPRESSIBLE_BY_SELECTED_T8_PROFILE`；
+- Provider/profile/workflow/runtime identity已显式检查；exact request preview因Router stop未创建，未persist或submit request，未进入per-Shot media Gate；
 - 未产生M6-D PASS、P6、Final Acceptance或Commercial verdict inheritance。

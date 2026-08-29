@@ -115,7 +115,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | B-D0 prerequisite complete后已获独立M6-D启动授权；canonical Shot 01 execution-intent overlay现已accepted/sealed，并通过current Planner/requirement seam生成新request `01c329aa...fe7c`、requirement `d234cd95...34d`与exact three-line H3 prompt。旧request/requirement仍immutable；未选择Provider/profile/runtime identity，未persist或submit request，也没有media/Production-state effect。详见`docs/record_for_agent/2026-08-29-drama-m6-d-shot-01-request-readiness-gate-stop.md` |
+| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | B-D0 prerequisite complete后已获独立M6-D启动授权；canonical Shot 01 execution-intent overlay与three-line H3 prompt保持accepted/sealed。当前已显式选择local H3 quality candidate且runtime identity exact match，但canonical Router因sealed fixed `5.0s` requirement无法由profile的`124`-frame output contract表达而`blocked_capability`；没有生成exact request preview、persist/submit request或media/Production-state effect。详见`docs/record_for_agent/2026-08-29-drama-m6-d-shot-01-request-readiness-gate-stop.md` |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -852,9 +852,19 @@ verified projection `f2292b67f3616a5b4757c6c3e45301b971230bb59a3b683207d8a6d6cb4
 dialogue once、explicit Chinese tag、`non_diegetic_music: none`，且无raw JSON、Story/Scene/future bookkeeping、opaque
 canonical identity、abstract objective或`unspecified`。Accepted evidence位于
 `runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-authoring-to-request-accepted-v1.json`
-（SHA-256 `1e38b731b31b4866720d5b80bfb2dd40da04ebe56dea8656f3d7219d15298cb6`）。Current stop转为
-`PROVIDER_PROFILE_RUNTIME_IDENTITY_AND_EXACT_REQUEST_NOT_SELECTED`；`M6-D`仍保持`NOT_EVALUATED / STOP_BEFORE_SUBMIT`，
-`next_shot_submit_allowed=false`，本prerequisite未进入Provider submit或per-Shot media Gate。
+（SHA-256 `1e38b731b31b4866720d5b80bfb2dd40da04ebe56dea8656f3d7219d15298cb6`）。
+
+Provider/profile/runtime/exact-request readiness prerequisite已通过current canonical Router执行。显式quality-first candidate为
+`comfy-local-h3-t8` / `minimax-h3-t8-t2va-quality-v1` / profile
+`4b299a689723bb856026776500119774ee9490c777a6460e932007be022e05e7`，required runtime identity当前exact match且checkout
+clean；但sealed requirement要求fixed `5.0s`，selected profile只声明`frame_count=124`，Router因此返回
+`blocked_capability / PROVIDER_CAPABILITY_DENIED`并且不产生`ProviderBoundVideoRequest`。Blocked evidence位于
+`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-provider-profile-runtime-request-readiness-blocked-v1.json`
+（SHA-256 `f214645086e11c41d698190ac0ff4418278da9c02aae6ca1605b964d304b2cb1`），封存 envelope 位于
+`docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v1.blocked.json`。
+Current blocker为`FIXED_5S_REQUIREMENT_NOT_EXPRESSIBLE_BY_SELECTED_T8_PROFILE`；`M6-D`仍保持
+`NOT_EVALUATED / STOP_BEFORE_SUBMIT`，`next_shot_submit_allowed=false`。没有exact request preview、SourceAudio binding、
+Provider preflight、permit、submit或per-Shot media Gate。
 
 Stop immediately and report rather than expanding scope when：
 

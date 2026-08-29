@@ -1,0 +1,91 @@
+{
+  "schema_version": "drama-m6-d-shot01-pre-submit-readiness-envelope/1",
+  "decision": "blocked",
+  "domain_id": "drama",
+  "lane_id": "M6-D",
+  "target_shot": {
+    "shot_id": "drama.shot.waiting-room.001",
+    "revision": 1,
+    "content_hash": "4cf53970d6642d4bfe73c23e5c12f9714c069843b0a7b47069dfb2519c47253b"
+  },
+  "accepted_lineage": {
+    "execution_intent_envelope_sha256": "8b50b61b152b59542fc4521c870cc060b9b6469fc18db5e3a14248cf05de7efd",
+    "authoring_to_request_evidence_sha256": "1e38b731b31b4866720d5b80bfb2dd40da04ebe56dea8656f3d7219d15298cb6",
+    "request_hash": "01c329aa22b898521d0611bd4fbcfcbba912babb81b4ce85a88582985704fe7c",
+    "verified_projection_hash": "f2292b67f3616a5b4757c6c3e45301b971230bb59a3b683207d8a6d6cb412b1d",
+    "requirement_hash": "d234cd95b712ca8d966132d28c6ee15a49831b412305b795c8c8eb9a2491b34d",
+    "prompt_sha256": "3676c9998a63e7ddc024faff7d18f07f5e48722046ee7193201f490ee57c750d",
+    "active_pre_generation_graph_hash": "761c92a0a8507ae2b8f14de5338b337e0d567e78b654e36403d3428a0da47ff1"
+  },
+  "explicit_candidate": {
+    "selection_intent": "quality-first local H3 candidate; no ranking or fallback",
+    "provider_name": "comfy-local-h3-t8",
+    "model_id": "minimax-h3-t8-t2va-quality",
+    "capability_id": "minimax-h3-t8-t2va-quality-v1",
+    "profile_id": "minimax-h3-t8-t2va-quality",
+    "profile_version": "v1",
+    "profile_content_hash": "4b299a689723bb856026776500119774ee9490c777a6460e932007be022e05e7",
+    "workflow_sha256": "6a508f8522694297c2e3ce1157dd1b235cd34514d85bf3c2908f55020cd990a5",
+    "binding_sha256": "3af2ab9928d832253e22aaf14f47bf70ef80949f56a1664817accb8acacfd564",
+    "compiler_id": "comfy-local-h3-t8-video-compiler",
+    "compiler_version": "3",
+    "compiler_hash": "c0ff7a9881e66159ebe6c01e4bd109c6a9227587c428587f8fff01417bcac47d",
+    "family_capabilities_fingerprint": "d3b8e5cc31570763aae6f7454ca794737634c345ec3ea6bbbcaadc36196381dd"
+  },
+  "runtime_identity": {
+    "result": "MATCH",
+    "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+    "t8_commit": "977df788fcf8b971dc3d0fc7d6baa79a0edfaf40",
+    "t8_version": "1.36.2",
+    "videohelpersuite_commit": "4ee72c065db22c9d96c2427954dc69e7b908444b",
+    "sageattention_version": "2.2.0",
+    "checkout_clean": true,
+    "launch_capabilities": [
+      "sage_attention"
+    ],
+    "inspection_mode": "read_only_checkout_package_and_systemd_launch_identity",
+    "provider_preflight": "NOT_INVOKED_NO_RESOLVED_REQUEST"
+  },
+  "router_stop": {
+    "outcome": "blocked_capability",
+    "reason_code": "PROVIDER_CAPABILITY_DENIED",
+    "blocker_id": "FIXED_5S_REQUIREMENT_NOT_EXPRESSIBLE_BY_SELECTED_T8_PROFILE",
+    "requirement_timing": {
+      "timing_mode": "fixed",
+      "duration_seconds": 5.0,
+      "fps": 24
+    },
+    "selected_profile_timing": {
+      "timing_mode": "frame_count",
+      "frame_count": 124,
+      "fps": 24
+    },
+    "provider_bound_request_created": false
+  },
+  "request_and_audio_readiness": {
+    "exact_request_preview": "NOT_CREATED_ROUTER_BLOCKED",
+    "request_persisted": false,
+    "prompt_unchanged": true,
+    "source_audio_policy": "BLOCKED_NO_PROVIDER_BOUND_REQUEST",
+    "source_type": null,
+    "source_audio_default_or_inference_used": false,
+    "durable_submit_intent_created": false,
+    "one_use_permit_minted": false,
+    "provider_submit_count": 0,
+    "media_generated": false,
+    "video_analysis_invoked": false
+  },
+  "evidence": {
+    "driver_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/provider_request_readiness_driver.py",
+    "driver_sha256": "9fd7aa85254ed46ff0543f06596ba0ac41545bea42a4f45a15a96266a9a66402",
+    "evidence_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-provider-profile-runtime-request-readiness-blocked-v1.json",
+    "evidence_sha256": "f214645086e11c41d698190ac0ff4418278da9c02aae6ca1605b964d304b2cb1"
+  },
+  "status_boundary": {
+    "m6_d": "NOT_EVALUATED",
+    "execution": "STOP_BEFORE_SUBMIT",
+    "next_shot_submit_allowed": false,
+    "p6": "NOT_EVALUATED",
+    "final_acceptance": "NOT_EVALUATED"
+  }
+}
