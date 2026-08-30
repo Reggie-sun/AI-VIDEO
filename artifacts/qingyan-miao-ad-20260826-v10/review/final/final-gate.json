@@ -1,0 +1,96 @@
+{
+  "gate": "qingyan-v10-full-preview",
+  "verdict": "PASS_FOR_HUMAN_REVIEW",
+  "human_final_acceptance": "PENDING",
+  "artifact": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v10/final/青颜_苗家腋下止汗完整广告_30s_9x16_v10.mp4",
+    "sha256": "44e153f748189acffc15951bcf842eea11d2a6a4f00efacd8af1e61ab824b455",
+    "bytes": 29148103,
+    "picture_frames": 720,
+    "fps": 24,
+    "width": 1080,
+    "height": 1920,
+    "container_duration_seconds": 30.022,
+    "audio": "AAC stereo 48kHz"
+  },
+  "requirements": [
+    {
+      "id": "R1_PROBLEM_FIRST",
+      "verdict": "PASS",
+      "evidence": "Frames 0-140 first show the young woman discovering the underarm problem, lifting her arm, sniffing, and recoiling; no product is present."
+    },
+    {
+      "id": "R2_CAP_OPEN_BEFORE_SPRAY",
+      "verdict": "PASS",
+      "evidence": "The solution Shot shows the cap being removed before the bottle is aimed and sprayed at the underarm."
+    },
+    {
+      "id": "R3_BEFORE_AFTER_PRESENTATION",
+      "verdict": "PASS",
+      "evidence": "The before/after contrast is behavioral and sequential: visible odor concern in Shot 00, then relaxed expression and '使用后 · 清爽舒适' after the recap; no static comparison slider is used."
+    },
+    {
+      "id": "R4_RECAP_AND_ELDER_ENTRANCE",
+      "verdict": "PASS",
+      "evidence": "The generated bridge uses one continuous 124-frame action to pick up the only cap, recap the bottle, and let the elder enter naturally from screen right. Its exact per-Shot Gate is PASS."
+    },
+    {
+      "id": "R5_AUDIBLE_ELDER_DIALOGUE",
+      "verdict": "PASS",
+      "evidence": "Whisper detects three dialogue turns at 15.08-21.42s: elder question, young woman's product response, and elder approval. On-screen subtitles follow the measured timing."
+    },
+    {
+      "id": "R6_NO_DUPLICATE_PRODUCT_GRAPHIC",
+      "verdict": "PASS",
+      "evidence": "No corner product icon or package overlay appears in the live-action section. The exact packshot appears once, only in the final hero card."
+    },
+    {
+      "id": "R7_NO_WHITE_FLASH_OR_SYNTHETIC_SEAM",
+      "verdict": "PASS",
+      "evidence": "The composition contains direct action/eyeline cuts only; no xfade, dissolve, white flash, transition overlay, minterpolate, or optical retime is used. Boundary frames were inspected at all six cuts."
+    },
+    {
+      "id": "R8_LIVE_ACTION_MOTION",
+      "verdict": "PASS",
+      "evidence": "Fresh freezedetect reports no freeze interval during 0-25s live action. The source's near-static treatment frames 141-174 were retired before final composition."
+    },
+    {
+      "id": "R9_LAST_FIVE_SECONDS_ONLY",
+      "verdict": "PASS",
+      "evidence": "The golden-fluid benefit visual appears once from 25.0-27.5s and the exact packshot appears once from 27.5-30.0s. Their stable 2.5s holds are intentional."
+    },
+    {
+      "id": "R10_PROMOTIONAL_COPY_HAS_SOUND",
+      "verdict": "PASS",
+      "evidence": "Whisper detects '清爽舒适' at 25.02-26.02s and the product line at 27.66-29.76s; there is no silent promotional text card."
+    },
+    {
+      "id": "R11_TECHNICAL_DELIVERY",
+      "verdict": "PASS",
+      "evidence": "Fresh ffprobe and full video/audio decode confirm H.264 1080x1920, 24fps, exactly 720 picture frames, AAC stereo 48kHz. Integrated loudness is -13.9 LUFS."
+    },
+    {
+      "id": "R12_PROJECT_VIDEO_ANALYSIS_MCP",
+      "verdict": "PASS",
+      "evidence": "A fresh serialized stdio session initialized project server video-analysis 1.29.0 and called video_analyze, video_review, and video_transcribe on the exact final path; all returned isError=false and video_review returned issues=[]."
+    }
+  ],
+  "evidence": {
+    "ffprobe": "artifacts/qingyan-miao-ad-20260826-v10/review/final/ffprobe.json",
+    "freezedetect": "artifacts/qingyan-miao-ad-20260826-v10/review/final/freezedetect.txt",
+    "silencedetect": "artifacts/qingyan-miao-ad-20260826-v10/review/final/silencedetect.txt",
+    "ebur128": "artifacts/qingyan-miao-ad-20260826-v10/review/final/ebur128.txt",
+    "contact_sheet": "artifacts/qingyan-miao-ad-20260826-v10/review/final/contact-1fps.jpg",
+    "boundary_sheet": "artifacts/qingyan-miao-ad-20260826-v10/review/final/all-boundaries.jpg",
+    "video_analysis_mcp_receipt": {
+      "path": "artifacts/qingyan-miao-ad-20260826-v10/review/final/video-analysis-mcp-receipt.json",
+      "sha256": "9d926c41793e5935ca44c3c8ee0db4b3dc65908e746fc7dc24fde0d1ed2dc14d"
+    }
+  },
+  "scope_notes": [
+    "MCP ASR renders 青颜/抑汗净味 with homophone substitutions; timing and utterance presence are valid, but the accepted native audio is the spoken-text authority.",
+    "MCP scene_count=1 at threshold 0.35 is not used as edit-boundary truth; exact boundary frames and the deterministic concat timeline are the relevant evidence.",
+    "BGM rights/provenance are unresolved for publication. This artifact is a development preview, not a publication-ready or Final Acceptance artifact.",
+    "The user's uninterrupted visual and listening verdict remains the final empirical acceptance gate."
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "acceptance_boundary": "single local T8-only 20-step development clip; not Production activation, P6, or Final Acceptance",
+  "last_frame": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v10/assets/00-underarm-odor-recoil-last-v5.png",
+    "sha256": "d0b4bf6edc9cb8a8cb1d4a141aef698c60fefafa29e72a48f54888b0f7c3a0e6",
+    "uploaded_name": "qingyan-v10-00_problem_discovery_sniff_recoil_v2-last-d0b4bf6edc9cb8a8.png"
+  },
+  "output": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/00_problem_discovery_sniff_recoil_v2.mp4",
+    "sha256": "8e1db59cb565f8e348ac79eec75f0531b027d2a3e8ebea78f1253845d711b846",
+    "size_bytes": 3022191
+  },
+  "prompt_id": "1f5e2fd9-6b3d-4933-9310-66f7976b5e32",
+  "prompt_path": "artifacts/qingyan-miao-ad-20260826-v10/prompts/00_problem_discovery_sniff_recoil_v3.txt",
+  "prompt_sha256": "3ec025658f0587ccd9e131d8c989d20496c53287e68ddec6f6c332530545c29b",
+  "provider_effects": {
+    "fallback_count": 0,
+    "local_submit_count": 1,
+    "remote_submit_count": 0,
+    "retry_count": 0
+  },
+  "runtime": {
+    "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+    "endpoint": "http://127.0.0.1:8188",
+    "t8_commit": "28cb160827c245b2d6a37539df30c1d7c5e7aecd"
+  },
+  "seed": 104759,
+  "settings": {
+    "crf": 17,
+    "fps": 24,
+    "frame_count": 141,
+    "height": 1344,
+    "lora_enabled": false,
+    "mode": "FL2VA",
+    "native_audio": true,
+    "sampler": "res_multistep",
+    "scheduler": "simple",
+    "steps": 20,
+    "width": 768
+  },
+  "shot_id": "00_problem_discovery_sniff_recoil_v2",
+  "source": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v10/assets/00-problem-discovery-first-v2.png",
+    "sha256": "0d5fe47955eb309cb3982fc904edeb58458474b95c5bd3ec782222990404065c",
+    "uploaded_name": "qingyan-v10-00_problem_discovery_sniff_recoil_v2-0d5fe47955eb309c.png"
+  },
+  "template": {
+    "path": "workflows/templates/minimax_h3_t8_t2va_quality_api.json",
+    "source_sha256": "6a508f8522694297c2e3ce1157dd1b235cd34514d85bf3c2908f55020cd990a5",
+    "submitted_graph_path": "artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/00_problem_discovery_sniff_recoil_v2.submitted-workflow.json",
+    "submitted_graph_sha256": "f199098c2c2927d3e67cdc8719447fb97416bb83c9b3f20574506628a77cd047"
+  },
+  "wall_time_seconds": 462.373
+}

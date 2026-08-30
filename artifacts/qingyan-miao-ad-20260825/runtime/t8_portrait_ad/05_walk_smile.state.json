@@ -1,0 +1,10 @@
+{
+  "output_sha256": "66cc9a0983bebef138fbc15deeb2c502a0f4a1bfb714ff849b0ecbf459036e4a",
+  "prompt_id": "b58c08cb-2abb-4041-a553-5019dd8bfc72",
+  "receipt": "artifacts/qingyan-miao-ad-20260825/runtime/t8_portrait_ad/05_walk_smile.receipt.json",
+  "seed": 8252205,
+  "shot_id": "05_walk_smile",
+  "source_sha256": "a065ff7129c890a5c0c9f257f836d59aedbee7939129b84dce1735270c493f02",
+  "status": "completed",
+  "submitted_graph_sha256": "9a0140a19a270873add7f5ee21faa528b770adb977e5a70552a88d5366b2b256"
+}

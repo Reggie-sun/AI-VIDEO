@@ -1,0 +1,10 @@
+{
+  "output_sha256": "ced2f7e4739a9930b88fcf1e62479a55c8a59a9b04f0fb6a8d4cc84392784be0",
+  "prompt_id": "f4d94af5-a42e-47c3-99b7-8778afc31371",
+  "receipt": "artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/01_underarm_deodorizing_repair.receipt.json",
+  "seed": 8262802,
+  "shot_id": "01_underarm_deodorizing_repair",
+  "source_sha256": "69470e24f03d3d12ef34f00f4dc0c35d013b157082b77f8a1ad55fcbabf7142f",
+  "status": "completed",
+  "submitted_graph_sha256": "5599c119cbd7688804228c6bb472f8dac71551d52cec4bd4394d3a1d62265ef5"
+}

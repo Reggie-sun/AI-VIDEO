@@ -1,0 +1,10 @@
+{
+  "output_sha256": "e6e54b1c504737d6453056f5f7bbe68ef742d0f186bb3ff02be5c6ec6540a943",
+  "prompt_id": "1cb5f6b5-893a-488c-8a27-c8a0e4c510ba",
+  "receipt": "artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/01_recap_elder_enters_v2.receipt.json",
+  "seed": 104761,
+  "shot_id": "01_recap_elder_enters_v2",
+  "source_sha256": "4a9f0e7ceb42c7de0965824808ffb840e2a6005cf5d0835da7c9c18d690fc43e",
+  "status": "completed",
+  "submitted_graph_sha256": "27dbc1e7d89e06734d42a297c8b7951dbfb9e52e142b969c352694171477502f"
+}

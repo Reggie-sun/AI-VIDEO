@@ -1,0 +1,69 @@
+{
+  "schema_version": "agent-final-media-gate/1",
+  "artifact": "final/青颜_苗家女孩T8动态广告_重新生成_28s_9x16.mp4",
+  "sha256": "2713634e60f590deb7203cc629812f61c7e9f6b1e68b13edbb4f60127bb0e36d",
+  "technical_evidence": {
+    "duration_seconds": 28.022,
+    "video": "H.264 High, 1080x1920, 24 fps, 672 frames, yuv420p",
+    "audio": "AAC, 48 kHz, stereo, 28.000 s",
+    "integrated_loudness_lufs": -19.5,
+    "true_peak_dbfs": -1.6,
+    "video_full_decode": "PASS",
+    "audio_full_decode": "PASS",
+    "sha256_sidecar": "PASS",
+    "black_frame_scan": "PASS",
+    "project_local_video_analyze": "PASS",
+    "project_local_video_review": "PASS: no issues",
+    "unique_frame_ratio": 0.996
+  },
+  "requirements": [
+    {
+      "id": "final.duration_and_canvas",
+      "verdict": "PASS",
+      "reason": "The delivery is 28.022 seconds on a 1080x1920 portrait canvas at constant 24 fps."
+    },
+    {
+      "id": "final.main_character",
+      "verdict": "PASS",
+      "reason": "A modern young Miao woman remains the clear protagonist with restrained embroidery and silver accessories rather than a tourism-performance stereotype."
+    },
+    {
+      "id": "final.problem_solution_arc",
+      "verdict": "PASS",
+      "reason": "The sequence visibly progresses from restrained concern to product lift and pre-use implication, then into walking, social confidence and product recall."
+    },
+    {
+      "id": "final.temporal_motion",
+      "verdict": "PASS",
+      "reason": "All five used character shots passed exact-file post-media gates; the walking and social sections contain real temporal motion rather than Ken Burns stills."
+    },
+    {
+      "id": "final.product_identity",
+      "verdict": "PASS",
+      "reason": "Readable packaging views use the supplied source image byte-for-byte, preserving the yellow box, yellow bottle label, white cap, box and bottle shapes."
+    },
+    {
+      "id": "final.claim_safety",
+      "verdict": "PASS",
+      "reason": "Copy stays within the supplied directions: antiperspirant/deodorizing, refreshing comfort and helping reduce sweat-wetness trouble; it does not claim medical treatment or guaranteed all-day efficacy."
+    },
+    {
+      "id": "final.visual_style",
+      "verdict": "PASS",
+      "reason": "The edit remains bright, clean, lightly ethnic, female-confident and product-led without hospital, laboratory, livestream or sexualized framing."
+    },
+    {
+      "id": "final.audio_presence",
+      "verdict": "PASS",
+      "reason": "A complete stereo music-and-SFX track is present at -19.5 LUFS integrated and -1.6 dBFS true peak."
+    }
+  ],
+  "overall_verdict": "PASS",
+  "remaining_human_checks": [
+    "One uninterrupted 1.0x-speed human watch on the intended phone",
+    "Douyin UI overlay preview on the actual ad account/device",
+    "Commercial-use license confirmation for BGM and SFX",
+    "Optional voice-over recording if the buyer requires spoken copy"
+  ],
+  "boundary": "Development media acceptance only; not Production candidate activation, P6, Final Acceptance, platform approval or performance proof."
+}

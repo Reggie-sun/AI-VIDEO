@@ -1,0 +1,68 @@
+{
+  "schema_version": "agent-post-media-gate/1",
+  "shot_id": "04_walk_forward",
+  "output_sha256": "423c9c5483ed691e2611a225bc0a80572b6be2d1f2c87fc3f44fea1d72b4c8a0",
+  "evidence": {
+    "project_local_mcp_calls": [
+      "video_probe",
+      "video_extract_frames",
+      "video_review"
+    ],
+    "sampled_frame_count": 10,
+    "dense_review": [
+      "review/04_walk_forward/frames16-39.jpg",
+      "review/04_walk_forward/frames44-55.jpg"
+    ],
+    "decoded_frames": 56,
+    "video_full_decode": "PASS",
+    "audio_full_decode": "PASS",
+    "flow_p90_median": 2.0080261230,
+    "flow_p90_max": 5.5783905983,
+    "flow_max_transition": 54,
+    "background_flow_p90_median": 1.0096485615,
+    "background_flow_p90_max": 6.3651337624,
+    "background_flow_max_transition": 54,
+    "mad_median": 2.8821701776,
+    "mad_max": 5.1286756727,
+    "mad_max_transition": 54
+  },
+  "findings": [
+    {
+      "requirement_id": "shot.identity.main_character",
+      "verdict": "PASS",
+      "reason": "The same young Miao woman, facial identity, blouse embroidery, navy skirt, earrings and hair ornament remain stable across the walk."
+    },
+    {
+      "requirement_id": "shot.cast.allowed_count",
+      "verdict": "PASS",
+      "reason": "Exactly one person remains visible and no extra limb or bystander enters the portrait frame."
+    },
+    {
+      "requirement_id": "shot.action.walk_forward",
+      "verdict": "PASS",
+      "reason": "The subject completes a restrained forward walking cycle with both shoes visible through alternating contact and lift phases."
+    },
+    {
+      "requirement_id": "shot.motion.required",
+      "verdict": "PASS",
+      "reason": "All 56 frames decode; dense review around all measured peaks, including frames 44-55, shows continuous body, skirt and leg motion rather than the previous 24-frame hard seam."
+    },
+    {
+      "requirement_id": "shot.camera.intent",
+      "verdict": "PASS",
+      "reason": "The background has a gentle continuous forward-follow drift but no abrupt pan, hard jump or direction reversal; this remains compatible with the brief's outdoor walking coverage."
+    },
+    {
+      "requirement_id": "shot.style.clean_outdoor",
+      "verdict": "PASS",
+      "reason": "The bright stone lane, mountain greenery and restrained village architecture remain clean, airy and secondary to the product-ad subject."
+    },
+    {
+      "requirement_id": "shot.delivery.portrait_canvas",
+      "verdict": "PASS",
+      "reason": "The exact output is native 768x1344 portrait, 24 fps, 56 frames with AAC audio."
+    }
+  ],
+  "overall_verdict": "PASS",
+  "boundary": "Agent-side sequential post-media Gate only; not Production candidate activation, P6 or Final Acceptance."
+}

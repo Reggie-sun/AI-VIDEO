@@ -1,0 +1,10 @@
+{
+  "output_sha256": "249dc7f5fe29213e237f52c68c95bd9fef81a5e8f50087fad1c3e178b7badc9b",
+  "prompt_id": "66f5c49f-f662-4379-8c87-448429ec2482",
+  "receipt": "artifacts/qingyan-miao-ad-20260826-v3/runtime/voice/vo02_product.receipt.json",
+  "seed": 8262702,
+  "shot_id": "vo02_product",
+  "source_sha256": "6e28ecb2c9b88b5d0e737d92d0bc98855278c21f23c2ef29daa878fce84ba12c",
+  "status": "completed",
+  "submitted_graph_sha256": "52014d4fc54156a722cd2abf222f8c4145bc61ccc34e36911526ab32dc4e2299"
+}

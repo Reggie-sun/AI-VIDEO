@@ -1,0 +1,54 @@
+{
+  "acceptance_boundary": "single local T8-only 20-step development clip; not Production activation, P6, or Final Acceptance",
+  "last_frame": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v10/assets/01b-elder-dialogue-entry-last.png",
+    "sha256": "ced89e0528725968ea4f017d29a70c8000d6b1a98cff00b998485547a9341ddb",
+    "uploaded_name": "qingyan-v10-01_recap_elder_enters_v2-last-ced89e0528725968.png"
+  },
+  "output": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/01_recap_elder_enters_v2.mp4",
+    "sha256": "e6e54b1c504737d6453056f5f7bbe68ef742d0f186bb3ff02be5c6ec6540a943",
+    "size_bytes": 3952430
+  },
+  "prompt_id": "1cb5f6b5-893a-488c-8a27-c8a0e4c510ba",
+  "prompt_path": "artifacts/qingyan-miao-ad-20260826-v10/prompts/01b_recap_elder_enters_v2.txt",
+  "prompt_sha256": "c2de68c3a994104c4748ecc2e272c4e8815535174896998551236d617cddb236",
+  "provider_effects": {
+    "fallback_count": 0,
+    "local_submit_count": 1,
+    "remote_submit_count": 0,
+    "retry_count": 0
+  },
+  "runtime": {
+    "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+    "endpoint": "http://127.0.0.1:8188",
+    "t8_commit": "28cb160827c245b2d6a37539df30c1d7c5e7aecd"
+  },
+  "seed": 104761,
+  "settings": {
+    "crf": 17,
+    "fps": 24,
+    "frame_count": 124,
+    "height": 1344,
+    "lora_enabled": false,
+    "mode": "FL2VA",
+    "native_audio": true,
+    "sampler": "res_multistep",
+    "scheduler": "simple",
+    "steps": 20,
+    "width": 768
+  },
+  "shot_id": "01_recap_elder_enters_v2",
+  "source": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v10/assets/01b-relief-spray-finished-first.png",
+    "sha256": "4a9f0e7ceb42c7de0965824808ffb840e2a6005cf5d0835da7c9c18d690fc43e",
+    "uploaded_name": "qingyan-v10-01_recap_elder_enters_v2-4a9f0e7ceb42c7de.png"
+  },
+  "template": {
+    "path": "workflows/templates/minimax_h3_t8_t2va_quality_api.json",
+    "source_sha256": "6a508f8522694297c2e3ce1157dd1b235cd34514d85bf3c2908f55020cd990a5",
+    "submitted_graph_path": "artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/01_recap_elder_enters_v2.submitted-workflow.json",
+    "submitted_graph_sha256": "27dbc1e7d89e06734d42a297c8b7951dbfb9e52e142b969c352694171477502f"
+  },
+  "wall_time_seconds": 400.343
+}

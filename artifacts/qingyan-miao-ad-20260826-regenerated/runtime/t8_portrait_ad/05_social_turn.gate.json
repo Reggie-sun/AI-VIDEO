@@ -1,0 +1,67 @@
+{
+  "schema_version": "agent-post-media-gate/1",
+  "shot_id": "05_social_turn",
+  "output_sha256": "92222b20f055b32ddad48a2da2da8dd63e0f5a049adeaa53c4d0d0ea05ebb7f7",
+  "evidence": {
+    "project_local_mcp_calls": [
+      "video_probe",
+      "video_extract_frames",
+      "video_review"
+    ],
+    "sampled_frame_count": 10,
+    "dense_review": "review/05_social_turn/frames12-31.jpg",
+    "decoded_frames": 56,
+    "video_full_decode": "PASS",
+    "audio_full_decode": "PASS",
+    "flow_p90_median": 0.9180116057,
+    "flow_p90_max": 2.5757148266,
+    "flow_max_transition": 18,
+    "mad_median": 2.1356685578,
+    "mad_max": 4.4918823242,
+    "mad_max_transition": 22
+  },
+  "findings": [
+    {
+      "requirement_id": "shot.identity.main_character",
+      "verdict": "PASS",
+      "reason": "The main young Miao woman retains stable facial identity, embroidery, skirt, earrings and hair ornament through the turn and return."
+    },
+    {
+      "requirement_id": "shot.cast.allowed_count",
+      "verdict": "PASS",
+      "reason": "Exactly three women remain in their original roles and positions; no duplicated or disappearing person is observed."
+    },
+    {
+      "requirement_id": "shot.action.social_turn",
+      "verdict": "PASS",
+      "reason": "The main woman turns toward her friends, shares a restrained smile and returns near camera while the friends respond with small natural expressions."
+    },
+    {
+      "requirement_id": "shot.hands_and_faces",
+      "verdict": "PASS",
+      "reason": "The foreground hand and both background hand groupings remain anatomically coherent; all three faces remain stable and natural."
+    },
+    {
+      "requirement_id": "shot.motion.required",
+      "verdict": "PASS",
+      "reason": "All 56 frames decode; dense inspection around frames 12-31 confirms a continuous head-and-torso turn with no hard temporal seam."
+    },
+    {
+      "requirement_id": "shot.camera.intent",
+      "verdict": "PASS",
+      "reason": "The portrait camera, courtyard wall, table and tree remain visually locked while the subjects move."
+    },
+    {
+      "requirement_id": "shot.style.light_social",
+      "verdict": "PASS",
+      "reason": "The courtyard interaction reads as a clean modern lifestyle moment with restrained Miao elements rather than a staged tourism performance."
+    },
+    {
+      "requirement_id": "shot.delivery.portrait_canvas",
+      "verdict": "PASS",
+      "reason": "The exact output is native 768x1344 portrait, 24 fps, 56 frames with AAC audio."
+    }
+  ],
+  "overall_verdict": "PASS",
+  "boundary": "Agent-side sequential post-media Gate only; not Production candidate activation, P6 or Final Acceptance."
+}

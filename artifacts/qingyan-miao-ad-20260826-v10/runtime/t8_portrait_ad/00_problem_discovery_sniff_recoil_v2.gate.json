@@ -1,0 +1,82 @@
+{
+  "acceptance_boundary": "agent-side per-Shot post-media Gate only; not Production activation, P6, Final Acceptance, or human acceptance",
+  "exact_output": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/00_problem_discovery_sniff_recoil_v2.mp4",
+    "sha256": "8e1db59cb565f8e348ac79eec75f0531b027d2a3e8ebea78f1253845d711b846",
+    "size_bytes": 3022191,
+    "duration_seconds": 5.875,
+    "resolution": "768x1344",
+    "fps": 24.0,
+    "frame_count": 141
+  },
+  "mcp_evidence": {
+    "server_name": "video-analysis",
+    "server_version": "1.29.0",
+    "video_analyze_response_sha256": "8b5361ea0cb5cee1516c652de07470ede59da09deb64f8d9d6722f6d7e05ece9",
+    "video_review_response_sha256": "87de6f239959d309de8344602fc54cb8f92d8adfc2882f8b6cf7a0e75d1a07b1",
+    "scene_count": 1,
+    "sampled_frame_count": 189,
+    "unique_frame_count": 189,
+    "unique_frame_ratio": 1.0,
+    "ordered_gate_frames": 13,
+    "audio_stream_present": true,
+    "estimated_speaking_duration_seconds": 0.0
+  },
+  "decode_evidence": {
+    "video_full_decode": "PASS",
+    "audio_full_decode": "PASS"
+  },
+  "overall_verdict": "PASS",
+  "human_acceptance": {
+    "date": "2026-08-27",
+    "scope": "audible-sniff-cue for the exact MP4 identified above",
+    "verdict": "PASS",
+    "evidence": "After receiving the exact video link and the explicit request to confirm whether the sniff sound was acceptable, the user replied: 可以."
+  },
+  "requirements": [
+    {
+      "id": "problem-discovery-before-solution",
+      "verdict": "PASS",
+      "evidence": "The ordered sequence begins with neutral blouse adjustment, then progresses to the underarm sweat problem before any treatment appears."
+    },
+    {
+      "id": "visible-underarm-perspiration",
+      "verdict": "PASS",
+      "evidence": "A localized darker damp patch becomes readable at the covered left underarm before the smelling action."
+    },
+    {
+      "id": "explicit-sniff-and-reaction-closure",
+      "verdict": "PASS",
+      "evidence": "MCP-extracted frames show the nose and head moving toward the raised covered underarm by 3.615-4.067 seconds, followed by progressive head and upper-torso recoil with a wrinkled concerned expression from 4.519 through 5.423 seconds. The action now reads as approach, odor check, and reaction rather than sustained visual inspection."
+    },
+    {
+      "id": "audible-sniff-cue",
+      "verdict": "PASS",
+      "evidence": "The audio stream decodes and the 3.4-5.5 second waveform/spectrogram contains two separated broadband non-speech events aligned with approach and recoil. Project-local MCP could not classify their breath semantics, and the user supplied the required human listening verdict by replying 可以 after being asked whether the sniff sound was acceptable."
+    },
+    {
+      "id": "zero-product-objects",
+      "verdict": "PASS",
+      "evidence": "All 13 ordered MCP frames contain one woman and no bottle, box, cap, nozzle, product thumbnail, mist, or treatment action."
+    },
+    {
+      "id": "continuous-motion-without-cut-freeze-or-flash",
+      "verdict": "PASS",
+      "evidence": "MCP scene detection reports one 5.875-second scene, and review metrics report 189 unique frames out of 189 sampled frames."
+    },
+    {
+      "id": "portrait-t8-technical-contract",
+      "verdict": "PASS",
+      "evidence": "Exact output is H.264 768x1344 at 24 fps with 141 frames and AAC stereo audio; full video and audio decode both pass."
+    }
+  ],
+  "comparison_to_previous_generation": {
+    "previous_sha256": "b6c471d5a184bd6c8ef325dcec5e5d7bbbfb82a77a88b741fbf4030927552dcb",
+    "previous_failure": "No clearly readable sniff-to-recoil visual closure and no distinct audio event.",
+    "current_change": "A new recoil endpoint plus a longer isolated beat timeline produces a visible approach-to-recoil transition and distinct non-speech audio energy."
+  },
+  "submission_barrier": {
+    "next_shot_allowed": true,
+    "reason": "All visual and technical requirements pass, and the remaining audible-sniff-cue requirement received an explicit human listening PASS on 2026-08-27."
+  }
+}

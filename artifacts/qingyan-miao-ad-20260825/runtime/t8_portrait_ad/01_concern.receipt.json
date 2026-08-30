@@ -1,0 +1,46 @@
+{
+  "acceptance_boundary": "single local T8 Turbo4 I2VA development clip for a portrait ad; not Production activation, P6, or Final Acceptance",
+  "output": {
+    "path": "artifacts/qingyan-miao-ad-20260825/runtime/t8_portrait_ad/01_concern.mp4",
+    "sha256": "a55a2ce806a5b4b9ce3b7eb3264f5e939a8cbaae1ed89144e24d8fce0cc78889",
+    "size_bytes": 1744237
+  },
+  "prompt_id": "45e48fc5-f718-42f5-8214-1080080685e2",
+  "prompt_sha256": "d66a927a923ab6f0e4f5495291cb51ac1c4470e26b94fcc9a204bda1b5a7158e",
+  "provider_effects": {
+    "fallback_count": 0,
+    "local_submit_count": 1,
+    "remote_submit_count": 0,
+    "retry_count": 0
+  },
+  "runtime": {
+    "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+    "endpoint": "http://127.0.0.1:8188",
+    "t8_commit": "28cb160827c245b2d6a37539df30c1d7c5e7aecd"
+  },
+  "seed": 8252201,
+  "settings": {
+    "crf": 17,
+    "fps": 24,
+    "frame_count": 56,
+    "height": 1344,
+    "mode": "I2VA",
+    "native_audio": true,
+    "sampler": "dual_clock_euler",
+    "scheduler": "native_flow",
+    "steps": 4,
+    "width": 768
+  },
+  "shot_id": "01_concern",
+  "source": {
+    "path": "artifacts/qingyan-miao-ad-20260825/assets/01-concern.png",
+    "sha256": "e05e0c03f34af5ade3ae027df3505b1bf9b401d1a95851b541cc32334c0665ef",
+    "uploaded_name": "qingyan-01_concern-e05e0c03f34af5ad.png"
+  },
+  "template": {
+    "path": "workflows/templates/minimax_h3_t8_i2va_turbo_native_v2_api.json",
+    "source_sha256": "a2de56895642582481ab4ebe4a92aa356c908e2d7475159a77a1ffb9c06131df",
+    "submitted_graph_sha256": "32b0d741950cd3536bafd5b57673f71444b90930ac0f26229308538f24af0ee4"
+  },
+  "wall_time_seconds": 70.734
+}

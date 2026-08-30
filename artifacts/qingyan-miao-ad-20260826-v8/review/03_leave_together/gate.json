@@ -1,0 +1,52 @@
+{
+  "gate_version": "agent-per-shot-v1",
+  "shot_id": "03_leave_together",
+  "artifact": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/03_leave_together.mp4",
+    "sha256": "5edda6a828c1fbbf392ccf5c49aec6e68dce4092ad6b64fbc4f9144257502eb8",
+    "duration_seconds": 7.292,
+    "frame_count": 175,
+    "width": 768,
+    "height": 1344,
+    "fps": 24
+  },
+  "evidence": {
+    "video_analysis_probe": "PASS: exact 175-frame portrait MP4 and stereo audio returned for the bound path",
+    "video_analysis_review": "PASS for visual structure: one scene and unique_frame_ratio 1.0",
+    "dense_contact_sheet": "review/03_leave_together/contact-2fps.jpg",
+    "terminal_frame": {
+      "path": "review/03_leave_together/terminal-frame.png",
+      "sha256": "889081d43dfe51dd0c375934fcfc93bf34068dbe988f77d3d3bd6fd9d3c695a1"
+    }
+  },
+  "required_findings": [
+    {
+      "requirement": "Exact two-person state continues from the accepted dialogue terminal frame",
+      "status": "PASS",
+      "evidence": "0.0s begins on the accepted two-shot; all dense samples preserve the same young and elderly women with stable wardrobe and faces."
+    },
+    {
+      "requirement": "Both women turn and walk through the existing doorway without teleport or direction reversal",
+      "status": "PASS",
+      "evidence": "0.0-2.5s samples show continuous movement through the doorway; 2.5-7.0s preserves forward walking direction in the courtyard."
+    },
+    {
+      "requirement": "The single physical bottle disappears into the bag and does not reappear or duplicate",
+      "status": "PASS",
+      "evidence": "One physical bottle is visible during the opening movement and is no longer visible after about 2.0s; no duplicate or floating product appears."
+    },
+    {
+      "requirement": "No product packshot, product icon, corner overlay, embedded text or floating graphic",
+      "status": "PASS",
+      "evidence": "All 15 dense samples and the terminal frame contain no package, icon, poster, text or floating graphic."
+    },
+    {
+      "requirement": "No visually apparent promotional dialogue",
+      "status": "PASS",
+      "evidence": "Both women remain in walking/smiling behavior without speaker staging. Whisper's isolated phrase '字幕by索兰娅' is treated as a known non-speech/music hallucination and the final composition discards this Shot's native audio entirely."
+    }
+  ],
+  "verdict": "PASS",
+  "next_submit_permitted": true,
+  "final_audio_policy": "Discard Shot 03 native audio; use the continuous composition BGM only."
+}

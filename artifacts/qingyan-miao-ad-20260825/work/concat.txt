@@ -1,0 +1,8 @@
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260825/work/01-hook.mp4'
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260825/work/02-intro.mp4'
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260825/work/03-packshot.mp4'
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260825/work/04-benefit.mp4'
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260825/work/05-walk.mp4'
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260825/work/06-social.mp4'
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260825/work/07-hero.mp4'
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260825/work/08-close.mp4'

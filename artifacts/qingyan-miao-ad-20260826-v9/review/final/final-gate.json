@@ -1,0 +1,71 @@
+{
+  "gate_version": "agent-final-candidate-v1",
+  "artifact": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v9/final/青颜_苗家腋下使用前后对比广告_30s_9x16_v9.mp4",
+    "sha256": "f0014c5907b8426a6f453cc6373532a16596dfb25b145f3cc3fa23c000f75568",
+    "duration_seconds": 30.022,
+    "video_duration_seconds": 30.0,
+    "audio_duration_seconds": 30.0,
+    "frame_count": 720,
+    "width": 1080,
+    "height": 1920,
+    "fps": 24
+  },
+  "timeline": [
+    {"segment": "underarm_motion_hook", "start": 0.0, "end": 6.25, "source_frames": "25-174"},
+    {"segment": "elder_dialogue", "start": 6.25, "end": 12.708},
+    {"segment": "before_after_comparison", "start": 12.708, "end": 17.708},
+    {"segment": "leave_together_native", "start": 17.708, "end": 25.0, "source_frames": "0-174"},
+    {"segment": "benefit_card", "start": 25.0, "end": 27.5},
+    {"segment": "product_hero", "start": 27.5, "end": 30.0}
+  ],
+  "evidence": {
+    "video_analysis_probe": "PASS: exact H.264 High 1080x1920, 24fps, 720 frames, AAC 48kHz stereo",
+    "video_analysis_review": "PASS: issues=[], unique_frame_ratio=0.999 from 1437 sampled frames",
+    "opening_freeze": "PASS: no >=0.35s freeze from 0.000-12.708s; rejected source frames 0-24 are absent",
+    "comparison_transcription": "PASS: exact 12.708-17.708s segment transcribes 清爽舒适",
+    "outdoor_transcription": "PASS: exact 17.708-25.000s segment has no speech and contains no promotional subtitle",
+    "benefit_transcription": "PASS: exact 25.000-27.500s segment transcribes 清爽舒适 难怪这么自在",
+    "product_transcription": "PASS for audible line and order: exact 27.500-30.000s segment transcribes product-name homophones followed by 清爽舒适; ASR does not prove exact brand spelling",
+    "loudness": "Integrated -18.2 LUFS; true peak -1.7 dBFS",
+    "contact_sheet": "review/final/contact-1fps.jpg",
+    "comparison_sheet": "review/final/comparison-4fps.jpg",
+    "boundary_montage": "review/final/boundaries.jpg"
+  },
+  "required_findings": [
+    {
+      "requirement": "Opening begins with visible motion rather than a frozen setup",
+      "status": "PASS",
+      "evidence": "The compositor starts from accepted Shot 01 frame 25; visible blue-white airflow is already moving on frame one and no opening freeze is detected."
+    },
+    {
+      "requirement": "Product performance is an explicit underarm before/after comparison",
+      "status": "PASS",
+      "evidence": "12.708-17.708s uses the same young woman and underarm composition with labeled 使用前 汗湿闷热 / 使用后 清爽舒适 states and an animated comparison divider. No packshot asset appears."
+    },
+    {
+      "requirement": "The former 14-second uncanny optical-retime transition is removed",
+      "status": "PASS",
+      "evidence": "At 14.000s the viewer is inside the intentional comparison reveal. The outdoor Shot starts at 17.708s and uses all 175 accepted source frames at native 24fps with no minterpolate or setpts stretch."
+    },
+    {
+      "requirement": "Later promotional copy has audible matching speech",
+      "status": "PASS",
+      "evidence": "Project-local transcription confirms the comparison, benefit card and product hero speech. The intentionally silent outdoor segment contains no promotional copy."
+    },
+    {
+      "requirement": "No repeated package overlay or white-flash seam",
+      "status": "PASS",
+      "evidence": "The comparison uses only character frames. The product packshot appears once in the final 2.5-second hero; the compositor contains no white flash or xfade."
+    },
+    {
+      "requirement": "Exact 30-second portrait delivery",
+      "status": "PASS",
+      "evidence": "720 frames at 24fps, 1080x1920; video and audio streams are both exactly 30.000s."
+    }
+  ],
+  "verdict": "TARGETED_AGENT_GATE_PASS",
+  "human_visual_verdict": "PENDING",
+  "production_state": "LOCAL_CANDIDATE_ONLY",
+  "final_acceptance": false
+}

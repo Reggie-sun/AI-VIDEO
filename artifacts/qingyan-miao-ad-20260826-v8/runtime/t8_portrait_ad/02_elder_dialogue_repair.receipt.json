@@ -1,0 +1,54 @@
+{
+  "acceptance_boundary": "single local T8-only 20-step development clip; not Production activation, P6, or Final Acceptance",
+  "last_frame": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v8/assets/02-elder-dialogue-last-frame.png",
+    "sha256": "b479e24a13ae9d3b7b8e0b0c1d4a5912e6b6c3874bc3440bfb58b7f82058969d",
+    "uploaded_name": "qingyan-v8-02_elder_dialogue_repair-last-b479e24a13ae9d3b.png"
+  },
+  "output": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/02_elder_dialogue_repair.mp4",
+    "sha256": "4d28cd1f9ea588802d8028e5581fa421e33f3cd5154159971b7179e1226ba2aa",
+    "size_bytes": 3681785
+  },
+  "prompt_id": "f60dfb25-0f87-4377-82a7-776767407b8a",
+  "prompt_path": "artifacts/qingyan-miao-ad-20260826-v8/prompts/02_elder_dialogue_repair.txt",
+  "prompt_sha256": "ee15a6eff86ce8b9efdc2e270890754f748e45e888fb6c4a1b5980c4328155d7",
+  "provider_effects": {
+    "fallback_count": 0,
+    "local_submit_count": 1,
+    "remote_submit_count": 0,
+    "retry_count": 0
+  },
+  "runtime": {
+    "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+    "endpoint": "http://127.0.0.1:8188",
+    "t8_commit": "28cb160827c245b2d6a37539df30c1d7c5e7aecd"
+  },
+  "seed": 8262803,
+  "settings": {
+    "crf": 17,
+    "fps": 24,
+    "frame_count": 175,
+    "height": 1344,
+    "lora_enabled": false,
+    "mode": "FL2VA",
+    "native_audio": true,
+    "sampler": "res_multistep",
+    "scheduler": "simple",
+    "steps": 20,
+    "width": 768
+  },
+  "shot_id": "02_elder_dialogue_repair",
+  "source": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v8/review/01_underarm_deodorizing_repair/terminal-frame.png",
+    "sha256": "2f4e2198c3cab189e8853579e6b3c9aa0bb9862b14032b0f58070177d24790e4",
+    "uploaded_name": "qingyan-v8-02_elder_dialogue_repair-2f4e2198c3cab189.png"
+  },
+  "template": {
+    "path": "workflows/templates/minimax_h3_t8_t2va_quality_api.json",
+    "source_sha256": "6a508f8522694297c2e3ce1157dd1b235cd34514d85bf3c2908f55020cd990a5",
+    "submitted_graph_path": "artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/02_elder_dialogue_repair.submitted-workflow.json",
+    "submitted_graph_sha256": "8171c885829d2d168653bc73283ffdb857871228eca9d5c17b901c686b25c2ab"
+  },
+  "wall_time_seconds": 592.537
+}

@@ -1,0 +1,71 @@
+{
+  "acceptance_boundary": "agent-side per-Shot post-media Gate only; not Production activation, P6, Final Acceptance, or human acceptance",
+  "exact_output": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/00_problem_discovery_sniff.mp4",
+    "sha256": "b6c471d5a184bd6c8ef325dcec5e5d7bbbfb82a77a88b741fbf4030927552dcb",
+    "size_bytes": 2733231,
+    "duration_seconds": 5.167,
+    "resolution": "768x1344",
+    "fps": 24.0,
+    "frame_count": 124
+  },
+  "mcp_evidence": {
+    "server_name": "video-analysis",
+    "server_version": "1.29.0",
+    "video_analyze_response_sha256": "b78582d692dec6c4e975c3f921fc66f247b6e6c3db049d783ca085bebfa18579",
+    "video_review_response_sha256": "08f4ba28c1db86b74b06a88673665e951676411be14d730fb8677eb91bd8c72d",
+    "scene_count": 1,
+    "sampled_frame_count": 166,
+    "unique_frame_count": 166,
+    "unique_frame_ratio": 1.0,
+    "audio_stream_present": true,
+    "estimated_speaking_duration_seconds": 0.0
+  },
+  "decode_evidence": {
+    "video_full_decode": "PASS",
+    "audio_full_decode": "PASS"
+  },
+  "overall_verdict": "FAIL",
+  "requirements": [
+    {
+      "id": "problem-discovery-before-solution",
+      "verdict": "PASS",
+      "evidence": "The ordered samples begin with calm blouse adjustment, then progress to underarm inspection; no treatment action appears."
+    },
+    {
+      "id": "visible-underarm-perspiration",
+      "verdict": "PASS",
+      "evidence": "A localized darker damp patch becomes visible at the covered left underarm while the woman raises her arm and checks it."
+    },
+    {
+      "id": "explicit-sniff-and-reaction-closure",
+      "verdict": "FAIL",
+      "evidence": "The woman leans and looks toward the covered underarm, but the sampled end sequence does not show a clearly readable short inhale followed by nose wrinkle and restrained recoil; it reads mainly as sustained visual inspection."
+    },
+    {
+      "id": "audible-sniff-cue",
+      "verdict": "FAIL",
+      "evidence": "The native audio stream decodes, but the full-duration waveform does not expose a distinct short sniff transient in the intended final beat."
+    },
+    {
+      "id": "zero-product-objects",
+      "verdict": "PASS",
+      "evidence": "All 11 MCP-extracted ordered frames contain no bottle, box, cap, nozzle, product thumbnail, or mist."
+    },
+    {
+      "id": "continuous-motion-without-cut-freeze-or-flash",
+      "verdict": "PASS",
+      "evidence": "MCP scene detection reports one 5.167-second scene, and review metrics report 166 unique frames out of 166 sampled frames."
+    },
+    {
+      "id": "portrait-t8-technical-contract",
+      "verdict": "PASS",
+      "evidence": "Exact output is H.264 768x1344 at 24 fps with 124 frames and AAC stereo audio; full video and audio decode both pass."
+    }
+  ],
+  "submission_barrier": {
+    "next_shot_allowed": false,
+    "retry_allowed_without_new_user_direction": false,
+    "reason": "The required sniff action-and-reaction beat and its audible cue failed; no later Shot or retry may be submitted automatically."
+  }
+}

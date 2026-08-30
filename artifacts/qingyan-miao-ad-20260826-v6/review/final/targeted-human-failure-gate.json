@@ -1,0 +1,67 @@
+{
+  "gate": "QINGYAN_V6_TARGETED_HUMAN_FAILURE_REPAIR",
+  "status": "PASS",
+  "artifact": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v6/final/青颜_苗家女孩T8自然转场广告_30s_9x16_v6.mp4",
+    "sha256": "cdac1d5c78f0a40735220ad643f1d8ab9f5b6d8bd2bd41d7b9ef2d124432258d",
+    "size_bytes": 17341950
+  },
+  "findings": [
+    {
+      "requirement": "opening.seam.at_2_seconds",
+      "status": "PASS",
+      "evidence": "01 concern reaches a white endpoint before a product-free 24-frame graphic bridge begins. No empty-hand/product-in-hand cross-dissolve remains."
+    },
+    {
+      "requirement": "opening.seam.at_4_seconds",
+      "status": "PASS",
+      "evidence": "Timestamp 4.0s lies inside the single continuous 3.000-8.167s spoken presenter Shot. The old 02_product_lift segment was removed."
+    },
+    {
+      "requirement": "product.no_same_frame_duplication",
+      "status": "PASS",
+      "evidence": "The presenter Shot contains only the generated hand-held bottle and no lower-right packshot overlay."
+    },
+    {
+      "requirement": "product.source_packshot_frequency",
+      "status": "PASS",
+      "evidence": "The compositor has exactly one source-packshot input, used only in the dedicated 19.833-25.833s hero window. The end card is text-only."
+    },
+    {
+      "requirement": "product.still_geometry_stability",
+      "status": "PASS",
+      "evidence": "No zoompan or oscillating crop exists. Product/text pixels stay fixed while a background light band moves once left-to-right. Phase correlation over 85 hero crop frames at 21.0-24.5s measured max drift dx=0.000544px, dy=0.000516px."
+    },
+    {
+      "requirement": "live_action.motion_continuity",
+      "status": "PASS",
+      "evidence": "The source's initial 8-frame still holds were removed from both concern and social clips. FFmpeg freezedetect found no >=0.25s event inside any live-action window."
+    },
+    {
+      "requirement": "edit.no_hidden_motion_constructs",
+      "status": "PASS",
+      "evidence": "Composer contains zero xfade, zoompan, tpad, clone, reverse or duplicated-frame extension constructs. Ten non-overlapping segments sum directly to 720 frames."
+    },
+    {
+      "requirement": "dialogue.product_recommendation",
+      "status": "PASS",
+      "evidence": "Whisper medium detected the single Mandarin recommendation at 3.30-8.24s; the exact correct Chinese line is burned in during the same continuous Shot."
+    },
+    {
+      "requirement": "delivery.technical",
+      "status": "PASS",
+      "evidence": "Project video_probe: H.264 High, 1080x1920, 24fps, 720 frames; AAC 48kHz stereo. Full video/audio decode passed."
+    }
+  ],
+  "intentional_graphic_windows": [
+    "2.000-3.000s neutral graphic bridge",
+    "8.167-11.667s benefit card",
+    "14.000-15.500s scenario bridge",
+    "19.833-25.833s fixed product/text with a one-direction background light pass",
+    "25.833-30.000s fixed text with a one-direction background light pass"
+  ],
+  "limitations": [
+    "This targeted Agent gate addresses the user's named defects; it does not create a new user human verdict.",
+    "It is not canonical Ecommerce Gate 2, P6, Final Acceptance, Production activation or publication proof."
+  ]
+}

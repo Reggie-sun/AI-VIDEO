@@ -1,0 +1,46 @@
+{
+  "acceptance_boundary": "single local T8 Turbo4 I2VA development clip for a portrait ad; not Production activation, P6, or Final Acceptance",
+  "output": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v3/runtime/voice/vo01_hook.mp4",
+    "sha256": "6b891df468db4fa7a4063be4d6acb9850fe46e8b0827711ea0296fc57f48cc5d",
+    "size_bytes": 1823861
+  },
+  "prompt_id": "a9a2ce03-d8a5-45c3-8d08-976e8d86154f",
+  "prompt_sha256": "d0a283acb664cf61e4e6d539205d6384bfd465319179919087e06387bc723323",
+  "provider_effects": {
+    "fallback_count": 0,
+    "local_submit_count": 1,
+    "remote_submit_count": 0,
+    "retry_count": 0
+  },
+  "runtime": {
+    "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+    "endpoint": "http://127.0.0.1:8188",
+    "t8_commit": "28cb160827c245b2d6a37539df30c1d7c5e7aecd"
+  },
+  "seed": 8262701,
+  "settings": {
+    "crf": 17,
+    "fps": 24,
+    "frame_count": 107,
+    "height": 1344,
+    "mode": "I2VA",
+    "native_audio": true,
+    "sampler": "dual_clock_euler",
+    "scheduler": "native_flow",
+    "steps": 4,
+    "width": 768
+  },
+  "shot_id": "vo01_hook",
+  "source": {
+    "path": "artifacts/qingyan-miao-ad-20260825/assets/04-golden-fluid.png",
+    "sha256": "6e28ecb2c9b88b5d0e737d92d0bc98855278c21f23c2ef29daa878fce84ba12c",
+    "uploaded_name": "qingyan-vo01_hook-6e28ecb2c9b88b5d.png"
+  },
+  "template": {
+    "path": "workflows/templates/minimax_h3_t8_i2va_turbo_native_v2_api.json",
+    "source_sha256": "a2de56895642582481ab4ebe4a92aa356c908e2d7475159a77a1ffb9c06131df",
+    "submitted_graph_sha256": "5deb4a3cf3acfbff139267114839d518086625621f6f5862fcb66416d6659083"
+  },
+  "wall_time_seconds": 90.115
+}

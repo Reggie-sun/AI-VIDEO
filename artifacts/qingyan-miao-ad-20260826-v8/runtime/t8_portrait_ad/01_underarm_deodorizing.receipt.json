@@ -1,0 +1,49 @@
+{
+  "acceptance_boundary": "single local T8-only 20-step I2VA development clip; not Production activation, P6, or Final Acceptance",
+  "output": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/01_underarm_deodorizing.mp4",
+    "sha256": "9b73f8c8b591268677f5b42a624c05671c5d6de4e2ed2e084b0fda231f122646",
+    "size_bytes": 4649636
+  },
+  "prompt_id": "2835edb3-20be-4bef-9b22-24da1d7746df",
+  "prompt_path": "artifacts/qingyan-miao-ad-20260826-v8/prompts/01_underarm_deodorizing.txt",
+  "prompt_sha256": "6cde7045bae8d2081fe7ccfc942b52480fd3fd835b1b9f93f522c7b3e84532b2",
+  "provider_effects": {
+    "fallback_count": 0,
+    "local_submit_count": 1,
+    "remote_submit_count": 0,
+    "retry_count": 0
+  },
+  "runtime": {
+    "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+    "endpoint": "http://127.0.0.1:8188",
+    "t8_commit": "977df788fcf8b971dc3d0fc7d6baa79a0edfaf40"
+  },
+  "seed": 8262801,
+  "settings": {
+    "crf": 17,
+    "fps": 24,
+    "frame_count": 175,
+    "height": 1344,
+    "lora_enabled": false,
+    "mode": "I2VA",
+    "native_audio": true,
+    "sampler": "res_multistep",
+    "scheduler": "simple",
+    "steps": 20,
+    "width": 768
+  },
+  "shot_id": "01_underarm_deodorizing",
+  "source": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v8/assets/01-underarm-pov-first-frame.png",
+    "sha256": "69470e24f03d3d12ef34f00f4dc0c35d013b157082b77f8a1ad55fcbabf7142f",
+    "uploaded_name": "qingyan-v8-01_underarm_deodorizing-69470e24f03d3d12.png"
+  },
+  "template": {
+    "path": "workflows/templates/minimax_h3_t8_t2va_quality_api.json",
+    "source_sha256": "6a508f8522694297c2e3ce1157dd1b235cd34514d85bf3c2908f55020cd990a5",
+    "submitted_graph_path": "artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/01_underarm_deodorizing.submitted-workflow.json",
+    "submitted_graph_sha256": "2b456842c27daf49899b53048f7ad2bad55274d22fd45fd4df7d58cb60440596"
+  },
+  "wall_time_seconds": 568.533
+}

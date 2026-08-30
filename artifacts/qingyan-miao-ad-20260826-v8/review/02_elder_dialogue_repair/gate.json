@@ -1,0 +1,58 @@
+{
+  "gate_version": "agent-per-shot-v1",
+  "shot_id": "02_elder_dialogue_repair",
+  "failed_predecessor": "02_elder_dialogue",
+  "artifact": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/02_elder_dialogue_repair.mp4",
+    "sha256": "4d28cd1f9ea588802d8028e5581fa421e33f3cd5154159971b7179e1226ba2aa",
+    "duration_seconds": 7.292,
+    "frame_count": 175,
+    "width": 768,
+    "height": 1344,
+    "fps": 24
+  },
+  "evidence": {
+    "video_analysis_probe": "PASS: exact 175-frame portrait MP4 and stereo audio returned for the bound path",
+    "video_analysis_review": "PASS: one scene, unique_frame_ratio 1.0, estimated speaking duration 6.3s",
+    "video_analysis_transcription": [
+      {"start": 0.0, "end": 1.68, "text": "姑娘 喷的什么?"},
+      {"start": 1.68, "end": 4.74, "text": "青言意汗敬畏喷雾 清爽舒适", "note": "ASR homophones correspond phonetically to 青颜抑汗净味喷雾"},
+      {"start": 4.74, "end": 6.1, "text": "难怪这么自在"}
+    ],
+    "dense_contact_sheet": "review/02_elder_dialogue_repair/contact-4fps.jpg",
+    "terminal_frame": {
+      "path": "review/02_elder_dialogue_repair/terminal-frame.png",
+      "sha256": "049c9d96b8266cda5ded9f1c030a800ef3c990d93cdc2631b02a4f2b12df0274"
+    }
+  },
+  "required_findings": [
+    {
+      "requirement": "Three promotional lines occur once and in the required order",
+      "status": "PASS",
+      "evidence": "Project transcription returns exactly three ordered segments at 0.00-1.68s, 1.68-4.74s and 4.74-6.10s with the intended phonetic content."
+    },
+    {
+      "requirement": "Elder-young turn-taking is visually coherent",
+      "status": "PASS",
+      "evidence": "4fps samples show the elder speaking first, the young woman speaking through the middle line, and the elder speaking again after 4.74s; the listener's mouth remains predominantly closed in each interval."
+    },
+    {
+      "requirement": "Exactly two women and exactly one physical bottle remain stable",
+      "status": "PASS",
+      "evidence": "All 30 sampled frames contain the same two women and one yellow-white bottle without duplication or anatomy failure."
+    },
+    {
+      "requirement": "No product packshot, product icon, corner overlay, embedded text or floating graphic",
+      "status": "PASS",
+      "evidence": "All dense samples and the terminal frame show a plain wall and doorway with no package, icon, poster, text or floating graphic."
+    },
+    {
+      "requirement": "End state prepares the next continuous movement",
+      "status": "PASS",
+      "evidence": "The elder finishes with an open-hand doorway gesture while the young woman lowers the single bottle; both remain oriented toward one another and the doorway."
+    }
+  ],
+  "verdict": "PASS",
+  "next_submit_permitted": true,
+  "remaining_human_check": "Human listening remains the final authority for perceived voice-age distinction and exact brand-word naturalness."
+}

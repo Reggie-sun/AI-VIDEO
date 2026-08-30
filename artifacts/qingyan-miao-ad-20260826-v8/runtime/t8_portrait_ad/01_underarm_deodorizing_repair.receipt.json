@@ -1,0 +1,54 @@
+{
+  "acceptance_boundary": "single local T8-only 20-step I2VA development clip; not Production activation, P6, or Final Acceptance",
+  "last_frame": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v8/assets/01-underarm-pov-last-frame-clean.png",
+    "sha256": "99782cfd96e9d6cce2afeadc2290eaa10baa3b3df447e255fc3ae3041398aa1a",
+    "uploaded_name": "qingyan-v8-01_underarm_deodorizing_repair-last-99782cfd96e9d6cc.png"
+  },
+  "output": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/01_underarm_deodorizing_repair.mp4",
+    "sha256": "ced2f7e4739a9930b88fcf1e62479a55c8a59a9b04f0fb6a8d4cc84392784be0",
+    "size_bytes": 4535879
+  },
+  "prompt_id": "f4d94af5-a42e-47c3-99b7-8778afc31371",
+  "prompt_path": "artifacts/qingyan-miao-ad-20260826-v8/prompts/01_underarm_deodorizing_repair.txt",
+  "prompt_sha256": "8c7efbf61dcc51c6d5923c3b46c80876d2a8c057f488eedb07bde03c21fe49c5",
+  "provider_effects": {
+    "fallback_count": 0,
+    "local_submit_count": 1,
+    "remote_submit_count": 0,
+    "retry_count": 0
+  },
+  "runtime": {
+    "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+    "endpoint": "http://127.0.0.1:8188",
+    "t8_commit": "28cb160827c245b2d6a37539df30c1d7c5e7aecd"
+  },
+  "seed": 8262802,
+  "settings": {
+    "crf": 17,
+    "fps": 24,
+    "frame_count": 175,
+    "height": 1344,
+    "lora_enabled": false,
+    "mode": "FL2VA",
+    "native_audio": true,
+    "sampler": "res_multistep",
+    "scheduler": "simple",
+    "steps": 20,
+    "width": 768
+  },
+  "shot_id": "01_underarm_deodorizing_repair",
+  "source": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v8/assets/01-underarm-pov-first-frame.png",
+    "sha256": "69470e24f03d3d12ef34f00f4dc0c35d013b157082b77f8a1ad55fcbabf7142f",
+    "uploaded_name": "qingyan-v8-01_underarm_deodorizing_repair-69470e24f03d3d12.png"
+  },
+  "template": {
+    "path": "workflows/templates/minimax_h3_t8_t2va_quality_api.json",
+    "source_sha256": "6a508f8522694297c2e3ce1157dd1b235cd34514d85bf3c2908f55020cd990a5",
+    "submitted_graph_path": "artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/01_underarm_deodorizing_repair.submitted-workflow.json",
+    "submitted_graph_sha256": "5599c119cbd7688804228c6bb472f8dac71551d52cec4bd4394d3a1d62265ef5"
+  },
+  "wall_time_seconds": 596.566
+}

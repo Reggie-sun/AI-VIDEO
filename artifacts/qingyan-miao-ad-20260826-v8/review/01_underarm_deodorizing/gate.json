@@ -1,0 +1,48 @@
+{
+  "gate_version": "agent-per-shot-v1",
+  "shot_id": "01_underarm_deodorizing",
+  "artifact": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/01_underarm_deodorizing.mp4",
+    "sha256": "9b73f8c8b591268677f5b42a624c05671c5d6de4e2ed2e084b0fda231f122646",
+    "duration_seconds": 7.292,
+    "frame_count": 175,
+    "width": 768,
+    "height": 1344,
+    "fps": 24
+  },
+  "evidence": {
+    "video_analysis_probe": "PASS: exact metadata and audio stream returned for the bound path",
+    "video_analysis_review": "PASS: one scene and unique_frame_ratio 1.0; generic portrait-resolution warning is not applicable to the accepted T8 canvas",
+    "dense_contact_sheet": "review/01_underarm_deodorizing/contact-2fps.jpg"
+  },
+  "required_findings": [
+    {
+      "requirement": "Tasteful fully clothed exaggerated underarm viewpoint",
+      "status": "PASS",
+      "evidence": "0.0-3.5s samples show a covered sleeve/underarm, one adult woman and a clean personal-care presentation."
+    },
+    {
+      "requirement": "Warm haze visibly clears after one deodorizing spray effect",
+      "status": "PASS",
+      "evidence": "Yellow haze is strongest at 0.0-0.5s; a blue-white airflow appears from 1.0s and the frame is clear by about 3.0s."
+    },
+    {
+      "requirement": "Exactly one elderly Miao woman enters and ends beside the young woman",
+      "status": "PASS",
+      "evidence": "The elder enters from screen right at about 3.0s; samples from 4.5-7.0s show exactly two women."
+    },
+    {
+      "requirement": "No visible anatomy failure or duplicate physical bottle",
+      "status": "PASS",
+      "evidence": "Dense sampled frames show stable faces, two arms per person, and one physical bottle in the young woman's hand."
+    },
+    {
+      "requirement": "No product packshot, product icon, corner overlay, embedded text or floating graphic",
+      "status": "FAIL",
+      "evidence": "A generated yellow box-and-bottle poster appears at the upper-right from about 4.0s through the terminal frame. This directly repeats the user's rejected product-icon behavior."
+    }
+  ],
+  "verdict": "FAIL",
+  "next_submit_permitted": false,
+  "repair_direction": "Replace Shot 01 with a first-and-last-frame constrained generation whose exact terminal frame contains the two women and one physical bottle but no poster or overlay. Do not submit Shot 02 until the replacement passes all required findings."
+}

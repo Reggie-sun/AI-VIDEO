@@ -1,0 +1,10 @@
+{
+  "output_sha256": "654588aeaf575902bcd461b8074366bb14f8dd27d497a5a9d9cc05b6cc26672f",
+  "prompt_id": "48e2a8a9-ae13-42c2-aff7-0dfb4f3fbe86",
+  "receipt": "artifacts/qingyan-miao-ad-20260825/runtime/t8_portrait_ad/07_social回眸.receipt.json",
+  "seed": 8252207,
+  "shot_id": "07_social回眸",
+  "source_sha256": "49b8da0daebb81b61f39283d6df3f798c8ed845fe51fe498e3d891b4128c2651",
+  "status": "completed",
+  "submitted_graph_sha256": "58d31892989960a9d2b6e43b96a2389c1fd625fcc0068cbf275446562bea8edc"
+}

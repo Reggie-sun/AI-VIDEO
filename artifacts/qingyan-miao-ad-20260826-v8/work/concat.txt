@@ -1,0 +1,5 @@
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260826-v8/work/01-underarm-deodorizing.mp4'
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260826-v8/work/02-elder-dialogue.mp4'
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260826-v8/work/03-leave-together.mp4'
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260826-v8/work/04-golden-fluid-benefit.mp4'
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260826-v8/work/05-product-hero.mp4'

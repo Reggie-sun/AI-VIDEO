@@ -1,0 +1,44 @@
+{
+  "acceptance_boundary": "agent-side per-Shot post-media Gate only; not Production activation, P6, Final Acceptance, or human acceptance",
+  "exact_output": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/01_problem_open_cap_spray.mp4",
+    "sha256": "d33a0a8fd1c1dd3a56183886dc554cacdd8452b5cb6e2fdb3ac4522f387e536e"
+  },
+  "mcp_attempts": [
+    {
+      "operation": "video_analyze",
+      "result": "Transport closed"
+    },
+    {
+      "operation": "video_probe",
+      "result": "Transport closed"
+    }
+  ],
+  "overall_verdict": "NOT_EVALUATED",
+  "requirements": [
+    {
+      "id": "problem-reaction-before-use",
+      "verdict": "NOT_EVALUATED"
+    },
+    {
+      "id": "cap-fully-removed-before-spray",
+      "verdict": "NOT_EVALUATED"
+    },
+    {
+      "id": "single-cap-and-single-bottle-continuity",
+      "verdict": "NOT_EVALUATED"
+    },
+    {
+      "id": "expression-changes-from-concern-to-relief",
+      "verdict": "NOT_EVALUATED"
+    },
+    {
+      "id": "continuous-motion-without-freeze-or-flash-seam",
+      "verdict": "NOT_EVALUATED"
+    }
+  ],
+  "submission_barrier": {
+    "next_shot_allowed": false,
+    "reason": "project-local video-analysis MCP was unavailable; local contact-sheet inspection is advisory and cannot replace the required Gate"
+  }
+}

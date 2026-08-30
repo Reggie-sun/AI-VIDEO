@@ -12,6 +12,9 @@ cwd = "/home/reggie/vscode_folder/AI-VIDEO"
 [mcp_servers.video-analysis.env]
 PYTHONPATH = "/home/reggie/vscode_folder/AI-VIDEO/src"
 
+[mcp_servers.video-analysis.tools.video_analyze]
+approval_mode = "approve"
+
 [mcp_servers.gpt-image-2]
 command = "/home/reggie/.local/share/ai-video/gpt-image-2-mcp/launch-chatgpt-web.sh"
 cwd = "/home/reggie/vscode_folder/AI-VIDEO"

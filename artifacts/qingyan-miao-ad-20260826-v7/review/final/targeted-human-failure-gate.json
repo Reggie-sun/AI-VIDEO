@@ -1,0 +1,39 @@
+{
+  "schema": "qingyan-targeted-human-failure-gate/1",
+  "artifact": "artifacts/qingyan-miao-ad-20260826-v7/final/青颜_苗家女孩T8硬切顺滑广告_30s_9x16_v7.mp4",
+  "sha256": "4ac67c1c3193819befc5144e11c457a122c481d6bcbfd458963f7fe2028e63e5",
+  "status": "TARGETED_AGENT_GATE_PASS",
+  "human_verdict": "PENDING",
+  "requirements": [
+    {
+      "id": "ad.edit.no_white_flash_seams",
+      "verdict": "PASS",
+      "evidence": "No xfade or video fade filter; seven boundary windows contain zero full-white frames."
+    },
+    {
+      "id": "ad.product.no_moving_yellow_band",
+      "verdict": "PASS",
+      "evidence": "No yellow color-source overlay or moving-band expression exists in the v7 compositor."
+    },
+    {
+      "id": "ad.product.final_two_shots_only",
+      "verdict": "PASS",
+      "evidence": "Golden-fluid input count is one at frames 384-551; source-packshot input count is one at frames 552-719."
+    },
+    {
+      "id": "ad.motion.no_live_action_freeze",
+      "verdict": "PASS",
+      "evidence": "The presenter's initial six still frames and the social clip's initial eight still frames are removed; freezedetect finds no >=0.25s live-action freeze before frame 326."
+    },
+    {
+      "id": "ad.delivery.technical",
+      "verdict": "PASS",
+      "evidence": "H.264 High 1080x1920, 24fps, 720 frames, AAC 48kHz stereo; full video/audio decode and SHA-256 sidecar verification pass."
+    }
+  ],
+  "limitations": [
+    "This is a targeted development gate, not canonical Ecommerce Gate 2, P6, Final Acceptance, publication, or market-performance evidence.",
+    "The final two graphic Shots are intentionally low-motion; the stillness is not a live-action clone or seam stutter.",
+    "User uninterrupted 1.0x playback remains the authoritative subjective verdict."
+  ]
+}

@@ -1,0 +1,48 @@
+{
+  "acceptance_boundary": "single local T8-only 20-step I2VA dialogue development clip; not Production activation, P6, or Final Acceptance",
+  "exact_dialogue": "出门前用青颜，抑汗净味，清爽舒适。",
+  "output": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v5/runtime/t8_portrait_ad/03_spoken_recommendation.mp4",
+    "sha256": "43a3838e3d002567c58abbc0d0ee4647996d236600d0023e40e03fd7332b3b72",
+    "size_bytes": 3129100
+  },
+  "prompt_id": "83bd9a9d-8882-46b3-a341-25bb02c24728",
+  "prompt_sha256": "ab46b640ea437c6c76defaad3f2c4ed140afd17e12f79cd5115f65f7d90300e5",
+  "provider_effects": {
+    "fallback_count": 0,
+    "local_submit_count": 1,
+    "remote_submit_count": 0,
+    "retry_count": 0
+  },
+  "runtime": {
+    "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+    "endpoint": "http://127.0.0.1:8188",
+    "t8_commit": "28cb160827c245b2d6a37539df30c1d7c5e7aecd"
+  },
+  "seed": 8262703,
+  "settings": {
+    "crf": 17,
+    "fps": 24,
+    "frame_count": 124,
+    "height": 1344,
+    "lora_enabled": false,
+    "mode": "I2VA",
+    "native_audio": true,
+    "sampler": "res_multistep",
+    "scheduler": "simple",
+    "steps": 20,
+    "width": 768
+  },
+  "shot_id": "03_spoken_recommendation",
+  "source": {
+    "path": "artifacts/qingyan-miao-ad-20260825/runtime/inputs/product-use-936x1664.png",
+    "sha256": "e0b5b9e588819ec595d4ea346668a3c6348dddd20b216103d1725bd4fd700a74",
+    "uploaded_name": "qingyan-03_spoken_recommendation-e0b5b9e588819ec5.png"
+  },
+  "template": {
+    "path": "workflows/templates/minimax_h3_t8_t2va_quality_api.json",
+    "source_sha256": "6a508f8522694297c2e3ce1157dd1b235cd34514d85bf3c2908f55020cd990a5",
+    "submitted_graph_sha256": "44231883b810cc9cd606ebd3c3dce47f67c6bb9d27cad0933e7d4def6d5a1756"
+  },
+  "wall_time_seconds": 392.345
+}

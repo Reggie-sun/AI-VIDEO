@@ -1,0 +1,10 @@
+{
+  "output_sha256": "9b73f8c8b591268677f5b42a624c05671c5d6de4e2ed2e084b0fda231f122646",
+  "prompt_id": "2835edb3-20be-4bef-9b22-24da1d7746df",
+  "receipt": "artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/01_underarm_deodorizing.receipt.json",
+  "seed": 8262801,
+  "shot_id": "01_underarm_deodorizing",
+  "source_sha256": "69470e24f03d3d12ef34f00f4dc0c35d013b157082b77f8a1ad55fcbabf7142f",
+  "status": "completed",
+  "submitted_graph_sha256": "2b456842c27daf49899b53048f7ad2bad55274d22fd45fd4df7d58cb60440596"
+}

@@ -1,0 +1,20 @@
+Input #0, png_pipe, from 'artifacts/qingyan-miao-ad-20260826-v8/review/final/boundaries/frame-174.png':
+  Duration: N/A, bitrate: N/A
+    Stream #0:0: Video: png, rgb24(pc), 1080x1920, 25 tbr, 25 tbn, 25 tbc
+Input #1, png_pipe, from 'artifacts/qingyan-miao-ad-20260826-v8/review/final/boundaries/frame-175.png':
+  Duration: N/A, bitrate: N/A
+    Stream #1:0: Video: png, rgb24(pc), 1080x1920, 25 tbr, 25 tbn, 25 tbc
+Stream mapping:
+  Stream #0:0 (png) -> ssim:main
+  Stream #1:0 (png) -> ssim:reference
+  ssim -> Stream #0:0 (wrapped_avframe)
+Press [q] to stop, [?] for help
+Output #0, null, to 'pipe:':
+  Metadata:
+    encoder         : Lavf58.45.100
+    Stream #0:0: Video: wrapped_avframe, gbrp, 1080x1920, q=2-31, 200 kb/s, 25 fps, 25 tbn, 25 tbc (default)
+    Metadata:
+      encoder         : Lavc58.91.100 wrapped_avframe
+frame=    1 fps=0.0 q=-0.0 Lsize=N/A time=00:00:00.04 bitrate=N/A speed=0.863x    
+video:1kB audio:0kB subtitle:0kB other streams:0kB global headers:0kB muxing overhead: unknown
+[Parsed_ssim_0 @ 0x652d290c3980] SSIM R:0.865254 (8.704857) G:0.863492 (8.648413) B:0.892175 (9.672792) All:0.873640 (8.983915)

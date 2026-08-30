@@ -1,0 +1,117 @@
+{
+  "schema_version": "ecommerce-ad-workflow/input/1",
+  "delivery_intent": "video",
+  "product": {
+    "sku_id": "qingyan-aluminum-chlorohydrate-refreshing-spray-60ml",
+    "name": "青颜 氯化羟铝抑汗净味喷雾",
+    "source_assets": [
+      {
+        "asset_id": "asset-qingyan-packshot",
+        "source_kind": "IMAGE",
+        "reference": "assets/product-packshot.jpg",
+        "rights_status": "CONFIRMED"
+      }
+    ],
+    "landing_page_reference": null
+  },
+  "product_truth": {
+    "sources": [
+      {
+        "source_id": "source-user-product-image",
+        "source_kind": "PRODUCT_ASSET",
+        "reference": "assets/product-packshot.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "source_id": "source-user-brief",
+        "source_kind": "USER_ATTESTATION",
+        "reference": "current-user-request-2026-08-26",
+        "rights_status": "CONFIRMED"
+      }
+    ],
+    "facts": [
+      {
+        "fact_id": "fact-product-identity",
+        "statement": "包装正面可观察到黄色盒装、黄色瓶身标签、白色瓶盖、青颜字样和60ml标识。",
+        "source_ids": ["source-user-product-image"]
+      },
+      {
+        "fact_id": "fact-approved-positioning",
+        "statement": "用户要求将产品表达为抑汗净味喷雾，并限定为帮助减少汗湿困扰、清爽舒适的克制表述。",
+        "source_ids": ["source-user-brief", "source-user-product-image"]
+      }
+    ],
+    "allowed_claims": [
+      {
+        "claim_id": "claim-fresh",
+        "text": "抑汗净味，清爽舒适",
+        "claim_type": "BENEFIT",
+        "fact_ids": ["fact-approved-positioning"],
+        "source_ids": ["source-user-brief", "source-user-product-image"]
+      },
+      {
+        "claim_id": "claim-help-sweat",
+        "text": "帮助减少汗湿困扰",
+        "claim_type": "BENEFIT",
+        "fact_ids": ["fact-approved-positioning"],
+        "source_ids": ["source-user-brief", "source-user-product-image"]
+      }
+    ],
+    "prohibited_claims": [
+      {
+        "claim_id": "prohibited-medical",
+        "text": "治疗、止痒、收缩汗腺或直接调节汗液分泌",
+        "claim_type": "MEDICAL_OR_THERAPEUTIC",
+        "reason": "本轮没有医疗或治疗证据，且广告方向明确要求避免医疗广告表达。"
+      },
+      {
+        "claim_id": "prohibited-quantified",
+        "text": "14天、96.67%、15%等量化效果",
+        "claim_type": "BENEFIT",
+        "reason": "用户提供的来源页含有这些文字，但本轮没有独立证据授权在成片中使用。"
+      },
+      {
+        "claim_id": "prohibited-absolute",
+        "text": "永久、绝对、医学保证或夸张before/after",
+        "claim_type": "BENEFIT",
+        "reason": "属于绝对或未经支持的效果承诺。"
+      }
+    ],
+    "required_disclaimers": []
+  },
+  "audience": {
+    "target_consumer": "关注通勤、出游、运动和约会场景清爽感的年轻女性",
+    "context": "炎热天气下的出门准备与近距离社交",
+    "pain_point": "汗湿黏腻和异味带来的轻微社交顾虑",
+    "desired_outcome": "保持清爽、舒适和自然自信"
+  },
+  "platform": {
+    "platform": "douyin",
+    "placement": "vertical-feed",
+    "constraints": [
+      "9:16原生竖屏，关键文字位于移动端安全区",
+      "不得使用医疗、绝对或未经支持的量化宣称",
+      "苗家女孩应现代、自然、克制，避免刻板印象和过度性感化"
+    ]
+  },
+  "objective": "CONVERSION",
+  "duration_seconds": 30,
+  "aspect_ratio": "9:16",
+  "language": "zh-CN",
+  "style": "清爽高级、轻民族感、女性自信、明快留白的抖音电商广告",
+  "ad_format": "problem_solution",
+  "references": [
+    "assets/product-packshot.jpg",
+    "current-user-shot-brief-2026-08-26-v5-repair"
+  ],
+  "constraints": [
+    "保持黄色包装盒、黄色瓶身标签、白色瓶盖、瓶型和盒型",
+    "只使用本输入允许的claims",
+    "成片是媒体候选，不自动代表P6或Final Acceptance",
+    "生成手持画面只作为动作提示；所有可读包装与产品英雄镜头必须使用用户源产品图",
+    "T8人物素材使用768x1344原生portrait canvas，最终Composition输出1080x1920",
+    "整片必须包含可听辨的中文商品推广口播，且商品名与允许claim可追溯",
+    "live-action镜头不得使用clone-frame或freeze padding补时长",
+    "每个剪辑边界必须按前后状态和scene intent验收；不得把两个不连续动作直接伪装为一个Shot"
+  ]
+}

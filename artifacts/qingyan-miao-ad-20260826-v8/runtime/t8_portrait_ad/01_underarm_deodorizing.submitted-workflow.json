@@ -1,0 +1,170 @@
+{
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "10": {
+    "class_type": "MiniMaxH3AVDecodeT8",
+    "inputs": {
+      "audio_vae": [
+        "4",
+        0
+      ],
+      "av_latent": [
+        "9",
+        0
+      ],
+      "video_vae": [
+        "3",
+        0
+      ]
+    }
+  },
+  "11": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "audio": [
+        "10",
+        1
+      ],
+      "crf": 17,
+      "filename_prefix": "development_experiment/qingyan_v8_01_underarm_deodorizing_seed8262801",
+      "format": "video/h264-mp4",
+      "frame_rate": 24.0,
+      "images": [
+        "10",
+        0
+      ],
+      "loop_count": 0,
+      "pingpong": false,
+      "pix_fmt": "yuv420p",
+      "save_metadata": true,
+      "save_output": true,
+      "trim_to_audio": false
+    }
+  },
+  "12": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "qingyan-v8-01_underarm_deodorizing-69470e24f03d3d12.png"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+      "device": "default",
+      "type": "minimax"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "minimax_h3_video_vae_fp16.safetensors"
+    }
+  },
+  "4": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "minimax_h3_audio_vae_fp32.safetensors"
+    }
+  },
+  "5": {
+    "class_type": "MiniMaxH3AudioConditioningT8",
+    "inputs": {
+      "add_source_as_reference": false,
+      "audio_denoise_strength": 1.0,
+      "audio_mode": "native",
+      "audio_vae": [
+        "4",
+        0
+      ],
+      "clip": [
+        "2",
+        0
+      ],
+      "first_frame": [
+        "12",
+        0
+      ],
+      "height": 1344,
+      "length": 175,
+      "prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced.\n\nintegrated_multimodal_description: [Shot 1] One continuous native portrait live-action premium personal-care commercial. Start exactly from Picture 1 with the same 22-year-old Miao woman, natural Chinese face, ivory blouse with refined indigo Miao embroidery, navy skirt, restrained silver earrings and silver hair ornament. The camera remains at an exaggerated very low close viewpoint beside her raised right elbow, looking diagonally upward along the fully clothed embroidered sleeve toward her face. Her underarm stays completely covered by the loose blouse. A translucent warm-yellow stuffy haze drifts close to the lens as a clean visual metaphor for heat and odor. She looks mildly bothered, never disgusted. She removes the white cap from exactly one small yellow-and-white Qingyan spray bottle, aims it only at the outside of the clothed underarm, and presses the nozzle exactly once. A fine visible mist and a crisp pale blue-white airflow sweep outward; the yellow haze rapidly disperses and the room becomes clear, bright and fresh. Her expression changes to relieved confidence. The camera slowly dollies backward and rises into a stable eye-level medium composition without a cut. During the final two seconds, exactly one elderly Miao woman with a kind lined Chinese face, grey hair in a neat bun, dark indigo traditional blouse with restrained silver details enters naturally through the doorway on screen right, notices the bottle, and stops beside the young woman. End on a still-moving but stable medium two-shot: young woman on screen left holding exactly one capped bottle at waist height, elderly woman on screen right looking curiously at the bottle. Realistic anatomy and fabric physics, tasteful hygienic advertising, no bare armpit, no sexualized pose, no scene cut, no flash, no extra person, no extra limb, no duplicated bottle, no package box, no floating product, no corner product icon, no embedded text, no logo overlay, no label morphing, no camera shake.\noverall_soundscape: Natural quiet indoor room tone, one soft aerosol press and fine spray hiss, subtle fabric movement, one restrained silver-earring chime, and light footsteps as the elderly woman enters. No voice and no speech.\nnon_diegetic_music: Very soft clean modern plucked strings at a steady gentle tempo, far below the diegetic sound, with no dramatic hit.",
+      "prompt_primary_audio_ordinal": 0,
+      "ref_image_size": "match",
+      "reference_video_policy": "official_2_to_15s",
+      "strict_prompt_tags": true,
+      "task_type": "I2VA",
+      "video_vae": [
+        "3",
+        0
+      ],
+      "width": 768
+    }
+  },
+  "6": {
+    "class_type": "MiniMaxH3DualClockSamplerT8",
+    "inputs": {
+      "av_latent": [
+        "5",
+        1
+      ],
+      "model": [
+        "1",
+        0
+      ],
+      "sampler_name": "res_multistep",
+      "scheduler": "simple",
+      "shift_audio": 3.0,
+      "shift_video": 12.0,
+      "steps": 20
+    }
+  },
+  "7": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 8262801
+    }
+  },
+  "8": {
+    "class_type": "BasicGuider",
+    "inputs": {
+      "conditioning": [
+        "5",
+        0
+      ],
+      "model": [
+        "6",
+        0
+      ]
+    }
+  },
+  "9": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "guider": [
+        "8",
+        0
+      ],
+      "latent_image": [
+        "5",
+        1
+      ],
+      "noise": [
+        "7",
+        0
+      ],
+      "sampler": [
+        "6",
+        1
+      ],
+      "sigmas": [
+        "6",
+        2
+      ]
+    }
+  }
+}

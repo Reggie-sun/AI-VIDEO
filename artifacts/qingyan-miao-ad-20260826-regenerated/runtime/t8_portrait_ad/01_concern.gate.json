@@ -1,0 +1,57 @@
+{
+  "schema_version": "agent-post-media-gate/1",
+  "shot_id": "01_concern",
+  "output_sha256": "9e3d64b6fa85e4eba47fcbae09c55e10d0b6897b663da65ff1708acf71619a0f",
+  "evidence": {
+    "project_local_mcp_calls": [
+      "video_probe",
+      "video_extract_frames",
+      "video_review"
+    ],
+    "sampled_frame_count": 10,
+    "dense_review": "review/01_concern/frames38-47.jpg",
+    "decoded_frames": 56,
+    "video_full_decode": "PASS",
+    "audio_full_decode": "PASS",
+    "flow_p90_median": 0.9662851691,
+    "flow_p90_max": 9.7874507904,
+    "flow_max_transition": 42,
+    "mad_median": 1.7856639624,
+    "mad_max": 5.9080286026,
+    "mad_max_transition": 46
+  },
+  "findings": [
+    {
+      "requirement_id": "shot.identity.main_character",
+      "verdict": "PASS",
+      "reason": "The same young Miao woman, face, embroidery, earrings and hair ornament remain stable across sampled frames."
+    },
+    {
+      "requirement_id": "shot.cast.allowed_count",
+      "verdict": "PASS",
+      "reason": "Exactly one person remains visible and no extra limb enters the frame."
+    },
+    {
+      "requirement_id": "shot.action.concern_check",
+      "verdict": "PASS",
+      "reason": "The restrained underarm-fabric check resolves into a natural hand lowering without an uncomfortable sweat close-up."
+    },
+    {
+      "requirement_id": "shot.motion.required",
+      "verdict": "PASS",
+      "reason": "All 56 frames are present; dense inspection around the measured motion peaks shows one continuous lowering motion rather than a hard jump."
+    },
+    {
+      "requirement_id": "shot.camera.intent",
+      "verdict": "PASS",
+      "reason": "The portrait camera remains visually locked with a stable window and interior background."
+    },
+    {
+      "requirement_id": "shot.delivery.portrait_canvas",
+      "verdict": "PASS",
+      "reason": "The exact output is native 768x1344 portrait, 24 fps, 56 frames with AAC audio."
+    }
+  ],
+  "overall_verdict": "PASS",
+  "boundary": "Agent-side sequential post-media Gate only; not Production candidate activation, P6 or Final Acceptance."
+}

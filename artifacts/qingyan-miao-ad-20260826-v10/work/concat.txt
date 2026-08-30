@@ -1,0 +1,7 @@
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260826-v10/work/00-problem.mp4'
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260826-v10/work/01a-treatment.mp4'
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260826-v10/work/01b-recap-elder-enters.mp4'
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260826-v10/work/02-dialogue.mp4'
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260826-v10/work/03-leave.mp4'
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260826-v10/work/04-benefit.mp4'
+file '/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260826-v10/work/05-product-hero.mp4'

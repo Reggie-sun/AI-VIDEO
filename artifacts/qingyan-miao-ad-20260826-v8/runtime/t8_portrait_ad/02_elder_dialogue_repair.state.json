@@ -1,0 +1,10 @@
+{
+  "output_sha256": "4d28cd1f9ea588802d8028e5581fa421e33f3cd5154159971b7179e1226ba2aa",
+  "prompt_id": "f60dfb25-0f87-4377-82a7-776767407b8a",
+  "receipt": "artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/02_elder_dialogue_repair.receipt.json",
+  "seed": 8262803,
+  "shot_id": "02_elder_dialogue_repair",
+  "source_sha256": "2f4e2198c3cab189e8853579e6b3c9aa0bb9862b14032b0f58070177d24790e4",
+  "status": "completed",
+  "submitted_graph_sha256": "8171c885829d2d168653bc73283ffdb857871228eca9d5c17b901c686b25c2ab"
+}

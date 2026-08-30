@@ -1,0 +1,67 @@
+{
+  "schema_version": "agent-post-media-gate/1",
+  "shot_id": "03_preuse_hint",
+  "output_sha256": "ef4e6ae65181eff913a1e3086510c7e70125f05815e6066523023745f69ad3e8",
+  "evidence": {
+    "project_local_mcp_calls": [
+      "video_probe",
+      "video_extract_frames",
+      "video_review"
+    ],
+    "sampled_frame_count": 10,
+    "dense_review": "review/03_preuse_hint/frames18-35.jpg",
+    "decoded_frames": 56,
+    "video_full_decode": "PASS",
+    "audio_full_decode": "PASS",
+    "flow_p90_median": 0.5365337133,
+    "flow_p90_max": 1.2776331902,
+    "flow_max_transition": 30,
+    "mad_median": 1.7990286691,
+    "mad_max": 4.0996103438,
+    "mad_max_transition": 30
+  },
+  "findings": [
+    {
+      "requirement_id": "shot.identity.main_character",
+      "verdict": "PASS",
+      "reason": "The same young Miao woman, facial identity, embroidery, earrings and hair ornament remain stable throughout the clip."
+    },
+    {
+      "requirement_id": "shot.cast.allowed_count",
+      "verdict": "PASS",
+      "reason": "Exactly one person and two coherent hands are present; no extra hand, arm or person appears."
+    },
+    {
+      "requirement_id": "shot.product.presence",
+      "verdict": "PASS",
+      "reason": "The capped yellow-labelled bottle remains continuously visible and is never replaced by another object."
+    },
+    {
+      "requirement_id": "shot.product.packaging_identity",
+      "verdict": "PASS",
+      "reason": "The stable white cap, yellow label and cylindrical bottle silhouette preserve the supplied product's coarse identity; exact readable copy remains reserved for the source packshot."
+    },
+    {
+      "requirement_id": "shot.action.preuse_hint",
+      "verdict": "PASS",
+      "reason": "The capped bottle rotates slightly and rises in one restrained continuous product-ready gesture, without exposed skin or an implausible cross-body spray."
+    },
+    {
+      "requirement_id": "shot.motion.required",
+      "verdict": "PASS",
+      "reason": "All 56 frames decode; dense inspection around transitions 18-35 confirms a continuous short lift and rotation with no temporal seam."
+    },
+    {
+      "requirement_id": "shot.camera.intent",
+      "verdict": "PASS",
+      "reason": "The portrait camera remains locked and the window background stays stable."
+    },
+    {
+      "requirement_id": "shot.delivery.portrait_canvas",
+      "verdict": "PASS",
+      "reason": "The exact output is native 768x1344 portrait, 24 fps, 56 frames with AAC audio."
+    }
+  ],
+  "overall_verdict": "PASS",
+  "boundary": "Agent-side sequential post-media Gate only; not Production candidate activation, P6 or Final Acceptance."
+}

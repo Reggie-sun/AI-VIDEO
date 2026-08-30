@@ -1,0 +1,67 @@
+{
+  "schema_version": "agent-post-media-gate/1",
+  "shot_id": "02_product_lift",
+  "output_sha256": "6d7f12ed2d9f7ec4e4346893aac667c57fe578c1330ceab75423fe35aa08f499",
+  "evidence": {
+    "project_local_mcp_calls": [
+      "video_probe",
+      "video_extract_frames",
+      "video_review"
+    ],
+    "sampled_frame_count": 10,
+    "dense_review": "review/02_product_lift/frames16-31.jpg",
+    "decoded_frames": 56,
+    "video_full_decode": "PASS",
+    "audio_full_decode": "PASS",
+    "flow_p90_median": 1.5930947065,
+    "flow_p90_max": 4.2543535233,
+    "flow_max_transition": 26,
+    "mad_median": 3.1911117312,
+    "mad_max": 6.0831676665,
+    "mad_max_transition": 22
+  },
+  "findings": [
+    {
+      "requirement_id": "shot.identity.main_character",
+      "verdict": "PASS",
+      "reason": "The same young Miao woman, face, embroidered blouse, earrings and hair ornament remain stable across sampled and dense-review frames."
+    },
+    {
+      "requirement_id": "shot.cast.allowed_count",
+      "verdict": "PASS",
+      "reason": "Exactly one person and two anatomically coherent hands remain visible throughout the reviewed sequence."
+    },
+    {
+      "requirement_id": "shot.product.presence",
+      "verdict": "PASS",
+      "reason": "A yellow-labelled cylindrical bottle with a white cap remains continuously visible as the primary handled product."
+    },
+    {
+      "requirement_id": "shot.product.packaging_identity",
+      "verdict": "PASS",
+      "reason": "The required yellow label, white cap and cylindrical bottle silhouette remain stable at the coarse visual-identity level; readable label truth will use the supplied source packshot in composition."
+    },
+    {
+      "requirement_id": "shot.action.product_presentation",
+      "verdict": "PASS",
+      "reason": "The bottle rises continuously from waist to chest level and the free hand naturally points toward it without an implausible grip change."
+    },
+    {
+      "requirement_id": "shot.motion.required",
+      "verdict": "PASS",
+      "reason": "All 56 frames decode; dense inspection around transitions 16-31 shows continuous arm and bottle motion with no hard cut or temporal jump."
+    },
+    {
+      "requirement_id": "shot.camera.intent",
+      "verdict": "PASS",
+      "reason": "The portrait camera and window background remain visually stable while the subject performs the product lift."
+    },
+    {
+      "requirement_id": "shot.delivery.portrait_canvas",
+      "verdict": "PASS",
+      "reason": "The exact output is native 768x1344 portrait, 24 fps, 56 frames with AAC audio."
+    }
+  ],
+  "overall_verdict": "PASS",
+  "boundary": "Agent-side sequential post-media Gate only; not Production candidate activation, P6 or Final Acceptance."
+}

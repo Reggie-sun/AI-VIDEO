@@ -1,0 +1,59 @@
+{
+  "gate": "QINGYAN_V5_REQUIREMENT_LEVEL_MEDIA_GATE",
+  "status": "PASS",
+  "artifact": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v5/final/青颜_苗家女孩T8对白修复广告_30s_9x16_v5.mp4",
+    "sha256": "3e8f46318a273e410d7360cc19b8b5acd5cd081d146463ee2e182ee72dedbfe9"
+  },
+  "findings": [
+    {
+      "requirement": "ad.audio.product_recommendation",
+      "status": "PASS",
+      "evidence": "Whisper medium 检出 4.12-9.16 秒普通话推广口播；青颜/抑汗为同音字误写，净味与清爽舒适完整；同窗烧录准确中文文案。"
+    },
+    {
+      "requirement": "ad.audio.voice_continuity",
+      "status": "PASS",
+      "evidence": "仅一个 T8 native-audio 人声 Shot；单一画内女性持续说完整句，无换说话人。"
+    },
+    {
+      "requirement": "ad.motion.required_windows",
+      "status": "PASS",
+      "evidence": "freezedetect 在所有 live-action windows 中无 >=0.25 秒冻结；原始开头 8 个静止帧已移除。"
+    },
+    {
+      "requirement": "ad.edit.pacing",
+      "status": "PASS",
+      "evidence": "合成脚本无 tpad/clone/reverse；10 段真实源/动画帧以 9 个 6-frame dissolve 得到精确 720 帧。"
+    },
+    {
+      "requirement": "ad.continuity.character",
+      "status": "PASS",
+      "evidence": "30 帧全片 contact sheet 与 27 帧 boundary sheet 显示主脸、苗族元素服饰、发型稳定；对白段嘴部连续发声。"
+    },
+    {
+      "requirement": "ad.continuity.spatial_temporal",
+      "status": "PASS",
+      "evidence": "室内推荐、户外行走、社交与产品卡被定义为独立 beat；信息卡显式重置空间，未把脚步/姿态硬拼成同一 Shot。"
+    },
+    {
+      "requirement": "ad.product.packaging_consistency",
+      "status": "PASS",
+      "evidence": "可读产品卡全部来自 source packshot SHA-256 03d27bd46be48082b6d5ac737fbbb1f6cdca68b891d6c7d7c58eaa2c1c14f078；人物手持只承担 coarse identity。"
+    },
+    {
+      "requirement": "ad.copy.claim_compliance",
+      "status": "PASS",
+      "evidence": "口播与字幕仅使用青颜、抑汗净味、清爽舒适、帮助减少汗湿困扰等已允许表述；无医疗、量化、全天或绝对效果 claim。"
+    },
+    {
+      "requirement": "ad.delivery.duration_aspect",
+      "status": "PASS",
+      "evidence": "ffprobe/count_frames: 1080x1920, 24fps, 720 frames, video duration 30.000 秒；H.264 High + AAC 48kHz stereo。"
+    }
+  ],
+  "limitations": [
+    "这是 local development requirement-level Gate，不是 Production Manifest activation、P6、Final Acceptance 或平台发布证明。",
+    "最终消费者观感仍需用户播放 exact MP4 作 human visual acceptance；工具与 Agent 抽帧不能替代该判定。"
+  ]
+}

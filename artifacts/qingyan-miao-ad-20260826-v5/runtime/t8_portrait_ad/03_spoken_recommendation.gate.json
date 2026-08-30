@@ -1,0 +1,64 @@
+{
+  "schema_version": "agent-per-shot-post-media-gate/1",
+  "shot_id": "03_spoken_recommendation",
+  "artifact_path": "artifacts/qingyan-miao-ad-20260826-v5/runtime/t8_portrait_ad/03_spoken_recommendation.mp4",
+  "artifact_sha256": "43a3838e3d002567c58abbc0d0ee4647996d236600d0023e40e03fd7332b3b72",
+  "overall_verdict": "PASS",
+  "required_findings": [
+    {
+      "requirement_id": "shot.delivery.portrait_canvas",
+      "verdict": "PASS",
+      "reason": "Project video_probe measured native 768x1344, 24 fps, 124 frames and one AAC 32 kHz stereo stream."
+    },
+    {
+      "requirement_id": "shot.dialogue.presence",
+      "verdict": "PASS",
+      "reason": "Project video_review measured approximately 5.0 seconds of speech in the 5.167-second clip."
+    },
+    {
+      "requirement_id": "shot.dialogue.product_recommendation",
+      "verdict": "PASS",
+      "reason": "Independent small and medium Chinese ASR both recovered the full spoken phonetic sequence for 出门前用青颜，抑汗净味，清爽舒适. The orthographic alternatives 青言/清盐 and 意汗/意旱 are homophones; medium ASR closed 净味 and 清爽舒适. Exact written characters remain owned by the burned caption, not inferred from audio orthography alone."
+    },
+    {
+      "requirement_id": "shot.dialogue.speaker_binding",
+      "verdict": "PASS",
+      "reason": "Dense visual contact frames show the single on-screen main woman looking toward camera with continuous speaking mouth shapes and no second visible speaker."
+    },
+    {
+      "requirement_id": "shot.identity.main_character",
+      "verdict": "PASS",
+      "reason": "Face, hair ornament, earrings, embroidered ivory blouse and navy skirt remain stable across the sampled sequence."
+    },
+    {
+      "requirement_id": "shot.product.coarse_identity",
+      "verdict": "PASS",
+      "reason": "The hand-held capped cylindrical bottle keeps a stable yellow label and white cap; readable label truth remains delegated to the source packshot in Composition."
+    },
+    {
+      "requirement_id": "shot.anatomy.allowed_hands",
+      "verdict": "PASS",
+      "reason": "Exactly two hands remain attached to the main woman; the bottle lift is continuous and no extra arm enters the frame."
+    },
+    {
+      "requirement_id": "shot.motion.required",
+      "verdict": "PASS",
+      "reason": "Mouth, head, bottle hand and free hand show continuous motion. FFmpeg freezedetect found only the initial 0.25-second settle and no later freeze interval."
+    },
+    {
+      "requirement_id": "shot.edit.no_internal_seam",
+      "verdict": "PASS",
+      "reason": "Project review measured one scene; dense frames show one locked-camera take with no internal cut, pose reset or scale jump."
+    }
+  ],
+  "tool_evidence": {
+    "video_probe": true,
+    "video_review": true,
+    "video_transcribe_small_zh": "出門前用青言,意汗敬畏,清爽舒適",
+    "video_transcribe_medium_zh": "出门前用清盐,意旱净味,清爽舒适。",
+    "video_audio_full_decode": "PASS",
+    "video_full_decode": "PASS",
+    "contact_sheet": "artifacts/qingyan-miao-ad-20260826-v5/review/03-spoken-contact.jpg"
+  },
+  "acceptance_boundary": "Development per-Shot evidence only; not Production activation, P6 or Final Acceptance."
+}

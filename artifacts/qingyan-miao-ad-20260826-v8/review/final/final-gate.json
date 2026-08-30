@@ -1,0 +1,70 @@
+{
+  "gate_version": "agent-final-candidate-v1",
+  "artifact": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v8/final/青颜_苗家双人腋下止汗对话广告_30s_9x16_v8.mp4",
+    "sha256": "e534c4ac93da0b03a0ac3f028fb6c83bf50292716dfccc64f0a49ae4828e5bd8",
+    "duration_seconds": 30.022,
+    "video_duration_seconds": 30.0,
+    "audio_duration_seconds": 30.0,
+    "frame_count": 720,
+    "width": 1080,
+    "height": 1920,
+    "fps": 24
+  },
+  "timeline": [
+    {"shot": "01_underarm_deodorizing_repair", "start": 0.0, "end": 7.292},
+    {"shot": "02_elder_dialogue_repair", "start": 7.292, "end": 13.75},
+    {"shot": "03_leave_together", "start": 13.75, "end": 25.0},
+    {"shot": "04_golden_fluid_benefit", "start": 25.0, "end": 27.5},
+    {"shot": "05_product_hero", "start": 27.5, "end": 30.0}
+  ],
+  "evidence": {
+    "video_analysis_probe": "PASS: H.264 High 1080x1920, 24fps, 720 frames, AAC 48kHz stereo; exact video and audio streams are 30.000s",
+    "video_analysis_review": "PASS: issues=[], unique_frame_ratio=0.999 from 1437 sampled frames",
+    "video_analysis_transcribe": "PASS for dialogue order: elder question 7.20-9.04s, young response 9.04-12.20s, elder endorsement 12.20-13.68s; ASR does not prove brand spelling",
+    "boundary_ssim": {
+      "shot01_to_shot02": 0.951692,
+      "shot02_to_shot03": 0.972581
+    },
+    "freeze_detection": "No >=0.35s freeze at either character-shot boundary. Opening has a deliberate 0.917s low-motion setup; final two 2.5s graphic holds are intentional.",
+    "loudness": "Integrated -19.2 LUFS; true peak -8.5 dBFS",
+    "contact_sheet": "review/final/contact-1fps.jpg",
+    "boundary_montage": "review/final/all-boundaries.jpg"
+  },
+  "required_findings": [
+    {
+      "requirement": "Opening clearly communicates exaggerated but tasteful underarm deodorizing",
+      "status": "PASS",
+      "evidence": "The young woman raises one clothed arm; warm odor haze is replaced by a blue-white clean-air effect while the body remains fully clothed and non-sexualized."
+    },
+    {
+      "requirement": "An elderly woman participates in audible on-camera promotional dialogue",
+      "status": "PASS",
+      "evidence": "Three ordered dialogue turns are present and subtitle-bound to elder, young woman, then elder. Visual staging alternates speaker/listener behavior."
+    },
+    {
+      "requirement": "Character Shots do not stutter or use a white-flash seam",
+      "status": "PASS",
+      "evidence": "Character transitions are direct continuity cuts with matched people, wardrobe, room and pose; boundary SSIM is 0.951692 and 0.972581, and no boundary freeze is detected."
+    },
+    {
+      "requirement": "No repeated floating product icon or simultaneous hand-product plus corner packshot",
+      "status": "PASS",
+      "evidence": "Character Shots contain only the single physical bottle. The rejected floating package output is not used; full packshot graphics appear only once at the ending."
+    },
+    {
+      "requirement": "The two final graphics appear once, total five seconds, without yellow bar or white flash",
+      "status": "PASS",
+      "evidence": "Benefit graphic is 25.0-27.5s and product hero is 27.5-30.0s. Both are fixed 60-frame holds; measured consecutive-frame differences are codec-level only."
+    },
+    {
+      "requirement": "Exact 30-second portrait delivery",
+      "status": "PASS",
+      "evidence": "720 frames at 24fps, 1080x1920; both encoded streams are exactly 30.000s."
+    }
+  ],
+  "verdict": "TARGETED_AGENT_GATE_PASS",
+  "human_visual_verdict": "PENDING",
+  "production_state": "LOCAL_CANDIDATE_ONLY",
+  "final_acceptance": false
+}

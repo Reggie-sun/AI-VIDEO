@@ -1,0 +1,10 @@
+{
+  "output_sha256": "6d7f12ed2d9f7ec4e4346893aac667c57fe578c1330ceab75423fe35aa08f499",
+  "prompt_id": "3acdc77c-2c69-419c-ba58-7e5cb99bf12d",
+  "receipt": "artifacts/qingyan-miao-ad-20260826-regenerated/runtime/t8_portrait_ad/02_product_lift.receipt.json",
+  "seed": 8262602,
+  "shot_id": "02_product_lift",
+  "source_sha256": "e0b5b9e588819ec595d4ea346668a3c6348dddd20b216103d1725bd4fd700a74",
+  "status": "completed",
+  "submitted_graph_sha256": "571358fea8de07efc932d3f6c46b2128002db37757b1f9b161df64f9e8bd24ac"
+}

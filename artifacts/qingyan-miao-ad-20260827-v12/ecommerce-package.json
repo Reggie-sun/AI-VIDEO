@@ -1,0 +1,162 @@
+{
+  "schema_version": "ecommerce-ad-workflow/package/2",
+  "package_id": "b3dd381614b057275afbbdb86354ddc7894999560785cd62e042e9b8afbcebef",
+  "source_input_hash": "f358082ffcd80bd3ed3867bb1c03b0d44e9fd1aebb4e0ed0cae729d219d5469a",
+  "duration_seconds": 30.0,
+  "aspect_ratio": "9:16",
+  "ad_format": "problem_solution",
+  "product_truth": {
+    "sku_id": "qingyan-aluminum-chlorohydrate-refreshing-spray-60ml",
+    "product_name": "青颜 氯化羟铝抑汗净味喷雾",
+    "source_assets": [
+      {"asset_id": "asset-qingyan-packshot", "source_kind": "IMAGE", "reference": "assets/product-packshot.jpg", "rights_status": "CONFIRMED"}
+    ],
+    "sources": [
+      {"source_id": "source-user-product-image", "source_kind": "PRODUCT_ASSET", "reference": "assets/product-packshot.jpg", "rights_status": "CONFIRMED"},
+      {"source_id": "source-user-v12-brief", "source_kind": "USER_ATTESTATION", "reference": "current-user-request-2026-08-27-v12", "rights_status": "CONFIRMED"}
+    ],
+    "facts": [
+      {"fact_id": "fact-product-identity", "statement": "包装正面可观察到黄色盒装、黄色瓶身标签、白色瓶盖、青颜字样、氯化羟铝抑汗净味喷雾和60ml标识。", "source_ids": ["source-user-product-image"]},
+      {"fact_id": "fact-approved-positioning", "statement": "用户要求使用抑汗、净味、清爽舒适的克制表达，并明确禁止无依据的时长、根除、永久或医疗承诺。", "source_ids": ["source-user-v12-brief", "source-user-product-image"]}
+    ],
+    "allowed_claims": [
+      {"claim_id": "claim-core", "text": "抑汗｜净味", "claim_type": "BENEFIT", "fact_ids": ["fact-product-identity", "fact-approved-positioning"], "source_ids": ["source-user-product-image", "source-user-v12-brief"]},
+      {"claim_id": "claim-comfort", "text": "清爽舒适", "claim_type": "BENEFIT", "fact_ids": ["fact-approved-positioning"], "source_ids": ["source-user-v12-brief", "source-user-product-image"]}
+    ],
+    "prohibited_claims": [
+      {"claim_id": "prohibited-medical", "text": "治疗、止痒、收缩汗腺或直接调节汗液分泌", "claim_type": "MEDICAL_OR_THERAPEUTIC", "reason": "没有医疗或治疗证据。"},
+      {"claim_id": "prohibited-quantified", "text": "24H、14天、96.67%、15%等时长或量化效果", "claim_type": "BENEFIT", "reason": "没有支持时长或量化效果的可核验证据。"},
+      {"claim_id": "prohibited-absolute", "text": "根除、永久、绝对、医学保证或夸张before/after", "claim_type": "BENEFIT", "reason": "属于绝对或未经支持的效果承诺。"}
+    ],
+    "required_disclaimers": []
+  },
+  "claim_ledger": [
+    {"claim_id": "claim-core", "status": "USED", "fact_ids": ["fact-product-identity", "fact-approved-positioning"], "source_ids": ["source-user-product-image", "source-user-v12-brief"], "used_at": ["audio-recommend", "copy-treatment", "copy-cta"], "spoken_form": "青颜抑汗净味喷雾", "visual_form": "抑汗｜净味"},
+    {"claim_id": "claim-comfort", "status": "USED", "fact_ids": ["fact-approved-positioning"], "source_ids": ["source-user-v12-brief", "source-user-product-image"], "used_at": ["audio-recommend", "copy-result"], "spoken_form": "清爽舒适", "visual_form": "清爽舒适"},
+    {"claim_id": "prohibited-medical", "status": "PROHIBITED", "fact_ids": [], "source_ids": [], "used_at": [], "spoken_form": null, "visual_form": null},
+    {"claim_id": "prohibited-quantified", "status": "PROHIBITED", "fact_ids": [], "source_ids": [], "used_at": [], "spoken_form": null, "visual_form": null},
+    {"claim_id": "prohibited-absolute", "status": "PROHIBITED", "fact_ids": [], "source_ids": [], "used_at": [], "spoken_form": null, "visual_form": null}
+  ],
+  "ad_strategy": {
+    "strategy_id": "strategy-elder-recommendation-causal-v12",
+    "audience": "在意通勤、出游与近距离社交清爽感的年轻女性",
+    "pain_point": "腋下汗湿黏腻和异味带来的社交顾虑",
+    "angle": "先建立真实问题，再由老人推荐，少女喷用后用自然同行证明舒适结果",
+    "promise": "只表达抑汗、净味与清爽舒适",
+    "proof_boundary": "不使用医疗、时长、量化或绝对效果承诺",
+    "objection_handling": "用可见动作、连续结果与已批准产品图完成说明，不追加未经支持的旁白",
+    "objective": "CONVERSION"
+  },
+  "hook_contract": {
+    "components": [
+      {"component_id": "hook-problem-visual", "kind": "VISUAL", "cue_seconds": 0.0, "content": "少女抬臂察觉腋下不适并下意识回避", "claim_ids": [], "bound_ids": ["beat-problem", "shot-problem"]},
+      {"component_id": "hook-problem-copy", "kind": "COPY", "cue_seconds": 0.1, "content": "汗湿黏腻？一靠近，就下意识躲开", "claim_ids": [], "bound_ids": ["copy-problem"]},
+      {"component_id": "hook-problem-audio", "kind": "AUDIO", "cue_seconds": 0.08, "content": "衣物摩擦声明确提示问题", "claim_ids": [], "bound_ids": ["audio-problem-sfx"]}
+    ],
+    "product_presence": "NONE",
+    "promise_claim_ids": ["claim-comfort"],
+    "promise_boundary": "舒适结果只在喷用之后表达",
+    "first_payoff_deadline_seconds": 17.041667,
+    "platform_constraints": ["问题在首秒可读且可听", "关键文案位于竖屏安全区"]
+  },
+  "ad_beats": [
+    {"beat_id": "beat-problem", "role": "PROBLEM", "start_seconds": 0.0, "end_seconds": 4.5, "duration_seconds": 4.5, "duration_basis": "HOOK_DENSITY", "pacing_rationale": "给表演、文案和声音足够时间共同建立问题。", "message": "汗湿黏腻带来靠近顾虑。", "shot_ids": ["shot-problem"], "presentation_ids": [], "copy_ids": ["copy-problem"], "audio_event_ids": ["audio-bgm", "audio-problem-sfx"]},
+    {"beat_id": "beat-recommend", "role": "PRODUCT_INTRO", "start_seconds": 4.5, "end_seconds": 7.25, "duration_seconds": 2.75, "duration_basis": "PROOF_READABILITY", "pacing_rationale": "一次完整推荐先于任何喷用动作。", "message": "老人向少女推荐青颜。", "shot_ids": ["shot-recommend"], "presentation_ids": ["presentation-intro"], "copy_ids": ["copy-recommend"], "audio_event_ids": ["audio-bgm", "audio-recommend"]},
+    {"beat_id": "beat-treatment", "role": "DEMONSTRATION", "start_seconds": 7.25, "end_seconds": 13.25, "duration_seconds": 6.0, "duration_basis": "DEMO_COMPLEXITY", "pacing_rationale": "连续展示旋开、放盖、抬臂与喷雾。", "message": "少女听从建议并完成喷用。", "shot_ids": ["shot-treatment"], "presentation_ids": ["presentation-demo"], "copy_ids": ["copy-treatment"], "audio_event_ids": ["audio-bgm", "audio-cap", "audio-spray"]},
+    {"beat_id": "beat-result", "role": "BENEFIT_PROOF", "start_seconds": 13.25, "end_seconds": 17.041667, "duration_seconds": 3.791667, "duration_basis": "PROOF_READABILITY", "pacing_rationale": "自然微笑和收好产品明确区分结果状态。", "message": "喷用之后才表现清爽舒适。", "shot_ids": ["shot-result"], "presentation_ids": ["presentation-result"], "copy_ids": ["copy-result"], "audio_event_ids": ["audio-bgm", "audio-result-sfx"]},
+    {"beat_id": "beat-social", "role": "BENEFIT_PROOF", "start_seconds": 17.041667, "end_seconds": 24.333333, "duration_seconds": 7.291666, "duration_basis": "PROOF_READABILITY", "pacing_rationale": "一个连续同行镜头让22秒不再成为异常切点。", "message": "两人自然靠近同行。", "shot_ids": ["shot-social"], "presentation_ids": [], "copy_ids": ["copy-social"], "audio_event_ids": ["audio-bgm"]},
+    {"beat_id": "beat-close", "role": "CTA_CLOSE", "start_seconds": 24.333333, "end_seconds": 30.0, "duration_seconds": 5.666667, "duration_basis": "CTA_DWELL", "pacing_rationale": "单一动态packshot完成识别和收口，不轮播静图。", "message": "以产品身份和已批准利益点收口。", "shot_ids": ["shot-close"], "presentation_ids": ["presentation-hero", "presentation-cta"], "copy_ids": ["copy-product-label", "copy-cta", "copy-end-card"], "audio_event_ids": ["audio-bgm", "audio-close-sfx"]}
+  ],
+  "product_presentation": [
+    {"presentation_id": "presentation-intro", "role": "INTRO", "mode": "IN_SCENE_GENERATED", "beat_id": "beat-recommend", "shot_id": "shot-recommend", "start_seconds": 4.5, "duration_seconds": 2.75, "product_source_asset_id": "asset-qingyan-packshot", "talent_interaction": "PHYSICAL_CONTACT", "occlusion_required": true, "lighting_shadow_required": true, "copy_cue_ids": ["copy-recommend"], "audio_cue_ids": ["audio-recommend"], "fallback_policy": "NONE", "capability_requirement_ids": ["req-source-media", "req-existing-contact"]},
+    {"presentation_id": "presentation-demo", "role": "DEMONSTRATION", "mode": "IN_SCENE_GENERATED", "beat_id": "beat-treatment", "shot_id": "shot-treatment", "start_seconds": 7.25, "duration_seconds": 6.0, "product_source_asset_id": "asset-qingyan-packshot", "talent_interaction": "PHYSICAL_CONTACT", "occlusion_required": true, "lighting_shadow_required": true, "copy_cue_ids": ["copy-treatment"], "audio_cue_ids": ["audio-cap", "audio-spray"], "fallback_policy": "NONE", "capability_requirement_ids": ["req-source-media", "req-existing-contact"]},
+    {"presentation_id": "presentation-result", "role": "BENEFIT_PROOF", "mode": "IN_SCENE_GENERATED", "beat_id": "beat-result", "shot_id": "shot-result", "start_seconds": 13.25, "duration_seconds": 3.791667, "product_source_asset_id": "asset-qingyan-packshot", "talent_interaction": "PHYSICAL_CONTACT", "occlusion_required": true, "lighting_shadow_required": true, "copy_cue_ids": ["copy-result"], "audio_cue_ids": ["audio-result-sfx"], "fallback_policy": "NONE", "capability_requirement_ids": ["req-source-media", "req-existing-contact"]},
+    {"presentation_id": "presentation-hero", "role": "HERO_SHOT", "mode": "DEDICATED_HERO_SHOT", "beat_id": "beat-close", "shot_id": "shot-close", "start_seconds": 24.333333, "duration_seconds": 5.666667, "product_source_asset_id": "asset-qingyan-packshot", "talent_interaction": "NONE", "occlusion_required": false, "lighting_shadow_required": false, "copy_cue_ids": ["copy-product-label"], "audio_cue_ids": ["audio-close-sfx"], "fallback_policy": "NONE", "capability_requirement_ids": ["req-product-asset", "req-ad-graphics"]},
+    {"presentation_id": "presentation-cta", "role": "CTA_SUPPORT", "mode": "GRAPHIC_REVEAL", "beat_id": "beat-close", "shot_id": "shot-close", "start_seconds": 24.333333, "duration_seconds": 5.666667, "product_source_asset_id": "asset-qingyan-packshot", "talent_interaction": "NONE", "occlusion_required": false, "lighting_shadow_required": false, "copy_cue_ids": ["copy-cta", "copy-end-card"], "audio_cue_ids": ["audio-close-sfx"], "fallback_policy": "NONE", "capability_requirement_ids": ["req-product-asset", "req-ad-graphics"]}
+  ],
+  "talent_plan": [
+    {"talent_id": "talent-girl", "role": "苗家少女", "appearance": "年轻女性，克制自然", "wardrobe": "白色上衣与深蓝苗族风格裙装", "performance": "问题时回避，听取推荐后完成喷用，结果段放松微笑", "continuity_anchors": ["固定发型", "白蓝服装", "屏幕左侧主位置"]},
+    {"talent_id": "talent-elder", "role": "苗家老人", "appearance": "银发老人，亲切可信", "wardrobe": "深蓝苗族风格上衣与银饰", "performance": "先主动推荐，结尾与少女自然同行", "continuity_anchors": ["银发盘发", "深蓝银饰服装", "屏幕右侧位置"]}
+  ],
+  "set_plan": [
+    {"set_id": "set-bright-room-doorway", "location": "明亮室内与相连门廊", "lighting": "柔和自然日光", "brand_palette": ["白", "深蓝", "黄色产品点缀"], "product_surface": "室内浅色圆桌", "continuity_anchors": ["左侧窗帘", "后方门框", "固定180度轴线"]}
+  ],
+  "copy_graphics_plan": [
+    {"copy_id": "copy-problem", "role": "HEADLINE", "text": "汗湿黏腻？一靠近，就下意识躲开", "priority": 1, "beat_id": "beat-problem", "shot_id": "shot-problem", "safe_area_intent": "上方中央安全区", "avoidance_intent": "不遮挡面部和腋下动作", "entrance_intent": "首帧后快速出现", "exit_intent": "推荐镜头前清除", "keyword_emphasis": ["汗湿黏腻"], "brand_token_reference": "problem-header", "synchronized_event_ids": ["audio-problem-sfx"], "treatment_id": "treatment-problem"},
+    {"copy_id": "copy-recommend", "role": "DIALOGUE_SUBTITLE", "text": "姑娘，试试青颜；抑汗净味，清爽舒适", "priority": 2, "beat_id": "beat-recommend", "shot_id": "shot-recommend", "safe_area_intent": "下方字幕安全区", "avoidance_intent": "不遮挡产品和手势", "entrance_intent": "与老人开口同步", "exit_intent": "对白结束即清除", "keyword_emphasis": ["青颜"], "brand_token_reference": "dialogue-subtitle", "synchronized_event_ids": ["audio-recommend"], "treatment_id": "treatment-dialogue"},
+    {"copy_id": "copy-treatment", "role": "BENEFIT_CALLOUT", "text": "听她的，旋开喷头；轻轻一喷", "priority": 3, "beat_id": "beat-treatment", "shot_id": "shot-treatment", "safe_area_intent": "下方中央安全区", "avoidance_intent": "不遮挡开盖和喷雾动作", "entrance_intent": "跟随开盖动作", "exit_intent": "喷雾结束后清除", "keyword_emphasis": ["轻轻一喷"], "brand_token_reference": "action-callout", "synchronized_event_ids": ["presentation-demo"], "treatment_id": "treatment-action"},
+    {"copy_id": "copy-result", "role": "PROOF_LABEL", "text": "清爽舒适", "priority": 2, "beat_id": "beat-result", "shot_id": "shot-result", "safe_area_intent": "下方中央安全区", "avoidance_intent": "不遮挡产品", "entrance_intent": "喷雾结束后出现", "exit_intent": "同行镜头前淡出", "keyword_emphasis": ["清爽舒适"], "brand_token_reference": "result-proof", "synchronized_event_ids": ["presentation-result"], "treatment_id": "treatment-result"},
+    {"copy_id": "copy-social", "role": "BENEFIT_CALLOUT", "text": "靠近，也更自在", "priority": 3, "beat_id": "beat-social", "shot_id": "shot-social", "safe_area_intent": "下方中央安全区", "avoidance_intent": "不遮挡两人步态", "entrance_intent": "同行稳定后出现", "exit_intent": "产品收口前清除", "keyword_emphasis": ["更自在"], "brand_token_reference": "social-callout", "synchronized_event_ids": ["audio-bgm"], "treatment_id": "treatment-social"},
+    {"copy_id": "copy-product-label", "role": "PRODUCT_LABEL", "text": "青颜 氯化羟铝抑汗净味喷雾", "priority": 1, "beat_id": "beat-close", "shot_id": "shot-close", "safe_area_intent": "产品下方安全区", "avoidance_intent": "不遮挡包装", "entrance_intent": "随产品缓慢推进出现", "exit_intent": "保持到终帧", "keyword_emphasis": ["青颜"], "brand_token_reference": "product-label", "synchronized_event_ids": ["presentation-hero"], "treatment_id": "treatment-product-label"},
+    {"copy_id": "copy-cta", "role": "CTA", "text": "抑汗｜净味", "priority": 1, "beat_id": "beat-close", "shot_id": "shot-close", "safe_area_intent": "下方中央安全区", "avoidance_intent": "不遮挡产品", "entrance_intent": "随收口提示音出现", "exit_intent": "保持到终帧", "keyword_emphasis": ["抑汗", "净味"], "brand_token_reference": "cta-benefit", "synchronized_event_ids": ["audio-close-sfx"], "treatment_id": "treatment-cta"},
+    {"copy_id": "copy-end-card", "role": "BRAND_END_CARD", "text": "青颜 氯化羟铝抑汗净味喷雾", "priority": 2, "beat_id": "beat-close", "shot_id": "shot-close", "safe_area_intent": "品牌收口安全区", "avoidance_intent": "保持packshot完整", "entrance_intent": "与产品页同帧出现", "exit_intent": "保持到终帧", "keyword_emphasis": ["青颜"], "brand_token_reference": "brand-end-card", "synchronized_event_ids": ["presentation-cta"], "treatment_id": "treatment-end-card"}
+  ],
+  "audio_plan": {
+    "events": [
+      {"event_id": "audio-bgm", "kind": "MUSIC", "start_seconds": 0.0, "end_seconds": 30.0, "beat_ids": ["beat-problem", "beat-recommend", "beat-treatment", "beat-result", "beat-social", "beat-close"], "shot_ids": ["shot-problem", "shot-recommend", "shot-treatment", "shot-result", "shot-social", "shot-close"], "source_requirement": "已授权的低音量器乐BGM", "speaker_id": null, "verbatim_line": null, "on_camera": false, "lip_sync_required": false, "energy": "低调连续，推荐对白下自动让位", "ducking_required": true, "synchronized_event_ids": [], "silence_rationale": null},
+      {"event_id": "audio-problem-sfx", "kind": "SFX", "start_seconds": 0.08, "end_seconds": 0.93, "beat_ids": ["beat-problem"], "shot_ids": ["shot-problem"], "source_requirement": "衣物摩擦提示音", "speaker_id": null, "verbatim_line": null, "on_camera": false, "lip_sync_required": false, "energy": "短促可辨", "ducking_required": false, "synchronized_event_ids": ["hook-problem-audio", "copy-problem"], "silence_rationale": null},
+      {"event_id": "audio-recommend", "kind": "DIALOGUE", "start_seconds": 4.5, "end_seconds": 7.25, "beat_ids": ["beat-recommend"], "shot_ids": ["shot-recommend"], "source_requirement": "由既有已接受原生对白重构的一次推荐", "speaker_id": "talent-elder", "verbatim_line": "姑娘，青颜抑汗净味喷雾，清爽舒适。", "on_camera": true, "lip_sync_required": true, "energy": "亲切、直接、只说一次", "ducking_required": true, "synchronized_event_ids": ["presentation-intro", "copy-recommend"], "silence_rationale": null},
+      {"event_id": "audio-cap", "kind": "SFX", "start_seconds": 7.8, "end_seconds": 8.28, "beat_ids": ["beat-treatment"], "shot_ids": ["shot-treatment"], "source_requirement": "开盖机械声", "speaker_id": null, "verbatim_line": null, "on_camera": false, "lip_sync_required": false, "energy": "干净短促", "ducking_required": false, "synchronized_event_ids": ["presentation-demo"], "silence_rationale": null},
+      {"event_id": "audio-spray", "kind": "SFX", "start_seconds": 11.15, "end_seconds": 11.73, "beat_ids": ["beat-treatment"], "shot_ids": ["shot-treatment"], "source_requirement": "绑定真实喷雾动作的柔和喷雾声", "speaker_id": null, "verbatim_line": null, "on_camera": false, "lip_sync_required": false, "energy": "细雾短喷", "ducking_required": false, "synchronized_event_ids": ["presentation-demo", "copy-treatment"], "silence_rationale": null},
+      {"event_id": "audio-result-sfx", "kind": "SFX", "start_seconds": 13.25, "end_seconds": 14.5, "beat_ids": ["beat-result"], "shot_ids": ["shot-result"], "source_requirement": "轻微清亮提示音", "speaker_id": null, "verbatim_line": null, "on_camera": false, "lip_sync_required": false, "energy": "克制清亮", "ducking_required": false, "synchronized_event_ids": ["presentation-result", "copy-result"], "silence_rationale": null},
+      {"event_id": "audio-close-sfx", "kind": "SFX", "start_seconds": 24.333333, "end_seconds": 25.583333, "beat_ids": ["beat-close"], "shot_ids": ["shot-close"], "source_requirement": "单一品牌收口提示音", "speaker_id": null, "verbatim_line": null, "on_camera": false, "lip_sync_required": false, "energy": "柔和坚定", "ducking_required": false, "synchronized_event_ids": ["presentation-hero", "presentation-cta", "copy-cta"], "silence_rationale": null}
+    ],
+    "source_audio_policies": [
+      {"shot_id": "shot-problem", "source_type": "GENERATED", "policy": "REPLACE", "trim_start_seconds": null, "lead_in_noise_risk": false, "p6_measurement_required": true, "measurement_requirement": "确认首秒有可辨问题SFX且无异常底噪。"},
+      {"shot_id": "shot-recommend", "source_type": "NATIVE", "policy": "REPLACE", "trim_start_seconds": null, "lead_in_noise_risk": false, "p6_measurement_required": true, "measurement_requirement": "确认只保留一次重构推荐且无旧问答残留。"},
+      {"shot_id": "shot-treatment", "source_type": "GENERATED", "policy": "REPLACE", "trim_start_seconds": null, "lead_in_noise_risk": false, "p6_measurement_required": true, "measurement_requirement": "确认开盖和喷雾SFX绑定动作。"},
+      {"shot_id": "shot-result", "source_type": "GENERATED", "policy": "REPLACE", "trim_start_seconds": null, "lead_in_noise_risk": false, "p6_measurement_required": true, "measurement_requirement": "确认结果提示音克制且无重复口播。"},
+      {"shot_id": "shot-social", "source_type": "GENERATED", "policy": "MUTE", "trim_start_seconds": null, "lead_in_noise_risk": false, "p6_measurement_required": false, "measurement_requirement": null},
+      {"shot_id": "shot-close", "source_type": "NONE", "policy": "MUTE", "trim_start_seconds": null, "lead_in_noise_risk": false, "p6_measurement_required": false, "measurement_requirement": null}
+    ]
+  },
+  "storyboard": [
+    {"group_id": "group-problem", "beat_id": "beat-problem", "shot_ids": ["shot-problem"], "commercial_intent": "建立可见可听的问题。"},
+    {"group_id": "group-recommend", "beat_id": "beat-recommend", "shot_ids": ["shot-recommend"], "commercial_intent": "老人先完成产品推荐。"},
+    {"group_id": "group-treatment", "beat_id": "beat-treatment", "shot_ids": ["shot-treatment"], "commercial_intent": "连续展示喷用动作。"},
+    {"group_id": "group-result", "beat_id": "beat-result", "shot_ids": ["shot-result"], "commercial_intent": "喷用后才表现效果。"},
+    {"group_id": "group-social", "beat_id": "beat-social", "shot_ids": ["shot-social"], "commercial_intent": "自然同行证明社交结果。"},
+    {"group_id": "group-close", "beat_id": "beat-close", "shot_ids": ["shot-close"], "commercial_intent": "单一动态产品收口。"}
+  ],
+  "shot_intents": [
+    {"shot_id": "shot-problem", "beat_id": "beat-problem", "purpose": "明确问题，不只展示湿。", "start_seconds": 0.0, "end_seconds": 4.5, "duration_basis": "HOOK_DENSITY", "product_state": "产品不出现。", "talent_action": "少女抬臂闻到不适并回避。", "camera_intent": "稳定中景，不增加数字运镜。", "presentation_ids": [], "copy_ids": ["copy-problem"], "audio_event_ids": ["audio-bgm", "audio-problem-sfx"], "visual_strategy_need": "复用v10问题镜头并强化问题文案。"},
+    {"shot_id": "shot-recommend", "beat_id": "beat-recommend", "purpose": "老人先推荐产品。", "start_seconds": 4.5, "end_seconds": 7.25, "duration_basis": "PROOF_READABILITY", "product_state": "少女持有单一黄色瓶，尚未喷用。", "talent_action": "老人开口推荐，少女倾听。", "camera_intent": "固定同框中景。", "presentation_ids": ["presentation-intro"], "copy_ids": ["copy-recommend"], "audio_event_ids": ["audio-bgm", "audio-recommend"], "visual_strategy_need": "复用已接受老人开口画面并重构一次产品对白。"},
+    {"shot_id": "shot-treatment", "beat_id": "beat-treatment", "purpose": "推荐后才完成开盖喷用。", "start_seconds": 7.25, "end_seconds": 13.25, "duration_basis": "DEMO_COMPLEXITY", "product_state": "单一黄色瓶从封盖到开盖并喷用。", "talent_action": "少女旋盖、放盖、抬臂、轻喷。", "camera_intent": "一个连续稳定中景，11秒不切镜。", "presentation_ids": ["presentation-demo"], "copy_ids": ["copy-treatment"], "audio_event_ids": ["audio-bgm", "audio-cap", "audio-spray"], "visual_strategy_need": "复用v10完整动作并排除冻结尾帧。"},
+    {"shot_id": "shot-result", "beat_id": "beat-result", "purpose": "喷用后表现自然舒适。", "start_seconds": 13.25, "end_seconds": 17.041667, "duration_basis": "PROOF_READABILITY", "product_state": "少女收好产品。", "talent_action": "少女放松微笑并收好瓶盖。", "camera_intent": "轻微慢动作，不突然推拉。", "presentation_ids": ["presentation-result"], "copy_ids": ["copy-result"], "audio_event_ids": ["audio-bgm", "audio-result-sfx"], "visual_strategy_need": "复用v10结果桥段并去除冻结。"},
+    {"shot_id": "shot-social", "beat_id": "beat-social", "purpose": "用连续同行表现从容。", "start_seconds": 17.041667, "end_seconds": 24.333333, "duration_basis": "PROOF_READABILITY", "product_state": "产品不再作为画面焦点。", "talent_action": "两人并肩走出门廊。", "camera_intent": "保持源镜头连续运动，22秒不切镜。", "presentation_ids": [], "copy_ids": ["copy-social"], "audio_event_ids": ["audio-bgm"], "visual_strategy_need": "复用v8连续同行镜头。"},
+    {"shot_id": "shot-close", "beat_id": "beat-close", "purpose": "用一个持续运动的packshot收口。", "start_seconds": 24.333333, "end_seconds": 30.0, "duration_basis": "CTA_DWELL", "product_state": "批准的产品图完整可见。", "talent_action": null, "camera_intent": "单一缓慢数字推进贯穿结尾。", "presentation_ids": ["presentation-hero", "presentation-cta"], "copy_ids": ["copy-product-label", "copy-cta", "copy-end-card"], "audio_event_ids": ["audio-bgm", "audio-close-sfx"], "visual_strategy_need": "一张批准packshot加持续运动与品牌排版。"}
+  ],
+  "cta": {"spoken_text": null, "visual_text": "抑汗｜净味", "destination_action": "查看青颜产品信息", "beat_id": "beat-close", "shot_id": "shot-close", "cta_copy_id": "copy-cta", "end_card_copy_id": "copy-end-card"},
+  "runtime_handoff": {
+    "delivery_intent": "video",
+    "proposals": [
+      {"proposal_id": "proposal-brief", "target": "ProductionBrief", "source_ids": ["strategy-elder-recommendation-causal-v12"], "summary": "保留问题、老人推荐、喷用、结果、同行与单一动态收口的顺序。"},
+      {"proposal_id": "proposal-character", "target": "Character", "source_ids": ["talent-girl", "talent-elder"], "summary": "保持两位人物身份、服装、位置与表演职责。"},
+      {"proposal_id": "proposal-scene", "target": "Scene", "source_ids": ["set-bright-room-doorway"], "summary": "保持室内门廊与180度轴线。"},
+      {"proposal_id": "proposal-storyboard", "target": "Storyboard", "source_ids": ["group-problem", "group-recommend", "group-treatment", "group-result", "group-social", "group-close"], "summary": "按已锁定的六个因果beat投影。"},
+      {"proposal_id": "proposal-shots", "target": "Shot", "source_ids": ["shot-problem", "shot-recommend", "shot-treatment", "shot-result", "shot-social", "shot-close"], "summary": "使用精确帧预算和不变切点。"},
+      {"proposal_id": "proposal-audio", "target": "AudioTrackSpec", "source_ids": ["audio-bgm", "audio-problem-sfx", "audio-recommend", "audio-cap", "audio-spray", "audio-result-sfx", "audio-close-sfx"], "summary": "保留一次推荐并用动作SFX补足信息。"},
+      {"proposal_id": "proposal-caption", "target": "CaptionTrack", "source_ids": ["copy-recommend", "audio-recommend"], "summary": "只将老人推荐作为对白字幕。"}
+    ],
+    "requirements": [
+      {"requirement_id": "req-product-asset", "capability": "product_source_asset", "classification": "SUPPORTED_CURRENTLY", "rationale": "已绑定批准的packshot。"},
+      {"requirement_id": "req-source-media", "capability": "product_source_generation", "classification": "SUPPORTED_CURRENTLY", "rationale": "本次只复用已落盘并绑定哈希的既有媒体。"},
+      {"requirement_id": "req-existing-contact", "capability": "physical_product_interaction", "classification": "SUPPORTED_CURRENTLY", "rationale": "手持、开盖与喷用动作已存在于精确源视频，不需要新生成。"},
+      {"requirement_id": "req-ad-graphics", "capability": "advertising_copy_graphics", "classification": "SUPPORTED_CURRENTLY", "rationale": "FFmpeg确定性排版已生成。"},
+      {"requirement_id": "req-audio", "capability": "audio_authoring", "classification": "SUPPORTED_CURRENTLY", "rationale": "一次对白与SFX已确定性混音。"}
+    ],
+    "classified_gaps": [
+      {"gap_id": "gap-supported-v12", "classification": "SUPPORTED_CURRENTLY", "requirement_ids": ["req-product-asset", "req-source-media", "req-existing-contact", "req-ad-graphics", "req-audio"], "blocker_code": null, "rationale": "本次重剪所需资产、图形与音频能力均已在现有素材和本地合成中满足。"}
+    ]
+  },
+  "ad_qc_report": {
+    "ready": true,
+    "findings": [
+      {"code": "narrative-order-pass", "status": "PASS", "related_ids": ["beat-problem", "beat-recommend", "beat-treatment", "beat-result"], "message": "问题、老人推荐、喷用与结果按因果顺序排列。"},
+      {"code": "camera-cut-pass", "status": "PASS", "related_ids": ["shot-treatment", "shot-social"], "message": "11秒和22秒均位于连续镜头内部。"},
+      {"code": "audio-repetition-pass", "status": "PASS", "related_ids": ["audio-recommend", "shot-close"], "message": "产品推荐只出现一次，结尾没有重复口播。"},
+      {"code": "single-close-pass", "status": "PASS", "related_ids": ["shot-close", "presentation-hero", "presentation-cta"], "message": "结尾只有一个持续运动的产品收口。"}
+    ]
+  },
+  "unresolved_items": []
+}

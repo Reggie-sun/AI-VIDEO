@@ -1,0 +1,72 @@
+{
+  "gate": "per-shot-post-media",
+  "shot_id": "01_recap_elder_enters_v2",
+  "verdict": "PASS",
+  "artifact": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v10/runtime/t8_portrait_ad/01_recap_elder_enters_v2.mp4",
+    "sha256": "e6e54b1c504737d6453056f5f7bbe68ef742d0f186bb3ff02be5c6ec6540a943",
+    "bytes": 3952430,
+    "width": 768,
+    "height": 1344,
+    "fps": 24,
+    "frames": 124
+  },
+  "analysis": {
+    "video_analyze_response_sha256": "271ae1a100f14962284b36a4407c136c2b00af79c3b34ee87a418a72ecd7ff87",
+    "video_review_response_sha256": "00a479dd05e83f8a8df54fb1694dae304a0d073c8d7b98adeda201c80a161089",
+    "scene_count": 1,
+    "sampled_frames": 166,
+    "unique_sampled_frames": 166,
+    "speech_detected": false
+  },
+  "requirements": [
+    {
+      "id": "R1_OPEN_STATE_CONTINUITY",
+      "verdict": "PASS",
+      "evidence": "Frame 0 exactly matches the accepted treatment terminal frame: raised left arm, open nozzle, one white cap on the table."
+    },
+    {
+      "id": "R2_RECAP_ACTION",
+      "verdict": "PASS",
+      "evidence": "In one continuous shot, the young woman lowers her arm, picks up the only cap from the table, aligns it with the nozzle, and closes the bottle."
+    },
+    {
+      "id": "R3_NO_POST_RECAP_SPRAY",
+      "verdict": "PASS",
+      "evidence": "No spray action or mist occurs after the cap is reattached."
+    },
+    {
+      "id": "R4_ELDER_ENTRANCE",
+      "verdict": "PASS",
+      "evidence": "One elder woman walks in naturally from screen right after the recap action."
+    },
+    {
+      "id": "R5_OBJECT_AND_CHARACTER_COUNT",
+      "verdict": "PASS",
+      "evidence": "The shot contains exactly two women by the close state, one yellow spray bottle, and one white cap; no product overlay or duplicate packshot appears."
+    },
+    {
+      "id": "R6_CONTINUOUS_MOTION",
+      "verdict": "PASS",
+      "evidence": "Single continuous scene with active hand, head, and walking motion; no cut, flash, freeze, or static-card insert."
+    },
+    {
+      "id": "R7_CLOSE_STATE_CONTINUITY",
+      "verdict": "PASS",
+      "evidence": "Frame 123 exactly matches the accepted elder-dialogue frame 0 in character placement, eyeline, room, and capped bottle state."
+    },
+    {
+      "id": "R8_NO_DIALOGUE",
+      "verdict": "PASS",
+      "evidence": "Project video-analysis detected no speech; this bridge intentionally contains only room/action sound."
+    }
+  ],
+  "review_assets": [
+    "artifacts/qingyan-miao-ad-20260826-v10/review/bridge-gate/contact.png",
+    "artifacts/qingyan-miao-ad-20260826-v10/review/bridge-gate/boundary-comparison.png"
+  ],
+  "notes": [
+    "The generic analyzer low-resolution warning is not applicable to the approved T8 portrait generation canvas of 768x1344; final delivery is composed at 1080x1920.",
+    "This PASS authorizes deterministic composition only; it does not imply final human acceptance."
+  ]
+}

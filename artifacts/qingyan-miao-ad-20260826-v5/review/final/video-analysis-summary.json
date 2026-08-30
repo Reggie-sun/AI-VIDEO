@@ -1,0 +1,55 @@
+{
+  "artifact": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v5/final/青颜_苗家女孩T8对白修复广告_30s_9x16_v5.mp4",
+    "sha256": "3e8f46318a273e410d7360cc19b8b5acd5cd081d146463ee2e182ee72dedbfe9",
+    "size_bytes": 24260773
+  },
+  "project_video_analysis": {
+    "probe": {
+      "duration_seconds": 30.022,
+      "video_duration_seconds": 30.0,
+      "width": 1080,
+      "height": 1920,
+      "fps": 24.0,
+      "frame_count": 720,
+      "video_codec": "h264",
+      "audio_codec": "aac",
+      "audio_sample_rate": 48000,
+      "audio_channels": 2
+    },
+    "review": {
+      "sampled_frame_count": 1437,
+      "unique_frame_count": 1437,
+      "unique_frame_ratio": 1.0,
+      "issues": []
+    },
+    "transcription": {
+      "model": "medium",
+      "language": "zh",
+      "start_seconds": 4.12,
+      "end_seconds": 9.16,
+      "text": "出门前用清盐 意旱净味 清爽舒适",
+      "interpretation": "青颜/清盐与抑汗/意旱为普通话同音字误写；声学语义锚点完整，画面同时烧录准确文案：出门前用青颜，抑汗净味，清爽舒适。"
+    },
+    "scene_detection": {
+      "threshold": 0.08,
+      "hard_cut_count": 0,
+      "interpretation": "九处换景均使用 6-frame dissolve，没有检测为硬切。"
+    }
+  },
+  "ffmpeg": {
+    "full_video_decode": "PASS",
+    "full_audio_decode": "PASS",
+    "integrated_loudness_lufs": -22.7,
+    "true_peak_dbfs": -8.6,
+    "silence_events_over_0_35_seconds_at_minus_42_db": 0,
+    "live_action_freeze_events_over_0_25_seconds_at_minus_45_db": 0,
+    "non_live_card_freeze_note": "检测到的短静止区间只落在 06/09/10 信息卡与产品卡，最长 0.458333 秒；不含人物 clone padding。",
+    "clone_or_reverse_constructs_in_composer": 0
+  },
+  "visual_evidence": {
+    "contact_sheet": "artifacts/qingyan-miao-ad-20260826-v5/review/final/contact.jpg",
+    "boundary_contact_sheet": "artifacts/qingyan-miao-ad-20260826-v5/review/final/boundary-contact.jpg",
+    "boundary_review": "PASS: 人物服饰与主脸稳定；不同空间通过明确 dissolve/信息卡重置；产品英雄镜头使用 source packshot。"
+  }
+}

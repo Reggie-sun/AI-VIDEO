@@ -1,0 +1,13 @@
+{
+  "shot_id": "02_elder_dialogue",
+  "prompt_id": "b6003e0f-33d8-4f0b-85e4-c9e0392f4748",
+  "submitted_graph_sha256": "db4bcd05e53b87a5f3e54dc24f2d3913408ad9df2fa8f1822c3ea27e3b0b620f",
+  "requested_frame_count": 226,
+  "outcome": "FAILED_NO_ARTIFACT",
+  "error_type": "torch.OutOfMemoryError",
+  "error_message": "Allocation on device",
+  "failed_node_id": "9",
+  "failed_node_type": "SamplerCustomAdvanced",
+  "retry_count": 0,
+  "repair_direction": "Use the already proven 175-frame FL2VA ceiling and shorten the dialogue while preserving the same exact first and last frames."
+}

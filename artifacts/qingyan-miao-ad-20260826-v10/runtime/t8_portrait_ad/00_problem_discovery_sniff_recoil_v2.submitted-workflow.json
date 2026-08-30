@@ -1,0 +1,180 @@
+{
+  "1": {
+    "class_type": "UNETLoader",
+    "inputs": {
+      "unet_name": "minimax_h3_fl2va_pruned_int8_convrot.safetensors",
+      "weight_dtype": "default"
+    }
+  },
+  "10": {
+    "class_type": "MiniMaxH3AVDecodeT8",
+    "inputs": {
+      "audio_vae": [
+        "4",
+        0
+      ],
+      "av_latent": [
+        "9",
+        0
+      ],
+      "video_vae": [
+        "3",
+        0
+      ]
+    }
+  },
+  "11": {
+    "class_type": "VHS_VideoCombine",
+    "inputs": {
+      "audio": [
+        "10",
+        1
+      ],
+      "crf": 17,
+      "filename_prefix": "development_experiment/qingyan_v10_00_problem_discovery_sniff_recoil_v2_seed104759",
+      "format": "video/h264-mp4",
+      "frame_rate": 24.0,
+      "images": [
+        "10",
+        0
+      ],
+      "loop_count": 0,
+      "pingpong": false,
+      "pix_fmt": "yuv420p",
+      "save_metadata": true,
+      "save_output": true,
+      "trim_to_audio": false
+    }
+  },
+  "12": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "qingyan-v10-00_problem_discovery_sniff_recoil_v2-0d5fe47955eb309c.png"
+    }
+  },
+  "13": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "qingyan-v10-00_problem_discovery_sniff_recoil_v2-last-d0b4bf6edc9cb8a8.png"
+    }
+  },
+  "2": {
+    "class_type": "CLIPLoader",
+    "inputs": {
+      "clip_name": "qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors",
+      "device": "default",
+      "type": "minimax"
+    }
+  },
+  "3": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "minimax_h3_video_vae_fp16.safetensors"
+    }
+  },
+  "4": {
+    "class_type": "VAELoader",
+    "inputs": {
+      "vae_name": "minimax_h3_audio_vae_fp32.safetensors"
+    }
+  },
+  "5": {
+    "class_type": "MiniMaxH3AudioConditioningT8",
+    "inputs": {
+      "add_source_as_reference": false,
+      "audio_denoise_strength": 1.0,
+      "audio_mode": "native",
+      "audio_vae": [
+        "4",
+        0
+      ],
+      "clip": [
+        "2",
+        0
+      ],
+      "first_frame": [
+        "12",
+        0
+      ],
+      "height": 1344,
+      "last_frame": [
+        "13",
+        0
+      ],
+      "length": 141,
+      "prompt": "For the target video, at 0.00 seconds into the target video, <Picture 1> (from [Shot 1]) is fully referenced as the exact first frame; the ending frame aligns with <Picture 2>.\n\nintegrated_multimodal_description: [Shot 1] Live-action premium underarm-antiperspirant advertising with clear natural human performance in one continuous native 9:16 portrait shot. Inherit from both pictures only the exact same young Miao woman, face identity, hairstyle, silver hair ornament, earrings, embroidered white blouse, navy skirt, body proportions, room layout, empty wooden table, soft morning window light, and localized darker damp patch at the covered left underarm; exclude every product, package, cap, nozzle, yellow brand object, mist, text, and treatment action. Start exactly from Picture 1. This shot has one purpose: the audience must clearly see her unexpectedly discover heat-caused underarm perspiration, deliberately smell the covered underarm, and then visibly recoil from the odor before any solution appears. From 0.0 to 1.0 seconds, she calmly smooths the blouse fastening and sleeve while preparing to leave, with relaxed brows, neutral lips, low shoulders, ordinary breathing, and no concern yet. From 1.0 to 2.0 seconds, the irregular darker sweat patch gradually becomes visible directly over and just below the covered left underarm; her fingers pause, her eyes move first to that exact patch, and her shoulders tighten. From 2.0 to 3.0 seconds, she raises her left arm, keeps the elbow above shoulder height, and uses her right fingertips to hold the damp fabric edge while checking the patch. From 3.0 to 4.05 seconds, she deliberately bends her neck and upper torso toward the raised left underarm until her nose is only a few centimeters from the blouse at the armpit; her gaze stays fixed on that exact point and this approach must read as preparing to smell, not merely looking. From 4.05 to 4.40 seconds, she briefly holds her nose close to the underarm and performs two quick, unmistakable nasal inhalations: her nostrils visibly flare twice and the upper chest makes two small inward breathing pulses while the rest of her body pauses. From 4.40 to 5.20 seconds, the odor immediately triggers a single clear reaction: her chin pulls backward, her nose wrinkles, her eyes narrow, her brows knit, her lips press together, her gaze breaks away from the underarm, and her head plus upper torso recoil backward by about fifteen centimeters while her raised arm and right-hand fabric contact remain continuous. From 5.20 seconds to the end, she settles into the exact Picture 2 recoil pose for a readable final beat, still concerned and with no solution present. camera_start: stable eye-level medium full-body portrait framing from Picture 1 with natural perspective. camera_path: one smooth slow small-amplitude push-in that increasingly favors her face and covered left underarm; no other camera movement. camera_end: align exactly with Picture 2, keeping her recoiled face, damp underarm patch, raised arm, and right-hand fabric contact sharply readable in the same frame. No cut, no transition, no freeze, and no white flash. The wooden table remains empty throughout.\noverall_soundscape: Quiet morning room tone and soft blouse rustle remain a very low background bed. At 4.05 to 4.40 seconds, exactly two short dry nasal sniff inhalations are isolated in the audio foreground and synchronized to the visible nostril and chest pulses. At 4.40 to 5.20 seconds, one small involuntary breath-stop and restrained displeased exhale accompany the visible recoil. No dialogue, no voice-over, no spray sound, no music, and no unrelated human sound.\nnon_diegetic_music: No music and no automatic emotional score; preserve acoustic space around the two foreground sniff sounds and the recoil reaction.\n\nNegative constraints: exactly one woman, zero product objects, and zero treatment action. The action order cannot collapse into sustained visual inspection: approach the underarm, perform two visible nasal inhalations, recoil once, then settle. No extra person or anatomical deformation; no comic odor visualization, exposed armpit, or medical imagery; no camera cut, failure jitter, freeze, white flash, overlay text, subtitle, or watermark.",
+      "prompt_primary_audio_ordinal": 0,
+      "ref_image_size": "match",
+      "reference_video_policy": "official_2_to_15s",
+      "strict_prompt_tags": true,
+      "task_type": "FL2VA",
+      "video_vae": [
+        "3",
+        0
+      ],
+      "width": 768
+    }
+  },
+  "6": {
+    "class_type": "MiniMaxH3DualClockSamplerT8",
+    "inputs": {
+      "av_latent": [
+        "5",
+        1
+      ],
+      "model": [
+        "1",
+        0
+      ],
+      "sampler_name": "res_multistep",
+      "scheduler": "simple",
+      "shift_audio": 3.0,
+      "shift_video": 12.0,
+      "steps": 20
+    }
+  },
+  "7": {
+    "class_type": "RandomNoise",
+    "inputs": {
+      "noise_seed": 104759
+    }
+  },
+  "8": {
+    "class_type": "BasicGuider",
+    "inputs": {
+      "conditioning": [
+        "5",
+        0
+      ],
+      "model": [
+        "6",
+        0
+      ]
+    }
+  },
+  "9": {
+    "class_type": "SamplerCustomAdvanced",
+    "inputs": {
+      "guider": [
+        "8",
+        0
+      ],
+      "latent_image": [
+        "5",
+        1
+      ],
+      "noise": [
+        "7",
+        0
+      ],
+      "sampler": [
+        "6",
+        1
+      ],
+      "sigmas": [
+        "6",
+        2
+      ]
+    }
+  }
+}

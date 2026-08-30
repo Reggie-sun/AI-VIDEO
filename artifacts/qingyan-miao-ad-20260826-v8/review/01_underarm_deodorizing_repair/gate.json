@@ -1,0 +1,57 @@
+{
+  "gate_version": "agent-per-shot-v1",
+  "shot_id": "01_underarm_deodorizing_repair",
+  "supersedes_shot_id": "01_underarm_deodorizing",
+  "artifact": {
+    "path": "artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/01_underarm_deodorizing_repair.mp4",
+    "sha256": "ced2f7e4739a9930b88fcf1e62479a55c8a59a9b04f0fb6a8d4cc84392784be0",
+    "duration_seconds": 7.292,
+    "frame_count": 175,
+    "width": 768,
+    "height": 1344,
+    "fps": 24
+  },
+  "evidence": {
+    "video_analysis_probe": "PASS: exact 175-frame portrait MP4 and stereo audio returned for the bound path",
+    "video_analysis_review": "PASS: one scene, unique_frame_ratio 1.0, and estimated speaking duration 0.0s",
+    "dense_contact_sheet": "review/01_underarm_deodorizing_repair/contact-2fps.jpg",
+    "terminal_frame": {
+      "path": "review/01_underarm_deodorizing_repair/terminal-frame.png",
+      "sha256": "2f4e2198c3cab189e8853579e6b3c9aa0bb9862b14032b0f58070177d24790e4"
+    }
+  },
+  "required_findings": [
+    {
+      "requirement": "Tasteful fully clothed exaggerated underarm viewpoint",
+      "status": "PASS",
+      "evidence": "0.0-3.5s samples preserve the covered sleeve/underarm viewpoint with complete clothing and natural anatomy."
+    },
+    {
+      "requirement": "Exaggerated deodorizing effect clearly changes the state",
+      "status": "PASS",
+      "evidence": "Warm yellow haze is visible at 0.0-1.0s; an intentionally exaggerated blue-white airflow appears from 1.0-3.0s and clears to bright air."
+    },
+    {
+      "requirement": "Exactly one elderly Miao woman enters and the Shot ends as a stable two-shot",
+      "status": "PASS",
+      "evidence": "The elder enters at about 3.5s; 5.0-7.0s samples show the same two women facing each other in a stable composition."
+    },
+    {
+      "requirement": "Exactly one physical bottle and no anatomy failure",
+      "status": "PASS",
+      "evidence": "All 2fps samples show one physical yellow-white bottle, stable faces, and no duplicated person or limb."
+    },
+    {
+      "requirement": "No product packshot, product icon, corner overlay, embedded text or floating graphic",
+      "status": "PASS",
+      "evidence": "All 15 dense samples and the exact terminal frame show a plain wall/doorway with no generated poster, box, icon, text or floating graphic."
+    },
+    {
+      "requirement": "No accidental dialogue",
+      "status": "PASS",
+      "evidence": "Project video-analysis reports estimated speaking duration 0.0s."
+    }
+  ],
+  "verdict": "PASS",
+  "next_submit_permitted": true
+}
