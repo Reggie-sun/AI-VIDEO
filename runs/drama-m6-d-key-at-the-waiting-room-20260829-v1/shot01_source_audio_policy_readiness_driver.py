@@ -23,17 +23,17 @@ PROJECT_ROOT = RUN_ROOT / "production-project"
 TIMING_DRIVER_PATH = RUN_ROOT / "shot01_timing_request_readiness_driver.py"
 POLICY_PATH = Path(
     "docs/superpowers/artifacts/drama/b-d0/source-audio-policy/"
-    "key-at-the-waiting-room-shot-01-v2.proposed.json"
+    "key-at-the-waiting-room-shot-01-v3.proposed.json"
 )
 ACCEPTANCE_PATH = Path(
     "docs/superpowers/artifacts/drama/b-d0/source-audio-policy/"
-    "key-at-the-waiting-room-shot-01-v2.accepted.json"
+    "key-at-the-waiting-room-shot-01-v3.accepted.json"
 )
 CANDIDATE_EVIDENCE_PATH = RUN_ROOT / (
-    "evidence/drama-shot-01-source-audio-policy-readiness-candidate-v2.json"
+    "evidence/drama-shot-01-source-audio-policy-readiness-candidate-v3.json"
 )
 ACCEPTED_EVIDENCE_PATH = RUN_ROOT / (
-    "evidence/drama-shot-01-source-audio-policy-readiness-accepted-v2.json"
+    "evidence/drama-shot-01-source-audio-policy-readiness-accepted-v3.json"
 )
 
 TIMING_PROPOSAL_SHA256 = (
@@ -67,6 +67,14 @@ EXACT_AMBIENCE = (
     "enclosed room reflections, continuous for the full take"
 )
 EXACT_MUSIC = "none"
+TARGET_CONTENT_HASH = "4cf53970d6642d4bfe73c23e5c12f9714c069843b0a7b47069dfb2519c47253b"
+NORMALIZED_SELECTION = (
+    "source_type=GENERATED;policy=KEEP;"
+    "shot_id=drama.shot.waiting-room.001;revision=1"
+)
+EXPECTED_PROVIDER = "comfy-local-h3-t8"
+EXPECTED_MODEL = "minimax-h3-t8-t2va-quality"
+EXPECTED_CAPABILITY = "minimax-h3-t8-t2va-quality-v1"
 EXACT_RAW_AUDIO_FINDINGS = (
     "decoded audio stream is usable and audible",
     "Lin-Jun says the exact verbatim dialogue 钥匙还在。回去，一起开门。 "
@@ -74,6 +82,13 @@ EXACT_RAW_AUDIO_FINDINGS = (
     "speaker and visible lip-sync binding are credible",
     "rain ambience is present without unintended music or duplicate speech",
     "audio timing remains synchronized with the exact Shot action",
+)
+EXPECTED_FORBIDDEN_EFFECTS = (
+    "Provider or ComfyUI preflight under mismatched runtime",
+    "ComfyUI checkout or lifecycle change",
+    "VideoGenerationRequest persistence, durable submit intent or permit minting",
+    "Provider submit, media generation, retry, repair or video-analysis",
+    "Manifest, Registry, candidate activation, M6-D PASS, P6 or Final Acceptance",
 )
 
 
@@ -173,29 +188,36 @@ def _validate_policy(payload: dict[str, object]) -> None:
     policy = payload.get("source_audio_policy")
     binding = payload.get("binding_contract")
     if (
-        payload.get("schema_version") != "drama-shot-source-audio-policy/2"
+        payload.get("schema_version") != "drama-shot-source-audio-policy/3"
         or payload.get("record_kind") != "drama_shot_source_audio_policy"
         or payload.get("policy_id")
         != "drama.source-audio.key-at-the-waiting-room.shot-01"
-        or payload.get("policy_version") != 2
+        or payload.get("policy_version") != 3
         or payload.get("status") != "proposed"
         or payload.get("domain_id") != "drama"
         or payload.get("lane_id") != "M6-D"
         or not isinstance(target, dict)
         or target.get("shot_id") != "drama.shot.waiting-room.001"
         or target.get("revision") != 1
+        or target.get("content_hash") != TARGET_CONTENT_HASH
         or not isinstance(lineage, dict)
         or lineage.get("accepted_timing_repair_envelope_sha256")
         != TIMING_ACCEPTANCE_SHA256
         or lineage.get("accepted_timing_readiness_evidence_sha256")
         != TIMING_EVIDENCE_SHA256
         or lineage.get("blocked_readiness_envelope_sha256") != BLOCKED_V2_SHA256
-        or lineage.get("rejected_policy_candidate_commit")
+        or lineage.get("rejected_policy_candidate_v1_commit")
         != "c3dd44940a251966790ea105d26e3c941879c3ac"
-        or lineage.get("rejected_policy_candidate_sha256")
+        or lineage.get("rejected_policy_candidate_v1_sha256")
         != "141cc81edd0557ed94bc867676817b1f482e9c9c4a28efc3b34d2f8138755b11"
-        or lineage.get("rejected_policy_evidence_sha256")
+        or lineage.get("rejected_policy_evidence_v1_sha256")
         != "0ca93cee2c882c996513c33572e95e8c1fc35b9cf1fd94ace90679b7d693920c"
+        or lineage.get("rejected_policy_candidate_v2_commit")
+        != "f230896ba7504e79f383c177bc8a3c3198b015ee"
+        or lineage.get("rejected_policy_candidate_v2_sha256")
+        != "5968e99d3a6f7bacc1bf812b607fdec55a3bdf69265a5d6b5ccae75057577cb3"
+        or lineage.get("rejected_policy_evidence_v2_sha256")
+        != "c3ab3b9ba2a6d2ab60048021831cf88129a91b866610231b8dc582bcaa0df13e"
         or lineage.get("request_hash") != REQUEST_HASH
         or lineage.get("verified_projection_hash") != PROJECTION_HASH
         or lineage.get("requirement_hash") != REQUIREMENT_HASH
@@ -206,6 +228,10 @@ def _validate_policy(payload: dict[str, object]) -> None:
         or lineage.get("resolved_generation_hash") != RESOLVED_HASH
         or lineage.get("preview_fingerprint") != PREVIEW_HASH
         or not isinstance(selection, dict)
+        or selection.get("source_id")
+        != "current-session:user-selected-source-audio-policy-20260830"
+        or selection.get("selection_channel") != "request_user_input"
+        or selection.get("normalized_selection") != NORMALIZED_SELECTION
         or selection.get("selection_is_default_or_inference") is not False
         or not isinstance(policy, dict)
         or policy.get("source_type") != "GENERATED"
@@ -218,8 +244,26 @@ def _validate_policy(payload: dict[str, object]) -> None:
         or tuple(policy.get("required_raw_shot_audio_findings", ()))
         != EXACT_RAW_AUDIO_FINDINGS
         or not isinstance(binding, dict)
+        or binding.get("selected_provider") != EXPECTED_PROVIDER
+        or binding.get("selected_model") != EXPECTED_MODEL
+        or binding.get("selected_capability") != EXPECTED_CAPABILITY
         or binding.get("exact_request_native_audio") is not True
         or binding.get("policy_matches_exact_request") is not True
+        or binding.get("raw_shot_audio_pass_does_not_imply_final_composition_audio_pass")
+        is not True
+        or binding.get("canonical_p4_composition_required_before_final_delivery_claim")
+        is not True
+        or tuple(payload.get("forbidden_effects", ())) != EXPECTED_FORBIDDEN_EFFECTS
+        or not isinstance(payload.get("status_boundary"), dict)
+        or payload["status_boundary"].get("m6_d") != "NOT_EVALUATED"
+        or payload["status_boundary"].get("execution") != "STOP_BEFORE_SUBMIT"
+        or payload["status_boundary"].get("next_shot_submit_allowed") is not False
+        or payload["status_boundary"].get(
+            "candidate_acceptance_required_before_audio_blocker_can_clear"
+        )
+        is not True
+        or payload["status_boundary"].get("remaining_runtime_blocker")
+        != RUNTIME_BLOCKER
     ):
         raise RuntimeError("SourceAudioPolicy contract is invalid")
 
@@ -233,7 +277,7 @@ def _load_policy() -> tuple[dict[str, object], dict[str, object]]:
         accepted = acceptance.get("accepted_policy_payload")
         if (
             acceptance.get("schema_version")
-            != "drama-shot-source-audio-policy-acceptance/2"
+            != "drama-shot-source-audio-policy-acceptance/3"
             or acceptance.get("status") != "accepted"
             or not isinstance(accepted, dict)
             or accepted.get("path") != POLICY_PATH.as_posix()
@@ -381,6 +425,26 @@ def main() -> None:
             "key-at-the-waiting-room-shot-01-v2.blocked.json",
             BLOCKED_V2_SHA256,
         ),
+        (
+            "docs/superpowers/artifacts/drama/b-d0/source-audio-policy/"
+            "key-at-the-waiting-room-shot-01-v1.proposed.json",
+            "141cc81edd0557ed94bc867676817b1f482e9c9c4a28efc3b34d2f8138755b11",
+        ),
+        (
+            "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/"
+            "drama-shot-01-source-audio-policy-readiness-candidate-v1.json",
+            "0ca93cee2c882c996513c33572e95e8c1fc35b9cf1fd94ace90679b7d693920c",
+        ),
+        (
+            "docs/superpowers/artifacts/drama/b-d0/source-audio-policy/"
+            "key-at-the-waiting-room-shot-01-v2.proposed.json",
+            "5968e99d3a6f7bacc1bf812b607fdec55a3bdf69265a5d6b5ccae75057577cb3",
+        ),
+        (
+            "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/"
+            "drama-shot-01-source-audio-policy-readiness-candidate-v2.json",
+            "c3ab3b9ba2a6d2ab60048021831cf88129a91b866610231b8dc582bcaa0df13e",
+        ),
     ):
         _assert_path_hash(path, expected)
     policy, policy_identity = _load_policy()
@@ -421,27 +485,51 @@ def main() -> None:
     ):
         raise RuntimeError("canonical exact request lineage drifted")
     audio_policy = policy["source_audio_policy"]
-    if (
-        requirement.audio_need.value != "required"
-        or request_preview.output_requirement.native_audio is not True
-        or tuple(routed["selected"].output_capability.native_audio_options)
-        != (True,)
-        or audio_policy["source_type"] != "GENERATED"
-        or audio_policy["policy"] != "KEEP"
-        or audio_policy["request_native_audio_required"] is not True
-        or audio_policy["required_dialogue"]
-        != requirement.generation_intent.dialogue_intent.verbatim_text
-        or audio_policy["required_ambience"]
-        != requirement.generation_intent.ambience_intent.environment_bed
-        or audio_policy["music"]
-        != requirement.generation_intent.music_intent.mode
-        or prompt.prompt_text.count(f"<d>[Chinese]{EXACT_DIALOGUE}</d>") != 1
-    ):
+    exact_sound_facts_match = (
+        audio_policy["required_dialogue"]
+        == requirement.generation_intent.dialogue_intent.verbatim_text
+        and audio_policy["required_ambience"]
+        == requirement.generation_intent.ambience_intent.environment_bed
+        and audio_policy["music"] == requirement.generation_intent.music_intent.mode
+        and prompt.prompt_text.count(f"<d>[Chinese]{EXACT_DIALOGUE}</d>") == 1
+    )
+    exact_request_binding_matches = (
+        requirement.audio_need.value == "required"
+        and request_preview.output_requirement.native_audio is True
+        and tuple(routed["selected"].output_capability.native_audio_options)
+        == (True,)
+        and audio_policy["source_type"] == "GENERATED"
+        and audio_policy["policy"] == "KEEP"
+        and audio_policy["request_native_audio_required"] is True
+        and routed["family"].capabilities().provider_name == EXPECTED_PROVIDER
+        and routed["selected"].model_id == EXPECTED_MODEL
+        and routed["selected"].capability_id == EXPECTED_CAPABILITY
+        and exact_sound_facts_match
+    )
+    if not exact_request_binding_matches:
         raise RuntimeError("SourceAudioPolicy does not match exact request capability")
+    gate_boundaries_validated = (
+        policy["binding_contract"][
+            "raw_shot_audio_pass_does_not_imply_final_composition_audio_pass"
+        ]
+        is True
+        and policy["binding_contract"][
+            "canonical_p4_composition_required_before_final_delivery_claim"
+        ]
+        is True
+    )
+    stop_boundary_validated = (
+        policy["status_boundary"]["m6_d"] == "NOT_EVALUATED"
+        and policy["status_boundary"]["execution"] == "STOP_BEFORE_SUBMIT"
+        and policy["status_boundary"]["next_shot_submit_allowed"] is False
+    )
+    if not gate_boundaries_validated or not stop_boundary_validated:
+        raise RuntimeError("SourceAudioPolicy Gate or stop boundary drifted")
     policy_binding = {
         "policy_payload_sha256": policy_identity["payload_sha256"],
         "shot_id": policy["target_shot"]["shot_id"],
         "shot_revision": policy["target_shot"]["revision"],
+        "shot_content_hash": policy["target_shot"]["content_hash"],
         "source_type": "GENERATED",
         "policy": "KEEP",
         "request_hash": REQUEST_HASH,
@@ -460,7 +548,7 @@ def main() -> None:
     if before != after:
         raise RuntimeError("SourceAudioPolicy driver mutated Production state")
     evidence = {
-        "schema_version": "drama-m6-d-shot01-source-audio-readiness/2",
+        "schema_version": "drama-m6-d-shot01-source-audio-readiness/3",
         "status": (
             "SOURCE_AUDIO_POLICY_ACCEPTED_RUNTIME_BLOCKED"
             if accepted
@@ -500,11 +588,15 @@ def main() -> None:
             "policy_binding": policy_binding,
             "policy_binding_hash": policy_binding_hash,
             "default_or_inference_used": False,
-            "exact_request_binding_matches": True,
+            "exact_sound_facts_match": exact_sound_facts_match,
+            "exact_request_binding_matches": exact_request_binding_matches,
             "raw_shot_gate_requirements": audio_policy[
                 "required_raw_shot_audio_findings"
             ],
-            "final_composition_audio_gate_still_required": True,
+            "raw_and_final_gate_boundaries_validated": gate_boundaries_validated,
+            "final_composition_audio_gate_still_required": policy[
+                "binding_contract"
+            ]["canonical_p4_composition_required_before_final_delivery_claim"],
         },
         "runtime_identity": exact["runtime"],
         "submit_readiness": {
@@ -531,20 +623,31 @@ def main() -> None:
                 "overwritten": False,
             },
             "rejected_policy_candidate_v1": {
-                "path": policy["parent_lineage"]["rejected_policy_candidate_path"],
-                "commit": policy["parent_lineage"]["rejected_policy_candidate_commit"],
-                "sha256": policy["parent_lineage"]["rejected_policy_candidate_sha256"],
+                "path": policy["parent_lineage"]["rejected_policy_candidate_v1_path"],
+                "commit": policy["parent_lineage"]["rejected_policy_candidate_v1_commit"],
+                "sha256": policy["parent_lineage"]["rejected_policy_candidate_v1_sha256"],
                 "overwritten": False,
             },
             "rejected_policy_evidence_v1": {
-                "path": policy["parent_lineage"]["rejected_policy_evidence_path"],
-                "sha256": policy["parent_lineage"]["rejected_policy_evidence_sha256"],
+                "path": policy["parent_lineage"]["rejected_policy_evidence_v1_path"],
+                "sha256": policy["parent_lineage"]["rejected_policy_evidence_v1_sha256"],
+                "overwritten": False,
+            },
+            "rejected_policy_candidate_v2": {
+                "path": policy["parent_lineage"]["rejected_policy_candidate_v2_path"],
+                "commit": policy["parent_lineage"]["rejected_policy_candidate_v2_commit"],
+                "sha256": policy["parent_lineage"]["rejected_policy_candidate_v2_sha256"],
+                "overwritten": False,
+            },
+            "rejected_policy_evidence_v2": {
+                "path": policy["parent_lineage"]["rejected_policy_evidence_v2_path"],
+                "sha256": policy["parent_lineage"]["rejected_policy_evidence_v2_sha256"],
                 "overwritten": False,
             },
         },
         "source_identity": {
             "actor_identity": "codex_primary_agent",
-            "generator_id": "drama-shot01-source-audio-policy-readiness-driver@2",
+            "generator_id": "drama-shot01-source-audio-policy-readiness-driver@3",
             "driver_path": Path(__file__).relative_to(REPO_ROOT).as_posix(),
             "driver_sha256": _sha256(Path(__file__).read_bytes()),
             "policy_path": POLICY_PATH.as_posix(),
@@ -554,6 +657,10 @@ def main() -> None:
                 for path in (
                     "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/"
                     "shot01_timing_request_readiness_driver.py",
+                    "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/"
+                    "authoring_to_request_driver.py",
+                    "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/"
+                    "provider_request_readiness_driver.py",
                     "docs/superpowers/artifacts/drama/b-d0/execution-intent/"
                     "key-at-the-waiting-room-shot-01-v2.accepted.json",
                     "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/"
@@ -577,9 +684,12 @@ def main() -> None:
             "driver_manifest_or_registry_writes": 0,
             "driver_candidate_activation_count": 0,
         },
-        "m6_d_status": "NOT_EVALUATED",
-        "execution_status": "STOP_BEFORE_SUBMIT",
-        "next_shot_submit_allowed": False,
+        "stop_boundary_validated": stop_boundary_validated,
+        "m6_d_status": policy["status_boundary"]["m6_d"],
+        "execution_status": policy["status_boundary"]["execution"],
+        "next_shot_submit_allowed": policy["status_boundary"][
+            "next_shot_submit_allowed"
+        ],
         "remaining_blockers": blockers,
     }
     output_path = ACCEPTED_EVIDENCE_PATH if accepted else CANDIDATE_EVIDENCE_PATH
