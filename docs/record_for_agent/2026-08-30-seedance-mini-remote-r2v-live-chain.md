@@ -21,11 +21,13 @@ V2 的音轨、响度和字幕画面技术测量继续保留，但其 current-fa
 `Review V3` 取代。上一版只检查字幕 presence / legibility / safe area，未把
 `AUDIO_SEMANTIC_SYNC` 作为强制 requirement，因此不是有效的完整 Caption Gate。
 
-当前 review artifact 是
-`output/epic-skyship-two-shot-29p79s-small-caption-voice-bgm-v3.mp4`，另提供明确无字幕、无旁白但
-保留 BGM/SFX 的 `output/epic-skyship-two-shot-29p79s-no-caption-bgm-v3.mp4`。本轮没有重新生成
-Seedance Shot、没有 remote/paid Provider call，也没有改变两次 live Provider attempts、remote R2V
-provenance 或 Manifest activation truth；新增声音来自四次 bounded local H3 T2VA submit。
+V3 voiced-captioned artifact 随后又因前后音质不同获得 human `FAIL`，其 current-facing review candidate
+status 已被 V4 technical review candidate 取代；V3 的 technical decode、字幕与 ASR evidence 继续保留为
+历史 proof layer。当前 review artifact 是
+`output/epic-skyship-two-shot-29p79s-consistent-voice-bgm-v4.mp4`。V4 没有重新生成 Seedance Shot、没有
+remote/paid Provider call，也没有改变两次 live Provider attempts、remote R2V provenance 或 Manifest
+activation truth；V4 的人声由一次成功的 bounded local H3 continuous-take attempt 派生，human playback
+仍为 `NOT_EVALUATED`。
 
 ## Purpose
 
@@ -234,6 +236,76 @@ background balance。全片末端的单次 `loudnorm` 只归一化 program aggre
 assets 变成同一声线或相同局部响度。故根因是 source voice identity 未锁定加上 per-clip mastering 缺失，
 不是 AAC decode、播放器 track selection 或 Caption Gate semantic-sync failure。
 
+### Review V4 — Continuous Voice Source And Full-Bed Ducking
+
+V4 保留两份 exact Seedance Shot、R2V provenance、0.25s xfade、三条 32px 字幕文本与 timing，不重新调用
+Seedance/Ark。它只替换 V3 的旁白 source 和 deterministic audio mix：三句先在一个 local H3 T8 T2VA
+quality take 中连续生成，再从同一 exact source 切成三个 timeline cues。这样不再依赖三次不同 seed 的
+独立 voice identity。
+
+continuous source：
+
+- path：`voice-v4/source/continuous-repair-02.mp4`
+- SHA-256：`0c7e244e0e1671055e249b7c120508668d566d7aa947d242fc124769f108e9e1`
+- size：`1,316,636` bytes
+- duration：`14.375s`
+- prompt ID：`bfbfb438-9093-424d-b944-fa7ed16c7765`
+- MiniMax H3 T8 T2VA quality、20 steps、`res_multistep/simple`、seed `8300200`
+- `768x416`、345 frames、32 kHz stereo source AAC
+- accepted attempt：local submit `1`、retry `0`、fallback `0`、remote submit `0`
+
+本轮总计发生三个 outcome-known local submits，均保存独立 intent / permit / state：首次 `1344x768`
+attempt 在 sampler 发生 `torch.OutOfMemoryError`；`repair-01` 在 sampling 前因 height `432` 不能被 32
+整除而 fail closed；`repair-02` 只将无用画布修正为 `768x416`，保持 prompt、345 frames、20 steps、
+seed 与 audio model 不变后成功。三者不是 blind retry，remote/paid submit 始终为 `0`。
+
+project-local `video-analysis` MCP 以 medium 和 large Whisper 绑定 exact source bytes，按顺序识别出三句；
+其中 `舰驶` 被写成 `劍使` / `见驶` 等同音字形，其他语义与顺序一致。large evidence 还暴露了第一次
+切点会吃掉句首，因此最终 source ranges 调整为：
+
+- `vo01`：`1.05–5.75s`
+- `vo02`：`6.50–10.55s`
+- `vo03`：`11.40–13.85s`
+
+三个 final PCM voice assets 均来自上述同一 SHA，并使用相同 high-pass、low-pass、轻 compression 与
+loudness chain；per-cue level calibration 后全部为 `-19.0 LUFS`。SHA-256 和 high-band measurement：
+
+- `vo01.wav`：`053ae1ca6060e5883c5bee1c1d3c8ebb215ab862ae0cc9eb68f7f13aed75ab63`，
+  `3.5–14 kHz RMS -34.496144 dB`
+- `vo02.wav`：`f2328b828089b1c37bb3c2e64393196e65d885d98a6f0ae946ce67806c0074be`，
+  `3.5–14 kHz RMS -32.691238 dB`
+- `vo03.wav`：`671d43bcfd01ab034845aad2afb22ca3788b6fb4094da48b7b21aa9b2fd95554`，
+  `3.5–14 kHz RMS -33.207619 dB`
+
+source-cue loudness spread 从 V3 的 `3.4 LU` 降至 `0.0 LU`，high-band proxy spread 为
+`1.804906 dB`。这些是 engineering metrics，不等于 human timbre verdict。
+
+final review artifact：
+
+- path：`output/epic-skyship-two-shot-29p79s-consistent-voice-bgm-v4.mp4`
+- SHA-256：`fb4d626ff7af31add575583c181359ad4237bf43c802600bef041cbeb84dd7f5`
+- size：`19,880,554` bytes
+- H.264 High、`1280x720@24fps`、715 frames、29.813s
+- AAC、48 kHz、stereo、256 kbps、language `zho`
+- video stream `29.791667s`；audio stream `29.791000s`
+- program integrated loudness：`-16.0 LUFS`
+- 23–28s 无旁白尾段 BGM：`-15.8 LUFS`
+
+mix 先把 BGM、ambience、whoosh、impact 与 shimmer 合成一个 bed，再以 full-duration voice control
+统一 sidechain；不再只 duck BGM。第一次 render 暴露 audio stream 在第三句后结束的 deterministic
+bug；单纯 `apad` 未改变 exact bytes，最终以显式 29.792s `anullsrc` control lane 修复。只有在
+`ffprobe` 证明 audio stream 延伸至 `29.791s` 且尾段响度为 `-15.8 LUFS` 后才保留 current output。
+
+project-local `video-analysis video_analyze` 对 final exact SHA 识别三句顺序、`has_audio=true`，并在
+threshold `0.4` 下只检出一个 scene；full video/audio decode 均为 `PASS`。32px caption 和 seam contact
+sheet：`evidence/review-v4/caption-and-seam-contact-sheet.jpg`。完整 requirement-level receipt：
+`evidence/review-v4/gate.json`。
+
+`VOICE_SOURCE_IDENTITY`、`VOICE_LEVEL_CONSISTENCY`、`BGM_PRESENT_AFTER_FINAL_LINE`、
+`FULL_BED_VOICE_DUCKING` 与 Caption Gate technical requirements 为 `PASS`；
+`VOICE_TIMBRE_HUMAN_VERDICT`、`HUMAN_AUDIBILITY_AND_MIX` 与 `FINAL_ACCEPTANCE` 保持
+`NOT_EVALUATED`。V4 只是 current technical review candidate，不是 activation、P6 或 Final Acceptance。
+
 ## Provider And Budget Boundary
 
 run `...-002` 只发生两个 submit POST：Shot 1 T2V 一次、Shot 2 R2V 一次。Shot 2 resume 在 local profile compatibility preflight 曾 fail closed 一次，位于 credential/network/POST 之前；修正后只消费剩余一次授权 POST。全程 blind retry `0`、Provider fallback `0`、I2V fallback `0`、manual Ark Asset upload `0`。
@@ -250,6 +322,9 @@ Manifest revision `56` 中两 attempts 均为 `status=succeeded`、`video_genera
 | epic-v2-shot01-agent-gate | seedance-mini:442b80460a921846900de4f2f69aebb26b2f5ec389c9770723764b24b369bf86 | seedance-mini-r2v-epic-skyship-20260829-002 | epic-skyship-v2-shot-01-attempt | shot-01-t2v | aff994a4ebefb9a5fd3d65d824be4f4f290cae0272ff94fe6d4765aa3338afd8 | AGENT_PER_SHOT_POST_MEDIA_GATE | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | epic-v2-shot01-provider-fetch | runs/seedance-mini-r2v-epic-skyship-20260829-002/evidence/shot-01-gate.json |
 | epic-v2-shot02-provider-fetch | seedance-mini:53da0af907a055e9b807a637866b4d1edfd26d6a636bb5d85fe27d5a251f5507 | seedance-mini-r2v-epic-skyship-20260829-002 | epic-skyship-v2-shot-02-attempt | shot-02-r2v | e33f18bc09c178703af5abfd534982d2c15ce5c48a2135dc7f4be3101eb68029 | PAID_PROVIDER_SUBMIT_POLL_FETCH | PASS | NONE | NEW_ATTEMPT | NONE | runs/seedance-mini-r2v-epic-skyship-20260829-002/evidence/shot-02-live-report.json |
 | epic-v2-shot02-agent-gate | seedance-mini:53da0af907a055e9b807a637866b4d1edfd26d6a636bb5d85fe27d5a251f5507 | seedance-mini-r2v-epic-skyship-20260829-002 | epic-skyship-v2-shot-02-attempt | shot-02-r2v | e33f18bc09c178703af5abfd534982d2c15ce5c48a2135dc7f4be3101eb68029 | AGENT_PER_SHOT_POST_MEDIA_GATE | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | epic-v2-shot02-provider-fetch | runs/seedance-mini-r2v-epic-skyship-20260829-002/evidence/shot-02-gate.json |
+| epic-v3-human-voice-consistency | h3-voice-v3:35d385483ef96da349d7ab161faae59d13777268f5b4199cc814638aed122093 | epic-skyship-voice-consistency-v4 | review-v3-independent-voice-sources | independent-voice-sources | 35d385483ef96da349d7ab161faae59d13777268f5b4199cc814638aed122093 | HUMAN_PLAYBACK | FAIL | VOICE_IDENTITY_AND_LEVEL_INCONSISTENCY | NEW_ATTEMPT | NONE | runs/seedance-mini-r2v-epic-skyship-20260829-002/evidence/review-v3/gate.json |
+| epic-v4-continuous-source | h3-local:1e2170c35bddc8f0e554b5df837874758c786b7655d477d54a8caab6fd6b0466 | epic-skyship-voice-consistency-v4 | continuous-repair-02 | continuous-voice-source | 0c7e244e0e1671055e249b7c120508668d566d7aa947d242fc124769f108e9e1 | LOCAL_COMFYUI_SUBMIT_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | runs/seedance-mini-r2v-epic-skyship-20260829-002/voice-v4/source/continuous-repair-02.receipt.json |
+| epic-v4-technical-review-gate | v4-review:fb4d626ff7af31add575583c181359ad4237bf43c802600bef041cbeb84dd7f5 | epic-skyship-voice-consistency-v4 | v4-final-deterministic-mix | continuous-voice-final-mix | fb4d626ff7af31add575583c181359ad4237bf43c802600bef041cbeb84dd7f5 | TECHNICAL_REVIEW_DERIVATIVE_GATE | PASS | NONE | INPUT_REUSE_ONLY | epic-v4-continuous-source | runs/seedance-mini-r2v-epic-skyship-20260829-002/evidence/review-v4/gate.json |
 
 ## Assessment
 
@@ -261,7 +336,7 @@ Manifest revision `56` 中两 attempts 均为 `status=succeeded`、`video_genera
 
 - local H3/T8 output 自动上传受控 object storage、presigned URL lifecycle、cloud-egress approval 与 provider-neutral materialization proof 尚未实现；不得把 Seedance-output refresh permit 泛化为 uploader authority。
 - 本次只有一个真实 Mini R2V attempt，不能自动形成 Provider-wide Learning Claim，也不能外推 Seedance 2.0 base/fast/2.5。
-- Agent Per-Shot Gate、boundary SSIM 与 Review V3 technical Gate 都不是独立 human P6 / Final Acceptance；current voiced-captioned V3 已因前后音质不一致获得 human `FAIL`，不得继续作为 current acceptance candidate。
+- Agent Per-Shot Gate、boundary SSIM 与 Review V4 technical Gate 都不是独立 human P6 / Final Acceptance；V3 human `FAIL` 继续有效，V4 尚未获得新的 human timbre、audibility、mix 或 Final Acceptance verdict。
 - follow-up RAG 对本次新增 voice-consistency query 返回 tagged last-good fragments 并 queued detached
   refresh；current record bytes 不得据此视为已经进入 retrieval index。
 
@@ -271,5 +346,6 @@ Manifest revision `56` 中两 attempts 均为 `status=succeeded`、`video_genera
 - nominal duration 不能覆盖 physical probe measurement；physical measurement 也不能直接改写 sealed official profile capability。
 - source Provider success/fetch 不授权下一 Shot；必须先 exact-byte Gate PASS并 activation。
 - combined 30s MP4 是 review derivative，不得冒充 Provider output、P6 或 final active deliverable。
-- 本次 V3 repair 只有四次 loopback local H3 voice generation，没有 remote/paid Provider call、
-  Production mutation、push 或 release；记录完成时 ComfyUI 已停止。
+- V4 repair 共三个 outcome-known loopback local H3 submits：一个 sampler OOM、一个 pre-sampling dimension
+  validation failure、一个 successful continuous take；没有 remote/paid Provider call、Production mutation、
+  push 或 release。ComfyUI service 在本任务开始前由其他 session 启动，本任务未停止或接管其 lifecycle。
