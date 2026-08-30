@@ -10,9 +10,25 @@ Date: 2026-08-30
 
 ## Purpose
 
-本文记录 Provider Console 无法看到 `runs/<run_id>/outputs/**` 新合成视频的 deterministic integration gap、
+本文记录 Provider Console 无法看到 `runs/<run_id>/outputs/**` 或 `runs/<run_id>/output/**` 新合成视频的 deterministic integration gap、
 实现边界和真实浏览器验证。它是 local read-only catalog 修复，不是媒体生成、Production state、candidate、
 P6、Final Acceptance、publish 或 release evidence。
+
+## Seedance Singular Output Extension — 2026-08-30
+
+Commit `8c3e33c813ab743aee82067b5f0500a2f443d5cf` 将同一 catalog contract 扩展到 Seedance skyship run：
+
+- `run_outputs` 同时扫描 direct top-level `output/**` 与 `outputs/**`，仍不递归暴露
+  `<run_id>/production/**/outputs/**`；
+- exact evidence 只从同一 top-level run 的 `sidecars/**` 与 `evidence/**` 读取；
+- `REVIEW_V3_CAPTION_AUDIO_CONTRACT` adapter 要求 workspace-relative path、SHA-256、bytes 完全匹配，且
+  `publication.candidate_activation`、`publication.p6`、`publication.final_acceptance` 均为 `false`；
+- `FINAL_ACCEPTANCE` 作为 exact-bound external reported status；只有 explicit
+  `human_playback_finding.verdict` 与其一致时才投影 `human_verdict`；
+- 切换视频来源时清除旧的 `externalQuery`，因此截图中遗留的 `rama-h3...` 不会继续隐藏 Seedance 条目。
+
+错误 path、SHA、bytes、publication 标志、含 `.` / `..` 的 path 或冲突 gate 均 fail closed。该扩展仍只产生
+`non_canonical` External evidence，不改变 Manifest、candidate、P6、Final Acceptance 或 activation ownership。
 
 ## Runtime Truth And Fix
 
@@ -20,7 +36,8 @@ P6、Final Acceptance、publish 或 release evidence。
 Commit `3b8faf32b06a0dc500ba462c1eebe7e34e73497c` 完成以下修复：
 
 - 新增 `runs-outputs` source，root 为 repository `runs/`，layout 为 `run_outputs`；
-- scanner 只读取 direct `runs/<run_id>/outputs/**` media 与同 workspace `sidecars/**`，排除
+- scanner 只读取 direct `runs/<run_id>/output/**`、`runs/<run_id>/outputs/**` media 与同 workspace
+  `sidecars/**`、`evidence/**`，排除
   `<run_id>/production/**/state/render/outputs/**`；
 - sidecar limit 按 media 所属 top-level run 隔离，避免全 `runs/` JSON 排序截断后漏掉较新的 composition gate；
 - 只支持 `development-composition-repair-gate-1.0` 与
@@ -53,6 +70,24 @@ request 返回 HTTP `206`，console 无 error/warn。
 该 playback evidence 只证明 exact file 可见和可播放。Human `FAIL` 仍是当前质量 verdict，不能由 technical
 gate、播放器 ready 或 build/test PASS 覆盖。
 
+### Seedance V3 Runtime Evidence
+
+当前最新 skyship composition 是两个 Seedance Shot 经本地 `ffmpeg` 合成的 review derivative，不是新的
+Seedance Provider raw output：
+
+- `runs/seedance-mini-r2v-epic-skyship-20260829-002/output/epic-skyship-two-shot-29p79s-no-caption-bgm-v3.mp4`
+  - bytes: `20143672`
+  - SHA-256: `00b6bce620ab5af929607457d257fb6f812f4503cd133ff6b99e0a212b247471`
+  - `FINAL_ACCEPTANCE=NOT_EVALUATED`；没有独立 human verdict；
+- `runs/seedance-mini-r2v-epic-skyship-20260829-002/output/epic-skyship-two-shot-29p79s-small-caption-voice-bgm-v3.mp4`
+  - bytes: `19828969`
+  - SHA-256: `35d385483ef96da349d7ab161faae59d13777268f5b4199cc814638aed122093`
+  - explicit human playback finding 与 `FINAL_ACCEPTANCE` 均为 `FAIL`。
+
+Live catalog 将两条记录投影为 `bound + deterministic_composition`，默认 `linked` filter 可见。Chrome 在
+`AI-VIDEO Runs Outputs` source 中清除旧 query 后显示两张卡片；打开 no-caption 分支时 opaque media token
+`readyState=4`、`duration=29.791667`，页面显示 exact repository-relative path 与 SHA。
+
 ## Verification
 
 - Provider Console Node suite：`90 passed`。
@@ -68,6 +103,22 @@ Receipt `.agent/harness/runs/20260830T002353506023Z/receipt.json` 的 overall st
 `HEAD` 从 `3b8faf3` 推进到 unrelated commit `a604c8d`。因此本记录不把该 receipt 宣称为 passing completion
 receipt；重新对非-current `3b8faf3` 请求 completion verification 会按 Harness contract 返回
 `completion scope is not closure eligible`。
+
+Seedance extension 的 current verification：
+
+- Provider Console Node/continuity suite：`86 passed`；
+- `npm exec --offline -- vite build`：PASS，`4582 modules transformed`；
+- native `reviewer_xhigh` final scoped re-review：`accept`，无 blocking/non-blocking concern；
+- exact commit range `8c3e33c^..8c3e33c` 的 mandatory Harness checks 全部通过，包括
+  skill boundary `2 passed`、Architecture Gate PASS、Provider Console Python `42 passed`、Node `86 passed`
+  与 web build；
+- fresh passing receipt：`.agent/harness/runs/provider-console-seedance-output-20260830-v2/receipt.json`；
+  verifier 的 `passed`、`fresh`、`fresh_for_snapshot`、`scope_paths_match`、`scope_worktree_clean`、
+  `complete_completion_proof`、`integrity` 与 `artifact_integrity` 均为 `true`。
+
+第一次 Harness attempt 使用 repository `.venv/bin/python`，因该环境缺少 `pytest` 产生 failed receipt
+`.agent/harness/runs/provider-console-seedance-output-20260830-v1/receipt.json`；随后使用现有
+`/home/reggie/miniconda3/bin/python` 对同一 immutable commit range 完成上述 passing verification，未安装 dependency。
 
 ## Boundaries And Remaining Risk
 
@@ -85,5 +136,6 @@ receipt；重新对非-current `3b8faf3` 请求 completion verification 会按 H
 
 - 不得把 `runs-outputs` 卡片当成 Production attempt 或 delivery truth。
 - 不得把 technical `PASS_FOR_HUMAN_REVIEW` 覆盖 human `FAIL`。
-- 不得扩大 layout 到 arbitrary recursive `runs/` scan；nested Production render 必须继续排除。
+- 不得扩大 layout 到 arbitrary recursive `runs/` scan；只允许 direct top-level `output/**` / `outputs/**`，
+  nested Production render 必须继续排除。
 - 不得对 unknown composition schema 或未知 verdict 字符串做 best-effort 解释。
