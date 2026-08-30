@@ -204,9 +204,35 @@ metadata 与响度测量。为排除播放器预览静音或 track-selection 问
 - path：`output/epic-skyship-soundtrack-v3.wav`
 - SHA-256：`4629159990db8a35245910e4517def8a99ee033030be22c03634d7507c151bfb`
 
-完整 requirement-level receipt：`evidence/review-v3/gate.json`。其中 technical caption/audio
-requirements 为 `PASS`，但 `HUMAN_AUDIBILITY_AND_MIX` 与 `FINAL_ACCEPTANCE` 仍为
-`NOT_EVALUATED`；V3 没有被激活为 candidate、P6 或 Final Acceptance。
+完整 requirement-level receipt：`evidence/review-v3/gate.json`。首次导出时 technical
+caption/audio requirements 为 `PASS`，`HUMAN_AUDIBILITY_AND_MIX` 与 `FINAL_ACCEPTANCE`
+为 `NOT_EVALUATED`；下方后续 human playback evidence 已将 current verdict 更新为 `FAIL`。
+V3 从未被激活为 candidate、P6 或 Final Acceptance。
+
+#### Human Audio Consistency FAIL — 2026-08-30
+
+用户实际播放后指出前后音质不同。该反馈将 voiced-captioned V3 的
+`VOICE_IDENTITY_CONSISTENCY`、`HUMAN_AUDIBILITY_AND_MIX` 与 `FINAL_ACCEPTANCE` 更新为
+`FAIL`；上方 technical decode、BGM presence、caption rendering 与
+`AUDIO_SEMANTIC_SYNC PASS` 继续作为不同 proof layer 保留，不能覆盖 human verdict。
+
+exact final MP4 分段 EBU R128 测量确认变化不是单纯主观错觉：
+
+- `0.75–5.90s`：`-14.5 LUFS`
+- `7.40–12.55s`：`-11.5 LUFS`
+- `15.50–18.90s`：`-10.7 LUFS`
+- `19.00–29.00s` 无旁白尾段：`-18.1 LUFS`
+
+三份独立 H3 source clip 本身也不一致：`vo01=-12.6 LUFS`、`vo02=-10.3 LUFS`、
+`vo03=-13.7 LUFS`；其 `3.5–14 kHz` high-band mean 分别约 `-32.9 dB`、`-25.9 dB`、
+`-30.6 dB`，vo02 明显更亮。三个 clips 使用不同 seed 独立生成；prompt 中的 `same ... (S1)`
+只是文字约束，没有 shared speaker-reference asset、voice embedding 或可验证的 speaker identity。
+
+composition 又对三段统一使用固定 `volume=1.35`，没有逐 clip loudness、EQ、noise-floor、compression
+或 timbre matching；BGM sidechain ducking 和 time-varying ambience/SFX 进一步改变前后 foreground /
+background balance。全片末端的单次 `loudnorm` 只归一化 program aggregate，不能把三个独立 voice
+assets 变成同一声线或相同局部响度。故根因是 source voice identity 未锁定加上 per-clip mastering 缺失，
+不是 AAC decode、播放器 track selection 或 Caption Gate semantic-sync failure。
 
 ## Provider And Budget Boundary
 
@@ -235,8 +261,9 @@ Manifest revision `56` 中两 attempts 均为 `status=succeeded`、`video_genera
 
 - local H3/T8 output 自动上传受控 object storage、presigned URL lifecycle、cloud-egress approval 与 provider-neutral materialization proof 尚未实现；不得把 Seedance-output refresh permit 泛化为 uploader authority。
 - 本次只有一个真实 Mini R2V attempt，不能自动形成 Provider-wide Learning Claim，也不能外推 Seedance 2.0 base/fast/2.5。
-- Agent Per-Shot Gate、boundary SSIM 与 Review V3 local Gate 都不是独立 human P6 / Final Acceptance；用户仍需对 current V3 的实际音量、旁白质感、配乐、字幕大小与 seam 作最终取舍。
-- RAG index 未刷新；committed record bytes 不等于 retrieval index 已包含本次 evidence。
+- Agent Per-Shot Gate、boundary SSIM 与 Review V3 technical Gate 都不是独立 human P6 / Final Acceptance；current voiced-captioned V3 已因前后音质不一致获得 human `FAIL`，不得继续作为 current acceptance candidate。
+- follow-up RAG 对本次新增 voice-consistency query 返回 tagged last-good fragments 并 queued detached
+  refresh；current record bytes 不得据此视为已经进入 retrieval index。
 
 ## Agent Guardrails
 
