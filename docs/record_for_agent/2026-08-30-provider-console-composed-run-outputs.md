@@ -88,6 +88,30 @@ Live catalog 将两条记录投影为 `bound + deterministic_composition`，默�
 `AI-VIDEO Runs Outputs` source 中清除旧 query 后显示两张卡片；打开 no-caption 分支时 opaque media token
 `readyState=4`、`duration=29.791667`，页面显示 exact repository-relative path 与 SHA。
 
+### Seedance V4 Evidence Extension
+
+Commit `b8830a8` 将同一 External catalog contract 扩展到最新 `review-v4/gate.json` technical review
+candidate。目标 MP4 由另一个已完成的 media session 创建；本次只修复 read-only frontend/server projection，
+没有重新生成 Seedance Shot、旁白或 composition：
+
+- path: `runs/seedance-mini-r2v-epic-skyship-20260829-002/output/epic-skyship-two-shot-29p79s-consistent-voice-bgm-v4.mp4`；
+- bytes: `19880554`；
+- SHA-256: `fb4d626ff7af31add575583c181359ad4237bf43c802600bef041cbeb84dd7f5`；
+- measured playback duration: `29.791667` seconds；
+- exact evidence: `runs/seedance-mini-r2v-epic-skyship-20260829-002/evidence/review-v4/gate.json`。
+
+V4 adapter 只在 artifact path、SHA-256、bytes、same-run evidence containment、
+`review_candidate_gate=PASS`、`FINAL_ACCEPTANCE=NOT_EVALUATED` 与 explicit acceptance boundary 全部匹配时
+投影 `bound + deterministic_composition + technical_gate=PASS`。它明确保留
+`human_verdict=null`、`lifecycle_status=NOT_EVALUATED` 与 `evidence_classification=non_canonical`；不产生
+candidate activation、P6、Final Acceptance 或 human acceptance。错误 SHA、bytes、traversal path、越界
+acceptance 字段均 fail closed；同一 exact bytes 同时出现 V3/V4 binding 时标记 association ambiguity，不按版本
+或 mtime 猜测。
+
+Live `/api/external-media?refresh=1` 返回上述 exact projection。Chrome 默认 `已关联` filter 中可见该卡片，
+播放器 opaque token 的 `readyState=4`、`duration=29.791667`，detail 显示 exact path、full SHA 与
+`evidence/review-v4/gate.json`。
+
 ## Verification
 
 - Provider Console Node suite：`90 passed`。
@@ -120,16 +144,29 @@ Seedance extension 的 current verification：
 `.agent/harness/runs/provider-console-seedance-output-20260830-v1/receipt.json`；随后使用现有
 `/home/reggie/miniconda3/bin/python` 对同一 immutable commit range 完成上述 passing verification，未安装 dependency。
 
+Seedance V4 evidence extension 的 current verification：
+
+- focused V4 regression：`1 passed`；Provider Console Node/continuity suite：`87 passed`；
+- `npm exec --offline -- vite build`：PASS，`4582 modules transformed`；
+- native `reviewer_xhigh` scoped re-review：`accept`，无 blocking/non-blocking concern；
+- exact commit range `b8830a8^..b8830a8` 的 mandatory Harness checks 全部通过，包括 docs contract、policy
+  audit、skill boundary `2 passed`、Architecture Gate PASS、Provider Console Python `42 passed`、Node
+  `87 passed` 与 web build；
+- fresh passing receipt：`.agent/harness/runs/seedance-review-v4-visibility-20260830/receipt.json`；receipt verifier
+  的 `passed`、`fresh`、`fresh_for_snapshot`、`scope_paths_match`、`scope_worktree_clean`、
+  `complete_completion_proof`、`integrity` 与 `artifact_integrity` 均为 `true`。
+
 ## Boundaries And Remaining Risk
 
 - `runs-outputs` 是 External/non-canonical catalog，不改变 canonical Runs latest-follow。
 - 文件名、mtime 或目录位置不会生成 Prompt、Shot、success、candidate 或 lifecycle truth；只有窄 schema 的 exact
   evidence chain可投影 composition review status。
 - 未调用 Provider、未生成媒体、未修改 Manifest 或 activation state。
-- `retrieve-ai-video-memory` exact CLI 因当前 Python 环境缺少 `langchain_core` 返回
-  `ModuleNotFoundError`；没有重建 index，也没有用 text search 冒充 RAG。
-- Automatic `distill-ai-video-learning` evaluation outcome：`no_candidate`。本轮只有一条 deterministic
-  integration failure/fix chain，不满足跨实验 Learning Claim admission threshold，也不创建 placeholder。
+- 本次 `retrieve-ai-video-memory` experience query 成功返回 tagged last-good fragments；相关 experience shard
+  标记为 stale 并由 CLI 排队 detached refresh，没有 foreground rebuild，也没有把 RAG hit 当作 runtime truth。
+- Automatic `distill-ai-video-learning` evaluation outcome：`no_candidate`。V3/V4 属于同一
+  `architecture_implementation` integration topic 的 schema/version 演进，不是可独立计数的 media experiment
+  attempts；该记录保持 `learning_eligibility: ineligible`，不创建 placeholder。
 - Implementation 与 record 均为 local commits；未 push、deploy 或 release。
 
 ## Agent Guardrails
