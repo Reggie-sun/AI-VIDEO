@@ -4,11 +4,23 @@ topic_id: promptless-long-form-director-preflight
 learning_eligibility: ineligible
 ---
 
-# Promptless Director Strategy Preflight Record
+# Raw Creative Input Director Strategy Preflight Record
 
 Date: 2026-08-30
 
-## Supersession Notice — 2026-08-30
+## Current Supersession Notice — Raw Creative Input Boundary
+
+Implementation commit `107e025bf27216bff90db760620adb540d5caf77` supersedes the
+promptless-only routing contract from `f83f42ac7981aba0caa634c2a4c38a4362dee117`.
+Prompt presence、detail 或格式不再构成 Director preflight bypass：只要输入尚未形成 approved
+AI-VIDEO Shot / ordered coverage，无论是 missing、模糊方向、concept/script、reference-led brief 还是
+详细 draft prompt，都必须先进入 `open-video` 优化。只有 already-approved 且本次不改变 creative
+intent / coverage 的 Shot 可以跳过。
+
+本文件名与 `topic_id` 保留历史身份；下方 promptless-only 与 fixed-threshold contracts 仅作为
+regression chronology，不再代表 current boundary。
+
+## Historical Supersession Notice — Fixed Threshold
 
 本记录下方由 commits `a9b0dc0522e995573a2a6f706b637d075c531d2e` 与
 `01c9d306526d7fd75d6e244988821734965a98fa` 实现的固定 `>15s` creative threshold，以及
@@ -16,16 +28,16 @@ Date: 2026-08-30
 `f83f42ac7981aba0caa634c2a4c38a4362dee117` supersede。旧段落保留为发生过的 regression
 chronology，不再代表 current contract。
 
-Current contract 对所有 `PROMPTLESS_REQUEST` 都先 route 到 `open-video`，由 Agent 根据叙事 beat、
+该次修复对所有 `PROMPTLESS_REQUEST` 都先 route 到 `open-video`，由 Agent 根据叙事 beat、
 动作/空间变化、camera/blocking trajectory、pacing、continuity risk 与用户明确偏好选择
 `coverage_strategy=single_take|multi_shot`。时长与 Seedance 2.5 native `30s` capability 只属于 pacing /
 downstream feasibility，不能直接选择 creative strategy。
 
 ## Purpose
 
-本文记录 `PROMPTLESS_REQUEST` Director preflight 的初始修复及其后续 strategy-owner correction。目标是阻止
-“用户只给时长和 Seedance target、没有 creative brief”时，Agent 直接把空 brief 降级为一个重复慢运镜，
-再用 `VIDEO_EXTEND`、`no cut` 或 `uninterrupted` 补足时长。
+本文记录 Director preflight 从 fixed-duration、promptless-only 规则收敛到 raw creative input boundary
+的过程。目标是阻止 Agent 在用户不给 prompt 时自行降级为简单镜头，也阻止 Agent 因用户已经给出一段
+prompt 或模糊方向，就绕过 Director optimization 直接交给 Provider-specific authoring。
 
 本记录描述 Development control-plane implementation，不是 Provider/runtime capability promotion，
 不证明 Seedance 的真实媒体复杂度、prompt adherence、P6 或 Final Acceptance。
@@ -44,21 +56,37 @@ downstream feasibility，不能直接选择 creative strategy。
 `30s` 可能适合一个完整 single take，而 `10s` 也可能需要 multi-shot。当前修复因此删除整个
 duration-based creative classification，而不是调整 threshold 数值。
 
+后续检查发现 promptless-only 仍是错误边界：用户给出的 prompt 可能只是一句模糊方向，也可能是需要
+保真重构的 draft；它们都不是 approved Shot。若以 prompt presence 作为 bypass，简单镜头问题仍会在
+“有 prompt 但没有 Director coverage”时复现。Current implementation 因此改用 approved Shot ownership
+作为唯一 routing boundary。
+
 ## Current Corrected Contract
 
-Implementation commit `f83f42ac7981aba0caa634c2a4c38a4362dee117` 实现以下 current boundary：
+Implementation commit `107e025bf27216bff90db760620adb540d5caf77` 实现以下 current boundary：
 
-- 所有缺少 user creative brief 的 request 都是 `PROMPTLESS_REQUEST`，必须先进入 `open-video`；
+- 所有尚未形成 approved Shot / ordered coverage 的输入都是 `DIRECTOR_PREFLIGHT_REQUEST`；missing、
+  vague direction、concept/script、reference-led brief 与 draft prompt 一律先进入 `open-video`；
+- schema v3 将 raw input 分类为 `creative_input_kind=missing|direction|draft_prompt`。Supplied input 必须
+  绑定 exact `creative_input_evidence`；missing 必须使用 `null`，不得伪造 user prompt；
+- supplied input 必须声明 structured `creative_constraints`。每个 `source_text` 必须是 input evidence
+  的 verbatim substring；global constraint 必须绑定所有 coverage units，beat-specific constraint 至少
+  绑定一个 unit，unknown 或 duplicate ID fail closed；
+- validator 只证明 declared inventory 的结构、verbatim source anchoring 与 binding，不证明 raw input
+  的约束已经提全，也不理解语义。Agent 必须依次 review `raw evidence -> inventory` 是否漏提 explicit
+  constraints，以及 `inventory -> coverage` 是否遗漏、反转或擅自改写；
 - Agent 必须显式选择 `coverage_strategy=single_take|multi_shot`，并以
-  `director_decision_rationale` 说明基于内容的判断；没有 duration threshold 或 Provider-capability
-  creative branch；
+  `director_decision_rationale` 说明基于内容的判断；没有 prompt-presence、duration threshold 或
+  Provider-capability creative branch；
 - `strategy_source=agent_directed|user_requested` 区分 Agent 判断与用户偏好；只有
   `user_requested` 可携带 `strategy_request_evidence`，不得伪造 user evidence；
-- schema v2 validator 对 `multi_shot` 要求至少两个 ordered units 与 cut-class non-final transition，
+- schema v3 validator 对 `multi_shot` 要求至少两个 ordered units 与 cut-class non-final transition，
   对 `single_take` 要求 continuous non-final transition；`30s` 单 unit single take 与 `10s` multi-shot
   都可在 coverage 自洽时通过；
 - multiple units 仍须具有不同 `objective` 与 `visible_change`；只有 `multi_shot` 强制相邻 finite
   beat/scale/camera categories 不同，合法 `single_take` 可保持同一 camera language；
+- 只有 already-approved 且本次不修改 creative intent / coverage 的 Shot 才能直接进入
+  `seedance-authoring`；任意 raw prompt 都不能冒充 approval；
 - Seedance 2.5 native `30s` capability 不选择 strategy。若已选 strategy 通过 downstream exact
   capability check 后发现不可执行，必须返回 Director 重新判断，Provider adapter 不得静默改写；
 - `runtime_skill_calls = 0`、Product Runtime isolation、Provider authorization、per-Shot media Gate、
@@ -69,7 +97,7 @@ Implementation commit `f83f42ac7981aba0caa634c2a4c38a4362dee117` 实现以下 cu
 Focused working-tree verification：
 
 ```text
-168 passed
+183 passed
 Documentation contract gate passed
 Harness policy audit: no unmapped, unverified, missing, or unreferenced paths
 Architecture Gate: PASS
@@ -77,14 +105,15 @@ skill-creator quick_validate: both Skills are valid
 git diff --check: passed
 ```
 
-首次 `reviewer_xhigh` verdict 为 `accept with concerns`，指出 validator 将 multi-shot 的相邻
-beat/scale/camera diversity 规则错误套到了 multi-unit `single_take`。修复并新增 regression test 后，
-同一 reviewer 的 scoped re-review verdict 为 `accept`，无 blocking 或 non-blocking concern。
+本轮 `reviewer_xhigh` 首次 re-review verdict 为 `reject`：正向 fixture 没有保留 raw input 的
+`red product` / `dark table` / `no people`，且旧措辞把 declared inventory completeness 冒充 raw input
+constraint extraction completeness。修复 coherent fixture、verbatim substring gate 与两阶段 Agent review
+后，同一 reviewer 的 scoped re-review verdict 为 `accept`，无 blocking 或 non-blocking concern。
 
 Exact commit-range Harness：
 
-- scope: `1cd07984ee1299cdc1479a0e96ec82d526c76aa7..f83f42ac7981aba0caa634c2a4c38a4362dee117`
-- receipt: `.agent/harness/runs/promptless-director-strategy-20260830-v1/receipt.json`
+- scope: `a45e00c8677db9c4b25e83037326e55662465412..107e025bf27216bff90db760620adb540d5caf77`
+- receipt: `.agent/harness/runs/raw-creative-input-director-20260830-v1/receipt.json`
 - selected checks: `scope_diff_check`、`docs_contract_check`、`policy_audit_check`、
   `product_runtime_skill_boundary_tests`、`task_architecture_gate`、`harness_tests`、
   `seedance_authoring_skill_tests`、`open_video_skill_tests`
@@ -146,24 +175,25 @@ Final canonical-wording alignment 另以 exact range
 ## Evidence Boundary
 
 本次 correction 没有调用 Provider、没有生成媒体、没有修改 Manifest / Registry / P6 / Final
-Acceptance，也没有声称 validator 能判断真实镜头是否“高级”或“好看”。schema v2 只验证 Agent 已
-显式作出 strategy decision、evidence source 与 transition/coverage 结构内部一致；创意判断本身由
-`open-video` routing 下的 Agent 承担，不能由 validator 的时长公式替代。
+Acceptance，也没有声称 validator 能判断真实镜头是否“高级”或“好看”。schema v3 只验证 Agent 已
+显式作出 strategy decision、declared constraints 的 source anchoring / binding 与 transition/coverage
+结构内部一致；创意判断和 constraint extraction / semantic preservation 仍由 `open-video` routing 下的
+Agent 承担，不能由 prompt presence、validator 或时长公式替代。
 
 真实生成后的镜头复杂度、构图、动作、camera adherence 与观感仍属于 empirical uncertainty，必须由
 现有 per-Shot media Gate 和 human/visual review 判断。
 
 ## Repository State
 
-- current correction commit: `f83f42ac7981aba0caa634c2a4c38a4362dee117`
-- superseded implementation commits: `a9b0dc0522e995573a2a6f706b637d075c531d2e`、
-  `01c9d306526d7fd75d6e244988821734965a98fa`
+- current correction commit: `107e025bf27216bff90db760620adb540d5caf77`
+- superseded implementation commits: `f83f42ac7981aba0caa634c2a4c38a4362dee117`、
+  `a9b0dc0522e995573a2a6f706b637d075c531d2e`、`01c9d306526d7fd75d6e244988821734965a98fa`
 - publication: local `main` only；本次未 push、未 release
 - unrelated `.codex/config.toml`、既有 staged H3 record、untracked artifacts/plans 与 `uv.lock` 均未修改、
   未 stage、未 commit
-- Agent Memory retrieval preflight 因 local index library version mismatch 未运行成功；按 Skill
-  fail closed，未 rebuild 或刷新 RAG index。本次判断以 current code、contracts、tests、review 和
-  exact Harness receipt 为准
+- Agent Memory retrieval preflight 返回 stale last-good advisory fragments，并排队 background refresh；
+  未把 stale RAG 作为 current truth。本次判断以 current code、contracts、tests、review 和 exact Harness
+  receipt 为准，record 阶段未另行刷新 index
 
 ## Learning Evaluation
 
