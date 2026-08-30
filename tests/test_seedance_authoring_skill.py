@@ -141,19 +141,28 @@ def test_selected_profile_preserves_exact_runtime_identity() -> None:
     )
 
 
-def test_promptless_request_routes_to_agent_directed_strategy_before_seedance() -> None:
+def test_all_raw_creative_input_routes_to_director_before_seedance() -> None:
     seedance = _read(SKILL_PATH)
     open_video = _read(OPEN_VIDEO_SKILL_PATH)
     playbook = _read(ROOT / ".agent" / "context" / "control-plane-playbook.md")
 
+    assert "DIRECTOR_PREFLIGHT_REQUEST" in seedance
+    assert "prompt presence 不等于" in seedance
+    assert "模糊方向" in seedance
+    assert "完整 draft prompt" in seedance
     assert "coverage_strategy=single_take|multi_shot" in seedance
     assert "不得按时长阈值选择" in seedance
     assert "MUST NOT" in seedance
     assert "one uninterrupted shot" in seedance
-    assert "coverage_strategy" in open_video
-    assert "Duration is a pacing and feasibility input, not a creative branch" in open_video
+    assert "creative_input_kind" in open_video
+    assert "missing" in open_video
+    assert "direction" in open_video
+    assert "draft_prompt" in open_video
+    assert "A user prompt is raw input, not approval" in open_video
+    assert "feasibility input, not a creative branch" in open_video
     assert "validate_director_coverage.py" in open_video
     assert "strategy_source=agent_directed" in open_video
-    assert "Promptless Director Strategy Gate" in playbook
+    assert "Raw Creative Input Director Strategy Gate" in playbook
+    assert "prompt presence" in playbook
     assert "VIDEO_EXTEND" in playbook
-    assert "不得用时长阈值" in playbook
+    assert "时长阈值" in playbook

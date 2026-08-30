@@ -60,7 +60,7 @@ def _seedance_max_duration(model_id: str) -> int:
     raise AssertionError(f"missing Seedance capability for {model_id}")
 
 
-def test_skill_discovery_includes_promptless_duration_only_requests() -> None:
+def test_skill_discovery_includes_all_raw_creative_inputs() -> None:
     text = SKILL_PATH.read_text(encoding="utf-8")
     match = re.match(r"\A---\n(.*?)\n---\n", text, flags=re.DOTALL)
     assert match is not None
@@ -68,8 +68,10 @@ def test_skill_discovery_includes_promptless_duration_only_requests() -> None:
 
     assert frontmatter["name"] == "open-video"
     description = frontmatter["description"]
-    assert "promptless duration-only request" in description
-    assert "ordered Shots" in description
+    assert "raw creative input" in description
+    assert "draft prompt" in description
+    assert "approved Shots" in description
+    assert "ordered coverage" in description
     assert "advisory" in description
 
 
@@ -77,6 +79,7 @@ def _unit(
     unit_id: str,
     *,
     duration_seconds: float = 15,
+    constraint_ids: list[str] | None = None,
     beat_function: str,
     objective: str,
     open_state: str,
@@ -99,21 +102,54 @@ def _unit(
         "camera_intent": camera_intent,
         "visible_change": visible_change,
         "transition_out": transition_out,
+        "constraint_ids": [] if constraint_ids is None else constraint_ids,
     }
 
 
 def _payload(
     *,
+    creative_input_kind: str = "missing",
     coverage_strategy: str = "multi_shot",
     strategy_source: str = "agent_directed",
     target_duration_seconds: float = 30,
 ) -> dict[str, object]:
     unit_duration = target_duration_seconds / 2
+    supplied_input = creative_input_kind != "missing"
+    constraint_ids = (
+        ["constraint-product", "constraint-surface", "constraint-people"]
+        if supplied_input
+        else []
+    )
     return {
-        "schema_version": "2",
+        "schema_version": "3",
         "request": {
-            "user_creative_brief_supplied": False,
-            "user_creative_brief_evidence": None,
+            "creative_input_kind": creative_input_kind,
+            "creative_input_evidence": (
+                None
+                if not supplied_input
+                else "Show a red product alone on a dark table; no people."
+            ),
+            "creative_constraints": (
+                []
+                if not supplied_input
+                else [
+                    {
+                        "constraint_id": "constraint-product",
+                        "scope": "global",
+                        "source_text": "red product",
+                    },
+                    {
+                        "constraint_id": "constraint-surface",
+                        "scope": "global",
+                        "source_text": "dark table",
+                    },
+                    {
+                        "constraint_id": "constraint-people",
+                        "scope": "global",
+                        "source_text": "no people",
+                    },
+                ]
+            ),
             "target_duration_seconds": target_duration_seconds,
             "coverage_strategy": coverage_strategy,
             "strategy_source": strategy_source,
@@ -133,14 +169,35 @@ def _payload(
             _unit(
                 "shot-01",
                 duration_seconds=unit_duration,
+                constraint_ids=constraint_ids,
                 beat_function="establish",
-                objective="Establish the vessel's danger and scale.",
-                open_state="The vessel is trapped below the storm shelf.",
-                close_state="Lightning exposes the blocked mountain pass.",
+                objective=(
+                    "Establish the red product alone on the dark table."
+                    if supplied_input
+                    else "Establish the vessel's danger and scale."
+                ),
+                open_state=(
+                    "The red product rests alone on the dark table; no people appear."
+                    if supplied_input
+                    else "The vessel is trapped below the storm shelf."
+                ),
+                close_state=(
+                    "A narrow rim light defines the red product against the empty set."
+                    if supplied_input
+                    else "Lightning exposes the blocked mountain pass."
+                ),
                 shot_scale="extreme_wide",
                 camera_treatment="tracking",
-                camera_intent="Fast lateral tracking reveals the blocked pass.",
-                visible_change="The route closes as the storm front descends.",
+                camera_intent=(
+                    "Track laterally across the dark table while keeping the product alone."
+                    if supplied_input
+                    else "Fast lateral tracking reveals the blocked pass."
+                ),
+                visible_change=(
+                    "The red surface moves from silhouette into a clean rim-lit profile."
+                    if supplied_input
+                    else "The route closes as the storm front descends."
+                ),
                 transition_out=(
                     "video_extend"
                     if coverage_strategy == "single_take"
@@ -150,14 +207,35 @@ def _payload(
             _unit(
                 "shot-02",
                 duration_seconds=unit_duration,
+                constraint_ids=constraint_ids,
                 beat_function="reveal",
-                objective="Reveal the escape decision and destination.",
-                open_state="The vessel turns away from the blocked pass.",
-                close_state="The vessel clears the clouds toward the citadel.",
+                objective=(
+                    "Reveal the red product's material detail without introducing people."
+                    if supplied_input
+                    else "Reveal the escape decision and destination."
+                ),
+                open_state=(
+                    "The red product remains alone in profile on the dark table."
+                    if supplied_input
+                    else "The vessel turns away from the blocked pass."
+                ),
+                close_state=(
+                    "The camera resolves on its embossed detail in the same empty setup."
+                    if supplied_input
+                    else "The vessel clears the clouds toward the citadel."
+                ),
                 shot_scale="mixed_progression",
                 camera_treatment="compound",
-                camera_intent="Whip pan into a crane reveal of the destination.",
-                visible_change="A risky turn opens the citadel route.",
+                camera_intent=(
+                    "Arc into a closer detail while preserving the dark table and empty set."
+                    if supplied_input
+                    else "Whip pan into a crane reveal of the destination."
+                ),
+                visible_change=(
+                    "The embossed surface detail becomes readable while the product stays red."
+                    if supplied_input
+                    else "A risky turn opens the citadel route."
+                ),
                 transition_out="end",
             ),
         ],
@@ -179,15 +257,16 @@ def _single_unit_payload(*, target_duration_seconds: float = 30) -> dict[str, ob
     return payload
 
 
-def test_promptless_30s_agent_can_choose_multi_shot() -> None:
+def test_missing_input_30s_agent_can_choose_multi_shot() -> None:
     validator = _load_validator()
 
     result = validator.validate_director_coverage(_payload())
 
     assert result == {
         "status": "passed",
-        "schema_version": "2",
-        "promptless_request": True,
+        "schema_version": "3",
+        "director_preflight_request": True,
+        "creative_input_kind": "missing",
         "coverage_strategy": "multi_shot",
         "strategy_source": "agent_directed",
         "coverage_unit_count": 2,
@@ -218,7 +297,7 @@ def test_seedance_2_5_native_30s_does_not_choose_coverage_strategy() -> None:
     assert single_take["coverage_strategy"] == "single_take"
 
 
-def test_promptless_30s_agent_can_choose_one_coverage_unit_single_take() -> None:
+def test_missing_input_30s_agent_can_choose_one_coverage_unit_single_take() -> None:
     validator = _load_validator()
 
     result = validator.validate_director_coverage(_single_unit_payload())
@@ -228,7 +307,7 @@ def test_promptless_30s_agent_can_choose_one_coverage_unit_single_take() -> None
     assert result["planned_duration_seconds"] == 30.0
 
 
-def test_promptless_10s_agent_can_choose_multi_shot() -> None:
+def test_missing_input_10s_agent_can_choose_multi_shot() -> None:
     validator = _load_validator()
 
     result = validator.validate_director_coverage(
@@ -240,12 +319,157 @@ def test_promptless_10s_agent_can_choose_multi_shot() -> None:
     assert result["planned_duration_seconds"] == 10.0
 
 
-def test_short_promptless_request_still_requires_open_video() -> None:
+def test_missing_input_still_requires_open_video() -> None:
     validator = _load_validator()
     payload = _single_unit_payload(target_duration_seconds=10)
     payload["request"]["director_skill"] = "seedance-authoring"
 
-    with pytest.raises(validator.CoverageValidationError, match="PROMPTLESS_REQUEST"):
+    with pytest.raises(
+        validator.CoverageValidationError, match="DIRECTOR_PREFLIGHT_REQUEST"
+    ):
+        validator.validate_director_coverage(payload)
+
+
+@pytest.mark.parametrize("creative_input_kind", ["direction", "draft_prompt"])
+def test_supplied_raw_creative_input_still_requires_open_video(
+    creative_input_kind: str,
+) -> None:
+    validator = _load_validator()
+    payload = _payload(creative_input_kind=creative_input_kind)
+    payload["request"]["director_skill"] = "seedance-authoring"
+
+    with pytest.raises(
+        validator.CoverageValidationError, match="DIRECTOR_PREFLIGHT_REQUEST"
+    ):
+        validator.validate_director_coverage(payload)
+
+
+@pytest.mark.parametrize("creative_input_kind", ["direction", "draft_prompt"])
+def test_supplied_raw_creative_input_can_pass_structural_director_preflight(
+    creative_input_kind: str,
+) -> None:
+    validator = _load_validator()
+
+    result = validator.validate_director_coverage(
+        _payload(creative_input_kind=creative_input_kind)
+    )
+
+    assert result["director_preflight_request"] is True
+    assert result["creative_input_kind"] == creative_input_kind
+
+
+@pytest.mark.parametrize("creative_input_kind", ["direction", "draft_prompt"])
+def test_supplied_raw_creative_input_requires_evidence(
+    creative_input_kind: str,
+) -> None:
+    validator = _load_validator()
+    payload = _payload(creative_input_kind=creative_input_kind)
+    payload["request"]["creative_input_evidence"] = None
+
+    with pytest.raises(
+        validator.CoverageValidationError, match="creative_input_evidence"
+    ):
+        validator.validate_director_coverage(payload)
+
+
+@pytest.mark.parametrize("creative_input_kind", ["direction", "draft_prompt"])
+def test_supplied_raw_creative_input_requires_constraint_inventory(
+    creative_input_kind: str,
+) -> None:
+    validator = _load_validator()
+    payload = _payload(creative_input_kind=creative_input_kind)
+    payload["request"]["creative_constraints"] = []
+    for unit in payload["coverage_units"]:
+        unit["constraint_ids"] = []
+
+    with pytest.raises(
+        validator.CoverageValidationError, match="creative_constraints"
+    ):
+        validator.validate_director_coverage(payload)
+
+
+def test_constraint_source_text_must_be_verbatim_input_evidence() -> None:
+    validator = _load_validator()
+    payload = _payload(creative_input_kind="draft_prompt")
+    payload["request"]["creative_constraints"][0]["source_text"] = (
+        "Keep the product red."
+    )
+
+    with pytest.raises(validator.CoverageValidationError, match="exact substring"):
+        validator.validate_director_coverage(payload)
+
+
+def test_global_creative_constraint_must_bind_to_every_coverage_unit() -> None:
+    validator = _load_validator()
+    payload = _payload(creative_input_kind="direction")
+    payload["coverage_units"][1]["constraint_ids"] = []
+
+    with pytest.raises(
+        validator.CoverageValidationError, match="omits global constraints"
+    ):
+        validator.validate_director_coverage(payload)
+
+
+def test_unknown_creative_constraint_binding_fails_closed() -> None:
+    validator = _load_validator()
+    payload = _payload(creative_input_kind="draft_prompt")
+    payload["coverage_units"][0]["constraint_ids"].append("invented-constraint")
+
+    with pytest.raises(validator.CoverageValidationError, match="unknown IDs"):
+        validator.validate_director_coverage(payload)
+
+
+def test_beat_specific_constraint_must_bind_to_at_least_one_unit() -> None:
+    validator = _load_validator()
+    payload = _payload(creative_input_kind="direction")
+    payload["request"]["creative_input_evidence"] += (
+        " Reveal the embossed logo during the payoff beat."
+    )
+    payload["request"]["creative_constraints"].append(
+        {
+            "constraint_id": "constraint-02",
+            "scope": "beat_specific",
+            "source_text": "Reveal the embossed logo during the payoff beat.",
+        }
+    )
+
+    with pytest.raises(
+        validator.CoverageValidationError, match="beat-specific creative constraints"
+    ):
+        validator.validate_director_coverage(payload)
+
+
+def test_missing_creative_input_rejects_invented_user_evidence() -> None:
+    validator = _load_validator()
+    payload = _payload()
+    payload["request"]["creative_input_evidence"] = "Invented user prompt."
+
+    with pytest.raises(
+        validator.CoverageValidationError, match="creative_input_evidence"
+    ):
+        validator.validate_director_coverage(payload)
+
+
+def test_missing_creative_input_rejects_invented_constraint_inventory() -> None:
+    validator = _load_validator()
+    payload = _payload()
+    payload["request"]["creative_constraints"] = [
+        {
+            "constraint_id": "invented-constraint",
+            "scope": "global",
+            "source_text": "Invented user constraint.",
+        }
+    ]
+
+    with pytest.raises(validator.CoverageValidationError, match="must be empty"):
+        validator.validate_director_coverage(payload)
+
+
+def test_approved_shot_is_not_a_raw_creative_input_kind() -> None:
+    validator = _load_validator()
+    payload = _payload(creative_input_kind="approved_shot")
+
+    with pytest.raises(validator.CoverageValidationError, match="creative_input_kind"):
         validator.validate_director_coverage(payload)
 
 
@@ -417,10 +641,10 @@ def test_single_take_rejects_a_cut_between_units() -> None:
         validator.validate_director_coverage(payload)
 
 
-def test_schema_v1_fixed_duration_contract_is_retired() -> None:
+def test_schema_v2_prompt_presence_routing_contract_is_retired() -> None:
     validator = _load_validator()
     payload = _payload()
-    payload["schema_version"] = "1"
+    payload["schema_version"] = "2"
 
     with pytest.raises(validator.CoverageValidationError, match="schema_version"):
         validator.validate_director_coverage(payload)

@@ -25,8 +25,14 @@ prompt/reference 专家，不是 Seedance workflow、router、Provider adapter �
 - deterministic motion graphics、pacing 或 composition -> `video-shotcraft`；
 - capability selection、execution、activation 或 QA -> 当前 AI-VIDEO code 与 contracts。
 
-只提供时长、Seedance model/profile 或输出规格，但没有 concept、approved Shot 或 ordered
-coverage 的请求不是可消费的 Shot，必须先作为 `PROMPTLESS_REQUEST` route 到 `open-video`。
+任何尚未形成 approved Shot / ordered coverage 的请求都不是该 Skill 可消费的 Shot。无论用户给出
+空白、模糊方向、concept/script、reference-led brief 或完整 draft prompt，都必须先作为
+`DIRECTOR_PREFLIGHT_REQUEST` route 到 `open-video` 做 Director optimization；prompt presence 不等于
+approval。只有已经批准且本次不修改 creative intent/coverage 的 Shot 才可直接进入本 Skill。
+`open-video` 必须保留用户明确的 subject、action、style、product facts、references 与 exclusions，
+不得以“优化”为名覆盖 hard constraints；其 validator 只验证 declared constraint inventory 的结构、
+verbatim source anchoring 与 coverage binding，不证明 raw input 的约束已提全或语义保真。进入本 Skill
+前必须由 Agent 依次 review `raw evidence -> inventory` 与 `inventory -> coverage`。
 Agent 必须在 Director 层根据 narrative beats、action/space progression、camera/blocking trajectory、
 pacing 与 continuity 风险选择 `coverage_strategy=single_take|multi_shot`，不得按时长阈值选择。
 Seedance 2.5 技术性支持单次 `30s` 既不自动证明应当 single-take，也不强制 multi-shot；它只影响

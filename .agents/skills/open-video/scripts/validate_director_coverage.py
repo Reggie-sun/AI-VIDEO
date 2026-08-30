@@ -12,10 +12,11 @@ import sys
 from typing import Any, Mapping, Sequence
 
 
-SCHEMA_VERSION = "2"
+SCHEMA_VERSION = "3"
 REQUEST_FIELDS = {
-    "user_creative_brief_supplied",
-    "user_creative_brief_evidence",
+    "creative_input_kind",
+    "creative_input_evidence",
+    "creative_constraints",
     "target_duration_seconds",
     "coverage_strategy",
     "strategy_source",
@@ -35,7 +36,9 @@ COVERAGE_FIELDS = {
     "camera_intent",
     "visible_change",
     "transition_out",
+    "constraint_ids",
 }
+CREATIVE_CONSTRAINT_FIELDS = {"constraint_id", "scope", "source_text"}
 CONTINUOUS_ONLY_TRANSITIONS = {
     "continuous",
     "no_cut",
@@ -44,6 +47,8 @@ CONTINUOUS_ONLY_TRANSITIONS = {
 }
 COVERAGE_STRATEGIES = {"multi_shot", "single_take"}
 STRATEGY_SOURCES = {"agent_directed", "user_requested"}
+CREATIVE_INPUT_KINDS = {"direction", "draft_prompt", "missing"}
+CONSTRAINT_SCOPES = {"beat_specific", "global"}
 BEAT_FUNCTIONS = {
     "decision",
     "detail",
@@ -127,12 +132,6 @@ def _number(value: Any, label: str) -> float:
     return number
 
 
-def _boolean(value: Any, label: str) -> bool:
-    if not isinstance(value, bool):
-        raise CoverageValidationError(f"{label} must be a boolean")
-    return value
-
-
 def _normalized(value: str) -> str:
     return re.sub(r"[^\w]+", "_", value.casefold(), flags=re.UNICODE).strip("_")
 
@@ -146,6 +145,18 @@ def _enum(value: Any, allowed: set[str], label: str) -> str:
     return normalized
 
 
+def _normalized_text_list(value: Any, label: str) -> list[str]:
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
+        raise CoverageValidationError(f"{label} must be an array")
+    normalized = [
+        _normalized(_text(item, f"{label}[{index}]"))
+        for index, item in enumerate(value)
+    ]
+    if len(normalized) != len(set(normalized)):
+        raise CoverageValidationError(f"{label} must not contain duplicates")
+    return normalized
+
+
 def validate_director_coverage(payload: Mapping[str, Any]) -> dict[str, Any]:
     _exact_fields(payload, {"schema_version", "request", "coverage_units"}, "root")
     if payload["schema_version"] != SCHEMA_VERSION:
@@ -155,21 +166,77 @@ def validate_director_coverage(payload: Mapping[str, Any]) -> dict[str, Any]:
 
     request = _mapping(payload["request"], "request")
     _exact_fields(request, REQUEST_FIELDS, "request")
-    user_brief_supplied = _boolean(
-        request["user_creative_brief_supplied"],
-        "request.user_creative_brief_supplied",
+    creative_input_kind = _enum(
+        request["creative_input_kind"],
+        CREATIVE_INPUT_KINDS,
+        "request.creative_input_kind",
     )
-    user_brief_evidence = request["user_creative_brief_evidence"]
-    if user_brief_supplied:
-        _text(
-            user_brief_evidence,
-            "request.user_creative_brief_evidence",
+    creative_input_evidence = request["creative_input_evidence"]
+    raw_constraints = request["creative_constraints"]
+    if not isinstance(raw_constraints, Sequence) or isinstance(
+        raw_constraints, (str, bytes)
+    ):
+        raise CoverageValidationError("request.creative_constraints must be an array")
+    if creative_input_kind == "missing":
+        creative_input_text = None
+        if creative_input_evidence is not None:
+            raise CoverageValidationError(
+                "request.creative_input_evidence must be null when "
+                "creative_input_kind is 'missing'"
+            )
+        if raw_constraints:
+            raise CoverageValidationError(
+                "request.creative_constraints must be empty when "
+                "creative_input_kind is 'missing'"
+            )
+    else:
+        creative_input_text = _text(
+            creative_input_evidence,
+            "request.creative_input_evidence",
         )
-    elif user_brief_evidence is not None:
-        raise CoverageValidationError(
-            "request.user_creative_brief_evidence must be null when the user did "
-            "not supply a creative brief"
+        if not raw_constraints:
+            raise CoverageValidationError(
+                "request.creative_constraints must not be empty for supplied raw input"
+            )
+
+    constraints: list[dict[str, str]] = []
+    for index, raw_constraint in enumerate(raw_constraints):
+        constraint = _mapping(
+            raw_constraint, f"request.creative_constraints[{index}]"
         )
+        _exact_fields(
+            constraint,
+            CREATIVE_CONSTRAINT_FIELDS,
+            f"request.creative_constraints[{index}]",
+        )
+        source_text = _text(
+            constraint["source_text"],
+            f"request.creative_constraints[{index}].source_text",
+        )
+        if creative_input_text is None or source_text not in creative_input_text:
+            raise CoverageValidationError(
+                f"request.creative_constraints[{index}].source_text must be an "
+                "exact substring of request.creative_input_evidence"
+            )
+        constraints.append(
+            {
+                "constraint_id": _normalized(
+                    _text(
+                        constraint["constraint_id"],
+                        f"request.creative_constraints[{index}].constraint_id",
+                    )
+                ),
+                "scope": _enum(
+                    constraint["scope"],
+                    CONSTRAINT_SCOPES,
+                    f"request.creative_constraints[{index}].scope",
+                ),
+                "source_text": source_text,
+            }
+        )
+    constraint_ids = [constraint["constraint_id"] for constraint in constraints]
+    if len(constraint_ids) != len(set(constraint_ids)):
+        raise CoverageValidationError("creative constraint IDs must be unique")
     target_duration = _number(
         request["target_duration_seconds"], "request.target_duration_seconds"
     )
@@ -212,7 +279,7 @@ def validate_director_coverage(payload: Mapping[str, Any]) -> dict[str, Any]:
         _exact_fields(unit, COVERAGE_FIELDS, f"coverage_units[{index}]")
         parsed = {
             field: _text(unit[field], f"coverage_units[{index}].{field}")
-            for field in COVERAGE_FIELDS - {"duration_seconds"}
+            for field in COVERAGE_FIELDS - {"constraint_ids", "duration_seconds"}
         }
         for field, allowed in (
             ("beat_function", BEAT_FUNCTIONS),
@@ -226,11 +293,44 @@ def validate_director_coverage(payload: Mapping[str, Any]) -> dict[str, Any]:
         parsed["duration_seconds"] = _number(
             unit["duration_seconds"], f"coverage_units[{index}].duration_seconds"
         )
+        parsed["constraint_ids"] = _normalized_text_list(
+            unit["constraint_ids"], f"coverage_units[{index}].constraint_ids"
+        )
         units.append(parsed)
 
     unit_ids = [_normalized(unit["unit_id"]) for unit in units]
     if len(unit_ids) != len(set(unit_ids)):
         raise CoverageValidationError("coverage unit IDs must be unique")
+
+    known_constraint_ids = set(constraint_ids)
+    global_constraint_ids = {
+        constraint["constraint_id"]
+        for constraint in constraints
+        if constraint["scope"] == "global"
+    }
+    beat_specific_constraint_ids = known_constraint_ids - global_constraint_ids
+    covered_constraint_ids: set[str] = set()
+    for index, unit in enumerate(units):
+        unit_constraint_ids = set(unit["constraint_ids"])
+        unknown_constraint_ids = unit_constraint_ids - known_constraint_ids
+        if unknown_constraint_ids:
+            raise CoverageValidationError(
+                f"coverage_units[{index}].constraint_ids contains unknown IDs: "
+                f"{sorted(unknown_constraint_ids)}"
+            )
+        missing_global_ids = global_constraint_ids - unit_constraint_ids
+        if missing_global_ids:
+            raise CoverageValidationError(
+                f"coverage_units[{index}].constraint_ids omits global constraints: "
+                f"{sorted(missing_global_ids)}"
+            )
+        covered_constraint_ids.update(unit_constraint_ids)
+    uncovered_beat_specific_ids = beat_specific_constraint_ids - covered_constraint_ids
+    if uncovered_beat_specific_ids:
+        raise CoverageValidationError(
+            "beat-specific creative constraints must bind to at least one coverage unit: "
+            f"{sorted(uncovered_beat_specific_ids)}"
+        )
 
     planned_duration = sum(unit["duration_seconds"] for unit in units)
     if not math.isclose(planned_duration, target_duration, abs_tol=0.05):
@@ -238,10 +338,9 @@ def validate_director_coverage(payload: Mapping[str, Any]) -> dict[str, Any]:
             "coverage duration must match target_duration_seconds within 0.05s"
         )
 
-    promptless_request = not user_brief_supplied
-    if promptless_request and director_skill != "open-video":
+    if director_skill != "open-video":
         raise CoverageValidationError(
-            "PROMPTLESS_REQUEST requires director_skill='open-video'"
+            "DIRECTOR_PREFLIGHT_REQUEST requires director_skill='open-video'"
         )
     if coverage_strategy == "multi_shot" and len(units) < 2:
         raise CoverageValidationError(
@@ -292,7 +391,8 @@ def validate_director_coverage(payload: Mapping[str, Any]) -> dict[str, Any]:
     return {
         "status": "passed",
         "schema_version": SCHEMA_VERSION,
-        "promptless_request": promptless_request,
+        "director_preflight_request": True,
+        "creative_input_kind": creative_input_kind,
         "coverage_strategy": coverage_strategy,
         "strategy_source": strategy_source,
         "coverage_unit_count": len(units),

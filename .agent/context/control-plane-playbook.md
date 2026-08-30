@@ -34,12 +34,26 @@ Use the minimum matching Skill set. Installation、description matching 或“�
    - relevant Skill lint/preflight 结果，或该 Skill 没有 executable lint surface 的明确说明。
 4. 若 mandatory preflight 或上述 evidence 不完整，Agent MUST fail closed，不得进入付费 preview、mint/consume submit permit 或执行 Provider POST。
 
-#### Promptless Director Strategy Gate
+#### Raw Creative Input Director Strategy Gate
 
-`PROMPTLESS_REQUEST` 指用户只给出时长、Provider/model、输出规格或“自动生成”等执行约束，
-但没有提供 concept、script、reference-led story、approved Shot 或 ordered coverage。所有这类请求
-都必须先进入 `open-video`。Agent 必须为请求明确选择 `coverage_strategy=single_take|multi_shot`，
-不得用时长阈值、Provider 单次时长上限或缺失 prompt 自动替代 Director 判断。`30s` 可以是具有完整
+`DIRECTOR_PREFLIGHT_REQUEST` 指尚未形成 approved AI-VIDEO Shot / ordered coverage 的 raw
+creative input。它包括没有 prompt、只有时长/Provider/output constraint、模糊方向、concept/script、
+reference-led brief 与详细 draft prompt。Prompt 存在或看起来完整都不等于 Shot approval；所有这些
+request 都必须先进入 `open-video`，优化并翻译为 approved Shot / coverage 后，才可进入
+Provider-specific authoring。只有已经批准且本次不修改 creative intent/coverage 的 Shot 才跳过该 Gate。
+
+Agent 必须把 raw input 分类为 `creative_input_kind=missing|direction|draft_prompt`。`direction` 与
+`draft_prompt` 必须绑定 exact `creative_input_evidence`，并保留用户明确的 subject、action、style、
+product facts、references、exclusions 与其他 hard constraints；`missing` 的 evidence 必须为 `null`，
+不得伪造 user prompt。Supplied raw input 还必须建立 structured `creative_constraints` inventory：每项
+包含 stable `constraint_id`、作为 `creative_input_evidence` verbatim substring 的 `source_text` 与
+`scope=global|beat_specific`；每个 coverage unit
+通过 `constraint_ids` 声明其处理的约束，global constraint 必须绑定所有 units，beat-specific constraint
+至少绑定一个 unit。Agent 可以补齐有界创意空白或重构 draft，但 unresolved choice 若会实质改变
+product direction 或扩大 accepted scope，必须先询问用户。
+
+Agent 还必须明确选择 `coverage_strategy=single_take|multi_shot`，不得用 prompt presence、prompt
+detail、时长阈值、Provider 单次时长上限或缺失 prompt 自动替代 Director 判断。`30s` 可以是具有完整
 动作与空间轨迹的 single take，`10s` 也可以因多个叙事 beat 而需要 multi-shot；target duration 只参与
 pacing 与 downstream feasibility，不直接决定 strategy。
 
@@ -52,16 +66,22 @@ owner 在 downstream handoff 独立 fail closed。若已选 strategy 技术上�
 
 在首次编写 Shot Contract、Provider prompt 或 execution script 之前，Agent MUST：
 
-1. 读取 `open-video`，产出 schema v2 `Director Coverage Evidence`，至少包含
-   `user_creative_brief_supplied`、目标时长、`coverage_strategy`、`strategy_source`、
+1. 读取 `open-video`，产出 schema v3 `Director Coverage Evidence`，至少包含
+   `creative_input_kind`、适用的 exact `creative_input_evidence`、`creative_constraints` inventory、目标时长、
+   `coverage_strategy`、`strategy_source`、
    `director_decision_rationale`、适用时的直接 user-request evidence、ordered coverage units，以及每个
    unit 的 duration、beat function、objective、open/close state、shot scale、camera treatment、camera
-   intent、visible change 和 transition；current selected profile 的 single-Shot limit 只作为 downstream
-   runtime handoff，由 capability owner 重新验证；
+   intent、visible change、transition 和 `constraint_ids`；current selected profile 的 single-Shot limit
+   只作为 downstream runtime handoff，由 capability owner 重新验证；
 2. 使用 `.agents/skills/open-video/scripts/validate_director_coverage.py` 验证该 evidence，并在
    commentary 中报告结果；validator 没有通过时 fail closed；
 3. 只有验证通过的 coverage 才能翻译成 approved AI-VIDEO Character / Scene / Shot artifacts，随后按
    concern 顺序进入 continuity Skill 与 Provider-specific authoring Skill。
+
+Validator 只证明 declared constraint inventory 的结构、verbatim source anchoring 与 coverage binding
+完整且无 unknown ID，不理解任意自然语言。Agent 必须先逐项 review raw evidence -> declared inventory
+是否覆盖全部 explicit constraints，再 review declared inventory -> coverage 是否存在遗漏、反转或未经授权的
+reinterpretation，并把这些约束保留在后续 approved Shot 中。
 
 Agent MUST NOT 把 `VIDEO_EXTEND`、FLF2V、尾帧 handoff、`no cut`、`uninterrupted` 或重复同一
 camera/action sentence 当作 Director 判断本身；这些只是已选择 `single_take` 后可用的
@@ -74,7 +94,7 @@ execution/continuity treatment。`multi_shot` 必须包含至少两个 ordered c
 
 ### Skill Selection
 
-`open-video` MUST use when the task needs Director-level concept/script decomposition、ordered Shot planning、coverage、per-Shot objective、multi-Shot segmentation、transition/handoff intent 或 review criteria，包括所有 `PROMPTLESS_REQUEST`。它是 project-local Shot Planning knowledge Skill；其 `plan -> craft -> validate -> generate -> judge -> refine -> stitch -> deliver` 只作为 authoring rubric。Agent MAY 提取 shot decomposition、H3 prompt grammar、continuity questions 与 judging heuristics，然后必须将结果翻译成 approved AI-VIDEO Character / Scene / Shot artifacts 和现有 contracts。
+`open-video` MUST use when the task needs Director-level concept/script decomposition、raw prompt optimization、ordered Shot planning、coverage、per-Shot objective、multi-Shot segmentation、transition/handoff intent 或 review criteria，包括所有 `DIRECTOR_PREFLIGHT_REQUEST`。它是 project-local Shot Planning knowledge Skill；其 `plan -> craft -> validate -> generate -> judge -> refine -> stitch -> deliver` 只作为 authoring rubric。Agent MAY 提取 shot decomposition、H3 prompt grammar、continuity questions 与 judging heuristics，然后必须将结果翻译成 approved AI-VIDEO Character / Scene / Shot artifacts 和现有 contracts。
 
 `open-video` MUST NOT 运行或安装其 product/CLI/Python runtime，不得执行 `open-video install/pull/status/run`、ComfyUI submit、generation、judge loop、refine loop、ffmpeg stitch、artifact/receipt write，也不得成为 video engine、Provider、renderer、Production runtime 或 Agent runtime/lifecycle owner。上游 multi-shot Director path 标记为 evolving/design-scaffold；其 capability、constraint、model 与 quality claims 只能作为候选知识，使用前必须由当前 AI-VIDEO code、sealed profile、tests 或 runtime evidence 重新验证。
 

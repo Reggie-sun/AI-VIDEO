@@ -1,13 +1,13 @@
 ---
 name: open-video
-description: Use for AI-VIDEO Director coverage when a concept, script, reference-led brief, or promptless duration-only request needs ordered Shots, transitions, or a long film beyond the selected model's single-Shot limit; guidance is advisory and must return to AI-VIDEO contracts.
+description: Use for AI-VIDEO Director coverage when raw creative input—missing, vague direction, concept, script, reference-led brief, or draft prompt—must be optimized into approved Shots and ordered coverage; guidance is advisory and must return to AI-VIDEO contracts.
 ---
 
 # open-video — autonomous director skill
 
-> **v0.0.1 default for high-quality H3 clips is [`skill/h3-video`](../h3-video/SKILL.md)**  
-> (Ollama for H3 + harness). Use **this** skill when the user wants multi-shot / long-film
-> director behavior (plan → judge → stitch) beyond a single strong clip.
+> **AI-VIDEO routing:** Raw creative input uses this Director preflight even for one short clip.
+> [`h3-video`](../h3-video/SKILL.md) is eligible only after an approved Shot exists; the upstream
+> v0.0.1 single-clip preference below must not bypass this boundary.
 
 ## 1. What open-video does
 
@@ -36,40 +36,47 @@ Single open models still cap ~15s/shot; longer output needs multi-shot orchestra
 
 ## 2. Agentic procedure — run these steps in order
 
-**Step 1 — Understand the request.** Classify the job: single shot vs multi-shot film; target
-duration; did the user supply reference image(s) / video / audio; desired aspect; quality bar. If
-the request is ambiguous *and* the target is a film >30s, ask ONE focused question (subject +
-mood + length). Do not generate a long film on guesswork.
+**Step 1 — Understand the request.** First distinguish raw creative input from an approved AI-VIDEO
+Shot / ordered coverage. A user prompt is raw input, not approval. Classify raw input as
+`missing`, `direction`, or `draft_prompt`; preserve its subject, action, style, product facts,
+references, exclusions, and other explicit constraints. Fill bounded creative gaps when the
+direction is adequate; ask a focused question only when an unresolved choice would materially
+change product direction or exceed the accepted scope.
 
-**Promptless Director strategy boundary.** Set `user_creative_brief_supplied=false` when the user supplies only duration,
-Provider/model, output settings, or an instruction to generate automatically, without a concept,
-script, reference-led story, approved Shot, or ordered coverage. Every promptless request requires
-`director_skill=open-video`. The Agent must select exactly one `coverage_strategy`: `single_take`
-or `multi_shot`. Duration is a pacing and feasibility input, not a creative branch: a rich `30s`
-single take and a tightly cut `10s` multi-shot plan are both valid when the Director rationale and
-coverage agree.
+**Raw creative input Director boundary.** Every request without an approved Shot / ordered coverage
+is a `DIRECTOR_PREFLIGHT_REQUEST`, whether the user supplied no prompt, a vague direction, a
+concept/script, a reference-led brief, or a detailed draft prompt. Every such request requires
+`director_skill=open-video`. The Agent must optimize raw input into Director coverage and select
+exactly one `coverage_strategy`: `single_take` or `multi_shot`. It must not treat prompt presence,
+prompt detail, duration, or Provider capability as approval.
 
 Choose the strategy from the ordered narrative beats, whether action/space/time changes need a
 viewpoint reset, whether one camera/blocking trajectory can carry every visible change, pacing and
 information reveal, identity/continuity risk, and any explicit user single-take/cut preference.
-These considerations are not a fixed score or duration formula. Provider capability is validated
-downstream and cannot silently choose or rewrite the creative strategy; an infeasible selected
-strategy must return to Director planning.
+These considerations are not a fixed score or duration formula. Duration is a pacing and
+feasibility input, not a creative branch: a rich `30s` single take and a tightly cut `10s`
+multi-shot plan are both valid when the Director rationale and coverage agree. Provider capability
+is validated downstream and cannot silently choose or rewrite the creative strategy; an infeasible
+selected strategy must return to Director planning.
 
-Before crafting any Shot or Provider prompt for a `PROMPTLESS_REQUEST`, create schema v2 Director Coverage
-Evidence with:
+Before crafting an approved Shot or Provider-specific prompt for a `DIRECTOR_PREFLIGHT_REQUEST`,
+create schema v3 Director Coverage Evidence with:
 
-- request facts: `user_creative_brief_supplied` plus direct user-input evidence when true,
+- request facts: `creative_input_kind=missing|direction|draft_prompt`, exact
+  `creative_input_evidence` for `direction` / `draft_prompt` and `null` for `missing`,
+  structured `creative_constraints` with stable `constraint_id`, `source_text` copied as a
+  verbatim substring of `creative_input_evidence`, and `scope=global|beat_specific`,
   `target_duration_seconds`, `coverage_strategy`, `strategy_source`, a non-empty
   `director_decision_rationale`, `strategy_request_evidence` when the strategy was directly
   requested by the user, and
   `director_skill=open-video`;
 - ordered `coverage_units`, each with `unit_id`, `duration_seconds`, finite `beat_function`,
   `objective`, `open_state`, `close_state`, finite `shot_scale`, finite `camera_treatment`,
-  `camera_intent`, `visible_change`, and finite `transition_out`;
+  `camera_intent`, `visible_change`, finite `transition_out`, and `constraint_ids`;
 - distinct objectives and visible changes; adjacent ordinary multi-Shot units must change finite
   beat, scale, and camera-treatment categories without requiring those categories to be globally
-  unique across a long film.
+  unique across a long film; every global constraint ID must bind to every unit, while every
+  beat-specific constraint ID must bind to at least one unit.
 
 Validate the evidence before downstream authoring:
 
@@ -82,8 +89,16 @@ execution treatments, not the Director decision. They are valid only when the se
 `single_take`; if that strategy has multiple evolving internal coverage units, every non-final
 transition must remain continuous. `multi_shot` requires at least two ordered units and cut-class
 non-final transitions. `strategy_source=user_requested` requires direct user evidence;
-`strategy_source=agent_directed` requires no invented user evidence. Never infer the strategy from
-duration alone or from missing prompt.
+`strategy_source=agent_directed` requires no invented user evidence. Director optimization may
+expand gaps or restructure a draft, but must preserve explicit user constraints and disclose its
+own decisions through the rationale. An already approved Shot does not re-enter this validator
+unless the task changes its creative intent or coverage.
+
+The validator proves declared-inventory structure, verbatim source anchoring, and binding
+completeness; it does not prove exhaustive constraint extraction or natural-language entailment.
+Before Shot approval, the Agent must first compare raw evidence against the declared inventory for
+unextracted explicit constraints, then compare the declared inventory against planned coverage for
+omissions, reversals, or unauthorized reinterpretation.
 
 **Step 2 — Pick the mode.** Mode is auto-derived from inputs (see `backends/h3/backend.py` and
 `scripts/validate_prompt.py` `detect_mode`):
