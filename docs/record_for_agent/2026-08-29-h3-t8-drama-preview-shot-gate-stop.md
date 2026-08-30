@@ -11,6 +11,142 @@ Date: 2026-08-29
 
 Updated: 2026-08-30
 
+## Supersession Notice — 2026-08-30 v70 Human-Review Rebuild
+
+用户明确拒绝 v56：尽管其 technical metrics 与逐 Shot Gate 可通过，但实际观看仍是“人根本看不了”。
+该 human `FAIL` 取代 v56 的 current-facing `PASS_FOR_HUMAN_REVIEW`；v56 只保留为 historical
+technical evidence，不再是当前候选。本轮没有继续优化旧成片，而是完成后续 Shot 3–6 repair、
+重新封存六个 current source Gate，并从 exact bytes 重做 30 秒 hard-cut composition、逐句烧录字幕和
+final-byte audio arbitration。
+
+Current human-review artifact：
+
+`runs/drama-h3-t8-30s-preview-20260830-v70/outputs/drama-h3-t8-30s-preview-v70.mp4`
+
+- SHA-256：`971127aa32c1a6e8492655142ad4127a20c03e7de81a82c8d14a24fce30118e5`
+- exact stream：H.264 High、`1344x768`、`24 fps`、`720` frames、video/audio stream 均
+  `30.000s`；AAC `32000 Hz` stereo；container 因 AAC packet padding 为 `30.032s`
+- full video/audio decode：`PASS`；719 个 frame PTS delta 均在
+  `0.041666–0.041667s`，anomaly `0`；`freezedetect` 没有 `>=0.5s` window
+- composition：六个 exact source Shot、五个 hard cut，cut start frames 为
+  `112 / 236 / 360 / 484 / 608`；无 dissolve、crossfade、interpolation、transition blend 或
+  duplicated hold。为保留五条 exact-terminal continuity seam，仅裁 Shot 1 开头 12 帧和 Shot 6
+  结尾 12 帧
+- audio seams：每段使用 20ms fade-in/fade-out；peak `-3.6 dB`。Shot 3 首秒曾被 final-byte
+  `medium` 转写复现为非脚本“是的”，因此只把该 pre-dialogue 1 秒替换为已通过 Shot 5 的雨声环境音；
+  Shot 3 从 1 秒起的原音和全部画面不变
+- subtitles：六个 cue 均以 `/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc`、白字黑边、
+  半透明底板、bottom-center safe area 直接烧录，分别为 `钥匙还在。`、`回去，一起开门。`、
+  `你这次，会留下吗？`、`我会留下。`、`你来决定。`、`等你开门。`
+- final exact `video_review`：`issues=[]`、`968/968` unique sampled frames。连续性锚点使
+  scene detector 在 `0.18` 与 `0.03` threshold 下均报告 one continuous scene；这不是单 source
+  Shot 证明，six-source/five-hard-cut identity 由 exact filtergraph、source hash 与 cut frame 独立封存
+- whole-track Whisper 在连续雨声下会产生 time-shifted hallucinations，因此不作为对白 verdict。
+  对 exact final MP4 重新按 canonical boundaries 解码并以 `medium` 转写六段，结果依次为：空、
+  `钥匙还在 / 回去一起开门`、`你这次会留下吗`、`我会留下 / 你来决定`、空、`等你开门`。
+  Independent reviewer 复跑时文本保持一致，但 Shot 2/3 timestamp 不可复现；因此 ASR timestamp
+  只作为 advisory observation，不作为字幕同步证明，subtitle sync 仍属于 human 1.0× review
+
+Current source identity：
+
+| Shot | Exact media SHA-256 | Gate SHA-256 |
+| --- | --- | --- |
+| 1 v34 | `6aa84857b1b7ac7809099bfbc8b58a407ee1d5070753ca5ee7433a256e13f7cc` | `2446d2028ce5ce380b07722474e3bf357db9d9a070831e2f88074e0a4715509b` |
+| 2 v41 | `a2814f29e978ff51ff2fb3e4dd4bb53b7da8a346d458d30d80da58c4151e81fe` | `7dc091525ff628125f0136a9048177744662b83edd5efb93675e37f74ec7ab50` |
+| 3 v59 | `899046ecadaf3262034ea9ceac15b20fffc2b121075aaa538c4dc3887298df53` | `ee0b7c20df773b01ce556c3fc0b8f491a6aebc110ae9538cb510d65e1b119085` |
+| 4 v65 | `5c61c2ddea059bd6d9797ccac02c2ec67c5b0c2cb805892d03c55b382277ce3c` | `fd7502600129d2aaf2d2786b44d01b6bc8c6dc219db6ab2b7a40f57da321151b` |
+| 5 v66 | `f78e10f4f0a7fa03cf7a28f85f7cd3850262878a6c3506802594de73d015aa9c` | `05f5e75c1d4e8a368b19596c79c53d78bfcea37310eb656ac829a4408ecff8fb` |
+| 6 v69 | `3f64f9f5e792f235b922939e9873a958bf2392e7440e4ab1f334e297a768d965` | `b68363186cecbdfedd85e1e1ce2f1893506754a2d3f5816b3c71e6981372dddb` |
+
+Evidence owners：
+
+- exact final Gate：
+  `runs/drama-h3-t8-30s-preview-20260830-v70/sidecars/gates/final-composition-gate.json`，SHA-256
+  `463e5b8e5b558ea54f1b2b33fba9cca0baf39ea9ee211c97e30cb9997f87a486`
+- composition/source/cut/audio/subtitle provenance：
+  `runs/drama-h3-t8-30s-preview-20260830-v70/sidecars/composition-provenance.json`
+- exact-final-derived six-segment transcript evidence：
+  `runs/drama-h3-t8-30s-preview-20260830-v70/sidecars/segment-transcription-evidence.json`
+- seam、dense、subtitle contacts：
+  `runs/drama-h3-t8-30s-preview-20260830-v70/sidecars/analysis/`
+
+Final Gate 仅为 `PASS_FOR_HUMAN_REVIEW`。`human_1x_watchability` 与 `human_lip_sync` 仍为
+`NOT_EVALUATED`；不得升级为 P6、Final Acceptance、activation、publication 或 release。全部 Provider
+generation 均为 loopback local/unmetered ComfyUI，无 remote/cloud egress 或 paid call；v70 composition
+本身为 deterministic local `ffmpeg` execution。
+
+`record-ai-video-session` 后的 automatic `distill-ai-video-learning` evaluation 为 `no_candidate`。
+Evidence identity validator 对本记录返回 `PASS` 但 `admitted: false`：v56 提供 human `FAIL`，v70
+目前只有 technical `PASS_FOR_HUMAN_REVIEW`，且两者同时改变 source Shot、composition、subtitle 与
+audio repair，不构成 controlled multi-arm comparison，也没有两个独立 human support attempt。未创建
+placeholder Learning Claim，未修改任何 Skill、Policy、Preflight、Contract 或 Gate target。
+
+## Supersession Notice — 2026-08-30 Six-Shot Rebuild And Captioned Candidate
+
+用户以 1.0× 实际观看下方 `Composition Repair` 的 v2 MP4 后给出明确 human `FAIL`：逐镜边界仍然
+卡顿、短 dissolve 产生不可接受的双影，而且交付观看时没有获得可用字幕。该 human verdict 取代
+v2 的 current-facing watchability `PENDING`；v2 的 `720` frames、PTS、decode 与字幕 contact-sheet
+测量继续作为 historical technical evidence，但不得再称为可供观看验收的最新候选。
+
+本轮没有继续调 dissolve，而是把六个 source Shot 全部换成新的 exact-terminal continuation chain，
+并在每个 exact MP4 落盘后调用 project-local `video-analysis` MCP、写入 requirement-level Gate，只有
+全部 required findings 为 `PASS` 才推进下一 Shot。Accepted source 与 Gate 分别为：
+
+| Shot | Exact media | Media SHA-256 | Gate SHA-256 |
+| --- | --- | --- | --- |
+| 1 | `runs/drama-h3-t8-30s-preview-20260830-v34/outputs/shot-01.mp4` | `6aa84857b1b7ac7809099bfbc8b58a407ee1d5070753ca5ee7433a256e13f7cc` | `2446d2028ce5ce380b07722474e3bf357db9d9a070831e2f88074e0a4715509b` |
+| 2 | `runs/drama-h3-t8-30s-preview-20260830-v41/outputs/shot-02.mp4` | `a2814f29e978ff51ff2fb3e4dd4bb53b7da8a346d458d30d80da58c4151e81fe` | `7dc091525ff628125f0136a9048177744662b83edd5efb93675e37f74ec7ab50` |
+| 3 | `runs/drama-h3-t8-30s-preview-20260830-v45/outputs/shot-03.mp4` | `55216bb88122bea948f744fda94e6c5a42f590c275a60b7761a92234f80b3b5e` | `b2afd09a4b6b01d8cbd1b5dff92a79a0328badfbb6afb526526f109bf29a081f` |
+| 4 | `runs/drama-h3-t8-30s-preview-20260830-v50/outputs/shot-04.mp4` | `9da5f621fe0e0ea02192053c805901d14886c9f2a77d1938c00ef6389e5df6e2` | `6ba06f3e2f758dff92dcde3dd7844e23f1a649cbdbee05da52f19c73ff173436` |
+| 5 | `runs/drama-h3-t8-30s-preview-20260830-v54/outputs/shot-05.mp4` | `50259c9160ec425f18f2a8e2e2fd93772d2aad810b959bb5f593a574d2d61a98` | `f5a2d9c2562ce85c62719637435aba144634d1b5e99245acb1ba12ffb96880ef` |
+| 6 | `runs/drama-h3-t8-30s-preview-20260830-v55/outputs/shot-06.mp4` | `49d0fb48f01f5ce90e7a61739eb32b68e956e0e0c8a799478f2130e94bcee720` | `9ce8394a44fdd3d1450b16e4d65067fb8c1435a14ddf20a23a3168cc66dc5b32` |
+
+Shot 6 的 bounded repair 最终由 `small` 与 `medium` 中文转写独立得到 `等你开门`；首帧与 Shot 5
+terminal 的 SSIM 为 `0.92597`，frame 0–99 的动作在 30 秒截点前完成。该结果取代 v21–v24 的
+Shot 6 `NOT_EVALUATED` blocker，但只对 v55 exact bytes 生效。Shot 4 v50 是 deterministic
+development remux：visual stream 来自 v47，完整 native H3 audio 来自 v48；它通过本轮 exact Gate，
+仍不产生 human lip-sync、P6 或 Final Acceptance verdict。
+
+新的 30 秒候选为：
+
+`runs/drama-h3-t8-30s-preview-20260830-v56/outputs/drama-h3-t8-30s-captioned.mp4`
+
+- SHA-256：`2a9651474e7576bec120d4b718d19a857723541d64d441d4df9e2b89ee3dafee`
+- exact media：H.264 High、`1344x768`、`24 fps`、`720` frames、`30.000s`；AAC
+  `48000 Hz` stereo；完整视频与音频 decode 均为 `PASS`
+- composition：六段分别取 `124 / 124 / 124 / 124 / 124 / 100` frames；只使用 hard cut，
+  没有 dissolve、crossfade 或 duplicated seam frame
+- cadence：decoded presentation PTS 从 `0.0` 到 `29.958333` 严格单调，相邻 delta 为
+  `0.041666–0.041667s`；near-duplicate delta `<0.1` count 为 `0`；freezedetect 无窗口
+- seam evidence：五个 cut 的 SSIM 为 `0.87810 / 0.90978 / 0.90688 / 0.89778 / 0.91514`；
+  25-frame contact sheet SHA-256 为
+  `859c4235498f639f00e4314c37bd7ce8f704771dd3e49f9201d9dbef36196400`
+- captions：五个 cue 使用 `NotoSansCJK-Regular.ttc` 直接烧录，原分辨率逐 cue 截帧确认文字可见、
+  bottom safe area 未裁切；文本分别为 `钥匙还在。`、`回去，一起开门。`、
+  `你这次，会留下吗？`、`我会留下。你来决定。`、`等你开门。`
+- project-local `video_review` 对 exact final MP4 返回 `issues=[]`、
+  `unique_frame_ratio=1.0`、sampled frame count `1434`；whole-file Whisper 在 native ambience
+  和 concat boundary 上产生额外不可靠 token，因此台词文字只绑定逐 Shot 独立 accepted transcript，
+  不从 whole-file transcript 反推
+- exact candidate Gate：
+  `runs/drama-h3-t8-30s-preview-20260830-v56/sidecars/gates/final-candidate-gate.json`，
+  verdict `PASS_FOR_HUMAN_REVIEW`
+
+运行完全使用 loopback local ComfyUI，无 remote/cloud egress、无 paid Provider call。为避免 H3 T2VA
+OOM 使用的 task-local `comfy_kitchen` patch 已恢复；恢复文件 SHA-256 为
+`71ad880e9aadf4e9e8f144a3a1ba7a5e2c836df727fc90e059a4431bab94ceb8`。ComfyUI queue 已清空；
+service 属于共享 session，未擅自停止。
+
+当前最重要边界仍是：`PASS_FOR_HUMAN_REVIEW` 不是“人能看”的结论。v56 尚未获得用户 1.0× 完整
+观看 verdict，lip-sync 也仍为 `NOT_EVALUATED`；不得将 technical Gate、MCP `issues=[]`、字幕可见性或
+seam SSIM 升级为 human acceptance、candidate activation、P6、Final Acceptance 或 release。
+
+本次 `record-ai-video-session` 后的 automatic `distill-ai-video-learning` evaluation 为
+`no_candidate`：v2 有 exact human `FAIL`，v56 只有 technical `PASS_FOR_HUMAN_REVIEW`，而且两者同时
+改变了 source Shot、continuity chain 与 composition，不能作为 controlled multi-arm comparison；v56
+也还没有 human counter verdict。`experience` RAG follow-up 因 local index library version mismatch
+严格失败，未前台 rebuild、未降低 admission gate，也未创建 placeholder Learning Claim。
+
 ## Dynamic-Watchability Diagnosis — 2026-08-30
 
 用户报告当前生成镜头主观上“非常简单”。诊断时 repository 中最新两个 exact Drama 媒体是
@@ -278,6 +414,11 @@ V2 finding、output identity 与停止决定位于
 | h3-t8-drama-shot06-v22-gate-20260830 | local-comfyui:h3-t8:drama-shot06-dialogue-v22:20260830 | drama-h3-t8-30s-preview-20260830-shot06-dialogue | drama-preview-shot-06-submit-v22 | v22-dialogue-timing | 82d48e32e033f45694e102f5b4767ba1030351da6513eff4c5faa90bc00d799b | EXACT_MEDIA_GATE | NOT_EVALUATED | CONFLICTING_FIRST_SYLLABLE_TRANSCRIPTION | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-v22/sidecars/gates/shot-06-gate.json` |
 | h3-t8-drama-shot06-v23-gate-20260830 | local-comfyui:h3-t8:drama-shot06-dialogue-v23:20260830 | drama-h3-t8-30s-preview-20260830-shot06-dialogue | drama-preview-shot-06-submit-v23 | v23-four-syllable-anchor | bc62c5cb4f560a50cf0397b24696bd644e501fdf50302b29c1d809c0575b6ab6 | EXACT_MEDIA_GATE | NOT_EVALUATED | CONFLICTING_FIRST_SYLLABLE_TRANSCRIPTION | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-v23/sidecars/gates/shot-06-gate.json` |
 | h3-t8-drama-shot06-v24-gate-20260830 | local-comfyui:h3-t8:drama-shot06-dialogue-v24:20260830 | drama-h3-t8-30s-preview-20260830-shot06-dialogue | drama-preview-shot-06-submit-v24 | v24-deng3-phonetic-anchor | 28b2817a023863ba9b0553f42f14867435bf323a84b58f54d0146724d7f58ff1 | EXACT_MEDIA_GATE | NOT_EVALUATED | CONFLICTING_FIRST_SYLLABLE_AND_LARGE_MODEL_UNAVAILABLE | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-v24/sidecars/gates/shot-06-gate.json` |
+| h3-t8-drama-v2-human-watch-20260830 | local-human:drama-h3-t8-composition-v2:20260830 | drama-h3-t8-30s-composition-watchability | key-at-the-waiting-room-v2-human-watch | six-frame-linear-dissolve | c4ca36017f48a398eb15765b8342e4f198a3c7e79fa06de13a2450e9b56ef5a0 | HUMAN_PLAYBACK | FAIL | UNWATCHABLE_SEAMS_AND_MISSING_USABLE_CAPTIONS | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-final-v2/outputs/key-at-the-waiting-room-development-preview-v2-30.000s.mp4` |
+| h3-t8-drama-v56-final-technical-gate-20260830 | local-comfyui:h3-t8:drama-six-shot-rebuild-v56:20260830 | drama-h3-t8-30s-composition-watchability | drama-h3-t8-six-shot-rebuild-v56 | exact-terminal-hard-cut-captioned | 2a9651474e7576bec120d4b718d19a857723541d64d441d4df9e2b89ee3dafee | EXACT_COMPOSITION_GATE | PASS_FOR_HUMAN_REVIEW | NONE | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-v56/sidecars/gates/final-candidate-gate.json` |
+| h3-t8-drama-v56-human-watch-20260830 | local-comfyui:h3-t8:drama-six-shot-rebuild-v56:20260830 | drama-h3-t8-30s-composition-watchability | drama-h3-t8-six-shot-rebuild-v56 | exact-terminal-hard-cut-captioned | 2a9651474e7576bec120d4b718d19a857723541d64d441d4df9e2b89ee3dafee | HUMAN_PLAYBACK | FAIL | HUMAN_UNWATCHABLE | SAME_EVIDENCE_NEW_PROOF_LAYER | h3-t8-drama-v56-final-technical-gate-20260830 | `docs/record_for_agent/2026-08-29-h3-t8-drama-preview-shot-gate-stop.md#supersession-notice--2026-08-30-v70-human-review-rebuild` |
+| h3-t8-drama-shot06-v69-gate-20260830 | local-comfyui:h3-t8:drama-shot06-audio-remux-v69:20260830 | drama-h3-t8-30s-preview-20260830-shot06-dialogue | drama-preview-shot-06-deterministic-audio-repair-v69 | v68-visual-v55-native-audio | 3f64f9f5e792f235b922939e9873a958bf2392e7440e4ab1f334e297a768d965 | EXACT_MEDIA_GATE | PASS | NONE | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-v69/sidecars/gates/shot-06-gate.json` |
+| h3-t8-drama-v70-final-technical-gate-20260830 | local-composition:h3-t8:drama-six-shot-v70:20260830 | drama-h3-t8-30s-composition-watchability | drama-h3-t8-six-shot-rebuild-v70 | hard-cut-captioned-segment-audio-repair | 971127aa32c1a6e8492655142ad4127a20c03e7de81a82c8d14a24fce30118e5 | EXACT_COMPOSITION_GATE | PASS_FOR_HUMAN_REVIEW | HUMAN_1X_WATCH_NOT_EVALUATED | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-v70/sidecars/gates/final-composition-gate.json` |
 | h3-t8-drama-composition-v2-20260830 | local-composition:h3-t8:drama-preview-v2:20260830 | drama-h3-t8-30s-preview-20260830-composition | composition-repair-v2 | manual-six-frame-blend-authored-subtitles | c4ca36017f48a398eb15765b8342e4f198a3c7e79fa06de13a2450e9b56ef5a0 | DEVELOPMENT_COMPOSITION_REPAIR_GATE | PASS_FOR_HUMAN_REVIEW | HUMAN_FULL_SPEED_WATCH_PENDING | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-final-v2/sidecars/gates/composition-repair-gate.json` |
 | h3-t8-drama-shot01-v34-dynamic-gate-20260830 | local-comfyui:h3-t8:drama-shot01-dynamic-v34:20260830 | drama-h3-t8-30s-preview-20260830-dynamic-watchability | drama-preview-shot-01-submit-v34 | t2va-quality-dynamic-truck | 6aa84857b1b7ac7809099bfbc8b58a407ee1d5070753ca5ee7433a256e13f7cc | EXACT_MEDIA_GATE | PASS | NONE | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-v34/sidecars/gates/shot-01-gate.json` |
 | h3-t8-drama-shot02-v39-pre-gate-20260830 | local-comfyui:h3-t8:drama-shot02-dynamic-v39:20260830 | drama-h3-t8-30s-preview-20260830-dynamic-watchability | drama-preview-shot-02-submit-v39 | i2va-turbo-exact-terminal-dolly | d0decc68f4c410d4609be2a493b2319961b55288d3d618352af73083c7e6c9bd | GENERATED_ARTIFACT_PRE_GATE | NOT_EVALUATED | POST_MEDIA_GATE_PENDING | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-v39/sidecars/shot-02-result.json` |
