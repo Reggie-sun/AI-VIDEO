@@ -756,7 +756,7 @@ def test_minimal_cloud_response_restarts_and_stops_at_validated_candidate(
     shot = loaded.shots[0]
     source = loaded.registry.assets[0]
     terminal = _router_asset(
-        "continuity_terminal",
+        "first_frame",
         "minimal-cloud-source",
         source.sha256,
         mime_type=source.mime_type,
@@ -766,9 +766,9 @@ def test_minimal_cloud_response_restarts_and_stops_at_validated_candidate(
         registry_revision_id=loaded.manifest.active_registry.revision_id,
     ).model_copy(update={"asset_id": source.asset_id})
     context = _router_context(
-        continuity=RouterContinuityMode.EXACT_TERMINAL,
-        terminal=_router_asset(
-            "continuity_terminal",
+        continuity=RouterContinuityMode.NONE,
+        keyframe=_router_asset(
+            "first_frame",
             "minimal-cloud-source",
             source.sha256,
             mime_type=source.mime_type,
@@ -787,7 +787,7 @@ def test_minimal_cloud_response_restarts_and_stops_at_validated_candidate(
             "selected_registry_revision_id": (
                 loaded.manifest.active_registry.revision_id
             ),
-            "upstream_terminal": terminal,
+            "shot_keyframe": terminal,
         }
     )
     requirement = ProviderNeutralVideoRequirement.create(
@@ -802,13 +802,13 @@ def test_minimal_cloud_response_restarts_and_stops_at_validated_candidate(
             if character.character_id in shot.character_ids
         ),
         generation_mode=RequirementGenerationMode.IMAGE_TO_VIDEO,
-        continuity_mode=RequirementContinuityMode.EXACT_TERMINAL,
+        continuity_mode=RequirementContinuityMode.NONE,
         motion_requirement=RequirementMotionRequirement.FREE_COMPLEX,
         generation_intent=GenerationIntent(),
-        semantic_reference_roles=(SemanticReferenceRole.CONTINUITY_TERMINAL,),
+        semantic_reference_roles=(SemanticReferenceRole.FIRST_FRAME,),
         asset_evidence=(
             AssetEvidence(
-                role=SemanticReferenceRole.CONTINUITY_TERMINAL,
+                role=SemanticReferenceRole.FIRST_FRAME,
                 asset_id=source.asset_id,
                 asset_sha256=source.sha256,
                 mime_type=source.mime_type,

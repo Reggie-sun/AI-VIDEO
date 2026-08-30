@@ -4,6 +4,7 @@ from typing import Any, Literal
 
 from ai_video.production._video_capability_fingerprint import (
     c4_exact_cardinality_grammar_satisfies_variant,
+    capability_variant_fingerprint,
 )
 from ai_video.production.video import VideoGenerationMode, VideoOutputRequirement
 from ai_video.production.video_contracts import VideoFlexibleOutputRequirement
@@ -14,6 +15,7 @@ from ai_video.production.video_requirement import (
     ProviderNeutralVideoRequirement,
     SemanticReferenceRole,
 )
+from ai_video.production.video_transition import ContinuityObligation
 
 
 def requirement_mode(mode: GenerationMode) -> VideoGenerationMode | None:
@@ -302,6 +304,315 @@ def as_capability_blocked(
         outcome=outcome,
     )
     return type(decision).create(**values)
+
+
+def validate_continuity_transition(
+    *,
+    projection: Any,
+    context: Any,
+    lifecycle: Any,
+    continuity_routing: Any | None,
+) -> Any | None:
+    if continuity_routing is None:
+        if context.continuity_mode.value != "none":
+            raise ValueError(
+                "continuity-bearing requirement requires exact sequence routing evidence"
+            )
+        return None
+    continuity_routing = type(continuity_routing).model_validate(
+        continuity_routing.model_dump(mode="python")
+    )
+    policy = continuity_routing.transition_policy
+    target = policy.target_shot
+    requirement = projection.requirement
+    context_mode = context.continuity_mode.value
+    requirement_mode_value = requirement.continuity_mode.value
+    if context_mode != requirement_mode_value:
+        raise ValueError(
+            "continuity policy requires matching context and requirement modes"
+        )
+    _validate_obligation_mode(policy, requirement)
+    if (target.artifact_id, target.revision, target.content_hash) != (
+        context.activated_shot.artifact_id,
+        context.target_shot_revision,
+        context.target_shot_content_hash,
+    ):
+        raise ValueError("continuity policy must match the exact current routing target")
+    if (
+        policy.project != lifecycle.base_project
+        or policy.registry != lifecycle.base_registry
+    ):
+        raise ValueError(
+            "continuity routing inputs must share exact Project and Registry snapshots"
+        )
+    if (
+        policy.continuity_obligation is ContinuityObligation.FULL_CONTINUITY
+    ):
+        _validate_full_continuity_terminal(
+            projection,
+            context,
+            lifecycle,
+            continuity_routing.previous_shot,
+            continuity_routing.previous_provider_bound_request,
+        )
+        if (
+            policy.source_execution_stack_hash
+            != policy.destination_execution_stack_hash
+        ):
+            _validate_cross_stack_spatial_intent(projection.requirement, policy)
+    return continuity_routing
+
+
+def _validate_obligation_mode(policy: Any, requirement: Any) -> None:
+    mode = requirement.continuity_mode.value
+    obligation = policy.continuity_obligation
+    if obligation is ContinuityObligation.FULL_CONTINUITY:
+        if mode not in {"exact_terminal", "multi_anchor"}:
+            raise ValueError(
+                "full continuity requires terminal-bearing continuity mode"
+            )
+        return
+    if obligation is ContinuityObligation.SUBSTANTIAL_RESET:
+        if mode != "none":
+            raise ValueError(
+                "substantial reset requires continuity mode none"
+            )
+        return
+    if mode == "reference":
+        evidence_roles = {item.role for item in requirement.asset_evidence}
+        required_roles = {
+            SemanticReferenceRole.IDENTITY,
+            SemanticReferenceRole.SCENE,
+        }
+        if not evidence_roles.intersection(required_roles):
+            raise ValueError(
+                "identity/style carryover requires identity or scene reference evidence"
+            )
+        if (
+            "identity" in policy.required_carryover_dimensions
+            and SemanticReferenceRole.IDENTITY not in evidence_roles
+        ):
+            raise ValueError(
+                "identity carryover requires exact identity reference evidence"
+            )
+        return
+    if mode == "semantic":
+        identity = requirement.generation_intent.identity_continuity
+        if (
+            "identity" in policy.required_carryover_dimensions
+            and (
+                identity.preservation.value == "unspecified"
+                or not identity.character_ids
+            )
+        ):
+            raise ValueError(
+                "semantic identity carryover requires typed identity continuity"
+            )
+        return
+    raise ValueError(
+        "identity/style carryover requires reference or semantic continuity mode"
+    )
+
+
+def _validate_full_continuity_terminal(
+    projection: Any,
+    context: Any,
+    lifecycle: Any,
+    previous_shot: Any,
+    previous_provider_bound_request: Any,
+) -> None:
+    terminal = context.upstream_terminal
+    c4_binding = projection.requirement.c4_multi_anchor_binding
+    lifecycle_binding = lifecycle.continuity_binding
+    if lifecycle_binding is not None and (
+        lifecycle_binding.target_shot_id,
+        lifecycle_binding.target_shot_revision,
+        lifecycle_binding.target_shot_content_hash,
+    ) != (
+        context.target_shot_id,
+        context.target_shot_revision,
+        context.target_shot_content_hash,
+    ):
+        raise ValueError(
+            "continuity lifecycle binding does not match the exact current target"
+        )
+    evidence = (
+        lifecycle_binding.terminal_frame
+        if lifecycle_binding is not None
+        else c4_binding.terminal if c4_binding is not None else None
+    )
+    if terminal is None or evidence is None:
+        raise ValueError("full continuity routing requires exact previous terminal evidence")
+    if (
+        (
+            evidence.source_shot_id,
+            evidence.source_shot_revision,
+            evidence.source_shot_content_hash,
+            evidence.source_video_asset_id,
+            evidence.source_generation_id,
+            evidence.source_registry,
+        )
+        != (
+            previous_shot.shot_id,
+            previous_shot.revision,
+            previous_shot.content_hash,
+            previous_provider_bound_request.lifecycle.output_asset_id,
+            previous_provider_bound_request.lifecycle.generation_id,
+            previous_provider_bound_request.lifecycle.base_registry,
+        )
+        or (
+            evidence.extracted_asset_id,
+            evidence.extracted_sha256,
+            evidence.extracted_mime_type,
+            evidence.extracted_size_bytes,
+            evidence.extracted_width,
+            evidence.extracted_height,
+        )
+        != (
+            terminal.asset_id,
+            terminal.asset_sha256,
+            terminal.mime_type,
+            terminal.size_bytes,
+            terminal.width,
+            terminal.height,
+        )
+    ):
+        raise ValueError(
+            "full continuity terminal does not match the exact previous request"
+        )
+
+
+def _validate_cross_stack_spatial_intent(requirement: Any, policy: Any) -> None:
+    intent = requirement.generation_intent
+    required_dimensions = {"camera_velocity", "screen_axis", "subject_position"}
+    if (
+        not required_dimensions.issubset(policy.required_carryover_dimensions)
+        or intent.space_continuity.subject_position == "unspecified"
+        or intent.space_continuity.screen_direction == "unspecified"
+        or intent.axis_continuity.camera_axis == "unspecified"
+        or intent.axis_continuity.framing_continuity == "unspecified"
+    ):
+        raise ValueError(
+            "cross-stack full continuity requires explicit spatial and camera intent"
+        )
+
+
+def apply_continuity_transition(
+    *,
+    decision: Any,
+    context: Any,
+    provider_profile: Any,
+    capabilities: Any,
+    selected_capability_id: str,
+    compiler_contract: Any,
+    continuity_routing: Any | None,
+) -> Any:
+    if continuity_routing is None:
+        return decision
+    decision = _bind_continuity_lineage(
+        decision,
+        continuity_routing,
+    )
+    selected = next(
+        (
+            variant
+            for variant in capabilities.variants
+            if variant.capability_id == selected_capability_id
+        ),
+        None,
+    )
+    policy = continuity_routing.transition_policy
+    if selected is not None:
+        current_route = type(continuity_routing.destination_route).create(
+            provider_name=capabilities.provider_name,
+            provider_kind=selected.provider_kind,
+            model_id=selected.model_id,
+            provider_profile=provider_profile,
+            capability_id=selected.capability_id,
+            capability_fingerprint=capability_variant_fingerprint(selected),
+            execution_kind=selected.execution_kind,
+            billing_kind=selected.billing_kind,
+            compiler_contract=compiler_contract,
+        )
+        if current_route != continuity_routing.destination_route:
+            same_stack = (
+                policy.source_execution_stack_hash
+                == policy.destination_execution_stack_hash
+            )
+            reason_type = type(decision.reason_codes[0])
+            outcome_type = type(decision.outcome)
+            return as_capability_blocked(
+                decision,
+                reason_code=reason_type(
+                    "CONTINUITY_PROVIDER_LOCKED"
+                    if same_stack
+                    else "CONTINUITY_DESTINATION_ROUTE_MISMATCH"
+                ),
+                outcome=outcome_type("blocked_policy"),
+                rationale=(
+                    "The continuity edge locks the previous Provider route."
+                    if same_stack
+                    else "The selected Provider route is not the destination sealed by the continuity edge."
+                ),
+            )
+    if (
+        policy.source_execution_stack_hash
+        != policy.destination_execution_stack_hash
+        and policy.continuity_obligation
+        is ContinuityObligation.FULL_CONTINUITY
+        and not _uses_exact_terminal_frame(decision, context, selected)
+    ):
+        reason_type = type(decision.reason_codes[0])
+        outcome_type = type(decision.outcome)
+        return as_capability_blocked(
+            decision,
+            reason_code=reason_type("CONTINUITY_FRAME_CONDITIONING_REQUIRED"),
+            outcome=outcome_type("blocked_capability"),
+            rationale=(
+                "A cross-stack full-continuity route must condition the destination "
+                "Provider on the exact previous terminal as its first frame."
+            ),
+        )
+    return decision
+
+
+def _bind_continuity_lineage(
+    decision: Any,
+    continuity_routing: Any,
+) -> Any:
+    values = {
+        field_name: getattr(decision, field_name)
+        for field_name in type(decision).model_fields
+        if field_name not in {"semantic_routing_hash", "audit_decision_hash"}
+    }
+    values.update(
+        continuity_transition_policy_hash=(
+            continuity_routing.transition_policy.policy_hash
+        ),
+        previous_provider_bound_request_hash=(
+            continuity_routing.previous_provider_bound_request.provider_bound_request_hash
+        ),
+        continuity_provider_route_binding_hash=continuity_routing.binding_hash,
+    )
+    return type(decision).create(**values)
+
+
+def _uses_exact_terminal_frame(
+    decision: Any,
+    context: Any,
+    selected: Any,
+) -> bool:
+    terminal = context.upstream_terminal
+    return bool(
+        selected is not None
+        and selected.mode is VideoGenerationMode.IMAGE_TO_VIDEO
+        and "first_frame" in selected.allowed_image_roles
+        and decision.required_binding_roles
+        and decision.required_binding_roles[0] == "first_frame"
+        and decision.input_assets
+        and terminal is not None
+        and decision.input_assets[0] == terminal
+    )
 
 
 def enforce_c4_requirement_gate(

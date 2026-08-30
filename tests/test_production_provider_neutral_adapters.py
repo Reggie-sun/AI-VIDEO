@@ -29,6 +29,7 @@ from ai_video.production.seedance_capabilities import (
 )
 from ai_video.production.shot_router import (
     AdapterCompilerContract,
+    ContinuityProviderRouteBinding,
     ContinuityMode,
     MotionRequirement,
     RoutingOutcome,
@@ -51,9 +52,11 @@ from ai_video.production.video import (
 from ai_video.production.video_contracts import VideoFlexibleOutputRequirement
 from ai_video.production.video_requirement import (
     AssetEvidence,
+    AxisContinuity,
     AudioNeed,
     CapabilityNeed,
     ContinuityMode as RequirementContinuityMode,
+    GenerationIntent,
     GenerationMode as RequirementGenerationMode,
     OutputGeometryPolicy,
     OutputNeed,
@@ -61,7 +64,12 @@ from ai_video.production.video_requirement import (
     ProviderNeutralVideoRequirement,
     QualityNeed,
     SemanticReferenceRole,
+    SpaceContinuity,
     VerifiedGenerationRequirementProjection,
+)
+from ai_video.production.video_transition import (
+    BoundaryKind,
+    ContinuityObligation,
 )
 from test_production_minimax_h3 import _output as _h3_output
 from test_production_minimax_h3 import _profile as _h3_profile
@@ -73,10 +81,17 @@ from test_production_seedance import (
     _request as _seedance_request,
 )
 from test_production_shot_router import (
+    HASH_A,
     _asset,
+    _bound_route_identity,
+    _continuity_routing,
     _context,
     _lifecycle,
     _policy,
+    _route_first_frame,
+    _selected_route_identity,
+    _terminal_lifecycle,
+    _transition_policy,
     _verified_requirement,
 )
 from test_production_comfy_video import QUALITY_PROFILE_PATH, _profile_and_comfy_root
@@ -108,6 +123,87 @@ def _replace_requirement(
         target_shot_id=requirement.target_shot.shot_id,
         target_shot_revision=requirement.target_shot.revision,
         target_shot_content_hash=requirement.target_shot.content_hash,
+    )
+
+
+def _cross_provider_continuity(
+    *,
+    context,
+    provider_profile: ProviderProfilePointer,
+    capabilities: VideoProviderCapabilities,
+    selected_capability_id: str,
+    compiler_contract: AdapterCompilerContract,
+) -> tuple[object, ContinuityProviderRouteBinding]:
+    source_context = _context(
+        shot_id="shot-1",
+        continuity=ContinuityMode.NONE,
+        keyframe=_asset("first_frame", "adapter-source-opening", HASH_A),
+        important=False,
+    )
+    source_lifecycle = _lifecycle(source_context).model_copy(
+        update={
+            "input_artifact_ids": (
+                source_context.target_shot_id,
+                source_context.shot_keyframe.asset_id,
+            ),
+            "seal_terminal_frame": True,
+        }
+    )
+    previous_bound = _route_first_frame(
+        source_context,
+        provider_name="adapter-source-provider",
+        provider_kind="adapter_source",
+        model_id="adapter-source-model",
+        profile_id="adapter-source-profile",
+        profile_sha256=HASH_A,
+        lifecycle=source_lifecycle,
+        compiler_contract=compiler_contract,
+    )
+    lifecycle = _terminal_lifecycle(
+        context,
+        source_context=source_context,
+        source_bound_request=previous_bound,
+    )
+    selected = next(
+        variant
+        for variant in capabilities.variants
+        if variant.capability_id == selected_capability_id
+    )
+    destination_route = _selected_route_identity(
+        provider_name=capabilities.provider_name,
+        variant=selected,
+        provider_profile=provider_profile,
+        compiler_contract=compiler_contract,
+    )
+    transition = _transition_policy(
+        source_context=source_context,
+        target_context=context,
+        lifecycle=lifecycle,
+        boundary=BoundaryKind.HARD_CUT,
+        obligation=ContinuityObligation.FULL_CONTINUITY,
+        source_route=_bound_route_identity(previous_bound),
+        destination_route=destination_route,
+    )
+    return lifecycle, _continuity_routing(
+        transition=transition,
+        previous_bound=previous_bound,
+        previous_shot=source_context.activated_shot,
+        destination_route=destination_route,
+    )
+
+
+def _spatial_intent(intent: GenerationIntent | None = None) -> GenerationIntent:
+    return (intent or GenerationIntent()).model_copy(
+        update={
+            "space_continuity": SpaceContinuity(
+                subject_position="preserve exact screen-space position",
+                screen_direction="left_to_right",
+            ),
+            "axis_continuity": AxisContinuity(
+                camera_axis="same_side",
+                framing_continuity="preserve subject scale",
+            ),
+        }
     )
 
 
@@ -383,6 +479,7 @@ def test_local_h3_compiles_neutral_first_frame_without_runtime_execution(
         _verified_requirement(context),
         generation_mode=RequirementGenerationMode.IMAGE_TO_VIDEO,
         continuity_mode=RequirementContinuityMode.EXACT_TERMINAL,
+        generation_intent=_spatial_intent(),
         semantic_reference_roles=(SemanticReferenceRole.CONTINUITY_TERMINAL,),
         asset_evidence=(
             AssetEvidence(
@@ -415,31 +512,35 @@ def test_local_h3_compiles_neutral_first_frame_without_runtime_execution(
         image_resolver=lambda *_: image_root / "unused.png",
         transport=object(),
     )
+    provider_profile = ProviderProfilePointer(
+        profile_id="minimax-h3-fl2va",
+        profile_version="v1",
+        profile_path=Path(f"provider-profiles/{profile.profile_content_hash}.json"),
+        profile_sha256=profile.profile_content_hash,
+    )
+    capabilities = provider.capabilities()
+    compiler_contract = AdapterCompilerContract.create(
+        compiler_id="comfy-local-h3-video-compiler",
+        compiler_version="1",
+    )
+    lifecycle, continuity_routing = _cross_provider_continuity(
+        context=context,
+        provider_profile=provider_profile,
+        capabilities=capabilities,
+        selected_capability_id="minimax-h3-fl2va-local-v1",
+        compiler_contract=compiler_contract,
+    )
     routing = VideoGenerationResolver().resolve_requirement(
         projection=projection,
         context=context,
         policy=_policy(),
-        provider_profile=ProviderProfilePointer(
-            profile_id="minimax-h3-fl2va",
-            profile_version="v1",
-            profile_path=Path(f"provider-profiles/{profile.profile_content_hash}.json"),
-            profile_sha256=profile.profile_content_hash,
-        ),
-        capabilities=provider.capabilities(),
+        provider_profile=provider_profile,
+        capabilities=capabilities,
         selected_capability_id="minimax-h3-fl2va-local-v1",
         output_requirement=output,
-        lifecycle=_lifecycle(context).model_copy(
-            update={
-                "input_artifact_ids": (
-                    context.target_shot_id,
-                    terminal.asset_id,
-                )
-            }
-        ),
-        compiler_contract=AdapterCompilerContract.create(
-            compiler_id="comfy-local-h3-video-compiler",
-            compiler_version="1",
-        ),
+        lifecycle=lifecycle,
+        compiler_contract=compiler_contract,
+        continuity_routing=continuity_routing,
     )
     assert routing.provider_bound_request is not None
 
@@ -493,7 +594,7 @@ def test_stock20_v4_compiles_exact_h3_prompt_without_neutral_fallback(
         contract_version="provider-neutral-video-requirement/4",
         generation_mode=RequirementGenerationMode.IMAGE_TO_VIDEO,
         continuity_mode=RequirementContinuityMode.EXACT_TERMINAL,
-        generation_intent=_complete_intent(),
+        generation_intent=_spatial_intent(_complete_intent()),
         conditioning_compatibility=_compatible_fl2va().model_copy(
             update={
                 "first_anchor_id": first.asset_id,
@@ -551,34 +652,44 @@ def test_stock20_v4_compiles_exact_h3_prompt_without_neutral_fallback(
         image_resolver=lambda *_: image_root / "unused.png",
         transport=object(),
     )
+    provider_profile = ProviderProfilePointer(
+        profile_id="minimax-h3-fl2va",
+        profile_version="v1",
+        profile_path=Path(
+            f"provider-profiles/{profile.profile_content_hash}.json"
+        ),
+        profile_sha256=profile.profile_content_hash,
+    )
+    capabilities = provider.capabilities()
+    compiler_contract = AdapterCompilerContract.create(
+        compiler_id="comfy-local-h3-video-compiler",
+        compiler_version="2",
+    )
+    lifecycle, continuity_routing = _cross_provider_continuity(
+        context=context,
+        provider_profile=provider_profile,
+        capabilities=capabilities,
+        selected_capability_id="minimax-h3-fl2va-local-v1",
+        compiler_contract=compiler_contract,
+    )
+    lifecycle = lifecycle.model_copy(
+        update={
+            "input_artifact_ids": tuple(
+                dict.fromkeys((*lifecycle.input_artifact_ids, last.asset_id))
+            )
+        }
+    )
     routing = VideoGenerationResolver().resolve_requirement(
         projection=projection,
         context=context,
         policy=_policy(),
-        provider_profile=ProviderProfilePointer(
-            profile_id="minimax-h3-fl2va",
-            profile_version="v1",
-            profile_path=Path(
-                f"provider-profiles/{profile.profile_content_hash}.json"
-            ),
-            profile_sha256=profile.profile_content_hash,
-        ),
-        capabilities=provider.capabilities(),
+        provider_profile=provider_profile,
+        capabilities=capabilities,
         selected_capability_id="minimax-h3-fl2va-local-v1",
         output_requirement=output,
-        lifecycle=_lifecycle(context).model_copy(
-            update={
-                "input_artifact_ids": (
-                    context.target_shot_id,
-                    first.asset_id,
-                    last.asset_id,
-                )
-            }
-        ),
-        compiler_contract=AdapterCompilerContract.create(
-            compiler_id="comfy-local-h3-video-compiler",
-            compiler_version="2",
-        ),
+        lifecycle=lifecycle,
+        compiler_contract=compiler_contract,
+        continuity_routing=continuity_routing,
     )
     assert routing.provider_bound_request is not None, routing.decision.model_dump_json(
         indent=2
@@ -990,6 +1101,7 @@ def test_hailuo_compiles_first_frame_to_adaptive_i2v_without_fixed_pixels() -> N
         _verified_requirement(context),
         generation_mode=RequirementGenerationMode.IMAGE_TO_VIDEO,
         continuity_mode=RequirementContinuityMode.EXACT_TERMINAL,
+        generation_intent=_spatial_intent(),
         semantic_reference_roles=(SemanticReferenceRole.CONTINUITY_TERMINAL,),
         asset_evidence=(
             AssetEvidence(
@@ -1012,22 +1124,30 @@ def test_hailuo_compiles_first_frame_to_adaptive_i2v_without_fixed_pixels() -> N
         ),
         audio_need=AudioNeed.FORBIDDEN,
     )
-    lifecycle = _lifecycle(context).model_copy(
-        update={"input_artifact_ids": (context.target_shot_id, terminal.asset_id)}
+    provider_profile = _hailuo_profile()
+    capabilities = hailuo_module._CAPABILITIES
+    compiler_contract = AdapterCompilerContract.create(
+        compiler_id="minimax-hailuo-video-compiler",
+        compiler_version="1",
+    )
+    lifecycle, continuity_routing = _cross_provider_continuity(
+        context=context,
+        provider_profile=provider_profile,
+        capabilities=capabilities,
+        selected_capability_id=hailuo_module._I2V_CAPABILITY_ID,
+        compiler_contract=compiler_contract,
     )
     routing = VideoGenerationResolver().resolve_requirement(
         projection=projection,
         context=context,
         policy=_policy(remote_authorized=True, budget_authorized=True),
-        provider_profile=_hailuo_profile(),
-        capabilities=hailuo_module._CAPABILITIES,
+        provider_profile=provider_profile,
+        capabilities=capabilities,
         selected_capability_id=hailuo_module._I2V_CAPABILITY_ID,
         output_requirement=output,
         lifecycle=lifecycle,
-        compiler_contract=AdapterCompilerContract.create(
-            compiler_id="minimax-hailuo-video-compiler",
-            compiler_version="1",
-        ),
+        compiler_contract=compiler_contract,
+        continuity_routing=continuity_routing,
     )
     assert routing.provider_bound_request is not None
     provider = MiniMaxHailuoVideoProvider(

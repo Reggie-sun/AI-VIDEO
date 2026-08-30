@@ -4,9 +4,11 @@ from __future__ import annotations
 
 from ai_video.production._shot_router_contracts import (
     AdapterCompilerContract,
+    ContinuityProviderRouteBinding,
     ContinuityMode,
     MotionRequirement,
     ProviderBoundVideoRequest,
+    ProviderRouteIdentity,
     RequirementRoutingResult,
     RouterAssetIdentity,
     RouterContinuityState,
@@ -25,6 +27,7 @@ from ai_video.production._video_capability_fingerprint import (
     capability_variant_fingerprint,
 )
 from ai_video.production._video_requirement_routing import (
+    apply_continuity_transition,
     as_capability_blocked,
     commercial_requirement_context_is_current,
     effective_policy_for_requirement,
@@ -33,6 +36,7 @@ from ai_video.production._video_requirement_routing import (
     requirement_mode,
     requirement_output_matches,
     requirement_route_is_unsupported,
+    validate_continuity_transition,
     validate_requirement_asset_lineage,
 )
 from ai_video.production.models import VisualStrategy
@@ -58,6 +62,43 @@ class VideoGenerationResolver:
     """Resolve one exact selected capability without provider fallback."""
 
     def resolve(
+        self,
+        *,
+        context: ShotRoutingContext,
+        policy: VideoRoutingPolicy,
+        provider_profile: ProviderProfilePointer,
+        capabilities: VideoProviderCapabilities,
+        selected_capability_id: str,
+        output_requirement: VideoOutputRequirement | VideoFlexibleOutputRequirement,
+        requirement_hash: str | None = None,
+        requirement_mode: VideoGenerationMode | None = None,
+        requirement_binding_roles: tuple[str, ...] | None = None,
+        requirement_input_assets: tuple[RouterAssetIdentity, ...] | None = None,
+        requirement_lineage_current: bool = True,
+        commercial_source_preparation: bool = False,
+    ) -> VideoGenerationRoutingDecision:
+        """Resolve an independent Shot; continuity-bearing routes use the requirement API."""
+
+        if context.continuity_mode is not ContinuityMode.NONE:
+            raise ValueError(
+                "continuity-bearing routing must use resolve_requirement with sequence evidence"
+            )
+        return self._resolve_capability(
+            context=context,
+            policy=policy,
+            provider_profile=provider_profile,
+            capabilities=capabilities,
+            selected_capability_id=selected_capability_id,
+            output_requirement=output_requirement,
+            requirement_hash=requirement_hash,
+            requirement_mode=requirement_mode,
+            requirement_binding_roles=requirement_binding_roles,
+            requirement_input_assets=requirement_input_assets,
+            requirement_lineage_current=requirement_lineage_current,
+            commercial_source_preparation=commercial_source_preparation,
+        )
+
+    def _resolve_capability(
         self,
         *,
         context: ShotRoutingContext,
@@ -367,10 +408,14 @@ class VideoGenerationResolver:
         output_requirement: VideoOutputRequirement | VideoFlexibleOutputRequirement,
         lifecycle: VideoGenerationLifecycleEnvelope,
         compiler_contract: AdapterCompilerContract,
+        continuity_routing: ContinuityProviderRouteBinding | None = None,
     ) -> RequirementRoutingResult:
         """Bind one verified neutral requirement to one exact capability."""
 
         requirement = projection.requirement
+        lifecycle = VideoGenerationLifecycleEnvelope.model_validate(
+            lifecycle.model_dump(mode="python")
+        )
         if (
             projection.target_shot_id != context.target_shot_id
             or projection.target_shot_revision != context.target_shot_revision
@@ -381,6 +426,12 @@ class VideoGenerationResolver:
             raise ValueError("verified requirement does not match current routing target")
         if lifecycle.base_registry.revision_id != context.selected_registry_revision_id:
             raise ValueError("lifecycle Registry snapshot is not current for routing")
+        transition = validate_continuity_transition(
+            projection=projection,
+            context=context,
+            lifecycle=lifecycle,
+            continuity_routing=continuity_routing,
+        )
 
         effective_policy = effective_policy_for_requirement(requirement, policy)
 
@@ -396,7 +447,7 @@ class VideoGenerationResolver:
             and requirement.capability_need.needs_product_fidelity
         )
         if expected_mode is None or binding_projection is None:
-            decision = self.resolve(
+            decision = self._resolve_capability(
                 context=context,
                 policy=effective_policy,
                 provider_profile=provider_profile,
@@ -414,9 +465,18 @@ class VideoGenerationResolver:
                     outcome=RoutingOutcome.BLOCKED_CAPABILITY,
                     rationale="The neutral generation mode or bindings are unsupported.",
                 )
+            decision = apply_continuity_transition(
+                decision=decision,
+                context=context,
+                provider_profile=provider_profile,
+                capabilities=capabilities,
+                selected_capability_id=selected_capability_id,
+                compiler_contract=compiler_contract,
+                continuity_routing=transition,
+            )
             return RequirementRoutingResult(decision=decision)
         native_roles, input_assets = binding_projection
-        decision = self.resolve(
+        decision = self._resolve_capability(
             context=context,
             policy=effective_policy,
             provider_profile=provider_profile,
@@ -445,6 +505,15 @@ class VideoGenerationResolver:
                     "The exact selected capability cannot express the sealed neutral requirement."
                 ),
             )
+        decision = apply_continuity_transition(
+            decision=decision,
+            context=context,
+            provider_profile=provider_profile,
+            capabilities=capabilities,
+            selected_capability_id=selected_capability_id,
+            compiler_contract=compiler_contract,
+            continuity_routing=transition,
+        )
         if decision.outcome is not RoutingOutcome.SELECTED:
             return RequirementRoutingResult(decision=decision)
 

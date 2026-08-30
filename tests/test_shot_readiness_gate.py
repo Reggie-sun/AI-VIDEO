@@ -813,6 +813,35 @@ def test_compatibility_handoff_receives_projection_without_plan_hint() -> None:
     )
 
 
+def test_continuity_handoff_preserves_exact_transition_policy() -> None:
+    current_request = _current_v4_causal_request()
+    plan = VideoPlanner().plan(current_request)
+    requirement = plan.generation_requirement
+    assert requirement is not None
+    policy = _complete_causal_policy(
+        requirement.generation_intent_hash,
+        requirement.target_shot,
+    )
+    handoff = Mock(return_value="eligible")
+
+    from ai_video.planning import prepare_shot_for_existing_production
+
+    result = prepare_shot_for_existing_production(
+        current_request=current_request,
+        plan=plan,
+        production_handoff=handoff,
+        continuity_transition_policy=policy,
+    )
+
+    assert result == "eligible"
+    assert handoff.call_count == 1
+    assert handoff.call_args.kwargs["continuity_transition_policy"] == policy
+    assert isinstance(
+        handoff.call_args.kwargs["generation_requirement"],
+        VerifiedGenerationRequirementProjection,
+    )
+
+
 def test_readiness_import_and_single_owner_boundaries() -> None:
     quality_root = Path("src/ai_video/quality_gates")
     forbidden_prefixes = (

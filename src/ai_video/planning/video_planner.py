@@ -825,7 +825,16 @@ def prepare_shot_for_existing_production(
         plan=plan,
         continuity_transition_policy=continuity_transition_policy,
     )
+    handoff: dict[str, object] = {
+        "current_shot": current_request.target_shot,
+        "generation_requirement": projection,
+    }
+    if continuity_transition_policy is not None:
+        handoff["continuity_transition_policy"] = (
+            ContinuityTransitionPolicy.model_validate(
+                continuity_transition_policy.model_dump(mode="python")
+            )
+        )
     return production_handoff(
-        current_shot=current_request.target_shot,
-        generation_requirement=projection,
+        **handoff,
     )

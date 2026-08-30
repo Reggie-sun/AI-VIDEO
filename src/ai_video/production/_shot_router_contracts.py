@@ -30,8 +30,10 @@ from ai_video.production.video import (
 )
 from ai_video.production.video_contracts import VideoFlexibleOutputRequirement
 from ai_video.production.video_requirement import ExpressionStrength
-
-
+from ai_video.production.video_execution_stack import (
+    GenerationExecutionStackIdentity,
+)
+from ai_video.production.video_transition import ContinuityTransitionPolicy
 
 _SAFE_ID = r"^[A-Za-z0-9._:/-]{1,256}$"
 _SHA256 = r"^[0-9a-f]{64}$"
@@ -104,6 +106,9 @@ class RouterReasonCode(str, Enum):
     MISSING_SHOT_KEYFRAME = "MISSING_SHOT_KEYFRAME"
     COMMERCIAL_SOURCE_LINEAGE_MISMATCH = "COMMERCIAL_SOURCE_LINEAGE_MISMATCH"
     PROVIDER_CAPABILITY_DENIED = "PROVIDER_CAPABILITY_DENIED"
+    CONTINUITY_PROVIDER_LOCKED = "CONTINUITY_PROVIDER_LOCKED"
+    CONTINUITY_DESTINATION_ROUTE_MISMATCH = "CONTINUITY_DESTINATION_ROUTE_MISMATCH"
+    CONTINUITY_FRAME_CONDITIONING_REQUIRED = "CONTINUITY_FRAME_CONDITIONING_REQUIRED"
     LOCAL_RESOURCE_POLICY_DENIED = "LOCAL_RESOURCE_POLICY_DENIED"
     REMOTE_AUTHORIZATION_REQUIRED = "REMOTE_AUTHORIZATION_REQUIRED"
     BUDGET_POLICY_DENIED = "BUDGET_POLICY_DENIED"
@@ -280,6 +285,50 @@ class AdapterCompilerContract(_RouterModel):
                 }
             ),
         )
+
+
+class ProviderRouteIdentity(_RouterModel):
+    """Exact Provider execution selection, independent of Shot-local inputs."""
+
+    provider_name: str = Field(pattern=_SAFE_ID)
+    provider_kind: str = Field(pattern=_SAFE_ID)
+    model_id: str = Field(pattern=_SAFE_ID)
+    provider_profile: ProviderProfilePointer
+    capability_id: str = Field(pattern=_SAFE_ID)
+    capability_fingerprint: str = Field(pattern=_SHA256)
+    execution_kind: VideoExecutionKind
+    billing_kind: BillingKind
+    compiler_contract: AdapterCompilerContract
+    route_identity_hash: str = Field(pattern=_SHA256)
+
+    @model_validator(mode="after")
+    def _validate_hash(self) -> "ProviderRouteIdentity":
+        expected = canonical_sha256(
+            {
+                "schema": "ai-video-provider-route-identity/1",
+                **self.model_dump(mode="json", exclude={"route_identity_hash"}),
+            }
+        )
+        if self.route_identity_hash != expected:
+            raise ValueError("Provider route identity hash does not match content")
+        return self
+
+    @classmethod
+    def create(cls, **values: object) -> "ProviderRouteIdentity":
+        data = dict(values)
+        data.pop("route_identity_hash", None)
+        candidate = cls.model_construct(**data, route_identity_hash="0" * 64)
+        data["route_identity_hash"] = canonical_sha256(
+            {
+                "schema": "ai-video-provider-route-identity/1",
+                **candidate.model_dump(
+                    mode="json",
+                    exclude={"route_identity_hash"},
+                    warnings=False,
+                ),
+            }
+        )
+        return cls.model_validate(data)
 
 
 class VideoGenerationLifecycleEnvelope(_RouterModel):
@@ -551,6 +600,18 @@ class VideoGenerationRoutingDecision(_RouterModel):
         pattern=_SHA256,
     )
     requirement_hash: str | None = Field(default=None, pattern=_SHA256)
+    continuity_transition_policy_hash: str | None = Field(
+        default=None,
+        pattern=_SHA256,
+    )
+    previous_provider_bound_request_hash: str | None = Field(
+        default=None,
+        pattern=_SHA256,
+    )
+    continuity_provider_route_binding_hash: str | None = Field(
+        default=None,
+        pattern=_SHA256,
+    )
     execution_kind: VideoExecutionKind | None
     output_requirement: VideoOutputRequirement | VideoFlexibleOutputRequirement
     reason_codes: tuple[RouterReasonCode, ...] = Field(min_length=1)
@@ -569,9 +630,13 @@ class VideoGenerationRoutingDecision(_RouterModel):
     def semantic_payload(self) -> dict[str, object]:
         payload: dict[str, object] = {
             "schema": (
-                "ai-video-shot-routing-semantic/3"
-                if self.requirement_hash is not None
-                else "ai-video-shot-routing-semantic/2"
+                "ai-video-shot-routing-semantic/4"
+                if self.continuity_transition_policy_hash is not None
+                else (
+                    "ai-video-shot-routing-semantic/3"
+                    if self.requirement_hash is not None
+                    else "ai-video-shot-routing-semantic/2"
+                )
             ),
             "target_shot_id": self.target_shot_id,
             "target_shot_revision": self.target_shot_revision,
@@ -602,10 +667,31 @@ class VideoGenerationRoutingDecision(_RouterModel):
         }
         if self.requirement_hash is not None:
             payload["requirement_hash"] = self.requirement_hash
+        if self.continuity_transition_policy_hash is not None:
+            payload["continuity_transition_policy_hash"] = (
+                self.continuity_transition_policy_hash
+            )
+            payload["previous_provider_bound_request_hash"] = (
+                self.previous_provider_bound_request_hash
+            )
+            payload["continuity_provider_route_binding_hash"] = (
+                self.continuity_provider_route_binding_hash
+            )
         return payload
 
     @model_validator(mode="after")
     def _validate_decision(self) -> "VideoGenerationRoutingDecision":
+        continuity_lineage = (
+            self.continuity_transition_policy_hash,
+            self.previous_provider_bound_request_hash,
+            self.continuity_provider_route_binding_hash,
+        )
+        if any(value is None for value in continuity_lineage) and any(
+            value is not None for value in continuity_lineage
+        ):
+            raise ValueError(
+                "continuity routing lineage must bind policy, routes, and previous request"
+            )
         if self.outcome is RoutingOutcome.SELECTED and self.selected_mode is None:
             raise ValueError("selected routing outcome requires a generation mode")
         if self.outcome is not RoutingOutcome.SELECTED and self.selected_mode is not None:
@@ -745,6 +831,128 @@ class ProviderBoundVideoRequest(_RouterModel):
         )
         data["provider_bound_request_hash"] = canonical_sha256(
             candidate._hash_payload()
+        )
+        return cls.model_validate(data)
+
+
+class ContinuityProviderRouteBinding(_RouterModel):
+    """One exact transition bound to its source and destination Provider routes."""
+
+    transition_policy: ContinuityTransitionPolicy
+    previous_shot: Shot
+    previous_provider_bound_request: ProviderBoundVideoRequest
+    source_route: ProviderRouteIdentity
+    destination_route: ProviderRouteIdentity
+    source_execution_stack: GenerationExecutionStackIdentity
+    destination_execution_stack: GenerationExecutionStackIdentity
+    binding_hash: str = Field(pattern=_SHA256)
+
+    @model_validator(mode="after")
+    def _validate_binding(self) -> "ContinuityProviderRouteBinding":
+        policy = self.transition_policy
+        previous = self.previous_provider_bound_request
+        shot = self.previous_shot
+        if not verify_artifact_hash(shot):
+            raise ValueError("previous continuity Shot is not an exact sealed artifact")
+        if (
+            (
+                policy.source_shot.artifact_id,
+                policy.source_shot.revision,
+                policy.source_shot.content_hash,
+            )
+            != (shot.artifact_id, shot.revision, shot.content_hash)
+            or (
+                previous.target_shot_id,
+                previous.target_shot_revision,
+                previous.target_shot_content_hash,
+            )
+            != (shot.shot_id, shot.revision, shot.content_hash)
+        ):
+            raise ValueError(
+                "continuity policy and previous request must match the exact source Shot"
+            )
+        if (
+            policy.project != previous.lifecycle.base_project
+            or policy.registry != previous.lifecycle.base_registry
+        ):
+            raise ValueError(
+                "continuity policy and previous request must share exact snapshots"
+            )
+        expected_source = ProviderRouteIdentity.create(
+            provider_name=previous.provider_name,
+            provider_kind=previous.provider_kind,
+            model_id=previous.model_id,
+            provider_profile=previous.provider_profile,
+            capability_id=previous.capability_id,
+            capability_fingerprint=previous.capability_fingerprint,
+            execution_kind=previous.execution_kind,
+            billing_kind=previous.billing_kind,
+            compiler_contract=previous.compiler_contract,
+        )
+        if self.source_route != expected_source:
+            raise ValueError("source Provider route does not match previous request")
+        if (
+            policy.source_execution_stack_hash
+            != self.source_execution_stack.execution_stack_hash
+            or policy.destination_execution_stack_hash
+            != self.destination_execution_stack.execution_stack_hash
+        ):
+            raise ValueError(
+                "continuity policy must bind exact source and destination execution stacks"
+            )
+        self._validate_route_stack(self.source_route, self.source_execution_stack)
+        self._validate_route_stack(
+            self.destination_route,
+            self.destination_execution_stack,
+        )
+        if (
+            policy.source_execution_stack_hash
+            == policy.destination_execution_stack_hash
+            and self.source_route != self.destination_route
+        ):
+            raise ValueError(
+                "same-stack continuity cannot bind a different Provider route"
+            )
+        expected_hash = canonical_sha256(
+            {
+                "schema": "ai-video-continuity-provider-route-binding/1",
+                **self.model_dump(mode="json", exclude={"binding_hash"}),
+            }
+        )
+        if self.binding_hash != expected_hash:
+            raise ValueError("continuity Provider route binding hash does not match content")
+        return self
+
+    @staticmethod
+    def _validate_route_stack(
+        route: ProviderRouteIdentity,
+        stack: GenerationExecutionStackIdentity,
+    ) -> None:
+        if (
+            route.provider_kind != stack.provider_kind
+            or route.model_id != stack.model_id
+            or route.capability_id != stack.capability_id
+            or route.provider_profile.profile_sha256 != stack.profile_hash
+            or route.compiler_contract.compiler_hash != stack.compiler_hash
+        ):
+            raise ValueError(
+                "Provider route does not match its exact execution stack identity"
+            )
+
+    @classmethod
+    def create(cls, **values: object) -> "ContinuityProviderRouteBinding":
+        data = dict(values)
+        data.pop("binding_hash", None)
+        candidate = cls.model_construct(**data, binding_hash="0" * 64)
+        data["binding_hash"] = canonical_sha256(
+            {
+                "schema": "ai-video-continuity-provider-route-binding/1",
+                **candidate.model_dump(
+                    mode="json",
+                    exclude={"binding_hash"},
+                    warnings=False,
+                ),
+            }
         )
         return cls.model_validate(data)
 

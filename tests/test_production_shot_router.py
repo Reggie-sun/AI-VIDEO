@@ -17,8 +17,10 @@ from ai_video.production.models import (
 )
 from ai_video.production.shot_router import (
     AdapterCompilerContract,
+    ContinuityProviderRouteBinding,
     ContinuityMode,
     MotionRequirement,
+    ProviderRouteIdentity,
     RouterAssetIdentity,
     RouterContinuityState,
     RouterPolicyIdentity,
@@ -34,6 +36,7 @@ from ai_video.production._video_requirement_routing import requirement_bindings
 from ai_video.production.video_requirement import (
     AssetEvidence,
     AudioNeed,
+    AxisContinuity,
     CapabilityNeed,
     ContinuityMode as RequirementContinuityMode,
     ExpressionStrength,
@@ -44,13 +47,18 @@ from ai_video.production.video_requirement import (
     ProviderNeutralVideoRequirement,
     QualityNeed,
     SemanticReferenceRole,
+    SpaceContinuity,
     VerifiedGenerationRequirementProjection,
 )
 from tests.fixtures.planning_factory import make_character, make_scene
 from ai_video.production.video_compiler import compile_provider_video_request
 from ai_video.production.video import (
     BillingKind,
+    ContinuityArtifactIdentity,
+    ContinuityConstraintSet,
+    ContinuityReferenceBinding,
     ProviderProfilePointer,
+    TerminalFrameEvidence,
     VideoCapabilityVariant,
     VideoExecutionKind,
     VideoGenerationMode,
@@ -62,6 +70,19 @@ from ai_video.production.video import (
 from ai_video.production.video_contracts import (
     VideoFlexibleOutputRequirement,
     VideoOutputCapability,
+)
+from ai_video.production.video_execution_stack import (
+    GenerationExecutionStackIdentity,
+    RuntimeSeal,
+    StackComponentIdentity,
+)
+from ai_video.production.video_transition import (
+    BoundaryKind,
+    ContinuityAnchorBinding,
+    ContinuityAnchorRole,
+    ContinuityObligation,
+    ContinuityTransitionPolicy,
+    CreativeArtifactIdentity,
 )
 
 
@@ -325,21 +346,25 @@ def test_multi_anchor_context_fails_closed_without_sealed_c4_requirement():
     context = _context(continuity=ContinuityMode.MULTI_ANCHOR)
 
     visual = ShotVisualResolver().resolve(context, _policy())
-    routed = VideoGenerationResolver().resolve(
-        context=context,
-        policy=_policy(),
-        provider_profile=_profile(),
-        capabilities=_capabilities(_variant(VideoGenerationMode.IMAGE_TO_VIDEO)),
-        selected_capability_id="capability-image_to_video",
-        output_requirement=_output(),
-    )
+    with pytest.raises(
+        ValueError,
+        match="must use resolve_requirement with sequence evidence",
+    ):
+        VideoGenerationResolver().resolve(
+            context=context,
+            policy=_policy(),
+            provider_profile=_profile(),
+            capabilities=_capabilities(
+                _variant(VideoGenerationMode.IMAGE_TO_VIDEO)
+            ),
+            selected_capability_id="capability-image_to_video",
+            output_requirement=_output(),
+        )
 
     assert visual.outcome is RoutingOutcome.BLOCKED_MISSING_INPUT
-    assert routed.outcome is RoutingOutcome.BLOCKED_CAPABILITY
     assert visual.reason_codes == (
         RouterReasonCode.MULTI_ANCHOR_REQUIREMENT_REQUIRED,
     )
-    assert routed.reason_codes == visual.reason_codes
 
 
 def test_c4_static_requirement_routes_and_compiles_exact_request():
@@ -357,7 +382,43 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
             _asset("character_reference", "c4-identity", "e" * 64),
         ),
     )
+    compiler = AdapterCompilerContract.create(
+        compiler_id="test-c4-compiler",
+        compiler_version="1",
+    )
+    source_context = _context(
+        shot_id="shot-1",
+        continuity=ContinuityMode.NONE,
+        keyframe=_asset("first_frame", "c4-source-opening", HASH_A),
+        important=False,
+    )
+    source_lifecycle = _lifecycle(source_context).model_copy(
+        update={
+            "input_artifact_ids": (
+                source_context.target_shot_id,
+                source_context.shot_keyframe.asset_id,
+            ),
+            "seal_terminal_frame": True,
+        }
+    )
+    previous_bound = _route_first_frame(
+        source_context,
+        provider_name="exact-provider",
+        provider_kind="local_test",
+        model_id="model-test",
+        profile_id="exact-profile",
+        profile_sha256=HASH_D,
+        lifecycle=source_lifecycle,
+        compiler_contract=compiler,
+    )
+    continuity_lifecycle = _terminal_lifecycle(
+        context,
+        source_context=source_context,
+        source_bound_request=previous_bound,
+    )
+    assert continuity_lifecycle.continuity_binding is not None
     binding = _c4_binding(
+        terminal=continuity_lifecycle.continuity_binding.terminal_frame,
         selected_registry_revision_id=HASH_F,
         identity_changes={"registry_revision_id": HASH_F},
         endpoint_changes={
@@ -443,7 +504,16 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
             size_bytes=identity_asset.size_bytes,
         ),
     )
-    intent = GenerationIntent()
+    intent = GenerationIntent(
+        space_continuity=SpaceContinuity(
+            subject_position="preserve exact screen-space position",
+            screen_direction="left_to_right",
+        ),
+        axis_continuity=AxisContinuity(
+            camera_axis="same_side",
+            framing_continuity="preserve subject scale",
+        ),
+    )
     character = make_character().model_copy(
         update={
             "artifact_id": "character-001",
@@ -513,23 +583,66 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
             )
         }
     )
-    compiler = AdapterCompilerContract.create(
-        compiler_id="test-c4-compiler",
-        compiler_version="1",
+    profile = _profile()
+    capabilities = _capabilities(variant)
+    source_route = _bound_route_identity(previous_bound)
+    destination_route = _selected_route_identity(
+        provider_name=capabilities.provider_name,
+        variant=capabilities.variants[0],
+        provider_profile=profile,
+        compiler_contract=compiler,
+    )
+    transition = _transition_policy(
+        source_context=source_context,
+        target_context=context,
+        lifecycle=lifecycle,
+        boundary=BoundaryKind.HARD_CUT,
+        obligation=ContinuityObligation.FULL_CONTINUITY,
+        source_route=source_route,
+        destination_route=destination_route,
+    )
+    continuity_routing = _continuity_routing(
+        transition=transition,
+        previous_bound=previous_bound,
+        previous_shot=source_context.activated_shot,
+        destination_route=destination_route,
     )
     incomplete_variant = variant.model_copy(
         update={"binding_cardinality_constraints": ()}
+    )
+    incomplete_capabilities = _capabilities(incomplete_variant)
+    incomplete_destination_route = _selected_route_identity(
+        provider_name=incomplete_capabilities.provider_name,
+        variant=incomplete_capabilities.variants[0],
+        provider_profile=profile,
+        compiler_contract=compiler,
+    )
+    incomplete_transition = _transition_policy(
+        source_context=source_context,
+        target_context=context,
+        lifecycle=lifecycle,
+        boundary=BoundaryKind.HARD_CUT,
+        obligation=ContinuityObligation.FULL_CONTINUITY,
+        source_route=source_route,
+        destination_route=incomplete_destination_route,
+    )
+    incomplete_routing = _continuity_routing(
+        transition=incomplete_transition,
+        previous_bound=previous_bound,
+        previous_shot=source_context.activated_shot,
+        destination_route=incomplete_destination_route,
     )
     incomplete = VideoGenerationResolver().resolve_requirement(
         projection=projection,
         context=context,
         policy=_policy(),
-        provider_profile=_profile(),
-        capabilities=_capabilities(incomplete_variant),
+        provider_profile=profile,
+        capabilities=incomplete_capabilities,
         selected_capability_id=incomplete_variant.capability_id,
         output_requirement=_output(),
         lifecycle=lifecycle,
         compiler_contract=compiler,
+        continuity_routing=incomplete_routing,
     )
     stale_binding = _c4_binding(
         endpoint_changes={
@@ -539,6 +652,35 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
             "duration_milliseconds": 4_000,
         },
         semantic_boundary=binding.semantic_boundary,
+    )
+    stale_evidence = (
+        AssetEvidence(
+            role=SemanticReferenceRole.CONTINUITY_TERMINAL,
+            asset_id=stale_binding.terminal.extracted_asset_id,
+            asset_sha256=stale_binding.terminal.extracted_sha256,
+            mime_type=stale_binding.terminal.extracted_mime_type,
+            width=stale_binding.terminal.extracted_width,
+            height=stale_binding.terminal.extracted_height,
+            size_bytes=stale_binding.terminal.extracted_size_bytes,
+        ),
+        AssetEvidence(
+            role=SemanticReferenceRole.APPROVED_ENDPOINT,
+            asset_id=stale_binding.approved_endpoint.asset_id,
+            asset_sha256=stale_binding.approved_endpoint.asset_sha256,
+            mime_type=stale_binding.approved_endpoint.asset_mime_type,
+            width=stale_binding.approved_endpoint.asset_width,
+            height=stale_binding.approved_endpoint.asset_height,
+            size_bytes=stale_binding.approved_endpoint.asset_size_bytes,
+        ),
+        AssetEvidence(
+            role=SemanticReferenceRole.IDENTITY,
+            asset_id=stale_binding.identity_anchor.asset_id,
+            asset_sha256=stale_binding.identity_anchor.asset_sha256,
+            mime_type=stale_binding.identity_anchor.asset_mime_type,
+            width=stale_binding.identity_anchor.asset_width,
+            height=stale_binding.identity_anchor.asset_height,
+            size_bytes=stale_binding.identity_anchor.asset_size_bytes,
+        ),
     )
     stale_requirement = ProviderNeutralVideoRequirement.create(
         **{
@@ -551,6 +693,7 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
                 },
             ),
             "c4_multi_anchor_binding": stale_binding,
+            "asset_evidence": stale_evidence,
         }
     )
     stale_projection = VerifiedGenerationRequirementProjection.create(
@@ -562,38 +705,42 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
         target_shot_content_hash=context.target_shot_content_hash,
     )
 
-    stale = VideoGenerationResolver().resolve_requirement(
-        projection=stale_projection,
-        context=context,
-        policy=_policy(),
-        provider_profile=_profile(),
-        capabilities=_capabilities(variant),
-        selected_capability_id=variant.capability_id,
-        output_requirement=_output(),
-        lifecycle=lifecycle,
-        compiler_contract=compiler,
-    )
+    with pytest.raises(
+        ValueError,
+        match="full continuity terminal does not match",
+    ):
+        VideoGenerationResolver().resolve_requirement(
+            projection=stale_projection,
+            context=context,
+            policy=_policy(),
+            provider_profile=profile,
+            capabilities=capabilities,
+            selected_capability_id=variant.capability_id,
+            output_requirement=_output(),
+            lifecycle=lifecycle,
+            compiler_contract=compiler,
+            continuity_routing=continuity_routing,
+        )
 
     routed = VideoGenerationResolver().resolve_requirement(
         projection=projection,
         context=context,
         policy=_policy(),
-        provider_profile=_profile(),
-        capabilities=_capabilities(variant),
+        provider_profile=profile,
+        capabilities=capabilities,
         selected_capability_id=variant.capability_id,
         output_requirement=_output(),
         lifecycle=lifecycle,
         compiler_contract=compiler,
+        continuity_routing=continuity_routing,
     )
 
     assert incomplete.decision.outcome is RoutingOutcome.BLOCKED_CAPABILITY
     assert incomplete.provider_bound_request is None
-    assert stale.decision.outcome is RoutingOutcome.BLOCKED_MISSING_INPUT
-    assert stale.decision.reason_codes == (
-        RouterReasonCode.C4_REGISTRY_REVISION_MISMATCH,
+    assert routed.decision.outcome is RoutingOutcome.SELECTED, (
+        routed.decision.reason_codes,
+        routed.decision.rationale,
     )
-    assert stale.provider_bound_request is None
-    assert routed.decision.outcome is RoutingOutcome.SELECTED
     assert routed.provider_bound_request is not None
     compiled = compile_provider_video_request(
         provider_bound=routed.provider_bound_request,
@@ -651,6 +798,8 @@ def _variant(
     *,
     capability_id: str | None = None,
     execution_kind: VideoExecutionKind = VideoExecutionKind.LOCAL,
+    provider_kind: str = "local_test",
+    model_id: str = "model-test",
 ) -> VideoCapabilityVariant:
     roles: tuple[str, ...]
     max_references: int
@@ -667,8 +816,8 @@ def _variant(
         max_references = 4
     return VideoCapabilityVariant(
         capability_id=capability_id or f"capability-{mode.value}",
-        provider_kind="local_test",
-        model_id="model-test",
+        provider_kind=provider_kind,
+        model_id=model_id,
         profile_version="1",
         execution_kind=execution_kind,
         billing_kind=(
@@ -693,21 +842,28 @@ def _variant(
     )
 
 
-def _capabilities(*variants: VideoCapabilityVariant) -> VideoProviderCapabilities:
+def _capabilities(
+    *variants: VideoCapabilityVariant,
+    provider_name: str = "exact-provider",
+) -> VideoProviderCapabilities:
     return VideoProviderCapabilities.create(
-        provider_name="exact-provider",
+        provider_name=provider_name,
         variants=variants,
     )
 
 
-def _profile() -> ProviderProfilePointer:
+def _profile(
+    *,
+    profile_id: str = "exact-profile",
+    profile_sha256: str = HASH_D,
+) -> ProviderProfilePointer:
     from pathlib import Path
 
     return ProviderProfilePointer(
-        profile_id="exact-profile",
+        profile_id=profile_id,
         profile_version="1",
-        profile_path=Path(f"provider-profiles/{HASH_D}.json"),
-        profile_sha256=HASH_D,
+        profile_path=Path(f"provider-profiles/{profile_sha256}.json"),
+        profile_sha256=profile_sha256,
     )
 
 
@@ -771,6 +927,532 @@ def _lifecycle(context: ShotRoutingContext) -> VideoGenerationLifecycleEnvelope:
         input_artifact_ids=(context.target_shot_id,),
         output_asset_id="video-output",
     )
+
+
+def _exact_terminal_projection(
+    context: ShotRoutingContext,
+) -> VerifiedGenerationRequirementProjection:
+    terminal = context.upstream_terminal
+    assert terminal is not None
+    original = _verified_requirement(context)
+    intent = original.requirement.generation_intent.model_copy(
+        update={
+            "space_continuity": SpaceContinuity(
+                subject_position="preserve exact screen-space position",
+                screen_direction="left_to_right",
+            ),
+            "axis_continuity": AxisContinuity(
+                camera_axis="same_side",
+                framing_continuity="preserve subject scale",
+            ),
+        }
+    )
+    requirement = ProviderNeutralVideoRequirement.create(
+        **{
+            **original.requirement.model_dump(
+                mode="python",
+                exclude={"requirement_id", "requirement_hash"},
+            ),
+            "generation_mode": RequirementGenerationMode.IMAGE_TO_VIDEO,
+            "continuity_mode": RequirementContinuityMode.EXACT_TERMINAL,
+            "semantic_reference_roles": (
+                SemanticReferenceRole.CONTINUITY_TERMINAL,
+            ),
+            "asset_evidence": (
+                AssetEvidence(
+                    role=SemanticReferenceRole.CONTINUITY_TERMINAL,
+                    asset_id=terminal.asset_id,
+                    asset_sha256=terminal.asset_sha256,
+                    mime_type=terminal.mime_type,
+                    width=terminal.width,
+                    height=terminal.height,
+                    size_bytes=terminal.size_bytes,
+                ),
+            ),
+            "capability_need": CapabilityNeed(
+                needs_first_frame=True,
+                needs_terminal_reference=True,
+            ),
+            "generation_intent": intent,
+        }
+    )
+    return VerifiedGenerationRequirementProjection.create(
+        requirement=requirement,
+        plan_hash=original.plan_hash,
+        verified_source_request_content_hash=(
+            original.verified_source_request_content_hash
+        ),
+        target_shot_id=context.target_shot_id,
+        target_shot_revision=context.target_shot_revision,
+        target_shot_content_hash=context.target_shot_content_hash,
+    )
+
+
+def _first_frame_projection(
+    context: ShotRoutingContext,
+) -> VerifiedGenerationRequirementProjection:
+    first_frame = context.shot_keyframe
+    assert first_frame is not None
+    original = _verified_requirement(context)
+    requirement = ProviderNeutralVideoRequirement.create(
+        **{
+            **original.requirement.model_dump(
+                mode="python",
+                exclude={"requirement_id", "requirement_hash"},
+            ),
+            "generation_mode": RequirementGenerationMode.IMAGE_TO_VIDEO,
+            "semantic_reference_roles": (SemanticReferenceRole.FIRST_FRAME,),
+            "asset_evidence": (
+                AssetEvidence(
+                    role=SemanticReferenceRole.FIRST_FRAME,
+                    asset_id=first_frame.asset_id,
+                    asset_sha256=first_frame.asset_sha256,
+                    mime_type=first_frame.mime_type,
+                    width=first_frame.width,
+                    height=first_frame.height,
+                    size_bytes=first_frame.size_bytes,
+                ),
+            ),
+            "capability_need": CapabilityNeed(needs_first_frame=True),
+        }
+    )
+    return VerifiedGenerationRequirementProjection.create(
+        requirement=requirement,
+        plan_hash=original.plan_hash,
+        verified_source_request_content_hash=(
+            original.verified_source_request_content_hash
+        ),
+        target_shot_id=context.target_shot_id,
+        target_shot_revision=context.target_shot_revision,
+        target_shot_content_hash=context.target_shot_content_hash,
+    )
+
+
+def _identity_reference_projection(
+    context: ShotRoutingContext,
+) -> VerifiedGenerationRequirementProjection:
+    identity = context.canonical_character_references[0]
+    character = make_character(character_id=context.important_character_ids[0])
+    requirement = ProviderNeutralVideoRequirement.create(
+        source_request_content_hash=HASH_A,
+        intent_evidence_hash=HASH_B,
+        generation_intent_hash=HASH_C,
+        target_shot=context.activated_shot,
+        scene=make_scene(scene_id=context.activated_shot.scene_id),
+        characters=(character,),
+        generation_mode=RequirementGenerationMode.REFERENCE_TO_VIDEO,
+        continuity_mode=RequirementContinuityMode.REFERENCE,
+        motion_requirement=RequirementMotionRequirement.FREE_COMPLEX,
+        generation_intent=GenerationIntent(),
+        semantic_reference_roles=(SemanticReferenceRole.IDENTITY,),
+        asset_evidence=(
+            AssetEvidence(
+                role=SemanticReferenceRole.IDENTITY,
+                asset_id=identity.asset_id,
+                asset_sha256=identity.asset_sha256,
+                canonical_owner_id=identity.canonical_owner_id,
+                canonical_owner_content_hash=(
+                    identity.canonical_owner_content_hash
+                ),
+                mime_type=identity.mime_type,
+                width=identity.width,
+                height=identity.height,
+                size_bytes=identity.size_bytes,
+            ),
+        ),
+        capability_need=CapabilityNeed(
+            needs_identity_reference=True,
+            max_reference_count=1,
+        ),
+        output_need=OutputNeed(
+            duration_seconds=4,
+            width=1024,
+            height=576,
+            fps=24,
+            container_mime="video/mp4",
+        ),
+        audio_need=AudioNeed.FORBIDDEN,
+        quality_need=QualityNeed(objective_tier="production"),
+    )
+    return VerifiedGenerationRequirementProjection.create(
+        requirement=requirement,
+        plan_hash=HASH_D,
+        verified_source_request_content_hash=HASH_A,
+        target_shot_id=context.target_shot_id,
+        target_shot_revision=context.target_shot_revision,
+        target_shot_content_hash=context.target_shot_content_hash,
+    )
+
+
+def _terminal_lifecycle(
+    context: ShotRoutingContext,
+    *,
+    source_context: ShotRoutingContext | None = None,
+    source_bound_request=None,
+) -> VideoGenerationLifecycleEnvelope:
+    terminal = context.upstream_terminal
+    assert terminal is not None
+    base = _lifecycle(context)
+    continuity_binding = None
+    input_ids = [context.target_shot_id, terminal.asset_id]
+    if source_context is not None:
+        assert source_bound_request is not None
+        source_registry = source_bound_request.lifecycle.base_registry
+        evidence = TerminalFrameEvidence.create(
+            source_shot_id=source_context.target_shot_id,
+            source_shot_revision=source_context.target_shot_revision,
+            source_shot_content_hash=source_context.target_shot_content_hash,
+            source_video_asset_id=source_bound_request.lifecycle.output_asset_id,
+            source_video_sha256=HASH_B,
+            source_generation_id=source_bound_request.lifecycle.generation_id,
+            source_request_input_hash=(
+                source_bound_request.provider_bound_request_hash
+            ),
+            source_resolved_generation_hash=(
+                source_bound_request.provider_bound_request_hash
+            ),
+            source_provenance_receipt_id="source-video-provenance",
+            extraction_receipt_id=HASH_E,
+            source_registry=source_registry,
+            source_container_name="mp4",
+            source_codec_name="h264",
+            source_width=terminal.width,
+            source_height=terminal.height,
+            source_fps_numerator=24,
+            source_fps_denominator=1,
+            source_duration_milliseconds=4000,
+            source_frame_count=96,
+            frame_index=95,
+            timestamp_numerator=95,
+            timestamp_denominator=24,
+            selection_rule="generated_candidate_terminal",
+            extraction_contract_version="terminal-frame-v1",
+            extractor_name="ffmpeg",
+            extractor_version="7.1",
+            extracted_asset_id=terminal.asset_id,
+            extracted_sha256=terminal.asset_sha256,
+            extracted_mime_type="image/png",
+            extracted_size_bytes=terminal.size_bytes,
+            extracted_width=terminal.width,
+            extracted_height=terminal.height,
+            extracted_color_space="bt709",
+        )
+        constraints = ContinuityConstraintSet.create(
+            scene_identity=ContinuityArtifactIdentity(
+                artifact_id=context.activated_shot.scene_id,
+                revision=1,
+                content_hash=context.scene_content_hash,
+            ),
+            character_identities=(
+                ContinuityArtifactIdentity(
+                    artifact_id="continuity-subject",
+                    revision=1,
+                    content_hash=HASH_A,
+                ),
+            ),
+            camera_axis="preserve screen axis",
+            framing="preserve subject scale",
+            lighting="preserve motivated lighting",
+            color="preserve palette",
+            motion_direction="preserve motion vector",
+            exit_state="source terminal",
+            entrance_state="target opening",
+        )
+        continuity_binding = ContinuityReferenceBinding.create(
+            role="first_frame",
+            terminal_frame=evidence,
+            target_shot_id=context.target_shot_id,
+            target_shot_revision=context.target_shot_revision,
+            target_shot_content_hash=context.target_shot_content_hash,
+            constraints=constraints,
+        )
+        input_ids.extend(
+            (
+                source_context.target_shot_id,
+                source_bound_request.lifecycle.output_asset_id,
+            )
+        )
+    return base.model_copy(
+        update={
+            "input_artifact_ids": tuple(dict.fromkeys(input_ids)),
+            "continuity_binding": continuity_binding,
+            "seal_terminal_frame": True,
+        }
+    )
+
+
+def _route_first_frame(
+    context: ShotRoutingContext,
+    *,
+    provider_name: str,
+    provider_kind: str,
+    model_id: str,
+    profile_id: str,
+    profile_sha256: str,
+    lifecycle: VideoGenerationLifecycleEnvelope,
+    compiler_contract: AdapterCompilerContract | None = None,
+):
+    variant = _variant(
+        VideoGenerationMode.IMAGE_TO_VIDEO,
+        provider_kind=provider_kind,
+        model_id=model_id,
+    )
+    result = VideoGenerationResolver().resolve_requirement(
+        projection=_first_frame_projection(context),
+        context=context,
+        policy=_policy(),
+        provider_profile=_profile(
+            profile_id=profile_id,
+            profile_sha256=profile_sha256,
+        ),
+        capabilities=_capabilities(variant, provider_name=provider_name),
+        selected_capability_id=variant.capability_id,
+        output_requirement=_output(),
+        lifecycle=lifecycle,
+        compiler_contract=(
+            compiler_contract
+            or AdapterCompilerContract.create(
+                compiler_id="continuity-test-compiler",
+                compiler_version="1",
+            )
+        ),
+    )
+    assert result.provider_bound_request is not None
+    return result.provider_bound_request
+
+
+def _bound_route_identity(bound_request) -> ProviderRouteIdentity:
+    return ProviderRouteIdentity.create(
+        provider_name=bound_request.provider_name,
+        provider_kind=bound_request.provider_kind,
+        model_id=bound_request.model_id,
+        provider_profile=bound_request.provider_profile,
+        capability_id=bound_request.capability_id,
+        capability_fingerprint=bound_request.capability_fingerprint,
+        execution_kind=bound_request.execution_kind,
+        billing_kind=bound_request.billing_kind,
+        compiler_contract=bound_request.compiler_contract,
+    )
+
+
+def _selected_route_identity(
+    *,
+    provider_name: str,
+    variant: VideoCapabilityVariant,
+    provider_profile: ProviderProfilePointer,
+    compiler_contract: AdapterCompilerContract,
+) -> ProviderRouteIdentity:
+    from ai_video.production._video_capability_fingerprint import (
+        capability_variant_fingerprint,
+    )
+
+    return ProviderRouteIdentity.create(
+        provider_name=provider_name,
+        provider_kind=variant.provider_kind,
+        model_id=variant.model_id,
+        provider_profile=provider_profile,
+        capability_id=variant.capability_id,
+        capability_fingerprint=capability_variant_fingerprint(variant),
+        execution_kind=variant.execution_kind,
+        billing_kind=variant.billing_kind,
+        compiler_contract=compiler_contract,
+    )
+
+
+def _execution_stack_identity(
+    route: ProviderRouteIdentity,
+    *,
+    workflow_hash: str = "none",
+    runtime_content_hash: str | None = None,
+    output_contract_hash: str = HASH_0,
+) -> GenerationExecutionStackIdentity:
+    return GenerationExecutionStackIdentity.create(
+        materialization_status="materialized",
+        candidate_id=route.provider_name,
+        contract_version=route.compiler_contract.compiler_version,
+        provider_kind=route.provider_kind,
+        deployment_identity=route.provider_name,
+        model_id=route.model_id,
+        capability_id=route.capability_id,
+        profile_hash=route.provider_profile.profile_sha256,
+        compiler_hash=route.compiler_contract.compiler_hash,
+        workflow_hash=workflow_hash,
+        components=(
+            StackComponentIdentity(
+                ordinal=0,
+                kind="artifact",
+                component_id=route.model_id,
+                content_hash=route.capability_fingerprint,
+            ),
+        ),
+        sampler_identity="provider_managed",
+        scheduler_identity="provider_managed",
+        runtime_seals=(
+            RuntimeSeal(
+                name=route.provider_kind,
+                version=route.model_id,
+                content_hash=(
+                    runtime_content_hash or route.capability_fingerprint
+                ),
+            ),
+        ),
+        output_contract_hash=output_contract_hash,
+    )
+
+
+def _continuity_routing(
+    *,
+    transition: ContinuityTransitionPolicy,
+    previous_bound,
+    previous_shot: Shot,
+    destination_route: ProviderRouteIdentity,
+    source_execution_stack: GenerationExecutionStackIdentity | None = None,
+    destination_execution_stack: GenerationExecutionStackIdentity | None = None,
+) -> ContinuityProviderRouteBinding:
+    source_route = _bound_route_identity(previous_bound)
+    return ContinuityProviderRouteBinding.create(
+        transition_policy=transition,
+        previous_shot=previous_shot,
+        previous_provider_bound_request=previous_bound,
+        source_route=source_route,
+        destination_route=destination_route,
+        source_execution_stack=(
+            source_execution_stack or _execution_stack_identity(source_route)
+        ),
+        destination_execution_stack=(
+            destination_execution_stack
+            or _execution_stack_identity(destination_route)
+        ),
+    )
+
+
+def _transition_policy(
+    *,
+    source_context: ShotRoutingContext,
+    target_context: ShotRoutingContext,
+    lifecycle: VideoGenerationLifecycleEnvelope,
+    boundary: BoundaryKind,
+    obligation: ContinuityObligation,
+    source_route: ProviderRouteIdentity,
+    destination_route: ProviderRouteIdentity,
+    source_execution_stack: GenerationExecutionStackIdentity | None = None,
+    destination_execution_stack: GenerationExecutionStackIdentity | None = None,
+) -> ContinuityTransitionPolicy:
+    source_stack = source_execution_stack or _execution_stack_identity(source_route)
+    destination_stack = (
+        destination_execution_stack
+        or _execution_stack_identity(destination_route)
+    )
+    if obligation is ContinuityObligation.FULL_CONTINUITY:
+        anchors = tuple(
+            ContinuityAnchorBinding(
+                role=role,
+                source_kind="planned_derivation",
+                source_identity=f"{source_context.target_shot_id}-{role.value}",
+                content_hash={
+                    ContinuityAnchorRole.FIRST_FRAME: HASH_A,
+                    ContinuityAnchorRole.LAST_FRAME: HASH_B,
+                    ContinuityAnchorRole.REFERENCE: HASH_C,
+                    ContinuityAnchorRole.REFERENCE_VIDEO: HASH_D,
+                }[role],
+                evidence_fingerprint={
+                    ContinuityAnchorRole.FIRST_FRAME: HASH_B,
+                    ContinuityAnchorRole.LAST_FRAME: HASH_C,
+                    ContinuityAnchorRole.REFERENCE: HASH_D,
+                    ContinuityAnchorRole.REFERENCE_VIDEO: HASH_E,
+                }[role],
+            )
+            for role in ContinuityAnchorRole
+        )
+        dimensions = (
+            "camera_velocity",
+            "identity",
+            "screen_axis",
+            "subject_position",
+        )
+    elif obligation is ContinuityObligation.IDENTITY_STYLE_CARRYOVER:
+        anchors = (
+            ContinuityAnchorBinding(
+                role=ContinuityAnchorRole.REFERENCE,
+                source_kind="planned_derivation",
+                source_identity=f"{source_context.target_shot_id}-identity",
+                content_hash=HASH_C,
+                evidence_fingerprint=HASH_D,
+            ),
+        )
+        dimensions = ("identity",)
+    else:
+        anchors = ()
+        dimensions = ()
+    return ContinuityTransitionPolicy.create(
+        policy_id=f"{source_context.target_shot_id}-{target_context.target_shot_id}",
+        project=lifecycle.base_project,
+        registry=lifecycle.base_registry,
+        source_shot=CreativeArtifactIdentity(
+            artifact_id=source_context.activated_shot.artifact_id,
+            revision=source_context.target_shot_revision,
+            content_hash=source_context.target_shot_content_hash,
+        ),
+        target_shot=CreativeArtifactIdentity(
+            artifact_id=target_context.activated_shot.artifact_id,
+            revision=target_context.target_shot_revision,
+            content_hash=target_context.target_shot_content_hash,
+        ),
+        boundary_kind=boundary,
+        continuity_obligation=obligation,
+        take_id=(
+            "take-continuity-test"
+            if boundary is BoundaryKind.WITHIN_CONTINUOUS_TAKE
+            else None
+        ),
+        source_execution_stack_hash=source_stack.execution_stack_hash,
+        destination_execution_stack_hash=destination_stack.execution_stack_hash,
+        continuity_grade="c4_native_boundary_motion",
+        required_carryover_dimensions=dimensions,
+        anchors=anchors,
+        qa_policy_hash=HASH_E,
+        authoring_evidence_hash=HASH_F,
+    )
+
+
+def _sequence_fixture():
+    source_context = _context(
+        shot_id="shot-1",
+        continuity=ContinuityMode.NONE,
+        keyframe=_asset("first_frame", "shot-1-opening", HASH_A),
+        important=False,
+    )
+    source_lifecycle = _lifecycle(source_context).model_copy(
+        update={
+            "input_artifact_ids": (
+                source_context.target_shot_id,
+                source_context.shot_keyframe.asset_id,
+            ),
+            "seal_terminal_frame": True,
+        }
+    )
+    previous_bound = _route_first_frame(
+        source_context,
+        provider_name="continuity-provider",
+        provider_kind="provider-a",
+        model_id="model-a",
+        profile_id="provider-a-profile",
+        profile_sha256=HASH_A,
+        lifecycle=source_lifecycle,
+    )
+    terminal = _asset("continuity_terminal", "shot-1-terminal", HASH_E)
+    target_context = _context(
+        shot_id="shot-2",
+        continuity=ContinuityMode.EXACT_TERMINAL,
+        terminal=terminal,
+        important=False,
+    )
+    target_lifecycle = _terminal_lifecycle(
+        target_context,
+        source_context=source_context,
+        source_bound_request=previous_bound,
+    )
+    return source_context, previous_bound, target_context, target_lifecycle, terminal
 
 
 def _request_from_decision(
@@ -1035,7 +1717,7 @@ def test_reference_continuity_requires_exact_r2v_capability_without_fallback() -
         continuity_state=_continuity_state(),
     )
 
-    result = VideoGenerationResolver().resolve(
+    result = VideoGenerationResolver()._resolve_capability(
         context=context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -1072,7 +1754,7 @@ def test_exact_terminal_without_important_character_still_requires_terminal_i2v(
     assert result.required_binding_roles == ("first_frame",)
 
 
-def test_exact_terminal_uses_exact_terminal_as_first_frame() -> None:
+def test_continuity_bearing_direct_resolve_requires_sequence_api() -> None:
     terminal = _asset("continuity_terminal", "terminal", HASH_C)
     context = _context(
         continuity=ContinuityMode.EXACT_TERMINAL,
@@ -1080,23 +1762,762 @@ def test_exact_terminal_uses_exact_terminal_as_first_frame() -> None:
     )
     capabilities = _capabilities(_variant(VideoGenerationMode.IMAGE_TO_VIDEO))
 
-    decision = VideoGenerationResolver().resolve(
-        context=context,
-        policy=_policy(),
-        provider_profile=_profile(),
-        capabilities=capabilities,
-        selected_capability_id="capability-image_to_video",
-        output_requirement=_output(),
+    with pytest.raises(
+        ValueError,
+        match="must use resolve_requirement with sequence evidence",
+    ):
+        VideoGenerationResolver().resolve(
+            context=context,
+            policy=_policy(),
+            provider_profile=_profile(),
+            capabilities=capabilities,
+            selected_capability_id="capability-image_to_video",
+            output_requirement=_output(),
+        )
+
+
+def test_continuous_take_rejects_lower_cost_provider_preselection() -> None:
+    (
+        source_context,
+        previous_bound,
+        target_context,
+        target_lifecycle,
+        _,
+    ) = _sequence_fixture()
+    compiler = AdapterCompilerContract.create(
+        compiler_id="continuity-test-compiler",
+        compiler_version="1",
+    )
+    lower_cost_variant = _variant(
+        VideoGenerationMode.IMAGE_TO_VIDEO,
+        provider_kind="provider-b",
+        model_id="lower-cost-model",
+    )
+    locked_variant = _variant(
+        VideoGenerationMode.IMAGE_TO_VIDEO,
+        provider_kind="provider-a",
+        model_id="model-a",
+    )
+    locked_profile = _profile(
+        profile_id="provider-a-profile",
+        profile_sha256=HASH_A,
+    )
+    locked_capabilities = _capabilities(
+        locked_variant,
+        provider_name="continuity-provider",
+    )
+    source_route = _bound_route_identity(previous_bound)
+    locked_route = _selected_route_identity(
+        provider_name=locked_capabilities.provider_name,
+        variant=locked_variant,
+        provider_profile=locked_profile,
+        compiler_contract=compiler,
+    )
+    assert locked_route == source_route
+    transition = _transition_policy(
+        source_context=source_context,
+        target_context=target_context,
+        lifecycle=target_lifecycle,
+        boundary=BoundaryKind.WITHIN_CONTINUOUS_TAKE,
+        obligation=ContinuityObligation.FULL_CONTINUITY,
+        source_route=source_route,
+        destination_route=locked_route,
+    )
+    continuity_routing = _continuity_routing(
+        transition=transition,
+        previous_bound=previous_bound,
+        previous_shot=source_context.activated_shot,
+        destination_route=locked_route,
     )
 
-    assert decision.outcome is RoutingOutcome.SELECTED
-    assert decision.required_mode is VideoGenerationMode.IMAGE_TO_VIDEO
-    assert decision.selected_mode is VideoGenerationMode.IMAGE_TO_VIDEO
-    assert decision.required_binding_roles == ("first_frame",)
-    assert decision.input_assets == (terminal,)
-    assert decision.reason_codes == (
-        RouterReasonCode.EXACT_TERMINAL_USES_FIRST_FRAME,
+    rejected = VideoGenerationResolver().resolve_requirement(
+        projection=_exact_terminal_projection(target_context),
+        context=target_context,
+        policy=_policy(),
+        provider_profile=_profile(
+            profile_id="lower-cost-profile",
+            profile_sha256=HASH_C,
+        ),
+        capabilities=_capabilities(
+            lower_cost_variant,
+            provider_name="lower-cost-provider",
+        ),
+        selected_capability_id=lower_cost_variant.capability_id,
+        output_requirement=_output(),
+        lifecycle=target_lifecycle,
+        compiler_contract=compiler,
+        continuity_routing=continuity_routing,
     )
+    selected = VideoGenerationResolver().resolve_requirement(
+        projection=_exact_terminal_projection(target_context),
+        context=target_context,
+        policy=_policy(),
+        provider_profile=locked_profile,
+        capabilities=locked_capabilities,
+        selected_capability_id=locked_variant.capability_id,
+        output_requirement=_output(),
+        lifecycle=target_lifecycle,
+        compiler_contract=compiler,
+        continuity_routing=continuity_routing,
+    )
+
+    assert rejected.decision.outcome is RoutingOutcome.BLOCKED_POLICY
+    assert rejected.decision.reason_codes == (
+        RouterReasonCode.CONTINUITY_PROVIDER_LOCKED,
+    )
+    assert rejected.provider_bound_request is None
+    assert selected.decision.outcome is RoutingOutcome.SELECTED
+    assert selected.provider_bound_request is not None
+    assert selected.provider_bound_request.provider_name == "continuity-provider"
+
+
+def test_hard_cut_identity_carryover_allows_new_provider_route() -> None:
+    (
+        source_context,
+        previous_bound,
+        _,
+        _,
+        terminal,
+    ) = _sequence_fixture()
+    character = make_character()
+    identity_reference = _asset(
+        "character_reference",
+        "hard-cut-identity",
+        HASH_A,
+        canonical_owner_id=character.character_id,
+        canonical_owner_content_hash=character.content_hash,
+    )
+    target_context = _context(
+        shot_id="shot-2",
+        continuity=ContinuityMode.REFERENCE,
+        terminal=terminal,
+        continuity_state=_continuity_state(),
+        motion=MotionRequirement.FREE_COMPLEX,
+        important_character_ids=(character.character_id,),
+        character_bible_hashes=(character.content_hash,),
+        character_references=(identity_reference,),
+    )
+    identity = target_context.canonical_character_references[0]
+    target_lifecycle = _lifecycle(target_context).model_copy(
+        update={
+            "input_artifact_ids": (
+                target_context.target_shot_id,
+                identity.asset_id,
+            )
+        }
+    )
+    variant = _variant(
+        VideoGenerationMode.REFERENCE_TO_VIDEO,
+        provider_kind="provider-b",
+        model_id="model-b",
+    )
+    profile = _profile(
+        profile_id="provider-b-profile",
+        profile_sha256=HASH_C,
+    )
+    capabilities = _capabilities(variant, provider_name="provider-b")
+    compiler = AdapterCompilerContract.create(
+        compiler_id="continuity-test-compiler",
+        compiler_version="1",
+    )
+    destination_route = _selected_route_identity(
+        provider_name=capabilities.provider_name,
+        variant=variant,
+        provider_profile=profile,
+        compiler_contract=compiler,
+    )
+    transition = _transition_policy(
+        source_context=source_context,
+        target_context=target_context,
+        lifecycle=target_lifecycle,
+        boundary=BoundaryKind.HARD_CUT,
+        obligation=ContinuityObligation.IDENTITY_STYLE_CARRYOVER,
+        source_route=_bound_route_identity(previous_bound),
+        destination_route=destination_route,
+    )
+    continuity_routing = _continuity_routing(
+        transition=transition,
+        previous_bound=previous_bound,
+        previous_shot=source_context.activated_shot,
+        destination_route=destination_route,
+    )
+
+    result = VideoGenerationResolver().resolve_requirement(
+        projection=_identity_reference_projection(target_context),
+        context=target_context,
+        policy=_policy(),
+        provider_profile=profile,
+        capabilities=capabilities,
+        selected_capability_id=variant.capability_id,
+        output_requirement=_output(),
+        lifecycle=target_lifecycle,
+        compiler_contract=compiler,
+        continuity_routing=continuity_routing,
+    )
+
+    assert result.decision.outcome is RoutingOutcome.SELECTED, (
+        result.decision.reason_codes,
+        result.decision.rationale,
+    )
+    assert result.decision.required_binding_roles == ("reference",)
+    assert result.decision.input_assets == (identity,)
+    assert result.provider_bound_request is not None
+    assert result.provider_bound_request.provider_name == "provider-b"
+
+
+def test_identity_carryover_cannot_seal_none_t2v_route() -> None:
+    source_context, previous_bound, _, _, _ = _sequence_fixture()
+    target_context = _context(
+        shot_id="shot-2",
+        continuity=ContinuityMode.NONE,
+        motion=MotionRequirement.FREE_COMPLEX,
+        important=False,
+    )
+    lifecycle = _lifecycle(target_context)
+    variant = _variant(
+        VideoGenerationMode.TEXT_TO_VIDEO,
+        provider_kind="provider-b",
+        model_id="model-b",
+    )
+    profile = _profile(
+        profile_id="provider-b-profile",
+        profile_sha256=HASH_C,
+    )
+    capabilities = _capabilities(variant, provider_name="provider-b")
+    compiler = AdapterCompilerContract.create(
+        compiler_id="continuity-test-compiler",
+        compiler_version="1",
+    )
+    destination_route = _selected_route_identity(
+        provider_name=capabilities.provider_name,
+        variant=variant,
+        provider_profile=profile,
+        compiler_contract=compiler,
+    )
+    transition = _transition_policy(
+        source_context=source_context,
+        target_context=target_context,
+        lifecycle=lifecycle,
+        boundary=BoundaryKind.HARD_CUT,
+        obligation=ContinuityObligation.IDENTITY_STYLE_CARRYOVER,
+        source_route=_bound_route_identity(previous_bound),
+        destination_route=destination_route,
+    )
+    continuity_routing = _continuity_routing(
+        transition=transition,
+        previous_bound=previous_bound,
+        previous_shot=source_context.activated_shot,
+        destination_route=destination_route,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match=(
+            "identity/style carryover requires reference or semantic "
+            "continuity mode"
+        ),
+    ):
+        VideoGenerationResolver().resolve_requirement(
+            projection=_verified_requirement(target_context),
+            context=target_context,
+            policy=_policy(),
+            provider_profile=profile,
+            capabilities=capabilities,
+            selected_capability_id=variant.capability_id,
+            output_requirement=_output(),
+            lifecycle=lifecycle,
+            compiler_contract=compiler,
+            continuity_routing=continuity_routing,
+        )
+
+
+def test_explicit_cross_provider_full_continuity_binds_previous_terminal_first() -> None:
+    (
+        source_context,
+        previous_bound,
+        target_context,
+        target_lifecycle,
+        terminal,
+    ) = _sequence_fixture()
+    variant = _variant(
+        VideoGenerationMode.IMAGE_TO_VIDEO,
+        provider_kind="provider-b",
+        model_id="model-b",
+    )
+    profile = _profile(
+        profile_id="provider-b-profile",
+        profile_sha256=HASH_C,
+    )
+    capabilities = _capabilities(variant, provider_name="provider-b")
+    compiler = AdapterCompilerContract.create(
+        compiler_id="continuity-test-compiler",
+        compiler_version="1",
+    )
+    destination_route = _selected_route_identity(
+        provider_name=capabilities.provider_name,
+        variant=variant,
+        provider_profile=profile,
+        compiler_contract=compiler,
+    )
+    transition = _transition_policy(
+        source_context=source_context,
+        target_context=target_context,
+        lifecycle=target_lifecycle,
+        boundary=BoundaryKind.HARD_CUT,
+        obligation=ContinuityObligation.FULL_CONTINUITY,
+        source_route=_bound_route_identity(previous_bound),
+        destination_route=destination_route,
+    )
+    continuity_routing = _continuity_routing(
+        transition=transition,
+        previous_bound=previous_bound,
+        previous_shot=source_context.activated_shot,
+        destination_route=destination_route,
+    )
+
+    result = VideoGenerationResolver().resolve_requirement(
+        projection=_exact_terminal_projection(target_context),
+        context=target_context,
+        policy=_policy(),
+        provider_profile=profile,
+        capabilities=capabilities,
+        selected_capability_id=variant.capability_id,
+        output_requirement=_output(),
+        lifecycle=target_lifecycle,
+        compiler_contract=compiler,
+        continuity_routing=continuity_routing,
+    )
+
+    assert result.decision.outcome is RoutingOutcome.SELECTED
+    assert result.decision.required_binding_roles[0] == "first_frame"
+    assert result.decision.input_assets[0] == terminal
+    assert result.decision.continuity_transition_policy_hash == transition.policy_hash
+    assert result.decision.previous_provider_bound_request_hash == (
+        previous_bound.provider_bound_request_hash
+    )
+    assert result.provider_bound_request is not None
+    assert result.provider_bound_request.input_assets[0] == terminal
+
+
+def test_cross_stack_gate_applies_when_provider_route_is_unchanged() -> None:
+    (
+        source_context,
+        previous_bound,
+        target_context,
+        target_lifecycle,
+        _,
+    ) = _sequence_fixture()
+    route = _bound_route_identity(previous_bound)
+    source_stack = _execution_stack_identity(route)
+    destination_stack = _execution_stack_identity(
+        route,
+        workflow_hash=HASH_B,
+    )
+    assert source_stack.output_contract_hash != route.capability_fingerprint
+    assert source_stack.execution_stack_hash != destination_stack.execution_stack_hash
+    transition = _transition_policy(
+        source_context=source_context,
+        target_context=target_context,
+        lifecycle=target_lifecycle,
+        boundary=BoundaryKind.HARD_CUT,
+        obligation=ContinuityObligation.FULL_CONTINUITY,
+        source_route=route,
+        destination_route=route,
+        source_execution_stack=source_stack,
+        destination_execution_stack=destination_stack,
+    )
+    continuity_routing = _continuity_routing(
+        transition=transition,
+        previous_bound=previous_bound,
+        previous_shot=source_context.activated_shot,
+        destination_route=route,
+        source_execution_stack=source_stack,
+        destination_execution_stack=destination_stack,
+    )
+    projection = _exact_terminal_projection(target_context)
+    incomplete_intent = GenerationIntent()
+    incomplete_requirement = ProviderNeutralVideoRequirement.create(
+        **{
+            **projection.requirement.model_dump(
+                mode="python",
+                exclude={"requirement_id", "requirement_hash"},
+            ),
+            "generation_intent": incomplete_intent,
+            "generation_intent_hash": canonical_sha256(
+                incomplete_intent.model_dump(mode="json")
+            ),
+        }
+    )
+    incomplete_projection = VerifiedGenerationRequirementProjection.create(
+        requirement=incomplete_requirement,
+        plan_hash=projection.plan_hash,
+        verified_source_request_content_hash=(
+            projection.verified_source_request_content_hash
+        ),
+        target_shot_id=target_context.target_shot_id,
+        target_shot_revision=target_context.target_shot_revision,
+        target_shot_content_hash=target_context.target_shot_content_hash,
+    )
+    variant = _variant(
+        VideoGenerationMode.IMAGE_TO_VIDEO,
+        provider_kind=route.provider_kind,
+        model_id=route.model_id,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="cross-stack full continuity requires explicit spatial and camera intent",
+    ):
+        VideoGenerationResolver().resolve_requirement(
+            projection=incomplete_projection,
+            context=target_context,
+            policy=_policy(),
+            provider_profile=route.provider_profile,
+            capabilities=_capabilities(
+                variant,
+                provider_name=route.provider_name,
+            ),
+            selected_capability_id=variant.capability_id,
+            output_requirement=_output(),
+            lifecycle=target_lifecycle,
+            compiler_contract=route.compiler_contract,
+            continuity_routing=continuity_routing,
+        )
+
+
+def test_reference_only_provider_cannot_claim_cross_stack_spatial_continuity() -> None:
+    (
+        source_context,
+        previous_bound,
+        target_context,
+        target_lifecycle,
+        _,
+    ) = _sequence_fixture()
+    reference_only = _variant(
+        VideoGenerationMode.REFERENCE_TO_VIDEO,
+        provider_kind="provider-b",
+        model_id="identity-reference-only",
+    )
+    profile = _profile(
+        profile_id="provider-b-reference-profile",
+        profile_sha256=HASH_C,
+    )
+    capabilities = _capabilities(
+        reference_only,
+        provider_name="reference-only-provider",
+    )
+    compiler = AdapterCompilerContract.create(
+        compiler_id="continuity-test-compiler",
+        compiler_version="1",
+    )
+    destination_route = _selected_route_identity(
+        provider_name=capabilities.provider_name,
+        variant=reference_only,
+        provider_profile=profile,
+        compiler_contract=compiler,
+    )
+    transition = _transition_policy(
+        source_context=source_context,
+        target_context=target_context,
+        lifecycle=target_lifecycle,
+        boundary=BoundaryKind.HARD_CUT,
+        obligation=ContinuityObligation.FULL_CONTINUITY,
+        source_route=_bound_route_identity(previous_bound),
+        destination_route=destination_route,
+    )
+    continuity_routing = _continuity_routing(
+        transition=transition,
+        previous_bound=previous_bound,
+        previous_shot=source_context.activated_shot,
+        destination_route=destination_route,
+    )
+
+    result = VideoGenerationResolver().resolve_requirement(
+        projection=_exact_terminal_projection(target_context),
+        context=target_context,
+        policy=_policy(),
+        provider_profile=profile,
+        capabilities=capabilities,
+        selected_capability_id=reference_only.capability_id,
+        output_requirement=_output(),
+        lifecycle=target_lifecycle,
+        compiler_contract=compiler,
+        continuity_routing=continuity_routing,
+    )
+
+    assert result.decision.outcome is RoutingOutcome.BLOCKED_CAPABILITY
+    assert result.decision.reason_codes == (
+        RouterReasonCode.CONTINUITY_FRAME_CONDITIONING_REQUIRED,
+    )
+    assert result.provider_bound_request is None
+
+
+def test_continuity_requirement_cannot_omit_sequence_route_binding() -> None:
+    (
+        _,
+        _,
+        target_context,
+        target_lifecycle,
+        _,
+    ) = _sequence_fixture()
+    variant = _variant(
+        VideoGenerationMode.IMAGE_TO_VIDEO,
+        provider_kind="provider-b",
+        model_id="model-b",
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="requires exact sequence routing evidence",
+    ):
+        VideoGenerationResolver().resolve_requirement(
+            projection=_exact_terminal_projection(target_context),
+            context=target_context,
+            policy=_policy(),
+            provider_profile=_profile(
+                profile_id="provider-b-profile",
+                profile_sha256=HASH_C,
+            ),
+            capabilities=_capabilities(variant, provider_name="provider-b"),
+            selected_capability_id=variant.capability_id,
+            output_requirement=_output(),
+            lifecycle=target_lifecycle,
+            compiler_contract=AdapterCompilerContract.create(
+                compiler_id="continuity-test-compiler",
+                compiler_version="1",
+            ),
+        )
+
+
+def test_full_continuity_rejects_binding_for_another_target_shot() -> None:
+    (
+        source_context,
+        previous_bound,
+        target_context,
+        target_lifecycle,
+        _,
+    ) = _sequence_fixture()
+    lifecycle_binding = target_lifecycle.continuity_binding
+    assert lifecycle_binding is not None
+    stale_binding = ContinuityReferenceBinding.create(
+        **{
+            **lifecycle_binding.model_dump(
+                mode="python",
+                exclude={"binding_hash"},
+            ),
+            "target_shot_id": "shot-other",
+            "target_shot_revision": 1,
+            "target_shot_content_hash": HASH_D,
+        }
+    )
+    stale_lifecycle = target_lifecycle.model_copy(
+        update={"continuity_binding": stale_binding}
+    )
+    variant = _variant(
+        VideoGenerationMode.IMAGE_TO_VIDEO,
+        provider_kind="provider-b",
+        model_id="model-b",
+    )
+    profile = _profile(
+        profile_id="provider-b-profile",
+        profile_sha256=HASH_C,
+    )
+    capabilities = _capabilities(variant, provider_name="provider-b")
+    compiler = AdapterCompilerContract.create(
+        compiler_id="continuity-test-compiler",
+        compiler_version="1",
+    )
+    destination_route = _selected_route_identity(
+        provider_name=capabilities.provider_name,
+        variant=variant,
+        provider_profile=profile,
+        compiler_contract=compiler,
+    )
+    transition = _transition_policy(
+        source_context=source_context,
+        target_context=target_context,
+        lifecycle=target_lifecycle,
+        boundary=BoundaryKind.HARD_CUT,
+        obligation=ContinuityObligation.FULL_CONTINUITY,
+        source_route=_bound_route_identity(previous_bound),
+        destination_route=destination_route,
+    )
+    continuity_routing = _continuity_routing(
+        transition=transition,
+        previous_bound=previous_bound,
+        previous_shot=source_context.activated_shot,
+        destination_route=destination_route,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="does not match the exact current target",
+    ):
+        VideoGenerationResolver().resolve_requirement(
+            projection=_exact_terminal_projection(target_context),
+            context=target_context,
+            policy=_policy(),
+            provider_profile=profile,
+            capabilities=capabilities,
+            selected_capability_id=variant.capability_id,
+            output_requirement=_output(),
+            lifecycle=stale_lifecycle,
+            compiler_contract=compiler,
+            continuity_routing=continuity_routing,
+        )
+
+
+def test_stale_transition_hash_cannot_release_provider_lock() -> None:
+    (
+        source_context,
+        previous_bound,
+        target_context,
+        target_lifecycle,
+        _,
+    ) = _sequence_fixture()
+    source_route = _bound_route_identity(previous_bound)
+    transition = _transition_policy(
+        source_context=source_context,
+        target_context=target_context,
+        lifecycle=target_lifecycle,
+        boundary=BoundaryKind.WITHIN_CONTINUOUS_TAKE,
+        obligation=ContinuityObligation.FULL_CONTINUITY,
+        source_route=source_route,
+        destination_route=source_route,
+    )
+    routing = _continuity_routing(
+        transition=transition,
+        previous_bound=previous_bound,
+        previous_shot=source_context.activated_shot,
+        destination_route=source_route,
+    )
+    stale_policy = transition.model_copy(
+        update={"destination_execution_stack_hash": HASH_B}
+    )
+    stale_routing = routing.model_copy(
+        update={"transition_policy": stale_policy}
+    )
+    variant = _variant(
+        VideoGenerationMode.IMAGE_TO_VIDEO,
+        provider_kind="provider-a",
+        model_id="model-a",
+    )
+
+    with pytest.raises(ValidationError):
+        VideoGenerationResolver().resolve_requirement(
+            projection=_exact_terminal_projection(target_context),
+            context=target_context,
+            policy=_policy(),
+            provider_profile=_profile(
+                profile_id="provider-a-profile",
+                profile_sha256=HASH_A,
+            ),
+            capabilities=_capabilities(
+                variant,
+                provider_name="continuity-provider",
+            ),
+            selected_capability_id=variant.capability_id,
+            output_requirement=_output(),
+            lifecycle=target_lifecycle,
+            compiler_contract=AdapterCompilerContract.create(
+                compiler_id="continuity-test-compiler",
+                compiler_version="1",
+            ),
+            continuity_routing=stale_routing,
+        )
+
+
+def test_cross_stack_binding_rejects_unsealed_destination_provider() -> None:
+    (
+        source_context,
+        previous_bound,
+        target_context,
+        target_lifecycle,
+        _,
+    ) = _sequence_fixture()
+    compiler = AdapterCompilerContract.create(
+        compiler_id="continuity-test-compiler",
+        compiler_version="1",
+    )
+    sealed_variant = _variant(
+        VideoGenerationMode.IMAGE_TO_VIDEO,
+        provider_kind="provider-b",
+        model_id="model-b",
+    )
+    sealed_profile = _profile(
+        profile_id="provider-b-profile",
+        profile_sha256=HASH_C,
+    )
+    sealed_route = _selected_route_identity(
+        provider_name="provider-b",
+        variant=sealed_variant,
+        provider_profile=sealed_profile,
+        compiler_contract=compiler,
+    )
+    transition = _transition_policy(
+        source_context=source_context,
+        target_context=target_context,
+        lifecycle=target_lifecycle,
+        boundary=BoundaryKind.HARD_CUT,
+        obligation=ContinuityObligation.FULL_CONTINUITY,
+        source_route=_bound_route_identity(previous_bound),
+        destination_route=sealed_route,
+    )
+    continuity_routing = _continuity_routing(
+        transition=transition,
+        previous_bound=previous_bound,
+        previous_shot=source_context.activated_shot,
+        destination_route=sealed_route,
+    )
+    unsealed_variant = _variant(
+        VideoGenerationMode.IMAGE_TO_VIDEO,
+        provider_kind="provider-c",
+        model_id="model-c",
+    )
+    unsealed_profile = _profile(
+        profile_id="provider-c-profile",
+        profile_sha256=HASH_D,
+    )
+    unsealed_capabilities = _capabilities(
+        unsealed_variant,
+        provider_name="provider-c",
+    )
+    unsealed_route = _selected_route_identity(
+        provider_name=unsealed_capabilities.provider_name,
+        variant=unsealed_variant,
+        provider_profile=unsealed_profile,
+        compiler_contract=compiler,
+    )
+
+    with pytest.raises(
+        ValueError,
+        match="policy must bind exact source and destination execution stacks",
+    ):
+        _continuity_routing(
+            transition=transition,
+            previous_bound=previous_bound,
+            previous_shot=source_context.activated_shot,
+            destination_route=unsealed_route,
+        )
+
+    result = VideoGenerationResolver().resolve_requirement(
+        projection=_exact_terminal_projection(target_context),
+        context=target_context,
+        policy=_policy(),
+        provider_profile=unsealed_profile,
+        capabilities=unsealed_capabilities,
+        selected_capability_id=unsealed_variant.capability_id,
+        output_requirement=_output(),
+        lifecycle=target_lifecycle,
+        compiler_contract=compiler,
+        continuity_routing=continuity_routing,
+    )
+
+    assert result.decision.outcome is RoutingOutcome.BLOCKED_POLICY
+    assert result.decision.reason_codes == (
+        RouterReasonCode.CONTINUITY_DESTINATION_ROUTE_MISMATCH,
+    )
+    assert result.provider_bound_request is None
 
 
 def test_free_motion_can_use_text_to_video_without_identity_or_continuity() -> None:
@@ -1159,7 +2580,7 @@ def test_terminal_mime_and_measurements_must_satisfy_exact_capability() -> None:
         terminal=terminal,
     )
 
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver()._resolve_capability(
         context=context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -1473,7 +2894,7 @@ def test_exact_reference_capability_selects_r2v_with_all_anchors() -> None:
         scene_reference=scene,
     )
 
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver()._resolve_capability(
         context=context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -1581,7 +3002,7 @@ def test_reference_routing_generalizes_across_distinct_references_and_prompts() 
             character_bible_hashes=(case["character_hash"],),
             scene_content_hash=case["scene_hash"],
         )
-        decision = VideoGenerationResolver().resolve(
+        decision = VideoGenerationResolver()._resolve_capability(
             context=context,
             policy=_policy(),
             provider_profile=_profile(),
@@ -1645,7 +3066,7 @@ def test_semantic_continuity_carries_state_but_never_terminal_pixels() -> None:
         continuity_state=state,
     )
 
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver()._resolve_capability(
         context=context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -1669,7 +3090,7 @@ def test_semantic_continuity_carries_state_but_never_terminal_pixels() -> None:
 def test_semantic_continuity_requires_sealed_state() -> None:
     context = _context(continuity=ContinuityMode.SEMANTIC)
 
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver()._resolve_capability(
         context=context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -1756,7 +3177,7 @@ def test_exact_terminal_ignores_extra_semantic_state() -> None:
         continuity_state=_continuity_state(),
     )
 
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver()._resolve_capability(
         context=context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -1781,14 +3202,14 @@ def test_continuity_mode_and_state_change_semantic_routing_hash() -> None:
     }
     first_state = _continuity_state(story_state_hash=HASH_A)
     second_state = _continuity_state(story_state_hash=HASH_D)
-    first = VideoGenerationResolver().resolve(
+    first = VideoGenerationResolver()._resolve_capability(
         context=_context(
             continuity=ContinuityMode.SEMANTIC,
             continuity_state=first_state,
         ),
         **common,
     )
-    second = VideoGenerationResolver().resolve(
+    second = VideoGenerationResolver()._resolve_capability(
         context=_context(
             continuity=ContinuityMode.SEMANTIC,
             continuity_state=second_state,
@@ -2247,7 +3668,7 @@ def test_exact_terminal_accepts_real_h3_and_hailuo_i2v_capabilities() -> None:
         terminal=terminal,
     )
 
-    h3_decision = VideoGenerationResolver().resolve(
+    h3_decision = VideoGenerationResolver()._resolve_capability(
         context=context,
         policy=_policy(),
         provider_profile=h3_profile,
@@ -2255,7 +3676,7 @@ def test_exact_terminal_accepts_real_h3_and_hailuo_i2v_capabilities() -> None:
         selected_capability_id=h3_variant.capability_id,
         output_requirement=h3_output,
     )
-    unsupported_h3_decision = VideoGenerationResolver().resolve(
+    unsupported_h3_decision = VideoGenerationResolver()._resolve_capability(
         context=context,
         policy=_policy(),
         provider_profile=h3_profile,
@@ -2265,7 +3686,7 @@ def test_exact_terminal_accepts_real_h3_and_hailuo_i2v_capabilities() -> None:
             update={"width": 16384, "height": 16384}
         ),
     )
-    hailuo_decision = VideoGenerationResolver().resolve(
+    hailuo_decision = VideoGenerationResolver()._resolve_capability(
         context=context,
         policy=_policy(remote_authorized=True, budget_authorized=True),
         provider_profile=hailuo_profile,
