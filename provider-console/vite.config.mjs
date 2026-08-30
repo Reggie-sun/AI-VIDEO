@@ -8,6 +8,7 @@ import { createRunsApiPlugin } from "./scripts/runs-api.mjs";
 
 export function configuredExternalMediaSources({ repoRoot, homeRoot }) {
   return [
+    { id: "runs-outputs", label: "AI-VIDEO Runs Outputs", kind: "development_artifact", root: path.join(repoRoot, "runs"), layout: "run_outputs" },
     { id: "artifacts", label: "AI-VIDEO Artifacts", kind: "development_artifact", root: path.join(repoRoot, "artifacts") },
     { id: "ai-video-experiments", label: "AI-VIDEO Experiments", kind: "development_artifact", root: path.join(homeRoot, "ai-video-experiments") },
     { id: "comfyui-output", label: "ComfyUI Output", kind: "raw_provider_output", root: path.join(homeRoot, "ComfyUI", "output") },

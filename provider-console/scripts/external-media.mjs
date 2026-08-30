@@ -25,6 +25,7 @@ const SOURCE_PRIORITY = Object.freeze({
 });
 const EXTERNAL_METADATA_SCHEMA = "ai-video-external-media-metadata/1";
 const LONG_VIDEO_MANIFEST_FORMAT = "minimax_h3_t8_accepted_manifest";
+const COMPOSITION_HUMAN_VERDICTS = new Set(["PASS", "FAIL", "NOT_EVALUATED"]);
 const MEDIA_SCAN_CONCURRENCY = 8;
 const EMBEDDED_METADATA_MAX_BYTES = 2 * 1024 * 1024;
 const EMBEDDED_METADATA_TIMEOUT_MS = 5_000;
@@ -218,7 +219,7 @@ async function inspectMedia(root, sourcePath) {
   }
 }
 
-async function walkRoot(root, limits) {
+async function walkRoot(root, limits, layout = "recursive") {
   const files = [];
   let entriesSeen = 0;
   async function visit(directory, depth) {
@@ -242,8 +243,54 @@ async function walkRoot(root, limits) {
       if (entry.isFile()) files.push(candidate);
     }
   }
-  await visit(root, 0);
+  if (layout === "recursive") {
+    await visit(root, 0);
+  } else if (layout === "run_outputs") {
+    let runs;
+    try {
+      runs = await readdir(root, { withFileTypes: true });
+    } catch {
+      return files;
+    }
+    runs.sort((left, right) => left.name.localeCompare(right.name));
+    for (const run of runs) {
+      if (entriesSeen >= limits.maxEntriesPerRoot) break;
+      entriesSeen += 1;
+      if (!run.isDirectory() || run.isSymbolicLink()) continue;
+      for (const directoryName of ["outputs", "sidecars"]) {
+        if (entriesSeen >= limits.maxEntriesPerRoot) break;
+        const directory = path.join(root, run.name, directoryName);
+        let stat;
+        try {
+          stat = await lstat(directory);
+        } catch {
+          continue;
+        }
+        entriesSeen += 1;
+        if (!stat.isDirectory() || stat.isSymbolicLink()) continue;
+        await visit(directory, 0);
+      }
+    }
+  }
   return files;
+}
+
+function runOutputWorkspace(root, sourcePath) {
+  const relative = path.relative(root, sourcePath);
+  if (!relative || path.isAbsolute(relative)) return null;
+  const parts = relative.split(path.sep);
+  return parts.length >= 3 && parts[0] && parts[1] === "outputs" ? parts[0] : null;
+}
+
+function runSidecarsForMedia(sidecars, root, mediaPath, limit) {
+  const workspace = runOutputWorkspace(root, mediaPath);
+  if (!workspace) return [];
+  return sidecars
+    .filter((sidecarPath) => {
+      const parts = path.relative(root, sidecarPath).split(path.sep);
+      return parts.length >= 3 && parts[0] === workspace && parts[1] === "sidecars";
+    })
+    .slice(0, limit);
 }
 
 function isExactPathBinding(value, sidecarPath, mediaPath) {
@@ -423,9 +470,10 @@ async function metadataForMedia(sidecars, media, limits, experimentImages) {
   let composition = null;
   for (const sidecarPath of sidecars) {
     try {
-      const parsed = await readSidecarObject(sidecarPath, limits, media.source_root);
-      if (!parsed) continue;
-      parsedSidecars.push({ path: sidecarPath, value: parsed });
+      const sidecar = await readSidecarRecord(sidecarPath, limits, media.source_root);
+      if (!sidecar) continue;
+      const parsed = sidecar.value;
+      parsedSidecars.push({ path: sidecarPath, value: parsed, sha256: sidecar.sha256 });
       if (hasDirectBinding(parsed, sidecarPath, media)) {
         evidenceRefs.push(path.relative(media.source_root, sidecarPath).split(path.sep).join("/"));
         if (media.source_kind === "external_project_asset" && path.basename(sidecarPath) === "result.json") {
@@ -454,6 +502,7 @@ async function metadataForMedia(sidecars, media, limits, experimentImages) {
   const experimentChain = media.source_id === EXPERIMENT_SOURCE_ID
     ? await experimentEvidenceForMedia(parsedSidecars, media, limits, experimentImages, experimentEvidenceHelpers)
     : null;
+  const compositionReviewChain = developmentCompositionReviewEvidence(parsedSidecars, media);
   const longVideoSignatures = new Set(longVideoChains.map((chain) => JSON.stringify(chain.metadata)));
   const longVideoAmbiguity = longVideoSignatures.size > 1;
   const longVideoChain = longVideoAmbiguity ? null : longVideoChains[0];
@@ -464,7 +513,7 @@ async function metadataForMedia(sidecars, media, limits, experimentImages) {
         evidence_refs: [relativeLocation(media.source_root, media.source_path).relative_path],
       }
     : null;
-  const selectedChain = experimentChain || verifiedChain || longVideoChain || embeddedChain;
+  const selectedChain = experimentChain || verifiedChain || compositionReviewChain || longVideoChain || embeddedChain;
   const associationAmbiguityTiers = [];
   if (longVideoAmbiguity) associationAmbiguityTiers.push("bound");
   if (selectedChain?.association_ambiguity === true) {
@@ -485,7 +534,47 @@ async function metadataForMedia(sidecars, media, limits, experimentImages) {
   };
 }
 
-async function readSidecarObject(sidecarPath, limits, root) {
+function compositionArtifactBinding(record, media, schemaVersion) {
+  const value = record?.value;
+  return value?.schema_version === schemaVersion
+    && value.production_or_final_acceptance === false
+    && typeof value.artifact_sha256 === "string"
+    && value.artifact_sha256.toLowerCase() === media.sha256
+    && isExactPathBinding(value.artifact_path, record.path, media.source_path);
+}
+
+function developmentCompositionReviewEvidence(records, media) {
+  const technical = records.filter((record) => compositionArtifactBinding(
+    record,
+    media,
+    "development-composition-repair-gate-1.0",
+  ));
+  if (technical.length !== 1) return technical.length > 1 ? { status: "bound", metadata: {}, association_ambiguity: true } : null;
+  const gate = technical[0];
+  const human = records.filter((record) => {
+    if (!compositionArtifactBinding(record, media, "development-composition-human-verdict-1.0")) return false;
+    const value = record.value;
+    return typeof value.prior_technical_gate_sha256 === "string"
+      && value.prior_technical_gate_sha256.toLowerCase() === gate.sha256
+      && isExactPathBinding(value.prior_technical_gate_path, record.path, gate.path);
+  });
+  if (human.length > 1) return { status: "bound", metadata: {}, association_ambiguity: true };
+  const rawHumanVerdict = boundedString(human[0]?.value?.overall_human_verdict);
+  const humanVerdict = COMPOSITION_HUMAN_VERDICTS.has(rawHumanVerdict) ? rawHumanVerdict : null;
+  const technicalGate = boundedString(gate.value.technical_decision);
+  return {
+    status: "bound",
+    metadata: {
+      generation_type: "deterministic_composition",
+      ...(humanVerdict ? { status: humanVerdict } : {}),
+    },
+    evidence_refs: [gate, ...human].map((record) => relativeLocation(media.source_root, record.path).relative_path),
+    technical_gate: technicalGate,
+    human_verdict: humanVerdict,
+  };
+}
+
+async function readSidecarRecord(sidecarPath, limits, root) {
   const file = await open(sidecarPath, constants.O_RDONLY | constants.O_NOFOLLOW);
   try {
     const [stat, openedPath] = await Promise.all([
@@ -493,11 +582,18 @@ async function readSidecarObject(sidecarPath, limits, root) {
       realpath(`/proc/self/fd/${file.fd}`),
     ]);
     if (!stat.isFile() || stat.size > limits.maxSidecarBytes || openedPath !== sidecarPath || !containedPath(root, openedPath)) return null;
-    const parsed = JSON.parse(await file.readFile({ encoding: "utf8" }));
-    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : null;
+    const bytes = await file.readFile();
+    const parsed = JSON.parse(bytes.toString("utf8"));
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed)
+      ? { value: parsed, sha256: createHash("sha256").update(bytes).digest("hex") }
+      : null;
   } finally {
     await file.close();
   }
+}
+
+async function readSidecarObject(sidecarPath, limits, root) {
+  return (await readSidecarRecord(sidecarPath, limits, root))?.value || null;
 }
 
 async function externalProjectEvidenceChain(resultPath, result, media, limits) {
@@ -729,7 +825,12 @@ async function mapWithConcurrency(values, concurrency, mapper) {
 
 async function scanSource(source, limits) {
   const sourceId = safeSourceId(source);
-  if (!sourceId || !["development_artifact", "raw_provider_output", "external_project_asset"].includes(source?.kind)) {
+  const layout = source?.layout || "recursive";
+  if (
+    !sourceId
+    || !["development_artifact", "raw_provider_output", "external_project_asset"].includes(source?.kind)
+    || !["recursive", "run_outputs"].includes(layout)
+  ) {
     return { source: publicSource(source, "unavailable"), records: [] };
   }
   const sourceLabel = safeSourceLabel(source);
@@ -741,13 +842,15 @@ async function scanSource(source, limits) {
   } catch {
     return { source: publicSource(source, "unavailable"), records: [] };
   }
-  const files = await walkRoot(root, limits);
+  const files = await walkRoot(root, limits, layout);
   const experimentImages = await indexExperimentImages(files, root, sourceId, experimentEvidenceHelpers);
   const sidecars = files
-    .filter((file) => path.extname(file).toLowerCase() === ".json")
-    .slice(0, limits.maxSidecarsPerRoot);
+    .filter((file) => path.extname(file).toLowerCase() === ".json");
   const mediaFiles = files
-    .filter((sourcePath) => VIDEO_MIME_TYPES.has(path.extname(sourcePath).toLowerCase()))
+    .filter((sourcePath) => (
+      VIDEO_MIME_TYPES.has(path.extname(sourcePath).toLowerCase())
+      && (layout !== "run_outputs" || runOutputWorkspace(root, sourcePath))
+    ))
     .slice(0, limits.maxMediaPerRoot);
   const scannedRecords = await mapWithConcurrency(mediaFiles, MEDIA_SCAN_CONCURRENCY, async (sourcePath) => {
     const mime_type = VIDEO_MIME_TYPES.get(path.extname(sourcePath).toLowerCase());
@@ -774,7 +877,14 @@ async function scanSource(source, limits) {
         association_ambiguity,
         association_ambiguity_tiers,
         reference_descriptors,
-      } = await metadataForMedia(sidecars, media, limits, experimentImages);
+      } = await metadataForMedia(
+        layout === "run_outputs"
+          ? runSidecarsForMedia(sidecars, root, sourcePath, limits.maxSidecarsPerRoot)
+          : sidecars.slice(0, limits.maxSidecarsPerRoot),
+        media,
+        limits,
+        experimentImages,
+      );
       return {
         ...media,
         source_label: sourceLabel,
@@ -829,6 +939,27 @@ function metadataRecordsConflict(records) {
   });
 }
 
+function layeredReviewRecordsConflict(records) {
+  return ["technical_gate", "human_verdict"].some((field) => new Set(records
+    .map((record) => record[field])
+    .filter((value) => value !== undefined && value !== null && value !== "")
+    .map(String)).size > 1);
+}
+
+function strongestBoundRecord(records) {
+  return records.reduce((selected, record) => {
+    const rank = (record.human_verdict ? 4 : 0)
+      + (record.technical_gate ? 2 : 0)
+      + (record.metadata?.status !== undefined ? 1 : 0);
+    const selectedRank = selected
+      ? (selected.human_verdict ? 4 : 0)
+        + (selected.technical_gate ? 2 : 0)
+        + (selected.metadata?.status !== undefined ? 1 : 0)
+      : -1;
+    return rank > selectedRank ? record : selected;
+  }, null);
+}
+
 function recordAmbiguousAtTier(record, tier) {
   if (!record.association_ambiguity) return false;
   if (Array.isArray(record.association_ambiguity_tiers)) return record.association_ambiguity_tiers.includes(tier);
@@ -862,11 +993,12 @@ function groupProjection(records) {
     const experimentSignatures = new Set(experimentRecords.map((record) => record.experiment_signature));
     const associationAmbiguity = selectedEvidenceTier.some((record) => recordAmbiguousAtTier(record, selectedTier))
       || experimentSignatures.size > 1
-      || metadataRecordsConflict(selectedEvidenceTier);
+      || metadataRecordsConflict(selectedEvidenceTier)
+      || layeredReviewRecordsConflict(selectedEvidenceTier);
     const experimentSource = associationAmbiguity ? null : duplicates.find((record) => record.experiment_signature);
     const metadataSource = experimentSource
       || duplicates.find((record) => record.metadata_status.startsWith("verified_"))
-      || duplicates.find((record) => record.metadata_status === "bound")
+      || strongestBoundRecord(boundRecords)
       || preview;
     const compositionSource = duplicates.find((record) => record.composition);
     const token = externalToken(preview);

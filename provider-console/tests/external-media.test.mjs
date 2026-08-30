@@ -218,6 +218,122 @@ test("catalog is allowlisted, marks missing roots unavailable, and ignores symli
   assert.equal(accepted.lifecycle_status, "NOT_EVALUATED");
 });
 
+test("run_outputs source includes direct run outputs with exact composition review and excludes nested Production render outputs", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-runs-outputs-"));
+  const runRoot = path.join(root, "development-composition");
+  const outputRoot = path.join(runRoot, "outputs");
+  const gateRoot = path.join(runRoot, "sidecars", "gates");
+  const earlierSidecarRoot = path.join(root, "aaa-earlier-run", "sidecars", "gates");
+  const nestedRenderRoot = path.join(runRoot, "production", "state", "render", "outputs");
+  await Promise.all([
+    mkdir(outputRoot, { recursive: true }),
+    mkdir(gateRoot, { recursive: true }),
+    mkdir(earlierSidecarRoot, { recursive: true }),
+    mkdir(nestedRenderRoot, { recursive: true }),
+  ]);
+  const videoBytes = Buffer.from("exact composed video bytes");
+  const videoPath = path.join(outputRoot, "latest-composition.mp4");
+  await Promise.all([
+    writeFile(videoPath, videoBytes),
+    writeFile(path.join(nestedRenderRoot, "production-render.mp4"), "must not be scanned"),
+  ]);
+  const artifactSha256 = sha256(videoBytes);
+  const gatePath = path.join(gateRoot, "composition-repair-gate.json");
+  const gateValue = {
+    schema_version: "development-composition-repair-gate-1.0",
+    artifact_path: videoPath,
+    artifact_sha256: artifactSha256,
+    technical_decision: "PASS_FOR_HUMAN_REVIEW",
+    production_or_final_acceptance: false,
+  };
+  const gateBytes = JSON.stringify(gateValue);
+  await writeFile(gatePath, gateBytes);
+  await Promise.all([
+    writeFile(path.join(gateRoot, "composition-repair-human-verdict.json"), JSON.stringify({
+      schema_version: "development-composition-human-verdict-1.0",
+      artifact_path: videoPath,
+      artifact_sha256: artifactSha256,
+      prior_technical_gate_path: gatePath,
+      prior_technical_gate_sha256: sha256(gateBytes),
+      overall_human_verdict: "FAIL",
+      production_or_final_acceptance: false,
+    })),
+    writeFile(path.join(earlierSidecarRoot, "a.json"), "{}"),
+    writeFile(path.join(earlierSidecarRoot, "b.json"), "{}"),
+  ]);
+
+  const result = await catalogExternalMedia({
+    sources: [{
+      id: "runs-outputs",
+      label: "AI-VIDEO Runs Outputs",
+      kind: "development_artifact",
+      root,
+      layout: "run_outputs",
+    }],
+    limits: { maxSidecarsPerRoot: 2 },
+  });
+
+  assert.equal(result.groups.length, 1);
+  const group = result.groups[0];
+  assert.equal(group.preview.relative_path, "development-composition/outputs/latest-composition.mp4");
+  assert.equal(group.metadata_status, "bound");
+  assert.equal(group.generation_type, "deterministic_composition");
+  assert.equal(group.reported_status, "FAIL");
+  assert.equal(group.technical_gate, "PASS_FOR_HUMAN_REVIEW");
+  assert.equal(group.human_verdict, "FAIL");
+  assert.deepEqual(group.evidence_refs, [
+    { source_id: "runs-outputs", relative_path: "development-composition/sidecars/gates/composition-repair-gate.json" },
+    { source_id: "runs-outputs", relative_path: "development-composition/sidecars/gates/composition-repair-human-verdict.json" },
+  ]);
+  assert.equal(result.groups.some((candidate) => candidate.preview.file_name === "production-render.mp4"), false);
+
+  await writeFile(path.join(gateRoot, "composition-repair-human-verdict.json"), JSON.stringify({
+    schema_version: "development-composition-human-verdict-1.0",
+    artifact_path: videoPath,
+    artifact_sha256: artifactSha256,
+    prior_technical_gate_path: gatePath,
+    prior_technical_gate_sha256: "0".repeat(64),
+    overall_human_verdict: "PASS",
+    production_or_final_acceptance: false,
+  }));
+  const tampered = await catalogExternalMedia({
+    sources: [{ id: "runs-outputs", label: "AI-VIDEO Runs Outputs", kind: "development_artifact", root, layout: "run_outputs" }],
+    limits: { maxSidecarsPerRoot: 2 },
+  });
+  assert.equal(tampered.groups[0].reported_status, null);
+  assert.equal(tampered.groups[0].human_verdict, null);
+  assert.equal(tampered.groups[0].technical_gate, "PASS_FOR_HUMAN_REVIEW");
+  assert.deepEqual(tampered.groups[0].evidence_refs, [
+    { source_id: "runs-outputs", relative_path: "development-composition/sidecars/gates/composition-repair-gate.json" },
+  ]);
+
+  await writeFile(path.join(gateRoot, "composition-repair-human-verdict.json"), JSON.stringify({
+    schema_version: "development-composition-human-verdict-1.0",
+    artifact_path: videoPath,
+    artifact_sha256: artifactSha256,
+    prior_technical_gate_path: gatePath,
+    prior_technical_gate_sha256: sha256(gateBytes),
+    overall_human_verdict: "PENDING",
+    production_or_final_acceptance: false,
+  }));
+  const unknownVerdict = await catalogExternalMedia({
+    sources: [{ id: "runs-outputs", label: "AI-VIDEO Runs Outputs", kind: "development_artifact", root, layout: "run_outputs" }],
+    limits: { maxSidecarsPerRoot: 2 },
+  });
+  assert.equal(unknownVerdict.groups[0].reported_status, null);
+  assert.equal(unknownVerdict.groups[0].human_verdict, null);
+});
+
+test("unknown external source layout fails closed", async () => {
+  const paths = await fixture();
+  await writeFile(path.join(paths.artifacts, "must-not-scan.mp4"), "bytes");
+  const result = await catalogExternalMedia({
+    sources: [{ id: "unknown-layout", label: "Unknown", kind: "development_artifact", root: paths.artifacts, layout: "guess" }],
+  });
+  assert.equal(result.status, "unavailable");
+  assert.equal(result.groups.length, 0);
+});
+
 test("deduplicates exact bytes across sources with a stable source-qualified token and priority preview", async () => {
   const paths = await fixture();
   await writeFile(path.join(paths.artifacts, "from-artifact.mp4"), "same exact bytes");
@@ -893,6 +1009,68 @@ test("a weaker internally ambiguous record cannot override stronger verified exp
   assert.equal(ambiguousExperimentGroup.association_ambiguity, true);
   assert.equal(ambiguousExperimentGroup.metadata_status, "ambiguous_verified_experiment_evidence");
   assert.equal(ambiguousExperimentGroup.prompt_text, null);
+});
+
+test("duplicate exact composition bytes prefer a complete human chain and conflicting layered verdicts fail closed", () => {
+  const shared = {
+    sha256: "c".repeat(64),
+    bytes: 100,
+    mime_type: "video/mp4",
+    identity: ["1", "2", "3", "4"],
+    metadata_status: "bound",
+    experiment_signature: null,
+    association_ambiguity: false,
+    association_ambiguity_tiers: [],
+    composition: null,
+    shot_evidence: [],
+    reference_descriptors: {},
+  };
+  const technicalOnly = {
+    ...shared,
+    source_path: "/newer/outputs/composition.mp4",
+    source_root: "/newer",
+    source_id: "newer",
+    source_label: "Newer copy",
+    source_kind: "development_artifact",
+    mtime_ms: 2,
+    metadata: { generation_type: "deterministic_composition" },
+    evidence_refs: ["sidecars/technical.json"],
+    technical_gate: "PASS_FOR_HUMAN_REVIEW",
+    human_verdict: null,
+  };
+  const completeHuman = {
+    ...shared,
+    source_path: "/older/outputs/composition.mp4",
+    source_root: "/older",
+    source_id: "older",
+    source_label: "Older complete copy",
+    source_kind: "development_artifact",
+    mtime_ms: 1,
+    metadata: { generation_type: "deterministic_composition", status: "FAIL" },
+    evidence_refs: ["sidecars/technical.json", "sidecars/human.json"],
+    technical_gate: "PASS_FOR_HUMAN_REVIEW",
+    human_verdict: "FAIL",
+  };
+
+  const complete = __test__.groupProjection([technicalOnly, completeHuman]).groups[0];
+  assert.equal(complete.association_ambiguity, false);
+  assert.equal(complete.reported_status, "FAIL");
+  assert.equal(complete.human_verdict, "FAIL");
+
+  const conflictingHuman = {
+    ...completeHuman,
+    source_path: "/conflict/outputs/composition.mp4",
+    source_root: "/conflict",
+    source_id: "conflict",
+    source_label: "Conflicting copy",
+    metadata: { generation_type: "deterministic_composition", status: "PASS" },
+    human_verdict: "PASS",
+  };
+  const conflict = __test__.groupProjection([completeHuman, conflictingHuman]).groups[0];
+  assert.equal(conflict.association_ambiguity, true);
+  assert.equal(conflict.reported_status, null);
+  assert.equal(conflict.human_verdict, null);
+  assert.equal(conflict.metadata_status, "ambiguous_bound_evidence");
 });
 
 test("unbound sidecars fail closed and scan limits are deterministic", async () => {

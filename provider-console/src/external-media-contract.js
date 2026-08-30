@@ -1,5 +1,5 @@
 const SUCCESS_STATES = new Set(["success", "succeeded", "completed", "complete", "fetched", "output_recorded"]);
-const FAILURE_STATES = new Set(["failed", "failure", "error", "blocked", "cancelled", "canceled"]);
+const FAILURE_STATES = new Set(["fail", "failed", "failure", "error", "blocked", "cancelled", "canceled"]);
 
 export function externalStatus(group) {
   if (group?.association_ambiguity === true) {

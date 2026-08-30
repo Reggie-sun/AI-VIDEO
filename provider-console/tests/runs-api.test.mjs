@@ -330,6 +330,7 @@ test("Runs attempt keeps the inline player and Project Shot breakdown in the mai
 
 test("default external media sources include the AI-VIDEO experiments directory", () => {
   assert.deepEqual(configuredExternalMediaSources({ repoRoot: "/repo", homeRoot: "/home/operator" }), [
+    { id: "runs-outputs", label: "AI-VIDEO Runs Outputs", kind: "development_artifact", root: "/repo/runs", layout: "run_outputs" },
     { id: "artifacts", label: "AI-VIDEO Artifacts", kind: "development_artifact", root: "/repo/artifacts" },
     { id: "ai-video-experiments", label: "AI-VIDEO Experiments", kind: "development_artifact", root: "/home/operator/ai-video-experiments" },
     { id: "comfyui-output", label: "ComfyUI Output", kind: "raw_provider_output", root: "/home/operator/ComfyUI/output" },
@@ -847,6 +848,21 @@ test("external evidence states distinguish linked, incomplete, and unbound group
     { id: "unparsed", label: "旁证待解析", count: 1 },
     { id: "unbound", label: "无绑定证据", count: 1 },
   ]);
+});
+
+test("exact composition human FAIL is rendered as a blocked linked status", () => {
+  assert.deepEqual(externalStatus({
+    reported_status: "FAIL",
+    metadata_status: "bound",
+    evidence_refs: [{ relative_path: "sidecars/gates/composition-human-verdict.json" }],
+  }), {
+    raw: "FAIL",
+    label: "外部报告：FAIL",
+    badge: "FAIL",
+    tone: "blocked",
+    evaluated: true,
+    evidence_state: "linked",
+  });
 });
 
 test("exact-bound metadata without a reported outcome is linked but not evaluated", () => {
