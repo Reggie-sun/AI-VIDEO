@@ -1,6 +1,6 @@
 ---
 name: open-video
-description: Generate, edit, or direct videos via open-source models (MiniMax H3 baseline; Wan2.2 / LTX future). Use when the user wants to turn a concept, script, or reference image into a finished video or multi-shot film — single shots, image-to-video, first-last-frame interpolation, reference-video/audio styling, or stitched long films beyond the 15s model ceiling. Covers prompt crafting, hard validation, ComfyUI-driven generation, vision judging, refine loop, and ffmpeg stitching.
+description: Use for AI-VIDEO Director coverage when a concept, script, reference-led brief, or promptless duration-only request needs ordered Shots, transitions, or a long film beyond the selected model's single-Shot limit; guidance is advisory and must return to AI-VIDEO contracts.
 ---
 
 # open-video — autonomous director skill
@@ -40,6 +40,42 @@ Single open models still cap ~15s/shot; longer output needs multi-shot orchestra
 duration; did the user supply reference image(s) / video / audio; desired aspect; quality bar. If
 the request is ambiguous *and* the target is a film >30s, ask ONE focused question (subject +
 mood + length). Do not generate a long film on guesswork.
+
+**Promptless long-form boundary.** Set `user_creative_brief_supplied=false` when the user supplies only duration,
+Provider/model, output settings, or an instruction to generate automatically, without a concept,
+script, reference-led story, approved Shot, or ordered coverage. If the target duration exceeds the
+fixed `15s` creative coverage threshold, classify it as `PROMPTLESS_LONG_FORM`. The Director
+validator does not accept or prove Provider duration capability; downstream capability/profile
+owners still validate exact technical limits. A Provider's ability to generate one technical `30s`
+output does not waive Director coverage. Do not turn the missing brief into a default slow tracking
+shot, a repeated action, or one uninterrupted extension. Shorter promptless requests still require
+`director_skill=open-video`, but may validate with one coverage unit.
+
+Before crafting any Shot or Provider prompt for `PROMPTLESS_LONG_FORM`, create Director Coverage
+Evidence with:
+
+- request facts: `user_creative_brief_supplied` plus direct user-input evidence when true,
+  `target_duration_seconds`, `explicit_single_take_requested` plus direct user-request evidence
+  when true, and
+  `director_skill=open-video`;
+- ordered `coverage_units`, each with `unit_id`, `duration_seconds`, finite `beat_function`,
+  `objective`, `open_state`, `close_state`, finite `shot_scale`, finite `camera_treatment`,
+  `camera_intent`, `visible_change`, and finite `transition_out`;
+- distinct objectives and visible changes; adjacent ordinary multi-Shot units must change finite
+  beat, scale, and camera-treatment categories without requiring those categories to be globally
+  unique across a long film.
+
+Validate the evidence before downstream authoring:
+
+```bash
+python .agents/skills/open-video/scripts/validate_director_coverage.py <coverage.json>
+```
+
+`VIDEO_EXTEND`, FLF2V, a terminal-frame handoff, `no cut`, and `uninterrupted` are continuity or
+execution treatments, not Director coverage. They cannot be the automatic fallback for a
+promptless request. Only an explicit user request for a single take may set
+`explicit_single_take_requested=true`; even then, plan multiple evolving internal coverage units.
+Do not infer single-take intent from “continuous”, “smooth”, duration alone, or missing prompt.
 
 **Step 2 — Pick the mode.** Mode is auto-derived from inputs (see `backends/h3/backend.py` and
 `scripts/validate_prompt.py` `detect_mode`):

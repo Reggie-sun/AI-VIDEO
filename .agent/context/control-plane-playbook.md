@@ -34,11 +34,38 @@ Use the minimum matching Skill set. Installation、description matching 或“�
    - relevant Skill lint/preflight 结果，或该 Skill 没有 executable lint surface 的明确说明。
 4. 若 mandatory preflight 或上述 evidence 不完整，Agent MUST fail closed，不得进入付费 preview、mint/consume submit permit 或执行 Provider POST。
 
+#### Promptless Long-Form Director Gate
+
+`PROMPTLESS_REQUEST` 指用户只给出时长、Provider/model、输出规格或“自动生成”等执行约束，
+但没有提供 concept、script、reference-led story、approved Shot 或 ordered coverage。所有这类请求
+都必须先进入 `open-video`；其中目标时长超过 `15s` creative coverage threshold，或超过当前 selected
+capability/profile 已验证的单 Shot 时长上限时，进一步分类为 `PROMPTLESS_LONG_FORM`。其中 Director
+validator 只执行固定 `15s` creative threshold，不接收或自证 Provider capability；exact duration/mode
+支持仍由 current capability/profile owner 在 downstream handoff 独立 fail closed。Provider 能在一次
+调用中技术性支持 `30s` 不得放宽 creative threshold。请求不是 approved Shot，也不得由 Agent 以一个
+默认慢运镜扩展到目标时长。
+
+在首次编写 Shot Contract、Provider prompt 或 execution script 之前，Agent MUST：
+
+1. 读取 `open-video`，产出 `Director Coverage Evidence`，至少包含 `user_creative_brief_supplied`、目标时长、
+   ordered coverage units，以及每个 unit 的 duration、beat function、objective、open/close state、
+   shot scale、camera treatment、camera intent、visible change 和 transition；current selected profile
+   的 single-Shot limit 只作为 downstream runtime handoff，由 capability owner 重新验证；
+2. 使用 `.agents/skills/open-video/scripts/validate_director_coverage.py` 验证该 evidence，并在
+   commentary 中报告结果；validator 没有通过时 fail closed；
+3. 只有验证通过的 coverage 才能翻译成 approved AI-VIDEO Character / Scene / Shot artifacts，随后按
+   concern 顺序进入 continuity Skill 与 Provider-specific authoring Skill。
+
+Agent MUST NOT 把 `VIDEO_EXTEND`、FLF2V、尾帧 handoff、`no cut`、`uninterrupted` 或重复同一
+camera/action sentence 当作 Director coverage；这些只是 execution/continuity treatment。只有用户明确
+要求一镜到底时才可设置 `explicit_single_take_requested=true`，并且仍需多个具有不同 objective 与
+visible change 的 ordered coverage units。该 flag 不得从“连贯”“流畅”“30s”或缺失 prompt 推断。
+
 该 gate 是 Agent authoring/process prerequisite，不是 Production runtime contract。Run script、Provider adapter、Manifest、receipt、timeline 与 renderer MUST NOT import、联网调用或依赖 Creative Skill；`runtime_skill_calls = 0` 是正确边界，不能被解释为 Agent authoring 阶段可以跳过 Skill。若 task 只涉及 production state、asset identity、schema、dependency、timeline consumption、render execution、activation、recovery 或 Provider lifecycle，且不创作或修改 creative intent/prompt，则不触发本 preflight；Agent 应明确说明该判定，不能把它用于规避真实 creative work。
 
 ### Skill Selection
 
-`open-video` MUST use when the task needs Director-level concept/script decomposition、ordered Shot planning、coverage、per-Shot objective、multi-Shot segmentation、transition/handoff intent 或 review criteria。它是 project-local Shot Planning knowledge Skill；其 `plan -> craft -> validate -> generate -> judge -> refine -> stitch -> deliver` 只作为 authoring rubric。Agent MAY 提取 shot decomposition、H3 prompt grammar、continuity questions 与 judging heuristics，然后必须将结果翻译成 approved AI-VIDEO Character / Scene / Shot artifacts 和现有 contracts。
+`open-video` MUST use when the task needs Director-level concept/script decomposition、ordered Shot planning、coverage、per-Shot objective、multi-Shot segmentation、transition/handoff intent 或 review criteria，包括所有 `PROMPTLESS_REQUEST`。它是 project-local Shot Planning knowledge Skill；其 `plan -> craft -> validate -> generate -> judge -> refine -> stitch -> deliver` 只作为 authoring rubric。Agent MAY 提取 shot decomposition、H3 prompt grammar、continuity questions 与 judging heuristics，然后必须将结果翻译成 approved AI-VIDEO Character / Scene / Shot artifacts 和现有 contracts。
 
 `open-video` MUST NOT 运行或安装其 product/CLI/Python runtime，不得执行 `open-video install/pull/status/run`、ComfyUI submit、generation、judge loop、refine loop、ffmpeg stitch、artifact/receipt write，也不得成为 video engine、Provider、renderer、Production runtime 或 Agent runtime/lifecycle owner。上游 multi-shot Director path 标记为 evolving/design-scaffold；其 capability、constraint、model 与 quality claims 只能作为候选知识，使用前必须由当前 AI-VIDEO code、sealed profile、tests 或 runtime evidence 重新验证。
 

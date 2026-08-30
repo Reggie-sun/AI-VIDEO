@@ -125,6 +125,10 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_seedance_authoring_skill.py, -q]
     cwd: .
     description: Verify minimal Seedance authoring dispatch, progressive version loading, and advisory authority boundaries.
+  open_video_skill_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_open_video_skill.py, -q]
+    cwd: .
+    description: Verify promptless long-form Director coverage validation and explicit single-take boundaries.
   experience_learning_skill_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_distill_ai_video_learning_skill.py, tests/test_experience_evidence_identity.py, -q]
     cwd: .
@@ -269,6 +273,7 @@ checks:
       - composition_architecture_tests
       - ecommerce_ad_workflow_skill_tests
       - seedance_authoring_skill_tests
+      - open_video_skill_tests
       - experience_learning_skill_tests
       - product_runtime_skill_boundary_tests
       - harness_tests
@@ -914,6 +919,15 @@ categories:
       - .agents/skills/seedance-authoring/**
       - tests/test_seedance_authoring_skill.py
     check_ids:
+      - seedance_authoring_skill_tests
+      - task_architecture_gate
+  open_video_skill:
+    patterns:
+      - .agent/context/control-plane-playbook.md
+      - .agents/skills/open-video/**
+      - tests/test_open_video_skill.py
+    check_ids:
+      - open_video_skill_tests
       - seedance_authoring_skill_tests
       - task_architecture_gate
   experience_learning:

@@ -25,6 +25,14 @@ prompt/reference 专家，不是 Seedance workflow、router、Provider adapter �
 - deterministic motion graphics、pacing 或 composition -> `video-shotcraft`；
 - capability selection、execution、activation 或 QA -> 当前 AI-VIDEO code 与 contracts。
 
+只提供时长、Seedance model/profile 或输出规格，但没有 concept、approved Shot 或 ordered
+coverage 的请求不是可消费的 Shot，必须先作为 `PROMPTLESS_REQUEST` route 到 `open-video`。
+若目标时长超过固定 `15s` creative coverage threshold，按 `PROMPTLESS_LONG_FORM` 通过 Director
+Coverage validator；Seedance 2.5 技术性支持单次 `30s` 不能跳过该 creative Gate。Director validator
+不证明 Provider duration/mode capability；这些 exact facts 仍由 current selected profile owner 校验。
+MUST NOT 为填补空 brief 自动起草 `one uninterrupted shot`、重复慢运镜、`no cut` 或
+`VIDEO_EXTEND` prompt；这些 expression 只能来自已经批准的 coverage 与明确 continuity intent。
+
 不得猜测 version、mode、surface、asset identity 或 reference job。输入为 unknown, future,
 mixed, or stale 时必须 fail closed，并报告缺失的 deterministic selection。
 

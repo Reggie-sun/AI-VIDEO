@@ -1614,6 +1614,23 @@ def test_project_skill_installation_routes_to_control_plane_harness(path: str) -
     assert "harness_tests" in report["check_ids"]
 
 
+def test_open_video_skill_routes_to_promptless_director_coverage_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+
+    for path in (
+        ".agent/context/control-plane-playbook.md",
+        ".agents/skills/open-video/SKILL.md",
+        ".agents/skills/open-video/scripts/validate_director_coverage.py",
+        "tests/test_open_video_skill.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["fallback_paths"] == []
+        assert "open_video_skill" in report["categories"]
+        assert "open_video_skill_tests" in report["check_ids"]
+        assert "seedance_authoring_skill_tests" in report["check_ids"]
+        assert "task_architecture_gate" in report["check_ids"]
+
+
 @pytest.mark.parametrize(
     "path",
     [
