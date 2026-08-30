@@ -8,6 +8,17 @@ learning_eligibility: ineligible
 
 Date: 2026-08-30
 
+## Supersession Notice — 2026-08-30
+
+下方 `Evidence And Scope Boundaries` 中 loose `runs/*/outputs/*.mp4` 不进入 canonical Runs auto-follow 的结论仍然成立，
+但“不是前端漏扫”不再适用于 External media catalog。Commit `3b8faf32b06a0dc500ba462c1eebe7e34e73497c`
+新增显式 `runs-outputs` source，只读扫描 `runs/<run_id>/outputs/**`，并用同 workspace exact composition
+technical→human path/SHA chain 投影 non-canonical evidence。详见
+`docs/record_for_agent/2026-08-30-provider-console-composed-run-outputs.md`。
+
+该变更不把 loose output 升级为 Manifest attempt、candidate、P6、Final Acceptance 或 activation；canonical Runs
+latest-follow contract 未改变。
+
 ## Purpose
 
 本文记录 Provider Console “实时更新已连接，但播放器仍停留在旧视频” regression 的 current root cause、
