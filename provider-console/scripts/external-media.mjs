@@ -26,6 +26,7 @@ const SOURCE_PRIORITY = Object.freeze({
 const EXTERNAL_METADATA_SCHEMA = "ai-video-external-media-metadata/1";
 const LONG_VIDEO_MANIFEST_FORMAT = "minimax_h3_t8_accepted_manifest";
 const COMPOSITION_HUMAN_VERDICTS = new Set(["PASS", "FAIL", "NOT_EVALUATED"]);
+const REVIEW_V4_ACCEPTANCE_BOUNDARY = "Technical review candidate only; not Production activation, P6, or Final Acceptance. Human playback remains required for timbre, audibility, mix, and final acceptance.";
 const MEDIA_SCAN_CONCURRENCY = 8;
 const EMBEDDED_METADATA_MAX_BYTES = 2 * 1024 * 1024;
 const EMBEDDED_METADATA_TIMEOUT_MS = 5_000;
@@ -506,6 +507,10 @@ async function metadataForMedia(sidecars, media, limits, experimentImages) {
     : null;
   const compositionReviewChain = developmentCompositionReviewEvidence(parsedSidecars, media);
   const reviewV3Chain = developmentReviewV3Evidence(parsedSidecars, media);
+  const reviewV4Chain = developmentReviewV4Evidence(parsedSidecars, media);
+  const versionedReviewChain = reviewV3Chain && reviewV4Chain
+    ? { status: "bound", metadata: {}, association_ambiguity: true }
+    : reviewV3Chain || reviewV4Chain;
   const longVideoSignatures = new Set(longVideoChains.map((chain) => JSON.stringify(chain.metadata)));
   const longVideoAmbiguity = longVideoSignatures.size > 1;
   const longVideoChain = longVideoAmbiguity ? null : longVideoChains[0];
@@ -516,7 +521,7 @@ async function metadataForMedia(sidecars, media, limits, experimentImages) {
         evidence_refs: [relativeLocation(media.source_root, media.source_path).relative_path],
       }
     : null;
-  const selectedChain = experimentChain || verifiedChain || compositionReviewChain || reviewV3Chain || longVideoChain || embeddedChain;
+  const selectedChain = experimentChain || verifiedChain || compositionReviewChain || versionedReviewChain || longVideoChain || embeddedChain;
   const associationAmbiguityTiers = [];
   if (longVideoAmbiguity) associationAmbiguityTiers.push("bound");
   if (selectedChain?.association_ambiguity === true) {
@@ -577,7 +582,7 @@ function developmentCompositionReviewEvidence(records, media) {
   };
 }
 
-function runRelativeArtifactBinding(record, media, artifact) {
+function runArtifactBinding(record, media, artifact) {
   const workspace = runOutputWorkspace(media.source_root, media.source_path);
   const relativeParts = typeof artifact?.path === "string" ? artifact.path.split("/") : [];
   if (
@@ -594,7 +599,21 @@ function runRelativeArtifactBinding(record, media, artifact) {
     || artifact.bytes !== media.bytes
   ) return false;
   const runRoot = path.join(media.source_root, workspace);
-  return path.resolve(runRoot, artifact.path) === media.source_path
+  let sourceRelativeParts;
+  if (["output", "outputs"].includes(relativeParts[0])) {
+    sourceRelativeParts = [workspace, ...relativeParts];
+  } else if (relativeParts[0] === workspace && ["output", "outputs"].includes(relativeParts[1])) {
+    sourceRelativeParts = relativeParts;
+  } else if (
+    ["runs", path.basename(media.source_root)].includes(relativeParts[0])
+    && relativeParts[1] === workspace
+    && ["output", "outputs"].includes(relativeParts[2])
+  ) {
+    sourceRelativeParts = relativeParts.slice(1);
+  } else {
+    return false;
+  }
+  return path.resolve(media.source_root, ...sourceRelativeParts) === media.source_path
     && containedPath(path.join(runRoot, "evidence"), record.path);
 }
 
@@ -614,7 +633,7 @@ function developmentReviewV3Evidence(records, media) {
       const verdict = boundedString(artifact?.requirements?.FINAL_ACCEPTANCE);
       const explicitHumanVerdict = boundedString(artifact?.evidence?.human_playback_finding?.verdict);
       if (
-        runRelativeArtifactBinding(record, media, artifact)
+        runArtifactBinding(record, media, artifact)
         && COMPOSITION_HUMAN_VERDICTS.has(verdict)
       ) matches.push({
         record,
@@ -632,6 +651,27 @@ function developmentReviewV3Evidence(records, media) {
     metadata: { generation_type: "deterministic_composition", status: verdict },
     evidence_refs: [relativeLocation(media.source_root, record.path).relative_path],
     human_verdict: humanVerdict,
+  };
+}
+
+function developmentReviewV4Evidence(records, media) {
+  const matches = records.filter((record) => {
+    const value = record?.value;
+    return path.basename(record?.path || "") === "gate.json"
+      && path.basename(path.dirname(record.path)) === "review-v4"
+      && runArtifactBinding(record, media, value?.artifact)
+      && value?.requirements?.FINAL_ACCEPTANCE === "NOT_EVALUATED"
+      && value?.review_candidate_gate === "PASS"
+      && value?.acceptance_boundary === REVIEW_V4_ACCEPTANCE_BOUNDARY;
+  });
+  if (matches.length !== 1) {
+    return matches.length > 1 ? { status: "bound", metadata: {}, association_ambiguity: true } : null;
+  }
+  return {
+    status: "bound",
+    metadata: { generation_type: "deterministic_composition", status: "NOT_EVALUATED" },
+    evidence_refs: [relativeLocation(media.source_root, matches[0].path).relative_path],
+    technical_gate: "PASS",
   };
 }
 

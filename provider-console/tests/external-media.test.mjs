@@ -433,6 +433,80 @@ test("run_outputs source includes singular Seedance output with exact review-v3 
   assert.equal(groupMatchesEvidenceFilter(conflictingVoiced, "linked"), false);
 });
 
+test("run_outputs source binds the latest Seedance review-v4 technical candidate without inventing final acceptance", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-seedance-review-v4-"));
+  const workspace = "seedance-mini-r2v-epic-skyship-20260829-002";
+  const runRoot = path.join(root, workspace);
+  const outputRoot = path.join(runRoot, "output");
+  const evidenceRoot = path.join(runRoot, "evidence", "review-v4");
+  await Promise.all([
+    mkdir(outputRoot, { recursive: true }),
+    mkdir(evidenceRoot, { recursive: true }),
+  ]);
+  const videoBytes = Buffer.from("exact Seedance review-v4 composition bytes");
+  const videoPath = path.join(outputRoot, "consistent-voice-bgm-v4.mp4");
+  const gatePath = path.join(evidenceRoot, "gate.json");
+  const gateValue = {
+    artifact: {
+      path: `runs/${workspace}/output/consistent-voice-bgm-v4.mp4`,
+      sha256: sha256(videoBytes),
+      bytes: videoBytes.length,
+    },
+    requirements: { FINAL_ACCEPTANCE: "NOT_EVALUATED" },
+    review_candidate_gate: "PASS",
+    acceptance_boundary: "Technical review candidate only; not Production activation, P6, or Final Acceptance. Human playback remains required for timbre, audibility, mix, and final acceptance.",
+  };
+  await Promise.all([
+    writeFile(videoPath, videoBytes),
+    writeFile(gatePath, JSON.stringify(gateValue)),
+  ]);
+
+  const catalog = await catalogExternalMedia({
+    sources: [{ id: "runs-outputs", label: "AI-VIDEO Runs Outputs", kind: "development_artifact", root, layout: "run_outputs" }],
+  });
+  const group = catalog.groups[0];
+  assert.equal(group.preview.relative_path, `${workspace}/output/consistent-voice-bgm-v4.mp4`);
+  assert.equal(group.metadata_status, "bound");
+  assert.equal(group.generation_type, "deterministic_composition");
+  assert.equal(group.reported_status, "NOT_EVALUATED");
+  assert.equal(group.technical_gate, "PASS");
+  assert.equal(group.human_verdict, null);
+  assert.equal(group.evidence_classification, "non_canonical");
+  assert.equal(group.lifecycle_status, "NOT_EVALUATED");
+  assert.equal(groupMatchesEvidenceFilter(group, "linked"), true);
+
+  for (const invalid of [
+    { ...gateValue, requirements: { FINAL_ACCEPTANCE: "PASS" } },
+    { ...gateValue, acceptance_boundary: "Production Final Acceptance" },
+    { ...gateValue, artifact: { ...gateValue.artifact, sha256: "0".repeat(64) } },
+    { ...gateValue, artifact: { ...gateValue.artifact, bytes: videoBytes.length + 1 } },
+    { ...gateValue, artifact: { ...gateValue.artifact, path: `runs/${workspace}/output/../output/consistent-voice-bgm-v4.mp4` } },
+  ]) {
+    await writeFile(gatePath, JSON.stringify(invalid));
+    const invalidCatalog = await catalogExternalMedia({
+      sources: [{ id: "runs-outputs", label: "AI-VIDEO Runs Outputs", kind: "development_artifact", root, layout: "run_outputs" }],
+    });
+    assert.equal(groupMatchesEvidenceFilter(invalidCatalog.groups[0], "linked"), false);
+  }
+
+  await writeFile(gatePath, JSON.stringify(gateValue));
+  const reviewV3Root = path.join(runRoot, "evidence", "review-v3");
+  await mkdir(reviewV3Root, { recursive: true });
+  await writeFile(path.join(reviewV3Root, "gate.json"), JSON.stringify({
+    gate: "REVIEW_V3_CAPTION_AUDIO_CONTRACT",
+    publication: { candidate_activation: false, p6: false, final_acceptance: false },
+    no_caption: {
+      ...gateValue.artifact,
+      requirements: { FINAL_ACCEPTANCE: "NOT_EVALUATED" },
+    },
+  }));
+  const conflictingCatalog = await catalogExternalMedia({
+    sources: [{ id: "runs-outputs", label: "AI-VIDEO Runs Outputs", kind: "development_artifact", root, layout: "run_outputs" }],
+  });
+  assert.equal(conflictingCatalog.groups[0].association_ambiguity, true);
+  assert.equal(groupMatchesEvidenceFilter(conflictingCatalog.groups[0], "linked"), false);
+});
+
 test("unknown external source layout fails closed", async () => {
   const paths = await fixture();
   await writeFile(path.join(paths.artifacts, "must-not-scan.mp4"), "bytes");
