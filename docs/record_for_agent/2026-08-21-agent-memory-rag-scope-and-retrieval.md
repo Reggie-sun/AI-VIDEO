@@ -290,6 +290,68 @@ checks 全部为 true。Native `reviewer_xhigh` 初审发现 `incident`、explic
 无 blocking issue 或 concern。该 commit 仅存在于 local `main`，未 push 或 release；本次
 routing-rule change 没有运行新的 RAG query、Provider、媒体或网络操作。
 
+## 2026-08-30 Temporal Validity Session Audit And Proposed Policy
+
+本节记录一次 read-only recent-session audit 形成的 architecture decision；它不是已实现的
+retrieval policy。审计抽查了 2026-08-27 至 2026-08-30 local session records 中的真实
+Agent Memory execution，覆盖 tagged stale last-good、fresh hits、execution failure 与 strict
+identity failure。Shell-level execution 可能包含多个 query，因此本节不把 invocation 数量
+或比例当作长期 service-level metric。
+
+代表性调用证明 `index_freshness` 只能说明 query 时的 derived index 是否映射 current corpus
+bytes，不能说明每个 retrieved claim 仍是 current truth：
+
+- 历史 T8 `Ref2VA` technical-smoke records 对 capability archaeology、model/output 定位与
+  reproduction 很有价值；current code、profile、model SHA-256、MP4 与 tests 复核后仍必须
+  限定为 technical smoke，不能升级为已验证 `reference_video` input、P6 或 Final Acceptance。
+- 旧 P4 audio/mixing record 能正确指向 `ResolvedTimeline -> HyperFrames` canonical owner；
+  但 current exact composition、测量与 human playback 可以取代旧 deliverable/quality verdict，
+  同时保留原 architecture 和 failure mechanism 的历史价值。
+- 一个 query-time fresh Provider Console hit 之后仍可能因新 artifact/evidence 落盘立即不再
+  描述 latest/current projection；`fresh` 不是对 volatile runtime claim 的 lease。
+- Retrieval unavailable、answerability abstention `[]`、stale last-good 与 fresh hits 是四种
+  不同结果。Failure 不得被解释为“没有历史”，stale 或 historical hit 也不得静默提升为
+  current answer。
+
+因此 temporal handling 必须保留三个正交维度，而不是用日期或一个总分替代：
+
+1. `index_freshness`：derived index 相对 corpus bytes 的 mechanical state。
+2. `authority`：current contract、runtime baseline、roadmap、advisory experience、historical
+   plan、research、deferred decision 或 run summary 的证据权限。
+3. `claim_validity`：claim 对其 exact scope 是 `active`、`superseded`、`historical`、`pending`
+   还是 `unknown`，并绑定 `observed_at`、适用时的 `valid_from` / `valid_until`、
+   `superseded_by` 与 source/artifact identity。
+
+Proposed answer policy：
+
+- 默认 `current` intent 只允许 authority-compatible 且 claim-valid 的 evidence 支撑 current
+  conclusion。Fresh index hit 仍须按 claim 类型回源；stale index hit 先进入单独的
+  `verification_hint` lane，只有 exact source/current owner 重新验证其 claim bytes 与 scope
+  仍有效后才能晋升为 current candidate。是否同时进入 `historical_context` 只由
+  `claim_validity` 决定；`superseded`、`historical` 与 `unknown` item 不得仅因相关度高而
+  占用或回填 current-answer candidates。
+- 显式 `historical` intent 保留旧事件、失败模式、当时的 contract 与决策理由；必须显示
+  event/observation time、authority、claim validity 与 supersession link。
+- `evolution` intent 同时检索 current owner 与历史链，并显式呈现 replacement，不让 RRF、
+  dense/BM25 score 或文档日期解决 authority conflict。
+- 不采用 blanket recency decay，也不自动删除旧记录。旧 contract 可能仍有效，新 plan 也可能
+  尚未获准；temporal validity 必须按 claim、scope 与 canonical owner 判断。
+- 对 current runtime、latest artifact、active pointer、availability、credential/access、
+  Provider capability 和 human quality/acceptance 等 volatile claim，RAG 只能提供 provenance
+  或调查入口；最终必须 reopen current code/docs/artifact，执行适用 runtime probe，或明确
+  abstain。
+
+Current implementation 尚未实现上述 `claim_validity` / intent lanes。普通 Markdown 的
+`date` / `status` 目前只是 metadata，最终排序只看 retrieval relevance；project CLI 仍允许
+tagged stale last-good 进入 normal Top-K。Run summaries 只有同 family highest `-vN` 的窄化，
+也不等于通用 semantic supersession。
+
+本次真实 project RAG preflight 以 strict failure 结束：`index library version mismatch; rebuild
+required`。按 retrieval Skill contract，本轮没有 foreground rebuild、validation weakening、
+fake embedding 或 retry；上述 decision 来自 current code/tests/contracts 与 sanitized session
+audit。没有修改 retrieval implementation、derived index 或 Product Runtime，也没有 Provider、
+媒体、网络、activation、quality acceptance、push 或 release 操作。
+
 ## Guardrails
 
 - `experience` 记录是 advisory experience，不等于 code/runtime truth。
