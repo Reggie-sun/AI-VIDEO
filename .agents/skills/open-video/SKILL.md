@@ -41,22 +41,28 @@ duration; did the user supply reference image(s) / video / audio; desired aspect
 the request is ambiguous *and* the target is a film >30s, ask ONE focused question (subject +
 mood + length). Do not generate a long film on guesswork.
 
-**Promptless long-form boundary.** Set `user_creative_brief_supplied=false` when the user supplies only duration,
+**Promptless Director strategy boundary.** Set `user_creative_brief_supplied=false` when the user supplies only duration,
 Provider/model, output settings, or an instruction to generate automatically, without a concept,
-script, reference-led story, approved Shot, or ordered coverage. If the target duration exceeds the
-fixed `15s` creative coverage threshold, classify it as `PROMPTLESS_LONG_FORM`. The Director
-validator does not accept or prove Provider duration capability; downstream capability/profile
-owners still validate exact technical limits. A Provider's ability to generate one technical `30s`
-output does not waive Director coverage. Do not turn the missing brief into a default slow tracking
-shot, a repeated action, or one uninterrupted extension. Shorter promptless requests still require
-`director_skill=open-video`, but may validate with one coverage unit.
+script, reference-led story, approved Shot, or ordered coverage. Every promptless request requires
+`director_skill=open-video`. The Agent must select exactly one `coverage_strategy`: `single_take`
+or `multi_shot`. Duration is a pacing and feasibility input, not a creative branch: a rich `30s`
+single take and a tightly cut `10s` multi-shot plan are both valid when the Director rationale and
+coverage agree.
 
-Before crafting any Shot or Provider prompt for `PROMPTLESS_LONG_FORM`, create Director Coverage
+Choose the strategy from the ordered narrative beats, whether action/space/time changes need a
+viewpoint reset, whether one camera/blocking trajectory can carry every visible change, pacing and
+information reveal, identity/continuity risk, and any explicit user single-take/cut preference.
+These considerations are not a fixed score or duration formula. Provider capability is validated
+downstream and cannot silently choose or rewrite the creative strategy; an infeasible selected
+strategy must return to Director planning.
+
+Before crafting any Shot or Provider prompt for a `PROMPTLESS_REQUEST`, create schema v2 Director Coverage
 Evidence with:
 
 - request facts: `user_creative_brief_supplied` plus direct user-input evidence when true,
-  `target_duration_seconds`, `explicit_single_take_requested` plus direct user-request evidence
-  when true, and
+  `target_duration_seconds`, `coverage_strategy`, `strategy_source`, a non-empty
+  `director_decision_rationale`, `strategy_request_evidence` when the strategy was directly
+  requested by the user, and
   `director_skill=open-video`;
 - ordered `coverage_units`, each with `unit_id`, `duration_seconds`, finite `beat_function`,
   `objective`, `open_state`, `close_state`, finite `shot_scale`, finite `camera_treatment`,
@@ -72,10 +78,12 @@ python .agents/skills/open-video/scripts/validate_director_coverage.py <coverage
 ```
 
 `VIDEO_EXTEND`, FLF2V, a terminal-frame handoff, `no cut`, and `uninterrupted` are continuity or
-execution treatments, not Director coverage. They cannot be the automatic fallback for a
-promptless request. Only an explicit user request for a single take may set
-`explicit_single_take_requested=true`; even then, plan multiple evolving internal coverage units.
-Do not infer single-take intent from “continuous”, “smooth”, duration alone, or missing prompt.
+execution treatments, not the Director decision. They are valid only when the selected strategy is
+`single_take`; if that strategy has multiple evolving internal coverage units, every non-final
+transition must remain continuous. `multi_shot` requires at least two ordered units and cut-class
+non-final transitions. `strategy_source=user_requested` requires direct user evidence;
+`strategy_source=agent_directed` requires no invented user evidence. Never infer the strategy from
+duration alone or from missing prompt.
 
 **Step 2 — Pick the mode.** Mode is auto-derived from inputs (see `backends/h3/backend.py` and
 `scripts/validate_prompt.py` `detect_mode`):

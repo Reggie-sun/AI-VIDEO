@@ -76,6 +76,7 @@ def test_skill_discovery_includes_promptless_duration_only_requests() -> None:
 def _unit(
     unit_id: str,
     *,
+    duration_seconds: float = 15,
     beat_function: str,
     objective: str,
     open_state: str,
@@ -88,7 +89,7 @@ def _unit(
 ) -> dict[str, object]:
     return {
         "unit_id": unit_id,
-        "duration_seconds": 15,
+        "duration_seconds": duration_seconds,
         "beat_function": beat_function,
         "objective": objective,
         "open_state": open_state,
@@ -101,17 +102,29 @@ def _unit(
     }
 
 
-def _payload(*, explicit_single_take_requested: bool = False) -> dict[str, object]:
+def _payload(
+    *,
+    coverage_strategy: str = "multi_shot",
+    strategy_source: str = "agent_directed",
+    target_duration_seconds: float = 30,
+) -> dict[str, object]:
+    unit_duration = target_duration_seconds / 2
     return {
-        "schema_version": "1",
+        "schema_version": "2",
         "request": {
             "user_creative_brief_supplied": False,
             "user_creative_brief_evidence": None,
-            "target_duration_seconds": 30,
-            "explicit_single_take_requested": explicit_single_take_requested,
-            "single_take_request_evidence": (
-                "User explicitly requested one uninterrupted take."
-                if explicit_single_take_requested
+            "target_duration_seconds": target_duration_seconds,
+            "coverage_strategy": coverage_strategy,
+            "strategy_source": strategy_source,
+            "director_decision_rationale": (
+                "The ordered beats need a viewpoint reset."
+                if coverage_strategy == "multi_shot"
+                else "One continuous camera trajectory can carry both evolving beats."
+            ),
+            "strategy_request_evidence": (
+                "User explicitly requested this coverage strategy."
+                if strategy_source == "user_requested"
                 else None
             ),
             "director_skill": "open-video",
@@ -119,6 +132,7 @@ def _payload(*, explicit_single_take_requested: bool = False) -> dict[str, objec
         "coverage_units": [
             _unit(
                 "shot-01",
+                duration_seconds=unit_duration,
                 beat_function="establish",
                 objective="Establish the vessel's danger and scale.",
                 open_state="The vessel is trapped below the storm shelf.",
@@ -127,10 +141,15 @@ def _payload(*, explicit_single_take_requested: bool = False) -> dict[str, objec
                 camera_treatment="tracking",
                 camera_intent="Fast lateral tracking reveals the blocked pass.",
                 visible_change="The route closes as the storm front descends.",
-                transition_out="match_cut",
+                transition_out=(
+                    "video_extend"
+                    if coverage_strategy == "single_take"
+                    else "match_cut"
+                ),
             ),
             _unit(
                 "shot-02",
+                duration_seconds=unit_duration,
                 beat_function="reveal",
                 objective="Reveal the escape decision and destination.",
                 open_state="The vessel turns away from the blocked pass.",
@@ -145,80 +164,165 @@ def _payload(*, explicit_single_take_requested: bool = False) -> dict[str, objec
     }
 
 
-def test_promptless_30s_requires_distinct_director_coverage() -> None:
+def _single_unit_payload(*, target_duration_seconds: float = 30) -> dict[str, object]:
+    payload = _payload(
+        coverage_strategy="single_take",
+        target_duration_seconds=target_duration_seconds,
+    )
+    unit = payload["coverage_units"][0]
+    unit["duration_seconds"] = target_duration_seconds
+    unit["transition_out"] = "end"
+    payload["coverage_units"] = [unit]
+    payload["request"]["director_decision_rationale"] = (
+        "A single uninterrupted reveal has one coherent spatial and action trajectory."
+    )
+    return payload
+
+
+def test_promptless_30s_agent_can_choose_multi_shot() -> None:
     validator = _load_validator()
 
     result = validator.validate_director_coverage(_payload())
 
     assert result == {
         "status": "passed",
-        "schema_version": "1",
+        "schema_version": "2",
         "promptless_request": True,
-        "promptless_long_form": True,
+        "coverage_strategy": "multi_shot",
+        "strategy_source": "agent_directed",
         "coverage_unit_count": 2,
         "planned_duration_seconds": 30.0,
-        "explicit_single_take_requested": False,
     }
 
 
 @pytest.mark.parametrize("transition", ["VIDEO_EXTEND", "no cut", "uninterrupted"])
-def test_promptless_30s_rejects_continuous_treatment_as_coverage(
+def test_multi_shot_rejects_continuous_treatment_as_a_cut(
     transition: str,
 ) -> None:
     validator = _load_validator()
     payload = _payload()
     payload["coverage_units"][0]["transition_out"] = transition
 
-    with pytest.raises(validator.CoverageValidationError, match="VIDEO_EXTEND"):
+    with pytest.raises(validator.CoverageValidationError, match="multi_shot"):
         validator.validate_director_coverage(payload)
 
 
-def test_seedance_2_5_native_30s_does_not_waive_director_coverage() -> None:
+def test_seedance_2_5_native_30s_does_not_choose_coverage_strategy() -> None:
     validator = _load_validator()
 
     assert _seedance_max_duration("doubao-seedance-2-5-260628") == 30
-    payload = _payload()
+    multi_shot = validator.validate_director_coverage(_payload())
+    single_take = validator.validate_director_coverage(_single_unit_payload())
 
-    result = validator.validate_director_coverage(payload)
+    assert multi_shot["coverage_strategy"] == "multi_shot"
+    assert single_take["coverage_strategy"] == "single_take"
 
-    assert result["promptless_request"] is True
-    assert result["promptless_long_form"] is True
 
-    payload["coverage_units"][0]["transition_out"] = "VIDEO_EXTEND"
-    with pytest.raises(validator.CoverageValidationError, match="VIDEO_EXTEND"):
-        validator.validate_director_coverage(payload)
+def test_promptless_30s_agent_can_choose_one_coverage_unit_single_take() -> None:
+    validator = _load_validator()
+
+    result = validator.validate_director_coverage(_single_unit_payload())
+
+    assert result["coverage_strategy"] == "single_take"
+    assert result["coverage_unit_count"] == 1
+    assert result["planned_duration_seconds"] == 30.0
+
+
+def test_promptless_10s_agent_can_choose_multi_shot() -> None:
+    validator = _load_validator()
+
+    result = validator.validate_director_coverage(
+        _payload(target_duration_seconds=10)
+    )
+
+    assert result["coverage_strategy"] == "multi_shot"
+    assert result["coverage_unit_count"] == 2
+    assert result["planned_duration_seconds"] == 10.0
 
 
 def test_short_promptless_request_still_requires_open_video() -> None:
     validator = _load_validator()
-    payload = _payload()
-    payload["request"]["target_duration_seconds"] = 15
-    payload["coverage_units"] = [payload["coverage_units"][0]]
+    payload = _single_unit_payload(target_duration_seconds=10)
     payload["request"]["director_skill"] = "seedance-authoring"
 
     with pytest.raises(validator.CoverageValidationError, match="PROMPTLESS_REQUEST"):
         validator.validate_director_coverage(payload)
 
 
-def test_explicit_user_single_take_keeps_evolving_internal_coverage() -> None:
+def test_single_take_can_keep_evolving_internal_coverage() -> None:
     validator = _load_validator()
-    payload = _payload(explicit_single_take_requested=True)
-    payload["coverage_units"][0]["transition_out"] = "VIDEO_EXTEND"
+    payload = _payload(coverage_strategy="single_take")
 
     result = validator.validate_director_coverage(payload)
 
     assert result["status"] == "passed"
-    assert result["explicit_single_take_requested"] is True
+    assert result["coverage_strategy"] == "single_take"
 
 
-def test_single_take_flag_requires_direct_user_request_evidence() -> None:
+def test_single_take_can_keep_one_camera_language_across_internal_beats() -> None:
     validator = _load_validator()
-    payload = _payload(explicit_single_take_requested=True)
-    payload["request"]["single_take_request_evidence"] = None
+    payload = _payload(coverage_strategy="single_take")
+    payload["coverage_units"][1]["beat_function"] = "establish"
+    payload["coverage_units"][1]["shot_scale"] = "extreme_wide"
+    payload["coverage_units"][1]["camera_treatment"] = "tracking"
+
+    result = validator.validate_director_coverage(payload)
+
+    assert result["coverage_strategy"] == "single_take"
+    assert result["coverage_unit_count"] == 2
+
+
+def test_user_requested_strategy_requires_direct_request_evidence() -> None:
+    validator = _load_validator()
+    payload = _payload(strategy_source="user_requested")
+    payload["request"]["strategy_request_evidence"] = None
 
     with pytest.raises(
-        validator.CoverageValidationError, match="single_take_request_evidence"
+        validator.CoverageValidationError, match="strategy_request_evidence"
     ):
+        validator.validate_director_coverage(payload)
+
+
+def test_agent_directed_strategy_rejects_user_request_evidence() -> None:
+    validator = _load_validator()
+    payload = _payload()
+    payload["request"]["strategy_request_evidence"] = "Invented user preference."
+
+    with pytest.raises(
+        validator.CoverageValidationError, match="agent_directed"
+    ):
+        validator.validate_director_coverage(payload)
+
+
+def test_director_decision_requires_a_rationale() -> None:
+    validator = _load_validator()
+    payload = _payload()
+    payload["request"]["director_decision_rationale"] = ""
+
+    with pytest.raises(
+        validator.CoverageValidationError, match="director_decision_rationale"
+    ):
+        validator.validate_director_coverage(payload)
+
+
+def test_unknown_coverage_strategy_fails_closed() -> None:
+    validator = _load_validator()
+    payload = _payload()
+    payload["request"]["coverage_strategy"] = "decide from duration"
+
+    with pytest.raises(validator.CoverageValidationError, match="coverage_strategy"):
+        validator.validate_director_coverage(payload)
+
+
+def test_multi_shot_requires_multiple_units_regardless_of_duration() -> None:
+    validator = _load_validator()
+    payload = _payload()
+    unit = payload["coverage_units"][0]
+    unit["duration_seconds"] = 30
+    unit["transition_out"] = "end"
+    payload["coverage_units"] = [unit]
+
+    with pytest.raises(validator.CoverageValidationError, match="at least two"):
         validator.validate_director_coverage(payload)
 
 
@@ -302,11 +406,21 @@ def test_transition_end_is_reserved_for_the_final_coverage_unit() -> None:
         validator.validate_director_coverage(payload)
 
 
-def test_explicit_single_take_rejects_a_cut_between_units() -> None:
+def test_single_take_rejects_a_cut_between_units() -> None:
     validator = _load_validator()
-    payload = _payload(explicit_single_take_requested=True)
+    payload = _payload(coverage_strategy="single_take")
+    payload["coverage_units"][0]["transition_out"] = "cut"
 
     with pytest.raises(
         validator.CoverageValidationError, match="continuous non-final transitions"
     ):
+        validator.validate_director_coverage(payload)
+
+
+def test_schema_v1_fixed_duration_contract_is_retired() -> None:
+    validator = _load_validator()
+    payload = _payload()
+    payload["schema_version"] = "1"
+
+    with pytest.raises(validator.CoverageValidationError, match="schema_version"):
         validator.validate_director_coverage(payload)

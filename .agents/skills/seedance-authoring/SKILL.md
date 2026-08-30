@@ -27,11 +27,13 @@ prompt/reference 专家，不是 Seedance workflow、router、Provider adapter �
 
 只提供时长、Seedance model/profile 或输出规格，但没有 concept、approved Shot 或 ordered
 coverage 的请求不是可消费的 Shot，必须先作为 `PROMPTLESS_REQUEST` route 到 `open-video`。
-若目标时长超过固定 `15s` creative coverage threshold，按 `PROMPTLESS_LONG_FORM` 通过 Director
-Coverage validator；Seedance 2.5 技术性支持单次 `30s` 不能跳过该 creative Gate。Director validator
-不证明 Provider duration/mode capability；这些 exact facts 仍由 current selected profile owner 校验。
+Agent 必须在 Director 层根据 narrative beats、action/space progression、camera/blocking trajectory、
+pacing 与 continuity 风险选择 `coverage_strategy=single_take|multi_shot`，不得按时长阈值选择。
+Seedance 2.5 技术性支持单次 `30s` 既不自动证明应当 single-take，也不强制 multi-shot；它只影响
+downstream feasibility。Director validator 不证明 Provider duration/mode capability；这些 exact facts
+仍由 current selected profile owner 校验，若 selected strategy 不可执行则返回 Director 重新判断。
 MUST NOT 为填补空 brief 自动起草 `one uninterrupted shot`、重复慢运镜、`no cut` 或
-`VIDEO_EXTEND` prompt；这些 expression 只能来自已经批准的 coverage 与明确 continuity intent。
+`VIDEO_EXTEND` prompt；这些 expression 只能来自已经批准的 `single_take` coverage 与明确 continuity intent。
 
 不得猜测 version、mode、surface、asset identity 或 reference job。输入为 unknown, future,
 mixed, or stale 时必须 fail closed，并报告缺失的 deterministic selection。

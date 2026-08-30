@@ -34,31 +34,41 @@ Use the minimum matching Skill set. Installation、description matching 或“�
    - relevant Skill lint/preflight 结果，或该 Skill 没有 executable lint surface 的明确说明。
 4. 若 mandatory preflight 或上述 evidence 不完整，Agent MUST fail closed，不得进入付费 preview、mint/consume submit permit 或执行 Provider POST。
 
-#### Promptless Long-Form Director Gate
+#### Promptless Director Strategy Gate
 
 `PROMPTLESS_REQUEST` 指用户只给出时长、Provider/model、输出规格或“自动生成”等执行约束，
 但没有提供 concept、script、reference-led story、approved Shot 或 ordered coverage。所有这类请求
-都必须先进入 `open-video`；其中目标时长超过固定 `15s` creative coverage threshold 时，进一步分类为
-`PROMPTLESS_LONG_FORM`。Director validator 不接收或自证 Provider capability；exact duration/mode
-支持仍由 current capability/profile owner 在 downstream handoff 独立 fail closed，技术上需要多次
-submit 也不会反向改变 creative classification。Provider 能在一次调用中支持 `30s` 同样不得放宽
-creative threshold。请求不是 approved Shot，也不得由 Agent 以一个默认慢运镜扩展到目标时长。
+都必须先进入 `open-video`。Agent 必须为请求明确选择 `coverage_strategy=single_take|multi_shot`，
+不得用时长阈值、Provider 单次时长上限或缺失 prompt 自动替代 Director 判断。`30s` 可以是具有完整
+动作与空间轨迹的 single take，`10s` 也可以因多个叙事 beat 而需要 multi-shot；target duration 只参与
+pacing 与 downstream feasibility，不直接决定 strategy。
+
+Agent 的判断必须综合叙事 beat 的数量与顺序、动作/空间/时间变化是否需要 viewpoint reset、单一 camera
+与 blocking trajectory 能否连贯承载全部变化、信息 reveal 与 pacing、identity/continuity 风险，以及用户
+明确表达的 single-take/cut 偏好。该列表用于约束有证据的导演判断，不是新的固定打分公式。Director
+validator 不接收或自证 Provider capability；exact duration/mode 支持仍由 current capability/profile
+owner 在 downstream handoff 独立 fail closed。若已选 strategy 技术上不可执行，必须返回 Director
+重新判断，不得由 Provider adapter 静默改写 creative strategy。
 
 在首次编写 Shot Contract、Provider prompt 或 execution script 之前，Agent MUST：
 
-1. 读取 `open-video`，产出 `Director Coverage Evidence`，至少包含 `user_creative_brief_supplied`、目标时长、
-   ordered coverage units，以及每个 unit 的 duration、beat function、objective、open/close state、
-   shot scale、camera treatment、camera intent、visible change 和 transition；current selected profile
-   的 single-Shot limit 只作为 downstream runtime handoff，由 capability owner 重新验证；
+1. 读取 `open-video`，产出 schema v2 `Director Coverage Evidence`，至少包含
+   `user_creative_brief_supplied`、目标时长、`coverage_strategy`、`strategy_source`、
+   `director_decision_rationale`、适用时的直接 user-request evidence、ordered coverage units，以及每个
+   unit 的 duration、beat function、objective、open/close state、shot scale、camera treatment、camera
+   intent、visible change 和 transition；current selected profile 的 single-Shot limit 只作为 downstream
+   runtime handoff，由 capability owner 重新验证；
 2. 使用 `.agents/skills/open-video/scripts/validate_director_coverage.py` 验证该 evidence，并在
    commentary 中报告结果；validator 没有通过时 fail closed；
 3. 只有验证通过的 coverage 才能翻译成 approved AI-VIDEO Character / Scene / Shot artifacts，随后按
    concern 顺序进入 continuity Skill 与 Provider-specific authoring Skill。
 
 Agent MUST NOT 把 `VIDEO_EXTEND`、FLF2V、尾帧 handoff、`no cut`、`uninterrupted` 或重复同一
-camera/action sentence 当作 Director coverage；这些只是 execution/continuity treatment。只有用户明确
-要求一镜到底时才可设置 `explicit_single_take_requested=true`，并且仍需多个具有不同 objective 与
-visible change 的 ordered coverage units。该 flag 不得从“连贯”“流畅”“30s”或缺失 prompt 推断。
+camera/action sentence 当作 Director 判断本身；这些只是已选择 `single_take` 后可用的
+execution/continuity treatment。`multi_shot` 必须包含至少两个 ordered coverage units，并使用真实 cut
+类 transition；`single_take` 可以由用户指定，也可以由 Agent 根据内容选择，多个 internal units 之间
+必须保持 continuous transition。无论选择哪种 strategy，都必须提供非空 `director_decision_rationale`；
+`strategy_source=user_requested` 还必须绑定直接 user evidence，`agent_directed` 不得伪造该 evidence。
 
 该 gate 是 Agent authoring/process prerequisite，不是 Production runtime contract。Run script、Provider adapter、Manifest、receipt、timeline 与 renderer MUST NOT import、联网调用或依赖 Creative Skill；`runtime_skill_calls = 0` 是正确边界，不能被解释为 Agent authoring 阶段可以跳过 Skill。若 task 只涉及 production state、asset identity、schema、dependency、timeline consumption、render execution、activation、recovery 或 Provider lifecycle，且不创作或修改 creative intent/prompt，则不触发本 preflight；Agent 应明确说明该判定，不能把它用于规避真实 creative work。
 

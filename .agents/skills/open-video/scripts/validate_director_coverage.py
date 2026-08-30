@@ -12,14 +12,15 @@ import sys
 from typing import Any, Mapping, Sequence
 
 
-SCHEMA_VERSION = "1"
-PROMPTLESS_LONG_FORM_THRESHOLD_SECONDS = 15.0
+SCHEMA_VERSION = "2"
 REQUEST_FIELDS = {
     "user_creative_brief_supplied",
     "user_creative_brief_evidence",
     "target_duration_seconds",
-    "explicit_single_take_requested",
-    "single_take_request_evidence",
+    "coverage_strategy",
+    "strategy_source",
+    "director_decision_rationale",
+    "strategy_request_evidence",
     "director_skill",
 }
 COVERAGE_FIELDS = {
@@ -41,6 +42,8 @@ CONTINUOUS_ONLY_TRANSITIONS = {
     "uninterrupted",
     "video_extend",
 }
+COVERAGE_STRATEGIES = {"multi_shot", "single_take"}
+STRATEGY_SOURCES = {"agent_directed", "user_requested"}
 BEAT_FUNCTIONS = {
     "decision",
     "detail",
@@ -91,7 +94,7 @@ TRANSITIONS = {
 
 
 class CoverageValidationError(ValueError):
-    """Raised when promptless long-form coverage is incomplete or misleading."""
+    """Raised when Director coverage evidence is incomplete or inconsistent."""
 
 
 def _mapping(value: Any, label: str) -> Mapping[str, Any]:
@@ -170,20 +173,30 @@ def validate_director_coverage(payload: Mapping[str, Any]) -> dict[str, Any]:
     target_duration = _number(
         request["target_duration_seconds"], "request.target_duration_seconds"
     )
-    explicit_single_take = _boolean(
-        request["explicit_single_take_requested"],
-        "request.explicit_single_take_requested",
+    coverage_strategy = _enum(
+        request["coverage_strategy"],
+        COVERAGE_STRATEGIES,
+        "request.coverage_strategy",
     )
-    single_take_evidence = request["single_take_request_evidence"]
-    if explicit_single_take:
+    strategy_source = _enum(
+        request["strategy_source"],
+        STRATEGY_SOURCES,
+        "request.strategy_source",
+    )
+    _text(
+        request["director_decision_rationale"],
+        "request.director_decision_rationale",
+    )
+    strategy_request_evidence = request["strategy_request_evidence"]
+    if strategy_source == "user_requested":
         _text(
-            single_take_evidence,
-            "request.single_take_request_evidence",
+            strategy_request_evidence,
+            "request.strategy_request_evidence",
         )
-    elif single_take_evidence is not None:
+    elif strategy_request_evidence is not None:
         raise CoverageValidationError(
-            "request.single_take_request_evidence must be null when single-take "
-            "was not explicitly requested"
+            "request.strategy_request_evidence must be null when strategy_source "
+            "is 'agent_directed'"
         )
     director_skill = _text(request["director_skill"], "request.director_skill")
 
@@ -230,45 +243,44 @@ def validate_director_coverage(payload: Mapping[str, Any]) -> dict[str, Any]:
         raise CoverageValidationError(
             "PROMPTLESS_REQUEST requires director_skill='open-video'"
         )
-    promptless_long_form = (
-        promptless_request
-        and target_duration > PROMPTLESS_LONG_FORM_THRESHOLD_SECONDS
-    )
-    if promptless_long_form:
-        if len(units) < 2:
-            raise CoverageValidationError(
-                "PROMPTLESS_LONG_FORM requires at least two ordered coverage units"
-            )
+    if coverage_strategy == "multi_shot" and len(units) < 2:
+        raise CoverageValidationError(
+            "coverage_strategy='multi_shot' requires at least two ordered coverage units"
+        )
 
+    if len(units) > 1:
         for field in ("objective", "visible_change"):
             normalized = [_normalized(unit[field]) for unit in units]
             if len(normalized) != len(set(normalized)):
                 raise CoverageValidationError(
-                    f"PROMPTLESS_LONG_FORM requires distinct {field} values"
+                    f"multiple coverage units require distinct {field} values"
                 )
-        for field in ("beat_function", "shot_scale", "camera_treatment"):
-            normalized = [_normalized(unit[field]) for unit in units]
-            if any(left == right for left, right in zip(normalized, normalized[1:])):
-                raise CoverageValidationError(
-                    f"PROMPTLESS_LONG_FORM requires adjacent {field} values to differ"
-                )
+        if coverage_strategy == "multi_shot":
+            for field in ("beat_function", "shot_scale", "camera_treatment"):
+                normalized = [_normalized(unit[field]) for unit in units]
+                if any(
+                    left == right for left, right in zip(normalized, normalized[1:])
+                ):
+                    raise CoverageValidationError(
+                        f"adjacent multi-shot units require different {field} values"
+                    )
 
         nonfinal_transitions = [
             _normalized(unit["transition_out"]) for unit in units[:-1]
         ]
-        if explicit_single_take and not all(
+        if coverage_strategy == "single_take" and not all(
             transition in CONTINUOUS_ONLY_TRANSITIONS
             for transition in nonfinal_transitions
         ):
             raise CoverageValidationError(
-                "explicit single-take coverage requires continuous non-final transitions"
+                "coverage_strategy='single_take' requires continuous non-final transitions"
             )
-        if not explicit_single_take and set(nonfinal_transitions).intersection(
+        if coverage_strategy == "multi_shot" and set(nonfinal_transitions).intersection(
             CONTINUOUS_ONLY_TRANSITIONS
         ):
             raise CoverageValidationError(
-                "VIDEO_EXTEND/no-cut continuity cannot replace Director coverage unless "
-                "the user explicitly requested a single take"
+                "coverage_strategy='multi_shot' cannot use VIDEO_EXTEND/no-cut "
+                "as a non-final transition"
             )
     if units[-1]["transition_out"] != "end":
         raise CoverageValidationError("the final coverage unit transition_out must be 'end'")
@@ -281,10 +293,10 @@ def validate_director_coverage(payload: Mapping[str, Any]) -> dict[str, Any]:
         "status": "passed",
         "schema_version": SCHEMA_VERSION,
         "promptless_request": promptless_request,
-        "promptless_long_form": promptless_long_form,
+        "coverage_strategy": coverage_strategy,
+        "strategy_source": strategy_source,
         "coverage_unit_count": len(units),
         "planned_duration_seconds": planned_duration,
-        "explicit_single_take_requested": explicit_single_take,
     }
 
 
