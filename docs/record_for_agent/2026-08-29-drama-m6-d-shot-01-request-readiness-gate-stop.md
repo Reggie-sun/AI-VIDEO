@@ -17,12 +17,15 @@ Planner/requirement seam生成完整typed requirement与exact three-line H3 prom
 
 Current state仍是`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`。2026-08-30 versioned timing repair已把canonical
 requirement改为selected profile可表达的exact `124 frames @ 24fps`，并贯通Router、adapter compiler、resolver与
-non-persisted exact request preview。Current blockers已推进为`SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH`与
-`SOURCE_AUDIO_POLICY_NOT_SEALED_FOR_NATIVE_AUDIO_REQUEST`。本记录不授权runtime切换、SourceAudioPolicy补造、submit或进入per-Shot media Gate。
+non-persisted exact request preview；current user显式选择的`GENERATED + KEEP` SourceAudioPolicy也已绑定并封存。
+Current唯一blocker为`SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH`。本记录不授权runtime切换、Provider preflight、
+submit或进入per-Shot media Gate。
 
 ## Purpose
 
-本文固定 canonical M6-D Shot 01 从 accepted Drama package 到 H3 native prompt 之间的 executable boundary。原始checkpoint因`GenerationIntent`不完整而`STOP_BEFORE_SUBMIT`；本轮只解除该authoring blocker，并把current stop推进到Provider/profile/runtime identity与exact request selection之前。
+本文固定 canonical M6-D Shot 01 从 accepted Drama package 到 H3 exact non-persisted request preview之间的
+executable boundary，并保存后续versioned prerequisite chronology。Current stop位于selected profile所要求的runtime
+identity与observed runtime不匹配处。
 
 本文不修改 accepted fixture、baseline、Project、Registry、Manifest、historical request 或媒体 evidence，也不授权手写 prompt、默认值补全、Provider submit、retry、`video-analysis`、candidate activation、P6 或 Final Acceptance。
 
@@ -253,3 +256,56 @@ boundary保持`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`、`next_shot_submit_allo
 P6、Final Acceptance或Commercial verdict inheritance。`distill-ai-video-learning` automatic evaluation为
 `no_candidate`：本记录保持`learning_eligibility: ineligible`，且当前single pre-artifact readiness stop不足以形成
 跨实验Learning Claim；未创建candidate或placeholder。
+
+## Explicit SourceAudioPolicy And Runtime-Only Stop — 2026-08-30
+
+Current user通过`request_user_input`明确选择canonical Shot 01的`source_type=GENERATED`与`policy=KEEP`。该选择不是
+从dialogue、rain ambience、`native_audio=true`或历史preview推断出的default。Versioned policy只绑定Shot
+`drama.shot.waiting-room.001` revision `1`、content hash
+`4cf53970d6642d4bfe73c23e5c12f9714c069843b0a7b47069dfb2519c47253b`与既有exact request lineage，不修改Product
+`VideoGenerationRequest` schema，也不改变fixture、baseline、Story、Scene、Character、Shot或execution-intent bytes。
+
+两份被review拒绝的candidate保持不可覆盖：
+
+- v1 payload commit `c3dd44940a251966790ea105d26e3c941879c3ac`，SHA-256
+  `141cc81edd0557ed94bc867676817b1f482e9c9c4a28efc3b34d2f8138755b11`；evidence SHA-256
+  `0ca93cee2c882c996513c33572e95e8c1fc35b9cf1fd94ace90679b7d693920c`；
+- v2 payload commit `f230896ba7504e79f383c177bc8a3c3198b015ee`，SHA-256
+  `5968e99d3a6f7bacc1bf812b607fdec55a3bdf69265a5d6b5ccae75057577cb3`；evidence SHA-256
+  `c3ab3b9ba2a6d2ab60048021831cf88129a91b866610231b8dc582bcaa0df13e`。
+
+Accepted v3 identity：
+
+- proposed payload：`docs/superpowers/artifacts/drama/b-d0/source-audio-policy/key-at-the-waiting-room-shot-01-v3.proposed.json`；
+- candidate commit：`9677aad1814ddbef7dc430f91902e08bc15bd6a3`；
+- payload SHA-256：`302ee9dec106902bc7b870feda7993ca6c47bb4d8c6cf144896b402e99ec9587`；
+- acceptance envelope：`docs/superpowers/artifacts/drama/b-d0/source-audio-policy/key-at-the-waiting-room-shot-01-v3.accepted.json`，
+  SHA-256 `bd10225c06fc837fb4fcd118f62bbf3214cadd0abd08445f35323c14df9e3239`；
+- driver：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/shot01_source_audio_policy_readiness_driver.py`，
+  SHA-256 `1c81b4f2d81f545c13d6538bd1f735f1b54ea06de541daf0be4496085cac45f6`；
+- candidate evidence SHA-256：`1d6b7a214946b93e817b5c78315f322dd2073360127a4dacdabf4195960acbc4`；
+- accepted evidence：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-source-audio-policy-readiness-accepted-v3.json`，
+  SHA-256 `3fae21a8ccb6a40ef5a2c2e515b1c771e8b156d9533770196a8020e3486bb659`；
+- current blocked envelope：`docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v3.blocked.json`，
+  SHA-256 `d121d63afe62149f851c4bbb9338911182201a97adb4fe95e6100259d14aebfb`。
+
+Strict reopen再次得到request `6dd31121a17d0178f4372bb4fa764f350216133b18f91d476675137af1480047`、requirement
+`735c670eeee9bef29f9e9980ae8e476bde7bfff8786a78edf54af644d9eed924`、prompt
+`e6cc74114e4dd41db284a29a83db228cbd9a034370fb5577a0e534d560139b47`与preview
+`4ba6861de793286c47215d480d94237ab7202c966f9c4836716144008d7ecb76`。Request保持`native_audio=true`，exact dialogue
+出现一次；required rain ambience与`music=none`一致。Raw-Shot audio PASS不会推导final-composition audio PASS，后者仍须
+经canonical P4 composition后独立判定。
+
+Native `reviewer_xhigh`对candidate commit `9677aad1814ddbef7dc430f91902e08bc15bd6a3`的verdict为
+`accept with concerns`，无blocking issue。Non-blocking concern是少数non-operational nested metadata字段未逐字段进入
+candidate validator；当前accepted bytes正确且由commit/blob/byte-size/SHA绑定，任何accepted-byte drift均fail closed。
+Focused Planner/requirement/Router/T8 suite为`276 passed`，8个关键policy mutation probe全部fail closed。
+
+Read-only runtime inspection仍观察到required ComfyUI commit
+`7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`与current clean checkout
+`e01fb4c56b7a88149d469b99cbbfe3223d715054`不匹配。因此SourceAudio blocker已解除，但唯一remaining blocker为
+`SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH`。Current boundary仍为`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`、
+`next_shot_submit_allowed=false`。Provider preflight、ComfyUI lifecycle change、request persistence、durable intent、permit、
+submit、media、retry/repair、Manifest/Registry write、candidate activation与`video-analysis`均未发生。
+`distill-ai-video-learning` automatic evaluation为`no_candidate`：该record保持
+`learning_eligibility: ineligible`，当前单一pre-media readiness lineage不满足跨实验admission threshold，未创建Learning Claim。

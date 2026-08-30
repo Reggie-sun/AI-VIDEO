@@ -1,0 +1,93 @@
+{
+  "schema_version": "drama-shot-source-audio-policy-acceptance/3",
+  "record_kind": "drama_shot_source_audio_policy_acceptance",
+  "policy_id": "drama.source-audio.key-at-the-waiting-room.shot-01",
+  "policy_version": 3,
+  "status": "accepted",
+  "domain_id": "drama",
+  "lane_id": "M6-D",
+  "accepted_policy_payload": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/source-audio-policy/key-at-the-waiting-room-shot-01-v3.proposed.json",
+    "commit": "9677aad1814ddbef7dc430f91902e08bc15bd6a3",
+    "git_blob_oid": "f1fa68fa2bb9c9926c8b73d57fd8fe72016644c9",
+    "byte_size": 6167,
+    "accepted_record_sha256": "302ee9dec106902bc7b870feda7993ca6c47bb4d8c6cf144896b402e99ec9587",
+    "candidate_status_at_acceptance": "proposed",
+    "content_address_semantics": "Only the exact GENERATED + KEEP SourceAudioPolicy bytes at the bound commit, blob OID, byte size and SHA-256 are accepted for canonical Shot 01. No Product request field, runtime identity, Provider lifecycle or media state is accepted by this envelope."
+  },
+  "parent_lineage": {
+    "accepted_timing_repair_envelope_sha256": "b508cb375b6c326cbaaa5342d6aec051d20276f2d652e094f9cbca3a48efee10",
+    "accepted_timing_readiness_evidence_sha256": "e3463ca9acc9ac381d0c2cc350f9b449214c588bcbade6f74fa7438c86b6f113",
+    "blocked_readiness_envelope_sha256": "5fde388ce6b46225ed68031d79edca79d83b988ef7a4b391e28c6be4eea82f5e",
+    "request_hash": "6dd31121a17d0178f4372bb4fa764f350216133b18f91d476675137af1480047",
+    "verified_projection_hash": "e201aebeb90a324549138163c0d0f4f93405ad7755f3645b1a9bd99c5413ea21",
+    "requirement_hash": "735c670eeee9bef29f9e9980ae8e476bde7bfff8786a78edf54af644d9eed924",
+    "prompt_sha256": "e6cc74114e4dd41db284a29a83db228cbd9a034370fb5577a0e534d560139b47",
+    "provider_bound_request_hash": "69b470cd4a188fc31a73b04d69c59bba9b0efe8ab1f1eb9bde994f7999e951aa",
+    "compiled_request_hash": "56a6a21750a93ea392139a1e98a0558d9e7d5ae0576e1210f7b744e3118b7656",
+    "request_input_hash": "de4b222eef59e867eaa30c591a10f98808558a19fa9b5d8973c7aece366b27d2",
+    "resolved_generation_hash": "5a9ee2722103a6cee533b36cd5ca2d6254f3ca2bf4c7e0e22da752bd48fecc95",
+    "preview_fingerprint": "4ba6861de793286c47215d480d94237ab7202c966f9c4836716144008d7ecb76"
+  },
+  "explicit_user_selection_binding": {
+    "source_id": "current-session:user-selected-source-audio-policy-20260830",
+    "selection_channel": "request_user_input",
+    "normalized_selection": "source_type=GENERATED;policy=KEEP;shot_id=drama.shot.waiting-room.001;revision=1",
+    "selection_is_default_or_inference": false,
+    "recorded_at": "2026-08-30T09:04:02+08:00",
+    "normalized_source_tuple": "source_type=GENERATED;policy=KEEP;shot_id=drama.shot.waiting-room.001;revision=1;selection_channel=request_user_input;effective_date=2026-08-30",
+    "selection_source_sha256": "aa239cf6d88cde201fc5525a59a17ba9ae175eb260afb74bb6b9017d967fbf81"
+  },
+  "adjudication": {
+    "adjudicator_identity": "codex_primary_agent",
+    "authority_role": "delegated_primary_agent",
+    "decision": "CONFIRM",
+    "decided_at": "2026-08-30T09:04:02+08:00",
+    "decision_source_id": "current-session:drama-shot01-source-audio-policy-v3-autonomous-adjudication",
+    "rationale": "The exact candidate binds the user's explicit GENERATED + KEEP choice to canonical Shot 01 and its native-audio request lineage, preserves raw-Shot versus final-composition audio Gate separation, and remains fail closed before submit."
+  },
+  "independent_review_evidence": {
+    "reviewer_role": "reviewer",
+    "reviewer_tier": "xhigh",
+    "reviewer_identity": "native:drama_m6d_readiness_review",
+    "review_source_id": "current-session:drama-shot01-source-audio-policy-v3-scoped-review",
+    "candidate_commit": "9677aad1814ddbef7dc430f91902e08bc15bd6a3",
+    "candidate_policy_sha256": "302ee9dec106902bc7b870feda7993ca6c47bb4d8c6cf144896b402e99ec9587",
+    "candidate_driver_sha256": "1c81b4f2d81f545c13d6538bd1f735f1b54ea06de541daf0be4496085cac45f6",
+    "candidate_evidence_sha256": "1d6b7a214946b93e817b5c78315f322dd2073360127a4dacdabf4195960acbc4",
+    "verdict": "accept with concerns",
+    "blocking_issues": [],
+    "non_blocking_concerns": [
+      "Some non-operational nested metadata fields are not individually validated by the candidate driver; current accepted bytes are correct and any accepted-byte drift fails the commit/blob/size/SHA binding."
+    ],
+    "normalized_review_tuple": "reviewer_role=reviewer;reviewer_tier=xhigh;candidate_commit=9677aad1814ddbef7dc430f91902e08bc15bd6a3;candidate_policy_sha256=302ee9dec106902bc7b870feda7993ca6c47bb4d8c6cf144896b402e99ec9587;candidate_driver_sha256=1c81b4f2d81f545c13d6538bd1f735f1b54ea06de541daf0be4496085cac45f6;candidate_evidence_sha256=1d6b7a214946b93e817b5c78315f322dd2073360127a4dacdabf4195960acbc4;verdict=accept_with_concerns;blocking_issues=none;non_blocking_concern=some_non_operational_nested_fields_are_not_individually_validated_but_exact_accepted_bytes_are_commit_bound",
+    "review_evidence_sha256": "8baedc1cc3153d63993bf7c2056c38a636a5a948a99327987a46e5cc5118ac4b"
+  },
+  "accepted_scope": {
+    "includes": [
+      "canonical Shot 01 SourceAudioPolicy source_type=GENERATED and policy=KEEP",
+      "exact native-audio request, dialogue, ambience and no-music binding",
+      "raw-Shot audio findings and independent final-composition audio Gate requirement",
+      "offline strict request replay and read-only runtime identity evidence"
+    ],
+    "excludes": [
+      "fixture, baseline, Story, Scene, Character, Shot or execution-intent semantic-byte changes",
+      "Product VideoGenerationRequest schema or persistence changes",
+      "Provider/profile/workflow/runtime contract changes or fallback",
+      "ComfyUI checkout or lifecycle change, Provider preflight, permit, submit or media",
+      "Manifest, Registry, candidate activation, video-analysis, M6-D PASS, P6 or Final Acceptance"
+    ]
+  },
+  "current_gate_state": {
+    "source_audio_policy": "ACCEPTED_AND_SEALED",
+    "exact_request_binding_matches": true,
+    "runtime_identity": "MISMATCH",
+    "provider_preflight": "NOT_INVOKED_SOURCE_AUDIO_POLICY_ONLY_SLICE",
+    "m6_d": "NOT_EVALUATED",
+    "execution": "STOP_BEFORE_SUBMIT",
+    "next_shot_submit_allowed": false,
+    "remaining_blockers": [
+      "SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH"
+    ]
+  }
+}

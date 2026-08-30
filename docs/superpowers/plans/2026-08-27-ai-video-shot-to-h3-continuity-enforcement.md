@@ -115,7 +115,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | B-D0 prerequisite complete后已获独立M6-D启动授权；canonical Shot 01 versioned timing repair已accepted/sealed为`124 frames @ 24fps`，Router、adapter compiler、resolver与exact non-persisted request preview现已贯通。Current selected profile要求ComfyUI commit `7cee3ceb...`，read-only inspection观察到clean checkout `e01fb4c...`，故runtime identity `MISMATCH`且Provider preflight未调用；SourceAudioPolicy仍未由canonical authoring owner封存。没有persist/submit request、permit、media或Production-state effect。详见`docs/record_for_agent/2026-08-29-drama-m6-d-shot-01-request-readiness-gate-stop.md` |
+| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | B-D0 prerequisite complete后已获独立M6-D启动授权；canonical Shot 01 versioned timing repair已accepted/sealed为`124 frames @ 24fps`，Router、adapter compiler、resolver与exact non-persisted request preview现已贯通。Current user显式选择的SourceAudioPolicy `GENERATED + KEEP`已绑定并封存到exact native-audio request；raw-Shot audio findings仍不替代final-composition audio Gate。Selected profile要求ComfyUI commit `7cee3ceb...`，read-only inspection观察到clean checkout `e01fb4c...`，故runtime identity `MISMATCH`且Provider preflight未调用。唯一remaining blocker为`SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH`；没有persist/submit request、permit、media或Production-state effect。详见`docs/record_for_agent/2026-08-29-drama-m6-d-shot-01-request-readiness-gate-stop.md` |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -889,6 +889,19 @@ preflight fail closed为未调用。Exact request声明`native_audio=true`，但
 推断`GENERATED + KEEP`。Current blockers为`SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH`与
 `SOURCE_AUDIO_POLICY_NOT_SEALED_FOR_NATIVE_AUDIO_REQUEST`；`M6-D`继续
 `NOT_EVALUATED / STOP_BEFORE_SUBMIT`，没有request persistence、permit、submit、media或per-Shot Gate。
+
+Current user随后通过canonical selection channel显式选择`source_type=GENERATED`与`policy=KEEP`。Versioned v3
+SourceAudioPolicy只绑定Shot `drama.shot.waiting-room.001` revision `1`、content hash
+`4cf53970d6642d4bfe73c23e5c12f9714c069843b0a7b47069dfb2519c47253b`及上述exact request lineage；没有新增Product
+request field或推断audio policy。Accepted policy payload SHA-256为
+`302ee9dec106902bc7b870feda7993ca6c47bb4d8c6cf144896b402e99ec9587`，acceptance envelope SHA-256为
+`bd10225c06fc837fb4fcd118f62bbf3214cadd0abd08445f35323c14df9e3239`，accepted readiness evidence SHA-256为
+`3fae21a8ccb6a40ef5a2c2e515b1c771e8b156d9533770196a8020e3486bb659`。Raw-Shot audio findings保持独立于
+final-composition audio Gate。SourceAudio blocker已清除；current唯一remaining blocker为
+`SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH`，blocked envelope v3 SHA-256为
+`d121d63afe62149f851c4bbb9338911182201a97adb4fe95e6100259d14aebfb`。`M6-D`仍为
+`NOT_EVALUATED / STOP_BEFORE_SUBMIT`，`next_shot_submit_allowed=false`；Provider preflight、request persistence、permit、
+submit、media与per-Shot Gate均未发生。
 
 Stop immediately and report rather than expanding scope when：
 
