@@ -309,3 +309,24 @@ Read-only runtime inspection仍观察到required ComfyUI commit
 submit、media、retry/repair、Manifest/Registry write、candidate activation与`video-analysis`均未发生。
 `distill-ai-video-learning` automatic evaluation为`no_candidate`：该record保持
 `learning_eligibility: ineligible`，当前单一pre-media readiness lineage不满足跨实验admission threshold，未创建Learning Claim。
+
+## Post-Acceptance Runtime Identity Drift — 2026-08-30
+
+Initial v3 accepted replay与exact-range Harness完成后，concurrent unrelated work改变了active ComfyUI supervisor
+identity。旧 supervisor `ai-video-comfyui-4ec54ce8452c4b7383bed5a27d7ce414.service`不再是canonical discovery结果；
+fresh read-only replay观察到active unit `ai-video-comfyui-1ae8d86d0a554e73a5dd7bb1aea5a7b3.service`、PID `747091`、
+invocation `dc7e5c60bd584247ab09ec4f6744f75c`。本slice没有start、stop、restart或checkout操作。
+
+Source、workflow、binding、accepted SourceAudioPolicy与exact request lineage均未漂移。Current checkout仍为clean
+`e01fb4c56b7a88149d469b99cbbfe3223d715054`，selected profile仍要求
+`7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`；因此唯一blocker仍是
+`SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH`。Immutable v3 evidence未覆盖；fresh sidecar与current envelope为：
+
+- accepted readiness evidence v4：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-source-audio-policy-readiness-accepted-v4.json`，
+  SHA-256 `55c217616b0967c95a240caf920a1cf7483b4837b59124ad0fda4ca86b6ed45b`；
+- blocked envelope v4：`docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v4.blocked.json`，
+  SHA-256 `2ffbb5de9291470ddbd8a7703523aa3bfe710e771ce6bc8f4e6d570998648b39`。
+
+v4 replay的所有non-runtime fields与v3一致，Production tree前后仍为15个相同files；Provider preflight、request
+persistence、permit、submit、media、repair、Manifest/Registry write、candidate activation与`video-analysis`均为零。
+`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`、`next_shot_submit_allowed=false`保持不变。

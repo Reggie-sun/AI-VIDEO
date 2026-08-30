@@ -1,0 +1,90 @@
+{
+  "schema_version": "drama-m6-d-shot01-pre-submit-readiness-envelope/4",
+  "decision": "blocked",
+  "domain_id": "drama",
+  "lane_id": "M6-D",
+  "recorded_at": "2026-08-30T09:37:52+08:00",
+  "target_shot": {
+    "shot_id": "drama.shot.waiting-room.001",
+    "revision": 1,
+    "content_hash": "4cf53970d6642d4bfe73c23e5c12f9714c069843b0a7b47069dfb2519c47253b"
+  },
+  "accepted_lineage": {
+    "source_audio_policy_payload_commit": "9677aad1814ddbef7dc430f91902e08bc15bd6a3",
+    "source_audio_policy_payload_sha256": "302ee9dec106902bc7b870feda7993ca6c47bb4d8c6cf144896b402e99ec9587",
+    "source_audio_policy_acceptance_sha256": "bd10225c06fc837fb4fcd118f62bbf3214cadd0abd08445f35323c14df9e3239",
+    "previous_accepted_readiness_evidence_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-source-audio-policy-readiness-accepted-v3.json",
+    "previous_accepted_readiness_evidence_sha256": "3fae21a8ccb6a40ef5a2c2e515b1c771e8b156d9533770196a8020e3486bb659",
+    "previous_blocked_envelope_path": "docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v3.blocked.json",
+    "previous_blocked_envelope_sha256": "d121d63afe62149f851c4bbb9338911182201a97adb4fe95e6100259d14aebfb",
+    "request_hash": "6dd31121a17d0178f4372bb4fa764f350216133b18f91d476675137af1480047",
+    "verified_projection_hash": "e201aebeb90a324549138163c0d0f4f93405ad7755f3645b1a9bd99c5413ea21",
+    "requirement_hash": "735c670eeee9bef29f9e9980ae8e476bde7bfff8786a78edf54af644d9eed924",
+    "prompt_sha256": "e6cc74114e4dd41db284a29a83db228cbd9a034370fb5577a0e534d560139b47",
+    "provider_bound_request_hash": "69b470cd4a188fc31a73b04d69c59bba9b0efe8ab1f1eb9bde994f7999e951aa",
+    "compiled_request_hash": "56a6a21750a93ea392139a1e98a0558d9e7d5ae0576e1210f7b744e3118b7656",
+    "request_input_hash": "de4b222eef59e867eaa30c591a10f98808558a19fa9b5d8973c7aece366b27d2",
+    "resolved_generation_hash": "5a9ee2722103a6cee533b36cd5ca2d6254f3ca2bf4c7e0e22da752bd48fecc95",
+    "preview_fingerprint": "4ba6861de793286c47215d480d94237ab7202c966f9c4836716144008d7ecb76"
+  },
+  "current_read_only_replay": {
+    "driver_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/shot01_source_audio_policy_readiness_driver.py",
+    "driver_sha256": "1c81b4f2d81f545c13d6538bd1f735f1b54ea06de541daf0be4496085cac45f6",
+    "evidence_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-source-audio-policy-readiness-accepted-v4.json",
+    "evidence_sha256": "55c217616b0967c95a240caf920a1cf7483b4837b59124ad0fda4ca86b6ed45b",
+    "non_runtime_fields_match_previous_evidence": true,
+    "request_persisted": false,
+    "provider_preflight_invoked": false,
+    "provider_submit_invoked": false,
+    "production_state_writes": 0
+  },
+  "source_audio_resolution": {
+    "source_type": "GENERATED",
+    "policy": "KEEP",
+    "default_or_inference_used": false,
+    "exact_request_binding_matches": true,
+    "status": "ACCEPTED_AND_SEALED"
+  },
+  "runtime_identity_drift": {
+    "result": "MISMATCH",
+    "profile_required_comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+    "observed_comfyui_commit": "e01fb4c56b7a88149d469b99cbbfe3223d715054",
+    "checkout_clean": true,
+    "previous_supervisor": {
+      "unit": "ai-video-comfyui-4ec54ce8452c4b7383bed5a27d7ce414.service",
+      "main_pid": 392221,
+      "invocation_id": "385b1913dfe549cc87e2ea24ef23169e"
+    },
+    "current_supervisor": {
+      "unit": "ai-video-comfyui-1ae8d86d0a554e73a5dd7bb1aea5a7b3.service",
+      "main_pid": 747091,
+      "invocation_id": "dc7e5c60bd584247ab09ec4f6744f75c",
+      "active_state": "active",
+      "sub_state": "running",
+      "exec_start_sha256": "66d7102ccfc4112ae967e258ac97a108f53a5f1d0cc0497d51e5aee1ae819eb3"
+    },
+    "provider_preflight": "NOT_INVOKED_SOURCE_AUDIO_POLICY_ONLY_SLICE",
+    "comfyui_lifecycle_changed_by_this_slice": false
+  },
+  "submit_readiness": {
+    "budget": "NOT_APPLICABLE_LOCAL_UNMETERED",
+    "cloud_egress": "DENIED_AND_NOT_USED",
+    "durable_submit_intent_created": false,
+    "one_use_permit_minted": false,
+    "provider_preflight_count": 0,
+    "provider_submit_count": 0,
+    "media_generated": false,
+    "video_analysis_invoked": false,
+    "ready": false,
+    "blockers": [
+      "SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH"
+    ]
+  },
+  "status_boundary": {
+    "m6_d": "NOT_EVALUATED",
+    "execution": "STOP_BEFORE_SUBMIT",
+    "next_shot_submit_allowed": false,
+    "p6": "NOT_EVALUATED",
+    "final_acceptance": "NOT_EVALUATED"
+  }
+}

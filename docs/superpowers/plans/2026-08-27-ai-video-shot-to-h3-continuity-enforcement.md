@@ -898,8 +898,11 @@ request field或推断audio policy。Accepted policy payload SHA-256为
 `bd10225c06fc837fb4fcd118f62bbf3214cadd0abd08445f35323c14df9e3239`，accepted readiness evidence SHA-256为
 `3fae21a8ccb6a40ef5a2c2e515b1c771e8b156d9533770196a8020e3486bb659`。Raw-Shot audio findings保持独立于
 final-composition audio Gate。SourceAudio blocker已清除；current唯一remaining blocker为
-`SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH`，blocked envelope v3 SHA-256为
-`d121d63afe62149f851c4bbb9338911182201a97adb4fe95e6100259d14aebfb`。`M6-D`仍为
+`SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH`。Initial accepted replay与blocked envelope v3保持历史immutable evidence；
+随后concurrent unrelated work改变了active ComfyUI supervisor identity，但checkout仍为`e01fb4c...`且profile仍要求
+`7cee3ceb...`。Fresh read-only replay封存为accepted evidence v4 SHA-256
+`55c217616b0967c95a240caf920a1cf7483b4837b59124ad0fda4ca86b6ed45b`与current blocked envelope v4 SHA-256
+`2ffbb5de9291470ddbd8a7703523aa3bfe710e771ce6bc8f4e6d570998648b39`。`M6-D`仍为
 `NOT_EVALUATED / STOP_BEFORE_SUBMIT`，`next_shot_submit_allowed=false`；Provider preflight、request persistence、permit、
 submit、media与per-Shot Gate均未发生。
 
