@@ -1,0 +1,77 @@
+{
+  "schema_version": "drama-shot-source-audio-policy/1",
+  "record_kind": "drama_shot_source_audio_policy",
+  "policy_id": "drama.source-audio.key-at-the-waiting-room.shot-01",
+  "policy_version": 1,
+  "status": "proposed",
+  "domain_id": "drama",
+  "lane_id": "M6-D",
+  "target_shot": {
+    "shot_id": "drama.shot.waiting-room.001",
+    "revision": 1,
+    "content_hash": "4cf53970d6642d4bfe73c23e5c12f9714c069843b0a7b47069dfb2519c47253b"
+  },
+  "parent_lineage": {
+    "accepted_timing_repair_envelope_path": "docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v2.accepted.json",
+    "accepted_timing_repair_envelope_sha256": "b508cb375b6c326cbaaa5342d6aec051d20276f2d652e094f9cbca3a48efee10",
+    "accepted_timing_readiness_evidence_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-timing-request-readiness-accepted-v1.json",
+    "accepted_timing_readiness_evidence_sha256": "e3463ca9acc9ac381d0c2cc350f9b449214c588bcbade6f74fa7438c86b6f113",
+    "blocked_readiness_envelope_path": "docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v2.blocked.json",
+    "blocked_readiness_envelope_sha256": "5fde388ce6b46225ed68031d79edca79d83b988ef7a4b391e28c6be4eea82f5e",
+    "request_hash": "6dd31121a17d0178f4372bb4fa764f350216133b18f91d476675137af1480047",
+    "verified_projection_hash": "e201aebeb90a324549138163c0d0f4f93405ad7755f3645b1a9bd99c5413ea21",
+    "requirement_hash": "735c670eeee9bef29f9e9980ae8e476bde7bfff8786a78edf54af644d9eed924",
+    "prompt_sha256": "e6cc74114e4dd41db284a29a83db228cbd9a034370fb5577a0e534d560139b47",
+    "provider_bound_request_hash": "69b470cd4a188fc31a73b04d69c59bba9b0efe8ab1f1eb9bde994f7999e951aa",
+    "compiled_request_hash": "56a6a21750a93ea392139a1e98a0558d9e7d5ae0576e1210f7b744e3118b7656",
+    "request_input_hash": "de4b222eef59e867eaa30c591a10f98808558a19fa9b5d8973c7aece366b27d2",
+    "resolved_generation_hash": "5a9ee2722103a6cee533b36cd5ca2d6254f3ca2bf4c7e0e22da752bd48fecc95",
+    "preview_fingerprint": "4ba6861de793286c47215d480d94237ab7202c966f9c4836716144008d7ecb76"
+  },
+  "explicit_user_selection": {
+    "source_id": "current-session:user-selected-source-audio-policy-20260830",
+    "selection_channel": "request_user_input",
+    "normalized_selection": "source_type=GENERATED;policy=KEEP;shot_id=drama.shot.waiting-room.001;revision=1",
+    "selection_is_default_or_inference": false
+  },
+  "source_audio_policy": {
+    "source_type": "GENERATED",
+    "policy": "KEEP",
+    "trim_start_seconds": null,
+    "request_native_audio_required": true,
+    "provider_output_identity_status": "NOT_CREATED_PRE_SUBMIT",
+    "required_dialogue": "钥匙还在。回去，一起开门。",
+    "required_ambience": "steady soft rain heard outside the waiting-room windows with quiet enclosed room reflections, continuous for the full take",
+    "music": "none",
+    "required_raw_shot_audio_findings": [
+      "decoded audio stream is usable and audible",
+      "the exact dialogue semantics and single utterance are present",
+      "speaker and visible lip-sync binding are credible",
+      "rain ambience is present without unintended music or duplicate speech",
+      "audio timing remains synchronized with the exact Shot action"
+    ]
+  },
+  "binding_contract": {
+    "selected_provider": "comfy-local-h3-t8",
+    "selected_model": "minimax-h3-t8-t2va-quality",
+    "selected_capability": "minimax-h3-t8-t2va-quality-v1",
+    "exact_request_native_audio": true,
+    "policy_matches_exact_request": true,
+    "raw_shot_audio_pass_does_not_imply_final_composition_audio_pass": true,
+    "canonical_p4_composition_required_before_final_delivery_claim": true
+  },
+  "forbidden_effects": [
+    "Provider or ComfyUI preflight under mismatched runtime",
+    "ComfyUI checkout or lifecycle change",
+    "VideoGenerationRequest persistence, durable submit intent or permit minting",
+    "Provider submit, media generation, retry, repair or video-analysis",
+    "Manifest, Registry, candidate activation, M6-D PASS, P6 or Final Acceptance"
+  ],
+  "status_boundary": {
+    "m6_d": "NOT_EVALUATED",
+    "execution": "STOP_BEFORE_SUBMIT",
+    "next_shot_submit_allowed": false,
+    "candidate_acceptance_required_before_audio_blocker_can_clear": true,
+    "remaining_runtime_blocker": "SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH"
+  }
+}
