@@ -18,8 +18,12 @@ Planner/requirement seam生成完整typed requirement与exact three-line H3 prom
 Current state仍是`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`。2026-08-30 versioned timing repair已把canonical
 requirement改为selected profile可表达的exact `124 frames @ 24fps`，并贯通Router、adapter compiler、resolver与
 non-persisted exact request preview；current user显式选择的`GENERATED + KEEP` SourceAudioPolicy也已绑定并封存。
-Current唯一blocker为`SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH`。本记录不授权runtime切换、Provider preflight、
-submit或进入per-Shot media Gate。
+随后current user明确授权runtime切换，canonical supervisor已把clean ComfyUI checkout切换到profile-required
+`7cee3ceb...`，原`SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH`已清除。Independent review拒绝了最初unsealed preflight
+observation的dependency provenance；修复后strict hash-before-import又发现current request seam有uncommitted source
+identity drift，且两次exact observation证明这些bytes仍在变化。Current唯一blocker因此是
+`CANONICAL_REQUEST_SEAM_DEPENDENCY_IDENTITY_UNSTABLE`；durable submit intent与
+one-use permit仍未创建，本记录不授权submit、media或进入per-Shot media Gate。
 
 ## Purpose
 
@@ -330,3 +334,94 @@ Source、workflow、binding、accepted SourceAudioPolicy与exact request lineage
 v4 replay的所有non-runtime fields与v3一致，Production tree前后仍为15个相同files；Provider preflight、request
 persistence、permit、submit、media、repair、Manifest/Registry write、candidate activation与`video-analysis`均为零。
 `M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`、`next_shot_submit_allowed=false`保持不变。
+
+## Authorized Runtime Switch And Request-Seam Drift Stop — 2026-08-30
+
+Current user在比较“切换actual runtime”与“重新封存profile contract”后明确选择并授权前者。切换前，canonical
+supervisor对应ComfyUI clean detached checkout `e01fb4c56b7a88149d469b99cbbfe3223d715054`。Readiness preflight发现
+queue中已有一条unrelated H3 job；本slice没有取消、接管、重试或恢复该job，而是等它自然完成并确认queue为
+`0 running / 0 pending`后才继续。
+
+Canonical `scripts/comfyui_supervisor.py`随后完成stop，确认`127.0.0.1:8188` listener消失，再把
+`/home/reggie/ComfyUI`切换为clean detached commit
+`7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`并以`--lowvram --use-sage-attention`重新启动。Initial restart之后发生一次
+concurrent supervisor replacement；first seal attempt因短暂`Connection refused` fail closed且未写evidence。Fresh canonical
+discovery最终绑定active unit `ai-video-comfyui-614d031d49ab4d18aca515337362a0dd.service`、PID `1511754`、invocation
+`e46d4c1a66b04470b6857740e9549813`，且loopback listener由该PID拥有。该live identity只对下方exact evidence时点有效，
+未来effect边界仍须重新核对。
+
+切换后的一次preliminary、尚未封存的strict reopen观察到以下request lineage不变：
+
+- request：`6dd31121a17d0178f4372bb4fa764f350216133b18f91d476675137af1480047`；
+- verified projection：`e201aebeb90a324549138163c0d0f4f93405ad7755f3645b1a9bd99c5413ea21`；
+- requirement：`735c670eeee9bef29f9e9980ae8e476bde7bfff8786a78edf54af644d9eed924`；
+- prompt：`e6cc74114e4dd41db284a29a83db228cbd9a034370fb5577a0e534d560139b47`；
+- resolved generation：`5a9ee2722103a6cee533b36cd5ca2d6254f3ca2bf4c7e0e22da752bd48fecc95`；
+- preview：`4ba6861de793286c47215d480d94237ab7202c966f9c4836716144008d7ecb76`。
+
+Current runtime与profile逐项匹配：ComfyUI `7cee3ceb...`、T8 `977df788...` / `1.36.2`、VideoHelperSuite
+`4ee72c...`、SageAttention `2.2.0`与`sage_attention` launch capability；三个checkout均clean。Canonical
+`ComfyUIT8VideoProvider.preflight()`对该exact resolved request验证sealed component size/SHA、required object-info nodes、
+workflow-required inputs与T8 input-schema hash，结果为`PASS_READ_ONLY_COMPONENT_AND_OBJECT_INFO`。Queue在preflight前后均
+为空，supervisor identity不变，Production tree前后均为15个相同files。但independent `reviewer_xhigh`指出该provisional
+evidence只绑定top-level driver，没有在import前assert并记录它实际执行的timing/readiness/provider/transport bytes，故
+verdict为`reject`。该provisional evidence与envelope未checkpoint并已移除，不能作为accepted preflight或future submit
+prerequisite复用。
+
+Parent修复provenance ordering后，readiness driver SHA-256为
+`8c9ea10f23a65e8ec8b4062a79d002dda33b2762aa585d79ae9499e487247ed1`。其hash-before-import检查的first exact
+observation发现以下working-tree bytes已偏离v4 accepted dependency identities：
+
+- `src/ai_video/production/_shot_router_contracts.py`：accepted `d67d5a20...`，current `1e27bed5...`；
+- `src/ai_video/production/_video_requirement_routing.py`：accepted `506bf639...`，current `962b3818...`；
+- `src/ai_video/production/shot_router.py`：accepted `01101b1b...`，current `4e022cfb...`。
+
+这些path均带uncommitted `M` status并属于unrelated concurrent work；本slice没有修改、reset、stage或接管它们。因为
+current exact request必须执行这些bytes，driver在import前fail closed；current exact request reopen与canonical Provider
+preflight均为`NOT_EVALUATED_DEPENDENCY_DRIFT`。Reviewer在concurrent write期间的broader focused run曾观察到4个
+`continuity_transition_policy`同源failure；parent随后fresh运行本slice的170项focused suite与standalone
+`tests/test_production_shot_router.py`均通过（`170 passed`、`64 passed`）。这说明当前working-tree behavior已继续收敛，但
+仍不能把未提交且不在本checkpoint中的dependency bytes重封为durable replacement contract。
+
+First observation封存后，independent re-review发现上述dependency又发生变化。Second exact observation再次看到三个
+path全部变化，并在single capture内以before/after reread确认该次snapshot内部stable。两次observation间至少包括：
+
+- `_shot_router_contracts.py`：`1e27bed5...` → `59b9a3f5...`；
+- `_video_requirement_routing.py`：`962b3818...` → `b5e17c7f...`；
+- `shot_router.py`：`4e022cfb...` → `e6489aaa...`。
+
+Second evidence显式设置`current_exact_hash_claim=false`；这些值只是两个已绑定观察时点，不被描述成回复时仍current。
+该two-snapshot change把current blocker收紧为`CANONICAL_REQUEST_SEAM_DEPENDENCY_IDENTITY_UNSTABLE`，exact reopen与
+canonical preflight均为`NOT_EVALUATED_DEPENDENCY_UNSTABLE`。
+
+Immutable blocker checkpoint：
+
+- readiness driver：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/shot01_runtime_profile_exact_request_readiness_driver.py`，
+  SHA-256 `8c9ea10f23a65e8ec8b4062a79d002dda33b2762aa585d79ae9499e487247ed1`；
+- blocker driver：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/shot01_runtime_profile_exact_request_readiness_blocker_driver.py`，
+  SHA-256 `e5e2eefc4176cd885a67bac778cfdb3089cf0110dab36c566908a17300ccf919`；
+- blocker evidence：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-runtime-profile-exact-request-readiness-blocked-v1.json`，
+  SHA-256 `d8f73639958447b8d138995b7a8a234e6f5e344217b68417fea0cd9dac675d2f`；
+- instability driver：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/shot01_runtime_profile_exact_request_instability_driver.py`，
+  SHA-256 `3d228ac85256832a6501a6efb925a7b99bc79903879d1d0d800dc0f55916f5f2`；
+- current blocker evidence：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-runtime-profile-exact-request-readiness-blocked-v2.json`，
+  SHA-256 `91545ca9b1281cf05c6f1624a7f63620ab4cfc5edc61a965a38813aa80c6627a`；
+- blocked envelope：`docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v5.blocked.json`，
+  SHA-256 `febf132fd11284c471ee7ce4df82b9cd519484256e782ed40e44df7e016b02b1`。
+
+Selected-profile preflight通过不等于整个ComfyUI installation无warning：startup log仍报告两个不属于该profile required
+node集合的`comfy_extras` dependency warning，以及`comfyui-embedded-docs`版本warning。它们没有使current selected-profile
+preflight失败，也不应被外推为其它ComfyUI capability已qualified。
+
+本slice完成了authorized runtime switch，但没有接受
+`provider_profile_runtime_identity_and_exact_request_pre_submit_prerequisite`。Blocker evidence中的current Provider preflight
+count为0；request persistence、durable submit intent、permit、submit、media、`video-analysis`、Manifest/Registry write与
+candidate activation也均为0。Current boundary保持`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`、
+`next_shot_submit_allowed=false`。只有unrelated request-seam owner完成、稳定并提交其change后，后续窗口才能在不修改这些
+source/tests的前提下重新核对new canonical hashes、focused tests与exact preflight；本checkpoint不能复用为effect
+authorization。
+
+`retrieve-ai-video-memory`的matching `experience` preflight因local index library version mismatch严格失败；按Skill contract
+未重建、重试或降级检索，当前RAG freshness保持未知。`distill-ai-video-learning` automatic evaluation为
+`no_candidate`：本记录保持`learning_eligibility: ineligible`，该single operational runtime/request-seam blocker不满足两次
+independent attempt、controlled multi-arm或existing-claim material update threshold；未创建Learning Claim或placeholder。

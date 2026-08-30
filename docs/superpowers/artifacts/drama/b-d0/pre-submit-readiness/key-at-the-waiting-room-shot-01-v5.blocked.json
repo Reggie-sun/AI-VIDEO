@@ -1,0 +1,82 @@
+{
+  "schema_version": "drama-m6-d-shot01-pre-submit-readiness-envelope/5",
+  "decision": "blocked",
+  "domain_id": "drama",
+  "lane_id": "M6-D",
+  "target_shot": {
+    "shot_id": "drama.shot.waiting-room.001",
+    "revision": 1,
+    "content_hash": "4cf53970d6642d4bfe73c23e5c12f9714c069843b0a7b47069dfb2519c47253b"
+  },
+  "accepted_lineage": {
+    "previous_blocked_envelope_path": "docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v4.blocked.json",
+    "previous_blocked_envelope_sha256": "2ffbb5de9291470ddbd8a7703523aa3bfe710e771ce6bc8f4e6d570998648b39",
+    "previous_accepted_readiness_evidence_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-source-audio-policy-readiness-accepted-v4.json",
+    "previous_accepted_readiness_evidence_sha256": "55c217616b0967c95a240caf920a1cf7483b4837b59124ad0fda4ca86b6ed45b",
+    "request_hash": "6dd31121a17d0178f4372bb4fa764f350216133b18f91d476675137af1480047",
+    "verified_projection_hash": "e201aebeb90a324549138163c0d0f4f93405ad7755f3645b1a9bd99c5413ea21",
+    "requirement_hash": "735c670eeee9bef29f9e9980ae8e476bde7bfff8786a78edf54af644d9eed924",
+    "prompt_sha256": "e6cc74114e4dd41db284a29a83db228cbd9a034370fb5577a0e534d560139b47",
+    "provider_bound_request_hash": "69b470cd4a188fc31a73b04d69c59bba9b0efe8ab1f1eb9bde994f7999e951aa",
+    "compiled_request_hash": "56a6a21750a93ea392139a1e98a0558d9e7d5ae0576e1210f7b744e3118b7656",
+    "request_input_hash": "de4b222eef59e867eaa30c591a10f98808558a19fa9b5d8973c7aece366b27d2",
+    "resolved_generation_hash": "5a9ee2722103a6cee533b36cd5ca2d6254f3ca2bf4c7e0e22da752bd48fecc95",
+    "preview_fingerprint": "4ba6861de793286c47215d480d94237ab7202c966f9c4836716144008d7ecb76"
+  },
+  "runtime_switch": {
+    "previous_comfyui_commit": "e01fb4c56b7a88149d469b99cbbfe3223d715054",
+    "required_comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+    "current_comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+    "result": "MATCH",
+    "checkout_clean": true,
+    "status": "AUTHORIZED_SWITCH_COMPLETED"
+  },
+  "current_blocker": {
+    "blocker_id": "CANONICAL_REQUEST_SEAM_DEPENDENCY_IDENTITY_UNSTABLE",
+    "evidence_kind": "two_exact_observed_snapshots",
+    "current_modules_imported": false,
+    "current_exact_request_reopen": "NOT_EVALUATED_DEPENDENCY_UNSTABLE",
+    "canonical_provider_preflight": "NOT_INVOKED_DEPENDENCY_UNSTABLE",
+    "current_exact_hash_claim": false,
+    "drifted_paths": [
+      "src/ai_video/production/_shot_router_contracts.py",
+      "src/ai_video/production/_video_requirement_routing.py",
+      "src/ai_video/production/shot_router.py"
+    ],
+    "preliminary_unsealed_preflight_observation": "NOT_ACCEPTED_AFTER_INDEPENDENT_PROVENANCE_REVIEW"
+  },
+  "evidence": {
+    "readiness_driver_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/shot01_runtime_profile_exact_request_readiness_driver.py",
+    "readiness_driver_sha256": "8c9ea10f23a65e8ec8b4062a79d002dda33b2762aa585d79ae9499e487247ed1",
+    "blocker_driver_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/shot01_runtime_profile_exact_request_readiness_blocker_driver.py",
+    "blocker_driver_sha256": "e5e2eefc4176cd885a67bac778cfdb3089cf0110dab36c566908a17300ccf919",
+    "first_observation_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-runtime-profile-exact-request-readiness-blocked-v1.json",
+    "first_observation_sha256": "d8f73639958447b8d138995b7a8a234e6f5e344217b68417fea0cd9dac675d2f",
+    "instability_driver_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/shot01_runtime_profile_exact_request_instability_driver.py",
+    "instability_driver_sha256": "3d228ac85256832a6501a6efb925a7b99bc79903879d1d0d800dc0f55916f5f2",
+    "blocker_evidence_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-runtime-profile-exact-request-readiness-blocked-v2.json",
+    "blocker_evidence_sha256": "91545ca9b1281cf05c6f1624a7f63620ab4cfc5edc61a965a38813aa80c6627a"
+  },
+  "submit_readiness": {
+    "pre_submit_prerequisite_ready": false,
+    "blockers": [
+      "CANONICAL_REQUEST_SEAM_DEPENDENCY_IDENTITY_UNSTABLE"
+    ],
+    "budget": "NOT_APPLICABLE_LOCAL_UNMETERED",
+    "cloud_egress": "DENIED_AND_NOT_USED",
+    "durable_submit_intent_created": false,
+    "one_use_permit_minted": false,
+    "provider_preflight_count": 0,
+    "provider_submit_count": 0,
+    "media_generated": false,
+    "video_analysis_invoked": false
+  },
+  "status_boundary": {
+    "m6_d": "NOT_EVALUATED",
+    "execution": "STOP_BEFORE_SUBMIT",
+    "next_shot_submit_allowed": false,
+    "per_shot_media_gate_entered": false,
+    "p6": "NOT_EVALUATED",
+    "final_acceptance": "NOT_EVALUATED"
+  }
+}

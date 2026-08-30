@@ -115,7 +115,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | B-D0 prerequisite complete后已获独立M6-D启动授权；canonical Shot 01 versioned timing repair已accepted/sealed为`124 frames @ 24fps`，Router、adapter compiler、resolver与exact non-persisted request preview现已贯通。Current user显式选择的SourceAudioPolicy `GENERATED + KEEP`已绑定并封存到exact native-audio request；raw-Shot audio findings仍不替代final-composition audio Gate。Selected profile要求ComfyUI commit `7cee3ceb...`，read-only inspection观察到clean checkout `e01fb4c...`，故runtime identity `MISMATCH`且Provider preflight未调用。唯一remaining blocker为`SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH`；没有persist/submit request、permit、media或Production-state effect。详见`docs/record_for_agent/2026-08-29-drama-m6-d-shot-01-request-readiness-gate-stop.md` |
+| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | B-D0 prerequisite complete后已获独立M6-D启动授权；canonical Shot 01 versioned timing repair已accepted/sealed为`124 frames @ 24fps`，Router、adapter compiler、resolver与exact non-persisted request preview现已贯通。Current user显式选择的SourceAudioPolicy `GENERATED + KEEP`已绑定并封存到exact native-audio request；raw-Shot audio findings仍不替代final-composition audio Gate。Current user授权后，canonical supervisor已把ComfyUI切换到profile-required clean commit `7cee3ceb...`，runtime identity为`MATCH`；但current request seam的三个uncommitted source dependencies在两次exact observation之间继续变化，strict hash-before-import阻断exact reopen与canonical preflight。Current唯一blocker为`CANONICAL_REQUEST_SEAM_DEPENDENCY_IDENTITY_UNSTABLE`；没有persist/submit request、permit、media或Production-state effect。详见`docs/record_for_agent/2026-08-29-drama-m6-d-shot-01-request-readiness-gate-stop.md` |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -905,6 +905,30 @@ final-composition audio Gate。SourceAudio blocker已清除；current唯一remai
 `2ffbb5de9291470ddbd8a7703523aa3bfe710e771ce6bc8f4e6d570998648b39`。`M6-D`仍为
 `NOT_EVALUATED / STOP_BEFORE_SUBMIT`，`next_shot_submit_allowed=false`；Provider preflight、request persistence、permit、
 submit、media与per-Shot Gate均未发生。
+
+Current user随后明确授权把local ComfyUI runtime切换到selected profile要求的commit。Canonical supervisor在确认一条
+unrelated running queue item自然结束后停止旧unit，把clean detached checkout从`e01fb4c...`切换为
+`7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`并重新启动loopback runtime。切换期间没有取消、重试或接管unrelated
+job。Fresh inspection观察到T8 `977df788...` / `1.36.2`、VideoHelperSuite `4ee72c...`、SageAttention `2.2.0`与
+ComfyUI commit全部满足profile，故原`SELECTED_PROFILE_RUNTIME_IDENTITY_MISMATCH`已清除。
+
+Independent `reviewer_xhigh`随后拒绝最初unsealed readiness evidence，因为它没有在import前assert并记录完整preflight
+tool chain。Parent修复该provenance缺口后，strict hash-before-import立即发现current working tree中的
+`src/ai_video/production/_shot_router_contracts.py`、`src/ai_video/production/_video_requirement_routing.py`与
+`src/ai_video/production/shot_router.py`已偏离v4 accepted dependency identities，且这些path属于unrelated concurrent
+writer。本slice没有修改、reset或接管这些source/tests，也没有把current uncommitted hashes重封为新contract。
+
+First blocker observation封存后，三个uncommitted dependency bytes又全部变化。Second observation在一次capture内
+保持stable，并与first observation形成exact two-snapshot instability evidence；它显式不声明second hashes仍是current。
+Exact request reopen与canonical Provider preflight因此均为`NOT_EVALUATED_DEPENDENCY_UNSTABLE`；此前unsealed
+preliminary preflight observation不构成accepted evidence。Current blocker evidence为
+`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-runtime-profile-exact-request-readiness-blocked-v2.json`
+（SHA-256 `91545ca9b1281cf05c6f1624a7f63620ab4cfc5edc61a965a38813aa80c6627a`），blocked envelope为
+`docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v5.blocked.json`
+（SHA-256 `febf132fd11284c471ee7ce4df82b9cd519484256e782ed40e44df7e016b02b1`）。Current唯一blocker为
+`CANONICAL_REQUEST_SEAM_DEPENDENCY_IDENTITY_UNSTABLE`。Request persistence、durable submit intent、permit、Provider preflight、
+submit、media、`video-analysis`、Manifest/Registry write与candidate activation均为零；current boundary继续是
+`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`、`next_shot_submit_allowed=false`。
 
 Stop immediately and report rather than expanding scope when：
 
