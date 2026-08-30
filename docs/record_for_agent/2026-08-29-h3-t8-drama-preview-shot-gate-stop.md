@@ -11,6 +11,60 @@ Date: 2026-08-29
 
 Updated: 2026-08-30
 
+## Dynamic-Watchability Diagnosis — 2026-08-30
+
+用户报告当前生成镜头主观上“非常简单”。诊断时 repository 中最新两个 exact Drama 媒体是
+Shot 1 v34 与 Shot 2 v39；本文只把根因映射到这两个 exact artifacts，不假定用户一定观看了
+哪个具体文件，也不把该主观反馈改写成 P6 或 Final Acceptance verdict。
+
+### Exact Evidence Boundary
+
+- Shot 1 v34：`runs/drama-h3-t8-30s-preview-20260830-v34/outputs/shot-01.mp4`，
+  SHA-256 `6aa84857b1b7ac7809099bfbc8b58a407ee1d5070753ca5ee7433a256e13f7cc`。
+  它使用 `minimax_h3_t8_t2va_quality_local`、20 steps、`res_multistep/simple`。Exact intent
+  指定 `truck_left`、`moderate` amplitude / speed 与 continuous actor motion；Gate 实测半分辨率
+  background cumulative x motion `125.9243 px`、same-sign `100%`、最后一秒仍有 `12.5973 px`
+  位移，因此“模型完全没有执行运镜”不符合当前证据。该 Gate 的
+  `human_full_sequence_acceptance` 仍为 `NOT_EVALUATED`。
+- Shot 2 v39：`runs/drama-h3-t8-30s-preview-20260830-v39/outputs/shot-02.mp4`，
+  SHA-256 `d0decc68f4c410d4609be2a493b2319961b55288d3d618352af73083c7e6c9bd`；
+  H.264/AAC、`1344x768`、24 fps、124 frames、`5.167s`。它绑定 v34 exact terminal PNG
+  `9f4c0c11cd78fe7bc2be2d397fd59fc77a0213786fe035b2ed3a4a9b8876bee5` 作为唯一
+  `first_frame`，使用 `continuity_mode=exact_terminal` 与
+  `minimax-h3-t8-i2va-turbo-native-v2` 的 4-step Turbo profile。Exact prompt要求一个 slow、
+  moderate-amplitude `dolly_in`，同时只执行“抬起一把钥匙 + 姐姐抬头”这一个 causal beat。
+  当前 result sidecar指向的 `sidecars/gates/shot-02-gate.json` 尚不存在，所以 v39 只能作为
+  generated/pre-Gate evidence，不能称为 accepted Shot。
+- 两个 current prompt分别为 compiler version 3 与 version 2 的 exact H3 three-field native prompt；v34/v39
+  prompt SHA-256 分别为 `8c71ff1150c981ea85ce86bf4876777f52fdf35325f89ba52a19e78c0eb6fe1c`
+  与 `1f5ceb944265151ffe514c10c6e77022024e322e45d2da23bd50126dd08f22ed`。
+  因此早期 v1 raw neutral serialization不是这两个 current artifacts的直接根因。
+
+### Root-Cause Assessment
+
+1. **Primary — coverage contract本身很窄。** 六镜仍是同一候车室、同一对人物、同一稳定左右轴、
+   同一把钥匙；每镜固定约 `5.167s`，只允许一个 continuous causal beat。即使 camera operator
+   在 `truck_left`、`dolly_in`、`orbit_left`、`pedestal_up` 与 `dolly_out` 间变化，仍没有
+   close-up / insert / over-the-shoulder / reaction / wide reset 等真正改变信息层级的 coverage。
+2. **Primary — exact-terminal continuity与新机位需求冲突。** Shot 2 从 Shot 1 exact terminal
+   直接 I2V continuation，只能从既有两人 medium composition缓慢推进。它适合“同一长镜头继续”，
+   不适合在 cut 后重新选择角度、焦段、景别或 foreground/background关系，因此自然趋向保守构图。
+3. **Secondary — correctness约束压过导演表达。** Prompt同时要求人物身份、左右轴、单一钥匙、
+   anatomical hand、面部可读、对白/lip sync、雨声、无字幕、无 extra、无静止尾部。当前 Gate
+   能证明动作、相机位移、轴线与音频等 requirement，但没有独立的 shot-scale variety、visual
+   information gain 或 human watchability requirement；技术 PASS 不等于镜头丰富。
+4. **Secondary — Shot 2 使用 4-step Turbo preview lane。** 该 lane优先本地速度与连续性，
+   不是 20-step Quality recipe。它会进一步鼓励 first-frame附近的安全演化，但不能单独解释全部问题，
+   因为 20-step v34 Shot 1在技术上有持续横移，主观上仍属于单一 medium two-shot coverage。
+
+### Corrective Direction Boundary
+
+要解决主观“简单”，首要对象不是把同一 prompt再加更多 `cinematic` 形容词，而是重新 author
+coverage 与 continuity route：只在真正连续动作处使用 `exact_terminal`；需要 cut/reframe时使用
+独立 approved keyframe或 capability-supported reference lane，并为每个 Shot冻结新的信息增量、景别、
+前后景关系与机位目的。质量比较应让 20-step Quality lane成为 control，并新增 human full-speed
+watchability / coverage verdict；现有 per-Shot technical Gate继续保留，不能被该主观层替代。
+
 ## Supersession Notice — 2026-08-30 Six-Shot Repair Sequence
 
 下方 v1/v2 停止结果继续作为 historical evidence，但“30 秒成片不存在”和“最新可查看
@@ -225,6 +279,8 @@ V2 finding、output identity 与停止决定位于
 | h3-t8-drama-shot06-v23-gate-20260830 | local-comfyui:h3-t8:drama-shot06-dialogue-v23:20260830 | drama-h3-t8-30s-preview-20260830-shot06-dialogue | drama-preview-shot-06-submit-v23 | v23-four-syllable-anchor | bc62c5cb4f560a50cf0397b24696bd644e501fdf50302b29c1d809c0575b6ab6 | EXACT_MEDIA_GATE | NOT_EVALUATED | CONFLICTING_FIRST_SYLLABLE_TRANSCRIPTION | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-v23/sidecars/gates/shot-06-gate.json` |
 | h3-t8-drama-shot06-v24-gate-20260830 | local-comfyui:h3-t8:drama-shot06-dialogue-v24:20260830 | drama-h3-t8-30s-preview-20260830-shot06-dialogue | drama-preview-shot-06-submit-v24 | v24-deng3-phonetic-anchor | 28b2817a023863ba9b0553f42f14867435bf323a84b58f54d0146724d7f58ff1 | EXACT_MEDIA_GATE | NOT_EVALUATED | CONFLICTING_FIRST_SYLLABLE_AND_LARGE_MODEL_UNAVAILABLE | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-v24/sidecars/gates/shot-06-gate.json` |
 | h3-t8-drama-composition-v2-20260830 | local-composition:h3-t8:drama-preview-v2:20260830 | drama-h3-t8-30s-preview-20260830-composition | composition-repair-v2 | manual-six-frame-blend-authored-subtitles | c4ca36017f48a398eb15765b8342e4f198a3c7e79fa06de13a2450e9b56ef5a0 | DEVELOPMENT_COMPOSITION_REPAIR_GATE | PASS_FOR_HUMAN_REVIEW | HUMAN_FULL_SPEED_WATCH_PENDING | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-final-v2/sidecars/gates/composition-repair-gate.json` |
+| h3-t8-drama-shot01-v34-dynamic-gate-20260830 | local-comfyui:h3-t8:drama-shot01-dynamic-v34:20260830 | drama-h3-t8-30s-preview-20260830-dynamic-watchability | drama-preview-shot-01-submit-v34 | t2va-quality-dynamic-truck | 6aa84857b1b7ac7809099bfbc8b58a407ee1d5070753ca5ee7433a256e13f7cc | EXACT_MEDIA_GATE | PASS | NONE | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-v34/sidecars/gates/shot-01-gate.json` |
+| h3-t8-drama-shot02-v39-pre-gate-20260830 | local-comfyui:h3-t8:drama-shot02-dynamic-v39:20260830 | drama-h3-t8-30s-preview-20260830-dynamic-watchability | drama-preview-shot-02-submit-v39 | i2va-turbo-exact-terminal-dolly | d0decc68f4c410d4609be2a493b2319961b55288d3d618352af73083c7e6c9bd | GENERATED_ARTIFACT_PRE_GATE | NOT_EVALUATED | POST_MEDIA_GATE_PENDING | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-v39/sidecars/shot-02-result.json` |
 
 ## Historical Assessment Before 2026-08-30
 
