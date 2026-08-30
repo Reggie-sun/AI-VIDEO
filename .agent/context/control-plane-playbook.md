@@ -38,12 +38,11 @@ Use the minimum matching Skill set. Installation、description matching 或“�
 
 `PROMPTLESS_REQUEST` 指用户只给出时长、Provider/model、输出规格或“自动生成”等执行约束，
 但没有提供 concept、script、reference-led story、approved Shot 或 ordered coverage。所有这类请求
-都必须先进入 `open-video`；其中目标时长超过 `15s` creative coverage threshold，或超过当前 selected
-capability/profile 已验证的单 Shot 时长上限时，进一步分类为 `PROMPTLESS_LONG_FORM`。其中 Director
-validator 只执行固定 `15s` creative threshold，不接收或自证 Provider capability；exact duration/mode
-支持仍由 current capability/profile owner 在 downstream handoff 独立 fail closed。Provider 能在一次
-调用中技术性支持 `30s` 不得放宽 creative threshold。请求不是 approved Shot，也不得由 Agent 以一个
-默认慢运镜扩展到目标时长。
+都必须先进入 `open-video`；其中目标时长超过固定 `15s` creative coverage threshold 时，进一步分类为
+`PROMPTLESS_LONG_FORM`。Director validator 不接收或自证 Provider capability；exact duration/mode
+支持仍由 current capability/profile owner 在 downstream handoff 独立 fail closed，技术上需要多次
+submit 也不会反向改变 creative classification。Provider 能在一次调用中支持 `30s` 同样不得放宽
+creative threshold。请求不是 approved Shot，也不得由 Agent 以一个默认慢运镜扩展到目标时长。
 
 在首次编写 Shot Contract、Provider prompt 或 execution script 之前，Agent MUST：
 
