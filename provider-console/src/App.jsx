@@ -849,6 +849,7 @@ export function App() {
 
   const selectSource = useCallback((sourceId) => {
     setSelectedSource(sourceId);
+    setExternalQuery("");
     setEvidenceOpen(false);
     if (sourceId === "runs" || sourceId === "all") {
       runsFollowLatest.current = true;

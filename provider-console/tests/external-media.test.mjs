@@ -7,6 +7,7 @@ import path from "node:path";
 import test from "node:test";
 
 import { __test__, catalogExternalMedia, publicExternalMediaProjection } from "../scripts/external-media.mjs";
+import { externalStatus, groupMatchesEvidenceFilter } from "../src/external-media-contract.js";
 
 async function fixture() {
   const root = await mkdtemp(path.join(tmpdir(), "provider-console-external-media-"));
@@ -322,6 +323,114 @@ test("run_outputs source includes direct run outputs with exact composition revi
   });
   assert.equal(unknownVerdict.groups[0].reported_status, null);
   assert.equal(unknownVerdict.groups[0].human_verdict, null);
+});
+
+test("run_outputs source includes singular Seedance output with exact review-v3 evidence", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-seedance-output-"));
+  const runRoot = path.join(root, "seedance-mini-r2v-epic-skyship-20260829-002");
+  const outputRoot = path.join(runRoot, "output");
+  const evidenceRoot = path.join(runRoot, "evidence", "review-v3");
+  await Promise.all([
+    mkdir(outputRoot, { recursive: true }),
+    mkdir(evidenceRoot, { recursive: true }),
+  ]);
+  const voicedBytes = Buffer.from("exact Seedance voiced composition bytes");
+  const noCaptionBytes = Buffer.from("exact Seedance no-caption composition bytes");
+  const gatePath = path.join(evidenceRoot, "gate.json");
+  const gateValue = {
+    gate: "REVIEW_V3_CAPTION_AUDIO_CONTRACT",
+    voiced_captioned: {
+      path: "output/small-caption-voice-bgm-v3.mp4",
+      sha256: sha256(voicedBytes),
+      bytes: voicedBytes.length,
+      requirements: { FINAL_ACCEPTANCE: "FAIL" },
+      evidence: { human_playback_finding: { verdict: "FAIL" } },
+    },
+    no_caption: {
+      path: "output/no-caption-bgm-v3.mp4",
+      sha256: sha256(noCaptionBytes),
+      bytes: noCaptionBytes.length,
+      requirements: { FINAL_ACCEPTANCE: "NOT_EVALUATED" },
+    },
+    publication: {
+      candidate_activation: false,
+      p6: false,
+      final_acceptance: false,
+    },
+  };
+  await Promise.all([
+    writeFile(path.join(outputRoot, "small-caption-voice-bgm-v3.mp4"), voicedBytes),
+    writeFile(path.join(outputRoot, "no-caption-bgm-v3.mp4"), noCaptionBytes),
+    writeFile(gatePath, JSON.stringify(gateValue)),
+  ]);
+
+  const result = await catalogExternalMedia({
+    sources: [{
+      id: "runs-outputs",
+      label: "AI-VIDEO Runs Outputs",
+      kind: "development_artifact",
+      root,
+      layout: "run_outputs",
+    }],
+  });
+
+  assert.equal(result.groups.length, 2);
+  const voiced = result.groups.find((group) => group.preview.file_name === "small-caption-voice-bgm-v3.mp4");
+  const noCaption = result.groups.find((group) => group.preview.file_name === "no-caption-bgm-v3.mp4");
+  assert.equal(voiced.preview.relative_path, "seedance-mini-r2v-epic-skyship-20260829-002/output/small-caption-voice-bgm-v3.mp4");
+  assert.equal(voiced.metadata_status, "bound");
+  assert.equal(voiced.generation_type, "deterministic_composition");
+  assert.equal(voiced.reported_status, "FAIL");
+  assert.equal(voiced.human_verdict, "FAIL");
+  assert.equal(voiced.evidence_classification, "non_canonical");
+  assert.equal(voiced.lifecycle_status, "NOT_EVALUATED");
+  assert.equal(externalStatus(voiced).evidence_state, "linked");
+  assert.equal(groupMatchesEvidenceFilter(voiced, "linked"), true);
+  assert.deepEqual(voiced.evidence_refs, [{
+    source_id: "runs-outputs",
+    relative_path: "seedance-mini-r2v-epic-skyship-20260829-002/evidence/review-v3/gate.json",
+  }]);
+  assert.equal(noCaption.metadata_status, "bound");
+  assert.equal(noCaption.reported_status, "NOT_EVALUATED");
+  assert.equal(noCaption.human_verdict, null);
+
+  const invalidGates = [
+    { label: "traversal path", value: { ...gateValue, voiced_captioned: { ...gateValue.voiced_captioned, path: "output/../output/small-caption-voice-bgm-v3.mp4" } } },
+    { label: "wrong sha", value: { ...gateValue, voiced_captioned: { ...gateValue.voiced_captioned, sha256: "0".repeat(64) } } },
+    { label: "wrong bytes", value: { ...gateValue, voiced_captioned: { ...gateValue.voiced_captioned, bytes: voicedBytes.length + 1 } } },
+    { label: "candidate activation", value: { ...gateValue, publication: { ...gateValue.publication, candidate_activation: true } } },
+    { label: "p6", value: { ...gateValue, publication: { ...gateValue.publication, p6: true } } },
+    { label: "final acceptance", value: { ...gateValue, publication: { ...gateValue.publication, final_acceptance: true } } },
+  ];
+  for (const invalid of invalidGates) {
+    await writeFile(gatePath, JSON.stringify(invalid.value));
+    const invalidResult = await catalogExternalMedia({
+      sources: [{ id: "runs-outputs", label: "AI-VIDEO Runs Outputs", kind: "development_artifact", root, layout: "run_outputs" }],
+    });
+    const invalidVoiced = invalidResult.groups.find((group) => group.preview.file_name === "small-caption-voice-bgm-v3.mp4");
+    assert.notEqual(invalidVoiced.metadata_status, "bound", invalid.label);
+    assert.equal(invalidVoiced.reported_status, null, invalid.label);
+    assert.equal(groupMatchesEvidenceFilter(invalidVoiced, "linked"), false, invalid.label);
+  }
+
+  await writeFile(gatePath, JSON.stringify(gateValue));
+  const conflictingEvidenceRoot = path.join(runRoot, "evidence", "review-v3-conflict");
+  await mkdir(conflictingEvidenceRoot, { recursive: true });
+  await writeFile(path.join(conflictingEvidenceRoot, "gate.json"), JSON.stringify({
+    ...gateValue,
+    voiced_captioned: {
+      ...gateValue.voiced_captioned,
+      requirements: { FINAL_ACCEPTANCE: "NOT_EVALUATED" },
+      evidence: { human_playback_finding: { verdict: "NOT_EVALUATED" } },
+    },
+  }));
+  const conflictingResult = await catalogExternalMedia({
+    sources: [{ id: "runs-outputs", label: "AI-VIDEO Runs Outputs", kind: "development_artifact", root, layout: "run_outputs" }],
+  });
+  const conflictingVoiced = conflictingResult.groups.find((group) => group.preview.file_name === "small-caption-voice-bgm-v3.mp4");
+  assert.equal(conflictingVoiced.association_ambiguity, true);
+  assert.equal(conflictingVoiced.reported_status, null);
+  assert.equal(groupMatchesEvidenceFilter(conflictingVoiced, "linked"), false);
 });
 
 test("unknown external source layout fails closed", async () => {

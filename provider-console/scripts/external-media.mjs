@@ -257,7 +257,7 @@ async function walkRoot(root, limits, layout = "recursive") {
       if (entriesSeen >= limits.maxEntriesPerRoot) break;
       entriesSeen += 1;
       if (!run.isDirectory() || run.isSymbolicLink()) continue;
-      for (const directoryName of ["outputs", "sidecars"]) {
+      for (const directoryName of ["output", "outputs", "sidecars", "evidence"]) {
         if (entriesSeen >= limits.maxEntriesPerRoot) break;
         const directory = path.join(root, run.name, directoryName);
         let stat;
@@ -279,16 +279,18 @@ function runOutputWorkspace(root, sourcePath) {
   const relative = path.relative(root, sourcePath);
   if (!relative || path.isAbsolute(relative)) return null;
   const parts = relative.split(path.sep);
-  return parts.length >= 3 && parts[0] && parts[1] === "outputs" ? parts[0] : null;
+  return parts.length >= 3 && parts[0] && ["output", "outputs"].includes(parts[1]) ? parts[0] : null;
 }
 
-function runSidecarsForMedia(sidecars, root, mediaPath, limit) {
+function runEvidenceFilesForMedia(sidecars, root, mediaPath, limit) {
   const workspace = runOutputWorkspace(root, mediaPath);
   if (!workspace) return [];
   return sidecars
     .filter((sidecarPath) => {
       const parts = path.relative(root, sidecarPath).split(path.sep);
-      return parts.length >= 3 && parts[0] === workspace && parts[1] === "sidecars";
+      return parts.length >= 3
+        && parts[0] === workspace
+        && ["sidecars", "evidence"].includes(parts[1]);
     })
     .slice(0, limit);
 }
@@ -503,6 +505,7 @@ async function metadataForMedia(sidecars, media, limits, experimentImages) {
     ? await experimentEvidenceForMedia(parsedSidecars, media, limits, experimentImages, experimentEvidenceHelpers)
     : null;
   const compositionReviewChain = developmentCompositionReviewEvidence(parsedSidecars, media);
+  const reviewV3Chain = developmentReviewV3Evidence(parsedSidecars, media);
   const longVideoSignatures = new Set(longVideoChains.map((chain) => JSON.stringify(chain.metadata)));
   const longVideoAmbiguity = longVideoSignatures.size > 1;
   const longVideoChain = longVideoAmbiguity ? null : longVideoChains[0];
@@ -513,7 +516,7 @@ async function metadataForMedia(sidecars, media, limits, experimentImages) {
         evidence_refs: [relativeLocation(media.source_root, media.source_path).relative_path],
       }
     : null;
-  const selectedChain = experimentChain || verifiedChain || compositionReviewChain || longVideoChain || embeddedChain;
+  const selectedChain = experimentChain || verifiedChain || compositionReviewChain || reviewV3Chain || longVideoChain || embeddedChain;
   const associationAmbiguityTiers = [];
   if (longVideoAmbiguity) associationAmbiguityTiers.push("bound");
   if (selectedChain?.association_ambiguity === true) {
@@ -570,6 +573,64 @@ function developmentCompositionReviewEvidence(records, media) {
     },
     evidence_refs: [gate, ...human].map((record) => relativeLocation(media.source_root, record.path).relative_path),
     technical_gate: technicalGate,
+    human_verdict: humanVerdict,
+  };
+}
+
+function runRelativeArtifactBinding(record, media, artifact) {
+  const workspace = runOutputWorkspace(media.source_root, media.source_path);
+  const relativeParts = typeof artifact?.path === "string" ? artifact.path.split("/") : [];
+  if (
+    !workspace
+    || typeof artifact?.path !== "string"
+    || !artifact.path
+    || artifact.path.includes("\0")
+    || artifact.path.includes("\\")
+    || path.isAbsolute(artifact.path)
+    || relativeParts.some((part) => !part || part === "." || part === "..")
+    || typeof artifact.sha256 !== "string"
+    || artifact.sha256.toLowerCase() !== media.sha256
+    || !Number.isSafeInteger(artifact.bytes)
+    || artifact.bytes !== media.bytes
+  ) return false;
+  const runRoot = path.join(media.source_root, workspace);
+  return path.resolve(runRoot, artifact.path) === media.source_path
+    && containedPath(path.join(runRoot, "evidence"), record.path);
+}
+
+function developmentReviewV3Evidence(records, media) {
+  const matches = [];
+  for (const record of records) {
+    const value = record?.value;
+    if (
+      path.basename(record?.path || "") !== "gate.json"
+      || value?.gate !== "REVIEW_V3_CAPTION_AUDIO_CONTRACT"
+      || value?.publication?.candidate_activation !== false
+      || value?.publication?.p6 !== false
+      || value?.publication?.final_acceptance !== false
+    ) continue;
+    for (const branchName of ["voiced_captioned", "no_caption"]) {
+      const artifact = value[branchName];
+      const verdict = boundedString(artifact?.requirements?.FINAL_ACCEPTANCE);
+      const explicitHumanVerdict = boundedString(artifact?.evidence?.human_playback_finding?.verdict);
+      if (
+        runRelativeArtifactBinding(record, media, artifact)
+        && COMPOSITION_HUMAN_VERDICTS.has(verdict)
+      ) matches.push({
+        record,
+        verdict,
+        humanVerdict: explicitHumanVerdict === verdict ? explicitHumanVerdict : null,
+      });
+    }
+  }
+  if (matches.length !== 1) {
+    return matches.length > 1 ? { status: "bound", metadata: {}, association_ambiguity: true } : null;
+  }
+  const [{ record, verdict, humanVerdict }] = matches;
+  return {
+    status: "bound",
+    metadata: { generation_type: "deterministic_composition", status: verdict },
+    evidence_refs: [relativeLocation(media.source_root, record.path).relative_path],
     human_verdict: humanVerdict,
   };
 }
@@ -879,7 +940,7 @@ async function scanSource(source, limits) {
         reference_descriptors,
       } = await metadataForMedia(
         layout === "run_outputs"
-          ? runSidecarsForMedia(sidecars, root, sourcePath, limits.maxSidecarsPerRoot)
+          ? runEvidenceFilesForMedia(sidecars, root, sourcePath, limits.maxSidecarsPerRoot)
           : sidecars.slice(0, limits.maxSidecarsPerRoot),
         media,
         limits,
