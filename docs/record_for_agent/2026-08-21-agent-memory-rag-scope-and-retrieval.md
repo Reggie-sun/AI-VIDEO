@@ -346,11 +346,14 @@ Current implementation 尚未实现上述 `claim_validity` / intent lanes。普�
 tagged stale last-good 进入 normal Top-K。Run summaries 只有同 family highest `-vN` 的窄化，
 也不等于通用 semantic supersession。
 
-本次真实 project RAG preflight 以 strict failure 结束：`index library version mismatch; rebuild
-required`。按 retrieval Skill contract，本轮没有 foreground rebuild、validation weakening、
-fake embedding 或 retry；上述 decision 来自 current code/tests/contracts 与 sanitized session
-audit。没有修改 retrieval implementation、derived index 或 Product Runtime，也没有 Provider、
-媒体、网络、activation、quality acceptance、push 或 release 操作。
+本次第一次真实 project RAG preflight 以 strict failure 结束：`index library version mismatch;
+rebuild required`。随后 `record-ai-video-session` 触发的 automatic learning evaluation 按其独立
+discovery contract 执行一次 `experience` query，返回 tagged stale last-good fragments，并由
+CLI queue exact `experience` refresh；该调用不是对第一次 query 的 retry。按 retrieval Skill
+contract，本轮没有 foreground rebuild、等待/poll、validation weakening 或 fake embedding；
+也没有验证后台 refresh 的最终 activation state。上述 decision 来自 current
+code/tests/contracts 与 sanitized session audit。没有修改 retrieval implementation 或 Product
+Runtime，也没有 Provider、媒体、网络、activation、quality acceptance、push 或 release 操作。
 
 ## Guardrails
 
