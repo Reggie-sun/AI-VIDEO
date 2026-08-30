@@ -31,7 +31,8 @@ threshold 与 Provider ceiling 分离。
 
 ## Implemented Contract
 
-Commit `a9b0dc0522e995573a2a6f706b637d075c531d2e` 实现以下边界：
+Implementation commit `a9b0dc0522e995573a2a6f706b637d075c531d2e` 与 final wording alignment
+commit `01c9d306526d7fd75d6e244988821734965a98fa` 实现以下边界：
 
 - 所有缺少 user creative brief 的 request 都是 `PROMPTLESS_REQUEST`，必须先进入 `open-video`；
 - duration `>15s` 使用固定 creative threshold 分类为 `PROMPTLESS_LONG_FORM`，Seedance 2.5 单次支持
@@ -73,6 +74,12 @@ Exact commit-range Harness：
 - receipt verification: `passed=true`、`fresh=true`、`complete_completion_proof=true`、
   `snapshot_matches=true`、`workspace_cleanup_confirmed=true`
 
+Final canonical-wording alignment 另以 exact range
+`ef7d6de50912836fdfe1e7924a618e7e39a1aa31..01c9d306526d7fd75d6e244988821734965a98fa`
+验证，receipt 为
+`.agent/harness/runs/promptless-director-threshold-20260830-v1/receipt.json`；全部 selected checks
+通过，receipt verification 同样满足 `fresh=true` 与 `complete_completion_proof=true`。
+
 ## Evidence Boundary
 
 本次没有调用 Provider、没有生成媒体、没有修改 Manifest / Registry / P6 / Final Acceptance，也没有
@@ -84,7 +91,8 @@ Provider prompt、重复同一 coverage category、或用连续扩展冒充普�
 
 ## Repository State
 
-- implementation commit: `a9b0dc0522e995573a2a6f706b637d075c531d2e`
+- implementation commits: `a9b0dc0522e995573a2a6f706b637d075c531d2e`、
+  `01c9d306526d7fd75d6e244988821734965a98fa`
 - publication: local `main` only；本次未 push、未 release
 - unrelated `.codex/config.toml`、既有 staged H3 record、untracked artifacts/plans 与 `uv.lock` 均未修改、
   未 stage、未 commit
