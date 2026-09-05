@@ -1,0 +1,97 @@
+{
+  "schema_version": "drama-per-shot-media-gate-envelope/1",
+  "record_kind": "per_shot_media_gate_stop",
+  "domain_id": "drama",
+  "fixture_id": "key-at-the-waiting-room",
+  "shot_id": "drama.shot.waiting-room.001",
+  "attempt_id": "drama-shot01-first-20260906-v5",
+  "status": "NOT_EVALUATED",
+  "stop": "STOP_AFTER_SHOT_01_GATE",
+  "sealed_at": "2026-09-05T17:08:54Z",
+  "exact_media": {
+    "path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/production-project/state/video-generation/fetch/files/264a4857ed7bd279c9fc528b78d59d55fc8747c128bdf9b2f68ff6e9ea745c36.mp4",
+    "sha256": "264a4857ed7bd279c9fc528b78d59d55fc8747c128bdf9b2f68ff6e9ea745c36",
+    "size_bytes": 1724778,
+    "duration_seconds": 5.167,
+    "video": "h264 High 1344x768 24fps 124 frames yuv420p",
+    "audio": "aac 32000Hz stereo"
+  },
+  "execution_identity": {
+    "first_submit_approval_path": "docs/superpowers/artifacts/drama/b-d0/first-submit/key-at-the-waiting-room-shot-01-v5.accepted.json",
+    "first_submit_approval_sha256": "163324e9530bbb4c44f6b9401f5fdda1fbebf5fa1b1b10c6cfd08a0c040e3630",
+    "driver_sha256": "56d0754be372d9cedd7b3521aeae12cad5aba655b74315b973ff9ff984c38a97",
+    "provider": "comfy-local-h3-t8",
+    "model": "minimax-h3-t8-t2va-quality",
+    "profile_sha256": "4b299a689723bb856026776500119774ee9490c777a6460e932007be022e05e7",
+    "workflow_sha256": "6a508f8522694297c2e3ce1157dd1b235cd34514d85bf3c2908f55020cd990a5",
+    "binding_sha256": "3af2ab9928d832253e22aaf14f47bf70ef80949f56a1664817accb8acacfd564",
+    "compiled_prompt_sha256": "e6cc74114e4dd41db284a29a83db228cbd9a034370fb5577a0e534d560139b47",
+    "provider_request_id": "3f56e4f0-c8d1-447d-9e25-020498756cf1",
+    "provider_submit_count": 1,
+    "provider_terminal_state": "succeeded",
+    "activation": false
+  },
+  "raw_evidence": {
+    "path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-first-20260906-v5-media-gate-v1.json",
+    "sha256": "0cce35bfeb7098fd620c0020ca061af8406fdd3b8ea0ab9108e79d34f43f1e3f",
+    "authority": "project_local_video_analysis_mcp_supporting_evidence",
+    "exact_media_identity": "PASS",
+    "decode_and_streams": "PASS",
+    "scene_count": 1,
+    "sampled_frame_count": 8,
+    "video_review_reported_issues": 0,
+    "video_review_unique_frame_metric": "INCONSISTENT_166_REPORTED_VS_124_PROBED_EXCLUDED_FROM_GATE",
+    "required_dialogue_semantics_speaker_lip_sync": "NOT_EVALUATED"
+  },
+  "material_supporting_concerns": [
+    "The exact 0.000s sampled frame already shows a partial view of Lin-Jun at the extreme screen-right doorway edge; the sealed opening specifies an empty doorway.",
+    "Whisper recovered the three-part semantic line but transcribed 钥匙 as the homophone 要是, split speech across 0.000-5.080s, and cannot establish exact delivery or lip sync against the sealed 1.700-3.900s window."
+  ],
+  "technical_barrier": {
+    "verdict": "NOT_EVALUATED",
+    "reason": "The generated-audio barrier requires credible required-dialogue semantics, speaker binding, and lip-sync evidence; the available raw evidence does not establish them."
+  },
+  "required_human_findings": [
+    {
+      "requirement_id": "DRAMA-MEDIA-SHOT-NARRATIVE-001",
+      "verdict": "NOT_EVALUATED"
+    },
+    {
+      "requirement_id": "DRAMA-MEDIA-SHOT-DIALOGUE-001",
+      "verdict": "NOT_EVALUATED"
+    },
+    {
+      "requirement_id": "DRAMA-MEDIA-SHOT-PERFORMANCE-001",
+      "verdict": "NOT_EVALUATED"
+    },
+    {
+      "requirement_id": "DRAMA-MEDIA-SHOT-BLOCKING-001",
+      "verdict": "NOT_EVALUATED"
+    },
+    {
+      "requirement_id": "DRAMA-MEDIA-SHOT-EMOTION-001",
+      "verdict": "NOT_EVALUATED"
+    }
+  ],
+  "human_playback": {
+    "authority": "CURRENT_USER_OR_PREAUTHORIZED_HUMAN_DESIGNEE",
+    "required_mode": "FULL_LENGTH_1.0X_FULL_AUDIO_NO_SCRUBBING_DURING_PRIMARY_VERDICT",
+    "attestation": "NOT_PROVIDED",
+    "verdict": "NOT_EVALUATED"
+  },
+  "blockers": [
+    "MANDATORY_TECHNICAL_AUDIO_FINDINGS_NOT_EVALUATED",
+    "REQUIRED_HUMAN_PER_SHOT_FINDINGS_NOT_EVALUATED"
+  ],
+  "boundary": {
+    "m6_d": "NOT_EVALUATED",
+    "next_shot_submit_allowed": false,
+    "retry_allowed_by_sealed_attempt_budget": false,
+    "media_retry_count": 0,
+    "activation_allowed": false,
+    "p6": "NOT_EVALUATED",
+    "final_acceptance": "NOT_EVALUATED",
+    "commercial_verdict_inherited": false
+  },
+  "next_one_thing": "Obtain an exact full-length 1.0x full-audio HUMAN per-Shot verdict for all five required DRAMA-MEDIA-SHOT-* findings while preserving this media identity. No Shot 02 submit is allowed unless every required HUMAN finding and the mandatory technical barrier are PASS."
+}

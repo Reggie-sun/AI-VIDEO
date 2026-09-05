@@ -115,7 +115,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | V3 invocation、xhigh review及exact driver Harness `4361 passed, 4 skipped`均完成；但新的Vidu Product source已stage而未commit，canonical full inventory再次拒绝`pinned source drift`。V3 invocation未消费，request/permit/submit/media均零。下一步待source owner建立stable commit后封存新的exact invocation，不覆盖或重放v3。详见current session record与`first-submit/key-at-the-waiting-room-shot-01-v3.blocked.json` |
+| `M6-D Drama` | `NOT_EVALUATED` / `STOP_AFTER_SHOT_01_GATE` | Canonical v5 invocation在runtime/profile/source exact match与fresh Harness后完成1次local H3/T8 submit，取得Shot 01 exact MP4 SHA-256 `264a4857...45c36`。Immediate project-local `video-analysis`已绑定同一bytes；identity/decode/single-scene evidence通过，但required dialogue semantics/speaker/lip-sync仍未完全判定，五项HUMAN per-Shot findings也无full-length `1.0x` full-audio verdict。Shot 02、retry、activation、P6与Final Acceptance继续阻断。详见`2026-09-06-drama-m6-d-shot-01-first-generation.md`与`per-shot-media-gate/key-at-the-waiting-room-shot-01-v1.blocked.json` |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -767,14 +767,34 @@ make harness-verify
 
 ## Execution Order And Stop Conditions
 
-Latest execution stop（2026-09-05）：V3 first-submit driver及exact acceptance已完成，source `52b9631`的
-GET-only v7 capture通过，`reviewer_xhigh=accept`；exact driver Harness通过`4361 passed, 4 skipped`，Architecture 0 errors。
-执行前另一条Vidu lane已stage新的`vidu.py`、`vidu_download.py`及`vidu_profile.py`，但尚未建立committed Product
-inventory；canonical `_inventory`拒绝`pinned source drift: src/ai_video/production/vidu.py`。Blocker仍为
-`CANONICAL_COMMITTED_SOURCE_INVENTORY_DRIFT`，见`first-submit/key-at-the-waiting-room-shot-01-v3.blocked.json`。
-V3 invocation未消费，Production tree不变，`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`；没有submit/media。
-Next One Thing：待Vidu owner提交stable source后，按既有seam选择该exact commit并封存新的versioned invocation，
-再执行同一Shot 01/Gate；不改或重放v3、不排除source inventory、不manual request、不进入Shot 02/retry/activation/P6/Final Acceptance。
+Latest execution stop（2026-09-06）：shot-router owner提交stable source `b304141`后，v5 driver固定于`6244b7b`，
+GET-only v9 preflight重新验证exact graph/request/prompt/audio、Provider/profile/workflow、runtime
+`7cee3ceb...`与empty queue；v5 approval固定于`429d17c`。Exact executable Harness range
+`b304141..6244b7b`通过`4431 passed, 4 skipped`及Architecture `0/0/0`，receipt
+`.agent/harness/runs/drama-shot01-first-v5-executable-20260906/receipt.json` SHA-256
+`5be34c239d1857e17804c0c4425a7a004384b4878093df9f0013b9ad6dc95f15`。
+
+Canonical execution只提交一次Provider request `3f56e4f0-c8d1-447d-9e25-020498756cf1`，terminal `succeeded`并fetch
+`5.167s`、H.264 `1344x768@24fps`、AAC stereo exact MP4 SHA-256
+`264a4857ed7bd279c9fc528b78d59d55fc8747c128bdf9b2f68ff6e9ea745c36`。Immediate project-local
+`video-analysis`综合调用输出过大后，按`EVIDENCE_REPAIR_FIRST`对相同bytes完成probe、8-frame sampled review、scene detect、
+transcribe与review；没有媒体retry。Technical identity/decode/single-scene层通过，但ASR不能证明逐字台词、speaker/lip-sync及
+sealed delivery timing，五项required HUMAN findings也尚无exact full-length `1.0x` full-audio playback attestation。
+Current gate为`M6-D=NOT_EVALUATED / STOP_AFTER_SHOT_01_GATE`，见
+`per-shot-media-gate/key-at-the-waiting-room-shot-01-v1.blocked.json`。`next_shot_submit_allowed=false`；sealed v5 budget
+`retry_count=0`。Next One Thing仅为current user或pre-authorized HUMAN designee对exact Shot 01逐项给出五项HUMAN verdict；
+不得提交Shot 02、生成repair attempt、activation、pairwise/whole-scene Gate、P6或Final Acceptance。
+
+Historical v4 execution stop（2026-09-06）：前一Vidu source已由owner提交`467397c`。V4 driver固定于`30cf1b8`，
+GET-only v8 capture验证278-file inventory、exact request/graph/prompt/audio、runtime/profile及empty queue，final seal SHA
+`4b4e1bf1...fcab`。但seal后另一条lane产生uncommitted `src/ai_video/production/shot_router.py`，current SHA
+`92f2c4ee...fb352`不同于pinned `bf5b1b4d...48a6`；canonical `_inventory`拒绝，`reviewer_xhigh=reject`。
+V4 driver在fresh inventory前创建`invoked` marker，故不得试跑。Executable Harness的obsolete snapshot在full suite期间中止，
+没有fresh passing executable receipt。Blocker为`CANONICAL_COMMITTED_SOURCE_INVENTORY_DRIFT`，见
+`first-submit/key-at-the-waiting-room-shot-01-v4.blocked.json`。V4 invocation未消费，Production tree不变，
+`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`；没有request persistence、permit、submit、media或video-analysis。
+Next One Thing：待shot-router owner提交stable source或恢复`30cf1b8` exact bytes；前者需要new versioned invocation，后者仍须
+fresh exact verification。不得执行/重放v4、排除source inventory、manual request或进入Shot 02/retry/activation/P6/Final Acceptance。
 
 Historical pre-submit prerequisite acceptance（2026-09-05）：source-binding v3 repair与最终executable Harness已通过，
 full suite `4281 passed, 4 skipped`、Architecture 0 errors。原V8 uncommitted-source blocker在owner提交`272b17d`后解除；

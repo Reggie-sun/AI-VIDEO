@@ -8,7 +8,58 @@ learning_eligibility: ineligible
 
 Date: 2026-08-29
 
-## Current First-Submit V3 Source Drift Stop — 2026-09-05
+> Superseded current-facing status (2026-09-06): canonical v5 first-submit已完成1次local H3/T8 generation并取得
+> exact MP4 SHA-256 `264a4857ed7bd279c9fc528b78d59d55fc8747c128bdf9b2f68ff6e9ea745c36`。当前边界已从
+> `STOP_BEFORE_SUBMIT`推进为`M6-D=NOT_EVALUATED / STOP_AFTER_SHOT_01_GATE`；mandatory technical audio evidence与五项
+> HUMAN per-Shot findings仍为`NOT_EVALUATED`，Shot 02继续阻断。Current primary record：
+> `docs/record_for_agent/2026-09-06-drama-m6-d-shot-01-first-generation.md`；exact gate envelope：
+> `docs/superpowers/artifacts/drama/b-d0/per-shot-media-gate/key-at-the-waiting-room-shot-01-v1.blocked.json`。
+
+## Historical First-Submit V4 Source Drift Stop — 2026-09-06
+
+用户确认前一条Vidu source lane已commit后，Parent沿同一已审execution seam创建v4 invocation，并完成新的
+GET-only preflight与exact seal；但seal完成后另一条lane又修改未提交的`src/ai_video/production/shot_router.py`。
+Canonical `_inventory(30cf1b8...)`精确拒绝`pinned source drift: src/ai_video/production/shot_router.py`。
+V4 driver会在fresh inventory检查前创建`invoked` marker，因此当前执行将消费invocation后才停止，不能“试跑”。
+当前保持`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`。
+
+- Vidu owner commit `467397c01d50255ce2efa5004469f718a9fb74a4`稳定了前一source blocker。V4 driver在
+  `30cf1b828d4cbac1ace2b724237155d1e4d7755f`封存，SHA
+  `3fef48cc9122de75b7bba32c97a66bbaf7db3769efb2d63011b83951634f27d4`；相对v3仅更新attempt、approval path
+  及四个内部module labels，canonical execution语义不变。
+- GET-only v8 capture为`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-source-binding-preflight-v8.json`，
+  SHA `a486f3dd17416f3d8f891ccc8bf2d2f313001ac76171b58fdc1ea92eec76c2cc`。Capture时278-file source inventory、
+  current graph/request/prompt/audio、runtime `7cee3ceb...`、supervisor、queue empty及16-file Production tree全部通过；
+  仅发生三次loopback GET，没有submit或Product mutation。
+- Final v4 seal位于`docs/superpowers/artifacts/drama/b-d0/first-submit/key-at-the-waiting-room-shot-01-v4.accepted.json`，
+  commit `8ae36014072f657171079c38b719771a3036a2a7`，SHA
+  `4b4e1bf1b937382f0de42922e31cc8d072a92c4b9b2991e9c1ce918d0315fcab`。原`07a44e0` preimage仅因EOF
+  空行被supersede；semantic JSON未变。Final seal Harness PASS，receipt
+  `.agent/harness/runs/drama-shot01-first-v4-seal-final-20260906/receipt.json`，SHA
+  `e0d5ac8b8069ad7d14f1c62534cf29fce1276c2121fae81dcf76795810ecd510`。
+
+Seal后current `shot_router.py` SHA变为`92f2c4ee...fb352`，而`30cf1b8` committed SHA为
+`bf5b1b4d...48a6`；相关test SHA为`3e395b62...2f00`。Native `reviewer_xhigh`因此给出`reject`，其余v4
+request/prompt/audio/profile/budget/zero-fallback契约静态通过。V4 executable Harness在obsolete snapshot中已通过
+docs contract、policy audit、runtime Skill boundary与Architecture `0/0/0`，随后由Parent中止未完成full suite；它不是
+fresh passing acceptance receipt，也不能覆盖live source drift。
+
+V4所有`invoked/started/submitted/terminal/stopped/fetched` markers均不存在，invocation未消费。Production tree仍为
+`3abfb1c08a7de162220d46bbf1813115100db8f651b810a362e8bce55edb6731`；request persistence、permit、submit、media、
+video-analysis、runtime lifecycle与activation均为零。Exact blocker envelope：
+`docs/superpowers/artifacts/drama/b-d0/first-submit/key-at-the-waiting-room-shot-01-v4.blocked.json`，SHA
+`7236ff0785bf61b297cc1f3d92e6304c20f6d61bbd4d0cde493495844dbc4bfc`。
+
+Next One Thing：`shot_router.py` owner先建立stable committed Product source，或恢复与`30cf1b8`完全相同的bytes。
+只有后者且v4 markers仍为空时才可重新验证并使用v4；否则必须通过现有seam封存新的versioned Shot 01 invocation。
+不得修改或执行v4、排除source inventory、手写request或进入Shot 02。
+
+本primary record按`record-ai-video-session`更新；自动`distill-ai-video-learning=no_candidate`：v4仍属于同一
+deterministic source-drift链，没有媒体attempt、controlled comparison或匹配existing Learning Claim的material update。
+同一task的experience retrieval已strict失败`index library version mismatch; rebuild required`，按Skill未重试、rebuild或
+fallback。记录阶段没有Provider/media/network或额外tests，unrelated Jieshi与shot-router work保留，未push/release。
+
+## Historical First-Submit V3 Source Drift Stop — 2026-09-05
 
 用户继续要求运行同一canonical Shot 01。V3 execution driver及exact invocation seal均已完成独立审查与
 exact-snapshot verification，但在消费invocation前，另一条Vidu lane把新的Product source完整stage而尚未commit。
