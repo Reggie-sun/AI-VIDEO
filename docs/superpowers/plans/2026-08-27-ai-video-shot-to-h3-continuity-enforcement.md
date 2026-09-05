@@ -115,7 +115,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | Accepted timing repair及`GENERATED + KEEP`不变。Fresh source/runtime/Provider preflight已通过，但唯一first-submit invocation在canonical `start()`被拒绝：active graph仍绑定旧requirement `d07dba76...`，current request为`735c670e...`。Production tree未变，request/intent/permit/submit/media均零。需独立graph lineage reconciliation scope后重新封存exact request；不得retry本invocation或推进Shot 02。详见current session record及`first-submit/key-at-the-waiting-room-shot-01-v1.blocked.json` |
+| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | Canonical graph-only transition已完成（`665736c`）：Manifest 4→6、new graph `a95a916f...`，Project/Registry及creative/audio语义不变。Fresh authoring reopen被overlay旧graph source binding阻断；无runtime/Provider GET、request persistence、intent、permit、submit或media。需要正式authoring versioned binding/current loader selection，禁止旁路或重放旧attempt；full Harness仍有既有document/test失败。详见current session record及`pre-generation-rebind/key-at-the-waiting-room-shot-01-v1.blocked.json` |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -767,7 +767,17 @@ make harness-verify
 
 ## Execution Order And Stop Conditions
 
-Latest canonical start stop（2026-09-05）：fresh source/runtime/Provider preflight及empty queue检查通过；
+Latest graph-rebind stop（2026-09-05）：用户授权后，canonical committer完成一次graph-only transition，Manifest 4→6、
+schema2.7及Project/Registry exact bytes不变，新active graph为`a95a916f...62e8742a`。Transition后canonical lineage
+validator通过，新resolved request `87c98a1f...88f1d`及preview `a9b79ed8...b820a`已在transition evidence中固定。
+从头fresh reopen仍在`authoring_to_request_driver._assert_source_binding`失败：accepted overlay绑定旧graph761c92，
+现有loader没有正式supersession seam。不得跳过断言、手写request或把transition proof冒充完整readiness。
+Exact stop：`docs/superpowers/artifacts/drama/b-d0/pre-generation-rebind/key-at-the-waiting-room-shot-01-v1.blocked.json`。
+`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`；Provider/媒体effects均零，图的canonical state mutation已完成且不重放。
+Next One Thing需要扩展到authoring owner的versioned binding/current loader selection，保留semantic bytes；另需处理
+既有document/test contract failure，当前没有fresh passing executable Harness receipt。旧first-submit invocation不重试。
+
+Historical canonical start stop（2026-09-05）：fresh source/runtime/Provider preflight及empty queue检查通过；
 single invocation `drama-shot01-first-20260905-v1`随后在`ProductionStateCommitter.begin_video_generation`持久化request前，
 因`ACTIVE_PRE_GENERATION_GRAPH_REQUIREMENT_LINEAGE_STALE`被拒绝。Active graph `761c92a0...a47ff1`仍绑定旧requirement
 `d07dba76...`，current request requirement为`735c670e...`；read-only canonical validator已独立复现。

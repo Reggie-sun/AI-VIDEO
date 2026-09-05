@@ -8,7 +8,70 @@ learning_eligibility: ineligible
 
 Date: 2026-08-29
 
-## Current Canonical Start Rejection — 2026-09-05
+## Current Graph Rebind And Authoring Reopen Stop — 2026-09-05
+
+用户的“修复然后继续”授权本轮通过既有canonical graph/committer owner修复lineage，再继续检查Shot 01。
+Graph-only transition已成功，但fresh authoring reopen出现新的source-binding blocker；本节取代下方历史current状态。
+当前仍为`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`，不是缺少同一Shot的生成授权，也不是已确认runtime失配。
+
+Checkpoint `665736cae9f462d065cc3c4d9d73324059b8672d`封存graph driver、rehearsal v7及graph-only approval。
+唯一live transition `drama-shot01-graph-lineage-20260905-v1`通过
+`ProductionStateCommitter.commit(StateCommitRequest(operation="commit_project_registry"))`完成：
+Manifest revision `4 -> 6`、schema保持`2.7`，只改变Manifest与新增content-addressed graph。
+Project/Registry pointers及exact bytes不变，旧graph、旧attempt、accepted creative/audio/overlay全部保留。
+
+| Identity | Current verified value |
+| --- | --- |
+| active graph | `a95a916f26b53f4a2437d90860a13910fa458e33735507963148360062e8742a` |
+| graph-bound resolved request | `87c98a1f8b834cd56d8fcbc163dd3a73526545e51edff202ad3fdf0ce3c88f1d` |
+| graph-bound preview | `a9b79ed8cd91e3e3718187bda22eceeaf59b7ea5a70c5587ffb44379c80b820a` |
+| unchanged prompt | `e6cc74114e4dd41db284a29a83db228cbd9a034370fb5577a0e534d560139b47` |
+| Production tree after transition | `3abfb1c08a7de162220d46bbf1813115100db8f651b810a362e8bce55edb6731` |
+
+Transition中的standard reload、canonical `verify_current_video_generation_lineage`通过，旧graph-bound request被拒绝。
+但这些新request hashes只是transition时重新route得到的evidence，不是一次fresh完整execution preflight acceptance。
+下一次从头reopen在`authoring_to_request_driver._assert_source_binding`停止：accepted overlay仍封存旧graph
+`761c92a0...a47ff1`，此断言读取current Manifest后发现`a95a916f...62e8742a`，因而拒绝。
+现有authoring loader没有消费graph-transition envelope来supersede该binding；不能手工跳过断言、改旧overlay、
+手写request或把旧graph暂时切回去制造通过。Native `reviewer_xhigh`独立确认该边界，拒绝readiness acceptance。
+未完成的success preflight代码已移除，仅保留严格复现exact rejection、验证Production零变更的blocked probe。
+
+Exact evidence位于同一run的`evidence/`：
+
+- `drama-shot01-graph-lineage-20260905-v1-committed.json`，SHA `2021fa28f0df82fde878f4316c879aa2486a33797f49300702e7092f53730b1c`。
+- `drama-shot01-graph-bound-preflight-v1.blocked.json`，SHA `38036cb46ffe871464ebdbcfe97d2fa66aaac07e62549c14937b4b5eafd0d7b4`。
+- Final stop envelope：`docs/superpowers/artifacts/drama/b-d0/pre-generation-rebind/key-at-the-waiting-room-shot-01-v1.blocked.json`。
+
+Focused graph/committer tests `211 passed`；isolated exact-copy transition、replay零byte变化、canonical start的request
+persistence-only proof与4项fault/replay checks通过。所有scratch persistence仅在隔离copy；canonical run没有
+VideoGenerationRequest persistence、intent、permit、Provider submit、media或video-analysis。Fresh post-transition
+probe在runtime/Provider GET之前停止；本轮graph-only commit不能写成Production零变更。
+
+Graph checkpoint exact-range Harness：`.agent/harness/runs/drama-shot01-graph-rebind-20260905/receipt.json`，
+SHA `0b8f8c775b4a2432d5379e31fdf68d691d1dd333d703c33933552151bf74c7e7`，固定detached `665736c`。
+Docs contract、policy audit、runtime/Skill boundary与task Architecture Gate通过（Architecture 0 errors）。
+Full suite再次遇到已知`test_native_audio_gate_documents_provider_capability_branch`的`outcome-known`字面量断言失败；
+同commit focused复测同样FAIL。原计划的`PYTEST_ADDOPTS=-x`被Harness的environment sanitization清除，未生效；
+parent对已知失败suite发送SIGINT，最终`1 failed, 882 passed, 1 skipped`，full check不完整且receipt为FAILED。
+没有修改AGENTS/Skill/tests或隐藏该失败；不能宣称fresh passing executable receipt或execution ready。
+Negative-only probe与live graph sidecars已在`74262c8b870ab9debd48e779d82b5097b7c8090f`单独checkpoint；
+该commit的exact-parent Architecture Gate亦为PASS（0 errors），immutable probe重复调用在入口拒绝、没有重取或覆盖evidence。
+上述graph Harness不覆盖这个后续driver commit；后者同样没有fresh passing full-suite receipt，不重复运行已知失败suite。
+Final `reviewer_xhigh`对blocked probe、stop envelope、record与plan为`accept with concerns`，无artifact blocking issue；
+concerns是两个已明确保留的operational blockers，不构成execution readiness。Final docs-only receipt单独位于
+`.agent/harness/runs/drama-shot01-graph-rebind-stop-20260905/receipt.json`，以其实际结果为准，不代替executable verification。
+
+Next One Thing：由execution-intent/authoring owner正式提供新的versioned source binding及current loader selection，
+仅将旧graph binding沿已验证graph commit lineage更新，保持generation-intent semantic bytes不变；同时需要独立处理
+既有documentation/test contract drift。当前“不修改accepted binding/code/tests”的边界未覆盖这些owner changes，
+故停止并报告scope expansion。不得重跑已消费的graph transition/first-submit invocation，不得进入Shot 02或activation。
+
+`retrieve-ai-video-memory --scope experience`仍为strict failure：`index library version mismatch; rebuild required`，
+未rebuild/retry/fallback。`record-ai-video-session`在这个真实blocker边界更新本记录；自动
+`distill-ai-video-learning`结果`no_candidate`：多次rehearsal/fault proof是同一deterministic修复链，没有独立媒体实验或
+新controlled empirical comparison，未发现适用existing Learning Claim，未创建placeholder。未push/release，unrelated工作保留。
+
+## Historical Canonical Start Rejection — 2026-09-05
 
 此前source/queue blocker已在本轮fresh capture中解除，但真正的canonical `start()`暴露了更后面的graph lineage
 blocker。本节取代下方历史current-facing结论；`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`仍然成立，原因不再是授权、
