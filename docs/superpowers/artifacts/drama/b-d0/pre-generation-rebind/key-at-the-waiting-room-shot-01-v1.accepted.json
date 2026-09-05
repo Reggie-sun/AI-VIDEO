@@ -1,0 +1,38 @@
+{
+  "schema_version": "drama-shot01-graph-rebind-acceptance/1",
+  "decision": "ACCEPT_CANONICAL_GRAPH_ONLY_TRANSITION",
+  "attempt_id": "drama-shot01-graph-lineage-20260905-v1",
+  "authority": "CURRENT_USER_REPAIR_AND_CONTINUE",
+  "source_commit": "36305dec492b07d3d1d7e037c3f96521f19b414d",
+  "driver_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/shot01_graph_lineage_rebind_v1.py",
+  "driver_sha256": "51c281dae9f5e785a1c28f0d23039650fe1412efbfc3d512de8def8b6e432df0",
+  "rehearsal_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-graph-lineage-rehearsal-v7.json",
+  "rehearsal_sha256": "b9a7fba5d70b6c6ecd03360da99fe030ec0c1619d4522018fddd683f90ecdcf2",
+  "binding": "All exact candidate, source, creative, audio, graph, request and before-state identities in the SHA-bound rehearsal",
+  "canonical_owner": "ProductionStateCommitter.commit(StateCommitRequest)",
+  "operation": "commit_project_registry",
+  "max_live_transitions": 1,
+  "allowed_changed_paths": [
+    "state/manifest.json",
+    "state/dependency_graph.a95a916f26b53f4a2437d90860a13910fa458e33735507963148360062e8742a.json"
+  ],
+  "new_graph_hash": "a95a916f26b53f4a2437d90860a13910fa458e33735507963148360062e8742a",
+  "project_registry_semantic_bytes_changed": false,
+  "schema_preserved": "2.7",
+  "old_graph_preserved": true,
+  "old_attempt_replay_allowed": false,
+  "provider_submit_allowed_by_this_envelope": false,
+  "media_allowed_by_this_envelope": false,
+  "candidate_activation_allowed": false,
+  "next_shot_submit_allowed": false,
+  "m6_d": "NOT_EVALUATED",
+  "independent_review": {"profile": "reviewer_xhigh", "verdict": "accept", "blocking_issues": []},
+  "verification": {
+    "focused_tests": "211 passed; source production/test bytes unchanged across rehearsal source commits",
+    "isolated_exact_transition": "PASS",
+    "isolated_canonical_start": "PASS_REQUEST_PERSISTENCE_ONLY_NO_SUBMIT",
+    "old_request_rejection": "PASS",
+    "immutable_replay": "ZERO_BYTE_CHANGE",
+    "full_harness": "NOT_CLAIMED_PRE_EXISTING_VERIFICATION_BLOCKER_REMAINS"
+  }
+}
