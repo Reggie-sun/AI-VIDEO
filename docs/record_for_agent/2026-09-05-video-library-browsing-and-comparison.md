@@ -106,8 +106,9 @@ canonical fake-render lifecycle 和标准 Project loader 重开，确认只读�
 播放时间从 0 增至 1.111593s，media error=null；Range `bytes=0-1023` 返回 206/1024 bytes，
 Content-Range `bytes 0-1023/18956501`，页面 error/warn 为空。
 
-最终 exact-snapshot Harness receipt：
-`.agent/harness/runs/video-library-active-render-20260905/receipt.json`；完成状态以该 receipt
+Staged Harness 九项全部通过，Architecture Gate 零 warning；实现 commit `2819582`。
+最终 exact commit-range Harness receipt：
+`.agent/harness/runs/video-library-active-render-20260905-final/receipt.json`；完成状态以该 receipt
 及 freshness verifier 为准。本次仅修复读取/浏览，未生成或复制媒体、未修改 Production state，
 未 push/release，不对媒体质量作新验收。Learning evaluation：`no_candidate`；单个工程缺陷
 及回归/播放验证不构成独立 model-quality experiments。
