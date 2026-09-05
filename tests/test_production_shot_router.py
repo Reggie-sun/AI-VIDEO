@@ -876,6 +876,10 @@ def _verified_requirement(
         generation_intent_hash=HASH_C,
         target_shot=context.activated_shot,
         scene=make_scene(scene_id=context.activated_shot.scene_id),
+        characters=tuple(
+            make_character(character_id=character_id)
+            for character_id in context.activated_shot.character_ids
+        ),
         generation_mode=RequirementGenerationMode.TEXT_TO_VIDEO,
         continuity_mode=RequirementContinuityMode.NONE,
         motion_requirement=RequirementMotionRequirement.FREE_COMPLEX,
@@ -3313,6 +3317,94 @@ def test_router_exposes_prompt_free_provider_bound_projection_contract() -> None
 
     assert hasattr(shot_router, "ProviderBoundVideoRequest")
     assert hasattr(VideoGenerationResolver, "resolve_requirement")
+
+
+@pytest.mark.parametrize("entrypoint", ["resolve", "resolve_requirement", "planner"])
+@pytest.mark.parametrize("references_available", [False, True])
+def test_explicit_t2v_cannot_downgrade_important_character(
+    entrypoint: str, references_available: bool,
+) -> None:
+    context = _context()
+    if not references_available:
+        context = context.model_copy(update={
+            "canonical_character_references": (),
+            "canonical_scene_reference": None,
+        })
+    context = context.model_copy(update={
+        "allowed_generation_modes": (VideoGenerationMode.TEXT_TO_VIDEO,),
+    })
+    kwargs = {
+        "context": context,
+        "policy": _policy(),
+        "provider_profile": _profile(),
+        "capabilities": _capabilities(
+            _variant(VideoGenerationMode.TEXT_TO_VIDEO),
+            _variant(VideoGenerationMode.IMAGE_TO_VIDEO),
+            _variant(VideoGenerationMode.REFERENCE_TO_VIDEO),
+        ),
+        "selected_capability_id": "capability-text_to_video",
+        "output_requirement": _output(),
+    }
+    if entrypoint == "resolve":
+        decision = VideoGenerationResolver().resolve(
+            **kwargs, requirement_mode=VideoGenerationMode.TEXT_TO_VIDEO,
+            requirement_binding_roles=(), requirement_input_assets=(),
+        )
+    else:
+        projection = _verified_requirement(context)
+        if entrypoint == "planner":
+            from ai_video.planning import VideoPlanner, require_current_video_plan
+            from ai_video.production.video_requirement import (
+                GenerationOperation,
+                MotionEnvelope,
+                ProviderNeutralGenerationIntentProjection,
+                SubjectAction,
+            )
+            from tests.fixtures.planning_factory import make_request
+
+            requirement = projection.requirement
+            request = make_request(
+                target_shot=context.activated_shot,
+                scene_context=requirement.scene,
+                character_context=requirement.characters,
+                available_assets=(),
+                review_decision=None,
+                planning_contract_version="video-planner/3",
+                generation_intent=ProviderNeutralGenerationIntentProjection.create(
+                    generation_intent=GenerationIntent(
+                        subject_action=SubjectAction(
+                            start_state="seated beside the window",
+                            progression="raises the left hand toward the glass",
+                        ),
+                        motion_envelope=MotionEnvelope(
+                            onset="immediate", peak="raises hand", settle="holds",
+                        ),
+                    ),
+                    generation_operation=GenerationOperation.TEXT_TO_VIDEO,
+                    output_need=requirement.output_need,
+                    audio_need=requirement.audio_need,
+                    quality_need=requirement.quality_need,
+                ),
+            )
+            projection = require_current_video_plan(
+                current_request=request, plan=VideoPlanner().plan(request),
+            )
+        result = VideoGenerationResolver().resolve_requirement(
+            **kwargs, projection=projection,
+            lifecycle=_lifecycle(context),
+            compiler_contract=AdapterCompilerContract.create(
+                compiler_id="fake-video-compiler", compiler_version="1",
+            ),
+        )
+        assert result.provider_bound_request is None
+        decision = result.decision
+
+    assert decision.outcome is RoutingOutcome.BLOCKED_POLICY
+    assert decision.reason_codes == (
+        RouterReasonCode.IMPORTANT_CHARACTER_REQUIRES_VISUAL_ANCHOR,
+    )
+    assert decision.required_mode is VideoGenerationMode.TEXT_TO_VIDEO
+    assert decision.selected_mode is None
 
 
 def test_router_projects_verified_requirement_to_deterministic_prompt_free_bound_request() -> None:

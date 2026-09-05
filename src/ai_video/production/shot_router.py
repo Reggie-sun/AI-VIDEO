@@ -331,6 +331,20 @@ class VideoGenerationResolver:
                 else "The Shot starts an independent visual state."
             )
 
+        # A verified mode must still satisfy the Shot's identity constraints.
+        # Available references cannot anchor a T2V request that does not consume them.
+        if (
+            context.important_character_ids
+            and required_mode is VideoGenerationMode.TEXT_TO_VIDEO
+        ):
+            return self._blocked(
+                base,
+                RoutingOutcome.BLOCKED_POLICY,
+                RouterReasonCode.IMPORTANT_CHARACTER_REQUIRES_VISUAL_ANCHOR,
+                "An explicit T2V requirement cannot discard important-character visual anchors.",
+                required_mode=required_mode,
+            )
+
         if context.continuity_mode is ContinuityMode.SEMANTIC:
             reason = RouterReasonCode.SEMANTIC_CONTINUITY_USES_STATE_ONLY
             rationale = "Use typed continuity state without consuming upstream terminal pixels."
