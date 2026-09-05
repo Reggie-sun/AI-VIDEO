@@ -11,6 +11,103 @@ Date: 2026-08-29
 
 Updated: 2026-09-05
 
+## Current Delivery Candidate — 2026-09-05 v77 Gaze-Continuous Entry
+
+当前交付文件为 `runs/drama-h3-t8-30s-preview-20260905-v77/drama-stock20-repair-30s-subtitled.mp4`，
+SHA-256 `5d190435fd322e8cccdb2591505ee15c65982cff45aa675e04068bb9af1ca882`，`12293904 bytes`。
+独立 reviewer 拒绝了下方 v76：第四个 cut 从抬头直接跳到低头，删掉了真实转头动作。
+Parent 对照 source frames `0/6/12/18` 核实问题，再把 Shot 5 in 改为 frame6，保留抬头和随后低头过程；
+恢复 Shot 1 in12，Shot 6 out118，总计仍720帧。新 cuts 为 `112/236/360/484/602`，
+前五句字幕恢复 v73 时间，末句为 `25.45–27.00s`。本轮只有两次 Provider submit，没有为剪辑重做生成。
+
+v77 exact MP4 再次调用 project-local `video_analyze`；full decode、720帧、video/audio各30.000s 已复验。
+Parent 和同一 `reviewer_high` scoped re-review 均确认 frame483→484 保持抬头，486–492有连续低头动作，
+最终 verdict `accept with concerns`，无新的 blocking defect。PTS单调、无连续 exact duplicate。
+低面积变化 detector 仍标记 `20.1667–20.7083s` 两段，但其中确有头部运动，
+不能把它说成已确认数字卡帧，也不能称 human smoothness 已通过。钥匙和近景软化限制仍在。
+精确验证与边界见 v77 `sidecars/analysis/final-verification.json`、`shot5-entry.png`。
+v73/v76 均保留为中间证据，不再是最新交付指针。`distill-ai-video-learning` 仍为 `no_candidate`：
+本轮剪辑修正没有增加独立模型质量证据；不生成占位 claim，不改变 Skill/Policy/Gate。
+
+## Rejected Intermediate — 2026-09-05 v76 Entry-Pacing Repair
+
+中间版本为 `runs/drama-h3-t8-30s-preview-20260905-v76/drama-stock20-repair-30s-subtitled.mp4`，
+SHA-256 `2ab098e3a4405c47e31dd288a76847e0103aa2afd87bac91d8c0a72d52ca3bf5`，`12510694 bytes`。
+v73 保留为本轮中间版本，不能再当作最新交付指针；下方 v73 数值只属于该 exact artifact。
+
+独立 final reviewer 在 v73 第四个 cut 附近发现 `.292s/.250s` 低运动窗口，
+虽无 exact duplicate 或 PTS 错误，仍可能感到停顿。Parent 继续执行 bounded composition repair：
+Shot 5 source-in 从 frame0 改为 frame18；Shot 1 source-in 从12改为6，Shot 6 source-out 从112改为124，
+用真实开场/迈步帧补齐时长，没有补冻结帧或变速。新 cut frames 为 `118/242/366/490/596`，
+总计仍 `720 frames / 24fps`；video/audio 各 `30.000s`，container `30.032s`。
+前五句字幕统一后移 `.25s`，末句前移 `.5s`：第二句 `7.95–10.04s`，末句 `25.20–26.75s`。
+源媒体、六个 Gate、两处 crop 与音频素材 owner 不变；没有新增 Provider submit。
+
+新 exact MP4 已调用 project-local `video_analyze`，实际字幕帧和五组 cut pair 已检查；
+全音视频 decode 通过，`freezedetect -50dB / .25s` 本版无 flagged window。
+新 timeline 上的源音频 PCM 比对证据在 v76 `sidecars/analysis/final-verification.json`。
+这些指标与静帧检查不等于 human normal-speed smoothness PASS；钥匙过大/扁平和 Shot 3 软化仍保留。
+没有新 human acceptance、Production activation、P6 或 Final Acceptance。
+
+## Supersession Notice — 2026-09-05 Stock20 30s Subtitled Candidate
+
+本轮已生成并逐 Shot 检查 Stock20 v74b Shot 5、v75 Shot 6，再渲染新的六镜头 Development candidate。
+下方 compiler checkpoint 的“尚无新成片”和 T8 repair blocker 只保留为当时状态；
+v70/v71c/v72 的历史失败结论不变。当前 candidate 不是 Production activation、P6、Final Acceptance
+或 human watchability PASS，也不是全片原生单次连续生成。
+
+### Exact Media And Scope
+
+- 成片：`runs/drama-h3-t8-30s-preview-20260905-v73/drama-stock20-repair-30s-subtitled.mp4`，
+  SHA-256 `bc4d2ec4b0616629afa60195c361186124cb59d27b2dfef34d5106dec837fc22`，`12275788 bytes`。
+  解码计数 `720 frames / 24fps / 1344x768`；video/audio stream 各 `30.000s`，
+  MP4 container `30.032s` 包含 AAC padding。全音视频解码通过。
+- Source 顺序：v34/41/59/65 的前四镜，v74b Shot 5、v75 Shot 6；精确 source/Gate hashes、
+  trims、cuts 和字幕窗在 v73 `composition.json`。旧源与 Gate 未覆盖，两个新 Gate 首次封存后未修改。
+- v74b：MP4 `0e6b5fcd3aa671f3e004ceaab987bbafebfe0c1cf1e9677feeba2402f90b9e24`，
+  request `23d88ef4-beed-4910-b166-14bf53925816`，实际 Comfy execution `341.36s`；
+  Gate `345f365f5767c3a770d47bdb48c7d799d827ec8303269925849a257eedc7f3ab`。
+  MCP 0.4s samples、6fps contact 与 independent visual review 未见 v72 的持续窗框/身体重影；
+  拿钥匙、起身、小幅 screen-right 靠近可见。独立 reviewer 不确认画外脚步精确距离或原速主观流畅。
+- v75：MP4 `f568f73132e7caf36ad5aef496f05fc6f195594a0b38d5bd3386b584eb4d9c2b`，
+  request `814474cc-f969-48e9-b558-8bf7f52aa045`，实际 Comfy execution `325.48s`；
+  Gate `9b31f2b25be9759df224af382a247bc812e7825d682d499b85f4cbc343370d86`。
+  只在 v74b exact Gate required findings PASS 后提交，首帧为其真实 frame 123
+  `90ae941b9bff70193ee52ec8390fadee47718d9657ceed1bafb6ec56d933f2bc`。
+  small/medium 均转写“等你开门”，12fps mouth contact 显示主要声段内张闭嘴，
+  随后两人转身迈步；只支持 phrase-level 对应，不签发 phoneme-level lip-sync 或 human PASS。
+- 两次均为真实 `comfy-local-h3 / minimax-h3-fl2va`，现有 profile `a154259…`、
+  20-step `res_multistep/simple`、无 LoRA、first-only、native audio；没有 compile 后改写 prompt。
+  v74b submitted-graph evidence 明确只有 node15 first frame，无 node16/last_frame。
+  无 paid/cloud call、新 dependency、fallback 或 activation。
+
+### Composition And Verification Boundaries
+
+- 第 2 镜按 `1008x576@(168,0)` 收紧双人景别，第 3 镜按 `672x384@(280,232)` 取妹妹反应近景；
+  后者有约 2 倍放大软化。保留 hard cuts，以景别变化区别段落，没有用插帧/叠化掩盖重影。
+- 硬字幕 Noto CJK `42px`，白字黑描边/半透明底，底部 margin `50px`；实际帧已看到六句字幕，未遮脸。
+  第二句改为 `7.70–9.79s`，最后一句依据本次原音频改为 `25.70–27.25s`。
+- 第 6 镜使用同次原生音频；第 3 镜首秒历史多余“是的”继续由明确的 Shot 5 雨声片段替代，
+  本轮该 ambience source 为 v74b。各音频切点 20ms fade，结尾250ms fade，画面末8帧淡出。
+- v73 `sidecars/analysis/final-verification.json`、MCP evidence、cut-boundaries contact 保存验证。
+  原 32k AAC 整段 small ASR 出现时间压缩/错位及重复“我来”，不得用于字幕 Gate。
+  16k PCM review derivative 的 medium 恢复六句主要对白与合理粗时码，但末尾单个“那”
+  未被 raw v75 的 small/medium 支持，仍不作为真实新增对白或严格词级对齐结论。
+  最终 PCM 与六个输入在预期位置的 correlation 为 `.997/.918/.9997/.989/.757/.989`；
+  排除 fades 和 Shot 3 替换首秒，低电平雨声的 lossy AAC correlation 较低。此项证明拼接位置，不是听感 PASS。
+- v74b `video_review` 返回167个 sampled/unique frames，与实际124帧不符，已排除该计数。
+  early `freezedetect -50dB` 两个0.25s低运动区间不在尾部；不能用这些指标替代人眼原速流畅判断。
+- inherited v65 钥匙仍过大、扁平、亮黄；单一钥匙/持握连续的 PASS 不是黄铜写实度 PASS。
+  run-local continuity 的 `source_provenance_receipt_id` 使用旧 resolved hash、extraction ID 为构造值，
+  仅为 Development surrogate；真实 v65 fetch/Gate/PNG 另有 exact evidence，不可冒充 activated provenance。
+  wrapper 的45 GPU-minute ceiling 由 parent 计时监督，不是自动硬终止器；本轮两个已知成功 outcome
+  均在各自 ceiling 内。确认 queue running/pending 均空后，supervised ComfyUI 已正常停止为 inactive。
+
+`record-ai-video-session`：新媒体与成片为 stable checkpoint，更新同一 primary record。
+`distill-ai-video-learning`：`no_candidate`；这是同一 inherited chain 的两个不同 Shot，
+recipe/seed/prompt formatting 有混杂，不形成 Stock20 对所有场景更优的独立对照结论。
+未修改 learning target，也未主动重建 RAG index。其他窗口的 Provider Console/Seedance 变更保持 untouched。
+
 ## Supersession Notice — 2026-09-05 Stock20 Compiler Repair
 
 用户已明确确认复用现有 Stock20 quality lane 并修复 first-only v4 I2VA 编译入口。
@@ -519,6 +616,12 @@ V2 finding、output identity 与停止决定位于
 
 | evidence_id | independence_key | experiment_id | attempt_id | arm_id | artifact_sha256 | proof_layer | verdict | failure_class | relation_kind | related_evidence_id | source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| h3-stock20-drama-v77-candidate-20260905 | local-composition:drama-six-shot-stock20-v77:20260905 | drama-h3-t8-30s-composition-watchability | drama-six-shot-stock20-v77 | N/A | 5d190435fd322e8cccdb2591505ee15c65982cff45aa675e04068bb9af1ca882 | HUMAN_WATCHABILITY | NOT_EVALUATED | HUMAN_ACCEPTANCE_PENDING | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v77/sidecars/analysis/final-verification.json` |
+| h3-stock20-drama-v76-posture-review-20260905 | local-composition:drama-six-shot-stock20-v76:20260905 | drama-h3-t8-30s-composition-watchability | drama-six-shot-stock20-v76 | N/A | 2ab098e3a4405c47e31dd288a76847e0103aa2afd87bac91d8c0a72d52ca3bf5 | AGENT_TARGETED_MEDIA_REVIEW | FAIL | SHOT5_ENTRY_POSTURE_SNAP | SAME_EVIDENCE_NEW_PROOF_LAYER | h3-stock20-drama-v76-candidate-20260905 | `docs/record_for_agent/2026-08-29-h3-t8-drama-preview-shot-gate-stop.md#current-delivery-candidate--2026-09-05-v77-gaze-continuous-entry` |
+| h3-stock20-drama-v76-candidate-20260905 | local-composition:drama-six-shot-stock20-v76:20260905 | drama-h3-t8-30s-composition-watchability | drama-six-shot-stock20-v76 | N/A | 2ab098e3a4405c47e31dd288a76847e0103aa2afd87bac91d8c0a72d52ca3bf5 | HUMAN_WATCHABILITY | NOT_EVALUATED | HUMAN_ACCEPTANCE_PENDING | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v76/sidecars/analysis/final-verification.json` |
+| h3-stock20-drama-shot05-v74b-gate-20260905 | local-comfyui:23d88ef4-beed-4910-b166-14bf53925816 | drama-shot05-incompatible-last-anchor-20260905 | drama-shot05-v74b | N/A | 0e6b5fcd3aa671f3e004ceaab987bbafebfe0c1cf1e9677feeba2402f90b9e24 | EXACT_MEDIA_GATE | PASS | NONE | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v74b/sidecars/gates/shot-05-gate.json` |
+| h3-stock20-drama-shot06-v75-gate-20260905 | local-comfyui:814474cc-f969-48e9-b558-8bf7f52aa045 | drama-shot06-stock20-native-audio-20260905 | drama-shot06-v75 | N/A | f568f73132e7caf36ad5aef496f05fc6f195594a0b38d5bd3386b584eb4d9c2b | EXACT_MEDIA_GATE | PASS | NONE | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v75/sidecars/gates/shot-06-gate.json` |
+| h3-stock20-drama-v73-candidate-20260905 | local-composition:drama-six-shot-stock20-v73:20260905 | drama-h3-t8-30s-composition-watchability | drama-six-shot-stock20-v73 | N/A | bc4d2ec4b0616629afa60195c361186124cb59d27b2dfef34d5106dec837fc22 | HUMAN_WATCHABILITY | NOT_EVALUATED | HUMAN_ACCEPTANCE_PENDING | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v73/sidecars/analysis/final-verification.json` |
 | h3-t8-drama-v70-targeted-review-20260905 | local-composition:h3-t8:drama-six-shot-v70:20260830 | drama-h3-t8-30s-composition-watchability | drama-h3-t8-six-shot-rebuild-v70 | hard-cut-captioned-segment-audio-repair | 971127aa32c1a6e8492655142ad4127a20c03e7de81a82c8d14a24fce30118e5 | AGENT_TARGETED_MEDIA_REVIEW | FAIL | GEOMETRY_GHOSTING_AND_LATE_CAPTION | CONCLUSION_SUPERSEDED | h3-t8-drama-v70-final-technical-gate-20260830 | `docs/record_for_agent/2026-08-29-h3-t8-drama-preview-shot-gate-stop.md#supersession-notice--2026-09-05-watchability-repair-blocked` |
 | h3-t8-drama-shot05-v71c-gate-20260905 | local-comfyui:6ebf6d61-6fcb-4b4d-a2de-b51d69f4db3a | drama-shot05-incompatible-last-anchor-20260905 | drama-shot05-v71c | N/A | 55b0dd9050e7078f583130ce958ce83c298569b5ec7e05acdef1085d8a3859c5 | EXACT_MEDIA_GATE | FAIL | APPROACH_DIRECTION_NOT_SATISFIED | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v71c/sidecars/gates/shot-05-gate.json` |
 | h3-t8-drama-shot05-v72-gate-20260905 | local-comfyui:68330dfb-c0eb-40d8-85c5-fee2c35817b6 | drama-shot05-incompatible-last-anchor-20260905 | drama-shot05-v72 | N/A | 7ff7a2960d64f2a5eab501ac3dc1801b3470fd00a32bf70af7e55fa39386bd18 | EXACT_MEDIA_GATE | FAIL | TEMPORAL_SUBJECT_AND_GEOMETRY_GHOSTING | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v72/sidecars/gates/shot-05-gate.json` |
