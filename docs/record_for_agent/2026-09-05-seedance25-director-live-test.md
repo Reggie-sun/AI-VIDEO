@@ -9,6 +9,13 @@ evidence_index_version: "1"
 
 Date: 2026-09-05
 
+## Subsequent User Feedback
+
+2026-09-05，用户对本条实片反馈“很成功”，并要求继续测试 Mini。这是总体正面反馈，
+不撤销下文铜花提前张开的 Agent `FAIL` 或音效未听验的 `NOT_EVALUATED`，也不是 P6。
+后续独立 Mini 实测见 [Mini record](2026-09-05-seedance-mini-director-live-test.md)；不同模型、
+时长与 authored pacing，不作为受控 A/B 或本条媒体的修复版本。
+
 ## Purpose
 
 用户要求“真实视频生成测试”，沿用对话中的 Seedance / 30s / 无 creative prompt 场景。
