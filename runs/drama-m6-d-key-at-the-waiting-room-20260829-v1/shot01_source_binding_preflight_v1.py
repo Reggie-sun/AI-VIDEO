@@ -269,6 +269,7 @@ def collect(source_commit: str, observations: dict[str, object]) -> dict[str, ob
             _require(body.get("queue_running") == [] and body.get("queue_pending") == [], "ComfyUI queue is occupied")
             return {"running": 0, "pending": 0}
 
+        observations["check_stage"] = "queue_before"
         queue_before = queue()
         provider = readiness.ComfyUIT8VideoProvider(
             exact["routed"]["profile"],
@@ -277,11 +278,19 @@ def collect(source_commit: str, observations: dict[str, object]) -> dict[str, ob
             runtime_inspector=lambda: inspection,
             transport=ComfyClient("http://127.0.0.1:8188", http_client=http),
         )
+        observations["check_stage"] = "provider_preflight"
         provider.preflight(exact["routed"]["resolved"])
+        observations["check_stage"] = "queue_after"
         queue_after = queue()
+    observations["check_stage"] = "transport_sequence"
+    expected_urls = ["http://127.0.0.1:8188/queue", "http://127.0.0.1:8188/object_info", "http://127.0.0.1:8188/queue"]
+    _require(requests == expected_urls and [item["url"] for item in responses] == expected_urls
+             and all(item["status"] == 200 for item in responses), "read-only transport sequence drift")
+    observations["check_stage"] = "runtime_after"
     runtime_after, _, _, supervisor_after = _check_runtime(readiness, exact["routed"]["profile"])
     observations["runtime_after"] = {**runtime_after, "supervisor": supervisor_after}
     _require(runtime_before == runtime_after and supervisor_before == supervisor_after, "runtime identity changed during GET-only preflight")
+    observations["check_stage"] = "production_after_get"
     _require(_tree(PROJECT) == production_before, "GET-only preflight changed Production state")
     observations["production_tree_sha256_after"] = _sha256(_canonical(_tree(PROJECT)))
     observations["check_stage"] = "formal_reopen_after_get"
@@ -294,6 +303,10 @@ def collect(source_commit: str, observations: dict[str, object]) -> dict[str, ob
     observations["check_stage"] = "source_inventory_after_get"
     inventory_after = _inventory(source_commit)
     _require(inventory_after == inventory_before, "source inventory changed during GET-only preflight")
+    observations["check_stage"] = "production_after"
+    production_after = _tree(PROJECT)
+    observations["production_tree_sha256_after"] = _sha256(_canonical(production_after))
+    _require(production_after == production_before, "Production state changed during final reopen")
     return {
         "schema_version": "drama-shot01-source-binding-preflight/1",
         "status": "PASS_READ_ONLY_PROVIDER_PREFLIGHT",
@@ -307,9 +320,10 @@ def collect(source_commit: str, observations: dict[str, object]) -> dict[str, ob
         "exact_request_identity": identity_before,
         "selected_provider": _selected_provider(exact),
         "source_audio_policy": exact["source_audio_policy"],
-        "runtime": {**runtime_after, "supervisor_before": supervisor_before, "supervisor_after": supervisor_after},
+        "runtime": {**runtime_after, "supervisor_before": supervisor_before, "supervisor_after": supervisor_after,
+                    "canonical_provider_preflight": "PASS_READ_ONLY_COMPONENT_AND_OBJECT_INFO"},
         "transport": {"allowed_get_urls": sorted(allowed), "requests": requests, "responses": responses, "queue_before": queue_before, "queue_after": queue_after, "listener": listener},
-        "effects": {"production_tree_sha256_before": _sha256(_canonical(production_before)), "production_tree_sha256_after": _sha256(_canonical(production_before)), "provider_preflight": 1, "provider_submit": 0, "request_persistence": 0, "permit_mint": 0, "candidate_activation": False, "media": 0, "video_analysis": 0, "runtime_lifecycle": 0},
+        "effects": {"production_tree_sha256_before": _sha256(_canonical(production_before)), "production_tree_sha256_after": _sha256(_canonical(production_after)), "provider_preflight": 1, "provider_submit": 0, "request_persistence": 0, "permit_mint": 0, "candidate_activation": False, "media": 0, "video_analysis": 0, "runtime_lifecycle": 0},
         "status_boundary": {"execution": "STOP_BEFORE_SUBMIT", "m6_d": "NOT_EVALUATED", "next_shot_submit_allowed": False, "P6": "NOT_EVALUATED", "final_acceptance": "NOT_EVALUATED"},
     }
 
@@ -326,6 +340,11 @@ def main() -> int:
     try:
         payload = collect(args.source_commit, observations)
     except Exception as error:
+        # Do not import unverified Product code when an early inventory check failed.
+        errors_module = sys.modules.get("ai_video.errors")
+        error_type = getattr(errors_module, "AiVideoError", None)
+        if error_type is not None and isinstance(error, error_type):
+            observations["typed_failure"] = {"code": error.code.value, "user_message": error.user_message}
         _write_once(output, {"schema_version": "drama-shot01-source-binding-preflight/1", "status": "BLOCKED_READ_ONLY_PREFLIGHT", "source_commit": args.source_commit, "observed_at": datetime.now(timezone.utc).isoformat(), "driver_sha256": observations["driver_sha256"], "blocker": "READ_ONLY_PREFLIGHT_CHECK_FAILED", "check_stage": observations["check_stage"], "failure_class": type(error).__name__, "reason": str(error) if isinstance(error, PreflightCheckError) else "DEPENDENCY_CHECK_FAILED", "observations": observations, "retry_allowed": False, "status_boundary": {"execution": "STOP_BEFORE_SUBMIT", "m6_d": "NOT_EVALUATED", "next_shot_submit_allowed": False}})
         return 1
     _write_once(output, payload)
