@@ -45,12 +45,16 @@ Exact tracked evidence：
 Focused canonical state/service/T8/Router/prompt tests：`153 passed`；临时目录中exclusive invocation/replay guard检查
 通过。Native `reviewer_xhigh`对driver为`accept with concerns`：无blocking safety defect，但共享外部runtime在最后guard
 到POST之间仍有TOCTOU残余风险；本轮实际未到POST。该静态review不能代替committer lineage验证，更不能证明media quality。
-Final blocker evidence经同一native `reviewer_xhigh`独立复核为`accept`。Driver exact-range Harness：
-`.agent/harness/runs/drama-shot01-first-submit-boundary-detached-20260905/receipt.json`；
+Final blocker evidence经同一native `reviewer_xhigh`独立复核为`accept`。Driver exact-range Harness（FAILED）：
+`.agent/harness/runs/drama-shot01-first-submit-boundary-20260905/receipt.json`；
 最终stop documentation exact-range receipt：`.agent/harness/runs/drama-shot01-first-submit-stop-20260905/receipt.json`。
 以receipt实际status为准，未完成的check不计PASS。
 初次Harness run `drama-shot01-first-submit-boundary-20260905`期间共享HEAD被unrelated工作推进，已中止其full suite并保留
-不完整receipt；不计作fresh completion evidence。最终driver验证从固定commit的独立detached验证目录重新运行。
+不完整receipt；不计作fresh completion evidence。中止输出为`1 failed, 1494 passed, 1 skipped`，失败项是
+`tests/test_ecommerce_ad_workflow_skill.py::test_native_audio_gate_documents_provider_capability_branch`：
+`AGENTS.md`缺少test要求的字面量`outcome-known`。在固定`eb902f3`及其parent的detached验证目录分别复测均为同一FAIL；
+两者相关source/test文件无diff，确认是本轮之前已有的verification blocker。未修改AGENTS、Skill或tests，也未忽略该test。
+Driver缺少fresh passing full-suite receipt，不能宣称全部verification完成或执行ready；无需重复整套测试来制造相同失败。
 
 `retrieve-ai-video-memory`的experience查询仍为strict failure：`index library version mismatch; rebuild required`；
 未重建、重试或fallback。`record-ai-video-session`在这个真实blocker边界更新本记录；`distill-ai-video-learning`为
