@@ -11,6 +11,68 @@ Date: 2026-08-29
 
 Updated: 2026-09-05
 
+## Current Repair Checkpoint — 2026-09-05 v78b And Generalization Boundary
+
+本轮用户批准继续生成，并在执行中追问能否成为泛化能力。只有一次实际 local Stock20 submit：
+request `60f24a89-df16-4e73-94ec-2d0763372dd3`，resolved request
+`b3b94c905de683969b3a4f50445eb544c81f40480753d14d4a399bd34b88effc`。
+新 Shot 4 位于 `runs/drama-h3-t8-30s-preview-20260905-v78b/outputs/shot-04.mp4`，
+SHA-256 `c58d509ce453e286371060199e4f18f7e1976f8bec76364bfea76fb9d7045fc7`。
+它不是新的30秒交付；本轮没有生成 Shot 5/6 或重新合成全片，下方 v77 仍是既有整片候选。
+
+### Prop Repair Evidence
+
+Parent 直接检查发现 v65 的 `conditioning/shot-04-terminal-constraint.png` 本身已含放大的
+扁平黄色钥匙。新 attempt 移除该错误末帧，只使用 v59 的真实 terminal PNG
+`cbb2bf6cb42bfa924a914181325c24f131f79deb608748c5c9e5c55168551881`；保留原对白、
+放钥匙故事与 canonical slow dolly-in，补充小尺寸、金属响应、接触与松手要求。
+先前 v78 prepare 中的 dolly-out 与旧 Shot 相反，被 `reviewer_xhigh` 在 submit 前拒绝；
+v78 保留为 zero-submit rejected preparation，v78b 重新封存 exact request 后 scoped review通过。
+
+实际 submitted graph 是 Stock20 原生 `MiniMaxH3ImageToVideo`、20 steps、
+`res_multistep/simple`、first-only、无 LoRA、无 T8 custom node。主机 T8 checkout 虽已是
+`977df78`，但其 installed presence 不构成本次调用证据。相较 v65，recipe、conditioning、
+prompt 与 derived seed 均有差异，因此不能把此次成功升级为受控单变量因果结论。
+
+Exact MP4 为 `1344x768 / 124 frames / 24fps / 5.167s`，含 AAC 32k stereo。
+project-local `video_analyze`、6fps序列、完整音视频 decode、frame hashes、PTS与freeze检查完成；
+0连续 exact duplicates、0非单调PTS、无freeze窗口。small与medium均恢复“我会留下 / 你来决定”。
+Parent与独立 `reviewer_high` 确认放置、松手、撤手与钥匙留在座位；同一参考人物、衣着与轴线保持。
+Scoped Development media Gate为PASS，非human原速/精确viseme/Production acceptance。
+限制：钥匙平放后齿形不够可读，哥哥terminal头顶留白约8px。
+
+可查看的字幕衍生片为同目录 `shot-04-repair-subtitled.mp4`，SHA-256
+`3b1ca9ddbad47cc5dab977684a2514da41d42425deac2dadbbdccec93409bab7`。
+两句字幕已通过MCP实际画面检查，完整decode通过；烧录前后decoded audio SHA-256同为
+`50d96c9be5b4265f557327c8d3b66678c25e02827935c2cd3ef1d454feb191a0`。
+
+### Next-Shot Scope Decision
+
+继续准备时发现旧 canonical Shot 5 写 `navy coat`，Character wardrobe写
+`charcoal-gray wool coat`，实际已使用的参考画面却是驼色大衣。
+本轮 `identity_wardrobe` PASS仅证明相对于实际参考的保持，不能证明三者已统一。
+仅改 generation intent可避开模型收到旧颜色词，但不能冒充canonical authoring已修正。
+
+正式修订 Shot/Character会改变project revision。当前
+`src/ai_video/production/_shot_router_contracts.py` 的 `ContinuityProviderRouteBinding`
+要求policy snapshots等于previous-bound snapshots；
+`src/ai_video/production/_video_requirement_routing.py` 的连续性校验又要求同一policy snapshots
+等于新target lifecycle snapshots。当前strict route因此不能直接承接跨project revision修订。
+Parent已直接核对两个校验，不只是引用explorer结论；未实现或测试新的cross-revision方案。
+不得重封历史previous-bound或删除同snapshot guard来伪装支持。
+
+`v78b/NEXT_SHOT_BLOCKED.json` 明确阻断下一submit并要求scope decision；其优先于单镜
+reference-relative media Gate的继续资格。新30秒修复仍未完成，不是预算耗尽或outcome unknown。
+需要用户决定是否扩展为canonical creative reconciliation与安全cross-revision continuity工作；
+本轮没有修改产品代码、规则或公共契约。真正泛化还需要固定入口与独立故事测试，不能由
+run-local脚本、一个修复样例或技术PASS推出。
+
+Task预算保存在 `v78/task-budget.json`：最多6次、90 GPU分钟、150 elapsed分钟，
+v78b没有重置总预算。实际一次生成、无remote/paid/egress；queue清空后本轮unique supervisor
+`ai-video-comfyui-94bf2350c7684bdfa0faf7f8f7db6384.service` 已停止并确认inactive。
+`distill-ai-video-learning`评估为 `no_candidate`：此次小钥匙修复是单个带confound的案例，
+reference输入与历史续接共享证据，不能凑成独立泛化测试；不新增claim或修改adoption target。
+
 ## Current Delivery Candidate — 2026-09-05 v77 Gaze-Continuous Entry
 
 当前交付文件为 `runs/drama-h3-t8-30s-preview-20260905-v77/drama-stock20-repair-30s-subtitled.mp4`，
@@ -616,6 +678,8 @@ V2 finding、output identity 与停止决定位于
 
 | evidence_id | independence_key | experiment_id | attempt_id | arm_id | artifact_sha256 | proof_layer | verdict | failure_class | relation_kind | related_evidence_id | source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| h3-stock20-drama-shot04-v78b-gate-20260905 | local-comfyui:60f24a89-df16-4e73-94ec-2d0763372dd3 | drama-prop-repair-20260905 | drama-shot04-v78b | N/A | c58d509ce453e286371060199e4f18f7e1976f8bec76364bfea76fb9d7045fc7 | REFERENCE_RELATIVE_DEVELOPMENT_MEDIA_GATE | PASS | NONE | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v78b/sidecars/gates/shot-04-gate.json` |
+| h3-stock20-drama-v78b-authoring-boundary-20260905 | local-comfyui:60f24a89-df16-4e73-94ec-2d0763372dd3 | drama-prop-repair-20260905 | drama-shot04-v78b | N/A | c58d509ce453e286371060199e4f18f7e1976f8bec76364bfea76fb9d7045fc7 | CANONICAL_AUTHORING_ALIGNMENT | NOT_EVALUATED | CANONICAL_WARDROBE_CONFLICT | SAME_EVIDENCE_NEW_PROOF_LAYER | h3-stock20-drama-shot04-v78b-gate-20260905 | `runs/drama-h3-t8-30s-preview-20260905-v78b/NEXT_SHOT_BLOCKED.json` |
 | h3-stock20-drama-v77-candidate-20260905 | local-composition:drama-six-shot-stock20-v77:20260905 | drama-h3-t8-30s-composition-watchability | drama-six-shot-stock20-v77 | N/A | 5d190435fd322e8cccdb2591505ee15c65982cff45aa675e04068bb9af1ca882 | HUMAN_WATCHABILITY | NOT_EVALUATED | HUMAN_ACCEPTANCE_PENDING | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v77/sidecars/analysis/final-verification.json` |
 | h3-stock20-drama-v76-posture-review-20260905 | local-composition:drama-six-shot-stock20-v76:20260905 | drama-h3-t8-30s-composition-watchability | drama-six-shot-stock20-v76 | N/A | 2ab098e3a4405c47e31dd288a76847e0103aa2afd87bac91d8c0a72d52ca3bf5 | AGENT_TARGETED_MEDIA_REVIEW | FAIL | SHOT5_ENTRY_POSTURE_SNAP | SAME_EVIDENCE_NEW_PROOF_LAYER | h3-stock20-drama-v76-candidate-20260905 | `docs/record_for_agent/2026-08-29-h3-t8-drama-preview-shot-gate-stop.md#current-delivery-candidate--2026-09-05-v77-gaze-continuous-entry` |
 | h3-stock20-drama-v76-candidate-20260905 | local-composition:drama-six-shot-stock20-v76:20260905 | drama-h3-t8-30s-composition-watchability | drama-six-shot-stock20-v76 | N/A | 2ab098e3a4405c47e31dd288a76847e0103aa2afd87bac91d8c0a72d52ca3bf5 | HUMAN_WATCHABILITY | NOT_EVALUATED | HUMAN_ACCEPTANCE_PENDING | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v76/sidecars/analysis/final-verification.json` |
