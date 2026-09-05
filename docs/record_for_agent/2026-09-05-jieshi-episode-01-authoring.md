@@ -6,7 +6,71 @@ learning_eligibility: ineligible
 
 # Jieshi Episode 01 Authoring
 
-## Current Generation Checkpoint — 2026-09-05
+## Current Seedance 2.5 Repair Result — 2026-09-05
+
+用户在明确“追加最多85元、仅一次2.5首镜”的问题后回复“继续”，此授权已执行。
+下方“2.5尚未提交／追加预算尚未确认”现在仅是历史准备状态。
+新 run：`runs/jieshi-e01-seedance25-20260905-repair01/`。
+使用独立且明确获批的修复 project/ledger；旧 15 CNY ledger bytes/hash 保持不变，
+没有重置额度或隐去旧支出。
+
+实际只提交一次 `doubao-seedance-2-5-260628` T2V 请求，resolved hash
+`f766195d33a048d819c8199be599a7cd4724e8c345b1410c416a33747d929ea9`，
+paid preview `9e4fb4163d39417db6f9c961de43e31e772df6e8248e430ebb975e8d17ade7a1`。
+native reviewer_xhigh 在 submit 前独立检查新 scope/原账/新请求/授权/计费及 canonical owners，
+结论 accept，无新增 blocking/non-blocking issues。主线程重新运行相关测试：132 passed。
+
+## Repair Media And Gate
+
+实际 MP4 路径为新 run 下：
+`production-s01-repair-v1/state/video-generation/fetch/files/eed2589c7655b89d5e114b5b5146bb3cc2a31bb5983e5af9d796d0dd008df440.mp4`。
+SHA-256 与文件名相同；2420329 bytes，1080×1920，24 fps，97frames / 4042ms，
+HEVC Main 10 / yuv420p10le，无音轨。新的 provider_selected 时长要求通过技术检查；
+没有将旧2.0的exact_seconds失败改判PASS。HEVC的浏览器播放/最终renderer兼容性未验证。
+
+再次显式调用 project-local video-analysis MCP，并检查0至4秒每0.5秒共9帧，
+完整证据和 sealed rubric / findings 在新run的 `preparation/shot-01-*.json`。
+本次总 Gate 仍为 FAIL：窗中下缘仍有林砚头部/背部反射，2至4秒清晰出现抬手反射；
+窗中仅六名清楚可辨的人（含女孩），未保持七名他人；构图为正面全身，车窗在林砚身后，
+左手抬向身前而非身侧玻璃。清晰度/解码/时长和非血腥判据通过不能抵消叙事失败。
+没有 candidate activation、下一Shot、P6或human acceptance，原始MP4没有广播/字幕。
+
+实际返回196425 completion_tokens，按当前官方55.44 micro-CNY/token结算
+10889802 micro-CNY（10.889802 CNY），新ledger active hash
+`878bd8c16808c6f3d21533c30b07a4a09343372f51d6427a778b40abcfcc048b`。
+新额度剩余74.110198 CNY，两轮合计20.907477 CNY。单次submit许可已用完，剩余额度
+不等于新增retry或切换Provider的submit许可。本次没有unknown outcome或blind retry。
+
+## Vidu I2V Next-Step Preflight
+
+两次T2V都未保证所需倒影，因此下一候选改用既有正确首帧做q3-pro I2V，
+不把失败T2V当作continuity基础。主线程重新查看原PNG，七名他人/主角空倒影构图可见。
+只读code_mapper确认Vidu支持按注册图片SHA/size校验后发送data URI，无Ark素材入库条件；
+这不等于Vidu服务端已接受该图，也不冒充image import、人类视觉验收或Registry激活。
+
+新run的 `preparation/vidu-i2v-next-step.md` 保存具体3秒1080p首镜提示、输入SHA、
+当前官方费用估算2.25 CNY及建议3 CNY上限。未提交、未生成、未建立Vidu预算或permit。
+Vidu仍有真实接入阻点：新只读GET国内站tasks?count=1返回HTTP200、tasks=[]，
+无可核验生成结果CDN origin；当前官方查询生成物文档也只给URL占位符。
+此前 `2026-09-05-vidu-live-preflight.md` 的这一缺项本轮复核后仍成立。
+未猜测host、用测试CDN/官网展示素材host补profile，或在提交后替换frozen profile。
+下一步需要可信生成结果CDN说明或真实生成结果链接，之后才可完成canonical import、
+profile/preview与新增paid授权。详细sanitized证据为 `vidu-result-origin-preflight.json`。
+
+## Verification And Record Boundary
+
+本轮实际 bootstrap/load、Planner/readiness/Router/compiler/resolve、paid-gate identity、
+费用算术、原预算SHA及actual MP4 SHA均核验；fresh focused tests 132 passed。
+新run的三个脚本及README已stage，与原三个脚本一起保留。原全量Harness缺少whisper及
+验证时HEAD变化的失败未解决，未用重复测试或调低routing掩盖；脚本尚未完成全量验收/commit。
+本记录单独按文档scope checkpoint，不把记录通过当作脚本验收。
+
+record-ai-video-session继续更新同一primary record。distill-ai-video-learning为
+`no_candidate`：虽然有两次独立失败调用，模型与提示/时长同时变化，尚不能支持某个修复
+方案的因果有效性；“生成成功不等于媒体Gate通过”已是现有契约，不提出重复adoption。
+所有其他writer的文件保持原状，无push/release。完整300秒Episode尚未生成。
+
+## Historical Seedance 2.0 Generation Checkpoint — 2026-09-05
 
 本节取代下方历史的“没有 MP4 / submit 为 0 / Ark 入库是唯一下一步”状态。
 用户要求先解决 Seedance，随后允许 2.5 修复及 Vidu q3-pro 配合；并非要求真人素材。
@@ -47,7 +111,7 @@ SHA-256 与文件名一致，1931391 bytes，1080×1920，H.264 High，24 fps，
 素材状态 `fetched_unactivated`；没有 candidate activation、下一 Shot submit、
 P6、Final Acceptance 或 human acceptance。广播与硬字幕仍需既有 P4 合成。
 
-## Seedance 2.5 Repair And Budget Boundary
+## Historical Seedance 2.5 Repair And Budget Boundary
 
 用户授权在 2.0 效果不好时选 2.5。候选为 `doubao-seedance-2-5-260628` T2V，
 1080p；现有 `provider_selected` timing 可保留真实源帧数，源长度由模型选择
