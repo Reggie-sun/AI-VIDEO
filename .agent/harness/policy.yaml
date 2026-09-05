@@ -89,6 +89,10 @@ fallback_check_ids:
   - task_architecture_gate
 
 checks:
+  production_vidu_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_vidu.py, -q]
+    cwd: .
+    description: Verify Vidu Q3 payloads, paid permit, task identity, and bounded downloads offline.
   scope_diff_check:
     argv: [git, diff, --check]
     cwd: .
@@ -271,6 +275,7 @@ checks:
     timeout_seconds: 1800
     execution_priority: 30
     covers_check_ids:
+      - production_vidu_tests
       - commercial_source_preparation_tests
       - composition_playbook_tests
       - composition_strategy_proposal_tests
@@ -700,6 +705,8 @@ categories:
       - workflows/templates/minimax_h3_t8_*_turbo_native_v2*
       - src/ai_video/production/minimax_h3.py
       - src/ai_video/production/minimax_hailuo.py
+      - src/ai_video/production/vidu.py
+      - src/ai_video/production/vidu_profile.py
       - src/ai_video/production/seedance.py
       - src/ai_video/production/seedance_asset.py
       - src/ai_video/production/seedance_capabilities.py
@@ -760,6 +767,7 @@ categories:
       - tests/test_production_paid_provider_e2e.py
       - tests/test_production_minimax_h3.py
       - tests/test_production_minimax_hailuo.py
+      - tests/test_production_vidu.py
       - tests/test_production_seedance.py
       - tests/test_production_video.py
       - tests/test_production_ecommerce_shot_candidate_gate.py
@@ -795,6 +803,7 @@ categories:
       - workflows/qualification/rainy_station_source_v9_boundary_human_decision.json
     check_ids:
       - production_video_provider_tests
+      - production_vidu_tests
       - provider_neutral_video_requirement_tests
       - task_architecture_gate
   production_shot_router:

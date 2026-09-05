@@ -1,5 +1,8 @@
 # AI-VIDEO
 
+Vidu Q3 Pro/Turbo 可作为 optional video Provider 显式注入，支持文生视频、图生视频和
+首尾帧模式；配置与验证边界见 [Vidu Provider](docs/vidu-provider.md)。
+
 Local-first Python CLI for orchestrating long-video generation through default-local ComfyUI. Non-local ComfyUI requires explicit opt-in.
 
 The MVP reads a project config and shot list, renders ComfyUI workflow JSON per shot, submits each shot locally, extracts the last frame, passes that frame into the next shot, and stitches normalized clips with ffmpeg.
