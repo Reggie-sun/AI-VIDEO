@@ -68,7 +68,7 @@ Plans、specs、roadmaps、console text、Agent memory 或历史 receipts 本身
 - Dependency Graph 独占 dependency、desired fingerprint、precise invalidation 与 rebuild frontier；immutable graph 不保存 mutable lifecycle，也不推导 timeline。
 - HyperFrames 是默认 Production renderer。只有显式批准的 adapter contract 才能改变 renderer selection；不得出现隐式 fallback 或第二条 canonical timeline。
 - Image、video、voice 与其他 Providers 是 optional capabilities。基础 Production path 在没有 Video Provider 时仍必须能够完成 image、motion graphics、voice、captions 与 deterministic composition。
-- Remote/paid execution 必须 explicit opt-in，并通过既有 budget、cloud-egress、secret、durable intent、one-use permit、provenance、activation 与 recovery gates。
+- Remote/paid execution 必须 explicit opt-in，并通过 finite task-level submit quota、既有 runtime Budget Guard、cloud-egress、secret、durable intent、one-use permit、provenance、activation 与 recovery gates。正常 task authorization 不要求 Agent 或用户查询、推导或确认 Provider 官方价格。
 
 ### Cross-Cutting Safety
 
@@ -195,9 +195,10 @@ alternate path 与 focused verification 的唯一 human-readable owner。实现�
 - Secret lookup 必须封装在 injected credential supplier 中，presence check 不得回显；lookup失败、keyring locked、credential invalid/rotated 时 fail closed，不得搜索 repo、shell history 或替代 secret source。本机 credential reference、Secret Service attributes 与 lookup detail 只在 `.agent/context/control-plane-playbook.md` 维护。
 - Credential 存在不证明 access、pricing、余额或当前 task authorization。
 - 用户明确要求执行一个必然包含 remote/paid call 的任务时，该请求构成该 accepted scope 的 task-scoped authorization；不得仅因付费对同一任务重复询问。Docs-only、plan、review、可行性分析或“能否执行”不构成 live authorization。
-- Authorization 仅覆盖 accepted Provider/model、inputs、budget 与完成目标所需的最少调用；不得复用于 benchmark、额外 variants、不同 Provider/model 或扩大后的 scope。
-- Task-scoped authorization 不替代 Paid Provider Gate。调用前仍需 exact preview、finite budget ceiling/reservation、cloud-egress approval、secret reference、durable submit intent 与 one-use permit。
-- 若费用超过 ceiling、scope/provider/egress 变化、需要更多调用，或上一次 outcome unknown，必须停止并报告；不得 blind retry、remint permit 或把授权解释为无限额度。
+- Authorization 仅覆盖 accepted Provider/model、inputs 与完成目标所需的最少有限 submit count；不得复用于 benchmark、额外 variants、不同 Provider/model 或扩大后的 scope。用户未指定 count 时，Agent 必须按已接受输出与 Shot 数量封存完成任务所需的最小 task-level ceiling，不得改为询问或研究价格。
+- Agent MUST NOT 为获得 task authorization、设置 submit ceiling 或准备单次调用而浏览官方 pricing、搜索当前单价、计算预计账单、刷新 pricing snapshot，或要求用户提供价格。已有 runtime monetary fields 只能消费 repository/provider profile 中预先配置并已 sealed 的 operator upper bound；它们是内部兼容与安全 evidence，不是 Agent 的 per-call research task，也不得被描述为官方实际价格。
+- Task-scoped authorization 不替代 Paid Provider Gate。调用前仍需 Agent orchestration 的 remaining submit-count check、exact preview、适用的既有 runtime Budget Guard/reservation、cloud-egress approval、secret reference、durable submit intent 与 one-use permit；本条不声称现有 runtime monetary ledger 已迁移为 count-based schema。
+- 若 task-level submit ceiling 已耗尽、scope/provider/egress 变化、确需新增调用，或上一次 outcome unknown，必须停止并报告；不得 blind retry、remint permit 或把授权解释为无限调用。若现有 runtime 因缺失或过期 monetary profile 阻断，必须如实报告 compatibility blocker，MUST NOT 临时查价、伪造新观察时间或自行放宽 Gate。
 - 历史 live evidence、offline tests、现有 credential/余额或旧 run 不授权新的调用。
 
 ## Local ComfyUI Authorization Exemption

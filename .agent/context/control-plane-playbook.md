@@ -177,9 +177,11 @@ code/tests；`AGENTS.md` 的 `Canonical Ownership` 继续提供顶层 durable bo
 - 豁免只移除 user-approval layer。执行必须使用所涉 surface 的既有 canonical seam；AI-VIDEO local video Provider 仍经 `VideoGenerationService`、sealed profile、preflight、durable local intent、committer-issued one-use permit、唯一 committer、recovery 与 media verification，禁止直接调用 Comfy transport 或 Provider `submit()`。Agent-side local image authoring也不得绕过其既有 tool/provider identity、input/output provenance 与 image-level Gate。Exact preview 在既有 seam 要求时仍是 readiness/provenance evidence，但不是 local ComfyUI 的 user-approval gate。
 - Retry、variant 与 benchmark 可以不询问用户，但必须是 bounded、task-relevant、具有新 exact identity 的 attempt。上一次 outcome unknown 时仍须 fail closed，禁止 blind retry、fallback、permit remint 或重复 side effect；Per-Shot Gate 的 `FAIL` / `NOT_EVALUATED` 终止 current attempt 并阻断下一 Shot，但用户目标仍未完成且 outcome known 时，Agent orchestration 必须按 `LOCAL_BOUNDED_REPAIR_LOOP` 继续同一 Shot。任何非 loopback、可能 cloud egress、metered、remote 或 paid execution 均回到对应 authorization 与 Provider gates。
 - 用户明确要求执行一个必然包含 remote/paid call 的任务时，该请求构成该 accepted scope 的 task-scoped authorization；Docs-only、plan、review、可行性分析或“能否执行”不构成 live authorization。
-- Authorization 仅覆盖 accepted Provider/model、inputs、budget 与完成目标所需的最少调用；不得复用于 benchmark、额外 variants、不同 Provider/model 或扩大后的 scope。
-- Task-scoped authorization 不替代 Paid Provider Gate。调用前仍需 exact preview、finite budget ceiling/reservation、cloud-egress approval、secret reference、durable submit intent 与 one-use permit。
-- 若费用超过 ceiling、scope/provider/egress 变化、需要更多调用，或上一次 outcome unknown，必须停止并报告；不得 blind retry、remint permit 或把授权解释为无限额度。
+- Authorization 仅覆盖 accepted Provider/model、inputs 与完成目标所需的最少有限 submit count；不得复用于 benchmark、额外 variants、不同 Provider/model 或扩大后的 scope。用户未指定 count 时，按 accepted output 与 Shot 数量封存完成任务所需的最小 task-level ceiling，不得转为询价流程。
+- Agent 不得为了 task authorization、submit ceiling 或单次调用准备而浏览官方 pricing、搜索当前单价、计算预计账单、刷新 pricing snapshot，或要求用户提供价格。正常 paid execution 的 orchestration 约束是 task-level submit count；每个 exact attempt 仍必须独立 reservation 并消费 one-use permit。
+- 现有 runtime monetary fields 只允许消费 repository/provider profile 中预先配置并 sealed 的 operator upper bound；该值只作为兼容的内部 Budget Guard evidence，不代表官方实际价格，不得触发 Agent-side research。若 profile 缺失或过期导致 runtime fail closed，报告 compatibility blocker，不得临时查价、伪造 observed/expires 时间或自行修改 Gate。
+- Task-scoped authorization 不替代 Paid Provider Gate。调用前仍需 Agent orchestration 的 remaining submit-count check、exact preview、适用的既有 runtime Budget Guard/reservation、cloud-egress approval、secret reference、durable submit intent 与 one-use permit；这不把现有 monetary ledger 或 historical receipts 解释为 count-based runtime schema。
+- 若 task-level submit ceiling 已耗尽、scope/provider/egress 变化、确需新增调用，或上一次 outcome unknown，必须停止并报告；不得 blind retry、remint permit 或把授权解释为无限调用。
 - 历史 live evidence、offline tests、现有 credential/余额或旧 run 不授权新的调用。
 
 ## 4. Verification, Pilot And Delivery Details
