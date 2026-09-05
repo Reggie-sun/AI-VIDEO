@@ -37,8 +37,9 @@ This command queries five dedicated main-corpus shards plus the eligible
 run-summary shard. Stale last-good fragments identify their shard via
 `corpus_kind` and `index_freshness=stale`; only those shards are queued for
 detached refresh. Missing or legacy layout returns exit `3` after queueing the
-required materialization. Follow the parent skill's non-blocking result rules
-and never run a foreground recovery build.
+required materialization. Library-incompatible shards also return exit `3`
+after queueing only those exact shards. Follow the parent skill's non-blocking
+result rules and never run a foreground recovery build.
 
 ## Interpretation
 

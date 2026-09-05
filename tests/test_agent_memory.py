@@ -1710,6 +1710,255 @@ def test_cli_builds_and_searches_all_scopes(
     }
 
 
+def test_cli_all_scope_queues_only_library_incompatible_shards(
+    scoped_corpora,
+    project_docs_corpora,
+    tmp_path: Path,
+    capsys,
+    monkeypatch,
+) -> None:
+    experience, superpowers = scoped_corpora
+    docs_root, _ = project_docs_corpora
+    idx = tmp_path / "idx"
+    common = [
+        "--embedding",
+        "fake",
+        "--scope",
+        "all",
+        "--corpus",
+        str(experience.root),
+        "--superpowers-corpus",
+        str(superpowers.root),
+        "--docs-root",
+        str(docs_root),
+        "--index",
+        str(idx),
+        "--runs-root",
+        str(tmp_path / "missing_runs"),
+    ]
+    assert agent_memory_main([*common, "build"]) == 0
+    capsys.readouterr()
+
+    from ai_video.agent_memory.layout import shard_path
+
+    for kind in ("superpowers", "research"):
+        manifest_path = shard_path(idx, kind) / "manifest.json"
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+        payload["library_versions"]["chromadb"] = "0.5.23"
+        manifest_path.write_text(
+            json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+
+    incompatible_leaves = {
+        shard_path(idx, kind).resolve() for kind in ("superpowers", "research")
+    }
+    original_client = index_module._client
+
+    def reject_migrating_incompatible_leaf(index_path):
+        if Path(index_path).resolve() in incompatible_leaves:
+            pytest.fail("library-incompatible shards must not open through Chroma")
+        return original_client(index_path)
+
+    monkeypatch.setattr(index_module, "_client", reject_migrating_incompatible_leaf)
+    queued: list[tuple[str, ...]] = []
+    monkeypatch.setattr(
+        agent_memory_script,
+        "_enqueue",
+        lambda args, kinds: queued.append(tuple(kinds)),
+    )
+
+    result = agent_memory_main([*common, "search", "recovery", "--json"])
+
+    assert result == 3
+    assert queued == [("superpowers", "research")]
+    assert (
+        "library-incompatible Agent Memory shard(s): superpowers, research"
+        in capsys.readouterr().err
+    )
+
+
+def test_cli_library_mismatch_does_not_hide_physical_corruption(
+    scoped_corpora,
+    project_docs_corpora,
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    experience, superpowers = scoped_corpora
+    docs_root, project_corpora = project_docs_corpora
+    idx = tmp_path / "idx"
+    common = [
+        "--embedding",
+        "fake",
+        "--scope",
+        "all",
+        "--corpus",
+        str(experience.root),
+        "--superpowers-corpus",
+        str(superpowers.root),
+        "--docs-root",
+        str(docs_root),
+        "--index",
+        str(idx),
+        "--runs-root",
+        str(tmp_path / "missing_runs"),
+    ]
+    assert agent_memory_main([*common, "build"]) == 0
+
+    from ai_video.agent_memory.layout import shard_path
+
+    leaf = shard_path(idx, "superpowers")
+    manifest_path = leaf / "manifest.json"
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    payload["library_versions"]["chromadb"] = "0.5.23"
+    manifest_path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    research = next(item for item in project_corpora if item.kind == "research")
+    research_leaf = shard_path(idx, "research")
+    collection = index_module.load_index(
+        research_leaf,
+        DeterministicFakeEmbeddings(),
+    ).get_collection(research.collection_name)
+    collection.delete(ids=[collection.get(limit=1)["ids"][0]])
+    monkeypatch.setattr(
+        agent_memory_script,
+        "_enqueue",
+        lambda args, kinds: pytest.fail("physical corruption must not enqueue"),
+    )
+
+    assert agent_memory_main([*common, "search", "recovery", "--json"]) == 2
+
+
+def test_cli_library_mismatch_race_queues_only_changed_shard(
+    scoped_corpora,
+    project_docs_corpora,
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    from ai_video.agent_memory.manifest import LibraryVersionMismatchError
+
+    experience, superpowers = scoped_corpora
+    docs_root, _ = project_docs_corpora
+    idx = tmp_path / "idx"
+    common = [
+        "--embedding",
+        "fake",
+        "--scope",
+        "all",
+        "--corpus",
+        str(experience.root),
+        "--superpowers-corpus",
+        str(superpowers.root),
+        "--docs-root",
+        str(docs_root),
+        "--index",
+        str(idx),
+        "--runs-root",
+        str(tmp_path / "missing_runs"),
+    ]
+    assert agent_memory_main([*common, "build"]) == 0
+
+    original_validate = retrieval_module.validate_scoped_index
+    validation_calls: dict[str, int] = {}
+
+    def replace_research_after_preflight(corpora, index_path, embedding):
+        kind = corpora[0].kind
+        validation_calls[kind] = validation_calls.get(kind, 0) + 1
+        if kind == "research" and validation_calls[kind] == 2:
+            manifest_path = Path(index_path) / "manifest.json"
+            payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+            payload["library_versions"]["chromadb"] = "0.5.23"
+            manifest_path.write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            raise LibraryVersionMismatchError()
+        return original_validate(corpora, index_path, embedding)
+
+    monkeypatch.setattr(
+        retrieval_module,
+        "validate_scoped_index",
+        replace_research_after_preflight,
+    )
+    queued: list[tuple[str, ...]] = []
+    monkeypatch.setattr(
+        agent_memory_script,
+        "_enqueue",
+        lambda args, kinds: queued.append(tuple(kinds)),
+    )
+
+    assert agent_memory_main([*common, "search", "recovery", "--json"]) == 3
+    assert queued == [("research",)]
+
+
+def test_cli_library_mismatch_race_does_not_hide_corruption(
+    scoped_corpora,
+    project_docs_corpora,
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    from ai_video.agent_memory.manifest import LibraryVersionMismatchError
+
+    experience, superpowers = scoped_corpora
+    docs_root, project_corpora = project_docs_corpora
+    research = next(item for item in project_corpora if item.kind == "research")
+    idx = tmp_path / "idx"
+    common = [
+        "--embedding",
+        "fake",
+        "--scope",
+        "all",
+        "--corpus",
+        str(experience.root),
+        "--superpowers-corpus",
+        str(superpowers.root),
+        "--docs-root",
+        str(docs_root),
+        "--index",
+        str(idx),
+        "--runs-root",
+        str(tmp_path / "missing_runs"),
+    ]
+    assert agent_memory_main([*common, "build"]) == 0
+
+    original_validate = retrieval_module.validate_scoped_index
+    validation_calls: dict[str, int] = {}
+
+    def replace_corrupt_research_after_preflight(corpora, index_path, embedding):
+        kind = corpora[0].kind
+        validation_calls[kind] = validation_calls.get(kind, 0) + 1
+        if kind == "research" and validation_calls[kind] == 2:
+            manifest_path = Path(index_path) / "manifest.json"
+            payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+            payload["library_versions"]["chromadb"] = "0.5.23"
+            manifest_path.write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+                encoding="utf-8",
+            )
+            collection = index_module.load_index(
+                index_path,
+                embedding,
+            ).get_collection(research.collection_name)
+            collection.delete(ids=[collection.get(limit=1)["ids"][0]])
+            raise LibraryVersionMismatchError()
+        return original_validate(corpora, index_path, embedding)
+
+    monkeypatch.setattr(
+        retrieval_module,
+        "validate_scoped_index",
+        replace_corrupt_research_after_preflight,
+    )
+    monkeypatch.setattr(
+        agent_memory_script,
+        "_enqueue",
+        lambda args, kinds: pytest.fail("physical corruption must not enqueue"),
+    )
+
+    assert agent_memory_main([*common, "search", "recovery", "--json"]) == 2
+
+
 def test_cli_build_materializes_run_summaries_before_search(
     sample_runs_root: Path, tmp_path: Path, capsys
 ) -> None:
@@ -2659,6 +2908,57 @@ def test_scoped_validation_classifies_source_drift_as_stale(
 
     with pytest.raises(StaleIndexError, match="stale corpus"):
         index_module.validate_scoped_index((experience,), idx, fake_embedding)
+
+
+def test_library_rebuild_candidate_rejects_uncheckpointed_database(
+    scoped_corpora, tmp_path: Path, fake_embedding
+) -> None:
+    from ai_video.agent_memory.layout import build_project_indexes, shard_path
+
+    experience, _ = scoped_corpora
+    root = tmp_path / "project-index"
+    build_project_indexes((experience,), root, fake_embedding)
+    leaf = shard_path(root, "experience")
+    manifest_path = leaf / "manifest.json"
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    payload["library_versions"]["chromadb"] = "0.5.23"
+    manifest_path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    Path(f"{leaf / 'chroma.sqlite3'}-wal").write_bytes(b"uncheckpointed")
+
+    with pytest.raises(index_module.IndexMismatchError, match="uncheckpointed"):
+        index_module.validate_library_rebuild_candidate(
+            (experience,),
+            leaf,
+            fake_embedding,
+        )
+
+
+def test_library_rebuild_candidate_rejects_malformed_version_identity(
+    scoped_corpora, tmp_path: Path, fake_embedding
+) -> None:
+    from ai_video.agent_memory.layout import build_project_indexes, shard_path
+
+    experience, _ = scoped_corpora
+    root = tmp_path / "project-index"
+    build_project_indexes((experience,), root, fake_embedding)
+    leaf = shard_path(root, "experience")
+    manifest_path = leaf / "manifest.json"
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    payload["library_versions"].pop("chromadb")
+    manifest_path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(index_module.IndexMismatchError, match="invalid index library"):
+        index_module.validate_library_rebuild_candidate(
+            (experience,),
+            leaf,
+            fake_embedding,
+        )
 
 
 def test_stale_fallback_rejects_different_corpus_root_identity(

@@ -387,8 +387,9 @@ Result handling 必须 fail closed 且 non-blocking：
 - exit `0` + fresh hits 或 `[]` 是正常结果；`[]` 是有效 abstention。
 - exit `0` + `index_freshness=stale` 只返回 physically valid、tagged last-good fragments，
   并异步 queue exact stale shards；继续使用当前文件证据，不等待、不轮询、不重复检索。
-- exit `3` 表示 local sharded layout missing 或需要 one-time migration；CLI 已 queue
-  materialization，本 task 继续使用当前 repository evidence，不在前台重试。
+- exit `3` 表示 local sharded layout missing、需要 one-time migration，或 exact shard
+  由不同 library stack materialize；CLI 已 queue exact required shards，本 task 继续使用
+  当前 repository evidence，不在前台重试。
 - exit `2` 是 schema、embedding、authority、manifest 或 physical collection strict
   failure；显式报告并继续当前文件证据，不 enqueue/rebuild、不降低 validation。
 

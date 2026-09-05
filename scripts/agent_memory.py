@@ -67,7 +67,11 @@ from ai_video.agent_memory.maintenance import (
     enqueue_refresh,
     run_refresh_worker,
 )
-from ai_video.agent_memory.manifest import corpus_digest, run_summary_digest
+from ai_video.agent_memory.manifest import (
+    LibraryVersionMismatchError,
+    corpus_digest,
+    run_summary_digest,
+)
 from ai_video.agent_memory.retrieval import format_text, retrieve_project
 
 
@@ -297,6 +301,23 @@ def cmd_search(args: argparse.Namespace) -> int:
             print(f"{exc}; refresh could not be queued: {queue_exc}", file=sys.stderr)
             return 2
         print(f"{exc}; continue with current repository evidence.", file=sys.stderr)
+        return 3
+    except LibraryVersionMismatchError as exc:
+        if not exc.kinds:
+            print(str(exc), file=sys.stderr)
+            return 2
+        kinds = exc.kinds
+        try:
+            _enqueue(args, kinds)
+        except Exception as queue_exc:
+            print(f"{exc}; refresh could not be queued: {queue_exc}", file=sys.stderr)
+            return 2
+        print(
+            "library-incompatible Agent Memory shard(s): "
+            f"{', '.join(kinds)}; refresh queued; continue with current "
+            "repository evidence.",
+            file=sys.stderr,
+        )
         return 3
     except (FileNotFoundError, IndexMismatchError, ValueError) as exc:
         print(str(exc), file=sys.stderr)

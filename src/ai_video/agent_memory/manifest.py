@@ -25,6 +25,14 @@ class IndexMismatchError(RuntimeError):
     """Raised when an index does not match its requested corpus/model identity."""
 
 
+class LibraryVersionMismatchError(IndexMismatchError):
+    """Raised when derived index bytes need rebuilding for current libraries."""
+
+    def __init__(self, *, kinds: Iterable[str] = ()) -> None:
+        super().__init__("index library version mismatch; rebuild required")
+        self.kinds = tuple(dict.fromkeys(kinds))
+
+
 class StaleIndexError(IndexMismatchError):
     """Raised only when a valid materialized index trails source corpus bytes."""
 
@@ -184,6 +192,48 @@ def validate_manifest(
     corpora: Iterable[CorpusSpec],
     embedding,
 ) -> None:
+    _validate_manifest_contract(
+        manifest,
+        corpora,
+        embedding,
+        check_library_versions=True,
+        check_source_identity=True,
+    )
+
+
+def validate_library_rebuild_candidate_manifest(
+    manifest: IndexManifest,
+    corpora: Iterable[CorpusSpec],
+    embedding,
+) -> None:
+    """Validate every immutable identity except the rebuildable library tuple."""
+    recorded_versions = dict(manifest.library_versions)
+    current_versions = _library_versions()
+    if recorded_versions == current_versions:
+        raise IndexMismatchError("index library identity is already current")
+    if set(recorded_versions) != set(current_versions) or not all(
+        isinstance(value, str) and value for value in recorded_versions.values()
+    ):
+        raise IndexMismatchError(
+            "invalid index library version identity; explicit build required"
+        )
+    _validate_manifest_contract(
+        manifest,
+        corpora,
+        embedding,
+        check_library_versions=False,
+        check_source_identity=False,
+    )
+
+
+def _validate_manifest_contract(
+    manifest: IndexManifest,
+    corpora: Iterable[CorpusSpec],
+    embedding,
+    *,
+    check_library_versions: bool,
+    check_source_identity: bool,
+) -> None:
     if manifest.schema_version != MANIFEST_SCHEMA_VERSION:
         raise IndexMismatchError("index manifest schema mismatch; rebuild required")
     if manifest.embedding != embedding_identity(embedding):
@@ -194,8 +244,11 @@ def validate_manifest(
         "cosine",
     ):
         raise IndexMismatchError("index chunking/metric identity mismatch; rebuild required")
-    if dict(manifest.library_versions) != _library_versions():
-        raise IndexMismatchError("index library version mismatch; rebuild required")
+    if (
+        check_library_versions
+        and dict(manifest.library_versions) != _library_versions()
+    ):
+        raise LibraryVersionMismatchError()
 
     indexed = {item.kind: item for item in manifest.corpora}
     for corpus in corpora:
@@ -211,16 +264,17 @@ def validate_manifest(
             raise IndexMismatchError(
                 f"corpus contract mismatch for {corpus.kind!r}; rebuild required"
             )
-        if corpus.kind == "run_summaries":
-            digest, document_count = run_summary_digest(corpus.root)
-        else:
-            digest, document_count = corpus_digest(corpus.root, corpus)
         if item.root != _display_root(corpus.root):
             raise IndexMismatchError(
                 f"corpus root identity mismatch for {corpus.kind!r}; "
                 "rebuild required"
             )
-        if item.source_sha256 != digest or item.document_count != document_count:
-            raise StaleIndexError(
-                f"stale corpus {corpus.kind!r}; rebuild the Agent Memory index"
-            )
+        if check_source_identity:
+            if corpus.kind == "run_summaries":
+                digest, document_count = run_summary_digest(corpus.root)
+            else:
+                digest, document_count = corpus_digest(corpus.root, corpus)
+            if item.source_sha256 != digest or item.document_count != document_count:
+                raise StaleIndexError(
+                    f"stale corpus {corpus.kind!r}; rebuild the Agent Memory index"
+                )

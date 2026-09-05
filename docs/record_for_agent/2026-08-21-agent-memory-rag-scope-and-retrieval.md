@@ -171,9 +171,12 @@ count 全部通过后，CLI 可返回带
 `index_freshness=stale` 的 last-good 片段，并 queue exact stale shards。Build 在独立
 staging 完成 embedding，只在 atomic activation 时与 search 共享短时 read/write lock；
 因此前台 query 不等待数分钟 build。Missing/legacy layout queue materialization 并以
-exit `3` 返回；identity 或 physical corruption 属于 `BROKEN`，以 exit `2` fail closed，
-绝不 last-good 或自动修复。旧 shared `.agent/memory/index` 不再读取；one-time migration
-从 authoritative corpus bytes 重建 per-corpus shards。
+exit `3` 返回。Library-version mismatch 同样拒绝本次读取，但属于可确定的 derived-index
+rematerialization：CLI 收集 exact incompatible shard kinds、queue 后以 exit `3` 返回。
+Schema、embedding、chunking、authority/collection contract 或 physical corruption 仍属于
+`BROKEN`，以 exit `2` fail closed，绝不 last-good 或自动修复。旧 shared
+`.agent/memory/index` 不再读取；one-time migration 从 authoritative corpus bytes 重建
+per-corpus shards。
 
 Queue 位于 worktree-local Git path `.git/agent-memory-refresh/`，只保存 sanitized corpus
 root/index configuration、corpus kinds 与 exact desired source identities，不保存 query、

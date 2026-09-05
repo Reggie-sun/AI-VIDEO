@@ -65,9 +65,10 @@ foreground; normal query/null embeddings still run locally for retrieval.
   tagged last-good fragments and queues the exact stale corpus shards for a
   detached refresh. Use those fragments as stale advisory context and continue;
   do not wait, poll, or retry in the same task merely to obtain fresh results.
-- Exit code `3` means the local sharded layout is missing or needs one-time
-  migration. The CLI has queued the required materialization; continue from
-  current repository evidence without retrying in this task.
+- Exit code `3` means the local sharded layout is missing, needs one-time
+  migration, or contains shards materialized by a different library stack.
+  The CLI has queued the exact required shards; continue from current
+  repository evidence without retrying in this task.
 - Exit code `2` is a strict failure such as schema, embedding, authority,
   manifest, or physical collection corruption. Report it and continue from
   current repository evidence; do not enqueue, rebuild, or weaken validation.

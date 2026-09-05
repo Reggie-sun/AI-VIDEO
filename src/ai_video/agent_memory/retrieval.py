@@ -30,6 +30,7 @@ from ai_video.agent_memory.index import (
     load_index,
     release_index_client,
     validate_index_path,
+    validate_library_rebuild_candidate,
     validate_materialized_index,
     validate_run_summary_index,
     validate_scoped_index,
@@ -39,7 +40,11 @@ from ai_video.agent_memory.layout import (
     read_project_layout,
     shard_path,
 )
-from ai_video.agent_memory.manifest import IndexManifest, StaleIndexError
+from ai_video.agent_memory.manifest import (
+    IndexManifest,
+    LibraryVersionMismatchError,
+    StaleIndexError,
+)
 
 
 @dataclass
@@ -301,6 +306,39 @@ def retrieve_project(
             kinds=tuple(missing_kinds),
         )
     embedding = embedding or build_embedding()
+    library_incompatible_kinds: list[str] = []
+    version_leaves = [(item.kind, leaves[item.kind]) for item in selected]
+    if run_spec is not None:
+        assert run_leaf is not None
+        version_leaves.append(("run_summaries", run_leaf))
+    for kind, leaf in version_leaves:
+        matching_corpora = (
+            (run_spec,)
+            if kind == "run_summaries"
+            else tuple(item for item in selected if item.kind == kind)
+        )
+        with index_activation_lock(leaf, exclusive=False):
+            try:
+                if kind == "run_summaries":
+                    assert run_spec is not None
+                    validate_run_summary_index(leaf, run_spec, embedding)
+                else:
+                    validate_scoped_index(matching_corpora, leaf, embedding)
+            except LibraryVersionMismatchError:
+                validate_library_rebuild_candidate(
+                    matching_corpora,
+                    leaf,
+                    embedding,
+                )
+                library_incompatible_kinds.append(kind)
+            except StaleIndexError:
+                if kind == "run_summaries":
+                    validate_materialized_index(leaf, embedding, (kind,))
+            finally:
+                release_index_client(leaf)
+    if library_incompatible_kinds:
+        raise LibraryVersionMismatchError(kinds=library_incompatible_kinds)
+
     allocations = _allocate_scope_limits(requested, top_k)
     query_vector = embedding.embed_query(query)
     null_query_vector = embedding.embed_query(select_dense_null_query(query))
@@ -313,14 +351,25 @@ def retrieve_project(
             freshness = "fresh"
             try:
                 manifest = validate_scoped_index((corpus,), leaf, embedding)
+            except LibraryVersionMismatchError as exc:
+                validate_library_rebuild_candidate((corpus,), leaf, embedding)
+                raise LibraryVersionMismatchError(
+                    kinds=exc.kinds or (corpus.kind,)
+                ) from exc
             except StaleIndexError:
                 if not allow_stale:
                     raise
-                manifest = validate_materialized_index(
-                    leaf,
-                    embedding,
-                    (corpus.kind,),
-                )
+                try:
+                    manifest = validate_materialized_index(
+                        leaf,
+                        embedding,
+                        (corpus.kind,),
+                    )
+                except LibraryVersionMismatchError as exc:
+                    validate_library_rebuild_candidate((corpus,), leaf, embedding)
+                    raise LibraryVersionMismatchError(
+                        kinds=exc.kinds or (corpus.kind,)
+                    ) from exc
                 freshness = "stale"
                 stale_kinds.append(corpus.kind)
             try:
@@ -346,14 +395,29 @@ def retrieve_project(
             freshness = "fresh"
             try:
                 manifest = validate_run_summary_index(run_leaf, run_spec, embedding)
+            except LibraryVersionMismatchError as exc:
+                validate_library_rebuild_candidate((run_spec,), run_leaf, embedding)
+                raise LibraryVersionMismatchError(
+                    kinds=exc.kinds or ("run_summaries",)
+                ) from exc
             except StaleIndexError:
                 if not allow_stale:
                     raise
-                manifest = validate_materialized_index(
-                    run_leaf,
-                    embedding,
-                    ("run_summaries",),
-                )
+                try:
+                    manifest = validate_materialized_index(
+                        run_leaf,
+                        embedding,
+                        ("run_summaries",),
+                    )
+                except LibraryVersionMismatchError as exc:
+                    validate_library_rebuild_candidate(
+                        (run_spec,),
+                        run_leaf,
+                        embedding,
+                    )
+                    raise LibraryVersionMismatchError(
+                        kinds=exc.kinds or ("run_summaries",)
+                    ) from exc
                 freshness = "stale"
                 stale_kinds.append("run_summaries")
             try:

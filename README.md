@@ -121,8 +121,9 @@ Project-level retrieval core 保持 read-only。CLI `search` 遇到 corpus bytes
 detached queue；前台不等待 corpus re-embedding 或 Chroma materialization，正常 query/null
 embedding 仍在本地查询内执行。首次缺失 sharded layout 或旧 shared layout 需要
 migration 时，CLI queue materialization 后以 exit `3` 快速返回。Schema、embedding、
-chunking/metric、library identity、authority/collection contract 或 physical collection
-损坏仍以 exit `2` strict fail closed，不自动修复。Queue 不是 lifecycle hook，不读取
+chunking/metric、authority/collection contract 或 physical collection 损坏仍以 exit `2`
+strict fail closed，不自动修复。Library identity mismatch 仍拒绝本次读取，但会收集并
+queue exact incompatible shards 后以 exit `3` 返回。Queue 不是 lifecycle hook，不读取
 Provider secret、不联网，也不改变 Production state。
 
 Leaf manifest 保持 schema v1，且 collection、authority 与 index 目录相互独立。

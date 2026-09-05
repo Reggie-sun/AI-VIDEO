@@ -40,7 +40,8 @@ python -m scripts.agent_memory --scope experience search \
 
 This command queries the canonical per-corpus shards. Stale last-good fragments
 are explicitly tagged and their exact shards are queued for detached refresh;
-missing or legacy layout returns exit `3` after queueing materialization.
+missing/legacy layout or a library-incompatible shard returns exit `3` after
+queueing exact materialization.
 Follow the parent skill's non-blocking result rules and never run a foreground
 recovery build.
 

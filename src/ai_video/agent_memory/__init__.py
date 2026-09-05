@@ -43,7 +43,10 @@ from ai_video.agent_memory.layout import (
     build_project_indexes,
     shard_path,
 )
-from ai_video.agent_memory.manifest import StaleIndexError
+from ai_video.agent_memory.manifest import (
+    LibraryVersionMismatchError,
+    StaleIndexError,
+)
 from ai_video.agent_memory.retrieval import (
     Hit,
     RetrievalResult,
@@ -76,6 +79,7 @@ __all__ = [
     "index_exists",
     "read_index_manifest",
     "IndexMismatchError",
+    "LibraryVersionMismatchError",
     "StaleIndexError",
     "MissingProjectIndexError",
     "build_project_indexes",

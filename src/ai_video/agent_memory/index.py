@@ -7,6 +7,7 @@ import fcntl
 import logging
 import os
 import shutil
+import sqlite3
 import tempfile
 import threading
 import uuid
@@ -32,6 +33,7 @@ from ai_video.agent_memory.manifest import (
     corpus_digest,
     read_manifest,
     run_summary_digest,
+    validate_library_rebuild_candidate_manifest,
     validate_manifest,
     write_manifest,
 )
@@ -325,6 +327,71 @@ def _validate_index_collections(
             )
 
 
+def _validate_index_collections_read_only(
+    index_path: Path,
+    corpus_kinds: Iterable[str],
+    manifest: IndexManifest,
+) -> None:
+    """Inspect an incompatible Chroma store without allowing schema migration."""
+    database = Path(index_path).resolve() / "chroma.sqlite3"
+    for suffix in ("-wal", "-journal"):
+        sidecar = Path(f"{database}{suffix}")
+        if sidecar.exists() and sidecar.stat().st_size:
+            raise IndexMismatchError(
+                "library-incompatible index has uncheckpointed database state; "
+                "explicit build required"
+            )
+    connection: sqlite3.Connection | None = None
+    try:
+        connection = sqlite3.connect(
+            f"{database.as_uri()}?mode=ro&immutable=1",
+            uri=True,
+        )
+        connection.execute("PRAGMA query_only = ON")
+        if connection.execute("PRAGMA quick_check").fetchall() != [("ok",)]:
+            raise IndexMismatchError(
+                "library-incompatible index database failed integrity check"
+            )
+        indexed = {item.kind: item for item in manifest.corpora}
+        for kind in corpus_kinds:
+            item = indexed[kind]
+            segments = connection.execute(
+                """
+                SELECT segments.id, segments.scope
+                FROM collections
+                JOIN segments ON segments.collection = collections.id
+                WHERE collections.name = ?
+                """,
+                (item.collection_name,),
+            ).fetchall()
+            metadata_segments = [row[0] for row in segments if row[1] == "METADATA"]
+            vector_segments = [row[0] for row in segments if row[1] == "VECTOR"]
+            if len(metadata_segments) != 1 or len(vector_segments) != 1:
+                raise IndexMismatchError(
+                    f"index collection for scope {kind!r} is unavailable; "
+                    "explicit build required"
+                )
+            actual_chunks = connection.execute(
+                "SELECT COUNT(*) FROM embeddings WHERE segment_id = ?",
+                (metadata_segments[0],),
+            ).fetchone()[0]
+            if actual_chunks != item.chunk_count:
+                raise IndexMismatchError(
+                    f"index collection for scope {kind!r} chunk count mismatch; "
+                    "explicit build required"
+                )
+    except IndexMismatchError:
+        raise
+    except (OSError, sqlite3.Error, TypeError) as exc:
+        raise IndexMismatchError(
+            "library-incompatible index cannot be verified read-only; "
+            "explicit build required"
+        ) from exc
+    finally:
+        if connection is not None:
+            connection.close()
+
+
 def validate_materialized_index(
     index_path: Path,
     embedding: Embeddings,
@@ -352,6 +419,35 @@ def validate_materialized_index(
             f"scope(s) {sorted(missing)} not present in index; rebuild required"
         )
     _validate_index_collections(index_path, kinds, manifest)
+    return manifest
+
+
+def validate_library_rebuild_candidate(
+    corpora: Sequence[CorpusSpec],
+    index_path: Path,
+    embedding: Embeddings,
+) -> IndexManifest:
+    """Accept only a physically valid shard whose sole contract drift is libraries."""
+    if not corpora:
+        raise ValueError("at least one corpus is required")
+    index_path = Path(index_path)
+    validate_index_path(index_path, tuple(corpus.root for corpus in corpora))
+    for corpus in corpora:
+        if not corpus.root.is_dir():
+            raise FileNotFoundError(f"corpus not found: {corpus.root}")
+    if not index_exists(index_path):
+        raise IndexMismatchError(
+            f"Agent project RAG index at {index_path} is incomplete; "
+            "explicit rebuild required"
+        )
+    manifest = read_index_manifest(index_path)
+    validate_library_rebuild_candidate_manifest(manifest, corpora, embedding)
+    kinds = tuple(corpus.kind for corpus in corpora)
+    if tuple(item.kind for item in manifest.corpora) != kinds:
+        raise IndexMismatchError(
+            "library-incompatible shard contains unexpected corpora"
+        )
+    _validate_index_collections_read_only(index_path, kinds, manifest)
     return manifest
 
 
@@ -442,6 +538,7 @@ __all__ = [
     "load_index",
     "read_index_manifest",
     "validate_index_path",
+    "validate_library_rebuild_candidate",
     "validate_materialized_index",
     "validate_manifest",
     "validate_run_summary_index",
