@@ -636,7 +636,7 @@ class ComfyUIVideoProvider:
             != self.profile.profile_content_hash
             or requirement.conditioning_compatibility is None
             or requirement.conditioning_compatibility.lane
-            is not ConditioningLane.FL2VA
+            not in (ConditioningLane.I2VA, ConditioningLane.FL2VA)
         ):
             return ProviderRequirementUnsupported(
                 requirement_hash=requirement.requirement_hash,

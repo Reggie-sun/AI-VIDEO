@@ -55,6 +55,7 @@ from ai_video.production.video_requirement import (
     AxisContinuity,
     AudioNeed,
     CapabilityNeed,
+    ConditioningLane,
     ContinuityMode as RequirementContinuityMode,
     GenerationIntent,
     GenerationMode as RequirementGenerationMode,
@@ -560,8 +561,10 @@ def test_local_h3_compiles_neutral_first_frame_without_runtime_execution(
     assert provider.resolve(compiled.request) == resolved
 
 
+@pytest.mark.parametrize("with_last_frame", [False, True], ids=["i2va", "fl2va"])
 def test_stock20_v4_compiles_exact_h3_prompt_without_neutral_fallback(
     tmp_path: Path,
+    with_last_frame: bool,
 ) -> None:
     artifact_root, comfy_root, profile = _profile_and_comfy_root(
         tmp_path, QUALITY_PROFILE_PATH
@@ -569,7 +572,7 @@ def test_stock20_v4_compiles_exact_h3_prompt_without_neutral_fallback(
     image_root = tmp_path / "images-v4"
     image_root.mkdir()
     first = _asset("continuity_terminal", "v4-first", "8" * 64)
-    last = _asset("last_frame", "v4-last", "9" * 64)
+    last = _asset("last_frame", "v4-last", "9" * 64) if with_last_frame else None
     context = _context(
         continuity=ContinuityMode.EXACT_TERMINAL,
         terminal=first,
@@ -597,21 +600,20 @@ def test_stock20_v4_compiles_exact_h3_prompt_without_neutral_fallback(
         generation_intent=_spatial_intent(_complete_intent()),
         conditioning_compatibility=_compatible_fl2va().model_copy(
             update={
+                "lane": ConditioningLane.FL2VA if last else ConditioningLane.I2VA,
                 "first_anchor_id": first.asset_id,
-                "last_anchor_id": last.asset_id,
+                "last_anchor_id": last.asset_id if last else None,
             }
         ),
         capability_need=CapabilityNeed(
             needs_first_frame=True,
-            needs_last_frame=True,
+            needs_last_frame=with_last_frame,
             needs_continuity_state=True,
             accepts_local_execution=True,
             accepts_remote_execution=False,
         ),
-        semantic_reference_roles=(
-            SemanticReferenceRole.CONTINUITY_TERMINAL,
-            SemanticReferenceRole.LAST_FRAME,
-        ),
+        semantic_reference_roles=(SemanticReferenceRole.CONTINUITY_TERMINAL,)
+        + ((SemanticReferenceRole.LAST_FRAME,) if last else ()),
         asset_evidence=(
             AssetEvidence(
                 role=SemanticReferenceRole.CONTINUITY_TERMINAL,
@@ -622,15 +624,21 @@ def test_stock20_v4_compiles_exact_h3_prompt_without_neutral_fallback(
                 height=first.height,
                 size_bytes=first.size_bytes,
             ),
-            AssetEvidence(
-                role=SemanticReferenceRole.LAST_FRAME,
-                asset_id=last.asset_id,
-                asset_sha256=last.asset_sha256,
-                mime_type=last.mime_type,
-                width=last.width,
-                height=last.height,
-                size_bytes=last.size_bytes,
-            ),
+        )
+        + (
+            (
+                AssetEvidence(
+                    role=SemanticReferenceRole.LAST_FRAME,
+                    asset_id=last.asset_id,
+                    asset_sha256=last.asset_sha256,
+                    mime_type=last.mime_type,
+                    width=last.width,
+                    height=last.height,
+                    size_bytes=last.size_bytes,
+                ),
+            )
+            if last
+            else ()
         ),
         output_need=OutputNeed(
             timing_mode="frame_count",
@@ -672,13 +680,14 @@ def test_stock20_v4_compiles_exact_h3_prompt_without_neutral_fallback(
         selected_capability_id="minimax-h3-fl2va-local-v1",
         compiler_contract=compiler_contract,
     )
-    lifecycle = lifecycle.model_copy(
-        update={
-            "input_artifact_ids": tuple(
-                dict.fromkeys((*lifecycle.input_artifact_ids, last.asset_id))
-            )
-        }
-    )
+    if last:
+        lifecycle = lifecycle.model_copy(
+            update={
+                "input_artifact_ids": tuple(
+                    dict.fromkeys((*lifecycle.input_artifact_ids, last.asset_id))
+                )
+            }
+        )
     routing = VideoGenerationResolver().resolve_requirement(
         projection=projection,
         context=context,
@@ -702,9 +711,26 @@ def test_stock20_v4_compiles_exact_h3_prompt_without_neutral_fallback(
 
     assert isinstance(compiled, CompiledProviderVideoRequest)
     assert compiled.adapter_compiler_version == "2"
+    resolved = provider.resolve(compiled.request)
+    expected_roles = ["first_frame", "last_frame"] if last else ["first_frame"]
+    assert [binding.role for binding in resolved.image_bindings] == expected_roles
+    assert resolved.image_bindings[0].asset_id == "asset-v4-first"
+    assert resolved.image_bindings[0].asset_sha256 == "8" * 64
     assert compiled.provider_native_prompt.count("[Shot 1]") == 1
     assert "integrated_multimodal_description:" in compiled.provider_native_prompt
     assert "generation_mode=" not in compiled.provider_native_prompt
+
+    mismatched_bound = routing.provider_bound_request.model_copy(
+        update={
+            "provider_profile": provider_profile.model_copy(
+                update={"profile_sha256": "a" * 64}
+            )
+        }
+    )
+    mismatch = provider.compile_request(mismatched_bound, projection.requirement)
+    assert isinstance(mismatch, ProviderRequirementUnsupported)
+    assert mismatch.reason is ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH
+    assert mismatch.unsupported_field_paths == ("provider_profile",)
 
     performance = projection.requirement.generation_intent.performance_intent
     assert performance is not None

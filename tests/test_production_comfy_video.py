@@ -494,6 +494,8 @@ def test_h3_quality_profile_renders_1344x672_with_explicit_h264_crf17(
     assert workflow["14"]["inputs"]["codec"] == "h264"
     assert workflow["14"]["inputs"]["codec.encoding"] == "re-encode"
     assert workflow["14"]["inputs"]["codec.encoding.crf"] == 17
+    assert "16" not in workflow
+    assert "last_frame" not in workflow["5"]["inputs"]
 
 
 @pytest.mark.parametrize(
