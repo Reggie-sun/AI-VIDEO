@@ -11,6 +11,33 @@ Date: 2026-08-29
 
 Updated: 2026-09-05
 
+## Supersession Notice — 2026-09-05 Stock20 Compiler Repair
+
+用户已明确确认复用现有 Stock20 quality lane 并修复 first-only v4 I2VA 编译入口。
+下方要求等待该 scope 确认的 blocker 已解除；历史 v70/v71c/v72 视觉失败仍有效。
+`5daec94` 只将 `ComfyUIVideoProvider.compile_request` 的 quality v4 lane allowlist
+从 FL2VA 扩展为 I2VA/FL2VA；保持 exact profile hash、输入 lineage、compiler version `2`、
+首尾帧既有行为与唯一状态写入 owner。不新增模型、workflow、dependency 或远程调用。
+
+- RED：新增 first-only v4 参数化 case 在旧 guard 处失败，既有 FL2VA case 通过。
+- GREEN：focused 四文件 tests `113 passed`；native `reviewer_xhigh` 为 `accept with concerns`。
+- Exact staged Harness：`743 + 371 + 2` tests passed，Architecture Gate、docs contracts、policy audit 均通过。
+  Receipt：`.agent/harness/runs/stock20-v4-i2va-20260905/receipt.json`，校验 `passed=true`、
+  `fresh=true`、`complete_completion_proof=true`。上述结果只证明编译路径，不证明媒体质量。
+- 既存 `/4` H3 prompt emitter 仍输出 `dialogue none` 或对白 bookkeeping；本次不偷偷修改
+  编译后的 prompt，须以 exact canonical prompt 的真实音视频判断风险。
+- v74 prepare 因旧 T8 `aspect_ratio=16:9` 与 Stock20 `adaptive` output 声明不匹配被拦截，
+  没有 Provider submit。v74b 在 authoring 阶段移除这个与实际 `1344x768` 不符的冗余 ratio，
+  保持精确 width/height/fps/frame count 后重新 sealed planning/routing；只传 v65 exact terminal。
+  Stock20 recipe、派生 seed 与 canonical soundscape formatting 相对 v72 同时变化，不能称为 controlled A/B。
+- 当前没有新的合格 30 秒成片。run-local v74b 的旧 header/comment 和 inherited
+  `repair_loop.patched_runtime_sha256` 是历史 T8 模板信息，不能当作 Stock20 runtime seal；
+  当前 selected stack 必须读取 exact bound/resolved request 与 profile。
+
+`record-ai-video-session`：编译修复为 stable implementation checkpoint，更新本 primary record。
+`distill-ai-video-learning`：本次仅一个确定性 compiler regression，尚无新的媒体结论，`no_candidate`；
+未修改 learning target 或刷新 RAG index。下一步继续本轮已启动的 local Stock20 attempt 与完整逐 Shot Gate。
+
 ## Supersession Notice — 2026-09-05 Watchability Repair Blocked
 
 本次重新检查 exact v70 后，撤回其 current-facing `PASS_FOR_HUMAN_REVIEW` 候选地位；
