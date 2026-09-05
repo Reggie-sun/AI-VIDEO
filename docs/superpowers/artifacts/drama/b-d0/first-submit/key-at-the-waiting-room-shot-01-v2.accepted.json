@@ -1,0 +1,372 @@
+{
+  "schema_version": "drama-shot01-first-submit-acceptance/2",
+  "decision": "accepted_one_shot_first_submit",
+  "attempt_id": "drama-shot01-first-20260905-v2",
+  "authority": "CURRENT_USER_RUN_SAME_CANONICAL_SHOT_01",
+  "scope": "One canonical Shot 01 start/submit/poll/fetch and immediate Agent media Gate; no retry, Shot 02, activation or final acceptance",
+  "source_commit": "0df8b5a4a507427872c3a2942ccd54cb962d0e5a",
+  "driver_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/shot01_first_submit_v2.py",
+  "driver_sha256": "71d4d4ed13a563333ce62220cd55cc6880bd533148264207ef8d1d146de3738e",
+  "preflight_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-source-binding-preflight-v6.json",
+  "preflight_sha256": "373fee5c3f2f66f361d25e4fb92310cbf480e2e58e3677c39705acdc34282b6a",
+  "v9_path": "docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v9.accepted.json",
+  "v9_sha256": "c0a505c48d77011143c1d231c56412c869278d9c0988a9e3a702f337278f1dee",
+  "budget": {
+    "max_submits": 1,
+    "max_gpu_jobs": 1,
+    "poll_timeout_seconds": 3600,
+    "retry_count": 0,
+    "remote_egress": false
+  },
+  "runtime_current": {
+    "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+    "launch_capabilities": [
+      "sage_attention"
+    ],
+    "sageattention_version": "2.2.0",
+    "t8_commit": "977df788fcf8b971dc3d0fc7d6baa79a0edfaf40",
+    "t8_version": "1.36.2",
+    "videohelpersuite_commit": "4ee72c065db22c9d96c2427954dc69e7b908444b"
+  },
+  "runtime_supervisor": {
+    "active_state": "active",
+    "exec_main_status": 0,
+    "invocation_id": "5b59be0ad54f4485a5a791f7593e1197",
+    "load_state": "loaded",
+    "main_pid": 1039472,
+    "sub_state": "running",
+    "unit": "ai-video-comfyui-d78eb1859328489996c9d5160cfdb63d.service"
+  },
+  "creative_lineage": {
+    "files": {
+      "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.proposed.json": "a5ec4f78b05ce189d9eaa0cf694ffaba0747b499f4e85fd1ac1ac4221ec61331",
+      "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.accepted.json": "f81365c1d084d6c096d7bcbf83c06beff75100f34b6ed90bafc9341dfb247cac",
+      "docs/superpowers/artifacts/drama/b-d0/fixture-selection/key-at-the-waiting-room-v1.proposed.json": "73a3a57e78859f8a508dd21cea3493a8d2a32ccb8a08c173a304b516fc5d34ab",
+      "docs/superpowers/artifacts/drama/b-d0/fixture-selection/key-at-the-waiting-room-v1.accepted.json": "e2601e8ac7af4686c3a4290a05d956c87d8bcea73bc146f16bad4ee5fad52e1d",
+      "docs/superpowers/artifacts/drama/b-d0/baseline-selection/key-at-the-waiting-room-v3.proposed.json": "bab68c8e43a36e33e12d8c3c5b8e0aea683db2b9889e8ef417a261ca77fd06bb",
+      "docs/superpowers/artifacts/drama/b-d0/baseline-selection/key-at-the-waiting-room-v3.accepted.json": "3056fd344cc2485fe6ddf089d7d50d6461b27b62756f293c9b1968d69a5d08f5",
+      "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v1.blocked.json": "6f77f095a4c034d50f776c6c8e2b58e744c7e1bd69fd6b6e836f3bcc7251060e",
+      "runs/drama-baseline-reference-20260829/raw/shot-01-take-01-audio.mp4": "6a9e0504fe946c7320b93895c66e8c5423db7cc1eff0f46bbe9e7b3712259331"
+    },
+    "semantic_rubric": {
+      "spec_path": "docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md",
+      "spec_commit": "01483ec1f434661984ca009fffa85960310dedd6",
+      "spec_sha256": "239573a700fe987eb76282cb3c89f4ee666721646ec90b4e1398527e65c6801b",
+      "contract_version": "drama-authoring-and-acceptance/1"
+    },
+    "provider_reference_handoff": "NONE_T2VA_FIRST_SHOT",
+    "prompt_changes": "NONE_ACCEPTED_NATIVE_COMPILATION",
+    "required_human_findings": [
+      "DRAMA-MEDIA-SHOT-NARRATIVE-001",
+      "DRAMA-MEDIA-SHOT-DIALOGUE-001",
+      "DRAMA-MEDIA-SHOT-PERFORMANCE-001",
+      "DRAMA-MEDIA-SHOT-BLOCKING-001",
+      "DRAMA-MEDIA-SHOT-EMOTION-001"
+    ],
+    "human_verdict": "NOT_EVALUATED",
+    "next_shot_submit_allowed": false
+  },
+  "creative_lineage_sha256": "7e67b448c66e04a3f97f3a859e754c2e47b55a2e3b7c778e9678cc19bfb3aa7d",
+  "captured_preflight": {
+    "canonical_lineage": {
+      "active_graph_hash": "a95a916f26b53f4a2437d90860a13910fa458e33735507963148360062e8742a",
+      "planning_request_hash": "6dd31121a17d0178f4372bb4fa764f350216133b18f91d476675137af1480047",
+      "project_content_hash": "940f0ceee3148ba1d4dab4a5b7bcbc2adc3229c5964f1705149bec1e9d14dfc1",
+      "prompt_sha256": "e6cc74114e4dd41db284a29a83db228cbd9a034370fb5577a0e534d560139b47",
+      "registry_content_hash": "13a9404d3ec6bb3de0ec00871cd22dd5ca861ca8ea413fdfe13ea145e6c2ec1b",
+      "requirement_hash": "735c670eeee9bef29f9e9980ae8e476bde7bfff8786a78edf54af644d9eed924",
+      "resolved_generation_hash": "87c98a1f8b834cd56d8fcbc163dd3a73526545e51edff202ad3fdf0ce3c88f1d",
+      "target_shot": {
+        "content_hash": "4cf53970d6642d4bfe73c23e5c12f9714c069843b0a7b47069dfb2519c47253b",
+        "revision": 1,
+        "shot_id": "drama.shot.waiting-room.001"
+      },
+      "verified_projection_hash": "e201aebeb90a324549138163c0d0f4f93405ad7755f3645b1a9bd99c5413ea21"
+    },
+    "driver_sha256": "8ba4d9ecec4621420709f01bc9441c93f122cb24fbe73db0e438c345c47e73d7",
+    "effects": {
+      "candidate_activation": false,
+      "media": 0,
+      "permit_mint": 0,
+      "production_tree_sha256_after": "3abfb1c08a7de162220d46bbf1813115100db8f651b810a362e8bce55edb6731",
+      "production_tree_sha256_before": "3abfb1c08a7de162220d46bbf1813115100db8f651b810a362e8bce55edb6731",
+      "provider_preflight": 1,
+      "provider_submit": 0,
+      "request_persistence": 0,
+      "runtime_lifecycle": 0,
+      "video_analysis": 0
+    },
+    "exact_request_identity": {
+      "compiled_request_hash": "d654db78ddb7fc84f3ae0bc7ec775665a517a4101ee31f172de8ab02f61ebd38",
+      "preview_fingerprint": "a9b79ed8cd91e3e3718187bda22eceeaf59b7ea5a70c5587ffb44379c80b820a",
+      "projection_hash": "e201aebeb90a324549138163c0d0f4f93405ad7755f3645b1a9bd99c5413ea21",
+      "prompt_sha256": "e6cc74114e4dd41db284a29a83db228cbd9a034370fb5577a0e534d560139b47",
+      "provider_bound_request_hash": "69dc918bfb313a94ce97cb446f0dd2bd7324e72d30359ffaa44807a013620db4",
+      "request_hash": "6dd31121a17d0178f4372bb4fa764f350216133b18f91d476675137af1480047",
+      "request_input_hash": "5b16181456d3dffff83678ca8428cd1a97276ecbd136f1ec2a983420752e6441",
+      "requirement_hash": "735c670eeee9bef29f9e9980ae8e476bde7bfff8786a78edf54af644d9eed924",
+      "resolved_generation_hash": "87c98a1f8b834cd56d8fcbc163dd3a73526545e51edff202ad3fdf0ce3c88f1d",
+      "source_audio_policy": {
+        "identity": {
+          "acceptance_sha256": "bd10225c06fc837fb4fcd118f62bbf3214cadd0abd08445f35323c14df9e3239",
+          "authority_status": "ACCEPTED_AND_SEALED",
+          "payload_commit": "9677aad1814ddbef7dc430f91902e08bc15bd6a3",
+          "payload_sha256": "302ee9dec106902bc7b870feda7993ca6c47bb4d8c6cf144896b402e99ec9587"
+        },
+        "native_audio": true,
+        "selection": "GENERATED + KEEP",
+        "sound_facts_match": true
+      },
+      "source_binding": {
+        "canonical_source_binding": {
+          "accepted_fixture_payload_commit": "3b436195e939f7bc8fff5999438e9018030a38fe",
+          "accepted_fixture_payload_path": "docs/superpowers/artifacts/drama/b-d0/fixture-selection/key-at-the-waiting-room-v1.proposed.json",
+          "accepted_fixture_payload_sha256": "73a3a57e78859f8a508dd21cea3493a8d2a32ccb8a08c173a304b516fc5d34ab",
+          "accepted_package_acceptance_path": "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.accepted.json",
+          "accepted_package_acceptance_sha256": "f81365c1d084d6c096d7bcbf83c06beff75100f34b6ed90bafc9341dfb247cac",
+          "accepted_package_payload_commit": "1175c8270ffba6ff136d54cc0eb9390a96d6bf29",
+          "accepted_package_payload_path": "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.proposed.json",
+          "accepted_package_payload_sha256": "a5ec4f78b05ce189d9eaa0cf694ffaba0747b499f4e85fd1ac1ac4221ec61331",
+          "active_pre_generation_graph_hash": "a95a916f26b53f4a2437d90860a13910fa458e33735507963148360062e8742a",
+          "canonical_materialization_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-canonical-materialization.json",
+          "canonical_materialization_sha256": "75be2e494e44b5b253d730f9c9daca366806e09209c7e5e5e231c014a1b09f71",
+          "historical_request_hash": "92e6de89a72730da3beb58638dd54c637cad5162aab94a3259d3413a9a50931f",
+          "historical_requirement_hash": "d07dba76f19e2a1d998d9bf087df8583a1a99653cc7c1d9760935f72534c9b81",
+          "project_content_hash": "940f0ceee3148ba1d4dab4a5b7bcbc2adc3229c5964f1705149bec1e9d14dfc1",
+          "registry_content_hash": "13a9404d3ec6bb3de0ec00871cd22dd5ca861ca8ea413fdfe13ea145e6c2ec1b"
+        },
+        "identity": {
+          "acceptance_path": "docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v3.accepted.json",
+          "acceptance_sha256": "70dc023257863683157a12b0849f2fd3c6d8fe2d9c9dacf70c95d8ce38797276",
+          "authority_status": "ACCEPTED_AND_SEALED",
+          "payload_byte_size": 3223,
+          "payload_commit": "75e88e0f1934a2829838f1f28cc6f90d66def0c3",
+          "payload_git_blob_oid": "d641b6923f30c73263470b2757f6787941126888",
+          "payload_path": "docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v3.proposed.json",
+          "payload_sha256": "3c8b1305812c921ebf7166c01111eed8c90714a15839026797e83dfddde19188"
+        },
+        "inventory_file_count": 277,
+        "inventory_sha256": "d9fc9c67f98aaa97febf0a05da33a2873acd5884ad38fc477cd62f37b061adbf",
+        "source_commit": "0df8b5a4a507427872c3a2942ccd54cb962d0e5a"
+      }
+    },
+    "observed_at": "2026-09-05T14:04:10.040967+00:00",
+    "runtime": {
+      "canonical_provider_preflight": "PASS_READ_ONLY_COMPONENT_AND_OBJECT_INFO",
+      "checkout_clean": {
+        "comfyui": true,
+        "t8": true,
+        "videohelpersuite": true
+      },
+      "current": {
+        "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+        "launch_capabilities": [
+          "sage_attention"
+        ],
+        "sageattention_version": "2.2.0",
+        "t8_commit": "977df788fcf8b971dc3d0fc7d6baa79a0edfaf40",
+        "t8_version": "1.36.2",
+        "videohelpersuite_commit": "4ee72c065db22c9d96c2427954dc69e7b908444b"
+      },
+      "inspection_mode": "read_only_checkout_package_and_systemd_launch_identity",
+      "launch_identity": {
+        "exec_start_sha256": "5dbb262ab8cd90138488039c52ed7db6d4a9552610444157084d73d0b70b0329",
+        "inspection_mode": "systemd_exec_start_read_only",
+        "launch_capabilities": [
+          "sage_attention"
+        ],
+        "result": "OBSERVED"
+      },
+      "mismatches": {},
+      "missing_launch_capabilities": [],
+      "required": {
+        "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+        "launch_capabilities": [
+          "sage_attention"
+        ],
+        "sageattention_version": "2.2.0",
+        "t8_commit": "977df788fcf8b971dc3d0fc7d6baa79a0edfaf40",
+        "t8_version": "1.36.2",
+        "videohelpersuite_commit": "4ee72c065db22c9d96c2427954dc69e7b908444b"
+      },
+      "result": "MATCH",
+      "supervisor_after": {
+        "active_state": "active",
+        "exec_main_status": 0,
+        "invocation_id": "5b59be0ad54f4485a5a791f7593e1197",
+        "load_state": "loaded",
+        "main_pid": 1039472,
+        "sub_state": "running",
+        "unit": "ai-video-comfyui-d78eb1859328489996c9d5160cfdb63d.service"
+      },
+      "supervisor_before": {
+        "active_state": "active",
+        "exec_main_status": 0,
+        "invocation_id": "5b59be0ad54f4485a5a791f7593e1197",
+        "load_state": "loaded",
+        "main_pid": 1039472,
+        "sub_state": "running",
+        "unit": "ai-video-comfyui-d78eb1859328489996c9d5160cfdb63d.service"
+      }
+    },
+    "schema_version": "drama-shot01-source-binding-preflight/1",
+    "selected_provider": {
+      "binding_sha256": "3af2ab9928d832253e22aaf14f47bf70ef80949f56a1664817accb8acacfd564",
+      "capability": "minimax-h3-t8-t2va-quality-v1",
+      "compiler": {
+        "compiler_hash": "c0ff7a9881e66159ebe6c01e4bd109c6a9227587c428587f8fff01417bcac47d",
+        "compiler_id": "comfy-local-h3-t8-video-compiler",
+        "compiler_version": "3"
+      },
+      "fallback_allowed": false,
+      "model": "minimax-h3-t8-t2va-quality",
+      "output": {
+        "container": "mp4",
+        "dimension_mode": "exact",
+        "duration_seconds": null,
+        "fps": 24,
+        "frame_count": 124,
+        "height": 768,
+        "mime_type": "video/mp4",
+        "native_audio": true,
+        "ratio": "16:9",
+        "resolution_label": "h3_t8_native",
+        "timing_mode": "frame_count",
+        "width": 1344
+      },
+      "profile_hash": "4b299a689723bb856026776500119774ee9490c777a6460e932007be022e05e7",
+      "provider": "comfy-local-h3-t8",
+      "workflow_sha256": "6a508f8522694297c2e3ce1157dd1b235cd34514d85bf3c2908f55020cd990a5"
+    },
+    "source_audio_policy": {
+      "identity": {
+        "acceptance_sha256": "bd10225c06fc837fb4fcd118f62bbf3214cadd0abd08445f35323c14df9e3239",
+        "authority_status": "ACCEPTED_AND_SEALED",
+        "payload_commit": "9677aad1814ddbef7dc430f91902e08bc15bd6a3",
+        "payload_sha256": "302ee9dec106902bc7b870feda7993ca6c47bb4d8c6cf144896b402e99ec9587"
+      },
+      "native_audio": true,
+      "selection": "GENERATED + KEEP",
+      "sound_facts_match": true
+    },
+    "source_binding": {
+      "canonical_source_binding": {
+        "accepted_fixture_payload_commit": "3b436195e939f7bc8fff5999438e9018030a38fe",
+        "accepted_fixture_payload_path": "docs/superpowers/artifacts/drama/b-d0/fixture-selection/key-at-the-waiting-room-v1.proposed.json",
+        "accepted_fixture_payload_sha256": "73a3a57e78859f8a508dd21cea3493a8d2a32ccb8a08c173a304b516fc5d34ab",
+        "accepted_package_acceptance_path": "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.accepted.json",
+        "accepted_package_acceptance_sha256": "f81365c1d084d6c096d7bcbf83c06beff75100f34b6ed90bafc9341dfb247cac",
+        "accepted_package_payload_commit": "1175c8270ffba6ff136d54cc0eb9390a96d6bf29",
+        "accepted_package_payload_path": "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.proposed.json",
+        "accepted_package_payload_sha256": "a5ec4f78b05ce189d9eaa0cf694ffaba0747b499f4e85fd1ac1ac4221ec61331",
+        "active_pre_generation_graph_hash": "a95a916f26b53f4a2437d90860a13910fa458e33735507963148360062e8742a",
+        "canonical_materialization_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-canonical-materialization.json",
+        "canonical_materialization_sha256": "75be2e494e44b5b253d730f9c9daca366806e09209c7e5e5e231c014a1b09f71",
+        "historical_request_hash": "92e6de89a72730da3beb58638dd54c637cad5162aab94a3259d3413a9a50931f",
+        "historical_requirement_hash": "d07dba76f19e2a1d998d9bf087df8583a1a99653cc7c1d9760935f72534c9b81",
+        "project_content_hash": "940f0ceee3148ba1d4dab4a5b7bcbc2adc3229c5964f1705149bec1e9d14dfc1",
+        "registry_content_hash": "13a9404d3ec6bb3de0ec00871cd22dd5ca861ca8ea413fdfe13ea145e6c2ec1b"
+      },
+      "identity": {
+        "acceptance_path": "docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v3.accepted.json",
+        "acceptance_sha256": "70dc023257863683157a12b0849f2fd3c6d8fe2d9c9dacf70c95d8ce38797276",
+        "authority_status": "ACCEPTED_AND_SEALED",
+        "payload_byte_size": 3223,
+        "payload_commit": "75e88e0f1934a2829838f1f28cc6f90d66def0c3",
+        "payload_git_blob_oid": "d641b6923f30c73263470b2757f6787941126888",
+        "payload_path": "docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v3.proposed.json",
+        "payload_sha256": "3c8b1305812c921ebf7166c01111eed8c90714a15839026797e83dfddde19188"
+      },
+      "inventory_file_count": 277,
+      "inventory_sha256": "d9fc9c67f98aaa97febf0a05da33a2873acd5884ad38fc477cd62f37b061adbf",
+      "source_commit": "0df8b5a4a507427872c3a2942ccd54cb962d0e5a"
+    },
+    "source_commit": "0df8b5a4a507427872c3a2942ccd54cb962d0e5a",
+    "source_inventory_file_count": 276,
+    "source_inventory_sha256": "faf167bf0c60a0729fc61936975893f549fb4a3b2e3ee0be1667a9e4e56c8835",
+    "status": "PASS_READ_ONLY_PROVIDER_PREFLIGHT",
+    "status_boundary": {
+      "P6": "NOT_EVALUATED",
+      "execution": "STOP_BEFORE_SUBMIT",
+      "final_acceptance": "NOT_EVALUATED",
+      "m6_d": "NOT_EVALUATED",
+      "next_shot_submit_allowed": false
+    },
+    "transport": {
+      "allowed_get_urls": [
+        "http://127.0.0.1:8188/object_info",
+        "http://127.0.0.1:8188/queue",
+        "http://127.0.0.1:8188/system_stats"
+      ],
+      "listener": "State  Recv-Q Send-Q Local Address:Port Peer Address:PortProcess\nLISTEN 0      128        127.0.0.1:8188      0.0.0.0:*    users:((\"python3.13\",pid=1039472,fd=51))\n",
+      "queue_after": {
+        "pending": 0,
+        "running": 0
+      },
+      "queue_before": {
+        "pending": 0,
+        "running": 0
+      },
+      "requests": [
+        "http://127.0.0.1:8188/queue",
+        "http://127.0.0.1:8188/object_info",
+        "http://127.0.0.1:8188/queue"
+      ],
+      "responses": [
+        {
+          "byte_size": 42,
+          "sha256": "6c1bb554d677ad1ea8526c38e26e141e6faf4f2fab85faaa8d264aeda0e7b4f0",
+          "status": 200,
+          "url": "http://127.0.0.1:8188/queue"
+        },
+        {
+          "byte_size": 2207274,
+          "sha256": "591b044f94fec7afdd2c739d84a8f3c6b34fed0d54b28576ae6d528e2e29e0e0",
+          "status": 200,
+          "url": "http://127.0.0.1:8188/object_info"
+        },
+        {
+          "byte_size": 42,
+          "sha256": "6c1bb554d677ad1ea8526c38e26e141e6faf4f2fab85faaa8d264aeda0e7b4f0",
+          "status": 200,
+          "url": "http://127.0.0.1:8188/queue"
+        }
+      ]
+    }
+  },
+  "preflight_storage": "RUN_LOCAL_RAW_WITH_EXACT_JSON_CONTENT_EMBEDDED_HERE",
+  "source_reseal": "SOURCE_METADATA_ONLY; canonical request hashes, semantic binding, native prompt, audio, provider and runtime contract unchanged from V9",
+  "canonical_effect_owner": "VideoGenerationService + ProductionStateCommitter",
+  "not_a_permit": true,
+  "m6_d": "NOT_EVALUATED",
+  "human_verdict": "NOT_EVALUATED",
+  "next_shot_submit_allowed": false,
+  "retry_allowed": false,
+  "activation_allowed": false,
+  "p6_allowed": false,
+  "final_acceptance_allowed": false,
+  "runtime_code_tests_profile_changes_allowed": false,
+  "independent_review": {
+    "profile": "reviewer_xhigh",
+    "verdict": "accept",
+    "scope": "Versioned driver implementation; exact approval separately rechecked before invocation",
+    "blocking_issues": []
+  },
+  "verification": {
+    "driver_validate_only": "PASS_NO_EFFECT",
+    "pure_envelope_positive": 1,
+    "pure_drift_denial_cases": [
+      "prompt",
+      "graph",
+      "audio",
+      "profile",
+      "runtime",
+      "production",
+      "status"
+    ],
+    "focused_tests": "66 passed in 13.72s",
+    "architecture_gate": "PASS 0 errors 0 warnings 0 info",
+    "full_harness": "RUNNING_NOT_COMPLETION_PROOF",
+    "harness_run_id": "drama-shot01-first-v2-executable-20260905"
+  }
+}
