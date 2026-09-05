@@ -18,12 +18,14 @@ from ai_video import (
 from ai_video.production._video_continuity import (
     ContinuityArtifactIdentity,
     ContinuityConstraintSet,
+    ContinuityReferenceBinding,
 )
 from ai_video.production.models import (
     StateCommitStatus,
     ToolIdentity,
     VideoAttemptPhase,
 )
+from test_production_video import _terminal_frame
 
 
 ZERO = "0" * 64
@@ -282,8 +284,9 @@ def test_catalog_entry_budget_limits_scandir_consumption(
     assert consumed <= 3
 
 
+@pytest.mark.parametrize("review_eligible", [False, True])
 def test_production_detail_uses_strict_readers_and_returns_only_whitelisted_data(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, review_eligible: bool
 ):
     runs = tmp_path / "runs"
     project_path = _production_workspace(runs, "demo/project")
@@ -353,6 +356,18 @@ def test_production_detail_uses_strict_readers_and_returns_only_whitelisted_data
         effective_negative_prompt_text="DO NOT LEAK NEGATIVE",
         provider_task_binding=_ns(provider_task_id="signed-url-secret"),
     )
+    if review_eligible:
+        attempt.status = StateCommitStatus.RUNNING
+        state.phase = VideoAttemptPhase.VALIDATE
+        state.continuity_evaluation = None
+        state.local_fetch_receipt = _ns()
+        loaded.manifest.active_qa_policy = _ns()
+        original_request.target_shot_content_hash = ZERO
+        request.continuity_binding = _ns(
+            terminal_frame=_ns(source_shot_id="shot-source"),
+            target_shot_id=original_request.target_shot_id,
+            target_shot_content_hash=ZERO,
+        )
     calls: list[object] = []
     monkeypatch.setattr(provider_console, "load_production_project", lambda path: calls.append(path) or loaded)
     monkeypatch.setattr(
@@ -371,6 +386,7 @@ def test_production_detail_uses_strict_readers_and_returns_only_whitelisted_data
         "project_id": "demo", "title": "Demo", "revision": 7, "content_hash": ZERO,
     }
     assert result["attempts"][0]["provider"]["name"] == "comfy-local-h3"
+    assert result["attempts"][0]["continuity_review_eligible"] is review_eligible
     assert result["attempts"][0]["target_shot_id"] == "shot-12"
     assert result["attempts"][0]["mode"] == "image_to_video"
     assert result["attempts"][0]["generation_type"] == "I2V"
@@ -1299,8 +1315,12 @@ def test_invalid_video_request_receipt_fails_closed_instead_of_hiding_attempt(
     assert "private" not in json.dumps(result)
 
 
+@pytest.mark.parametrize("unavailable", [
+    None, "terminal", "polling", "evaluated", "missing_terminal", "no_binding",
+    "no_policy", "no_fetch", "two_fetches", "wrong_target",
+])
 def test_continuity_review_projection_is_exact_sanitized_and_read_only(
-    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, unavailable: str | None
 ):
     runs = tmp_path / "runs"
     project_path = _production_workspace(runs, "continuity/project")
@@ -1327,9 +1347,11 @@ def test_continuity_review_projection_is_exact_sanitized_and_read_only(
         exit_state="Alice is outside the source frame",
         entrance_state="Alice enters target frame from left",
     )
-    binding = _ns(
-        terminal_frame=_ns(source_shot_id="shot-source"),
+    binding = ContinuityReferenceBinding.create(
+        role="first_frame",
+        terminal_frame=_terminal_frame(source_shot_id="shot-source"),
         target_shot_id="shot-target",
+        target_shot_revision=1,
         target_shot_content_hash="4" * 64,
         constraints=constraints,
     )
@@ -1409,6 +1431,42 @@ def test_continuity_review_projection_is_exact_sanitized_and_read_only(
         path: (path.stat().st_size, path.stat().st_mtime_ns)
         for path in runs.rglob("*") if path.is_file()
     }
+
+    if unavailable == "terminal":
+        attempt.status = StateCommitStatus.FAILED
+    elif unavailable == "polling":
+        state.phase = VideoAttemptPhase.POLLING
+    elif unavailable == "evaluated":
+        state.continuity_evaluation = object()
+    elif unavailable == "missing_terminal":
+        request.continuity_binding = _ns(source_shot_id="shot-source")
+    elif unavailable == "no_binding":
+        request.continuity_binding = None
+    elif unavailable == "no_policy":
+        loaded.manifest.active_qa_policy = None
+    elif unavailable == "no_fetch":
+        state.local_fetch_receipt = None
+    elif unavailable == "two_fetches":
+        state.fetch_receipt = pointer
+    elif unavailable == "wrong_target":
+        request.continuity_binding = ContinuityReferenceBinding.create(
+            **binding.model_dump(exclude={"binding_hash", "target_shot_id"}),
+            target_shot_id="another-shot",
+        )
+    assert provider_console_continuity.continuity_review_eligible(
+        attempt, request, loaded.manifest.active_qa_policy
+    ) is (unavailable is None)
+    if unavailable:
+        with pytest.raises(ValueError, match="continuity review"):
+            provider_console.project_continuity_review(
+                runs, "continuity/project/project.yaml", "attempt-1",
+                automatic_evaluator=AUTOMATIC, required_reviewer=HUMAN,
+            )
+        assert before == {
+            path: (path.stat().st_size, path.stat().st_mtime_ns)
+            for path in runs.rglob("*") if path.is_file()
+        }
+        return
 
     result = provider_console.project_continuity_review(
         runs,

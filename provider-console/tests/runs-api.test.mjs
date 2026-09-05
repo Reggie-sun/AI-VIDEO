@@ -1636,6 +1636,18 @@ test("detail rejects missing or traversal workspace keys and projector failures 
   });
 });
 
+test("continuity review explains missing identity configuration without exposing values", async () => {
+  const handler = createRunsApiHandler({
+    repoRoot: process.cwd(),
+    runProjector: async () => { throw new RunsApiError(503, "CONTINUITY_REVIEW_CONFIG_UNAVAILABLE"); },
+  });
+  const result = await invoke(handler, request("GET", "/api/runs/continuity-review?workspace=demo%2Fproject.yaml&attempt=attempt-1"));
+  assert.equal(result.res.statusCode, 503);
+  const error = JSON.parse(result.res.body).error;
+  assert.equal(error.code, "CONTINUITY_REVIEW_CONFIG_UNAVAILABLE");
+  assert.match(error.message, /自动评估器.*人工审核者.*name\/version/);
+});
+
 test("continuity review is GET-only, no-store, exact-bound, and rejects tampered projections", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "provider-console-api-"));
   const media = path.join(root, "runs", "demo", "candidate.mp4");

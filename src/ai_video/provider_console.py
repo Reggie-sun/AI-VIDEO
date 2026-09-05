@@ -23,7 +23,11 @@ from ai_video.production._video_project_reader import (
 )
 from ai_video.production.models import ToolIdentity
 from ai_video.production.project import load_production_project, load_production_project_candidate
-from ai_video.provider_console_continuity import measure_contained_file, project_continuity_review as _project_continuity_review
+from ai_video.provider_console_continuity import (
+    continuity_review_eligible,
+    measure_contained_file,
+    project_continuity_review as _project_continuity_review,
+)
 from ai_video.provider_console_manifest import (
     latest_video_attempt_at as _latest_video_attempt_at,
     read_production_manifest_nofollow as _read_production_manifest_nofollow,
@@ -662,6 +666,9 @@ def _production_detail(
                     root=loaded.root, media_map=media_map,
                 ),
                 "fetched_media": fetched_media,
+                "continuity_review_eligible": continuity_review_eligible(
+                    attempt, request, getattr(loaded.manifest, "active_qa_policy", None)
+                ),
                 "continuity_role": (
                     type(request.continuity_binding).__name__
                     if getattr(request, "continuity_binding", None) is not None

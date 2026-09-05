@@ -45,6 +45,29 @@ def _continuity_media_token(workspace: str, attempt_id: str, sha256: str) -> str
     return hashlib.sha256(identity.encode("utf-8")).hexdigest()[:40]
 
 
+def continuity_review_eligible(
+    attempt: object, request: object, active_qa_policy: object | None
+) -> bool:
+    """Check request prerequisites, not exact media or reviewer acceptance."""
+    state = getattr(attempt, "video_generation_state", None)
+    binding = getattr(request, "continuity_binding", None)
+    original = getattr(getattr(request, "activation_scope", None), "request", None)
+    return bool(
+        getattr(attempt, "status", None) is StateCommitStatus.RUNNING
+        and getattr(state, "phase", None) is VideoAttemptPhase.VALIDATE
+        and getattr(state, "continuity_evaluation", None) is None
+        and getattr(binding, "terminal_frame", None) is not None
+        and original is not None
+        and binding.target_shot_id == original.target_shot_id
+        and binding.target_shot_content_hash == original.target_shot_content_hash
+        and active_qa_policy is not None
+        and (
+            (getattr(state, "local_fetch_receipt", None) is not None)
+            != (getattr(state, "fetch_receipt", None) is not None)
+        )
+    )
+
+
 def measure_contained_file(path: Path, *, root: Path) -> tuple[str, int]:
     try:
         metadata = path.lstat()
@@ -114,12 +137,7 @@ def project_continuity_review(
     request = load_video_request_receipt(loaded.root, state.request)
     binding = request.continuity_binding
     original = request.activation_scope.request if request.activation_scope else None
-    if (
-        binding is None
-        or original is None
-        or binding.target_shot_id != original.target_shot_id
-        or binding.target_shot_content_hash != original.target_shot_content_hash
-    ):
+    if not continuity_review_eligible(attempt, request, loaded.manifest.active_qa_policy):
         raise ValueError("continuity review binding is unavailable")
     fetch_pointer = state.local_fetch_receipt or state.fetch_receipt
     if fetch_pointer is None or (

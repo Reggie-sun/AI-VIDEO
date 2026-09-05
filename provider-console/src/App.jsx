@@ -724,9 +724,7 @@ export function App() {
     [detail],
   );
   const attempt = useMemo(() => attempts.find((item, index) => attemptId(item, index) === selectedId) || attempts[0], [attempts, selectedId]);
-  const continuityEligible = Boolean(
-    attempt?.continuity_role && String(attempt?.phase || "").toLowerCase() === "validate"
-  );
+  const continuityEligible = attempt?.continuity_review_eligible === true;
 
   const loadContinuityReview = useCallback(async () => {
     const epoch = ++continuityRequestEpoch.current;

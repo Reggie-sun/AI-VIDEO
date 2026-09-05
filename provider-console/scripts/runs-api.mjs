@@ -660,7 +660,9 @@ export function createRunsApiHandler({
         } catch (cause) {
           const status = cause instanceof RunsApiError ? cause.status : 503;
           const code = cause instanceof RunsApiError ? cause.code : "CONTINUITY_REVIEW_UNAVAILABLE";
-          const message = status === 404 ? "workspace 不存在。" : status === 409 ? "该 attempt 当前不可人工 review。" : "continuity review 投影不可用。";
+          const message = code === "CONTINUITY_REVIEW_CONFIG_UNAVAILABLE"
+            ? "未配置 continuity review 的自动评估器与人工审核者身份，请在本地服务启动时配置对应 name/version。"
+            : status === 404 ? "workspace 不存在。" : status === 409 ? "该 attempt 当前不可人工 review。" : "continuity review 投影不可用。";
           send(res, status, { error: { code, message } });
           return;
         }
