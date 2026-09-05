@@ -1,0 +1,69 @@
+{
+  "schema_version": "drama-shot01-source-binding-pure-proof/1",
+  "decision": "PURE_CANONICAL_REOPEN_PASS",
+  "observed_at": "2026-09-05T12:51:23.736565+00:00",
+  "source_commit": "2649f5f391f9422c8c9bba004f7910f11d182a8c",
+  "loader_sha256": "250320e63b63a3699f892b240e97a11f0a51fdfb5497fdbc1d28b411ebdd1abc",
+  "source_binding": {
+    "identity": {
+      "authority_status": "ACCEPTED_AND_SEALED",
+      "acceptance_path": "docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v3.accepted.json",
+      "acceptance_sha256": "70dc023257863683157a12b0849f2fd3c6d8fe2d9c9dacf70c95d8ce38797276",
+      "payload_path": "docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v3.proposed.json",
+      "payload_commit": "75e88e0f1934a2829838f1f28cc6f90d66def0c3",
+      "payload_git_blob_oid": "d641b6923f30c73263470b2757f6787941126888",
+      "payload_byte_size": 3223,
+      "payload_sha256": "3c8b1305812c921ebf7166c01111eed8c90714a15839026797e83dfddde19188"
+    },
+    "canonical_source_binding": {
+      "accepted_package_acceptance_path": "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.accepted.json",
+      "accepted_package_acceptance_sha256": "f81365c1d084d6c096d7bcbf83c06beff75100f34b6ed90bafc9341dfb247cac",
+      "accepted_package_payload_path": "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.proposed.json",
+      "accepted_package_payload_commit": "1175c8270ffba6ff136d54cc0eb9390a96d6bf29",
+      "accepted_package_payload_sha256": "a5ec4f78b05ce189d9eaa0cf694ffaba0747b499f4e85fd1ac1ac4221ec61331",
+      "accepted_fixture_payload_path": "docs/superpowers/artifacts/drama/b-d0/fixture-selection/key-at-the-waiting-room-v1.proposed.json",
+      "accepted_fixture_payload_commit": "3b436195e939f7bc8fff5999438e9018030a38fe",
+      "accepted_fixture_payload_sha256": "73a3a57e78859f8a508dd21cea3493a8d2a32ccb8a08c173a304b516fc5d34ab",
+      "canonical_materialization_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-canonical-materialization.json",
+      "canonical_materialization_sha256": "75be2e494e44b5b253d730f9c9daca366806e09209c7e5e5e231c014a1b09f71",
+      "project_content_hash": "940f0ceee3148ba1d4dab4a5b7bcbc2adc3229c5964f1705149bec1e9d14dfc1",
+      "registry_content_hash": "13a9404d3ec6bb3de0ec00871cd22dd5ca861ca8ea413fdfe13ea145e6c2ec1b",
+      "active_pre_generation_graph_hash": "a95a916f26b53f4a2437d90860a13910fa458e33735507963148360062e8742a",
+      "historical_request_hash": "92e6de89a72730da3beb58638dd54c637cad5162aab94a3259d3413a9a50931f",
+      "historical_requirement_hash": "d07dba76f19e2a1d998d9bf087df8583a1a99653cc7c1d9760935f72534c9b81"
+    },
+    "source_commit": "2649f5f391f9422c8c9bba004f7910f11d182a8c",
+    "inventory_sha256": "199e2b9d73e1ededf648b5346c5361435832c384ebad5bdebefa0b065ab85cea",
+    "inventory_file_count": 275
+  },
+  "source_audio_policy": {
+    "identity": {
+      "acceptance_sha256": "bd10225c06fc837fb4fcd118f62bbf3214cadd0abd08445f35323c14df9e3239",
+      "authority_status": "ACCEPTED_AND_SEALED",
+      "payload_commit": "9677aad1814ddbef7dc430f91902e08bc15bd6a3",
+      "payload_sha256": "302ee9dec106902bc7b870feda7993ca6c47bb4d8c6cf144896b402e99ec9587"
+    },
+    "selection": "GENERATED + KEEP",
+    "native_audio": true,
+    "sound_facts_match": true
+  },
+  "planning_request_hash": "6dd31121a17d0178f4372bb4fa764f350216133b18f91d476675137af1480047",
+  "requirement_hash": "735c670eeee9bef29f9e9980ae8e476bde7bfff8786a78edf54af644d9eed924",
+  "projection_hash": "e201aebeb90a324549138163c0d0f4f93405ad7755f3645b1a9bd99c5413ea21",
+  "prompt_sha256": "e6cc74114e4dd41db284a29a83db228cbd9a034370fb5577a0e534d560139b47",
+  "prompt_line_count": 3,
+  "exact_dialogue_count": 1,
+  "resolved_generation_hash": "87c98a1f8b834cd56d8fcbc163dd3a73526545e51edff202ad3fdf0ce3c88f1d",
+  "preview_fingerprint": "a9b79ed8cd91e3e3718187bda22eceeaf59b7ea5a70c5587ffb44379c80b820a",
+  "production_tree_sha256_before": "3abfb1c08a7de162220d46bbf1813115100db8f651b810a362e8bce55edb6731",
+  "production_tree_sha256_after": "3abfb1c08a7de162220d46bbf1813115100db8f651b810a362e8bce55edb6731",
+  "production_file_count": 16,
+  "audit_boundary": "socket events and filesystem writes denied; only read-only Git subprocesses allowed",
+  "provider_submit": 0,
+  "request_persistence": 0,
+  "permit_mint": 0,
+  "runtime_inspection": 0,
+  "media": 0,
+  "m6_d": "NOT_EVALUATED",
+  "next_shot_submit_allowed": false
+}
