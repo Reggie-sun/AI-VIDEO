@@ -115,7 +115,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | Versioned source-binding v3与formal loader已完成；`2649f5f` pure canonical reopen及exact-range Harness PASS，old v1/v2 semantic bytes不变。后续GET-only capture在Product import前被unrelated untracked `src/ai_video/production/vidu_profile.py`阻断；无runtime/Provider GET、request persistence、permit、submit或media。待source owner完成committed state后重做fresh exact-source readiness，不得删除/忽略unrelated模块或重放旧attempt。详见current session record及`pre-submit-readiness/key-at-the-waiting-room-shot-01-v8.blocked.json` |
+| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | Versioned source-binding v3与formal loader已完成；最终executable Harness `4281 passed, 4 skipped`、Architecture 0 errors。Source owner提交后，`272b17d` fresh GET-only capture通过：same graph/request/prompt/audio、runtime MATCH、queue empty、Production不变，v9接受独立pre-submit prerequisite。未创建request/intent/permit或提交媒体；下一步是新的Shot 01首次invocation与逐Shot Gate，不重放旧attempt。详见current session record及`pre-submit-readiness/key-at-the-waiting-room-shot-01-v9.accepted.json` |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -767,7 +767,15 @@ make harness-verify
 
 ## Execution Order And Stop Conditions
 
-Latest source-binding stop（2026-09-05）：用户授权的metadata-only v3/current loader与documentation-test repair已完成，
+Latest pre-submit prerequisite acceptance（2026-09-05）：source-binding v3 repair与最终executable Harness已通过，
+full suite `4281 passed, 4 skipped`、Architecture 0 errors。原V8 uncommitted-source blocker在owner提交`272b17d`后解除；
+fresh GET-only capture v3验证exact request/graph/prompt/audio不变、profile/runtime MATCH、queue empty、Production tree不变。
+Current seal：`docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v9.accepted.json`。
+本独立prerequisite完成；`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`仍成立，无request persistence、permit、submit或media。
+Next One Thing为新的versioned Shot 01 first-submit invocation与完整per-Shot Agent Gate；重新检查live identity，不能重放旧v1。
+这是已授权同一Shot的后续execution，不新增授权要求，也不进入Shot 02、retry/variant、activation、P6或Final Acceptance。
+
+Historical source-binding stop（2026-09-05）：用户授权的metadata-only v3/current loader与documentation-test repair已完成，
 `2649f5f` full canonical pure reopen、focused tests与exact-range Harness PASS；原semantic/timing parents未修改。
 Graph仍为`a95a916...`、resolved为`87c98a1f...`、preview为`a9b79ed8...`、prompt为`e6cc7411...`。
 新GET-only driver的`ee1b8d1` capture在首次Product import前拒绝unrelated untracked `src/ai_video/production/vidu_profile.py`；

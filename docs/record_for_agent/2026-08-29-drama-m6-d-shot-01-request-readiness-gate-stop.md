@@ -8,7 +8,48 @@ learning_eligibility: ineligible
 
 Date: 2026-08-29
 
-## Current Source-Binding Repair And Source Inventory Stop — 2026-09-05
+## Current Pre-Submit Prerequisite Acceptance — 2026-09-05
+
+本窗口授权的独立source-binding repair与pre-submit prerequisite已完成；本节取代下方V8 source inventory stop。
+M6-D仍为`NOT_EVALUATED / STOP_BEFORE_SUBMIT`，没有Shot 01生成或media Gate结果。
+
+在等待最终Harness时，unrelated owner提交`272b17d5dae5b566d27f883c0414439176d053a3`。
+相比`ee1b8d1`，`src/`与`workflows/`仅增加Vidu两个模块，原H3 source/workflow与本task drivers未变。
+因此继续执行新versioned GET-only capture，而没有删除、忽略或接管其他任务文件：
+`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-source-binding-preflight-v3.json`，
+SHA `f2988ac213f9f27c2e1d77b0adbc93a880ea5effc40ab0c11da3f61800fca726`，source固定为`272b17d`。
+
+Current accepted seal为`docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v9.accepted.json`。
+它内嵌raw capture的完整JSON值；按driver的canonical serialization恢复后，bytes SHA与run-local raw sidecar一致。
+Raw sidecar保留在canonical run且不另作Git source文件；tracked seal保存同一exact evidence内容，不建立第二Product owner。
+
+- Canonical graph `a95a916...`、resolved request `87c98a1f...`、preview `a9b79ed8...`和prompt `e6cc7411...`均不变；
+  strict reopen在GET前后再次完成，audio显式绑定同一accepted `GENERATED + KEEP` identity。
+- Profile/runtime `MATCH`且checkouts clean：ComfyUI `7cee3ceb...`、T8 `977df788...` / `1.36.2`、
+  VideoHelperSuite `4ee72c06...`、SageAttention `2.2.0`，required launch capability为`sage_attention`。
+  Unit `ai-video-comfyui-d78eb1859328489996c9d5160cfdb63d.service`、PID `1039472`、invocation
+  `5b59be0ad54f4485a5a791f7593e1197`及interpreter/cwd/listener归属通过前后核验。
+- 仅发生`queue -> object_info -> queue`三次loopback GET，均HTTP 200，前后queue为空；Provider component/profile
+  preflight通过。16-file Production tree前后仍为`3abfb1c...6731`；submit、request persistence、permit、activation、
+  runtime lifecycle、media与video-analysis均为零。上述MATCH只适用于exact capture，不保证future runtime仍不变。
+- `reviewer_xhigh`独立重算source inventories并核对capture/Git/profile/lineage，最终`accept`，只接受read-only facts。
+
+Final executable Harness已自然完成：`4281 passed, 4 skipped`，耗时`1385.22s`，Architecture 0 errors，mandatory checks通过。
+Receipt `.agent/harness/runs/drama-shot01-binding-final-20260905/receipt.json`，SHA
+`bd76007da11ddf5e1b631c906ca7a719c2a84a81ebc417d681052fd1cbabe818`，exact range为`4ea0e328...0bc212d`。
+在固定detached snapshot中`verify-receipt`全部true，包括fresh、artifact integrity与complete completion proof；原receipt已归档。
+该receipt覆盖最终task executable bytes，不声称覆盖之后的Vidu实现、raw capture或V9 docs-only封存；后者单独按docs policy验证。
+早期慢ONNX smoke并未证明hang；未跳过或改变tests，最终正常PASS。旧superseded Harness SIGINT仍保留为历史失败receipt。
+
+Next One Thing：以新的versioned first-submit invocation消费V9 exact prerequisite，重新核对live source/runtime/queue，
+再由既有`VideoGenerationService.start -> submit_local_once -> refresh_local_once -> fetch_local_once`执行已授权的同一Shot 01，
+MP4落盘后立即进入该Shot的完整Agent Gate。不得复用已消费v1 invocation/permit，不得默认推进Shot 02、retry/variant、
+activation、P6或Final Acceptance。本checkpoint完成的是独立pre-submit prerequisite，不是生成/质量接受；没有新增授权要求。
+
+本primary record按`record-ai-video-session`更新；自动`distill-ai-video-learning=no_candidate`，理由仍为同一deterministic
+修复链而非独立媒体实验。Experience retrieval的strict version-mismatch未修复或降级；无push/release，unrelated工作保留。
+
+## Historical Source-Binding Repair And Source Inventory Stop — 2026-09-05
 
 用户明确授权metadata-only source-binding与formal loader，以及相关document/test contract repair。
 本节取代下方历史graph-binding stop：旧binding问题已修复，但后续GET-only capture在首次Product import前遇到新的
