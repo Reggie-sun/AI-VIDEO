@@ -219,6 +219,55 @@ test("catalog is allowlisted, marks missing roots unavailable, and ignores symli
   assert.equal(accepted.lifecycle_status, "NOT_EVALUATED");
 });
 
+test("run_outputs includes direct run-root videos without scanning internal directories or trusting adjacent JSON", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-run-root-"));
+  const run = path.join(root, "drama-preview");
+  await mkdir(path.join(run, "outputs"), { recursive: true });
+  await mkdir(path.join(run, "production", "state", "render", "outputs"), { recursive: true });
+  await mkdir(path.join(run, "assets"), { recursive: true });
+  await Promise.all([
+    writeFile(path.join(run, "subtitled.mp4"), "exact subtitled video"),
+    writeFile(path.join(run, "outputs", "copy.mp4"), "exact subtitled video"),
+    writeFile(path.join(run, "production", "state", "render", "outputs", "private.mp4"), "internal render"),
+    writeFile(path.join(run, "assets", "private.mp4"), "internal asset"),
+    writeFile(path.join(root, "not-in-a-run.mp4"), "outside run"),
+    writeFile(path.join(run, "composition.json"), JSON.stringify({ prompt: "Do not infer", status: "PASS" })),
+    symlink(path.join(run, "subtitled.mp4"), path.join(run, "linked.mp4")),
+    symlink(run, path.join(root, "linked-run")),
+  ]);
+  const result = await catalogExternalMedia({ sources: [{ id: "runs-outputs", label: "Runs outputs", kind: "development_artifact", root, layout: "run_outputs" }] });
+  assert.equal(result.groups.length, 1);
+  const [group] = result.groups;
+  assert.equal(group.sha256, sha256(Buffer.from("exact subtitled video")));
+  assert.deepEqual(group.locations.map((item) => item.relative_path).sort(), ["drama-preview/outputs/copy.mp4", "drama-preview/subtitled.mp4"]);
+  assert.equal(group.evidence_classification, "non_canonical");
+  assert.equal(group.lifecycle_status, "NOT_EVALUATED");
+  assert.equal(group.reported_status, null);
+  assert.equal(group.prompt_text, null);
+});
+
+test("run_outputs reports entry, depth, media and same-run evidence budget truncation", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-run-bounds-"));
+  const run = path.join(root, "demo");
+  await mkdir(path.join(run, "outputs", "deep"), { recursive: true });
+  await mkdir(path.join(run, "sidecars"), { recursive: true });
+  await Promise.all([
+    ...Array.from({ length: 6 }, (_, i) => writeFile(path.join(run, `${i}.json`), "{}")),
+    writeFile(path.join(run, "outputs", "existing.mp4"), "existing"),
+    writeFile(path.join(run, "outputs", "deep", "clip.mp4"), "deep"),
+    writeFile(path.join(run, "sidecars", "a.json"), "{}"),
+    writeFile(path.join(run, "sidecars", "b.json"), "{}"),
+  ]);
+  const sources = [{ id: "runs-outputs", label: "Runs", kind: "development_artifact", root, layout: "run_outputs" }];
+  for (const limits of [{ maxEntriesPerRoot: 7 }, { maxDepth: 0 }, { maxMediaPerRoot: 1 }, { maxSidecarsPerRoot: 1 }]) {
+    const result = await catalogExternalMedia({ sources, limits });
+    assert.equal(result.sources[0].truncated, true, JSON.stringify(limits));
+  }
+  const complete = await catalogExternalMedia({ sources });
+  assert.notEqual(complete.sources[0].truncated, true);
+  assert.equal(complete.groups.length, 2);
+});
+
 test("run_outputs source includes direct run outputs with exact composition review and excludes nested Production render outputs", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "provider-console-runs-outputs-"));
   const runRoot = path.join(root, "development-composition");

@@ -8,6 +8,13 @@ learning_eligibility: ineligible
 
 Date: 2026-08-30
 
+## Discovery Scope Update — 2026-09-05
+
+下方“只读取 output/outputs”的扫描范围属于历史实现。当前新增 run 根目录直属视频的浅层
+发现，保持非 canonical、exact bytes 和内部目录隔离；详见
+[Video Library follow-up](2026-09-05-video-library-browsing-and-comparison.md#direct-run-root-follow-up--2026-09-05)。
+下方历史 gate、人审及 Provider evidence 不变。
+
 ## Purpose
 
 本文记录 Provider Console 无法看到 `runs/<run_id>/outputs/**` 或 `runs/<run_id>/output/**` 新合成视频的 deterministic integration gap、

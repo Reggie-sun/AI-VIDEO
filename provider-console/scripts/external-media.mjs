@@ -223,8 +223,9 @@ async function inspectMedia(root, sourcePath) {
 async function walkRoot(root, limits, layout = "recursive") {
   const files = [];
   let entriesSeen = 0;
-  async function visit(directory, depth) {
-    if (depth > limits.maxDepth || entriesSeen >= limits.maxEntriesPerRoot) return;
+  let truncated = false;
+  async function visit(directory, depth, descend = true) {
+    if (depth > limits.maxDepth || entriesSeen >= limits.maxEntriesPerRoot) { truncated = true; return; }
     let entries;
     try {
       entries = await readdir(directory, { withFileTypes: true });
@@ -233,12 +234,12 @@ async function walkRoot(root, limits, layout = "recursive") {
     }
     entries.sort((left, right) => left.name.localeCompare(right.name));
     for (const entry of entries) {
-      if (entriesSeen >= limits.maxEntriesPerRoot) return;
+      if (entriesSeen >= limits.maxEntriesPerRoot) { truncated = true; return; }
       entriesSeen += 1;
       const candidate = path.join(directory, entry.name);
       if (entry.isSymbolicLink()) continue;
       if (entry.isDirectory()) {
-        await visit(candidate, depth + 1);
+        if (descend) await visit(candidate, depth + 1);
         continue;
       }
       if (entry.isFile()) files.push(candidate);
@@ -251,15 +252,16 @@ async function walkRoot(root, limits, layout = "recursive") {
     try {
       runs = await readdir(root, { withFileTypes: true });
     } catch {
-      return files;
+      return { files, truncated };
     }
     runs.sort((left, right) => left.name.localeCompare(right.name));
     for (const run of runs) {
-      if (entriesSeen >= limits.maxEntriesPerRoot) break;
+      if (entriesSeen >= limits.maxEntriesPerRoot) { truncated = true; break; }
       entriesSeen += 1;
       if (!run.isDirectory() || run.isSymbolicLink()) continue;
+      await visit(path.join(root, run.name), 0, false);
       for (const directoryName of ["output", "outputs", "sidecars", "evidence"]) {
-        if (entriesSeen >= limits.maxEntriesPerRoot) break;
+        if (entriesSeen >= limits.maxEntriesPerRoot) { truncated = true; break; }
         const directory = path.join(root, run.name, directoryName);
         let stat;
         try {
@@ -273,17 +275,17 @@ async function walkRoot(root, limits, layout = "recursive") {
       }
     }
   }
-  return files;
+  return { files, truncated };
 }
 
 function runOutputWorkspace(root, sourcePath) {
   const relative = path.relative(root, sourcePath);
   if (!relative || path.isAbsolute(relative)) return null;
   const parts = relative.split(path.sep);
-  return parts.length >= 3 && parts[0] && ["output", "outputs"].includes(parts[1]) ? parts[0] : null;
+  return parts[0] && (parts.length === 2 || (parts.length >= 3 && ["output", "outputs"].includes(parts[1]))) ? parts[0] : null;
 }
 
-function runEvidenceFilesForMedia(sidecars, root, mediaPath, limit) {
+function runEvidenceFilesForMedia(sidecars, root, mediaPath) {
   const workspace = runOutputWorkspace(root, mediaPath);
   if (!workspace) return [];
   return sidecars
@@ -292,8 +294,7 @@ function runEvidenceFilesForMedia(sidecars, root, mediaPath, limit) {
       return parts.length >= 3
         && parts[0] === workspace
         && ["sidecars", "evidence"].includes(parts[1]);
-    })
-    .slice(0, limit);
+    });
 }
 
 function isExactPathBinding(value, sidecarPath, mediaPath) {
@@ -943,7 +944,8 @@ async function scanSource(source, limits) {
   } catch {
     return { source: publicSource(source, "unavailable"), records: [] };
   }
-  const files = await walkRoot(root, limits, layout);
+  const scan = await walkRoot(root, limits, layout);
+  const files = scan.files;
   const experimentImages = await indexExperimentImages(files, root, sourceId, experimentEvidenceHelpers);
   const sidecars = files
     .filter((file) => path.extname(file).toLowerCase() === ".json");
@@ -951,9 +953,9 @@ async function scanSource(source, limits) {
     .filter((sourcePath) => (
       VIDEO_MIME_TYPES.has(path.extname(sourcePath).toLowerCase())
       && (layout !== "run_outputs" || runOutputWorkspace(root, sourcePath))
-    ))
-    .slice(0, limits.maxMediaPerRoot);
-  const scannedRecords = await mapWithConcurrency(mediaFiles, MEDIA_SCAN_CONCURRENCY, async (sourcePath) => {
+    ));
+  let truncated = scan.truncated || mediaFiles.length > limits.maxMediaPerRoot;
+  const scannedRecords = await mapWithConcurrency(mediaFiles.slice(0, limits.maxMediaPerRoot), MEDIA_SCAN_CONCURRENCY, async (sourcePath) => {
     const mime_type = VIDEO_MIME_TYPES.get(path.extname(sourcePath).toLowerCase());
     try {
       const inspected = await inspectMedia(root, sourcePath);
@@ -966,6 +968,10 @@ async function scanSource(source, limits) {
         mime_type,
         ...inspected,
       };
+      const applicableSidecars = layout === "run_outputs"
+        ? runEvidenceFilesForMedia(sidecars, root, sourcePath)
+        : sidecars;
+      if (applicableSidecars.length > limits.maxSidecarsPerRoot) truncated = true;
       const {
         metadata,
         metadata_status,
@@ -979,9 +985,7 @@ async function scanSource(source, limits) {
         association_ambiguity_tiers,
         reference_descriptors,
       } = await metadataForMedia(
-        layout === "run_outputs"
-          ? runEvidenceFilesForMedia(sidecars, root, sourcePath, limits.maxSidecarsPerRoot)
-          : sidecars.slice(0, limits.maxSidecarsPerRoot),
+        applicableSidecars.slice(0, limits.maxSidecarsPerRoot),
         media,
         limits,
         experimentImages,
@@ -1007,7 +1011,7 @@ async function scanSource(source, limits) {
     }
   });
   const records = scannedRecords.filter(Boolean);
-  return { source: publicSource(source, "available", { media_count: records.length }), records };
+  return { source: publicSource(source, "available", { media_count: records.length, truncated }), records };
 }
 
 function compareRecords(left, right) {

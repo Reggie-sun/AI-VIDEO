@@ -11,6 +11,13 @@ import {
 
 const sha = (letter) => letter.repeat(64);
 
+test("external videos can be found by their source-relative run directory", () => {
+  const output = media("e", "externalvideo");
+  const entries = buildLibraryEntries([], { groups: [{ ...output, locations: [{ source_id: "runs-outputs", token: "externalvideo", file_name: "subtitled.mp4", relative_path: "drama-preview-v81/subtitled.mp4" }] }] });
+  assert.equal(filterLibraryEntries(entries, { query: "drama-preview-v81" }).length, 1);
+  assert.equal(filterLibraryEntries(entries, { query: "drama-preview-v77" }).length, 0);
+});
+
 test("strict render output is searchable and ordered without inventing a Shot or Provider attempt", () => {
   const rendered = { ...media("d", "rendertoken"), source_kind: "active_render", relative_path: `state/render/outputs/${sha("d")}.mp4`, started_at: "2026-09-05T11:00:00Z" };
   const entries = buildLibraryEntries([

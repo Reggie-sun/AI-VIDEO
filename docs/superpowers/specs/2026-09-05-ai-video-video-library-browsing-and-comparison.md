@@ -50,6 +50,8 @@ contract；本次仍不包含媒体生成、Production mutation 或新的 execut
 - candidate、fetched、已注册视频与 external output 均按各自现有 reader 的允许范围投影。
   同时包含 strict Project reader 已验证的 `active_render_state` 成片输出；不裸扫 render 目录，
   不从恢复旁证推导 active render。成片不借用源 Shot 的 Provider、Prompt 或版本身份。
+  External `run_outputs` 覆盖 run 根目录直属视频和既有 `output/**` / `outputs/**`；直属
+  文件仍是非 canonical 媒体，不递归发现其他 Production 内部目录，不解释相邻任意 JSON。
   同一 attempt 的 fetched/candidate 若不同 bytes，则作为不同输出保留角色标记；不只取 active。
 - 展示层只合并 read-only projections，不成为第二个 Registry、Manifest、timeline 或证据 owner。
   每个来源仍保留自身 authority；多个绑定有歧义时，显示歧义并让用户选择详情上下文，不能任取

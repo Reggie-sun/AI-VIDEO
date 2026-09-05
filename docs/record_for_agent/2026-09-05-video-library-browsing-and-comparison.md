@@ -113,5 +113,41 @@ Staged Harness 九项全部通过，Architecture Gate 零 warning；实现 commi
 未 push/release，不对媒体质量作新验收。Learning evaluation：`no_candidate`；单个工程缺陷
 及回归/播放验证不构成独立 model-quality experiments。
 
+## Direct Run Root Follow-up — 2026-09-05
+
+用户随后报告 `runs/drama-h3-t8-30s-preview-20260905-v81/drama-stock20-repair-30s-subtitled.mp4`
+也未显示。该文件是 run 根目录直属的 development output，不是上一节的 Manifest-selected
+active render。修复前真实 External API 没有该 exact group；旧 `run_outputs` 只发现
+`output/**` / `outputs/**`，导致根目录直属视频被遗漏。
+
+`external-media.mjs::walkRoot` 现在对每个 run 根目录浅层发现直属视频，再沿既有目录白名单
+递归；不扫描其他 Production 内部目录、不新增 root、不硬编码此 run，也不复制/注册 MP4。
+来源保持 `non_canonical`，同 bytes 多位置去重，旁证仍只取同 run `sidecars/**` / `evidence/**`；
+相邻 `composition.json` 不获得 Prompt、Provider、lifecycle 或质量 authority。
+实际目录名搜索另发现 External context 只索引 basename，未包含已经投影的 relative path。
+本次将该相对路径纳入统一搜索，并用 v81 命中/v77 不误匹配测试先 RED 后 GREEN 验证，
+使同名不同 bytes 视频可用 run 目录区分，不制造版本关系。最终真实浏览器搜索完整 v81
+目录命中唯一目标；library contract suite 11 passed。
+
+独立 review 指出新增浅层扫描可能耗尽共享 entry budget，却遗漏原先可见的 outputs 且未标记
+截断。已用 `maxEntriesPerRoot=7` + 六个根目录 JSON 的 fixture 复现；修复让 walker 返回
+entry/depth 截断，并把 media 数量和适用 sidecar 数量截断投影为 `source.truncated`，沿用 UI
+覆盖不完整提示。上限保持不变。Root-file 缺失与预算披露测试均先 RED 后 GREEN；External
+suite 34 passed，覆盖根目录文件、copy 去重、symlink、内部目录排除、未知相邻 JSON 与各预算。
+
+真实 Chrome DevTools MCP 默认来源搜索 `drama-stock20-repair-30s-subtitled` 找到四段同名但
+不同 SHA 的视频，v81 对应 18:33:23 文件时间，未将它们自动归为 Shot versions。目标实测：
+SHA-256 `2b64bd01a2fae757fc0131910c25e9b9c13d0c8a767f18577f3fecb4b8680924`、12637506 bytes、
+30.000s、1344×768、readyState=4、thumbnail 有效，播放从 0 增至 0.924584s，media error=null。
+Range 返回 206、1024 bytes、`bytes 0-1023/12637506`；页面 error/warn 为空。最终真实扫描仍
+包含目标，Runs Outputs location count 从 98 增至 114，五个 allowlisted sources 均未截断。
+这些数量只对应本次本机快照，不构成未来全量索引保证。
+
+最终 exact commit-range Harness receipt：
+`.agent/harness/runs/video-library-run-root-20260905/receipt.json`。状态及 freshness 以该 receipt
+为准；本次未生成或改动媒体、未修改 Production state、未 push/release。旧 composed-run-outputs
+record 已添加范围更新说明。按 `record-ai-video-session` 记录并执行
+`distill-ai-video-learning` evaluation：`no_candidate`；本次是扫描缺陷与技术播放验证。
+
 本轮不证明媒体感知质量、P6、Final Acceptance、activation、remote availability 或 publication。
 扫描仍受原 catalog/reader allowlist 与数量限制；stale、truncated、恢复旁证及来源失败明确可见。

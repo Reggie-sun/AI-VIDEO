@@ -316,6 +316,7 @@ function matchesQuery(entry, query) {
   return entry.contexts.some((context) => [
     context.title,
     context.workspace,
+    context.media?.relative_path,
     context.attempt?.target_shot_id,
     context.attempt?.shot_id,
     context.model,
