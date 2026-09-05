@@ -8,6 +8,12 @@ learning_eligibility: ineligible
 
 Date: 2026-09-06
 
+## Supersession Notice
+
+本记录的“readiness阻塞、未有新提交”已由[后续有界修复与Vidu逐镜证据](2026-09-06-jieshi-s01-vidu-i2v-live-gate.md)取代。
+`80b5ffe` 修复首镜显式first_frame，已完成唯一一次Vidu I2V提交、下载和MCP分析；
+当前停止原因是媒体Gate FAIL，不再是输入接入阻塞。以下保留历史准备过程。
+
 ## Scope And Result
 
 继续既有《界蚀》第一集 52 Shot / 300 秒创作包，只处理 S01 首帧驱动请求。新准备目录为 `runs/jieshi-e01-i2v-20260906-attempt01/`；详细事实与准确 evidence 文件见其 [README](../../runs/jieshi-e01-i2v-20260906-attempt01/README.md)。本轮停于真实 `ShotReadinessGate`，没有新的生成提交、MP4、intent、permit、candidate activation 或 S02 submit。

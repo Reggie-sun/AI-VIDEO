@@ -1,6 +1,25 @@
 # Episode 01 — 不存在的终点站
 
-《界蚀》第一集完整创作包。都市异常、规则悬疑、轻科幻；目标300秒、9:16、1080×1920、24fps。当前是创作交付，尚未生成MP4。
+## Audio Production Policy
+
+2026-09-06 用户更新：本集后续新请求默认优先使用所选模型的原生声音，不再把
+“字幕和声音遵循既有合成流程”解释为统一关闭原生音轨。所选 capability 支持声音时，
+通过现有 Planner/Router/Provider contract 明确表达 `AudioNeed.REQUIRED` 与
+`native_audio=True`；环境声、拟音和当前镜头已有对白/广播一同进入生成意图。
+不新增台词、旁白或人物，不改变既有 Shot 时长和叙事。
+
+逐镜 Gate 同时核验 exact MP4 的音轨、台词逐字准确性、中文姓名、时间窗口、
+口型（适用时）、环境声及跨镜音色一致性；开声音不等于这些 findings 已 PASS。
+达标原生声音直接保留，需要修正的部分再经既有音频路径替换。母亲仿声与真实电话
+仍须维持同一声线。字幕继续由既有流程制作；最终剪辑、混音、响度及字幕时序
+仍消费同一 `ResolvedTimeline`，不改变 renderer 或音频 ownership。
+
+本策略不追改已经提交的请求、profile、intent、permit 和媒体证据。
+`jieshi-e01-s01-vidu-i2v-attempt01` 在更新前已按无声请求提交，仅保留为本次视觉
+验证素材；不能据此宣称本集音频完成。后续新 attempt 必须重新封装符合本策略的
+exact 请求并遵守适用调用次数与授权边界，不能复用已消费 permit。
+
+《界蚀》第一集完整创作包。都市异常、规则悬疑、轻科幻；目标300秒、9:16、1080×1920、24fps。已进入S01逐镜制作；最新Vidu I2V有真实动作但Gate FAIL，尚无已接受S01。证据见 `runs/jieshi-e01-i2v-20260906-attempt01/preparation-v7/shot-01-gate.md`。
 
 生成进度：开场首帧候选已保存至 `runs/jieshi-e01-seedance20-20260905-001/preparation/shot-01-first-frame-v1.png`。原图941×1672，未上采样；它不是1080p成片。Seedance尚未提交：当前写实人物I2V路线需要exact首帧的人工Ark `Active`素材证据；详情见同目录 `submit-readiness.json`。
 

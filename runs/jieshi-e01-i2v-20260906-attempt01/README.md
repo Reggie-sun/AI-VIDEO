@@ -1,6 +1,22 @@
 # Jieshi S01 First-Frame Preparation
 
-## Status
+## Current Result — 2026-09-06
+
+I2V 接入修复提交 `80b5ffe`；已完成一次 Vidu q3-pro 4秒1080p真实首帧调用和 exact MP4 Gate。
+最新请求与证据为 `preparation-v7/`；`preparation-v3` 至 `v6` 是保留的离线诊断，不是额外生成。
+下载成功，但[逐镜 Gate](preparation-v7/shot-01-gate.md)为 **FAIL**：短暂手影、多余数字和机位变化。
+MP4 SHA-256：`b4b4def02532232b3c910999af483604bd677ed0bd9606a2b378951b81e27f8a`。
+素材有真实抬手、实测1080×1920/24fps/4.042s；未激活、没有S02提交。
+
+初次下载因本机 fake-IP DNS 被公共地址 guard 拒绝。`fetch_i2v.py` 在同一 durable FETCH
+阶段用仅本进程的真实公共DNS解析恢复，原域名 TLS/SNI、公网IP校验、禁止redirect和
+无凭据下载保持；无第二次 generation POST。两个 scoped `reviewer_xhigh` reviews 均 accept。
+
+用户随后明确改为原生声音优先，见[本集声音策略](../../docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.md#audio-production-policy)。
+本次已提交无声请求保持历史身份。应用户价格问题，只读查询同参数audio开/关均96积分；
+没有刷新旧profile或另发生成。旧85元授权未使用；本次新的一次submit已消费，reservation未因推算账单而结算。
+
+## Historical Preparation Status
 
 `STOP_AT_READINESS`。未生成新视频，未创建新 paid intent/permit。没有可供逐镜 Gate 分析的新 MP4，不能推进 S02。
 
