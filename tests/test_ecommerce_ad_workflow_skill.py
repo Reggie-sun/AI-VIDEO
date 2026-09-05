@@ -1141,10 +1141,26 @@ def test_native_audio_gate_documents_provider_capability_branch() -> None:
     for policy_text in (agents, playbook, h3_skill):
         assert "LOCAL_BOUNDED_REPAIR_LOOP" in policy_text
         assert "EVIDENCE_REPAIR_FIRST" in policy_text
+    # AGENTS owns the durable barrier and routes execution detail to its owner.
+    agents_gate = agents.split("### Per-Shot Post-Media Gate\n", 1)[1].split(
+        "\n## ", 1
+    )[0]
+    playbook_gate = playbook.split("### Per-Shot Post-Media Gate\n", 1)[1].split(
+        "\n## ", 1
+    )[0]
+    assert "outcome known" in agents_gate
+    assert "Unknown outcome 必须停止" in agents_gate
+    assert "只有全部 required findings 为 `PASS` 才可推进" in agents_gate
+    assert (
+        "[Per-Shot Post-Media Gate]"
+        "(.agent/context/control-plane-playbook.md#per-shot-post-media-gate)"
+    ) in agents_gate
+    for policy_text in (playbook_gate, h3_skill):
         assert "outcome-known" in policy_text
-    assert "阻断下一 Shot" in agents
-    assert "新 exact identity / intent / one-use permit" in agents
-    assert "task-scoped attempt / elapsed-time / GPU budget" in agents
+    assert "阻断下一 Shot" in agents_gate
+    assert "new exact identity / intent / one-use permit" in playbook_gate
+    assert "封存有限的 task-scoped attempt count、elapsed-time" in playbook_gate
+    assert "与 GPU budget" in playbook_gate
     assert "绝不允许提交下一 Shot" in playbook
     assert "新 exact identity" in playbook
     assert "durable intent" in playbook

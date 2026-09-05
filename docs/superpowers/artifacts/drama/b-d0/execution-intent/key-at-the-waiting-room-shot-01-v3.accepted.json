@@ -1,0 +1,24 @@
+{
+  "schema_version": "drama-shot-source-binding-acceptance/1",
+  "record_kind": "drama_shot_source_binding_acceptance",
+  "overlay_id": "drama.execution-intent.key-at-the-waiting-room.shot-01",
+  "binding_version": 3,
+  "status": "accepted",
+  "domain_id": "drama",
+  "lane_id": "M6-D",
+  "accepted_binding_payload": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v3.proposed.json",
+    "commit": "75e88e0f1934a2829838f1f28cc6f90d66def0c3",
+    "git_blob_oid": "d641b6923f30c73263470b2757f6787941126888",
+    "byte_size": 3223,
+    "sha256": "3c8b1305812c921ebf7166c01111eed8c90714a15839026797e83dfddde19188"
+  },
+  "authority": "CURRENT_USER_METADATA_BINDING_AND_LOADER_AUTHORIZATION",
+  "accepted_scope": "Metadata-only graph source-binding supersession; original v1 semantics and v2 timing repair remain immutable",
+  "execution_authority": false,
+  "runtime_readiness": "NOT_EVALUATED",
+  "provider_submit": false,
+  "candidate_activation": false,
+  "m6_d": "NOT_EVALUATED",
+  "next_shot_submit_allowed": false
+}

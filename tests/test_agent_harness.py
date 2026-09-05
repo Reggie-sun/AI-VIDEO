@@ -1670,6 +1670,30 @@ def test_ecommerce_ad_skill_paths_route_to_focused_and_control_plane_checks(
     assert "production_video_provider_tests" not in report["check_ids"]
 
 
+def test_drama_source_binding_has_only_its_exact_focused_route() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+    for path in (
+        "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/"
+        "shot01_authoring_source_binding_v3.py",
+        "tests/test_drama_shot01_authoring_source_binding.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["fallback_paths"] == []
+        assert "drama_authoring_source_binding_tests" in report["check_ids"]
+        assert "task_architecture_gate" in report["check_ids"]
+    assert policy["checks"]["drama_authoring_source_binding_tests"]["argv"] == [
+        "python", "-m", "pytest", "-p", "no:cacheprovider",
+        "tests/test_drama_shot01_authoring_source_binding.py", "-q",
+    ]
+    assert "drama_authoring_source_binding_tests" in policy["checks"]["full_tests"][
+        "covers_check_ids"
+    ]
+    unknown = "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/unknown_driver.py"
+    report = agent_harness.inspect_paths([unknown], policy)
+    assert report["fallback_paths"] == [unknown]
+    assert "full_tests" in report["check_ids"]
+
+
 def test_ecommerce_ad_contract_test_has_an_exact_focused_route() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 

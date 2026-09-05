@@ -114,6 +114,15 @@ Quality architecture 采用 **Universal Production QA + Domain-Specific Acceptan
 | Domain authoring and media acceptance | Ecommerce authoring由`.agents/skills/ecommerce-ad-workflow/`拥有；Ecommerce post-media Runtime由上方Gate 2 seam拥有；Drama Development authoring/rubric与exact HUMAN evidence contract由accepted `docs/superpowers/specs/2026-08-28-ai-video-drama-authoring-and-acceptance.md`拥有 | `AdQCReport.ready`只表示Ecommerce authoring readiness；`AdCreativeReviewReport.is_ready`只表示sealed handoff integrity且`production_verdict=None`。Ecommerce media evidence必须进入existing P6 exact-target binding；Production physical/perceptual continuity与Drama motivation/causality/emotional/payoff continuity保持不同owner；Drama typed Runtime Gate 2/P6 seam仍未实现。 | Skill或Drama Development artifact写Manifest、创建`ReviewReceipt`/`FinalAcceptanceReceipt`、把Base AI Comic或Ecommerce closure称为Drama acceptance、用physical continuity替代narrative continuity。 | `python -m pytest -p no:cacheprovider tests/test_ecommerce_ad_workflow_skill.py tests/test_production_ad_creative.py tests/test_production_ecommerce_quality_gate.py tests/test_shot_readiness_gate.py -q` |
 | Market performance | Future separately approved analytics/empirical feedback owner；当前不存在Production acceptance owner | CTR、CVR、CPA、ROAS、hold rate、retention、completion等只属于outcome evidence；不得从authoring、P6或Final Acceptance预测。 | 跨domain `Quality Score`、`Ad QC PASS -> predicts ROAS`、`Drama QC PASS -> predicts audience success`。 | 当前无Runtime implementation；任何future seam须独立spec/plan、真实校准数据与authorization。 |
 
+Drama M6-D Shot 01 的versioned source-binding读取由run-local
+`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/shot01_authoring_source_binding_v3.py`独占。
+它是Development authoring loader，不是新的Product subsystem：显式选择v3 metadata acceptance，严格重开Git/working
+bytes，保留v1 semantic parent与v2 timing repair；仅将已接受的graph transition组合到source-binding view，复用原完整
+source-binding校验、Planner/Router/compiler与current lineage validator。禁止latest/fallback、历史driver globals
+patch、修改旧accepted bytes、手写VideoGenerationRequest或任何Production/Provider effect。
+Focused verification：`python -m pytest -p no:cacheprovider tests/test_drama_shot01_authoring_source_binding.py -q`，
+Harness check owner为`drama_authoring_source_binding_tests`；实际当前run的pure reopen另以exact sidecar记录，不能代替media Gate。
+
 `ShotReadinessGate.READY`只证明pre-submit structural binding/eligibility/assets；它不证明post-media quality、P6、activation或Final Acceptance。Base AI Comic E2E当前证明exact selected policy（`LAYOUT + CAPTION`）下的durable closure，不证明完整Drama semantic acceptance或human perceptual caption quality。Independent Format Gate暂缓：现有`DeliveryProfile`、`CompositionSpec`、`ResolvedTimeline`和policy继续拥有format/timing/layout约束，除非未来出现重复且不可由这些owner表达的stable requirements。
 
 ### Shot Continuity M0 Live Qualification
