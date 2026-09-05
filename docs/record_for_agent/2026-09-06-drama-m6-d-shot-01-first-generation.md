@@ -97,6 +97,22 @@ playback前明确授权的HUMAN designee，以exact MP4全长、`1.0x`、full au
 `retry_count=0`，当前task不得自动生成repair attempt；不得提交Shot 02、激活candidate、进入pairwise/whole-scene Gate、
 P6或Final Acceptance。
 
+## Verification And Checkpoint
+
+- v5 executable source range `b30414152ab7a825069d0aa5dbf6986cef67ff69..6244b7b590be6dd96e329c55aaa0afe292bce04f`
+  已通过`4431 passed, 4 skipped`与task Architecture `0 errors / 0 warnings / 0 info`；receipt
+  `.agent/harness/runs/drama-shot01-first-v5-executable-20260906/receipt.json`，SHA-256
+  `5be34c239d1857e17804c0c4425a7a004384b4878093df9f0013b9ad6dc95f15`。
+- 本media-gate payload checkpoint为`bdfc3c5a8b109f30de7e4016d413d8446e037d2c`；exact parent
+  `77458fc57349dd9e56ffe20086c5e867fc533e78`。
+- 该exact four-file documentation range由Harness路由为`documentation`，
+  `scope_diff_check`、`docs_contract_check`、`policy_audit_check`与`product_runtime_skill_boundary_tests`均PASS；receipt
+  `.agent/harness/runs/drama-shot01-media-gate-v1-final-20260906/receipt.json`，SHA-256
+  `44cff67a8e56d724b7544f95db9d9b16bea5e6798ae19bcaa13517de98356472`；receipt verify的integrity、freshness、
+  snapshot与scope checks全部为`true`。
+- `validate_evidence_identity.py`对本记录返回`errors=[]`；automatic distillation不满足admission threshold，结果
+  `no_candidate`。
+
 ## Agent Guardrails
 
 本记录不把Provider success、MCP metrics或sampled frames转写为HUMAN Drama verdict，也不复用Commercial verdict。
