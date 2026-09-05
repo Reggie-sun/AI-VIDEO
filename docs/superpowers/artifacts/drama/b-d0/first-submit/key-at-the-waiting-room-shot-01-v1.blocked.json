@@ -1,0 +1,62 @@
+{
+  "schema_version": "drama-shot01-first-submit-stop/1",
+  "attempt_id": "drama-shot01-first-20260905-v1",
+  "decision": "STOP_BEFORE_SUBMIT",
+  "m6_d": "NOT_EVALUATED",
+  "blocker": "ACTIVE_PRE_GENERATION_GRAPH_REQUIREMENT_LINEAGE_STALE",
+  "acceptance_path": "docs/superpowers/artifacts/drama/b-d0/first-submit/key-at-the-waiting-room-shot-01-v1.accepted.json",
+  "acceptance_sha256": "dd2571c788389183fc2639e0d0142c6e497c4ea48faa8a970634fe8e2e172840",
+  "preflight_sha256": "28b320b076297cbf553345eba585d20801088b94d91d02e6184eb3655639a624",
+  "source_commit": "7148b548f08b036bdd0d59dd25e0c829ee1573b4",
+  "driver_checkpoint": "eb902f3552087a4132eeca2b1b500ae2c5072205",
+  "observation": {
+    "entry": "VideoGenerationService.start -> ProductionStateCommitter.begin_video_generation",
+    "user_message": "Video generation request lineage is not current and exact.",
+    "read_only_validator": "verify_current_video_generation_lineage",
+    "validator_result": "REJECT",
+    "validator_reason": "video request does not match the active generation target",
+    "activation_scope_present": true,
+    "request_persistence_reached": false
+  },
+  "lineage": {
+    "active_graph_hash": "761c92a0a8507ae2b8f14de5338b337e0d567e78b654e36403d3428a0da47ff1",
+    "target": "generation-target:drama.shot.waiting-room.001:final_visual",
+    "graph_requirement_hash": "d07dba76f19e2a1d998d9bf087df8583a1a99653cc7c1d9760935f72534c9b81",
+    "request_requirement_hash": "735c670eeee9bef29f9e9980ae8e476bde7bfff8786a78edf54af644d9eed924",
+    "graph_planning_request_hash": "92e6de89a72730da3beb58638dd54c637cad5162aab94a3259d3413a9a50931f",
+    "current_planning_request_hash": "6dd31121a17d0178f4372bb4fa764f350216133b18f91d476675137af1480047",
+    "graph_verified_projection_hash": "9481519d2b4929e6abd9b0826cc5731ea54f60526ec414ffa07279d32f0a57fb",
+    "current_verified_projection_hash": "e201aebeb90a324549138163c0d0f4f93405ad7755f3645b1a9bd99c5413ea21",
+    "resolved_generation_hash": "5a9ee2722103a6cee533b36cd5ca2d6254f3ca2bf4c7e0e22da752bd48fecc95",
+    "prompt_sha256": "e6cc74114e4dd41db284a29a83db228cbd9a034370fb5577a0e534d560139b47"
+  },
+  "event_evidence": [
+    {"path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-first-20260905-v1-invoked.json", "sha256": "86f034043f8e5a6bb2dd0b4081366dd483e00a0651774f0dfcfd2d6da2d3d3b6"},
+    {"path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-first-20260905-v1-started.json", "sha256": "b93dd4ea7026d9ccc17251e9171da5573a80c04ee78cac6faaba0f20e7c864db"},
+    {"path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-first-20260905-v1-stopped.json", "sha256": "b86901d7cf8b5af18a2808d1b958ceb2e75693b03604c6749307cc5265b96235"}
+  ],
+  "effects": {
+    "orchestration_invocations": 1,
+    "canonical_start_calls": 1,
+    "production_files_before": 15,
+    "production_files_after": 15,
+    "production_tree_sha256_before": "105168d84dfd9f1405b5bea548e7af1c0d6497696ec9256a29ba4700ac24a4f2",
+    "production_tree_sha256_after": "105168d84dfd9f1405b5bea548e7af1c0d6497696ec9256a29ba4700ac24a4f2",
+    "production_bytes_changed": false,
+    "request_persistence": 0,
+    "durable_intent": 0,
+    "permit": 0,
+    "provider_submit": 0,
+    "media": 0,
+    "video_analysis": 0,
+    "runtime_lifecycle": 0
+  },
+  "interpretation": "Router/compiler/Provider preview readiness did not prove current committer graph-lineage readiness. Historical v6 and this attempt's preflight remain exact observations, not successful execution evidence.",
+  "next_work_requires_separate_scope": "Use the canonical Dependency Graph and ProductionStateCommitter owner to reconcile the new requirement lineage, reseal the graph-bound exact request, then assess a new attempt; do not hand-edit graph, replay this invocation or modify code to bypass validation.",
+  "retry_allowed": false,
+  "next_shot_submit_allowed": false,
+  "activation_allowed": false,
+  "human_verdict": "NOT_EVALUATED",
+  "p6": "NOT_EVALUATED",
+  "final_acceptance": "NOT_EVALUATED"
+}

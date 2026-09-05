@@ -8,7 +8,64 @@ learning_eligibility: ineligible
 
 Date: 2026-08-29
 
-## Current Scope Expansion And Pre-Submit Stop — 2026-09-05
+## Current Canonical Start Rejection — 2026-09-05
+
+此前source/queue blocker已在本轮fresh capture中解除，但真正的canonical `start()`暴露了更后面的graph lineage
+blocker。本节取代下方历史current-facing结论；`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`仍然成立，原因不再是授权、
+runtime checkout或queue不可用。用户已授权Shot 01首次真实生成及Agent-side单Shot Gate；没有授权重建pre-generation graph。
+
+本轮在source commit `7148b548f08b036bdd0d59dd25e0c829ee1573b4`下完成strict reopen，profile-required ComfyUI
+`7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`、T8 `977df788fcf8b971dc3d0fc7d6baa79a0edfaf40`及其余runtime identity
+为MATCH，canonical Provider preflight通过，queue为空。Exact current prompt仍为`e6cc7411...139b47`，音频策略为
+已封存的`GENERATED + KEEP`。未修改accepted fixture、baseline、Story/Scene/Character/Shot、execution-intent或profile。
+
+Driver与preflight checkpoint：`eb902f3`。唯一调用`drama-shot01-first-20260905-v1`在2026-09-05T11:21:57Z进入
+`VideoGenerationService.start -> ProductionStateCommitter.begin_video_generation`，在request persistence之前被
+`verify_current_video_generation_lineage`拒绝：`video request does not match the active generation target`。
+Parent通过同一read-only validator独立复现，不重跑service.start、不retry、不改代码。
+
+| Binding | Active graph | Exact current request |
+| --- | --- | --- |
+| requirement | `d07dba76f19e2a1d998d9bf087df8583a1a99653cc7c1d9760935f72534c9b81` | `735c670eeee9bef29f9e9980ae8e476bde7bfff8786a78edf54af644d9eed924` |
+| planning request | `92e6de89a72730da3beb58638dd54c637cad5162aab94a3259d3413a9a50931f` | `6dd31121a17d0178f4372bb4fa764f350216133b18f91d476675137af1480047` |
+| verified projection | `9481519d2b4929e6abd9b0826cc5731ea54f60526ec414ffa07279d32f0a57fb` | `e201aebeb90a324549138163c0d0f4f93405ad7755f3645b1a9bd99c5413ea21` |
+
+Active graph仍为`761c92a0...a47ff1`。15-file Production tree的前后SHA均为
+`105168d84dfd9f1405b5bea548e7af1c0d6497696ec9256a29ba4700ac24a4f2`；Manifest仍只有bootstrap attempt。
+Request persistence、durable intent、permit、Provider submit、media、video-analysis和Production byte changes均为零。
+Orchestration的`invoked`、`started`、`stopped`sidecars保留；`started`只是进入canonical start前的记录，不表示已提交。
+该invocation已消费，不能再次执行同一attempt。
+
+Exact tracked evidence：
+
+- `docs/superpowers/artifacts/drama/b-d0/first-submit/key-at-the-waiting-room-shot-01-v1.accepted.json`：只封存单次执行范围，不是permit或media acceptance。
+- `runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-first-submit-preflight-v3.json`：SHA `28b320b076297cbf553345eba585d20801088b94d91d02e6184eb3655639a624`。
+- `docs/superpowers/artifacts/drama/b-d0/first-submit/key-at-the-waiting-room-shot-01-v1.blocked.json`：封存exact lineage差异、validator结果、effects与三份run-local event sidecar SHA。Sidecars和早期preflight v1/v2保留为ignored本地证据，不覆盖旧版本。
+
+Focused canonical state/service/T8/Router/prompt tests：`153 passed`；临时目录中exclusive invocation/replay guard检查
+通过。Native `reviewer_xhigh`对driver为`accept with concerns`：无blocking safety defect，但共享外部runtime在最后guard
+到POST之间仍有TOCTOU残余风险；本轮实际未到POST。该静态review不能代替committer lineage验证，更不能证明media quality。
+Final blocker evidence经同一native `reviewer_xhigh`独立复核为`accept`。Driver exact-range Harness：
+`.agent/harness/runs/drama-shot01-first-submit-boundary-detached-20260905/receipt.json`；
+最终stop documentation exact-range receipt：`.agent/harness/runs/drama-shot01-first-submit-stop-20260905/receipt.json`。
+以receipt实际status为准，未完成的check不计PASS。
+初次Harness run `drama-shot01-first-submit-boundary-20260905`期间共享HEAD被unrelated工作推进，已中止其full suite并保留
+不完整receipt；不计作fresh completion evidence。最终driver验证从固定commit的独立detached验证目录重新运行。
+
+`retrieve-ai-video-memory`的experience查询仍为strict failure：`index library version mismatch; rebuild required`；
+未重建、重试或fallback。`record-ai-video-session`在这个真实blocker边界更新本记录；`distill-ai-video-learning`为
+`no_candidate`：无新媒体实验、无controlled comparison，不把同一链的多版本或多proof层计为独立evidence。
+
+Next One Thing：单独扩展到canonical Dependency Graph / committer owner的lineage reconciliation，保持creative bytes
+不变，更新graph后重新解析并封存graph-bound exact request，之后才评估新attempt。不能手改graph/Manifest、复用旧request、
+重跑本invocation或修改runtime/code/tests绕过验证。Shot 02、retry、activation、P6、Final Acceptance仍不在本轮范围内。
+现有`pre_generation_graph_driver.py`只支持bootstrap/exact replay，不能直接重跑；general graph transition owner虽存在，
+本轮尚未验证exact graph-only transition。Future scope必须先验证该seam及unchanged Project/Registry语义，不能凭静态mapping
+执行Manifest写入，也不能用旧bootstrap路径刷新当前schema。Readiness漏验点是没有在start前调用
+`verify_current_video_generation_lineage()`；不能通过放宽这个canonical Gate来消除blocker。
+本轮没有push/release，unrelated record写入保持原样；没有创建或刷新RAG index。
+
+## Historical Scope Expansion And Pre-Submit Stop — 2026-09-05
 
 用户已将范围扩展为canonical Shot 01首次真实生成及Agent-side单Shot媒体验收，包含必要的canonical request
 persistence、durable intent与one-use permit；不包含Shot 02、activation、P6、Final Acceptance或runtime/code/tests修改。

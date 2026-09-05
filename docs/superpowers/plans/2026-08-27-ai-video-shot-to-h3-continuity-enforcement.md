@@ -115,7 +115,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | Accepted timing repair（124 frames @ 24fps）及SourceAudioPolicy `GENERATED + KEEP`保持不变。V6只接受historical exact-capture prerequisite。用户已扩展授权至Shot 01首次生成与单Shot Gate；最新v7 observation因current source revalidation未完成及共享ComfyUI queue中不归本轮所有的prompt而STOP。未创建request/intent/permit，未submit、生成媒体或写Production state。待runtime可用后重新封存fresh readiness，仍不推进Shot 02。详见`docs/record_for_agent/2026-08-29-drama-m6-d-shot-01-request-readiness-gate-stop.md` |
+| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | Accepted timing repair及`GENERATED + KEEP`不变。Fresh source/runtime/Provider preflight已通过，但唯一first-submit invocation在canonical `start()`被拒绝：active graph仍绑定旧requirement `d07dba76...`，current request为`735c670e...`。Production tree未变，request/intent/permit/submit/media均零。需独立graph lineage reconciliation scope后重新封存exact request；不得retry本invocation或推进Shot 02。详见current session record及`first-submit/key-at-the-waiting-room-shot-01-v1.blocked.json` |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -767,7 +767,16 @@ make harness-verify
 
 ## Execution Order And Stop Conditions
 
-Latest scope expansion stop（2026-09-05）：用户已授权canonical Shot 01首次generation及Agent-side单Shot Gate，
+Latest canonical start stop（2026-09-05）：fresh source/runtime/Provider preflight及empty queue检查通过；
+single invocation `drama-shot01-first-20260905-v1`随后在`ProductionStateCommitter.begin_video_generation`持久化request前，
+因`ACTIVE_PRE_GENERATION_GRAPH_REQUIREMENT_LINEAGE_STALE`被拒绝。Active graph `761c92a0...a47ff1`仍绑定旧requirement
+`d07dba76...`，current request requirement为`735c670e...`；read-only canonical validator已独立复现。
+Evidence：`docs/superpowers/artifacts/drama/b-d0/first-submit/key-at-the-waiting-room-shot-01-v1.blocked.json`。
+本invocation已消费，不能retry；Production 15-file tree未变，request/intent/permit/submit/media均为零。
+`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`。Next One Thing是独立授权canonical graph lineage reconciliation及
+new graph-bound exact-request reseal；不是重复选择Provider、切换runtime、改creative bytes或再次授权旧request。
+
+Historical scope expansion stop（2026-09-05）：用户已授权canonical Shot 01首次generation及Agent-side单Shot Gate，
 但fresh pre-submit仍被current source revalidation未完成与共享ComfyUI queue占用阻断。V7 observation：
 `docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v7.blocked.json`
 （SHA-256 `b5df618b7cd7d0d91daea50d2f9d9a7dbcd6e577314da0a0a88efc76ecf9577a`）。
