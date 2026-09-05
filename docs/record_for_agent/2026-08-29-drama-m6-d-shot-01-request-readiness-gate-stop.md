@@ -8,7 +8,15 @@ learning_eligibility: ineligible
 
 Date: 2026-08-29
 
-## Supersession Notice — 2026-08-29
+## Supersession Notice — 2026-09-05
+
+Current Shot 01 pre-submit prerequisite已在committed source `3bd41443ab295289fe61a26846bfaab1a327622b`
+上重新验证：exact Planner/Router/compiler/resolver/preview hashes保持不变，runtime identity `MATCH`，
+canonical read-only Provider preflight通过。V6 envelope只接受这个prerequisite；下方v5 source-instability stop
+保留为历史观察。当前仍为`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`，durable submit intent和one-use permit未创建。
+详见末尾`Committed Source Reopen And Read-Only Preflight — 2026-09-05`及v6 envelope；future effect必须重新核对live identity。
+
+## Historical Supersession Notice — 2026-08-29
 
 本文原始`CANONICAL_SHOT_01_EXECUTION_INTENT_INCOMPLETE` stop及13-path diagnostics保留为commit
 `71fc4e7ddc3174150283088030b3039fe32d963c`时的historical executable truth。新的versioned execution-intent overlay
@@ -28,12 +36,12 @@ one-use permit仍未创建，本记录不授权submit、media或进入per-Shot m
 ## Purpose
 
 本文固定 canonical M6-D Shot 01 从 accepted Drama package 到 H3 exact non-persisted request preview之间的
-executable boundary，并保存后续versioned prerequisite chronology。Current stop位于selected profile所要求的runtime
-identity与observed runtime不匹配处。
+executable boundary，并保存后续versioned prerequisite chronology。Current pre-submit prerequisite已通过；停止边界仍在
+request persistence、durable intent、permit与任何submit之前，未进入M6-D empirical evaluation。
 
 本文不修改 accepted fixture、baseline、Project、Registry、Manifest、historical request 或媒体 evidence，也不授权手写 prompt、默认值补全、Provider submit、retry、`video-analysis`、candidate activation、P6 或 Final Acceptance。
 
-## Exact Canonical Identity
+## Historical Materialization Identity
 
 - canonical run root：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/`。
 - materialization evidence：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-canonical-materialization.json`，SHA-256 `75be2e494e44b5b253d730f9c9daca366806e09209c7e5e5e231c014a1b09f71`。
@@ -425,3 +433,52 @@ authorization。
 未重建、重试或降级检索，当前RAG freshness保持未知。`distill-ai-video-learning` automatic evaluation为
 `no_candidate`：本记录保持`learning_eligibility: ineligible`，该single operational runtime/request-seam blocker不满足两次
 independent attempt、controlled multi-arm或existing-claim material update threshold；未创建Learning Claim或placeholder。
+
+## Committed Source Reopen And Read-Only Preflight — 2026-09-05
+
+本次从clean `3bd41443ab295289fe61a26846bfaab1a327622b`续接。之前三个Router source files已由其owner正式提交；
+`video_planner.py`也有已提交变化。新driver在Product首次import前对289个source/workflow/canonical-run files核对该
+commit的Git blobs，strict重开accepted overlay、timing repair、SourceAudioPolicy、Project/Registry、Shot与active graph，
+之后再次核对source inventory和15-file Production tree。四个changed source hashes在evidence中独立保存，旧accepted
+source identities没有被覆盖；所有exact request hashes与v4/v5 lineage一致。
+
+初查supervisor inactive，故仅做offline reopen；随后外部工作启动canonical unit，第二次capture拒绝继续保存过时
+inactive结论。本session没有start、stop或checkout操作。最终read-only preflight绑定unit
+`ai-video-comfyui-688d00c86482418295fce737686eeb89.service`、PID `69226`、invocation
+`18fc0acbe8a64dda9b32e777c9e2d57f`及该PID拥有的`127.0.0.1:8188` listener。
+ComfyUI `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`、T8 `977df788fcf8b971dc3d0fc7d6baa79a0edfaf40` /
+`1.36.2`、VHS `4ee72c065db22c9d96c2427954dc69e7b908444b`、SageAttention `2.2.0`及`sage_attention`
+launch capability全部匹配selected profile，三个checkout clean。
+
+Provider仍是`comfy-local-h3-t8`，model/profile为`minimax-h3-t8-t2va-quality`，capability为
+`minimax-h3-t8-t2va-quality-v1`，compiler version `3`。Canonical
+`ComfyUIT8VideoProvider.preflight()`校验actual component bytes、required nodes、workflow inputs和input-schema；
+真实transport只发生`GET /queue → GET /object_info → GET /queue`，三个HTTP 200，queue前后均为空，
+supervisor identity前后稳定。Injected HTTP hook拒绝所有其它method/URL，socket guard限制到literal loopback:8188。
+
+Timing-repaired prompt SHA-256仍为`e6cc74114e4dd41db284a29a83db228cbd9a034370fb5577a0e534d560139b47`，
+严格三行、exact dialogue一次；原5.000s prompt `3676c999...750d`仍是未改动的historical parent。
+SourceAudioPolicy通过原canonical loader显式重开，acceptance/payload/commit identity与v4完全相同，
+`GENERATED + KEEP`、required dialogue/ambience/music和native-audio capability/request逐项一致。
+
+Checkpoint artifacts：
+
+- driver：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/shot01_committed_seam_readiness_v1.py`，
+  SHA-256 `f4d2c29da3e550b6f8b95b612cc20b3d0e4ed7bbede8bbf85f91350670d0a847`；
+- evidence：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-committed-seam-readiness-v2.json`，
+  SHA-256 `c6529f5e43342e7f8ed00c1480939dba2a7b6c3f2260748b7b36f01480b3db7b`；
+- envelope：`docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v6.accepted.json`，
+  SHA-256 `4db6a56bf8c043a308d989be38af726f2003e94686e75fbd88209c1692aa245f`。
+
+Focused Planner/Router/adapter/T8/family suite：`240 passed`。Independent review和exact-range Harness结果以本次交付的
+review verdict与`.agent/harness/runs/drama-m6d-shot01-committed-seam-20260905/receipt.json`为准；本段不以旧receipt
+代替最终check。旧证据与accepted semantic bytes保持原样，没有修改runtime/code/tests来制造readiness。
+
+`pre_submit_prerequisite_ready=true`只对应本次exact capture。Durable submit intent与one-use permit均未创建，
+`submit_effect_allowed=false`；没有持久化VideoGenerationRequest、Provider submit、媒体、video-analysis或Production
+mutation。当前为`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`。下一独立阶段必须重新核对current identity并经既有
+durable intent/permit owner处理submit前条件；不得把v6作为permit或M6-D/P6/Final Acceptance。
+
+`retrieve-ai-video-memory --scope experience`正常返回matching history，但相关experience fragments标记`stale`；
+CLI自行排队derived refresh，本session未手动重建或为freshness重试。`distill-ai-video-learning`评估为`no_candidate`：
+这是同一pre-media prerequisite的source/runtime更新，没有新的独立媒体实验或可采纳的跨实验claim。

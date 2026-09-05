@@ -1,0 +1,55 @@
+{
+  "schema_version": "drama-m6-d-shot01-pre-submit-readiness-envelope/6",
+  "decision": "accepted_pre_submit_prerequisite_only",
+  "domain_id": "drama",
+  "lane_id": "M6-D",
+  "target_shot": {
+    "shot_id": "drama.shot.waiting-room.001",
+    "revision": 1,
+    "content_hash": "4cf53970d6642d4bfe73c23e5c12f9714c069843b0a7b47069dfb2519c47253b"
+  },
+  "previous_envelope": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v5.blocked.json",
+    "sha256": "febf132fd11284c471ee7ce4df82b9cd519484256e782ed40e44df7e016b02b1"
+  },
+  "evidence": {
+    "path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-committed-seam-readiness-v2.json",
+    "sha256": "c6529f5e43342e7f8ed00c1480939dba2a7b6c3f2260748b7b36f01480b3db7b",
+    "driver_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/shot01_committed_seam_readiness_v1.py",
+    "driver_sha256": "f4d2c29da3e550b6f8b95b612cc20b3d0e4ed7bbede8bbf85f91350670d0a847",
+    "source_commit": "3bd41443ab295289fe61a26846bfaab1a327622b"
+  },
+  "canonical_request_identity": {
+    "request_hash": "6dd31121a17d0178f4372bb4fa764f350216133b18f91d476675137af1480047",
+    "requirement_hash": "735c670eeee9bef29f9e9980ae8e476bde7bfff8786a78edf54af644d9eed924",
+    "prompt_sha256": "e6cc74114e4dd41db284a29a83db228cbd9a034370fb5577a0e534d560139b47",
+    "resolved_generation_hash": "5a9ee2722103a6cee533b36cd5ca2d6254f3ca2bf4c7e0e22da752bd48fecc95",
+    "preview_fingerprint": "4ba6861de793286c47215d480d94237ab7202c966f9c4836716144008d7ecb76",
+    "source_audio_policy": "GENERATED + KEEP"
+  },
+  "readiness": {
+    "pre_submit_prerequisite_ready": true,
+    "blockers": [],
+    "resolved_historical_blocker": "CANONICAL_REQUEST_SEAM_DEPENDENCY_IDENTITY_UNSTABLE",
+    "offline_exact_reopen": "PASS",
+    "runtime_identity": "MATCH",
+    "provider_preflight": "PASS_READ_ONLY_COMPONENT_AND_OBJECT_INFO",
+    "validity": "EXACT_CAPTURE_ONLY_RECHECK_BEFORE_ANY_EFFECT"
+  },
+  "submit_effect": {
+    "allowed": false,
+    "blockers": ["DURABLE_SUBMIT_INTENT_NOT_CREATED", "ONE_USE_PERMIT_NOT_MINTED"],
+    "request_persisted": false,
+    "provider_submit_count": 0,
+    "media_generated": false,
+    "production_state_writes": 0
+  },
+  "status_boundary": {
+    "m6_d": "NOT_EVALUATED",
+    "execution": "STOP_BEFORE_SUBMIT",
+    "next_shot_submit_allowed": false,
+    "per_shot_media_gate_entered": false,
+    "p6": "NOT_EVALUATED",
+    "final_acceptance": "NOT_EVALUATED"
+  }
+}
