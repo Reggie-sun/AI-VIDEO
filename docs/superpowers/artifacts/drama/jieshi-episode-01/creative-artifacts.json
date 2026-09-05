@@ -1,0 +1,3390 @@
+{
+  "document_kind": "derived_creative_artifact_model_snapshot",
+  "authority": "development_authoring_only",
+  "source_sha256": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee",
+  "source_path": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+  "note": "各artifact通过现有Pydantic model和canonical hash；未物化ProductionProject/Manifest/Registry，无asset绑定，无Product loading/readiness/acceptance claim。",
+  "artifacts": {
+    "brief": {
+      "artifact_id": "jieshi-e01-brief",
+      "schema_version": "2.0",
+      "revision": 1,
+      "content_hash": "9bb691079832a605a9586600a345f1a358e02d34fd86fed07360a87789b61be3",
+      "creation_receipt_id": "authoring-jieshi-e01-r1",
+      "source_provenance": [
+        {
+          "kind": "derived",
+          "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+          "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+        }
+      ],
+      "title": "界蚀：不存在的终点站",
+      "objective": "前三秒钩子、三十秒问题链、五分钟续看悬念",
+      "audience": "短视频竖屏都市科幻悬疑观众",
+      "format": "9:16 / 1080p / 24fps / 300s episode authoring",
+      "language": "zh-CN",
+      "constraints": [
+        "都市异常 + 规则悬疑 + 轻科幻。",
+        "参考《神秘复苏》《零号档案》《反相之地》《归墟》的成功机制，但禁止复制人物、剧情、组织、怪物和具体设定。",
+        "现实正在被另一套“错误现实”逐渐侵蚀，这种现象称为“界蚀”。",
+        "主角林砚能够提前看到 7 秒后的“错误现实”，但每次使用能力，他都会逐渐从现实世界的记录和他人记忆中消失。",
+        "先阅读仓库当前 AI-VIDEO workflow、已有 skill、episode/scene/shot 数据结构，再按现有体系生成第一集，不要绕开现有 workflow。",
+        "制作第一集约 5 分钟内容，必须首先考虑短视频留存，而不是文学完整性。",
+        "第一集只讲一个核心异常，不堆设定：\n   “不存在的终点站”。",
+        "异常规则逐步出现，而不是旁白一次讲完。\n   观众必须和主角一起发现规则。",
+        "第一集不要解释“界蚀”真相。",
+        "不使用真实鬼魂、招魂、驱鬼、符咒、法事、风水改命等封建迷信体系。",
+        "不依赖血腥、尸体、肢解制造恐怖。",
+        "恐惧来自空间错误、行为异常、认知冲突和规则未知。",
+        "明确属于虚构科幻异常世界。",
+        "控制主要人物数量。",
+        "第一集尽量集中在地铁车厢、站台两个主场景。",
+        "保证角色服装、面部、道具、车厢布局连续。",
+        "避免大量群众复杂动作。",
+        "每个 shot 都要有明确视觉目标。",
+        "镜头不要只是人物站着说话，要持续存在视觉信息变化。",
+        "剧情节拍 → scene → shot → 台词/旁白 → 视觉动作 → 镜头设计 → 每个 shot 的生成提示信息。",
+        "一个完全不知道这部剧的人，在前 3 秒停下来，30 秒想继续看，5 分钟结束后主动点第二集。",
+        "如果某段只是“解释世界观”但不能提高留存，直接删除。",
+        "前 3 秒必须抓住观众。",
+        "深夜地铁。",
+        "林砚看向车窗倒影。",
+        "车厢所有乘客都有倒影，唯独他自己没有。",
+        "同时广播响起：“林砚，请在终点站下车。”",
+        "「可这条地铁，没有终点站。」",
+        "不要片头、不要世界观介绍、不要慢铺垫。",
+        "前 30 秒连续制造至少 3 个问题：",
+        "为什么其他乘客像什么都没发生？",
+        "正常现实和 7 秒后的错误现实快速交错，让观众第一次意识到他能看见别人看不见的东西。",
+        "3 个小反转",
+        "1 次主角能力展示",
+        "1 个角色选择",
+        "1 个更大的世界观信息泄露",
+        "最后 15 秒一个必须让人点下一集的 cliffhanger",
+        "只让观众知道：这不是普通幻觉，而且有人早就知道这种事件存在。",
+        "主角终于逃出地铁，以为恢复正常。",
+        "手机重新有信号。",
+        "他给母亲打电话。",
+        "对方沉默几秒后问：",
+        "“请问你找谁？”",
+        "随后镜头切到地铁监控。",
+        "刚才整节车厢里，从始至终都没有出现过林砚。",
+        "用seedance2.0或者2.5",
+        "清晰度用高点,你看着办",
+        "为什么名字都是字母,名字你也自己取了好了"
+      ]
+    },
+    "story": {
+      "artifact_id": "jieshi-e01-story",
+      "schema_version": "2.0",
+      "revision": 1,
+      "content_hash": "8d9715ade7af94d8c71fe32cf392c675acf3bcf626cbf9af47c8a14968adf42f",
+      "creation_receipt_id": "authoring-jieshi-e01-r1",
+      "source_provenance": [
+        {
+          "kind": "derived",
+          "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+          "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+        }
+      ],
+      "language": "zh-CN",
+      "logline": "被不存在的终点站点名的上班族，用七秒后的错误现实救下一名陌生女孩，却在逃离后发现现实正在删除自己。",
+      "synopsis": "一次深夜环线通勤停靠不存在的终点站。两次均为T+7秒错误分支的主观预见，不是手机自主预测；手机秒钟只是观众对时锚点。第一次改变撞击结果，第二次否定独留原车。初始倒影异常是进入界蚀后的观测缺陷，能力使用会加速后续抹除。两人离开列车；母亲不认识林砚，监控追溯性移除林砚。苏遥仍能当面看见他，成为下一集关系与存在证明的悬念。",
+      "beats": [
+        {
+          "beat_id": "B01",
+          "summary": "本人坐在镜头前，窗上六名乘客和女孩的倒影齐全，独缺他；广播点名与指定字幕同时进入。"
+        },
+        {
+          "beat_id": "B02",
+          "summary": "林砚询问，邻座以为没有广播；镜头扫到毫无反应的人群。"
+        },
+        {
+          "beat_id": "B03",
+          "summary": "倒影恢复；连续报站变成名字，局部乘客停手后恢复。"
+        },
+        {
+          "beat_id": "B04",
+          "summary": "陌生短信逐条出现，回复失败，信号栏变为双竖线。"
+        },
+        {
+          "beat_id": "B05",
+          "summary": "两人从陌生到交换观测；用连续黑窗揭示列车没有经过隧道灯。"
+        },
+        {
+          "beat_id": "B06",
+          "summary": "环线屏幕变成终点站，停靠不该存在的站台。"
+        },
+        {
+          "beat_id": "B07",
+          "summary": "老人先下车回头挥手，灯暗后消失，再出现于远端。"
+        },
+        {
+          "beat_id": "B08",
+          "summary": "短信警告不要相信第一个下车者；女孩挡住视线，广播改用母亲的声音。"
+        },
+        {
+          "beat_id": "B09",
+          "summary": "林砚想求证母亲安危，呼叫失败；广播回应他的拨号动作。"
+        },
+        {
+          "beat_id": "B10",
+          "summary": "同机位错误/正常现实交错，七秒后推人画面被现实动作印证；林砚提前拉开女孩。"
+        },
+        {
+          "beat_id": "B11",
+          "summary": "女孩从戒备转为信任；手机工作群中林砚自己的成员记录消失，能力代价第一次可见。"
+        },
+        {
+          "beat_id": "B12",
+          "summary": "第二次预见暴露独自留车也会被困在废弃车厢；回来后工牌姓名和头像消失。"
+        },
+        {
+          "beat_id": "B13",
+          "summary": "林砚本可独自先过连接门，却回身带女孩一起；看见乘客手停在门槛边界并关门。"
+        },
+        {
+          "beat_id": "B14",
+          "summary": "仅林砚看见J-017/界蚀深度2；女孩只见黑屏，二人知道差异而不解释来源。"
+        },
+        {
+          "beat_id": "B15",
+          "summary": "到达正常站，先看普通乘客从相邻既有车门下车，两人才出D2；信号恢复，林砚拨打妈妈联系人。"
+        },
+        {
+          "beat_id": "B16",
+          "summary": "母亲不认识他；监控回放开场和救人时刻从未有他，系统出现J-000异常个体提示。"
+        }
+      ],
+      "source_references": [
+        "docs/superpowers/artifacts/drama/jieshi-episode-01/creative-input.md"
+      ]
+    },
+    "characters": [
+      {
+        "artifact_id": "jieshi-e01-character-LY",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "5d89b9bc186df3a0d47e70e5077fa231119a2baae3a44b70596824b41cf7bb46",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "character_id": "LY",
+        "name": "林砚",
+        "identity": "24岁男性，普通上班族；观察、求证，不主动解释未知机制。",
+        "appearance_bible": "窄长脸、直眉、短黑发左侧自然分缝，干净下颌；身高约178cm，偏瘦；不使用演员或既有作品人物相貌。",
+        "wardrobe": [
+          "深灰短夹克敞开",
+          "浅灰圆领T恤",
+          "黑色直筒长裤",
+          "灰白运动鞋",
+          "蓝色挂绳矩形白工牌"
+        ],
+        "voice_profile": null,
+        "reference_asset_ids": [],
+        "allowed_variations": [
+          "倒影缺席只发生于S01，S05恢复；属于界蚀初期观测异常，不算额外一次预见",
+          "S33后工作群里他的成员记录消失",
+          "S37后工牌头像姓名消失，其余版面和挂绳保持",
+          "结尾母亲不认识他且历史监控追溯性缺席；在女孩的直接视野中仍可见"
+        ]
+      },
+      {
+        "artifact_id": "jieshi-e01-character-G",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "a1ba7629b41935152885243cd39403d2eee465f0a37978360bc3e5150e543fc3",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "character_id": "G",
+        "name": "苏遥",
+        "identity": "约20岁女性，制作角色名苏遥；本集对白、手机文字和监控提示均不揭露她的姓名或身份，只显示她更早警觉，绝不证实短信由她发送。",
+        "appearance_bible": "椭圆脸、齐肩深黑直发、中分、无刘海，身高约165cm。",
+        "wardrobe": [
+          "米白短外套",
+          "墨绿圆领上衣",
+          "深蓝直筒牛仔裤",
+          "白色帆布鞋"
+        ],
+        "voice_profile": null,
+        "reference_asset_ids": [],
+        "allowed_variations": [
+          "恐惧强度和呼吸变化",
+          "衣服完整，无伤口无换装"
+        ]
+      },
+      {
+        "artifact_id": "jieshi-e01-character-P1",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "0e360e64252c7289a97c97e48f49303434749bac465e53fb641411e162201614",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "character_id": "P1",
+        "name": "周伯祥",
+        "identity": "65岁左右男性乘客，第一位下车者；异常投影的性质不解释。",
+        "appearance_bible": "灰白短发，瘦脸，圆肩。",
+        "wardrobe": [
+          "棕色针织开衫",
+          "灰衬衫",
+          "黑裤",
+          "黑布鞋"
+        ],
+        "voice_profile": null,
+        "reference_asset_ids": [],
+        "allowed_variations": [
+          "S20消失、S21出现在远端属于明确异常；不得生成瞬移拖影或实体变形"
+        ]
+      },
+      {
+        "artifact_id": "jieshi-e01-character-P2",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "9a21129db0b2e5f278ba84f7bec04f84847fbf488098ad726fc7587612a456b6",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "character_id": "P2",
+        "name": "陈立",
+        "identity": "约35岁男性乘客，起初邻座，后堵门。",
+        "appearance_bible": "方脸、短寸发，中等身形。",
+        "wardrobe": [
+          "灰色连帽卫衣",
+          "深蓝长裤",
+          "黑鞋"
+        ],
+        "voice_profile": null,
+        "reference_asset_ids": [],
+        "allowed_variations": [
+          "坐下→起身→单次肩撞→伸右手挡门；无受伤表现"
+        ]
+      },
+      {
+        "artifact_id": "jieshi-e01-character-P3",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "a5bb7fe610a6775e1c704487719e3c4649f58d5b2d3ad412e1d8fc451c2d020c",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "character_id": "P3",
+        "name": "许雯",
+        "identity": "静态背景乘客，不增加支线。",
+        "appearance_bible": "30岁，短发，海军蓝风衣、黑裤，黑色手机",
+        "wardrobe": [
+          "30岁，短发，海军蓝风衣、黑裤，黑色手机"
+        ],
+        "voice_profile": null,
+        "reference_asset_ids": [],
+        "allowed_variations": [
+          "单次抬眼或站起；不群跑、不新增独立动作"
+        ]
+      },
+      {
+        "artifact_id": "jieshi-e01-character-P4",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "39c2c52bc1e59eb54488e4727be78a1bda99739b0524b43f6b0ba135f9481a60",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "character_id": "P4",
+        "name": "郭向东",
+        "identity": "静态背景乘客，不增加支线。",
+        "appearance_bible": "40岁，黑色棒球帽、深蓝棉外套、灰裤，无独立道具",
+        "wardrobe": [
+          "40岁，黑色棒球帽、深蓝棉外套、灰裤，无独立道具"
+        ],
+        "voice_profile": null,
+        "reference_asset_ids": [],
+        "allowed_variations": [
+          "单次抬眼或站起；不群跑、不新增独立动作"
+        ]
+      },
+      {
+        "artifact_id": "jieshi-e01-character-P5",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "5b3e6c497d9f11c225cd6b9d4d4f8add2e724219a2acb898c29116e8eb4636e2",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "character_id": "P5",
+        "name": "沈嘉程",
+        "identity": "静态背景乘客，不增加支线。",
+        "appearance_bible": "25岁，细黑框眼镜、卡其夹克、黑裤，无独立道具",
+        "wardrobe": [
+          "25岁，细黑框眼镜、卡其夹克、黑裤，无独立道具"
+        ],
+        "voice_profile": null,
+        "reference_asset_ids": [],
+        "allowed_variations": [
+          "单次抬眼或站起；不群跑、不新增独立动作"
+        ]
+      },
+      {
+        "artifact_id": "jieshi-e01-character-P6",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "0edac2a0f0cac394a27079c5ab20256bc0cfb8f922947ae644f91842c20aff88",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "character_id": "P6",
+        "name": "何静",
+        "identity": "静态背景乘客，不增加支线。",
+        "appearance_bible": "45岁，低马尾、酒红针织衫、黑裤。",
+        "wardrobe": [
+          "酒红针织衫",
+          "黑裤"
+        ],
+        "voice_profile": null,
+        "reference_asset_ids": [],
+        "allowed_variations": [
+          "单次抬眼或站起；不群跑、不新增独立动作",
+          "S34由坐到站时放袋，灰布袋留原座位。"
+        ]
+      },
+      {
+        "artifact_id": "jieshi-e01-character-M",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "28d17447e4d8b683223e5c47cb83451231fba545c83a5b9708eca4a6fcd5f112",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "character_id": "M",
+        "name": "周惠",
+        "identity": "林砚的母亲，制作角色名周惠，约50岁，仅声音；站台仿声与真实电话使用同一声线但不同空间处理。",
+        "appearance_bible": "不出镜，不生成肖像。",
+        "wardrobe": [],
+        "voice_profile": null,
+        "reference_asset_ids": [],
+        "allowed_variations": [
+          "扬声器窄频混响与电话窄频音色差异，不换声纹"
+        ]
+      },
+      {
+        "artifact_id": "jieshi-e01-character-PA",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "73f884d5c41df17d05d3a3c44f84a93418e70118708e039309e1409c49413aec",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "character_id": "PA",
+        "name": "列车广播",
+        "identity": "无形播报声源，不拟人、不额外生成角色。",
+        "appearance_bible": "无可见身体。",
+        "wardrobe": [],
+        "voice_profile": null,
+        "reference_asset_ids": [],
+        "allowed_variations": [
+          "点名失真时只处理声学，不生成人脸"
+        ]
+      },
+      {
+        "artifact_id": "jieshi-e01-character-N1",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "ae59fd9ab820ff12ebc8bcc43bc3bc2655dc2a2fcfd58029c1f5fc45f5d344e4",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "character_id": "N1",
+        "name": "赵晨",
+        "identity": "正常临江路站的一名普通通勤者，从相邻既有车门先下车；不建立第三节车厢内景。",
+        "appearance_bible": "约30岁，背对镜头，浅蓝衬衫、黑裤、单肩黑包。",
+        "wardrobe": [
+          "浅蓝衬衫",
+          "黑裤"
+        ],
+        "voice_profile": null,
+        "reference_asset_ids": [],
+        "allowed_variations": [
+          "一人正常下车，其他人声均画外。"
+        ]
+      }
+    ],
+    "scenes": [
+      {
+        "artifact_id": "jieshi-e01-scene-SC01",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "d08cd90302d017491838ace25a1bd6d5948b7317c135d2e4adc17629703a9e6c",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "scene_id": "SC01",
+        "location": "虚构城市环线地铁车厢；A1与相邻A2共用同一车厢几何，以门区与空置状态区分。",
+        "time": "深夜；手机初始00:17；无昼夜跳跃。",
+        "mood": "冷白人工光与正常交通声形成认知冲突。",
+        "participant_ids": [
+          "LY",
+          "G",
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "P5",
+          "P6",
+          "PA",
+          "M",
+          "N1"
+        ],
+        "continuity_constraints": [
+          "固定空间：A区座位在D侧门左后；B区是D门内侧，黄色门槛线；C连接门在车厢纵轴前端。A1人物逃生沿纵轴朝C，不横穿站台。",
+          "主轴摄影机在过道靠左座椅一侧，看向C；对话林砚屏幕左/苏遥屏幕右。反打经正面中性构图过渡；不凭切镜左右互换。",
+          "六名普通乘客周伯祥-何静，加林砚和苏遥，共八名实体。周伯祥下车后A1剩七名实体；S34之后五名异常乘客可分局部拍，不增加群众。",
+          "深灰地胶、蓝色长椅、银色立杆、D门黄色门槛；纵向扶杆间距与电子屏位置固定。",
+          "A1正常→停顿→异常停靠；未来废弃版只改材质和空置状态，不能重建门窗。A2空置正常版；没有凭空多一节第三车厢。 正常站末段允许相邻既有车门的门框插入，只作他人先下车证据，不建立第三车厢内景。",
+          "D侧门：S17打开，S28错误现实关闭；回现实仍打开；S31堵门后保持打开至两人进入A2。C门：S38前关闭，S39打开，S41关闭。",
+          "车窗倒影例外只按逐镜声明；其他时刻人数、物理左右和脸一致。"
+        ],
+        "visual_reference_asset_ids": []
+      },
+      {
+        "artifact_id": "jieshi-e01-scene-SC02",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "a3e6f4f5fb08026adcbbbdbb28fcb5f28df6d9d0d29f922844f836b63c04f3a7",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "scene_id": "SC02",
+        "location": "同一站台模块的异常版与临江路正常版。",
+        "time": "深夜，连续事件。",
+        "mood": "异常版空白与正常版生活声形成反差。",
+        "participant_ids": [
+          "LY",
+          "G",
+          "P1",
+          "M",
+          "N1"
+        ],
+        "continuity_constraints": [
+          "异常版：黑底白字终点站牌正对D门；远端灰柱距D约五十米，周伯祥只在S21出现在那里。",
+          "正常版保留柱距和黄色安全线，启用临江路站名和广告灯箱；只有赵晨一个下车通勤者，群众声在画外。",
+          "不出现真实线路标志、真实城市运营商或宗教物件。",
+          "林砚下车在画面左/苏遥右；镜头先跟过门槛再换平台机位，避免瞬间出现在站台。"
+        ],
+        "visual_reference_asset_ids": []
+      },
+      {
+        "artifact_id": "jieshi-e01-scene-SC03",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "277699dec39e4f610dfe4448545c85c288df8ac8fc67eead5c5f0d6eb33e8754",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "scene_id": "SC03",
+        "location": "地铁监控显示器的极短插入画面，不建立新监控室全景。",
+        "time": "与站台电话相邻的剪辑；画面内回放此前两段监控。",
+        "mood": "客观记录否认观众刚才所见。",
+        "participant_ids": [
+          "G",
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "P5",
+          "P6"
+        ],
+        "continuity_constraints": [
+          "显示器只有屏幕内容与窄黑边，无工作人员脸、无新组织标志。",
+          "另备CAM-CCTV-01固定俯拍板，绑定SC01同一几何；开场A区与救人B区的屏内角色按对应历史时刻出现，林砚始终为零。不得把主摄影斜侧镜头冒充原生监控机位。",
+          "监控图像属于屏内历史素材，不增加现场角色；空处不出现轮廓、马赛克或透明人。",
+          "J-000提示只说明记录存在，不解释组织、分类体系或界蚀来源。",
+          "participant_ids只登记屏内被记录的人物，不表示监控室现场有人；林砚不在屏内任何帧。"
+        ],
+        "visual_reference_asset_ids": []
+      }
+    ],
+    "storyboard": {
+      "artifact_id": "jieshi-e01-storyboard",
+      "schema_version": "2.0",
+      "revision": 1,
+      "content_hash": "0cc8548cd027159ce030fab0e4344fd90ce9ca42691f0298f24a59a4e93c6587",
+      "creation_receipt_id": "authoring-jieshi-e01-r1",
+      "source_provenance": [
+        {
+          "kind": "derived",
+          "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+          "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+        }
+      ],
+      "beats": [
+        {
+          "beat_id": "B01-SC01",
+          "scene_id": "SC01",
+          "shot_ids": [
+            "S01"
+          ],
+          "narrative_intent": "本人坐在镜头前，窗上六名乘客和女孩的倒影齐全，独缺他；广播点名与指定字幕同时进入。"
+        },
+        {
+          "beat_id": "B02-SC01",
+          "scene_id": "SC01",
+          "shot_ids": [
+            "S02",
+            "S03",
+            "S04"
+          ],
+          "narrative_intent": "林砚询问，邻座以为没有广播；镜头扫到毫无反应的人群。"
+        },
+        {
+          "beat_id": "B03-SC01",
+          "scene_id": "SC01",
+          "shot_ids": [
+            "S05",
+            "S06",
+            "S07"
+          ],
+          "narrative_intent": "倒影恢复；连续报站变成名字，局部乘客停手后恢复。"
+        },
+        {
+          "beat_id": "B04-SC01",
+          "scene_id": "SC01",
+          "shot_ids": [
+            "S08",
+            "S09",
+            "S10",
+            "S11"
+          ],
+          "narrative_intent": "陌生短信逐条出现，回复失败，信号栏变为双竖线。"
+        },
+        {
+          "beat_id": "B05-SC01",
+          "scene_id": "SC01",
+          "shot_ids": [
+            "S12",
+            "S13",
+            "S14"
+          ],
+          "narrative_intent": "两人从陌生到交换观测；用连续黑窗揭示列车没有经过隧道灯。"
+        },
+        {
+          "beat_id": "B06-SC01",
+          "scene_id": "SC01",
+          "shot_ids": [
+            "S15",
+            "S16",
+            "S17"
+          ],
+          "narrative_intent": "环线屏幕变成终点站，停靠不该存在的站台。"
+        },
+        {
+          "beat_id": "B07-SC01",
+          "scene_id": "SC01",
+          "shot_ids": [
+            "S18",
+            "S19",
+            "S20",
+            "S21"
+          ],
+          "narrative_intent": "老人先下车回头挥手，灯暗后消失，再出现于远端。"
+        },
+        {
+          "beat_id": "B08-SC01",
+          "scene_id": "SC01",
+          "shot_ids": [
+            "S22",
+            "S23",
+            "S24"
+          ],
+          "narrative_intent": "短信警告不要相信第一个下车者；女孩挡住视线，广播改用母亲的声音。"
+        },
+        {
+          "beat_id": "B09-SC01",
+          "scene_id": "SC01",
+          "shot_ids": [
+            "S25",
+            "S26",
+            "S27"
+          ],
+          "narrative_intent": "林砚想求证母亲安危，呼叫失败；广播回应他的拨号动作。"
+        },
+        {
+          "beat_id": "B10-SC01",
+          "scene_id": "SC01",
+          "shot_ids": [
+            "S28",
+            "S29",
+            "S30",
+            "S31"
+          ],
+          "narrative_intent": "同机位错误/正常现实交错，七秒后推人画面被现实动作印证；林砚提前拉开女孩。"
+        },
+        {
+          "beat_id": "B11-SC01",
+          "scene_id": "SC01",
+          "shot_ids": [
+            "S32",
+            "S33",
+            "S34"
+          ],
+          "narrative_intent": "女孩从戒备转为信任；手机工作群中林砚自己的成员记录消失，能力代价第一次可见。"
+        },
+        {
+          "beat_id": "B12-SC01",
+          "scene_id": "SC01",
+          "shot_ids": [
+            "S35",
+            "S36",
+            "S37"
+          ],
+          "narrative_intent": "第二次预见暴露独自留车也会被困在废弃车厢；回来后工牌姓名和头像消失。"
+        },
+        {
+          "beat_id": "B13-SC01",
+          "scene_id": "SC01",
+          "shot_ids": [
+            "S38",
+            "S39",
+            "S40",
+            "S41"
+          ],
+          "narrative_intent": "林砚本可独自先过连接门，却回身带女孩一起；看见乘客手停在门槛边界并关门。"
+        },
+        {
+          "beat_id": "B14-SC01",
+          "scene_id": "SC01",
+          "shot_ids": [
+            "S42",
+            "S43",
+            "S44",
+            "S45"
+          ],
+          "narrative_intent": "仅林砚看见J-017/界蚀深度2；女孩只见黑屏，二人知道差异而不解释来源。"
+        },
+        {
+          "beat_id": "B15-SC02",
+          "scene_id": "SC02",
+          "shot_ids": [
+            "S46",
+            "S47",
+            "S48",
+            "S49"
+          ],
+          "narrative_intent": "到达正常站，先看普通乘客从相邻既有车门下车，两人才出D2；信号恢复，林砚拨打妈妈联系人。"
+        },
+        {
+          "beat_id": "B16-SC02",
+          "scene_id": "SC02",
+          "shot_ids": [
+            "S50"
+          ],
+          "narrative_intent": "母亲不认识他；监控回放开场和救人时刻从未有他，系统出现J-000异常个体提示。"
+        },
+        {
+          "beat_id": "B16-SC03",
+          "scene_id": "SC03",
+          "shot_ids": [
+            "S51",
+            "S52"
+          ],
+          "narrative_intent": "母亲不认识他；监控回放开场和救人时刻从未有他，系统出现J-000异常个体提示。"
+        }
+      ]
+    },
+    "shots": [
+      {
+        "artifact_id": "jieshi-e01-S01",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "40b02bc22a5adbcb55b60df9265b7040d419985475a7e5ba4b36b32cf4b00237",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S01",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B01-SC01",
+        "intent": "不存在的倒影：首帧已见六名乘客与苏遥的完整倒影，林砚对应位置为空；林砚看向空位并抬左手靠玻璃，玻璃里没有手。",
+        "dialogue": "列车广播→林砚：林砚，请在终点站下车。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 3.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G",
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "P5",
+          "P6"
+        ],
+        "continuity_constraints": [
+          "林砚坐A区末位，镜头内本人右侧脸和肩占下方；玻璃占上方。",
+          "左手距窗约2cm停住；不是先见正常再逐渐消失。",
+          "接S02：左手悬在窗前。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S02",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "1385053bb0bc6507a28f62eda6ce93982e27f606aacf56c7160489e7dcc4a49c",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S02",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B02-SC01",
+        "intent": "他听见了名字：手收回，视线先去扬声器，再向屏幕右邻座；吸气停一下。",
+        "dialogue": "林砚→陈立：刚才……叫的是我？",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 4.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "P2"
+        ],
+        "continuity_constraints": [
+          "左手悬在窗前。",
+          "林砚转头面对陈立。",
+          "接S03：陈立戴耳机，深蓝手机在右手。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S03",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "76137266b627fa5dc12ae6a1442a8fbc29d62712dfd19edc47878cee8b84fd29",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S03",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B02-SC01",
+        "intent": "邻座否认：取下左耳机，瞥林砚画外方向；笑了一下又把耳机戴上。",
+        "dialogue": "陈立→林砚：什么？没报站啊。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 4.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "P2"
+        ],
+        "continuity_constraints": [
+          "陈立戴耳机，深蓝手机在右手。",
+          "视线落回手机。",
+          "接S04：四人分坐车厢后区，保持原站位。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S04",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "92878d6fae5bafc08058ae4551f8107a2f457739edda583748a054b1688966e4",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S04",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B02-SC01",
+        "intent": "日常仍在继续：许雯拇指继续滚动，郭向东头轻垂；沈嘉程、何静不动。手机内笑声跨镜延续。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 4.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "P3",
+          "P4",
+          "P5",
+          "P6"
+        ],
+        "continuity_constraints": [
+          "四人分坐车厢后区，保持原站位。",
+          "视线切点回到窗方向。",
+          "接S05：回到S01同窗与座位。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S05",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "70a00ed284629f763be3e7db87a2dc2d71746e34324d790e6e8559bd3fe0971e",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S05",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B03-SC01",
+        "intent": "倒影回来了：林砚抬左手；这一次玻璃中的手同步抬起。他慢慢握拳验证。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 4.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY"
+        ],
+        "continuity_constraints": [
+          "回到S01同窗与座位。",
+          "林砚和倒影同时握拳。",
+          "接S06：林砚放下左手看电子屏。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S06",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "3bb827e1831b95f6fe679a3d9839982f02bdaba1b3fc958d31563c452a556ffd",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S06",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B03-SC01",
+        "intent": "报站重复：屏幕显示临江路；广播同音色重复，第三次卡在名字；林砚笑意消失。",
+        "dialogue": "列车广播→全车：下一站，临江路。\n列车广播→全车：下一站，临江路。\n列车广播→林砚：下一站……林砚。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 6.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY"
+        ],
+        "continuity_constraints": [
+          "林砚放下左手看电子屏。",
+          "林砚视线从屏幕滑向陈立。",
+          "接S07：许雯手指移动，陈立手机笑声未断，周伯祥闭眼。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S07",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "a3654bf8762ee5c48e8028e749e61b44212098b98752d822be63b7295b0618d6",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S07",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B03-SC01",
+        "intent": "动作被截断：0–2秒许雯指尖悬停，陈立抬眼，周伯祥睁眼；2–3秒暗一档；3–5秒恢复刚才动作。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 5.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "P1",
+          "P2",
+          "P3"
+        ],
+        "continuity_constraints": [
+          "许雯手指移动，陈立手机笑声未断，周伯祥闭眼。",
+          "手机笑声从被截位置接续，陈立低头。",
+          "接S08：林砚右手取出黑壳手机，胸前工牌完整。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S08",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "a6206ed0f4a94d8019e4f88e05f31c50e4a7770067f1a4ae6f2eaa0ea1e53292",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S08",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B04-SC01",
+        "intent": "记录仍然存在：锁屏00:17；打开工作群本人名片，头像、林砚、产品部均在；手机震动覆盖页面。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 5.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY"
+        ],
+        "continuity_constraints": [
+          "林砚右手取出黑壳手机，胸前工牌完整。",
+          "陌生短信横幅进入。",
+          "接S09：陌生号码短信页打开。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S09",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "10f6d208d81b9751d7fc9ca1bb7385dab3bfd4aa1230e3f7048b965d84a0a8cd",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S09",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B04-SC01",
+        "intent": "第一条规则：一条短信打断他的拇指动作；拇指停在屏幕边。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 5.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY"
+        ],
+        "continuity_constraints": [
+          "陌生号码短信页打开。",
+          "短信保留不消失。",
+          "接S10：第一条短信可见。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S10",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "a434e2544c0b8b215c65375f20a885cff453b78eeca2788f48033d07dc3f8b0a",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S10",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B04-SC01",
+        "intent": "第二条未完成：第二条出现；第三条输入中的三个点闪动后消失。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 5.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY"
+        ],
+        "continuity_constraints": [
+          "第一条短信可见。",
+          "林砚在键盘上输入回应。",
+          "接S11：林砚右手持手机，苏遥在远处B区。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S11",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "997eff6e7cb0d51760b93b4a60a2fb30af91e75a6b9703611ea6501506082159",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S11",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B04-SC01",
+        "intent": "发不出去：林砚发送你是谁失败；信号格变为两条错开的竖线；他抬眼，焦点落到正看着他的苏遥。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 5.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "林砚右手持手机，苏遥在远处B区。",
+          "苏遥迅速把乳白手机屏幕扣向掌心。",
+          "接S12：林砚从A区站起，苏遥在B区D门内。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S12",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "ad3871ca2888c949549477ce016cdcb2fb927368d2687135962f8fbd43c4852e",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S12",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B05-SC01",
+        "intent": "走近同类：林砚沿过道向B走两步，右手手机垂下；苏遥把手机紧握在左手。",
+        "dialogue": "林砚→苏遥：你也收到了？",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 6.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "林砚从A区站起，苏遥在B区D门内。",
+          "林砚停在苏遥屏幕左，间隔一臂。",
+          "接S13：林砚左/苏遥右，D门仍关。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S13",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "428c7bdbdd0f719416435b3fbb05bd237cbadbde16c1141bd111a5544e43b117",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S13",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B05-SC01",
+        "intent": "她只说观察：苏遥右食指做轻微噤声动作，再指车窗；林砚顺着手看过去。",
+        "dialogue": "苏遥→林砚：声音小一点。\n苏遥→林砚：你看，外面还有灯吗？",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 7.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "林砚左/苏遥右，D门仍关。",
+          "苏遥手落下，二人目光指向窗。",
+          "接S14：两人在B区看窗。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S14",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "975bd49b42d2bb0e54d0dbf0a514f65e14e0b851fad8f00c3957c7f1c13664b6",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S14",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B05-SC01",
+        "intent": "隧道不见了：玻璃外七秒没有一盏灯、没有墙面；林砚移近半步，扶杆反光仍在证明曝光正常。",
+        "dialogue": "苏遥→林砚：刚才隔几秒就有一盏。现在全没了。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 7.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "两人在B区看窗。",
+          "刹车声开始，二人回看D门。",
+          "接S15：林砚看向D门上方线路图。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S15",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "6e707d2fc828376de3152ee454c6a55d1d702337a0dbcae8dce67f03ba2a85f5",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S15",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B06-SC01",
+        "intent": "环线出现尽头：环形路线仍完整，下一站的临江路闪掉，替换为终点站。",
+        "dialogue": "林砚→苏遥：这是环线，哪来的终点？",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 5.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY"
+        ],
+        "continuity_constraints": [
+          "林砚看向D门上方线路图。",
+          "林砚食指停在环形路线闭合处。",
+          "接S16：列车减速；林砚向D门偏半步。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S16",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "c18e3412fa3c40c837e6704e8a451ecacbbc3a047ebe7dfdf29a5d8b0e3385e5",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S16",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B06-SC01",
+        "intent": "她拉住他：苏遥右手抓住林砚左袖，不让他顺势迈出；林砚看她的手，再看门缝。",
+        "dialogue": "苏遥→林砚：先别动。\n列车广播→全车：终点站到了。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 7.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "列车减速；林砚向D门偏半步。",
+          "二人停在黄色门槛内一米。",
+          "接S17：D门尚闭，二人都在车内。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S17",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "250f2b4ae521948febc51cb0fe4a46f6fdf7c9c4f3122ac9334639b7556560ab",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S17",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B06-SC01",
+        "intent": "错误的站台：D门从中间缓慢滑开；黑色站牌随门缝扩大显露，站台一个人都没有。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 8.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "D门尚闭，二人都在车内。",
+          "D门全开；终点站三个字占画面中心。",
+          "接S18：周伯祥在扶杆旁，二人让出门路但仍在车内。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S18",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "b0658f7bbb46f305cca18b55eb8fe110a32461dfc6c77d774614e4850ee39588",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S18",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B07-SC01",
+        "intent": "有人先下车：周伯祥起身，走两步跨过D门槛；苏遥握袖口更紧。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 6.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "P1",
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "周伯祥在扶杆旁，二人让出门路但仍在车内。",
+          "周伯祥站在站台距D约两米。",
+          "接S19：周伯祥背朝车厢站在站台。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S19",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "e42eb384c29392b54fa21edd1e72a18ace0c2563a27d6dca49f752f9449b29b7",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S19",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B07-SC01",
+        "intent": "招手：回头，解剖右手抬至肩高，掌心向车厢，温和笑一次。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 5.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "P1"
+        ],
+        "continuity_constraints": [
+          "周伯祥背朝车厢站在站台。",
+          "右手停在肩高。",
+          "接S20：门外两米处周伯祥右手举起。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S20",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "af5a2d70921ae193a891676a9f0a476cca5e717a790a9a4fac044a6a38dcce4c",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S20",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B07-SC01",
+        "intent": "消失：车厢照明暗一档约0.25秒，再亮时周伯祥消失；林砚探出上身但脚留在车内。",
+        "dialogue": "苏遥→林砚：别过去。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 4.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "P1",
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "门外两米处周伯祥右手举起。",
+          "苏遥拉袖口把他带回半步。",
+          "接S21：同一D门视线；门口仍空。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S21",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "f0d0a3ea20d410240df913c24ce9a3f1b34620019a6690c72540ec1f79639a68",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S21",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B07-SC01",
+        "intent": "距离错误：远端灰柱旁出现周伯祥，保持相同右手招手姿态；柱距证明他到了五十米外。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 5.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "P1"
+        ],
+        "continuity_constraints": [
+          "同一D门视线；门口仍空。",
+          "远端周伯祥不走、不靠近。",
+          "接S22：林砚右手手机再次震动。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S22",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "e030da136e01eec2c2d503d280984ba4e31444e2335f7a14faeae4f00fed5787",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S22",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B08-SC01",
+        "intent": "迟到的补充：短信规则二出现；林砚扫完，手指停止，目光抬向远端。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 6.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY"
+        ],
+        "continuity_constraints": [
+          "林砚右手手机再次震动。",
+          "手机停在胸前，苏遥开始抬右手。",
+          "接S23：林砚看远端，苏遥在屏幕右。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S23",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "ff86daa22c9f07049de153805a3305a8e4dcc2df933b32ed1dd8bb317bb68131",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S23",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B08-SC01",
+        "intent": "不要一直看：苏遥右手挡住林砚眼前站台方向；林砚目光回到她，呼吸紧。",
+        "dialogue": "林砚→苏遥：他刚才明明就在门口。\n苏遥→林砚：别一直看。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 7.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "林砚看远端，苏遥在屏幕右。",
+          "苏遥收手，两人又留意广播。",
+          "接S24：关门警报在D门上方响起。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S24",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "bb3de8a210f4fa1a49c91e3fca0632ddce6df2ae47f8b34c59a00f5c912a9e44",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S24",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B08-SC01",
+        "intent": "母亲的称呼：站台扬声器叫砚砚；林砚肩膀绷住，目光锁住门外，脚尖前移。",
+        "dialogue": "周惠→林砚：砚砚。\n周惠→林砚：下来，妈在外面。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 7.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "关门警报在D门上方响起。",
+          "苏遥注意到他异常的反应。",
+          "接S25：林砚重心偏向D，苏遥仍在他右侧。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S25",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "bf6864319a7f1354af7ec235c8b13a91e542b6fff83761c1a265e8425d2b74fb",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S25",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B09-SC01",
+        "intent": "他想相信：他看手机妈妈联系人；苏遥右手再次拉住袖口，林砚目光在电话与门间切换。",
+        "dialogue": "周惠→林砚：你爸出事了，快下来。\n林砚→苏遥：是我妈的声音。\n苏遥→林砚：先打给她。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 7.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "林砚重心偏向D，苏遥仍在他右侧。",
+          "林砚按下拨号。",
+          "接S26：右手手机呼叫妈妈。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S26",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "1c7ae9433df3243482a07de33f15b0c8ca7693648af7ab266e4ace7afc3ceb94",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S26",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B09-SC01",
+        "intent": "广播听见拨号：呼叫失败出现；门外仿声立刻让他别打，林砚拇指停在重拨上。",
+        "dialogue": "周惠→林砚：别打了。妈就在外面。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 6.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY"
+        ],
+        "continuity_constraints": [
+          "右手手机呼叫妈妈。",
+          "林砚把手机压低，不再试图对广播说话。",
+          "接S27：林砚/苏遥都在B区；陈立仍在后方座位边。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S27",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "6ad92749c062dc42a86ede73fce2b4471ada42035d64e995e37cfb3664aa949a",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S27",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B09-SC01",
+        "intent": "她确认声源在观察：苏遥看扬声器，林砚退半步；后景陈立将手机收进卫衣袋并起身靠近门侧。",
+        "dialogue": "苏遥→林砚：它听得见我们。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 7.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G",
+          "P2"
+        ],
+        "continuity_constraints": [
+          "林砚/苏遥都在B区；陈立仍在后方座位边。",
+          "林砚在苏遥后左半步，陈立在苏遥右前侧；碰撞路径建立。",
+          "接S28：现实锚点T0：苏遥在D门内，林砚在后左，陈立刚把手抽离口袋；林砚手机时间00:19:00。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S28",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "f7a70173be0626cc48c5fcb9e8d090cf252218fa3ae71bcc34a78709eaf863e8",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S28",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B10-SC01",
+        "intent": "第一次七秒错误现实：同机位A/B交错：正常苏遥站稳／错误苏遥向门外失衡；正常门开／错误门合；正常二人在车内／错误苏遥跌坐站台、林砚为了接她也迈出车厢。错误端点手机时间00:19:07。最后回到T0的手出袋位置。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 7.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G",
+          "P2"
+        ],
+        "continuity_constraints": [
+          "现实锚点T0：苏遥在D门内，林砚在后左，陈立刚把手抽离口袋；林砚手机时间00:19:00。",
+          "恢复正常时陈立尚未撞人；现实手机仍00:19:00，苏遥不知道刚才看见了什么。",
+          "接S29：回到T0，陈立手刚抽离口袋，D门全开。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S29",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "df32ac88635f4e70aa911631b881dadeaf20b5d3bfe04697c4cd46feba28b051",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S29",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B10-SC01",
+        "intent": "第一个相同动作：陈立鞋尖转向苏遥，关门三声中的第一声响；林砚先看鞋，再看苏遥。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 3.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G",
+          "P2"
+        ],
+        "continuity_constraints": [
+          "回到T0，陈立手刚抽离口袋，D门全开。",
+          "林砚左手伸向苏遥右腕，尚未接触。",
+          "接S30：林砚左手距苏遥右腕约10cm；苏遥左手手机不动。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S30",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "eea791b7ebc65ed9022bf337e2139f36a704508f01f878de699cf39d4f8858e2",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S30",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B10-SC01",
+        "intent": "他改掉一个动作：第一秒林砚左手握住苏遥右腕并向内拉；第二至三秒苏遥脚跟挪向过道，陈立右肩撞向原空位；第四秒撞到门框。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 4.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G",
+          "P2"
+        ],
+        "continuity_constraints": [
+          "林砚左手距苏遥右腕约10cm；苏遥左手手机不动。",
+          "苏遥停在林砚身侧，二人仍在车内；陈立右肩贴门框。",
+          "接S31：苏遥踉跄但已站稳，林砚松开她右腕。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S31",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "79842fcef453d73821b9d8eb99fe7b574228117082101817bb9a68ef5af9f1d5",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S31",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B10-SC01",
+        "intent": "门被留住：门试图关闭；陈立伸解剖右手卡住，门重新打开；他只盯林砚，不看手。",
+        "dialogue": "苏遥→林砚：你怎么知道？",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 7.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G",
+          "P2"
+        ],
+        "continuity_constraints": [
+          "苏遥踉跄但已站稳，林砚松开她右腕。",
+          "D门保持打开；陈立堵在门边。",
+          "接S32：苏遥右手自然落下，林砚右手仍有手机。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S32",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "309d7bada9896badcba2a1a9af2ece778a267e2dd33ef7c8d9e217e0509790a2",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S32",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B11-SC01",
+        "intent": "信任有了原因：苏遥看刚才被握的手腕再看陈立，主动与林砚站到同一侧；林砚盯手机，不敢断言。",
+        "dialogue": "林砚→苏遥：刚才这一幕……我看见过。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 6.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "苏遥右手自然落下，林砚右手仍有手机。",
+          "两人并肩面对堵门者。",
+          "接S33：手机停在最近应用，工作群本人名片仍在缓存。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S33",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "a6fe0c2a12fdd52922874a05be6bd07abdb3308a48146d1834ad8f8c239e6dc2",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S33",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B11-SC01",
+        "intent": "第一次代价：名片中林砚头像与名字同时清空，成员栏变成该成员不存在；其他同事头像和姓名保持。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 6.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY"
+        ],
+        "continuity_constraints": [
+          "手机停在最近应用，工作群本人名片仍在缓存。",
+          "林砚拇指滑回再打开，空白不恢复。",
+          "接S34：陈立门边，许雯-何静仍在座区。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S34",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "fd247f731569009c0183644dcef7a63028d7de0250c72b6ff6b15726567e4c34",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S34",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B11-SC01",
+        "intent": "他们围上来：许雯/郭向东局部起身，切沈嘉程/何静已经站定；这次明确的起身省略中何静把灰布袋留在原座位。林砚把手机收进右裤袋，两人向过道后退一步。",
+        "dialogue": "苏遥→林砚：他们一直没眨眼。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 7.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G",
+          "P2",
+          "P3",
+          "P4",
+          "P5",
+          "P6"
+        ],
+        "continuity_constraints": [
+          "陈立门边，许雯-何静仍在座区。",
+          "五名异常乘客封住D方向；林砚/苏遥面向C退路。",
+          "接S35：两人被压向过道，C门在林砚侧后。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S35",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "20b81b787336ed9ecbb392a1588e33d4fc67f396ab75d10de6581496949850f1",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S35",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B12-SC01",
+        "intent": "留在车里也不安全：主观错误现实：苏遥被推出D门，门合上；林砚独留原车，照明变暗，蓝椅出现积灰，银杆变锈。返回前停在空车里唯一的林砚。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 7.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G",
+          "P2"
+        ],
+        "continuity_constraints": [
+          "两人被压向过道，C门在林砚侧后。",
+          "回到当前五人堵D，苏遥仍站林砚身边。",
+          "接S36：林砚回神，苏遥在身边，D方向被挡。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S36",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "35fd880b483598249a6e2afbc4c78e70ef9f9b8fa49750f4f12b00bb78290011",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S36",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B12-SC01",
+        "intent": "他开始比较结局：林砚看D再看C，张开右手按稳扶杆；苏遥注意到他的停顿，抬眼找他的视线目标。",
+        "dialogue": "苏遥→林砚：又看见了？\n林砚→苏遥：留在这儿也不行。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 6.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "林砚回神，苏遥在身边，D方向被挡。",
+          "林砚视线锁住C连接门。",
+          "接S37：林砚右手离开扶杆，胸前工牌完整。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S37",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "d0f3cbef60fe37eda799c3cf33b953f56d7509fa47c4ffb903cc14f1c24df255",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S37",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B12-SC01",
+        "intent": "第二次代价与选择：工牌在胸前晃动后静止，姓名与头像从牌面退去；蓝挂绳和产品部字样仍在。林砚按住空牌，抬眼指C。",
+        "dialogue": "林砚→苏遥：换车厢。一起走。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 7.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "林砚右手离开扶杆，胸前工牌完整。",
+          "林砚先迈向C，苏遥跟上，二人无流血。",
+          "接S38：林砚/苏遥朝C逃，陈立/许雯在后方约三米。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S38",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "30e095e1ef52871031062e5a895e85c6cd5e2e7c94b9ef86ec40f8ecc4797653",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S38",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B13-SC01",
+        "intent": "走路的人追得上：两人快走转为短跑，陈立/许雯只正常走路；固定间距看起来没有拉开。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 6.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G",
+          "P2",
+          "P3"
+        ],
+        "continuity_constraints": [
+          "林砚/苏遥朝C逃，陈立/许雯在后方约三米。",
+          "林砚右手到C把手，苏遥落后半步。",
+          "接S39：C门关闭，林砚右手碰到横向把手，苏遥在后半步。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S39",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "b39c7ef7a2e38a4a199ae543173411fc6ca64171ded009ba486f7b59744d07bb",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S39",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B13-SC01",
+        "intent": "他先碰到出口：林砚拉开C门并跨过一脚；回头看见苏遥外套袖角被陈立手指勾住；他的另一脚停住。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 5.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G",
+          "P2"
+        ],
+        "continuity_constraints": [
+          "C门关闭，林砚右手碰到横向把手，苏遥在后半步。",
+          "C门打开，林砚没有独自离开。",
+          "接S40：林砚半身进入A2，苏遥右袖角被陈立右指勾住。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S40",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "c2b762ad3bdab16f3a315ad71d199d08827912091b5441651a9f681ab5165fce",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S40",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B13-SC01",
+        "intent": "回身救她：林砚回身左手接住苏遥右前臂，把她带过C门；苏遥顺势旋肩让袖角滑脱，不与陈立角力。",
+        "dialogue": "林砚→苏遥：抓住我。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 7.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G",
+          "P2"
+        ],
+        "continuity_constraints": [
+          "林砚半身进入A2，苏遥右袖角被陈立右指勾住。",
+          "苏遥全身进入A2，林砚也收回最后一脚。",
+          "接S41：林砚/苏遥都在A2，C仍开，陈立右手伸向门框平面。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S41",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "3cb28dd7bc37628b9f1803e995454d3f9a929db9c16c611ba3025b8a1e10fb34",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S41",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B13-SC01",
+        "intent": "边界显现：手指到C门槛上方后停住，林砚看见停顿，右手拉C门关闭；五人最终隔玻璃站定。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 7.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G",
+          "P2",
+          "P3",
+          "P4",
+          "P5",
+          "P6"
+        ],
+        "continuity_constraints": [
+          "林砚/苏遥都在A2，C仍开，陈立右手伸向门框平面。",
+          "C门已关闭，林砚手离把手；苏遥右手松开林砚，左手手机仍在。",
+          "接S42：A2空车，二人靠扶杆，C后五人静止。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S42",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "41428ba45da4fa4379410494cdd60700ab6f358df69e46f17cbaa273955bf1be",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S42",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B14-SC01",
+        "intent": "喘息仍有疑问：苏遥看林砚空白工牌，再看他的脸；林砚手掌覆住工牌，放开后仍空白。",
+        "dialogue": "苏遥→林砚：你每次看见之后……\n林砚→苏遥：先出去。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 6.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "A2空车，二人靠扶杆，C后五人静止。",
+          "两人不再望向身后，头顶屏幕亮起。",
+          "接S43：林砚抬眼，苏遥在画外。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S43",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "0fbc5cdc195206e514848fcb0ff803d43d4b8c0e6ce042c6e1a957548d0d2350",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S43",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B14-SC01",
+        "intent": "只有他能读：电子屏在林砚视角显示编号J-017，下方界蚀深度2；他读出一个陌生词。",
+        "dialogue": "林砚→苏遥：界蚀？",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 6.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY"
+        ],
+        "continuity_constraints": [
+          "林砚抬眼，苏遥在画外。",
+          "林砚眼睛定住。",
+          "接S44：苏遥追随林砚目光看屏幕。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S44",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "22029f2843b189de25969866a1c16b68e117d1b5675cca21cdbe30b675096d2a",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S44",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B14-SC01",
+        "intent": "她看见的是黑屏：从苏遥肩后看同一屏幕却全黑；切回林砚看她，双方对照发现视觉权限不一致。",
+        "dialogue": "苏遥→林砚：你能看见什么？\n林砚→苏遥：上面的字。\n苏遥→林砚：哪有字？",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 6.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "苏遥追随林砚目光看屏幕。",
+          "苏遥摇头，第一次不自觉退半步。",
+          "接S45：A2屏幕在旁观者视角全黑，窗外也黑。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S45",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "048d05d59fba06c3b3adb6e8a16d7368588d467447d61a94ab2ee8d1514ad3c3",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S45",
+        "scene_id": "SC01",
+        "storyboard_beat_id": "B14-SC01",
+        "intent": "熟悉的灯回来了：第一盏隧道灯扫过二人脸，第二盏接续；电子屏重新亮出临江路；苏遥左手始终握着乳白手机，指节短暂放松后又收紧，手机不离手。",
+        "dialogue": "列车广播→全车：临江路站到了。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 7.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "A2屏幕在旁观者视角全黑，窗外也黑。",
+          "二人转向A2的D2侧门。",
+          "接S46：A2的D2侧门打开，林砚/苏遥站门内不动；相邻既有车门也打开，正常站台有人声。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S46",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "970f940cd9d36b3423982ecb71cd6b9aea2ce9c700c12777ba52f290879d4d11",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S46",
+        "scene_id": "SC02",
+        "storyboard_beat_id": "B15-SC02",
+        "intent": "先看别人下车：先见林砚/苏遥仍在D2门内等候；切到相邻既有车门门槛，赵晨一人先跨下车并沿站台离开。此时两位主角仍留在D2门内，下一镜才跨出。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 7.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G",
+          "N1"
+        ],
+        "continuity_constraints": [
+          "A2的D2侧门打开，林砚/苏遥站门内不动；相邻既有车门也打开，正常站台有人声。",
+          "赵晨已先下车离开门口，林砚/苏遥仍在D2门内等候，尚未跨门槛。",
+          "接S47：林砚/苏遥在D2门内，赵晨已先从相邻既有车门下车并沿站台走远。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S47",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "6f0d908149dd5d19a1e7176d9f44b57750d9b5863f47197779761fc37b090e5d",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S47",
+        "scene_id": "SC02",
+        "storyboard_beat_id": "B15-SC02",
+        "intent": "终于踩上站台：林砚先把右脚落在站台，回看苏遥；苏遥随后跨出，二人走离门口一米。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 6.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "林砚/苏遥在D2门内，赵晨已先从相邻既有车门下车并沿站台走远。",
+          "两人都站在SC02正常版黄色安全线后。",
+          "接S48：林砚/苏遥站台，门关。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S48",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "086c9269f98c197b406203ab2b0c2c1623155a230fae96b1756d883ca970b1b8",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S48",
+        "scene_id": "SC02",
+        "storyboard_beat_id": "B15-SC02",
+        "intent": "异常车厢没了：列车驶走，窗内只见普通蓝座；原C门前五张脸的位置没有人。林砚肩膀缓缓放松。",
+        "dialogue": "苏遥→林砚：出来了……吧？",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 6.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "林砚/苏遥站台，门关。",
+          "尾车掠过，站台普通生活声回来。",
+          "接S49：林砚右手伸向右裤袋，苏遥在他右边。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S49",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "3bc3c07409ce8285e2b3b62681345007284b639f29383da3295faa53a2e3fc8c",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S49",
+        "scene_id": "SC02",
+        "storyboard_beat_id": "B15-SC02",
+        "intent": "信号回来了：取出手机；正常信号格恢复；打开妈妈联系人拨号。第一声回铃后接通。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 6.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "林砚右手伸向右裤袋，苏遥在他右边。",
+          "林砚将手机贴右耳，等待回应。",
+          "接S50：电话刚接通，林砚右手贴右耳，苏遥在屏幕右后。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S50",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "f12df9ec7bab226f1eec669bd71f2414c7547df8d2c379024be963347944da9f",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S50",
+        "scene_id": "SC02",
+        "storyboard_beat_id": "B16-SC02",
+        "intent": "你找谁：林砚叫妈，停两秒等回答；母亲礼貌询问；林砚笑容消失，手机缓缓离耳但未掉落。",
+        "dialogue": "林砚→周惠：妈？\n周惠→林砚：请问你找谁？\n林砚→周惠：是我，林砚。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 9.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "LY",
+          "G"
+        ],
+        "continuity_constraints": [
+          "电话刚接通，林砚右手贴右耳，苏遥在屏幕右后。",
+          "林砚视线失焦停在空处，苏遥看见他的反应。",
+          "接S51：监控显示器回放本集S01的A区固定俯拍。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S51",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "7d5d9c1467c231927494854c4820bd6def173a75c79b141f71a341d63d907c4a",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S51",
+        "scene_id": "SC03",
+        "storyboard_beat_id": "B16-SC03",
+        "intent": "监控从未拍到他：前1.25秒空座，其他人都在；随后切到S30救人时刻，苏遥右腕抬起、身体退开，林砚位置仍空。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 3.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "G",
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "P5",
+          "P6"
+        ],
+        "continuity_constraints": [
+          "监控显示器回放本集S01的A区固定俯拍。",
+          "苏遥被不存在的人拉离撞击线的动作完成。",
+          "接S52：监控停在苏遥伸出右腕的帧。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      },
+      {
+        "artifact_id": "jieshi-e01-S52",
+        "schema_version": "2.0",
+        "revision": 1,
+        "content_hash": "3790e619f269de1e2d37339576d17d7be94bf612ebffba151682878f1f18482c",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "source_provenance": [
+          {
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          }
+        ],
+        "shot_id": "S52",
+        "scene_id": "SC03",
+        "storyboard_beat_id": "B16-SC03",
+        "intent": "有人已经在记录：红色提示在同一画面叠入；编号停留约2.5秒后硬切黑，黑中留下短促记录完成音。",
+        "dialogue": "",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 3.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "G",
+          "P2"
+        ],
+        "continuity_constraints": [
+          "监控停在苏遥伸出右腕的帧。",
+          "黑屏结束，不播片尾演职员表。",
+          "300秒/7200帧结束；不增加片头片尾。",
+          "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+        ],
+        "visual_strategy": "static_image",
+        "required_asset_roles": [],
+        "motion_directives": [],
+        "generated_video_rationale": null,
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": [
+            "identity",
+            "spatial_continuity",
+            "dramatic_action",
+            "text_readability"
+          ]
+        }
+      }
+    ]
+  }
+}
