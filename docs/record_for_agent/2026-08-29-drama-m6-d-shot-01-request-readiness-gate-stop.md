@@ -8,7 +8,64 @@ learning_eligibility: ineligible
 
 Date: 2026-08-29
 
-## Current Pre-Submit Prerequisite Acceptance — 2026-09-05
+## Current First-Submit V2 Source Drift Stop — 2026-09-05
+
+用户明确要求运行同一canonical Shot 01。本窗口完成新的versioned invocation接线与封存，但在消费invocation前
+发现unrelated Product source变化；当前仍为`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`，没有生成媒体。
+本节取代下方V9之后“立即执行new invocation”的current next action；V9及全部旧evidence bytes保持不变。
+
+- `0df8b5a4a507427872c3a2942ccd54cb962d0e5a`只新增`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/shot01_first_submit_v2.py`，
+  SHA `71d4d4ed13a563333ce62220cd55cc6880bd533148264207ef8d1d146de3738e`。唯一Product effect owner仍为
+  `VideoGenerationService + ProductionStateCommitter`；formal v3 reopen、current graph/request、source/audio、
+  runtime/supervisor、creative lineage与queue在start、intent和exact POST前重验。旧v1 driver未重放或修改。
+- `aa730c8d096b4d915dc559c7d4977cf26eff2385`封存`docs/superpowers/artifacts/drama/b-d0/first-submit/key-at-the-waiting-room-shot-01-v2.accepted.json`，
+  SHA `c4f256e30df40b0e158476a3ae74c27de0c6f1158d98c3c7974da39919dcb979`。预算为1 submit、1 GPU job、
+  3600s、0 retry、0 remote egress；这是orchestration acceptance，不是permit、media或HUMAN acceptance。
+- 新GET-only capture v6为`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-source-binding-preflight-v6.json`，
+  SHA `373fee5c3f2f66f361d25e4fb92310cbf480e2e58e3677c39705acdc34282b6a`，exact source固定为`0df8b5a`。
+  Capture时runtime `MATCH`、supervisor与V9相同、queue empty，request `87c98a1f...`、prompt `e6cc7411...`与
+  `GENERATED + KEEP`未变。完整capture嵌入tracked invocation seal，canonical re-encode与raw bytes完全相同。
+- Parent首次GET-only启动漏设`PYTHONPATH=src`，v4在Product import前`ModuleNotFoundError`退出；没有Provider访问。
+  v4失败SHA `5432d6271050cdb27d41c2c9fd34fc7b86ba33bf299548dc96d456e56ce4fc52`保留。修正launch环境后，
+  新v5/v6分别通过3次GET检查；这些read-only captures不是generation retry。
+
+### Verification And Actual Stop
+
+Native `reviewer_xhigh`分别对最终driver和exact invocation seal给出`accept`。Parent的`--validate-only`、
+actual approval validator与embedded capture对比通过；1项positive及7项prompt/graph/audio/profile/runtime/
+Production/status drift拒绝检查通过。固定snapshot中focused tests为`66 passed in 13.72s`。
+
+Executable Harness exact range为`886c86d092fa8d1c6188d6c4161d4c55ddb66651..0df8b5a4a507427872c3a2942ccd54cb962d0e5a`：
+`4318 passed, 4 skipped`，`1428.88s`；Architecture `0 errors / 0 warnings / 0 info`，mandatory checks全部PASS。
+Receipt `.agent/harness/runs/drama-shot01-first-v2-executable-20260905/receipt.json`，SHA
+`96374e6854b8139d234ca835fcc7424572b40b25696e12e040072be00d31057b`。在固定temporary checkout中
+`verify-receipt`全部true；完整receipt已归档。该proof只覆盖exact snapshot，不覆盖后续unrelated source/policy edits。
+Invocation seal独立docs Harness `.agent/harness/runs/drama-shot01-first-v2-seal-20260905/receipt.json`为PASS，
+SHA `8f9c698ac7573776b2310aaa89159aaf346d550798c1b03136776bd42b56180c`，当时freshness校验全部true。
+
+等待full Harness期间，其他会话修改`src/ai_video/production/vidu.py`和`vidu_profile.py`，随后新增
+`vidu_source.py`。Parent只读调用现有`shot01_source_binding_preflight_v1._inventory(0df8b5a...)`，精确失败为
+`pinned source drift: src/ai_video/production/vidu.py`。没有因为它不是H3模块就排除full source inventory，
+也没有接管、删除、stage或commit这些unrelated bytes。
+
+Blocker envelope：`docs/superpowers/artifacts/drama/b-d0/first-submit/key-at-the-waiting-room-shot-01-v2.blocked.json`，
+SHA `a0a22dfe0fa9c5e3e295cf54ca4258c8828bea29e0b26ad645055b2aef81146d`；blocker为
+`CANONICAL_COMMITTED_SOURCE_INVENTORY_DRIFT`。这次停止发生在v2 `invoked` marker之前；invocation仍未消费。
+16-file Production tree仍为`3abfb1c08a7de162220d46bbf1813115100db8f651b810a362e8bce55edb6731`，
+request persistence、intent/permit、submit、runtime lifecycle、media、video-analysis与activation均为零。
+
+随后source owner以`6b34537424841eafa45d632791e7aa7a7dac2820`提交Vidu changes，当前source不再dirty，
+但仍不同于v2 pinned inventory；这不使旧v2 seal自动适用于新source。
+Next One Thing：沿既有formal source-binding/preflight seam显式选择新committed source并封存新的exact
+invocation，不改旧accepted v2或manual request。
+目标仍是同一Shot 01及逐Shot Gate；不是重复授权问题，也不进入Shot 02、retry、P6或Final Acceptance。
+
+按`record-ai-video-session`更新本primary record；自动`distill-ai-video-learning=no_candidate`：这仍是同一
+deterministic repair/source-drift链，没有新独立媒体实验、controlled comparison或匹配existing Learning Claim。
+Experience retrieval仍strict失败`index library version mismatch; rebuild required`，未rebuild或fallback。
+记录阶段没有额外Provider/media/network调用；unrelated dirty/index work保留，未push/release。
+
+## Historical Pre-Submit Prerequisite Acceptance — 2026-09-05
 
 本窗口授权的独立source-binding repair与pre-submit prerequisite已完成；本节取代下方V8 source inventory stop。
 M6-D仍为`NOT_EVALUATED / STOP_BEFORE_SUBMIT`，没有Shot 01生成或media Gate结果。

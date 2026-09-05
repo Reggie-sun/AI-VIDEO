@@ -1,0 +1,58 @@
+{
+  "schema_version": "drama-shot01-first-submit-stop/2",
+  "decision": "BLOCKED_BEFORE_INVOCATION",
+  "attempt_id": "drama-shot01-first-20260905-v2",
+  "observed_at": "2026-09-05T14:23:35.119885+00:00",
+  "blocker": "CANONICAL_COMMITTED_SOURCE_INVENTORY_DRIFT",
+  "check": "shot01_source_binding_preflight_v1._inventory",
+  "observation": {
+    "status": "BLOCKED",
+    "reason": "pinned source drift: src/ai_video/production/vidu.py",
+    "source_commit": "0df8b5a4a507427872c3a2942ccd54cb962d0e5a",
+    "head": "aa730c8d096b4d915dc559c7d4977cf26eff2385",
+    "observed_files": {
+      "src/ai_video/production/vidu.py": "c8844be2afce60cd239513b73fe200325677aba9059d0d1c1f7cf9ca0929a268",
+      "src/ai_video/production/vidu_profile.py": "f4d7c667046c2fea771f1bc14c358bdef42d861172333f1b214ef5fb463c9ace"
+    },
+    "invocation_consumed": false
+  },
+  "accepted_invocation": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/first-submit/key-at-the-waiting-room-shot-01-v2.accepted.json",
+    "sha256": "c4f256e30df40b0e158476a3ae74c27de0c6f1158d98c3c7974da39919dcb979",
+    "commit": "aa730c8d096b4d915dc559c7d4977cf26eff2385"
+  },
+  "prior_read_only_capture": {
+    "path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-source-binding-preflight-v6.json",
+    "sha256": "373fee5c3f2f66f361d25e4fb92310cbf480e2e58e3677c39705acdc34282b6a",
+    "status": "PASS_AT_CAPTURE_NOT_CURRENT_SOURCE_READINESS"
+  },
+  "production": {
+    "file_count": 16,
+    "tree_sha256": "3abfb1c08a7de162220d46bbf1813115100db8f651b810a362e8bce55edb6731",
+    "unchanged_from_v9": true
+  },
+  "effects": {
+    "invocation_consumed": false,
+    "request_persistence": 0,
+    "permit": 0,
+    "provider_submit": 0,
+    "media": 0,
+    "activation": 0,
+    "video_analysis": 0,
+    "runtime_lifecycle": 0
+  },
+  "historical_launch_error": {
+    "path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-source-binding-preflight-v4.json",
+    "sha256": "5432d6271050cdb27d41c2c9fd34fc7b86ba33bf299548dc96d456e56ce4fc52",
+    "reason": "Parent omitted PYTHONPATH=src; ModuleNotFoundError before Product import. Preserved; corrected GET-only v5/v6 captures passed."
+  },
+  "ownership": "Observed drift belongs to unrelated active Vidu work. No modification, staging, commit, rollback, fallback or inventory exclusion of that work.",
+  "boundary": {
+    "m6_d": "NOT_EVALUATED",
+    "execution": "STOP_BEFORE_SUBMIT",
+    "next_shot_submit_allowed": false,
+    "p6": "NOT_EVALUATED",
+    "final_acceptance": "NOT_EVALUATED"
+  },
+  "next_action": "Source owner must stabilize committed Product inventory. If it differs from v2 pinned source, select and independently seal a new exact invocation through existing source-binding/preflight seams; do not alter v2 sealed bytes or invent a request. Same Shot 01 remains the task."
+}
