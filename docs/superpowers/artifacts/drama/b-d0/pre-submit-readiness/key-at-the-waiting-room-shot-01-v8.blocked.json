@@ -1,0 +1,43 @@
+{
+  "schema_version": "drama-shot01-source-binding-readiness-stop/1",
+  "domain_id": "drama",
+  "lane_id": "M6-D",
+  "status": "STOP_BEFORE_SUBMIT",
+  "m6_d": "NOT_EVALUATED",
+  "blocker": "UNCOMMITTED_PRODUCT_MODULE_SUPPLEMENTS_PINNED_SOURCE",
+  "source_commit": "ee1b8d1490f1988901af0e07d19dffec43ebc1b4",
+  "blocked_path_observed": "src/ai_video/production/vidu_profile.py",
+  "blocked_path_observed_sha256": "55b9656d664c58fac1ac986d5ee672ad31fd2d0ce942d38df4b6b6b9dbf1edc9",
+  "observation_boundary": "Unrelated untracked Product module observed after source-binding pure proof; hash is an observation, not a contract or authority to modify it",
+  "source_binding_stage": "ACCEPTED_METADATA_ONLY_WITH_PURE_CANONICAL_PROOF",
+  "source_binding_acceptance_sha256": "70dc023257863683157a12b0849f2fd3c6d8fe2d9c9dacf70c95d8ce38797276",
+  "pure_proof": {
+    "path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-source-binding-v3-pure-proof-v1.json",
+    "sha256": "2c8ad90c8d4c0400884486b86c26c967256ad640dba3abce97182507fd2aeca8"
+  },
+  "current_blocked_capture": {
+    "path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-source-binding-preflight-v2.json",
+    "sha256": "2741a6eb689ca780cacd10feefc49ba7a59728f76bd5d6ed5ec14915a628ab32",
+    "check_stage": "source_inventory_before_import"
+  },
+  "prior_invocation_error": {
+    "path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-source-binding-preflight-v1.json",
+    "sha256": "ba4250d45e235af172978d9f445413053b4bb8f733ef3c61b9ac008862491d1c",
+    "cause": "Parent supplied an incorrect source commit; rejected before Product import, preserved and not overwritten"
+  },
+  "effects": {
+    "provider_get": 0,
+    "provider_submit": 0,
+    "request_persistence": 0,
+    "permit_mint": 0,
+    "runtime_lifecycle": 0,
+    "production_writes": 0,
+    "media": 0,
+    "video_analysis": 0
+  },
+  "next_action": "Wait for the unrelated Product source owner to complete its committed state; then select and revalidate a new exact committed source with a new immutable GET-only capture. Do not delete, ignore, stage or commit unrelated work.",
+  "next_shot_submit_allowed": false,
+  "candidate_activation": false,
+  "P6": "NOT_EVALUATED",
+  "final_acceptance": "NOT_EVALUATED"
+}

@@ -8,7 +8,66 @@ learning_eligibility: ineligible
 
 Date: 2026-08-29
 
-## Current Graph Rebind And Authoring Reopen Stop — 2026-09-05
+## Current Source-Binding Repair And Source Inventory Stop — 2026-09-05
+
+用户明确授权metadata-only source-binding与formal loader，以及相关document/test contract repair。
+本节取代下方历史graph-binding stop：旧binding问题已修复，但后续GET-only capture在首次Product import前遇到新的
+unrelated uncommitted source blocker。状态保持`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`，不是缺少同一Shot授权。
+
+### Completed Repair
+
+- `75e88e0f1934a2829838f1f28cc6f90d66def0c3`封存execution-intent source-binding v3 proposal，SHA
+  `3c8b1305812c921ebf7166c01111eed8c90714a15839026797e83dfddde19188`；v3 accepted SHA
+  `70dc023257863683157a12b0849f2fd3c6d8fe2d9c9dacf70c95d8ce38797276`。
+- `39833755eb38b2172ddf8073032687b73171ff96`新增formal v3 loader；`2649f5f391f9422c8c9bba004f7910f11d182a8c`
+  补齐final audio reread与exact metadata Harness routing。v3只替换active graph binding为`a95a916...`；原v1 semantic
+  与v2 timing artifacts、historical drivers和graph evidence均未修改。没有Product/runtime/profile代码变更。
+- Loader复用original `_assert_source_binding`、Planner、Router、compiler与current lineage validator；显式source commit
+  inventory在imports前及收尾核验，并再次重开accepted references、audio policy、graph与semantic parents。
+- 旧documentation test误要求已下沉至playbook的细节仍出现在AGENTS；修复测试的owner assertions，保留全部fail-closed
+  audio/permit/budget/next-Shot语义，没有修改AGENTS/Skill/playbook来制造通过。
+
+### Verification And New Blocker
+
+Final pure proof：`runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-source-binding-v3-pure-proof-v1.json`，
+SHA `2c8ad90c8d4c0400884486b86c26c967256ad640dba3abce97182507fd2aeca8`。Fresh process在禁止socket、文件写入
+及非只读Git subprocess的audit boundary下通过完整canonical reopen；275-entry source inventory固定于`2649f5f`。
+Resolved request为`87c98a1f...88f1d`、preview为`a9b79ed8...b820a`；prompt `e6cc7411...139b47`仍为3行、exact dialogue一次；
+完整source-audio identity保持`GENERATED + KEEP`。16-file Production tree前后均为`3abfb1c...6731`。
+
+Metadata/loader final exact-range Harness覆盖`4ea0e328...2649f5f`，8项mandatory checks全部PASS：Architecture 0 errors，
+loader 7 tests、Harness 206 tests、ecommerce 94 tests、runtime boundary 2 tests。Receipt：
+`.agent/harness/runs/drama-shot01-source-binding-20260905/receipt.json`，SHA
+`3152f6cd61b16638a4c1da09e3ac992b71029ff505b8ead610f9259be42c0c51`；在固定detached snapshot中
+`verify-receipt`全部true，包括fresh与complete completion proof。Native `reviewer_xhigh`最终`accept`。
+此receipt只覆盖该stage，不覆盖后续GET-only driver。
+
+新GET-only driver于`fa669da31cdf2f1eea2449b82c6d7898057d71bb`进入checkpoint，审查后以
+`ee1b8d1490f1988901af0e07d19dffec43ebc1b4`修复最终Production snapshot、精确check-stage及runtime evidence标签。
+真实Provider.preflight调用面已静态复核，parent的no-network canonical request assertions通过，`reviewer_xhigh=accept`；
+没有POST/lifecycle/permit路径。旧`fa669da` full Harness在driver已superseded后由parent中止：198 passed，SIGINT，
+不是fresh PASS。最终全部task delta verification使用
+`.agent/harness/runs/drama-shot01-binding-final-20260905/receipt.json`的实际结果；未完成前不能称完整executable closure。
+
+首次capture v1因parent误填不存在的source commit，在`source_inventory_before_import`被拒绝；错误证据保留。
+改为真实`ee1b8d1`的capture v2仍在相同阶段正确拒绝：`uncommitted Product module supplements source commit`。
+随后只读Git确认新untracked `src/ai_video/production/vidu_profile.py`来自本task之外，观察SHA
+`55b9656d664c58fac1ac986d5ee672ad31fd2d0ce942d38df4b6b6b9dbf1edc9`。这个hash只是观察，不是接受其为新contract；
+未删除、忽略、修改、stage或commit该文件，也未触碰concurrent `jieshi-episode-01` artifacts/record或其index。
+两次capture均未进入runtime/Provider GET，request persistence、intent/permit、Provider submit、media、video-analysis及
+Production writes为零。当前runtime是否仍满足profile、queue是否空闲在这次capture中均未验证。
+
+Exact stop envelope：`docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v8.blocked.json`。
+Next One Thing：待source owner完成其committed state后，显式选择并验证新的exact source commit，沿v3 loader完成新的
+immutable GET-only capture；不得以删除/忽略unrelated module、临时切换graph、重写旧request或重放已消费attempt绕过检查。
+不进入Shot 02、retry/variant、activation、P6或Final Acceptance。
+
+`retrieve-ai-video-memory --scope experience`仍strict failure：`index library version mismatch; rebuild required`，
+未rebuild/retry/fallback。`record-ai-video-session`在真实blocker边界更新本primary record；自动
+`distill-ai-video-learning=no_candidate`：这是同一deterministic修复链，没有独立媒体实验/controlled comparison，
+existing learning claims未发现匹配source-binding/graph-rebind claim。无placeholder、adoption、push或release。
+
+## Historical Graph Rebind And Authoring Reopen Stop — 2026-09-05
 
 用户的“修复然后继续”授权本轮通过既有canonical graph/committer owner修复lineage，再继续检查Shot 01。
 Graph-only transition已成功，但fresh authoring reopen出现新的source-binding blocker；本节取代下方历史current状态。
