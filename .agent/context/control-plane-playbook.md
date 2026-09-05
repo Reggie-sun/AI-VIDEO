@@ -195,6 +195,18 @@ code/tests；`AGENTS.md` 的 `Canonical Ownership` 继续提供顶层 durable bo
 
 ### Empirical Uncertainty Triage
 
+本 section 承接 `AGENTS.md` 的 `Empirical Validation Priority`；执行前核对当前 code、环境与
+exact runtime evidence，不能由本手册或历史实验推断 readiness。
+
+- 本优先级针对无法仅由 deterministic verification 证明的媒体能力。Pure schema migration、
+  deterministic bug、state corruption、replay bug、security fix 与 no-media backend refactor 不触发。
+- 只有 Empirical / Model-Quality Uncertainty 是最大的 remaining uncertainty，且最小实验满足
+  safe、bounded、适用 authorization 或 local exemption、affordable/local、technically executable、
+  isolation 与 attribution 时，才优先于仅服务未来验证的 qualification/schema/lifecycle/Harness/integration。
+- 真实 blocker 可以是 safety、适用 authorization、credential、exact model/workflow、output destination、
+  isolation 或 minimum repeatability/attribution prerequisite；先关闭这些技术前置条件。
+  用户明确要求先完成 contract 时尊重该顺序，不能把“先实验”泛化为所有任务的默认。
+
 当 task 涉及新视频/图像/音频模型或 Provider、新 ComfyUI workflow、LoRA / Turbo、continuity / identity / reference strategy、long-video、lip sync、motion / camera control、multi-character、upscaling / refine、prompt strategy或音频感知质量时，在最小技术前置条件关闭后记录：
 
 ```text
@@ -203,7 +215,7 @@ cheapest_valid_experiment: <能证伪或支持该问题的最小安全实验>
 blocking_prerequisite: <真实 blocker；没有则写 none>
 ```
 
-若 `blocking_prerequisite = none`，下一关键动作默认执行 `cheapest_valid_experiment`，而不是继续增加非必要 qualification infrastructure、schema、lifecycle、Harness 或 integration。推荐顺序是：
+满足上述适用条件、用户未要求先完成 contract 且 `blocking_prerequisite = none` 时，下一关键动作默认执行 `cheapest_valid_experiment`，而不是继续增加非必要 qualification infrastructure、schema、lifecycle、Harness 或 integration。推荐顺序是：
 
 ```text
 Safety / Applicable Authorization Or Local Exemption
@@ -393,96 +405,21 @@ signature 时，完成前才允许一次 focused follow-up；不得把重复检�
 
 ### Experience Learning And Confirmation
 
-Memory/record 保留 exact historical evidence；Learning Claim 是基于多条evidence的current、scoped、
-可撤销advisory synthesis。两者继续共享 `experience` query，但
-`docs/record_for_agent/learning/**/*.md` 必须返回
-`authority=advisory_learning` 与 `document_kind=learning_claim`，不能被普通record或frontmatter伪造。
+触发与授权边界见 `AGENTS.md` 的 `Experience Learning Routing`。
+详细契约只读取以下 owner，不在本 playbook 维护第二份字段、threshold、状态表或确认步骤：
 
-`record-ai-video-session` 创建或materially更新substantial stable record后，必须自动调用
-`distill-ai-video-learning`，不得等待用户另行要求。Evaluation只有两种有效结果：
+- [distill-ai-video-learning](../../.agents/skills/distill-ai-video-learning/SKILL.md)：
+  Learning Claim、evidence identity/admission、exact candidate confirmation、supersession 与 adoption。
+- [record-ai-video-session](../../.agents/skills/record-ai-video-session/SKILL.md)：
+  record evidence classification、Evidence Index、stable checkpoint 与 hook ACK。
 
-1. `no_candidate`：没有达到多attempt、controlled comparison或existing-claim material update
-   threshold，不创建空artifact，不请求形式化确认。
-2. `pending_candidate`：只创建或更新一个most-relevant
-   `docs/record_for_agent/learning/<claim-id>.md`。Claim分离`Active Claim`与`Pending Candidate`；
-   新candidate不得覆盖仍被target消费的adopted active版本。Pending固定
-   `pending_approval_status=PENDING_CONFIRMATION`、
-   `pending_adoption_status=NOT_ADOPTED`，只把claim path形成candidate checkpoint commit，
-   再向用户展示support/counter evidence、scope/exclusions、evidence status、recommended action、
-   exact target paths、verification、candidate commit与该commit中exact file bytes SHA-256。
-
-Session boundary只触发evaluation；experiment/attempt/controlled-arm boundary才产生evidence identity。
-新建或实质更新、准备进入automatic distillation的empirical record使用flat scalar envelope：
-`record_kind`、`topic_id`、`learning_eligibility`与`evidence_index_version: "1"`。其中
-`learning_eligibility=eligible`要求正文包含`## Evidence Index`，以`evidence_id`引用proof item，
-以`independence_key`作为唯一support/counter计数单位，并同时记录`experiment_id`、`attempt_id`、
-`arm_id`、`artifact_sha256`、`proof_layer`、`verdict`、`failure_class`、`relation_kind`、
-`related_evidence_id`与`source`。Pre-artifact failure使用`NO_ARTIFACT:<TYPED_REASON>`；没有arm或relation
-分别使用`N/A`与`NONE`，不得用空值掩盖identity uncertainty。
-
-Q0 `AttemptIdentityKey.identity_hash`存在时，`independence_key`优先为`q0:<identity_hash>`；否则record
-必须提供stable non-Q0 key，并以runtime/provider/model/workflow boundary、experiment、attempt及至少一个
-request/result/artifact anchor支撑。Document path、Markdown heading、RAG chunk与artifact version均不得自动合成
-key。一个key不得指向两个experiment/attempt/arm tuples，同一tuple也不得同时mint Q0/non-Q0或其他多个keys；
-同一artifact/source anchor也不得mint多个keys；该bijection在本次显式validation set内fail closed。同一个key跨
-records、chunks或proof layers始终只计一个unit；相同SHA但真实attempt identity不同的evidence不得只因bytes相同
-被合并，并必须保留distinct exact request/result source。
-
-`Evidence Index` relation区分`NEW_ATTEMPT`、`SAME_EVIDENCE_NEW_PROOF_LAYER`、
-`CONCLUSION_SUPERSEDED`与`INPUT_REUSE_ONLY`。Technical PASS与后续human FAIL可在同一key下作为不同proof
-layers并存，不能互相擦除或算作两次独立实验；`INPUT_REUSE_ONLY`本身不能进入support/counter threshold。
-Learning Claim的Supporting/Counter tables以`evidence_ref`引用record row，并声明exact identity tuple与proof；
-admission仅允许`TWO_INDEPENDENT_ATTEMPTS`、`CONTROLLED_MULTI_ARM`或
-`MATERIAL_EXISTING_CLAIM_UPDATE`。Material update还必须命名target claim、previous evidence与具体delta。
-
-`.agents/skills/distill-ai-video-learning/scripts/validate_evidence_identity.py`只读取caller显式提供的Markdown
-paths，不扫描corpus、不刷新Agent Memory、不调用Provider/media/network，也不写回文件。它对blank/malformed
-identity、duplicate record-local `evidence_id`、unresolved relation、source-reference mismatch、非法重复计数与
-不满足basis的candidate fail closed，并输出每个document的distinct support/counter keys与admission result。
-Legacy record/claim没有`evidence_index_version: "1"`时仍可检索但不自动admit；`needs_identity`允许人工阅读，
-不得fallback到document/hit count。Forward-only rollout不批量迁移历史record，也不原地改写既有confirmed或
-pending candidate preimage。
-
-Agent Memory只从existing flat frontmatter向`Hit`、JSON与human-readable provenance投影allowlisted
-`record_kind`、`topic_id`、`learning_eligibility`、`evidence_index_version`。这些字段不改变ranking、filter、
-chunk identity、path-owned `authority`/`document_kind`、admission、confidence、confirmation或adoption；同一document
-产生多个hits仍只是retrieval结果，不是independent evidence count。
-
-确认只对previewed candidate commit、hash与bounded target有效。`Confirm`前必须用
-`git show <candidate-commit>:<claim-path>`重开immutable preimage并重算hash，同时要求current pending
-bytes未漂移；确认还必须保存sanitized actor/time与durable evidence pointer，不复制raw transcript。
-Bytes/evidence/commit变化或target scope扩大都使旧确认失效。`Revise`产生新checkpoint
-与hash并重新确认；`Reject`只拒绝pending lane，必须保留active claim与其adoption evidence。确认后的
-target implementation继续走原owner、decision gate、tests、review与Harness；只有target实际修改且
-verification通过后，pending才可提升为active并记录`ADOPTED`。Skill/claim本身不授权Provider/media、
-Manifest/Registry/P6/Final Acceptance、retry、activation、target commit、push或release；确认前唯一允许
-的commit是只包含claim path的candidate checkpoint。
-
-Session hook把自动evaluation作为completion handshake的一部分：`recorded` ACK只接受
-`learning_outcome=no_candidate|pending_candidate`，`no_record`只接受
-`learning_outcome=not_applicable`。因此Agent不能在有durable record时跳过evaluation后直接关闭checkpoint；
-hook仍不负责synthesis、确认或target mutation。
+需要学习或记录操作时，先读取匹配 Skill 及其指定 reference，再按 exact evidence 执行。
+本文不提供独立的 claim/template/validator 协议，也不改变 `advisory_learning` authority。
 
 ## 7. Durable Session Record Gate
 
-`record-ai-video-session` 是 substantial AI-VIDEO work 的 completion-time durable capture
-owner。它不是只在 hook 注入 `capture_request_id` 时才生效；hook只是backstop，主动评估由
-当前Agent负责。
-
-在 final response、handoff 或 compaction 前按以下顺序判断：
-
-1. 当前 task 是否包含 substantial implementation、documentation、local/remote live proof、
-   real media generation或diagnosis、architecture decision、recovery或independently reusable
-   runtime lesson。
-2. 工作是否已达到 stable checkpoint、completion或genuine blocker；尚未完成时先继续工作，
-   不得为了写record打断主任务。
-3. 检查repository内外effects。`/home/reggie/ComfyUI/output/`、`/tmp/`、Provider artifacts、
-   fetched media与analysis derivatives即使没有tracked diff，也属于record trigger evidence。
-4. 若1与2成立，主动读取并执行`.agents/skills/record-ai-video-session/SKILL.md`；不得因
-   PostToolUse未归属path、没有hook request或没有`capture_request_id`而跳过。
-5. Formatting、trivial conversation、unfinished work或没有durable value的status question明确
-   判定为`no_record`。不要创建空泛session note，也不要让record触发另一份record。
-
-Record只能保存verified evidence与边界，不能授权新实现、generation、Provider call、push、
-release或Production mutation。若hook提供exact `capture_request_id`，仍按Skill要求只acknowledge
-一次；没有ID时不运行acknowledgement command。
+主动触发与 repository 内外 effects 的边界见 `AGENTS.md` 的 `Completion Standard`；
+[record-ai-video-session](../../.agents/skills/record-ai-video-session/SKILL.md) 独占
+stable-boundary evaluation、record/no-record 决定、supersession、verification/checkpoint 与 ACK 步骤。
+完成 substantial record 后按 `AGENTS.md` 的 `Experience Learning Routing` 自动执行学习评估。
+本 section 只保留入口，不复制流程，也不因缺少 hook request 而免除主动评估。

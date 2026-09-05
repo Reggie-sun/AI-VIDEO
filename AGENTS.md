@@ -80,17 +80,16 @@ Plans、specs、roadmaps、console text、Agent memory 或历史 receipts 本身
 
 ### Empirical Validation Priority
 
-- 对 video、image、audio、continuity、identity、motion、camera、prompt adherence、lip sync 与 perceptual quality 等不能仅由 code、tests、static analysis、review 或 Harness 证明的能力，Agent 必须区分 Engineering / Deterministic Uncertainty 与 Empirical / Model-Quality Uncertainty。
-- 当 Empirical / Model-Quality Uncertainty 是最大的 remaining uncertainty，且存在 safe、bounded、已满足适用 authorization（或属于下述 local ComfyUI exemption）、affordable/local、technically executable、可隔离且可归因的最小真实媒体实验时，在继续扩大仅服务未来验证的 Production qualification、schema、lifecycle、Harness 或 integration 之前，下一关键动作 SHOULD 优先获取该实验的 evidence。只有真实阻塞实验的 safety、适用 authorization、credential、exact model/workflow、output destination、isolation、minimum repeatability/attribution prerequisite，或用户明确要求先完成 contract 时，才继续优先 engineering。
-- Development experiment evidence 不是 Production evidence。PASS 不自动产生 active capability、Production qualification、P6 / Final Acceptance、live-ready、release 或 replay truth；FAIL 不授权降低 Production contract、改变 frozen rubric、fallback、blind retry，或绕过 safety、budget、egress、permit、lifecycle 与 recovery。
-- Pure schema migration、deterministic bug、state corruption、replay bug、security fix 与 no-media backend refactor 不触发本优先级；本规则也不把“先生成再写代码”或“媒体生成永远优先”设为默认。
+- 对不能仅由 code/tests/Harness 证明的媒体能力，必须区分 Engineering / Deterministic Uncertainty 与 Empirical / Model-Quality Uncertainty。后者占主导且存在安全、有界、满足适用授权或 local exemption、可负担且可执行、可隔离归因的最小真实实验时，下一关键动作 SHOULD 优先取证，再扩大仅服务未来验证的 engineering。
+- Development experiment evidence 不产生 Production qualification、activation、P6 / Final Acceptance、live-ready、release 或 replay truth；PASS/FAIL 均不授权降低 contract、改变 frozen rubric 或绕过现有 safety、budget、egress、permit、lifecycle、recovery gates。
+- 触发场景、前置条件、用户要求先完成 contract 的优先权、pure deterministic work 排除项与操作顺序，由 [Empirical Uncertainty Triage](.agent/context/control-plane-playbook.md#empirical-uncertainty-triage) 维护；本规则不要求所有任务先生成媒体。
 
 ### Per-Shot Post-Media Gate
 
-- Agent 控制 sequential multi-Shot generation 时，每个 Shot 的 exact MP4 落盘后，必须在提交下一 Shot 前显式调用 project-local `video-analysis` MCP，并按该 Shot 的 sealed intent、applicable requirements 与前序已接受状态给出 requirement-level `PASS` / `FAIL` / `NOT_EVALUATED`。
-- 只有 exact current Shot 的全部 required findings 为 `PASS` 才允许提交下一 Shot。MCP 不可用、证据缺失或陈旧、文件 identity 不匹配、required requirement 无法判定均为 `NOT_EVALUATED`，并阻断任何下一 Shot submit；不得等待整个 batch 完成、依赖用户提醒、用 background analysis hook、tool success、单一总分或自动 VLM stub 代替该阻断 Gate。
-- `FAIL` / `NOT_EVALUATED` 终止的是 current Shot attempt 和向下一 Shot 的推进，不自动终止仍在 accepted scope 内的整个用户任务。严格 local/loopback、unmetered、outcome-known 且适用 `Local ComfyUI Authorization Exemption` 时，Agent orchestration 必须采用 `LOCAL_BOUNDED_REPAIR_LOOP`：保存失败 Gate，先封存有限的 task-scoped attempt / elapsed-time / GPU budget，基于 evidence 每次只选择一个可归因 repair variable，以新 exact identity / intent / one-use permit 重新执行同一 Shot，并再次通过完整 Gate；不得复用旧 permit、blind retry、fallback 或跳到下一 Shot。若 `NOT_EVALUATED` 来自 MCP / analyzer / stale evidence 而非媒体本身，必须采用 `EVIDENCE_REPAIR_FIRST`，先修复或重取 evidence，不得无理由重新生成媒体。
-- `video-analysis` MCP 只提供绑定 exact bytes 的 raw evidence；Agent-side Gate 本身不得写 Manifest、激活 candidate、签发 P6 / Final Acceptance 或自行重试。只有 orchestration 层可按上一条启动独立 repair attempt。真正停止整个任务只允许在 outcome unknown、没有新的 evidence-backed repair variable、同类失败重复且无法进一步隔离、MCP/evidence 持续不可恢复、scope/Provider/egress 改变，或出现其他真实 blocker 时发生。详细顺序与 evidence contract 由 `.agent/context/control-plane-playbook.md` 的 `Per-Shot Post-Media Gate` 独占。
+- Sequential multi-Shot generation 必须在每个 Shot 的 exact MP4 落盘后、下一 Shot submit 前显式调用 project-local `video-analysis` MCP，按 sealed intent、applicable requirements 与前序已接受状态逐项给出 `PASS` / `FAIL` / `NOT_EVALUATED`。只有全部 required findings 为 `PASS` 才可推进。
+- MCP 不可用、证据缺失/陈旧、identity 不匹配或 required finding 无法判定均为 `NOT_EVALUATED`，阻断下一 Shot；不得等待 batch 完成或用户提醒，也不得以 background hook、tool success、总分或自动 VLM stub 代替 Gate。
+- `FAIL` / `NOT_EVALUATED` 停止当前 attempt，不默认结束未完成的任务。适用 local exemption 且 outcome known 时，orchestration 必须执行有界 `LOCAL_BOUNDED_REPAIR_LOOP`；证据问题先执行 `EVIDENCE_REPAIR_FIRST`。Unknown outcome 必须停止，禁止 blind retry、fallback、permit 复用或越过 Gate。
+- MCP 只提供 exact-bytes raw evidence；Gate 不写 Manifest、不激活 candidate、不签发 P6 / Final Acceptance，也不自行重试。独立 repair attempt、有限预算、单变量诊断、新 identity/intent/permit、完整重验与任务停止条件，由 [Per-Shot Post-Media Gate](.agent/context/control-plane-playbook.md#per-shot-post-media-gate) 独占。
 
 ## Canonical Ownership
 
@@ -126,21 +125,9 @@ acceptance、push 或 release authorization。
 
 ## Experience Learning Routing
 
-`distill-ai-video-learning` 是跨多次真实 evidence 形成 current scoped Learning Claim 的
-唯一 Development Governance owner。`record-ai-video-session` 完成 substantial stable record
-后必须自动执行该 Skill 的 candidate evaluation，且record hook的`recorded` ACK必须携带
-`no_candidate`或`pending_candidate`结果；满足threshold时只生成pending candidate，保留既有
-active adopted claim，并绑定candidate checkpoint commit与其中exact bytes SHA-256。
-用户确认前不得修改 Skill / Provider Policy / Preflight / Contract / Gate target；确认后仍须通过
-target 的 canonical owner、tests 与 Harness，实际验证完成后才可标记 `ADOPTED`。
-
-Learning Claim 回答“基于多次 evidence 现在知道什么”，Memory/record 回答“过去发生了什么”；二者
-共享 `experience` retrieval scope但保持独立 `advisory_learning` authority。详细 threshold、字段、
-confirmation、state transition、supersession 与 adoption flow由
-`.agents/skills/distill-ai-video-learning/SKILL.md` 和
-`.agent/context/control-plane-playbook.md` 的 `Experience Learning And Confirmation` 独占。
-该流程不得调用Provider、生成媒体、写Production state、自动retry/activation/acceptance或绕过现有
-decision gates。
+- `distill-ai-video-learning` 是 scoped Learning Claim 的唯一 Development Governance owner；`record-ai-video-session` 完成 substantial stable record 后必须自动执行 candidate evaluation。
+- Learning 保持 `advisory_learning` authority。自动 evaluation 只可提出 pending candidate，保留既有 adopted claim；用户确认前不得修改 Skill / Provider Policy / Preflight / Contract / Gate target，确认后仍须由 target owner 完成 tests 与 Harness，才可标记 `ADOPTED`。
+- 字段、threshold、exact confirmation、state transition 与 adoption flow 只由 [distill-ai-video-learning](.agents/skills/distill-ai-video-learning/SKILL.md) 管理；record/ACK 流程只由 [record-ai-video-session](.agents/skills/record-ai-video-session/SKILL.md) 管理，playbook 仅提供入口。Learning 不授权 Provider/media、Production mutation、retry、activation、acceptance、push/release 或绕过 decision gates。
 
 ## Creative Skill Routing
 
@@ -243,7 +230,7 @@ state write、typed dependency、`ResolvedTimeline` 或 truthful delivery bounda
 
 在宣称完成前确认：
 
-- substantial AI-VIDEO implementation、documentation、live proof、media diagnosis、architecture decision 或 recovery work 达到 stable checkpoint、completion、genuine blocker、handoff 或 compaction boundary 后，必须在 final response 前评估并按 `record-ai-video-session` 执行；repository 外的 authorized media/artifact effects 也计入，不得因没有 tracked diff、hook request 或 `capture_request_id` 而跳过主动评估。Unfinished或trivial work按Skill边界明确判定为no record。
+- Substantial AI-VIDEO work 达到 stable checkpoint、completion、genuine blocker、handoff 或 compaction boundary 后，必须在 final response 前按 [record-ai-video-session](.agents/skills/record-ai-video-session/SKILL.md) 主动评估并执行；repository 外的 media/artifact effects 也计入。没有 tracked diff、hook request 或 `capture_request_id` 不能免除评估；unfinished/trivial work 按 Skill 判定为 `no_record`。
 - 最终 diff 仅包含 task-owned changes，且未覆盖 unrelated user work。
 - Canonical owner、禁止旁路与 unchanged contracts 已复核。
 - 行为变化已在代码和测试中体现；公共契约变化已同步 canonical docs。

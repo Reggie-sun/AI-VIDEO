@@ -2,6 +2,12 @@
 
 Date: 2026-08-25
 
+## Routing Update — 2026-09-05
+
+下方“五步判断保存于 playbook”的描述是当时的历史布局。当前 record/no-record、ACK 与
+Learning 流程只由对应 Skill 管理，playbook 保留入口；根 `AGENTS.md` 的主动记录触发与
+repository 外 effects 边界不变。详见 [Control-Plane Detail Deduplication](2026-09-05-control-plane-detail-deduplication.md)。
+
 ## Purpose
 
 本文记录两个 durable control-plane 决策：保持 repository `AGENTS.md` 为 thin
