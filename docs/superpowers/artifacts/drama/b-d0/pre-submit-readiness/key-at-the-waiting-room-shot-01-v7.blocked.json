@@ -1,0 +1,138 @@
+{
+  "schema_version": "drama-m6-d-shot01-pre-submit-readiness-envelope/7",
+  "decision": "blocked_before_first_submit",
+  "domain_id": "drama",
+  "lane_id": "M6-D",
+  "target_shot": {
+    "shot_id": "drama.shot.waiting-room.001",
+    "revision": 1,
+    "content_hash": "4cf53970d6642d4bfe73c23e5c12f9714c069843b0a7b47069dfb2519c47253b"
+  },
+  "previous_envelope": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v6.accepted.json",
+    "sha256": "4db6a56bf8c043a308d989be38af726f2003e94686e75fbd88209c1692aa245f",
+    "validity": "historical_exact_capture_only"
+  },
+  "authorization": {
+    "source": "current-session:user-scope-expansion",
+    "user_text": "扩展",
+    "scope": "canonical Shot 01 first generation and Agent-side single-Shot media Gate",
+    "includes": [
+      "canonical request persistence",
+      "finite local execution budget",
+      "committer-owned durable intent and one-use permit",
+      "one exact local submit, terminal observation and fetch",
+      "project-local video-analysis and requirement-level Agent Gate"
+    ],
+    "excludes": [
+      "Shot 02",
+      "candidate activation",
+      "P6",
+      "Final Acceptance",
+      "runtime/code/tests modification",
+      "remote or paid fallback"
+    ],
+    "technical_readiness_not_waived": true
+  },
+  "blockers": [
+    "CURRENT_SOURCE_REVALIDATION_INCOMPLETE",
+    "SHARED_COMFYUI_QUEUE_OCCUPIED_BY_UNATTRIBUTED_TASK"
+  ],
+  "checks": [
+    {
+      "id": "v6_strict_reopen",
+      "result": "BLOCKED",
+      "source_commit": "3bd41443ab295289fe61a26846bfaab1a327622b",
+      "error": "committed source drift: src/ai_video/production/comfy_video.py",
+      "product_imports_started": false
+    },
+    {
+      "id": "new_committed_source_read_only_diagnostic",
+      "result": "BLOCKED",
+      "source_commit": "767270b97f7060a246b53533f9ff98bf183bdd83",
+      "procedure": "Verified sealed v6 driver hash before import; rebound only its in-process SOURCE_COMMIT for a new read-only diagnostic, invoked collect() with loopback audit guard, never invoked main() or wrote its OUTPUT. This diagnostic is not a v6 reopen or a replacement acceptance.",
+      "driver_sha256": "f4d2c29da3e550b6f8b95b612cc20b3d0e4ed7bbede8bbf85f91350670d0a847",
+      "reached": "queue_after following canonical Provider preflight",
+      "error": "ComfyUI queue not empty",
+      "new_readiness_evidence_sealed": false
+    },
+    {
+      "id": "independent_runtime_git_check",
+      "result": "OBSERVED",
+      "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+      "t8_commit": "977df788fcf8b971dc3d0fc7d6baa79a0edfaf40",
+      "comfyui_and_t8_worktrees_clean": true,
+      "full_runtime_readiness_accepted": false
+    },
+    {
+      "id": "experience_retrieval",
+      "result": "STRICT_FAILURE",
+      "exit_code": 2,
+      "error": "index library version mismatch; rebuild required",
+      "rebuilt_or_retried": false
+    }
+  ],
+  "observation": {
+    "observed_at": "2026-09-05T08:54:26.276253+00:00",
+    "head": "ec6f4f22b57a8c2efb5a4498f54d7c04e9e5bee5",
+    "git_status": "",
+    "source_changes": {
+      "src/ai_video/production/comfy_video.py": {
+        "previous_sha256": "b005d1469462877b015382ad9d5c431f552d2839b3b9b9e248842e55ed5c79f3",
+        "current_sha256": "c63eaaf928522405f55989a55c539ad84ef9aabeda41303a2066d4004ae2c4e6",
+        "matches_HEAD": true
+      },
+      "src/ai_video/provider_console.py": {
+        "previous_sha256": "27acc37795bdc92c6c4688ab24bb1116c2afd2220b5993807bcb1e30ef9e6a6a",
+        "current_sha256": "dd0addb67dde80768b5f2ded18d89a9f9aa70f9abb6f92f193c70db3fc6a544c",
+        "matches_HEAD": true
+      },
+      "src/ai_video/provider_console_continuity.py": {
+        "previous_sha256": "1edee54c51dbe1687f52c2c288a294095ec26edf348fa8a2444447ee16cbe876",
+        "current_sha256": "8efa1400c1ab99c587a0722f79a913c268ac9a8bb6ebef190d7a452d548c70ff",
+        "matches_HEAD": true
+      }
+    },
+    "production_tree_sha256": "105168d84dfd9f1405b5bea548e7af1c0d6497696ec9256a29ba4700ac24a4f2",
+    "previous_production_tree_sha256": "105168d84dfd9f1405b5bea548e7af1c0d6497696ec9256a29ba4700ac24a4f2",
+    "production_files": 15,
+    "queue": {
+      "response_sha256": "b789e3c66f939b87fc33abdcad240680ffa97056d4e2ef86c8cf46ccce1e431e",
+      "running": [
+        {
+          "number": 0,
+          "prompt_id": "60f24a89-df16-4e73-94ec-2d0763372dd3"
+        }
+      ],
+      "pending": []
+    },
+    "supervisor": {
+      "active_state": "active",
+      "exec_main_status": 0,
+      "invocation_id": "5ff183d776ec42b88d22d5cc097cc596",
+      "load_state": "loaded",
+      "main_pid": 875740,
+      "sub_state": "running",
+      "unit": "ai-video-comfyui-94bf2350c7684bdfa0faf7f8f7db6384.service"
+    }
+  },
+  "effects": {
+    "request_persistence": 0,
+    "durable_submit_intent": 0,
+    "permit_mint": 0,
+    "provider_submit": 0,
+    "runtime_lifecycle": 0,
+    "generated_media": 0,
+    "video_analysis": 0,
+    "production_writes": 0
+  },
+  "status_boundary": {
+    "m6_d": "NOT_EVALUATED",
+    "execution": "STOP_BEFORE_SUBMIT",
+    "per_shot_media_gate_entered": false,
+    "next_shot_submit_allowed": false,
+    "p6": "NOT_EVALUATED",
+    "final_acceptance": "NOT_EVALUATED"
+  },
+  "next_action": "Do not stop, clear, recover or adopt the unrelated prompt. After the runtime is available, independently reseal fresh source/runtime/exact-request readiness; retain the existing Shot 01-only authorization and use canonical lifecycle owners."
+}

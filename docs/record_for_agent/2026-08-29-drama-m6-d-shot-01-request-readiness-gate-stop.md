@@ -8,7 +8,46 @@ learning_eligibility: ineligible
 
 Date: 2026-08-29
 
-## Supersession Notice — 2026-09-05
+## Current Scope Expansion And Pre-Submit Stop — 2026-09-05
+
+用户已将范围扩展为canonical Shot 01首次真实生成及Agent-side单Shot媒体验收，包含必要的canonical request
+persistence、durable intent与one-use permit；不包含Shot 02、activation、P6、Final Acceptance或runtime/code/tests修改。
+授权已明确，当前停止原因不是缺少授权。
+
+V6仍是有效的historical exact-capture evidence，但本轮fresh reopen在首次Product import前发现
+`src/ai_video/production/comfy_video.py`相对其pinned source commit发生已提交漂移。随后只读diagnostic在新committed
+source `767270b97f7060a246b53533f9ff98bf183bdd83`下验证既有exact request，并完成canonical Provider preflight；
+但其post-preflight queue check失败：外部prompt `60f24a89-df16-4e73-94ec-2d0763372dd3`开始运行。
+Diagnostic仅在内存中为新observation显式重绑sealed driver的source commit，没有修改旧driver、旧OUTPUT或v6 envelope，
+也不构成新的accepted readiness。后续GET再次观察到同一running prompt，pending为空；该prompt不归本轮所有，
+不得interrupt、clear、recover、adopt或把它计为本轮Shot 01。
+
+Blocker evidence：
+`docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v7.blocked.json`，
+SHA-256 `b5df618b7cd7d0d91daea50d2f9d9a7dbcd6e577314da0a0a88efc76ecf9577a`。
+2026-09-05T08:54:26Z capture绑定HEAD `ec6f4f22b57a8c2efb5a4498f54d7c04e9e5bee5`、三项已提交source变化、
+unit `ai-video-comfyui-94bf2350c7684bdfa0faf7f8f7db6384.service` / PID `875740`及queue response SHA。
+独立Git检查显示ComfyUI仍为`7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa`、T8仍为
+`977df788fcf8b971dc3d0fc7d6baa79a0edfaf40`，两者checkout clean；没有重新接受完整runtime readiness。
+15-file Production tree SHA-256仍为`105168d84dfd9f1405b5bea548e7af1c0d6497696ec9256a29ba4700ac24a4f2`，
+与v6 capture一致。Request persistence、intent、permit、submit、media、video-analysis与Production writes全部为零。
+
+Current blockers：`CURRENT_SOURCE_REVALIDATION_INCOMPLETE`与
+`SHARED_COMFYUI_QUEUE_OCCUPIED_BY_UNATTRIBUTED_TASK`；`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`。
+待共享runtime空闲后，沿已授权的同一Shot 01范围重新封存fresh source/runtime/exact-request readiness，再通过
+`VideoGenerationService.start -> submit_local_once -> refresh_local_once -> fetch_local_once`进入真实媒体。
+Native read-only explorer已核对该调用链、committer-owned intent/permit与fetch后`VALIDATE`停止点；不能将offline
+Router family中的`transport=object()`用于live执行，也不能把blocking `poll_job()`的timeout当作轻量poll tick。
+实际generation与media Gate尚未开始，不能从static mapping推出成功。Focused canonical local state / service / T8 tests：
+`59 passed`。Repository baseline Architecture Gate为PASS（0 errors、21 warnings、11 info），这些是既有baseline debt，
+不是本轮documentation delta的新增问题；exact task-delta verification另随checkpoint执行。
+
+`retrieve-ai-video-memory --scope experience`本轮exit `2`，报`index library version mismatch; rebuild required`；
+未重建、重试或降级。`distill-ai-video-learning`评估为`no_candidate`：单次operational source/queue observation不满足
+独立媒体实验或controlled comparison threshold，未创建Learning Claim。Verification receipt以
+`.agent/harness/runs/drama-m6d-shot01-expanded-scope-stop-20260905/receipt.json`的exact checkpoint结果为准。
+
+## Historical Prerequisite Acceptance — 2026-09-05
 
 Current Shot 01 pre-submit prerequisite已在committed source `3bd41443ab295289fe61a26846bfaab1a327622b`
 上重新验证：exact Planner/Router/compiler/resolver/preview hashes保持不变，runtime identity `MATCH`，

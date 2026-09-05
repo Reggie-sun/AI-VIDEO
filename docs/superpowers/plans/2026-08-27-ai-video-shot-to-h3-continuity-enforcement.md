@@ -115,7 +115,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | Canonical Shot 01的accepted timing repair（124 frames @ 24fps）及显式SourceAudioPolicy `GENERATED + KEEP`保持不变。2026-09-05在committed source `3bd41443...`上strict reopen成功，request/requirement/prompt/resolved/preview hashes与accepted lineage一致；profile-required checkout/package/launch identity为`MATCH`，canonical read-only component/object-info preflight通过。V6 envelope接受单一pre-submit prerequisite，已解除historical source-instability blocker；durable submit intent与one-use permit未创建，未持久化/submit request、生成媒体或写Production state。Exact capture必须在future effect前重新核对。详见`docs/record_for_agent/2026-08-29-drama-m6-d-shot-01-request-readiness-gate-stop.md` |
+| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | Accepted timing repair（124 frames @ 24fps）及SourceAudioPolicy `GENERATED + KEEP`保持不变。V6只接受historical exact-capture prerequisite。用户已扩展授权至Shot 01首次生成与单Shot Gate；最新v7 observation因current source revalidation未完成及共享ComfyUI queue中不归本轮所有的prompt而STOP。未创建request/intent/permit，未submit、生成媒体或写Production state。待runtime可用后重新封存fresh readiness，仍不推进Shot 02。详见`docs/record_for_agent/2026-08-29-drama-m6-d-shot-01-request-readiness-gate-stop.md` |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -767,13 +767,23 @@ make harness-verify
 
 ## Execution Order And Stop Conditions
 
-Current stop update（2026-09-05）：canonical Shot 01 pre-submit prerequisite已通过committed source reopen与
+Latest scope expansion stop（2026-09-05）：用户已授权canonical Shot 01首次generation及Agent-side单Shot Gate，
+但fresh pre-submit仍被current source revalidation未完成与共享ComfyUI queue占用阻断。V7 observation：
+`docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v7.blocked.json`
+（SHA-256 `b5df618b7cd7d0d91daea50d2f9d9a7dbcd6e577314da0a0a88efc76ecf9577a`）。
+Running prompt `60f24a89-df16-4e73-94ec-2d0763372dd3`不归本轮所有；不允许interrupt、clear、adopt或追加submit。
+V6是historical exact-capture acceptance，不能跨source/runtime变化复用。待runtime可用后重新完成fresh readiness，
+再沿已授权的同一Shot 01 canonical lifecycle执行；不需重复请求同范围授权。当前仍为
+`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`，本轮request persistence/intent/permit/submit/media/Production writes均为零，
+Shot 02、activation、P6与Final Acceptance保持不在范围内。
+
+Historical prerequisite acceptance（2026-09-05, v6 capture）：canonical Shot 01 pre-submit prerequisite已通过committed source reopen与
 read-only Provider preflight。V6 envelope：
 `docs/superpowers/artifacts/drama/b-d0/pre-submit-readiness/key-at-the-waiting-room-shot-01-v6.accepted.json`
 （SHA-256 `4db6a56bf8c043a308d989be38af726f2003e94686e75fbd88209c1692aa245f`）；evidence：
 `runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot-01-committed-seam-readiness-v2.json`
 （SHA-256 `c6529f5e43342e7f8ed00c1480939dba2a7b6c3f2260748b7b36f01480b3db7b`）。
-下方v1–v5 stop chronology是historical evidence；latest prerequisite blockers为空，但durable submit intent与one-use
+下方v1–v5 stop chronology是historical evidence；该v6 capture的prerequisite blockers为空，但durable submit intent与one-use
 permit未创建。`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`保持不变；future submit需要独立scope及fresh exact identity，
 不得把本次technical prerequisite当作media Gate、P6或Final Acceptance。
 
