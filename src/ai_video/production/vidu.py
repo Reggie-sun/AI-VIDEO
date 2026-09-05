@@ -26,7 +26,7 @@ from ai_video.production.state_commit import _DurablePaidProviderSubmitPermit
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest, VideoFetchReceipt, VideoFlexibleOutputRequirement,
     VideoGenerationMode, VideoGenerationPreview, VideoGenerationRequest,
-    VideoImageReferenceBinding, VideoProviderCapabilities, VideoProviderTaskBinding,
+    VideoImageReferenceBinding, VideoMediaReferenceBinding, VideoProviderCapabilities, VideoProviderTaskBinding,
     VideoSubmission, VideoSubmitResult, VideoTaskObservation, VideoTaskState,
     build_video_paid_permit_binding,
 )
@@ -35,8 +35,9 @@ from ai_video.production.video_compiler import (
 )
 from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
 from ai_video.production.vidu_profile import (
-    VIDU_MODEL_IDS, ViduProviderProfile, vidu_capabilities,
+    VIDU_MODEL_IDS, VIDU_REFERENCE_MODEL_IDS, VIDU_EXTEND_MODEL_IDS, ViduProviderProfile, vidu_capabilities,
 )
+from ai_video.production.vidu_source import ViduExtensionSource
 
 
 _MAX_JSON_BYTES = 1_000_000
@@ -134,15 +135,25 @@ class HttpxViduTransport:
             self._client.close()
 
 
+class _SourceVerificationSink:
+    def write(self, chunk: bytes) -> int:
+        return len(chunk)
+
+    def flush(self) -> None:
+        pass
+
+
 class ViduVideoProvider:
     def __init__(self, *, profile: ViduProviderProfile, transport: ViduTransport,
                  credential: Callable[[], str],
                  image_resolver: Callable[[VideoImageReferenceBinding], bytes] | None = None,
+                 extension_source: Callable[[VideoMediaReferenceBinding], ViduExtensionSource] | None = None,
                  now: Callable[[], datetime] | None = None) -> None:
         self._profile = profile
         self._transport = transport
         self._credential = credential
         self._image_resolver = image_resolver
+        self._extension_source = extension_source
         self._now = now or (lambda: datetime.now(UTC))
 
     def capabilities(self) -> VideoProviderCapabilities:
@@ -165,8 +176,10 @@ class ViduVideoProvider:
             request.provider_name != "vidu" or request.provider_kind != "vidu"
             or request.provider_profile != self._profile.pointer()
             or not isinstance(output, VideoFlexibleOutputRequirement)
-            or request.media_bindings or request.negative_prompt_text
-            or len(request.prompt_text) > 5000
+            or request.negative_prompt_text
+            or len(request.prompt_text) > (2000 if request.mode in (
+                VideoGenerationMode.REFERENCE_TO_VIDEO, VideoGenerationMode.VIDEO_EXTEND,
+            ) else 5000)
             or (request.seed is not None and not 1 <= request.seed <= 2_147_483_647)
         ):
             raise _error("Vidu request does not match the sealed profile.", ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED)
@@ -175,11 +188,20 @@ class ViduVideoProvider:
                          and v.output_capability.supports(output))
         if len(variants) != 1:
             raise _error("Vidu request does not match one capability.", ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED)
-        if request.mode is VideoGenerationMode.TEXT_TO_VIDEO:
+        if request.mode in (VideoGenerationMode.TEXT_TO_VIDEO, VideoGenerationMode.REFERENCE_TO_VIDEO):
             width, height = (int(value) for value in output.ratio.split(":"))
-            if (request.image_bindings or output.width * height != output.height * width
+            if (output.width * height != output.height * width
                     or min(output.width, output.height) != int(output.resolution_label[:-1])):
-                raise _error("Vidu T2V geometry or bindings are unsupported.", ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED)
+                raise _error("Vidu output geometry is unsupported.", ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED)
+        if request.mode is VideoGenerationMode.VIDEO_EXTEND:
+            if (len(request.media_bindings) != 1 or request.media_bindings[0].kind != "video"
+                    or request.seed is not None):
+                raise _error("Vidu extension requires one video and no seed.", ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED)
+            source = request.media_bindings[0]
+            extension_millis = output.duration_seconds * 1000 - source.duration_millis
+            if (source.duration_millis % 1000 or not 1000 <= extension_millis <= 7000
+                    or source.fps != output.fps):
+                raise _error("Vidu extension requires 1-7 added seconds and matching FPS.", ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED)
         if any(b.size_bytes is None or b.size_bytes <= 0 or not 0.25 < b.width / b.height < 4
                for b in request.image_bindings):
             raise _error("Vidu input requires exact image bytes and supported geometry.", ErrorCode.VIDEO_REQUEST_INVALID)
@@ -203,7 +225,8 @@ class ViduVideoProvider:
         return VideoGenerationPreview.create(
             resolved=request, estimated_cost_upper_bound_microunits=self._profile.cost_upper_bound_microunits,
             currency=self._profile.currency, destination=self._profile.origin,
-            egress_item_ids=("prompt", *(b.asset_id for b in request.image_bindings)),
+            egress_item_ids=("prompt", *(b.asset_id for b in request.image_bindings),
+                             *(b.asset_id for b in request.media_bindings)),
         )
 
     def _headers(self) -> dict[str, str]:
@@ -222,7 +245,18 @@ class ViduVideoProvider:
                        audio=output.native_audio, off_peak=False)
         if request.effective_seed is not None:
             payload["seed"] = request.effective_seed
-        endpoint = "text2video"
+        endpoint = {
+            VideoGenerationMode.TEXT_TO_VIDEO: "text2video",
+            VideoGenerationMode.IMAGE_TO_VIDEO: "img2video",
+            VideoGenerationMode.REFERENCE_TO_VIDEO: "reference2video",
+            VideoGenerationMode.VIDEO_EXTEND: "extend",
+        }[request.mode]
+        if request.mode is VideoGenerationMode.VIDEO_EXTEND:
+            source = request.media_bindings[0]
+            payload["duration"] = output.duration_seconds - source.duration_millis // 1000
+            payload["video_creation_id"] = self._extension_creation(source)
+            del payload["audio"]
+            del payload["off_peak"]
         if request.image_bindings:
             images = []
             for binding in sorted(request.image_bindings, key=lambda b: b.role != "first_frame"):
@@ -235,13 +269,38 @@ class ViduVideoProvider:
                     raise _error("Vidu image bytes do not match binding.", ErrorCode.VIDEO_REQUEST_INVALID)
                 images.append(f"data:{binding.mime_type};base64," + base64.b64encode(raw).decode("ascii"))
             payload["images"] = images
-            endpoint = "start-end2video" if len(images) == 2 else "img2video"
-        else:
+            if request.mode is VideoGenerationMode.IMAGE_TO_VIDEO and len(images) == 2:
+                endpoint = "start-end2video"
+        if request.mode in (VideoGenerationMode.TEXT_TO_VIDEO, VideoGenerationMode.REFERENCE_TO_VIDEO):
             payload["aspect_ratio"] = output.ratio
         body = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")
         if len(body) > _MAX_BODY_BYTES:
             raise _error("Vidu request exceeds the body size limit.", ErrorCode.VIDEO_REQUEST_INVALID)
         return endpoint, body
+
+    def _extension_creation(self, binding: VideoMediaReferenceBinding) -> str:
+        try:
+            source = self._extension_source(binding) if self._extension_source else None
+            if not isinstance(source, ViduExtensionSource):
+                raise ValueError()
+            source = ViduExtensionSource.model_validate_json(source.model_dump_json())
+            if not source.matches(binding):
+                raise ValueError()
+        except Exception:
+            raise _error("Vidu extension source evidence is unavailable or mismatched.", ErrorCode.VIDEO_REQUEST_INVALID) from None
+        task_id = self._submission(source.submission, source.submit_receipt)
+        state, creation_id, _ = self._query(task_id, source.submission.provider_task_binding.response_model_id)
+        if (state is not VideoTaskState.SUCCEEDED or creation_id is None
+                or self._file_id(task_id, creation_id) != source.fetch_receipt.provider_file_id):
+            raise _error("Vidu extension source creation changed.", ErrorCode.VIDEO_REQUEST_INVALID)
+        observation = VideoTaskObservation.create(
+            submission=source.submission, state=state, observed_at=self._now(), progress_milli=1000,
+            provider_file_id=source.fetch_receipt.provider_file_id,
+        )
+        fetched = self.fetch(source.submission, source.submit_receipt, observation, _SourceVerificationSink())
+        if (fetched.artifact_sha256 != binding.asset_sha256 or fetched.size_bytes != binding.size_bytes):
+            raise _error("Vidu extension source bytes changed.", ErrorCode.VIDEO_REQUEST_INVALID)
+        return creation_id
 
     def submit(self, request: ResolvedVideoGenerationRequest, video_preview: VideoGenerationPreview,
                paid_preview: PaidProviderCallPreview | None,
@@ -258,6 +317,7 @@ class ViduVideoProvider:
         prompt = request.prompt_text.encode("utf-8")
         expected = {"prompt": (hashlib.sha256(prompt).hexdigest(), len(prompt), "text/plain", "prompt")}
         expected.update({b.asset_id: (b.asset_sha256, b.size_bytes, b.mime_type, "reference") for b in request.image_bindings})
+        expected.update({b.asset_id: (b.asset_sha256, b.size_bytes, b.mime_type, "reference") for b in request.media_bindings})
         actual = {i.item_id: (i.sha256, i.size_bytes, i.mime_type, i.purpose) for i in paid_preview.egress_items}
         if actual != expected or len(actual) != len(paid_preview.egress_items):
             raise _error("Vidu egress does not bind exact input bytes.", ErrorCode.VIDEO_REQUEST_INVALID)
@@ -265,6 +325,10 @@ class ViduVideoProvider:
             raise _error("Vidu permit is invalid.", ErrorCode.PAID_PROVIDER_AUTHORIZATION_REQUIRED)
         endpoint, body = self._payload(request)
         transport_request = ViduTransportRequest("POST", f"{self._profile.origin}/ent/v2/{endpoint}", self._headers(), body)
+        # Source lookup and input/secret suppliers may outlive the initial authorization.
+        validate_paid_provider_authorization(paid_preview, authorization, now=self._now())
+        if video_preview != self.preview(request):
+            raise _error("Vidu preview changed before submit.", ErrorCode.VIDEO_REQUEST_INVALID)
         if not permit._consume_paid_provider_operation_permit(**binding):
             raise _error("Vidu permit is consumed.", ErrorCode.PAID_PROVIDER_AUTHORIZATION_REQUIRED)
         try:
@@ -290,7 +354,7 @@ class ViduVideoProvider:
                 or receipt.submit_receipt_fingerprint != submission.paid_submit_receipt_fingerprint
                 or receipt.request_fingerprint != submission.resolved_generation_hash
                 or task_binding is None
-                or task_binding.response_model_id not in VIDU_MODEL_IDS
+                or task_binding.response_model_id not in (*VIDU_MODEL_IDS, *VIDU_REFERENCE_MODEL_IDS, *VIDU_EXTEND_MODEL_IDS)
                 or task_binding.request_target_id != self._target_id(task_binding.response_model_id)):
             raise _error("Vidu submission evidence mismatch.", ErrorCode.VIDEO_REQUEST_INVALID)
         return _identifier(receipt.external_effect_id)

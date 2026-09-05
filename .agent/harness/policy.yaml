@@ -707,6 +707,7 @@ categories:
       - src/ai_video/production/minimax_hailuo.py
       - src/ai_video/production/vidu.py
       - src/ai_video/production/vidu_profile.py
+      - src/ai_video/production/vidu_source.py
       - src/ai_video/production/seedance.py
       - src/ai_video/production/seedance_asset.py
       - src/ai_video/production/seedance_capabilities.py

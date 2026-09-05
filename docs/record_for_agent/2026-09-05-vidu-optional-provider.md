@@ -8,6 +8,34 @@ learning_eligibility: ineligible
 
 Date: 2026-09-05
 
+## Capability Follow-up
+
+同日用户要求补齐 R2V 和 `VIDEO_EXTEND`。本 follow-up 已在原 adapter 上增加
+`viduq3`／`viduq3-turbo` 的 1–7 张图片参考，以及 `viduq2-pro`／`viduq2-turbo`
+的无声 Vidu 视频延长。下方三模式与 37 tests 描述原 checkpoint，不再代表完整能力清单。
+
+新增 `vidu_source.py` 的 `ViduExtensionSource` 只验证 canonical submit/fetch/probe
+链及 exact source bytes/measurement。注入 source supplier 后，adapter 重查原 task，
+只复用与 fetch opaque file ID 一致的 creation，随后通过既有 fetch 流式重验远端完整
+SHA/size；丢弃校验字节，不落盘。该 source proof 不替代 Registry/continuity/activation owner。
+无 raw URL input、upload、第二 writer 或 fallback。
+Source video 也纳入 exact paid egress。`output_requirement` 表示完整成片长度，HTTP
+`duration` 为减去 source measured duration 后新增的 1–7 秒。
+官方文档只明确新增时长，没有明确返回媒体是否包含原片；当前完整输出约定仍需 live probe
+验证，产物不符时原 artifact gate 拒绝，不自动裁剪。尾帧可选；外部 URL、有声源、
+命名主体库、视频参考编辑和 `/4` native authoring 保持未接入。
+
+Focused `tests/test_production_vidu.py`：80 passed；新增证据包括 1/2/7 图 payload、
+R2V 与 extend 的 Router/compiler、真实 committer/service permit 与 restart 拒绝重复 POST、
+来源变更/损坏/跨站与 exact egress mismatch、源时长/FPS/输出/角色/model 边界。
+Independent review 发现 source GET 期间授权/报价过期后仍可 POST 的窗口；先以 3 个
+failing tests 复现，再增加消费 permit 前的授权/报价重验和 extension prompt 2000 字符限制。
+官方 [R2V](https://platform.vidu.cn/docs/reference-to-video) 和
+[extension](https://platform.vidu.cn/docs/video-extension) 本轮公开文档 HTTP 200。
+没有读取 key、付费 POST、上传或生成媒体；其他窗口的 staged `runs/` files 保持原样。
+独立 review 与 exact-range Harness receipt 作为完成证据另行核验，不由本记录提前证明。
+`distill-ai-video-learning`：`no_candidate`，没有新独立媒体实验。
+
 ## Credential Follow-up
 
 同日后续 [live preflight](2026-09-05-vidu-live-preflight.md) 已验证国内站

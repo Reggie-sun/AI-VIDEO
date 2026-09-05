@@ -1,7 +1,8 @@
 # AI-VIDEO
 
 Vidu Q3 Pro/Turbo 可作为 optional video Provider 显式注入，支持文生视频、图生视频和
-首尾帧模式；配置与验证边界见 [Vidu Provider](docs/vidu-provider.md)。
+首尾帧模式；另支持 Q3/Turbo 图片参考生视频和 Q2 Pro/Turbo 视频延长。
+配置与验证边界见 [Vidu Provider](docs/vidu-provider.md)。
 
 Local-first Python CLI for orchestrating long-video generation through default-local ComfyUI. Non-local ComfyUI requires explicit opt-in.
 

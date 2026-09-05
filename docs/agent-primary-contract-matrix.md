@@ -2,8 +2,9 @@
 
 ## Vidu Cloud Adapter
 
-`src/ai_video/production/vidu.py` 独占 Q3 payload/status/download mapping，
-`vidu_profile.py` 独占 dated profile、能力与 per-call ceiling。显式 registry 注入，
+`src/ai_video/production/vidu.py` 独占 Vidu payload/status/download mapping，
+`vidu_profile.py` 独占 dated profile、能力与 per-call ceiling；`vidu_source.py`
+只验证延长输入的 canonical submit/fetch/probe receipts，不拥有 lifecycle。显式 registry 注入，
 沿既有 `VideoGenerationService` / `ProductionStateCommitter` lifecycle；不得自动选路、
 fallback、重试 POST 或 activation。Profile hash、task/model、creation ID、exact egress、
 one-use permit 与 result-origin containment 均 fail closed。

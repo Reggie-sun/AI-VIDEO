@@ -5,15 +5,17 @@
 `ai_video.production.vidu.ViduVideoProvider` 是显式注入的 optional video Provider，
 通过既有 `VideoProviderRegistry` / `VideoGenerationService` 使用。
 支持 `viduq3-pro`、`viduq3-turbo` 的 T2V、单 `first_frame` I2V，以及
-`first_frame + last_frame` 首尾帧模式。其他模型、参考生视频、视频延长、主体库和
-自动选路不属于本次接入。
+`first_frame + last_frame` 首尾帧模式。另外支持 `viduq3`、`viduq3-turbo` 的
+R2V／多主体图片参考，以及 `viduq2-pro`、`viduq2-turbo` 的 `VIDEO_EXTEND`。
+R2V 的官方模型 ID 是 `viduq3`，不将 `viduq3-pro` 静默改名；Q3 不声明延长能力。
+主体库管理、命名 `subjects`、视频参考编辑和自动选路不属于本次接入。
 
 ## Configuration
 
 创建 `ViduProviderProfile` 时必须提供 official `origin`（`https://api.vidu.cn`
 或 `https://api.vidu.com`）、实际结果 CDN 的 exact `result_origins`、
 `cost_upper_bound_microunits`、timezone-aware `pricing_observed_at` 与
-`pricing_expires_at`。费用字段是覆盖所使用 Q3 请求的 operator per-call ceiling，
+`pricing_expires_at`。费用字段是覆盖所使用模型和请求的 operator per-call ceiling，
 不是内置报价；国内站使用 CNY，国际站使用 USD。过期 ceiling 在 preview 阶段拒绝。
 不要把测试 CDN、示例费用或历史报价直接用于真实调用。
 
@@ -55,6 +57,42 @@ MIME 与比例，然后在内存编码 data URI；完整 JSON body 不得超过 
 与既有 cloud adapter 一致，generic compiler 对没有 native prompt 表达的 `/4`
 requirement 返回 typed unsupported；本次不扩展 Director/native-prompt authoring。
 
+## Reference To Video
+
+`mode=REFERENCE_TO_VIDEO` 使用 `/ent/v2/reference2video` 的非主体调用 `images` 路径。
+支持 1–7 张 `role=reference` 的图片，按 request 的 canonical asset ID 顺序发送，
+多个角色／主体可以各有参考图；不把两张参考图误发到首尾帧 endpoint。
+图片至少 128×128，单张保守限制为 10,000,000 bytes（兼容两站限制），
+比例严格介于 1:4 与 4:1，prompt 最多 2000 字符；
+Q3 R2V 时长为 3–16 秒，ratio 为 16:9、9:16、1:1，使用 exact geometry。
+`native_audio` 显式选择，视频／音频 reference 不会被静默丢弃或改为图片。
+
+## Video Extension
+
+`mode=VIDEO_EXTEND` 使用 `/ent/v2/extend`。当前接入已下载、测量并注册的 Vidu
+无声视频，绑定一个 `VideoMediaReferenceBinding(kind=video, role=reference_video)`；
+原视频为 4–60 秒的整秒、24 fps MP4，可额外绑定一张 `last_frame`，prompt 最多 2000 字符。
+Output 使用 adaptive geometry、540p/720p/1080p、`native_audio=False`，不支持 seed。
+这里 `output_requirement.duration_seconds` 表示期望完整输出长度，HTTP `duration`
+表示新增长度：完整长度减去 source measured duration，必须为 1–7 秒。
+例如 5 秒原片延长 4 秒，output 写 9，HTTP 写 4；adapter 不做剪切或第二套 timeline。
+实际服务是否返回符合这一完整输出约定的媒体，仍需 live probe 验证，不能由离线 payload
+测试证明；若产物长度、音轨或其他测量不符，既有 artifact gate 拒绝，不自动修剪或接受。
+
+调用方注入 `extension_source(binding) -> ViduExtensionSource`，从 canonical state
+重开同一 profile 下的 `submission`、`submit_receipt`、`fetch_receipt`、`probe_receipt`。
+`vidu_source.py` 只验证这些 receipts 的 seal、相互绑定及 source SHA/size/duration/
+geometry/FPS，不写 state，也不替代 Registry loader 或证明 candidate activation。
+Adapter 在付费 POST 前查询原 task，要求当前成功 creation 仍对应 fetch receipt 的
+opaque file ID，再通过现有受限 fetch 流式重验远端完整 SHA/size，丢弃字节而不落盘，
+全部一致后发送 `video_creation_id`。普通 reference 不自动等于连续镜头验收；
+顺序连续生成仍必须由现有 continuity、Registry、Per-Shot Gate owners 验证。
+Source video 的 exact SHA/size/MIME 也必须包含在 paid egress preview 中，purpose 为
+`reference`，即使该素材由 Provider 内部复用；未知／变更 source 在 POST 和 permit 消费前拒绝。
+Source 查询与素材/secret supplier 返回后、permit 消费前，重新核验 authorization 和报价有效期。
+本次不实现任意外部 `video_url` 上传、无凭证 creation ID 或有声源视频延长。
+历史 profile ID/version 保持兼容，新增能力使用独立 capability ID，不重写旧 receipt。
+
 ## Lifecycle And Verification
 
 `submit` 只在 durable paid permit 消费后执行一次 POST。超时、无法解释的响应和
@@ -74,6 +112,8 @@ URL 仅在进程内存中使用；receipt 不保存完整 signed URL。
 - [Text to Video](https://platform.vidu.cn/docs/text-to-video)
 - [Image to Video](https://platform.vidu.com/docs/image-to-video)
 - [Start End to Video](https://platform.vidu.com/docs/start-end-to-video)
+- [Reference to Video](https://platform.vidu.cn/docs/reference-to-video)
+- [Video Extension](https://platform.vidu.cn/docs/video-extension)
 - [Get Creation](https://platform.vidu.com/docs/get-generation)
 - [Model Map](https://platform.vidu.com/docs/model-map)
 - [Pricing](https://platform.vidu.com/docs/pricing)
