@@ -2,6 +2,8 @@
 
 《界蚀》第一集完整创作包。都市异常、规则悬疑、轻科幻；目标300秒、9:16、1080×1920、24fps。当前是创作交付，尚未生成MP4。
 
+生成进度：开场首帧候选已保存至 `runs/jieshi-e01-seedance20-20260905-001/preparation/shot-01-first-frame-v1.png`。原图941×1672，未上采样；它不是1080p成片。Seedance尚未提交：当前写实人物I2V路线需要exact首帧的人工Ark `Active`素材证据；详情见同目录 `submit-readiness.json`。
+
 ## Production Choice
 
 按用户最新指定选择Seedance 2.0标准版：`doubao-seedance-2-0-260128`，统一准备 `image_to_video` 素材，使用 `ratio=9:16`、1080p档（1080×1920）、24fps。当前仓库该capability允许4–15秒；本集计划源素材均为4–9秒。该capability不支持seed或独立negative_prompt字段。执行profile、素材、费用与egress等仍待实际执行前封装，实际清晰度须在输出后核验。

@@ -6,6 +6,37 @@ learning_eligibility: ineligible
 
 # Jieshi Episode 01 Authoring
 
+## Generation Preparation Checkpoint
+
+用户随后明确要求“生成”；本次实际调用一次built-in `image_gen.imagegen`制作开场首帧，
+保存原始输出与prompt到 `runs/jieshi-e01-seedance20-20260905-001/preparation/`。
+候选图为 `shot-01-first-frame-v1.png`，941×1672、2064319bytes，SHA-256
+`4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb`。
+未上采样，不声明原图1080p。Agent视觉检查可见林砚本人、七个他人倒影及林砚倒影缺席；
+这不是human acceptance、Production import、Ark Active observation或媒体验收。
+图片生成时的exact创作源另存 `source-authoring.proposed.json`，SHA与旧commit `05b6367`一致；
+新修正不重写其provenance。当前proposal另修复姓名替换误伤的P4技术用语并升为revision3，
+SHA-256 `d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921`。
+
+真实执行阻断：`SeedanceAssetMaterializationReceipt`要求human观察Ark Console中exact素材为Active；
+`SeedanceSyntheticImageAuthorizer`和`SeedanceSyntheticImageReferenceResolver.validate_submit`
+会在POST前拒绝写实person-like inline引用。仓库只有already-materialized receipt import/resolver，
+没有自动Ark Assets上传action。Parent通过codegraph/current source检查，native `code_mapper`
+独立复核；其引用的历史整体live状态不作为本次结论，以上结论取自当前执行代码。
+对应focused tests实际为3 passed、120 deselected。没有降低gate或静默改为T2V。
+
+经injected supplier只检查 `secret_store:ARK_API_KEY` presence为true，未回显或保存secret，
+没有用其发起请求；presence不证明账号权限或余额。未封装当前pricing/budget/egress/permit，
+官方文档本轮web读取失败，搜索摘要未用于构造计费事实。
+Seedance submit/poll/fetch数量均为0，没有MP4；精确缺项见 `submit-readiness.json`。
+本次生成的图片保留在run目录，未伪造Manifest/Registry或asset URL。
+
+主线程继续拥有创作和execution准备；code_mapper只读、没有writer overlap。
+当前commit-range Harness receipt预定为
+`.agent/harness/runs/jieshi-e01-preparation-20260905/receipt.json`，实际状态以receipt为准。
+同主题更新record；Learning evaluation仍为`no_candidate`：一次首帧生成与静态gate检查
+不足以形成跨实验结论。下文“没有图片生成”等属于更早authoring阶段的历史状态。
+
 ## Current Model Selection Update
 
 2026-09-05用户最新指令“用seedance2.0吧”取代初版2.5选择。

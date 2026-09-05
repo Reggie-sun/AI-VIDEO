@@ -2,6 +2,16 @@
 
 ## Scope
 
+生成准备checkpoint：已实际生成并检查1张开场首帧PNG，尚无MP4。
+当前proposal SHA-256为 `d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921`。
+恢复了被先前中文姓名替换误伤的技术术语P4音频编排；角色郭向东及其剧情不变。
+本文下方初版“没有参考图生成”等声明仅描述authoring checkpoint，当前实测见本节。
+原图941×1672，SHA-256 `4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb`；
+PNG decode通过、七个他人倒影与林砚缺席倒影经Agent视觉检查，human/Ark acceptance未取得。
+`tests/test_production_seedance.py`中Active receipt resolution与photorealistic inline denial的focused验证：
+3 passed，120 deselected；使用fake transport，未发生视频Provider调用。
+当前preparation receipt预定为 `.agent/harness/runs/jieshi-e01-preparation-20260905/receipt.json`。
+
 本轮是完整Episode创作与提示草稿交付。源内容为 `episode-01.proposed.json`；
 `episode-01.md` 是人读分镜，`creative-artifacts.json` 是派生的现有模型快照。
 不把文档、Pydantic验证或Harness当作Production loading、媒体验收或留存实测。
