@@ -9,6 +9,21 @@ evidence_index_version: "1"
 
 Date: 2026-09-05
 
+## User Acceptance — 2026-09-05
+
+交付下方 exact 30s 成片后，用户回复“确认可以”。本次记录为该版本的整体用户认可，
+绑定 MP4 SHA-256 `3749b1e53c4fe674279b7bf50b8c496b67daa66428569e8f25c77d397c83bd38`；
+不再等待整体认可，也不再生成新版本。用户未说明播放方式或逐项听验结果，因此不将该反馈
+扩张为 full-speed/listening rubric 全项 PASS、精确建筑一致性或 P6 / Final Acceptance。
+下方 `final-render-human` 与 `final-media-gate.json` 保留为交付时的历史未评估证据；
+本次新增独立的整体认可 proof layer，不修改媒体、原 Gate 或 Production state。
+
+`distill-ai-video-learning` 本次评估仍为 `no_candidate`：同一 exact 成片的用户反馈
+没有增加独立实验，也未形成新的受控比较或同范围 existing claim 更新。
+仅补记本文件；未新增 Provider/media/network 调用，未刷新 RAG index，未 push/release。
+本次 documentation 验证 receipt：
+`.agent/harness/runs/h3-lighthouse-30s-user-acceptance-20260905-v1/receipt.json`。
+
 ## Current Checkpoint — Completed Render After One Approved Renewal
 
 用户在原9次预算停止后明确同意：只给最后 Shot06追加1次补拍，通过后合成。原
@@ -188,3 +203,4 @@ amber lamp 与 rainy coast；新 identity/intent/permit 后完整重验。不得
 | final-render-technical | render:86f9f69f61aad5a9eb031a0c20d88deeae6331c38f464feb8860cf899bdb6c5c | lighthouse-30s-composition-20260905 | lighthouse-30s-final-render | N/A | 3749b1e53c4fe674279b7bf50b8c496b67daa66428569e8f25c77d397c83bd38 | RENDER_TECHNICAL | PASS | NONE | NEW_ATTEMPT | NONE | runs/director-h3-lighthouse-30s-20260905-001/final-render-result.json |
 | final-render-media | render:86f9f69f61aad5a9eb031a0c20d88deeae6331c38f464feb8860cf899bdb6c5c | lighthouse-30s-composition-20260905 | lighthouse-30s-final-render | N/A | 3749b1e53c4fe674279b7bf50b8c496b67daa66428569e8f25c77d397c83bd38 | AGENT_VISUAL | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | final-render-technical | runs/director-h3-lighthouse-30s-20260905-001/final-media-gate.json |
 | final-render-human | render:86f9f69f61aad5a9eb031a0c20d88deeae6331c38f464feb8860cf899bdb6c5c | lighthouse-30s-composition-20260905 | lighthouse-30s-final-render | N/A | 3749b1e53c4fe674279b7bf50b8c496b67daa66428569e8f25c77d397c83bd38 | HUMAN | NOT_EVALUATED | HUMAN_REVIEW_PENDING | SAME_EVIDENCE_NEW_PROOF_LAYER | final-render-technical | runs/director-h3-lighthouse-30s-20260905-001/final-media-gate.json |
+| final-render-user-acceptance | render:86f9f69f61aad5a9eb031a0c20d88deeae6331c38f464feb8860cf899bdb6c5c | lighthouse-30s-composition-20260905 | lighthouse-30s-final-render | N/A | 3749b1e53c4fe674279b7bf50b8c496b67daa66428569e8f25c77d397c83bd38 | USER_OVERALL_ACCEPTANCE | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | final-render-technical | docs/record_for_agent/2026-09-05-local-h3-lighthouse-30s-test.md#user-acceptance--2026-09-05 |
