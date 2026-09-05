@@ -9,7 +9,91 @@ evidence_index_version: "1"
 
 Date: 2026-08-29
 
-Updated: 2026-08-30
+Updated: 2026-09-05
+
+## Supersession Notice — 2026-09-05 Watchability Repair Blocked
+
+本次重新检查 exact v70 后，撤回其 current-facing `PASS_FOR_HUMAN_REVIEW` 候选地位；
+下方 v70 数值与 Gate 保留为历史技术证据，不证明现在可观看或字幕同步。没有新的 human verdict，
+也没有新的合格 30 秒成片、Shot 6 submit、Production activation 或 Final Acceptance。
+
+### Verified Problems
+
+- v70 前四个 cut 的相邻灰度帧差，在去除字幕区域后分别为 `3.154 / 2.447 / 2.425 / 2.598`；
+  邻近正常帧约 `0.325–0.680`。配合实际帧检查，表现为相似景别下姿态/机位重新起动；
+  这只是定位 evidence，不能把帧差变小等同于人眼流畅。
+- Shot 5 v66 强制连接 v65 首帧与历史 v54 尾帧，窗框在起身过程中重叠、弯折；后续 v69
+  沿用该背景。v69 另使用 v68 画面 + v55 音频，不能证明同次原生口型同步。
+- exact v70 解码 PCM 后，第二句明显语音能量为 `7.90–8.32s` 与 `9.22–9.72s`，
+  原 cue `8.51–9.79s` 完全晚于第一段发声。修复窗口应为 `7.70–9.79s`；
+  本轮仅完成定位，尚未把此调整烧录到新的 30 秒成片。能量区间不是词级强制对齐。
+- 已检查 Shot 2 `1024x576@(160,0)`、Shot 3 `672x384@(280,232)` 的实际重新取景帧；
+  后者能突出妹妹反应，但有放大软化风险。样张在 `runs/drama-h3-t8-30s-preview-20260905-v73/sidecars/analysis/`，
+  只是 composition 方案证据，不是新生成镜头或已交付修复。
+
+### Bounded Local Attempts
+
+两次 submit 均为 loopback local/unmetered H3 T8 I2VA Turbo，原生音频、`1344x768 / 24fps / 124 frames`；
+每次独立封存新 request/intent/permit，单次 submit ceiling `1`、GPU ceiling `25min`、elapsed ceiling `30min`。
+两个已完成 outcome 的同一 Shot repair 都调用 project-local `video_analyze`，保存 exact-byte evidence 与失败 Gate，
+没有推进下一 Shot。v71/v71b 仅为本地 preflight 失败目录，没有 Provider submit。
+
+| Attempt | Media SHA-256 | Result |
+| --- | --- | --- |
+| v71c | `55b0dd9050e7078f583130ce958ce83c298569b5ec7e05acdef1085d8a3859c5` | 移除不兼容历史尾帧，只由 v65 首帧续拍；背景改善，但起身后向 screen-left 偏移，不满足朝哥哥靠近的动作判断，Gate `FAIL` |
+| v72 | `7ff7a2960d64f2a5eab501ac3dc1801b3470fd00a32bf70af7e55fa39386bd18` | 明确 screen-right approach 后方向改善，但约 2 秒后出现多层窗框、手臂与人物残影，Gate `FAIL` |
+
+- v71c request `6ebf6d61-6fcb-4b4d-a2de-b51d69f4db3a`，resolved hash
+  `8fe51f499fe6d24e688bc2a3c87db4496e4a5d24a6a8df6584d51eb7722fbcfc`；Comfy execution `92.98s`。
+- v72 request `68330dfb-c0eb-40d8-85c5-fee2c35817b6`，resolved hash
+  `c2594c2ef7895c3ff973c26ceff80feda298a119f23e1d8c1b387a804ca51332`；Comfy execution `81.91s`。
+- Gate paths 为各自 run 的 `sidecars/gates/shot-05-gate.json`，SHA-256 分别为
+  `41fabd85c0def6ebbcee213d70893eb3948bf7441f3573944bb86baa1ee949c1`、
+  `0ffe8e25c13287f4df43fa1c54fb95365b42650c6c2f90127036b8c1237e5490`。
+  原 Gate 将剩余未判定项合并记录：identity/wardrobe、single key、axis、camera readability、
+  actor/camera continuity、static tail、first-frame continuity 均未独立验收，不得将缺失项解释为 PASS。
+  v71c 的 temporal subject integrity、v72 的 native audio 也未额外给出独立 PASS。
+  MCP metadata/transcription/frame timestamps 位于对应 `sidecars/analysis/video-analysis-mcp.json`；
+  精确 PNG 尾帧与 MP4 保留在 run 中。摘要剔除了 base64 与嵌入的 full workflow prompt。
+- v71c 全音视频解码通过，音频 mean `-48.5 dBFS` / peak `-34.8 dBFS`，
+  `freezedetect` 未报 `>=0.4s` freeze。两次 `small` 均无转写文本；这些均不推翻视觉 `FAIL`。
+- 新 compiler 派生 seed 随 exact intent 改变，v71c 与 v72 seed 不同；本轮不是隔离 seed 的 controlled A/B，
+  不能认定单个 prompt 词或 Turbo 本身已经被证明是残影的唯一根因。
+
+### Current Blocker And Boundary
+
+`workflows/profiles/minimax_h3_t8_t2va_quality.json` 有非 Turbo `20-step / res_multistep / simple` 档，
+但 `ComfyUIT8VideoProvider` 只公布 `TEXT_TO_VIDEO`、`allowed_image_roles=()`；
+`_validate_workflow` 拒绝 `first_frame` 等输入并要求 `task_type=T2VA`。
+`T8NativeTurboExecutionProfile` 的现有 I2VA contract 则固定 `steps=4`、LoRA strength `1.0`。
+但上述 T8 边界不等于仓库没有质量档图生视频。独立 review 指出、parent 重新核实：
+`ComfyUIVideoProvider` + `workflows/profiles/minimax_h3_fl2va_quality.json` 已有 Stock20/no-LoRA
+质量流程，公开能力要求 first frame、允许 optional last frame；`render_h3_workflow` 能移除空的尾帧节点。
+真正缺口在当前 v4 `compile_request` 强制 `conditioning_compatibility.lane=FL2VA`，
+而 FL2VA requirement 必须有 last anchor，当前 exact first-only I2VA 不能直接通过。
+最小下一步应复用现有质量流程、审计并补齐 v4 I2VA 首帧路由，不应新造 workflow/profile。
+v72 Gate 的历史 `stop_reason` 对质量路线表述不够精确，以本节的 Stock20/current-v4 区分取代该解释；
+不改其历史失败结论。Review 中曾原地细化两份 Gate 并修改 v72 解释，现两份原 Gate 均已还原到
+本轮首次记录的 exact hash；本轮新建的两份 detail 副本已移除，未删除原始 Gate、MCP evidence 或媒体。
+未判定项说明与路线解释纠正仅保留在本记录，不建立第二份 Gate owner。
+这会把当前 `minimax_h3_t8_i2va_turbo_native` 档切换为 `minimax_h3_fl2va` Stock20 档并修改编译契约，
+需先明确对应 scope；本轮不直接修改 sealed graph、伪造 capability、调用裸 Comfy submit 或使用 T2VA fallback。
+质量档能否改善本场景尚未实测，不作成功承诺。另有已声明的 T8 Ref2VA Turbo 档，
+但未验证本次视频参考续拍的适用性；本记录不声称所有本地修复方案已被穷尽。
+继续随机改 seed/prompt 也缺少已隔离的因果依据。
+
+Focused verification：quality 单一 T2VA capability、拒绝重新封存的 workflow/schema drift、
+native 四种 profile 的固定 sampler/converted LoRA checks，共 `6 passed`。
+这些 tests 只证明现有执行边界，不证明 Stock20 v4 I2VA 已支持，也不证明媒体质量。
+Native independent reviewer 重新核验 exact media/result/Manifest identity，两个 Manifest 都只有
+一个 Shot 5 attempt（`phase=validate`）、无 candidate 或 Shot 6 attempt；v72 尾帧的明显残影可独立复现。
+v71c 方向判断仍仅为 parent 对顺序 MCP 帧的观察，reviewer 未独立完成 temporal/human 1.0× 验证。
+
+本轮启动的 supervised ComfyUI 在确认 queue running/pending 都为空后已正常停止，状态 `inactive`；
+失败媒体保留可追溯。无 paid/cloud execution。其余并发窗口的文档、plan 与 readiness 提交均未触碰。
+`record-ai-video-session` stable-blocker evaluation：需要更新本 primary record。
+`distill-ai-video-learning`：`no_candidate`，两次失败模式不同、seed/compiler 有混杂，
+没有可外推为模型级修复规则的独立支持；不修改 Skill/Policy/Gate，也不主动重建 RAG index。
 
 ## Supersession Notice — 2026-08-30 v70 Human-Review Rebuild
 
@@ -408,6 +492,9 @@ V2 finding、output identity 与停止决定位于
 
 | evidence_id | independence_key | experiment_id | attempt_id | arm_id | artifact_sha256 | proof_layer | verdict | failure_class | relation_kind | related_evidence_id | source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| h3-t8-drama-v70-targeted-review-20260905 | local-composition:h3-t8:drama-six-shot-v70:20260830 | drama-h3-t8-30s-composition-watchability | drama-h3-t8-six-shot-rebuild-v70 | hard-cut-captioned-segment-audio-repair | 971127aa32c1a6e8492655142ad4127a20c03e7de81a82c8d14a24fce30118e5 | AGENT_TARGETED_MEDIA_REVIEW | FAIL | GEOMETRY_GHOSTING_AND_LATE_CAPTION | CONCLUSION_SUPERSEDED | h3-t8-drama-v70-final-technical-gate-20260830 | `docs/record_for_agent/2026-08-29-h3-t8-drama-preview-shot-gate-stop.md#supersession-notice--2026-09-05-watchability-repair-blocked` |
+| h3-t8-drama-shot05-v71c-gate-20260905 | local-comfyui:6ebf6d61-6fcb-4b4d-a2de-b51d69f4db3a | drama-shot05-incompatible-last-anchor-20260905 | drama-shot05-v71c | N/A | 55b0dd9050e7078f583130ce958ce83c298569b5ec7e05acdef1085d8a3859c5 | EXACT_MEDIA_GATE | FAIL | APPROACH_DIRECTION_NOT_SATISFIED | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v71c/sidecars/gates/shot-05-gate.json` |
+| h3-t8-drama-shot05-v72-gate-20260905 | local-comfyui:68330dfb-c0eb-40d8-85c5-fee2c35817b6 | drama-shot05-incompatible-last-anchor-20260905 | drama-shot05-v72 | N/A | 7ff7a2960d64f2a5eab501ac3dc1801b3470fd00a32bf70af7e55fa39386bd18 | EXACT_MEDIA_GATE | FAIL | TEMPORAL_SUBJECT_AND_GEOMETRY_GHOSTING | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v72/sidecars/gates/shot-05-gate.json` |
 | h3-t8-drama-shot01-gate-20260829 | local-comfyui:h3-t8:drama-prompt-audio-adherence:20260829 | drama-h3-t8-30s-preview-20260829-v1 | drama-preview-shot-01-entry-submit-1 | t2va-quality | d33a3de37ecccb369dd13cd0f043a80a2700882cf4428b16c89543a67d222cc9 | EXACT_MEDIA_GATE | FAIL | UNINTENDED_NARRATION_AND_BURNED_SUBTITLES | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260829-v1/sidecars/gates/shot-01-gate.json` |
 | h3-t8-drama-shot01-v2-gate-20260829 | local-comfyui:h3-t8:drama-prompt-audio-adherence-v2:20260829 | drama-h3-t8-30s-preview-20260829-v2 | drama-preview-shot-01-entry-submit-2 | t2va-quality-compiler-v2 | 139ed00ca11e9e2aca1701d13162814486cbc41982a90fea5286cbf5d9ef7a20 | EXACT_MEDIA_GATE | FAIL | UNINTENDED_SPEECH_ASR_ONLY_NO_BURNED_SUBTITLES | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260829-v2/sidecars/gates/shot-01-gate.json` |
 | h3-t8-drama-shot06-v21-gate-20260830 | local-comfyui:h3-t8:drama-shot06-dialogue-v21:20260830 | drama-h3-t8-30s-preview-20260830-shot06-dialogue | drama-preview-shot-06-submit-v21 | v21-boundary-retranscription | 84d5d9ce51d3027e6b4d2f04e48b606d7d0dd3b04bc5b3c930b29c1c0febc5dc | EXACT_MEDIA_GATE | NOT_EVALUATED | CONFLICTING_FIRST_SYLLABLE_TRANSCRIPTION | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260830-v21/sidecars/gates/shot-06-gate.json` |
