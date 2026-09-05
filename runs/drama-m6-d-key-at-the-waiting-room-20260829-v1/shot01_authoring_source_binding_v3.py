@@ -300,6 +300,12 @@ def _assert_imports_are_pinned(inventory: dict[str, str]) -> None:
             _require(relative in inventory and _sha256(resolved.read_bytes()) == inventory[relative], "imported Product source escaped pinned inventory")
 
 
+def _reload_unchanged_audio_policy(source_audio: ModuleType, policy: dict, identity: dict) -> dict:
+    final_policy, final_identity = source_audio._load_policy()
+    _require(final_policy == policy and final_identity == identity, "source-audio policy changed during reopen")
+    return final_policy
+
+
 def reopen_exact_request(
     *,
     expected_acceptance_sha256: str,
@@ -389,6 +395,11 @@ def reopen_exact_request(
     final_loaded = timing.load_production_project(PROJECT_ROOT / "project.yaml")
     _require(final_loaded.manifest.active_dependency_graph.model_dump(mode="json") == graph["graph_pointer"], "active graph changed during reopen")
     verify_current_video_generation_lineage(final_loaded, routed["resolved"])
+    final_policy = _reload_unchanged_audio_policy(source_audio, policy, policy_identity)
+    _require(
+        _assert_audio_policy(final_policy, graph["source_audio_policy"], requirement, routed) == source_audio_identity,
+        "source-audio facts changed during reopen",
+    )
     _require(_committed_source_inventory(source_commit) == inventory, "pinned source inventory changed during reopen")
     _assert_imports_are_pinned(inventory)
     return {

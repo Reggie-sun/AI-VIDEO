@@ -1673,6 +1673,10 @@ def test_ecommerce_ad_skill_paths_route_to_focused_and_control_plane_checks(
 def test_drama_source_binding_has_only_its_exact_focused_route() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
     for path in (
+        "docs/superpowers/artifacts/drama/b-d0/execution-intent/"
+        "key-at-the-waiting-room-shot-01-v3.proposed.json",
+        "docs/superpowers/artifacts/drama/b-d0/execution-intent/"
+        "key-at-the-waiting-room-shot-01-v3.accepted.json",
         "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/"
         "shot01_authoring_source_binding_v3.py",
         "tests/test_drama_shot01_authoring_source_binding.py",

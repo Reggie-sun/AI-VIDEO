@@ -319,6 +319,8 @@ checks:
 categories:
   drama_authoring_source_binding:
     patterns:
+      - docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v3.proposed.json
+      - docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v3.accepted.json
       - runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/shot01_authoring_source_binding_v3.py
       - tests/test_drama_shot01_authoring_source_binding.py
     check_ids:

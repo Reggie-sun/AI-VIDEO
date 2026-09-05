@@ -5,6 +5,7 @@ from __future__ import annotations
 import importlib.util
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -23,6 +24,23 @@ def _module():
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
     return module
+
+
+def test_final_audio_reload_rejects_payload_or_identity_drift() -> None:
+    module = _module()
+    policy = {"source_audio_policy": {"source_type": "GENERATED", "policy": "KEEP"}}
+    identity = {"acceptance_sha256": "a" * 64, "payload_sha256": "b" * 64}
+    for changed in (
+        ({"source_audio_policy": {"source_type": "GENERATED", "policy": "DROP"}}, identity),
+        (policy, {**identity, "payload_sha256": "c" * 64}),
+    ):
+        sequence = iter(((policy, identity), changed))
+        source = SimpleNamespace(_load_policy=lambda: next(sequence))
+        initial_policy, initial_identity = source._load_policy()
+        with pytest.raises(RuntimeError, match="source-audio policy changed during reopen"):
+            module._reload_unchanged_audio_policy(source, initial_policy, initial_identity)
+    source = SimpleNamespace(_load_policy=lambda: (policy, identity))
+    assert module._reload_unchanged_audio_policy(source, policy, identity) == policy
 
 
 def _binding(graph_hash: str = "a95a916f26b53f4a2437d90860a13910fa458e33735507963148360062e8742a"):
