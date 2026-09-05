@@ -63,8 +63,9 @@ library browser SSR/audio tests、transport stale/concurrent tests 通过；offl
 Native `reviewer_xhigh` 完成 review，已报 blockers 均修复；其 SSR/交互覆盖 concern 已用上述
 interactive evidence 补齐，snapshot mismatch fixture 已改为合法 SHA 并验证存在但不能归组。
 
-最终 exact commit-range 验证使用 `python -m scripts.agent_harness verify`；该检查的实际状态与
-policy/check/artifact hashes 以 `.agent/harness/runs/video-library-browsing-20260905/receipt.json`
+首轮 Harness 的 9 项检查全部通过；其 reader LOC warning 通过简化本次新增的单用 helper 消除，
+未调整 Architecture baseline。最终 exact commit-range 验证使用 `python -m scripts.agent_harness verify`；该检查的实际状态与
+policy/check/artifact hashes 以 `.agent/harness/runs/video-library-browsing-20260905-final/receipt.json`
 为准，不能由本 record 或上述 focused/browser results 代替。
 
 ## Boundaries And Learning Evaluation
