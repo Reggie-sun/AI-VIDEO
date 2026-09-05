@@ -1,0 +1,48 @@
+{
+  "schema_version": "drama-shot-source-binding/1",
+  "record_kind": "drama_shot_source_binding",
+  "overlay_id": "drama.execution-intent.key-at-the-waiting-room.shot-01",
+  "binding_version": 3,
+  "status": "proposed",
+  "domain_id": "drama",
+  "lane_id": "M6-D",
+  "references": {
+    "semantic_overlay_acceptance": {
+      "path": "docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v1.accepted.json",
+      "commit": "4ea0e3285597ea6f6942406fd75a232db18964b1",
+      "sha256": "8b50b61b152b59542fc4521c870cc060b9b6469fc18db5e3a14248cf05de7efd"
+    },
+    "timing_repair_acceptance": {
+      "path": "docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v2.accepted.json",
+      "commit": "4ea0e3285597ea6f6942406fd75a232db18964b1",
+      "sha256": "b508cb375b6c326cbaaa5342d6aec051d20276f2d652e094f9cbca3a48efee10"
+    },
+    "source_audio_policy_acceptance": {
+      "path": "docs/superpowers/artifacts/drama/b-d0/source-audio-policy/key-at-the-waiting-room-shot-01-v3.accepted.json",
+      "commit": "4ea0e3285597ea6f6942406fd75a232db18964b1",
+      "sha256": "bd10225c06fc837fb4fcd118f62bbf3214cadd0abd08445f35323c14df9e3239"
+    },
+    "graph_transition_evidence": {
+      "path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-graph-lineage-20260905-v1-committed.json",
+      "commit": "74262c8b870ab9debd48e779d82b5097b7c8090f",
+      "sha256": "2021fa28f0df82fde878f4316c879aa2486a33797f49300702e7092f53730b1c"
+    }
+  },
+  "canonical_source_binding": {
+    "accepted_package_acceptance_path": "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.accepted.json",
+    "accepted_package_acceptance_sha256": "f81365c1d084d6c096d7bcbf83c06beff75100f34b6ed90bafc9341dfb247cac",
+    "accepted_package_payload_path": "docs/superpowers/artifacts/drama/b-d0/authoring-package/key-at-the-waiting-room-v3.proposed.json",
+    "accepted_package_payload_commit": "1175c8270ffba6ff136d54cc0eb9390a96d6bf29",
+    "accepted_package_payload_sha256": "a5ec4f78b05ce189d9eaa0cf694ffaba0747b499f4e85fd1ac1ac4221ec61331",
+    "accepted_fixture_payload_path": "docs/superpowers/artifacts/drama/b-d0/fixture-selection/key-at-the-waiting-room-v1.proposed.json",
+    "accepted_fixture_payload_commit": "3b436195e939f7bc8fff5999438e9018030a38fe",
+    "accepted_fixture_payload_sha256": "73a3a57e78859f8a508dd21cea3493a8d2a32ccb8a08c173a304b516fc5d34ab",
+    "canonical_materialization_path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-canonical-materialization.json",
+    "canonical_materialization_sha256": "75be2e494e44b5b253d730f9c9daca366806e09209c7e5e5e231c014a1b09f71",
+    "project_content_hash": "940f0ceee3148ba1d4dab4a5b7bcbc2adc3229c5964f1705149bec1e9d14dfc1",
+    "registry_content_hash": "13a9404d3ec6bb3de0ec00871cd22dd5ca861ca8ea413fdfe13ea145e6c2ec1b",
+    "active_pre_generation_graph_hash": "a95a916f26b53f4a2437d90860a13910fa458e33735507963148360062e8742a",
+    "historical_request_hash": "92e6de89a72730da3beb58638dd54c637cad5162aab94a3259d3413a9a50931f",
+    "historical_requirement_hash": "d07dba76f19e2a1d998d9bf087df8583a1a99653cc7c1d9760935f72534c9b81"
+  }
+}
