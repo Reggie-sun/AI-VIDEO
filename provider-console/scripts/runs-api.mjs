@@ -274,6 +274,38 @@ async function validatedMedia(entry, runsRoot) {
   }
 }
 
+function unavailableMediaDescriptors(value, unavailableTokens) {
+  if (Array.isArray(value)) return value.map((item) => unavailableMediaDescriptors(item, unavailableTokens));
+  if (!value || typeof value !== "object") return value;
+  const projected = Object.fromEntries(
+    Object.entries(value).map(([key, item]) => [key, unavailableMediaDescriptors(item, unavailableTokens)]),
+  );
+  if (typeof value.token !== "string" || !unavailableTokens.has(value.token)) return projected;
+  delete projected.token;
+  projected.availability = "unavailable";
+  return projected;
+}
+
+async function registerRunsMedia(result, runsRoot, mediaCache) {
+  const unavailableTokens = new Set();
+  const entries = result?._media && typeof result._media === "object" ? Object.entries(result._media) : [];
+  for (const [token, entry] of entries) {
+    if (!/^[A-Za-z0-9_-]{6,128}$/.test(token)) continue;
+    let media = null;
+    try {
+      media = await validatedMedia(entry, runsRoot);
+    } catch {
+      // A bad descriptor must not prevent other exact media from being projected.
+    }
+    if (media) mediaCache.set(token, media);
+    else {
+      mediaCache.delete(token);
+      unavailableTokens.add(token);
+    }
+  }
+  return unavailableTokens;
+}
+
 function parseRange(header, size) {
   if (!header) return null;
   const match = /^bytes=(\d*)-(\d*)$/.exec(header);
@@ -629,13 +661,8 @@ export function createRunsApiHandler({
           send(res, status, { error: { code, message } });
           return;
         }
-        const entries = result?._media && typeof result._media === "object" ? Object.entries(result._media) : [];
-        for (const [token, entry] of entries) {
-          if (!/^[A-Za-z0-9_-]{6,128}$/.test(token)) continue;
-          const media = await validatedMedia(entry, runsRoot);
-          if (media) mediaCache.set(token, media);
-        }
-        send(res, 200, publicProjection(result));
+        const unavailableTokens = await registerRunsMedia(result, runsRoot, mediaCache);
+        send(res, 200, publicProjection(unavailableMediaDescriptors(result, unavailableTokens)));
         return;
       }
 

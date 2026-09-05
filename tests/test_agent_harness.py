@@ -632,6 +632,7 @@ def test_provider_console_bridge_routes_to_python_and_node_contracts() -> None:
         "provider-console/scripts/runs-api.mjs",
         "provider-console/tests/external-media.test.mjs",
         "provider-console/tests/runs-api.test.mjs",
+        "provider-console/tests/library-media.test.mjs",
     ):
         report = agent_harness.inspect_paths([path], policy)
         assert report["categories"] == ["provider_console"]
@@ -659,6 +660,10 @@ def test_provider_console_web_routes_to_node_contracts() -> None:
     for path in (
         "provider-console/src/App.jsx",
         "provider-console/src/continuity-review.js",
+        "provider-console/src/library-browser.jsx",
+        "provider-console/src/library-contract.js",
+        "provider-console/src/library-data.js",
+        "provider-console/src/library-preview.js",
     ):
         report = agent_harness.inspect_paths([path], policy)
         assert report["categories"] == ["provider_console_web"]
@@ -679,6 +684,8 @@ def test_provider_console_web_routes_to_node_contracts() -> None:
     for path in (
         "provider-console/tests/continuity-review-contract.test.mjs",
         "provider-console/tests/continuity-review.test.mjs",
+        "provider-console/tests/library-contract.test.mjs",
+        "provider-console/tests/library-browser.test.mjs",
     ):
         report = agent_harness.inspect_paths([path], policy)
         assert report["categories"] == ["provider_console_web_tests"]
@@ -703,6 +710,9 @@ def test_provider_console_web_routes_to_node_contracts() -> None:
         "provider-console/tests/external-media.test.mjs",
         "provider-console/tests/continuity-review-contract.test.mjs",
         "provider-console/tests/continuity-review.test.mjs",
+        "provider-console/tests/library-contract.test.mjs",
+        "provider-console/tests/library-browser.test.mjs",
+        "provider-console/tests/library-media.test.mjs",
     ]
     assert policy["checks"]["provider_console_web_build"]["argv"] == [
         "npm",

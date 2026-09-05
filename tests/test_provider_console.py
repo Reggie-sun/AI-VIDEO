@@ -292,6 +292,7 @@ def test_production_detail_uses_strict_readers_and_returns_only_whitelisted_data
     project_path = _production_workspace(runs, "demo/project")
     first_frame = _write(project_path.parent / "assets" / "first.png", b"image")
     candidate = _write(project_path.parent / "assets" / "candidate.mp4", b"video-bytes")
+    next_candidate = _write(project_path.parent / "assets" / "candidate-next.mp4", b"next-video")
     first_record = _ns(
         asset_id="first-frame", asset_type=_ns(value="image"), mime_type="image/png",
         size_bytes=5, width=1280, height=720, duration_seconds=None, video_metadata=None,
@@ -307,6 +308,12 @@ def test_production_detail_uses_strict_readers_and_returns_only_whitelisted_data
         video_metadata=video_metadata, sha256=ONE, egress=_ns(remote=False),
         artifact_path=Path("assets/candidate.mp4"),
     )
+    next_video_record = _ns(
+        asset_id="video-output-2", asset_type=_ns(value="video"), mime_type="video/mp4",
+        size_bytes=10, width=1344, height=672, duration_seconds=5.167,
+        video_metadata=video_metadata, sha256="2" * 64, egress=_ns(remote=False),
+        artifact_path=Path("assets/candidate-next.mp4"),
+    )
     request_pointer = _ns(
         path=Path("state/video-generation/requests/request.json"), file_sha256=ZERO,
         request_receipt_fingerprint=ONE, generation_id="generation-1",
@@ -314,7 +321,7 @@ def test_production_detail_uses_strict_readers_and_returns_only_whitelisted_data
     )
     state = _ns(
         request=request_pointer, phase=_ns(value="activate"), generation_id="generation-1",
-        candidate_video_asset_ids=("video-output",), terminal_frame_evidence=None,
+        candidate_video_asset_ids=("video-output", "video-output-2"), terminal_frame_evidence=None,
         paid_submit_receipt=None, local_submit_receipt=_ns(path=Path("state/local.json")),
     )
     attempt = _ns(
@@ -332,8 +339,12 @@ def test_production_detail_uses_strict_readers_and_returns_only_whitelisted_data
         project=_ns(project_id="demo", title="Demo", revision=7, content_hash=ZERO),
         manifest=_ns(schema_version="2.8", manifest_revision=34, attempts=(attempt,)),
         shots=(shot,), scenes=(_ns(scene_id="cafe", title="Cafe"),),
-        registry=_ns(assets=(first_record, video_record)),
-        asset_paths={"first-frame": first_frame, "video-output": candidate},
+        registry=_ns(assets=(first_record, video_record, next_video_record)),
+        asset_paths={
+            "first-frame": first_frame,
+            "video-output": candidate,
+            "video-output-2": next_candidate,
+        },
     )
     binding = _ns(
         role="first_frame", asset_id="first-frame", mime_type="image/png", width=1280,
@@ -397,9 +408,24 @@ def test_production_detail_uses_strict_readers_and_returns_only_whitelisted_data
     assert result["attempts"][0]["input_bindings"][0]["media"]["token"]
     assert result["attempts"][0]["first_frame_media"]["token"]
     assert result["attempts"][0]["candidate_media"]["token"]
+    assert result["attempts"][0]["candidate_media"]["asset_id"] == "video-output-2"
+    assert result["attempts"][0]["candidate_media_items"] == [
+        {
+            "role": "candidate",
+            "asset_id": "video-output",
+            "media": result["attempts"][0]["candidate_media_items"][0]["media"],
+        },
+        {
+            "role": "candidate",
+            "asset_id": "video-output-2",
+            "media": result["attempts"][0]["candidate_media"],
+        },
+    ]
+    assert result["attempts"][0]["candidate_media_truncated"] is False
     assert [item["asset_id"] for item in result["workspace_media"]] == [
         "first-frame",
         "video-output",
+        "video-output-2",
     ]
     assert result["workspace_media_truncated"] is False
     assert result["operation_summary"] == [
@@ -407,6 +433,7 @@ def test_production_detail_uses_strict_readers_and_returns_only_whitelisted_data
     ]
     assert set(result["_media"]) == {
         result["attempts"][0]["first_frame_media"]["token"],
+        result["attempts"][0]["candidate_media_items"][0]["media"]["token"],
         result["attempts"][0]["candidate_media"]["token"],
     }
     serialized_public = json.dumps({key: value for key, value in result.items() if key != "_media"})

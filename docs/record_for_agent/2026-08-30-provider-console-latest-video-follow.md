@@ -8,6 +8,14 @@ learning_eligibility: ineligible
 
 Date: 2026-08-30
 
+## Supersession Notice — 2026-09-05
+
+本记录的 workspace-first/default selected-workspace UI 与按来源分开的 follow state 已由
+`2026-09-05-ai-video-video-library-browsing-and-comparison.md` 的统一视频库实施替换。当前浏览
+以 exact 内容 identity pin，手动选择退出跟随，所有来源共用筛选；后台刷新不再选中其他 workspace。
+旧媒体 reader、transport、来源 authority 与 explicit follow 的安全边界继续有效。实现与本机验收
+见 `docs/v0.2-runtime-baseline.md`；下文保留当时的故障与修复证据。
+
 ## Supersession Notice — 2026-08-30
 
 下方 `Evidence And Scope Boundaries` 中 loose `runs/*/outputs/*.mp4` 不进入 canonical Runs auto-follow 的结论仍然成立，

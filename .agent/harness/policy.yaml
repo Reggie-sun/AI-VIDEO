@@ -238,7 +238,7 @@ checks:
     cwd: .
     description: Verify bounded local-only runs discovery, canonical read projection, exact media indexing, sanitization, and no-write contracts.
   provider_console_node_tests:
-    argv: [node, --test, provider-console/tests/runs-api.test.mjs, provider-console/tests/external-media.test.mjs, provider-console/tests/continuity-review-contract.test.mjs, provider-console/tests/continuity-review.test.mjs]
+    argv: [node, --test, provider-console/tests/runs-api.test.mjs, provider-console/tests/external-media.test.mjs, provider-console/tests/continuity-review-contract.test.mjs, provider-console/tests/continuity-review.test.mjs, provider-console/tests/library-contract.test.mjs, provider-console/tests/library-browser.test.mjs, provider-console/tests/library-media.test.mjs]
     cwd: .
     npm_workspace_dependency_paths: [provider-console/node_modules]
     description: Verify the loopback-only runs/external-media bridge, exact-bound human decision authoring, opaque media tokens, and descriptor-bound media reads.
@@ -863,6 +863,7 @@ categories:
       - provider-console/scripts/runs-api.mjs
       - provider-console/tests/external-media.test.mjs
       - provider-console/tests/runs-api.test.mjs
+      - provider-console/tests/library-media.test.mjs
     check_ids:
       - provider_console_python_tests
       - provider_console_node_tests
@@ -876,6 +877,8 @@ categories:
       - task_architecture_gate
   provider_console_web_tests:
     patterns:
+      - provider-console/tests/library-contract.test.mjs
+      - provider-console/tests/library-browser.test.mjs
       - provider-console/tests/continuity-review-contract.test.mjs
       - provider-console/tests/continuity-review.test.mjs
     check_ids:

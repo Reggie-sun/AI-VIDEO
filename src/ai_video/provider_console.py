@@ -489,6 +489,34 @@ def _input_bindings_projection(
     return projected, False
 
 
+def _candidate_media_items_projection(
+    *,
+    workspace: str,
+    candidate_asset_ids: tuple[str, ...],
+    assets: dict[str, object],
+    asset_paths: dict[str, Path],
+    root: Path,
+    media_map: dict[str, dict[str, object]],
+) -> tuple[list[dict[str, object]], bool]:
+    projected: list[dict[str, object]] = []
+    for asset_id in candidate_asset_ids:
+        if len(projected) >= _MAX_WORKSPACE_MEDIA:
+            return projected, True
+        media = _media_projection(
+            workspace=workspace,
+            asset=_asset_by_id(assets, asset_id),
+            asset_paths=asset_paths,
+            root=root,
+            media_map=media_map,
+        )
+        projected.append({
+            "role": "candidate",
+            "asset_id": asset_id,
+            "media": media,
+        })
+    return projected, False
+
+
 def _workspace_media_projection(
     *,
     workspace: str,
@@ -607,6 +635,14 @@ def _production_detail(
         candidate_asset = _asset_by_id(
             assets, candidate_ids[-1] if candidate_ids else None
         )
+        candidate_media_items, candidate_media_truncated = _candidate_media_items_projection(
+            workspace=workspace,
+            candidate_asset_ids=candidate_ids,
+            assets=assets,
+            asset_paths=loaded.asset_paths,
+            root=loaded.root,
+            media_map=media_map,
+        )
         fetched_media = _fetched_media_projection(
             workspace=workspace,
             attempt_id=attempt.attempt_id,
@@ -665,6 +701,8 @@ def _production_detail(
                     workspace=workspace, asset=candidate_asset, asset_paths=loaded.asset_paths,
                     root=loaded.root, media_map=media_map,
                 ),
+                "candidate_media_items": candidate_media_items,
+                "candidate_media_truncated": candidate_media_truncated,
                 "fetched_media": fetched_media,
                 "continuity_review_eligible": continuity_review_eligible(
                     attempt, request, getattr(loaded.manifest, "active_qa_policy", None)

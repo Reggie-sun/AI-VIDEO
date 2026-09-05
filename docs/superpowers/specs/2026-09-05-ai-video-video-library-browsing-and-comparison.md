@@ -1,7 +1,7 @@
 # AI-VIDEO Video Library Browsing And Comparison
 
 Date: 2026-09-05
-Status: Proposed specification; product direction confirmed, implementation not started.
+Status: Implemented locally; current verification and limits are recorded in the runtime baseline.
 Scope: Existing Provider Console local read-only browsing surface.
 
 ## Goal
@@ -9,8 +9,8 @@ Scope: Existing Provider Console local read-only browsing surface.
 默认体验以浏览、播放与比较视频为中心。用户无需理解 `runs/`、Production fetch layout 或
 Provider lifecycle，即可找到已有视频；生成排障与证据仍可从详情进入。
 
-本轮只交付轻量 spec，不包含 implementation plan、代码修改、媒体生成或 Production mutation。
-下文是 target contract，不代表当前页面已经实现，也不构成新 execution gateway 的授权。
+初始 checkpoint 只交付轻量 spec。后续用户明确要求实施，现已在既有只读 Console 实现下方
+contract；本次仍不包含媒体生成、Production mutation 或新的 execution gateway。
 
 ## Current Evidence And Problem
 
@@ -125,7 +125,7 @@ Provider lifecycle，即可找到已有视频；生成排障与证据仍可从�
   [Runs integration spec](2026-08-22-ai-video-provider-console-runs-integration.md) 的
   workspace-first/default selected-workspace 展示方式；旧 spec 的 reader、transport 和安全边界继续有效。
   [Execution control spec](2026-08-22-ai-video-provider-console-execution-control.md) 的 mutation scope
-  不由本 spec 激活或变更。当前 baseline/roadmap 不提前写成已实现。
+  不由本 spec 激活或变更。实现与验证范围由 current runtime baseline 记录。
 
 ## Acceptance Criteria
 
@@ -151,4 +151,4 @@ Provider lifecycle，即可找到已有视频；生成排障与证据仍可从�
 - Browser QA 检查桌面与窄屏，包含键盘选择/焦点及两个 unequal-duration 视频的手动比较。
   mock/unit/build/Harness 不能替代真实页面验收，也不能证明媒体质量。
 - 代码实施完成才更新相应 current-runtime owner，运行 exact snapshot 的 policy-required checks，
-  获取 fresh receipt，并接受独立 review。当前 docs-only checkpoint 仅验证文档及其 policy checks。
+  获取 fresh receipt，并接受独立 review。初始 docs-only checkpoint 的证据仅限文档及其 policy checks。

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import React, { useEffect, useId, useRef, useState } from "react";
 import {
   ArrowSquareOut,
   ArrowsClockwise,
@@ -29,35 +29,13 @@ import {
   shotForAttempt,
 } from "./run-detail-contract.js";
 import {
-  attachRunsMediaIndex,
-  externalDisplayMetadata,
-  externalGroupTitle,
-  externalMediaUrl,
-  externalStatus,
-  groupMatchesEvidenceFilter,
-  groupMatchesQuery,
-  groupMatchesSource,
-  preferredExternalLocation,
-  readExternalCatalogResponse,
-  runsMediaContextNotice,
-  sortExternalGroupsNewest,
-  sourceLabel,
+  externalDisplayMetadata, externalGroupTitle, externalMediaUrl,
+  externalStatus, preferredExternalLocation, sourceLabel,
 } from "./external-media-contract.js";
 import { AudibleVideo } from "./media-player.jsx";
-import { useLibraryLiveUpdates } from "./library-live-updates.js";
-import {
-  createLatestRequestGuard,
-  createWorkspaceSelectionGuard,
-  libraryLiveStatus,
-  refreshOrder,
-  refreshSelectionKey,
-  selectionTracksNewest,
-  sortAttemptsNewest,
-  sortVideoWorkspacesNewest,
-} from "./library-refresh-contract.js";
+import { LibraryBrowser } from "./library-browser.jsx";
 import { ExternalShotBreakdown, ProjectShotBreakdown } from "./shot-breakdown.jsx";
 import { shotTiming } from "./shot-time-contract.js";
-import { VideoLibraryRail } from "./video-library-rail.jsx";
 
 const NAV_ITEMS = [
   ["projects", "项目", FolderSimple],
@@ -72,10 +50,6 @@ const NAV_ITEMS = [
 
 function text(value, fallback = "—") {
   return value === undefined || value === null || value === "" ? fallback : String(value);
-}
-
-function requestsCanCommit(selectionGuard, selectionToken, requestGuard, requestToken) {
-  return selectionGuard.canCommit(selectionToken) && requestGuard.canCommit(requestToken);
 }
 
 function formatTime(value) {
@@ -265,10 +239,10 @@ function ModeInputPanel({ attempt }) {
   );
 }
 
-function MediaCard({ attempt }) {
+function MediaCard({ attempt, hidePlayer = false }) {
   const media = attempt?.candidate_media || attempt?.fetched_media || attempt?.output_media || attempt?.video_media;
   const state = outputState(attempt);
-  return <div className="attempt-media"><ModeInputPanel attempt={attempt} /><div className="output-media"><span>生成视频</span><OutputMediaCard media={media} state={state} /></div></div>;
+  return <div className="attempt-media"><ModeInputPanel attempt={attempt} />{!hidePlayer && <div className="output-media"><span>生成视频</span><OutputMediaCard media={media} state={state} /></div>}</div>;
 }
 
 function WorkspaceMediaThumb({ item }) {
@@ -338,7 +312,7 @@ function WorkspaceOverview({ detail, projectShotsContent }) {
   );
 }
 
-function DetailPane({ detail, attempt, onEvidence, continuityContent, projectShotsContent }) {
+function DetailPane({ detail, attempt, onEvidence, continuityContent, projectShotsContent, hidePlayer = false }) {
   const provider = providerOf(attempt);
   const output = outputOf(attempt);
   const shot = shotForAttempt(detail, attempt);
@@ -361,7 +335,7 @@ function DetailPane({ detail, attempt, onEvidence, continuityContent, projectSho
           <ol className="sequence-list">
             <li className="sequence-step"><div className="sequence-marker sequence-marker--ready"><StatusIcon tone="ready" size={24} /><span className="sequence-line" /></div><div className="sequence-content"><div className="sequence-title-row"><h4>1. 工作区已严格打开</h4><span className="ready-tag">只读</span></div><p className="step-description">{detail.workspace} · Manifest revision {text(detail.manifest_revision || detail.manifest?.revision)}</p></div></li>
             <li className="sequence-step sequence-step--storyboard"><div className={`sequence-marker sequence-marker--${shot.snapshot_available === false ? "gated" : "ready"}`}><StatusIcon tone={shot.snapshot_available === false ? "gated" : "ready"} size={24} /><span className="sequence-line" /></div><div className="sequence-content"><div className="sequence-title-row"><h4>2. 生成当时的 Shot 分镜</h4><span className={`ready-tag ready-tag--${shot.snapshot_available === false ? "gated" : "ready"}`}>{shot.snapshot_available === false ? "历史快照不可用" : "Exact snapshot"}</span></div><p className="step-description">Target Shot：{shot.shot_id || shot.id || attempt?.target_shot_id || "—"}</p><ShotStoryboard shot={shot} attempt={attempt} /></div></li>
-            <li className="sequence-step sequence-step--media"><div className={`sequence-marker sequence-marker--${mediaState.tone}`}><StatusIcon tone={mediaState.tone} size={24} /><span className="sequence-line" /></div><div className="sequence-content"><div className="sequence-title-row"><h4>3. 实际提交 Prompt 与视频</h4><span className={`ready-tag ready-tag--${mediaState.tone}`}>{mediaState.label}</span></div><MediaCard attempt={attempt} /></div></li>
+            <li className="sequence-step sequence-step--media"><div className={`sequence-marker sequence-marker--${mediaState.tone}`}><StatusIcon tone={mediaState.tone} size={24} /><span className="sequence-line" /></div><div className="sequence-content"><div className="sequence-title-row"><h4>3. 实际提交 Prompt 与视频</h4><span className={`ready-tag ready-tag--${mediaState.tone}`}>{mediaState.label}</span></div><MediaCard attempt={attempt} hidePlayer={hidePlayer} /></div></li>
             <li className="sequence-step"><div className={`sequence-marker sequence-marker--${tone}`}><StatusIcon tone={tone} size={24} /></div><div className="sequence-content"><div className="sequence-title-row"><h4>4. Attempt lifecycle</h4><span className={`ready-tag ready-tag--${tone}`}>{outcome.label}</span></div><p className="step-description">Raw status：{attempt?.status || "—"} · phase：{attempt?.phase || "—"}{attempt?.error_code ? ` · error code：${attempt.error_code}` : ""}</p><div className={`intent-box intent-box--${tone}`}><Info size={20} /><div><strong>状态不等于质量验收</strong><p>“成功”只表示该 lifecycle 已成功结束；fetched video、candidate、QA acceptance 与 activation 会分别标注。控制台不会推进任何状态。</p></div></div></div></li>
           </ol>
           {continuityContent}
@@ -390,6 +364,7 @@ export function RunsAttemptView({
   onSelectAttempt,
   onEvidence,
   continuityContent,
+  hidePlayer = false,
 }) {
   const projectShotsContent = (
     <ProjectShotBreakdown
@@ -407,6 +382,7 @@ export function RunsAttemptView({
         onEvidence={onEvidence}
         continuityContent={continuityContent}
         projectShotsContent={projectShotsContent}
+        hidePlayer={hidePlayer}
       />
     </>
   );
@@ -437,26 +413,7 @@ function formatBytes(value) {
   return `${numeric} bytes`;
 }
 
-function ExternalSummary({ group, sources }) {
-  const location = preferredExternalLocation(group);
-  const source = sources.find((item) => item.id === location?.source_id);
-  const status = externalStatus(group);
-  const metadata = externalDisplayMetadata(group);
-  const compositionShotCount = group.composition?.ordered_shots?.length || 0;
-  const typeLabel = compositionShotCount ? "Shot 信息" : metadata.generation_type ? "生成类型" : metadata.shot_type ? "Shot 类型" : "生成类型";
-  const typeValue = compositionShotCount ? `同目录 Shot 计划 · ${compositionShotCount}` : (metadata.generation_type || metadata.shot_type || "NOT_EVALUATED");
-  return (
-    <header className="shot-summary external-summary">
-      <div className="summary-project external-summary-title"><div><span>外部媒体</span><strong title={externalGroupTitle(group)}>{externalGroupTitle(group)}</strong></div></div>
-      <div className="summary-field"><span>首选来源</span><strong>{sourceLabel(source, location?.source_label)}</strong></div>
-      <div className="summary-field summary-field--wide"><span>{typeLabel}</span><strong>{typeValue}</strong></div>
-      <div className={`summary-field summary-field--${status.tone}`}><span>生成状态</span><strong>{status.label}</strong></div>
-      <div className="summary-field summary-field--updated"><span>文件时间</span><strong>{formatTime(group.modified_at || location?.modified_at)}</strong></div>
-    </header>
-  );
-}
-
-export function ExternalMediaDetail({ group, sources }) {
+export function ExternalMediaDetail({ group, sources, hidePlayer = false }) {
   const url = externalMediaUrl(group);
   const status = externalStatus(group);
   const metadata = externalDisplayMetadata(group);
@@ -474,9 +431,9 @@ export function ExternalMediaDetail({ group, sources }) {
             <div><span>External Media Evidence</span><h1>同一视频的可验证信息</h1><p>按 exact SHA-256 合并重复文件；来源与 sidecar 证据保留，但不冒充 Production lifecycle。</p></div>
             <span className="external-proof-badge">NON-CANONICAL</span>
           </header>
-          <div className="external-preview-wrap">
+          {!hidePlayer && <div className="external-preview-wrap">
             {url ? <AudibleVideo src={url} preload="metadata" aria-label={`外部视频 ${externalGroupTitle(group)}`} /> : <div className="media-empty"><FilmStrip size={28} /><p>该文件当前无法安全预览。</p></div>}
-          </div>
+          </div>}
           <section className={`external-status-callout external-status-callout--${status.tone}`}>
             <StatusIcon tone={status.tone} size={21} />
             <div><strong>{status.label}</strong><p>{status.ambiguous ? "同一视频 bytes 关联到互相冲突的 exact evidence；不会选择最新记录或猜测语义。" : status.evaluated ? "状态来自受支持且经 exact identity 绑定的证据链；它不是 Manifest attempt、candidate 或质量验收。" : metadata.source === "runs_exact_sha" ? "Prompt、生成类型与可用的 Shot snapshot 来自 canonical Runs 的 exact SHA-256 + bytes 关联；External generation status 仍保持 NOT_EVALUATED。" : status.raw === "INCOMPLETE_RUNS_CONTEXT" ? "Runs context 正在加载、当前不可用或部分 workspace 无法严格重开；该视频没有已确认 match，但不能据此断言完全没有绑定。" : status.evidence_state === "unparsed" ? "已找到 exact-bound evidence ref，但 schema 或完整关联链尚未支持，因此不会解释其中的 Prompt、Shot 或状态。" : status.evidence_state === "linked" ? "Prompt 或类型来自受支持且与 exact bytes 绑定的 metadata；没有 direct Shot ID 时只显示 Prompt/type，不从内容反推 canonical 分镜。生成状态仍保持 NOT_EVALUATED。" : "没有找到语义受支持且与 exact bytes 绑定的生成记录，因此不会把文件名或文件存在解释为 Prompt、Shot 或成功状态。"}</p></div>
@@ -528,10 +485,6 @@ export function ExternalMediaDetail({ group, sources }) {
   );
 }
 
-function EmptyState({ title, detail, retry }) {
-  return <section className="console-state"><WarningCircle size={36} /><h1>{title}</h1><p>{detail}</p>{retry && <button type="button" onClick={retry}><ArrowsClockwise size={17} />重新读取</button>}</section>;
-}
-
 function EvidenceDialog({ open, detail, attempt, onClose }) {
   const titleId = useId();
   const closeRef = useRef(null);
@@ -565,384 +518,41 @@ function EvidenceDialog({ open, detail, attempt, onClose }) {
   );
 }
 
-export function App() {
-  const [activeSurface, setActiveSurface] = useState("runs");
-  const [catalog, setCatalog] = useState([]);
-  const [workspace, setWorkspace] = useState("");
-  const [detail, setDetail] = useState(null);
-  const [selectedId, setSelectedId] = useState("");
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+function RecordDetail({ detail, selectedId, onSelect, hidePlayer = false }) {
   const [evidenceOpen, setEvidenceOpen] = useState(false);
-  const [continuityProjection, setContinuityProjection] = useState(null);
-  const [continuityLoading, setContinuityLoading] = useState(false);
-  const [continuityError, setContinuityError] = useState("");
-  const [externalCatalog, setExternalCatalog] = useState(null);
-  const [externalSelectedSha, setExternalSelectedSha] = useState("");
-  const [selectedSource, setSelectedSource] = useState("all");
-  const [externalQuery, setExternalQuery] = useState("");
-  const [externalEvidenceFilter, setExternalEvidenceFilter] = useState("linked");
-  const [externalLoading, setExternalLoading] = useState(false);
-  const [externalError, setExternalError] = useState("");
-  const [runsMediaIndex, setRunsMediaIndex] = useState(null);
-  const [runsContextLoading, setRunsContextLoading] = useState(false);
-  const [runsContextError, setRunsContextError] = useState("");
-  const continuityRequestEpoch = useRef(0);
-  const workspaceRef = useRef("");
-  const workspaceSelectionGuard = useRef(null);
-  const detailRequestGuard = useRef(null);
-  const runsContextRequestGuard = useRef(null);
-  const runsFollowLatest = useRef(true);
-  const externalFollowLatest = useRef(true);
-  if (!workspaceSelectionGuard.current) workspaceSelectionGuard.current = createWorkspaceSelectionGuard();
-  if (!detailRequestGuard.current) detailRequestGuard.current = createLatestRequestGuard();
-  if (!runsContextRequestGuard.current) runsContextRequestGuard.current = createLatestRequestGuard();
-  const runsRefreshInFlight = useRef(false);
-  const runsRefreshQueued = useRef(false);
-  const externalRefreshInFlight = useRef(false);
-  const externalRefreshQueued = useRef(false);
-  const externalForceRefreshQueued = useRef(false);
-
-  const loadDetail = useCallback(async (key, { selectionToken, requestToken } = {}) => {
-    const response = await fetch(`/api/runs/detail?workspace=${encodeURIComponent(key)}`, { cache: "no-store" });
-    const body = await response.json();
-    if (!requestsCanCommit(workspaceSelectionGuard.current, selectionToken, detailRequestGuard.current, requestToken)) return null;
-    if (!response.ok || body?.status === "invalid" || body?.error) {
-      const message = body?.error?.message || body?.message || "工作区 strict reopen 失败。";
-      const code = body?.error?.code;
-      throw new Error(code ? `${message} · ${code}` : message);
-    }
-    workspaceRef.current = key;
-    setWorkspace(key);
-    setDetail(body);
-    const attempts = sortAttemptsNewest(body.attempts || body.video_generation_attempts || []);
-    setSelectedId((current) => refreshSelectionKey({
-      items: attempts,
-      currentKey: current,
-      followLatest: runsFollowLatest.current,
-      keyOf: (item) => attemptId(item, 0),
-    }));
-    return body;
-  }, []);
-
-  const refresh = useCallback(async () => {
-    if (runsRefreshInFlight.current) {
-      runsRefreshQueued.current = true;
-      return;
-    }
-    runsRefreshInFlight.current = true;
-    setLoading(true);
-    let selectionToken = workspaceSelectionGuard.current.snapshot();
-    let requestToken = detailRequestGuard.current.snapshot();
-    try {
-      do {
-        selectionToken = workspaceSelectionGuard.current.snapshot();
-        requestToken = detailRequestGuard.current.beginRequest();
-        runsRefreshQueued.current = false;
-        setError(null);
-        try {
-          const response = await fetch("/api/runs", { cache: "no-store" });
-          const body = await response.json();
-          if (!response.ok) throw new Error(body?.error?.message || "本地 runs 数据源不可用。");
-          const items = body.workspaces || body.items || [];
-          setCatalog(items);
-          if (!workspaceSelectionGuard.current.canCommit(selectionToken)) continue;
-          if (!items.length) {
-            workspaceRef.current = "";
-            setWorkspace("");
-            setDetail(null);
-            continue;
-          }
-          const current = workspaceRef.current;
-          const videoWorkspaces = sortVideoWorkspacesNewest(items);
-          const videoWorkspaceKeys = new Set(videoWorkspaces.map((item) => item.workspace));
-          const newestFirst = [
-            ...videoWorkspaces,
-            ...items.filter((item) => !videoWorkspaceKeys.has(item.workspace)),
-          ];
-          const ordered = refreshOrder({
-            items: newestFirst,
-            currentKey: current,
-            followLatest: runsFollowLatest.current,
-            keyOf: (item) => item.workspace,
-          });
-          let lastError;
-          for (const item of ordered) {
-            try {
-              const loaded = await loadDetail(item.workspace, { selectionToken, requestToken });
-              if (!loaded) break;
-              if (
-                runsFollowLatest.current
-                && videoWorkspaceKeys.has(item.workspace)
-                && !(loaded.attempts || loaded.video_generation_attempts || []).length
-              ) continue;
-              lastError = null;
-              break;
-            } catch (cause) {
-              if (!workspaceSelectionGuard.current.canCommit(selectionToken)) break;
-              lastError = cause;
-            }
-          }
-          if (!workspaceSelectionGuard.current.canCommit(selectionToken)) continue;
-          if (lastError) throw lastError;
-        } catch (cause) {
-          if (!workspaceSelectionGuard.current.canCommit(selectionToken)) continue;
-          setDetail(null);
-          setError(cause instanceof Error ? cause.message : "本地 runs 数据源不可用。");
-        }
-      } while (runsRefreshQueued.current);
-    } finally {
-      runsRefreshInFlight.current = false;
-      if (requestsCanCommit(workspaceSelectionGuard.current, selectionToken, detailRequestGuard.current, requestToken)) setLoading(false);
-    }
-  }, [loadDetail]);
-
-  const selectWorkspace = useCallback(async (key) => {
-    const selectionToken = workspaceSelectionGuard.current.beginSelection();
-    const requestToken = detailRequestGuard.current.beginRequest();
-    workspaceRef.current = key;
-    setSelectedId("");
-    setLoading(true);
-    setError(null);
-    try {
-      await loadDetail(key, { selectionToken, requestToken });
-    } catch (cause) {
-      if (!requestsCanCommit(workspaceSelectionGuard.current, selectionToken, detailRequestGuard.current, requestToken)) return;
-      workspaceRef.current = key;
-      setDetail(null);
-      setWorkspace(key);
-      setError(cause instanceof Error ? cause.message : "工作区无法打开。");
-    } finally {
-      if (requestsCanCommit(workspaceSelectionGuard.current, selectionToken, detailRequestGuard.current, requestToken)) setLoading(false);
-    }
-  }, [loadDetail]);
-
-  useEffect(() => { refresh(); }, [refresh]);
-
-  const attempts = useMemo(
-    () => sortAttemptsNewest(detail?.attempts || detail?.video_generation_attempts || []),
-    [detail],
-  );
-  const attempt = useMemo(() => attempts.find((item, index) => attemptId(item, index) === selectedId) || attempts[0], [attempts, selectedId]);
-  const continuityEligible = attempt?.continuity_review_eligible === true;
-
-  const loadContinuityReview = useCallback(async () => {
-    const epoch = ++continuityRequestEpoch.current;
-    if (!continuityEligible || !workspace || !attempt) {
-      setContinuityProjection(null);
-      setContinuityError("");
-      setContinuityLoading(false);
-      return;
-    }
-    setContinuityLoading(true);
-    setContinuityError("");
-    setContinuityProjection(null);
-    try {
+  const [review, setReview] = useState(null);
+  const [reviewError, setReviewError] = useState("");
+  const attempt = (detail.attempts || []).find((item, index) => attemptId(item, index) === selectedId);
+  useEffect(() => {
+    const controller = new AbortController();
+    setReview(null);
+    setReviewError("");
+    if (attempt?.continuity_review_eligible) {
       const id = attemptId(attempt, 0);
-      const response = await fetch(
-        `/api/runs/continuity-review?workspace=${encodeURIComponent(workspace)}&attempt=${encodeURIComponent(id)}`,
-        { cache: "no-store" },
-      );
-      const body = await response.json();
-      if (!response.ok || body?.error) throw new Error(body?.error?.message || "continuity review 投影不可用。");
-      if (!projectionMatchesTarget(body, workspace, id)) throw new Error("continuity review 投影已过期。");
-      if (epoch !== continuityRequestEpoch.current) return;
-      setContinuityProjection(body);
-    } catch (cause) {
-      if (epoch !== continuityRequestEpoch.current) return;
-      setContinuityProjection(null);
-      setContinuityError(cause instanceof Error ? cause.message : "continuity review 投影不可用。");
-    } finally {
-      if (epoch === continuityRequestEpoch.current) setContinuityLoading(false);
+      fetch(`/api/runs/continuity-review?workspace=${encodeURIComponent(detail.workspace)}&attempt=${encodeURIComponent(id)}`, { cache: "no-store", signal: controller.signal })
+        .then(async (response) => {
+          const body = await response.json();
+          if (!response.ok || body.error || !projectionMatchesTarget(body, detail.workspace, id)) throw new Error(body.error?.message || "continuity review 投影不可用或已过期");
+          if (!controller.signal.aborted) setReview(body);
+        }).catch((error) => { if (!controller.signal.aborted) setReviewError(error.message); });
     }
-  }, [attempt, continuityEligible, workspace]);
-
-  useEffect(() => { loadContinuityReview(); }, [loadContinuityReview]);
-
-  const refreshExternal = useCallback(async ({ force = false } = {}) => {
-    if (force) externalForceRefreshQueued.current = true;
-    if (externalRefreshInFlight.current) {
-      externalRefreshQueued.current = true;
-      return;
-    }
-    externalRefreshInFlight.current = true;
-    setExternalLoading(true);
-    try {
-      do {
-        externalRefreshQueued.current = false;
-        const forceRequest = externalForceRefreshQueued.current;
-        externalForceRefreshQueued.current = false;
-        try {
-          const response = await fetch(forceRequest ? "/api/external-media?refresh=1" : "/api/external-media", { cache: "no-store" });
-          const body = await readExternalCatalogResponse(response);
-          const groups = body.groups || [];
-          const ordered = sortExternalGroupsNewest(groups);
-          setExternalCatalog(body);
-          setExternalError("");
-          setExternalSelectedSha((current) => refreshSelectionKey({
-            items: ordered,
-            currentKey: current,
-            followLatest: externalFollowLatest.current,
-            keyOf: (item) => item.sha256,
-          }));
-        } catch (cause) {
-          setExternalError(cause instanceof Error ? cause.message : "外部媒体数据源不可用。");
-        }
-      } while (externalRefreshQueued.current);
-    } finally {
-      externalRefreshInFlight.current = false;
-      setExternalLoading(false);
-    }
-  }, []);
-
-  useEffect(() => { refreshExternal(); }, [refreshExternal]);
-  const refreshRunsMediaIndex = useCallback(async () => {
-    const requestToken = runsContextRequestGuard.current.beginRequest();
-    setRunsMediaIndex(null);
-    setRunsContextLoading(true);
-    try {
-      const response = await fetch("/api/runs/media-context-index", { cache: "no-store" });
-      const body = await response.json();
-      if (!response.ok || body?.error) throw new Error(body?.error?.message || "Runs exact media context 当前不可用。");
-      if (!runsContextRequestGuard.current.canCommit(requestToken)) return;
-      setRunsMediaIndex(body);
-      setRunsContextError(runsMediaContextNotice(body));
-    } catch (cause) {
-      if (!runsContextRequestGuard.current.canCommit(requestToken)) return;
-      setRunsMediaIndex(null);
-      setRunsContextError(cause instanceof Error ? cause.message : "Runs exact media context 当前不可用。");
-    } finally {
-      if (runsContextRequestGuard.current.canCommit(requestToken)) setRunsContextLoading(false);
-    }
-  }, []);
-  useEffect(() => { refreshRunsMediaIndex(); }, [refreshRunsMediaIndex]);
-  const refreshRunsAndContext = useCallback(async () => {
-    await Promise.all([refresh(), refreshRunsMediaIndex()]);
-  }, [refresh, refreshRunsMediaIndex]);
-  const liveConnection = useLibraryLiveUpdates({ refreshRuns: refreshRunsAndContext, refreshExternal });
-  const enrichedExternalCatalog = useMemo(
-    () => attachRunsMediaIndex(externalCatalog, runsMediaIndex),
-    [externalCatalog, runsMediaIndex],
-  );
-
-  const visibleExternalGroups = sortExternalGroupsNewest(
-    (enrichedExternalCatalog?.groups || [])
-      .filter((group) => selectedSource !== "runs" && groupMatchesSource(group, selectedSource))
-      .filter((group) => groupMatchesEvidenceFilter(group, externalEvidenceFilter))
-      .filter((group) => groupMatchesQuery(group, externalQuery)),
-    selectedSource,
-  );
-  const externalGroup = visibleExternalGroups.find((group) => group.sha256 === externalSelectedSha)
-    || visibleExternalGroups[0];
-  const refreshFailed = selectedSource === "runs"
-    ? Boolean(error)
-    : selectedSource === "all" ? Boolean(error || externalError) : Boolean(externalError);
-  const liveStatus = libraryLiveStatus({
-    connectionState: liveConnection.state,
-    expectedSources: liveConnection.expectedSources,
-    watchedSources: liveConnection.watchedSources,
-    selectedSource,
-    refreshFailed,
-  });
-
-  const selectSource = useCallback((sourceId) => {
-    setSelectedSource(sourceId);
-    setExternalQuery("");
-    setEvidenceOpen(false);
-    if (sourceId === "runs" || sourceId === "all") {
-      runsFollowLatest.current = true;
-      setActiveSurface("runs");
-      void refresh();
-      return;
-    }
-    externalFollowLatest.current = true;
-    const groups = sortExternalGroupsNewest(
-      (enrichedExternalCatalog?.groups || [])
-        .filter((group) => groupMatchesSource(group, sourceId))
-        .filter((group) => groupMatchesEvidenceFilter(group, externalEvidenceFilter)),
-      sourceId,
-    );
-    setExternalSelectedSha(groups[0]?.sha256 || "");
-    setActiveSurface("external");
-  }, [enrichedExternalCatalog, externalEvidenceFilter, refresh]);
-
-  const selectAttempt = useCallback((id) => {
-    workspaceSelectionGuard.current.beginSelection();
-    runsFollowLatest.current = selectionTracksNewest({
-      items: sortVideoWorkspacesNewest(catalog),
-      selectedKey: workspace,
-      keyOf: (item) => item.workspace,
-    }) && selectionTracksNewest({
-      items: attempts,
-      selectedKey: id,
-      keyOf: (item) => attemptId(item, 0),
-    });
-    setSelectedId(id);
-    setLoading(false);
-    setActiveSurface("runs");
-    setEvidenceOpen(false);
-  }, [attempts, catalog, workspace]);
-
-  const selectExternal = useCallback((sha256) => {
-    externalFollowLatest.current = selectionTracksNewest({
-      items: visibleExternalGroups,
-      selectedKey: sha256,
-      keyOf: (item) => item.sha256,
-    });
-    setExternalSelectedSha(sha256);
-    setActiveSurface("external");
-    setEvidenceOpen(false);
-  }, [visibleExternalGroups]);
-
-  const selectWorkspaceAndShowRuns = useCallback(async (key) => {
-    runsFollowLatest.current = selectionTracksNewest({
-      items: sortVideoWorkspacesNewest(catalog),
-      selectedKey: key,
-      keyOf: (item) => item.workspace,
-    });
-    setSelectedSource("runs");
-    setActiveSurface("runs");
-    await selectWorkspace(key);
-  }, [catalog, selectWorkspace]);
-
-  const refreshSelectedSource = useCallback(async () => {
-    if (selectedSource === "runs") await refreshRunsAndContext();
-    else if (selectedSource === "all") await Promise.all([refreshRunsAndContext(), refreshExternal({ force: true })]);
-    else await refreshExternal({ force: true });
-  }, [refreshExternal, refreshRunsAndContext, selectedSource]);
-
-  const continuityContent = (
-    <>
-      {continuityEligible && continuityLoading && <section className="continuity-review-loading" aria-live="polite">正在严格打开 continuity review request…</section>}
-      {continuityEligible && continuityError && <section className="continuity-review-error"><WarningCircle size={20} weight="fill" /><div><strong>Human continuity review 不可用</strong><p>{continuityError}</p><button type="button" onClick={loadContinuityReview}>重新读取</button></div></section>}
-      {continuityProjection && <ContinuityReviewPanel key={continuityProjection.review_request.content_hash} projection={continuityProjection} />}
-    </>
-  );
-
-  let runsContent;
-  if (loading && !detail) runsContent = <EmptyState title="正在读取 runs" detail="正在通过 canonical reader 打开本机工作区…" />;
-  else if (error) runsContent = <EmptyState title="工作区不可用" detail={error} retry={refresh} />;
-  else if (!detail) runsContent = <EmptyState title="没有 runs 工作区" detail="repository/runs 下没有可读取的 Production 或 Legacy 工作区。" retry={refresh} />;
-  else if (!attempt) runsContent = <RunsWorkspaceView detail={detail} selectedAttemptId={selectedId} onSelectAttempt={selectAttempt} />;
-  else runsContent = <RunsAttemptView detail={detail} attempt={attempt} selectedAttemptId={selectedId} onSelectAttempt={selectAttempt} onEvidence={() => setEvidenceOpen(true)} continuityContent={continuityContent} />;
-
-  let externalContent;
-  if (externalLoading && !externalCatalog) externalContent = <EmptyState title="正在扫描外部视频" detail="正在计算 exact SHA 并读取直接绑定的 JSON evidence…" />;
-  else if (externalError && !externalCatalog) externalContent = <EmptyState title="外部媒体不可用" detail={externalError} retry={refreshExternal} />;
-  else if (!externalGroup && (externalCatalog?.groups || []).length > 0) externalContent = <EmptyState title="没有符合筛选的视频" detail="请调整视频来源、证据状态或搜索条件。" />;
-  else if (!externalGroup) externalContent = <EmptyState title="没有外部视频" detail="当前 server allowlist 中没有可读取的常规视频文件。" retry={refreshExternal} />;
-  else externalContent = <>{externalError && <section className="catalog-stale-warning" role="status"><WarningCircle size={18} weight="fill" /><div><strong>外部视频刷新失败，当前内容可能已过期</strong><p>{externalError}</p></div></section>}<ExternalSummary group={externalGroup} sources={enrichedExternalCatalog?.sources || []} /><ExternalMediaDetail group={externalGroup} sources={enrichedExternalCatalog?.sources || []} /></>;
-
-  return (
-    <div className="app-shell">
-      <Sidebar />
-      <VideoLibraryRail runsCatalog={catalog} workspace={workspace} attempts={attempts} selectedId={selectedId} runsLoading={loading} runsError={error} externalCatalog={enrichedExternalCatalog || {}} selectedSha={externalGroup?.sha256 || externalSelectedSha} selectedSource={selectedSource} query={externalQuery} evidenceFilter={externalEvidenceFilter} externalLoading={externalLoading} externalError={externalError} runsContextLoading={runsContextLoading} runsContextError={runsContextError} activeSurface={activeSurface} liveStatus={liveStatus} onWorkspace={selectWorkspaceAndShowRuns} onSelectAttempt={selectAttempt} onSelectExternal={selectExternal} onSource={selectSource} onQuery={setExternalQuery} onEvidenceFilter={setExternalEvidenceFilter} onRefresh={refreshSelectedSource} />
-      <main className="provider-console">
-        {activeSurface === "external" ? externalContent : runsContent}
-      </main>
-      <EvidenceDialog open={evidenceOpen} detail={detail || {}} attempt={attempt || {}} onClose={() => setEvidenceOpen(false)} />
-    </div>
-  );
+    return () => controller.abort();
+  }, [detail.workspace, attempt]);
+  return <>
+    {attempt ? <RunsAttemptView detail={detail} attempt={attempt} selectedAttemptId={selectedId} onSelectAttempt={onSelect} onEvidence={() => setEvidenceOpen(true)} hidePlayer={hidePlayer} continuityContent={<>
+      {reviewError && <p role="status">{reviewError}</p>}
+      {review && <ContinuityReviewPanel key={review.review_request.content_hash} projection={review} />}
+    </>} /> : <RunsWorkspaceView detail={detail} selectedAttemptId={selectedId} onSelectAttempt={onSelect} />}
+    <EvidenceDialog open={evidenceOpen} detail={detail} attempt={attempt || {}} onClose={() => setEvidenceOpen(false)} />
+  </>;
 }
 
-export default App;
+export function App() {
+  return <LibraryBrowser sidebar={<Sidebar />}
+    renderRecord={(detail, id, onSelect) => <RecordDetail key={`${detail.workspace}:${id}`} detail={detail} selectedId={id} onSelect={onSelect} />}
+    renderContext={(context) => context.runBinding
+      ? <section><p>Runs exact SHA + bytes 旁证；不表示当前 workspace strict reopen、lifecycle 或质量已通过。</p><ExternalShotBreakdown group={{ run_bindings: [context.runBinding] }} /></section>
+      : context.detail
+      ? <RecordDetail key={context.id} detail={context.detail} selectedId={context.attemptId} onSelect={() => {}} hidePlayer />
+      : <ExternalMediaDetail group={context.group} sources={[]} hidePlayer />} />;
+}

@@ -32,6 +32,12 @@
 | Development Governance Isolation | Codex、`AGENTS.md`、`.agent/`、`.agents/`、`.codex/`、`.workflow/`、Development Verification Harness、Documentation Contract Gate、Architecture Gate 与 developer-only Agent Memory 只拥有开发治理。`src/ai_video/**` Product Runtime 不得 import、执行或依赖这些 artifacts，也不得把 `.workflow/` session 当作 production session。 |
 | Agent Session Fact Domain | 当前没有通用 Product Agent Loop、Tool Registry 或 event-sourced Product Session。未来若引入 Product Agent Session，其 append-only events 只能拥有 model-visible conversation、decision context 与 non-authoritative telemetry；Project、Registry、Manifest、Provider effect、activation、review、repair 与 delivery truth 继续由既有 domain owners 独占。 |
 
+## Provider Console Browsing Surface
+
+| Surface | Primary Owner | Invariants | Forbidden Alternate Path | Focused Verification |
+| --- | --- | --- | --- | --- |
+| Unified Video Library | `provider_console.py` 的 strict detail 与 `provider_console_media_index.py` 的 evidence association；`runs-api.mjs` / `external-media.mjs` 的本机 transport；`library-contract.js` / `library-data.js` / `library-browser.jsx` 的临时浏览状态 | 内容按 SHA-256 + bytes 去重并保留来源和角色；版本只来自 verified workspace/project/Shot identity；所有来源使用同一筛选；手动 pin 不随刷新变化；播放与双视频比较只读，实测值来自 exact 视频解码；请求、预览 decoder 与分页有界。新增 library contract/browser/media Node tests 与现有 bridge checks 共用 `provider_console_node_tests`。 | 裸扫 fetch、第二 catalog/state owner、相似标题推导版本、任取歧义 Prompt/verdict、把播放或旁证提升为 P6/Final Acceptance、刷新期间提前删除有效媒体 cache、远端 fallback、Provider/Manifest mutation。 | `python -m pytest -p no:cacheprovider tests/test_provider_console.py tests/test_provider_console_media_index.py -q`；`node --test provider-console/tests/library-contract.test.mjs provider-console/tests/library-browser.test.mjs provider-console/tests/library-media.test.mjs provider-console/tests/runs-api.test.mjs provider-console/tests/external-media.test.mjs`；offline Vite compile 与 exact snapshot Harness；真实本机 A1–A10/browser QA 另验。 |
+
 ## Development Control Surface
 
 | Surface | Primary Owner | Invariants | Forbidden Alternate Path | Focused Verification |
