@@ -5,11 +5,71 @@ learning_eligibility: eligible
 evidence_index_version: "1"
 ---
 
-# Local H3 Lighthouse 30s Test — Budget Stop
+# Local H3 Lighthouse 30s Test
 
 Date: 2026-09-05
 
-## Current Status
+## Current Checkpoint — Completed Render After One Approved Renewal
+
+用户在原9次预算停止后明确同意：只给最后 Shot06追加1次补拍，通过后合成。原
+`budget.json` bytes未改，新增`budget-renewal-shot-06.json`绑定原hash
+`7855d73bbde634c993bcafadf92ddd44434ab96bba93a40d53708449b1785404`，
+仅对`shot-06-repair-01`开放total10，其他per-Shot/time/GPU/unknown-outcome限制不变。
+原FAIL Gate保留；这不是复用旧permit或重新解释旧attempt。Native reviewer_xhigh限定审查通过。
+
+补拍仅增强原extreme-wide目标的完整塔身/塔基、远处屏幕占比和海岸边界表达；
+small slow backward camera、amber灯和雨夜均保留。新resolved request
+`ccb7306a28874982f144a5aaa891dd6d39e818551dd61d5dcf0a76d887f48277`，
+submit 11:10:32 UTC，succeeded 11:15:42 UTC。MP4
+`84c20601b55bfb74dfd00ea715944bc9aec350607ae0b769b36e506c53fa4cc8`，
+1790565bytes；MCP probe、0–5s抽样和完整AV decode通过。完整塔身与塔基全程入画，
+塔体随拉远缩小，海岸主导画面；原required findings全部PASS。
+“约五分之一”属于构图引导而非精确像素约束，不声称逐帧达到该比例。
+
+六段选择为`shot-01-repair-01, shot-02, shot-03, shot-04-repair-01,
+shot-05-repair-01, shot-06-repair-01`。通过真实import和唯一committer创建final project，
+实际`compose_final.py prepare`与`render`完成，不再只是静态脚本证据。
+`ResolvedTimeline`为720frames/1440000samples，六段各取前120frames，HyperFrames 0.7.103。
+最终canonical render：
+
+```text
+runs/director-h3-lighthouse-30s-20260905-001/final-production/state/render/outputs/3749b1e53c4fe674279b7bf50b8c496b67daa66428569e8f25c77d397c83bd38.mp4
+```
+
+SHA-256与文件名一致，18956501bytes，H.264 High、1344×768（实际7:4）、24fps、720frames；
+video/audio stream durations均30.000s，container duration30.022s包含AAC framing。
+AAC为48kHz stereo。最终MP4完整AV decode通过；显式MCP probe和30张抽帧中的18张
+实看片（时间0至29.021s）确认六个叙事段落、动作完成与收尾均保留，没有用循环/慢放凑时长。
+证据：run下`final-render-result.json`、`final-mcp-probe.json`、
+`final-mcp-frame-review.json`、`final-media-gate.json`及六份`import-*.json`。
+
+P4唯一音轨确实覆盖1440000samples；source HTML六个video均muted，
+canonical mixed WAV hash为`be1d4c6d3cd28dee74ed8362f68e1f2c8e072c46e9263e873a81f9e3c5f7f20a`。
+初次无seek解码与reference零偏移相关度-0.2606；检查first AAC packet发现pts=-1024、
+SkipSamples=1024。仅将验证命令改为`ffmpeg -ss0`按presentation start解码，未改MP4，
+对应波形相关度0.999891498。比对1439744samples；decode尾部少256samples（5.333ms），
+处于最终fade，未比对reference尾峰值0.000244；encoded stream与canonical timeline仍为30s。
+最终RMS -28.46dBFS / peak -13.97dBFS。此为音源路由/编码技术证据，不等于无损PCM一致、
+sample-perfect解码或human听验。详见`final-audio-verification.json`。
+
+Development required technical/sampled-visual Gate为PASS，**human full-speed/listening、
+P6及Final Acceptance未执行**。首尾塔的窗格、栏杆、附属建筑仍有可见差异；
+仅宣称已选定的bounded semantic/color/archetype continuity，不宣称建筑精确一致。
+交付为可供用户观看/听验的30s本地成片。没有更多Provider调用、cloud/paid执行或发布。
+
+续期前做了真实RAG `H3 extreme wide shot scale full subject framing cropped`：
+返回旧三镜头run summary与stale-tagged M6片段，未命中直接可复用的当前T2VA修复配方；
+重开相关run原文，未手动刷新索引。自动`distill-ai-video-learning`仍为`no_candidate`：
+新增补拍与render只扩展同一链，seed混杂未消除，无同范围existing claim可更新，
+不以文档/片段/多proof层数量冒充独立实验。
+
+本次更新使用documentation exact-staged Harness：
+`.agent/harness/runs/h3-lighthouse-30s-final-20260905-v1/receipt.json`。
+记录期间无额外Provider/media/network；保留其他窗口工作，未push/release。
+下方Budget-stop、Audio/Composition和Resume段落均保留为**续期前历史状态**，
+已由本节实际成片证据取代；各旧source FAIL本身仍有效。
+
+## Historical Budget-stop Status
 
 用户要求真实本地 H3 30s 视频。本次封存的 9 次生成全部完成并 fetched，但只完成五个 Shot 的 required Gate：
 `shot-01-repair-01 → shot-02 → shot-03 → shot-04-repair-01 → shot-05-repair-01`。
@@ -68,7 +128,7 @@ perceptual quality、精确跨镜头建筑一致性、P6 或 Final Acceptance。
 Repairs 保持同 profile/mode/duration，但新 exact request 派生了新 seed；
 它们是 evidence-backed bounded attempts，不是固定 seed 的受控因果比较。
 
-## Audio And Composition State
+## Audio And Composition State Before Renewal
 
 用户同意统一后期音轨，所有 source 声明 `GENERATED + REPLACE`，同时请求 native audio=true。
 Raw Gate 只证明 native route 与显式 P4 0–30s coverage 已声明，不证明最终替换已经发生。
@@ -96,7 +156,7 @@ task composer 声明 P4 +6000millidB gain。尚未混入成片，human listening
 本次只有一个六段叙事链，各段目标不同，三次 repair 均混有 seed 变化；
 不能据此提出“增强 prompt 必然修复”或 H3 model-wide quality/continuity 规则。未修改 adoption targets。
 
-## Resume And Verification Boundary
+## Historical Resume And Verification Boundary
 
 如用户选择继续最小补拍，应先显式续封有限预算，仅重做 Shot06：
 让 whole tower、base 与 coast 的可见 endpoints 明确，小尺寸塔体完整入画，保留 backward camera、
@@ -124,3 +184,7 @@ amber lamp 与 rainy coast；新 identity/intent/permit 后完整重验。不得
 | shot-05-media | h3:04014045bb2758574974f1563ef9142763f5a23f10973296e137663d11b8b05b | lighthouse-30s-20260905 | shot-05-video-30s | N/A | 73937df49aaf0977c53e017849891245d957c8390cb61d0a550b6cb6413e1dfd | AGENT_VISUAL | FAIL | OFFSCREEN_ARCHITECTURE | NEW_ATTEMPT | NONE | runs/director-h3-lighthouse-30s-20260905-001/shot-05/media-gate.json |
 | shot-05-repair-01-media | h3:77bf42aeb183f2fadafa884ff18f88d7150dca6a075d10fc2197e0cb00bf9063 | lighthouse-30s-20260905 | shot-05-repair-01-video-30s | N/A | 0fe033bb5189ec4c339e27789fd84763826a90ace7e9daccda740f9021ca8476 | AGENT_VISUAL | PASS | NONE | NEW_ATTEMPT | NONE | runs/director-h3-lighthouse-30s-20260905-001/shot-05-repair-01/media-gate.json |
 | shot-06-media | h3:2d7f875c2b2a2f4948e43c04b5332ce633f5af4ac3237dfe27ba730ced2975c3 | lighthouse-30s-20260905 | shot-06-video-30s | N/A | 272dd8b34ab8f0bd2bbb7a14394ffa708d7e72277f25dd1ef177b527dbb3c861 | AGENT_VISUAL | FAIL | SHOT_SCALE | NEW_ATTEMPT | NONE | runs/director-h3-lighthouse-30s-20260905-001/shot-06/media-gate.json |
+| shot-06-repair-01-media | h3:ccb7306a28874982f144a5aaa891dd6d39e818551dd61d5dcf0a76d887f48277 | lighthouse-30s-20260905 | shot-06-repair-01-video-30s | N/A | 84c20601b55bfb74dfd00ea715944bc9aec350607ae0b769b36e506c53fa4cc8 | AGENT_VISUAL | PASS | NONE | NEW_ATTEMPT | NONE | runs/director-h3-lighthouse-30s-20260905-001/shot-06-repair-01/media-gate.json |
+| final-render-technical | render:86f9f69f61aad5a9eb031a0c20d88deeae6331c38f464feb8860cf899bdb6c5c | lighthouse-30s-composition-20260905 | lighthouse-30s-final-render | N/A | 3749b1e53c4fe674279b7bf50b8c496b67daa66428569e8f25c77d397c83bd38 | RENDER_TECHNICAL | PASS | NONE | NEW_ATTEMPT | NONE | runs/director-h3-lighthouse-30s-20260905-001/final-render-result.json |
+| final-render-media | render:86f9f69f61aad5a9eb031a0c20d88deeae6331c38f464feb8860cf899bdb6c5c | lighthouse-30s-composition-20260905 | lighthouse-30s-final-render | N/A | 3749b1e53c4fe674279b7bf50b8c496b67daa66428569e8f25c77d397c83bd38 | AGENT_VISUAL | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | final-render-technical | runs/director-h3-lighthouse-30s-20260905-001/final-media-gate.json |
+| final-render-human | render:86f9f69f61aad5a9eb031a0c20d88deeae6331c38f464feb8860cf899bdb6c5c | lighthouse-30s-composition-20260905 | lighthouse-30s-final-render | N/A | 3749b1e53c4fe674279b7bf50b8c496b67daa66428569e8f25c77d397c83bd38 | HUMAN | NOT_EVALUATED | HUMAN_REVIEW_PENDING | SAME_EVIDENCE_NEW_PROOF_LAYER | final-render-technical | runs/director-h3-lighthouse-30s-20260905-001/final-media-gate.json |
