@@ -27,6 +27,10 @@ Date: 2026-09-06
 - Exact commit-range Harness：`b304141^..b304141`；Router 契约组 284 passed，neutral requirement 契约组 377 passed，runtime skill boundary 2 passed；架构、文档与 policy audit 通过。测试组有重叠，不累加为独立测试总数。
 - Receipt：`.agent/harness/runs/router-important-character-t2v-20260906/receipt.json`；`verify-receipt` 通过。证据只证明这次离线路由修复，不证明媒体质量。
 
+### Freshness Follow-up
+
+上述代码 receipt 在创建时通过全部 integrity/freshness 检查；记录提交 `84908ff` 的独立文档 Harness 也通过（`.agent/harness/runs/router-important-character-record-20260906/receipt.json`）。随后其他会话的提交连续推进共享 HEAD，旧 receipt 的 `fresh/snapshot_matches` 因而失效。尝试合并提交区间时发现夹有其他任务的 run script，触发了非本任务的 full suite；该扩大范围的验证已终止，其临时 checkout 已清理，不作为 passing evidence。旧代码提交重新验证被 Harness 的 head-equality contract 拒绝。已核对本任务三个修复文件与 `b304141` 内容相同；但这不能替代当前 HEAD 的新鲜完整回执，最终交付保留这一验证限制。
+
 ## Remaining Work And Publication
 
 《界蚀》S01 仍需以合适且真实可用的视觉参考路线生成或修复，并通过逐镜媒体 Gate。本修复不解决 Ark/其他 Provider 素材接入，也不追认两次失败产物。
