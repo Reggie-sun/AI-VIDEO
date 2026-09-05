@@ -1,0 +1,66 @@
+{
+  "schema_version": "drama-shot01-first-submit-stop/4",
+  "decision": "BLOCKED_BEFORE_INVOCATION",
+  "attempt_id": "drama-shot01-first-20260906-v4",
+  "observed_at": "2026-09-05T16:24:43.265034+00:00",
+  "blocker": "CANONICAL_COMMITTED_SOURCE_INVENTORY_DRIFT",
+  "check": "shot01_source_binding_preflight_v1._inventory",
+  "observation": {
+    "status": "BLOCKED",
+    "reason": "pinned source drift: src/ai_video/production/shot_router.py",
+    "source_commit": "30cf1b828d4cbac1ace2b724237155d1e4d7755f",
+    "approval_commit": "8ae36014072f657171079c38b719771a3036a2a7",
+    "head": "13039628b3933d857fd03ffa8dfacde0397a151e",
+    "working_tree_state": "UNRELATED_UNCOMMITTED_PRODUCT_SOURCE",
+    "committed_source_sha256": "bf5b1b4dbcf1294449d6f8aa258909e0852f58f31cd0683698444f5659e848a6",
+    "observed_files": {
+      "src/ai_video/production/shot_router.py": "92f2c4ee8c63d39e88e6a3b610f0968fc9a1cbb41ae8da266c49c11e362fb352",
+      "tests/test_production_shot_router.py": "3e395b626ec16abacdd95191d1064fe5d128735772068cf4b72ae54ffcf82f00"
+    },
+    "invocation_consumed": false
+  },
+  "accepted_invocation": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/first-submit/key-at-the-waiting-room-shot-01-v4.accepted.json",
+    "sha256": "4b4e1bf1b937382f0de42922e31cc8d072a92c4b9b2991e9c1ce918d0315fcab",
+    "commit": "8ae36014072f657171079c38b719771a3036a2a7"
+  },
+  "prior_read_only_capture": {
+    "path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-source-binding-preflight-v8.json",
+    "sha256": "a486f3dd17416f3d8f891ccc8bf2d2f313001ac76171b58fdc1ea92eec76c2cc",
+    "status": "PASS_AT_CAPTURE_NOT_CURRENT_SOURCE_READINESS"
+  },
+  "verification": {
+    "reviewer_xhigh": "REJECT_CURRENT_EXECUTION_DUE_TO_CONFIRMED_SOURCE_DRIFT",
+    "seal_receipt_path": ".agent/harness/runs/drama-shot01-first-v4-seal-final-20260906/receipt.json",
+    "seal_receipt_sha256": "e0d5ac8b8069ad7d14f1c62534cf29fce1276c2121fae81dcf76795810ecd510",
+    "seal_receipt_status": "PASS_FOR_EXACT_COMMIT_RANGE_ONLY",
+    "executable_harness": "NO_FRESH_PASS_OBSOLETE_RANGE_TERMINATED_AFTER_SOURCE_DRIFT",
+    "architecture_before_termination": "PASS_0_ERRORS_0_WARNINGS_0_INFO",
+    "full_suite": "INCOMPLETE_NOT_ACCEPTANCE_EVIDENCE"
+  },
+  "production": {
+    "file_count": 16,
+    "tree_sha256": "3abfb1c08a7de162220d46bbf1813115100db8f651b810a362e8bce55edb6731",
+    "unchanged_from_v9": true
+  },
+  "effects": {
+    "invocation_consumed": false,
+    "request_persistence": 0,
+    "permit": 0,
+    "provider_submit": 0,
+    "media": 0,
+    "activation": 0,
+    "video_analysis": 0,
+    "runtime_lifecycle": 0
+  },
+  "safety_reason": "The v4 driver writes its invoked marker before the fresh full source inventory check. Executing against the observed drift would consume the invocation without authorizing or reaching a Provider submit.",
+  "ownership": "Observed shot_router.py and test changes belong to unrelated work. No modification, staging, commit, rollback, stash, fallback or inventory exclusion of that work.",
+  "boundary": {
+    "m6_d": "NOT_EVALUATED",
+    "execution": "STOP_BEFORE_SUBMIT",
+    "next_shot_submit_allowed": false,
+    "p6": "NOT_EVALUATED",
+    "final_acceptance": "NOT_EVALUATED"
+  },
+  "next_action": "The shot_router.py owner must establish stable committed Product source or restore the exact 30cf1b8 bytes. Only an exact match with all v4 markers absent can reuse v4; otherwise seal a new versioned Shot 01 invocation through the existing source-binding and preflight seams. Do not execute or replay v4, hand-write a request, or submit Shot 02."
+}
