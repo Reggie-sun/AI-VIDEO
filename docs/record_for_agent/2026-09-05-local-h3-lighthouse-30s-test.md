@@ -9,6 +9,36 @@ evidence_index_version: "1"
 
 Date: 2026-09-05
 
+## Learning Adoption — 2026-09-05
+
+用户在收到 exact candidate 与唯一目标预览后回复“可以”。确认于
+`2026-09-05T20:16:26+08:00` 记录：candidate commit
+`63ea712ae2b968f670392b781609fb689f278864`，committed bytes SHA-256
+`567d7fa9c73447515d1ad9d6f4c1f5ae249f9fb49729dedd6b124b199f8a9a19`。
+采纳前与 current pending bytes 核对一致。本次不同于之前只批准补评估的确认。
+
+当前为 `ADOPTED`（active v1，pending version 0）；唯一目标为 `.agents/skills/h3-video/SKILL.md` C 节，
+只增加 Shot-local 可见状态与 palette/lighting/materials/camera subject/endpoints 的一致性
+检查，以及 actual compiled prompt 回查和既有 Gate 不变的边界。下方 `pending_candidate`
+与未采纳描述保留为先前评估阶段的历史，不再表示当前采用状态。
+
+Target commit `5d17c05864b588d1d893f66a3b8b28be4340e3a6` 仅新增 17 行；target bytes SHA-256
+`79dfdb27e4fe4e511f9fb4bcd65c1d8914601515a214d8f3f62bdd0a7a5fd67a`。
+18 项 focused Node assertions 确认 scoped 指导和旧内容完整保留；documentation/policy checks、
+runtime boundary 2 tests、local supervisor 17 tests、Harness 205 tests 均 PASS。
+目标 receipt `.agent/harness/runs/h3-shot-local-adoption-target-20260905-v1/receipt.json`
+已验证 fresh/integrity/snapshot/scope 全部通过。未用测试证明模型质量提升。
+
+按 `record-ai-video-session` 同步主记录、旧记录与 claim lifecycle；本次文档收尾 receipt 为
+`.agent/harness/runs/h3-shot-local-adoption-record-20260905-v1/receipt.json`。
+`distill-ai-video-learning` 收尾评估为 `no_candidate`：本轮只采纳已确认 v1，没有新增 empirical
+evidence，不另造候选，也不改变其他已采纳 claim。用户对 30s 成片的整体认可与原 Gate 均不变。
+
+采纳 preflight 实际执行 `experience` 检索 `h3-shot-local-visible-context candidate adoption`，
+返回含 stale-tagged 的旧 experience；决策基于重新核对的 exact committed candidate，
+不根据历史摘要改变范围。CLI 自行排队派生索引刷新；未手工重建/等待，不声称新 active 状态已入索引。
+本轮未调用 Provider、生成媒体或写 Product state；保留 unrelated dirty/index work，未 push/release。
+
 ## Learning Reassessment — 2026-09-05
 
 用户确认补全跨实验复核后，本轮结果为 `pending_candidate`：

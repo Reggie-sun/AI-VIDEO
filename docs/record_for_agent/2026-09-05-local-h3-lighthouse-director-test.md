@@ -9,6 +9,13 @@ evidence_index_version: "1"
 
 Date: 2026-09-05
 
+## Learning Adoption Notice — 2026-09-05
+
+下方关联候选现已由用户确认 exact commit/hash，并在目标 Skill 验证后成为 active v1 `ADOPTED`。
+唯一 target commit 为 `5d17c05864b588d1d893f66a3b8b28be4340e3a6`，仅补充 H3 authoring 指导；
+详见 [主记录的采纳证据](2026-09-05-local-h3-lighthouse-30s-test.md#learning-adoption--2026-09-05)。
+下方 `pending_candidate`/未采纳描述是历史阶段；本记录旧媒体 FAIL/NOT_EVALUATED 不变。
+
 ## Related Learning Reassessment — 2026-09-05
 
 后续将本次两个短片 attempt 与 30s 灯塔 run 的十个 source 一起复核，产生了有限的

@@ -6,21 +6,21 @@ admission_basis: TWO_INDEPENDENT_ATTEMPTS
 material_update_target_claim:
 material_update_previous_evidence:
 material_update_delta:
-active_claim_version: 0
-active_evidence_status: NONE
-active_adoption_status: NOT_ADOPTED
-active_candidate_sha256:
-active_candidate_commit:
-active_adoption_commit:
-pending_claim_version: 1
-pending_evidence_status: SUPPORTED
-pending_approval_status: PENDING_CONFIRMATION
+active_claim_version: 1
+active_evidence_status: SUPPORTED
+active_adoption_status: ADOPTED
+active_candidate_sha256: 567d7fa9c73447515d1ad9d6f4c1f5ae249f9fb49729dedd6b124b199f8a9a19
+active_candidate_commit: 63ea712ae2b968f670392b781609fb689f278864
+active_adoption_commit: 5d17c05864b588d1d893f66a3b8b28be4340e3a6
+pending_claim_version: 0
+pending_evidence_status: RETIRED
+pending_approval_status: CONFIRMED
 pending_adoption_status: NOT_ADOPTED
-confirmed_candidate_sha256:
-confirmed_candidate_commit:
-confirmed_by:
-confirmed_at:
-confirmation_evidence:
+confirmed_candidate_sha256: 567d7fa9c73447515d1ad9d6f4c1f5ae249f9fb49729dedd6b124b199f8a9a19
+confirmed_candidate_commit: 63ea712ae2b968f670392b781609fb689f278864
+confirmed_by: user
+confirmed_at: 2026-09-05T20:16:26+08:00
+confirmation_evidence: docs/record_for_agent/2026-09-05-local-h3-lighthouse-30s-test.md#learning-adoption--2026-09-05
 supersedes:
 retired_by:
 ---
@@ -31,9 +31,9 @@ Date: 2026-09-05
 
 ## Active Claim
 
-None。尚无已采纳版本；已有其他 Learning Claim 不受本候选影响。
-
-## Pending Candidate
+Active v1 已获 exact user confirmation，并在目标 Skill 验证通过后采纳。
+下方保留已确认的观察、假设、证据与适用边界；没有升级模型效果结论。
+原 pending preimage 保存在 `63ea712ae2b968f670392b781609fb689f278864`；其他 Learning Claim 不变。
 
 ### Failure Pattern
 
@@ -134,7 +134,7 @@ profile SHA-256 `4b299a689723bb856026776500119774ee9490c777a6460e932007be022e05e
 
 ### Evidence Assessment
 
-`pending_evidence_status`：`SUPPORTED`，只针对上述重复跨字段冲突的观察与有限 authoring 建议。
+`active_evidence_status`：`SUPPORTED`，只针对上述重复跨字段冲突的观察与有限 authoring 建议。
 修复的因果机制与泛化效力仍未确立。
 
 `admission_basis`：`TWO_INDEPENDENT_ATTEMPTS`。Shot01 与 Shot05 的 request、seed、MP4、
@@ -150,8 +150,8 @@ focused query `H3 shot-local palette camera subject offscreen state conflict` �
 
 ### Recommended Action
 
-`recommended_action`：经 exact confirmation 后，在 H3 authoring 的现有三字段指导处增加
-一个简短的 Shot-local consistency 检查提示：
+`recommended_action`：已按 exact confirmation，在 H3 authoring 的现有三字段指导处增加
+一个简短的 Shot-local consistency 检查提示，继续按以下范围使用：
 
 1. 从已批准 Shot 判断此时可见/不可见、已发生/未发生的状态。
 2. 对照 palette、lighting、materials、camera subject 与 endpoints，发现与当前画面要求的
@@ -167,28 +167,47 @@ mandatory schema、runtime hook、自动重试或泛化的 prompt 优化器。
 `adoption_target`：`Skill`。
 唯一目标：`.agents/skills/h3-video/SKILL.md` 的 `C. Craft the 3-field prompt`。
 只添加上述有限检查及非因果/非保证边界，引用本候选；不修改其他 Skill、Policy、Preflight、
-Contract、Gate、compiler 或 Product source。确认前该目标保持不变。
+Contract、Gate、compiler 或 Product source。该目标在 exact confirmation 前未修改。
 
 Unchanged contracts：approved creative intent、Director 自主 strategy、exact request、
 canonical compiler/committer、预算/permit、逐 Shot MCP Gate、Production acceptance ownership。
 
-确认后 planned verification：`git diff --check`、按当前 Harness inspection 路由执行
-exact staged verification 和 receipt verification。当前目标路由为
+本次 verification：`git diff --check`、按当前 Harness inspection 路由执行
+exact staged verification 和 receipt verification。目标路由为
 `scope_diff_check`、`docs_contract_check`、`policy_audit_check`、
 `product_runtime_skill_boundary_tests`、`local_comfyui_supervisor_tests`、`harness_tests`；
-实际变更时重新 inspection，另验证 intended guidance 与 unchanged boundaries 的 focused
-Skill assertions。无需新增媒体/Provider 调用，tests 不证明模型效果。
+18 项 focused Skill assertions 验证 intended guidance、链接存在与新增小节之外原 bytes 不变。
+未来变更仍需重新 inspection；本次无新增媒体/Provider 调用，tests 不证明模型效果。
 
 ### Confirmation
 
-`pending_approval_status`：`PENDING_CONFIRMATION`。用户这次“确认”只批准补评估，
-不是采纳本候选。仅本文件的 candidate checkpoint commit 和从该 commit 读取的 exact bytes
-SHA-256 在交付中展示；避免把自引用 hash 写进自身 bytes。候选或目标改变须重新确认。
+`pending_approval_status`：`CONFIRMED`。用户在候选及唯一目标展示后回复“可以”。
+采纳前已核对 commit `63ea712ae2b968f670392b781609fb689f278864` 中的 exact bytes
+与当时 pending 文件一致，SHA-256 为
+`567d7fa9c73447515d1ad9d6f4c1f5ae249f9fb49729dedd6b124b199f8a9a19`。
+该确认区别于先前只批准补评估的“确认”；候选内容或目标范围变化仍须重新确认。
 
 ### Adoption Evidence
 
-`pending_adoption_status`：`NOT_ADOPTED`。本轮没有修改 adoption target；
-没有 Production state、Provider/media、P6、Final Acceptance、push 或 release effect。
+`active_adoption_status`：`ADOPTED`。
+
+- 唯一 target commit：`5d17c05864b588d1d893f66a3b8b28be4340e3a6`，仅含
+  `.agents/skills/h3-video/SKILL.md` 的 C 节 17 行新增。
+- 该 commit 中 target bytes SHA-256：
+  `79dfdb27e4fe4e511f9fb4bcd65c1d8914601515a214d8f3f62bdd0a7a5fd67a`。
+- 目标 fresh exact-staged receipt：
+  `.agent/harness/runs/h3-shot-local-adoption-target-20260905-v1/receipt.json`；
+  docs contract、policy audit、runtime boundary 2 tests、local supervisor 17 tests、Harness
+  205 tests 均 PASS，receipt integrity/freshness/snapshot/scope verification 全部通过。
+- 18 项只读 Node assertions PASS：C 节插入位置、14 个指导/边界要素、claim 链接存在，
+  且移除新增小节后与 confirmed candidate checkpoint 中的旧 Skill 完全一致。
+- 没有 Production state、Provider/media、P6、Final Acceptance、push 或 release effect。
+  此次 adoption 只验证 advisory guidance 落地，不添加独立媒体实验或扩大 empirical scope。
+
+## Pending Candidate
+
+无。`pending_claim_version: 0`；`pending_evidence_status: RETIRED` 仅表示 pending lane 已关闭，
+不表示 active v1 被 retired。后续 claim 或目标范围改变须创建新的 pending revision 并重新确认。
 
 ## Supersession And Reopen Conditions
 
