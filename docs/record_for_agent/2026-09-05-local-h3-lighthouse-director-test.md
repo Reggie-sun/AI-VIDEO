@@ -9,6 +9,16 @@ evidence_index_version: "1"
 
 Date: 2026-09-05
 
+## Related Learning Reassessment — 2026-09-05
+
+后续将本次两个短片 attempt 与 30s 灯塔 run 的十个 source 一起复核，产生了有限的
+[H3 Shot-Local Visible Context Consistency](learning/h3-shot-local-visible-context.md)
+`pending_candidate`；完整复核见
+[30s 主记录](2026-09-05-local-h3-lighthouse-30s-test.md#learning-reassessment--2026-09-05)。
+下方 `no_candidate` 是当时仅有两个短片样本时的历史结论，不代表后续组合证据仍无候选。
+本记录 001 `NOT_EVALUATED`、002 `FAIL` 保持不变；尤其保留“亮灯修好但扫光失败”的
+counter evidence。没有采纳 Skill 修改，也不把新成片用户认可追溯为旧短片验收。
+
 ## Purpose And Scope
 
 用户先要求“换个场景再试一下”，随后指定“再试一下本地的h3”。本轮未继续 Mini，

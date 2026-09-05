@@ -9,6 +9,51 @@ evidence_index_version: "1"
 
 Date: 2026-09-05
 
+## Learning Reassessment — 2026-09-05
+
+用户确认补全跨实验复核后，本轮结果为 `pending_candidate`：
+[H3 Shot-Local Visible Context Consistency](learning/h3-shot-local-visible-context.md)。
+它只提出 H3 T2VA authoring 的跨字段一致性检查，不证明 prompt repair 的因果效力或成功率。
+下方各历史 `no_candidate` 保留，但不再代表本主题已经完整复核后的当前结论。
+先前“同一叙事链 + seed 改变，因此没有候选”的理由不充分：不同 request 可以构成不同
+execution unit；seed 混杂排除严格 prompt-only 因果比较，不自动排除重复的有限观察。
+
+本轮重开两个短片 attempt 与本 run 十个 source 的 resolved request、逐项 Gate，重算十二个
+MP4 SHA-256，全部与既存 Evidence Index 相符；另读主要支持的 compiled prompt 与 MCP
+frame-review sidecars。没有重新生成/解码/分析媒体，没有改变旧 Gate 或用户认可。
+
+| Evidence group | Reassessment / counting |
+| --- | --- |
+| Shot01 initial + Shot05 initial | 两个不同 request 分别含暗灯/amber palette、sea-only/lighthouse camera subject 冲突，且对应 required finding FAIL；是同一窄问题的两个主要支持 unit |
+| Shot01/05 repairs | 相关字段修正后的新 request 均 PASS；seed 同时改变且文字有多个相关变化，保留为相邻观察，不宣称固定 seed A/B 或成功率 |
+| Shot04/06 initial + repairs | 四个独立 execution，pan 可读性与 extreme-wide framing 各有 FAIL→PASS；目标不同，不为当前 context 冲突 claim 扩大支持数 |
+| Shot02/03 | 两个初次 PASS，作为边界：不是所有 Shot 都失败或必须预防性补拍 |
+| 旧短片001/002 | 两个 distinct request；002解决可见点灯，但扫光 FAIL。反对“修好局部即可通过整镜”的过宽解释 |
+| Final render + technical/visual/user proof | 同一组合成片的新 proof layers，不计为新的生成实验；用户整体认可不变 |
+
+真实 `experience` RAG 首查 `H3 T2VA lighthouse prompt camera framing repair seed` 返回
+stale-tagged experience 与单独 fresh 的 V8 run summary；发现跨字段冲突后 focused 查询
+`H3 shot-local palette camera subject offscreen state conflict` 返回 M6 fresh 对照片段。
+已重开 exact 当前 source；未以 RAG score、片段数量或旧 no_candidate 自证结论。
+CLI 首查自行排队派生索引刷新；未手工重建或等待，也不声称新增候选已可检索。
+
+历史对照覆盖旧灯塔、Drama v1/v2、M6、T8 upstream、V8 summary 与 Turbo comparison。
+Drama 同 profile 的局部 framing PASS 不能覆盖其 overall audio FAIL；M6/V8/upstream 的
+FL2VA/Long Video 与 Turbo recipe 不并入当前 T2VA support。现有 learning 目录仅见
+无关的 HyperFrames caption adopted claim，保持不变。一个 native read-only explorer
+独立检查历史边界，parent 重开关键原文复核；没有让历史摘要代替本次 exact evidence。
+
+唯一拟采纳目标为 `.agents/skills/h3-video/SKILL.md` 的现有 authoring 指导；本轮未修改它。
+候选状态 `SUPPORTED / PENDING_CONFIRMATION / NOT_ADOPTED`；用户本次确认仅批准评估，
+不授权采纳尚未展示 exact commit/hash 的新候选。本轮记录按 `record-ai-video-session`
+完成并由 `distill-ai-video-learning` 生成一个候选，不另造同题记录。
+
+本轮验证 receipt 分别为
+`.agent/harness/runs/h3-learning-reassessment-record-20260905-v1/receipt.json` 与
+`.agent/harness/runs/h3-shot-local-visible-context-candidate-20260905-v1/receipt.json`。
+只执行本次文档/learning delta 的 policy checks；无 Provider/media/cloud/paid 调用，
+无 Product state 写入，保留 unrelated dirty/index work，未 push/release。
+
 ## User Acceptance — 2026-09-05
 
 交付下方 exact 30s 成片后，用户回复“确认可以”。本次记录为该版本的整体用户认可，
