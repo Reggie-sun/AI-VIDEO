@@ -146,6 +146,23 @@ non_diegetic_music: <1–3 sentences: instruments, tempo, rhythm — no vague mo
 
 **Expand** casual NL into 3-field; never ship a bare phrase as the only prompt for “high quality.”
 
+#### Shot-Local Visible Context (AI-VIDEO Advisory)
+
+对已选 `minimax-h3-t8-t2va-quality-v1` / `text_to_video` 的 authoring，参考
+[H3 Shot-Local Visible Context](../../../docs/record_for_agent/learning/h3-shot-local-visible-context.md)
+的灯塔案例，增加以下有限检查：
+
+1. 从 approved Shot 区分当前可见/画外、已发生/未发生的状态；不要把未来亮灯状态提前写入暗灯镜头。
+2. 对照 `palette`、`lighting`、`materials`、`camera subject` 与 `endpoints` 是否与当前画面一致；
+   sea-only 镜头不应同时要求 camera 保持灯塔主体入画。保留有意义的画外光源和 narrative location，
+   不做物件名称的 blanket deletion。实质冲突回到 authoring owner 修正，再走原 compiler。
+3. 回查 actual compiled prompt 是否仍有相反指导；不得直接 patch resolved request，也不得将静态
+   一致性检查视为媒体 PASS。修正后仍逐项执行原有 post-media Gate。
+
+这是当前 T2VA lane 的 advisory 案例，不是 deterministic validator 或自动修复规则。
+补拍同时改变 seed，不能据此保证因果改善、成功率或其他场景/模式的效果；不按时长或有无 prompt
+强制 `single_take` / `multi_shot`，不改变 Director、Provider selection、预算/permit 或 Gate ownership。
+
 ### D. Dry-run (cheap)
 
 ```bash
