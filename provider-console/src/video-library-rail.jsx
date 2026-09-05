@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { requestLibraryPreview } from "./library-preview.js";
+import { playbackFailureLabel, requestLibraryPreview } from "./library-preview.js";
 
 export function durationLabel(measurement) {
   return Number.isFinite(measurement?.duration) ? `${measurement.duration.toFixed(3)} 秒` : "实测时长未提供";
@@ -28,7 +28,7 @@ function VideoCard({ entry, selected, checked, onSelect, onCompare, measurement,
     <button className="library-card-select" type="button" aria-pressed={selected} onClick={() => onSelect(entry.id)}>
       <div className="library-thumbnail">{measurement?.poster ? <img src={measurement.poster} alt={`${entryTitle(entry)} 的视频缩略图`} /> : <span>{measurement?.failed || !entry.url ? "预览图暂不可用" : "正在读取预览图…"}</span>}<span className="library-duration">{durationLabel(measurement)}</span></div>
       <strong>{entryTitle(entry)}</strong><span className="library-card-model">{entry.model || "模型未提供"}</span>
-      <span>{entry.available ? "已获取 · 可预览" : "文件不可用"}{entry.ambiguous ? " · 多个详情上下文" : ""}</span>
+      <span>{entry.available ? playbackFailureLabel(measurement?.playbackError) || "已获取 · 可预览" : "文件不可用"}{entry.ambiguous ? " · 多个详情上下文" : ""}</span>
       <small>{entry.startedAt ? `${entry.timeKind === "file" ? "文件时间 · " : ""}${new Date(entry.startedAt).toLocaleString("zh-CN", { hour12: false })}` : "时间未提供"}</small>
     </button>
     <label className="library-compare-check"><input type="checkbox" checked={checked} disabled={!entry.available && !checked} onChange={() => onCompare(entry.id)} />选择比较</label>

@@ -4,7 +4,29 @@ import { fileURLToPath } from "node:url";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createServer } from "vite";
-import { keepOneAudio } from "../src/library-preview.js";
+import { classifyPlaybackFailure, keepOneAudio } from "../src/library-preview.js";
+
+test("playback failures distinguish missing bytes, decode support, network and abort", async () => {
+  const signal = new AbortController().signal;
+  const calls = [];
+  const readable = async (...args) => { calls.push(args); return { ok: true, status: 200 }; };
+  assert.equal(await classifyPlaybackFailure(4, "/api/runs/media/exact", signal, readable), "decode");
+  assert.equal(await classifyPlaybackFailure(3, "/api/runs/media/exact", signal, readable), "decode");
+  assert.equal(await classifyPlaybackFailure(2, "/api/runs/media/exact", signal, readable), "network");
+  assert.equal(calls[0][1].method, "HEAD");
+  assert.equal(await classifyPlaybackFailure(4, "/api/runs/media/exact", signal, async () => ({ status: 404 })), "unavailable");
+  assert.equal(await classifyPlaybackFailure(4, "/api/runs/media/exact", signal, async () => ({ status: 503 })), "network");
+  assert.equal(await classifyPlaybackFailure(4, "/api/runs/media/exact", signal, async () => { throw new Error("offline"); }), "network");
+  const aborted = new AbortController(); aborted.abort();
+  assert.equal(await classifyPlaybackFailure(4, "/api/runs/media/exact", aborted.signal, readable), null);
+  assert.equal(await classifyPlaybackFailure(1, "/api/runs/media/exact", signal, readable), null);
+  const switched = new AbortController();
+  let resolveRequest;
+  const pending = classifyPlaybackFailure(4, "/api/runs/media/exact", switched.signal, () => new Promise((resolve) => { resolveRequest = resolve; }));
+  switched.abort();
+  resolveRequest({ ok: true, status: 200 });
+  assert.equal(await pending, null, "an old response cannot mark a switched player as failed");
+});
 
 test("default browser offers one cross-source search, records and explicit follow without decoder burst", async () => {
   const server = await createServer({ root: fileURLToPath(new URL("..", import.meta.url)), server: { middlewareMode: true }, appType: "custom", optimizeDeps: { noDiscovery: true } });
@@ -30,6 +52,11 @@ test("default browser offers one cross-source search, records and explicit follo
     assert.match(player, /muted=""/);
     assert.match(player, /controls=""/);
     assert.doesNotMatch(player, /autoPlay|loop=/);
+    const incompatible = renderToStaticMarkup(React.createElement(ExactPlayer, { entry: { id: "exact", available: true, url: "/api/runs/media/exacttoken" }, measurement: { playbackError: "decode" } }));
+    assert.match(incompatible, /浏览器无法解码/);
+    assert.match(incompatible, /下载原文件/);
+    assert.match(incompatible, /href="\/api\/runs\/media\/exacttoken"/);
+    assert.doesNotMatch(incompatible, /文件不可用/);
     const status = renderToStaticMarkup(React.createElement(StatusSummary, { context: { attempt: { status: "running", phase: "validate" } }, available: true }));
     assert.match(status, /已获取 · 可预览/);
     assert.match(status, /等待验证（running \/ validate）/);

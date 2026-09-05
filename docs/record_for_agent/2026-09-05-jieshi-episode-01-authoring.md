@@ -26,7 +26,10 @@ native reviewer_xhigh 在 submit 前独立检查新 scope/原账/新请求/授�
 `production-s01-repair-v1/state/video-generation/fetch/files/eed2589c7655b89d5e114b5b5146bb3cc2a31bb5983e5af9d796d0dd008df440.mp4`。
 SHA-256 与文件名相同；2420329 bytes，1080×1920，24 fps，97frames / 4042ms，
 HEVC Main 10 / yuv420p10le，无音轨。新的 provider_selected 时长要求通过技术检查；
-没有将旧2.0的exact_seconds失败改判PASS。HEVC的浏览器播放/最终renderer兼容性未验证。
+没有将旧2.0的exact_seconds失败改判PASS。该次生成时 HEVC 的浏览器播放/最终renderer兼容性未验证。
+2026-09-06 浏览器结论已由 [HEVC compatible preview record](2026-09-06-video-library-hevc-compatible-preview.md)
+更新：本机 Chrome 无法解码原 HEVC，用户授权的独立 H.264 副本已实际播放；原文件、Gate
+与 Production 状态不变，最终 renderer 兼容性仍未验证。
 
 再次显式调用 project-local video-analysis MCP，并检查0至4秒每0.5秒共9帧，
 完整证据和 sealed rubric / findings 在新run的 `preparation/shot-01-*.json`。

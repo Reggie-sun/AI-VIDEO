@@ -3,6 +3,20 @@ const cache = new Map();
 const queue = [];
 let active = 0;
 
+export async function classifyPlaybackFailure(code, url, signal, request = fetch) {
+  if (signal.aborted || code === 1) return null;
+  try {
+    const response = await request(url, { method: "HEAD", cache: "no-store", signal });
+    if (signal.aborted) return null;
+    if (response.status === 404 || response.status === 410) return "unavailable";
+    return response.ok && (code === 3 || code === 4) ? "decode" : "network";
+  } catch { return signal.aborted ? null : "network"; }
+}
+
+export function playbackFailureLabel(kind) {
+  return kind === "decode" ? "当前浏览器无法解码此视频" : kind === "network" ? "播放请求失败，请刷新后重试" : "";
+}
+
 function drain() {
   while (active < 2 && queue.length) {
     const task = queue.shift();

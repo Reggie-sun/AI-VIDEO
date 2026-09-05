@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { buildLibraryEntries, filterLibraryEntries, libraryLifecycle, selectLibraryEntry, versionGroups } from "./library-contract.js";
 import { useLibraryData } from "./library-data.js";
-import { keepOneAudio } from "./library-preview.js";
+import { classifyPlaybackFailure, keepOneAudio, playbackFailureLabel } from "./library-preview.js";
 import { durationLabel, entryTitle, VideoLibraryRail } from "./video-library-rail.jsx";
 import { attemptId } from "./run-detail-contract.js";
 import { libraryLiveStatus } from "./library-refresh-contract.js";
@@ -9,21 +9,30 @@ import "./library-browser.css";
 
 export function ExactPlayer({ entry, measurement, onMeasured, onUnavailable }) {
   const ref = useRef(null);
+  const errorRequest = useRef(null);
   useEffect(() => {
     const media = ref.current;
     if (media && entry.url && media.getAttribute("src") !== entry.url) { media.src = entry.url; media.load(); }
-    return () => { if (media) { media.pause(); media.removeAttribute("src"); media.load(); } };
-  }, [entry.id, entry.url]);
+    return () => { errorRequest.current?.abort(); if (media) { media.pause(); media.removeAttribute("src"); media.load(); } };
+  }, [entry.id, entry.url, measurement?.playbackError]);
   if (!entry.available || !entry.url) return <p role="status">文件不可用，请刷新重新读取。所选视频保持固定。</p>;
+  if (measurement?.playbackError) return <div role="status"><p>{playbackFailureLabel(measurement.playbackError)}。原文件未被替换。</p><a href={entry.url} download={`${entry.sha256 || entry.id}.mp4`}>下载原文件</a></div>;
   return <video ref={ref} src={entry.url} poster={measurement?.poster} controls muted playsInline preload="metadata" aria-label={`预览 ${entryTitle(entry)}`} data-media-identity={entry.id}
     onLoadedMetadata={(event) => { const v = event.currentTarget; onMeasured(entry.id, { duration: Number.isFinite(v.duration) ? v.duration : null, width: v.videoWidth, height: v.videoHeight }); }}
     onVolumeChange={(event) => keepOneAudio(event.currentTarget, event.currentTarget.closest(".library-shell"))}
-    onError={() => onUnavailable(entry.id)} />;
+    onError={async (event) => {
+      errorRequest.current?.abort();
+      const controller = new AbortController();
+      errorRequest.current = controller;
+      const kind = await classifyPlaybackFailure(event.currentTarget.error?.code, entry.url, controller.signal);
+      if (kind === "unavailable") onUnavailable(entry.id);
+      else if (kind) onMeasured(entry.id, { playbackError: kind });
+    }} />;
 }
 
-export function StatusSummary({ context, available }) {
+export function StatusSummary({ context, available, playbackError }) {
   return <dl className="library-status">
-    <div><dt>媒体</dt><dd>{available ? "已获取 · 可预览" : "文件不可用"}</dd></div>
+    <div><dt>媒体</dt><dd>{available ? playbackFailureLabel(playbackError) || "已获取 · 可预览" : "文件不可用"}</dd></div>
     <div><dt>生成记录</dt><dd>{context?.attempt ? libraryLifecycle(context.attempt) : "未提供"}</dd></div>
     <div><dt>质量证据</dt><dd>未评估 · 请查看 exact 证据层</dd></div>
   </dl>;
@@ -47,7 +56,7 @@ function Preview({ entry, measurements, onMeasured, onUnavailable, entries, rend
   return <section className="library-preview" aria-label="视频预览详情">
     <header><span className="library-eyebrow">视频预览</span><h1>{context?.title || entryTitle(entry)}</h1><p>{context?.model || entry.model || "模型未提供"} · {durationLabel(measurement)}{measurement?.width ? ` · ${measurement.width} × ${measurement.height}` : " · 实测尺寸未提供"}</p></header>
     <ExactPlayer key={`${entry.id}:${entry.url}`} entry={entry} measurement={measurement} onMeasured={onMeasured} onUnavailable={onUnavailable} />
-    <StatusSummary context={context} available={entry.available} />
+    <StatusSummary context={context} available={entry.available} playbackError={measurement?.playbackError} />
     <ContextPicker entry={entry} value={contextId} onChange={setContextId} />
     <details className="library-sources"><summary>全部来源与 exact identity（{entry.contexts.length}）</summary><code>{entry.sha256} · {entry.bytes} bytes</code>{entry.contexts.map((item) => <p key={item.id}>{item.workspace || item.sourceId} · {item.role}<br />{item.media?.asset_id || item.media?.relative_path || item.group?.preview?.relative_path || "相对文件标识未提供"}</p>)}</details>
     <details><summary>版本（仅限严格验证的同 Project / Shot）</summary>{members.length ? members.map(({ entry: video, context: binding }) => <button type="button" key={`${video.id}:${binding.id}`} onClick={() => onSelect(video.id)}>{entryTitle(video)} · revision {binding.attempt.target_shot_revision} · {binding.model || "模型未提供"} · {binding.startedAt || "时间未提供"} · {binding.role}</button>) : <p>没有可归组的版本。独立 Project 保持独立，可手动选择比较。</p>}</details>
@@ -64,7 +73,7 @@ function Comparison({ entries, measurements, onMeasured, onUnavailable, onClose 
     document.addEventListener("keydown", escape);
     return () => { document.removeEventListener("keydown", escape); previous?.focus?.(); };
   }, [onClose]);
-  return <section className="library-comparison" aria-label="双视频比较"><header><div><h1>比较视频</h1><p>独立播放与定位 · 默认静音 · 不对齐时长</p></div><button ref={close} type="button" onClick={onClose}>退出比较</button></header><div className="library-comparison-grid">{entries.map((entry) => <article key={entry.id}><h2>{entryTitle(entry)}</h2><p>{entry.model || "模型未提供"} · {durationLabel(measurements[entry.id])}</p><ExactPlayer entry={entry} measurement={measurements[entry.id]} onMeasured={onMeasured} onUnavailable={onUnavailable} /><StatusSummary available={entry.available} context={!entry.ambiguous && entry.contexts.find((item) => item.attempt)} /><code>{entry.contexts.map((item) => item.workspace || item.sourceId).filter((v, i, a) => a.indexOf(v) === i).join(" · ")}</code></article>)}</div></section>;
+  return <section className="library-comparison" aria-label="双视频比较"><header><div><h1>比较视频</h1><p>独立播放与定位 · 默认静音 · 不对齐时长</p></div><button ref={close} type="button" onClick={onClose}>退出比较</button></header><div className="library-comparison-grid">{entries.map((entry) => <article key={entry.id}><h2>{entryTitle(entry)}</h2><p>{entry.model || "模型未提供"} · {durationLabel(measurements[entry.id])}</p><ExactPlayer entry={entry} measurement={measurements[entry.id]} onMeasured={onMeasured} onUnavailable={onUnavailable} /><StatusSummary available={entry.available} playbackError={measurements[entry.id]?.playbackError} context={!entry.ambiguous && entry.contexts.find((item) => item.attempt)} /><code>{entry.contexts.map((item) => item.workspace || item.sourceId).filter((v, i, a) => a.indexOf(v) === i).join(" · ")}</code></article>)}</div></section>;
 }
 
 export function LibraryBrowser({ sidebar, renderContext, renderRecord }) {
@@ -113,7 +122,7 @@ export function LibraryBrowser({ sidebar, renderContext, renderRecord }) {
   const canCompare = compareEntries.length === 2 && compareEntries.every((entry) => entry.available);
   const closeComparison = useCallback(() => setComparing(false), []);
   useEffect(() => { if (!comparing && listScroll.current) listScroll.current.scrollTop = savedScroll.current; }, [comparing]);
-  const refresh = () => { setUnavailable(new Set()); data.refreshRuns(); data.refreshExternal({ force: true }); };
+  const refresh = () => { setUnavailable(new Set()); setMeasurements((current) => Object.fromEntries(Object.entries(current).map(([id, value]) => [id, { ...value, playbackError: null }]))); data.refreshRuns(); data.refreshExternal({ force: true }); };
   const failed = Object.values(data.details).filter((item) => item.error);
   const partial = data.runsError || data.externalError || data.indexNotice || data.catalog.truncated || data.loaded.some((item) => item.workspace_media_truncated || item.status === "recovered_video_evidence" || item.attempts?.some((attempt) => attempt.candidate_media_truncated)) || (data.external?.sources || []).some((item) => item.truncated || item.status !== "available");
   const liveStatus = libraryLiveStatus({ connectionState: data.connection.state, expectedSources: data.connection.expectedSources, watchedSources: data.connection.watchedSources, selectedSource: source, refreshFailed: Boolean(data.runsError || data.externalError) });
