@@ -11,7 +11,79 @@ Date: 2026-08-29
 
 Updated: 2026-09-05
 
+## Current Delivery — 2026-09-05 v81 Thirty-Second Film
+
+用户明确选择“先把30s成片做好”，继续采用实际参考中的驼色大衣、黑色手袋与既有人物站位，
+暂不扩展 canonical wardrobe reconciliation / cross-revision / generalized capability。
+`v79/scope-resolution.json` supersede 下方 v78b 的 scope pause；不覆盖任何 media Gate。
+本次实际交付为 `runs/drama-h3-t8-30s-preview-20260905-v81/drama-stock20-repair-30s-subtitled.mp4`，
+SHA-256 `2b64bd01a2fae757fc0131910c25e9b9c13d0c8a767f18577f3fecb4b8680924`，
+12,637,506 bytes。视频与音频 stream 均为30.000s，视频720 frames / 24fps / 1344x768；
+container 30.032s 的额外32ms为AAC尾部封装，不是额外画面。它取代 v77 作为当前可看片，
+并取代下方“未生成 Shot 5/6、未完成新的30秒片”的 current-facing 状态；旧记录保留为历史。
+
+### Continuation And Bounded Repair
+
+前3镜仍为 v34 / v41 / v59，第4镜为已通过检查的 v78b；本续做发生4次 local Stock20 submit：
+
+| Attempt | Request | Exact MP4 SHA-256 | Result |
+| --- | --- | --- | --- |
+| v79 Shot 5 | `c63fb195-e675-4b77-a45d-322c460f4d87` | `20800c45762b55a6a05a440f8fc09226ed8db9de4d1a1015b4f6b615441b491a` | 左手取小钥匙、右手持包、起身向右靠近；reference-relative Gate PASS |
+| v80 Shot 6 | `0409b0fa-d19f-4193-a303-9a0990715218` | `403f6540d2a7828e536c23d6d889b9a0c159239f2399505852e6bdbb6ae8d0a9` | FAIL：0.5–2.5s钥匙变成巨大黄色图形；隔离，不进成片 |
+| v82 Shot 6 | `de141c60-8d88-42b6-8b92-e32bcf33c365` | `f40bcd02a87e2f6b396406d5648b75b940274b8518808a8f50847f7b6703b12b` | 小钥匙保持，但明确点头缺失且开头近乎静止；FAIL |
+| v84b Shot 6 | `e5826087-fb0c-48aa-b79b-e5c16d1dcc83` | `032d880fe2346f86dac130c9990680d6ba0d8fbe17dc80ad5f7ac8f4bea6a2c2` | 明确下颌下压、回正后转身迈步，小钥匙保持；scoped narrative Gate PASS |
+
+v82 的主动修复为放低持钥匙手；v84b 为把完整点头与后续躯干转向分开。Derived seed随
+exact intent变化，因此不是严格单变量因果实验。每次仍使用 accepted v79 terminal，
+不复用 failed v80/v82 anchor。v84 prepare 曾出现 nod2.0–2.8s 与 dialogue0.5–3.5s 的
+时序冲突，被 `reviewer_xhigh` 在 submit 前拒绝；v84b重新封存为对白→点头→离场顺序。
+v83 是对 v82 裁掉前16帧的零Provider诊断衍生片：完整“等你开门”保留、freeze消失，
+但未解决点头，故没有进入成片。v84也是zero-submit preparation，不计生成次数。
+
+各实际新MP4落盘后显式调用 project-local `video_analyze`，保存 exact hash、序列与
+requirement findings。失败没有终止整个任务，而是在原 `v78/task-budget.json` 内修复。
+连同上一 checkpoint 的v78b，累计5/6 submits；未重置11:15:47UTC deadline或90 GPU分钟上限。
+v79/v80/v82的own ComfyUI execution分别为331.967/332.371/331.280s。运行在另一任务拥有的
+supervisor unit中，按queue串行；没有打断或停止该unit、其他请求，也没有remote/paid/egress。
+
+### Composition And Verification
+
+`v81/composition.json`、`filtergraph.txt` 与 `compose.py` 保存可重现Development剪辑：
+只裁掉Shot1前24帧，其余五镜各124帧，保留完整点头与离场；cut frames为100/224/348/472/596。
+Shot2保留1008x576 crop，Shot3改为1008x576@(112,192)约1.33x反应镜头，取代旧2x放大。
+硬切，无补帧、变速、重复帧或停帧补时长；末尾4帧淡出。六句中文硬字幕已在exact成片
+5/8/12/15/17/25s帧中直接检查，底部safe area内无互相覆盖。
+
+保持同次生成原声：Shot4 +5dB、Shot5 +3dB、Shot6 -5dB；Shot3开头1s的非预期“是的”
+按既有剪辑策略替换为accepted v79的1s环境声（+6dB），不是替换配音。
+Full decode通过；720帧、0 consecutive exact duplicates、0非单调PTS、无-50dB/0.25s
+freeze窗口；成片mean -29.4dB、peak -6.4dB。
+
+整段medium ASR遗漏前两句且时间戳明显不可信，原始结果仍保留，未据此改字幕或冒充完整通过。
+从exact成片分割的Shot2/3/4/6 check clips恢复全部六句；其ASR时间戳也不单独作为alignment。
+进一步比较decoded PCM与各source的预期位置：对白Shot2/3/4/6 correlation分别
+0.998724/0.999302/0.999920/0.999798，最佳偏移0/-1/-1/-2 samples（32kHz），
+证明音频位于对应剪辑段；不是原速人类听辨或精确viseme证明。
+证据在 `v81/analysis/dialogue-checks.json`、`video-analysis-mcp.json`、`final-seams.png`
+及 `final-verification.json`。Parent与 `reviewer_high`复核五处切口，未见明显姿态跳回或ghosting；
+final verdict为 `accept with concerns` / `PASS_FOR_HUMAN_REVIEW`，不是Human/Production acceptance。
+
+### Remaining Boundaries And Learning Evaluation
+
+早期Shot2/3与后期小钥匙的外观细节、尺度和材质仍不完全一致；不声称道具完美连续。
+v84b明确点头实际约1.67–2.5s，早于prompt3.5–4.2s；钥匙手虽下降，但终态仍高于指定腰位。
+因果顺序可读不等于完整microtiming/pose compliance。Human1x观感、精确viseme、移动端字幕
+以及Production activation/P6仍未评估；旧canonical衣着冲突未修改。
+
+`record-ai-video-session`更新本primary record，`distill-ai-video-learning`评估为
+`no_candidate`：这是同一故事与共享reference链上的带confound修复，存在反例且不能当作独立
+泛化验证；不新建claim或修改adoption target。媒体/scripts保留在ignored runs，产品代码与规则
+无本任务修改；仅提交本record，其他窗口的dirty/staged work不纳入，不push/release。
+记录期间没有额外生成或paid call，也没有主动重建RAG index；preflight已有stale结果不得当作fresh。
+
 ## Current Repair Checkpoint — 2026-09-05 v78b And Generalization Boundary
+
+> Historical checkpoint：已被上方v81完整30秒交付和用户实际参考scope选择取代；下方停止状态不再是当前next action。
 
 本轮用户批准继续生成，并在执行中追问能否成为泛化能力。只有一次实际 local Stock20 submit：
 request `60f24a89-df16-4e73-94ec-2d0763372dd3`，resolved request
@@ -678,6 +750,12 @@ V2 finding、output identity 与停止决定位于
 
 | evidence_id | independence_key | experiment_id | attempt_id | arm_id | artifact_sha256 | proof_layer | verdict | failure_class | relation_kind | related_evidence_id | source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| h3-stock20-drama-shot05-v79-gate-20260905 | local-comfyui:c63fb195-e675-4b77-a45d-322c460f4d87 | drama-prop-repair-20260905 | drama-shot05-v79 | N/A | 20800c45762b55a6a05a440f8fc09226ed8db9de4d1a1015b4f6b615441b491a | REFERENCE_RELATIVE_DEVELOPMENT_MEDIA_GATE | PASS | NONE | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v79/sidecars/gates/shot-05-gate.json` |
+| h3-stock20-drama-shot06-v80-gate-20260905 | local-comfyui:0409b0fa-d19f-4193-a303-9a0990715218 | drama-prop-repair-20260905 | drama-shot06-v80 | N/A | 403f6540d2a7828e536c23d6d889b9a0c159239f2399505852e6bdbb6ae8d0a9 | REFERENCE_RELATIVE_DEVELOPMENT_MEDIA_GATE | FAIL | OVERSIZED_YELLOW_KEY | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v80/sidecars/gates/shot-06-gate.json` |
+| h3-stock20-drama-shot06-v82-gate-20260905 | local-comfyui:de141c60-8d88-42b6-8b92-e32bcf33c365 | drama-prop-repair-20260905 | drama-shot06-v82 | N/A | f40bcd02a87e2f6b396406d5648b75b940274b8518808a8f50847f7b6703b12b | REFERENCE_RELATIVE_DEVELOPMENT_MEDIA_GATE | FAIL | MISSING_RECEIVING_NOD_AND_ENTRY_HOLD | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v82/sidecars/gates/shot-06-gate.json` |
+| h3-stock20-drama-shot06-v84b-gate-20260905 | local-comfyui:e5826087-fb0c-48aa-b79b-e5c16d1dcc83 | drama-prop-repair-20260905 | drama-shot06-v84b | N/A | 032d880fe2346f86dac130c9990680d6ba0d8fbe17dc80ad5f7ac8f4bea6a2c2 | REFERENCE_RELATIVE_DEVELOPMENT_MEDIA_GATE | PASS | NONE | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v84b/sidecars/gates/shot-06-gate.json` |
+| h3-stock20-drama-v81-technical-20260905 | local-composition:drama-six-shot-stock20-v81:20260905 | drama-h3-t8-30s-composition-watchability | drama-six-shot-stock20-v81 | N/A | 2b64bd01a2fae757fc0131910c25e9b9c13d0c8a767f18577f3fecb4b8680924 | DEVELOPMENT_COMPOSITION_REVIEW | PASS | NONE | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v81/analysis/final-verification.json` |
+| h3-stock20-drama-v81-human-20260905 | local-composition:drama-six-shot-stock20-v81:20260905 | drama-h3-t8-30s-composition-watchability | drama-six-shot-stock20-v81 | N/A | 2b64bd01a2fae757fc0131910c25e9b9c13d0c8a767f18577f3fecb4b8680924 | HUMAN_WATCHABILITY | NOT_EVALUATED | HUMAN_ACCEPTANCE_PENDING | SAME_EVIDENCE_NEW_PROOF_LAYER | h3-stock20-drama-v81-technical-20260905 | `runs/drama-h3-t8-30s-preview-20260905-v81/analysis/final-verification.json` |
 | h3-stock20-drama-shot04-v78b-gate-20260905 | local-comfyui:60f24a89-df16-4e73-94ec-2d0763372dd3 | drama-prop-repair-20260905 | drama-shot04-v78b | N/A | c58d509ce453e286371060199e4f18f7e1976f8bec76364bfea76fb9d7045fc7 | REFERENCE_RELATIVE_DEVELOPMENT_MEDIA_GATE | PASS | NONE | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v78b/sidecars/gates/shot-04-gate.json` |
 | h3-stock20-drama-v78b-authoring-boundary-20260905 | local-comfyui:60f24a89-df16-4e73-94ec-2d0763372dd3 | drama-prop-repair-20260905 | drama-shot04-v78b | N/A | c58d509ce453e286371060199e4f18f7e1976f8bec76364bfea76fb9d7045fc7 | CANONICAL_AUTHORING_ALIGNMENT | NOT_EVALUATED | CANONICAL_WARDROBE_CONFLICT | SAME_EVIDENCE_NEW_PROOF_LAYER | h3-stock20-drama-shot04-v78b-gate-20260905 | `runs/drama-h3-t8-30s-preview-20260905-v78b/NEXT_SHOT_BLOCKED.json` |
 | h3-stock20-drama-v77-candidate-20260905 | local-composition:drama-six-shot-stock20-v77:20260905 | drama-h3-t8-30s-composition-watchability | drama-six-shot-stock20-v77 | N/A | 5d190435fd322e8cccdb2591505ee15c65982cff45aa675e04068bb9af1ca882 | HUMAN_WATCHABILITY | NOT_EVALUATED | HUMAN_ACCEPTANCE_PENDING | NEW_ATTEMPT | NONE | `runs/drama-h3-t8-30s-preview-20260905-v77/sidecars/analysis/final-verification.json` |
