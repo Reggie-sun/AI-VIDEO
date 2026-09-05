@@ -14,9 +14,9 @@
 - 逐镜连续时间、台词窗口、角色/Scene引用、3秒原句钩子、最后15秒、24fps素材裁切均已检查。
 - 66个素材component：65个候选生成素材与1个末帧复用；最少计划源时长337秒，剪辑300秒。
   该数量不是已发生调用，不含首帧准备、重试或可执行预算。
-- 选择的当前capability：`seedance-2-5-260628-image_to_video`，
-  `doubao-seedance-2-5-260628`，`seedance-2026-08-19`。
-  当前本地profile允许4–30秒、1080p、24fps，I2V ratio为adaptive；不支持seed或negative_prompt参数。
+- 选择的当前capability：`seedance-2-0-260128-image_to_video`，
+  `doubao-seedance-2-0-260128`，`seedance-2026-08-19`。
+  当前本地profile允许4–15秒，选择1080p、24fps、I2V ratio=9:16；不支持seed或negative_prompt参数。
   这是仓库capability事实，不证明账号权限、实时价格或模型质量。
 
 ## Reproduce
@@ -36,12 +36,23 @@ import math
 from pathlib import Path
 from ai_video.production import models
 from ai_video.production.hashing import verify_artifact_hash
+from ai_video.production.hashing import canonical_sha256
+from ai_video.production.seedance_capabilities import select_seedance_capabilities
 
 r = Path('docs/superpowers/artifacts/drama/jieshi-episode-01')
 p = json.loads((r / 'episode-01.proposed.json').read_text())
 a = json.loads((r / 'creative-artifacts.json').read_text())
 sha = hashlib.sha256((r / 'episode-01.proposed.json').read_bytes()).hexdigest()
 assert sha == a['source_sha256']
+cap = next(c for c in select_seedance_capabilities('doubao-seedance-2-0-260128')
+           if c.variant.mode.value == 'image_to_video')
+t = p['selected_authoring_target']
+assert t['model_id'] == cap.variant.model_id
+assert t['capability_id'] == cap.variant.capability_id
+assert t['capability_content_sha256'] == canonical_sha256(cap)
+assert t['ratio'] == '9:16' and t['resolution_label'] == '1080p' and t['fps'] == 24
+assert any(x.resolution_label == '1080p' and x.ratio == '9:16'
+           and x.width == 1080 and x.height == 1920 for x in cap.output_rasters)
 types = {'brief': models.ProductionBrief, 'story': models.Story,
          'characters': models.Character, 'scenes': models.Scene,
          'storyboard': models.Storyboard, 'shots': models.Shot}
@@ -72,7 +83,7 @@ for i, s in enumerate(shots):
         assert math.isclose(c['edited_seconds'] * 24, round(c['edited_seconds'] * 24))
         assert set(c['visible_character_ids']) <= set(s['character_ids'])
         assert c['prompt_draft'] and c['camera_intent'] and c['first_frame_preparation']
-        assert c['kind'] != 'seedance_i2v_draft' or 4 <= c['requested_source_seconds'] <= 30
+        assert c['kind'] != 'seedance_i2v_draft' or 4 <= c['requested_source_seconds'] <= 15
     for d in s['dialogue']:
         assert 0 <= d['start_seconds'] < d['end_seconds'] <= s['duration_seconds']
         assert d['speaker_id'] in characters
@@ -88,6 +99,11 @@ print({'status': 'passed', 'typed_models': count, 'shots': 52, 'seconds': 300, '
 
 ## Harness
 
+2026-09-05用户改选Seedance 2.0后的proposal SHA-256：
+`433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8`。
+本次仅更新模型选择、画幅参数、用户约束及派生provenance/hash；52个Shot内容与时长逐项保持一致。
+下述独立审读属于前一创作版本，不作为本次模型选择的review证据。
+
 Native `reviewer_high`独立审读后修正原阻断，同tier scoped re-review最终为`accept`，
 没有剩余Blocking issues。改名前复核proposal SHA-256为
 `48ec205ef97e4df55744dec3f80d4fc77a2cdc2e59920a53c26278aa87ddab3f`。
@@ -99,13 +115,13 @@ Native `reviewer_high`独立审读后修正原阻断，同tier scoped re-review�
 
 真实路径归入documentation；exact staged snapshot的mandatory checks由当时的
 `.agent/harness/policy.yaml`决定。最终receipt预定位置：
-`.agent/harness/runs/jieshi-e01-authoring-names-20260905/receipt.json`。
+`.agent/harness/runs/jieshi-e01-seedance20-20260905/receipt.json`。
 是否通过和freshness以实际receipt及本轮交付为准，本文不预写成功结果。
 
 ```bash
-python scripts/agent_harness.py inspect --staged
-python scripts/agent_harness.py verify --staged --run-id jieshi-e01-authoring-names-20260905
-python scripts/agent_harness.py verify-receipt .agent/harness/runs/jieshi-e01-authoring-names-20260905/receipt.json
+python scripts/agent_harness.py inspect --base-ref <task-commit-parent> --head-ref <task-commit>
+python scripts/agent_harness.py verify --base-ref <task-commit-parent> --head-ref <task-commit> --run-id jieshi-e01-seedance20-20260905
+python scripts/agent_harness.py verify-receipt .agent/harness/runs/jieshi-e01-seedance20-20260905/receipt.json
 ```
 
 ## Remaining Evidence

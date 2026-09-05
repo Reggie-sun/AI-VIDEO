@@ -4,7 +4,7 @@
   "title": "界蚀",
   "episode": "01",
   "episode_title": "不存在的终点站",
-  "revision": 1,
+  "revision": 2,
   "status": "creative_package_proposed",
   "contract_notes": "此JSON是现有Drama语义contract的文档实例，非新Runtime schema；没有Episode运行时类，不借用B-D0的2–3Shot fixture acceptance。",
   "target": {
@@ -14,25 +14,25 @@
     "height": 1920,
     "fps": 24,
     "edited_frames": 7200,
-    "clarity": "原生1080p档；I2V的adaptive尺寸须按实际输出验证，不能把放大标记为原生1080p。"
+    "clarity": "原生1080p档，9:16、1080×1920；实际输出须验证尺寸和画质，不能把放大标记为原生1080p。"
   },
   "selected_authoring_target": {
-    "version_family": "2.5",
-    "model_id": "doubao-seedance-2-5-260628",
-    "capability_id": "seedance-2-5-260628-image_to_video",
+    "version_family": "2.0",
+    "model_id": "doubao-seedance-2-0-260128",
+    "capability_id": "seedance-2-0-260128-image_to_video",
     "profile_version": "seedance-2026-08-19",
-    "capability_content_sha256": "c383d76fb729c7e53dad5b030f3fcd9f826bee3ca4a733efc4b853191eedf644",
+    "capability_content_sha256": "10a7f345de52722d419b0a41f6cf514e3f0a32bc1027e67d09bfd99ca00f3a29",
     "provider_kind": "volcengine_ark_seedance",
     "runtime_surface": "AI-VIDEO Seedance adapter / Volcengine Ark",
     "mode": "image_to_video",
     "resolution_label": "1080p",
-    "ratio": "adaptive",
+    "ratio": "9:16",
     "fps": 24,
     "native_audio_intent": false,
     "seed": null,
     "negative_prompt_parameter": null,
     "execution_profile_binding": null,
-    "selection_basis": "用户允许2.0或2.5，由primary agent选2.5；当前capability静态核对，不声明账号entitlement/实时价格。统一同一capability避免连续片段跨Provider漂移。"
+    "selection_basis": "用户最新明确指定Seedance 2.0，选择标准版；当前capability静态核对，不声明账号entitlement/实时价格。统一同一capability避免连续片段跨Provider漂移。"
   },
   "story": {
     "premise": "一次深夜环线通勤停靠不存在的终点站。",
@@ -5947,7 +5947,7 @@
       "制作并批准林砚/苏遥/周伯祥/陈立及背景乘客参考形象，SC01/SC02几何与窗反射首帧；用真实资产ID/hash替换需求占位",
       "通过既有Shot Planner/Readiness/Router绑定当前registry、exact首帧及continuity obligation；同机位连续必须接前序真实末帧，换机位须先物化合规连续性keyframe，不靠T2V重造空间",
       "能力A/B板、中文UI/字幕、监控删人等所需合成素材先在现有支持的composition/registered source seam确认；缺失能力不得以临时FFmpeg交付旁路代替",
-      "封装当前2.5执行profile、有限budget reservation、egress、durable intent和one-use permit；本次没有价格或配额事实",
+      "封装当前2.0执行profile、有限budget reservation、egress、durable intent和one-use permit；本次没有价格或配额事实",
       "逐个生成素材/Shot按exact MP4+SHA调用project-local video-analysis，逐required PASS才进入下一依赖Shot；保持郭向东音频与ResolvedTimeline唯一计时",
       "1080p实测解码检查、字形可读性、身份/空间连续性、对白口型/字幕时序、全速人工观看，最后才讨论质量与留存"
     ]

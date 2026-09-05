@@ -6,6 +6,29 @@ learning_eligibility: ineligible
 
 # Jieshi Episode 01 Authoring
 
+## Current Model Selection Update
+
+2026-09-05用户最新指令“用seedance2.0吧”取代初版2.5选择。
+当前目标为标准版 `doubao-seedance-2-0-260128`，capability
+`seedance-2-0-260128-image_to_video`，1080p、9:16、1080×1920、24fps。
+下方初版2.5选择与review/receipt均保留为历史，不证明更新后的执行状态。
+
+本次仅修改原创作包的模型目标、画幅参数、源约束及派生hash，没有修改Runtime路径或契约。
+由主线程完成这一有界文档调整；没有新增subagent或Provider调用。
+现有capability的canonical SHA-256：
+`10a7f345de52722d419b0a41f6cf514e3f0a32bc1027e67d09bfd99ca00f3a29`。
+当前proposal SHA-256：
+`433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8`。
+65个计划生成素材均为4–9秒，符合本地capability的4–15秒范围。
+实际运行Director validator与verification.md内只读检查：16beats、52shots、300秒、
+69个typed artifact及hash通过；逐项对比前版story/cast/scenes/beats/ordered_shots完全一致。
+输入素材仍未绑定，不能把静态参数支持当作账号权限、实测清晰度或执行就绪。
+
+当前模型版本的commit-range Harness receipt预定为
+`.agent/harness/runs/jieshi-e01-seedance20-20260905/receipt.json`，实际结果以receipt为准。
+record-ai-video-session评估为更新同一主题记录；distill-ai-video-learning为`no_candidate`，
+没有新增独立媒体实验或现有Learning Claim变更证据。
+
 ## Purpose
 
 为《界蚀》第一集《不存在的终点站》完成用户要求的300秒创作包：

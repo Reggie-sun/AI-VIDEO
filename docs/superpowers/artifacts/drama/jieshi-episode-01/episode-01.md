@@ -4,7 +4,9 @@
 
 ## Production Choice
 
-按用户允许的范围选择Seedance 2.5：`doubao-seedance-2-5-260628`，统一准备 `image_to_video` 素材。当前仓库该mode使用 `ratio=adaptive`；以竖屏原生高清首帧锁画幅，选择1080p档并在实际输出后核验尺寸。该capability不支持seed或独立negative_prompt字段。执行profile、素材、费用与egress等仍待实际执行前封装。
+按用户最新指定选择Seedance 2.0标准版：`doubao-seedance-2-0-260128`，统一准备 `image_to_video` 素材，使用 `ratio=9:16`、1080p档（1080×1920）、24fps。当前仓库该capability允许4–15秒；本集计划源素材均为4–9秒。该capability不支持seed或独立negative_prompt字段。执行profile、素材、费用与egress等仍待实际执行前封装，实际清晰度须在输出后核验。
+
+生成提示按Seedance 2.0 guidance使用有序动作与起止状态；逐镜台词窗口、七秒交错和字幕时间由最终ResolvedTimeline落实，不要求模型精确执行密集时间戳。
 
 先制作逐镜首帧和必要画面分层，素材仅完成一个动作。倒影缺席、错误分支、中文UI、监控删人各有明确目标；正式合成须经现有支持的注册素材与ResolvedTimeline/HyperFrames seam，不假定任意mask/VFX已经受runtime支持。
 

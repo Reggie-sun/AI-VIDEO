@@ -1,7 +1,7 @@
 {
   "document_kind": "derived_creative_artifact_model_snapshot",
   "authority": "development_authoring_only",
-  "source_sha256": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee",
+  "source_sha256": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8",
   "source_path": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
   "note": "各artifact通过现有Pydantic model和canonical hash；未物化ProductionProject/Manifest/Registry，无asset绑定，无Product loading/readiness/acceptance claim。",
   "artifacts": {
@@ -9,13 +9,13 @@
       "artifact_id": "jieshi-e01-brief",
       "schema_version": "2.0",
       "revision": 1,
-      "content_hash": "9bb691079832a605a9586600a345f1a358e02d34fd86fed07360a87789b61be3",
+      "content_hash": "8633f3f3dc750291e947df20258a51a19354f4f0f3710aea04c949b0283f60f6",
       "creation_receipt_id": "authoring-jieshi-e01-r1",
       "source_provenance": [
         {
           "kind": "derived",
           "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-          "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
         }
       ],
       "title": "界蚀：不存在的终点站",
@@ -69,7 +69,7 @@
         "“请问你找谁？”",
         "随后镜头切到地铁监控。",
         "刚才整节车厢里，从始至终都没有出现过林砚。",
-        "用seedance2.0或者2.5",
+        "用seedance2.0吧",
         "清晰度用高点,你看着办",
         "为什么名字都是字母,名字你也自己取了好了"
       ]
@@ -78,13 +78,13 @@
       "artifact_id": "jieshi-e01-story",
       "schema_version": "2.0",
       "revision": 1,
-      "content_hash": "8d9715ade7af94d8c71fe32cf392c675acf3bcf626cbf9af47c8a14968adf42f",
+      "content_hash": "0281bd79779a677979a310d0d00e956e80f5775cdc52e47611f49ae5f1f7a984",
       "creation_receipt_id": "authoring-jieshi-e01-r1",
       "source_provenance": [
         {
           "kind": "derived",
           "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-          "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
         }
       ],
       "language": "zh-CN",
@@ -165,13 +165,13 @@
         "artifact_id": "jieshi-e01-character-LY",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "5d89b9bc186df3a0d47e70e5077fa231119a2baae3a44b70596824b41cf7bb46",
+        "content_hash": "c3299fdca27f81c955ae32767569dedb88bb316d2cc01dd5433d433c5243a0a8",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "character_id": "LY",
@@ -198,13 +198,13 @@
         "artifact_id": "jieshi-e01-character-G",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "a1ba7629b41935152885243cd39403d2eee465f0a37978360bc3e5150e543fc3",
+        "content_hash": "7fcfc01b4d13ab1e26ef688c9eb5919e5e4ec64698b96a061764bf0bc12be127",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "character_id": "G",
@@ -228,13 +228,13 @@
         "artifact_id": "jieshi-e01-character-P1",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "0e360e64252c7289a97c97e48f49303434749bac465e53fb641411e162201614",
+        "content_hash": "aae021d424373a1576dbcef41b6bfedc59f9efbae181d0cb7fe8da0a09c25f95",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "character_id": "P1",
@@ -257,13 +257,13 @@
         "artifact_id": "jieshi-e01-character-P2",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "9a21129db0b2e5f278ba84f7bec04f84847fbf488098ad726fc7587612a456b6",
+        "content_hash": "5351bc75245b2fa776e0ac1ade12d8ff5da6d871ca97a55862c249c3d711822c",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "character_id": "P2",
@@ -285,13 +285,13 @@
         "artifact_id": "jieshi-e01-character-P3",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "a5bb7fe610a6775e1c704487719e3c4649f58d5b2d3ad412e1d8fc451c2d020c",
+        "content_hash": "b45d2831b66d41aa0c637800b24c220b4af51bd788544441a7f0a3b5350510ce",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "character_id": "P3",
@@ -311,13 +311,13 @@
         "artifact_id": "jieshi-e01-character-P4",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "39c2c52bc1e59eb54488e4727be78a1bda99739b0524b43f6b0ba135f9481a60",
+        "content_hash": "988ca8f7815d6424a0627f165339ffeff4446b9fcfec2ef68ff69d1ff7b67e15",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "character_id": "P4",
@@ -337,13 +337,13 @@
         "artifact_id": "jieshi-e01-character-P5",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "5b3e6c497d9f11c225cd6b9d4d4f8add2e724219a2acb898c29116e8eb4636e2",
+        "content_hash": "e2797dc47620f685229ca0e3b1c8f5c443f8ecf2579a231662e60a1f17d223a2",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "character_id": "P5",
@@ -363,13 +363,13 @@
         "artifact_id": "jieshi-e01-character-P6",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "0edac2a0f0cac394a27079c5ab20256bc0cfb8f922947ae644f91842c20aff88",
+        "content_hash": "671783c8b446810af213480d27e37ebb36909ba7b028592352c3a125c1d2f6b2",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "character_id": "P6",
@@ -391,13 +391,13 @@
         "artifact_id": "jieshi-e01-character-M",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "28d17447e4d8b683223e5c47cb83451231fba545c83a5b9708eca4a6fcd5f112",
+        "content_hash": "ec526120a71282239f5990943a3c2c9350a094f3545b578dc170d4afeb09dd0b",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "character_id": "M",
@@ -415,13 +415,13 @@
         "artifact_id": "jieshi-e01-character-PA",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "73f884d5c41df17d05d3a3c44f84a93418e70118708e039309e1409c49413aec",
+        "content_hash": "7c697e2ca7614a1c62aebbed3298881e52625d7a799d02a0b14085dc6018b35b",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "character_id": "PA",
@@ -439,13 +439,13 @@
         "artifact_id": "jieshi-e01-character-N1",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "ae59fd9ab820ff12ebc8bcc43bc3bc2655dc2a2fcfd58029c1f5fc45f5d344e4",
+        "content_hash": "0ea209434baeff20a981ada41308768c0e052b69b9b7679f0321b5897b82fb47",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "character_id": "N1",
@@ -468,13 +468,13 @@
         "artifact_id": "jieshi-e01-scene-SC01",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "d08cd90302d017491838ace25a1bd6d5948b7317c135d2e4adc17629703a9e6c",
+        "content_hash": "57f7ecfd830686dbbf6e2675ee8660d3a1ec6a4da939e069fa687db1a943befe",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "scene_id": "SC01",
@@ -509,13 +509,13 @@
         "artifact_id": "jieshi-e01-scene-SC02",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "a3e6f4f5fb08026adcbbbdbb28fcb5f28df6d9d0d29f922844f836b63c04f3a7",
+        "content_hash": "2386c3eb336ce44983b9b5183a01403b85957af62ec60286cb9a540638ec9fb7",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "scene_id": "SC02",
@@ -541,13 +541,13 @@
         "artifact_id": "jieshi-e01-scene-SC03",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "277699dec39e4f610dfe4448545c85c288df8ac8fc67eead5c5f0d6eb33e8754",
+        "content_hash": "4e0a8aaab6c8a1ca506cacd6622bb9c38e73e17745901b5a8efe24a8d70f460f",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "scene_id": "SC03",
@@ -577,13 +577,13 @@
       "artifact_id": "jieshi-e01-storyboard",
       "schema_version": "2.0",
       "revision": 1,
-      "content_hash": "0cc8548cd027159ce030fab0e4344fd90ce9ca42691f0298f24a59a4e93c6587",
+      "content_hash": "7c01407b13a02512ff1992d2116dfece07758b6e4fefb8fb91d25cecd306bcca",
       "creation_receipt_id": "authoring-jieshi-e01-r1",
       "source_provenance": [
         {
           "kind": "derived",
           "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-          "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+          "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
         }
       ],
       "beats": [
@@ -765,13 +765,13 @@
         "artifact_id": "jieshi-e01-S01",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "40b02bc22a5adbcb55b60df9265b7040d419985475a7e5ba4b36b32cf4b00237",
+        "content_hash": "419dbc0e7b943f4e37434dfd9a331870753bd550c9b9450822be467435792bbb",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S01",
@@ -821,13 +821,13 @@
         "artifact_id": "jieshi-e01-S02",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "1385053bb0bc6507a28f62eda6ce93982e27f606aacf56c7160489e7dcc4a49c",
+        "content_hash": "3dcad9d808bdea4e9e15ba368931d34f1c1268fb52e2b18af84e00159ff7f27f",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S02",
@@ -871,13 +871,13 @@
         "artifact_id": "jieshi-e01-S03",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "76137266b627fa5dc12ae6a1442a8fbc29d62712dfd19edc47878cee8b84fd29",
+        "content_hash": "c4bbabf7b2022a9afeff035d5038d0196946795890e48a945436c4b18be27bc3",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S03",
@@ -920,13 +920,13 @@
         "artifact_id": "jieshi-e01-S04",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "92878d6fae5bafc08058ae4551f8107a2f457739edda583748a054b1688966e4",
+        "content_hash": "fad475eaf964fd48cd71cb8f74b863b4e92e0e16e204e669daf2016a605e6c20",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S04",
@@ -972,13 +972,13 @@
         "artifact_id": "jieshi-e01-S05",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "70a00ed284629f763be3e7db87a2dc2d71746e34324d790e6e8559bd3fe0971e",
+        "content_hash": "2d7bb051e35803d2db06ec09d02dbf05c8f9aaf3f7cd7a1c187106d4c0b72467",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S05",
@@ -1021,13 +1021,13 @@
         "artifact_id": "jieshi-e01-S06",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "3bb827e1831b95f6fe679a3d9839982f02bdaba1b3fc958d31563c452a556ffd",
+        "content_hash": "3427702051c4a18933f335491d990e09e37058f20a45eb7d2de275c2d0493ff9",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S06",
@@ -1070,13 +1070,13 @@
         "artifact_id": "jieshi-e01-S07",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "a3654bf8762ee5c48e8028e749e61b44212098b98752d822be63b7295b0618d6",
+        "content_hash": "3edcffe2345a1b81c408d7822a0e31af6eb6b18c834d0d62b1f991939ae82fd2",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S07",
@@ -1121,13 +1121,13 @@
         "artifact_id": "jieshi-e01-S08",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "a6206ed0f4a94d8019e4f88e05f31c50e4a7770067f1a4ae6f2eaa0ea1e53292",
+        "content_hash": "de79a970d58c200878c665262586a21318a121155446456255679060ea8d9c9a",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S08",
@@ -1170,13 +1170,13 @@
         "artifact_id": "jieshi-e01-S09",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "10f6d208d81b9751d7fc9ca1bb7385dab3bfd4aa1230e3f7048b965d84a0a8cd",
+        "content_hash": "90be65593c77d1e311aa3ce56fecc633dd1b590e08e3a00dc2cf6e3a2b39eaf4",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S09",
@@ -1219,13 +1219,13 @@
         "artifact_id": "jieshi-e01-S10",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "a434e2544c0b8b215c65375f20a885cff453b78eeca2788f48033d07dc3f8b0a",
+        "content_hash": "62b4f319ac41319030f8ec6be97bdf8c9bea49db3a887eabba32b09ddce33e20",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S10",
@@ -1268,13 +1268,13 @@
         "artifact_id": "jieshi-e01-S11",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "997eff6e7cb0d51760b93b4a60a2fb30af91e75a6b9703611ea6501506082159",
+        "content_hash": "1e646b39742f8ef8e0c5f3477ae2f2e16b9178625a0bc4fe16a6463b61e90be5",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S11",
@@ -1318,13 +1318,13 @@
         "artifact_id": "jieshi-e01-S12",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "ad3871ca2888c949549477ce016cdcb2fb927368d2687135962f8fbd43c4852e",
+        "content_hash": "675b6d9cf30f336452aac250069034056fb2b7b17e64a0ad1f6745b60ebb702b",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S12",
@@ -1368,13 +1368,13 @@
         "artifact_id": "jieshi-e01-S13",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "428c7bdbdd0f719416435b3fbb05bd237cbadbde16c1141bd111a5544e43b117",
+        "content_hash": "49ed823d86c6b01083fe2ebbf1670c1184359eed1eb660e5a6356977a38a616c",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S13",
@@ -1418,13 +1418,13 @@
         "artifact_id": "jieshi-e01-S14",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "975bd49b42d2bb0e54d0dbf0a514f65e14e0b851fad8f00c3957c7f1c13664b6",
+        "content_hash": "5436ed6815afd8252d41c98e542e21f3ff5afbdd401cd0f37faba7986ca8c47d",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S14",
@@ -1468,13 +1468,13 @@
         "artifact_id": "jieshi-e01-S15",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "6e707d2fc828376de3152ee454c6a55d1d702337a0dbcae8dce67f03ba2a85f5",
+        "content_hash": "f6bb900dba49d7e2c29b354e57c5f75140749dddfdb8a0822c0ce1e3590e392f",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S15",
@@ -1517,13 +1517,13 @@
         "artifact_id": "jieshi-e01-S16",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "c18e3412fa3c40c837e6704e8a451ecacbbc3a047ebe7dfdf29a5d8b0e3385e5",
+        "content_hash": "71dd9c7ec0e1c4ab7bf7e5c1e842f4fc2a8f7385239cb23def6e2a27bbaae27e",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S16",
@@ -1567,13 +1567,13 @@
         "artifact_id": "jieshi-e01-S17",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "250f2b4ae521948febc51cb0fe4a46f6fdf7c9c4f3122ac9334639b7556560ab",
+        "content_hash": "5081139b186e44f3978a4c1e13cc055056eed5c48010c34428f063cdfdedf7e0",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S17",
@@ -1617,13 +1617,13 @@
         "artifact_id": "jieshi-e01-S18",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "b0658f7bbb46f305cca18b55eb8fe110a32461dfc6c77d774614e4850ee39588",
+        "content_hash": "3e9345bda8469cd531b030269a25b622d6dcb7baeb62857a9a004326cbd9299c",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S18",
@@ -1668,13 +1668,13 @@
         "artifact_id": "jieshi-e01-S19",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "e42eb384c29392b54fa21edd1e72a18ace0c2563a27d6dca49f752f9449b29b7",
+        "content_hash": "6e14a531a0783de7b1a11e5082ba0a47138efe6b421463ab5df403e062f95650",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S19",
@@ -1717,13 +1717,13 @@
         "artifact_id": "jieshi-e01-S20",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "af5a2d70921ae193a891676a9f0a476cca5e717a790a9a4fac044a6a38dcce4c",
+        "content_hash": "19abc3719715132e26405f0b6d8955a9bd95840642e8f0a882dde175892a78d3",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S20",
@@ -1768,13 +1768,13 @@
         "artifact_id": "jieshi-e01-S21",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "f0d0a3ea20d410240df913c24ce9a3f1b34620019a6690c72540ec1f79639a68",
+        "content_hash": "9db5084db4399643ed544a63ba5bfd0893c975da0c429cbe2c4b9a85df421aa4",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S21",
@@ -1817,13 +1817,13 @@
         "artifact_id": "jieshi-e01-S22",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "e030da136e01eec2c2d503d280984ba4e31444e2335f7a14faeae4f00fed5787",
+        "content_hash": "b529a8550ed2eb50b7ffc0aca40aed1d792f3977c63b2c419521e7c09b115c54",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S22",
@@ -1866,13 +1866,13 @@
         "artifact_id": "jieshi-e01-S23",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "ff86daa22c9f07049de153805a3305a8e4dcc2df933b32ed1dd8bb317bb68131",
+        "content_hash": "8ccdca90bdb8ec6a5452b08992e78b23968e3e588bef3473748573155b9adb2a",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S23",
@@ -1916,13 +1916,13 @@
         "artifact_id": "jieshi-e01-S24",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "bb3de8a210f4fa1a49c91e3fca0632ddce6df2ae47f8b34c59a00f5c912a9e44",
+        "content_hash": "f839d9f3e36d9da80b6687079b186c7144abf87334becfec03e6250bcc14899d",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S24",
@@ -1966,13 +1966,13 @@
         "artifact_id": "jieshi-e01-S25",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "bf6864319a7f1354af7ec235c8b13a91e542b6fff83761c1a265e8425d2b74fb",
+        "content_hash": "41492336e03a79b903ac77c8191a9800ae0fdb7630f63add51b86f635a2f0786",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S25",
@@ -2016,13 +2016,13 @@
         "artifact_id": "jieshi-e01-S26",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "1c7ae9433df3243482a07de33f15b0c8ca7693648af7ab266e4ace7afc3ceb94",
+        "content_hash": "703a8a8d4377f494423b75e2e7b76076ae071ae8acb3ceaca65bb09d87f0b25f",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S26",
@@ -2065,13 +2065,13 @@
         "artifact_id": "jieshi-e01-S27",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "6ad92749c062dc42a86ede73fce2b4471ada42035d64e995e37cfb3664aa949a",
+        "content_hash": "33969ec0470847965d9b44932317f8bda994c34a8bc3b647e9bfc3cbb13cfbf6",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S27",
@@ -2116,13 +2116,13 @@
         "artifact_id": "jieshi-e01-S28",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "f7a70173be0626cc48c5fcb9e8d090cf252218fa3ae71bcc34a78709eaf863e8",
+        "content_hash": "a29987c65ac77222860c17b5a1d1602349da6064c234542d4df8a313fd6f548f",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S28",
@@ -2167,13 +2167,13 @@
         "artifact_id": "jieshi-e01-S29",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "df32ac88635f4e70aa911631b881dadeaf20b5d3bfe04697c4cd46feba28b051",
+        "content_hash": "9e630d1598ed329c89f2a087346449a6764b37cff167cb944ca9fc113f5a4e19",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S29",
@@ -2218,13 +2218,13 @@
         "artifact_id": "jieshi-e01-S30",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "eea791b7ebc65ed9022bf337e2139f36a704508f01f878de699cf39d4f8858e2",
+        "content_hash": "bb3d0631090daf27f204a7fa3d2195bf5beb5011da2aeb5a5c64e7367974160c",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S30",
@@ -2269,13 +2269,13 @@
         "artifact_id": "jieshi-e01-S31",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "79842fcef453d73821b9d8eb99fe7b574228117082101817bb9a68ef5af9f1d5",
+        "content_hash": "8118d610f4e01aba00dee6f253fb241a9bf4dc4facb76e9aa77e6079b8f88d07",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S31",
@@ -2320,13 +2320,13 @@
         "artifact_id": "jieshi-e01-S32",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "309d7bada9896badcba2a1a9af2ece778a267e2dd33ef7c8d9e217e0509790a2",
+        "content_hash": "bd5b5e735be087465b492399e26714ead2f3378f9497fc342fcdec56f3d033e6",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S32",
@@ -2370,13 +2370,13 @@
         "artifact_id": "jieshi-e01-S33",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "a6fe0c2a12fdd52922874a05be6bd07abdb3308a48146d1834ad8f8c239e6dc2",
+        "content_hash": "c1b0f1f032b76f8a207d932661e661d8af5b62c3fadf2cf5c873fa51875e20c1",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S33",
@@ -2419,13 +2419,13 @@
         "artifact_id": "jieshi-e01-S34",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "fd247f731569009c0183644dcef7a63028d7de0250c72b6ff6b15726567e4c34",
+        "content_hash": "2da9a883c10849c0d8894193df5d4e1cedae2c7f7a94e080e6979b7af6dc26de",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S34",
@@ -2474,13 +2474,13 @@
         "artifact_id": "jieshi-e01-S35",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "20b81b787336ed9ecbb392a1588e33d4fc67f396ab75d10de6581496949850f1",
+        "content_hash": "3833bc73d2b224488e535108ebf84f2f48e2a585a22f6cafc3414112d5dbc2d1",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S35",
@@ -2525,13 +2525,13 @@
         "artifact_id": "jieshi-e01-S36",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "35fd880b483598249a6e2afbc4c78e70ef9f9b8fa49750f4f12b00bb78290011",
+        "content_hash": "11309a9c8b65ca970e52e0b6fe5bedf9a97d86ab7be2a824d154dba65aa71de2",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S36",
@@ -2575,13 +2575,13 @@
         "artifact_id": "jieshi-e01-S37",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "d0f3cbef60fe37eda799c3cf33b953f56d7509fa47c4ffb903cc14f1c24df255",
+        "content_hash": "37fbec7d399a6404a24699baf8f9f4bceccfd3a2e4c5243137cab0ab2443eaa4",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S37",
@@ -2625,13 +2625,13 @@
         "artifact_id": "jieshi-e01-S38",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "30e095e1ef52871031062e5a895e85c6cd5e2e7c94b9ef86ec40f8ecc4797653",
+        "content_hash": "0c01d02b91c95ed8a49443b69223314a05bf78e73280c73154d0c0243b4b2193",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S38",
@@ -2677,13 +2677,13 @@
         "artifact_id": "jieshi-e01-S39",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "b39c7ef7a2e38a4a199ae543173411fc6ca64171ded009ba486f7b59744d07bb",
+        "content_hash": "11b982892126b7a85a16d6f06bd58773c923be0f70e9f82c5debf5fc5f2aa8c3",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S39",
@@ -2728,13 +2728,13 @@
         "artifact_id": "jieshi-e01-S40",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "c2b762ad3bdab16f3a315ad71d199d08827912091b5441651a9f681ab5165fce",
+        "content_hash": "698bdb3b1b58386ab7a66ab6c6a3ff542e9cb31a4de45c837833c763fa5548d2",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S40",
@@ -2779,13 +2779,13 @@
         "artifact_id": "jieshi-e01-S41",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "3cb28dd7bc37628b9f1803e995454d3f9a929db9c16c611ba3025b8a1e10fb34",
+        "content_hash": "1674319817d79a47fae7c5189eebf09feaf010429ebeb1291c7d8358c4ace0cb",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S41",
@@ -2834,13 +2834,13 @@
         "artifact_id": "jieshi-e01-S42",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "41428ba45da4fa4379410494cdd60700ab6f358df69e46f17cbaa273955bf1be",
+        "content_hash": "56dd8d3a14dc46d920d2c2593c5beab454ca6b49ae251e924fe61fde5e711a92",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S42",
@@ -2884,13 +2884,13 @@
         "artifact_id": "jieshi-e01-S43",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "0fbc5cdc195206e514848fcb0ff803d43d4b8c0e6ce042c6e1a957548d0d2350",
+        "content_hash": "15be8618992f72ba9dacaf7c2ed64ef60a80b2cd6ff382ba5e9d5e873f889528",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S43",
@@ -2933,13 +2933,13 @@
         "artifact_id": "jieshi-e01-S44",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "22029f2843b189de25969866a1c16b68e117d1b5675cca21cdbe30b675096d2a",
+        "content_hash": "4bed4a0dac8c85fbd74badc56a2216c774c889610ce94cf57a664856d8aa5030",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S44",
@@ -2983,13 +2983,13 @@
         "artifact_id": "jieshi-e01-S45",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "048d05d59fba06c3b3adb6e8a16d7368588d467447d61a94ab2ee8d1514ad3c3",
+        "content_hash": "da7ab1d4a6ce30eaac56e0dbe0dd0544c72d1b0eeeee11659aad15a9ef6bd0d5",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S45",
@@ -3033,13 +3033,13 @@
         "artifact_id": "jieshi-e01-S46",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "970f940cd9d36b3423982ecb71cd6b9aea2ce9c700c12777ba52f290879d4d11",
+        "content_hash": "531f02f5f3b1c151f8f867aacd8870f8b36714dc1a717bf74ac5ad47279a8e1b",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S46",
@@ -3084,13 +3084,13 @@
         "artifact_id": "jieshi-e01-S47",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "6f0d908149dd5d19a1e7176d9f44b57750d9b5863f47197779761fc37b090e5d",
+        "content_hash": "159e62371aa11dcba11ff93edb77d457aecff73e993a9360f2c3da646fdff123",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S47",
@@ -3134,13 +3134,13 @@
         "artifact_id": "jieshi-e01-S48",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "086c9269f98c197b406203ab2b0c2c1623155a230fae96b1756d883ca970b1b8",
+        "content_hash": "4704d4db2a1a398a276a707a5da5866defea9e5e8229cbd1707dc21c8bfa3794",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S48",
@@ -3184,13 +3184,13 @@
         "artifact_id": "jieshi-e01-S49",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "3bc3c07409ce8285e2b3b62681345007284b639f29383da3295faa53a2e3fc8c",
+        "content_hash": "9665fb6600cf1fee07b4564da7ec548e8a5281cc5ea874dc47d6b7acf1737b92",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S49",
@@ -3234,13 +3234,13 @@
         "artifact_id": "jieshi-e01-S50",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "f12df9ec7bab226f1eec669bd71f2414c7547df8d2c379024be963347944da9f",
+        "content_hash": "7cf85a1f3956b012ced577c65e3c76a688ae16cfca81372b1532fea62ba5dbdc",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S50",
@@ -3284,13 +3284,13 @@
         "artifact_id": "jieshi-e01-S51",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "7d5d9c1467c231927494854c4820bd6def173a75c79b141f71a341d63d907c4a",
+        "content_hash": "c04b68f4d76b68ba5bc78ffb7878efe9f053b5859fbe25f5a6c940c523248659",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S51",
@@ -3339,13 +3339,13 @@
         "artifact_id": "jieshi-e01-S52",
         "schema_version": "2.0",
         "revision": 1,
-        "content_hash": "3790e619f269de1e2d37339576d17d7be94bf612ebffba151682878f1f18482c",
+        "content_hash": "fa4feb654bd32615bbbb11d06b8e3b5e4592da2f7d189026bd8bf9f2c93b315b",
         "creation_receipt_id": "authoring-jieshi-e01-r1",
         "source_provenance": [
           {
             "kind": "derived",
             "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
-            "content_hash": "6f1bdb6d8f0f42cb3a9f3d41ffc1db2206f991330dfdbcac17d14c8b790143ee"
+            "content_hash": "433434377d96a14fa3dc4efce4428acfa1b599d3c81db6afedfd26a2ddf459e8"
           }
         ],
         "shot_id": "S52",
