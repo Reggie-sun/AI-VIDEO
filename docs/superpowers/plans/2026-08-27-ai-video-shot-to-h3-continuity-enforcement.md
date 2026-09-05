@@ -115,7 +115,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / `STOP_AFTER_SHOT_01_GATE` | Canonical v5 invocation在runtime/profile/source exact match与fresh Harness后完成1次local H3/T8 submit，取得Shot 01 exact MP4 SHA-256 `264a4857...45c36`。Immediate project-local `video-analysis`已绑定同一bytes；identity/decode/single-scene evidence通过，但required dialogue semantics/speaker/lip-sync仍未完全判定，五项HUMAN per-Shot findings也无full-length `1.0x` full-audio verdict。Shot 02、retry、activation、P6与Final Acceptance继续阻断。详见`2026-09-06-drama-m6-d-shot-01-first-generation.md`与`per-shot-media-gate/key-at-the-waiting-room-shot-01-v1.blocked.json` |
+| `M6-D Drama` | `DEFERRED_PRODUCT_PRIORITY`；media verdict `NOT_EVALUATED` | 用户于2026-09-06确认延期钥匙候诊室canonical lane。保留v5 Shot 01及`STOP_AFTER_SHOT_01_GATE`证据，取消默认人审催办、Shot 02与repair推进；已有30秒Development v81保留，不继承为M6-D PASS。恢复须由用户明确重新选择该lane，并重核current identity与适用Gate。详见`2026-09-06-drama-m6-d-shot-01-first-generation.md` |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -767,7 +767,14 @@ make harness-verify
 
 ## Execution Order And Stop Conditions
 
-Latest execution stop（2026-09-06）：shot-router owner提交stable source `b304141`后，v5 driver固定于`6244b7b`，
+Current priority decision（2026-09-06）：用户在询问项目必要性后，以“可以”确认将钥匙M6-D lane按产品优先级延期。
+Scheduling status为`DEFERRED_PRODUCT_PRIORITY`；media verdict仍为`NOT_EVALUATED`，原exact Gate不修改。
+本lane不再有active Next One Thing；不默认催办五项HUMAN verdict、生成Shot 02或repair。
+已有30秒Development v81与canonical v5 Shot 01都保留；延期不证明任何新quality acceptance，也不改变M6-C结果。
+M7–M9在本plan中继续deferred，不据此阻塞不依赖这些里程碑的其他产品工作。
+只有用户明确重新选择本lane后，才重新核对current source/request/runtime与原Gate，确定有界恢复步骤。
+
+Historical execution stop（2026-09-06，media evidence仍有效）：shot-router owner提交stable source `b304141`后，v5 driver固定于`6244b7b`，
 GET-only v9 preflight重新验证exact graph/request/prompt/audio、Provider/profile/workflow、runtime
 `7cee3ceb...`与empty queue；v5 approval固定于`429d17c`。Exact executable Harness range
 `b304141..6244b7b`通过`4431 passed, 4 skipped`及Architecture `0/0/0`，receipt
@@ -782,7 +789,7 @@ transcribe与review；没有媒体retry。Technical identity/decode/single-scene
 sealed delivery timing，五项required HUMAN findings也尚无exact full-length `1.0x` full-audio playback attestation。
 Current gate为`M6-D=NOT_EVALUATED / STOP_AFTER_SHOT_01_GATE`，见
 `per-shot-media-gate/key-at-the-waiting-room-shot-01-v1.blocked.json`。`next_shot_submit_allowed=false`；sealed v5 budget
-`retry_count=0`。Next One Thing仅为current user或pre-authorized HUMAN designee对exact Shot 01逐项给出五项HUMAN verdict；
+`retry_count=0`。当时Next One Thing为current user或pre-authorized HUMAN designee对exact Shot 01逐项给出五项HUMAN verdict；该排期已由上方延期决定取代。
 不得提交Shot 02、生成repair attempt、activation、pairwise/whole-scene Gate、P6或Final Acceptance。
 
 Historical v4 execution stop（2026-09-06）：前一Vidu source已由owner提交`467397c`。V4 driver固定于`30cf1b8`，

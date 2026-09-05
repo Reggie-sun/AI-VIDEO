@@ -9,6 +9,19 @@ evidence_index_version: "1"
 
 Date: 2026-09-06
 
+## Product Priority Deferral — 2026-09-06
+
+用户询问重复执行钥匙场景对项目的必要性后，以“可以”确认停止继续生成并将该lane按产品优先级延期。
+Current scheduling status为`DEFERRED_PRODUCT_PRIORITY`；原media verdict保持`NOT_EVALUATED`，exact
+`STOP_AFTER_SHOT_01_GATE` envelope与5.167s Shot 01保留。下方人审清单成为恢复时参考，不再是当前待办。
+本lane没有active Next One Thing；不默认催办HUMAN verdict、生成Shot 02或repair。恢复须由用户明确重新选择该lane，
+并重新核对current identity与适用Gate。
+
+已有30秒Development v81保留在`runs/drama-h3-t8-30s-preview-20260905-v81/drama-stock20-repair-30s-subtitled.mp4`，
+其结果不升级为canonical M6-D PASS。M7–M9在continuity plan内继续deferred，其他不依赖这些里程碑的产品工作可独立推进。
+本次只更新plan与本记录，无新媒体、Provider或Product state操作。`record-ai-video-session`沿用本primary record；
+`distill-ai-video-learning=no_candidate`，因为仅新增用户优先级决定，没有新experiment或material claim evidence。
+
 ## Purpose
 
 本文封存canonical `Key at the Waiting Room` Shot 01首次真实local H3/T8 generation、exact fetched MP4与紧随其后的
@@ -81,7 +94,7 @@ dialogue semantics、speaker binding与lip-sync没有credible complete evidence�
 | drama-shot01-v5-technical-gate | drama-shot01-first-20260906-v5 | drama-m6-d-shot01-first-generation | drama-shot01-first-20260906-v5 | N/A | 264a4857ed7bd279c9fc528b78d59d55fc8747c128bdf9b2f68ff6e9ea745c36 | ANALYZER | NOT_EVALUATED | REQUIRED_AUDIO_SEMANTICS_SPEAKER_LIPSYNC_NOT_ESTABLISHED | SAME_EVIDENCE_NEW_PROOF_LAYER | drama-shot01-v5-provider-result | runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-first-20260906-v5-media-gate-v1.json |
 | drama-shot01-v5-human-gate | drama-shot01-first-20260906-v5 | drama-m6-d-shot01-first-generation | drama-shot01-first-20260906-v5 | N/A | 264a4857ed7bd279c9fc528b78d59d55fc8747c128bdf9b2f68ff6e9ea745c36 | HUMAN | NOT_EVALUATED | HUMAN_PLAYBACK_ATTESTATION_MISSING | SAME_EVIDENCE_NEW_PROOF_LAYER | drama-shot01-v5-provider-result | docs/superpowers/artifacts/drama/b-d0/per-shot-media-gate/key-at-the-waiting-room-shot-01-v1.blocked.json |
 
-## Assessment And Next Work
+## Historical Assessment And Resume Reference
 
 Current boundary是`M6-D=NOT_EVALUATED / STOP_AFTER_SHOT_01_GATE`，不是`STOP_BEFORE_SUBMIT`。下一唯一动作是由当前用户或
 playback前明确授权的HUMAN designee，以exact MP4全长、`1.0x`、full audio、primary verdict期间不scrub的方式，对以下五项
