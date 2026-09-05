@@ -147,24 +147,26 @@ function runContexts(details) {
         });
       }
     }
-    for (const [mediaIndex, media] of (Array.isArray(detail?.workspace_media) ? detail.workspace_media : []).entries()) {
+    const workspaceMedia = Array.isArray(detail?.workspace_media) ? detail.workspace_media : [];
+    for (const [mediaIndex, media] of [...(detail?.active_render_media ? [detail.active_render_media] : []), ...workspaceMedia].entries()) {
       if (!validMedia(media)) continue;
+      const isRender = media === detail.active_render_media;
       const projectTitle = valueOrNull(detail?.project?.title);
-      const fileName = valueOrNull(media?.asset_id);
+      const fileName = valueOrNull(media?.asset_id || media?.relative_path);
       contexts.push({
-        id: `runs:${detail?.workspace || ""}:workspace_media:${fileName || mediaIndex}`,
+        id: `runs:${detail?.workspace || ""}:${isRender ? "active_render" : "workspace_media"}:${fileName || mediaIndex}`,
         sourceId: "runs",
         workspace: valueOrNull(detail?.workspace),
         ownerKey: JSON.stringify([detail?.workspace, detail?.project?.project_id]),
         attemptId: null,
-        role: "workspace_media",
-        title: [projectTitle, fileName].filter(Boolean).join(" · ") || null,
+        role: isRender ? "active_render" : "workspace_media",
+        title: [projectTitle, isRender ? "合成成片" : fileName].filter(Boolean).join(" · ") || null,
         semanticTitle: null,
         semanticBinding: null,
         model: null,
         prompt: null,
-        startedAt: null,
-        timeKind: null,
+        startedAt: isRender ? valueOrNull(media.started_at) : null,
+        timeKind: isRender && timestamp(media.started_at) !== null ? "attempt" : null,
         media,
         url: mediaUrl(media, "/api/runs/media/"),
         detail,

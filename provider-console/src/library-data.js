@@ -58,7 +58,8 @@ export function useLibraryData() {
         const workspaces = body.workspaces || [];
         const keys = new Set(workspaces.map((item) => item.workspace));
         setDetails((current) => Object.fromEntries(Object.entries(current).filter(([key]) => keys.has(key)).map(([key, value]) => [key, { ...value, refreshing: true }])));
-        const pending = [...workspaces].sort((a, b) => (Date.parse(b.latest_video_attempt_at) || 0) - (Date.parse(a.latest_video_attempt_at) || 0));
+        // Catalog order loads recently updated render-only workspaces promptly too.
+        const pending = [...workspaces];
         const worker = async () => {
           while (pending.length && !controller.signal.aborted) {
             const item = pending.shift();

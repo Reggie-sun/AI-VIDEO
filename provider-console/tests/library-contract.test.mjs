@@ -11,6 +11,25 @@ import {
 
 const sha = (letter) => letter.repeat(64);
 
+test("strict render output is searchable and ordered without inventing a Shot or Provider attempt", () => {
+  const rendered = { ...media("d", "rendertoken"), source_kind: "active_render", relative_path: `state/render/outputs/${sha("d")}.mp4`, started_at: "2026-09-05T11:00:00Z" };
+  const entries = buildLibraryEntries([
+    { workspace: "lighthouse/final-production/project.yaml", project: { project_id: "final", title: "The Lighthouse Awakens" }, attempts: [], active_render_media: rendered },
+    detail("source", attempt({ fetched_media: media("a", "sourcetoken") })),
+  ], null);
+  assert.equal(entries.length, 2);
+  const [entry] = filterLibraryEntries(entries, { query: `${sha("d")}.mp4` });
+  assert.equal(entries[0], entry);
+  assert.match(entry.title, /The Lighthouse Awakens.*合成成片/);
+  assert.equal(entry.url, "/api/runs/media/rendertoken");
+  assert.equal(entry.contexts[0].role, "active_render");
+  assert.equal(entry.contexts[0].attempt, null);
+  assert.equal(entry.contexts[0].versionKey, null);
+  assert.equal(entry.model, null);
+  const unavailable = buildLibraryEntries([{ active_render_media: { ...rendered, token: undefined } }], null);
+  assert.equal(unavailable[0].available, false);
+});
+
 test("registry roles supplement the same owner but never choose a different Project title", () => {
   const output = media("a", "registered");
   const first = detail("owner-a", attempt({ fetched_media: output }));

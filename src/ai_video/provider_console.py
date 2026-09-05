@@ -32,6 +32,7 @@ from ai_video.provider_console_manifest import (
     latest_video_attempt_at as _latest_video_attempt_at,
     read_production_manifest_nofollow as _read_production_manifest_nofollow,
 )
+from ai_video.provider_console_render import active_render_media
 
 
 _BOUNDARY = {"read_only": True, "local_only": True, "network": False}
@@ -722,6 +723,7 @@ def _production_detail(
         ],
         "workspace_media": workspace_media,
         "workspace_media_truncated": workspace_media_truncated,
+        "active_render_media": active_render_media(loaded, workspace, media_map) if status == "valid" else None,
         "_media": media_map,
     }
 

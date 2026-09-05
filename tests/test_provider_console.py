@@ -34,6 +34,46 @@ AUTOMATIC = ToolIdentity(name="continuity-cuda", version="1")
 HUMAN = ToolIdentity(name="continuity-human", version="1")
 
 
+def test_strict_active_render_is_browsable_without_video_generation(tmp_path: Path):
+    from test_production_hyperframes import make_manifest_25_render_fixture
+    from ai_video.production.project import load_production_project
+
+    runs = tmp_path / "runs"
+    root = runs / "render-only" / "final-production"
+    fixture = make_manifest_25_render_fixture(root)
+    workspace = "render-only/final-production/project.yaml"
+    assert provider_console.project_workspace_detail(runs, workspace).get("active_render_media") is None
+    fixture.render()
+    loaded = load_production_project(root / "project.yaml")
+    output = loaded.render_state.output
+    before = {p.relative_to(root): p.read_bytes() for p in root.rglob("*") if p.is_file()}
+
+    detail = provider_console.project_workspace_detail(runs, workspace)
+
+    assert detail["status"] == "valid"
+    assert detail["attempts"] == []
+    media = detail["active_render_media"]
+    assert media["sha256"] == output.file_sha256
+    assert media["bytes"] == output.size_bytes
+    assert media["relative_path"] == output.path.as_posix()
+    assert media["source_kind"] == "active_render"
+    assert media["mime_type"] == "video/mp4"
+    assert media["started_at"] == next(
+        a.started_at for a in loaded.manifest.attempts if a.attempt_id == loaded.render_state.attempt_id
+    )
+    assert detail["_media"][media["token"]]["source_path"] == str(root / output.path)
+    assert str(tmp_path) not in json.dumps({k: v for k, v in detail.items() if k != "_media"})
+    assert before == {p.relative_to(root): p.read_bytes() for p in root.rglob("*") if p.is_file()}
+
+    # Same-size corruption must fail strict reopen, never recover a render token.
+    (root / output.path).write_bytes(b"x" * output.size_bytes)
+    invalid = provider_console.project_workspace_detail(runs, workspace)
+    assert invalid["status"] == "invalid"
+    assert invalid.get("active_render_media") is None
+    recovered = provider_console_video_evidence.project_workspace_video_evidence(runs, workspace)
+    assert recovered.get("active_render_media") is None
+
+
 def _write(path: Path, data: bytes = b"{}") -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(data)

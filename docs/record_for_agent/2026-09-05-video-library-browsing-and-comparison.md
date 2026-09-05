@@ -78,5 +78,39 @@ policy/check/artifact hashes 以 `.agent/harness/runs/video-library-browsing-202
 足以提出或修改既有 Learning Claim 的跨实验证据。`distill-ai-video-learning` evaluation：
 `no_candidate`。不创建占位 claim，不修改 Skill/Policy/Gate adoption target。
 
+## Active Render Follow-up — 2026-09-05
+
+用户报告 `director-h3-lighthouse-30s-20260905-001/final-production/state/render/outputs/`
+下的 `3749b1e53c4fe674279b7bf50b8c496b67daa66428569e8f25c77d397c83bd38.mp4`
+未出现在视频库。真实 API 证明 catalog 已发现该 workspace、strict detail 为 valid，但 detail
+只有六段 Registry source-video，`attempts=[]`。根因为投影遗漏已经由 strict Project reader
+验证的 `loaded.render_state.output`；此前 greenhouse 验证不能覆盖 render 成片入口。
+
+本次新增有界只读 `provider_console_render.py`，消费严格重开后的 active render pointer，
+复验 containment/no-follow、SHA/大小后才向原 transport `_media` 注册 opaque token。
+`active_render_media` 为 additive projection；没有 active render 返回 null，恢复旁证不提供
+render token，文件在重开后改变则保留无 token 的不可用 descriptor。不扫描历史 render 目录。
+UI 保留 `active_render` 角色与“合成成片”标题，按 canonical render attempt 时间排序，
+不借用源 Shot 的 Provider/model/Prompt/version。详情请求沿 catalog 顺序先读取最近更新的
+workspace，避免 render-only 项目等所有 video-generation workspace 加载完才出现。
+
+回归测试先在旧代码复现 Python `KeyError: active_render_media` 与 Node `1 != 2`，修复后
+Python Console/index suite 53 passed、Node library contract 10 passed。Python fixture 经
+canonical fake-render lifecycle 和标准 Project loader 重开，确认只读、无 video attempt 仍可
+浏览，等长篡改阻断 strict 输出，recovered reader 不泄漏 render token。Native
+`reviewer_xhigh` verdict `accept`，无 blocking/non-blocking findings。
+
+本轮 Chrome DevTools MCP 在真实 `http://127.0.0.1:5173/` 验证：默认全来源中成片位于首项，
+完整 MP4 文件名搜索命中一项；标题 `The Lighthouse Awakens — 30 seconds · 合成成片`，
+缩略图有效。Exact SHA 如上、18956501 bytes、实测 30.000s / 1344×768、readyState=4，
+播放时间从 0 增至 1.111593s，media error=null；Range `bytes=0-1023` 返回 206/1024 bytes，
+Content-Range `bytes 0-1023/18956501`，页面 error/warn 为空。
+
+最终 exact-snapshot Harness receipt：
+`.agent/harness/runs/video-library-active-render-20260905/receipt.json`；完成状态以该 receipt
+及 freshness verifier 为准。本次仅修复读取/浏览，未生成或复制媒体、未修改 Production state，
+未 push/release，不对媒体质量作新验收。Learning evaluation：`no_candidate`；单个工程缺陷
+及回归/播放验证不构成独立 model-quality experiments。
+
 本轮不证明媒体感知质量、P6、Final Acceptance、activation、remote availability 或 publication。
 扫描仍受原 catalog/reader allowlist 与数量限制；stale、truncated、恢复旁证及来源失败明确可见。

@@ -48,6 +48,8 @@ contract；本次仍不包含媒体生成、Production mutation 或新的 execut
 - 列表单位是 exact 视频内容，以已验证 `sha256 + size_bytes` 去重。同一内容出现在多个来源或
   多个 attempts 时只显示一个视频条目，并可展开全部来源、角色和关联；不同 bytes 不合并。
 - candidate、fetched、已注册视频与 external output 均按各自现有 reader 的允许范围投影。
+  同时包含 strict Project reader 已验证的 `active_render_state` 成片输出；不裸扫 render 目录，
+  不从恢复旁证推导 active render。成片不借用源 Shot 的 Provider、Prompt 或版本身份。
   同一 attempt 的 fetched/candidate 若不同 bytes，则作为不同输出保留角色标记；不只取 active。
 - 展示层只合并 read-only projections，不成为第二个 Registry、Manifest、timeline 或证据 owner。
   每个来源仍保留自身 authority；多个绑定有歧义时，显示歧义并让用户选择详情上下文，不能任取
@@ -69,6 +71,7 @@ contract；本次仍不包含媒体生成、Production mutation 或新的 execut
 - 默认按关联 video attempt 的 `started_at` 降序；没有可信 attempt 时间的 external 条目使用
   已投影的文件时间，并标明“文件时间”。未知时间置后；同时间以稳定 identity 排序。
   workspace mtime、刷新时间不得伪装成生成时间。
+  Active render 成片使用其 canonical render attempt 的 `started_at` 参与相同排序；缺失时置后。
 - 首屏呈现可用结果，不等待所有来源关联完成。显示“已加载 N 段”和扫描/关联是否完成；计数与
   筛选一致。扫描截断、单来源失败、恢复旁证或 stale 数据必须可见，不能宣称已完整列出全部内容。
 - 大量视频采用分页或虚拟列表，预览解码与请求并发有界；滚动离屏不保留无限 video decoder。
