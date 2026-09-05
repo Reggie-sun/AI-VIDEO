@@ -1,6 +1,6 @@
 ---
 record_kind: session_summary
-topic_id: vidu-credential-live-preflight
+topic_id: vidu-live-preflight
 learning_eligibility: ineligible
 ---
 

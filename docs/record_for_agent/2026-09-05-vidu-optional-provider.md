@@ -10,7 +10,7 @@ Date: 2026-09-05
 
 ## Credential Follow-up
 
-同日后续 [live preflight](2026-09-05-vidu-credential-live-preflight.md) 已验证国内站
+同日后续 [live preflight](2026-09-05-vidu-live-preflight.md) 已验证国内站
 credential 与账户查询 HTTP 200，并安全保存 `VIDU_API_KEY`。下方“没有读取真实 credential”
 描述原 implementation checkpoint；生成 POST、媒体质量及 P6 仍未验证，后续未提交生成。
 
