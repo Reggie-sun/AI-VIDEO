@@ -130,7 +130,7 @@ def validate_shot_strategy(
             role for role in roles.values() if not role.asset_ids
         )
         if pending_roles:
-            if len(roles) != 1 or len(pending_roles) != 1:
+            if len(pending_roles) != 1:
                 raise _invalid(
                     f"Shot {shot.shot_id} generated_video requires exactly one "
                     "pending video target role."
@@ -140,6 +140,16 @@ def validate_shot_strategy(
                     f"Shot {shot.shot_id} generated_video pending target role "
                     "must allow only video."
                 )
+            for role in roles.values():
+                if role.asset_ids and not (
+                    role.role == "first_frame"
+                    and len(role.asset_ids) == 1
+                    and role.allowed_asset_types == (AssetType.IMAGE,)
+                ):
+                    raise _invalid(
+                        f"Shot {shot.shot_id} generated_video pending target "
+                        "allows only one bound first_frame image input."
+                    )
         generated_videos = [
             asset
             for asset in bound.values()

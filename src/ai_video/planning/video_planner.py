@@ -4,6 +4,7 @@ from collections.abc import Callable
 from typing import Any, TypeVar
 
 from ai_video.planning._asset_readiness import (
+    is_initial_first_frame_request as _is_initial_first_frame_request,
     asset_matches_role as _asset_matches_role,
     available_role as _available_role,
     current_review as _current_review,
@@ -276,6 +277,24 @@ def _dynamic_decision(
             _append_unique(reasons, ReasonCode.IMPORTANT_CHARACTER)
         _append_unique(reasons, ReasonCode.TEXT_TO_VIDEO_EXPLICIT)
         return GenerationMode.TEXT_TO_VIDEO, PlanOutcome.PROPOSED, ()
+    if (
+        _is_initial_first_frame_request(request)
+        and continuity is ContinuityMode.NONE
+    ):
+        required = (
+            RequiredAssetRole(
+                role=AssetRole.APPROVED_KEYFRAME,
+                reason_code=ReasonCode.REFERENCE_AVAILABLE,
+            ),
+        )
+        if _available_role(request, AssetRole.APPROVED_KEYFRAME) and (
+            _media_selection_is_complete(request, required)
+        ):
+            _append_unique(reasons, ReasonCode.REFERENCE_AVAILABLE)
+            return GenerationMode.IMAGE_TO_VIDEO, PlanOutcome.PROPOSED, required
+        _append_unique(reasons, ReasonCode.MISSING_REFERENCES)
+        _append_unique(warnings, PlanWarning.REQUIRES_HUMAN_REVIEW)
+        return GenerationMode.IMAGE_TO_VIDEO, PlanOutcome.BLOCKED, required
     if declared_roles or generation_operation is not GenerationOperation.AUTO:
         roles = list(declared_roles)
         if generation_operation in {

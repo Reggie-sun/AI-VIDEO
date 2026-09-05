@@ -34,6 +34,16 @@ Provider / neutral requirement / Architecture checks。配置边界见 [Vidu Pro
 
 ## Cross-Cutting Contracts
 
+### Initial Shot First-Frame Input
+
+`validation.validate_shot_strategy()` 允许 pending generated-video 输出位附带一个已绑定
+`first_frame` IMAGE 输入；其余 pending/非图片/多图片输入继续拒绝。
+`planning._asset_readiness` 校验 exact Shot ID/content hash 与该输入绑定，
+`VideoPlanner._dynamic_decision()` 只对 `/3`、无前镜、`AUTO + FIRST_FRAME` 选择 I2V。
+缺失或陈旧首帧阻塞，不转 T2V，不冒充 previous terminal；人物 T2V guard、商业审批、
+连续镜头和 activation owner 不变。Focused verification：
+`python -m pytest -q tests/test_production_validation.py tests/test_planning_video_planner.py tests/test_shot_readiness_gate.py tests/test_production_shot_router.py`。
+
 | Contract | Invariant |
 | --- | --- |
 | Product Isolation | Legacy `0.1.x` CLI/Manifest/flat run layout 与 v2 Production Python APIs 保持隔离；除非独立获批，不得借 v2 change 修改 Legacy public surface。 |

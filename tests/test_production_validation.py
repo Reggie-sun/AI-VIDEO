@@ -180,7 +180,8 @@ def test_all_visual_strategies_accept_concrete_assets(
     validate_shot_strategy(shot, assets)
 
 
-def test_generated_video_accepts_one_unbound_pre_generation_target_role():
+@pytest.mark.parametrize("with_first_frame", [False, True])
+def test_generated_video_accepts_one_unbound_pre_generation_target_role(with_first_frame):
     shot = make_shot(
         VisualStrategy.GENERATED_VIDEO,
         required_asset_roles=(
@@ -189,11 +190,31 @@ def test_generated_video_accepts_one_unbound_pre_generation_target_role():
                 asset_ids=(),
                 allowed_asset_types=(AssetType.VIDEO,),
             ),
-        ),
+        ) + ((make_role("first_frame", "frame.png", AssetType.IMAGE),) if with_first_frame else ()),
         generated_video_rationale="The sealed Shot requires a generated performance.",
     )
 
-    validate_shot_strategy(shot, {})
+    validate_shot_strategy(shot, {"frame.png": make_asset("frame.png", AssetType.IMAGE)})
+
+
+@pytest.mark.parametrize("role,asset_type,asset_ids", [
+    ("scene_reference", AssetType.IMAGE, ("frame.png",)),
+    ("first_frame", AssetType.VIDEO, ("frame.png",)),
+    ("first_frame", AssetType.IMAGE, ()),
+    ("first_frame", AssetType.IMAGE, ("frame.png", "second.png")),
+])
+def test_pending_generated_video_rejects_non_first_frame_adjuncts(role, asset_type, asset_ids):
+    shot = make_shot(
+        VisualStrategy.GENERATED_VIDEO,
+        required_asset_roles=(
+            AssetRoleRequirement(role="final_visual", asset_ids=(), allowed_asset_types=(AssetType.VIDEO,)),
+            AssetRoleRequirement(role=role, asset_ids=asset_ids, allowed_asset_types=(asset_type,)),
+        ),
+        generated_video_rationale="Requires a real performance.",
+    )
+    assets = {asset_id: make_asset(asset_id, asset_type) for asset_id in asset_ids}
+    with pytest.raises(AiVideoError):
+        validate_shot_strategy(shot, assets)
 
 
 @pytest.mark.parametrize(

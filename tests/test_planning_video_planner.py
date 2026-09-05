@@ -28,7 +28,7 @@ from ai_video.planning import (
     prepare_shot_for_existing_production,
     require_current_video_plan,
 )
-from ai_video.production.hashing import canonical_sha256
+from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.models import (
     AssetRoleRequirement,
     AssetType,
@@ -820,6 +820,77 @@ def _generated_shot(**overrides):
         visual_strategy=VisualStrategy.GENERATED_VIDEO,
         **overrides,
     )
+
+
+@pytest.mark.parametrize("defect", [None, "scene_owner", "stale_owner", "unbound", "missing", "wrong_role", "final_visual_only", "previous_without_terminal"])
+def test_v3_initial_first_frame_drives_i2v_and_exact_readiness(defect):
+    shot = seal_artifact(_generated_shot().model_copy(update={
+        "required_asset_roles": (
+            AssetRoleRequirement(role="final_visual", asset_ids=(), allowed_asset_types=(AssetType.VIDEO,)),
+            AssetRoleRequirement(
+                role="scene_reference" if defect == "wrong_role" else "first_frame",
+                asset_ids=("other-frame" if defect == "unbound" else "keyframe-shot-1",),
+                allowed_asset_types=(AssetType.IMAGE,),
+            ),
+        ),
+        "generated_video_rationale": "The character must actually raise his hand.",
+    }))
+    if defect == "final_visual_only":
+        shot = _generated_shot()
+    asset = make_available_asset(
+        canonical_owner_id="room" if defect == "scene_owner" else shot.shot_id,
+        canonical_owner_content_hash=TWO_HASH if defect == "stale_owner" else shot.content_hash,
+    )
+    request = make_request(
+        target_shot=shot,
+        available_assets=() if defect == "missing" else (asset,),
+        shot_intent_evidence=make_intent_evidence(target_shot=shot, character_action_required=True),
+        review_decision=None,
+        previous_shot_state=make_previous_state(is_same_action=True) if defect == "previous_without_terminal" else None,
+        planning_contract_version="video-planner/3",
+        generation_intent=_neutral_generation_intent(semantic_reference_roles=(SemanticReferenceRole.FIRST_FRAME,)),
+    )
+    plan = VideoPlanner().plan(request)
+    if defect == "previous_without_terminal":
+        assert plan.outcome is PlanOutcome.BLOCKED
+        with pytest.raises(AiVideoError):
+            require_current_video_plan(current_request=request, plan=plan)
+        return
+    assert plan.generation_mode is GenerationMode.IMAGE_TO_VIDEO
+    assert request.target_shot.character_ids == ("hero",)
+    if defect is not None:
+        assert plan.outcome is PlanOutcome.BLOCKED
+        with pytest.raises(AiVideoError):
+            require_current_video_plan(current_request=request, plan=plan)
+        return
+    assert plan.outcome is PlanOutcome.PROPOSED
+    projection = require_current_video_plan(current_request=request, plan=plan)
+    assert projection is not None
+    assert tuple(item.role for item in plan.required_asset_roles) == (AssetRole.APPROVED_KEYFRAME,)
+    assert plan.generation_requirement.capability_need.needs_first_frame
+    assert not plan.generation_requirement.capability_need.needs_identity_reference
+
+
+def test_v3_existing_r2v_keeps_final_visual_keyframe_readiness():
+    shot = seal_artifact(_generated_shot().model_copy(update={
+        "required_asset_roles": (
+            AssetRoleRequirement(role="final_visual", asset_ids=("keyframe-shot-1",), allowed_asset_types=(AssetType.IMAGE,)),
+            AssetRoleRequirement(role="rendered_video", asset_ids=("generated-clip",), allowed_asset_types=(AssetType.VIDEO,)),
+        ),
+        "generated_video_rationale": "An existing generated performance with its keyframe.",
+    }))
+    request = make_request(
+        target_shot=shot,
+        available_assets=(make_available_asset(canonical_owner_content_hash=shot.content_hash), _character_reference(), _scene_reference()),
+        shot_intent_evidence=make_intent_evidence(target_shot=shot, character_action_required=True),
+        review_decision=None,
+        planning_contract_version="video-planner/3",
+        generation_intent=_neutral_generation_intent(semantic_reference_roles=(SemanticReferenceRole.FIRST_FRAME, SemanticReferenceRole.IDENTITY, SemanticReferenceRole.SCENE)),
+    )
+    plan = VideoPlanner().plan(request)
+    assert plan.generation_mode is GenerationMode.REFERENCE_TO_VIDEO
+    assert plan.outcome is PlanOutcome.PROPOSED
+    assert require_current_video_plan(current_request=request, plan=plan) is not None
 
 
 @pytest.mark.parametrize(

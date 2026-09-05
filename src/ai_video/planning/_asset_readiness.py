@@ -7,10 +7,24 @@ from ai_video.planning._planner_models import (
     ReviewDecisionProjection,
     VideoPlanningRequest,
 )
-from ai_video.production.models import AssetType
+from ai_video.production.models import AssetType, VisualStrategy
+from ai_video.production.video_requirement import GenerationOperation, SemanticReferenceRole
 
 
 _FINAL_VISUAL_ROLE = "final_visual"
+
+
+def is_initial_first_frame_request(request: VideoPlanningRequest) -> bool:
+    intent = request.generation_intent
+    return (
+        request.planning_contract_version == "video-planner/3"
+        and request.target_shot.visual_strategy is VisualStrategy.GENERATED_VIDEO
+        and request.commercial_execution_projection is None
+        and request.previous_shot_state is None
+        and intent is not None
+        and intent.generation_operation is GenerationOperation.AUTO
+        and intent.semantic_reference_roles == (SemanticReferenceRole.FIRST_FRAME,)
+    )
 
 
 def _content_binding_matches(
@@ -93,6 +107,16 @@ def _is_shot_bound_final_visual(
             and registered.width == asset.width
             and registered.height == asset.height
             and registered.size_bytes == asset.size_bytes
+        )
+    if (
+        asset.role is AssetRole.APPROVED_KEYFRAME
+        and is_initial_first_frame_request(request)
+    ):
+        return any(
+            requirement.role == "first_frame"
+            and requirement.asset_ids == (asset.asset_id,)
+            and requirement.allowed_asset_types == (AssetType.IMAGE,)
+            for requirement in request.target_shot.required_asset_roles
         )
     if not _has_exact_image_binding(request, asset.asset_id):
         return False
