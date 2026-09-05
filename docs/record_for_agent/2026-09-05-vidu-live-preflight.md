@@ -8,6 +8,14 @@ learning_eligibility: ineligible
 
 Date: 2026-09-05
 
+## Supersession
+
+2026-09-05 用户批准的 [Result Trust Follow-up](2026-09-05-vidu-optional-provider.md#result-trust-follow-up)
+新增显式 `authenticated_task` 与 public-IP pinned HTTPS。下方“需先取得 CDN origin”
+是旧固定白名单模式的历史 blocker；新模式不再需要该前置条件。正式生成仍需真实
+Production root、sealed profile、预算/egress/durable intent/one-use permit 与媒体验证。
+此调整没有新增 live submit，也没有改变下方账户查询记录的历史证据边界。
+
 ## Verified Result
 
 用户提供 credential 并要求测试。使用 no-echo stdin 将 credential 写入本机

@@ -90,7 +90,7 @@ fallback_check_ids:
 
 checks:
   production_vidu_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_vidu.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_vidu.py, tests/test_production_vidu_download.py, -q]
     cwd: .
     description: Verify Vidu Q3 payloads, paid permit, task identity, and bounded downloads offline.
   scope_diff_check:
@@ -707,6 +707,7 @@ categories:
       - src/ai_video/production/minimax_hailuo.py
       - src/ai_video/production/vidu.py
       - src/ai_video/production/vidu_profile.py
+      - src/ai_video/production/vidu_download.py
       - src/ai_video/production/vidu_source.py
       - src/ai_video/production/seedance.py
       - src/ai_video/production/seedance_asset.py
@@ -769,6 +770,7 @@ categories:
       - tests/test_production_minimax_h3.py
       - tests/test_production_minimax_hailuo.py
       - tests/test_production_vidu.py
+      - tests/test_production_vidu_download.py
       - tests/test_production_seedance.py
       - tests/test_production_video.py
       - tests/test_production_ecommerce_shot_candidate_gate.py

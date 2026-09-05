@@ -318,7 +318,7 @@ def test_invalid_request_rejected_before_transport(change):
     assert transport.calls == []
 
 
-def test_transport_excludes_injected_client_auth_and_cookies():
+def test_api_transport_excludes_injected_client_auth_and_cookies():
     seen = []
     def respond(request):
         seen.append(request)
@@ -327,12 +327,9 @@ def test_transport_excludes_injected_client_auth_and_cookies():
                       headers={"Authorization": "CLIENT-SECRET"}, cookies={"private": "cookie"}) as client:
         transport = HttpxViduTransport(client=client)
         transport.request(ViduTransportRequest("POST", "https://api.vidu.cn/ent/v2/text2video", {"authorization": "Token SUPPLIER"}))
-        with transport.stream(ViduTransportRequest("GET", URL, {"accept": "video/mp4"})) as response:
-            list(response.iter_bytes())
     assert seen[0].headers["authorization"] == "Token SUPPLIER"
     assert "cookie" not in seen[0].headers
-    assert "authorization" not in seen[1].headers
-    assert "cookie" not in seen[1].headers
+    assert len(seen) == 1
 
 
 def test_router_compiler_resolver_uses_vidu_capability_without_network():

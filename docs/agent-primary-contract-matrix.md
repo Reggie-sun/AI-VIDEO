@@ -3,12 +3,14 @@
 ## Vidu Cloud Adapter
 
 `src/ai_video/production/vidu.py` 独占 Vidu payload/status/download mapping，
-`vidu_profile.py` 独占 dated profile、能力与 per-call ceiling；`vidu_source.py`
+`vidu_profile.py` 独占 dated profile、能力、下载信任模式与 per-call ceiling；
+`vidu_download.py` 独占 credential-free public-IP pinned HTTPS（原域名 TLS、无 redirect）；`vidu_source.py`
 只验证延长输入的 canonical submit/fetch/probe receipts，不拥有 lifecycle。显式 registry 注入，
 沿既有 `VideoGenerationService` / `ProductionStateCommitter` lifecycle；不得自动选路、
 fallback、重试 POST 或 activation。Profile hash、task/model、creation ID、exact egress、
-one-use permit 与 result-origin containment 均 fail closed。
-Focused verification：`python -m pytest -p no:cacheprovider tests/test_production_vidu.py -q`；
+one-use permit 与 sealed download trust 均 fail closed。显式 `authenticated_task` 无需
+预知 CDN；默认 `fixed_origins` 保持旧 profile hash，额外约束 exact origin。
+Focused verification：`python -m pytest -p no:cacheprovider tests/test_production_vidu.py tests/test_production_vidu_download.py -q`；
 Harness 路由为 `production_video_provider`，包含 `production_vidu_tests` 与既有
 Provider / neutral requirement / Architecture checks。配置边界见 [Vidu Provider](vidu-provider.md)。
 

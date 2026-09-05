@@ -5,9 +5,10 @@ from __future__ import annotations
 import ipaddress
 from datetime import datetime
 from pathlib import Path
+from typing import Literal
 from urllib.parse import urlsplit
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_serializer, model_validator
 
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import StrictModel
@@ -48,7 +49,8 @@ class ViduProviderProfile(StrictModel):
     model_config = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True)
 
     origin: str
-    result_origins: tuple[str, ...] = Field(min_length=1)
+    result_origins: tuple[str, ...] = ()
+    result_trust: Literal["fixed_origins", "authenticated_task"] = "fixed_origins"
     cost_upper_bound_microunits: int = Field(strict=True, gt=0)
     pricing_observed_at: datetime
     pricing_expires_at: datetime
@@ -58,6 +60,8 @@ class ViduProviderProfile(StrictModel):
     def _validate_profile(self) -> "ViduProviderProfile":
         if self.origin not in {"https://api.vidu.cn", "https://api.vidu.com"}:
             raise ValueError("Vidu API origin must be an official explicit endpoint")
+        if (self.result_trust == "fixed_origins") != bool(self.result_origins):
+            raise ValueError("Vidu fixed trust requires origins; authenticated task trust requires none")
         for origin in self.result_origins:
             canonical_result_origin(origin)
         if len(set(self.result_origins)) != len(self.result_origins):
@@ -67,6 +71,14 @@ class ViduProviderProfile(StrictModel):
         )) or self.pricing_observed_at >= self.pricing_expires_at:
             raise ValueError("Vidu pricing must have an aware finite validity window")
         return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_profile(self, handler):
+        data = handler(self)
+        # Existing sealed profiles must retain their exact pre-mode bytes/hash.
+        if self.result_trust == "fixed_origins":
+            data.pop("result_trust", None)
+        return data
 
     @property
     def currency(self) -> str:

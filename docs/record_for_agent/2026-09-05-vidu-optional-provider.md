@@ -8,6 +8,32 @@ learning_eligibility: ineligible
 
 Date: 2026-09-05
 
+## Result Trust Follow-up
+
+用户明确批准调整首次下载的 CDN 信任方式。新增显式
+`result_trust="authenticated_task"`，只消费 official authenticated exact-task 查询返回的
+同一 creation URL；不再要求该模式在首次生成前已知 CDN。默认 `fixed_origins` 保留
+旧 profile bytes/hash；新模式进入 sealed profile，不能替换旧任务 profile 绕过绑定。
+
+`vidu_download.py` 是唯一 Vidu 结果网络连接实现，两个模式均检查所有 DNS answers，
+仅连接已验证 public 数值 IP，并以原 hostname 执行 TLS SNI/证书验证。API client 与
+media socket 分离，无 inherited credentials/cookies、环境 proxy、redirect 或 retry。
+新模式复用 `RemoteMediaMaterializationReceipt` 绑定 exact locator hash 与下载 bytes；
+不持久化 signed URL，不新增 lifecycle owner 或放宽 paid/media acceptance gates。
+
+离线 Red：首次无 CDN 的显式 profile 测试在修改前失败；Green：Vidu focused suite
+144 passed，包括旧 hash/roundtrip、wire headers、public IPv4/IPv6、混合 DNS、TLS
+失败、redirect、超时参数、资源清理与 task/model/creation/profile drift。独立 review
+发现全局 `http.client` debuglevel 会打印 signed URL；新增 failing stdout regression
+复现后，强制 per-connection debuglevel=0，相关 regression 与完整 focused suite 通过。Fake socket
+测试执行真实 `http.client` framing，但没有真实 CDN/TLS/live media 证明。
+Independent review 与 exact-commit Harness 是额外 completion evidence，按最终 receipt
+核验；不能由该 focused count 推导。此次没有读取 credential、Provider calls、上传或
+生成媒体；其他窗口 staged `runs/` 保持原样。配置详情由 [Vidu Provider](../vidu-provider.md)
+独占；历史 CDN blocker 见 [superseded preflight](2026-09-05-vidu-live-preflight.md)。
+`distill-ai-video-learning`：`no_candidate`；本次是单个 offline implementation，
+没有独立生成实验或满足 admission threshold 的 controlled comparison。
+
 ## Capability Follow-up
 
 同日用户要求补齐 R2V 和 `VIDEO_EXTEND`。本 follow-up 已在原 adapter 上增加
