@@ -115,7 +115,7 @@ provider-neutral Shared Continuity Core，并将 Phase B 拆成独立 domain lan
 
 | Lane | Current status | What the status means |
 | --- | --- | --- |
-| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | V9 prerequisite后新增v2 invocation，`0df8b5a` fresh capture通过，driver/封存均获xhigh accept，full Harness `4318 passed, 4 skipped`、Architecture 0 errors。但live Vidu source随后发生unrelated drift，canonical full inventory拒绝；v2 invocation未消费，request/permit/submit/media均零。下一步待source owner稳定后封存新的exact invocation，不覆盖v2。详见current session record与`first-submit/key-at-the-waiting-room-shot-01-v2.blocked.json` |
+| `M6-D Drama` | `NOT_EVALUATED` / `STOP_BEFORE_SUBMIT` | V3 invocation、xhigh review及exact driver Harness `4361 passed, 4 skipped`均完成；但新的Vidu Product source已stage而未commit，canonical full inventory再次拒绝`pinned source drift`。V3 invocation未消费，request/permit/submit/media均零。下一步待source owner建立stable commit后封存新的exact invocation，不覆盖或重放v3。详见current session record与`first-submit/key-at-the-waiting-room-shot-01-v3.blocked.json` |
 | `M6-C Commercial` | `HUMAN_FAIL` | Exact Qingyan `15.5s` assembly SHA-256 `c36bbb7b5bcdcd9312fcd74d521751502b22800a637ba788e4db1c7b97ef1c07` 在 watchability、commercial-quality baseline 与 assembly acceptance 上 FAIL；历史 per-Shot technical PASS 只保留在其证据层 |
 | Dual-domain Phase B | `FAIL` | 两条 lane 未同时通过；M7–M9 继续 deferred |
 
@@ -767,14 +767,14 @@ make harness-verify
 
 ## Execution Order And Stop Conditions
 
-Latest execution stop（2026-09-05）：用户要求运行后，v2 first-submit driver与exact acceptance完成，source `0df8b5a`
-GET-only capture通过，xhigh accept；full Harness `4318 passed, 4 skipped`、Architecture 0 errors。
-但live `vidu.py`/`vidu_profile.py`出现unrelated edits，canonical `_inventory`拒绝`pinned source drift`；
-blocker为`CANONICAL_COMMITTED_SOURCE_INVENTORY_DRIFT`，见`first-submit/key-at-the-waiting-room-shot-01-v2.blocked.json`。
-V2 invocation未消费，Production tree不变，`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`；没有submit/media。
-Source owner随后已提交`6b34537`，但旧v2 source seal不自动升级。Next One Thing：按既有seam选择新source、
-封存新的exact invocation并执行同一Shot 01/Gate；
-不改旧v2 seal、不排除source inventory、不manual request、不进入Shot 02/retry/activation/P6/Final Acceptance。
+Latest execution stop（2026-09-05）：V3 first-submit driver及exact acceptance已完成，source `52b9631`的
+GET-only v7 capture通过，`reviewer_xhigh=accept`；exact driver Harness通过`4361 passed, 4 skipped`，Architecture 0 errors。
+执行前另一条Vidu lane已stage新的`vidu.py`、`vidu_download.py`及`vidu_profile.py`，但尚未建立committed Product
+inventory；canonical `_inventory`拒绝`pinned source drift: src/ai_video/production/vidu.py`。Blocker仍为
+`CANONICAL_COMMITTED_SOURCE_INVENTORY_DRIFT`，见`first-submit/key-at-the-waiting-room-shot-01-v3.blocked.json`。
+V3 invocation未消费，Production tree不变，`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`；没有submit/media。
+Next One Thing：待Vidu owner提交stable source后，按既有seam选择该exact commit并封存新的versioned invocation，
+再执行同一Shot 01/Gate；不改或重放v3、不排除source inventory、不manual request、不进入Shot 02/retry/activation/P6/Final Acceptance。
 
 Historical pre-submit prerequisite acceptance（2026-09-05）：source-binding v3 repair与最终executable Harness已通过，
 full suite `4281 passed, 4 skipped`、Architecture 0 errors。原V8 uncommitted-source blocker在owner提交`272b17d`后解除；

@@ -1,0 +1,64 @@
+{
+  "schema_version": "drama-shot01-first-submit-stop/3",
+  "decision": "BLOCKED_BEFORE_INVOCATION",
+  "attempt_id": "drama-shot01-first-20260905-v3",
+  "observed_at": "2026-09-05T15:56:44.707410+00:00",
+  "blocker": "CANONICAL_COMMITTED_SOURCE_INVENTORY_DRIFT",
+  "check": "shot01_source_binding_preflight_v1._inventory",
+  "observation": {
+    "status": "BLOCKED",
+    "reason": "pinned source drift: src/ai_video/production/vidu.py",
+    "source_commit": "52b963120b6b6f44fd51928dd9ef840c76df92b6",
+    "approval_commit": "279a46bf0734af325465d4829880772c67ea73e7",
+    "head": "279a46bf0734af325465d4829880772c67ea73e7",
+    "index_state": "UNRELATED_STAGED_PRODUCT_SOURCE_NOT_COMMITTED",
+    "observed_files": {
+      "src/ai_video/production/vidu.py": "eb032dc9705695f86adb53017ba2068c3be21b3cdb2f5b4fd73ac68926fbe067",
+      "src/ai_video/production/vidu_download.py": "a639912a9f04e76829d43940f44da596bf8a8992c165c33d3cc90a3ff31bacf8",
+      "src/ai_video/production/vidu_profile.py": "cb13b963e9226357d57e417c64fe7cfc2102de5c4eaedc2342c62ec36d549cdd"
+    },
+    "invocation_consumed": false
+  },
+  "accepted_invocation": {
+    "path": "docs/superpowers/artifacts/drama/b-d0/first-submit/key-at-the-waiting-room-shot-01-v3.accepted.json",
+    "sha256": "94bb7cd0dffd3734c47a43f7d9860002036aefa063f6edc5bd31cba22dbd86ab",
+    "commit": "279a46bf0734af325465d4829880772c67ea73e7"
+  },
+  "prior_read_only_capture": {
+    "path": "runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/evidence/drama-shot01-source-binding-preflight-v7.json",
+    "sha256": "0141c85d8effa544164cd68eb349af1d1589468ed1777d5e6ad12bcff76b37a7",
+    "status": "PASS_AT_CAPTURE_NOT_CURRENT_SOURCE_READINESS"
+  },
+  "executable_verification": {
+    "path": ".agent/harness/runs/drama-shot01-first-v3-executable-20260905/receipt.json",
+    "sha256": "282e1216ae8af86a9ee88d5fc097d784332714fe736c636f85faee30018c29b8",
+    "status": "PASS_FOR_EXACT_COMMIT_RANGE_ONLY",
+    "range": "7a6a6aa41f8fc9cfdde9939d209607af4ba23ffb..52b963120b6b6f44fd51928dd9ef840c76df92b6",
+    "tests": "4361 passed, 4 skipped",
+    "architecture": "0 errors / 0 warnings / 0 info"
+  },
+  "production": {
+    "file_count": 16,
+    "tree_sha256": "3abfb1c08a7de162220d46bbf1813115100db8f651b810a362e8bce55edb6731",
+    "unchanged_from_v9": true
+  },
+  "effects": {
+    "invocation_consumed": false,
+    "request_persistence": 0,
+    "permit": 0,
+    "provider_submit": 0,
+    "media": 0,
+    "activation": 0,
+    "video_analysis": 0,
+    "runtime_lifecycle": 0
+  },
+  "ownership": "Observed staged Product source belongs to unrelated Vidu work. No modification, unstaging, commit, rollback, stash, worktree bypass, fallback or inventory exclusion of that work.",
+  "boundary": {
+    "m6_d": "NOT_EVALUATED",
+    "execution": "STOP_BEFORE_SUBMIT",
+    "next_shot_submit_allowed": false,
+    "p6": "NOT_EVALUATED",
+    "final_acceptance": "NOT_EVALUATED"
+  },
+  "next_action": "The Vidu source owner must first establish a stable committed Product inventory. Then select that exact source commit and seal a new versioned Shot 01 invocation through the existing formal source-binding and preflight seams. Do not alter or replay v3, exclude Product modules, hand-write a request, or submit Shot 02."
+}

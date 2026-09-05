@@ -8,7 +8,48 @@ learning_eligibility: ineligible
 
 Date: 2026-08-29
 
-## Current First-Submit V2 Source Drift Stop — 2026-09-05
+## Current First-Submit V3 Source Drift Stop — 2026-09-05
+
+用户继续要求运行同一canonical Shot 01。V3 execution driver及exact invocation seal均已完成独立审查与
+exact-snapshot verification，但在消费invocation前，另一条Vidu lane把新的Product source完整stage而尚未commit。
+`shot01_source_binding_preflight_v1._inventory(52b9631...)`按设计拒绝
+`pinned source drift: src/ai_video/production/vidu.py`。当前保持
+`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`。本次首个已观察blocker是source drift；runtime与Provider未重新评估。
+
+- Driver `runs/drama-m6-d-key-at-the-waiting-room-20260829-v1/shot01_first_submit_v3.py`在
+  `52b963120b6b6f44fd51928dd9ef840c76df92b6`封存，SHA
+  `6919e77f6a6c79e91ca4eea16f49632fda941e880ce64fce390c7bdb3f64fdf8`；相对已接受v2只改变versioned
+  attempt、approval path及内部module labels，canonical request、guard、single POST、budget与lifecycle语义不变。
+- Exact invocation seal位于`docs/superpowers/artifacts/drama/b-d0/first-submit/key-at-the-waiting-room-shot-01-v3.accepted.json`，
+  SHA `94bb7cd0dffd3734c47a43f7d9860002036aefa063f6edc5bd31cba22dbd86ab`，commit
+  `279a46bf0734af325465d4829880772c67ea73e7`。Fresh GET-only v7 capture SHA为
+  `0141c85d8effa544164cd68eb349af1d1589468ed1777d5e6ad12bcff76b37a7`；capture时exact request、prompt、
+  audio、runtime/supervisor与queue均通过，但它不覆盖随后出现的source bytes。
+- Native `reviewer_xhigh`对v3 driver及seal给出`accept`。Exact driver Harness range
+  `7a6a6aa41f8fc9cfdde9939d209607af4ba23ffb..52b963120b6b6f44fd51928dd9ef840c76df92b6`通过
+  `4361 passed, 4 skipped`，Architecture `0 errors / 0 warnings / 0 info`。归档receipt为
+  `.agent/harness/runs/drama-shot01-first-v3-executable-20260905/receipt.json`，SHA
+  `282e1216ae8af86a9ee88d5fc097d784332714fe736c636f85faee30018c29b8`；固定detached snapshot内
+  `verify-receipt`全部true。Approval docs Harness亦已通过，receipt SHA `1f7265f6...24fe`。
+
+当前staged Product bytes为`vidu.py` `eb032dc9...e067`、`vidu_download.py` `a639912a...acf8`及
+`vidu_profile.py` `cb13b963...49cdd`。这些bytes及其tests/docs/runs属于unrelated Vidu work；Parent未修改、
+unstage、commit、stash、reset或排除它们，也未用worktree绕过canonical inventory。V3四个
+`invoked/started/stopped/fetched` markers全部不存在，invocation未消费。16-file Production tree仍为
+`3abfb1c08a7de162220d46bbf1813115100db8f651b810a362e8bce55edb6731`；request persistence、permit、
+submit、media、video-analysis、runtime lifecycle与activation均为零。
+
+Exact blocker envelope：`docs/superpowers/artifacts/drama/b-d0/first-submit/key-at-the-waiting-room-shot-01-v3.blocked.json`，
+SHA `e6569aecb3345e858e9f441de5df0ae7a70d87927d5a264618bf8173cdd12075`。Next One Thing：待Vidu owner先建立
+stable committed Product inventory，再沿现有formal source-binding/preflight seam选择该exact commit并封存新的versioned
+Shot 01 invocation；不得修改或重放v3、手写request、排除Product module或进入Shot 02。
+
+本primary record按`record-ai-video-session`更新；自动`distill-ai-video-learning=no_candidate`：这是与v2相同的
+deterministic source-drift failure class及同一attempt lineage，没有独立媒体实验、controlled comparison或匹配existing
+Learning Claim的material update。Experience retrieval继续strict失败`index library version mismatch; rebuild required`，
+未rebuild/retry/fallback。记录阶段没有Provider、media、network或额外tests，未push/release。
+
+## Historical First-Submit V2 Source Drift Stop — 2026-09-05
 
 用户明确要求运行同一canonical Shot 01。本窗口完成新的versioned invocation接线与封存，但在消费invocation前
 发现unrelated Product source变化；当前仍为`M6-D=NOT_EVALUATED / STOP_BEFORE_SUBMIT`，没有生成媒体。
