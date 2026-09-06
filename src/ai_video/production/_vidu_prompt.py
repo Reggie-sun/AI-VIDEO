@@ -29,6 +29,7 @@ class ViduPromptCompilation(_ViduPromptModel):
     outcome: Literal["compiled"] = "compiled"
     prompt_text: str = Field(min_length=1)
     prompt_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    expressed_control_paths: tuple[str, ...] = ()
 
     @model_validator(mode="after")
     def _validate_hash(self) -> "ViduPromptCompilation":
@@ -222,6 +223,15 @@ def compile_vidu_prompt(
         return ViduPromptUnsupported(unsupported_field_paths=("generation_intent",))
     return ViduPromptCompilation(
         prompt_text=prompt,
+        expressed_control_paths=(
+            "generation_intent.open_state.required_change",
+            "generation_intent.close_state.required_change",
+            "generation_intent.subject_action.endpoint.required_change",
+            "generation_intent.identity_continuity.preservation",
+            "generation_intent.pacing.shot_duration_seconds",
+            "generation_intent.camera_endpoint.position_lock",
+            "generation_intent.camera_endpoint.orientation_lock",
+        ),
         prompt_sha256=hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
     )
 

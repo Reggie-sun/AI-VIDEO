@@ -386,7 +386,7 @@ def test_fl2va_compiler_preserves_neutral_first_last_frame_mode(
         audio_need=AudioNeed.REQUIRED,
     )
     capabilities = t8_native_turbo_capabilities(profile)
-    routing = VideoGenerationResolver().resolve_requirement(
+    routing = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_policy(),

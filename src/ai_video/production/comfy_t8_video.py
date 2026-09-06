@@ -729,6 +729,7 @@ class ComfyUIT8VideoProvider:
                 grammar_contract="h3-three-field-v1",
                 prompt_text=prompt.prompt_text,
                 prompt_sha256=prompt.prompt_sha256,
+                expressed_control_paths=prompt.expressed_control_paths,
             ),
         )
 

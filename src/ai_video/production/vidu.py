@@ -179,17 +179,11 @@ class ViduVideoProvider:
     def compile_request(self, provider_bound: ProviderBoundVideoRequest,
                         requirement: ProviderNeutralVideoRequirement) -> ProviderRequestCompilationResult:
         try:
-            preflight = compile_provider_video_request(
-                provider_bound=provider_bound, requirement=requirement,
-                compiler_id="vidu-video-compiler", compiler_version="2",
-                capabilities=self.capabilities(),
-                native_prompt=ProviderNativePrompt(
-                    grammar_contract="vidu-prose-v2",
-                    prompt_text="preflight",
-                    prompt_sha256=hashlib.sha256(b"preflight").hexdigest(),
-                ),
-            )
-        except PydanticSerializationError:
+            # Reopen identities before native expression; a placeholder prompt
+            # cannot serve as requirement coverage for a new sealed recipe.
+            ProviderBoundVideoRequest.model_validate(provider_bound.model_dump(mode="python"))
+            ProviderNeutralVideoRequirement.model_validate(requirement.model_dump(mode="python"))
+        except (PydanticSerializationError, ValueError):
             return ProviderRequirementUnsupported(
                 requirement_hash=requirement.requirement_hash,
                 provider_bound_request_hash=provider_bound.provider_bound_request_hash,
@@ -197,8 +191,6 @@ class ViduVideoProvider:
                 reason=ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH,
                 unsupported_field_paths=("requirement_hash",),
             )
-        if isinstance(preflight, ProviderRequirementUnsupported):
-            return preflight
         prompt = compile_vidu_prompt(requirement)
         if not isinstance(prompt, ViduPromptCompilation):
             return ProviderRequirementUnsupported(
@@ -216,6 +208,7 @@ class ViduVideoProvider:
                 grammar_contract="vidu-prose-v2",
                 prompt_text=prompt.prompt_text,
                 prompt_sha256=prompt.prompt_sha256,
+                expressed_control_paths=prompt.expressed_control_paths,
             ),
         )
 

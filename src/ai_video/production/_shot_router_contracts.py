@@ -5,11 +5,12 @@ from __future__ import annotations
 from enum import Enum
 from typing import Literal
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_serializer, model_validator
 
 from ai_video.production._video_requirement_routing import (
     validate_provider_bound_projection,
 )
+from ai_video.production.generation_recipe import GenerationRecipe
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.models import (
     DependencyGraphSnapshotPointer,
@@ -804,7 +805,15 @@ class ProviderBoundVideoRequest(_RouterModel):
     lifecycle: VideoGenerationLifecycleEnvelope
     compiler_contract: AdapterCompilerContract
     expression_strength: ExpressionStrength
+    generation_recipe: GenerationRecipe | None = None
     provider_bound_request_hash: str = Field(pattern=_SHA256)
+
+    @model_serializer(mode="wrap")
+    def _serialize_recipe(self, handler):
+        payload = handler(self)
+        if self.generation_recipe is None:
+            payload.pop("generation_recipe", None)
+        return payload
 
     def _hash_payload(self) -> dict[str, object]:
         return {
@@ -818,6 +827,12 @@ class ProviderBoundVideoRequest(_RouterModel):
     @model_validator(mode="after")
     def _validate_bound_request(self) -> "ProviderBoundVideoRequest":
         validate_provider_bound_projection(self)
+        if self.generation_recipe is not None and (
+            self.generation_recipe.requirement_hash != self.requirement_hash
+            or self.generation_recipe.profile_sha256 != self.provider_profile.profile_sha256
+            or self.generation_recipe.compiler_hash != self.compiler_contract.compiler_hash
+        ):
+            raise ValueError("generation recipe does not match bound requirement/profile/compiler")
         if self.provider_bound_request_hash != canonical_sha256(self._hash_payload()):
             raise ValueError("provider-bound request hash does not match projection")
         return self

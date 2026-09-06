@@ -59,9 +59,9 @@ from ai_video.production.video_requirement import (
 
 
 class VideoGenerationResolver:
-    """Resolve one exact selected capability without provider fallback."""
+    """Select generation recipes before sealing; never execute or fall back."""
 
-    def resolve(
+    def inspect_capability(
         self,
         *,
         context: ShotRoutingContext,
@@ -411,6 +411,18 @@ class VideoGenerationResolver:
         )
 
     def resolve_requirement(
+        self, *, projection, context, policy, lifecycle, inputs,
+        continuity_routing=None,
+    ):
+        """Pure candidate/evidence decision. Caller preselection is not accepted."""
+        from ai_video.production.generation_decision import resolve_generation_decision
+
+        return resolve_generation_decision(
+            self, projection=projection, context=context, policy=policy,
+            lifecycle=lifecycle, inputs=inputs, continuity_routing=continuity_routing,
+        )
+
+    def _bind_requirement(
         self,
         *,
         projection: VerifiedGenerationRequirementProjection,

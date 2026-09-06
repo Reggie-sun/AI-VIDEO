@@ -851,7 +851,7 @@ def test_minimal_cloud_response_restarts_and_stops_at_validated_candidate(
         capability.output_recovery_strategy
         is VideoOutputRecoveryStrategy.REQUERY_BY_EFFECT_ID
     )
-    routing = VideoGenerationResolver().resolve_requirement(
+    routing = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_router_policy(remote_authorized=True, budget_authorized=True),

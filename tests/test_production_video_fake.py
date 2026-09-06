@@ -117,7 +117,7 @@ def test_fake_compiler_projects_bound_requirement_without_provider_side_effects(
         compiler_version="1",
     )
     projection = _verified_requirement(context)
-    routing = VideoGenerationResolver().resolve_requirement(
+    routing = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_router_policy(),
@@ -183,7 +183,7 @@ def test_fake_compiler_returns_typed_unsupported_for_wrong_compiler_contract():
         _router_variant(VideoGenerationMode.TEXT_TO_VIDEO)
     )
     projection = _verified_requirement(context)
-    routing = VideoGenerationResolver().resolve_requirement(
+    routing = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_router_policy(),

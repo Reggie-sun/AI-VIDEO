@@ -666,7 +666,7 @@ def test_offline_qingyan_approved_source_routes_exact_i2v_and_compiles_product_f
             }
         ).model_dump(mode="python")
     )
-    selected = VideoGenerationResolver().resolve_requirement(
+    selected = VideoGenerationResolver()._bind_requirement(
         projection=verified,
         context=context,
         policy=_routing_policy(),
@@ -677,7 +677,7 @@ def test_offline_qingyan_approved_source_routes_exact_i2v_and_compiles_product_f
         lifecycle=lifecycle,
         compiler_contract=compiler,
     )
-    denied_t2v = VideoGenerationResolver().resolve_requirement(
+    denied_t2v = VideoGenerationResolver()._bind_requirement(
         projection=verified,
         context=context,
         policy=_routing_policy(),

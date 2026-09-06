@@ -655,6 +655,13 @@ def _typed_generation_intent_is_sufficient(
 
 
 class VideoPlanner:
+    @staticmethod
+    def generation_difficulty(projection):
+        """Expose relational facts separately from historical plan confidence."""
+        from ai_video.planning.generation_difficulty import generation_difficulty
+
+        return generation_difficulty(projection)
+
     CONTRACT_VERSION = "video-planner/3"
 
     def plan(self, request: VideoPlanningRequest) -> VideoGenerationPlan:

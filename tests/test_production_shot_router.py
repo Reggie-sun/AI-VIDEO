@@ -350,7 +350,7 @@ def test_multi_anchor_context_fails_closed_without_sealed_c4_requirement():
         ValueError,
         match="must use resolve_requirement with sequence evidence",
     ):
-        VideoGenerationResolver().resolve(
+        VideoGenerationResolver().inspect_capability(
             context=context,
             policy=_policy(),
             provider_profile=_profile(),
@@ -632,7 +632,7 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
         previous_shot=source_context.activated_shot,
         destination_route=incomplete_destination_route,
     )
-    incomplete = VideoGenerationResolver().resolve_requirement(
+    incomplete = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_policy(),
@@ -709,7 +709,7 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
         ValueError,
         match="full continuity terminal does not match",
     ):
-        VideoGenerationResolver().resolve_requirement(
+        VideoGenerationResolver()._bind_requirement(
             projection=stale_projection,
             context=context,
             policy=_policy(),
@@ -722,7 +722,7 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
             continuity_routing=continuity_routing,
         )
 
-    routed = VideoGenerationResolver().resolve_requirement(
+    routed = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_policy(),
@@ -1201,7 +1201,7 @@ def _route_first_frame(
         provider_kind=provider_kind,
         model_id=model_id,
     )
-    result = VideoGenerationResolver().resolve_requirement(
+    result = VideoGenerationResolver()._bind_requirement(
         projection=_first_frame_projection(context),
         context=context,
         policy=_policy(),
@@ -1770,7 +1770,7 @@ def test_continuity_bearing_direct_resolve_requires_sequence_api() -> None:
         ValueError,
         match="must use resolve_requirement with sequence evidence",
     ):
-        VideoGenerationResolver().resolve(
+        VideoGenerationResolver().inspect_capability(
             context=context,
             policy=_policy(),
             provider_profile=_profile(),
@@ -1834,7 +1834,7 @@ def test_continuous_take_rejects_lower_cost_provider_preselection() -> None:
         destination_route=locked_route,
     )
 
-    rejected = VideoGenerationResolver().resolve_requirement(
+    rejected = VideoGenerationResolver()._bind_requirement(
         projection=_exact_terminal_projection(target_context),
         context=target_context,
         policy=_policy(),
@@ -1852,7 +1852,7 @@ def test_continuous_take_rejects_lower_cost_provider_preselection() -> None:
         compiler_contract=compiler,
         continuity_routing=continuity_routing,
     )
-    selected = VideoGenerationResolver().resolve_requirement(
+    selected = VideoGenerationResolver()._bind_requirement(
         projection=_exact_terminal_projection(target_context),
         context=target_context,
         policy=_policy(),
@@ -1946,7 +1946,7 @@ def test_hard_cut_identity_carryover_allows_new_provider_route() -> None:
         destination_route=destination_route,
     )
 
-    result = VideoGenerationResolver().resolve_requirement(
+    result = VideoGenerationResolver()._bind_requirement(
         projection=_identity_reference_projection(target_context),
         context=target_context,
         policy=_policy(),
@@ -2021,7 +2021,7 @@ def test_identity_carryover_cannot_seal_none_t2v_route() -> None:
             "continuity mode"
         ),
     ):
-        VideoGenerationResolver().resolve_requirement(
+        VideoGenerationResolver()._bind_requirement(
             projection=_verified_requirement(target_context),
             context=target_context,
             policy=_policy(),
@@ -2079,7 +2079,7 @@ def test_explicit_cross_provider_full_continuity_binds_previous_terminal_first()
         destination_route=destination_route,
     )
 
-    result = VideoGenerationResolver().resolve_requirement(
+    result = VideoGenerationResolver()._bind_requirement(
         projection=_exact_terminal_projection(target_context),
         context=target_context,
         policy=_policy(),
@@ -2172,7 +2172,7 @@ def test_cross_stack_gate_applies_when_provider_route_is_unchanged() -> None:
         ValueError,
         match="cross-stack full continuity requires explicit spatial and camera intent",
     ):
-        VideoGenerationResolver().resolve_requirement(
+        VideoGenerationResolver()._bind_requirement(
             projection=incomplete_projection,
             context=target_context,
             policy=_policy(),
@@ -2236,7 +2236,7 @@ def test_reference_only_provider_cannot_claim_cross_stack_spatial_continuity() -
         destination_route=destination_route,
     )
 
-    result = VideoGenerationResolver().resolve_requirement(
+    result = VideoGenerationResolver()._bind_requirement(
         projection=_exact_terminal_projection(target_context),
         context=target_context,
         policy=_policy(),
@@ -2274,7 +2274,7 @@ def test_continuity_requirement_cannot_omit_sequence_route_binding() -> None:
         ValueError,
         match="requires exact sequence routing evidence",
     ):
-        VideoGenerationResolver().resolve_requirement(
+        VideoGenerationResolver()._bind_requirement(
             projection=_exact_terminal_projection(target_context),
             context=target_context,
             policy=_policy(),
@@ -2357,7 +2357,7 @@ def test_full_continuity_rejects_binding_for_another_target_shot() -> None:
         ValueError,
         match="does not match the exact current target",
     ):
-        VideoGenerationResolver().resolve_requirement(
+        VideoGenerationResolver()._bind_requirement(
             projection=_exact_terminal_projection(target_context),
             context=target_context,
             policy=_policy(),
@@ -2408,7 +2408,7 @@ def test_stale_transition_hash_cannot_release_provider_lock() -> None:
     )
 
     with pytest.raises(ValidationError):
-        VideoGenerationResolver().resolve_requirement(
+        VideoGenerationResolver()._bind_requirement(
             projection=_exact_terminal_projection(target_context),
             context=target_context,
             policy=_policy(),
@@ -2504,7 +2504,7 @@ def test_cross_stack_binding_rejects_unsealed_destination_provider() -> None:
             destination_route=unsealed_route,
         )
 
-    result = VideoGenerationResolver().resolve_requirement(
+    result = VideoGenerationResolver()._bind_requirement(
         projection=_exact_terminal_projection(target_context),
         context=target_context,
         policy=_policy(),
@@ -2527,7 +2527,7 @@ def test_cross_stack_binding_rejects_unsealed_destination_provider() -> None:
 def test_free_motion_can_use_text_to_video_without_identity_or_continuity() -> None:
     context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
 
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -2554,7 +2554,7 @@ def test_exact_capability_denial_does_not_try_another_variant() -> None:
         capability_id="unused-r2v",
     )
 
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -2603,7 +2603,7 @@ def test_selected_profile_version_must_match_capability() -> None:
     profile = _profile().model_copy(update={"profile_version": "different"})
     context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
 
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=_policy(),
         provider_profile=profile,
@@ -2634,7 +2634,7 @@ def test_hero_or_repair_remains_blocked_in_first_phase() -> None:
     policy = _policy()
 
     visual = ShotVisualResolver().resolve(context, policy)
-    generation = VideoGenerationResolver().resolve(
+    generation = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=policy,
         provider_profile=_profile(),
@@ -2654,7 +2654,7 @@ def test_hero_or_repair_remains_blocked_in_first_phase() -> None:
 def test_remote_capability_requires_authorization_before_selection() -> None:
     context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
 
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -2678,7 +2678,7 @@ def test_remote_capability_requires_authorization_before_selection() -> None:
 def test_local_capability_requires_available_local_resources() -> None:
     context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
 
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=_policy(local_resources=False),
         provider_profile=_profile(),
@@ -2696,7 +2696,7 @@ def test_local_capability_requires_available_local_resources() -> None:
 def test_remote_capability_requires_budget_after_authorization() -> None:
     context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
 
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=_policy(remote_authorized=True),
         provider_profile=_profile(),
@@ -2720,7 +2720,7 @@ def test_output_requirement_must_match_exact_capability() -> None:
     context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
     output = _output().model_copy(update={"duration_seconds": 5})
 
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -2745,7 +2745,7 @@ def test_generation_mode_must_be_allowed_by_context() -> None:
         }
     )
 
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -2783,7 +2783,7 @@ def test_video_resolver_rejects_non_generated_activated_strategy() -> None:
         visual_strategy=VisualStrategy.STATIC_IMAGE,
     )
 
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -2805,7 +2805,7 @@ def test_hybrid_generated_layer_uses_the_same_exact_generation_contract() -> Non
         visual_strategy=VisualStrategy.HYBRID,
     )
 
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -2832,14 +2832,14 @@ def test_reference_input_order_is_canonicalized_before_semantic_hashing() -> Non
         "output_requirement": _output(),
     }
 
-    first = VideoGenerationResolver().resolve(
+    first = VideoGenerationResolver().inspect_capability(
         context=_context(
             character_references=(first_reference, second_reference),
             scene_reference=scene_reference,
         ),
         **common,
     )
-    second = VideoGenerationResolver().resolve(
+    second = VideoGenerationResolver().inspect_capability(
         context=_context(
             character_references=(second_reference, first_reference),
             scene_reference=scene_reference,
@@ -2871,11 +2871,11 @@ def test_remote_authorization_changes_audit_not_semantic_routing() -> None:
         "output_requirement": _output(),
     }
 
-    blocked = VideoGenerationResolver().resolve(
+    blocked = VideoGenerationResolver().inspect_capability(
         policy=_policy(),
         **kwargs,
     )
-    selected = VideoGenerationResolver().resolve(
+    selected = VideoGenerationResolver().inspect_capability(
         policy=_policy(remote_authorized=True, budget_authorized=True),
         **kwargs,
     )
@@ -3157,7 +3157,7 @@ def test_none_continuity_ignores_available_terminal_and_semantic_state() -> None
         continuity_state=_continuity_state(),
     )
 
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -3220,7 +3220,7 @@ def test_continuity_mode_and_state_change_semantic_routing_hash() -> None:
         ),
         **common,
     )
-    none = VideoGenerationResolver().resolve(
+    none = VideoGenerationResolver().inspect_capability(
         context=_context(continuity=ContinuityMode.NONE),
         **common,
     )
@@ -3243,11 +3243,11 @@ def test_policy_identity_changes_audit_hash_but_not_semantic_hash() -> None:
         "output_requirement": _output(),
     }
 
-    first = VideoGenerationResolver().resolve(
+    first = VideoGenerationResolver().inspect_capability(
         policy=_policy(policy_hash=HASH_A),
         **kwargs,
     )
-    second = VideoGenerationResolver().resolve(
+    second = VideoGenerationResolver().inspect_capability(
         policy=_policy(policy_hash=HASH_B),
         **kwargs,
     )
@@ -3274,11 +3274,11 @@ def test_unselected_capability_order_does_not_change_semantic_routing() -> None:
         "output_requirement": _output(),
     }
 
-    first = VideoGenerationResolver().resolve(
+    first = VideoGenerationResolver().inspect_capability(
         capabilities=_capabilities(selected, unused),
         **common,
     )
-    second = VideoGenerationResolver().resolve(
+    second = VideoGenerationResolver().inspect_capability(
         capabilities=_capabilities(unused, selected),
         **common,
     )
@@ -3346,7 +3346,7 @@ def test_explicit_t2v_cannot_downgrade_important_character(
         "output_requirement": _output(),
     }
     if entrypoint == "resolve":
-        decision = VideoGenerationResolver().resolve(
+        decision = VideoGenerationResolver().inspect_capability(
             **kwargs, requirement_mode=VideoGenerationMode.TEXT_TO_VIDEO,
             requirement_binding_roles=(), requirement_input_assets=(),
         )
@@ -3389,7 +3389,7 @@ def test_explicit_t2v_cannot_downgrade_important_character(
             projection = require_current_video_plan(
                 current_request=request, plan=VideoPlanner().plan(request),
             )
-        result = VideoGenerationResolver().resolve_requirement(
+        result = VideoGenerationResolver()._bind_requirement(
             **kwargs, projection=projection,
             lifecycle=_lifecycle(context),
             compiler_contract=AdapterCompilerContract.create(
@@ -3428,8 +3428,8 @@ def test_router_projects_verified_requirement_to_deterministic_prompt_free_bound
         "compiler_contract": compiler,
     }
 
-    first = VideoGenerationResolver().resolve_requirement(**kwargs)
-    second = VideoGenerationResolver().resolve_requirement(**kwargs)
+    first = VideoGenerationResolver()._bind_requirement(**kwargs)
+    second = VideoGenerationResolver()._bind_requirement(**kwargs)
 
     assert first.decision.outcome is RoutingOutcome.SELECTED
     assert first.provider_bound_request == second.provider_bound_request
@@ -3472,7 +3472,7 @@ def test_router_native_control_requirement_blocks_without_bound_request() -> Non
         target_shot_content_hash=context.target_shot_content_hash,
     )
 
-    result = VideoGenerationResolver().resolve_requirement(
+    result = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_policy(),
@@ -3517,7 +3517,7 @@ def test_router_intersects_provider_execution_with_requirement_policy() -> None:
         target_shot_content_hash=projection.target_shot_content_hash,
     )
 
-    result = VideoGenerationResolver().resolve_requirement(
+    result = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_policy(remote_authorized=True, budget_authorized=True),
@@ -3620,7 +3620,7 @@ def test_t8_family_requires_explicit_quality_or_turbo_selection_without_fallback
     )
     context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
 
-    selected = VideoGenerationResolver().resolve(
+    selected = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=_policy(),
         provider_profile=profile,
@@ -3628,7 +3628,7 @@ def test_t8_family_requires_explicit_quality_or_turbo_selection_without_fallback
         selected_capability_id="minimax-h3-t8-t2va-quality-v1",
         output_requirement=output,
     )
-    turbo_selected = VideoGenerationResolver().resolve(
+    turbo_selected = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=_policy(),
         provider_profile=ProviderProfilePointer(
@@ -3643,7 +3643,7 @@ def test_t8_family_requires_explicit_quality_or_turbo_selection_without_fallback
         selected_capability_id="minimax-h3-t8-t2va-turbo-v1",
         output_requirement=output,
     )
-    missing = VideoGenerationResolver().resolve(
+    missing = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=_policy(),
         provider_profile=profile,
@@ -3846,7 +3846,7 @@ def test_router_rejects_capability_cardinality_violation_before_provider_bound_c
         important=True,
         keyframe=keyframe,
     )
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -3901,7 +3901,7 @@ def test_router_distinguishes_i2va_from_fl2va_when_both_are_image_to_video_mode(
         important=True, keyframe=keyframe, last_frame=last_frame
     )
 
-    i2va_decision = VideoGenerationResolver().resolve(
+    i2va_decision = VideoGenerationResolver().inspect_capability(
         context=i2va_context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -3909,7 +3909,7 @@ def test_router_distinguishes_i2va_from_fl2va_when_both_are_image_to_video_mode(
         selected_capability_id=i2va_variant.capability_id,
         output_requirement=_output(),
     )
-    fl2va_decision = VideoGenerationResolver().resolve(
+    fl2va_decision = VideoGenerationResolver().inspect_capability(
         context=fl2va_context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -3920,7 +3920,7 @@ def test_router_distinguishes_i2va_from_fl2va_when_both_are_image_to_video_mode(
         requirement_binding_roles=("first_frame", "last_frame"),
         requirement_input_assets=(keyframe, last_frame),
     )
-    cross_decision = VideoGenerationResolver().resolve(
+    cross_decision = VideoGenerationResolver().inspect_capability(
         context=i2va_context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -3983,7 +3983,7 @@ def test_router_ref2va_capability_rejects_missing_or_overflowing_references() ->
         for i in range(10)
     )
     overflow_context = _context(important=False)
-    no_ref_decision = VideoGenerationResolver().resolve(
+    no_ref_decision = VideoGenerationResolver().inspect_capability(
         context=context_no_ref,
         policy=_policy(),
         provider_profile=_profile(),
@@ -3994,7 +3994,7 @@ def test_router_ref2va_capability_rejects_missing_or_overflowing_references() ->
         requirement_binding_roles=(),
         requirement_input_assets=(),
     )
-    overflow_decision = VideoGenerationResolver().resolve(
+    overflow_decision = VideoGenerationResolver().inspect_capability(
         context=overflow_context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -4021,7 +4021,7 @@ def test_router_does_not_fallback_when_v2_capability_id_is_unknown() -> None:
         important=True,
         keyframe=_asset("first_frame", "keyframe", HASH_A),
     )
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=_policy(),
         provider_profile=_profile(),
@@ -4056,7 +4056,7 @@ def test_router_selected_capability_fingerprint_includes_canonical_constraints()
         important=True,
         keyframe=_asset("first_frame", "keyframe", HASH_A),
     )
-    decision = VideoGenerationResolver().resolve(
+    decision = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=_policy(),
         provider_profile=_profile(),

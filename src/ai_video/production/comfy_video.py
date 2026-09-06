@@ -672,6 +672,7 @@ class ComfyUIVideoProvider:
                 grammar_contract="h3-three-field-v1",
                 prompt_text=result.prompt_text,
                 prompt_sha256=result.prompt_sha256,
+                expressed_control_paths=result.expressed_control_paths,
             )
         return compile_provider_video_request(
             provider_bound=provider_bound,

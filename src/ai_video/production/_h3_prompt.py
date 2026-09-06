@@ -33,6 +33,7 @@ class H3PromptCompilation(_H3PromptModel):
     outcome: Literal["compiled"] = "compiled"
     prompt_text: str = Field(min_length=1)
     prompt_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    expressed_control_paths: tuple[str, ...] = ()
 
     @model_validator(mode="after")
     def _validate_hash(self) -> "H3PromptCompilation":
@@ -306,6 +307,17 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptR
     return H3PromptCompilation(
         prompt_text=prompt,
         prompt_sha256=hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+        expressed_control_paths=(
+            "generation_intent.primary_camera_motion.movement_kind",
+            "generation_intent.primary_camera_motion.amplitude_class",
+            "generation_intent.primary_camera_motion.speed_class",
+            "generation_intent.primary_camera_motion.end_motion_state",
+            "generation_intent.camera_subject_relation.relation_kind",
+            "generation_intent.dialogue_intent.start_seconds",
+            "generation_intent.dialogue_intent.end_seconds",
+            "generation_intent.dialogue_intent.on_screen",
+            "generation_intent.dialogue_intent.lip_sync_required",
+        ),
     )
 
 
@@ -509,6 +521,12 @@ def _compile_h3_t2va_prompt(
     return H3PromptCompilation(
         prompt_text=prompt,
         prompt_sha256=hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+        expressed_control_paths=(
+            "generation_intent.subject_action.endpoint.required_change",
+            "generation_intent.camera_endpoint.position_lock",
+            "generation_intent.camera_endpoint.orientation_lock",
+            "generation_intent.pacing.shot_duration_seconds",
+        ),
     )
 
 

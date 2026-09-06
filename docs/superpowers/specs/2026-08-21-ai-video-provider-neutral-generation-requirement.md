@@ -62,7 +62,7 @@ Canonical Shot + Intent Evidence + Continuity
 
 - 不实现或替代 `ShotReadinessGate`、Shot Quality Gate、post-fetch quality gate、P6 Review/Repair或human Pilot Reality Gate；
 - 不判断 identity drift、motion naturalness、continuity quality、画面美感、subjective sharpness或Final Acceptance；
-- 不新增 Provider ranking、automatic selection policy、fallback、retry、repair、candidate iteration或Candidate 2/3；
+- 原 neutral requirement slice 不拥有 Provider ranking；2026-09-07 generation decision contract 将纯 candidate/recipe comparison 与 intervention selection 收敛到 Router。Requirement、Registry、compiler 不进行 ranking/fallback，也不执行 retry/repair 或 Candidate 2/3；
 - 不新增global Provider catalog、automatic candidate discovery、Registry-owned selection或
   Registry-to-Service automatic assembly；
 - 不改变 canonical Shot、Asset Registry、Manifest、Dependency Graph、`ResolvedTimeline`、renderer、committer、permit或recovery schema ownership；
@@ -490,4 +490,4 @@ commit `15ef1d5`的已验证范围，必须由本slice的fresh receipt单独证�
 - existing `VideoGenerationRequest`作为lifecycle DTO，以request `/5`、resolved `/6`、activation scope `/4`接入并保持全部历史hash；
 - capability denial和adapter unsupported均fail closed，不触发fallback。
 
-任何改变上述选择、引入Manifest schema/layout mutation、Provider ranking或新的quality owner，均是新的scope expansion，必须单独Spec与用户授权。
+2026-09-07 generation decision implementation 已获用户授权 Router-owned 纯 candidate/recipe comparison；它不改变 Manifest schema/layout 或 quality owner。除此之外改变上述选择或引入新的 mutation/quality owner 仍需独立 scope 与授权。

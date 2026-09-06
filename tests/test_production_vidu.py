@@ -389,7 +389,7 @@ def test_router_compiler_resolver_uses_vidu_capability_without_network():
         output_need=OutputNeed(duration_seconds=5,
             width=1280, height=720, aspect_ratio="16:9", fps=24, container_mime="video/mp4"),
         audio_need=AudioNeed.REQUIRED)
-    routing = VideoGenerationResolver().resolve_requirement(
+    routing = VideoGenerationResolver()._bind_requirement(
         projection=projection, context=context,
         policy=_policy(remote_authorized=True, budget_authorized=True),
         provider_profile=_profile().pointer(), capabilities=provider.capabilities(),
@@ -402,7 +402,7 @@ def test_router_compiler_resolver_uses_vidu_capability_without_network():
     assert isinstance(compiled, CompiledProviderVideoRequest)
     assert provider.resolve(compiled.request).capability_id == args[0].capability_id
     assert transport.calls == []
-    legacy_routing = VideoGenerationResolver().resolve_requirement(
+    legacy_routing = VideoGenerationResolver()._bind_requirement(
         projection=projection, context=context,
         policy=_policy(remote_authorized=True, budget_authorized=True),
         provider_profile=_profile().pointer(), capabilities=provider.capabilities(),
@@ -465,7 +465,7 @@ def test_router_compiled_v2_i2v_posts_is_rec_and_ordered_exact_frames(last):
             geometry_policy=OutputGeometryPolicy.ADAPTIVE, aspect_ratio="adaptive",
             fps=output.fps, container_mime=output.mime_type), audio_need=AudioNeed.REQUIRED)
     provider, _, _ = _setup()
-    routing = VideoGenerationResolver().resolve_requirement(projection=projection, context=context,
+    routing = VideoGenerationResolver()._bind_requirement(projection=projection, context=context,
         policy=_policy(remote_authorized=True, budget_authorized=True), provider_profile=_profile().pointer(),
         capabilities=provider.capabilities(), selected_capability_id="viduq3-pro-i2v-v1",
         output_requirement=output, lifecycle=_lifecycle(context).model_copy(update={
@@ -781,7 +781,7 @@ def test_r2v_and_extension_router_compiler_reach_adapter(extend):
             geometry_policy=OutputGeometryPolicy.ADAPTIVE if extend else OutputGeometryPolicy.EXACT,
             aspect_ratio=output.ratio, fps=24, container_mime="video/mp4"),
         audio_need=AudioNeed.FORBIDDEN if extend else AudioNeed.REQUIRED)
-    routing = VideoGenerationResolver().resolve_requirement(projection=projection, context=context,
+    routing = VideoGenerationResolver()._bind_requirement(projection=projection, context=context,
         policy=_policy(remote_authorized=True, budget_authorized=True), provider_profile=_profile().pointer(),
         capabilities=provider.capabilities(), selected_capability_id=capability_id, output_requirement=output,
         lifecycle=_lifecycle(context).model_copy(update={"input_artifact_ids": (context.target_shot_id, asset.asset_id)}),

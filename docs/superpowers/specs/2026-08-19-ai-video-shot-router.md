@@ -40,7 +40,7 @@ Router 的核心原则是：
 1. `ShotVisualResolver`：从当前 Shot/Storyboard revision、intent 和可用资产产生 coarse `VisualStrategy` authoring proposal。proposal 不是 runtime truth，第一阶段也没有 materialization API；caller 仍需显式 authoring。未来若新增接受 proposal 的 slice，仍只有 `ProductionStateCommitter` 可物化并激活新的 Shot/Storyboard revision。
 2. `VideoGenerationResolver`：只读取已经激活、明确为 `generated_video` 或含 generated-video layer 的 `hybrid` Shot，决定 provider-neutral `VideoGenerationMode`、required reference roles、capability requirements 和 execution requirements。
 
-Provider 实例仍由 Router core 之外的显式 production policy、authorization 和 exact registry name 选择。Router core 只返回 required capability set 和 execution requirements，不返回 ranked/eligible Provider list；它不得自行调用 Provider、申请预算、读取 secret、提交任务、激活候选或渲染。
+2026-09-07 accepted generation decision contract 取代新任务的外部预选：caller 提供候选目录、用户限制、适用执行范围与显式 evidence，只有 Router 比较 fit 并选择 recipe。Registry 仍只做 exact lookup。Router 不调用 Provider、申请预算、读取 secret、提交任务、激活候选或渲染；sealed request 之后不允许 fallback。历史 exact binder/replay contract 保留。
 
 ## Non-Goals
 
@@ -99,7 +99,7 @@ Character Bible + Scene/Shot intent + exact available assets
 - Router policy id/version/content hash。
 - explicit `continuity_mode`；`reference`/`semantic` 所需的 typed semantic continuity state，至少覆盖 character identity、story、wardrobe、injury、prop 与可选 scene state hashes。state由`content_hash` seal，并以`continuity-state:<hash>` token先物化进activated Shot的既有`continuity_constraints`；Router必须验证该projection存在。
 
-`VideoGenerationResolver` 额外读取 activated Shot、由外部 production policy 预先选择的一个 exact Provider/profile identity，以及该 profile 的 sealed capability snapshot。它不得看到一个用于自动 fallback 的 Provider list。若这个 exact selection 不支持 required mode/roles/output，结果是 blocked，不选择下一个 Provider。
+`VideoGenerationResolver.resolve_requirement` 读取 activated Shot、verified requirement 和显式候选/evidence snapshots。Router 在 seal 前比较 exact Provider/profile/recipe；内部 `_bind_requirement` 逐候选验证 mode/roles/output/continuity route。技术 compatibility 不代替 fit。调用者不能提交 `selected_capability_id` 冒充选型；seal 后拒绝 fallback。`inspect_capability` 只提供不产生 bound request 的技术观察。
 
 缺失 reference 不能被解释为“可以 T2V”。Router 必须显式区分：资产确实不需要、资产尚未准备、Provider 不支持、策略不允许、预算不允许与授权缺失。
 
@@ -123,7 +123,7 @@ proposal 不能作为 second truth 被 request、P5、composition 或 render 消
 - ordered required binding roles，例如 `first_frame`、`last_frame`、`reference`、`reference_video`、`reference_audio`；
 - exact required input asset identities/hashes；
 - required capability set，而不是 Provider-specific payload；
-- required execution kind/policy constraints，不包含 ranked/eligible Provider list；
+- required execution kind/policy constraints，以及带 scope/unknown/tie 解释的 candidate assessments；它们不构成 execution permit；
 - stable semantic reason codes 与 human-readable rationale；
 - `semantic_routing_hash`：只覆盖会改变生成语义的 selected mode、bindings、inputs、capability/output requirements；
 - `audit_decision_hash`：额外覆盖 policy id/version/hash 与解释信息；

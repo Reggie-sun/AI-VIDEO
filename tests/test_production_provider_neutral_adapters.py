@@ -234,7 +234,7 @@ def test_remote_output_recovery_is_rejected_purely_before_compilation(
         provider_name=h3_module._PROVIDER_NAME,
         variants=(variant,),
     )
-    routing = VideoGenerationResolver().resolve_requirement(
+    routing = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_policy(remote_authorized=True, budget_authorized=True),
@@ -375,7 +375,7 @@ def test_minimax_h3_compiles_neutral_t2v_to_exact_offline_capability() -> None:
         compiler_id="minimax-h3-video-compiler",
         compiler_version="1",
     )
-    routing = VideoGenerationResolver().resolve_requirement(
+    routing = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_policy(remote_authorized=True, budget_authorized=True),
@@ -420,7 +420,7 @@ def test_adapter_returns_typed_unsupported_for_unexpressible_quality_floor() -> 
             native_enforcement_required=True,
         ),
     )
-    routing = VideoGenerationResolver().resolve_requirement(
+    routing = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_policy(remote_authorized=True, budget_authorized=True),
@@ -531,7 +531,7 @@ def test_local_h3_compiles_neutral_first_frame_without_runtime_execution(
         selected_capability_id="minimax-h3-fl2va-local-v1",
         compiler_contract=compiler_contract,
     )
-    routing = VideoGenerationResolver().resolve_requirement(
+    routing = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_policy(),
@@ -688,7 +688,7 @@ def test_stock20_v4_compiles_exact_h3_prompt_without_neutral_fallback(
                 )
             }
         )
-    routing = VideoGenerationResolver().resolve_requirement(
+    routing = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_policy(),
@@ -889,7 +889,7 @@ def test_local_t8_family_compiles_both_exact_lanes_without_runtime_execution() -
         ),
     )
     for selected_profile, profile_id, capability_id, compiler_id in lanes:
-        routing = VideoGenerationResolver().resolve_requirement(
+        routing = VideoGenerationResolver()._bind_requirement(
             projection=projection,
             context=context,
             policy=_policy(),
@@ -931,7 +931,7 @@ def test_local_t8_family_compiles_both_exact_lanes_without_runtime_execution() -
         assert resolved.capability_id == capability_id
         assert resolved.effective_output.native_audio is True
 
-        legacy_routing = VideoGenerationResolver().resolve_requirement(
+        legacy_routing = VideoGenerationResolver()._bind_requirement(
             projection=legacy_projection,
             context=context,
             policy=_policy(),
@@ -1024,7 +1024,7 @@ def test_t8_quality_native_compiler_uses_h3_three_field_prompt_without_neutral_f
         ),
         audio_need=AudioNeed.REQUIRED,
     )
-    routing = VideoGenerationResolver().resolve_requirement(
+    routing = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_policy(),
@@ -1083,7 +1083,7 @@ def test_t8_quality_native_compiler_uses_h3_three_field_prompt_without_neutral_f
     assert isinstance(stale, ProviderRequirementUnsupported)
     assert stale.reason is ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH
 
-    legacy_compiler_routing = VideoGenerationResolver().resolve_requirement(
+    legacy_compiler_routing = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_policy(),
@@ -1163,7 +1163,7 @@ def test_hailuo_compiles_first_frame_to_adaptive_i2v_without_fixed_pixels() -> N
         selected_capability_id=hailuo_module._I2V_CAPABILITY_ID,
         compiler_contract=compiler_contract,
     )
-    routing = VideoGenerationResolver().resolve_requirement(
+    routing = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_policy(remote_authorized=True, budget_authorized=True),
@@ -1225,7 +1225,7 @@ def test_seedance_compiles_exact_profile_t2v_without_materialization_or_network(
         and variant.output_capability.supports(output)
     )
     assert len(selected) == 1
-    routing = VideoGenerationResolver().resolve_requirement(
+    routing = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_policy(remote_authorized=True, budget_authorized=True),
@@ -1362,7 +1362,7 @@ def test_seedance_r2v_preserves_multiple_typed_video_and_audio_references() -> N
             )
         }
     )
-    routing = VideoGenerationResolver().resolve_requirement(
+    routing = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_policy(remote_authorized=True, budget_authorized=True),
@@ -1487,7 +1487,7 @@ def test_seedance_edit_and_extend_neutral_modes_reach_exact_offline_capability(
         if variant.model_id == "doubao-seedance-2-5-260628"
         and variant.mode is provider_mode
     )
-    routing = VideoGenerationResolver().resolve_requirement(
+    routing = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
         policy=_policy(remote_authorized=True, budget_authorized=True),

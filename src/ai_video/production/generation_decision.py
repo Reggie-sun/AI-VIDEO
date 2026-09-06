@@ -1,0 +1,429 @@
+"""Shot Router's pure generation policy over explicit immutable snapshots."""
+
+from typing import Literal
+
+from pydantic import Field, model_validator
+
+from ai_video.production.artifact_contracts import StrictModel
+from ai_video.production._shot_router_contracts import (
+    AdapterCompilerContract, RequirementRoutingResult, RoutingOutcome,
+)
+from ai_video.production.generation_diagnosis import (
+    AttemptEvidence, Diagnosis, Intervention, diagnose_exact_result,
+)
+from ai_video.production.generation_recipe import GenerationRecipe, SHA256
+from ai_video.production.hashing import canonical_sha256
+from ai_video.production.video import (
+    ProviderProfilePointer, VideoGenerationRequest, VideoOutputRequirement, VideoProviderCapabilities,
+)
+from ai_video.production.video_contracts import VideoFlexibleOutputRequirement
+
+
+class GenerationCandidate(StrictModel):
+    candidate_id: str = Field(min_length=1)
+    provider_profile: ProviderProfilePointer
+    capabilities: VideoProviderCapabilities
+    capability_id: str = Field(min_length=1)
+    compiler_contract: AdapterCompilerContract
+    output_requirement: VideoOutputRequirement | VideoFlexibleOutputRequirement
+    recipe: GenerationRecipe
+
+    @model_validator(mode="after")
+    def _identity(self):
+        if (self.recipe.profile_sha256 != self.provider_profile.profile_sha256
+                or self.recipe.compiler_hash != self.compiler_contract.compiler_hash):
+            raise ValueError("recipe profile/compiler identity mismatch")
+        variants = tuple(v for v in self.capabilities.variants
+                         if v.capability_id == self.capability_id)
+        if len(variants) != 1:
+            raise ValueError("candidate must name one exact registered capability")
+        if (self.recipe.seed.kind == "uncontrolled") == variants[0].seed_supported:
+            raise ValueError("recipe must explicitly use the capability's seed semantics")
+        return self
+
+    @property
+    def scope_hash(self):
+        return canonical_sha256({"provider": self.capabilities.provider_name,
+                                 "capability": self.capability_id,
+                                 "capabilities": self.capabilities.capabilities_fingerprint,
+                                 "recipe": self.recipe.fit_hash,
+                                 "output": self.output_requirement.model_dump(mode="json")})
+
+
+class ExecutionLimits(StrictModel):
+    """Current orchestration projection; no reservation or authorization writer."""
+
+    task_id: str = Field(min_length=1)
+    generation_forbidden: bool
+    allowed_remote_candidates: tuple[str, ...] = ()
+    paid_submit_ceiling: int = Field(strict=True, ge=0)
+    paid_submits_used: int = Field(strict=True, ge=0)
+    local_batch_limit: int = Field(strict=True, gt=0)
+    local_batch_used: int = Field(strict=True, ge=0)
+    local_total_limit: int | None = Field(default=None, strict=True, gt=0)
+    local_total_used: int = Field(strict=True, ge=0)
+    local_resource_available: bool
+    batch_review_evidence_hash: str | None = Field(default=None, pattern=SHA256)
+
+
+class DecisionPolicy(StrictModel):
+    policy_id: Literal["generation-decision"] = "generation-decision"
+    version: Literal["1"] = "1"
+    repeated_failure_threshold: int = Field(default=3, strict=True, ge=2)
+    allow_bounded_exploration: bool = False
+
+    @property
+    def content_hash(self):
+        return canonical_sha256(self.model_dump(mode="json"))
+
+
+class InputConflict(StrictModel):
+    kind: Literal["reference", "intent", "rubric", "evaluator"]
+    source_sha256: str = Field(pattern=SHA256)
+    observation: str = Field(min_length=1)
+    affected_requirements: tuple[str, ...] = Field(min_length=1)
+    next_owner: str = Field(min_length=1)
+
+
+class DecisionInputs(StrictModel):
+    projection_hash: str = Field(pattern=SHA256)
+    facts_hash: str = Field(pattern=SHA256)
+    rubric_hash: str = Field(pattern=SHA256)
+    policy: DecisionPolicy
+    limits: ExecutionLimits
+    candidates: tuple[GenerationCandidate, ...] = Field(min_length=1)
+    evidence: tuple[AttemptEvidence, ...] = ()
+    latest_attempt_hash: str | None = Field(default=None, pattern=SHA256)
+    interventions: tuple[Intervention, ...] = ()
+    conflicts: tuple[InputConflict, ...] = ()
+    historical_recipes: tuple[GenerationCandidate, ...] = ()
+    baseline_request: VideoGenerationRequest | None = None
+    user_fixed_candidates: tuple[str, ...] = ()
+
+    @model_validator(mode="after")
+    def _snapshot(self):
+        ids = [c.candidate_id for c in self.candidates]
+        if len(ids) != len(set(ids)):
+            raise ValueError("duplicate candidate IDs")
+        evidence_ids = [e.evidence_hash for e in self.evidence]
+        if len(evidence_ids) != len(set(evidence_ids)):
+            raise ValueError("duplicate exact evidence projection")
+        if self.latest_attempt_hash is not None and self.latest_attempt_hash not in evidence_ids:
+            raise ValueError("latest attempt missing from evidence snapshot")
+        if not set(self.user_fixed_candidates) <= set(ids):
+            raise ValueError("user constraint names an absent candidate")
+        if not set(self.limits.allowed_remote_candidates) <= set(ids):
+            raise ValueError("execution scope names an absent candidate")
+        if len({c.recipe.rubric_hash for c in self.candidates}) != 1:
+            raise ValueError("candidates cannot compare different rubrics")
+        rubric_projections = {
+            canonical_sha256({"expressions": [r.model_dump(mode="json", exclude={"native_text"})
+                              for r in c.recipe.expressions]}) for c in self.candidates
+        }
+        if len(rubric_projections) != 1:
+            raise ValueError("candidate recipes must preserve the same acceptance projection")
+        return self
+
+    @property
+    def snapshot_hash(self):
+        payload = self.model_dump(mode="json")
+        for field in ("candidates", "evidence", "interventions", "conflicts", "historical_recipes"):
+            payload[field] = sorted(payload[field], key=canonical_sha256)
+        payload["user_fixed_candidates"] = sorted(payload["user_fixed_candidates"])
+        payload["limits"]["allowed_remote_candidates"] = sorted(payload["limits"]["allowed_remote_candidates"])
+        return canonical_sha256(payload)
+
+
+class CandidateAssessment(StrictModel):
+    candidate_id: str
+    scope_hash: str
+    fit: Literal["supported", "unknown", "conflicting", "unsupported"]
+    compatible: bool
+    executable: bool
+    supported_dimensions: tuple[str, ...]
+    failed_dimensions: tuple[str, ...]
+    unknown_dimensions: tuple[str, ...]
+    evidence_hashes: tuple[str, ...]
+    ignored_evidence_hashes: tuple[str, ...]
+    sample_count: int
+    pass_count: int
+    fail_count: int
+    not_evaluated_count: int
+    runtime_failure_count: int
+    unknown_outcome_count: int
+    not_submitted_count: int
+    reasons: tuple[str, ...]
+
+
+class GenerationDecision(StrictModel):
+    snapshot_hash: str
+    disposition: str
+    selected_candidate_id: str | None = None
+    assessments: tuple[CandidateAssessment, ...]
+    diagnosis: Diagnosis | None = None
+    intervention: Intervention | None = None
+    routing: RequirementRoutingResult | None = None
+    rationale: tuple[str, ...]
+    revalidate_requirements: tuple[str, ...] = ()
+    # Recompute selection from current inputs before binding; never consume this
+    # advisory result as a submit permit or mutable progress checkpoint.
+    @property
+    def decision_hash(self):
+        return canonical_sha256(self.model_dump(mode="json"))
+
+
+def _assess(candidate, inputs, routing):
+    recipe = candidate.recipe
+    relevant = tuple(e for e in inputs.evidence
+                     if e.recipe_scope_hash == candidate.scope_hash
+                     and e.facts_hash == inputs.facts_hash
+                     and e.rubric_hash == inputs.rubric_hash)
+    dimensions = {r.dimension for r in recipe.expressions
+                  if r.level == "acceptance" and r.stage == "raw_generation"}
+    support, failed = set(), set()
+    supported_ids = set()
+    passes, failures, unevaluated = set(), set(), set()
+    for e in relevant:
+        if e.outcome != "media" or e.stage != "raw_generation":
+            continue
+        diagnosis = diagnose_exact_result(e, relevant, recipe)
+        for rule in recipe.expressions:
+            if rule.requirement_id in diagnosis.failed_requirements:
+                failed.add(rule.dimension)
+            if rule.requirement_id in diagnosis.preserved_requirements:
+                supported_ids.add(rule.requirement_id)
+        if "QUALITY_FAILURE" in diagnosis.failure_classes:
+            failures.add(e.artifact_sha256)
+        elif diagnosis.all_required_observed_pass:
+            passes.add(e.artifact_sha256)
+        else:
+            unevaluated.add(e.artifact_sha256)
+    # Multiple records/proof layers of the same bytes are never independent wins.
+    passes -= failures | unevaluated
+    unevaluated -= failures
+    for dimension in dimensions:
+        required_ids = {r.requirement_id for r in recipe.expressions
+                        if r.level == "acceptance" and r.stage == "raw_generation"
+                        and r.dimension == dimension}
+        if required_ids <= supported_ids:
+            support.add(dimension)
+    unknown = dimensions - support - failed
+    fit = "unknown"
+    if failed:
+        fit = ("unsupported" if len(failures) >= inputs.policy.repeated_failure_threshold
+               else "conflicting")
+    elif dimensions and not unknown:
+        fit = "supported"
+    variant = next(v for v in candidate.capabilities.variants if v.capability_id == candidate.capability_id)
+    local = variant.execution_kind.value == "local"
+    limits = inputs.limits
+    reasons = []
+    compatible = routing.decision.outcome == RoutingOutcome.SELECTED
+    if not compatible:
+        reasons.extend(code.value for code in routing.decision.reason_codes)
+    if limits.generation_forbidden:
+        reasons.append("GENERATION_FORBIDDEN")
+    if local:
+        if not limits.local_resource_available:
+            reasons.append("LOCAL_RESOURCES_UNAVAILABLE")
+        if limits.local_batch_used >= limits.local_batch_limit:
+            reasons.append("LOCAL_BATCH_REVIEW_REQUIRED")
+        if limits.local_total_limit is not None and limits.local_total_used >= limits.local_total_limit:
+            reasons.append("LOCAL_TOTAL_LIMIT")
+        if (limits.local_total_used > 0 and limits.local_batch_used == 0
+                and limits.batch_review_evidence_hash is None):
+            reasons.append("LOCAL_BATCH_REVIEW_REQUIRED")
+    else:
+        if candidate.candidate_id not in limits.allowed_remote_candidates:
+            reasons.append("REMOTE_SCOPE_NOT_AUTHORIZED")
+        if limits.paid_submits_used >= limits.paid_submit_ceiling:
+            reasons.append("TASK_SUBMIT_CEILING")
+    if inputs.user_fixed_candidates and candidate.candidate_id not in inputs.user_fixed_candidates:
+        reasons.append("USER_ROUTE_CONSTRAINT")
+    return CandidateAssessment(
+        candidate_id=candidate.candidate_id, scope_hash=candidate.scope_hash, fit=fit,
+        compatible=compatible, executable=not reasons,
+        supported_dimensions=tuple(sorted(support)), failed_dimensions=tuple(sorted(failed)),
+        unknown_dimensions=tuple(sorted(unknown)),
+        evidence_hashes=tuple(sorted(e.evidence_hash for e in relevant)),
+        ignored_evidence_hashes=tuple(sorted(e.evidence_hash for e in inputs.evidence if e not in relevant)),
+        sample_count=len(passes | failures | unevaluated), pass_count=len(passes),
+        fail_count=len(failures), not_evaluated_count=len(unevaluated),
+        runtime_failure_count=sum(e.outcome == "runtime_failure" for e in relevant),
+        unknown_outcome_count=sum(e.outcome == "unknown_outcome" for e in relevant),
+        not_submitted_count=sum(e.outcome == "not_submitted" for e in relevant),
+        reasons=tuple(reasons),
+    )
+
+
+def resolve_generation_decision(resolver, *, projection, context, policy, lifecycle,
+                                inputs, continuity_routing=None):
+    """Only the Router invokes the exact binder; candidates never execute here."""
+    inputs = DecisionInputs.model_validate(inputs.model_dump(mode="python"))
+    if (inputs.projection_hash != projection.projection_hash
+            or inputs.facts_hash != canonical_sha256(projection.requirement.model_dump(
+                mode="json", exclude={"requirement_id", "requirement_hash"}))):
+        raise ValueError("stale generation decision projection or difficulty facts")
+    candidates = sorted(inputs.candidates, key=lambda c: c.candidate_id)
+    for c in candidates:
+        if (c.recipe.requirement_hash != projection.requirement.requirement_hash
+                or c.recipe.rubric_hash != inputs.rubric_hash):
+            raise ValueError("stale candidate requirement/rubric")
+    # Inspect technical compatibility separately from execution authorization.
+    # The selected candidate is rebound under the original execution policy.
+    compatibility_policy = policy.model_copy(update={"remote_authorized": True,
+                                                      "budget_authorized": True,
+                                                      "local_resources_available": True})
+    bindings = {c.candidate_id: resolver._bind_requirement(
+        projection=projection, context=context, policy=compatibility_policy,
+        provider_profile=c.provider_profile, capabilities=c.capabilities,
+        selected_capability_id=c.capability_id, output_requirement=c.output_requirement,
+        lifecycle=lifecycle, compiler_contract=c.compiler_contract,
+        continuity_routing=continuity_routing) for c in candidates}
+    assessments = tuple(_assess(c, inputs, bindings[c.candidate_id]) for c in candidates)
+    base = dict(snapshot_hash=inputs.snapshot_hash, assessments=assessments)
+    latest = next((e for e in inputs.evidence if e.evidence_hash == inputs.latest_attempt_hash), None)
+    current_attempts = tuple(e for e in inputs.evidence if e.task_id == inputs.limits.task_id
+                             and e.shot_id == context.target_shot_id)
+    if any(e.outcome == "unknown_outcome" for e in current_attempts):
+        return GenerationDecision(**base, disposition="UNKNOWN_OUTCOME",
+                                  rationale=("explicit recovery must close the exact attempt",))
+    if current_attempts and latest is None:
+        return GenerationDecision(**base, disposition="EVIDENCE_GAP",
+                                  rationale=("current task history requires exact latest attempt identity",))
+    if any(e.intervention_id is not None and e.intervention_semantic_hash is None for e in current_attempts):
+        return GenerationDecision(**base, disposition="EVIDENCE_GAP",
+                                  rationale=("repair semantic identity missing from current attempt history",))
+    if latest is not None:
+        if latest not in current_attempts:
+            raise ValueError("latest attempt is outside current task/Shot")
+        old_recipe = next((c.recipe for c in (*candidates, *inputs.historical_recipes)
+                           if c.scope_hash == latest.recipe_scope_hash), None)
+        if old_recipe is None:
+            return GenerationDecision(**base, disposition="EVIDENCE_GAP",
+                                      rationale=("include the prior exact recipe for diagnosis",))
+        diagnosis = diagnose_exact_result(latest, inputs.evidence, old_recipe)
+        base["diagnosis"] = diagnosis
+        for reason in ("UNKNOWN_OUTCOME", "RUNTIME_FAILURE", "RUBRIC_OR_STAGE_ERROR", "EVIDENCE_GAP"):
+            if reason in diagnosis.failure_classes:
+                return GenerationDecision(**base, disposition=reason,
+                                          rationale=(f"repair via {diagnosis.next_owner} on exact evidence",))
+        if (diagnosis.all_required_observed_pass and latest.facts_hash == inputs.facts_hash
+                and latest.recipe_scope_hash in {c.scope_hash for c in candidates}
+                and not inputs.conflicts):
+            return GenerationDecision(**base, disposition="REVIEW_CURRENT_RESULT",
+                                      rationale=("current exact result has all applicable observations; use existing acceptance owner, not regeneration",))
+    if inputs.conflicts:
+        conflict = sorted(inputs.conflicts, key=lambda c: (c.kind, c.source_sha256))[0]
+        disposition = {"reference": "CHANGE_REFERENCE_STRATEGY", "intent": "INTENT_OR_REFERENCE_CONFLICT",
+                       "rubric": "RUBRIC_OR_STAGE_ERROR", "evaluator": "EVIDENCE_GAP"}[conflict.kind]
+        return GenerationDecision(**base, disposition=disposition,
+                                  rationale=tuple(f"{c.observation}; owner={c.next_owner}" for c in
+                                                  sorted(inputs.conflicts, key=lambda c: (c.kind, c.source_sha256))))
+    intervention = None
+    if latest is not None and "QUALITY_FAILURE" in base["diagnosis"].failure_classes:
+        evidence_ids = {e.evidence_hash for e in inputs.evidence}
+        alternatives = []
+        for proposed in inputs.interventions:
+            if not set(proposed.support + proposed.counterevidence) <= evidence_ids:
+                raise ValueError("intervention cites missing evidence")
+            if latest.evidence_hash not in proposed.support + proposed.counterevidence:
+                continue
+            if not set(base["diagnosis"].failed_requirements) & set(proposed.closes):
+                continue
+            previous = tuple(e for e in current_attempts
+                             if e.intervention_semantic_hash == proposed.semantic_hash
+                             or e.intervention_id == proposed.intervention_id)
+            # A refuted intervention cannot be relabeled as new learning.
+            if previous and proposed.purpose != "resample":
+                continue
+            previous_attempts = {(e.task_id, e.shot_id, e.attempt_id, e.request_hash) for e in previous}
+            if proposed.purpose == "resample" and len(previous_attempts) >= proposed.resample_limit:
+                continue
+            alternatives.append(proposed)
+        if not alternatives:
+            return GenerationDecision(**base, disposition="REASSESS_FEASIBILITY",
+                                      rationale=("no new testable intervention; stop equivalent retries",))
+        if len(alternatives) > 1:
+            # Prefer hypotheses with independent supporting exact artifacts and
+            # fewer recorded counterexamples, not caller proposal order.
+            def rank(p):
+                supporting = {e.artifact_sha256 for e in inputs.evidence
+                              if e.evidence_hash in p.support and e.artifact_sha256 is not None}
+                opposing = {e.artifact_sha256 for e in inputs.evidence
+                            if e.evidence_hash in p.counterevidence and e.artifact_sha256 is not None}
+                return (len(opposing), -len(supporting), len(p.regression_risks))
+            alternatives.sort(key=lambda p: (rank(p), p.intervention_id))
+            if rank(alternatives[0]) == rank(alternatives[1]):
+                return GenerationDecision(**base, disposition="UNRESOLVED_TIE",
+                                          rationale=("intervention evidence does not distinguish hypotheses",))
+        intervention = alternatives[0]
+        if intervention.disposition != "GENERATE_ONCE":
+            return GenerationDecision(**base, disposition=intervention.disposition,
+                                      intervention=intervention, rationale=(intervention.hypothesis,))
+        proposed_candidate = next((c for c in candidates if c.candidate_id == intervention.candidate_id), None)
+        if proposed_candidate is None:
+            raise ValueError("intervention candidate is absent")
+        baseline = inputs.baseline_request
+        if baseline is None or baseline.request_input_hash != latest.request_hash:
+            return GenerationDecision(**base, disposition="EVIDENCE_GAP",
+                                      rationale=("repair needs the exact compiled baseline and actual delta contract",))
+        from ai_video.production.generation_diagnosis import seal_intervention_comparison
+
+        comparison = seal_intervention_comparison(intervention, baseline)
+        if (proposed_candidate.recipe.comparison is not None
+                and proposed_candidate.recipe.comparison != comparison):
+            raise ValueError("caller comparison is not derived from exact compiled baseline")
+    eligible = [a for a in assessments if a.compatible and a.executable
+                and (intervention is not None and a.candidate_id == intervention.candidate_id
+                     or intervention is None and (a.fit == "supported" or
+                         a.fit == "unknown" and inputs.policy.allow_bounded_exploration))]
+    if not eligible:
+        resource_stops = {"GENERATION_FORBIDDEN", "TASK_SUBMIT_CEILING", "LOCAL_TOTAL_LIMIT",
+                          "LOCAL_BATCH_REVIEW_REQUIRED", "LOCAL_RESOURCES_UNAVAILABLE"}
+        supported = [a for a in assessments if a.fit == "supported" and a.compatible
+                     and not resource_stops.intersection(a.reasons)]
+        if supported:
+            disposition = "CHANGE_PROVIDER_MODEL"
+        elif any(a.compatible and a.executable for a in assessments):
+            disposition = ("CAPABILITY_BOUNDARY" if all(a.fit == "unsupported" for a in assessments
+                           if a.compatible and a.executable) else "INSUFFICIENT_EVIDENCE")
+        else:
+            disposition = "BLOCKED_EXECUTION"
+        return GenerationDecision(**base, disposition=disposition,
+                                  rationale=tuple(f"{a.candidate_id}: {a.fit}; {','.join(a.reasons)}" for a in assessments))
+    def fit_rank(a):
+        return (len(a.failed_dimensions), len(a.unknown_dimensions))
+    eligible.sort(key=lambda a: (fit_rank(a), a.candidate_id))
+    if len(eligible) > 1 and fit_rank(eligible[0]) == fit_rank(eligible[1]):
+        return GenerationDecision(**base, disposition="UNRESOLVED_TIE",
+                                  rationale=("candidate evidence does not establish a unique fit",))
+    chosen = next(c for c in candidates if c.candidate_id == eligible[0].candidate_id)
+    selected_recipe = chosen.recipe
+    if intervention is not None:
+        selected_recipe = selected_recipe.model_copy(update={"comparison": comparison})
+    elif selected_recipe.comparison is not None:
+        raise ValueError("comparison is only valid for a diagnosed intervention")
+    routing = resolver._bind_requirement(
+        projection=projection, context=context, policy=policy,
+        provider_profile=chosen.provider_profile, capabilities=chosen.capabilities,
+        selected_capability_id=chosen.capability_id, output_requirement=chosen.output_requirement,
+        lifecycle=lifecycle, compiler_contract=chosen.compiler_contract,
+        continuity_routing=continuity_routing)
+    if routing.provider_bound_request is None:
+        return GenerationDecision(**base, disposition="BLOCKED_EXECUTION",
+                                  rationale=(routing.decision.rationale,))
+    from ai_video.production._shot_router_contracts import ProviderBoundVideoRequest
+
+    bound = ProviderBoundVideoRequest.create(**{
+        **{name: getattr(routing.provider_bound_request, name)
+           for name in ProviderBoundVideoRequest.model_fields if name != "provider_bound_request_hash"},
+        "generation_recipe": selected_recipe,
+    })
+    routing = RequirementRoutingResult(decision=routing.decision, provider_bound_request=bound)
+    return GenerationDecision(**base, disposition="GENERATE_ONCE", selected_candidate_id=chosen.candidate_id,
+                              routing=routing, intervention=intervention,
+                              rationale=(f"{chosen.candidate_id}: {eligible[0].fit}; one bounded attempt, no quality guarantee",
+                                         "evidence and policy affect audit identity, not unrelated media semantics"),
+                              revalidate_requirements=tuple(r.requirement_id for r in chosen.recipe.expressions
+                                                            if r.level == "acceptance"))

@@ -221,7 +221,7 @@ checks:
     cwd: .
     description: Verify deterministic Shot Continuity P0 preparation, immutable stack/policy evidence, and fail-closed persistence.
   production_shot_router_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_shot_router.py, tests/test_production_video.py, tests/test_production_dependency.py, tests/test_production_selective_rebuild.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_generation_decision.py, tests/test_production_shot_router.py, tests/test_production_video.py, tests/test_production_dependency.py, tests/test_production_selective_rebuild.py, -q]
     cwd: .
     covered_by_check_ids: [production_contract_tests]
     description: Verify pure Shot routing, exact video capabilities, and dependency isolation.
@@ -817,6 +817,10 @@ categories:
       - task_architecture_gate
   production_shot_router:
     patterns:
+      - src/ai_video/production/generation_decision.py
+      - src/ai_video/production/generation_diagnosis.py
+      - src/ai_video/production/generation_recipe.py
+      - tests/test_production_generation_decision.py
       - src/ai_video/production/_shot_router_contracts.py
       - src/ai_video/production/_shot_visual_resolver.py
       - src/ai_video/production/shot_router.py

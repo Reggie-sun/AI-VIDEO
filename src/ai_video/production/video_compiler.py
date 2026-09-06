@@ -16,6 +16,7 @@ from ai_video.production._video_requirement_routing import (
     requirement_output_matches,
 )
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.generation_recipe import expression_errors
 from ai_video.production.models import (
     DependencyGraphSnapshotPointer,
     ProjectSnapshotPointer,
@@ -92,6 +93,7 @@ class ProviderNativePrompt(_CompilerModel):
     grammar_contract: str = Field(pattern=_SAFE_ID)
     prompt_text: str = Field(min_length=1)
     prompt_sha256: str = Field(pattern=_SHA256)
+    expressed_control_paths: tuple[str, ...] = ()
 
     @model_validator(mode="after")
     def _validate_prompt_hash(self) -> "ProviderNativePrompt":
@@ -555,6 +557,21 @@ def compile_provider_video_request(
         if native_prompt is not None
         else _compile_neutral_prompt(requirement)
     )
+    recipe = provider_bound.generation_recipe
+    if recipe is not None:
+        if native_prompt is None:
+            return _unsupported(provider_bound, requirement,
+                                ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+                                ("generation_recipe.native_expression",))
+        missing = expression_errors(recipe, requirement, prompt, native_prompt.expressed_control_paths)
+        if missing:
+            return _unsupported(provider_bound, requirement,
+                                ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+                                missing)
+        if (recipe.seed.kind == "uncontrolled") == capability.seed_supported:
+            return _unsupported(provider_bound, requirement,
+                                ProviderRequirementUnsupportedReason.NATIVE_CONTROL_UNSUPPORTED,
+                                ("generation_recipe.seed",))
     projection = VideoGenerationRequestCompilation.create(
         compilation_kind="provider_neutral",
         generation_id=lifecycle.generation_id,
@@ -582,7 +599,7 @@ def compile_provider_video_request(
         seal_terminal_frame=lifecycle.seal_terminal_frame,
         media_bindings=media_bindings,
         output_requirement=provider_bound.output_requirement,
-        seed=None,
+        seed=recipe.seed.value if recipe is not None else None,
         base_project=lifecycle.base_project,
         base_registry=lifecycle.base_registry,
         base_dependency_graph=lifecycle.base_dependency_graph,
@@ -590,6 +607,14 @@ def compile_provider_video_request(
         output_asset_id=lifecycle.output_asset_id,
     )
     request = compile_video_generation_request(projection)
+    if recipe is not None and recipe.comparison is not None:
+        from ai_video.production.generation_diagnosis import compiled_comparison_errors
+
+        errors = compiled_comparison_errors(recipe.comparison, request)
+        if errors:
+            return _unsupported(provider_bound, requirement,
+                                ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH,
+                                errors)
     payload_hash = canonical_sha256(
         {
             "schema": "provider-video-payload-projection/1",
