@@ -370,6 +370,49 @@ def test_a4_actual_reference_intervention_fixed_seed_and_compiler_delta_guard():
         decide(after)
 
 
+def test_historical_uncontrolled_seed_allows_fixed_seed_repair_with_explicit_delta():
+    from ai_video.production.generation_diagnosis import verify_intervention_comparison
+    from ai_video.production.video import VideoGenerationRequest
+
+    setup = setup_decision(reference_hash="a" * 64)
+    current = setup["inputs"].candidates[0]
+    historical = GenerationCandidate.model_validate({
+        **current.model_dump(mode="python"),
+        "recipe": current.recipe.model_copy(update={"seed": SeedPolicy(kind="uncontrolled")}),
+    })
+    with pytest.raises(ValueError, match="current candidates"):
+        DecisionInputs.model_validate({
+            **setup["inputs"].model_dump(mode="python"), "candidates": (historical,),
+        })
+    unsupported = setup_decision(remote=True, seed_supported=False)["inputs"].candidates[0]
+    with pytest.raises(ValueError, match="seed-supported capability"):
+        GenerationCandidate.model_validate({
+            **unsupported.model_dump(mode="python"),
+            "recipe": unsupported.recipe.model_copy(update={"seed": SeedPolicy(kind="fixed", value=42)}),
+        })
+
+    controlled_baseline = compile_decision(decide(setup), setup).request
+    baseline = VideoGenerationRequest.create(**{
+        **controlled_baseline.model_dump(mode="python", exclude={"request_input_hash"}), "seed": None,
+    })
+    prior = evidence(setup, candidate=historical, verdict="FAIL", task_id="task",
+                     request_hash=baseline.request_input_hash)
+    proposal = intervention(prior, purpose="production_repair", changed_variables=("seed",),
+                            held_constants=("prompt_text",), uncontrolled_variables=("seed",))
+    setup["inputs"] = DecisionInputs.model_validate({
+        **setup["inputs"].model_dump(mode="python"), "historical_recipes": (historical,),
+        "evidence": (prior,), "latest_attempt_hash": prior.evidence_hash,
+        "interventions": (proposal,), "baseline_request": baseline,
+    })
+
+    result = decide(setup)
+    compiled = compile_decision(result, setup).request
+    assert result.disposition == "GENERATE_ONCE"
+    assert compiled.seed == 42
+    assert result.routing.provider_bound_request.generation_recipe.comparison.changed_variables == ("seed",)
+    assert verify_intervention_comparison(proposal, baseline, compiled)["uncontrolled_stochasticity"]
+
+
 def test_a7_improving_target_does_not_inherit_other_requirement_acceptance():
     setup = setup_decision()
     recipe = setup["inputs"].candidates[0].recipe

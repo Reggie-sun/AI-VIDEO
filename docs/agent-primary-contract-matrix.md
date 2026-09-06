@@ -21,6 +21,8 @@ native controls 使用既有 request 检查，不要求重复进入 prose。不�
 序列化保持原 hash。显式 fixed/paired/randomized seed 与 lifecycle identity 分离；repair 的
 comparison 由 Router 从 validated exact baseline request 导出，compiler 再检查实际 delta；
 两端未经控制的随机性必须披露。最终字幕不作为 raw finding，
+seed-capable Provider 的当前 `DecisionInputs.candidates` 必须显式控制 seed；
+`historical_recipes` 可如实保留当时未指定的 seed，但不能声称 Provider 不支持的受控 seed。
 human FAIL 不被 technical PASS 覆盖；所有新 bytes 重新验证。Scope、reference、compiler、
 rubric、facts 或 policy 的改变产生新审计 identity；只有实际 recipe/request 变化进入生成语义。
 

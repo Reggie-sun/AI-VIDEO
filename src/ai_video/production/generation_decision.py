@@ -37,8 +37,8 @@ class GenerationCandidate(StrictModel):
                          if v.capability_id == self.capability_id)
         if len(variants) != 1:
             raise ValueError("candidate must name one exact registered capability")
-        if (self.recipe.seed.kind == "uncontrolled") == variants[0].seed_supported:
-            raise ValueError("recipe must explicitly use the capability's seed semantics")
+        if self.recipe.seed.kind != "uncontrolled" and not variants[0].seed_supported:
+            raise ValueError("controlled recipe requires a seed-supported capability")
         return self
 
     @property
@@ -105,6 +105,11 @@ class DecisionInputs(StrictModel):
         ids = [c.candidate_id for c in self.candidates]
         if len(ids) != len(set(ids)):
             raise ValueError("duplicate candidate IDs")
+        for candidate in self.candidates:
+            variant = next(v for v in candidate.capabilities.variants
+                           if v.capability_id == candidate.capability_id)
+            if variant.seed_supported and candidate.recipe.seed.kind == "uncontrolled":
+                raise ValueError("current candidates require an explicit controlled seed")
         evidence_ids = [e.evidence_hash for e in self.evidence]
         if len(evidence_ids) != len(set(evidence_ids)):
             raise ValueError("duplicate exact evidence projection")

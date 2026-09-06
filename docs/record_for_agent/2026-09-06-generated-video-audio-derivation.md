@@ -10,6 +10,43 @@ Date: 2026-09-06
 
 ## Current Correction — S01 Hand Motion Rejected
 
+### Supersession — Approved Endpoint Imported On 2026-09-07
+
+下文第三张候选“未注册、未获得human approval”现为历史状态。用户在看到 exact
+`endpoint-repair-03.png` 后回复“确认”，本次正式导入其 SHA-256
+`d9a21860e91cadc7cf4cfe0ce74a44b57c2aa6d600b8c8cc06dc17e4fb4cd1da`，
+2,051,993 bytes，941×1672。新 run 为
+`runs/jieshi-e01-i2v-20260907-attempt10/`，HumanImageImportReceipt hash
+`c08cf7784be9dd5bbc3cd5454f70e56a15f3a3efb504908a13ad62aecaecced0`。
+`ProductionStateCommitter` 完成 bootstrap、import、project/registry/dependency transition，
+strict reopen 为 S01 revision 6。图的来源是旧 registered endpoint 的局部编辑；
+prompt fingerprint 来自原始工具调用，未编造新图沿用旧 approval。
+
+这只替代输入审批状态。旧本地 preview 的 human FAIL 与 attempt09 的手部 Gate FAIL
+继续有效，S02 仍阻断。本次未提交新 Provider、未取得新 MP4、未激活 candidate，
+也没有新增 budget reservation 或 one-use permit。新 request draft 保留首帧、native audio、
+同 Vidu Q3 Pro 和一次 submit ceiling；动作措辞对齐侧向微曲的新手势。
+后续真实修复仍要完成 exact request、operator ceiling 同额续期和所有既有 submit gates。
+
+接入新 decision API 时实际发现：旧 Vidu request `seed=None`，但 capability 支持 seed，
+原 `GenerationCandidate` 将新任务规则施加于 `historical_recipes`，导致历史事实无法载入。
+已将新任务受控 seed 要求放在 `DecisionInputs.candidates`，保留结构与 capability 校验，
+旧无 seed 可如实进入历史。当前 fixed seed 与旧 uncontrolled baseline 的对照仍需披露随机性
+和真实 delta；不称单变量实验。focused regression 43 passed。
+
+`diagnose_previous.py` 已对 exact attempt09 MP4
+`7b249ddc7c535b36447b0804909059f2e54a74d0a73328dafe409db16a759302`
+重验 SHA/3,476,468 bytes，并从旧 Gate 全部 15 项生成回溯诊断投影。
+`previous-diagnosis.json` 为 `EVIDENCE_GAP + QUALITY_FAILURE`，
+`next_owner=evidence_owner`，不是 Gate PASS，也不声称旧请求当时已封存新 recipe schema。
+未把 final composition 字幕错放 raw stage；原始表不改写。仍须处理约 2cm 的未标定深度解释、
+身份/胸牌细节和真实 1.0× 试听；已向用户提供旧片并请求声音观察，不要求其重新接受失败手部。
+独立审查确认保留 evidence-first 有契约依据，未为继续付费生成而放宽该分支。
+
+本次 `record-ai-video-session` 的自动 `distill-ai-video-learning` 评估为 `no_candidate`：
+输入获批/登记与历史 seed 兼容性修复不是新的独立视频实验，不足以证明手势方案有效。
+记录阶段不调用 Provider、媒体或网络，不刷新 RAG；保留既有七个 staged run 文件，不 push。
+
 ### Follow-up — Endpoint Hand Repair Candidates
 
 用户随后明确要求“修复”。直接查看旧末帧`059bb2b261883190168057b35baafc90011866acba9fb64b1c9c186122861330`发现：抬起左臂的手背朝镜头，拇指却位于画面左侧，存在左右手形态不一致；这是动作突变的输入风险，尚未通过对照视频证明因果。使用image_gen进行了三次局部修图：前两次仍保留错误拇指侧，拒绝；第三次改为侧向微曲、手指透视重叠的试探手势，仅为待审阅候选，不宣称解剖或视频Gate通过。
