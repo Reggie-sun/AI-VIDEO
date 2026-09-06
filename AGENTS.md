@@ -198,7 +198,7 @@ alternate path 与 focused verification 的唯一 human-readable owner。实现�
 - Authorization 仅覆盖 accepted Provider/model、inputs 与完成目标所需的最少有限 submit count；不得复用于 benchmark、额外 variants、不同 Provider/model 或扩大后的 scope。用户未指定 count 时，Agent 必须按已接受输出与 Shot 数量封存完成任务所需的最小 task-level ceiling，不得改为询问或研究价格。
 - Agent MUST NOT 为获得 task authorization、设置 submit ceiling 或准备单次调用而浏览官方 pricing、搜索当前单价、计算预计账单、刷新 pricing snapshot，或要求用户提供价格。已有 runtime monetary fields 只能消费 repository/provider profile 中预先配置并已 sealed 的 operator upper bound；它们是内部兼容与安全 evidence，不是 Agent 的 per-call research task，也不得被描述为官方实际价格。
 - Task-scoped authorization 不替代 Paid Provider Gate。调用前仍需 Agent orchestration 的 remaining submit-count check、exact preview、适用的既有 runtime Budget Guard/reservation、cloud-egress approval、secret reference、durable submit intent 与 one-use permit；本条不声称现有 runtime monetary ledger 已迁移为 count-based schema。
-- 若 task-level submit ceiling 已耗尽、scope/provider/egress 变化、确需新增调用，或上一次 outcome unknown，必须停止并报告；不得 blind retry、remint permit 或把授权解释为无限调用。若现有 runtime 因缺失或过期 monetary profile 阻断，必须如实报告 compatibility blocker，MUST NOT 临时查价、伪造新观察时间或自行放宽 Gate。
+- 若 task-level submit ceiling 已耗尽、scope/provider/egress 变化、确需新增调用，或上一次 outcome unknown，必须停止并报告；不得 blind retry、remint permit 或把授权解释为无限调用。已授权任务中，纯 operator upper bound 的过期 profile 可按 playbook 的 `Operator Ceiling Renewal` 新建有界续期版本，无需再次询问；缺失上限、真实市场报价过期或不满足续期条件时仍报告 compatibility blocker，不得临时查价、伪造市场观察或放宽 runtime Gate。
 - 历史 live evidence、offline tests、现有 credential/余额或旧 run 不授权新的调用。
 
 ## Local ComfyUI Authorization Exemption

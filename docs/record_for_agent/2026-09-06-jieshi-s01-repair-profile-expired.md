@@ -6,6 +6,13 @@ learning_eligibility: ineligible
 
 # S01 Repair Preflight Block
 
+## Supersession Notice
+
+用户随后明确要求修改仓库规则；当前允许按
+[Operator Ceiling Renewal](../../.agent/context/control-plane-playbook.md#operator-ceiling-renewal)
+为已授权新 attempt 重新确认纯内部上限，无需另请 operator。以下 preview 拒绝属于旧
+profile 的真实历史证据，不表示新 profile 已封装或新视频已生成。
+
 ## Result
 
 用户“实践”授权新的有界 S01 实验。已核对原始首帧、先前 I2V Gate 和现有执行脚本，新增 `runs/jieshi-e01-i2v-20260906-attempt02/request-draft.json`；最多一次提交，本轮实际零提交。草案不是 compiled request、Registry receipt、intent 或 permit。

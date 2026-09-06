@@ -19,6 +19,12 @@ R2V 的官方模型 ID 是 `viduq3`，不将 `viduq3-pro` 静默改名；Q3 不�
 不是内置报价；国内站使用 CNY，国际站使用 USD。过期 ceiling 在 preview 阶段拒绝。
 不要把测试 CDN、示例费用或历史报价直接用于真实调用。
 
+已授权任务可以按 [Operator Ceiling Renewal](../.agent/context/control-plane-playbook.md#operator-ceiling-renewal)
+重新确认既有内部上限，创建新 profile 与新请求。这里的 `pricing_observed_at` /
+`pricing_expires_at` 是 dated operator ceiling 的有效窗口，不要求在线取得官方报价。
+续期须保存真实决定及旧/新 hash 的证据，不能覆盖历史 profile 或改变旧提交的恢复绑定。
+Runtime 仍拒绝过期 profile；该流程没有改变 schema 或取消 freshness 校验。
+
 首次接入可显式设置 `result_trust="authenticated_task"`，此时 `result_origins` 必须为空
 （可以省略）。下载 URL 只来自 official API 对 exact task 的认证查询，并在 fetch 时
 重新验证同一 creation；无需先生成历史任务来发现 CDN。该模式进入 profile hash。
@@ -30,7 +36,7 @@ R2V 的官方模型 ID 是 `viduq3`，不将 `viduq3-pro` 静默改名；Q3 不�
 from ai_video.production.vidu import HttpxViduTransport, ViduVideoProvider
 from ai_video.production.video import VideoProviderRegistry
 
-# profile contains verified pricing and an explicit result trust policy.
+# profile contains a dated operator ceiling and an explicit result trust policy.
 # credential_supplier resolves VIDU_API_KEY without logging its value.
 transport = HttpxViduTransport()
 provider = ViduVideoProvider(

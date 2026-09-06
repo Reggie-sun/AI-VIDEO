@@ -179,10 +179,20 @@ code/tests；`AGENTS.md` 的 `Canonical Ownership` 继续提供顶层 durable bo
 - 用户明确要求执行一个必然包含 remote/paid call 的任务时，该请求构成该 accepted scope 的 task-scoped authorization；Docs-only、plan、review、可行性分析或“能否执行”不构成 live authorization。
 - Authorization 仅覆盖 accepted Provider/model、inputs 与完成目标所需的最少有限 submit count；不得复用于 benchmark、额外 variants、不同 Provider/model 或扩大后的 scope。用户未指定 count 时，按 accepted output 与 Shot 数量封存完成任务所需的最小 task-level ceiling，不得转为询价流程。
 - Agent 不得为了 task authorization、submit ceiling 或单次调用准备而浏览官方 pricing、搜索当前单价、计算预计账单、刷新 pricing snapshot，或要求用户提供价格。正常 paid execution 的 orchestration 约束是 task-level submit count；每个 exact attempt 仍必须独立 reservation 并消费 one-use permit。
-- 现有 runtime monetary fields 只允许消费 repository/provider profile 中预先配置并 sealed 的 operator upper bound；该值只作为兼容的内部 Budget Guard evidence，不代表官方实际价格，不得触发 Agent-side research。若 profile 缺失或过期导致 runtime fail closed，报告 compatibility blocker，不得临时查价、伪造 observed/expires 时间或自行修改 Gate。
+- 现有 runtime monetary fields 只允许消费 repository/provider profile 中预先配置并 sealed 的 operator upper bound；该值只作为兼容的内部 Budget Guard evidence，不代表官方实际价格，不得触发 Agent-side research。纯 operator upper bound 的续期按下节执行；真实市场报价或缺失上限仍须报告 compatibility blocker。
 - Task-scoped authorization 不替代 Paid Provider Gate。调用前仍需 Agent orchestration 的 remaining submit-count check、exact preview、适用的既有 runtime Budget Guard/reservation、cloud-egress approval、secret reference、durable submit intent 与 one-use permit；这不把现有 monetary ledger 或 historical receipts 解释为 count-based runtime schema。
 - 若 task-level submit ceiling 已耗尽、scope/provider/egress 变化、确需新增调用，或上一次 outcome unknown，必须停止并报告；不得 blind retry、remint permit 或把授权解释为无限调用。
 - 历史 live evidence、offline tests、现有 credential/余额或旧 run 不授权新的调用。
+
+### Operator Ceiling Renewal
+
+用户明确授权生成或继续生成时，Agent 可以为新 exact attempt 续期已有的纯 operator upper bound；该权限是任务内本地配置委托，不新增 submit quota，也不把 docs-only 请求变成执行授权。
+
+- 仅适用于 Provider contract 明确定义为内部定额上限的 profile（当前 Vidu）；不适用于包含实际单价、token 费率或市场观察的 pricing snapshot（不得推用于 Seedance 的实际报价字段）。
+- 必须有可追溯的旧 sealed profile、已授权且剩余次数大于零的 task quota，以及 known outcome。Provider、model、输入和输出规格、egress 均须在已授权范围内；续期不能自动增加费用上限、币种、总预算或调用次数。
+- 创建新 immutable profile，沿用旧上限及非时间配置，使用本次真实决定时间和最多一小时的有效期；不得覆盖旧 profile 或把新 profile 用于旧 submit 的 fetch/recovery。
+- 在 attempt preparation 中保存续期证据：旧/新 profile hash、用户任务授权来源、scope、剩余 submit count、原上限及币种、决定时间、失效时间，并明确 `operator_ceiling_reaffirmation`，不是官方报价或余额观察。Vidu 的历史字段名 `pricing_observed_at` / `pricing_expires_at` 在此承载内部上限重新确认的有效窗口，不产生市场定价事实。
+- 重新走 Planner/readiness、Router、compiler、exact preview 和既有 Budget Guard/reservation，签发新 intent/one-use permit。任何其他 Gate 失败仍停止；同一失败/unknown submit 不得通过续期重试，quota 耗尽也不得续期重置。
 
 ## 4. Verification, Pilot And Delivery Details
 

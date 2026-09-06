@@ -2,6 +2,13 @@
 
 Date: 2026-09-06
 
+## Supersession Notice
+
+“过期 profile 一律阻塞”的 Agent-side 结论已由用户后续授权修改，见
+[Operator Ceiling Renewal](../../.agent/context/control-plane-playbook.md#operator-ceiling-renewal)。
+纯内部上限可在既有任务授权和剩余 quota 内重新确认；真实市场报价、runtime freshness、
+旧提交恢复绑定和其他安全 Gate 不变。以下保留原 checkpoint 的历史描述。
+
 ## Purpose
 
 本记录说明 Paid Provider 的 Agent-side bounded execution policy 已从“反复确认或研究价格”澄清为 task-level finite submit count。目标是阻止 Agent 为正常单次调用浏览官方 pricing、计算预计账单或刷新 pricing snapshot，同时保留当前 runtime 的安全与兼容边界。
