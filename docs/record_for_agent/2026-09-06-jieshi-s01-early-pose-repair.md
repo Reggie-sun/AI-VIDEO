@@ -9,6 +9,10 @@ evidence_index_version: "1"
 
 Date: 2026-09-06
 
+## Continuation — 2026-09-06
+
+后续已只读核查07画面与08原生音轨组合路径，当前缺少canonical embedded-audio extraction/registration，并无变速入口；见[当前修复边界](2026-09-06-jieshi-s01-composition-repair-blocker.md)。09失败与额度已消费的事实不变，没有新增生成；下一步停在最小runtime能力范围确认。
+
 ## Outcome
 
 用户继续后先核对08封存请求，发现此前Gate仅按“3秒前抬起”判PASS，遗漏了请求中“2秒前达到末帧姿态并保持”。根据已查看的2秒掌心朝镜头、3秒才转正证据，把08整体NOT_EVALUATED纠正为FAIL。更新08 Gate、README及[08记录](2026-09-06-jieshi-s01-broadcast-onset-repair.md)，保留原媒体和请求。
