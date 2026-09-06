@@ -1,0 +1,25 @@
+{"at": "2026-09-06T10:08:01.171099+00:00", "kind": "paid_preview_ready_no_submit", "max_submit_count": 1, "preview_hash": "c9d053e3f2821cad9257bba4e9ab3c3508f3f6d87564330e1908c9e341a9b4ea"}
+{"at": "2026-09-06T10:09:57.382243+00:00", "body_sha256": "62fe2899d163bf9f970dbca14fb0613efb00995f984539b0613af134c8398139", "frame_sha256": ["4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb", "059bb2b261883190168057b35baafc90011866acba9fb64b1c9c186122861330"], "kind": "submit_transport_started"}
+{"at": "2026-09-06T10:09:59.371871+00:00", "kind": "http_response", "method": "POST", "response_sha256": "6572cf3ee0c834803bd9e7a428f593cc2f7517a9b2c77bf381e5ce7d8024cef4", "status": 200}
+{"at": "2026-09-06T10:09:59.394457+00:00", "kind": "submit_accepted", "submission_fingerprint": "6624819f8426ea4acb126b7bbccaa1027b4469851ecaca99ad4a965e62177906"}
+{"at": "2026-09-06T10:09:59.451994+00:00", "kind": "http_response", "method": "GET", "response_sha256": "02966252d81c3e9959e875c57e1f26bc89f60301db19479d2e8bd6209413212f", "status": 200}
+{"at": "2026-09-06T10:09:59.469576+00:00", "kind": "poll", "ordinal": 0, "state": "queued"}
+{"at": "2026-09-06T10:10:09.782582+00:00", "kind": "http_response", "method": "GET", "response_sha256": "9ba89f9d949b427d97ee66a509d623a0f02cb07cac48c59174f03f37f3b9b9a3", "status": 200}
+{"at": "2026-09-06T10:10:09.806338+00:00", "kind": "poll", "ordinal": 1, "state": "queued"}
+{"at": "2026-09-06T10:10:20.111668+00:00", "kind": "http_response", "method": "GET", "response_sha256": "a4401c39663648c6a8c4820d3f733f99fa8b600fe8ba907a970bc5e0fb994d5c", "status": 200}
+{"at": "2026-09-06T10:10:20.137625+00:00", "kind": "poll", "ordinal": 2, "state": "running"}
+{"at": "2026-09-06T10:10:30.447981+00:00", "kind": "http_response", "method": "GET", "response_sha256": "6c11e14aa1aefaa869d55443c8a68f103bd8aa499a59cc877e26fd02a9eb1c54", "status": 200}
+{"at": "2026-09-06T10:10:30.471371+00:00", "kind": "poll", "ordinal": 3, "state": "running"}
+{"at": "2026-09-06T10:10:40.732497+00:00", "kind": "http_response", "method": "GET", "response_sha256": "48babd0603266f1b01d3c218c7d85c9e9186fd6bc243a632f353769dfe09d3ca", "status": 200}
+{"at": "2026-09-06T10:10:40.755743+00:00", "kind": "poll", "ordinal": 4, "state": "running"}
+{"at": "2026-09-06T10:10:51.010507+00:00", "kind": "http_response", "method": "GET", "response_sha256": "e5b1da34b66c65992bd4d727cc7f0b1ac43bff97e2fda4e2a6654d5d230c71d9", "status": 200}
+{"at": "2026-09-06T10:10:51.046203+00:00", "kind": "poll", "ordinal": 5, "state": "running"}
+{"at": "2026-09-06T10:11:01.512529+00:00", "kind": "http_response", "method": "GET", "response_sha256": "8a7ece2597c59aae0d017108a0634b5705213f63cd60a62335b23e2a2c562efa", "status": 200}
+{"at": "2026-09-06T10:11:01.533407+00:00", "kind": "poll", "ordinal": 6, "state": "running"}
+{"at": "2026-09-06T10:11:11.797429+00:00", "kind": "http_response", "method": "GET", "response_sha256": "f575d8a5a15112ff39ff02677ef147ef6afb7c4c89e96e7181b5b28012487f34", "status": 200}
+{"at": "2026-09-06T10:11:11.816122+00:00", "kind": "poll", "ordinal": 7, "state": "running"}
+{"at": "2026-09-06T10:11:22.225308+00:00", "kind": "http_response", "method": "GET", "response_sha256": "17d05250d55828f11d2c8fe01fd506207b4393adc4f6569bd2248b2caff7bf81", "status": 200}
+{"at": "2026-09-06T10:11:22.243910+00:00", "kind": "poll", "ordinal": 8, "state": "succeeded"}
+{"at": "2026-09-06T10:11:22.415097+00:00", "kind": "http_response", "method": "GET", "response_sha256": "17d05250d55828f11d2c8fe01fd506207b4393adc4f6569bd2248b2caff7bf81", "status": 200}
+{"at": "2026-09-06T10:11:22.419561+00:00", "error_code": "video_artifact_invalid", "kind": "stopped", "message": "Vidu result requires direct public HTTPS without redirects."}
+{"at": "2026-09-06T10:11:42.343101+00:00", "kind": "fetched_unactivated", "next_action": "exact MP4 project-local video-analysis Gate", "path": "/home/reggie/vscode_folder/AI-VIDEO/runs/jieshi-e01-i2v-20260906-attempt07/production-s01-v7/state/video-generation/fetch/files/88d3a8ed59550c706e176da88e1d7ef89c02a1e60a5f6e1546b112507d0cd93e.mp4", "sha256": "88d3a8ed59550c706e176da88e1d7ef89c02a1e60a5f6e1546b112507d0cd93e", "size_bytes": 3350152}

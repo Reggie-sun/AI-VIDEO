@@ -1,0 +1,25 @@
+{
+  "kind": "operator_ceiling_reaffirmation",
+  "old_profile": {
+    "profile_id": "vidu-official-q3",
+    "profile_version": "vidu-q3-2026-09-05",
+    "profile_path": "provider-profiles/ffdd18138c89381e85af1937bb42ccd32cdc5be93bbfe103496a1d20b9b3cfef.json",
+    "profile_sha256": "ffdd18138c89381e85af1937bb42ccd32cdc5be93bbfe103496a1d20b9b3cfef"
+  },
+  "new_profile": {
+    "profile_id": "vidu-official-q3",
+    "profile_version": "vidu-q3-2026-09-05",
+    "profile_path": "provider-profiles/20e3bfe7e0d6ba15679156c1829eb1cb67447f60589f669dea9a580e176f126a.json",
+    "profile_sha256": "20e3bfe7e0d6ba15679156c1829eb1cb67447f60589f669dea9a580e176f126a"
+  },
+  "authorization_source": "用户在attempt06 Gate FAIL后明确要求：jixu",
+  "max_submit_count": 1,
+  "remaining_submit_count_before": 1,
+  "scope": "S01 approved first/last PNGs Vidu Q3 Pro4s1080p native audio; camera constraint expression repair; one new submit",
+  "cost_upper_bound_microunits": 3000000,
+  "currency": "CNY",
+  "decided_at": "2026-09-06T10:07:41.037550+00:00",
+  "expires_at": "2026-09-06T11:07:41.037550+00:00",
+  "previous_outcome": "attempt06 known fetched/validate Gate FAIL; old quota consumed",
+  "is_official_price": false
+}

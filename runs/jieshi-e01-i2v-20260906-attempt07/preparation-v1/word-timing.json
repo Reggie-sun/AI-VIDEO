@@ -1,0 +1,17 @@
+{
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/jieshi-e01-i2v-20260906-attempt07/production-s01-v7/state/video-generation/fetch/files/88d3a8ed59550c706e176da88e1d7ef89c02a1e60a5f6e1546b112507d0cd93e.mp4",
+  "model": "medium",
+  "language": "zh",
+  "duration_seconds": 4.042,
+  "segments": [
+    {
+      "id": 0,
+      "start": 0.84,
+      "end": 3.4,
+      "start_hms": "00:00:00.840",
+      "end_hms": "00:00:03.400",
+      "text": "林彥,請在終點站下車。"
+    }
+  ],
+  "full_text": "林彥,請在終點站下車。"
+}

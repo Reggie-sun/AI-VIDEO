@@ -1,0 +1,167 @@
+{
+  "activation_scope": {
+    "request": {
+      "adapter_compiler_hash": "410566c55ab94578cba7598c4b37afcab6e5bcc92b385ce00d07a0833ece283a",
+      "adapter_compiler_id": "vidu-video-compiler",
+      "adapter_compiler_version": "2",
+      "base_dependency_graph": {
+        "content_hash": "e0cea89e343abaa7e092e0cef907bf0a0c0f23620919e54fa67afe8fc65deb40",
+        "file_sha256": "b0b64a41e3dbe9a34bc975192baa91a8876976b4a3c86971195ea7c0d4debfd9",
+        "path": "state/dependency_graph.e0cea89e343abaa7e092e0cef907bf0a0c0f23620919e54fa67afe8fc65deb40.json",
+        "revision_id": "e0cea89e343abaa7e092e0cef907bf0a0c0f23620919e54fa67afe8fc65deb40"
+      },
+      "base_project": {
+        "content_hash": "585cb45e0e35cba933e51eeb3906eb3137d0e8aab3899ce485c0b5fbb9699e23",
+        "file_sha256": "4871fbdf1befdb304dc54866420e5af9fa7c69d8aec850af02c84fb523cdfbe6",
+        "path": "state/projects/project.5.585cb45e0e35cba933e51eeb3906eb3137d0e8aab3899ce485c0b5fbb9699e23.yaml",
+        "revision": 5
+      },
+      "base_registry": {
+        "content_hash": "50a3cd41a464a50beafe7b2a7bf87981b340824bc378b2351e3f3991e0b3cb81",
+        "file_sha256": "ce8993cb4cb01be1f31ea4b7f5cc8d314f391a1e8457ab07e0ce1d9f50a16e14",
+        "path": "assets/registry.50a3cd41a464a50beafe7b2a7bf87981b340824bc378b2351e3f3991e0b3cb81.json",
+        "revision_id": "50a3cd41a464a50beafe7b2a7bf87981b340824bc378b2351e3f3991e0b3cb81"
+      },
+      "c4_multi_anchor_binding": null,
+      "continuity_binding": null,
+      "execution_stack_hash": null,
+      "generation_id": "jieshi-e01-s01-vidu-i2v-attempt07",
+      "hard_cut_keyframe_binding": null,
+      "image_bindings": [
+        {
+          "asset_id": "image-import-89318576d4eed1eafaaba834f57b832f8376168d25ac735125791966ad9109b1",
+          "asset_sha256": "4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb",
+          "height": 1672,
+          "mime_type": "image/png",
+          "role": "first_frame",
+          "size_bytes": 2064319,
+          "width": 941
+        },
+        {
+          "asset_id": "image-import-c1ffc3e43f26f4f29c7ad276e67ab1429f9e909f30bd5c01413e37b8d5ac8bb4",
+          "asset_sha256": "059bb2b261883190168057b35baafc90011866acba9fb64b1c9c186122861330",
+          "height": 1672,
+          "mime_type": "image/png",
+          "role": "last_frame",
+          "size_bytes": 1998073,
+          "width": 941
+        }
+      ],
+      "input_artifact_ids": [
+        "jieshi-e01-S01",
+        "image-import-89318576d4eed1eafaaba834f57b832f8376168d25ac735125791966ad9109b1",
+        "image-import-c1ffc3e43f26f4f29c7ad276e67ab1429f9e909f30bd5c01413e37b8d5ac8bb4"
+      ],
+      "media_bindings": [],
+      "mode": "image_to_video",
+      "model_id": "viduq3-pro",
+      "negative_prompt_text": "",
+      "output_asset_id": "jieshi-e01-s01-vidu-video-attempt07",
+      "output_requirement": {
+        "container": "mp4",
+        "dimension_mode": "adaptive",
+        "duration_seconds": 4,
+        "fps": 24,
+        "frame_count": null,
+        "height": null,
+        "mime_type": "video/mp4",
+        "native_audio": true,
+        "ratio": "adaptive",
+        "resolution_label": "1080p",
+        "timing_mode": "exact_seconds",
+        "width": null
+      },
+      "prompt_text": "以提供的首帧图像作为精确的视觉起点。 以提供的末帧图像作为动作结束时应达到的视觉状态。 开场：以已绑定的真实首帧为起点。林砚本人坐窗边，窗中保留七名他人的倒影，唯独林砚对应座位为空。从第一帧保持这项差异。。 保持画面中人物的外观、服装和身份连续一致。 允许的变化仅限于仅眼神、呼吸、左手动作；consistent character appearance, same outfit and features throughout。 时间：深夜。 氛围：冷灰青色都市悬疑，非血腥、非鬼魂；虚构错误现实。 场景约束：固定机位，原首帧为起点、末帧为第2秒就达到并保持的姿态。七名他人的倒影与空蓝座保持原位置，玻璃内没有林砚及其手的倒影。画面只呈现人物与车厢，不显示文字。声音：清晰的普通话女声列车广播，从0.1秒开始，在2.7秒前说完唯一一句：“林砚，请在终点站下车。” 广播来自画外喇叭，林砚闭嘴倾听。背景只有轻柔轮轨声，无音乐。。 动作：从林砚看向窗中自己的空位，眉间收紧。开始，从第0秒立即抬起空左手，在第2秒前达到末帧图的手势：五指伸直、手背朝镜头、掌心朝窗，停在玻璃前约2厘米。第2至4秒保持这个末帧姿态。右手手机始终留在腿上。，以左手停在玻璃前，玻璃内没有手。结束。 该动作必须产生真实的可见状态变化，不能用静止画面代替。 动作起始：立即察觉。 动作峰值：抬左手。 动作停稳：左手悬停。 动作方向：左手朝车窗。 动作幅度：小幅自然动作。 节奏：前三秒识别空倒影。 速度：紧凑克制。 镜头时长为4秒。 收束状态：林砚左手悬停在玻璃前约2厘米；窗中仍没有他的脸、身体和手，七名他人的倒影保留。。 摄影机运动：locked。 摄影机稳定性：相机刚性固定在车厢上，与窗框和座椅保持完全相同的相对位置。固定焦距、固定光轴、固定裁切；整个4秒的每一帧都保持相同视场，不做推近、拉远、摇移、旋转、跟随或透视变化。。 构图意图：精确沿用输入图的取景，不重新构图。窗框四角、竖杆、座椅边界和七名乘客在图像中的位置及大小全程固定。前景人物与右侧乘客保持原有边缘留量；只让林砚的左臂在这个固定画面中运动。。 起始构图：本人下部、黑窗上部。 结束构图：相同构图，新增悬停左手。 摄影机位置和朝向全程锁定。",
+      "provider_bound_request_hash": "d6e443b1308f426e72c128bbfce6d739820d231b9f42509824273f9d6c77a83d",
+      "provider_kind": "vidu",
+      "provider_name": "vidu",
+      "provider_profile": {
+        "profile_id": "vidu-official-q3",
+        "profile_path": "provider-profiles/20e3bfe7e0d6ba15679156c1829eb1cb67447f60589f669dea9a580e176f126a.json",
+        "profile_sha256": "20e3bfe7e0d6ba15679156c1829eb1cb67447f60589f669dea9a580e176f126a",
+        "profile_version": "vidu-q3-2026-09-05"
+      },
+      "request_input_hash": "999d9942dec45e1bb1212f2a6f3ff640860c2753170edb96dd89b173ae6a74c8",
+      "requirement_hash": "d2e7ad785e60bd85feaf6e107ae67160e3d315b4aea37029b5b0c3559b05b14b",
+      "seal_terminal_frame": false,
+      "seed": null,
+      "target_asset_role": "final_visual",
+      "target_shot_content_hash": "de06d29d761e12671aaeb719296c1a96727775b8987e9cbb8291de90b627e608",
+      "target_shot_id": "S01",
+      "target_shot_revision": 5,
+      "target_visual_strategy": "generated_video"
+    },
+    "scope_fingerprint": "9121a157e87dd09d557e7509f91bef05efc6ebf82cb1344aa07bab03e8e6e622",
+    "usage_license": "provider-output"
+  },
+  "adapter_compiler_hash": "410566c55ab94578cba7598c4b37afcab6e5bcc92b385ce00d07a0833ece283a",
+  "adapter_compiler_id": "vidu-video-compiler",
+  "adapter_compiler_version": "2",
+  "billing_kind": "metered",
+  "c4_multi_anchor_binding": null,
+  "capability_id": "viduq3-pro-i2v-v1",
+  "continuity_binding": null,
+  "desired_generation_fingerprint": "593e3c56176d80fc97e3c1bba9c10f9ef4196206b1b4ddbb887fb947ec965c11",
+  "effective_negative_prompt_text": "",
+  "effective_output": {
+    "container": "mp4",
+    "dimension_mode": "adaptive",
+    "duration_seconds": 4,
+    "fps": 24,
+    "frame_count": null,
+    "height": null,
+    "mime_type": "video/mp4",
+    "native_audio": true,
+    "ratio": "adaptive",
+    "resolution_label": "1080p",
+    "timing_mode": "exact_seconds",
+    "width": null
+  },
+  "effective_seed": null,
+  "execution_kind": "remote",
+  "execution_stack_hash": null,
+  "generation_id": "jieshi-e01-s01-vidu-i2v-attempt07",
+  "hard_cut_keyframe_binding": null,
+  "image_bindings": [
+    {
+      "asset_id": "image-import-89318576d4eed1eafaaba834f57b832f8376168d25ac735125791966ad9109b1",
+      "asset_sha256": "4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb",
+      "height": 1672,
+      "mime_type": "image/png",
+      "role": "first_frame",
+      "size_bytes": 2064319,
+      "width": 941
+    },
+    {
+      "asset_id": "image-import-c1ffc3e43f26f4f29c7ad276e67ab1429f9e909f30bd5c01413e37b8d5ac8bb4",
+      "asset_sha256": "059bb2b261883190168057b35baafc90011866acba9fb64b1c9c186122861330",
+      "height": 1672,
+      "mime_type": "image/png",
+      "role": "last_frame",
+      "size_bytes": 1998073,
+      "width": 941
+    }
+  ],
+  "media_bindings": [],
+  "mode": "image_to_video",
+  "model_id": "viduq3-pro",
+  "output_asset_id": "jieshi-e01-s01-vidu-video-attempt07",
+  "prompt_text": "以提供的首帧图像作为精确的视觉起点。 以提供的末帧图像作为动作结束时应达到的视觉状态。 开场：以已绑定的真实首帧为起点。林砚本人坐窗边，窗中保留七名他人的倒影，唯独林砚对应座位为空。从第一帧保持这项差异。。 保持画面中人物的外观、服装和身份连续一致。 允许的变化仅限于仅眼神、呼吸、左手动作；consistent character appearance, same outfit and features throughout。 时间：深夜。 氛围：冷灰青色都市悬疑，非血腥、非鬼魂；虚构错误现实。 场景约束：固定机位，原首帧为起点、末帧为第2秒就达到并保持的姿态。七名他人的倒影与空蓝座保持原位置，玻璃内没有林砚及其手的倒影。画面只呈现人物与车厢，不显示文字。声音：清晰的普通话女声列车广播，从0.1秒开始，在2.7秒前说完唯一一句：“林砚，请在终点站下车。” 广播来自画外喇叭，林砚闭嘴倾听。背景只有轻柔轮轨声，无音乐。。 动作：从林砚看向窗中自己的空位，眉间收紧。开始，从第0秒立即抬起空左手，在第2秒前达到末帧图的手势：五指伸直、手背朝镜头、掌心朝窗，停在玻璃前约2厘米。第2至4秒保持这个末帧姿态。右手手机始终留在腿上。，以左手停在玻璃前，玻璃内没有手。结束。 该动作必须产生真实的可见状态变化，不能用静止画面代替。 动作起始：立即察觉。 动作峰值：抬左手。 动作停稳：左手悬停。 动作方向：左手朝车窗。 动作幅度：小幅自然动作。 节奏：前三秒识别空倒影。 速度：紧凑克制。 镜头时长为4秒。 收束状态：林砚左手悬停在玻璃前约2厘米；窗中仍没有他的脸、身体和手，七名他人的倒影保留。。 摄影机运动：locked。 摄影机稳定性：相机刚性固定在车厢上，与窗框和座椅保持完全相同的相对位置。固定焦距、固定光轴、固定裁切；整个4秒的每一帧都保持相同视场，不做推近、拉远、摇移、旋转、跟随或透视变化。。 构图意图：精确沿用输入图的取景，不重新构图。窗框四角、竖杆、座椅边界和七名乘客在图像中的位置及大小全程固定。前景人物与右侧乘客保持原有边缘留量；只让林砚的左臂在这个固定画面中运动。。 起始构图：本人下部、黑窗上部。 结束构图：相同构图，新增悬停左手。 摄影机位置和朝向全程锁定。",
+  "provider_bound_request_hash": "d6e443b1308f426e72c128bbfce6d739820d231b9f42509824273f9d6c77a83d",
+  "provider_kind": "vidu",
+  "provider_name": "vidu",
+  "provider_profile": {
+    "profile_id": "vidu-official-q3",
+    "profile_path": "provider-profiles/20e3bfe7e0d6ba15679156c1829eb1cb67447f60589f669dea9a580e176f126a.json",
+    "profile_sha256": "20e3bfe7e0d6ba15679156c1829eb1cb67447f60589f669dea9a580e176f126a",
+    "profile_version": "vidu-q3-2026-09-05"
+  },
+  "provider_task_binding": {
+    "request_target_id": "https://api.vidu.cn/20e3bfe7e0d6ba15679156c1829eb1cb67447f60589f669dea9a580e176f126a/viduq3-pro",
+    "response_model_id": "viduq3-pro"
+  },
+  "request_input_hash": "999d9942dec45e1bb1212f2a6f3ff640860c2753170edb96dd89b173ae6a74c8",
+  "requirement_hash": "d2e7ad785e60bd85feaf6e107ae67160e3d315b4aea37029b5b0c3559b05b14b",
+  "resolved_generation_hash": "593e3c56176d80fc97e3c1bba9c10f9ef4196206b1b4ddbb887fb947ec965c11",
+  "seal_terminal_frame": false
+}
