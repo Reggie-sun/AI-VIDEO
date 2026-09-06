@@ -618,7 +618,10 @@ def test_h3_prompt_serializes_locked_camera_without_motion_strength() -> None:
     assert "locked with" not in result.prompt_text
 
 
-def test_h3_prompt_preserves_exact_dialogue_bytes_and_sealed_music() -> None:
+@pytest.mark.parametrize("on_screen", (True, False))
+def test_h3_prompt_preserves_exact_dialogue_bytes_and_sealed_music(
+    on_screen: bool,
+) -> None:
     requirement = _requirement()
     exact_dialogue = (
         'He said "I\'m ready" — 好。 Literal provider tag; '
@@ -633,9 +636,9 @@ def test_h3_prompt_preserves_exact_dialogue_bytes_and_sealed_music() -> None:
                 verbatim_text=exact_dialogue,
                 start_seconds=0.5,
                 end_seconds=2.0,
-                on_screen=True,
+                on_screen=on_screen,
                 response_obligation="elder acknowledges",
-                lip_sync_required=True,
+                lip_sync_required=on_screen,
             ),
             "music_intent": MusicIntent(
                 mode="music",
@@ -667,9 +670,14 @@ def test_h3_prompt_preserves_exact_dialogue_bytes_and_sealed_music() -> None:
     assert "<d>" not in fields["overall_soundscape"]
     assert exact_dialogue not in fields["overall_soundscape"]
     assert result.prompt_text.count(exact_dialogue) == 1
-    assert "from 0.500s to 2.000s; on_screen=true" in result.prompt_text
-    assert "response obligation elder acknowledges" in result.prompt_text
-    assert "lip_sync_required=true" in result.prompt_text
+    assert "Speak only from 0.500s to 2.000s." in result.prompt_text
+    position = "on-screen" if on_screen else "off-screen"
+    assert f"Speaker hero is {position}." in result.prompt_text
+    assert result.prompt_text.index("elder acknowledges") < result.prompt_text.index("<d>")
+    sync = "required" if on_screen else "not required"
+    assert f"Lip synchronization is {sync}." in result.prompt_text
+    assert "says exactly and only:" in result.prompt_text
+    assert "No narration or other speech outside this marked dialogue." in result.prompt_text
     assert "non_diegetic_music: muted guzheng; 72 bpm sparse pulse; low under dialogue" in result.prompt_text
 
 
