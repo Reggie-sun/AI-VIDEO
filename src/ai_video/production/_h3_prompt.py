@@ -233,7 +233,7 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptR
             f"Lip synchronization is {'required' if dialogue.lip_sync_required else 'not required'}. "
             "Only the words inside the following marked dialogue are spoken, once. "
             f"Speaker {dialogue.speaker_id} says exactly and only: "
-            f"<d>[{dialogue_language}]{dialogue.verbatim_text}</d> "
+            f"<d>[{dialogue_language}] {dialogue.verbatim_text}</d> "
             "No narration or other speech outside this marked dialogue."
         )
     foley = ", ".join(ambience.foley_cues) if ambience.foley_cues else "none"

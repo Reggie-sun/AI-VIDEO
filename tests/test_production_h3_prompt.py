@@ -664,9 +664,9 @@ def test_h3_prompt_preserves_exact_dialogue_bytes_and_sealed_music(
 
     assert isinstance(result, H3PromptCompilation)
     assert exact_dialogue in result.prompt_text
-    assert f"<d>[English]{exact_dialogue}</d>" in result.prompt_text
+    assert f"<d>[English] {exact_dialogue}</d>" in result.prompt_text
     fields = dict(line.split(": ", 1) for line in result.prompt_text.splitlines())
-    assert f"<d>[English]{exact_dialogue}</d>" in fields["integrated_multimodal_description"]
+    assert f"<d>[English] {exact_dialogue}</d>" in fields["integrated_multimodal_description"]
     assert "<d>" not in fields["overall_soundscape"]
     assert exact_dialogue not in fields["overall_soundscape"]
     assert result.prompt_text.count(exact_dialogue) == 1
