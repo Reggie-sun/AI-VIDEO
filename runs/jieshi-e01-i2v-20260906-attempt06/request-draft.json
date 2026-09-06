@@ -1,0 +1,16 @@
+{
+  "status": "DRAFT_NOT_SUBMITTED",
+  "attempt_id": "jieshi-e01-s01-vidu-i2v-attempt06",
+  "authorization_source": "用户：继续；沿用已批准首尾帧。一次新有界提交",
+  "max_submit_count": 1,
+  "provider": "vidu",
+  "model": "viduq3-pro",
+  "duration_seconds": 4,
+  "resolution_label": "1080p",
+  "native_audio": true,
+  "input_sha256": "4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb",
+  "action_progression": "从第0秒立即抬起空左手，在第2秒前达到末帧图的手势：五指伸直、手背朝镜头、掌心朝窗，停在玻璃前约2厘米。第2至4秒保持这个末帧姿态。右手手机始终留在腿上。",
+  "prompt_draft": "固定机位，原首帧为起点、末帧为第2秒就达到并保持的姿态。七名他人的倒影与空蓝座保持原位置，玻璃内没有林砚及其手的倒影。画面只呈现人物与车厢，不显示文字。声音：清晰的普通话女声列车广播，从0.1秒开始，在2.7秒前说完唯一一句：“林砚，请在终点站下车。” 广播来自画外喇叭，林砚闭嘴倾听。背景只有轻柔轮轨声，无音乐。",
+  "endpoint_sha256": "059bb2b261883190168057b35baafc90011866acba9fb64b1c9c186122861330",
+  "experiment_change": "Only authored expression changes versus attempt05: explicit 0–2s movement/2–4s hold and concise audible broadcast wording. Same approved first/last PNGs, compiler2, provider/model, duration, raster, audio=true, is_rec=false. Not a controlled single-phrase causal test."
+}

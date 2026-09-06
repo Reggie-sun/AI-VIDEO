@@ -1,0 +1,11 @@
+{
+  "at": "2026-09-06T09:38:15.177321+00:00",
+  "hostname": "prod-ss-vidu.s3.oss-cn-beijing.aliyuncs.com",
+  "addresses": [
+    "8.141.221.10",
+    "8.141.221.11"
+  ],
+  "dns_response_sha256": "afb7a9f3f83839c43c1005c03f2a7af3334f47be77ae3c616a621214f9e63c1e",
+  "scope": "this single fetch process only",
+  "new_submit_count": 0
+}

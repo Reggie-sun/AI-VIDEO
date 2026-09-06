@@ -1,0 +1,39 @@
+{"at": "2026-09-06T09:32:45.398040+00:00", "kind": "paid_preview_ready_no_submit", "max_submit_count": 1, "preview_hash": "6a9d3787a27b7dd3d4ad0709b10881c77e779c581d7d86212365ccb252952792"}
+{"at": "2026-09-06T09:35:23.954752+00:00", "body_sha256": "cb0883b014a49665f8f8083ee9a64884a48ac8cccf2fe6a2306ba672b02fb670", "frame_sha256": ["4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb", "059bb2b261883190168057b35baafc90011866acba9fb64b1c9c186122861330"], "kind": "submit_transport_started"}
+{"at": "2026-09-06T09:35:26.416579+00:00", "kind": "http_response", "method": "POST", "response_sha256": "516ac9439ad7e3f645dfd45885a102106598da13ac8332b17f6d3136116397c6", "status": 200}
+{"at": "2026-09-06T09:35:26.438804+00:00", "kind": "submit_accepted", "submission_fingerprint": "83fe80a1a5b8d9fc352a343ce056c0cd4dc232d6b408b13c14174681c537fe1b"}
+{"at": "2026-09-06T09:35:26.499065+00:00", "kind": "http_response", "method": "GET", "response_sha256": "b2023e33c8a44f69b51bd18368a80d1de07e659027891d44465dd00d40f805b3", "status": 200}
+{"at": "2026-09-06T09:35:26.519692+00:00", "kind": "poll", "ordinal": 0, "state": "queued"}
+{"at": "2026-09-06T09:35:36.865548+00:00", "kind": "http_response", "method": "GET", "response_sha256": "986907c955bb03130194389f5e9df44e86221384dedf20c0f52f0a80d43b4cc0", "status": 200}
+{"at": "2026-09-06T09:35:36.899949+00:00", "kind": "poll", "ordinal": 1, "state": "queued"}
+{"at": "2026-09-06T09:35:47.155168+00:00", "kind": "http_response", "method": "GET", "response_sha256": "8316a4006540eaa3d542390101b6222a2e0d7e17721b5eed7b037308bd62fb98", "status": 200}
+{"at": "2026-09-06T09:35:47.177005+00:00", "kind": "poll", "ordinal": 2, "state": "queued"}
+{"at": "2026-09-06T09:35:57.424127+00:00", "kind": "http_response", "method": "GET", "response_sha256": "8316a4006540eaa3d542390101b6222a2e0d7e17721b5eed7b037308bd62fb98", "status": 200}
+{"at": "2026-09-06T09:35:57.451476+00:00", "kind": "poll", "ordinal": 3, "state": "queued"}
+{"at": "2026-09-06T09:36:08.010502+00:00", "kind": "http_response", "method": "GET", "response_sha256": "4741f04519d040a4d6adf1b769ce7a7195e8f0e2a99836f18909e75c904ea0b1", "status": 200}
+{"at": "2026-09-06T09:36:08.025346+00:00", "kind": "poll", "ordinal": 4, "state": "running"}
+{"at": "2026-09-06T09:36:18.337312+00:00", "kind": "http_response", "method": "GET", "response_sha256": "7e7aae78e3d54a91eada7c060410428e62dbc775c33be7a5a864182b4fd3d2d7", "status": 200}
+{"at": "2026-09-06T09:36:18.371754+00:00", "kind": "poll", "ordinal": 5, "state": "running"}
+{"at": "2026-09-06T09:36:28.762324+00:00", "kind": "http_response", "method": "GET", "response_sha256": "7e7aae78e3d54a91eada7c060410428e62dbc775c33be7a5a864182b4fd3d2d7", "status": 200}
+{"at": "2026-09-06T09:36:28.781882+00:00", "kind": "poll", "ordinal": 6, "state": "running"}
+{"at": "2026-09-06T09:36:39.059159+00:00", "kind": "http_response", "method": "GET", "response_sha256": "7e7aae78e3d54a91eada7c060410428e62dbc775c33be7a5a864182b4fd3d2d7", "status": 200}
+{"at": "2026-09-06T09:36:39.077025+00:00", "kind": "poll", "ordinal": 7, "state": "running"}
+{"at": "2026-09-06T09:36:49.329392+00:00", "kind": "http_response", "method": "GET", "response_sha256": "7e7aae78e3d54a91eada7c060410428e62dbc775c33be7a5a864182b4fd3d2d7", "status": 200}
+{"at": "2026-09-06T09:36:49.345323+00:00", "kind": "poll", "ordinal": 8, "state": "running"}
+{"at": "2026-09-06T09:36:59.644124+00:00", "kind": "http_response", "method": "GET", "response_sha256": "e64ed8d8b1b86e4f1a81e07f4851a94759faca6633d3e671814568c2ee3ee89a", "status": 200}
+{"at": "2026-09-06T09:36:59.662105+00:00", "kind": "poll", "ordinal": 9, "state": "running"}
+{"at": "2026-09-06T09:37:09.911278+00:00", "kind": "http_response", "method": "GET", "response_sha256": "f45161b75d834033c8b9300f03924b49d58371fd6960fc3f802689ad8546371a", "status": 200}
+{"at": "2026-09-06T09:37:09.932620+00:00", "kind": "poll", "ordinal": 10, "state": "running"}
+{"at": "2026-09-06T09:37:20.215137+00:00", "kind": "http_response", "method": "GET", "response_sha256": "20e0c1f8e46feeecb1c115c3efbf5ba1f239899f41118ec60c17fc3c74a713ab", "status": 200}
+{"at": "2026-09-06T09:37:20.244789+00:00", "kind": "poll", "ordinal": 11, "state": "running"}
+{"at": "2026-09-06T09:37:30.652779+00:00", "kind": "http_response", "method": "GET", "response_sha256": "36287df4c335246e2541758334403b2c1c9b7efca3a384e9ebf85f0f97054780", "status": 200}
+{"at": "2026-09-06T09:37:30.668073+00:00", "kind": "poll", "ordinal": 12, "state": "running"}
+{"at": "2026-09-06T09:37:40.923642+00:00", "kind": "http_response", "method": "GET", "response_sha256": "ba32d3882ac4b78bc9ae4f6e6c760bfe4ec68750f6154a62736707ed7dc92c63", "status": 200}
+{"at": "2026-09-06T09:37:40.939744+00:00", "kind": "poll", "ordinal": 13, "state": "running"}
+{"at": "2026-09-06T09:37:51.190811+00:00", "kind": "http_response", "method": "GET", "response_sha256": "a5909001928bd7741fd2e09c6e45d25c3aa55dc397e3e5d05a6035594c1d25bc", "status": 200}
+{"at": "2026-09-06T09:37:51.211309+00:00", "kind": "poll", "ordinal": 14, "state": "running"}
+{"at": "2026-09-06T09:38:01.617669+00:00", "kind": "http_response", "method": "GET", "response_sha256": "851e22aacf1a32040ac96f0562035fed000aafcfe8a09a9ece2b6cd592086c58", "status": 200}
+{"at": "2026-09-06T09:38:01.640182+00:00", "kind": "poll", "ordinal": 15, "state": "succeeded"}
+{"at": "2026-09-06T09:38:01.816549+00:00", "kind": "http_response", "method": "GET", "response_sha256": "851e22aacf1a32040ac96f0562035fed000aafcfe8a09a9ece2b6cd592086c58", "status": 200}
+{"at": "2026-09-06T09:38:01.819726+00:00", "error_code": "video_artifact_invalid", "kind": "stopped", "message": "Vidu result requires direct public HTTPS without redirects."}
+{"at": "2026-09-06T09:38:16.020258+00:00", "kind": "fetched_unactivated", "next_action": "exact MP4 project-local video-analysis Gate", "path": "/home/reggie/vscode_folder/AI-VIDEO/runs/jieshi-e01-i2v-20260906-attempt06/production-s01-v6/state/video-generation/fetch/files/041de54a023082c24cb2d4cced4ba8d068569aebdf3330496f40615eaa9ae2a4.mp4", "sha256": "041de54a023082c24cb2d4cced4ba8d068569aebdf3330496f40615eaa9ae2a4", "size_bytes": 4111052}

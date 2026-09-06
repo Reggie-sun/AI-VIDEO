@@ -1,0 +1,12 @@
+{
+  "source_attempt": "jieshi-e01-s01-vidu-i2v-attempt05",
+  "source_mp4_sha256": "292aae3a02357a96e129879af07b19ff6340c37f801d8bc7833d82fa7b2588cb",
+  "tool": "project-local video-analysis video_transcribe",
+  "model": "medium",
+  "language": "zh",
+  "word_timestamps": true,
+  "segments": [],
+  "full_text": "",
+  "verdict": "NOT_EVALUATED",
+  "interpretation": "No verified exact broadcast. Empty ASR does not establish silence or the actual spoken words. No new Provider submit for this recheck."
+}

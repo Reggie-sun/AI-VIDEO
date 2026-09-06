@@ -1,0 +1,22 @@
+{
+  "attempt_id": "jieshi-e01-s01-vidu-i2v-attempt06",
+  "preview_fingerprint": "6a9d3787a27b7dd3d4ad0709b10881c77e779c581d7d86212365ccb252952792",
+  "explicit_opt_in": true,
+  "actor": {
+    "actor_id": "reggie",
+    "actor_kind": "human"
+  },
+  "opt_in_policy_receipt_id": "user-jieshi-repair06-authorized-20260906",
+  "budget_policy_id": "jieshi-s01-vidu-repair06-submit-count-one-20260906",
+  "budget_currency": "CNY",
+  "project_budget_ceiling_microunits": 3000000,
+  "per_call_ceiling_microunits": 3000000,
+  "egress_authorized": true,
+  "egress_policy_receipt_id": "user-jieshi-repair06-first-frame-vidu-20260906",
+  "live_test_authorized": true,
+  "live_authorization_receipt_id": "user-jieshi-repair06-authorized-20260906",
+  "issued_at": "2026-09-06T09:32:45.397718Z",
+  "expires_at": "2026-09-06T10:32:21.831917Z",
+  "max_submit_count": 1,
+  "authorization_fingerprint": "3ef7e7a90fb21914743840c89891ba2af9296fd679f92075f2a26e2ff534d7ef"
+}
