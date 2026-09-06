@@ -276,13 +276,17 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptR
         f"end framing {intent.camera_endpoint.end_framing}; "
         f"terminal motion state {motion.end_motion_state.value}"
     )
+    if dialogue.mode == "dialogue":
+        visual += f"; dialogue {dialogue_text}"
+    soundscape = f"ambience {ambience.environment_bed}; foley {foley}"
+    if dialogue.mode == "none":
+        soundscape += "; dialogue none"
     prompt = unicodedata.normalize(
         "NFC",
         "\n".join(
             (
                 f"integrated_multimodal_description: {visual}",
-                f"overall_soundscape: ambience {ambience.environment_bed}; "
-                f"foley {foley}; dialogue {dialogue_text}",
+                f"overall_soundscape: {soundscape}",
                 f"non_diegetic_music: {music_text}",
             )
         ),
