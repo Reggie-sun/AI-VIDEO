@@ -1463,6 +1463,19 @@ def test_seedance_adapter_and_extended_contracts_route_to_video_provider_suite()
     assert "tests/test_production_seedance.py" in provider_argv
 
 
+def test_vidu_native_prompt_routes_to_provider_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+    for path in (
+        "src/ai_video/production/_vidu_prompt.py",
+        "tests/test_production_vidu_prompt.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["categories"] == ["production_video_provider"]
+        assert "production_vidu_tests" in report["check_ids"]
+        assert "task_architecture_gate" in report["check_ids"]
+    assert "tests/test_production_vidu_prompt.py" in policy["checks"]["production_vidu_tests"]["argv"]
+
+
 def test_production_test_helpers_route_to_their_contract_owners() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 

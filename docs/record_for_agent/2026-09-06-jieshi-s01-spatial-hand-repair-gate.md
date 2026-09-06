@@ -65,6 +65,10 @@ Prompt改变且随机种子未控制；本次左手改善仅为观察，不晋�
 
 ## Official Parameter Audit
 
+后续更新（2026-09-06）：[Vidu native prompt v2](2026-09-06-vidu-native-prompt-v2.md)
+已实现新请求 prose 编译与显式 `is_rec=false`，仅有离线验证；下方是改进前的调查历史，
+不改变本 attempt 的 exact payload、FAIL 或已消费授权。
+
 用户质疑漏传参数后，于2026-09-06核对
 [官方中文I2V请求表](https://platform.vidu.cn/docs/image-to-video)、
 [官方英文I2V请求表](https://platform.vidu.com/docs/image-to-video)及

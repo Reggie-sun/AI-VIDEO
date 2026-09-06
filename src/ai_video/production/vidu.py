@@ -14,6 +14,7 @@ from typing import BinaryIO, Literal, Protocol
 from urllib.parse import quote
 
 import httpx
+from pydantic_core import PydanticSerializationError
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.paid_provider import (
@@ -32,9 +33,12 @@ from ai_video.production.video import (
     build_video_paid_permit_binding,
 )
 from ai_video.production.video_compiler import (
-    ProviderRequestCompilationResult, compile_provider_video_request,
+    ProviderNativePrompt, ProviderRequestCompilationResult,
+    ProviderRequirementUnsupported, ProviderRequirementUnsupportedReason,
+    compile_provider_video_request,
 )
 from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
+from ai_video.production._vidu_prompt import ViduPromptCompilation, compile_vidu_prompt
 from ai_video.production.vidu_profile import (
     VIDU_MODEL_IDS, VIDU_REFERENCE_MODEL_IDS, VIDU_EXTEND_MODEL_IDS, ViduProviderProfile, vidu_capabilities,
 )
@@ -174,10 +178,45 @@ class ViduVideoProvider:
 
     def compile_request(self, provider_bound: ProviderBoundVideoRequest,
                         requirement: ProviderNeutralVideoRequirement) -> ProviderRequestCompilationResult:
+        try:
+            preflight = compile_provider_video_request(
+                provider_bound=provider_bound, requirement=requirement,
+                compiler_id="vidu-video-compiler", compiler_version="2",
+                capabilities=self.capabilities(),
+                native_prompt=ProviderNativePrompt(
+                    grammar_contract="vidu-prose-v2",
+                    prompt_text="preflight",
+                    prompt_sha256=hashlib.sha256(b"preflight").hexdigest(),
+                ),
+            )
+        except PydanticSerializationError:
+            return ProviderRequirementUnsupported(
+                requirement_hash=requirement.requirement_hash,
+                provider_bound_request_hash=provider_bound.provider_bound_request_hash,
+                selected_capability_id=provider_bound.capability_id,
+                reason=ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH,
+                unsupported_field_paths=("requirement_hash",),
+            )
+        if isinstance(preflight, ProviderRequirementUnsupported):
+            return preflight
+        prompt = compile_vidu_prompt(requirement)
+        if not isinstance(prompt, ViduPromptCompilation):
+            return ProviderRequirementUnsupported(
+                requirement_hash=requirement.requirement_hash,
+                provider_bound_request_hash=provider_bound.provider_bound_request_hash,
+                selected_capability_id=provider_bound.capability_id,
+                reason=ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+                unsupported_field_paths=prompt.unsupported_field_paths,
+            )
         return compile_provider_video_request(
             provider_bound=provider_bound, requirement=requirement,
-            compiler_id="vidu-video-compiler", compiler_version="1",
+            compiler_id="vidu-video-compiler", compiler_version="2",
             capabilities=self.capabilities(),
+            native_prompt=ProviderNativePrompt(
+                grammar_contract="vidu-prose-v2",
+                prompt_text=prompt.prompt_text,
+                prompt_sha256=prompt.prompt_sha256,
+            ),
         )
 
     def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:
@@ -281,6 +320,12 @@ class ViduVideoProvider:
             payload["images"] = images
             if request.mode is VideoGenerationMode.IMAGE_TO_VIDEO and len(images) == 2:
                 endpoint = "start-end2video"
+        if (
+            request.mode is VideoGenerationMode.IMAGE_TO_VIDEO
+            and request.adapter_compiler_id == "vidu-video-compiler"
+            and request.adapter_compiler_version == "2"
+        ):
+            payload["is_rec"] = False
         if request.mode in (VideoGenerationMode.TEXT_TO_VIDEO, VideoGenerationMode.REFERENCE_TO_VIDEO):
             payload["aspect_ratio"] = output.ratio
         body = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode("utf-8")

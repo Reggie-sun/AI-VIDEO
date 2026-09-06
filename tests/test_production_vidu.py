@@ -18,6 +18,10 @@ from ai_video.production.video import (
     VideoFlexibleOutputRequirement, VideoImageReferenceBinding, VideoSubmission,
     VideoTaskState, VideoMediaReferenceBinding, build_video_paid_permit_binding,
 )
+from ai_video.production.video_requirement import (
+    ActionEndpoint, CameraEndpoint, CameraIntent, ContinuityStateKind,
+    GenerationIntent, SceneContinuity, SubjectAction, TypedStateReference,
+)
 from ai_video.production.models import (
     ProjectSnapshotPointer, RegistrySnapshotPointer, DependencyGraphSnapshotPointer,
     ActorIdentity,
@@ -151,6 +155,18 @@ def _setup(request=None, profile=None, **provider_args):
     return provider, transport, (resolved, preview, paid, auth, permit)
 
 
+def _native_prompt_intent(scene_id="scene-room"):
+    return GenerationIntent(
+        open_state=TypedStateReference(kind=ContinuityStateKind.TYPED_TEXT, state_text="The shot begins from the supplied image."),
+        close_state=TypedStateReference(kind=ContinuityStateKind.TYPED_TEXT, state_text="The action settles without changing the composition."),
+        scene_continuity=SceneContinuity(scene_id=scene_id, state_constraints=("Keep the authored visible scene constraints.",)),
+        subject_action=SubjectAction(start_state="The subject waits.", progression="The subject performs the authored action.",
+            endpoint=ActionEndpoint(state_text="The subject reaches the authored endpoint.", required_change=True)),
+        camera_intent=CameraIntent(movement="locked", stability="locked-off", framing_intent="preserve the original framing"),
+        camera_endpoint=CameraEndpoint(start_framing="original composition", end_framing="same composition", position_lock=True, orientation_lock=True),
+    )
+
+
 def _submitted(provider, args):
     result = provider.submit(*args)
     resolved, _, paid, _, _ = args
@@ -239,6 +255,7 @@ def test_image_and_start_end_payload(last):
     assert transport.calls[0].url.endswith("start-end2video" if last else "img2video")
     payload = json.loads(transport.calls[0].body)
     assert len(payload["images"]) == len(images)
+    assert "is_rec" not in payload
     assert "aspect_ratio" not in payload
 
 
@@ -248,6 +265,32 @@ def test_expired_profile_blocks_preview_without_network():
     with pytest.raises(AiVideoError) as exc:
         provider.preview(provider.resolve(_request(profile)))
     assert exc.value.code == ErrorCode.PAID_PROVIDER_BUDGET_REJECTED
+
+
+@pytest.mark.parametrize("version,expects_is_rec", [("1", False), ("2", True)])
+def test_versioned_i2v_payload_only_adds_is_rec_for_new_v2(version, expects_is_rec):
+    raw = b"image-test-bytes"
+    image = VideoImageReferenceBinding(role="first_frame", asset_id="first-frame",
+        asset_sha256=hashlib.sha256(raw).hexdigest(), mime_type="image/png",
+        size_bytes=len(raw), width=1280, height=720)
+    request = _request(images=(image,))
+    values = request.model_dump(mode="python", exclude={"request_input_hash"})
+    values.update(requirement_hash=HASH, provider_bound_request_hash=HASH,
+        adapter_compiler_id="vidu-video-compiler", adapter_compiler_version=version,
+        adapter_compiler_hash=HASH)
+    versioned = VideoGenerationRequest.create(**values)
+    provider = ViduVideoProvider(profile=_profile(), transport=None, credential=lambda: "key",
+        image_resolver=lambda _: raw, now=lambda: NOW)
+    _, body = provider._payload(provider.resolve(versioned))
+
+    if not expects_is_rec:
+        _, historic_body = provider._payload(provider.resolve(request))
+        assert body == historic_body
+        assert "is_rec" not in json.loads(body)
+        return
+    submitted_provider, transport, args = _setup(versioned, image_resolver=lambda _: raw)
+    submitted_provider.submit(*args)
+    assert json.loads(transport.calls[0].body)["is_rec"] is False
 
 
 def test_transport_does_not_follow_redirects():
@@ -342,6 +385,7 @@ def test_router_compiler_resolver_uses_vidu_capability_without_network():
     output = args[0].effective_output
     context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
     projection = _replace_requirement(_verified_requirement(context),
+        generation_intent=_native_prompt_intent(context.activated_shot.scene_id),
         output_need=OutputNeed(duration_seconds=5,
             width=1280, height=720, aspect_ratio="16:9", fps=24, container_mime="video/mp4"),
         audio_need=AudioNeed.REQUIRED)
@@ -351,13 +395,99 @@ def test_router_compiler_resolver_uses_vidu_capability_without_network():
         provider_profile=_profile().pointer(), capabilities=provider.capabilities(),
         selected_capability_id=args[0].capability_id, output_requirement=output,
         lifecycle=_lifecycle(context),
-        compiler_contract=AdapterCompilerContract.create(compiler_id="vidu-video-compiler", compiler_version="1"),
+        compiler_contract=AdapterCompilerContract.create(compiler_id="vidu-video-compiler", compiler_version="2"),
     )
     assert routing.provider_bound_request is not None, routing.decision.model_dump_json()
     compiled = provider.compile_request(routing.provider_bound_request, projection.requirement)
     assert isinstance(compiled, CompiledProviderVideoRequest)
     assert provider.resolve(compiled.request).capability_id == args[0].capability_id
     assert transport.calls == []
+    legacy_routing = VideoGenerationResolver().resolve_requirement(
+        projection=projection, context=context,
+        policy=_policy(remote_authorized=True, budget_authorized=True),
+        provider_profile=_profile().pointer(), capabilities=provider.capabilities(),
+        selected_capability_id=args[0].capability_id, output_requirement=output,
+        lifecycle=_lifecycle(context),
+        compiler_contract=AdapterCompilerContract.create(compiler_id="vidu-video-compiler", compiler_version="1"),
+    )
+    assert legacy_routing.provider_bound_request is not None
+    legacy = provider.compile_request(legacy_routing.provider_bound_request, projection.requirement)
+    from ai_video.production.video_compiler import ProviderRequirementUnsupported, ProviderRequirementUnsupportedReason
+    assert isinstance(legacy, ProviderRequirementUnsupported)
+    assert legacy.reason is ProviderRequirementUnsupportedReason.COMPILER_VERSION_UNSUPPORTED
+    with pytest.warns(UserWarning):
+        malformed = provider.compile_request(
+            routing.provider_bound_request,
+            projection.requirement.model_copy(update={"generation_intent": "malformed"}),
+        )
+    assert isinstance(malformed, ProviderRequirementUnsupported)
+    assert malformed.reason is ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH
+
+
+@pytest.mark.parametrize("last", [False, True])
+def test_router_compiled_v2_i2v_posts_is_rec_and_ordered_exact_frames(last):
+    import base64
+    from test_production_provider_neutral_adapters import _replace_requirement
+    from test_production_shot_router import _asset, _context, _lifecycle, _policy, _verified_requirement
+    from ai_video.production.shot_router import AdapterCompilerContract, MotionRequirement, VideoGenerationResolver
+    from ai_video.production.video_compiler import CompiledProviderVideoRequest
+    from ai_video.production.video_requirement import (
+        AssetEvidence, AudioNeed, GenerationMode as RequirementGenerationMode,
+        OutputGeometryPolicy, OutputNeed, SemanticReferenceRole,
+    )
+
+    raw_by_role = {"first_frame": b"canonical-first", "last_frame": b"canonical-last"}
+    first = _asset("first_frame", "router-first", hashlib.sha256(raw_by_role["first_frame"]).hexdigest(),
+        size_bytes=len(raw_by_role["first_frame"]), width=1280, height=720)
+    endpoint = _asset("last_frame", "router-last", hashlib.sha256(raw_by_role["last_frame"]).hexdigest(),
+        size_bytes=len(raw_by_role["last_frame"]), width=1280, height=720)
+    context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False,
+        keyframe=first, last_frame=endpoint if last else None)
+    roles = (SemanticReferenceRole.FIRST_FRAME,)
+    assets = (first,)
+    if last:
+        roles += (SemanticReferenceRole.LAST_FRAME,)
+        assets += (endpoint,)
+    evidence = tuple(AssetEvidence(role=role, asset_id=asset.asset_id,
+        asset_sha256=asset.asset_sha256, mime_type=asset.mime_type, width=asset.width,
+        height=asset.height, size_bytes=asset.size_bytes,
+        canonical_owner_id=asset.canonical_owner_id,
+        canonical_owner_content_hash=asset.canonical_owner_content_hash)
+        for role, asset in zip(roles, assets, strict=True))
+    output = _request(images=(VideoImageReferenceBinding(role="first_frame", asset_id="unused",
+        asset_sha256=hashlib.sha256(b"unused").hexdigest(), mime_type="image/png",
+        size_bytes=len(b"unused"), width=1280, height=720),)).output_requirement
+    projection = _replace_requirement(_verified_requirement(context),
+        generation_mode=(RequirementGenerationMode.FIRST_LAST_FRAME_VIDEO if last else RequirementGenerationMode.IMAGE_TO_VIDEO),
+        generation_intent=_native_prompt_intent(context.activated_shot.scene_id),
+        semantic_reference_roles=roles, asset_evidence=evidence,
+        output_need=OutputNeed(duration_seconds=output.duration_seconds,
+            geometry_policy=OutputGeometryPolicy.ADAPTIVE, aspect_ratio="adaptive",
+            fps=output.fps, container_mime=output.mime_type), audio_need=AudioNeed.REQUIRED)
+    provider, _, _ = _setup()
+    routing = VideoGenerationResolver().resolve_requirement(projection=projection, context=context,
+        policy=_policy(remote_authorized=True, budget_authorized=True), provider_profile=_profile().pointer(),
+        capabilities=provider.capabilities(), selected_capability_id="viduq3-pro-i2v-v1",
+        output_requirement=output, lifecycle=_lifecycle(context).model_copy(update={
+            "input_artifact_ids": (context.target_shot_id, *(asset.asset_id for asset in assets)),
+        }), compiler_contract=AdapterCompilerContract.create(compiler_id="vidu-video-compiler", compiler_version="2"))
+    assert routing.provider_bound_request is not None, routing.decision.model_dump_json()
+    compiled = provider.compile_request(routing.provider_bound_request, projection.requirement)
+    assert isinstance(compiled, CompiledProviderVideoRequest)
+    raw_by_asset = {asset.asset_id: raw_by_role[role] for role, asset in zip(("first_frame", "last_frame"), (first, endpoint), strict=True)}
+    provider, transport, args = _setup(compiled.request, image_resolver=lambda binding: raw_by_asset[binding.asset_id])
+    provider.submit(*args)
+    payload = json.loads(transport.calls[0].body)
+    assert payload["is_rec"] is False
+    assert payload["audio"] is True
+    assert "The subject performs the authored action." in payload["prompt"]
+    assert "收束状态" in payload["prompt"]
+    assert "generation_mode=" not in payload["prompt"]
+    assert transport.calls[0].url.endswith("start-end2video" if last else "img2video")
+    expected_images = [raw_by_role["first_frame"]]
+    if last:
+        expected_images.append(raw_by_role["last_frame"])
+    assert [base64.b64decode(value.split(",", 1)[1]) for value in payload["images"]] == expected_images
 
 
 def test_missing_authorization_and_credential_failure_do_not_consume_permit():
@@ -645,6 +775,7 @@ def test_r2v_and_extension_router_compiler_reach_adapter(extend):
             duration_millis=asset.duration_millis, fps=asset.fps,
             canonical_owner_id=asset.canonical_owner_id, canonical_owner_content_hash=asset.canonical_owner_content_hash),)
     projection = _replace_requirement(base, generation_mode=mode,
+        generation_intent=_native_prompt_intent(context.activated_shot.scene_id),
         semantic_reference_roles=(semantic,), asset_evidence=evidence,
         output_need=OutputNeed(duration_seconds=output.duration_seconds, width=output.width, height=output.height,
             geometry_policy=OutputGeometryPolicy.ADAPTIVE if extend else OutputGeometryPolicy.EXACT,
@@ -654,7 +785,7 @@ def test_r2v_and_extension_router_compiler_reach_adapter(extend):
         policy=_policy(remote_authorized=True, budget_authorized=True), provider_profile=_profile().pointer(),
         capabilities=provider.capabilities(), selected_capability_id=capability_id, output_requirement=output,
         lifecycle=_lifecycle(context).model_copy(update={"input_artifact_ids": (context.target_shot_id, asset.asset_id)}),
-        compiler_contract=AdapterCompilerContract.create(compiler_id="vidu-video-compiler", compiler_version="1"))
+        compiler_contract=AdapterCompilerContract.create(compiler_id="vidu-video-compiler", compiler_version="2"))
     assert routing.provider_bound_request is not None, routing.decision.model_dump_json()
     compiled = provider.compile_request(routing.provider_bound_request, projection.requirement)
     assert isinstance(compiled, CompiledProviderVideoRequest)

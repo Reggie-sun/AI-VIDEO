@@ -67,8 +67,23 @@ Generic Router 当前使用 `exact_seconds`，其时长要求由 downstream arti
 Image resolver 必须返回绑定的 exact registered bytes。Adapter 核对 SHA-256、size、
 MIME 与比例，然后在内存编码 data URI；完整 JSON body 不得超过 20 MiB。
 首尾帧模式固定 first/last 次序。所有 prompt/image bytes 必须进入 paid egress preview。
-与既有 cloud adapter 一致，generic compiler 对没有 native prompt 表达的 `/4`
-requirement 返回 typed unsupported；本次不扩展 Director/native-prompt authoring。
+
+## Native Prompt Compilation
+
+新请求使用 `vidu-video-compiler` version `2`，由 `_vidu_prompt.py` 将受支持的
+neutral requirement 编译为自然语言，保留已编写的动作、空间、镜头及声音约束，
+不把内部 ID、hash 或控制字段序列化给模型。新编译拒绝 version `1`；历史请求仍按
+原始 prompt/payload 读取与恢复，不重新编译。`/4`、无法表达的语义及 native hard
+control 继续 typed unsupported，文字描述固定机位不等于 API 硬控制能力。
+
+Version `2` 的 I2V／首尾帧请求显式发送 `is_rec=false`，使用提交的 prompt；其他
+endpoint 不附加此字段。官方文档没有明确省略该字段时的默认行为，因此不能断言
+历史请求曾被服务端改写。Q3 的 `movement_amplitude` 无效，I2V 没有公开的
+`add_subtitle` 或固定机位参数；不能将 one-click MV 的字幕参数移植到 I2V。
+参数依据：[official I2V](https://platform.vidu.cn/docs/image-to-video)。
+Native audio 仍由 `native_audio` 显式控制；neutral compiler 尚不提供固定 seed，
+直接 request seam 的显式 seed 保持有效。编译与 payload 测试只证明请求封装，
+字幕、机位、动作与声音质量仍必须通过 exact MP4 的逐镜 Gate。
 
 ## Reference To Video
 
