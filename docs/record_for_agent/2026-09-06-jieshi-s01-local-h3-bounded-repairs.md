@@ -11,7 +11,7 @@ Date: 2026-09-06
 
 ## Unlimited-Budget Continuation — 2026-09-06
 
-用户明确“预算无限”，取消Agent自设的累计尝试次数停止条件。仍采用有限批次、known-outcome检查和独立exact attempts；有证据支持下一修复时自动续批，不重复询问。范围仍为同一local H3 native V2横版S01、同一已批准首帧与required Gate；不改变音频路线。repair3封存010–013四次批次，repair4继续独立有界尝试，**010–012均已fetch并检查，均FAIL；013在SamplerCustomAdvanced发生已知terminal GPU OOM，没有MP4；014改用既有CPU offload模式准备中**。下方两轮预算耗尽与shutdown只描述历史状态，当前任务继续。
+用户明确“预算无限”，取消Agent自设的累计尝试次数停止条件。仍采用有限批次、known-outcome检查和独立exact attempts；有证据支持下一修复时自动续批，不重复询问。范围仍为同一local H3 native V2横版S01、同一已批准首帧与required Gate；不改变音频路线。repair3封存010–013四次批次，repair4继续独立有界尝试，**010–012均已fetch并检查，均FAIL；013在SamplerCustomAdvanced发生已知terminal GPU OOM，没有MP4；014改用既有CPU offload模式后仍在SamplerCustomAdvanced发生已知terminal GPU OOM，没有MP4**。下方两轮预算耗尽与shutdown只描述历史状态，当前因其他会话显存占用而阻塞；预算不是停止原因。
 
 - `043ba02`将完整对白块前置；010转写“请在终点下车”，medium和existing-local large-v3均未建立完整原文；额外手影且左手停稳晚于3s。
 - 011仅增加姓名/站字的发音指导；large-v3转写“请在终点站下车”，末字3.28s，超出2.7s；额外手影FAIL。
@@ -19,6 +19,8 @@ Date: 2026-09-06
 - 三片均通过full AV decode，11个MCP样本逐帧检查，exact identity见Evidence Index；每版补充转写绑定源SHA。large-v3使用本机已有checkpoint，未下载模型或安装依赖。音频输入不支持，未声称主观试听通过。
 - `206a1b1`仅为`/4` language tag之后增加一个ASCII空格，与本地T8 `speech.py:513,522`模板一致；原文bytes、旧`/1`、none和fail-closed行为不变。两个定向测试先红后绿，61focused与703相关测试通过（20.22s）；独立reviewer_xhigh accept并验证31个兼容结果逐字节相同。docs、policy、architecture检查通过。此为013的独立lexical实验，未声称空格已被证明为根因或有效修复。
 - 正式Harness receipt限制保持：未自行创建用户禁止的detached worktree，不把working-tree测试冒充receipt；验证日志`runs/jieshi-s01-h3-repair3-20260906/verification-space.log`。7个无关staged文件patch SHA维持`5e6c24dd5a82a3e9f66a79781d234e63491b97293e28716ddbda3f7db611a639`。
+
+截至当前共14次attempt、12个raw视频；没有required findings全PASS。014用既有`--novram`启动后运行210.48s，仍在node10 `SamplerCustomAdvanced` OOM；exact request `42662fa1176ef717a31be186035e9f72ba6ca02c38e73c2e091758e979d8ec25`，provider request `b6f00b35-d1eb-45e9-a3a0-514e1af0c0f6`，见014/runtime-failure.json。两次均known outcome，不blind retry。014后核对owned unit `ai-video-comfyui-cbe620481d1e45919dde90cc77a3dfb6.service` invocation `548a22af69224e1ea4d890e1627d7807`和空queue后停止，见repair4/shutdown.json。其他Codex持有的MCP PIDs20392/24127未终止，游戏未触碰。继续需要其owner允许释放或重启这些驻留GPU模型；无限生成预算不自动授权中断其他会话。013–014没有MP4，所以不能运行exact-MP4 MCP Gate，也不把runtime failure当媒体质量结论。
 
 本次稳定代码/已检查媒体checkpoint自动learning evaluation为`no_candidate`：尚无隔离并重复支持的有效修复，seed随新request变化；不创建采纳请求，不放宽Gate。记录不结束生成任务。
 
@@ -83,6 +85,7 @@ Date: 2026-09-06
 | repair-011-gate | local-request:7140f98dcbac3a69f47797471f5e6cef54abaf9b5f297d2cf553ac54d36bda17 | jieshi-s01-h3-repair3-20260906 | jieshi-s01-h3-horizontal-video-011 | N/A | 8ce0b79c94d98e9a015bb5be2fa68e84132a5a424f0970ba07cf76f7689c74ab | AGENT_MEDIA_GATE | FAIL | AUDIO_OR_VISUAL_REQUIREMENT_UNMET | NEW_ATTEMPT | NONE | runs/jieshi-s01-h3-horizontal-20260906-011/media-gate.json |
 | repair-012-gate | local-request:ed209098276062078891e508915d78e56110b3b6a3552357b0d995342d0d38bd | jieshi-s01-h3-repair3-20260906 | jieshi-s01-h3-horizontal-video-012 | N/A | b35d0c9b35d59f9ab581005f73678787af7f8c78ed2ae2a76ff4603fbbe30cff | AGENT_MEDIA_GATE | FAIL | AUDIO_OR_VISUAL_REQUIREMENT_UNMET | NEW_ATTEMPT | NONE | runs/jieshi-s01-h3-horizontal-20260906-012/media-gate.json |
 | repair-013-outcome | local-request:2da0f9c540d2e18c6669d67863e0625e4b91e66a0af727e7f51523d04736dca0 | jieshi-s01-h3-repair3-20260906 | jieshi-s01-h3-horizontal-video-013 | N/A | NO_ARTIFACT:GPU_OUT_OF_MEMORY | RUNTIME_OUTCOME | NOT_EVALUATED | GPU_OUT_OF_MEMORY | NEW_ATTEMPT | NONE | runs/jieshi-s01-h3-horizontal-20260906-013/runtime-failure.json |
+| repair-014-outcome | local-request:42662fa1176ef717a31be186035e9f72ba6ca02c38e73c2e091758e979d8ec25 | jieshi-s01-h3-repair4-20260906 | jieshi-s01-h3-horizontal-video-014 | N/A | NO_ARTIFACT:GPU_OUT_OF_MEMORY | RUNTIME_OUTCOME | NOT_EVALUATED | GPU_OUT_OF_MEMORY | NEW_ATTEMPT | NONE | runs/jieshi-s01-h3-horizontal-20260906-014/runtime-failure.json |
 
 ## Boundaries And Learning Evaluation
 

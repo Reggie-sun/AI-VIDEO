@@ -11,7 +11,7 @@ Date: 2026-09-06
 
 ## Supersession Notice — 2026-09-06
 
-后续已执行002–007六次有界repair，用户再次继续后又执行008–009；后续用户明确预算无限，010–012也已检查且FAIL，013已知OOM无视频，014准备中，任务继续且没有整镜PASS，见[bounded repairs](2026-09-06-jieshi-s01-local-h3-bounded-repairs.md)。下方“唯一一次”与待重试方向仅描述001历史；001测量不变。原剧本“约2cm”已在新实验前澄清为小幅非接触间隙，不要求单视角精确标定。新证据未产生S02、activation或Final Acceptance。
+后续已执行002–007六次有界repair，用户再次继续后又执行008–009；后续用户明确预算无限，010–012也已检查且FAIL，013和014均已知OOM无视频；当前14次attempt/12个视频，显存资源阻塞且没有整镜PASS，见[bounded repairs](2026-09-06-jieshi-s01-local-h3-bounded-repairs.md)。下方“唯一一次”与待重试方向仅描述001历史；001测量不变。原剧本“约2cm”已在新实验前澄清为小幅非接触间隙，不要求单视角精确标定。新证据未产生S02、activation或Final Acceptance。
 
 ## Scope And Result
 
