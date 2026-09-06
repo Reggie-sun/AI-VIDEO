@@ -62,3 +62,32 @@ Prompt改变且随机种子未控制；本次左手改善仅为观察，不晋�
 候选单独保存，确认前不修改Provider Policy或Gate。
 此次一次submit已用尽，额外paid试验需要新有界授权；没有自动再试。
 记录阶段无Provider/media/网络调用。RAG搜索返回stale片段，本次未前台刷新索引。
+
+## Official Parameter Audit
+
+用户质疑漏传参数后，于2026-09-06核对
+[官方中文I2V请求表](https://platform.vidu.cn/docs/image-to-video)、
+[官方英文I2V请求表](https://platform.vidu.com/docs/image-to-video)及
+[一键MV接口](https://platform.vidu.com/docs/one-click-ai-mv)。以下是文档核对，不是新媒体实验。
+
+- I2V公开参数表未列出字幕开关、negative_prompt或camera lock。
+  `movement_amplitude`明确对Q2/Q3不生效；`audio_type`拆分仅支持较早模型，
+  Q3的`voice_id`和`bgm`也标为不生效。
+- `watermark`控制默认“内容由AI生成”的标记，默认不加；不能据此解释广播全文字幕。
+  一键MV的`add_subtitle`不能移植到`img2video`请求，两个接口合同不同。
+- `is_rec=true`会采用推荐提示；本次未传is_rec，官方该项未清晰声明省略默认值。
+  不能据此断言服务端改写过prompt，但显式false是值得核对的封装改进。
+  本次未指定seed，不能做固定随机条件的对照。
+
+使用`ViduVideoProvider._payload`离线重建本次body，与真实POST记录SHA精确一致：
+`2989380ce1f68dc3ef2c405810d3dc124f7aa0e856d118baf12fd0355350eacd`。
+真实keys为model/prompt/duration/resolution/audio/off_peak/images；值为viduq3-pro、
+4秒、1080p、true、false、一个exact PNG。重建未访问credential/transport。
+prompt为1752字符，包含内部neutral key-value，例如camera_position_lock=true。
+这些不是官方独立参数；当前表达是否影响质量仍属未隔离的假设。
+因此不能把失败全部归因于模型上限，也不能声称漏传一个官方字幕/锁镜头开关已经被证实。
+
+本次仅更新调查记录，不改adapter、不提交新视频，不采用待确认学习候选。
+`record-ai-video-session`追加稳定调查；`distill-ai-video-learning`评估为no_candidate：
+没有新独立媒体，官方核对不推翻原两次字幕观察，也未证明具体原因；既有pending候选保留。
+未改变已有staged runs和其他会话测试文件，未push；RAG stale结果仅作定位。
