@@ -53,6 +53,33 @@ prompt fingerprint 来自原始工具调用，未编造新图沿用旧 approval�
 输入获批/登记与历史 seed 兼容性修复不是新的独立视频实验，不足以证明手势方案有效。
 记录阶段不调用 Provider、媒体或网络，不刷新 RAG；保留既有七个 staged run 文件，不 push。
 
+### Verification Checkpoint — 2026-09-07
+
+本地 checkpoint 为 `a4b54bf`、`e1196ab`；native `reviewer_xhigh` 对
+`2ae1216..e1196ab` scoped review 为 `accept`，无 blocking finding。
+Parent 复跑 decision regressions 为 43 passed；真实旧 Vidu historical candidate 可读取，
+新项目 strict reopen、导入 identity 和旧诊断均由 parent 与 reviewer 独立复核。
+
+Exact-commit Harness receipt：
+`.agent/harness/runs/jieshi-s01-historical-seed-20260907-final/receipt.json`。
+scope、docs、policy、runtime boundary 与 Architecture Gate 通过；full tests 为
+4541 passed、4 skipped、1 failed，1353.00 秒。唯一失败是
+`tests/test_agent_memory.py::test_local_multilingual_project_corpus_answerability_calibration`，
+其中文连续性查询的 top-8 缺少 source 包含 `continuity` 的 dense/hybrid hit。
+没有把失败 receipt 说成 passing；`verify-receipt` 确认 scope/snapshot/policy/artifact
+integrity，但 `passed=false`、`complete_completion_proof=false`。
+
+为区分本次回归与既有问题，将任务前精确 commit `2ae1216a829fa9d0913badcc35f3daf4bef74d78`
+通过 `git archive` 解到临时目录，用该快照的 code/docs、显式 snapshot `PYTHONPATH`
+及 Harness no-network environment 单独运行同一 calibration test：296.30 秒后在同一
+`tests/test_agent_memory.py:2196` 断言失败。证据位于同一 Harness run 的
+`baseline-calibration-result.json` 与 `baseline-calibration.stdout.log`。
+这是任务前已存在的 verification blocker，未改 RAG code/test/threshold、未伪造 model
+缺失以 skip，也未再次运行完整测试。只建立测试临时索引，生产 RAG 索引没有刷新。
+
+代码已提交但没有 fresh passing code Harness receipt；该未关闭检查和媒体补证均必须
+在后续交接中保留。Record/learning evaluation 仍为 `no_candidate`。
+
 ### Follow-up — Endpoint Hand Repair Candidates
 
 用户随后明确要求“修复”。直接查看旧末帧`059bb2b261883190168057b35baafc90011866acba9fb64b1c9c186122861330`发现：抬起左臂的手背朝镜头，拇指却位于画面左侧，存在左右手形态不一致；这是动作突变的输入风险，尚未通过对照视频证明因果。使用image_gen进行了三次局部修图：前两次仍保留错误拇指侧，拒绝；第三次改为侧向微曲、手指透视重叠的试探手势，仅为待审阅候选，不宣称解剖或视频Gate通过。
