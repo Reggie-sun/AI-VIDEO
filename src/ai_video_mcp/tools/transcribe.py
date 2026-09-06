@@ -60,7 +60,22 @@ def video_transcribe(
     model_name = model if model is not None else config.whisper_model
     lang = language if language is not None else config.whisper_language
 
-    import whisper as _w
+    probe_result = video_probe(video_path, config, cache)
+    has_audio = probe_result.get("audio_stream") is not None
+    if not has_audio:
+        raise McpError(
+            McpErrorCode.NO_AUDIO_STREAM,
+            "No audio stream found in video file",
+        )
+
+    try:
+        import whisper as _w
+    except ImportError as exc:
+        raise McpError(
+            McpErrorCode.WHISPER_FAILED,
+            "Whisper transcription dependency is unavailable",
+            detail=str(exc),
+        ) from exc
     available = _w.available_models()
     if model_name not in available:
         raise McpError(
@@ -71,14 +86,6 @@ def video_transcribe(
     cached = cache.get(p, "transcribe", model=model_name, language=lang)
     if cached is not None:
         return cached
-
-    probe_result = video_probe(video_path, config, cache)
-    has_audio = probe_result.get("audio_stream") is not None
-    if not has_audio:
-        raise McpError(
-            McpErrorCode.NO_AUDIO_STREAM,
-            "No audio stream found in video file",
-        )
 
     duration = probe_result["file"]["duration_seconds"]
 

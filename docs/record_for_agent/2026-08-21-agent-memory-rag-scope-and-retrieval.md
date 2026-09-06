@@ -386,6 +386,15 @@ database 配合 old-version manifest，没有保留真实历史 Chroma format fi
 110 个用例全部通过，包括该 calibration。两项失败属于 `test_mcp_transcribe.py`：
 本机缺少 `whisper`，`video_transcribe()` 在预期 typed error 前 import 失败；该模块
 不属于本次修改范围。完整 Harness 因此为 failed，不能宣称全仓验证通过。
+后续用户授权修复这两项失败：转写入口现先验证音轨，并将 Whisper import failure
+映射为既有 `WHISPER_FAILED`；非法模型测试显式提供 backend catalog，避免依赖本机
+安装状态。新增 no-audio precedence、dependency missing 与 backend model success
+用例；实际 Whisper 推理仍未验证。此后续修复不改写上述历史 full-suite verdict，
+也不把 typed failure handling 描述为本机已安装或能执行 Whisper。
+后续 focused transcription tests 为 5 passed、1 skipped；policy 对应的 MCP tests 为
+61 passed、1 skipped。唯一 skip 是既有真实 Whisper 慢测试；没有下载模型或执行
+真实 ASR。记录更新后的 RAG freshness 需由既有 detached refresh 处理，本次不执行
+foreground rebuild。Automatic learning evaluation 仍为 `no_candidate`。
 结果以 `.agent/harness/runs/rag-resumed-20260906/receipt.json` 为准，
 其 snapshot 包含其他 session 已提交的变更，不能把整个 range 都归为本任务修改。
 该轮执行期间其他 session 又推进 HEAD；因此该 receipt 不能被声称为最终 HEAD 的
