@@ -8,6 +8,12 @@ learning_eligibility: ineligible
 
 Date: 2026-09-06
 
+## Current Correction — S01 Hand Motion Rejected
+
+用户观看本地preview后明确指出“手的问题很大”。该反馈取代下文“第7版视觉可以保留”的暂定判断，不得将此前“没问题”解释为全面验收。MCP补看每0.4秒的1080px帧后发现：1.6秒掌心朝镜头，2秒变手背朝镜头，轮廓变化未清晰呈现自然旋转；先前稀疏抽帧错过了主要动作问题。preview当前FAIL，不推进S02。`runs/jieshi-s02-preparation-20260906-001/`只有原07第71帧的clean continuity reference，未批准/注册为S02首帧，现不得作为accepted source。
+
+字幕澄清与用户具体手部问题正在等待回复；本轮未新提交Provider或生成修复视频。record/learning评估no_candidate：单次同源诊断修正，不扩张为已证实的普遍模型结论。
+
 ## Follow-up — Local Editorial Preview
 
 用户后来明确要求“别管扣费的”。已对下载的07素材完成一次本地ffmpeg剪辑预览：保留前3秒真实画面，原生音轨从0.7秒开始，添加既定叙事字幕。输出`runs/jieshi-s01-local-edit-20260906-001/s01-preview.mp4`，SHA256 `5e713b14f1ac886537a1b4076cab3a473308b58f808c2e32073a668b9a4c6182`。这是独立editorial preview，不是canonical HyperFrames composition；没有通过改名、伪造成本或登记改变Production状态。下文“未合成”只描述先前checkpoint；现在已有本地预览，canonical composition仍未完成。
