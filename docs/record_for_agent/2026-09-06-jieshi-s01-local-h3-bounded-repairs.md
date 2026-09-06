@@ -9,6 +9,22 @@ evidence_index_version: "1"
 
 Date: 2026-09-06
 
+## Renewed Continuation — 2026-09-06
+
+用户再次明确“继续”后，封存独立第二轮上限2次、3600秒任务时间、1200秒累计生成预算，见`runs/jieshi-s01-h3-repair2-20260906/budget.json`。008和009均成功fetch并完整检查，均FAIL；**截至本段累计9个raw版本，没有整镜PASS**。下方第一轮6次是历史批次范围，不是当前总数。
+
+`43d733f`仅调整`/4`对白表达：在原文tag前用自然语言表达speaker画内/画外、performance/response、时间窗、lip-sync；只允许marked dialogue内的唯一原文发声。依据本机`speech.py:512–528`表达示例，不能将`no narration`认定为已证实根因。`/1`、无对白及拒绝输出保持逐字节一致；没有修改Provider/profile/音频路线或放宽Gate。
+
+- 008复用002的完整GenerationIntent，只改变对白serialization。mean−46.9dB/peak−30.9dB；MCP及+20dB强制中文转写为空；玻璃有额外手影，FAIL。
+- 009仅在008基础上将广播置于低音量环境声前景。转写`李念 请在重点站下车`；MCP粗分段`0–2s`经补充词级对齐被推翻，实际约**1.84–4.52s**。姓名低置信度不能靠ASR独断真人发音错误，但时间窗单独已FAIL；手部倒影同样FAIL。mean−45.4dB/peak−21.5dB。
+- 两片均1344×768/124frames/24fps/5.167s/H264+AAC，full AV decode exit0。每版11个MCP抽帧已核对，exact字节identity见下表及run。没有主观试听或人类验收。
+- 当前变更2项定向测试先红后绿；61 focused passed，policy要求的测试与H3邻近覆盖去重后703 passed（20.81s）；独立reviewer_xhigh accept，28项纯测试和31个兼容输出比较通过。docs contract、policy audit通过；architecture检查PASS，唯一warning来自不属于本任务的`video_planner.py`增长，未修改该文件。验证日志见repair2/verification.log。第一次手写测试命令拼错文件名，仅0tests收集失败，随后从policy抽取真实路径完成上述验证。
+- 正式Harness receipt仍因用户禁止自行创建detached worktree而未生成，不将工作区定向测试冒充receipt。相关其他planning/validation dirty work及既有7个staged文件均保留。独立RAG检索本轮返回fresh，未主动build/index refresh。
+
+第二轮2次预算已耗尽；本任务ComfyUI unit在核对invocation和空queue后停止，见repair2/shutdown.json。`distill-ai-video-learning`仍为`no_candidate`：自然语言表达未证明关闭失败，seed混杂，不提出Skill/Policy/Gate采纳。没有push/release、S02、activation或P6。
+
+可供后续确认的具体替代路线是：保留003仅画面候选（MP4 SHA `2f2927f6f02e89d7a31a1557105184d920317196d5bc631f30aa1e10cbdd5075`）前3秒，独立制作原文“林砚，请在终点站下车。”的女声广播，置于0.1–2.7s，经既有P4时间线/混音/renderer合成后重新检查。**该替代尚未获确认，也未执行**；它改变既有native source-audio路线，不能用它把历史raw Gate改成PASS，不授权remote/paid或新依赖。
+
 ## Scope And Current Result
 
 承接用户“继续，一直生成直到第一个 shot 通过检查”，对同一已批准首帧、本地 H3 native V2 横版 S01 连续执行 6 个新 repair attempts（002–007）。全部成功 fetch，全部显式调用 project-local video-analysis MCP，**没有一版全部 required findings PASS**。既有001加本轮共7个raw版本，不是正式竖屏成片。
@@ -46,6 +62,9 @@ Date: 2026-09-06
 | repair-005-gate | local-request:642e71671bb5f5564de1a3bdb035e927172f6924215244dfafc51c7b62401b42 | jieshi-s01-h3-repair-20260906 | jieshi-s01-h3-horizontal-video-005 | N/A | ccf74a18753d3fe14c9f5001b1c748d35ee5971115caf22de1912710344fed39 | agent_media_gate | FAIL | AUDIO_OR_VISUAL_REQUIREMENT_UNMET | NEW_ATTEMPT | NONE | runs/jieshi-s01-h3-horizontal-20260906-005/media-gate.json |
 | repair-006-gate | local-request:a5c80537426cea1787cc5a5425ca1793f099bf7a663f6bb7048ae725d81fe82a | jieshi-s01-h3-repair-20260906 | jieshi-s01-h3-horizontal-video-006 | N/A | 0dbc0e12d85342bc871abe219efedc9eab80932dcc8bf49c06cc53c15028673e | agent_media_gate | NOT_EVALUATED | AUDIO_OR_VISUAL_REQUIREMENT_UNMET | NEW_ATTEMPT | NONE | runs/jieshi-s01-h3-horizontal-20260906-006/media-gate.json |
 | repair-007-gate | local-request:3fb048d133279464d0f05f9ac6d90af0f1d4832fa41eebd2e6906ef3ff1bb04a | jieshi-s01-h3-repair-20260906 | jieshi-s01-h3-horizontal-video-007 | N/A | 204718617ac34ac437d30a2b5d6c6d6744c5fde027b04a56308ea52e83e007e8 | agent_media_gate | FAIL | AUDIO_OR_VISUAL_REQUIREMENT_UNMET | NEW_ATTEMPT | NONE | runs/jieshi-s01-h3-horizontal-20260906-007/media-gate.json |
+
+| repair-008-gate | local-request:ecb54ea6d800ab24d46b4a9ff90e2c9749e02dd2c70e179b1cdae5ee7eb96fb7 | jieshi-s01-h3-repair2-20260906 | jieshi-s01-h3-horizontal-video-008 | N/A | 1fecf4f0193887527f42a752bd45f5aa1dbd094ed6008983f0962fb8116b60cb | agent_media_gate | FAIL | AUDIO_OR_VISUAL_REQUIREMENT_UNMET | NEW_ATTEMPT | NONE | runs/jieshi-s01-h3-horizontal-20260906-008/media-gate.json |
+| repair-009-gate | local-request:1433ea5d17b0cc284f6f761880f619b739f39f42af192163ea671cd41a04c8ab | jieshi-s01-h3-repair2-20260906 | jieshi-s01-h3-horizontal-video-009 | N/A | d8df8b6f8ea2d6c54fe0aa3cb4df3d414458c5e48e10ea231260ad1895371e13 | agent_media_gate | FAIL | AUDIO_OR_VISUAL_REQUIREMENT_UNMET | NEW_ATTEMPT | NONE | runs/jieshi-s01-h3-horizontal-20260906-009/media-gate.json |
 
 ## Boundaries And Learning Evaluation
 

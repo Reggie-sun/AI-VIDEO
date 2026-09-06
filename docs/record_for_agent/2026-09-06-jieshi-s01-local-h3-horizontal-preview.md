@@ -11,7 +11,7 @@ Date: 2026-09-06
 
 ## Supersession Notice — 2026-09-06
 
-后续已执行002–007六次有界repair，当前状态为预算耗尽且没有整镜PASS，见[bounded repairs](2026-09-06-jieshi-s01-local-h3-bounded-repairs.md)。下方“唯一一次”与待重试方向仅描述001历史；001测量不变。原剧本“约2cm”已在新实验前澄清为小幅非接触间隙，不要求单视角精确标定。新证据未产生S02、activation或Final Acceptance。
+后续已执行002–007六次有界repair，用户再次继续后又执行008–009；当前累计9版，第二轮预算耗尽且没有整镜PASS，见[bounded repairs](2026-09-06-jieshi-s01-local-h3-bounded-repairs.md)。下方“唯一一次”与待重试方向仅描述001历史；001测量不变。原剧本“约2cm”已在新实验前澄清为小幅非接触间隙，不要求单视角精确标定。新证据未产生S02、activation或Final Acceptance。
 
 ## Scope And Result
 
