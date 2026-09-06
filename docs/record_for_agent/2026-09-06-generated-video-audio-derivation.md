@@ -8,6 +8,12 @@ learning_eligibility: ineligible
 
 Date: 2026-09-06
 
+## Follow-up — Local Editorial Preview
+
+用户后来明确要求“别管扣费的”。已对下载的07素材完成一次本地ffmpeg剪辑预览：保留前3秒真实画面，原生音轨从0.7秒开始，添加既定叙事字幕。输出`runs/jieshi-s01-local-edit-20260906-001/s01-preview.mp4`，SHA256 `5e713b14f1ac886537a1b4076cab3a473308b58f808c2e32073a668b9a4c6182`。这是独立editorial preview，不是canonical HyperFrames composition；没有通过改名、伪造成本或登记改变Production状态。下文“未合成”只描述先前checkpoint；现在已有本地预览，canonical composition仍未完成。
+
+Exact输出已调用project-local video_analyze和word_timestamps转写：1080×1920、72帧/24fps，container3.022秒；ASR段落结束2.64秒，字幕可见。完整逐镜判定在run的`REVIEW.md`，总体NOT_EVALUATED：人耳起音/混音、全程倒影计数、胸牌及约2cm间隙未完全确认。没有推进S02。record自动learning评估仍no_candidate：这是同源单次剪辑，不能宣称普遍的修复成功规律。
+
 ## Scope And Current Truth
 
 用户明确批准有界原生音轨派生入口，目标是后续组合《界蚀》S01的attempt07视觉与attempt08广播。本轮完成能力实现，不重新编剧、不增加Provider调用、不改变源视频Gate结论。
