@@ -1,0 +1,18 @@
+{
+  "status": "DRAFT_NOT_SUBMITTED",
+  "attempt_id": "jieshi-e01-s01-vidu-i2v-attempt08",
+  "authorization_source": "用户在attempt07 Gate FAIL后要求jixu；一次新的S01广播时序修复提交",
+  "max_submit_count": 1,
+  "provider": "vidu",
+  "model": "viduq3-pro",
+  "duration_seconds": 4,
+  "resolution_label": "1080p",
+  "native_audio": true,
+  "input_sha256": "4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb",
+  "action_progression": "从第0秒立即抬起空左手，在第2秒前达到末帧图的手势：五指伸直、手背朝镜头、掌心朝窗，停在玻璃前约2厘米。第2至4秒保持这个末帧姿态。右手手机始终留在腿上。",
+  "prompt_draft": "固定机位，原首帧为起点、末帧为第2秒就达到并保持的姿态。七名他人的倒影与空蓝座保持原位置，玻璃内没有林砚及其手的倒影。画面只呈现人物与车厢，不显示文字。声音：视频一开始立刻听到清晰的普通话女声列车广播，首字从第0秒起声，没有前奏、提示音或起声前静默。用流畅偏快的播报语速连续说完唯一一句：“林砚，请在终点站下车。” 姓名后不停顿，整句在第2.2秒前结束，最后两个字“下车”也必须在第2.2秒前说完；剩余时间只有轻柔轮轨声。声音来自画外喇叭，林砚始终闭嘴倾听。无音乐。",
+  "endpoint_sha256": "059bb2b261883190168057b35baafc90011866acba9fb64b1c9c186122861330",
+  "experiment_change": "Only spoken-broadcast onset/pace wording differs from07. Same camera/action/image bindings, compiler2,model,4s1080p,native audio,is_rec false. No guaranteed model timing.",
+  "camera_stability": "相机刚性固定在车厢上，与窗框和座椅保持完全相同的相对位置。固定焦距、固定光轴、固定裁切；整个4秒的每一帧都保持相同视场，不做推近、拉远、摇移、旋转、跟随或透视变化。",
+  "camera_framing": "精确沿用输入图的取景，不重新构图。窗框四角、竖杆、座椅边界和七名乘客在图像中的位置及大小全程固定。前景人物与右侧乘客保持原有边缘留量；只让林砚的左臂在这个固定画面中运动。"
+}

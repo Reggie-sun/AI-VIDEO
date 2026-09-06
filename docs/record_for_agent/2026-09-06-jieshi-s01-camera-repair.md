@@ -9,6 +9,10 @@ evidence_index_version: "1"
 
 Date: 2026-09-06
 
+## Continuation Notice — 2026-09-06
+
+后续attempt08已完成广播起声修复实验，见[新记录](2026-09-06-jieshi-s01-broadcast-onset-repair.md)。08 ASR segment结束约2.14秒，整体仍NOT_EVALUATED，下一步为补全验收证据。下文07的FAIL和测量保留为历史，不代表08当前广播仍超时；下文“后续需处理广播启动/结束时间”已由08实验推进。
+
 ## Outcome
 
 用户在06失败后要求“jixu”。完成一次Vidu Q3 Pro首尾帧生成并canonical fetch，exact MP4 `88d3a8ed59550c706e176da88e1d7ef89c02a1e60a5f6e1546b112507d0cd93e`，3,350,152 bytes，1080×1920、24fps、97帧、4.042秒、AAC48k stereo。
