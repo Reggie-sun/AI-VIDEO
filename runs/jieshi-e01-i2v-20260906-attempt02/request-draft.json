@@ -1,0 +1,19 @@
+{
+  "status": "DRAFT_BLOCKED_PROFILE_EXPIRED_NOT_COMPILED",
+  "attempt_id": "jieshi-e01-s01-vidu-i2v-attempt02",
+  "authorization_source": "用户：实践",
+  "max_submit_count": 1,
+  "submit_count": 0,
+  "provider": "vidu",
+  "model": "viduq3-pro",
+  "duration_seconds": 4,
+  "resolution_label": "1080p",
+  "native_audio": true,
+  "input_role": "first_frame",
+  "input_sha256": "4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb",
+  "canonical_project": "runs/jieshi-e01-i2v-20260906-attempt01/production-s01-v1/project.yaml",
+  "prompt_draft": "以输入图为精确起始构图。深夜地铁，冷白顶灯，保持人物外观与服装。前景坐着的林砚缓慢抬起解剖左手，右手手机始终留在腿上；前三秒内左手靠近玻璃，在玻璃前悬停。窗内始终只有输入图已有的七个人及空蓝座位，他们的位置保持不变。前景林砚的脸、身体、抬起的左手在玻璃中始终完全缺席；手移过的玻璃区域仍呈现原有空座和车厢背景。摄影机固定在输入图位置，全程保持同一焦距、视角和画面边界。一个连续镜头。画面干净，无数字、字幕或新增人物。声音：稳定低沉轮轨声和轻微衣料声，0.1至2.7秒画外列车广播准确说：林砚，请在终点站下车。林砚嘴唇不动。无配乐，无其他对白。",
+  "required_checks": ["exact_first_frame_egress", "real_left_hand_motion", "seven_reflections_preserved", "no_linyan_reflection_throughout", "locked_camera", "no_generated_text", "native_audio_exact_broadcast", "identity_and_badge", "1080p_raster"],
+  "blocker": "Existing sealed operator profile expired; ViduVideoProvider.preview reproduced paid_provider_budget_rejected. No new intent or permit minted.",
+  "experiment_limit": "Prompt refinement and user-requested audio change are both present; not a controlled single-variable comparison."
+}
