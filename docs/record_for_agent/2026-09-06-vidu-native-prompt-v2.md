@@ -9,6 +9,12 @@ evidence_index_version: "1"
 
 Date: 2026-09-06
 
+## Subsequent Live Evidence
+
+同日后续 [S01 compiler2 live attempt04](2026-09-06-jieshi-s01-vidu-v2-live-gate.md)
+已生成并检查 exact MP4，Gate FAIL：烧入字幕、掌心朝镜头和机位漂移仍存在。
+下方“尚无 version2 媒体证据”仅描述本实现 checkpoint 的历史边界。
+
 ## Purpose
 
 用户在核对官方参数后要求“改进／继续”。本轮只改进 Vidu 请求编译和验证，

@@ -1,0 +1,25 @@
+{
+  "kind": "operator_ceiling_reaffirmation",
+  "old_profile": {
+    "profile_id": "vidu-official-q3",
+    "profile_version": "vidu-q3-2026-09-05",
+    "profile_path": "provider-profiles/9af6fc5ce4c1bf3885f8b40309635817ffeb035f024fac3766e3ea5ba107b1d4.json",
+    "profile_sha256": "9af6fc5ce4c1bf3885f8b40309635817ffeb035f024fac3766e3ea5ba107b1d4"
+  },
+  "new_profile": {
+    "profile_id": "vidu-official-q3",
+    "profile_version": "vidu-q3-2026-09-05",
+    "profile_path": "provider-profiles/d7b416fdedaec092f00a9bea689c50115333248d44e0e78555c3aa7bbe191e9b.json",
+    "profile_sha256": "d7b416fdedaec092f00a9bea689c50115333248d44e0e78555c3aa7bbe191e9b"
+  },
+  "authorization_source": "current user: 继续生成",
+  "max_submit_count": 1,
+  "remaining_submit_count_before": 1,
+  "scope": "S01 Vidu Q3 Pro first-frame I2V 4s 1080p native audio, compiler2",
+  "cost_upper_bound_microunits": 3000000,
+  "currency": "CNY",
+  "decided_at": "2026-09-06T08:30:32.674570+00:00",
+  "expires_at": "2026-09-06T09:30:32.674570+00:00",
+  "previous_outcome": "attempt03 exact MP4 fetched, validate, Gate FAIL; old quota consumed",
+  "is_official_price": false
+}

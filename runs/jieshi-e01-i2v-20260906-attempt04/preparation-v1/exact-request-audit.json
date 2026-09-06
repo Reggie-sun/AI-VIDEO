@@ -1,0 +1,16 @@
+{
+  "request_hash": "b66d3b87c97390eacddd01140785d1702d6f566e82881908123ac576700f55c3",
+  "endpoint": "img2video",
+  "body_sha256": "d504b3aefe6d3f1ac8d8b50c4c53df76d73fb31c6a9c94ca006e834bed13c1d6",
+  "body_size_bytes": 2755203,
+  "prompt_chars": 974,
+  "prompt_sha256": "5d5a5fc5f60807318b066fa7566b6d26da00cbd704457ea8b3460244e1a6767a",
+  "model": "viduq3-pro",
+  "duration": 4,
+  "resolution": "1080p",
+  "audio": true,
+  "is_rec": false,
+  "first_frame_sha256": "4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb",
+  "max_submit_count": 1,
+  "compiler_version": "2"
+}
