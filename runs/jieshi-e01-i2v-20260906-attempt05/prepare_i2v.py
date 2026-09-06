@@ -145,6 +145,11 @@ def main():
     if loaded.manifest.schema_version == "2.5":
         writer.upgrade_manifest_schema("2.7", expected_manifest_revision=loaded.manifest.manifest_revision)
         loaded = load_production_project(ROOT / "project.yaml")
+    finish_request(loaded, source, request, verified)
+
+
+def finish_request(loaded, source, request, verified):
+    shot = loaded.shots[0]
     profile = ViduProviderProfile.model_validate_json((RUN / "provider-profile.json").read_bytes())
     provider = ViduVideoProvider(profile=profile, transport=None, credential=forbidden)
     policy_data = {"user_instruction": "继续生成", "provider": "vidu", "model": "viduq3-pro",
@@ -164,8 +169,7 @@ def main():
             mime_type=source.mime_type, size_bytes=source.size_bytes, width=941, height=1672),
         last_frame=RouterAssetIdentity(role="last_frame", asset_id=endpoint.asset_id,
             asset_sha256=endpoint.sha256, source_registry_revision_id=loaded.registry.revision_id,
-            mime_type=endpoint.mime_type, size_bytes=endpoint.size_bytes, width=endpoint.width, height=endpoint.height,
-            canonical_owner_id=shot.shot_id, canonical_owner_content_hash=shot.content_hash),
+            mime_type=endpoint.mime_type, size_bytes=endpoint.size_bytes, width=endpoint.width, height=endpoint.height),
         upstream_terminal=None, motion_requirement="character_action", continuity_mode="none",
         semantic_continuity_state=None, allowed_visual_strategies=("generated_video",),
         allowed_generation_modes=("image_to_video",),

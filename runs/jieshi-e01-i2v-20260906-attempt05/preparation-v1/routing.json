@@ -1,0 +1,200 @@
+{
+  "decision": {
+    "audit_decision_hash": "44f42b650222ea871fd5a56a544202c9dc3e6c555d2a788cffeac337ad79e816",
+    "continuity_mode": "none",
+    "continuity_provider_route_binding_hash": null,
+    "continuity_transition_policy_hash": null,
+    "execution_kind": "remote",
+    "input_assets": [
+      {
+        "asset_id": "image-import-89318576d4eed1eafaaba834f57b832f8376168d25ac735125791966ad9109b1",
+        "asset_sha256": "4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb",
+        "canonical_owner_content_hash": null,
+        "canonical_owner_id": null,
+        "canonical_owner_kind": null,
+        "duration_millis": null,
+        "fps": null,
+        "height": 1672,
+        "mime_type": "image/png",
+        "role": "first_frame",
+        "size_bytes": 2064319,
+        "source_registry_revision_id": "50a3cd41a464a50beafe7b2a7bf87981b340824bc378b2351e3f3991e0b3cb81",
+        "width": 941
+      },
+      {
+        "asset_id": "image-import-c1ffc3e43f26f4f29c7ad276e67ab1429f9e909f30bd5c01413e37b8d5ac8bb4",
+        "asset_sha256": "059bb2b261883190168057b35baafc90011866acba9fb64b1c9c186122861330",
+        "canonical_owner_content_hash": null,
+        "canonical_owner_id": null,
+        "canonical_owner_kind": null,
+        "duration_millis": null,
+        "fps": null,
+        "height": 1672,
+        "mime_type": "image/png",
+        "role": "last_frame",
+        "size_bytes": 1998073,
+        "source_registry_revision_id": "50a3cd41a464a50beafe7b2a7bf87981b340824bc378b2351e3f3991e0b3cb81",
+        "width": 941
+      }
+    ],
+    "outcome": "selected",
+    "output_requirement": {
+      "container": "mp4",
+      "dimension_mode": "adaptive",
+      "duration_seconds": 4,
+      "fps": 24,
+      "frame_count": null,
+      "height": null,
+      "mime_type": "video/mp4",
+      "native_audio": true,
+      "ratio": "adaptive",
+      "resolution_label": "1080p",
+      "timing_mode": "exact_seconds",
+      "width": null
+    },
+    "policy": {
+      "policy_id": "jieshi-s01-i2v-attempt05",
+      "policy_sha256": "3b039623a8299c233f8425a748ce7d9d860a42f7c0659b7b8e25f1d38da79f61",
+      "policy_version": "1"
+    },
+    "previous_provider_bound_request_hash": null,
+    "provider_capabilities_fingerprint": "fcded60786198a87fba5b91bc4d0ac5bd605f5ebaf9c2a3c86158f6138fb2705",
+    "provider_name": "vidu",
+    "provider_profile": {
+      "profile_id": "vidu-official-q3",
+      "profile_path": "provider-profiles/868f3c99e9841118a4b3a2df34b323b0e52b711d489a349d836c89c1412ca3e3.json",
+      "profile_sha256": "868f3c99e9841118a4b3a2df34b323b0e52b711d489a349d836c89c1412ca3e3",
+      "profile_version": "vidu-q3-2026-09-05"
+    },
+    "rationale": "Bind the verified neutral requirement to the exact capability.",
+    "reason_codes": [
+      "CANONICAL_REFERENCES_ENABLE_R2V"
+    ],
+    "required_binding_roles": [
+      "first_frame",
+      "last_frame"
+    ],
+    "required_mode": "image_to_video",
+    "requirement_hash": "b14c3824d068a6a0b473171670289c2a04cc71b0d3cea3b56fafc2d7529c4984",
+    "selected_capability_fingerprint": "c4d26eea6aa51b9a56676207c8621139a07e5c79065ce195a1526f305160c8c9",
+    "selected_capability_id": "viduq3-pro-i2v-v1",
+    "selected_mode": "image_to_video",
+    "semantic_continuity_state": null,
+    "semantic_routing_hash": "de1e42bf6ae722a1818b3443404dd74037dce9f78c0741f36fbfce22654a0e6e",
+    "target_shot_content_hash": "de06d29d761e12671aaeb719296c1a96727775b8987e9cbb8291de90b627e608",
+    "target_shot_id": "S01",
+    "target_shot_revision": 5
+  },
+  "provider_bound_request": {
+    "audit_decision_hash": "44f42b650222ea871fd5a56a544202c9dc3e6c555d2a788cffeac337ad79e816",
+    "billing_kind": "metered",
+    "binding_roles": [
+      "first_frame",
+      "last_frame"
+    ],
+    "capability_fingerprint": "c4d26eea6aa51b9a56676207c8621139a07e5c79065ce195a1526f305160c8c9",
+    "capability_id": "viduq3-pro-i2v-v1",
+    "compiler_contract": {
+      "compiler_hash": "410566c55ab94578cba7598c4b37afcab6e5bcc92b385ce00d07a0833ece283a",
+      "compiler_id": "vidu-video-compiler",
+      "compiler_version": "2"
+    },
+    "execution_kind": "remote",
+    "expression_strength": "semantic_prompt_allowed",
+    "input_assets": [
+      {
+        "asset_id": "image-import-89318576d4eed1eafaaba834f57b832f8376168d25ac735125791966ad9109b1",
+        "asset_sha256": "4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb",
+        "canonical_owner_content_hash": null,
+        "canonical_owner_id": null,
+        "canonical_owner_kind": null,
+        "duration_millis": null,
+        "fps": null,
+        "height": 1672,
+        "mime_type": "image/png",
+        "role": "first_frame",
+        "size_bytes": 2064319,
+        "source_registry_revision_id": "50a3cd41a464a50beafe7b2a7bf87981b340824bc378b2351e3f3991e0b3cb81",
+        "width": 941
+      },
+      {
+        "asset_id": "image-import-c1ffc3e43f26f4f29c7ad276e67ab1429f9e909f30bd5c01413e37b8d5ac8bb4",
+        "asset_sha256": "059bb2b261883190168057b35baafc90011866acba9fb64b1c9c186122861330",
+        "canonical_owner_content_hash": null,
+        "canonical_owner_id": null,
+        "canonical_owner_kind": null,
+        "duration_millis": null,
+        "fps": null,
+        "height": 1672,
+        "mime_type": "image/png",
+        "role": "last_frame",
+        "size_bytes": 1998073,
+        "source_registry_revision_id": "50a3cd41a464a50beafe7b2a7bf87981b340824bc378b2351e3f3991e0b3cb81",
+        "width": 941
+      }
+    ],
+    "lifecycle": {
+      "base_dependency_graph": {
+        "content_hash": "24071c3a49023d75f3969c6e04b36294677805a248659519435da9196697b5f5",
+        "file_sha256": "6d1d1f4d8fe1b6d659cfb7215da23c1ecc69a53b5efd82b754ebabe80a4d6763",
+        "path": "state/dependency_graph.24071c3a49023d75f3969c6e04b36294677805a248659519435da9196697b5f5.json",
+        "revision_id": "24071c3a49023d75f3969c6e04b36294677805a248659519435da9196697b5f5"
+      },
+      "base_project": {
+        "content_hash": "585cb45e0e35cba933e51eeb3906eb3137d0e8aab3899ce485c0b5fbb9699e23",
+        "file_sha256": "4871fbdf1befdb304dc54866420e5af9fa7c69d8aec850af02c84fb523cdfbe6",
+        "path": "state/projects/project.5.585cb45e0e35cba933e51eeb3906eb3137d0e8aab3899ce485c0b5fbb9699e23.yaml",
+        "revision": 5
+      },
+      "base_registry": {
+        "content_hash": "50a3cd41a464a50beafe7b2a7bf87981b340824bc378b2351e3f3991e0b3cb81",
+        "file_sha256": "ce8993cb4cb01be1f31ea4b7f5cc8d314f391a1e8457ab07e0ce1d9f50a16e14",
+        "path": "assets/registry.50a3cd41a464a50beafe7b2a7bf87981b340824bc378b2351e3f3991e0b3cb81.json",
+        "revision_id": "50a3cd41a464a50beafe7b2a7bf87981b340824bc378b2351e3f3991e0b3cb81"
+      },
+      "continuity_binding": null,
+      "generation_id": "jieshi-e01-s01-vidu-i2v-attempt05",
+      "hard_cut_keyframe_binding": null,
+      "input_artifact_ids": [
+        "jieshi-e01-S01",
+        "image-import-89318576d4eed1eafaaba834f57b832f8376168d25ac735125791966ad9109b1",
+        "image-import-c1ffc3e43f26f4f29c7ad276e67ab1429f9e909f30bd5c01413e37b8d5ac8bb4"
+      ],
+      "output_asset_id": "jieshi-e01-s01-vidu-video-attempt05",
+      "seal_terminal_frame": false,
+      "target_asset_role": "final_visual"
+    },
+    "mode": "image_to_video",
+    "model_id": "viduq3-pro",
+    "output_requirement": {
+      "container": "mp4",
+      "dimension_mode": "adaptive",
+      "duration_seconds": 4,
+      "fps": 24,
+      "frame_count": null,
+      "height": null,
+      "mime_type": "video/mp4",
+      "native_audio": true,
+      "ratio": "adaptive",
+      "resolution_label": "1080p",
+      "timing_mode": "exact_seconds",
+      "width": null
+    },
+    "plan_hash": "be8fb8facb5a671fad130e2a1f349ac2296f9617c715072ac44a572a1d055e1a",
+    "provider_bound_request_hash": "094c144d93f0eee1e66bee9f6f1b98e48f9fd58cb2e3c22db5274cbeb89a7175",
+    "provider_kind": "vidu",
+    "provider_name": "vidu",
+    "provider_profile": {
+      "profile_id": "vidu-official-q3",
+      "profile_path": "provider-profiles/868f3c99e9841118a4b3a2df34b323b0e52b711d489a349d836c89c1412ca3e3.json",
+      "profile_sha256": "868f3c99e9841118a4b3a2df34b323b0e52b711d489a349d836c89c1412ca3e3",
+      "profile_version": "vidu-q3-2026-09-05"
+    },
+    "requirement_hash": "b14c3824d068a6a0b473171670289c2a04cc71b0d3cea3b56fafc2d7529c4984",
+    "semantic_routing_hash": "de1e42bf6ae722a1818b3443404dd74037dce9f78c0741f36fbfce22654a0e6e",
+    "target_shot_content_hash": "de06d29d761e12671aaeb719296c1a96727775b8987e9cbb8291de90b627e608",
+    "target_shot_id": "S01",
+    "target_shot_revision": 5,
+    "verified_projection_hash": "c9c04fa01186371cee4c625a37396725380de53b1095ccf0fa9484eccbf03b84"
+  }
+}

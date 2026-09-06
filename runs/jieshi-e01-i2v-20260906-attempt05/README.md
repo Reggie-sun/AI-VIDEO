@@ -2,6 +2,10 @@
 
 ## Status
 
+最终更新：已执行一次真实首尾帧生成并下载，MP4 SHA256 `292aae3a02357a96e129879af07b19ff6340c37f801d8bc7833d82fa7b2588cb`，3,689,055 bytes。逐镜 **FAIL**：左手目标姿态约3.5–4秒才达到；准确广播等仍NOT_EVALUATED。详见 `preparation-v1/shot-01-gate.md`。一次submit额度已消费，无activation、无S02。以下准备状态保留为历史。
+
+更新：用户已回复“同意”；新末帧 canonical import 已完成，receipt content hash 为 `c1ffc3e43f26f4f29c7ad276e67ab1429f9e909f30bd5c01413e37b8d5ac8bb4`。首尾帧请求 `83680c436cf3694be09a2982e1ac8d110ef5aafe2b5bdc41fd39e1a812649f68` 和 paid preview 已封存。以下“待确认”描述保留为前一检查点历史；当前尚未 submit，提交前审查进行中。
+
 2026-09-06：仅完成新末帧候选、离线接入修复和 independent canonical bootstrap。没有新的视频 POST、MP4 或逐镜 PASS；S02 仍阻断。
 
 - 输入首帧 SHA256：`4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb`。

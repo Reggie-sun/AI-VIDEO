@@ -1,0 +1,39 @@
+{
+  "schema_version": "1",
+  "source_surface": "codex_imagegen_tool",
+  "declared_ui_product_label": "Codex image_gen.imagegen",
+  "backend_model_id": null,
+  "original_filename": "shot-01-last-frame-v1.png",
+  "output_sha256": "059bb2b261883190168057b35baafc90011866acba9fb64b1c9c186122861330",
+  "output_size_bytes": 1998073,
+  "output_width": 941,
+  "output_height": 1672,
+  "imported_at": "2026-09-06T08:48:04.256743+00:00",
+  "prompt_fingerprint": "3d9c9f3152af19e3631c256f171fdbd29527a6481c5aa038c5fc7925704d3995",
+  "references": [
+    {
+      "role": "shot_endpoint",
+      "creative_artifact_id": "jieshi-e01-S01",
+      "creative_revision": 4,
+      "creative_content_hash": "f8707e8b78a92b757733d0e2fe4bcf50f6dcd8a0ee5b146b81194098c5a0c175",
+      "creative_artifact_path": "creative/shots/jieshi-e01-S01-r4.yaml",
+      "asset_role": "first_frame",
+      "asset_id": "image-import-89318576d4eed1eafaaba834f57b832f8376168d25ac735125791966ad9109b1",
+      "asset_sha256": "4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb"
+    }
+  ],
+  "target_kind": "repair_replacement",
+  "target_artifact_id": "jieshi-e01-S01",
+  "target_asset_role": "last_frame",
+  "human_actor": {
+    "actor_id": "reggie",
+    "actor_kind": "human"
+  },
+  "approved": true,
+  "approved_at": "2026-09-06T09:06:51.315234+00:00",
+  "license_source_note": "Project fictional image edited with Codex image_gen tool from the registered first frame. User replied 同意 to the exact endpoint input-use question in this session; approval recorded now. No human video-quality verdict or backend-model attestation.",
+  "provider_request_id": null,
+  "durable_submit_intent_present": false,
+  "automated_browser": false,
+  "content_hash": "c1ffc3e43f26f4f29c7ad276e67ab1429f9e909f30bd5c01413e37b8d5ac8bb4"
+}

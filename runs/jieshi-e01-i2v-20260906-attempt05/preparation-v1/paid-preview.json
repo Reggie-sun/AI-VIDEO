@@ -1,0 +1,42 @@
+{
+  "attempt_id": "jieshi-e01-s01-vidu-i2v-attempt05",
+  "operation": "video_generation",
+  "provider_kind": "vidu",
+  "model_id": "viduq3-pro",
+  "request_fingerprint": "83680c436cf3694be09a2982e1ac8d110ef5aafe2b5bdc41fd39e1a812649f68",
+  "billing_mode": "remote_metered",
+  "currency": "CNY",
+  "estimated_cost_upper_bound_microunits": 3000000,
+  "destination": "https://api.vidu.cn",
+  "method": "POST",
+  "egress_items": [
+    {
+      "item_id": "prompt",
+      "sha256": "61cc3a1f478f635f990a5a7050cbe72c43e8ee7a634543be8c8a15d0ee75ad49",
+      "size_bytes": 2699,
+      "mime_type": "text/plain",
+      "purpose": "prompt"
+    },
+    {
+      "item_id": "image-import-89318576d4eed1eafaaba834f57b832f8376168d25ac735125791966ad9109b1",
+      "sha256": "4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb",
+      "size_bytes": 2064319,
+      "mime_type": "image/png",
+      "purpose": "reference"
+    },
+    {
+      "item_id": "image-import-c1ffc3e43f26f4f29c7ad276e67ab1429f9e909f30bd5c01413e37b8d5ac8bb4",
+      "sha256": "059bb2b261883190168057b35baafc90011866acba9fb64b1c9c186122861330",
+      "size_bytes": 1998073,
+      "mime_type": "image/png",
+      "purpose": "reference"
+    }
+  ],
+  "retention_mode": "provider_standard",
+  "provider_policy_snapshot_id": "jieshi-s01-vidu-i2v-user-20260906",
+  "secret_reference": {
+    "kind": "secret_store",
+    "reference_id": "VIDU_API_KEY"
+  },
+  "preview_fingerprint": "faf2e760c63976ce72e55e53cc7e4bc7ef7548d7576ed89c0ab9fd6401d8e2b5"
+}

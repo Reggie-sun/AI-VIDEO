@@ -1,0 +1,522 @@
+{
+  "plan_hash": "be8fb8facb5a671fad130e2a1f349ac2296f9617c715072ac44a572a1d055e1a",
+  "projection_hash": "c9c04fa01186371cee4c625a37396725380de53b1095ccf0fa9484eccbf03b84",
+  "requirement": {
+    "asset_evidence": [
+      {
+        "asset_id": "image-import-89318576d4eed1eafaaba834f57b832f8376168d25ac735125791966ad9109b1",
+        "asset_sha256": "4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb",
+        "canonical_owner_content_hash": "de06d29d761e12671aaeb719296c1a96727775b8987e9cbb8291de90b627e608",
+        "canonical_owner_id": "S01",
+        "duration_millis": null,
+        "fps": null,
+        "height": 1672,
+        "mime_type": "image/png",
+        "role": "first_frame",
+        "size_bytes": 2064319,
+        "width": 941
+      },
+      {
+        "asset_id": "image-import-c1ffc3e43f26f4f29c7ad276e67ab1429f9e909f30bd5c01413e37b8d5ac8bb4",
+        "asset_sha256": "059bb2b261883190168057b35baafc90011866acba9fb64b1c9c186122861330",
+        "canonical_owner_content_hash": "de06d29d761e12671aaeb719296c1a96727775b8987e9cbb8291de90b627e608",
+        "canonical_owner_id": "S01",
+        "duration_millis": null,
+        "fps": null,
+        "height": 1672,
+        "mime_type": "image/png",
+        "role": "last_frame",
+        "size_bytes": 1998073,
+        "width": 941
+      }
+    ],
+    "audio_need": "required",
+    "c4_multi_anchor_binding": null,
+    "capability_need": {
+      "accepts_local_execution": true,
+      "accepts_remote_execution": true,
+      "max_reference_count": null,
+      "needs_continuity_state": false,
+      "needs_first_frame": true,
+      "needs_identity_reference": false,
+      "needs_last_frame": true,
+      "needs_native_audio": true,
+      "needs_scene_reference": false,
+      "needs_terminal_reference": false
+    },
+    "characters": [
+      {
+        "allowed_variations": [
+          "恐惧强度和呼吸变化",
+          "衣服完整，无伤口无换装"
+        ],
+        "appearance_bible": "椭圆脸、齐肩深黑直发、中分、无刘海，身高约165cm。",
+        "artifact_id": "jieshi-e01-character-G",
+        "character_id": "G",
+        "content_hash": "552b2ec3b7d4632702f73b4ffb5e2ee6e61942a5746cb3a426ce91f070c749d4",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "identity": "约20岁女性，制作角色名苏遥；本集对白、手机文字和监控提示均不揭露她的姓名或身份，只显示她更早警觉，绝不证实短信由她发送。",
+        "name": "苏遥",
+        "reference_asset_ids": [],
+        "revision": 1,
+        "schema_version": "2.0",
+        "source_provenance": [
+          {
+            "content_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921",
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json"
+          }
+        ],
+        "voice_profile": null,
+        "wardrobe": [
+          "米白短外套",
+          "墨绿圆领上衣",
+          "深蓝直筒牛仔裤",
+          "白色帆布鞋"
+        ]
+      },
+      {
+        "allowed_variations": [
+          "倒影缺席只发生于S01，S05恢复；属于界蚀初期观测异常，不算额外一次预见",
+          "S33后工作群里他的成员记录消失",
+          "S37后工牌头像姓名消失，其余版面和挂绳保持",
+          "结尾母亲不认识他且历史监控追溯性缺席；在女孩的直接视野中仍可见"
+        ],
+        "appearance_bible": "窄长脸、直眉、短黑发左侧自然分缝，干净下颌；身高约178cm，偏瘦；不使用演员或既有作品人物相貌。",
+        "artifact_id": "jieshi-e01-character-LY",
+        "character_id": "LY",
+        "content_hash": "e000dd9c538f86069de604ddfe2b0f52545eeb27e4d677f19980674bb3d98677",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "identity": "24岁男性，普通上班族；观察、求证，不主动解释未知机制。",
+        "name": "林砚",
+        "reference_asset_ids": [],
+        "revision": 1,
+        "schema_version": "2.0",
+        "source_provenance": [
+          {
+            "content_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921",
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json"
+          }
+        ],
+        "voice_profile": null,
+        "wardrobe": [
+          "深灰短夹克敞开",
+          "浅灰圆领T恤",
+          "黑色直筒长裤",
+          "灰白运动鞋",
+          "蓝色挂绳矩形白工牌"
+        ]
+      },
+      {
+        "allowed_variations": [
+          "S20消失、S21出现在远端属于明确异常；不得生成瞬移拖影或实体变形"
+        ],
+        "appearance_bible": "灰白短发，瘦脸，圆肩。",
+        "artifact_id": "jieshi-e01-character-P1",
+        "character_id": "P1",
+        "content_hash": "7dbea2e0bfb013afe3e8aa2b5141d8f70305461eb7448b66e64a2707a1da9ec4",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "identity": "65岁左右男性乘客，第一位下车者；异常投影的性质不解释。",
+        "name": "周伯祥",
+        "reference_asset_ids": [],
+        "revision": 1,
+        "schema_version": "2.0",
+        "source_provenance": [
+          {
+            "content_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921",
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json"
+          }
+        ],
+        "voice_profile": null,
+        "wardrobe": [
+          "棕色针织开衫",
+          "灰衬衫",
+          "黑裤",
+          "黑布鞋"
+        ]
+      },
+      {
+        "allowed_variations": [
+          "坐下→起身→单次肩撞→伸右手挡门；无受伤表现"
+        ],
+        "appearance_bible": "方脸、短寸发，中等身形。",
+        "artifact_id": "jieshi-e01-character-P2",
+        "character_id": "P2",
+        "content_hash": "b70805bc2314853c631305efe4ec01ee429707ec8e540cb73f8c2bac97018d08",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "identity": "约35岁男性乘客，起初邻座，后堵门。",
+        "name": "陈立",
+        "reference_asset_ids": [],
+        "revision": 1,
+        "schema_version": "2.0",
+        "source_provenance": [
+          {
+            "content_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921",
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json"
+          }
+        ],
+        "voice_profile": null,
+        "wardrobe": [
+          "灰色连帽卫衣",
+          "深蓝长裤",
+          "黑鞋"
+        ]
+      },
+      {
+        "allowed_variations": [
+          "单次抬眼或站起；不群跑、不新增独立动作"
+        ],
+        "appearance_bible": "30岁，短发，海军蓝风衣、黑裤，黑色手机",
+        "artifact_id": "jieshi-e01-character-P3",
+        "character_id": "P3",
+        "content_hash": "0936c625974c6bf3e89680ea0159ab67c6b4624a064b8d6803898002127cfc60",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "identity": "静态背景乘客，不增加支线。",
+        "name": "许雯",
+        "reference_asset_ids": [],
+        "revision": 1,
+        "schema_version": "2.0",
+        "source_provenance": [
+          {
+            "content_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921",
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json"
+          }
+        ],
+        "voice_profile": null,
+        "wardrobe": [
+          "30岁，短发，海军蓝风衣、黑裤，黑色手机"
+        ]
+      },
+      {
+        "allowed_variations": [
+          "单次抬眼或站起；不群跑、不新增独立动作"
+        ],
+        "appearance_bible": "40岁，黑色棒球帽、深蓝棉外套、灰裤，无独立道具",
+        "artifact_id": "jieshi-e01-character-P4",
+        "character_id": "P4",
+        "content_hash": "6fbd23977ae881c8817e783c413c6c164c7d6424463cde3a98ff3804d375a3fc",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "identity": "静态背景乘客，不增加支线。",
+        "name": "郭向东",
+        "reference_asset_ids": [],
+        "revision": 1,
+        "schema_version": "2.0",
+        "source_provenance": [
+          {
+            "content_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921",
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json"
+          }
+        ],
+        "voice_profile": null,
+        "wardrobe": [
+          "40岁，黑色棒球帽、深蓝棉外套、灰裤，无独立道具"
+        ]
+      },
+      {
+        "allowed_variations": [
+          "单次抬眼或站起；不群跑、不新增独立动作"
+        ],
+        "appearance_bible": "25岁，细黑框眼镜、卡其夹克、黑裤，无独立道具",
+        "artifact_id": "jieshi-e01-character-P5",
+        "character_id": "P5",
+        "content_hash": "2c4a41d7e7fc83b50c6cb32e38ae2b00a172dbfa9857a3582dd18adb2da36890",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "identity": "静态背景乘客，不增加支线。",
+        "name": "沈嘉程",
+        "reference_asset_ids": [],
+        "revision": 1,
+        "schema_version": "2.0",
+        "source_provenance": [
+          {
+            "content_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921",
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json"
+          }
+        ],
+        "voice_profile": null,
+        "wardrobe": [
+          "25岁，细黑框眼镜、卡其夹克、黑裤，无独立道具"
+        ]
+      },
+      {
+        "allowed_variations": [
+          "单次抬眼或站起；不群跑、不新增独立动作",
+          "S34由坐到站时放袋，灰布袋留原座位。"
+        ],
+        "appearance_bible": "45岁，低马尾、酒红针织衫、黑裤。",
+        "artifact_id": "jieshi-e01-character-P6",
+        "character_id": "P6",
+        "content_hash": "2c321aaea03e2d4e548ccf6cc72b328689cd0ab9f4dc5114d13ca6069e104d18",
+        "creation_receipt_id": "authoring-jieshi-e01-r1",
+        "identity": "静态背景乘客，不增加支线。",
+        "name": "何静",
+        "reference_asset_ids": [],
+        "revision": 1,
+        "schema_version": "2.0",
+        "source_provenance": [
+          {
+            "content_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921",
+            "kind": "derived",
+            "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json"
+          }
+        ],
+        "voice_profile": null,
+        "wardrobe": [
+          "酒红针织衫",
+          "黑裤"
+        ]
+      }
+    ],
+    "continuity_mode": "none",
+    "contract_version": "provider-neutral-video-requirement/1",
+    "generation_intent": {
+      "axis_continuity": {
+        "camera_axis": "unspecified",
+        "crossing_policy": "unspecified",
+        "framing_continuity": "unspecified"
+      },
+      "camera_endpoint": {
+        "end_framing": "相同构图，新增悬停左手",
+        "orientation_lock": true,
+        "position_lock": true,
+        "start_framing": "本人下部、黑窗上部"
+      },
+      "camera_intent": {
+        "expression_strength": "semantic_prompt_allowed",
+        "framing_intent": "28mm广角近景，坐姿眼高；同框呈现林砚本人及其空倒影座位，固定机位。",
+        "movement": "locked",
+        "stability": "locked-off static camera, no movement"
+      },
+      "close_state": {
+        "kind": "typed_text",
+        "required_change": false,
+        "state_hash": null,
+        "state_ref": null,
+        "state_text": "林砚左手悬停在玻璃前约2厘米；窗中仍没有他的脸、身体和手，七名他人的倒影保留。"
+      },
+      "identity_continuity": {
+        "allowed_variation": [
+          "仅眼神、呼吸、左手动作；consistent character appearance, same outfit and features throughout"
+        ],
+        "character_ids": [
+          "G",
+          "LY",
+          "P1",
+          "P2",
+          "P3",
+          "P4",
+          "P5",
+          "P6"
+        ],
+        "preservation": "exact"
+      },
+      "motion_envelope": {
+        "amplitude_class": "小幅自然动作",
+        "direction": "左手朝车窗",
+        "onset": "立即察觉",
+        "peak": "抬左手",
+        "settle": "左手悬停"
+      },
+      "open_state": {
+        "kind": "typed_text",
+        "required_change": false,
+        "state_hash": null,
+        "state_ref": null,
+        "state_text": "以已绑定的真实首帧为起点。林砚本人坐窗边，窗中保留七名他人的倒影，唯独林砚对应座位为空。从第一帧保持这项差异。"
+      },
+      "pacing": {
+        "cadence": "前三秒识别空倒影",
+        "shot_duration_seconds": 4.0,
+        "tempo_class": "紧凑克制"
+      },
+      "scene_continuity": {
+        "mood": "冷灰青色都市悬疑，非血腥、非鬼魂；虚构错误现实",
+        "scene_id": "SC01",
+        "state_constraints": [
+          "沿用输入图的同一机位、同一构图和冷白灯光。只有前景男子靠窗的空左手缓慢抬向玻璃，掌心向窗，前三秒内悬停；握手机的另一只手固定在大腿上。窗框边缘与全部七名倒影在画面中的坐标全程固定，画面四边保持与首帧一致。窗内始终是同一组七个人和同一块空蓝座位；空手经过的玻璃区域仍显示原来的空座与车厢背景，林砚的人脸、身体、手均没有镜像。输出纯摄影画面，画面下部保持人物衣物和座位原貌，全程没有字幕、文字或数字覆盖。音频轨道独立：低沉轮轨声、轻微衣料摩擦，画外列车喇叭在0.1至2.7秒说出林砚，请在终点站下车。这句话只被听见，不在画面中显示。男子闭嘴倾听。无音乐。"
+        ],
+        "time_of_day": "深夜"
+      },
+      "space_continuity": {
+        "crossing_policy": "unspecified",
+        "entrance_state": null,
+        "exit_state": null,
+        "screen_direction": "unspecified",
+        "subject_position": "unspecified"
+      },
+      "subject_action": {
+        "endpoint": {
+          "required_change": true,
+          "state_hash": null,
+          "state_ref": null,
+          "state_text": "左手停在玻璃前，玻璃内没有手。"
+        },
+        "progression": "林砚靠窗的空手是他的左手：起始位于画面右侧膝上，五指空着。只有这只空左手向右上方车窗缓慢抬起，掌心朝向玻璃，3秒前在玻璃前约2厘米停住。画面左侧握着黑手机的右手、右前臂始终贴在大腿上，位置固定。目光保持看玻璃，嘴唇闭合。",
+        "start_state": "林砚看向窗中自己的空位，眉间收紧。"
+      }
+    },
+    "generation_intent_hash": "d00e5b24b87a81132abd443dbfd09da058208caaf5759ae52421869f9c70510d",
+    "generation_mode": "first_last_frame_video",
+    "intent_evidence_hash": "3623f3060f56c75c73923c9c6a704860063b320fdc61a76fdeced630ebb7ecb6",
+    "motion_requirement": "character_action",
+    "output_need": {
+      "aspect_ratio": "adaptive",
+      "container_mime": "video/mp4",
+      "duration_seconds": 4.0,
+      "fps": 24,
+      "frame_count": null,
+      "geometry_policy": "adaptive",
+      "height": null,
+      "timing_mode": "fixed",
+      "width": null
+    },
+    "quality_need": {
+      "minimum_codec": null,
+      "minimum_raster": null,
+      "native_enforcement_required": false,
+      "objective_tier": "production"
+    },
+    "requirement_hash": "b14c3824d068a6a0b473171670289c2a04cc71b0d3cea3b56fafc2d7529c4984",
+    "requirement_id": "video-requirement-b14c3824d068a6a0b4731716",
+    "review_evidence": null,
+    "scene": {
+      "artifact_id": "jieshi-e01-scene-SC01",
+      "content_hash": "3058cebf335dad4350932ce39443d9d6508cb29535a09885d73524b42401413d",
+      "continuity_constraints": [
+        "固定空间：A区座位在D侧门左后；B区是D门内侧，黄色门槛线；C连接门在车厢纵轴前端。A1人物逃生沿纵轴朝C，不横穿站台。",
+        "主轴摄影机在过道靠左座椅一侧，看向C；对话林砚屏幕左/苏遥屏幕右。反打经正面中性构图过渡；不凭切镜左右互换。",
+        "六名普通乘客周伯祥-何静，加林砚和苏遥，共八名实体。周伯祥下车后A1剩七名实体；S34之后五名异常乘客可分局部拍，不增加群众。",
+        "深灰地胶、蓝色长椅、银色立杆、D门黄色门槛；纵向扶杆间距与电子屏位置固定。",
+        "A1正常→停顿→异常停靠；未来废弃版只改材质和空置状态，不能重建门窗。A2空置正常版；没有凭空多一节第三车厢。 正常站末段允许相邻既有车门的门框插入，只作他人先下车证据，不建立第三车厢内景。",
+        "D侧门：S17打开，S28错误现实关闭；回现实仍打开；S31堵门后保持打开至两人进入A2。C门：S38前关闭，S39打开，S41关闭。",
+        "车窗倒影例外只按逐镜声明；其他时刻人数、物理左右和脸一致。"
+      ],
+      "creation_receipt_id": "89318576d4eed1eafaaba834f57b832f8376168d25ac735125791966ad9109b1",
+      "location": "虚构城市环线地铁车厢；A1与相邻A2共用同一车厢几何，以门区与空置状态区分。",
+      "mood": "冷白人工光与正常交通声形成认知冲突。",
+      "participant_ids": [
+        "LY",
+        "G",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6",
+        "PA",
+        "M",
+        "N1"
+      ],
+      "revision": 2,
+      "scene_id": "SC01",
+      "schema_version": "2.0",
+      "source_provenance": [
+        {
+          "content_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921",
+          "kind": "derived",
+          "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json"
+        }
+      ],
+      "time": "深夜；手机初始00:17；无昼夜跳跃。",
+      "visual_reference_asset_ids": [
+        "image-import-89318576d4eed1eafaaba834f57b832f8376168d25ac735125791966ad9109b1"
+      ]
+    },
+    "semantic_reference_roles": [
+      "first_frame",
+      "last_frame"
+    ],
+    "source_request_content_hash": "534943205be9aab32bfe3ca564f6f22c44ea065371fcdbaf9b7c46066a7f4ded",
+    "target_shot": {
+      "artifact_id": "jieshi-e01-S01",
+      "character_ids": [
+        "LY",
+        "G",
+        "P1",
+        "P2",
+        "P3",
+        "P4",
+        "P5",
+        "P6"
+      ],
+      "composition_directives": [],
+      "content_hash": "de06d29d761e12671aaeb719296c1a96727775b8987e9cbb8291de90b627e608",
+      "continuity_constraints": [
+        "林砚坐A区末位，镜头内本人右侧脸和肩占下方；玻璃占上方。",
+        "左手距窗约2cm停住；不是先见正常再逐渐消失。",
+        "接S02：左手悬在窗前。",
+        "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。"
+      ],
+      "creation_receipt_id": "c1ffc3e43f26f4f29c7ad276e67ab1429f9e909f30bd5c01413e37b8d5ac8bb4",
+      "dialogue": "列车广播→林砚：林砚，请在终点站下车。",
+      "duration_policy": {
+        "maximum_seconds": null,
+        "minimum_seconds": null,
+        "mode": "fixed",
+        "seconds": 3.0
+      },
+      "generated_video_rationale": "人物微表演、手部接触与空间异常需要动态素材；具体component与后期层见authoring proposal。",
+      "hybrid_layers": [],
+      "intent": "不存在的倒影：首帧已见六名乘客与苏遥的完整倒影，林砚对应位置为空；林砚看向空位并抬左手靠玻璃，玻璃里没有手。",
+      "motion_directives": [],
+      "narration": "",
+      "required_asset_roles": [
+        {
+          "allowed_asset_types": [
+            "video"
+          ],
+          "asset_ids": [],
+          "role": "final_visual"
+        },
+        {
+          "allowed_asset_types": [
+            "image"
+          ],
+          "asset_ids": [
+            "image-import-89318576d4eed1eafaaba834f57b832f8376168d25ac735125791966ad9109b1"
+          ],
+          "role": "first_frame"
+        },
+        {
+          "allowed_asset_types": [
+            "image"
+          ],
+          "asset_ids": [
+            "image-import-c1ffc3e43f26f4f29c7ad276e67ab1429f9e909f30bd5c01413e37b8d5ac8bb4"
+          ],
+          "role": "last_frame"
+        }
+      ],
+      "review_policy": {
+        "required_checks": [
+          "identity",
+          "spatial_continuity",
+          "dramatic_action",
+          "text_readability"
+        ]
+      },
+      "revision": 5,
+      "scene_id": "SC01",
+      "schema_version": "2.0",
+      "shot_id": "S01",
+      "source_provenance": [
+        {
+          "content_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921",
+          "kind": "derived",
+          "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json"
+        }
+      ],
+      "storyboard_beat_id": "B01-SC01",
+      "visual_strategy": "generated_video"
+    }
+  },
+  "target_shot_content_hash": "de06d29d761e12671aaeb719296c1a96727775b8987e9cbb8291de90b627e608",
+  "target_shot_id": "S01",
+  "target_shot_revision": 5,
+  "verified_source_request_content_hash": "534943205be9aab32bfe3ca564f6f22c44ea065371fcdbaf9b7c46066a7f4ded"
+}

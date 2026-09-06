@@ -22,7 +22,7 @@ RUN = Path(__file__).resolve().parent
 ROOT = RUN / "production-s01-v5"
 PREP = RUN / "preparation-v1"
 ATTEMPT = "jieshi-e01-s01-vidu-i2v-attempt05"
-EXPECTED = "PENDING_CANONICAL_PREPARATION"
+EXPECTED = "83680c436cf3694be09a2982e1ac8d110ef5aafe2b5bdc41fd39e1a812649f68"
 
 
 def event(kind, **fields):
