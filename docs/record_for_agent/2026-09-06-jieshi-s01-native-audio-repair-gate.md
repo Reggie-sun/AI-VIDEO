@@ -7,6 +7,12 @@ evidence_index_version: "1"
 
 # S01 Native Audio Repair Gate
 
+## Follow-up Notice
+
+2026-09-06 用户另行授权 attempt03；左手/手机动作改善，但烧录字幕和机位移动仍FAIL。
+见[后续测试](2026-09-06-jieshi-s01-spatial-hand-repair-gate.md)。本记录的attempt02测量与FAIL
+保留，末尾quota停止条件属于当次授权；最新独立测试亦已用尽一次submit。
+
 ## Current Runtime Truth
 
 用户再次“授权”后，完成一个 Vidu `viduq3-pro` I2V submit；4 秒、1080p、原生音频开启。
@@ -50,7 +56,7 @@ Harness inspect 将新 runs scripts 判为 fallback，要求 full tests / archit
 
 | evidence_id | independence_key | experiment_id | attempt_id | arm_id | artifact_sha256 | proof_layer | verdict | failure_class | relation_kind | related_evidence_id | source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| s01-native-repair-gate | request:cdf6a55c1d3586fbad30e5649306ef38f99d924afec645144d4daf5f9e96df9c | jieshi-s01-first-frame-repair | jieshi-e01-s01-vidu-i2v-attempt02 | N/A | 49e585e89585449627431e3fe7395d64c1fa4bd42c9d400a3863fdde06fcb5f8 | agent_review_of_mcp | FAIL | WRONG_HAND_AND_BURNED_CAPTIONS | NEW_ATTEMPT | NONE | runs/jieshi-e01-i2v-20260906-attempt02/preparation-v3/shot-01-gate.md |
+| s01-native-repair-gate | request:cdf6a55c1d3586fbad30e5649306ef38f99d924afec645144d4daf5f9e96df9c | jieshi-s01-first-frame-repair | jieshi-e01-s01-vidu-i2v-attempt02 | N/A | 49e585e89585449627431e3fe7395d64c1fa4bd42c9d400a3863fdde06fcb5f8 | AGENT_REVIEW_OF_MCP | FAIL | WRONG_HAND_AND_BURNED_CAPTIONS | NEW_ATTEMPT | NONE | runs/jieshi-e01-i2v-20260906-attempt02/preparation-v3/shot-01-gate.md |
 
 ## Learning And Next Work
 
