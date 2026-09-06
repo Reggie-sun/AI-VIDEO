@@ -225,14 +225,14 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptR
         assert dialogue.verbatim_text is not None
         assert dialogue_language is not None
         dialogue_text = (
-            f"Speaker {dialogue.speaker_id} is "
+            f"Speaker 1 (S1), identified as {dialogue.speaker_id}, is "
             f"{'on-screen' if dialogue.on_screen else 'off-screen'}. "
             "Performance and response direction, not spoken aloud: "
             f"{dialogue.response_obligation}. "
             f"Speak only from {dialogue.start_seconds:.3f}s to {dialogue.end_seconds:.3f}s. "
             f"Lip synchronization is {'required' if dialogue.lip_sync_required else 'not required'}. "
             "Only the words inside the following marked dialogue are spoken, once. "
-            f"Speaker {dialogue.speaker_id} says exactly and only: "
+            "Speaker 1 (S1) says exactly and only: "
             f"<d>[{dialogue_language}] {dialogue.verbatim_text}</d> "
             "No narration or other speech outside this marked dialogue."
         )

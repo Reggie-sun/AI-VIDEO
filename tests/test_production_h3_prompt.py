@@ -673,11 +673,11 @@ def test_h3_prompt_preserves_exact_dialogue_bytes_and_sealed_music(
     assert result.prompt_text.index("<d>") < result.prompt_text.index("scene room")
     assert "Speak only from 0.500s to 2.000s." in result.prompt_text
     position = "on-screen" if on_screen else "off-screen"
-    assert f"Speaker hero is {position}." in result.prompt_text
+    assert f"Speaker 1 (S1), identified as hero, is {position}." in result.prompt_text
     assert result.prompt_text.index("elder acknowledges") < result.prompt_text.index("<d>")
     sync = "required" if on_screen else "not required"
     assert f"Lip synchronization is {sync}." in result.prompt_text
-    assert "says exactly and only:" in result.prompt_text
+    assert "Speaker 1 (S1) says exactly and only:" in result.prompt_text
     assert "No narration or other speech outside this marked dialogue." in result.prompt_text
     assert "non_diegetic_music: muted guzheng; 72 bpm sparse pulse; low under dialogue" in result.prompt_text
 

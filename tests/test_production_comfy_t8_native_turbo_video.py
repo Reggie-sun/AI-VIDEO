@@ -631,6 +631,8 @@ def test_i2va_compiler_uses_native_h3_prompt_for_v4_requirement(
     compiled = provider.compile_request(provider_bound, requirement)
 
     assert isinstance(compiled, CompiledProviderVideoRequest)
+    assert "Speaker 1 (S1), identified as announcer, is off-screen." in compiled.provider_native_prompt
+    assert "Speaker 1 (S1) says exactly and only:" in compiled.provider_native_prompt
     assert "<d>[Chinese] 林砚，请在终点站下车。</d>" in compiled.provider_native_prompt
     assert "dolly in with subtle amplitude at slow speed" in compiled.provider_native_prompt
     assert compiled.request.mode is VideoGenerationMode.IMAGE_TO_VIDEO
