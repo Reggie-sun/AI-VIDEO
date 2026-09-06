@@ -358,6 +358,40 @@ contract，本轮没有 foreground rebuild、等待/poll、validation weakening 
 code/tests/contracts 与 sanitized session audit。没有修改 retrieval implementation 或 Product
 Runtime，也没有 Provider、媒体、网络、activation、quality acceptance、push 或 release 操作。
 
+## Library Compatibility Recovery — 2026-09-06
+
+本节更新上文历史 `index library version mismatch` 的当前处理状态；保留原始失败记录，
+不将历史 strict failure 描述为仍未恢复的本机现状。
+
+`31f573322f01f218774d2d630e3d968c669fa0fe` 为 library mismatch 增加独立 typed
+classification。只有 manifest authority、version identity 与只读 physical integrity
+检查全部成立时，CLI 才 enqueue exact incompatible shards 并以 exit 3 返回；不返回
+旧版本 hits。其他 corruption 仍以 exit 2 fail closed。检查 incompatible SQLite 使用
+read-only immutable inspection，不通过 Chroma client 打开旧库，避免验证触发 migration；
+未 checkpoint 的 WAL/journal、跨 shard corruption 与 preflight/query race 均有专门防护。
+
+本轮实际执行 `python -m scripts.agent_memory --scope all build` 成功：五个 main corpora
+共 7525 chunks，run summaries 9 chunks。六个 manifests 的 library versions 和 source
+digests 均与当时环境及语料一致。随后 `experience`、`superpowers` 与 `all` 三个 scope
+真实 CLI query 均 exit 0，返回 hits 全部标为 `fresh`。使用本机 ONNX embedding；
+没有 Provider submit、价格查询或 Production state mutation。重建按 shard 激活，
+不是全 scope 的单次原子事务；之后 source edits 仍会使对应 shard stale。
+
+Focused regression verification 为 8 passed；native `reviewer_xhigh` scoped review 为
+`accept with concerns`，无 blocking issue。剩余覆盖限制是 fixture 使用 current Chroma
+database 配合 old-version manifest，没有保留真实历史 Chroma format fixture。
+先前完整 Agent Memory suite 的 multilingual answerability calibration 曾失败；
+本轮没有降低 threshold、修改 assertion 或把一次独立 query 当作校准测试通过。
+完整 Harness 结果以 `.agent/harness/runs/rag-resumed-20260906/receipt.json` 为准，
+其 snapshot 包含其他 session 已提交的变更，不能把整个 range 都归为本任务修改。
+该轮执行期间其他 session 又推进 HEAD；因此该 receipt 不能被声称为最终 HEAD 的
+fresh code receipt。记录后的第一次 `experience` refresh 也因并发新增记录而拒绝
+activation（`corpus 'experience' changed during index build`），不能与 library mismatch
+混为同一故障，也不能通过忽略 source digest 来绕过。
+
+本次属于 recovery/implementation evidence；automatic learning evaluation 为
+`no_candidate`，未创建或采用跨实验 Learning Claim。
+
 ## Guardrails
 
 - `experience` 记录是 advisory experience，不等于 code/runtime truth。
