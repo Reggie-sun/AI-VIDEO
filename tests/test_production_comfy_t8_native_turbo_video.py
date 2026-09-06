@@ -28,6 +28,10 @@ from ai_video.production.comfy_t8_native_turbo_video import (
     render_t8_native_turbo_workflow,
     t8_native_turbo_capabilities,
 )
+from ai_video.production.hashing import canonical_sha256
+from ai_video.production._video_capability_fingerprint import (
+    capability_variant_fingerprint,
+)
 from ai_video.production.models import (
     DependencyGraphSnapshotPointer,
     ProjectSnapshotPointer,
@@ -36,6 +40,8 @@ from ai_video.production.models import (
 from ai_video.production.shot_router import (
     AdapterCompilerContract,
     MotionRequirement,
+    ProviderBoundVideoRequest,
+    RouterAssetIdentity,
     RoutingOutcome,
     VideoGenerationResolver,
 )
@@ -54,16 +60,26 @@ from ai_video.production.video_contracts import (
     VideoFlexibleOutputRequirement,
     VideoMediaReferenceBinding,
 )
-from ai_video.production.video_compiler import CompiledProviderVideoRequest
+from ai_video.production.video_compiler import (
+    CompiledProviderVideoRequest,
+    ProviderRequirementUnsupported,
+    ProviderRequirementUnsupportedReason,
+)
 from ai_video.production.video_requirement import (
     AssetEvidence,
     AudioNeed,
+    ExpressionStrength,
     ContinuityMode as RequirementContinuityMode,
     GenerationMode as RequirementGenerationMode,
     OutputGeometryPolicy,
     OutputNeed,
+    DialogueIntent,
+    Pacing,
+    ProviderNeutralVideoRequirement,
     SemanticReferenceRole,
 )
+from test_production_video_intent_validation import _complete_intent
+from test_production_video_requirement import _v4_requirement_kwargs
 from ai_video.workflow_loader import load_workflow_template
 from test_production_provider_neutral_adapters import _replace_requirement
 from test_production_shot_router import (
@@ -429,6 +445,237 @@ def test_fl2va_compiler_preserves_neutral_first_last_frame_mode(
     assert tuple(item.role for item in compiled.request.image_bindings) == (
         "first_frame",
         "last_frame",
+    )
+
+    blocked_intent = projection.requirement.generation_intent.model_copy(
+        update={
+            "camera_intent": projection.requirement.generation_intent.camera_intent.model_copy(
+                update={
+                    "expression_strength": ExpressionStrength.NATIVE_CONTROL_REQUIRED
+                }
+            )
+        }
+    )
+    blocked_projection = _replace_requirement(
+        projection,
+        generation_intent=blocked_intent,
+        generation_intent_hash=canonical_sha256(blocked_intent.model_dump(mode="json")),
+    )
+    blocked_bound = ProviderBoundVideoRequest.create(
+        **{
+            **{
+                key: value
+                for key, value in routing.provider_bound_request.__dict__.items()
+                if key != "provider_bound_request_hash"
+            },
+            "requirement_hash": blocked_projection.requirement.requirement_hash,
+            "expression_strength": ExpressionStrength.NATIVE_CONTROL_REQUIRED,
+        }
+    )
+
+    rejected = provider.compile_request(blocked_bound, blocked_projection.requirement)
+
+    assert isinstance(rejected, ProviderRequirementUnsupported)
+    assert rejected.reason is ProviderRequirementUnsupportedReason.NATIVE_CONTROL_UNSUPPORTED
+    assert rejected.unsupported_field_paths == (
+        "generation_intent.camera_intent.expression_strength",
+    )
+
+
+def test_i2va_compiler_uses_native_h3_prompt_for_v4_requirement(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    profile = _load("I2VA")
+    seconds = 124 / 24
+    intent = _complete_intent()
+    intent = intent.model_copy(
+        update={
+            "pacing": Pacing(shot_duration_seconds=seconds),
+            "camera_intent": intent.camera_intent.model_copy(
+                update={
+                    "expression_strength": ExpressionStrength.SEMANTIC_PROMPT_ALLOWED
+                }
+            ),
+            "dialogue_intent": DialogueIntent(
+                mode="dialogue",
+                language="zh-CN",
+                speaker_id="announcer",
+                verbatim_text="林砚，请在终点站下车。",
+                start_seconds=0.5,
+                end_seconds=2.0,
+                on_screen=False,
+                response_obligation="Lin Yan freezes",
+            ),
+        }
+    )
+    payload = _v4_requirement_kwargs()
+    payload.update(
+        generation_intent=intent,
+        generation_intent_hash=canonical_sha256(
+            {
+                "schema": "provider-neutral-generation-intent/2",
+                "generation_intent": intent.model_dump(mode="json"),
+            }
+        ),
+        conditioning_compatibility=payload["conditioning_compatibility"].model_copy(
+            update={"available_duration_seconds": seconds}
+        ),
+        asset_evidence=(
+            AssetEvidence(
+                role=SemanticReferenceRole.FIRST_FRAME,
+                asset_id="frame-shot-1",
+                asset_sha256="1" * 64,
+                mime_type="image/png",
+                width=1344,
+                height=768,
+                size_bytes=1024,
+            ),
+        ),
+        output_need=OutputNeed(
+            timing_mode="frame_count",
+            frame_count=124,
+            geometry_policy=OutputGeometryPolicy.EXACT,
+            width=1344,
+            height=768,
+            aspect_ratio="16:9",
+            fps=24,
+            container_mime="video/mp4",
+        ),
+        audio_need=AudioNeed.REQUIRED,
+        quality_need=payload["quality_need"].model_copy(
+            update={
+                "native_enforcement_required": False,
+                "minimum_raster": None,
+                "minimum_codec": None,
+            }
+        ),
+    )
+    requirement = ProviderNeutralVideoRequirement.create(**payload)
+    output = VideoFlexibleOutputRequirement(
+        timing_mode="frame_count",
+        frame_count=124,
+        dimension_mode="exact",
+        width=1344,
+        height=768,
+        resolution_label="h3_t8_native",
+        ratio="16:9",
+        fps=24,
+        container="mp4",
+        mime_type="video/mp4",
+        native_audio=True,
+    )
+    context = _context(important=False, shot_id="shot-1")
+    capability = t8_native_turbo_capabilities(profile).variants[0]
+    provider_bound = ProviderBoundVideoRequest.create(
+        plan_hash="d" * 64,
+        requirement_hash=requirement.requirement_hash,
+        verified_projection_hash="e" * 64,
+        target_shot_id=requirement.target_shot.shot_id,
+        target_shot_revision=requirement.target_shot.revision,
+        target_shot_content_hash=requirement.target_shot.content_hash,
+        semantic_routing_hash="a" * 64,
+        audit_decision_hash="b" * 64,
+        provider_name="comfy-local-h3-t8",
+        provider_kind=capability.provider_kind,
+        model_id=capability.model_id,
+        provider_profile=ProviderProfilePointer(
+            profile_id=profile.capability_id,
+            profile_version="v2",
+            profile_path=Path(
+                f"provider-profiles/{profile.profile_content_hash}.json"
+            ),
+            profile_sha256=profile.profile_content_hash,
+        ),
+        capability_id=capability.capability_id,
+        capability_fingerprint=capability_variant_fingerprint(capability),
+        execution_kind=capability.execution_kind,
+        billing_kind=capability.billing_kind,
+        mode=capability.mode,
+        binding_roles=("first_frame",),
+        input_assets=(
+            RouterAssetIdentity(
+                role="first_frame",
+                asset_id="frame-shot-1",
+                asset_sha256="1" * 64,
+                source_registry_revision_id="f" * 64,
+                mime_type="image/png",
+                size_bytes=1024,
+                width=1344,
+                height=768,
+            ),
+        ),
+        output_requirement=output,
+        lifecycle=_lifecycle(context).model_copy(
+            update={"input_artifact_ids": (context.target_shot_id, "frame-shot-1")}
+        ),
+        compiler_contract=AdapterCompilerContract.create(
+            compiler_id="comfy-local-h3-t8-native-turbo-video-compiler",
+            compiler_version="2",
+        ),
+        expression_strength=requirement.generation_intent.camera_intent.expression_strength,
+    )
+    provider = ComfyUIT8NativeTurboVideoProvider(
+        profile,
+        artifact_root=REPO_ROOT,
+        comfy_root=REPO_ROOT,
+        input_root=tmp_path,
+        asset_resolver=lambda *_: tmp_path / "unused",
+        runtime_inspector=lambda: (_ for _ in ()).throw(
+            AssertionError("offline compilation must not inspect runtime")
+        ),
+        transport=object(),
+    )
+    monkeypatch.setattr(provider, "capabilities", lambda: t8_native_turbo_capabilities(profile))
+
+    compiled = provider.compile_request(provider_bound, requirement)
+
+    assert isinstance(compiled, CompiledProviderVideoRequest)
+    assert "<d>[Chinese]林砚，请在终点站下车。</d>" in compiled.provider_native_prompt
+    assert "dolly in with subtle amplitude at slow speed" in compiled.provider_native_prompt
+    assert compiled.request.mode is VideoGenerationMode.IMAGE_TO_VIDEO
+
+    blocked_intent = intent.model_copy(
+        update={
+            "camera_intent": intent.camera_intent.model_copy(
+                update={
+                    "expression_strength": ExpressionStrength.NATIVE_CONTROL_REQUIRED
+                }
+            )
+        }
+    )
+    blocked_payload = requirement.model_dump(
+        mode="python",
+        exclude={"requirement_id", "requirement_hash"},
+    )
+    blocked_payload.update(
+        generation_intent=blocked_intent,
+        generation_intent_hash=canonical_sha256(
+            {
+                "schema": "provider-neutral-generation-intent/2",
+                "generation_intent": blocked_intent.model_dump(mode="json"),
+            }
+        ),
+    )
+    blocked_requirement = ProviderNeutralVideoRequirement.create(**blocked_payload)
+    blocked_bound = ProviderBoundVideoRequest.create(
+        **{
+            **{
+                key: value
+                for key, value in provider_bound.__dict__.items()
+                if key != "provider_bound_request_hash"
+            },
+            "requirement_hash": blocked_requirement.requirement_hash,
+            "expression_strength": ExpressionStrength.NATIVE_CONTROL_REQUIRED,
+        }
+    )
+
+    rejected = provider.compile_request(blocked_bound, blocked_requirement)
+
+    assert isinstance(rejected, ProviderRequirementUnsupported)
+    assert rejected.reason is ProviderRequirementUnsupportedReason.NATIVE_CONTROL_UNSUPPORTED
+    assert rejected.unsupported_field_paths == (
+        "generation_intent.camera_intent.expression_strength",
     )
 
 

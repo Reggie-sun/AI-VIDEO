@@ -25,6 +25,7 @@ from ai_video.production.comfy_t8_native_turbo_profile import (
     validate_t8_native_turbo_lora,
 )
 from ai_video.production.comfy_t8_video import ComfyUIT8VideoProvider
+from ai_video.production._h3_prompt import H3PromptCompilation, compile_h3_prompt
 from ai_video.production.local_video import (
     DurableLocalVideoSubmitPermit,
     LocalVideoSubmitIntent,
@@ -41,6 +42,9 @@ from ai_video.production.video import (
     VideoProviderCapabilities,
 )
 from ai_video.production.video_compiler import (
+    ProviderNativePrompt,
+    ProviderRequirementUnsupported,
+    ProviderRequirementUnsupportedReason,
     ProviderRequestCompilationResult,
     compile_provider_video_request,
 )
@@ -442,12 +446,29 @@ class ComfyUIT8NativeTurboVideoProvider(ComfyUIT8VideoProvider):
         provider_bound: ProviderBoundVideoRequest,
         requirement: ProviderNeutralVideoRequirement,
     ) -> ProviderRequestCompilationResult:
+        native_prompt = None
+        if requirement.contract_version == "provider-neutral-video-requirement/4":
+            prompt = compile_h3_prompt(requirement)
+            if not isinstance(prompt, H3PromptCompilation):
+                return ProviderRequirementUnsupported(
+                    requirement_hash=requirement.requirement_hash,
+                    provider_bound_request_hash=provider_bound.provider_bound_request_hash,
+                    selected_capability_id=provider_bound.capability_id,
+                    reason=ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+                    unsupported_field_paths=prompt.unsupported_field_paths,
+                )
+            native_prompt = ProviderNativePrompt(
+                grammar_contract="h3-three-field-v1",
+                prompt_text=prompt.prompt_text,
+                prompt_sha256=prompt.prompt_sha256,
+            )
         return compile_provider_video_request(
             provider_bound=provider_bound,
             requirement=requirement,
             compiler_id=_COMPILER_ID,
             compiler_version="2",
             capabilities=self.capabilities(),
+            native_prompt=native_prompt,
         )
 
     def resolve(

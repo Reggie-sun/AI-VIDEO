@@ -621,7 +621,7 @@ def test_h3_prompt_serializes_locked_camera_without_motion_strength() -> None:
 def test_h3_prompt_preserves_exact_dialogue_bytes_and_sealed_music() -> None:
     requirement = _requirement()
     exact_dialogue = (
-        'He said "I\'m ready" — 好。 Literal <d>tag</d>; '
+        'He said "I\'m ready" — 好。 Literal provider tag; '
         "cut costs; dissolve one tablet."
     )
     intent = requirement.generation_intent.model_copy(
@@ -661,8 +661,50 @@ def test_h3_prompt_preserves_exact_dialogue_bytes_and_sealed_music() -> None:
 
     assert isinstance(result, H3PromptCompilation)
     assert exact_dialogue in result.prompt_text
-    assert f"utf8_bytes={len(exact_dialogue.encode('utf-8'))}" in result.prompt_text
+    assert f"<d>[English]{exact_dialogue}</d>" in result.prompt_text
+    assert "from 0.500s to 2.000s; on_screen=true" in result.prompt_text
+    assert "response obligation elder acknowledges" in result.prompt_text
+    assert "lip_sync_required=true" in result.prompt_text
     assert "non_diegetic_music: muted guzheng; 72 bpm sparse pulse; low under dialogue" in result.prompt_text
+
+
+@pytest.mark.parametrize("language", (None, "ja-JP", "es-ES"))
+def test_h3_v4_prompt_requires_supported_sealed_dialogue_language(
+    language: str | None,
+) -> None:
+    requirement = _requirement()
+    intent = requirement.generation_intent.model_copy(
+        update={
+            "dialogue_intent": DialogueIntent(
+                mode="dialogue",
+                language=language,
+                speaker_id="hero",
+                verbatim_text="Exact speech.",
+                start_seconds=0.5,
+                end_seconds=2.0,
+                on_screen=False,
+                response_obligation="listener attends",
+            )
+        }
+    )
+    payload = requirement.model_dump(
+        mode="python",
+        exclude={"requirement_id", "requirement_hash"},
+    )
+    payload["generation_intent"] = intent
+    payload["generation_intent_hash"] = canonical_sha256(
+        {
+            "schema": "provider-neutral-generation-intent/2",
+            "generation_intent": intent.model_dump(mode="json"),
+        }
+    )
+
+    result = compile_h3_prompt(ProviderNeutralVideoRequirement.create(**payload))
+
+    assert isinstance(result, H3PromptUnsupported)
+    assert result.unsupported_field_paths == (
+        "generation_intent.dialogue_intent.language",
+    )
 
 
 def test_h3_prompt_rejects_secondary_motion_in_bypassed_relation_model() -> None:

@@ -157,6 +157,7 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptR
         return _compile_h3_t2va_prompt(requirement)
 
     intent = requirement.generation_intent
+    dialogue = intent.dialogue_intent
     diagnostics = list(
         validate_generation_intent_for_continuity(intent, audio_need=requirement.audio_need)
     )
@@ -168,10 +169,16 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptR
         diagnostics.append("contract_version")
     if intent.camera_intent.movement != "unspecified":
         diagnostics.append("generation_intent.camera_intent.movement")
+    dialogue_language = None
+    if dialogue is not None and dialogue.mode == "dialogue":
+        dialogue_language = _h3_dialogue_language(dialogue.language)
+        if dialogue_language is None:
+            diagnostics.append("generation_intent.dialogue_intent.language")
     diagnostics.extend(
         _reserved_field_paths(
             intent.model_dump(mode="python"),
             path="generation_intent",
+            reject_h3_dialogue_tags=True,
         )
     )
     if (
@@ -188,7 +195,6 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptR
     treatment = intent.visual_treatment
     lighting = intent.lighting_intent
     ambience = intent.ambience_intent
-    dialogue = intent.dialogue_intent
     music = intent.music_intent
     motion = intent.primary_camera_motion
     relation = intent.camera_subject_relation
@@ -217,14 +223,15 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptR
     dialogue_text = "none"
     if dialogue.mode == "dialogue":
         assert dialogue.verbatim_text is not None
+        assert dialogue_language is not None
         dialogue_text = (
-            f"speaker {dialogue.speaker_id} says verbatim "
-            f"utf8_bytes={len(dialogue.verbatim_text.encode('utf-8'))} "
-            f"text={dialogue.verbatim_text} "
+            f"speaker {dialogue.speaker_id} says once "
+            f"<d>[{dialogue_language}]{dialogue.verbatim_text}</d> "
             f"from {dialogue.start_seconds:.3f}s to {dialogue.end_seconds:.3f}s; "
             f"on_screen={str(dialogue.on_screen).lower()}; "
             f"response obligation {dialogue.response_obligation}; "
-            f"lip_sync_required={str(dialogue.lip_sync_required).lower()}"
+            f"lip_sync_required={str(dialogue.lip_sync_required).lower()}; "
+            "no narration and no extra speech"
         )
     foley = ", ".join(ambience.foley_cues) if ambience.foley_cues else "none"
     music_text = "none"
