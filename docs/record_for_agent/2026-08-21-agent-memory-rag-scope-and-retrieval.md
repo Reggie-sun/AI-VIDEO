@@ -382,7 +382,11 @@ Focused regression verification 为 8 passed；native `reviewer_xhigh` scoped re
 database 配合 old-version manifest，没有保留真实历史 Chroma format fixture。
 先前完整 Agent Memory suite 的 multilingual answerability calibration 曾失败；
 本轮没有降低 threshold、修改 assertion 或把一次独立 query 当作校准测试通过。
-完整 Harness 结果以 `.agent/harness/runs/rag-resumed-20260906/receipt.json` 为准，
+本轮完整测试最终为 4449 passed、4 skipped、2 failed；JUnit 中 Agent Memory 的
+110 个用例全部通过，包括该 calibration。两项失败属于 `test_mcp_transcribe.py`：
+本机缺少 `whisper`，`video_transcribe()` 在预期 typed error 前 import 失败；该模块
+不属于本次修改范围。完整 Harness 因此为 failed，不能宣称全仓验证通过。
+结果以 `.agent/harness/runs/rag-resumed-20260906/receipt.json` 为准，
 其 snapshot 包含其他 session 已提交的变更，不能把整个 range 都归为本任务修改。
 该轮执行期间其他 session 又推进 HEAD；因此该 receipt 不能被声称为最终 HEAD 的
 fresh code receipt。记录后的第一次 `experience` refresh 也因并发新增记录而拒绝
