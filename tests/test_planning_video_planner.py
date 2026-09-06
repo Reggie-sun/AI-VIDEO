@@ -871,6 +871,87 @@ def test_v3_initial_first_frame_drives_i2v_and_exact_readiness(defect):
     assert not plan.generation_requirement.capability_need.needs_identity_reference
 
 
+@pytest.mark.parametrize(
+    "defect",
+    [
+        None,
+        "missing_first",
+        "missing_last",
+        "wrong_first_role",
+        "wrong_last_role",
+        "wrong_last_owner",
+        "stale_first",
+        "stale_last",
+        "unbound_first",
+        "unbound_last",
+    ],
+)
+def test_v3_initial_first_last_drives_fl2v_with_exact_two_frame_readiness(defect):
+    shot = seal_artifact(_generated_shot().model_copy(update={
+        "required_asset_roles": (
+            AssetRoleRequirement(role="final_visual", asset_ids=(), allowed_asset_types=(AssetType.VIDEO,)),
+            AssetRoleRequirement(
+                role="first_frame",
+                asset_ids=("other-first" if defect == "unbound_first" else "keyframe-shot-1",),
+                allowed_asset_types=(AssetType.IMAGE,),
+            ),
+            AssetRoleRequirement(
+                role="last_frame",
+                asset_ids=("other-last" if defect == "unbound_last" else "last-frame-shot-1",),
+                allowed_asset_types=(AssetType.IMAGE,),
+            ),
+        ),
+        "generated_video_rationale": "The character must visibly complete the authored gesture.",
+    }))
+    first = make_available_asset(
+        role=AssetRole.LAST_FRAME if defect == "wrong_first_role" else AssetRole.APPROVED_KEYFRAME,
+        canonical_owner_id=shot.shot_id,
+        canonical_owner_content_hash=TWO_HASH if defect == "stale_first" else shot.content_hash,
+    )
+    last = make_available_asset(
+        role=AssetRole.APPROVED_KEYFRAME if defect == "wrong_last_role" else AssetRole.LAST_FRAME,
+        asset_id="last-frame-shot-1",
+        canonical_owner_id="other-shot" if defect == "wrong_last_owner" else shot.shot_id,
+        canonical_owner_content_hash=TWO_HASH if defect == "stale_last" else shot.content_hash,
+    )
+    assets = () if defect == "missing_first" else (first,)
+    if defect != "missing_last":
+        assets += (last,)
+    request = make_request(
+        target_shot=shot,
+        available_assets=assets,
+        shot_intent_evidence=make_intent_evidence(target_shot=shot, character_action_required=True),
+        review_decision=None,
+        planning_contract_version="video-planner/3",
+        generation_intent=_neutral_generation_intent(semantic_reference_roles=(
+            SemanticReferenceRole.FIRST_FRAME,
+            SemanticReferenceRole.LAST_FRAME,
+        )),
+    )
+
+    plan = VideoPlanner().plan(request)
+
+    assert plan.generation_mode is GenerationMode.FIRST_LAST_FRAME_VIDEO
+    if defect is not None:
+        assert plan.outcome is PlanOutcome.BLOCKED
+        with pytest.raises(AiVideoError):
+            require_current_video_plan(current_request=request, plan=plan)
+        return
+    assert plan.outcome is PlanOutcome.PROPOSED
+    assert tuple(item.role for item in plan.required_asset_roles) == (
+        AssetRole.APPROVED_KEYFRAME,
+        AssetRole.LAST_FRAME,
+    )
+    projection = require_current_video_plan(current_request=request, plan=plan)
+    assert projection.requirement.generation_mode.value == "first_last_frame_video"
+    assert projection.requirement.semantic_reference_roles == (
+        SemanticReferenceRole.FIRST_FRAME,
+        SemanticReferenceRole.LAST_FRAME,
+    )
+    assert not projection.requirement.capability_need.needs_identity_reference
+    assert not projection.requirement.capability_need.needs_scene_reference
+
+
 def test_v3_existing_r2v_keeps_final_visual_keyframe_readiness():
     shot = seal_artifact(_generated_shot().model_copy(update={
         "required_asset_roles": (

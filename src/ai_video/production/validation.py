@@ -140,16 +140,25 @@ def validate_shot_strategy(
                     f"Shot {shot.shot_id} generated_video pending target role "
                     "must allow only video."
                 )
+            first_frame = roles.get("first_frame")
+            last_frame = roles.get("last_frame")
             for role in roles.values():
                 if role.asset_ids and not (
-                    role.role == "first_frame"
+                    role.role in {"first_frame", "last_frame"}
                     and len(role.asset_ids) == 1
                     and role.allowed_asset_types == (AssetType.IMAGE,)
                 ):
                     raise _invalid(
-                        f"Shot {shot.shot_id} generated_video pending target "
-                        "allows only one bound first_frame image input."
+                        f"Shot {shot.shot_id} generated_video pending target allows only "
+                        "one bound first_frame image input and optional last_frame image input."
                     )
+            if last_frame is not None and last_frame.asset_ids and (
+                first_frame is None or not first_frame.asset_ids
+            ):
+                raise _invalid(
+                    f"Shot {shot.shot_id} generated_video pending target last_frame "
+                    "requires one bound first_frame image input."
+                )
         generated_videos = [
             asset
             for asset in bound.values()

@@ -197,13 +197,52 @@ def test_generated_video_accepts_one_unbound_pre_generation_target_role(with_fir
     validate_shot_strategy(shot, {"frame.png": make_asset("frame.png", AssetType.IMAGE)})
 
 
+@pytest.mark.parametrize("with_last_frame", [False, True])
+def test_project_validation_accepts_pending_generated_video_with_optional_last_frame(
+    with_last_frame: bool,
+):
+    bundle = make_bundle()
+    roles = (
+        AssetRoleRequirement(
+            role="final_visual",
+            asset_ids=(),
+            allowed_asset_types=(AssetType.VIDEO,),
+        ),
+        make_role("first_frame", "hero.png", AssetType.IMAGE),
+    )
+    assets = bundle.registry.assets
+    if with_last_frame:
+        roles += (make_role("last_frame", "terminal.png", AssetType.IMAGE),)
+        assets += (make_asset("terminal.png", AssetType.IMAGE),)
+    bundle = bundle.model_copy(
+        update={
+            "shots": (
+                bundle.shots[0].model_copy(
+                    update={
+                        "visual_strategy": VisualStrategy.GENERATED_VIDEO,
+                        "required_asset_roles": roles,
+                        "generated_video_rationale": "The sealed Shot requires a generated performance.",
+                    }
+                ),
+            ),
+            "registry": bundle.registry.model_copy(update={"assets": assets}),
+        }
+    )
+
+    validate_project_references(bundle)
+
+
 @pytest.mark.parametrize("role,asset_type,asset_ids", [
     ("scene_reference", AssetType.IMAGE, ("frame.png",)),
     ("first_frame", AssetType.VIDEO, ("frame.png",)),
     ("first_frame", AssetType.IMAGE, ()),
     ("first_frame", AssetType.IMAGE, ("frame.png", "second.png")),
+    ("last_frame", AssetType.IMAGE, ()),
+    ("last_frame", AssetType.IMAGE, ("frame.png",)),
+    ("last_frame", AssetType.VIDEO, ("frame.png",)),
+    ("last_frame", AssetType.IMAGE, ("frame.png", "second.png")),
 ])
-def test_pending_generated_video_rejects_non_first_frame_adjuncts(role, asset_type, asset_ids):
+def test_pending_generated_video_rejects_invalid_adjuncts(role, asset_type, asset_ids):
     shot = make_shot(
         VisualStrategy.GENERATED_VIDEO,
         required_asset_roles=(

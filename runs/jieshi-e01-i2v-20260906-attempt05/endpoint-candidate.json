@@ -1,0 +1,13 @@
+{
+  "source_surface": "codex_imagegen_tool",
+  "tool": "image_gen.imagegen",
+  "source_path": "/home/reggie/.codex/generated_images/01a0726b-b481-7b13-b743-2ca0698d89b8/exec-496bddc8-bbff-42a5-a737-678ecb0ca0e7.png",
+  "sha256": "059bb2b261883190168057b35baafc90011866acba9fb64b1c9c186122861330",
+  "size_bytes": 1998073,
+  "width": 941,
+  "height": 1672,
+  "registered": false,
+  "human_input_use_approved": false,
+  "source_first_frame_sha256": "4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb",
+  "agent_visual_review": "candidate: left hand back visible toward camera; palm toward window; background and seven people preserved; not human acceptance"
+}

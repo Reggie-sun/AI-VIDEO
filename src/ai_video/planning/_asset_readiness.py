@@ -23,7 +23,13 @@ def is_initial_first_frame_request(request: VideoPlanningRequest) -> bool:
         and request.previous_shot_state is None
         and intent is not None
         and intent.generation_operation is GenerationOperation.AUTO
-        and intent.semantic_reference_roles == (SemanticReferenceRole.FIRST_FRAME,)
+        and intent.semantic_reference_roles in {
+            (SemanticReferenceRole.FIRST_FRAME,),
+            (
+                SemanticReferenceRole.FIRST_FRAME,
+                SemanticReferenceRole.LAST_FRAME,
+            ),
+        }
     )
 
 
@@ -186,6 +192,19 @@ def asset_matches_role(
         )
         return not selection or asset.asset_id in selection
     if role is AssetRole.LAST_FRAME:
+        if is_initial_first_frame_request(request):
+            return (
+                asset.canonical_owner_id == request.target_shot.shot_id
+                and _content_binding_matches(
+                    request, asset, request.target_shot.content_hash
+                )
+                and any(
+                    requirement.role == "last_frame"
+                    and requirement.asset_ids == (asset.asset_id,)
+                    and requirement.allowed_asset_types == (AssetType.IMAGE,)
+                    for requirement in request.target_shot.required_asset_roles
+                )
+            )
         return True
     return _is_shot_bound_final_visual(
         request,

@@ -281,20 +281,36 @@ def _dynamic_decision(
         _is_initial_first_frame_request(request)
         and continuity is ContinuityMode.NONE
     ):
+        has_last_frame = SemanticReferenceRole.LAST_FRAME in declared_roles
         required = (
             RequiredAssetRole(
                 role=AssetRole.APPROVED_KEYFRAME,
                 reason_code=ReasonCode.REFERENCE_AVAILABLE,
             ),
+            *(
+                (
+                    RequiredAssetRole(
+                        role=AssetRole.LAST_FRAME,
+                        reason_code=ReasonCode.REFERENCE_AVAILABLE,
+                    ),
+                )
+                if has_last_frame
+                else ()
+            ),
         )
-        if _available_role(request, AssetRole.APPROVED_KEYFRAME) and (
+        mode = (
+            GenerationMode.FIRST_LAST_FRAME_VIDEO
+            if has_last_frame
+            else GenerationMode.IMAGE_TO_VIDEO
+        )
+        if all(_available_role(request, item.role) for item in required) and (
             _media_selection_is_complete(request, required)
         ):
             _append_unique(reasons, ReasonCode.REFERENCE_AVAILABLE)
-            return GenerationMode.IMAGE_TO_VIDEO, PlanOutcome.PROPOSED, required
+            return mode, PlanOutcome.PROPOSED, required
         _append_unique(reasons, ReasonCode.MISSING_REFERENCES)
         _append_unique(warnings, PlanWarning.REQUIRES_HUMAN_REVIEW)
-        return GenerationMode.IMAGE_TO_VIDEO, PlanOutcome.BLOCKED, required
+        return mode, PlanOutcome.BLOCKED, required
     if declared_roles or generation_operation is not GenerationOperation.AUTO:
         roles = list(declared_roles)
         if generation_operation in {
