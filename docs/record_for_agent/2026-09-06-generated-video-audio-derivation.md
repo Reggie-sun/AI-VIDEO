@@ -30,6 +30,12 @@ Date: 2026-09-06
 
 ## Live Blocker And Next Action
 
+### Follow-up — Minimal Edit Candidate
+
+用户在了解分层制作方法后同意继续。Parent通过project-local `video_extract_frames`复看07的0/1.01/2.021/3.031秒画面：约2秒真实左手已抬起，所查看玻璃区域未见匹配的林砚或手部倒影。因此不应仅因刚讨论遮罩技术就重做已有可用视觉。
+
+07既有广播ASR窗口为0.84–3.40秒，语音本身约2.56秒。现有`AudioTrackSpec.trim_start_sample`和同一timeline的audio span已经支持源裁切；可先试听从音轨前部移除约0.6–0.7秒是否仅移除广播前间隙，使广播落入前三秒。此候选保留07原生声音，无需先借08音轨；未实际试听/渲染，不能承诺不会切掉起音或产生环境声接缝。登记与结算blocker不因这一编辑候选消失；未执行新Provider、提取WAV、合成或activation。学习评估仍`no_candidate`，不是新生成实验。
+
 attempt07 MP4：`88d3a8ed59550c706e176da88e1d7ef89c02a1e60a5f6e1546b112507d0cd93e`，3,350,152 bytes。
 
 attempt08 MP4：`cc522e481994be961e585a95b618887a4f06b192fa9ae85b1c359e87474c194e`，3,232,566 bytes。
