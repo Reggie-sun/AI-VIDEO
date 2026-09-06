@@ -1,0 +1,9 @@
+{
+  "cost_upper_bound_microunits": 3000000,
+  "max_download_bytes": 536870912,
+  "origin": "https://api.vidu.cn",
+  "pricing_expires_at": "2026-09-06T11:59:55.335957Z",
+  "pricing_observed_at": "2026-09-06T10:59:55.335957Z",
+  "result_origins": [],
+  "result_trust": "authenticated_task"
+}

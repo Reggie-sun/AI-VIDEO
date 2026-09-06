@@ -1,0 +1,19 @@
+{
+  "requested_word_timestamps": true,
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/jieshi-e01-i2v-20260906-attempt09/production-s01-v9/state/video-generation/fetch/files/7b249ddc7c535b36447b0804909059f2e54a74d0a73328dafe409db16a759302.mp4",
+  "model": "medium",
+  "language": "zh",
+  "duration_seconds": 4.042,
+  "segments": [
+    {
+      "id": 0,
+      "start": 0,
+      "end": 2.24,
+      "start_hms": "00:00:00.000",
+      "end_hms": "00:00:02.240",
+      "text": "林燕請在終點站下車"
+    }
+  ],
+  "full_text": "林燕請在終點站下車",
+  "limitation": "MCP exposes segment times only; no per-word array."
+}

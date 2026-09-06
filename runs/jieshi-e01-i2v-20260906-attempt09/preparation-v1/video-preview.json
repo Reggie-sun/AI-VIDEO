@@ -1,0 +1,14 @@
+{
+  "billing_kind": "metered",
+  "currency": "CNY",
+  "destination": "https://api.vidu.cn",
+  "egress_item_ids": [
+    "prompt",
+    "image-import-89318576d4eed1eafaaba834f57b832f8376168d25ac735125791966ad9109b1",
+    "image-import-c1ffc3e43f26f4f29c7ad276e67ab1429f9e909f30bd5c01413e37b8d5ac8bb4"
+  ],
+  "estimated_cost_upper_bound_microunits": 3000000,
+  "execution_kind": "remote",
+  "preview_fingerprint": "5fdcd53f8deb83d5e4141f4e5139d5df603f99a69936d9732db861143cc1abae",
+  "resolved_generation_hash": "4aa13578f273965fe32ef02c82c90a1c9dbee9f8ea79cbbd0c92038f70c55911"
+}

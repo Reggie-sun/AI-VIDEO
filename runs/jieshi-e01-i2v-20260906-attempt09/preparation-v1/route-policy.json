@@ -1,0 +1,9 @@
+{
+  "endpoint_sha256": "059bb2b261883190168057b35baafc90011866acba9fb64b1c9c186122861330",
+  "input_sha256": "4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb",
+  "max_submit_count": 1,
+  "model": "viduq3-pro",
+  "provider": "vidu",
+  "scope": "S01 first-last-frame repair",
+  "user_instruction": "继续,一直到成功为止"
+}

@@ -2,7 +2,9 @@
 
 ## Identity And Verdict
 
-**NOT_EVALUATED overall — required evidence incomplete; no activation, no S02.**
+**FAIL overall — sealed action timing not met; no activation, no S02.**
+
+2026-09-06 continuation correction：此前仅按before3s抬起判PASS，遗漏封存request-draft与compiled request明确要求第2秒前达到末帧姿态并保持。2秒图显示掌心朝镜头，约3秒才转正，因此action timing应FAIL；历史NOT_EVALUATED结论被本次纠正取代。未修改原MP4或请求。
 
 Request `65958875804c478f4094e57f6f60ebe5dd976a930e92f9a0969d6a71b9272bc7`。
 MP4 `cc522e481994be961e585a95b618887a4f06b192fa9ae85b1c359e87474c194e`，3,232,566 bytes。
@@ -14,7 +16,7 @@ Exact fetch后调用project-local video_analyze：9张640px图、0.5秒间隔、
 | --- | --- | --- |
 | Registered first/last inputs | PASS | 两张已批准PNG经Registry/receipt及实际POST逐图hash/bytes校验 |
 | 1080p 9:16 output | PASS | 1080×1920、24fps、97帧、4.042秒H264；不证明内部native raster |
-| Real LEFT hand before3s | PASS | 约1秒起抬空左手，2秒已抬起，接近3秒转向玻璃；真实连续动作，非图片渐变 |
+| Real LEFT hand reaches endpoint before2s and holds | FAIL | 约1秒起抬空左手，2秒掌心仍朝镜头，接近3秒才转向玻璃；未达到封存动作时序，虽为真实连续动作 |
 | RIGHT phone hand on lap | PASS | 顺序帧中右手手机留在腿上 |
 | Palm faces window at hover | PASS | 约3–4秒手背朝镜头；2秒掌心朝镜头，之后有明显翻腕，动作自然度仍待全速审看 |
 | Approx2cm hover gap | NOT_EVALUATED | 单机位没有足够深度证据确认约2cm间隙 |

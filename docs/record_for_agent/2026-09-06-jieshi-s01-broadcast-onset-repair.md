@@ -9,6 +9,10 @@ evidence_index_version: "1"
 
 Date: 2026-09-06
 
+## Verdict Correction — 2026-09-06
+
+后续继续时重新核对封存request：要求第2秒前达到末帧姿态并保持，08在2秒仍掌心朝镜头、约3秒才转正。此前以before3s抬起判PASS遗漏了更严格时序，整体结论应为 **FAIL / ACTION_ENDPOINT_TIMING**，下文NOT_EVALUATED为被纠正的历史评估。广播0–2.14秒及原MP4数据不变；纠正未激活状态，后续attempt09仅改动作表述。
+
 ## Outcome
 
 用户在07后要求继续，完成一次新Vidu Q3 Pro首尾帧attempt08。唯一创作变量为广播从第0秒起声、连续偏快播报、目标2.2秒前结束；句子内容、动作、相机、已批准双图、compiler2、4秒1080p、audio=true及is_rec=false保持原样。reviewer_xhigh pre-submit accept；未固定seed，单次结果不证明因果保证。

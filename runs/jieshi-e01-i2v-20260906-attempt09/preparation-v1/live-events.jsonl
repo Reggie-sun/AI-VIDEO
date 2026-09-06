@@ -1,0 +1,33 @@
+{"at": "2026-09-06T11:00:32.115003+00:00", "kind": "paid_preview_ready_no_submit", "max_submit_count": 1, "preview_hash": "4c676904169862a0eec2d3e9a036fb81582cafc2ec62fcfbe5adb30ce306bd4a"}
+{"at": "2026-09-06T11:02:51.824479+00:00", "body_sha256": "966d267e4bf7525c7d54722d3a61ee0d21607a8b451345624693f21f5d0ac9e5", "frame_sha256": ["4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb", "059bb2b261883190168057b35baafc90011866acba9fb64b1c9c186122861330"], "kind": "submit_transport_started"}
+{"at": "2026-09-06T11:02:54.445413+00:00", "kind": "http_response", "method": "POST", "response_sha256": "2ab4c75bd7cc3c5a7f4ed6d5ed7593cba37056c4c09ef9eb0520a69c435ceed5", "status": 200}
+{"at": "2026-09-06T11:02:54.468624+00:00", "kind": "submit_accepted", "submission_fingerprint": "e910928eb2984c065e54acf8fbab52e7c15f96e3c54718459aa465d08797aeb4"}
+{"at": "2026-09-06T11:02:54.588774+00:00", "kind": "http_response", "method": "GET", "response_sha256": "497148fed7bb7db3f0fcb86e329ebac2eedbd67d1a35e5fe266f8a0820b8c2ed", "status": 200}
+{"at": "2026-09-06T11:02:54.606264+00:00", "kind": "poll", "ordinal": 0, "state": "queued"}
+{"at": "2026-09-06T11:03:04.924885+00:00", "kind": "http_response", "method": "GET", "response_sha256": "751536e8a583a33d789904a1e9b4c6d37935cbbbc074ba19513485fcd628a41d", "status": 200}
+{"at": "2026-09-06T11:03:04.945679+00:00", "kind": "poll", "ordinal": 1, "state": "queued"}
+{"at": "2026-09-06T11:03:15.201621+00:00", "kind": "http_response", "method": "GET", "response_sha256": "6e19f048e1af603c3f19b6ea6adf5c34291a9d9e3fe6025d39aabe5b519f9316", "status": 200}
+{"at": "2026-09-06T11:03:15.220306+00:00", "kind": "poll", "ordinal": 2, "state": "queued"}
+{"at": "2026-09-06T11:03:25.549801+00:00", "kind": "http_response", "method": "GET", "response_sha256": "1fece0a138ca6adf8af81427dfcfb5e7677aa583b4a09c7e9e0a1781d287e02b", "status": 200}
+{"at": "2026-09-06T11:03:25.569155+00:00", "kind": "poll", "ordinal": 3, "state": "running"}
+{"at": "2026-09-06T11:03:35.822975+00:00", "kind": "http_response", "method": "GET", "response_sha256": "fc1233af968dc39b83a4bd6ff01dde9cfb8ce82cbae216c69249af4a262cd51f", "status": 200}
+{"at": "2026-09-06T11:03:35.839308+00:00", "kind": "poll", "ordinal": 4, "state": "running"}
+{"at": "2026-09-06T11:03:46.096901+00:00", "kind": "http_response", "method": "GET", "response_sha256": "e604b8ce28b6b962bf8bbd62b0329f02176e9dc3c985755cb8cce50859951547", "status": 200}
+{"at": "2026-09-06T11:03:46.124455+00:00", "kind": "poll", "ordinal": 5, "state": "running"}
+{"at": "2026-09-06T11:03:56.607873+00:00", "kind": "http_response", "method": "GET", "response_sha256": "3fef282c7b9d140c6887c0aadbedd6b6a1b963e02ed243759014121029acc624", "status": 200}
+{"at": "2026-09-06T11:03:56.624671+00:00", "kind": "poll", "ordinal": 6, "state": "running"}
+{"at": "2026-09-06T11:04:06.873209+00:00", "kind": "http_response", "method": "GET", "response_sha256": "49e40dc08ec19c8ef3d9846bd5c7d9b548b080eff0fc31beaf88c3dca44aebad", "status": 200}
+{"at": "2026-09-06T11:04:06.896233+00:00", "kind": "poll", "ordinal": 7, "state": "running"}
+{"at": "2026-09-06T11:04:17.158684+00:00", "kind": "http_response", "method": "GET", "response_sha256": "79c046bf62aef39fdfdc287eb66367627306bdf3a8aaf51a5ff47cb7d9a824ca", "status": 200}
+{"at": "2026-09-06T11:04:17.191013+00:00", "kind": "poll", "ordinal": 8, "state": "running"}
+{"at": "2026-09-06T11:04:27.452710+00:00", "kind": "http_response", "method": "GET", "response_sha256": "b91664537ae4e488fceff4f77c199f6d260a9a11776be1e50a8a963c13b8efeb", "status": 200}
+{"at": "2026-09-06T11:04:27.474152+00:00", "kind": "poll", "ordinal": 9, "state": "running"}
+{"at": "2026-09-06T11:04:37.731569+00:00", "kind": "http_response", "method": "GET", "response_sha256": "e607bf79f8b9dc2632fba9d31b23e250a818ad1667706479418e5e0de545b670", "status": 200}
+{"at": "2026-09-06T11:04:37.751712+00:00", "kind": "poll", "ordinal": 10, "state": "running"}
+{"at": "2026-09-06T11:04:47.999673+00:00", "kind": "http_response", "method": "GET", "response_sha256": "5b5e3589cc78341bf49e917c4a4be6e8f605f5581d89e7042f702c66c079b255", "status": 200}
+{"at": "2026-09-06T11:04:48.020005+00:00", "kind": "poll", "ordinal": 11, "state": "running"}
+{"at": "2026-09-06T11:04:58.611963+00:00", "kind": "http_response", "method": "GET", "response_sha256": "4dcc388535c4c00eea981759a2d439d88082fe0ef3a7cdaa23d54bde05ede354", "status": 200}
+{"at": "2026-09-06T11:04:58.629641+00:00", "kind": "poll", "ordinal": 12, "state": "succeeded"}
+{"at": "2026-09-06T11:04:58.788892+00:00", "kind": "http_response", "method": "GET", "response_sha256": "4dcc388535c4c00eea981759a2d439d88082fe0ef3a7cdaa23d54bde05ede354", "status": 200}
+{"at": "2026-09-06T11:04:58.790913+00:00", "error_code": "video_artifact_invalid", "kind": "stopped", "message": "Vidu result requires direct public HTTPS without redirects."}
+{"at": "2026-09-06T11:05:22.866114+00:00", "kind": "fetched_unactivated", "next_action": "exact MP4 project-local video-analysis Gate", "path": "/home/reggie/vscode_folder/AI-VIDEO/runs/jieshi-e01-i2v-20260906-attempt09/production-s01-v9/state/video-generation/fetch/files/7b249ddc7c535b36447b0804909059f2e54a74d0a73328dafe409db16a759302.mp4", "sha256": "7b249ddc7c535b36447b0804909059f2e54a74d0a73328dafe409db16a759302", "size_bytes": 3476468}
