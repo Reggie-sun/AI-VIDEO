@@ -254,7 +254,8 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptR
     )
     visual = (
         "[Shot 1] "
-        f"scene {requirement.scene.scene_id}; open state {_state_text(intent.open_state)}; "
+        + (f"dialogue {dialogue_text}; " if dialogue.mode == "dialogue" else "")
+        + f"scene {requirement.scene.scene_id}; open state {_state_text(intent.open_state)}; "
         f"action {intent.subject_action.start_state} -> {intent.subject_action.progression} "
         f"-> {_state_text(intent.subject_action.endpoint)}; "
         f"close state {_state_text(intent.close_state)}; "
@@ -279,8 +280,6 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptR
         f"end framing {intent.camera_endpoint.end_framing}; "
         f"terminal motion state {motion.end_motion_state.value}"
     )
-    if dialogue.mode == "dialogue":
-        visual += f"; dialogue {dialogue_text}"
     soundscape = f"ambience {ambience.environment_bed}; foley {foley}"
     if dialogue.mode == "none":
         soundscape += "; dialogue none"
