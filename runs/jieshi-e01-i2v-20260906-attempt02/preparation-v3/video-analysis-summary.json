@@ -1,0 +1,157 @@
+{
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/jieshi-e01-i2v-20260906-attempt02/production-s01-v2/state/video-generation/fetch/files/49e585e89585449627431e3fe7395d64c1fa4bd42c9d400a3863fdde06fcb5f8.mp4",
+  "probe": {
+    "file": {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/runs/jieshi-e01-i2v-20260906-attempt02/production-s01-v2/state/video-generation/fetch/files/49e585e89585449627431e3fe7395d64c1fa4bd42c9d400a3863fdde06fcb5f8.mp4",
+      "size_bytes": 4248601,
+      "size_mb": 4.05,
+      "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "duration_seconds": 4.042,
+      "duration_hms": "00:00:04.042",
+      "bit_rate_kbps": 8409
+    },
+    "video_stream": {
+      "codec": "h264",
+      "profile": "High",
+      "width": 1080,
+      "height": 1920,
+      "aspect_ratio": "N/A",
+      "fps": 24,
+      "pixel_format": "yuvj420p",
+      "bit_rate_kbps": 8269,
+      "frame_count": 97
+    },
+    "audio_stream": {
+      "codec": "aac",
+      "sample_rate": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "bit_rate_kbps": 132,
+      "language": "und"
+    },
+    "metadata": {
+      "major_brand": "isom",
+      "minor_version": "512",
+      "compatible_brands": "isomiso2avc1mp41",
+      "AIGC": "{\"Label\": \"1\", \"ContentProducer\": \"001191110108MACC4D63XF10306\", \"ContentPropagator\": \"001191110108MACC4D63XF10306\", \"ProduceID\": \"img2video-3.2-4-720p-994083212919599104\", \"PropagateID\": \"img2video-3.2-4-720p-994083212919599104\", \"ReservedCode1\": \"8d861f5892ef58e8d08143694f1c1aa6\", \"ReservedCode2\": \"8d861f5892ef58e8d08143694f1c1aa6\"}",
+      "encoder": "Lavf58.76.100"
+    }
+  },
+  "frames": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/jieshi-e01-i2v-20260906-attempt02/production-s01-v2/state/video-generation/fetch/files/49e585e89585449627431e3fe7395d64c1fa4bd42c9d400a3863fdde06fcb5f8.mp4",
+    "total_frames_extracted": 9,
+    "interval_used": 0.5,
+    "frames": [
+      {
+        "timestamp_seconds": 0,
+        "timestamp_hms": "00:00:00.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 40317
+      },
+      {
+        "timestamp_seconds": 0.5,
+        "timestamp_hms": "00:00:00.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 42726
+      },
+      {
+        "timestamp_seconds": 1,
+        "timestamp_hms": "00:00:01.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 45657
+      },
+      {
+        "timestamp_seconds": 1.5,
+        "timestamp_hms": "00:00:01.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 46163
+      },
+      {
+        "timestamp_seconds": 2,
+        "timestamp_hms": "00:00:02.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 46566
+      },
+      {
+        "timestamp_seconds": 2.5,
+        "timestamp_hms": "00:00:02.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 43637
+      },
+      {
+        "timestamp_seconds": 3,
+        "timestamp_hms": "00:00:03.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 44414
+      },
+      {
+        "timestamp_seconds": 3.5,
+        "timestamp_hms": "00:00:03.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 43935
+      },
+      {
+        "timestamp_seconds": 4,
+        "timestamp_hms": "00:00:04.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 43259
+      }
+    ]
+  },
+  "transcription": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/jieshi-e01-i2v-20260906-attempt02/production-s01-v2/state/video-generation/fetch/files/49e585e89585449627431e3fe7395d64c1fa4bd42c9d400a3863fdde06fcb5f8.mp4",
+    "model": "base",
+    "language": "zh",
+    "duration_seconds": 4.042,
+    "segments": [
+      {
+        "id": 0,
+        "start": 0,
+        "end": 2.56,
+        "start_hms": "00:00:00.000",
+        "end_hms": "00:00:02.560",
+        "text": "林燕,請在終點站下車"
+      }
+    ],
+    "full_text": "林燕,請在終點站下車"
+  },
+  "scenes": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/jieshi-e01-i2v-20260906-attempt02/production-s01-v2/state/video-generation/fetch/files/49e585e89585449627431e3fe7395d64c1fa4bd42c9d400a3863fdde06fcb5f8.mp4",
+    "threshold": 0.4,
+    "total_scenes": 1,
+    "scenes": [
+      {
+        "scene_number": 1,
+        "start_time": 0,
+        "start_hms": "00:00:00.000",
+        "end_time": 4.042,
+        "end_hms": "00:00:04.042",
+        "duration_seconds": 4.042,
+        "confidence": null
+      }
+    ]
+  },
+  "analysis_summary": {
+    "duration_hms": "00:00:04.042",
+    "resolution": "1080x1920",
+    "has_audio": true,
+    "estimated_speaking_duration_seconds": 2.6,
+    "scene_count": 1,
+    "frames_extracted": 9
+  },
+  "evidence_binding": {
+    "artifact_sha256": "49e585e89585449627431e3fe7395d64c1fa4bd42c9d400a3863fdde06fcb5f8",
+    "tool": "project-local video-analysis.video_analyze",
+    "visual_review": "Codex inspected all nine MCP frames; not a human acceptance receipt"
+  }
+}

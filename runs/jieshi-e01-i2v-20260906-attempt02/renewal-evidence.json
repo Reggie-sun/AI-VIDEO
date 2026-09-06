@@ -1,0 +1,14 @@
+{
+  "kind": "operator_ceiling_reaffirmation",
+  "old_profile_hash": "0874e2ddd61044561b49d3cb74ef9598f83aa9b2a44bf019cf30184aad00c1b4",
+  "new_profile_hash": "9af6fc5ce4c1bf3885f8b40309635817ffeb035f024fac3766e3ea5ba107b1d4",
+  "authorization_source": "用户：实践、生成、把仓库规则改了、授权",
+  "scope": "S01 viduq3-pro first-frame I2V 4s 1080p native audio; existing PNG",
+  "max_submit_count": 1,
+  "remaining_submit_count": 1,
+  "currency": "CNY",
+  "unchanged_upper_bound": 3000000,
+  "decided_at": "2026-09-06T07:18:04.140790+00:00",
+  "expires_at": "2026-09-06T08:18:04.140790+00:00",
+  "market_price_observation": false
+}

@@ -8,6 +8,11 @@ learning_eligibility: ineligible
 
 ## Supersession Notice
 
+2026-09-06 后续真实执行已完成：新 profile 通过既有 Gate，一次 I2V 返回带原生音频视频，
+但抬错手、自带字幕、镜头移动导致逐镜 FAIL。见
+[最新修复记录](2026-09-06-jieshi-s01-native-audio-repair-gate.md)。下方零提交、未封装与 Next Action
+仅描述当时 checkpoint；当前阻塞是媒体质量和已用尽的单次 submit quota。
+
 用户随后明确要求修改仓库规则；当前允许按
 [Operator Ceiling Renewal](../../.agent/context/control-plane-playbook.md#operator-ceiling-renewal)
 为已授权新 attempt 重新确认纯内部上限，无需另请 operator。以下 preview 拒绝属于旧
