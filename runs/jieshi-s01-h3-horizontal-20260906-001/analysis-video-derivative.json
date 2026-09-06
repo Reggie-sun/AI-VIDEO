@@ -1,0 +1,7 @@
+{
+  "source_sha256": "6126e68df217ce9a859c5de904b99ea294437fb48f10444eff3bccc52706492a",
+  "derivative_sha256": "65cf85b790c7ddae88bf888e159a062c7bfeaca0da63dde309f7ced290fbf868",
+  "derivative_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/jieshi-s01-h3-horizontal-20260906-001/analysis-only-plus20db.mp4",
+  "transform": "video stream copy; audio volume +20dB AAC; no trim",
+  "purpose": "analyzer compatibility only: video-analysis rejects WAV; not composition or delivery; raw MP4 unchanged"
+}

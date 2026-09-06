@@ -1,0 +1,12 @@
+{
+  "scope": "Resumed Jieshi S01 horizontal local H3 preview; no previous video submission",
+  "user_authorization": "可以 approved horizontal S01 preview; 继续 approved use of displayed exact image after import confirmation request",
+  "initial_attempts": 1,
+  "maximum_total_attempts": 2,
+  "task_elapsed_ceiling_seconds": 7200,
+  "gpu_generation_ceiling_seconds": 3600,
+  "local_only": true,
+  "automatic_retry": false,
+  "repair_requires_new_evidence_and_identity": true,
+  "started_at": "2026-09-06T06:25:26.848481+00:00"
+}

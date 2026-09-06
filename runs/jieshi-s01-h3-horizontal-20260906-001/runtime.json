@@ -1,0 +1,10 @@
+{
+  "comfyui_commit": "7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa",
+  "launch_capabilities": [
+    "sage_attention"
+  ],
+  "sageattention_version": "2.2.0",
+  "t8_commit": "977df788fcf8b971dc3d0fc7d6baa79a0edfaf40",
+  "t8_version": "1.36.2",
+  "videohelpersuite_commit": "4ee72c065db22c9d96c2427954dc69e7b908444b"
+}

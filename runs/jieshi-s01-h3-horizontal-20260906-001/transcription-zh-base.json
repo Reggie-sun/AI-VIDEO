@@ -1,0 +1,17 @@
+{
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/jieshi-s01-h3-horizontal-20260906-001/production/state/video-generation/fetch/files/6126e68df217ce9a859c5de904b99ea294437fb48f10444eff3bccc52706492a.mp4",
+  "model": "base",
+  "language": "zh",
+  "duration_seconds": 5.167,
+  "segments": [
+    {
+      "id": 0,
+      "start": 0,
+      "end": 2.7,
+      "start_hms": "00:00:00.000",
+      "end_hms": "00:00:02.700",
+      "text": "你"
+    }
+  ],
+  "full_text": "你"
+}

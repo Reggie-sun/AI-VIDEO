@@ -1,0 +1,28 @@
+{
+  "schema_version": "1",
+  "source_surface": "codex_imagegen_tool",
+  "declared_ui_product_label": "OpenAI imagegen",
+  "backend_model_id": null,
+  "original_filename": "first-frame.png",
+  "output_sha256": "1ea65e808a44444bd162185e9bacf299f5ff02ebe49556fc147b7a261b7b0061",
+  "output_size_bytes": 1921406,
+  "output_width": 1672,
+  "output_height": 941,
+  "imported_at": "2026-09-06T06:25:26.848481+00:00",
+  "prompt_fingerprint": "98311a9c1bc9b87eef7c93a0637bc04fa659415f8fd7494600062f931611ca99",
+  "references": [],
+  "target_kind": "key_shot",
+  "target_artifact_id": "jieshi-e01-S01",
+  "target_asset_role": "first_frame",
+  "human_actor": {
+    "actor_id": "user",
+    "actor_kind": "human"
+  },
+  "approved": true,
+  "approved_at": "2026-09-06T06:25:26.848481+00:00",
+  "license_source_note": "User instructed 继续 after exact displayed horizontal image approval request, authorizing its use as this H3 trial input. This records input-use approval, not human media quality acceptance or rights certification. Original image reference identity is preserved in provenance.json.",
+  "provider_request_id": null,
+  "durable_submit_intent_present": false,
+  "automated_browser": false,
+  "content_hash": "ef33d6769ca82f8eecfd38cea18a81a7e476e09c9c739c8a38351e99483a90d3"
+}

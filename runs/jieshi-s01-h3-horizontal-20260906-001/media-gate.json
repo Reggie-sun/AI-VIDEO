@@ -1,0 +1,64 @@
+{
+  "schema": "agent-post-media-gate/1",
+  "attempt_id": "jieshi-s01-h3-horizontal-video-001",
+  "artifact_sha256": "6126e68df217ce9a859c5de904b99ea294437fb48f10444eff3bccc52706492a",
+  "size_bytes": 1419435,
+  "overall": "NOT_EVALUATED",
+  "next_shot_allowed": false,
+  "activation": false,
+  "findings": [
+    {
+      "id": "decode_geometry_duration",
+      "verdict": "PASS",
+      "evidence": "video-analysis.json and decode.json: 1344x768,124 frames,24fps,5.167s,H264/AAC,full decode exit 0"
+    },
+    {
+      "id": "seven_other_reflections",
+      "verdict": "PASS",
+      "evidence": "11 MCP sampled frames and full-resolution frame-3s.png show 2 standing +5 seated; initial thumbnail miscount was corrected"
+    },
+    {
+      "id": "foreground_identity_and_missing_reflection",
+      "verdict": "PASS",
+      "evidence": "sampled frames retain the foreground man and no corresponding face/body/raised-hand reflection"
+    },
+    {
+      "id": "left_hand_raise_right_hand_phone",
+      "verdict": "PASS",
+      "evidence": "sampled 1.0-3.0s left hand rises continuously, right hand retains black phone, pose held to5.0s"
+    },
+    {
+      "id": "exact_two_centimeter_gap",
+      "verdict": "NOT_EVALUATED",
+      "evidence": "single oblique camera view supports hovering but cannot measure exact metric gap"
+    },
+    {
+      "id": "locked_camera_no_cut_no_overlay",
+      "verdict": "PASS",
+      "evidence": "sampled framing stable,scene detector1scene,no generated title/subtitle/UI observed"
+    },
+    {
+      "id": "audio_integrity",
+      "verdict": "PASS",
+      "evidence": "AAC stereo32000Hz decoded,mean -47.8dB,max -23.6dB; audibility/semantic acceptance not inferred"
+    },
+    {
+      "id": "exact_pa_dialogue_timing",
+      "verdict": "NOT_EVALUATED",
+      "evidence": "auto-language base hallucinated timestamps beyond duration; Chinese base returned 你; Chinese medium returned 看到些; neither supports full exact line or0.1-2.7s window"
+    },
+    {
+      "id": "pa_voice_and_foreground_silence",
+      "verdict": "NOT_EVALUATED",
+      "evidence": "visible mouths closed in sampled frames; PA timbre and lack of extra speech not reliably established"
+    }
+  ],
+  "repair": {
+    "evidence_repair_first": "Completed Chinese base and medium transcription plus full-resolution visual recount; additional source-hash-bound +20dB diagnostic MP4 returned empty medium transcription. Raw MP4 unchanged.",
+    "generation_attempts_used": 1,
+    "generation_attempt_ceiling": 2,
+    "stop_reason": "No isolated evidence-backed generation repair variable established: exact native prompt already includes correct Mandarin text/language/window/offscreen source; ASR and low audio level do not establish a causal prompt defect. Do not spend remaining submit on a random rewrite.",
+    "status": "STOP_CURRENT_ATTEMPT_NO_S02"
+  },
+  "human_quality_acceptance": "NOT_EVALUATED"
+}

@@ -1,0 +1,159 @@
+{
+  "open_state": {
+    "kind": "typed_text",
+    "state_ref": null,
+    "state_text": "Landscape first frame: young man seated foreground left facing right toward the window, right hand holding black phone on lap and left hand resting on knee. Seven other passenger reflections remain in the window; his corresponding reflection is absent from the start.",
+    "state_hash": null,
+    "required_change": false
+  },
+  "close_state": {
+    "kind": "typed_text",
+    "state_ref": null,
+    "state_text": "The same man holds his anatomical left hand about two centimeters before the glass; his right hand keeps the phone on his lap. His face, body and raised hand have no reflection, while all seven other reflections remain. Hold this framing and pose.",
+    "state_hash": null,
+    "required_change": false
+  },
+  "identity_continuity": {
+    "character_ids": [
+      "G",
+      "LY",
+      "P1",
+      "P2",
+      "P3",
+      "P4",
+      "P5",
+      "P6"
+    ],
+    "preservation": "exact",
+    "allowed_variation": [
+      "仅眼神、呼吸、左手动作；consistent character appearance, same outfit and features throughout"
+    ]
+  },
+  "scene_continuity": {
+    "scene_id": "SC01",
+    "time_of_day": "深夜00:17",
+    "mood": "冷灰青色都市悬疑，非血腥、非鬼魂；虚构错误现实",
+    "state_constraints": [
+      "苏遥：椭圆脸、齐肩深黑直发、中分、无刘海，身高约165cm。；服装：米白短外套、墨绿圆领上衣、深蓝直筒牛仔裤、白色帆布鞋",
+      "林砚：窄长脸、直眉、短黑发左侧自然分缝，干净下颌；身高约178cm，偏瘦；不使用演员或既有作品人物相貌。；服装：深灰短夹克敞开、浅灰圆领T恤、黑色直筒长裤、灰白运动鞋、蓝色挂绳矩形白工牌",
+      "周伯祥：灰白短发，瘦脸，圆肩。；服装：棕色针织开衫、灰衬衫、黑裤、黑布鞋",
+      "陈立：方脸、短寸发，中等身形。；服装：灰色连帽卫衣、深蓝长裤、黑鞋",
+      "许雯：30岁，短发，海军蓝风衣、黑裤，黑色手机；服装：30岁，短发，海军蓝风衣、黑裤，黑色手机",
+      "郭向东：40岁，黑色棒球帽、深蓝棉外套、灰裤，无独立道具；服装：40岁，黑色棒球帽、深蓝棉外套、灰裤，无独立道具",
+      "沈嘉程：25岁，细黑框眼镜、卡其夹克、黑裤，无独立道具；服装：25岁，细黑框眼镜、卡其夹克、黑裤，无独立道具",
+      "何静：45岁，低马尾、酒红针织衫、黑裤。；服装：酒红针织衫、黑裤",
+      "车厢座椅、窗框和扶手位置稳定。七名背景人物保持原位、不转头。",
+      "冷白车顶灯，黑色车窗，保留皮肤自然细节，深景深确保空倒影座位清晰。",
+      "Man keeps black phone in anatomical right hand; girl retains white phone in left hand. Generate the existing offscreen train broadcast with native audio. No generated subtitles or title card; final subtitle belongs to existing composition path."
+    ]
+  },
+  "space_continuity": {
+    "subject_position": "man foreground left seated facing right; seven other reflections inside window to the right",
+    "screen_direction": "left hand travels from knee upward toward the window on screen right",
+    "entrance_state": null,
+    "exit_state": null,
+    "crossing_policy": "no change of seats or axis"
+  },
+  "axis_continuity": {
+    "camera_axis": "same oblique side of seated man and window",
+    "framing_continuity": "fixed medium-wide landscape",
+    "crossing_policy": "no axis crossing"
+  },
+  "subject_action": {
+    "start_state": "林砚看向窗中自己的空位，眉间收紧。",
+    "progression": "林砚眉间收紧，解剖左手从膝盖连续抬向玻璃，在前三秒内距玻璃约2厘米停住，随后保持。解剖右手始终握着黑手机留在腿上。",
+    "endpoint": {
+      "state_ref": null,
+      "state_text": "左手停在玻璃前，玻璃内没有手。",
+      "state_hash": null,
+      "required_change": true
+    }
+  },
+  "motion_envelope": {
+    "onset": "立即察觉",
+    "peak": "抬左手",
+    "settle": "左手悬停",
+    "direction": "左手朝车窗",
+    "amplitude_class": "小幅自然动作"
+  },
+  "pacing": {
+    "cadence": "Left hand rises once and stops before glass within the first three seconds; hold through the remainder.",
+    "tempo_class": "measured restrained action",
+    "shot_duration_seconds": 5.166666666666667
+  },
+  "camera_intent": {
+    "movement": "unspecified",
+    "stability": "locked-off static camera, no movement",
+    "framing_intent": "Locked seated eye-height oblique medium-wide 28mm natural lens view: man foreground left, seven reflections across the window to the right, corresponding empty seat visible.",
+    "expression_strength": "semantic_prompt_allowed"
+  },
+  "camera_endpoint": {
+    "start_framing": "Locked seated eye-height oblique medium-wide 28mm natural lens view: man foreground left, seven reflections across the window to the right, corresponding empty seat visible.",
+    "end_framing": "Identical landscape framing with the left hand now raised before the window.",
+    "position_lock": true,
+    "orientation_lock": true
+  },
+  "performance_intent": {
+    "trigger": "sees his own empty reflected seat",
+    "visible_response": "brows tighten slightly, eyes remain fixed on the missing reflection",
+    "gaze_target": "his empty reflected seat in the window",
+    "body_behavior": "seated body stays still, mouth remains closed",
+    "hand_behavior": "anatomical left hand rises once from knee toward glass; anatomical right hand retains black phone on lap",
+    "terminal_performance_state": "left hand held two centimeters before glass, mouth closed"
+  },
+  "visual_treatment": {
+    "medium_look": "Photorealistic live-action subway scene, the same young Chinese man and seven other passenger reflections from the first frame",
+    "palette": "cool white overhead light, blue subway seats, gray metal and dark window",
+    "material_treatment": "natural skin and jacket cloth, dark reflective glass, brushed metal carriage",
+    "prohibited_visual_drift": [
+      "reflection of the foreground man or his raised hand",
+      "additional people or missing background reflections",
+      "subtitles, digits, UI, title cards",
+      "camera movement or cut"
+    ]
+  },
+  "lighting_intent": {
+    "motivated_source": "cool white overhead subway fluorescent lights",
+    "direction": "soft overhead light onto faces and blue seats",
+    "exposure_priority": "preserve foreground face and dark glass details",
+    "continuity_state": "constant lighting; black tunnel outside"
+  },
+  "ambience_intent": {
+    "environment_bed": "Low continuous train wheel rumble and carriage ventilation beneath the broadcast",
+    "foley_cues": [
+      "soft jacket fabric movement as left arm rises"
+    ],
+    "explicitly_silent": false
+  },
+  "dialogue_intent": {
+    "mode": "dialogue",
+    "language": "zh-CN",
+    "speaker_id": "train_pa",
+    "verbatim_text": "林砚，请在终点站下车。",
+    "start_seconds": 0.1,
+    "end_seconds": 2.7,
+    "on_screen": false,
+    "response_obligation": "Neutral female Mandarin train PA from overhead speaker, polite flat tone with narrow-band loudspeaker resonance; only this line. All visible people keep their mouths closed.",
+    "lip_sync_required": false
+  },
+  "music_intent": {
+    "mode": "none",
+    "instrumentation": null,
+    "tempo_rhythm": null,
+    "dynamics": null
+  },
+  "primary_camera_motion": {
+    "movement_kind": "locked",
+    "direction": "none",
+    "amplitude_class": "subtle",
+    "speed_class": "very_slow",
+    "start_motion_state": "stationary",
+    "end_motion_state": "settled"
+  },
+  "camera_subject_relation": {
+    "subject_id": "LY",
+    "relation_kind": "fixed_frame",
+    "start_relation": "man remains foreground left, window and seven reflections to the right",
+    "end_relation": "man remains in the same foreground position with raised left hand; window stays in identical framing"
+  }
+}

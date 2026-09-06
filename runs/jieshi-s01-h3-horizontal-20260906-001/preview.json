@@ -1,0 +1,10 @@
+{
+  "billing_kind": "local_unmetered",
+  "currency": null,
+  "destination": null,
+  "egress_item_ids": [],
+  "estimated_cost_upper_bound_microunits": null,
+  "execution_kind": "local",
+  "preview_fingerprint": "8258cb7a2dab8ab49884aaef2d45d9c67b38c5d2b33a7e414064d4ded60b7aad",
+  "resolved_generation_hash": "3a4ad6f82bc9ac67ae14220a1066647351b3e3564f1b930e6ab046781bc52367"
+}

@@ -1,0 +1,145 @@
+{
+  "activation_scope": {
+    "request": {
+      "adapter_compiler_hash": "54be4252b34d5fa4877197d95e93d551dd4b191349ac61c4c69adc21eac5802a",
+      "adapter_compiler_id": "comfy-local-h3-t8-native-turbo-video-compiler",
+      "adapter_compiler_version": "2",
+      "base_dependency_graph": {
+        "content_hash": "1dde4c0bf857e76b2d843bdcae00accdd05d303cadf6bd7b230fb9d28e3f7646",
+        "file_sha256": "1bd66c01861b4a2fb200ed4051428d3fd7920522dc5427bc8e368735c00f4df0",
+        "path": "state/dependency_graph.1dde4c0bf857e76b2d843bdcae00accdd05d303cadf6bd7b230fb9d28e3f7646.json",
+        "revision_id": "1dde4c0bf857e76b2d843bdcae00accdd05d303cadf6bd7b230fb9d28e3f7646"
+      },
+      "base_project": {
+        "content_hash": "170fa32f2540513a5ab487f29b05a5c2fd416094f6f519d4d5d7cdffd72f2b86",
+        "file_sha256": "027d63b9db4bf5e8ebb989f158ce6850188ee6792e5a716122e1078389294099",
+        "path": "state/projects/project.5.170fa32f2540513a5ab487f29b05a5c2fd416094f6f519d4d5d7cdffd72f2b86.yaml",
+        "revision": 5
+      },
+      "base_registry": {
+        "content_hash": "94c31462b1b3bdcd54f74583059d267a2b030835105888eda2f9b41e4ed50d1b",
+        "file_sha256": "d8847e09d86bd1bf7e24804481a6a4455b13f7cc8418c8642ea0517b56e8bcf5",
+        "path": "assets/registry.94c31462b1b3bdcd54f74583059d267a2b030835105888eda2f9b41e4ed50d1b.json",
+        "revision_id": "94c31462b1b3bdcd54f74583059d267a2b030835105888eda2f9b41e4ed50d1b"
+      },
+      "c4_multi_anchor_binding": null,
+      "continuity_binding": null,
+      "execution_stack_hash": null,
+      "generation_id": "jieshi-s01-h3-horizontal-generation-001",
+      "hard_cut_keyframe_binding": null,
+      "image_bindings": [
+        {
+          "asset_id": "image-import-ef33d6769ca82f8eecfd38cea18a81a7e476e09c9c739c8a38351e99483a90d3",
+          "asset_sha256": "1ea65e808a44444bd162185e9bacf299f5ff02ebe49556fc147b7a261b7b0061",
+          "height": 941,
+          "mime_type": "image/png",
+          "role": "first_frame",
+          "size_bytes": 1921406,
+          "width": 1672
+        }
+      ],
+      "input_artifact_ids": [
+        "jieshi-e01-S01",
+        "image-import-ef33d6769ca82f8eecfd38cea18a81a7e476e09c9c739c8a38351e99483a90d3"
+      ],
+      "media_bindings": [],
+      "mode": "image_to_video",
+      "model_id": "minimax-h3-t8-i2va-turbo-native",
+      "negative_prompt_text": "",
+      "output_asset_id": "jieshi-s01-h3-horizontal-raw-video-001",
+      "output_requirement": {
+        "container": "mp4",
+        "dimension_mode": "exact",
+        "duration_seconds": null,
+        "fps": 24,
+        "frame_count": 124,
+        "height": 768,
+        "mime_type": "video/mp4",
+        "native_audio": true,
+        "ratio": "16:9",
+        "resolution_label": "h3_t8_native",
+        "timing_mode": "frame_count",
+        "width": 1344
+      },
+      "prompt_text": "integrated_multimodal_description: [Shot 1] scene SC01; open state Landscape first frame: young man seated foreground left facing right toward the window, right hand holding black phone on lap and left hand resting on knee. Seven other passenger reflections remain in the window; his corresponding reflection is absent from the start.; action 林砚看向窗中自己的空位，眉间收紧。 -> 林砚眉间收紧，解剖左手从膝盖连续抬向玻璃，在前三秒内距玻璃约2厘米停住，随后保持。解剖右手始终握着黑手机留在腿上。 -> 左手停在玻璃前，玻璃内没有手。; close state The same man holds his anatomical left hand about two centimeters before the glass; his right hand keeps the phone on his lap. His face, body and raised hand have no reflection, while all seven other reflections remain. Hold this framing and pose.; performance trigger sees his own empty reflected seat; visible response brows tighten slightly, eyes remain fixed on the missing reflection; gaze his empty reflected seat in the window; body seated body stays still, mouth remains closed; hands anatomical left hand rises once from knee toward glass; anatomical right hand retains black phone on lap; terminal performance left hand held two centimeters before glass, mouth closed; visual treatment Photorealistic live-action subway scene, the same young Chinese man and seven other passenger reflections from the first frame; palette cool white overhead light, blue subway seats, gray metal and dark window; materials natural skin and jacket cloth, dark reflective glass, brushed metal carriage; prohibit reflection of the foreground man or his raised hand, additional people or missing background reflections, subtitles, digits, UI, title cards, camera movement or cut; lighting from cool white overhead subway fluorescent lights, soft overhead light onto faces and blue seats, exposure priority preserve foreground face and dark glass details, continuity constant lighting; black tunnel outside; screen direction left hand travels from knee upward toward the window on screen right; camera axis same oblique side of seated man and window; start framing Locked seated eye-height oblique medium-wide 28mm natural lens view: man foreground left, seven reflections across the window to the right, corresponding empty seat visible.; locked-off camera; maintain fixed frame to subject LY from man remains foreground left, window and seven reflections to the right to man remains in the same foreground position with raised left hand; window stays in identical framing; end framing Identical landscape framing with the left hand now raised before the window.; terminal motion state settled\noverall_soundscape: ambience Low continuous train wheel rumble and carriage ventilation beneath the broadcast; foley soft jacket fabric movement as left arm rises; dialogue speaker train_pa says once <d>[Chinese]林砚，请在终点站下车。</d> from 0.100s to 2.700s; on_screen=false; response obligation Neutral female Mandarin train PA from overhead speaker, polite flat tone with narrow-band loudspeaker resonance; only this line. All visible people keep their mouths closed.; lip_sync_required=false; no narration and no extra speech\nnon_diegetic_music: none",
+      "provider_bound_request_hash": "c594ac9feca952ac0c43c4f1be353ca6fafdac16462e3cea4ca1a27bf46492b8",
+      "provider_kind": "minimax_h3_t8_i2va_turbo_native",
+      "provider_name": "comfy-local-h3-t8",
+      "provider_profile": {
+        "profile_id": "minimax-h3-t8-i2va-turbo-native-v2",
+        "profile_path": "provider-profiles/f73fe4a9adef3275ba4b6c9b3bd0307bed39a40542f80747867f2cb46df3e667.json",
+        "profile_sha256": "f73fe4a9adef3275ba4b6c9b3bd0307bed39a40542f80747867f2cb46df3e667",
+        "profile_version": "v2"
+      },
+      "request_input_hash": "ce46ce897ef42a47574690124d86d5671f714e4d6a452ee6537e7a00f06c699f",
+      "requirement_hash": "eb42d85da01811daed2e6995ea1c4e860212b47b5c6b50eb3bb75c3fe0079037",
+      "seal_terminal_frame": false,
+      "seed": null,
+      "target_asset_role": "final_visual",
+      "target_shot_content_hash": "dd91bce78eac93519917209cac0776cc078ab3a17b105e88f8626333e2119f6a",
+      "target_shot_id": "S01",
+      "target_shot_revision": 5,
+      "target_visual_strategy": "generated_video"
+    },
+    "scope_fingerprint": "64cff3b1f22b40c8fad1d573d30545cef18725da8a986124cddd44a159946f98",
+    "usage_license": "provider-output"
+  },
+  "adapter_compiler_hash": "54be4252b34d5fa4877197d95e93d551dd4b191349ac61c4c69adc21eac5802a",
+  "adapter_compiler_id": "comfy-local-h3-t8-native-turbo-video-compiler",
+  "adapter_compiler_version": "2",
+  "billing_kind": "local_unmetered",
+  "c4_multi_anchor_binding": null,
+  "capability_id": "minimax-h3-t8-i2va-turbo-native-v2",
+  "continuity_binding": null,
+  "desired_generation_fingerprint": "3a4ad6f82bc9ac67ae14220a1066647351b3e3564f1b930e6ab046781bc52367",
+  "effective_negative_prompt_text": "",
+  "effective_output": {
+    "container": "mp4",
+    "dimension_mode": "exact",
+    "duration_seconds": null,
+    "fps": 24,
+    "frame_count": 124,
+    "height": 768,
+    "mime_type": "video/mp4",
+    "native_audio": true,
+    "ratio": "16:9",
+    "resolution_label": "h3_t8_native",
+    "timing_mode": "frame_count",
+    "width": 1344
+  },
+  "effective_seed": 5640422673263897159,
+  "execution_kind": "local",
+  "execution_stack_hash": null,
+  "generation_id": "jieshi-s01-h3-horizontal-generation-001",
+  "hard_cut_keyframe_binding": null,
+  "image_bindings": [
+    {
+      "asset_id": "image-import-ef33d6769ca82f8eecfd38cea18a81a7e476e09c9c739c8a38351e99483a90d3",
+      "asset_sha256": "1ea65e808a44444bd162185e9bacf299f5ff02ebe49556fc147b7a261b7b0061",
+      "height": 941,
+      "mime_type": "image/png",
+      "role": "first_frame",
+      "size_bytes": 1921406,
+      "width": 1672
+    }
+  ],
+  "media_bindings": [],
+  "mode": "image_to_video",
+  "model_id": "minimax-h3-t8-i2va-turbo-native",
+  "output_asset_id": "jieshi-s01-h3-horizontal-raw-video-001",
+  "prompt_text": "integrated_multimodal_description: [Shot 1] scene SC01; open state Landscape first frame: young man seated foreground left facing right toward the window, right hand holding black phone on lap and left hand resting on knee. Seven other passenger reflections remain in the window; his corresponding reflection is absent from the start.; action 林砚看向窗中自己的空位，眉间收紧。 -> 林砚眉间收紧，解剖左手从膝盖连续抬向玻璃，在前三秒内距玻璃约2厘米停住，随后保持。解剖右手始终握着黑手机留在腿上。 -> 左手停在玻璃前，玻璃内没有手。; close state The same man holds his anatomical left hand about two centimeters before the glass; his right hand keeps the phone on his lap. His face, body and raised hand have no reflection, while all seven other reflections remain. Hold this framing and pose.; performance trigger sees his own empty reflected seat; visible response brows tighten slightly, eyes remain fixed on the missing reflection; gaze his empty reflected seat in the window; body seated body stays still, mouth remains closed; hands anatomical left hand rises once from knee toward glass; anatomical right hand retains black phone on lap; terminal performance left hand held two centimeters before glass, mouth closed; visual treatment Photorealistic live-action subway scene, the same young Chinese man and seven other passenger reflections from the first frame; palette cool white overhead light, blue subway seats, gray metal and dark window; materials natural skin and jacket cloth, dark reflective glass, brushed metal carriage; prohibit reflection of the foreground man or his raised hand, additional people or missing background reflections, subtitles, digits, UI, title cards, camera movement or cut; lighting from cool white overhead subway fluorescent lights, soft overhead light onto faces and blue seats, exposure priority preserve foreground face and dark glass details, continuity constant lighting; black tunnel outside; screen direction left hand travels from knee upward toward the window on screen right; camera axis same oblique side of seated man and window; start framing Locked seated eye-height oblique medium-wide 28mm natural lens view: man foreground left, seven reflections across the window to the right, corresponding empty seat visible.; locked-off camera; maintain fixed frame to subject LY from man remains foreground left, window and seven reflections to the right to man remains in the same foreground position with raised left hand; window stays in identical framing; end framing Identical landscape framing with the left hand now raised before the window.; terminal motion state settled\noverall_soundscape: ambience Low continuous train wheel rumble and carriage ventilation beneath the broadcast; foley soft jacket fabric movement as left arm rises; dialogue speaker train_pa says once <d>[Chinese]林砚，请在终点站下车。</d> from 0.100s to 2.700s; on_screen=false; response obligation Neutral female Mandarin train PA from overhead speaker, polite flat tone with narrow-band loudspeaker resonance; only this line. All visible people keep their mouths closed.; lip_sync_required=false; no narration and no extra speech\nnon_diegetic_music: none",
+  "provider_bound_request_hash": "c594ac9feca952ac0c43c4f1be353ca6fafdac16462e3cea4ca1a27bf46492b8",
+  "provider_kind": "minimax_h3_t8_i2va_turbo_native",
+  "provider_name": "comfy-local-h3-t8",
+  "provider_profile": {
+    "profile_id": "minimax-h3-t8-i2va-turbo-native-v2",
+    "profile_path": "provider-profiles/f73fe4a9adef3275ba4b6c9b3bd0307bed39a40542f80747867f2cb46df3e667.json",
+    "profile_sha256": "f73fe4a9adef3275ba4b6c9b3bd0307bed39a40542f80747867f2cb46df3e667",
+    "profile_version": "v2"
+  },
+  "provider_task_binding": null,
+  "request_input_hash": "ce46ce897ef42a47574690124d86d5671f714e4d6a452ee6537e7a00f06c699f",
+  "requirement_hash": "eb42d85da01811daed2e6995ea1c4e860212b47b5c6b50eb3bb75c3fe0079037",
+  "resolved_generation_hash": "3a4ad6f82bc9ac67ae14220a1066647351b3e3564f1b930e6ab046781bc52367",
+  "seal_terminal_frame": false
+}

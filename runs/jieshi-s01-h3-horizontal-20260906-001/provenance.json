@@ -1,0 +1,13 @@
+{
+  "source_surface": "codex_imagegen_tool",
+  "actor": "codex",
+  "source_path": "/home/reggie/.codex/generated_images/01a072a2-23a1-7850-af2c-edceff320d9e/exec-e1650ffc-4157-4acc-9f2b-b00cb587c4b7.png",
+  "source_sha256": "1ea65e808a44444bd162185e9bacf299f5ff02ebe49556fc147b7a261b7b0061",
+  "size_bytes": 1921406,
+  "width": 1672,
+  "height": 941,
+  "reference_sha256": "4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb",
+  "operation": "landscape reframe preserving Jieshi S01 identities and reflection anomaly",
+  "human_visual_acceptance": false,
+  "created_at": "2026-09-05T17:43:45.483497+00:00"
+}

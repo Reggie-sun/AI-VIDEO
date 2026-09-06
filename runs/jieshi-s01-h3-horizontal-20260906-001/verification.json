@@ -1,0 +1,40 @@
+{
+  "code_commit": "6f5c0a195d18a69050e4c0ec55d88b2bd423893b",
+  "source_hashes": {
+    "src/ai_video/production/comfy_t8_native_turbo_video.py": "f421ed607b2c31ffd180f60a192ae28376b66758538ad3fa07899b73ec84f091",
+    "src/ai_video/production/_h3_prompt.py": "a8adea2dada13ff6890b772185d54a7b75d2f0ad7d673b3b22ebb51f5efee98f",
+    "tests/test_production_comfy_t8_native_turbo_video.py": "ba5c9a2b58d9256c1dd2a9b8d8e6c34c67ba867042344baf352299312de12c83",
+    "tests/test_production_h3_prompt.py": "b1c5e8af6f02d80d621eb56c8060f7fd0dd0447a932b53d4d507947287792ecf"
+  },
+  "focused_native_and_prompt": {
+    "passed": 60
+  },
+  "expanded_provider_requirements": {
+    "passed": 1184,
+    "duration_seconds": 124.94
+  },
+  "full_suite": {
+    "command": "python -m pytest -p no:cacheprovider -q",
+    "exit_code": 1,
+    "passed": 4453,
+    "failed": 2,
+    "skipped": 4,
+    "warnings": 2,
+    "duration_seconds": 1389.53,
+    "log_sha256": "27c389107fd63f96ade49d8f80e5173168ad8c2ebf03870115b9e0999abfc9f8",
+    "failures": [
+      "tests/test_mcp_transcribe.py::TestVideoTranscribe::test_transcribe_no_audio",
+      "tests/test_mcp_transcribe.py::TestVideoTranscribe::test_transcribe_invalid_model"
+    ],
+    "diagnosis": "Both independently reproduce in current Python. ModuleNotFoundError.name=whisper. Unchanged src/ai_video_mcp/tools/transcribe.py imports whisper before typed invalid-model/audio checks. Live MCP has its own working environment. No dependency installed; no unrelated source fix."
+  },
+  "docs_contract": "PASS",
+  "policy_audit": "PASS",
+  "architecture_task_delta": "PASS; nonblocking native adapter fan-out14 INFO",
+  "independent_review": {
+    "profile": "reviewer_xhigh",
+    "verdict": "accept"
+  },
+  "harness": "NOT_RUN: user worktree constraint conflicts with standard detached-worktree execution; no fresh Harness receipt",
+  "scope_note": "ordinary shared-checkout verification, not exact-snapshot Harness evidence"
+}

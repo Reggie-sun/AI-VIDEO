@@ -1,0 +1,17 @@
+{
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/jieshi-s01-h3-horizontal-20260906-001/production/state/video-generation/fetch/files/6126e68df217ce9a859c5de904b99ea294437fb48f10444eff3bccc52706492a.mp4",
+  "model": "medium",
+  "language": "zh",
+  "duration_seconds": 5.167,
+  "segments": [
+    {
+      "id": 0,
+      "start": 0,
+      "end": 1.68,
+      "start_hms": "00:00:00.000",
+      "end_hms": "00:00:01.680",
+      "text": "看到些"
+    }
+  ],
+  "full_text": "看到些"
+}

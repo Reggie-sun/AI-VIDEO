@@ -1,0 +1,179 @@
+{
+  "artifact_sha256": "6126e68df217ce9a859c5de904b99ea294437fb48f10444eff3bccc52706492a",
+  "tool": "project-local video-analysis MCP",
+  "result": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/jieshi-s01-h3-horizontal-20260906-001/production/state/video-generation/fetch/files/6126e68df217ce9a859c5de904b99ea294437fb48f10444eff3bccc52706492a.mp4",
+    "probe": {
+      "file": {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/runs/jieshi-s01-h3-horizontal-20260906-001/production/state/video-generation/fetch/files/6126e68df217ce9a859c5de904b99ea294437fb48f10444eff3bccc52706492a.mp4",
+        "size_bytes": 1419435,
+        "size_mb": 1.35,
+        "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "duration_seconds": 5.167,
+        "duration_hms": "00:00:05.167",
+        "bit_rate_kbps": 2198
+      },
+      "video_stream": {
+        "codec": "h264",
+        "profile": "High",
+        "width": 1344,
+        "height": 768,
+        "aspect_ratio": "N/A",
+        "fps": 24,
+        "pixel_format": "yuv420p",
+        "bit_rate_kbps": 2051,
+        "frame_count": 124
+      },
+      "audio_stream": {
+        "codec": "aac",
+        "sample_rate": 32000,
+        "channels": 2,
+        "channel_layout": "stereo",
+        "bit_rate_kbps": 128,
+        "language": "und"
+      }
+    },
+    "frames": {
+      "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/jieshi-s01-h3-horizontal-20260906-001/production/state/video-generation/fetch/files/6126e68df217ce9a859c5de904b99ea294437fb48f10444eff3bccc52706492a.mp4",
+      "total_frames_extracted": 11,
+      "interval_used": 0.5,
+      "frames": [
+        {
+          "timestamp_seconds": 0,
+          "timestamp_hms": "00:00:00.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 17927
+        },
+        {
+          "timestamp_seconds": 0.5,
+          "timestamp_hms": "00:00:00.500",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 18083
+        },
+        {
+          "timestamp_seconds": 1,
+          "timestamp_hms": "00:00:01.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 18037
+        },
+        {
+          "timestamp_seconds": 1.5,
+          "timestamp_hms": "00:00:01.500",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 17918
+        },
+        {
+          "timestamp_seconds": 2,
+          "timestamp_hms": "00:00:02.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 17983
+        },
+        {
+          "timestamp_seconds": 2.5,
+          "timestamp_hms": "00:00:02.500",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 17937
+        },
+        {
+          "timestamp_seconds": 3,
+          "timestamp_hms": "00:00:03.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 17910
+        },
+        {
+          "timestamp_seconds": 3.5,
+          "timestamp_hms": "00:00:03.500",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 17965
+        },
+        {
+          "timestamp_seconds": 4,
+          "timestamp_hms": "00:00:04.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 17978
+        },
+        {
+          "timestamp_seconds": 4.5,
+          "timestamp_hms": "00:00:04.500",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 18062
+        },
+        {
+          "timestamp_seconds": 5,
+          "timestamp_hms": "00:00:05.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 17965
+        }
+      ]
+    },
+    "transcription": {
+      "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/jieshi-s01-h3-horizontal-20260906-001/production/state/video-generation/fetch/files/6126e68df217ce9a859c5de904b99ea294437fb48f10444eff3bccc52706492a.mp4",
+      "model": "base",
+      "language": "en",
+      "duration_seconds": 5.167,
+      "segments": [
+        {
+          "id": 0,
+          "start": 0,
+          "end": 1.66,
+          "start_hms": "00:00:00.000",
+          "end_hms": "00:00:01.660",
+          "text": "Yeah."
+        },
+        {
+          "id": 1,
+          "start": 2.5,
+          "end": 3.5,
+          "start_hms": "00:00:02.500",
+          "end_hms": "00:00:03.500",
+          "text": "Maria."
+        },
+        {
+          "id": 2,
+          "start": 5,
+          "end": 29.9,
+          "start_hms": "00:00:05.000",
+          "end_hms": "00:00:29.900",
+          "text": "Miss"
+        }
+      ],
+      "full_text": "Yeah.\nMaria.\nMiss"
+    },
+    "scenes": {
+      "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/jieshi-s01-h3-horizontal-20260906-001/production/state/video-generation/fetch/files/6126e68df217ce9a859c5de904b99ea294437fb48f10444eff3bccc52706492a.mp4",
+      "threshold": 0.4,
+      "total_scenes": 1,
+      "scenes": [
+        {
+          "scene_number": 1,
+          "start_time": 0,
+          "start_hms": "00:00:00.000",
+          "end_time": 5.167,
+          "end_hms": "00:00:05.167",
+          "duration_seconds": 5.167,
+          "confidence": null
+        }
+      ]
+    },
+    "analysis_summary": {
+      "duration_hms": "00:00:05.167",
+      "resolution": "1344x768",
+      "has_audio": true,
+      "estimated_speaking_duration_seconds": 27.6,
+      "scene_count": 1,
+      "frames_extracted": 11
+    }
+  }
+}

@@ -1,0 +1,9 @@
+{
+  "observation_fingerprint": "1c61a5c0fd364a5759c70ff4abb09fb0ae4973db7437d703f680231cedbe3721",
+  "observed_at": "2026-09-06T06:50:38.484481Z",
+  "progress_milli": 1000,
+  "provider_file_id": "MiniMaxH3:ai_video_h3_t8_native_v2_3a4ad6f82bc9ac67_00001-audio.mp4:output",
+  "state": "succeeded",
+  "submission_fingerprint": "d84f5dac8e79294d2665ea10adee067315576daf9b1ff3e24a5fefd8a6909b5e",
+  "submit_result_fingerprint": "46342b854d07dcaa9956f3928cfec25b9968ee406a0b377c42784c275c756665"
+}
