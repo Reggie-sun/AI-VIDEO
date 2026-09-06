@@ -10,6 +10,14 @@ Date: 2026-09-06
 
 ## Current Correction — S01 Hand Motion Rejected
 
+### Follow-up — Endpoint Hand Repair Candidates
+
+用户随后明确要求“修复”。直接查看旧末帧`059bb2b261883190168057b35baafc90011866acba9fb64b1c9c186122861330`发现：抬起左臂的手背朝镜头，拇指却位于画面左侧，存在左右手形态不一致；这是动作突变的输入风险，尚未通过对照视频证明因果。使用image_gen进行了三次局部修图：前两次仍保留错误拇指侧，拒绝；第三次改为侧向微曲、手指透视重叠的试探手势，仅为待审阅候选，不宣称解剖或视频Gate通过。
+
+三张原样输出保存在`runs/jieshi-s01-hand-repair-20260906-001/`，`candidates.json`记录exact hash与bytes。第三张`endpoint-repair-03.png` SHA256 `d9a21860e91cadc7cf4cfe0ce74a44b57c2aa6d600b8c8cc06dc17e4fb4cd1da`，2,051,993 bytes，未注册、未获得human approval。未发起新的Vidu/Seedance视频调用，未生成修复MP4，不推进S02。旧图approval不能冒充新图approval。
+
+本次实际发生image_gen媒体调用，记录阶段不再调用媒体或网络。学习评估`no_candidate`：同一输入的迭代且第三张未验收，不足以提出已验证的跨实验修复规律。保留既有七个staged runs文件；不push。
+
 用户观看本地preview后明确指出“手的问题很大”。该反馈取代下文“第7版视觉可以保留”的暂定判断，不得将此前“没问题”解释为全面验收。MCP补看每0.4秒的1080px帧后发现：1.6秒掌心朝镜头，2秒变手背朝镜头，轮廓变化未清晰呈现自然旋转；先前稀疏抽帧错过了主要动作问题。preview当前FAIL，不推进S02。`runs/jieshi-s02-preparation-20260906-001/`只有原07第71帧的clean continuity reference，未批准/注册为S02首帧，现不得作为accepted source。
 
 字幕澄清与用户具体手部问题正在等待回复；本轮未新提交Provider或生成修复视频。record/learning评估no_candidate：单次同源诊断修正，不扩张为已证实的普遍模型结论。
