@@ -9,6 +9,10 @@ evidence_index_version: "1"
 
 Date: 2026-09-06
 
+## Supersession Notice — 2026-09-06
+
+后续已执行002–007六次有界repair，当前状态为预算耗尽且没有整镜PASS，见[bounded repairs](2026-09-06-jieshi-s01-local-h3-bounded-repairs.md)。下方“唯一一次”与待重试方向仅描述001历史；001测量不变。原剧本“约2cm”已在新实验前澄清为小幅非接触间隙，不要求单视角精确标定。新证据未产生S02、activation或Final Acceptance。
+
 ## Scope And Result
 
 用户要求用本地 H3 试做既有《界蚀》，并批准 S01 横版试片及展示首帧的使用。复用完整剧本 `docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.md` 的首镜；本次不是 52 Shot / 300 秒竖屏全集交付。
