@@ -221,6 +221,7 @@ def test_committer_mro_preserves_approved_domain_order() -> None:
         "_StateCommitVoiceIntentMixin",
         "_StateCommitVoiceCandidateMixin",
         "_StateCommitVoiceActivationMixin",
+        "_StateCommitGeneratedVideoAudioMixin",
         "_StateCommitRenderLifecycleMixin",
         "_StateCommitRenderSupportMixin",
         "_StateCommitDependencyMixin",

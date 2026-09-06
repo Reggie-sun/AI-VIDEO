@@ -785,6 +785,22 @@ def test_every_tracked_provider_console_path_has_an_explicit_route() -> None:
         assert report["fallback_paths"] == [], path
 
 
+def test_generated_video_audio_routes_to_composition_audio_suite() -> None:
+    policy = agent_harness.load_policy(POLICY_PATH)
+    for path in (
+        "src/ai_video/production/generated_video_audio.py",
+        "src/ai_video/production/_generated_video_audio_contracts.py",
+        "src/ai_video/production/_generated_video_audio_reader.py",
+        "tests/test_production_generated_video_audio.py",
+    ):
+        report = agent_harness.inspect_paths([path], policy)
+        assert report["fallback_paths"] == []
+        assert "production_composition_audio_tests" in report["check_ids"]
+    assert "tests/test_production_generated_video_audio.py" in policy["checks"][
+        "production_composition_audio_tests"
+    ]["argv"]
+
+
 def test_hyperframes_source_routes_to_composition_audio_suite() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 

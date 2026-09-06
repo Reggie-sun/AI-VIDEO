@@ -184,6 +184,7 @@ from ._state_commit_common import (
     prepare_dependency_graph_transition,
     prepare_project_registry_commit,
 )
+from ._state_commit_generated_video_audio import _StateCommitGeneratedVideoAudioMixin
 from ._state_commit_bootstrap import _StateCommitBootstrapMixin
 from ._state_commit_contracts import (
     ActivateRenderStateRequest,
@@ -279,6 +280,7 @@ class ProductionStateCommitter(
     _StateCommitVoiceIntentMixin,
     _StateCommitVoiceCandidateMixin,
     _StateCommitVoiceActivationMixin,
+    _StateCommitGeneratedVideoAudioMixin,
     _StateCommitRenderLifecycleMixin,
     _StateCommitRenderSupportMixin,
     _StateCommitDependencyMixin,

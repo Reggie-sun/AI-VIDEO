@@ -16,6 +16,7 @@ from ai_video.production._commercial_project_reader import (
     verify_commercial_source_project_state,
 )
 from ai_video.production._image_project_reader import verify_active_image_evidence
+from ai_video.production._generated_video_audio_reader import verify_active_generated_voice_claims
 from ai_video.production._paid_provider_project_reader import (
     verify_paid_provider_evidence,
 )
@@ -377,19 +378,12 @@ def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
             "Active P4 voice candidate history is invalid.", detail
         ) from exc
     assets_by_id = {asset.asset_id: asset for asset in bundle.registry.assets}
-    generated_voice_ids = {
-        asset.asset_id
-        for asset in bundle.registry.assets
-        if asset.asset_type is AssetType.VOICE
-        and asset.source_kind is AssetSourceKind.GENERATED
-    }
     claimed_audio_ids = {
         asset_id
         for attempt in attempts
         for asset_id in attempt.candidate_audio_asset_ids
     }
-    if generated_voice_ids != claimed_audio_ids:
-        raise _invalid("Active generated voice assets do not match succeeded attempts.")
+    verify_active_generated_voice_claims(bundle, claimed_audio_ids)
     for attempt in attempts:
         if len(attempt.candidate_audio_asset_ids) != 1:
             raise _invalid(

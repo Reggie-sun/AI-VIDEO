@@ -8,6 +8,10 @@ learning_eligibility: ineligible
 
 Date: 2026-09-06
 
+## Supersession Notice — 2026-09-06
+
+用户随后明确批准有界原生音轨派生入口，现已实现并通过聚焦验证与独立review；下文“Not Authorized Or Implemented”保留为历史状态。新能力仅支持已结算的remote语音源及限定target版本，07/08仍缺实际结算证据，尚未真实派生或合成。当前边界见[实现记录](2026-09-06-generated-video-audio-derivation.md)。
+
 ## Current Evidence
 
 用户在attempt09失败后要求继续。本次没有新增Provider提交或生成媒体；只检查替代修复路径。07和08经canonical strict reader复核仍为validate，exact MP4 SHA及bytes保持：
