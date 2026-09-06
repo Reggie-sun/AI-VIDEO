@@ -43,6 +43,12 @@ prompt fingerprint 来自原始工具调用，未编造新图沿用旧 approval�
 身份/胸牌细节和真实 1.0× 试听；已向用户提供旧片并请求声音观察，不要求其重新接受失败手部。
 独立审查确认保留 evidence-first 有契约依据，未为继续付费生成而放宽该分支。
 
+随后为补齐视觉证据显式调用 project-local `video_extract_frames`，同一 attempt09 MP4
+按 0.5 秒间隔提取 9 张 1080px 图并逐张检查，原始结果保存在新 run 的
+`previous-video-frames-mcp.json`。2–3 秒掌心朝镜头、3.5 秒变为手背，手部失败继续成立；
+胸牌可见白色面但不足以确认其是否背面，深度没有标定，仍不伪造细节或厘米 PASS。
+这项同源补证不是新生成或独立实验。
+
 本次 `record-ai-video-session` 的自动 `distill-ai-video-learning` 评估为 `no_candidate`：
 输入获批/登记与历史 seed 兼容性修复不是新的独立视频实验，不足以证明手势方案有效。
 记录阶段不调用 Provider、媒体或网络，不刷新 RAG；保留既有七个 staged run 文件，不 push。

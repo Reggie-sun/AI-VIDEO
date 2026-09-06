@@ -57,4 +57,3 @@ def planning(loaded, source):
     plan = VideoPlanner().plan(request)
     verified = require_current_video_plan(current_request=request, plan=plan)
     return request, plan, verified
-
