@@ -209,7 +209,7 @@ def test_global_durable_experience_cannot_be_omitted_from_next_binding() -> None
     )
     unrelated.video_generation_state.generation_experiences = (pointer,)
     unrelated.video_generation_state.execution_binding = None
-    manifest = SimpleNamespace(attempts=(unrelated,))
+    manifest = SimpleNamespace(attempts=(unrelated,), imported_generation_experiences=())
     committer = _HistoryCommitter(
         {"current": current},
         {"current-request": _request(), "unrelated-request": _request(shot_id="other-shot")},
@@ -258,7 +258,7 @@ def test_not_submitted_experience_cannot_hide_later_durable_outcome(later_state)
     else:
         prior.video_generation_state.local_fetch_receipt = SimpleNamespace(artifact_sha256="d" * 64)
         message = "exact media evaluation"
-    manifest = SimpleNamespace(attempts=(prior,))
+    manifest = SimpleNamespace(attempts=(prior,), imported_generation_experiences=())
     committer = _HistoryCommitter({"current": current, "previous": current},
         {"old-request": _request()}, {id(pointer): experience}, manifest)
     with pytest.raises(AiVideoError, match=message):
@@ -271,7 +271,7 @@ def test_unpersisted_extra_experience_cannot_influence_next_submit():
     invented = SimpleNamespace(evidence_hash="c" * 64)
     experience = SimpleNamespace(evidence=(invented,), model_dump=lambda mode: {"experience": "invented"})
     current.inputs = SimpleNamespace(**vars(current.inputs), evidence=(invented,), experiences=(experience,))
-    manifest = SimpleNamespace(attempts=())
+    manifest = SimpleNamespace(attempts=(), imported_generation_experiences=())
     committer = _HistoryCommitter({"current": current}, {}, {}, manifest)
     with pytest.raises(AiVideoError, match="complete durable experience"):
         committer._require_submit_execution_binding(manifest,
@@ -292,7 +292,7 @@ def test_permit_requires_latest_from_ordered_durable_shot_history(latest):
     prior = _attempt(attempt_id="old", binding="previous", request="old-request")
     prior.video_generation_state.generation_experiences = pointers
     prior.video_generation_state.local_fetch_receipt = SimpleNamespace(artifact_sha256="e" * 64)
-    manifest = SimpleNamespace(attempts=(prior,))
+    manifest = SimpleNamespace(attempts=(prior,), imported_generation_experiences=())
     committer = _HistoryCommitter({"current": current, "previous": current},
         {"old-request": _request()}, {id(p): x for p, x in zip(pointers, experiences)}, manifest)
     with pytest.raises(AiVideoError, match="ordered durable history"):

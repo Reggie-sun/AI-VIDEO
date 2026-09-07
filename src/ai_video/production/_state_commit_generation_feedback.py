@@ -196,10 +196,14 @@ class _StateCommitGenerationFeedbackMixin:
 
     def read_generation_experiences(self) -> tuple[GenerationExperience, ...]:
         manifest = self._read_manifest()
+        from ai_video.production._generation_feedback_reader import load_imported_history
+
+        imported = load_imported_history(self._project_root, manifest)
         receipts = tuple(
             pointer
             for attempt in manifest.attempts
             if attempt.video_generation_state is not None
             for pointer in attempt.video_generation_state.generation_experiences
         )
-        return tuple(self._reopen_generation_experience(pointer) for pointer in receipts)
+        return (*tuple(item.experience for item in imported),
+                *tuple(self._reopen_generation_experience(pointer) for pointer in receipts))

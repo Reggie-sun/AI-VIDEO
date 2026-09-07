@@ -62,6 +62,17 @@ QA owner 的 `generation_evaluation_authorities` 显式绑定 evaluator 与 proo
 source/M0 caller 的独立验证路径进入；历史 recovery 不重新 submit。
 permit 从 Manifest 顺序推导同 Shot 的最新有效结果，优先实际提交结果；prepared-only、换 task
 名称或选择更早的记录不能抹去 FAIL。完整持久历史必须与 decision inputs 一致，不接受遗漏或注入。
+旧版无binding、已取回的remote媒体通过显式`import_generation_experience()`导入，
+唯一writer仍为`ProductionStateCommitter`；`generation_history_import.py`独占历史收据
+及保留的source Manifest/request/submit/status/fetch/MP4和事后评价来源校验，不伪造原始execution binding。
+Manifest的可选`imported_generation_experiences`只适用于具备video-generation能力的版本，
+空字段不进入历史序列化。导入必须在目标任何video attempt之前，按原fetch时间排序，
+同源request不能重复；exact replay不再写入。标准loader重开保留证据，提交校验同时比较
+导入历史与新attempt历史，不能用新目录或未持久化评价隐藏旧FAIL。事后QA policy与rubric
+显式保留；原付费状态不变，历史所属task的调用不能冒充新task的submit授权。
+原始评价必须从显式evidence root按contained path/hash读取并保留evaluator attribution；
+原文到typed findings的语义对应由retrospective evaluator负责，不能由hash检查推断。
+导入不接受新MCP analysis evidence或无binding来源凭空声明的受控intervention。
 `VideoGenerationService` 在 effect 前重验当前真实 adapter compiler/resolve，Ecommerce facade
 传递同一 execution binding。Commercial identity 由既有 lifecycle→compiler 保真传递。
 Production 不 import Planning/Q0/Dev records/RAG/Skills，不增加 quota ledger、Gate 或 activation owner。
@@ -80,6 +91,7 @@ Focused verification：`python -m pytest -p no:cacheprovider tests/test_generati
 tests/test_generation_evaluation.py tests/test_generation_execution.py tests/test_generation_execution_guards.py
 tests/test_generation_provider_wiring.py tests/test_generation_local_wiring.py
 tests/test_generation_historical_replay.py tests/test_production_generation_decision.py
+tests/test_generation_history_import.py tests/test_generation_history_import_receipt.py
 tests/test_generation_feedback_driver.py tests/test_generation_feedback_review.py -q`。
 实际 changed paths 还必须执行 Harness 的 production state/provider、requirement、Ecommerce 与 control-plane checks。
 

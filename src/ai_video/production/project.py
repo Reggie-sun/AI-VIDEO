@@ -1625,6 +1625,9 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
     # eligibility is checked separately at canonical execution boundaries.
     validate_project_references(bundle)
     verify_manifest_video_evidence(bundle, manifest)
+    from ai_video.production._generation_feedback_reader import verify_imported_history
+
+    verify_imported_history(bundle)
     verify_commercial_source_project_state(bundle)
     if manifest.active_render_state is not None:
         render_state = (

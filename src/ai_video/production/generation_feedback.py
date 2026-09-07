@@ -347,8 +347,15 @@ class GenerationFeedbackOrchestrator:
             # synthesize a baseline from the current prompt or recipe.
             baseline = None
             if latest is not None:
-                _, state = VideoGenerationService(committer=committer, provider=None)._state(latest.attempt_id)
-                request = committer._reopen_video_request(state.request)
+                from ai_video.production._generation_feedback_reader import load_imported_history
+
+                imports = load_imported_history(committer.project_root, committer._read_manifest())
+                imported = next((r for r in imports if latest in r.experience.evidence), None)
+                if imported is not None:
+                    request = imported.source_request
+                else:
+                    _, state = VideoGenerationService(committer=committer, provider=None)._state(latest.attempt_id)
+                    request = committer._reopen_video_request(state.request)
                 if request.activation_scope is not None:
                     baseline = request.activation_scope.request
             return GenerationHistory(experiences, latest.evidence_hash if latest else None, baseline)

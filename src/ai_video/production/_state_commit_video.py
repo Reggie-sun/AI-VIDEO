@@ -169,6 +169,15 @@ class _StateCommitVideoMixin:
             persisted_evidence: set[str] = set()
             ordered_shot_evidence = []
             ordered_experiences = []
+            from ai_video.production._generation_feedback_reader import load_imported_history
+
+            for imported in load_imported_history(self._project_root, manifest):
+                experience = imported.experience
+                ordered_experiences.append(experience)
+                persisted_experiences.add(canonical_sha256(experience.model_dump(mode="json")))
+                persisted_evidence.update(e.evidence_hash for e in experience.evidence)
+                ordered_shot_evidence.extend(e for e in experience.evidence
+                                             if e.shot_id == binding.context.target_shot_id)
             for item in manifest.attempts:
                 prior = item.video_generation_state
                 if prior is None:

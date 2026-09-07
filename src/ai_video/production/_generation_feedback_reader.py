@@ -125,3 +125,29 @@ def verify_generation_feedback(root, state, request):
                 raise _invalid(f"{label} execution binding is not exact.", str(exc)) from exc
     for pointer in state.generation_experiences:
         load_generation_experience(root, pointer)
+
+
+def load_imported_history(root, manifest):
+    """Read the Manifest-selected retrospective history in source order."""
+    if not manifest.imported_generation_experiences:
+        return ()
+    from ai_video.production.generation_history_import import load_imported_generation_experience
+
+    receipts = tuple(load_imported_generation_experience(root, p)
+                     for p in manifest.imported_generation_experiences)
+    if len({r.import_id for r in receipts}) != len(receipts):
+        raise _invalid("Historical generation import IDs are duplicated.")
+    dates = tuple(r.source_fetch.fetched_at for r in receipts)
+    if dates != tuple(sorted(dates)):
+        raise _invalid("Historical generation imports are not in source order.")
+    return receipts
+
+
+def verify_imported_history(loaded):
+    for receipt in load_imported_history(loaded.root, loaded.manifest):
+        request = receipt.source_request.activation_scope.request
+        shots = (*loaded.shots, *loaded.production_parents)
+        if (receipt.source_manifest.project_id != loaded.project.project_id
+                or not any(s.shot_id == request.target_shot_id
+                           and s.artifact_id in request.input_artifact_ids for s in shots)):
+            raise _invalid("Imported history has a different project or Shot identity.")

@@ -197,6 +197,22 @@ class GenerationExperienceReceiptPointer(_PaidLifecycleModel):
         return self
 
 
+class ImportedGenerationExperienceReceiptPointer(_PaidLifecycleModel):
+    path: Path
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "ImportedGenerationExperienceReceiptPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(f"state/video-generation/imported-experiences/{self.content_hash}.json"),
+            "imported generation experience receipt",
+        )
+        return self
+
+
 class QualificationExecutionBindingPointer(_PaidLifecycleModel):
     path: Path
     binding_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
