@@ -2,6 +2,23 @@
 
 ## Current State
 
+### Latest Result — 2026-09-08
+
+用户授权“解决之后再生成”已执行：legacy history兼容修复通过独立review与正式Harness，
+旧16项评价已canonical导入，原四项FAIL保留；当前2.3 QA已选择。一次Vidu提交成功，
+经原public-IP下载保护下的进程内DNS修复取回MP4，SHA-256
+`94e7480dfce4374f9b3a4de3006797aae033526a8fc36faa8f9ac19ae0406954`，3,325,775 bytes。
+
+project-local `video_analyze`实测1080×1920、24fps、97帧、4.042秒，AAC48kHz stereo；
+medium转写原点名广播为0–2秒。17帧/0.25秒检查发现1.5秒才开始抬手、约3秒接近
+目标，且途中掌向仍改变：legacy-03/05 FAIL。新片human06/14/17待答，不能继承旧片批准。
+Gate为FAIL，未激活、未推进S02；一次提交额度已用完，禁止自动再次POST。
+
+strict reopen：Manifest r22 / Project r6 / Shot r6，attempt RUNNING/VALIDATE，
+一条imported history与一条新generation experience；原attempt09 Manifest完全未改变。
+`preparation-v2/`保存exact preview/binding、POST审计、fetch结果、MCP原始响应、Gate、
+canonical反馈诊断与runtime checkpoint。下方是本次生成前的历史准备状态。
+
 ### Supersession — 2026-09-08
 
 用户对 exact attempt09 明确反馈“手部出现明显变型”，并对前3秒的小间隙可读性

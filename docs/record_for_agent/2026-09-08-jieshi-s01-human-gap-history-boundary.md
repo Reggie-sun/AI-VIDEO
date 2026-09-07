@@ -37,6 +37,55 @@ FAIL；不把不可读解释成已测量物理接触或厘米距离。
 
 ## Current Execution Boundary
 
+### Supersession — Authorized Compatibility Implementation
+
+用户随后明确“解决”“解决之后再生成”，授权先实现此兼容性边界，再执行原单次
+Vidu S01修复。代码checkpoint为`43f45e6`和`a99daf2`：唯一committer导入已知成功fetch
+的legacy source，保留原始请求/submit/status/fetch、媒体及实际读取的原始评价文件和
+attribution；不制造旧binding、激活或结算。标准loader、feedback与submit guard消费同一历史。
+新schema由独立Manifest mixin维护；原Manifest序列化保持兼容。
+
+两次`reviewer_xhigh`审查均accept，独立import tests 13 passed。初次Harness因models/project
+增长失败，已提取责任；第二次exact-range Harness已PASS，完整性、freshness及snapshot复核
+全部通过：`.agent/harness/runs/jieshi-s01-history-import-20260908-v2/receipt.json`。
+Production回归3275 passed / 3 skipped，generation feedback177 passed / 1 skipped，
+Provider/lifecycle749 passed；不将这些测试数量相加为独立样本。
+原文到typed评价的语义真实性由retrospective evaluator负责，bytes校验不替代它。
+
+`preparation-v2/prepared-history-import.json`已对真实source只读prepare成功，媒体3,476,468
+bytes，16项评价保留；`legacy-03/05/06/17`仍全部FAIL。receipt hash
+`0a325c94e2f8b951c1521efc87f60299969eeea97e69f4758e1c2fca55c1ad39`。
+随后已正式导入旧评价、选择2.3 QA并完成新Provider提交与fetch，见下方Latest Runtime Result。
+以下旧“没有导入入口/没有修改核心代码”叙述仅描述本节supersession之前的状态。
+
+### Latest Runtime Result
+
+一次新Vidu Q3 Pro I2V提交于2026-09-07 19:16:03 UTC获接受，随后SUCCEEDED。
+原first/approved last bytes、原点名广播保持；固定seed20260907。实际compiled delta仅为
+`provider_profile/prompt_text/image_bindings/seed`，旧随机性未控制，不声称单变量因果。
+现有requirement/1由实际Vidu native compiler/2支持；离线尝试compiler/3返回unsupported后，
+按实际contract选择compiler/2，未借此使用generic compiler或发送额外Provider请求。
+
+首次fetch被Mihomo fake DNS的198.18地址拒绝；使用既有恢复方式对exact公共host做HTTPS
+DNS解析，仅在该fetch进程内注入真实公网地址，保留原HTTPS/public-IP/no-redirect guards。
+没有额外POST、系统DNS修改或fallback。原请求的成功结果于19:19:04 UTC取回：
+SHA-256 `94e7480dfce4374f9b3a4de3006797aae033526a8fc36faa8f9ac19ae0406954`，
+3,325,775 bytes；准确路径由attempt10 `preparation-v2/fetch-result.json`保存。
+
+project-local MCP实跑`video_analyze`：1080×1920、24fps、97帧、4.042秒、H264/AAC48kHz
+stereo；medium转写原点名广播0–2秒。Main thread检查17帧/0.25秒：legacy-03/05 FAIL，
+1.5秒才起手、约3秒近目标且途中掌向变化。其余11项raw技术/抽样analyzer项PASS；
+human06/14/17尚无新exact观看答复，NOT_EVALUATED；final subtitle只属于composition。
+Gate FAIL，没有质量通过、candidate activation或S02。单次额度已消费，不自动再次生成。
+
+通过真实初始化的project-local MCP ClientSession与`review_generation_attempt`写入canonical
+feedback，diagnosis为EVIDENCE_GAP+QUALITY_FAILURE。方便封装`ProjectAnalysisSession`
+首次因isolated runtime失败，后续使用实际venv executable的initialized session完成同一
+bridge，未伪造analysis proof或修改helper。新experience hash
+`2ae553127fd452c025359ce11b99f55a10da6d459e3db01c7de0bb2d71b2a974`。
+strict reopen Manifest r22 / Project r6 / Shot r6，attempt RUNNING/VALIDATE；保留付费
+reservation，未虚构实际账单结算。source09 Manifest hash复核未变化。
+
 standard `load_production_project()`重开attempt10为Manifest revision 4、Project/Shot
 revision 6，`active_qa_policy=None`。准备目录的2.3 acceptance不是canonical active QA。
 常规`activate_qa_policy`入口已存在；它本身不能解决历史接入。
@@ -61,5 +110,7 @@ candidate activation或S02；没有新MP4，单次修复额度未消费。没有
 
 ## Learning Evaluation
 
-`distill-ai-video-learning`：no_candidate。同一旧MP4的补充human proof不是新独立
-模型实验，不能证明修复末帧会改善生成质量。RAG仅作为advisory discovery使用。
+`distill-ai-video-learning`：no_candidate。旧片补充human proof不是独立实验；本次修复
+同时改变末帧、动作文本、profile及seed，且新人类质量判断未完成。当前证据不能支持
+“修复末帧改善手部”之类可采用的因果结论或新的policy target。保留两个exact结果及
+反证，不创建占位Learning Claim。RAG仅作为advisory discovery使用。
