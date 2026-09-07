@@ -10,6 +10,24 @@ Date: 2026-09-06
 
 ## Current Correction — S01 Hand Motion Rejected
 
+### Supersession — Hand And Personalized Broadcast Rejected
+
+用户随后明确反馈“1手太奇怪了. 2音频不符合,地铁站不可能报名字”。因此下方声音
+“没问题”仅保留为历史问答，不能继续支持当前音频接受。新的 human 结论为手型／
+动作观感 FAIL，以及广播点名的 creative choice FAIL；不伪造杂音、错读或嘴部问题。
+
+当前 [S01 修复方向](../superpowers/artifacts/drama/jieshi-episode-01/s01-repair-direction-20260907.md)
+明确去除姓名，拟用“前方终点站，请准备下车。”，保留既定对白窗口、native audio
+及原批准图。具体短句由 Codex 拟定；“终点站到了”因暗示已到站而未采用。
+episode-01.md 的 S01 增加显式版本指向，旧派生稿与选中 Production creative revision
+未被静默改写。新的 runtime creative commit、规划与编译尚未执行。
+
+Native reviewer_xhigh 复核：本次“手太奇怪”没有明确判断小间隙可读性，因此不能
+据此关闭 legacy-06，也不能通过合并手型与间隙 criteria 消除缺口。当前 submit
+readiness 仍为 reject；所需最小补证是同一旧片前 3 秒“小间隙是否可读”的真实观看
+结论。未提交 Provider、未生成新视频、未消费修复额度，不扩大到核心 policy 改动。
+本次为同源 human 纠错与 authoring draft，自动 learning evaluation 为 no_candidate。
+
 ### Supersession — Human Audio Review Received On 2026-09-07
 
 用户对 exact attempt09 MP4 的正常速度试听问题（广播是否清楚完整、有无杂音或声音
