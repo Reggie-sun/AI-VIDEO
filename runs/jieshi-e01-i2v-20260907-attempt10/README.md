@@ -2,6 +2,27 @@
 
 ## Current State
 
+### Supersession — 2026-09-08
+
+用户对 exact attempt09 明确反馈“手部出现明显变型”，并对前3秒的小间隙可读性
+回答“看不清”。`human-visual-review-attempt09-20260908.json` 保存原话和媒体 identity；
+legacy-17 / legacy-06 均为 human FAIL，不推断物理接触或厘米深度。
+`historical-human-supplement-20260908.json` 与旧证据在原2.1 rubric 下合并，
+`historical-diagnosis-after-visual-20260908.json` 实跑仅 QUALITY_FAILURE，
+不再有 EVIDENCE_GAP；原始证据和旧 NOT_EVALUATED 不覆盖。
+`historical-decision-after-visual-20260908.json` 的纯历史 Router 重放为
+REASSESS_FEASIBILITY，不是当前2.3 rubric 的可提交决定。
+
+当前 strict reopen 仍为 Manifest r4 / Project r6 / Shot r6，active_qa_policy=None。
+旧attempt09没有新版execution binding，v10没有durable generation experience。
+当前committer要求新binding的历史与Manifest完全一致，且没有旧无binding历史的
+导入入口；不能清空失败历史、伪造旧binding或绕过提交校验。需先解决这个明确的
+兼容性边界，再绑定已有2.3 rubric/evaluator并重新规划。没有新Provider提交，
+单次修复额度未消费。详细当前记录见
+[S01 history boundary](../../docs/record_for_agent/2026-09-08-jieshi-s01-human-gap-history-boundary.md)。
+
+下方2026-09-07状态为历史准备记录，其中“待补真实间隙答复”已被上文取代。
+
 2026-09-07 最新用户指令：“那我的判断出问题了,你就修复手的问题就好了”。
 原点名广播保留；普通报站改稿撤回，未进入 runtime。旧片手部 human FAIL 保留。
 `preparation-v1/` 已保存 strict planner/context/lifecycle、同额续期 profile 和完整

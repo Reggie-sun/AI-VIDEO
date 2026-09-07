@@ -8,6 +8,15 @@ learning_eligibility: ineligible
 
 Date: 2026-09-06
 
+## Supersession — 2026-09-08 Human Gap Finding Received
+
+用户已对exact attempt09回复“手部出现明显变型”及间隙“看不清”。手部自然性、
+前3秒间隙可读性均为human FAIL；不推断物理接触。原2.1历史诊断实跑已移除
+EVIDENCE_GAP，保留QUALITY_FAILURE。下文“待补真实间隙答复”不再是当前停止点。
+当前阻塞是旧无execution binding历史无法通过新版durable experience提交校验；
+没有新Provider提交。准确证据与接口边界见
+[2026-09-08 record](2026-09-08-jieshi-s01-human-gap-history-boundary.md)。
+
 ## Current Correction — S01 Hand Motion Rejected
 
 ### Current Scope — Original Broadcast Retained, Hand Repair Only
