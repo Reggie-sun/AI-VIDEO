@@ -12,6 +12,16 @@ Date: 2026-09-06
 
 ### Supersession — Hand And Personalized Broadcast Rejected
 
+随后用户要求先核对之前音频。Parent 重新确认旧预览 SHA
+`5e713b14f1ac886537a1b4076cab3a473308b58f808c2e32073a668b9a4c6182` 与
+attempt09 SHA `7b249ddc7c535b36447b0804909059f2e54a74d0a73328dafe409db16a759302`，
+对两者实际音轨调用 project-local video_transcribe（Whisper medium / zh）：
+分别为 0–2.64s“林彥,請在終點站下車”、0–2.24s“林燕請在終點站下車”。
+均符合旧点名台词；同音 ASR 字形不是错读证据，也不证明音色自然。
+creative-input.md 第 26、35 行本来就要求点名及“广播为什么知道他的名字”的悬念。
+因此普通报站是叙事改写候选，不是纠正模型擅自加词；尚未取得用户对该取舍的接受。
+没有提交新生成；本次同源转写不增加独立实验，learning evaluation 仍为 no_candidate。
+
 用户随后明确反馈“1手太奇怪了. 2音频不符合,地铁站不可能报名字”。因此下方声音
 “没问题”仅保留为历史问答，不能继续支持当前音频接受。新的 human 结论为手型／
 动作观感 FAIL，以及广播点名的 creative choice FAIL；不伪造杂音、错读或嘴部问题。
