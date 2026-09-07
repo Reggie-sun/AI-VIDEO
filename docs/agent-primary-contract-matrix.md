@@ -66,6 +66,7 @@ permit 从 Manifest 顺序推导同 Shot 的最新有效结果，优先实际提
 唯一writer仍为`ProductionStateCommitter`；`generation_history_import.py`独占历史收据
 及保留的source Manifest/request/submit/status/fetch/MP4和事后评价来源校验，不伪造原始execution binding。
 Manifest的可选`imported_generation_experiences`只适用于具备video-generation能力的版本，
+字段与校验由`_generation_history_schema.py`的Manifest mixin维护，
 空字段不进入历史序列化。导入必须在目标任何video attempt之前，按原fetch时间排序，
 同源request不能重复；exact replay不再写入。标准loader重开保留证据，提交校验同时比较
 导入历史与新attempt历史，不能用新目录或未持久化评价隐藏旧FAIL。事后QA policy与rubric

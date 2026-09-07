@@ -143,7 +143,10 @@ def load_imported_history(root, manifest):
     return receipts
 
 
-def verify_imported_history(loaded):
+def verify_manifest_generation_evidence(loaded, manifest):
+    from ai_video.production._video_project_reader import verify_manifest_video_evidence
+
+    verify_manifest_video_evidence(loaded, manifest)
     for receipt in load_imported_history(loaded.root, loaded.manifest):
         request = receipt.source_request.activation_scope.request
         shots = (*loaded.shots, *loaded.production_parents)

@@ -21,7 +21,7 @@ from ai_video.production._paid_provider_project_reader import (
     verify_paid_provider_evidence,
 )
 from ai_video.production._review_project_reader import load_active_review_state
-from ai_video.production._video_project_reader import verify_manifest_video_evidence
+from ai_video.production._generation_feedback_reader import verify_manifest_generation_evidence
 from ai_video.production._voice_project_reader import (
     read_canonical_voice_json,
     read_canonical_voice_model,
@@ -1624,10 +1624,7 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
     # Revalidate immutable lineage after attaching review state. Current-use
     # eligibility is checked separately at canonical execution boundaries.
     validate_project_references(bundle)
-    verify_manifest_video_evidence(bundle, manifest)
-    from ai_video.production._generation_feedback_reader import verify_imported_history
-
-    verify_imported_history(bundle)
+    verify_manifest_generation_evidence(bundle, manifest)
     verify_commercial_source_project_state(bundle)
     if manifest.active_render_state is not None:
         render_state = (

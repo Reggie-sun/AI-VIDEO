@@ -25,7 +25,7 @@ from ai_video.production.artifact_contracts import (
     StrictModel,
     VersionedArtifact,
 )
-import ai_video.production._caption_review_models as _caption_review
+from ai_video.production import _caption_review_models as _caption_review, _generation_history_schema as _generation_history
 from ai_video.production.production_strategy_contracts import (
     ProductionShotMixin,
 )
@@ -75,7 +75,6 @@ from ai_video.production._commercial_source_state import (
 from ai_video.production._immutable_models import ImmutableDict as _ImmutableDict
 from ai_video.production._lifecycle_schema import (
     ImageRequestReceipt,
-    ImportedGenerationExperienceReceiptPointer,
     PaidProviderAttemptPhase as PaidProviderAttemptPhase, PaidProviderAttemptState as PaidProviderAttemptState,
     PaidProviderBudgetSnapshotPointer as PaidProviderBudgetSnapshotPointer, PaidProviderGateReceiptPointer as PaidProviderGateReceiptPointer,
     PaidProviderSubmitReceiptPointer as PaidProviderSubmitReceiptPointer, P0QualificationPreparedReceiptPointer as P0QualificationPreparedReceiptPointer,
@@ -1676,7 +1675,7 @@ class FinalAcceptanceState(StrictModel):
     active_receipt: FinalAcceptanceReceiptPointer | None = None
 
 
-class ProductionManifest(_caption_review.CaptionManifestMixin, StrictModel):
+class ProductionManifest(_caption_review.CaptionManifestMixin, _generation_history.GenerationHistoryManifestMixin, StrictModel):
     schema_version: ManifestVersion = "2.0"
     project_id: str
     manifest_revision: int = Field(ge=1)
@@ -1697,16 +1696,6 @@ class ProductionManifest(_caption_review.CaptionManifestMixin, StrictModel):
     active_commercial_source_approvals: tuple[CommercialSourceApprovalPointer, ...] = ()
     commercial_source_attempts: tuple[CommercialSourceAttemptState, ...] = ()
     attempts: tuple[StateCommitAttempt, ...] = ()
-    imported_generation_experiences: tuple[ImportedGenerationExperienceReceiptPointer, ...] = ()
-
-    @model_validator(mode="before")
-    @classmethod
-    def _reject_unsupported_imported_history(cls, value):
-        if (isinstance(value, Mapping) and "imported_generation_experiences" in value
-                and not manifest_supports(value.get("schema_version", "2.0"),
-                                          ManifestCapability.VIDEO_GENERATION)):
-            raise ValueError("Imported generation history requires video-generation capability")
-        return value
 
     @model_validator(mode="before")
     @classmethod
@@ -1825,13 +1814,6 @@ class ProductionManifest(_caption_review.CaptionManifestMixin, StrictModel):
 
     @model_validator(mode="after")
     def _validate_unique_attempt_ids(self) -> "ProductionManifest":
-        imports = self.imported_generation_experiences
-        if imports and not manifest_supports(self.schema_version, ManifestCapability.VIDEO_GENERATION):
-            raise ValueError("Imported generation history requires video-generation capability")
-        if len({p.content_hash for p in imports}) != len(imports) or len(
-            {p.request_fingerprint for p in imports}
-        ) != len(imports):
-            raise ValueError("Imported generation histories must have unique source requests")
         attempt_ids = [item.attempt_id for item in self.attempts]
         if len(attempt_ids) != len(set(attempt_ids)):
             raise ValueError("Production Manifest attempt IDs must be unique")
@@ -1961,9 +1943,7 @@ class ProductionManifest(_caption_review.CaptionManifestMixin, StrictModel):
     def _serialize_compatible_schema(
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, object]:
-        data = handler(self)
-        if not self.imported_generation_experiences:
-            data.pop("imported_generation_experiences", None)
+        data = self._serialize_imported_history(handler(self))
         if self.schema_version == "2.0" and self.active_render_state is None: data.pop("active_render_state", None)
         if (
             not manifest_supports(self.schema_version, ManifestCapability.DEPENDENCY_GRAPH)

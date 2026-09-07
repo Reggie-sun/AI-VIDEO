@@ -399,6 +399,7 @@ categories:
       - src/ai_video/production/_state_commit_generation_feedback.py
       - src/ai_video/production/_state_commit_generation_history.py
       - src/ai_video/production/generation_history_import.py
+      - src/ai_video/production/_generation_history_schema.py
       - src/ai_video/production/_generation_feedback_reader.py
       - src/ai_video/production/_remote_video_native_prompt.py
       - tests/test_generation_feedback.py
