@@ -10,6 +10,38 @@ Date: 2026-09-06
 
 ## Current Correction — S01 Hand Motion Rejected
 
+### Current Scope — Original Broadcast Retained, Hand Repair Only
+
+用户复核最初创意后明确：“那我的判断出问题了,你就修复手的问题就好了”。
+保留“林砚，请在终点站下车。”及原 native audio 要求；下方普通报站改稿撤回，
+从未进入选中 creative revision 或 Provider。手部 human FAIL 仍有效。
+
+本轮继续在 attempt10 正式 preparation：strict reopen Manifest revision 4 / Shot
+revision 6，仅有 endpoint import；重跑 planner 并保存 exact context/lifecycle、
+原广播请求、新批准 endpoint、fixed seed 20260907 的 candidate。同额 operator
+ceiling 从旧 profile 续期到 `e7af1c87569f4dcfdb31629b335e5237e15e51568f3e7ab488a90bf7cb7c66fd`，
+真实有效窗口 `2026-09-07T06:49:27.095639Z` 至 `07:49:27.095639Z`，额度仍为 1，
+没有价格研究或预算扩大；过期后不能继续当 fresh profile 使用。
+
+`preparation-v1/candidate.json` / `acceptance-policy.json` 当前版本 2.3，rubric hash
+`6e95f68134a326906d23b266c2a9a556cffe10988be7c48c0a19074191459820`。
+显式区分间隙的 human 可读性、可见工牌连续性、音频 human / 嘴部 analyzer，以及
+自然手部 human 观感。旧 v1 Gate 与真实历史 bytes 保留；不通过重组 criteria 抹掉 gap。
+旧观测语句不能作为未来 measurement，已改成对被评价 exact artifact 的检查方法；
+新生成音频必须重新试听。早期无效草稿保留为 `*draft*.json`，不作为 active candidate。
+
+Parent 的 native expression check 无遗漏；独立 reviewer 重开 typed artifacts、replan、
+检查原广播、双图及 profile identity。Public Router 对待补历史视觉证据实跑仍为
+EVIDENCE_GAP。`decision-awaiting-visual.json` 与 historical-v2 投影使用早期 rubric 2.1，
+不能复用成 active 2.3 的提交决定；真实间隙答复到达后须重算。已经发送具体视觉问题，
+没有代填答案。尚无 compiled/resolved request、paid preview、permit、提交或新视频。
+独立 reviewer_xhigh 对最终 2.3 的 scoped re-review 为 accept，无离线准备 blocking issue；
+该 verdict 不关闭 human gap，也不是 submit 或媒体质量通过。
+
+本轮没有新增 Python helper 或改核心代码；运行的是既有 Production Python APIs 的
+离线 preparation。用户原任务未完成，停止点仍是明确的 missing human finding。
+自动 learning evaluation 为 no_candidate；同一旧视频的版本化评价不算独立实验。
+
 ### Supersession — Hand And Personalized Broadcast Rejected
 
 随后用户要求先核对之前音频。Parent 重新确认旧预览 SHA

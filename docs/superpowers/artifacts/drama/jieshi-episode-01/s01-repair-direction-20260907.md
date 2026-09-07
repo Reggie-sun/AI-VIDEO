@@ -1,12 +1,20 @@
 # S01 Repair Direction
 
+## Current Accepted Scope
+
+用户复核最初设计后明确：“那我的判断出问题了,你就修复手的问题就好了”。
+保留原广播“林砚，请在终点站下车。”、原对白窗口及 native audio。
+下方普通报站候选已撤回，未进入任何 Production creative revision 或 Provider 提交。
+只修手部：原首帧、已确认 endpoint-repair-03.png、同 Vidu Q3 Pro、最多一次新提交。
+旧片手型和动作 FAIL 保留，不把这次范围确认解释为旧片整体通过。
+
 ## User Correction
 
 2026-09-07 用户对 attempt09 明确反馈：“1手太奇怪了. 2音频不符合,地铁站不可能报名字”。
 该反馈取代先前声音“没问题”的暂定结论；旧片手部与广播内容均为 human FAIL。
 不将这条反馈解释为物理接触、间隙厘米或胸牌细节已经测量通过。
 
-## Current Creative Direction
+## Historical Broadcast Proposal — Withdrawn
 
 ### Audio Recheck
 

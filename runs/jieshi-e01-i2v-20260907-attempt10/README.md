@@ -2,6 +2,20 @@
 
 ## Current State
 
+2026-09-07 最新用户指令：“那我的判断出问题了,你就修复手的问题就好了”。
+原点名广播保留；普通报站改稿撤回，未进入 runtime。旧片手部 human FAIL 保留。
+`preparation-v1/` 已保存 strict planner/context/lifecycle、同额续期 profile 和完整
+candidate/acceptance projection。当前 acceptance version 2.3；所有 measurement
+面向被评价 exact artifact，新生成音频不继承旧片批准。早期未通过表达/measurement
+检查的草稿另存为 `*draft*.json`，不是 active candidate。
+
+public Router 已实跑 `decision-awaiting-visual.json` 为 EVIDENCE_GAP；该历史评价与
+decision 使用早期 rubric 2.1，不能作为 2.3 的最终 decision。真实间隙可读性答复
+到达后须按当前 rubric 重算；没有已提交任务，不需要恢复 Provider outcome。
+此处待补的是旧片前 3 秒小间隙的观看结论，不是厘米标定或旧手势接受。
+native 表达检查已通过，不代表 compiled request 或 submit readiness。
+尚无 compiled/resolved request、paid preview、authorization、intent、permit、POST 或新 MP4。
+
 用户在 2026-09-07 对已展示的 `endpoint-repair-03.png` 回复“确认”。输入 SHA-256
 `d9a21860e91cadc7cf4cfe0ce74a44b57c2aa6d600b8c8cc06dc17e4fb4cd1da`，
 2,051,993 bytes，941×1672。该确认只批准新图作为 S01 末帧，不是旧视频或新视频质量验收。
