@@ -8,6 +8,49 @@ learning_eligibility: ineligible
 
 Date: 2026-09-08
 
+## Latest Checkpoint — Attempt 11 Lifecycle Blocker
+
+用户再次授权继续，并对链接到 exact attempt10 的三项问题（手部自然、手与玻璃
+间隙清楚、广播完整清晰）回复“确认”。该答复按三项肯定观看结论记录；不代表
+整体 Gate PASS，也不覆盖 analyzer 的 legacy-03/05 FAIL。通过真实初始化的
+project-local MCP session，对同一 MP4 重新取证并调用
+`review_generation_attempt(..., repair_evidence=True)`：human06/14/17 PASS，
+diagnosis 仅剩 QUALITY_FAILURE，next_owner=shot_router。原评价保留。
+
+strict reopen 为 Manifest r23、Project/Shot r6；完整历史包含 imported09、原10及
+补证10三个 experience。补证 evidence hash 为
+`9214c8e40f0b4be1d1feb6a7a53b18eb6cd40f5f2b9c4fa97414c0234905c445`。
+`preparation-v3/attempt10-human-confirmation.json` 保存问题/原答复与 exact SHA，
+`attempt10-repaired-diagnosis.json` 保存实际诊断。下文 r22、人类待答与额度耗尽
+仅描述上一 checkpoint；新增一次授权尚未消费。
+
+attempt11 草稿统一 1.5 秒前到位，明确抬手与广播同时开始、连续上移不旋腕；
+保留已登记首末帧与广播内容。Planner/requirement projection 已在内存生成，但
+更新 dependency graph 的正式 `ProductionStateCommitter.commit()` 在写入前拒绝：
+`Production state has an unresolved attempt; explicit recovery is required.`
+原因是 attempt10 仍为 RUNNING/VALIDATE；没有新 graph 激活、attempt11 request、
+profile 续期、permit、Provider call 或新 MP4。草稿不是可提交请求。
+
+### Missing Runtime Contract
+
+`_state_commit_transaction.py` 拒绝存在 RUNNING/OUTCOME_UNKNOWN 的 generic graph
+transaction；`_state_commit_generation_feedback.py` 只追加评价，不结束 attempt。
+`_state_commit_video_recovery.py` 保留已 fetch 的 VALIDATE attempt；现有
+`record_video_provider_failure` 仅允许 Provider failure/unknown，不能用来表达质量拒绝。
+`validate_once` 要求真实 settlement 并准备 candidate，不能冒充失败终结。
+Main thread 与 read-only code_mapper 均核对了这些入口；未运行 recovery 或伪造结算。
+
+最小后续 scope 是由现有 `ProductionStateCommitter` 提供显式质量拒绝终结：
+绑定 exact fetched bytes 与完整评价、保留 paid reservation/原账单状态，禁止激活，
+独立于 Provider failure，并让 subsequent graph transition 仍完整验证历史。
+unknown、missing evidence、identity drift 必须拒绝；exact replay 不重复写入。
+需要相应 lifecycle/reader/replay/paid-state tests 与独立 review。这是尚未实现的
+runtime contract，当前没有通过改写 Manifest 或放宽 unresolved guard 绕过。
+
+本 checkpoint 只修改 task-owned 记录；保留其他已 staged 文件。没有推送。
+Learning evaluation：no_candidate；同一视频补证和单次 lifecycle 阻塞不构成新的
+独立媒体实验或已证明改进。
+
 ## Scope And Result
 
 承接用户“继续生成界蚀shot1”。保留原点名广播、原首帧、已批准修复末帧、Vidu

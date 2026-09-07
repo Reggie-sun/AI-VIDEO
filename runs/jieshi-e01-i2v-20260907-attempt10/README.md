@@ -2,6 +2,20 @@
 
 ## Current State
 
+### Latest Continuation — Human Evidence Repaired, Runtime Blocked
+
+用户授权一次追加修复，并对 exact attempt10 的手部自然、间隙清楚与广播完整清晰
+三项观看问题回复“确认”。真实 MCP bridge 已在原视频上追加 human06/14/17 PASS；
+legacy-03/05 仍 FAIL。Manifest r23，Project/Shot r6，完整历史三条 experience。
+补证与下一版时序草稿在 `preparation-v3/`，新额度尚未消费。
+
+下一版 graph transition 在任何写入前被正式 committer 拒绝：attempt10 仍处于
+RUNNING/VALIDATE，现有 runtime 缺少质量 FAIL 的无激活终结入口。不能把质量失败
+伪装为 Provider failure 或虚构结算。没有 attempt11 submit、新媒体或下一 Shot。
+所需最小 lifecycle contract 见
+[当前记录](../../docs/record_for_agent/2026-09-08-jieshi-s01-human-gap-history-boundary.md)。
+以下人类待答、r22 与额度耗尽均是上一 checkpoint 的历史状态。
+
 ### Latest Result — 2026-09-08
 
 用户授权“解决之后再生成”已执行：legacy history兼容修复通过独立review与正式Harness，
