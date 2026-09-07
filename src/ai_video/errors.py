@@ -56,6 +56,7 @@ class ErrorCode(str, Enum):
     VIDEO_CAPABILITY_UNSUPPORTED = "video_capability_unsupported"
     VIDEO_PROVIDER_FAILED = "video_provider_failed"
     VIDEO_PROVIDER_OUTCOME_UNKNOWN = "video_provider_outcome_unknown"
+    VIDEO_QUALITY_REJECTED = "video_quality_rejected"
     VIDEO_ARTIFACT_INVALID = "video_artifact_invalid"
     DISK_SPACE_LOW = "disk_space_low"
     DEPENDENCY_GRAPH_INVALID = "dependency_graph_invalid"

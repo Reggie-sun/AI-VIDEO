@@ -197,6 +197,25 @@ class GenerationExperienceReceiptPointer(_PaidLifecycleModel):
         return self
 
 
+class GenerationQualityRejectionReceiptPointer(_PaidLifecycleModel):
+    path: Path
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    attempt_id: str = Field(min_length=1)
+    request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    experience_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "GenerationQualityRejectionReceiptPointer":
+        _canonical_paid_path(
+            self.path,
+            Path("state/video-generation/rejections") / f"{self.content_hash}.json",
+            "generation quality rejection receipt",
+        )
+        return self
+
+
 class ImportedGenerationExperienceReceiptPointer(_PaidLifecycleModel):
     path: Path
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -825,6 +844,7 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
     execution_binding: GenerationExecutionBindingPointer | None = None
     qualification_binding: QualificationExecutionBindingPointer | None = None
     generation_experiences: tuple[GenerationExperienceReceiptPointer, ...] = ()
+    quality_rejection: GenerationQualityRejectionReceiptPointer | None = None
     generation_id: str = Field(min_length=1)
     resolved_generation_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     phase: VideoAttemptPhase
@@ -859,6 +879,8 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
             data.pop("qualification_binding", None)
         if not self.generation_experiences:
             data.pop("generation_experiences", None)
+        if self.quality_rejection is None:
+            data.pop("quality_rejection", None)
         if self.continuity_evaluation is None:
             data.pop("continuity_evaluation", None)
         if self.commercial_evaluation is None:
@@ -893,6 +915,16 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
             for item in self.generation_experiences
         ):
             raise ValueError("generation experience receipt does not match request")
+        if self.quality_rejection is not None and (
+            self.phase is not VideoAttemptPhase.VALIDATE
+            or self.quality_rejection.request_fingerprint != self.request.request_input_hash
+            or not self.generation_experiences
+            or self.quality_rejection.experience_content_hash
+            != self.generation_experiences[-1].content_hash
+            or self.candidate_video_asset_ids
+            or self.candidate_continuity_asset_ids
+        ):
+            raise ValueError("quality rejection must close the latest validate experience")
         if self.execution_binding is not None and self.qualification_binding is not None:
             raise ValueError("video attempt cannot mix production and qualification bindings")
         local_fields = (
@@ -1178,6 +1210,16 @@ def _validate_video_attempt(attempt: Any) -> None:
     }
     if state.phase not in allowed_phases[attempt.status.value]:
         raise ValueError("video attempt status and phase are inconsistent")
+    quality_rejected = attempt.error_code == "video_quality_rejected"
+    if state.quality_rejection is not None and (
+        attempt.status.value != "failed"
+        or state.phase is not VideoAttemptPhase.VALIDATE
+        or not quality_rejected
+        or state.quality_rejection.attempt_id != attempt.attempt_id
+    ):
+        raise ValueError("quality rejection lifecycle state is inconsistent")
+    if quality_rejected and state.quality_rejection is None:
+        raise ValueError("quality rejection error requires its receipt pointer")
     if (
         state.paid_submit_receipt is not None
         and paid_state is not None

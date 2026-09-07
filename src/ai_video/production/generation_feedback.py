@@ -414,6 +414,25 @@ def record_attempt_evaluation(*, committer, attempt_id, evaluation_sources=(), a
     from ai_video.production.video_generation import VideoGenerationService
 
     attempt, state = VideoGenerationService(committer=committer, provider=None)._state(attempt_id)
+    if state.quality_rejection is not None:
+        from ai_video.production.project import load_production_project
+
+        # Reopen through the standard reader so a terminal replay never turns
+        # an altered receipt or media file into a trusted historical answer.
+        load_production_project(committer.project_root / "project.yaml")
+        if evaluation_sources or analysis_proof is not None:
+            raise ValueError("closed quality rejection cannot accept new evaluation evidence")
+        receipt = committer._reopen_generation_quality_rejection(state.quality_rejection)
+        if not state.generation_experiences:
+            raise ValueError("closed quality rejection has no retained experience")
+        experience = committer._reopen_generation_experience(
+            state.generation_experiences[-1]
+        )
+        if not any(
+            item.evidence_hash == receipt.evidence_hash for item in experience.evidence
+        ):
+            raise ValueError("closed quality rejection evidence is missing")
+        return experience
     if state.execution_binding is None:
         raise ValueError("feedback requires a durable generation decision")
     binding = committer._reopen_generation_execution_binding(state.execution_binding)

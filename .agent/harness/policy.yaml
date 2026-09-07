@@ -226,7 +226,7 @@ checks:
     covered_by_check_ids: [production_contract_tests]
     description: Verify pure Shot routing, exact video capabilities, and dependency isolation.
   generation_feedback_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_generation_feedback.py, tests/test_generation_evaluation.py, tests/test_generation_execution.py, tests/test_generation_execution_guards.py, tests/test_generation_historical_replay.py, tests/test_generation_provider_wiring.py, tests/test_generation_local_wiring.py, tests/test_generation_feedback_driver.py, tests/test_generation_feedback_review.py, tests/test_generation_history_import.py, tests/test_generation_history_import_receipt.py, tests/test_production_generation_decision.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_generation_feedback.py, tests/test_generation_evaluation.py, tests/test_generation_execution.py, tests/test_generation_execution_guards.py, tests/test_generation_historical_replay.py, tests/test_generation_provider_wiring.py, tests/test_generation_local_wiring.py, tests/test_generation_feedback_driver.py, tests/test_generation_feedback_review.py, tests/test_generation_history_import.py, tests/test_generation_history_import_receipt.py, tests/test_generation_quality_rejection.py, tests/test_production_generation_decision.py, -q]
     cwd: .
     description: Verify evidence-derived decisions, transferable cohorts, execution binding and frozen historical replay without Provider effects.
   production_strategy_tests:
@@ -400,6 +400,8 @@ categories:
       - src/ai_video/production/_state_commit_generation_history.py
       - src/ai_video/production/generation_history_import.py
       - src/ai_video/production/_generation_history_schema.py
+      - src/ai_video/production/generation_rejection.py
+      - src/ai_video/production/_state_commit_generation_rejection.py
       - src/ai_video/production/_generation_feedback_reader.py
       - src/ai_video/production/_remote_video_native_prompt.py
       - tests/test_generation_feedback.py
@@ -409,6 +411,7 @@ categories:
       - tests/test_generation_historical_replay.py
       - tests/test_generation_history_import.py
       - tests/test_generation_history_import_receipt.py
+      - tests/test_generation_quality_rejection.py
       - tests/test_generation_provider_wiring.py
       - tests/test_generation_local_wiring.py
       - tests/production_generation_execution_factory.py

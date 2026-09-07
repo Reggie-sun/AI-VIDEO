@@ -4,7 +4,7 @@ from pydantic import ValidationError
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production._lifecycle_schema import (
     GenerationExecutionBindingPointer, GenerationExperienceReceiptPointer,
-    QualificationExecutionBindingPointer,
+    GenerationQualityRejectionReceiptPointer, QualificationExecutionBindingPointer,
 )
 from ai_video.production.paths import _read_regular_file_nofollow, resolve_contained_path
 
@@ -86,6 +86,33 @@ def load_generation_experience(
     return experience
 
 
+def load_generation_quality_rejection(
+    root: str | Path, pointer: GenerationQualityRejectionReceiptPointer
+):
+    """Reopen an immutable explicit terminal quality decision."""
+    from ai_video.production.generation_rejection import GenerationQualityRejectionReceipt
+    from ai_video.production.hashing import canonical_sha256
+
+    resolved_root, resolved = _root_and_path(root, pointer.path)
+    try:
+        raw = _read_regular_file_nofollow(
+            resolved, contained_by=resolved_root / "state"
+        )
+        receipt = GenerationQualityRejectionReceipt.model_validate_json(raw.data)
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid("Could not reopen generation quality rejection.", str(exc)) from exc
+    if (
+        raw.file_sha256 != pointer.file_sha256
+        or canonical_sha256(receipt.model_dump(mode="json")) != pointer.content_hash
+        or receipt.attempt_id != pointer.attempt_id
+        or receipt.request_fingerprint != pointer.request_fingerprint
+        or receipt.artifact_sha256 != pointer.artifact_sha256
+        or receipt.experience_content_hash != pointer.experience_content_hash
+    ):
+        raise _invalid("Generation quality rejection pointer identity is invalid.")
+    return receipt
+
+
 
 def load_qualification_execution_binding(
     root: str | Path, pointer: QualificationExecutionBindingPointer
@@ -125,6 +152,86 @@ def verify_generation_feedback(root, state, request):
                 raise _invalid(f"{label} execution binding is not exact.", str(exc)) from exc
     for pointer in state.generation_experiences:
         load_generation_experience(root, pointer)
+    if state.quality_rejection is None:
+        return
+    receipt = load_generation_quality_rejection(root, state.quality_rejection)
+    if not state.generation_experiences:
+        raise _invalid("Quality rejection has no generation experience.")
+    experience = load_generation_experience(root, state.generation_experiences[-1])
+    evidence = next(
+        (item for item in experience.evidence
+         if item.evidence_hash == receipt.evidence_hash),
+        None,
+    )
+    fetch_pointer = state.local_fetch_receipt or state.fetch_receipt
+    if fetch_pointer is None:
+        raise _invalid("Quality rejection has no fetched media.")
+    try:
+        from ai_video.production._video_project_reader import (
+            load_local_video_fetch_receipt, load_video_fetch_receipt,
+        )
+
+        fetch = (
+            load_local_video_fetch_receipt(root, fetch_pointer)
+            if state.local_fetch_receipt is not None
+            else load_video_fetch_receipt(root, fetch_pointer)
+        )
+    except AiVideoError:
+        raise
+    except (OSError, ValueError) as exc:
+        raise _invalid("Quality rejection media evidence is invalid.", str(exc)) from exc
+    if (
+        receipt.request_fingerprint != request.request_input_hash
+        or receipt.attempt_id != state.quality_rejection.attempt_id
+        or receipt.experience_content_hash != state.generation_experiences[-1].content_hash
+        or receipt.artifact_sha256 != fetch.artifact_sha256
+        or receipt.artifact_size_bytes != fetch.size_bytes
+        or evidence is None
+        or receipt.attempt_id != evidence.attempt_id
+        or evidence.request_hash != request.request_input_hash
+        or evidence.outcome != "media"
+        or evidence.artifact_sha256 != fetch.artifact_sha256
+        or not experience.evaluation_sources
+        or any(
+            source.qa_policy_content_hash != receipt.qa_policy_content_hash
+            for source in experience.evaluation_sources
+        )
+        or tuple(
+            finding
+            for source in experience.evaluation_sources
+            for finding in source.project_findings()
+        ) != evidence.findings
+    ):
+        raise _invalid("Quality rejection receipt does not match retained evidence.")
+    if state.execution_binding is None:
+        raise _invalid("Quality rejection has no production execution binding.")
+    binding = load_generation_execution_binding(root, state.execution_binding)
+    all_evidence = tuple(
+        item
+        for experience_pointer in state.generation_experiences
+        for item in load_generation_experience(root, experience_pointer).evidence
+    )
+    try:
+        from ai_video.production.generation_rejection import (
+            validate_quality_rejection_experience,
+        )
+        from ai_video.production.project import load_qa_policy
+
+        binding.validate_request(request)
+        diagnosis = validate_quality_rejection_experience(
+            binding=binding,
+            experience=experience,
+            evidence=evidence,
+            request=request,
+            attempt_id=receipt.attempt_id,
+            artifact_sha256=fetch.artifact_sha256,
+            qa_policy=load_qa_policy(root, receipt.qa_policy),
+            history=all_evidence,
+        )
+    except (AiVideoError, AttributeError, ValueError) as exc:
+        raise _invalid("Quality rejection execution evidence is invalid.", str(exc)) from exc
+    if diagnosis != receipt.diagnosis:
+        raise _invalid("Quality rejection diagnosis is not exact to retained evidence.")
 
 
 def load_imported_history(root, manifest):

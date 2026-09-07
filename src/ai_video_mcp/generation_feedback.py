@@ -78,6 +78,11 @@ async def review_generation_attempt(*, committer, attempt_id, session, adjudicat
     attempt, state = VideoGenerationService(committer=committer, provider=None)._state(attempt_id)
     if state.execution_binding is None:
         raise ValueError("review requires a durable generation decision")
+    if attempt.status is StateCommitStatus.FAILED and state.quality_rejection is not None:
+        if repair_evidence or analysis_only:
+            raise ValueError("closed quality rejection cannot be reanalyzed or repaired")
+        return _diagnosis(committer, record_attempt_evaluation(
+            committer=committer, attempt_id=attempt_id))
     if attempt.status in {StateCommitStatus.FAILED, StateCommitStatus.OUTCOME_UNKNOWN}:
         if analysis_only:
             raise ValueError("runtime outcome requires explicit resolution before media analysis")
