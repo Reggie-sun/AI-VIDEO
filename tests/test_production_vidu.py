@@ -331,20 +331,18 @@ def test_preview_rejects_same_capability_id_with_changed_model():
 
 
 def test_real_service_durable_permit_and_restart_replay(tmp_path):
-    from production_project_factory import write_production_project, make_manifest_23_project
-    from ai_video.production.models import ProductionManifest
+    from production_remote_generation_factory import prepare_remote_generation
     from ai_video.production.state_commit import ProductionStateCommitter
     from ai_video.production.video_generation import VideoGenerationService
-    write_production_project(tmp_path)
-    make_manifest_23_project(tmp_path)
-    manifest_path = tmp_path / "state/manifest.json"
-    manifest = ProductionManifest.model_validate_json(manifest_path.read_bytes())
-    manifest_path.write_text(manifest.model_copy(update={"schema_version": "2.7"}).model_dump_json())
-    provider, transport, (resolved, _, paid, auth, _) = _setup()
+    provider, _, _ = _setup()
+    prepared = prepare_remote_generation(root=tmp_path, provider=provider, request=_request(),
+        compiler_id="vidu-video-compiler", compiler_version="3")
+    provider, transport, (resolved, _, paid, auth, _) = _setup(prepared.compilation.request)
     committer = ProductionStateCommitter(tmp_path,
         paid_provider_authorizer=lambda exact: auth if exact == paid else None, paid_provider_clock=lambda: NOW)
     service = VideoGenerationService(committer=committer, provider=provider)
-    service.start(attempt_id=paid.attempt_id, request=resolved)
+    service.start(attempt_id=paid.attempt_id, request=resolved,
+                  execution_binding=prepared.execution_binding)
     submission = service.submit_once(attempt_id=paid.attempt_id, paid_preview=paid, reservation_id="reservation")
     assert submission.resolved_generation_hash == resolved.resolved_generation_hash
     restarted = VideoGenerationService(committer=ProductionStateCommitter(tmp_path, paid_provider_clock=lambda: NOW), provider=provider)
@@ -711,28 +709,46 @@ def test_r2v_rejects_unsupported_inputs_before_network(change):
 
 
 def test_extension_and_r2v_use_real_service_durable_permit(tmp_path):
-    from production_project_factory import write_production_project, make_manifest_23_project
-    from ai_video.production.models import ProductionManifest
+    from production_project_factory import _p7_png
+    from production_remote_generation_factory import prepare_remote_generation
     from ai_video.production.state_commit import ProductionStateCommitter
     from ai_video.production.video_generation import VideoGenerationService
     binding, source = _extension_input()
-    requests = (_extension_request(binding), _request(images=_references(2), model_id="viduq3",
-        mode=VideoGenerationMode.REFERENCE_TO_VIDEO, output_requirement=_request().output_requirement))
-    for index, request in enumerate(requests):
+    image_bytes = _p7_png(width=1280, height=720)
+    reference = VideoImageReferenceBinding(
+        role="reference", asset_id="fixture-scene-reference",
+        asset_sha256=hashlib.sha256(image_bytes).hexdigest(), mime_type="image/png",
+        size_bytes=len(image_bytes), width=1280, height=720,
+    )
+    requests = (
+        (_extension_request(binding), {binding.asset_id: MP4}),
+        (_request(images=(reference,), model_id="viduq3",
+                  mode=VideoGenerationMode.REFERENCE_TO_VIDEO,
+                  output_requirement=_request().output_requirement),
+         {reference.asset_id: image_bytes}),
+    )
+    for index, (request, input_bytes) in enumerate(requests):
         root = tmp_path / str(index)
         root.mkdir()
-        write_production_project(root)
-        make_manifest_23_project(root)
-        manifest_path = root / "state/manifest.json"
-        manifest = ProductionManifest.model_validate_json(manifest_path.read_bytes())
-        manifest_path.write_text(manifest.model_copy(update={"schema_version": "2.7"}).model_dump_json())
-        provider, transport, (resolved, _, paid, auth, _) = _setup(request, extension_source=lambda _: source,
-            image_resolver=lambda b: f"image-{int(b.asset_id[-2:])}".encode())
-        transport.submit["model"] = request.model_id
+        compiler_provider, _, _ = _setup(
+            request, extension_source=lambda _: source,
+            image_resolver=lambda candidate: input_bytes[candidate.asset_id],
+        )
+        prepared = prepare_remote_generation(
+            root=root, provider=compiler_provider, request=request,
+            compiler_id="vidu-video-compiler", compiler_version="3",
+            input_bytes=input_bytes,
+        )
+        provider, transport, (resolved, _, paid, auth, _) = _setup(
+            prepared.compilation.request, extension_source=lambda _: source,
+            image_resolver=lambda candidate: input_bytes[candidate.asset_id],
+        )
+        transport.submit["model"] = resolved.model_id
         committer = ProductionStateCommitter(root, paid_provider_authorizer=lambda exact: auth if exact == paid else None,
             paid_provider_clock=lambda: NOW)
         service = VideoGenerationService(committer=committer, provider=provider)
-        service.start(attempt_id=paid.attempt_id, request=resolved)
+        service.start(attempt_id=paid.attempt_id, request=resolved,
+                      execution_binding=prepared.execution_binding)
         service.submit_once(attempt_id=paid.attempt_id, paid_preview=paid, reservation_id="reservation")
         restarted = VideoGenerationService(committer=ProductionStateCommitter(root, paid_provider_clock=lambda: NOW), provider=provider)
         with pytest.raises(AiVideoError):

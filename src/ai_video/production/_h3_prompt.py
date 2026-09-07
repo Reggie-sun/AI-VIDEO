@@ -273,15 +273,21 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptR
         f"continuity {lighting.continuity_state}; "
         f"screen direction {intent.space_continuity.screen_direction}; "
         f"camera axis {intent.axis_continuity.camera_axis}; "
+        f"framing continuity {intent.axis_continuity.framing_continuity}; "
         f"start framing {intent.camera_endpoint.start_framing}; "
         f"{camera_motion_text}; "
         f"maintain {relation.relation_kind.value.replace('_', ' ')} "
         f"to subject {relation.subject_id} "
         f"from {relation.start_relation} to {relation.end_relation}; "
         f"end framing {intent.camera_endpoint.end_framing}; "
-        f"terminal motion state {motion.end_motion_state.value}"
+        f"initial motion state {motion.start_motion_state.value}; "
+        f"terminal motion state {motion.end_motion_state.value}; "
+        f"duration {intent.pacing.shot_duration_seconds:g} seconds"
     )
-    soundscape = f"ambience {ambience.environment_bed}; foley {foley}"
+    soundscape = (
+        f"ambience {ambience.environment_bed}; foley {foley}; "
+        f"explicitly silent {str(ambience.explicitly_silent).lower()}"
+    )
     if dialogue.mode == "none":
         soundscape += "; dialogue none"
     prompt = unicodedata.normalize(
@@ -311,7 +317,10 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptR
             "generation_intent.primary_camera_motion.movement_kind",
             "generation_intent.primary_camera_motion.amplitude_class",
             "generation_intent.primary_camera_motion.speed_class",
+            "generation_intent.primary_camera_motion.start_motion_state",
             "generation_intent.primary_camera_motion.end_motion_state",
+            "generation_intent.pacing.shot_duration_seconds",
+            "generation_intent.ambience_intent.explicitly_silent",
             "generation_intent.camera_subject_relation.relation_kind",
             "generation_intent.dialogue_intent.start_seconds",
             "generation_intent.dialogue_intent.end_seconds",

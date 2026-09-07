@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, BinaryIO, Callable, Literal, Mapping
@@ -61,6 +62,7 @@ from ai_video.production.video import (
     VideoGenerationPreview,
 )
 from ai_video.production.video_generation import VideoGenerationService
+from ai_video.production.generation_execution import _mint_qualification_execution_binding
 
 
 _SHA256 = r"^[0-9a-f]{64}$"
@@ -96,6 +98,69 @@ def _invalid(message: str, detail: str | None = None) -> AiVideoError:
 
 def _value(value: object) -> object:
     return getattr(value, "value", value)
+
+
+class _SourceQualificationExecutionCapability:
+    """Owner-held capability for one exact, reopened source closure."""
+
+    __slots__ = (
+        "_proof",
+        "_request_input_hash",
+        "_resolved_generation_hash",
+        "_snapshot",
+        "_consumed",
+    )
+
+    def __init__(
+        self,
+        *,
+        request_input_hash: str,
+        resolved_generation_hash: str,
+        snapshot: SourceQualificationPreflightSnapshot,
+    ) -> None:
+        object.__setattr__(self, "_proof", None)
+        object.__setattr__(self, "_request_input_hash", request_input_hash)
+        object.__setattr__(self, "_resolved_generation_hash", resolved_generation_hash)
+        object.__setattr__(self, "_snapshot", snapshot)
+        object.__setattr__(self, "_consumed", False)
+
+    def __setattr__(self, _name: str, _value: object) -> None:
+        raise AttributeError("source qualification execution capability is sealed")
+
+    def bind(self, proof: "_SourceQualificationExecutionProof") -> None:
+        if self._proof is not None:
+            raise ValueError("source qualification execution capability is already bound")
+        object.__setattr__(self, "_proof", proof)
+
+    def consume(
+        self,
+        proof: "_SourceQualificationExecutionProof",
+        request: ResolvedVideoGenerationRequest,
+    ) -> SourceQualificationPreflightSnapshot:
+        if (
+            self._proof is not proof
+            or self._consumed
+            or request.request_input_hash != self._request_input_hash
+            or request.resolved_generation_hash != self._resolved_generation_hash
+        ):
+            raise ValueError("source qualification owner proof is stale or consumed")
+        object.__setattr__(self, "_consumed", True)
+        return self._snapshot
+
+
+@dataclass(frozen=True)
+class _SourceQualificationExecutionProof:
+    """One-use result of this Provider reopening its complete local closure."""
+
+    request_input_hash: str
+    resolved_generation_hash: str
+    snapshot: SourceQualificationPreflightSnapshot
+    _capability: _SourceQualificationExecutionCapability
+
+    def _consume_for_binding(
+        self, request: ResolvedVideoGenerationRequest
+    ) -> SourceQualificationPreflightSnapshot:
+        return self._capability.consume(self, request)
 
 
 def derive_source_qualification_seed(values: Mapping[str, object]) -> int:
@@ -655,6 +720,31 @@ class ShotContinuitySourceQualificationProvider:
             inputs=inputs,
         )
 
+    def execution_proof(
+        self,
+        request: ResolvedVideoGenerationRequest,
+        *,
+        expected: SourceQualificationPreflightSnapshot,
+    ) -> _SourceQualificationExecutionProof:
+        """Reopen the owner closure again before authorizing its durable request."""
+
+        current = self.validate_pre_effect(request)
+        if current != expected:
+            raise _invalid("Source qualification closure drifted before request write.")
+        capability = _SourceQualificationExecutionCapability(
+            request_input_hash=request.request_input_hash,
+            resolved_generation_hash=request.resolved_generation_hash,
+            snapshot=current,
+        )
+        proof = _SourceQualificationExecutionProof(
+            request_input_hash=request.request_input_hash,
+            resolved_generation_hash=request.resolved_generation_hash,
+            snapshot=current,
+            _capability=capability,
+        )
+        capability.bind(proof)
+        return proof
+
     def preview(
         self, request: ResolvedVideoGenerationRequest | Any
     ) -> VideoGenerationPreview:
@@ -816,7 +906,17 @@ class ShotContinuitySourceQualificationCaller:
             committer=self._committer,
             provider=self._provider,
         )
-        service.start(attempt_id=attempt_id, request=resolved_request)
+        service._start_qualification(
+            attempt_id=attempt_id,
+            request=resolved_request,
+            qualification_binding=_mint_qualification_execution_binding(
+                qualification_kind="source_boundary",
+                request=resolved_request,
+                proof=self._provider.execution_proof(
+                    resolved_request, expected=initial
+                ),
+            ),
+        )
 
         def exact_guard(current: ResolvedVideoGenerationRequest) -> None:
             if current.resolved_generation_hash != expected_hash:

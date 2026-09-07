@@ -19,11 +19,16 @@ from pydantic import (
 from ai_video.production._dependency_types import DependencyNodeKind
 
 from ai_video.production.artifact_contracts import (
+    ArtifactReference as ArtifactReference,
+    QaPolicyPointer as QaPolicyPointer,
     SourceReference,
     StrictModel,
     VersionedArtifact,
 )
 import ai_video.production._caption_review_models as _caption_review
+from ai_video.production.production_strategy_contracts import (
+    ProductionShotMixin,
+)
 from ai_video.production.composition_contracts import (
     AUDIO_KIND_PRIORITY,
     AudioKind,
@@ -45,7 +50,8 @@ from ai_video.production.composition_contracts import (
     TransitionKind,
     TransitionSpec,
 )
-from ai_video.production.domain_acceptance import DomainAcceptanceQaPolicyMixin, QaLayer as QaLayer
+from ai_video.production.domain_acceptance import DomainAcceptanceQaPolicyMixin, QaLayer as QaLayer, GenerationEvaluationAuthority as GenerationEvaluationAuthority
+from ai_video.production.artifact_contracts import ToolIdentity as ToolIdentity
 from ai_video.production.manifest_schema import ManifestCapability, ManifestVersion, manifest_supports
 
 from ai_video.production._asset_registry_validation import (
@@ -76,7 +82,7 @@ from ai_video.production._lifecycle_schema import (
     VideoAttemptPhase as VideoAttemptPhase,
     VideoFetchReceiptPointer as VideoFetchReceiptPointer,
     VideoGenerationAttemptState as VideoGenerationAttemptState, ContinuityEvaluationPhase as ContinuityEvaluationPhase, GeneratedShotContinuityEvidencePointer as GeneratedShotContinuityEvidencePointer,
-    VideoRequestReceiptPointer as VideoRequestReceiptPointer, TerminalFrameEvidencePointer as TerminalFrameEvidencePointer, ContinuityEvaluationState as ContinuityEvaluationState, VideoProbeReceiptPointer as VideoProbeReceiptPointer, VideoProvenanceReceiptPointer as VideoProvenanceReceiptPointer,
+    VideoRequestReceiptPointer as VideoRequestReceiptPointer, GenerationExecutionBindingPointer as GenerationExecutionBindingPointer, GenerationExperienceReceiptPointer as GenerationExperienceReceiptPointer, QualificationExecutionBindingPointer as QualificationExecutionBindingPointer, TerminalFrameEvidencePointer as TerminalFrameEvidencePointer, ContinuityEvaluationState as ContinuityEvaluationState, VideoProbeReceiptPointer as VideoProbeReceiptPointer, VideoProvenanceReceiptPointer as VideoProvenanceReceiptPointer,
     VideoStatusReceiptPointer as VideoStatusReceiptPointer, TerminalFrameExtractionReceiptPointer as TerminalFrameExtractionReceiptPointer, ContinuityEvaluationIntentPointer as ContinuityEvaluationIntentPointer, CommercialShotEvaluationIntentPointer as CommercialShotEvaluationIntentPointer, CommercialShotEvaluationPhase as CommercialShotEvaluationPhase, CommercialShotEvaluationState as CommercialShotEvaluationState, GeneratedCommercialShotEvidencePointer as GeneratedCommercialShotEvidencePointer, SourceBoundaryEvaluationPhase as SourceBoundaryEvaluationPhase, SourceBoundaryEvaluationState as SourceBoundaryEvaluationState, SourceBoundaryReviewEvidencePointer as SourceBoundaryReviewEvidencePointer, SourceBoundaryReviewIntentPointer as SourceBoundaryReviewIntentPointer, SourceBoundaryReviewReceiptPointer as SourceBoundaryReviewReceiptPointer, SourceBoundaryReviewVerdict as SourceBoundaryReviewVerdict,
     has_p6_state,
     prune_attempt_fields,
@@ -216,13 +222,6 @@ class RendererPolicy(StrictModel):
         if self.default_preference not in self.allowed:
             raise ValueError("renderer default_preference must be present in allowed")
         return self
-
-
-class ArtifactReference(StrictModel):
-    artifact_id: str = Field(min_length=1)
-    revision: int = Field(ge=1)
-    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
-    path: Path
 
 
 class ProjectArtifactRefs(StrictModel):
@@ -371,7 +370,7 @@ class ReviewPolicy(StrictModel):
     required_checks: tuple[str, ...] = ()
 
 
-class Shot(VersionedArtifact):
+class Shot(ProductionShotMixin, VersionedArtifact):
     shot_id: str
     scene_id: str
     storyboard_beat_id: str
@@ -394,11 +393,6 @@ class AssetSourceKind(str, Enum):
     IMPORTED = "imported"
     GENERATED = "generated"
     DERIVED = "derived"
-
-
-class ToolIdentity(StrictModel):
-    name: str
-    version: str
 
 
 class QaTechnicalThresholds(StrictModel):
@@ -1540,24 +1534,6 @@ def _require_content_addressed_pointer_path(
     return value
 
 
-class QaPolicyPointer(StrictModel):
-    path: Path
-    policy_id: str = Field(min_length=1)
-    policy_version: str = Field(min_length=1)
-    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
-    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-
-    @model_validator(mode="after")
-    def _canonical_pointer(self) -> "QaPolicyPointer":
-        _require_content_addressed_pointer_path(
-            self.path,
-            content_hash=self.content_hash,
-            prefix="state/reviews/policy.",
-            label="QA policy",
-        )
-        return self
-
-
 class ReviewRequestPointer(StrictModel):
     path: Path
     request_id: str = Field(min_length=1)
@@ -2012,6 +1988,8 @@ class LoadedProductionProject(StrictModel):
     scenes: tuple[Scene, ...]
     storyboard: Storyboard
     shots: tuple[Shot, ...]
+    production_parents: tuple[Shot, ...] = ()
+    production_allocation_policies: tuple[QaPolicy, ...] = ()
     registry: AssetRegistrySnapshot
     asset_paths: dict[str, Path]
     render_state: RenderStateSnapshot | None = None

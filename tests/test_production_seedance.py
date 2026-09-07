@@ -210,6 +210,118 @@ def _profile_pointer(profile: SeedanceProviderProfile) -> ProviderProfilePointer
     )
 
 
+def test_recipe_compiles_complete_t2v_intent_with_native_remote_grammar():
+    from ai_video.production.generation_recipe import (
+        GenerationRecipe,
+        RequirementExpression,
+        SeedPolicy,
+    )
+    from ai_video.production.shot_router import (
+        AdapterCompilerContract,
+        ProviderBoundVideoRequest,
+        VideoGenerationResolver,
+    )
+    from ai_video.production.video_compiler import CompiledProviderVideoRequest
+    from ai_video.production.video_requirement import AudioNeed, OutputNeed
+    from test_production_generation_decision import acceptance_policy
+    from test_production_provider_neutral_adapters import _replace_requirement
+    from test_production_shot_router import (
+        _context,
+        _lifecycle,
+        _policy,
+        _verified_requirement,
+    )
+    from tests.test_production_video_intent_validation import _complete_intent
+
+    profile = _profile()
+    request_fixture = _request(profile)
+    output = request_fixture.output_requirement
+    context = _context(important=False)
+    projection = _replace_requirement(
+        _verified_requirement(context),
+        contract_version="provider-neutral-video-requirement/4",
+        generation_intent=_complete_intent(),
+        output_need=OutputNeed(
+            duration_seconds=output.duration_seconds,
+            width=output.width,
+            height=output.height,
+            aspect_ratio=output.ratio,
+            fps=output.fps,
+            container_mime=output.mime_type,
+        ),
+        audio_need=AudioNeed.REQUIRED,
+    )
+    provider = SeedanceVideoProvider(
+        profile=profile,
+        transport=object(),
+        credential=lambda: "unused",
+        input_reference=object(),
+    )
+    selected = next(
+        variant
+        for variant in provider.capabilities().variants
+        if variant.model_id == request_fixture.model_id
+        and variant.mode is request_fixture.mode
+        and variant.output_capability is not None
+        and variant.output_capability.supports(output)
+    )
+    compiler = AdapterCompilerContract.create(
+        compiler_id="seedance-video-compiler", compiler_version="2"
+    )
+    expression = RequirementExpression(
+        requirement_id="hand-behavior",
+        level="acceptance",
+        stage="raw_generation",
+        dimension="interaction",
+        observable="the hand secures the product",
+        tolerance="exact",
+        measurement="human review",
+        proof="human",
+        intent_paths=("generation_intent.performance_intent.hand_behavior",),
+        native_text=("reaches once and secures the product",),
+        production_owner="shot_authoring",
+    )
+    acceptance = acceptance_policy((expression,))
+    recipe = GenerationRecipe(
+        seed=SeedPolicy(kind="uncontrolled"),
+        profile_sha256=profile.profile_sha256,
+        compiler_hash=compiler.compiler_hash,
+        requirement_hash=projection.requirement.requirement_hash,
+        rubric_hash=acceptance.profile_content_hash,
+        acceptance_policy=acceptance,
+        expressions=(expression,),
+    )
+    routing = VideoGenerationResolver()._bind_requirement(
+        projection=projection,
+        context=context,
+        policy=_policy(remote_authorized=True, budget_authorized=True),
+        provider_profile=_profile_pointer(profile),
+        capabilities=provider.capabilities(),
+        selected_capability_id=selected.capability_id,
+        output_requirement=output,
+        lifecycle=_lifecycle(context),
+        compiler_contract=compiler,
+    )
+    assert routing.provider_bound_request is not None
+    bound = ProviderBoundVideoRequest.create(
+        **{
+            **{
+                name: getattr(routing.provider_bound_request, name)
+                for name in ProviderBoundVideoRequest.model_fields
+                if name != "provider_bound_request_hash"
+            },
+            "generation_recipe": recipe,
+        }
+    )
+
+    compiled = provider.compile_request(bound, projection.requirement)
+
+    assert isinstance(compiled, CompiledProviderVideoRequest)
+    assert compiled.adapter_compiler_version == "2"
+    assert "reaches once and secures the product" in compiled.provider_native_prompt
+    assert provider.resolve(compiled.request).capability_id == selected.capability_id
+
+
 def _project_pointer() -> ProjectSnapshotPointer:
     return ProjectSnapshotPointer(
         path=Path("project.yaml"), revision=1, content_hash=HASH_A, file_sha256=HASH_B

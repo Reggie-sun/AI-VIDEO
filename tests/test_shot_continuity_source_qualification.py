@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import io
-from dataclasses import dataclass, replace
+from dataclasses import FrozenInstanceError, dataclass, replace
 from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace
@@ -12,6 +12,9 @@ import pytest
 
 from ai_video.comfy_client import JobResult, JobStatus
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.generation_execution import (
+    _mint_qualification_execution_binding,
+)
 from ai_video.production.local_video import (
     LocalVideoSubmission,
     LocalVideoSubmitIntent,
@@ -489,7 +492,9 @@ class _Committer:
         assert require_materialized
         return (self.source_stack,)
 
-    def begin_video_generation(self, *, attempt_id: str, request: Any) -> Any:
+    def _begin_qualification_video_generation(
+        self, *, attempt_id: str, request: Any, qualification_binding: Any
+    ) -> Any:
         if self.attempt is not None:
             raise ValueError("duplicate attempt")
         self.start_writes += 1
@@ -501,6 +506,7 @@ class _Committer:
             video_generation_state=SimpleNamespace(
                 phase=VideoAttemptPhase.REQUEST,
                 request=SimpleNamespace(path=Path("request.json")),
+                qualification_binding=qualification_binding,
             ),
         )
         return SimpleNamespace()
@@ -516,6 +522,9 @@ class _Committer:
     def _reopen_video_request(self, pointer: Any) -> Any:
         del pointer
         return self.request
+
+    def _reopen_qualification_execution_binding(self, pointer: Any) -> Any:
+        return pointer
 
     def record_local_video_submit_intent(
         self,
@@ -606,6 +615,7 @@ def _make_case(
     )
     request = SimpleNamespace(
         generation_id="source-generation-1",
+        request_input_hash="b" * 64,
         provider_name=profile.provider_name,
         provider_kind=profile.provider_kind,
         model_id=profile.model_id,
@@ -822,7 +832,64 @@ def test_source_qualification_submits_once_after_permit_with_exact_a2_a3(
     assert workflow["5"]["inputs"]["prompt"] == case.profile.prompt
     assert (case.committer.start_writes, case.committer.intent_writes) == (1, 1)
     assert (case.committer.result_writes, case.committer.failure_writes) == (1, 0)
-    assert case.transport.object_info_calls == 4
+    # The owner reopens the complete closure again before it mints the one-use
+    # proof, then repeats it under the pre-submit guard.
+    assert case.transport.object_info_calls == 5
+
+
+def test_source_owner_reopens_closure_and_rejects_fully_shaped_forged_snapshot(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    case = _make_case(tmp_path, monkeypatch)
+    actual = case.provider.validate_pre_effect(case.request)
+    forged = replace(actual, project_content_hash="0" * 64)
+
+    with pytest.raises(AiVideoError, match="closure drifted before request write"):
+        case.provider.execution_proof(case.request, expected=forged)
+    with pytest.raises(ValueError, match="owner-issued closure proof"):
+        _mint_qualification_execution_binding(
+            qualification_kind="source_boundary",
+            request=case.request,
+            proof=forged,
+        )
+
+    _assert_zero_effect(case)
+
+
+def test_source_owner_proof_rejects_mutation_copy_and_second_consume(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    case = _make_case(tmp_path, monkeypatch)
+    initial = case.provider.validate_pre_effect(case.request)
+    proof = case.provider.execution_proof(case.request, expected=initial)
+
+    with pytest.raises(FrozenInstanceError):
+        proof.request_input_hash = "0" * 64  # type: ignore[misc]
+    with pytest.raises(FrozenInstanceError):
+        proof.resolved_generation_hash = "0" * 64  # type: ignore[misc]
+    with pytest.raises(FrozenInstanceError):
+        proof.snapshot = replace(proof.snapshot, project_content_hash="0" * 64)  # type: ignore[misc]
+    copied = replace(proof, request_input_hash="0" * 64)
+    with pytest.raises(ValueError, match="stale or consumed"):
+        _mint_qualification_execution_binding(
+            qualification_kind="source_boundary",
+            request=case.request,
+            proof=copied,
+        )
+
+    _mint_qualification_execution_binding(
+        qualification_kind="source_boundary",
+        request=case.request,
+        proof=proof,
+    )
+    with pytest.raises(ValueError, match="stale or consumed"):
+        _mint_qualification_execution_binding(
+            qualification_kind="source_boundary",
+            request=case.request,
+            proof=proof,
+        )
+
+    _assert_zero_effect(case)
 
 
 def test_source_qualification_real_provider_polls_and_fetches_exact_output(
@@ -1101,16 +1168,22 @@ def test_closure_drift_after_request_write_still_blocks_before_permit_or_effect(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     case = _make_case(tmp_path, monkeypatch)
-    original_begin = case.committer.begin_video_generation
+    original_begin = case.committer._begin_qualification_video_generation
 
-    def begin_and_drift(*, attempt_id: str, request: Any) -> Any:
-        result = original_begin(attempt_id=attempt_id, request=request)
+    def begin_and_drift(
+        *, attempt_id: str, request: Any, qualification_binding: Any
+    ) -> Any:
+        result = original_begin(
+            attempt_id=attempt_id,
+            request=request,
+            qualification_binding=qualification_binding,
+        )
         case.p0_box["value"] = replace(
             case.p0_box["value"], validation_set_hash="0" * 64
         )
         return result
 
-    case.committer.begin_video_generation = begin_and_drift  # type: ignore[method-assign]
+    case.committer._begin_qualification_video_generation = begin_and_drift  # type: ignore[method-assign]
     with pytest.raises(AiVideoError):
         _qualify(case)
 

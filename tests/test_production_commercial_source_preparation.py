@@ -101,11 +101,13 @@ def _creative_reference(artifact) -> production.CommercialCreativeReference:
 
 
 def _state_reference_set(loaded) -> production.ProductReferenceSet:
-    image_assets = tuple(
+    images = tuple(
         item
         for item in loaded.registry.assets
         if item.asset_type is AssetType.IMAGE
-    )[:2]
+    )
+    product_sources = tuple(item for item in images if item.asset_id.startswith("fixture-product-"))
+    image_assets = (product_sources or images)[:2]
     assert len(image_assets) == 2
     return production.ProductReferenceSet.create(
         artifact_id="product-reference-qingyan",
@@ -142,8 +144,40 @@ def _state_reference_set(loaded) -> production.ProductReferenceSet:
     )
 
 
-def _make_commercial_state_project(root, *, include_inputs: bool = False):
+def _make_commercial_state_project(root, *, include_inputs: bool = False, generated_video: bool = False):
     inputs = project_factory.make_p5_dependency_inputs(root, decodable_pngs=True)
+    if generated_video:
+        # Product photographs are fixture inputs, not outputs of the Shot being
+        # reauthored. Give them independent measured bytes before the initial
+        # dependency snapshot, rather than marking invalidated Shot assets fresh.
+        from ai_video.production.models import AssetSourceKind
+
+        sources = []
+        for index, asset in enumerate(item for item in inputs.project.registry.assets
+                                      if item.asset_type is AssetType.IMAGE):
+            asset_id = f"fixture-product-{index}"
+            path = asset.artifact_path.parent / f"{asset_id}.png"
+            data = (root / asset.artifact_path).read_bytes()
+            (root / path).write_bytes(data)
+            sources.append(asset.model_copy(update={
+                "asset_id": asset_id, "artifact_path": path,
+                "source_kind": AssetSourceKind.IMPORTED, "input_artifact_ids": (),
+                "input_fingerprint": canonical_sha256({"fixture-input": asset_id, "sha256": asset.sha256}),
+                "creation_receipt_id": f"fixture-import-{asset_id}",
+            }))
+        registry = inputs.project.registry.model_copy(update={"assets": (
+            *inputs.project.registry.assets, *sources)})
+        registry_hash = registry_semantic_sha256(registry)
+        registry = registry.model_copy(update={"revision_id": registry_hash, "content_hash": registry_hash})
+        registry_payload = _canonical_json_bytes(registry)
+        registry_path = root / f"assets/registry.{registry_hash}.json"
+        registry_path.write_bytes(registry_payload)
+        pointer = RegistrySnapshotPointer(path=registry_path.relative_to(root),
+            revision_id=registry_hash, content_hash=registry_hash,
+            file_sha256=hashlib.sha256(registry_payload).hexdigest())
+        manifest = inputs.project.manifest.model_copy(update={"active_registry": pointer})
+        (root / "state/manifest.json").write_text(manifest.model_dump_json(indent=2), encoding="utf-8")
+        inputs = replace(inputs, project=load_production_project(root / "project.yaml"))
     project_payload = _canonical_yaml_bytes(inputs.project.project)
     project_path = canonical_project_snapshot_path(
         inputs.project.project.revision,
@@ -196,6 +230,10 @@ def _make_commercial_state_project(root, *, include_inputs: bool = False):
         initial_manifest.model_dump_json(indent=2), encoding="utf-8"
     )
     base = load_production_project(root / "project.yaml")
+    if generated_video:
+        from production_generation_execution_factory import activate_generated_video_shot
+        inputs = activate_generated_video_shot(root=root, inputs=replace(inputs, project=base))
+        base = inputs.project
     reference_set = _state_reference_set(base)
     image_bytes = project_factory._p7_png(rgba=b"\x31\x62\x93\xff")
     receipt = production.CommercialImageImportReceipt.create(

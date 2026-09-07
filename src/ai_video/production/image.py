@@ -1194,7 +1194,7 @@ def validate_image_activation_candidate(
             ("composition:", "timeline:", "renderer-source:", "render:")
         )
     }
-    if newly_affected != allowed_affected:
+    if newly_affected != allowed_affected - previously_nonfresh:
         raise _image_scope_invalid(
             "Image candidate resolution contains an unrelated dependency node."
         )

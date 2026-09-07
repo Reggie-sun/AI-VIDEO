@@ -225,6 +225,14 @@ checks:
     cwd: .
     covered_by_check_ids: [production_contract_tests]
     description: Verify pure Shot routing, exact video capabilities, and dependency isolation.
+  generation_feedback_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_generation_feedback.py, tests/test_generation_evaluation.py, tests/test_generation_execution.py, tests/test_generation_execution_guards.py, tests/test_generation_historical_replay.py, tests/test_generation_provider_wiring.py, tests/test_generation_local_wiring.py, tests/test_generation_feedback_driver.py, tests/test_generation_feedback_review.py, tests/test_production_generation_decision.py, -q]
+    cwd: .
+    description: Verify evidence-derived decisions, transferable cohorts, execution binding and frozen historical replay without Provider effects.
+  production_strategy_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_strategy_contracts.py, tests/test_production_requirement_allocation.py, tests/test_production_source_use_evidence.py, tests/test_production_strategy_resolver.py, tests/test_production_strategy_materialization.py, tests/test_production_strategy_reader.py, tests/test_production_strategy_dependency.py, tests/test_production_planning_service.py, tests/test_production_planning_generation.py, -q]
+    cwd: .
+    description: Verify production-means decisions, exact source use, component lineage and canonical materialization without Provider effects.
   video_planner_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_planning_video_planner.py, tests/test_errors.py, -q]
     cwd: .
@@ -275,6 +283,7 @@ checks:
     timeout_seconds: 1800
     execution_priority: 30
     covers_check_ids:
+      - generation_feedback_tests
       - production_vidu_tests
       - commercial_source_preparation_tests
       - composition_playbook_tests
@@ -295,6 +304,7 @@ checks:
       - mcp_tests
       - production_contract_tests
       - production_reader_tests
+      - production_strategy_tests
       - production_state_tests
       - production_composition_audio_tests
       - production_dependency_tests
@@ -322,6 +332,24 @@ checks:
     description: Report repository health against the version-controlled architecture baseline.
 
 categories:
+  production_strategy:
+    patterns:
+      - src/ai_video/planning/production_strategy.py
+      - src/ai_video/production_planning.py
+      - src/ai_video/production/production_strategy_*.py
+      - src/ai_video/production/_creative_project_reader.py
+      - src/ai_video/production/source_use_evidence.py
+      - tests/test_production_strategy_*.py
+      - tests/test_production_requirement_allocation.py
+      - tests/test_production_source_use_evidence.py
+      - tests/test_production_planning_service.py
+      - tests/test_production_planning_generation.py
+      - tests/production_strategy_factory.py
+    check_ids:
+      - production_strategy_tests
+      - generation_feedback_tests
+      - production_shot_router_tests
+      - task_architecture_gate
   drama_authoring_source_binding:
     patterns:
       - docs/superpowers/artifacts/drama/b-d0/execution-intent/key-at-the-waiting-room-shot-01-v3.proposed.json
@@ -354,6 +382,37 @@ categories:
       - .agent/harness/**
     check_ids:
       - harness_tests
+  generation_feedback:
+    patterns:
+      - src/ai_video/planning/generation_feedback_context.py
+      - src/ai_video_mcp/generation_feedback.py
+      - src/ai_video_mcp/analysis_client.py
+      - scripts/generation_feedback_driver.py
+      - tests/test_generation_feedback_driver.py
+      - tests/test_generation_feedback_review.py
+      - src/ai_video/production/generation_feedback.py
+      - src/ai_video/production/generation_experience.py
+      - src/ai_video/production/generation_evaluation.py
+      - src/ai_video/production/generation_execution.py
+      - src/ai_video/production/generation_decision.py
+      - src/ai_video/production/generation_diagnosis.py
+      - src/ai_video/production/_state_commit_generation_feedback.py
+      - src/ai_video/production/_generation_feedback_reader.py
+      - src/ai_video/production/_remote_video_native_prompt.py
+      - tests/test_generation_feedback.py
+      - tests/test_generation_execution.py
+      - tests/test_generation_execution_guards.py
+      - tests/test_generation_evaluation.py
+      - tests/test_generation_historical_replay.py
+      - tests/test_generation_provider_wiring.py
+      - tests/test_generation_local_wiring.py
+      - tests/production_generation_execution_factory.py
+      - tests/production_remote_generation_factory.py
+      - tests/fixtures/generation_feedback_history.json
+    check_ids:
+      - generation_feedback_tests
+      - production_shot_router_tests
+      - production_video_provider_tests
   documentation:
     patterns:
       - README.md
@@ -615,6 +674,7 @@ categories:
       - src/ai_video/production/comfy_image.py
       - src/ai_video/production/image_import.py
       - src/ai_video/production/_image_project_reader.py
+      - src/ai_video/production/_image_video_lineage.py
       - src/ai_video/production/_state_commit_image_*.py
       - workflows/bindings/p7_1_*
       - workflows/profiles/p7_1_*

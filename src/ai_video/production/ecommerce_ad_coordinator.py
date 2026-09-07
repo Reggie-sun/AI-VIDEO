@@ -136,6 +136,7 @@ class EcommerceVideoGenerationFacade:
     continuity_reviewer: Any = None
     pre_submit_guard: Callable[[ResolvedVideoGenerationRequest], None] | None = None
     before_validate: Callable[[], None] | None = None
+    execution_binding: Any = None
     _started: bool = False
 
     def __post_init__(self) -> None:
@@ -194,7 +195,8 @@ class EcommerceVideoGenerationFacade:
         return self.service.commercial_execution_guard(attempt_id=self.attempt_id)
 
     def start(self) -> None:
-        self.service.start(attempt_id=self.attempt_id, request=self.request)
+        self.service.start(attempt_id=self.attempt_id, request=self.request,
+                           execution_binding=self.execution_binding)
         self._started = True
 
     def submit(self) -> None:

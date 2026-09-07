@@ -51,10 +51,11 @@ from ai_video.production.video import (
     VideoGenerationRequest,
     VideoImageReferenceBinding,
     VideoOutputRequirement,
+    VideoOutputRecoveryStrategy,
     VideoProviderCapabilities,
     VideoTaskState,
 )
-from ai_video.production.video_fake import FakeVideoScenario, ScriptedFakeVideoProvider
+from ai_video.production.video_fake import FakeVideoScenario
 from ai_video.production.video_generation import VideoGenerationService
 from ai_video.production.video_compiler import (
     CompiledProviderVideoRequest,
@@ -172,7 +173,7 @@ def _approved_commercial_project(
     root, *, source_plan_shot_id: str, post_media: bool = False
 ):
     inputs, reference_set, import_receipt = _make_commercial_state_project(
-        root, include_inputs=True
+        root, include_inputs=True, generated_video=post_media
     )
     committer = ProductionStateCommitter(
         root,
@@ -214,6 +215,14 @@ def _approved_commercial_project(
         expected_manifest_revision=with_policy.manifest_revision,
     )
     loaded = load_production_project(root / "project.yaml")
+    if post_media:
+        from production_generation_execution_factory import activate_fixture_generation_qa_policy
+
+        inputs = activate_fixture_generation_qa_policy(root=root,
+            inputs=replace(inputs, project=loaded), output=VideoOutputRequirement(
+                duration_seconds=1, width=64, height=64, fps=24,
+                container="mp4", mime_type="video/mp4", native_audio=False))
+        loaded = inputs.project
     projection = _interaction_projection(
         source_plan_shot_id=source_plan_shot_id,
         target_shot_id=loaded.shots[0].shot_id,
@@ -261,6 +270,9 @@ def _approved_commercial_project(
 
 
 def _product_video_runtime(root):
+    from production_generation_execution_factory import (
+        NativeFixtureVideoProvider, prepare_generation_execution,
+    )
     loaded, projection, approved_source, inputs = _approved_commercial_project(
         root,
         source_plan_shot_id="shot-04",
@@ -362,8 +374,10 @@ def _product_video_runtime(root):
         fps_supported=True,
         idempotent_submit=False,
         lookup_supported=False,
+        output_recovery_strategy=VideoOutputRecoveryStrategy.REQUERY_BY_EFFECT_ID,
     )
-    provider = ScriptedFakeVideoProvider(
+    provider = NativeFixtureVideoProvider(
+        native_prompt_text=request.prompt_text,
         capabilities=VideoProviderCapabilities.create(
             provider_name="fake-product-video",
             variants=(variant,),
@@ -372,6 +386,9 @@ def _product_video_runtime(root):
         scenario=FakeVideoScenario(status_events=(VideoTaskState.SUCCEEDED,)),
     )
     resolved = provider.resolve(request)
+    prepared = prepare_generation_execution(project=loaded, provider=provider, request=resolved,
+        task_id="product-interaction-fixture", compiler_id="native-fixture-video", compiler_version="1")
+    resolved = prepared.resolved
     attempt_id = "qingyan-product-shot-attempt"
     preview = _paid_preview(
         resolved,
@@ -388,7 +405,7 @@ def _product_video_runtime(root):
         paid_provider_clock=lambda: authorization.issued_at,
     )
     service = VideoGenerationService(committer=committer, provider=provider)
-    service.start(attempt_id=attempt_id, request=resolved)
+    service.start(attempt_id=attempt_id, request=resolved, execution_binding=prepared.binding)
     service.submit_once(
         attempt_id=attempt_id,
         paid_preview=preview,

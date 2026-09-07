@@ -302,11 +302,14 @@ def test_pre_generation_graph_is_exact_asset_free_and_submit_ready(
         if item.node_id != target_id
     )
 
-    committed = ProductionStateCommitter(target).begin_video_generation(
-        attempt_id="begin-exact-pre-generation",
-        request=_resolved_request(loaded),
-    )
-    assert committed.attempts[-1].operation == "video_generation"
+    before_manifest = (target / "state/manifest.json").read_bytes()
+    with pytest.raises(AiVideoError, match="execution binding"):
+        ProductionStateCommitter(target).begin_video_generation(
+            attempt_id="begin-exact-pre-generation",
+            request=_resolved_request(loaded),
+            execution_binding=None,
+        )
+    assert (target / "state/manifest.json").read_bytes() == before_manifest
 
 
 def test_begin_rejects_noncanonical_authoring_graph_before_write(
@@ -376,6 +379,7 @@ def test_begin_rejects_noncanonical_authoring_graph_before_write(
         writer.begin_video_generation(
             attempt_id="reject-noncanonical-authoring-graph",
             request=_resolved_request(reopened),
+            execution_binding=None,
         )
 
     assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID
@@ -446,6 +450,7 @@ def test_begin_video_generation_rejects_pre_generation_lineage_drift_before_writ
         ProductionStateCommitter(target).begin_video_generation(
             attempt_id=f"reject-{mutation.replace('_', '-')}",
             request=_resolved_request(loaded, changes={mutation: replacement}),
+            execution_binding=None,
         )
 
     assert exc_info.value.code is ErrorCode.PRODUCTION_STATE_INVALID

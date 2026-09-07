@@ -14,7 +14,7 @@ from ai_video.production.generation_recipe import RequirementExpression
 from ai_video.production.generation_decision import InputConflict
 from ai_video.production.generation_diagnosis import (
     AttemptEvidence, Finding, Intervention, diagnose_attempt, compare_compiled_requests,
-    verify_intervention_comparison,
+    intervention_prediction_outcome, verify_intervention_comparison,
 )
 from ai_video.production.video_compiler import (
     compile_provider_video_request, ProviderNativePrompt, ProviderRequirementUnsupported,
@@ -142,7 +142,7 @@ def test_a1_a3_readiness_is_not_quality_and_unknown_is_bounded():
 
 def test_a2_unauthorized_supported_provider_is_only_a_recommendation():
     setup = setup_decision(remote=True)
-    e = evidence(setup)
+    e = evidence(setup, shot_id="historical-shot")
     result = decide(setup, evidence=(e,))
     assert result.disposition == "CHANGE_PROVIDER_MODEL"
     assert result.routing is None
@@ -158,6 +158,27 @@ def test_a8_a12_no_media_is_not_model_quality_failure(outcome, expected):
     result = decide(setup, evidence=(e,), latest_attempt_hash=e.evidence_hash)
     assert result.disposition == expected
     assert result.assessments[0].fail_count == 0
+    assert result.routing is None
+
+
+def test_known_exact_recovery_keeps_unknown_history_without_permanent_block():
+    setup = setup_decision()
+    unknown = evidence(setup, outcome="unknown_outcome", task_id="task")
+    recovered = evidence(setup, task_id="task")
+    result = decide(setup, evidence=(unknown, recovered), latest_attempt_hash=recovered.evidence_hash)
+    assert result.disposition == "REVIEW_CURRENT_RESULT"
+    unrelated = recovered.model_copy(update={"request_hash": "e" * 64})
+    result = decide(setup, evidence=(unknown, unrelated), latest_attempt_hash=unrelated.evidence_hash)
+    assert result.disposition == "UNKNOWN_OUTCOME"
+
+
+def test_prepared_only_latest_cannot_erase_submitted_failure():
+    setup = setup_decision()
+    failed = evidence(setup, verdict="FAIL", task_id="task")
+    prepared = evidence(setup, outcome="not_submitted", task_id="task", attempt="prepared-only")
+    result = decide(setup, evidence=(failed, prepared), latest_attempt_hash=prepared.evidence_hash,
+                    policy=DecisionPolicy(max_resamples=0))
+    assert result.disposition == "EVIDENCE_GAP"
     assert result.routing is None
 
 
@@ -252,7 +273,7 @@ def test_a12_stale_current_projection_and_recipe_fail_closed():
 
 def test_a13_feedback_changes_decision_and_unrelated_model_does_not():
     setup = setup_decision()
-    failures = tuple(evidence(setup, verdict="FAIL", attempt=str(i)) for i in range(3))
+    failures = tuple(evidence(setup, verdict="FAIL", attempt=str(i), shot_id="historical-shot") for i in range(3))
     assert decide(setup).disposition == "GENERATE_ONCE"
     assert decide(setup, evidence=failures).disposition == "CAPABILITY_BOUNDARY"
     stale = tuple(e.model_copy(update={"recipe_scope_hash": "0" * 64}) for e in failures)
@@ -295,7 +316,7 @@ def test_a16_registration_order_tie_and_audit_only_changes():
     b = decide(setup, candidates=(second, c))
     assert a == b
     assert a.disposition == "UNRESOLVED_TIE"
-    e = evidence(setup)
+    e = evidence(setup, shot_id="historical-shot")
     first = decide(setup)
     informed = decide(setup, evidence=(e,))
     assert first.decision_hash != informed.decision_hash
@@ -397,7 +418,7 @@ def test_historical_uncontrolled_seed_allows_fixed_seed_repair_with_explicit_del
     })
     prior = evidence(setup, candidate=historical, verdict="FAIL", task_id="task",
                      request_hash=baseline.request_input_hash)
-    proposal = intervention(prior, purpose="production_repair", changed_variables=("seed",),
+    proposal = intervention(prior, purpose="resample", resample_limit=1, changed_variables=("seed",),
                             held_constants=("prompt_text",), uncontrolled_variables=("seed",))
     setup["inputs"] = DecisionInputs.model_validate({
         **setup["inputs"].model_dump(mode="python"), "historical_recipes": (historical,),
@@ -488,6 +509,28 @@ def test_partial_dimension_evidence_cannot_claim_supported_fit():
     assert result.assessments[0].not_evaluated_count == 1
 
 
+@pytest.mark.parametrize("dimension", ["action_and_time", "identity"])
+def test_partial_dimension_proofs_on_different_artifacts_cannot_be_pooled(dimension):
+    setup = setup_decision()
+    candidate = setup["inputs"].candidates[0]
+    recipe = candidate.recipe
+    viewing = recipe.expressions[0].model_copy(update={
+        "requirement_id": "viewing", "proof": "human", "dimension": dimension,
+    })
+    candidate = candidate.model_copy(update={"recipe": recipe_with_rules(recipe, (*recipe.expressions, viewing))})
+    duration = evidence(setup, candidate=candidate, attempt="duration")
+    viewing_only = evidence(setup, candidate=candidate, attempt="viewing")
+    viewing_only = viewing_only.model_copy(update={"findings": (
+        viewing_only.findings[0].model_copy(update={"requirement_id": "viewing", "proof": "human"}),
+    )})
+    result = decide(setup, candidates=(candidate,), evidence=(duration, viewing_only),
+                    rubric_hash=candidate.recipe.rubric_hash)
+    assessment = result.assessments[0]
+    assert assessment.fit == "unknown"
+    assert assessment.supported_dimensions == (() if dimension == "action_and_time" else ("action_and_time", "identity"))
+    assert assessment.pass_count == 0
+
+
 def test_recipe_cannot_omit_a_sealed_acceptance_item():
     setup = setup_decision()
     recipe = setup["inputs"].candidates[0].recipe
@@ -559,6 +602,112 @@ def test_intervention_rename_cannot_reset_semantic_resample_limit():
                   interventions=(renamed,)).disposition == "REASSESS_FEASIBILITY"
 
 
+def test_intervention_semantics_ignore_explanatory_prose_but_bind_controlled_values():
+    setup = setup_decision()
+    proposed = intervention(evidence(setup), semantic_variable_hashes=(("image_bindings", "d" * 64),))
+    reworded = proposed.model_copy(update={
+        "hypothesis": "a differently worded explanation",
+        "confidence_basis": "different prose",
+        "improvement_prediction": "different predicted wording",
+        "falsification_prediction": "different falsification wording",
+        "insufficient_evidence_condition": "different evidence wording",
+    })
+    changed_target = proposed.model_copy(update={"semantic_variable_hashes": (("image_bindings", "e" * 64),)})
+    assert reworded.semantic_hash == proposed.semantic_hash
+    assert changed_target.semantic_hash != proposed.semantic_hash
+
+
+def test_non_resample_generate_once_repair_cannot_be_a_noop():
+    setup = setup_decision()
+    with pytest.raises(ValueError, match="must change"):
+        intervention(evidence(setup), purpose="production_repair", changed_variables=(),
+                     held_constants=("seed", "prompt_text", "image_bindings"))
+
+
+@pytest.mark.parametrize("purpose", ["production_repair", "diagnostic"])
+def test_seed_only_operation_cannot_be_relabeled_to_bypass_sampling_policy(purpose):
+    with pytest.raises(ValueError, match="bounded resample"):
+        intervention(evidence(setup_decision()), purpose=purpose,
+                     changed_variables=("seed",), held_constants=("prompt_text",))
+
+
+def test_compiler_checks_declared_target_values_against_actual_reference_bytes():
+    before = setup_decision(reference_hash="a" * 64)
+    baseline = compile_decision(decide(before), before).request
+    failed = evidence(before, verdict="FAIL", task_id="task", request_hash=baseline.request_input_hash)
+    after = setup_decision(reference_hash="b" * 64)
+    proposed = intervention(failed, semantic_variable_hashes=(("image_bindings", "d" * 64),))
+    decision = decide(after, historical_recipes=before["inputs"].candidates,
+        baseline_request=baseline, evidence=(failed,), latest_attempt_hash=failed.evidence_hash,
+        interventions=(proposed,))
+    result = compile_decision(decision, after)
+    assert result.outcome == "unsupported"
+    assert result.unsupported_field_paths == ("generation_recipe.comparison.target_values",)
+
+
+def test_policy_resample_cap_counts_submitted_cross_task_semantic_experiment_only():
+    setup = setup_decision()
+    baseline = compile_decision(decide(setup), setup).request
+    latest = evidence(setup, verdict="FAIL", task_id="task", attempt="current",
+                      request_hash=baseline.request_input_hash)
+    proposal = intervention(latest, purpose="resample", resample_limit=99,
+                            changed_variables=("seed",), held_constants=("prompt_text", "image_bindings"))
+    original = setup["inputs"].candidates[0]
+    changed = original.model_copy(update={"recipe": original.recipe.model_copy(
+        update={"seed": SeedPolicy(kind="fixed", value=43)})})
+    setup = {**setup, "inputs": setup["inputs"].model_copy(
+        update={"candidates": (changed,), "historical_recipes": (original,)})}
+    prior = evidence(setup, verdict="FAIL", task_id="previous-task", attempt="submitted")
+    prior = prior.model_copy(update={"intervention_id": "historical-name",
+                                     "intervention_semantic_hash": proposal.semantic_hash})
+    blocked = decide(setup, evidence=(prior, latest), latest_attempt_hash=latest.evidence_hash,
+                     interventions=(proposal,), baseline_request=baseline,
+                     policy=DecisionPolicy(max_resamples=1))
+    assert blocked.disposition == "REASSESS_FEASIBILITY"
+    not_submitted = prior.model_copy(update={"outcome": "not_submitted", "artifact_sha256": None,
+                                             "findings": (), "attempt_id": "prepared-only"})
+    allowed = decide(setup, evidence=(not_submitted, latest), latest_attempt_hash=latest.evidence_hash,
+                     interventions=(proposal,), baseline_request=baseline,
+                     policy=DecisionPolicy(max_resamples=1))
+    assert allowed.disposition == "GENERATE_ONCE"
+    unknown = prior.model_copy(update={"outcome": "unknown_outcome", "artifact_sha256": None,
+                                       "findings": (), "attempt_id": "unknown"})
+    fail_closed = decide(setup, evidence=(unknown, latest), latest_attempt_hash=latest.evidence_hash,
+                         interventions=(proposal,), baseline_request=baseline,
+                         policy=DecisionPolicy(max_resamples=1))
+    assert fail_closed.disposition == "UNKNOWN_OUTCOME"
+
+
+def test_prediction_outcome_is_observational_and_protects_declared_requirements():
+    from ai_video.production.generation_diagnosis import Diagnosis
+
+    setup = setup_decision()
+    proposed = intervention(evidence(setup), protected_requirements=("continuity",))
+    supported = Diagnosis(failure_classes=(), failed_requirements=(),
+                          preserved_requirements=("duration", "continuity"),
+                          evidence_hashes=("a" * 64,), next_owner="review_owner")
+    refuted = supported.model_copy(update={"failed_requirements": ("continuity",),
+                                           "preserved_requirements": ("duration",)})
+    incomplete = supported.model_copy(update={"preserved_requirements": ("duration",)})
+    assert intervention_prediction_outcome(proposed, supported) == "supported"
+    assert intervention_prediction_outcome(proposed, refuted) == "refuted"
+    assert intervention_prediction_outcome(proposed, incomplete) == "undetermined"
+
+
+def test_undetermined_prior_repair_prediction_requires_evidence_before_reeligibility():
+    setup = setup_decision()
+    baseline = compile_decision(decide(setup), setup).request
+    latest = evidence(setup, verdict="FAIL", task_id="task", attempt="current",
+                      request_hash=baseline.request_input_hash)
+    proposal = intervention(latest)
+    prior = evidence(setup, verdict="NOT_EVALUATED", task_id="previous-task", attempt="prior")
+    prior = prior.model_copy(update={"intervention_id": "old-name",
+                                     "intervention_semantic_hash": proposal.semantic_hash})
+    result = decide(setup, evidence=(prior, latest), latest_attempt_hash=latest.evidence_hash,
+                    interventions=(proposal,), baseline_request=baseline)
+    assert result.disposition == "EVIDENCE_GAP"
+
+
 def test_comparison_discloses_uncontrolled_historical_baseline():
     from ai_video.production.generation_diagnosis import seal_intervention_comparison, compiled_comparison_errors
     from ai_video.production.video import VideoGenerationRequest
@@ -568,7 +717,8 @@ def test_comparison_discloses_uncontrolled_historical_baseline():
     for seed in (None, -1):
         baseline = VideoGenerationRequest.create(**{**values, "seed": seed})
         e = evidence(setup, verdict="FAIL")
-        proposed = intervention(e, changed_variables=("seed",), held_constants=("prompt_text",))
+        proposed = intervention(e, purpose="resample", resample_limit=1,
+                               changed_variables=("seed",), held_constants=("prompt_text",))
         comparison = seal_intervention_comparison(proposed, baseline)
         assert compiled_comparison_errors(comparison, controlled) == ("generation_recipe.comparison.uncontrolled_seed",)
 
@@ -644,7 +794,15 @@ def test_current_result_can_complete_previously_missing_evidence_on_same_bytes()
 @pytest.mark.parametrize("update", [{"generation_forbidden": True}, {"local_batch_used": 3}, {"local_resource_available": False}])
 def test_supported_fit_does_not_turn_resource_stop_into_provider_switch(update):
     setup = setup_decision()
-    e = evidence(setup)
+    e = evidence(setup, shot_id="historical-shot")
     result = decide(setup, evidence=(e,), limits=setup["inputs"].limits.model_copy(update=update))
     assert result.disposition == "BLOCKED_EXECUTION"
+    assert result.routing is None
+
+
+def test_new_task_cannot_omit_latest_same_shot_submitted_history():
+    setup = setup_decision()
+    prior = evidence(setup, verdict="FAIL", task_id="previous-task")
+    result = decide(setup, evidence=(prior,), policy=DecisionPolicy(max_resamples=0))
+    assert result.disposition == "EVIDENCE_GAP"
     assert result.routing is None

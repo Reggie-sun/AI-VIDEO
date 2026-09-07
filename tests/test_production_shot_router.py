@@ -345,7 +345,8 @@ def test_c4_requirement_bindings_use_exact_native_multi_anchor_order():
 def test_multi_anchor_context_fails_closed_without_sealed_c4_requirement():
     context = _context(continuity=ContinuityMode.MULTI_ANCHOR)
 
-    visual = ShotVisualResolver().resolve(context, _policy())
+    with pytest.raises(ValueError, match="selection is retired"):
+        ShotVisualResolver().resolve(context, _policy())
     with pytest.raises(
         ValueError,
         match="must use resolve_requirement with sequence evidence",
@@ -361,10 +362,6 @@ def test_multi_anchor_context_fails_closed_without_sealed_c4_requirement():
             output_requirement=_output(),
         )
 
-    assert visual.outcome is RoutingOutcome.BLOCKED_MISSING_INPUT
-    assert visual.reason_codes == (
-        RouterReasonCode.MULTI_ANCHOR_REQUIREMENT_REQUIRED,
-    )
 
 
 def test_c4_static_requirement_routes_and_compiles_exact_request():
@@ -1555,16 +1552,14 @@ def _request_from_decision(
         ),
     ],
 )
-def test_visual_resolver_uses_deterministic_priority_matrix(
+def test_retired_visual_selector_rejects_all_former_priority_inputs(
     context: ShotRoutingContext,
     expected_strategy: VisualStrategy,
     expected_reason: RouterReasonCode,
 ) -> None:
-    result = ShotVisualResolver().resolve(context, _policy())
+    with pytest.raises(ValueError, match="selection is retired"):
+        ShotVisualResolver().resolve(context, _policy())
 
-    assert result.outcome is RoutingOutcome.PROPOSED
-    assert result.proposed_visual_strategy is expected_strategy
-    assert expected_reason in result.reason_codes
 
 
 def test_visual_resolver_blocks_important_character_without_anchor() -> None:
@@ -1574,12 +1569,9 @@ def test_visual_resolver_blocks_important_character_without_anchor() -> None:
         keyframe=None,
     )
 
-    result = ShotVisualResolver().resolve(context, _policy())
+    with pytest.raises(ValueError, match="selection is retired"):
+        ShotVisualResolver().resolve(context, _policy())
 
-    assert result.outcome is RoutingOutcome.BLOCKED_MISSING_INPUT
-    assert result.proposed_visual_strategy is None
-    assert RouterReasonCode.MISSING_CHARACTER_REFERENCE in result.reason_codes
-    assert result.required_generation_mode is not VideoGenerationMode.TEXT_TO_VIDEO
 
 
 def test_reference_continuity_proposes_r2v_without_copying_terminal_as_first_frame() -> None:
@@ -1590,15 +1582,9 @@ def test_reference_continuity_proposes_r2v_without_copying_terminal_as_first_fra
         continuity_state=_continuity_state(),
     )
 
-    visual = ShotVisualResolver().resolve(context, _policy())
+    with pytest.raises(ValueError, match="selection is retired"):
+        ShotVisualResolver().resolve(context, _policy())
 
-    assert visual.outcome is RoutingOutcome.PROPOSED
-    assert visual.proposed_visual_strategy is VisualStrategy.GENERATED_VIDEO
-    assert visual.required_generation_mode is VideoGenerationMode.REFERENCE_TO_VIDEO
-    assert visual.required_binding_roles == ("reference",)
-    assert visual.reason_codes == (
-        RouterReasonCode.REFERENCE_CONTINUITY_USES_TERMINAL_REFERENCE,
-    )
 
 
 def test_exact_terminal_continuity_precedes_unproven_existing_video() -> None:
@@ -1609,14 +1595,9 @@ def test_exact_terminal_continuity_precedes_unproven_existing_video() -> None:
         terminal=_asset("continuity_terminal", "terminal", HASH_C),
     )
 
-    proposal = ShotVisualResolver().resolve(context, _policy())
+    with pytest.raises(ValueError, match="selection is retired"):
+        ShotVisualResolver().resolve(context, _policy())
 
-    assert proposal.outcome is RoutingOutcome.PROPOSED
-    assert proposal.proposed_visual_strategy is VisualStrategy.GENERATED_VIDEO
-    assert proposal.required_generation_mode is VideoGenerationMode.IMAGE_TO_VIDEO
-    assert proposal.reason_codes == (
-        RouterReasonCode.EXACT_TERMINAL_USES_FIRST_FRAME,
-    )
 
 
 def test_approved_existing_video_requires_mp4_mime() -> None:
@@ -1706,12 +1687,9 @@ def test_reference_continuity_requires_semantic_state() -> None:
         terminal=_asset("continuity_terminal", "terminal", HASH_C),
     )
 
-    result = ShotVisualResolver().resolve(context, _policy())
+    with pytest.raises(ValueError, match="selection is retired"):
+        ShotVisualResolver().resolve(context, _policy())
 
-    assert result.outcome is RoutingOutcome.BLOCKED_MISSING_INPUT
-    assert result.reason_codes == (
-        RouterReasonCode.MISSING_SEMANTIC_CONTINUITY_STATE,
-    )
 
 
 def test_reference_continuity_requires_exact_r2v_capability_without_fallback() -> None:
@@ -1750,12 +1728,9 @@ def test_exact_terminal_without_important_character_still_requires_terminal_i2v(
         terminal=terminal,
     )
 
-    result = ShotVisualResolver().resolve(context, _policy())
+    with pytest.raises(ValueError, match="selection is retired"):
+        ShotVisualResolver().resolve(context, _policy())
 
-    assert result.outcome is RoutingOutcome.PROPOSED
-    assert result.proposed_visual_strategy is VisualStrategy.GENERATED_VIDEO
-    assert result.required_generation_mode is VideoGenerationMode.IMAGE_TO_VIDEO
-    assert result.required_binding_roles == ("first_frame",)
 
 
 def test_continuity_bearing_direct_resolve_requires_sequence_api() -> None:
@@ -2633,7 +2608,8 @@ def test_hero_or_repair_remains_blocked_in_first_phase() -> None:
     )
     policy = _policy()
 
-    visual = ShotVisualResolver().resolve(context, policy)
+    with pytest.raises(ValueError, match="selection is retired"):
+        ShotVisualResolver().resolve(context, policy)
     generation = VideoGenerationResolver().inspect_capability(
         context=context,
         policy=policy,
@@ -2643,7 +2619,6 @@ def test_hero_or_repair_remains_blocked_in_first_phase() -> None:
         output_requirement=_output(),
     )
 
-    assert visual.outcome is RoutingOutcome.BLOCKED_POLICY
     assert generation.outcome is RoutingOutcome.BLOCKED_POLICY
     assert generation.selected_mode is None
     assert generation.reason_codes == (
@@ -2768,12 +2743,9 @@ def test_visual_strategy_must_be_allowed_by_context() -> None:
         update={"allowed_visual_strategies": (VisualStrategy.STATIC_IMAGE,)}
     )
 
-    proposal = ShotVisualResolver().resolve(context, _policy())
+    with pytest.raises(ValueError, match="selection is retired"):
+        ShotVisualResolver().resolve(context, _policy())
 
-    assert proposal.outcome is RoutingOutcome.BLOCKED_POLICY
-    assert proposal.reason_codes == (
-        RouterReasonCode.VISUAL_STRATEGY_POLICY_DENIED,
-    )
 
 
 def test_video_resolver_rejects_non_generated_activated_strategy() -> None:
@@ -3118,11 +3090,9 @@ def test_semantic_continuity_does_not_reuse_unproven_existing_video() -> None:
         existing_video=_asset("existing_video", "unproven", HASH_D),
     )
 
-    proposal = ShotVisualResolver().resolve(context, _policy())
+    with pytest.raises(ValueError, match="selection is retired"):
+        ShotVisualResolver().resolve(context, _policy())
 
-    assert proposal.outcome is RoutingOutcome.PROPOSED
-    assert proposal.proposed_visual_strategy is VisualStrategy.GENERATED_VIDEO
-    assert proposal.proposed_visual_strategy is not VisualStrategy.EXISTING_VIDEO
 
 
 def test_continuity_state_must_be_materialized_in_activated_shot() -> None:

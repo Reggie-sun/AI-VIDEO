@@ -114,6 +114,20 @@ def _complete_receipt_fixture(
     return receipt_path, tracked, policy_path, scope
 
 
+@pytest.mark.parametrize("path", [
+    "src/ai_video/production/generation_feedback.py",
+    "src/ai_video/production/generation_execution.py",
+    "src/ai_video/production/generation_experience.py",
+    "src/ai_video/production/_state_commit_generation_feedback.py",
+    "tests/production_remote_generation_factory.py",
+    "tests/fixtures/generation_feedback_history.json",
+])
+def test_generation_feedback_routes_to_decision_and_provider_checks(path) -> None:
+    inspection = agent_harness.inspect_paths([path], agent_harness.load_policy(POLICY_PATH))
+    assert {"generation_feedback_tests", "production_shot_router_tests",
+            "production_video_provider_tests"} <= set(inspection["check_ids"])
+
+
 def test_repository_policy_v2_loads_and_references_known_checks() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 

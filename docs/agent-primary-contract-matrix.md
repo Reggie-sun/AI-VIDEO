@@ -1,15 +1,87 @@
 # AI-VIDEO Contract Routing Matrix
 
+## Production Strategy
+
+`planning/production_strategy.py::ProductionStrategyResolver` 是 Director intent 到生产手段的唯一选择
+owner；从 selected Shot 的 `ProductionIntent`、QA allocation、Registry 与 exact source-use evidence
+枚举 coverage/source/generation 候选。候选持平、证据不足、范围禁止和 capability gap 均显式返回。
+Application caller `production_planning.py::ProductionPlanningService` 使用 standard loader，在 materialize 前
+重新解析并比较完整 decision；只将缺失的动态组件交给原 generation owner。
+
+`production_strategy_contracts.py` 只保存 immutable authoring/handoff；`domain_acceptance.py` 的
+`ProductionRequirementAllocation` 与 QA-owned `source_use_evidence.py` 分别拥有组件验收分配和
+精确 bytes/window/role/transform/requirement/evaluator 的用途证据。正向证据必须符合当前
+acceptance inventory 的 proof 与 source/raw stage；Registry 技术有效不等于用途 PASS。
+`production_strategy_reader.py` 按 Manifest 保留的 origin Project snapshot 重开 parent，验证 lineage、
+完整 coverage 与历史 allocation policy pointer；合法 QA revision 不妨碍历史项目重开，但执行必须
+满足当前 allocation 和用途证据。`production_strategy_composition.py` 校验实际 CompositionSpec 的
+window、transform、图层、音轨、字幕与有序 coverage，禁止仅凭旧 lineage 证明新用途。
+`production_strategy_materialization.py` 仅构造原 committer 的
+`StateCommitRequest` 或原 CompositionSpec。不得写入第二个 strategy lifecycle、timeline 或 quota。
+`production_strategy_dependency.py` 通过既有 P5 resolver/transition 将 authoring revision 交回唯一
+committer；保留未受影响的 authoring→asset edges、fingerprint 和 lifecycle。受影响的旧 render
+domain 退出当前图，新 render graph 仍需由原 dependency builder 消费新的 CompositionSpec 构建。
+
+`ShotVisualResolver.resolve()` 已退役并明确报错；历史 proposal 类型、sealed request 与 recovery
+仍可读取。`VideoGenerationResolver` 继续独占**决定生成之后**的 exact generation selection；
+组件 generation acceptance 来自 `selected_shot_generation_acceptance()`，禁止直接复制父 rubric，
+也禁止以新 component/task 名重置家族历史和预算。Product 不反向 import Planning。
+Focused verification：`python -m pytest -q tests/test_production_strategy_contracts.py
+tests/test_production_requirement_allocation.py tests/test_production_source_use_evidence.py
+tests/test_production_strategy_resolver.py tests/test_production_strategy_materialization.py
+tests/test_production_strategy_reader.py tests/test_production_strategy_dependency.py
+tests/test_production_planning_service.py tests/test_production_planning_generation.py`；
+mandatory changed-path routing 仍由 `.agent/harness/policy.yaml` 独占。
+
 ## Generation Decision Loop
 
-`VideoGenerationResolver.resolve_requirement()` 是新任务 selection/fit 的唯一 public owner，
+`VideoGenerationResolver.resolve_requirement()` 是新 generation 任务 selection/fit 的唯一 public owner，
 消费 `generation_decision.DecisionInputs` 的候选、当前 projection、rubric、执行范围和显式
 advisory evidence；不接收外部 `selected_capability_id`。`inspect_capability()` 只提供无
 bound request 的兼容性观察；`_bind_requirement()` 是 Router 内部 exact binder。
 `generation_diagnosis.py` 比较 exact attempts、proof layers 与 intervention；
 `generation_recipe.py` 定义 immutable recipe/seed/阶段与 compiler expression coverage。
-`planning/generation_difficulty.py` 只由 Planner 暴露组合事实，不将 confidence 变成成功率。
-Production 不 import Planning/Q0/storage。没有新的 execution、Gate 或 state writer。
+`planning/generation_difficulty.py` 暴露组合事实和 `generation_experience.py` 的版本化特征；
+后者仅拥有 Provider/model/mode、可比 rubric 和特征 cohort 的观测估计，不把 confidence 当成功率。
+`generation_feedback.py` 是共同 input/intervention producer；从重新打开的 authoring/context、
+registered variants 和 durable experience 构造 `DecisionInputs`，Router 仍独占选择。
+`generation_evaluation.py` 保存 Review 边界的 raw-generation evaluator document 并投影 Finding；
+committer 必须重验 document hash、request/artifact/rubric/current QA identity、selected evaluator，
+不能只保存 caller 手填的 Finding/source hash。该契约不替代真实 analyzer/human 调用或 Gate。
+QA owner 的 `generation_evaluation_authorities` 显式绑定 evaluator 与 proof kind；旧 policy 的
+空字段保持原序列化，新 generation 缺少适用 authority 时必须在 submit 前拒绝。
+同一 `QaPolicy` 可通过 `generation_acceptance` 保存独立生成阶段 rubric，而 `domain_acceptance`
+继续拥有 whole-output 验收。`selected_generation_acceptance()` 独占选择：显式生成 rubric 优先，
+旧 combined policy 仅在已含 sealed inventory 时保留兼容；不得从 whole-ad 要求猜测 raw 投影。
+空新增字段不进入旧序列化；新选择会改变 QA content hash，使旧 policy-bound evidence 失效。
+`generation_execution.py` 将可重算 decision 绑定实际 native compiled request；普通新 v2 start
+必须提供该 binding，旧 request shape、空 lineage 或 run script 不能成为 submit 例外。
+`ProductionStateCommitter` 通过既有 video mixin 和 `_state_commit_generation_feedback.py`
+独占 binding/evaluator projection 持久化与 permit 前重验；`_generation_feedback_reader.py`
+重开 exact binding/experience/qualification receipts，video reader 复用它。Qualification 仅由原
+source/M0 caller 的独立验证路径进入；历史 recovery 不重新 submit。
+permit 从 Manifest 顺序推导同 Shot 的最新有效结果，优先实际提交结果；prepared-only、换 task
+名称或选择更早的记录不能抹去 FAIL。完整持久历史必须与 decision inputs 一致，不接受遗漏或注入。
+`VideoGenerationService` 在 effect 前重验当前真实 adapter compiler/resolve，Ecommerce facade
+传递同一 execution binding。Commercial identity 由既有 lifecycle→compiler 保真传递。
+Production 不 import Planning/Q0/Dev records/RAG/Skills，不增加 quota ledger、Gate 或 activation owner。
+重复失败可触发有界 resample、Provider 建议或 authoring feasibility；不宣称学习策略的质量收益。
+
+`planning/generation_feedback_context.py` 只校验当前 plan/context，不 import execution service。
+`scripts/generation_feedback_driver.py` 拥有私有 Seedance 配置与执行入口；两个当前 run 的
+prepare/live wrappers 委托该入口，历史 bootstrap 不授予新 submit 权限。
+`ai_video_mcp/generation_feedback.py` 拥有 exact fetched bytes → MCP → selected evaluator 的桥接；
+`analysis_client.py` 复用独立 MCP Python，无 production runtime 新依赖。MCP raw response 不能
+代替 required verdict，evaluator 必须显式关联相同分析证据。首次写入需要桥接签发的进程内
+一次性 proof，不能导入自称调用过 MCP 的 JSON；持久证据由 committer/reader 原子保存与重验。
+这些约束不构成远程 tool attestation，也不自动激活或签发 P6/Final Acceptance。
+
+Focused verification：`python -m pytest -p no:cacheprovider tests/test_generation_feedback.py
+tests/test_generation_evaluation.py tests/test_generation_execution.py tests/test_generation_execution_guards.py
+tests/test_generation_provider_wiring.py tests/test_generation_local_wiring.py
+tests/test_generation_historical_replay.py tests/test_production_generation_decision.py
+tests/test_generation_feedback_driver.py tests/test_generation_feedback_review.py -q`。
+实际 changed paths 还必须执行 Harness 的 production state/provider、requirement、Ecommerce 与 control-plane checks。
 
 新 recipe 不接受 generic neutral-field prompt 作为完整表达；adapter 必须提供 native prompt，
 recipe 必须与 selected `DomainAcceptancePolicy` 的 sealed `generation_requirements` inventory
@@ -20,11 +92,16 @@ native controls 使用既有 request 检查，不要求重复进入 prose。不�
 此 conservative lexical coverage 不是语义理解或模型遵循证明。历史无 recipe 的 bound/request
 序列化保持原 hash。显式 fixed/paired/randomized seed 与 lifecycle identity 分离；repair 的
 comparison 由 Router 从 validated exact baseline request 导出，compiler 再检查实际 delta；
+如 intervention 声明 target variable hashes，必须与实际编译值一致，不能作为未经核验的重试新身份。
 两端未经控制的随机性必须披露。最终字幕不作为 raw finding，
 seed-capable Provider 的当前 `DecisionInputs.candidates` 必须显式控制 seed；
 `historical_recipes` 可如实保留当时未指定的 seed，但不能声称 Provider 不支持的受控 seed。
 human FAIL 不被 technical PASS 覆盖；所有新 bytes 重新验证。Scope、reference、compiler、
 rubric、facts 或 policy 的改变产生新审计 identity；只有实际 recipe/request 变化进入生成语义。
+
+P7 image 被后续视频保留时，`_image_video_lineage.py` 只验证 reader 的后继关系：succeeded video
+attempt、exact input image bytes、video 输出所在 role、immutable candidate Shot 与完整 video
+evidence 必须一致；P7 原 receipt 仍需完整重开，不增加 activation 或 lineage writer。
 
 Harness owner：`production_shot_router`（新纯模块与测试）、`video_planning`（Planner）及已有
 compiler/provider categories。Focused verification：

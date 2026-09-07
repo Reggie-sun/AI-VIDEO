@@ -60,6 +60,70 @@ from ai_video.production.video import (
     validate_terminal_frame_evidence_against_project,
 )
 from ai_video.production.video_generation import VideoGenerationService
+from ai_video.production.generation_execution import _mint_qualification_execution_binding
+
+
+class _M0QualificationExecutionCapability:
+    """Owner-held capability for one exact, reopened M0 closure."""
+
+    __slots__ = (
+        "_proof",
+        "_request_input_hash",
+        "_resolved_generation_hash",
+        "_snapshot",
+        "_consumed",
+    )
+
+    def __init__(
+        self,
+        *,
+        request_input_hash: str,
+        resolved_generation_hash: str,
+        snapshot: M0ValidationPreflightSnapshot,
+    ) -> None:
+        object.__setattr__(self, "_proof", None)
+        object.__setattr__(self, "_request_input_hash", request_input_hash)
+        object.__setattr__(self, "_resolved_generation_hash", resolved_generation_hash)
+        object.__setattr__(self, "_snapshot", snapshot)
+        object.__setattr__(self, "_consumed", False)
+
+    def __setattr__(self, _name: str, _value: object) -> None:
+        raise AttributeError("M0 qualification execution capability is sealed")
+
+    def bind(self, proof: "_M0QualificationExecutionProof") -> None:
+        if self._proof is not None:
+            raise ValueError("M0 qualification execution capability is already bound")
+        object.__setattr__(self, "_proof", proof)
+
+    def consume(
+        self,
+        proof: "_M0QualificationExecutionProof",
+        request: ResolvedVideoGenerationRequest,
+    ) -> M0ValidationPreflightSnapshot:
+        if (
+            self._proof is not proof
+            or self._consumed
+            or request.request_input_hash != self._request_input_hash
+            or request.resolved_generation_hash != self._resolved_generation_hash
+        ):
+            raise ValueError("M0 qualification owner proof is stale or consumed")
+        object.__setattr__(self, "_consumed", True)
+        return self._snapshot
+
+
+@dataclass(frozen=True)
+class _M0QualificationExecutionProof:
+    """One-use result of the M0 caller reopening its own complete closure."""
+
+    request_input_hash: str
+    resolved_generation_hash: str
+    snapshot: M0ValidationPreflightSnapshot
+    _capability: _M0QualificationExecutionCapability
+
+    def _consume_for_binding(
+        self, request: ResolvedVideoGenerationRequest
+    ) -> M0ValidationPreflightSnapshot:
+        return self._capability.consume(self, request)
 
 
 @dataclass(frozen=True)
@@ -665,6 +729,34 @@ class M0QualificationCaller:
         self._accepted_upstream_reopener = accepted_upstream_reopener
         self._feasibility_approval_reopener = feasibility_approval_reopener
 
+    def _execution_proof(
+        self,
+        *,
+        attempt_id: str,
+        request: ResolvedVideoGenerationRequest | Any,
+        expected: M0ValidationPreflightSnapshot,
+    ) -> _M0QualificationExecutionProof:
+        """Reopen every M0-owned source before authorizing the durable request."""
+
+        _, current = self._validate_pre_effect(
+            request,
+            attempt_id=attempt_id,
+            expected_snapshot=expected,
+        )
+        capability = _M0QualificationExecutionCapability(
+            request_input_hash=request.request_input_hash,
+            resolved_generation_hash=request.resolved_generation_hash,
+            snapshot=current,
+        )
+        proof = _M0QualificationExecutionProof(
+            request_input_hash=request.request_input_hash,
+            resolved_generation_hash=request.resolved_generation_hash,
+            snapshot=current,
+            _capability=capability,
+        )
+        capability.bind(proof)
+        return proof
+
     def qualify(
         self,
         *,
@@ -690,9 +782,18 @@ class M0QualificationCaller:
             committer=self._committer,
             provider=self._provider,
         )
-        service.start(
+        service._start_qualification(
             attempt_id=attempt_id,
             request=resolved_request,
+            qualification_binding=_mint_qualification_execution_binding(
+                qualification_kind="m0",
+                request=resolved_request,
+                proof=self._execution_proof(
+                    attempt_id=attempt_id,
+                    request=resolved_request,
+                    expected=expected_snapshot,
+                ),
+            ),
         )
         submission = service.submit_local_once(
             attempt_id=attempt_id,

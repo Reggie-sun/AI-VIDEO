@@ -157,11 +157,38 @@ def validate_requirement_conditioning_compatibility(
         if capability.max_reference_count not in {None, 0}:
             diagnostics.append("capability_need.max_reference_count")
         return tuple(diagnostics)
+    if requirement.generation_mode in {
+        GenerationMode.REFERENCE_TO_VIDEO, GenerationMode.VIDEO_EDIT, GenerationMode.VIDEO_EXTEND,
+    }:
+        # Reference/edit/extend inputs are not first/last-frame anchors. Their
+        # exact roles and native cardinalities are checked by the binder and
+        # adapter; an I2VA attestation cannot stand in for source-media proof.
+        diagnostics = []
+        if evidence is not None:
+            diagnostics.append("conditioning_compatibility")
+        references = tuple(item for item in requirement.asset_evidence if item.role in {
+            SemanticReferenceRole.IDENTITY, SemanticReferenceRole.SCENE,
+            SemanticReferenceRole.VIDEO_REFERENCE, SemanticReferenceRole.AUDIO_REFERENCE,
+            SemanticReferenceRole.CONTINUITY_MOTION_TAIL,
+        })
+        if not references:
+            diagnostics.append("asset_evidence.references")
+        if requirement.generation_mode in {GenerationMode.VIDEO_EDIT, GenerationMode.VIDEO_EXTEND}:
+            sources = tuple(item for item in references if item.role in {
+                SemanticReferenceRole.VIDEO_REFERENCE, SemanticReferenceRole.CONTINUITY_MOTION_TAIL})
+            if len(sources) != 1 or any(
+                getattr(sources[0], field) is None
+                for field in ("width", "height", "duration_millis", "fps", "size_bytes")
+            ):
+                diagnostics.append("asset_evidence.source_video")
+        return tuple(diagnostics)
     diagnostics = list(validate_conditioning_compatibility(evidence))
     if evidence is None:
         return tuple(diagnostics)
-    if requirement.generation_mode is not GenerationMode.IMAGE_TO_VIDEO:
+    if requirement.generation_mode not in {GenerationMode.IMAGE_TO_VIDEO, GenerationMode.FIRST_LAST_FRAME_VIDEO}:
         diagnostics.append("generation_mode")
+    if requirement.generation_mode is GenerationMode.FIRST_LAST_FRAME_VIDEO and evidence.lane is not ConditioningLane.FL2VA:
+        diagnostics.append("conditioning_compatibility.lane")
 
     first_roles = {
         SemanticReferenceRole.FIRST_FRAME,

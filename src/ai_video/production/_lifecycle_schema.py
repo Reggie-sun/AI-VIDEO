@@ -159,6 +159,63 @@ class VideoRequestReceiptPointer(_PaidLifecycleModel):
         return self
 
 
+class GenerationExecutionBindingPointer(_PaidLifecycleModel):
+    path: Path
+    binding_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "GenerationExecutionBindingPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/decision-bindings/"
+                f"{self.binding_hash}.json"
+            ),
+            "generation decision execution binding",
+        )
+        return self
+
+
+class GenerationExperienceReceiptPointer(_PaidLifecycleModel):
+    path: Path
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "GenerationExperienceReceiptPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/experience/"
+                f"{self.content_hash}.json"
+            ),
+            "generation experience receipt",
+        )
+        return self
+
+
+class QualificationExecutionBindingPointer(_PaidLifecycleModel):
+    path: Path
+    binding_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "QualificationExecutionBindingPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/qualification-bindings/"
+                f"{self.binding_hash}.json"
+            ),
+            "qualification execution binding",
+        )
+        return self
+
+
 class VideoStatusReceiptPointer(_PaidLifecycleModel):
     path: Path
     observation_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -749,6 +806,9 @@ _VIDEO_CANDIDATE_PHASES = frozenset(
 
 class VideoGenerationAttemptState(_PaidLifecycleModel):
     request: VideoRequestReceiptPointer
+    execution_binding: GenerationExecutionBindingPointer | None = None
+    qualification_binding: QualificationExecutionBindingPointer | None = None
+    generation_experiences: tuple[GenerationExperienceReceiptPointer, ...] = ()
     generation_id: str = Field(min_length=1)
     resolved_generation_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     phase: VideoAttemptPhase
@@ -777,6 +837,12 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
             data.pop("terminal_frame_evidence", None)
         if self.terminal_frame_extraction is None:
             data.pop("terminal_frame_extraction", None)
+        if self.execution_binding is None:
+            data.pop("execution_binding", None)
+        if self.qualification_binding is None:
+            data.pop("qualification_binding", None)
+        if not self.generation_experiences:
+            data.pop("generation_experiences", None)
         if self.continuity_evaluation is None:
             data.pop("continuity_evaluation", None)
         if self.commercial_evaluation is None:
@@ -802,6 +868,17 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
             or self.request.resolved_generation_hash != self.resolved_generation_hash
         ):
             raise ValueError("video attempt identity does not match its request pointer")
+        if len({item.content_hash for item in self.generation_experiences}) != len(
+            self.generation_experiences
+        ):
+            raise ValueError("generation experience receipts must be unique")
+        if any(
+            item.request_fingerprint != self.request.request_input_hash
+            for item in self.generation_experiences
+        ):
+            raise ValueError("generation experience receipt does not match request")
+        if self.execution_binding is not None and self.qualification_binding is not None:
+            raise ValueError("video attempt cannot mix production and qualification bindings")
         local_fields = (
             self.local_submit_intent,
             self.local_submit_receipt,

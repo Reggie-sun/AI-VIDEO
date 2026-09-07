@@ -2,7 +2,7 @@
 
 from typing import Literal
 
-from pydantic import Field, model_validator
+from pydantic import Field, model_serializer, model_validator
 
 from ai_video.production.artifact_contracts import StrictModel
 from ai_video.production.hashing import canonical_sha256
@@ -50,6 +50,14 @@ class CompiledComparison(StrictModel):
     changed_variables: tuple[str, ...]
     held_constants: tuple[str, ...]
     uncontrolled_variables: tuple[str, ...]
+    target_variable_hashes: tuple[tuple[str, str], ...] = ()
+
+    @model_serializer(mode="wrap")
+    def _preserve_legacy_comparison(self, handler):
+        data = handler(self)
+        if not self.target_variable_hashes:
+            data.pop("target_variable_hashes", None)
+        return data
 
     @model_validator(mode="after")
     def _shape(self):
@@ -61,6 +69,12 @@ class CompiledComparison(StrictModel):
             raise ValueError("baseline values must be exact SHA-256 hashes")
         if set(self.changed_variables) & set(self.held_constants):
             raise ValueError("comparison delta and held constants overlap")
+        target_names = tuple(name for name, _ in self.target_variable_hashes)
+        if len(set(target_names)) != len(target_names) or not set(target_names) <= set(self.changed_variables):
+            raise ValueError("target values must uniquely identify changed variables")
+        if any(len(value) != 64 or any(c not in "0123456789abcdef" for c in value)
+               for _, value in self.target_variable_hashes):
+            raise ValueError("target values must be exact SHA-256 hashes")
         return self
 
 
@@ -135,7 +149,7 @@ def expression_errors(recipe, requirement, prompt: str, control_paths=()) -> tup
                 prompt_paths.append((path, node))
         # Output/audio controls are validated against the exact request by the
         # existing binder/compiler. They need not be redundantly put in prose.
-        if prompt_paths and not item.native_text:
+        if any(path not in control_paths for path, _ in prompt_paths) and not item.native_text:
             errors.append(item.requirement_id)
         if any(not text or text not in prompt for text in item.native_text):
             errors.append(item.requirement_id)

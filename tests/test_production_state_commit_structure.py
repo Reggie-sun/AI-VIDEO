@@ -22,6 +22,7 @@ PRIVATE_MODULES = (
     "_state_commit_voice_candidate.py",
     "_state_commit_voice_activation.py",
     "_state_commit_video_candidate.py",
+    "_state_commit_generation_feedback.py",
     "_state_commit_video_activation.py",
     "_state_commit_video_recovery.py",
     "_state_commit_recovery.py",
@@ -202,6 +203,8 @@ def test_recovery_methods_have_domain_owners() -> None:
 
 def test_committer_mro_preserves_approved_domain_order() -> None:
     facade = importlib.import_module("ai_video.production.state_commit")
+    feedback = importlib.import_module("ai_video.production._state_commit_generation_feedback")
+    assert facade.ProductionStateCommitter.record_generation_experience.__module__ == feedback.__name__
     assert tuple(
         owner.__name__ for owner in facade.ProductionStateCommitter.__mro__[1:-1]
     ) == (
@@ -210,6 +213,7 @@ def test_committer_mro_preserves_approved_domain_order() -> None:
         "_StateCommitCommercialSourceMixin",
         "_StateCommitCommercialSourceRecoveryMixin",
         "_StateCommitVideoMixin",
+        "_StateCommitGenerationFeedbackMixin",
         "_StateCommitVideoCandidateMixin",
         "_StateCommitVideoActivationMixin",
         "_StateCommitPaidProviderMixin",

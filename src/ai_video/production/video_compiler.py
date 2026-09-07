@@ -17,6 +17,7 @@ from ai_video.production._video_requirement_routing import (
 )
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.generation_recipe import expression_errors
+from ai_video.production.commercial_video_contracts import CommercialVideoBindingMixin
 from ai_video.production.models import (
     DependencyGraphSnapshotPointer,
     ProjectSnapshotPointer,
@@ -185,7 +186,7 @@ def require_compiled_provider_request(
     return result
 
 
-class VideoGenerationRequestCompilation(_CompilerModel):
+class VideoGenerationRequestCompilation(CommercialVideoBindingMixin, _CompilerModel):
     """Typed, hash-bound input to the sole request constructor owner."""
 
     compilation_kind: Literal[
@@ -584,7 +585,7 @@ def compile_provider_video_request(
         adapter_compiler_id=contract.compiler_id,
         adapter_compiler_version=contract.compiler_version,
         adapter_compiler_hash=contract.compiler_hash,
-        execution_stack_hash=None,
+        execution_stack_hash=lifecycle.execution_stack_hash,
         target_shot_id=provider_bound.target_shot_id,
         target_shot_revision=provider_bound.target_shot_revision,
         target_shot_content_hash=provider_bound.target_shot_content_hash,
@@ -605,6 +606,7 @@ def compile_provider_video_request(
         base_dependency_graph=lifecycle.base_dependency_graph,
         input_artifact_ids=lifecycle.input_artifact_ids,
         output_asset_id=lifecycle.output_asset_id,
+        commercial_binding=lifecycle.commercial_binding,
     )
     request = compile_video_generation_request(projection)
     if recipe is not None and recipe.comparison is not None:

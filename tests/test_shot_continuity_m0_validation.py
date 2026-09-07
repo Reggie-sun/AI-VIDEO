@@ -1126,6 +1126,7 @@ def test_m0_request_drift_denies_before_preview_intent_or_submit() -> None:
                 video_generation_state=SimpleNamespace(
                     phase=VideoAttemptPhase.REQUEST,
                     request=SimpleNamespace(),
+                    qualification_binding="guard-only-offline-binding",
                 ),
             )
 
@@ -1137,6 +1138,13 @@ def test_m0_request_drift_denies_before_preview_intent_or_submit() -> None:
 
         def _reopen_video_request(self, _pointer):
             return request
+
+        def _reopen_qualification_execution_binding(self, pointer):
+            assert pointer == "guard-only-offline-binding"
+            # This test isolates M0's pre-submit guard, not proof issuance.
+            def validate_request(current):
+                assert current is request
+            return SimpleNamespace(validate_request=validate_request)
 
         def record_local_video_submit_intent(self, **_kwargs):
             self.intent_calls += 1

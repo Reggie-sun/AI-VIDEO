@@ -1073,34 +1073,7 @@ def _validate_canonical_entrypoint(root: Path, supplied_path: Path) -> None:
         )
 
 
-def _build_loaded_project(
-    root: Path,
-    manifest: ProductionManifest,
-    project: ProductionProject,
-    registry_path: Path,
-) -> LoadedProductionProject:
-    asset_root = _resolve_input(root, project.asset_root, allowed_root=root / "assets")
-    registry, asset_paths = load_asset_registry(registry_path, root, asset_root)
-    refs = project.artifacts
-    bundle = LoadedProductionProject(
-        root=root,
-        project=project,
-        manifest=manifest,
-        brief=_load_referenced_artifact(root, refs.brief, ProductionBrief),
-        story=_load_referenced_artifact(root, refs.story, Story),
-        characters=tuple(
-            _load_referenced_artifact(root, item, Character) for item in refs.characters
-        ),
-        scenes=tuple(
-            _load_referenced_artifact(root, item, Scene) for item in refs.scenes
-        ),
-        storyboard=_load_referenced_artifact(root, refs.storyboard, Storyboard),
-        shots=tuple(_load_referenced_artifact(root, item, Shot) for item in refs.shots),
-        registry=registry,
-        asset_paths=asset_paths,
-    )
-    validate_project_references(bundle)
-    return bundle
+from ai_video.production._creative_project_reader import _build_loaded_project
 
 
 def _load_active_dependency_graph(
@@ -1584,12 +1557,24 @@ def load_production_project_candidate(
     project = _load_yaml_artifact(resolved_project_path, ProductionProject)
     if manifest.project_id != project.project_id:
         raise _invalid("Production manifest project_id does not match project.")
-    return _build_loaded_project(
+    bundle = _build_loaded_project(
         resolved_root,
         manifest,
         project,
         resolved_registry_path.relative_to(resolved_root),
     )
+    # Candidate validation normally has no active review state.  A strategy
+    # child is different: its allocation is a current QA-owned constraint, so
+    # validate it whenever the supplied Manifest has a selected policy.
+    if (
+        manifest.active_qa_policy is not None
+        and any(shot.production_lineage is not None for shot in bundle.shots)
+    ):
+        bundle = bundle.model_copy(
+            update={"qa_policy": load_qa_policy(resolved_root, manifest.active_qa_policy)}
+        )
+        validate_project_references(bundle)
+    return bundle
 
 
 def load_production_project(path: str | Path) -> LoadedProductionProject:
@@ -1636,6 +1621,9 @@ def load_production_project(path: str | Path) -> LoadedProductionProject:
         _verify_manifest_dependency_states(bundle, dependency_graph)
         bundle = bundle.model_copy(update={"dependency_graph": dependency_graph})
     bundle = load_active_review_state(root, bundle)
+    # Revalidate immutable lineage after attaching review state. Current-use
+    # eligibility is checked separately at canonical execution boundaries.
+    validate_project_references(bundle)
     verify_manifest_video_evidence(bundle, manifest)
     verify_commercial_source_project_state(bundle)
     if manifest.active_render_state is not None:

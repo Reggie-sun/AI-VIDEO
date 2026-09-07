@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 
 from ai_video.errors import AiVideoError, ErrorCode
@@ -13,12 +14,17 @@ from ai_video.production._dependency_primitives import (
 )
 from ai_video.production.models import (
     DependencyEdge,
+    DependencyGraphSnapshot,
+    DependencyLifecycle,
     DependencyNode,
     DependencyNodeKind,
+    DependencyNodeState,
     DependencyReason,
     DependencySemanticRole,
     FingerprintContribution,
     LoadedProductionProject,
+    ProjectDependencyEvidence,
+    ProjectSnapshotPointer,
     Shot,
 )
 
@@ -212,3 +218,117 @@ def build_authoring_dependency_projection(
         edges=tuple(edges),
         shot_projection_ids=shot_projection_ids,
     )
+
+
+def rebase_authoring_dependency_graph(
+    *,
+    existing_graph: DependencyGraphSnapshot,
+    previous_project: LoadedProductionProject,
+    candidate_project: LoadedProductionProject,
+) -> DependencyGraphSnapshot:
+    """Replace the creative prefix without retiring registered asset nodes.
+
+    A strategy materialization changes the Project's Shot authoring before a
+    new CompositionSpec exists.  The old render-domain graph must therefore be
+    retired, while immutable registered assets remain available to a later
+    composition owner.  Lifecycle is intentionally not assigned here: the
+    dependency resolver derives stale, blocked, and superseded states from the
+    returned graph and the prior Manifest states.
+    """
+    # Local import avoids a module import cycle: dependency.py consumes this
+    # projection module to build normal P5 graphs.
+    from ai_video.production.dependency import build_dependency_graph
+
+    previous = build_authoring_dependency_projection(previous_project)
+    candidate = build_authoring_dependency_projection(candidate_project)
+    old_by_id = {node.node_id: node for node in previous.nodes}
+    new_by_id = {node.node_id: node for node in candidate.nodes}
+
+    # A node with the same stable ID but changed contribution represents a new
+    # immutable creative version.  Its previous descendants cannot continue as
+    # the active composition/render unit.
+    replaced_authoring_ids = {
+        node_id
+        for node_id, old_node in old_by_id.items()
+        if new_by_id.get(node_id) != old_node
+    }
+    outgoing: dict[str, list[str]] = {}
+    for edge in existing_graph.edges:
+        outgoing.setdefault(edge.source_node_id, []).append(edge.target_node_id)
+
+    affected: set[str] = set()
+    pending = sorted(replaced_authoring_ids)
+    while pending:
+        node_id = pending.pop()
+        if node_id in affected:
+            continue
+        affected.add(node_id)
+        pending.extend(outgoing.get(node_id, ()))
+
+    existing_by_id = {node.node_id: node for node in existing_graph.nodes}
+    retired_non_assets = {
+        node_id
+        for node_id in affected
+        if node_id in existing_by_id
+        and existing_by_id[node_id].kind is not DependencyNodeKind.ASSET
+    }
+    old_authoring_ids = set(old_by_id)
+    retained_nodes = tuple(
+        node
+        for node in existing_graph.nodes
+        if node.node_id not in old_authoring_ids
+        and node.node_id not in retired_non_assets
+    )
+    retained_ids = {node.node_id for node in retained_nodes}
+    unchanged_authoring_ids = {node_id for node_id, node in old_by_id.items()
+                               if new_by_id.get(node_id) == node}
+    surviving_ids = retained_ids | unchanged_authoring_ids
+    retained_edges = tuple(
+        edge
+        for edge in existing_graph.edges
+        if edge.source_node_id in surviving_ids and edge.target_node_id in surviving_ids
+        and (edge.source_node_id in retained_ids or edge.target_node_id in retained_ids)
+    )
+    return build_dependency_graph(
+        nodes=(*retained_nodes, *candidate.nodes),
+        edges=(*retained_edges, *candidate.edges),
+    )
+
+
+def build_authoring_project_evidence_states(
+    *,
+    graph: DependencyGraphSnapshot,
+    projection: AuthoringDependencyProjection,
+    project_pointer: ProjectSnapshotPointer,
+    desired: Mapping[str, str],
+) -> tuple[DependencyNodeState, ...]:
+    """Bind current creative nodes to the exact candidate Project snapshot.
+
+    This is the authoring counterpart of the Project evidence construction in
+    ``build_applied_dependency_evidence``.  It is deliberately limited to
+    immutable creative artifacts; asset and render states remain owned by their
+    existing evidence paths.
+    """
+    graph_nodes = {node.node_id: node for node in graph.nodes}
+    states: list[DependencyNodeState] = []
+    for projected in projection.nodes:
+        node = graph_nodes.get(projected.node_id)
+        fingerprint = desired.get(projected.node_id)
+        if node != projected or fingerprint is None:
+            raise _invalid("candidate authoring projection is not present in the graph")
+        states.append(
+            DependencyNodeState(
+                node_id=node.node_id,
+                graph_revision_id=graph.revision_id,
+                desired_fingerprint=fingerprint,
+                applied_fingerprint=fingerprint,
+                lifecycle=DependencyLifecycle.FRESH,
+                applied_evidence=ProjectDependencyEvidence(
+                    owner="project_snapshot",
+                    pointer=project_pointer,
+                    artifact_id=node.artifact_id,
+                    artifact_fingerprint=fingerprint,
+                ),
+            )
+        )
+    return tuple(sorted(states, key=lambda state: state.node_id))

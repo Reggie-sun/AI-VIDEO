@@ -10,6 +10,7 @@ from ai_video.production._shot_router_contracts import (
 )
 from ai_video.production.generation_diagnosis import (
     AttemptEvidence, Diagnosis, Intervention, diagnose_exact_result,
+    intervention_prediction_outcome,
 )
 from ai_video.production.generation_recipe import GenerationRecipe, SHA256
 from ai_video.production.hashing import canonical_sha256
@@ -68,8 +69,11 @@ class ExecutionLimits(StrictModel):
 
 class DecisionPolicy(StrictModel):
     policy_id: Literal["generation-decision"] = "generation-decision"
-    version: Literal["1"] = "1"
+    # Version 1 remains readable for sealed historical inputs.  Version 2
+    # moves the resample ceiling to policy so a new proposal cannot expand it.
+    version: Literal["1", "2"] = "2"
     repeated_failure_threshold: int = Field(default=3, strict=True, ge=2)
+    max_resamples: int = Field(default=1, strict=True, ge=0)
     allow_bounded_exploration: bool = False
 
     @property
@@ -99,6 +103,8 @@ class DecisionInputs(StrictModel):
     historical_recipes: tuple[GenerationCandidate, ...] = ()
     baseline_request: VideoGenerationRequest | None = None
     user_fixed_candidates: tuple[str, ...] = ()
+    experiences: tuple["GenerationExperience", ...] = ()
+    feature_scope: "GenerationFeatures | None" = None
 
     @model_validator(mode="after")
     def _snapshot(self):
@@ -111,6 +117,9 @@ class DecisionInputs(StrictModel):
             if variant.seed_supported and candidate.recipe.seed.kind == "uncontrolled":
                 raise ValueError("current candidates require an explicit controlled seed")
         evidence_ids = [e.evidence_hash for e in self.evidence]
+        if any(e.evidence_hash not in evidence_ids for experience in self.experiences
+               for e in experience.evidence):
+            raise ValueError("experience is absent from complete evidence snapshot")
         if len(evidence_ids) != len(set(evidence_ids)):
             raise ValueError("duplicate exact evidence projection")
         if self.latest_attempt_hash is not None and self.latest_attempt_hash not in evidence_ids:
@@ -132,7 +141,7 @@ class DecisionInputs(StrictModel):
     @property
     def snapshot_hash(self):
         payload = self.model_dump(mode="json")
-        for field in ("candidates", "evidence", "interventions", "conflicts", "historical_recipes"):
+        for field in ("candidates", "evidence", "interventions", "conflicts", "historical_recipes", "experiences"):
             payload[field] = sorted(payload[field], key=canonical_sha256)
         payload["user_fixed_candidates"] = sorted(payload["user_fixed_candidates"])
         payload["limits"]["allowed_remote_candidates"] = sorted(payload["limits"]["allowed_remote_candidates"])
@@ -158,6 +167,7 @@ class CandidateAssessment(StrictModel):
     unknown_outcome_count: int
     not_submitted_count: int
     reasons: tuple[str, ...]
+    empirical: "EmpiricalEstimate | None" = None
 
 
 class GenerationDecision(StrictModel):
@@ -186,7 +196,7 @@ def _assess(candidate, inputs, routing):
     dimensions = {r.dimension for r in recipe.expressions
                   if r.level == "acceptance" and r.stage == "raw_generation"}
     support, failed = set(), set()
-    supported_ids = set()
+    supported_by_artifact: dict[str, set[str]] = {}
     passes, failures, unevaluated = set(), set(), set()
     for e in relevant:
         if e.outcome != "media" or e.stage != "raw_generation":
@@ -196,7 +206,7 @@ def _assess(candidate, inputs, routing):
             if rule.requirement_id in diagnosis.failed_requirements:
                 failed.add(rule.dimension)
             if rule.requirement_id in diagnosis.preserved_requirements:
-                supported_ids.add(rule.requirement_id)
+                supported_by_artifact.setdefault(e.artifact_sha256, set()).add(rule.requirement_id)
         if "QUALITY_FAILURE" in diagnosis.failure_classes:
             failures.add(e.artifact_sha256)
         elif diagnosis.all_required_observed_pass:
@@ -210,14 +220,21 @@ def _assess(candidate, inputs, routing):
         required_ids = {r.requirement_id for r in recipe.expressions
                         if r.level == "acceptance" and r.stage == "raw_generation"
                         and r.dimension == dimension}
-        if required_ids <= supported_ids:
+        # Proof for separate media bytes cannot be pooled into a virtual PASS.
+        if any(required_ids <= observed for observed in supported_by_artifact.values()):
             support.add(dimension)
     unknown = dimensions - support - failed
     fit = "unknown"
     if failed:
         fit = ("unsupported" if len(failures) >= inputs.policy.repeated_failure_threshold
                else "conflicting")
-    elif dimensions and not unknown:
+    elif dimensions and passes:
+        fit = "supported"
+    empirical = empirical_assessment(candidate, inputs.feature_scope, inputs.experiences)
+    if empirical.failed_artifacts and not empirical.supported_artifacts:
+        fit = ("unsupported" if len(empirical.failed_artifacts) >= inputs.policy.repeated_failure_threshold
+               else "conflicting")
+    elif empirical.supported_artifacts:
         fit = "supported"
     variant = next(v for v in candidate.capabilities.variants if v.capability_id == candidate.capability_id)
     local = variant.execution_kind.value == "local"
@@ -257,7 +274,7 @@ def _assess(candidate, inputs, routing):
         runtime_failure_count=sum(e.outcome == "runtime_failure" for e in relevant),
         unknown_outcome_count=sum(e.outcome == "unknown_outcome" for e in relevant),
         not_submitted_count=sum(e.outcome == "not_submitted" for e in relevant),
-        reasons=tuple(reasons),
+        reasons=tuple(reasons), empirical=empirical,
     )
 
 
@@ -265,6 +282,8 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
                                 inputs, continuity_routing=None):
     """Only the Router invokes the exact binder; candidates never execute here."""
     inputs = DecisionInputs.model_validate(inputs.model_dump(mode="python"))
+    if inputs.feature_scope is not None and inputs.feature_scope != extract_generation_features(projection):
+        raise ValueError("stale generation feature projection")
     if (inputs.projection_hash != projection.projection_hash
             or inputs.facts_hash != canonical_sha256(projection.requirement.model_dump(
                 mode="json", exclude={"requirement_id", "requirement_hash"}))):
@@ -288,20 +307,40 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
     assessments = tuple(_assess(c, inputs, bindings[c.candidate_id]) for c in candidates)
     base = dict(snapshot_hash=inputs.snapshot_hash, assessments=assessments)
     latest = next((e for e in inputs.evidence if e.evidence_hash == inputs.latest_attempt_hash), None)
-    current_attempts = tuple(e for e in inputs.evidence if e.task_id == inputs.limits.task_id
-                             and e.shot_id == context.target_shot_id)
-    if any(e.outcome == "unknown_outcome" for e in current_attempts):
+    # Task identifiers scope submit quotas, not the Shot's failure/recovery
+    # history. Starting a new task must not erase an unfinished exact attempt.
+    current_attempts = tuple(e for e in inputs.evidence
+                             if e.shot_id == context.target_shot_id)
+    def exact_attempt(entry):
+        return (entry.task_id, entry.shot_id, entry.attempt_id, entry.request_hash,
+                entry.recipe_scope_hash, entry.facts_hash, entry.rubric_hash)
+
+    # A later known outcome for the same exact attempt closes uncertainty, not
+    # the historical record. At submit the committer requires this complete
+    # persisted history and independently rejects any still-unknown lifecycle;
+    # a caller-supplied media claim cannot act as recovery authorization.
+    known_attempts = {exact_attempt(e) for e in inputs.evidence
+                      if e.outcome in {"media", "runtime_failure"}}
+    def unresolved_unknown(entry):
+        return entry.outcome == "unknown_outcome" and exact_attempt(entry) not in known_attempts
+
+    if any(unresolved_unknown(e) for e in current_attempts):
         return GenerationDecision(**base, disposition="UNKNOWN_OUTCOME",
                                   rationale=("explicit recovery must close the exact attempt",))
     if current_attempts and latest is None:
         return GenerationDecision(**base, disposition="EVIDENCE_GAP",
-                                  rationale=("current task history requires exact latest attempt identity",))
+                                  rationale=("Shot history requires exact latest attempt identity",))
     if any(e.intervention_id is not None and e.intervention_semantic_hash is None for e in current_attempts):
         return GenerationDecision(**base, disposition="EVIDENCE_GAP",
                                   rationale=("repair semantic identity missing from current attempt history",))
+    if latest is not None and latest.outcome == "not_submitted" and any(
+        entry.outcome != "not_submitted" for entry in current_attempts
+    ):
+        return GenerationDecision(**base, disposition="EVIDENCE_GAP",
+            rationale=("prepared-only work cannot replace the last submitted outcome and baseline",))
     if latest is not None:
         if latest not in current_attempts:
-            raise ValueError("latest attempt is outside current task/Shot")
+            raise ValueError("latest attempt is outside current Shot")
         old_recipe = next((c.recipe for c in (*candidates, *inputs.historical_recipes)
                            if c.scope_hash == latest.recipe_scope_hash), None)
         if old_recipe is None:
@@ -329,6 +368,7 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
     if latest is not None and "QUALITY_FAILURE" in base["diagnosis"].failure_classes:
         evidence_ids = {e.evidence_hash for e in inputs.evidence}
         alternatives = []
+        unresolved_prediction = False
         for proposed in inputs.interventions:
             if not set(proposed.support + proposed.counterevidence) <= evidence_ids:
                 raise ValueError("intervention cites missing evidence")
@@ -336,17 +376,69 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
                 continue
             if not set(base["diagnosis"].failed_requirements) & set(proposed.closes):
                 continue
-            previous = tuple(e for e in current_attempts
-                             if e.intervention_semantic_hash == proposed.semantic_hash
-                             or e.intervention_id == proposed.intervention_id)
-            # A refuted intervention cannot be relabeled as new learning.
+            # A semantic experiment survives task/run naming changes.  Only a
+            # submitted outcome consumes the shared policy budget; a prepared
+            # but unsubmitted request must not do so.
+            target = next((c for c in candidates if c.candidate_id == proposed.candidate_id), None)
+            previous = tuple(e for e in inputs.evidence
+                             if e.shot_id == context.target_shot_id
+                             and (e.intervention_semantic_hash == proposed.semantic_hash
+                                  or (target is not None and e.intervention_id is not None
+                                      and e.recipe_scope_hash == target.scope_hash
+                                      and set(e.actual_delta) == set(proposed.changed_variables)))
+                             and e.outcome != "not_submitted")
+            if proposed.purpose == "resample":
+                target = next((c for c in candidates if c.candidate_id == proposed.candidate_id), None)
+                if target is None:
+                    raise ValueError("resample candidate is absent")
+                expected_delta = () if target.recipe.seed.kind == "uncontrolled" else ("seed",)
+                if tuple(sorted(proposed.changed_variables)) != expected_delta:
+                    continue
+                def strategy(candidate):
+                    variant = next(v for v in candidate.capabilities.variants
+                                   if v.capability_id == candidate.capability_id)
+                    return candidate.capabilities.provider_name, variant.model_id, variant.mode
+                sampling_history = []
+                for entry in inputs.evidence:
+                    if (entry.shot_id != context.target_shot_id or entry.intervention_id is None
+                            or entry.outcome == "not_submitted" or set(entry.actual_delta) - {"seed"}):
+                        continue
+                    prior_candidate = next((c for c in (*candidates, *inputs.historical_recipes)
+                                            if c.scope_hash == entry.recipe_scope_hash), None)
+                    if prior_candidate is None:
+                        return GenerationDecision(**base, disposition="EVIDENCE_GAP",
+                            rationale=("sampling budget needs the historical generation strategy",))
+                    if strategy(prior_candidate) == strategy(target):
+                        sampling_history.append(entry)
+                # Sampling is bounded per Shot and Provider/model/mode, across
+                # task names and proposal wording/held-constant annotations.
+                previous = tuple(sampling_history)
+            if any(unresolved_unknown(e) for e in previous):
+                return GenerationDecision(**base, disposition="UNKNOWN_OUTCOME",
+                                          rationale=("explicit recovery must close the prior semantic experiment",))
+            previous = tuple(e for e in previous if e.outcome != "unknown_outcome")
+            prediction_outcomes = []
+            for entry in previous:
+                old_recipe = next((c.recipe for c in (*candidates, *inputs.historical_recipes)
+                                   if c.scope_hash == entry.recipe_scope_hash), None)
+                if old_recipe is None:
+                    prediction_outcomes.append("undetermined")
+                    continue
+                prediction_outcomes.append(intervention_prediction_outcome(
+                    proposed, diagnose_exact_result(entry, inputs.evidence, old_recipe)))
+            # A non-resample experiment may run once.  Its observed outcome is
+            # retained to distinguish evidence repair from a relabeled retry.
             if previous and proposed.purpose != "resample":
+                unresolved_prediction |= all(value == "undetermined" for value in prediction_outcomes)
                 continue
             previous_attempts = {(e.task_id, e.shot_id, e.attempt_id, e.request_hash) for e in previous}
-            if proposed.purpose == "resample" and len(previous_attempts) >= proposed.resample_limit:
+            if proposed.purpose == "resample" and len(previous_attempts) >= inputs.policy.max_resamples:
                 continue
             alternatives.append(proposed)
         if not alternatives:
+            if unresolved_prediction:
+                return GenerationDecision(**base, disposition="EVIDENCE_GAP",
+                                          rationale=("prior repair prediction remains undetermined; repair exact evidence before another intervention",))
             return GenerationDecision(**base, disposition="REASSESS_FEASIBILITY",
                                       rationale=("no new testable intervention; stop equivalent retries",))
         if len(alternatives) > 1:
@@ -398,7 +490,11 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
         return GenerationDecision(**base, disposition=disposition,
                                   rationale=tuple(f"{a.candidate_id}: {a.fit}; {','.join(a.reasons)}" for a in assessments))
     def fit_rank(a):
-        return (len(a.failed_dimensions), len(a.unknown_dimensions))
+        estimate = a.empirical
+        # Observed cohort fit precedes exact-hash coverage. Cold start has no
+        # probability; bounds are sampling uncertainty, not model guarantees.
+        lower = estimate.interval_95[0] if estimate and estimate.interval_95 is not None else -1.
+        return (-lower, len(a.failed_dimensions), len(a.unknown_dimensions))
     eligible.sort(key=lambda a: (fit_rank(a), a.candidate_id))
     if len(eligible) > 1 and fit_rank(eligible[0]) == fit_rank(eligible[1]):
         return GenerationDecision(**base, disposition="UNRESOLVED_TIE",
@@ -432,3 +528,14 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
                                          "evidence and policy affect audit identity, not unrelated media semantics"),
                               revalidate_requirements=tuple(r.requirement_id for r in chosen.recipe.expressions
                                                             if r.level == "acceptance"))
+
+
+from ai_video.production.generation_experience import (
+    EmpiricalEstimate, GenerationExperience, GenerationFeatures,
+    bind_experience_models, empirical_assessment, extract_generation_features,
+)
+
+bind_experience_models(GenerationCandidate)
+DecisionInputs.model_rebuild()
+CandidateAssessment.model_rebuild()
+GenerationDecision.model_rebuild()

@@ -248,7 +248,14 @@ def validate_project_references(bundle: LoadedProductionProject) -> None:
         ],
         "artifact_id",
     )
-    known_inputs = artifact_ids | asset_ids | character_ids | scene_ids | shot_ids | beat_ids
+    # Strategy parents are immutable historical inputs.  They are deliberately
+    # not active Storyboard members, but Registry provenance may still name them.
+    parent_artifact_ids = {item.artifact_id for item in bundle.production_parents}
+    parent_shot_ids = {item.shot_id for item in bundle.production_parents}
+    known_inputs = (
+        artifact_ids | parent_artifact_ids | asset_ids | character_ids | scene_ids
+        | shot_ids | parent_shot_ids | beat_ids
+    )
     assets_by_id = {item.asset_id: item for item in bundle.registry.assets}
     shots_by_id = {item.shot_id: item for item in bundle.shots}
 
@@ -332,3 +339,7 @@ def validate_project_references(bundle: LoadedProductionProject) -> None:
     for shot in bundle.shots:
         if storyboard_membership.get(shot.shot_id) != shot.storyboard_beat_id:
             raise _invalid(f"Shot {shot.shot_id} storyboard membership does not match.")
+
+    from ai_video.production.production_strategy_reader import validate_production_lineage
+
+    validate_production_lineage(bundle)

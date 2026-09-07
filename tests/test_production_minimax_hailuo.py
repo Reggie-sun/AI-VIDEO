@@ -160,6 +160,113 @@ def _fixed_now() -> datetime:
     return _FIXED_NOW
 
 
+def test_recipe_compiles_complete_t2v_intent_with_native_remote_grammar() -> None:
+    from ai_video.production.generation_recipe import (
+        GenerationRecipe,
+        RequirementExpression,
+        SeedPolicy,
+    )
+    from ai_video.production.shot_router import (
+        AdapterCompilerContract,
+        ProviderBoundVideoRequest,
+        VideoGenerationResolver,
+    )
+    from ai_video.production.video_compiler import CompiledProviderVideoRequest
+    from ai_video.production.video_requirement import (
+        AmbienceIntent,
+        AudioNeed,
+        OutputNeed,
+        Pacing,
+    )
+    from test_production_generation_decision import acceptance_policy
+    from test_production_provider_neutral_adapters import _replace_requirement
+    from test_production_shot_router import (
+        _context,
+        _lifecycle,
+        _policy,
+        _verified_requirement,
+    )
+    from tests.test_production_video_intent_validation import _complete_intent
+
+    context = _context(important=False)
+    intent = _complete_intent().model_copy(
+        update={
+            "ambience_intent": AmbienceIntent(
+                environment_bed="none", explicitly_silent=True
+            ),
+            "pacing": Pacing(shot_duration_seconds=6),
+        }
+    )
+    projection = _replace_requirement(
+        _verified_requirement(context),
+        contract_version="provider-neutral-video-requirement/4",
+        generation_intent=intent,
+        output_need=OutputNeed(
+            duration_seconds=6,
+            width=1366,
+            height=768,
+            container_mime="video/mp4",
+        ),
+        audio_need=AudioNeed.FORBIDDEN,
+    )
+    compiler = AdapterCompilerContract.create(
+        compiler_id="minimax-hailuo-video-compiler", compiler_version="2"
+    )
+    expression = RequirementExpression(
+        requirement_id="hand-behavior",
+        level="acceptance",
+        stage="raw_generation",
+        dimension="interaction",
+        observable="the hand secures the product",
+        tolerance="exact",
+        measurement="human review",
+        proof="human",
+        intent_paths=("generation_intent.performance_intent.hand_behavior",),
+        native_text=("reaches once and secures the product",),
+        production_owner="shot_authoring",
+    )
+    acceptance = acceptance_policy((expression,))
+    recipe = GenerationRecipe(
+        seed=SeedPolicy(kind="uncontrolled"),
+        profile_sha256=_profile().profile_sha256,
+        compiler_hash=compiler.compiler_hash,
+        requirement_hash=projection.requirement.requirement_hash,
+        rubric_hash=acceptance.profile_content_hash,
+        acceptance_policy=acceptance,
+        expressions=(expression,),
+    )
+    routing = VideoGenerationResolver()._bind_requirement(
+        projection=projection,
+        context=context,
+        policy=_policy(remote_authorized=True, budget_authorized=True),
+        provider_profile=_profile(),
+        capabilities=hailuo_module._CAPABILITIES,
+        selected_capability_id=hailuo_module._CAPABILITY_ID,
+        output_requirement=hailuo_module._OUTPUT,
+        lifecycle=_lifecycle(context),
+        compiler_contract=compiler,
+    )
+    assert routing.provider_bound_request is not None
+    bound = ProviderBoundVideoRequest.create(
+        **{
+            **{
+                name: getattr(routing.provider_bound_request, name)
+                for name in ProviderBoundVideoRequest.model_fields
+                if name != "provider_bound_request_hash"
+            },
+            "generation_recipe": recipe,
+        }
+    )
+
+    provider = MiniMaxHailuoVideoProvider(transport=object(), credential=lambda: "unused")
+    compiled = provider.compile_request(bound, projection.requirement)
+
+    assert isinstance(compiled, CompiledProviderVideoRequest)
+    assert compiled.adapter_compiler_version == "2"
+    assert "reaches once and secures the product" in compiled.provider_native_prompt
+    assert provider.resolve(compiled.request).capability_id == hailuo_module._CAPABILITY_ID
+
+
 class _SecretResolver:
     def __init__(self, value: str = SECRET_TEXT) -> None:
         self._value = value
@@ -362,8 +469,8 @@ def _paid_preview(
         egress_items=(
             PaidProviderEgressItem(
                 item_id="prompt",
-                sha256=hashlib.sha256(PROMPT_TEXT.encode("utf-8")).hexdigest(),
-                size_bytes=len(PROMPT_TEXT.encode("utf-8")),
+                sha256=hashlib.sha256(resolved.prompt_text.encode("utf-8")).hexdigest(),
+                size_bytes=len(resolved.prompt_text.encode("utf-8")),
                 mime_type="text/plain",
                 purpose="prompt",
             ),
@@ -1415,23 +1522,16 @@ def test_foreign_duck_typed_permit_is_rejected_before_transport(monkeypatch):
 
 
 def test_real_committer_permit_drives_exactly_one_submit(tmp_path: Path):
-    write_production_project(tmp_path)
-    make_manifest_23_project(tmp_path)
-    manifest_path = tmp_path / "state/manifest.json"
-    manifest = ProductionManifest.model_validate_json(manifest_path.read_bytes())
-    manifest_path.write_text(
-        manifest.model_copy(update={"schema_version": "2.7"}).model_dump_json(
-            indent=2
-        ),
-        encoding="utf-8",
-    )
+    from production_remote_generation_factory import prepare_remote_generation
     transport = _FakeTransport(submit_response=_submit_response())
     provider = MiniMaxHailuoVideoProvider(
         transport=transport,
         credential=_SecretResolver(),
         now=_fixed_now,
     )
-    resolved = provider.resolve(_request())
+    prepared = prepare_remote_generation(root=tmp_path, provider=provider, request=_request(),
+        compiler_id="minimax-hailuo-video-compiler")
+    resolved = prepared.resolved_request
     video_preview = provider.preview(resolved)
     paid_preview = _paid_preview(resolved, video_preview=video_preview)
     authorization = _paid_authorization(paid_preview)
@@ -1444,7 +1544,8 @@ def test_real_committer_permit_drives_exactly_one_submit(tmp_path: Path):
     )
     service = VideoGenerationService(committer=committer, provider=provider)
 
-    service.start(attempt_id=paid_preview.attempt_id, request=resolved)
+    service.start(attempt_id=paid_preview.attempt_id, request=resolved,
+                  execution_binding=prepared.execution_binding)
     submission = service.submit_once(
         attempt_id=paid_preview.attempt_id,
         paid_preview=paid_preview,

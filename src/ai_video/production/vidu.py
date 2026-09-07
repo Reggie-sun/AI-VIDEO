@@ -191,8 +191,18 @@ class ViduVideoProvider:
                 reason=ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH,
                 unsupported_field_paths=("requirement_hash",),
             )
-        prompt = compile_vidu_prompt(requirement)
-        if not isinstance(prompt, ViduPromptCompilation):
+        current_recipe = (provider_bound.generation_recipe is not None
+                          and requirement.contract_version == "provider-neutral-video-requirement/4")
+        if current_recipe:
+            from ai_video.production._remote_video_native_prompt import (
+                compile_remote_video_prompt, RemoteVideoPromptCompilation,
+            )
+            prompt = compile_remote_video_prompt(requirement)
+            compiled_prompt = isinstance(prompt, RemoteVideoPromptCompilation)
+        else:
+            prompt = compile_vidu_prompt(requirement)
+            compiled_prompt = isinstance(prompt, ViduPromptCompilation)
+        if not compiled_prompt:
             return ProviderRequirementUnsupported(
                 requirement_hash=requirement.requirement_hash,
                 provider_bound_request_hash=provider_bound.provider_bound_request_hash,
@@ -202,10 +212,10 @@ class ViduVideoProvider:
             )
         return compile_provider_video_request(
             provider_bound=provider_bound, requirement=requirement,
-            compiler_id="vidu-video-compiler", compiler_version="2",
+            compiler_id="vidu-video-compiler", compiler_version="3" if current_recipe else "2",
             capabilities=self.capabilities(),
             native_prompt=ProviderNativePrompt(
-                grammar_contract="vidu-prose-v2",
+                grammar_contract="vidu-prose-v3" if current_recipe else "vidu-prose-v2",
                 prompt_text=prompt.prompt_text,
                 prompt_sha256=prompt.prompt_sha256,
                 expressed_control_paths=prompt.expressed_control_paths,

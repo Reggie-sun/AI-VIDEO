@@ -1,4 +1,4 @@
-"""Canonical, relational Shot facts; no model-success probability."""
+"""Canonical Shot facts and versioned empirical feature projection."""
 
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.video_requirement import VerifiedGenerationRequirementProjection
@@ -29,7 +29,11 @@ def generation_difficulty(projection: VerifiedGenerationRequirementProjection) -
     from pydantic import TypeAdapter
 
     payload = TypeAdapter(dict).dump_python(facts, mode="json")
+    from ai_video.production.generation_experience import extract_generation_features
+
+    features = extract_generation_features(projection)
     return {"facts": payload, "facts_hash": canonical_sha256(
                 requirement.model_dump(mode="json", exclude={"requirement_id", "requirement_hash"})),
+            "feature_scope": features.model_dump(mode="json"),
             "unknowns": ("semantic difficulty observations require sourced evidence",
                          "readiness and planner confidence are not quality estimates")}

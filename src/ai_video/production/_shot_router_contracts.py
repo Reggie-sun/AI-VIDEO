@@ -11,6 +11,7 @@ from ai_video.production._video_requirement_routing import (
     validate_provider_bound_projection,
 )
 from ai_video.production.generation_recipe import GenerationRecipe
+from ai_video.production.commercial_video_contracts import CommercialVideoBindingMixin
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
 from ai_video.production.models import (
     DependencyGraphSnapshotPointer,
@@ -332,7 +333,7 @@ class ProviderRouteIdentity(_RouterModel):
         return cls.model_validate(data)
 
 
-class VideoGenerationLifecycleEnvelope(_RouterModel):
+class VideoGenerationLifecycleEnvelope(CommercialVideoBindingMixin, _RouterModel):
     generation_id: str = Field(pattern=_SAFE_ID)
     target_asset_role: str = Field(pattern=_SAFE_ID)
     base_project: ProjectSnapshotPointer
@@ -343,6 +344,14 @@ class VideoGenerationLifecycleEnvelope(_RouterModel):
     continuity_binding: ContinuityReferenceBinding | None = None
     hard_cut_keyframe_binding: HardCutKeyframeBinding | None = None
     seal_terminal_frame: bool = Field(default=False, strict=True)
+    execution_stack_hash: str | None = Field(default=None, pattern=_SHA256)
+
+    @model_serializer(mode="wrap")
+    def _serialize_optional_execution_stack(self, handler):
+        data = self._serialize_optional_commercial_binding(handler)
+        if self.execution_stack_hash is None:
+            data.pop("execution_stack_hash", None)
+        return data
 
     @model_validator(mode="after")
     def _validate_inputs(self) -> "VideoGenerationLifecycleEnvelope":

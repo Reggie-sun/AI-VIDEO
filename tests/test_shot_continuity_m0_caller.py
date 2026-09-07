@@ -4,7 +4,7 @@ import copy
 import hashlib
 import io
 import subprocess
-from dataclasses import dataclass, replace
+from dataclasses import FrozenInstanceError, dataclass, replace
 from datetime import UTC, datetime
 from pathlib import Path
 from types import SimpleNamespace
@@ -15,6 +15,9 @@ import pytest
 import ai_video.production.shot_continuity_m0_caller as caller_module
 from ai_video.comfy_client import JobResult, JobStatus
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.generation_execution import (
+    _mint_qualification_execution_binding,
+)
 from ai_video.production.local_video import (
     LocalVideoSubmission,
     LocalVideoSubmitIntent,
@@ -298,10 +301,13 @@ class _Committer:
     def _read_manifest(self) -> object:
         return object()
 
-    def begin_video_generation(self, *, attempt_id: str, request: Any) -> object:
+    def _begin_qualification_video_generation(
+        self, *, attempt_id: str, request: Any, qualification_binding: Any
+    ) -> object:
         assert attempt_id == "m0-attempt"
         assert request is self.request
         self.start_writes += 1
+        self.qualification_binding = qualification_binding
         return object()
 
     def _video_attempt(self, manifest: object, attempt_id: str) -> Any:
@@ -312,11 +318,15 @@ class _Committer:
             video_generation_state=SimpleNamespace(
                 phase=VideoAttemptPhase.REQUEST,
                 request=SimpleNamespace(),
+                qualification_binding=self.qualification_binding,
             ),
         )
 
     def _reopen_video_request(self, pointer: object) -> Any:
         return self.request
+
+    def _reopen_qualification_execution_binding(self, pointer: Any) -> Any:
+        return pointer
 
     def record_local_video_submit_intent(
         self,
@@ -464,6 +474,7 @@ def _make_case(
     profile = sources.profile
     request = SimpleNamespace(
         generation_id="m0-generation",
+        request_input_hash="2" * 64,
         output_asset_id="m0-output",
         resolved_generation_hash="3" * 64,
         execution_stack_hash=_materialized_m0(sources).execution_stack_hash,
@@ -748,10 +759,80 @@ def test_qualification_caller_submits_once_with_exact_four_anchor_order(
     assert case.transport.workflows[0]["8"]["inputs"]["noise_seed"] == (
         case.sources.profile.sealed_seed
     )
-    assert case.transport.object_info_calls == 4
+    # One extra owner reopen issues the one-use durable-request proof.
+    assert case.transport.object_info_calls == 5
     assert case.committer.intent_writes == 1
     assert case.committer.result_writes == 1
     assert case.committer.failure_writes == 0
+
+
+def test_m0_owner_reopens_closure_and_rejects_fully_shaped_forged_snapshot(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    case = _make_case(tmp_path, monkeypatch)
+    _, actual = case.caller._validate_pre_effect(
+        case.request,
+        attempt_id="m0-attempt",
+    )
+    forged = replace(actual, workflow_hash="0" * 64)
+
+    with pytest.raises(AiVideoError):
+        case.caller._execution_proof(
+            attempt_id="m0-attempt",
+            request=case.request,
+            expected=forged,
+        )
+    with pytest.raises(ValueError, match="owner-issued closure proof"):
+        _mint_qualification_execution_binding(
+            qualification_kind="m0",
+            request=case.request,
+            proof=forged,
+        )
+
+    _assert_zero_effect(case)
+
+
+def test_m0_owner_proof_rejects_mutation_copy_and_second_consume(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    case = _make_case(tmp_path, monkeypatch)
+    _, initial = case.caller._validate_pre_effect(
+        case.request,
+        attempt_id="m0-attempt",
+    )
+    proof = case.caller._execution_proof(
+        attempt_id="m0-attempt",
+        request=case.request,
+        expected=initial,
+    )
+
+    with pytest.raises(FrozenInstanceError):
+        proof.request_input_hash = "0" * 64  # type: ignore[misc]
+    with pytest.raises(FrozenInstanceError):
+        proof.resolved_generation_hash = "0" * 64  # type: ignore[misc]
+    with pytest.raises(FrozenInstanceError):
+        proof.snapshot = replace(proof.snapshot, workflow_hash="0" * 64)  # type: ignore[misc]
+    copied = replace(proof, request_input_hash="0" * 64)
+    with pytest.raises(ValueError, match="stale or consumed"):
+        _mint_qualification_execution_binding(
+            qualification_kind="m0",
+            request=case.request,
+            proof=copied,
+        )
+
+    _mint_qualification_execution_binding(
+        qualification_kind="m0",
+        request=case.request,
+        proof=proof,
+    )
+    with pytest.raises(ValueError, match="stale or consumed"):
+        _mint_qualification_execution_binding(
+            qualification_kind="m0",
+            request=case.request,
+            proof=proof,
+        )
+
+    _assert_zero_effect(case)
 
 
 def test_qualification_provider_polls_and_fetches_exact_m0_output(

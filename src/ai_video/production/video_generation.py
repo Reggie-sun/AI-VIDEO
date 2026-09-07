@@ -36,6 +36,7 @@ from ai_video.production.video import (
     VideoSubmission,
     VideoTaskObservation,
 )
+from ai_video.production.video_compiler import CompiledProviderVideoRequest
 
 if TYPE_CHECKING:
     from ai_video.production.state_commit import ProductionStateCommitter
@@ -75,11 +76,83 @@ class VideoGenerationService:
         *,
         attempt_id: str,
         request: ResolvedVideoGenerationRequest,
+        execution_binding,
     ):
         return self._committer.begin_video_generation(
             attempt_id=attempt_id,
             request=request,
+            execution_binding=execution_binding,
         )
+
+    def _start_qualification(
+        self,
+        *,
+        attempt_id: str,
+        request: ResolvedVideoGenerationRequest,
+        qualification_binding,
+    ):
+        """Dedicated callers only; their closure guard remains mandatory at submit."""
+
+        return self._committer._begin_qualification_video_generation(
+            attempt_id=attempt_id,
+            request=request,
+            qualification_binding=qualification_binding,
+        )
+
+    def _validate_generation_execution_binding(self, state, request) -> None:
+        """Reopen and recompute the decision before any Provider access."""
+
+        pointer = getattr(state, "execution_binding", None)
+        if pointer is None:
+            qualification = getattr(state, "qualification_binding", None)
+            if qualification is None:
+                raise AiVideoError(
+                    code=ErrorCode.PRODUCTION_STATE_INVALID,
+                    user_message=(
+                        "Video submit requires a persisted generation or qualification binding."
+                    ),
+                    retryable=False,
+                )
+            try:
+                self._committer._reopen_qualification_execution_binding(
+                    qualification
+                ).validate_request(request)
+            except (AiVideoError, AttributeError, ValueError) as exc:
+                if isinstance(exc, AiVideoError):
+                    raise
+                raise AiVideoError(
+                    code=ErrorCode.PRODUCTION_STATE_INVALID,
+                    user_message="Qualification execution binding is stale or invalid.",
+                    technical_detail=str(exc),
+                    retryable=False,
+                ) from exc
+            return
+        try:
+            binding = self._committer._reopen_generation_execution_binding(pointer)
+            binding.validate_request(request)
+            routing = binding.decision.routing
+            if routing is None or routing.provider_bound_request is None:
+                raise ValueError("submit decision has no bound request")
+            result = self._provider.compile_request(
+                routing.provider_bound_request,
+                binding.projection.requirement,
+            )
+            if not isinstance(result, CompiledProviderVideoRequest):
+                raise ValueError("current Provider compiler cannot express the bound recipe")
+            sealed = request.activation_scope.request if request.activation_scope else None
+            if sealed is None or result.request != sealed:
+                raise ValueError("current Provider compilation differs from sealed request")
+            if self._provider.resolve(result.request) != request:
+                raise ValueError("current Provider resolution differs from sealed request")
+        except (AiVideoError, AttributeError, ValueError) as exc:
+            if isinstance(exc, AiVideoError):
+                raise
+            raise AiVideoError(
+                code=ErrorCode.PRODUCTION_STATE_INVALID,
+                user_message="Generation decision binding is stale or no longer executable.",
+                technical_detail=str(exc),
+                retryable=False,
+            ) from exc
 
     @contextmanager
     def commercial_execution_guard(self, *, attempt_id: str) -> Iterator[None]:
@@ -192,6 +265,13 @@ class VideoGenerationService:
                 retryable=False,
             )
         request = self._committer._reopen_video_request(state.request)
+        self._validate_generation_execution_binding(state, request)
+        if getattr(state, "qualification_binding", None) is not None:
+            raise AiVideoError(
+                code=ErrorCode.PRODUCTION_STATE_INVALID,
+                user_message="Qualification execution cannot use a paid Provider submit path.",
+                retryable=False,
+            )
         video_preview = self._provider.preview(request)
         permit = self._committer.record_paid_provider_submit_intent(
             paid_preview,
@@ -275,6 +355,16 @@ class VideoGenerationService:
                 retryable=False,
             )
         request = self._committer._reopen_video_request(state.request)
+        self._validate_generation_execution_binding(state, request)
+        if (
+            getattr(state, "qualification_binding", None) is not None
+            and pre_submit_guard is None
+        ):
+            raise AiVideoError(
+                code=ErrorCode.PRODUCTION_STATE_INVALID,
+                user_message="Qualification local submit requires its exact closure guard.",
+                retryable=False,
+            )
         if request.execution_stack_hash is not None and pre_submit_guard is None:
             raise AiVideoError(
                 code=ErrorCode.PRODUCTION_STATE_INVALID,

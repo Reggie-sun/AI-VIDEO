@@ -62,8 +62,15 @@ from ai_video.production.video_contracts import (
     VideoOutputCapability,
 )
 from ai_video.production.shot_router import ProviderBoundVideoRequest
+from ai_video.production._remote_video_native_prompt import (
+    RemoteVideoPromptCompilation,
+    compile_remote_video_prompt,
+)
 from ai_video.production.video_compiler import (
+    ProviderNativePrompt,
     ProviderRequestCompilationResult,
+    ProviderRequirementUnsupported,
+    ProviderRequirementUnsupportedReason,
     compile_provider_video_request,
 )
 from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
@@ -457,12 +464,32 @@ class MiniMaxHailuoVideoProvider:
         provider_bound: ProviderBoundVideoRequest,
         requirement: ProviderNeutralVideoRequirement,
     ) -> ProviderRequestCompilationResult:
+        native_prompt = None
+        compiler_version = "1"
+        if provider_bound.generation_recipe is not None:
+            compiled_prompt = compile_remote_video_prompt(requirement)
+            if not isinstance(compiled_prompt, RemoteVideoPromptCompilation):
+                return ProviderRequirementUnsupported(
+                    requirement_hash=requirement.requirement_hash,
+                    provider_bound_request_hash=provider_bound.provider_bound_request_hash,
+                    selected_capability_id=provider_bound.capability_id,
+                    reason=ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+                    unsupported_field_paths=compiled_prompt.unsupported_field_paths,
+                )
+            compiler_version = "2"
+            native_prompt = ProviderNativePrompt(
+                grammar_contract="remote-video-prose-v1",
+                prompt_text=compiled_prompt.prompt_text,
+                prompt_sha256=compiled_prompt.prompt_sha256,
+                expressed_control_paths=compiled_prompt.expressed_control_paths,
+            )
         return compile_provider_video_request(
             provider_bound=provider_bound,
             requirement=requirement,
             compiler_id="minimax-hailuo-video-compiler",
-            compiler_version="1",
+            compiler_version=compiler_version,
             capabilities=_CAPABILITIES,
+            native_prompt=native_prompt,
         )
 
     def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:

@@ -367,6 +367,10 @@ def test_local_submit_pre_submit_guard_denies_before_preview_or_intent() -> None
     committer.attempt.paid_provider_state = None
     request = SimpleNamespace(execution_stack_hash="a" * 64)
     committer._reopen_video_request = MagicMock(return_value=request)
+    committer.attempt.video_generation_state.qualification_binding = object()
+    committer._reopen_qualification_execution_binding = MagicMock(
+        return_value=SimpleNamespace(validate_request=lambda _request: None)
+    )
     committer.record_local_video_submit_intent = MagicMock()
     provider = MagicMock()
     guard_error = AiVideoError(
@@ -393,15 +397,33 @@ def test_stack_bound_local_submit_cannot_omit_pre_submit_guard() -> None:
     committer.attempt.paid_provider_state = None
     request = SimpleNamespace(execution_stack_hash="a" * 64)
     committer._reopen_video_request = MagicMock(return_value=request)
+    committer.attempt.video_generation_state.qualification_binding = object()
+    committer._reopen_qualification_execution_binding = MagicMock(
+        return_value=SimpleNamespace(validate_request=lambda _request: None)
+    )
     committer.record_local_video_submit_intent = MagicMock()
     provider = MagicMock()
     service = VideoGenerationService(committer=committer, provider=provider)
 
-    with pytest.raises(AiVideoError, match="requires a pre-submit guard"):
+    with pytest.raises(AiVideoError, match="requires its exact closure guard"):
         service.submit_local_once(attempt_id="attempt-1")
 
     provider.preview.assert_not_called()
     committer.record_local_video_submit_intent.assert_not_called()
+
+
+def test_legacy_request_cannot_bypass_execution_binding_before_preview() -> None:
+    committer = _FakeCommitter(phase=VideoAttemptPhase.REQUEST)
+    committer.attempt.paid_provider_state = None
+    request = SimpleNamespace(requirement_hash=None, execution_stack_hash=None)
+    committer._reopen_video_request = MagicMock(return_value=request)
+    provider = MagicMock()
+    service = VideoGenerationService(committer=committer, provider=provider)
+
+    with pytest.raises(AiVideoError, match="persisted generation or qualification"):
+        service.submit_local_once(attempt_id="attempt-1")
+
+    provider.preview.assert_not_called()
 
 
 def test_validate_once_does_not_invoke_legacy_fetch_and_activate() -> None:

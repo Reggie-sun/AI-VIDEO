@@ -24,6 +24,8 @@ from ai_video.production._video_project_reader import (
     load_continuity_evaluation_intent,
     load_generated_commercial_shot_evidence,
     load_generated_shot_continuity_evidence,
+    load_generation_execution_binding,
+    load_qualification_execution_binding,
     load_local_video_fetch_receipt,
     load_local_video_status_receipt,
     load_local_video_submit_intent,
@@ -61,6 +63,8 @@ from ai_video.production.models import (
     VideoAttemptPhase,
     VideoFetchReceiptPointer,
     VideoGenerationAttemptState,
+    GenerationExecutionBindingPointer,
+    QualificationExecutionBindingPointer,
     VideoRequestReceiptPointer,
     VideoStatusReceiptPointer,
 )
@@ -76,6 +80,7 @@ from ai_video.production.paths import (
     canonical_video_status_receipt_path,
 )
 from ai_video.production.project import load_qa_policy
+from ai_video.production.hashing import canonical_sha256
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
     VideoFetchReceipt,
@@ -128,6 +133,288 @@ class _StateCommitVideoMixin:
         self, pointer: VideoRequestReceiptPointer
     ) -> ResolvedVideoGenerationRequest:
         return load_video_request_receipt(self._project_root, pointer)
+
+    def _reopen_generation_execution_binding(
+        self, pointer: GenerationExecutionBindingPointer
+    ):
+        return load_generation_execution_binding(self._project_root, pointer)
+
+    def _reopen_qualification_execution_binding(
+        self, pointer: QualificationExecutionBindingPointer
+    ):
+        return load_qualification_execution_binding(self._project_root, pointer)
+
+    def _require_submit_execution_binding(self, manifest, state, request) -> None:
+        """Reject old request records before any new Provider intent or permit."""
+
+        if state.execution_binding is not None:
+            binding = self._reopen_generation_execution_binding(
+                state.execution_binding
+            )
+            binding.validate_request(request)
+            loaded = self._load_production_project(self._project_root / "project.yaml")
+            if loaded.manifest != manifest:
+                raise _state_invalid("Active Manifest changed during decision validation.")
+            binding.validate_current_project(loaded)
+            self._require_current_generation_acceptance(loaded, binding)
+            from ai_video.production.production_strategy_reader import production_family_shot_ids
+
+            family_ids = production_family_shot_ids(loaded, binding.context.target_shot_id)
+            expected_evidence = {item.evidence_hash for item in binding.inputs.evidence}
+            expected_experiences = {
+                canonical_sha256(item.model_dump(mode="json"))
+                for item in binding.inputs.experiences
+            }
+            persisted_experiences: set[str] = set()
+            persisted_evidence: set[str] = set()
+            ordered_shot_evidence = []
+            ordered_experiences = []
+            for item in manifest.attempts:
+                prior = item.video_generation_state
+                if prior is None:
+                    continue
+                prior_evidence = []
+                for pointer in prior.generation_experiences:
+                    experience = self._reopen_generation_experience(pointer)
+                    ordered_experiences.append(experience)
+                    prior_evidence.extend(experience.evidence)
+                    ordered_shot_evidence.extend(
+                        e for e in experience.evidence
+                        if e.shot_id == binding.context.target_shot_id
+                    )
+                    persisted_evidence.update(e.evidence_hash for e in experience.evidence)
+                    persisted_experiences.add(pointer.content_hash)
+                    if (
+                        pointer.content_hash
+                        != canonical_sha256(experience.model_dump(mode="json"))
+                        or any(
+                            evidence.evidence_hash not in expected_evidence
+                            for evidence in experience.evidence
+                        )
+                    ):
+                        raise _state_invalid(
+                            "Generation decision evidence is stale relative to durable history."
+                        )
+                if prior.generation_id == state.generation_id:
+                    continue
+                prior_request = self._reopen_video_request(prior.request)
+                prior_scope = prior_request.activation_scope
+                if prior_scope is None:
+                    raise _state_invalid("Prior video attempt has no verifiable Shot scope.")
+                if prior_scope.request.target_shot_id not in family_ids:
+                    continue
+                if prior.execution_binding is None:
+                    if prior.qualification_binding is None:
+                        raise _state_invalid(
+                            "Prior video attempt lacks a production decision binding."
+                        )
+                    # Qualification work does not constitute production decision
+                    # history, and cannot manufacture GenerationExperience.
+                    continue
+                prior_binding = self._reopen_generation_execution_binding(
+                    prior.execution_binding
+                )
+                if prior_binding.context.target_shot_id not in family_ids:
+                    continue
+                if item.status in {StateCommitStatus.OUTCOME_UNKNOWN, StateCommitStatus.INTERRUPTED}:
+                    raise _state_invalid("Prior generation outcome requires explicit recovery.")
+                fetch = prior.local_fetch_receipt or prior.fetch_receipt
+                if fetch is not None:
+                    if not any(e.outcome == "media" and e.artifact_sha256 == fetch.artifact_sha256
+                               for e in prior_evidence):
+                        raise _state_invalid("Prior fetched generation lacks exact media evaluation.")
+                elif item.status is StateCommitStatus.FAILED:
+                    if not any(e.outcome == "runtime_failure" for e in prior_evidence):
+                        raise _state_invalid("Prior failed generation lacks runtime evidence.")
+                elif prior.phase is not VideoAttemptPhase.REQUEST:
+                    raise _state_invalid("Prior generation is unfinished; evaluation cannot replace lifecycle.")
+                if not prior.generation_experiences:
+                    raise _state_invalid(
+                        "Prior generation attempt lacks durable evaluation evidence."
+                    )
+            if persisted_experiences != expected_experiences or persisted_evidence != expected_evidence:
+                raise _state_invalid(
+                    "Generation decision differs from complete durable experience history."
+                )
+            submitted_history = [e for e in ordered_shot_evidence if e.outcome != "not_submitted"]
+            effective_history = submitted_history or ordered_shot_evidence
+            latest_hash = effective_history[-1].evidence_hash if effective_history else None
+            if binding.inputs.latest_attempt_hash != latest_hash:
+                raise _state_invalid("Generation latest attempt differs from ordered durable history.")
+            self._require_production_predecessors(loaded, binding, tuple(ordered_experiences))
+            self._require_persisted_generation_limits(manifest, state, binding)
+            return
+        if state.qualification_binding is not None:
+            self._reopen_qualification_execution_binding(
+                state.qualification_binding
+            ).validate_request(request)
+            return
+        raise _state_invalid(
+            "Video submit requires a persisted generation or qualification execution binding."
+        )
+
+    def _require_current_generation_acceptance(self, loaded, binding) -> None:
+        policy = loaded.qa_policy
+        from ai_video.production.production_strategy_reader import selected_shot_generation_acceptance
+
+        shot = next(s for s in loaded.shots if s.shot_id == binding.context.target_shot_id)
+        if shot.production_intent is not None:
+            raise _state_invalid("Production intent must be resolved before generation.")
+        if shot.production_lineage is not None and shot.production_lineage.task_id != binding.inputs.limits.task_id:
+            raise _state_invalid("Production component cannot reset its parent task identity.")
+        if shot.production_lineage is not None:
+            from ai_video.production.production_strategy_reader import require_production_source_eligibility
+
+            require_production_source_eligibility(loaded, family_shot_id=shot.shot_id)
+        acceptance = selected_shot_generation_acceptance(loaded, binding.context.target_shot_id)
+        if (
+            acceptance is None
+            or not acceptance.profile_payload.get("generation_requirements")
+        ):
+            raise _state_invalid(
+                "Current QA owner has no complete generation requirement projection."
+            )
+        if any(
+            candidate.recipe.acceptance_policy != acceptance
+            for candidate in binding.inputs.candidates
+        ):
+            raise _state_invalid(
+                "Generation candidates do not use the current QA acceptance owner."
+            )
+        from ai_video.production.generation_evaluation import require_generation_evaluation_authorities
+
+        try:
+            require_generation_evaluation_authorities(policy, acceptance)
+        except (KeyError, ValueError) as exc:
+            raise _state_invalid("Generation evaluation authority is incomplete.", str(exc)) from exc
+
+    def _require_production_predecessors(self, loaded, binding, durable_experiences) -> None:
+        """Same-component repair is allowed; advancing coverage needs exact PASS."""
+        from ai_video.production.generation_diagnosis import diagnose_exact_result
+        from ai_video.production.production_strategy_reader import production_parent_context
+
+        shot = next(s for s in loaded.shots if s.shot_id == binding.context.target_shot_id)
+        lineage = shot.production_lineage
+        if lineage is None:
+            return
+        parent, _, _, _ = production_parent_context(loaded, shot.shot_id)
+        coverage = next(c for c in parent.production_intent.coverage_options
+                        if c.coverage_id == lineage.coverage_id)
+        preceding = []
+        for unit in coverage.units:
+            if unit.shot_id == shot.shot_id:
+                break
+            preceding.append(unit.shot_id)
+        for sibling in loaded.shots:
+            if sibling.shot_id not in preceding or sibling.production_lineage.source is not None:
+                continue
+            pairs = [(experience, e) for experience in durable_experiences
+                     for e in experience.evidence if e.shot_id == sibling.shot_id
+                     and e.outcome != "not_submitted"]
+            if not pairs:
+                raise _state_invalid("Previous production component has no required media PASS.")
+            experience, latest = pairs[-1]
+            diagnosis = diagnose_exact_result(latest,
+                tuple(e for _, e in pairs), experience.candidate.recipe)
+            if not diagnosis.all_required_observed_pass:
+                raise _state_invalid("Previous production component required findings are not all PASS.")
+
+    def _require_persisted_generation_limits(self, manifest, state, binding) -> None:
+        """Use durable submits and prior bindings; caller limits may only tighten."""
+
+        current_limits = binding.inputs.limits
+        current_policy = binding.inputs.policy
+        from ai_video.production.production_strategy_reader import production_family_shot_ids
+
+        loaded = self._load_production_project(self._project_root / "project.yaml")
+        family_ids = production_family_shot_ids(loaded, binding.context.target_shot_id)
+        submitted = {"local": set(), "remote": set()}
+        for attempt in manifest.attempts:
+            prior = attempt.video_generation_state
+            if prior is None or prior.generation_id == state.generation_id:
+                continue
+            if prior.execution_binding is None:
+                continue
+            prior_binding = self._reopen_generation_execution_binding(
+                prior.execution_binding
+            )
+            prior_policy = prior_binding.inputs.policy
+            if prior_binding.context.target_shot_id in family_ids and (
+                current_policy.max_resamples > prior_policy.max_resamples
+                or current_policy.repeated_failure_threshold > prior_policy.repeated_failure_threshold
+                or (current_policy.allow_bounded_exploration and not prior_policy.allow_bounded_exploration)
+            ):
+                raise _state_invalid(
+                    "Generation repair policy cannot expand for the same Shot."
+                )
+            prior_limits = prior_binding.inputs.limits
+            if (len(family_ids) > 1 and prior_binding.context.target_shot_id in family_ids
+                    and prior_limits.task_id != current_limits.task_id):
+                raise _state_invalid("Production family cannot reset its generation task.")
+            if prior_limits.task_id != current_limits.task_id:
+                continue
+            prior_request = self._reopen_video_request(prior.request)
+            if prior.local_submit_intent is not None or prior.local_submit_receipt is not None:
+                submitted["local"].add(
+                    (attempt.attempt_id, prior_request.request_input_hash)
+                )
+            if (
+                prior.paid_submit_receipt is not None
+                or (
+                    attempt.paid_provider_state is not None
+                    and (attempt.paid_provider_state.submit_receipt is not None
+                         or attempt.paid_provider_state.phase is PaidProviderAttemptPhase.SUBMIT_INTENT)
+                )
+            ):
+                submitted["remote"].add(
+                    (attempt.attempt_id, prior_request.request_input_hash)
+                )
+            if (
+                current_limits.paid_submit_ceiling > prior_limits.paid_submit_ceiling
+                or current_limits.local_batch_limit > prior_limits.local_batch_limit
+                or (
+                    prior_limits.local_total_limit is not None
+                    and (
+                        current_limits.local_total_limit is None
+                        or current_limits.local_total_limit
+                        > prior_limits.local_total_limit
+                    )
+                )
+            ):
+                raise _state_invalid(
+                    "Generation submit ceilings cannot expand within one task."
+                )
+        if (
+            current_limits.paid_submits_used < len(submitted["remote"])
+            or current_limits.local_total_used < len(submitted["local"])
+            # A bare hash in DecisionInputs is not a reopened batch-review
+            # receipt. Until this committer owns that receipt relationship, a
+            # caller cannot reset the durable local batch count by naming one.
+            or current_limits.local_batch_used < len(submitted["local"])
+        ):
+            raise _state_invalid(
+                "Generation submit counters are below durable submit receipts."
+            )
+        selected = next(
+            candidate
+            for candidate in binding.inputs.candidates
+            if candidate.candidate_id == binding.decision.selected_candidate_id
+        )
+        variant = next(
+            item
+            for item in selected.capabilities.variants
+            if item.capability_id == selected.capability_id
+        )
+        if variant.execution_kind.value == "remote":
+            if len(submitted["remote"]) >= current_limits.paid_submit_ceiling:
+                raise _state_invalid("Durable paid submit ceiling is exhausted.")
+        elif (
+            len(submitted["local"]) >= current_limits.local_batch_limit
+        ) or (
+            current_limits.local_total_limit is not None
+            and len(submitted["local"]) >= current_limits.local_total_limit
+        ):
+            raise _state_invalid("Durable local submit limit is exhausted.")
 
     def _reopen_video_status(
         self, pointer: VideoStatusReceiptPointer
@@ -247,6 +534,44 @@ class _StateCommitVideoMixin:
         *,
         attempt_id: str,
         request: ResolvedVideoGenerationRequest,
+        execution_binding,
+    ) -> ProductionManifest:
+        """Persist one production decision-bound request before any effect."""
+
+        return self._begin_video_generation(
+            attempt_id=attempt_id,
+            request=request,
+            execution_binding=execution_binding,
+            qualification_binding=None,
+        )
+
+    def _begin_qualification_video_generation(
+        self,
+        *,
+        attempt_id: str,
+        request: ResolvedVideoGenerationRequest,
+        qualification_binding,
+    ) -> ProductionManifest:
+        """Private entry used by the two closure-validating qualification callers."""
+
+        if not hasattr(qualification_binding, "_consume_fresh_mint") or not (
+            qualification_binding._consume_fresh_mint()
+        ):
+            raise _state_invalid("Qualification start requires one fresh closure mint.")
+        return self._begin_video_generation(
+            attempt_id=attempt_id,
+            request=request,
+            execution_binding=None,
+            qualification_binding=qualification_binding,
+        )
+
+    def _begin_video_generation(
+        self,
+        *,
+        attempt_id: str,
+        request: ResolvedVideoGenerationRequest,
+        execution_binding=None,
+        qualification_binding=None,
     ) -> ProductionManifest:
         """Persist the exact resolved request before any Paid Gate action."""
 
@@ -267,6 +592,54 @@ class _StateCommitVideoMixin:
             output_asset_id=request.output_asset_id,
             file_sha256=artifact.file_sha256,
         )
+        if (execution_binding is None) == (qualification_binding is None):
+            raise _state_invalid(
+                "Video generation requires exactly one production or qualification execution binding."
+            )
+        binding_artifact = None
+        binding_pointer = None
+        qualification_artifact = None
+        qualification_pointer = None
+        if execution_binding is not None:
+            try:
+                execution_binding.validate_request(request)
+                binding_artifact = _artifact(
+                    Path(
+                        "state/video-generation/decision-bindings/"
+                        f"{execution_binding.binding_hash}.json"
+                    ),
+                    execution_binding,
+                )
+                binding_pointer = GenerationExecutionBindingPointer(
+                    path=binding_artifact.relative_path,
+                    binding_hash=execution_binding.binding_hash,
+                    request_fingerprint=request.resolved_generation_hash,
+                    file_sha256=binding_artifact.file_sha256,
+                )
+            except (AttributeError, ValueError) as exc:
+                raise _state_invalid(
+                    "Generation decision execution binding is invalid.", str(exc)
+                ) from exc
+        else:
+            try:
+                qualification_binding.validate_request(request)
+                qualification_artifact = _artifact(
+                    Path(
+                        "state/video-generation/qualification-bindings/"
+                        f"{qualification_binding.binding_hash}.json"
+                    ),
+                    qualification_binding,
+                )
+                qualification_pointer = QualificationExecutionBindingPointer(
+                    path=qualification_artifact.relative_path,
+                    binding_hash=qualification_binding.binding_hash,
+                    request_fingerprint=request.request_input_hash,
+                    file_sha256=qualification_artifact.file_sha256,
+                )
+            except (AttributeError, ValueError) as exc:
+                raise _state_invalid(
+                    "Qualification execution binding is invalid.", str(exc)
+                ) from exc
         with self._exclusive_lock():
             manifest = self._read_manifest()
             if not manifest_supports(manifest.schema_version, ManifestCapability.VIDEO_GENERATION):
@@ -363,6 +736,11 @@ class _StateCommitVideoMixin:
                 )
                 if loaded.manifest != manifest:
                     raise ValueError("active Manifest changed during video validation")
+                if execution_binding is not None:
+                    execution_binding.validate_current_project(loaded)
+                    self._require_current_generation_acceptance(
+                        loaded, execution_binding
+                    )
                 verify_current_video_generation_lineage(loaded, request)
             except (AiVideoError, OSError, ValueError) as exc:
                 raise _state_invalid(
@@ -380,6 +758,12 @@ class _StateCommitVideoMixin:
             ):
                 raise _state_invalid("Video generation identity is already owned.")
             self._write_immutable_artifact(artifact, attempt_id=attempt_id)
+            if binding_artifact is not None:
+                self._write_immutable_artifact(binding_artifact, attempt_id=attempt_id)
+            if qualification_artifact is not None:
+                self._write_immutable_artifact(
+                    qualification_artifact, attempt_id=attempt_id
+                )
             attempt = StateCommitAttempt(
                 attempt_id=attempt_id,
                 operation="video_generation",
@@ -388,9 +772,15 @@ class _StateCommitVideoMixin:
                 base_project=manifest.active_project,
                 base_registry=manifest.active_registry,
                 base_dependency_graph=manifest.active_dependency_graph,
-                candidate_artifacts_hash=_candidate_artifacts_hash((artifact,)),
+                candidate_artifacts_hash=_candidate_artifacts_hash(
+                    (artifact,)
+                    if binding_artifact is None and qualification_artifact is None
+                    else (artifact, binding_artifact or qualification_artifact)
+                ),
                 video_generation_state=VideoGenerationAttemptState(
                     request=pointer,
+                    execution_binding=binding_pointer,
+                    qualification_binding=qualification_pointer,
                     generation_id=request.generation_id,
                     resolved_generation_hash=request.resolved_generation_hash,
                     phase=VideoAttemptPhase.REQUEST,
@@ -406,6 +796,10 @@ class _StateCommitVideoMixin:
             )
             self._write_manifest_atomic(next_manifest)
             self._reopen_video_request(pointer)
+            if binding_pointer is not None:
+                self._reopen_generation_execution_binding(binding_pointer)
+            if qualification_pointer is not None:
+                self._reopen_qualification_execution_binding(qualification_pointer)
             return self._read_manifest()
 
     def record_local_video_submit_intent(
@@ -431,6 +825,11 @@ class _StateCommitVideoMixin:
             ):
                 raise _state_invalid("Local video submit is not the next durable action.")
             request = self._reopen_video_request(state.request)
+            self._require_submit_execution_binding(manifest, state, request)
+            if state.qualification_binding is not None and pre_submit_guard is None:
+                raise _state_invalid(
+                    "Qualification local submit requires its exact closure guard."
+                )
             if request.execution_stack_hash is not None and pre_submit_guard is None:
                 raise _state_invalid(
                     "Stack-bound local video submit requires a pre-submit guard."

@@ -544,6 +544,9 @@ class _StateCommitTransactionMixin:
         )
         project = bundle.project
         registry = bundle.registry
+        from ai_video.production.production_strategy_reader import require_production_source_eligibility
+
+        require_production_source_eligibility(bundle)
         if (
             project.project_id != self._read_manifest().project_id
             or project.revision != request.next_project.revision

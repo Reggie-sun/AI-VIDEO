@@ -6,6 +6,12 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production._generation_feedback_reader import (
+    load_generation_execution_binding as load_generation_execution_binding,
+    load_generation_experience as load_generation_experience,
+    load_qualification_execution_binding as load_qualification_execution_binding,
+    verify_generation_feedback,
+)
 from ai_video.production._lifecycle_schema import (
     CommercialShotEvaluationIntentPointer,
     ContinuityEvaluationIntentPointer,
@@ -894,6 +900,7 @@ def verify_video_evidence(
     request_owners: list[str] = []
     for state in states:
         request = load_video_request_receipt(root, state.request)
+        verify_generation_feedback(root, state, request)
         if (
             (
                 request.commercial_binding is not None
@@ -1239,7 +1246,6 @@ def _verify_active_terminal_frame(
         metadata is None
         or state.candidate_continuity_asset_ids != (expected_asset_id,)
         or extraction.content_hash != evidence.extraction_receipt_id
-        or evidence.source_registry != bundle.manifest.active_registry
         or evidence.source_registry != attempt.candidate_registry
         or evidence.source_shot_id != scope.request.target_shot_id
         or evidence.source_shot_revision != scope.request.target_shot_revision
@@ -1281,6 +1287,19 @@ def _verify_active_generated_video(
     attempt,
     request: ResolvedVideoGenerationRequest,
 ) -> None:
+    if (attempt.candidate_project != bundle.manifest.active_project
+            or attempt.candidate_registry != bundle.manifest.active_registry
+            or attempt.candidate_dependency_graph != bundle.manifest.active_dependency_graph):
+        raise _invalid("Active generated video selection is not exact.")
+    _verify_generated_video_candidate(bundle, attempt, request)
+
+
+def _verify_generated_video_candidate(
+    bundle: LoadedProductionProject,
+    attempt,
+    request: ResolvedVideoGenerationRequest,
+) -> None:
+    """Verify the complete activation evidence in its immutable candidate scope."""
     state = attempt.video_generation_state
     if state is None:
         raise _invalid("Active video generation attempt has no lifecycle state.")
@@ -1302,9 +1321,10 @@ def _verify_active_generated_video(
     if (
         attempt.status is not StateCommitStatus.SUCCEEDED
         or state.phase is not VideoAttemptPhase.ACTIVATE
-        or attempt.candidate_project != bundle.manifest.active_project
-        or attempt.candidate_registry != bundle.manifest.active_registry
-        or attempt.candidate_dependency_graph != bundle.manifest.active_dependency_graph
+        or attempt.candidate_project is None
+        or attempt.candidate_registry is None
+        or bundle.project.content_hash != attempt.candidate_project.content_hash
+        or bundle.registry.content_hash != attempt.candidate_registry.content_hash
         or state.candidate_video_asset_ids != (request.output_asset_id,)
     ):
         raise _invalid("Active generated video selection is not exact.")

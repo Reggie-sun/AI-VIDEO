@@ -413,7 +413,7 @@ def test_capture_continuity_pass_reopens_and_writes_score_one(
     tmp_path: Path, manifest_schema: str
 ) -> None:
     project_root = tmp_path / "project"
-    inputs, provider, _, committer = _reach_fetch(project_root, continuity=True)
+    inputs, provider, request, committer = _reach_fetch(project_root, continuity=True)
     service = VideoGenerationService(committer=committer, provider=provider)
     service.fetch_once(attempt_id=ATTEMPT_ID)
     VideoGenerationService(
@@ -452,7 +452,8 @@ def test_capture_continuity_pass_reopens_and_writes_score_one(
     assert record.identity.attempt_id == ATTEMPT_ID
     assert record.routing.selected_capability_id == record.provider.capability_id
     assert record.planning.planning_request_hash.state is EvidenceState.NOT_APPLICABLE
-    assert record.provider.adapter_compiler_id.state is EvidenceState.NOT_APPLICABLE
+    assert record.provider.adapter_compiler_id.state is EvidenceState.KNOWN
+    assert record.provider.adapter_compiler_id.value == request.adapter_compiler_id
     assert record.inputs.items[0].creation_receipt_hash.state is EvidenceState.NOT_APPLICABLE
     assert record.artifact_evidence.file_sha256 == hashlib.sha256(
         (project_root / record.artifact_evidence.relative_path).read_bytes()

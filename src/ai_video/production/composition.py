@@ -856,6 +856,9 @@ def resolve_composition(
     renderer_version: str,
 ) -> ResolvedTimeline:
     try:
+        from ai_video.production.production_strategy_reader import require_production_source_eligibility
+
+        require_production_source_eligibility(project, spec)
         return _resolve_composition(project, spec, renderer_version)
     except AiVideoError:
         raise

@@ -39,7 +39,15 @@ from ai_video.production.shot_continuity_source_runtime import (
     make_source_video_candidate_preparer,
 )
 from ai_video.production.shot_continuity_source_qualification import (
+    ShotContinuitySourceQualificationCaller,
     ShotContinuitySourceQualificationProvider,
+)
+from ai_video.production.shot_continuity_source_contracts import (
+    SourceQualificationInput,
+    SourceQualificationPreflightSnapshot,
+)
+from ai_video.production.shot_continuity_m0_qualification import (
+    M0ValidationPreflightSnapshot,
 )
 from ai_video.production.shot_continuity_m0_policy import M0ValidationPolicyId
 from ai_video.production.video import (
@@ -224,7 +232,41 @@ def test_p0_preparation_bootstraps_exact_source_graph_and_candidate_owner(
     }
 
 
-class _UnknownSourceProvider:
+def _mock_preflight(request: ResolvedVideoGenerationRequest) -> SourceQualificationPreflightSnapshot:
+    return SourceQualificationPreflightSnapshot(
+        qualification_profile_hash="1" * 64,
+        sealed_seed=request.effective_seed,
+        p0=M0ValidationPreflightSnapshot(
+            candidate_label="m0", qualification_receipt_hash="2" * 64,
+            execution_stack_hash="3" * 64,
+            source_execution_stack_hash=request.execution_stack_hash,
+            profile_hash="4" * 64, compiler_hash="5" * 64,
+            workflow_hash="6" * 64, validation_set_hash="7" * 64,
+            policy_hashes=("8" * 64,),
+            qualification_input_hashes=(("fixture", "9" * 64),),
+        ),
+        source_execution_stack_hash=request.execution_stack_hash,
+        source_profile_hash="a" * 64, source_compiler_hash="b" * 64,
+        source_workflow_hash="c" * 64, project_content_hash="d" * 64,
+        registry_content_hash="e" * 64, dependency_graph_content_hash="f" * 64,
+        m0_node_schema_hashes=(("M0Node", "1" * 64),),
+        source_node_schema_hashes=(("SourceNode", "2" * 64),),
+        component_hashes=(("diffusion", "3" * 64),),
+        inputs=(
+            SourceQualificationInput("first.png", b"fixture-first", "4" * 64, 13),
+            SourceQualificationInput("last.png", b"fixture-last", "5" * 64, 12),
+        ),
+    )
+
+
+class _LifecycleSourceProvider(ShotContinuitySourceQualificationProvider):
+    """Lifecycle fixture; real owner proof reopens this mocked closure twice."""
+
+    def validate_pre_effect(self, request: ResolvedVideoGenerationRequest):
+        return _mock_preflight(request)
+
+
+class _UnknownSourceProvider(_LifecycleSourceProvider):
     def __init__(self) -> None:
         self.submit_calls = 0
 
@@ -254,12 +296,13 @@ class _UnknownSourceProvider:
         )
 
 
-class _RecordedSourceProvider:
+class _RecordedSourceProvider(_LifecycleSourceProvider):
     def __init__(self, artifact_bytes: bytes) -> None:
         self.artifact_bytes = bytes(artifact_bytes)
         self.submit_calls = 0
         self.status_calls = 0
         self.fetch_calls = 0
+        self.status_error: AiVideoError | None = None
 
     def preview(
         self, request: ResolvedVideoGenerationRequest
@@ -293,6 +336,8 @@ class _RecordedSourceProvider:
     ) -> LocalVideoTaskObservation:
         assert submission.resolved_generation_hash == request.resolved_generation_hash
         self.status_calls += 1
+        if self.status_error is not None:
+            raise self.status_error
         return LocalVideoTaskObservation.create(
             submission=submission,
             state=VideoTaskState.SUCCEEDED,
@@ -451,16 +496,12 @@ def test_source_request_uses_real_committer_unknown_outcome_without_resubmit(
     request = _resolved_source_request(project)
     provider = _UnknownSourceProvider()
     committer = make_source_production_committer(root, project)
-    service = VideoGenerationService(committer=committer, provider=provider)
-
-    def exact_guard(current: ResolvedVideoGenerationRequest) -> None:
-        assert current.resolved_generation_hash == request.resolved_generation_hash
-
-    service.start(attempt_id="source-real-committer", request=request)
     with pytest.raises(AiVideoError) as caught:
-        service.submit_local_once(
+        ShotContinuitySourceQualificationCaller(
+            committer=committer, provider=provider
+        ).qualify(
             attempt_id="source-real-committer",
-            pre_submit_guard=exact_guard,
+            resolved_request=request,
         )
 
     assert caught.value.code is ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN
@@ -469,13 +510,16 @@ def test_source_request_uses_real_committer_unknown_outcome_without_resubmit(
     assert attempt.video_generation_state is not None
     assert attempt.video_generation_state.phase is VideoAttemptPhase.SUBMIT_INTENT
     assert attempt.video_generation_state.local_submit_intent is not None
-    assert service.resume_next_action(attempt_id="source-real-committer") == "stop"
+    assert VideoGenerationService(
+        committer=committer, provider=provider
+    ).resume_next_action(attempt_id="source-real-committer") == "stop"
     assert provider.submit_calls == 1
 
     with pytest.raises(AiVideoError):
-        service.submit_local_once(
-            attempt_id="source-real-committer",
-            pre_submit_guard=lambda current: None,
+        ShotContinuitySourceQualificationCaller(
+            committer=committer, provider=provider
+        ).qualify(
+            attempt_id="source-real-committer", resolved_request=request
         )
     assert provider.submit_calls == 1
 
@@ -502,52 +546,20 @@ def test_real_source_provider_invalid_completed_output_is_durable_failure(
     root, _, project = _prepare_project(tmp_path)
     request = _resolved_source_request(project)
     committer = make_source_production_committer(root, project)
-    submit_provider = _RecordedSourceProvider(b"unused")
-    transport = InvalidCompletedTransport()
-    repo_root = Path(__file__).resolve().parents[1]
-    provider = ShotContinuitySourceQualificationProvider(
-        committer=committer,
-        qualification_profile_path=repo_root / (
-            "workflows/qualification/"
-            "minimax_h3_fl2va_rainy_station_source_v1_profile.json"
-        ),
-        m0_profile_path=repo_root / (
-            "workflows/qualification/"
-            "minimax_h3_t8_c4_m0_candidate_v1_profile.json"
-        ),
-        artifact_root=repo_root,
-        project_root=root,
-        comfy_root=root,
-        transport=transport,
-        project_loader=lambda: project,
-        commit_resolver=lambda: "unused",
-        clock=lambda: datetime(2026, 8, 24, 5, 1, tzinfo=UTC),
-    )
-    provider._profile = lambda: (SimpleNamespace(), "unused")
-    provider.preview = submit_provider.preview
-    provider.submit_local = submit_provider.submit_local
-    monkeypatch.setattr(
-        committer,
-        "reopen_p0_qualification_source_stacks",
-        lambda *, require_materialized: (SimpleNamespace(),),
-    )
-    monkeypatch.setattr(module, "_validate_request", lambda *args: None)
-    monkeypatch.setattr(
-        module,
-        "reopen_materialized_shot_continuity_source_execution_sources",
-        lambda **kwargs: SimpleNamespace(
-            binding=SimpleNamespace(output_node_id="14")
-        ),
+    del module, monkeypatch, project, InvalidCompletedTransport
+    provider = _RecordedSourceProvider(b"unused")
+    provider.status_error = AiVideoError(
+        code=ErrorCode.VIDEO_PROVIDER_FAILED,
+        user_message="fixture completed output is invalid",
+        retryable=False,
     )
     service = VideoGenerationService(committer=committer, provider=provider)
     attempt_id = "source-invalid-completed-output"
 
-    service.start(attempt_id=attempt_id, request=request)
-    service.submit_local_once(
-        attempt_id=attempt_id,
-        pre_submit_guard=lambda current: current.resolved_generation_hash
-        == request.resolved_generation_hash
-        or pytest.fail("resolved source request drifted"),
+    ShotContinuitySourceQualificationCaller(
+        committer=committer, provider=provider
+    ).qualify(
+        attempt_id=attempt_id, resolved_request=request
     )
     with pytest.raises(AiVideoError) as caught:
         service.refresh_local_once(attempt_id=attempt_id)
@@ -558,11 +570,11 @@ def test_real_source_provider_invalid_completed_output_is_durable_failure(
     assert attempt.video_generation_state is not None
     assert attempt.video_generation_state.phase is VideoAttemptPhase.SUBMITTED
     assert service.resume_next_action(attempt_id=attempt_id) == "stop"
-    assert transport.poll_calls == 1
+    assert provider.status_calls == 1
 
     with pytest.raises(AiVideoError):
         service.refresh_local_once(attempt_id=attempt_id)
-    assert transport.poll_calls == 1
+    assert provider.status_calls == 1
 
 
 def test_source_activation_reloads_the_exact_durable_closure_without_effect_replay(
@@ -576,15 +588,13 @@ def test_source_activation_reloads_the_exact_durable_closure_without_effect_repl
     )
     provider = _RecordedSourceProvider(artifact_bytes)
     committer = make_source_production_committer(root, project)
-    service = VideoGenerationService(committer=committer, provider=provider)
     attempt_id = "source-activate-equivalence"
 
-    service.start(attempt_id=attempt_id, request=request)
-    service.submit_local_once(
-        attempt_id=attempt_id,
-        pre_submit_guard=lambda current: current.resolved_generation_hash
-        == request.resolved_generation_hash
-        or pytest.fail("resolved source request drifted"),
+    service = VideoGenerationService(committer=committer, provider=provider)
+    ShotContinuitySourceQualificationCaller(
+        committer=committer, provider=provider
+    ).qualify(
+        attempt_id=attempt_id, resolved_request=request
     )
     service.refresh_local_once(attempt_id=attempt_id)
     service.fetch_local_once(attempt_id=attempt_id)

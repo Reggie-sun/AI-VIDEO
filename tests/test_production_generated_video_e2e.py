@@ -14,9 +14,10 @@ from pydantic import ValidationError
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import (
     AssetRegistrySnapshot,
+    AssetRoleRequirement,
+    AssetType,
     DependencyLifecycle,
     EvidenceStrength,
-    HybridLayer,
     QaLayer,
     QaLayoutRules,
     QaPolicy,
@@ -151,6 +152,12 @@ from production_project_factory import (
     make_p8_video_generation_base,
     make_composition_spec,
 )
+from production_generation_execution_factory import (
+    NativeFixtureVideoProvider,
+    activate_generated_video_shot,
+    activate_fixture_generation_qa_policy,
+    prepare_generation_execution,
+)
 from test_production_state_commit import make_image_provider_result
 from test_production_video import (
     _continuity_binding,
@@ -273,11 +280,15 @@ class _MinimalCloudBackend:
         return self._artifact_bytes
 
 
-class _MinimalProviderResponseAdapter(ScriptedFakeVideoProvider):
+class _MinimalProviderResponseAdapter(NativeFixtureVideoProvider):
     """Offline adapter that parses only job/status/re-queryable output URL."""
 
     def __init__(self, *, backend: _MinimalCloudBackend, **kwargs: object) -> None:
-        super().__init__(**kwargs)
+        super().__init__(
+            native_prompt_text="A sealed one-second archive-room push-in.",
+            compiler_id="generated-video-e2e-fixture",
+            **kwargs,
+        )
         self._backend = backend
         self.provider_responses: list[dict[str, str]] = []
 
@@ -363,9 +374,11 @@ def _runtime(
     seal_terminal_frame: bool = False,
     continuity: bool = False,
     commercial: bool = False,
+    activate_second_shot: bool = False,
     commercial_unapproved_product: bool = False,
     commercial_plan_hash: str = "a" * 64,
     status_events: tuple[VideoTaskState | str, ...] | None = None,
+    activate_shot: bool = True,
 ):
     inputs = make_p8_video_generation_base(
         root,
@@ -379,6 +392,14 @@ def _runtime(
             else "2.7"
         ),
     )
+    if activate_shot:
+        inputs = activate_generated_video_shot(root=root, inputs=inputs)
+    if activate_second_shot:
+        inputs = activate_generated_video_shot(
+            root=root,
+            inputs=inputs,
+            target_shot_id=inputs.project.shots[1].shot_id,
+        )
     loaded = inputs.project
     commercial_profile = (
         create_qingyan_ecommerce_acceptance_profile() if commercial else None
@@ -433,25 +454,13 @@ def _runtime(
                 domain_acceptance=domain_acceptance,
             )
         )
-        policy_bytes = policy.model_dump_json().encode("utf-8")
-        policy_path = canonical_qa_policy_path(policy.content_hash)
-        (root / policy_path).parent.mkdir(parents=True, exist_ok=True)
-        (root / policy_path).write_bytes(policy_bytes)
-        policy_pointer = QaPolicyPointer(
-            path=policy_path,
-            policy_id=policy.policy_id,
-            policy_version=policy.policy_version,
-            content_hash=policy.content_hash,
-            file_sha256=hashlib.sha256(policy_bytes).hexdigest(),
+        committer = ProductionStateCommitter(root)
+        manifest = committer._read_manifest()
+        committer.activate_qa_policy(
+            policy,
+            expected_manifest_revision=manifest.manifest_revision,
+            attempt_id="activate-generated-video-e2e-policy",
         )
-        manifest_path = root / "state/manifest.json"
-        manifest = loaded.manifest.model_copy(
-            update={
-                "manifest_revision": loaded.manifest.manifest_revision + 1,
-                "active_qa_policy": policy_pointer,
-            }
-        )
-        manifest_path.write_text(manifest.model_dump_json(indent=2), encoding="utf-8")
         loaded = load_production_project(root / "project.yaml")
         inputs = replace(inputs, project=loaded)
     shot = loaded.shots[0]
@@ -465,6 +474,10 @@ def _runtime(
         mime_type="video/mp4",
         native_audio=False,
     )
+    inputs = activate_fixture_generation_qa_policy(root=root, inputs=inputs, output=output)
+    loaded = inputs.project
+    shot = loaded.shots[0]
+    source = loaded.registry.assets[0]
     profile_sha = "d" * 64
     continuity_binding = None
     image_bindings = (
@@ -599,7 +612,9 @@ def _runtime(
             VideoOutputRecoveryStrategy.REQUERY_BY_EFFECT_ID
         ),
     )
-    provider = ScriptedFakeVideoProvider(
+    provider = NativeFixtureVideoProvider(
+        native_prompt_text="A sealed one-second archive-room push-in.",
+        compiler_id="generated-video-e2e-fixture",
         capabilities=VideoProviderCapabilities.create(
             provider_name="fake-video", variants=(variant,)
         ),
@@ -614,7 +629,20 @@ def _runtime(
             ),
         ),
     )
-    resolved = provider.resolve(request)
+    direct_resolved = provider.resolve(request)
+    prepared = (
+        prepare_generation_execution(
+            project=inputs.project,
+            provider=provider,
+            request=direct_resolved,
+            task_id="generated-video-e2e-fixture",
+            compiler_id="generated-video-e2e-fixture",
+            compiler_version="1",
+        )
+        if activate_shot
+        else None
+    )
+    resolved = prepared.resolved if prepared is not None else direct_resolved
     video_preview = provider.preview(resolved)
     paid_preview = _paid_preview(
         resolved,
@@ -630,15 +658,23 @@ def _runtime(
         ),
         paid_provider_clock=lambda: authorization.issued_at,
     )
-    return inputs, provider, resolved, paid_preview, committer
+    return (
+        inputs,
+        provider,
+        resolved,
+        prepared.binding if prepared is not None else None,
+        paid_preview,
+        committer,
+    )
 
 
 def test_minimal_cloud_response_restarts_and_stops_at_validated_candidate(
     tmp_path: Path,
 ) -> None:
-    inputs, base_provider, direct_resolved, _, _ = _runtime(
+    inputs, base_provider, direct_resolved, _, _, _ = _runtime(
         tmp_path,
         status_events=(VideoTaskState.SUCCEEDED,),
+        activate_shot=False,
     )
     initial = inputs.project
     initial_shot = initial.shots[0]
@@ -647,28 +683,21 @@ def test_minimal_cloud_response_restarts_and_stops_at_validated_candidate(
             update={
                 "revision": initial_shot.revision + 1,
                 "content_hash": "0" * 64,
-                "visual_strategy": VisualStrategy.HYBRID,
+                "visual_strategy": VisualStrategy.GENERATED_VIDEO,
                 "required_asset_roles": (
-                    initial_shot.required_asset_roles[0],
-                    initial.shots[1].required_asset_roles[0].model_copy(
-                        update={"role": "secondary_still"}
+                    AssetRoleRequirement(
+                        role=initial_shot.required_asset_roles[0].role,
+                        asset_ids=(),
+                        allowed_asset_types=(AssetType.VIDEO,),
+                    ),
+                    AssetRoleRequirement(
+                        role="first_frame",
+                        asset_ids=(initial_shot.required_asset_roles[0].asset_ids[0],),
+                        allowed_asset_types=(AssetType.IMAGE,),
                     ),
                 ),
-                "generated_video_rationale": None,
-                "hybrid_layers": (
-                    HybridLayer(
-                        role="base",
-                        asset_role=initial_shot.required_asset_roles[0].role,
-                        asset_id=initial_shot.required_asset_roles[0].asset_ids[0],
-                        z_index=0,
-                    ),
-                    HybridLayer(
-                        role="secondary",
-                        asset_role="secondary_still",
-                        asset_id=initial.shots[1].required_asset_roles[0].asset_ids[0],
-                        z_index=1,
-                    ),
-                ),
+                "generated_video_rationale": "minimal cloud fixture generation",
+                "hybrid_layers": (),
             }
         )
     )
@@ -755,127 +784,16 @@ def test_minimal_cloud_response_restarts_and_stops_at_validated_candidate(
     direct_request = direct_resolved.activation_scope.request
     shot = loaded.shots[0]
     source = loaded.registry.assets[0]
-    terminal = _router_asset(
-        "first_frame",
-        "minimal-cloud-source",
-        source.sha256,
-        mime_type=source.mime_type,
-        size_bytes=source.size_bytes,
-        width=source.width,
-        height=source.height,
-        registry_revision_id=loaded.manifest.active_registry.revision_id,
-    ).model_copy(update={"asset_id": source.asset_id})
-    context = _router_context(
-        continuity=RouterContinuityMode.NONE,
-        keyframe=_router_asset(
-            "first_frame",
-            "minimal-cloud-source",
-            source.sha256,
-            mime_type=source.mime_type,
-            size_bytes=source.size_bytes,
-            width=source.width,
-            height=source.height,
-        ),
-        important=False,
-        shot_id=shot.shot_id,
-    ).model_copy(
-        update={
-            "activated_shot": shot,
-            "target_shot_id": shot.shot_id,
-            "target_shot_revision": shot.revision,
-            "target_shot_content_hash": shot.content_hash,
-            "selected_registry_revision_id": (
-                loaded.manifest.active_registry.revision_id
-            ),
-            "shot_keyframe": terminal,
-        }
+    prepared = prepare_generation_execution(
+        project=loaded,
+        provider=base_provider,
+        request=direct_resolved,
+        task_id="minimal-cloud-response-fixture",
+        compiler_id="generated-video-e2e-fixture",
+        compiler_version="1",
     )
-    requirement = ProviderNeutralVideoRequirement.create(
-        source_request_content_hash="a" * 64,
-        intent_evidence_hash="b" * 64,
-        generation_intent_hash="c" * 64,
-        target_shot=shot,
-        scene=next(scene for scene in loaded.scenes if scene.scene_id == shot.scene_id),
-        characters=tuple(
-            character
-            for character in loaded.characters
-            if character.character_id in shot.character_ids
-        ),
-        generation_mode=RequirementGenerationMode.IMAGE_TO_VIDEO,
-        continuity_mode=RequirementContinuityMode.NONE,
-        motion_requirement=RequirementMotionRequirement.FREE_COMPLEX,
-        generation_intent=GenerationIntent(),
-        semantic_reference_roles=(SemanticReferenceRole.FIRST_FRAME,),
-        asset_evidence=(
-            AssetEvidence(
-                role=SemanticReferenceRole.FIRST_FRAME,
-                asset_id=source.asset_id,
-                asset_sha256=source.sha256,
-                mime_type=source.mime_type,
-                width=source.width,
-                height=source.height,
-                size_bytes=source.size_bytes,
-            ),
-        ),
-        output_need=OutputNeed(
-            duration_seconds=direct_resolved.effective_output.duration_seconds,
-            width=direct_resolved.effective_output.width,
-            height=direct_resolved.effective_output.height,
-            fps=direct_resolved.effective_output.fps,
-            container_mime=direct_resolved.effective_output.mime_type,
-        ),
-        audio_need=AudioNeed.FORBIDDEN,
-        quality_need=QualityNeed(objective_tier="production"),
-    )
-    projection = VerifiedGenerationRequirementProjection.create(
-        requirement=requirement,
-        plan_hash="d" * 64,
-        verified_source_request_content_hash=requirement.source_request_content_hash,
-        target_shot_id=shot.shot_id,
-        target_shot_revision=shot.revision,
-        target_shot_content_hash=shot.content_hash,
-    )
-    lifecycle = _router_lifecycle(context).model_copy(
-        update={
-            "generation_id": direct_resolved.generation_id,
-            "target_asset_role": direct_request.target_asset_role,
-            "base_project": loaded.manifest.active_project,
-            "base_registry": loaded.manifest.active_registry,
-            "base_dependency_graph": loaded.manifest.active_dependency_graph,
-            "input_artifact_ids": direct_request.input_artifact_ids,
-            "output_asset_id": direct_resolved.output_asset_id,
-        }
-    )
-    capability = base_provider._capabilities.variants[0]
-    assert (
-        capability.output_recovery_strategy
-        is VideoOutputRecoveryStrategy.REQUERY_BY_EFFECT_ID
-    )
-    routing = VideoGenerationResolver()._bind_requirement(
-        projection=projection,
-        context=context,
-        policy=_router_policy(remote_authorized=True, budget_authorized=True),
-        provider_profile=direct_resolved.provider_profile,
-        capabilities=base_provider._capabilities,
-        selected_capability_id=capability.capability_id,
-        output_requirement=direct_resolved.effective_output,
-        lifecycle=lifecycle,
-        compiler_contract=AdapterCompilerContract.create(
-            compiler_id="fake-video-compiler",
-            compiler_version="1",
-        ),
-    )
-    assert (
-        routing.decision.outcome is RoutingOutcome.SELECTED
-    ), routing.decision.model_dump_json()
-    assert routing.provider_bound_request is not None
-    compiled = base_provider.compile_request(
-        routing.provider_bound_request,
-        projection.requirement,
-    )
-    assert isinstance(compiled, CompiledProviderVideoRequest)
-    resolved = base_provider.resolve(compiled.request)
-    assert resolved.requirement_hash == projection.requirement.requirement_hash
+    resolved = prepared.resolved
+    execution_binding = prepared.binding
     video_preview = base_provider.preview(resolved)
     paid_preview = _paid_preview(
         resolved,
@@ -907,7 +825,11 @@ def test_minimal_cloud_response_restarts_and_stops_at_validated_candidate(
     )
     service = VideoGenerationService(committer=committer, provider=provider)
     before = committer._read_manifest()
-    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    service.start(
+        attempt_id=ATTEMPT_ID,
+        request=resolved,
+        execution_binding=execution_binding,
+    )
     service.submit_once(
         attempt_id=ATTEMPT_ID,
         paid_preview=paid_preview,
@@ -1002,15 +924,21 @@ def _reach_fetch(
     seal_terminal_frame: bool = False,
     continuity: bool = False,
     commercial: bool = False,
+    activate_second_shot: bool = False,
 ):
-    inputs, provider, resolved, paid_preview, committer = _runtime(
+    inputs, provider, resolved, execution_binding, paid_preview, committer = _runtime(
         root,
         seal_terminal_frame=seal_terminal_frame,
         continuity=continuity,
         commercial=commercial,
+        activate_second_shot=activate_second_shot,
     )
     service = VideoGenerationService(committer=committer, provider=provider)
-    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    service.start(
+        attempt_id=ATTEMPT_ID,
+        request=resolved,
+        execution_binding=execution_binding,
+    )
     service.submit_once(
         attempt_id=ATTEMPT_ID,
         paid_preview=paid_preview,
@@ -1078,7 +1006,9 @@ def test_hard_cut_keyframe_activation_reopens_exact_terminal_and_replays_zero_ca
     tmp_path: Path,
 ) -> None:
     inputs, provider, _, source_committer = _reach_fetch(
-        tmp_path, seal_terminal_frame=True
+        tmp_path,
+        seal_terminal_frame=True,
+        activate_second_shot=True,
     )
     VideoGenerationService(
         committer=source_committer, provider=provider
@@ -1121,7 +1051,7 @@ def test_hard_cut_keyframe_activation_reopens_exact_terminal_and_replays_zero_ca
         provider_kind="fake-local",
         model_id="fixture-image-model-1",
         target_shot_id=target.shot_id,
-        target_asset_role=target.required_asset_roles[0].role,
+        target_asset_role="first_frame",
         prompt_text="Alice continues from the chair-touch exit state in a new medium framing.",
         negative_prompt_text="identity drift, axis reversal, changed wardrobe",
         parameters=ImageProviderParameters(
@@ -1283,6 +1213,7 @@ def test_hard_cut_keyframe_activation_reopens_exact_terminal_and_replays_zero_ca
             ),
         ),
         hard_cut_keyframe_binding=hard_cut,
+        seal_terminal_frame=True,
         output_requirement=video_output,
         seed=29,
         base_project=keyframe_project.manifest.active_project,
@@ -1312,8 +1243,11 @@ def test_hard_cut_keyframe_activation_reopens_exact_terminal_and_replays_zero_ca
         fps_supported=True,
         idempotent_submit=False,
         lookup_supported=False,
+        output_recovery_strategy=VideoOutputRecoveryStrategy.REQUERY_BY_EFFECT_ID,
     )
-    video_provider = ScriptedFakeVideoProvider(
+    video_provider = NativeFixtureVideoProvider(
+        native_prompt_text="Alice pulls the chair and sits without changing axis or wardrobe.",
+        compiler_id="hard-cut-video-fixture",
         capabilities=VideoProviderCapabilities.create(
             provider_name="fake-hard-cut-video", variants=(variant,)
         ),
@@ -1323,7 +1257,15 @@ def test_hard_cut_keyframe_activation_reopens_exact_terminal_and_replays_zero_ca
             provider_file_id="fake-hard-cut-file-2",
         ),
     )
-    resolved_video = video_provider.resolve(video_request)
+    prepared_video = prepare_generation_execution(
+        project=keyframe_project,
+        provider=video_provider,
+        request=video_provider.resolve(video_request),
+        task_id="hard-cut-video-fixture",
+        compiler_id="hard-cut-video-fixture",
+        compiler_version="1",
+    )
+    resolved_video = prepared_video.resolved
     video_preview = video_provider.preview(resolved_video)
     paid_preview = _paid_preview(
         resolved_video,
@@ -1346,6 +1288,7 @@ def test_hard_cut_keyframe_activation_reopens_exact_terminal_and_replays_zero_ca
     video_service.start(
         attempt_id="hard-cut-video-attempt",
         request=resolved_video,
+        execution_binding=prepared_video.binding,
     )
     video_service.submit_once(
         attempt_id="hard-cut-video-attempt",
@@ -1377,6 +1320,81 @@ def test_hard_cut_keyframe_activation_reopens_exact_terminal_and_replays_zero_ca
     assert recovered.manifest_revision_before == video_activated.manifest_revision
     assert recovered.manifest_revision_after == video_activated.manifest_revision
     assert load_production_project(tmp_path / "project.yaml").manifest == video_activated
+    assert video_provider.call_counts == before_replay
+
+    from ai_video.production._image_video_lineage import has_exact_video_successor
+    from ai_video.production._image_project_reader import verify_active_image_evidence
+
+    final_shot = next(item for item in final_project.shots if item.shot_id == target.shot_id)
+    retained_image = next(item for item in final_project.registry.assets
+                          if item.asset_id == resolved_video.image_bindings[0].asset_id)
+    assert has_exact_video_successor(final_project, final_shot, retained_image)
+    assert not has_exact_video_successor(final_project, final_shot,
+        retained_image.model_copy(update={"sha256": "0" * 64}))
+    foreign_receipt_shot = final_shot.model_copy(update={"creation_receipt_id": "0" * 64})
+    with pytest.raises(AiVideoError, match="P7 image candidate history"):
+        verify_active_image_evidence(final_project.model_copy(update={"shots": tuple(
+            foreign_receipt_shot if item.shot_id == final_shot.shot_id else item
+            for item in final_project.shots)}))
+
+    # Advance the canonical project pointer without another generation effect.
+    # The retained image now depends on a historical video candidate, for which
+    # the ordinary current-active-video reader no longer runs its full check.
+    from ai_video.production.state_commit import (
+        prepare_project_registry_commit, prepare_dependency_graph_transition,
+        PreparedArtifact, _canonical_json_bytes,
+    )
+    from ai_video.production.paths import (
+        canonical_video_probe_receipt_path, canonical_video_provenance_receipt_path,
+    )
+    from ai_video.production.registry import registry_semantic_sha256
+
+    later_project = seal_artifact(final_project.project.model_copy(update={
+        "revision": final_project.project.revision + 1,
+        "content_hash": "0" * 64, "creation_receipt_id": "unrelated-project-revision"}))
+    transition = prepare_dependency_graph_transition(
+        expected_manifest_revision=final_project.manifest.manifest_revision,
+        base_dependency_graph=final_project.manifest.active_dependency_graph,
+        candidate_graph=final_project.dependency_graph,
+        candidate_dependency_states=final_project.manifest.dependency_states,
+        expected_desired_fingerprints=desired_fingerprints(final_project.dependency_graph))
+    # Reorder only the video's two appended records, preserving the immutable
+    # P7 registry prefix as well as all asset records and graph fingerprints.
+    assert {item.asset_id for item in final_project.registry.assets[-2:]} == {
+        resolved_video.output_asset_id, f"{resolved_video.output_asset_id}:terminal-frame"}
+    later_registry = final_project.registry.model_copy(update={
+        "assets": (*final_project.registry.assets[:-2], *reversed(final_project.registry.assets[-2:]))})
+    later_registry_hash = registry_semantic_sha256(later_registry)
+    later_registry = later_registry.model_copy(update={
+        "revision_id": later_registry_hash, "content_hash": later_registry_hash})
+    draft = prepare_project_registry_commit(manifest=final_project.manifest,
+        project=later_project, registry=later_registry, attempt_id="later-project-revision")
+    graph_payload = _canonical_json_bytes(final_project.dependency_graph)
+    draft = replace(draft, dependency_graph_transition=transition,
+        artifacts=tuple(sorted((*draft.artifacts, PreparedArtifact(
+            transition.candidate_dependency_graph.path, graph_payload,
+            hashlib.sha256(graph_payload).hexdigest())), key=lambda item: item.relative_path.as_posix())))
+    ProductionStateCommitter(tmp_path).commit(draft)
+    later = load_production_project(tmp_path / "project.yaml")
+    assert later.manifest.active_project != video_activated.active_project
+    assert later.manifest.active_registry != video_activated.active_registry
+    output_asset = next(item for item in later.registry.assets if item.asset_id == resolved_video.output_asset_id)
+    assert has_exact_video_successor(later, final_shot, retained_image)
+    replaced_output = output_asset.model_copy(update={"usage_license": "different-output-record"})
+    replaced_registry = later.registry.model_copy(update={"assets": tuple(
+        replaced_output if item.asset_id == output_asset.asset_id else item for item in later.registry.assets)})
+    with pytest.raises(AiVideoError, match="P7 image candidate history"):
+        verify_active_image_evidence(later.model_copy(update={"registry": replaced_registry}))
+    for path in (canonical_video_probe_receipt_path(output_asset.video_metadata.probe_receipt_id),
+                 canonical_video_provenance_receipt_path(output_asset.video_metadata.provenance_receipt_id)):
+        exact_bytes = (tmp_path / path).read_bytes()
+        try:
+            (tmp_path / path).write_bytes(b"{}\n")
+            with pytest.raises(AiVideoError):
+                load_production_project(tmp_path / "project.yaml")
+        finally:
+            (tmp_path / path).write_bytes(exact_bytes)
+    assert load_production_project(tmp_path / "project.yaml").manifest == later.manifest
     assert video_provider.call_counts == before_replay
 
     (tmp_path / canonical_image_request_path(request.request_fingerprint)).write_text(
@@ -1677,7 +1695,7 @@ def test_commercial_candidate_rejects_current_policy_replacement(
 def test_commercial_start_rejects_caller_supplied_unapproved_product_hashes(
     tmp_path: Path,
 ) -> None:
-    _, provider, resolved, _, committer = _runtime(
+    _, provider, resolved, execution_binding, _, committer = _runtime(
         tmp_path,
         commercial=True,
         commercial_unapproved_product=True,
@@ -1685,7 +1703,11 @@ def test_commercial_start_rejects_caller_supplied_unapproved_product_hashes(
     service = VideoGenerationService(committer=committer, provider=provider)
 
     with pytest.raises(AiVideoError) as rejected:
-        service.start(attempt_id=ATTEMPT_ID, request=resolved)
+        service.start(
+            attempt_id=ATTEMPT_ID,
+            request=resolved,
+            execution_binding=execution_binding,
+        )
 
     assert rejected.value.code is ErrorCode.PRODUCTION_STATE_INVALID
     assert provider.call_counts.submit == 0
@@ -1694,7 +1716,7 @@ def test_commercial_start_rejects_caller_supplied_unapproved_product_hashes(
 def test_paid_ecommerce_facade_enforces_real_service_barrier_and_replay(
     tmp_path: Path,
 ) -> None:
-    _, provider, resolved, paid_preview, committer = _runtime(
+    _, provider, resolved, execution_binding, paid_preview, committer = _runtime(
         tmp_path,
         commercial=True,
         status_events=(VideoTaskState.SUCCEEDED,),
@@ -1712,6 +1734,7 @@ def test_paid_ecommerce_facade_enforces_real_service_barrier_and_replay(
             attempt_id=ATTEMPT_ID,
             actual_cost_microunits=1_000_000,
         ),
+        execution_binding=execution_binding,
     )
     handoff = _commercial_handoff(resolved.commercial_binding.target_shot_id)
 
@@ -1740,8 +1763,8 @@ def test_paid_ecommerce_resume_rejects_durable_request_mismatch_before_effect(
 ) -> None:
     expected_root = tmp_path / "expected"
     durable_root = tmp_path / "durable"
-    _, _, expected_request, _, _ = _runtime(expected_root, commercial=True)
-    _, provider, durable_request, durable_preview, committer = _runtime(
+    _, _, expected_request, expected_execution_binding, _, _ = _runtime(expected_root, commercial=True)
+    _, provider, durable_request, durable_execution_binding, durable_preview, committer = _runtime(
         durable_root,
         commercial=True,
         commercial_plan_hash="b" * 64,
@@ -1749,7 +1772,11 @@ def test_paid_ecommerce_resume_rejects_durable_request_mismatch_before_effect(
     )
     service = VideoGenerationService(committer=committer, provider=provider)
     if preexisting_attempt:
-        service.start(attempt_id=ATTEMPT_ID, request=durable_request)
+        service.start(
+            attempt_id=ATTEMPT_ID,
+            request=durable_request,
+            execution_binding=durable_execution_binding,
+        )
     binding = expected_request.commercial_binding
     assert binding is not None
     facade = EcommerceVideoGenerationFacade(
@@ -1760,13 +1787,18 @@ def test_paid_ecommerce_resume_rejects_durable_request_mismatch_before_effect(
         paid_preview=durable_preview,
         reservation_id="p8-video-reservation-1",
         commercial_reviewer=_CountingCommercialShotReviewer(),
+        execution_binding=expected_execution_binding,
     )
     competing_start_done = preexisting_attempt
 
     def start_competing_request_after_preflight() -> bool:
         nonlocal competing_start_done
         if not competing_start_done:
-            service.start(attempt_id=ATTEMPT_ID, request=durable_request)
+            service.start(
+                attempt_id=ATTEMPT_ID,
+                request=durable_request,
+                execution_binding=durable_execution_binding,
+            )
             competing_start_done = True
         return False
 
@@ -1786,13 +1818,17 @@ def test_paid_ecommerce_duplicate_coordinator_claims_poll_once(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    _, provider, resolved, paid_preview, committer = _runtime(
+    _, provider, resolved, execution_binding, paid_preview, committer = _runtime(
         tmp_path,
         commercial=True,
         status_events=(VideoTaskState.SUCCEEDED,),
     )
     service = VideoGenerationService(committer=committer, provider=provider)
-    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    service.start(
+        attempt_id=ATTEMPT_ID,
+        request=resolved,
+        execution_binding=execution_binding,
+    )
     service.submit_once(
         attempt_id=ATTEMPT_ID,
         paid_preview=paid_preview,
@@ -1810,6 +1846,7 @@ def test_paid_ecommerce_duplicate_coordinator_claims_poll_once(
             attempt_id=ATTEMPT_ID,
             actual_cost_microunits=1_000_000,
         ),
+        execution_binding=execution_binding,
     )
     binding = resolved.commercial_binding
     assert binding is not None
@@ -1957,7 +1994,7 @@ def test_continuity_and_commercial_share_one_authoritative_probe(
 def test_new_commercial_attempt_rejects_manifest_212_before_provider_submit(
     tmp_path: Path,
 ) -> None:
-    _, provider, resolved, _, committer = _runtime(tmp_path, commercial=True)
+    _, provider, resolved, execution_binding, _, committer = _runtime(tmp_path, commercial=True)
     manifest_path = tmp_path / "state/manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     manifest["schema_version"] = "2.12"
@@ -1965,10 +2002,11 @@ def test_new_commercial_attempt_rejects_manifest_212_before_provider_submit(
     before = provider.call_counts
 
     with pytest.raises(AiVideoError) as rejected:
-        VideoGenerationService(committer=committer, provider=provider).start(
-            attempt_id=ATTEMPT_ID,
-            request=resolved,
-        )
+            VideoGenerationService(committer=committer, provider=provider).start(
+                attempt_id=ATTEMPT_ID,
+                request=resolved,
+                execution_binding=execution_binding,
+            )
 
     assert rejected.value.code is ErrorCode.PRODUCTION_STATE_INVALID
     assert provider.call_counts == before
@@ -2104,7 +2142,7 @@ def test_historical_manifest_29_evidenced_replay_reuses_evaluator_evidence(
 def test_new_continuity_attempt_rejects_manifest_29_before_provider_submit(
     tmp_path: Path,
 ) -> None:
-    _, provider, resolved, _, committer = _runtime(tmp_path, continuity=True)
+    _, provider, resolved, execution_binding, _, committer = _runtime(tmp_path, continuity=True)
     manifest_path = tmp_path / "state/manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     manifest["schema_version"] = "2.9"
@@ -2115,6 +2153,7 @@ def test_new_continuity_attempt_rejects_manifest_29_before_provider_submit(
         VideoGenerationService(committer=committer, provider=provider).start(
             attempt_id=ATTEMPT_ID,
             request=resolved,
+            execution_binding=execution_binding,
         )
 
     assert rejected.value.code is ErrorCode.PRODUCTION_STATE_INVALID
@@ -2394,7 +2433,9 @@ def test_fake_video_fetch_activate_reopen_and_replay_are_exact(tmp_path: Path):
 
 
 def test_active_video_reopens_after_later_paid_budget_revision(tmp_path: Path):
-    inputs, provider, resolved, committer = _reach_fetch(tmp_path)
+    inputs, provider, resolved, committer = _reach_fetch(
+        tmp_path, activate_second_shot=True
+    )
     VideoGenerationService(committer=committer, provider=provider).fetch_and_activate(
         attempt_id=ATTEMPT_ID
     )
@@ -2413,9 +2454,28 @@ def test_active_video_reopens_after_later_paid_budget_revision(tmp_path: Path):
     next_values.update(
         generation_id="p8-generation-002",
         output_asset_id="video-output-p8-002",
+        target_shot_id=selected.shots[1].shot_id,
+        target_shot_revision=selected.shots[1].revision,
+        target_shot_content_hash=selected.shots[1].content_hash,
+        target_asset_role=selected.shots[1].required_asset_roles[0].role,
+        base_project=selected.manifest.active_project,
+        base_registry=selected.manifest.active_registry,
+        base_dependency_graph=selected.manifest.active_dependency_graph,
+        input_artifact_ids=(
+            selected.shots[1].artifact_id,
+            selected.registry.assets[0].asset_id,
+        ),
     )
     next_request = VideoGenerationRequest.create(**next_values)
-    next_resolved = provider.resolve(next_request)
+    prepared_next = prepare_generation_execution(
+        project=selected,
+        provider=provider,
+        request=provider.resolve(next_request),
+        task_id="later-paid-budget-fixture",
+        compiler_id="generated-video-e2e-fixture",
+        compiler_version="1",
+    )
+    next_resolved = prepared_next.resolved
     next_attempt_id = "p8-generated-video-next"
     next_preview = _paid_preview(
         next_resolved,
@@ -2425,7 +2485,9 @@ def test_active_video_reopens_after_later_paid_budget_revision(tmp_path: Path):
     next_authorization = _paid_authorization(next_preview)
     next_committer = ProductionStateCommitter(
         tmp_path,
-        video_candidate_preparer=make_p8_video_candidate_preparer(inputs),
+        video_candidate_preparer=make_p8_video_candidate_preparer(
+            replace(inputs, project=selected)
+        ),
         paid_provider_authorizer=(
             lambda exact: next_authorization if exact == next_preview else None
         ),
@@ -2435,7 +2497,11 @@ def test_active_video_reopens_after_later_paid_budget_revision(tmp_path: Path):
         committer=next_committer,
         provider=provider,
     )
-    next_service.start(attempt_id=next_attempt_id, request=next_resolved)
+    next_service.start(
+        attempt_id=next_attempt_id,
+        request=next_resolved,
+        execution_binding=prepared_next.binding,
+    )
     next_committer.record_paid_provider_submit_intent(
         next_preview,
         reservation_id="p8-video-reservation-2",

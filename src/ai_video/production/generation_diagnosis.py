@@ -163,6 +163,7 @@ class Intervention(StrictModel):
                          "CHANGE_PROVIDER_MODEL", "CHANGE_REFERENCE_STRATEGY",
                          "CAPABILITY_BOUNDARY"]
     closes: tuple[str, ...] = Field(min_length=1)
+    protected_requirements: tuple[str, ...] = ()
     support: tuple[str, ...] = Field(min_length=1)
     counterevidence: tuple[str, ...] = ()
     changed_variables: tuple[str, ...]
@@ -174,6 +175,9 @@ class Intervention(StrictModel):
     improvement_prediction: str = Field(min_length=1)
     falsification_prediction: str = Field(min_length=1)
     insufficient_evidence_condition: str = Field(min_length=1)
+    # Optional hashes bind the intended values of declared controlled variables
+    # without making explanatory wording a new experiment.
+    semantic_variable_hashes: tuple[tuple[str, str], ...] = ()
     resample_limit: int | None = Field(default=None, strict=True, gt=0)
 
     @model_validator(mode="after")
@@ -182,15 +186,66 @@ class Intervention(StrictModel):
             raise ValueError("diagnostic comparison must isolate one declared variable")
         if set(self.changed_variables) & set(self.held_constants):
             raise ValueError("changed variables cannot also be held constant")
+        if set(self.closes) & set(self.protected_requirements):
+            raise ValueError("targeted requirements cannot also be protected requirements")
+        semantic_names = [name for name, _ in self.semantic_variable_hashes]
+        if len(semantic_names) != len(set(semantic_names)):
+            raise ValueError("duplicate semantic variable hash")
+        if not set(semantic_names) <= set(self.changed_variables):
+            raise ValueError("semantic variable hash must name a changed variable")
+        if any(len(value) != 64 or any(char not in "0123456789abcdef" for char in value)
+               for _, value in self.semantic_variable_hashes):
+            raise ValueError("semantic variable hash must be SHA-256")
+        if (self.disposition == "GENERATE_ONCE" and self.purpose != "resample"
+                and not self.changed_variables):
+            raise ValueError("non-resample generation repair must change a declared variable")
+        if (self.disposition == "GENERATE_ONCE" and self.purpose != "resample"
+                and set(self.changed_variables) == {"seed"}):
+            raise ValueError("seed-only changes must use the bounded resample policy")
         if self.purpose == "resample" and self.resample_limit is None:
             raise ValueError("resampling requires its own finite limit")
         return self
 
     @property
     def semantic_hash(self):
-        return canonical_sha256(self.model_dump(mode="json", exclude={
-            "intervention_id", "candidate_id", "support", "counterevidence",
-            "confidence_basis", "regression_risks", "resample_limit"}))
+        """Stable identity for one controlled experiment, not its explanation.
+
+        Proposal IDs, evidence citations, confidence prose, predictions and the
+        caller-provided resample ceiling are audit context.  They must never
+        turn the same controlled action into a new experiment.
+        """
+        return canonical_sha256({
+            "schema": "generation-intervention-semantic/3",
+            "purpose": self.purpose,
+            "disposition": self.disposition,
+            "changed_variables": tuple(sorted(self.changed_variables)),
+            "uncontrolled_variables": tuple(sorted(self.uncontrolled_variables)),
+            "semantic_variable_hashes": tuple(sorted(self.semantic_variable_hashes)),
+        })
+
+
+PredictionOutcome = Literal["supported", "refuted", "undetermined"]
+
+
+def intervention_prediction_outcome(intervention: Intervention,
+                                    diagnosis: Diagnosis) -> PredictionOutcome:
+    """Classify the exact observable result of one intervention.
+
+    This records whether the stated target/protected requirements were observed.
+    It deliberately does not claim that the intervention caused the result.
+    """
+    blocking = {"UNKNOWN_OUTCOME", "RUNTIME_FAILURE", "RUBRIC_OR_STAGE_ERROR", "EVIDENCE_GAP"}
+    if blocking.intersection(diagnosis.failure_classes):
+        return "undetermined"
+    failed = set(diagnosis.failed_requirements)
+    preserved = set(diagnosis.preserved_requirements)
+    targeted = set(intervention.closes)
+    protected = set(intervention.protected_requirements)
+    if (targeted | protected) & failed:
+        return "refuted"
+    if targeted <= preserved and protected <= preserved:
+        return "supported"
+    return "undetermined"
 
 
 _COMPARISON_FIELDS = ("provider_name", "provider_kind", "model_id", "provider_profile",
@@ -231,6 +286,9 @@ def verify_intervention_comparison(intervention, before, after) -> dict:
         raise ValueError("claimed held constants changed in compiled requests")
     if delta["uncontrolled_stochasticity"] and "seed" not in intervention.uncontrolled_variables:
         raise ValueError("uncontrolled seed must be disclosed")
+    actual = dict(compiled_variable_hashes(after))
+    if any(actual.get(name) != value for name, value in intervention.semantic_variable_hashes):
+        raise ValueError("intended variable value differs from actual compiled request")
     return delta
 
 
@@ -241,6 +299,7 @@ def seal_intervention_comparison(intervention, baseline):
                               baseline_seed_controlled=baseline.seed is not None and baseline.seed >= 0,
                               variable_hashes=compiled_variable_hashes(baseline),
                               changed_variables=intervention.changed_variables,
+                              target_variable_hashes=intervention.semantic_variable_hashes,
                               held_constants=intervention.held_constants,
                               uncontrolled_variables=intervention.uncontrolled_variables)
 
@@ -252,6 +311,8 @@ def compiled_comparison_errors(comparison, request) -> tuple[str, ...]:
     actual = {name for name in left if left[name] != right[name]}
     if actual != set(comparison.changed_variables) or actual & set(comparison.held_constants):
         return ("generation_recipe.comparison.actual_delta",)
+    if any(right.get(name) != value for name, value in comparison.target_variable_hashes):
+        return ("generation_recipe.comparison.target_values",)
     if (not comparison.baseline_seed_controlled or request.seed is None or request.seed < 0) and "seed" not in comparison.uncontrolled_variables:
         return ("generation_recipe.comparison.uncontrolled_seed",)
     return ()

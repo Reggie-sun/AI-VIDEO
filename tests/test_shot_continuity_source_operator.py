@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from argparse import Namespace
+from dataclasses import replace
 from datetime import UTC, datetime
 import hashlib
 import importlib
@@ -48,7 +49,15 @@ from ai_video.production.shot_continuity_source_review import (
 )
 from ai_video.production.shot_continuity_source_qualification import (
     ShotContinuitySourceQualificationProfile,
+    ShotContinuitySourceQualificationProvider,
     load_source_qualification_profile,
+)
+from ai_video.production.shot_continuity_source_contracts import (
+    SourceQualificationInput,
+    SourceQualificationPreflightSnapshot,
+)
+from ai_video.production.shot_continuity_m0_qualification import (
+    M0ValidationPreflightSnapshot,
 )
 from ai_video.production.shot_continuity_source_runtime import (
     APPROVED_ENDPOINT_ROLE,
@@ -188,23 +197,25 @@ def _bind_profile_to_p0(
     return ShotContinuitySourceQualificationProfile.create(**values)
 
 
-class _RecordedProvider:
+class _RecordedProvider(ShotContinuitySourceQualificationProvider):
+    """Lifecycle fixture: mock external reopens, use the real owner proof."""
     def __init__(self) -> None:
         self.preflight_calls = 0
         self.submit_calls = 0
         self.poll_calls = 0
         self.fetch_calls = 0
         self.on_preflight = None
+        self.drift_on_preflight_call: int | None = None
 
     def validate_pre_effect(self, request: ResolvedVideoGenerationRequest):
         self.preflight_calls += 1
         if self.on_preflight is not None:
             self.on_preflight()
-        return SimpleNamespace(
+        snapshot = SourceQualificationPreflightSnapshot(
             qualification_profile_hash="1" * 64,
             source_execution_stack_hash=request.execution_stack_hash,
             sealed_seed=request.effective_seed,
-            p0=SimpleNamespace(
+            p0=M0ValidationPreflightSnapshot(
                 candidate_label="m0",
                 qualification_receipt_hash="2" * 64,
                 execution_stack_hash="3" * 64,
@@ -226,13 +237,13 @@ class _RecordedProvider:
             source_node_schema_hashes=(("SourceNode", "2" * 64),),
             component_hashes=(("diffusion", "3" * 64),),
             inputs=(
-                SimpleNamespace(
+                SourceQualificationInput(
                     file_name="a2.png",
                     data=b"SENSITIVE-A2-BYTES",
                     file_sha256="4" * 64,
                     size_bytes=18,
                 ),
-                SimpleNamespace(
+                SourceQualificationInput(
                     file_name="a3.png",
                     data=b"SENSITIVE-A3-BYTES",
                     file_sha256="5" * 64,
@@ -240,6 +251,9 @@ class _RecordedProvider:
                 ),
             ),
         )
+        if self.drift_on_preflight_call == self.preflight_calls:
+            return replace(snapshot, project_content_hash="0" * 64)
+        return snapshot
 
     def preview(
         self, request: ResolvedVideoGenerationRequest
@@ -724,6 +738,8 @@ def test_operator_keeps_preflight_read_only_and_stops_fetch_at_validate(
     assert outcome.provider_request_id == "source-operator-prompt-1"
     assert operator.status()["next_action"] == "poll"
     assert provider.submit_calls == 1
+    # caller initial preflight, owner proof reopen, then in-lock submit guard.
+    assert provider.preflight_calls == 5
 
     with pytest.raises(AiVideoError) as caught:
         operator.submit(require_new_attempt=True)
@@ -775,7 +791,38 @@ def test_operator_keeps_preflight_read_only_and_stops_fetch_at_validate(
     with pytest.raises(AiVideoError) as replacement_caught:
         replacement.submit(require_new_attempt=True)
     assert replacement_caught.value.code is ErrorCode.PRODUCTION_STATE_INVALID
-    assert provider.submit_calls == 1
+
+
+def test_operator_rejects_changed_reopened_closure_before_effect(
+    tmp_path: Path,
+) -> None:
+    module = _operator_module()
+    root, project = _prepare_project(tmp_path)
+    profile, document_hash = _profile_for(project)
+    provider = _RecordedProvider()
+    provider.drift_on_preflight_call = 2
+    operator = module.ShotContinuitySourceOperator(
+        project_root=root,
+        committer=make_source_production_committer(root, project),
+        provider=provider,
+        request=module.build_source_qualification_request(
+            project=project,
+            profile=profile,
+            profile_document_hash=document_hash,
+            generation_id="rainy-station-source-drift-v1",
+        ),
+        attempt_id="rainy-station-source-drift-attempt-v1",
+    )
+
+    with pytest.raises(AiVideoError, match="closure drifted before request write"):
+        operator.submit(require_new_attempt=True)
+
+    assert provider.preflight_calls == 2
+    assert provider.submit_calls == provider.poll_calls == provider.fetch_calls == 0
+    assert not any(
+        item.attempt_id == operator.attempt_id
+        for item in load_production_project(root / "project.yaml").manifest.attempts
+    )
 
 
 def test_preflight_detects_non_state_bundle_mutation(tmp_path: Path) -> None:

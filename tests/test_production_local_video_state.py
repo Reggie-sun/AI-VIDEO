@@ -53,10 +53,19 @@ from ai_video.production.video import (
 )
 from ai_video.production.video_fake import ScriptedFakeVideoProvider
 from ai_video.production.video_generation import VideoGenerationService
+from ai_video.production.video_compiler import (
+    ProviderNativePrompt,
+    compile_provider_video_request,
+)
 from ai_video.production.project import load_production_project
 from production_project_factory import (
     make_p8_video_candidate_preparer,
     make_p8_video_generation_base,
+)
+from production_generation_execution_factory import (
+    activate_generated_video_shot,
+    activate_fixture_generation_qa_policy,
+    prepare_generation_execution,
 )
 
 
@@ -70,6 +79,7 @@ class LocalVideoProviderDouble:
         *,
         capabilities,
         artifact_bytes: bytes,
+        native_prompt_text: str = "Generate the sealed local video request.",
         submit_error: ErrorCode | None = None,
         status_state: VideoTaskState = VideoTaskState.SUCCEEDED,
         status_error: ErrorCode | None = None,
@@ -79,6 +89,7 @@ class LocalVideoProviderDouble:
             artifact_bytes=artifact_bytes,
         )
         self._artifact_bytes = artifact_bytes
+        self._native_prompt_text = native_prompt_text
         self.submit_error = submit_error
         self.status_state = status_state
         self.status_error = status_error
@@ -91,6 +102,21 @@ class LocalVideoProviderDouble:
 
     def resolve(self, request):
         return self._delegate.resolve(request)
+
+    def compile_request(self, provider_bound, requirement):
+        prompt_text = self._native_prompt_text
+        return compile_provider_video_request(
+            provider_bound=provider_bound,
+            requirement=requirement,
+            compiler_id="local-video-state-fixture",
+            compiler_version="1",
+            capabilities=self.capabilities(),
+            native_prompt=ProviderNativePrompt(
+                grammar_contract="local-video-state-fixture-v1",
+                prompt_text=prompt_text,
+                prompt_sha256=hashlib.sha256(prompt_text.encode("utf-8")).hexdigest(),
+            ),
+        )
 
     def preview(self, request):
         return self._delegate.preview(request)
@@ -179,6 +205,7 @@ def _runtime(
     inputs = make_p8_video_generation_base(
         root, schema_version="2.13" if commercial else "2.8"
     )
+    inputs = activate_generated_video_shot(root=root, inputs=inputs)
     shot = inputs.project.shots[0]
     source = inputs.project.registry.assets[0]
     output = VideoOutputRequirement(
@@ -202,6 +229,9 @@ def _runtime(
     commercial_profile = (
         create_qingyan_ecommerce_acceptance_profile() if commercial else None
     )
+    inputs = activate_fixture_generation_qa_policy(root=root, inputs=inputs, output=output)
+    shot = inputs.project.shots[0]
+    source = inputs.project.registry.assets[0]
     if commercial:
         from test_production_generated_video_e2e import (
             COMMERCIAL_EVALUATOR,
@@ -306,11 +336,20 @@ def _runtime(
             provider_name=provider_name, variants=(variant,)
         ),
         artifact_bytes=FIXTURE.read_bytes(),
+        native_prompt_text=prompt_text,
         submit_error=submit_error,
         status_state=status_state,
         status_error=status_error,
     )
     resolved = provider.resolve(request)
+    prepared = prepare_generation_execution(
+        project=inputs.project,
+        provider=provider,
+        request=resolved,
+        task_id="local-video-state-fixture",
+        compiler_id="local-video-state-fixture",
+        compiler_version="1",
+    )
     committer = ProductionStateCommitter(
         root,
         video_candidate_preparer=make_p8_video_candidate_preparer(inputs),
@@ -340,7 +379,9 @@ def _runtime(
                 ),
                 strategy_rules_version="1",
                 semantic_requirement="required",
-                semantic_authorities=(COMMERCIAL_EVALUATOR,),
+                semantic_authorities=(COMMERCIAL_EVALUATOR, *inputs.project.qa_policy.semantic_authorities),
+                generation_acceptance=inputs.project.qa_policy.selected_generation_acceptance(),
+                generation_evaluation_authorities=inputs.project.qa_policy.generation_evaluation_authorities,
                 domain_acceptance=DomainAcceptancePolicy(
                     domain_id="ecommerce",
                     profile_id=commercial_profile.profile_id,
@@ -362,16 +403,20 @@ def _runtime(
             expected_manifest_revision=current.manifest_revision,
             attempt_id="activate-local-commercial-policy",
         )
-    return inputs, provider, resolved, committer
+    return inputs, provider, prepared.resolved, prepared.binding, committer
 
 
 def test_local_video_lifecycle_never_claims_paid_authority_and_replays_exactly(
     tmp_path: Path,
 ) -> None:
-    _, provider, resolved, committer = _runtime(tmp_path)
+    _, provider, resolved, execution_binding, committer = _runtime(tmp_path)
     service = VideoGenerationService(committer=committer, provider=provider)
 
-    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    service.start(
+        attempt_id=ATTEMPT_ID,
+        request=resolved,
+        execution_binding=execution_binding,
+    )
     submission = service.submit_local_once(attempt_id=ATTEMPT_ID)
     observation = service.refresh_local_once(attempt_id=ATTEMPT_ID)
 
@@ -430,13 +475,14 @@ def test_local_ecommerce_facade_uses_real_service_and_replays_zero_effect(
         _commercial_handoff,
     )
 
-    _, provider, resolved, committer = _runtime(tmp_path, commercial=True)
+    _, provider, resolved, execution_binding, committer = _runtime(tmp_path, commercial=True)
     facade = EcommerceVideoGenerationFacade(
         service=VideoGenerationService(committer=committer, provider=provider),
         attempt_id=ATTEMPT_ID,
         request=resolved,
         lane="local",
         commercial_reviewer=_CountingCommercialShotReviewer(),
+        execution_binding=execution_binding,
     )
     binding = resolved.commercial_binding
     assert binding is not None
@@ -468,15 +514,19 @@ def test_local_ecommerce_resume_rejects_durable_request_mismatch_before_effect(
 
     expected_root = tmp_path / "expected"
     durable_root = tmp_path / "durable"
-    _, _, expected_request, _ = _runtime(expected_root, commercial=True)
-    _, provider, durable_request, committer = _runtime(
+    _, _, expected_request, expected_execution_binding, _ = _runtime(expected_root, commercial=True)
+    _, provider, durable_request, durable_execution_binding, committer = _runtime(
         durable_root,
         commercial=True,
         commercial_plan_hash="b" * 64,
     )
     service = VideoGenerationService(committer=committer, provider=provider)
     if preexisting_attempt:
-        service.start(attempt_id=ATTEMPT_ID, request=durable_request)
+        service.start(
+            attempt_id=ATTEMPT_ID,
+            request=durable_request,
+            execution_binding=durable_execution_binding,
+        )
     binding = expected_request.commercial_binding
     assert binding is not None
     facade = EcommerceVideoGenerationFacade(
@@ -485,13 +535,18 @@ def test_local_ecommerce_resume_rejects_durable_request_mismatch_before_effect(
         request=expected_request,
         lane="local",
         commercial_reviewer=_CountingCommercialShotReviewer(),
+        execution_binding=expected_execution_binding,
     )
     competing_start_done = preexisting_attempt
 
     def start_competing_request_after_preflight() -> bool:
         nonlocal competing_start_done
         if not competing_start_done:
-            service.start(attempt_id=ATTEMPT_ID, request=durable_request)
+            service.start(
+                attempt_id=ATTEMPT_ID,
+                request=durable_request,
+                execution_binding=durable_execution_binding,
+            )
             competing_start_done = True
         return False
 
@@ -518,9 +573,13 @@ def test_local_ecommerce_duplicate_coordinator_claims_fetch_once(
         _commercial_handoff,
     )
 
-    _, provider, resolved, committer = _runtime(tmp_path, commercial=True)
+    _, provider, resolved, execution_binding, committer = _runtime(tmp_path, commercial=True)
     service = VideoGenerationService(committer=committer, provider=provider)
-    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    service.start(
+        attempt_id=ATTEMPT_ID,
+        request=resolved,
+        execution_binding=execution_binding,
+    )
     service.submit_local_once(attempt_id=ATTEMPT_ID)
     service.refresh_local_once(attempt_id=ATTEMPT_ID)
     facade = EcommerceVideoGenerationFacade(
@@ -529,6 +588,7 @@ def test_local_ecommerce_duplicate_coordinator_claims_fetch_once(
         request=resolved,
         lane="local",
         commercial_reviewer=_CountingCommercialShotReviewer(),
+        execution_binding=execution_binding,
     )
     binding = resolved.commercial_binding
     assert binding is not None
@@ -585,12 +645,12 @@ def test_local_ecommerce_guard_rechecks_completed_durable_request_identity(
         _commercial_handoff,
     )
 
-    _, _, expected_request, _ = _runtime(
+    _, _, expected_request, expected_execution_binding, _ = _runtime(
         tmp_path / "expected",
         commercial=True,
         prompt_text="Expected exact Qingyan commercial prompt.",
     )
-    _, provider, competing_request, committer = _runtime(
+    _, provider, competing_request, competing_execution_binding, committer = _runtime(
         tmp_path / "durable",
         commercial=True,
         prompt_text="Competing prompt with the same commercial binding.",
@@ -609,6 +669,7 @@ def test_local_ecommerce_guard_rechecks_completed_durable_request_identity(
         request=expected_request,
         lane="local",
         commercial_reviewer=_CountingCommercialShotReviewer(),
+        execution_binding=expected_execution_binding,
     )
     competing_facade = EcommerceVideoGenerationFacade(
         service=service,
@@ -616,6 +677,7 @@ def test_local_ecommerce_guard_rechecks_completed_durable_request_identity(
         request=competing_request,
         lane="local",
         commercial_reviewer=_CountingCommercialShotReviewer(),
+        execution_binding=competing_execution_binding,
     )
     assert expected_binding is not None
     handoff = _commercial_handoff(expected_binding.target_shot_id)
@@ -646,10 +708,14 @@ def test_local_ecommerce_guard_rechecks_completed_durable_request_identity(
 
 
 def test_t8_t2va_reuses_local_intent_permit_and_state_lifecycle(tmp_path: Path) -> None:
-    _, provider, resolved, committer = _runtime(tmp_path, t8_t2va=True)
+    _, provider, resolved, execution_binding, committer = _runtime(tmp_path, t8_t2va=True)
     service = VideoGenerationService(committer=committer, provider=provider)
 
-    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    service.start(
+        attempt_id=ATTEMPT_ID,
+        request=resolved,
+        execution_binding=execution_binding,
+    )
     submission = service.submit_local_once(attempt_id=ATTEMPT_ID)
     observation = service.refresh_local_once(attempt_id=ATTEMPT_ID)
 
@@ -674,12 +740,16 @@ def test_stack_bound_local_intent_requires_guard_inside_committer(
     tmp_path: Path,
 ) -> None:
     stack_hash = "e" * 64
-    _, provider, resolved, committer = _runtime(
+    _, provider, resolved, execution_binding, committer = _runtime(
         tmp_path,
         execution_stack_hash=stack_hash,
     )
     service = VideoGenerationService(committer=committer, provider=provider)
-    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    service.start(
+        attempt_id=ATTEMPT_ID,
+        request=resolved,
+        execution_binding=execution_binding,
+    )
     before = committer._read_manifest()
     preview = provider.preview(resolved)
 
@@ -710,12 +780,16 @@ def test_stack_drift_after_preview_denies_intent_permit_and_submit(
     tmp_path: Path,
 ) -> None:
     stack_hash = "e" * 64
-    _, provider, resolved, committer = _runtime(
+    _, provider, resolved, execution_binding, committer = _runtime(
         tmp_path,
         execution_stack_hash=stack_hash,
     )
     service = VideoGenerationService(committer=committer, provider=provider)
-    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    service.start(
+        attempt_id=ATTEMPT_ID,
+        request=resolved,
+        execution_binding=execution_binding,
+    )
     before = committer._read_manifest()
     guard_calls = 0
 
@@ -745,7 +819,7 @@ def test_stack_drift_after_preview_denies_intent_permit_and_submit(
 def test_t8_family_registry_assembly_restarts_without_last_selected_state(
     tmp_path: Path,
 ) -> None:
-    _, quality, resolved, committer = _runtime(tmp_path, t8_t2va=True)
+    _, quality, resolved, execution_binding, committer = _runtime(tmp_path, t8_t2va=True)
     quality_variant = quality.capabilities().variants[0]
     turbo_variant = VideoCapabilityVariant.model_validate(
         {
@@ -779,7 +853,11 @@ def test_t8_family_registry_assembly_restarts_without_last_selected_state(
     assert registry.resolve("minimax_hailuo") is hailuo
 
     service = VideoGenerationService(committer=committer, provider=selected)
-    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    service.start(
+        attempt_id=ATTEMPT_ID,
+        request=resolved,
+        execution_binding=execution_binding,
+    )
     service.submit_local_once(attempt_id=ATTEMPT_ID)
 
     restarted_family = LocalH3VideoProviderFamily((quality, turbo))
@@ -804,9 +882,13 @@ def test_t8_family_registry_assembly_restarts_without_last_selected_state(
 
 
 def test_local_submit_intent_recovery_stops_without_resubmit(tmp_path: Path) -> None:
-    _, provider, resolved, committer = _runtime(tmp_path)
+    _, provider, resolved, execution_binding, committer = _runtime(tmp_path)
     service = VideoGenerationService(committer=committer, provider=provider)
-    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    service.start(
+        attempt_id=ATTEMPT_ID,
+        request=resolved,
+        execution_binding=execution_binding,
+    )
     preview = provider.preview(resolved)
     intent, _ = committer.record_local_video_submit_intent(
         attempt_id=ATTEMPT_ID, preview=preview
@@ -829,11 +911,15 @@ def test_local_submit_intent_recovery_stops_without_resubmit(tmp_path: Path) -> 
 
 
 def test_local_submit_unknown_is_durable_and_never_resubmitted(tmp_path: Path) -> None:
-    _, provider, resolved, committer = _runtime(
+    _, provider, resolved, execution_binding, committer = _runtime(
         tmp_path, submit_error=ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN
     )
     service = VideoGenerationService(committer=committer, provider=provider)
-    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    service.start(
+        attempt_id=ATTEMPT_ID,
+        request=resolved,
+        execution_binding=execution_binding,
+    )
 
     with pytest.raises(AiVideoError) as exc_info:
         service.submit_local_once(attempt_id=ATTEMPT_ID)
@@ -854,11 +940,15 @@ def test_local_submit_unknown_is_durable_and_never_resubmitted(tmp_path: Path) -
 def test_local_known_pre_submit_failure_is_durable_without_prompt(
     tmp_path: Path,
 ) -> None:
-    _, provider, resolved, committer = _runtime(
+    _, provider, resolved, execution_binding, committer = _runtime(
         tmp_path, submit_error=ErrorCode.VIDEO_PROVIDER_FAILED
     )
     service = VideoGenerationService(committer=committer, provider=provider)
-    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    service.start(
+        attempt_id=ATTEMPT_ID,
+        request=resolved,
+        execution_binding=execution_binding,
+    )
 
     with pytest.raises(AiVideoError) as exc_info:
         service.submit_local_once(attempt_id=ATTEMPT_ID)
@@ -878,11 +968,15 @@ def test_local_known_pre_submit_failure_is_durable_without_prompt(
 def test_local_terminal_job_failure_is_durable_and_never_repolled(
     tmp_path: Path,
 ) -> None:
-    _, provider, resolved, committer = _runtime(
+    _, provider, resolved, execution_binding, committer = _runtime(
         tmp_path, status_state=VideoTaskState.FAILED
     )
     service = VideoGenerationService(committer=committer, provider=provider)
-    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    service.start(
+        attempt_id=ATTEMPT_ID,
+        request=resolved,
+        execution_binding=execution_binding,
+    )
     service.submit_local_once(attempt_id=ATTEMPT_ID)
     observation = service.refresh_local_once(attempt_id=ATTEMPT_ID)
 
@@ -903,11 +997,15 @@ def test_local_terminal_job_failure_is_durable_and_never_repolled(
 def test_local_poll_timeout_is_durable_outcome_unknown_and_never_repolled(
     tmp_path: Path,
 ) -> None:
-    _, provider, resolved, committer = _runtime(
+    _, provider, resolved, execution_binding, committer = _runtime(
         tmp_path, status_error=ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN
     )
     service = VideoGenerationService(committer=committer, provider=provider)
-    service.start(attempt_id=ATTEMPT_ID, request=resolved)
+    service.start(
+        attempt_id=ATTEMPT_ID,
+        request=resolved,
+        execution_binding=execution_binding,
+    )
     service.submit_local_once(attempt_id=ATTEMPT_ID)
 
     with pytest.raises(AiVideoError) as exc_info:
