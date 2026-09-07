@@ -10,6 +10,34 @@ Date: 2026-09-06
 
 ## Current Correction — S01 Hand Motion Rejected
 
+### Supersession — Human Audio Review Received On 2026-09-07
+
+用户对 exact attempt09 MP4 的正常速度试听问题（广播是否清楚完整、有无杂音或声音
+突变）回复“没问题”。该 human 音频分项为 PASS，替代下文“等待真实试听”的状态；
+不扩大为手部、嘴部视觉、间隙、胸牌或整体视频验收。原样问答和 identity 已保存于
+`runs/jieshi-e01-i2v-20260907-attempt10/human-audio-review-attempt09.json`，
+SHA-256 `678ef0b1155358e212493a7fc8bcff6a7519ece29eea11f62334dc9f0cb237bd`。
+
+旧 `legacy-14` 将 mouth / ambience / mix 合并为一个 human finding，因此本次补充
+没有直接将其整体判 PASS。`historical-audio-supplement.json` 保留聚合项
+NOT_EVALUATED，并引用已通过的音频分项；`previous-diagnosis-after-audio.json`
+实跑仍为 EVIDENCE_GAP + QUALITY_FAILURE。旧 Gate、historical evidence 与旧诊断未覆盖。
+
+Parent 与 native `reviewer_xhigh` 重新查看同一 MCP 缓存帧；reviewer 核对帧 bytes。
+现有 1.5、2.5、3.5、4 秒帧不足以正面证明小间隙且不接触，未见按压不等于悬停
+PASS；3.5–4 秒不能抵消前 3 秒动作失败。空白牌面不足以判断正反，不能新增姓名头像
+已消失的 confirmed FAIL。当前 readiness review 为 reject；没有核心代码修复需求。
+
+最小下一步是对同一旧 MP4 的前 3 秒补真实视觉判断：近窗非接触悬停是否可读、
+工牌可见外观是否连贯。Acceptance owner 的显式新版本可区分约 2cm 的观看目标与
+不可标定物理深度、可见牌体连续性与不可见文字、音频与嘴部 proof；不得删除要求或
+改写旧结论。“看不清”只能作为悬停可读性 criterion 的 FAIL，不是物理接触证据。
+
+本轮 strict reopen 仍为 Manifest revision 4，只有 endpoint import attempt；没有
+Provider POST、poll、fetch、续期 profile、新 MP4、activation 或 S02。声音确认没有
+耗用新生成额度。当前补证不是独立实验，`distill-ai-video-learning` 评估 no_candidate。
+没有修改核心代码或重复全量测试；七个 unrelated staged files 保留，不 push。
+
 ### Supersession — Approved Endpoint Imported On 2026-09-07
 
 下文第三张候选“未注册、未获得human approval”现为历史状态。用户在看到 exact
