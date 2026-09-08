@@ -69,21 +69,78 @@ class _StateCommitPaidProviderMixin:
     def _reopen_paid_budget(
         self, pointer: PaidProviderBudgetSnapshotPointer
     ) -> PaidProviderBudgetSnapshot:
+        from ai_video.production._paid_provider_project_reader import load_paid_provider_budget
         try:
-            raw = _read_regular_file_nofollow(
-                self._project_root / pointer.path,
-                contained_by=self._project_root / "state",
-            )
-            snapshot = PaidProviderBudgetSnapshot.model_validate_json(raw.data)
-        except (OSError, ValidationError, ValueError) as exc:
+            return load_paid_provider_budget(self._project_root, pointer)
+        except Exception as exc:
             raise _state_invalid("Paid Provider budget could not be reopened.", str(exc)) from exc
-        if (
-            raw.file_sha256 != pointer.file_sha256
-            or snapshot.revision != pointer.revision
-            or snapshot.content_hash != pointer.content_hash
-        ):
-            raise _state_invalid("Paid Provider budget pointer identity is invalid.")
-        return snapshot
+
+    def extend_paid_provider_budget(self, entry):
+        """Atomically select one sealed, explicit ledger-ceiling extension."""
+        from ai_video.production.paid_provider_budget_extension import PaidProviderBudgetCeilingExtension
+
+        if not isinstance(entry, PaidProviderBudgetCeilingExtension):
+            raise _state_invalid("Paid Provider budget extension is invalid.")
+        try:
+            entry = PaidProviderBudgetCeilingExtension.model_validate_json(entry.model_dump_json())
+        except ValueError as exc:
+            raise _state_invalid("Paid Provider budget extension seal is invalid.", str(exc)) from exc
+        with self._exclusive_lock():
+            manifest = self._read_manifest()
+            current = manifest.active_paid_provider_budget
+            if current is None:
+                raise _state_invalid("Paid Provider budget extension requires an active ledger.")
+            from ai_video.production.project import load_production_project
+            try:
+                loaded = load_production_project(self._project_root / "project.yaml")
+                if loaded.manifest != manifest:
+                    raise ValueError("Manifest changed during budget extension validation")
+            except Exception as exc:
+                raise _state_invalid("Paid Provider budget extension requires a standard project reopen.", str(exc)) from exc
+            budget = self._reopen_paid_budget(current)
+            existing = next((x for x in budget.ceiling_extensions if x.extension_id == entry.extension_id), None)
+            if existing is not None:
+                if existing != entry:
+                    raise _state_invalid("Paid Provider budget extension ID collision differs.")
+                return manifest
+            if (
+                entry.project_id != manifest.project_id
+                or entry.explicit_opt_in is not True
+                or not entry.authorization_receipt_id
+                or entry.expected_manifest_revision != manifest.manifest_revision
+                or entry.base_budget != current
+                or entry.policy_id != budget.policy_id
+                or entry.currency != budget.currency
+                or entry.old_ceiling_microunits != budget.project_ceiling_microunits
+                or not entry.valid_at(self._paid_provider_clock())
+                or budget.blocked
+                or any(a.status in {StateCommitStatus.RUNNING, StateCommitStatus.OUTCOME_UNKNOWN}
+                       for a in manifest.attempts)
+                or any(r.status.value == "unsettled" for r in budget.reservations)
+            ):
+                raise _state_invalid("Paid Provider budget extension preconditions are not current.")
+            updated = PaidProviderBudgetSnapshot.create(
+                revision=budget.revision + 1,
+                policy_id=budget.policy_id,
+                currency=budget.currency,
+                project_ceiling_microunits=entry.new_ceiling_microunits,
+                reservations=budget.reservations,
+                ceiling_extensions=(*budget.ceiling_extensions, entry),
+                blocked=False,
+            )
+            artifact = _artifact(canonical_paid_provider_budget_path(updated.content_hash), updated)
+            pointer = PaidProviderBudgetSnapshotPointer(
+                path=artifact.relative_path, revision=updated.revision,
+                content_hash=updated.content_hash, file_sha256=artifact.file_sha256,
+            )
+            self._write_immutable_artifact(artifact, attempt_id=entry.extension_id)
+            next_manifest = _validated_transition(manifest, {
+                "manifest_revision": manifest.manifest_revision + 1,
+                "active_paid_provider_budget": pointer,
+            })
+            self._write_manifest_atomic(next_manifest)
+            self._reopen_paid_budget(pointer)
+            return self._read_manifest()
 
     def _reopen_paid_gate(
         self, pointer: PaidProviderGateReceiptPointer

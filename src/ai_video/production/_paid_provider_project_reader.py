@@ -48,8 +48,10 @@ def _root_and_path(root: str | Path, stored: Path) -> tuple[Path, Path]:
 
 
 def load_paid_provider_budget(
-    root: str | Path, pointer: PaidProviderBudgetSnapshotPointer
+    root: str | Path, pointer: PaidProviderBudgetSnapshotPointer, *, _seen=frozenset()
 ) -> PaidProviderBudgetSnapshot:
+    if pointer.content_hash in _seen:
+        raise _invalid("Paid Provider budget extension base is cyclic.")
     resolved_root, resolved = _root_and_path(root, pointer.path)
     try:
         raw = _read_regular_file_nofollow(resolved, contained_by=resolved_root / "state")
@@ -62,7 +64,60 @@ def load_paid_provider_budget(
         or budget.content_hash != pointer.content_hash
     ):
         raise _invalid("Paid Provider budget pointer identity is invalid.")
+    _verify_budget_extensions(resolved_root, budget, _seen | {pointer.content_hash})
     return budget
+
+
+def _verify_budget_extensions(root: Path, budget: PaidProviderBudgetSnapshot, seen) -> None:
+    extensions = budget.ceiling_extensions
+    if len({item.extension_id for item in extensions}) != len(extensions):
+        raise _invalid("Paid Provider budget extension IDs are duplicated.")
+    previous = None
+    for index, entry in enumerate(extensions):
+        if (
+            entry.policy_id != budget.policy_id
+            or entry.currency != budget.currency
+            or entry.new_ceiling_microunits <= entry.old_ceiling_microunits
+        ):
+            raise _invalid("Paid Provider budget extension metadata is invalid.")
+        if previous is not None and entry.old_ceiling_microunits != previous.new_ceiling_microunits:
+            raise _invalid("Paid Provider budget extension chain is discontinuous.")
+        try:
+            base = load_paid_provider_budget(root, entry.base_budget, _seen=seen)
+        except AiVideoError as exc:
+            raise _invalid("Paid Provider budget extension base is invalid.", str(exc)) from exc
+        if (
+            base.policy_id != entry.policy_id
+            or base.currency != entry.currency
+            or base.project_ceiling_microunits != entry.old_ceiling_microunits
+            or base.ceiling_extensions != extensions[:index]
+            or base.blocked
+            or any(item.status is BudgetReservationStatus.UNSETTLED for item in base.reservations)
+            or budget.revision <= base.revision
+        ):
+            raise _invalid("Paid Provider budget extension base chain is invalid.")
+        # The first snapshot produced by this extension is deterministic: it
+        # changes only the ceiling and appends the sealed entry.  Reopening it
+        # proves the extension did not rewrite reservations at publication.
+        expected = PaidProviderBudgetSnapshot.create(
+            revision=base.revision + 1,
+            policy_id=base.policy_id,
+            currency=base.currency,
+            project_ceiling_microunits=entry.new_ceiling_microunits,
+            reservations=base.reservations,
+            ceiling_extensions=(*base.ceiling_extensions, entry),
+            blocked=False,
+        )
+        if budget.content_hash != expected.content_hash:
+            try:
+                derived = load_paid_provider_budget_by_content_hash(root, expected.content_hash)
+            except AiVideoError as exc:
+                raise _invalid("Paid Provider first extension snapshot is missing.", str(exc)) from exc
+            if derived != expected:
+                raise _invalid("Paid Provider first extension snapshot is invalid.")
+        previous = entry
+    if extensions and budget.project_ceiling_microunits != extensions[-1].new_ceiling_microunits:
+        raise _invalid("Paid Provider budget extension ceiling regressed.")
 
 
 def load_paid_provider_budget_by_content_hash(
@@ -80,6 +135,7 @@ def load_paid_provider_budget_by_content_hash(
         raise _invalid("Could not reopen historical paid Provider budget.", str(exc)) from exc
     if budget.content_hash != content_hash:
         raise _invalid("Historical paid Provider budget identity is invalid.")
+    _verify_budget_extensions(resolved_root, budget, {content_hash})
     return budget
 
 
@@ -125,6 +181,8 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
     if pointer is None:
         return
     budget = load_paid_provider_budget(root, pointer)
+    if any(entry.project_id != manifest.project_id for entry in budget.ceiling_extensions):
+        raise _invalid("Paid Provider budget extension project is invalid.")
     reservations = {item.reservation_id: item for item in budget.reservations}
     external_effect_ids: list[str] = []
     for attempt in paid_attempts:

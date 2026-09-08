@@ -8,11 +8,12 @@ from enum import Enum
 from typing import Literal, Protocol
 from urllib.parse import urlsplit
 
-from pydantic import ConfigDict, Field, field_validator, model_validator
+from pydantic import ConfigDict, Field, field_validator, model_validator, model_serializer
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import ActorIdentity, StrictModel
+from ai_video.production.paid_provider_budget_extension import PaidProviderBudgetCeilingExtension
 
 
 _SAFE_ID = re.compile(r"^[A-Za-z0-9._:/-]{1,512}$")
@@ -226,8 +227,16 @@ class PaidProviderBudgetSnapshot(_PaidStrictModel):
     currency: str = Field(pattern=r"^[A-Z]{3}$")
     project_ceiling_microunits: int = Field(strict=True, gt=0)
     reservations: tuple[PaidProviderBudgetReservation, ...] = ()
+    ceiling_extensions: tuple[PaidProviderBudgetCeilingExtension, ...] = ()
     blocked: bool = Field(strict=True)
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_serializer(mode="wrap")
+    def _legacy_empty_extensions(self, handler):
+        data = handler(self)
+        if not self.ceiling_extensions:
+            data.pop("ceiling_extensions", None)
+        return data
 
     @model_validator(mode="after")
     def _validate_seal_and_uniqueness(self) -> "PaidProviderBudgetSnapshot":
@@ -332,6 +341,7 @@ def reserve_paid_provider_budget(
         currency=snapshot.currency,
         project_ceiling_microunits=snapshot.project_ceiling_microunits,
         reservations=snapshot.reservations + (reservation,),
+        ceiling_extensions=snapshot.ceiling_extensions,
         blocked=False,
     )
     return updated, reservation
@@ -430,6 +440,7 @@ def _replace_reservation(
         currency=snapshot.currency,
         project_ceiling_microunits=snapshot.project_ceiling_microunits,
         reservations=reservations,
+        ceiling_extensions=snapshot.ceiling_extensions,
         blocked=(
             snapshot.blocked
             or sum(
@@ -534,6 +545,7 @@ def settle_paid_provider_budget(
             currency=next_snapshot.currency,
             project_ceiling_microunits=next_snapshot.project_ceiling_microunits,
             reservations=next_snapshot.reservations,
+            ceiling_extensions=next_snapshot.ceiling_extensions,
             blocked=True,
         )
     return next_snapshot
