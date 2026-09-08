@@ -8,7 +8,56 @@ learning_eligibility: ineligible
 
 Date: 2026-09-08
 
-## Current Engineering Checkpoint — Explicit Failed-Result Abandonment
+## Latest Runtime Checkpoint — Attempt 13 Timing FAIL (2026-09-09)
+
+用户明确允许的终结入口已提交为 `5c711fd`。99项 focused tests通过；正式 Harness
+`.agent/harness/runs/20260908-s01-explicit-abandonment/receipt.json` 针对精确
+`b800141..5c711fd` 全部12 checks通过，2,953 passed / 1 skipped；
+`verify-receipt` 证明 scope、完整性、freshness 与隔离清理均通过。
+独立 `reviewer_xhigh` 核对核心终结/反馈契约，父代理按其建议补足反馈闭环测试；随后复核
+实际提交脚本，修复文本见证失配后 scoped re-review 为 accept。
+
+真实 attempt12 经唯一 committer 从 r51终结至r52，receipt
+`88b629f54a968d98c2c14f4d03ab5ca54bfb7716b307af137ac4deabf9734255`。
+保留 legacy-03 FAIL、legacy-05 NOT_EVALUATED、exact MP4、全部评价和 paid state；
+实测原参数 replay 零新增写入。新图依赖事务至r54，预算扩展至r55，attempt13 request
+至r56，same-task quota3→4至r57；各扩展均保留旧 reservations，不代表结算或退款。
+
+新规划只把时间动作表达简化为开头一次连贯抬臂与随后保持自然呼吸的悬停；
+实际 compiled delta仅 `prompt_text` 与已有operator upper bound的profile续期。
+原首末PNG、seed20260907、Vidu Q3Pro、I2V、4秒1080p、点名广播与frozen QA保持。
+本次是待验证的prompt修复假设，不声称已证明模型支持；未查官方价格。
+唯一POST于2026-09-08 16:25 UTC发出并返回200，随后canonical接受回执落盘，
+同一任务状态succeeded后取回；本机假DNS用仅限本次fetch进程的公共解析恢复。
+
+新 MP4 SHA `d6a636d5fe19c1a9cbdd23d5bbb160ce3b2e91b8379d40346ff12e69aebff922`，
+3,305,001 bytes，位于同Production root的 `state/video-generation/fetch/files/`。
+project-local MCP实测1080×1920、24fps、97帧、4.042秒容器、H264/AAC48kHz stereo。
+父代理检查17帧/0.25秒及5张1080px补充帧：1.5秒手仍低于目标且手指近水平，
+约2.75–3秒才接近末帧悬停，legacy-03仍FAIL，本次修复假设未通过。
+掌向因细节与运动模糊仍NOT_EVALUATED。Whisper medium识别原点名广播，
+两次配置的segment end为2.44/2.32秒，未返回word timestamps，不能据此确认
+2.2秒末字边界，legacy-13保留NOT_EVALUATED；同音字不判为发音失败。
+human06/14/17等待本片实际观感，不继承旧片回复。legacy-15属最终composition，
+不作为raw blocker。变化的玻璃暗影另存为视觉concern，不能凭局部指标豁免整体质量。
+
+真实 initialized MCP bridge 已写入正式评价；严格重开得到Manifest r62、
+attempt13 RUNNING/VALIDATE，experience
+`a098eb77a136bfe65cc4ebec13bc4e0a7122aec76d46906297faf85605cbb34c`，
+diagnosis为EVIDENCE_GAP + QUALITY_FAILURE，仅legacy-03为明确FAIL。
+budget r15保留4份reservation，available为0；没有结算、释放或candidate activation。
+
+证据与精确执行脚本保存在 `preparation-v5/`，包括Gate、MCP响应、补充帧、
+编译对比、授权来源、扩展/replay检查及sanitized live events。task额度4/used4，
+本次唯一追加授权已消费，无自动重试、S02、candidate activation、P6或Final Acceptance。
+原冻结派生片仍为已拒绝历史，未重做加速/clone-tail，也未覆盖任何旧媒体。
+
+按 `record-ai-video-session` 更新同一主记录；自动 `distill-ai-video-learning`
+评估no_candidate：单次新prompt实验失败尚不能证明可采用的修复策略或模型硬限制，
+不将不同proof层、旧片与新记录数量当作新的独立支持。无关暂存工作保持，未push，
+未因记录新增Provider调用或重建RAG。
+
+## Engineering Checkpoint — Explicit Failed-Result Abandonment
 
 用户在恢复 S01 后明确“允许”实现证据无法补齐的失败结果终结入口。
 `ProductionStateCommitter.abandon_video_generation()` 复用原 quality rejection 的单一事务，
@@ -35,7 +84,7 @@ fake Provider 下自动读取 `/2` → compile/create binding → service.start 
 工具实现”保留为根因记录时的历史事实。该实现不改变冻结预览的用户 FAIL/撤回结论，
 不修复 S01 媒体、不使用旧付费授权、不修改 Manifest，也不产生新的质量验收。
 
-## Latest Checkpoint — Freeze Preview Rejected And Root Cause
+## Historical Checkpoint — Freeze Preview Rejected And Root Cause
 
 用户明确拒绝派生片 `090b4c605a400b712fa41d27028352bd6b38d6ba0436dda280b78a730b9840e3`：
 “没道理,你这加速完后面静图是什么意思”，并要求查明根因。

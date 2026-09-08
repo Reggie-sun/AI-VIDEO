@@ -2,7 +2,22 @@
 
 ## Current State
 
-### Latest Continuation — Timing Preview Rejected
+### Latest Continuation — Attempt 13 Timing FAIL (2026-09-09)
+
+已完成允许的显式失败终结入口与正式Harness验证（`5c711fd`），attempt12在r52
+终结，原FAIL/NOT_EVALUATED、媒体、评价和付费状态保留，replay零新增写入。
+既有一次追加授权已用于Vidu Q3Pro attempt13，原首末帧、seed、广播、QA保持。
+新片SHA `d6a636d5fe19c1a9cbdd23d5bbb160ce3b2e91b8379d40346ff12e69aebff922`，
+3,305,001 bytes，1080×1920/24fps/97frames/4.042秒，原生AAC48kHz stereo。
+实测1.5秒未到位，约2.75–3秒接近末帧，legacy-03仍FAIL。
+掌向、广播2.2秒截止证据及本片human观感未齐，不认定修复成功或激活；
+task总ceiling4/used4，没有剩余自动提交额度，未进入S02。
+正式MCP评价写入并严格重开：Manifest r62、attempt13 RUNNING/VALIDATE，
+diagnosis为EVIDENCE_GAP + QUALITY_FAILURE，paid reservations共4份保持。
+`preparation-v5/` 保存exact Gate、MCP、授权、compiled delta及执行来源；
+详见主记录。下方“追加授权未使用”等状态均为历史。
+
+### Historical Continuation — Timing Preview Rejected
 
 用户已拒绝下方本地预览：加速后约2.5秒整帧冻结，不符合自然连续镜头。
 该片撤回，human自然动态FAIL；`../jieshi-s01-retime-review-20260908-v1/human-rejection.json`
