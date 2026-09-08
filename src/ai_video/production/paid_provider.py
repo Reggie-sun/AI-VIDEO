@@ -14,6 +14,7 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import ActorIdentity, StrictModel
 from ai_video.production.paid_provider_budget_extension import PaidProviderBudgetCeilingExtension
+from ai_video.production.paid_provider_submit_quota import PaidProviderSubmitQuotaExtension
 
 
 _SAFE_ID = re.compile(r"^[A-Za-z0-9._:/-]{1,512}$")
@@ -228,6 +229,7 @@ class PaidProviderBudgetSnapshot(_PaidStrictModel):
     project_ceiling_microunits: int = Field(strict=True, gt=0)
     reservations: tuple[PaidProviderBudgetReservation, ...] = ()
     ceiling_extensions: tuple[PaidProviderBudgetCeilingExtension, ...] = ()
+    submit_quota_extensions: tuple[PaidProviderSubmitQuotaExtension, ...] = ()
     blocked: bool = Field(strict=True)
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
 
@@ -236,16 +238,21 @@ class PaidProviderBudgetSnapshot(_PaidStrictModel):
         data = handler(self)
         if not self.ceiling_extensions:
             data.pop("ceiling_extensions", None)
+        if not self.submit_quota_extensions:
+            data.pop("submit_quota_extensions", None)
         return data
 
     @model_validator(mode="after")
     def _validate_seal_and_uniqueness(self) -> "PaidProviderBudgetSnapshot":
         reservation_ids = [item.reservation_id for item in self.reservations]
         attempt_ids = [item.attempt_id for item in self.reservations]
+        quota_extension_ids = [item.extension_id for item in self.submit_quota_extensions]
         if len(reservation_ids) != len(set(reservation_ids)):
             raise ValueError("paid Provider reservation IDs must be unique")
         if len(attempt_ids) != len(set(attempt_ids)):
             raise ValueError("paid Provider attempts can reserve only once")
+        if len(quota_extension_ids) != len(set(quota_extension_ids)):
+            raise ValueError("paid Provider submit quota extension IDs must be unique")
         data = self.model_dump(mode="json", exclude={"content_hash"})
         if canonical_sha256(data) != self.content_hash:
             raise ValueError("paid Provider budget content hash does not match")
@@ -342,6 +349,7 @@ def reserve_paid_provider_budget(
         project_ceiling_microunits=snapshot.project_ceiling_microunits,
         reservations=snapshot.reservations + (reservation,),
         ceiling_extensions=snapshot.ceiling_extensions,
+        submit_quota_extensions=snapshot.submit_quota_extensions,
         blocked=False,
     )
     return updated, reservation
@@ -441,6 +449,7 @@ def _replace_reservation(
         project_ceiling_microunits=snapshot.project_ceiling_microunits,
         reservations=reservations,
         ceiling_extensions=snapshot.ceiling_extensions,
+        submit_quota_extensions=snapshot.submit_quota_extensions,
         blocked=(
             snapshot.blocked
             or sum(
@@ -546,6 +555,7 @@ def settle_paid_provider_budget(
             project_ceiling_microunits=next_snapshot.project_ceiling_microunits,
             reservations=next_snapshot.reservations,
             ceiling_extensions=next_snapshot.ceiling_extensions,
+            submit_quota_extensions=next_snapshot.submit_quota_extensions,
             blocked=True,
         )
     return next_snapshot

@@ -64,7 +64,9 @@ def load_paid_provider_budget(
         or budget.content_hash != pointer.content_hash
     ):
         raise _invalid("Paid Provider budget pointer identity is invalid.")
-    _verify_budget_extensions(resolved_root, budget, _seen | {pointer.content_hash})
+    seen = _seen | {pointer.content_hash}
+    _verify_budget_extensions(resolved_root, budget, seen)
+    _verify_submit_quota_extensions(resolved_root, budget, seen)
     return budget
 
 
@@ -106,6 +108,7 @@ def _verify_budget_extensions(root: Path, budget: PaidProviderBudgetSnapshot, se
             project_ceiling_microunits=entry.new_ceiling_microunits,
             reservations=base.reservations,
             ceiling_extensions=(*base.ceiling_extensions, entry),
+            submit_quota_extensions=base.submit_quota_extensions,
             blocked=False,
         )
         if budget.content_hash != expected.content_hash:
@@ -118,6 +121,59 @@ def _verify_budget_extensions(root: Path, budget: PaidProviderBudgetSnapshot, se
         previous = entry
     if extensions and budget.project_ceiling_microunits != extensions[-1].new_ceiling_microunits:
         raise _invalid("Paid Provider budget extension ceiling regressed.")
+
+
+def _verify_submit_quota_extensions(root: Path, budget: PaidProviderBudgetSnapshot, seen) -> None:
+    """Verify the immutable publication chain without treating it as lifecycle."""
+    extensions = budget.submit_quota_extensions
+    if len({item.extension_id for item in extensions}) != len(extensions):
+        raise _invalid("Paid Provider submit quota extension IDs are duplicated.")
+    for index, entry in enumerate(extensions):
+        try:
+            base = load_paid_provider_budget(root, entry.base_budget, _seen=seen)
+            from ai_video.production._generation_feedback_reader import (
+                load_generation_execution_binding,
+            )
+
+            target_binding = load_generation_execution_binding(root, entry.target_binding)
+            prior_binding = load_generation_execution_binding(root, entry.prior_binding)
+        except AiVideoError as exc:
+            raise _invalid("Paid Provider submit quota extension base is invalid.", str(exc)) from exc
+        except (OSError, ValueError) as exc:
+            raise _invalid("Paid Provider submit quota extension bindings are invalid.", str(exc)) from exc
+        target_limits = target_binding.inputs.limits
+        prior_limits = prior_binding.inputs.limits
+        if (
+            not entry.authorization_receipt_id
+            or entry.explicit_opt_in is not True
+            or target_limits.task_id != entry.task_id
+            or prior_limits.task_id != entry.task_id
+            or target_limits.paid_submit_ceiling != entry.new_paid_submit_ceiling
+            or prior_limits.paid_submit_ceiling != entry.old_paid_submit_ceiling
+            or base.submit_quota_extensions != extensions[:index]
+            or base.blocked
+            or any(item.status is BudgetReservationStatus.UNSETTLED for item in base.reservations)
+            or any(item.attempt_id == entry.target_attempt_id for item in base.reservations)
+            or budget.revision <= base.revision
+        ):
+            raise _invalid("Paid Provider submit quota extension chain is invalid.")
+        expected = PaidProviderBudgetSnapshot.create(
+            revision=base.revision + 1,
+            policy_id=base.policy_id,
+            currency=base.currency,
+            project_ceiling_microunits=base.project_ceiling_microunits,
+            reservations=base.reservations,
+            ceiling_extensions=base.ceiling_extensions,
+            submit_quota_extensions=(*base.submit_quota_extensions, entry),
+            blocked=False,
+        )
+        if budget.content_hash != expected.content_hash:
+            try:
+                derived = load_paid_provider_budget_by_content_hash(root, expected.content_hash)
+            except AiVideoError as exc:
+                raise _invalid("Paid Provider first submit quota snapshot is missing.", str(exc)) from exc
+            if derived != expected:
+                raise _invalid("Paid Provider first submit quota snapshot is invalid.")
 
 
 def load_paid_provider_budget_by_content_hash(
@@ -136,6 +192,7 @@ def load_paid_provider_budget_by_content_hash(
     if budget.content_hash != content_hash:
         raise _invalid("Historical paid Provider budget identity is invalid.")
     _verify_budget_extensions(resolved_root, budget, {content_hash})
+    _verify_submit_quota_extensions(resolved_root, budget, {content_hash})
     return budget
 
 
@@ -183,6 +240,22 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
     budget = load_paid_provider_budget(root, pointer)
     if any(entry.project_id != manifest.project_id for entry in budget.ceiling_extensions):
         raise _invalid("Paid Provider budget extension project is invalid.")
+    if any(entry.project_id != manifest.project_id for entry in budget.submit_quota_extensions):
+        raise _invalid("Paid Provider submit quota extension project is invalid.")
+    for entry in budget.submit_quota_extensions:
+        target = next((item for item in manifest.attempts if item.attempt_id == entry.target_attempt_id), None)
+        prior = next((item for item in manifest.attempts if item.attempt_id == entry.prior_attempt_id), None)
+        if (
+            target is None
+            or prior is None
+            or target.operation != "video_generation"
+            or prior.operation != "video_generation"
+            or target.video_generation_state is None
+            or prior.video_generation_state is None
+            or target.video_generation_state.execution_binding != entry.target_binding
+            or prior.video_generation_state.execution_binding != entry.prior_binding
+        ):
+            raise _invalid("Paid Provider submit quota extension attempt binding is invalid.")
     initial_ceiling = (
         budget.ceiling_extensions[0].old_ceiling_microunits
         if budget.ceiling_extensions else budget.project_ceiling_microunits
@@ -240,6 +313,8 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
             or budget.revision < gate_budget.revision
             or budget.ceiling_extensions[:len(gate_budget.ceiling_extensions)]
             != gate_budget.ceiling_extensions
+            or budget.submit_quota_extensions[:len(gate_budget.submit_quota_extensions)]
+            != gate_budget.submit_quota_extensions
         ):
             raise _invalid("Paid Provider budget lineage differs from retained Gate authorization.")
         gate_reservation = next(

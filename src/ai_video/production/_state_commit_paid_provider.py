@@ -126,6 +126,7 @@ class _StateCommitPaidProviderMixin:
                 project_ceiling_microunits=entry.new_ceiling_microunits,
                 reservations=budget.reservations,
                 ceiling_extensions=(*budget.ceiling_extensions, entry),
+                submit_quota_extensions=budget.submit_quota_extensions,
                 blocked=False,
             )
             artifact = _artifact(canonical_paid_provider_budget_path(updated.content_hash), updated)
@@ -141,6 +142,13 @@ class _StateCommitPaidProviderMixin:
             self._write_manifest_atomic(next_manifest)
             self._reopen_paid_budget(pointer)
             return self._read_manifest()
+
+    def extend_paid_provider_submit_quota(self, entry):
+        from ai_video.production.paid_provider_submit_quota import (
+            _extend_paid_provider_submit_quota,
+        )
+
+        return _extend_paid_provider_submit_quota(self, entry)
 
     def _reopen_paid_gate(
         self, pointer: PaidProviderGateReceiptPointer

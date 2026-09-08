@@ -212,7 +212,7 @@ checks:
     cwd: .
     description: Verify image contracts, local adapter, truthful import, activation, and recovery.
   production_video_provider_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_budget_extension.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_video_pre_generation.py, tests/test_production_ecommerce_shot_candidate_gate.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_shot_continuity_source_review.py, tests/test_shot_continuity_source_operator.py, tests/test_shot_continuity_source_transport.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_budget_extension.py, tests/test_production_paid_submit_quota.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_video_pre_generation.py, tests/test_production_ecommerce_shot_candidate_gate.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_shot_continuity_source_review.py, tests/test_shot_continuity_source_operator.py, tests/test_shot_continuity_source_transport.py, -q]
     cwd: .
     covered_by_check_ids: [production_contract_tests]
     description: Verify paid-provider safety and generated-video contracts without live submit.
@@ -790,6 +790,7 @@ categories:
       - src/ai_video/production/remote_media.py
       - src/ai_video/production/paid_provider.py
       - src/ai_video/production/paid_provider_budget_extension.py
+      - src/ai_video/production/paid_provider_submit_quota.py
       - src/ai_video/production/video.py
       - src/ai_video/production/video_request_models.py
       - src/ai_video/production/commercial_video_contracts.py
@@ -840,6 +841,7 @@ categories:
       - src/ai_video/production/_state_commit_video*.py
       - tests/test_production_paid_provider.py
       - tests/test_production_paid_budget_extension.py
+      - tests/test_production_paid_submit_quota.py
       - tests/test_production_paid_provider_state.py
       - tests/test_production_paid_provider_e2e.py
       - tests/test_production_minimax_h3.py

@@ -337,6 +337,27 @@ class _StateCommitVideoMixin:
 
         loaded = self._load_production_project(self._project_root / "project.yaml")
         family_ids = production_family_shot_ids(loaded, binding.context.target_shot_id)
+        def quota_raise_is_retained(prior_limits) -> bool:
+            pointer = getattr(manifest, "active_paid_provider_budget", None)
+            current_attempt = next(
+                (item for item in manifest.attempts if item.video_generation_state == state),
+                None,
+            )
+            if pointer is None or state.execution_binding is None or current_attempt is None:
+                return False
+            try:
+                budget = self._reopen_paid_budget(pointer)
+            except Exception:
+                return False
+            return any(
+                entry.target_attempt_id == current_attempt.attempt_id
+                and entry.target_binding == state.execution_binding
+                and entry.task_id == current_limits.task_id
+                and entry.old_paid_submit_ceiling >= prior_limits.paid_submit_ceiling
+                and entry.new_paid_submit_ceiling == current_limits.paid_submit_ceiling
+                for entry in budget.submit_quota_extensions
+            )
+
         submitted = {"local": set(), "remote": set()}
         for attempt in manifest.attempts:
             prior = attempt.video_generation_state
@@ -379,7 +400,10 @@ class _StateCommitVideoMixin:
                     (attempt.attempt_id, prior_request.request_input_hash)
                 )
             if (
-                current_limits.paid_submit_ceiling > prior_limits.paid_submit_ceiling
+                (
+                    current_limits.paid_submit_ceiling > prior_limits.paid_submit_ceiling
+                    and not quota_raise_is_retained(prior_limits)
+                )
                 or current_limits.local_batch_limit > prior_limits.local_batch_limit
                 or (
                     prior_limits.local_total_limit is not None
