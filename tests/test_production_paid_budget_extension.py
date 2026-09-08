@@ -267,13 +267,16 @@ def test_running_attempt_and_budget_overrun_cannot_be_unblocked_by_extension(tmp
     assert _bytes(tmp_path) == before
 
 
-def test_rehashed_budget_cannot_increase_beyond_authorized_extension(tmp_path):
+@pytest.mark.parametrize('strip_lineage', [False, True])
+def test_rehashed_budget_cannot_increase_beyond_authorized_extension(tmp_path, strip_lineage):
     from ai_video.production.project import load_production_project
     committer, manifest, pointer, budget = _ledger(tmp_path)
     extended = committer.extend_paid_provider_budget(_entry(manifest, pointer, budget))
     current = committer._reopen_paid_budget(extended.active_paid_provider_budget)
     values = current.model_dump(mode='python', exclude={'content_hash'})
     values['project_ceiling_microunits'] += 1
+    if strip_lineage:
+        values['ceiling_extensions'] = ()
     tampered = PaidProviderBudgetSnapshot.create(**values)
     raw = _canonical_json_bytes(tampered)
     pointer = PaidProviderBudgetSnapshotPointer(path=canonical_paid_provider_budget_path(tampered.content_hash),

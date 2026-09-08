@@ -183,6 +183,10 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
     budget = load_paid_provider_budget(root, pointer)
     if any(entry.project_id != manifest.project_id for entry in budget.ceiling_extensions):
         raise _invalid("Paid Provider budget extension project is invalid.")
+    initial_ceiling = (
+        budget.ceiling_extensions[0].old_ceiling_microunits
+        if budget.ceiling_extensions else budget.project_ceiling_microunits
+    )
     reservations = {item.reservation_id: item for item in budget.reservations}
     external_effect_ids: list[str] = []
     for attempt in paid_attempts:
@@ -219,6 +223,25 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
                 file_sha256=gate.budget_snapshot_file_sha256,
             ),
         )
+        gate_initial_ceiling = (
+            gate_budget.ceiling_extensions[0].old_ceiling_microunits
+            if gate_budget.ceiling_extensions else gate_budget.project_ceiling_microunits
+        )
+        # Historical Gate authorization anchors the legacy ledger ceiling even
+        # if a rehashed active snapshot has stripped its optional extension field.
+        if (
+            gate_budget.policy_id != gate.authorization.budget_policy_id
+            or gate_budget.currency != gate.authorization.budget_currency
+            or gate_budget.project_ceiling_microunits
+            != gate.authorization.project_budget_ceiling_microunits
+            or budget.policy_id != gate_budget.policy_id
+            or budget.currency != gate_budget.currency
+            or initial_ceiling != gate_initial_ceiling
+            or budget.revision < gate_budget.revision
+            or budget.ceiling_extensions[:len(gate_budget.ceiling_extensions)]
+            != gate_budget.ceiling_extensions
+        ):
+            raise _invalid("Paid Provider budget lineage differs from retained Gate authorization.")
         gate_reservation = next(
             (
                 item
