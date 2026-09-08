@@ -168,6 +168,16 @@ class GenerationDecisionExecutionBinding(StrictModel):
 
         if self.inputs.policy.version != "3":
             raise ValueError("new execution requires final-output no-regression decision policy/3")
+        if self.inputs.abandoned_result is not None:
+            from ai_video.production._generation_feedback_reader import load_generation_quality_rejection
+
+            receipt = self.inputs.abandoned_result
+            prior = next((a for a in project.manifest.attempts if a.attempt_id == receipt.attempt_id), None)
+            state = prior.video_generation_state if prior is not None else None
+            if (state is None or state.quality_rejection is None
+                    or receipt.qa_policy != project.manifest.active_qa_policy
+                    or load_generation_quality_rejection(project.root, state.quality_rejection) != receipt):
+                raise ValueError("abandoned result has no matching canonical terminal authority")
         if project.qa_policy is None:
             raise ValueError("generation execution requires a current QA policy")
         if any(candidate.final_output_goal != project.qa_policy.final_output

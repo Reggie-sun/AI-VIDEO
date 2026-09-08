@@ -23,6 +23,7 @@ from ai_video.production.generation_recipe import GenerationRecipe, RequirementE
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.shot_router import VideoGenerationResolver
 from ai_video.production.video_compiler import ProviderRequirementUnsupported
+from ai_video.production.generation_rejection import GenerationQualityRejectionReceipt
 
 bind_experience_models(GenerationCandidate)
 
@@ -46,6 +47,7 @@ class GenerationHistory:
     experiences: tuple[GenerationExperience, ...] = ()
     latest_attempt_hash: str | None = None
     baseline_request: object | None = None
+    abandoned_result: GenerationQualityRejectionReceipt | None = None
 
 
 @dataclass(frozen=True)
@@ -269,6 +271,7 @@ class GenerationFeedbackOrchestrator:
             interventions=interventions, conflicts=conflicts, historical_recipes=tuple(historical.values()),
             baseline_request=history.baseline_request,
             experiences=history.experiences, feature_scope=extract_generation_features(projection),
+            abandoned_result=history.abandoned_result,
         )
         arguments = {name: current[name] for name in ("projection", "context", "policy", "lifecycle")}
         if "continuity_routing" in current:
@@ -348,6 +351,7 @@ class GenerationFeedbackOrchestrator:
             # The persisted binding is the compiled baseline owner. Never
             # synthesize a baseline from the current prompt or recipe.
             baseline = None
+            abandoned_result = None
             if latest is not None:
                 from ai_video.production._generation_feedback_reader import load_imported_history
 
@@ -358,9 +362,14 @@ class GenerationFeedbackOrchestrator:
                 else:
                     _, state = VideoGenerationService(committer=committer, provider=None)._state(latest.attempt_id)
                     request = committer._reopen_video_request(state.request)
+                    if state.quality_rejection is not None:
+                        receipt = committer._reopen_generation_quality_rejection(state.quality_rejection)
+                        if receipt.abandonment_reason is not None:
+                            abandoned_result = receipt
                 if request.activation_scope is not None:
                     baseline = request.activation_scope.request
-            return GenerationHistory(experiences, latest.evidence_hash if latest else None, baseline)
+            return GenerationHistory(experiences, latest.evidence_hash if latest else None,
+                                     baseline, abandoned_result)
 
         from ai_video.production.video_generation import VideoGenerationService
 

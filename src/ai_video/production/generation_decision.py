@@ -15,6 +15,9 @@ from ai_video.production.generation_diagnosis import (
 from ai_video.production.generation_recipe import GenerationRecipe, SHA256
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.final_output_contracts import FinalOutputContract
+from ai_video.production.generation_rejection import (
+    GenerationQualityRejectionReceipt, validate_abandoned_result,
+)
 from ai_video.production.video import (
     ProviderProfilePointer, VideoGenerationRequest, VideoOutputRequirement, VideoProviderCapabilities,
 )
@@ -117,6 +120,14 @@ class DecisionInputs(StrictModel):
     user_fixed_candidates: tuple[str, ...] = ()
     experiences: tuple["GenerationExperience", ...] = ()
     feature_scope: "GenerationFeatures | None" = None
+    abandoned_result: GenerationQualityRejectionReceipt | None = None
+
+    @model_serializer(mode="wrap")
+    def _serialize_abandonment(self, handler):
+        data = handler(self)
+        if self.abandoned_result is None:
+            data.pop("abandoned_result", None)
+        return data
 
     @model_validator(mode="after")
     def _snapshot(self):
@@ -353,6 +364,12 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
         return GenerationDecision(**base, disposition="EVIDENCE_GAP",
             rationale=("prepared-only work cannot replace the last submitted outcome and baseline",))
     goal_changed = False
+    if inputs.abandoned_result is not None:
+        prior = next((x for x in inputs.experiences if latest in x.evidence), None)
+        if latest is None or prior is None or inputs.policy.version != "3":
+            raise ValueError("abandoned result requires the latest complete experience and current policy")
+        validate_abandoned_result(inputs.abandoned_result, experience=prior, evidence=latest,
+                                  history=inputs.evidence)
     if latest is not None:
         if latest not in current_attempts:
             raise ValueError("latest attempt is outside current Shot")
@@ -374,6 +391,8 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
                     rationale=("Final-output repair cannot replace its frozen goal requirements; retain the old failure and author a new goal version explicitly",))
         for reason in ("UNKNOWN_OUTCOME", "RUNTIME_FAILURE", "RUBRIC_OR_STAGE_ERROR", "EVIDENCE_GAP"):
             if goal_changed and reason == "EVIDENCE_GAP":
+                continue
+            if inputs.abandoned_result is not None and reason == "EVIDENCE_GAP":
                 continue
             if reason in diagnosis.failure_classes:
                 return GenerationDecision(**base, disposition=reason,

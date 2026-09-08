@@ -109,6 +109,15 @@ QA owner 的 `generation_evaluation_authorities` 显式绑定 evaluator 与 proo
 source/M0 caller 的独立验证路径进入；历史 recovery 不重新 submit。
 permit 从 Manifest 顺序推导同 Shot 的最新有效结果，优先实际提交结果；prepared-only、换 task
 名称或选择更早的记录不能抹去 FAIL。完整持久历史必须与 decision inputs 一致，不接受遗漏或注入。
+`abandon_video_generation()` 通过原 quality-rejection transaction 显式放弃已 fetch 的
+`QUALITY_FAILURE + EVIDENCE_GAP` 结果；actor 必须说明同 bytes 补证已耗尽，所有适用
+requirement 必须已有对应 proof 的观察，未知项仍为 `NOT_EVALUATED`。原 `/1` 收据与
+`reject_video_generation()` 的完整质量失败条件不变；`/2` 绑定放弃理由和重算的未知项，
+不改变 Manifest schema、原评价、付费预留、activation 或 recovery。标准 reader 重验全部 joins。
+Feedback 从 Manifest 投影 exact latest `/2` 到 `DecisionInputs.abandoned_result`；Router
+仅据此继续原质量修复评估，保留完整 diagnosis、保护原 PASS，并要求新片完整重验。
+新 execution 重验 canonical terminal pointer 与当前 QA；caller 自报、旧片/旧评价/旧 QA
+或未知 Provider outcome 不获得例外。终结不发 permit、不追加额度，也不自动 retry。
 旧版无binding、已取回的remote媒体通过显式`import_generation_experience()`导入，
 唯一writer仍为`ProductionStateCommitter`；`generation_history_import.py`独占历史收据
 及保留的source Manifest/request/submit/status/fetch/MP4和事后评价来源校验，不伪造原始execution binding。
@@ -348,7 +357,7 @@ Harness check owner为`drama_authoring_source_binding_tests`；实际当前run�
 | Poll or Fetch Generated Video | `VideoGenerationService.refresh_once()` / `refresh_local_once()` / `fetch_once()` / `fetch_local_once()` | Owning orchestration for the same durable attempt | `EXTERNAL_EFFECT` / `LOCAL_EFFECT` | `ProductionStateCommitter` | Exact submission、latest durable phase、terminal success before fetch、held-FD sink | 直接调用Provider `get_status()`/`fetch()`并保留未持久化observation或未注册bytes |
 | Refresh Remote Video Reference Lease | `VideoGenerationService.refresh_remote_reference_lease_once()` | Owning orchestration for one currently exact-active remote source Shot | `EXTERNAL_EFFECT` | `ProductionStateCommitter` remains evidence owner | Manifest active-pointer replay、reopened submit/status/fetch receipt、process-local one-use refresh permit、same task/model/locator、fresh full-byte accessibility verification、最多5分钟lease且每次resolve重验source仍current-active | 直接调用Provider lease helper、从unactivated/failed/superseded source签lease、另行mint refresh/lease authority、只做HEAD/host check、持久化signed URL、rotation后继续或fallback |
 | Validate Generated-Video Candidate | `VideoGenerationService.validate_once()` | P8 candidate review/activation orchestration | `LOCAL_EFFECT` / `DURABLE_WRITE` | `ProductionStateCommitter` | Measured artifact、probe/provenance、active QA policy与required P6 continuity evidence | 为new one-action control调用legacy `fetch_and_activate()`、analyzer/evaluator自行activation |
-| Reject Generated-Video Quality | `ProductionStateCommitter.reject_video_generation()` | Explicit quality-rejection orchestration | `DURABLE_WRITE` | `ProductionStateCommitter` | Exact fetched bytes、latest durable experience、selected QA authority、完整 QUALITY_FAILURE、actor与expected revision；immutable rejection receipt绑定终结原因，历史replay无新副作用 | 将质量失败记成Provider失败、关闭unknown/missing evidence、释放或结算paid reservation、激活candidate、清空历史或放宽generic unresolved guard |
+| Reject or Abandon Generated-Video Quality | `ProductionStateCommitter.reject_video_generation()` / `abandon_video_generation()` | Explicit quality-rejection / abandonment orchestration | `DURABLE_WRITE` | `ProductionStateCommitter` | Exact fetched bytes、latest durable experience、selected QA authority、actor与expected revision；reject仅完整 QUALITY_FAILURE，abandon仅明确补证耗尽原因及逐项显式观察的 QUALITY_FAILURE + EVIDENCE_GAP；immutable receipt绑定终结原因，历史replay无新副作用 | 将质量失败记成Provider失败、关闭unknown outcome或缺失观察、释放或结算paid reservation、激活candidate、清空历史或放宽generic unresolved guard |
 | Activate Generated-Video Candidate | `VideoGenerationService.activate_once()` | Approved P8 activation orchestration | `DURABLE_WRITE` | `ProductionStateCommitter` | Exact current candidate、fresh complete evidence、current Project/Registry/graph base | 直接调用committer pointer primitives、把fetch/validation success当activation |
 | Exact Generated-Video Replay | `VideoGenerationService.fetch_and_activate()` 的exact-active replay branch | Owning orchestration reopening the identical completed attempt | `READ_ONLY` | `ProductionStateCommitter` | Identical sealed request/resolved/artifact/activation identity | 重新submit、poll、fetch、analyze、mint permit或写Manifest；不得将legacy combined path用于new staged control |
 | Recover Production State | `recover_production_state()` | Explicit operator/recovery orchestration | `RECOVERY` | `ProductionStateCommitter` | Exact old/new state、bounded owned temp与strict reopened evidence | Reader/Registry auto-recovery、猜测mixed state、自动激活orphan、blind retry |

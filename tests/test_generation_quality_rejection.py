@@ -86,6 +86,193 @@ def _fetched_experience(tmp_path, *, verdict="FAIL"):
     return committer, experience, manifest, attempt
 
 
+def _fetched_mixed_failure(tmp_path):
+    committer, original, _, _ = _fetched_experience(tmp_path, verdict="NOT_EVALUATED")
+    loaded = load_production_project(tmp_path / "project.yaml")
+    from ai_video.production.models import GenerationEvaluationAuthority
+
+    policy = loaded.qa_policy
+    authority = GenerationEvaluationAuthority(
+        proof="human", evaluator=policy.semantic_authorities[0],
+    )
+    policy = seal_artifact(policy.model_copy(update={
+        "revision": policy.revision + 1,
+        "generation_evaluation_authorities": (*policy.generation_evaluation_authorities, authority),
+        "content_hash": "0" * 64,
+    }))
+    committer.activate_qa_policy(policy, expected_manifest_revision=loaded.manifest.manifest_revision,
+                                 attempt_id="mixed-failure-authority")
+    technical = original.evaluation_sources[0].model_copy(update={"qa_policy_content_hash": policy.content_hash})
+    human = technical.model_copy(update={
+        "proof": "human",
+        "observations": (GenerationObservation(requirement_id="duration", verdict="FAIL",
+            observation="Viewer rejects the usable duration; technical measurement is irrecoverable."),),
+    })
+    experience = original.model_copy(update={
+        "evaluation_sources": (technical, human),
+        "evidence": (original.evidence[0].model_copy(update={
+            "findings": (*technical.project_findings(), *human.project_findings()),
+        }),),
+    })
+    committer.record_generation_experience(attempt_id=ATTEMPT_ID, experience=experience)
+    manifest = committer._read_manifest()
+    attempt = next(a for a in manifest.attempts if a.attempt_id == ATTEMPT_ID)
+    return committer, experience, manifest, attempt
+
+
+def test_abandon_preserves_mixed_diagnosis_paid_state_and_exact_replay(tmp_path):
+    committer, experience, manifest, before = _fetched_mixed_failure(tmp_path)
+    state = before.video_generation_state
+    arguments = dict(attempt_id=ATTEMPT_ID, expected_manifest_revision=manifest.manifest_revision,
+        experience_content_hash=state.generation_experiences[-1].content_hash, actor=ACTOR,
+        reason="Explicitly discard the failed output after evidence repair was exhausted.")
+    with pytest.raises(AiVideoError, match="complete known quality failure"):
+        committer.reject_video_generation(**{k: v for k, v in arguments.items() if k != "reason"})
+    closed = committer.abandon_video_generation(**arguments)
+    after = next(a for a in closed.attempts if a.attempt_id == ATTEMPT_ID)
+    receipt = committer._reopen_generation_quality_rejection(after.video_generation_state.quality_rejection)
+    assert after.status is StateCommitStatus.FAILED
+    assert after.paid_provider_state == before.paid_provider_state
+    assert closed.active_paid_provider_budget == manifest.active_paid_provider_budget
+    assert after.video_generation_state.generation_experiences == state.generation_experiences
+    assert after.video_generation_state.fetch_receipt == state.fetch_receipt
+    assert receipt.diagnosis.failure_classes == ("EVIDENCE_GAP", "QUALITY_FAILURE")
+    assert receipt.unresolved_requirements == ("duration",)
+    assert not receipt.diagnosis.all_required_observed_pass
+    assert receipt.schema_version == "generation-quality-rejection/2"
+    assert load_production_project(tmp_path / "project.yaml").manifest == closed
+    assert committer.abandon_video_generation(**arguments) == closed
+    assert record_attempt_evaluation(committer=committer, attempt_id=ATTEMPT_ID) == experience
+    with pytest.raises(AiVideoError, match="replay"):
+        committer.abandon_video_generation(**{**arguments, "reason": "different reason"})
+    with pytest.raises(AiVideoError, match="replay"):
+        committer.reject_video_generation(**{k: v for k, v in arguments.items() if k != "reason"})
+
+
+@pytest.mark.parametrize("verdict", ["PASS", "FAIL", "NOT_EVALUATED"])
+def test_abandon_requires_both_known_failure_and_unresolved_evidence(tmp_path, verdict):
+    committer, _, manifest, attempt = _fetched_experience(tmp_path, verdict=verdict)
+    with pytest.raises(AiVideoError, match="quality failure with unresolved evidence"):
+        committer.abandon_video_generation(attempt_id=ATTEMPT_ID,
+            expected_manifest_revision=manifest.manifest_revision,
+            experience_content_hash=attempt.video_generation_state.generation_experiences[-1].content_hash,
+            actor=ACTOR, reason="Explicit abandonment")
+    assert committer._read_manifest() == manifest
+
+
+def test_abandoned_result_reaches_router_without_erasing_gap_or_authorizing_submit(tmp_path):
+    from ai_video.production.generation_decision import DecisionInputs, DecisionPolicy
+    from ai_video.production.generation_diagnosis import Intervention
+    from ai_video.production.shot_router import VideoGenerationResolver
+
+    committer, experience, manifest, attempt = _fetched_mixed_failure(tmp_path)
+    state = attempt.video_generation_state
+    binding = committer._reopen_generation_execution_binding(state.execution_binding)
+    history = committer.read_generation_experiences()
+    evidence = experience.evidence[-1]
+    inputs = DecisionInputs.model_validate({**binding.inputs.model_dump(mode="python"),
+        "policy": DecisionPolicy(), "evidence": tuple(e for x in history for e in x.evidence),
+        "experiences": history, "latest_attempt_hash": evidence.evidence_hash,
+        "historical_recipes": (experience.candidate,),
+        "baseline_request": binding.compiled_request.activation_scope.request,
+    })
+    args = dict(projection=binding.projection, context=binding.context,
+                policy=binding.policy, lifecycle=binding.lifecycle)
+    router = VideoGenerationResolver()
+    assert router.resolve_requirement(**args, inputs=inputs).disposition == "EVIDENCE_GAP"
+    closed = committer.abandon_video_generation(attempt_id=ATTEMPT_ID,
+        expected_manifest_revision=manifest.manifest_revision,
+        experience_content_hash=state.generation_experiences[-1].content_hash,
+        actor=ACTOR, reason="Same-bytes evidence repair exhausted; preserve failure and unknown proof.")
+    after = next(a for a in closed.attempts if a.attempt_id == ATTEMPT_ID)
+    receipt = committer._reopen_generation_quality_rejection(after.video_generation_state.quality_rejection)
+    inputs = inputs.model_copy(update={"abandoned_result": receipt})
+    result = router.resolve_requirement(**args, inputs=inputs)
+    assert result.disposition == "REASSESS_FEASIBILITY"
+    assert result.diagnosis.failure_classes == ("EVIDENCE_GAP", "QUALITY_FAILURE")
+    proposal = Intervention(intervention_id="repair-after-abandonment", candidate_id="selected",
+        purpose="resample", disposition="GENERATE_ONCE", closes=("duration",),
+        support=(evidence.evidence_hash,), changed_variables=("seed",), held_constants=(),
+        uncontrolled_variables=(), regression_risks=("all source requirements need new proof",),
+        hypothesis="One bounded new sample may repair the rejected duration.", confidence_basis="observed failure",
+        improvement_prediction="duration meets requirement", falsification_prediction="duration still fails",
+        insufficient_evidence_condition="new exact result remains unobservable", resample_limit=1)
+    inputs = inputs.model_copy(update={"interventions": (proposal,)})
+    result = router.resolve_requirement(**args, inputs=inputs)
+    assert result.disposition == "GENERATE_ONCE"
+    assert not result.diagnosis.all_required_observed_pass
+    assert "duration" in result.revalidate_requirements
+    loaded = load_production_project(tmp_path / "project.yaml")
+    # A pure decision is not terminal authority: execution requires the real pointer.
+    guarded = binding.model_copy(update={"inputs": inputs})
+    guarded.validate_current_project(loaded)
+    unclosed = loaded.model_copy(update={"manifest": manifest})
+    with pytest.raises(ValueError, match="canonical terminal authority"):
+        guarded.validate_current_project(unclosed)
+    for field in ("artifact_sha256", "request_fingerprint", "evidence_hash", "experience_content_hash"):
+        values = {name: getattr(receipt, name) for name in type(receipt).model_fields
+                  if name != "content_hash"}
+        values[field] = "a" * 64
+        if field == "evidence_hash":
+            values["diagnosis"] = receipt.diagnosis.model_copy(update={"evidence_hashes": ("a" * 64,)})
+        forged = GenerationQualityRejectionReceipt.create(**values)
+        with pytest.raises(ValueError, match="exact latest evidence"):
+            router.resolve_requirement(**args, inputs=inputs.model_copy(update={"abandoned_result": forged}))
+    assert committer._read_manifest() == closed
+
+
+def test_abandoned_result_real_feedback_binding_start_roundtrip(tmp_path):
+    from ai_video.production.generation_decision import DecisionPolicy
+    from ai_video.production.generation_feedback import GenerationFeedbackOrchestrator, RegisteredGenerationTarget
+    from ai_video.production._video_project_reader import load_generation_execution_binding
+    from production_generation_execution_factory import NativeFixtureVideoProvider
+
+    committer, experience, manifest, attempt = _fetched_mixed_failure(tmp_path)
+    state = attempt.video_generation_state
+    template = committer._reopen_generation_execution_binding(state.execution_binding)
+    committer.abandon_video_generation(attempt_id=ATTEMPT_ID,
+        expected_manifest_revision=manifest.manifest_revision,
+        experience_content_hash=state.generation_experiences[-1].content_hash,
+        actor=ACTOR, reason="Explicit proof remains unobservable after same-bytes review.")
+    candidate = experience.candidate
+    provider = NativeFixtureVideoProvider(capabilities=candidate.capabilities, artifact_bytes=b"unused",
+        compiler_id=candidate.compiler_contract.compiler_id,
+        compiler_version=candidate.compiler_contract.compiler_version,
+        native_prompt_text=template.compiled_request.activation_scope.request.prompt_text)
+
+    def context(loaded):
+        return dict(projection=template.projection, context=template.context, policy=template.policy,
+            lifecycle=template.lifecycle.model_copy(update={
+                "generation_id": "after-abandonment", "output_asset_id": "after-abandonment-video",
+                "base_project": loaded.manifest.active_project,
+                "base_registry": loaded.manifest.active_registry,
+                "base_dependency_graph": loaded.manifest.active_dependency_graph,
+            }))
+
+    caller = GenerationFeedbackOrchestrator.for_project(committer=committer,
+        targets=(RegisteredGenerationTarget(provider, candidate.provider_profile,
+            candidate.compiler_contract, candidate.output_requirement),),
+        context_loader=context, policy=DecisionPolicy())
+    limits = template.inputs.limits.model_copy(update={"allowed_remote_candidates": tuple(
+            f"{candidate.capabilities.provider_name}/{variant.capability_id}"
+            for variant in candidate.capabilities.variants)})
+    assert caller.prepare(limits=limits).decision.disposition == "BLOCKED_EXECUTION"
+    prepared = caller.start(committer=committer, attempt_id="after-abandonment",
+                            limits=limits.model_copy(update={"paid_submit_ceiling": 2}))
+    assert prepared.decision.disposition == "GENERATE_ONCE", prepared.decision
+    assert prepared.execution_binding is not None, prepared.compilation
+    assert prepared.inputs.abandoned_result.attempt_id == ATTEMPT_ID
+    assert prepared.inputs.limits.paid_submits_used == 1
+    assert prepared.inputs.experiences == committer.read_generation_experiences()
+    loaded = load_production_project(tmp_path / "project.yaml")
+    new_attempt = next(a for a in loaded.manifest.attempts if a.attempt_id == "after-abandonment")
+    reopened = load_generation_execution_binding(tmp_path, new_attempt.video_generation_state.execution_binding)
+    assert reopened == prepared.execution_binding
+    reopened.validate_current_project(loaded)
+    assert new_attempt.paid_provider_state is None
+    assert provider.call_counts.submit == provider.call_counts.status == provider.call_counts.fetch == 0
+
+
 def test_closes_remote_fetched_quality_failure_without_paid_mutation_and_replays(tmp_path):
     committer, experience, manifest, before = _fetched_experience(tmp_path)
     state = before.video_generation_state

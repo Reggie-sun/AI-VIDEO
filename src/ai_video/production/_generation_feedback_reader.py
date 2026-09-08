@@ -232,6 +232,14 @@ def verify_generation_feedback(root, state, request):
         raise _invalid("Quality rejection execution evidence is invalid.", str(exc)) from exc
     if diagnosis != receipt.diagnosis:
         raise _invalid("Quality rejection diagnosis is not exact to retained evidence.")
+    if receipt.abandonment_reason is not None:
+        from ai_video.production.generation_rejection import validate_abandoned_result
+
+        try:
+            validate_abandoned_result(receipt, experience=experience, evidence=evidence,
+                                      history=all_evidence)
+        except ValueError as exc:
+            raise _invalid("Abandoned result evidence is invalid.", str(exc)) from exc
 
 
 def load_imported_history(root, manifest):

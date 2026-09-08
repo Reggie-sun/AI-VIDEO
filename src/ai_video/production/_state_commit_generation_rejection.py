@@ -16,6 +16,7 @@ from ai_video.production._state_commit_common import (
 from ai_video.production.generation_rejection import (
     GenerationQualityRejectionReceipt,
     validate_quality_rejection_experience,
+    unresolved_generation_requirements,
 )
 from ai_video.production.models import StateCommitStatus, VideoAttemptPhase
 
@@ -45,6 +46,29 @@ class _StateCommitGenerationRejectionMixin:
     ):
         """Close only a current fetched media quality failure with exact evidence."""
 
+        return self._close_video_quality_result(attempt_id=attempt_id,
+            expected_manifest_revision=expected_manifest_revision,
+            experience_content_hash=experience_content_hash, actor=actor, reason=None)
+
+    def abandon_video_generation(
+        self, *, attempt_id: str, expected_manifest_revision: int,
+        experience_content_hash: str, actor, reason: str,
+    ):
+        """Explicitly discard failed media after same-bytes proof repair is exhausted.
+
+        The actor supplies the exhaustion rationale; no finding is changed and
+        this closure does not authorize another submit or imply acceptance.
+        """
+        if not isinstance(reason, str) or not reason.strip():
+            raise _state_invalid("Abandonment requires an explicit evidence-repair exhaustion reason.")
+        return self._close_video_quality_result(attempt_id=attempt_id,
+            expected_manifest_revision=expected_manifest_revision,
+            experience_content_hash=experience_content_hash, actor=actor, reason=reason)
+
+    def _close_video_quality_result(
+        self, *, attempt_id, expected_manifest_revision, experience_content_hash, actor, reason,
+    ):
+
         from ai_video.production.project import load_production_project
 
         with self._exclusive_lock():
@@ -62,6 +86,7 @@ class _StateCommitGenerationRejectionMixin:
                     expected_manifest_revision != receipt.expected_manifest_revision
                     or receipt.experience_content_hash != experience_content_hash
                     or receipt.actor != actor
+                    or receipt.abandonment_reason != reason
                 ):
                     raise _state_invalid("Quality rejection replay differs from retained evidence.")
                 return manifest
@@ -82,6 +107,8 @@ class _StateCommitGenerationRejectionMixin:
                 raise _state_invalid("Quality rejection requires the latest durable experience receipt.")
             request = self._reopen_video_request(state.request)
             binding = self._reopen_generation_execution_binding(state.execution_binding)
+            history = tuple(item for stored in self.read_generation_experiences()
+                            for item in stored.evidence)
             try:
                 binding.validate_request(request)
             except ValueError as exc:
@@ -118,17 +145,23 @@ class _StateCommitGenerationRejectionMixin:
                     attempt_id=attempt_id,
                     artifact_sha256=fetch.artifact_sha256,
                     qa_policy=loaded.qa_policy,
-                    history=tuple(
-                        item
-                        for stored in self.read_generation_experiences()
-                        for item in stored.evidence
-                    ),
+                    history=history,
                 )
             except (AttributeError, ValueError) as exc:
                 raise _state_invalid("Quality rejection evidence is invalid.", str(exc)) from exc
-            if diagnosis.failure_classes != ("QUALITY_FAILURE",):
+            if reason is not None and diagnosis.failure_classes != ("EVIDENCE_GAP", "QUALITY_FAILURE"):
+                raise _state_invalid("Abandonment requires a known quality failure with unresolved evidence.")
+            if reason is None and diagnosis.failure_classes != ("QUALITY_FAILURE",):
                 raise _state_invalid("Quality rejection requires a complete known quality failure.")
+            try:
+                unresolved = unresolved_generation_requirements(
+                    evidence, history, experience.candidate.recipe) if reason is not None else ()
+            except ValueError as exc:
+                raise _state_invalid("Abandonment evidence is invalid.", str(exc)) from exc
             receipt = GenerationQualityRejectionReceipt.create(
+                schema_version="generation-quality-rejection/2" if reason is not None else "generation-quality-rejection/1",
+                abandonment_reason=reason,
+                unresolved_requirements=unresolved,
                 attempt_id=attempt_id,
                 actor=actor,
                 request_fingerprint=request.request_input_hash,

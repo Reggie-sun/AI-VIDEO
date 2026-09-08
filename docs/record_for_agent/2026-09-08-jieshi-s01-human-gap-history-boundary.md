@@ -8,6 +8,26 @@ learning_eligibility: ineligible
 
 Date: 2026-09-08
 
+## Current Engineering Checkpoint — Explicit Failed-Result Abandonment
+
+用户在恢复 S01 后明确“允许”实现证据无法补齐的失败结果终结入口。
+`ProductionStateCommitter.abandon_video_generation()` 复用原 quality rejection 的单一事务，
+仅接受已 fetch、明确 FAIL 且每项已有显式观察的 EVIDENCE_GAP + QUALITY_FAILURE；
+`generation-quality-rejection/2` 保存 actor、补证耗尽原因、未知要求与 exact evidence。
+原 MP4、FAIL/NOT_EVALUATED、experience、paid reservation 和已用次数保持原值。
+这不是验收、退款、结算或新 submit 授权，旧完整质量拒绝 `/1` 行为与 hash 兼容。
+
+Feedback 自动读取 canonical 终结记录；Router policy/3 允许评估新修复，execution
+重新核验真实 Manifest pointer、当前 QA 与完整历史。旧 PASS 保护和新片完整重验保持。
+独立 `reviewer_xhigh` 未发现 blocking defect；其指出的实际反馈闭环覆盖缺口已补测试：
+fake Provider 下自动读取 `/2` → compile/create binding → service.start → strict reopen，
+同时证明原次数额度耗尽仍阻断、已用次数与历史不丢失、没有 Provider 调用。
+工程测试和 Harness 不代表 S01 修复成功；真实 attempt12 在此工程 checkpoint 尚未终结，
+追加一次授权尚未使用。下方旧停点保留为历史，并由后续实际运行结果更新。
+
+按 `record-ai-video-session` 更新同一主记录，自动 `distill-ai-video-learning` 评估
+为 no_candidate：这是生命周期实现与离线验证，没有新的独立媒体质量实验结论。
+
 ## Engineering Follow-up — Final-output-first / No-regression
 
 通用约束的后续工程实现见 [implementation record](2026-09-08-final-output-no-regression.md)。

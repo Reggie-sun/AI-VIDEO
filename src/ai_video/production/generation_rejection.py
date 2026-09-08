@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import Field, model_validator
+from pydantic import Field, model_serializer, model_validator
 
 from ai_video.production.artifact_contracts import QaPolicyPointer, StrictModel
 from ai_video.production.generation_diagnosis import Diagnosis, diagnose_exact_result
@@ -22,7 +22,7 @@ class GenerationQualityRejectionReceipt(StrictModel):
     permit.  The committer is the only writer of this receipt.
     """
 
-    schema_version: Literal["generation-quality-rejection/1"] = (
+    schema_version: Literal["generation-quality-rejection/1", "generation-quality-rejection/2"] = (
         "generation-quality-rejection/1"
     )
     attempt_id: str = Field(min_length=1)
@@ -35,12 +35,33 @@ class GenerationQualityRejectionReceipt(StrictModel):
     qa_policy: QaPolicyPointer
     expected_manifest_revision: int = Field(strict=True, ge=0)
     diagnosis: Diagnosis
+    abandonment_reason: str | None = None
+    unresolved_requirements: tuple[str, ...] = ()
     content_hash: str = Field(pattern=_SHA256)
+
+    @model_serializer(mode="wrap")
+    def _serialize(self, handler):
+        data = handler(self)
+        if self.abandonment_reason is None:
+            data.pop("abandonment_reason", None)
+        if not self.unresolved_requirements:
+            data.pop("unresolved_requirements", None)
+        return data
 
     @model_validator(mode="after")
     def _exact_quality_failure(self) -> "GenerationQualityRejectionReceipt":
-        if self.diagnosis.failure_classes != ("QUALITY_FAILURE",):
-            raise ValueError("quality rejection requires exactly QUALITY_FAILURE")
+        if self.schema_version == "generation-quality-rejection/1":
+            if self.diagnosis.failure_classes != ("QUALITY_FAILURE",):
+                raise ValueError("quality rejection requires exactly QUALITY_FAILURE")
+            if self.abandonment_reason is not None or self.unresolved_requirements:
+                raise ValueError("historical quality rejection cannot declare abandonment")
+        elif (self.diagnosis.failure_classes != ("EVIDENCE_GAP", "QUALITY_FAILURE")
+              or not self.diagnosis.failed_requirements
+              or self.diagnosis.all_required_observed_pass
+              or not self.abandonment_reason or not self.abandonment_reason.strip()
+              or not self.unresolved_requirements
+              or tuple(sorted(set(self.unresolved_requirements))) != self.unresolved_requirements):
+            raise ValueError("abandonment requires a known quality failure with unresolved evidence")
         if self.evidence_hash not in self.diagnosis.evidence_hashes:
             raise ValueError("quality rejection diagnosis omits its exact evidence")
         if self.content_hash != canonical_sha256(self.model_dump(mode="json")):
@@ -111,3 +132,39 @@ def validate_quality_rejection_experience(
         qa_policy=qa_policy,
     )
     return diagnose_exact_result(evidence, history, experience.candidate.recipe)
+
+
+def unresolved_generation_requirements(evidence, history, recipe) -> tuple[str, ...]:
+    """Retain explicitly unobservable requirements; missing proof is not exhaustion."""
+    diagnosis = diagnose_exact_result(evidence, history, recipe)
+    exact_hashes = set(diagnosis.evidence_hashes)
+    findings = tuple(f for e in (*history, evidence) if e.evidence_hash in exact_hashes
+                     for f in e.findings)
+    unresolved = []
+    for rule in recipe.expressions:
+        if rule.level != "acceptance" or rule.stage != evidence.stage:
+            continue
+        observed = tuple(f for f in findings if f.requirement_id == rule.requirement_id
+                         and f.proof == rule.proof and f.stage == rule.stage
+                         and f.rubric_hash == recipe.rubric_hash)
+        if not observed:
+            raise ValueError("abandonment requires explicit observations for every applicable requirement")
+        if all(f.verdict == "NOT_EVALUATED" for f in observed):
+            unresolved.append(rule.requirement_id)
+    return tuple(sorted(unresolved))
+
+
+def validate_abandoned_result(receipt, *, experience, evidence, history) -> None:
+    """Pure exact-result join; persisted terminal authority is checked at execution."""
+    receipt = GenerationQualityRejectionReceipt.model_validate(receipt.model_dump(mode="python"))
+    if (receipt.schema_version != "generation-quality-rejection/2"
+            or receipt.attempt_id != evidence.attempt_id
+            or receipt.request_fingerprint != evidence.request_hash
+            or receipt.artifact_sha256 != evidence.artifact_sha256
+            or receipt.evidence_hash != evidence.evidence_hash
+            or receipt.experience_content_hash != canonical_sha256(experience.model_dump(mode="json"))
+            or evidence not in experience.evidence
+            or receipt.diagnosis != diagnose_exact_result(evidence, history, experience.candidate.recipe)
+            or receipt.unresolved_requirements != unresolved_generation_requirements(
+                evidence, history, experience.candidate.recipe)):
+        raise ValueError("abandoned result differs from exact latest evidence")
