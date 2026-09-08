@@ -8,6 +8,28 @@ learning_eligibility: ineligible
 
 Date: 2026-09-08
 
+## Latest Authorized Continuation — Additional Submit Unused
+
+用户在询问反复授权原因后再次明确“授权”。本次按原 Vidu Q3 Pro / S01 scope
+追加一次处理，保持原首末帧、seed20260907、点名广播与 QA，不再次询问相同授权。
+`preparation-v4/authorization-scope.json` 保存 task 级 ceiling3 / prior used2 / remaining1，
+SHA-256 `485436e28d7f2be32207f9dd3b87eb8822cc0aaf70ce72a6832fe2d7132aaf8f`。
+它不是 runtime quota extension、budget reservation 或 submit permit；实际 Manifest
+仍 r36，旧 runtime ceiling2 和全部原预留未变，没有新 POST 或 MP4。
+
+已重读 attempt10/11 的实际 compiled prompts：两者均已要求立即抬手和1.5秒前到位，
+但同时保留“看向空位、眉间收紧”“立即察觉”“前三秒识别空倒影”等反应起始描述。
+`preparation-v4/prompt-onset-audit.json` 仅提出去除动作前反应阶段的可测试假设；
+没有证明这些词是延迟的原因，也没有证明该改动能关闭 legacy-05 翻掌失败，不能称为
+可提交 binding 或已经修复。未更换 Provider、重写原广播或放宽 frozen acceptance。
+
+当前 genuine blocker 仍为 attempt11 human legacy-06/14/17 未取得实际观看结论。
+已重新提供 exact 新片和三个观感问题；“授权”不等于“手部自然、间隙可读、声音清晰”。
+先补齐证据，再经已有 lifecycle/Planner/Router 评估下一干预；授权保持未消费。
+项目 RAG 返回 stale、弱相关 fragments，未据此推断本 case 结论，未前台重建索引。
+本段按 `record-ai-video-session` 保存；`distill-ai-video-learning` 评估 no_candidate：
+没有新媒体实验或已验证的因果/修复结论，不建立重复 learning claim。
+
 ## Latest Checkpoint — Attempt 11 Generated, Quality Still Fails
 
 用户“授权”批准保留原 ledger 的一次金额扩容和同一 Vidu S01 任务追加一次生成。
