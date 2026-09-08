@@ -8,7 +8,36 @@ learning_eligibility: ineligible
 
 Date: 2026-09-08
 
-## Latest Checkpoint — Local Timing Repair Preview
+## Latest Checkpoint — Freeze Preview Rejected And Root Cause
+
+用户明确拒绝派生片 `090b4c605a400b712fa41d27028352bd6b38d6ba0436dda280b78a730b9840e3`：
+“没道理,你这加速完后面静图是什么意思”，并要求查明根因。
+`runs/jieshi-s01-retime-review-20260908-v1/human-rejection.json` 绑定该exact预览，
+human自然动态结论为FAIL，取代下方“等待观感”；该预览撤回，保留bytes作为失败证据。
+
+直接机制为本会话主动采用 `setpts=0.375*(PTS-STARTPTS)` 加
+`tpad=stop_mode=clone:stop_duration=3`，再裁为97帧：约4秒源动作缩为1.5秒，
+余下约2.5秒重复整帧。FFmpeg按命令执行；这是方案选择错误，不是随机编码故障。
+原Shot要求左手停住、保持到切出，没有要求全画面时间停止。
+
+决策根因是把完整目标“按时到位且自然持续表演”替换为容易测量的到位时间，
+并将手部悬停错误实现成整帧冻结；未评估素材中是否有足够的自然动态尾段。
+为避免继续无效付费重试而选择可控后处理，并不证明该后处理符合创作意图。
+独立mapping检查的是现有API能力与Production隔离，不是对冻结效果的质量批准。
+本轮QA重点验证timing与audio packet相等，却把从命令和抽帧已明确可见的整帧冻结
+仅记成待人类观看的风险，没有先依据镜头意图淘汰该方案。标记review-only只能限制
+Production影响，不能使不符合目标的方案成为合格修复；此前“时序修复”措辞过强。
+
+历史continuity plan也保留“后处理不能创造continuity PASS”的边界；本轮修复前的
+检索未有效找回clone/static-tail失败先例，不能将既有经验存在等同于已应用。
+本次审查没有修改视频、Production、QA标准或工具实现，没有新Provider调用。
+现存生成原片的时序FAIL/掌向证据缺口保持；额外一次授权仍未使用。
+
+按 `record-ai-video-session` 更新原记录并执行 `distill-ai-video-learning`：
+no_candidate。该事件重现既有连续性边界，当前只纠正本次结果与决策记录，
+不重复创建采用提案或自动改Skill/Gate；未为记录新增媒体、网络或额外测试。
+
+## Historical Checkpoint — Local Timing Repair Preview
 
 用户明确“授权修复”后，本轮转为现有 exact attempt12 的本地时序修复预览，
 没有再次付费生成。独立 code_mapper 通过 codegraph/源码确认当前

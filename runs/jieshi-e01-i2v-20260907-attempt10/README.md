@@ -2,7 +2,14 @@
 
 ## Current State
 
-### Latest Continuation — Local Timing Repair Preview
+### Latest Continuation — Timing Preview Rejected
+
+用户已拒绝下方本地预览：加速后约2.5秒整帧冻结，不符合自然连续镜头。
+该片撤回，human自然动态FAIL；`../jieshi-s01-retime-review-20260908-v1/human-rejection.json`
+保存exact反馈。原timing/audio技术测量不撤销，但不能作为修复成功或整体质量通过。
+根因与决策纠正见主记录；未修改媒体或Production，追加授权未使用。
+
+### Historical Continuation — Local Timing Repair Preview
 
 用户授权修复后已生成[本地时序预览](../jieshi-s01-retime-review-20260908-v1/s01-timing-repair-review.mp4)：
 画面3/8时间缩放并保持末帧，1.5秒已到位；190个AAC packet内容及时间戳与源相同。
