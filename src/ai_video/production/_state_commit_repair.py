@@ -295,8 +295,14 @@ class _StateCommitRepairMixin:
                 for item in manifest.dependency_states
                 if node_kinds.get(item.node_id) is DependencyNodeKind.RENDER
             )
-            require_no_regression_outcome(
-                self._project_root, approved, receipt, manifest, current_render)
+            try:
+                require_no_regression_outcome(
+                    self._project_root, approved, receipt, manifest, current_render)
+            except (AiVideoError, OSError, ValueError) as exc:
+                if isinstance(exc, AiVideoError) and exc.code is ErrorCode.REPAIR_SCOPE_INVALID:
+                    raise
+                raise AiVideoError(ErrorCode.REPAIR_SCOPE_INVALID,
+                    "Final-output repair outcome review chain is invalid.", str(exc)) from exc
             if any(p.approved_receipt == receipt.approved_receipt for p in (
                 RepairOutcomeReceipt.model_validate_json(_read_regular_file_nofollow(
                     self._project_root / item.path, contained_by=self._project_root / "state").data)

@@ -1614,6 +1614,7 @@ class BaseAiComicE2ERuntime:
             expected_manifest_revision=manifest.manifest_revision,
             attempt_id="base-ai-comic-layout-policy",
         )
+        self._review_current_caption(label="initial")
         return self._review_current_render(label="initial")
 
     def review_repaired_render(self) -> tuple[BaseAiComicReviewResult, ...]:
@@ -1692,7 +1693,7 @@ class BaseAiComicE2ERuntime:
                 render_output_sha256=bundle.render_state.output.file_sha256,
                 timeline_fingerprint=bundle.render_state.timeline_fingerprint,
                 qa_policy=manifest.active_qa_policy,
-                review_receipt_ids=(failed.receipt.review_id,),
+                review_receipt_ids=tuple(item.review_id for item in manifest.active_review_receipts),
                 baseline_review_receipts=manifest.active_review_receipts,
                 issue_ids=failed.issue_ids,
                 evidence_ids=failed.receipt.evidence_ids,

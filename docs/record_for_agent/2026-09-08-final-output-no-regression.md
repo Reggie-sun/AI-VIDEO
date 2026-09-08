@@ -53,9 +53,20 @@ native `reviewer_xhigh` 独立审查最初拒绝 profile-only 目标豁免与失
 scoped 复审先为 `accept with concerns`，无阻断；提出的 missing QA 错误分类与真实 goal binding
 测试补齐后，同级最终 scoped verdict 为 `accept`。Review 不替代本地 tests、Harness 或真实媒体验收。
 
-正式验收使用 exact commit range，自起点 `b9fd7b5` 到本任务提交：
-`python -m scripts.agent_harness verify --base-ref b9fd7b5 --head-ref HEAD --run-id final-output-no-regression-20260908`。
-权威结果保存于 `.agent/harness/runs/final-output-no-regression-20260908/receipt.json`；
+首次实现提交 `9f82b2a` 的 exact-range Harness 为 FAIL，原 receipt 保留于
+`.agent/harness/runs/final-output-no-regression-20260908/receipt.json`。新增契约测试 48 passed、
+generation feedback 193 passed / 1 skipped、Router 340 passed、Provider/lifecycle 782 passed；
+Production 组合 8 failed / 3341 passed / 3 skipped。8 项共同原因为漫画 E2E 的旧 initial
+baseline 只运行 LAYOUT，但 QA 也要求 CAPTION；fixture 已通过原 caption review 入口
+补齐证据，并把全部 review pointers 绑定到 approval。继续定向验证暴露 caption 篡改被更早
+的通用 loader 拒绝后错误码变为 PRODUCTION_PROJECT_INVALID；唯一 committer 现映射回
+原 REPAIR_SCOPE_INVALID，保留原断言和拒绝语义。两项修正均获 reviewer_xhigh scoped accept。
+修正后完整 `tests/test_production_base_ai_comic_e2e.py` 为 14 passed（135.70s），
+含损坏 caption evidence/request 拒绝、完整修复验收和 exact replay 零副作用。
+
+修正后正式验收使用 exact commit range，自起点 `b9fd7b5` 到本任务最终提交：
+`python -m scripts.agent_harness verify --base-ref b9fd7b5 --head-ref HEAD --run-id final-output-no-regression-20260908-v2`。
+权威结果保存于 `.agent/harness/runs/final-output-no-regression-20260908-v2/receipt.json`；
 需以 receipt status、scope、artifact hashes 和 `verify-receipt` freshness 共同判定。
 本文在运行前与实现一起封存，不预先宣称该 receipt PASS；最终执行结果由 receipt 独占。
 
