@@ -2,7 +2,15 @@
 
 ## Current State
 
-### Latest Continuation — Attempt 12 Generated, Timing FAIL
+### Latest Continuation — Attempt 12 Human PASS
+
+用户对第12版手部、间隙、声音明确回复“都正常”；真实 MCP bridge 已补齐
+human06/14/17 PASS，Manifest r51。legacy-03 FAIL、legacy-05 NOT_EVALUATED仍保留，
+不宣布质量通过。`preparation-v4/attempt12-human-confirmation.json` 保存 exact 答复。
+后续一次继续授权已保存但未使用，runtime仍ceiling3/used3，未发新permit或POST。
+下方human pending/r50均为历史；以本节及主记录为准。
+
+### Historical Continuation — Attempt 12 Generated, Timing FAIL
 
 既有一次追加授权已用于新的肘部屈曲动作方案，原首末帧、seed、广播与QA保留。
 2026-09-08 10:45 UTC唯一POST成功；10:47 UTC通过原下载保护下的同任务DNS恢复取回。

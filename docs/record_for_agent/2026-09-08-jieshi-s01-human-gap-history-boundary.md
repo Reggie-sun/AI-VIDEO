@@ -8,7 +8,34 @@ learning_eligibility: ineligible
 
 Date: 2026-09-08
 
-## Latest Checkpoint — Attempt 12 Generated, Timing FAIL
+## Latest Checkpoint — Attempt 12 Human Evidence Repaired
+
+用户对 exact attempt12 的手部自然、近窗间隙可读、广播完整清晰三项明确回复
+“都正常”，随后要求“继续”。`preparation-v4/attempt12-human-confirmation.json`
+保存原话与 MP4 SHA/3,472,114 bytes；重新核验实际 bytes 后，通过真实 initialized
+project-local MCP bridge 补入 human06/14/17 PASS，不继承旧片答案。
+Manifest r51，attempt12仍 RUNNING/VALIDATE；新 experience hash
+`dea0633520b36d51952c29941bf31d43d061c676812f6457c9acb57872a72847`。
+legacy-03 FAIL与legacy-05 NOT_EVALUATED保留，diagnosis仍为
+EVIDENCE_GAP+QUALITY_FAILURE；没有激活、质量终结或新Provider调用。
+下方 attempt12 human pending 与 r50 是已被本节取代的历史状态。
+
+后续“授权继续”独立保存于 `preparation-v4/continuation-authorization-after-attempt12.json`：
+同 Vidu Q3 Pro / S01、原首末帧、seed与广播、frozen QA，最小追加一次，prior used3，
+task级总ceiling4。该额度未使用，runtime仍ceiling3/used3；没有扩ledger或签发permit。
+这不是无限重试，也不能填补掌向证据或当作质量通过。
+
+独立 `reviewer_xhigh` 本轮实际查看保存的1080px加密图像：0秒、1.25–2.75秒
+每0.125秒、3秒与4秒；accept parent保留legacy-05 NOT_EVALUATED。
+1.5–2.125秒掌纹、指甲和拇指根部特征因运动模糊不可稳定识别；指轴变化不能
+证明掌面反向，后段清晰姿态不能补证早段。现有same-bytes补证已到实际限制，
+重复抽同样帧没有明确增益。当前停点是该证据缺口与明确时序失败，非缺少授权。
+
+本次按 `record-ai-video-session` 更新原记录；`distill-ai-video-learning` 为
+no_candidate：同一媒体补充人类观察不是新独立实验，没有新的已验证修复结论。
+记录阶段无Provider/media/network调用、无RAG重建；无关暂存工作保留。
+
+## Historical Checkpoint — Attempt 12 Generated, Timing FAIL
 
 用户再次“授权”后沿既有一次追加范围继续，未累加为第二份额度。独立
 `reviewer_xhigh` 对 exact 首末帧和 attempt11 四个保存帧复核为 accept with concerns：
