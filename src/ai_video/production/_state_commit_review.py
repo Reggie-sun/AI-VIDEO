@@ -112,6 +112,16 @@ class _StateCommitReviewMixin:
                 and manifest.active_qa_policy == pointer
             ):
                 return manifest
+            if manifest.active_qa_policy is not None:
+                prior = load_qa_policy(self._project_root, manifest.active_qa_policy).final_output
+                current = policy.final_output
+                if prior is not None and (
+                    current is None or (
+                        (prior.goal_id, prior.goal_version) == (current.goal_id, current.goal_version)
+                        and prior != current
+                    )
+                ):
+                    raise _state_invalid("Final-output goal changes require an explicit new goal version; requirements cannot be removed in place.")
             artifact = PreparedArtifact(pointer.path, payload, file_sha256)
             self._write_immutable_artifact(artifact, attempt_id=attempt_id)
             stale_states = tuple(
@@ -574,6 +584,13 @@ class _StateCommitReviewMixin:
                 load_review_receipt(self._project_root, item)
                 for item in receipt.required_review_receipts
             )
+            from ai_video.production.final_output_review import require_closed_repairs, reopen_review_verdict
+
+            require_closed_repairs(self._project_root, manifest)
+            if policy.final_output is not None:
+                for item in receipt.required_review_receipts:
+                    if item.layer is QaLayer.SEMANTIC:
+                        reopen_review_verdict(self._project_root, item)
             caption_pointers = tuple(
                 item
                 for item in receipt.required_review_receipts

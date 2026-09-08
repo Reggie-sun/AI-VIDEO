@@ -74,9 +74,17 @@ def load_active_review_state(
                 raise _invalid(
                     "Active CAPTION Review Receipt chain is invalid.", str(exc)
                 ) from exc
+        if receipt_pointer.layer is QaLayer.SEMANTIC and qa_policy.final_output is not None:
+            from ai_video.production.final_output_review import reopen_review_verdict
+
+            reopen_review_verdict(root, receipt_pointer)
     acceptance = manifest.final_acceptance_state
     if acceptance is not None and acceptance.active_receipt is not None:
         final_receipt = load_final_acceptance_receipt(root, acceptance.active_receipt)
+        if qa_policy.final_output is not None:
+            from ai_video.production.final_output_review import require_closed_repairs
+
+            require_closed_repairs(root, manifest)
         required_layers = {
             item for item in qa_policy.required_layers if item.value != "final_acceptance"
         }

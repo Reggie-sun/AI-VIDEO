@@ -185,6 +185,8 @@ class ImportedGenerationExperienceReceipt(StrictModel):
         if self.evaluation_policy.content_hash != canonical_sha256(self.evaluation_policy):
             raise ValueError("retrospective evaluation policy content hash is invalid")
         self._validate_experience(request, fetch)
+        if self.experience.candidate.final_output_goal is not None:
+            raise ValueError("unbound historical source cannot attest a generation-time final-output goal")
         if (
             self.experience.candidate.recipe.comparison is not None
             or any(

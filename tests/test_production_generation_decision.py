@@ -685,7 +685,8 @@ def test_prediction_outcome_is_observational_and_protects_declared_requirements(
     proposed = intervention(evidence(setup), protected_requirements=("continuity",))
     supported = Diagnosis(failure_classes=(), failed_requirements=(),
                           preserved_requirements=("duration", "continuity"),
-                          evidence_hashes=("a" * 64,), next_owner="review_owner")
+                          evidence_hashes=("a" * 64,), next_owner="review_owner",
+                          all_required_observed_pass=True)
     refuted = supported.model_copy(update={"failed_requirements": ("continuity",),
                                            "preserved_requirements": ("duration",)})
     incomplete = supported.model_copy(update={"preserved_requirements": ("duration",)})

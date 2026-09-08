@@ -2,7 +2,7 @@
 
 from typing import Literal
 
-from pydantic import Field, model_validator
+from pydantic import Field, model_serializer, model_validator
 
 from ai_video.production.artifact_contracts import StrictModel
 from ai_video.production._shot_router_contracts import (
@@ -14,6 +14,7 @@ from ai_video.production.generation_diagnosis import (
 )
 from ai_video.production.generation_recipe import GenerationRecipe, SHA256
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.final_output_contracts import FinalOutputContract
 from ai_video.production.video import (
     ProviderProfilePointer, VideoGenerationRequest, VideoOutputRequirement, VideoProviderCapabilities,
 )
@@ -28,6 +29,14 @@ class GenerationCandidate(StrictModel):
     compiler_contract: AdapterCompilerContract
     output_requirement: VideoOutputRequirement | VideoFlexibleOutputRequirement
     recipe: GenerationRecipe
+    final_output_goal: FinalOutputContract | None = None
+
+    @model_serializer(mode="wrap")
+    def _serialize_goal(self, handler):
+        result = handler(self)
+        if self.final_output_goal is None:
+            result.pop("final_output_goal", None)
+        return result
 
     @model_validator(mode="after")
     def _identity(self):
@@ -44,11 +53,14 @@ class GenerationCandidate(StrictModel):
 
     @property
     def scope_hash(self):
-        return canonical_sha256({"provider": self.capabilities.provider_name,
+        payload = {"provider": self.capabilities.provider_name,
                                  "capability": self.capability_id,
                                  "capabilities": self.capabilities.capabilities_fingerprint,
                                  "recipe": self.recipe.fit_hash,
-                                 "output": self.output_requirement.model_dump(mode="json")})
+                                 "output": self.output_requirement.model_dump(mode="json")}
+        if self.final_output_goal is not None:
+            payload["final_output_goal"] = self.final_output_goal.contract_hash
+        return canonical_sha256(payload)
 
 
 class ExecutionLimits(StrictModel):
@@ -71,7 +83,7 @@ class DecisionPolicy(StrictModel):
     policy_id: Literal["generation-decision"] = "generation-decision"
     # Version 1 remains readable for sealed historical inputs.  Version 2
     # moves the resample ceiling to policy so a new proposal cannot expand it.
-    version: Literal["1", "2"] = "2"
+    version: Literal["1", "2", "3"] = "3"
     repeated_failure_threshold: int = Field(default=3, strict=True, ge=2)
     max_resamples: int = Field(default=1, strict=True, ge=0)
     allow_bounded_exploration: bool = False
@@ -130,6 +142,8 @@ class DecisionInputs(StrictModel):
             raise ValueError("execution scope names an absent candidate")
         if len({c.recipe.rubric_hash for c in self.candidates}) != 1:
             raise ValueError("candidates cannot compare different rubrics")
+        if len({c.final_output_goal for c in self.candidates}) != 1:
+            raise ValueError("candidates cannot compare different final-output goals")
         rubric_projections = {
             canonical_sha256({"expressions": [r.model_dump(mode="json", exclude={"native_text"})
                               for r in c.recipe.expressions]}) for c in self.candidates
@@ -338,6 +352,7 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
     ):
         return GenerationDecision(**base, disposition="EVIDENCE_GAP",
             rationale=("prepared-only work cannot replace the last submitted outcome and baseline",))
+    goal_changed = False
     if latest is not None:
         if latest not in current_attempts:
             raise ValueError("latest attempt is outside current Shot")
@@ -348,7 +363,18 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
                                       rationale=("include the prior exact recipe for diagnosis",))
         diagnosis = diagnose_exact_result(latest, inputs.evidence, old_recipe)
         base["diagnosis"] = diagnosis
+        if inputs.policy.version == "3" and latest.rubric_hash != inputs.rubric_hash:
+            old_goal = next(c.final_output_goal for c in (*candidates, *inputs.historical_recipes)
+                if c.scope_hash == latest.recipe_scope_hash)
+            new_goal = candidates[0].final_output_goal
+            goal_changed = bool(old_goal is not None and new_goal is not None
+                and (old_goal.goal_id, old_goal.goal_version) != (new_goal.goal_id, new_goal.goal_version))
+            if not goal_changed:
+                return GenerationDecision(**base, disposition="RUBRIC_OR_STAGE_ERROR",
+                    rationale=("Final-output repair cannot replace its frozen goal requirements; retain the old failure and author a new goal version explicitly",))
         for reason in ("UNKNOWN_OUTCOME", "RUNTIME_FAILURE", "RUBRIC_OR_STAGE_ERROR", "EVIDENCE_GAP"):
+            if goal_changed and reason == "EVIDENCE_GAP":
+                continue
             if reason in diagnosis.failure_classes:
                 return GenerationDecision(**base, disposition=reason,
                                           rationale=(f"repair via {diagnosis.next_owner} on exact evidence",))
@@ -365,11 +391,18 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
                                   rationale=tuple(f"{c.observation}; owner={c.next_owner}" for c in
                                                   sorted(inputs.conflicts, key=lambda c: (c.kind, c.source_sha256))))
     intervention = None
-    if latest is not None and "QUALITY_FAILURE" in base["diagnosis"].failure_classes:
+    if latest is not None and not goal_changed and "QUALITY_FAILURE" in base["diagnosis"].failure_classes:
         evidence_ids = {e.evidence_hash for e in inputs.evidence}
         alternatives = []
         unresolved_prediction = False
         for proposed in inputs.interventions:
+            if inputs.policy.version == "3" and (
+                proposed.known_requirement_violations
+                or not set(base["diagnosis"].preserved_requirements)
+                    <= set(proposed.protected_requirements)
+                or not set(proposed.closes) <= set(base["diagnosis"].failed_requirements)
+            ):
+                continue
             if not set(proposed.support + proposed.counterevidence) <= evidence_ids:
                 raise ValueError("intervention cites missing evidence")
             if latest.evidence_hash not in proposed.support + proposed.counterevidence:
@@ -425,7 +458,8 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
                     prediction_outcomes.append("undetermined")
                     continue
                 prediction_outcomes.append(intervention_prediction_outcome(
-                    proposed, diagnose_exact_result(entry, inputs.evidence, old_recipe)))
+                    proposed, diagnose_exact_result(entry, inputs.evidence, old_recipe),
+                    require_all=inputs.policy.version == "3"))
             # A non-resample experiment may run once.  Its observed outcome is
             # retained to distinguish evidence repair from a relabeled retry.
             if previous and proposed.purpose != "resample":
@@ -525,7 +559,8 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
     return GenerationDecision(**base, disposition="GENERATE_ONCE", selected_candidate_id=chosen.candidate_id,
                               routing=routing, intervention=intervention,
                               rationale=(f"{chosen.candidate_id}: {eligible[0].fit}; one bounded attempt, no quality guarantee",
-                                         "evidence and policy affect audit identity, not unrelated media semantics"),
+                                         "explicit goal revision retains the old failed result; it is not a repair success"
+                                         if goal_changed else "evidence and policy affect audit identity, not unrelated media semantics"),
                               revalidate_requirements=tuple(r.requirement_id for r in chosen.recipe.expressions
                                                             if r.level == "acceptance"))
 

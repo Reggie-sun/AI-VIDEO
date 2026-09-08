@@ -83,7 +83,7 @@ def _expressions(acceptance, requirement):
     return tuple(sorted(result, key=lambda rule: rule.requirement_id))
 
 
-def create_generation_candidates(*, projection, targets, acceptance, baseline=None):
+def create_generation_candidates(*, projection, targets, acceptance, baseline=None, final_output_goal=None):
     """Enumerate actual registered variants; Router owns compatibility/ranking."""
     expressions = _expressions(acceptance, projection.requirement)
     candidates = []
@@ -114,7 +114,7 @@ def create_generation_candidates(*, projection, targets, acceptance, baseline=No
                 candidate_id=candidate_id, provider_profile=target.profile,
                 capabilities=capabilities, capability_id=variant.capability_id,
                 compiler_contract=target.compiler_contract,
-                output_requirement=target.output_requirement, recipe=recipe))
+                output_requirement=target.output_requirement, recipe=recipe, final_output_goal=final_output_goal))
     if not candidates:
         raise ValueError("no video capabilities registered; use the non-video production path")
     return tuple(candidates), providers
@@ -253,7 +253,8 @@ class GenerationFeedbackOrchestrator:
         })
         candidates, providers = create_generation_candidates(
             projection=current["projection"], targets=self.targets,
-            acceptance=current["acceptance"], baseline=history.baseline_request)
+            acceptance=current["acceptance"], baseline=history.baseline_request,
+            final_output_goal=current.get("final_output_goal"))
         interventions, conflicts = derive_generation_interventions(
             projection=current["projection"], candidates=candidates, history=history, policy=self.policy)
         evidence = {e.evidence_hash: e for x in history.experiences for e in x.evidence}
@@ -333,6 +334,7 @@ class GenerationFeedbackOrchestrator:
 
             require_generation_evaluation_authorities(loaded.qa_policy, acceptance)
             result["acceptance"] = acceptance
+            result["final_output_goal"] = loaded.qa_policy.final_output
             return result
 
         def history():

@@ -17,6 +17,7 @@ from pydantic import (
 from ai_video.production._immutable_models import ImmutableDict
 from ai_video.production.artifact_contracts import StrictModel, ToolIdentity
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.final_output_contracts import FinalOutputContract
 from ai_video.production.source_use_evidence import (
     SourceUseEvidence,
     require_source_use_evidence_authority,
@@ -184,6 +185,7 @@ class DomainAcceptanceQaPolicyMixin:
     """Pydantic mixin that keeps the generic QA model domain-neutral."""
 
     domain_acceptance: DomainAcceptancePolicy | None = None
+    final_output: FinalOutputContract | None = None
     generation_acceptance: DomainAcceptancePolicy | None = None
     generation_evaluation_authorities: tuple[GenerationEvaluationAuthority, ...] = ()
     production_allocations: tuple[ProductionRequirementAllocation, ...] = ()
@@ -244,6 +246,11 @@ class DomainAcceptanceQaPolicyMixin:
 
     @model_validator(mode="after")
     def _validate_domain_acceptance_policy(self):
+        if self.final_output is not None and (
+            self.semantic_requirement != "required"
+            or QaLayer.SEMANTIC not in self.required_layers
+        ):
+            raise ValueError("Final-output contract requires the semantic layer and authority")
         if any(item.evaluator not in self.semantic_authorities for item in self.generation_evaluation_authorities):
             raise ValueError("generation proof authority must be a policy-selected evaluator")
         if (self.generation_acceptance is not None
@@ -293,6 +300,8 @@ class DomainAcceptanceQaPolicyMixin:
         data = handler(self)
         if self.domain_acceptance is None:
             data.pop("domain_acceptance", None)
+        if self.final_output is None:
+            data.pop("final_output", None)
         if self.generation_acceptance is None:
             data.pop("generation_acceptance", None)
         if data.get("caption_policy") is None:

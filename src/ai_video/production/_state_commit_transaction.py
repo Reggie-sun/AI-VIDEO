@@ -465,6 +465,11 @@ class _StateCommitTransactionMixin:
                 ErrorCode.REPAIR_AUTHORIZATION_REQUIRED,
                 "Approved Repair Receipt base identities are stale.",
             )
+        from ai_video.production.final_output_review import require_repair_baseline
+        from ai_video.production.project import load_qa_policy
+
+        require_repair_baseline(self._project_root, approved,
+            load_qa_policy(self._project_root, approved.qa_policy))
         transition = request.dependency_graph_transition
         if transition is None:
             raise AiVideoError(

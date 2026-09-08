@@ -20,6 +20,9 @@ def approved_repair_is_current(
 
     return (
         current_render is not None
+        and not receipt.selected_repair_action.known_requirement_violations
+        and bool(receipt.baseline_review_receipts)
+        and receipt.baseline_review_receipts == manifest.active_review_receipts
         and manifest.active_dependency_graph == receipt.dependency_graph
         and canonical_sha256(
             {

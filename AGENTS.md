@@ -78,6 +78,13 @@ Plans、specs、roadmaps、console text、Agent memory 或历史 receipts 本身
 - Unknown outcome 必须 fail closed；recovery 必须显式，不能 blind retry、remint permit、猜测 mixed state、自动激活或删除完整 orphan evidence。
 - Typed cross-module failures使用 `AiVideoError` 与 `ErrorCode`；retryability 由 typed metadata 决定，常规 CLI 输出不得泄露 raw traceback。
 
+### Final-output-first / No-regression
+
+所有生成、修复、后处理和验收，最终判断对象都是用户实际会看到的成片，而不是某个局部指标、技术检查或中间产物。
+任何局部修复都不得以破坏其他已经满足的视觉、动作、连续性、节奏、音频或叙事要求为代价。
+单项指标通过不代表方案通过。若方案已知会造成整体质量退化，必须在执行或交付前主动否决，不得以 preview、technical pass、成本更低、避免重新生成或等待用户确认作为放行理由。
+当局部目标与成片质量冲突时，成片质量拥有最高优先级；若无法同时满足，应判定当前方案失败，而不是修改对目标的解释。
+
 ### Empirical Validation Priority
 
 - 对不能仅由 code/tests/Harness 证明的媒体能力，必须区分 Engineering / Deterministic Uncertainty 与 Empirical / Model-Quality Uncertainty。后者占主导且存在安全、有界、满足适用授权或 local exemption、可负担且可执行、可隔离归因的最小真实实验时，下一关键动作 SHOULD 优先取证，再扩大仅服务未来验证的 engineering。

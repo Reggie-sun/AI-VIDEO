@@ -166,6 +166,13 @@ class GenerationDecisionExecutionBinding(StrictModel):
     def validate_current_project(self, project) -> None:
         """Bind a self-consistent decision to the currently loaded source bytes."""
 
+        if self.inputs.policy.version != "3":
+            raise ValueError("new execution requires final-output no-regression decision policy/3")
+        if project.qa_policy is None:
+            raise ValueError("generation execution requires a current QA policy")
+        if any(candidate.final_output_goal != project.qa_policy.final_output
+               for candidate in self.inputs.candidates):
+            raise ValueError("generation final-output goal differs from the current QA owner")
         request = self.compiled_request
         scope = request.activation_scope
         if scope is None:

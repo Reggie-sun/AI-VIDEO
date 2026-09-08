@@ -17,6 +17,7 @@ from pydantic import (
 )
 
 from ai_video.production._dependency_types import DependencyNodeKind
+from ai_video.production.final_output_contracts import RepairAction as RepairAction, RepairBaselineMixin, RepairOutcomeMixin
 
 from ai_video.production.artifact_contracts import (
     ArtifactReference as ArtifactReference,
@@ -404,11 +405,6 @@ class QaTechnicalThresholds(StrictModel):
 class QaLayoutRules(StrictModel):
     safe_area_inset_milli: int = Field(ge=0, le=500)
     caption_overflow_tolerance_milli: int = Field(ge=0)
-
-
-class RepairAction(StrictModel):
-    kind: str = Field(min_length=1)
-    parameters_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
 class ActorIdentity(StrictModel):
@@ -2399,7 +2395,7 @@ class ReviewReceipt(_caption_review.CaptionReviewReceiptMixin, VersionedArtifact
         return self
 
 
-class RepairRequest(VersionedArtifact):
+class RepairRequest(RepairBaselineMixin, VersionedArtifact):
     repair_id: str = Field(min_length=1)
     base_manifest_revision: int = Field(ge=1)
     dependency_graph: DependencyGraphSnapshotPointer
@@ -2425,7 +2421,7 @@ class ApprovedRepairReceipt(RepairRequest):
     request_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
 
 
-class RepairOutcomeReceipt(_caption_review.CaptionRepairOutcomeMixin, VersionedArtifact):
+class RepairOutcomeReceipt(RepairOutcomeMixin, _caption_review.CaptionRepairOutcomeMixin, VersionedArtifact):
     repair_id: str = Field(min_length=1)
     approved_receipt: ApprovedRepairReceiptPointer
     review_receipt_ids: tuple[str, ...] = Field(min_length=1)

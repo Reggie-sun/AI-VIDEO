@@ -8,6 +8,17 @@
 
 ## 1. Creative Skill Routing And Preflight
 
+### Final-output-first Repair Preflight
+
+裁决优先级为用户成片目标 → Final-output / No-regression → Shot 完整要求 → 局部指标；
+它不要求在收集证据前凭空给出顶层 PASS。修复前从当前 QA/authoring 固定完整目标、原片
+identity 和全部 baseline review；先记录并拒绝已知违反要求的方案，preview 同样适用。
+不要将技术 PASS、成本或避免重新生成作为豁免。目标变化须显式保留新版本与旧失败。
+无已知违规只表示尚未在 preflight 被否决；新片必须重新完成全部适用 proof。
+Runtime 字段和入口由 [Final-output-first / No-regression](../../docs/agent-primary-contract-matrix.md#final-output-first--no-regression)
+维护。对未经过 Production 的 task-local shell/media 操作，Agent 仍必须执行相同原则；
+当前 Python Gate 不拦截任意 shell command，也不提供通用媒体 runtime。
+
 AI-VIDEO remains the sole owner of production truth. External Skills provide advisory knowledge only unless an explicitly approved project contract says otherwise. Skill guidance MUST be translated into AI-VIDEO domain contracts before execution and MUST NOT mutate or own canonical state.
 
 Use the minimum matching Skill set. Installation、description matching 或“本仓库生产视频”本身不构成触发条件。纯 production-state、asset、schema、dependency、timeline、render、activation、recovery 或 Provider-lifecycle 工作只使用 AI-VIDEO code 与 accepted contracts。

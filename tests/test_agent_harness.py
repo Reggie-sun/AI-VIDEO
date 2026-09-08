@@ -128,6 +128,23 @@ def test_generation_feedback_routes_to_decision_and_provider_checks(path) -> Non
             "production_video_provider_tests"} <= set(inspection["check_ids"])
 
 
+@pytest.mark.parametrize("path", [
+    "src/ai_video/production/final_output_contracts.py",
+    "src/ai_video/production/final_output_review.py",
+    "src/ai_video/production/_state_commit_repair.py",
+    "src/ai_video/production/generation_decision.py",
+    "tests/test_production_final_output.py",
+    "tests/test_generation_no_regression.py",
+])
+def test_final_output_gate_routes_to_real_entry_contract_checks(path):
+    policy = agent_harness.load_policy(POLICY_PATH)
+    inspection = agent_harness.inspect_paths([path], policy)
+    assert "final_output_no_regression_tests" in inspection["check_ids"]
+    command = policy["checks"]["final_output_no_regression_tests"]["argv"]
+    assert "tests/test_production_final_output.py" in command
+    assert "tests/test_generation_no_regression.py" in command
+
+
 def test_repository_policy_v2_loads_and_references_known_checks() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 

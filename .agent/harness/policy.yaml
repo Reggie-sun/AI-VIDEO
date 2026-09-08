@@ -89,6 +89,10 @@ fallback_check_ids:
   - task_architecture_gate
 
 checks:
+  final_output_no_regression_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_final_output.py, tests/test_generation_no_regression.py, -q]
+    cwd: .
+    description: Verify final-output requirements, exact repair baselines, known-violation refusal and complete fresh review through existing owners; no Provider or media effects.
   production_vidu_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_vidu.py, tests/test_production_vidu_download.py, tests/test_production_vidu_prompt.py, -q]
     cwd: .
@@ -310,6 +314,7 @@ checks:
       - production_dependency_tests
       - production_review_tests
       - production_image_tests
+      - final_output_no_regression_tests
       - production_video_provider_tests
       - shot_continuity_p0_tests
       - production_shot_router_tests
@@ -390,6 +395,7 @@ categories:
       - scripts/generation_feedback_driver.py
       - tests/test_generation_feedback_driver.py
       - tests/test_generation_feedback_review.py
+      - tests/test_generation_no_regression.py
       - src/ai_video/production/generation_feedback.py
       - src/ai_video/production/generation_experience.py
       - src/ai_video/production/generation_evaluation.py
@@ -419,6 +425,7 @@ categories:
       - tests/fixtures/generation_feedback_history.json
     check_ids:
       - generation_feedback_tests
+      - final_output_no_regression_tests
       - production_shot_router_tests
       - production_video_provider_tests
   documentation:
@@ -612,6 +619,9 @@ categories:
       - task_architecture_gate
   production_review:
     patterns:
+      - src/ai_video/production/final_output_contracts.py
+      - src/ai_video/production/final_output_review.py
+      - tests/test_production_final_output.py
       - src/ai_video/production/caption_quality_contracts.py
       - src/ai_video/production/caption_quality.py
       - src/ai_video/production/_caption_quality_p6.py
@@ -649,6 +659,7 @@ categories:
       - tests/test_mcp_apply_optimization.py
     check_ids:
       - production_review_tests
+      - final_output_no_regression_tests
       - task_architecture_gate
   commercial_source_preparation:
     patterns:

@@ -7,6 +7,7 @@ from pydantic import Field, model_validator
 from ai_video.production.artifact_contracts import StrictModel
 from ai_video.production.generation_recipe import SHA256, Proof, Stage, GenerationRecipe
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.final_output_contracts import RepairPredictionMixin
 
 
 class Finding(StrictModel):
@@ -155,7 +156,7 @@ def diagnose_exact_result(attempt: AttemptEvidence, evidence: tuple[AttemptEvide
     return diagnosis.model_copy(update={"evidence_hashes": tuple(sorted(records))})
 
 
-class Intervention(StrictModel):
+class Intervention(RepairPredictionMixin, StrictModel):
     intervention_id: str = Field(min_length=1)
     candidate_id: str = Field(min_length=1)
     purpose: Literal["diagnostic", "production_repair", "resample"]
@@ -228,15 +229,22 @@ PredictionOutcome = Literal["supported", "refuted", "undetermined"]
 
 
 def intervention_prediction_outcome(intervention: Intervention,
-                                    diagnosis: Diagnosis) -> PredictionOutcome:
+                                    diagnosis: Diagnosis, *, require_all: bool = True) -> PredictionOutcome:
     """Classify the exact observable result of one intervention.
 
     This records whether the stated target/protected requirements were observed.
     It deliberately does not claim that the intervention caused the result.
     """
-    blocking = {"UNKNOWN_OUTCOME", "RUNTIME_FAILURE", "RUBRIC_OR_STAGE_ERROR", "EVIDENCE_GAP"}
+    blocking = {"UNKNOWN_OUTCOME", "RUNTIME_FAILURE", "RUBRIC_OR_STAGE_ERROR"}
+    if not require_all:
+        blocking.add("EVIDENCE_GAP")
     if blocking.intersection(diagnosis.failure_classes):
         return "undetermined"
+    if require_all:
+        if diagnosis.failed_requirements or intervention.known_requirement_violations:
+            return "refuted"
+        if not diagnosis.all_required_observed_pass:
+            return "undetermined"
     failed = set(diagnosis.failed_requirements)
     preserved = set(diagnosis.preserved_requirements)
     targeted = set(intervention.closes)

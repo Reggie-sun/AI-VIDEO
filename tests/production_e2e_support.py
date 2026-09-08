@@ -1693,6 +1693,7 @@ class BaseAiComicE2ERuntime:
                 timeline_fingerprint=bundle.render_state.timeline_fingerprint,
                 qa_policy=manifest.active_qa_policy,
                 review_receipt_ids=(failed.receipt.review_id,),
+                baseline_review_receipts=manifest.active_review_receipts,
                 issue_ids=failed.issue_ids,
                 evidence_ids=failed.receipt.evidence_ids,
                 root_cause_hypothesis="layout safe area requires deterministic inset",

@@ -172,13 +172,13 @@ class _Manifest25RepairFixture:
             if item.node_id not in REPAIR_CLOSURE
         }
 
-    def rerender(self) -> ProductionManifest:
+    def rerender(self, *, attempt_id="base-e2e-repaired-render") -> ProductionManifest:
         manifest = self.load_manifest()
         graph = load_production_project(self.root / "project.yaml").dependency_graph
         assert graph is not None
         selection = RendererSelectionReceipt(
-            receipt_id="selection-base-e2e-repaired-render",
-            attempt_id="base-e2e-repaired-render",
+            receipt_id=f"selection-{attempt_id}",
+            attempt_id=attempt_id,
             requested_kind=RendererKind.HYPERFRAMES,
             selected_kinds=(RendererKind.HYPERFRAMES,),
             renderer_version="0.7.103",
@@ -331,6 +331,7 @@ def make_manifest_25_failed_layout_review_fixture(
             timeline_fingerprint=bundle.render_state.timeline_fingerprint,
             qa_policy=manifest.active_qa_policy,
             review_receipt_ids=(review_pointer.review_id,),
+            baseline_review_receipts=manifest.active_review_receipts,
             issue_ids=("caption-overflow",),
             evidence_ids=("review-evidence-manifest-25-layout",),
             root_cause_hypothesis="caption layout exceeds safe area",

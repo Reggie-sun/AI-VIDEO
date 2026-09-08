@@ -7,6 +7,7 @@ from pydantic import ValidationError
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.caption_quality import reopen_caption_review_chain
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
+from ai_video.production.final_output_review import require_repair_baseline, require_no_regression_outcome, require_preserved_repair_layers
 from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     ApprovedRepairReceipt,
@@ -66,6 +67,7 @@ class _StateCommitRepairMixin:
             "actor",
             "authorization",
             "before_fingerprints",
+            "baseline_review_receipts",
         )
         if receipt.request_content_hash != request.content_hash or any(
             getattr(receipt, field) != getattr(request, field)
@@ -156,6 +158,10 @@ class _StateCommitRepairMixin:
                     "Approved Repair Receipt output or timeline is stale.",
                 )
             graph = self._reopen_dependency_graph(receipt.dependency_graph)
+            if receipt.baseline_review_receipts != manifest.active_review_receipts:
+                raise _state_invalid("Final-output repair baseline must bind every current review.")
+            require_repair_baseline(self._project_root, receipt, policy)
+            require_preserved_repair_layers(self._project_root, manifest, receipt, policy)
             node_ids = {item.node_id for item in graph.nodes}
             targets = set(receipt.exact_target_node_ids)
             if not targets or not targets.issubset(node_ids):
@@ -268,6 +274,12 @@ class _StateCommitRepairMixin:
                     ErrorCode.REPAIR_SCOPE_INVALID,
                     "Repair outcome has no succeeded repair attempt.",
                 )
+            if (manifest.active_dependency_graph
+                    != manifest.attempts[repair_index].candidate_dependency_graph
+                    or any(item.operation == "repair" and item.status is StateCommitStatus.SUCCEEDED
+                        for item in manifest.attempts[repair_index + 1:])):
+                raise AiVideoError(ErrorCode.REPAIR_SCOPE_INVALID,
+                    "Final-output repair outcome cannot borrow a later repair's output or baseline.")
             rerender_recorded = any(
                 item.operation == "render_state"
                 and item.status is StateCommitStatus.SUCCEEDED
@@ -283,6 +295,14 @@ class _StateCommitRepairMixin:
                 for item in manifest.dependency_states
                 if node_kinds.get(item.node_id) is DependencyNodeKind.RENDER
             )
+            require_no_regression_outcome(
+                self._project_root, approved, receipt, manifest, current_render)
+            if any(p.approved_receipt == receipt.approved_receipt for p in (
+                RepairOutcomeReceipt.model_validate_json(_read_regular_file_nofollow(
+                    self._project_root / item.path, contained_by=self._project_root / "state").data)
+                for item in manifest.repair_outcome_receipts
+            )):
+                raise _state_invalid("Final-output repair already has an immutable terminal outcome.")
             if (
                 not any(
                     item.operation == "repair"
@@ -309,8 +329,9 @@ class _StateCommitRepairMixin:
                 )
                 or any(
                     state_by_layer.get(item.layer) is None
-                    or state_by_layer[item.layer].lifecycle
-                    is not ReviewLifecycle.FRESH
+                    or state_by_layer[item.layer].lifecycle not in (
+                        {ReviewLifecycle.FRESH} if receipt.verdict == "pass" else
+                        {ReviewLifecycle.FRESH, ReviewLifecycle.FAILED, ReviewLifecycle.NOT_EVALUATED})
                     for item in receipt.fresh_review_receipts
                 )
             ):
@@ -333,7 +354,7 @@ class _StateCommitRepairMixin:
                             project=bundle,
                             receipt_pointer=caption_pointer,
                         )
-                        if reopened.verdict is not QaVerdict.PASS:
+                        if receipt.verdict == "pass" and reopened.verdict is not QaVerdict.PASS:
                             raise ValueError(
                                 "CAPTION review chain did not recompute to PASS"
                             )

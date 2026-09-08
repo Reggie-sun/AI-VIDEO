@@ -1,5 +1,52 @@
 # AI-VIDEO Contract Routing Matrix
 
+## Final-output-first / No-regression
+
+Review / Repair 的 `final_output_contracts.py` 与 `final_output_review.py` 独占通用成片
+要求、已知违规方案拒绝和修复前后比较；不拥有媒体执行或 lifecycle。
+`QaPolicy.final_output` 是可选的 immutable `FinalOutputContract`，固定 `goal_id`、
+`goal_version`、原文 `user_goal` 与完整 `requirements`（ID、observable、human/evaluator proof）。
+配置后必须启用 required SEMANTIC 与 selected authority；与 domain acceptance 同时配置时
+两者都必须通过。旧 policy 未声明的成片要求不能由技术层推断为已满足。
+
+`ReviewEvidence.measured_payload.final_output` 绑定 `contract_hash`、exact
+`review_request_content_hash`、逐项 finding/verdict/observation；human 要求必须有
+HUMAN strength 与 `viewing_speed_milli=1000`。原 request/receipt/evidence chain 继续绑定
+exact MP4、timeline、graph、QA 与工具身份。`record_review_receipt()`、strict active reader
+与 Final Acceptance 重开并重算该判断；缺项、错 proof、陈旧或错 identity 均不产生 PASS。
+这验证证据契约，不证明 evaluator 说真话，也不运行或伪造人类观看。
+
+新 `RepairRequest.baseline_review_receipts` 必须等于全部 current review pointers；
+approval 冻结该列表、原片、QA、scope 与证据，execution freshness 重验相同 baseline。
+`record_repair_outcome()` 重新读取 baseline 与新 review chain；QA 版本不得替换，全部
+required 和 baseline layers（包括 optional 原 PASS）都需新片 current PASS。
+PASS→FAIL 或原目标仍 FAIL 拒绝成功关闭；遗漏、PASS→NOT_EVALUATED 或陈旧同样阻断。
+失败后的新 review 保留，不能靠更换基线将失败修复记成成功。`RepairOutcomeReceipt.verdict`
+可显式记录经重算的 `fail` 终局；缺失/不确定证据不允许成功关闭。后续 repair 保留原目标
+全部 review 层，不得用 R2 的产物为 R1 写成功。Final Acceptance 要求同目标旧 repair 均有
+终局、最新 repair 为 PASS；显式新目标版本可独立验收，不改写旧失败或补写旧成功。
+`ProductionStateCommitter` 仍是唯一持久 writer。
+
+`RepairAction` / `Intervention.known_requirement_violations` 保存 requirement ID、证据 hash
+与 reason；任何非空已知违规均在执行选择/批准前拒绝，包括 preview，和操作名称无关。
+generation decision policy `/3` 保留 exact latest history、rubric、baseline request 与完整
+inventory，拒绝删减 protected PASS、原目标下替换 rubric 或已知违规；prediction supported 必须
+完整适用要求均有 PASS。raw-generation 观察不构成 whole-output 或 Final Acceptance。
+policy `/1`、`/2` 仍可重开；当前新 begin/submit 必须 `/3`，不借历史兼容获得新执行资格。
+空新增字段省略，旧 artifact hash 不变；历史缺少 baseline 的 approval 不获得新 repair 执行资格。
+`GenerationCandidate.final_output_goal` 由 `for_project()` 从当前 QA 供给、current execution
+重验；历史 candidate 保留原目标，只有显式不同的 `(goal_id, goal_version)` 可作为新目标
+分流。仅变更 rubric `profile_version` 不构成目标变化，历史无目标证据不能推断该例外。
+未绑定 source 的历史 import 不得凭事后评价伪造原 generation-time 目标。
+QA activation 拒绝同目标版本删改或移除完整要求；显式改目标需新 goal 版本。
+旧 repair 的失败与历史证据保持独立。新增空字段和默认 PASS outcome 不改变旧序列化。
+
+Focused verification：`python -m pytest -p no:cacheprovider
+tests/test_production_final_output.py tests/test_generation_no_regression.py
+tests/test_production_repair.py tests/test_generation_execution.py -q`。
+Harness `final_output_no_regression_tests` 验证现有入口契约，不收集媒体或裁决真实观感；
+machine-readable changed-path routing 仍由 `.agent/harness/policy.yaml` 独占。
+
 ## Production Strategy
 
 `planning/production_strategy.py::ProductionStrategyResolver` 是 Director intent 到生产手段的唯一选择

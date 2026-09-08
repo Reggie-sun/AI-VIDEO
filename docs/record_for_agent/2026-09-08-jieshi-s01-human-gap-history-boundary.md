@@ -8,6 +8,13 @@ learning_eligibility: ineligible
 
 Date: 2026-09-08
 
+## Engineering Follow-up — Final-output-first / No-regression
+
+通用约束的后续工程实现见 [implementation record](2026-09-08-final-output-no-regression.md)。
+它接入 Review / Repair、generation execution 与 Development Harness；下方“本次审查未修改
+工具实现”保留为根因记录时的历史事实。该实现不改变冻结预览的用户 FAIL/撤回结论，
+不修复 S01 媒体、不使用旧付费授权、不修改 Manifest，也不产生新的质量验收。
+
 ## Latest Checkpoint — Freeze Preview Rejected And Root Cause
 
 用户明确拒绝派生片 `090b4c605a400b712fa41d27028352bd6b38d6ba0436dda280b78a730b9840e3`：

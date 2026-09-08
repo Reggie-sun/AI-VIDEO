@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Callable
 
 import pytest
 
@@ -225,6 +226,8 @@ class _Manifest25ReviewFixture:
     review_layer: QaLayer = QaLayer.TECHNICAL
     review_fails: bool = False
     review_attempt_id: str = "base-e2e-technical-review"
+    evidence_factory: Callable[[ReviewRequest, ReviewEvidence], ReviewEvidence] | None = None
+    expected_verdict: QaVerdict | None = None
 
     def load_manifest(self) -> ProductionManifest:
         return load_production_project(self.root / "project.yaml").manifest
@@ -342,6 +345,8 @@ class _Manifest25ReviewFixture:
                 measured_payload=measured_payload,
             )
         )
+        if self.evidence_factory is not None:
+            evidence = self.evidence_factory(request, evidence)
         evidence_payload = _canonical_json_bytes(evidence)
         evidence_pointer = ReviewEvidencePointer(
             path=canonical_review_evidence_path(evidence.content_hash),
@@ -371,7 +376,7 @@ class _Manifest25ReviewFixture:
                 evidence=(evidence_pointer,),
                 evidence_ids=(evidence.evidence_id,),
                 tool_identities=(tool,),
-                verdict=QaVerdict.FAIL if self.review_fails else QaVerdict.PASS,
+                verdict=self.expected_verdict or (QaVerdict.FAIL if self.review_fails else QaVerdict.PASS),
             )
         )
         reviewed = self.committer.record_review_receipt(
