@@ -8,7 +8,34 @@ learning_eligibility: ineligible
 
 Date: 2026-09-08
 
-## Latest Authorized Continuation — Additional Submit Unused
+## Latest Checkpoint — Human PASS, Attempt 11 Quality Closed
+
+用户对 exact attempt11 的手部自然、玻璃间隙可读、原广播清晰三项问题回复“正常”。
+`preparation-v3/attempt11-human-confirmation.json` 保存原话及 exact MP4 SHA/bytes。
+真实 initialized project-local MCP 经 `review_generation_attempt` 补齐
+human legacy-06/14/17 PASS；legacy-03/05 仍 FAIL，诊断仅剩 QUALITY_FAILURE，
+next_owner=shot_router。下方 human pending、EVIDENCE_GAP 与 r36 均为历史状态。
+
+新 experience hash `770ce6f20ce35c77e998056db029e92ff57af00f63d618caf907b52a06d9dc8b`，
+evidence hash `b2fbbdc986983b99c0f02bcff4541037dfc6097afd7726562cd1ea15bcef621d`。
+经唯一 `ProductionStateCommitter.reject_video_generation` 完成 r37→r38：
+attempt11 FAILED / `video_quality_rejected`，rejection hash
+`8ba98b7d61348182d2049240a3dc9701c8771bab8412145fe1118f013ca84648`。
+`preparation-v4/attempt11-closure.json` 证明旧 paid 文件不变、原参数 replay 零写入；
+Project/Shot r6、原预留保留，未激活 candidate，也未创建新媒体或推进 S02。
+
+追加一次的既有授权仍未消费。当前 onset-only 草稿仅试图隔离起手延迟，不能解决
+已观察到的掌向变化；两次旧 prompt 均已要求立即抬手与稳定腕部。未将重复措辞
+包装成新干预，未放宽 frozen QA，也未把三次总失败数直接当作 comparable cohort 阈值。
+新干预仍需 exact latest evidence、真实编译差异及 Router 评估；本 checkpoint
+没有运行新的 Router 决策或签发 permit，不能称为 GENERATE_ONCE / submit-ready。
+当前停点是修复方案尚未满足生成前条件，不是缺少用户授权或观看答复。
+
+`record-ai-video-session` 更新原记录；`distill-ai-video-learning` 为 no_candidate：
+同一媒体补充 human proof 不是独立实验，尚无验证有效的新修复方法可提出采用。
+本次补证/终结零 Provider POST，记录阶段没有 Provider/media/network 调用或索引重建。
+
+## Historical Authorized Continuation — Additional Submit Unused
 
 用户在询问反复授权原因后再次明确“授权”。本次按原 Vidu Q3 Pro / S01 scope
 追加一次处理，保持原首末帧、seed20260907、点名广播与 QA，不再次询问相同授权。

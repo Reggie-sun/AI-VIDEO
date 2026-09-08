@@ -2,7 +2,20 @@
 
 ## Current State
 
-### Latest Continuation — Attempt 11 Generated, Gate FAIL
+### Latest Continuation — Human PASS, Attempt 11 Quality Closed
+
+用户对 exact attempt11 的三项观感问题回复“正常”，真实 MCP bridge 已补齐
+human06/14/17 PASS；legacy-03/05 仍 FAIL，诊断只剩 QUALITY_FAILURE。
+唯一 committer 已将 attempt11 终结为 FAILED / `video_quality_rejected`，Manifest r38；
+Project/Shot r6、旧预留与 paid 文件保留，原参数 replay 零写入。
+证据见 `preparation-v4/attempt11-closure.json` 与
+`preparation-v3/attempt11-human-confirmation.json`。
+
+此前追加一次的授权仍未消费。onset-only 草稿尚不能解决掌向变化，未形成新
+submit-ready intervention；没有新 POST、MP4、candidate activation 或 S02。
+下方 human pending、EVIDENCE_GAP 与 r36 是已被本节取代的历史状态。
+
+### Historical Continuation — Attempt 11 Generated, Gate FAIL
 
 金额扩容与同 task 次数追加代码已通过独立 review 和正式 Harness（`7dd8237`）。
 在保留旧预留和已用次数后，唯一追加 POST 已于2026-09-08 09:24 UTC被接受，随后成功fetch。
