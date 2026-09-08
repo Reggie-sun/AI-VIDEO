@@ -2,7 +2,20 @@
 
 ## Current State
 
-### Latest Continuation — Human Evidence Repaired, Runtime Blocked
+### Latest Continuation — Quality Closed, Budget Extension Pending
+
+`6017eed` 的显式质量终结已通过独立复审和正式 Harness。真实 attempt10 已标记为
+FAILED / `video_quality_rejected`，原 legacy-03/05 FAIL 保留；下一次 pre-generation
+graph 已通过原 committer 提交，Manifest r26 / Project 与 Shot r6。
+`preparation-v3/quality-close-runtime-checkpoint.json` 保存 receipt、graph 与不变性核验。
+原参数重放无写入，paid-provider 文件和 source09 保持不变；没有新 Provider call 或 MP4。
+
+下一次生成次数尚未使用，但原 ledger available 为 0；旧预留不得伪造结算/释放。
+新增有界预算扩容契约尚待明确授权。Planner/graph 准备不等于可提交请求。
+
+### Historical Continuation — Human Evidence Repaired, Runtime Blocked
+
+以下入口缺失与 r23 状态已由上述 checkpoint 取代。
 
 用户授权一次追加修复，并对 exact attempt10 的手部自然、间隙清楚与广播完整清晰
 三项观看问题回复“确认”。真实 MCP bridge 已在原视频上追加 human06/14/17 PASS；

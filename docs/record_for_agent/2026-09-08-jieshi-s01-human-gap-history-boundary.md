@@ -8,7 +8,47 @@ learning_eligibility: ineligible
 
 Date: 2026-09-08
 
-## Latest Checkpoint — Attempt 11 Lifecycle Blocker
+## Latest Checkpoint — Quality Closed, Budget Extension Pending
+
+用户“ok”授权的显式质量终结已实现并提交为 `6017eed`。独立 `reviewer_xhigh`
+复审为 accept with concerns，相关组合 51 passed；正式 exact-range Harness
+`1e348a0..6017eed` PASS，Production 3275 passed / 3 skipped。
+receipt 位于 `.agent/harness/runs/jieshi-s01-quality-rejection-20260908/receipt.json`，
+`verify-receipt` 的完整性、scope、freshness 与 completion proof 均为 true。
+
+真实 `ProductionStateCommitter.reject_video_generation()` 绑定 latest experience
+`b10f3a695250b4f1557fb28b8c13dbd2fce36c106f98ee256e1d02b5a03e37f4` 和 exact
+attempt10 MP4，将原 RUNNING/VALIDATE 终结为 FAILED / `video_quality_rejected`。
+rejection receipt 为 `360edb3bb8d9c28d709d496f935d484f2a780d84637825f439c84b8fe4bd5cc2`。
+随后原 generic committer 成功提交下一次 pre-generation graph；strict reopen 为
+Manifest r26，Project/Shot 仍 r6。关闭后及 graph 更新后，以原 expected revision/actor
+重放均没有 Manifest 写入。旧 paid state、paid-provider 文件与 source09 Manifest
+逐项/逐字节保持不变；没有 candidate activation、Provider submit 或新 MP4。
+
+runtime evidence：`runs/jieshi-e01-i2v-20260907-attempt10/preparation-v3/quality-close-runtime-checkpoint.json`。
+下一版 requirement hash 为
+`5bdc061ff2ebfb11891436b49e6fb3f7f1f944d57a700154072652b0504e4e26`，
+graph hash 为 `a2a75533f8e7df2307a14e4b8a0119682634923557220feabbccffd621c74525`。
+Planner/graph 准备不等于 sealed submit readiness；profile、Router execution binding、
+preview、预算及一次性 permit 仍须在真正 submit 前完成。
+
+剩余独立 blocker：原账本 total ceiling 为 3,000,000 microunits，旧 ACCEPTED 任务
+reserved upper bound 同为 3,000,000，available 为 0。质量拒绝不能虚构结算或释放。
+当前没有正式预算扩容入口；已提出只增加一次既有内部单次上限、保留原 ledger 和旧预留
+的新增 Budget Guard 契约，尚待明确答复。新增一次生成授权未消费；未研究官方价格。
+
+复审非阻断 concern：writer 使用全项目 history、reader 使用本 attempt history；当前
+request hash 包含 generation lifecycle，尚无证据证明合法路径可触发差异。component QA
+override 不在新入口支持范围，写入前拒绝。未据此扩大本轮 scope。
+
+本轮仅提交 task-owned code/docs；未推送，其他 staged/dirty 文件保留。
+`record-ai-video-session` 后自动执行 `distill-ai-video-learning` evaluation：no_candidate。
+这是同一媒体证据的 lifecycle 修复，没有新的独立媒体实验，也不证明手部质量改善；
+没有专门为记录执行 Provider、媒体、网络或额外测试，未另行刷新 RAG index。
+
+## Historical Checkpoint — Attempt 11 Lifecycle Blocker
+
+以下缺失入口和 r23 状态已被上述 `6017eed` 与真实 r26 checkpoint 取代。
 
 用户再次授权继续，并对链接到 exact attempt10 的三项问题（手部自然、手与玻璃
 间隙清楚、广播完整清晰）回复“确认”。该答复按三项肯定观看结论记录；不代表
