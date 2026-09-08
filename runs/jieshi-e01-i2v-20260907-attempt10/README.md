@@ -2,7 +2,17 @@
 
 ## Current State
 
-### Latest Continuation — Attempt 12 Human PASS
+### Latest Continuation — Local Timing Repair Preview
+
+用户授权修复后已生成[本地时序预览](../jieshi-s01-retime-review-20260908-v1/s01-timing-repair-review.mp4)：
+画面3/8时间缩放并保持末帧，1.5秒已到位；190个AAC packet内容及时间戳与源相同。
+输出SHA `090b4c605a400b712fa41d27028352bd6b38d6ba0436dda280b78a730b9840e3`，
+2,247,344 bytes；MCP实测1080×1920/24fps/97帧，容器4.054秒，原广播0–2秒。
+这是Production外的review derivative，源片、Production文件、r51与旧Gate不变。
+原运动模糊仍在，加速动作与末帧保持待新观感确认；无新Provider调用，追加额度未用。
+新run中的provenance、audio-timing-check、video-analysis与review-findings保存证据。
+
+### Historical Continuation — Attempt 12 Human PASS
 
 用户对第12版手部、间隙、声音明确回复“都正常”；真实 MCP bridge 已补齐
 human06/14/17 PASS，Manifest r51。legacy-03 FAIL、legacy-05 NOT_EVALUATED仍保留，

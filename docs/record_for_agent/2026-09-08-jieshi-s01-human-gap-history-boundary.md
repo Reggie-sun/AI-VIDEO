@@ -8,7 +8,42 @@ learning_eligibility: ineligible
 
 Date: 2026-09-08
 
-## Latest Checkpoint — Attempt 12 Human Evidence Repaired
+## Latest Checkpoint — Local Timing Repair Preview
+
+用户明确“授权修复”后，本轮转为现有 exact attempt12 的本地时序修复预览，
+没有再次付费生成。独立 code_mapper 通过 codegraph/源码确认当前
+`CompositionLayerSpec` 只有 source trim，没有 playback-rate/hold；HyperFrames 的
+MP4 visual 为 muted，声音消费独立 `ResolvedAudioSpan`。当前不存在可直接完成
+“画面重定时、原生AAC完整复制”的 canonical repair seam；未新增adapter/schema，
+也未将 failed raw 绕过 source eligibility 放入 Production composition。
+
+task-local review derivative 位于 Production root 外：
+`runs/jieshi-s01-retime-review-20260908-v1/s01-timing-repair-review.mp4`。
+源仍为 attempt12 SHA `c56b05e2da5d38bfeddd2d6f58322d84a7d8433c01589112b87d1865b388b7f3`。
+FFmpeg 将画面时间缩为3/8、24fps重采样，随后clone末帧，输出97帧；原音轨stream-copy。
+source及整个Production目录在操作前后逐文件SHA相等，未触碰Manifest/Registry/QA。
+`provenance.json` 保存完整命令、tool SHA、source/output SHA及限制；无Provider调用，
+此前一次追加授权未使用。此预览不是新Provider raw，也不是canonical timeline或P6结果。
+
+输出 SHA-256 `090b4c605a400b712fa41d27028352bd6b38d6ba0436dda280b78a730b9840e3`，
+2,247,344 bytes。真实 project-local `video_analyze`：1080×1920、24fps、97帧、
+4.054秒容器、H264/AAC48kHz stereo；广播medium转写0–2秒。
+父代理实际查看0/0.5/0.75/1/1.25/1.5/2/3/4秒：1–1.25秒已近窗，1.5秒末帧姿态，
+2/3/4秒保持；仅该派生片的局部timing观察PASS，不覆盖source legacy-03 FAIL。
+全部190个AAC packet的内容hash、PTS/DTS/duration、timebase和4.032秒音轨时长
+均与源相同；`audio-timing-check.json` 保存比较，不将容器4.054秒说成exact4秒。
+
+`video-analysis.json` 保留真实MCP响应，`review-findings.json`保留逐项结论。
+原始运动模糊没有被重建或消除；掌向与加速后动作自然度仍NOT_EVALUATED。
+已提供新预览并请求实际观感，不能继承用户对原attempt12的“都正常”。
+原Production r51/原Gate未改变；下一Shot仍未放行。
+
+按 `record-ai-video-session` 保存此稳定预览checkpoint；自动
+`distill-ai-video-learning` 为 no_candidate：这是一份尚待新观感确认的派生片，
+不以原片加派生片数量冒充两个独立生成实验，不提出新的自动修复/QA采用结论。
+记录阶段无Provider/media/network调用或RAG重建；无关暂存工作保留。
+
+## Historical Checkpoint — Attempt 12 Human Evidence Repaired
 
 用户对 exact attempt12 的手部自然、近窗间隙可读、广播完整清晰三项明确回复
 “都正常”，随后要求“继续”。`preparation-v4/attempt12-human-confirmation.json`
