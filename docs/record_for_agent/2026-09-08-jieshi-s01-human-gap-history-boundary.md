@@ -8,7 +8,80 @@ learning_eligibility: ineligible
 
 Date: 2026-09-08
 
-## Latest Checkpoint — Quality Closed, Budget Extension Pending
+## Latest Checkpoint — Attempt 11 Generated, Quality Still Fails
+
+用户“授权”批准保留原 ledger 的一次金额扩容和同一 Vidu S01 任务追加一次生成。
+本轮已完成金额与次数契约修复、正式验证及一次实际 POST；但新视频仍未满足手部要求。
+下面旧“预算未授权/没有入口/尚未提交”段落仅保留为历史，已被本 checkpoint 取代。
+
+### Engineering And Authorization Evidence
+
+- 金额扩容代码 `07f1e0c` / `5108864` 保留旧 reservations 和 Gate，通过独立
+  `reviewer_xhigh`、91 项 focused checks 与正式
+  `.agent/harness/runs/jieshi-s01-budget-extension-20260908-v2/receipt.json`。
+  真实 Manifest r27 / budget r4 的内部 ceiling 3M→6M microunits，旧 3M 预留未释放。
+  extension hash 为 `84356454b4770b871840b96ed02150f481072ecc95f84e7c639ea9bd2dfb89bb`。
+- attempt11 在 r28 创建 REQUEST 后，`submit_once` 于任何 Provider POST 前被
+  `Generation submit ceilings cannot expand within one task` 拒绝。之前不同 task 的
+  扩容测试没有覆盖此同 task 场景；未通过另建 task、重置计数或复用 permit 绕过。
+- 次数扩展代码 `7dd8237` 通过独立 `reviewer_xhigh`；parent 与 reviewer 各自的
+  六文件组合均 119 passed。新增 14 项测试包含真实 service 的同 task 1→2、
+  POST 前拒绝、再次提交拒绝、两类扩展并存、错误授权、计数清零、raw tamper、
+  publication fault 与过期 exact replay。测试数不是独立媒体样本数。
+- 正式 exact-range `18a7fa6..7dd8237` Harness 全部 PASS：
+  `.agent/harness/runs/jieshi-s01-submit-quota-20260908/receipt.json`。
+  实际提交前 `verify-receipt` 的 integrity、freshness、snapshot、scope、completion
+  proof 等项全部为 true。后续文档 checkpoint 不代表重新执行代码测试。
+- `extend_paid_provider_submit_quota` 将真实 Manifest 推至 r29，只保留一次 sealed
+  授权：task `jieshi-s01-hand-repair10-20260908` 的 ceiling 1→2、prior used=1。
+  quota extension hash `3614c656576fd976e75f04fa49632cb0a4c530df3848c2651eabdc13a21eea57`。
+  金额、旧预留、原 binding 和请求不变；原授权重放没有新增写入。
+
+### Exact Media And Gate
+
+attempt11 于 2026-09-08 09:24:00 UTC 收到唯一 POST 的 HTTP 200，随后 SUCCEEDED。
+submission fingerprint `947beef9346159b89c841f8704e846d8aa5f7418b6cdf08c24f93e8215e6b9bb`。
+保留 approved first/last PNG、seed20260907 和原点名广播；相对 attempt10 的 compiled
+差异只有 `provider_profile` 与 `prompt_text`，profile 为同内部上限的有界时效续期。
+
+首次 fetch 被 Mihomo fake DNS 公网校验拒绝；沿既有 exact-host HTTPS DNS 恢复，
+仅修改该 fetch 进程的解析，保留 HTTPS/public-IP/no-redirect guards，没有额外 POST。
+取回 MP4 SHA-256 `cb73c70c1e935d6849b3a91f5fa7ff19d81966647afaf88a010cd00dc89be537`，
+3,297,401 bytes，1080×1920、24fps、97帧、4.042秒、H264/AAC48kHz stereo。
+
+真实 project-local `video_analyze` 与 initialized MCP feedback bridge 均对新 exact bytes
+执行。Main thread 检查全部 17 帧（0.25秒间隔）：
+
+- legacy-03 FAIL：1.0秒仍在腿上，约1.25秒开始抬手，约2.5秒接近目标，未在1.5秒到位。
+- legacy-05 FAIL：1.5–2秒期间腕部弯曲、指尖偏下/横向，随后才转为直立近窗掌向。
+- 其余11项技术/抽样 analyzer requirements PASS；七名他人位置保留。但约0.5–3.5秒
+  窗内下部有明显暗色遮蔽变化，作为额外视觉 concern 保留，不伪称丢失人物。
+- medium ASR 原点名广播为0–2.24秒；同音字转写不证明错读，也不证明声音观感通过。
+- human legacy-06/14/17 暂为 NOT_EVALUATED；已向用户提供 exact 新片和三个观看问题，
+  不继承 attempt10 的“确认”。legacy-15 属 final composition，不是 raw blocker。
+
+canonical experience hash `cc249a07903d8d2fd5f1d765905510faa339bb0b30e57880ed8f0b1dd6b50856`，
+evidence hash `53e9594837ffc7a3474cb239f422977cda86945e9ea65f33acd262699bab46f1`。
+诊断为 EVIDENCE_GAP + QUALITY_FAILURE，next_owner=evidence_owner。
+严格重开 Manifest r36 / Project与Shot r6，attempt11 RUNNING/VALIDATE、paid ACCEPTED；
+budget r7 保留两份 reservations，available=0。次数 ceiling2 / used2，没有额度内新提交。
+没有虚构结算、质量通过、candidate activation、S02、P6 或 Final Acceptance。
+
+本地 `preparation-v3/` 保存 authorization、quota/budget runtime checkpoint、POST audit、
+`shot-01-gate.json`、`video-analysis-bridge.json`、`attempt11-diagnosis.json` 和
+`attempt11-runtime-checkpoint.json`。下一步先保留/补齐新片 human evidence；不能在未增加
+有限授权的情况下再次 POST，也不能把补齐 human 项当作清除既有时序/掌向 FAIL。
+
+### Record And Learning Evaluation
+
+本轮按 `record-ai-video-session` 更新同一 primary record，保留旧 chronology；
+随后按 `distill-ai-video-learning` 评估为 **no_candidate**。新增 attempt11 确实是新的
+媒体证据，两次失败仅支持本 case 的时序 prompt 修改仍未达标；尚无经验证的有效替代
+干预。现有 exact-media Gate 已覆盖禁止据生成成功宣称修复，不新增重复或外推的
+Provider/Skill adoption claim。没有仅为记录执行额外 Provider/media/network/test，
+没有刷新 RAG index、推送或 release；其他 staged 文件保留。
+
+## Historical Checkpoint — Quality Closed, Budget Extension Pending
 
 用户“ok”授权的显式质量终结已实现并提交为 `6017eed`。独立 `reviewer_xhigh`
 复审为 accept with concerns，相关组合 51 passed；正式 exact-range Harness

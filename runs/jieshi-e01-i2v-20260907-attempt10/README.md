@@ -2,7 +2,22 @@
 
 ## Current State
 
-### Latest Continuation — Quality Closed, Budget Extension Pending
+### Latest Continuation — Attempt 11 Generated, Gate FAIL
+
+金额扩容与同 task 次数追加代码已通过独立 review 和正式 Harness（`7dd8237`）。
+在保留旧预留和已用次数后，唯一追加 POST 已于2026-09-08 09:24 UTC被接受，随后成功fetch。
+MP4 SHA-256 `cb73c70c1e935d6849b3a91f5fa7ff19d81966647afaf88a010cd00dc89be537`，
+3,297,401 bytes。原首末帧、seed20260907和点名广播保留。
+
+17帧/0.25秒检验仍为 legacy-03/05 FAIL：约1.25秒起手、2.5秒近目标，途中仍翻掌。
+human06/14/17待新exact观看答复；没有质量通过、激活或S02。正式反馈诊断为
+EVIDENCE_GAP+QUALITY_FAILURE，Manifest r36 / Project和Shot r6。
+同 task ceiling2/used2、budget available0；不能自动再次POST。
+详见 `preparation-v3/attempt11-runtime-checkpoint.json` 与
+[当前记录](../../docs/record_for_agent/2026-09-08-jieshi-s01-human-gap-history-boundary.md)。
+以下旧pending状态已被本节取代。
+
+### Historical Continuation — Quality Closed, Budget Extension Pending
 
 `6017eed` 的显式质量终结已通过独立复审和正式 Harness。真实 attempt10 已标记为
 FAILED / `video_quality_rejected`，原 legacy-03/05 FAIL 保留；下一次 pre-generation
