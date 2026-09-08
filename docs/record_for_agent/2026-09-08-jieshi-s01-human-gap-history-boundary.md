@@ -8,7 +8,54 @@ learning_eligibility: ineligible
 
 Date: 2026-09-08
 
-## Latest Checkpoint — Human PASS, Attempt 11 Quality Closed
+## Latest Checkpoint — Attempt 12 Generated, Timing FAIL
+
+用户再次“授权”后沿既有一次追加范围继续，未累加为第二份额度。独立
+`reviewer_xhigh` 对 exact 首末帧和 attempt11 四个保存帧复核为 accept with concerns：
+指轴由下转上不等于掌面翻向镜头；不能断言首末帧使 legacy-05 必然不可满足，
+也不据此改写旧 FAIL。肘部屈曲带前臂沿弧线上升具有可测试的运动机制差异。
+采用该组合修复并删除动作前识别等待，不能称为单变量实验或预先保证改善。
+
+actual pure Router 为 GENERATE_ONCE，当前 Vidu native compiler/2 通过；
+新动作的 native expression witnesses 与实际文本一致，intervention 绑定实际
+prompt semantic hash。实际 compiled delta 仅 `prompt_text/provider_profile`；
+原 first/last PNG、seed20260907、广播、4秒/1080×1920/24fps 与 QA 均保留。
+所有准备与新证据位于 `runs/jieshi-e01-i2v-20260907-attempt10/preparation-v4/`。
+binding hash `1734ce790fb926ffe26e2229361c13eae55a38c2a8993a2415f0486dc0a60268`，
+resolved hash `57eaff8336a2c91c2f4bfb3943636b8edcf101496cd6def16f43ffa168d9496a`。
+
+通过原 committer 更新 pre-generation graph r38→r40、内部预算 ceiling6M→9M
+r41、attempt12 REQUEST r42、同 task quota2→3 r43。两种 extension 的旧预留均保留，
+exact replay 未增加写入；没有实际价格研究或伪造结算。次数扩展 hash
+`df9fa8e1e50f542a7245fd1ee7695000be5f2b0111623295f05cb5d7cd668ab6`。
+唯一 POST 于2026-09-08 10:45:11 UTC发出、10:45:13获HTTP200，10:47:05查询SUCCEEDED。
+submission fingerprint `78845a0476b77bc85b12e417cba661a3b3f2ffc6ee52511cd10860add08f0b75`。
+首次下载再次遭遇已知 fake DNS 公网校验拒绝，随后通过同一 exact-host、GET-only、
+进程内 HTTPS DNS恢复，于10:47:38取回，未增加 POST 或放宽下载保护。
+
+新 MP4 SHA-256 `c56b05e2da5d38bfeddd2d6f58322d84a7d8433c01589112b87d1865b388b7f3`，
+3,472,114 bytes；真实 project-local MCP `video_analyze`：1080×1920、24fps、97帧、
+4.042秒、H264/AAC48kHz stereo，medium转写原广播0–2秒。
+Parent查看全17帧/0.25秒，并调用 MCP 1080px/0.125秒加密取证：
+
+- legacy-03 FAIL：约1.25秒才起手，1.5秒明显未到位，约2.75–3秒接近近窗姿态。
+- legacy-05 NOT_EVALUATED：加密查看1.375/1.625/1.875/2.125秒仍有运动模糊，
+  可见腕部屈曲但不能可靠确认整个抬手过程的掌面朝向；不以指尖方向代替掌向。
+- 其余11项技术/抽样 analyzer要求PASS；human06/14/17等待本片明确观看答复，
+  不继承 attempt11“正常”。已提供新MP4；Gate FAIL，无candidate activation或S02。
+
+真实 initialized MCP bridge 已写入反馈；strict loader重开 Manifest r50、Project/Shot r6，
+attempt12 RUNNING/VALIDATE。experience hash
+`6d72e7a3028c583ee30c2e5d0637355028601af28fd2694fb4d20c69fc253738`；
+budget r11有三份原样保留的预留、available0。`attempt12-runtime-checkpoint.json`
+保存 exact 状态；因 EVIDENCE_GAP 未伪造质量终结或金额结算。
+
+追加一次已消费，task ceiling3/used3；不再自动POST。`record-ai-video-session`
+更新原记录并执行 `distill-ai-video-learning`：no_candidate。新机制只有一次失败结果，
+无法提出有效修复方法的采用结论；旧掌向判定风险尚非校准后的替代Gate。
+记录阶段没有Provider/media/network调用或RAG重建，无关暂存文件保持不变。
+
+## Historical Checkpoint — Human PASS, Attempt 11 Quality Closed
 
 用户对 exact attempt11 的手部自然、玻璃间隙可读、原广播清晰三项问题回复“正常”。
 `preparation-v3/attempt11-human-confirmation.json` 保存原话及 exact MP4 SHA/bytes。

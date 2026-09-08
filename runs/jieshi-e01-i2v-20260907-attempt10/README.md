@@ -2,7 +2,18 @@
 
 ## Current State
 
-### Latest Continuation — Human PASS, Attempt 11 Quality Closed
+### Latest Continuation — Attempt 12 Generated, Timing FAIL
+
+既有一次追加授权已用于新的肘部屈曲动作方案，原首末帧、seed、广播与QA保留。
+2026-09-08 10:45 UTC唯一POST成功；10:47 UTC通过原下载保护下的同任务DNS恢复取回。
+MP4 SHA-256 `c56b05e2da5d38bfeddd2d6f58322d84a7d8433c01589112b87d1865b388b7f3`，
+3,472,114 bytes。实际 project-local MCP 检查仍为 legacy-03 FAIL：约1.25秒起手，
+1.5秒未到位；legacy-05因运动模糊无法可靠判定，NOT_EVALUATED。
+其他11项技术/analyzer项PASS，human06/14/17待本片答复，不继承旧片确认。
+证据在 `preparation-v4/`；次数 ceiling3/used3，不自动重试，无激活或S02。
+下方“追加授权未消费”和 attempt11状态均为历史；以本节及当前记录为准。
+
+### Historical Continuation — Human PASS, Attempt 11 Quality Closed
 
 用户对 exact attempt11 的三项观感问题回复“正常”，真实 MCP bridge 已补齐
 human06/14/17 PASS；legacy-03/05 仍 FAIL，诊断只剩 QUALITY_FAILURE。
