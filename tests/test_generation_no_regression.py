@@ -39,6 +39,18 @@ def test_router_refuses_omitted_protection_and_known_global_regression():
         assert result.routing is None
 
 
+def test_legacy_candidate_without_final_output_goal_keeps_its_serialized_identity():
+    setup, baseline, latest = setup_full_requirements()
+    candidate = setup["inputs"].candidates[0]
+    payload = candidate.model_dump(mode="json")
+
+    assert "final_output_goal" not in payload
+    assert candidate.scope_hash == "38032161761c86fe37481d0088257eea5b7c5d66e87af63bd701bb77c3474ae0"
+    assert candidate.recipe.recipe_hash == "b125e0c6f2897c5d93f076cb5d19b2cfa7ce2ea7a1875f90153849efbc4ad9cd"
+    assert baseline.request_input_hash == "3df3dcdca7225512feffd1695c6f46d09ce97fd9e43800508359c9dcac8e3a77"
+    assert latest.evidence_hash == "41d92409c82cc1baa480b57ad25a1fd1c3cb2e6c35d9026dd15f9d52fa2d6c6b"
+
+
 @pytest.mark.parametrize("natural,timing,expected", [
     ("FAIL", "PASS", "refuted"), ("NOT_EVALUATED", "PASS", "undetermined"),
     (None, "PASS", "undetermined"), ("PASS", "FAIL", "refuted"), ("PASS", "PASS", "supported"),

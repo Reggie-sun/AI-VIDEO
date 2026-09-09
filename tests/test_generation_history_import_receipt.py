@@ -144,6 +144,13 @@ def _legacy_source(tmp_path, *, strip_binding: bool = True):
 
 def test_prepares_and_reopens_a_strict_legacy_remote_snapshot(tmp_path):
     loaded, experience, policy, source = _legacy_source(tmp_path)
+    source_payload = source.model_dump(mode="json")
+    assert source.schema_version == "generation-evaluation/1"
+    assert source.source_sha256 == "19899e8635031be80b9bae82f5e3f69b28a07bc6b7a1cacc8113dc711fe83a31"
+    assert experience.evidence[0].evidence_hash == "fcb33d9b3f154c5162f50bc84f9c3a9a700186b5e4f151235e1c4b302dfe565e"
+    assert canonical_sha256(experience.model_dump(mode="json")) == "3eed2e3fb476f8a8652e72af33d6233738d83c9c1ea50539ce6a5b7479c7a402"
+    assert "analysis_evidence" not in source_payload
+    assert GenerationEvaluationSource.model_validate(source_payload).model_dump(mode="json") == source_payload
     expected = hashlib.sha256((tmp_path / "state/manifest.json").read_bytes()).hexdigest()
     evidence_root = tmp_path / "evidence"
     document = _document(evidence_root, "Human review: hand is distorted and gap is unreadable.")

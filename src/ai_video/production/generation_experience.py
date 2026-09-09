@@ -13,7 +13,7 @@ from pydantic import Field, model_validator
 
 from ai_video.production.artifact_contracts import StrictModel
 from ai_video.production.generation_diagnosis import AttemptEvidence, diagnose_exact_result
-from ai_video.production.generation_evaluation import GenerationEvaluationSource
+from ai_video.production.generation_evaluation import GenerationEvaluationSource, validate_generation_evaluation_sources
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.video_requirement import VerifiedGenerationRequirementProjection
 
@@ -100,6 +100,17 @@ class GenerationExperience(StrictModel):
                or e.rubric_hash != self.candidate.recipe.rubric_hash
                or e.shot_id != requirement.target_shot.shot_id for e in self.evidence):
             raise ValueError("experience evidence does not match its exact source")
+        if self.candidate.recipe.acceptance_policy.profile_payload.get("requirement_semantics_version"):
+            for entry in self.evidence:
+                if entry.outcome != "media":
+                    continue
+                if not self.evaluation_sources:
+                    raise ValueError("marked media experience needs original evaluator sources")
+                snapshot = self.evaluation_sources[0].qa_policy_snapshot
+                if snapshot is None:
+                    raise ValueError("marked experience needs original sealed QA")
+                validate_generation_evaluation_sources(sources=self.evaluation_sources, evidence=entry,
+                    qa_policy=snapshot, acceptance=self.candidate.recipe.acceptance_policy)
         return self
 
     @property

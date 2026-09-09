@@ -12,10 +12,11 @@ from test_production_generation_decision import evidence, setup_decision
 
 
 def fixture():
-    entry = evidence(setup_decision())
+    setup = setup_decision()
+    entry = evidence(setup)
     tool = ToolIdentity(name="offline-evaluator", version="1")
     policy = SimpleNamespace(content_hash="a" * 64, semantic_authorities=(tool,),
-        selected_generation_acceptance=lambda: SimpleNamespace(profile_content_hash=entry.rubric_hash),
+        selected_generation_acceptance=lambda: setup["inputs"].candidates[0].recipe.acceptance_policy,
         generation_evaluation_authorities=(GenerationEvaluationAuthority(evaluator=tool, proof="technical"),))
     source = GenerationEvaluationSource(
         request_hash=entry.request_hash, artifact_sha256=entry.artifact_sha256,
@@ -81,8 +82,45 @@ def test_old_qa_policy_keeps_exact_bytes_when_new_authority_field_is_absent():
     assert "generation_evaluation_authorities" not in payload
     assert "generation_acceptance" not in payload
     reopened = QaPolicy.model_validate(payload)
+    assert policy.content_hash == "7c2365bca6069e6b5434cf9c953959145e750c3c643a4aae1ec988f7a4f66cce"
     assert canonical_sha256(reopened) == policy.content_hash
     assert reopened.model_dump(mode="json") == payload
+
+
+def test_legacy_evaluator_source_and_nested_evidence_hashes_are_frozen():
+    """A /1 source remains byte-identical while /2 semantics are introduced elsewhere."""
+    entry, source, _ = fixture()
+    payload = source.model_dump(mode="json")
+
+    assert payload == {
+        "schema_version": "generation-evaluation/1",
+        "request_hash": entry.request_hash,
+        "artifact_sha256": entry.artifact_sha256,
+        "rubric_hash": entry.rubric_hash,
+        "qa_policy_content_hash": "a" * 64,
+        "evaluator": {"name": "offline-evaluator", "version": "1"},
+        "proof": "technical",
+        "observations": [{
+            "requirement_id": "duration",
+            "verdict": "PASS",
+            "observation": "Injected four seconds",
+            "span_millis": None,
+        }],
+    }
+    assert "analysis_evidence" not in payload
+    assert source.source_sha256 == "7462c4ac94d4d2f9bb987cb8c564c72d2bfc19c70d7badd3e63c4292b6d50d79"
+    assert entry.evidence_hash == "4c977fa225df858e3d6b344599a269dacba8fc3a7f07b9a6f74d3a229f054721"
+    assert GenerationEvaluationSource.model_validate(payload).model_dump(mode="json") == payload
+    assert entry.findings[0].model_dump(mode="json") == {
+        "requirement_id": "duration",
+        "rubric_hash": entry.rubric_hash,
+        "stage": "raw_generation",
+        "proof": "technical",
+        "verdict": "PASS",
+        "source_sha256": source.source_sha256,
+        "observation": "Injected four seconds",
+        "span_millis": None,
+    }
 
 
 def test_generation_acceptance_does_not_replace_whole_ad_policy():

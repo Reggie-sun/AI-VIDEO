@@ -60,7 +60,7 @@ is validated downstream and cannot silently choose or rewrite the creative strat
 selected strategy must return to Director planning.
 
 Before crafting an approved Shot or Provider-specific prompt for a `DIRECTOR_PREFLIGHT_REQUEST`,
-create schema v3 Director Coverage Evidence with:
+create Director Coverage Evidence with:
 
 - request facts: `creative_input_kind=missing|direction|draft_prompt`, exact
   `creative_input_evidence` for `direction` / `draft_prompt` and `null` for `missing`,
@@ -83,6 +83,50 @@ Validate the evidence before downstream authoring:
 ```bash
 python .agents/skills/open-video/scripts/validate_director_coverage.py <coverage.json>
 ```
+
+### Requirement-semantics handoff
+
+Schema v3 remains the legacy coverage format and is read under its original rules. New Director
+handoffs use schema v4: in addition to the same request and coverage fields, include an
+`intent_items` inventory and all five `intent_groups`, even when a group is empty:
+
+- `must_happen`: observable result needed for the approved goal.
+- `must_not_happen`: result that would break narrative, quality, continuity, or an explicit user
+  constraint.
+- `preferred_performance`: a preferred performance or camera treatment for which a reasonable
+  alternative can still satisfy the goal.
+- `timing_targets`: a time target with `target_kind=delivery_constraint` or
+  `target_kind=generation_margin`.
+- `acceptable_variation`: a permitted variation linked to the result it must preserve.
+
+Each `intent_items` entry has a stable `intent_item_id`, a single atomic `statement`, an `origin`
+of `explicit_user`, `director_choice`, or `repair_margin`, non-empty `source_refs`, and explicit
+`related_intent_ids` where it depends on another intent. A source reference carries the exact
+`source_hash`, `locator`, source `intent_item_id`, verbatim `quote`, and `origin`; `fixed` is
+optional. For `explicit_user`, quote the raw creative input verbatim and bind its SHA-256 to that
+exact input. Do not describe a Director-written statement as user evidence. The same source intent
+may support separately split performance and timing atoms, but an atom must not be copied into
+conflicting groups.
+
+`intent_groups` bind every inventory item by ID. Group entries are `{ "intent_item_id": "..." }`,
+while a timing entry also includes its `target_kind`. `acceptable_variation` must name the result it
+preserves through `related_intent_ids`. A `generation_margin` must be a `repair_margin` intent and
+must point one-way to an original non-margin target; it cannot become an acceptance predicate by
+being precise or by appearing in a prompt.
+
+For example, a compound brief such as “the courier holds the sealed key at the delivery cut, no
+phone appears, keep identity continuous, use natural hand motion, and reach the pose by 2.7s”
+needs separate source-bound atoms for delivery state, phone absence, continuity, natural motion,
+and timing. Do not turn the whole sentence, or a recipe margin, into one hard criterion.
+
+Director coverage only records intent and suggested classification. Before any intent can enter the
+QA acceptance inventory, the QA acceptance owner must independently approve its `hard_basis`,
+predicate, stage, tolerance, measurement, and proof. A hard atom needs an explicit user fixed
+requirement, approved narrative result, accepted quality/continuity or cut contract, or applicable
+production contract, plus the result it protects and the proof boundary. If a fixed user constraint
+conflicts with a proposed variation, return it to authoring/QA instead of weakening it. Prompt
+wording, historical observations, Provider recipes, and generation margins never grant that
+authority.
 
 `VIDEO_EXTEND`, FLF2V, a terminal-frame handoff, `no cut`, and `uninterrupted` are continuity or
 execution treatments, not the Director decision. They are valid only when the selected strategy is

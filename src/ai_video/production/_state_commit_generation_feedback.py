@@ -41,7 +41,7 @@ class _StateCommitGenerationFeedbackMixin:
         return load_generation_experience(self._project_root, pointer)
 
     def record_generation_experience(
-        self, *, attempt_id: str, experience: GenerationExperience, analysis_proof=None
+        self, *, attempt_id: str, experience: GenerationExperience, analysis_proof=None, presentation_proof=None
     ):
         """Persist only evaluation evidence for the exact finished attempt."""
 
@@ -110,10 +110,13 @@ class _StateCommitGenerationFeedbackMixin:
                     from ai_video.production.project import load_production_project
 
                     loaded = load_production_project(self._project_root / "project.yaml")
+                    pointer = state.local_fetch_receipt or state.fetch_receipt
+                    fetch = (self._reopen_local_video_fetch(pointer) if state.local_fetch_receipt
+                             else self._reopen_video_fetch(pointer))
                     try:
                         validate_generation_evaluation_sources(
                             sources=experience.evaluation_sources, evidence=evidence,
-                            qa_policy=loaded.qa_policy, loaded=loaded)
+                            qa_policy=loaded.qa_policy, loaded=loaded, size_bytes=fetch.size_bytes)
                     except (AttributeError, ValueError) as exc:
                         raise _state_invalid("Generation evaluation source is invalid.", str(exc)) from exc
             content_hash = _experience_hash(experience)
@@ -129,6 +132,11 @@ class _StateCommitGenerationFeedbackMixin:
             )
             if pointer in state.generation_experiences:
                 return manifest
+            if any(s.presentation_evidence is not None for s in experience.evaluation_sources):
+                from ai_video.production.generation_evaluation import _PresentationRecordingProof
+                if (type(presentation_proof) is not _PresentationRecordingProof
+                        or not presentation_proof.consume(attempt_id=attempt_id, sources=experience.evaluation_sources)):
+                    raise _state_invalid("Evaluation requires a fresh exact presentation verifier proof.")
             if any(s.analysis_evidence is not None for s in experience.evaluation_sources):
                 from ai_video.production.generation_evaluation import _AnalysisRecordingProof
                 if (type(analysis_proof) is not _AnalysisRecordingProof

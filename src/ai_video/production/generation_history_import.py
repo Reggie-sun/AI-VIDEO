@@ -116,6 +116,8 @@ class ImportedGenerationExperienceReceipt(StrictModel):
 
     @model_validator(mode="after")
     def _validate_snapshot(self) -> "ImportedGenerationExperienceReceipt":
+        if any(source.schema_version != "generation-evaluation/1" for source in self.experience.evaluation_sources):
+            raise ValueError("legacy history import cannot establish retrospective /2 presentation proof")
         from ai_video.production.generation_decision import GenerationCandidate
         from ai_video.production.generation_experience import bind_experience_models
 

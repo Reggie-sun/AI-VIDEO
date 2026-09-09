@@ -18,6 +18,7 @@ from ai_video.production._immutable_models import ImmutableDict
 from ai_video.production.artifact_contracts import StrictModel, ToolIdentity
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.final_output_contracts import FinalOutputContract
+from ai_video.production.requirement_semantics import validate_semantic_inventory, require_final_contract
 from ai_video.production.source_use_evidence import (
     SourceUseEvidence,
     require_source_use_evidence_authority,
@@ -83,6 +84,7 @@ class DomainAcceptancePolicy(StrictModel):
             raise ValueError("Domain acceptance profile identity does not match policy")
         if tuple(self.profile_payload.get("required_requirement_ids", ())) != requirement_ids:
             raise ValueError("Domain acceptance requirement coverage does not match profile")
+        validate_semantic_inventory(self.profile_payload, requirement_ids)
         return self
 
 
@@ -246,6 +248,13 @@ class DomainAcceptanceQaPolicyMixin:
 
     @model_validator(mode="after")
     def _validate_domain_acceptance_policy(self):
+        policies = [self.domain_acceptance, self.generation_acceptance]
+        policies.extend(component.generation_acceptance for allocation in self.production_allocations
+                        for component in allocation.components)
+        for policy in policies:
+            if policy is not None:
+                rules = validate_semantic_inventory(policy.profile_payload, policy.required_requirement_ids)
+                require_final_contract(rules, self.final_output)
         if self.final_output is not None and (
             self.semantic_requirement != "required"
             or QaLayer.SEMANTIC not in self.required_layers

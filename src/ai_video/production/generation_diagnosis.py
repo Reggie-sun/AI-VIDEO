@@ -2,7 +2,7 @@
 
 from typing import Literal
 
-from pydantic import Field, model_validator
+from pydantic import Field, model_validator, model_serializer
 
 from ai_video.production.artifact_contracts import StrictModel
 from ai_video.production.generation_recipe import SHA256, Proof, Stage, GenerationRecipe
@@ -45,13 +45,26 @@ class AttemptEvidence(StrictModel):
     intervention_id: str | None = None
     intervention_semantic_hash: str | None = Field(default=None, pattern=SHA256)
     actual_delta: tuple[str, ...] = ()
+    unresolved_quality_refs: tuple[str, ...] = ()
+
+    @model_serializer(mode="wrap")
+    def _legacy_refs(self, handler):
+        data = handler(self)
+        if not self.unresolved_quality_refs:
+            data.pop("unresolved_quality_refs", None)
+        return data
 
     @model_validator(mode="after")
     def _evidence_shape(self):
         if (self.outcome == "media") != (self.artifact_sha256 is not None):
             raise ValueError("media outcome must identify exact artifact bytes")
-        if self.outcome != "media" and self.findings:
+        if self.outcome != "media" and (self.findings or self.unresolved_quality_refs):
             raise ValueError("no-media outcome cannot have media findings")
+        refs = self.unresolved_quality_refs
+        if refs != tuple(sorted(set(refs))) or any(
+            len(ref) != 64 or any(c not in "0123456789abcdef" for c in ref) for ref in refs
+        ):
+            raise ValueError("unresolved quality references must be sorted unique content hashes")
         if self.outcome == "runtime_failure" and not self.runtime_reason:
             raise ValueError("runtime failure requires an execution reason")
         return self
@@ -108,10 +121,13 @@ def diagnose_attempt(attempt: AttemptEvidence, recipe: GenerationRecipe) -> Diag
             elif observations and all(f.verdict == "PASS" for f in observations):
                 preserved.add(rule.requirement_id)
         # An actual viewing rejection remains evidence even beside technical PASS.
-        if any(f.proof == "human" and f.verdict == "FAIL" for f in attempt.findings):
+        if (not recipe.acceptance_policy.profile_payload.get("requirement_semantics_version")
+                and any(f.proof == "human" and f.verdict == "FAIL" for f in attempt.findings)):
             classes.add("QUALITY_FAILURE")
             failed.update(f.requirement_id for f in attempt.findings
                           if f.proof == "human" and f.verdict == "FAIL")
+        if attempt.unresolved_quality_refs:
+            classes.add("RUBRIC_OR_STAGE_ERROR")
     owner = "review_owner"
     for label, next_owner in (
         ("QUALITY_FAILURE", "shot_router"),
@@ -152,7 +168,8 @@ def diagnose_exact_result(attempt: AttemptEvidence, evidence: tuple[AttemptEvide
     # remain present even alongside a PASS; this helper cannot overturn verdicts.
     combined = tuple(f for _, f in sorted(findings.items())
                      if f.verdict != "NOT_EVALUATED" or proof_key(f) not in observed)
-    diagnosis = diagnose_attempt(attempt.model_copy(update={"findings": combined}), recipe)
+    refs = tuple(sorted({ref for entry in records.values() for ref in entry.unresolved_quality_refs}))
+    diagnosis = diagnose_attempt(attempt.model_copy(update={"findings": combined, "unresolved_quality_refs": refs}), recipe)
     return diagnosis.model_copy(update={"evidence_hashes": tuple(sorted(records))})
 
 

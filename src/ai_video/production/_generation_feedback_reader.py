@@ -151,7 +151,18 @@ def verify_generation_feedback(root, state, request):
             except ValueError as exc:
                 raise _invalid(f"{label} execution binding is not exact.", str(exc)) from exc
     for pointer in state.generation_experiences:
-        load_generation_experience(root, pointer)
+        experience = load_generation_experience(root, pointer)
+        marked = [s for s in experience.evaluation_sources if s.schema_version == "generation-evaluation/2"]
+        if marked:
+            from ai_video.production._video_project_reader import load_local_video_fetch_receipt, load_video_fetch_receipt
+
+            fetch_pointer = state.local_fetch_receipt or state.fetch_receipt
+            if fetch_pointer is None:
+                raise _invalid("Marked evaluation has no fetched media.")
+            fetch = (load_local_video_fetch_receipt(root, fetch_pointer) if state.local_fetch_receipt
+                     else load_video_fetch_receipt(root, fetch_pointer))
+            if any(s.artifact_sha256 != fetch.artifact_sha256 or s.size_bytes != fetch.size_bytes for s in marked):
+                raise _invalid("Marked evaluation differs from exact fetched media.")
     if state.quality_rejection is None:
         return
     receipt = load_generation_quality_rejection(root, state.quality_rejection)

@@ -24,6 +24,7 @@ from ai_video.production.hashing import canonical_sha256
 from ai_video.production.shot_router import VideoGenerationResolver
 from ai_video.production.video_compiler import ProviderRequirementUnsupported
 from ai_video.production.generation_rejection import GenerationQualityRejectionReceipt
+from ai_video.production.generation_evaluation import project_generation_evaluation_sources
 
 bind_experience_models(GenerationCandidate)
 
@@ -70,7 +71,8 @@ def _expressions(acceptance, requirement):
     for raw in inventory:
         rule = RequirementExpression.model_validate(raw)
         expressions = []
-        for path in rule.intent_paths:
+        paths = () if rule.semantics is not None and rule.level == "diagnostic" else rule.intent_paths
+        for path in paths:
             if path.startswith("output_need.") or path == "audio_need":
                 continue
             value = payload
@@ -377,24 +379,28 @@ class GenerationFeedbackOrchestrator:
 
     @staticmethod
     def record_evaluation(*, committer, prepared, attempt_id, outcome, artifact_sha256=None,
-                          evaluation_sources=(), runtime_reason=None):
+                          evaluation_sources=(), runtime_reason=None, presentation_proof=None, analysis_proof=None):
         """Persist exact evaluator proof for automatic reuse on the next prepare."""
+        candidate = next(c for c in prepared.inputs.candidates
+                         if c.candidate_id == prepared.decision.selected_candidate_id)
+        findings, refs = project_generation_evaluation_sources(
+            sources=evaluation_sources, acceptance=candidate.recipe.acceptance_policy)
         evidence = project_attempt_evidence(
             prepared=prepared, task_id=prepared.inputs.limits.task_id,
             shot_id=prepared.execution_binding.context.target_shot_id,
             attempt_id=attempt_id, outcome=outcome, artifact_sha256=artifact_sha256,
-            findings=tuple(f for source in evaluation_sources for f in source.project_findings()),
+            findings=findings, unresolved_quality_refs=refs,
             runtime_reason=runtime_reason)
-        candidate = next(c for c in prepared.inputs.candidates
-                         if c.candidate_id == prepared.decision.selected_candidate_id)
         experience = GenerationExperience(projection=prepared.execution_binding.projection,
                                          candidate=candidate, evidence=(evidence,),
                                          evaluation_sources=tuple(evaluation_sources))
-        return committer.record_generation_experience(attempt_id=attempt_id, experience=experience)
+        return committer.record_generation_experience(attempt_id=attempt_id, experience=experience,
+            presentation_proof=presentation_proof, analysis_proof=analysis_proof)
 
 
 def project_attempt_evidence(*, prepared, task_id, shot_id, attempt_id, outcome,
-                             artifact_sha256=None, findings: tuple[Finding, ...] = (), runtime_reason=None):
+                             artifact_sha256=None, findings: tuple[Finding, ...] = (), runtime_reason=None,
+                             unresolved_quality_refs=()):
     """Join an exact evaluator result to the actual compiled attempt identity."""
     if prepared.compilation is None or isinstance(prepared.compilation, ProviderRequirementUnsupported):
         raise ValueError("attempt evidence requires an actual compiled request")
@@ -408,6 +414,7 @@ def project_attempt_evidence(*, prepared, task_id, shot_id, attempt_id, outcome,
         recipe_scope_hash=candidate.scope_hash, facts_hash=prepared.inputs.facts_hash,
         rubric_hash=prepared.inputs.rubric_hash, request_hash=request.request_input_hash,
         artifact_sha256=artifact_sha256, outcome=outcome, findings=findings, runtime_reason=runtime_reason,
+        unresolved_quality_refs=unresolved_quality_refs,
         intervention_id=intervention.intervention_id if intervention else None,
         intervention_semantic_hash=intervention.semantic_hash if intervention else None,
         actual_delta=compare_compiled_requests(prepared.inputs.baseline_request, request)["changed_variables"]
@@ -415,7 +422,8 @@ def project_attempt_evidence(*, prepared, task_id, shot_id, attempt_id, outcome,
     )
 
 
-def record_attempt_evaluation(*, committer, attempt_id, evaluation_sources=(), analysis_proof=None):
+def record_attempt_evaluation(*, committer, attempt_id, evaluation_sources=(), analysis_proof=None,
+                              presentation_proof=None):
     """Join evaluation to a reopened attempt, including after process restart.
 
     Runtime outcome comes from the Manifest; sources cannot relabel UNKNOWN as
@@ -431,7 +439,7 @@ def record_attempt_evaluation(*, committer, attempt_id, evaluation_sources=(), a
         # Reopen through the standard reader so a terminal replay never turns
         # an altered receipt or media file into a trusted historical answer.
         load_production_project(committer.project_root / "project.yaml")
-        if evaluation_sources or analysis_proof is not None:
+        if evaluation_sources or analysis_proof is not None or presentation_proof is not None:
             raise ValueError("closed quality rejection cannot accept new evaluation evidence")
         receipt = committer._reopen_generation_quality_rejection(state.quality_rejection)
         if not state.generation_experiences:
@@ -467,13 +475,15 @@ def record_attempt_evaluation(*, committer, attempt_id, evaluation_sources=(), a
     if outcome != "media" and evaluation_sources:
         raise ValueError("no-media attempt cannot consume evaluator findings")
     intervention = binding.decision.intervention
+    findings, refs = project_generation_evaluation_sources(
+        sources=evaluation_sources, acceptance=candidate.recipe.acceptance_policy)
     evidence = AttemptEvidence(
         task_id=binding.inputs.limits.task_id, shot_id=binding.context.target_shot_id,
         attempt_id=attempt_id, recipe_scope_hash=candidate.scope_hash,
         facts_hash=binding.inputs.facts_hash, rubric_hash=binding.inputs.rubric_hash,
         request_hash=resolved.request_input_hash, artifact_sha256=artifact_sha256,
         outcome=outcome, runtime_reason=reason,
-        findings=tuple(f for source in evaluation_sources for f in source.project_findings()),
+        findings=findings, unresolved_quality_refs=refs,
         intervention_id=intervention.intervention_id if intervention else None,
         intervention_semantic_hash=intervention.semantic_hash if intervention else None,
         actual_delta=compare_compiled_requests(binding.inputs.baseline_request,
@@ -482,5 +492,6 @@ def record_attempt_evaluation(*, committer, attempt_id, evaluation_sources=(), a
     )
     experience = GenerationExperience(projection=binding.projection, candidate=candidate,
         evidence=(evidence,), evaluation_sources=tuple(evaluation_sources))
-    committer.record_generation_experience(attempt_id=attempt_id, experience=experience, analysis_proof=analysis_proof)
+    committer.record_generation_experience(attempt_id=attempt_id, experience=experience,
+        analysis_proof=analysis_proof, presentation_proof=presentation_proof)
     return experience

@@ -169,6 +169,35 @@ def test_frozen_sources_are_present_and_hash_bound_without_touching_media():
     assert not any("PASS" in record.get("failed", ()) for record in fixture["records"])
 
 
+def test_legacy_replay_recipe_and_experience_serialization_are_frozen():
+    """The simulated non-Vidu replay stays a /1-era contract, including no goal."""
+    fixture = _history()
+    record = next(item for item in fixture["records"] if item["id"] == "h3-015")
+    experience = _experiences((record,))[0][-1]
+    candidate = experience.candidate
+    recipe_payload = candidate.recipe.model_dump(mode="json")
+    candidate_payload = candidate.model_dump(mode="json")
+    evidence_payload = experience.evidence[0].model_dump(mode="json")
+    diagnosis = diagnose_attempt(experience.evidence[0], candidate.recipe)
+
+    assert canonical_sha256(fixture) == "afc752e430d183a377418ebb86df9343d2af503df6936347d7bc102fddebfaaa"
+    assert candidate.recipe.recipe_hash == "0582649a4c6b3eaf0071f5d8bfe87005a436b4ffc8d09cf5013572ab9fa34b95"
+    assert canonical_sha256(experience.model_dump(mode="json")) == "de3a44ea29d9c79b69cc61cbcf618cb233332efc33fb2eafd2a720eb27e6a977"
+    assert experience.evidence[0].evidence_hash == "6c7a42c6b193071f87583466ec838cac653bcaa80392f8c974a8502ca93990d6"
+    assert "final_output_goal" not in candidate_payload
+    assert recipe_payload["contract_version"] == "generation-recipe/1"
+    assert recipe_payload["comparison"] is None
+    assert evidence_payload["actual_delta"] == []
+    assert evidence_payload["intervention_id"] is None
+    assert GenerationExperience.model_validate(
+        experience.model_dump(mode="python")
+    ).model_dump(mode="json") == experience.model_dump(mode="json")
+    assert diagnosis.failure_classes == ("EVIDENCE_GAP", "QUALITY_FAILURE")
+    assert diagnosis.failed_requirements == (
+        "exact_pa_dialogue_timing", "left_hand_raise_right_hand_phone",
+    )
+
+
 def test_h3_015_to_030_replay_preserves_evidence_gaps_and_oom_as_non_quality_failure():
     records = [record for record in _history()["records"] if record["id"].startswith("h3-")]
     entries = _experiences(records)

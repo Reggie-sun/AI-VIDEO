@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -12,7 +13,10 @@ import sys
 from typing import Any, Mapping, Sequence
 
 
-SCHEMA_VERSION = "3"
+LEGACY_SCHEMA_VERSION = "3"
+SCHEMA_VERSION = "4"
+LEGACY_ROOT_FIELDS = {"schema_version", "request", "coverage_units"}
+V4_ROOT_FIELDS = LEGACY_ROOT_FIELDS | {"intent_items", "intent_groups"}
 REQUEST_FIELDS = {
     "creative_input_kind",
     "creative_input_evidence",
@@ -96,6 +100,30 @@ TRANSITIONS = {
     "video_extend",
     "wipe",
 }
+INTENT_GROUPS = {
+    "must_happen",
+    "must_not_happen",
+    "preferred_performance",
+    "timing_targets",
+    "acceptable_variation",
+}
+INTENT_ITEM_FIELDS = {
+    "intent_item_id",
+    "statement",
+    "source_refs",
+    "origin",
+    "related_intent_ids",
+}
+INTENT_SOURCE_REQUIRED_FIELDS = {
+    "source_hash",
+    "locator",
+    "intent_item_id",
+    "quote",
+    "origin",
+}
+INTENT_ORIGINS = {"explicit_user", "director_choice", "repair_margin"}
+TIMING_TARGET_KINDS = {"delivery_constraint", "generation_margin"}
+SHA256 = re.compile(r"^[0-9a-f]{64}$")
 
 
 class CoverageValidationError(ValueError):
@@ -157,11 +185,175 @@ def _normalized_text_list(value: Any, label: str) -> list[str]:
     return normalized
 
 
+def _array(value: Any, label: str) -> Sequence[Any]:
+    if not isinstance(value, Sequence) or isinstance(value, (str, bytes)):
+        raise CoverageValidationError(f"{label} must be an array")
+    return value
+
+
+def _validate_v4_intent_handoff(
+    payload: Mapping[str, Any], *, creative_input_text: str | None
+) -> dict[str, int]:
+    raw_items = _array(payload["intent_items"], "intent_items")
+
+    items: dict[str, dict[str, Any]] = {}
+    for index, raw_item in enumerate(raw_items):
+        label = f"intent_items[{index}]"
+        item = _mapping(raw_item, label)
+        _exact_fields(item, INTENT_ITEM_FIELDS, label)
+        intent_item_id = _text(item["intent_item_id"], f"{label}.intent_item_id")
+        if intent_item_id in items:
+            raise CoverageValidationError("intent_item_id values must be unique")
+        _text(item["statement"], f"{label}.statement")
+        origin = _enum(item["origin"], INTENT_ORIGINS, f"{label}.origin")
+        source_refs = _array(item["source_refs"], f"{label}.source_refs")
+        if not source_refs:
+            raise CoverageValidationError(f"{label}.source_refs must not be empty")
+        for source_index, raw_source in enumerate(source_refs):
+            source_label = f"{label}.source_refs[{source_index}]"
+            source = _mapping(raw_source, source_label)
+            missing = sorted(INTENT_SOURCE_REQUIRED_FIELDS - set(source))
+            unknown = sorted(
+                set(source) - INTENT_SOURCE_REQUIRED_FIELDS - {"fixed"}
+            )
+            if missing or unknown:
+                raise CoverageValidationError(
+                    f"{source_label} fields mismatch: missing={missing}, unknown={unknown}"
+                )
+            _text(source["source_hash"], f"{source_label}.source_hash")
+            source_hash = source["source_hash"]
+            if SHA256.fullmatch(source_hash) is None:
+                raise CoverageValidationError(
+                    f"{source_label}.source_hash must be a lowercase SHA-256 hash"
+                )
+            _text(source["locator"], f"{source_label}.locator")
+            _text(source["intent_item_id"], f"{source_label}.intent_item_id")
+            _text(source["quote"], f"{source_label}.quote")
+            quote = source["quote"]
+            source_origin = _enum(
+                source["origin"], INTENT_ORIGINS, f"{source_label}.origin"
+            )
+            if source_origin != origin:
+                raise CoverageValidationError(
+                    f"{source_label}.origin must match {label}.origin"
+                )
+            if "fixed" in source and not isinstance(source["fixed"], bool):
+                raise CoverageValidationError(f"{source_label}.fixed must be boolean")
+            if source_origin == "explicit_user":
+                if creative_input_text is None or quote not in creative_input_text:
+                    raise CoverageValidationError(
+                        f"{source_label}.quote must be a verbatim substring of "
+                        "request.creative_input_evidence"
+                    )
+                if source_hash != hashlib.sha256(
+                    creative_input_text.encode("utf-8")
+                ).hexdigest():
+                    raise CoverageValidationError(
+                        f"{source_label}.source_hash must bind the exact "
+                        "creative_input_evidence"
+                    )
+        related_ids = _array(item["related_intent_ids"], f"{label}.related_intent_ids")
+        parsed_related = [
+            _text(related_id, f"{label}.related_intent_ids[{related_index}]")
+            for related_index, related_id in enumerate(related_ids)
+        ]
+        if intent_item_id in parsed_related or len(parsed_related) != len(set(parsed_related)):
+            raise CoverageValidationError(
+                f"{label}.related_intent_ids must not contain self-references or duplicates"
+            )
+        items[intent_item_id] = {"origin": origin, "related_ids": parsed_related,
+                                 "fixed": any(source.get("fixed", False) for source in source_refs)}
+
+    groups = _mapping(payload["intent_groups"], "intent_groups")
+    _exact_fields(groups, INTENT_GROUPS, "intent_groups")
+    membership: dict[str, set[str]] = {intent_item_id: set() for intent_item_id in items}
+    counts: dict[str, int] = {}
+    for group_name in sorted(INTENT_GROUPS):
+        raw_members = _array(groups[group_name], f"intent_groups.{group_name}")
+        member_ids: list[str] = []
+        for member_index, raw_member in enumerate(raw_members):
+            member_label = f"intent_groups.{group_name}[{member_index}]"
+            member = _mapping(raw_member, member_label)
+            expected_fields = {"intent_item_id"}
+            if group_name == "timing_targets":
+                expected_fields.add("target_kind")
+            _exact_fields(member, expected_fields, member_label)
+            intent_item_id = _text(member["intent_item_id"], f"{member_label}.intent_item_id")
+            if intent_item_id not in items:
+                raise CoverageValidationError(
+                    f"{member_label} contains unknown intent IDs: {[intent_item_id]}"
+                )
+            if group_name == "timing_targets":
+                target_kind = _enum(
+                    member["target_kind"], TIMING_TARGET_KINDS,
+                    f"{member_label}.target_kind",
+                )
+                if items[intent_item_id]["fixed"] and target_kind != "delivery_constraint":
+                    raise CoverageValidationError("fixed intent must remain a delivery constraint")
+                if items[intent_item_id]["origin"] == "repair_margin" and target_kind != "generation_margin":
+                    raise CoverageValidationError("repair margin cannot become a delivery constraint")
+                if target_kind == "generation_margin":
+                    related_ids = items[intent_item_id]["related_ids"]
+                    if (
+                        items[intent_item_id]["origin"] != "repair_margin"
+                        or not related_ids
+                        or not any(
+                            items[related_id]["origin"] != "repair_margin"
+                            for related_id in related_ids
+                            if related_id in items
+                        )
+                    ):
+                        raise CoverageValidationError(
+                            f"{member_label}.generation_margin must bind an "
+                            "original non-margin intent target"
+                        )
+            member_ids.append(intent_item_id)
+            membership[intent_item_id].add(group_name)
+        if len(member_ids) != len(set(member_ids)):
+            raise CoverageValidationError(
+                f"intent_groups.{group_name} must not contain duplicates"
+            )
+        counts[group_name] = len(member_ids)
+
+    for intent_item_id, item in items.items():
+        if item["fixed"] and membership[intent_item_id] & {"preferred_performance", "acceptable_variation"}:
+            raise CoverageValidationError("fixed intent cannot be weakened from a constraint to advisory")
+        unknown_related = set(item["related_ids"]) - set(items)
+        if unknown_related:
+            raise CoverageValidationError(
+                f"intent_item_id={intent_item_id!r} contains unknown related intent IDs: "
+                f"{sorted(unknown_related)}"
+            )
+        if not membership[intent_item_id]:
+            raise CoverageValidationError(
+                f"intent_item_id={intent_item_id!r} is not bound to an intent group"
+            )
+        if (
+            "acceptable_variation" in membership[intent_item_id]
+            and not item["related_ids"]
+        ):
+            raise CoverageValidationError(
+                f"intent_item_id={intent_item_id!r} acceptable_variation needs a related target"
+            )
+        if len(membership[intent_item_id]) > 1 and membership[intent_item_id] != {
+            "preferred_performance",
+            "timing_targets",
+        }:
+            raise CoverageValidationError(
+                f"intent_item_id={intent_item_id!r} must be split into independent atoms"
+            )
+    return counts
+
+
 def validate_director_coverage(payload: Mapping[str, Any]) -> dict[str, Any]:
-    _exact_fields(payload, {"schema_version", "request", "coverage_units"}, "root")
-    if payload["schema_version"] != SCHEMA_VERSION:
+    schema_version = payload.get("schema_version")
+    if schema_version == LEGACY_SCHEMA_VERSION:
+        _exact_fields(payload, LEGACY_ROOT_FIELDS, "root")
+    elif schema_version == SCHEMA_VERSION:
+        _exact_fields(payload, V4_ROOT_FIELDS, "root")
+    else:
         raise CoverageValidationError(
-            f"schema_version must be {SCHEMA_VERSION!r}"
+            f"schema_version must be {LEGACY_SCHEMA_VERSION!r} or {SCHEMA_VERSION!r}"
         )
 
     request = _mapping(payload["request"], "request")
@@ -388,9 +580,17 @@ def validate_director_coverage(payload: Mapping[str, Any]) -> dict[str, Any]:
             "only the final coverage unit may use transition_out='end'"
         )
 
-    return {
+    intent_group_counts = (
+        _validate_v4_intent_handoff(
+            payload, creative_input_text=request["creative_input_evidence"] if creative_input_text is not None else None
+        )
+        if schema_version == SCHEMA_VERSION
+        else None
+    )
+
+    result = {
         "status": "passed",
-        "schema_version": SCHEMA_VERSION,
+        "schema_version": schema_version,
         "director_preflight_request": True,
         "creative_input_kind": creative_input_kind,
         "coverage_strategy": coverage_strategy,
@@ -398,6 +598,13 @@ def validate_director_coverage(payload: Mapping[str, Any]) -> dict[str, Any]:
         "coverage_unit_count": len(units),
         "planned_duration_seconds": planned_duration,
     }
+    if intent_group_counts is not None:
+        result.update(
+            intent_group_counts=intent_group_counts,
+            qa_admission_required=True,
+            director_intent_is_not_acceptance=True,
+        )
+    return result
 
 
 def _load_payload(source: str) -> Mapping[str, Any]:

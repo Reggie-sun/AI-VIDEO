@@ -7,6 +7,7 @@ from pydantic import Field, model_serializer, model_validator
 from ai_video.production.artifact_contracts import StrictModel
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.domain_acceptance import DomainAcceptancePolicy
+from ai_video.production.requirement_semantics import RequirementExpressionFields, validate_semantic_inventory
 
 SHA256 = r"^[0-9a-f]{64}$"
 Stage = Literal["raw_generation", "shot_editorial", "final_composition"]
@@ -24,21 +25,8 @@ class SeedPolicy(StrictModel):
         return self
 
 
-class RequirementExpression(StrictModel):
+class RequirementExpression(RequirementExpressionFields):
     """An acceptance-owner projection; recipe hints cannot become findings."""
-
-    requirement_id: str = Field(min_length=1)
-    level: Literal["acceptance", "recipe_hint", "diagnostic"]
-    stage: Stage
-    dimension: str = Field(min_length=1)
-    observable: str = Field(min_length=1)
-    tolerance: str = Field(min_length=1)
-    measurement: str = Field(min_length=1)
-    proof: Proof
-    # Exact canonical intent paths and native expressions, checked by compiler.
-    intent_paths: tuple[str, ...] = ()
-    native_text: tuple[str, ...] = ()
-    production_owner: str = Field(min_length=1)
 
 
 class CompiledComparison(StrictModel):
@@ -103,6 +91,12 @@ class GenerationRecipe(StrictModel):
         if required_ids != set(self.acceptance_policy.required_requirement_ids):
             raise ValueError("recipe omits or adds an accepted requirement")
         inventory = self.acceptance_policy.profile_payload.get("generation_requirements")
+        marked_rules = validate_semantic_inventory(self.acceptance_policy.profile_payload,
+                                                  self.acceptance_policy.required_requirement_ids)
+        if marked_rules:
+            # Compare the QA owner's typed projection, including optional-field
+            # defaults, while retaining the original sealed profile/hash verbatim.
+            inventory = tuple(r.model_dump(mode="json", exclude={"native_text"}) for r in marked_rules)
         actual = tuple(r.model_dump(mode="json", exclude={"native_text"}) for r in self.expressions)
         if inventory is None or canonical_sha256({"rules": inventory}) != canonical_sha256({"rules": actual}):
             raise ValueError("recipe needs the complete versioned acceptance-owner projection")
@@ -130,6 +124,10 @@ def expression_errors(recipe, requirement, prompt: str, control_paths=()) -> tup
     errors = []
     for item in recipe.expressions:
         if item.stage != "raw_generation":
+            continue
+        if item.semantics is not None and (
+            item.level == "diagnostic" or item.level == "recipe_hint" and not item.intent_paths
+        ):
             continue
         if not item.intent_paths:
             errors.append(item.requirement_id)

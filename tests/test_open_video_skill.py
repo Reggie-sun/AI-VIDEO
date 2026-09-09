@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import hashlib
 import importlib.util
 from pathlib import Path
 import re
@@ -257,6 +258,105 @@ def _single_unit_payload(*, target_duration_seconds: float = 30) -> dict[str, ob
     return payload
 
 
+def _v4_payload() -> dict[str, object]:
+    """A fixture-only compound brief split into Director intent atoms."""
+    payload = _payload(creative_input_kind="direction")
+    creative_input = (
+        "At the delivery cut, the courier must hold the sealed key; no phone may "
+        "appear; keep the courier identity continuous; use natural hand motion; "
+        "reach the delivery pose by 2.7 seconds."
+    )
+    payload["schema_version"] = "4"
+    payload["request"]["creative_input_evidence"] = creative_input
+    payload["request"]["creative_constraints"] = [
+        {
+            "constraint_id": "constraint-delivery",
+            "scope": "global",
+            "source_text": "the courier must hold the sealed key",
+        },
+        {
+            "constraint_id": "constraint-phone",
+            "scope": "global",
+            "source_text": "no phone may appear",
+        },
+    ]
+    for unit in payload["coverage_units"]:
+        unit["constraint_ids"] = ["constraint-delivery", "constraint-phone"]
+
+    source_hash = hashlib.sha256(creative_input.encode("utf-8")).hexdigest()
+
+    def explicit_ref(intent_item_id: str, quote: str) -> dict[str, object]:
+        return {
+            "source_hash": source_hash,
+            "locator": "request.creative_input_evidence",
+            "intent_item_id": intent_item_id,
+            "quote": quote,
+            "origin": "explicit_user",
+            "fixed": True,
+        }
+
+    payload["intent_items"] = [
+        {
+            "intent_item_id": "delivery-state",
+            "statement": "The courier holds the sealed key at the delivery cut.",
+            "source_refs": [
+                explicit_ref("user-delivery", "the courier must hold the sealed key")
+            ],
+            "origin": "explicit_user",
+            "related_intent_ids": [],
+        },
+        {
+            "intent_item_id": "phone-absence",
+            "statement": "No phone appears in the delivery frame.",
+            "source_refs": [explicit_ref("user-phone", "no phone may appear")],
+            "origin": "explicit_user",
+            "related_intent_ids": ["delivery-state"],
+        },
+        {
+            "intent_item_id": "natural-hands",
+            "statement": "Hand motion remains natural while reaching the pose.",
+            "source_refs": [
+                explicit_ref("user-performance", "use natural hand motion")
+            ],
+            "origin": "explicit_user",
+            "related_intent_ids": ["delivery-state"],
+        },
+        {
+            "intent_item_id": "delivery-time",
+            "statement": "The delivery pose is targeted by 2.7 seconds.",
+            "source_refs": [explicit_ref("user-timing", "reach the delivery pose by 2.7 seconds")],
+            "origin": "explicit_user",
+            "related_intent_ids": ["delivery-state"],
+        },
+        {
+            "intent_item_id": "delivery-variation",
+            "statement": "The approach path may vary while the delivery state remains.",
+            "source_refs": [{"source_hash": "a" * 64, "locator": "director/variation",
+                "intent_item_id": "director-variation", "quote": "Vary approach while retaining delivery",
+                "origin": "director_choice"}],
+            "origin": "director_choice",
+            "related_intent_ids": ["delivery-state"],
+        },
+        {"intent_item_id": "gentle-approach", "statement": "Prefer a gentle approach tempo",
+         "source_refs": [{"source_hash": "b" * 64, "locator": "director/performance",
+            "intent_item_id": "director-tempo", "quote": "Prefer a gentle tempo",
+            "origin": "director_choice"}], "origin": "director_choice", "related_intent_ids": ["delivery-state"]},
+    ]
+    payload["intent_groups"] = {
+        "must_happen": [{"intent_item_id": "delivery-state"}, {"intent_item_id": "natural-hands"}],
+        "must_not_happen": [{"intent_item_id": "phone-absence"}],
+        "preferred_performance": [{"intent_item_id": "gentle-approach"}],
+        "timing_targets": [
+            {
+                "intent_item_id": "delivery-time",
+                "target_kind": "delivery_constraint",
+            }
+        ],
+        "acceptable_variation": [{"intent_item_id": "delivery-variation"}],
+    }
+    return payload
+
+
 def test_missing_input_30s_agent_can_choose_multi_shot() -> None:
     validator = _load_validator()
 
@@ -272,6 +372,128 @@ def test_missing_input_30s_agent_can_choose_multi_shot() -> None:
         "coverage_unit_count": 2,
         "planned_duration_seconds": 30.0,
     }
+
+
+def test_v4_director_handoff_binds_complete_compound_intent_groups() -> None:
+    validator = _load_validator()
+    payload = _v4_payload()
+
+    result = validator.validate_director_coverage(payload)
+
+    assert result["schema_version"] == "4"
+    assert result["intent_group_counts"] == {
+        "must_happen": 2,
+        "must_not_happen": 1,
+        "preferred_performance": 1,
+        "timing_targets": 1,
+        "acceptable_variation": 1,
+    }
+    assert result["qa_admission_required"] is True
+    assert result["director_intent_is_not_acceptance"] is True
+
+
+def test_v4_handoff_allows_explicitly_empty_intent_groups() -> None:
+    validator = _load_validator()
+    payload = _payload()
+    payload["schema_version"] = "4"
+    payload["intent_items"] = []
+    payload["intent_groups"] = {
+        group_name: []
+        for group_name in (
+            "must_happen",
+            "must_not_happen",
+            "preferred_performance",
+            "timing_targets",
+            "acceptable_variation",
+        )
+    }
+
+    result = validator.validate_director_coverage(payload)
+
+    assert result["intent_group_counts"] == {
+        "must_happen": 0,
+        "must_not_happen": 0,
+        "preferred_performance": 0,
+        "timing_targets": 0,
+        "acceptable_variation": 0,
+    }
+
+
+def test_v4_handoff_rejects_missing_required_intent_group() -> None:
+    validator = _load_validator()
+    payload = _v4_payload()
+    del payload["intent_groups"]["acceptable_variation"]
+
+    with pytest.raises(validator.CoverageValidationError, match="intent_groups fields mismatch"):
+        validator.validate_director_coverage(payload)
+
+
+def test_v4_handoff_keeps_explicit_user_quote_verbatim() -> None:
+    validator = _load_validator()
+    payload = _v4_payload()
+    payload["intent_items"][0]["source_refs"][0]["quote"] = (
+        "The courier must visibly hold the sealed key."
+    )
+
+    with pytest.raises(validator.CoverageValidationError, match="verbatim substring"):
+        validator.validate_director_coverage(payload)
+
+
+@pytest.mark.parametrize("group", ["preferred_performance", "acceptable_variation"])
+def test_v4_fixed_user_result_cannot_be_reclassified_as_advisory(group):
+    validator = _load_validator()
+    payload = _v4_payload()
+    payload["intent_groups"]["must_happen"] = [
+        member for member in payload["intent_groups"]["must_happen"] if member["intent_item_id"] != "delivery-state"]
+    payload["intent_groups"][group].append({"intent_item_id": "delivery-state"})
+    payload["intent_items"][0]["related_intent_ids"] = ["phone-absence"]
+    with pytest.raises(validator.CoverageValidationError, match="fixed.*constraint"):
+        validator.validate_director_coverage(payload)
+
+
+def test_v4_source_hash_binds_exact_untrimmed_user_input():
+    validator = _load_validator()
+    payload = _v4_payload()
+    old_text = payload["request"]["creative_input_evidence"]
+    exact_text = "\n  " + old_text + "  \n"
+    payload["request"]["creative_input_evidence"] = exact_text
+    for item in payload["intent_items"]:
+        for source in item["source_refs"]:
+            if source["origin"] == "explicit_user":
+                source["source_hash"] = hashlib.sha256(exact_text.encode()).hexdigest()
+    assert validator.validate_director_coverage(payload)["status"] == "passed"
+    payload["intent_items"][0]["source_refs"][0]["source_hash"] = hashlib.sha256(old_text.encode()).hexdigest()
+    with pytest.raises(validator.CoverageValidationError, match="exact creative_input_evidence"):
+        validator.validate_director_coverage(payload)
+
+
+def test_v4_handoff_rejects_repair_margin_without_original_target_binding() -> None:
+    validator = _load_validator()
+    payload = _v4_payload()
+    payload["intent_items"][3]["origin"] = "repair_margin"
+    payload["intent_items"][3]["source_refs"][0]["origin"] = "repair_margin"
+    payload["intent_items"][3]["source_refs"][0]["fixed"] = False
+    payload["intent_items"][3]["related_intent_ids"] = []
+    payload["intent_groups"]["timing_targets"][0]["target_kind"] = "generation_margin"
+
+    with pytest.raises(validator.CoverageValidationError, match="generation_margin"):
+        validator.validate_director_coverage(payload)
+
+
+def test_v4_handoff_rejects_unbound_or_duplicate_intent_references() -> None:
+    validator = _load_validator()
+    payload = _v4_payload()
+    payload["intent_groups"]["must_happen"].append(
+        {"intent_item_id": "delivery-state"}
+    )
+
+    with pytest.raises(validator.CoverageValidationError, match="must not contain duplicates"):
+        validator.validate_director_coverage(payload)
+
+    payload = _v4_payload()
+    payload["intent_groups"]["must_happen"][0]["intent_item_id"] = "missing-intent"
+    with pytest.raises(validator.CoverageValidationError, match="unknown intent IDs"):
+        validator.validate_director_coverage(payload)
 
 
 @pytest.mark.parametrize("transition", ["VIDEO_EXTEND", "no cut", "uninterrupted"])

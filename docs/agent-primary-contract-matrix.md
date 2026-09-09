@@ -95,6 +95,18 @@ registered variants 和 durable experience 构造 `DecisionInputs`，Router 仍�
 `generation_evaluation.py` 保存 Review 边界的 raw-generation evaluator document 并投影 Finding；
 committer 必须重验 document hash、request/artifact/rubric/current QA identity、selected evaluator，
 不能只保存 caller 手填的 Finding/source hash。该契约不替代真实 analyzer/human 调用或 Gate。
+`requirement_semantics.py` 是原 QA inventory 的无 I/O 类型与校验叶模块；selected QA 的
+`requirement-semantics/1` marker 决定版本，不新增 inventory 或选择 owner。
+`generation_evaluation_criteria.py` 从封存 predicate 与 fetched SHA/size 派生 immutable items，
+有限 event-time 区间按 canonical 窗口判定，不从 Provider prompt 增加标准。
+`generation-evaluation/2` 将 acceptance、advisory 与 unresolved quality 分开；两个 feedback
+录入入口、committer 与 strict reopen 共用 exact projection 校验。追加 PASS 不能抹掉原
+unresolved refs；真实 hard FAIL 与 refs 并存时仍按失败统计，不降成 incomplete。
+`ai_video_mcp/generation_feedback.py::ControlledPresentationVerifier` 拥有受控 technical/analyzer
+问答 capture；首次写入另需 one-use presentation proof，原 analysis proof 不能替代它。
+未接入可信 human host 时 fail closed；旧 `/1` serialization/hash/verdict 原样保留。
+Marked final 项仍引用原 FinalOutputContract；纯 shadow helper 不产生 Production 权限。
+
 QA owner 的 `generation_evaluation_authorities` 显式绑定 evaluator 与 proof kind；旧 policy 的
 空字段保持原序列化，新 generation 缺少适用 authority 时必须在 submit 前拒绝。
 同一 `QaPolicy` 可通过 `generation_acceptance` 保存独立生成阶段 rubric，而 `domain_acceptance`
@@ -145,7 +157,9 @@ prepare/live wrappers 委托该入口，历史 bootstrap 不授予新 submit 权
 这些约束不构成远程 tool attestation，也不自动激活或签发 P6/Final Acceptance。
 
 Focused verification：`python -m pytest -p no:cacheprovider tests/test_generation_feedback.py
-tests/test_generation_evaluation.py tests/test_generation_execution.py tests/test_generation_execution_guards.py
+tests/test_generation_evaluation.py tests/test_requirement_semantics.py
+tests/test_generation_evaluation_binding.py tests/test_requirement_semantics_replay.py
+tests/test_generation_execution.py tests/test_generation_execution_guards.py
 tests/test_generation_provider_wiring.py tests/test_generation_local_wiring.py
 tests/test_generation_historical_replay.py tests/test_production_generation_decision.py
 tests/test_generation_history_import.py tests/test_generation_history_import_receipt.py

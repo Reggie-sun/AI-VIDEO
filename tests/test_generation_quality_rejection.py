@@ -123,6 +123,18 @@ def _fetched_mixed_failure(tmp_path):
 def test_abandon_preserves_mixed_diagnosis_paid_state_and_exact_replay(tmp_path):
     committer, experience, manifest, before = _fetched_mixed_failure(tmp_path)
     state = before.video_generation_state
+    assert tuple(source.schema_version for source in experience.evaluation_sources) == (
+        "generation-evaluation/1", "generation-evaluation/1",
+    )
+    assert tuple(source.source_sha256 for source in experience.evaluation_sources) == (
+        "774cf3ccb881ff2ce8b78012ea073372c94ac90e22f2e6c70156059eb3165a16",
+        "70c1618d31429fc61c8f3e805270a7118af3600df8fbddd5e1a85ecee309a34a",
+    )
+    assert experience.evidence[0].evidence_hash == "4e0a16eecf34667db896c204d7ad10b489994580772cedf8c70c66bed19c64ca"
+    assert canonical_sha256(experience.model_dump(mode="json")) == "3f312234a508cd1375495729688aab51011937a1e5b31959fa3a22e78f66687b"
+    assert diagnose_exact_result(
+        experience.evidence[0], experience.evidence, experience.candidate.recipe
+    ).failure_classes == ("EVIDENCE_GAP", "QUALITY_FAILURE")
     arguments = dict(attempt_id=ATTEMPT_ID, expected_manifest_revision=manifest.manifest_revision,
         experience_content_hash=state.generation_experiences[-1].content_hash, actor=ACTOR,
         reason="Explicitly discard the failed output after evidence repair was exhausted.")

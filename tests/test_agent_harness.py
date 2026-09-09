@@ -129,6 +129,27 @@ def test_generation_feedback_routes_to_decision_and_provider_checks(path) -> Non
 
 
 @pytest.mark.parametrize("path", [
+    "src/ai_video/production/requirement_semantics.py",
+    "src/ai_video/production/generation_evaluation_criteria.py",
+    "tests/test_requirement_semantics.py",
+    "tests/test_generation_evaluation_binding.py",
+    "tests/test_requirement_semantics_replay.py",
+])
+def test_requirement_semantics_routes_to_existing_checks_without_fallback(path):
+    policy = agent_harness.load_policy(POLICY_PATH)
+    inspection = agent_harness.inspect_paths([path], policy)
+    assert inspection["fallback_paths"] == []
+    assert "generation_feedback" in inspection["categories"]
+    assert {"generation_feedback_tests", "final_output_no_regression_tests",
+            "production_video_provider_tests"} <= set(inspection["check_ids"])
+    if path.endswith("requirement_semantics.py"):
+        assert {"production_review", "production_shot_router"} <= set(inspection["categories"])
+    assert {"tests/test_requirement_semantics.py", "tests/test_generation_evaluation_binding.py",
+            "tests/test_requirement_semantics_replay.py"} <= set(
+                policy["checks"]["generation_feedback_tests"]["argv"])
+
+
+@pytest.mark.parametrize("path", [
     "src/ai_video/production/final_output_contracts.py",
     "src/ai_video/production/final_output_review.py",
     "src/ai_video/production/_state_commit_repair.py",
