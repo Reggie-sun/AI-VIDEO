@@ -1,6 +1,7 @@
 """Pure selected-QA evaluation views and bounded source-time predicates."""
 
 from typing import Literal
+import re
 
 from pydantic import Field, model_validator
 
@@ -45,6 +46,16 @@ def evaluation_items(*, acceptance, qa_policy_content_hash, request_hash, artifa
         category=r.semantics.category, proof=r.proof, observable=r.observable,
         tolerance=r.tolerance, measurement=r.measurement, measurement_spec=r.measurement_spec)
         for r in rules if r.level == "acceptance" and r.stage == "raw_generation")
+
+
+def require_canonical_observation_basis(item, observation):
+    """Check explicit criterion identifiers; free prose is not a predicate."""
+    if observation.verdict == "NOT_EVALUATED":
+        return
+    text = observation.observation
+    labels = re.findall(r"(?:\bcriterion\s*:?\s*|按)\[([^\]]+)\]", text, flags=re.IGNORECASE)
+    if any(label != item.requirement_id for label in labels):
+        raise ValueError("observation cites a different canonical criterion")
 
 
 class TemporalMeasurement(StrictModel):

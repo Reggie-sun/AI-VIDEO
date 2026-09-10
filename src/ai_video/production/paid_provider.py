@@ -14,6 +14,9 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import ActorIdentity, StrictModel
 from ai_video.production.paid_provider_budget_extension import PaidProviderBudgetCeilingExtension
+from ai_video.production.paid_provider_no_effect_reconciliation import (
+    PaidProviderNoEffectReconciliationPointer,
+)
 from ai_video.production.paid_provider_submit_quota import PaidProviderSubmitQuotaExtension
 
 
@@ -400,8 +403,16 @@ class PaidProviderSubmitReceipt(_PaidStrictModel):
     reservation_id: str = Field(pattern=_SAFE_SHORT_ID.pattern)
     outcome: PaidProviderSubmitOutcome
     external_effect_id: str | None = None
+    no_effect_reconciliation: PaidProviderNoEffectReconciliationPointer | None = None
     recorded_at: datetime
     submit_receipt_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_serializer(mode="wrap")
+    def _serialize_optional_reconciliation(self, handler):
+        data = handler(self)
+        if self.no_effect_reconciliation is None:
+            data.pop("no_effect_reconciliation", None)
+        return data
 
     @field_validator("external_effect_id")
     @classmethod
@@ -419,6 +430,11 @@ class PaidProviderSubmitReceipt(_PaidStrictModel):
                 raise ValueError("accepted paid submit requires exact external effect ID")
         elif self.external_effect_id is not None:
             raise ValueError("non-accepted paid submit cannot claim an external effect ID")
+        if (
+            self.no_effect_reconciliation is not None
+            and self.outcome is not PaidProviderSubmitOutcome.KNOWN_NO_EFFECT
+        ):
+            raise ValueError("only known-no-effect submits may link a reconciliation")
         data = self.model_dump(mode="json", exclude={"submit_receipt_fingerprint"})
         if canonical_sha256(data) != self.submit_receipt_fingerprint:
             raise ValueError("paid Provider submit receipt fingerprint does not match")

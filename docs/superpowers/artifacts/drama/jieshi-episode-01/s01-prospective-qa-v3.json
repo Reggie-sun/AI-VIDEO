@@ -1,0 +1,1139 @@
+{
+  "artifact_id": "jieshi-s01-generation-qa",
+  "schema_version": "2.0",
+  "revision": 3,
+  "content_hash": "3ae75134be69407d677d894041980623b1477635b1993ada7b7e6cba1895b48a",
+  "creation_receipt_id": "s01-prospective-semantics-20260910",
+  "source_provenance": [
+    {
+      "kind": "derived",
+      "reference": "creative/brief/jieshi-e01-brief-r1.yaml",
+      "content_hash": "7901e4b4af3f2ba8506227e626873cbc7b32dc2f1803ddad5e2382d2dd706396"
+    },
+    {
+      "kind": "derived",
+      "reference": "creative/shots/jieshi-e01-S01-r6.yaml",
+      "content_hash": "4c442c56961d589931ebba34aad987a73ed997f0eeb44755d0f6cc2fb8593d30"
+    },
+    {
+      "kind": "derived",
+      "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+      "content_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+    }
+  ],
+  "final_output": {
+    "goal_id": "jieshi-e01-S01-final-output",
+    "goal_version": "3",
+    "user_goal": "依照canonical Brief和S01 Shot，使前三秒缺失倒影异常可读、广播正确，并保持自然动作与S02接续；局部timing偏好不能牺牲成片。",
+    "requirements": [
+      {
+        "requirement_id": "anomaly-readable",
+        "observable": "前三秒内可读出他人有倒影而林砚没有的异常，林砚看向对应空位并作出反应。",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "protagonist-no-reflection",
+        "observable": "林砚对应窗区没有匹配其脸、身体或左手的倒影。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "others-reflection-contrast",
+        "observable": "六名乘客与苏遥的倒影保持成立，与林砚对应空位形成可读对照。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "natural-hand",
+        "observable": "自然左手、连续腕部动作、无畸形或不自然翻掌",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "hover-readable",
+        "observable": "前3秒内近窗非接触悬停的小间隙在观看中清楚可读",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "identity-continuity",
+        "observable": "可见人物外观、服装、蓝色挂绳和矩形白牌体与批准首帧连续，无可见异常变形或消失事件",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "phone-scene-continuity",
+        "observable": "手机、道具所有权和车厢布局保持连续；右手持手机在腿部的既定状态不发生无因变化。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "no-generated-text",
+        "observable": "原始视频没有新增的生成字幕、错误文字或烧字覆盖。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "broadcast-core",
+        "observable": "画外列车广播清楚完整地说出“林砚，请在终点站下车。”",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "broadcast-window",
+        "observable": "广播完整句的结束时刻落在 canonical 0.1–2.7s 窗口内。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "native-audio-quality",
+        "observable": "原广播清楚完整、无杂音和突变、轻柔轮轨声且无新增音乐",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "silent-protagonist",
+        "observable": "林砚闭嘴听画外广播，无可见跟读",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "natural-dynamics",
+        "observable": "人物动作和车厢自然动态连续，没有整帧冻结、跳帧或突变破坏正常观看。",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "genre-fixed",
+        "observable": "保持虚构科幻异常表达，不出现真实鬼魂、招魂、驱鬼、符咒、法事、风水改命或血腥肢解。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "s02-cut-state",
+        "observable": "最终S01切点时林砚左手悬在窗前，身份、道具与缺失倒影状态可接S02。",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "final-subtitle",
+        "observable": "最终成片0–3s清楚显示“可这条地铁，没有终点站。”且无错误字幕。",
+        "proof": "evaluator"
+      }
+    ]
+  },
+  "generation_acceptance": {
+    "domain_id": "jieshi",
+    "profile_id": "S01-generation-acceptance",
+    "profile_version": "3.0",
+    "profile_content_hash": "9611f8b6b0db47b137c18e6bda7c1e00db2de5ae06845419087c9e19179bddac",
+    "profile_payload": {
+      "domain_id": "jieshi",
+      "profile_id": "S01-generation-acceptance",
+      "profile_version": "3.0",
+      "measurement_contract_version": "S01-visual-audio/3",
+      "requirement_semantics_version": "requirement-semantics/1",
+      "prospective_from_rubric_hash": "6e95f68134a326906d23b266c2a9a556cffe10988be7c48c0a19074191459820",
+      "generation_requirements": [
+        {
+          "requirement_id": "anomaly-readable",
+          "level": "acceptance",
+          "stage": "raw_generation",
+          "dimension": "anomaly-readable",
+          "observable": "前三秒内可读出他人有倒影而林砚没有的异常，林砚看向对应空位并作出反应。",
+          "tolerance": "以观看中能理解核心对照为准；不要求左手在1.5s前完全到位。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "human",
+          "intent_paths": [
+            "generation_intent.open_state.state_text"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "narrative_critical",
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "source_hash": "7901e4b4af3f2ba8506227e626873cbc7b32dc2f1803ddad5e2382d2dd706396",
+                "locator": "constraints/22",
+                "intent_item_id": "constraints/22",
+                "quote": "前 3 秒必须抓住观众。",
+                "origin": "explicit_user"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-03"
+              },
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-07"
+              },
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-08"
+              }
+            ],
+            "hard_basis": {
+              "kind": "explicit_user",
+              "source_hash": "7901e4b4af3f2ba8506227e626873cbc7b32dc2f1803ddad5e2382d2dd706396",
+              "locator": "constraints/22",
+              "necessity": "前三秒内可读出他人有倒影而林砚没有的异常，林砚看向对应空位并作出反应。"
+            }
+          }
+        },
+        {
+          "requirement_id": "arrival-margin",
+          "level": "recipe_hint",
+          "stage": "raw_generation",
+          "dimension": "arrival-margin",
+          "observable": "偏好左手在≤1.5s前到位并留出保持余量。",
+          "tolerance": "允许晚于1.5s；单独偏离不构成质量失败。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "analyzer",
+          "intent_paths": [
+            "generation_intent.subject_action.progression"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "directional_preference",
+            "intent_role": "timing_target",
+            "source_refs": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-03",
+                "intent_item_id": "generation_acceptance/generation_requirements/legacy-03",
+                "quote": "Real LEFT hand reaches endpoint by1.5s and holds",
+                "origin": "repair_margin"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-03"
+              }
+            ]
+          }
+        },
+        {
+          "requirement_id": "broadcast-core",
+          "level": "acceptance",
+          "stage": "raw_generation",
+          "dimension": "broadcast-core",
+          "observable": "画外列车广播清楚完整地说出“林砚，请在终点站下车。”",
+          "tolerance": "核心姓名和下车信息必须正确；ASR同音字拼写本身不证明错读。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "human",
+          "intent_paths": [
+            "generation_intent.scene_continuity.state_constraints"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "narrative_critical",
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "source_hash": "7901e4b4af3f2ba8506227e626873cbc7b32dc2f1803ddad5e2382d2dd706396",
+                "locator": "constraints/26",
+                "intent_item_id": "constraints/26",
+                "quote": "同时广播响起：“林砚，请在终点站下车。”",
+                "origin": "explicit_user"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-13"
+              },
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-14"
+              }
+            ],
+            "hard_basis": {
+              "kind": "explicit_user",
+              "source_hash": "7901e4b4af3f2ba8506227e626873cbc7b32dc2f1803ddad5e2382d2dd706396",
+              "locator": "constraints/26",
+              "necessity": "画外列车广播清楚完整地说出“林砚，请在终点站下车。”"
+            }
+          }
+        },
+        {
+          "requirement_id": "broadcast-margin",
+          "level": "recipe_hint",
+          "stage": "raw_generation",
+          "dimension": "broadcast-margin",
+          "observable": "偏好广播在≤2.2s前结束，留出prompt余量。",
+          "tolerance": "2.2s不改变canonical 0.1–2.7s广播criterion。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "analyzer",
+          "intent_paths": [
+            "generation_intent.scene_continuity.state_constraints"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "directional_preference",
+            "intent_role": "timing_target",
+            "source_refs": [
+              {
+                "source_hash": "6f868b5feb43ee31a8af723c1817a7af0018672e4f3948808134218d4763f5a8",
+                "locator": "generation_intent/scene_continuity/state_constraints",
+                "intent_item_id": "generation_intent/scene_continuity/state_constraints",
+                "quote": "整句在第2.2秒前结束",
+                "origin": "repair_margin"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-13"
+              }
+            ]
+          }
+        },
+        {
+          "requirement_id": "broadcast-window",
+          "level": "acceptance",
+          "stage": "raw_generation",
+          "dimension": "broadcast-window",
+          "observable": "广播完整句的结束时刻落在 canonical 0.1–2.7s 窗口内。",
+          "tolerance": "S01-D1-completion: [100, 2700] source_media_millis",
+          "measurement": "The last audible syllable of the complete named broadcast 林砚，请在终点站下车。; boundary=end; methods=word_aligned_audio,human_bounded_audio; coverage=0..3000; uncertainty=bounded_interval",
+          "proof": "analyzer",
+          "intent_paths": [
+            "generation_intent.scene_continuity.state_constraints"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "narrative_critical",
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921",
+                "locator": "ordered_shots/S01/dialogue/S01-D1",
+                "intent_item_id": "ordered_shots/S01/dialogue/S01-D1",
+                "quote": "{\"audio_cue_id\": \"S01-D1\", \"start_seconds\": 0.1, \"end_seconds\": 2.7, \"speaker_id\": \"PA\", \"addressee\": \"林砚\", \"text\": \"林砚，请在终点站下车。\", \"turn_function_and_reaction\": \"点名；林砚嘴唇不动，目光固定空座。\", \"delivery\": \"普通话自然短句；其余角色不复制口型。\"}",
+                "origin": "director_choice"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-13"
+              }
+            ],
+            "hard_basis": {
+              "kind": "approved_narrative",
+              "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921",
+              "locator": "ordered_shots/S01/dialogue/S01-D1",
+              "necessity": "广播完整句的结束时刻落在 canonical 0.1–2.7s 窗口内。"
+            }
+          },
+          "measurement_spec": {
+            "kind": "event_time_window",
+            "event_id": "S01-D1-completion",
+            "event_definition": "The last audible syllable of the complete named broadcast 林砚，请在终点站下车。",
+            "boundary": "end",
+            "timebase": "source_media_millis",
+            "source_role": "fetched_raw",
+            "selection_rule": "submitted_output",
+            "lower_millis": 100,
+            "upper_millis": 2700,
+            "lower_inclusive": true,
+            "upper_inclusive": true,
+            "allowed_methods": [
+              "word_aligned_audio",
+              "human_bounded_audio"
+            ],
+            "required_coverage": [
+              0,
+              3000
+            ],
+            "uncertainty": "bounded_interval"
+          }
+        },
+        {
+          "requirement_id": "final-subtitle",
+          "level": "acceptance",
+          "stage": "final_composition",
+          "dimension": "final-subtitle",
+          "observable": "最终成片0–3s清楚显示“可这条地铁，没有终点站。”且无错误字幕。",
+          "tolerance": "文字准确、可读，排版不得遮挡核心倒影异常。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "analyzer",
+          "intent_paths": [],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "narrative_critical",
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "source_hash": "7901e4b4af3f2ba8506227e626873cbc7b32dc2f1803ddad5e2382d2dd706396",
+                "locator": "constraints/27",
+                "intent_item_id": "constraints/27",
+                "quote": "「可这条地铁，没有终点站。」",
+                "origin": "explicit_user"
+              },
+              {
+                "source_hash": "b589be4bacb642d4400a494d4168c073ad25ba6a7eabc6ebb3a8541e6489d774",
+                "locator": "final-subtitle",
+                "intent_item_id": "final-subtitle",
+                "quote": "最终成片0–3s清楚显示“可这条地铁，没有终点站。”且无错误字幕。",
+                "origin": "director_choice"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-15"
+              }
+            ],
+            "hard_basis": {
+              "kind": "explicit_user",
+              "source_hash": "7901e4b4af3f2ba8506227e626873cbc7b32dc2f1803ddad5e2382d2dd706396",
+              "locator": "constraints/27",
+              "necessity": "最终成片0–3s清楚显示“可这条地铁，没有终点站。”且无错误字幕。"
+            }
+          }
+        },
+        {
+          "requirement_id": "fixed-palm",
+          "level": "recipe_hint",
+          "stage": "raw_generation",
+          "dimension": "fixed-palm",
+          "observable": "偏好抬手全程固定朝玻璃的掌向。",
+          "tolerance": "允许自然掌向变化；异常翻腕由natural-hand独立判断。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "analyzer",
+          "intent_paths": [
+            "generation_intent.subject_action.progression"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "directional_preference",
+            "intent_role": "preferred_performance",
+            "source_refs": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-05",
+                "intent_item_id": "generation_acceptance/generation_requirements/legacy-05",
+                "quote": "Palm orientation remains toward glass during lift",
+                "origin": "repair_margin"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-05"
+              }
+            ]
+          }
+        },
+        {
+          "requirement_id": "genre-fixed",
+          "level": "acceptance",
+          "stage": "raw_generation",
+          "dimension": "genre-fixed",
+          "observable": "保持虚构科幻异常表达，不出现真实鬼魂、招魂、驱鬼、符咒、法事、风水改命或血腥肢解。",
+          "tolerance": "空间和认知异常可以存在；不得以被禁止的表现替代本镜异常。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "analyzer",
+          "intent_paths": [
+            "generation_intent.scene_continuity.state_constraints"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "quality_critical",
+            "intent_role": "must_not_happen",
+            "source_refs": [
+              {
+                "source_hash": "7901e4b4af3f2ba8506227e626873cbc7b32dc2f1803ddad5e2382d2dd706396",
+                "locator": "constraints/9",
+                "intent_item_id": "constraints/9",
+                "quote": "不使用真实鬼魂、招魂、驱鬼、符咒、法事、风水改命等封建迷信体系。",
+                "origin": "explicit_user"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-08"
+              }
+            ],
+            "hard_basis": {
+              "kind": "explicit_user",
+              "source_hash": "7901e4b4af3f2ba8506227e626873cbc7b32dc2f1803ddad5e2382d2dd706396",
+              "locator": "constraints/9",
+              "necessity": "保持虚构科幻异常表达，不出现真实鬼魂、招魂、驱鬼、符咒、法事、风水改命或血腥肢解。"
+            }
+          }
+        },
+        {
+          "requirement_id": "hand-trajectory",
+          "level": "recipe_hint",
+          "stage": "raw_generation",
+          "dimension": "hand-trajectory",
+          "observable": "偏好沿既定抬手轨迹靠近玻璃。",
+          "tolerance": "允许自然轨迹变化，不接受明显畸形或不自然翻腕。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "analyzer",
+          "intent_paths": [
+            "generation_intent.subject_action.progression"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "directional_preference",
+            "intent_role": "preferred_performance",
+            "source_refs": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-03",
+                "intent_item_id": "generation_acceptance/generation_requirements/legacy-03",
+                "quote": "Real LEFT hand reaches endpoint by1.5s and holds",
+                "origin": "repair_margin"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-03"
+              },
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-17"
+              }
+            ]
+          }
+        },
+        {
+          "requirement_id": "hover-readable",
+          "level": "acceptance",
+          "stage": "raw_generation",
+          "dimension": "hover-readable",
+          "observable": "前3秒内近窗非接触悬停的小间隙在观看中清楚可读",
+          "tolerance": "约2cm为近窗小间隙的观看目标，不宣称未标定单目物理测量；看不清仅判可读性FAIL，不判物理接触。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "human",
+          "intent_paths": [
+            "generation_intent.close_state.state_text"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "quality_critical",
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "source_hash": "4c442c56961d589931ebba34aad987a73ed997f0eeb44755d0f6cc2fb8593d30",
+                "locator": "continuity_constraints/1",
+                "intent_item_id": "continuity_constraints/1",
+                "quote": "左手距窗约2cm停住；不是先见正常再逐渐消失。",
+                "origin": "director_choice"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-06"
+              }
+            ],
+            "hard_basis": {
+              "kind": "approved_narrative",
+              "source_hash": "4c442c56961d589931ebba34aad987a73ed997f0eeb44755d0f6cc2fb8593d30",
+              "locator": "continuity_constraints/1",
+              "necessity": "前3秒内近窗非接触悬停的小间隙在观看中清楚可读"
+            }
+          }
+        },
+        {
+          "requirement_id": "identity-continuity",
+          "level": "acceptance",
+          "stage": "raw_generation",
+          "dimension": "identity-continuity",
+          "observable": "可见人物外观、服装、蓝色挂绳和矩形白牌体与批准首帧连续，无可见异常变形或消失事件",
+          "tolerance": "S01中广景不要求读出姓名头像；不可见正反面信息不推断为存在或消失，S08/S37细节仍按各镜验收。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "analyzer",
+          "intent_paths": [
+            "generation_intent.identity_continuity.preservation"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "quality_critical",
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "source_hash": "7901e4b4af3f2ba8506227e626873cbc7b32dc2f1803ddad5e2382d2dd706396",
+                "locator": "constraints/15",
+                "intent_item_id": "constraints/15",
+                "quote": "保证角色服装、面部、道具、车厢布局连续。",
+                "origin": "explicit_user"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-11"
+              }
+            ],
+            "hard_basis": {
+              "kind": "explicit_user",
+              "source_hash": "7901e4b4af3f2ba8506227e626873cbc7b32dc2f1803ddad5e2382d2dd706396",
+              "locator": "constraints/15",
+              "necessity": "可见人物外观、服装、蓝色挂绳和矩形白牌体与批准首帧连续，无可见异常变形或消失事件"
+            }
+          }
+        },
+        {
+          "requirement_id": "immediate-onset",
+          "level": "recipe_hint",
+          "stage": "raw_generation",
+          "dimension": "immediate-onset",
+          "observable": "偏好立即起手。",
+          "tolerance": "反应和停顿可变化，以异常可读和接续结果为准。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "analyzer",
+          "intent_paths": [
+            "generation_intent.subject_action.progression"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "directional_preference",
+            "intent_role": "preferred_performance",
+            "source_refs": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-03",
+                "intent_item_id": "generation_acceptance/generation_requirements/legacy-03",
+                "quote": "Real LEFT hand reaches endpoint by1.5s and holds",
+                "origin": "repair_margin"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-03"
+              }
+            ]
+          }
+        },
+        {
+          "requirement_id": "native-audio-quality",
+          "level": "acceptance",
+          "stage": "raw_generation",
+          "dimension": "native-audio-quality",
+          "observable": "原广播清楚完整、无杂音和突变、轻柔轮轨声且无新增音乐",
+          "tolerance": "必须对该 exact MP4 真实试听；旧音频 PASS 不继承到新视频。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "human",
+          "intent_paths": [
+            "generation_intent.scene_continuity.state_constraints"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "quality_critical",
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-14",
+                "intent_item_id": "generation_acceptance/generation_requirements/legacy-14",
+                "quote": "原广播清楚完整、无杂音和突变、轻柔轮轨声且无新增音乐",
+                "origin": "director_choice"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-14"
+              }
+            ],
+            "hard_basis": {
+              "kind": "accepted_quality",
+              "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+              "locator": "generation_acceptance/generation_requirements/legacy-14",
+              "necessity": "原广播清楚完整、无杂音和突变、轻柔轮轨声且无新增音乐"
+            }
+          }
+        },
+        {
+          "requirement_id": "natural-dynamics",
+          "level": "acceptance",
+          "stage": "raw_generation",
+          "dimension": "natural-dynamics",
+          "observable": "人物动作和车厢自然动态连续，没有整帧冻结、跳帧或突变破坏正常观看。",
+          "tolerance": "自然停顿和微动可以存在；把动态镜头尾段整体冻结以满足局部 timing 不可接受。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "human",
+          "intent_paths": [
+            "generation_intent.subject_action.progression"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "quality_critical",
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "source_hash": "7901e4b4af3f2ba8506227e626873cbc7b32dc2f1803ddad5e2382d2dd706396",
+                "locator": "constraints/18",
+                "intent_item_id": "constraints/18",
+                "quote": "镜头不要只是人物站着说话，要持续存在视觉信息变化。",
+                "origin": "explicit_user"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-03"
+              },
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-09"
+              },
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-17"
+              }
+            ],
+            "hard_basis": {
+              "kind": "explicit_user",
+              "source_hash": "7901e4b4af3f2ba8506227e626873cbc7b32dc2f1803ddad5e2382d2dd706396",
+              "locator": "constraints/18",
+              "necessity": "人物动作和车厢自然动态连续，没有整帧冻结、跳帧或突变破坏正常观看。"
+            }
+          }
+        },
+        {
+          "requirement_id": "natural-hand",
+          "level": "acceptance",
+          "stage": "raw_generation",
+          "dimension": "natural-hand",
+          "observable": "自然左手、连续腕部动作、无畸形或不自然翻掌",
+          "tolerance": "真实观看不接受明显异常手型和动作；不能用末帧正确抵消前段失败",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "human",
+          "intent_paths": [
+            "generation_intent.subject_action.progression"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "quality_critical",
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-17",
+                "intent_item_id": "generation_acceptance/generation_requirements/legacy-17",
+                "quote": "自然左手、连续腕部动作、无畸形或不自然翻掌",
+                "origin": "director_choice"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-05"
+              },
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-17"
+              }
+            ],
+            "hard_basis": {
+              "kind": "accepted_quality",
+              "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+              "locator": "generation_acceptance/generation_requirements/legacy-17",
+              "necessity": "自然左手、连续腕部动作、无畸形或不自然翻掌"
+            }
+          }
+        },
+        {
+          "requirement_id": "no-generated-text",
+          "level": "acceptance",
+          "stage": "raw_generation",
+          "dimension": "no-generated-text",
+          "observable": "原始视频没有新增的生成字幕、错误文字或烧字覆盖。",
+          "tolerance": "final composition 的指定叙事字幕由后期检查；raw 阶段不因缺后期字幕失败。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "analyzer",
+          "intent_paths": [
+            "generation_intent.scene_continuity.state_constraints"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "quality_critical",
+            "intent_role": "must_not_happen",
+            "source_refs": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-10",
+                "intent_item_id": "generation_acceptance/generation_requirements/legacy-10",
+                "quote": "No generated caption overlay",
+                "origin": "director_choice"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-10"
+              }
+            ],
+            "hard_basis": {
+              "kind": "accepted_quality",
+              "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+              "locator": "generation_acceptance/generation_requirements/legacy-10",
+              "necessity": "原始视频没有新增的生成字幕、错误文字或烧字覆盖。"
+            }
+          }
+        },
+        {
+          "requirement_id": "others-reflection-contrast",
+          "level": "acceptance",
+          "stage": "raw_generation",
+          "dimension": "others-reflection-contrast",
+          "observable": "六名乘客与苏遥的倒影保持成立，与林砚对应空位形成可读对照。",
+          "tolerance": "保持人物与对应倒影的空间关系；不能靠同时删除他人倒影获得空窗。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "analyzer",
+          "intent_paths": [
+            "generation_intent.open_state.state_text"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "narrative_critical",
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "source_hash": "4c442c56961d589931ebba34aad987a73ed997f0eeb44755d0f6cc2fb8593d30",
+                "locator": "intent",
+                "intent_item_id": "intent",
+                "quote": "不存在的倒影：首帧已见六名乘客与苏遥的完整倒影，林砚对应位置为空；林砚看向空位并抬左手靠玻璃，玻璃里没有手。",
+                "origin": "director_choice"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-07"
+              }
+            ],
+            "hard_basis": {
+              "kind": "approved_narrative",
+              "source_hash": "4c442c56961d589931ebba34aad987a73ed997f0eeb44755d0f6cc2fb8593d30",
+              "locator": "intent",
+              "necessity": "六名乘客与苏遥的倒影保持成立，与林砚对应空位形成可读对照。"
+            }
+          }
+        },
+        {
+          "requirement_id": "phone-scene-continuity",
+          "level": "acceptance",
+          "stage": "raw_generation",
+          "dimension": "phone-scene-continuity",
+          "observable": "手机、道具所有权和车厢布局保持连续；右手持手机在腿部的既定状态不发生无因变化。",
+          "tolerance": "允许自然微动；不接受道具换手、丢失、错误增生或车厢几何突变。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "analyzer",
+          "intent_paths": [
+            "generation_intent.scene_continuity.state_constraints"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "quality_critical",
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "source_hash": "4c442c56961d589931ebba34aad987a73ed997f0eeb44755d0f6cc2fb8593d30",
+                "locator": "continuity_constraints/3",
+                "intent_item_id": "continuity_constraints/3",
+                "quote": "身份/服装/道具所有权/场景几何/已发生的记录消失；画内异常只能按本镜声明改变。",
+                "origin": "director_choice"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-04"
+              },
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-09"
+              },
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-11"
+              }
+            ],
+            "hard_basis": {
+              "kind": "approved_narrative",
+              "source_hash": "4c442c56961d589931ebba34aad987a73ed997f0eeb44755d0f6cc2fb8593d30",
+              "locator": "continuity_constraints/3",
+              "necessity": "手机、道具所有权和车厢布局保持连续；右手持手机在腿部的既定状态不发生无因变化。"
+            }
+          }
+        },
+        {
+          "requirement_id": "protagonist-no-reflection",
+          "level": "acceptance",
+          "stage": "raw_generation",
+          "dimension": "protagonist-no-reflection",
+          "observable": "林砚对应窗区没有匹配其脸、身体或左手的倒影。",
+          "tolerance": "不允许以先有正常倒影再消失替代本镜已缺失状态。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "analyzer",
+          "intent_paths": [
+            "generation_intent.open_state.state_text"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "narrative_critical",
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "source_hash": "4c442c56961d589931ebba34aad987a73ed997f0eeb44755d0f6cc2fb8593d30",
+                "locator": "intent",
+                "intent_item_id": "intent",
+                "quote": "不存在的倒影：首帧已见六名乘客与苏遥的完整倒影，林砚对应位置为空；林砚看向空位并抬左手靠玻璃，玻璃里没有手。",
+                "origin": "director_choice"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-08"
+              }
+            ],
+            "hard_basis": {
+              "kind": "approved_narrative",
+              "source_hash": "4c442c56961d589931ebba34aad987a73ed997f0eeb44755d0f6cc2fb8593d30",
+              "locator": "intent",
+              "necessity": "林砚对应窗区没有匹配其脸、身体或左手的倒影。"
+            }
+          }
+        },
+        {
+          "requirement_id": "s02-cut-state",
+          "level": "acceptance",
+          "stage": "final_composition",
+          "dimension": "s02-cut-state",
+          "observable": "最终S01切点时林砚左手悬在窗前，身份、道具与缺失倒影状态可接S02。",
+          "tolerance": "由 canonical timeline 的实际3s切点和S02接续义务判断；4s源尾帧正确不能代替切点成立。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "human",
+          "intent_paths": [],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "narrative_critical",
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "source_hash": "4c442c56961d589931ebba34aad987a73ed997f0eeb44755d0f6cc2fb8593d30",
+                "locator": "continuity_constraints/2",
+                "intent_item_id": "continuity_constraints/2",
+                "quote": "接S02：左手悬在窗前。",
+                "origin": "director_choice"
+              },
+              {
+                "source_hash": "b589be4bacb642d4400a494d4168c073ad25ba6a7eabc6ebb3a8541e6489d774",
+                "locator": "s02-cut-state",
+                "intent_item_id": "s02-cut-state",
+                "quote": "最终S01切点时林砚左手悬在窗前，身份、道具与缺失倒影状态可接S02。",
+                "origin": "director_choice"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-03"
+              },
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-06"
+              },
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-08"
+              }
+            ],
+            "hard_basis": {
+              "kind": "approved_narrative",
+              "source_hash": "4c442c56961d589931ebba34aad987a73ed997f0eeb44755d0f6cc2fb8593d30",
+              "locator": "continuity_constraints/2",
+              "necessity": "最终S01切点时林砚左手悬在窗前，身份、道具与缺失倒影状态可接S02。"
+            }
+          }
+        },
+        {
+          "requirement_id": "silent-protagonist",
+          "level": "acceptance",
+          "stage": "raw_generation",
+          "dimension": "silent-protagonist",
+          "observable": "林砚闭嘴听画外广播，无可见跟读",
+          "tolerance": "抽样判断明确边界，疑似嘴部活动需加密检查；不由音频通过推出视觉通过",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "analyzer",
+          "intent_paths": [
+            "generation_intent.scene_continuity.state_constraints"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "quality_critical",
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-16",
+                "intent_item_id": "generation_acceptance/generation_requirements/legacy-16",
+                "quote": "林砚闭嘴听画外广播，无可见跟读",
+                "origin": "director_choice"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-16"
+              }
+            ],
+            "hard_basis": {
+              "kind": "accepted_quality",
+              "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+              "locator": "generation_acceptance/generation_requirements/legacy-16",
+              "necessity": "林砚闭嘴听画外广播，无可见跟读"
+            }
+          }
+        },
+        {
+          "requirement_id": "zero-camera-motion",
+          "level": "recipe_hint",
+          "stage": "raw_generation",
+          "dimension": "zero-camera-motion",
+          "observable": "偏好绝对零camera motion。",
+          "tolerance": "允许不破坏倒影可读性、构图和continuity的自然微动。",
+          "measurement": "Inspect the exact selected output with coverage sufficient for this observable; missing or ambiguous evidence is NOT_EVALUATED.",
+          "proof": "analyzer",
+          "intent_paths": [
+            "generation_intent.camera_intent.stability"
+          ],
+          "production_owner": "QA/jieshi-S01-prospective-v3",
+          "semantics": {
+            "version": "requirement-semantics/1",
+            "category": "directional_preference",
+            "intent_role": "preferred_performance",
+            "source_refs": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-09",
+                "intent_item_id": "generation_acceptance/generation_requirements/legacy-09",
+                "quote": "Locked camera/framing",
+                "origin": "director_choice"
+              }
+            ],
+            "derived_from": [
+              {
+                "source_hash": "38365bff9fa63cd6ff0e6f08ca15c70b0931841d630f8957156ae509bc6ffc01",
+                "locator": "generation_acceptance/generation_requirements/legacy-09"
+              }
+            ]
+          }
+        }
+      ],
+      "required_requirement_ids": [
+        "anomaly-readable",
+        "broadcast-core",
+        "broadcast-window",
+        "final-subtitle",
+        "genre-fixed",
+        "hover-readable",
+        "identity-continuity",
+        "native-audio-quality",
+        "natural-dynamics",
+        "natural-hand",
+        "no-generated-text",
+        "others-reflection-contrast",
+        "phone-scene-continuity",
+        "protagonist-no-reflection",
+        "s02-cut-state",
+        "silent-protagonist"
+      ],
+      "content_hash": "9611f8b6b0db47b137c18e6bda7c1e00db2de5ae06845419087c9e19179bddac"
+    },
+    "measurement_contract_version": "S01-visual-audio/3",
+    "required_requirement_ids": [
+      "anomaly-readable",
+      "broadcast-core",
+      "broadcast-window",
+      "final-subtitle",
+      "genre-fixed",
+      "hover-readable",
+      "identity-continuity",
+      "native-audio-quality",
+      "natural-dynamics",
+      "natural-hand",
+      "no-generated-text",
+      "others-reflection-contrast",
+      "phone-scene-continuity",
+      "protagonist-no-reflection",
+      "s02-cut-state",
+      "silent-protagonist"
+    ]
+  },
+  "generation_evaluation_authorities": [
+    {
+      "evaluator": {
+        "name": "codex-exact-media-technical-review",
+        "version": "2026-09-08"
+      },
+      "proof": "technical"
+    },
+    {
+      "evaluator": {
+        "name": "codex-video-analysis-evidence-review",
+        "version": "2026-09-08"
+      },
+      "proof": "analyzer"
+    },
+    {
+      "evaluator": {
+        "name": "reggie-human-visual-audio-review",
+        "version": "1"
+      },
+      "proof": "human"
+    }
+  ],
+  "policy_id": "jieshi-s01-generation-qa",
+  "policy_version": "3.0",
+  "required_layers": [
+    "semantic"
+  ],
+  "technical_thresholds": {
+    "black_luma_max_milli": 10,
+    "silence_peak_max_millidb": -60000,
+    "clipping_peak_min_millidb": -100
+  },
+  "layout_rules": {
+    "safe_area_inset_milli": 50,
+    "caption_overflow_tolerance_milli": 0
+  },
+  "strategy_rules_version": "1",
+  "semantic_requirement": "required",
+  "semantic_authorities": [
+    {
+      "name": "codex-exact-media-technical-review",
+      "version": "2026-09-08"
+    },
+    {
+      "name": "codex-video-analysis-evidence-review",
+      "version": "2026-09-08"
+    },
+    {
+      "name": "reggie-human-visual-audio-review",
+      "version": "1"
+    }
+  ],
+  "repair_authorities": []
+}

@@ -164,9 +164,10 @@ def marked_fetched(tmp_path, monkeypatch, *, measurement_spec=None):
 
 def marked_adjudicate(review, *, verdict="PASS", unresolved=True):
     item = review.evaluation_items[0]
+    assert review.request is None and review.projection is None and review.recipe is None
     return (GenerationEvaluationSource(schema_version="generation-evaluation/2",
-        request_hash=review.request.request_input_hash, artifact_sha256=review.analysis.artifact_sha256,
-        size_bytes=review.analysis.size_bytes, rubric_hash=review.recipe.rubric_hash,
+        request_hash=item.request_hash, artifact_sha256=review.analysis.artifact_sha256,
+        size_bytes=review.analysis.size_bytes, rubric_hash=item.rubric_hash,
         qa_policy_content_hash=review.qa_policy.content_hash, qa_policy_snapshot=review.qa_policy,
         analysis_evidence=review.analysis, evaluator=review.qa_policy.semantic_authorities[0], proof="technical",
         observations=(GenerationObservation(requirement_id=item.requirement_id, verdict=verdict,

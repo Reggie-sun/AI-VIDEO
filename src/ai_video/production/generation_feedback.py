@@ -8,6 +8,7 @@ invents a finding, human approval, execution permit, or activation.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from enum import Enum
 from typing import Callable
 
 from ai_video.production.generation_decision import (
@@ -66,7 +67,7 @@ def _expressions(acceptance, requirement):
     inventory = acceptance.profile_payload.get("generation_requirements")
     if not inventory:
         raise ValueError("selected acceptance owner has no generation requirement projection")
-    payload = requirement.model_dump(mode="json")
+    payload = requirement.model_dump(mode="python")
     result = []
     for raw in inventory:
         rule = RequirementExpression.model_validate(raw)
@@ -78,11 +79,12 @@ def _expressions(acceptance, requirement):
             value = payload
             try:
                 for key in path.split("."):
-                    value = value[int(key)] if isinstance(value, list) else value[key]
+                    value = value[int(key)] if isinstance(value, (list, tuple)) else value[key]
             except (KeyError, IndexError, TypeError, ValueError):
                 continue  # The compiler rejects the unsupported path.
-            if isinstance(value, str) and value not in {"", "unspecified"}:
-                expressions.append(value)
+            values = value if isinstance(value, (list, tuple)) else (value,)
+            expressions.extend(item for item in values if isinstance(item, str)
+                and not isinstance(item, Enum) and item not in {"", "unspecified"})
         result.append(rule.model_copy(update={"native_text": tuple(expressions)}))
     return tuple(sorted(result, key=lambda rule: rule.requirement_id))
 
@@ -144,7 +146,8 @@ def derive_generation_interventions(*, projection, candidates, history, policy):
     if latest is None:
         return (), conflicts
     prior = next(x for x in history.experiences if latest in x.evidence)
-    diagnosis = diagnose_exact_result(latest, evidence, prior.candidate.recipe)
+    sources = tuple(s for x in history.experiences for s in x.evaluation_sources)
+    diagnosis = diagnose_exact_result(latest, evidence, prior.candidate.recipe, evaluation_sources=sources)
     if not diagnosis.failed_requirements:
         return (), conflicts
     features = extract_generation_features(projection)
@@ -153,6 +156,9 @@ def derive_generation_interventions(*, projection, candidates, history, policy):
                     if c.capabilities.provider_name == prior.candidate.capabilities.provider_name
                     and c.capability_id == prior.candidate.capability_id), None)
     if current is None:
+        return (), conflicts
+    if current.recipe.rubric_hash != prior.candidate.recipe.rubric_hash:
+        # A prospective QA revision is not a repair of the old rubric's failure.
         return (), conflicts
     current_estimate = next(e for c, e in estimates if c == current)
     # Cohort failures from other Shots inform ranking, not this Shot's retry
@@ -169,7 +175,7 @@ def derive_generation_interventions(*, projection, candidates, history, policy):
             seen_attempts.add(identity)
             if entry.evidence_hash not in comparable:
                 break
-            result = diagnose_exact_result(entry, evidence, experience.candidate.recipe)
+            result = diagnose_exact_result(entry, evidence, experience.candidate.recipe, evaluation_sources=sources)
             if "QUALITY_FAILURE" not in result.failure_classes:
                 break
             failure_streak += 1
@@ -464,7 +470,16 @@ def record_attempt_evaluation(*, committer, attempt_id, evaluation_sources=(), a
     if attempt.status is StateCommitStatus.OUTCOME_UNKNOWN:
         outcome = "unknown_outcome"
     elif attempt.status is StateCommitStatus.FAILED:
-        outcome, reason = "runtime_failure", "Durable video attempt failed; inspect its execution receipts."
+        from ai_video.production.paid_provider_no_effect_reconciliation import (
+            is_verified_reconciled_no_effect_video_attempt,
+        )
+
+        if is_verified_reconciled_no_effect_video_attempt(
+            committer, attempt_id=attempt_id
+        ):
+            outcome = "not_submitted"
+        else:
+            outcome, reason = "runtime_failure", "Durable video attempt failed; inspect its execution receipts."
     elif pointer is not None:
         outcome = "media"
         artifact_sha256 = pointer.artifact_sha256

@@ -4,9 +4,9 @@ import hashlib
 from dataclasses import replace
 from datetime import datetime
 from pathlib import Path
-from typing import Literal
+from typing import Literal, TypeAlias
 
-from pydantic import ConfigDict, Field, field_validator, model_validator
+from pydantic import ConfigDict, Field, TypeAdapter, field_validator, model_validator
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
@@ -14,6 +14,10 @@ from ai_video.production.commercial_reference import (
     ProductReferenceSet,
 )
 from ai_video.production.image import ImageReferenceBinding, _measure_png
+from ai_video.production.image_import_video_frame import (
+    VideoFrameImageImportReferenceBinding,
+    validate_video_frame_reference_bytes,
+)
 from ai_video.production.models import (
     ActorIdentity,
     AssetRecord,
@@ -87,6 +91,9 @@ class ShotEndpointImageImportReferenceBinding(StrictModel):
 
 ImageImportReferenceBinding = (
     ImageReferenceBinding | ShotEndpointImageImportReferenceBinding
+)
+AutomatedImageImportReferenceBinding: TypeAlias = (
+    ImageReferenceBinding | VideoFrameImageImportReferenceBinding
 )
 
 
@@ -186,7 +193,7 @@ class AutomatedBrowserImageImportReceipt(StrictModel):
     approved_at: str = Field(min_length=1)
     imported_at: str = Field(min_length=1)
     prompt_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
-    references: tuple[ImageReferenceBinding, ...]
+    references: tuple[AutomatedImageImportReferenceBinding, ...]
     target_kind: Literal[
         "character_master", "scene_reference", "key_shot", "repair_replacement"
     ]
@@ -239,6 +246,10 @@ class AutomatedBrowserImageImportReceipt(StrictModel):
         data.setdefault("durable_submit_intent_present", False)
         data.setdefault("automated_browser", True)
         data.pop("content_hash", None)
+        data["references"] = tuple(
+            TypeAdapter(AutomatedImageImportReferenceBinding).validate_python(item)
+            for item in data["references"]
+        )
         if (
             data["backend_model_id"] is not None
             or data["provider_request_id"] is not None
@@ -508,7 +519,11 @@ def _image_import_asset(
     inputs = tuple(
         identity
         for reference in receipt.references
-        for identity in (reference.creative_artifact_id, reference.asset_id)
+        for identity in (
+            ()
+            if isinstance(reference, VideoFrameImageImportReferenceBinding)
+            else (reference.creative_artifact_id, reference.asset_id)
+        )
     )
     return AssetRecord(
         asset_id=f"image-import-{receipt.content_hash}",
@@ -603,6 +618,7 @@ def _prepare_image_import_commit(
     base_commit: StateCommitRequest,
     asset: AssetRecord,
     receipt_path: Path,
+    reference_artifacts: tuple[PreparedArtifact, ...] = (),
 ) -> StateCommitRequest:
     """Add exact import evidence to one already prepared P5 project/registry commit."""
     base_target = _selected_target(base, receipt)
@@ -616,7 +632,33 @@ def _prepare_image_import_commit(
     shot_references = {
         item.artifact_id: item for item in base.project.artifacts.shots
     }
+    artifacts_by_path = {item.relative_path: item for item in reference_artifacts}
+    if len(artifacts_by_path) != len(reference_artifacts):
+        raise _invalid("Video frame import evidence contains duplicate paths.")
+    expected_reference_paths: set[Path] = set()
     for reference in receipt.references:
+        if isinstance(reference, VideoFrameImageImportReferenceBinding):
+            expected_reference_paths.update(
+                (reference.source_video_path, reference.extracted_frame_path)
+            )
+            source = artifacts_by_path.get(reference.source_video_path)
+            frame = artifacts_by_path.get(reference.extracted_frame_path)
+            if (
+                source is None
+                or frame is None
+                or source.file_sha256 != reference.source_video_sha256
+                or frame.file_sha256 != reference.extracted_frame_sha256
+                or hashlib.sha256(source.payload).hexdigest() != source.file_sha256
+                or hashlib.sha256(frame.payload).hexdigest() != frame.file_sha256
+            ):
+                raise _invalid("Video frame import reference evidence is missing or inexact.")
+            validate_video_frame_reference_bytes(
+                reference,
+                source_video_bytes=source.payload,
+                extracted_frame_bytes=frame.payload,
+                verify_derivation=True,
+            )
+            continue
         creative = (
             characters.get(reference.creative_artifact_id)
             if reference.role == "character"
@@ -670,6 +712,8 @@ def _prepare_image_import_commit(
             or selected_asset.sha256 != reference.asset_sha256
         ):
             raise _invalid("Image import reference identity is not active and exact.")
+    if set(artifacts_by_path) != expected_reference_paths:
+        raise _invalid("Video frame import evidence bundle does not exactly match references.")
     if (
         base_commit.operation != "commit_project_registry"
         or base_commit.dependency_graph_transition is None
@@ -762,6 +806,7 @@ def _prepare_image_import_commit(
             image_bytes,
             receipt.output_sha256,
         ),
+        *reference_artifacts,
     )
     paths = {item.relative_path for item in base_commit.artifacts}
     if any(item.relative_path in paths for item in additions):
@@ -806,6 +851,7 @@ def prepare_automated_browser_image_import_commit(
     candidate_target: Character | Scene | Shot,
     candidate_project: ProductionProject,
     base_commit: StateCommitRequest,
+    reference_artifacts: tuple[PreparedArtifact, ...] = (),
 ) -> StateCommitRequest:
     """Add truthful MCP/browser-import evidence to one prepared P5 commit."""
 
@@ -821,4 +867,5 @@ def prepare_automated_browser_image_import_commit(
         receipt_path=canonical_automated_browser_image_import_receipt_path(
             receipt.content_hash
         ),
+        reference_artifacts=reference_artifacts,
     )

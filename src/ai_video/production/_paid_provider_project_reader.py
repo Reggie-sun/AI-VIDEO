@@ -20,6 +20,11 @@ from ai_video.production.paid_provider import (
     PaidProviderSubmitReceipt,
     PaidProviderSubmitOutcome,
 )
+from ai_video.production.paid_provider_no_effect_reconciliation import (
+    PaidProviderNoEffectReconciliation,
+    PaidProviderNoEffectReconciliationPointer,
+    release_unsettled_paid_provider_reservation,
+)
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
     canonical_paid_provider_budget_path,
@@ -230,6 +235,36 @@ def load_paid_provider_submit_receipt(
     return receipt
 
 
+def _load_paid_provider_no_effect_reconciliation(
+    root: Path, pointer: PaidProviderNoEffectReconciliationPointer
+) -> PaidProviderNoEffectReconciliation:
+    _, resolved = _root_and_path(root, pointer.path)
+    try:
+        raw = _read_regular_file_nofollow(resolved, contained_by=root / "state")
+        reconciliation = PaidProviderNoEffectReconciliation.model_validate_json(raw.data)
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid("Could not reopen paid Provider no-effect reconciliation.", str(exc)) from exc
+    if (
+        raw.file_sha256 != pointer.file_sha256
+        or reconciliation.content_hash != pointer.content_hash
+    ):
+        raise _invalid("Paid Provider no-effect reconciliation pointer identity is invalid.")
+    for evidence in reconciliation.evidence:
+        _, evidence_path = _root_and_path(root, evidence.path)
+        try:
+            evidence_raw = _read_regular_file_nofollow(
+                evidence_path, contained_by=root / "state"
+            )
+        except OSError as exc:
+            raise _invalid("Could not reopen paid Provider no-effect evidence.", str(exc)) from exc
+        if (
+            evidence_raw.file_sha256 != evidence.file_sha256
+            or len(evidence_raw.data) != evidence.size_bytes
+        ):
+            raise _invalid("Paid Provider no-effect evidence identity is invalid.")
+    return reconciliation
+
+
 def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> None:
     pointer = manifest.active_paid_provider_budget
     paid_attempts = [
@@ -411,5 +446,68 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
                 raise _invalid("Paid Provider settlement evidence is inconsistent.")
             if submit.external_effect_id is not None:
                 external_effect_ids.append(submit.external_effect_id)
+            if submit.no_effect_reconciliation is not None:
+                reconciliation = _load_paid_provider_no_effect_reconciliation(
+                    root, submit.no_effect_reconciliation
+                )
+                prior = load_paid_provider_submit_receipt(
+                    root, reconciliation.prior_submit_receipt
+                )
+                base_budget = load_paid_provider_budget(root, reconciliation.base_budget)
+                if (
+                    state.phase is not PaidProviderAttemptPhase.KNOWN_NO_EFFECT
+                    or reconciliation.project_id != manifest.project_id
+                    or reconciliation.attempt_id != attempt.attempt_id
+                    or reconciliation.expected_manifest_revision + 1
+                    > manifest.manifest_revision
+                    or prior.outcome is not PaidProviderSubmitOutcome.OUTCOME_UNKNOWN
+                    or prior.no_effect_reconciliation is not None
+                    or prior.external_effect_id is not None
+                    or prior.recorded_at > submit.recorded_at
+                    or not (
+                        reconciliation.issued_at
+                        <= submit.recorded_at
+                        < reconciliation.expires_at
+                    )
+                    or any(
+                        getattr(prior, field) != getattr(submit, field)
+                        for field in (
+                            "attempt_id",
+                            "request_fingerprint",
+                            "preview_fingerprint",
+                            "gate_receipt_fingerprint",
+                            "reservation_id",
+                        )
+                    )
+                ):
+                    raise _invalid("Paid Provider no-effect reconciliation lineage is invalid.")
+                try:
+                    expected_budget = release_unsettled_paid_provider_reservation(
+                        base_budget,
+                        prior_receipt=prior,
+                        corrective_receipt=submit,
+                    )
+                    retained = load_paid_provider_budget_by_content_hash(
+                        root, expected_budget.content_hash
+                    )
+                except AiVideoError as exc:
+                    raise _invalid("Paid Provider no-effect reconciliation budget is invalid.", str(exc)) from exc
+                expected_reservation = next(
+                    (
+                        item
+                        for item in expected_budget.reservations
+                        if item.reservation_id == submit.reservation_id
+                    ),
+                    None,
+                )
+                active_reservation = reservations.get(submit.reservation_id)
+                if (
+                    retained != expected_budget
+                    or budget.policy_id != expected_budget.policy_id
+                    or budget.currency != expected_budget.currency
+                    or active_reservation != expected_reservation
+                    or budget.revision < expected_budget.revision
+                ):
+                    raise _invalid("Paid Provider no-effect reconciliation budget lineage is invalid.")
     if len(external_effect_ids) != len(set(external_effect_ids)):
         raise _invalid("Paid Provider external effect ownership is ambiguous.")

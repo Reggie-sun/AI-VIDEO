@@ -120,8 +120,8 @@ def test_next_component_requires_previous_exact_required_findings_pass(monkeypat
     setup = setup_decision()
     candidate = setup["inputs"].candidates[0]
     observation = evidence(setup, verdict=verdict).model_copy(update={"shot_id": "child-a"})
-    experience = SimpleNamespace(candidate=candidate, evidence=(observation,))
-    old_pass = SimpleNamespace(candidate=candidate, evidence=(
+    experience = SimpleNamespace(candidate=candidate, evidence=(observation,), evaluation_sources=())
+    old_pass = SimpleNamespace(candidate=candidate, evaluation_sources=(), evidence=(
         evidence(setup, verdict="PASS").model_copy(update={"shot_id": "child-a", "attempt_id": "old",
             "request_hash": "d" * 64, "artifact_sha256": "e" * 64}),))
     lineage = SimpleNamespace(source=None, coverage_id="coverage")

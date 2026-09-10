@@ -162,7 +162,8 @@ def empirical_assessment(candidate, features, experiences) -> EmpiricalEstimate:
                 exclusions.append((entry.evidence_hash, reason or "not_raw_media"))
                 continue
             hashes.add(entry.evidence_hash)
-            diagnosis = diagnose_exact_result(entry, all_evidence, old.recipe)
+            diagnosis = diagnose_exact_result(entry, all_evidence, old.recipe,
+                evaluation_sources=tuple(s for x in experiences for s in x.evaluation_sources))
             if "QUALITY_FAILURE" in diagnosis.failure_classes:
                 rejected.add(entry.artifact_sha256)
                 failed_ids.update(diagnosis.failed_requirements)

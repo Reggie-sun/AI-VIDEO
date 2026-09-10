@@ -89,6 +89,10 @@ fallback_check_ids:
   - task_architecture_gate
 
 checks:
+  repair_input_admission_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_repair_input_admission.py, -q]
+    cwd: .
+    description: Verify development-only failed-video provenance admission, no qualification, and exact bootstrap replay without Provider effects.
   final_output_no_regression_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_final_output.py, tests/test_generation_no_regression.py, -q]
     cwd: .
@@ -237,6 +241,10 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_strategy_contracts.py, tests/test_production_requirement_allocation.py, tests/test_production_source_use_evidence.py, tests/test_production_strategy_resolver.py, tests/test_production_strategy_materialization.py, tests/test_production_strategy_reader.py, tests/test_production_strategy_dependency.py, tests/test_production_planning_service.py, tests/test_production_planning_generation.py, -q]
     cwd: .
     description: Verify production-means decisions, exact source use, component lineage and canonical materialization without Provider effects.
+  s01_strategy_regression_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_s01_strategy_regression.py, -q]
+    cwd: .
+    description: Verify read-only recovery observations, canonical history, source identity and non-vacuous strategy controls without media or Provider effects.
   video_planner_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_planning_video_planner.py, tests/test_errors.py, -q]
     cwd: .
@@ -287,6 +295,7 @@ checks:
     timeout_seconds: 1800
     execution_priority: 30
     covers_check_ids:
+      - repair_input_admission_tests
       - generation_feedback_tests
       - production_vidu_tests
       - commercial_source_preparation_tests
@@ -309,6 +318,7 @@ checks:
       - production_contract_tests
       - production_reader_tests
       - production_strategy_tests
+      - s01_strategy_regression_tests
       - production_state_tests
       - production_composition_audio_tests
       - production_dependency_tests
@@ -337,6 +347,25 @@ checks:
     description: Report repository health against the version-controlled architecture baseline.
 
 categories:
+  repair_input_admission:
+    patterns:
+      - src/ai_video/production/repair_input_admission.py
+      - tests/test_repair_input_admission.py
+    check_ids:
+      - repair_input_admission_tests
+      - production_reader_tests
+      - production_state_tests
+      - generation_feedback_tests
+      - task_architecture_gate
+  s01_strategy_regression:
+    patterns:
+      - scripts/s01_strategy_regression.py
+      - tests/test_s01_strategy_regression.py
+    check_ids:
+      - s01_strategy_regression_tests
+      - production_strategy_tests
+      - generation_feedback_tests
+      - task_architecture_gate
   production_strategy:
     patterns:
       - src/ai_video/planning/production_strategy.py

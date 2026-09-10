@@ -122,10 +122,139 @@ def test_marked_raw_pass_cannot_replace_final_output_naturalness_or_proof():
 
     setup, candidate, qa = marked_context()
     exp = experience_for(simulated_source(candidate, qa), setup, candidate)
-    assert diagnose_exact_result(exp.evidence[0], (), candidate.recipe).all_required_observed_pass
+    assert diagnose_exact_result(exp.evidence[0], (), candidate.recipe,
+        evaluation_sources=exp.evaluation_sources).all_required_observed_pass
     policy = viewing_policy()
     for natural, expected in (("fail", QaVerdict.FAIL), ("not_evaluated", QaVerdict.NOT_EVALUATED)):
         result = adjudicate_review_evidence(policy, QaLayer.SEMANTIC,
             (viewing_evidence(policy, {"timing": "pass", "natural": natural, "audio": "pass"}),),
             review_request_content_hash="a" * 64)
         assert result is expected
+
+
+def prospective_s01_policy():
+    from ai_video.production.models import QaPolicy
+    from ai_video.production.hashing import verify_artifact_hash
+
+    path = Path(__file__).parents[1] / "docs/superpowers/artifacts/drama/jieshi-episode-01/s01-prospective-qa-v3.json"
+    policy = QaPolicy.model_validate_json(path.read_bytes())
+    assert verify_artifact_hash(policy)
+    return policy
+
+
+def test_prospective_s01_qa_uses_existing_activation_and_exact_history(tmp_path):
+    from ai_video.production.project import load_production_project, load_qa_policy
+    from ai_video.production.production_strategy_reader import selected_shot_generation_acceptance
+    from test_production_repair import make_manifest_25_failed_layout_review_fixture
+
+    fixture = make_manifest_25_failed_layout_review_fixture(tmp_path)
+    before = load_production_project(tmp_path / "project.yaml")
+    old_pointer = before.manifest.active_qa_policy
+    old_bytes = (tmp_path / old_pointer.path).read_bytes()
+    policy = prospective_s01_policy()
+    fixture.committer.activate_qa_policy(policy,
+        expected_manifest_revision=before.manifest.manifest_revision, attempt_id="prospective-s01-policy")
+    after = load_production_project(tmp_path / "project.yaml")
+    assert after.qa_policy == policy
+    assert selected_shot_generation_acceptance(after, after.shots[0].shot_id) == policy.generation_acceptance
+    assert after.manifest.attempts == before.manifest.attempts
+    assert (tmp_path / old_pointer.path).read_bytes() == old_bytes
+    assert load_qa_policy(tmp_path, old_pointer) == before.qa_policy
+
+
+def test_prospective_s01_timing_preferences_cannot_create_a_quality_failure():
+    from ai_video.production.generation_recipe import GenerationRecipe
+    from ai_video.production.generation_feedback import _expressions
+    from ai_video.production.generation_evaluation import GenerationEvaluationSource, project_generation_evaluation_sources
+    from ai_video.production.generation_evaluation_criteria import evaluation_items, PresentationEvidence
+    from ai_video.production.generation_diagnosis import diagnose_attempt
+    from test_production_generation_decision import setup_decision, evidence
+
+    qa = prospective_s01_policy()
+    acceptance = qa.generation_acceptance
+    setup = setup_decision()
+    base = setup["inputs"].candidates[0]
+    recipe = GenerationRecipe.model_validate({**base.recipe.model_dump(mode="python"),
+        "rubric_hash": acceptance.profile_content_hash, "acceptance_policy": acceptance,
+        "expressions": _expressions(acceptance, setup["projection"].requirement)})
+    candidate = base.model_copy(update={"recipe": recipe, "final_output_goal": qa.final_output})
+    items = evaluation_items(acceptance=acceptance, qa_policy_content_hash=qa.content_hash,
+        request_hash="b"*64, artifact_sha256="c"*64, size_bytes=32)
+    hints = {r.requirement_id for r in recipe.expressions if r.level == "recipe_hint"}
+    assert hints == {"arrival-margin", "immediate-onset", "hand-trajectory", "fixed-palm", "zero-camera-motion", "broadcast-margin"}
+    assert not hints & {item.requirement_id for item in items}
+    assert not hints & {item.requirement_id for item in qa.final_output.requirements}
+    assert all(r.intent_paths for r in recipe.expressions if r.stage == "raw_generation")
+    actor = next(a.evaluator for a in qa.generation_evaluation_authorities if a.proof == "analyzer")
+    presented = tuple(item for item in items if item.proof == "analyzer")
+    source = GenerationEvaluationSource(schema_version="generation-evaluation/2", request_hash="b"*64,
+        artifact_sha256="c"*64, size_bytes=32, rubric_hash=recipe.rubric_hash,
+        qa_policy_content_hash=qa.content_hash, qa_policy_snapshot=qa, evaluator=actor, proof="analyzer",
+        observations=[dict(requirement_id=i.requirement_id, verdict="NOT_EVALUATED", observation="Synthetic incomplete evidence",
+            evaluation_item_hash=i.evaluation_item_hash, question_text=i.question_text,
+            presentation_ref="fixture/request", answer_ref="fixture/response") for i in presented],
+        advisory_observations=[dict(requirement_id="arrival-margin", observation="Later than 1.5s preferred endpoint",
+            evidence_refs=["fixture/frame"])])
+    source = source.model_copy(update={"presentation_evidence": PresentationEvidence(namespace="controlled-evaluator/1",
+        interaction_ref="fixture", presentation_ref="fixture/request", answer_ref="fixture/response",
+        event_order=("presentation", "answer"), actor_name=actor.name, actor_version=actor.version,
+        items=presented, answers_json=json.dumps(source.answer_payload()))})
+    findings, refs = project_generation_evaluation_sources(sources=(source,), acceptance=acceptance)
+    entry = evidence(setup, candidate=candidate, findings=findings, unresolved_quality_refs=refs, artifact_sha256="c"*64)
+    diagnosis = diagnose_attempt(entry, recipe, evaluation_sources=(source,))
+    assert diagnosis.failure_classes == ("EVIDENCE_GAP",)
+    assert not diagnosis.failed_requirements and not diagnosis.all_required_observed_pass
+    assert {i.requirement_id for i in findings}.isdisjoint(hints)
+
+
+def test_prospective_s01_compiler_carries_list_intent_and_uses_native_enum_controls():
+    from ai_video.production.generation_feedback import _expressions
+    from ai_video.production.generation_recipe import GenerationRecipe, expression_errors
+    from ai_video.production._vidu_prompt import compile_vidu_prompt
+    from test_production_vidu_prompt import _requirement
+    from test_production_generation_decision import setup_decision
+
+    requirement = _requirement()
+    qa = prospective_s01_policy()
+    policy = qa.generation_acceptance
+    base = setup_decision()["inputs"].candidates[0].recipe
+    recipe = GenerationRecipe.model_validate({**base.model_dump(mode="python"),
+        "rubric_hash":policy.profile_content_hash,"acceptance_policy":policy,
+        "expressions":_expressions(policy,requirement)})
+    native = compile_vidu_prompt(requirement)
+    assert expression_errors(recipe,requirement,native.prompt_text,native.expressed_control_paths) == ()
+    rules = {r.requirement_id:r for r in recipe.expressions}
+    assert rules["broadcast-core"].native_text == requirement.generation_intent.scene_continuity.state_constraints
+    assert rules["identity-continuity"].native_text == ()
+    assert "generation_intent.identity_continuity.preservation" in native.expressed_control_paths
+
+
+@pytest.mark.parametrize("end,method,expected", [(2320,"word_aligned_audio","PASS"),
+    (2440,"word_aligned_audio","PASS"),(2440,"asr_segment","NOT_EVALUATED"),(2800,"word_aligned_audio","FAIL")])
+def test_prospective_s01_broadcast_uses_only_canonical_window(end, method, expected):
+    from ai_video.production.generation_evaluation_criteria import TemporalMeasurement, temporal_verdict
+    policy = prospective_s01_policy()
+    rules = validate_semantic_inventory(policy.generation_acceptance.profile_payload,
+        policy.generation_acceptance.required_requirement_ids)
+    spec = next(r.measurement_spec for r in rules if r.requirement_id == "broadcast-window")
+    assert (spec.lower_millis, spec.upper_millis) == (100,2700)
+    measured = TemporalMeasurement(artifact_sha256="a"*64,size_bytes=32,evaluation_item_hash="b"*64,
+        event_id=spec.event_id,boundary="end",timebase="source_media_millis",interval_millis=(end,end),
+        method=method,coverage_millis=(0,4000),evidence_refs=("fixture/audio",))
+    assert temporal_verdict(spec, measured) == expected
+
+
+def test_prospective_s01_freeze_remains_a_final_output_failure():
+    from ai_video.production.models import QaVerdict, QaLayer
+    from ai_video.production.review import adjudicate_review_evidence
+    from test_production_final_output import viewing_evidence
+
+    policy = prospective_s01_policy()
+    verdicts = {r.requirement_id: "pass" for r in policy.final_output.requirements if r.proof == "human"}
+    verdicts["natural-dynamics"] = "fail"
+    actor = next(a.evaluator for a in policy.generation_evaluation_authorities if a.proof == "human")
+    item = viewing_evidence(policy, verdicts)
+    item = item.model_copy(update={"tool_identity": actor,
+        "measured_payload": {**item.measured_payload,"evaluator_identity": f"{actor.name}@{actor.version}"}})
+    assert adjudicate_review_evidence(policy, QaLayer.SEMANTIC, (item,),
+        review_request_content_hash="a"*64) is QaVerdict.FAIL

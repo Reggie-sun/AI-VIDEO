@@ -93,6 +93,9 @@ def validate_shot_strategy(
     assets_by_id: dict[str, AssetRecord],
 ) -> None:
     roles, bound = _bound_assets(shot, assets_by_id)
+    from ai_video.production.repair_input_admission import REPAIR_INPUT_TOOL
+    if any(a.tool == REPAIR_INPUT_TOOL for a in bound.values()):
+        raise _invalid("Development repair input cannot be bound for Production execution.")
     if shot.visual_strategy is VisualStrategy.STATIC_IMAGE:
         if not _has_type(bound, AssetType.IMAGE):
             raise _invalid(f"Shot {shot.shot_id} static_image requires an image role.")
@@ -229,6 +232,13 @@ def _unique(values: Iterable[str], label: str) -> set[str]:
 
 
 def validate_project_references(bundle: LoadedProductionProject) -> None:
+    from ai_video.production.repair_input_admission import REPAIR_INPUT_TOOL, verify_repair_input
+    for asset in bundle.registry.assets:
+        if asset.tool == REPAIR_INPUT_TOOL:
+            receipt = verify_repair_input(asset, bundle.root)
+            if (receipt.target_project_id != bundle.project.project_id
+                    or receipt.target_project_hash != bundle.project.content_hash):
+                raise _invalid("Development repair input belongs to another project snapshot.")
     character_ids = _unique(
         [item.character_id for item in bundle.characters], "character_id"
     )

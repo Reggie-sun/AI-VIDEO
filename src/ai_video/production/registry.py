@@ -41,10 +41,19 @@ def registry_semantic_sha256(registry: AssetRegistrySnapshot) -> str:
 
 
 def _verify_asset(record: AssetRecord, root: Path, asset_root: Path) -> Path:
+    from ai_video.production.repair_input_admission import REPAIR_INPUT_TOOL, verify_repair_input
+
+    repair_input = (record.tool.name == REPAIR_INPUT_TOOL.name
+                    or record.artifact_path.is_relative_to(Path("assets/repair-inputs")))
+    if repair_input:
+        try:
+            verify_repair_input(record, root)
+        except (OSError, ValueError) as exc:
+            raise _invalid("Development repair input provenance is invalid.", str(exc)) from exc
     sealed_asset = (
         record.audio_metadata is not None
         or record.caption_metadata is not None
-        or record.video_metadata is not None
+        or record.video_metadata is not None or repair_input
     )
     if record.video_metadata is not None:
         expected = canonical_video_asset_path(record.sha256)

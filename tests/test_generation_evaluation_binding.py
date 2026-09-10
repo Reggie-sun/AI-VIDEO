@@ -134,7 +134,8 @@ def test_unresolved_refs_survive_reopen_merge_and_failure_first_statistics(hard_
     assert reopened == experience
     assert len(reopened.evidence[0].unresolved_quality_refs) == 1
     later = experience_for(simulated_source(candidate, qa), setup, candidate)
-    diagnosis = diagnose_exact_result(later.evidence[0], reopened.evidence, candidate.recipe)
+    diagnosis = diagnose_exact_result(later.evidence[0], reopened.evidence, candidate.recipe,
+        evaluation_sources=(*later.evaluation_sources, *reopened.evaluation_sources))
     assert "RUBRIC_OR_STAGE_ERROR" in diagnosis.failure_classes
     assert diagnosis.next_owner == "acceptance_owner"
     assert not diagnosis.all_required_observed_pass
@@ -166,7 +167,8 @@ def test_advisory_cannot_fail_and_pure_diagnosis_defends_hint_injection():
     assert len(exp.evidence[0].findings) == 1
     assert empirical_assessment(candidate, exp.features, (exp,)).observed_success_fraction == 1
     injected = exp.evidence[0].findings[0].model_copy(update={"requirement_id": "early", "proof": "human", "verdict": "FAIL"})
-    result = diagnose_attempt(exp.evidence[0].model_copy(update={"findings": (*exp.evidence[0].findings, injected)}), candidate.recipe)
+    result = diagnose_attempt(exp.evidence[0].model_copy(update={"findings": (*exp.evidence[0].findings, injected)}),
+        candidate.recipe, evaluation_sources=exp.evaluation_sources)
     assert result.failure_classes == ("RUBRIC_OR_STAGE_ERROR",)
     assert result.failed_requirements == ()
 
@@ -203,3 +205,222 @@ def test_advisory_only_source_is_incomplete_without_creating_a_failure_sample():
     assert estimate.observed_success_fraction is None
     assert not estimate.failed_artifacts and not estimate.supported_artifacts
     assert estimate.incomplete_artifacts == (source.artifact_sha256,)
+
+
+def test_separate_legal_advisory_source_does_not_block_complete_bound_proof():
+    from ai_video.production.generation_experience import empirical_assessment
+    from ai_video.production.generation_diagnosis import diagnose_exact_result
+
+    setup, candidate, qa = marked_context()
+    passed = experience_for(simulated_source(candidate,qa),setup,candidate)
+    source = simulated_source(candidate,qa,advisory=True).model_copy(update={"observations":()})
+    source = source.model_copy(update={"presentation_evidence":source.presentation_evidence.model_copy(
+        update={"answers_json":json.dumps(source.answer_payload())})})
+    advisory = experience_for(source,setup,candidate)
+    result = diagnose_exact_result(advisory.evidence[0],passed.evidence,candidate.recipe,
+        evaluation_sources=(*passed.evaluation_sources,*advisory.evaluation_sources))
+    assert result.all_required_observed_pass and not result.failure_classes
+    estimate = empirical_assessment(candidate,passed.features,(passed,advisory))
+    assert estimate.supported_artifacts == (source.artifact_sha256,)
+    assert not estimate.failed_artifacts and not estimate.incomplete_artifacts
+
+
+@pytest.mark.parametrize("mutation", ["proof", "question", "criterion", "artifact", "source", "missing"])
+def test_pure_exact_diagnosis_and_router_reject_unbound_marked_proof(mutation):
+    from ai_video.production.generation_decision import DecisionInputs
+    from ai_video.production.generation_diagnosis import diagnose_exact_result
+    from ai_video.production.shot_router import VideoGenerationResolver
+
+    setup, candidate, qa = marked_context()
+    source = simulated_source(candidate, qa)
+    exp = experience_for(source, setup, candidate)
+    entry = exp.evidence[0]
+    sources = (source,)
+    if mutation == "proof":
+        wrong = entry.findings[0].model_copy(update={"proof": "human", "verdict": "FAIL"})
+        entry = entry.model_copy(update={"findings": (*entry.findings, wrong)})
+    elif mutation in {"question", "criterion"}:
+        update = {"question_text": "Is the hand natural?"} if mutation == "question" else {
+            "evaluation_item_hash": "d" * 64}
+        source = source.model_copy(update={"observations": (
+            source.observations[0].model_copy(update=update),)})
+        sources = (source,)
+    elif mutation == "artifact":
+        entry = entry.model_copy(update={"artifact_sha256": "d" * 64})
+    elif mutation == "source":
+        entry = entry.model_copy(update={"findings": (
+            entry.findings[0].model_copy(update={"source_sha256": "d" * 64}),)})
+    else:
+        sources = ()
+    result = diagnose_exact_result(entry, (), candidate.recipe, evaluation_sources=sources)
+    assert not result.all_required_observed_pass
+    assert set(result.failure_classes) & {"EVIDENCE_GAP", "RUBRIC_OR_STAGE_ERROR"}
+    # Caller-supplied bare Findings cannot bypass original source admission.
+    inputs = DecisionInputs.model_validate(setup["inputs"].model_copy(update={
+        "candidates": (candidate,), "rubric_hash": candidate.recipe.rubric_hash,
+        "evidence": (entry,), "latest_attempt_hash": entry.evidence_hash,
+    }).model_dump(mode="python"))
+    decision = VideoGenerationResolver().resolve_requirement(**{**setup, "inputs": inputs})
+    assert decision.disposition != "REVIEW_CURRENT_RESULT"
+    assert not decision.diagnosis.all_required_observed_pass
+
+
+def test_pure_exact_diagnosis_preserves_bound_fail_beside_pass():
+    from ai_video.production.generation_diagnosis import diagnose_exact_result
+
+    setup, candidate, qa = marked_context()
+    passed = experience_for(simulated_source(candidate, qa), setup, candidate)
+    failed = experience_for(simulated_source(candidate, qa, verdict="FAIL"), setup, candidate)
+    result = diagnose_exact_result(passed.evidence[0], failed.evidence, candidate.recipe,
+        evaluation_sources=(*passed.evaluation_sources, *failed.evaluation_sources))
+    assert result.failed_requirements == ("signal",)
+    assert "QUALITY_FAILURE" in result.failure_classes
+    assert not result.all_required_observed_pass
+
+
+def test_invalid_same_record_proof_does_not_erase_independently_bound_fail():
+    from ai_video.production.generation_diagnosis import diagnose_attempt, diagnose_exact_result
+
+    setup, candidate, qa = marked_context()
+    exp = experience_for(simulated_source(candidate, qa, verdict="FAIL"), setup, candidate)
+    entry = exp.evidence[0]
+    invalid = entry.findings[0].model_copy(update={"proof": "human", "verdict": "PASS"})
+    entry = entry.model_copy(update={"findings": (*entry.findings, invalid)})
+    for result in (diagnose_attempt(entry, candidate.recipe, evaluation_sources=exp.evaluation_sources),
+                   diagnose_exact_result(entry, (), candidate.recipe, evaluation_sources=exp.evaluation_sources)):
+        assert result.failed_requirements == ("signal",)
+        assert set(result.failure_classes) == {"QUALITY_FAILURE", "RUBRIC_OR_STAGE_ERROR"}
+        assert not result.all_required_observed_pass
+
+
+@pytest.mark.parametrize("first_verdict", ["PASS", "FAIL"])
+def test_partial_proofs_from_different_qa_authorities_cannot_form_one_pass(first_verdict):
+    from ai_video.production.models import QaPolicy, GenerationEvaluationAuthority
+    from ai_video.production.hashing import seal_artifact
+    from ai_video.production.generation_recipe import GenerationRecipe, RequirementExpression
+    from ai_video.production.generation_evaluation import GenerationObservation
+    from ai_video.production.generation_evaluation_criteria import evaluation_items
+    from ai_video.production.generation_diagnosis import diagnose_exact_result
+    from ai_video.production.generation_experience import empirical_assessment
+    from test_requirement_semantics import semantic_rule, marked_policy
+
+    setup, candidate, qa = marked_context()
+    rules = [semantic_rule("req-a"), semantic_rule("req-b")]
+    policy = marked_policy(rules)
+    recipe = GenerationRecipe.model_validate({**candidate.recipe.model_dump(mode="python"),
+        "acceptance_policy":policy,"rubric_hash":policy.profile_content_hash,
+        "expressions":tuple(RequirementExpression.model_validate(r) for r in rules)})
+    candidate = candidate.model_copy(update={"recipe":recipe})
+    qa = seal_artifact(QaPolicy.model_validate({**qa.model_dump(mode="python"),"generation_acceptance":policy}))
+    actor = qa.semantic_authorities[0].model_copy(update={"version":"replacement"})
+    replacement = seal_artifact(QaPolicy.model_validate({**qa.model_dump(mode="python"),
+        "semantic_authorities":(actor,),"generation_evaluation_authorities":(
+            GenerationEvaluationAuthority(evaluator=actor,proof="analyzer"),)}))
+    experiences=[]
+    for selected, verdicts in ((qa,(first_verdict,"NOT_EVALUATED")),(replacement,("NOT_EVALUATED","PASS"))):
+        source=simulated_source(candidate,selected)
+        items=evaluation_items(acceptance=policy,qa_policy_content_hash=selected.content_hash,
+            request_hash=source.request_hash,artifact_sha256=source.artifact_sha256,size_bytes=source.size_bytes)
+        source=source.model_copy(update={"observations":tuple(GenerationObservation(
+            requirement_id=item.requirement_id,verdict=verdict,observation="Synthetic partial observation",
+            evaluation_item_hash=item.evaluation_item_hash,question_text=item.question_text,
+            presentation_ref="fixture/request",answer_ref="fixture/response") for item,verdict in zip(items,verdicts))})
+        source=source.model_copy(update={"presentation_evidence":source.presentation_evidence.model_copy(
+            update={"answers_json":json.dumps(source.answer_payload())})})
+        experiences.append(experience_for(source,setup,candidate))
+    all_evidence=tuple(e for x in experiences for e in x.evidence)
+    diagnosis=diagnose_exact_result(all_evidence[-1],all_evidence,recipe,
+        evaluation_sources=tuple(s for x in experiences for s in x.evaluation_sources))
+    assert "RUBRIC_OR_STAGE_ERROR" in diagnosis.failure_classes
+    assert not diagnosis.all_required_observed_pass
+    assert diagnosis.failed_requirements == (("req-a",) if first_verdict=="FAIL" else ())
+    estimate=empirical_assessment(candidate,experiences[0].features,tuple(experiences))
+    assert not estimate.supported_artifacts
+    assert estimate.observed_success_fraction != 1
+
+
+@pytest.mark.parametrize("observation", [
+    "The rescue signal is visible before 2s.",
+    "The prompt margin of 2.2s is irrelevant; the rescue signal is visible.",
+    "The rescue signal is visible [frame 12].",
+])
+def test_observation_timestamps_and_evidence_citations_are_not_thresholds(observation):
+    from ai_video.production.generation_evaluation import project_generation_evaluation_sources
+
+    _, candidate, qa = marked_context()
+    source = simulated_source(candidate, qa)
+    source = source.model_copy(update={"observations": (
+        source.observations[0].model_copy(update={"observation": observation}),)})
+    source = source.model_copy(update={"presentation_evidence": source.presentation_evidence.model_copy(
+        update={"answers_json": json.dumps(source.answer_payload())})})
+    findings, refs = project_generation_evaluation_sources(sources=(source,), acceptance=candidate.recipe.acceptance_policy)
+    assert findings[0].verdict == "PASS" and not refs
+
+
+@pytest.mark.parametrize("observation", [
+    "按[early]判断：未满足提前到位偏好，所以FAIL。",
+])
+def test_correct_question_cannot_admit_explicit_foreign_criterion_in_answer(observation):
+    from ai_video.production.generation_evaluation import project_generation_evaluation_sources
+
+    _, candidate, qa = marked_context()
+    source = simulated_source(candidate, qa, verdict="FAIL")
+    source = source.model_copy(update={"observations": (
+        source.observations[0].model_copy(update={"observation": observation}),)})
+    source = source.model_copy(update={"presentation_evidence": source.presentation_evidence.model_copy(
+        update={"answers_json": json.dumps(source.answer_payload())})})
+    with pytest.raises(ValueError, match="canonical criterion"):
+        project_generation_evaluation_sources(sources=(source,), acceptance=candidate.recipe.acceptance_policy)
+
+
+@pytest.mark.parametrize("end,text,valid", [
+    (2440,"FAIL because it exceeds the prompt margin of 2.2s.",False),
+    (2440,"FAIL: 2.44s > 2.2s.",False),
+    (3100,"FAIL because the measured completion is > 3.0s, beyond the canonical 2.7s upper bound.",True),
+])
+def test_timing_failure_requires_canonical_measurement_not_prose(end,text,valid):
+    from ai_video.production.generation_evaluation import project_generation_evaluation_sources
+    from ai_video.production.generation_evaluation_criteria import TemporalMeasurement, evaluation_items
+    from ai_video.production.generation_recipe import GenerationRecipe, RequirementExpression
+    from ai_video.production.models import QaPolicy
+    from ai_video.production.hashing import seal_artifact
+    from test_requirement_semantics import semantic_rule, marked_policy
+
+    _, candidate, qa = marked_context()
+    spec = time_window()
+    rule=semantic_rule("signal")
+    rule.update(tolerance=spec.tolerance_text, measurement=spec.measurement_text, measurement_spec=spec.model_dump(mode="json"))
+    policy=marked_policy([rule])
+    qa=seal_artifact(QaPolicy.model_validate({**qa.model_dump(mode="python"),"generation_acceptance":policy}))
+    recipe=GenerationRecipe.model_validate({**candidate.recipe.model_dump(mode="python"),
+        "acceptance_policy":policy,"rubric_hash":policy.profile_content_hash,"expressions":(RequirementExpression.model_validate(rule),)})
+    candidate=candidate.model_copy(update={"recipe":recipe})
+    source=simulated_source(candidate,qa,verdict="FAIL")
+    item=evaluation_items(acceptance=policy,qa_policy_content_hash=qa.content_hash,request_hash=source.request_hash,
+        artifact_sha256=source.artifact_sha256,size_bytes=source.size_bytes)[0]
+    measured=TemporalMeasurement(artifact_sha256=item.artifact_sha256,size_bytes=item.size_bytes,
+        evaluation_item_hash=item.evaluation_item_hash,event_id=spec.event_id,boundary="end",timebase="source_media_millis",
+        interval_millis=(end,end),method="word_alignment",coverage_millis=(0,4000),evidence_refs=("fixture/audio",))
+    source=source.model_copy(update={"observations":(source.observations[0].model_copy(
+        update={"observation":text,"measurement_result":measured}),)})
+    source=source.model_copy(update={"presentation_evidence":source.presentation_evidence.model_copy(
+        update={"answers_json":json.dumps(source.answer_payload())})})
+    if valid:
+        findings,_=project_generation_evaluation_sources(sources=(source,),acceptance=policy)
+        assert findings[0].verdict=="FAIL"
+    else:
+        with pytest.raises(ValueError,match="time verdict contradicts"):
+            project_generation_evaluation_sources(sources=(source,),acceptance=policy)
+
+
+def test_non_temporal_failure_can_describe_measured_freeze_duration():
+    from ai_video.production.generation_evaluation import project_generation_evaluation_sources
+
+    _, candidate, qa = marked_context()
+    source = simulated_source(candidate, qa, verdict="FAIL")
+    source = source.model_copy(update={"observations": (
+        source.observations[0].model_copy(update={"observation": "FAIL because the entire frame is frozen for > 1s, destroying visibility of the moving signal."}),)})
+    source = source.model_copy(update={"presentation_evidence": source.presentation_evidence.model_copy(
+        update={"answers_json": json.dumps(source.answer_payload())})})
+    findings, _ = project_generation_evaluation_sources(sources=(source,), acceptance=candidate.recipe.acceptance_policy)
+    assert findings[0].verdict == "FAIL"

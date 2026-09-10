@@ -211,7 +211,16 @@ class _StateCommitGenerationFeedbackMixin:
                 raise _state_invalid("Unknown outcome evidence requires a durable unknown attempt.")
         elif evidence.outcome == "not_submitted":
             if state.phase.value != "request":
-                raise _state_invalid("Not-submitted evidence requires a request-phase attempt.")
+                from ai_video.production.paid_provider_no_effect_reconciliation import (
+                    is_verified_reconciled_no_effect_video_attempt,
+                )
+
+                if not is_verified_reconciled_no_effect_video_attempt(
+                    self, attempt_id=attempt.attempt_id
+                ):
+                    raise _state_invalid(
+                        "Not-submitted evidence requires a request-phase attempt."
+                    )
         else:  # Defensive even though AttemptEvidence is a closed schema.
             raise _state_invalid("Generation evidence outcome is unsupported.")
 

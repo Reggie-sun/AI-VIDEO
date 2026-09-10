@@ -183,3 +183,44 @@ def test_explicit_generation_goal_revision_preserves_failed_history_and_can_prog
     assert result.diagnosis.failed_requirements == ("duration",)
     assert compile_decision(result, setup).request is not None
     assert result.routing.provider_bound_request.generation_recipe.rubric_hash == new_hash
+
+
+@pytest.mark.parametrize("parent_binding", ["exact", "wrong", "missing"])
+def test_legacy_goal_can_only_enter_explicitly_bound_prospective_marked_qa(parent_binding):
+    from test_requirement_semantics import marked_policy, semantic_rule
+    from test_production_final_output import viewing_policy
+    from ai_video.production.generation_recipe import RequirementExpression, GenerationRecipe
+
+    setup, baseline, latest = setup_full_requirements()
+    prior = setup["inputs"].candidates[0]
+    before = prior.model_dump_json(), latest.model_dump_json()
+    rules = []
+    for old_rule in prior.recipe.expressions:
+        rule = old_rule.model_dump(mode="json")
+        rule["semantics"] = semantic_rule()["semantics"]
+        rules.append(rule)
+    updates = {} if parent_binding == "missing" else {
+        "prospective_from_rubric_hash": prior.recipe.rubric_hash if parent_binding == "exact" else "f" * 64}
+    policy = marked_policy(rules, **updates)
+    recipe = GenerationRecipe.model_validate(prior.recipe.model_copy(update={
+        "rubric_hash": policy.profile_content_hash, "acceptance_policy": policy,
+        "expressions": tuple(RequirementExpression.model_validate(r) for r in rules),
+    }).model_dump(mode="python"))
+    candidate = prior.model_copy(update={"recipe": recipe, "final_output_goal": viewing_policy().final_output})
+    from ai_video.production.generation_feedback import GenerationHistory, derive_generation_interventions
+    from ai_video.production.generation_experience import GenerationExperience
+    historical = GenerationExperience(projection=setup["projection"], candidate=prior, evidence=(latest,))
+    proposals, _ = derive_generation_interventions(projection=setup["projection"], candidates=(candidate,),
+        history=GenerationHistory(experiences=(historical,), latest_attempt_hash=latest.evidence_hash,
+            baseline_request=baseline), policy=setup["inputs"].policy)
+    assert proposals == ()
+    setup["inputs"] = setup["inputs"].model_copy(update={"candidates": (candidate,),
+        "rubric_hash": recipe.rubric_hash, "historical_recipes": (prior,)})
+    result = decide(setup, evidence=(latest,), latest_attempt_hash=latest.evidence_hash,
+                    baseline_request=baseline)
+    assert (prior.model_dump_json(), latest.model_dump_json()) == before
+    assert result.disposition == ("GENERATE_ONCE" if parent_binding == "exact" else "RUBRIC_OR_STAGE_ERROR")
+    if parent_binding == "exact":
+        assert result.intervention is None
+        assert result.diagnosis.failed_requirements == ("duration",)  # Historical truth only.
+        assert result.routing.provider_bound_request.generation_recipe == recipe

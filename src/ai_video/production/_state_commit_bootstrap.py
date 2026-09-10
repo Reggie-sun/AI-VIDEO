@@ -31,6 +31,19 @@ from ._state_commit_contracts import PreparedArtifact
 
 
 class _StateCommitBootstrapMixin:
+    def bootstrap_repair_input(self, *, attempt_id, project, registry, artifacts,
+                               source_root, source_attempt_id, source_sha256,
+                               asset_id, usage_license):
+        """New development bundle only; no source write, qualification or activation."""
+        from ai_video.production.repair_input_admission import prepare_repair_input
+
+        updated, captured = prepare_repair_input(target_root=self._project_root,
+            project=project, registry=registry, source_root=source_root,
+            source_attempt_id=source_attempt_id, source_sha256=source_sha256,
+            asset_id=asset_id, usage_license=usage_license)
+        return self.bootstrap_initial_state(attempt_id=attempt_id, project=project,
+            registry=updated, artifacts=(*artifacts, *captured))
+
     def upgrade_manifest_schema(
         self,
         target_schema_version: str,
@@ -140,6 +153,9 @@ class _StateCommitBootstrapMixin:
             HumanImageImportReceipt,
             ShotEndpointImageImportReferenceBinding,
         )
+        from ai_video.production.image_import_video_frame import (
+            VideoFrameImageImportReferenceBinding,
+        )
         from ai_video.production.models import AssetSourceKind, AssetType
         from ai_video.production.paths import (
             canonical_automated_browser_image_import_receipt_path,
@@ -147,6 +163,9 @@ class _StateCommitBootstrapMixin:
         )
 
         artifacts_by_path = {item.relative_path: item for item in artifacts}
+        from ai_video.production.repair_input_admission import REPAIR_INPUT_TOOL, repair_input_receipt_path
+        required_paths.update(repair_input_receipt_path(item.creation_receipt_id)
+                              for item in registry.assets if item.tool == REPAIR_INPUT_TOOL)
         for item in registry.assets:
             if (
                 item.source_kind is not AssetSourceKind.IMPORTED
@@ -198,6 +217,12 @@ class _StateCommitBootstrapMixin:
                 if isinstance(
                     reference, ShotEndpointImageImportReferenceBinding
                 )
+            )
+            required_paths.update(
+                path
+                for reference in receipt.references
+                if isinstance(reference, VideoFrameImageImportReferenceBinding)
+                for path in (reference.source_video_path, reference.extracted_frame_path)
             )
         supplied_paths = tuple(item.relative_path for item in artifacts)
         supplied_path_set = set(supplied_paths)
@@ -317,6 +342,39 @@ class _StateCommitBootstrapMixin:
                             "Exact Production bootstrap replay did not reopen safely."
                         )
                     return current
+                for item in registry.assets:
+                    if (
+                        item.source_kind is not AssetSourceKind.IMPORTED
+                        or item.asset_type is not AssetType.IMAGE
+                        or item.tool != AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL
+                    ):
+                        continue
+                    receipt_path = canonical_automated_browser_image_import_receipt_path(
+                        item.creation_receipt_id
+                    )
+                    receipt_artifact = artifacts_by_path[receipt_path]
+                    receipt = AutomatedBrowserImageImportReceipt.model_validate_json(
+                        receipt_artifact.payload
+                    )
+                    for reference in receipt.references:
+                        if not isinstance(
+                            reference, VideoFrameImageImportReferenceBinding
+                        ):
+                            continue
+                        from ai_video.production.image_import_video_frame import (
+                            validate_video_frame_reference_bytes,
+                        )
+
+                        validate_video_frame_reference_bytes(
+                            reference,
+                            source_video_bytes=artifacts_by_path[
+                                reference.source_video_path
+                            ].payload,
+                            extracted_frame_bytes=artifacts_by_path[
+                                reference.extracted_frame_path
+                            ].payload,
+                            verify_derivation=True,
+                        )
                 for artifact in sorted(
                     prepared, key=lambda item: item.relative_path.as_posix()
                 ):

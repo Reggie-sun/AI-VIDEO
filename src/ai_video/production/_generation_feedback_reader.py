@@ -217,11 +217,9 @@ def verify_generation_feedback(root, state, request):
     if state.execution_binding is None:
         raise _invalid("Quality rejection has no production execution binding.")
     binding = load_generation_execution_binding(root, state.execution_binding)
-    all_evidence = tuple(
-        item
-        for experience_pointer in state.generation_experiences
-        for item in load_generation_experience(root, experience_pointer).evidence
-    )
+    experiences = tuple(load_generation_experience(root, pointer) for pointer in state.generation_experiences)
+    all_evidence = tuple(item for stored in experiences for item in stored.evidence)
+    sources = tuple(source for stored in experiences for source in stored.evaluation_sources)
     try:
         from ai_video.production.generation_rejection import (
             validate_quality_rejection_experience,
@@ -238,6 +236,7 @@ def verify_generation_feedback(root, state, request):
             artifact_sha256=fetch.artifact_sha256,
             qa_policy=load_qa_policy(root, receipt.qa_policy),
             history=all_evidence,
+            evaluation_sources=sources,
         )
     except (AiVideoError, AttributeError, ValueError) as exc:
         raise _invalid("Quality rejection execution evidence is invalid.", str(exc)) from exc
@@ -248,7 +247,7 @@ def verify_generation_feedback(root, state, request):
 
         try:
             validate_abandoned_result(receipt, experience=experience, evidence=evidence,
-                                      history=all_evidence)
+                                      history=all_evidence, evaluation_sources=sources)
         except ValueError as exc:
             raise _invalid("Abandoned result evidence is invalid.", str(exc)) from exc
 

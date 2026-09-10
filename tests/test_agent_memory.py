@@ -2193,10 +2193,19 @@ def test_local_multilingual_project_corpus_answerability_calibration(
         embedding=embedding,
     )
     assert relevant
-    assert any(
-        "continuity" in hit.source
-        and hit.admission_lane in {"dense", "hybrid"}
+    # Corpus growth can move a semantic answer into a baseline or research file.
+    # Require both query concepts in the same admitted hit, not its filename.
+    semantic_texts = (
+        " ".join((hit.title, hit.h1, hit.h2, hit.h3, hit.excerpt)).casefold()
         for hit in relevant
+        if hit.admission_lane in {"dense", "hybrid"}
+    )
+    assert any(
+        any(anchor in text for anchor in ("continuity", "连续性"))
+        and any(anchor in text for anchor in (
+            "首尾帧", "首帧", "终止帧", "first_frame", "terminal",
+        ))
+        for text in semantic_texts
     )
 
     assert search(

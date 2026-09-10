@@ -35,6 +35,10 @@ from ai_video.production.image_import import (
     validate_automated_browser_image_import,
     validate_human_image_import,
 )
+from ai_video.production.image_import_video_frame import (
+    VideoFrameImageImportReferenceBinding,
+    validate_video_frame_reference_bytes,
+)
 from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     AssetRecord,
@@ -1011,6 +1015,23 @@ def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
                 expected_asset = human_image_import_asset(receipt)
             if expected_asset != asset:
                 raise ValueError("selected image import AssetRecord is inconsistent")
+            for reference in receipt.references:
+                if not isinstance(reference, VideoFrameImageImportReferenceBinding):
+                    continue
+                source_video = _read_regular_file_nofollow(
+                    bundle.root / reference.source_video_path,
+                    contained_by=bundle.root,
+                )
+                extracted_frame = _read_regular_file_nofollow(
+                    bundle.root / reference.extracted_frame_path,
+                    contained_by=bundle.root,
+                )
+                validate_video_frame_reference_bytes(
+                    reference,
+                    source_video_bytes=source_video.data,
+                    extracted_frame_bytes=extracted_frame.data,
+                    verify_derivation=False,
+                )
             registry_assets = {
                 item.asset_id: item for item in bundle.registry.assets
             }

@@ -83,7 +83,7 @@ class GenerationQualityRejectionReceipt(StrictModel):
 
 def validate_quality_rejection_experience(
     *, binding, experience, evidence, request, attempt_id: str, artifact_sha256: str,
-    qa_policy, history: tuple,
+    qa_policy, history: tuple, evaluation_sources=(),
 ):
     """Validate the original decision joins shared by close and strict replay."""
     selected = next(
@@ -131,12 +131,15 @@ def validate_quality_rejection_experience(
         evidence=evidence,
         qa_policy=qa_policy,
     )
-    return diagnose_exact_result(evidence, history, experience.candidate.recipe)
+    return diagnose_exact_result(evidence, history, experience.candidate.recipe,
+        evaluation_sources=(*evaluation_sources, *experience.evaluation_sources))
 
 
-def unresolved_generation_requirements(evidence, history, recipe) -> tuple[str, ...]:
+def unresolved_generation_requirements(evidence, history, recipe, *, evaluation_sources=()) -> tuple[str, ...]:
     """Retain explicitly unobservable requirements; missing proof is not exhaustion."""
-    diagnosis = diagnose_exact_result(evidence, history, recipe)
+    diagnosis = diagnose_exact_result(evidence, history, recipe, evaluation_sources=evaluation_sources)
+    if "RUBRIC_OR_STAGE_ERROR" in diagnosis.failure_classes:
+        raise ValueError("abandonment cannot reinterpret conflicting evaluation evidence")
     exact_hashes = set(diagnosis.evidence_hashes)
     findings = tuple(f for e in (*history, evidence) if e.evidence_hash in exact_hashes
                      for f in e.findings)
@@ -154,9 +157,10 @@ def unresolved_generation_requirements(evidence, history, recipe) -> tuple[str, 
     return tuple(sorted(unresolved))
 
 
-def validate_abandoned_result(receipt, *, experience, evidence, history) -> None:
+def validate_abandoned_result(receipt, *, experience, evidence, history, evaluation_sources=()) -> None:
     """Pure exact-result join; persisted terminal authority is checked at execution."""
     receipt = GenerationQualityRejectionReceipt.model_validate(receipt.model_dump(mode="python"))
+    sources = (*evaluation_sources, *experience.evaluation_sources)
     if (receipt.schema_version != "generation-quality-rejection/2"
             or receipt.attempt_id != evidence.attempt_id
             or receipt.request_fingerprint != evidence.request_hash
@@ -164,7 +168,8 @@ def validate_abandoned_result(receipt, *, experience, evidence, history) -> None
             or receipt.evidence_hash != evidence.evidence_hash
             or receipt.experience_content_hash != canonical_sha256(experience.model_dump(mode="json"))
             or evidence not in experience.evidence
-            or receipt.diagnosis != diagnose_exact_result(evidence, history, experience.candidate.recipe)
+            or receipt.diagnosis != diagnose_exact_result(evidence, history, experience.candidate.recipe,
+                                                        evaluation_sources=sources)
             or receipt.unresolved_requirements != unresolved_generation_requirements(
-                evidence, history, experience.candidate.recipe)):
+                evidence, history, experience.candidate.recipe, evaluation_sources=sources)):
         raise ValueError("abandoned result differs from exact latest evidence")

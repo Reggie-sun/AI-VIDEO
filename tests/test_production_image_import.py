@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
 from dataclasses import replace
+from io import BytesIO
 from pathlib import Path
 
 import pytest
+from PIL import Image
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
@@ -24,6 +27,10 @@ from ai_video.production.image_import import (
     validate_commercial_image_import,
     validate_human_image_import,
 )
+from ai_video.production.image_import_video_frame import (
+    VideoFrameImageImportReferenceBinding,
+    validate_video_frame_reference_bytes,
+)
 from ai_video.production.commercial_reference import (
     ProductReferenceAssetBinding,
     ProductReferenceSet,
@@ -37,6 +44,7 @@ from ai_video.production.hashing import seal_artifact
 from ai_video.production.models import (
     ActorIdentity,
     ArtifactReference,
+    AssetRegistrySnapshot,
     AssetSourceKind,
     DependencyGraphSnapshotPointer,
     ProjectSnapshotPointer,
@@ -46,6 +54,7 @@ from ai_video.production.paths import (
     canonical_automated_browser_image_import_receipt_path,
     canonical_dependency_graph_snapshot_path,
     canonical_human_image_import_receipt_path,
+    canonical_image_asset_path,
     canonical_image_shot_revision_path,
 )
 from ai_video.production.project import load_production_project
@@ -115,6 +124,75 @@ def _automated_receipt(
     return AutomatedBrowserImageImportReceipt.create(**values)
 
 
+def _ffmpeg_version() -> str:
+    return subprocess.run(
+        ["ffmpeg", "-version"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.splitlines()[0].split()[2]
+
+
+def _video_frame_reference(
+    tmp_path: Path, source_video: Path, *, frame_index: int
+) -> tuple[bytes, dict[str, object], tuple[PreparedArtifact, ...]]:
+    extracted = tmp_path / "extracted-frame.png"
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-y",
+            "-v",
+            "error",
+            "-i",
+            str(source_video),
+            "-vf",
+            f"select=eq(n\\,{frame_index})",
+            "-frames:v",
+            "1",
+            str(extracted),
+        ],
+        check=True,
+    )
+    source_bytes = source_video.read_bytes()
+    frame_bytes = extracted.read_bytes()
+    source_sha256 = hashlib.sha256(source_bytes).hexdigest()
+    frame_sha256 = hashlib.sha256(frame_bytes).hexdigest()
+    with Image.open(BytesIO(frame_bytes)) as image:
+        width, height = image.size
+    reference = {
+        "role": "video_frame",
+        "source_video_path": f"evidence/video-frame-import/{source_sha256}.mp4",
+        "source_video_sha256": source_sha256,
+        "source_video_size_bytes": len(source_bytes),
+        "extracted_frame_path": f"evidence/video-frame-import/{frame_sha256}.png",
+        "extracted_frame_sha256": frame_sha256,
+        "extracted_frame_size_bytes": len(frame_bytes),
+        "extracted_frame_width": width,
+        "extracted_frame_height": height,
+        "frame_index": frame_index,
+        "extraction_contract_version": "video-frame-import-v1",
+        "extractor_name": "ffmpeg",
+        "extractor_version": _ffmpeg_version(),
+    }
+    binding = VideoFrameImageImportReferenceBinding.model_validate(reference)
+    return (
+        frame_bytes,
+        reference,
+        (
+            PreparedArtifact(
+                binding.source_video_path,
+                source_bytes,
+                source_sha256,
+            ),
+            PreparedArtifact(
+                binding.extracted_frame_path,
+                frame_bytes,
+                frame_sha256,
+            ),
+        ),
+    )
+
+
 def test_human_import_receipt_is_truthful_sealed_and_builds_imported_asset() -> None:
     png = project_factory._p7_png()
     receipt = _receipt(png)
@@ -166,6 +244,358 @@ def test_automated_browser_import_is_truthful_sealed_and_distinct() -> None:
     assert receipt.source_generation_remote
     assert asset.tool == AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL
     assert asset.tool != HUMAN_IMAGE_IMPORT_TOOL
+    assert receipt.content_hash == (
+        "c64366d543e373ce4958e92abd58b68a97a29634e12bf4b74b1328a9d019eb68"
+    )
+
+
+def test_automated_browser_import_accepts_a_truthful_raw_video_frame_reference() -> None:
+    png = project_factory._p7_png()
+
+    receipt = _automated_receipt(
+        png,
+        references=(
+            {
+                "role": "video_frame",
+                "source_video_path": f"evidence/video-frame-import/{'a' * 64}.mp4",
+                "source_video_sha256": "a" * 64,
+                "source_video_size_bytes": 123,
+                "extracted_frame_path": (
+                    "evidence/video-frame-import/"
+                    f"{hashlib.sha256(png).hexdigest()}.png"
+                ),
+                "extracted_frame_sha256": hashlib.sha256(png).hexdigest(),
+                "extracted_frame_size_bytes": len(png),
+                "extracted_frame_width": 2,
+                "extracted_frame_height": 1,
+                "frame_index": 71,
+                "extraction_contract_version": "video-frame-import-v1",
+                "extractor_name": "ffmpeg",
+                "extractor_version": "fixture-1",
+            },
+        ),
+    )
+
+    assert receipt.references[0].role == "video_frame"
+
+
+def test_video_frame_reference_rejects_wrong_frame_tampering_and_traversal(
+    tmp_path: Path, tiny_video: Path
+) -> None:
+    frame_bytes, reference, artifacts = _video_frame_reference(
+        tmp_path, tiny_video, frame_index=7
+    )
+    binding = VideoFrameImageImportReferenceBinding.model_validate(reference)
+
+    validate_video_frame_reference_bytes(
+        binding,
+        source_video_bytes=artifacts[0].payload,
+        extracted_frame_bytes=frame_bytes,
+        verify_derivation=True,
+    )
+    with pytest.raises(AiVideoError):
+        validate_video_frame_reference_bytes(
+            binding.model_copy(update={"frame_index": 8}),
+            source_video_bytes=artifacts[0].payload,
+            extracted_frame_bytes=frame_bytes,
+            verify_derivation=True,
+        )
+    with pytest.raises(AiVideoError):
+        validate_video_frame_reference_bytes(
+            binding,
+            source_video_bytes=artifacts[0].payload + b"tampered",
+            extracted_frame_bytes=frame_bytes,
+            verify_derivation=False,
+        )
+    with pytest.raises(AiVideoError):
+        validate_video_frame_reference_bytes(
+            binding,
+            source_video_bytes=artifacts[0].payload,
+            extracted_frame_bytes=frame_bytes + b"tampered",
+            verify_derivation=False,
+        )
+    with pytest.raises(ValidationError):
+        VideoFrameImageImportReferenceBinding.model_validate(
+            {**reference, "source_video_path": "../source.mp4"}
+        )
+
+
+def test_video_frame_reference_rejects_alpha_disguised_source_and_pixel_count_collision(
+    tmp_path: Path, tiny_video: Path
+) -> None:
+    frame_bytes, reference, artifacts = _video_frame_reference(
+        tmp_path, tiny_video, frame_index=7
+    )
+    binding = VideoFrameImageImportReferenceBinding.model_validate(reference)
+
+    def frame_binding(payload: bytes, *, width: int, height: int):
+        digest = hashlib.sha256(payload).hexdigest()
+        return VideoFrameImageImportReferenceBinding.model_validate(
+            {
+                **binding.model_dump(mode="json"),
+                "extracted_frame_path": f"evidence/video-frame-import/{digest}.png",
+                "extracted_frame_sha256": digest,
+                "extracted_frame_size_bytes": len(payload),
+                "extracted_frame_width": width,
+                "extracted_frame_height": height,
+            }
+        )
+
+    with Image.open(BytesIO(frame_bytes)) as image:
+        rgb = image.convert("RGB")
+        reshaped = Image.frombytes("RGB", (160, 480), rgb.tobytes())
+        reshaped_output = BytesIO()
+        reshaped.save(reshaped_output, format="PNG")
+        transparent = rgb.convert("RGBA")
+        alpha = Image.new("L", transparent.size, color=255)
+        alpha.putpixel((0, 0), 0)
+        transparent.putalpha(alpha)
+        transparent_output = BytesIO()
+        transparent.save(transparent_output, format="PNG")
+
+    with pytest.raises(AiVideoError):
+        validate_video_frame_reference_bytes(
+            frame_binding(reshaped_output.getvalue(), width=160, height=480),
+            source_video_bytes=artifacts[0].payload,
+            extracted_frame_bytes=reshaped_output.getvalue(),
+            verify_derivation=True,
+        )
+    with pytest.raises(AiVideoError):
+        validate_video_frame_reference_bytes(
+            frame_binding(transparent_output.getvalue(), width=320, height=240),
+            source_video_bytes=artifacts[0].payload,
+            extracted_frame_bytes=transparent_output.getvalue(),
+            verify_derivation=False,
+        )
+    disguised = VideoFrameImageImportReferenceBinding.model_validate(
+        {
+            **binding.model_dump(mode="json"),
+            "source_video_path": (
+                "evidence/video-frame-import/"
+                f"{hashlib.sha256(frame_bytes).hexdigest()}.mp4"
+            ),
+            "source_video_sha256": hashlib.sha256(frame_bytes).hexdigest(),
+            "source_video_size_bytes": len(frame_bytes),
+        }
+    )
+    with pytest.raises(AiVideoError):
+        validate_video_frame_reference_bytes(
+            disguised,
+            source_video_bytes=frame_bytes,
+            extracted_frame_bytes=frame_bytes,
+            verify_derivation=False,
+        )
+
+    def box(kind: bytes, payload: bytes) -> bytes:
+        return (len(payload) + 8).to_bytes(4, "big") + kind + payload
+
+    external_dref = box(
+        b"dref",
+        b"\x00\x00\x00\x00"
+        + (1).to_bytes(4, "big")
+        + box(b"url ", b"\x00\x00\x00\x00external.mov\x00"),
+    )
+    external_source = box(b"ftyp", b"isom\x00\x00\x02\x00isom") + box(
+        b"moov", box(b"trak", box(b"mdia", box(b"minf", box(b"dinf", external_dref))))
+    )
+    external_digest = hashlib.sha256(external_source).hexdigest()
+    external = VideoFrameImageImportReferenceBinding.model_validate(
+        {
+            **binding.model_dump(mode="json"),
+            "source_video_path": f"evidence/video-frame-import/{external_digest}.mp4",
+            "source_video_sha256": external_digest,
+            "source_video_size_bytes": len(external_source),
+        }
+    )
+    with pytest.raises(AiVideoError):
+        validate_video_frame_reference_bytes(
+            external,
+            source_video_bytes=external_source,
+            extracted_frame_bytes=frame_bytes,
+            verify_derivation=False,
+        )
+
+    nested = b""
+    for _ in range(10):
+        nested = box(b"moov", nested)
+    deep_source = box(b"ftyp", b"isom\x00\x00\x02\x00isom") + nested
+    deep_digest = hashlib.sha256(deep_source).hexdigest()
+    deep = VideoFrameImageImportReferenceBinding.model_validate(
+        {
+            **binding.model_dump(mode="json"),
+            "source_video_path": f"evidence/video-frame-import/{deep_digest}.mp4",
+            "source_video_sha256": deep_digest,
+            "source_video_size_bytes": len(deep_source),
+        }
+    )
+    with pytest.raises(AiVideoError):
+        validate_video_frame_reference_bytes(
+            deep,
+            source_video_bytes=deep_source,
+            extracted_frame_bytes=frame_bytes,
+            verify_derivation=False,
+        )
+
+
+def test_video_frame_reference_accepts_autorotated_frame_and_rejects_reshaping(
+    tmp_path: Path, tiny_video: Path
+) -> None:
+    rotated = tmp_path / "rotated.mp4"
+    subprocess.run(
+        [
+            "ffmpeg",
+            "-y",
+            "-v",
+            "error",
+            "-i",
+            str(tiny_video),
+            "-c",
+            "copy",
+            "-metadata:s:v:0",
+            "rotate=90",
+            str(rotated),
+        ],
+        check=True,
+    )
+    frame_bytes, reference, artifacts = _video_frame_reference(
+        tmp_path, rotated, frame_index=7
+    )
+    binding = VideoFrameImageImportReferenceBinding.model_validate(reference)
+    assert (binding.extracted_frame_width, binding.extracted_frame_height) == (240, 320)
+    validate_video_frame_reference_bytes(
+        binding,
+        source_video_bytes=artifacts[0].payload,
+        extracted_frame_bytes=frame_bytes,
+        verify_derivation=True,
+    )
+    with Image.open(BytesIO(frame_bytes)) as image:
+        reshaped = Image.frombytes("RGB", (480, 160), image.convert("RGB").tobytes())
+        output = BytesIO()
+        reshaped.save(output, format="PNG")
+    reshaped_bytes = output.getvalue()
+    digest = hashlib.sha256(reshaped_bytes).hexdigest()
+    reshaped_binding = VideoFrameImageImportReferenceBinding.model_validate(
+        {
+            **binding.model_dump(mode="json"),
+            "extracted_frame_path": f"evidence/video-frame-import/{digest}.png",
+            "extracted_frame_sha256": digest,
+            "extracted_frame_size_bytes": len(reshaped_bytes),
+            "extracted_frame_width": 480,
+            "extracted_frame_height": 160,
+        }
+    )
+    with pytest.raises(AiVideoError):
+        validate_video_frame_reference_bytes(
+            reshaped_binding,
+            source_video_bytes=artifacts[0].payload,
+            extracted_frame_bytes=reshaped_bytes,
+            verify_derivation=True,
+        )
+
+
+def test_bootstrap_validates_video_frame_derivation_only_before_initial_write(
+    tmp_path: Path, tiny_video: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    source = tmp_path / "source"
+    valid_target = tmp_path / "valid-target"
+    invalid_target = tmp_path / "invalid-target"
+    source.mkdir()
+    valid_target.mkdir()
+    invalid_target.mkdir()
+    project_factory.write_production_project(source)
+    base = load_production_project(source / "project.yaml")
+    frame_bytes, reference, reference_artifacts = _video_frame_reference(
+        tmp_path, tiny_video, frame_index=7
+    )
+
+    def bootstrap_inputs(
+        target: Path, raw_reference: dict[str, object]
+    ) -> tuple[ProductionStateCommitter, AssetRegistrySnapshot, tuple[PreparedArtifact, ...]]:
+        writer = ProductionStateCommitter(target)
+        receipt = _automated_receipt(frame_bytes, references=(raw_reference,))
+        asset = automated_browser_image_import_asset(receipt)
+        provisional = base.registry.model_copy(
+            update={
+                "revision_id": "0" * 64,
+                "content_hash": "0" * 64,
+                "assets": (*base.registry.assets, asset),
+            }
+        )
+        registry_hash = registry_semantic_sha256(provisional)
+        registry = provisional.model_copy(
+            update={"revision_id": registry_hash, "content_hash": registry_hash}
+        )
+        required = {
+            base.project.artifacts.brief.path,
+            base.project.artifacts.story.path,
+            base.project.artifacts.storyboard.path,
+            *(item.path for item in base.project.artifacts.characters),
+            *(item.path for item in base.project.artifacts.scenes),
+            *(item.path for item in base.project.artifacts.shots),
+            *(item.artifact_path for item in base.registry.assets),
+        }
+        prepared = [
+            writer.prepare_artifact("bootstrap-video-frame", path, (source / path).read_bytes())
+            for path in sorted(required, key=Path.as_posix)
+        ]
+        prepared.extend(
+            (
+                writer.prepare_artifact(
+                    "bootstrap-video-frame", canonical_image_asset_path(asset.sha256), frame_bytes
+                ),
+                writer.prepare_artifact(
+                    "bootstrap-video-frame",
+                    canonical_automated_browser_image_import_receipt_path(receipt.content_hash),
+                    _canonical_json_bytes(receipt),
+                ),
+                *reference_artifacts,
+            )
+        )
+        return writer, registry, tuple(prepared)
+
+    writer, registry, artifacts = bootstrap_inputs(valid_target, reference)
+    committed = writer.bootstrap_initial_state(
+        attempt_id="bootstrap-video-frame",
+        project=base.project,
+        registry=registry,
+        artifacts=artifacts,
+    )
+
+    import ai_video.production.image_import_video_frame as video_frame_module
+
+    original_validate = video_frame_module.validate_video_frame_reference_bytes
+
+    def fail_if_rederived(*args, **kwargs):
+        if kwargs["verify_derivation"]:
+            raise AssertionError("exact bootstrap replay must not decode media")
+        return original_validate(*args, **kwargs)
+
+    monkeypatch.setattr(
+        video_frame_module, "validate_video_frame_reference_bytes", fail_if_rederived
+    )
+    assert writer.bootstrap_initial_state(
+        attempt_id="bootstrap-video-frame-replay",
+        project=base.project,
+        registry=registry,
+        artifacts=artifacts,
+    ) == committed
+
+    bad_writer, bad_registry, bad_artifacts = bootstrap_inputs(
+        invalid_target, {**reference, "frame_index": 8}
+    )
+    monkeypatch.setattr(
+        video_frame_module,
+        "validate_video_frame_reference_bytes",
+        original_validate,
+    )
+    with pytest.raises(AiVideoError):
+        bad_writer.bootstrap_initial_state(
+            attempt_id="bootstrap-video-frame-bad-index",
+            project=base.project,
+            registry=bad_registry,
+            artifacts=bad_artifacts,
+        )
+    assert not (invalid_target / "state/manifest.json").exists()
 
 
 def test_commercial_interaction_import_binds_product_character_scene_and_exact_png() -> None:

@@ -67,7 +67,9 @@ class ControlledPresentationVerifier:
                    for a in review_input.qa_policy.generation_evaluation_authorities):
             raise ValueError("presentation evaluator is not selected by QA")
         interaction = uuid4().hex
-        presented = replace(review_input,
+        # The evaluator receives QA criteria and raw evidence, never the native
+        # prompt, recipe margins, repair hypothesis, or authoring projection.
+        presented = replace(review_input, request=None, projection=None, recipe=None,
             evaluation_items=tuple(i for i in review_input.evaluation_items if i.proof == self.proof),
             interaction_ref=interaction, presentation_ref=f"{interaction}/request", answer_ref=f"{interaction}/response")
         # These are the actual immutable request items, fixed before the call.
@@ -124,8 +126,10 @@ class ProjectAnalysisSession:
 
 def _diagnosis(committer, experience):
     entry = experience.evidence[-1]
-    history = tuple(e for x in committer.read_generation_experiences() for e in x.evidence)
-    return diagnose_exact_result(entry, history, experience.candidate.recipe)
+    experiences = committer.read_generation_experiences()
+    history = tuple(e for x in experiences for e in x.evidence)
+    return diagnose_exact_result(entry, history, experience.candidate.recipe,
+        evaluation_sources=tuple(s for x in experiences for s in x.evaluation_sources))
 
 
 async def review_generation_attempt(*, committer, attempt_id, session, adjudicate,

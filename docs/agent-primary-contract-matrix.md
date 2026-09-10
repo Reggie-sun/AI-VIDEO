@@ -1,5 +1,28 @@
 # AI-VIDEO Contract Routing Matrix
 
+## Development Repair Input Admission
+
+`ProductionStateCommitter.bootstrap_repair_input()` 复用既有 atomic bootstrap，是新开发
+bundle 的唯一 writer。`repair_input_admission.py` 只读捕获 exact FAILED remote fetch、
+原 Manifest、request/submit/status/binding、quality rejection 与原 QA/experience closure；
+Registry 独立重开 immutable receipt，不依赖外部 root。保留路径与 tool marker 必须一致。
+该输入固定 `NOT_EVALUATED`，绑定 target Project hash，禁止作为 Production Shot 素材绑定；
+不导入 history、不迁移预算、不建立 source-use PASS、不生成媒体或 activation。
+旧 Manifest schema、普通 imported assets 和 bootstrap replay/recovery owner 不变。
+Focused verification：`tests/test_repair_input_admission.py`；reader/state/feedback 检查组合
+由 Harness policy `repair_input_admission` category 独占。这不是通用视频导入或修复执行器。
+
+## S01 Read-only Recovery Observation
+
+`scripts/s01_strategy_regression.py` 是私有诊断 caller；Strategy/Feedback、strict loader
+和既有 committer read seams 保留原 owner。它不得生成 source-use PASS、写 Production
+state、提交 Provider 或把历史授权快照宣称为当前许可。候选与原 disposition 原样输出；
+无 authoring 是 integration gap，不是已证明的 executor gap，workflow acceptance 恒为
+`not_evaluated`。CLI 的 transport、credential 和媒体获取均为拒绝实现。
+Focused verification：`tests/test_s01_strategy_regression.py`、
+`tests/test_production_planning_service.py`、`tests/test_generation_feedback.py`；
+具体检查组合由 Harness policy 的 `s01_strategy_regression` category 独占。
+
 ## Final-output-first / No-regression
 
 Review / Repair 的 `final_output_contracts.py` 与 `final_output_review.py` 独占通用成片

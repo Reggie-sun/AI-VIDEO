@@ -233,7 +233,17 @@ class _StateCommitVideoMixin:
                                for e in prior_evidence):
                         raise _state_invalid("Prior fetched generation lacks exact media evaluation.")
                 elif item.status is StateCommitStatus.FAILED:
-                    if not any(e.outcome == "runtime_failure" for e in prior_evidence):
+                    from ai_video.production.paid_provider_no_effect_reconciliation import (
+                        is_verified_reconciled_no_effect_video_attempt,
+                    )
+
+                    recovered_no_effect = is_verified_reconciled_no_effect_video_attempt(
+                        self, attempt_id=item.attempt_id
+                    )
+                    required_outcome = (
+                        "not_submitted" if recovered_no_effect else "runtime_failure"
+                    )
+                    if not any(e.outcome == required_outcome for e in prior_evidence):
                         raise _state_invalid("Prior failed generation lacks runtime evidence.")
                 elif prior.phase is not VideoAttemptPhase.REQUEST:
                     raise _state_invalid("Prior generation is unfinished; evaluation cannot replace lifecycle.")
@@ -324,7 +334,8 @@ class _StateCommitVideoMixin:
                 raise _state_invalid("Previous production component has no required media PASS.")
             experience, latest = pairs[-1]
             diagnosis = diagnose_exact_result(latest,
-                tuple(e for _, e in pairs), experience.candidate.recipe)
+                tuple(e for _, e in pairs), experience.candidate.recipe,
+                evaluation_sources=tuple(s for x, _ in pairs for s in x.evaluation_sources))
             if not diagnosis.all_required_observed_pass:
                 raise _state_invalid("Previous production component required findings are not all PASS.")
 

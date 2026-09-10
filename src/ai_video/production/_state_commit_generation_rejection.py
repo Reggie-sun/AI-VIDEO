@@ -107,8 +107,9 @@ class _StateCommitGenerationRejectionMixin:
                 raise _state_invalid("Quality rejection requires the latest durable experience receipt.")
             request = self._reopen_video_request(state.request)
             binding = self._reopen_generation_execution_binding(state.execution_binding)
-            history = tuple(item for stored in self.read_generation_experiences()
-                            for item in stored.evidence)
+            experiences = self.read_generation_experiences()
+            history = tuple(item for stored in experiences for item in stored.evidence)
+            sources = tuple(source for stored in experiences for source in stored.evaluation_sources)
             try:
                 binding.validate_request(request)
             except ValueError as exc:
@@ -146,6 +147,7 @@ class _StateCommitGenerationRejectionMixin:
                     artifact_sha256=fetch.artifact_sha256,
                     qa_policy=loaded.qa_policy,
                     history=history,
+                    evaluation_sources=sources,
                 )
             except (AttributeError, ValueError) as exc:
                 raise _state_invalid("Quality rejection evidence is invalid.", str(exc)) from exc
@@ -155,7 +157,8 @@ class _StateCommitGenerationRejectionMixin:
                 raise _state_invalid("Quality rejection requires a complete known quality failure.")
             try:
                 unresolved = unresolved_generation_requirements(
-                    evidence, history, experience.candidate.recipe) if reason is not None else ()
+                    evidence, history, experience.candidate.recipe,
+                    evaluation_sources=sources) if reason is not None else ()
             except ValueError as exc:
                 raise _state_invalid("Abandonment evidence is invalid.", str(exc)) from exc
             receipt = GenerationQualityRejectionReceipt.create(

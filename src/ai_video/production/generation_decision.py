@@ -226,7 +226,8 @@ def _assess(candidate, inputs, routing):
     for e in relevant:
         if e.outcome != "media" or e.stage != "raw_generation":
             continue
-        diagnosis = diagnose_exact_result(e, relevant, recipe)
+        diagnosis = diagnose_exact_result(e, relevant, recipe,
+            evaluation_sources=tuple(s for x in inputs.experiences for s in x.evaluation_sources))
         for rule in recipe.expressions:
             if rule.requirement_id in diagnosis.failed_requirements:
                 failed.add(rule.dimension)
@@ -369,7 +370,8 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
         if latest is None or prior is None or inputs.policy.version != "3":
             raise ValueError("abandoned result requires the latest complete experience and current policy")
         validate_abandoned_result(inputs.abandoned_result, experience=prior, evidence=latest,
-                                  history=inputs.evidence)
+            history=inputs.evidence,
+            evaluation_sources=tuple(s for x in inputs.experiences for s in x.evaluation_sources))
     if latest is not None:
         if latest not in current_attempts:
             raise ValueError("latest attempt is outside current Shot")
@@ -378,13 +380,19 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
         if old_recipe is None:
             return GenerationDecision(**base, disposition="EVIDENCE_GAP",
                                       rationale=("include the prior exact recipe for diagnosis",))
-        diagnosis = diagnose_exact_result(latest, inputs.evidence, old_recipe)
+        diagnosis = diagnose_exact_result(latest, inputs.evidence, old_recipe,
+            evaluation_sources=tuple(s for x in inputs.experiences for s in x.evaluation_sources))
         base["diagnosis"] = diagnosis
         if inputs.policy.version == "3" and latest.rubric_hash != inputs.rubric_hash:
             old_goal = next(c.final_output_goal for c in (*candidates, *inputs.historical_recipes)
                 if c.scope_hash == latest.recipe_scope_hash)
             new_goal = candidates[0].final_output_goal
-            goal_changed = bool(old_goal is not None and new_goal is not None
+            new_acceptance = candidates[0].recipe.acceptance_policy.profile_payload
+            legacy_prospective = (old_goal is None and new_goal is not None
+                and not old_recipe.acceptance_policy.profile_payload.get("requirement_semantics_version")
+                and new_acceptance.get("requirement_semantics_version") == "requirement-semantics/1"
+                and new_acceptance.get("prospective_from_rubric_hash") == old_recipe.rubric_hash)
+            goal_changed = bool(legacy_prospective or old_goal is not None and new_goal is not None
                 and (old_goal.goal_id, old_goal.goal_version) != (new_goal.goal_id, new_goal.goal_version))
             if not goal_changed:
                 return GenerationDecision(**base, disposition="RUBRIC_OR_STAGE_ERROR",
@@ -477,7 +485,8 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
                     prediction_outcomes.append("undetermined")
                     continue
                 prediction_outcomes.append(intervention_prediction_outcome(
-                    proposed, diagnose_exact_result(entry, inputs.evidence, old_recipe),
+                    proposed, diagnose_exact_result(entry, inputs.evidence, old_recipe,
+                        evaluation_sources=tuple(s for x in inputs.experiences for s in x.evaluation_sources)),
                     require_all=inputs.policy.version == "3"))
             # A non-resample experiment may run once.  Its observed outcome is
             # retained to distinguish evidence repair from a relabeled retry.

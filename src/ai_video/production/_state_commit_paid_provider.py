@@ -66,6 +66,26 @@ def _artifact(path: Path, model: object) -> PreparedArtifact:
 
 
 class _StateCommitPaidProviderMixin:
+    def reconcile_paid_provider_no_effect(
+        self,
+        reconciliation,
+        *,
+        evidence_artifacts: tuple[PreparedArtifact, ...],
+        authorizer,
+    ) -> ProductionManifest:
+        """Explicitly close one already-sealed unknown paid video submission."""
+
+        from ai_video.production.paid_provider_no_effect_reconciliation import (
+            reconcile_paid_provider_no_effect,
+        )
+
+        return reconcile_paid_provider_no_effect(
+            self,
+            reconciliation,
+            evidence_artifacts=evidence_artifacts,
+            authorizer=authorizer,
+        )
+
     def _reopen_paid_budget(
         self, pointer: PaidProviderBudgetSnapshotPointer
     ) -> PaidProviderBudgetSnapshot:

@@ -20,6 +20,7 @@ from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import ToolIdentity, QaPolicy
 from ai_video.production.generation_evaluation_criteria import (
     PresentationEvidence, TemporalMeasurement, evaluation_items, temporal_verdict,
+    require_canonical_observation_basis,
 )
 from ai_video.production.requirement_semantics import validate_semantic_inventory
 
@@ -247,6 +248,7 @@ def _validate_marked_source(source, acceptance):
                 or observation.evaluation_item_hash != item.evaluation_item_hash
                 or observation.question_text != item.question_text):
             raise ValueError("observation answers a different criterion, stage or proof")
+        require_canonical_observation_basis(item, observation)
         if presentation is None:
             if observation.verdict != "NOT_EVALUATED":
                 raise ValueError("EVIDENCE_GAP: no verified presentation and answer evidence")
