@@ -8,6 +8,21 @@ learning_eligibility: ineligible
 
 ## Outcome
 
+2026-09-12 更新：用户以“那就用这个先生成,把模型的声音也打开”确认首帧与声音。本次已完成一次 `viduq3-pro` I2V 提交并下载带原生音轨的 S04。下文首帧待确认、尚无 Router/Provider 结果与 used=0 均为先前 checkpoint 的历史状态，已由本节及 `Native Audio Generation` 取代。实际提交 quota 为 1/1；成片人审仍为 `UNDECIDED`，没有 activation 或 S05 submit。
+
+## Native Audio Generation
+
+- Exact MP4：`runs/jieshi-e01-i2v-20260907-attempt10/production-s04-v1/state/video-generation/fetch/files/a2a0251715de19e52d5ba80c335db06afb89f083c0c546cf5cd7c246b64aee4e.mp4`；SHA-256 同文件名；6,159,895 bytes。
+- 请求为单张已批准首帧、4 秒、1080p、`native_audio=true`。实际 POST body SHA-256 为 `8437b7c6ab3f1b480e09c2c4cf3f0afb86e175ecd69c1157de8b93a68b91fbf4`；2026-09-11 16:03:57 UTC 提交，16:06:24 UTC success，16:07:03 UTC fetch 完成。
+- project-local `video-analysis` MCP 已对 exact MP4 执行 probe、review 与 0.5 秒间隔抽帧。实际容器为 4.042 秒、1080×1920、24fps、97 帧；AAC 48kHz 双声道。FFmpeg 完整音轨解码成功，mean -38.1 dB、peak -21.8 dB，确认非静音；不推导声音内容或音量适宜性。
+- 0/2 秒采样可见四人原有相邻座位；4 秒横移后最右人物部分出画。采样不证明整段动作自然、身份连续性或手机笑声语义。required findings 逐项为 `NOT_EVALUATED`，holistic `UNDECIDED`；P4 跨镜音频亦未验收。结果保存在 preparation 目录的 `s04-attempt01-post-media-gate.json`、`s04-attempt01-mcp-probe.json` 和 `s04-attempt01-mcp-review.json`。这是 orchestration evidence，未写入 Manifest acceptance。
+- 第一次 fetch 因下载域名的本机 DNS 地址不满足 public HTTPS 检查而失败。复用 S03 的进程内 GET-only public-DNS helper，保留地址校验、TLS 与 canonical fetch；没有第二次 POST、全局网络修改或媒体重生成。`fetch-dns-evidence.json` 保存证据。
+- 准备阶段 QA admission 发现 necessity/observable 重复与 source locator 被用作 intent path；在 Provider 调用前修正，并将精确 35mm/20cm 保留为偏好、跨镜音频留在 P4。经 canonical graph/QA transitions 达到 pre-submit r7，未重建 root 或删除旧 evidence。最终 QA hash `19c1ff19f44158f9f7ca7ecb650b94e4d91598c9c18655637db430e89abdee80`。
+- 独立 `reviewer_xhigh` 为 `accept with concerns`，确认 exact request、audio、authorization、S03 前置 Gate 与 canonical execution seam；本次运行 `sys.flags.optimize=0`。相关 Vidu/guards 测试 98 passed，image-import/recovery 测试 42 passed。无 fresh isolated Harness receipt，不声称工程 Harness closure；未修改产品 source，保留其他 staged/dirty changes。
+- 按 `record-ai-video-session` 更新本记录并按 `distill-ai-video-learning` 评估：`no_candidate`。仅一个未有人审结论的生成 attempt，不构成重复支持或受控对照，不提出自动采用的模型结论。
+
+## Historical First-Frame Checkpoint
+
 用户要求“生成shot4”。本轮完成《界蚀》S04 的首帧候选；尚未生成视频、提交 Vidu、导入首帧或修改 Production state。待用户对 exact PNG 确认输入用途后继续既有 Planner/Router/Provider 路径。
 
 目录：`runs/jieshi-e01-i2v-20260907-attempt10/preparation-s04-v1/`。`image-generation-prompt.txt` 保存实际图片 prompt；`source-and-scope.json` 保存 S04 内容、参考范围及尚未 sealed 的视频意图；`first-frame-result.json` 保存测量结果。
