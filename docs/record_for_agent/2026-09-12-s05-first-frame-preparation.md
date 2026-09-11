@@ -8,6 +8,8 @@ learning_eligibility: ineligible
 
 ## Outcome
 
+2026-09-12 后续人审：用户对“S05 的画面、倒影同步和原生声音，你确认可以保留吗？”回答“通过”。重新核验 exact MP4 `17010995…0e8424` 后，保存 `preparation-s05-v1/s05-attempt01-human-confirmation.json` 与 `s05-attempt01-human-next-shot-gate.json`。结合既有 sampled MCP evidence，raw Gate PASS、holistic KEEP；P4 final-composition 仍 NOT_EVALUATED，无 activation。下文生成 checkpoint 的待人审状态已由该确认取代。
+
 2026-09-12 更新：用户对展示的 S05 首帧回答“可以”，随后要求“继续”。已完成单次 Vidu Q3 Pro I2V 提交与原生音轨 MP4 下载；下文“待首帧确认、未导入、未生成”的初始 checkpoint 保留为历史，已由本节取代。当前 raw Gate `NOT_EVALUATED`、holistic `UNDECIDED`，等待 exact MP4 正常速度人审；未 activation 或提交 S06。
 
 ## Native-Audio Generation Result
