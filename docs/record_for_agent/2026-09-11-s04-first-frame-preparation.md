@@ -8,6 +8,8 @@ learning_eligibility: ineligible
 
 ## Outcome
 
+2026-09-12 人审更新：用户回答“可以”，明确回应“你已看过 S04，确认画面和原生声音可以保留吗？”。重新核对 exact MP4 SHA-256 后，保存 `preparation-s04-v1/s04-attempt01-human-confirmation.json` 与 `s04-attempt01-human-next-shot-gate.json`：raw-generation required findings 依据该人审为 PASS，holistic KEEP，允许准备下一镜。P4 跨镜音频仍 NOT_EVALUATED，无 candidate activation 或最终验收。下文生成 checkpoint 的待人审状态保留为历史。
+
 2026-09-12 更新：用户以“那就用这个先生成,把模型的声音也打开”确认首帧与声音。本次已完成一次 `viduq3-pro` I2V 提交并下载带原生音轨的 S04。下文首帧待确认、尚无 Router/Provider 结果与 used=0 均为先前 checkpoint 的历史状态，已由本节及 `Native Audio Generation` 取代。实际提交 quota 为 1/1；成片人审仍为 `UNDECIDED`，没有 activation 或 S05 submit。
 
 ## Native Audio Generation
