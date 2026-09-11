@@ -6,6 +6,20 @@ learning_eligibility: ineligible
 
 # S06 First-Frame Preparation
 
+## Attempt03 Continuation Result
+
+用户明确“继续修复”，追加一次 S06 attempt03。对 attempt02 的唯一语义变化为 `subject_action.progression`：移除视觉动作字段中的广播台词复述，仅描述林砚看屏幕、释然消失和末尾移开视线。原 `dialogue_intent` 三段台词/时窗、上轮黑屏材质描述、QA、首帧、Vidu Q3 Pro、6秒1080p/native audio和 seed `1439830583` 全部保留。假设是将视觉动作和听觉台词分开可减少屏幕文字，不是已经验证的因果结论。
+
+第三版仍 **FAIL**：exact MP4 为 `runs/jieshi-e01-i2v-20260907-attempt10/production-s06-v1/state/video-generation/fetch/files/32d968767180f2d94fa16843213e9cd57f47e76c3f5f8b8af9f6343927c574ec.mp4`，SHA-256同文件名，5,166,335 bytes；6.042秒、1080×1920、24fps、145帧、AAC 48kHz stereo。MCP在1.5和4.5秒的帧中发现白色报站/点名文字；0/3/6秒留白不能抵消期间的明确违规。Whisper small仍只识别两段（0–2.08秒站名、2.08–4.4秒点名），不能验证要求的三次完整广播。完整声画decode exit0，mean -22.0dB / peak -3.7dB仅为技术证据。其余需正常速度整体声画人审的要求继续 `NOT_EVALUATED`，holistic verdict `UNDECIDED`；不 activation、不进入下一 Shot、不宣称完整成片或修复成功。
+
+保持同一项目及 task，旧两次失败与 reservations未重置；`budget → start → quota → execute` 将内部operator总上限6M→9M microunits、同task submit ceiling2→3。唯一新POST在18:59:29 UTC返回200，18:59:44 acceptance持久化，19:01:06 succeeded，19:02:12 fetch。本轮新增一次、累计3/3已用完。编译body SHA `1c704cbad112a6373dc0af34acfcb73cda2d2d1a37873e801f060aceaceb83ce`，binding `6bfe34f36d7edbe2b110038ced4de7b9d71044089108684c2244dd277b6fc548`。未查询价格；上限不是实际账单。
+
+Evidence保存在 `runs/jieshi-e01-i2v-20260907-attempt10/preparation-s06-v3/`：authorization、compiled comparison、binding、preview、review、budget/quota、live events、MCP probe/review/frame metadata/transcript、audio decode及 `s06-attempt03-post-media-gate.json`。独立 `reviewer_xhigh` 为 `accept with concerns`，只确认执行约束；本轮22项guard/Vidu prompt/runtime boundary tests通过，strict current binding和单字段差异验证通过，S03/S04/S05 Manifest实测hash未变。无产品源码改动；policy audit仍被相同3条已有unmapped paths阻断，无fresh exact Harness receipt。
+
+`review_attempt03.py` 已经真实MCP桥接、`ControlledPresentationVerifier` 与 `/2` evaluator持久化新exact证据，再由 `abandon_video_generation()` 关闭第三版 mixed failure；结尾standard loader重开通过，fetch和paid state保留。诊断为 `EVIDENCE_GAP + QUALITY_FAILURE`，失败项 `s06-no-generated-text`；没有把其他缺证据项目改为PASS。
+
+按 `record-ai-video-session` 更新本记录并评估 `distill-ai-video-learning`：`no_candidate`，不将两个提示词修复均失败外推为模型必然失败。已重开现有 `vidu-s01-native-dialogue-burned-captions` pending claim，它仍未采用且明确不覆盖其他镜头；本轮不重复创建同一“禁止文字不能视为保证”的候选，也不擅自扩大其已封存范围。下一方向应重新评估声画制作方案，不能将本次失败视为第四次付费调用授权。
+
 ## Attempt02 Continuation Result
 
 用户“jixu继续”按前文失败上下文授权追加一次 S06 修复。保持原 task `jieshi-s06-production-20260912`、同一首帧、`viduq3-pro`、6秒1080p、native audio、seed `1439830583` 与完整 QA。唯一创作变量为 `visual_treatment.material_treatment`：强化屏幕全程纯黑关闭、广播独立于屏幕的描述；三次 PA 的原文、时窗和人物反应均未改。Provider profile 仅按原 operator upper bound 续期，未查询价格或宣称实际账单。
