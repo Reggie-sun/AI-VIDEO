@@ -6,6 +6,18 @@ learning_eligibility: ineligible
 
 # S06 First-Frame Preparation
 
+## Attempt02 Continuation Result
+
+用户“jixu继续”按前文失败上下文授权追加一次 S06 修复。保持原 task `jieshi-s06-production-20260912`、同一首帧、`viduq3-pro`、6秒1080p、native audio、seed `1439830583` 与完整 QA。唯一创作变量为 `visual_treatment.material_treatment`：强化屏幕全程纯黑关闭、广播独立于屏幕的描述；三次 PA 的原文、时窗和人物反应均未改。Provider profile 仅按原 operator upper bound 续期，未查询价格或宣称实际账单。
+
+结果仍 **FAIL**。第二版 exact MP4 为 `runs/jieshi-e01-i2v-20260907-attempt10/production-s06-v1/state/video-generation/fetch/files/d97cd757a99ea5932ff8f0a4aa87e342b8d5cbff1ac15ccf60b2f34f428adb25.mp4`，SHA-256 同文件名，4,505,874 bytes；6.042秒、1080×1920、24fps、145帧、AAC 48kHz stereo。显式 project-local MCP 抽帧在1.5/3/4.5/6秒均显示黄色生成文字和错误站名形状，留白修复假设被当前样本否定；不外推为整个模型不具备能力。Whisper small 仅识别两段：0–2.36秒站名、3–5.42秒点名；三次完整报站仍 `NOT_EVALUATED`。完整声画 decode exit0，音频 mean -24.9dB / peak -5.1dB，只证明可解码及非零音量，不证明台词、音色或节奏正确。
+
+先通过 `/2` evaluator + `ControlledPresentationVerifier` + 真实 MCP bridge，为 attempt01 持久化屏幕 FAIL 和其他 human `NOT_EVALUATED`，再由 `abandon_video_generation()` 保留 mixed failure 关闭。随后仅发布新 generation target，沿完整 history/baseline/intervention 经 Router 选择一次生成。按 `budget → start → quota → execute` 顺序，既有 committer 保留旧 reservation，将内部预算上限3M→6M microunits、同 task 次数1→2。18:47:37 UTC 接受唯一新 POST，18:49:06 succeeded，18:49:23 fetch；未重复 submit、未重建项目或清零历史。attempt02 的 exact mixed failure 也已通过同一桥接与 abandonment owner 关闭；两版均保留，不 activation，不进入 S07，不宣称 P4/Final Acceptance。当前总 submit2/2 已耗尽。
+
+Evidence owner：`runs/jieshi-e01-i2v-20260907-attempt10/preparation-s06-v2/` 中的 `continuation-authorization.json`、`s06-compiled-comparison.json`、`s06-execution-binding.json`、`s06-live-events.jsonl`、`s06-attempt02-post-media-gate.json`、`s06-attempt02-diagnosis.json` 与 MCP probe/review/frame metadata/transcript。`pre-submit-review.json` 记录 native `reviewer_xhigh` 的 `accept with concerns`；它验证提交约束，不证明媒体质量。
+
+Verification：standard loader 与 current binding 校验通过；实测仅 material_treatment 改变，S03/S04/S05 Manifest hash 未变；59项 rejection/quota/execution/Vidu focused tests通过，另2项 runtime Skill boundary通过。文档 contract与 task diff检查通过；没有 fresh exact Harness receipt，policy audit 的3条既有 unmapped paths 仍未解决。未修改产品源码或其他 dirty work。按 `record-ai-video-session` 更新本 owner；自动 `distill-ai-video-learning` 为 `no_candidate`：本轮单一受控修复对不足以支持跨实验采用 claim，不新增 placeholder 或自动改变模型/策略。
+
 ## Superseding Generation Result
 
 用户随后回复“可以”，批准本记录所述首帧用于 S06。已通过既有 Planner/Router/compiler、paid gates 与 canonical lifecycle，以 `viduq3-pro` I2V、6秒、1080p、`audio=true` 完成一次 submit 和一次 fetch；task ceiling1/used1。本节取代下文历史 checkpoint 的“尚未提交”和“待首帧确认”状态。
