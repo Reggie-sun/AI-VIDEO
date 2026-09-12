@@ -6,6 +6,18 @@ learning_eligibility: ineligible
 
 # S06 First-Frame Preparation
 
+## Audiovisual Reassessment Proposal
+
+用户在第三次失败后的“可以”授权重新评估声画制作方案。本轮为只读能力核对与此记录更新，没有新Provider调用、音频/视频生成、项目state写入或runtime实现。
+
+建议待明确批准的S06路线：视频只生成人物动作，`native_audio=false`；画面继续使用已批准首帧、原6秒机位和人物反应。广播、列车/通风环境声以及精确屏幕文字由独立P4 tracks/layer制作，最终片仍有声音。原生声音偏好在S06上改为显式独立音频，不追改三次旧请求/QA/失败证据。站名段“下一站，临江路。”只制作一份、在0秒和2秒复用同一音频内容，第三段“下一站……林砚。”在4.3秒进入，尾部短电流失真；保持原1.6/3.6/5.8秒窗口。不能截断发音来挤入窗口，实测不合适仍须调整制作并重新验收。屏幕仅显示“下一站：临江路”，不随第三段广播变成人名。最终timing仍由 `ResolvedTimeline` 独占。
+
+已排除当前可直接执行“原生环境声＋独立广播”的假设：当前S06 Manifest2.7/r40，三次attempt均FAILED、paid ACCEPTED；`generated_video_audio.py`要求已结算来源、仅允许DIALOGUE/NARRATION，并将目标限制为Manifest2.0–2.2/Registry2.1，不能为本项目登记AMBIENCE。P4能够消费已登记音轨，但本S06没有activated visual，MiniMax Speech batch也只创建独立测试项目，没有当前S06的generated-voice登记/组合handoff。国内凭证未在本轮复查；最近国内接入记录称未配置、无live WAV，不能描述为当前已可用。
+
+已有 `docs/superpowers/specs/2026-09-12-ai-video-voice-routing-design.md` 仍为 `proposed/not_started`，其SEPARATE明确要求首版视频`native_audio=false`，不支持上述混合路线。下一步若用户批准，需要先实施该路线所选项目布局的ledger/lifecycle、exact generated-voice registration和P4 handoff（尤其VR-13），完成测试与review，再做有界真实声画验证。此次“可以”不是对该新增runtime slice、切换音频路线或新Provider调用的授权；不编辑其他会话拥有的spec/源码。
+
+Evidence：分镜Audio Production Policy与S06卡、`docs/generated-video-audio.md`、`docs/minimax-speech.md`、国内接入record及现有Voice Routing spec；native `code_mapper`只读核对了audio derivation/CompositionSpec/HyperFrames限制。Agent Memory查询返回library-incompatible exit3，按Skill未重试，判断来自当前文件。文档contract和本文件diff检查通过；只更新本记录，无fresh exact Harness receipt。按record/learning流程评估为`recorded/no_candidate`，此次没有新增实验或可采用的能力证明。
+
 ## Attempt03 Continuation Result
 
 用户明确“继续修复”，追加一次 S06 attempt03。对 attempt02 的唯一语义变化为 `subject_action.progression`：移除视觉动作字段中的广播台词复述，仅描述林砚看屏幕、释然消失和末尾移开视线。原 `dialogue_intent` 三段台词/时窗、上轮黑屏材质描述、QA、首帧、Vidu Q3 Pro、6秒1080p/native audio和 seed `1439830583` 全部保留。假设是将视觉动作和听觉台词分开可减少屏幕文字，不是已经验证的因果结论。
