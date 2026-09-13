@@ -216,6 +216,23 @@ compiler/provider categories。Focused verification：
 
 ## Vidu Cloud Adapter
 
+验证所依赖的既有文件也必须有明确路由：`image_import_video_frame.py` 归属 image import，
+由 `production_image_tests` 验证原始视频帧 provenance；
+`paid_provider_no_effect_reconciliation.py` 归属既有 paid video recovery，
+由 `paid_reconciliation_tests` 与 `production_video_provider_tests` 验证。
+本映射不扩展 reconciliation 至广告请求，不改变现有 writer 或 recovery 授权。
+
+Whole-ad source creation：`ad-one-click` 是显式独立 operation，`vidu.py` 将协议工作
+委托给 `vidu_ad_wire.py` / `vidu_ad_provider.py`。`vidu_ad_contracts.py` 独占 sealed
+request 和待验收素材 metadata；`_provider_manifest_fields.py` 负责显式 Provider 字段
+的 schema admission。`_StateCommitAdMixin` 属于唯一 writer `ProductionStateCommitter`。
+既有 paid mixin 独占 reservation、Gate、one-use permit 和 unknown 封存；当前广告请求
+尚无解除 unknown 的 reconciliation 入口。`vidu_ad_reader.py` 经既有 paid reader 验证
+registered inputs、profile、request、paid joins 和下载 bytes。素材不会激活 Registry、
+Project、timeline 或 QA state，也不会注册成普通 Shot capability。Focused check：
+Harness 的 `vidu_ad_tests`；使用与兼容边界见 [Vidu ad source](vidu-ad-provider.md)。
+
+
 `src/ai_video/production/vidu.py` 独占 Vidu payload/status/download mapping，
 `_vidu_prompt.py` 独占 Vidu version `2` 的自然语言 prompt 编译；新编译不接受 version `1`，
 历史请求恢复保留原始 bytes。无法表达的语义与 native hard control 必须拒绝，不能静默丢弃。

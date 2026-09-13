@@ -260,6 +260,13 @@ class _StateCommitPaidProviderMixin:
                     raise _state_invalid(
                         "Paid Provider preview does not match the durable operation request."
                     )
+            elif preview.operation == "ad_generation":
+                from ai_video.production.vidu_ad_reader import validate_ad_intent
+                try:
+                    validate_ad_intent(self._project_root, manifest, attempt, preview,
+                                       self._paid_provider_clock())
+                except (ValueError, OSError, AttributeError) as exc:
+                    raise _state_invalid("Ad submit intent does not match its durable request.") from exc
             elif preview.operation == "video_generation":
                 video_state = attempt.video_generation_state
                 if video_state is None:
@@ -408,6 +415,16 @@ class _StateCommitPaidProviderMixin:
             manifest = ProductionManifest.model_validate_json(raw.data)
             attempt = self._paid_attempt(manifest, binding["attempt_id"])
             state = attempt.paid_provider_state
+            if attempt.operation == "ad_generation":
+                from ai_video.production.vidu_ad_reader import reopen_ad_request, validate_ad_images
+                from ai_video.production.vidu_ad_provider import ad_preview
+                request, profile = reopen_ad_request(self._project_root, attempt)
+                validate_ad_images(self._project_root, attempt)
+                if (ad_preview(request, profile, attempt.attempt_id).preview_fingerprint
+                        != binding["preview_fingerprint"]
+                        or not profile.pricing_observed_at <= self._paid_provider_clock()
+                        < min(profile.pricing_expires_at, request.expires_at)):
+                    return False
             return bool(
                 raw.file_sha256 == manifest_file_sha256
                 and manifest.manifest_revision == manifest_revision

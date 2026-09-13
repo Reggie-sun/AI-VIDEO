@@ -89,6 +89,14 @@ fallback_check_ids:
   - task_architecture_gate
 
 checks:
+  vidu_ad_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_vidu_ad_wire.py, tests/test_production_vidu_ad_generation.py, tests/test_production_vidu_ad_lifecycle.py, -q]
+    cwd: .
+    description: Verify whole-ad source creation, durable paid intent, bounded task quota, explicit recovery and unaccepted byte download offline.
+  paid_reconciliation_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_paid_provider_no_effect_reconciliation.py, -q]
+    cwd: .
+    description: Verify explicit paid video no-effect reconciliation and zero-resubmit recovery.
   repair_input_admission_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_repair_input_admission.py, -q]
     cwd: .
@@ -295,6 +303,8 @@ checks:
     timeout_seconds: 1800
     execution_priority: 30
     covers_check_ids:
+      - paid_reconciliation_tests
+      - vidu_ad_tests
       - repair_input_admission_tests
       - generation_feedback_tests
       - production_vidu_tests
@@ -347,6 +357,29 @@ checks:
     description: Report repository health against the version-controlled architecture baseline.
 
 categories:
+  vidu_ad_source:
+    patterns:
+      - src/ai_video/production/_provider_manifest_fields.py
+      - src/ai_video/production/vidu_ad_*.py
+      - src/ai_video/production/_state_commit_ad.py
+      - src/ai_video/production/vidu.py
+      - src/ai_video/production/vidu_profile.py
+      - src/ai_video/production/paid_provider.py
+      - src/ai_video/production/_state_commit_paid_provider.py
+      - src/ai_video/production/_paid_provider_project_reader.py
+      - tests/test_production_vidu_ad_*.py
+    check_ids:
+      - vidu_ad_tests
+      - production_vidu_tests
+      - task_architecture_gate
+  paid_no_effect_reconciliation:
+    patterns:
+      - src/ai_video/production/paid_provider_no_effect_reconciliation.py
+      - tests/test_paid_provider_no_effect_reconciliation.py
+    check_ids:
+      - paid_reconciliation_tests
+      - production_video_provider_tests
+      - task_architecture_gate
   repair_input_admission:
     patterns:
       - src/ai_video/production/repair_input_admission.py
@@ -546,6 +579,7 @@ categories:
       - task_architecture_gate
   production_shared_contracts:
     patterns:
+      - src/ai_video/production/_provider_manifest_fields.py
       - src/ai_video/production/__init__.py
       - src/ai_video/production/artifact_contracts.py
       - src/ai_video/production/models.py
@@ -728,6 +762,7 @@ categories:
       - src/ai_video/production/image.py
       - src/ai_video/production/comfy_image.py
       - src/ai_video/production/image_import.py
+      - src/ai_video/production/image_import_video_frame.py
       - src/ai_video/production/_image_project_reader.py
       - src/ai_video/production/_image_video_lineage.py
       - src/ai_video/production/_state_commit_image_*.py

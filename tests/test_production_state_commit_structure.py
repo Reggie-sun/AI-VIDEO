@@ -215,6 +215,7 @@ def test_committer_mro_preserves_approved_domain_order() -> None:
         "_StateCommitCommercialSourceMixin",
         "_StateCommitCommercialSourceRecoveryMixin",
         "_StateCommitVideoMixin",
+        "_StateCommitAdMixin",
         "_StateCommitGenerationFeedbackMixin",
         "_StateCommitGenerationRejectionMixin",
         "_StateCommitGenerationHistoryMixin",

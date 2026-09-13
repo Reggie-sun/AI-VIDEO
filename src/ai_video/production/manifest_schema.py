@@ -23,6 +23,7 @@ ManifestVersion: TypeAlias = Literal[
     "2.13",
     "2.14",
     "2.15",
+    "2.16",
 ]
 
 
@@ -40,6 +41,7 @@ class ManifestCapability(str, Enum):
     COMMERCIAL_VIDEO = "commercial_video"
     SOURCE_BOUNDARY = "source_boundary"
     CAPTION_REVIEW = "caption_review_v1"
+    AD_GENERATION = "ad_generation"
 
 
 _VERSIONS: tuple[ManifestVersion, ...] = (
@@ -59,6 +61,7 @@ _VERSIONS: tuple[ManifestVersion, ...] = (
     "2.13",
     "2.14",
     "2.15",
+    "2.16",
 )
 
 MANIFEST_SCHEMA_ORDER: tuple[ManifestVersion, ...] = _VERSIONS
@@ -77,6 +80,7 @@ _INTRODUCED_IN: dict[ManifestCapability, ManifestVersion] = {
     ManifestCapability.COMMERCIAL_VIDEO: "2.13",
     ManifestCapability.SOURCE_BOUNDARY: "2.14",
     ManifestCapability.CAPTION_REVIEW: "2.15",
+    ManifestCapability.AD_GENERATION: "2.16",
 }
 
 

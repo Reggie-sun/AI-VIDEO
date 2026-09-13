@@ -69,7 +69,6 @@ from ai_video.production._commercial_source_state import (
     CommercialSourceAttemptState,
     CommercialSourceDependencyEvidence,
     CommercialSourceLifecycle,
-    reject_explicit_commercial_source_fields,
     serialize_commercial_source_manifest,
     validate_commercial_source_manifest,
 )
@@ -88,12 +87,13 @@ from ai_video.production._lifecycle_schema import (
     has_p6_state,
     prune_attempt_fields,
     reject_explicit_p7_fields,
-    reject_explicit_p8_video_fields, reject_explicit_p0_fields,
-    reject_explicit_paid_provider_fields,
+    reject_explicit_p8_video_fields,
     validate_paid_provider_manifest,
     validate_provider_attempt,
 )
 from ai_video.production._state_lifecycle import ReviewAttemptPhase, StateCommitStatus
+from ai_video.production.vidu_ad_contracts import AdGenerationState, validate_ad_attempt
+from ai_video.production._provider_manifest_fields import reject_unsupported_provider_fields
 
 
 def _immutable_mapping(value: dict) -> _ImmutableDict:
@@ -1348,6 +1348,7 @@ class StateCommitAttempt(StrictModel):
     review_phase: ReviewAttemptPhase | None = None
     paid_provider_state: PaidProviderAttemptState | None = None
     video_generation_state: VideoGenerationAttemptState | None = None
+    ad_generation_state: AdGenerationState | None = None
     started_at: str
     finished_at: str | None = None
     error_code: str | None = None
@@ -1355,6 +1356,7 @@ class StateCommitAttempt(StrictModel):
 
     @model_validator(mode="after")
     def _validate_terminal_error(self) -> "StateCommitAttempt":
+        validate_ad_attempt(self)
         p5_graph_fields_present = any(
             value is not None
             for value in (
@@ -1483,6 +1485,8 @@ class StateCommitAttempt(StrictModel):
             data.pop("paid_provider_state", None)
         if self.video_generation_state is None:
             data.pop("video_generation_state", None)
+        if self.ad_generation_state is None:
+            data.pop("ad_generation_state", None)
         return data
 
 
@@ -1698,11 +1702,7 @@ class ProductionManifest(_caption_review.CaptionManifestMixin, _generation_histo
     def _reject_explicit_paid_provider_fields_in_old_versions(
         cls, value: object
     ) -> object:
-        return reject_explicit_p0_fields(
-            reject_explicit_paid_provider_fields(
-                reject_explicit_commercial_source_fields(value)
-            )
-        )
+        return reject_unsupported_provider_fields(value)
 
     @model_validator(mode="before")
     @classmethod

@@ -51,6 +51,13 @@ class _StateCommitRecoveryAttemptsMixin:
             ):
                 repaired.append(attempt)
                 continue
+            if attempt.operation == "ad_generation":
+                # Accepted external tasks are resumed only by explicit query/fetch;
+                # the shared paid recovery seals interrupted submit intents unknown.
+                from ai_video.production.vidu_ad_reader import verify_ad_evidence
+                verify_ad_evidence(self._project_root, manifest)
+                repaired.append(attempt)
+                continue
             if attempt.operation == "image_generation":
                 replacement, image_items = self._recover_image_attempt(
                     manifest, attempt

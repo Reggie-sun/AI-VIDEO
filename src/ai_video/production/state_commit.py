@@ -236,6 +236,7 @@ from ._state_commit_render_support import _StateCommitRenderSupportMixin
 from ._state_commit_review import _StateCommitReviewMixin
 from ._state_commit_transaction import _StateCommitTransactionMixin
 from ._state_commit_video import _StateCommitVideoMixin
+from ._state_commit_ad import _StateCommitAdMixin
 from ._state_commit_generation_feedback import _StateCommitGenerationFeedbackMixin
 from ._state_commit_generation_rejection import _StateCommitGenerationRejectionMixin
 from ._state_commit_generation_history import _StateCommitGenerationHistoryMixin
@@ -272,6 +273,7 @@ class ProductionStateCommitter(
     _StateCommitCommercialSourceMixin,
     _StateCommitCommercialSourceRecoveryMixin,
     _StateCommitVideoMixin,
+    _StateCommitAdMixin,
     _StateCommitGenerationFeedbackMixin,
     _StateCommitGenerationRejectionMixin,
     _StateCommitGenerationHistoryMixin,

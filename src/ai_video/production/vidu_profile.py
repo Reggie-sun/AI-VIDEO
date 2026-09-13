@@ -92,6 +92,25 @@ class ViduProviderProfile(StrictModel):
         )
 
 
+class ViduAdProviderProfile(ViduProviderProfile):
+    """Explicit service profile; its ceiling covers one whole-ad create request."""
+
+    service: Literal["ad-one-click"] = "ad-one-click"
+
+    @model_validator(mode="after")
+    def _domestic_ad(self):
+        if self.origin != "https://api.vidu.cn":
+            raise ValueError("Vidu ad service requires the documented domestic endpoint")
+        return self
+
+    def pointer(self) -> ProviderProfilePointer:
+        digest = canonical_sha256(self.model_dump(mode="json"))
+        return ProviderProfilePointer(
+            profile_id="vidu-official-ad", profile_version="vidu-ad-1",
+            profile_path=Path(f"provider-profiles/{digest}.json"), profile_sha256=digest,
+        )
+
+
 def vidu_capabilities() -> VideoProviderCapabilities:
     variants = []
     for model in VIDU_MODEL_IDS:

@@ -75,7 +75,7 @@ class PaidProviderEgressItem(_PaidStrictModel):
 
 class PaidProviderCallPreview(_PaidStrictModel):
     attempt_id: str = Field(pattern=_SAFE_SHORT_ID.pattern)
-    operation: Literal["voice_generation", "video_generation"]
+    operation: Literal["voice_generation", "video_generation", "ad_generation"]
     provider_kind: str = Field(pattern=_SAFE_SHORT_ID.pattern)
     model_id: str = Field(pattern=_SAFE_SHORT_ID.pattern)
     request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")

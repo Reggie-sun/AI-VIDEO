@@ -266,6 +266,8 @@ def _load_paid_provider_no_effect_reconciliation(
 
 
 def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> None:
+    from ai_video.production.vidu_ad_reader import verify_ad_evidence
+    verify_ad_evidence(root, manifest)
     pointer = manifest.active_paid_provider_budget
     paid_attempts = [
         item for item in manifest.attempts if item.paid_provider_state is not None
@@ -312,10 +314,17 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
             and attempt.status
             in {StateCommitStatus.FAILED, StateCommitStatus.INTERRUPTED}
         )
+        accepted_ad_terminal = (
+            attempt.operation == "ad_generation"
+            and attempt.ad_generation_state is not None
+            and state.phase is PaidProviderAttemptPhase.ACCEPTED
+            and attempt.status in {StateCommitStatus.SUCCEEDED, StateCommitStatus.FAILED}
+        )
         if (
             required_status is not None
             and attempt.status is not required_status
             and not accepted_video_terminal
+            and not accepted_ad_terminal
         ):
             raise _invalid("Paid Provider attempt status is inconsistent with its phase.")
         gate = load_paid_provider_gate_receipt(root, state.gate_receipt)

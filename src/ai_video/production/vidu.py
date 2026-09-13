@@ -44,6 +44,7 @@ from ai_video.production.vidu_profile import (
 )
 from ai_video.production.vidu_source import ViduExtensionSource
 from ai_video.production.vidu_download import parse_result_url, stream_public_video
+from ai_video.production.vidu_ad_provider import _ViduAdMethods
 
 
 _MAX_JSON_BYTES = 1_000_000
@@ -157,7 +158,7 @@ class _SourceVerificationSink:
         pass
 
 
-class ViduVideoProvider:
+class ViduVideoProvider(_ViduAdMethods):
     def __init__(self, *, profile: ViduProviderProfile, transport: ViduTransport,
                  credential: Callable[[], str],
                  image_resolver: Callable[[VideoImageReferenceBinding], bytes] | None = None,
@@ -474,6 +475,29 @@ class ViduVideoProvider:
         if (state is not VideoTaskState.SUCCEEDED or creation_id is None or url is None
                 or self._file_id(task_id, creation_id) != observation.provider_file_id):
             raise _error("Vidu result identity changed.")
+        artifact_sha256, size = self._stream_mp4(url, sink)
+        fetched_at = self._now()
+        materialization = None
+        if self._profile.result_trust == "authenticated_task":
+            materialization = RemoteMediaMaterializationReceipt.create(
+                transport_kind="provider_output_https", provider_kind="vidu",
+                model_id=submission.provider_task_binding.response_model_id,
+                submission_fingerprint=submission.submission_fingerprint,
+                paid_submit_receipt_fingerprint=submission.paid_submit_receipt_fingerprint,
+                provider_file_id=observation.provider_file_id,
+                remote_origin=parse_result_url(url).origin,
+                remote_locator_sha256=hashlib.sha256(url.encode()).hexdigest(),
+                artifact_sha256=artifact_sha256, artifact_size_bytes=size,
+                artifact_mime_type="video/mp4", accessibility_verification="exact_get",
+                verified_at=fetched_at,
+            )
+        return VideoFetchReceipt.create(
+            submission=submission, observation=observation, content_type="video/mp4",
+            size_bytes=size, artifact_sha256=artifact_sha256, fetched_at=fetched_at,
+            remote_materialization=materialization,
+        )
+
+    def _stream_mp4(self, url: str, sink: BinaryIO) -> tuple[str, int]:
         request = ViduTransportRequest("GET", self._result_url(url), {"accept": "video/mp4"})
         size, prefix, digest = 0, bytearray(), hashlib.sha256()
         declared = None
@@ -504,23 +528,4 @@ class ViduVideoProvider:
                 or (declared is not None and declared != size)):
             raise _error("Vidu download is not a complete MP4.", ErrorCode.VIDEO_ARTIFACT_INVALID)
         sink.flush()
-        fetched_at = self._now()
-        materialization = None
-        if self._profile.result_trust == "authenticated_task":
-            materialization = RemoteMediaMaterializationReceipt.create(
-                transport_kind="provider_output_https", provider_kind="vidu",
-                model_id=submission.provider_task_binding.response_model_id,
-                submission_fingerprint=submission.submission_fingerprint,
-                paid_submit_receipt_fingerprint=submission.paid_submit_receipt_fingerprint,
-                provider_file_id=observation.provider_file_id,
-                remote_origin=parse_result_url(url).origin,
-                remote_locator_sha256=hashlib.sha256(url.encode()).hexdigest(),
-                artifact_sha256=digest.hexdigest(), artifact_size_bytes=size,
-                artifact_mime_type="video/mp4", accessibility_verification="exact_get",
-                verified_at=fetched_at,
-            )
-        return VideoFetchReceipt.create(
-            submission=submission, observation=observation, content_type="video/mp4",
-            size_bytes=size, artifact_sha256=digest.hexdigest(), fetched_at=fetched_at,
-            remote_materialization=materialization,
-        )
+        return digest.hexdigest(), size
