@@ -2,11 +2,25 @@ from __future__ import annotations
 
 from enum import Enum
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import (
+    BaseModel, ConfigDict, Field, ValidationInfo, field_validator, model_validator,
+)
 
 
 class _StrictModel(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+
+    @field_validator(
+        "claim_reference_ids", "avoidance_target_ids", "keyword_emphasis",
+        "brand_token_ids", "sound_cue_ids", mode="before", check_fields=False,
+    )
+    @classmethod
+    def _json_reference_arrays(cls, value: object, info: ValidationInfo) -> object:
+        # Parent before-validators materialize JSON arrays as Python lists.
+        # Preserve JSON tuple semantics without accepting lists in Python mode.
+        if info.mode == "json" and isinstance(value, list):
+            return tuple(value)
+        return value
 
 
 class GraphicRole(str, Enum):

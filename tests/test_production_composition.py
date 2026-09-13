@@ -14,6 +14,7 @@ from ai_video.production.composition import _sample_at_frame, resolve_compositio
 from ai_video.production.hashing import seal_artifact
 from ai_video.production.commercial_graphics import (
     GraphicAnimation,
+    GraphicKeywordEmphasis,
     GraphicLayerAnimation,
     GraphicRole,
     GraphicTreatment,
@@ -288,6 +289,54 @@ def test_composition_22_resolves_image_graphic_over_generated_video_and_text(
     assert graphic.claim_reference_ids == ("claim-net-odor",)
     assert (graphic.start_frame, graphic.end_frame_exclusive) == (3, 27)
     assert (graphic.start_sample, graphic.end_sample) == (6_000, 54_000)
+
+
+@pytest.mark.parametrize("resolved", [False, True])
+def test_commercial_graphics_roundtrip_in_versioned_json(
+    tmp_path: Path, resolved: bool,
+) -> None:
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    loaded, spec = _with_video_and_product_graphic(tmp_path, loaded, spec)
+    graphic = spec.commercial_graphics[0].model_copy(update={
+        "avoidance_target_ids": ("rider",),
+        "keyword_emphasis": (
+            GraphicKeywordEmphasis(text="气味", brand_token_id="orange"),
+        ),
+        "brand_token_ids": ("orange",),
+        "sound_cue_ids": ("music",),
+    })
+    spec = seal_artifact(spec.model_copy(update={"commercial_graphics": (graphic,)}))
+    artifact = (
+        resolve_composition(loaded, spec, renderer_version="0.7.103")
+        if resolved else spec
+    )
+
+    assert type(artifact).model_validate_json(artifact.model_dump_json()) == artifact
+
+
+@pytest.mark.parametrize("invalid", ["claim", [1], None])
+def test_commercial_graphics_json_rejects_invalid_reference_arrays(
+    tmp_path: Path, invalid: object,
+) -> None:
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    _, spec = _with_video_and_product_graphic(tmp_path, loaded, spec)
+    payload = spec.model_dump(mode="json")
+    payload["commercial_graphics"][0]["claim_reference_ids"] = invalid
+
+    with pytest.raises(ValueError):
+        CompositionSpec.model_validate_json(json.dumps(payload))
+
+
+def test_commercial_graphics_python_reference_arrays_stay_strict(
+    tmp_path: Path,
+) -> None:
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    _, spec = _with_video_and_product_graphic(tmp_path, loaded, spec)
+    payload = spec.commercial_graphics[0].model_dump(mode="python")
+    payload["claim_reference_ids"] = ["claim"]
+
+    with pytest.raises(ValueError, match="claim_reference_ids"):
+        GraphicTreatment.model_validate(payload)
 
 
 def test_composition_22_rejects_commercial_graphic_outside_its_shot(
