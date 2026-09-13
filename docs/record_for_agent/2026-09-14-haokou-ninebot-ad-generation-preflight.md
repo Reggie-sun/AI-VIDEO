@@ -57,9 +57,12 @@ ASR同音错字不作为口播地点读错的证据；本片仍是生成式品�
 - 回归测试先复现两个roundtrip失败；修复后composition/ad-creative focused tests
   105 passed，另有6个聚焦边界测试通过。`reviewer_xhigh`独立复现旧代码错误、
   验证真实封存对象及54个非法输入，verdict `accept`。代码commit：`e30e8fd`。
-  exact-commit完整验证receipt：
-  `.agent/harness/runs/haokou-graphics-json-fix-20260914/receipt.json`；
-  各mandatory check状态由该receipt记录，focused tests不替代它。
+  首次完整套件976 passed、3 skipped，所有check通过，但parent在验证期间提交记录
+  改变了HEAD，故总receipt按scope freshness规则正确失败，不能作为完成凭证。
+  该历史保留在`.agent/harness/runs/haokou-graphics-json-fix-20260914/receipt.json`。
+  最终固定提交范围完整验证receipt：
+  `.agent/harness/runs/haokou-ad-final-snapshot-20260914/receipt.json`；
+  各mandatory check状态由该receipt记录，测试通过不替代snapshot freshness。
 - canonical成功attempt为`composed-production-28s`中的`haokou-28s-render-02`，
   render state hash `8f7f279e748d5cf318733f0776e137d65bf42afe6ab0dac99f93d2c9d279df0e`。
   旧本地失败attempt和未验收diagnostic render保留，不作为交付结果。
