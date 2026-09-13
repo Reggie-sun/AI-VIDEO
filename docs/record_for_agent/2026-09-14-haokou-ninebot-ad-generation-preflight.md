@@ -8,6 +8,49 @@ learning_eligibility: ineligible
 
 Date: 2026-09-14
 
+## Timed-Graphics Repair — 2026-09-14
+
+用户明确否定下方 28 秒“修正版”的常驻顶栏、底栏与念稿式配音，并要求广告文字
+随镜头短暂出现、随后消失。旧版的技术验证仍有效，但其创意交付状态已被本节取代；
+不得把旧版技术通过写成用户审美验收。
+
+当前本地节奏版：`runs/haokou-ninebot-ad-v4-20260914/delivery/潜江市浩口9号电动车-节奏版.mp4`，
+SHA256 `ca61e10ddd5a4221514f4e04ad50894a6bce484459727e1258c88a01ea45a24b`，
+36,814,053 bytes；H.264 1080×1920、24fps、672frames，AAC 48kHz stereo，
+容器时长 28.022 秒。交付副本与 canonical render output 字节哈希一致；
+`composed-production-28s` 的 `haokou-v4-render-01` 通过 HyperFrames check、render
+及输出验证，并由唯一 committer 更新本次独立 Production Project 的 render state。
+这不是 Vidu source candidate activation、P6 或用户最终验收。
+
+本次没有新增 Vidu、语音 Provider 或其他付费 submit。沿用上一轮已生成、未验收的
+同一人物/车源画面；前 6 秒裁掉源视频自带的立体店名，片尾以白底遮盖生成错误的
+“月990”、假网址与右边缘伪影。商业图文通过 `AdCreativePlan`、`CompositionSpec`、
+`ResolvedTimeline` 和 HyperFrames 按帧出现：0.5–3.5 秒问题钩子、6–8.75 秒
+感应解锁、9–11.5 秒上车、16.5–19 秒离车锁车；23.5 秒起的独立片尾展示
+“潜江市浩口9号电动车”及“到店试骑”。功能条件“需在 APP 设置、以实车为准”
+只在片尾展示。中间镜头留白，取消常驻商业字条。
+
+旧 Vidu 旁白及其混合原声已从最终 P4 audio track 移除；本版明确采用**无口播的
+音乐驱动广告**，不能声称已生成更自然的配音。唯一音轨是经登记的 BGM，
+来源为 Mixkit 的 `Cat Walk`（Arulo），原始 MP3 SHA256
+`e241cba000ce12e52cadd4c9956274e391ef1f66d1e48a5dd40bfc21645aa489`；
+来源页 `https://mixkit.co/free-stock-music/tag/technology/`，许可页
+`https://mixkit.co/license/#musicFree`。本地取 14–42 秒、规范化并淡入淡出为
+28 秒 PCM WAV，再由 P4 合成；没有从源 MP4 直接 mux 原声。
+
+首个本地图文渲染 attempt 显示现有 `_decimal_milli` 对以零结尾的百分比值
+序列化异常，例如宽度 `600` 变成 `6%`，导致文字竖排重叠、HyperFrames check
+拒绝。任务版将受影响宽度设为 `601`/`901` 后重新渲染；未改动共享源码，
+此通用序列化缺陷仍需单独代码修复和回归验证。下一版预检又发现源视频开场
+残留旧字和片尾右缘伪影，于是产生当前 v4；失败/中间版本均不作为交付。
+
+本轮对最终 exact MP4 实际调用 project-local `video_analyze`，核实 8 帧及
+音视频元数据；另人工抽看 0.5、1.5、3、6.5、8、9.5、10.5、14、
+16.5、17.5、20、23.5、24.5、27 秒，确认关键短句按镜头出现并消失、
+无常驻顶底栏，错误价格/网址在片尾不可见。此为本机技术与抽样视觉检查，
+不是用户对字体、音乐或广告效果的认可；原生成车辆也未被证明是具体 SKU
+的实拍外观。视频仅本地交付，未上传、投放、push 或 release。
+
 ## Repair Delivery — 2026-09-14
 
 用户随后明确要求“修正”。本节取代下方旧版“没有修正版”的当前状态；原始失败
