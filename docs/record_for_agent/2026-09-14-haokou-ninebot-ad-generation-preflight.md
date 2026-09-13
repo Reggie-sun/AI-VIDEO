@@ -8,6 +8,68 @@ learning_eligibility: ineligible
 
 Date: 2026-09-14
 
+## Repair Delivery — 2026-09-14
+
+用户随后明确要求“修正”。本节取代下方旧版“没有修正版”的当前状态；原始失败
+attempt及DNS证据继续作为历史保留。新修正版已通过canonical HyperFrames render
+verification，由committer激活render state；这不是原始Provider candidate activation，
+也不是P6、用户验收或发布。
+
+修正版：`runs/haokou-ninebot-ad-repair01-20260914/delivery/潜江市浩口9号电动车-修正版.mp4`。
+SHA256：`9cdc9f00db62a17819d150a713116dfd55a9a2d73ab2ff30c916e3f92ef7562a`；
+30,001,372 bytes，1080×1920，24fps，672frames，视频28秒，容器28.022秒，
+H.264 + AAC 48kHz stereo。交付副本与canonical output逐字节SHA一致。
+
+本次新的有限repair授权只执行一次Vidu `ad-one-click` generation POST，task
+`996764199801622528`，request SHA256
+`5973dd578374883f3a5b6f9bc30dc161a193cc2d730a7e4ea3f99e39eef9f176`。
+保留1000 CNY本地safety allocation及submit ceiling=1，不是价格声明；未追加远程
+variants。参考包括官方商品图及第一版6秒角色帧；新source candidate SHA256
+`9c980b14730c300feb193daad52849737faee6129606f43768e7744f7f84fb39`。
+修复后的系统DNS可正常完成canonical fetch，无本轮进程DNS override。
+
+新source改善了人物白头盔、橙黑白外套连续性，但尾卡生成了“月990”及无关网址，
+不能直接交付。通过独立真实import project登记静音visual及原始旁白/音乐混合PCM，
+由唯一`ResolvedTimeline`及P4混音进入HyperFrames；未把旁白混合音轨伪称BGM，
+未使用FFmpeg drawtext/direct mux替代final renderer。源预处理只做画幅、帧率和
+末帧补齐到28秒，原声保留到28秒。
+
+最终门店标题在4秒与22秒切换字号，骑行段避让头部，尾卡完整覆盖错误文字；
+底栏保留“感应解锁 · 离车自动锁”、APP预先设置条件和“欢迎到店体验”。
+`video_analyze`对最终exact MP4实际执行，抽查0–26秒每2秒共14帧，另查27.9秒；
+人物头盔/服装、文字、尾卡覆盖及技术音视频检查通过。
+证据位于同run的`review/final-analysis.json`、`final-review.json`、`final-last-frame.jpg`。
+ASR同音错字不作为口播地点读错的证据；本片仍是生成式品牌广告，不声称精确SKU
+实拍还原。用户主观认可和正式P6仍未评估。
+
+## Repair Runtime Findings
+
+- 缓存Chrome146在实际seek时出现`PIPELINE_ERROR_DISCONNECTED`，视频像素不变，
+  HyperFrames正确报`sweep_static`。同一source改用既有`browser_path`指向本机
+  Chrome149.0.7827.53后check通过；没有修改node_modules或禁用检查。
+- 671帧输出的有效音频比timeline少16samples，严格audio verification拒绝；
+  改为目标内的完整28秒/672帧后通过，没有放宽sample contract。
+- Pydantic严格JSON重读`CompositionSpec`/`ResolvedTimeline`时，parent before-validator
+  已将嵌套JSON数组物化为Python list，五类graphic tuple字段拒绝自己的序列化输出。
+  唯一代码修复在`commercial_graphics.py::_StrictModel._json_reference_arrays`：
+  仅JSON模式把这五类数组转tuple，继续检查元素类型，Python strict语义不变。
+  未修改其他会话的`composition_contracts.py`、`models.py`或paid/voice writer。
+- 回归测试先复现两个roundtrip失败；修复后composition/ad-creative focused tests
+  105 passed，另有6个聚焦边界测试通过。`reviewer_xhigh`独立复现旧代码错误、
+  验证真实封存对象及54个非法输入，verdict `accept`。代码commit：`e30e8fd`。
+  exact-commit完整验证receipt：
+  `.agent/harness/runs/haokou-graphics-json-fix-20260914/receipt.json`；
+  各mandatory check状态由该receipt记录，focused tests不替代它。
+- canonical成功attempt为`composed-production-28s`中的`haokou-28s-render-02`，
+  render state hash `8f7f279e748d5cf318733f0776e137d65bf42afe6ab0dac99f93d2c9d279df0e`。
+  旧本地失败attempt和未验收diagnostic render保留，不作为交付结果。
+
+按`record-ai-video-session`更新本记录并执行`distill-ai-video-learning`评估：
+`no_candidate`。当前是依赖原始角色帧的repair链，同时改变prompt/reference和本地
+图文策略，未形成可隔离归因的新跨实验模型能力结论；局部兼容故障由代码、回归测试
+及本次runtime证据记录，不自动扩大为Provider策略。未修改学习target或刷新RAG。
+交付仅在本机；其他staged/dirty文件保持原状，无push/release。
+
 ## Supersession And Live Result — 2026-09-14
 
 下方缺少 operator ceiling 的停止点及 `Next Action` 已成为历史。用户随后回复
@@ -28,7 +90,7 @@ SHA256即文件名；12,944,384 bytes，1080×1920，24fps，672frames，28.010�
 H.264 + AAC 48kHz mono。project-local `video_analyze` 与 `video_extract_frames`
 均实际执行；原始分析和抽帧在同run的 `review/`。
 
-媒体判定 **FAIL**：4秒戴头盔角色与8秒未戴头盔骑行角色/服装变化；
+媒体判定 **FAIL**：6秒戴头盔角色与10秒未戴头盔骑行角色/服装变化；
 24秒与26.5秒尾卡没有要求的“潜江市浩口9号电动车”文字。
 ASR存在明显同音识别错误，不能据其单独认定旁白念错地点；音频口播精确性仍未验收。
 有声可播放与Provider success不等于创意、质量或Production Final Acceptance。
