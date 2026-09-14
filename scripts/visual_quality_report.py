@@ -27,6 +27,7 @@ from ai_video.production.visual_quality import VisualDirection, VisualFrameRefer
 
 LABELS = {"typography": "字体与阅读", "palette": "配色", "layout": "排版与主体",
           "style": "画风一致性", "holistic": "全片观感"}
+CONTENT_LABELS = {"advertising": "广告", "drama": "电视剧"}
 
 
 class ReviewAnswer(StrictModel):
@@ -79,6 +80,8 @@ def prepare(video: Path, direction: VisualDirection, output: Path, timestamps: t
     packet = {"schema_version": "visual-review-packet/1", "authority": "development_only",
         "video_path": str(video), "video_sha256": before, "video_size_bytes": video.stat().st_size,
         "duration_ms": duration_ms, "contract": contract.model_dump(mode="json"), "frames": frames}
+    if direction.content_kind is not None:
+        packet["content_kind"] = direction.content_kind
     packet["subject_hash"] = canonical_sha256(packet)
     write_json(output / "packet.json", packet)
     observation = {"contract_hash": contract.contract_hash,
@@ -107,6 +110,12 @@ def reopen(output: Path):
     contract = FinalOutputContract.model_validate(packet["contract"])
     if {r.visual_dimension for r in contract.requirements} != set(LABELS):
         raise ValueError("Packet must retain all five visual requirements")
+    kind = packet.get("content_kind")
+    if "content_kind" in packet and (not isinstance(kind, str) or kind not in CONTENT_LABELS):
+        raise ValueError("Unknown visual content kind")
+    prefix = "visual" if kind is None else f"visual.{kind}"
+    if any(r.requirement_id != f"{prefix}.{r.visual_dimension}" for r in contract.requirements):
+        raise ValueError("Content kind differs from sealed visual requirements")
     for frame in packet["frames"]:
         path = output / frame["path"]
         if not path.resolve().is_relative_to((output / "frames").resolve()):
@@ -148,6 +157,8 @@ def check(output: Path, answers: Path):
         "video_sha256": packet["video_sha256"], "answers_sha256": file_hash(answers),
         "evaluator_name": answer.evaluator_name, "strength": answer.strength.value,
         "findings": [f.model_dump(mode="json") for f in source.findings]}
+    if "content_kind" in packet:
+        result["content_kind"] = packet["content_kind"]
     write_json(output / "result.json", result)
     (output / "report.html").write_text(render_html(packet, contract, result), encoding="utf-8")
     return result
@@ -176,7 +187,7 @@ main{{max-width:1240px;margin:auto;padding:48px 24px}}h1{{font-size:38px;line-he
 .identity{{overflow-wrap:anywhere;font:12px/1.8 monospace}}section{{margin-top:36px}}
 @media(max-width:720px){{.grid{{grid-template-columns:1fr}}.frames{{grid-template-columns:repeat(2,1fr)}}h1{{font-size:30px}}}}</style>
 <main><div class="eyebrow">VISUAL REVIEW / 成片整体视觉</div><h1>让视觉问题有据可查</h1>
-<p>{escape(Path(packet["video_path"]).name)} · {packet["duration_ms"] / 1000:.3f}s</p>
+<p>{escape(Path(packet["video_path"]).name)} · {packet["duration_ms"] / 1000:.3f}s · {CONTENT_LABELS.get(packet.get("content_kind"), "历史未分类方向")}</p>
 <p class="{result["verdict"]}"><strong>本次视觉检查：{result["verdict"].upper()}</strong></p>
 <p class="muted">开发侧评审报告。截图不证明全片观看；本报告不写入 Production 验收状态。
 下方单项标签是评审者的原始回答，最终结论还会检查证据与观看要求。</p>
@@ -192,6 +203,7 @@ def main(argv=None):
     prep = sub.add_parser("prepare")
     prep.add_argument("--video", type=Path, required=True)
     prep.add_argument("--direction", type=Path, required=True)
+    prep.add_argument("--content-kind", choices=tuple(CONTENT_LABELS), required=True)
     prep.add_argument("--output", type=Path, required=True)
     prep.add_argument("--timestamps-ms", type=int, nargs="+", required=True)
     review = sub.add_parser("check")
@@ -200,8 +212,10 @@ def main(argv=None):
     args = parser.parse_args(argv)
     try:
         if args.command == "prepare":
-            result = prepare(args.video, VisualDirection.model_validate_json(args.direction.read_text()),
-                args.output, tuple(args.timestamps_ms))
+            direction = VisualDirection.model_validate_json(args.direction.read_text())
+            if direction.content_kind != args.content_kind:
+                raise ValueError("Explicit content kind must match the direction file")
+            result = prepare(args.video, direction, args.output, tuple(args.timestamps_ms))
         else:
             result = check(args.packet, args.answers)
     except (ValueError, OSError, KeyError, subprocess.SubprocessError) as exc:

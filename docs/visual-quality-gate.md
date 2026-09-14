@@ -8,6 +8,24 @@ Review / Repair 和 `ProductionStateCommitter` 裁决并持久化。没有新增
 
 ## Authoring
 
+新建开发报告必须显式区分 `advertising` 与 `drama`，不能共用一份字体审美方向：
+[广告方向](../configs/visual-quality/advertising.json)关注商业标题、品牌、CTA和条件说明；
+[电视剧方向](../configs/visual-quality/drama.json)关注对白连续阅读、稳定位置、表演避让与
+题材画风，并将片名等展示字与对白字幕分开。两份文件是独立 authoring 起点，不是
+自动分类器或普遍适用的字体白名单；仍需根据具体作品明确字体、字号和观看标准。
+
+`VisualDirection.content_kind` 显式声明类型后，factory 生成
+`visual.advertising.<dimension>` 或 `visual.drama.<dimension>` requirement IDs。
+即使方向文案相同，contract hash 也不同；广告证据不能通过电视剧合同的原有
+exact identity 校验。选对作品类型由 authoring caller 负责，Gate 不从 MP4 猜类型。
+两类共用 bytes、抽帧引用与完整观看校验，仍使用唯一 SEMANTIC / Final Acceptance
+owner；电视剧对白准确性和同步仍由原 CAPTION Gate 负责，本次没有替换它。
+
+兼容：已有未分类 `VisualDirection` 在 Python API 中继续可读，缺省字段不序列化，
+旧 requirement ID、已封存 packet 和 `check` 行为不变。新私有 `prepare` CLI 要求
+`--content-kind` 且必须与方向文件一致；旧创建命令需补该参数及显式分类的方向文件，
+不能依靠默认广告类型。此变更不增加或改变公共 `ai-video` CLI 命令。
+
 `visual_quality.VisualDirection` 保存五项具体期望，`visual_requirements(direction)`
 将其转换为普通 `FinalOutputRequirement`，合并进完整用户目标的 requirements；
 不得替换或删掉原音频、动作、叙事等要求。新 `visual_dimension` 可选，缺省不序列化，
@@ -43,6 +61,7 @@ Production Manifest、Registry、ReviewReceipt 或 FinalAcceptanceReceipt。
 ```bash
 python -m scripts.visual_quality_report prepare \
   --video /absolute/path/video.mp4 \
+  --content-kind advertising \
   --direction configs/visual-quality/ninebot.json \
   --output /absolute/path/new-review-folder \
   --timestamps-ms 1000 3000 6000 9000 15000 21000 24000 27000
@@ -51,6 +70,9 @@ python -m scripts.visual_quality_report check \
   --packet /absolute/path/new-review-folder \
   --answers /absolute/path/new-review-folder/observations.json
 ```
+
+电视剧使用 `--content-kind drama --direction configs/visual-quality/drama.json`。
+类型缺失或冲突在抽帧和创建报告目录前拒绝；改变类型需新合同、新 packet 和新评审。
 
 先打开 `report.html` 看方向和截图，再复制 `observations.template.json` 填写实际
 评审。帧引用必须来自 packet；未观察到的项目保持 not_evaluated，不能为了通过

@@ -90,3 +90,54 @@ def test_sampled_agent_answers_do_not_manufacture_holistic_pass(packet):
     write_json(path, data)
     assert check(packet, path)["verdict"] == "fail"
     assert "<script>" not in (packet / "report.html").read_text()
+
+
+def test_new_cli_requires_explicit_matching_genre_before_media_effects(tmp_path, capsys):
+    from scripts.visual_quality_report import main
+    config = tmp_path / "direction.json"
+    output = tmp_path / "out"
+    args = ["prepare", "--video", str(tmp_path / "missing.mp4"), "--direction", str(config),
+        "--output", str(output), "--timestamps-ms", "0"]
+    write_json(config, {**direction().model_dump(), "content_kind": "advertising"})
+    with pytest.raises(SystemExit) as exc:
+        main(args)
+    assert exc.value.code == 2
+    assert main(args + ["--content-kind", "drama"]) == 2
+    assert "Explicit content kind must match" in capsys.readouterr().out
+    assert not output.exists()
+    write_json(config, direction().model_dump())
+    assert main(args + ["--content-kind", "advertising"]) == 2
+    assert not output.exists()
+
+
+def test_genre_packet_labels_and_cross_genre_answers(packet, tmp_path):
+    from ai_video.production.visual_quality import VisualDirection
+    original = json.loads((packet / "packet.json").read_text())
+    outputs = []
+    for kind in ("advertising", "drama"):
+        output = tmp_path / kind
+        authored = VisualDirection.model_validate({**direction().model_dump(), "content_kind": kind})
+        prepare(Path(original["video_path"]), authored, output, (0, 1000))
+        assert json.loads((output / "packet.json").read_text())["content_kind"] == kind
+        assert ("电视剧" if kind == "drama" else "广告") in (output / "report.html").read_text()
+        outputs.append(output)
+    with pytest.raises(ValueError):
+        check(outputs[1], answers(outputs[0]))
+
+
+def test_matching_genre_cli_creates_bound_packet_and_rejects_removed_label(packet, tmp_path):
+    from scripts.visual_quality_report import main, reopen
+    from ai_video.production.hashing import canonical_sha256
+    source = json.loads((packet / "packet.json").read_text())["video_path"]
+    config = tmp_path / "ad.json"
+    write_json(config, {**direction().model_dump(), "content_kind": "advertising"})
+    output = tmp_path / "ad"
+    assert main(["prepare", "--video", source, "--direction", str(config), "--content-kind",
+        "advertising", "--output", str(output), "--timestamps-ms", "0", "1000"]) == 0
+    saved = json.loads((output / "packet.json").read_text())
+    assert saved["content_kind"] == "advertising"
+    del saved["content_kind"]
+    saved["subject_hash"] = canonical_sha256({k: v for k, v in saved.items() if k != "subject_hash"})
+    write_json(output / "packet.json", saved)
+    with pytest.raises(ValueError, match="Content kind differs"):
+        reopen(output)

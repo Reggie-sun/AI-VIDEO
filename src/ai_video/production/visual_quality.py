@@ -5,29 +5,38 @@ No aesthetic classifier, media execution, aggregate score, or lifecycle state.
 
 from typing import Literal
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_serializer, model_validator
 
 from ai_video.production.artifact_contracts import StrictModel
 
 VisualDimension = Literal["typography", "palette", "layout", "style", "holistic"]
+VisualContentKind = Literal["drama", "advertising"]
 VISUAL_DIMENSIONS = ("typography", "palette", "layout", "style", "holistic")
 
 
 class VisualDirection(StrictModel):
     """Concrete authored expectations; the resulting QA requirements own them."""
 
+    content_kind: VisualContentKind | None = None
     typography: str = Field(min_length=1)
     palette: str = Field(min_length=1)
     layout: str = Field(min_length=1)
     style: str = Field(min_length=1)
     holistic: str = Field(min_length=1)
 
-    @field_validator("*")
+    @field_validator("typography", "palette", "layout", "style", "holistic")
     @classmethod
     def _nonblank(cls, value):
         if not value.strip():
             raise ValueError("Visual direction must describe an observable expectation")
         return value
+
+    @model_serializer(mode="wrap")
+    def _legacy_direction_bytes(self, handler):
+        data = handler(self)
+        if self.content_kind is None:
+            data.pop("content_kind", None)
+        return data
 
 
 class VisualFrameReference(StrictModel):
@@ -56,8 +65,9 @@ def visual_requirements(direction: VisualDirection):
     """Author five ordinary final-output requirements without selecting QA."""
     from ai_video.production.final_output_contracts import FinalOutputRequirement
 
+    prefix = "visual" if direction.content_kind is None else f"visual.{direction.content_kind}"
     return tuple(FinalOutputRequirement(
-        requirement_id=f"visual.{dimension}",
+        requirement_id=f"{prefix}.{dimension}",
         observable=getattr(direction, dimension),
         proof="human" if dimension == "holistic" else "evaluator",
         visual_dimension=dimension,

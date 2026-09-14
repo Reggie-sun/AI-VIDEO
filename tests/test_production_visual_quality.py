@@ -110,6 +110,31 @@ def test_visual_factory_keeps_holistic_human_and_legacy_bytes_unchanged():
         VisualDirection.model_validate({**direction().model_dump(), "layout": "  "})
 
 
+def test_advertising_and_drama_with_identical_prose_have_distinct_contracts():
+    policies = []
+    for kind in ("advertising", "drama"):
+        authored = VisualDirection.model_validate({**direction().model_dump(), "content_kind": kind})
+        contract = FinalOutputContract(goal_id="visual", goal_version="1", user_goal="成片整体视觉协调",
+            requirements=visual_requirements(authored))
+        assert contract.requirements[0].requirement_id == f"visual.{kind}.typography"
+        policies.append(seal_artifact(visual_policy().model_copy(update={"final_output": contract})))
+    assert policies[0].final_output.contract_hash != policies[1].final_output.contract_hash
+    ad_evidence = visual_evidence(policies[0])
+    assert judge(policies[0], ad_evidence) is QaVerdict.PASS
+    assert judge(policies[1], ad_evidence) is QaVerdict.NOT_EVALUATED
+    assert "content_kind" not in direction().model_dump(mode="json")
+    assert visual_requirements(direction())[0].requirement_id == "visual.typography"
+
+
+@pytest.mark.parametrize("kind", ["advertising", "drama"])
+def test_genre_rubric_examples_are_explicit_and_distinct(kind):
+    from pathlib import Path
+    config = Path(__file__).resolve().parents[1] / "configs" / "visual-quality" / f"{kind}.json"
+    authored = VisualDirection.model_validate_json(config.read_bytes())
+    assert authored.content_kind == kind
+    assert ("对白" if kind == "drama" else "商业") in authored.typography
+
+
 def test_visual_requirements_reject_duplicate_dimensions_and_downgraded_holistic():
     from ai_video.production.final_output_contracts import FinalOutputRequirement
     requirements = visual_requirements(direction())
