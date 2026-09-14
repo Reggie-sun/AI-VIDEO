@@ -8,6 +8,55 @@ learning_eligibility: ineligible
 
 Date: 2026-09-14
 
+## Scene-Backed Typography Repair — 2026-09-14
+
+用户继续否定 v4 的粗字形和过长白底片尾。本节取代下方“当前本地节奏版”的
+交付指向；v4 的历史技术数据仍有效，用户对 v4 的审美判断为不接受。
+
+当前本地新版：`runs/haokou-ninebot-ad-v8-20260914/delivery/潜江市浩口9号电动车-场景新版.mp4`。
+SHA256 `eac8d741e00db4a438c448b01f5400c5b13cc6ad2a78ede10e0c10434cba55d9`，
+34,374,729 bytes；H.264 1080×1920、24fps、540 frames，AAC 48kHz stereo，
+容器时长 22.522 秒。交付副本与 canonical HyperFrames output 的哈希一致；
+`load_production_project()` 对 v8 和历史 v4 的 active render state 均重新加载成功。
+v7 是同画面字节的中间版，曾在新代码审计中因默认字体 CSS 改动无法重开，
+因此另建 v8 并按最终代码重新封存；v8 output 与此前已抽看的 v7 output
+逐字节相同，旧 v7 state 不作为交付对象。
+
+视觉源沿用同一已生成、未验收的 Vidu source，无新增远程或付费 submit。
+确定性预处理保留原视频 0–20.5 秒、前 6 秒裁掉旧立体店名，再用原视频
+8–10 秒的完整骑行画面回扣为最后 2 秒；长白底产品尾卡完全移除。
+片头和卖点短句随镜头淡入淡出，中间留白；20.5–22.5 秒在骑行画面上出现
+“潜江市浩口9号电动车”“到店试骑”和 APP 设置条件。无常驻白色字条，
+无念稿式配音；保留已登记的 Mixkit `Cat Walk` BGM。
+对相同 SHA256 的 exact MP4 执行 project-local `video_analyze`，并抽看
+0.5–22.35 秒 14 个时间点，最终抽样帧为骑手和车辆，而非深色仪表或白底。
+这仍是本机媒体抽样和技术通过，未得到用户主观认可或 P6 / Final Acceptance。
+生成车辆未证实为具体 SKU 的实拍外观，功能文案以 APP 设置条件限定。
+
+配套代码提交 `9dcf968`、`156bef8` 为 commercial graphic 增加受限数值
+`font_weight`/`letter_spacing_px`，并修正 `width_milli=600` 被误写成 `6%`
+的 CSS 百分比错误。默认字段序列化与 CSS 保持历史输出；renderer audit
+只对全部默认字体的旧 source 接受精确历史百分比格式，不放宽自定义样式校验。
+聚焦 suite 先为 289 passed、3 skipped；审计逻辑收紧后 HyperFrames suite
+为 201 passed、3 skipped。`reviewer_xhigh` 的原阻断意见已修复，定向复审
+为 `accept`。首次 Harness receipt
+`.agent/harness/runs/haokou-v8-typography-20260914/receipt.json` 因
+`ARCH001 oversized-module-growth` 失败；收紧同模块旧候选代码后净减少 1 行。
+最终固定提交范围 Harness 在 987 passed、3 skipped，所有 6 项 mandatory checks
+均 passed 后仍给出 failed receipt：
+`.agent/harness/runs/haokou-v8-typography-final-20260914/receipt.json`。
+原因是另一会话在运行中提交 `4f80d74`，使 `HEAD` 从 `156bef8` 改变；
+`verify-receipt` 明确为 `fresh=false`、`snapshot_matches=false`。
+随后按原固定 `--head-ref 156bef8` 重试，被 Harness 以
+`completion scope is not closure eligible` 拒绝，因为它已不是当前 `HEAD`。
+这些通过的测试是 executable evidence，不构成 fresh passing completion receipt；
+本轮代码的仓库 completion gate 仍未满足，不能称作正式已验证完成。
+
+`record-ai-video-session` 后执行 `distill-ai-video-learning` 评估：
+`no_candidate`。本次是同一个 Provider source 的确定性剪辑与图文修复链，
+不构成独立模型实验或受控多臂比较。未修改 Learning target、刷新 RAG、
+上传、投放、push 或 release；其他会话的 staged/dirty files 保持原状。
+
 ## Timed-Graphics Repair — 2026-09-14
 
 用户明确否定下方 28 秒“修正版”的常驻顶栏、底栏与念稿式配音，并要求广告文字
