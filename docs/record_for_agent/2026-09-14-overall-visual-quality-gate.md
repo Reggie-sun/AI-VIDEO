@@ -69,10 +69,17 @@ snapshot/comparison/dependency checks，得到 `GateResult(findings=())`。这�
 
 ## Closure Boundary
 
-尚无 fresh exact-snapshot passing Harness receipt。现有 Harness 必须创建 detached
-temporary worktree，而当前用户规则要求只有本任务明确授权才能创建；未绕过该限制，
-也未用 working-tree 测试冒充正式 receipt。本轮已完成上述代码、报告与相关验证，
-正式 closure 剩余步骤为授权后运行 exact commit-range Harness 并验证 receipt freshness。
+用户随后明确授权 temporary worktree，正式验证固定在代码 commit
+`4f80d74a41c8f574d97b5ee33bcbe99d0aa84d1a` 的 parent-to-commit delta。
+Harness 10/10 checks passed，包含 Harness 233、CLI/config 13、Production review
+653（388.64s）、final-output/no-regression 52（323.12s）、新增视觉 36（30.01s）
+及 runtime boundary 2 项测试；Architecture 为 0 errors / 0 warnings。
+Receipt：`.agent/harness/runs/visual-quality-4f80d74-20260914/receipt.json`。
+在该 exact commit 的干净 detached checkout 执行 `verify-receipt`，所有字段为 true，
+包括 scope、snapshot、policy、artifact integrity、freshness、cleanup 与完整闭环。
+同目录 `receipt-verification.json` 保存验证结果，整目录逐文件核对 bytes 后归档。
+该证据证明上述固定代码版本；不把当前含其他任务 dirty changes 的主工作区宣称为
+同一 clean snapshot，也不把工程 PASS 转换为现有影片视觉 PASS 或人类 Final Acceptance。
 已有 dirty/staged 工作按 task delta 保留，不将其并入本任务 commit。未 push/release。
 
 ## Learning Evaluation
