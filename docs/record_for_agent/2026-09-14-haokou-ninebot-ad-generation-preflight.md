@@ -8,6 +8,11 @@ learning_eligibility: ineligible
 
 Date: 2026-09-14
 
+## Latest Visual Sample — 2026-09-14
+
+新的用户审看片为 [v11 visual sample](2026-09-14-ninebot-visual-v11.md)。
+下方 v8 保留为历史交付；v11 已重新渲染并验证媒体 bytes，整体人类验收仍未评估。
+
 ## Scene-Backed Typography Repair — 2026-09-14
 
 用户继续否定 v4 的粗字形和过长白底片尾。本节取代下方“当前本地节奏版”的
