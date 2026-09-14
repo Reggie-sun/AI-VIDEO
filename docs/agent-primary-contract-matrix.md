@@ -1,5 +1,17 @@
 # AI-VIDEO Contract Routing Matrix
 
+## Overall Visual Quality
+
+`visual_quality.py` 只提供视觉 authoring 与 evidence 叶类型；五项要求进入原
+`FinalOutputContract`，`final_output_review.py` 在现有 SEMANTIC 路径检查帧引用与
+全片观看声明。`ProductionStateCommitter` 继续独占 QA activation、review 和最终验收。
+旧 visual_dimension 缺省 bytes/hash 不变；无视觉要求的历史政策不追溯改变。
+`scripts/visual_quality_report.py` 仅生成绑定现有 MP4/截图的开发侧 HTML/JSON，
+不是 Production writer 或人类验收 host。详细使用与边界见
+[Visual Quality Gate](visual-quality-gate.md)；focused checks 为
+`tests/test_production_visual_quality.py`、`tests/test_visual_quality_report.py`，
+mandatory routing 由 Harness `visual_quality_tests` 独占。
+
 ## Development Repair Input Admission
 
 `ProductionStateCommitter.bootstrap_repair_input()` 复用既有 atomic bootstrap，是新开发

@@ -166,6 +166,21 @@ def test_final_output_gate_routes_to_real_entry_contract_checks(path):
     assert "tests/test_generation_no_regression.py" in command
 
 
+@pytest.mark.parametrize("path", [
+    "src/ai_video/production/visual_quality.py", "src/ai_video/production/final_output_review.py",
+    "src/ai_video/production/final_output_contracts.py", "tests/test_production_visual_quality.py",
+    "scripts/visual_quality_report.py", "tests/test_visual_quality_report.py",
+    "configs/visual-quality/ninebot.json", "docs/visual-quality-gate.md",
+])
+def test_visual_quality_changes_require_executable_gate_checks(path):
+    policy = agent_harness.load_policy(POLICY_PATH)
+    inspection = agent_harness.inspect_paths([path], policy)
+    assert not inspection["fallback_paths"]
+    assert "visual_quality_tests" in inspection["check_ids"]
+    assert "tests/test_production_visual_quality.py" in policy["checks"]["visual_quality_tests"]["argv"]
+    assert "tests/test_visual_quality_report.py" in policy["checks"]["visual_quality_tests"]["argv"]
+
+
 def test_repository_policy_v2_loads_and_references_known_checks() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 

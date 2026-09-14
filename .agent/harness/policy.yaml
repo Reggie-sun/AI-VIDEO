@@ -89,6 +89,10 @@ fallback_check_ids:
   - task_architecture_gate
 
 checks:
+  visual_quality_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_visual_quality.py, tests/test_visual_quality_report.py, -q]
+    cwd: .
+    description: Verify visual requirements through existing semantic/final acceptance, exact media report binding and missing-review blocking; no Provider calls.
   vidu_ad_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_vidu_ad_wire.py, tests/test_production_vidu_ad_generation.py, tests/test_production_vidu_ad_lifecycle.py, -q]
     cwd: .
@@ -303,6 +307,7 @@ checks:
     timeout_seconds: 1800
     execution_priority: 30
     covers_check_ids:
+      - visual_quality_tests
       - paid_reconciliation_tests
       - vidu_ad_tests
       - repair_input_admission_tests
@@ -687,6 +692,8 @@ categories:
       - task_architecture_gate
   production_review:
     patterns:
+      - src/ai_video/production/visual_quality.py
+      - tests/test_production_visual_quality.py
       - src/ai_video/production/final_output_contracts.py
       - src/ai_video/production/final_output_review.py
       - tests/test_production_final_output.py
@@ -730,6 +737,16 @@ categories:
     check_ids:
       - production_review_tests
       - final_output_no_regression_tests
+      - visual_quality_tests
+      - task_architecture_gate
+  visual_quality_report:
+    patterns:
+      - scripts/visual_quality_report.py
+      - tests/test_visual_quality_report.py
+      - configs/visual-quality/**
+      - docs/visual-quality-gate.md
+    check_ids:
+      - visual_quality_tests
       - task_architecture_gate
   commercial_source_preparation:
     patterns:

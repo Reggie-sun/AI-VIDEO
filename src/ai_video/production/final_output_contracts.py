@@ -6,12 +6,29 @@ from pydantic import Field, model_serializer, model_validator
 
 from ai_video.production.artifact_contracts import StrictModel
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.visual_quality import VISUAL_DIMENSIONS, VisualDimension
 
 
 class FinalOutputRequirement(StrictModel):
     requirement_id: str = Field(min_length=1)
     observable: str = Field(min_length=1)
     proof: Literal["human", "evaluator"]
+    visual_dimension: VisualDimension | None = None
+
+    @model_validator(mode="after")
+    def _visual_proof(self):
+        if self.visual_dimension is not None and not self.observable.strip():
+            raise ValueError("Visual requirements need an observable expectation")
+        if self.visual_dimension == "holistic" and self.proof != "human":
+            raise ValueError("Holistic visual acceptance requires human viewing")
+        return self
+
+    @model_serializer(mode="wrap")
+    def _legacy_bytes(self, handler):
+        result = handler(self)
+        if self.visual_dimension is None:
+            result.pop("visual_dimension", None)
+        return result
 
 
 class FinalOutputContract(StrictModel):
@@ -27,6 +44,11 @@ class FinalOutputContract(StrictModel):
         ids = [item.requirement_id for item in self.requirements]
         if len(ids) != len(set(ids)):
             raise ValueError("final-output requirements must be unique")
+        dimensions = [r.visual_dimension for r in self.requirements if r.visual_dimension]
+        if len(dimensions) != len(set(dimensions)):
+            raise ValueError("final-output visual dimensions must be unique")
+        if dimensions and set(dimensions) != set(VISUAL_DIMENSIONS):
+            raise ValueError("overall visual quality requires all five dimensions")
         return self
 
     @property

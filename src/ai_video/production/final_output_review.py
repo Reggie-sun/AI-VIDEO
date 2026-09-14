@@ -8,18 +8,22 @@ from pydantic import Field
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.artifact_contracts import StrictModel
 from ai_video.production.models import EvidenceStrength, QaLayer, QaVerdict
+from ai_video.production.visual_quality import VisualFrameInventory, VisualFrameReference, valid_visual_finding
 
 
 class FinalOutputFinding(StrictModel):
     requirement_id: str = Field(min_length=1)
     verdict: Literal["pass", "fail", "not_evaluated"]
     observation: str = Field(min_length=1)
+    visual_frames: tuple[VisualFrameReference, ...] = ()
 
 
 class FinalOutputObservation(StrictModel):
     contract_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     review_request_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     viewing_speed_milli: int | None = Field(default=None, strict=True, gt=0)
+    viewing_mode: Literal["sampled_frames", "full_playback"] | None = None
+    visual_frame_inventory: VisualFrameInventory | None = None
     findings: tuple[FinalOutputFinding, ...] = Field(min_length=1)
 
 
@@ -48,6 +52,9 @@ def adjudicate_final_output(contract, evidence, *, review_request_content_hash):
             continue
         for finding in source.findings:
             rule = rules[finding.requirement_id]
+            if rule.visual_dimension is not None and not valid_visual_finding(rule, finding, source, item):
+                incomplete = True
+                continue
             if rule.proof == "human" and (
                 item.strength is not EvidenceStrength.HUMAN
                 or source.viewing_speed_milli != 1000
