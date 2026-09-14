@@ -327,14 +327,26 @@ def _graphic_layer_keyframes(
     return f"@keyframes {name}{{{body}}}"
 
 
-def _commercial_graphic_css(graphic: ResolvedCommercialGraphic, duration: str) -> str:
+def _commercial_graphic_css(
+    graphic: ResolvedCommercialGraphic,
+    duration: str,
+    *,
+    legacy_percent_format: bool = False,
+) -> str:
     name = _graphic_animation_name(graphic.graphic_id)
     background = graphic.background_color or "transparent"
+    percent = _legacy_decimal_milli if legacy_percent_format else _decimal_milli
+    font_weight = f"font-weight:{graphic.font_weight};" if graphic.font_weight != 700 else ""
+    letter_spacing = (
+        f"letter-spacing:{graphic.letter_spacing_px}px;"
+        if graphic.letter_spacing_px != 0
+        else ""
+    )
     return (
-        f".{name}{{left:{_decimal_milli(graphic.x_milli * 100)}%;"
-        f"top:{_decimal_milli(graphic.y_milli * 100)}%;"
-        f"width:{_decimal_milli(graphic.width_milli * 100)}%;"
-        f"font-size:{graphic.font_size_px}px;color:{graphic.text_color};"
+        f".{name}{{left:{percent(graphic.x_milli * 100)}%;"
+        f"top:{percent(graphic.y_milli * 100)}%;"
+        f"width:{percent(graphic.width_milli * 100)}%;"
+        f"font-size:{graphic.font_size_px}px;{font_weight}{letter_spacing}color:{graphic.text_color};"
         f"background:{background};z-index:{graphic.z_index};"
         f"animation-name:{name};animation-duration:{duration}s;"
         "animation-fill-mode:both;animation-play-state:paused;"
@@ -358,6 +370,11 @@ def _commercial_graphic_text(graphic: ResolvedCommercialGraphic) -> str:
 
 
 def _decimal_milli(value: int) -> str:
+    rendered = format(Decimal(value) / Decimal(1000), "f")
+    return (rendered.rstrip("0").rstrip(".") if "." in rendered else rendered) or "0"
+
+
+def _legacy_decimal_milli(value: int) -> str:
     rendered = format(Decimal(value) / Decimal(1000), "f")
     return rendered.rstrip("0").rstrip(".") or "0"
 
@@ -449,6 +466,7 @@ def render_source(
     *,
     legacy_caption_style: bool = False,
     caption_top_auto: bool = True,
+    legacy_commercial_percent_format: bool = False,
 ) -> str:
     caption_styles = caption_styles or {}
     expected_style_hashes = {
@@ -463,6 +481,13 @@ def render_source(
     if legacy_caption_style and caption_styles:
         raise HyperFramesSourceError(
             "Legacy caption source cannot consume style values."
+        )
+    if legacy_commercial_percent_format and any(
+        graphic.font_weight != 700 or graphic.letter_spacing_px != 0
+        for graphic in timeline.commercial_graphics
+    ):
+        raise HyperFramesSourceError(
+            "Legacy commercial source cannot consume custom typography."
         )
     fps = timeline.delivery_profile.fps
     duration = seconds(timeline.total_frames, fps)
@@ -584,7 +609,13 @@ def render_source(
         )
     for graphic in timeline.commercial_graphics:
         name = _graphic_animation_name(graphic.graphic_id)
-        animations.append(_commercial_graphic_css(graphic, duration))
+        animations.append(
+            _commercial_graphic_css(
+                graphic,
+                duration,
+                legacy_percent_format=legacy_commercial_percent_format,
+            )
+        )
         keyframes.append(
             _graphic_keyframes(
                 graphic,

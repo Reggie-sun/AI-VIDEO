@@ -290,6 +290,8 @@ def _with_commercial_graphic(timeline: ResolvedTimeline) -> ResolvedTimeline:
         y_milli=120,
         width_milli=840,
         font_size_px=64,
+        font_weight=400,
+        letter_spacing_px=2,
         text_color="#171717",
         background_color="#F7D000E6",
         claim_reference_ids=("claim-net-odor",),
@@ -879,6 +881,8 @@ def test_commercial_graphic_is_materialized_as_audited_timeline_css(tmp_path):
     assert "top:12%" in html
     assert "width:84%" in html
     assert "font-size:64px" in html
+    assert "font-weight:400" in html
+    assert "letter-spacing:2px" in html
     assert "#f7d000e6" in html.lower()
     assert "@keyframes p22-graphic-" in html
     assert 'data-layer-entrance="scale_in"' in html
@@ -890,6 +894,63 @@ def test_commercial_graphic_is_materialized_as_audited_timeline_css(tmp_path):
         result.index_path,
         expected_timeline=timeline,
         expected_assets=result.asset_bindings,
+    )
+
+
+def test_commercial_graphic_zero_suffix_width_keeps_60_percent(tmp_path):
+    timeline = _with_commercial_graphic(make_resolved_timeline())
+    graphic = timeline.commercial_graphics[0].model_copy(update={"width_milli": 600})
+    timeline = _reseal_timeline(timeline, commercial_graphics=(graphic,))
+
+    result = _materialize(tmp_path, timeline)
+
+    html = result.index_path.read_text(encoding="utf-8")
+    assert "width:60%" in html
+    assert "width:6%" not in html
+
+
+@pytest.mark.parametrize("width_milli, historical_width", [(840, "84"), (600, "6")])
+def test_audit_keeps_historical_default_commercial_graphic_source(
+    tmp_path, width_milli, historical_width
+):
+    timeline = _with_commercial_graphic(make_resolved_timeline())
+    graphic = timeline.commercial_graphics[0].model_copy(
+        update={"width_milli": width_milli, "font_weight": 700, "letter_spacing_px": 0}
+    )
+    timeline = _reseal_timeline(timeline, commercial_graphics=(graphic,))
+    result = _materialize(tmp_path, timeline)
+    current = result.index_path.read_text(encoding="utf-8")
+    current_width = "60" if width_milli == 600 else "84"
+    assert f"width:{current_width}%;font-size:64px;color:#171717;" in current
+    assert "font-size:64px;font-weight:700" not in current
+
+    historical = current.replace(
+        f"width:{current_width}%;font-size:64px;color:#171717;",
+        f"width:{historical_width}%;font-size:64px;color:#171717;",
+    )
+    result.index_path.write_text(historical, encoding="utf-8")
+    audit_hyperframes_source(
+        result.index_path,
+        expected_timeline=timeline,
+        expected_assets=result.asset_bindings,
+    )
+
+
+def test_audit_rejects_removed_custom_commercial_typography(tmp_path):
+    timeline = _with_commercial_graphic(make_resolved_timeline())
+    result = _materialize(tmp_path, timeline)
+    html = result.index_path.read_text(encoding="utf-8")
+    assert "font-size:64px;font-weight:400;letter-spacing:2px;" in html
+    result.index_path.write_text(
+        html.replace("font-weight:400;letter-spacing:2px;", ""), encoding="utf-8"
+    )
+
+    _assert_source_invalid(
+        lambda: audit_hyperframes_source(
+            result.index_path,
+            expected_timeline=timeline,
+            expected_assets=result.asset_bindings,
+        )
     )
 
 

@@ -234,6 +234,8 @@ def _with_video_and_product_graphic(root: Path, loaded, spec):
         y_milli=120,
         width_milli=840,
         font_size_px=64,
+        font_weight=400,
+        letter_spacing_px=2,
         text_color="#171717",
         background_color="#F7D000E6",
         claim_reference_ids=("claim-net-odor",),
@@ -287,8 +289,52 @@ def test_composition_22_resolves_image_graphic_over_generated_video_and_text(
     graphic = timeline.commercial_graphics[0]
     assert graphic.graphic_id == "headline-hook"
     assert graphic.claim_reference_ids == ("claim-net-odor",)
+    assert (graphic.font_weight, graphic.letter_spacing_px) == (400, 2)
     assert (graphic.start_frame, graphic.end_frame_exclusive) == (3, 27)
     assert (graphic.start_sample, graphic.end_sample) == (6_000, 54_000)
+
+
+def test_commercial_typography_defaults_preserve_legacy_serialization(tmp_path):
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    loaded, spec = _with_video_and_product_graphic(tmp_path, loaded, spec)
+    original = spec.commercial_graphics[0]
+    defaulted = original.model_copy(
+        update={"font_weight": 700, "letter_spacing_px": 0}
+    )
+    spec = seal_artifact(
+        spec.model_copy(update={"commercial_graphics": (defaulted,)})
+    )
+
+    assert "font_weight" not in defaulted.model_dump()
+    assert "letter_spacing_px" not in defaulted.model_dump()
+    timeline = resolve_composition(loaded, spec, renderer_version="0.7.103")
+    assert "font_weight" not in timeline.commercial_graphics[0].model_dump()
+    assert "letter_spacing_px" not in timeline.commercial_graphics[0].model_dump()
+    assert type(spec).model_validate_json(spec.model_dump_json()) == spec
+    assert type(timeline).model_validate_json(timeline.model_dump_json()) == timeline
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    [
+        ("font_weight", 450),
+        ("font_weight", 1000),
+        ("font_weight", True),
+        ("letter_spacing_px", -1),
+        ("letter_spacing_px", 17),
+        ("letter_spacing_px", 2.5),
+    ],
+)
+def test_commercial_typography_rejects_invalid_values(
+    tmp_path: Path, field: str, value: object,
+) -> None:
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    loaded, spec = _with_video_and_product_graphic(tmp_path, loaded, spec)
+    payload = spec.commercial_graphics[0].model_dump(mode="python")
+    payload[field] = value
+
+    with pytest.raises(ValueError):
+        GraphicTreatment.model_validate(payload)
 
 
 @pytest.mark.parametrize("resolved", [False, True])

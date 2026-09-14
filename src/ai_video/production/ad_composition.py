@@ -63,6 +63,8 @@ def resolve_commercial_graphics(
                 y_milli=graphic.y_milli,
                 width_milli=graphic.width_milli,
                 font_size_px=graphic.font_size_px,
+                font_weight=graphic.font_weight,
+                letter_spacing_px=graphic.letter_spacing_px,
                 text_color=graphic.text_color,
                 background_color=graphic.background_color,
                 claim_reference_ids=graphic.claim_reference_ids,

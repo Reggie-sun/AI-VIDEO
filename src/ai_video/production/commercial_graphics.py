@@ -3,7 +3,8 @@ from __future__ import annotations
 from enum import Enum
 
 from pydantic import (
-    BaseModel, ConfigDict, Field, ValidationInfo, field_validator, model_validator,
+    BaseModel, ConfigDict, Field, SerializerFunctionWrapHandler, ValidationInfo,
+    field_validator, model_serializer, model_validator,
 )
 
 
@@ -93,6 +94,8 @@ class GraphicTreatment(_StrictModel):
     y_milli: int = Field(strict=True, ge=0, le=1000)
     width_milli: int = Field(strict=True, gt=0, le=1000)
     font_size_px: int = Field(strict=True, gt=0, le=512)
+    font_weight: int = Field(default=700, strict=True, ge=100, le=900, multiple_of=100)
+    letter_spacing_px: int = Field(default=0, strict=True, ge=0, le=16)
     text_color: str = Field(pattern=r"^#[0-9A-Fa-f]{8}$|^#[0-9A-Fa-f]{6}$")
     background_color: str | None = Field(
         default=None, pattern=r"^#[0-9A-Fa-f]{8}$|^#[0-9A-Fa-f]{6}$"
@@ -138,6 +141,17 @@ class GraphicTreatment(_StrictModel):
             raise ValueError("keyword emphasis text cannot overlap")
         return self
 
+    @model_serializer(mode="wrap")
+    def _serialize_compatible_typography(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.font_weight == 700:
+            data.pop("font_weight", None)
+        if self.letter_spacing_px == 0:
+            data.pop("letter_spacing_px", None)
+        return data
+
 
 class ResolvedCommercialGraphic(_StrictModel):
     graphic_id: str = Field(min_length=1)
@@ -152,6 +166,8 @@ class ResolvedCommercialGraphic(_StrictModel):
     y_milli: int = Field(strict=True, ge=0, le=1000)
     width_milli: int = Field(strict=True, gt=0, le=1000)
     font_size_px: int = Field(strict=True, gt=0, le=512)
+    font_weight: int = Field(default=700, strict=True, ge=100, le=900, multiple_of=100)
+    letter_spacing_px: int = Field(default=0, strict=True, ge=0, le=16)
     text_color: str = Field(pattern=r"^#[0-9A-Fa-f]{8}$|^#[0-9A-Fa-f]{6}$")
     background_color: str | None = Field(
         default=None, pattern=r"^#[0-9A-Fa-f]{8}$|^#[0-9A-Fa-f]{6}$"
@@ -176,3 +192,14 @@ class ResolvedCommercialGraphic(_StrictModel):
         if self.end_sample <= self.start_sample:
             raise ValueError("commercial graphic sample end must follow start")
         return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_compatible_typography(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.font_weight == 700:
+            data.pop("font_weight", None)
+        if self.letter_spacing_px == 0:
+            data.pop("letter_spacing_px", None)
+        return data
