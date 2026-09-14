@@ -719,28 +719,28 @@ def _audit_hyperframes_source(
     caption_styles = _load_materialized_caption_styles(
         source_root, expected_captions
     )
-    expected_current = _parse_source_document(
-        _render_source(
-            expected_timeline,
-            expected_audio[0] if expected_audio else None,
-            caption_styles,
-        )
+    allow_legacy_percent = bool(expected_timeline.commercial_graphics) and all(
+        graphic.font_weight == 700 and graphic.letter_spacing_px == 0
+        for graphic in expected_timeline.commercial_graphics
     )
-    expected_legacy = _parse_source_document(
-        _render_source(
-            expected_timeline,
-            expected_audio[0] if expected_audio else None,
-            legacy_caption_style=True,
+    expected_variants = [
+        _parse_source_document(
+            _render_source(
+                expected_timeline,
+                expected_audio[0] if expected_audio else None,
+                styles,
+                legacy_caption_style=legacy_caption_style,
+                caption_top_auto=caption_top_auto,
+                legacy_commercial_percent_format=legacy_percent,
+            )
         )
-    )
-    expected_pre_top_fix = _parse_source_document(
-        _render_source(
-            expected_timeline,
-            expected_audio[0] if expected_audio else None,
-            caption_styles,
-            caption_top_auto=False,
+        for legacy_percent in ((False, True) if allow_legacy_percent else (False,))
+        for styles, legacy_caption_style, caption_top_auto in (
+            (caption_styles, False, True),
+            (caption_styles, False, False),
+            (None, True, True),
         )
-    )
+    ]
 
     def structure_matches(expected: _ParsedSourceDocument) -> bool:
         return (
@@ -750,30 +750,6 @@ def _audit_hyperframes_source(
             and parsed.clip_attributes == expected.clip_attributes
         )
 
-    expected_variants = [expected_current, expected_pre_top_fix, expected_legacy]
-    if expected_timeline.commercial_graphics and all(
-        graphic.font_weight == 700 and graphic.letter_spacing_px == 0
-        for graphic in expected_timeline.commercial_graphics
-    ):
-        expected_variants.extend(
-            (
-                _parse_source_document(
-                    _render_source(
-                        expected_timeline,
-                        expected_audio[0] if expected_audio else None,
-                        styles,
-                        legacy_caption_style=legacy_caption_style,
-                        caption_top_auto=caption_top_auto,
-                        legacy_commercial_percent_format=True,
-                    )
-                )
-                for styles, legacy_caption_style, caption_top_auto in (
-                    (caption_styles, False, True),
-                    (caption_styles, False, False),
-                    (None, True, True),
-                )
-            )
-        )
     if not any(structure_matches(expected) for expected in expected_variants):
         raise _source_invalid("HyperFrames source structure does not match the timeline.")
     if parsed.stage_attributes.get("data-no-timeline", "missing") is not None:
