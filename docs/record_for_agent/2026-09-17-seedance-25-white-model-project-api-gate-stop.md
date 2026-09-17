@@ -9,6 +9,14 @@ evidence_index_version: "1"
 
 Date: 2026-09-17
 
+## Supersession Notice — 2026-09-17
+
+用户随后明确纠正：白模应由 Blender MCP 在本地制作，再作为 Seedance reference；不得让 Seedance
+先以 T2V 生成白模。本文记录的 2.5 T2V submit、artifact 与 Gate verdict 仍是准确的历史证据，但该
+attempt 基于误解，不是当前用户目标的 fulfillment。当前 corrected checkpoint 见
+[`2026-09-17-blender-mcp-white-model-seedance-mini-materialization-blocker.md`](2026-09-17-blender-mcp-white-model-seedance-mini-materialization-blocker.md)：
+local source PASS，Seedance Mini target 在 materialization blocker 前保持 `0` POST。
+
 ## Purpose
 
 本文记录一次用户明确要求的 Seedance 白模测试如何改走 AI-VIDEO project API，并冻结该次

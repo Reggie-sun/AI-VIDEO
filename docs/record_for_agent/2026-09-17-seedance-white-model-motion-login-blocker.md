@@ -9,6 +9,15 @@ evidence_index_version: "1"
 
 Date: 2026-09-17
 
+## Supersession Notice — 2026-09-17 (Blender MCP Correction)
+
+用户已将 exact source requirement 收紧为“由 Blender MCP 控制制作白模，再通过 AI-VIDEO project API
+交给 Seedance 2.0 Mini”。本文旧 local source 与 browser-upload chronology 仍是历史事实，但不再是
+当前 exact source 或 continuation。新的 Blender MCP source、exact Gate 与 current deterministic
+materialization blocker 见
+[`2026-09-17-blender-mcp-white-model-seedance-mini-materialization-blocker.md`](2026-09-17-blender-mcp-white-model-seedance-mini-materialization-blocker.md)。
+不得再按本文旧 Remaining Work 使用 Experience page 生成或把登录状态当成 project materialization。
+
 ## Supersession Notice — 2026-09-17
 
 本记录的 browser authentication blocker 已被同日的项目 API 实验
