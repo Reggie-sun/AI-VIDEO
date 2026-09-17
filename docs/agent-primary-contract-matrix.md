@@ -372,6 +372,26 @@ Provider / neutral requirement / Architecture checks。配置边界见 [Vidu Pro
 | P8 Seedance Cloud Adapter | `src/ai_video/production/seedance.py`、`seedance_asset.py`、`seedance_capabilities.py`、`seedance_reference_duration.py`、`seedance_profile.py`、`remote_media.py` | 2026-08-19 official matrix的七个current/legacy-callable Model IDs必须完整且不可由injected profile扩张或漏mode；Endpoint binding、expected response Model ID、output container和same-task identity进入durable evidence。credential只接受injected `ARK_API_KEY` reference；permit紧邻唯一POST消费，无POST retry；poll/fetch精确绑定task/model，redirect/cross-origin/oversize/MIME/ISO-BMFF brand均fail closed。Payload始终显式绑定`generate_audio`，但省略false/default/MP4/zero-valued optional defaults。Input materialization有两条显式lane：already-materialized Ark identity继续要求sealed、human-observed `Active` receipt并导出`asset://`；同一Seedance Provider刚生成并exact-fetch的普通video可由durable `RemoteMediaMaterializationReceipt`绑定task/model、opaque file identity、URL hash/origin与exact MP4 hash/bytes/MIME，再由`VideoGenerationService.refresh_remote_reference_lease_once()`验证attempt仍是Manifest exact active source、重开exact evidence并签发process-local one-use refresh permit；当exact active source request使用`nominal_seconds`时，permit与lease还绑定该nominal milliseconds，remote R2V binding必须使用该sealed nominal值并继续绑定同一exact bytes/materialization，物理duration仍由active artifact/probe独占。Seedance helper只有消费该permit后才能重新query同一locator、完整GET验证同一bytes并签发最长5分钟的in-memory `SeedanceRemoteReferenceLease`导出HTTPS `reference_video`。完整signed URL不得进入Manifest、receipt、repr或log；lease过期、locator轮换、bytes变化、identity不匹配或nominal proof不匹配都必须在新POST和permit消费前停止，且不得静默fallback到I2V。local Registry ID仍不能伪装成`asset://`或URL。`synthetic_photorealistic_person` receipt保持历史读取兼容，但authorizer与resolver必须在POST和permit消费前拒绝其inline egress。2026-08-29/30 Mini remote-output live chain已用exact-active Shot 1 refresh同一locator并复核同一bytes，随后唯一一次`VIDEO_EXTEND` POST直接消费HTTPS `reference_video`，Shot 2 fetched、Per-Shot Gate PASS并activation；该证据证明live chaining与本次技术/视觉Gate，不外推其他模型、billing价目正确性、P6或Final Acceptance。 | 接受retired/marketing alias、profile扩张官方能力、fallback到MiniMax keys、把local asset ID拼成`asset://`/URL、无exact bytes evidence导入remote reference、持久化raw signed URL、用nominal值覆盖exact measured artifact/probe duration、绕过Service从未activated或stale source签lease、公开或可重复mint refresh/lease authority、过期lease继续submit、locator轮换后只信host/HEAD或不重验bytes、把provider-output lease泛化成未经egress gate的local H3/T8 uploader、把photorealistic person-like synthetic bytes提交给Ark、unknown submit后blind retry、把diagnostic或单次live R2V证据外推为其他模型、P6、Final Acceptance或Provider-wide quality。 | `python -m pytest -p no:cacheprovider tests/test_production_seedance.py tests/test_production_video.py tests/test_video_generation.py tests/test_production_paid_provider.py tests/test_production_paid_provider_state.py tests/test_production_video_state_recovery.py tests/test_production_state_recovery.py -q` |
 | Base AI Comic E2E | `tests/test_production_base_ai_comic_e2e.py`、P3-P7 owners | No-Video-Provider path 必须沿唯一 committer/resolver/timeline/review control path完成 durable reopen、exact repair 与 zero-side-effect replay；repair不得 regenerate unaffected P7/voice/caption assets。 | 新 production coordinator、第二 writer/resolver、隐式 Video Provider、用 E2E acceptance 推导 paid/live authorization。 | `python -m pytest -p no:cacheprovider tests/test_production_base_ai_comic_e2e.py -q && python -m scripts.architecture_gate check` |
 
+### Seedance Local Non-Identity Video Materialization
+
+`src/ai_video/production/seedance_local_video.py` 独占本地普通或合成非身份视频到
+Seedance `reference_video` 的受控 HTTPS materialization seam。Exact preview 必须绑定
+source Registry revision/SHA/size/MP4 metadata、目标 Provider/model/request hash、对象存储
+account/bucket/object identity、credential reference、HTTPS origins 与 `task_transient`
+retention；human actor 只授权 upload/cloud egress，不是人物身份或 liveness attestation。
+One-use permit 在 PUT 前消费；Volcengine TOS response 必须返回 ETag 与 version ID，随后
+GET readback 必须逐字节重验 SHA/size/MIME/ISO-BMFF。Durable receipt 只保存 URL/ETag hash，
+raw presigned locator 只存在于最多五分钟的 process-local lease；Provider 在 resolve 与 paid
+submit 前都重验 exact request binding 和 lease freshness。该 seam 不创建 Ark person asset，
+也不调用人物 liveness/trusted-person path。
+
+禁止 anonymous temporary host、redirect、raw URL/secret persistence、未做 exact readback、
+把普通素材冒充人物授权、跨 request/model 复用、upload outcome unknown 后 blind retry，或将
+offline fake-transport PASS 宣称为 live Provider/媒体质量验收。当前没有 storage presigner、
+credential discovery 或 second lifecycle writer；调用方仍须经 existing Paid Provider Gate。
+Focused verification：`python -m pytest -p no:cacheprovider tests/test_production_seedance.py
+tests/test_production_seedance_local_video.py -q`。
+
 ## Quality Gate Architecture Boundary
 
 Quality architecture 采用 **Universal Production QA + Domain-Specific Acceptance Gate**。当前 generic `QaLayer` 是既有 P6 lifecycle envelope，不是跨 Ecommerce、Drama 与 market outcome 的完整 taxonomy；不得通过改名或复用 `STRATEGY` / `SEMANTIC` 建立第二套 business acceptance。

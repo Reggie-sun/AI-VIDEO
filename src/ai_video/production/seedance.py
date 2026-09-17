@@ -54,6 +54,9 @@ from ai_video.production.seedance_asset import (
     SeedanceRemoteReferenceResolver,
     SeedanceSyntheticImageReferenceResolver,
 )
+from ai_video.production.seedance_local_video import (
+    SeedanceLocalVideoReferenceResolver,
+)
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
     VideoFetchReceipt,
@@ -286,6 +289,7 @@ class SeedanceVideoProvider:
             SeedanceAssetReferenceResolver
             | SeedanceRemoteReferenceResolver
             | SeedanceSyntheticImageReferenceResolver
+            | SeedanceLocalVideoReferenceResolver
         ),
         now: Callable[[], datetime] | None = None,
     ) -> None:
@@ -350,6 +354,14 @@ class SeedanceVideoProvider:
                 ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                 "Seedance request does not match the sealed provider profile.",
             )
+        if type(self._input_reference) is SeedanceLocalVideoReferenceResolver:
+            try:
+                self._input_reference.validate_request(request)
+            except Exception:
+                raise _error(
+                    ErrorCode.VIDEO_REQUEST_INVALID,
+                    "Seedance local video materialization targets a different request.",
+                ) from None
         matches = tuple(
             entry
             for entry in self._profile.capabilities
@@ -420,7 +432,11 @@ class SeedanceVideoProvider:
                 request.media_bindings,
                 nominal_duration_resolver=(
                     self._input_reference
-                    if type(self._input_reference) is SeedanceRemoteReferenceResolver
+                    if type(self._input_reference)
+                    in {
+                        SeedanceRemoteReferenceResolver,
+                        SeedanceLocalVideoReferenceResolver,
+                    }
                     else None
                 ),
             )
@@ -560,6 +576,19 @@ class SeedanceVideoProvider:
                     "Seedance remote input reference is unavailable.",
                 ) from None
             return self._result_url(value)
+        if type(self._input_reference) is SeedanceLocalVideoReferenceResolver:
+            if type(binding) is not VideoMediaReferenceBinding:
+                raise _error(
+                    ErrorCode.VIDEO_REQUEST_INVALID,
+                    "Seedance local video resolver cannot resolve image bindings.",
+                )
+            try:
+                return self._input_reference(binding)
+            except Exception:
+                raise _error(
+                    ErrorCode.VIDEO_REQUEST_INVALID,
+                    "Seedance local video reference is unavailable.",
+                ) from None
         if type(self._input_reference) is not SeedanceAssetReferenceResolver:
             raise _error(
                 ErrorCode.VIDEO_REQUEST_INVALID,
@@ -582,7 +611,18 @@ class SeedanceVideoProvider:
     def _validate_remote_reference_lease(
         self, request: ResolvedVideoGenerationRequest
     ) -> None:
-        if type(self._input_reference) is SeedanceRemoteReferenceResolver:
+        if type(self._input_reference) in {
+            SeedanceRemoteReferenceResolver,
+            SeedanceLocalVideoReferenceResolver,
+        }:
+            if type(self._input_reference) is SeedanceLocalVideoReferenceResolver:
+                try:
+                    self._input_reference.validate_request(request)
+                except Exception:
+                    raise _error(
+                        ErrorCode.VIDEO_REQUEST_INVALID,
+                        "Seedance local video materialization targets a different request.",
+                    ) from None
             for binding in request.media_bindings:
                 self._asset_reference(binding)
 

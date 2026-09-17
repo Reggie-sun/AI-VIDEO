@@ -265,6 +265,19 @@ from ai_video.production.seedance_asset import (
     SeedanceSyntheticImageReferenceReceipt,
     SeedanceSyntheticImageReferenceResolver,
 )
+from ai_video.production.seedance_local_video import (
+    HttpxSeedanceLocalVideoMaterializationTransport,
+    SeedanceLocalVideoMaterialization,
+    SeedanceLocalVideoMaterializationAuthorization,
+    SeedanceLocalVideoMaterializationPreview,
+    SeedanceLocalVideoMaterializationReceipt,
+    SeedanceLocalVideoMaterializer,
+    SeedanceLocalVideoReferenceLease,
+    SeedanceLocalVideoReferenceResolver,
+    SeedanceLocalVideoTransportRequest,
+    SeedanceLocalVideoUploadGrant,
+    issue_seedance_local_video_materialization_permit,
+)
 from ai_video.production.remote_media import RemoteMediaMaterializationReceipt
 from ai_video.production.video import (
     ContinuityArtifactIdentity,
@@ -533,8 +546,18 @@ __all__ = [
     "Scene",
     "SeedanceAssetMaterializationReceipt",
     "SeedanceAssetReferenceResolver",
+    "HttpxSeedanceLocalVideoMaterializationTransport",
     "SeedanceRemoteReferenceLease",
     "SeedanceRemoteReferenceResolver",
+    "SeedanceLocalVideoMaterialization",
+    "SeedanceLocalVideoMaterializationAuthorization",
+    "SeedanceLocalVideoMaterializationPreview",
+    "SeedanceLocalVideoMaterializationReceipt",
+    "SeedanceLocalVideoMaterializer",
+    "SeedanceLocalVideoReferenceLease",
+    "SeedanceLocalVideoReferenceResolver",
+    "SeedanceLocalVideoTransportRequest",
+    "SeedanceLocalVideoUploadGrant",
     "SeedanceSyntheticImageAuthorizer",
     "SeedanceSyntheticImageEgressPolicyReceipt",
     "SeedanceSyntheticImageReceiptBinding",
@@ -600,4 +623,5 @@ __all__ = [
     "reserve_paid_provider_budget",
     "settle_paid_provider_budget",
     "validate_paid_provider_authorization",
+    "issue_seedance_local_video_materialization_permit",
 ]

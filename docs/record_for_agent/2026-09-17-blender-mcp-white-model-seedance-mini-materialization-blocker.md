@@ -9,6 +9,14 @@ evidence_index_version: "1"
 
 Date: 2026-09-17
 
+## Supersession Notice — 2026-09-17
+
+下文 `Project API Materialization Blocker` 对“current runtime 没有 local MP4 materializer”的结论已被
+本记录后续 `Materialization Implementation Checkpoint` 取代。现在 working tree 已实现受控对象存储
+presigned PUT/GET、TOS version identity、exact-byte readback 与 request-bound短租约，但 host/repository
+仍没有可用的受控 storage grant/presigner。因此 blocker 已从 `LOCAL_VIDEO_MATERIALIZER_NOT_IMPLEMENTED`
+缩小为 `CONTROLLED_OBJECT_STORAGE_GRANT_MISSING`；Seedance generation POST 仍为 `0`。
+
 ## Purpose
 
 本文记录用户纠正测试意图后的一次 bounded execution：白模不是由 Seedance 生成，而是由
@@ -105,12 +113,44 @@ presigned URL publisher 或另一条可把本次 Blender bytes 物化为受支�
 这不是“Seedance Mini 拒绝白模”的 empirical verdict；它是当前项目缺少 exact local-video
 materialization seam 的 deterministic blocker。
 
+## Materialization Implementation Checkpoint
+
+`src/ai_video/production/seedance_local_video.py` 已增加显式的非身份视频 lane：
+
+- exact preview 绑定 source asset/revision/SHA/size/MP4 metadata、目标 Provider/model/request hash、
+  对象存储 scope/bucket/object-key hash、credential reference 与有限 expiry；
+- human actor 只授权本次 upload/cloud egress，不是人物身份、liveness 或 trusted-person attestation；
+- durable-intent validator 签发一次性 materialization permit，PUT 前立即消费；
+- Volcengine TOS PUT 必须返回 ETag 与 `x-tos-version-id`；GET readback 逐字节重验
+  SHA/size/MIME/ISO-BMFF，上传后不确定结果 fail closed 且不能复用 permit；
+- HTTP transport 只接收已经校验并保留的 exact bytes，不按 pathname 二次打开，避免 permit 后
+  source swap；durable receipt 只保存 URL/ETag hash，raw presigned URL 不进入 model/repr；
+- 最多五分钟的 process-local lease 精确绑定同一 receipt，`SeedanceVideoProvider` 在 resolve 与
+  paid permit 消费前都重验 request/model/input hash 与 lease freshness。
+
+离线 focused verification 为 `129 passed`：
+
+```text
+python -m pytest -p no:cacheprovider \
+  tests/test_production_seedance.py \
+  tests/test_production_seedance_local_video.py -q
+```
+
+覆盖 Mini `reference_video` payload、source drift 在 upload 前阻断且不消费 permit、permit 后 path swap
+不能改变 upload bytes、readback mismatch 进入 unknown 并阻断 retry、跨 request materialization 在
+Provider effect 前拒绝，以及 signed URL 不进入 durable receipt/repr。以上均为 fake transport；没有
+发生 object-storage PUT/GET 或 Seedance POST。
+
+当前唯一 live pre-submit blocker 是缺少与 exact preview 一致的受控对象存储 presigned PUT/GET grant：
+repository/host 没有 TOS/S3 credential reference、presigner 配置或可调用的 materialization MCP。
+登录状态不能补足该 grant；匿名临时 host、browser upload、local path 与伪造 URL 继续禁止。
+
 ## Assessment
 
 用户纠正的 Blender-first source path 已完成，且相对于同日两个误解后的 Seedance T2V attempts，
 本次不再消耗 Provider 调用来生成白模。能够继续的最小下一动作不是再次 T2V，也不是在 Experience
-页面直接生成，而是取得本次 exact MP4 的 `Active asset://...` materialization receipt，或另行批准并
-实现受约束的 local-video publisher/materializer contract。
+页面直接生成，而是由受控对象存储 owner 为本次 exact object identity 签发匹配 preview 的一次
+presigned PUT/GET grant；materializer 实现本身已经存在，但不发现 credential、不自建匿名 publisher。
 
 在任一路径完成前，不能把 local Gate `PASS` 转换为 Seedance reference acceptance。即使未来 Provider
 submit succeeded，仍需下载 exact output 并执行新的 post-media Gate，才能评估 motion transfer。
@@ -121,13 +161,14 @@ submit succeeded，仍需下载 exact output 并执行新的 post-media Gate，�
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | blender-mcp-white-model-source | blender-mcp:white-model:b4cdb2a778390599eeff069c215486105b34170935a1297e45cecc010361b0b1 | seedance-blender-white-model-r2v-20260917-001 | blender-mcp-white-model-source-attempt | local-source | b4cdb2a778390599eeff069c215486105b34170935a1297e45cecc010361b0b1 | LOCAL_MCP_AUTHORING_AND_EXACT_MEDIA_GATE | PASS | NONE | NEW_ATTEMPT | NONE | runs/seedance-blender-white-model-r2v-20260917-001/evidence/local-source-gate.json |
 | seedance-mini-local-video-materialization | blender-mcp:white-model:b4cdb2a778390599eeff069c215486105b34170935a1297e45cecc010361b0b1 | seedance-blender-white-model-r2v-20260917-001 | blender-mcp-white-model-source-attempt | local-source | b4cdb2a778390599eeff069c215486105b34170935a1297e45cecc010361b0b1 | PROJECT_API_MATERIALIZATION_PREFLIGHT | BLOCKED | LOCAL_VIDEO_MATERIALIZER_NOT_IMPLEMENTED | SAME_EVIDENCE_NEW_PROOF_LAYER | blender-mcp-white-model-source | runs/seedance-blender-white-model-r2v-20260917-001/evidence/materialization-preflight.json |
+| seedance-mini-local-video-materializer-checkpoint | blender-mcp:white-model:b4cdb2a778390599eeff069c215486105b34170935a1297e45cecc010361b0b1 | seedance-blender-white-model-r2v-20260917-001 | blender-mcp-white-model-source-attempt | local-source | b4cdb2a778390599eeff069c215486105b34170935a1297e45cecc010361b0b1 | PROJECT_API_MATERIALIZATION_IMPLEMENTATION | BLOCKED | CONTROLLED_OBJECT_STORAGE_GRANT_MISSING | CONCLUSION_SUPERSEDED | seedance-mini-local-video-materialization | tests/test_production_seedance_local_video.py |
 
 ## Learning Evaluation
 
-`distill-ai-video-learning`: `no_candidate`。本次 correction 只有一个新的 independence unit；本地
-source Gate PASS 与 materialization blocker 是同一 attempt 的不同 proof layers，不能当作两个独立
-实验。关于“本地素材 path 不能冒充 Ark/provider identity”的规则已经由 current exact resolver 与
-repository invariants 直接拥有，不需要另建 Learning Claim。
+`distill-ai-video-learning`: `no_candidate`。materializer implementation checkpoint、原 preflight
+blocker 与本地 source Gate 仍属于同一 `independence_key` 的不同 proof layers，不构成两个独立实验，
+也没有 controlled multi-arm comparison。关于“本地素材 path 不能冒充 Provider identity”以及 upload
+后必须 exact readback 的规则已由 current contracts 直接拥有，不另建 Learning Claim。
 
 ## Agent Guardrails
 
