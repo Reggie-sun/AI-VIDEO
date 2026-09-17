@@ -9,6 +9,19 @@ evidence_index_version: "1"
 
 Date: 2026-09-17
 
+## Supersession Notice — 2026-09-17
+
+本记录的 browser authentication blocker 已被同日的项目 API 实验
+[`2026-09-17-seedance-25-white-model-project-api-gate-stop.md`](2026-09-17-seedance-25-white-model-project-api-gate-stop.md)
+取代。用户登录后明确要求不得使用网页 Experience submit，后续改走 AI-VIDEO 的
+`GenerationDecisionExecutionBinding -> VideoGenerationService -> SeedanceVideoProvider`
+canonical API path。该路径完成一次 Seedance 2.5 T2V submit/poll/fetch，但白模源因动作时序和
+全身 framing 不满足 sealed Gate 而保持 `VALIDATE`、未激活，R2V target submit 为 `0`。
+
+下文 local Blender reference 的 exact bytes、最初 browser 上传/登录 chronology 与当时
+submit count `0` 仍是历史事实；“登录后重新走 browser submit”的 Remaining Work 已失效，
+不得再作为当前 continuation 指令。
+
 ## Purpose
 
 本文记录一次用户明确要求的 Seedance 白模动作参考测试在正式 submit 前的准备证据与真实 blocker，供后续 Agent 从同一边界继续。本文不构成 Seedance 动作迁移能力 PASS，也不构成新的 Provider 调用授权。
