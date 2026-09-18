@@ -8,6 +8,15 @@ learning_eligibility: ineligible
 
 Date: 2026-09-19
 
+## Supersession Notice — 2026-09-19
+
+下文 `Specification And Plan Checkpoint` 中“只有文档与设计证据”已被
+[Ecommerce Production Job M0–M3 Implementation Record](2026-09-19-ecommerce-production-job-m0-m3.md)
+部分取代。M0–M3 现已实现 strict handoff/request/projection contracts、四层精确视觉合同、
+Skill-side pure exporter、canonical compiler/bootstrap adapter 与 read-only `inspect()`，并在 exact
+commit snapshot 上通过 Harness。原审计的历史 gap 与 target architecture 仍保留；M4–M6 Provider/media、
+repair、render、Final Acceptance 和 delivery packaging 仍未实现，也没有视觉成片验收。
+
 ## Purpose
 
 记录当前 AI-VIDEO 相对“电商广告视频全自动生产”目标的 source-level 架构边界，以及五个外部开源项目中值得吸收但不能直接替代本仓库 canonical owners 的设计。
