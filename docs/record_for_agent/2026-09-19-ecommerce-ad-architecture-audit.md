@@ -75,6 +75,28 @@ ProductInput -> ProductTruth -> AdBrief -> CreativeConcept -> Script
 - HyperFrames 仍是默认 renderer。
 - Provider adapter、Skill、Agent、subagent 与 analyzer 都不能直接 activation 或 Final Acceptance。
 
+## Specification And Plan Checkpoint
+
+本次后续工作把上述审计结论收敛为两个 proposed、docs-only contracts：
+
+- `docs/superpowers/specs/2026-09-19-ai-video-ecommerce-production-job.md`
+- `docs/superpowers/plans/2026-09-19-ai-video-ecommerce-production-job.md`
+
+核心架构决定：
+
+- 下一 slice 是薄的 `EcommerceProductionJob` application layer，不重写 Production SDK，也不继续扩张已经较大的 `ecommerce_ad_coordinator.py`。
+- `ecommerce-ad-workflow/package/2` 先导出 versioned、runtime-neutral handoff；`src/` Runtime 继续禁止导入或调用 Skill。
+- Job request 是 immutable execution intent；Job projection 只从 Project / Registry / Manifest / Dependency / Review canonical state 推导，不持久化第二套 lifecycle。
+- 应用层使用 `inspect()` 和 bounded `advance_once()` 语义，精确恢复最小 invalid frontier；unknown outcome 仍必须 explicit recovery。
+- Shot generation 保留 sequential per-Shot exact-byte barrier；`FAIL`、`NOT_EVALUATED` 与 unknown outcome 分别进入 media repair、evidence repair 与 recovery，禁止 blind retry。
+- composition 继续只消费一个 `ResolvedTimeline` 并使用 HyperFrames；voice/TTS、captions、BGM/SFX、CTA 与 end card 必须在 render 前解析或成为 blocker。
+- whole-video QC 必须拒绝无 required evidence 的 bare `PASS`；delivery bundle 只接受 exact Final Accepted MP4，不重新编码、不改变 activation。
+- V1 明确不包含 Product URL crawler、batch/variants、public CLI/API、campaign publishing 或 live Provider qualification；这些需要独立 follow-up spec 和授权。
+
+Implementation plan 分为 contract guards、handoff、compiler、projection/resume、Shot/repair、composition/render、final QC/delivery 与 offline E2E 八个 milestones。推荐首个 implementation slice 只执行 Milestone 0–3，使 application boundary 先稳定，再单独审查 Provider/media、repair、render 与 Final Acceptance integration。
+
+该 checkpoint 只有文档与设计证据，不证明 `EcommerceProductionJob` 已实现、可运行或已通过真实媒体质量验收；本轮没有 Provider submit、媒体生成、Production state mutation、push 或 release。
+
 ## Agent Guardrails
 
 - 不要把本审计的 target architecture 描述成当前 runtime truth。
