@@ -16,6 +16,7 @@ description: Use when an ecommerce, SKU, product advertising, direct-response pr
 - 不选择 renderer/timeline/Provider，也不把 `DIALOGUE_SUBTITLE` 当作 commercial graphics fallback。
 - Valid package 不证明 compositing、typography、audio stream、watchability、P6、Final Acceptance、live-ready 或 advertising performance。
 - `AdQCReport.ready`只表示 Ecommerce authoring readiness；它不能创建`ReviewReceipt`、`FinalAcceptanceReceipt`、Production verdict或Manifest mutation。`AdCreativeReviewReport.is_ready`只表示deterministic handoff integrity，且`production_verdict`必须保持`None`。Whole-ad post-media Ecommerce acceptance尚未实现。
+- Runtime handoff export 只有在 exact `DeliveryProfile`、reviewed `EcommerceVisualSystemProfile`、per-ad `EcommerceLayoutPlan` 与只绑定这些 identity 的 `EcommerceProductionCompileProfile` 同时存在时才允许。Exporter 不生成通用布局默认值，也不以 schema-valid 代替 preview / visual review。
 - CTR、CVR、CPA、ROAS、hold rate、retention与其他market outcome属于future empirical feedback，不得由package validity、Ad QC或Production Final Acceptance预测。
 
 ## Decision Sequence
@@ -52,10 +53,23 @@ description: Use when an ecommerce, SKU, product advertising, direct-response pr
    ```
 
 5. Exit `0` 只表示 authoring contract valid；exit `2` 返回稳定 contract diagnostics；exit `3` 表示 validator internal failure。任何非零结果都不得标为 `PACKAGE_READY`。Legacy `package/1`缺少可靠的format projection，必须从exact `input/1`重新生成`package/2`；不得原地猜测`ad_format`、talent、variants或prohibited claims。
+6. 只有经过 per-ad visual review 后，才可用纯 exporter 输出 `ecommerce-production-handoff/1`：
+
+   ```bash
+   python .agents/skills/ecommerce-ad-workflow/scripts/export_runtime_handoff.py \
+     --package PACKAGE_PATH \
+     --source-input INPUT_PATH \
+     --delivery-profile DELIVERY_PROFILE_PATH \
+     --visual-system-profile VISUAL_SYSTEM_PROFILE_PATH \
+     --layout-plan LAYOUT_PLAN_PATH \
+     --compile-profile COMPILE_PROFILE_PATH
+   ```
+
+   Exporter 只向 stdout 写 canonical JSON，不写 Project / Registry / Manifest。任何 unresolved product integration、truth / rights、Runtime capability 或 talent-free representation gap 都必须保留为 typed blocker；不得为了产出 handoff 伪造 protagonist 或弱化 presentation。
 
 ## Output Shape
 
-交付 exact input/package paths、schema versions、validator JSON result、`ad_format` Gate Profile、G0–G7 gate summary、claim/source lineage、Runtime capability classifications与 unresolved blocker。`runtime_handoff` 只能投影到现有 `ProductionBrief`、按需存在的talent-as-`Character`与set-as-`Scene`、`Storyboard`、`Shot`、`AudioTrackSpec` 与 `CaptionTrack` requests；advertising graphics和physical interaction保持独立 capability requirements。
+交付 exact input/package paths、schema versions、validator JSON result、`ad_format` Gate Profile、G0–G7 gate summary、claim/source lineage、Runtime capability classifications与 unresolved blocker。显式请求 handoff export 时，还要交付四个 exact visual contract identities 与 handoff identity。`runtime_handoff` 只能投影到现有 `ProductionBrief`、按需存在的talent-as-`Character`与set-as-`Scene`、`Storyboard`、`Shot`、`AudioTrackSpec` 与 `CaptionTrack` requests；advertising graphics和physical interaction保持独立 capability requirements。
 
 ## Stop Conditions
 

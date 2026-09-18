@@ -1,0 +1,3705 @@
+{
+  "$defs": {
+    "AdBeatPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "beat_id": {
+          "minLength": 1,
+          "title": "Beat Id",
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/$defs/AdBeatRole"
+        },
+        "shot_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Shot Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "beat_id",
+        "role",
+        "shot_ids"
+      ],
+      "title": "AdBeatPlan",
+      "type": "object"
+    },
+    "AdBeatRole": {
+      "enum": [
+        "problem",
+        "product_introduction",
+        "demonstration",
+        "proof",
+        "payoff",
+        "hero",
+        "cta",
+        "brand_closure"
+      ],
+      "title": "AdBeatRole",
+      "type": "string"
+    },
+    "AdCreativePlanProposal": {
+      "additionalProperties": false,
+      "properties": {
+        "ad_arc": {
+          "items": {
+            "$ref": "#/$defs/AdBeatPlan"
+          },
+          "minItems": 1,
+          "title": "Ad Arc",
+          "type": "array"
+        },
+        "claim_reference_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Claim Reference Ids",
+          "type": "array"
+        },
+        "creative_concept": {
+          "minLength": 1,
+          "title": "Creative Concept",
+          "type": "string"
+        },
+        "cta_graphic_id": {
+          "minLength": 1,
+          "title": "Cta Graphic Id",
+          "type": "string"
+        },
+        "end_card_graphic_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "End Card Graphic Ids",
+          "type": "array"
+        },
+        "graphic_treatments": {
+          "items": {
+            "$ref": "#/$defs/GraphicTreatment"
+          },
+          "minItems": 1,
+          "title": "Graphic Treatments",
+          "type": "array"
+        },
+        "hero_shot_presentation_id": {
+          "minLength": 1,
+          "title": "Hero Shot Presentation Id",
+          "type": "string"
+        },
+        "product_presentations": {
+          "items": {
+            "$ref": "#/$defs/ProductPresentation"
+          },
+          "minItems": 1,
+          "title": "Product Presentations",
+          "type": "array"
+        },
+        "product_reference_requirements": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ProductReferenceRequirement"
+          },
+          "title": "Product Reference Requirements",
+          "type": "array"
+        },
+        "product_truth_source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Product Truth Source Ids",
+          "type": "array"
+        },
+        "protagonist_continuity_policy": {
+          "$ref": "#/$defs/ProtagonistContinuityPolicy"
+        },
+        "sound_cues": {
+          "items": {
+            "$ref": "#/$defs/AdSoundCue"
+          },
+          "minItems": 1,
+          "title": "Sound Cues",
+          "type": "array"
+        },
+        "source_generation_evidence": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/SourceGenerationEvidencePointer"
+          },
+          "title": "Source Generation Evidence",
+          "type": "array"
+        },
+        "visual_motif": {
+          "minLength": 1,
+          "title": "Visual Motif",
+          "type": "string"
+        }
+      },
+      "required": [
+        "creative_concept",
+        "product_truth_source_ids",
+        "claim_reference_ids",
+        "protagonist_continuity_policy",
+        "ad_arc",
+        "product_presentations",
+        "graphic_treatments",
+        "sound_cues",
+        "visual_motif",
+        "hero_shot_presentation_id",
+        "end_card_graphic_ids",
+        "cta_graphic_id"
+      ],
+      "title": "AdCreativePlanProposal",
+      "type": "object"
+    },
+    "AdSoundCue": {
+      "additionalProperties": false,
+      "properties": {
+        "audio_track_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Audio Track Id"
+        },
+        "cue_id": {
+          "minLength": 1,
+          "title": "Cue Id",
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/$defs/AdSoundRole"
+        },
+        "synchronized_event_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Synchronized Event Id"
+        }
+      },
+      "required": [
+        "cue_id",
+        "role"
+      ],
+      "title": "AdSoundCue",
+      "type": "object"
+    },
+    "AdSoundRole": {
+      "enum": [
+        "dialogue",
+        "voice_over",
+        "music",
+        "sfx",
+        "reveal_hit",
+        "intentional_silence"
+      ],
+      "title": "AdSoundRole",
+      "type": "string"
+    },
+    "ArtifactReference": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "minLength": 1,
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "path": {
+          "format": "path",
+          "title": "Path",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "revision",
+        "content_hash",
+        "path"
+      ],
+      "title": "ArtifactReference",
+      "type": "object"
+    },
+    "AssetRoleRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_asset_types": {
+          "items": {
+            "$ref": "#/$defs/AssetType"
+          },
+          "minItems": 1,
+          "title": "Allowed Asset Types",
+          "type": "array"
+        },
+        "asset_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Asset Ids",
+          "type": "array"
+        },
+        "role": {
+          "title": "Role",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "asset_ids",
+        "allowed_asset_types"
+      ],
+      "title": "AssetRoleRequirement",
+      "type": "object"
+    },
+    "AssetType": {
+      "enum": [
+        "image",
+        "video",
+        "voice",
+        "music",
+        "sfx",
+        "caption",
+        "composition_source",
+        "render",
+        "review_evidence"
+      ],
+      "title": "AssetType",
+      "type": "string"
+    },
+    "AudioKind": {
+      "enum": [
+        "dialogue",
+        "narration",
+        "ambience",
+        "sfx",
+        "bgm"
+      ],
+      "title": "AudioKind",
+      "type": "string"
+    },
+    "AudioTrackSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "minLength": 1,
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "audio_kind": {
+          "$ref": "#/$defs/AudioKind"
+        },
+        "ducking": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/DuckingSpec"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "fade_in_samples": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Fade In Samples",
+          "type": "integer"
+        },
+        "fade_out_samples": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Fade Out Samples",
+          "type": "integer"
+        },
+        "gain_millidb": {
+          "default": 0,
+          "title": "Gain Millidb",
+          "type": "integer"
+        },
+        "shot_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Shot Id"
+        },
+        "start_sample": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Start Sample"
+        },
+        "track_id": {
+          "minLength": 1,
+          "title": "Track Id",
+          "type": "string"
+        },
+        "trim_duration_samples": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Trim Duration Samples"
+        },
+        "trim_start_sample": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Trim Start Sample",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "track_id",
+        "audio_kind",
+        "asset_id"
+      ],
+      "title": "AudioTrackSpec",
+      "type": "object"
+    },
+    "CapabilityClassification": {
+      "enum": [
+        "supported_currently",
+        "requires_source_generation_strategy",
+        "requires_runtime_capability",
+        "requires_human_decision",
+        "blocked_by_truth_or_rights"
+      ],
+      "title": "CapabilityClassification",
+      "type": "string"
+    },
+    "CaptionStyleReference": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "minLength": 1,
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "path": {
+          "format": "path",
+          "title": "Path",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "revision",
+        "content_hash",
+        "path"
+      ],
+      "title": "CaptionStyleReference",
+      "type": "object"
+    },
+    "CaptionTrackBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "binding_id": {
+          "minLength": 1,
+          "title": "Binding Id",
+          "type": "string"
+        },
+        "caption_asset_id": {
+          "minLength": 1,
+          "title": "Caption Asset Id",
+          "type": "string"
+        },
+        "shot_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Shot Id"
+        },
+        "source_audio_track_id": {
+          "minLength": 1,
+          "title": "Source Audio Track Id",
+          "type": "string"
+        },
+        "style_reference": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/CaptionStyleReference"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "binding_id",
+        "caption_asset_id",
+        "source_audio_track_id"
+      ],
+      "title": "CaptionTrackBinding",
+      "type": "object"
+    },
+    "Character": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_variations": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Allowed Variations",
+          "type": "array"
+        },
+        "appearance_bible": {
+          "title": "Appearance Bible",
+          "type": "string"
+        },
+        "artifact_id": {
+          "minLength": 1,
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "character_id": {
+          "title": "Character Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "creation_receipt_id": {
+          "minLength": 1,
+          "title": "Creation Receipt Id",
+          "type": "string"
+        },
+        "identity": {
+          "title": "Identity",
+          "type": "string"
+        },
+        "name": {
+          "title": "Name",
+          "type": "string"
+        },
+        "reference_asset_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Reference Asset Ids",
+          "type": "array"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source_provenance": {
+          "items": {
+            "$ref": "#/$defs/SourceReference"
+          },
+          "minItems": 1,
+          "title": "Source Provenance",
+          "type": "array"
+        },
+        "voice_profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/VoiceProfile"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "wardrobe": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Wardrobe",
+          "type": "array"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "revision",
+        "content_hash",
+        "creation_receipt_id",
+        "source_provenance",
+        "character_id",
+        "name",
+        "identity",
+        "appearance_bible"
+      ],
+      "title": "Character",
+      "type": "object"
+    },
+    "CompositionDirective": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "fit",
+            "position",
+            "crop",
+            "text",
+            "transition_hint"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "parameters": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          },
+          "title": "Parameters",
+          "type": "object"
+        }
+      },
+      "required": [
+        "kind"
+      ],
+      "title": "CompositionDirective",
+      "type": "object"
+    },
+    "DuckingSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "attack_samples": {
+          "minimum": 0,
+          "title": "Attack Samples",
+          "type": "integer"
+        },
+        "attenuation_millidb": {
+          "exclusiveMaximum": 0,
+          "title": "Attenuation Millidb",
+          "type": "integer"
+        },
+        "release_samples": {
+          "minimum": 0,
+          "title": "Release Samples",
+          "type": "integer"
+        },
+        "sidechain_track_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Sidechain Track Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "sidechain_track_ids",
+        "attenuation_millidb",
+        "attack_samples",
+        "release_samples"
+      ],
+      "title": "DuckingSpec",
+      "type": "object"
+    },
+    "DurationPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "maximum_seconds": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Maximum Seconds"
+        },
+        "minimum_seconds": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Minimum Seconds"
+        },
+        "mode": {
+          "enum": [
+            "fixed",
+            "voice_driven",
+            "content_driven"
+          ],
+          "title": "Mode",
+          "type": "string"
+        },
+        "seconds": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Seconds"
+        }
+      },
+      "required": [
+        "mode"
+      ],
+      "title": "DurationPolicy",
+      "type": "object"
+    },
+    "EcommerceAcceptanceRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "requirement_id": {
+          "minLength": 1,
+          "title": "Requirement Id",
+          "type": "string"
+        },
+        "scope": {
+          "enum": [
+            "SHOT",
+            "FINAL_OUTPUT"
+          ],
+          "title": "Scope",
+          "type": "string"
+        },
+        "subject_id": {
+          "minLength": 1,
+          "title": "Subject Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "requirement_id",
+        "scope",
+        "subject_id",
+        "description"
+      ],
+      "title": "EcommerceAcceptanceRequirement",
+      "type": "object"
+    },
+    "EcommerceAllowedClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "minLength": 1,
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "claim_type": {
+          "minLength": 1,
+          "title": "Claim Type",
+          "type": "string"
+        },
+        "fact_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Fact Ids",
+          "type": "array"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "claim_id",
+        "text",
+        "claim_type",
+        "fact_ids",
+        "source_ids"
+      ],
+      "title": "EcommerceAllowedClaim",
+      "type": "object"
+    },
+    "EcommerceArtifactProposals": {
+      "additionalProperties": false,
+      "properties": {
+        "brief": {
+          "$ref": "#/$defs/ProductionBrief"
+        },
+        "characters": {
+          "items": {
+            "$ref": "#/$defs/Character"
+          },
+          "title": "Characters",
+          "type": "array"
+        },
+        "scenes": {
+          "items": {
+            "$ref": "#/$defs/Scene"
+          },
+          "minItems": 1,
+          "title": "Scenes",
+          "type": "array"
+        },
+        "shots": {
+          "items": {
+            "$ref": "#/$defs/Shot"
+          },
+          "minItems": 1,
+          "title": "Shots",
+          "type": "array"
+        },
+        "story": {
+          "$ref": "#/$defs/Story"
+        },
+        "storyboard": {
+          "$ref": "#/$defs/Storyboard"
+        }
+      },
+      "required": [
+        "brief",
+        "story",
+        "characters",
+        "scenes",
+        "storyboard",
+        "shots"
+      ],
+      "title": "EcommerceArtifactProposals",
+      "type": "object"
+    },
+    "EcommerceAssetRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "minLength": 1,
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "expected_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Sha256"
+        },
+        "expected_size_bytes": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expected Size Bytes"
+        },
+        "reference": {
+          "minLength": 1,
+          "title": "Reference",
+          "type": "string"
+        },
+        "rights_status": {
+          "enum": [
+            "CONFIRMED",
+            "RESTRICTED",
+            "UNKNOWN"
+          ],
+          "title": "Rights Status",
+          "type": "string"
+        },
+        "source_kind": {
+          "minLength": 1,
+          "title": "Source Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "asset_id",
+        "source_kind",
+        "reference",
+        "rights_status"
+      ],
+      "title": "EcommerceAssetRequirement",
+      "type": "object"
+    },
+    "EcommerceBeatRoleBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "beat_id": {
+          "minLength": 1,
+          "title": "Beat Id",
+          "type": "string"
+        },
+        "role": {
+          "$ref": "#/$defs/AdBeatRole"
+        }
+      },
+      "required": [
+        "beat_id",
+        "role"
+      ],
+      "title": "EcommerceBeatRoleBinding",
+      "type": "object"
+    },
+    "EcommerceDeliveryProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "aspect_ratio": {
+          "const": "9:16",
+          "title": "Aspect Ratio",
+          "type": "string"
+        },
+        "audio_sample_rate_hz": {
+          "exclusiveMinimum": 0,
+          "title": "Audio Sample Rate Hz",
+          "type": "integer"
+        },
+        "codec_profile": {
+          "minLength": 1,
+          "title": "Codec Profile",
+          "type": "string"
+        },
+        "constraints": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Constraints",
+          "type": "array"
+        },
+        "fps": {
+          "exclusiveMinimum": 0,
+          "title": "Fps",
+          "type": "integer"
+        },
+        "height": {
+          "exclusiveMinimum": 0,
+          "title": "Height",
+          "type": "integer"
+        },
+        "placement": {
+          "minLength": 1,
+          "title": "Placement",
+          "type": "string"
+        },
+        "platform": {
+          "minLength": 1,
+          "title": "Platform",
+          "type": "string"
+        },
+        "profile_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "ecommerce-delivery-profile/1",
+          "default": "ecommerce-delivery-profile/1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "width": {
+          "exclusiveMinimum": 0,
+          "title": "Width",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "profile_id",
+        "aspect_ratio",
+        "width",
+        "height",
+        "fps",
+        "codec_profile",
+        "audio_sample_rate_hz",
+        "platform",
+        "placement",
+        "constraints"
+      ],
+      "title": "EcommerceDeliveryProfile",
+      "type": "object"
+    },
+    "EcommerceGraphicRoleBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "$ref": "#/$defs/GraphicRole"
+        },
+        "typography_token_id": {
+          "minLength": 1,
+          "title": "Typography Token Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "role",
+        "typography_token_id"
+      ],
+      "title": "EcommerceGraphicRoleBinding",
+      "type": "object"
+    },
+    "EcommerceLayoutPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "beat_roles": {
+          "items": {
+            "$ref": "#/$defs/EcommerceBeatRoleBinding"
+          },
+          "title": "Beat Roles",
+          "type": "array"
+        },
+        "delivery_profile_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Delivery Profile Id",
+          "type": "string"
+        },
+        "graphic_treatments": {
+          "items": {
+            "$ref": "#/$defs/GraphicTreatment"
+          },
+          "title": "Graphic Treatments",
+          "type": "array"
+        },
+        "layout_plan_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Layout Plan Id",
+          "type": "string"
+        },
+        "product_presentations": {
+          "items": {
+            "$ref": "#/$defs/ProductPresentation"
+          },
+          "title": "Product Presentations",
+          "type": "array"
+        },
+        "protagonist_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Protagonist Ids",
+          "type": "array"
+        },
+        "scenes": {
+          "items": {
+            "$ref": "#/$defs/EcommerceLayoutScene"
+          },
+          "minItems": 1,
+          "title": "Scenes",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "ecommerce-layout-plan/1",
+          "default": "ecommerce-layout-plan/1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "shots": {
+          "items": {
+            "$ref": "#/$defs/EcommerceLayoutShot"
+          },
+          "minItems": 1,
+          "title": "Shots",
+          "type": "array"
+        },
+        "source_package_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Source Package Id",
+          "type": "string"
+        },
+        "visual_system_profile_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Visual System Profile Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "layout_plan_id",
+        "source_package_id",
+        "delivery_profile_id",
+        "visual_system_profile_id",
+        "scenes",
+        "shots",
+        "beat_roles",
+        "graphic_treatments",
+        "product_presentations",
+        "protagonist_ids"
+      ],
+      "title": "EcommerceLayoutPlan",
+      "type": "object"
+    },
+    "EcommerceLayoutScene": {
+      "additionalProperties": false,
+      "properties": {
+        "continuity_constraints": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Continuity Constraints",
+          "type": "array"
+        },
+        "location": {
+          "minLength": 1,
+          "title": "Location",
+          "type": "string"
+        },
+        "mood": {
+          "minLength": 1,
+          "title": "Mood",
+          "type": "string"
+        },
+        "participant_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Participant Ids",
+          "type": "array"
+        },
+        "scene_id": {
+          "minLength": 1,
+          "title": "Scene Id",
+          "type": "string"
+        },
+        "source_set_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Set Id"
+        },
+        "time": {
+          "minLength": 1,
+          "title": "Time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "scene_id",
+        "location",
+        "time",
+        "mood",
+        "participant_ids",
+        "continuity_constraints"
+      ],
+      "title": "EcommerceLayoutScene",
+      "type": "object"
+    },
+    "EcommerceLayoutShot": {
+      "additionalProperties": false,
+      "properties": {
+        "character_ids": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Character Ids",
+          "type": "array"
+        },
+        "composition_directives": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CompositionDirective"
+          },
+          "title": "Composition Directives",
+          "type": "array"
+        },
+        "continuity_constraints": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Continuity Constraints",
+          "type": "array"
+        },
+        "scene_id": {
+          "minLength": 1,
+          "title": "Scene Id",
+          "type": "string"
+        },
+        "shot_id": {
+          "minLength": 1,
+          "title": "Shot Id",
+          "type": "string"
+        },
+        "visual_strategy": {
+          "$ref": "#/$defs/VisualStrategy"
+        }
+      },
+      "required": [
+        "shot_id",
+        "scene_id",
+        "character_ids",
+        "visual_strategy",
+        "continuity_constraints"
+      ],
+      "title": "EcommerceLayoutShot",
+      "type": "object"
+    },
+    "EcommerceProductFact": {
+      "additionalProperties": false,
+      "properties": {
+        "fact_id": {
+          "minLength": 1,
+          "title": "Fact Id",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "statement": {
+          "minLength": 1,
+          "title": "Statement",
+          "type": "string"
+        }
+      },
+      "required": [
+        "fact_id",
+        "statement",
+        "source_ids"
+      ],
+      "title": "EcommerceProductFact",
+      "type": "object"
+    },
+    "EcommerceProductTruth": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_claims": {
+          "items": {
+            "$ref": "#/$defs/EcommerceAllowedClaim"
+          },
+          "minItems": 1,
+          "title": "Allowed Claims",
+          "type": "array"
+        },
+        "facts": {
+          "items": {
+            "$ref": "#/$defs/EcommerceProductFact"
+          },
+          "minItems": 1,
+          "title": "Facts",
+          "type": "array"
+        },
+        "product_id": {
+          "minLength": 1,
+          "title": "Product Id",
+          "type": "string"
+        },
+        "product_name": {
+          "minLength": 1,
+          "title": "Product Name",
+          "type": "string"
+        },
+        "prohibited_claims": {
+          "items": {
+            "$ref": "#/$defs/EcommerceProhibitedClaim"
+          },
+          "title": "Prohibited Claims",
+          "type": "array"
+        },
+        "required_disclaimers": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Required Disclaimers",
+          "type": "array"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/EcommerceTruthSource"
+          },
+          "minItems": 1,
+          "title": "Sources",
+          "type": "array"
+        }
+      },
+      "required": [
+        "product_id",
+        "product_name",
+        "sources",
+        "facts",
+        "allowed_claims",
+        "prohibited_claims",
+        "required_disclaimers"
+      ],
+      "title": "EcommerceProductTruth",
+      "type": "object"
+    },
+    "EcommerceProductionCompileProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "delivery_profile_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Delivery Profile Id",
+          "type": "string"
+        },
+        "layout_plan_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Layout Plan Id",
+          "type": "string"
+        },
+        "profile_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "requirement_resolutions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/EcommerceRequirementResolution"
+          },
+          "title": "Requirement Resolutions",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "ecommerce-production-compile-profile/1",
+          "default": "ecommerce-production-compile-profile/1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "visual_system_profile_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Visual System Profile Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "profile_id",
+        "delivery_profile_id",
+        "visual_system_profile_id",
+        "layout_plan_id"
+      ],
+      "title": "EcommerceProductionCompileProfile",
+      "type": "object"
+    },
+    "EcommerceProhibitedClaim": {
+      "additionalProperties": false,
+      "properties": {
+        "claim_id": {
+          "minLength": 1,
+          "title": "Claim Id",
+          "type": "string"
+        },
+        "claim_type": {
+          "minLength": 1,
+          "title": "Claim Type",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "claim_id",
+        "text",
+        "claim_type",
+        "reason"
+      ],
+      "title": "EcommerceProhibitedClaim",
+      "type": "object"
+    },
+    "EcommerceRequirementResolution": {
+      "additionalProperties": false,
+      "properties": {
+        "capability": {
+          "const": "advertising_copy_graphics",
+          "title": "Capability",
+          "type": "string"
+        },
+        "evidence_ids": {
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 3,
+          "minItems": 3,
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "requirement_id": {
+          "minLength": 1,
+          "title": "Requirement Id",
+          "type": "string"
+        },
+        "resolution_kind": {
+          "const": "EXACT_GRAPHIC_LAYOUT",
+          "title": "Resolution Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "requirement_id",
+        "capability",
+        "resolution_kind",
+        "evidence_ids"
+      ],
+      "title": "EcommerceRequirementResolution",
+      "type": "object"
+    },
+    "EcommerceRuntimeRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "capability": {
+          "minLength": 1,
+          "title": "Capability",
+          "type": "string"
+        },
+        "classification": {
+          "enum": [
+            "SUPPORTED_CURRENTLY",
+            "REQUIRES_SOURCE_GENERATION_STRATEGY",
+            "REQUIRES_RUNTIME_CAPABILITY",
+            "REQUIRES_HUMAN_DECISION",
+            "BLOCKED_BY_TRUTH_OR_RIGHTS"
+          ],
+          "title": "Classification",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "requirement_id": {
+          "minLength": 1,
+          "title": "Requirement Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "requirement_id",
+        "capability",
+        "classification",
+        "rationale"
+      ],
+      "title": "EcommerceRuntimeRequirement",
+      "type": "object"
+    },
+    "EcommerceTruthSource": {
+      "additionalProperties": false,
+      "properties": {
+        "reference": {
+          "minLength": 1,
+          "title": "Reference",
+          "type": "string"
+        },
+        "rights_status": {
+          "enum": [
+            "CONFIRMED",
+            "RESTRICTED",
+            "UNKNOWN"
+          ],
+          "title": "Rights Status",
+          "type": "string"
+        },
+        "source_id": {
+          "minLength": 1,
+          "title": "Source Id",
+          "type": "string"
+        },
+        "source_kind": {
+          "minLength": 1,
+          "title": "Source Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "source_kind",
+        "reference",
+        "rights_status"
+      ],
+      "title": "EcommerceTruthSource",
+      "type": "object"
+    },
+    "EcommerceTypographyToken": {
+      "additionalProperties": false,
+      "properties": {
+        "background_color": {
+          "anyOf": [
+            {
+              "pattern": "^#[0-9A-Fa-f]{8}$|^#[0-9A-Fa-f]{6}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Background Color"
+        },
+        "font_family": {
+          "const": "sans-serif",
+          "title": "Font Family",
+          "type": "string"
+        },
+        "font_size_px": {
+          "exclusiveMinimum": 0,
+          "maximum": 512,
+          "title": "Font Size Px",
+          "type": "integer"
+        },
+        "font_weight": {
+          "maximum": 900,
+          "minimum": 100,
+          "multipleOf": 100,
+          "title": "Font Weight",
+          "type": "integer"
+        },
+        "letter_spacing_px": {
+          "maximum": 16,
+          "minimum": 0,
+          "title": "Letter Spacing Px",
+          "type": "integer"
+        },
+        "text_color": {
+          "pattern": "^#[0-9A-Fa-f]{8}$|^#[0-9A-Fa-f]{6}$",
+          "title": "Text Color",
+          "type": "string"
+        },
+        "token_id": {
+          "minLength": 1,
+          "title": "Token Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "token_id",
+        "font_family",
+        "font_size_px",
+        "font_weight",
+        "letter_spacing_px",
+        "text_color"
+      ],
+      "title": "EcommerceTypographyToken",
+      "type": "object"
+    },
+    "EcommerceUnsupportedGap": {
+      "additionalProperties": false,
+      "properties": {
+        "blocker_code": {
+          "minLength": 1,
+          "title": "Blocker Code",
+          "type": "string"
+        },
+        "classification": {
+          "minLength": 1,
+          "title": "Classification",
+          "type": "string"
+        },
+        "gap_id": {
+          "minLength": 1,
+          "title": "Gap Id",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "requirement_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Requirement Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "gap_id",
+        "classification",
+        "requirement_ids",
+        "blocker_code",
+        "rationale"
+      ],
+      "title": "EcommerceUnsupportedGap",
+      "type": "object"
+    },
+    "EcommerceVisualSystemProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "brand_token_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Brand Token Ids",
+          "type": "array"
+        },
+        "profile_id": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "role_bindings": {
+          "items": {
+            "$ref": "#/$defs/EcommerceGraphicRoleBinding"
+          },
+          "title": "Role Bindings",
+          "type": "array"
+        },
+        "safe_area": {
+          "$ref": "#/$defs/GraphicSafeAreaInsets"
+        },
+        "schema_version": {
+          "const": "ecommerce-visual-system-profile/1",
+          "default": "ecommerce-visual-system-profile/1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "typography_tokens": {
+          "items": {
+            "$ref": "#/$defs/EcommerceTypographyToken"
+          },
+          "title": "Typography Tokens",
+          "type": "array"
+        }
+      },
+      "required": [
+        "profile_id",
+        "brand_token_ids",
+        "safe_area",
+        "typography_tokens",
+        "role_bindings"
+      ],
+      "title": "EcommerceVisualSystemProfile",
+      "type": "object"
+    },
+    "FixedTransform": {
+      "additionalProperties": false,
+      "properties": {
+        "rotation_millidegrees": {
+          "default": 0,
+          "title": "Rotation Millidegrees",
+          "type": "integer"
+        },
+        "scale_x_milli": {
+          "default": 1000,
+          "exclusiveMinimum": 0,
+          "title": "Scale X Milli",
+          "type": "integer"
+        },
+        "scale_y_milli": {
+          "default": 1000,
+          "exclusiveMinimum": 0,
+          "title": "Scale Y Milli",
+          "type": "integer"
+        },
+        "translate_x_px": {
+          "default": 0,
+          "title": "Translate X Px",
+          "type": "integer"
+        },
+        "translate_y_px": {
+          "default": 0,
+          "title": "Translate Y Px",
+          "type": "integer"
+        }
+      },
+      "title": "FixedTransform",
+      "type": "object"
+    },
+    "GraphicAnimation": {
+      "enum": [
+        "none",
+        "fade",
+        "slide_up",
+        "scale_in"
+      ],
+      "title": "GraphicAnimation",
+      "type": "string"
+    },
+    "GraphicKeywordEmphasis": {
+      "additionalProperties": false,
+      "properties": {
+        "brand_token_id": {
+          "minLength": 1,
+          "title": "Brand Token Id",
+          "type": "string"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        }
+      },
+      "required": [
+        "text",
+        "brand_token_id"
+      ],
+      "title": "GraphicKeywordEmphasis",
+      "type": "object"
+    },
+    "GraphicRole": {
+      "enum": [
+        "dialogue_subtitle",
+        "headline",
+        "benefit_callout",
+        "product_label",
+        "proof_label",
+        "cta",
+        "brand_end_card"
+      ],
+      "title": "GraphicRole",
+      "type": "string"
+    },
+    "GraphicSafeAreaInsets": {
+      "additionalProperties": false,
+      "properties": {
+        "bottom_milli": {
+          "default": 0,
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "Bottom Milli",
+          "type": "integer"
+        },
+        "left_milli": {
+          "default": 0,
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "Left Milli",
+          "type": "integer"
+        },
+        "right_milli": {
+          "default": 0,
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "Right Milli",
+          "type": "integer"
+        },
+        "top_milli": {
+          "default": 0,
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "Top Milli",
+          "type": "integer"
+        }
+      },
+      "title": "GraphicSafeAreaInsets",
+      "type": "object"
+    },
+    "GraphicTreatment": {
+      "additionalProperties": false,
+      "properties": {
+        "avoidance_target_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Avoidance Target Ids",
+          "type": "array"
+        },
+        "background_color": {
+          "anyOf": [
+            {
+              "pattern": "^#[0-9A-Fa-f]{8}$|^#[0-9A-Fa-f]{6}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Background Color"
+        },
+        "brand_token_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Brand Token Ids",
+          "type": "array"
+        },
+        "caption_binding_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Caption Binding Id"
+        },
+        "claim_reference_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Claim Reference Ids",
+          "type": "array"
+        },
+        "duration_frames": {
+          "exclusiveMinimum": 0,
+          "title": "Duration Frames",
+          "type": "integer"
+        },
+        "entrance": {
+          "$ref": "#/$defs/GraphicAnimation",
+          "default": "none"
+        },
+        "exit": {
+          "$ref": "#/$defs/GraphicAnimation",
+          "default": "none"
+        },
+        "font_size_px": {
+          "exclusiveMinimum": 0,
+          "maximum": 512,
+          "title": "Font Size Px",
+          "type": "integer"
+        },
+        "font_weight": {
+          "default": 700,
+          "maximum": 900,
+          "minimum": 100,
+          "multipleOf": 100,
+          "title": "Font Weight",
+          "type": "integer"
+        },
+        "graphic_id": {
+          "minLength": 1,
+          "title": "Graphic Id",
+          "type": "string"
+        },
+        "keyword_emphasis": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/GraphicKeywordEmphasis"
+          },
+          "title": "Keyword Emphasis",
+          "type": "array"
+        },
+        "letter_spacing_px": {
+          "default": 0,
+          "maximum": 16,
+          "minimum": 0,
+          "title": "Letter Spacing Px",
+          "type": "integer"
+        },
+        "role": {
+          "$ref": "#/$defs/GraphicRole"
+        },
+        "safe_area": {
+          "$ref": "#/$defs/GraphicSafeAreaInsets"
+        },
+        "shot_id": {
+          "minLength": 1,
+          "title": "Shot Id",
+          "type": "string"
+        },
+        "sound_cue_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Sound Cue Ids",
+          "type": "array"
+        },
+        "start_frame_offset": {
+          "minimum": 0,
+          "title": "Start Frame Offset",
+          "type": "integer"
+        },
+        "synchronized_event_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Synchronized Event Id"
+        },
+        "text": {
+          "minLength": 1,
+          "title": "Text",
+          "type": "string"
+        },
+        "text_color": {
+          "pattern": "^#[0-9A-Fa-f]{8}$|^#[0-9A-Fa-f]{6}$",
+          "title": "Text Color",
+          "type": "string"
+        },
+        "width_milli": {
+          "exclusiveMinimum": 0,
+          "maximum": 1000,
+          "title": "Width Milli",
+          "type": "integer"
+        },
+        "x_milli": {
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "X Milli",
+          "type": "integer"
+        },
+        "y_milli": {
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "Y Milli",
+          "type": "integer"
+        },
+        "z_index": {
+          "title": "Z Index",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "graphic_id",
+        "role",
+        "text",
+        "shot_id",
+        "start_frame_offset",
+        "duration_frames",
+        "x_milli",
+        "y_milli",
+        "width_milli",
+        "font_size_px",
+        "text_color",
+        "z_index"
+      ],
+      "title": "GraphicTreatment",
+      "type": "object"
+    },
+    "HybridLayer": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "asset_role": {
+          "title": "Asset Role",
+          "type": "string"
+        },
+        "role": {
+          "title": "Role",
+          "type": "string"
+        },
+        "z_index": {
+          "title": "Z Index",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "role",
+        "asset_role",
+        "asset_id",
+        "z_index"
+      ],
+      "title": "HybridLayer",
+      "type": "object"
+    },
+    "MotionDirective": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "pan",
+            "zoom",
+            "parallax",
+            "reveal",
+            "layered",
+            "animate",
+            "particles",
+            "transition"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "parameters": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "string"
+              }
+            ]
+          },
+          "minProperties": 1,
+          "title": "Parameters",
+          "type": "object"
+        }
+      },
+      "required": [
+        "kind",
+        "parameters"
+      ],
+      "title": "MotionDirective",
+      "type": "object"
+    },
+    "ProductPresentation": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Asset Id"
+        },
+        "beat_id": {
+          "minLength": 1,
+          "title": "Beat Id",
+          "type": "string"
+        },
+        "capability_classification": {
+          "$ref": "#/$defs/CapabilityClassification"
+        },
+        "composition_layer_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Composition Layer Id"
+        },
+        "entrance": {
+          "$ref": "#/$defs/GraphicAnimation",
+          "default": "none"
+        },
+        "exit": {
+          "$ref": "#/$defs/GraphicAnimation",
+          "default": "none"
+        },
+        "graphic_treatment_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Graphic Treatment Ids",
+          "type": "array"
+        },
+        "lighting_match_required": {
+          "default": false,
+          "title": "Lighting Match Required",
+          "type": "boolean"
+        },
+        "mode": {
+          "$ref": "#/$defs/ProductPresentationMode"
+        },
+        "occlusion_required": {
+          "default": false,
+          "title": "Occlusion Required",
+          "type": "boolean"
+        },
+        "presentation_id": {
+          "minLength": 1,
+          "title": "Presentation Id",
+          "type": "string"
+        },
+        "product_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Product Id"
+        },
+        "product_reference_requirement_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Product Reference Requirement Id"
+        },
+        "product_truth_reference_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Product Truth Reference Ids",
+          "type": "array"
+        },
+        "requires_physical_interaction": {
+          "default": false,
+          "title": "Requires Physical Interaction",
+          "type": "boolean"
+        },
+        "role": {
+          "$ref": "#/$defs/ProductPresentationRole"
+        },
+        "shot_id": {
+          "minLength": 1,
+          "title": "Shot Id",
+          "type": "string"
+        },
+        "sound_cue_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Sound Cue Ids",
+          "type": "array"
+        },
+        "source_evidence_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Evidence Id"
+        },
+        "source_requirement_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Requirement Id"
+        },
+        "tracking_required": {
+          "default": false,
+          "title": "Tracking Required",
+          "type": "boolean"
+        },
+        "transform_intent": {
+          "$ref": "#/$defs/ProductTransformIntent"
+        }
+      },
+      "required": [
+        "presentation_id",
+        "role",
+        "mode",
+        "beat_id",
+        "shot_id",
+        "product_truth_reference_ids",
+        "graphic_treatment_ids",
+        "sound_cue_ids",
+        "capability_classification"
+      ],
+      "title": "ProductPresentation",
+      "type": "object"
+    },
+    "ProductPresentationMode": {
+      "enum": [
+        "in_scene_provider",
+        "graphic_reveal",
+        "hero_asset"
+      ],
+      "title": "ProductPresentationMode",
+      "type": "string"
+    },
+    "ProductPresentationRole": {
+      "enum": [
+        "intro",
+        "demonstration",
+        "benefit_proof",
+        "hero_shot",
+        "cta_support"
+      ],
+      "title": "ProductPresentationRole",
+      "type": "string"
+    },
+    "ProductReferenceRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "expected_views": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Expected Views",
+          "type": "array"
+        },
+        "fidelity_dimensions": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Fidelity Dimensions",
+          "type": "array"
+        },
+        "product_id": {
+          "minLength": 1,
+          "title": "Product Id",
+          "type": "string"
+        },
+        "requirement_id": {
+          "minLength": 1,
+          "title": "Requirement Id",
+          "type": "string"
+        },
+        "truth_reference_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Truth Reference Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "requirement_id",
+        "product_id",
+        "truth_reference_ids",
+        "expected_views",
+        "fidelity_dimensions"
+      ],
+      "title": "ProductReferenceRequirement",
+      "type": "object"
+    },
+    "ProductTransformIntent": {
+      "additionalProperties": false,
+      "properties": {
+        "opacity_milli": {
+          "default": 1000,
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "Opacity Milli",
+          "type": "integer"
+        },
+        "transform": {
+          "$ref": "#/$defs/FixedTransform"
+        }
+      },
+      "title": "ProductTransformIntent",
+      "type": "object"
+    },
+    "ProductionAudioUse": {
+      "additionalProperties": false,
+      "properties": {
+        "component_id": {
+          "minLength": 1,
+          "title": "Component Id",
+          "type": "string"
+        },
+        "requirement_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Requirement Ids",
+          "type": "array"
+        },
+        "source": {
+          "$ref": "#/$defs/ProductionSourceOption"
+        },
+        "track": {
+          "$ref": "#/$defs/AudioTrackSpec"
+        }
+      },
+      "required": [
+        "component_id",
+        "requirement_ids",
+        "source",
+        "track"
+      ],
+      "title": "ProductionAudioUse",
+      "type": "object"
+    },
+    "ProductionBrief": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "minLength": 1,
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "audience": {
+          "title": "Audience",
+          "type": "string"
+        },
+        "constraints": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Constraints",
+          "type": "array"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "creation_receipt_id": {
+          "minLength": 1,
+          "title": "Creation Receipt Id",
+          "type": "string"
+        },
+        "format": {
+          "title": "Format",
+          "type": "string"
+        },
+        "language": {
+          "title": "Language",
+          "type": "string"
+        },
+        "objective": {
+          "title": "Objective",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source_provenance": {
+          "items": {
+            "$ref": "#/$defs/SourceReference"
+          },
+          "minItems": 1,
+          "title": "Source Provenance",
+          "type": "array"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "revision",
+        "content_hash",
+        "creation_receipt_id",
+        "source_provenance",
+        "title",
+        "objective",
+        "audience",
+        "format",
+        "language"
+      ],
+      "title": "ProductionBrief",
+      "type": "object"
+    },
+    "ProductionComponentLineage": {
+      "additionalProperties": false,
+      "description": "Reopenable creative parent, not a mutable strategy lifecycle.",
+      "properties": {
+        "allocation_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Allocation Hash",
+          "type": "string"
+        },
+        "allocation_policy": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QaPolicyPointer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "component_id": {
+          "minLength": 1,
+          "title": "Component Id",
+          "type": "string"
+        },
+        "contract_version": {
+          "const": "production-component/1",
+          "default": "production-component/1",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "coverage_id": {
+          "minLength": 1,
+          "title": "Coverage Id",
+          "type": "string"
+        },
+        "decision_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Decision Hash",
+          "type": "string"
+        },
+        "operation": {
+          "$ref": "#/$defs/ProductionOperation"
+        },
+        "origin_project_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Origin Project Hash",
+          "type": "string"
+        },
+        "parent": {
+          "$ref": "#/$defs/ArtifactReference"
+        },
+        "parent_shot_id": {
+          "minLength": 1,
+          "title": "Parent Shot Id",
+          "type": "string"
+        },
+        "source": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProductionSourceOption"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "task_id": {
+          "minLength": 1,
+          "title": "Task Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "parent",
+        "origin_project_hash",
+        "parent_shot_id",
+        "task_id",
+        "coverage_id",
+        "component_id",
+        "allocation_hash",
+        "decision_hash",
+        "operation"
+      ],
+      "title": "ProductionComponentLineage",
+      "type": "object"
+    },
+    "ProductionCoverage": {
+      "additionalProperties": false,
+      "properties": {
+        "allocation_id": {
+          "minLength": 1,
+          "title": "Allocation Id",
+          "type": "string"
+        },
+        "audio": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ProductionAudioUse"
+          },
+          "title": "Audio",
+          "type": "array"
+        },
+        "captions": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CaptionTrackBinding"
+          },
+          "title": "Captions",
+          "type": "array"
+        },
+        "coverage_id": {
+          "minLength": 1,
+          "title": "Coverage Id",
+          "type": "string"
+        },
+        "units": {
+          "items": {
+            "$ref": "#/$defs/ProductionUnit"
+          },
+          "maxItems": 32,
+          "minItems": 1,
+          "title": "Units",
+          "type": "array"
+        }
+      },
+      "required": [
+        "coverage_id",
+        "allocation_id",
+        "units"
+      ],
+      "title": "ProductionCoverage",
+      "type": "object"
+    },
+    "ProductionIntent": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_operations": {
+          "items": {
+            "$ref": "#/$defs/ProductionOperation"
+          },
+          "minItems": 1,
+          "title": "Allowed Operations",
+          "type": "array"
+        },
+        "assembly_requirement_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Assembly Requirement Ids",
+          "type": "array"
+        },
+        "co_visible_required": {
+          "default": false,
+          "title": "Co Visible Required",
+          "type": "boolean"
+        },
+        "contract_version": {
+          "const": "production-intent/1",
+          "default": "production-intent/1",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "coverage_options": {
+          "items": {
+            "$ref": "#/$defs/ProductionCoverage"
+          },
+          "maxItems": 16,
+          "minItems": 1,
+          "title": "Coverage Options",
+          "type": "array"
+        },
+        "protected_requirement_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Protected Requirement Ids",
+          "type": "array"
+        },
+        "single_take": {
+          "default": false,
+          "title": "Single Take",
+          "type": "boolean"
+        },
+        "task_id": {
+          "minLength": 1,
+          "title": "Task Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "task_id",
+        "allowed_operations",
+        "protected_requirement_ids",
+        "coverage_options"
+      ],
+      "title": "ProductionIntent",
+      "type": "object"
+    },
+    "ProductionOperation": {
+      "enum": [
+        "GENERATE_FULL_SHOT",
+        "EXISTING_ASSET_REUSE",
+        "SPLIT_SHOT",
+        "CUTAWAY",
+        "REACTION_SHOT",
+        "INSERT_SHOT",
+        "REFRAME",
+        "TRIM_EXISTING",
+        "EDIT_EXISTING_VIDEO",
+        "STILL_IMAGE_WITH_MOTION",
+        "REPLACE_AUDIO",
+        "DUB_DIALOGUE",
+        "EXTEND_VIDEO",
+        "CHANGE_REFERENCE_STRATEGY",
+        "CHANGE_PROVIDER",
+        "SIMPLIFY_ACTION",
+        "COMPOSITE_MULTIPLE_ASSETS",
+        "MASK_COMPOSITE",
+        "TRACKING",
+        "LIP_SYNC"
+      ],
+      "title": "ProductionOperation",
+      "type": "string"
+    },
+    "ProductionSourceOption": {
+      "additionalProperties": false,
+      "description": "An authored possible use, not a claim that its content is qualified.",
+      "properties": {
+        "asset_id": {
+          "minLength": 1,
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "asset_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Asset Sha256",
+          "type": "string"
+        },
+        "duration": {
+          "exclusiveMinimum": 0,
+          "title": "Duration",
+          "type": "integer"
+        },
+        "evidence_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Ids",
+          "type": "array"
+        },
+        "opacity_milli": {
+          "default": 1000,
+          "maximum": 1000,
+          "minimum": 0,
+          "title": "Opacity Milli",
+          "type": "integer"
+        },
+        "requirement_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Requirement Ids",
+          "type": "array"
+        },
+        "role": {
+          "minLength": 1,
+          "title": "Role",
+          "type": "string"
+        },
+        "start": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Start",
+          "type": "integer"
+        },
+        "timebase": {
+          "enum": [
+            "frames",
+            "samples",
+            "still"
+          ],
+          "title": "Timebase",
+          "type": "string"
+        },
+        "transform": {
+          "$ref": "#/$defs/FixedTransform"
+        },
+        "z_index": {
+          "default": 0,
+          "title": "Z Index",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "asset_id",
+        "asset_sha256",
+        "role",
+        "timebase",
+        "duration"
+      ],
+      "title": "ProductionSourceOption",
+      "type": "object"
+    },
+    "ProductionUnit": {
+      "additionalProperties": false,
+      "properties": {
+        "additional_sources": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ProductionSourceOption"
+          },
+          "title": "Additional Sources",
+          "type": "array"
+        },
+        "component_id": {
+          "minLength": 1,
+          "title": "Component Id",
+          "type": "string"
+        },
+        "dialogue": {
+          "default": "",
+          "title": "Dialogue",
+          "type": "string"
+        },
+        "duration_frames": {
+          "exclusiveMinimum": 0,
+          "title": "Duration Frames",
+          "type": "integer"
+        },
+        "first_frame_asset_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "First Frame Asset Id"
+        },
+        "intent": {
+          "minLength": 1,
+          "title": "Intent",
+          "type": "string"
+        },
+        "motion_required": {
+          "default": false,
+          "title": "Motion Required",
+          "type": "boolean"
+        },
+        "narration": {
+          "default": "",
+          "title": "Narration",
+          "type": "string"
+        },
+        "required_operations": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ProductionOperation"
+          },
+          "title": "Required Operations",
+          "type": "array"
+        },
+        "requirement_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Requirement Ids",
+          "type": "array"
+        },
+        "shot_id": {
+          "minLength": 1,
+          "title": "Shot Id",
+          "type": "string"
+        },
+        "source_options": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/ProductionSourceOption"
+          },
+          "title": "Source Options",
+          "type": "array"
+        }
+      },
+      "required": [
+        "component_id",
+        "shot_id",
+        "intent",
+        "duration_frames",
+        "requirement_ids"
+      ],
+      "title": "ProductionUnit",
+      "type": "object"
+    },
+    "ProtagonistContinuityMode": {
+      "enum": [
+        "single_protagonist",
+        "declared_montage"
+      ],
+      "title": "ProtagonistContinuityMode",
+      "type": "string"
+    },
+    "ProtagonistContinuityPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "allowed_variations": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Allowed Variations",
+          "type": "array"
+        },
+        "mode": {
+          "$ref": "#/$defs/ProtagonistContinuityMode"
+        },
+        "protagonist_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Protagonist Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "mode",
+        "protagonist_ids"
+      ],
+      "title": "ProtagonistContinuityPolicy",
+      "type": "object"
+    },
+    "QaPolicyPointer": {
+      "additionalProperties": false,
+      "properties": {
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "file_sha256": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "File Sha256",
+          "type": "string"
+        },
+        "path": {
+          "format": "path",
+          "title": "Path",
+          "type": "string"
+        },
+        "policy_id": {
+          "minLength": 1,
+          "title": "Policy Id",
+          "type": "string"
+        },
+        "policy_version": {
+          "minLength": 1,
+          "title": "Policy Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "path",
+        "policy_id",
+        "policy_version",
+        "content_hash",
+        "file_sha256"
+      ],
+      "title": "QaPolicyPointer",
+      "type": "object"
+    },
+    "ReviewPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "required_checks": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Required Checks",
+          "type": "array"
+        }
+      },
+      "title": "ReviewPolicy",
+      "type": "object"
+    },
+    "Scene": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "minLength": 1,
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "continuity_constraints": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Continuity Constraints",
+          "type": "array"
+        },
+        "creation_receipt_id": {
+          "minLength": 1,
+          "title": "Creation Receipt Id",
+          "type": "string"
+        },
+        "location": {
+          "title": "Location",
+          "type": "string"
+        },
+        "mood": {
+          "title": "Mood",
+          "type": "string"
+        },
+        "participant_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Participant Ids",
+          "type": "array"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "scene_id": {
+          "title": "Scene Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source_provenance": {
+          "items": {
+            "$ref": "#/$defs/SourceReference"
+          },
+          "minItems": 1,
+          "title": "Source Provenance",
+          "type": "array"
+        },
+        "time": {
+          "title": "Time",
+          "type": "string"
+        },
+        "visual_reference_asset_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Visual Reference Asset Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "revision",
+        "content_hash",
+        "creation_receipt_id",
+        "source_provenance",
+        "scene_id",
+        "location",
+        "time",
+        "mood"
+      ],
+      "title": "Scene",
+      "type": "object"
+    },
+    "Shot": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "minLength": 1,
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "character_ids": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Character Ids",
+          "type": "array"
+        },
+        "composition_directives": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/CompositionDirective"
+          },
+          "title": "Composition Directives",
+          "type": "array"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "continuity_constraints": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Continuity Constraints",
+          "type": "array"
+        },
+        "creation_receipt_id": {
+          "minLength": 1,
+          "title": "Creation Receipt Id",
+          "type": "string"
+        },
+        "dialogue": {
+          "default": "",
+          "title": "Dialogue",
+          "type": "string"
+        },
+        "duration_policy": {
+          "$ref": "#/$defs/DurationPolicy"
+        },
+        "generated_video_rationale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Generated Video Rationale"
+        },
+        "hybrid_layers": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/HybridLayer"
+          },
+          "title": "Hybrid Layers",
+          "type": "array"
+        },
+        "intent": {
+          "title": "Intent",
+          "type": "string"
+        },
+        "motion_directives": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/MotionDirective"
+          },
+          "title": "Motion Directives",
+          "type": "array"
+        },
+        "narration": {
+          "default": "",
+          "title": "Narration",
+          "type": "string"
+        },
+        "production_intent": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProductionIntent"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "production_lineage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProductionComponentLineage"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "required_asset_roles": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/AssetRoleRequirement"
+          },
+          "title": "Required Asset Roles",
+          "type": "array"
+        },
+        "review_policy": {
+          "$ref": "#/$defs/ReviewPolicy"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "scene_id": {
+          "title": "Scene Id",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "shot_id": {
+          "title": "Shot Id",
+          "type": "string"
+        },
+        "source_provenance": {
+          "items": {
+            "$ref": "#/$defs/SourceReference"
+          },
+          "minItems": 1,
+          "title": "Source Provenance",
+          "type": "array"
+        },
+        "storyboard_beat_id": {
+          "title": "Storyboard Beat Id",
+          "type": "string"
+        },
+        "visual_strategy": {
+          "$ref": "#/$defs/VisualStrategy"
+        },
+        "voice_routing": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/VoiceRoutingRequirement"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "artifact_id",
+        "revision",
+        "content_hash",
+        "creation_receipt_id",
+        "source_provenance",
+        "shot_id",
+        "scene_id",
+        "storyboard_beat_id",
+        "intent",
+        "duration_policy",
+        "visual_strategy"
+      ],
+      "title": "Shot",
+      "type": "object"
+    },
+    "SourceGenerationEvidencePointer": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "minLength": 1,
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "asset_id": {
+          "minLength": 1,
+          "title": "Asset Id",
+          "type": "string"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "evidence_id": {
+          "minLength": 1,
+          "title": "Evidence Id",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "shot_id": {
+          "minLength": 1,
+          "title": "Shot Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_id",
+        "artifact_id",
+        "revision",
+        "content_hash",
+        "shot_id",
+        "asset_id"
+      ],
+      "title": "SourceGenerationEvidencePointer",
+      "type": "object"
+    },
+    "SourceReference": {
+      "additionalProperties": false,
+      "properties": {
+        "content_hash": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Content Hash"
+        },
+        "kind": {
+          "enum": [
+            "user_input",
+            "imported",
+            "derived"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "reference": {
+          "title": "Reference",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "reference"
+      ],
+      "title": "SourceReference",
+      "type": "object"
+    },
+    "Story": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "minLength": 1,
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "beats": {
+          "items": {
+            "$ref": "#/$defs/StoryBeat"
+          },
+          "minItems": 1,
+          "title": "Beats",
+          "type": "array"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "creation_receipt_id": {
+          "minLength": 1,
+          "title": "Creation Receipt Id",
+          "type": "string"
+        },
+        "language": {
+          "title": "Language",
+          "type": "string"
+        },
+        "logline": {
+          "title": "Logline",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source_provenance": {
+          "items": {
+            "$ref": "#/$defs/SourceReference"
+          },
+          "minItems": 1,
+          "title": "Source Provenance",
+          "type": "array"
+        },
+        "source_references": {
+          "default": [],
+          "items": {
+            "type": "string"
+          },
+          "title": "Source References",
+          "type": "array"
+        },
+        "synopsis": {
+          "title": "Synopsis",
+          "type": "string"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "revision",
+        "content_hash",
+        "creation_receipt_id",
+        "source_provenance",
+        "language",
+        "logline",
+        "synopsis",
+        "beats"
+      ],
+      "title": "Story",
+      "type": "object"
+    },
+    "StoryBeat": {
+      "additionalProperties": false,
+      "properties": {
+        "beat_id": {
+          "title": "Beat Id",
+          "type": "string"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "beat_id",
+        "summary"
+      ],
+      "title": "StoryBeat",
+      "type": "object"
+    },
+    "Storyboard": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_id": {
+          "minLength": 1,
+          "title": "Artifact Id",
+          "type": "string"
+        },
+        "beats": {
+          "items": {
+            "$ref": "#/$defs/StoryboardBeat"
+          },
+          "minItems": 1,
+          "title": "Beats",
+          "type": "array"
+        },
+        "content_hash": {
+          "pattern": "^[0-9a-f]{64}$",
+          "title": "Content Hash",
+          "type": "string"
+        },
+        "creation_receipt_id": {
+          "minLength": 1,
+          "title": "Creation Receipt Id",
+          "type": "string"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source_provenance": {
+          "items": {
+            "$ref": "#/$defs/SourceReference"
+          },
+          "minItems": 1,
+          "title": "Source Provenance",
+          "type": "array"
+        }
+      },
+      "required": [
+        "artifact_id",
+        "revision",
+        "content_hash",
+        "creation_receipt_id",
+        "source_provenance",
+        "beats"
+      ],
+      "title": "Storyboard",
+      "type": "object"
+    },
+    "StoryboardBeat": {
+      "additionalProperties": false,
+      "properties": {
+        "beat_id": {
+          "title": "Beat Id",
+          "type": "string"
+        },
+        "narrative_intent": {
+          "title": "Narrative Intent",
+          "type": "string"
+        },
+        "scene_id": {
+          "title": "Scene Id",
+          "type": "string"
+        },
+        "shot_ids": {
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Shot Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "beat_id",
+        "scene_id",
+        "shot_ids",
+        "narrative_intent"
+      ],
+      "title": "StoryboardBeat",
+      "type": "object"
+    },
+    "VisualStrategy": {
+      "enum": [
+        "static_image",
+        "image_motion",
+        "motion_graphics",
+        "generated_video",
+        "existing_video",
+        "hybrid"
+      ],
+      "title": "VisualStrategy",
+      "type": "string"
+    },
+    "VoiceMode": {
+      "enum": [
+        "auto",
+        "native_required",
+        "separate_required",
+        "no_voice"
+      ],
+      "title": "VoiceMode",
+      "type": "string"
+    },
+    "VoiceProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "language": {
+          "title": "Language",
+          "type": "string"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        },
+        "voice_hint": {
+          "title": "Voice Hint",
+          "type": "string"
+        }
+      },
+      "required": [
+        "language",
+        "voice_hint"
+      ],
+      "title": "VoiceProfile",
+      "type": "object"
+    },
+    "VoiceRoutingRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "voice-routing/1",
+          "default": "voice-routing/1",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "mode": {
+          "$ref": "#/$defs/VoiceMode",
+          "default": "auto"
+        },
+        "native_sound_required": {
+          "default": false,
+          "title": "Native Sound Required",
+          "type": "boolean"
+        },
+        "speakers": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/VoiceSpeakerRequirement"
+          },
+          "title": "Speakers",
+          "type": "array"
+        }
+      },
+      "title": "VoiceRoutingRequirement",
+      "type": "object"
+    },
+    "VoiceSpeakerRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "consistency": {
+          "default": "single_shot",
+          "enum": [
+            "single_shot",
+            "cross_shot_fixed"
+          ],
+          "title": "Consistency",
+          "type": "string"
+        },
+        "language": {
+          "pattern": "^[a-z]{2,3}(?:-[A-Z][a-z]{3})?(?:-(?:[A-Z]{2}|[0-9]{3}))?(?:-(?:[A-Za-z0-9]{5,8}|[0-9][A-Za-z0-9]{3}))*$",
+          "title": "Language",
+          "type": "string"
+        },
+        "reference_asset_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,255}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference Asset Id"
+        },
+        "reference_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference Sha256"
+        },
+        "script_text": {
+          "minLength": 1,
+          "title": "Script Text",
+          "type": "string"
+        },
+        "speaker_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,255}$",
+          "title": "Speaker Id",
+          "type": "string"
+        },
+        "voice_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Voice Id"
+        }
+      },
+      "required": [
+        "speaker_id",
+        "language",
+        "script_text"
+      ],
+      "title": "VoiceSpeakerRequirement",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "acceptance_requirements": {
+      "items": {
+        "$ref": "#/$defs/EcommerceAcceptanceRequirement"
+      },
+      "minItems": 1,
+      "title": "Acceptance Requirements",
+      "type": "array"
+    },
+    "ad_creative_plan_proposal": {
+      "$ref": "#/$defs/AdCreativePlanProposal"
+    },
+    "artifact_proposals": {
+      "$ref": "#/$defs/EcommerceArtifactProposals"
+    },
+    "asset_requirements": {
+      "items": {
+        "$ref": "#/$defs/EcommerceAssetRequirement"
+      },
+      "title": "Asset Requirements",
+      "type": "array"
+    },
+    "compile_profile": {
+      "$ref": "#/$defs/EcommerceProductionCompileProfile"
+    },
+    "delivery_profile": {
+      "$ref": "#/$defs/EcommerceDeliveryProfile"
+    },
+    "handoff_id": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Handoff Id",
+      "type": "string"
+    },
+    "layout_plan": {
+      "$ref": "#/$defs/EcommerceLayoutPlan"
+    },
+    "product_truth": {
+      "$ref": "#/$defs/EcommerceProductTruth"
+    },
+    "runtime_requirements": {
+      "items": {
+        "$ref": "#/$defs/EcommerceRuntimeRequirement"
+      },
+      "title": "Runtime Requirements",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "ecommerce-production-handoff/1",
+      "default": "ecommerce-production-handoff/1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_input_hash": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Input Hash",
+      "type": "string"
+    },
+    "source_package_id": {
+      "pattern": "^[0-9a-f]{64}$",
+      "title": "Source Package Id",
+      "type": "string"
+    },
+    "unsupported_gaps": {
+      "items": {
+        "$ref": "#/$defs/EcommerceUnsupportedGap"
+      },
+      "title": "Unsupported Gaps",
+      "type": "array"
+    },
+    "visual_system_profile": {
+      "$ref": "#/$defs/EcommerceVisualSystemProfile"
+    }
+  },
+  "required": [
+    "handoff_id",
+    "source_package_id",
+    "source_input_hash",
+    "delivery_profile",
+    "visual_system_profile",
+    "layout_plan",
+    "compile_profile",
+    "product_truth",
+    "artifact_proposals",
+    "ad_creative_plan_proposal",
+    "asset_requirements",
+    "runtime_requirements",
+    "acceptance_requirements",
+    "unsupported_gaps"
+  ],
+  "title": "EcommerceProductionHandoff",
+  "type": "object"
+}

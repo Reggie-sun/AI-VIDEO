@@ -2,9 +2,9 @@
 
 ## Status
 
-Proposed implementation plan。Governing design：`docs/superpowers/specs/2026-09-19-ai-video-ecommerce-production-job.md`。
+M0–M3 implementation checkpoint。Governing design：`docs/superpowers/specs/2026-09-19-ai-video-ecommerce-production-job.md`。
 
-本文只规划实现，不声明任何 milestone 已完成，不授权 live Provider/media execution，也不改变 current Production、release 或 Final Acceptance truth。
+Contracts、pure Skill-side exporter、canonical artifact compiler / bootstrap adapter 与 read-only projection 已进入 current implementation；M4–M6 仍是 future slices。本文不授权 live Provider/media execution，也不改变 current Production、release 或 Final Acceptance truth。
 
 ## Goal
 
@@ -71,6 +71,10 @@ M0 Baseline / Contract Guards
   - `EcommerceProductionJobProjection`
   - `EcommerceJobNextAction`
   - `EcommerceJobBlocker`
+  - `EcommerceDeliveryProfile`
+  - `EcommerceVisualSystemProfile`
+  - `EcommerceLayoutPlan`
+  - `EcommerceProductionCompileProfile`
   - delivery bundle inventory contracts
 - `src/ai_video/production/ecommerce_job_compiler.py`
   - pure handoff validation and compilation into existing artifact proposals / prepared artifacts
@@ -89,6 +93,7 @@ M0 Baseline / Contract Guards
 
 - Create `.agents/skills/ecommerce-ad-workflow/scripts/export_runtime_handoff.py`
 - Create `.agents/skills/ecommerce-ad-workflow/schemas/ecommerce-production-handoff.schema.json`
+- Export requires caller-authored exact delivery / visual system / per-ad layout / compile profile inputs; the exporter does not generate generic visual defaults.
 - Update `.agents/skills/ecommerce-ad-workflow/SKILL.md` only to document the explicit export seam and its non-runtime authority
 - Update `.agents/skills/ecommerce-ad-workflow/scripts/contract_models.py` only if package/2 validation must expose a stable projection helper; canonical runtime handoff models remain under `src/`
 
@@ -175,6 +180,9 @@ Create a deterministic, machine-readable boundary from authoring `package/2` to 
 - Exporter: pure/no-network/no-write.
 - Runtime parser: strict, rejects extra fields and unsupported gaps.
 - Package blockers remain blockers; they are never dropped to make export succeed.
+- Technical delivery、visual system、per-ad layout and compile binding are distinct content-addressed contracts.
+- Layout must resolve every package Shot、copy graphic and product presentation exactly once; typography and safe-area values must match the reviewed visual system.
+- Current talent-free forms remain explicit blockers until the canonical `AdCreativePlan` owns a truthful no-protagonist representation.
 
 ### Implementation
 
@@ -183,6 +191,7 @@ Create a deterministic, machine-readable boundary from authoring `package/2` to 
 3. Implement Skill-side exporter that validates `package/2`, projects fields explicitly and validates the runtime handoff schema.
 4. Check in schema bytes and prove model/schema drift detection in tests.
 5. Keep exporter output free of provider、permit、Manifest、timeline and mutable lifecycle fields.
+6. Reject stale visual identities、typography drift、safe-area drift、unmapped Shot/copy/presentation and generic fallback placement.
 
 ### Required Tests
 
@@ -192,6 +201,8 @@ Create a deterministic, machine-readable boundary from authoring `package/2` to 
 - unknown/extra/missing fields -> deterministic validation error；
 - no Runtime import/path/identity references to Skill；
 - example package/2 round-trip validates。
+- exact reviewed visual contracts produce deterministic handoff bytes；visual drift changes identity or fails validation；
+- a technically valid but still unresolved physical/product integration requirement remains a blocker。
 
 ### Verification
 
@@ -526,4 +537,4 @@ Implementation is complete only when:
 
 ## Recommended Execution Boundary
 
-The first implementation task should include Milestones 0–3 only: contracts、exporter、compiler and read-only projection/resume. That creates the stable application boundary without authorizing Provider/media effects. Milestones 4–6 should follow as separately reviewable slices because they cross paid/local execution、repair、render and Final Acceptance gates.
+The first implementation task includes Milestones 0–3 only: contracts、exporter、compiler and read-only projection/resume. This checkpoint creates the stable application boundary without authorizing Provider/media effects. Milestones 4–6 remain separately reviewable slices because they cross paid/local execution、repair、render and Final Acceptance gates.

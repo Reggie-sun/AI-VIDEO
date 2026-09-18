@@ -119,12 +119,15 @@ Package Validation
 | `handoff_id` | canonical SHA-256 of handoff payload excluding itself |
 | `source_package_id` | exact `ecommerce-ad-workflow/package/2` package identity |
 | `source_input_hash` | source authoring input identity |
-| `delivery_profile` | `9:16`、duration、frame/audio intent、platform constraints |
+| `delivery_profile` | exact `9:16` geometry、fps、codec/audio intent、platform constraints |
+| `visual_system_profile` | reviewed brand tokens、typography tokens、role bindings and exact safe area |
+| `layout_plan` | per-ad Scene / Shot mapping、visual strategy、exact `GraphicTreatment` geometry/timing and product presentation |
+| `compile_profile` | thin content-addressed binding of the exact delivery、visual system and layout identities, plus explicit requirement resolutions |
 | `product_truth` | fact/source/rights/claim references required by production |
 | `artifact_proposals` | `ProductionBrief`、`Story`、`Character`、`Scene`、`Storyboard`、ordered `Shot` proposals |
 | `ad_creative_plan_proposal` | existing `AdCreativePlanProposal` projection |
 | `asset_requirements` | product/reference/talent/set/logo/font/audio inputs and provenance requirements |
-| `audio_caption_requirements` | VO/dialogue/TTS、caption、BGM、SFX、silence and ducking intent |
+| `runtime_requirements` | graphics、product integration、VO/dialogue/TTS、caption、BGM、SFX、silence and ducking requirements |
 | `acceptance_requirements` | per-Shot and whole-video required findings, including final-output evidence |
 | `unsupported_gaps` | classified non-executable package requirements |
 
@@ -132,10 +135,31 @@ Package Validation
 
 - Export is pure, deterministic, no-network and no-write.
 - Same canonical package bytes MUST produce byte-identical handoff bytes.
+- Same package with different reviewed visual contracts MUST produce a different handoff identity.
 - Any package `BLOCKER` or unresolved runtime capability MUST remain an explicit blocker; exporter MUST NOT silently omit it.
+- `DeliveryProfile` only owns technical delivery. It MUST NOT own typography or ad layout.
+- `EcommerceVisualSystemProfile` owns reusable brand/type/safe-area constraints；`EcommerceLayoutPlan` owns this ad's exact visible treatment. A compile profile MUST bind their hashes and MUST NOT manufacture generic placement defaults.
+- Export requires exact copy/Shot/presentation coverage、role-to-typography binding、safe-area conformance、Shot-local timing and declared protagonist semantics. Schema validity without reviewed layout is not export readiness.
+- Talent-free package forms that current `AdCreativePlanProposal` cannot represent truthfully remain blocked; exporter MUST NOT invent a presenter or protagonist.
 - Handoff contains no credential、permit、provider response、Manifest revision、active pointer or mutable status.
 - Runtime validates the handoff using source code under `src/ai_video/production/`; it never imports `.agents/skills/**`.
 - Skill-side exporter MAY import public runtime-neutral contract models, but Runtime source MUST remain unaware of Skill names and paths.
+
+### Visual Delivery Contract
+
+视觉呈现不是 compiler 的隐式默认值。四个 owner 必须各自可独立审查并由 exact identity 串联：
+
+```text
+DeliveryProfile
+  + EcommerceVisualSystemProfile
+  + per-ad EcommerceLayoutPlan
+  -> EcommerceProductionCompileProfile (hash binding only)
+  -> EcommerceProductionHandoff
+```
+
+`EcommerceLayoutPlan` 的 `GraphicTreatment` 必须给出 frame timing、position、width、typography、safe area、avoidance、brand token、keyword emphasis、audio/event binding and z-order。preview / visual review 仍是 layout approval 的必要 evidence；contracts 与 tests 只能证明 deterministic binding，不能证明最终画面好看。最终判断继续由 exact rendered media 的 watchability、continuity、pacing、audio and narrative review owner 负责。
+
+Current commercial-graphic renderer 只明确表达 pinned `sans-serif` family，因此 M0–M3 的 typography token 必须固定为 `sans-serif`；不得在 profile 中声明 `Inter` 或其他 brand font 后让 renderer 静默替换。未来 custom font 支持必须先扩展 existing `GraphicTreatment -> CompositionSpec -> HyperFrames` canonical path、兼容 hash 与 rendered-media verification，不能由 Job compiler 私自注入 CSS。
 
 ## Contract 2: Job Request
 
