@@ -1818,6 +1818,25 @@ def test_ecommerce_ad_contract_test_has_an_exact_focused_route() -> None:
 @pytest.mark.parametrize(
     "path",
     [
+        "src/ai_video/production/ecommerce_job_contracts.py",
+        "src/ai_video/production/ecommerce_job_compiler.py",
+        "src/ai_video/production/ecommerce_job.py",
+        "tests/test_production_ecommerce_job_projection.py",
+        ".agents/skills/ecommerce-ad-workflow/scripts/export_runtime_handoff.py",
+    ],
+)
+def test_ecommerce_production_job_routes_to_exact_application_suite(path: str) -> None:
+    report = agent_harness.inspect_paths([path], agent_harness.load_policy(POLICY_PATH))
+    assert "ecommerce_production_job" in report["categories"]
+    assert "ecommerce_production_job_tests" in report["check_ids"]
+    assert "production_state_tests" in report["check_ids"]
+    assert "production_reader_tests" in report["check_ids"]
+    assert report["fallback_paths"] == []
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
         ".agents/skills/seedance-authoring/SKILL.md",
         ".agents/skills/seedance-authoring/references/authoring-common.md",
         ".agents/skills/seedance-authoring/references/seedance-2.0.md",
