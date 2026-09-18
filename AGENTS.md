@@ -85,6 +85,13 @@ Plans、specs、roadmaps、console text、Agent memory 或历史 receipts 本身
 单项指标通过不代表方案通过。若方案已知会造成整体质量退化，必须在执行或交付前主动否决，不得以 preview、technical pass、成本更低、避免重新生成或等待用户确认作为放行理由。
 当局部目标与成片质量冲突时，成片质量拥有最高优先级；若无法同时满足，应判定当前方案失败，而不是修改对目标的解释。
 
+### Watchability And Delivery Over Engineering Completeness
+
+- 不得为了工程完整性、架构完备、流程齐全或局部指标达标而牺牲成片的视觉观看性、动作自然度、节奏与叙事效果；工程工作必须服务于用户实际能看到、能观看的成片。
+- 不得将与当前交付无直接关系的工程 Gate、重复验证或未来能力建设作为出片前提，导致任务长期停留在 spec、plan、receipt 或中间产物。优先采用满足当前目标的最小可执行路径，持续推进生成、剪辑与成片交付。
+- Gate 阻断时必须指出它保护的具体要求及当前失败证据，并在已授权范围内主动修复、补证或选择符合现有契约的可行路径；不得仅以“Gate 未通过”结束仍有可执行下一步的任务，也不得通过降低观看质量换取技术通过。
+- 上述原则不授权绕过真实的安全、授权、预算、数据完整性或成片质量底线，也不允许伪造验收；确有无法解决的阻断时，必须说明具体原因、已尝试的解决办法及恢复出片所需的最小条件。
+
 ### Empirical Validation Priority
 
 - 对不能仅由 code/tests/Harness 证明的媒体能力，必须区分 Engineering / Deterministic Uncertainty 与 Empirical / Model-Quality Uncertainty。后者占主导且存在安全、有界、满足适用授权或 local exemption、可负担且可执行、可隔离归因的最小真实实验时，下一关键动作 SHOULD 优先取证，再扩大仅服务未来验证的 engineering。
