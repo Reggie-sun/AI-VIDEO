@@ -9,9 +9,35 @@ evidence_index_version: "1"
 
 Date: 2026-09-19
 
+## Continuation — Canonical Docs And Final-Review Fixes
+
+Commit `4ab55a01d44c8992bd82748dfde302f3400635dc` resolved the previously recorded
+same-file documentation blocker through a temporary Git index: it updated the Ecommerce
+Production Job ownership/routing row, runtime baseline and roadmap while preserving the
+pre-existing staged patch byte-for-byte.
+
+The first immutable final review then found four real M4 defects. Commit
+`a7b6439` fixes all four without changing canonical writer, activation, timeline,
+renderer, review or delivery ownership:
+
+- persisted `RUNNING + VideoAttemptPhase.SUBMIT_INTENT` now projects to
+  `RECOVER_UNKNOWN_OUTCOME`; it is never treated as permission to resubmit;
+- ordered generation can realize each Shot input after the prior Shot activation, so
+  later requests can be recompiled and resealed against current canonical pointers;
+- `CAPABILITY_BOUNDARY` and `SPLIT_SHOT` stop for authoring, and media repair requires
+  an actual verified before/after request delta in addition to declared variables;
+- one plan-scoped admission lock now covers locked reinspection, canonical attempt
+  counting and coordinator execution, preventing different `attempt_id` values from
+  concurrently crossing the finite ceiling.
+
+The focused Ecommerce contract suite after these fixes is `108 passed in 219.97s`.
+This is an offline engineering checkpoint. Completion still requires a fresh Harness
+receipt and independent Native Codex plus Kimi reviews of one later immutable snapshot;
+this record does not pre-claim those results.
+
 ## Purpose
 
-本文记录 Ecommerce Production Job M7 的 offline application E2E code checkpoint。它固定双 Shot 顺序执行、中断后重开与 exact replay 的 executable evidence，也明确 canonical documentation 尚因 existing same-file ownership 冲突未完成。本文不表示已经生成真实媒体、完成人工视觉验收、执行 remote/paid Provider submit、激活真实 Production 项目、push 或 release。
+本文记录 Ecommerce Production Job M7 的 offline application E2E code checkpoint，并由上方 continuation 补充 canonical documentation closure 与 final-review fix。它固定双 Shot 顺序执行、中断后重开与 exact replay 的 executable evidence。本文不表示已经生成真实媒体、完成人工视觉验收、执行 remote/paid Provider submit、激活真实 Production 项目、push 或 release。
 
 ## Current Runtime Truth
 
@@ -50,9 +76,7 @@ M7 application E2E code 已形成 committed、policy-verified 的 offline checkp
 
 ## Remaining Risks Or Next Work
 
-- `docs/agent-primary-contract-matrix.md` 与 `docs/v0.2-runtime-baseline.md` 存在其他 writer 的 same-file staged changes；M7 需要分别补充 ecommerce job owner/routing 与 implemented offline/Python-API boundary，但本 checkpoint 未写入这些文件。
-- `docs/v0.2-agentic-production-roadmap.md` 仍需同步 M4-M7 的实际 completed/deferred 状态。
-- M7 final immutable snapshot 尚需在 documentation ownership 解决后完成 native Codex 与 Kimi 双侧 independent review，并重新运行 final Harness。
+- M7 final immutable snapshot 仍需完成 fresh Harness，以及 Native Codex 与 Kimi 对同一 snapshot 的独立 review；任何后续修复都会使旧 review 失效。
 - 未运行 remote/paid Provider、真实 media generation、真实 HyperFrames CLI、Production activation 或 human visual review；不得从本记录推断已经出片。
 
 ## Agent Guardrails
