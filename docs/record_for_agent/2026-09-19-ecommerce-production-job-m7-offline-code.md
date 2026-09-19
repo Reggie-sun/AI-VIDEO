@@ -9,6 +9,43 @@ evidence_index_version: "1"
 
 Date: 2026-09-19
 
+## Continuation — Final Harness Receipt And Kimi Independent Review
+
+Date: 2026-09-20
+
+Final milestone evidence for the immutable snapshot `5f743cac22447fec5a1fd29d4dd6bba5b0af09aa`:
+
+- Fresh exact-range Harness run `ecommerce-production-job-m4-m7-final-20260919-05`
+  over `cd6edd7802550f6c8ded4b3990930f62778d1af8..5f743cac22447fec5a1fd29d4dd6bba5b0af09aa`
+  finished `status=passed` with `closure_eligible=true`; receipt SHA-256
+  `06fd69bbeb22d3703c01153f7f62d753f8216f400ac7e68c52c57326d36e96d1` at
+  `.agent/harness/runs/ecommerce-production-job-m4-m7-final-20260919-05/receipt.json`.
+- Independent Kimi review of the same snapshot reported no P0 and no P1. All eight
+  closure invariants (sole committer writer, declared-input repair binding,
+  unknown-outcome fail-closed, exact resume/replay, plan-scoped admission lock,
+  authoring stops, verified request delta, canonical evidence-repair frontier)
+  were traced against real call paths, and the reviewer independently ran the
+  policy-routed focused suite (168 tests) in a detached worktree at `5f743ca`
+  with all tests passing. Four P2 findings remain as follow-ups, none of which
+  violate a milestone invariant: raw `ValueError` from `job_execution_guard()`
+  on an empty-shot plan escaping `advance_once` untyped; an unwrapped
+  `inspect_ecommerce_review_frontier()` call in the no-`review_execution` branch
+  of `ecommerce_job.py`; outer `except AiVideoError` in `advance_once`
+  mis-classifying guard-cleanup failures as `ECOMMERCE_JOB_EXECUTION_BUSY`; and
+  media repair not rejecting a caller-built repair plan that declares a fresh
+  `attempt_id` for an already-activated sibling Shot (bounded by ceiling
+  counting, no canonical caller does this).
+- The Native Codex half of the required dual independent review was NOT
+  completed: the Codex CLI quota was exhausted during this session and the user
+  directed skipping it for now. Per the roadmap's final same-snapshot dual
+  independent review requirement, M4–M7 final closure remains incomplete until
+  a Native Codex review of snapshot `5f743ca` finishes with no unresolved
+  P0/P1. This record does not claim full dual-review closure.
+- After the reviewed snapshot, `main` advanced to `b7affb4` with unrelated
+  committed work (voice routing, S02 prospective, MiniMax speech, docs). That
+  work is outside the M4–M7 milestone scope; all milestone evidence above stays
+  anchored to exact range `cd6edd7..5f743ca`.
+
 ## Continuation — Canonical Reopen And Repair Binding
 
 Commit `66cfc73a4437ca46469db0599551af19bce32ea7` closes four blocking findings
@@ -108,7 +145,7 @@ M7 application E2E code 已形成 committed、policy-verified 的 offline checkp
 
 ## Remaining Risks Or Next Work
 
-- M7 final immutable snapshot 仍需完成 fresh Harness，以及 Native Codex 与 Kimi 对同一 snapshot 的独立 review；任何后续修复都会使旧 review 失效。
+- M7 final immutable snapshot 的 fresh Harness 与 Kimi 独立 review 已完成（见顶部 continuation）；Native Codex 独立 review 因额度原因尚未执行，dual-review closure 仍开放，完成后任何后续修复都会使旧 review 失效。
 - 未运行 remote/paid Provider、真实 media generation、真实 HyperFrames CLI、Production activation 或 human visual review；不得从本记录推断已经出片。
 
 ## Agent Guardrails
