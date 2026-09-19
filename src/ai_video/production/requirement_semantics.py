@@ -165,6 +165,39 @@ def validate_semantic_inventory(payload, required_ids):
     return rules
 
 
+def require_semantic_admission(acceptance):
+    """New publication/use only; historical deserialization remains compatible.
+
+    This rejects mechanical self-justification, not artistic meaning. The QA
+    author still owns verifying the cited necessity; paraphrasing is not proof.
+    """
+    if acceptance is None:
+        return
+    rules = validate_semantic_inventory(acceptance.profile_payload, acceptance.required_requirement_ids)
+    for rule in rules:
+        basis = rule.semantics.hard_basis
+        if basis is None:
+            continue
+        matching = [ref for ref in rule.semantics.source_refs
+                    if (ref.source_hash, ref.locator) == (basis.source_hash, basis.locator)]
+        if not any(ref.origin == "director_choice" for ref in matching):
+            continue
+        normalize = lambda text: " ".join(text.split())
+        necessity = normalize(basis.necessity)
+        repeats = {normalize(rule.observable), *(normalize(ref.quote) for ref in matching)}
+        if not necessity or necessity in repeats:
+            raise ValueError(f"{rule.requirement_id}: director hard acceptance needs an independent necessity")
+
+
+def require_qa_semantic_admission(policy):
+    """Validate every published QA inventory, including allocated components."""
+    require_semantic_admission(policy.domain_acceptance)
+    require_semantic_admission(policy.generation_acceptance)
+    for allocation in policy.production_allocations:
+        for component in allocation.components:
+            require_semantic_admission(component.generation_acceptance)
+
+
 def require_final_contract(rules, final_output):
     for rule in rules:
         if rule.level != "acceptance" or rule.stage != "final_composition":

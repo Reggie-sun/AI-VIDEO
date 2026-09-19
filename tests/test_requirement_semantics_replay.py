@@ -142,7 +142,7 @@ def prospective_s01_policy():
     return policy
 
 
-def test_prospective_s01_qa_uses_existing_activation_and_exact_history(tmp_path):
+def test_historical_s01_reopens_and_replays_but_cannot_be_newly_published(tmp_path, monkeypatch):
     from ai_video.production.project import load_production_project, load_qa_policy
     from ai_video.production.production_strategy_reader import selected_shot_generation_acceptance
     from test_production_repair import make_manifest_25_failed_layout_review_fixture
@@ -152,14 +152,28 @@ def test_prospective_s01_qa_uses_existing_activation_and_exact_history(tmp_path)
     old_pointer = before.manifest.active_qa_policy
     old_bytes = (tmp_path / old_pointer.path).read_bytes()
     policy = prospective_s01_policy()
-    fixture.committer.activate_qa_policy(policy,
-        expected_manifest_revision=before.manifest.manifest_revision, attempt_id="prospective-s01-policy")
+    from ai_video.errors import AiVideoError
+    import ai_video.production._state_commit_review as owner
+
+    with pytest.raises(AiVideoError, match="semantic admission"):
+        fixture.committer.activate_qa_policy(policy,
+            expected_manifest_revision=before.manifest.manifest_revision, attempt_id="rejected-policy")
+    assert load_production_project(tmp_path / "project.yaml").manifest == before.manifest
+    # Seed a historical selection, not a newly admissible policy. Disable only
+    # the new-use guard while constructing this explicit legacy fixture.
+    with monkeypatch.context() as historical:
+        historical.setattr(owner, "require_qa_semantic_admission", lambda _: None)
+        fixture.committer.activate_qa_policy(policy,
+            expected_manifest_revision=before.manifest.manifest_revision, attempt_id="historical-selection")
     after = load_production_project(tmp_path / "project.yaml")
     assert after.qa_policy == policy
     assert selected_shot_generation_acceptance(after, after.shots[0].shot_id) == policy.generation_acceptance
     assert after.manifest.attempts == before.manifest.attempts
     assert (tmp_path / old_pointer.path).read_bytes() == old_bytes
     assert load_qa_policy(tmp_path, old_pointer) == before.qa_policy
+    for revision in (before.manifest.manifest_revision, after.manifest.manifest_revision):
+        assert fixture.committer.activate_qa_policy(policy,
+            expected_manifest_revision=revision, attempt_id="exact-replay") == after.manifest
 
 
 def test_prospective_s01_timing_preferences_cannot_create_a_quality_failure():

@@ -82,6 +82,49 @@ def _artifact(path, model):
     )
 
 
+def _verified_new_goal_running_prior(*, committer, loaded, target, prior, target_binding,
+                                     prior_binding, target_request, prior_request):
+    """Return whether one fetched, evaluated prior may remain validating for a new goal.
+
+    This is deliberately a narrow quota predicate, not an attempt transition:
+    the old attempt remains running and its exact fetched/evaluated history is
+    retained in the new binding.  Every caller still uses the normal quota CAS.
+    """
+    from ai_video.production.video_pre_generation import (
+        verified_fetched_prior_for_new_goal,
+    )
+
+    verified = verified_fetched_prior_for_new_goal(committer, loaded, prior)
+    if verified is None:
+        return False
+    verified_binding, verified_request, retained = verified
+    if prior_binding != verified_binding or prior_request != verified_request:
+        return False
+    acceptance = loaded.qa_policy.selected_generation_acceptance()
+    target_goal = loaded.qa_policy.final_output
+    if (
+        acceptance is None
+        or target_goal is None
+        or target_binding.decision.disposition != "GENERATE_ONCE"
+        or target_binding.decision.intervention is not None
+        or target_binding.context.target_shot_id != prior_binding.context.target_shot_id
+        or target_binding.lifecycle.target_asset_role != prior_binding.lifecycle.target_asset_role
+        or target_binding.inputs.limits.task_id != prior_binding.inputs.limits.task_id
+        or any(candidate.final_output_goal != target_goal
+               or candidate.recipe.acceptance_policy != acceptance
+               for candidate in target_binding.inputs.candidates)
+        or target_binding.inputs.rubric_hash != acceptance.profile_content_hash
+    ):
+        return False
+    try:
+        target_binding.validate_current_project(loaded)
+    except Exception:
+        return False
+    if not retained or any(experience not in target_binding.inputs.experiences for experience in retained):
+        return False
+    return target_request.request_input_hash != prior_request.request_input_hash
+
+
 def _extend_paid_provider_submit_quota(committer, entry):
     """Atomically retain one explicit additional same-task paid submit."""
     from ai_video.production._state_commit_common import _state_invalid, _validated_transition
@@ -148,14 +191,6 @@ def _extend_paid_provider_submit_quota(committer, entry):
             or prior_state is None
             or prior_state.execution_binding != entry.prior_binding
             or any(
-                item.attempt_id != entry.target_attempt_id
-                and item.status in {
-                    StateCommitStatus.RUNNING,
-                    StateCommitStatus.OUTCOME_UNKNOWN,
-                }
-                for item in manifest.attempts
-            )
-            or any(
                 item.attempt_id == entry.target_attempt_id
                 for item in budget.reservations
             )
@@ -164,8 +199,30 @@ def _extend_paid_provider_submit_quota(committer, entry):
         try:
             target_binding = committer._reopen_generation_execution_binding(entry.target_binding)
             prior_binding = committer._reopen_generation_execution_binding(entry.prior_binding)
-            target_binding.validate_request(committer._reopen_video_request(target_state.request))
-            prior_binding.validate_request(committer._reopen_video_request(prior_state.request))
+            target_request = committer._reopen_video_request(target_state.request)
+            prior_request = committer._reopen_video_request(prior_state.request)
+            target_binding.validate_request(target_request)
+            prior_binding.validate_request(prior_request)
+            allowed_running_prior = _verified_new_goal_running_prior(
+                committer=committer,
+                loaded=loaded,
+                target=target,
+                prior=prior,
+                target_binding=target_binding,
+                prior_binding=prior_binding,
+                target_request=target_request,
+                prior_request=prior_request,
+            )
+            if any(
+                item.attempt_id != entry.target_attempt_id
+                and item.status in {
+                    StateCommitStatus.RUNNING,
+                    StateCommitStatus.OUTCOME_UNKNOWN,
+                }
+                and not (item.attempt_id == entry.prior_attempt_id and allowed_running_prior)
+                for item in manifest.attempts
+            ):
+                raise ValueError("unresolved attempt is not the verified prior new-goal result")
             target_limits = target_binding.inputs.limits
             prior_limits = prior_binding.inputs.limits
             same_task_limits = []

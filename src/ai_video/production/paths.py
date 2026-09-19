@@ -538,6 +538,7 @@ def canonical_voice_attempt_artifact_path(
         "request.json",
         "preview.json",
         "authorization.json",
+        "routing-binding.json",
         "submit-intent.json",
         "alignment.json",
         "cost.json",

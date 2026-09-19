@@ -208,6 +208,9 @@ def test_human_import_receipt_is_truthful_sealed_and_builds_imported_asset() -> 
     assert asset.source_kind is AssetSourceKind.IMPORTED
     assert asset.tool == HUMAN_IMAGE_IMPORT_TOOL
     assert asset.creation_receipt_id == receipt.content_hash
+    assert receipt.content_hash == (
+        "805c4f92a736c269b9281f6f7fcfda0dfbf205699e4389adfa9c921614fde2a8"
+    )
 
 
 def test_codex_imagegen_import_keeps_its_truthful_source_tool_identity() -> None:
@@ -228,6 +231,38 @@ def test_codex_imagegen_import_keeps_its_truthful_source_tool_identity() -> None
     assert not receipt.automated_browser
     assert asset.tool.name == "codex-imagegen-import"
     assert asset.tool.version == "1"
+
+
+def test_codex_imagegen_import_accepts_a_truthful_raw_video_frame_reference() -> None:
+    png = project_factory._p7_png()
+    reference = {
+        "role": "video_frame",
+        "source_video_path": f"evidence/video-frame-import/{'a' * 64}.mp4",
+        "source_video_sha256": "a" * 64,
+        "source_video_size_bytes": 123,
+        "extracted_frame_path": (
+            f"evidence/video-frame-import/{'b' * 64}.png"
+        ),
+        "extracted_frame_sha256": "b" * 64,
+        "extracted_frame_size_bytes": 456,
+        "extracted_frame_width": 1080,
+        "extracted_frame_height": 1920,
+        "frame_index": 96,
+        "extraction_contract_version": "video-frame-import-v1",
+        "extractor_name": "ffmpeg",
+        "extractor_version": "fixture-1",
+    }
+
+    receipt = _receipt(
+        png,
+        source_surface="codex_imagegen_tool",
+        declared_ui_product_label="OpenAI imagegen",
+        references=(reference,),
+    )
+
+    assert receipt.references[0].role == "video_frame"
+    with pytest.raises(ValidationError):
+        _receipt(png, references=(reference,))
 
 
 def test_automated_browser_import_is_truthful_sealed_and_distinct() -> None:
@@ -493,8 +528,12 @@ def test_video_frame_reference_accepts_autorotated_frame_and_rejects_reshaping(
         )
 
 
+@pytest.mark.parametrize("import_kind", ["automated_browser", "codex_imagegen"])
 def test_bootstrap_validates_video_frame_derivation_only_before_initial_write(
-    tmp_path: Path, tiny_video: Path, monkeypatch: pytest.MonkeyPatch
+    tmp_path: Path,
+    tiny_video: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    import_kind: str,
 ) -> None:
     source = tmp_path / "source"
     valid_target = tmp_path / "valid-target"
@@ -512,8 +551,28 @@ def test_bootstrap_validates_video_frame_derivation_only_before_initial_write(
         target: Path, raw_reference: dict[str, object]
     ) -> tuple[ProductionStateCommitter, AssetRegistrySnapshot, tuple[PreparedArtifact, ...]]:
         writer = ProductionStateCommitter(target)
-        receipt = _automated_receipt(frame_bytes, references=(raw_reference,))
-        asset = automated_browser_image_import_asset(receipt)
+        receipt = (
+            _automated_receipt(frame_bytes, references=(raw_reference,))
+            if import_kind == "automated_browser"
+            else _receipt(
+                frame_bytes,
+                source_surface="codex_imagegen_tool",
+                declared_ui_product_label="OpenAI imagegen",
+                references=(raw_reference,),
+            )
+        )
+        asset = (
+            automated_browser_image_import_asset(receipt)
+            if import_kind == "automated_browser"
+            else human_image_import_asset(receipt)
+        )
+        receipt_path = (
+            canonical_automated_browser_image_import_receipt_path(
+                receipt.content_hash
+            )
+            if import_kind == "automated_browser"
+            else canonical_human_image_import_receipt_path(receipt.content_hash)
+        )
         provisional = base.registry.model_copy(
             update={
                 "revision_id": "0" * 64,
@@ -545,7 +604,7 @@ def test_bootstrap_validates_video_frame_derivation_only_before_initial_write(
                 ),
                 writer.prepare_artifact(
                     "bootstrap-video-frame",
-                    canonical_automated_browser_image_import_receipt_path(receipt.content_hash),
+                    receipt_path,
                     _canonical_json_bytes(receipt),
                 ),
                 *reference_artifacts,
@@ -560,6 +619,7 @@ def test_bootstrap_validates_video_frame_derivation_only_before_initial_write(
         registry=registry,
         artifacts=artifacts,
     )
+    assert load_production_project(valid_target / "project.yaml").manifest == committed
 
     import ai_video.production.image_import_video_frame as video_frame_module
 
@@ -743,6 +803,7 @@ def test_human_import_reuses_atomic_project_registry_graph_commit_and_replays(
     tmp_path: Path,
     target_kind: str,
     import_kind: str,
+    tiny_video: Path,
 ) -> None:
     project_factory.write_production_project(tmp_path)
     base_inputs = project_factory.make_p7_image_generation_base(tmp_path)
@@ -783,6 +844,17 @@ def test_human_import_reuses_atomic_project_registry_graph_commit_and_replays(
         if import_kind == "codex_imagegen"
         else {}
     )
+    reference_artifacts: tuple[PreparedArtifact, ...] = ()
+    video_frame_reference: dict[str, object] | None = None
+    video_frame_bytes: bytes | None = None
+    if target_kind == "key_shot" and import_kind == "codex_imagegen":
+        (
+            video_frame_bytes,
+            video_frame_reference,
+            reference_artifacts,
+        ) = _video_frame_reference(tmp_path, tiny_video, frame_index=7)
+        receipt_overrides["references"] = (video_frame_reference,)
+
     receipt = receipt_factory(
         png,
         target_kind=target_kind,
@@ -947,6 +1019,40 @@ def test_human_import_reuses_atomic_project_registry_graph_commit_and_replays(
             )
         ),
     )
+    if video_frame_reference is not None:
+        with pytest.raises(AiVideoError):
+            commit_preparer(
+                base=base,
+                receipt=receipt,
+                image_bytes=png,
+                candidate_target=candidate_target,
+                candidate_project=candidate_project,
+                base_commit=base_commit,
+            )
+        with pytest.raises(AiVideoError):
+            commit_preparer(
+                base=base,
+                receipt=receipt,
+                image_bytes=png,
+                candidate_target=candidate_target,
+                candidate_project=candidate_project,
+                base_commit=base_commit,
+                reference_artifacts=(
+                    replace(reference_artifacts[0], payload=b"tampered"),
+                    reference_artifacts[1],
+                ),
+            )
+        wrong_frame = VideoFrameImageImportReferenceBinding.model_validate(
+            {**video_frame_reference, "frame_index": 8}
+        )
+        with pytest.raises(AiVideoError):
+            validate_video_frame_reference_bytes(
+                wrong_frame,
+                source_video_bytes=reference_artifacts[0].payload,
+                extracted_frame_bytes=video_frame_bytes,
+                verify_derivation=True,
+            )
+
     request = commit_preparer(
         base=base,
         receipt=receipt,
@@ -954,6 +1060,7 @@ def test_human_import_reuses_atomic_project_registry_graph_commit_and_replays(
         candidate_target=candidate_target,
         candidate_project=candidate_project,
         base_commit=base_commit,
+        reference_artifacts=reference_artifacts,
     )
 
     final = ProductionStateCommitter(tmp_path).commit(request)

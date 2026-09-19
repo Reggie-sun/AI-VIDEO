@@ -314,6 +314,16 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
             and attempt.status
             in {StateCommitStatus.FAILED, StateCommitStatus.INTERRUPTED}
         )
+        accepted_minimax_voice = (
+            attempt.operation == "voice_generation"
+            and attempt.voice_request is not None
+            and attempt.voice_request.provider_kind == "minimax-speech"
+            and state.phase is PaidProviderAttemptPhase.ACCEPTED
+            and attempt.status in {
+                StateCommitStatus.SUCCEEDED, StateCommitStatus.OUTCOME_UNKNOWN,
+                StateCommitStatus.FAILED, StateCommitStatus.INTERRUPTED,
+            }
+        )
         accepted_ad_terminal = (
             attempt.operation == "ad_generation"
             and attempt.ad_generation_state is not None
@@ -324,6 +334,7 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
             required_status is not None
             and attempt.status is not required_status
             and not accepted_video_terminal
+            and not accepted_minimax_voice
             and not accepted_ad_terminal
         ):
             raise _invalid("Paid Provider attempt status is inconsistent with its phase.")
@@ -348,6 +359,8 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
         # if a rehashed active snapshot has stripped its optional extension field.
         if (
             gate_budget.policy_id != gate.authorization.budget_policy_id
+            or gate_budget.voice_batch_submit_limit != gate.authorization.voice_batch_submit_limit
+            or budget.voice_batch_submit_limit != gate_budget.voice_batch_submit_limit
             or gate_budget.currency != gate.authorization.budget_currency
             or gate_budget.project_ceiling_microunits
             != gate.authorization.project_budget_ceiling_microunits

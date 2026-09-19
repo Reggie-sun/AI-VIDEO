@@ -118,6 +118,7 @@ class VoiceAttemptPaths:
     request_path: Path
     preview_path: Path
     authorization_path: Path
+    routing_binding_path: Path
     submit_intent_path: Path
     audio_candidate_path: Path
     alignment_path: Path

@@ -11,6 +11,13 @@ Date: 2026-09-10
 
 ## Current Status Update
 
+2026-09-11 prospective correctness 更新：下文“头脸入镜问题”的历史 FAIL 判据不再作为
+新验收的 narrative/quality 必要条件。新 S02 policy 将肩部限定拆为 framing preference，
+保留身份、服装、耳机、求证因果与真实 artifact/continuity hard requirements；两次素材
+新 shadow 都是 EVIDENCE_GAP/NOT_EVALUATED，待 human 1.0x review，不能仅因露脸重生成。
+原 Gate、verdict、Manifest 和 quota 完全保留；本说明不追溯改判。见
+[S02 Correctness Record](2026-09-11-s02-prospective-correctness.md)。
+
 2026-09-10 后续授权已扩展到一次 S02 视频生成及其必要的视频取帧导入兼容修复。
 下文 tool block / reference admission block 是保留的历史阶段；最新状态见本文末尾
 `S02 Bounded Framing Repair Result`。S01人审已通过；旧本地失败已显式对账。

@@ -42,6 +42,81 @@ def test_marked_qa_accepts_complete_simulated_inventory():
     assert marked_policy().required_requirement_ids == ("signal",)
 
 
+@pytest.mark.parametrize("copy_from", ["observable", "quote"])
+def test_new_use_rejects_director_self_justification_without_breaking_reopen(copy_from):
+    from ai_video.production.requirement_semantics import require_semantic_admission
+
+    rule = semantic_rule()
+    basis = rule["observable"] if copy_from == "observable" else rule["semantics"]["source_refs"][0]["quote"]
+    rule["semantics"]["hard_basis"]["necessity"] = "  " + basis + "\n"
+    historical = marked_policy([rule])
+    before = historical.model_dump_json()
+    # Historical parsing and exact serialization are not new publication.
+    assert DomainAcceptancePolicy.model_validate_json(before).model_dump_json() == before
+    with pytest.raises(ValueError, match="independent necessity"):
+        require_semantic_admission(historical)
+
+
+def test_new_use_accepts_explained_basis_and_does_not_infer_artistic_necessity():
+    from ai_video.production.requirement_semantics import require_semantic_admission
+
+    require_semantic_admission(marked_policy())
+    rule = semantic_rule()
+    rule["semantics"]["source_refs"][0]["origin"] = "explicit_user"
+    rule["semantics"]["hard_basis"].update(kind="explicit_user", necessity=rule["observable"])
+    require_semantic_admission(marked_policy([rule]))
+
+
+def test_new_generation_readiness_rejects_a_historically_readable_bad_basis():
+    from ai_video.production.generation_evaluation import require_generation_evaluation_authorities
+    from test_generation_evaluation_binding import marked_context
+
+    _, _, qa = marked_context()
+    rule = semantic_rule()
+    rule["semantics"]["hard_basis"]["necessity"] = rule["observable"]
+    with pytest.raises(ValueError, match="independent necessity"):
+        require_generation_evaluation_authorities(qa, marked_policy([rule]))
+
+
+def test_semantic_admission_keeps_unmarked_legacy_inventory_unchanged():
+    from ai_video.production.requirement_semantics import require_semantic_admission
+    from test_production_generation_decision import setup_decision
+
+    policy = setup_decision()["inputs"].candidates[0].recipe.acceptance_policy
+    before = policy.model_dump_json()
+    require_semantic_admission(policy)
+    assert policy.model_dump_json() == before
+
+
+def test_production_planning_and_submit_owner_both_reject_bad_director_basis(monkeypatch, tmp_path):
+    from types import SimpleNamespace
+    from ai_video.errors import AiVideoError
+    from ai_video.production._state_commit_video import _StateCommitVideoMixin
+    from ai_video.production.generation_feedback import GenerationFeedbackOrchestrator
+    from test_generation_evaluation_binding import marked_context
+
+    setup, candidate, qa = marked_context()
+    rule = semantic_rule()
+    rule["semantics"]["hard_basis"]["necessity"] = rule["observable"]
+    acceptance = marked_policy([rule])
+    qa = qa.model_copy(update={"generation_acceptance": acceptance})
+    shot = SimpleNamespace(shot_id=setup["context"].target_shot_id, production_intent=None, production_lineage=None)
+    loaded = SimpleNamespace(qa_policy=qa, shots=(shot,))
+    # Only the standard loader's fixture input is substituted; both real
+    # planning and submit-owner readiness implementations run unmodified.
+    monkeypatch.setattr("ai_video.production.project.load_production_project", lambda _: loaded)
+    orchestrator = GenerationFeedbackOrchestrator.for_project(
+        committer=SimpleNamespace(project_root=tmp_path), targets=(),
+        context_loader=lambda _: {"context": setup["context"]}, policy=setup["inputs"].policy)
+    with pytest.raises(ValueError, match="independent necessity"):
+        orchestrator.prepare(limits=setup["inputs"].limits)
+    binding = SimpleNamespace(context=setup["context"], inputs=SimpleNamespace(
+        candidates=(candidate.model_copy(update={"recipe": candidate.recipe.model_copy(
+            update={"acceptance_policy": acceptance})}),)))
+    with pytest.raises(AiVideoError, match="Generation QA admission"):
+        _StateCommitVideoMixin()._require_current_generation_acceptance(loaded, binding)
+
+
 @pytest.mark.parametrize("mutation", ["missing", "unknown_version", "margin", "wrong_level", "omit_hard"])
 def test_marked_qa_rejects_semantics_admission_gaps(mutation):
     rule = semantic_rule()

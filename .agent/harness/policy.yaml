@@ -93,14 +93,14 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_visual_quality.py, tests/test_visual_quality_report.py, -q]
     cwd: .
     description: Verify visual requirements through existing semantic/final acceptance, exact media report binding and missing-review blocking; no Provider calls.
-  vidu_ad_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_vidu_ad_wire.py, tests/test_production_vidu_ad_generation.py, tests/test_production_vidu_ad_lifecycle.py, -q]
-    cwd: .
-    description: Verify whole-ad source creation, durable paid intent, bounded task quota, explicit recovery and unaccepted byte download offline.
   paid_reconciliation_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_paid_provider_no_effect_reconciliation.py, -q]
     cwd: .
     description: Verify explicit paid video no-effect reconciliation and zero-resubmit recovery.
+  vidu_ad_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_vidu_ad_wire.py, tests/test_production_vidu_ad_generation.py, tests/test_production_vidu_ad_lifecycle.py, -q]
+    cwd: .
+    description: Verify whole-ad source creation, durable paid intent, bounded task quota, explicit recovery and unaccepted byte download offline.
   repair_input_admission_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_repair_input_admission.py, -q]
     cwd: .
@@ -255,9 +255,13 @@ checks:
     covered_by_check_ids: [production_contract_tests]
     description: Verify pure Shot routing, exact video capabilities, and dependency isolation.
   generation_feedback_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_generation_feedback.py, tests/test_generation_evaluation.py, tests/test_requirement_semantics.py, tests/test_generation_evaluation_binding.py, tests/test_requirement_semantics_replay.py, tests/test_generation_execution.py, tests/test_generation_execution_guards.py, tests/test_generation_historical_replay.py, tests/test_generation_provider_wiring.py, tests/test_generation_local_wiring.py, tests/test_generation_feedback_driver.py, tests/test_generation_feedback_review.py, tests/test_generation_history_import.py, tests/test_generation_history_import_receipt.py, tests/test_generation_quality_rejection.py, tests/test_production_generation_decision.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_generation_feedback.py, tests/test_generation_evaluation.py, tests/test_requirement_semantics.py, tests/test_generation_evaluation_binding.py, tests/test_requirement_semantics_replay.py, tests/test_s02_prospective_review.py, tests/test_generation_execution.py, tests/test_generation_execution_guards.py, tests/test_generation_historical_replay.py, tests/test_generation_provider_wiring.py, tests/test_generation_local_wiring.py, tests/test_generation_feedback_driver.py, tests/test_generation_feedback_review.py, tests/test_generation_history_import.py, tests/test_generation_history_import_receipt.py, tests/test_generation_quality_rejection.py, tests/test_production_generation_decision.py, -q]
     cwd: .
     description: Verify evidence-derived decisions, transferable cohorts, execution binding and frozen historical replay without Provider effects.
+  voice_source_routing_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_voice_routing_contracts.py, tests/test_voice_routing_integration.py, tests/test_voice_routing_guards.py, tests/test_voice_routing_handoff.py, tests/test_voice_routing_execution.py, tests/test_voice_routing_p4.py, tests/test_voice_routing_binding.py, tests/test_voice_routing_identity.py, -q]
+    cwd: .
+    description: Verify voice source selection, exact offline compiler binding, voice admission and P4 mandatory speech without live effects.
   production_strategy_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_strategy_contracts.py, tests/test_production_requirement_allocation.py, tests/test_production_source_use_evidence.py, tests/test_production_strategy_resolver.py, tests/test_production_strategy_materialization.py, tests/test_production_strategy_reader.py, tests/test_production_strategy_dependency.py, tests/test_production_planning_service.py, tests/test_production_planning_generation.py, -q]
     cwd: .
@@ -319,6 +323,7 @@ checks:
       - visual_quality_tests
       - paid_reconciliation_tests
       - vidu_ad_tests
+      - voice_source_routing_tests
       - repair_input_admission_tests
       - generation_feedback_tests
       - production_vidu_tests
@@ -373,6 +378,14 @@ checks:
     description: Report repository health against the version-controlled architecture baseline.
 
 categories:
+  paid_no_effect_reconciliation:
+    patterns:
+      - src/ai_video/production/paid_provider_no_effect_reconciliation.py
+      - tests/test_paid_provider_no_effect_reconciliation.py
+    check_ids:
+      - paid_reconciliation_tests
+      - production_video_provider_tests
+      - task_architecture_gate
   vidu_ad_source:
     patterns:
       - src/ai_video/production/_provider_manifest_fields.py
@@ -388,14 +401,34 @@ categories:
       - vidu_ad_tests
       - production_vidu_tests
       - task_architecture_gate
-  paid_no_effect_reconciliation:
+  voice_source_routing:
     patterns:
-      - src/ai_video/production/paid_provider_no_effect_reconciliation.py
-      - tests/test_paid_provider_no_effect_reconciliation.py
+      - src/ai_video/production/voice_routing*.py
+      - tests/test_voice_routing*.py
+      - src/ai_video/production/_state_commit_voice_intent.py
+      - src/ai_video/production/_state_commit_voice_activation.py
+      - src/ai_video/production/_state_commit_voice_candidate.py
+      - src/ai_video/production/_state_commit_paid_provider.py
+      - src/ai_video/production/_voice_project_reader.py
+      - src/ai_video/production/project.py
+      - src/ai_video/production/_state_commit_contracts.py
+      - src/ai_video/production/paths.py
+      - src/ai_video/production/models.py
+      - src/ai_video/production/video_requirement.py
+      - src/ai_video/planning/video_planner.py
+      - src/ai_video/production/generation_feedback.py
+      - src/ai_video/production/generation_decision.py
+      - src/ai_video/production/generation_execution.py
+      - src/ai_video/production/_shot_router_contracts.py
+      - src/ai_video/production/video_compiler.py
+      - src/ai_video/production/_remote_video_native_prompt.py
+      - src/ai_video/production/vidu.py
+      - src/ai_video/production/seedance.py
+      - src/ai_video/production/generated_video_audio.py
+      - src/ai_video/production/composition.py
+      - src/ai_video/production/composition_contracts.py
     check_ids:
-      - paid_reconciliation_tests
-      - production_video_provider_tests
-      - task_architecture_gate
+      - voice_source_routing_tests
   repair_input_admission:
     patterns:
       - src/ai_video/production/repair_input_admission.py
@@ -467,6 +500,9 @@ categories:
       - harness_tests
   generation_feedback:
     patterns:
+      - docs/superpowers/artifacts/drama/jieshi-episode-01/s02-prospective-qa-v2.json
+      - docs/superpowers/artifacts/drama/jieshi-episode-01/s02-prospective-shadow-v2.json
+      - tests/test_s02_prospective_review.py
       - src/ai_video/planning/generation_feedback_context.py
       - src/ai_video_mcp/generation_feedback.py
       - src/ai_video_mcp/analysis_client.py

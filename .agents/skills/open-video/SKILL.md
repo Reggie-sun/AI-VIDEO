@@ -73,10 +73,10 @@ create Director Coverage Evidence with:
 - ordered `coverage_units`, each with `unit_id`, `duration_seconds`, finite `beat_function`,
   `objective`, `open_state`, `close_state`, finite `shot_scale`, finite `camera_treatment`,
   `camera_intent`, `visible_change`, finite `transition_out`, and `constraint_ids`;
-- distinct objectives and visible changes; adjacent ordinary multi-Shot units must change finite
-  beat, scale, and camera-treatment categories without requiring those categories to be globally
-  unique across a long film; every global constraint ID must bind to every unit, while every
-  beat-specific constraint ID must bind to at least one unit.
+- distinct objectives and visible changes; adjacent ordinary multi-Shot units should vary finite
+  beat, scale, and camera-treatment categories when that improves coverage, but repetition is
+  Director guidance rather than a validation failure; every global constraint ID must bind to
+  every unit, while every beat-specific constraint ID must bind to at least one unit.
 
 Validate the evidence before downstream authoring:
 

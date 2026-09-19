@@ -22,7 +22,7 @@ from ai_video.production.generation_evaluation_criteria import (
     PresentationEvidence, TemporalMeasurement, evaluation_items, temporal_verdict,
     require_canonical_observation_basis,
 )
-from ai_video.production.requirement_semantics import validate_semantic_inventory
+from ai_video.production.requirement_semantics import require_semantic_admission, validate_semantic_inventory
 
 
 class GenerationObservation(StrictModel):
@@ -286,7 +286,8 @@ def project_generation_evaluation_sources(*, sources, acceptance):
 
 
 def require_generation_evaluation_authorities(qa_policy, acceptance):
-    """A required proof layer needs an explicitly configured owner before submit."""
+    """New generation requires admitted semantics and configured proof owners."""
+    require_semantic_admission(acceptance)
     required = {item["proof"] for item in acceptance.profile_payload["generation_requirements"]
                 if item["level"] == "acceptance" and item["stage"] == "raw_generation"}
     configured = {item.proof for item in qa_policy.generation_evaluation_authorities}

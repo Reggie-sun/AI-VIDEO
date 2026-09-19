@@ -442,7 +442,9 @@ def test_shared_production_contract_routes_to_cross_surface_suite() -> None:
         "src/ai_video/production/_state_lifecycle.py",
     ):
         report = agent_harness.inspect_paths([path], policy)
-        assert report["categories"] == ["production_shared_contracts"]
+        voice_route = path == "src/ai_video/production/models.py"
+        assert report["categories"] == (["voice_source_routing"] if voice_route else []) + ["production_shared_contracts"]
+        assert ("voice_source_routing_tests" in report["check_ids"]) == voice_route
         assert report["fallback_paths"] == []
         assert report["check_ids"] == [
             "scope_diff_check",
@@ -450,6 +452,7 @@ def test_shared_production_contract_routes_to_cross_surface_suite() -> None:
             "policy_audit_check",
             "product_runtime_skill_boundary_tests",
             "task_architecture_gate",
+            *(["voice_source_routing_tests"] if voice_route else []),
             "production_contract_tests",
             "cli_config_tests",
         ]
@@ -465,7 +468,9 @@ def test_shot_router_routes_to_exact_contract_suite() -> None:
         "tests/test_production_shot_router.py",
     ):
         report = agent_harness.inspect_paths([path], policy)
-        assert report["categories"] == ["production_shot_router"]
+        voice_route = path == "src/ai_video/production/_shot_router_contracts.py"
+        assert report["categories"] == (["voice_source_routing"] if voice_route else []) + ["production_shot_router"]
+        assert ("voice_source_routing_tests" in report["check_ids"]) == voice_route
         assert report["fallback_paths"] == []
         assert report["check_ids"] == [
             "scope_diff_check",
@@ -473,6 +478,7 @@ def test_shot_router_routes_to_exact_contract_suite() -> None:
             "policy_audit_check",
             "product_runtime_skill_boundary_tests",
             "task_architecture_gate",
+            *(["voice_source_routing_tests"] if voice_route else []),
             "production_shot_router_tests",
             "provider_neutral_video_requirement_tests",
         ]
@@ -496,7 +502,9 @@ def test_video_planner_routes_to_exact_contract_suite() -> None:
         "tests/test_planning_video_planner.py",
     ):
         report = agent_harness.inspect_paths([path], policy)
-        assert report["categories"] == ["video_planning"]
+        voice_route = path == "src/ai_video/planning/video_planner.py"
+        assert report["categories"] == (["voice_source_routing"] if voice_route else []) + ["video_planning"]
+        assert ("voice_source_routing_tests" in report["check_ids"]) == voice_route
         assert report["fallback_paths"] == []
         assert report["check_ids"] == [
             "scope_diff_check",
@@ -504,6 +512,7 @@ def test_video_planner_routes_to_exact_contract_suite() -> None:
             "policy_audit_check",
             "product_runtime_skill_boundary_tests",
             "task_architecture_gate",
+            *(["voice_source_routing_tests"] if voice_route else []),
             "video_planner_tests",
             "provider_neutral_video_requirement_tests",
             "shot_readiness_gate_tests",
@@ -900,7 +909,9 @@ def test_ad_creative_runtime_routes_to_composition_audio_suite() -> None:
         "tests/test_production_ad_creative.py",
     ):
         report = agent_harness.inspect_paths([path], policy)
-        assert report["categories"] == ["production_composition_audio"]
+        voice_route = path == "src/ai_video/production/composition_contracts.py"
+        assert report["categories"] == (["voice_source_routing"] if voice_route else []) + ["production_composition_audio"]
+        assert ("voice_source_routing_tests" in report["check_ids"]) == voice_route
         assert report["fallback_paths"] == []
         assert "production_composition_audio_tests" in report["check_ids"]
 
@@ -1539,7 +1550,9 @@ def test_seedance_adapter_and_extended_contracts_route_to_video_provider_suite()
         "tests/test_production_seedance.py",
     ):
         report = agent_harness.inspect_paths([path], policy)
-        assert report["categories"] == ["production_video_provider"]
+        voice_route = path == "src/ai_video/production/seedance.py"
+        assert report["categories"] == (["voice_source_routing"] if voice_route else []) + ["production_video_provider"]
+        assert ("voice_source_routing_tests" in report["check_ids"]) == voice_route
         assert "production_video_provider_tests" in report["check_ids"]
         assert "task_architecture_gate" in report["check_ids"]
     provider_argv = policy["checks"]["production_video_provider_tests"]["argv"]
@@ -1701,6 +1714,22 @@ def test_domain_committer_helpers_route_to_their_domain_suite(
     assert check_id in report["check_ids"]
     assert "production_state" in report["categories"]
     assert "production_state_tests" in report["check_ids"]
+
+
+@pytest.mark.parametrize("path", [
+    "src/ai_video/production/_state_commit_voice_intent.py",
+    "src/ai_video/production/_state_commit_voice_activation.py",
+    "src/ai_video/production/_state_commit_voice_candidate.py",
+    "src/ai_video/production/_state_commit_paid_provider.py",
+    "src/ai_video/production/_voice_project_reader.py",
+    "src/ai_video/production/project.py",
+    "src/ai_video/production/_state_commit_contracts.py",
+    "src/ai_video/production/paths.py",
+])
+def test_voice_binding_owners_also_route_to_voice_regressions(path: str) -> None:
+    report = agent_harness.inspect_paths([path], agent_harness.load_policy(POLICY_PATH))
+    assert "voice_source_routing_tests" in report["check_ids"]
+    assert report["fallback_paths"] == []
 
 
 @pytest.mark.parametrize(

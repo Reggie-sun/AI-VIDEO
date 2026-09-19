@@ -365,6 +365,12 @@ def compile_provider_video_request(
             ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH,
             ("requirement_hash",),
         )
+    from ai_video.production.voice_routing import validate_voice_compilation, voice_expression_recipe
+
+    voice_errors = validate_voice_compilation(requirement, provider_bound, native_prompt)
+    if voice_errors:
+        return _unsupported(provider_bound, requirement,
+            ProviderRequirementUnsupportedReason.NATIVE_CONTROL_UNSUPPORTED, voice_errors)
     if (
         requirement.contract_version == "provider-neutral-video-requirement/4"
         and native_prompt is None
@@ -564,7 +570,8 @@ def compile_provider_video_request(
             return _unsupported(provider_bound, requirement,
                                 ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
                                 ("generation_recipe.native_expression",))
-        missing = expression_errors(recipe, requirement, prompt, native_prompt.expressed_control_paths)
+        expression_recipe = voice_expression_recipe(recipe, requirement, provider_bound.voice_route)
+        missing = expression_errors(expression_recipe, requirement, prompt, native_prompt.expressed_control_paths)
         if missing:
             return _unsupported(provider_bound, requirement,
                                 ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,

@@ -54,6 +54,7 @@ from ai_video.production.review import (
     adjudicate_review_evidence,
     validate_technical_review_context,
 )
+from ai_video.production.requirement_semantics import require_qa_semantic_admission
 
 from ._state_commit_common import (
     _candidate_artifacts_hash,
@@ -112,6 +113,10 @@ class _StateCommitReviewMixin:
                 and manifest.active_qa_policy == pointer
             ):
                 return manifest
+            try:
+                require_qa_semantic_admission(policy)
+            except ValueError as exc:
+                raise _state_invalid("QA semantic admission failed.", str(exc)) from exc
             if manifest.active_qa_policy is not None:
                 prior = load_qa_policy(self._project_root, manifest.active_qa_policy).final_output
                 current = policy.final_output

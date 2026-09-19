@@ -7,7 +7,7 @@ from typing import Callable
 
 from pydantic import ValidationError
 
-from ai_video.errors import ErrorCode
+from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     PaidProviderAttemptPhase,
@@ -123,6 +123,12 @@ class _StateCommitPaidProviderMixin:
                 if existing != entry:
                     raise _state_invalid("Paid Provider budget extension ID collision differs.")
                 return manifest
+            from ai_video.production.video_pre_generation import verified_fetched_prior_for_new_goal
+
+            pending = tuple(a for a in manifest.attempts if a.status in {
+                StateCommitStatus.RUNNING, StateCommitStatus.OUTCOME_UNKNOWN})
+            retained_new_goal = (len(pending) == 1
+                and verified_fetched_prior_for_new_goal(self, loaded, pending[0]) is not None)
             if (
                 entry.project_id != manifest.project_id
                 or entry.explicit_opt_in is not True
@@ -134,8 +140,7 @@ class _StateCommitPaidProviderMixin:
                 or entry.old_ceiling_microunits != budget.project_ceiling_microunits
                 or not entry.valid_at(self._paid_provider_clock())
                 or budget.blocked
-                or any(a.status in {StateCommitStatus.RUNNING, StateCommitStatus.OUTCOME_UNKNOWN}
-                       for a in manifest.attempts)
+                or (pending and not retained_new_goal)
                 or any(r.status.value == "unsettled" for r in budget.reservations)
             ):
                 raise _state_invalid("Paid Provider budget extension preconditions are not current.")
@@ -246,20 +251,105 @@ class _StateCommitPaidProviderMixin:
             ):
                 raise _state_invalid("Paid Provider intent requires an exact current running attempt.")
             if preview.operation == "voice_generation":
-                request = attempt.voice_request
+                receipt = attempt.voice_request
                 if (
                     attempt.operation != "voice_generation"
                     or attempt.voice_phase != "submit_intent"
-                    or request is None
-                    or request.attempt_id != preview.attempt_id
-                    or request.request_fingerprint != preview.request_fingerprint
-                    or request.provider_kind != preview.provider_kind
-                    or request.model_id != preview.model_id
-                    or request.destination != preview.destination
+                    or receipt is None
+                    or receipt.attempt_id != preview.attempt_id
+                    or receipt.request_fingerprint != preview.request_fingerprint
+                    or receipt.provider_kind != preview.provider_kind
+                    or receipt.model_id != preview.model_id
+                    or receipt.destination != preview.destination
                 ):
                     raise _state_invalid(
                         "Paid Provider preview does not match the durable operation request."
                     )
+                if receipt.routing_binding_hash is not None:
+                    from ai_video.production._voice_project_reader import read_canonical_voice_model
+                    from ai_video.production.audio import (
+                        VoiceCallAuthorization,
+                        VoiceGenerationPreview,
+                        VoiceGenerationRequest,
+                    )
+
+                    try:
+                        voice_request, _ = read_canonical_voice_model(
+                            self._project_root, attempt.attempt_id, "request.json", VoiceGenerationRequest
+                        )
+                        voice_preview, _ = read_canonical_voice_model(
+                            self._project_root, attempt.attempt_id, "preview.json", VoiceGenerationPreview
+                        )
+                        if self._voice_receipt(
+                            voice_request,
+                            voice_preview,
+                            read_canonical_voice_model(
+                                self._project_root, attempt.attempt_id, "authorization.json",
+                                VoiceCallAuthorization,
+                            )[0],
+                            routing_task_id=receipt.routing_task_id,
+                            routing_binding_hash=receipt.routing_binding_hash,
+                        ) != receipt:
+                            raise ValueError("voice request evidence is not exact")
+                        envelope = self._require_current_voice_routing_binding(
+                            manifest, voice_request, voice_preview, receipt
+                        )
+                    except (AiVideoError, OSError, ValueError) as exc:
+                        raise _state_invalid(
+                            "Routed voice evidence is not current and exact.", str(exc)
+                        ) from exc
+                    if envelope is not None:
+                        from ai_video.production.video import build_video_paid_permit_binding
+                        from ai_video.production.voice_routing import validate_routed_paid_voice_preview
+
+                        try:
+                            validate_routed_paid_voice_preview(
+                                envelope.binding, voice_preview, preview
+                            )
+                        except ValueError as exc:
+                            raise _state_invalid(
+                                "Routed voice Paid Provider preview is not the sealed handoff.",
+                                str(exc),
+                            ) from exc
+
+                        video_authorization = authorizer(envelope.video_paid_preview)
+                        if video_authorization is None:
+                            raise _state_invalid("Routed voice requires current video budget authorization.")
+                        validate_paid_provider_authorization(
+                            envelope.video_paid_preview,
+                            video_authorization,
+                            now=self._paid_provider_clock(),
+                        )
+                        try:
+                            build_video_paid_permit_binding(
+                                envelope.binding.compiled_request,
+                                envelope.video_preview,
+                                envelope.video_paid_preview,
+                                video_authorization,
+                            )
+                            joint_budget = (
+                                self._reopen_paid_budget(manifest.active_paid_provider_budget)
+                                if manifest.active_paid_provider_budget is not None else None
+                            )
+                            joint_budget, _ = reserve_paid_provider_budget(
+                                joint_budget,
+                                preview=preview,
+                                authorization=authorization,
+                                reservation_id=f"voice-route-{preview.attempt_id}",
+                            )
+                            reserve_paid_provider_budget(
+                                joint_budget,
+                                preview=envelope.video_paid_preview,
+                                authorization=video_authorization,
+                                reservation_id=(
+                                    f"voice-route-video-{envelope.video_paid_preview.attempt_id}"
+                                ),
+                            )
+                        except (AiVideoError, ValueError) as exc:
+                            raise _state_invalid(
+                                "Routed voice and selected video do not fit the current shared budget.",
+                                str(exc),
+                            ) from exc
             elif preview.operation == "ad_generation":
                 from ai_video.production.vidu_ad_reader import validate_ad_intent
                 try:

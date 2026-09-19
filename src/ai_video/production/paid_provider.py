@@ -79,9 +79,9 @@ class PaidProviderCallPreview(_PaidStrictModel):
     provider_kind: str = Field(pattern=_SAFE_SHORT_ID.pattern)
     model_id: str = Field(pattern=_SAFE_SHORT_ID.pattern)
     request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
-    billing_mode: Literal["remote_metered"]
+    billing_mode: Literal["remote_metered", "minimax_speech_batch"]
     currency: str = Field(pattern=r"^[A-Z]{3}$")
-    estimated_cost_upper_bound_microunits: int = Field(strict=True, ge=0)
+    estimated_cost_upper_bound_microunits: int | None = Field(strict=True, ge=0)
     destination: str
     method: Literal["POST"]
     egress_items: tuple[PaidProviderEgressItem, ...] = Field(min_length=1)
@@ -97,6 +97,15 @@ class PaidProviderCallPreview(_PaidStrictModel):
 
     @model_validator(mode="after")
     def _validate_seal(self) -> "PaidProviderCallPreview":
+        if self.billing_mode == "minimax_speech_batch":
+            if (self.operation != "voice_generation"
+                    or self.provider_kind != "minimax-speech"
+                    or self.model_id not in {"speech-2.8-hd", "speech-2.8-turbo"}
+                    or self.destination not in {"https://api.minimax.io", "https://api.minimaxi.com"}
+                    or self.estimated_cost_upper_bound_microunits is not None):
+                raise ValueError("MiniMax Speech batch scope or unknown estimate is invalid")
+        elif self.estimated_cost_upper_bound_microunits is None:
+            raise ValueError("metered preview requires a monetary upper bound")
         if len({item.item_id for item in self.egress_items}) != len(self.egress_items):
             raise ValueError("paid Provider egress item IDs must be unique")
         data = self.model_dump(mode="json", exclude={"preview_fingerprint"})
@@ -124,8 +133,9 @@ class PaidProviderAuthorizationDecision(_PaidStrictModel):
     opt_in_policy_receipt_id: str = Field(pattern=_SAFE_SHORT_ID.pattern)
     budget_policy_id: str = Field(pattern=_SAFE_SHORT_ID.pattern)
     budget_currency: str = Field(pattern=r"^[A-Z]{3}$")
-    project_budget_ceiling_microunits: int = Field(strict=True, gt=0)
-    per_call_ceiling_microunits: int = Field(strict=True, ge=0)
+    project_budget_ceiling_microunits: int | None = Field(strict=True, gt=0)
+    per_call_ceiling_microunits: int | None = Field(strict=True, ge=0)
+    voice_batch_submit_limit: int | None = Field(default=None, strict=True, gt=0)
     egress_authorized: Literal[True]
     egress_policy_receipt_id: str = Field(pattern=_SAFE_SHORT_ID.pattern)
     live_test_authorized: Literal[True]
@@ -135,8 +145,22 @@ class PaidProviderAuthorizationDecision(_PaidStrictModel):
     max_submit_count: Literal[1]
     authorization_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
 
+    @model_serializer(mode="wrap")
+    def _legacy_authorization(self, handler):
+        data = handler(self)
+        if self.voice_batch_submit_limit is None:
+            data.pop("voice_batch_submit_limit", None)
+        return data
+
     @model_validator(mode="after")
     def _validate_seal_and_time(self) -> "PaidProviderAuthorizationDecision":
+        if self.voice_batch_submit_limit is None:
+            if (self.project_budget_ceiling_microunits is None
+                    or self.per_call_ceiling_microunits is None):
+                raise ValueError("monetary authorization requires ceilings")
+        elif (self.project_budget_ceiling_microunits is not None
+              or self.per_call_ceiling_microunits is not None):
+            raise ValueError("voice batch count must not be represented as money")
         if self.issued_at.tzinfo is None or self.expires_at.tzinfo is None:
             raise ValueError("paid Provider authorization timestamps must be timezone-aware")
         if self.expires_at <= self.issued_at:
@@ -177,7 +201,11 @@ def validate_paid_provider_authorization(
             ErrorCode.PAID_PROVIDER_BUDGET_REJECTED,
             "Paid Provider budget currency does not match the preview.",
         )
-    if authorization.per_call_ceiling_microunits < (
+    batch = preview.billing_mode == "minimax_speech_batch"
+    if batch != (authorization.voice_batch_submit_limit is not None):
+        raise _paid_error(ErrorCode.PAID_PROVIDER_BUDGET_REJECTED,
+                          "Voice batch authorization does not match the billing mode.")
+    if not batch and authorization.per_call_ceiling_microunits < (
         preview.estimated_cost_upper_bound_microunits
     ):
         raise _paid_error(
@@ -204,7 +232,7 @@ class PaidProviderBudgetReservation(_PaidStrictModel):
     attempt_id: str = Field(pattern=_SAFE_SHORT_ID.pattern)
     request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     preview_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
-    upper_bound_microunits: int = Field(strict=True, ge=0)
+    upper_bound_microunits: int | None = Field(strict=True, ge=0)
     status: BudgetReservationStatus
     actual_cost_microunits: int | None = Field(default=None, strict=True, ge=0)
     submit_receipt_fingerprint: str | None = Field(
@@ -229,7 +257,8 @@ class PaidProviderBudgetSnapshot(_PaidStrictModel):
     revision: int = Field(strict=True, ge=1)
     policy_id: str = Field(pattern=_SAFE_SHORT_ID.pattern)
     currency: str = Field(pattern=r"^[A-Z]{3}$")
-    project_ceiling_microunits: int = Field(strict=True, gt=0)
+    project_ceiling_microunits: int | None = Field(strict=True, gt=0)
+    voice_batch_submit_limit: int | None = Field(default=None, strict=True, gt=0)
     reservations: tuple[PaidProviderBudgetReservation, ...] = ()
     ceiling_extensions: tuple[PaidProviderBudgetCeilingExtension, ...] = ()
     submit_quota_extensions: tuple[PaidProviderSubmitQuotaExtension, ...] = ()
@@ -239,6 +268,8 @@ class PaidProviderBudgetSnapshot(_PaidStrictModel):
     @model_serializer(mode="wrap")
     def _legacy_empty_extensions(self, handler):
         data = handler(self)
+        if self.voice_batch_submit_limit is None:
+            data.pop("voice_batch_submit_limit", None)
         if not self.ceiling_extensions:
             data.pop("ceiling_extensions", None)
         if not self.submit_quota_extensions:
@@ -247,6 +278,15 @@ class PaidProviderBudgetSnapshot(_PaidStrictModel):
 
     @model_validator(mode="after")
     def _validate_seal_and_uniqueness(self) -> "PaidProviderBudgetSnapshot":
+        if self.voice_batch_submit_limit is None:
+            if (self.project_ceiling_microunits is None
+                    or any(r.upper_bound_microunits is None for r in self.reservations)):
+                raise ValueError("monetary ledger requires monetary bounds")
+        elif (self.project_ceiling_microunits is not None
+              or self.ceiling_extensions or self.submit_quota_extensions
+              or len(self.reservations) > self.voice_batch_submit_limit
+              or any(r.upper_bound_microunits is not None for r in self.reservations)):
+            raise ValueError("voice batch ledger must preserve its finite count and unknown estimate")
         reservation_ids = [item.reservation_id for item in self.reservations]
         attempt_ids = [item.attempt_id for item in self.reservations]
         quota_extension_ids = [item.extension_id for item in self.submit_quota_extensions]
@@ -262,7 +302,10 @@ class PaidProviderBudgetSnapshot(_PaidStrictModel):
         return self
 
     @property
-    def committed_microunits(self) -> int:
+    def committed_microunits(self) -> int | None:
+        if any(r.status in {BudgetReservationStatus.RESERVED, BudgetReservationStatus.UNSETTLED}
+               and r.upper_bound_microunits is None for r in self.reservations):
+            return None
         total = 0
         for reservation in self.reservations:
             if reservation.status is BudgetReservationStatus.SETTLED:
@@ -276,7 +319,9 @@ class PaidProviderBudgetSnapshot(_PaidStrictModel):
         return total
 
     @property
-    def available_microunits(self) -> int:
+    def available_microunits(self) -> int | None:
+        if self.project_ceiling_microunits is None:
+            return None
         return max(0, self.project_ceiling_microunits - self.committed_microunits)
 
     @classmethod
@@ -305,6 +350,7 @@ def reserve_paid_provider_budget(
             project_ceiling_microunits=(
                 authorization.project_budget_ceiling_microunits
             ),
+            voice_batch_submit_limit=authorization.voice_batch_submit_limit,
             reservations=(),
             blocked=False,
         )
@@ -318,6 +364,7 @@ def reserve_paid_provider_budget(
         or snapshot.currency != authorization.budget_currency
         or snapshot.project_ceiling_microunits
         != authorization.project_budget_ceiling_microunits
+        or snapshot.voice_batch_submit_limit != authorization.voice_batch_submit_limit
     ):
         raise _paid_error(
             ErrorCode.PAID_PROVIDER_BUDGET_REJECTED,
@@ -332,7 +379,14 @@ def reserve_paid_provider_budget(
             "Paid Provider attempt or reservation was already recorded.",
         )
     upper_bound = preview.estimated_cost_upper_bound_microunits
-    if upper_bound > snapshot.available_microunits:
+    if snapshot.voice_batch_submit_limit is not None:
+        if any(r.status is BudgetReservationStatus.UNSETTLED for r in snapshot.reservations):
+            raise _paid_error(ErrorCode.PAID_PROVIDER_OUTCOME_UNKNOWN,
+                              "Voice batch has an unknown submit outcome.")
+        if len(snapshot.reservations) >= snapshot.voice_batch_submit_limit:
+            raise _paid_error(ErrorCode.PAID_PROVIDER_BUDGET_REJECTED,
+                              "Voice batch submit count is exhausted.")
+    elif upper_bound > snapshot.available_microunits:
         raise _paid_error(
             ErrorCode.PAID_PROVIDER_BUDGET_REJECTED,
             "Paid Provider budget is insufficient for the declared upper bound.",
@@ -350,6 +404,7 @@ def reserve_paid_provider_budget(
         policy_id=snapshot.policy_id,
         currency=snapshot.currency,
         project_ceiling_microunits=snapshot.project_ceiling_microunits,
+        voice_batch_submit_limit=snapshot.voice_batch_submit_limit,
         reservations=snapshot.reservations + (reservation,),
         ceiling_extensions=snapshot.ceiling_extensions,
         submit_quota_extensions=snapshot.submit_quota_extensions,
@@ -463,17 +518,18 @@ def _replace_reservation(
         policy_id=snapshot.policy_id,
         currency=snapshot.currency,
         project_ceiling_microunits=snapshot.project_ceiling_microunits,
+        voice_batch_submit_limit=snapshot.voice_batch_submit_limit,
         reservations=reservations,
         ceiling_extensions=snapshot.ceiling_extensions,
         submit_quota_extensions=snapshot.submit_quota_extensions,
         blocked=(
             snapshot.blocked
-            or sum(
+            or (snapshot.project_ceiling_microunits is not None and sum(
                 item.actual_cost_microunits or 0
                 for item in reservations
                 if item.status is BudgetReservationStatus.SETTLED
             )
-            > snapshot.project_ceiling_microunits
+            > snapshot.project_ceiling_microunits)
         ),
     )
 
@@ -563,7 +619,8 @@ def settle_paid_provider_budget(
         }
     )
     next_snapshot = _replace_reservation(snapshot, updated)
-    if actual_cost_microunits > reservation.upper_bound_microunits:
+    if (reservation.upper_bound_microunits is not None
+            and actual_cost_microunits > reservation.upper_bound_microunits):
         next_snapshot = PaidProviderBudgetSnapshot.create(
             revision=next_snapshot.revision + 1,
             policy_id=next_snapshot.policy_id,

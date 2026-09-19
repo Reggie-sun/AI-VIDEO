@@ -12,6 +12,7 @@ from ai_video.production.audio import (
     VoiceGenerationPreview,
     VoiceGenerationRequest,
     VoiceProviderResult,
+    voice_cost_authorization_matches,
 )
 from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
@@ -60,6 +61,9 @@ class _StateCommitVoiceIntentMixin:
                 authorization_path=canonical_voice_attempt_artifact_path(
                     self._project_root, attempt_id, "authorization.json"
                 ),
+                routing_binding_path=canonical_voice_attempt_artifact_path(
+                    self._project_root, attempt_id, "routing-binding.json"
+                ),
                 submit_intent_path=canonical_voice_attempt_artifact_path(
                     self._project_root, attempt_id, "submit-intent.json"
                 ),
@@ -87,6 +91,9 @@ class _StateCommitVoiceIntentMixin:
         request: VoiceGenerationRequest,
         preview: VoiceGenerationPreview,
         authorization: VoiceCallAuthorization,
+        *,
+        routing_task_id: str | None = None,
+        routing_binding_hash: str | None = None,
     ) -> VoiceRequestReceipt:
         if (
             preview.request_fingerprint != request.voice_request_fingerprint
@@ -100,8 +107,7 @@ class _StateCommitVoiceIntentMixin:
             or preview.pricing_snapshot_id != request.pricing_snapshot_id
             or authorization.pricing_snapshot_id != request.pricing_snapshot_id
             or authorization.payload_categories != preview.payload_categories
-            or authorization.cost_ceiling_microunits
-            < preview.estimated_cost_upper_bound_microunits
+            or not voice_cost_authorization_matches(preview, authorization)
             or not preview.timing_supported
             or not preview.output_supported
             or not authorization.provider_enabled
@@ -122,6 +128,8 @@ class _StateCommitVoiceIntentMixin:
             budget_reservation_receipt_id=request.budget_reservation_receipt_id,
             egress_authorization_receipt_id=request.egress_authorization_receipt_id,
             destination=authorization.destination,
+            routing_task_id=routing_task_id,
+            routing_binding_hash=routing_binding_hash,
         )
 
     def _voice_prepared_artifact(
@@ -131,6 +139,76 @@ class _StateCommitVoiceIntentMixin:
             attempt_id, absolute_path.relative_to(self._project_root), payload
         )
 
+    def _routing_binding_artifact(self, request, binding, paths):
+        if binding is None:
+            return None
+        return self._voice_prepared_artifact(
+            request.attempt_id,
+            paths.routing_binding_path,
+            _canonical_json_bytes(binding),
+        )
+
+    def _require_current_voice_routing_binding(
+        self, manifest, request, preview, receipt, *, envelope=None
+    ):
+        """Reopen and validate the selected route while the voice owner lock holds."""
+
+        # Legacy P4 manifests have no Video Router layout or canonical project
+        # material to reopen.  They remain byte-exact unless a new route receipt
+        # explicitly opts into this admission path.
+        if (
+            receipt.routing_binding_hash is None
+            and not manifest_supports(
+                manifest.schema_version, ManifestCapability.VIDEO_GENERATION
+            )
+        ):
+            return
+        loaded = self._load_production_project(self._project_root / "project.yaml")
+        if loaded.manifest != manifest:
+            raise _state_invalid("Active Manifest changed during voice route validation.")
+        authored = any(
+            shot.voice_routing is not None and shot.artifact_id in request.input_artifact_ids
+            for shot in loaded.shots
+        )
+        if receipt.routing_binding_hash is None:
+            if authored:
+                raise _state_invalid(
+                    "Voice Router authoring requires an exact durable route binding."
+                )
+            return
+        if envelope is None:
+            from ai_video.production._voice_project_reader import read_canonical_voice_model
+            from ai_video.production.voice_routing_execution import VoiceRoutingExecutionEnvelope
+
+            envelope, _ = read_canonical_voice_model(
+                self._project_root,
+                request.attempt_id,
+                "routing-binding.json",
+                VoiceRoutingExecutionEnvelope,
+            )
+        from ai_video.production.voice_routing import validate_routed_voice_handoff
+
+        binding = envelope.binding
+        if (
+            envelope.envelope_hash != receipt.routing_binding_hash
+            or binding.inputs.limits.task_id != receipt.routing_task_id
+        ):
+            raise _state_invalid("Voice route task provenance does not match its receipt.")
+        try:
+            validate_routed_voice_handoff(binding, request, preview)
+            binding.validate_current_project(
+                loaded, preparing_voice=True, voice_attempt_id=request.attempt_id
+            )
+            from ai_video.production.video_pre_generation import (
+                verify_current_video_generation_lineage,
+            )
+
+            verify_current_video_generation_lineage(loaded, binding.compiled_request)
+            self._require_current_generation_acceptance(loaded, binding)
+        except (AiVideoError, ValueError) as exc:
+            raise _state_invalid("Voice route binding is not current and exact.", str(exc)) from exc
+        return envelope
+
     def begin_voice_generation(
         self,
         request: VoiceGenerationRequest,
@@ -138,11 +216,31 @@ class _StateCommitVoiceIntentMixin:
         authorization: VoiceCallAuthorization,
         *,
         dependency_transition_preparer_available: bool = False,
+        routing_execution_envelope=None,
     ) -> ProductionManifest:
         """Persist R+1 request, preview, and authorization evidence without transport."""
 
-        receipt = self._voice_receipt(request, preview, authorization)
         paths = self.voice_attempt_paths(request.attempt_id)
+        if routing_execution_envelope is not None:
+            from ai_video.production.voice_routing_execution import VoiceRoutingExecutionEnvelope
+
+            if not isinstance(routing_execution_envelope, VoiceRoutingExecutionEnvelope):
+                raise _state_invalid("Routed voice execution requires its full video budget envelope.")
+        routing_task_id = (
+            routing_execution_envelope.binding.inputs.limits.task_id
+            if routing_execution_envelope is not None else None
+        )
+        routing_binding_hash = (
+            routing_execution_envelope.envelope_hash
+            if routing_execution_envelope is not None else None
+        )
+        receipt = self._voice_receipt(
+            request, preview, authorization, routing_task_id=routing_task_id,
+            routing_binding_hash=routing_binding_hash,
+        )
+        routing_artifact = self._routing_binding_artifact(
+            request, routing_execution_envelope, paths
+        )
         evidence = (
             self._voice_prepared_artifact(
                 request.attempt_id, paths.request_path, _canonical_json_bytes(request)
@@ -155,7 +253,7 @@ class _StateCommitVoiceIntentMixin:
                 paths.authorization_path,
                 _canonical_json_bytes(authorization),
             ),
-        )
+        ) + ((routing_artifact,) if routing_artifact is not None else ())
         with self._exclusive_lock():
             manifest = self._read_manifest()
             if (
@@ -165,6 +263,9 @@ class _StateCommitVoiceIntentMixin:
                 raise _state_invalid(
                     "Graph-aware Manifest voice generation requires a dependency transition preparer."
                 )
+            self._require_current_voice_routing_binding(
+                manifest, request, preview, receipt, envelope=routing_execution_envelope
+            )
             existing = next(
                 (item for item in manifest.attempts if item.attempt_id == request.attempt_id),
                 None,
@@ -179,7 +280,8 @@ class _StateCommitVoiceIntentMixin:
                     and existing.status is StateCommitStatus.RUNNING
                 ):
                     reopened = self._reopen_voice_evidence(
-                        request.attempt_id, include_intent=False
+                        request.attempt_id, include_intent=False,
+                        routing_binding_hash=receipt.routing_binding_hash,
                     )
                     if reopened != evidence or (
                         _candidate_artifacts_hash(reopened)
@@ -237,12 +339,16 @@ class _StateCommitVoiceIntentMixin:
     ) -> _DurableVoiceSubmitPermit:
         """Persist R+2, reopen it, and mint exactly one process-local permit."""
 
-        receipt = self._voice_receipt(request, preview, authorization)
         with self._exclusive_lock():
             manifest = self._read_manifest()
             attempt = next(
                 (item for item in manifest.attempts if item.attempt_id == request.attempt_id),
                 None,
+            )
+            receipt = self._voice_receipt(
+                request, preview, authorization,
+                routing_task_id=(attempt.voice_request.routing_task_id if attempt and attempt.voice_request else None),
+                routing_binding_hash=(attempt.voice_request.routing_binding_hash if attempt and attempt.voice_request else None),
             )
             if (
                 attempt is None
@@ -256,6 +362,9 @@ class _StateCommitVoiceIntentMixin:
                 raise _state_invalid(
                     "Voice submit intent requires the exact current R+1 attempt."
                 )
+            self._require_current_voice_routing_binding(
+                manifest, request, preview, receipt
+            )
             self._crash_injector.checkpoint(CommitPhase.BEFORE_VOICE_SUBMIT_INTENT)
             paths = self.voice_attempt_paths(request.attempt_id)
             intent_payload = (
@@ -276,7 +385,11 @@ class _StateCommitVoiceIntentMixin:
             artifact = self._voice_prepared_artifact(
                 request.attempt_id, paths.submit_intent_path, intent_payload
             )
-            r1_artifacts = self._reopen_voice_evidence(request.attempt_id, include_intent=False)
+            r1_artifacts = self._reopen_voice_evidence(
+                request.attempt_id,
+                include_intent=False,
+                routing_binding_hash=receipt.routing_binding_hash,
+            )
             expected_r1 = (
                 self._voice_prepared_artifact(
                     request.attempt_id, paths.request_path, _canonical_json_bytes(request)
@@ -289,6 +402,9 @@ class _StateCommitVoiceIntentMixin:
                     paths.authorization_path,
                     _canonical_json_bytes(authorization),
                 ),
+            )
+            expected_r1 = expected_r1 + (
+                (r1_artifacts[-1],) if receipt.routing_binding_hash is not None else ()
             )
             if (
                 r1_artifacts != expected_r1
@@ -363,10 +479,13 @@ class _StateCommitVoiceIntentMixin:
             )
 
     def _reopen_voice_evidence(
-        self, attempt_id: str, *, include_intent: bool
+        self, attempt_id: str, *, include_intent: bool,
+        routing_binding_hash: str | None = None,
     ) -> tuple[PreparedArtifact, ...]:
         paths = self.voice_attempt_paths(attempt_id)
         selected = [paths.request_path, paths.preview_path, paths.authorization_path]
+        if routing_binding_hash is not None:
+            selected.append(paths.routing_binding_path)
         if include_intent:
             selected.append(paths.submit_intent_path)
         artifacts = []
@@ -398,7 +517,18 @@ class _StateCommitVoiceIntentMixin:
             if snapshot.file_sha256 != manifest_file_sha256:
                 return False
             manifest = ProductionManifest.model_validate_json(snapshot.data)
-            evidence = self._reopen_voice_evidence(attempt_id, include_intent=True)
+            attempt = next(
+                (item for item in manifest.attempts if item.attempt_id == attempt_id), None
+            )
+            evidence = self._reopen_voice_evidence(
+                attempt_id,
+                include_intent=True,
+                routing_binding_hash=(
+                    attempt.voice_request.routing_binding_hash
+                    if attempt is not None and attempt.voice_request is not None
+                    else None
+                ),
+            )
         except (AiVideoError, OSError, ValidationError, ValueError):
             return False
         attempt = next(
@@ -535,6 +665,7 @@ class _StateCommitVoiceIntentMixin:
             != preview.estimated_cost_upper_bound_microunits
             or (
                 result.cost_receipt.provider_reported_cost_microunits is not None
+                and authorization.cost_ceiling_microunits is not None
                 and result.cost_receipt.provider_reported_cost_microunits
                 > authorization.cost_ceiling_microunits
             )

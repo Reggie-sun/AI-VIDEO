@@ -90,7 +90,9 @@ class ShotEndpointImageImportReferenceBinding(StrictModel):
 
 
 ImageImportReferenceBinding = (
-    ImageReferenceBinding | ShotEndpointImageImportReferenceBinding
+    ImageReferenceBinding
+    | ShotEndpointImageImportReferenceBinding
+    | VideoFrameImageImportReferenceBinding
 )
 AutomatedImageImportReferenceBinding: TypeAlias = (
     ImageReferenceBinding | VideoFrameImageImportReferenceBinding
@@ -130,6 +132,16 @@ class HumanImageImportReceipt(StrictModel):
     def _validate_truthful_receipt(self) -> "HumanImageImportReceipt":
         if self.human_actor.actor_kind != "human":
             raise ValueError("human image import approval requires a human actor")
+        if (
+            self.source_surface != "codex_imagegen_tool"
+            and any(
+                isinstance(reference, VideoFrameImageImportReferenceBinding)
+                for reference in self.references
+            )
+        ):
+            raise ValueError(
+                "video frame references require the codex imagegen source surface"
+            )
         if Path(self.original_filename).name != self.original_filename:
             raise ValueError("original image filename must be a basename")
         if Path(self.original_filename).suffix.lower() != ".png":
@@ -160,6 +172,10 @@ class HumanImageImportReceipt(StrictModel):
         data.setdefault("durable_submit_intent_present", False)
         data.setdefault("automated_browser", False)
         data.pop("content_hash", None)
+        data["references"] = tuple(
+            TypeAdapter(ImageImportReferenceBinding).validate_python(item)
+            for item in data["references"]
+        )
         if (
             data["backend_model_id"] is not None
             or data["provider_request_id"] is not None
@@ -827,6 +843,7 @@ def prepare_human_image_import_commit(
     candidate_target: Character | Scene | Shot,
     candidate_project: ProductionProject,
     base_commit: StateCommitRequest,
+    reference_artifacts: tuple[PreparedArtifact, ...] = (),
 ) -> StateCommitRequest:
     """Add honest human-import evidence to one prepared P5 commit."""
 
@@ -840,6 +857,7 @@ def prepare_human_image_import_commit(
         base_commit=base_commit,
         asset=human_image_import_asset(receipt),
         receipt_path=canonical_human_image_import_receipt_path(receipt.content_hash),
+        reference_artifacts=reference_artifacts,
     )
 
 

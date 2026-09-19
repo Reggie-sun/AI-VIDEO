@@ -273,6 +273,64 @@ def _issue_real_permit(root: Path, provider, request, authorization):
     )
 
 
+@pytest.mark.parametrize("origin", ["https://api.minimax.io", "https://api.minimaxi.com"])
+def test_chinese_dialogue_preserves_text_language_and_provenance(tmp_path, origin):
+    text = "什么？没报站啊。"
+    transport = _FakeTransport(_response(
+        mutate=lambda payload: payload["extra_info"].update(usage_characters=len(text))
+    ))
+    provider = _provider(transport, policy=_policy(origin=origin))
+    request = _request(
+        language="Chinese", script_text=text, audio_kind=AudioKind.DIALOGUE,
+        speaker_id="P2", voice_id="male-qn-jingying",
+    )
+    preview = provider.preview(request)
+    assert preview.timing_supported and preview.output_supported
+    authorization = _authorization(provider, request)
+    permit = _issue_real_permit(tmp_path, provider, request, authorization)
+    result = provider.generate(request, authorization, permit)
+    assert transport.invocations == 1
+    assert transport.calls[0].url == origin + "/v1/t2a_v2"
+    body = json.loads(transport.calls[0].body)
+    assert body["language_boost"] == "Chinese"
+    assert body["text"] == text
+    assert body["voice_setting"]["voice_id"] == request.voice_id
+    assert result.provenance_receipt.language == "Chinese"
+    assert result.provenance_receipt.script_hash == request.script_hash
+
+
+def test_domestic_adapter_rejects_international_permit_before_secret(tmp_path):
+    transport = _FakeTransport(_response())
+    international = _provider(transport)
+    request = _request()
+    authorization = _authorization(international, request)
+    permit = _issue_real_permit(tmp_path, international, request, authorization)
+
+    class NoSecret:
+        def bearer_header(self):
+            pytest.fail("Cross-region authorization must fail before secret lookup")
+
+    domestic = _provider(transport, policy=_policy(origin="https://api.minimaxi.com"), secret=NoSecret())
+    with pytest.raises(AiVideoError):
+        domestic.generate(request, authorization, permit)
+    assert transport.invocations == 0
+
+
+@pytest.mark.parametrize("origin", ["http://api.minimaxi.com", "https://api.minimaxi.com.evil.test", "https://api.minimaxi.com/"])
+def test_speech_origin_is_exact_allowlist(origin):
+    with pytest.raises(ValueError):
+        _policy(origin=origin)
+
+
+@pytest.mark.parametrize("language", ["zh", "chinese", "Chinese,Yue", "unsupported"])
+def test_unconfigured_language_stays_unsupported_without_transport(language):
+    transport = _FakeTransport()
+    preview = _provider(transport).preview(_request(language=language))
+    assert not preview.timing_supported
+    assert not preview.output_supported
+    assert transport.invocations == 0
+
+
 def test_exact_request_and_successful_wav_result_use_real_paid_permit(tmp_path):
     transport = _FakeTransport(_response())
     secret = _DummySecret()

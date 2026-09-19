@@ -1,11 +1,13 @@
 """Explicit additional submit authorization on the original durable task."""
 from datetime import timedelta
 from dataclasses import replace
+from datetime import timedelta
 
 import pytest
 
 from ai_video.errors import AiVideoError
 from ai_video.production.generation_execution import GenerationDecisionExecutionBinding
+from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import ActorIdentity
 from ai_video.production.project import load_production_project
 from ai_video.production.shot_router import VideoGenerationResolver
@@ -17,6 +19,386 @@ import test_production_generated_video_e2e as e2e
 
 
 NEXT = "quota-next"
+
+
+def _goal(version):
+    from ai_video.production.final_output_contracts import (
+        FinalOutputContract,
+        FinalOutputRequirement,
+    )
+
+    return FinalOutputContract(
+        goal_id="fixture-same-shot-goal",
+        goal_version=version,
+        user_goal="The fetched shot remains a usable exact candidate.",
+        requirements=(
+            FinalOutputRequirement(
+                requirement_id="whole-shot",
+                observable="The whole shot remains usable.",
+                proof="evaluator",
+            ),
+        ),
+    )
+
+
+def _activate_goal(writer, *, goal, acceptance=None, attempt_id):
+    from ai_video.production.hashing import canonical_sha256, seal_artifact
+    from ai_video.production.domain_acceptance import DomainAcceptancePolicy
+
+    loaded = load_production_project(writer.project_root / "project.yaml")
+    policy = loaded.qa_policy
+    assert policy is not None
+    if acceptance is not None:
+        payload = dict(acceptance.profile_payload)
+        payload.pop("content_hash")
+        payload["profile_version"] = acceptance.profile_version
+        digest = canonical_sha256(payload)
+        acceptance = DomainAcceptancePolicy.model_validate({
+            **acceptance.model_dump(mode="python"),
+            "profile_content_hash": digest,
+            "profile_payload": {**payload, "content_hash": digest},
+        })
+    from ai_video.production.models import GenerationEvaluationAuthority
+
+    updated = policy.model_copy(update={
+        "revision": policy.revision + 1,
+        "content_hash": "0" * 64,
+        "policy_version": f"goal-{goal.goal_version}",
+        "final_output": goal,
+        **({"generation_acceptance": acceptance} if acceptance is not None else {}),
+        **({"generation_evaluation_authorities": (
+            GenerationEvaluationAuthority(
+                evaluator=policy.semantic_authorities[0], proof="technical"
+            ),
+        )} if acceptance is not None else {}),
+    })
+    writer.activate_qa_policy(
+        seal_artifact(updated),
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id=attempt_id,
+    )
+    return load_production_project(writer.project_root / "project.yaml")
+
+
+def _new_goal_pending(
+    tmp_path, *, before_target=None, evaluation_verdict="NOT_EVALUATED",
+    stop_after_goal=False,
+):
+    """One real paid fetch/NE history followed by a same-shot goal revision."""
+    from ai_video.production.generation_evaluation import (
+        GenerationEvaluationSource,
+        GenerationObservation,
+        _seal_presentation_recording,
+    )
+    from ai_video.production.generation_evaluation_criteria import (
+        PresentationEvidence,
+        evaluation_items,
+    )
+    from ai_video.production.generation_feedback import record_attempt_evaluation
+    from ai_video.production.generation_recipe import GenerationRecipe, RequirementExpression
+    from ai_video.production.hashing import canonical_sha256
+    from ai_video.production.domain_acceptance import DomainAcceptancePolicy
+    from ai_video.production.paid_provider import PaidProviderAuthorizationDecision
+
+    from test_requirement_semantics import marked_policy, semantic_rule
+
+    _, provider, resolved, _, _, bootstrap = e2e._runtime(tmp_path)
+    rule = semantic_rule("duration")
+    rule.update(
+        proof="technical",
+        observable="1 seconds",
+        tolerance="exact",
+        measurement="technical probe",
+        intent_paths=["output_need.duration_seconds"],
+        native_text=[],
+    )
+    old_acceptance = marked_policy([rule])
+    selected = _activate_goal(
+        bootstrap,
+        goal=_goal("1"),
+        acceptance=old_acceptance,
+        attempt_id="goal-v1",
+    )
+    values = resolved.activation_scope.request.model_dump(
+        mode="python", exclude={"request_input_hash"}
+    )
+    values.update(
+        generation_id="quota-goal-prior",
+        output_asset_id="quota-goal-prior-video",
+        base_project=selected.manifest.active_project,
+        base_registry=selected.manifest.active_registry,
+        base_dependency_graph=selected.manifest.active_dependency_graph,
+    )
+    prior_prepared = e2e.prepare_generation_execution(
+        project=selected,
+        provider=provider,
+        request=provider.resolve(VideoGenerationRequest.create(**values)),
+        task_id="quota-new-goal-fixture",
+        compiler_id="generated-video-e2e-fixture",
+        compiler_version="1",
+    )
+    prior_recipe = GenerationRecipe.model_validate({
+        **prior_prepared.binding.inputs.candidates[0].recipe.model_dump(mode="python"),
+        "rubric_hash": old_acceptance.profile_content_hash,
+        "acceptance_policy": old_acceptance,
+        "expressions": tuple(
+            RequirementExpression.model_validate(rule)
+            for rule in old_acceptance.profile_payload["generation_requirements"]
+        ),
+    })
+    prior_candidate = prior_prepared.binding.inputs.candidates[0].model_copy(update={
+        "recipe": prior_recipe,
+        "final_output_goal": _goal("1"),
+    })
+    prior_inputs = prior_prepared.binding.inputs.model_copy(
+        update={
+            "candidates": (prior_candidate,),
+            "rubric_hash": old_acceptance.profile_content_hash,
+        }
+    )
+    prior_decision = VideoGenerationResolver().resolve_requirement(
+        projection=prior_prepared.binding.projection,
+        context=prior_prepared.binding.context,
+        policy=prior_prepared.binding.policy,
+        lifecycle=prior_prepared.binding.lifecycle,
+        inputs=prior_inputs,
+    )
+    prior_compiled = provider.compile_request(
+        prior_decision.routing.provider_bound_request,
+        prior_prepared.binding.projection.requirement,
+    )
+    prior_request = provider.resolve(prior_compiled.request)
+    prior_binding = GenerationDecisionExecutionBinding.create(
+        projection=prior_prepared.binding.projection,
+        context=prior_prepared.binding.context,
+        policy=prior_prepared.binding.policy,
+        lifecycle=prior_prepared.binding.lifecycle,
+        inputs=prior_inputs,
+        decision=prior_decision,
+        compiled_request=prior_request,
+    )
+    prior_preview = e2e._paid_preview(
+        prior_request,
+        attempt_id="quota-goal-prior",
+        video_preview=provider.preview(prior_request),
+    )
+    prior_authorization = e2e._paid_authorization(prior_preview)
+    prior_authorization_values = prior_authorization.model_dump(
+        mode="python", exclude={"authorization_fingerprint"}
+    )
+    prior_authorization_values["project_budget_ceiling_microunits"] = 2_000_000
+    prior_authorization = PaidProviderAuthorizationDecision.create(
+        **prior_authorization_values
+    )
+    writer = ProductionStateCommitter(
+        tmp_path,
+        paid_provider_authorizer=lambda exact: (
+            prior_authorization if exact == prior_preview else None
+        ),
+        paid_provider_clock=lambda: prior_authorization.issued_at,
+    )
+    service = VideoGenerationService(committer=writer, provider=provider)
+    service.start(
+        attempt_id="quota-goal-prior",
+        request=prior_request,
+        execution_binding=prior_binding,
+    )
+    provider._scenario = replace(
+        provider._scenario, status_events=(e2e.VideoTaskState.SUCCEEDED,)
+    )
+    service.submit_once(
+        attempt_id="quota-goal-prior",
+        paid_preview=prior_preview,
+        reservation_id="quota-goal-prior-reservation",
+    )
+    service.refresh_once(attempt_id="quota-goal-prior")
+    service.fetch_once(attempt_id="quota-goal-prior")
+    selected = load_production_project(tmp_path / "project.yaml")
+    prior = next(item for item in selected.manifest.attempts if item.attempt_id == "quota-goal-prior")
+    state = prior.video_generation_state
+    assert state is not None and state.fetch_receipt is not None
+    fetched = writer._reopen_video_fetch(state.fetch_receipt)
+    candidate = prior_binding.inputs.candidates[0]
+    items = evaluation_items(
+        acceptance=old_acceptance,
+        qa_policy_content_hash=selected.qa_policy.content_hash,
+        request_hash=prior_request.request_input_hash,
+        artifact_sha256=fetched.artifact_sha256,
+        size_bytes=fetched.size_bytes,
+    )
+    assert len(items) == 1
+    item = items[0]
+    observation = GenerationObservation(
+        requirement_id=item.requirement_id,
+        verdict=evaluation_verdict,
+        observation="Exact fixture evaluator has no conclusive quality verdict.",
+        evaluation_item_hash=item.evaluation_item_hash,
+        question_text=item.question_text,
+        presentation_ref="fixture/goal-v1/presentation",
+        answer_ref="fixture/goal-v1/answer",
+    )
+    import json
+    source = GenerationEvaluationSource(
+        schema_version="generation-evaluation/2",
+        request_hash=prior_request.request_input_hash,
+        artifact_sha256=fetched.artifact_sha256,
+        size_bytes=fetched.size_bytes,
+        rubric_hash=candidate.recipe.rubric_hash,
+        qa_policy_content_hash=selected.qa_policy.content_hash,
+        qa_policy_snapshot=selected.qa_policy,
+        evaluator=selected.qa_policy.semantic_authorities[0],
+        proof="technical",
+        observations=(observation,),
+        presentation_evidence=PresentationEvidence(
+            namespace="controlled-evaluator/1",
+            interaction_ref="fixture/goal-v1",
+            presentation_ref=observation.presentation_ref,
+            answer_ref=observation.answer_ref,
+            event_order=("presentation", "answer"),
+            actor_name=selected.qa_policy.semantic_authorities[0].name,
+            actor_version=selected.qa_policy.semantic_authorities[0].version,
+            items=items,
+            answers_json=json.dumps({
+                "observations": [observation.model_dump(mode="json")],
+                "advisory_observations": [],
+                "unresolved_quality_observations": [],
+            }),
+        ),
+    )
+    experience = record_attempt_evaluation(
+        committer=writer,
+        attempt_id="quota-goal-prior",
+        evaluation_sources=(source,),
+        presentation_proof=_seal_presentation_recording(
+            attempt_id="quota-goal-prior", sources=(source,)
+        ),
+    )
+    selected = load_production_project(tmp_path / "project.yaml")
+    prior = next(
+        item for item in selected.manifest.attempts
+        if item.attempt_id == "quota-goal-prior"
+    )
+    old_acceptance = selected.qa_policy.selected_generation_acceptance()
+    assert old_acceptance is not None
+    payload = dict(old_acceptance.profile_payload)
+    payload.pop("content_hash")
+    payload["profile_version"] = "3"
+    next_acceptance = DomainAcceptancePolicy.model_validate({
+        **old_acceptance.model_dump(mode="python"),
+        "profile_version": "3",
+        "profile_content_hash": canonical_sha256(payload),
+        "profile_payload": {**payload, "content_hash": canonical_sha256(payload)},
+    })
+    selected = _activate_goal(
+        writer,
+        goal=_goal("2"),
+        acceptance=next_acceptance,
+        attempt_id="goal-v2",
+    )
+    if stop_after_goal:
+        return writer, selected, prior, experience, source
+    if before_target is not None:
+        before_target(writer, selected, prior)
+        selected = load_production_project(tmp_path / "project.yaml")
+    target_values = prior_request.activation_scope.request.model_dump(
+        mode="python", exclude={"request_input_hash"}
+    )
+    target_values.update(
+        generation_id=NEXT,
+        output_asset_id="quota-next-goal-video",
+        base_project=selected.manifest.active_project,
+        base_registry=selected.manifest.active_registry,
+        base_dependency_graph=selected.manifest.active_dependency_graph,
+    )
+    fresh = e2e.prepare_generation_execution(
+        project=selected,
+        provider=provider,
+        request=provider.resolve(VideoGenerationRequest.create(**target_values)),
+        task_id="quota-new-goal-fixture",
+        compiler_id="generated-video-e2e-fixture",
+        compiler_version="1",
+    )
+    fresh_candidate = fresh.binding.inputs.candidates[0]
+    recipe = GenerationRecipe.model_validate({
+        **fresh_candidate.recipe.model_dump(mode="python"),
+        "rubric_hash": next_acceptance.profile_content_hash,
+        "acceptance_policy": next_acceptance,
+        "expressions": tuple(
+            RequirementExpression.model_validate(rule)
+            for rule in next_acceptance.profile_payload["generation_requirements"]
+        ),
+    })
+    candidate = fresh_candidate.model_copy(update={
+        "recipe": recipe,
+        "final_output_goal": _goal("2"),
+    })
+    limits = fresh.binding.inputs.limits.model_copy(update={
+        "paid_submit_ceiling": 2,
+        "paid_submits_used": 1,
+    })
+    inputs = fresh.binding.inputs.model_copy(update={
+        "candidates": (candidate,),
+        "rubric_hash": recipe.rubric_hash,
+        "limits": limits,
+        "evidence": experience.evidence,
+        "experiences": (experience,),
+        "historical_recipes": (candidate.model_copy(update={
+            "recipe": prior_binding.inputs.candidates[0].recipe,
+            "final_output_goal": _goal("1"),
+        }),),
+        "latest_attempt_hash": experience.evidence[0].evidence_hash,
+        "baseline_request": prior_request.activation_scope.request,
+    })
+    assert inputs.policy.version == "3"
+    assert experience.evidence[0].rubric_hash != inputs.rubric_hash
+    assert inputs.historical_recipes[0].scope_hash == experience.evidence[0].recipe_scope_hash
+    assert inputs.historical_recipes[0].final_output_goal != candidate.final_output_goal
+    decision = VideoGenerationResolver().resolve_requirement(
+        projection=fresh.binding.projection,
+        context=fresh.binding.context,
+        policy=fresh.binding.policy,
+        lifecycle=fresh.binding.lifecycle,
+        inputs=inputs,
+    )
+    assert decision.disposition == "GENERATE_ONCE" and decision.intervention is None, (
+        decision.rationale,
+        decision.diagnosis,
+    )
+    compiled = provider.compile_request(
+        decision.routing.provider_bound_request, fresh.binding.projection.requirement
+    )
+    target_request = provider.resolve(compiled.request)
+    target_binding = GenerationDecisionExecutionBinding.create(
+        projection=fresh.binding.projection,
+        context=fresh.binding.context,
+        policy=fresh.binding.policy,
+        lifecycle=fresh.binding.lifecycle,
+        inputs=inputs,
+        decision=decision,
+        compiled_request=target_request,
+    )
+    target_preview = e2e._paid_preview(
+        target_request,
+        attempt_id=NEXT,
+        video_preview=provider.preview(target_request),
+    )
+    target_authorization = e2e._paid_authorization(target_preview)
+    authorization_values = target_authorization.model_dump(
+        mode="python", exclude={"authorization_fingerprint"}
+    )
+    authorization_values["project_budget_ceiling_microunits"] = 2_000_000
+    target_authorization = PaidProviderAuthorizationDecision.create(**authorization_values)
+    writer = ProductionStateCommitter(
+        tmp_path,
+        paid_provider_authorizer=lambda exact: (
+            target_authorization if exact == target_preview else None
+        ),
+        paid_provider_clock=lambda: target_authorization.issued_at,
+    )
+    service = VideoGenerationService(committer=writer, provider=provider)
+    service.start(attempt_id=NEXT, request=target_request, execution_binding=target_binding)
+    provider._scenario = replace(provider._scenario, external_effect_id="quota-goal-next-effect")
+    return writer, service, provider, target_preview, prior, experience
 
 
 def _pending(tmp_path, *, used=1, local_batch_limit=1):
@@ -112,6 +494,108 @@ def test_same_task_extension_resumes_pending_request_and_preserves_durable_used_
     with pytest.raises(AiVideoError):
         service.submit_once(attempt_id=NEXT, paid_preview=preview, reservation_id="quota-reservation-other")
     assert _bytes(tmp_path) == before
+
+
+def test_new_goal_allows_only_fetched_not_evaluated_prior_to_remain_validating(tmp_path):
+    writer, service, provider, preview, prior, experience = _new_goal_pending(tmp_path)
+    before = writer._read_manifest()
+    prior_before = next(item for item in before.attempts if item.attempt_id == prior.attempt_id)
+    budget_before = writer._reopen_paid_budget(before.active_paid_provider_budget)
+    assert prior_before.paid_provider_state.phase.value == "accepted"
+    assert [(reservation.status.value, reservation.actual_cost_microunits)
+            for reservation in budget_before.reservations] == [("reserved", None)]
+    from ai_video.production.paid_provider_submit_quota import PaidProviderSubmitQuotaExtension
+
+    entry_values = _entry(writer, prior).model_dump(mode="python", exclude={"content_hash"})
+    entry_values.update({
+        "extension_id": "quota-new-goal-one-more",
+        "task_id": "quota-new-goal-fixture",
+        "old_paid_submit_ceiling": 1,
+        "new_paid_submit_ceiling": 2,
+    })
+    entry = PaidProviderSubmitQuotaExtension.create(**entry_values)
+
+    with pytest.raises(AiVideoError, match="ceilings cannot expand"):
+        service.submit_once(
+            attempt_id=NEXT,
+            paid_preview=preview,
+            reservation_id="quota-goal-next-reservation",
+        )
+    amended = writer.extend_paid_provider_submit_quota(entry)
+    current_prior = next(item for item in amended.attempts if item.attempt_id == prior.attempt_id)
+    assert current_prior == prior_before
+    assert current_prior.video_generation_state.generation_experiences[-1].content_hash == canonical_sha256(
+        experience.model_dump(mode="json")
+    )
+    assert writer._reopen_paid_budget(amended.active_paid_provider_budget).reservations == budget_before.reservations
+
+    service.submit_once(
+        attempt_id=NEXT,
+        paid_preview=preview,
+        reservation_id="quota-goal-next-reservation",
+    )
+    assert provider.call_counts.submit == 2
+    reopened = load_production_project(tmp_path / "project.yaml")
+    assert next(item for item in reopened.manifest.attempts if item.attempt_id == prior.attempt_id) == prior_before
+
+
+def test_new_goal_extension_rejects_mismatched_target_binding_without_writes(tmp_path):
+    from ai_video.production.paid_provider_submit_quota import PaidProviderSubmitQuotaExtension
+
+    writer, _, _, _, prior, _ = _new_goal_pending(tmp_path)
+    original = _entry(writer, prior)
+    values = original.model_dump(mode="python", exclude={"content_hash"})
+    values.update({
+        "extension_id": "quota-new-goal-mismatched-target",
+        "target_binding": original.target_binding.model_copy(
+            update={"file_sha256": "0" * 64}
+        ),
+    })
+    entry = PaidProviderSubmitQuotaExtension.create(**values)
+    before = _bytes(tmp_path)
+    with pytest.raises(AiVideoError):
+        writer.extend_paid_provider_submit_quota(entry)
+    assert _bytes(tmp_path) == before
+
+
+def test_new_goal_prior_requires_snapshot_canonical_criterion_and_complete_ne(tmp_path):
+    from ai_video.production.generation_evaluation import validate_generation_evaluation_sources
+    from ai_video.production.video_pre_generation import (
+        verified_fetched_prior_for_new_goal,
+    )
+
+    writer, _, prior, experience, source = _new_goal_pending(
+        tmp_path, stop_after_goal=True
+    )
+    snapshot = source.qa_policy_snapshot
+    assert snapshot is not None
+    missing_snapshot = source.model_copy(update={"qa_policy_snapshot": None})
+    wrong_criterion = source.model_copy(update={
+        "observations": (
+            source.observations[0].model_copy(
+                update={"question_text": "[other] wrong canonical criterion"}
+            ),
+        ),
+    })
+    before = _bytes(tmp_path)
+    for invalid in (missing_snapshot, wrong_criterion):
+        with pytest.raises(ValueError):
+            validate_generation_evaluation_sources(
+                sources=(invalid,),
+                evidence=experience.evidence[0],
+                qa_policy=snapshot,
+                size_bytes=source.size_bytes,
+            )
+    assert _bytes(tmp_path) == before
+
+    failed_writer, failed_loaded, failed_prior, _, _ = _new_goal_pending(
+        tmp_path / "non-ne", evaluation_verdict="FAIL", stop_after_goal=True
+    )
+    before = _bytes(tmp_path / "non-ne")
+    assert verified_fetched_prior_for_new_goal(
+        failed_writer, failed_loaded, failed_prior
+    ) is None
+    assert _bytes(tmp_path / "non-ne") == before
 
 
 @pytest.mark.parametrize("field,value", [

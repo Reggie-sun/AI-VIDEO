@@ -57,6 +57,42 @@ def test_empty_extension_serialization_preserves_legacy_budget_hash():
     })
 
 
+def test_new_goal_extension_preserves_pending_exact_ne_result_and_reservation(tmp_path):
+    from test_production_paid_submit_quota import _new_goal_pending
+
+    def extend(writer, selected, prior):
+        manifest = selected.manifest
+        prior = next(a for a in manifest.attempts if a.attempt_id == prior.attempt_id)
+        pointer = manifest.active_paid_provider_budget
+        budget = writer._reopen_paid_budget(pointer)
+        entry = _entry(manifest, pointer, budget, now=writer._paid_provider_clock())
+        result = writer.extend_paid_provider_budget(entry)
+        assert next(a for a in result.attempts if a.attempt_id == prior.attempt_id) == prior
+        updated = writer._reopen_paid_budget(result.active_paid_provider_budget)
+        assert updated.reservations == budget.reservations
+        assert updated.reservations[0].actual_cost_microunits is None
+        assert writer.extend_paid_provider_budget(entry) == result
+
+    _new_goal_pending(tmp_path, before_target=extend)
+
+
+def test_pending_new_goal_budget_still_requires_explicit_authorization(tmp_path):
+    from test_production_paid_submit_quota import _new_goal_pending
+
+    def refuse(writer, selected, prior):
+        manifest = selected.manifest
+        pointer = manifest.active_paid_provider_budget
+        budget = writer._reopen_paid_budget(pointer)
+        entry = _entry(manifest, pointer, budget, now=writer._paid_provider_clock())
+        invalid = entry.model_copy(update={"explicit_opt_in": False})
+        before = (tmp_path / "state/manifest.json").read_bytes()
+        with pytest.raises(AiVideoError):
+            writer.extend_paid_provider_budget(invalid)
+        assert (tmp_path / "state/manifest.json").read_bytes() == before
+
+    _new_goal_pending(tmp_path, before_target=refuse)
+
+
 def test_explicit_extension_updates_only_active_budget_and_replays(tmp_path):
     committer, manifest, pointer, budget = _ledger(tmp_path)
     entry = _entry(manifest, pointer, budget)

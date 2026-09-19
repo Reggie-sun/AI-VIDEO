@@ -11,6 +11,7 @@ from pathlib import Path
 import re
 import sys
 from typing import Any, Mapping, Sequence
+import warnings
 
 
 LEGACY_SCHEMA_VERSION = "3"
@@ -547,14 +548,21 @@ def validate_director_coverage(payload: Mapping[str, Any]) -> dict[str, Any]:
                     f"multiple coverage units require distinct {field} values"
                 )
         if coverage_strategy == "multi_shot":
+            repeated_fields = []
             for field in ("beat_function", "shot_scale", "camera_treatment"):
                 normalized = [_normalized(unit[field]) for unit in units]
                 if any(
                     left == right for left, right in zip(normalized, normalized[1:])
                 ):
-                    raise CoverageValidationError(
-                        f"adjacent multi-shot units require different {field} values"
-                    )
+                    repeated_fields.append(field)
+            if repeated_fields:
+                warnings.warn(
+                    "adjacent multi-shot units repeat director categories "
+                    f"({', '.join(repeated_fields)}); vary them when it improves "
+                    "coverage, but repetition is permitted.",
+                    UserWarning,
+                    stacklevel=2,
+                )
 
         nonfinal_transitions = [
             _normalized(unit["transition_out"]) for unit in units[:-1]

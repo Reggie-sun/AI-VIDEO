@@ -34,6 +34,7 @@ from ai_video.production.models import Shot, VisualStrategy
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.video_transition import ContinuityTransitionPolicy
 from ai_video.production.video_requirement import (
+    AudioNeed,
     AssetEvidence as RequirementAssetEvidence,
     CapabilityNeed,
     ContinuityMode as RequirementContinuityMode,
@@ -579,6 +580,7 @@ def _build_generation_requirement(
         continuity_mode=RequirementContinuityMode(continuity.value),
         motion_requirement=RequirementMotionRequirement(motion.value),
         generation_intent=projection.generation_intent,
+        voice_routing=projection.voice_routing,
         conditioning_compatibility=projection.conditioning_compatibility,
         semantic_reference_roles=semantic_roles,
         capability_need=CapabilityNeed(
@@ -640,7 +642,7 @@ def _typed_generation_intent_is_sufficient(
 
         return not validate_generation_intent_for_continuity(
             intent,
-            audio_need=projection.audio_need,
+            audio_need=projection.audio_need if projection.voice_routing is None else AudioNeed.OPTIONAL,
         )
     return any(
         value != "unspecified"

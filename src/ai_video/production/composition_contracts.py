@@ -8,6 +8,7 @@ from typing import Literal, Mapping
 from pydantic import Field, SerializerFunctionWrapHandler, model_serializer, model_validator
 
 from ai_video.production.artifact_contracts import StrictModel, VersionedArtifact
+from ai_video.production._lifecycle_schema import GenerationExecutionBindingPointer
 from ai_video.production.commercial_graphics import (
     AdvertisingSoundCueProjection,
     GraphicLayerAnimation,
@@ -138,6 +139,20 @@ class TransitionSpec(StrictModel):
     duration_frames: int = Field(ge=0)
 
 
+class VoiceCompositionSource(StrictModel):
+    """Exact existing video decision consumed by P4, not another lifecycle."""
+
+    shot_id: str = Field(min_length=1)
+    source_project_file: Path
+    execution_binding: GenerationExecutionBindingPointer
+
+    @model_validator(mode="after")
+    def _absolute_source(self):
+        if not self.source_project_file.is_absolute() or self.source_project_file.name != "project.yaml":
+            raise ValueError("voice composition source must name an absolute canonical project.yaml")
+        return self
+
+
 class CompositionSpec(VersionedArtifact):
     schema_version: Literal["2.0", "2.1", "2.2"] = "2.0"
     composition_id: str
@@ -149,6 +164,7 @@ class CompositionSpec(VersionedArtifact):
     requested_renderer: RendererKind = RendererKind.HYPERFRAMES
     audio_tracks: tuple[AudioTrackSpec, ...] = ()
     caption_tracks: tuple[CaptionTrackBinding, ...] = ()
+    voice_sources: tuple[VoiceCompositionSource, ...] = ()
     graphic_layer_ids: tuple[str, ...] = ()
     graphic_layer_animations: tuple[GraphicLayerAnimation, ...] = ()
     commercial_graphics: tuple[GraphicTreatment, ...] = ()
@@ -189,6 +205,11 @@ class CompositionSpec(VersionedArtifact):
 
     @model_validator(mode="after")
     def _validate_versioned_tracks(self) -> "CompositionSpec":
+        voice_ids = tuple(item.shot_id for item in self.voice_sources)
+        if len(voice_ids) != len(set(voice_ids)) or not set(voice_ids) <= set(self.shot_ids):
+            raise ValueError("voice sources must uniquely bind composition Shots")
+        if self.schema_version == "2.0" and self.voice_sources:
+            raise ValueError("voice sources require the existing P4 track schema")
         if self.schema_version == "2.0" and (self.audio_tracks or self.caption_tracks):
             raise ValueError("CompositionSpec 2.0 cannot contain P4 tracks")
         audio_ids = tuple(item.track_id for item in self.audio_tracks)
@@ -250,6 +271,8 @@ class CompositionSpec(VersionedArtifact):
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, object]:
         data = handler(self)
+        if not self.voice_sources:
+            data.pop("voice_sources", None)
         if self.schema_version == "2.0":
             data.pop("audio_tracks", None)
             data.pop("caption_tracks", None)

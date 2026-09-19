@@ -1,0 +1,729 @@
+{
+  "artifact_id": "jieshi-s02-generation-qa",
+  "schema_version": "2.0",
+  "revision": 4,
+  "content_hash": "b4664eb1adcbeb185329ea75783e8f6dac97a055d72ce0c28ae1909ee6c69b7e",
+  "creation_receipt_id": "s02-correctness-prospective-20260911",
+  "source_provenance": [
+    {
+      "kind": "derived",
+      "reference": "docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.proposed.json",
+      "content_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+    }
+  ],
+  "final_output": {
+    "goal_id": "jieshi-e01-S02-final-output",
+    "goal_version": "2",
+    "user_goal": "S02作为真实电视剧镜头应自然承接悬停手势、完成林砚转向陈立的求证动作，并保持角色、场景和道具连续；精确对白、环境声和字幕由后续P4层验收。",
+    "requirements": [
+      {
+        "requirement_id": "s02-chenli-continuity",
+        "observable": "若陈立可辨认，必须符合陈立身份、灰色连帽卫衣、耳机及空间关系；与S03戴耳机、深蓝手机在右手、看向屏幕左的承接不矛盾。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "s02-identity-scene",
+        "observable": "林砚身份、服装、蓝挂绳白牌、单一右手手机和地铁几何连续，无实际可见错误。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "s02-narrative-focus",
+        "observable": "林砚仍是S02叙事与关键表演主体；陈立不能抢走求证的主体位置或明显遮挡关键表演。",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "s02-natural-action",
+        "observable": "撤手、视线转移和转头自然连续，无明显手部畸形、翻腕、冻结或跳变。",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "s02-no-generated-text",
+        "observable": "原始视频没有生成字幕、错误文字、logo或烧字。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "s02-open-continuity",
+        "observable": "开场可读为林砚左手仍在窗前悬停，且人物、服装、手机和车厢承接已批准S02首帧。",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "s02-p4-ambience",
+        "observable": "最终P4成片保持连续轮轨低频与车内通风，切镜不重启，并将对白下压低。",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "s02-p4-dialogue",
+        "observable": "最终P4成片在0.60–3.50秒以林砚可理解的自然普通话呈现“刚才……叫的是我？”，且仅林砚口型对应。",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "s02-question-progression",
+        "observable": "林砚正确完成收手→关注扬声器→转向邻座的求证关系；不能漏掉或颠倒造成因果误读。",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "s02-turn-endpoint",
+        "observable": "结束时林砚已面向陈立，为S03建立明确对话接点。",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "s02-visible-artifacts",
+        "observable": "不出现错误人物、复制人物或重复手机、错误肢体结构及明显遮挡林砚关键表演的真实质量问题；玻璃中既有反射不冒充新增实际人物。",
+        "proof": "evaluator"
+      }
+    ]
+  },
+  "generation_acceptance": {
+    "domain_id": "jieshi",
+    "profile_id": "S02-generation-acceptance",
+    "profile_version": "2.0",
+    "profile_content_hash": "97873adb856f0ce75aa5452b44b2d428321271318aa64e3f506a57d8552d6408",
+    "profile_payload": {
+      "content_hash": "97873adb856f0ce75aa5452b44b2d428321271318aa64e3f506a57d8552d6408",
+      "domain_id": "jieshi",
+      "generation_requirements": [
+        {
+          "dimension": "s02-camera-preference",
+          "intent_paths": [
+            "generation_intent.camera_intent.framing_intent"
+          ],
+          "level": "recipe_hint",
+          "measurement": "Inspect exact selected raw bytes; missing, wrong-stage, or ambiguous evidence is NOT_EVALUATED.",
+          "observable": "偏好50mm侧面近景与小幅向右pan，末帧纳入陈立肩部。",
+          "production_owner": "QA/jieshi-S02-prospective-v2",
+          "proof": "analyzer",
+          "requirement_id": "s02-camera-preference",
+          "semantics": {
+            "category": "directional_preference",
+            "intent_role": "preferred_performance",
+            "source_refs": [
+              {
+                "intent_item_id": "ordered_shots/S02/camera_intent",
+                "locator": "ordered_shots/S02/camera_intent",
+                "origin": "director_choice",
+                "quote": "50mm侧面近景，小幅向右pan，终点把陈立肩纳入边缘。",
+                "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+              }
+            ],
+            "version": "requirement-semantics/1",
+            "derived_from": [
+              {
+                "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+                "locator": "s02-camera-preference"
+              }
+            ]
+          },
+          "stage": "raw_generation",
+          "tolerance": "偏离单独不构成QUALITY_FAILURE。"
+        },
+        {
+          "dimension": "s02-chenli-continuity",
+          "intent_paths": [
+            "generation_intent.scene_continuity.state_constraints"
+          ],
+          "level": "acceptance",
+          "measurement": "Inspect exact selected raw bytes; missing, wrong-stage, or ambiguous evidence is NOT_EVALUATED.",
+          "observable": "若陈立可辨认，必须符合陈立身份、灰色连帽卫衣、耳机及空间关系；与S03戴耳机、深蓝手机在右手、看向屏幕左的承接不矛盾。",
+          "production_owner": "QA/jieshi-S02-prospective-v2",
+          "proof": "analyzer",
+          "requirement_id": "s02-chenli-continuity",
+          "semantics": {
+            "category": "quality_critical",
+            "hard_basis": {
+              "kind": "accepted_quality",
+              "locator": "ordered_shots/S03/generation_components/S03-main/prompt_draft",
+              "necessity": "S03的否认来自同一邻座；错误衣着、耳机、左右或道具所有权会造成换人或无因状态变化。局部头耳出现本身不构成这种错误。",
+              "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+            },
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "intent_item_id": "ordered_shots/S03/generation_components/S03-main/prompt_draft",
+                "locator": "ordered_shots/S03/generation_components/S03-main/prompt_draft",
+                "origin": "director_choice",
+                "quote": "允许人物（仅本素材构图内）：陈立：方脸、短寸发，中等身形。；灰色连帽卫衣、深蓝长裤、黑鞋。",
+                "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+              }
+            ],
+            "version": "requirement-semantics/1",
+            "derived_from": [
+              {
+                "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+                "locator": "s02-chenli-boundary"
+              }
+            ]
+          },
+          "stage": "raw_generation",
+          "tolerance": "按exact素材核对实际可见内容；证据模糊或缺失保持NOT_EVALUATED，不从局部露出推定错误。"
+        },
+        {
+          "dimension": "s02-chenli-framing-preference",
+          "intent_paths": [
+            "generation_intent.scene_continuity.state_constraints"
+          ],
+          "level": "recipe_hint",
+          "measurement": "Inspect exact selected raw bytes; missing, wrong-stage, or ambiguous evidence is NOT_EVALUATED.",
+          "observable": "偏好陈立仅肩部进入末帧边缘，头脸不入画，pan终点克制，保留50mm侧面近景意图。",
+          "production_owner": "QA/jieshi-S02-prospective-v2",
+          "proof": "analyzer",
+          "requirement_id": "s02-chenli-framing-preference",
+          "semantics": {
+            "category": "directional_preference",
+            "intent_role": "preferred_performance",
+            "source_refs": [
+              {
+                "intent_item_id": "ordered_shots/S02/production_note",
+                "locator": "ordered_shots/S02/production_note",
+                "origin": "director_choice",
+                "quote": "陈立仅肩部进入末帧边缘，不让陈立脸或额外手机进入构图。",
+                "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+              }
+            ],
+            "version": "requirement-semantics/1",
+            "derived_from": [
+              {
+                "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+                "locator": "s02-chenli-boundary"
+              }
+            ]
+          },
+          "stage": "raw_generation",
+          "tolerance": "仅头、耳或侧脸进入画面不构成QUALITY_FAILURE，也不单独授权framing repair或full regeneration。"
+        },
+        {
+          "dimension": "s02-identity-scene",
+          "intent_paths": [
+            "generation_intent.identity_continuity.preservation"
+          ],
+          "level": "acceptance",
+          "measurement": "Inspect exact selected raw bytes; missing, wrong-stage, or ambiguous evidence is NOT_EVALUATED.",
+          "observable": "林砚身份、服装、蓝挂绳白牌、单一右手手机和地铁几何连续，无实际可见错误。",
+          "production_owner": "QA/jieshi-S02-prospective-v2",
+          "proof": "analyzer",
+          "requirement_id": "s02-identity-scene",
+          "semantics": {
+            "category": "quality_critical",
+            "hard_basis": {
+              "kind": "approved_narrative",
+              "locator": "ordered_shots/S02/continuity_in",
+              "necessity": "相邻反应镜头必须属于同一人物和车厢；身份、服装或道具所有权漂移会把连续事件误读为另一个事件。",
+              "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+            },
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "intent_item_id": "ordered_shots/S02/continuity_in",
+                "locator": "ordered_shots/S02/continuity_in",
+                "origin": "director_choice",
+                "quote": "左手悬在窗前。",
+                "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+              }
+            ],
+            "version": "requirement-semantics/1",
+            "derived_from": [
+              {
+                "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+                "locator": "s02-identity-scene"
+              }
+            ]
+          },
+          "stage": "raw_generation",
+          "tolerance": "可见错误或无因消失为失败；不可见范围不推断。"
+        },
+        {
+          "dimension": "s02-narrative-focus",
+          "intent_paths": [
+            "generation_intent.scene_continuity.state_constraints"
+          ],
+          "level": "acceptance",
+          "measurement": "Inspect exact selected raw bytes; missing, wrong-stage, or ambiguous evidence is NOT_EVALUATED.",
+          "observable": "林砚仍是S02叙事与关键表演主体；陈立不能抢走求证的主体位置或明显遮挡关键表演。",
+          "production_owner": "QA/jieshi-S02-prospective-v2",
+          "proof": "human",
+          "requirement_id": "s02-narrative-focus",
+          "semantics": {
+            "category": "narrative_critical",
+            "hard_basis": {
+              "kind": "approved_narrative",
+              "locator": "ordered_shots/S02/action_and_performance",
+              "necessity": "本镜承担林砚对异常广播的反应，失去他的反应或求证对象会使S03回答失去动机。",
+              "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+            },
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "intent_item_id": "ordered_shots/S02/action_and_performance",
+                "locator": "ordered_shots/S02/action_and_performance",
+                "origin": "director_choice",
+                "quote": "手收回，视线先去扬声器，再向屏幕右邻座；吸气停一下。",
+                "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+              }
+            ],
+            "version": "requirement-semantics/1",
+            "derived_from": [
+              {
+                "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+                "locator": "s02-chenli-boundary"
+              }
+            ]
+          },
+          "stage": "raw_generation",
+          "tolerance": "按exact素材核对实际可见内容；证据模糊或缺失保持NOT_EVALUATED，不从局部露出推定错误。"
+        },
+        {
+          "dimension": "s02-natural-action",
+          "intent_paths": [
+            "generation_intent.subject_action.progression"
+          ],
+          "level": "acceptance",
+          "measurement": "Inspect exact selected raw bytes; missing, wrong-stage, or ambiguous evidence is NOT_EVALUATED.",
+          "observable": "撤手、视线转移和转头自然连续，无明显手部畸形、翻腕、冻结或跳变。",
+          "production_owner": "QA/jieshi-S02-prospective-v2",
+          "proof": "human",
+          "requirement_id": "s02-natural-action",
+          "semantics": {
+            "category": "quality_critical",
+            "hard_basis": {
+              "kind": "approved_narrative",
+              "locator": "ordered_shots/S02/action_and_performance",
+              "necessity": "求证必须表现为同一人在连续时空中的反应；畸形、冻结或跳变会使因果表演不可读。",
+              "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+            },
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "intent_item_id": "ordered_shots/S02/action_and_performance",
+                "locator": "ordered_shots/S02/action_and_performance",
+                "origin": "director_choice",
+                "quote": "手收回，视线先去扬声器，再向屏幕右邻座；吸气停一下。",
+                "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+              }
+            ],
+            "version": "requirement-semantics/1",
+            "derived_from": [
+              {
+                "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+                "locator": "s02-natural-action"
+              }
+            ]
+          },
+          "stage": "raw_generation",
+          "tolerance": "正常观看中无真实动作质量缺陷。"
+        },
+        {
+          "dimension": "s02-no-generated-text",
+          "intent_paths": [
+            "generation_intent.visual_treatment.prohibited_visual_drift"
+          ],
+          "level": "acceptance",
+          "measurement": "Inspect exact selected raw bytes; missing, wrong-stage, or ambiguous evidence is NOT_EVALUATED.",
+          "observable": "原始视频没有生成字幕、错误文字、logo或烧字。",
+          "production_owner": "QA/jieshi-S02-prospective-v2",
+          "proof": "analyzer",
+          "requirement_id": "s02-no-generated-text",
+          "semantics": {
+            "category": "quality_critical",
+            "hard_basis": {
+              "kind": "approved_narrative",
+              "locator": "ordered_shots/S02/generation_components/S02-main/prompt_draft",
+              "necessity": "随机烧字会污染由P4独立承载的精确中文信息，不能作为已完成的叙事信息交付。",
+              "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+            },
+            "intent_role": "must_not_happen",
+            "source_refs": [
+              {
+                "intent_item_id": "ordered_shots/S02/generation_components/S02-main/prompt_draft",
+                "locator": "ordered_shots/S02/generation_components/S02-main/prompt_draft",
+                "origin": "director_choice",
+                "quote": "不生成血腥、宗教仪式、怪物实体、片头和随机文字。",
+                "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+              }
+            ],
+            "version": "requirement-semantics/1",
+            "derived_from": [
+              {
+                "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+                "locator": "s02-no-generated-text"
+              }
+            ]
+          },
+          "stage": "raw_generation",
+          "tolerance": "任何生成文字覆盖均为失败。"
+        },
+        {
+          "dimension": "s02-open-continuity",
+          "intent_paths": [
+            "generation_intent.open_state.state_text"
+          ],
+          "level": "acceptance",
+          "measurement": "Inspect exact selected raw bytes; missing, wrong-stage, or ambiguous evidence is NOT_EVALUATED.",
+          "observable": "开场可读为林砚左手仍在窗前悬停，且人物、服装、手机和车厢承接已批准S02首帧。",
+          "production_owner": "QA/jieshi-S02-prospective-v2",
+          "proof": "human",
+          "requirement_id": "s02-open-continuity",
+          "semantics": {
+            "category": "narrative_critical",
+            "hard_basis": {
+              "kind": "approved_narrative",
+              "locator": "ordered_shots/S02/open_state",
+              "necessity": "观众必须能把上一镜窗前悬停与本镜撤手认作同一个连续事件，而不是无因重置。",
+              "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+            },
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "intent_item_id": "ordered_shots/S02/open_state",
+                "locator": "ordered_shots/S02/open_state",
+                "origin": "director_choice",
+                "quote": "左手悬在窗前。",
+                "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+              }
+            ],
+            "version": "requirement-semantics/1",
+            "derived_from": [
+              {
+                "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+                "locator": "s02-open-continuity"
+              }
+            ]
+          },
+          "stage": "raw_generation",
+          "tolerance": "需要可读连续性；不可见细节不臆断。"
+        },
+        {
+          "dimension": "s02-p4-ambience",
+          "intent_paths": [
+            "audio_need"
+          ],
+          "level": "acceptance",
+          "measurement": "Inspect exact final composition; missing, wrong-stage, or ambiguous evidence is NOT_EVALUATED.",
+          "observable": "最终P4成片保持连续轮轨低频与车内通风，切镜不重启，并将对白下压低。",
+          "production_owner": "P4/audio-caption",
+          "proof": "human",
+          "requirement_id": "s02-p4-ambience",
+          "semantics": {
+            "category": "quality_critical",
+            "hard_basis": {
+              "kind": "approved_narrative",
+              "locator": "ordered_shots/S02/audio_intent/ambience",
+              "necessity": "相邻镜头属于同一运行中的车厢；环境声断裂或盖住对白会损坏空间连续性与台词理解。",
+              "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+            },
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "intent_item_id": "ordered_shots/S02/audio_intent/ambience",
+                "locator": "ordered_shots/S02/audio_intent/ambience",
+                "origin": "director_choice",
+                "quote": "连续轮轨低频与车内通风，切镜不重启；对白下压低。",
+                "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+              },
+              {
+                "source_hash": "c22605b0882345b94db01bc9ddfc18b9e68d3e038d8772135163285336dabec1",
+                "locator": "s02-p4-ambience",
+                "intent_item_id": "s02-p4-ambience",
+                "quote": "最终P4成片保持连续轮轨低频与车内通风，切镜不重启，并将对白下压低。",
+                "origin": "director_choice"
+              }
+            ],
+            "version": "requirement-semantics/1",
+            "derived_from": [
+              {
+                "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+                "locator": "s02-p4-ambience"
+              }
+            ]
+          },
+          "stage": "final_composition",
+          "tolerance": "此项由外置P4音频层验收，未制作前为NOT_EVALUATED。"
+        },
+        {
+          "dimension": "s02-p4-dialogue",
+          "intent_paths": [
+            "audio_need"
+          ],
+          "level": "acceptance",
+          "measurement": "Inspect exact final composition; missing, wrong-stage, or ambiguous evidence is NOT_EVALUATED.",
+          "observable": "最终P4成片在0.60–3.50秒以林砚可理解的自然普通话呈现“刚才……叫的是我？”，且仅林砚口型对应。",
+          "production_owner": "P4/audio-caption",
+          "proof": "human",
+          "requirement_id": "s02-p4-dialogue",
+          "semantics": {
+            "category": "narrative_critical",
+            "hard_basis": {
+              "kind": "approved_narrative",
+              "locator": "ordered_shots/S02/dialogue/0",
+              "necessity": "观众需要听懂林砚在确认广播是否叫了自己，才能理解S03的否认及后续悬疑。",
+              "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+            },
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "intent_item_id": "ordered_shots/S02/dialogue/0",
+                "locator": "ordered_shots/S02/dialogue/0",
+                "origin": "director_choice",
+                "quote": "刚才……叫的是我？",
+                "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+              },
+              {
+                "source_hash": "c22605b0882345b94db01bc9ddfc18b9e68d3e038d8772135163285336dabec1",
+                "locator": "s02-p4-dialogue",
+                "intent_item_id": "s02-p4-dialogue",
+                "quote": "最终P4成片在0.60–3.50秒以林砚可理解的自然普通话呈现“刚才……叫的是我？”，且仅林砚口型对应。",
+                "origin": "director_choice"
+              }
+            ],
+            "version": "requirement-semantics/1",
+            "derived_from": [
+              {
+                "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+                "locator": "s02-p4-dialogue"
+              }
+            ]
+          },
+          "stage": "final_composition",
+          "tolerance": "此项由外置P4音频/字幕层验收，未制作前为NOT_EVALUATED。"
+        },
+        {
+          "dimension": "s02-question-progression",
+          "intent_paths": [
+            "generation_intent.subject_action.progression"
+          ],
+          "level": "acceptance",
+          "measurement": "Inspect exact selected raw bytes; missing, wrong-stage, or ambiguous evidence is NOT_EVALUATED.",
+          "observable": "林砚正确完成收手→关注扬声器→转向邻座的求证关系；不能漏掉或颠倒造成因果误读。",
+          "production_owner": "QA/jieshi-S02-prospective-v2",
+          "proof": "human",
+          "requirement_id": "s02-question-progression",
+          "semantics": {
+            "category": "narrative_critical",
+            "hard_basis": {
+              "kind": "approved_narrative",
+              "locator": "ordered_shots/S02/action_and_performance",
+              "necessity": "观众必须看懂广播触发林砚撤手并向邻座确认，不能用一个孤立转头代替这段因果。",
+              "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+            },
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "intent_item_id": "ordered_shots/S02/action_and_performance",
+                "locator": "ordered_shots/S02/action_and_performance",
+                "origin": "director_choice",
+                "quote": "手收回，视线先去扬声器，再向屏幕右邻座；吸气停一下。",
+                "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+              }
+            ],
+            "version": "requirement-semantics/1",
+            "derived_from": [
+              {
+                "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+                "locator": "s02-chenli-boundary"
+              }
+            ]
+          },
+          "stage": "raw_generation",
+          "tolerance": "按exact素材核对实际可见内容；证据模糊或缺失保持NOT_EVALUATED，不从局部露出推定错误。"
+        },
+        {
+          "dimension": "s02-quiet-question-preference",
+          "intent_paths": [
+            "generation_intent.performance_intent.visible_response"
+          ],
+          "level": "recipe_hint",
+          "measurement": "Inspect exact selected raw bytes; missing, wrong-stage, or ambiguous evidence is NOT_EVALUATED.",
+          "observable": "偏好林砚以克制、自然的安静求证表演呈现；精确台词声轨和对齐由P4外置。",
+          "production_owner": "QA/jieshi-S02-prospective-v2",
+          "proof": "human",
+          "requirement_id": "s02-quiet-question-preference",
+          "semantics": {
+            "category": "directional_preference",
+            "intent_role": "preferred_performance",
+            "source_refs": [
+              {
+                "intent_item_id": "ordered_shots/S02/dialogue/0",
+                "locator": "ordered_shots/S02/dialogue/0",
+                "origin": "director_choice",
+                "quote": "刚才……叫的是我？",
+                "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+              }
+            ],
+            "version": "requirement-semantics/1",
+            "derived_from": [
+              {
+                "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+                "locator": "s02-quiet-question-preference"
+              }
+            ]
+          },
+          "stage": "raw_generation",
+          "tolerance": "生成视频无native audio，偏离不单独构成QUALITY_FAILURE。"
+        },
+        {
+          "dimension": "s02-turn-endpoint",
+          "intent_paths": [
+            "generation_intent.close_state.state_text"
+          ],
+          "level": "acceptance",
+          "measurement": "Inspect exact selected raw bytes; missing, wrong-stage, or ambiguous evidence is NOT_EVALUATED.",
+          "observable": "结束时林砚已面向陈立，为S03建立明确对话接点。",
+          "production_owner": "QA/jieshi-S02-prospective-v2",
+          "proof": "human",
+          "requirement_id": "s02-turn-endpoint",
+          "semantics": {
+            "category": "narrative_critical",
+            "hard_basis": {
+              "kind": "approved_narrative",
+              "locator": "ordered_shots/S02/close_state",
+              "necessity": "S03邻座的否认需要明确回应林砚的询问，否则对话对象和反应因果断裂。",
+              "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+            },
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "intent_item_id": "ordered_shots/S02/close_state",
+                "locator": "ordered_shots/S02/close_state",
+                "origin": "director_choice",
+                "quote": "林砚转头面对陈立。",
+                "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+              }
+            ],
+            "version": "requirement-semantics/1",
+            "derived_from": [
+              {
+                "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+                "locator": "s02-turn-endpoint"
+              }
+            ]
+          },
+          "stage": "raw_generation",
+          "tolerance": "必须形成明确终态；未证明时保持NOT_EVALUATED。"
+        },
+        {
+          "dimension": "s02-visible-artifacts",
+          "intent_paths": [
+            "generation_intent.scene_continuity.state_constraints"
+          ],
+          "level": "acceptance",
+          "measurement": "Inspect exact selected raw bytes; missing, wrong-stage, or ambiguous evidence is NOT_EVALUATED.",
+          "observable": "不出现错误人物、复制人物或重复手机、错误肢体结构及明显遮挡林砚关键表演的真实质量问题；玻璃中既有反射不冒充新增实际人物。",
+          "production_owner": "QA/jieshi-S02-prospective-v2",
+          "proof": "analyzer",
+          "requirement_id": "s02-visible-artifacts",
+          "semantics": {
+            "category": "quality_critical",
+            "hard_basis": {
+              "kind": "accepted_quality",
+              "locator": "ordered_shots/S03/generation_components/S03-main/prompt_draft",
+              "necessity": "错误实体或肢体会改变场景中谁在向谁求证，也会破坏角色和道具所有权的可信连续性。",
+              "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+            },
+            "intent_role": "must_happen",
+            "source_refs": [
+              {
+                "intent_item_id": "ordered_shots/S03/generation_components/S03-main/prompt_draft",
+                "locator": "ordered_shots/S03/generation_components/S03-main/prompt_draft",
+                "origin": "director_choice",
+                "quote": "保护：不换脸换衣，不镜像左右，不复制手机或人物，不生成血腥、宗教仪式、怪物实体、片头和随机文字。",
+                "source_hash": "d0a373ce062564cc5ca64f075db38cbdc1f295063a27dbbeacaf982ca12de921"
+              }
+            ],
+            "version": "requirement-semantics/1",
+            "derived_from": [
+              {
+                "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+                "locator": "s02-chenli-boundary"
+              }
+            ]
+          },
+          "stage": "raw_generation",
+          "tolerance": "按exact素材核对实际可见内容；证据模糊或缺失保持NOT_EVALUATED，不从局部露出推定错误。"
+        }
+      ],
+      "measurement_contract_version": "S02-raw-visual/1",
+      "profile_id": "S02-generation-acceptance",
+      "profile_version": "2.0",
+      "required_requirement_ids": [
+        "s02-chenli-continuity",
+        "s02-identity-scene",
+        "s02-narrative-focus",
+        "s02-natural-action",
+        "s02-no-generated-text",
+        "s02-open-continuity",
+        "s02-p4-ambience",
+        "s02-p4-dialogue",
+        "s02-question-progression",
+        "s02-turn-endpoint",
+        "s02-visible-artifacts"
+      ],
+      "requirement_semantics_version": "requirement-semantics/1"
+    },
+    "measurement_contract_version": "S02-raw-visual/1",
+    "required_requirement_ids": [
+      "s02-chenli-continuity",
+      "s02-identity-scene",
+      "s02-narrative-focus",
+      "s02-natural-action",
+      "s02-no-generated-text",
+      "s02-open-continuity",
+      "s02-p4-ambience",
+      "s02-p4-dialogue",
+      "s02-question-progression",
+      "s02-turn-endpoint",
+      "s02-visible-artifacts"
+    ]
+  },
+  "generation_evaluation_authorities": [
+    {
+      "evaluator": {
+        "name": "codex-exact-media-technical-review",
+        "version": "2026-09-08"
+      },
+      "proof": "technical"
+    },
+    {
+      "evaluator": {
+        "name": "codex-video-analysis-evidence-review",
+        "version": "2026-09-08"
+      },
+      "proof": "analyzer"
+    },
+    {
+      "evaluator": {
+        "name": "reggie-human-visual-audio-review",
+        "version": "1"
+      },
+      "proof": "human"
+    }
+  ],
+  "policy_id": "jieshi-s02-generation-qa",
+  "policy_version": "2.0",
+  "required_layers": [
+    "semantic"
+  ],
+  "technical_thresholds": {
+    "black_luma_max_milli": 10,
+    "silence_peak_max_millidb": -60000,
+    "clipping_peak_min_millidb": -100
+  },
+  "layout_rules": {
+    "safe_area_inset_milli": 50,
+    "caption_overflow_tolerance_milli": 0
+  },
+  "strategy_rules_version": "1",
+  "semantic_requirement": "required",
+  "semantic_authorities": [
+    {
+      "name": "codex-exact-media-technical-review",
+      "version": "2026-09-08"
+    },
+    {
+      "name": "codex-video-analysis-evidence-review",
+      "version": "2026-09-08"
+    },
+    {
+      "name": "reggie-human-visual-audio-review",
+      "version": "1"
+    }
+  ],
+  "repair_authorities": []
+}

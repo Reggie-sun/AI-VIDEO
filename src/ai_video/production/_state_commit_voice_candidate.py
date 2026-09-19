@@ -295,8 +295,20 @@ class _StateCommitVoiceCandidateMixin:
             )
             + "\n"
         ).encode()
+        attempt = next(
+            (item for item in manifest.attempts if item.attempt_id == request.attempt_id),
+            None,
+        )
         evidence = (
-            *self._reopen_voice_evidence(request.attempt_id, include_intent=True),
+            *self._reopen_voice_evidence(
+                request.attempt_id,
+                include_intent=True,
+                routing_binding_hash=(
+                    attempt.voice_request.routing_binding_hash
+                    if attempt is not None and attempt.voice_request is not None
+                    else None
+                ),
+            ),
             PreparedArtifact(
                 paths.alignment_path.relative_to(self._project_root),
                 result.alignment_receipt_bytes,
@@ -354,6 +366,8 @@ class _StateCommitVoiceCandidateMixin:
                 paths.outcome_path,
             )
         }
+        if attempt.voice_request is not None and attempt.voice_request.routing_binding_hash is not None:
+            evidence_paths.add(paths.routing_binding_path.relative_to(self._project_root))
         if not evidence_paths.issubset(artifacts):
             raise _state_invalid("Voice candidate graph is missing durable lifecycle evidence.")
         try:
@@ -377,7 +391,15 @@ class _StateCommitVoiceCandidateMixin:
             )
         except (ValidationError, ValueError, json.JSONDecodeError) as exc:
             raise _state_invalid("Voice candidate evidence is malformed.", str(exc)) from exc
-        receipt = self._voice_receipt(voice_request, preview, authorization)
+        receipt = self._voice_receipt(
+            voice_request,
+            preview,
+            authorization,
+            routing_task_id=(attempt.voice_request.routing_task_id if attempt.voice_request else None),
+            routing_binding_hash=(
+                attempt.voice_request.routing_binding_hash if attempt.voice_request else None
+            ),
+        )
         if (
             receipt != attempt.voice_request
             or voice_request.base_project != attempt.base_project
@@ -395,6 +417,23 @@ class _StateCommitVoiceCandidateMixin:
             != artifacts[paths.alignment_path.relative_to(self._project_root)].file_sha256
         ):
             raise _state_invalid("Voice candidate evidence identity is inconsistent.")
+        if receipt.routing_binding_hash is not None:
+            try:
+                from ai_video.production.voice_routing import validate_routed_voice_handoff
+                from ai_video.production.voice_routing_execution import VoiceRoutingExecutionEnvelope
+
+                envelope = VoiceRoutingExecutionEnvelope.model_validate_json(
+                    artifacts[paths.routing_binding_path.relative_to(self._project_root)].payload
+                )
+                binding = envelope.binding
+                if (
+                    envelope.envelope_hash != receipt.routing_binding_hash
+                    or binding.inputs.limits.task_id != receipt.routing_task_id
+                ):
+                    raise ValueError("voice route task provenance mismatch")
+                validate_routed_voice_handoff(binding, voice_request, preview)
+            except (ValidationError, ValueError) as exc:
+                raise _state_invalid("Voice candidate route binding is invalid.", str(exc)) from exc
         base_snapshot = _read_regular_file_nofollow(
             self._project_root / attempt.base_registry.path,
             contained_by=self._project_root,

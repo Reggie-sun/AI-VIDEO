@@ -30,6 +30,7 @@ from ai_video.production import _caption_review_models as _caption_review, _gene
 from ai_video.production.production_strategy_contracts import (
     ProductionShotMixin,
 )
+from ai_video.production.voice_routing_contracts import VoiceRoutingRequirement
 from ai_video.production.composition_contracts import (
     AUDIO_KIND_PRIORITY,
     AudioKind,
@@ -388,6 +389,14 @@ class Shot(ProductionShotMixin, VersionedArtifact):
     hybrid_layers: tuple[HybridLayer, ...] = ()
     composition_directives: tuple[CompositionDirective, ...] = ()
     review_policy: ReviewPolicy = Field(default_factory=ReviewPolicy)
+    voice_routing: VoiceRoutingRequirement | None = None
+
+    @model_serializer(mode="wrap")
+    def _serialize_voice_routing(self, handler):
+        data = self._serialize_production_contract(handler)
+        if self.voice_routing is None:
+            data.pop("voice_routing", None)
+        return data
 
 
 class AssetSourceKind(str, Enum):
@@ -1283,6 +1292,23 @@ class VoiceRequestReceipt(StrictModel):
     budget_reservation_receipt_id: str = Field(min_length=1)
     egress_authorization_receipt_id: str = Field(min_length=1)
     destination: str = Field(min_length=1)
+    routing_task_id: str | None = Field(default=None, min_length=1)
+    routing_binding_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+
+    @model_serializer(mode="wrap")
+    def _serialize_routing_binding(self, handler):
+        data = handler(self)
+        if self.routing_task_id is None:
+            data.pop("routing_task_id", None)
+        if self.routing_binding_hash is None:
+            data.pop("routing_binding_hash", None)
+        return data
+
+    @model_validator(mode="after")
+    def _require_paired_routing_binding(self) -> "VoiceRequestReceipt":
+        if (self.routing_task_id is None) != (self.routing_binding_hash is None):
+            raise ValueError("voice route task and execution binding must be paired")
+        return self
 
     @field_validator("destination")
     @classmethod

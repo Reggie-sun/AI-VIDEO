@@ -198,7 +198,7 @@ class ViduVideoProvider(_ViduAdMethods):
             from ai_video.production._remote_video_native_prompt import (
                 compile_remote_video_prompt, RemoteVideoPromptCompilation,
             )
-            prompt = compile_remote_video_prompt(requirement)
+            prompt = compile_remote_video_prompt(requirement, voice_route=provider_bound.voice_route)
             compiled_prompt = isinstance(prompt, RemoteVideoPromptCompilation)
         else:
             prompt = compile_vidu_prompt(requirement)

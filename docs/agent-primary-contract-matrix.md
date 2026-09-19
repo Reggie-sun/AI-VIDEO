@@ -12,6 +12,35 @@
 `tests/test_production_visual_quality.py`、`tests/test_visual_quality_report.py`，
 mandatory routing 由 Harness `visual_quality_tests` 独占。
 
+## Voice Source Routing
+
+`voice_routing_contracts.py` 拥有可选 `voice-routing/1` authoring；`voice_routing.py` 只读构造
+feasibility 和 exact handoff observations。Planning 投影同一 canonical Shot 要求，既有 candidate
+builder 枚举 NATIVE/SEPARATE，`generation_decision.py` 保持唯一 selector，硬要求优先、native
+仅同等候选 tie-break。旧 `AudioNeed.REQUIRED` 仍为 native required；AUTO OPTIONAL 不取消对白。
+旧字段缺省序列化/hash不变；voice route 的稳定 fit scope 不携带 mutable budget/readiness state。
+
+`voice_routing_handoff.py` 在调用既有 `ProductionStateCommitter.generate_voice_asset` 前验证
+当前视频/声音布局与 exact MiniMax request、preview、credential reference 和 materializer；
+不拥有 lifecycle、Provider 选择、购买、预算、activation 或 recovery。缺能力/证据、失败与
+unknown 必须停止，不能静音、切路线或混用 count-based voice / monetary video ledger。
+`voice_routing_execution.py` 只拥有 immutable envelope；`ProductionStateCommitter` 在既有
+voice R+1/R+2 与 paid intent 锁内重验 route、QA、lineage 和 exact previews，仍是唯一 writer。
+Envelope 随 voice attempt 持久化并进入 receipt/hash；标准 reader 重开，缺省旧 receipt 不变。
+同 task voice/video submit 依据 canonical receipts 合计去重；paid owner 在当前账本核对
+voice + video 预算，不引入第二 ledger。已有 routed voice submit 后增加 task ceiling 明确阻断。
+generated native audio 继续经原 Registry 派生；`CompositionSpec.voice_sources` 只引用既有
+execution binding，`resolve_composition` 在唯一 ResolvedTimeline 上验证 exact fetched video、
+selected speech/non-speech tracks、完整音频与对白时间窗，不得 direct mux 或移除 muted。
+新 route 的 signal transformation 与 native fixed-speaker control 尚未资格化时明确阻断。
+
+Focused verification：`python -m pytest -p no:cacheprovider tests/test_voice_routing_contracts.py
+tests/test_voice_routing_integration.py tests/test_voice_routing_guards.py tests/test_voice_routing_handoff.py
+tests/test_voice_routing_execution.py tests/test_voice_routing_p4.py tests/test_voice_routing_binding.py
+tests/test_voice_routing_identity.py -q`；既有 Planning/Router/compiler/voice/P4/历史 replay 检查
+继续由 Harness 各 category 路由。当前验收状态与限制见 runtime baseline 和
+[spec](superpowers/specs/2026-09-12-ai-video-voice-routing-design.md)。
+
 ## Development Repair Input Admission
 
 `ProductionStateCommitter.bootstrap_repair_input()` 复用既有 atomic bootstrap，是新开发
@@ -132,6 +161,19 @@ committer 必须重验 document hash、request/artifact/rubric/current QA identi
 不能只保存 caller 手填的 Finding/source hash。该契约不替代真实 analyzer/human 调用或 Gate。
 `requirement_semantics.py` 是原 QA inventory 的无 I/O 类型与校验叶模块；selected QA 的
 `requirement-semantics/1` marker 决定版本，不新增 inventory 或选择 owner。
+新 QA publication 与新 generation readiness 额外调用该叶模块的 semantic admission：
+Director choice 升为 hard 必须由 QA author 给出可解释的独立 narrative/continuity/quality
+necessity；不得以 observable 或原 framing quote 的复述自证。代码仅拒绝空白与规范化后
+完全重复，不用 NLP 判定艺术必要性，也不把通过此检查当作语义正确证明。
+`activate_qa_policy()` 在 exact replay 返回之后、任何新 artifact write 之前校验全部
+QA inventories；`require_generation_evaluation_authorities()` 在共同 planning 与 submit
+入口检查选中的 rubric。历史 parsing/hash/verdict/replay 不追加此新 admission。
+S02 prospective policy v2 与 FinalOutput goal v2 将 shoulder-only/no-face 留为 preference，
+身份、服装、耳机、求证因果、主体、空间连续性与实体质量仍 hard；不改选历史 Manifest。
+Focused verification：`tests/test_requirement_semantics.py`、
+`tests/test_requirement_semantics_replay.py`、`tests/test_s02_prospective_review.py`。
+Director 相邻 multi-shot 的 beat/scale/camera 类别变化只作 warning/guidance；
+结构、枚举、source binding、transition 和 duration 校验仍由原 validator 独占。
 `generation_evaluation_criteria.py` 从封存 predicate 与 fetched SHA/size 派生 immutable items，
 有限 event-time 区间按 canonical 窗口判定，不从 Provider prompt 增加标准。
 `generation-evaluation/2` 将 acceptance、advisory 与 unresolved quality 分开；两个 feedback
@@ -243,7 +285,6 @@ request 和待验收素材 metadata；`_provider_manifest_fields.py` 负责显�
 registered inputs、profile、request、paid joins 和下载 bytes。素材不会激活 Registry、
 Project、timeline 或 QA state，也不会注册成普通 Shot capability。Focused check：
 Harness 的 `vidu_ad_tests`；使用与兼容边界见 [Vidu ad source](vidu-ad-provider.md)。
-
 
 `src/ai_video/production/vidu.py` 独占 Vidu payload/status/download mapping，
 `_vidu_prompt.py` 独占 Vidu version `2` 的自然语言 prompt 编译；新编译不接受 version `1`，

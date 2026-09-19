@@ -22,6 +22,8 @@ from ai_video.production.video import (
     ProviderProfilePointer, VideoGenerationRequest, VideoOutputRequirement, VideoProviderCapabilities,
 )
 from ai_video.production.video_contracts import VideoFlexibleOutputRequirement
+from ai_video.production.voice_routing import VoiceRouteBinding, route_blockers
+from ai_video.production.voice_routing_contracts import VoiceRoute
 
 
 class GenerationCandidate(StrictModel):
@@ -33,12 +35,15 @@ class GenerationCandidate(StrictModel):
     output_requirement: VideoOutputRequirement | VideoFlexibleOutputRequirement
     recipe: GenerationRecipe
     final_output_goal: FinalOutputContract | None = None
+    voice_route: VoiceRouteBinding | None = None
 
     @model_serializer(mode="wrap")
     def _serialize_goal(self, handler):
         result = handler(self)
         if self.final_output_goal is None:
             result.pop("final_output_goal", None)
+        if self.voice_route is None:
+            result.pop("voice_route", None)
         return result
 
     @model_validator(mode="after")
@@ -63,6 +68,8 @@ class GenerationCandidate(StrictModel):
                                  "output": self.output_requirement.model_dump(mode="json")}
         if self.final_output_goal is not None:
             payload["final_output_goal"] = self.final_output_goal.contract_hash
+        if self.voice_route is not None:
+            payload["voice_route"] = self.voice_route.fit_hash
         return canonical_sha256(payload)
 
 
@@ -288,6 +295,13 @@ def _assess(candidate, inputs, routing):
             reasons.append("TASK_SUBMIT_CEILING")
     if inputs.user_fixed_candidates and candidate.candidate_id not in inputs.user_fixed_candidates:
         reasons.append("USER_ROUTE_CONSTRAINT")
+    if candidate.voice_route is not None and candidate.voice_route.route is VoiceRoute.SEPARATE:
+        readiness = candidate.voice_route.readiness
+        if readiness is not None and readiness.pending_voice_requests:
+            if candidate.candidate_id not in limits.allowed_remote_candidates:
+                reasons.append("REMOTE_SCOPE_NOT_AUTHORIZED")
+            if len(readiness.pending_voice_requests) + int(not local) > limits.paid_submit_ceiling - limits.paid_submits_used:
+                reasons.append("TASK_SUBMIT_CEILING")
     return CandidateAssessment(
         candidate_id=candidate.candidate_id, scope_hash=candidate.scope_hash, fit=fit,
         compatible=compatible, executable=not reasons,
@@ -330,7 +344,15 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
         selected_capability_id=c.capability_id, output_requirement=c.output_requirement,
         lifecycle=lifecycle, compiler_contract=c.compiler_contract,
         continuity_routing=continuity_routing) for c in candidates}
-    assessments = tuple(_assess(c, inputs, bindings[c.candidate_id]) for c in candidates)
+    assessments = []
+    for candidate in candidates:
+        assessment = _assess(candidate, inputs, bindings[candidate.candidate_id])
+        voice_reasons = route_blockers(projection.requirement, candidate)
+        if voice_reasons:
+            assessment = assessment.model_copy(update={"compatible": False, "executable": False,
+                "reasons": (*assessment.reasons, *voice_reasons)})
+        assessments.append(assessment)
+    assessments = tuple(assessments)
     base = dict(snapshot_hash=inputs.snapshot_hash, assessments=assessments)
     latest = next((e for e in inputs.evidence if e.evidence_hash == inputs.latest_attempt_hash), None)
     # Task identifiers scope submit quotas, not the Shot's failure/recovery
@@ -538,6 +560,13 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
                      or intervention is None and (a.fit == "supported" or
                          a.fit == "unknown" and inputs.policy.allow_bounded_exploration))]
     if not eligible:
+        if projection.requirement.voice_routing is not None and all(
+            route_blockers(projection.requirement, c) for c in candidates
+        ):
+            reasons = tuple(reason for c in candidates for reason in route_blockers(projection.requirement, c))
+            return GenerationDecision(**base,
+                disposition="EVIDENCE_REQUIRED" if "EVIDENCE_REQUIRED" in reasons else "BLOCKED_CAPABILITY",
+                rationale=tuple(f"{a.candidate_id}: {','.join(a.reasons)}" for a in assessments))
         resource_stops = {"GENERATION_FORBIDDEN", "TASK_SUBMIT_CEILING", "LOCAL_TOTAL_LIMIT",
                           "LOCAL_BATCH_REVIEW_REQUIRED", "LOCAL_RESOURCES_UNAVAILABLE"}
         supported = [a for a in assessments if a.fit == "supported" and a.compatible
@@ -556,7 +585,9 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
         # Observed cohort fit precedes exact-hash coverage. Cold start has no
         # probability; bounds are sampling uncertainty, not model guarantees.
         lower = estimate.interval_95[0] if estimate and estimate.interval_95 is not None else -1.
-        return (-lower, len(a.failed_dimensions), len(a.unknown_dimensions))
+        candidate = next(c for c in candidates if c.candidate_id == a.candidate_id)
+        voice_preference = int(candidate.voice_route is not None and candidate.voice_route.route is VoiceRoute.SEPARATE)
+        return (-lower, len(a.failed_dimensions), len(a.unknown_dimensions), voice_preference)
     eligible.sort(key=lambda a: (fit_rank(a), a.candidate_id))
     if len(eligible) > 1 and fit_rank(eligible[0]) == fit_rank(eligible[1]):
         return GenerationDecision(**base, disposition="UNRESOLVED_TIE",
@@ -582,6 +613,7 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
         **{name: getattr(routing.provider_bound_request, name)
            for name in ProviderBoundVideoRequest.model_fields if name != "provider_bound_request_hash"},
         "generation_recipe": selected_recipe,
+        "voice_route": chosen.voice_route,
     })
     routing = RequirementRoutingResult(decision=routing.decision, provider_bound_request=bound)
     return GenerationDecision(**base, disposition="GENERATE_ONCE", selected_candidate_id=chosen.candidate_id,

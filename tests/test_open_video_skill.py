@@ -794,13 +794,17 @@ def test_punctuation_does_not_fake_a_distinct_objective() -> None:
         validator.validate_director_coverage(payload)
 
 
-def test_repeated_slow_camera_treatment_does_not_fake_coverage() -> None:
+def test_multi_shot_repeated_director_categories_are_guidance_not_rejection() -> None:
     validator = _load_validator()
     payload = _payload()
+    payload["coverage_units"][1]["beat_function"] = "establish"
+    payload["coverage_units"][1]["shot_scale"] = "extreme_wide"
     payload["coverage_units"][1]["camera_treatment"] = "tracking"
 
-    with pytest.raises(validator.CoverageValidationError, match="camera_treatment"):
-        validator.validate_director_coverage(payload)
+    with pytest.warns(UserWarning, match="repeat director categories"):
+        result = validator.validate_director_coverage(payload)
+
+    assert result["status"] == "passed"
 
 
 def test_unknown_camera_treatment_fails_closed() -> None:

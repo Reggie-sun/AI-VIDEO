@@ -317,7 +317,7 @@ class SeedanceVideoProvider:
         native_prompt = None
         compiler_version = "1"
         if provider_bound.generation_recipe is not None:
-            compiled_prompt = compile_remote_video_prompt(requirement)
+            compiled_prompt = compile_remote_video_prompt(requirement, voice_route=provider_bound.voice_route)
             if not isinstance(compiled_prompt, RemoteVideoPromptCompilation):
                 return ProviderRequirementUnsupported(
                     requirement_hash=requirement.requirement_hash,

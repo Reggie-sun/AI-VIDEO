@@ -383,6 +383,13 @@ def register_generated_video_audio(
             None if existing_receipt is None else existing_receipt.source_budget_pointer
         ),
     )
+    from ai_video.production.voice_routing_handoff import require_native_audio_handoff
+
+    source = load_production_project(request.source_project_root / "project.yaml")
+    try:
+        require_native_audio_handoff(source, request, committer._project_root)
+    except ValueError as exc:
+        raise _audio_invalid("Generated video audio route handoff is invalid.", str(exc)) from exc
     replay = _replay_if_exact(committer, request, binding, toolchain)
     if replay is not None:
         return replay

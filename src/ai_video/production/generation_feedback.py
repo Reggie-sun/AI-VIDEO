@@ -62,6 +62,12 @@ class PreparedGeneration:
     execution_binding: object | None = None
     target_shot_id: str | None = None
 
+    @property
+    def voice_handoffs(self):
+        from ai_video.production.voice_routing_handoff import selected_voice_handoffs
+
+        return selected_voice_handoffs(self)
+
 
 def _expressions(acceptance, requirement):
     inventory = acceptance.profile_payload.get("generation_requirements")
@@ -89,7 +95,8 @@ def _expressions(acceptance, requirement):
     return tuple(sorted(result, key=lambda rule: rule.requirement_id))
 
 
-def create_generation_candidates(*, projection, targets, acceptance, baseline=None, final_output_goal=None):
+def create_generation_candidates(*, projection, targets, acceptance, baseline=None, final_output_goal=None,
+                                 source_project=None, voice_context=None, generation_id=None, task_id=None):
     """Enumerate actual registered variants; Router owns compatibility/ranking."""
     expressions = _expressions(acceptance, projection.requirement)
     candidates = []
@@ -116,11 +123,19 @@ def create_generation_candidates(*, projection, targets, acceptance, baseline=No
                 rubric_hash=acceptance.profile_content_hash, acceptance_policy=acceptance,
                 expressions=expressions,
             )
-            candidates.append(GenerationCandidate(
+            candidate = GenerationCandidate(
                 candidate_id=candidate_id, provider_profile=target.profile,
                 capabilities=capabilities, capability_id=variant.capability_id,
                 compiler_contract=target.compiler_contract,
-                output_requirement=target.output_requirement, recipe=recipe, final_output_goal=final_output_goal))
+                output_requirement=target.output_requirement, recipe=recipe, final_output_goal=final_output_goal)
+            from ai_video.production.voice_routing import expand_voice_candidates
+
+            expanded = expand_voice_candidates(candidate, requirement=projection.requirement,
+                source=source_project, context=voice_context, generation_id=generation_id,
+                task_id=task_id)
+            candidates.extend(expanded)
+            for item in expanded:
+                providers[item.candidate_id] = target.provider
     if not candidates:
         raise ValueError("no video capabilities registered; use the non-video production path")
     return tuple(candidates), providers
@@ -152,9 +167,11 @@ def derive_generation_interventions(*, projection, candidates, history, policy):
         return (), conflicts
     features = extract_generation_features(projection)
     estimates = [(c, empirical_assessment(c, features, history.experiences)) for c in candidates]
+    prior_route = prior.candidate.voice_route.route if prior.candidate.voice_route else None
+    same_voice_route = lambda c: (c.voice_route.route if c.voice_route else None) == prior_route
     current = next((c for c in candidates
                     if c.capabilities.provider_name == prior.candidate.capabilities.provider_name
-                    and c.capability_id == prior.candidate.capability_id), None)
+                    and c.capability_id == prior.candidate.capability_id and same_voice_route(c)), None)
     if current is None:
         return (), conflicts
     if current.recipe.rubric_hash != prior.candidate.recipe.rubric_hash:
@@ -182,7 +199,7 @@ def derive_generation_interventions(*, projection, candidates, history, policy):
         else:
             continue
         break
-    alternatives = [(c, e) for c, e in estimates if c != current and e.interval_95 is not None
+    alternatives = [(c, e) for c, e in estimates if c != current and same_voice_route(c) and e.interval_95 is not None
                     and e.supported_artifacts and (current_estimate.interval_95 is None
                         or e.interval_95[0] > current_estimate.interval_95[1])]
     disposition = "GENERATE_ONCE"
@@ -264,7 +281,13 @@ class GenerationFeedbackOrchestrator:
         candidates, providers = create_generation_candidates(
             projection=current["projection"], targets=self.targets,
             acceptance=current["acceptance"], baseline=history.baseline_request,
-            final_output_goal=current.get("final_output_goal"))
+            final_output_goal=current.get("final_output_goal"), source_project=current.get("source_project"),
+            voice_context=current.get("voice_context"), generation_id=current["lifecycle"].generation_id,
+            task_id=limits.task_id)
+        voice_used = max((c.voice_route.readiness.voice_submits_used for c in candidates
+            if c.voice_route is not None and c.voice_route.readiness is not None), default=0)
+        limits = limits.model_copy(update={"paid_submits_used": max(limits.paid_submits_used,
+            len(submitted["remote"]) + voice_used)})
         interventions, conflicts = derive_generation_interventions(
             projection=current["projection"], candidates=candidates, history=history, policy=self.policy)
         evidence = {e.evidence_hash: e for x in history.experiences for e in x.evidence}
@@ -315,6 +338,17 @@ class GenerationFeedbackOrchestrator:
                 execution_binding=prepared.execution_binding)
         return prepared
 
+    def generate_selected_voice(self, **kwargs):
+        from ai_video.production.voice_routing_handoff import generate_selected_voice
+        from ai_video.errors import AiVideoError, ErrorCode
+
+        try:
+            return generate_selected_voice(self, **kwargs)
+        except ValueError as exc:
+            raise AiVideoError(code=ErrorCode.VOICE_REQUEST_INVALID,
+                user_message="Selected voice route is not ready for execution.",
+                technical_detail=str(exc), retryable=False) from exc
+
     @classmethod
     def for_project(cls, *, committer, targets, context_loader, policy):
         """Use the standard project loader and committer's durable feedback store.
@@ -346,6 +380,7 @@ class GenerationFeedbackOrchestrator:
             require_generation_evaluation_authorities(loaded.qa_policy, acceptance)
             result["acceptance"] = acceptance
             result["final_output_goal"] = loaded.qa_policy.final_output
+            result["source_project"] = loaded
             return result
 
         def history():

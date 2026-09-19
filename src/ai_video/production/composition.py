@@ -859,7 +859,11 @@ def resolve_composition(
         from ai_video.production.production_strategy_reader import require_production_source_eligibility
 
         require_production_source_eligibility(project, spec)
-        return _resolve_composition(project, spec, renderer_version)
+        timeline = _resolve_composition(project, spec, renderer_version)
+        from ai_video.production.voice_routing_handoff import require_voice_composition
+
+        require_voice_composition(project, spec, timeline)
+        return timeline
     except AiVideoError:
         raise
     except (OSError, ValueError) as exc:

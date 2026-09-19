@@ -305,7 +305,7 @@ class _StateCommitVideoMixin:
         try:
             require_generation_evaluation_authorities(policy, acceptance)
         except (KeyError, ValueError) as exc:
-            raise _state_invalid("Generation evaluation authority is incomplete.", str(exc)) from exc
+            raise _state_invalid("Generation QA admission or evaluation authority is incomplete.", str(exc)) from exc
 
     def _require_production_predecessors(self, loaded, binding, durable_experiences) -> None:
         """Same-component repair is allowed; advancing coverage needs exact PASS."""

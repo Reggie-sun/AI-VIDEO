@@ -71,8 +71,13 @@ class MiniMaxSpeechProviderPolicy:
     use_policy_allowed: bool
     voice_authorization_verified: bool
     policy_receipt_id: str
+    origin: Literal["https://api.minimax.io", "https://api.minimaxi.com"] = _ORIGIN
 
     def __post_init__(self) -> None:
+        if type(self.origin) is not str or self.origin not in {
+            "https://api.minimax.io", "https://api.minimaxi.com"
+        }:
+            raise ValueError("MiniMax Speech origin is invalid")
         if any(
             type(value) is not bool
             for value in (
@@ -200,7 +205,7 @@ def _request_is_supported(request: VoiceGenerationRequest) -> bool:
         and request.output_codec == "pcm_s16le"
         and request.output_sample_rate_hz in _SUPPORTED_SAMPLE_RATES
         and request.output_channels in {1, 2}
-        and request.language == "English"
+        and request.language in {"English", "Chinese"}
         and len(request.script_text) < 10_000
         and parameters.stability_milli is None
         and parameters.similarity_boost_milli is None
@@ -488,7 +493,7 @@ class MiniMaxSpeechVoiceProvider:
         return build_voice_generation_preview(
             request,
             pricing=self._pricing,
-            destination=_ORIGIN,
+            destination=self._policy.origin,
             credential_reference_kind=self._policy.credential_reference_kind,
             timing_supported=supported,
             output_supported=supported,
@@ -529,7 +534,7 @@ class MiniMaxSpeechVoiceProvider:
             )
         transport_request = MiniMaxSpeechTransportRequest(
             method="POST",
-            url=f"{_ORIGIN}{_T2A_PATH}",
+            url=f"{self._policy.origin}{_T2A_PATH}",
             headers={
                 "authorization": _authorization_header(self._api_key),
                 "content-type": "application/json",

@@ -8,6 +8,7 @@ from typing import Callable, TypeVar
 import yaml
 from pydantic import BaseModel, ValidationError
 
+from ai_video.production.audio import VoiceGenerationPreview, VoiceGenerationRequest
 from ai_video.production.hashing import verify_artifact_hash
 from ai_video.production.models import (
     AssetRegistrySnapshot,
@@ -221,6 +222,39 @@ def verify_voice_candidate_history(
                     evidence_path.relative_to(bundle.root).as_posix(),
                     evidence.file_sha256,
                 )
+            )
+        receipt = attempt.voice_request
+        if receipt is not None and receipt.routing_binding_hash is not None:
+            from ai_video.production.voice_routing import validate_routed_voice_handoff
+            from ai_video.production.voice_routing_execution import VoiceRoutingExecutionEnvelope
+
+            envelope, _ = read_canonical_voice_model(
+                bundle.root,
+                attempt.attempt_id,
+                "routing-binding.json",
+                VoiceRoutingExecutionEnvelope,
+            )
+            binding = envelope.binding
+            request, _ = read_canonical_voice_model(
+                bundle.root, attempt.attempt_id, "request.json", VoiceGenerationRequest
+            )
+            preview, _ = read_canonical_voice_model(
+                bundle.root, attempt.attempt_id, "preview.json", VoiceGenerationPreview
+            )
+            if (
+                envelope.envelope_hash != receipt.routing_binding_hash
+                or binding.inputs.limits.task_id != receipt.routing_task_id
+            ):
+                raise ValueError("voice route task provenance mismatch")
+            validate_routed_voice_handoff(binding, request, preview)
+            evidence_path = canonical_voice_attempt_artifact_path(
+                bundle.root, attempt.attempt_id, "routing-binding.json"
+            )
+            evidence = _read_regular_file_nofollow(
+                evidence_path, contained_by=bundle.root
+            )
+            pairs.append(
+                (evidence_path.relative_to(bundle.root).as_posix(), evidence.file_sha256)
             )
         if len({path for path, _ in pairs}) != len(pairs):
             raise ValueError("voice candidate evidence contains duplicate paths")

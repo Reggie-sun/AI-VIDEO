@@ -18,6 +18,7 @@ from pydantic import (
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import Character, Scene, Shot, StrictModel
 from ai_video.production._video_continuity import C4MultiAnchorBinding
+from ai_video.production.voice_routing_contracts import VoiceRoutingRequirement
 
 
 _REQUIREMENT_CONTRACT_VERSION = "provider-neutral-video-requirement/1"
@@ -738,6 +739,7 @@ class ReviewEvidenceLink(StrictModel):
 
 class ProviderNeutralGenerationIntentProjection(StrictModel):
     generation_intent: GenerationIntent
+    voice_routing: VoiceRoutingRequirement | None = None
     conditioning_compatibility: ConditioningCompatibilityEvidence | None = None
     generation_operation: GenerationOperation = GenerationOperation.AUTO
     semantic_reference_roles: tuple[SemanticReferenceRole, ...] = ()
@@ -752,6 +754,8 @@ class ProviderNeutralGenerationIntentProjection(StrictModel):
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, object]:
         data = handler(self)
+        if self.voice_routing is None:
+            data.pop("voice_routing", None)
         if (
             self.generation_intent.primary_camera_motion is None
             or self.generation_operation is GenerationOperation.TEXT_TO_VIDEO
@@ -777,6 +781,8 @@ class ProviderNeutralGenerationIntentProjection(StrictModel):
     def _validate_media_selection_roles(
         self,
     ) -> "ProviderNeutralGenerationIntentProjection":
+        if self.voice_routing is not None and self.audio_need.value != self.voice_routing.audio_need:
+            raise ValueError("voice routing conflicts with legacy audio_need")
         media_roles = {
             SemanticReferenceRole.VIDEO_REFERENCE,
             SemanticReferenceRole.AUDIO_REFERENCE,
@@ -820,7 +826,7 @@ class ProviderNeutralGenerationIntentProjection(StrictModel):
 
             diagnostics = validate_generation_intent_for_continuity(
                 self.generation_intent,
-                audio_need=self.audio_need,
+                audio_need=self.audio_need if self.voice_routing is None else AudioNeed.OPTIONAL,
             )
             if diagnostics:
                 raise ValueError(
@@ -905,6 +911,7 @@ class ProviderNeutralVideoRequirement(StrictModel):
     continuity_mode: ContinuityMode
     motion_requirement: MotionRequirement
     generation_intent: GenerationIntent
+    voice_routing: VoiceRoutingRequirement | None = None
     conditioning_compatibility: ConditioningCompatibilityEvidence | None = None
     semantic_reference_roles: tuple[SemanticReferenceRole, ...] = ()
     capability_need: CapabilityNeed = Field(default_factory=CapabilityNeed)
@@ -921,6 +928,8 @@ class ProviderNeutralVideoRequirement(StrictModel):
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, object]:
         data = handler(self)
+        if self.voice_routing is None:
+            data.pop("voice_routing", None)
         if self.contract_version != _CAMERA_COMPLETE_REQUIREMENT_CONTRACT_VERSION:
             data.pop("conditioning_compatibility", None)
         commercial_present = any(
@@ -1046,6 +1055,9 @@ class ProviderNeutralVideoRequirement(StrictModel):
 
     @model_validator(mode="after")
     def _enforce_asset_role_binding(self) -> "ProviderNeutralVideoRequirement":
+        from ai_video.production.voice_routing import validate_voice_requirement
+
+        validate_voice_requirement(self)
         asset_roles = {asset.role for asset in self.asset_evidence}
         semantic_roles = set(self.semantic_reference_roles)
         if semantic_roles != asset_roles:
@@ -1071,7 +1083,7 @@ class ProviderNeutralVideoRequirement(StrictModel):
 
             diagnostics = validate_generation_intent_for_continuity(
                 intent,
-                audio_need=self.audio_need,
+                audio_need=self.audio_need if self.voice_routing is None else AudioNeed.OPTIONAL,
             )
             if diagnostics:
                 raise ValueError(

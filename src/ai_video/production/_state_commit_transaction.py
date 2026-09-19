@@ -128,9 +128,12 @@ class _StateCommitTransactionMixin:
                 None,
             )
             if unresolved is not None:
-                raise _state_invalid(
-                    "Production state has an unresolved attempt; explicit recovery is required."
-                )
+                from ai_video.production.video_pre_generation import permits_prospective_target_transition
+
+                if not permits_prospective_target_transition(self, manifest, request, candidate_graph):
+                    raise _state_invalid(
+                        "Production state has an unresolved attempt; explicit recovery is required."
+                    )
             if manifest.manifest_revision != request.expected_manifest_revision:
                 raise _state_invalid("Production Manifest revision is stale.")
 

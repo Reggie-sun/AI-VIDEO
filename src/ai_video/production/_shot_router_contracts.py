@@ -779,6 +779,9 @@ class VideoGenerationRoutingDecision(_RouterModel):
         return cls.model_validate(data)
 
 
+from ai_video.production.voice_routing import VoiceRouteBinding
+
+
 class ProviderBoundVideoRequest(_RouterModel):
     """Prompt-free sealed projection owned by the Shot Router."""
 
@@ -815,6 +818,7 @@ class ProviderBoundVideoRequest(_RouterModel):
     compiler_contract: AdapterCompilerContract
     expression_strength: ExpressionStrength
     generation_recipe: GenerationRecipe | None = None
+    voice_route: VoiceRouteBinding | None = None
     provider_bound_request_hash: str = Field(pattern=_SHA256)
 
     @model_serializer(mode="wrap")
@@ -822,6 +826,8 @@ class ProviderBoundVideoRequest(_RouterModel):
         payload = handler(self)
         if self.generation_recipe is None:
             payload.pop("generation_recipe", None)
+        if self.voice_route is None:
+            payload.pop("voice_route", None)
         return payload
 
     def _hash_payload(self) -> dict[str, object]:

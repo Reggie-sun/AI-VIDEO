@@ -346,16 +346,40 @@ class _StateCommitBootstrapMixin:
                     if (
                         item.source_kind is not AssetSourceKind.IMPORTED
                         or item.asset_type is not AssetType.IMAGE
-                        or item.tool != AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL
+                        or item.tool
+                        not in {
+                            AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL,
+                            CODEX_IMAGEGEN_IMPORT_TOOL,
+                        }
                     ):
                         continue
-                    receipt_path = canonical_automated_browser_image_import_receipt_path(
-                        item.creation_receipt_id
+                    automated = item.tool == AUTOMATED_BROWSER_IMAGE_IMPORT_TOOL
+                    receipt_path = (
+                        canonical_automated_browser_image_import_receipt_path(
+                            item.creation_receipt_id
+                        )
+                        if automated
+                        else canonical_human_image_import_receipt_path(
+                            item.creation_receipt_id
+                        )
                     )
                     receipt_artifact = artifacts_by_path[receipt_path]
-                    receipt = AutomatedBrowserImageImportReceipt.model_validate_json(
-                        receipt_artifact.payload
+                    receipt = (
+                        AutomatedBrowserImageImportReceipt.model_validate_json(
+                            receipt_artifact.payload
+                        )
+                        if automated
+                        else HumanImageImportReceipt.model_validate_json(
+                            receipt_artifact.payload
+                        )
                     )
+                    if (
+                        not automated
+                        and receipt.source_surface != "codex_imagegen_tool"
+                    ):
+                        raise _state_invalid(
+                            "Codex imagegen bootstrap receipt source is invalid."
+                        )
                     for reference in receipt.references:
                         if not isinstance(
                             reference, VideoFrameImageImportReferenceBinding

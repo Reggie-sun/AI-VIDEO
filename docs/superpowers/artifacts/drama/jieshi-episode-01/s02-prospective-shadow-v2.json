@@ -1,0 +1,552 @@
+{
+  "authority": "development_shadow_only",
+  "manifest_revision": 35,
+  "selected_qa_unchanged": "520add1dc0aeea830f41fd15cc2d08c93fcf0687686524374b490a9f68afed8d",
+  "prospective_qa": "b4664eb1adcbeb185329ea75783e8f6dac97a055d72ce0c28ae1909ee6c69b7e",
+  "results": [
+    {
+      "authority": "development_shadow_only",
+      "production_permission": false,
+      "artifact_sha256": "382e74c78b5699ea2c1d3b4c942cca9abfc4fd2de3b1a872a06092535b7312bc",
+      "size_bytes": 3152278,
+      "request_hash": "603ad40e070c139b6d5cda4a2c036c1456ddce734ee3c4c1dfe8e248e1cb8237",
+      "historical_gate_sha256": "e0ed74c0c224a30faffb0c2d0c4d0c478276dc8f26f7c686e039dfc7e747daf7",
+      "historical_gate": {
+        "attempt_id": "jieshi-e01-s02-vidu-i2v-attempt02",
+        "status": "FAIL",
+        "qa_content_hash": "520add1dc0aeea830f41fd15cc2d08c93fcf0687686524374b490a9f68afed8d",
+        "acceptance_content_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+        "findings": [
+          {
+            "requirement_id": "s02-chenli-boundary",
+            "status": "FAIL",
+            "observation": "FAIL: 3.25–4.0s inspected exact frames show newly entering foreground neighbor head, ear and partial cheek/side face, not shoulder only. This is not a pre-existing glass reflection."
+          },
+          {
+            "requirement_id": "s02-identity-scene",
+            "status": "NOT_EVALUATED",
+            "observation": "Sampled frames retain clothing, lanyard, badge and one held phone. Whole-shot identity and mirror continuity are not proved by samples; no human PASS inherited."
+          },
+          {
+            "requirement_id": "s02-natural-action",
+            "status": "NOT_EVALUATED",
+            "observation": "Sampled progression shows hand withdrawal and a turn toward foreground neighbor; samples and 4-frame uniqueness metric do not prove normal-speed whole-shot naturalness."
+          },
+          {
+            "requirement_id": "s02-no-generated-text",
+            "status": "NOT_EVALUATED",
+            "observation": "No text overlay seen in 17 inspected samples; unsampled instants not certified."
+          },
+          {
+            "requirement_id": "s02-open-continuity",
+            "status": "NOT_EVALUATED",
+            "observation": "Opening sample visibly retains window-hover hand, clothing and phone; required exact S02 human continuity review has not been supplied."
+          },
+          {
+            "requirement_id": "s02-p4-ambience",
+            "status": "NOT_EVALUATED",
+            "observation": "P4 continuous ambience and cut mixing not produced or accepted."
+          },
+          {
+            "requirement_id": "s02-p4-dialogue",
+            "status": "NOT_EVALUATED",
+            "observation": "Raw generation intentionally has no audio stream. P4 dialogue has not been produced or accepted."
+          },
+          {
+            "requirement_id": "s02-turn-endpoint",
+            "status": "NOT_EVALUATED",
+            "observation": "End samples show a turn and address toward the foreground neighbor, but required S02 human proof remains missing; neighbor composition violates its independent hard rule."
+          }
+        ]
+      },
+      "historical_binding_sha256": "41f4dcfe34d015cd6698b626035d168d10751b450d2bcab0d719cf1b21dca60c",
+      "retained_experience_count": 2,
+      "proposed_qa_hash": "b4664eb1adcbeb185329ea75783e8f6dac97a055d72ce0c28ae1909ee6c69b7e",
+      "proposed_rubric_hash": "97873adb856f0ce75aa5452b44b2d428321271318aa64e3f506a57d8552d6408",
+      "diagnosis": {
+        "failure_classes": [
+          "EVIDENCE_GAP"
+        ],
+        "failed_requirements": [],
+        "preserved_requirements": [],
+        "evidence_hashes": [
+          "37aca19bbd6cb8058232c461e33a80fce0501731de3f994d6a1714ecd5905203"
+        ],
+        "next_owner": "evidence_owner",
+        "all_required_observed_pass": false
+      },
+      "proposed_interventions": [],
+      "conflicts": [],
+      "holistic_status": "NOT_EVALUATED",
+      "next_action": "human 1.0x review of exact attempt02 first",
+      "atoms": [
+        {
+          "requirement_id": "s02-camera-preference",
+          "category": "directional_preference",
+          "stage": "raw_generation",
+          "status": "advisory",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-camera-preference"
+            }
+          ],
+          "reason": "Framing/performance deviation alone is not a quality failure."
+        },
+        {
+          "requirement_id": "s02-chenli-continuity",
+          "category": "quality_critical",
+          "stage": "raw_generation",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-chenli-boundary"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-chenli-framing-preference",
+          "category": "directional_preference",
+          "stage": "raw_generation",
+          "status": "advisory",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-chenli-boundary"
+            }
+          ],
+          "reason": "Framing/performance deviation alone is not a quality failure."
+        },
+        {
+          "requirement_id": "s02-identity-scene",
+          "category": "quality_critical",
+          "stage": "raw_generation",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-identity-scene"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-narrative-focus",
+          "category": "narrative_critical",
+          "stage": "raw_generation",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-chenli-boundary"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-natural-action",
+          "category": "quality_critical",
+          "stage": "raw_generation",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-natural-action"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-no-generated-text",
+          "category": "quality_critical",
+          "stage": "raw_generation",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-no-generated-text"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-open-continuity",
+          "category": "narrative_critical",
+          "stage": "raw_generation",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-open-continuity"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-p4-ambience",
+          "category": "quality_critical",
+          "stage": "final_composition",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-p4-ambience"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-p4-dialogue",
+          "category": "narrative_critical",
+          "stage": "final_composition",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-p4-dialogue"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-question-progression",
+          "category": "narrative_critical",
+          "stage": "raw_generation",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-chenli-boundary"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-quiet-question-preference",
+          "category": "directional_preference",
+          "stage": "raw_generation",
+          "status": "advisory",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-quiet-question-preference"
+            }
+          ],
+          "reason": "Framing/performance deviation alone is not a quality failure."
+        },
+        {
+          "requirement_id": "s02-turn-endpoint",
+          "category": "narrative_critical",
+          "stage": "raw_generation",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-turn-endpoint"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-visible-artifacts",
+          "category": "quality_critical",
+          "stage": "raw_generation",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-chenli-boundary"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        }
+      ],
+      "sampled_review_limitations": [
+        "抽帧中林砚仍清楚可见，出现撤手与转向邻座的动作；这不是连续1.0x观看证明。",
+        "邻座可见衣着偏深色，耳部细节模糊，尚不能确认灰色连帽卫衣/耳机/人物身份正确；保持真实continuity和identity要求未验收。",
+        "样本没有确证重复手机或严重身体错误，但不能据此认证完整动态无缺陷。",
+        "S03尚无实际素材；只能核对其authoring接点，不能宣称S02→S03成片剪接已通过。",
+        "raw MP4无音轨；P4对白和环境声仍由原final_composition要求验收。"
+      ]
+    },
+    {
+      "authority": "development_shadow_only",
+      "production_permission": false,
+      "artifact_sha256": "2c82bfe8197d96241dd535154faaab30dfa4d2aa54dba66e76c7b1a32020c92a",
+      "size_bytes": 3049552,
+      "request_hash": "7c59efdf36aee67e82e4182f3b07db41ad43503e36b31f89c55f7443f06e48ab",
+      "historical_gate_sha256": "e9840109fdb15f270304d54ac27f942b34a3d42ecac275c97b1bc010dca7a63a",
+      "historical_gate": {
+        "attempt_id": "jieshi-e01-s02-vidu-i2v-attempt03",
+        "status": "FAIL",
+        "qa_content_hash": "520add1dc0aeea830f41fd15cc2d08c93fcf0687686524374b490a9f68afed8d",
+        "acceptance_content_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+        "findings": [
+          {
+            "requirement_id": "s02-chenli-boundary",
+            "status": "FAIL",
+            "observation": "FAIL: 2.25–4.0s inspected exact frames visibly show newly entering foreground neighbor head, ear, and side cheek/face, not shoulder only. The final 4.0s sample retains it. This is distinct from pre-existing glass reflections. Framing repair did not close this hard defect."
+          },
+          {
+            "requirement_id": "s02-identity-scene",
+            "status": "NOT_EVALUATED",
+            "observation": "Sampled frames retain clothing, lanyard, badge and one held phone. Whole-shot identity and mirror continuity are not proved by samples; no human PASS inherited."
+          },
+          {
+            "requirement_id": "s02-natural-action",
+            "status": "NOT_EVALUATED",
+            "observation": "Samples show a hand lowering from about 1.25s and resting near the single phone by 2s, with a turn toward the foreground neighbor. This does not establish normal-speed whole-shot naturalness; no human PASS inherited."
+          },
+          {
+            "requirement_id": "s02-no-generated-text",
+            "status": "NOT_EVALUATED",
+            "observation": "No text overlay seen in 17 inspected samples; unsampled instants not certified."
+          },
+          {
+            "requirement_id": "s02-open-continuity",
+            "status": "NOT_EVALUATED",
+            "observation": "Opening sample visibly retains window-hover hand, clothing and phone; required exact S02 human continuity review has not been supplied."
+          },
+          {
+            "requirement_id": "s02-p4-ambience",
+            "status": "NOT_EVALUATED",
+            "observation": "P4 continuous ambience and cut mixing not produced or accepted."
+          },
+          {
+            "requirement_id": "s02-p4-dialogue",
+            "status": "NOT_EVALUATED",
+            "observation": "Raw generation intentionally has no audio stream. P4 dialogue has not been produced or accepted."
+          },
+          {
+            "requirement_id": "s02-turn-endpoint",
+            "status": "NOT_EVALUATED",
+            "observation": "End samples show LinYan addressing the foreground neighbor. Human whole-shot continuity proof remains absent; the independently observed shoulder-only composition defect persists."
+          }
+        ]
+      },
+      "historical_binding_sha256": "d8ea3d6fad1f187d04aa9ba3f45ea77fd40b5ca89be2292574c7b1dc2a05b0ff",
+      "retained_experience_count": 0,
+      "proposed_qa_hash": "b4664eb1adcbeb185329ea75783e8f6dac97a055d72ce0c28ae1909ee6c69b7e",
+      "proposed_rubric_hash": "97873adb856f0ce75aa5452b44b2d428321271318aa64e3f506a57d8552d6408",
+      "diagnosis": {
+        "failure_classes": [
+          "EVIDENCE_GAP"
+        ],
+        "failed_requirements": [],
+        "preserved_requirements": [],
+        "evidence_hashes": [
+          "3f89b4cd132255b7235d3c5beb4f6a66f5bb248b105f66045cacaf95094e89b2"
+        ],
+        "next_owner": "evidence_owner",
+        "all_required_observed_pass": false
+      },
+      "proposed_interventions": [],
+      "conflicts": [],
+      "holistic_status": "NOT_EVALUATED",
+      "next_action": "human 1.0x review of exact attempt02 first",
+      "atoms": [
+        {
+          "requirement_id": "s02-camera-preference",
+          "category": "directional_preference",
+          "stage": "raw_generation",
+          "status": "advisory",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-camera-preference"
+            }
+          ],
+          "reason": "Framing/performance deviation alone is not a quality failure."
+        },
+        {
+          "requirement_id": "s02-chenli-continuity",
+          "category": "quality_critical",
+          "stage": "raw_generation",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-chenli-boundary"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-chenli-framing-preference",
+          "category": "directional_preference",
+          "stage": "raw_generation",
+          "status": "advisory",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-chenli-boundary"
+            }
+          ],
+          "reason": "Framing/performance deviation alone is not a quality failure."
+        },
+        {
+          "requirement_id": "s02-identity-scene",
+          "category": "quality_critical",
+          "stage": "raw_generation",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-identity-scene"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-narrative-focus",
+          "category": "narrative_critical",
+          "stage": "raw_generation",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-chenli-boundary"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-natural-action",
+          "category": "quality_critical",
+          "stage": "raw_generation",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-natural-action"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-no-generated-text",
+          "category": "quality_critical",
+          "stage": "raw_generation",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-no-generated-text"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-open-continuity",
+          "category": "narrative_critical",
+          "stage": "raw_generation",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-open-continuity"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-p4-ambience",
+          "category": "quality_critical",
+          "stage": "final_composition",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-p4-ambience"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-p4-dialogue",
+          "category": "narrative_critical",
+          "stage": "final_composition",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-p4-dialogue"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-question-progression",
+          "category": "narrative_critical",
+          "stage": "raw_generation",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-chenli-boundary"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-quiet-question-preference",
+          "category": "directional_preference",
+          "stage": "raw_generation",
+          "status": "advisory",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-quiet-question-preference"
+            }
+          ],
+          "reason": "Framing/performance deviation alone is not a quality failure."
+        },
+        {
+          "requirement_id": "s02-turn-endpoint",
+          "category": "narrative_critical",
+          "stage": "raw_generation",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-turn-endpoint"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        },
+        {
+          "requirement_id": "s02-visible-artifacts",
+          "category": "quality_critical",
+          "stage": "raw_generation",
+          "status": "NOT_EVALUATED",
+          "historical_lineage": [
+            {
+              "source_hash": "9d8bb176eb91d6a68cfabd6d6deefacfe2f3806441b9cc51afc79f4bb3c2c918",
+              "locator": "s02-chenli-boundary"
+            }
+          ],
+          "reason": "No fresh proof for the new criterion; historical sampled observations are references, not PASS/FAIL transfer."
+        }
+      ],
+      "sampled_review_limitations": [
+        "抽帧中林砚仍清楚可见，出现撤手与转向邻座的动作；这不是连续1.0x观看证明。",
+        "邻座可见衣着偏深色，耳部细节模糊，尚不能确认灰色连帽卫衣/耳机/人物身份正确；保持真实continuity和identity要求未验收。",
+        "样本没有确证重复手机或严重身体错误，但不能据此认证完整动态无缺陷。",
+        "S03尚无实际素材；只能核对其authoring接点，不能宣称S02→S03成片剪接已通过。",
+        "raw MP4无音轨；P4对白和环境声仍由原final_composition要求验收。"
+      ]
+    }
+  ],
+  "history_preservation": {
+    "files": 183,
+    "scope": [
+      "production-s02-v2",
+      "preparation-s02-video-v1",
+      "preparation-s02-video-v2",
+      "preparation-s02-video-v3"
+    ],
+    "verified": true
+  }
+}

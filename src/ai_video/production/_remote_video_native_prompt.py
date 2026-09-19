@@ -20,6 +20,7 @@ from ai_video.production._video_intent_validation import (
 )
 from ai_video.production.models import StrictModel
 from ai_video.production.video_requirement import (
+    AudioNeed,
     ContinuityStateKind,
     ProviderNeutralVideoRequirement,
 )
@@ -88,6 +89,7 @@ def _optional(label: str, value: str | None) -> str | None:
 
 def compile_remote_video_prompt(
     requirement: ProviderNeutralVideoRequirement,
+    *, voice_route=None,
 ) -> RemoteVideoPromptResult:
     """Compile the current complete intent into remote-provider prose.
 
@@ -98,7 +100,7 @@ def compile_remote_video_prompt(
     intent = requirement.generation_intent
     diagnostics = list(
         validate_generation_intent_for_continuity(
-            intent, audio_need=requirement.audio_need
+            intent, audio_need=requirement.audio_need if requirement.voice_routing is None else AudioNeed.OPTIONAL
         )
     )
     if requirement.contract_version != "provider-neutral-video-requirement/4":
@@ -240,7 +242,13 @@ def compile_remote_video_prompt(
         for cue in ambience.foley_cues:
             sentences.append(f"Foley cue: {cue}.")
 
-    if dialogue.mode == "dialogue":
+    separate_voice = voice_route is not None and voice_route.route.value == "separate"
+    if separate_voice:
+        sentences.append("Dialogue is supplied separately. Do not synthesize speech or a speaker voice.")
+        if dialogue.response_obligation:
+            sentences.append(f"Dialogue response: {dialogue.response_obligation}.")
+        controls.extend(f"generation_intent.dialogue_intent.{name}" for name in type(dialogue).model_fields)
+    elif dialogue.mode == "dialogue":
         assert dialogue.language is not None
         language = _DIALOGUE_LANGUAGE_NAMES.get(dialogue.language.split("-", 1)[0])
         if language is None:

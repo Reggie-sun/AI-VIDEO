@@ -250,7 +250,7 @@ class VoicePricingSnapshot(_VoiceStrictModel):
     effective_date: date
     currency: str = Field(pattern=r"^[A-Z]{3}$")
     pricing_unit: Literal["character"]
-    unit_price_microunits: int = Field(strict=True, ge=0)
+    unit_price_microunits: int | None = Field(strict=True, ge=0)
     minimum_billable_units: int = Field(strict=True, ge=0)
 
 
@@ -260,10 +260,10 @@ class VoiceGenerationPreview(_VoiceStrictModel):
     pricing_effective_date: date
     currency: str = Field(pattern=r"^[A-Z]{3}$")
     pricing_unit: Literal["character"]
-    unit_price_microunits: int = Field(strict=True, ge=0)
+    unit_price_microunits: int | None = Field(strict=True, ge=0)
     minimum_billable_units: int = Field(strict=True, ge=0)
     billable_units_upper_bound: int = Field(strict=True, gt=0)
-    estimated_cost_upper_bound_microunits: int = Field(strict=True, ge=0)
+    estimated_cost_upper_bound_microunits: int | None = Field(strict=True, ge=0)
     destination: str = Field(min_length=1)
     method: Literal["POST"]
     payload_categories: tuple[
@@ -280,7 +280,7 @@ class VoiceGenerationPreview(_VoiceStrictModel):
     credential_reference_kind: Literal["environment", "secret_store"]
     paid_call_required: bool = Field(strict=True)
     remote: Literal[True]
-    policy_decision: Literal["explicit_opt_in_required"]
+    policy_decision: Literal["explicit_opt_in_required", "standing_minimax_speech_batch"]
     timing_supported: bool = Field(strict=True)
     output_supported: bool = Field(strict=True)
     preview_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -299,9 +299,14 @@ class VoiceGenerationPreview(_VoiceStrictModel):
         ):
             raise ValueError("voice preview billable units are not conservative")
         if self.estimated_cost_upper_bound_microunits != (
-            self.billable_units_upper_bound * self.unit_price_microunits
+            None if self.unit_price_microunits is None
+            else self.billable_units_upper_bound * self.unit_price_microunits
         ):
             raise ValueError("voice preview estimated cost is inconsistent")
+        if (self.unit_price_microunits is None) != (
+            self.policy_decision == "standing_minimax_speech_batch"
+        ):
+            raise ValueError("unknown voice pricing requires the MiniMax batch contract")
         data = self.model_dump(mode="json", exclude={"preview_fingerprint"})
         if canonical_sha256(data) != self.preview_fingerprint:
             raise ValueError("preview_fingerprint does not match preview")
@@ -324,7 +329,7 @@ class VoiceCallAuthorization(_VoiceStrictModel):
         ],
         ...,
     ] = Field(min_length=1)
-    cost_ceiling_microunits: int = Field(strict=True, ge=0)
+    cost_ceiling_microunits: int | None = Field(strict=True, ge=0)
     provider_enabled: Literal[True]
     authorization_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
 
@@ -355,7 +360,7 @@ class VoiceCostReceipt(_VoiceStrictModel):
     currency: str = Field(pattern=r"^[A-Z]{3}$")
     pricing_unit: Literal["character"]
     measured_billable_units: int = Field(strict=True, gt=0)
-    estimated_cost_upper_bound_microunits: int = Field(strict=True, ge=0)
+    estimated_cost_upper_bound_microunits: int | None = Field(strict=True, ge=0)
     provider_reported_cost_microunits: int | None = Field(
         default=None, strict=True, ge=0
     )
@@ -552,6 +557,7 @@ class VoiceProviderResult(_VoiceStrictModel):
             != preview.estimated_cost_upper_bound_microunits
             or (
                 cost_receipt.provider_reported_cost_microunits is not None
+                and authorization.cost_ceiling_microunits is not None
                 and cost_receipt.provider_reported_cost_microunits
                 > authorization.cost_ceiling_microunits
             )
@@ -616,6 +622,13 @@ def build_voice_generation_preview(
             ErrorCode.VOICE_BUDGET_REJECTED,
             "Voice pricing snapshot does not match the immutable request.",
         )
+    if pricing.unit_price_microunits is None and (
+        request.provider_kind != "minimax-speech"
+        or request.model_id not in {"speech-2.8-hd", "speech-2.8-turbo"}
+        or destination not in {"https://api.minimax.io", "https://api.minimaxi.com"}
+    ):
+        raise _voice_error(ErrorCode.VOICE_BUDGET_REJECTED,
+                           "Unknown voice pricing is limited to MiniMax Speech batches.")
     script_characters = len(request.script_text)
     billable_units = max(script_characters, pricing.minimum_billable_units)
     data: dict[str, object] = {
@@ -628,7 +641,8 @@ def build_voice_generation_preview(
         "minimum_billable_units": pricing.minimum_billable_units,
         "billable_units_upper_bound": billable_units,
         "estimated_cost_upper_bound_microunits": (
-            billable_units * pricing.unit_price_microunits
+            None if pricing.unit_price_microunits is None
+            else billable_units * pricing.unit_price_microunits
         ),
         "destination": destination,
         "method": "POST",
@@ -638,7 +652,9 @@ def build_voice_generation_preview(
         "credential_reference_kind": credential_reference_kind,
         "paid_call_required": True,
         "remote": True,
-        "policy_decision": "explicit_opt_in_required",
+        "policy_decision": ("standing_minimax_speech_batch"
+                            if pricing.unit_price_microunits is None
+                            else "explicit_opt_in_required"),
         "timing_supported": timing_supported,
         "output_supported": output_supported,
     }
@@ -693,8 +709,7 @@ def validate_voice_call_authorization(
         or authorization.pricing_snapshot_id != request.pricing_snapshot_id
         or authorization.budget_reservation_receipt_id
         != request.budget_reservation_receipt_id
-        or authorization.cost_ceiling_microunits
-        < preview.estimated_cost_upper_bound_microunits
+        or not voice_cost_authorization_matches(preview, authorization)
     ):
         raise _voice_error(
             ErrorCode.VOICE_BUDGET_REJECTED,
@@ -715,6 +730,18 @@ def validate_voice_call_authorization(
             ErrorCode.VOICE_REQUEST_INVALID,
             "Voice provider does not support the requested output and timing contract.",
         )
+
+
+def voice_cost_authorization_matches(
+    preview: VoiceGenerationPreview, authorization: VoiceCallAuthorization,
+) -> bool:
+    if preview.policy_decision == "standing_minimax_speech_batch":
+        return (preview.estimated_cost_upper_bound_microunits is None
+                and authorization.cost_ceiling_microunits is None)
+    return (authorization.cost_ceiling_microunits is not None
+            and preview.estimated_cost_upper_bound_microunits is not None
+            and authorization.cost_ceiling_microunits
+            >= preview.estimated_cost_upper_bound_microunits)
 
 
 class AudioProbeToolchain(StrictModel):

@@ -498,9 +498,11 @@ def _verify_active_voice_evidence(bundle: LoadedProductionProject) -> None:
                 language=request.language,
                 pricing_snapshot_id=request.pricing_snapshot_id,
                 budget_reservation_receipt_id=request.budget_reservation_receipt_id,
-                egress_authorization_receipt_id=request.egress_authorization_receipt_id,
-                destination=authorization.destination,
-            )
+                    egress_authorization_receipt_id=request.egress_authorization_receipt_id,
+                    destination=authorization.destination,
+                    routing_task_id=attempt.voice_request.routing_task_id,
+                    routing_binding_hash=attempt.voice_request.routing_binding_hash,
+                )
             expected_intent = {
                 "attempt_id": request.attempt_id,
                 "request_fingerprint": request.voice_request_fingerprint,

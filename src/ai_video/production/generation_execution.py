@@ -163,7 +163,8 @@ class GenerationDecisionExecutionBinding(StrictModel):
         if request != self.compiled_request:
             raise ValueError("generation execution request is stale or altered")
 
-    def validate_current_project(self, project) -> None:
+    def validate_current_project(self, project, *, preparing_voice: bool = False,
+                                 voice_attempt_id: str | None = None) -> None:
         """Bind a self-consistent decision to the currently loaded source bytes."""
 
         if self.inputs.policy.version != "3":
@@ -204,6 +205,13 @@ class GenerationDecisionExecutionBinding(StrictModel):
         if len(shots) != 1:
             raise ValueError("generation execution target Shot is not current and unique")
         shot = shots[0]
+        if shot != self.projection.requirement.target_shot:
+            raise ValueError("generation execution must retain the exact canonical Shot")
+        if self.projection.requirement.voice_routing is not None:
+            from ai_video.production.voice_routing import validate_voice_execution
+
+            validate_voice_execution(self, project, preparing_voice=preparing_voice,
+                                     voice_attempt_id=voice_attempt_id)
         roles = tuple(
             role
             for role in shot.required_asset_roles

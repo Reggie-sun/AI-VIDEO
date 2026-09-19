@@ -336,9 +336,14 @@ class _StateCommitVoiceActivationMixin:
         *,
         dependency_transition_preparer: VoiceDependencyTransitionPreparer | None = None,
         paid_preview: PaidProviderCallPreview | None = None,
+        routing_execution_envelope=None,
     ) -> ProductionManifest:
         """Only public path allowed to invoke one voice provider transport call."""
 
+        if routing_execution_envelope is not None and paid_preview is None:
+            raise _state_invalid(
+                "Routed voice execution requires the existing Paid Provider preview."
+            )
         preflight_manifest = self._read_manifest()
         if (
             manifest_supports(preflight_manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH)
@@ -380,6 +385,7 @@ class _StateCommitVoiceActivationMixin:
             dependency_transition_preparer_available=(
                 dependency_transition_preparer is not None
             ),
+            routing_execution_envelope=routing_execution_envelope,
         )
         legacy_permit = self.record_voice_submit_intent(request, preview, authorization)
         permit: object = legacy_permit
@@ -508,16 +514,16 @@ class _StateCommitVoiceActivationMixin:
                     recorded_at=self._paid_provider_clock(),
                 )
             )
-            actual_cost = (
-                result.cost_receipt.provider_reported_cost_microunits
-                if result.cost_receipt.provider_reported_cost_microunits is not None
-                else result.cost_receipt.measured_billable_units
-                * preview.unit_price_microunits
-            )
-            self.settle_paid_provider_reservation(
-                attempt_id=request.attempt_id,
-                actual_cost_microunits=actual_cost,
-            )
+            actual_cost = result.cost_receipt.provider_reported_cost_microunits
+            # Historical non-MiniMax voice accounting remains outside this slice.
+            if actual_cost is None and request.provider_kind != "minimax-speech":
+                actual_cost = (result.cost_receipt.measured_billable_units
+                               * preview.unit_price_microunits)
+            if actual_cost is not None:
+                self.settle_paid_provider_reservation(
+                    attempt_id=request.attempt_id,
+                    actual_cost_microunits=actual_cost,
+                )
         self._crash_injector.checkpoint(CommitPhase.AFTER_VOICE_PROVIDER_RESULT)
         try:
             self._validate_voice_provider_result(request, preview, authorization, result)
