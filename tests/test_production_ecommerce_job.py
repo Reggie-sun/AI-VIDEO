@@ -110,13 +110,14 @@ def _projection(
     *,
     plan_id: str = "product-one-plan",
     plan_hash: str = PLAN_HASH,
+    shot_id: str = "shot-hero",
 ) -> CommercialExecutionProjection:
     values = {
         "schema_version": "commercial-execution-projection/1",
         "ad_creative_plan_id": plan_id,
         "ad_creative_plan_revision": 1,
         "ad_creative_plan_hash": plan_hash,
-        "target_shot_id": "shot-hero",
+        "target_shot_id": shot_id,
         "primary_class": CommercialShotClass.CHARACTER_PERFORMANCE,
         "product_id": None,
         "product_reference_requirement_id": None,
@@ -142,15 +143,22 @@ def _compiled_handoff(
     *,
     plan_id: str = "product-one-plan",
     plan_hash: str = PLAN_HASH,
+    shot_ids: tuple[str, ...] = ("shot-hero",),
 ) -> CompiledAdCreativeHandoff:
-    projection = _projection(plan_id=plan_id, plan_hash=plan_hash)
+    projections = tuple(
+        _projection(plan_id=plan_id, plan_hash=plan_hash, shot_id=shot_id)
+        for shot_id in shot_ids
+    )
     return CompiledAdCreativeHandoff(
         plan_id=plan_id,
         plan_content_hash=plan_hash,
-        shot_proposals=(AdShotProposal(shot_id="shot-hero", beat_ids=("beat-hero",)),),
+        shot_proposals=tuple(
+            AdShotProposal(shot_id=shot_id, beat_ids=("beat-hero",))
+            for shot_id in shot_ids
+        ),
         composition_requirements=AdCompositionRequirements(),
-        composition_spec=make_composition_spec(shot_ids=("shot-hero",)),
-        commercial_execution_projections=(projection,),
+        composition_spec=make_composition_spec(shot_ids=shot_ids),
+        commercial_execution_projections=projections,
     )
 
 
@@ -158,6 +166,7 @@ def _compiled_handoff(
 class _FakeVideoService:
     verdict: QaVerdict
     project_root: Path
+    shot_id: str = "shot-hero"
     raise_review_error: bool = False
     repair_verdict: QaVerdict | None = None
 
@@ -236,8 +245,8 @@ class _FakeVideoService:
         self.checkpoint = ActivatedCommercialShotCheckpoint.create(
             ad_creative_plan_hash=self.bound_identity[1],
             commercial_execution_projection_hash=self.bound_identity[2],
-            shot_id="shot-hero",
-            resolved_generation_hash=RESOLVED_HASH,
+            shot_id=self.shot_id,
+            resolved_generation_hash=self.bound_identity[0],
             artifact_sha256="f" * 64,
             commercial_evidence_content_hash="1" * 64,
             verdict=QaVerdict.PASS,
@@ -1123,3 +1132,383 @@ def test_delivery_publish_completes_and_exact_replay_has_no_effect(
     assert first.next_action is EcommerceJobNextAction.COMPLETE
     assert replay.next_action is EcommerceJobNextAction.COMPLETE
     assert delivery.package_calls == 1
+
+
+def _two_shot_runtime_handoff() -> EcommerceProductionHandoff:
+    base = _runtime_handoff_without_external_assets()
+    first_shot = base.artifact_proposals.shots[0]
+    second_shot = seal_artifact(
+        first_shot.model_copy(
+            update={
+                "artifact_id": "shot-artifact-proof",
+                "content_hash": "0" * 64,
+                "creation_receipt_id": "ecommerce-authoring-shot-proof",
+                "shot_id": "shot-proof",
+                "intent": "Show a second deterministic product proof angle.",
+            }
+        )
+    )
+    storyboard = base.artifact_proposals.storyboard
+    second_storyboard = seal_artifact(
+        storyboard.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "creation_receipt_id": "ecommerce-authoring-storyboard-two-shot",
+                "beats": (
+                    storyboard.beats[0].model_copy(
+                        update={"shot_ids": (first_shot.shot_id, second_shot.shot_id)}
+                    ),
+                ),
+            }
+        )
+    )
+    base_layout = base.layout_plan
+    layout_values = {
+        name: getattr(base_layout, name)
+        for name in type(base_layout).model_fields
+        if name != "layout_plan_id"
+    }
+    second_layout_shot = base_layout.shots[0].model_copy(
+        update={"shot_id": second_shot.shot_id}
+    )
+    layout = type(base_layout).create(
+        **{**layout_values, "shots": (*base_layout.shots, second_layout_shot)}
+    )
+    evidence_ids = (
+        base.delivery_profile.profile_id,
+        base.visual_system_profile.profile_id,
+        layout.layout_plan_id,
+    )
+    base_profile = base.compile_profile
+    profile_values = {
+        name: getattr(base_profile, name)
+        for name in type(base_profile).model_fields
+        if name != "profile_id"
+    }
+    compile_profile = type(base_profile).create(
+        **{
+            **profile_values,
+            "layout_plan_id": layout.layout_plan_id,
+            "requirement_resolutions": tuple(
+                item.model_copy(update={"evidence_ids": evidence_ids})
+                for item in base_profile.requirement_resolutions
+            ),
+        }
+    )
+    acceptance = base.acceptance_requirements[0].model_copy(
+        update={
+            "requirement_id": "accept-shot-proof",
+            "subject_id": second_shot.shot_id,
+            "description": "Second product proof Shot preserves product identity.",
+        }
+    )
+    values = {
+        name: getattr(base, name)
+        for name in EcommerceProductionHandoff.model_fields
+        if name != "handoff_id"
+    }
+    return EcommerceProductionHandoff.create(
+        **{
+            **values,
+            "layout_plan": layout,
+            "compile_profile": compile_profile,
+            "artifact_proposals": base.artifact_proposals.model_copy(
+                update={
+                    "storyboard": second_storyboard,
+                    "shots": (first_shot, second_shot),
+                }
+            ),
+            "acceptance_requirements": (
+                base.acceptance_requirements[0],
+                acceptance,
+                *base.acceptance_requirements[1:],
+            ),
+        }
+    )
+
+
+def _two_shot_execution(
+    handoff: EcommerceProductionHandoff,
+    *,
+    project_root: Path,
+) -> EcommerceShotExecutionPlan:
+    plan = create_ad_creative_plan(
+        handoff.ad_creative_plan_proposal,
+        artifact_id="product-one-two-shot-plan",
+        revision=1,
+        creation_receipt_id="ecommerce-two-shot-plan-test",
+        source_provenance=(
+            SourceReference(
+                kind="derived",
+                reference=f"ecommerce-handoff:{handoff.handoff_id}",
+                content_hash=handoff.handoff_id,
+            ),
+            SourceReference(
+                kind="derived",
+                reference=(
+                    "ecommerce-compile-profile:"
+                    f"{handoff.compile_profile.profile_id}"
+                ),
+                content_hash=handoff.compile_profile.profile_id,
+            ),
+        ),
+    )
+    shot_ids = tuple(item.shot_id for item in handoff.artifact_proposals.shots)
+    compiled = _compiled_handoff(
+        plan_id=plan.artifact_id,
+        plan_hash=plan.content_hash,
+        shot_ids=shot_ids,
+    )
+    projections = {
+        item.target_shot_id: item
+        for item in compiled.commercial_execution_projections
+    }
+    return EcommerceShotExecutionPlan(
+        handoff=compiled,
+        plan=plan,
+        shots=tuple(
+            EcommerceShotExecutionInput(
+                shot_id=shot_id,
+                attempt_id=f"attempt-{shot_id}-1",
+                service=_FakeVideoService(
+                    QaVerdict.PASS,
+                    project_root,
+                    shot_id=shot_id,
+                ),
+                request=SimpleNamespace(
+                    resolved_generation_hash=(
+                        "1" if shot_id == "shot-hero" else "2"
+                    )
+                    * 64,
+                    commercial_binding=SimpleNamespace(
+                        ad_creative_plan_hash=plan.content_hash,
+                        commercial_execution_projection_hash=(
+                            projections[shot_id].projection_hash
+                        ),
+                        target_shot_id=shot_id,
+                    ),
+                    provider_kind="local-test",
+                    model_id="local-model",
+                ),
+                lane="local",
+                commercial_reviewer=object(),
+            )
+            for shot_id in shot_ids
+        ),
+    )
+
+
+class _OfflineScenarioJob(EcommerceProductionJobService):
+    def __init__(self) -> None:
+        self.state = "shots"
+
+    def inspect(
+        self,
+        request,
+        handoff,
+        *,
+        shot_execution=None,
+        composition_execution=None,
+        review_execution=None,
+        delivery_execution=None,
+    ):
+        if delivery_execution is not None and delivery_execution.published:
+            action = EcommerceJobNextAction.COMPLETE
+        elif self.state == "package":
+            action = EcommerceJobNextAction.PACKAGE_DELIVERY
+        elif self.state == EcommerceFinalReviewFrontier.PREPARE_COMPOSITION.value:
+            action = EcommerceJobNextAction.PREPARE_COMPOSITION
+        elif self.state == "review":
+            action = EcommerceJobNextAction.REVIEW_FINAL
+        elif composition_execution is not None:
+            action = (
+                EcommerceJobNextAction.RENDER_FINAL
+                if composition_execution.state == "render"
+                else EcommerceJobNextAction.REVIEW_FINAL
+            )
+        elif shot_execution is not None:
+            pending = next(
+                (
+                    item.shot_id
+                    for item in shot_execution.shots
+                    if item.service.checkpoint is None
+                ),
+                None,
+            )
+            action = (
+                EcommerceJobNextAction.GENERATE_SHOT
+                if pending is not None
+                else EcommerceJobNextAction.PREPARE_COMPOSITION
+            )
+            return self._projection(
+                request,
+                next_action=action,
+                manifest_revision=1,
+                next_shot_id=pending,
+            )
+        else:
+            action = EcommerceJobNextAction.PREPARE_COMPOSITION
+        return self._projection(request, next_action=action, manifest_revision=1)
+
+
+def _bootstrapped_two_shot_job(tmp_path: Path):
+    handoff = _two_shot_runtime_handoff()
+    request = _request(tmp_path, handoff, attempts=2)
+    assert (
+        EcommerceProductionJobService().inspect(request, handoff).next_action
+        is EcommerceJobNextAction.BOOTSTRAP_PROJECT
+    )
+    compiled = compile_ecommerce_production_handoff(
+        handoff,
+        expected_project_id=request.expected_project_id,
+    )
+    bootstrap_ecommerce_production_project(
+        tmp_path,
+        attempt_id="ecommerce-two-shot-bootstrap",
+        compiled=compiled,
+    )
+    return handoff, request, _two_shot_execution(
+        handoff,
+        project_root=tmp_path.resolve(),
+    )
+
+
+def test_offline_two_shot_job_runs_bootstrap_through_delivery_and_exact_replay(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    handoff, request, shot_execution = _bootstrapped_two_shot_job(tmp_path)
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.bound_generation_attempt_ids",
+        lambda _root, _execution: (),
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.advance_ecommerce_job_assembly",
+        _fake_advance_composition,
+    )
+    job = _OfflineScenarioJob()
+
+    generated = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.GENERATE_SHOT,
+        shot_execution=shot_execution,
+    )
+    composition = _FakeCompositionExecution()
+    prepared = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.PREPARE_COMPOSITION,
+        shot_execution=shot_execution,
+        composition_execution=composition,
+    )
+    rendered = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.RENDER_FINAL,
+        shot_execution=shot_execution,
+        composition_execution=composition,
+    )
+    review = _FakeReviewExecution(QaVerdict.PASS, True, job)
+    reviewed = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.REVIEW_FINAL,
+        shot_execution=shot_execution,
+        composition_execution=composition,
+        review_execution=review,
+    )
+    delivery = _FakeDeliveryExecution()
+    delivered = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.PACKAGE_DELIVERY,
+        shot_execution=shot_execution,
+        composition_execution=composition,
+        review_execution=review,
+        delivery_execution=delivery,
+    )
+    manifest_bytes = (tmp_path / "state/manifest.json").read_bytes()
+    effect_snapshot = {
+        item.shot_id: tuple(item.service.effects)
+        for item in shot_execution.shots
+    }
+    replay = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.PACKAGE_DELIVERY,
+        shot_execution=shot_execution,
+        composition_execution=composition,
+        review_execution=review,
+        delivery_execution=delivery,
+    )
+
+    assert generated.next_action is EcommerceJobNextAction.PREPARE_COMPOSITION
+    assert prepared.next_action is EcommerceJobNextAction.RENDER_FINAL
+    assert rendered.next_action is EcommerceJobNextAction.REVIEW_FINAL
+    assert reviewed.next_action is EcommerceJobNextAction.PACKAGE_DELIVERY
+    assert delivered.next_action is EcommerceJobNextAction.COMPLETE
+    assert replay.next_action is EcommerceJobNextAction.COMPLETE
+    assert tuple(item.shot_id for item in shot_execution.shots) == (
+        "shot-hero",
+        "shot-proof",
+    )
+    assert all(effects[-1] == "activate" for effects in effect_snapshot.values())
+    assert {
+        item.shot_id: tuple(item.service.effects)
+        for item in shot_execution.shots
+    } == effect_snapshot
+    assert len(composition.rendered) == 1
+    assert review.calls == 1
+    assert delivery.package_calls == 1
+    assert (tmp_path / "state/manifest.json").read_bytes() == manifest_bytes
+
+
+def test_offline_two_shot_reopen_skips_first_activation_and_runs_second_only(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    handoff, request, shot_execution = _bootstrapped_two_shot_job(tmp_path)
+    by_shot = {item.shot_id: item for item in shot_execution.shots}
+    first_input = by_shot["shot-hero"]
+    first = first_input.service
+    first.actions = [EcommerceShotNextAction.DONE]
+    first.validated_verdict = QaVerdict.PASS
+    first_binding = first_input.request.commercial_binding
+    first.checkpoint = ActivatedCommercialShotCheckpoint.create(
+        ad_creative_plan_hash=first_binding.ad_creative_plan_hash,
+        commercial_execution_projection_hash=(
+            first_binding.commercial_execution_projection_hash
+        ),
+        shot_id=first_input.shot_id,
+        resolved_generation_hash="1" * 64,
+        artifact_sha256="3" * 64,
+        commercial_evidence_content_hash="5" * 64,
+        verdict=QaVerdict.PASS,
+        activated=True,
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.bound_generation_attempt_ids",
+        lambda _root, _execution: ("attempt-shot-hero-1",),
+    )
+    reopened = _OfflineScenarioJob()
+
+    before = reopened.inspect(request, handoff, shot_execution=shot_execution)
+    result = reopened.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.GENERATE_SHOT,
+        shot_execution=shot_execution,
+    )
+
+    assert before.next_shot_id == "shot-proof"
+    assert result.next_action is EcommerceJobNextAction.PREPARE_COMPOSITION
+    assert first.effects == []
+    assert by_shot["shot-proof"].service.effects == [
+        "start",
+        "submit",
+        "poll",
+        "fetch",
+        "validate",
+        "activate",
+    ]
