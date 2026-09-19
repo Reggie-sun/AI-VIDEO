@@ -9,6 +9,37 @@ evidence_index_version: "1"
 
 Date: 2026-09-19
 
+## Continuation — Canonical Reopen And Repair Binding
+
+Commit `66cfc73a4437ca46469db0599551af19bce32ea7` closes four blocking findings
+from the independent review of snapshot `ae7f10621c7b1d04cbd775e15b1f691ebaaa768a`:
+
+- repair execution now uses the exact declared input whose identity and request delta
+  were validated; a deferred factory cannot replace it with a different request,
+  Provider or service under the same Shot / attempt IDs;
+- evidence repair returns the canonical `REPAIR_SHOT_MEDIA`,
+  `REPAIR_SHOT_EVIDENCE` or `RECOVER_UNKNOWN_OUTCOME` frontier after a persisted
+  `REVIEW_EVIDENCE_INVALID` result, while unrelated request-identity errors still
+  fail closed as execution-input blockers;
+- resume reads exact activated checkpoints from the declared canonical services and
+  validates them before realizing deferred inputs, so an already completed Shot does
+  not repeat compilation, materialization or Provider-side effects;
+- `tests/test_production_ecommerce_job_canonical_e2e.py` now exercises a real
+  two-Shot `EcommerceProductionJobService` over `ProductionStateCommitter`,
+  `VideoGenerationService`, persisted Manifest / Project / Registry state and
+  deterministic local fixture Providers. It destroys and rebuilds Job, service,
+  committer and plan instances after Shot 1 activation, proves that only Shot 2 is
+  realized on resume, and proves completed replay leaves both Provider counters and
+  Manifest bytes unchanged.
+
+The earlier in-memory application scenarios remain useful orchestration unit tests,
+but no longer carry the canonical reopen proof. Fresh verification for this
+continuation is `60 passed` across the changed coordinator / Job / repair / canonical
+E2E modules, `78 passed` for the M4 plan suite, and `101 passed in 214.74s` for the
+M7 focused suite including the new canonical E2E. Final completion still requires a
+new exact-range Harness receipt and independent Native Codex plus Kimi review of the
+same later immutable snapshot.
+
 ## Continuation — Canonical Docs And Final-Review Fixes
 
 Commit `4ab55a01d44c8992bd82748dfde302f3400635dc` resolved the previously recorded
