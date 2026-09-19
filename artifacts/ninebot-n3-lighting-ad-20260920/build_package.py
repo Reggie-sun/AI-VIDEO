@@ -67,7 +67,7 @@ package = {
             "fact_ids": ["fact-brightness-65000cd"],
             "source_ids": ["source-alc-sticker", "source-user-attestation"],
             "used_at": ["beat-demo", "copy-proof-65000cd", "audio-vo-demo"],
-            "spoken_form": "65000cd 亮度",
+            "spoken_form": "亮度六万五千坎德拉",
             "visual_form": "65000cd 亮度",
         },
         {
@@ -103,7 +103,7 @@ package = {
             "fact_ids": ["fact-n3-70-price"],
             "source_ids": ["source-n3-70-pricetag"],
             "used_at": ["beat-proof", "copy-price-series", "audio-vo-proof"],
-            "spoken_form": "到手价 3499 起",
+            "spoken_form": "到手价三千四百九十九元起",
             "visual_form": "到手价 ¥3499 起",
         },
         {
@@ -511,7 +511,7 @@ package = {
         {
             "copy_id": "copy-sub-demo",
             "role": "DIALOGUE_SUBTITLE",
-            "text": "65000cd 亮度，远光升级，亮度提升百分之七十一",
+            "text": "亮度六万五千坎德拉，远光升级，亮度提升百分之七十一",
             "priority": 3,
             "beat_id": "beat-demo",
             "shot_id": "shot-demo",
@@ -575,7 +575,7 @@ package = {
         {
             "copy_id": "copy-sub-proof",
             "role": "DIALOGUE_SUBTITLE",
-            "text": "九号 N3 系列，到手价 3499 起",
+            "text": "九号 N3 系列，到手价三千四百九十九元起",
             "priority": 3,
             "beat_id": "beat-proof",
             "shot_id": "shot-proof",
@@ -682,7 +682,7 @@ package = {
                 "shot_ids": ["shot-demo"],
                 "source_requirement": "由 shot-demo 的 H3 原生音频生成，同一声线，转写逐字验证",
                 "speaker_id": None,
-                "verbatim_line": "65000cd 亮度，远光升级，亮度提升百分之七十一，一路照亮",
+                "verbatim_line": "亮度六万五千坎德拉，远光升级，亮度提升百分之七十一，一路照亮",
                 "on_camera": False,
                 "lip_sync_required": False,
                 "energy": "递进的证明感",
@@ -703,7 +703,7 @@ package = {
                 "shot_ids": ["shot-proof"],
                 "source_requirement": "由 shot-proof 的 H3 原生音频生成，同一声线，转写逐字验证",
                 "speaker_id": None,
-                "verbatim_line": "九号 N3 系列，到手价 3499 起",
+                "verbatim_line": "九号 N3 系列，到手价三千四百九十九元起",
                 "on_camera": False,
                 "lip_sync_required": False,
                 "energy": "干脆利落",

@@ -356,7 +356,7 @@
         "copy-proof-65000cd",
         "audio-vo-demo"
       ],
-      "spoken_form": "65000cd 亮度",
+      "spoken_form": "亮度六万五千坎德拉",
       "visual_form": "65000cd 亮度"
     },
     {
@@ -426,7 +426,7 @@
         "copy-price-series",
         "audio-vo-proof"
       ],
-      "spoken_form": "到手价 3499 起",
+      "spoken_form": "到手价三千四百九十九元起",
       "visual_form": "到手价 ¥3499 起"
     },
     {
@@ -966,7 +966,7 @@
     {
       "copy_id": "copy-sub-demo",
       "role": "DIALOGUE_SUBTITLE",
-      "text": "65000cd 亮度，远光升级，亮度提升百分之七十一",
+      "text": "亮度六万五千坎德拉，远光升级，亮度提升百分之七十一",
       "priority": 3,
       "beat_id": "beat-demo",
       "shot_id": "shot-demo",
@@ -1043,7 +1043,7 @@
     {
       "copy_id": "copy-sub-proof",
       "role": "DIALOGUE_SUBTITLE",
-      "text": "九号 N3 系列，到手价 3499 起",
+      "text": "九号 N3 系列，到手价三千四百九十九元起",
       "priority": 3,
       "beat_id": "beat-proof",
       "shot_id": "shot-proof",
@@ -1180,7 +1180,7 @@
         ],
         "source_requirement": "由 shot-demo 的 H3 原生音频生成，同一声线，转写逐字验证",
         "speaker_id": null,
-        "verbatim_line": "65000cd 亮度，远光升级，亮度提升百分之七十一，一路照亮",
+        "verbatim_line": "亮度六万五千坎德拉，远光升级，亮度提升百分之七十一，一路照亮",
         "on_camera": false,
         "lip_sync_required": false,
         "energy": "递进的证明感",
@@ -1205,7 +1205,7 @@
         ],
         "source_requirement": "由 shot-proof 的 H3 原生音频生成，同一声线，转写逐字验证",
         "speaker_id": null,
-        "verbatim_line": "九号 N3 系列，到手价 3499 起",
+        "verbatim_line": "九号 N3 系列，到手价三千四百九十九元起",
         "on_camera": false,
         "lip_sync_required": false,
         "energy": "干脆利落",
@@ -1678,5 +1678,5 @@
     ]
   },
   "unresolved_items": [],
-  "package_id": "6a29051056e3f385369f4194846b3f05bb8dcaf4ccb6d3f2dcec82cf4fe361b2"
+  "package_id": "281b2e6e273b40eb33f1e768b492400d0fd2d15a95e5dc9983bb70a1920ffd5b"
 }

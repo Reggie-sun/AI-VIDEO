@@ -1,7 +1,7 @@
 {
   "schema_version": "ecommerce-layout-plan/1",
-  "layout_plan_id": "b2cbff667840ab951c1376c5b7c32b9a26c1ff0ced6a7109fbd817f34b1d1500",
-  "source_package_id": "6a29051056e3f385369f4194846b3f05bb8dcaf4ccb6d3f2dcec82cf4fe361b2",
+  "layout_plan_id": "a6a90c3e848ec053ff8c2b3e58cce7703b50ef74fcf2064e84016aa537a6d551",
+  "source_package_id": "281b2e6e273b40eb33f1e768b492400d0fd2d15a95e5dc9983bb70a1920ffd5b",
   "delivery_profile_id": "0257b1de95681c9fae741c8ffeb4108027acd3526806616c4af2d29b75e299f8",
   "visual_system_profile_id": "3cfa394f5eb1198b7c63be5575ea5ee2b72362d305c9fa0f1a68f5a36160281f",
   "scenes": [
@@ -470,7 +470,7 @@
     {
       "graphic_id": "copy-sub-demo",
       "role": "dialogue_subtitle",
-      "text": "65000cd 亮度，远光升级，亮度提升百分之七十一",
+      "text": "亮度六万五千坎德拉，远光升级，亮度提升百分之七十一",
       "shot_id": "shot-demo",
       "start_frame_offset": 6,
       "duration_frames": 222,
@@ -615,7 +615,7 @@
     {
       "graphic_id": "copy-sub-proof",
       "role": "dialogue_subtitle",
-      "text": "九号 N3 系列，到手价 3499 起",
+      "text": "九号 N3 系列，到手价三千四百九十九元起",
       "shot_id": "shot-proof",
       "start_frame_offset": 6,
       "duration_frames": 186,
