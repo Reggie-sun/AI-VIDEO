@@ -1,6 +1,6 @@
 {
   "schema_version": "ecommerce-ad-workflow/package/2",
-  "source_input_hash": "0d11fe8fd2f1e5a9f2b679815638c965e2225edab5f99c55c064596f613afea8",
+  "source_input_hash": "2a160d2eb05cde18416f71020e73ea17f66097b2e546234f7fc928649a3ade8e",
   "duration_seconds": 30,
   "aspect_ratio": "9:16",
   "ad_format": "product_demo",
@@ -262,6 +262,18 @@
         ]
       },
       {
+        "claim_id": "claim-real-footage",
+        "text": "门店实拍",
+        "claim_type": "FACT",
+        "fact_ids": [
+          "fact-pov-footage"
+        ],
+        "source_ids": [
+          "source-night-pov-video",
+          "source-user-attestation"
+        ]
+      },
+      {
         "claim_id": "claim-series-price-from",
         "text": "九号 N3 系列到手价 ¥3499 起",
         "claim_type": "FACT",
@@ -384,6 +396,23 @@
       "visual_form": "亮度提升71%"
     },
     {
+      "claim_id": "claim-real-footage",
+      "status": "USED",
+      "fact_ids": [
+        "fact-pov-footage"
+      ],
+      "source_ids": [
+        "source-night-pov-video",
+        "source-user-attestation"
+      ],
+      "used_at": [
+        "beat-demo",
+        "copy-real-label"
+      ],
+      "spoken_form": null,
+      "visual_form": "门店实拍"
+    },
+    {
       "claim_id": "claim-series-price-from",
       "status": "USED",
       "fact_ids": [
@@ -433,7 +462,7 @@
         "component_id": "hook-visual",
         "kind": "VISUAL",
         "cue_seconds": 0,
-        "content": "夜间街道上普通电动车昏暗灯光只照亮眼前一小片，画面大半陷入黑暗",
+        "content": "夜间街道上 N3 85C 白色车身剪影几乎隐没在黑暗中，约1.2秒车灯点亮、光幕铺开",
         "claim_ids": [
           "claim-night-safety-benefit"
         ],
@@ -555,6 +584,7 @@
         "copy-proof-highbeam",
         "copy-proof-brighter71",
         "copy-benefit",
+        "copy-real-label",
         "copy-sub-demo"
       ],
       "audio_event_ids": [
@@ -721,7 +751,20 @@
       ]
     }
   ],
-  "talent_plan": [],
+  "talent_plan": [
+    {
+      "talent_id": "talent-n3-85c",
+      "role": "出镜主体：九号 N3 85C（白色实车）",
+      "appearance": "白色九号 N3 85C 电动车，车头 ALC 光幕大灯与九号车标，车身线条与门店实拍一致",
+      "wardrobe": "原厂白色车身，无改装件",
+      "performance": "作为产品主体贯穿 intro/demo/hero/close 镜头；hook 中以未开灯剪影 tease；无人物出镜",
+      "continuity_anchors": [
+        "白色车身",
+        "九号车标",
+        "ALC 光幕大灯形态"
+      ]
+    }
+  ],
   "set_plan": [
     {
       "set_id": "set-night-street",
@@ -913,6 +956,24 @@
         "audio-vo-demo"
       ],
       "treatment_id": "treatment-benefit"
+    },
+    {
+      "copy_id": "copy-real-label",
+      "role": "PROOF_LABEL",
+      "text": "门店实拍",
+      "priority": 2,
+      "beat_id": "beat-demo",
+      "shot_id": "shot-demo",
+      "safe_area_intent": "实拍画中画小窗上方",
+      "avoidance_intent": "紧贴画中画上沿，不遮挡光幕主体",
+      "entrance_intent": "与画中画同步出现",
+      "exit_intent": "与画中画同步消失",
+      "keyword_emphasis": [],
+      "brand_token_reference": "ninebot-proof-label",
+      "synchronized_event_ids": [
+        "presentation-demo"
+      ],
+      "treatment_id": "treatment-proof"
     },
     {
       "copy_id": "copy-sub-demo",
@@ -1395,9 +1456,9 @@
       "start_seconds": 0,
       "end_seconds": 3,
       "duration_basis": "HOOK_DENSITY",
-      "product_state": "不出现可识别产品，仅昏暗车灯剪影（TEASE）",
+      "product_state": "N3 85C 白色车身剪影隐没在黑暗中（TEASE，车灯未点亮）",
       "talent_action": null,
-      "camera_intent": "夜间街道低机位缓慢推进，画面大半陷入黑暗",
+      "camera_intent": "夜间街道低机位缓慢推进，车身剪影大半陷入黑暗，约1.2秒车灯点亮瞬间切入",
       "presentation_ids": [],
       "copy_ids": [
         "copy-headline",
@@ -1408,7 +1469,7 @@
         "audio-music",
         "audio-sfx-light-hit"
       ],
-      "visual_strategy_need": "生成夜间街道场景，不含真实地标、车牌或竞品标识"
+      "visual_strategy_need": "生成夜间街道场景，N3 85C 车身剪影与车灯点亮瞬间，不含真实地标、车牌或竞品标识"
     },
     {
       "shot_id": "shot-intro",
@@ -1436,13 +1497,13 @@
     {
       "shot_id": "shot-demo",
       "beat_id": "beat-demo",
-      "purpose": "照明演示：门店实拍 POV 光幕铺满路面，参数逐条弹出",
+      "purpose": "照明演示：生成夜骑镜头展示整车光幕，右下角画中画叠加门店实拍 POV 光幕实证，参数逐条弹出",
       "start_seconds": 8,
       "end_seconds": 16,
       "duration_basis": "DEMO_COMPLEXITY",
-      "product_state": "门店自有夜间 POV 实拍：ALC 光幕在漆黑路面上形成宽展均匀照明",
+      "product_state": "生成的夜间骑行镜头中 N3 85C 光幕照亮路面；右下角画中画为门店自有 POV 实拍（带「门店实拍」标签）",
       "talent_action": null,
-      "camera_intent": "第一人称骑行 POV（实拍素材，取光幕形态最佳的连续 8 秒段）",
+      "camera_intent": "第三人称侧跟机位展示整车与光幕；实拍 POV 以画中画形式呈现",
       "presentation_ids": [
         "presentation-demo"
       ],
@@ -1451,6 +1512,7 @@
         "copy-proof-highbeam",
         "copy-proof-brighter71",
         "copy-benefit",
+        "copy-real-label",
         "copy-sub-demo"
       ],
       "audio_event_ids": [
@@ -1458,7 +1520,7 @@
         "audio-music",
         "audio-sfx-light-hit-demo"
       ],
-      "visual_strategy_need": "CONFIRMED 实拍视频 asset-night-pov-video 直接承载演示，参数标签为承认的 graphic overlay；不需要生成"
+      "visual_strategy_need": "由 registered asset-n3-85c-front 经 image-to-video 生成夜间骑行镜头（车灯点亮、光幕铺路）；asset-night-pov-video 实拍素材以画中画 layer 叠加，不承担生成"
     },
     {
       "shot_id": "shot-proof",
@@ -1742,5 +1804,5 @@
     ]
   },
   "unresolved_items": [],
-  "package_id": "98d456c68a07cdfe4aacd068692e8a9ff66c5891d94b6369751d1c23692337de"
+  "package_id": "f549e05c24b82cef1651b6e34a73f733553f4279c226bcf1f9e18e1bd4332ece"
 }

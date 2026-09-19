@@ -1,0 +1,17 @@
+{
+  "schema_version": "ecommerce-delivery-profile/1",
+  "profile_id": "0257b1de95681c9fae741c8ffeb4108027acd3526806616c4af2d29b75e299f8",
+  "aspect_ratio": "9:16",
+  "width": 1080,
+  "height": 1920,
+  "fps": 30,
+  "codec_profile": "h264",
+  "audio_sample_rate_hz": 48000,
+  "platform": "douyin",
+  "placement": "vertical-feed",
+  "constraints": [
+    "价格与优惠详情咨询当地门店",
+    "性能数据来源于九号科技实验室",
+    "关键文字与价格信息保持在竖屏中央安全区内"
+  ]
+}

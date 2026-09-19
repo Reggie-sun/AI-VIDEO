@@ -1,0 +1,924 @@
+{
+  "schema_version": "ecommerce-layout-plan/1",
+  "layout_plan_id": "a81b6bb2dd0b0acd5d84c9b58c19937d706caf7a9c774d7e8054bb6f6129ada3",
+  "source_package_id": "f549e05c24b82cef1651b6e34a73f733553f4279c226bcf1f9e18e1bd4332ece",
+  "delivery_profile_id": "0257b1de95681c9fae741c8ffeb4108027acd3526806616c4af2d29b75e299f8",
+  "visual_system_profile_id": "3cfa394f5eb1198b7c63be5575ea5ee2b72362d305c9fa0f1a68f5a36160281f",
+  "scenes": [
+    {
+      "scene_id": "scene-night-street",
+      "source_set_id": "set-night-street",
+      "location": "夜间道路（demo 段为门店实拍 POV，hook/intro 为生成场景）",
+      "time": "night",
+      "mood": "安静、黑暗环境中光幕为唯一主角",
+      "participant_ids": [
+        "talent-n3-85c"
+      ],
+      "continuity_constraints": [
+        "白色车身",
+        "ALC 光幕大灯形态一致"
+      ]
+    },
+    {
+      "scene_id": "scene-showroom",
+      "source_set_id": "set-showroom",
+      "location": "门店展厅（延续实拍质感）",
+      "time": "interior",
+      "mood": "干净商业感",
+      "participant_ids": [
+        "talent-n3-85c"
+      ],
+      "continuity_constraints": [
+        "N3 85C 正面车头",
+        "价格信息准确"
+      ]
+    }
+  ],
+  "shots": [
+    {
+      "shot_id": "shot-hook",
+      "scene_id": "scene-night-street",
+      "character_ids": [
+        "talent-n3-85c"
+      ],
+      "visual_strategy": "generated_video",
+      "continuity_constraints": [
+        "车身剪影与车灯点亮瞬间一致"
+      ],
+      "composition_directives": []
+    },
+    {
+      "shot_id": "shot-intro",
+      "scene_id": "scene-night-street",
+      "character_ids": [
+        "talent-n3-85c"
+      ],
+      "visual_strategy": "generated_video",
+      "continuity_constraints": [
+        "白色车身与车标一致"
+      ],
+      "composition_directives": []
+    },
+    {
+      "shot_id": "shot-demo",
+      "scene_id": "scene-night-street",
+      "character_ids": [
+        "talent-n3-85c"
+      ],
+      "visual_strategy": "generated_video",
+      "continuity_constraints": [
+        "光幕形态与实拍素材一致"
+      ],
+      "composition_directives": []
+    },
+    {
+      "shot_id": "shot-proof",
+      "scene_id": "scene-showroom",
+      "character_ids": [
+        "talent-n3-85c"
+      ],
+      "visual_strategy": "generated_video",
+      "continuity_constraints": [
+        "车头灯特写的车型 identity 一致"
+      ],
+      "composition_directives": []
+    },
+    {
+      "shot_id": "shot-close",
+      "scene_id": "scene-showroom",
+      "character_ids": [
+        "talent-n3-85c"
+      ],
+      "visual_strategy": "generated_video",
+      "continuity_constraints": [
+        "定妆画面与 hero 一致"
+      ],
+      "composition_directives": []
+    }
+  ],
+  "beat_roles": [
+    {
+      "beat_id": "beat-hook",
+      "role": "problem"
+    },
+    {
+      "beat_id": "beat-intro",
+      "role": "product_introduction"
+    },
+    {
+      "beat_id": "beat-demo",
+      "role": "demonstration"
+    },
+    {
+      "beat_id": "beat-proof",
+      "role": "proof"
+    },
+    {
+      "beat_id": "beat-close",
+      "role": "brand_closure"
+    }
+  ],
+  "graphic_treatments": [
+    {
+      "graphic_id": "copy-headline",
+      "role": "headline",
+      "text": "夜骑，你看清了吗？",
+      "shot_id": "shot-hook",
+      "start_frame_offset": 12,
+      "duration_frames": 66,
+      "x_milli": 60,
+      "y_milli": 120,
+      "width_milli": 820,
+      "font_size_px": 92,
+      "font_weight": 800,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000066",
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 80,
+        "right_milli": 120,
+        "bottom_milli": 140,
+        "left_milli": 60
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [
+        {
+          "text": "看清",
+          "brand_token_id": "ninebot-accent-red"
+        }
+      ],
+      "brand_token_ids": [
+        "ninebot-heading-primary",
+        "ninebot-accent-red"
+      ],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [
+        "audio-vo-hook"
+      ],
+      "entrance": "slide_up",
+      "exit": "fade",
+      "z_index": 20,
+      "caption_binding_id": null
+    },
+    {
+      "graphic_id": "copy-sub-hook",
+      "role": "dialogue_subtitle",
+      "text": "晚上骑车，最怕看不清",
+      "shot_id": "shot-hook",
+      "start_frame_offset": 6,
+      "duration_frames": 78,
+      "x_milli": 60,
+      "y_milli": 830,
+      "width_milli": 820,
+      "font_size_px": 44,
+      "font_weight": 500,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000099",
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 80,
+        "right_milli": 120,
+        "bottom_milli": 140,
+        "left_milli": 60
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [],
+      "brand_token_ids": [
+        "caption-default"
+      ],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [
+        "audio-vo-hook"
+      ],
+      "entrance": "fade",
+      "exit": "fade",
+      "z_index": 15,
+      "caption_binding_id": "caption-audio-vo-hook"
+    },
+    {
+      "graphic_id": "copy-product-label",
+      "role": "product_label",
+      "text": "九号 N3 85C · ALC全境光幕照明系统",
+      "shot_id": "shot-intro",
+      "start_frame_offset": 20,
+      "duration_frames": 120,
+      "x_milli": 60,
+      "y_milli": 640,
+      "width_milli": 820,
+      "font_size_px": 60,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000066",
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 80,
+        "right_milli": 120,
+        "bottom_milli": 140,
+        "left_milli": 60
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [
+        {
+          "text": "九号 N3 85C",
+          "brand_token_id": "ninebot-accent-glow"
+        },
+        {
+          "text": "ALC全境光幕照明系统",
+          "brand_token_id": "ninebot-accent-glow"
+        }
+      ],
+      "brand_token_ids": [
+        "ninebot-product-label",
+        "ninebot-accent-glow"
+      ],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [
+        "audio-vo-intro"
+      ],
+      "entrance": "fade",
+      "exit": "fade",
+      "z_index": 20,
+      "caption_binding_id": null
+    },
+    {
+      "graphic_id": "copy-sub-intro",
+      "role": "dialogue_subtitle",
+      "text": "九号 N3 系列，ALC 全境光幕照明系统",
+      "shot_id": "shot-intro",
+      "start_frame_offset": 6,
+      "duration_frames": 138,
+      "x_milli": 60,
+      "y_milli": 830,
+      "width_milli": 820,
+      "font_size_px": 44,
+      "font_weight": 500,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000099",
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 80,
+        "right_milli": 120,
+        "bottom_milli": 140,
+        "left_milli": 60
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [],
+      "brand_token_ids": [
+        "caption-default"
+      ],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [
+        "audio-vo-intro"
+      ],
+      "entrance": "fade",
+      "exit": "fade",
+      "z_index": 15,
+      "caption_binding_id": "caption-audio-vo-intro"
+    },
+    {
+      "graphic_id": "copy-proof-65000cd",
+      "role": "proof_label",
+      "text": "65000cd 亮度",
+      "shot_id": "shot-demo",
+      "start_frame_offset": 12,
+      "duration_frames": 216,
+      "x_milli": 60,
+      "y_milli": 300,
+      "width_milli": 560,
+      "font_size_px": 56,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000066",
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 80,
+        "right_milli": 120,
+        "bottom_milli": 140,
+        "left_milli": 60
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [
+        {
+          "text": "65000cd",
+          "brand_token_id": "ninebot-accent-red"
+        }
+      ],
+      "brand_token_ids": [
+        "ninebot-proof-label",
+        "ninebot-accent-red"
+      ],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [
+        "audio-vo-demo",
+        "audio-sfx-light-hit-demo"
+      ],
+      "entrance": "scale_in",
+      "exit": "none",
+      "z_index": 20,
+      "caption_binding_id": null
+    },
+    {
+      "graphic_id": "copy-proof-highbeam",
+      "role": "proof_label",
+      "text": "远光升级",
+      "shot_id": "shot-demo",
+      "start_frame_offset": 60,
+      "duration_frames": 168,
+      "x_milli": 60,
+      "y_milli": 384,
+      "width_milli": 560,
+      "font_size_px": 56,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000066",
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 80,
+        "right_milli": 120,
+        "bottom_milli": 140,
+        "left_milli": 60
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [
+        {
+          "text": "远光",
+          "brand_token_id": "ninebot-accent-glow"
+        }
+      ],
+      "brand_token_ids": [
+        "ninebot-proof-label",
+        "ninebot-accent-glow"
+      ],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [
+        "audio-vo-demo"
+      ],
+      "entrance": "scale_in",
+      "exit": "none",
+      "z_index": 20,
+      "caption_binding_id": null
+    },
+    {
+      "graphic_id": "copy-proof-brighter71",
+      "role": "proof_label",
+      "text": "亮度提升71%",
+      "shot_id": "shot-demo",
+      "start_frame_offset": 110,
+      "duration_frames": 118,
+      "x_milli": 60,
+      "y_milli": 468,
+      "width_milli": 560,
+      "font_size_px": 56,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000066",
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 80,
+        "right_milli": 120,
+        "bottom_milli": 140,
+        "left_milli": 60
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [
+        {
+          "text": "71%",
+          "brand_token_id": "ninebot-accent-red"
+        }
+      ],
+      "brand_token_ids": [
+        "ninebot-proof-label",
+        "ninebot-accent-red"
+      ],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [
+        "audio-vo-demo"
+      ],
+      "entrance": "scale_in",
+      "exit": "none",
+      "z_index": 20,
+      "caption_binding_id": null
+    },
+    {
+      "graphic_id": "copy-benefit",
+      "role": "benefit_callout",
+      "text": "夜骑更亮，更安心",
+      "shot_id": "shot-demo",
+      "start_frame_offset": 160,
+      "duration_frames": 68,
+      "x_milli": 60,
+      "y_milli": 120,
+      "width_milli": 820,
+      "font_size_px": 84,
+      "font_weight": 800,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000066",
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 80,
+        "right_milli": 120,
+        "bottom_milli": 140,
+        "left_milli": 60
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [
+        {
+          "text": "更亮",
+          "brand_token_id": "ninebot-accent-glow"
+        }
+      ],
+      "brand_token_ids": [
+        "ninebot-callout",
+        "ninebot-accent-glow"
+      ],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [
+        "audio-vo-demo"
+      ],
+      "entrance": "fade",
+      "exit": "fade",
+      "z_index": 20,
+      "caption_binding_id": null
+    },
+    {
+      "graphic_id": "copy-real-label",
+      "role": "proof_label",
+      "text": "门店实拍",
+      "shot_id": "shot-demo",
+      "start_frame_offset": 12,
+      "duration_frames": 216,
+      "x_milli": 563,
+      "y_milli": 400,
+      "width_milli": 300,
+      "font_size_px": 56,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000066",
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 80,
+        "right_milli": 120,
+        "bottom_milli": 140,
+        "left_milli": 60
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [],
+      "brand_token_ids": [
+        "ninebot-proof-label"
+      ],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [],
+      "entrance": "fade",
+      "exit": "none",
+      "z_index": 20,
+      "caption_binding_id": null
+    },
+    {
+      "graphic_id": "copy-sub-demo",
+      "role": "dialogue_subtitle",
+      "text": "65000cd 亮度，远光升级，亮度提升百分之七十一",
+      "shot_id": "shot-demo",
+      "start_frame_offset": 6,
+      "duration_frames": 222,
+      "x_milli": 60,
+      "y_milli": 830,
+      "width_milli": 820,
+      "font_size_px": 44,
+      "font_weight": 500,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000099",
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 80,
+        "right_milli": 120,
+        "bottom_milli": 140,
+        "left_milli": 60
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [],
+      "brand_token_ids": [
+        "caption-default"
+      ],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [
+        "audio-vo-demo"
+      ],
+      "entrance": "fade",
+      "exit": "fade",
+      "z_index": 15,
+      "caption_binding_id": "caption-audio-vo-demo"
+    },
+    {
+      "graphic_id": "copy-price-series",
+      "role": "proof_label",
+      "text": "九号 N3 系列 到手价 ¥3499 起",
+      "shot_id": "shot-proof",
+      "start_frame_offset": 12,
+      "duration_frames": 186,
+      "x_milli": 60,
+      "y_milli": 300,
+      "width_milli": 820,
+      "font_size_px": 56,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000066",
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 80,
+        "right_milli": 120,
+        "bottom_milli": 140,
+        "left_milli": 60
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [
+        {
+          "text": "¥3499",
+          "brand_token_id": "ninebot-accent-red"
+        }
+      ],
+      "brand_token_ids": [
+        "ninebot-price-tag",
+        "ninebot-accent-red"
+      ],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [
+        "audio-vo-proof"
+      ],
+      "entrance": "scale_in",
+      "exit": "none",
+      "z_index": 20,
+      "caption_binding_id": null
+    },
+    {
+      "graphic_id": "copy-price-n3-85c",
+      "role": "proof_label",
+      "text": "N3 85C 到手价 ¥4199 起",
+      "shot_id": "shot-proof",
+      "start_frame_offset": 45,
+      "duration_frames": 153,
+      "x_milli": 60,
+      "y_milli": 392,
+      "width_milli": 820,
+      "font_size_px": 56,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000066",
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 80,
+        "right_milli": 120,
+        "bottom_milli": 140,
+        "left_milli": 60
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [
+        {
+          "text": "¥4199",
+          "brand_token_id": "ninebot-accent-red"
+        }
+      ],
+      "brand_token_ids": [
+        "ninebot-price-tag",
+        "ninebot-accent-red"
+      ],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [],
+      "entrance": "scale_in",
+      "exit": "none",
+      "z_index": 20,
+      "caption_binding_id": null
+    },
+    {
+      "graphic_id": "copy-disclaimer",
+      "role": "proof_label",
+      "text": "价格与优惠详情咨询当地门店 · 数据来源于九号科技实验室",
+      "shot_id": "shot-proof",
+      "start_frame_offset": 12,
+      "duration_frames": 186,
+      "x_milli": 60,
+      "y_milli": 520,
+      "width_milli": 820,
+      "font_size_px": 56,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000066",
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 80,
+        "right_milli": 120,
+        "bottom_milli": 140,
+        "left_milli": 60
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [],
+      "brand_token_ids": [
+        "ninebot-disclaimer"
+      ],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [],
+      "entrance": "fade",
+      "exit": "none",
+      "z_index": 10,
+      "caption_binding_id": null
+    },
+    {
+      "graphic_id": "copy-sub-proof",
+      "role": "dialogue_subtitle",
+      "text": "九号 N3 系列，到手价 3499 起",
+      "shot_id": "shot-proof",
+      "start_frame_offset": 6,
+      "duration_frames": 186,
+      "x_milli": 60,
+      "y_milli": 830,
+      "width_milli": 820,
+      "font_size_px": 44,
+      "font_weight": 500,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000099",
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 80,
+        "right_milli": 120,
+        "bottom_milli": 140,
+        "left_milli": 60
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [],
+      "brand_token_ids": [
+        "caption-default"
+      ],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [
+        "audio-vo-proof"
+      ],
+      "entrance": "fade",
+      "exit": "fade",
+      "z_index": 15,
+      "caption_binding_id": "caption-audio-vo-proof"
+    },
+    {
+      "graphic_id": "copy-cta",
+      "role": "cta",
+      "text": "到店试灯试驾",
+      "shot_id": "shot-close",
+      "start_frame_offset": 10,
+      "duration_frames": 200,
+      "x_milli": 180,
+      "y_milli": 480,
+      "width_milli": 640,
+      "font_size_px": 88,
+      "font_weight": 900,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#E60023FF",
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 80,
+        "right_milli": 120,
+        "bottom_milli": 140,
+        "left_milli": 60
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [
+        {
+          "text": "试灯试驾",
+          "brand_token_id": "ninebot-cta"
+        }
+      ],
+      "brand_token_ids": [
+        "ninebot-cta"
+      ],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [
+        "audio-sfx-close-hit",
+        "audio-vo-close"
+      ],
+      "entrance": "scale_in",
+      "exit": "none",
+      "z_index": 30,
+      "caption_binding_id": null
+    },
+    {
+      "graphic_id": "copy-end-card",
+      "role": "brand_end_card",
+      "text": "浩口九号智能电动车 · 九号 N3 系列",
+      "shot_id": "shot-close",
+      "start_frame_offset": 40,
+      "duration_frames": 170,
+      "x_milli": 60,
+      "y_milli": 200,
+      "width_milli": 820,
+      "font_size_px": 68,
+      "font_weight": 800,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000066",
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 80,
+        "right_milli": 120,
+        "bottom_milli": 140,
+        "left_milli": 60
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [
+        {
+          "text": "浩口九号智能电动车",
+          "brand_token_id": "ninebot-accent-red"
+        }
+      ],
+      "brand_token_ids": [
+        "ninebot-end-card",
+        "ninebot-accent-red"
+      ],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [],
+      "entrance": "fade",
+      "exit": "none",
+      "z_index": 25,
+      "caption_binding_id": null
+    },
+    {
+      "graphic_id": "copy-sub-close",
+      "role": "dialogue_subtitle",
+      "text": "浩口九号智能电动车，到店试灯，一试就知道",
+      "shot_id": "shot-close",
+      "start_frame_offset": 12,
+      "duration_frames": 186,
+      "x_milli": 60,
+      "y_milli": 830,
+      "width_milli": 820,
+      "font_size_px": 44,
+      "font_weight": 500,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000099",
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 80,
+        "right_milli": 120,
+        "bottom_milli": 140,
+        "left_milli": 60
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [],
+      "brand_token_ids": [
+        "caption-default"
+      ],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [
+        "audio-vo-close"
+      ],
+      "entrance": "fade",
+      "exit": "fade",
+      "z_index": 15,
+      "caption_binding_id": "caption-audio-vo-close"
+    }
+  ],
+  "product_presentations": [
+    {
+      "presentation_id": "presentation-intro",
+      "role": "intro",
+      "mode": "graphic_reveal",
+      "beat_id": "beat-intro",
+      "shot_id": "shot-intro",
+      "asset_id": "asset-n3-85c-front",
+      "composition_layer_id": "layer-product-intro",
+      "source_evidence_id": null,
+      "product_truth_reference_ids": [
+        "source-n3-85c-pricetag"
+      ],
+      "transform_intent": {
+        "transform": {
+          "translate_x_px": 0,
+          "translate_y_px": 0,
+          "scale_x_milli": 1000,
+          "scale_y_milli": 1000,
+          "rotation_millidegrees": 0
+        },
+        "opacity_milli": 1000
+      },
+      "entrance": "fade",
+      "exit": "none",
+      "tracking_required": false,
+      "occlusion_required": false,
+      "lighting_match_required": false,
+      "graphic_treatment_ids": [
+        "copy-product-label"
+      ],
+      "sound_cue_ids": [
+        "audio-vo-intro"
+      ],
+      "capability_classification": "supported_currently",
+      "requires_physical_interaction": false
+    },
+    {
+      "presentation_id": "presentation-demo",
+      "role": "demonstration",
+      "mode": "hero_asset",
+      "beat_id": "beat-demo",
+      "shot_id": "shot-demo",
+      "asset_id": "asset-night-pov-video",
+      "composition_layer_id": "layer-demo-video",
+      "source_evidence_id": null,
+      "product_truth_reference_ids": [
+        "source-night-pov-video"
+      ],
+      "transform_intent": {
+        "transform": {
+          "translate_x_px": 608,
+          "translate_y_px": 832,
+          "scale_x_milli": 400,
+          "scale_y_milli": 400,
+          "rotation_millidegrees": 0
+        },
+        "opacity_milli": 1000
+      },
+      "entrance": "none",
+      "exit": "none",
+      "tracking_required": false,
+      "occlusion_required": false,
+      "lighting_match_required": false,
+      "graphic_treatment_ids": [
+        "copy-proof-65000cd",
+        "copy-proof-highbeam",
+        "copy-proof-brighter71",
+        "copy-real-label"
+      ],
+      "sound_cue_ids": [
+        "audio-vo-demo",
+        "audio-sfx-light-hit-demo"
+      ],
+      "capability_classification": "supported_currently",
+      "requires_physical_interaction": false
+    },
+    {
+      "presentation_id": "presentation-hero",
+      "role": "hero_shot",
+      "mode": "hero_asset",
+      "beat_id": "beat-proof",
+      "shot_id": "shot-proof",
+      "asset_id": "asset-n3-85c-front",
+      "composition_layer_id": "layer-hero",
+      "source_evidence_id": null,
+      "product_truth_reference_ids": [
+        "source-n3-85c-pricetag"
+      ],
+      "transform_intent": {
+        "transform": {
+          "translate_x_px": 0,
+          "translate_y_px": 0,
+          "scale_x_milli": 1000,
+          "scale_y_milli": 1000,
+          "rotation_millidegrees": 0
+        },
+        "opacity_milli": 1000
+      },
+      "entrance": "none",
+      "exit": "none",
+      "tracking_required": false,
+      "occlusion_required": false,
+      "lighting_match_required": false,
+      "graphic_treatment_ids": [
+        "copy-price-series",
+        "copy-price-n3-85c",
+        "copy-disclaimer"
+      ],
+      "sound_cue_ids": [
+        "audio-vo-proof"
+      ],
+      "capability_classification": "supported_currently",
+      "requires_physical_interaction": false
+    },
+    {
+      "presentation_id": "presentation-cta",
+      "role": "cta_support",
+      "mode": "graphic_reveal",
+      "beat_id": "beat-close",
+      "shot_id": "shot-close",
+      "asset_id": "asset-n3-85c-front",
+      "composition_layer_id": "layer-cta",
+      "source_evidence_id": null,
+      "product_truth_reference_ids": [
+        "source-n3-85c-pricetag"
+      ],
+      "transform_intent": {
+        "transform": {
+          "translate_x_px": 0,
+          "translate_y_px": 0,
+          "scale_x_milli": 1000,
+          "scale_y_milli": 1000,
+          "rotation_millidegrees": 0
+        },
+        "opacity_milli": 1000
+      },
+      "entrance": "fade",
+      "exit": "none",
+      "tracking_required": false,
+      "occlusion_required": false,
+      "lighting_match_required": false,
+      "graphic_treatment_ids": [
+        "copy-cta",
+        "copy-end-card"
+      ],
+      "sound_cue_ids": [
+        "audio-vo-close",
+        "audio-sfx-close-hit"
+      ],
+      "capability_classification": "supported_currently",
+      "requires_physical_interaction": false
+    }
+  ],
+  "protagonist_ids": [
+    "talent-n3-85c"
+  ]
+}

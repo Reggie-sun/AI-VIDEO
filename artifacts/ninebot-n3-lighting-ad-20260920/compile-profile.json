@@ -1,0 +1,19 @@
+{
+  "schema_version": "ecommerce-production-compile-profile/1",
+  "profile_id": "ff59908418c380c866a01427547d49ddf990c0c14b2d2fe0a9df822072ef970e",
+  "delivery_profile_id": "0257b1de95681c9fae741c8ffeb4108027acd3526806616c4af2d29b75e299f8",
+  "visual_system_profile_id": "3cfa394f5eb1198b7c63be5575ea5ee2b72362d305c9fa0f1a68f5a36160281f",
+  "layout_plan_id": "a81b6bb2dd0b0acd5d84c9b58c19937d706caf7a9c774d7e8054bb6f6129ada3",
+  "requirement_resolutions": [
+    {
+      "requirement_id": "req-ad-graphics",
+      "capability": "advertising_copy_graphics",
+      "resolution_kind": "EXACT_GRAPHIC_LAYOUT",
+      "evidence_ids": [
+        "0257b1de95681c9fae741c8ffeb4108027acd3526806616c4af2d29b75e299f8",
+        "3cfa394f5eb1198b7c63be5575ea5ee2b72362d305c9fa0f1a68f5a36160281f",
+        "a81b6bb2dd0b0acd5d84c9b58c19937d706caf7a9c774d7e8054bb6f6129ada3"
+      ]
+    }
+  ]
+}

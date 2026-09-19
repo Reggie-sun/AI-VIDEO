@@ -1,0 +1,118 @@
+{
+  "schema_version": "ecommerce-visual-system-profile/1",
+  "profile_id": "3cfa394f5eb1198b7c63be5575ea5ee2b72362d305c9fa0f1a68f5a36160281f",
+  "brand_token_ids": [
+    "ninebot-heading-primary",
+    "caption-default",
+    "ninebot-product-label",
+    "ninebot-proof-label",
+    "ninebot-callout",
+    "ninebot-price-tag",
+    "ninebot-disclaimer",
+    "ninebot-cta",
+    "ninebot-end-card",
+    "ninebot-accent-red",
+    "ninebot-accent-glow"
+  ],
+  "safe_area": {
+    "top_milli": 80,
+    "right_milli": 120,
+    "bottom_milli": 140,
+    "left_milli": 60
+  },
+  "typography_tokens": [
+    {
+      "token_id": "type-headline",
+      "font_family": "sans-serif",
+      "font_size_px": 92,
+      "font_weight": 800,
+      "letter_spacing_px": 0,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000066"
+    },
+    {
+      "token_id": "type-caption",
+      "font_family": "sans-serif",
+      "font_size_px": 44,
+      "font_weight": 500,
+      "letter_spacing_px": 0,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000099"
+    },
+    {
+      "token_id": "type-product-label",
+      "font_family": "sans-serif",
+      "font_size_px": 60,
+      "font_weight": 700,
+      "letter_spacing_px": 0,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000066"
+    },
+    {
+      "token_id": "type-proof",
+      "font_family": "sans-serif",
+      "font_size_px": 56,
+      "font_weight": 700,
+      "letter_spacing_px": 0,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000066"
+    },
+    {
+      "token_id": "type-benefit",
+      "font_family": "sans-serif",
+      "font_size_px": 84,
+      "font_weight": 800,
+      "letter_spacing_px": 0,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000066"
+    },
+    {
+      "token_id": "type-cta",
+      "font_family": "sans-serif",
+      "font_size_px": 88,
+      "font_weight": 900,
+      "letter_spacing_px": 0,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#E60023FF"
+    },
+    {
+      "token_id": "type-end-card",
+      "font_family": "sans-serif",
+      "font_size_px": 68,
+      "font_weight": 800,
+      "letter_spacing_px": 0,
+      "text_color": "#FFFFFFFF",
+      "background_color": "#00000066"
+    }
+  ],
+  "role_bindings": [
+    {
+      "role": "headline",
+      "typography_token_id": "type-headline"
+    },
+    {
+      "role": "dialogue_subtitle",
+      "typography_token_id": "type-caption"
+    },
+    {
+      "role": "product_label",
+      "typography_token_id": "type-product-label"
+    },
+    {
+      "role": "proof_label",
+      "typography_token_id": "type-proof"
+    },
+    {
+      "role": "benefit_callout",
+      "typography_token_id": "type-benefit"
+    },
+    {
+      "role": "cta",
+      "typography_token_id": "type-cta"
+    },
+    {
+      "role": "brand_end_card",
+      "typography_token_id": "type-end-card"
+    }
+  ]
+}

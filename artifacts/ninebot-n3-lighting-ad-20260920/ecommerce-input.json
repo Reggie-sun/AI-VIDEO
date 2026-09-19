@@ -207,6 +207,13 @@
         "source_ids": ["source-alc-sticker", "source-user-attestation"]
       },
       {
+        "claim_id": "claim-real-footage",
+        "text": "门店实拍",
+        "claim_type": "FACT",
+        "fact_ids": ["fact-pov-footage"],
+        "source_ids": ["source-night-pov-video", "source-user-attestation"]
+      },
+      {
         "claim_id": "claim-series-price-from",
         "text": "九号 N3 系列到手价 ¥3499 起",
         "claim_type": "FACT",
