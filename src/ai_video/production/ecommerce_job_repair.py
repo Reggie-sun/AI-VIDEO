@@ -216,6 +216,33 @@ def bound_generation_attempt_ids_for_shot(
     return tuple(matched)
 
 
+def ecommerce_manifest_revision(root: Path, fallback: int | None) -> int | None:
+    try:
+        return load_production_project(root / "project.yaml").manifest.manifest_revision
+    except (AiVideoError, OSError, ValueError):
+        return fallback
+
+
+def ecommerce_attempt_status(
+    root: Path,
+    execution: Any,
+    *,
+    shot_id: str,
+) -> StateCommitStatus | None:
+    attempt_id = next(
+        item.attempt_id for item in execution.shots if item.shot_id == shot_id
+    )
+    try:
+        manifest = load_production_project(root / "project.yaml").manifest
+    except (AiVideoError, OSError, ValueError):
+        return None
+    attempt = next(
+        (item for item in manifest.attempts if item.attempt_id == attempt_id),
+        None,
+    )
+    return None if attempt is None else attempt.status
+
+
 def input_attempt_identity(item: Any) -> EcommerceAttemptIdentity:
     binding = item.request.commercial_binding
     routing_hash = getattr(item.execution_binding, "binding_hash", None)
@@ -502,6 +529,8 @@ __all__ = [
     "canonical_attempt_identity",
     "canonical_attempt_verdict",
     "canonical_repair_frontier",
+    "ecommerce_attempt_status",
+    "ecommerce_manifest_revision",
     "input_attempt_identity",
     "plan_ecommerce_shot_repair",
     "shot_gate_verdict",

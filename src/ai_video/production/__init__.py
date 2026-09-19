@@ -135,6 +135,10 @@ from ai_video.production.ecommerce_job import (
     EcommerceShotExecutionInput,
     EcommerceShotExecutionPlan,
 )
+from ai_video.production.ecommerce_job_assembly import (
+    EcommerceCompositionExecutionPlan,
+    EcommerceHyperFramesInvocation,
+)
 from ai_video.production.commercial_dependency import (
     extend_commercial_source_dependency_graph,
     validate_commercial_source_dependency_graph,
@@ -464,6 +468,8 @@ __all__ = [
     "EcommerceVisualSystemProfile",
     "EcommerceWholeAdAcceptanceTarget",
     "CompiledEcommerceProductionProject",
+    "EcommerceCompositionExecutionPlan",
+    "EcommerceHyperFramesInvocation",
     "EcommerceProductionJobService",
     "EcommerceShotExecutionInput",
     "EcommerceShotExecutionPlan",

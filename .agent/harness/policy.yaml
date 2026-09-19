@@ -146,7 +146,7 @@ checks:
     cwd: .
     description: Verify the ecommerce advertising authoring Skill, schemas, validator, fixtures, and no-I/O boundaries.
   ecommerce_production_job_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_ecommerce_job.py, tests/test_production_ecommerce_job_repair.py, tests/test_production_ecommerce_job_contracts.py, tests/test_production_ecommerce_job_compiler.py, tests/test_production_ecommerce_job_projection.py, tests/test_ecommerce_ad_workflow_handoff.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_ecommerce_job.py, tests/test_production_ecommerce_job_repair.py, tests/test_production_ecommerce_job_assembly.py, tests/test_production_ecommerce_job_contracts.py, tests/test_production_ecommerce_job_compiler.py, tests/test_production_ecommerce_job_projection.py, tests/test_ecommerce_ad_workflow_handoff.py, -q]
     cwd: .
     description: Verify exact visual-contract handoff, canonical bootstrap compilation, fail-closed gaps, and read-only Ecommerce Job projection without Provider or media effects.
   drama_authoring_source_binding_tests:

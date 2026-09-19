@@ -28,6 +28,7 @@ from ai_video.production.ecommerce_job import (
     EcommerceShotExecutionInput,
     EcommerceShotExecutionPlan,
 )
+from ai_video.production.ecommerce_job_assembly import EcommerceAssemblyDecision
 from ai_video.production.ecommerce_job_repair import (
     bound_generation_attempt_ids,
     canonical_repair_frontier,
@@ -420,17 +421,19 @@ def test_generation_ceiling_counts_prior_bound_attempts_across_service_instances
     assert service.effects == []
 
 
-def test_advance_unknown_outcome_stops_without_retry(tmp_path: Path) -> None:
-    class _UnknownOutcomeJob(EcommerceProductionJobService):
-        @staticmethod
-        def _attempt_status(request, execution, *, shot_id):
-            return StateCommitStatus.OUTCOME_UNKNOWN
-
+def test_advance_unknown_outcome_stops_without_retry(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     handoff, request = _bootstrapped_job(tmp_path)
     service = _FakeVideoService(QaVerdict.PASS, tmp_path.resolve())
     service.actions = [EcommerceShotNextAction.START, EcommerceShotNextAction.STOP]
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.ecommerce_attempt_status",
+        lambda _root, _execution, *, shot_id: StateCommitStatus.OUTCOME_UNKNOWN,
+    )
 
-    result = _UnknownOutcomeJob().advance_once(
+    result = EcommerceProductionJobService().advance_once(
         request,
         handoff,
         expected_action=EcommerceJobNextAction.GENERATE_SHOT,
@@ -837,3 +840,137 @@ def test_shot_execution_contracts_are_public_python_api() -> None:
 
     assert production.EcommerceShotExecutionInput is EcommerceShotExecutionInput
     assert production.EcommerceShotExecutionPlan is EcommerceShotExecutionPlan
+
+
+@dataclass
+class _FakeCompositionExecution:
+    state: str = "render"
+    fail_unknown: bool = False
+
+    def __post_init__(self) -> None:
+        self.prepared: list[Path] = []
+        self.rendered: list[object] = []
+
+    def prepare(self, _handoff, *, project_root: Path):
+        prepared = SimpleNamespace(project_root=project_root)
+        self.prepared.append(project_root)
+        return prepared
+
+    def render(self, prepared):
+        self.rendered.append(prepared)
+        if self.fail_unknown:
+            self.state = "recover"
+            raise OSError("renderer outcome is unknown")
+        self.state = "active"
+        return object()
+
+
+class _CompositionJob(EcommerceProductionJobService):
+    def inspect(
+        self,
+        request,
+        handoff,
+        *,
+        shot_execution=None,
+        composition_execution=None,
+    ):
+        if composition_execution is None:
+            action = EcommerceJobNextAction.PREPARE_COMPOSITION
+        elif composition_execution.state == "render":
+            action = EcommerceJobNextAction.RENDER_FINAL
+        elif composition_execution.state == "recover":
+            action = EcommerceJobNextAction.RECOVER_UNKNOWN_OUTCOME
+        else:
+            action = EcommerceJobNextAction.REVIEW_FINAL
+        return self._projection(request, next_action=action, manifest_revision=7)
+
+
+def _fake_advance_composition(execution, handoff, *, project_root, render):
+    prepared = execution.prepare(handoff, project_root=project_root)
+    if not render:
+        return EcommerceAssemblyDecision(EcommerceJobNextAction.RENDER_FINAL)
+    try:
+        execution.render(prepared)
+    except OSError:
+        return EcommerceAssemblyDecision(
+            EcommerceJobNextAction.RECOVER_UNKNOWN_OUTCOME
+        )
+    return EcommerceAssemblyDecision(EcommerceJobNextAction.REVIEW_FINAL)
+
+
+def test_prepare_composition_is_pure_and_projects_exact_render(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    handoff = _runtime_handoff_without_external_assets()
+    request = _request(tmp_path, handoff)
+    execution = _FakeCompositionExecution()
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.advance_ecommerce_job_assembly",
+        _fake_advance_composition,
+    )
+
+    result = _CompositionJob().advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.PREPARE_COMPOSITION,
+        composition_execution=execution,
+    )
+
+    assert result.next_action is EcommerceJobNextAction.RENDER_FINAL
+    assert execution.prepared == [tmp_path.resolve()]
+    assert execution.rendered == []
+
+
+def test_render_final_invokes_once_and_exact_replay_has_no_effect(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    handoff = _runtime_handoff_without_external_assets()
+    request = _request(tmp_path, handoff)
+    execution = _FakeCompositionExecution()
+    job = _CompositionJob()
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.advance_ecommerce_job_assembly",
+        _fake_advance_composition,
+    )
+
+    first = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.RENDER_FINAL,
+        composition_execution=execution,
+    )
+    replay = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.RENDER_FINAL,
+        composition_execution=execution,
+    )
+
+    assert first.next_action is EcommerceJobNextAction.REVIEW_FINAL
+    assert replay.next_action is EcommerceJobNextAction.REVIEW_FINAL
+    assert len(execution.rendered) == 1
+
+
+def test_render_unknown_outcome_stops_for_explicit_recovery(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    handoff = _runtime_handoff_without_external_assets()
+    request = _request(tmp_path, handoff)
+    execution = _FakeCompositionExecution(fail_unknown=True)
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.advance_ecommerce_job_assembly",
+        _fake_advance_composition,
+    )
+
+    result = _CompositionJob().advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.RENDER_FINAL,
+        composition_execution=execution,
+    )
+
+    assert result.next_action is EcommerceJobNextAction.RECOVER_UNKNOWN_OUTCOME
+    assert len(execution.rendered) == 1

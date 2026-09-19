@@ -9,7 +9,6 @@ from typing import Any, Literal
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.ad_creative_types import (
     AdCreativePlan,
-    AdCreativePlanProposal,
     CompiledAdCreativeHandoff,
 )
 from ai_video.production.ecommerce_ad_coordinator import (
@@ -24,23 +23,26 @@ from ai_video.production.ecommerce_job_contracts import (
     EcommerceProductionJobProjection,
     EcommerceProductionJobRequest,
 )
+from ai_video.production.ecommerce_job_assembly import (
+    EcommerceCompositionExecutionPlan,
+    advance_ecommerce_job_assembly,
+    inspect_ecommerce_job_assembly,
+    validate_ecommerce_plan_binding,
+)
 from ai_video.production.ecommerce_job_repair import (
     EcommerceShotRepairContext,
     bound_generation_attempt_ids,
     bound_generation_attempt_ids_for_shot,
     canonical_attempt_identity,
     canonical_repair_frontier,
+    ecommerce_attempt_status,
+    ecommerce_manifest_revision,
     input_attempt_identity,
     plan_ecommerce_shot_repair,
     shot_gate_verdict,
     shots_match_handoff,
 )
-from ai_video.production.hashing import verify_artifact_hash
-from ai_video.production.models import (
-    QaVerdict,
-    ReviewLifecycle,
-    StateCommitStatus,
-)
+from ai_video.production.models import QaVerdict, ReviewLifecycle, StateCommitStatus
 from ai_video.production.project import load_production_project
 
 
@@ -141,42 +143,7 @@ class EcommerceShotExecutionPlan:
         *,
         project_root: Path,
     ) -> dict[str, EcommerceVideoGenerationFacade]:
-        proposal = AdCreativePlanProposal.model_validate(
-            self.plan.model_dump(
-                mode="python",
-                exclude={
-                    "schema_version",
-                    "artifact_id",
-                    "revision",
-                    "content_hash",
-                    "creation_receipt_id",
-                    "source_provenance",
-                },
-            )
-        )
-        provenance = {
-            (item.reference, item.content_hash)
-            for item in self.plan.source_provenance
-        }
-        required_provenance = {
-            (
-                f"ecommerce-handoff:{runtime_handoff.handoff_id}",
-                runtime_handoff.handoff_id,
-            ),
-            (
-                "ecommerce-compile-profile:"
-                f"{runtime_handoff.compile_profile.profile_id}",
-                runtime_handoff.compile_profile.profile_id,
-            ),
-        }
-        if (
-            not verify_artifact_hash(self.plan)
-            or proposal != runtime_handoff.ad_creative_plan_proposal
-            or not required_provenance.issubset(provenance)
-            or self.handoff.plan_id != self.plan.artifact_id
-            or self.handoff.plan_content_hash != self.plan.content_hash
-        ):
-            raise ValueError("Compiled Ecommerce execution is not bound to the selected plan")
+        validate_ecommerce_plan_binding(runtime_handoff, self.handoff, self.plan)
         proposed_shots = tuple(
             item.shot_id for item in runtime_handoff.artifact_proposals.shots
         )
@@ -264,6 +231,7 @@ class EcommerceProductionJobService:
         handoff: EcommerceProductionHandoff,
         *,
         shot_execution: EcommerceShotExecutionPlan | None = None,
+        composition_execution: EcommerceCompositionExecutionPlan | None = None,
     ) -> EcommerceProductionJobProjection:
         """Strictly reopen canonical state and derive exactly one next action."""
 
@@ -491,10 +459,30 @@ class EcommerceProductionJobService:
                     next_shot_id=shot.shot_id,
                 )
 
-        if loaded.manifest.active_render_state is None:
+        assembly = inspect_ecommerce_job_assembly(
+            composition_execution,
+            handoff,
+            project_root=request.project_root,
+        )
+        if assembly.error is not None:
+            return self._blocked(
+                request,
+                blocker_code="ECOMMERCE_COMPOSITION_EXECUTION_INVALID",
+                stage="composition",
+                subject_id=request.job_id,
+                failure_classification="EXECUTION_INPUT_INVALID",
+                required_action="Repair the exact composition inputs through their owner.",
+                error_code=(
+                    assembly.error.code
+                    if isinstance(assembly.error, AiVideoError)
+                    else ErrorCode.PRODUCTION_STATE_INVALID
+                ),
+                manifest_revision=revision,
+            )
+        if assembly.next_action is not EcommerceJobNextAction.REVIEW_FINAL:
             return self._projection(
                 request,
-                next_action=EcommerceJobNextAction.PREPARE_COMPOSITION,
+                next_action=assembly.next_action,
                 manifest_revision=revision,
             )
         acceptance = loaded.manifest.final_acceptance_state
@@ -521,14 +509,59 @@ class EcommerceProductionJobService:
         *,
         expected_action: EcommerceJobNextAction,
         shot_execution: EcommerceShotExecutionPlan | None = None,
+        composition_execution: EcommerceCompositionExecutionPlan | None = None,
     ) -> EcommerceProductionJobProjection:
-        current = self.inspect(
-            request,
-            handoff,
-            shot_execution=shot_execution,
-        )
+        inspect_kwargs: dict[str, object] = {"shot_execution": shot_execution}
+        if (
+            composition_execution is not None
+            and expected_action is not EcommerceJobNextAction.PREPARE_COMPOSITION
+        ):
+            inspect_kwargs["composition_execution"] = composition_execution
+        current = self.inspect(request, handoff, **inspect_kwargs)
         if current.next_action is not expected_action:
             return current
+        if expected_action in {
+            EcommerceJobNextAction.PREPARE_COMPOSITION,
+            EcommerceJobNextAction.RENDER_FINAL,
+        }:
+            if composition_execution is None:
+                return self._blocked(
+                    request,
+                    blocker_code="ECOMMERCE_COMPOSITION_EXECUTION_INPUT_MISSING",
+                    stage="composition",
+                    subject_id=request.job_id,
+                    failure_classification="EXECUTION_INPUT_MISSING",
+                    required_action="Provide exact sealed composition and HyperFrames inputs.",
+                    manifest_revision=current.manifest_revision,
+                )
+            assembly = advance_ecommerce_job_assembly(
+                composition_execution,
+                handoff,
+                project_root=request.project_root,
+                render=expected_action is EcommerceJobNextAction.RENDER_FINAL,
+            )
+            if assembly.error is not None:
+                return self._blocked(
+                    request,
+                    blocker_code="ECOMMERCE_RENDER_EXECUTION_FAILED",
+                    stage="render",
+                    subject_id=request.job_id,
+                    failure_classification="RENDER_FAILED",
+                    required_action="Provide a new exact render attempt after diagnosis.",
+                    error_code=(
+                        assembly.error.code
+                        if isinstance(assembly.error, AiVideoError)
+                        else ErrorCode.RENDER_FAILED
+                    ),
+                    manifest_revision=current.manifest_revision,
+                )
+            return self._projection(
+                request,
+                next_action=assembly.next_action,
+                manifest_revision=ecommerce_manifest_revision(
+                    request.project_root, current.manifest_revision
+                ),
+            )
         if expected_action not in {
             EcommerceJobNextAction.GENERATE_SHOT,
             EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE,
@@ -694,7 +727,9 @@ class EcommerceProductionJobService:
                 manifest_revision=current.manifest_revision,
             )
 
-        revision = self._manifest_revision(request, current.manifest_revision)
+        revision = ecommerce_manifest_revision(
+            request.project_root, current.manifest_revision
+        )
         if result.complete:
             return self._projection(
                 request,
@@ -704,7 +739,9 @@ class EcommerceProductionJobService:
 
         shot_id = result.stopped_shot_id
         assert shot_id is not None
-        status = self._attempt_status(request, shot_execution, shot_id=shot_id)
+        status = ecommerce_attempt_status(
+            request.project_root, shot_execution, shot_id=shot_id
+        )
         if status is StateCommitStatus.OUTCOME_UNKNOWN:
             return self._projection(
                 request,
@@ -755,42 +792,6 @@ class EcommerceProductionJobService:
             required_action="Inspect the canonical attempt and select its typed recovery path.",
             manifest_revision=revision,
         )
-
-    @staticmethod
-    def _manifest_revision(
-        request: EcommerceProductionJobRequest,
-        fallback: int | None,
-    ) -> int | None:
-        try:
-            return load_production_project(
-                request.project_root / "project.yaml"
-            ).manifest.manifest_revision
-        except (AiVideoError, OSError, ValueError):
-            return fallback
-
-    @staticmethod
-    def _attempt_status(
-        request: EcommerceProductionJobRequest,
-        execution: EcommerceShotExecutionPlan,
-        *,
-        shot_id: str,
-    ) -> StateCommitStatus | None:
-        attempt_id = next(
-            item.attempt_id for item in execution.shots if item.shot_id == shot_id
-        )
-        try:
-            manifest = load_production_project(
-                request.project_root / "project.yaml"
-            ).manifest
-        except (AiVideoError, OSError, ValueError):
-            return None
-        attempt = next(
-            (item for item in manifest.attempts if item.attempt_id == attempt_id),
-            None,
-        )
-        return None if attempt is None else attempt.status
-
-
 
 __all__ = [
     "EcommerceProductionJobService",
