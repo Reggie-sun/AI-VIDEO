@@ -272,7 +272,7 @@ def build_presentations() -> tuple[ProductPresentation, ...]:
                 "copy-proof-brighter71",
                 "copy-real-label",
             ),
-            ("audio-vo-demo", "audio-sfx-light-hit-demo"),
+            ("audio-vo-demo",),
             transform=FixedTransform(
                 translate_x_px=608,
                 translate_y_px=832,
@@ -302,7 +302,7 @@ def build_presentations() -> tuple[ProductPresentation, ...]:
             "layer-cta",
             ("source-n3-85c-pricetag",),
             ("copy-cta", "copy-end-card"),
-            ("audio-vo-close", "audio-sfx-close-hit"),
+            ("audio-vo-close",),
             entrance=GraphicAnimation.FADE,
         ),
     )

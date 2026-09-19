@@ -497,11 +497,10 @@
         "component_id": "hook-audio",
         "kind": "AUDIO",
         "cue_seconds": 0,
-        "content": "低沉环境音铺垫，约1.2秒处光幕点亮的 reveal hit 切入",
+        "content": "原生环境声铺垫，约1.2秒处车灯点亮声效（由 Shot 原生音频承载）",
         "claim_ids": [],
         "bound_ids": [
-          "audio-music",
-          "audio-sfx-light-hit"
+          "audio-vo-hook"
         ]
       }
     ],
@@ -535,9 +534,7 @@
         "copy-sub-hook"
       ],
       "audio_event_ids": [
-        "audio-vo-hook",
-        "audio-music",
-        "audio-sfx-light-hit"
+        "audio-vo-hook"
       ]
     },
     {
@@ -560,8 +557,7 @@
         "copy-sub-intro"
       ],
       "audio_event_ids": [
-        "audio-vo-intro",
-        "audio-music"
+        "audio-vo-intro"
       ]
     },
     {
@@ -588,9 +584,7 @@
         "copy-sub-demo"
       ],
       "audio_event_ids": [
-        "audio-vo-demo",
-        "audio-music",
-        "audio-sfx-light-hit-demo"
+        "audio-vo-demo"
       ]
     },
     {
@@ -615,8 +609,7 @@
         "copy-sub-proof"
       ],
       "audio_event_ids": [
-        "audio-vo-proof",
-        "audio-music"
+        "audio-vo-proof"
       ]
     },
     {
@@ -640,9 +633,7 @@
         "copy-sub-close"
       ],
       "audio_event_ids": [
-        "audio-vo-close",
-        "audio-music",
-        "audio-sfx-close-hit"
+        "audio-vo-close"
       ]
     }
   ],
@@ -689,8 +680,7 @@
         "copy-proof-brighter71"
       ],
       "audio_cue_ids": [
-        "audio-vo-demo",
-        "audio-sfx-light-hit-demo"
+        "audio-vo-demo"
       ],
       "fallback_policy": "REQUIRE_REAPPROVAL_HERO",
       "capability_requirement_ids": [
@@ -741,8 +731,7 @@
         "copy-end-card"
       ],
       "audio_cue_ids": [
-        "audio-vo-close",
-        "audio-sfx-close-hit"
+        "audio-vo-close"
       ],
       "fallback_policy": "NONE",
       "capability_requirement_ids": [
@@ -892,8 +881,7 @@
       ],
       "brand_token_reference": "ninebot-proof-label",
       "synchronized_event_ids": [
-        "audio-vo-demo",
-        "audio-sfx-light-hit-demo"
+        "audio-vo-demo"
       ],
       "treatment_id": "treatment-proof"
     },
@@ -1086,7 +1074,6 @@
       ],
       "brand_token_reference": "ninebot-cta",
       "synchronized_event_ids": [
-        "audio-sfx-close-hit",
         "audio-vo-close"
       ],
       "treatment_id": "treatment-cta"
@@ -1135,21 +1122,21 @@
       {
         "event_id": "audio-vo-hook",
         "kind": "VOICE_OVER",
-        "start_seconds": 0.2,
-        "end_seconds": 2.8,
+        "start_seconds": 0.0,
+        "end_seconds": 3.0,
         "beat_ids": [
           "beat-hook"
         ],
         "shot_ids": [
           "shot-hook"
         ],
-        "source_requirement": "录制或合成中文男声 VO，语气贴近本地门店口播",
+        "source_requirement": "由 shot-hook 的 H3 原生音频生成（t2va native audio），Whisper 转写须与 verbatim line 逐字一致",
         "speaker_id": null,
         "verbatim_line": "晚上骑车，最怕看不清",
         "on_camera": false,
         "lip_sync_required": false,
         "energy": "低沉开场，带疑问感",
-        "ducking_required": true,
+        "ducking_required": false,
         "synchronized_event_ids": [
           "hook-visual",
           "copy-headline"
@@ -1159,21 +1146,21 @@
       {
         "event_id": "audio-vo-intro",
         "kind": "VOICE_OVER",
-        "start_seconds": 3.2,
-        "end_seconds": 7.8,
+        "start_seconds": 3.0,
+        "end_seconds": 8.0,
         "beat_ids": [
           "beat-intro"
         ],
         "shot_ids": [
           "shot-intro"
         ],
-        "source_requirement": "同一 VO 声线，清晰报出产品名与系统名",
+        "source_requirement": "由 shot-intro 的 H3 原生音频生成，同一声线，转写逐字验证",
         "speaker_id": null,
         "verbatim_line": "九号 N3 系列，ALC 全境光幕照明系统",
         "on_camera": false,
         "lip_sync_required": false,
         "energy": "自信揭示",
-        "ducking_required": true,
+        "ducking_required": false,
         "synchronized_event_ids": [
           "copy-product-label",
           "presentation-intro"
@@ -1183,21 +1170,21 @@
       {
         "event_id": "audio-vo-demo",
         "kind": "VOICE_OVER",
-        "start_seconds": 8.2,
-        "end_seconds": 15.6,
+        "start_seconds": 8.0,
+        "end_seconds": 16.0,
         "beat_ids": [
           "beat-demo"
         ],
         "shot_ids": [
           "shot-demo"
         ],
-        "source_requirement": "同一 VO 声线，参数逐条读出",
+        "source_requirement": "由 shot-demo 的 H3 原生音频生成，同一声线，转写逐字验证",
         "speaker_id": null,
         "verbatim_line": "65000cd 亮度，远光升级，亮度提升百分之七十一，一路照亮",
         "on_camera": false,
         "lip_sync_required": false,
         "energy": "递进的证明感",
-        "ducking_required": true,
+        "ducking_required": false,
         "synchronized_event_ids": [
           "copy-proof-65000cd",
           "copy-proof-highbeam",
@@ -1208,21 +1195,21 @@
       {
         "event_id": "audio-vo-proof",
         "kind": "VOICE_OVER",
-        "start_seconds": 16.2,
-        "end_seconds": 22.6,
+        "start_seconds": 16.0,
+        "end_seconds": 23.0,
         "beat_ids": [
           "beat-proof"
         ],
         "shot_ids": [
           "shot-proof"
         ],
-        "source_requirement": "同一 VO 声线，价格口播",
+        "source_requirement": "由 shot-proof 的 H3 原生音频生成，同一声线，转写逐字验证",
         "speaker_id": null,
         "verbatim_line": "九号 N3 系列，到手价 3499 起",
         "on_camera": false,
         "lip_sync_required": false,
         "energy": "干脆利落",
-        "ducking_required": true,
+        "ducking_required": false,
         "synchronized_event_ids": [
           "copy-price-series"
         ],
@@ -1231,129 +1218,24 @@
       {
         "event_id": "audio-vo-close",
         "kind": "VOICE_OVER",
-        "start_seconds": 23.4,
-        "end_seconds": 29.4,
+        "start_seconds": 23.0,
+        "end_seconds": 30.0,
         "beat_ids": [
           "beat-close"
         ],
         "shot_ids": [
           "shot-close"
         ],
-        "source_requirement": "同一 VO 声线，店名与到店引导",
+        "source_requirement": "由 shot-close 的 H3 原生音频生成，同一声线，转写逐字验证",
         "speaker_id": null,
         "verbatim_line": "浩口九号智能电动车，到店试灯，一试就知道",
         "on_camera": false,
         "lip_sync_required": false,
         "energy": "热情收尾",
-        "ducking_required": true,
+        "ducking_required": false,
         "synchronized_event_ids": [
           "copy-cta",
           "copy-end-card"
-        ],
-        "silence_rationale": null
-      },
-      {
-        "event_id": "audio-music",
-        "kind": "MUSIC",
-        "start_seconds": 0,
-        "end_seconds": 30,
-        "beat_ids": [
-          "beat-hook",
-          "beat-intro",
-          "beat-demo",
-          "beat-proof",
-          "beat-close"
-        ],
-        "shot_ids": [
-          "shot-hook",
-          "shot-intro",
-          "shot-demo",
-          "shot-proof",
-          "shot-close"
-        ],
-        "source_requirement": "可商用授权的电子节奏 instrumental，夜间都市感",
-        "speaker_id": null,
-        "verbatim_line": null,
-        "on_camera": false,
-        "lip_sync_required": false,
-        "energy": "hook 段低沉，demo 段上扬，close 段收束",
-        "ducking_required": true,
-        "synchronized_event_ids": [
-          "presentation-intro",
-          "presentation-demo",
-          "presentation-hero",
-          "presentation-cta"
-        ],
-        "silence_rationale": null
-      },
-      {
-        "event_id": "audio-sfx-light-hit",
-        "kind": "SFX",
-        "start_seconds": 1.2,
-        "end_seconds": 1.7,
-        "beat_ids": [
-          "beat-hook"
-        ],
-        "shot_ids": [
-          "shot-hook"
-        ],
-        "source_requirement": "设计音效：光幕点亮 reveal hit，demo 段复用变体",
-        "speaker_id": null,
-        "verbatim_line": null,
-        "on_camera": false,
-        "lip_sync_required": false,
-        "energy": "短促明亮的能量释放",
-        "ducking_required": false,
-        "synchronized_event_ids": [
-          "hook-visual"
-        ],
-        "silence_rationale": null
-      },
-      {
-        "event_id": "audio-sfx-light-hit-demo",
-        "kind": "SFX",
-        "start_seconds": 8.4,
-        "end_seconds": 8.9,
-        "beat_ids": [
-          "beat-demo"
-        ],
-        "shot_ids": [
-          "shot-demo"
-        ],
-        "source_requirement": "设计音效：光幕铺开 reveal hit 的 demo 变体",
-        "speaker_id": null,
-        "verbatim_line": null,
-        "on_camera": false,
-        "lip_sync_required": false,
-        "energy": "短促明亮的能量释放",
-        "ducking_required": false,
-        "synchronized_event_ids": [
-          "presentation-demo",
-          "copy-proof-65000cd"
-        ],
-        "silence_rationale": null
-      },
-      {
-        "event_id": "audio-sfx-close-hit",
-        "kind": "SFX",
-        "start_seconds": 23.2,
-        "end_seconds": 23.7,
-        "beat_ids": [
-          "beat-close"
-        ],
-        "shot_ids": [
-          "shot-close"
-        ],
-        "source_requirement": "设计音效：品牌收束 accent",
-        "speaker_id": null,
-        "verbatim_line": null,
-        "on_camera": false,
-        "lip_sync_required": false,
-        "energy": "柔和自信的收尾",
-        "ducking_required": false,
-        "synchronized_event_ids": [
-          "presentation-cta",
-          "copy-cta"
         ],
         "silence_rationale": null
       }
@@ -1362,7 +1244,7 @@
       {
         "shot_id": "shot-hook",
         "source_type": "GENERATED",
-        "policy": "MUTE",
+        "policy": "KEEP",
         "trim_start_seconds": null,
         "lead_in_noise_risk": false,
         "p6_measurement_required": false,
@@ -1370,8 +1252,8 @@
       },
       {
         "shot_id": "shot-intro",
-        "source_type": "NONE",
-        "policy": "MUTE",
+        "source_type": "GENERATED",
+        "policy": "KEEP",
         "trim_start_seconds": null,
         "lead_in_noise_risk": false,
         "p6_measurement_required": false,
@@ -1379,8 +1261,8 @@
       },
       {
         "shot_id": "shot-demo",
-        "source_type": "NATIVE",
-        "policy": "MUTE",
+        "source_type": "GENERATED",
+        "policy": "KEEP",
         "trim_start_seconds": null,
         "lead_in_noise_risk": false,
         "p6_measurement_required": false,
@@ -1388,8 +1270,8 @@
       },
       {
         "shot_id": "shot-proof",
-        "source_type": "NONE",
-        "policy": "MUTE",
+        "source_type": "GENERATED",
+        "policy": "KEEP",
         "trim_start_seconds": null,
         "lead_in_noise_risk": false,
         "p6_measurement_required": false,
@@ -1397,8 +1279,8 @@
       },
       {
         "shot_id": "shot-close",
-        "source_type": "NONE",
-        "policy": "MUTE",
+        "source_type": "GENERATED",
+        "policy": "KEEP",
         "trim_start_seconds": null,
         "lead_in_noise_risk": false,
         "p6_measurement_required": false,
@@ -1465,9 +1347,7 @@
         "copy-sub-hook"
       ],
       "audio_event_ids": [
-        "audio-vo-hook",
-        "audio-music",
-        "audio-sfx-light-hit"
+        "audio-vo-hook"
       ],
       "visual_strategy_need": "生成夜间街道场景，N3 85C 车身剪影与车灯点亮瞬间，不含真实地标、车牌或竞品标识"
     },
@@ -1489,8 +1369,7 @@
         "copy-sub-intro"
       ],
       "audio_event_ids": [
-        "audio-vo-intro",
-        "audio-music"
+        "audio-vo-intro"
       ],
       "visual_strategy_need": "registered asset-n3-85c-front 的 graphic reveal，承认 graphic layer"
     },
@@ -1516,9 +1395,7 @@
         "copy-sub-demo"
       ],
       "audio_event_ids": [
-        "audio-vo-demo",
-        "audio-music",
-        "audio-sfx-light-hit-demo"
+        "audio-vo-demo"
       ],
       "visual_strategy_need": "由 registered asset-n3-85c-front 经 image-to-video 生成夜间骑行镜头（车灯点亮、光幕铺路）；asset-night-pov-video 实拍素材以画中画 layer 叠加，不承担生成"
     },
@@ -1542,8 +1419,7 @@
         "copy-sub-proof"
       ],
       "audio_event_ids": [
-        "audio-vo-proof",
-        "audio-music"
+        "audio-vo-proof"
       ],
       "visual_strategy_need": "dedicated hero shot，价格卡 graphic overlay 需 disclaimer 小字"
     },
@@ -1566,9 +1442,7 @@
         "copy-sub-close"
       ],
       "audio_event_ids": [
-        "audio-vo-close",
-        "audio-music",
-        "audio-sfx-close-hit"
+        "audio-vo-close"
       ],
       "visual_strategy_need": "advertising copy graphics 层叠加在 approved product asset 上"
     }
@@ -1804,5 +1678,5 @@
     ]
   },
   "unresolved_items": [],
-  "package_id": "f549e05c24b82cef1651b6e34a73f733553f4279c226bcf1f9e18e1bd4332ece"
+  "package_id": "6a29051056e3f385369f4194846b3f05bb8dcaf4ccb6d3f2dcec82cf4fe361b2"
 }
