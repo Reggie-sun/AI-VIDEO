@@ -818,6 +818,7 @@ class VideoGenerationService:
         terminal_frame_extractor: TerminalFrameExtractor | None = None,
         continuity_reviewer: GeneratedShotContinuityReviewer | None = None,
         commercial_reviewer: GeneratedCommercialShotReviewer | None = None,
+        repair_commercial_evidence: bool = False,
     ):
         """Perform exactly one canonical prepare action without any activation."""
 
@@ -839,6 +840,7 @@ class VideoGenerationService:
             terminal_frame_extractor=terminal_frame_extractor,
             continuity_reviewer=continuity_reviewer,
             commercial_reviewer=commercial_reviewer,
+            repair_commercial_evidence=repair_commercial_evidence,
         )
 
     def activate_once(self, *, attempt_id: str):

@@ -176,10 +176,17 @@ def checkpoint_generated_commercial_shot(
     commercial_reviewer,
     commercial_policy_content_hash,
     commercial_authorities,
+    repair_not_evaluated=False,
 ):
     """Persist one intent/evidence pair and return exact reopened PASS evidence."""
 
     evaluation_state = state.commercial_evaluation
+    if repair_not_evaluated and (
+        evaluation_state is None or evaluation_state.evidence is None
+    ):
+        raise _state_invalid(
+            "Commercial evidence repair requires an exact existing evidence checkpoint."
+        )
     created_intent = False
     if evaluation_state is None:
         create_intent = getattr(commercial_reviewer, "create_intent", None)
@@ -347,6 +354,120 @@ def checkpoint_generated_commercial_shot(
         evidence = committer._reopen_generated_commercial_shot_evidence(
             evaluation_state.evidence
         )
+        if repair_not_evaluated:
+            previous_verdict = adjudicate_generated_commercial_shot_evidence(
+                evidence,
+                binding=request.commercial_binding,
+            )
+            if previous_verdict is not QaVerdict.NOT_EVALUATED:
+                raise _state_invalid(
+                    "Commercial evidence repair requires NOT_EVALUATED evidence."
+                )
+            repair_intent_state = state.model_copy(
+                update={
+                    "commercial_evaluation": CommercialShotEvaluationState(
+                        phase=CommercialShotEvaluationPhase.INTENT,
+                        intent=evaluation_state.intent,
+                    )
+                }
+            )
+            repair_intent_attempt = _validated_transition(
+                attempt,
+                {"video_generation_state": repair_intent_state},
+            )
+            repair_intent_manifest = _validated_transition(
+                manifest,
+                {
+                    "manifest_revision": manifest.manifest_revision + 1,
+                    "attempts": tuple(
+                        repair_intent_attempt
+                        if item.attempt_id == attempt_id
+                        else item
+                        for item in manifest.attempts
+                    ),
+                },
+            )
+            committer._write_manifest_atomic(repair_intent_manifest)
+            manifest = committer._read_manifest()
+            attempt = committer._video_attempt(manifest, attempt_id)
+            state = attempt.video_generation_state
+            if (
+                state is None
+                or state.commercial_evaluation is None
+                or state.commercial_evaluation.phase
+                is not CommercialShotEvaluationPhase.INTENT
+            ):
+                raise _state_invalid(
+                    "Commercial evidence repair intent checkpoint was lost."
+                )
+            evaluation_state = state.commercial_evaluation
+            replacement = invoke_generated_commercial_shot_reviewer(
+                held_fd,
+                request,
+                measured,
+                intent,
+                commercial_reviewer,
+                commercial_policy_content_hash,
+                commercial_authorities,
+            )
+            if replacement.content_hash == evidence.content_hash:
+                raise _state_invalid(
+                    "Commercial evidence repair did not produce new exact evidence."
+                )
+            evidence_artifact = _prepared_artifact(
+                canonical_generated_commercial_shot_evidence_path(
+                    replacement.content_hash
+                ),
+                _canonical_json_bytes(replacement),
+            )
+            committer._write_immutable_artifact(
+                evidence_artifact,
+                attempt_id=attempt_id,
+            )
+            committer._reopen_exact_video_artifact(evidence_artifact)
+            evidence_pointer = GeneratedCommercialShotEvidencePointer(
+                path=evidence_artifact.relative_path,
+                content_hash=replacement.content_hash,
+                intent_content_hash=replacement.intent_content_hash,
+                evaluation_fingerprint=replacement.evaluation_fingerprint,
+                binding_content_hash=replacement.binding_content_hash,
+                artifact_sha256=replacement.artifact_sha256,
+                file_sha256=evidence_artifact.file_sha256,
+            )
+            evidenced_state = state.model_copy(
+                update={
+                    "commercial_evaluation": CommercialShotEvaluationState(
+                        phase=CommercialShotEvaluationPhase.EVIDENCED,
+                        intent=evaluation_state.intent,
+                        evidence=evidence_pointer,
+                    )
+                }
+            )
+            evidenced_attempt = _validated_transition(
+                attempt,
+                {"video_generation_state": evidenced_state},
+            )
+            evidenced_manifest = _validated_transition(
+                manifest,
+                {
+                    "manifest_revision": manifest.manifest_revision + 1,
+                    "attempts": tuple(
+                        evidenced_attempt
+                        if item.attempt_id == attempt_id
+                        else item
+                        for item in manifest.attempts
+                    ),
+                },
+            )
+            committer._write_manifest_atomic(evidenced_manifest)
+            manifest = committer._read_manifest()
+            attempt = committer._video_attempt(manifest, attempt_id)
+            state = attempt.video_generation_state
+            if state is None or state.commercial_evaluation is None:
+                raise _state_invalid(
+                    "Repaired commercial Shot evidence checkpoint was lost."
+                )
+            evidence = replacement
 
     validate_generated_commercial_shot_evidence(
         evidence,

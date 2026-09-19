@@ -130,7 +130,11 @@ from ai_video.production.ecommerce_job_compiler import (
     bootstrap_ecommerce_production_project,
     compile_ecommerce_production_handoff,
 )
-from ai_video.production.ecommerce_job import EcommerceProductionJobService
+from ai_video.production.ecommerce_job import (
+    EcommerceProductionJobService,
+    EcommerceShotExecutionInput,
+    EcommerceShotExecutionPlan,
+)
 from ai_video.production.commercial_dependency import (
     extend_commercial_source_dependency_graph,
     validate_commercial_source_dependency_graph,
@@ -461,6 +465,8 @@ __all__ = [
     "EcommerceWholeAdAcceptanceTarget",
     "CompiledEcommerceProductionProject",
     "EcommerceProductionJobService",
+    "EcommerceShotExecutionInput",
+    "EcommerceShotExecutionPlan",
     "bootstrap_ecommerce_production_project",
     "compile_ecommerce_production_handoff",
     "CompiledAdCreativeHandoff",

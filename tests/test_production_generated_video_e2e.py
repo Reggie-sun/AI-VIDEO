@@ -16,6 +16,7 @@ from ai_video.production.models import (
     AssetRegistrySnapshot,
     AssetRoleRequirement,
     AssetType,
+    CommercialShotEvaluationPhase,
     DependencyLifecycle,
     EvidenceStrength,
     QaLayer,
@@ -1941,6 +1942,150 @@ def test_commercial_shot_intent_only_requires_explicit_recovery(
     assert replay.value.code is ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN
     assert reviewer.calls == 1
 
+
+def test_commercial_not_evaluated_evidence_repair_reuses_media_without_submit(
+    tmp_path: Path,
+) -> None:
+    _, provider, _, committer = _reach_fetch(tmp_path, commercial=True)
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.fetch_once(attempt_id=ATTEMPT_ID)
+    first_reviewer = _CountingCommercialShotReviewer(
+        verdict=QaVerdict.NOT_EVALUATED
+    )
+
+    with pytest.raises(AiVideoError) as first:
+        service.validate_once(
+            attempt_id=ATTEMPT_ID,
+            commercial_reviewer=first_reviewer,
+        )
+    assert first.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+    before = committer._read_manifest()
+    before_state = before.attempts[-1].video_generation_state
+    assert before_state is not None
+    assert before_state.commercial_evaluation is not None
+    assert before_state.commercial_evaluation.evidence is not None
+    before_evidence = before_state.commercial_evaluation.evidence.content_hash
+    submit_calls = provider.call_counts.submit
+
+    repaired_reviewer = _CountingCommercialShotReviewer(verdict=QaVerdict.PASS)
+    repaired_reviewer.intent = first_reviewer.intent
+    service.validate_once(
+        attempt_id=ATTEMPT_ID,
+        commercial_reviewer=repaired_reviewer,
+        repair_commercial_evidence=True,
+    )
+    service.activate_once(attempt_id=ATTEMPT_ID)
+
+    after = committer._read_manifest()
+    after_state = after.attempts[-1].video_generation_state
+    assert after_state is not None
+    assert after_state.phase is VideoAttemptPhase.ACTIVATE
+    assert after_state.commercial_evaluation is not None
+    assert after_state.commercial_evaluation.evidence is not None
+    assert after_state.commercial_evaluation.evidence.content_hash != before_evidence
+    assert repaired_reviewer.calls == 1
+    assert provider.call_counts.submit == submit_calls
+
+
+def test_interrupted_commercial_evidence_repair_is_unknown_and_not_repeated(
+    tmp_path: Path,
+) -> None:
+    _, provider, _, committer = _reach_fetch(tmp_path, commercial=True)
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.fetch_once(attempt_id=ATTEMPT_ID)
+    first_reviewer = _CountingCommercialShotReviewer(
+        verdict=QaVerdict.NOT_EVALUATED
+    )
+    with pytest.raises(AiVideoError):
+        service.validate_once(
+            attempt_id=ATTEMPT_ID,
+            commercial_reviewer=first_reviewer,
+        )
+
+    repair_reviewer = _CountingCommercialShotReviewer(
+        fail_during_evaluation=True
+    )
+    repair_reviewer.intent = first_reviewer.intent
+    with pytest.raises(AiVideoError) as interrupted:
+        service.validate_once(
+            attempt_id=ATTEMPT_ID,
+            commercial_reviewer=repair_reviewer,
+            repair_commercial_evidence=True,
+        )
+    assert interrupted.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+    assert repair_reviewer.calls == 1
+    interrupted_state = committer._read_manifest().attempts[-1].video_generation_state
+    assert interrupted_state is not None
+    assert interrupted_state.commercial_evaluation is not None
+    assert (
+        interrupted_state.commercial_evaluation.phase
+        is CommercialShotEvaluationPhase.INTENT
+    )
+
+    with pytest.raises(AiVideoError) as replay:
+        service.validate_once(
+            attempt_id=ATTEMPT_ID,
+            commercial_reviewer=repair_reviewer,
+            repair_commercial_evidence=True,
+        )
+    assert replay.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert repair_reviewer.calls == 1
+
+
+def test_repaired_evidence_write_without_manifest_commit_is_not_repeated(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _, provider, _, committer = _reach_fetch(tmp_path, commercial=True)
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.fetch_once(attempt_id=ATTEMPT_ID)
+    first_reviewer = _CountingCommercialShotReviewer(
+        verdict=QaVerdict.NOT_EVALUATED
+    )
+    with pytest.raises(AiVideoError):
+        service.validate_once(
+            attempt_id=ATTEMPT_ID,
+            commercial_reviewer=first_reviewer,
+        )
+
+    repaired_reviewer = _CountingCommercialShotReviewer(verdict=QaVerdict.PASS)
+    repaired_reviewer.intent = first_reviewer.intent
+    original_write = committer._write_manifest_atomic
+    writes = 0
+
+    def fail_evidence_manifest_write(manifest):
+        nonlocal writes
+        writes += 1
+        if writes == 2:
+            raise RuntimeError("fixture interrupted after immutable evidence write")
+        return original_write(manifest)
+
+    monkeypatch.setattr(
+        committer,
+        "_write_manifest_atomic",
+        fail_evidence_manifest_write,
+    )
+    with pytest.raises(RuntimeError, match="immutable evidence write"):
+        service.validate_once(
+            attempt_id=ATTEMPT_ID,
+            commercial_reviewer=repaired_reviewer,
+            repair_commercial_evidence=True,
+        )
+    assert repaired_reviewer.calls == 1
+    state = committer._read_manifest().attempts[-1].video_generation_state
+    assert state is not None
+    assert state.commercial_evaluation is not None
+    assert state.commercial_evaluation.phase is CommercialShotEvaluationPhase.INTENT
+
+    monkeypatch.setattr(committer, "_write_manifest_atomic", original_write)
+    with pytest.raises(AiVideoError) as replay:
+        service.validate_once(
+            attempt_id=ATTEMPT_ID,
+            commercial_reviewer=repaired_reviewer,
+            repair_commercial_evidence=True,
+        )
+    assert replay.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+    assert repaired_reviewer.calls == 1
 
 def test_commercial_shot_validate_once_cannot_bypass_missing_reviewer(
     tmp_path: Path,

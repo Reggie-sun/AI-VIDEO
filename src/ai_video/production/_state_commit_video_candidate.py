@@ -105,6 +105,7 @@ class _StateCommitVideoCandidateMixin:
         continuity_reviewer: GeneratedShotContinuityReviewer | None = None,
         commercial_reviewer: GeneratedCommercialShotReviewer | None = None,
         source_boundary_reviewer=None,
+        repair_commercial_evidence: bool = False,
     ):
         """Measure fetched bytes and persist an inactive exact bundle candidate."""
 
@@ -123,6 +124,10 @@ class _StateCommitVideoCandidateMixin:
                     "Video validation requires exact durable fetched evidence."
                 )
             request = self._reopen_video_request(state.request)
+            if repair_commercial_evidence and request.commercial_binding is None:
+                raise _state_invalid(
+                    "Commercial evidence repair requires a commercial-bound request."
+                )
             source_boundary_required = is_source_boundary_qualification_request(request)
             if source_boundary_required:
                 try:
@@ -289,6 +294,7 @@ class _StateCommitVideoCandidateMixin:
                                 commercial_policy_content_hash
                             ),
                             commercial_authorities=commercial_authorities,
+                            repair_not_evaluated=repair_commercial_evidence,
                         )
                     )
                 if request.continuity_binding is not None:
