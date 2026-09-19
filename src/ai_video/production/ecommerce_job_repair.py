@@ -40,6 +40,7 @@ class EcommerceShotRepairContext:
     proposed_attempt: EcommerceAttemptIdentity | None
     existing_job_attempts: int
     existing_shot_repairs: int
+    request_delta_verified: bool = False
 
 
 @dataclass(frozen=True)
@@ -84,6 +85,12 @@ def plan_ecommerce_shot_repair(
             media_submit_allowed=False,
             blocker_code="ECOMMERCE_SHOT_REPAIR_DIAGNOSIS_INCOMPLETE",
         )
+    if context.intervention.disposition in {"CAPABILITY_BOUNDARY", "SPLIT_SHOT"}:
+        return EcommerceShotRepairDecision(
+            next_action=EcommerceJobNextAction.BLOCKED,
+            media_submit_allowed=False,
+            blocker_code="ECOMMERCE_SHOT_REPAIR_AUTHORING_REQUIRED",
+        )
     if context.existing_shot_repairs >= max_repairs_per_shot:
         return EcommerceShotRepairDecision(
             next_action=EcommerceJobNextAction.BLOCKED,
@@ -127,11 +134,28 @@ def plan_ecommerce_shot_repair(
             media_submit_allowed=False,
             blocker_code="ECOMMERCE_SHOT_REPAIR_DELTA_INVALID",
         )
+    if not context.request_delta_verified:
+        return EcommerceShotRepairDecision(
+            next_action=EcommerceJobNextAction.BLOCKED,
+            media_submit_allowed=False,
+            blocker_code="ECOMMERCE_SHOT_REPAIR_DELTA_INVALID",
+        )
 
     return EcommerceShotRepairDecision(
         next_action=EcommerceJobNextAction.REPAIR_SHOT_MEDIA,
         media_submit_allowed=True,
         changed_variables=intervention.changed_variables,
+    )
+
+
+def attempt_requires_explicit_recovery(attempt: Any) -> bool:
+    """Project durable uncertain boundaries without mutating canonical state."""
+
+    state = getattr(attempt, "video_generation_state", None)
+    return attempt.status is StateCommitStatus.OUTCOME_UNKNOWN or (
+        attempt.status is StateCommitStatus.RUNNING
+        and state is not None
+        and getattr(state, "phase", None) is VideoAttemptPhase.SUBMIT_INTENT
     )
 
 
@@ -321,6 +345,46 @@ def canonical_attempt_identity(
     )
 
 
+def repair_request_delta_is_verified(
+    root: Path,
+    *,
+    prior_attempt_id: str,
+    proposed_request: Any,
+    intervention: Intervention,
+) -> bool:
+    from ai_video.production._video_project_reader import load_video_request_receipt
+    from ai_video.production.generation_diagnosis import verify_intervention_comparison
+
+    loaded = load_production_project(root / "project.yaml")
+    prior_attempt = next(
+        (
+            item
+            for item in loaded.manifest.attempts
+            if item.attempt_id == prior_attempt_id
+        ),
+        None,
+    )
+    if prior_attempt is None:
+        return False
+    state = prior_attempt.video_generation_state
+    if state is None:
+        return False
+    prior = load_video_request_receipt(root, state.request)
+    before = None if prior.activation_scope is None else prior.activation_scope.request
+    after = (
+        None
+        if getattr(proposed_request, "activation_scope", None) is None
+        else proposed_request.activation_scope.request
+    )
+    if before is None or after is None:
+        return False
+    try:
+        verify_intervention_comparison(intervention, before, after)
+    except (TypeError, ValueError):
+        return False
+    return True
+
+
 def canonical_attempt_verdict(root: Path, attempt: Any) -> QaVerdict | None:
     state = attempt.video_generation_state
     evaluation = None if state is None else state.commercial_evaluation
@@ -401,7 +465,7 @@ def canonical_repair_frontier(
         attempt = latest_by_shot.get(proposal.shot_id)
         if attempt is None:
             continue
-        if attempt.status is StateCommitStatus.OUTCOME_UNKNOWN:
+        if attempt_requires_explicit_recovery(attempt):
             return EcommerceJobNextAction.RECOVER_UNKNOWN_OUTCOME, proposal.shot_id
         evaluation = attempt.video_generation_state.commercial_evaluation
         if (

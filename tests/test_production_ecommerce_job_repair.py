@@ -1,13 +1,18 @@
 from __future__ import annotations
 
+from types import SimpleNamespace
+
+import pytest
+
 from ai_video.production.ecommerce_job_contracts import EcommerceJobNextAction
 from ai_video.production.ecommerce_job_repair import (
     EcommerceAttemptIdentity,
     EcommerceShotRepairContext,
+    attempt_requires_explicit_recovery,
     plan_ecommerce_shot_repair,
 )
 from ai_video.production.generation_diagnosis import Diagnosis, Intervention
-from ai_video.production.models import QaVerdict
+from ai_video.production.models import QaVerdict, StateCommitStatus, VideoAttemptPhase
 
 
 HASH_A = "a" * 64
@@ -84,6 +89,7 @@ def test_not_evaluated_routes_to_evidence_repair_without_media_submit() -> None:
             proposed_attempt=None,
             existing_job_attempts=1,
             existing_shot_repairs=0,
+            request_delta_verified=True,
         ),
         max_new_generation_attempts=2,
         max_repairs_per_shot=1,
@@ -106,6 +112,7 @@ def test_unknown_outcome_stops_for_explicit_recovery() -> None:
             proposed_attempt=None,
             existing_job_attempts=1,
             existing_shot_repairs=0,
+            request_delta_verified=True,
         ),
         max_new_generation_attempts=2,
         max_repairs_per_shot=1,
@@ -132,6 +139,7 @@ def test_known_failure_allows_one_diagnosed_new_attempt() -> None:
             ),
             existing_job_attempts=1,
             existing_shot_repairs=0,
+            request_delta_verified=True,
         ),
         max_new_generation_attempts=2,
         max_repairs_per_shot=1,
@@ -154,6 +162,7 @@ def test_exhausted_shot_ceiling_returns_blocked() -> None:
             proposed_attempt=_identity("attempt-3", permit="permit-c", resolved=HASH_C),
             existing_job_attempts=2,
             existing_shot_repairs=1,
+            request_delta_verified=True,
         ),
         max_new_generation_attempts=3,
         max_repairs_per_shot=1,
@@ -179,6 +188,7 @@ def test_provider_switch_requires_new_routing_permit_attempt_and_resolved_identi
             proposed_attempt=_identity("attempt-1"),
             existing_job_attempts=1,
             existing_shot_repairs=0,
+            request_delta_verified=True,
         ),
         max_new_generation_attempts=2,
         max_repairs_per_shot=1,
@@ -209,6 +219,7 @@ def test_provider_switch_accepts_fully_resealed_identity() -> None:
             ),
             existing_job_attempts=1,
             existing_shot_repairs=0,
+            request_delta_verified=True,
         ),
         max_new_generation_attempts=2,
         max_repairs_per_shot=1,
@@ -216,3 +227,64 @@ def test_provider_switch_accepts_fully_resealed_identity() -> None:
 
     assert decision.next_action is EcommerceJobNextAction.REPAIR_SHOT_MEDIA
     assert decision.media_submit_allowed is True
+
+
+@pytest.mark.parametrize("disposition", ("CAPABILITY_BOUNDARY", "SPLIT_SHOT"))
+def test_authoring_disposition_never_authorizes_media_submit(disposition: str) -> None:
+    decision = plan_ecommerce_shot_repair(
+        EcommerceShotRepairContext(
+            shot_id="shot-1",
+            verdict=QaVerdict.FAIL,
+            outcome_known=True,
+            diagnosis=_diagnosis("QUALITY_FAILURE"),
+            intervention=_intervention(disposition=disposition),
+            prior_attempt=_identity("attempt-1"),
+            proposed_attempt=_identity(
+                "attempt-2", permit="permit-b", resolved=HASH_B
+            ),
+            existing_job_attempts=1,
+            existing_shot_repairs=0,
+            request_delta_verified=True,
+        ),
+        max_new_generation_attempts=2,
+        max_repairs_per_shot=1,
+    )
+
+    assert decision.next_action is EcommerceJobNextAction.BLOCKED
+    assert decision.blocker_code == "ECOMMERCE_SHOT_REPAIR_AUTHORING_REQUIRED"
+    assert decision.media_submit_allowed is False
+
+
+def test_declared_repair_without_verified_request_delta_is_blocked() -> None:
+    decision = plan_ecommerce_shot_repair(
+        EcommerceShotRepairContext(
+            shot_id="shot-1",
+            verdict=QaVerdict.FAIL,
+            outcome_known=True,
+            diagnosis=_diagnosis("QUALITY_FAILURE"),
+            intervention=_intervention(),
+            prior_attempt=_identity("attempt-1"),
+            proposed_attempt=_identity(
+                "attempt-2", permit="permit-b", resolved=HASH_B
+            ),
+            existing_job_attempts=1,
+            existing_shot_repairs=0,
+            request_delta_verified=False,
+        ),
+        max_new_generation_attempts=2,
+        max_repairs_per_shot=1,
+    )
+
+    assert decision.next_action is EcommerceJobNextAction.BLOCKED
+    assert decision.blocker_code == "ECOMMERCE_SHOT_REPAIR_DELTA_INVALID"
+    assert decision.media_submit_allowed is False
+
+
+@pytest.mark.parametrize("status", (StateCommitStatus.RUNNING, StateCommitStatus.OUTCOME_UNKNOWN))
+def test_submit_intent_requires_explicit_recovery(status: StateCommitStatus) -> None:
+    attempt = SimpleNamespace(
+        status=status,
+        video_generation_state=SimpleNamespace(phase=VideoAttemptPhase.SUBMIT_INTENT),
+    )
+
+    assert attempt_requires_explicit_recovery(attempt) is True

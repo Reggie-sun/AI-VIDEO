@@ -1,12 +1,15 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
-from contextlib import nullcontext
+from contextlib import contextmanager, nullcontext
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, replace
 from pathlib import Path
+import threading
 from types import SimpleNamespace
 
 import pytest
 
+from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.ad_creative_types import (
     AdCompositionRequirements,
     AdShotProposal,
@@ -184,11 +187,13 @@ class _FakeVideoService:
         self.bound_identity = None
         self.checkpoint = None
         self.validated = False
+        self.guard_ids: list[str] = []
 
     def current_bound_commercial_request_identity(self, *, attempt_id: str):
         return self.bound_identity
 
     def commercial_execution_guard(self, *, attempt_id: str):
+        self.guard_ids.append(attempt_id)
         return nullcontext()
 
     def resume_next_action(self, *, attempt_id: str):
@@ -345,6 +350,14 @@ def test_advance_generate_shot_delegates_to_existing_coordinator_and_replays_no_
     assert replay.next_action is EcommerceJobNextAction.PREPARE_COMPOSITION
     assert first_effects == ("start", "submit", "poll", "fetch", "validate", "activate")
     assert tuple(service.effects) == first_effects
+    assert service.guard_ids[:2] == [
+        f"ecommerce-job-ceiling:{execution.handoff.plan_content_hash}",
+        "attempt-shot-hero-1",
+    ]
+    assert set(service.guard_ids) <= {
+        f"ecommerce-job-ceiling:{execution.handoff.plan_content_hash}",
+        "attempt-shot-hero-1",
+    }
 
 
 @pytest.mark.parametrize(
@@ -429,6 +442,81 @@ def test_generation_ceiling_counts_prior_bound_attempts_across_service_instances
     assert result.blocker is not None
     assert result.blocker.blocker_code == "ECOMMERCE_JOB_GENERATION_CEILING_EXHAUSTED"
     assert service.effects == []
+
+
+class _ConcurrentAdmissionVideoService(_FakeVideoService):
+    admission_lock = threading.Lock()
+    first_started = threading.Event()
+    release_first = threading.Event()
+
+    def commercial_execution_guard(self, *, attempt_id: str):
+        self.guard_ids.append(attempt_id)
+        if not attempt_id.startswith("ecommerce-job-ceiling:"):
+            return nullcontext()
+
+        @contextmanager
+        def guard():
+            if not self.admission_lock.acquire(blocking=False):
+                raise AiVideoError(
+                    code=ErrorCode.PRODUCTION_STATE_BUSY,
+                    user_message="Ecommerce Job execution is busy.",
+                    retryable=False,
+                )
+            try:
+                yield
+            finally:
+                self.admission_lock.release()
+
+        return guard()
+
+    def start(self, *, attempt_id: str, request, execution_binding=None):
+        self.first_started.set()
+        assert self.release_first.wait(timeout=5)
+        super().start(
+            attempt_id=attempt_id,
+            request=request,
+            execution_binding=execution_binding,
+        )
+
+
+def test_job_ceiling_admission_serializes_distinct_attempt_ids(tmp_path: Path) -> None:
+    _ConcurrentAdmissionVideoService.first_started.clear()
+    _ConcurrentAdmissionVideoService.release_first.clear()
+    handoff, request = _bootstrapped_job(tmp_path, attempts=1)
+    first_service = _ConcurrentAdmissionVideoService(QaVerdict.PASS, tmp_path.resolve())
+    second_service = _ConcurrentAdmissionVideoService(QaVerdict.PASS, tmp_path.resolve())
+    first = _execution(first_service, handoff)
+    second_base = _execution(second_service, handoff)
+    second = replace(
+        second_base,
+        shots=(replace(second_base.shots[0], attempt_id="attempt-shot-hero-2"),),
+    )
+    job = EcommerceProductionJobService()
+
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        running = pool.submit(
+            job.advance_once,
+            request,
+            handoff,
+            expected_action=EcommerceJobNextAction.GENERATE_SHOT,
+            shot_execution=first,
+        )
+        assert first_service.first_started.wait(timeout=5)
+        blocked = job.advance_once(
+            request,
+            handoff,
+            expected_action=EcommerceJobNextAction.GENERATE_SHOT,
+            shot_execution=second,
+        )
+        first_service.release_first.set()
+        completed = running.result(timeout=5)
+
+    assert completed.next_action is EcommerceJobNextAction.PREPARE_COMPOSITION
+    assert blocked.next_action is EcommerceJobNextAction.BLOCKED
+    assert blocked.blocker is not None
+    assert blocked.blocker.blocker_code == "ECOMMERCE_JOB_EXECUTION_BUSY"
+    assert first_service.effects.count("submit") == 1
+    assert second_service.effects == []
 
 
 def test_advance_unknown_outcome_stops_without_retry(
@@ -1263,10 +1351,7 @@ def _two_shot_execution(
         item.target_shot_id: item
         for item in compiled.commercial_execution_projections
     }
-    return EcommerceShotExecutionPlan(
-        handoff=compiled,
-        plan=plan,
-        shots=tuple(
+    inputs = tuple(
             EcommerceShotExecutionInput(
                 shot_id=shot_id,
                 attempt_id=f"attempt-{shot_id}-1",
@@ -1294,7 +1379,13 @@ def _two_shot_execution(
                 commercial_reviewer=object(),
             )
             for shot_id in shot_ids
-        ),
+        )
+    by_shot = {item.shot_id: item for item in inputs}
+    return EcommerceShotExecutionPlan(
+        handoff=compiled,
+        plan=plan,
+        shots=inputs,
+        input_factory=by_shot.__getitem__,
     )
 
 

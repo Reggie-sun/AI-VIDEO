@@ -463,7 +463,8 @@ def _run_claimed_shot(
 def run_ecommerce_ad_generation(
     handoff: CompiledAdCreativeHandoff,
     *,
-    facades: Mapping[str, EcommerceVideoGenerationFacade],
+    facades: Mapping[str, EcommerceVideoGenerationFacade] | None = None,
+    facade_factory: Callable[[str], EcommerceVideoGenerationFacade] | None = None,
     stop_requested: Callable[[], bool] | None = None,
 ) -> EcommerceAdGenerationResult:
     """Run Provider Shots strictly in proposal order with a synchronous PASS barrier."""
@@ -482,36 +483,49 @@ def run_ecommerce_ad_generation(
         for shot_id in proposal_ids
         if projection_by_shot[shot_id].invoke_video_provider
     )
-    if set(facades) != set(provider_shot_ids):
-        raise ValueError("Preselected Shot service facades do not match Provider Shots")
-
-    for shot_id in provider_shot_ids:
-        projection = projection_by_shot[shot_id]
-        try:
-            identity = facades[shot_id].bound_commercial_identity()
-        except (AttributeError, TypeError, ValueError):
-            identity = None
-        if identity != (
-            selected.plan_content_hash,
-            projection.projection_hash,
-            shot_id,
-        ):
-            return _stopped(
-                [],
-                shot_id=shot_id,
-                reason=EcommerceStopReason.CHECKPOINT_INVALID,
-            )
+    if (facades is None) == (facade_factory is None):
+        raise ValueError("Provide exactly one Ecommerce Shot facade source")
+    if facades is not None:
+        if set(facades) != set(provider_shot_ids):
+            raise ValueError("Preselected Shot service facades do not match Provider Shots")
+        for shot_id in provider_shot_ids:
+            projection = projection_by_shot[shot_id]
+            try:
+                identity = facades[shot_id].bound_commercial_identity()
+            except (AttributeError, TypeError, ValueError):
+                identity = None
+            if identity != (
+                selected.plan_content_hash,
+                projection.projection_hash,
+                shot_id,
+            ):
+                return _stopped(
+                    [],
+                    shot_id=shot_id,
+                    reason=EcommerceStopReason.CHECKPOINT_INVALID,
+                )
 
     should_stop = stop_requested or (lambda: False)
     activated: list[ActivatedCommercialShotCheckpoint] = []
     for shot_id in provider_shot_ids:
         projection = projection_by_shot[shot_id]
-        facade = facades[shot_id]
         if should_stop():
             return _stopped(
                 activated,
                 shot_id=shot_id,
                 reason=EcommerceStopReason.USER_STOP,
+            )
+        try:
+            facade = (
+                facades[shot_id]
+                if facades is not None
+                else facade_factory(shot_id)  # type: ignore[misc]
+            )
+        except (AiVideoError, AttributeError, KeyError, TypeError, ValueError):
+            return _stopped(
+                activated,
+                shot_id=shot_id,
+                reason=EcommerceStopReason.SERVICE_STOP,
             )
         guard_factory = getattr(facade, "execution_guard", None)
         guard = nullcontext() if guard_factory is None else guard_factory()

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Callable, Literal
 
 from ai_video.production.ad_creative_types import AdCreativePlan, CompiledAdCreativeHandoff
 from ai_video.production.ecommerce_ad_coordinator import EcommerceVideoGenerationFacade
@@ -103,13 +103,23 @@ class EcommerceShotExecutionPlan:
     handoff: CompiledAdCreativeHandoff
     plan: AdCreativePlan
     shots: tuple[EcommerceShotExecutionInput, ...]
+    input_factory: Callable[[str], EcommerceShotExecutionInput] | None = None
 
-    def build_facades(
+    def job_execution_guard(self):
+        """Serialize the Job-owned ceiling check through its Shot side effect."""
+
+        if not self.shots:
+            raise ValueError("Ecommerce Shot execution plan has no Provider Shots")
+        return self.shots[0].service.commercial_execution_guard(
+            attempt_id=f"ecommerce-job-ceiling:{self.handoff.plan_content_hash}"
+        )
+
+    def validate(
         self,
         runtime_handoff: EcommerceProductionHandoff,
         *,
         project_root: Path,
-    ) -> dict[str, EcommerceVideoGenerationFacade]:
+    ) -> None:
         validate_ecommerce_plan_binding(runtime_handoff, self.handoff, self.plan)
         proposed_shots = tuple(
             item.shot_id for item in runtime_handoff.artifact_proposals.shots
@@ -117,21 +127,60 @@ class EcommerceShotExecutionPlan:
         compiled_shots = tuple(item.shot_id for item in self.handoff.shot_proposals)
         if compiled_shots != proposed_shots:
             raise ValueError("Compiled Ecommerce Shot order does not match the Job handoff")
-        projections = {
-            item.target_shot_id: item
+        provider_shot_ids = tuple(
+            item.target_shot_id
             for item in self.handoff.commercial_execution_projections
             if item.invoke_video_provider
-        }
+        )
         inputs = {item.shot_id: item for item in self.shots}
-        if len(inputs) != len(self.shots) or set(inputs) != set(projections):
+        if len(inputs) != len(self.shots) or set(inputs) != set(provider_shot_ids):
             raise ValueError("Ecommerce Shot execution inputs do not cover exact Provider Shots")
+        if len(provider_shot_ids) > 1 and self.input_factory is None:
+            raise ValueError("Multiple Provider Shots require deferred execution inputs")
+        for item in self.shots:
+            service_root = getattr(item.service, "project_root", None)
+            if service_root is None or Path(service_root).resolve() != project_root.resolve():
+                raise ValueError("Ecommerce Shot service is bound to another Project root")
+
+    def build_facade_for_shot(
+        self,
+        shot_id: str,
+        runtime_handoff: EcommerceProductionHandoff,
+        *,
+        project_root: Path,
+    ) -> EcommerceVideoGenerationFacade:
+        self.validate(runtime_handoff, project_root=project_root)
+        declared = next((item for item in self.shots if item.shot_id == shot_id), None)
+        if declared is None:
+            raise ValueError("Ecommerce Shot is not declared by the execution plan")
+        selected = self.input_factory(shot_id) if self.input_factory else declared
+        if selected.shot_id != shot_id or selected.attempt_id != declared.attempt_id:
+            raise ValueError("Deferred Ecommerce Shot input changed declared identity")
+        projection = next(
+            item
+            for item in self.handoff.commercial_execution_projections
+            if item.invoke_video_provider and item.target_shot_id == shot_id
+        )
+        return selected.build_facade(
+            project_root=project_root,
+            plan_hash=self.handoff.plan_content_hash,
+            projection_hash=projection.projection_hash,
+        )
+
+    def build_facades(
+        self,
+        runtime_handoff: EcommerceProductionHandoff,
+        *,
+        project_root: Path,
+    ) -> dict[str, EcommerceVideoGenerationFacade]:
+        self.validate(runtime_handoff, project_root=project_root)
         return {
-            shot_id: inputs[shot_id].build_facade(
+            item.shot_id: self.build_facade_for_shot(
+                item.shot_id,
+                runtime_handoff,
                 project_root=project_root,
-                plan_hash=self.handoff.plan_content_hash,
-                projection_hash=projection.projection_hash,
             )
-            for shot_id, projection in projections.items()
+            for item in self.shots
         }
 
 

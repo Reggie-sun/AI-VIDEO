@@ -28,12 +28,14 @@ from ai_video.production.ecommerce_job_execution import (
 from ai_video.production.ecommerce_job_repair import (
     bound_generation_attempt_ids,
     bound_generation_attempt_ids_for_shot,
+    attempt_requires_explicit_recovery,
     canonical_attempt_identity,
     canonical_repair_frontier,
     ecommerce_attempt_status,
     ecommerce_manifest_revision,
     input_attempt_identity,
     plan_ecommerce_shot_repair,
+    repair_request_delta_is_verified,
     shot_gate_verdict,
     shots_match_handoff,
 )
@@ -232,7 +234,7 @@ class EcommerceProductionJobService:
         unknown_attempts = tuple(
             item.attempt_id
             for item in loaded.manifest.attempts
-            if item.status is StateCommitStatus.OUTCOME_UNKNOWN
+            if attempt_requires_explicit_recovery(item)
             or (
                 item.operation == "review"
                 and item.status is StateCommitStatus.RUNNING
@@ -264,7 +266,7 @@ class EcommerceProductionJobService:
 
         if shot_execution is not None:
             try:
-                shot_execution.build_facades(
+                shot_execution.validate(
                     handoff,
                     project_root=request.project_root,
                 )
@@ -581,210 +583,241 @@ class EcommerceProductionJobService:
             )
 
         try:
-            loaded = load_production_project(request.project_root / "project.yaml")
-            bound_attempt_ids = set(
-                bound_generation_attempt_ids(request.project_root, shot_execution)
-            )
-            requested_attempt_ids = {
-                item.attempt_id for item in shot_execution.shots
-            }
-            if (
-                len(bound_attempt_ids | requested_attempt_ids)
-                > request.max_new_generation_attempts
-            ):
-                return self._blocked(
-                    request,
-                    blocker_code="ECOMMERCE_JOB_GENERATION_CEILING_EXHAUSTED",
-                    stage="shot_execution",
-                    subject_id=current.next_shot_id or request.job_id,
-                    failure_classification="ATTEMPT_CEILING",
-                    required_action="Stop or authorize a new finite Job request.",
-                    manifest_revision=loaded.manifest.manifest_revision,
-                )
-            if expected_action is EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE:
-                item = next(
-                    (
-                        candidate
-                        for candidate in shot_execution.shots
-                        if candidate.shot_id == current.next_shot_id
-                    ),
-                    None,
-                )
-                if item is None or item.attempt_id not in bound_attempt_ids:
+            with shot_execution.job_execution_guard():
+                locked = self.inspect(request, handoff, **inspect_kwargs)
+                if locked.next_action is not expected_action:
+                    return locked
+                current = locked
+                try:
+                    loaded = load_production_project(request.project_root / "project.yaml")
+                    bound_attempt_ids = set(
+                        bound_generation_attempt_ids(request.project_root, shot_execution)
+                    )
+                    requested_attempt_ids = {
+                        item.attempt_id for item in shot_execution.shots
+                    }
+                    if (
+                        len(bound_attempt_ids | requested_attempt_ids)
+                        > request.max_new_generation_attempts
+                    ):
+                        return self._blocked(
+                            request,
+                            blocker_code="ECOMMERCE_JOB_GENERATION_CEILING_EXHAUSTED",
+                            stage="shot_execution",
+                            subject_id=current.next_shot_id or request.job_id,
+                            failure_classification="ATTEMPT_CEILING",
+                            required_action="Stop or authorize a new finite Job request.",
+                            manifest_revision=loaded.manifest.manifest_revision,
+                        )
+                    if expected_action is EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE:
+                        item = next(
+                            (
+                                candidate
+                                for candidate in shot_execution.shots
+                                if candidate.shot_id == current.next_shot_id
+                            ),
+                            None,
+                        )
+                        if item is None or item.attempt_id not in bound_attempt_ids:
+                            return self._blocked(
+                                request,
+                                blocker_code="ECOMMERCE_EVIDENCE_REPAIR_ATTEMPT_MISMATCH",
+                                stage="shot_repair",
+                                subject_id=current.next_shot_id or request.job_id,
+                                failure_classification="IDENTITY_MISMATCH",
+                                required_action="Resume the exact failed evidence attempt without a new submit.",
+                                manifest_revision=loaded.manifest.manifest_revision,
+                            )
+                        item.repair_evidence_once()
+                    if expected_action is EcommerceJobNextAction.REPAIR_SHOT_MEDIA:
+                        shot_id = current.next_shot_id
+                        item = next(
+                            (
+                                candidate
+                                for candidate in shot_execution.shots
+                                if candidate.shot_id == shot_id
+                            ),
+                            None,
+                        )
+                        if item is None or item.repair_context is None:
+                            return self._blocked(
+                                request,
+                                blocker_code="ECOMMERCE_SHOT_REPAIR_DIAGNOSIS_INCOMPLETE",
+                                stage="shot_repair",
+                                subject_id=shot_id or request.job_id,
+                                failure_classification="REPAIR_INPUT_INVALID",
+                                required_action="Provide the exact diagnosed bounded repair context.",
+                                manifest_revision=loaded.manifest.manifest_revision,
+                            )
+                        context = item.repair_context
+                        prior = canonical_attempt_identity(
+                            request.project_root,
+                            context.prior_attempt.attempt_id,
+                        )
+                        proposed = input_attempt_identity(item)
+                        if (
+                            context.shot_id != shot_id
+                            or context.prior_attempt != prior
+                            or context.proposed_attempt != proposed
+                        ):
+                            return self._blocked(
+                                request,
+                                blocker_code="ECOMMERCE_SHOT_REPAIR_IDENTITY_MISMATCH",
+                                stage="shot_repair",
+                                subject_id=shot_id or request.job_id,
+                                failure_classification="IDENTITY_MISMATCH",
+                                required_action="Re-seal repair against canonical prior and proposed identities.",
+                                manifest_revision=loaded.manifest.manifest_revision,
+                            )
+                        shot_attempts = bound_generation_attempt_ids_for_shot(
+                            request.project_root,
+                            shot_execution,
+                            shot_id=shot_id,
+                        )
+                        decision = plan_ecommerce_shot_repair(
+                            replace(
+                                context,
+                                existing_job_attempts=len(bound_attempt_ids),
+                                existing_shot_repairs=max(0, len(shot_attempts) - 1),
+                                request_delta_verified=repair_request_delta_is_verified(
+                                    request.project_root,
+                                    prior_attempt_id=context.prior_attempt.attempt_id,
+                                    proposed_request=item.request,
+                                    intervention=context.intervention,
+                                ),
+                            ),
+                            max_new_generation_attempts=request.max_new_generation_attempts,
+                            max_repairs_per_shot=request.max_repairs_per_shot,
+                        )
+                        if not decision.media_submit_allowed:
+                            return self._blocked(
+                                request,
+                                blocker_code=(
+                                    decision.blocker_code
+                                    or "ECOMMERCE_SHOT_REPAIR_NOT_AUTHORIZED"
+                                ),
+                                stage="shot_repair",
+                                subject_id=shot_id or request.job_id,
+                                failure_classification="REPAIR_BLOCKED",
+                                required_action="Stop or provide a valid bounded repair decision.",
+                                manifest_revision=loaded.manifest.manifest_revision,
+                            )
+                    facades = {}
+
+                    def facade_factory(shot_id: str):
+                        facade = shot_execution.build_facade_for_shot(
+                            shot_id,
+                            handoff,
+                            project_root=request.project_root,
+                        )
+                        facades[shot_id] = facade
+                        return facade
+
+                    result = run_ecommerce_ad_generation(
+                        shot_execution.handoff,
+                        facade_factory=facade_factory,
+                    )
+                except (AiVideoError, OSError, TypeError, ValueError) as exc:
+                    if expected_action is EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE:
+                        reopened = self.inspect(
+                            request,
+                            handoff,
+                            shot_execution=shot_execution,
+                        )
+                        if (
+                            reopened.next_action
+                            is EcommerceJobNextAction.RECOVER_UNKNOWN_OUTCOME
+                        ):
+                            return reopened
+                    code = exc.code if isinstance(exc, AiVideoError) else ErrorCode.PRODUCTION_STATE_INVALID
                     return self._blocked(
                         request,
-                        blocker_code="ECOMMERCE_EVIDENCE_REPAIR_ATTEMPT_MISMATCH",
-                        stage="shot_repair",
+                        blocker_code="ECOMMERCE_SHOT_EXECUTION_INVALID",
+                        stage="shot_execution",
                         subject_id=current.next_shot_id or request.job_id,
-                        failure_classification="IDENTITY_MISMATCH",
-                        required_action="Resume the exact failed evidence attempt without a new submit.",
-                        manifest_revision=loaded.manifest.manifest_revision,
+                        failure_classification="EXECUTION_INPUT_INVALID",
+                        required_action="Repair the exact Shot execution inputs through their owner.",
+                        error_code=code,
+                        manifest_revision=current.manifest_revision,
                     )
-                item.repair_evidence_once()
-            if expected_action is EcommerceJobNextAction.REPAIR_SHOT_MEDIA:
-                shot_id = current.next_shot_id
-                item = next(
-                    (
-                        candidate
-                        for candidate in shot_execution.shots
-                        if candidate.shot_id == shot_id
-                    ),
-                    None,
+
+                revision = ecommerce_manifest_revision(
+                    request.project_root, current.manifest_revision
                 )
-                if item is None or item.repair_context is None:
-                    return self._blocked(
+                if result.complete:
+                    return self._projection(
                         request,
-                        blocker_code="ECOMMERCE_SHOT_REPAIR_DIAGNOSIS_INCOMPLETE",
-                        stage="shot_repair",
-                        subject_id=shot_id or request.job_id,
-                        failure_classification="REPAIR_INPUT_INVALID",
-                        required_action="Provide the exact diagnosed bounded repair context.",
-                        manifest_revision=loaded.manifest.manifest_revision,
+                        next_action=EcommerceJobNextAction.PREPARE_COMPOSITION,
+                        manifest_revision=revision,
                     )
-                context = item.repair_context
-                prior = canonical_attempt_identity(
-                    request.project_root,
-                    context.prior_attempt.attempt_id,
+
+                shot_id = result.stopped_shot_id
+                assert shot_id is not None
+                status = ecommerce_attempt_status(
+                    request.project_root, shot_execution, shot_id=shot_id
                 )
-                proposed = input_attempt_identity(item)
-                if (
-                    context.shot_id != shot_id
-                    or context.prior_attempt != prior
-                    or context.proposed_attempt != proposed
-                ):
-                    return self._blocked(
+                if status is StateCommitStatus.OUTCOME_UNKNOWN:
+                    return self._projection(
                         request,
-                        blocker_code="ECOMMERCE_SHOT_REPAIR_IDENTITY_MISMATCH",
-                        stage="shot_repair",
-                        subject_id=shot_id or request.job_id,
-                        failure_classification="IDENTITY_MISMATCH",
-                        required_action="Re-seal repair against canonical prior and proposed identities.",
-                        manifest_revision=loaded.manifest.manifest_revision,
+                        next_action=EcommerceJobNextAction.RECOVER_UNKNOWN_OUTCOME,
+                        manifest_revision=revision,
+                        next_shot_id=shot_id,
                     )
-                shot_attempts = bound_generation_attempt_ids_for_shot(
-                    request.project_root,
-                    shot_execution,
-                    shot_id=shot_id,
-                )
-                decision = plan_ecommerce_shot_repair(
-                    replace(
-                        context,
-                        existing_job_attempts=len(bound_attempt_ids),
-                        existing_shot_repairs=max(0, len(shot_attempts) - 1),
-                    ),
-                    max_new_generation_attempts=request.max_new_generation_attempts,
-                    max_repairs_per_shot=request.max_repairs_per_shot,
-                )
-                if not decision.media_submit_allowed:
-                    return self._blocked(
-                        request,
-                        blocker_code=(
-                            decision.blocker_code
-                            or "ECOMMERCE_SHOT_REPAIR_NOT_AUTHORIZED"
-                        ),
-                        stage="shot_repair",
-                        subject_id=shot_id or request.job_id,
-                        failure_classification="REPAIR_BLOCKED",
-                        required_action="Stop or provide a valid bounded repair decision.",
-                        manifest_revision=loaded.manifest.manifest_revision,
-                    )
-            facades = shot_execution.build_facades(
-                handoff,
-                project_root=request.project_root,
-            )
-            result = run_ecommerce_ad_generation(
-                shot_execution.handoff,
-                facades=facades,
-            )
-        except (AiVideoError, OSError, TypeError, ValueError) as exc:
-            if expected_action is EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE:
                 reopened = self.inspect(
                     request,
                     handoff,
                     shot_execution=shot_execution,
                 )
-                if (
-                    reopened.next_action
-                    is EcommerceJobNextAction.RECOVER_UNKNOWN_OUTCOME
-                ):
+                if reopened.next_action is EcommerceJobNextAction.RECOVER_UNKNOWN_OUTCOME:
                     return reopened
-            code = exc.code if isinstance(exc, AiVideoError) else ErrorCode.PRODUCTION_STATE_INVALID
+                verdict = shot_gate_verdict(
+                    request.project_root,
+                    shot_execution,
+                    facades,
+                    shot_id=shot_id,
+                )
+                if verdict in {QaVerdict.FAIL, QaVerdict.NOT_EVALUATED}:
+                    action = (
+                        EcommerceJobNextAction.REPAIR_SHOT_MEDIA
+                        if verdict is QaVerdict.FAIL
+                        else EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE
+                    )
+                    return self._projection(
+                        request,
+                        next_action=action,
+                        manifest_revision=revision,
+                        next_shot_id=shot_id,
+                    )
+                if result.stop_reason is EcommerceStopReason.SHOT_NOT_PASS:
+                    return self._projection(
+                        request,
+                        next_action=EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE,
+                        manifest_revision=revision,
+                        next_shot_id=shot_id,
+                    )
+                return self._blocked(
+                    request,
+                    blocker_code="ECOMMERCE_SHOT_EXECUTION_STOPPED",
+                    stage="shot_execution",
+                    subject_id=shot_id,
+                    failure_classification=(
+                        result.stop_reason.value if result.stop_reason is not None else "STOPPED"
+                    ),
+                    required_action="Inspect the canonical attempt and select its typed recovery path.",
+                    manifest_revision=revision,
+                )
+        except AiVideoError as exc:
             return self._blocked(
                 request,
-                blocker_code="ECOMMERCE_SHOT_EXECUTION_INVALID",
+                blocker_code="ECOMMERCE_JOB_EXECUTION_BUSY",
                 stage="shot_execution",
                 subject_id=current.next_shot_id or request.job_id,
-                failure_classification="EXECUTION_INPUT_INVALID",
-                required_action="Repair the exact Shot execution inputs through their owner.",
-                error_code=code,
+                failure_classification="EXECUTION_BUSY",
+                required_action="Replay after the active Ecommerce Job execution finishes.",
+                error_code=exc.code,
                 manifest_revision=current.manifest_revision,
             )
 
-        revision = ecommerce_manifest_revision(
-            request.project_root, current.manifest_revision
-        )
-        if result.complete:
-            return self._projection(
-                request,
-                next_action=EcommerceJobNextAction.PREPARE_COMPOSITION,
-                manifest_revision=revision,
-            )
-
-        shot_id = result.stopped_shot_id
-        assert shot_id is not None
-        status = ecommerce_attempt_status(
-            request.project_root, shot_execution, shot_id=shot_id
-        )
-        if status is StateCommitStatus.OUTCOME_UNKNOWN:
-            return self._projection(
-                request,
-                next_action=EcommerceJobNextAction.RECOVER_UNKNOWN_OUTCOME,
-                manifest_revision=revision,
-                next_shot_id=shot_id,
-            )
-        reopened = self.inspect(
-            request,
-            handoff,
-            shot_execution=shot_execution,
-        )
-        if reopened.next_action is EcommerceJobNextAction.RECOVER_UNKNOWN_OUTCOME:
-            return reopened
-        verdict = shot_gate_verdict(
-            request.project_root,
-            shot_execution,
-            facades,
-            shot_id=shot_id,
-        )
-        if verdict in {QaVerdict.FAIL, QaVerdict.NOT_EVALUATED}:
-            action = (
-                EcommerceJobNextAction.REPAIR_SHOT_MEDIA
-                if verdict is QaVerdict.FAIL
-                else EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE
-            )
-            return self._projection(
-                request,
-                next_action=action,
-                manifest_revision=revision,
-                next_shot_id=shot_id,
-            )
-        if result.stop_reason is EcommerceStopReason.SHOT_NOT_PASS:
-            return self._projection(
-                request,
-                next_action=EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE,
-                manifest_revision=revision,
-                next_shot_id=shot_id,
-            )
-        return self._blocked(
-            request,
-            blocker_code="ECOMMERCE_SHOT_EXECUTION_STOPPED",
-            stage="shot_execution",
-            subject_id=shot_id,
-            failure_classification=(
-                result.stop_reason.value if result.stop_reason is not None else "STOPPED"
-            ),
-            required_action="Inspect the canonical attempt and select its typed recovery path.",
-            manifest_revision=revision,
-        )
 
 __all__ = [
     "EcommerceProductionJobService",
