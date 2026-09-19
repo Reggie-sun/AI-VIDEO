@@ -698,12 +698,23 @@ class EcommerceProductionJobService:
                                 manifest_revision=loaded.manifest.manifest_revision,
                             )
                     facades = {}
+                    shot_execution.validate(
+                        handoff,
+                        project_root=request.project_root,
+                    )
+                    completed_checkpoints = (
+                        shot_execution.current_completed_checkpoints()
+                    )
 
                     def facade_factory(shot_id: str):
                         facade = shot_execution.build_facade_for_shot(
                             shot_id,
                             handoff,
                             project_root=request.project_root,
+                            realize_deferred=(
+                                expected_action
+                                is EcommerceJobNextAction.GENERATE_SHOT
+                            ),
                         )
                         facades[shot_id] = facade
                         return facade
@@ -711,6 +722,7 @@ class EcommerceProductionJobService:
                     result = run_ecommerce_ad_generation(
                         shot_execution.handoff,
                         facade_factory=facade_factory,
+                        completed_checkpoints=completed_checkpoints,
                     )
                 except (AiVideoError, OSError, TypeError, ValueError) as exc:
                     if expected_action is EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE:
@@ -722,6 +734,15 @@ class EcommerceProductionJobService:
                         if (
                             reopened.next_action
                             is EcommerceJobNextAction.RECOVER_UNKNOWN_OUTCOME
+                            or (
+                                isinstance(exc, AiVideoError)
+                                and exc.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+                                and reopened.next_action
+                                in {
+                                    EcommerceJobNextAction.REPAIR_SHOT_MEDIA,
+                                    EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE,
+                                }
+                            )
                         ):
                             return reopened
                     code = exc.code if isinstance(exc, AiVideoError) else ErrorCode.PRODUCTION_STATE_INVALID

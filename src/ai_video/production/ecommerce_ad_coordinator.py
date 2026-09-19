@@ -465,6 +465,9 @@ def run_ecommerce_ad_generation(
     *,
     facades: Mapping[str, EcommerceVideoGenerationFacade] | None = None,
     facade_factory: Callable[[str], EcommerceVideoGenerationFacade] | None = None,
+    completed_checkpoints: Mapping[
+        str, ActivatedCommercialShotCheckpoint
+    ] | None = None,
     stop_requested: Callable[[], bool] | None = None,
 ) -> EcommerceAdGenerationResult:
     """Run Provider Shots strictly in proposal order with a synchronous PASS barrier."""
@@ -485,6 +488,9 @@ def run_ecommerce_ad_generation(
     )
     if (facades is None) == (facade_factory is None):
         raise ValueError("Provide exactly one Ecommerce Shot facade source")
+    completed = completed_checkpoints or {}
+    if not set(completed).issubset(provider_shot_ids):
+        raise ValueError("Completed Ecommerce checkpoints do not match Provider Shots")
     if facades is not None:
         if set(facades) != set(provider_shot_ids):
             raise ValueError("Preselected Shot service facades do not match Provider Shots")
@@ -515,6 +521,21 @@ def run_ecommerce_ad_generation(
                 shot_id=shot_id,
                 reason=EcommerceStopReason.USER_STOP,
             )
+        checkpoint = completed.get(shot_id)
+        if checkpoint is not None:
+            if not _checkpoint_is_exact(
+                checkpoint,
+                plan_hash=selected.plan_content_hash,
+                projection_hash=projection.projection_hash,
+                shot_id=shot_id,
+            ):
+                return _stopped(
+                    activated,
+                    shot_id=shot_id,
+                    reason=EcommerceStopReason.CHECKPOINT_INVALID,
+                )
+            activated.append(checkpoint)
+            continue
         try:
             facade = (
                 facades[shot_id]

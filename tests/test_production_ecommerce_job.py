@@ -732,6 +732,75 @@ def test_evidence_repair_resumes_exact_attempt_without_media_submit(
     assert service.effects == ["validate", "activate"]
 
 
+def test_evidence_repair_uses_declared_input_instead_of_deferred_replacement(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    class _EvidenceRepairJob(EcommerceProductionJobService):
+        def inspect(self, request, handoff, *, shot_execution=None):
+            return self._projection(
+                request,
+                next_action=EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE,
+                manifest_revision=1,
+                next_shot_id="shot-hero",
+            )
+
+    handoff, request = _bootstrapped_job(tmp_path)
+    service = _FakeVideoService(
+        QaVerdict.NOT_EVALUATED,
+        tmp_path.resolve(),
+        repair_verdict=QaVerdict.PASS,
+    )
+    service.actions = [
+        EcommerceShotNextAction.VALIDATE,
+        EcommerceShotNextAction.ACTIVATE,
+        EcommerceShotNextAction.DONE,
+    ]
+    execution = _execution(service, handoff)
+    declared = execution.shots[0]
+    binding = declared.request.commercial_binding
+    service.bound_identity = (
+        declared.request.resolved_generation_hash,
+        binding.ad_creative_plan_hash,
+        binding.commercial_execution_projection_hash,
+        binding.target_shot_id,
+    )
+    replacement_service = _FakeVideoService(QaVerdict.PASS, tmp_path.resolve())
+    replacement = replace(
+        declared,
+        service=replacement_service,
+        request=SimpleNamespace(
+            commercial_binding=declared.request.commercial_binding,
+            resolved_generation_hash="9" * 64,
+            provider_kind="replacement-provider",
+            model_id="replacement-model",
+        ),
+    )
+    factory_calls: list[str] = []
+
+    def replace_validated_input(shot_id: str):
+        factory_calls.append(shot_id)
+        return replacement
+
+    execution = replace(execution, input_factory=replace_validated_input)
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.bound_generation_attempt_ids",
+        lambda _root, _execution: (declared.attempt_id,),
+    )
+
+    result = _EvidenceRepairJob().advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE,
+        shot_execution=execution,
+    )
+
+    assert result.next_action is EcommerceJobNextAction.PREPARE_COMPOSITION
+    assert factory_calls == []
+    assert service.effects == ["validate", "activate"]
+    assert replacement_service.effects == []
+
+
 def test_evidence_repair_rejects_a_new_attempt_before_any_effect(
     tmp_path: Path,
 ) -> None:
@@ -893,6 +962,71 @@ def test_evidence_repair_interruption_returns_reopened_recovery_projection(
 
     assert result.next_action is EcommerceJobNextAction.RECOVER_UNKNOWN_OUTCOME
     assert result.blocker is None
+
+
+@pytest.mark.parametrize(
+    ("repair_verdict", "reopened_action"),
+    (
+        (QaVerdict.FAIL, EcommerceJobNextAction.REPAIR_SHOT_MEDIA),
+        (QaVerdict.NOT_EVALUATED, EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE),
+    ),
+)
+def test_evidence_repair_error_returns_durable_typed_repair_frontier(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    repair_verdict: QaVerdict,
+    reopened_action: EcommerceJobNextAction,
+) -> None:
+    class _EvidenceRepairJob(EcommerceProductionJobService):
+        inspections = 0
+
+        def inspect(self, request, handoff, *, shot_execution=None):
+            self.inspections += 1
+            action = (
+                EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE
+                if self.inspections <= 2
+                else reopened_action
+            )
+            return self._projection(
+                request,
+                next_action=action,
+                manifest_revision=self.inspections,
+                next_shot_id="shot-hero",
+            )
+
+    handoff, request = _bootstrapped_job(tmp_path)
+    service = _FakeVideoService(
+        QaVerdict.NOT_EVALUATED,
+        tmp_path.resolve(),
+        raise_review_error=True,
+        repair_verdict=repair_verdict,
+    )
+    service.actions = [EcommerceShotNextAction.VALIDATE]
+    execution = _execution(service, handoff)
+    declared = execution.shots[0]
+    binding = declared.request.commercial_binding
+    service.bound_identity = (
+        declared.request.resolved_generation_hash,
+        binding.ad_creative_plan_hash,
+        binding.commercial_execution_projection_hash,
+        binding.target_shot_id,
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.bound_generation_attempt_ids",
+        lambda _root, _execution: (declared.attempt_id,),
+    )
+
+    result = _EvidenceRepairJob().advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE,
+        shot_execution=execution,
+    )
+
+    assert result.next_action is reopened_action
+    assert result.next_shot_id == "shot-hero"
+    assert result.blocker is None
+    assert service.effects == ["validate"]
 
 
 def test_existing_shot_attempt_from_another_plan_cannot_reset_job_ceiling(

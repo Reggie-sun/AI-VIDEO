@@ -7,7 +7,10 @@ from pathlib import Path
 from typing import Any, Callable, Literal
 
 from ai_video.production.ad_creative_types import AdCreativePlan, CompiledAdCreativeHandoff
-from ai_video.production.ecommerce_ad_coordinator import EcommerceVideoGenerationFacade
+from ai_video.production.ecommerce_ad_coordinator import (
+    ActivatedCommercialShotCheckpoint,
+    EcommerceVideoGenerationFacade,
+)
 from ai_video.production.ecommerce_job_assembly import validate_ecommerce_plan_binding
 from ai_video.production.ecommerce_job_contracts import EcommerceProductionHandoff
 from ai_video.production.ecommerce_job_repair import EcommerceShotRepairContext
@@ -148,12 +151,17 @@ class EcommerceShotExecutionPlan:
         runtime_handoff: EcommerceProductionHandoff,
         *,
         project_root: Path,
+        realize_deferred: bool = True,
     ) -> EcommerceVideoGenerationFacade:
         self.validate(runtime_handoff, project_root=project_root)
         declared = next((item for item in self.shots if item.shot_id == shot_id), None)
         if declared is None:
             raise ValueError("Ecommerce Shot is not declared by the execution plan")
-        selected = self.input_factory(shot_id) if self.input_factory else declared
+        selected = (
+            self.input_factory(shot_id)
+            if realize_deferred and self.input_factory
+            else declared
+        )
         if selected.shot_id != shot_id or selected.attempt_id != declared.attempt_id:
             raise ValueError("Deferred Ecommerce Shot input changed declared identity")
         projection = next(
@@ -166,6 +174,24 @@ class EcommerceShotExecutionPlan:
             plan_hash=self.handoff.plan_content_hash,
             projection_hash=projection.projection_hash,
         )
+
+    def current_completed_checkpoints(
+        self,
+    ) -> dict[str, ActivatedCommercialShotCheckpoint]:
+        """Read canonical activations without realizing deferred execution inputs."""
+
+        checkpoints = {}
+        for item in self.shots:
+            if item.service.current_bound_commercial_request_identity(
+                attempt_id=item.attempt_id
+            ) is None:
+                continue
+            checkpoint = item.service.current_activated_commercial_checkpoint(
+                attempt_id=item.attempt_id
+            )
+            if checkpoint is not None:
+                checkpoints[item.shot_id] = checkpoint
+        return checkpoints
 
     def build_facades(
         self,

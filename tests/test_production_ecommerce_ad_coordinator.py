@@ -271,6 +271,47 @@ def test_done_resume_reuses_checkpoint_without_duplicate_effects() -> None:
     assert all(facade.effects == [] for facade in facades.values())
 
 
+def test_done_resume_skips_deferred_factory_for_exact_canonical_checkpoint() -> None:
+    handoff, facades = _facades()
+    first = "shot-b"
+    first_checkpoint = _checkpoint(first, facades[first].projection_hash)
+    realized: list[str] = []
+
+    def realize(shot_id: str):
+        assert shot_id != first
+        realized.append(shot_id)
+        return facades[shot_id]
+
+    result = run_ecommerce_ad_generation(
+        handoff,
+        facade_factory=realize,
+        completed_checkpoints={first: first_checkpoint},
+    )
+
+    assert result.complete is True
+    assert realized == ["shot-a", "shot-later"]
+    assert result.activated_shots[0] == first_checkpoint
+    assert facades[first].effects == []
+
+
+def test_done_resume_rejects_invalid_canonical_checkpoint_before_factory() -> None:
+    handoff, facades = _facades()
+    first = "shot-b"
+    invalid = _checkpoint(first, "0" * 64)
+    realized: list[str] = []
+
+    result = run_ecommerce_ad_generation(
+        handoff,
+        facade_factory=lambda shot_id: realized.append(shot_id),
+        completed_checkpoints={first: invalid},
+    )
+
+    assert result.complete is False
+    assert result.stopped_shot_id == first
+    assert result.stop_reason is EcommerceStopReason.CHECKPOINT_INVALID
+    assert realized == []
+
+
 def test_facade_identity_mismatch_stops_before_any_service_effect() -> None:
     handoff, facades = _facades()
     facades["shot-b"], facades["shot-a"] = facades["shot-a"], facades["shot-b"]
