@@ -10,6 +10,7 @@ from ai_video.production.ecommerce_job_repair import (
     EcommerceShotRepairContext,
     attempt_requires_explicit_recovery,
     plan_ecommerce_shot_repair,
+    shot_gate_verdict,
 )
 from ai_video.production.generation_diagnosis import Diagnosis, Intervention
 from ai_video.production.models import QaVerdict, StateCommitStatus, VideoAttemptPhase
@@ -288,3 +289,16 @@ def test_submit_intent_requires_explicit_recovery(status: StateCommitStatus) -> 
     )
 
     assert attempt_requires_explicit_recovery(attempt) is True
+
+
+def test_missing_deferred_facade_cannot_fabricate_a_gate_verdict(tmp_path) -> None:
+    execution = SimpleNamespace(
+        shots=(SimpleNamespace(shot_id="shot-1", attempt_id="attempt-1"),)
+    )
+
+    assert shot_gate_verdict(
+        tmp_path,
+        execution,
+        {},
+        shot_id="shot-1",
+    ) is None

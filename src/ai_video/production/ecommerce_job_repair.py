@@ -355,32 +355,29 @@ def repair_request_delta_is_verified(
     from ai_video.production._video_project_reader import load_video_request_receipt
     from ai_video.production.generation_diagnosis import verify_intervention_comparison
 
-    loaded = load_production_project(root / "project.yaml")
-    prior_attempt = next(
-        (
+    try:
+        loaded = load_production_project(root / "project.yaml")
+        prior_attempt = next(
             item
             for item in loaded.manifest.attempts
             if item.attempt_id == prior_attempt_id
-        ),
-        None,
-    )
-    if prior_attempt is None:
-        return False
-    state = prior_attempt.video_generation_state
-    if state is None:
-        return False
-    prior = load_video_request_receipt(root, state.request)
-    before = None if prior.activation_scope is None else prior.activation_scope.request
-    after = (
-        None
-        if getattr(proposed_request, "activation_scope", None) is None
-        else proposed_request.activation_scope.request
-    )
-    if before is None or after is None:
-        return False
-    try:
+        )
+        state = prior_attempt.video_generation_state
+        if state is None:
+            return False
+        prior = load_video_request_receipt(root, state.request)
+        before = (
+            None if prior.activation_scope is None else prior.activation_scope.request
+        )
+        after = (
+            None
+            if getattr(proposed_request, "activation_scope", None) is None
+            else proposed_request.activation_scope.request
+        )
+        if before is None or after is None:
+            return False
         verify_intervention_comparison(intervention, before, after)
-    except (TypeError, ValueError):
+    except (AiVideoError, OSError, StopIteration, TypeError, ValueError):
         return False
     return True
 
@@ -417,7 +414,7 @@ def shot_gate_verdict(
 ) -> QaVerdict | None:
     try:
         verdict = facades[shot_id].current_validation_verdict()
-    except (AiVideoError, OSError, ValueError):
+    except (AiVideoError, KeyError, OSError, ValueError):
         verdict = None
     if verdict in {QaVerdict.FAIL, QaVerdict.NOT_EVALUATED}:
         return verdict

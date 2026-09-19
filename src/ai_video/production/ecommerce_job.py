@@ -593,13 +593,8 @@ class EcommerceProductionJobService:
                     bound_attempt_ids = set(
                         bound_generation_attempt_ids(request.project_root, shot_execution)
                     )
-                    requested_attempt_ids = {
-                        item.attempt_id for item in shot_execution.shots
-                    }
-                    if (
-                        len(bound_attempt_ids | requested_attempt_ids)
-                        > request.max_new_generation_attempts
-                    ):
+                    requested_attempt_ids = {item.attempt_id for item in shot_execution.shots}
+                    if len(bound_attempt_ids | requested_attempt_ids) > request.max_new_generation_attempts:
                         return self._blocked(
                             request,
                             blocker_code="ECOMMERCE_JOB_GENERATION_CEILING_EXHAUSTED",
