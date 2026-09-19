@@ -9,6 +9,8 @@ evidence_index_version: "1"
 
 Date: 2026-09-19
 
+> **Superseded status (2026-09-19):** 下文记录的 Harness policy ownership blocker 已由用户授权的 Codex/Claude 决策通过 temporary-index 精确提交解决。Commit `b1c1a6c0a0ecbc4ef672f53d19b1eb2ef52fc1a3` 仅加入 Ecommerce M4 test routing；exact receipt `.agent/harness/runs/ecommerce-production-job-m4-final-20260919-01/receipt.json` 后续已通过 freshness、integrity、snapshot 与 scope 校验。下文失败 receipt、blocker 与 next action 保留为历史过程，不再代表当前 M4 状态。
+
 ## Purpose
 
 本文记录 Ecommerce Production Job 的 M4 `Shot Execution And Bounded Repair` 实现 checkpoint、已验证边界，以及阻止继续 M5–M7 的真实 control-plane ownership conflict。它不表示已经出片、完成视觉验收、执行 remote/paid Provider submit、激活真实 Production candidate、push 或 release。
