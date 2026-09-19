@@ -1,0 +1,243 @@
+{
+  "schema_version": "ecommerce-ad-workflow/input/1",
+  "delivery_intent": "video",
+  "product": {
+    "sku_id": "ninebot-n3-series-2026",
+    "name": "九号 N3 系列",
+    "source_assets": [
+      {
+        "asset_id": "asset-alc-sticker",
+        "source_kind": "IMAGE",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/alc-lighting-sticker-closeup.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-n3-85c-front",
+        "source_kind": "IMAGE",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n3-85c-white-front-price-4199.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-n3-85c-badge",
+        "source_kind": "IMAGE",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n3-85c-badge-closeup.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-n3-85-pricetag",
+        "source_kind": "IMAGE",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n3-85-2026-pricetag-4299.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-n3-85-badge",
+        "source_kind": "IMAGE",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n3-85-badge-closeup.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-n3-70-front",
+        "source_kind": "IMAGE",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n3-70-black-front-price-3499.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-n3-70-badge",
+        "source_kind": "IMAGE",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n3-70-badge-closeup.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-n85c-front",
+        "source_kind": "IMAGE",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n85c-2025-white-front-price-3599.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-n85c-badge",
+        "source_kind": "IMAGE",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n85c-badge-closeup.jpg",
+        "rights_status": "CONFIRMED"
+      }
+    ],
+    "landing_page_reference": null
+  },
+  "product_truth": {
+    "sources": [
+      {
+        "source_id": "source-alc-sticker",
+        "source_kind": "PRODUCT_ASSET",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/alc-lighting-sticker-closeup.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "source_id": "source-n3-85c-pricetag",
+        "source_kind": "PRODUCT_ASSET",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n3-85c-white-front-price-4199.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "source_id": "source-n3-85-pricetag",
+        "source_kind": "PRODUCT_ASSET",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n3-85-2026-pricetag-4299.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "source_id": "source-n3-70-pricetag",
+        "source_kind": "PRODUCT_ASSET",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n3-70-black-front-price-3499.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "source_id": "source-n85c-pricetag",
+        "source_kind": "PRODUCT_ASSET",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n85c-2025-white-front-price-3599.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "source_id": "source-user-attestation",
+        "source_kind": "USER_ATTESTATION",
+        "reference": "user-confirmation-2026-09-20: 门店实拍照片可商用；ALC 照明卖点确认属于主推 N3 系列车型",
+        "rights_status": "CONFIRMED"
+      }
+    ],
+    "facts": [
+      {
+        "fact_id": "fact-alc-system",
+        "statement": "N3 系列车身贴纸标注「ALC全境光幕照明系统」。",
+        "source_ids": ["source-alc-sticker", "source-user-attestation"]
+      },
+      {
+        "fact_id": "fact-brightness-65000cd",
+        "statement": "贴纸标注照明亮度 65000cd。",
+        "source_ids": ["source-alc-sticker", "source-user-attestation"]
+      },
+      {
+        "fact_id": "fact-highbeam-upgrade",
+        "statement": "贴纸标注「远光升级」。",
+        "source_ids": ["source-alc-sticker", "source-user-attestation"]
+      },
+      {
+        "fact_id": "fact-brightness-up-71",
+        "statement": "贴纸标注「亮度提升71%」。",
+        "source_ids": ["source-alc-sticker", "source-user-attestation"]
+      },
+      {
+        "fact_id": "fact-rideyfun",
+        "statement": "车身贴纸同时标注「RideyFUN™智驾系统」。",
+        "source_ids": ["source-alc-sticker"]
+      },
+      {
+        "fact_id": "fact-n3-85c-price",
+        "statement": "N3 85C 门店价格牌：到手价 ¥4199 起（零售价 ¥4899 起，活动优惠 ¥700），碳晶 72V24Ah，极速 52km/h，三档全速续航 76km，单人爬坡 11°。",
+        "source_ids": ["source-n3-85c-pricetag"]
+      },
+      {
+        "fact_id": "fact-n3-85-2026-price",
+        "statement": "另一张 N3 85 2026 价格牌：到手价 ¥4299 起（零售价 ¥4999 起，活动优惠 ¥700），碳晶 72V24Ah，极速 52km/h，三档全速续航 73km，单人爬坡 11°。",
+        "source_ids": ["source-n3-85-pricetag"]
+      },
+      {
+        "fact_id": "fact-n3-70-price",
+        "statement": "N3 70 2026 门店价格牌：到手价 ¥3499 起（零售价 ¥4199 起，活动优惠 ¥700），铅酸 60V20Ah，极速 47km/h，三档全速续航 59km，单人爬坡 10°。",
+        "source_ids": ["source-n3-70-pricetag"]
+      },
+      {
+        "fact_id": "fact-n85c-price",
+        "statement": "N85C 2025 门店价格牌：到手价 ¥3599 起（零售价 ¥4599 起，活动优惠 ¥1000），铅酸 72V23Ah，极速 51km/h，三档全速续航 75km，单人爬坡 12°。",
+        "source_ids": ["source-n85c-pricetag"]
+      },
+      {
+        "fact_id": "fact-pricetag-disclaimer",
+        "statement": "价格牌自带小字：「详情咨询当地门店」「数据来源于九号科技实验室」。",
+        "source_ids": ["source-n3-70-pricetag", "source-n3-85c-pricetag"]
+      }
+    ],
+    "allowed_claims": [
+      {
+        "claim_id": "claim-alc-lighting",
+        "text": "ALC全境光幕照明系统",
+        "claim_type": "FACT",
+        "fact_ids": ["fact-alc-system"],
+        "source_ids": ["source-alc-sticker", "source-user-attestation"]
+      },
+      {
+        "claim_id": "claim-65000cd",
+        "text": "65000cd 亮度",
+        "claim_type": "FACT",
+        "fact_ids": ["fact-brightness-65000cd"],
+        "source_ids": ["source-alc-sticker", "source-user-attestation"]
+      },
+      {
+        "claim_id": "claim-highbeam",
+        "text": "远光升级",
+        "claim_type": "FACT",
+        "fact_ids": ["fact-highbeam-upgrade"],
+        "source_ids": ["source-alc-sticker", "source-user-attestation"]
+      },
+      {
+        "claim_id": "claim-brighter-71",
+        "text": "亮度提升 71%",
+        "claim_type": "FACT",
+        "fact_ids": ["fact-brightness-up-71"],
+        "source_ids": ["source-alc-sticker", "source-user-attestation"]
+      },
+      {
+        "claim_id": "claim-night-safety-benefit",
+        "text": "夜骑视野更亮、更安心",
+        "claim_type": "BENEFIT",
+        "fact_ids": ["fact-alc-system", "fact-brightness-65000cd", "fact-brightness-up-71"],
+        "source_ids": ["source-alc-sticker", "source-user-attestation"]
+      },
+      {
+        "claim_id": "claim-series-price-from",
+        "text": "九号 N3 系列到手价 ¥3499 起",
+        "claim_type": "FACT",
+        "fact_ids": ["fact-n3-70-price"],
+        "source_ids": ["source-n3-70-pricetag"]
+      },
+      {
+        "claim_id": "claim-n3-85c-price",
+        "text": "N3 85C 到手价 ¥4199 起",
+        "claim_type": "FACT",
+        "fact_ids": ["fact-n3-85c-price"],
+        "source_ids": ["source-n3-85c-pricetag"]
+      }
+    ],
+    "prohibited_claims": [],
+    "required_disclaimers": [
+      "价格与优惠详情咨询当地门店",
+      "性能数据来源于九号科技实验室"
+    ]
+  },
+  "audience": {
+    "target_consumer": "本地（浩口及周边）18-35 岁通勤与年轻首购人群，关注性价比与夜间骑行体验",
+    "context": "晚间下班/放学通勤、夜间出行，刷抖音时看到门店内容",
+    "pain_point": "普通电动车大灯昏暗、照不远，夜骑看不清路面没有安全感",
+    "desired_outcome": "知道九号 N3 系列照明系统明显更亮，产生到店看车/试驾意愿"
+  },
+  "platform": {
+    "platform": "douyin",
+    "placement": "vertical-feed",
+    "constraints": [
+      "关键文字与价格信息保持在竖屏中央安全区内",
+      "价格与性能数字必须附带 disclaimer 小字",
+      "不使用第三方视频画面（截图仅作风格参考）"
+    ]
+  },
+  "objective": "CONVERSION",
+  "duration_seconds": 30,
+  "aspect_ratio": "9:16",
+  "language": "zh-CN",
+  "style": "夜间都市骑行质感 + 光束视觉钩子，门店实拍质感与 AI 生成夜骑画面结合，节奏明快",
+  "ad_format": "product_demo",
+  "references": [
+    "artifacts/ninebot-n3-lighting-ad-20260920/assets/douyin-reference-screenshot.jpg"
+  ],
+  "constraints": [
+    "只使用 confirmed Product Truth 中的 claim",
+    "照明 claim 仅绑定 N3 系列（N3 85C / N3 70）；N85C 仅作价格带展示，不绑定 ALC 照明 claim",
+    "最终交付意图为视频",
+    "CTA 为到店引导：浩口九号智能电动车门店"
+  ]
+}

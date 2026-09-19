@@ -1,0 +1,1726 @@
+{
+  "schema_version": "ecommerce-ad-workflow/package/2",
+  "source_input_hash": "582605d817fa9411c69a46e92dff77cd59a4c29c99793c688e085b953736fffd",
+  "duration_seconds": 30,
+  "aspect_ratio": "9:16",
+  "ad_format": "product_demo",
+  "product_truth": {
+    "sku_id": "ninebot-n3-series-2026",
+    "product_name": "九号 N3 系列",
+    "source_assets": [
+      {
+        "asset_id": "asset-alc-sticker",
+        "source_kind": "IMAGE",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/alc-lighting-sticker-closeup.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-n3-85c-front",
+        "source_kind": "IMAGE",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n3-85c-white-front-price-4199.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-n3-85c-badge",
+        "source_kind": "IMAGE",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n3-85c-badge-closeup.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-n3-85-pricetag",
+        "source_kind": "IMAGE",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n3-85-2026-pricetag-4299.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-n3-85-badge",
+        "source_kind": "IMAGE",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n3-85-badge-closeup.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-n3-70-front",
+        "source_kind": "IMAGE",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n3-70-black-front-price-3499.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-n3-70-badge",
+        "source_kind": "IMAGE",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n3-70-badge-closeup.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-n85c-front",
+        "source_kind": "IMAGE",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n85c-2025-white-front-price-3599.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-n85c-badge",
+        "source_kind": "IMAGE",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n85c-badge-closeup.jpg",
+        "rights_status": "CONFIRMED"
+      }
+    ],
+    "sources": [
+      {
+        "source_id": "source-alc-sticker",
+        "source_kind": "PRODUCT_ASSET",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/alc-lighting-sticker-closeup.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "source_id": "source-n3-85c-pricetag",
+        "source_kind": "PRODUCT_ASSET",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n3-85c-white-front-price-4199.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "source_id": "source-n3-85-pricetag",
+        "source_kind": "PRODUCT_ASSET",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n3-85-2026-pricetag-4299.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "source_id": "source-n3-70-pricetag",
+        "source_kind": "PRODUCT_ASSET",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n3-70-black-front-price-3499.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "source_id": "source-n85c-pricetag",
+        "source_kind": "PRODUCT_ASSET",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n85c-2025-white-front-price-3599.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "source_id": "source-user-attestation",
+        "source_kind": "USER_ATTESTATION",
+        "reference": "user-confirmation-2026-09-20: 门店实拍照片可商用；ALC 照明卖点确认属于主推 N3 系列车型",
+        "rights_status": "CONFIRMED"
+      }
+    ],
+    "facts": [
+      {
+        "fact_id": "fact-alc-system",
+        "statement": "N3 系列车身贴纸标注「ALC全境光幕照明系统」。",
+        "source_ids": [
+          "source-alc-sticker",
+          "source-user-attestation"
+        ]
+      },
+      {
+        "fact_id": "fact-brightness-65000cd",
+        "statement": "贴纸标注照明亮度 65000cd。",
+        "source_ids": [
+          "source-alc-sticker",
+          "source-user-attestation"
+        ]
+      },
+      {
+        "fact_id": "fact-highbeam-upgrade",
+        "statement": "贴纸标注「远光升级」。",
+        "source_ids": [
+          "source-alc-sticker",
+          "source-user-attestation"
+        ]
+      },
+      {
+        "fact_id": "fact-brightness-up-71",
+        "statement": "贴纸标注「亮度提升71%」。",
+        "source_ids": [
+          "source-alc-sticker",
+          "source-user-attestation"
+        ]
+      },
+      {
+        "fact_id": "fact-rideyfun",
+        "statement": "车身贴纸同时标注「RideyFUN™智驾系统」。",
+        "source_ids": [
+          "source-alc-sticker"
+        ]
+      },
+      {
+        "fact_id": "fact-n3-85c-price",
+        "statement": "N3 85C 门店价格牌：到手价 ¥4199 起（零售价 ¥4899 起，活动优惠 ¥700），碳晶 72V24Ah，极速 52km/h，三档全速续航 76km，单人爬坡 11°。",
+        "source_ids": [
+          "source-n3-85c-pricetag"
+        ]
+      },
+      {
+        "fact_id": "fact-n3-85-2026-price",
+        "statement": "另一张 N3 85 2026 价格牌：到手价 ¥4299 起（零售价 ¥4999 起，活动优惠 ¥700），碳晶 72V24Ah，极速 52km/h，三档全速续航 73km，单人爬坡 11°。",
+        "source_ids": [
+          "source-n3-85-pricetag"
+        ]
+      },
+      {
+        "fact_id": "fact-n3-70-price",
+        "statement": "N3 70 2026 门店价格牌：到手价 ¥3499 起（零售价 ¥4199 起，活动优惠 ¥700），铅酸 60V20Ah，极速 47km/h，三档全速续航 59km，单人爬坡 10°。",
+        "source_ids": [
+          "source-n3-70-pricetag"
+        ]
+      },
+      {
+        "fact_id": "fact-n85c-price",
+        "statement": "N85C 2025 门店价格牌：到手价 ¥3599 起（零售价 ¥4599 起，活动优惠 ¥1000），铅酸 72V23Ah，极速 51km/h，三档全速续航 75km，单人爬坡 12°。",
+        "source_ids": [
+          "source-n85c-pricetag"
+        ]
+      },
+      {
+        "fact_id": "fact-pricetag-disclaimer",
+        "statement": "价格牌自带小字：「详情咨询当地门店」「数据来源于九号科技实验室」。",
+        "source_ids": [
+          "source-n3-70-pricetag",
+          "source-n3-85c-pricetag"
+        ]
+      }
+    ],
+    "allowed_claims": [
+      {
+        "claim_id": "claim-alc-lighting",
+        "text": "ALC全境光幕照明系统",
+        "claim_type": "FACT",
+        "fact_ids": [
+          "fact-alc-system"
+        ],
+        "source_ids": [
+          "source-alc-sticker",
+          "source-user-attestation"
+        ]
+      },
+      {
+        "claim_id": "claim-65000cd",
+        "text": "65000cd 亮度",
+        "claim_type": "FACT",
+        "fact_ids": [
+          "fact-brightness-65000cd"
+        ],
+        "source_ids": [
+          "source-alc-sticker",
+          "source-user-attestation"
+        ]
+      },
+      {
+        "claim_id": "claim-highbeam",
+        "text": "远光升级",
+        "claim_type": "FACT",
+        "fact_ids": [
+          "fact-highbeam-upgrade"
+        ],
+        "source_ids": [
+          "source-alc-sticker",
+          "source-user-attestation"
+        ]
+      },
+      {
+        "claim_id": "claim-brighter-71",
+        "text": "亮度提升 71%",
+        "claim_type": "FACT",
+        "fact_ids": [
+          "fact-brightness-up-71"
+        ],
+        "source_ids": [
+          "source-alc-sticker",
+          "source-user-attestation"
+        ]
+      },
+      {
+        "claim_id": "claim-night-safety-benefit",
+        "text": "夜骑视野更亮、更安心",
+        "claim_type": "BENEFIT",
+        "fact_ids": [
+          "fact-alc-system",
+          "fact-brightness-65000cd",
+          "fact-brightness-up-71"
+        ],
+        "source_ids": [
+          "source-alc-sticker",
+          "source-user-attestation"
+        ]
+      },
+      {
+        "claim_id": "claim-series-price-from",
+        "text": "九号 N3 系列到手价 ¥3499 起",
+        "claim_type": "FACT",
+        "fact_ids": [
+          "fact-n3-70-price"
+        ],
+        "source_ids": [
+          "source-n3-70-pricetag"
+        ]
+      },
+      {
+        "claim_id": "claim-n3-85c-price",
+        "text": "N3 85C 到手价 ¥4199 起",
+        "claim_type": "FACT",
+        "fact_ids": [
+          "fact-n3-85c-price"
+        ],
+        "source_ids": [
+          "source-n3-85c-pricetag"
+        ]
+      }
+    ],
+    "prohibited_claims": [],
+    "required_disclaimers": [
+      "价格与优惠详情咨询当地门店",
+      "性能数据来源于九号科技实验室"
+    ]
+  },
+  "claim_ledger": [
+    {
+      "claim_id": "claim-night-safety-benefit",
+      "status": "USED",
+      "fact_ids": [
+        "fact-alc-system",
+        "fact-brightness-65000cd",
+        "fact-brightness-up-71"
+      ],
+      "source_ids": [
+        "source-alc-sticker",
+        "source-user-attestation"
+      ],
+      "used_at": [
+        "hook-vo",
+        "beat-hook",
+        "copy-benefit"
+      ],
+      "spoken_form": "晚上骑车，最怕看不清",
+      "visual_form": "夜骑更亮，更安心"
+    },
+    {
+      "claim_id": "claim-alc-lighting",
+      "status": "USED",
+      "fact_ids": [
+        "fact-alc-system"
+      ],
+      "source_ids": [
+        "source-alc-sticker",
+        "source-user-attestation"
+      ],
+      "used_at": [
+        "beat-intro",
+        "copy-product-label",
+        "audio-vo-intro"
+      ],
+      "spoken_form": "ALC 全境光幕照明系统",
+      "visual_form": "ALC全境光幕照明系统"
+    },
+    {
+      "claim_id": "claim-65000cd",
+      "status": "USED",
+      "fact_ids": [
+        "fact-brightness-65000cd"
+      ],
+      "source_ids": [
+        "source-alc-sticker",
+        "source-user-attestation"
+      ],
+      "used_at": [
+        "beat-demo",
+        "copy-proof-65000cd",
+        "audio-vo-demo"
+      ],
+      "spoken_form": "65000cd 亮度",
+      "visual_form": "65000cd 亮度"
+    },
+    {
+      "claim_id": "claim-highbeam",
+      "status": "USED",
+      "fact_ids": [
+        "fact-highbeam-upgrade"
+      ],
+      "source_ids": [
+        "source-alc-sticker",
+        "source-user-attestation"
+      ],
+      "used_at": [
+        "beat-demo",
+        "copy-proof-highbeam",
+        "audio-vo-demo"
+      ],
+      "spoken_form": "远光升级",
+      "visual_form": "远光升级"
+    },
+    {
+      "claim_id": "claim-brighter-71",
+      "status": "USED",
+      "fact_ids": [
+        "fact-brightness-up-71"
+      ],
+      "source_ids": [
+        "source-alc-sticker",
+        "source-user-attestation"
+      ],
+      "used_at": [
+        "beat-demo",
+        "copy-proof-brighter71",
+        "audio-vo-demo"
+      ],
+      "spoken_form": "亮度提升百分之七十一",
+      "visual_form": "亮度提升71%"
+    },
+    {
+      "claim_id": "claim-series-price-from",
+      "status": "USED",
+      "fact_ids": [
+        "fact-n3-70-price"
+      ],
+      "source_ids": [
+        "source-n3-70-pricetag"
+      ],
+      "used_at": [
+        "beat-proof",
+        "copy-price-series",
+        "audio-vo-proof"
+      ],
+      "spoken_form": "到手价 3499 起",
+      "visual_form": "到手价 ¥3499 起"
+    },
+    {
+      "claim_id": "claim-n3-85c-price",
+      "status": "USED",
+      "fact_ids": [
+        "fact-n3-85c-price"
+      ],
+      "source_ids": [
+        "source-n3-85c-pricetag"
+      ],
+      "used_at": [
+        "beat-proof",
+        "copy-price-n3-85c"
+      ],
+      "spoken_form": null,
+      "visual_form": "N3 85C 到手价 ¥4199 起"
+    }
+  ],
+  "ad_strategy": {
+    "strategy_id": "strategy-alc-night-visibility",
+    "audience": "本地（浩口及周边）18-35 岁通勤与年轻首购人群，关注性价比与夜间骑行体验",
+    "pain_point": "普通电动车大灯昏暗、照不远，夜骑看不清路面没有安全感",
+    "angle": "以黑夜骑行的照明痛点开场，用 ALC 全境光幕照明系统的可观察参数（65000cd、远光升级、亮度提升71%）做证明，再以到手价与到店试驾收口",
+    "promise": "九号 N3 系列的 ALC 全境光幕照明系统让夜骑视野更亮、更安心",
+    "proof_boundary": "只使用贴纸与价格牌上可观察、用户已确认的照明参数与价格事实；不做竞品对比、不暗示绝对安全；N3 85C 存在两张价格牌（¥4199起/续航76km 与 ¥4299起/续航73km），本片只采用 ¥4199 起价格牌的事实；N85C 仅作价格带展示，不绑定任何 ALC 照明 claim",
+    "objection_handling": "对「参数是否可信」的异议仅回指车身贴纸与「数据来源于九号科技实验室」disclaimer；对价格异议仅回指价格牌与「详情咨询当地门店」",
+    "objective": "CONVERSION"
+  },
+  "hook_contract": {
+    "components": [
+      {
+        "component_id": "hook-visual",
+        "kind": "VISUAL",
+        "cue_seconds": 0,
+        "content": "夜间街道上普通电动车昏暗灯光只照亮眼前一小片，画面大半陷入黑暗",
+        "claim_ids": [
+          "claim-night-safety-benefit"
+        ],
+        "bound_ids": [
+          "beat-hook",
+          "shot-hook"
+        ]
+      },
+      {
+        "component_id": "hook-vo",
+        "kind": "DIALOGUE_OR_VO",
+        "cue_seconds": 0.2,
+        "content": "晚上骑车，最怕看不清",
+        "claim_ids": [
+          "claim-night-safety-benefit"
+        ],
+        "bound_ids": [
+          "audio-vo-hook"
+        ]
+      },
+      {
+        "component_id": "hook-copy",
+        "kind": "COPY",
+        "cue_seconds": 0.4,
+        "content": "夜骑，你看清了吗？",
+        "claim_ids": [],
+        "bound_ids": [
+          "copy-headline"
+        ]
+      },
+      {
+        "component_id": "hook-audio",
+        "kind": "AUDIO",
+        "cue_seconds": 0,
+        "content": "低沉环境音铺垫，约1.2秒处光幕点亮的 reveal hit 切入",
+        "claim_ids": [],
+        "bound_ids": [
+          "audio-music",
+          "audio-sfx-light-hit"
+        ]
+      }
+    ],
+    "product_presence": "TEASE",
+    "promise_claim_ids": [
+      "claim-night-safety-benefit"
+    ],
+    "promise_boundary": "只承诺已被授权的照明事实与「更亮更安心」利益点，不做安全绝对化或竞品对比",
+    "first_payoff_deadline_seconds": 8,
+    "platform_constraints": [
+      "第一秒内出现可读的 Hook 文字",
+      "关键文字保持在竖屏中央安全区"
+    ]
+  },
+  "ad_beats": [
+    {
+      "beat_id": "beat-hook",
+      "role": "HOOK",
+      "start_seconds": 0,
+      "end_seconds": 3,
+      "duration_seconds": 3,
+      "duration_basis": "HOOK_DENSITY",
+      "pacing_rationale": "抖音前3秒决定留存：用昏暗夜骑痛点画面+提问式文案快速建立问题，不铺垫品牌",
+      "message": "夜骑看不清是真实痛点",
+      "shot_ids": [
+        "shot-hook"
+      ],
+      "presentation_ids": [],
+      "copy_ids": [
+        "copy-headline",
+        "copy-sub-hook"
+      ],
+      "audio_event_ids": [
+        "audio-vo-hook",
+        "audio-music",
+        "audio-sfx-light-hit"
+      ]
+    },
+    {
+      "beat_id": "beat-intro",
+      "role": "PRODUCT_INTRO",
+      "start_seconds": 3,
+      "end_seconds": 8,
+      "duration_seconds": 5,
+      "duration_basis": "PROOF_READABILITY",
+      "pacing_rationale": "5秒完成产品身份揭示与系统命名：整车亮相+PRODUCT_LABEL+ALC 系统名，承接 Hook 的光束",
+      "message": "九号 N3 系列搭载 ALC 全境光幕照明系统",
+      "shot_ids": [
+        "shot-intro"
+      ],
+      "presentation_ids": [
+        "presentation-intro"
+      ],
+      "copy_ids": [
+        "copy-product-label",
+        "copy-sub-intro"
+      ],
+      "audio_event_ids": [
+        "audio-vo-intro",
+        "audio-music"
+      ]
+    },
+    {
+      "beat_id": "beat-demo",
+      "role": "DEMONSTRATION",
+      "start_seconds": 8,
+      "end_seconds": 16,
+      "duration_seconds": 8,
+      "duration_basis": "DEMO_COMPLEXITY",
+      "pacing_rationale": "照明演示需要因果时间：光幕铺开->三个参数逐条弹出，每条参数需要可读的停留",
+      "message": "65000cd 亮度、远光升级、亮度提升71%，光幕照亮整段路面",
+      "shot_ids": [
+        "shot-demo"
+      ],
+      "presentation_ids": [
+        "presentation-demo"
+      ],
+      "copy_ids": [
+        "copy-proof-65000cd",
+        "copy-proof-highbeam",
+        "copy-proof-brighter71",
+        "copy-benefit",
+        "copy-sub-demo"
+      ],
+      "audio_event_ids": [
+        "audio-vo-demo",
+        "audio-music",
+        "audio-sfx-light-hit-demo"
+      ]
+    },
+    {
+      "beat_id": "beat-proof",
+      "role": "BENEFIT_PROOF",
+      "start_seconds": 16,
+      "end_seconds": 23,
+      "duration_seconds": 7,
+      "duration_basis": "PROOF_READABILITY",
+      "pacing_rationale": "价格证明与 hero 画面需要7秒：价格数字与 disclaimer 小字必须可读，hero 车灯特写收束卖点",
+      "message": "N3 系列到手价 ¥3499 起，N3 85C 到手价 ¥4199 起",
+      "shot_ids": [
+        "shot-proof"
+      ],
+      "presentation_ids": [
+        "presentation-hero"
+      ],
+      "copy_ids": [
+        "copy-price-series",
+        "copy-price-n3-85c",
+        "copy-disclaimer",
+        "copy-sub-proof"
+      ],
+      "audio_event_ids": [
+        "audio-vo-proof",
+        "audio-music"
+      ]
+    },
+    {
+      "beat_id": "beat-close",
+      "role": "CTA_CLOSE",
+      "start_seconds": 23,
+      "end_seconds": 30,
+      "duration_seconds": 7,
+      "duration_basis": "CTA_DWELL",
+      "pacing_rationale": "到店 CTA 与门店身份卡需要7秒停留，让观众记住店名并完成行动指引",
+      "message": "到浩口九号智能电动车门店试灯试驾",
+      "shot_ids": [
+        "shot-close"
+      ],
+      "presentation_ids": [
+        "presentation-cta"
+      ],
+      "copy_ids": [
+        "copy-cta",
+        "copy-end-card",
+        "copy-sub-close"
+      ],
+      "audio_event_ids": [
+        "audio-vo-close",
+        "audio-music",
+        "audio-sfx-close-hit"
+      ]
+    }
+  ],
+  "product_presentation": [
+    {
+      "presentation_id": "presentation-intro",
+      "role": "INTRO",
+      "mode": "GRAPHIC_REVEAL",
+      "beat_id": "beat-intro",
+      "shot_id": "shot-intro",
+      "start_seconds": 3,
+      "duration_seconds": 5,
+      "product_source_asset_id": "asset-n3-85c-front",
+      "talent_interaction": "NONE",
+      "occlusion_required": false,
+      "lighting_shadow_required": false,
+      "copy_cue_ids": [
+        "copy-product-label"
+      ],
+      "audio_cue_ids": [
+        "audio-vo-intro"
+      ],
+      "fallback_policy": "NONE",
+      "capability_requirement_ids": [
+        "req-product-asset",
+        "req-ad-graphics"
+      ]
+    },
+    {
+      "presentation_id": "presentation-demo",
+      "role": "DEMONSTRATION",
+      "mode": "IN_SCENE_GENERATED",
+      "beat_id": "beat-demo",
+      "shot_id": "shot-demo",
+      "start_seconds": 8,
+      "duration_seconds": 8,
+      "product_source_asset_id": "asset-n3-85c-front",
+      "talent_interaction": "NONE",
+      "occlusion_required": false,
+      "lighting_shadow_required": true,
+      "copy_cue_ids": [
+        "copy-proof-65000cd",
+        "copy-proof-highbeam",
+        "copy-proof-brighter71"
+      ],
+      "audio_cue_ids": [
+        "audio-vo-demo",
+        "audio-sfx-light-hit-demo"
+      ],
+      "fallback_policy": "REQUIRE_REAPPROVAL_HERO",
+      "capability_requirement_ids": [
+        "req-product-asset",
+        "req-product-animation",
+        "req-ad-graphics"
+      ]
+    },
+    {
+      "presentation_id": "presentation-hero",
+      "role": "HERO_SHOT",
+      "mode": "DEDICATED_HERO_SHOT",
+      "beat_id": "beat-proof",
+      "shot_id": "shot-proof",
+      "start_seconds": 16,
+      "duration_seconds": 7,
+      "product_source_asset_id": "asset-n3-85c-front",
+      "talent_interaction": "NONE",
+      "occlusion_required": false,
+      "lighting_shadow_required": true,
+      "copy_cue_ids": [
+        "copy-price-series",
+        "copy-price-n3-85c"
+      ],
+      "audio_cue_ids": [
+        "audio-vo-proof"
+      ],
+      "fallback_policy": "NONE",
+      "capability_requirement_ids": [
+        "req-product-asset",
+        "req-ad-graphics"
+      ]
+    },
+    {
+      "presentation_id": "presentation-cta",
+      "role": "CTA_SUPPORT",
+      "mode": "GRAPHIC_REVEAL",
+      "beat_id": "beat-close",
+      "shot_id": "shot-close",
+      "start_seconds": 23,
+      "duration_seconds": 7,
+      "product_source_asset_id": "asset-n3-85c-front",
+      "talent_interaction": "NONE",
+      "occlusion_required": false,
+      "lighting_shadow_required": false,
+      "copy_cue_ids": [
+        "copy-cta",
+        "copy-end-card"
+      ],
+      "audio_cue_ids": [
+        "audio-vo-close",
+        "audio-sfx-close-hit"
+      ],
+      "fallback_policy": "NONE",
+      "capability_requirement_ids": [
+        "req-product-asset",
+        "req-ad-graphics"
+      ]
+    }
+  ],
+  "talent_plan": [],
+  "set_plan": [
+    {
+      "set_id": "set-night-street",
+      "location": "夜间城市道路（生成场景，无真实地标与车牌）",
+      "lighting": "低照度环境光，车头光幕为主要光源",
+      "brand_palette": [
+        "深蓝黑",
+        "暖白光幕",
+        "九号白"
+      ],
+      "product_surface": "夜间沥青路面",
+      "continuity_anchors": [
+        "车头光幕形态一致",
+        "白色 N3 85C 车身"
+      ]
+    },
+    {
+      "set_id": "set-showroom",
+      "location": "门店展厅（基于实拍照片的质感延续）",
+      "lighting": "展厅均匀照明下的车灯点亮特写",
+      "brand_palette": [
+        "白",
+        "黑",
+        "价格牌红"
+      ],
+      "product_surface": "门店地砖",
+      "continuity_anchors": [
+        "N3 85C 正面车头",
+        "价格牌版式与实拍一致"
+      ]
+    }
+  ],
+  "copy_graphics_plan": [
+    {
+      "copy_id": "copy-headline",
+      "role": "HEADLINE",
+      "text": "夜骑，你看清了吗？",
+      "priority": 1,
+      "beat_id": "beat-hook",
+      "shot_id": "shot-hook",
+      "safe_area_intent": "竖屏上三分之一中央安全区",
+      "avoidance_intent": "避开车灯与路面光束区域",
+      "entrance_intent": "0.4秒随问句节奏快速上浮入场",
+      "exit_intent": "beat-hook 结束前下撤，让位产品揭示",
+      "keyword_emphasis": [
+        "看清"
+      ],
+      "brand_token_reference": "ninebot-heading-primary",
+      "synchronized_event_ids": [
+        "audio-vo-hook"
+      ],
+      "treatment_id": "treatment-hook-headline"
+    },
+    {
+      "copy_id": "copy-sub-hook",
+      "role": "DIALOGUE_SUBTITLE",
+      "text": "晚上骑车，最怕看不清",
+      "priority": 3,
+      "beat_id": "beat-hook",
+      "shot_id": "shot-hook",
+      "safe_area_intent": "底部字幕安全区",
+      "avoidance_intent": "避开车头与光束",
+      "entrance_intent": "与 VO 对齐逐句出现",
+      "exit_intent": "VO 结束后消失",
+      "keyword_emphasis": [],
+      "brand_token_reference": "caption-default",
+      "synchronized_event_ids": [
+        "audio-vo-hook"
+      ],
+      "treatment_id": "treatment-caption"
+    },
+    {
+      "copy_id": "copy-product-label",
+      "role": "PRODUCT_LABEL",
+      "text": "九号 N3 85C · ALC全境光幕照明系统",
+      "priority": 1,
+      "beat_id": "beat-intro",
+      "shot_id": "shot-intro",
+      "safe_area_intent": "整车下方中央安全区",
+      "avoidance_intent": "不遮挡车头、车标与车灯",
+      "entrance_intent": "随整车 graphic reveal 定格后解析入场",
+      "exit_intent": "demo 开始前淡出",
+      "keyword_emphasis": [
+        "九号 N3 85C",
+        "ALC全境光幕照明系统"
+      ],
+      "brand_token_reference": "ninebot-product-label",
+      "synchronized_event_ids": [
+        "audio-vo-intro",
+        "presentation-intro"
+      ],
+      "treatment_id": "treatment-product-label"
+    },
+    {
+      "copy_id": "copy-sub-intro",
+      "role": "DIALOGUE_SUBTITLE",
+      "text": "九号 N3 系列，ALC 全境光幕照明系统",
+      "priority": 3,
+      "beat_id": "beat-intro",
+      "shot_id": "shot-intro",
+      "safe_area_intent": "底部字幕安全区",
+      "avoidance_intent": "不遮挡车身",
+      "entrance_intent": "与 VO 对齐",
+      "exit_intent": "VO 结束后消失",
+      "keyword_emphasis": [],
+      "brand_token_reference": "caption-default",
+      "synchronized_event_ids": [
+        "audio-vo-intro"
+      ],
+      "treatment_id": "treatment-caption"
+    },
+    {
+      "copy_id": "copy-proof-65000cd",
+      "role": "PROOF_LABEL",
+      "text": "65000cd 亮度",
+      "priority": 1,
+      "beat_id": "beat-demo",
+      "shot_id": "shot-demo",
+      "safe_area_intent": "画面左侧中央安全区",
+      "avoidance_intent": "避开光幕主体与车头",
+      "entrance_intent": "光幕铺开时第一条弹出",
+      "exit_intent": "依次让位下一条参数，末尾汇总停留",
+      "keyword_emphasis": [
+        "65000cd"
+      ],
+      "brand_token_reference": "ninebot-proof-label",
+      "synchronized_event_ids": [
+        "audio-vo-demo",
+        "audio-sfx-light-hit-demo"
+      ],
+      "treatment_id": "treatment-proof"
+    },
+    {
+      "copy_id": "copy-proof-highbeam",
+      "role": "PROOF_LABEL",
+      "text": "远光升级",
+      "priority": 1,
+      "beat_id": "beat-demo",
+      "shot_id": "shot-demo",
+      "safe_area_intent": "画面左侧中央安全区",
+      "avoidance_intent": "避开光幕主体与车头",
+      "entrance_intent": "第二条弹出",
+      "exit_intent": "末尾汇总停留",
+      "keyword_emphasis": [
+        "远光"
+      ],
+      "brand_token_reference": "ninebot-proof-label",
+      "synchronized_event_ids": [
+        "audio-vo-demo"
+      ],
+      "treatment_id": "treatment-proof"
+    },
+    {
+      "copy_id": "copy-proof-brighter71",
+      "role": "PROOF_LABEL",
+      "text": "亮度提升71%",
+      "priority": 1,
+      "beat_id": "beat-demo",
+      "shot_id": "shot-demo",
+      "safe_area_intent": "画面左侧中央安全区",
+      "avoidance_intent": "避开光幕主体与车头",
+      "entrance_intent": "第三条弹出并停留",
+      "exit_intent": "beat-demo 结束淡出",
+      "keyword_emphasis": [
+        "71%"
+      ],
+      "brand_token_reference": "ninebot-proof-label",
+      "synchronized_event_ids": [
+        "audio-vo-demo"
+      ],
+      "treatment_id": "treatment-proof"
+    },
+    {
+      "copy_id": "copy-benefit",
+      "role": "BENEFIT_CALLOUT",
+      "text": "夜骑更亮，更安心",
+      "priority": 2,
+      "beat_id": "beat-demo",
+      "shot_id": "shot-demo",
+      "safe_area_intent": "画面上三分之一中央安全区",
+      "avoidance_intent": "避开参数标签与车头",
+      "entrance_intent": "三条参数之后收束入场",
+      "exit_intent": "beat-demo 结束淡出",
+      "keyword_emphasis": [
+        "更亮"
+      ],
+      "brand_token_reference": "ninebot-callout",
+      "synchronized_event_ids": [
+        "audio-vo-demo"
+      ],
+      "treatment_id": "treatment-benefit"
+    },
+    {
+      "copy_id": "copy-sub-demo",
+      "role": "DIALOGUE_SUBTITLE",
+      "text": "65000cd 亮度，远光升级，亮度提升百分之七十一",
+      "priority": 3,
+      "beat_id": "beat-demo",
+      "shot_id": "shot-demo",
+      "safe_area_intent": "底部字幕安全区",
+      "avoidance_intent": "避开光幕下沿",
+      "entrance_intent": "与 VO 对齐",
+      "exit_intent": "VO 结束后消失",
+      "keyword_emphasis": [],
+      "brand_token_reference": "caption-default",
+      "synchronized_event_ids": [
+        "audio-vo-demo"
+      ],
+      "treatment_id": "treatment-caption"
+    },
+    {
+      "copy_id": "copy-price-series",
+      "role": "PROOF_LABEL",
+      "text": "九号 N3 系列 到手价 ¥3499 起",
+      "priority": 1,
+      "beat_id": "beat-proof",
+      "shot_id": "shot-proof",
+      "safe_area_intent": "画面中央安全区",
+      "avoidance_intent": "不遮挡 hero 车头与车灯",
+      "entrance_intent": "随价格卡 graphic reveal 入场",
+      "exit_intent": "停留至 beat-proof 结束",
+      "keyword_emphasis": [
+        "¥3499"
+      ],
+      "brand_token_reference": "ninebot-price-tag",
+      "synchronized_event_ids": [
+        "audio-vo-proof",
+        "presentation-hero"
+      ],
+      "treatment_id": "treatment-price"
+    },
+    {
+      "copy_id": "copy-price-n3-85c",
+      "role": "PROOF_LABEL",
+      "text": "N3 85C 到手价 ¥4199 起",
+      "priority": 2,
+      "beat_id": "beat-proof",
+      "shot_id": "shot-proof",
+      "safe_area_intent": "价格卡下方次级位置",
+      "avoidance_intent": "不遮挡 hero 车头",
+      "entrance_intent": "主价格之后次级入场",
+      "exit_intent": "停留至 beat-proof 结束",
+      "keyword_emphasis": [
+        "¥4199"
+      ],
+      "brand_token_reference": "ninebot-price-tag",
+      "synchronized_event_ids": [
+        "presentation-hero"
+      ],
+      "treatment_id": "treatment-price"
+    },
+    {
+      "copy_id": "copy-disclaimer",
+      "role": "PROOF_LABEL",
+      "text": "价格与优惠详情咨询当地门店 · 数据来源于九号科技实验室",
+      "priority": 3,
+      "beat_id": "beat-proof",
+      "shot_id": "shot-proof",
+      "safe_area_intent": "价格卡底部小字区",
+      "avoidance_intent": "固定小字位，不遮挡主体",
+      "entrance_intent": "与价格卡同步出现",
+      "exit_intent": "与价格卡同步消失",
+      "keyword_emphasis": [],
+      "brand_token_reference": "ninebot-disclaimer",
+      "synchronized_event_ids": [
+        "presentation-hero"
+      ],
+      "treatment_id": "treatment-disclaimer"
+    },
+    {
+      "copy_id": "copy-sub-proof",
+      "role": "DIALOGUE_SUBTITLE",
+      "text": "九号 N3 系列，到手价 3499 起",
+      "priority": 3,
+      "beat_id": "beat-proof",
+      "shot_id": "shot-proof",
+      "safe_area_intent": "底部字幕安全区",
+      "avoidance_intent": "避开价格卡",
+      "entrance_intent": "与 VO 对齐",
+      "exit_intent": "VO 结束后消失",
+      "keyword_emphasis": [],
+      "brand_token_reference": "caption-default",
+      "synchronized_event_ids": [
+        "audio-vo-proof"
+      ],
+      "treatment_id": "treatment-caption"
+    },
+    {
+      "copy_id": "copy-cta",
+      "role": "CTA",
+      "text": "到店试灯试驾",
+      "priority": 1,
+      "beat_id": "beat-close",
+      "shot_id": "shot-close",
+      "safe_area_intent": "画面中央 CTA 安全区",
+      "avoidance_intent": "避开产品与门店名",
+      "entrance_intent": "随 close hit 揭示",
+      "exit_intent": "停留至最后一帧",
+      "keyword_emphasis": [
+        "试灯试驾"
+      ],
+      "brand_token_reference": "ninebot-cta",
+      "synchronized_event_ids": [
+        "audio-sfx-close-hit",
+        "audio-vo-close"
+      ],
+      "treatment_id": "treatment-cta"
+    },
+    {
+      "copy_id": "copy-end-card",
+      "role": "BRAND_END_CARD",
+      "text": "浩口九号智能电动车 · 九号 N3 系列",
+      "priority": 1,
+      "beat_id": "beat-close",
+      "shot_id": "shot-close",
+      "safe_area_intent": "片尾品牌卡中央安全区",
+      "avoidance_intent": "产品画面完整可见",
+      "entrance_intent": "CTA 之后解析定格",
+      "exit_intent": "停留至最后一帧",
+      "keyword_emphasis": [
+        "浩口九号智能电动车"
+      ],
+      "brand_token_reference": "ninebot-end-card",
+      "synchronized_event_ids": [
+        "presentation-cta"
+      ],
+      "treatment_id": "treatment-end-card"
+    },
+    {
+      "copy_id": "copy-sub-close",
+      "role": "DIALOGUE_SUBTITLE",
+      "text": "浩口九号智能电动车，到店试灯，一试就知道",
+      "priority": 3,
+      "beat_id": "beat-close",
+      "shot_id": "shot-close",
+      "safe_area_intent": "底部字幕安全区",
+      "avoidance_intent": "避开 CTA 按钮区",
+      "entrance_intent": "与 VO 对齐",
+      "exit_intent": "停留至最后一帧",
+      "keyword_emphasis": [],
+      "brand_token_reference": "caption-default",
+      "synchronized_event_ids": [
+        "audio-vo-close"
+      ],
+      "treatment_id": "treatment-caption"
+    }
+  ],
+  "audio_plan": {
+    "events": [
+      {
+        "event_id": "audio-vo-hook",
+        "kind": "VOICE_OVER",
+        "start_seconds": 0.2,
+        "end_seconds": 2.8,
+        "beat_ids": [
+          "beat-hook"
+        ],
+        "shot_ids": [
+          "shot-hook"
+        ],
+        "source_requirement": "录制或合成中文男声 VO，语气贴近本地门店口播",
+        "speaker_id": null,
+        "verbatim_line": "晚上骑车，最怕看不清",
+        "on_camera": false,
+        "lip_sync_required": false,
+        "energy": "低沉开场，带疑问感",
+        "ducking_required": true,
+        "synchronized_event_ids": [
+          "hook-visual",
+          "copy-headline"
+        ],
+        "silence_rationale": null
+      },
+      {
+        "event_id": "audio-vo-intro",
+        "kind": "VOICE_OVER",
+        "start_seconds": 3.2,
+        "end_seconds": 7.8,
+        "beat_ids": [
+          "beat-intro"
+        ],
+        "shot_ids": [
+          "shot-intro"
+        ],
+        "source_requirement": "同一 VO 声线，清晰报出产品名与系统名",
+        "speaker_id": null,
+        "verbatim_line": "九号 N3 系列，ALC 全境光幕照明系统",
+        "on_camera": false,
+        "lip_sync_required": false,
+        "energy": "自信揭示",
+        "ducking_required": true,
+        "synchronized_event_ids": [
+          "copy-product-label",
+          "presentation-intro"
+        ],
+        "silence_rationale": null
+      },
+      {
+        "event_id": "audio-vo-demo",
+        "kind": "VOICE_OVER",
+        "start_seconds": 8.2,
+        "end_seconds": 15.6,
+        "beat_ids": [
+          "beat-demo"
+        ],
+        "shot_ids": [
+          "shot-demo"
+        ],
+        "source_requirement": "同一 VO 声线，参数逐条读出",
+        "speaker_id": null,
+        "verbatim_line": "65000cd 亮度，远光升级，亮度提升百分之七十一，一路照亮",
+        "on_camera": false,
+        "lip_sync_required": false,
+        "energy": "递进的证明感",
+        "ducking_required": true,
+        "synchronized_event_ids": [
+          "copy-proof-65000cd",
+          "copy-proof-highbeam",
+          "copy-proof-brighter71"
+        ],
+        "silence_rationale": null
+      },
+      {
+        "event_id": "audio-vo-proof",
+        "kind": "VOICE_OVER",
+        "start_seconds": 16.2,
+        "end_seconds": 22.6,
+        "beat_ids": [
+          "beat-proof"
+        ],
+        "shot_ids": [
+          "shot-proof"
+        ],
+        "source_requirement": "同一 VO 声线，价格口播",
+        "speaker_id": null,
+        "verbatim_line": "九号 N3 系列，到手价 3499 起",
+        "on_camera": false,
+        "lip_sync_required": false,
+        "energy": "干脆利落",
+        "ducking_required": true,
+        "synchronized_event_ids": [
+          "copy-price-series"
+        ],
+        "silence_rationale": null
+      },
+      {
+        "event_id": "audio-vo-close",
+        "kind": "VOICE_OVER",
+        "start_seconds": 23.4,
+        "end_seconds": 29.4,
+        "beat_ids": [
+          "beat-close"
+        ],
+        "shot_ids": [
+          "shot-close"
+        ],
+        "source_requirement": "同一 VO 声线，店名与到店引导",
+        "speaker_id": null,
+        "verbatim_line": "浩口九号智能电动车，到店试灯，一试就知道",
+        "on_camera": false,
+        "lip_sync_required": false,
+        "energy": "热情收尾",
+        "ducking_required": true,
+        "synchronized_event_ids": [
+          "copy-cta",
+          "copy-end-card"
+        ],
+        "silence_rationale": null
+      },
+      {
+        "event_id": "audio-music",
+        "kind": "MUSIC",
+        "start_seconds": 0,
+        "end_seconds": 30,
+        "beat_ids": [
+          "beat-hook",
+          "beat-intro",
+          "beat-demo",
+          "beat-proof",
+          "beat-close"
+        ],
+        "shot_ids": [
+          "shot-hook",
+          "shot-intro",
+          "shot-demo",
+          "shot-proof",
+          "shot-close"
+        ],
+        "source_requirement": "可商用授权的电子节奏 instrumental，夜间都市感",
+        "speaker_id": null,
+        "verbatim_line": null,
+        "on_camera": false,
+        "lip_sync_required": false,
+        "energy": "hook 段低沉，demo 段上扬，close 段收束",
+        "ducking_required": true,
+        "synchronized_event_ids": [
+          "presentation-intro",
+          "presentation-demo",
+          "presentation-hero",
+          "presentation-cta"
+        ],
+        "silence_rationale": null
+      },
+      {
+        "event_id": "audio-sfx-light-hit",
+        "kind": "SFX",
+        "start_seconds": 1.2,
+        "end_seconds": 1.7,
+        "beat_ids": [
+          "beat-hook"
+        ],
+        "shot_ids": [
+          "shot-hook"
+        ],
+        "source_requirement": "设计音效：光幕点亮 reveal hit，demo 段复用变体",
+        "speaker_id": null,
+        "verbatim_line": null,
+        "on_camera": false,
+        "lip_sync_required": false,
+        "energy": "短促明亮的能量释放",
+        "ducking_required": false,
+        "synchronized_event_ids": [
+          "hook-visual"
+        ],
+        "silence_rationale": null
+      },
+      {
+        "event_id": "audio-sfx-light-hit-demo",
+        "kind": "SFX",
+        "start_seconds": 8.4,
+        "end_seconds": 8.9,
+        "beat_ids": [
+          "beat-demo"
+        ],
+        "shot_ids": [
+          "shot-demo"
+        ],
+        "source_requirement": "设计音效：光幕铺开 reveal hit 的 demo 变体",
+        "speaker_id": null,
+        "verbatim_line": null,
+        "on_camera": false,
+        "lip_sync_required": false,
+        "energy": "短促明亮的能量释放",
+        "ducking_required": false,
+        "synchronized_event_ids": [
+          "presentation-demo",
+          "copy-proof-65000cd"
+        ],
+        "silence_rationale": null
+      },
+      {
+        "event_id": "audio-sfx-close-hit",
+        "kind": "SFX",
+        "start_seconds": 23.2,
+        "end_seconds": 23.7,
+        "beat_ids": [
+          "beat-close"
+        ],
+        "shot_ids": [
+          "shot-close"
+        ],
+        "source_requirement": "设计音效：品牌收束 accent",
+        "speaker_id": null,
+        "verbatim_line": null,
+        "on_camera": false,
+        "lip_sync_required": false,
+        "energy": "柔和自信的收尾",
+        "ducking_required": false,
+        "synchronized_event_ids": [
+          "presentation-cta",
+          "copy-cta"
+        ],
+        "silence_rationale": null
+      }
+    ],
+    "source_audio_policies": [
+      {
+        "shot_id": "shot-hook",
+        "source_type": "GENERATED",
+        "policy": "MUTE",
+        "trim_start_seconds": null,
+        "lead_in_noise_risk": false,
+        "p6_measurement_required": false,
+        "measurement_requirement": null
+      },
+      {
+        "shot_id": "shot-intro",
+        "source_type": "NONE",
+        "policy": "MUTE",
+        "trim_start_seconds": null,
+        "lead_in_noise_risk": false,
+        "p6_measurement_required": false,
+        "measurement_requirement": null
+      },
+      {
+        "shot_id": "shot-demo",
+        "source_type": "GENERATED",
+        "policy": "MUTE",
+        "trim_start_seconds": null,
+        "lead_in_noise_risk": false,
+        "p6_measurement_required": false,
+        "measurement_requirement": null
+      },
+      {
+        "shot_id": "shot-proof",
+        "source_type": "NONE",
+        "policy": "MUTE",
+        "trim_start_seconds": null,
+        "lead_in_noise_risk": false,
+        "p6_measurement_required": false,
+        "measurement_requirement": null
+      },
+      {
+        "shot_id": "shot-close",
+        "source_type": "NONE",
+        "policy": "MUTE",
+        "trim_start_seconds": null,
+        "lead_in_noise_risk": false,
+        "p6_measurement_required": false,
+        "measurement_requirement": null
+      }
+    ]
+  },
+  "storyboard": [
+    {
+      "group_id": "group-hook",
+      "beat_id": "beat-hook",
+      "shot_ids": [
+        "shot-hook"
+      ],
+      "commercial_intent": "用夜骑痛点画面与提问式 Hook 在3秒内赢得注意力"
+    },
+    {
+      "group_id": "group-intro",
+      "beat_id": "beat-intro",
+      "shot_ids": [
+        "shot-intro"
+      ],
+      "commercial_intent": "揭示九号 N3 85C 整车与 ALC 照明系统身份"
+    },
+    {
+      "group_id": "group-demo",
+      "beat_id": "beat-demo",
+      "shot_ids": [
+        "shot-demo"
+      ],
+      "commercial_intent": "演示光幕照明效果并逐条给出可验证参数"
+    },
+    {
+      "group_id": "group-proof",
+      "beat_id": "beat-proof",
+      "shot_ids": [
+        "shot-proof"
+      ],
+      "commercial_intent": "以 hero 画面与到手价证明性价比"
+    },
+    {
+      "group_id": "group-close",
+      "beat_id": "beat-close",
+      "shot_ids": [
+        "shot-close"
+      ],
+      "commercial_intent": "到店 CTA 与门店品牌收束"
+    }
+  ],
+  "shot_intents": [
+    {
+      "shot_id": "shot-hook",
+      "beat_id": "beat-hook",
+      "purpose": "痛点 Hook：昏暗夜骑画面与提问文案",
+      "start_seconds": 0,
+      "end_seconds": 3,
+      "duration_basis": "HOOK_DENSITY",
+      "product_state": "不出现可识别产品，仅昏暗车灯剪影（TEASE）",
+      "talent_action": null,
+      "camera_intent": "夜间街道低机位缓慢推进，画面大半陷入黑暗",
+      "presentation_ids": [],
+      "copy_ids": [
+        "copy-headline",
+        "copy-sub-hook"
+      ],
+      "audio_event_ids": [
+        "audio-vo-hook",
+        "audio-music",
+        "audio-sfx-light-hit"
+      ],
+      "visual_strategy_need": "生成夜间街道场景，不含真实地标、车牌或竞品标识"
+    },
+    {
+      "shot_id": "shot-intro",
+      "beat_id": "beat-intro",
+      "purpose": "产品揭示：N3 85C 整车 graphic reveal 与系统命名",
+      "start_seconds": 3,
+      "end_seconds": 8,
+      "duration_basis": "PROOF_READABILITY",
+      "product_state": "白色 N3 85C 正面整车图形化揭示，车灯点亮",
+      "talent_action": null,
+      "camera_intent": "正面定妆构图，光幕从车头铺开",
+      "presentation_ids": [
+        "presentation-intro"
+      ],
+      "copy_ids": [
+        "copy-product-label",
+        "copy-sub-intro"
+      ],
+      "audio_event_ids": [
+        "audio-vo-intro",
+        "audio-music"
+      ],
+      "visual_strategy_need": "registered asset-n3-85c-front 的 graphic reveal，承认 graphic layer"
+    },
+    {
+      "shot_id": "shot-demo",
+      "beat_id": "beat-demo",
+      "purpose": "照明演示：夜骑光幕铺满路面，参数逐条弹出",
+      "start_seconds": 8,
+      "end_seconds": 16,
+      "duration_basis": "DEMO_COMPLEXITY",
+      "product_state": "N3 85C 在夜间场景中骑行，光幕为主要光源",
+      "talent_action": null,
+      "camera_intent": "侧跟或前跟机位，光幕覆盖前方路面",
+      "presentation_ids": [
+        "presentation-demo"
+      ],
+      "copy_ids": [
+        "copy-proof-65000cd",
+        "copy-proof-highbeam",
+        "copy-proof-brighter71",
+        "copy-benefit",
+        "copy-sub-demo"
+      ],
+      "audio_event_ids": [
+        "audio-vo-demo",
+        "audio-music",
+        "audio-sfx-light-hit-demo"
+      ],
+      "visual_strategy_need": "由 registered asset 经 image-to-video 生成的夜骑场景，车灯照明效果需光影一致"
+    },
+    {
+      "shot_id": "shot-proof",
+      "beat_id": "beat-proof",
+      "purpose": "hero 画面与价格证明",
+      "start_seconds": 16,
+      "end_seconds": 23,
+      "duration_basis": "PROOF_READABILITY",
+      "product_state": "N3 85C 车灯点亮特写 hero 画面",
+      "talent_action": null,
+      "camera_intent": "受控车头灯特写缓慢推近",
+      "presentation_ids": [
+        "presentation-hero"
+      ],
+      "copy_ids": [
+        "copy-price-series",
+        "copy-price-n3-85c",
+        "copy-disclaimer",
+        "copy-sub-proof"
+      ],
+      "audio_event_ids": [
+        "audio-vo-proof",
+        "audio-music"
+      ],
+      "visual_strategy_need": "dedicated hero shot，价格卡 graphic overlay 需 disclaimer 小字"
+    },
+    {
+      "shot_id": "shot-close",
+      "beat_id": "beat-close",
+      "purpose": "CTA 与门店品牌收束",
+      "start_seconds": 23,
+      "end_seconds": 30,
+      "duration_basis": "CTA_DWELL",
+      "product_state": "N3 85C 定妆画面保持完整可见",
+      "talent_action": null,
+      "camera_intent": "锁定片尾构图",
+      "presentation_ids": [
+        "presentation-cta"
+      ],
+      "copy_ids": [
+        "copy-cta",
+        "copy-end-card",
+        "copy-sub-close"
+      ],
+      "audio_event_ids": [
+        "audio-vo-close",
+        "audio-music",
+        "audio-sfx-close-hit"
+      ],
+      "visual_strategy_need": "advertising copy graphics 层叠加在 approved product asset 上"
+    }
+  ],
+  "cta": {
+    "spoken_text": "浩口九号智能电动车，到店试灯，一试就知道",
+    "visual_text": "到店试灯试驾",
+    "destination_action": "前往浩口九号智能电动车线下门店看车试灯",
+    "beat_id": "beat-close",
+    "shot_id": "shot-close",
+    "cta_copy_id": "copy-cta",
+    "end_card_copy_id": "copy-end-card"
+  },
+  "runtime_handoff": {
+    "delivery_intent": "video",
+    "proposals": [
+      {
+        "proposal_id": "proposal-brief",
+        "target": "ProductionBrief",
+        "source_ids": [
+          "strategy-alc-night-visibility"
+        ],
+        "summary": "投影 objective、audience、format、语言与约束，保留 Product Truth 附件与 claim lineage"
+      },
+      {
+        "proposal_id": "proposal-set-night",
+        "target": "Scene",
+        "source_ids": [
+          "set-night-street"
+        ],
+        "summary": "夜间街道 Scene proposal：低照度环境、光幕主光源、无真实地标"
+      },
+      {
+        "proposal_id": "proposal-set-showroom",
+        "target": "Scene",
+        "source_ids": [
+          "set-showroom"
+        ],
+        "summary": "门店展厅 Scene proposal：延续实拍质感的 hero 与价格卡场景"
+      },
+      {
+        "proposal_id": "proposal-storyboard",
+        "target": "Storyboard",
+        "source_ids": [
+          "group-hook",
+          "group-intro",
+          "group-demo",
+          "group-proof",
+          "group-close"
+        ],
+        "summary": "按序投影五个 ad beat 为 Storyboard proposals"
+      },
+      {
+        "proposal_id": "proposal-shots",
+        "target": "Shot",
+        "source_ids": [
+          "shot-hook",
+          "shot-intro",
+          "shot-demo",
+          "shot-proof",
+          "shot-close"
+        ],
+        "summary": "将每个可追溯 Shot intent 经既有 authoring owner 投影"
+      },
+      {
+        "proposal_id": "proposal-audio",
+        "target": "AudioTrackSpec",
+        "source_ids": [
+          "audio-vo-hook",
+          "audio-vo-intro",
+          "audio-vo-demo",
+          "audio-vo-proof",
+          "audio-vo-close",
+          "audio-music",
+          "audio-sfx-light-hit",
+          "audio-sfx-close-hit"
+        ],
+        "summary": "请求 canonical P4 audio authoring；exact timing 归 ResolvedTimeline owner"
+      },
+      {
+        "proposal_id": "proposal-caption",
+        "target": "CaptionTrack",
+        "source_ids": [
+          "copy-sub-hook",
+          "copy-sub-intro",
+          "copy-sub-demo",
+          "copy-sub-proof",
+          "copy-sub-close"
+        ],
+        "summary": "仅 VO 对齐字幕可投影为 CaptionTrack；商业图文角色保持独立"
+      }
+    ],
+    "requirements": [
+      {
+        "requirement_id": "req-product-asset",
+        "capability": "product_source_asset",
+        "classification": "SUPPORTED_CURRENTLY",
+        "rationale": "registered 门店实拍照片可支持静态画面与显式 graphic layer"
+      },
+      {
+        "requirement_id": "req-product-animation",
+        "capability": "product_source_generation",
+        "classification": "SUPPORTED_CURRENTLY",
+        "rationale": "demo 夜骑镜头需要由 registered image 生成 in-scene 动态画面；本地 image-to-video generation seam 已在既有 ecommerce production job 使用，执行仍须通过既有 Provider Gate 与 Per-Shot Gate"
+      },
+      {
+        "requirement_id": "req-ad-graphics",
+        "capability": "advertising_copy_graphics",
+        "classification": "REQUIRES_RUNTIME_CAPABILITY",
+        "rationale": "HEADLINE/PROOF_LABEL/价格卡/CTA/end card 等商业图文角色是独立 authoring requirement，不得降级为普通 CaptionTrack"
+      },
+      {
+        "requirement_id": "req-audio",
+        "capability": "audio_authoring",
+        "classification": "SUPPORTED_CURRENTLY",
+        "rationale": "VO/music/SFX 可在显式 Runtime materialization 后由 P4 authoring 承接"
+      },
+      {
+        "requirement_id": "req-caption",
+        "capability": "dialogue_caption_binding",
+        "classification": "SUPPORTED_CURRENTLY",
+        "rationale": "VO 逐句字幕可请求 audio-aligned CaptionTrack"
+      }
+    ],
+    "classified_gaps": [
+      {
+        "gap_id": "gap-product-asset",
+        "classification": "SUPPORTED_CURRENTLY",
+        "requirement_ids": [
+          "req-product-asset"
+        ],
+        "blocker_code": null,
+        "rationale": "静态 registered 产品图像已被支持"
+      },
+      {
+        "gap_id": "gap-product-animation",
+        "classification": "SUPPORTED_CURRENTLY",
+        "requirement_ids": [
+          "req-product-animation"
+        ],
+        "blocker_code": null,
+        "rationale": "image-to-video 生成路径存在；本 classification 不是执行证据，生成结果仍须过 Per-Shot Gate"
+      },
+      {
+        "gap_id": "gap-ad-graphics",
+        "classification": "REQUIRES_RUNTIME_CAPABILITY",
+        "requirement_ids": [
+          "req-ad-graphics"
+        ],
+        "blocker_code": null,
+        "rationale": "记录商业图文表达面缺口，不声称已有 Runtime 执行能力"
+      },
+      {
+        "gap_id": "gap-audio-caption",
+        "classification": "SUPPORTED_CURRENTLY",
+        "requirement_ids": [
+          "req-audio",
+          "req-caption"
+        ],
+        "blocker_code": null,
+        "rationale": "authoring requests 可指向 P4 owner；实际混音与字幕仍是 Runtime 工作"
+      }
+    ]
+  },
+  "ad_qc_report": {
+    "ready": true,
+    "findings": [
+      {
+        "code": "truth-lineage-pass",
+        "status": "PASS",
+        "related_ids": [
+          "claim-alc-lighting",
+          "claim-65000cd",
+          "claim-highbeam",
+          "claim-brighter-71",
+          "claim-night-safety-benefit",
+          "claim-series-price-from",
+          "claim-n3-85c-price"
+        ],
+        "message": "每条 used claim 均绑定 exact Product Truth fact 与 source（贴纸/价格牌/用户确认）"
+      },
+      {
+        "code": "hook-first-second-pass",
+        "status": "PASS",
+        "related_ids": [
+          "hook-visual",
+          "hook-vo",
+          "hook-copy",
+          "hook-audio"
+        ],
+        "message": "第一秒有可观察 VISUAL/AUDIO component，VO 与 COPY 在0.4秒内入场"
+      },
+      {
+        "code": "product-presentation-pass",
+        "status": "PASS",
+        "related_ids": [
+          "presentation-intro",
+          "presentation-demo",
+          "presentation-hero",
+          "presentation-cta"
+        ],
+        "message": "intro/demo/hero/CTA support 均有 typed role、诚实 mode、source identity 与 cue 绑定；无伪造物理互动"
+      },
+      {
+        "code": "copy-audio-closure-pass",
+        "status": "PASS",
+        "related_ids": [
+          "copy-product-label",
+          "copy-end-card",
+          "copy-cta",
+          "audio-music"
+        ],
+        "message": "product name 可见（PRODUCT_LABEL+end card）且可听（VO）；audio coverage 覆盖0-30秒；CTA 与品牌收束齐全"
+      },
+      {
+        "code": "runtime-gap-classified",
+        "status": "PASS",
+        "related_ids": [
+          "gap-ad-graphics",
+          "gap-product-animation"
+        ],
+        "message": "advertising copy graphics 缺口如实分类为 REQUIRES_RUNTIME_CAPABILITY，未被 prose 隐藏"
+      },
+      {
+        "code": "ad-format-profile-pass",
+        "status": "PASS",
+        "related_ids": [
+          "beat-demo",
+          "shot-demo"
+        ],
+        "message": "package 保留 input 的 product_demo format，demonstration beat 与 proof 证据闭合"
+      }
+    ]
+  },
+  "unresolved_items": [],
+  "package_id": "2dee026943d33e04b86cdb23037c58cd9e38dc9decba0b5b36cb071b40ce90de"
+}
