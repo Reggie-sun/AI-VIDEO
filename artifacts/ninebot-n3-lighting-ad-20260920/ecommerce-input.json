@@ -58,6 +58,12 @@
         "source_kind": "IMAGE",
         "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n85c-badge-closeup.jpg",
         "rights_status": "CONFIRMED"
+      },
+      {
+        "asset_id": "asset-night-pov-video",
+        "source_kind": "VIDEO",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/night-pov-light-curtain-real.mp4",
+        "rights_status": "CONFIRMED"
       }
     ],
     "landing_page_reference": null
@@ -92,6 +98,12 @@
         "source_id": "source-n85c-pricetag",
         "source_kind": "PRODUCT_ASSET",
         "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/n85c-2025-white-front-price-3599.jpg",
+        "rights_status": "CONFIRMED"
+      },
+      {
+        "source_id": "source-night-pov-video",
+        "source_kind": "PRODUCT_ASSET",
+        "reference": "artifacts/ninebot-n3-lighting-ad-20260920/assets/night-pov-light-curtain-real.mp4",
         "rights_status": "CONFIRMED"
       },
       {
@@ -146,6 +158,11 @@
         "fact_id": "fact-n85c-price",
         "statement": "N85C 2025 门店价格牌：到手价 ¥3599 起（零售价 ¥4599 起，活动优惠 ¥1000），铅酸 72V23Ah，极速 51km/h，三档全速续航 75km，单人爬坡 12°。",
         "source_ids": ["source-n85c-pricetag"]
+      },
+      {
+        "fact_id": "fact-pov-footage",
+        "statement": "门店自有夜间 POV 实拍视频（18.6s, 720x1280）显示车灯光幕在漆黑路面上形成宽展均匀的照明区域。",
+        "source_ids": ["source-night-pov-video", "source-user-attestation"]
       },
       {
         "fact_id": "fact-pricetag-disclaimer",

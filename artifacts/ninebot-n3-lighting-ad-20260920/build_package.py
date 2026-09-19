@@ -265,15 +265,15 @@ package = {
         {
             "presentation_id": "presentation-demo",
             "role": "DEMONSTRATION",
-            "mode": "IN_SCENE_GENERATED",
+            "mode": "DEDICATED_HERO_SHOT",
             "beat_id": "beat-demo",
             "shot_id": "shot-demo",
             "start_seconds": 8,
             "duration_seconds": 8,
-            "product_source_asset_id": "asset-n3-85c-front",
+            "product_source_asset_id": "asset-night-pov-video",
             "talent_interaction": "NONE",
             "occlusion_required": False,
-            "lighting_shadow_required": True,
+            "lighting_shadow_required": False,
             "copy_cue_ids": [
                 "copy-proof-65000cd",
                 "copy-proof-highbeam",
@@ -283,7 +283,6 @@ package = {
             "fallback_policy": "REQUIRE_REAPPROVAL_HERO",
             "capability_requirement_ids": [
                 "req-product-asset",
-                "req-product-animation",
                 "req-ad-graphics",
             ],
         },
@@ -302,7 +301,11 @@ package = {
             "copy_cue_ids": ["copy-price-series", "copy-price-n3-85c"],
             "audio_cue_ids": ["audio-vo-proof"],
             "fallback_policy": "NONE",
-            "capability_requirement_ids": ["req-product-asset", "req-ad-graphics"],
+            "capability_requirement_ids": [
+                "req-product-asset",
+                "req-product-animation",
+                "req-ad-graphics",
+            ],
         },
         {
             "presentation_id": "presentation-cta",
@@ -326,7 +329,7 @@ package = {
     "set_plan": [
         {
             "set_id": "set-night-street",
-            "location": "夜间城市道路（生成场景，无真实地标与车牌）",
+            "location": "夜间道路（demo 段为门店实拍 POV；hook 段为生成场景，无真实地标与车牌）",
             "lighting": "低照度环境光，车头光幕为主要光源",
             "brand_palette": ["深蓝黑", "暖白光幕", "九号白"],
             "product_surface": "夜间沥青路面",
@@ -797,7 +800,7 @@ package = {
             },
             {
                 "shot_id": "shot-demo",
-                "source_type": "GENERATED",
+                "source_type": "NATIVE",
                 "policy": "MUTE",
                 "trim_start_seconds": None,
                 "lead_in_noise_risk": False,
@@ -841,7 +844,7 @@ package = {
             "group_id": "group-demo",
             "beat_id": "beat-demo",
             "shot_ids": ["shot-demo"],
-            "commercial_intent": "演示光幕照明效果并逐条给出可验证参数",
+            "commercial_intent": "用门店实拍 POV 光幕演示照明效果并逐条给出可验证参数",
         },
         {
             "group_id": "group-proof",
@@ -890,13 +893,13 @@ package = {
         {
             "shot_id": "shot-demo",
             "beat_id": "beat-demo",
-            "purpose": "照明演示：夜骑光幕铺满路面，参数逐条弹出",
+            "purpose": "照明演示：门店实拍 POV 光幕铺满路面，参数逐条弹出",
             "start_seconds": 8,
             "end_seconds": 16,
             "duration_basis": "DEMO_COMPLEXITY",
-            "product_state": "N3 85C 在夜间场景中骑行，光幕为主要光源",
+            "product_state": "门店自有夜间 POV 实拍：ALC 光幕在漆黑路面上形成宽展均匀照明",
             "talent_action": None,
-            "camera_intent": "侧跟或前跟机位，光幕覆盖前方路面",
+            "camera_intent": "第一人称骑行 POV（实拍素材，取光幕形态最佳的连续 8 秒段）",
             "presentation_ids": ["presentation-demo"],
             "copy_ids": [
                 "copy-proof-65000cd",
@@ -906,7 +909,7 @@ package = {
                 "copy-sub-demo",
             ],
             "audio_event_ids": ["audio-vo-demo", "audio-music", "audio-sfx-light-hit-demo"],
-            "visual_strategy_need": "由 registered asset 经 image-to-video 生成的夜骑场景，车灯照明效果需光影一致",
+            "visual_strategy_need": "CONFIRMED 实拍视频 asset-night-pov-video 直接承载演示，参数标签为承认的 graphic overlay；不需要生成",
         },
         {
             "shot_id": "shot-proof",
