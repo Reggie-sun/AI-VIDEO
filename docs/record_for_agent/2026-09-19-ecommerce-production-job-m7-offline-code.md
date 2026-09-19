@@ -24,7 +24,8 @@ from the independent review of snapshot `ae7f10621c7b1d04cbd775e15b1f691ebaaa768
 - resume reads exact activated checkpoints from the declared canonical services and
   validates them before realizing deferred inputs, so an already completed Shot does
   not repeat compilation, materialization or Provider-side effects;
-- `tests/test_production_ecommerce_job_canonical_e2e.py` now exercises a real
+- the canonical two-Shot scenario in `tests/test_production_ecommerce_job.py`
+  now exercises a real
   two-Shot `EcommerceProductionJobService` over `ProductionStateCommitter`,
   `VideoGenerationService`, persisted Manifest / Project / Registry state and
   deterministic local fixture Providers. It destroys and rebuilds Job, service,
