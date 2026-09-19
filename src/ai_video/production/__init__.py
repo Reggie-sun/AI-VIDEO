@@ -97,6 +97,12 @@ from ai_video.production.ecommerce_quality_gate import (
     EcommerceGateResult,
     EcommerceQualityGateCoordinator,
     EcommerceWholeAdAcceptanceTarget,
+    EcommerceWholeAdEvaluationPayload,
+)
+from ai_video.production.delivery_packager import (
+    EcommerceDeliveryBundleResult,
+    inspect_ecommerce_delivery,
+    package_ecommerce_delivery,
 )
 from ai_video.production.ecommerce_job_contracts import (
     EcommerceAcceptanceRequirement,
@@ -138,6 +144,10 @@ from ai_video.production.ecommerce_job import (
 from ai_video.production.ecommerce_job_assembly import (
     EcommerceCompositionExecutionPlan,
     EcommerceHyperFramesInvocation,
+)
+from ai_video.production.ecommerce_job_review import (
+    EcommerceDeliveryExecutionPlan,
+    EcommercePostMediaExecutionPlan,
 )
 from ai_video.production.commercial_dependency import (
     extend_commercial_source_dependency_graph,
@@ -438,6 +448,8 @@ __all__ = [
     "EcommerceAssetRequirement",
     "EcommerceBeatRoleBinding",
     "EcommerceDeliveryProfile",
+    "EcommerceDeliveryBundleResult",
+    "EcommerceDeliveryExecutionPlan",
     "EcommerceGateBlockReason",
     "EcommerceGateOutcome",
     "EcommerceGateResult",
@@ -448,6 +460,7 @@ __all__ = [
     "EcommerceLayoutScene",
     "EcommerceLayoutShot",
     "EcommercePostMediaAcceptanceResult",
+    "EcommercePostMediaExecutionPlan",
     "EcommerceProductionCompileProfile",
     "EcommerceProductionHandoff",
     "EcommerceProductionJobProjection",
@@ -467,12 +480,15 @@ __all__ = [
     "EcommerceUnsupportedGap",
     "EcommerceVisualSystemProfile",
     "EcommerceWholeAdAcceptanceTarget",
+    "EcommerceWholeAdEvaluationPayload",
     "CompiledEcommerceProductionProject",
     "EcommerceCompositionExecutionPlan",
     "EcommerceHyperFramesInvocation",
     "EcommerceProductionJobService",
     "EcommerceShotExecutionInput",
     "EcommerceShotExecutionPlan",
+    "inspect_ecommerce_delivery",
+    "package_ecommerce_delivery",
     "bootstrap_ecommerce_production_project",
     "compile_ecommerce_production_handoff",
     "CompiledAdCreativeHandoff",

@@ -2,22 +2,15 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, replace
+from dataclasses import replace
 from pathlib import Path
-from typing import Any, Literal
 
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.production.ad_creative_types import (
-    AdCreativePlan,
-    CompiledAdCreativeHandoff,
-)
 from ai_video.production.ecommerce_ad_coordinator import (
     EcommerceStopReason,
-    EcommerceVideoGenerationFacade,
     run_ecommerce_ad_generation,
 )
 from ai_video.production.ecommerce_job_contracts import (
-    EcommerceJobBlocker,
     EcommerceJobNextAction,
     EcommerceProductionHandoff,
     EcommerceProductionJobProjection,
@@ -27,10 +20,12 @@ from ai_video.production.ecommerce_job_assembly import (
     EcommerceCompositionExecutionPlan,
     advance_ecommerce_job_assembly,
     inspect_ecommerce_job_assembly,
-    validate_ecommerce_plan_binding,
+)
+from ai_video.production.ecommerce_job_execution import (
+    EcommerceShotExecutionInput,
+    EcommerceShotExecutionPlan,
 )
 from ai_video.production.ecommerce_job_repair import (
-    EcommerceShotRepairContext,
     bound_generation_attempt_ids,
     bound_generation_attempt_ids_for_shot,
     canonical_attempt_identity,
@@ -42,188 +37,29 @@ from ai_video.production.ecommerce_job_repair import (
     shot_gate_verdict,
     shots_match_handoff,
 )
-from ai_video.production.models import QaVerdict, ReviewLifecycle, StateCommitStatus
+from ai_video.production.ecommerce_job_projection import (
+    block_ecommerce_job,
+    project_ecommerce_job,
+    project_ecommerce_review_frontier,
+)
+from ai_video.production.ecommerce_job_review import (
+    EcommerceDeliveryExecutionPlan,
+    EcommercePostMediaExecutionPlan,
+    inspect_ecommerce_review_frontier,
+)
+from ai_video.production.models import (
+    QaVerdict,
+    ReviewLifecycle,
+    StateCommitStatus,
+)
 from ai_video.production.project import load_production_project
-
-
-@dataclass(frozen=True)
-class EcommerceShotExecutionInput:
-    shot_id: str
-    attempt_id: str
-    service: Any
-    request: Any
-    lane: Literal["local", "paid"]
-    commercial_reviewer: Any
-    paid_preview: Any = None
-    reservation_id: str | None = None
-    probe: Any = None
-    terminal_frame_extractor: Any = None
-    continuity_reviewer: Any = None
-    pre_submit_guard: Any = None
-    before_validate: Any = None
-    execution_binding: Any = None
-    repair_context: EcommerceShotRepairContext | None = None
-
-    def build_facade(
-        self,
-        *,
-        project_root: Path,
-        plan_hash: str,
-        projection_hash: str,
-    ) -> EcommerceVideoGenerationFacade:
-        service_root = getattr(self.service, "project_root", None)
-        if service_root is None or Path(service_root).resolve() != project_root.resolve():
-            raise ValueError("Ecommerce Shot service is bound to another Project root")
-        binding = getattr(self.request, "commercial_binding", None)
-        if binding is None or (
-            binding.ad_creative_plan_hash != plan_hash
-            or binding.commercial_execution_projection_hash != projection_hash
-            or binding.target_shot_id != self.shot_id
-        ):
-            raise ValueError("Ecommerce Shot execution input is not exactly bound")
-        if self.lane == "paid" and (
-            self.paid_preview is None
-            or self.reservation_id is None
-            or self.paid_preview.attempt_id != self.attempt_id
-            or self.paid_preview.provider_kind != self.request.provider_kind
-            or self.paid_preview.model_id != self.request.model_id
-        ):
-            raise ValueError("Paid Ecommerce Shot execution input is not re-sealed")
-        return EcommerceVideoGenerationFacade(
-            service=self.service,
-            attempt_id=self.attempt_id,
-            request=self.request,
-            lane=self.lane,
-            commercial_reviewer=self.commercial_reviewer,
-            paid_preview=self.paid_preview,
-            reservation_id=self.reservation_id,
-            probe=self.probe,
-            terminal_frame_extractor=self.terminal_frame_extractor,
-            continuity_reviewer=self.continuity_reviewer,
-            pre_submit_guard=self.pre_submit_guard,
-            before_validate=self.before_validate,
-            execution_binding=self.execution_binding,
-        )
-
-    def repair_evidence_once(self) -> None:
-        binding = self.request.commercial_binding
-        expected = (
-            self.request.resolved_generation_hash,
-            binding.ad_creative_plan_hash,
-            binding.commercial_execution_projection_hash,
-            binding.target_shot_id,
-        )
-        with self.service.commercial_execution_guard(attempt_id=self.attempt_id):
-            current = self.service.current_bound_commercial_request_identity(
-                attempt_id=self.attempt_id
-            )
-            if current != expected:
-                raise ValueError(
-                    "Commercial evidence repair request identity is not durable"
-                )
-            self.service.validate_once(
-                attempt_id=self.attempt_id,
-                probe=self.probe,
-                terminal_frame_extractor=self.terminal_frame_extractor,
-                continuity_reviewer=self.continuity_reviewer,
-                commercial_reviewer=self.commercial_reviewer,
-                repair_commercial_evidence=True,
-            )
-
-
-@dataclass(frozen=True)
-class EcommerceShotExecutionPlan:
-    handoff: CompiledAdCreativeHandoff
-    plan: AdCreativePlan
-    shots: tuple[EcommerceShotExecutionInput, ...]
-
-    def build_facades(
-        self,
-        runtime_handoff: EcommerceProductionHandoff,
-        *,
-        project_root: Path,
-    ) -> dict[str, EcommerceVideoGenerationFacade]:
-        validate_ecommerce_plan_binding(runtime_handoff, self.handoff, self.plan)
-        proposed_shots = tuple(
-            item.shot_id for item in runtime_handoff.artifact_proposals.shots
-        )
-        compiled_shots = tuple(item.shot_id for item in self.handoff.shot_proposals)
-        if compiled_shots != proposed_shots:
-            raise ValueError("Compiled Ecommerce Shot order does not match the Job handoff")
-        projections = {
-            item.target_shot_id: item
-            for item in self.handoff.commercial_execution_projections
-            if item.invoke_video_provider
-        }
-        inputs = {item.shot_id: item for item in self.shots}
-        if len(inputs) != len(self.shots) or set(inputs) != set(projections):
-            raise ValueError("Ecommerce Shot execution inputs do not cover exact Provider Shots")
-        return {
-            shot_id: inputs[shot_id].build_facade(
-                project_root=project_root,
-                plan_hash=self.handoff.plan_content_hash,
-                projection_hash=projection.projection_hash,
-            )
-            for shot_id, projection in projections.items()
-        }
 
 
 class EcommerceProductionJobService:
     """Derive one safe next action without persisting Job-owned lifecycle."""
 
-    @staticmethod
-    def _projection(
-        request: EcommerceProductionJobRequest,
-        *,
-        next_action: EcommerceJobNextAction,
-        manifest_revision: int | None = None,
-        next_shot_id: str | None = None,
-        blocker: EcommerceJobBlocker | None = None,
-    ) -> EcommerceProductionJobProjection:
-        return EcommerceProductionJobProjection(
-            schema_version="ecommerce-production-job-projection/1",
-            job_id=request.job_id,
-            handoff_id=request.handoff_id,
-            expected_project_id=request.expected_project_id,
-            next_action=next_action,
-            manifest_revision=manifest_revision,
-            next_shot_id=next_shot_id,
-            blocker=blocker,
-        )
-
-    @classmethod
-    def _blocked(
-        cls,
-        request: EcommerceProductionJobRequest,
-        *,
-        blocker_code: str,
-        stage: str,
-        subject_id: str,
-        failure_classification: str,
-        required_action: str,
-        error_code: ErrorCode = ErrorCode.PRODUCTION_STATE_INVALID,
-        manifest_revision: int | None = None,
-        evidence_pointers: tuple[str, ...] = (),
-        outcome_known: bool = True,
-    ) -> EcommerceProductionJobProjection:
-        return cls._projection(
-            request,
-            next_action=EcommerceJobNextAction.BLOCKED,
-            manifest_revision=manifest_revision,
-            blocker=EcommerceJobBlocker(
-                blocker_code=blocker_code,
-                error_code=error_code,
-                stage=stage,
-                subject_id=subject_id,
-                failure_classification=failure_classification,
-                diagnosis_id=None,
-                evidence_pointers=evidence_pointers,
-                retryable=False,
-                required_owner="EcommerceProductionJobService",
-                required_action=required_action,
-                outcome_known=outcome_known,
-            ),
-        )
+    _projection = staticmethod(project_ecommerce_job)
+    _blocked = staticmethod(block_ecommerce_job)
 
     def inspect(
         self,
@@ -232,6 +68,8 @@ class EcommerceProductionJobService:
         *,
         shot_execution: EcommerceShotExecutionPlan | None = None,
         composition_execution: EcommerceCompositionExecutionPlan | None = None,
+        review_execution: EcommercePostMediaExecutionPlan | None = None,
+        delivery_execution: EcommerceDeliveryExecutionPlan | None = None,
     ) -> EcommerceProductionJobProjection:
         """Strictly reopen canonical state and derive exactly one next action."""
 
@@ -395,6 +233,10 @@ class EcommerceProductionJobService:
             item.attempt_id
             for item in loaded.manifest.attempts
             if item.status is StateCommitStatus.OUTCOME_UNKNOWN
+            or (
+                item.operation == "review"
+                and item.status is StateCommitStatus.RUNNING
+            )
         )
         if unknown_attempts:
             return self._projection(
@@ -491,11 +333,67 @@ class EcommerceProductionJobService:
             or acceptance.lifecycle is not ReviewLifecycle.FRESH
             or acceptance.active_receipt is None
         ):
-            return self._projection(
+            if review_execution is not None:
+                try:
+                    frontier = review_execution.inspect_frontier(
+                        handoff,
+                        project_root=request.project_root,
+                    )
+                except (AiVideoError, OSError, TypeError, ValueError) as exc:
+                    return self._blocked(
+                        request,
+                        blocker_code="ECOMMERCE_FINAL_REVIEW_BINDING_INVALID",
+                        stage="final_review",
+                        subject_id=request.job_id,
+                        failure_classification="EXECUTION_INPUT_INVALID",
+                        required_action=(
+                            "Repair the exact review policy, evidence, or handoff binding."
+                        ),
+                        error_code=(
+                            exc.code
+                            if isinstance(exc, AiVideoError)
+                            else ErrorCode.REVIEW_EVIDENCE_INVALID
+                        ),
+                        manifest_revision=revision,
+                    )
+                return project_ecommerce_review_frontier(
+                    request,
+                    frontier=frontier,
+                    manifest_revision=revision,
+                )
+            return project_ecommerce_review_frontier(
                 request,
-                next_action=EcommerceJobNextAction.REVIEW_FINAL,
+                frontier=inspect_ecommerce_review_frontier(request.project_root),
                 manifest_revision=revision,
             )
+        if delivery_execution is not None:
+            try:
+                packaged = delivery_execution.inspect(
+                    handoff,
+                    project_root=request.project_root,
+                    job_id=request.job_id,
+                )
+            except (AiVideoError, OSError, TypeError, ValueError) as exc:
+                return self._blocked(
+                    request,
+                    blocker_code="ECOMMERCE_DELIVERY_BUNDLE_INVALID",
+                    stage="delivery",
+                    subject_id=request.job_id,
+                    failure_classification="DELIVERY_INTEGRITY",
+                    required_action="Repair or remove the invalid delivery bundle.",
+                    error_code=(
+                        exc.code
+                        if isinstance(exc, AiVideoError)
+                        else ErrorCode.PRODUCTION_STATE_INVALID
+                    ),
+                    manifest_revision=revision,
+                )
+            if packaged is not None:
+                return self._projection(
+                    request,
+                    next_action=EcommerceJobNextAction.COMPLETE,
+                    manifest_revision=revision,
+                )
         return self._projection(
             request,
             next_action=EcommerceJobNextAction.PACKAGE_DELIVERY,
@@ -510,8 +408,14 @@ class EcommerceProductionJobService:
         expected_action: EcommerceJobNextAction,
         shot_execution: EcommerceShotExecutionPlan | None = None,
         composition_execution: EcommerceCompositionExecutionPlan | None = None,
+        review_execution: EcommercePostMediaExecutionPlan | None = None,
+        delivery_execution: EcommerceDeliveryExecutionPlan | None = None,
     ) -> EcommerceProductionJobProjection:
         inspect_kwargs: dict[str, object] = {"shot_execution": shot_execution}
+        if review_execution is not None:
+            inspect_kwargs["review_execution"] = review_execution
+        if delivery_execution is not None:
+            inspect_kwargs["delivery_execution"] = delivery_execution
         if (
             composition_execution is not None
             and expected_action is not EcommerceJobNextAction.PREPARE_COMPOSITION
@@ -561,6 +465,95 @@ class EcommerceProductionJobService:
                 manifest_revision=ecommerce_manifest_revision(
                     request.project_root, current.manifest_revision
                 ),
+            )
+        if expected_action is EcommerceJobNextAction.REVIEW_FINAL:
+            if review_execution is None:
+                return self._blocked(
+                    request,
+                    blocker_code="ECOMMERCE_FINAL_REVIEW_INPUT_MISSING",
+                    stage="final_review",
+                    subject_id=request.job_id,
+                    failure_classification="EXECUTION_INPUT_MISSING",
+                    required_action="Provide exact bound whole-video review inputs.",
+                    manifest_revision=current.manifest_revision,
+                )
+            try:
+                review_execution.run(
+                    handoff,
+                    project_root=request.project_root,
+                )
+            except (AiVideoError, OSError, TypeError, ValueError) as exc:
+                reopened = self.inspect(
+                    request,
+                    handoff,
+                    shot_execution=shot_execution,
+                    composition_execution=composition_execution,
+                    review_execution=review_execution,
+                    delivery_execution=delivery_execution,
+                )
+                if (
+                    reopened.next_action
+                    is EcommerceJobNextAction.RECOVER_UNKNOWN_OUTCOME
+                ):
+                    return reopened
+                return self._blocked(
+                    request,
+                    blocker_code="ECOMMERCE_FINAL_REVIEW_FAILED",
+                    stage="final_review",
+                    subject_id=request.job_id,
+                    failure_classification="REVIEW_EXECUTION_FAILED",
+                    required_action="Repair exact evidence or diagnose the failed final layer.",
+                    error_code=(
+                        exc.code
+                        if isinstance(exc, AiVideoError)
+                        else ErrorCode.REVIEW_EVIDENCE_INVALID
+                    ),
+                    manifest_revision=current.manifest_revision,
+                )
+            return self.inspect(
+                request,
+                handoff,
+                shot_execution=shot_execution,
+                composition_execution=composition_execution,
+                review_execution=review_execution,
+                delivery_execution=delivery_execution,
+            )
+        if expected_action is EcommerceJobNextAction.PACKAGE_DELIVERY:
+            if delivery_execution is None:
+                return self._blocked(
+                    request,
+                    blocker_code="ECOMMERCE_DELIVERY_INPUT_MISSING",
+                    stage="delivery",
+                    subject_id=request.job_id,
+                    failure_classification="EXECUTION_INPUT_MISSING",
+                    required_action="Provide the exact delivery destination.",
+                    manifest_revision=current.manifest_revision,
+                )
+            try:
+                delivery_execution.package(
+                    handoff,
+                    project_root=request.project_root,
+                    job_id=request.job_id,
+                )
+            except (AiVideoError, OSError, TypeError, ValueError) as exc:
+                return self._blocked(
+                    request,
+                    blocker_code="ECOMMERCE_DELIVERY_PUBLISH_FAILED",
+                    stage="delivery",
+                    subject_id=request.job_id,
+                    failure_classification="DELIVERY_FAILED",
+                    required_action="Repair the delivery destination and replay packaging.",
+                    error_code=(
+                        exc.code
+                        if isinstance(exc, AiVideoError)
+                        else ErrorCode.PRODUCTION_STATE_INVALID
+                    ),
+                    manifest_revision=current.manifest_revision,
+                )
+            return self._projection(
+                request,
+                next_action=EcommerceJobNextAction.COMPLETE,
+                manifest_revision=current.manifest_revision,
             )
         if expected_action not in {
             EcommerceJobNextAction.GENERATE_SHOT,

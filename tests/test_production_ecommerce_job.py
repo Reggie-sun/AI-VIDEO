@@ -43,6 +43,7 @@ from ai_video.production.ecommerce_job_contracts import (
     EcommerceProductionHandoff,
     EcommerceProductionJobRequest,
 )
+from ai_video.production.ecommerce_job_review import EcommerceFinalReviewFrontier
 from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.models import (
     AssetType,
@@ -974,3 +975,151 @@ def test_render_unknown_outcome_stops_for_explicit_recovery(
 
     assert result.next_action is EcommerceJobNextAction.RECOVER_UNKNOWN_OUTCOME
     assert len(execution.rendered) == 1
+
+
+@dataclass
+class _FakeReviewExecution:
+    verdict: QaVerdict
+    accepted: bool
+    owner: object
+    frontier: EcommerceFinalReviewFrontier = (
+        EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
+    )
+
+    def __post_init__(self) -> None:
+        self.calls = 0
+
+    def run(self, _handoff, *, project_root: Path):
+        self.calls += 1
+        self.owner.state = (
+            "package" if self.accepted else self.frontier.value
+        )
+        return SimpleNamespace(
+            final_acceptance_recorded=self.accepted,
+            gate_two=SimpleNamespace(verdict=self.verdict),
+        )
+
+
+@dataclass
+class _FakeDeliveryExecution:
+    published: bool = False
+    package_calls: int = 0
+
+    def package(self, _handoff, *, project_root: Path, job_id: str):
+        self.package_calls += 1
+        self.published = True
+        return object()
+
+
+class _FinalJob(EcommerceProductionJobService):
+    def __init__(self) -> None:
+        self.state = "review"
+
+    def inspect(
+        self,
+        request,
+        handoff,
+        *,
+        shot_execution=None,
+        composition_execution=None,
+        review_execution=None,
+        delivery_execution=None,
+    ):
+        if delivery_execution is not None and delivery_execution.published:
+            action = EcommerceJobNextAction.COMPLETE
+        elif self.state == "package":
+            action = EcommerceJobNextAction.PACKAGE_DELIVERY
+        elif self.state == EcommerceFinalReviewFrontier.PREPARE_COMPOSITION.value:
+            action = EcommerceJobNextAction.PREPARE_COMPOSITION
+        elif self.state == EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED.value:
+            return self._blocked(
+                request,
+                blocker_code="ECOMMERCE_FINAL_REPAIR_DIAGNOSIS_REQUIRED",
+                stage="final_review",
+                subject_id=request.job_id,
+                failure_classification="WHOLE_VIDEO_FAILURE",
+                required_action="Diagnose the exact failed final requirement.",
+                manifest_revision=11,
+            )
+        else:
+            action = EcommerceJobNextAction.REVIEW_FINAL
+        return self._projection(request, next_action=action, manifest_revision=11)
+
+
+@pytest.mark.parametrize(
+    ("verdict", "accepted", "frontier", "expected"),
+    (
+        (
+            QaVerdict.PASS,
+            True,
+            EcommerceFinalReviewFrontier.PACKAGE_DELIVERY,
+            EcommerceJobNextAction.PACKAGE_DELIVERY,
+        ),
+        (
+            QaVerdict.FAIL,
+            False,
+            EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED,
+            EcommerceJobNextAction.BLOCKED,
+        ),
+        (
+            QaVerdict.NOT_EVALUATED,
+            False,
+            EcommerceFinalReviewFrontier.REVIEW_FINAL,
+            EcommerceJobNextAction.REVIEW_FINAL,
+        ),
+        (
+            QaVerdict.FAIL,
+            False,
+            EcommerceFinalReviewFrontier.PREPARE_COMPOSITION,
+            EcommerceJobNextAction.PREPARE_COMPOSITION,
+        ),
+    ),
+)
+def test_review_final_routes_exact_outcome_to_smallest_frontier(
+    tmp_path: Path,
+    verdict: QaVerdict,
+    accepted: bool,
+    frontier: EcommerceFinalReviewFrontier,
+    expected: EcommerceJobNextAction,
+) -> None:
+    handoff = _runtime_handoff_without_external_assets()
+    request = _request(tmp_path, handoff)
+    job = _FinalJob()
+    execution = _FakeReviewExecution(verdict, accepted, job, frontier)
+
+    result = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.REVIEW_FINAL,
+        review_execution=execution,
+    )
+
+    assert result.next_action is expected
+    assert execution.calls == 1
+
+
+def test_delivery_publish_completes_and_exact_replay_has_no_effect(
+    tmp_path: Path,
+) -> None:
+    handoff = _runtime_handoff_without_external_assets()
+    request = _request(tmp_path, handoff)
+    job = _FinalJob()
+    job.state = "package"
+    delivery = _FakeDeliveryExecution()
+
+    first = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.PACKAGE_DELIVERY,
+        delivery_execution=delivery,
+    )
+    replay = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.PACKAGE_DELIVERY,
+        delivery_execution=delivery,
+    )
+
+    assert first.next_action is EcommerceJobNextAction.COMPLETE
+    assert replay.next_action is EcommerceJobNextAction.COMPLETE
+    assert delivery.package_calls == 1

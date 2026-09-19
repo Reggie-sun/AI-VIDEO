@@ -16,8 +16,9 @@ from ai_video.production.composition import timeline_fingerprint
 from ai_video.production.ecommerce_media_acceptance import (
     EcommerceAcceptanceEvidencePayload,
     EcommerceAcceptanceProfile,
-    adjudicate_ecommerce_acceptance,
 )
+from ai_video.production.ecommerce_job_contracts import EcommerceProductionHandoff
+from ai_video.production.final_output_review import FinalOutputObservation
 from ai_video.production.hashing import (
     canonical_sha256,
     seal_artifact,
@@ -38,6 +39,7 @@ from ai_video.production.quality_gate_coordinator import (
     UniversalQaGateResult,
     UniversalQaProfile,
 )
+from ai_video.production.review import adjudicate_review_evidence
 
 
 _SHA256 = r"^[0-9a-f]{64}$"
@@ -174,10 +176,47 @@ class ReviewAnalysisPermit(Protocol):
     ) -> bool: ...
 
 
+class EcommerceWholeAdEvaluationPayload(StrictModel):
+    """Evaluator observations; verdicts remain owned by canonical adjudicators."""
+
+    domain_acceptance: EcommerceAcceptanceEvidencePayload
+    final_output: FinalOutputObservation | None = None
+
+
 EcommerceWholeAdEvaluator = Callable[
     [EcommerceWholeAdAcceptanceTarget, EcommerceAcceptanceProfile],
-    EcommerceAcceptanceEvidencePayload,
+    EcommerceWholeAdEvaluationPayload | EcommerceAcceptanceEvidencePayload,
 ]
+
+
+def validate_ecommerce_final_output_contract(
+    handoff: EcommerceProductionHandoff,
+    policy: QaPolicy,
+) -> None:
+    """Require the selected QA contract to cover the exact handoff final output."""
+
+    required = {
+        item.requirement_id: item.description
+        for item in handoff.acceptance_requirements
+        if item.scope == "FINAL_OUTPUT"
+    }
+    selected = (
+        {}
+        if policy.final_output is None
+        else {
+            item.requirement_id: item.observable
+            for item in policy.final_output.requirements
+        }
+    )
+    if not required or selected != required:
+        raise ValueError(
+            "Selected QA policy does not bind the exact handoff final-output requirements"
+        )
+    if (
+        policy.domain_acceptance is None
+        or policy.domain_acceptance.domain_id != "ecommerce"
+    ):
+        raise ValueError("Selected QA policy omits Ecommerce domain acceptance")
 
 
 def universal_qa_context_content_hash(context: UniversalQaContext) -> str:
@@ -318,7 +357,7 @@ class EcommerceQualityGateCoordinator:
                 handoff.model_dump(mode="python")
             )
             selected_timeline = ResolvedTimeline.model_validate(
-                timeline.model_dump(mode="json")
+                timeline.model_dump(mode="python")
             )
             selected_shots = tuple(
                 EcommerceAcceptedShotIdentity.model_validate(
@@ -546,11 +585,19 @@ class EcommerceQualityGateCoordinator:
         if consumed is not True:
             raise ValueError("Review analysis permit is invalid or already consumed")
 
-        payload: EcommerceAcceptanceEvidencePayload | None
+        payload: EcommerceWholeAdEvaluationPayload | None
         try:
-            payload = EcommerceAcceptanceEvidencePayload.model_validate(
-                evaluate(prepared.target, prepared.profile).model_dump(mode="json")
+            raw_payload = evaluate(prepared.target, prepared.profile).model_dump(
+                mode="json"
             )
+            try:
+                payload = EcommerceWholeAdEvaluationPayload.model_validate(raw_payload)
+            except ValidationError:
+                payload = EcommerceWholeAdEvaluationPayload(
+                    domain_acceptance=(
+                        EcommerceAcceptanceEvidencePayload.model_validate(raw_payload)
+                    )
+                )
         except (AttributeError, TypeError, ValidationError, ValueError):
             payload = None
 
@@ -564,10 +611,14 @@ class EcommerceQualityGateCoordinator:
         }
         if payload is None:
             measured_payload["domain_evidence_invalid"] = True
-            verdict = QaVerdict.NOT_EVALUATED
         else:
-            measured_payload["domain_acceptance"] = payload.model_dump(mode="json")
-            verdict = adjudicate_ecommerce_acceptance(policy.domain_acceptance, payload)  # type: ignore[arg-type]
+            measured_payload["domain_acceptance"] = (
+                payload.domain_acceptance.model_dump(mode="json")
+            )
+            if payload.final_output is not None:
+                measured_payload["final_output"] = payload.final_output.model_dump(
+                    mode="json"
+                )
         evidence = seal_artifact(
             ReviewEvidence(
                 artifact_id=evidence_id,
@@ -594,6 +645,12 @@ class EcommerceQualityGateCoordinator:
                 subject_ids=handoff.composition_spec.shot_ids,
                 measured_payload=measured_payload,
             )
+        )
+        verdict = adjudicate_review_evidence(
+            policy,
+            QaLayer.SEMANTIC,
+            (evidence,),
+            review_request_content_hash=review_request.content_hash,
         )
         result = _result(
             verdict=verdict,
@@ -624,9 +681,11 @@ __all__ = [
     "EcommerceGateOutcome",
     "EcommerceGateResult",
     "EcommerceQualityGateCoordinator",
+    "EcommerceWholeAdEvaluationPayload",
     "EcommerceWholeAdAcceptanceTarget",
     "EcommerceWholeAdEvaluator",
     "universal_qa_context_content_hash",
     "universal_qa_gate_result_hash",
     "validate_ecommerce_review_evidence_binding",
+    "validate_ecommerce_final_output_contract",
 ]

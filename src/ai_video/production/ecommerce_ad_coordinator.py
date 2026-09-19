@@ -10,13 +10,14 @@ from typing import Any, Literal, Protocol
 
 from pydantic import Field, model_validator
 
-from ai_video.errors import AiVideoError
+from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production._caption_quality_p6 import (
     CaptionReviewExecution,
     caption_aware_review_layer_runner,
 )
 from ai_video.production._ecommerce_quality_gate_p6 import (
     _record_ecommerce_gate_review,
+    _reopen_ecommerce_gate_review,
 )
 from ai_video.production.ad_creative_types import CompiledAdCreativeHandoff
 from ai_video.production.artifact_contracts import StrictModel
@@ -24,17 +25,24 @@ from ai_video.production.ecommerce_quality_gate import (
     EcommerceAcceptedShotIdentity,
     EcommerceGateResult,
     EcommerceWholeAdEvaluator,
+    validate_ecommerce_final_output_contract,
 )
+from ai_video.production.ecommerce_job_contracts import EcommerceProductionHandoff
 from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.models import (
     FinalAcceptanceReceipt,
     QaLayer,
     QaVerdict,
+    ReviewLifecycle,
     SourceReference,
+    StateCommitStatus,
     ToolIdentity,
 )
 from ai_video.production.paid_provider import PaidProviderCallPreview
-from ai_video.production.project import load_production_project
+from ai_video.production.project import (
+    load_final_acceptance_receipt,
+    load_production_project,
+)
 from ai_video.production.quality_gate_coordinator import (
     HardCheckRunner,
     ReviewLayerRunner,
@@ -563,6 +571,7 @@ def _close_ecommerce_post_media_candidate(
     evidence_id: str,
     review_id: str,
     final_acceptance_id: str,
+    runtime_handoff: EcommerceProductionHandoff | None = None,
 ) -> EcommercePostMediaAcceptanceResult:
     """Close an already-active canonical render through Gate 2, P6, and Final Acceptance.
 
@@ -582,49 +591,8 @@ def _close_ecommerce_post_media_candidate(
         raise ValueError(
             "Ecommerce closure requires current canonical Production state"
         )
-
-    actual_applicability = UniversalQaApplicability(
-        has_audio=bool(timeline.audio_spans),
-        has_captions=bool(timeline.caption_cues),
-        has_graphics=bool(timeline.commercial_graphics)
-        or any(item.graphic_animation is not None for item in timeline.visual_spans),
-        has_safe_area_requirements=(
-            universal_profile.applicability.has_safe_area_requirements
-        ),
-        has_transitions=any(
-            item.incoming_transition is not None for item in timeline.visual_spans
-        ),
-        requires_continuity=universal_profile.applicability.requires_continuity,
-    )
-    universal_context = UniversalQaContext(
-        delivery_profile=timeline.delivery_profile,
-        applicability=actual_applicability,
-        project_content_hash=bundle.manifest.active_project.content_hash,
-        registry_content_hash=bundle.manifest.active_registry.content_hash,
-        dependency_graph_revision_id=(
-            bundle.manifest.active_dependency_graph.revision_id
-        ),
-        render_state_content_hash=bundle.manifest.active_render_state.content_hash,
-        render_output_sha256=render_state.output.file_sha256,
-        timeline_fingerprint=render_state.timeline_fingerprint,
-        qa_policy_content_hash=policy.content_hash,
-    )
-    run_canonical_review_layer = caption_aware_review_layer_runner(
-        committer=committer,
-        profile=universal_profile,
-        context=universal_context,
-        policy=policy,
-        execution=caption_review_execution,
-        fallback=run_review_layer,
-    )
-
-    universal_result = UniversalQualityGateCoordinator().run_once(
-        profile=universal_profile,
-        context=universal_context,
-        policy=policy,
-        run_hard_check=run_hard_check,
-        run_review_layer=run_canonical_review_layer,
-    )
+    if runtime_handoff is not None:
+        validate_ecommerce_final_output_contract(runtime_handoff, policy)
 
     projection_by_shot = {
         item.target_shot_id: item for item in handoff.commercial_execution_projections
@@ -677,21 +645,79 @@ def _close_ecommerce_post_media_candidate(
         )
         for item in checkpoints
     )
-    review = _record_ecommerce_gate_review(
+    review = _reopen_ecommerce_gate_review(
         committer=committer,
         universal_profile=universal_profile,
-        universal_context=universal_context,
-        universal_result=universal_result,
         policy=policy,
         handoff=handoff,
         accepted_shots=accepted_shots,
         tool_identity=tool_identity,
-        evaluate=evaluate,
         attempt_id=review_attempt_id,
         request_id=review_request_id,
         evidence_id=evidence_id,
         review_id=review_id,
     )
+    if review is None:
+        actual_applicability = UniversalQaApplicability(
+            has_audio=bool(timeline.audio_spans),
+            has_captions=bool(timeline.caption_cues),
+            has_graphics=bool(timeline.commercial_graphics)
+            or any(
+                item.graphic_animation is not None for item in timeline.visual_spans
+            ),
+            has_safe_area_requirements=(
+                universal_profile.applicability.has_safe_area_requirements
+            ),
+            has_transitions=any(
+                item.incoming_transition is not None for item in timeline.visual_spans
+            ),
+            requires_continuity=universal_profile.applicability.requires_continuity,
+        )
+        universal_context = UniversalQaContext(
+            delivery_profile=timeline.delivery_profile,
+            applicability=actual_applicability,
+            project_content_hash=bundle.manifest.active_project.content_hash,
+            registry_content_hash=bundle.manifest.active_registry.content_hash,
+            dependency_graph_revision_id=(
+                bundle.manifest.active_dependency_graph.revision_id
+            ),
+            render_state_content_hash=(
+                bundle.manifest.active_render_state.content_hash
+            ),
+            render_output_sha256=render_state.output.file_sha256,
+            timeline_fingerprint=render_state.timeline_fingerprint,
+            qa_policy_content_hash=policy.content_hash,
+        )
+        run_canonical_review_layer = caption_aware_review_layer_runner(
+            committer=committer,
+            profile=universal_profile,
+            context=universal_context,
+            policy=policy,
+            execution=caption_review_execution,
+            fallback=run_review_layer,
+        )
+        universal_result = UniversalQualityGateCoordinator().run_once(
+            profile=universal_profile,
+            context=universal_context,
+            policy=policy,
+            run_hard_check=run_hard_check,
+            run_review_layer=run_canonical_review_layer,
+        )
+        review = _record_ecommerce_gate_review(
+            committer=committer,
+            universal_profile=universal_profile,
+            universal_context=universal_context,
+            universal_result=universal_result,
+            policy=policy,
+            handoff=handoff,
+            accepted_shots=accepted_shots,
+            tool_identity=tool_identity,
+            evaluate=evaluate,
+            attempt_id=review_attempt_id,
+            request_id=review_request_id,
+            evidence_id=evidence_id,
+            review_id=review_id,
+        )
     if (
         review.gate.result.verdict is not QaVerdict.PASS
         or not review.p6_receipt_recorded
@@ -724,7 +750,42 @@ def _close_ecommerce_post_media_candidate(
     )
     if {item.layer for item in current_receipts} != required_layers:
         raise ValueError(
-            "Final Acceptance requires all current Gate 1 and Gate 2 receipts"
+            "Final Acceptance requires all current Gate 1 and Gate 2 receipts; "
+            f"required={sorted(item.value for item in required_layers)!r}, "
+            "current="
+            f"{sorted(item.layer.value for item in current_receipts)!r}"
+        )
+    acceptance_state = manifest.final_acceptance_state
+    if (
+        acceptance_state is not None
+        and acceptance_state.lifecycle is ReviewLifecycle.FRESH
+        and acceptance_state.active_receipt is not None
+    ):
+        existing = load_final_acceptance_receipt(
+            committer.project_root,
+            acceptance_state.active_receipt,
+        )
+        if (
+            existing.verdict is not QaVerdict.PASS
+            or existing.dependency_graph != manifest.active_dependency_graph
+            or existing.render_state != manifest.active_render_state
+            or existing.render_output_sha256 != render_state.output.file_sha256
+            or existing.timeline_fingerprint != render_state.timeline_fingerprint
+            or existing.qa_policy != manifest.active_qa_policy
+            or set(existing.required_review_receipts) != set(current_receipts)
+            or not any(
+                item.reference == review.gate.result.content_hash
+                for item in existing.source_provenance
+            )
+        ):
+            raise ValueError("Active Final Acceptance is not current")
+        return EcommercePostMediaAcceptanceResult(
+            shot_stage_complete=True,
+            gate_two=review.gate.result,
+            p6_semantic_receipt_recorded=True,
+            final_acceptance_recorded=True,
+            render_output_sha256=render_state.output.file_sha256,
+            final_acceptance_content_hash=existing.content_hash,
         )
     acceptance = seal_artifact(
         FinalAcceptanceReceipt(
@@ -738,6 +799,39 @@ def _close_ecommerce_post_media_candidate(
             source_provenance=(
                 SourceReference(
                     kind="derived", reference=review.gate.result.content_hash
+                ),
+                *(
+                    ()
+                    if runtime_handoff is None
+                    else (
+                        SourceReference(
+                            kind="derived",
+                            reference=(
+                                f"ecommerce-handoff:{runtime_handoff.handoff_id}"
+                            ),
+                            content_hash=runtime_handoff.handoff_id,
+                        ),
+                        SourceReference(
+                            kind="derived",
+                            reference=(
+                                "ecommerce-source-package:"
+                                f"{runtime_handoff.source_package_id}"
+                            ),
+                            content_hash=runtime_handoff.source_package_id,
+                        ),
+                        SourceReference(
+                            kind="derived",
+                            reference=f"ad-creative-plan:{handoff.plan_id}",
+                            content_hash=handoff.plan_content_hash,
+                        ),
+                        SourceReference(
+                            kind="derived",
+                            reference=(
+                                f"composition:{handoff.composition_spec.artifact_id}"
+                            ),
+                            content_hash=handoff.composition_spec.content_hash,
+                        ),
+                    )
                 ),
             ),
             acceptance_id=final_acceptance_id,
@@ -773,6 +867,31 @@ def _close_ecommerce_post_media_candidate(
         render_output_sha256=render_state.output.file_sha256,
         final_acceptance_content_hash=acceptance.content_hash,
     )
+
+
+def close_ecommerce_post_media_candidate(
+    **kwargs: Any,
+) -> EcommercePostMediaAcceptanceResult:
+    """Close an already-active render through the existing canonical owners."""
+
+    committer = kwargs.get("committer")
+    if not isinstance(committer, ProductionStateCommitter):
+        raise ValueError("Ecommerce closure requires the canonical committer")
+    manifest = load_production_project(
+        committer.project_root / "project.yaml"
+    ).manifest
+    if any(
+        item.operation == "review"
+        and item.status
+        in {StateCommitStatus.RUNNING, StateCommitStatus.OUTCOME_UNKNOWN}
+        for item in manifest.attempts
+    ):
+        raise AiVideoError(
+            ErrorCode.PRODUCTION_STATE_OUTCOME_UNKNOWN,
+            "An unresolved review attempt requires explicit recovery.",
+            retryable=False,
+        )
+    return _close_ecommerce_post_media_candidate(**kwargs)
 
 
 def run_ecommerce_ad_production(
@@ -832,7 +951,7 @@ def run_ecommerce_ad_production(
         return EcommerceAdProductionResult(shot_generation=generation)
 
     activate_final_render(selected, generation)
-    post_media = _close_ecommerce_post_media_candidate(
+    post_media = close_ecommerce_post_media_candidate(
         committer=committer,
         handoff=selected,
         shot_facades=facades,
@@ -863,6 +982,7 @@ __all__ = [
     "EcommerceVideoGenerationFacade",
     "EcommerceShotNextAction",
     "EcommerceStopReason",
+    "close_ecommerce_post_media_candidate",
     "run_ecommerce_ad_generation",
     "run_ecommerce_ad_production",
 ]

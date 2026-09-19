@@ -146,9 +146,9 @@ checks:
     cwd: .
     description: Verify the ecommerce advertising authoring Skill, schemas, validator, fixtures, and no-I/O boundaries.
   ecommerce_production_job_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_ecommerce_job.py, tests/test_production_ecommerce_job_repair.py, tests/test_production_ecommerce_job_assembly.py, tests/test_production_ecommerce_job_contracts.py, tests/test_production_ecommerce_job_compiler.py, tests/test_production_ecommerce_job_projection.py, tests/test_ecommerce_ad_workflow_handoff.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_ecommerce_job.py, tests/test_production_ecommerce_job_repair.py, tests/test_production_ecommerce_job_assembly.py, tests/test_production_ecommerce_job_contracts.py, tests/test_production_ecommerce_job_compiler.py, tests/test_production_ecommerce_job_projection.py, tests/test_production_ecommerce_job_review.py, tests/test_production_ecommerce_post_media_e2e.py, tests/test_production_delivery_packager.py, tests/test_ecommerce_ad_workflow_handoff.py, -q]
     cwd: .
-    description: Verify exact visual-contract handoff, canonical bootstrap compilation, fail-closed gaps, and read-only Ecommerce Job projection without Provider or media effects.
+    description: Verify exact handoff, canonical bootstrap, bounded Shot execution, deterministic composition, whole-ad review, and atomic delivery without Provider or media effects.
   drama_authoring_source_binding_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_drama_shot01_authoring_source_binding.py, -q]
     cwd: .
@@ -1144,9 +1144,11 @@ categories:
   ecommerce_production_job:
     patterns:
       - src/ai_video/production/ecommerce_job*.py
+      - src/ai_video/production/delivery_packager.py
       - tests/ecommerce_job_factory.py
       - tests/test_production_ecommerce_job.py
       - tests/test_production_ecommerce_job_*.py
+      - tests/test_production_delivery_packager.py
       - tests/test_ecommerce_ad_workflow_handoff.py
       - .agents/skills/ecommerce-ad-workflow/scripts/export_runtime_handoff.py
       - .agents/skills/ecommerce-ad-workflow/schemas/ecommerce-production-handoff.schema.json
