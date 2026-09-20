@@ -5,6 +5,7 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production._lifecycle_schema import (
     GenerationExecutionBindingPointer, GenerationExperienceReceiptPointer,
     GenerationQualityRejectionReceiptPointer, QualificationExecutionBindingPointer,
+    RuntimeRepairAuthorizationPointer,
 )
 from ai_video.production.paths import _read_regular_file_nofollow, resolve_contained_path
 
@@ -111,6 +112,31 @@ def load_generation_quality_rejection(
     ):
         raise _invalid("Generation quality rejection pointer identity is invalid.")
     return receipt
+
+
+def load_runtime_repair_authorization(
+    root: str | Path, pointer: RuntimeRepairAuthorizationPointer
+):
+    """Reopen an immutable runtime repair authorization."""
+    from ai_video.production.generation_runtime_repair import RuntimeRepairAuthorization
+    from ai_video.production.hashing import canonical_sha256
+
+    resolved_root, resolved = _root_and_path(root, pointer.path)
+    try:
+        raw = _read_regular_file_nofollow(
+            resolved, contained_by=resolved_root / "state"
+        )
+        authorization = RuntimeRepairAuthorization.model_validate_json(raw.data)
+    except (OSError, ValidationError, ValueError, AiVideoError) as exc:
+        raise _invalid("Could not reopen runtime repair authorization.", str(exc)) from exc
+    if (
+        raw.file_sha256 != pointer.file_sha256
+        or canonical_sha256(authorization.model_dump(mode="json")) != pointer.content_hash
+        or authorization.attempt_id != pointer.attempt_id
+        or authorization.evidence_hash != pointer.evidence_hash
+    ):
+        raise _invalid("Runtime repair authorization pointer identity is invalid.")
+    return authorization
 
 
 

@@ -364,7 +364,13 @@ class _StateCommitPaidProviderMixin:
                         "Paid Provider video intent requires durable video state."
                     )
                 request = self._reopen_video_request(video_state.request)
-                self._require_submit_execution_binding(manifest, video_state, request)
+                _paid_binding, runtime_repair = self._require_submit_execution_binding(
+                    manifest, video_state, request
+                )
+                if runtime_repair is not None:
+                    raise _state_invalid(
+                        "Paid Provider submit cannot consume a runtime repair grant."
+                    )
                 if (
                     video_state.qualification_binding is not None
                     or

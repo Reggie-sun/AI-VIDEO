@@ -25,6 +25,7 @@ from ai_video.production.hashing import canonical_sha256
 from ai_video.production.shot_router import VideoGenerationResolver
 from ai_video.production.video_compiler import ProviderRequirementUnsupported
 from ai_video.production.generation_rejection import GenerationQualityRejectionReceipt
+from ai_video.production.generation_runtime_repair import RuntimeRepairGrant
 from ai_video.production.generation_evaluation import project_generation_evaluation_sources
 
 bind_experience_models(GenerationCandidate)
@@ -50,6 +51,7 @@ class GenerationHistory:
     latest_attempt_hash: str | None = None
     baseline_request: object | None = None
     abandoned_result: GenerationQualityRejectionReceipt | None = None
+    runtime_repairs: tuple[RuntimeRepairGrant, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -302,7 +304,7 @@ class GenerationFeedbackOrchestrator:
             interventions=interventions, conflicts=conflicts, historical_recipes=tuple(historical.values()),
             baseline_request=history.baseline_request,
             experiences=history.experiences, feature_scope=extract_generation_features(projection),
-            abandoned_result=history.abandoned_result,
+            abandoned_result=history.abandoned_result, runtime_repairs=history.runtime_repairs,
         )
         arguments = {name: current[name] for name in ("projection", "context", "policy", "lifecycle")}
         if "continuity_routing" in current:
@@ -411,8 +413,17 @@ class GenerationFeedbackOrchestrator:
                             abandoned_result = receipt
                 if request.activation_scope is not None:
                     baseline = request.activation_scope.request
+            runtime_repairs = []
+            for item in committer._read_manifest().attempts:
+                video_state = item.video_generation_state
+                if video_state is None:
+                    continue
+                for pointer in video_state.runtime_repairs:
+                    runtime_repairs.append(RuntimeRepairGrant(
+                        authorization=committer._reopen_runtime_repair_authorization(pointer),
+                        consumed=pointer.consumed))
             return GenerationHistory(experiences, latest.evidence_hash if latest else None,
-                                     baseline, abandoned_result)
+                                     baseline, abandoned_result, tuple(runtime_repairs))
 
         from ai_video.production.video_generation import VideoGenerationService
 

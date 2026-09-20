@@ -359,6 +359,27 @@ class LocalVideoStatusReceiptPointer(_PaidLifecycleModel):
         return self
 
 
+class RuntimeRepairAuthorizationPointer(_PaidLifecycleModel):
+    path: Path
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    attempt_id: str = Field(min_length=1)
+    evidence_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    consumed: bool = False
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "RuntimeRepairAuthorizationPointer":
+        _canonical_paid_path(
+            self.path,
+            Path(
+                "state/video-generation/runtime-repair/"
+                f"{self.content_hash}.json"
+            ),
+            "runtime repair authorization",
+        )
+        return self
+
+
 class LocalVideoFetchReceiptPointer(_PaidLifecycleModel):
     path: Path
     fetch_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -844,6 +865,7 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
     execution_binding: GenerationExecutionBindingPointer | None = None
     qualification_binding: QualificationExecutionBindingPointer | None = None
     generation_experiences: tuple[GenerationExperienceReceiptPointer, ...] = ()
+    runtime_repairs: tuple[RuntimeRepairAuthorizationPointer, ...] = ()
     quality_rejection: GenerationQualityRejectionReceiptPointer | None = None
     generation_id: str = Field(min_length=1)
     resolved_generation_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -879,6 +901,8 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
             data.pop("qualification_binding", None)
         if not self.generation_experiences:
             data.pop("generation_experiences", None)
+        if not self.runtime_repairs:
+            data.pop("runtime_repairs", None)
         if self.quality_rejection is None:
             data.pop("quality_rejection", None)
         if self.continuity_evaluation is None:

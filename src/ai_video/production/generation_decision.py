@@ -18,6 +18,9 @@ from ai_video.production.final_output_contracts import FinalOutputContract
 from ai_video.production.generation_rejection import (
     GenerationQualityRejectionReceipt, validate_abandoned_result,
 )
+from ai_video.production.generation_runtime_repair import (
+    RuntimeRepairAuthorization, RuntimeRepairGrant,
+)
 from ai_video.production.video import (
     ProviderProfilePointer, VideoGenerationRequest, VideoOutputRequirement, VideoProviderCapabilities,
 )
@@ -128,6 +131,7 @@ class DecisionInputs(StrictModel):
     experiences: tuple["GenerationExperience", ...] = ()
     feature_scope: "GenerationFeatures | None" = None
     abandoned_result: GenerationQualityRejectionReceipt | None = None
+    runtime_repairs: tuple[RuntimeRepairGrant, ...] = ()
 
     @model_serializer(mode="wrap")
     def _serialize_abandonment(self, handler):
@@ -173,7 +177,8 @@ class DecisionInputs(StrictModel):
     @property
     def snapshot_hash(self):
         payload = self.model_dump(mode="json")
-        for field in ("candidates", "evidence", "interventions", "conflicts", "historical_recipes", "experiences"):
+        for field in ("candidates", "evidence", "interventions", "conflicts",
+                      "historical_recipes", "experiences", "runtime_repairs"):
             payload[field] = sorted(payload[field], key=canonical_sha256)
         payload["user_fixed_candidates"] = sorted(payload["user_fixed_candidates"])
         payload["limits"]["allowed_remote_candidates"] = sorted(payload["limits"]["allowed_remote_candidates"])
@@ -209,6 +214,7 @@ class GenerationDecision(StrictModel):
     assessments: tuple[CandidateAssessment, ...]
     diagnosis: Diagnosis | None = None
     intervention: Intervention | None = None
+    runtime_repair: RuntimeRepairAuthorization | None = None
     routing: RequirementRoutingResult | None = None
     rationale: tuple[str, ...]
     revalidate_requirements: tuple[str, ...] = ()
@@ -387,6 +393,8 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
         return GenerationDecision(**base, disposition="EVIDENCE_GAP",
             rationale=("prepared-only work cannot replace the last submitted outcome and baseline",))
     goal_changed = False
+    runtime_repair = None
+    repair_candidate = None
     if inputs.abandoned_result is not None:
         prior = next((x for x in inputs.experiences if latest in x.evidence), None)
         if latest is None or prior is None or inputs.policy.version != "3":
@@ -419,10 +427,29 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
             if not goal_changed:
                 return GenerationDecision(**base, disposition="RUBRIC_OR_STAGE_ERROR",
                     rationale=("Final-output repair cannot replace its frozen goal requirements; retain the old failure and author a new goal version explicitly",))
+        # A runtime repair authorizes exactly one re-execution of the identical
+        # strategy after the runtime owner diagnosed and fixed an environmental
+        # failure.  It never overrides quality findings, unknown outcomes, or
+        # mixed failure classes, and the committer consumes the grant inside the
+        # replacement submit intent's atomic write.
+        if diagnosis.failure_classes == ("RUNTIME_FAILURE",):
+            grant = next((g for g in inputs.runtime_repairs
+                          if not g.consumed
+                          and g.authorization.evidence_hash == latest.evidence_hash
+                          and g.authorization.attempt_id == latest.attempt_id), None)
+            if grant is not None:
+                repair_candidate = next(
+                    (c for c in candidates if c.scope_hash == latest.recipe_scope_hash), None)
+                if repair_candidate is None:
+                    return GenerationDecision(**base, disposition="EVIDENCE_GAP",
+                        rationale=("runtime repair requires the historical generation strategy",))
+                runtime_repair = grant.authorization
         for reason in ("UNKNOWN_OUTCOME", "RUNTIME_FAILURE", "RUBRIC_OR_STAGE_ERROR", "EVIDENCE_GAP"):
             if goal_changed and reason == "EVIDENCE_GAP":
                 continue
             if inputs.abandoned_result is not None and reason == "EVIDENCE_GAP":
+                continue
+            if runtime_repair is not None and reason == "RUNTIME_FAILURE":
                 continue
             if reason in diagnosis.failure_classes:
                 return GenerationDecision(**base, disposition=reason,
@@ -557,7 +584,9 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
             raise ValueError("caller comparison is not derived from exact compiled baseline")
     eligible = [a for a in assessments if a.compatible and a.executable
                 and (intervention is not None and a.candidate_id == intervention.candidate_id
-                     or intervention is None and (a.fit == "supported" or
+                     or runtime_repair is not None and repair_candidate is not None
+                        and a.candidate_id == repair_candidate.candidate_id
+                     or intervention is None and runtime_repair is None and (a.fit == "supported" or
                          a.fit == "unknown" and inputs.policy.allow_bounded_exploration))]
     if not eligible:
         if projection.requirement.voice_routing is not None and all(
@@ -617,7 +646,7 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
     })
     routing = RequirementRoutingResult(decision=routing.decision, provider_bound_request=bound)
     return GenerationDecision(**base, disposition="GENERATE_ONCE", selected_candidate_id=chosen.candidate_id,
-                              routing=routing, intervention=intervention,
+                              routing=routing, intervention=intervention, runtime_repair=runtime_repair,
                               rationale=(f"{chosen.candidate_id}: {eligible[0].fit}; one bounded attempt, no quality guarantee",
                                          "explicit goal revision retains the old failed result; it is not a repair success"
                                          if goal_changed else "evidence and policy affect audit identity, not unrelated media semantics"),
