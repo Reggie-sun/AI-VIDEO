@@ -94,8 +94,8 @@ SUPPORTED 的理由：单变量对照（同一源照片、同一暗化配方族�
 
 Candidate checkpoint commit 与 exact file bytes SHA-256 在 candidate 提交后记录于此：
 
-- candidate_commit：TBD
-- candidate_sha256：TBD
+- candidate_commit：e6e7c03
+- candidate_sha256：6e930a78f3a39c302c042e07d8debd3af5525f8c98667b1002b6d63d032421c5
 
 ### Adoption Evidence
 
