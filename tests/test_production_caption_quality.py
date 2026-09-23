@@ -4,6 +4,7 @@ import pytest
 
 from ai_video.production.caption_quality import (
     adjudicate_caption_review_evidence,
+    adjudicate_caption_review_evidence_detailed,
     caption_context_hash,
 )
 from ai_video.production.caption_quality_contracts import (
@@ -341,6 +342,55 @@ def test_caption_current_authorized_fail_has_priority_over_pass() -> None:
         )
         is QaVerdict.FAIL
     )
+
+
+def test_caption_detail_exposes_group_gap_masked_by_another_group_failure() -> None:
+    policy = _caption_policy()
+    context = _context(policy)
+    structural, final_media = _passing_evidence(policy, context)
+    structural_findings = CaptionEvidencePayload.model_validate(
+        dict(structural.measured_payload)
+    ).findings
+    final_findings = CaptionEvidencePayload.model_validate(
+        dict(final_media.measured_payload)
+    ).findings
+    timing_failure = _finding(
+        CaptionRequirementGroup.TIMING_CONTRACT,
+        verdict="fail",
+        covered_subject_ids=context.coverage_domains[1].subject_ids,
+    ).model_copy(update={"reason_code": CaptionFindingReasonCode.TIMING_OUT_OF_BOUNDS})
+    failing_structural = _evidence(
+        evidence_id="caption-timing-failed",
+        context=context,
+        policy=policy,
+        tool=ToolIdentity(name="renderer-audit", version="1"),
+        strength=EvidenceStrength.RENDERER_BOUND,
+        findings=(structural_findings[0], timing_failure),
+    )
+    incomplete_final = _evidence(
+        evidence_id="caption-final-incomplete",
+        context=context,
+        policy=policy,
+        tool=ToolIdentity(name="final-media-evaluator", version="1"),
+        strength=EvidenceStrength.EXPLICIT_EVALUATOR,
+        findings=tuple(
+            finding.model_copy(update={"covered_subject_ids": ()})
+            if finding.requirement_group is CaptionRequirementGroup.UNINTENDED_TEXT
+            else finding
+            for finding in final_findings
+        ),
+    )
+
+    result = adjudicate_caption_review_evidence_detailed(
+        policy=policy,
+        context=context,
+        evidence=(failing_structural, incomplete_final),
+    )
+
+    assert result.verdict is QaVerdict.FAIL
+    assert result.group_verdicts[1] is QaVerdict.FAIL
+    assert result.group_verdicts[5] is QaVerdict.NOT_EVALUATED
+    assert result.authorized_findings[1] == (timing_failure,)
 
 
 def test_caption_authorized_uncertainty_blocks_an_otherwise_complete_pass() -> None:

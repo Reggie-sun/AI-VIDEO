@@ -11,6 +11,7 @@ from ai_video.production.ecommerce_job_review import (
     inspect_ecommerce_review_frontier,
 )
 from ai_video.production.caption_quality_contracts import (
+    CAPTION_REQUIREMENT_GROUPS,
     CaptionCoverageStatus,
     CaptionEvidencePayload,
     CaptionFindingReasonCode,
@@ -277,10 +278,7 @@ def test_caption_failure_requires_exact_group_before_local_repair(
     )
     monkeypatch.setattr(
         "ai_video.production.ecommerce_job_review.reopen_caption_review_chain",
-        lambda **_kwargs: SimpleNamespace(
-            verdict=QaVerdict.FAIL,
-            evidence=(SimpleNamespace(measured_payload=payload.model_dump(mode="json")),)
-        ),
+        lambda **_kwargs: _reopened_caption(payload),
         raising=False,
     )
 
@@ -316,6 +314,10 @@ def _caption_payload(
                     if verdict == "not_evaluated"
                     else CaptionFindingReasonCode.REQUIREMENT_CONFIRMED
                 ),
+                covered_subject_ids=(
+                    "render-1" if group is CaptionRequirementGroup.UNINTENDED_TEXT
+                    else "cue-1",
+                ),
                 raw_evidence_references=("exact-render",),
                 coverage_status=CaptionCoverageStatus.COMPLETE,
                 observation_fingerprint="c" * 64,
@@ -325,6 +327,30 @@ def _caption_payload(
         caption_policy_hash="a" * 64,
         caption_context_hash="b" * 64,
         findings=tuple(findings),
+    )
+
+
+def _reopened_caption(
+    payload: CaptionEvidencePayload,
+    *,
+    unevaluated_group: CaptionRequirementGroup | None = None,
+):
+    by_group = {finding.requirement_group: finding for finding in payload.findings}
+    return SimpleNamespace(
+        verdict=QaVerdict.FAIL,
+        evidence=(SimpleNamespace(measured_payload=payload.model_dump(mode="json")),),
+        adjudication=SimpleNamespace(
+            group_verdicts=tuple(
+                QaVerdict.NOT_EVALUATED
+                if group is unevaluated_group or group not in by_group
+                else QaVerdict(by_group[group].verdict)
+                for group in CAPTION_REQUIREMENT_GROUPS
+            ),
+            authorized_findings=tuple(
+                (by_group[group],) if group in by_group else ()
+                for group in CAPTION_REQUIREMENT_GROUPS
+            ),
+        ),
     )
 
 
@@ -362,9 +388,50 @@ def test_caption_failure_with_incomplete_required_evidence_repairs_evidence_firs
     )
     monkeypatch.setattr(
         "ai_video.production.ecommerce_job_review.reopen_caption_review_chain",
-        lambda **_kwargs: SimpleNamespace(
-            verdict=QaVerdict.FAIL,
-            evidence=(SimpleNamespace(measured_payload=payload.model_dump(mode="json")),),
+        lambda **_kwargs: _reopened_caption(payload),
+    )
+
+    assert inspect_ecommerce_review_frontier(
+        tmp_path
+    ) is EcommerceFinalReviewFrontier.EVIDENCE_REPAIR_REQUIRED
+
+
+def test_caption_failure_with_incomplete_canonical_cue_coverage_repairs_evidence_first(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    pointer = object()
+    payload = _caption_payload(
+        failed_group=CaptionRequirementGroup.TIMING_CONTRACT,
+        failed_reason=CaptionFindingReasonCode.TIMING_OUT_OF_BOUNDS,
+    )
+    payload = payload.model_copy(
+        update={
+            "findings": tuple(
+                finding.model_copy(update={"covered_subject_ids": ()})
+                if finding.requirement_group is CaptionRequirementGroup.UNINTENDED_TEXT
+                else finding
+                for finding in payload.findings
+            )
+        }
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_review.load_production_project",
+        lambda _path: SimpleNamespace(
+            manifest=SimpleNamespace(active_review_receipts=(pointer,))
+        ),
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_review.load_review_receipt",
+        lambda _root, _pointer: SimpleNamespace(
+            verdict=QaVerdict.FAIL, layer=QaLayer.CAPTION
+        ),
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_review.reopen_caption_review_chain",
+        lambda **_kwargs: _reopened_caption(
+            payload,
+            unevaluated_group=CaptionRequirementGroup.UNINTENDED_TEXT,
         ),
     )
 

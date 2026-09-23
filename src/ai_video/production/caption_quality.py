@@ -17,6 +17,7 @@ from ai_video.production.caption_quality_contracts import (
     CaptionEvidenceStrength,
     CaptionGroupCoverageDomain,
     CaptionQualityPolicy,
+    CaptionRequirementFinding,
     CaptionRequirementGroup,
     CaptionReviewContext,
     CaptionTrackReviewBinding,
@@ -260,13 +261,28 @@ def _authority_for(
     return None
 
 
-def adjudicate_caption_review_evidence(
+@dataclass(frozen=True)
+class CaptionEvidenceAdjudication:
+    verdict: QaVerdict
+    group_verdicts: tuple[QaVerdict, ...]
+    authorized_findings: tuple[tuple[CaptionRequirementFinding, ...], ...]
+
+
+def _not_evaluated_caption_adjudication() -> CaptionEvidenceAdjudication:
+    return CaptionEvidenceAdjudication(
+        verdict=QaVerdict.NOT_EVALUATED,
+        group_verdicts=(QaVerdict.NOT_EVALUATED,) * len(CAPTION_REQUIREMENT_GROUPS),
+        authorized_findings=((),) * len(CAPTION_REQUIREMENT_GROUPS),
+    )
+
+
+def adjudicate_caption_review_evidence_detailed(
     *,
     policy: CaptionQualityPolicy,
     context: CaptionReviewContext,
     evidence: Sequence[ReviewEvidence],
-) -> QaVerdict:
-    """Aggregate exact-bound raw findings; analyzers never own the verdict."""
+) -> CaptionEvidenceAdjudication:
+    """Return the canonical aggregate and each required group's evidence state."""
     try:
         validated_policy = CaptionQualityPolicy.model_validate(
             policy.model_dump(mode="json")
@@ -275,19 +291,19 @@ def adjudicate_caption_review_evidence(
             context.model_dump(mode="json")
         )
     except ValidationError:
-        return QaVerdict.NOT_EVALUATED
+        return _not_evaluated_caption_adjudication()
     if (
         validated_context.caption_policy_hash != validated_policy.content_hash
         or validated_context.measurement_contract_version
         != validated_policy.measurement_contract_version
     ):
-        return QaVerdict.NOT_EVALUATED
+        return _not_evaluated_caption_adjudication()
     context_digest = caption_context_hash(validated_context)
     expected_domains = {
         item.requirement_group: set(item.subject_ids)
         for item in validated_context.coverage_domains
     }
-    findings_by_group: dict[CaptionRequirementGroup, list[object]] = {
+    findings_by_group: dict[CaptionRequirementGroup, list[CaptionRequirementFinding]] = {
         group: [] for group in CAPTION_REQUIREMENT_GROUPS
     }
     for item in evidence:
@@ -305,17 +321,17 @@ def adjudicate_caption_review_evidence(
                 or validated.measurement_contract_version
                 != validated_context.measurement_contract_version
             ):
-                return QaVerdict.NOT_EVALUATED
+                return _not_evaluated_caption_adjudication()
             payload = CaptionEvidencePayload.model_validate(
                 dict(validated.measured_payload)
             )
         except (ValidationError, ValueError):
-            return QaVerdict.NOT_EVALUATED
+            return _not_evaluated_caption_adjudication()
         if (
             payload.caption_policy_hash != validated_policy.content_hash
             or payload.caption_context_hash != context_digest
         ):
-            return QaVerdict.NOT_EVALUATED
+            return _not_evaluated_caption_adjudication()
         for finding in payload.findings:
             if _authority_for(
                 authorities=validated_policy.evidence_authorities,
@@ -349,11 +365,34 @@ def adjudicate_caption_review_evidence(
             group_verdicts.append(QaVerdict.NOT_EVALUATED)
             continue
         group_verdicts.append(QaVerdict.PASS)
-    if QaVerdict.FAIL in group_verdicts:
-        return QaVerdict.FAIL
-    if any(item is not QaVerdict.PASS for item in group_verdicts):
-        return QaVerdict.NOT_EVALUATED
-    return QaVerdict.PASS
+    verdict = (
+        QaVerdict.FAIL
+        if QaVerdict.FAIL in group_verdicts
+        else QaVerdict.NOT_EVALUATED
+        if any(item is not QaVerdict.PASS for item in group_verdicts)
+        else QaVerdict.PASS
+    )
+    return CaptionEvidenceAdjudication(
+        verdict=verdict,
+        group_verdicts=tuple(group_verdicts),
+        authorized_findings=tuple(
+            tuple(findings_by_group[group]) for group in CAPTION_REQUIREMENT_GROUPS
+        ),
+    )
+
+
+def adjudicate_caption_review_evidence(
+    *,
+    policy: CaptionQualityPolicy,
+    context: CaptionReviewContext,
+    evidence: Sequence[ReviewEvidence],
+) -> QaVerdict:
+    """Aggregate exact-bound raw findings; analyzers never own the verdict."""
+    return adjudicate_caption_review_evidence_detailed(
+        policy=policy,
+        context=context,
+        evidence=evidence,
+    ).verdict
 
 
 def adjudicate_caption_layer(
@@ -373,7 +412,11 @@ class ReopenedCaptionReview:
     receipt: ReviewReceipt
     request: ReviewRequest
     evidence: tuple[ReviewEvidence, ...]
-    verdict: QaVerdict
+    adjudication: CaptionEvidenceAdjudication
+
+    @property
+    def verdict(self) -> QaVerdict:
+        return self.adjudication.verdict
 
 
 def reopen_caption_review_chain(
@@ -444,16 +487,16 @@ def reopen_caption_review_chain(
     )
     if request.dependency_states_hash != dependency_states_hash:
         raise ValueError("CAPTION review dependency state is stale")
-    verdict = adjudicate_caption_review_evidence(
+    adjudication = adjudicate_caption_review_evidence_detailed(
         policy=policy.caption_policy,
         context=request.caption_context,
         evidence=evidence,
     )
-    if receipt.verdict is not verdict:
+    if receipt.verdict is not adjudication.verdict:
         raise ValueError("CAPTION review stored verdict does not match durable evidence")
     return ReopenedCaptionReview(
         receipt=receipt,
         request=request,
         evidence=evidence,
-        verdict=verdict,
+        adjudication=adjudication,
     )

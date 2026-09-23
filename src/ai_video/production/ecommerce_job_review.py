@@ -13,7 +13,6 @@ from ai_video.production.caption_quality import reopen_caption_review_chain
 from ai_video.production.caption_quality_contracts import (
     CAPTION_REQUIREMENT_GROUPS,
     CaptionCoverageStatus,
-    CaptionEvidencePayload,
     CaptionFindingReasonCode,
     CaptionRequirementGroup,
 )
@@ -69,18 +68,20 @@ def _caption_repair_frontier(project, pointer) -> EcommerceFinalReviewFrontier:
         )
         if reopened.verdict is not QaVerdict.FAIL:
             return EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
+        adjudication = reopened.adjudication
         findings = tuple(
             finding
-            for evidence in reopened.evidence
-            for finding in CaptionEvidencePayload.model_validate(
-                dict(evidence.measured_payload)
-            ).findings
+            for group_findings in adjudication.authorized_findings
+            for finding in group_findings
         )
     except (AiVideoError, OSError, TypeError, ValueError):
         return EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
     if (
-        {finding.requirement_group for finding in findings}
-        != set(CAPTION_REQUIREMENT_GROUPS)
+        len(adjudication.group_verdicts) != len(CAPTION_REQUIREMENT_GROUPS)
+        or any(
+            verdict is QaVerdict.NOT_EVALUATED
+            for verdict in adjudication.group_verdicts
+        )
         or any(
             finding.verdict == "not_evaluated"
             or finding.coverage_status is not CaptionCoverageStatus.COMPLETE
