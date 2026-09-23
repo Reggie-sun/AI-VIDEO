@@ -265,6 +265,7 @@ def _authority_for(
 class CaptionEvidenceAdjudication:
     verdict: QaVerdict
     group_verdicts: tuple[QaVerdict, ...]
+    group_coverage_complete: tuple[bool, ...]
     authorized_findings: tuple[tuple[CaptionRequirementFinding, ...], ...]
 
 
@@ -272,6 +273,7 @@ def _not_evaluated_caption_adjudication() -> CaptionEvidenceAdjudication:
     return CaptionEvidenceAdjudication(
         verdict=QaVerdict.NOT_EVALUATED,
         group_verdicts=(QaVerdict.NOT_EVALUATED,) * len(CAPTION_REQUIREMENT_GROUPS),
+        group_coverage_complete=(False,) * len(CAPTION_REQUIREMENT_GROUPS),
         authorized_findings=((),) * len(CAPTION_REQUIREMENT_GROUPS),
     )
 
@@ -341,8 +343,30 @@ def adjudicate_caption_review_evidence_detailed(
                 findings_by_group[finding.requirement_group].append(finding)
 
     group_verdicts: list[QaVerdict] = []
+    group_coverage_complete: list[bool] = []
     for group in CAPTION_REQUIREMENT_GROUPS:
         findings = findings_by_group[group]
+        covered = {
+            subject_id for item in findings for subject_id in item.covered_subject_ids
+        }
+        subjects_current = all(
+            item.covered_subject_ids
+            and set(item.covered_subject_ids).issubset(expected_domains[group])
+            for item in findings
+        )
+        coverage_complete = (
+            bool(findings)
+            and subjects_current
+            and covered == expected_domains[group]
+            and all(
+                item.coverage_status is CaptionCoverageStatus.COMPLETE
+                for item in findings
+            )
+        )
+        group_coverage_complete.append(coverage_complete)
+        if not subjects_current:
+            group_verdicts.append(QaVerdict.NOT_EVALUATED)
+            continue
         if any(item.verdict == "fail" for item in findings):
             group_verdicts.append(QaVerdict.FAIL)
             continue
@@ -350,16 +374,9 @@ def adjudicate_caption_review_evidence_detailed(
             group_verdicts.append(QaVerdict.NOT_EVALUATED)
             continue
         passes = [item for item in findings if item.verdict == "pass"]
-        covered = {
-            subject_id for item in passes for subject_id in item.covered_subject_ids
-        }
         if (
             not passes
-            or any(
-                item.coverage_status is not CaptionCoverageStatus.COMPLETE
-                for item in passes
-            )
-            or covered != expected_domains[group]
+            or not coverage_complete
             or len({item.observation_fingerprint for item in passes}) > 1
         ):
             group_verdicts.append(QaVerdict.NOT_EVALUATED)
@@ -375,6 +392,7 @@ def adjudicate_caption_review_evidence_detailed(
     return CaptionEvidenceAdjudication(
         verdict=verdict,
         group_verdicts=tuple(group_verdicts),
+        group_coverage_complete=tuple(group_coverage_complete),
         authorized_findings=tuple(
             tuple(findings_by_group[group]) for group in CAPTION_REQUIREMENT_GROUPS
         ),

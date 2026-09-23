@@ -78,10 +78,12 @@ def _caption_repair_frontier(project, pointer) -> EcommerceFinalReviewFrontier:
         return EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
     if (
         len(adjudication.group_verdicts) != len(CAPTION_REQUIREMENT_GROUPS)
+        or len(adjudication.group_coverage_complete) != len(CAPTION_REQUIREMENT_GROUPS)
         or any(
             verdict is QaVerdict.NOT_EVALUATED
             for verdict in adjudication.group_verdicts
         )
+        or not all(adjudication.group_coverage_complete)
         or any(
             finding.verdict == "not_evaluated"
             or finding.coverage_status is not CaptionCoverageStatus.COMPLETE

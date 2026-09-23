@@ -390,7 +390,41 @@ def test_caption_detail_exposes_group_gap_masked_by_another_group_failure() -> N
     assert result.verdict is QaVerdict.FAIL
     assert result.group_verdicts[1] is QaVerdict.FAIL
     assert result.group_verdicts[5] is QaVerdict.NOT_EVALUATED
+    assert result.group_coverage_complete[1] is True
+    assert result.group_coverage_complete[5] is False
     assert result.authorized_findings[1] == (timing_failure,)
+
+
+def test_caption_failure_outside_current_subject_domain_is_not_evaluated() -> None:
+    policy = _caption_policy()
+    context = _context(policy)
+    structural, final_media = _passing_evidence(policy, context)
+    source_finding = CaptionEvidencePayload.model_validate(
+        dict(structural.measured_payload)
+    ).findings[0]
+    external_failure = _finding(
+        CaptionRequirementGroup.TIMING_CONTRACT,
+        verdict="fail",
+        covered_subject_ids=("f" * 64,),
+    ).model_copy(update={"reason_code": CaptionFindingReasonCode.TIMING_OUT_OF_BOUNDS})
+    malformed_structural = _evidence(
+        evidence_id="caption-timing-outside-context",
+        context=context,
+        policy=policy,
+        tool=ToolIdentity(name="renderer-audit", version="1"),
+        strength=EvidenceStrength.RENDERER_BOUND,
+        findings=(source_finding, external_failure),
+    )
+
+    result = adjudicate_caption_review_evidence_detailed(
+        policy=policy,
+        context=context,
+        evidence=(malformed_structural, final_media),
+    )
+
+    assert result.verdict is QaVerdict.NOT_EVALUATED
+    assert result.group_verdicts[1] is QaVerdict.NOT_EVALUATED
+    assert result.group_coverage_complete[1] is False
 
 
 def test_caption_authorized_uncertainty_blocks_an_otherwise_complete_pass() -> None:
