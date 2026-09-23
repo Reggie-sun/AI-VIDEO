@@ -345,6 +345,7 @@ checks:
       - composition_architecture_tests
       - ecommerce_ad_workflow_skill_tests
       - ecommerce_production_job_tests
+      - aoci_project_cognition_tests
       - drama_authoring_source_binding_tests
       - seedance_authoring_skill_tests
       - open_video_skill_tests
