@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "decisions": [
+    {
+      "path": "index.json",
+      "decision": "exclude",
+      "role": "CodeGraph structure index artifact",
+      "reason": "Large generated structural graph; CodeGraph remains the precise owner, and this artifact is not source semantics.",
+      "confidence": 100,
+      "source_sha256": "fe3fd122eaca25ac3cd2e9b10bf2ca82684e047f521a18ef82c07e8f21d237a0",
+      "agent": "codex",
+      "model": "gpt-6-astra",
+      "updated_at": "2026-09-23T13:35:05Z"
+    },
+    {
+      "path": "provider-console/design/implementation-cloud-gated-final.png",
+      "decision": "exclude",
+      "role": "Visual design or media asset",
+      "reason": "Binary image asset; its semantic responsibility is expressed by source and architecture documents, not file text.",
+      "confidence": 100,
+      "source_sha256": "847656413e6fe2fc6f02edae90e6b849bf16458c8595cb5a64a0c3fbed76281f",
+      "agent": "codex",
+      "model": "gpt-6-astra",
+      "updated_at": "2026-09-23T13:35:05Z"
+    },
+    {
+      "path": "provider-console/design/implementation-evidence-final.png",
+      "decision": "exclude",
+      "role": "Visual design or media asset",
+      "reason": "Binary image asset; its semantic responsibility is expressed by source and architecture documents, not file text.",
+      "confidence": 100,
+      "source_sha256": "d964cadf2c4d98e0c8e8d084daac4a387375b2c56c829572e09158c3cd8bb361",
+      "agent": "codex",
+      "model": "gpt-6-astra",
+      "updated_at": "2026-09-23T13:35:05Z"
+    },
+    {
+      "path": "provider-console/design/implementation-gates-collapsed-final.png",
+      "decision": "exclude",
+      "role": "Visual design or media asset",
+      "reason": "Binary image asset; its semantic responsibility is expressed by source and architecture documents, not file text.",
+      "confidence": 100,
+      "source_sha256": "2469d3042099386970c297d82fb8e6db6165b1d5c97a16484dac00da05cfe0b5",
+      "agent": "codex",
+      "model": "gpt-6-astra",
+      "updated_at": "2026-09-23T13:35:05Z"
+    },
+    {
+      "path": "provider-console/design/implementation-interactions-final.png",
+      "decision": "exclude",
+      "role": "Visual design or media asset",
+      "reason": "Binary image asset; its semantic responsibility is expressed by source and architecture documents, not file text.",
+      "confidence": 100,
+      "source_sha256": "36375c0ee180533f44c1bbd668294b7ada77e80b78cda746dd0d0d3f3d810728",
+      "agent": "codex",
+      "model": "gpt-6-astra",
+      "updated_at": "2026-09-23T13:35:05Z"
+    },
+    {
+      "path": "provider-console/design/implementation-main-final.png",
+      "decision": "exclude",
+      "role": "Visual design or media asset",
+      "reason": "Binary image asset; its semantic responsibility is expressed by source and architecture documents, not file text.",
+      "confidence": 100,
+      "source_sha256": "1853d064798cfa6fb5de8d23e9ca973d1a11efd4486da83529c30736fca9c2b0",
+      "agent": "codex",
+      "model": "gpt-6-astra",
+      "updated_at": "2026-09-23T13:35:05Z"
+    },
+    {
+      "path": "provider-console/design/provider-console-source.png",
+      "decision": "exclude",
+      "role": "Visual design or media asset",
+      "reason": "Binary image asset; its semantic responsibility is expressed by source and architecture documents, not file text.",
+      "confidence": 100,
+      "source_sha256": "eb5cd43f59259d4c3b11d0a6927befa4232d171bc692853caf8aacb8afec5bf4",
+      "agent": "codex",
+      "model": "gpt-6-astra",
+      "updated_at": "2026-09-23T13:35:05Z"
+    },
+    {
+      "path": "provider-console/design/qa-comparison-final.png",
+      "decision": "exclude",
+      "role": "Visual design or media asset",
+      "reason": "Binary image asset; its semantic responsibility is expressed by source and architecture documents, not file text.",
+      "confidence": 100,
+      "source_sha256": "b1620e89b3ee9a07d604b9cc5b493f93f9007e01b07002e6d6a58b657088b612",
+      "agent": "codex",
+      "model": "gpt-6-astra",
+      "updated_at": "2026-09-23T13:35:05Z"
+    },
+    {
+      "path": "provider-console/public/assets/alice-cafe-first-frame.png",
+      "decision": "exclude",
+      "role": "Visual design or media asset",
+      "reason": "Binary image asset; its semantic responsibility is expressed by source and architecture documents, not file text.",
+      "confidence": 100,
+      "source_sha256": "930d043c11359b21332a583f1a5a9a3042df5e84248179d9618ebc64f23ae304",
+      "agent": "codex",
+      "model": "gpt-6-astra",
+      "updated_at": "2026-09-23T13:35:05Z"
+    },
+    {
+      "path": "src/ai_video_mcp/tools/__init__.py",
+      "decision": "exclude",
+      "role": "Empty Python package marker",
+      "reason": "Zero-byte package marker with no source semantics to author.",
+      "confidence": 100,
+      "source_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "agent": "codex",
+      "model": "gpt-6-astra",
+      "updated_at": "2026-09-23T13:35:05Z"
+    }
+  ]
+}
