@@ -192,6 +192,9 @@ QA owner 的 `generation_evaluation_authorities` 显式绑定 evaluator 与 proo
 空新增字段不进入旧序列化；新选择会改变 QA content hash，使旧 policy-bound evidence 失效。
 `generation_execution.py` 将可重算 decision 绑定实际 native compiled request；普通新 v2 start
 必须提供该 binding，旧 request shape、空 lineage 或 run script 不能成为 submit 例外。
+`generation_runtime_repair.py` 的 one-use grant 只对最新已知 `RUNTIME_FAILURE` 的同 Shot
+re-execution 生效；committer 在 replacement submit intent 的同一原子写入中消耗 grant，
+unknown outcome、旧 evidence 或耗尽的 per-Shot ceiling 不获得 retry 权限。
 `ProductionStateCommitter` 通过既有 video mixin 和 `_state_commit_generation_feedback.py`
 独占 binding/evaluator projection 持久化与 permit 前重验；`_generation_feedback_reader.py`
 重开 exact binding/experience/qualification receipts，video reader 复用它。Qualification 仅由原
@@ -237,6 +240,7 @@ Focused verification：`python -m pytest -p no:cacheprovider tests/test_generati
 tests/test_generation_evaluation.py tests/test_requirement_semantics.py
 tests/test_generation_evaluation_binding.py tests/test_requirement_semantics_replay.py
 tests/test_generation_execution.py tests/test_generation_execution_guards.py
+tests/test_generation_runtime_repair.py
 tests/test_generation_provider_wiring.py tests/test_generation_local_wiring.py
 tests/test_generation_historical_replay.py tests/test_production_generation_decision.py
 tests/test_generation_history_import.py tests/test_generation_history_import_receipt.py
