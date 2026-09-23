@@ -376,6 +376,7 @@ def prepare_generation_execution(
     compiler_version: str,
     final_output_goal=None,
     local_batch_limit: int = 1,
+    use_current_generation_acceptance: bool = False,
 ) -> PreparedGenerationExecution:
     """Build one executable decision from the loaded production project.
 
@@ -514,8 +515,20 @@ def prepare_generation_execution(
     compiler = AdapterCompilerContract.create(
         compiler_id=compiler_id, compiler_version=compiler_version
     )
-    expression = fixture_generation_expression(output)
-    acceptance = acceptance_policy((expression,))
+    if use_current_generation_acceptance:
+        from ai_video.production.generation_feedback import _expressions
+        from ai_video.production.production_strategy_reader import (
+            selected_shot_generation_acceptance,
+        )
+
+        acceptance = selected_shot_generation_acceptance(project, shot.shot_id)
+        if acceptance is None:
+            raise ValueError("fixture has no selected generation acceptance")
+        expressions = _expressions(acceptance, requirement)
+    else:
+        expression = fixture_generation_expression(output)
+        acceptance = acceptance_policy((expression,))
+        expressions = (expression,)
     seed = (
         SeedPolicy(kind="fixed", value=request.effective_seed or 0)
         if capability.seed_supported
@@ -528,7 +541,7 @@ def prepare_generation_execution(
         requirement_hash=requirement.requirement_hash,
         rubric_hash=acceptance.profile_content_hash,
         acceptance_policy=acceptance,
-        expressions=(expression,),
+        expressions=expressions,
     )
     candidate = GenerationCandidate(
         candidate_id="selected",

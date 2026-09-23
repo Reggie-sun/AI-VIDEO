@@ -528,6 +528,7 @@ categories:
       - src/ai_video/production/generation_feedback.py
       - src/ai_video/production/generation_experience.py
       - src/ai_video/production/generation_evaluation.py
+      - src/ai_video/production/ecommerce_generation_bridge.py
       - src/ai_video/production/generation_evaluation_criteria.py
       - src/ai_video/production/requirement_semantics.py
       - src/ai_video/production/generation_execution.py
@@ -1196,6 +1197,7 @@ categories:
   ecommerce_production_job:
     patterns:
       - src/ai_video/production/ecommerce_job*.py
+      - src/ai_video/production/ecommerce_generation_bridge.py
       - src/ai_video/production/delivery_packager.py
       - tests/ecommerce_job_factory.py
       - tests/production_ecommerce_job_render_support.py

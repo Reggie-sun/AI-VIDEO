@@ -29,6 +29,7 @@ from ai_video.production.ecommerce_job_repair import (
     bound_generation_attempt_ids_for_shot,
     attempt_requires_explicit_recovery,
     canonical_attempt_identity,
+    commercial_media_repair_is_exact,
     ecommerce_attempt_status,
     ecommerce_manifest_revision,
     input_attempt_identity,
@@ -602,17 +603,12 @@ class EcommerceProductionJobService:
                                 ),
                                 manifest_revision=loaded.manifest.manifest_revision,
                             )
-                        evaluation = (
-                            None if latest_state is None
-                            else latest_state.commercial_evaluation
-                        )
-                        evidence_hash = (
-                            None if evaluation is None or evaluation.evidence is None
-                            else evaluation.evidence.content_hash
-                        )
-                        if (
-                            evidence_hash is None
-                            or evidence_hash not in context.diagnosis.evidence_hashes
+                        if not commercial_media_repair_is_exact(
+                            request.project_root,
+                            loaded=loaded,
+                            prior_attempt=latest_attempt,
+                            context=context,
+                            execution_binding=item.execution_binding,
                         ):
                             return self._blocked(
                                 request,

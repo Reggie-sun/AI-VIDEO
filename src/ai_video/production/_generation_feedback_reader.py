@@ -165,7 +165,7 @@ def load_qualification_execution_binding(
 
 
 
-def verify_generation_feedback(root, state, request):
+def verify_generation_feedback(root, state, request, *, qa_policy=None):
     for pointer, loader, label in (
         (state.execution_binding, load_generation_execution_binding, "Generation"),
         (state.qualification_binding, load_qualification_execution_binding, "Qualification"),
@@ -178,6 +178,28 @@ def verify_generation_feedback(root, state, request):
                 raise _invalid(f"{label} execution binding is not exact.", str(exc)) from exc
     for pointer in state.generation_experiences:
         experience = load_generation_experience(root, pointer)
+        tagged = tuple(
+            source for source in experience.evaluation_sources
+            if source.commercial_evidence_content_hash is not None
+        )
+        if tagged:
+            from ai_video.production.ecommerce_generation_bridge import (
+                validate_commercial_failure_evaluation_source,
+            )
+
+            if len(tagged) != 1 or qa_policy is None:
+                raise _invalid("Commercial generation source has no exact QA checkpoint.")
+            try:
+                validate_commercial_failure_evaluation_source(
+                    root=root,
+                    state=state,
+                    request=request,
+                    qa_policy=qa_policy,
+                    acceptance=experience.candidate.recipe.acceptance_policy,
+                    source=tagged[0],
+                )
+            except (AiVideoError, OSError, ValueError) as exc:
+                raise _invalid("Commercial generation source is not exact.", str(exc)) from exc
         marked = [s for s in experience.evaluation_sources if s.schema_version == "generation-evaluation/2"]
         if marked:
             from ai_video.production._video_project_reader import load_local_video_fetch_receipt, load_video_fetch_receipt

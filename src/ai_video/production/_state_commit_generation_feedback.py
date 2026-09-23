@@ -117,6 +117,25 @@ class _StateCommitGenerationFeedbackMixin:
                         validate_generation_evaluation_sources(
                             sources=experience.evaluation_sources, evidence=evidence,
                             qa_policy=loaded.qa_policy, loaded=loaded, size_bytes=fetch.size_bytes)
+                        tagged = tuple(
+                            source for source in experience.evaluation_sources
+                            if source.commercial_evidence_content_hash is not None
+                        )
+                        if tagged:
+                            from ai_video.production.ecommerce_generation_bridge import (
+                                validate_commercial_failure_evaluation_source,
+                            )
+
+                            if len(tagged) != 1:
+                                raise ValueError("one commercial Shot checkpoint must have one source")
+                            validate_commercial_failure_evaluation_source(
+                                root=self._project_root,
+                                state=state,
+                                request=request,
+                                qa_policy=loaded.qa_policy,
+                                acceptance=candidate.recipe.acceptance_policy,
+                                source=tagged[0],
+                            )
                     except (AttributeError, ValueError) as exc:
                         raise _state_invalid("Generation evaluation source is invalid.", str(exc)) from exc
             content_hash = _experience_hash(experience)

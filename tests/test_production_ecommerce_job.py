@@ -572,7 +572,7 @@ def test_inspect_projects_blocked_when_failed_shot_has_no_repair_capacity(
     (
         ("attempt-old", "d" * 64, "ECOMMERCE_SHOT_REPAIR_IDENTITY_MISMATCH"),
         ("attempt-latest", "a" * 64, "ECOMMERCE_SHOT_REPAIR_EVIDENCE_MISMATCH"),
-        ("attempt-latest", "d" * 64, None),
+        ("attempt-latest", "d" * 64, "ECOMMERCE_SHOT_REPAIR_EVIDENCE_MISMATCH"),
     ),
 )
 def test_media_repair_rejects_stale_attempt_or_gate_evidence_before_execution(
@@ -624,6 +624,7 @@ def test_media_repair_rejects_stale_attempt_or_gate_evidence_before_execution(
         status=StateCommitStatus.FAILED,
         video_generation_state=SimpleNamespace(
             quality_rejection=object(),
+            generation_experiences=(),
             commercial_evaluation=SimpleNamespace(
                 evidence=SimpleNamespace(content_hash="d" * 64)
             )
@@ -652,13 +653,8 @@ def test_media_repair_rejects_stale_attempt_or_gate_evidence_before_execution(
         "ai_video.production.ecommerce_job.repair_request_delta_is_verified",
         lambda *_, **__: True,
     )
-    generation_calls: list[str] = []
-
     def run_generation(*_args, **_kwargs):
-        if expected_blocker is not None:
-            pytest.fail("stale repair reached generation")
-        generation_calls.append("run")
-        return SimpleNamespace(complete=True)
+        pytest.fail("unverified repair reached generation")
 
     monkeypatch.setattr(
         "ai_video.production.ecommerce_job.run_ecommerce_ad_generation",
@@ -672,14 +668,9 @@ def test_media_repair_rejects_stale_attempt_or_gate_evidence_before_execution(
         shot_execution=execution,
     )
 
-    if expected_blocker is None:
-        assert result.next_action is EcommerceJobNextAction.PREPARE_COMPOSITION
-        assert generation_calls == ["run"]
-    else:
-        assert result.next_action is EcommerceJobNextAction.BLOCKED
-        assert result.blocker is not None
-        assert result.blocker.blocker_code == expected_blocker
-        assert generation_calls == []
+    assert result.next_action is EcommerceJobNextAction.BLOCKED
+    assert result.blocker is not None
+    assert result.blocker.blocker_code == expected_blocker
     assert service.effects == []
 
 
@@ -2221,6 +2212,9 @@ def _real_input(
     artifact_bytes: bytes | None = None,
     caption_style_fingerprints: tuple[tuple[str, str], ...] = (),
     local_batch_limit: int = 1,
+    use_current_generation_acceptance: bool = False,
+    commercial_requirement_ids: tuple[str, ...] | None = None,
+    authored_commercial_prompt: bool = False,
 ) -> tuple[EcommerceShotExecutionInput, LocalVideoProviderDouble]:
     loaded = load_production_project(root / "project.yaml")
     inputs = ProductionDependencyInputs(
@@ -2244,7 +2238,7 @@ def _real_input(
     commercial_binding = project_generated_commercial_shot_binding(
         projection,
         profile=profile,
-        applicable_requirement_ids=(
+        applicable_requirement_ids=commercial_requirement_ids or (
             "shot.identity.main_character",
             "shot.motion.required",
             "shot.camera.intent",
@@ -2272,7 +2266,12 @@ def _real_input(
         target_asset_role=shot.required_asset_roles[0].role,
         target_visual_strategy="generated_video",
         mode=VideoGenerationMode.TEXT_TO_VIDEO,
-        prompt_text=f"Render deterministic offline Ecommerce Shot {shot_id}.",
+        prompt_text=(
+            f"{shot.intent} {' '.join(shot.character_ids)} "
+            f"{shot.generated_video_rationale}"
+            if authored_commercial_prompt
+            else f"Render deterministic offline Ecommerce Shot {shot_id}."
+        ),
         negative_prompt_text="",
         image_bindings=(),
         commercial_binding=commercial_binding,
@@ -2325,6 +2324,7 @@ def _real_input(
             None if loaded.qa_policy is None else loaded.qa_policy.final_output
         ),
         local_batch_limit=local_batch_limit,
+        use_current_generation_acceptance=use_current_generation_acceptance,
     )
     service = VideoGenerationService(
         committer=ProductionStateCommitter(

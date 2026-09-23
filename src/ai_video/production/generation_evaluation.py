@@ -169,9 +169,12 @@ class GenerationEvaluationSource(StrictModel):
     presentation_evidence: PresentationEvidence | None = None
     advisory_observations: tuple[AdvisoryObservation, ...] = ()
     unresolved_quality_observations: tuple[UnresolvedQualityObservation, ...] = ()
+    commercial_evidence_content_hash: str | None = Field(default=None, pattern=SHA256)
 
     @model_validator(mode="after")
     def _version(self):
+        if self.commercial_evidence_content_hash is not None and self.schema_version != "generation-evaluation/1":
+            raise ValueError("commercial Shot projection uses the original unmarked evaluator source")
         if self.schema_version == "generation-evaluation/1":
             if (not self.observations or self.size_bytes is not None or self.qa_policy_snapshot is not None
                     or self.presentation_evidence is not None or self.advisory_observations
@@ -192,7 +195,8 @@ class GenerationEvaluationSource(StrictModel):
         if self.analysis_evidence is None:
             result.pop("analysis_evidence", None)
         for name in ("size_bytes", "qa_policy_snapshot", "presentation_evidence",
-                     "advisory_observations", "unresolved_quality_observations"):
+                     "advisory_observations", "unresolved_quality_observations",
+                     "commercial_evidence_content_hash"):
             if getattr(self, name) is None or getattr(self, name) == ():
                 result.pop(name, None)
         return result

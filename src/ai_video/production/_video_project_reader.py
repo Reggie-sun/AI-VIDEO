@@ -900,7 +900,10 @@ def verify_video_evidence(
     request_owners: list[str] = []
     for state in states:
         request = load_video_request_receipt(root, state.request)
-        verify_generation_feedback(root, state, request)
+        verify_generation_feedback(
+            root, state, request,
+            qa_policy=None if bundle is None else bundle.qa_policy,
+        )
         if (
             (
                 request.commercial_binding is not None

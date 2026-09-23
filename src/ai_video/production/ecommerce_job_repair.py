@@ -345,6 +345,93 @@ def canonical_attempt_identity(
     )
 
 
+def commercial_media_repair_is_exact(
+    root: Path,
+    *,
+    loaded: Any,
+    prior_attempt: Any,
+    context: EcommerceShotRepairContext,
+    execution_binding: Any,
+) -> bool:
+    """Require a complete rejection derived from the original commercial FAIL."""
+
+    from ai_video.production._generation_feedback_reader import (
+        load_generation_quality_rejection,
+    )
+    from ai_video.production._video_project_reader import (
+        load_generated_commercial_shot_evidence,
+        load_generation_experience,
+        load_video_request_receipt,
+    )
+    from ai_video.production.ecommerce_generation_bridge import (
+        validate_commercial_failure_evaluation_source,
+    )
+    from ai_video.production.ecommerce_media_acceptance import (
+        adjudicate_generated_commercial_shot_evidence,
+    )
+
+    state = prior_attempt.video_generation_state
+    if (
+        state is None
+        or state.quality_rejection is None
+        or not state.generation_experiences
+        or state.commercial_evaluation is None
+        or state.commercial_evaluation.evidence is None
+        or execution_binding is None
+    ):
+        return False
+    try:
+        rejection = load_generation_quality_rejection(root, state.quality_rejection)
+        experience = load_generation_experience(root, state.generation_experiences[-1])
+        request = load_video_request_receipt(root, state.request)
+        binding = request.commercial_binding
+        if binding is None:
+            return False
+        commercial = load_generated_commercial_shot_evidence(
+            root, state.commercial_evaluation.evidence
+        )
+        tagged = tuple(
+            source for source in experience.evaluation_sources
+            if source.commercial_evidence_content_hash is not None
+        )
+        if len(tagged) != 1:
+            return False
+        validate_commercial_failure_evaluation_source(
+            root=root,
+            state=state,
+            request=request,
+            qa_policy=loaded.qa_policy,
+            acceptance=experience.candidate.recipe.acceptance_policy,
+            source=tagged[0],
+        )
+        failed_ids = {
+            item.requirement_id for item in commercial.findings
+            if item.verdict is QaVerdict.FAIL
+        }
+        decision = execution_binding.decision
+        inputs = execution_binding.inputs
+        return bool(
+            rejection.schema_version == "generation-quality-rejection/1"
+            and rejection.abandonment_reason is None
+            and rejection.diagnosis == context.diagnosis
+            and rejection.evidence_hash in {
+                item.evidence_hash for item in experience.evidence
+            }
+            and inputs.latest_attempt_hash == rejection.evidence_hash
+            and decision.intervention == context.intervention
+            and decision.diagnosis == rejection.diagnosis
+            and adjudicate_generated_commercial_shot_evidence(
+                commercial, binding=binding
+            ) is QaVerdict.FAIL
+            and failed_ids
+            and failed_ids <= set(rejection.diagnosis.failed_requirements)
+            and context.intervention is not None
+            and failed_ids <= set(context.intervention.closes)
+        )
+    except (AiVideoError, AttributeError, OSError, ValueError):
+        return False
+
+
 def repair_request_delta_is_verified(
     root: Path,
     *,

@@ -2,7 +2,7 @@
 
 ## Status
 
-M0–M7 offline implementation and deterministic scenarios are on local `main`; the latest M7 repair-closure checkpoint is pending final exact-range verification. Governing design：`docs/superpowers/specs/2026-09-19-ai-video-ecommerce-production-job.md`。Contracts、pure Skill-side exporter、canonical compiler/bootstrap、read-only projection/resume、bounded ordered Shot execution、composition/render、whole-video QC and delivery all use existing Production owners. M7 now includes full canonical two-Shot Job paths through render、review、delivery and exact replay for direct PASS、evidence repair and one known-failure media repair, plus CAPTION timing `FAIL` → newly sealed composition → rerender → fresh review → delivery. The expanded focused suite passed `140` tests, including generation-execution helper tests. Final closure evidence must still be checked against the exact later Harness receipt and independent review recorded for that snapshot.
+M0–M7 offline implementation and deterministic scenarios are on local `main`; the commercial-only `FAIL` bridge is under fresh exact-snapshot verification. Governing design：`docs/superpowers/specs/2026-09-19-ai-video-ecommerce-production-job.md`。Contracts、pure Skill-side exporter、canonical compiler/bootstrap、read-only projection/resume、bounded ordered Shot execution、composition/render、whole-video QC and delivery all use existing Production owners. M7 includes full canonical two-Shot Job paths through render、review、delivery and exact replay for direct PASS、evidence repair and QA-aligned commercial-only media repair, plus CAPTION timing `FAIL` → newly sealed composition → rerender → fresh review → delivery. Prior `140 passed` focused and Harness results belong to older snapshots; final closure requires new verification and independent review on the final commit.
 
 `c24ef92` 的历史 exact-range Harness receipt（`.agent/harness/runs/ecommerce-production-job-cta-repair-20260924-01/receipt.json`）只证明该 snapshot。后续 `b404e91`、`c5ec8e0` 修正 P6 CAPTION per-group evidence/coverage，`8c72763` 加入与封存要求一致的 1080×1920、3 秒 Shot 和 6 秒 final offline MP4 fixture，`f07d7de` 证明 CAPTION 局部修复跨完整 Job 后仍保留已接受 Shot。Fixture runner/evaluator 为确定性替身，未产生真实商品广告或人工视觉验收。详细 evidence 与当前 final gate 见 `docs/record_for_agent/2026-09-19-ecommerce-production-job-m7-offline-code.md`。
 
@@ -315,6 +315,7 @@ Connect the application service to existing Shot readiness、generation feedback
    - `NOT_EVALUATED` -> evidence repair first；
    - unknown -> explicit recovery stop。
 4. Implement repair controller only as a small owner around existing decision/diagnosis contracts.
+   For commercial-only `FAIL`, admit a generation evaluation source only when the frozen generation QA and original commercial Gate share exact requirement IDs, proof and evaluator authority; retain the original commercial evidence hash and validate it in both committer and strict reader. Unmapped criteria stop rather than inventing a technical failure or changing the rubric after submit. The Job requires the exact complete rejection receipt and commercial failed requirements in the bounded intervention; abandonment or caller-edited diagnosis does not authorize submit.
 5. Enforce per-Shot and job-level finite ceilings.
 6. A provider switch creates new routing/binding/permit/attempt identity and invalidates provider-specific evidence.
 
