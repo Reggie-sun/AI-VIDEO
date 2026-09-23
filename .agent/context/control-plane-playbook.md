@@ -6,6 +6,17 @@
 
 冲突时遵循 `AGENTS.md` 的 `Conflict Resolution`；本文件只能补充执行细节，不能覆盖用户指令、当前 code/tests/runtime evidence、`docs/agent-primary-contract-matrix.md` 或 `.agent/harness/policy.yaml`。
 
+## Task Context Loading
+
+读取 `AGENTS.md` 后，按当前 task concern 选择下一层证据：
+
+1. `docs/agent-primary-contract-matrix.md` 确定 surface owner 与禁止旁路；`.agent/harness/policy.yaml` 确定 task-owned paths 的 mandatory checks。
+2. `docs/v0.2-runtime-baseline.md` 核对当前实现与证据边界，`docs/v0.2-agentic-production-roadmap.md` 核对 phase 状态与 gate；再按需读 `README.md`、active spec / plan、相关源码与测试。
+3. 涉及本机 MiniMax H3 T8、LatentSync、SyncNet 或硬字幕运行时，读取 `t8-latentsync-local-runtime.md`，并重新核对当前 checkout、dependency、GPU、exact submitted graph 与 runtime state。
+4. `session-handoff.md`（若存在）和 `.agent/bug-memory/` 仅用于直接相关的上下文或已发生案例；`.workflow/` 草稿和 brainstorming 产物仅作可选上下文。
+
+这些材料不替代当前代码、测试、Git 和 runtime evidence；本机路径与运行状态均可能漂移。
+
 ## 1. Creative Skill Routing And Preflight
 
 ### Final-output-first Repair Preflight

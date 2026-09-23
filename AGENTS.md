@@ -27,15 +27,8 @@ Plans、specs、roadmaps、console text、Agent memory 或历史 receipts 本身
 
 1. 用户请求。
 2. 本 `AGENTS.md`。
-3. `docs/agent-primary-contract-matrix.md`。
-4. `.agent/harness/policy.yaml`，确认 task-owned paths 的 mandatory checks。
-5. `docs/v0.2-runtime-baseline.md`，确认当前实现与证据边界。
-6. `docs/v0.2-agentic-production-roadmap.md`，确认 phase 状态与 gate。
-7. `README.md`、active spec 与当前 slice plan。
-8. 相关源码与测试。
-9. task 涉及本机 MiniMax H3 T8、LatentSync、SyncNet 或硬字幕运行时，读取 `.agent/context/t8-latentsync-local-runtime.md`；它只提供 host-specific 环境与启动操作参考，使用前必须重新核对当前 checkout、dependency、GPU、exact submitted graph 与 runtime state。
-10. `.agent/context/session-handoff.md`（若存在）和 `.agent/bug-memory/` 中与当前问题直接相关的记录，仅作为上下文或案例证据。
-11. `.workflow/` 草稿或 brainstorming 产物，仅作为可选上下文。
+3. 按 task concern 读取 `docs/agent-primary-contract-matrix.md`、`.agent/harness/policy.yaml`、runtime baseline、roadmap、active spec / plan 与相关源码、测试；不得以文档状态替代 executable truth。
+4. `.agent/context/` 是 advisory operational reference；按需读取匹配章节并重新核对当前环境与 runtime。`session-handoff`、`.agent/bug-memory/` 和 `.workflow/` 仅提供次级上下文。详细入口见 [Task Context Loading](.agent/context/control-plane-playbook.md#task-context-loading)。
 
 ## Conflict Resolution
 
@@ -80,18 +73,9 @@ Plans、specs、roadmaps、console text、Agent memory 或历史 receipts 本身
 
 ### Final-output-first / No-regression
 
-所有生成、修复、后处理和验收，最终判断对象都是用户实际会看到的成片，而不是某个局部指标、技术检查或中间产物。
-任何局部修复都不得以破坏其他已经满足的视觉、动作、连续性、节奏、音频或叙事要求为代价。
-单项指标通过不代表方案通过。若方案已知会造成整体质量退化，必须在执行或交付前主动否决，不得以 preview、technical pass、成本更低、避免重新生成或等待用户确认作为放行理由。
-当局部目标与成片质量冲突时，成片质量拥有最高优先级；若无法同时满足，应判定当前方案失败，而不是修改对目标的解释。
+所有生成、修复、后处理和验收均以用户实际会看到的成片为最终判断对象。局部修复不得破坏已满足的视觉、动作、连续性、节奏、音频或叙事要求；已知会降低整体观看质量的方案必须否决，不能用 preview、技术 PASS、成本或避免重生成放行。
 
-### Watchability And Delivery Over Engineering Completeness
-
-- 不得为了工程完整性、架构完备、流程齐全或局部指标达标而牺牲成片的视觉观看性、动作自然度、节奏与叙事效果；工程工作必须服务于用户实际能看到、能观看的成片。
-- Harness 必须服务于成片质量与实际交付，不能只追求工程正确性。测试通过、schema/contract 一致或 receipt 齐全只证明其覆盖的技术条件，不能替代对实际成片的视觉、动作、连续性、节奏、音频与叙事效果的检查；技术全绿但成片不好看或没有产出，均不得宣称用户目标已完成。
-- 不得将与当前交付无直接关系的工程 Gate、重复验证或未来能力建设作为出片前提，导致任务长期停留在 spec、plan、receipt 或中间产物。优先采用满足当前目标的最小可执行路径，持续推进生成、剪辑与成片交付。
-- Gate 阻断时必须指出它保护的具体要求及当前失败证据，并在已授权范围内主动修复、补证或选择符合现有契约的可行路径；不得仅以“Gate 未通过”结束仍有可执行下一步的任务，也不得通过降低观看质量换取技术通过。
-- 上述原则不授权绕过真实的安全、授权、预算、数据完整性或成片质量底线，也不允许伪造验收；确有无法解决的阻断时，必须说明具体原因、已尝试的解决办法及恢复出片所需的最小条件。
+测试、schema、receipt 或单项指标只证明其覆盖的条件，不能替代对成片的观看检查，也不得因追求未来工程完整性长期阻滞当前出片。Gate 阻断时说明其保护的具体要求和失败证据，在已授权范围内修复或补证；确无可行路径时说明恢复出片的最小条件。不得因此绕过安全、授权、预算、数据完整性或质量底线，也不得伪造验收。修复前的具体 preflight 见 [Final-output-first Repair Preflight](.agent/context/control-plane-playbook.md#final-output-first-repair-preflight)。
 
 ### Empirical Validation Priority
 
@@ -126,23 +110,12 @@ Reader、registry、validation、dependency、Provider adapter、renderer 与 an
 
 ## Agent Memory Retrieval Routing
 
-`retrieve-ai-video-memory` 是 substantial AI-VIDEO work 的 mandatory advisory preflight；
-real media/quality、Provider/model behavior、continuity/identity、known regression/incident/
-recovery、prior architecture decision 或用户明确要求 earlier evidence 时，必须在 matching
-domain Skill 与 substantial execution 前调用。Formatting、typo、unrelated trivial test、
-isolated mechanical refactor 与 exact current source lookup 不触发。
-
-Scope selection、stale/missing/strict-failure handling 与 provenance 细节由
-`.agents/skills/retrieve-ai-video-memory/SKILL.md` 和
-`.agent/context/control-plane-playbook.md` 的 `Agent Experience Memory Routing` 独占；
-retrieval 永远只是 advisory evidence，不产生 implementation、Provider、activation、quality
-acceptance、push 或 release authorization。
+`retrieve-ai-video-memory` 是 substantial AI-VIDEO work 的 mandatory advisory preflight：real media/quality、Provider/model behavior、continuity/identity、known regression/incident/recovery、prior architecture decision 或明确要求 earlier evidence 时，在 matching domain Skill 与 substantial execution 前调用；trivial formatting/test 与 exact current source lookup 不触发。Scope、失败处理与 provenance 由 [Skill](.agents/skills/retrieve-ai-video-memory/SKILL.md) 和 [Agent Experience Memory Routing](.agent/context/control-plane-playbook.md#6-agent-experience-memory-routing) 独占。检索不授权 implementation、Provider、activation、quality acceptance、push 或 release。
 
 ## Experience Learning Routing
 
-- `distill-ai-video-learning` 是 scoped Learning Claim 的唯一 Development Governance owner；`record-ai-video-session` 完成 substantial stable record 后必须自动执行 candidate evaluation。
-- Learning 保持 `advisory_learning` authority。自动 evaluation 只可提出 pending candidate，保留既有 adopted claim；用户确认前不得修改 Skill / Provider Policy / Preflight / Contract / Gate target，确认后仍须由 target owner 完成 tests 与 Harness，才可标记 `ADOPTED`。
-- 字段、threshold、exact confirmation、state transition 与 adoption flow 只由 [distill-ai-video-learning](.agents/skills/distill-ai-video-learning/SKILL.md) 管理；record/ACK 流程只由 [record-ai-video-session](.agents/skills/record-ai-video-session/SKILL.md) 管理，playbook 仅提供入口。Learning 不授权 Provider/media、Production mutation、retry、activation、acceptance、push/release 或绕过 decision gates。
+- `record-ai-video-session` 完成 substantial stable record 后，必须由唯一 owner [distill-ai-video-learning](.agents/skills/distill-ai-video-learning/SKILL.md) 自动评估 scoped Learning Claim；record/ACK 由 [record-ai-video-session](.agents/skills/record-ai-video-session/SKILL.md) 独占。
+- Learning 仅有 `advisory_learning` authority：自动评估只可提出 pending candidate 并保留既有 adopted claim；用户确认及 target owner 的 tests/Harness 前不得修改 Skill、Provider Policy、Preflight、Contract、Gate 或标记 `ADOPTED`；不授权 Provider/media、Production mutation、retry、activation、acceptance、push/release 或绕过 decision gates。
 
 ## Creative Skill Routing
 
@@ -170,25 +143,11 @@ repair 或 delivery state。
 
 ## Agent Workflow Routing
 
-Canonical contract for how any agent runtime (Codex, Claude Code, future runtimes) selects
-skills, specs, plans, review, and verification depth. Runtime adapters (`.codex/`、`CLAUDE.md`、
-`.claude/`) only wire this contract and must not carry a second copy. Operational detail lives in
-`.agent/context/control-plane-playbook.md`; the design spec is
-`docs/superpowers/specs/2026-09-20-claude-code-harness-adapter.md`。
+本节是 Codex、Claude Code 等 runtime 选择 Skill、spec、plan、review 与 verification 深度的共享契约。Runtime adapter 仅接线，不复制规则；操作细节见 [Agent Workflow Operations](.agent/context/control-plane-playbook.md#agent-workflow-operations)。
 
 ### Instruction Hierarchy
 
-确定性优先级（高到低），冲突时低位阶不得推翻高位阶：
-
-1. 用户当前明确指令。
-2. 当前代码、测试与已验证 runtime evidence。
-3. 本 `AGENTS.md` 及其委托的 contract matrix、policy.yaml、playbook。
-4. 当前 slice 的 accepted spec 与 approved plan。
-5. Skill instructions（含 superpowers 与 `.agents/skills/`）。
-6. Reviewer feedback（advisory，由 parent 裁决后落地）。
-7. Runtime 默认行为（含插件 skill 的默认触发门控）。
-
-Skill 默认门控与本节 routing 冲突时，以本节为准。
+冲突时依次以用户当前明确指令、当前 code/tests/runtime evidence、本 `AGENTS.md` 及委托的 matrix/policy/playbook、accepted spec / approved plan、Skill instructions、reviewer feedback、runtime defaults 为准。低位阶不得推翻高位阶；Skill 默认门控不得覆盖本节 routing。Reviewer 只提供 advisory evidence，由 Parent 裁决。
 
 ### Task Tiers And Skill Routing
 
@@ -202,54 +161,29 @@ Skill 默认门控与本节 routing 冲突时，以本节为准。
 | T3 关键契约 | canonical ownership、verification contract、paid/credential/recovery/QA acceptance 语义变化 | T2 全部 + final dual independent review |
 | Bug | 任意 tier 的 bug | 先 systematic-debugging 做 root-cause，再按 tier 走流程，末做 regression validation |
 
-Skill 命中即触发、不预载全部：设计不清 → brainstorming；写 plan → writing-plans（落
-`docs/superpowers/plans/`）；执行已批准 plan → executing-plans /
-subagent-driven-development；bug → systematic-debugging；声称完成前 →
-verification-before-completion；到达 review 边界 → 本节 reviewer 机制；项目 skill 与
-creative skill 按本文件既有 routing 表。
+Skill 按需触发、不预载：设计不清用 brainstorming，写 plan 用 writing-plans（`docs/superpowers/plans/`），执行 approved plan 用 executing-plans / subagent-driven-development，bug 用 systematic-debugging，完成前用 verification-before-completion，review 按本节边界；项目与 creative Skill 按上方 routing。
 
 ### Specs / Plan / Review Triggers
 
-- Specs 触发：architecture contract、workflow state machine、Provider contract、Harness
-  行为、acceptance criteria、Shot generation/regeneration policy、shared schema、
-  persistent project rule、cross-module 行为变化，或用户明确要求。普通小修复不触发。
-- Plan 触发：多文件且顺序非显而易见、多阶段、T2/T3、architecture/Provider/workflow
-  修改、涉及迁移/回滚/兼容性。复用 writing-plans，不重新实现。T0/T1 简单任务不产
-  plan artifact。
-- Review 只在完整稳定 target 的边界触发：T2/T3 的 spec 完成后、plan 完成后、
-  implementation 到达完整 checkpoint 后；T3 在声明完成前做 final dual review。T0/T1
-  不触发独立 review。禁止碎片化 reviewer loop；`review executed` / `PARSED` 不等于
-  `accepted`。
+- Specs：architecture、workflow state machine、Provider/Harness contract、acceptance criteria、Shot generation/regeneration policy、shared schema、persistent project rule、cross-module behavior 变化或用户明确要求时触发；普通小修复不触发。
+- Plan：多文件且顺序不明显、多阶段、T2/T3、architecture/Provider/workflow 修改或迁移/回滚/兼容性时触发；复用 writing-plans。简单 T0/T1 不产 plan artifact。
+- Review：仅在完整稳定 target 上触发 T2/T3 spec、plan、implementation review；T3 完成前 final dual review。T0/T1 无独立 review；禁止碎片化循环，`PARSED` 或 review 执行不等于 acceptance。
 
 ### Dual Independent Review
 
-T3（及 parent 判定的高风险 spec/plan）必须双独立审查：两个 reviewer 针对同一 immutable
-review target（exact commit 或 exact staged snapshot，target ID 记入证据）独立审查；
-互不先看对方结论；双方都无 blocking issue 才允许 acceptance；不用多数票；冲突由
-parent 调查具体 evidence 裁决；reviewer 不修改 acceptance criteria；修复后生成新
-target，两个 reviewer 基于同一新状态重审。两个 reviewer 可以是同一 runtime 上两个隔离
-context 的独立 subagent 实例，也可以是跨 runtime；后者独立性更强，可用时优先。
+T3（及 Parent 判定的高风险 spec/plan）对同一 immutable exact commit 或 staged snapshot 进行双独立审查并记录 target ID；reviewer 互不先看结论，均无 blocking issue 才可进入 Parent acceptance。冲突由 Parent 按证据裁决，不投票、不改 acceptance criteria；修复后两者重审同一新 target。可用时优先跨 runtime 的独立 context；派发和裁决步骤见 playbook。
 
 ### Verification Levels And Evidence
 
-声称完成前区分五级，不得以下位替代上位：execution success、structural validity、
-functional correctness、acceptance criteria、final review acceptance。局部机器指标不能
-替代最终成片目标（禁止 metric substitution）。所有 PASS / DONE / ACCEPTED 必须附
-evidence；无法验证的项明确标 `NOT_EVALUATED`。
+完成前区分 execution success、structural validity、functional correctness、acceptance criteria、final review acceptance 五级；下位或局部指标不能替代上位或成片目标。PASS / DONE / ACCEPTED 必须有 evidence，无法验证标 `NOT_EVALUATED`。
 
 ### Roles
 
-- Parent（主会话）：理解最终目标、按本节决定 routing、分派任务、裁决 reviewer
-  disagreement、唯一执行最终 acceptance 判断。
-- Worker：实施具体任务，不得自行降低 acceptance criteria。
-- Reviewer：独立、read-only 优先、输出 evidence + severity、不继承主会话历史、不负责
-  让任务通过。
+Parent 独占最终 routing、分派、冲突裁决与 acceptance；Worker 不得降低 criteria；Reviewer 独立、read-only 优先，只报告 evidence + severity，不以通过任务为职责。
 
 ### Context Control
 
-常驻 context 仅限用户全局规则、runtime adapter 文件与 canonical 规则正文；skill 正文、
-spec、plan、provider/workflow 文档按需加载（progressive disclosure），降低 context
-pollution 与 stale context。
+常驻 context 只含全局规则、runtime adapter 与 canonical 规则；Skill、spec、plan 和 Provider/workflow 文档按需加载。
 
 ## Module Boundaries
 
@@ -280,31 +214,21 @@ alternate path 与 focused verification 的唯一 human-readable owner。实现�
 ## Verification Contract
 
 - `.agent/harness/policy.yaml` 是 changed-path routing 与 mandatory checks 的 machine-readable truth；`docs/agent-primary-contract-matrix.md` 提供 human-readable focused verification。两者的 routing 变更必须同步并测试。
-- 开始时使用 Harness inspection 确认真实 scope；完成验证必须针对 non-empty exact staged snapshot 或 exact commit range，并在 detached temporary worktree 中运行，使 unrelated dirty changes 不进入 execution tree。
-- Code 或 executable tooling change 在完成前必须有 fresh passing receipt，并验证 scope、policy、artifact hashes 与 freshness。Documentation/control-plane change按真实 policy 执行对应 checks。
-- Unmapped owned paths 必须 fail safe 到 full tests 与 task-delta Architecture Gate；历史 repository debt 不得伪装成当前 task regression，反之也不得通过刷新 baseline 隐藏 regression。
-- Behavioral change 必须有覆盖 public behavior、boundary 与 failure path 的 executable evidence；优先 targeted checks，结束前运行 policy 要求的完整组合。未实际执行不得声称 passing。
-- Harness 不调度 Agent、不修改产品 state、不读取 Provider secret，也不执行 live Provider、ComfyUI、paid smoke 或媒体生成。CI 必须生成自己的 evidence，不能信任提交的本地 receipt。
-- Workflow 文件存在不等于 server enforcement；需要声明 remote protection/publish truth 时必须重新验证当前 GitHub ruleset / branch protection。
+- 开始时 inspect scope；完成时在 detached temporary worktree 对 non-empty exact staged snapshot 或 exact commit range 运行 policy checks。Code / executable tooling change 要有 fresh passing receipt 并验证 scope、policy、artifact hash 与 freshness；documentation/control-plane change 同样按真实 policy 验证。
+- Unmapped owned paths fail safe 到 full tests 与 task-delta Architecture Gate；behavioral change 要有 public behavior、boundary、failure path 的 executable evidence。历史 debt 不能冒充 task regression，也不能刷新 baseline 隐藏 regression；未运行不得声称通过。
+- Harness 不调度 Agent、变更 Product state、读取 secret 或执行 live Provider/media；CI 自行生成 evidence。Workflow 文件不证明 server enforcement。具体执行与远端核验见 [Verification, Pilot And Delivery Details](.agent/context/control-plane-playbook.md#4-verification-pilot-and-delivery-details)。
 
 ## Provider Credential and Paid Execution Rules
 
-- Seedance / Volcengine Ark raw credential 不得存入 repository、`.env`、artifact、prompt、command argument、fixture、log、error、repr、receipt 或本文档。
-- Secret lookup 必须封装在 injected credential supplier 中，presence check 不得回显；lookup失败、keyring locked、credential invalid/rotated 时 fail closed，不得搜索 repo、shell history 或替代 secret source。本机 credential reference、Secret Service attributes 与 lookup detail 只在 `.agent/context/control-plane-playbook.md` 维护。
-- Credential 存在不证明 access、pricing、余额或当前 task authorization。
-- 用户明确要求执行一个必然包含 remote/paid call 的任务时，该请求构成该 accepted scope 的 task-scoped authorization；不得仅因付费对同一任务重复询问。Docs-only、plan、review、可行性分析或“能否执行”不构成 live authorization。
-- Authorization 仅覆盖 accepted Provider/model、inputs 与完成目标所需的最少有限 submit count；不得复用于 benchmark、额外 variants、不同 Provider/model 或扩大后的 scope。用户未指定 count 时，Agent 必须按已接受输出与 Shot 数量封存完成任务所需的最小 task-level ceiling，不得改为询问或研究价格。
-- Agent MUST NOT 为获得 task authorization、设置 submit ceiling 或准备单次调用而浏览官方 pricing、搜索当前单价、计算预计账单、刷新 pricing snapshot，或要求用户提供价格。已有 runtime monetary fields 只能消费 repository/provider profile 中预先配置并已 sealed 的 operator upper bound；它们是内部兼容与安全 evidence，不是 Agent 的 per-call research task，也不得被描述为官方实际价格。
-- Task-scoped authorization 不替代 Paid Provider Gate。调用前仍需 Agent orchestration 的 remaining submit-count check、exact preview、适用的既有 runtime Budget Guard/reservation、cloud-egress approval、secret reference、durable submit intent 与 one-use permit；本条不声称现有 runtime monetary ledger 已迁移为 count-based schema。
-- 若 task-level submit ceiling 已耗尽、scope/provider/egress 变化、确需新增调用，或上一次 outcome unknown，必须停止并报告；不得 blind retry、remint permit 或把授权解释为无限调用。已授权任务中，纯 operator upper bound 的过期 profile 可按 playbook 的 `Operator Ceiling Renewal` 新建有界续期版本，无需再次询问；缺失上限、真实市场报价过期或不满足续期条件时仍报告 compatibility blocker，不得临时查价、伪造市场观察或放宽 runtime Gate。
-- 历史 live evidence、offline tests、现有 credential/余额或旧 run 不授权新的调用。
+- Raw credential 不得进入 repository、`.env`、artifact、prompt、argument、fixture、log、error、repr 或 receipt；lookup 只经 injected supplier，失败时 fail closed，不搜索其他 secret source。本机引用与查找步骤见 [Provider Credential And Paid Execution Details](.agent/context/control-plane-playbook.md#3-provider-credential-and-paid-execution-details)。Credential 存在不证明 access、余额或授权。
+- 用户明确要求完成必含 remote/paid call 的任务，即授权该 accepted Provider/model、inputs 与最少有限 submit count，不因付费重复询问；docs-only、plan、review、可行性分析、历史执行或旧 run 不授权 live call，也不得复用于 benchmark、额外 variants 或扩大后的 scope。未指定 count 时按已接受输出与 Shot 数封存最小 ceiling，不为此询价、查价、计算预计账单或刷新 pricing snapshot。
+- 每次 submit 仍须 remaining-count check、exact preview、既有 Budget Guard/reservation、cloud-egress approval、secret reference、durable intent 与 one-use permit；现有 monetary ledger 不因此变成 count-based schema。Runtime monetary fields 仅消费预先配置并 sealed 的 operator upper bound，不代表官方实际价格。
+- Ceiling 耗尽、scope/Provider/egress 变化、确需新增调用或上次 outcome unknown 时停止报告，禁止 blind retry、remint permit 或扩大授权。纯 operator upper bound 续期只按 [Operator Ceiling Renewal](.agent/context/control-plane-playbook.md#operator-ceiling-renewal)；缺失上限、真实市场报价过期或不符合续期条件仍是 compatibility blocker。
 
 ## Local ComfyUI Authorization Exemption
 
-- 连接严格限制为 loopback、执行完全 local/unmetered 且无 cloud egress 的 ComfyUI lifecycle 与 media actions 不需要 user authorization、task-scoped authorization 或额外 confirmation；该豁免包括为任务所需的 `status` / `start` / `stop`、image/video generation、retry、variant 与 benchmark。
-- 该豁免只移除 authorization gate，不扩大用户 task scope，也不覆盖用户明确的 read-only、禁止 live generation / media effects 或更高优先级限制。Exact request identity、sealed profile/workflow/binding、preflight、适用的 local intent/one-use permit、canonical execution seam、唯一 committer、content-addressed provenance、recovery 与 media verification gates 保持不变。
-- Retry、variant 与 benchmark 可以无需询问用户，但必须是 bounded、task-relevant 的新 exact attempt；上一次 outcome unknown 时仍须 fail closed，禁止 blind retry、fallback、permit remint 或重复 side effect。Per-Shot Gate 的 `FAIL` / `NOT_EVALUATED` 必须停止 current attempt 并阻断下一 Shot；当用户目标仍未完成且 outcome known 时，后续同一 Shot repair 按 `LOCAL_BOUNDED_REPAIR_LOOP` 继续，无需额外 confirmation。该 loop 不得改变 accepted scope、Provider、egress、paid 状态或 Gate requirement。
-- Exact preview 在既有 seam 要求时继续作为 readiness/provenance evidence，但不得充当 local ComfyUI 的 user-approval gate。任何非 loopback、可能 cloud egress、metered、remote 或 paid execution 均不适用本豁免。
+- 严格 loopback、完全 local/unmetered、无 cloud egress 的 ComfyUI `status` / `start` / `stop`、image/video generation、retry、variant 与 benchmark 不需要额外 user/task authorization。用户明确的 read-only 或禁止 media effects 仍优先；非 loopback、remote、metered、paid 或可能 cloud egress 不适用。
+- 豁免只移除 authorization gate，不扩大 task scope；exact identity、sealed profile、preflight、local intent/one-use permit、canonical seam、唯一 committer、provenance、recovery 与 media verification 均保留。Retry/variant/benchmark 必须是 bounded、task-relevant 的新 exact attempt；unknown outcome 禁止 blind retry、fallback、permit remint 或重复 side effect。Per-Shot `FAIL` / `NOT_EVALUATED` 阻断下一 Shot，outcome known 时按 `LOCAL_BOUNDED_REPAIR_LOOP` 处理。Exact preview 是 readiness evidence，不是 user approval。操作细节见 [Provider Credential And Paid Execution Details](.agent/context/control-plane-playbook.md#3-provider-credential-and-paid-execution-details)。
 
 ## Decision Gates
 
@@ -329,14 +253,10 @@ state write、typed dependency、`ResolvedTimeline` 或 truthful delivery bounda
 
 在宣称完成前确认：
 
-- Substantial AI-VIDEO work 达到 stable checkpoint、completion、genuine blocker、handoff 或 compaction boundary 后，必须在 final response 前按 [record-ai-video-session](.agents/skills/record-ai-video-session/SKILL.md) 主动评估并执行；repository 外的 media/artifact effects 也计入。没有 tracked diff、hook request 或 `capture_request_id` 不能免除评估；unfinished/trivial work 按 Skill 判定为 `no_record`。
-- 最终 diff 仅包含 task-owned changes，且未覆盖 unrelated user work。
-- Canonical owner、禁止旁路与 unchanged contracts 已复核。
-- 行为变化已在代码和测试中体现；公共契约变化已同步 canonical docs。
-- Policy 要求的验证已对 exact staged snapshot 或 exact commit range 实际运行。
-- Code / executable tooling change 已生成并验证 fresh passing Harness receipt；文档/control-plane change已完成真实 policy 要求。
-- Final delivery 报告 changed files、verification evidence、receipt repository-relative path（如适用）、publication state、remaining risk 与未验证区域。
-- 未执行的 live/provider/media/quality 验证必须明确标注，不能由历史证据或计划推断。
+- Substantial AI-VIDEO work 到 stable checkpoint、completion、genuine blocker、handoff 或 compaction boundary 时，按 [record-ai-video-session](.agents/skills/record-ai-video-session/SKILL.md) 主动评估；repository 外的 effects 也计入，缺少 diff/hook/request 不免除。Unfinished/trivial work 按 Skill 判为 `no_record`。
+- Diff 仅含 task-owned changes，canonical owner 与禁止旁路已复核；行为或公共契约变化同步 code、tests 与 canonical docs。
+- 对 exact staged snapshot 或 commit range 完成 policy checks；code/tooling change 有 fresh verified passing Harness receipt，documentation/control-plane change 也按 policy 验证。
+- 交付报告 changed files、验证证据、receipt 相对路径、publication state、风险及未验证区域。未执行的 live/provider/media/quality 验证不能由历史证据推断。
 
 <!-- aoci:begin -->
 ## AOCI-CODE 与 CodeGraph
