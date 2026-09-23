@@ -29,7 +29,11 @@ from ai_video.production.ecommerce_job_review import (
     EcommercePostMediaExecutionPlan,
     inspect_ecommerce_review_frontier,
 )
-from ai_video.production.models import LoadedProductionProject, ReviewLifecycle
+from ai_video.production.models import (
+    LoadedProductionProject,
+    ReviewLifecycle,
+    StateCommitStatus,
+)
 
 
 def project_ecommerce_job(
@@ -224,11 +228,30 @@ def project_ecommerce_job_progress(
                         item for item in loaded.manifest.attempts
                         if item.attempt_id == shot_attempts[-1]
                     )
-                    evaluation = attempt.video_generation_state.commercial_evaluation
+                    state = attempt.video_generation_state
+                    evaluation = state.commercial_evaluation
                     intent = load_commercial_shot_evaluation_intent(
                         request.project_root, evaluation.intent
                     )
-                except (AiVideoError, AttributeError, OSError, IndexError, StopIteration, TypeError, ValueError):
+                    abandonment_reason = None
+                    if state.quality_rejection is not None:
+                        from ai_video.production._generation_feedback_reader import (
+                            load_generation_quality_rejection,
+                        )
+
+                        rejection = load_generation_quality_rejection(
+                            request.project_root, state.quality_rejection
+                        )
+                        abandonment_reason = rejection.abandonment_reason
+                except (
+                    AiVideoError,
+                    AttributeError,
+                    OSError,
+                    IndexError,
+                    StopIteration,
+                    TypeError,
+                    ValueError,
+                ):
                     return block_ecommerce_job(
                         request,
                         blocker_code="ECOMMERCE_SHOT_EXECUTION_INVALID",
@@ -236,6 +259,24 @@ def project_ecommerce_job_progress(
                         subject_id=shot_id,
                         failure_classification="EXECUTION_INPUT_INVALID",
                         required_action="Reopen the exact Shot evidence attempt.",
+                        manifest_revision=revision,
+                    )
+                if attempt.status is StateCommitStatus.FAILED:
+                    return block_ecommerce_job(
+                        request,
+                        blocker_code=(
+                            "ECOMMERCE_SHOT_REPAIR_ABANDONED"
+                            if abandonment_reason is not None
+                            else "ECOMMERCE_EVIDENCE_REPAIR_PRIOR_CLOSED"
+                        ),
+                        stage="shot_repair",
+                        subject_id=shot_id,
+                        failure_classification=(
+                            "QUALITY_REJECTION_INCOMPLETE"
+                            if abandonment_reason is not None
+                            else "TERMINAL_ATTEMPT"
+                        ),
+                        required_action="The closed Shot attempt cannot receive new evidence; reconcile it through its canonical owner.",
                         manifest_revision=revision,
                     )
                 if (

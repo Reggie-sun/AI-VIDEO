@@ -1078,6 +1078,10 @@ def test_canonical_two_shot_job_closes_offline_and_replays_without_effect(
         )
         assert advanced.next_action is EcommerceJobNextAction.PREPARE_COMPOSITION, advanced
         assert provider.submit_calls == 2
+        original_plan = replace(shots, shots=(execution,))
+        completed_after_repair = original_plan.current_completed_checkpoints()
+        assert tuple(completed_after_repair) == ("shot-proof",)
+        assert completed_after_repair["shot-proof"].verdict is QaVerdict.PASS
     assert advanced.next_action is EcommerceJobNextAction.PREPARE_COMPOSITION, advanced
     expected_submits = 2 if first_verdict is QaVerdict.FAIL else 1
     assert provider.submit_calls == expected_submits
@@ -1421,6 +1425,108 @@ def test_commercial_evidence_repair_with_changed_qa_stops_before_effect(
     assert reopened.blocker is not None
     assert reopened.blocker.blocker_code == "ECOMMERCE_COMMERCIAL_REPAIR_QA_CHANGED"
     assert replay == reopened
+    assert reviewer.calls == 1
+    assert provider.submit_calls == 1
+
+
+def test_abandoned_commercial_evidence_gap_blocks_reviewer_reentry(
+    tmp_path: Path,
+) -> None:
+    handoff, plan, compiled = _handoff_and_compiled()
+    request = _request(tmp_path, handoff, attempts=2)
+    _bootstrap(tmp_path, handoff, compiled.composition_spec)
+    _activate_commercial_generation_policy(tmp_path, unresolved_duration=True)
+    execution, provider = _real_input(
+        root=tmp_path,
+        execution=SimpleNamespace(handoff=compiled),
+        shot_id="shot-proof",
+        composition_spec=compiled.composition_spec,
+        output=OUTPUT,
+        artifact_bytes=VIDEO.read_bytes(),
+        use_current_generation_acceptance=True,
+        commercial_requirement_ids=(
+            "shot.identity.main_character", "shot.motion.required"
+        ),
+        authored_commercial_prompt=True,
+    )
+    reviewer = _CountingCommercialShotReviewer(verdict=QaVerdict.NOT_EVALUATED)
+    shots = EcommerceShotExecutionPlan(
+        handoff=compiled,
+        plan=plan,
+        shots=(replace(execution, commercial_reviewer=reviewer),),
+    )
+    job = EcommerceProductionJobService()
+    first = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.GENERATE_SHOT,
+        shot_execution=shots,
+    )
+    assert first.next_action is EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE
+    policy = load_production_project(tmp_path / "project.yaml").qa_policy
+    assert policy is not None
+    duration_failure = GenerationEvaluationSource(
+        request_hash=execution.request.request_input_hash,
+        artifact_sha256=hashlib.sha256(VIDEO.read_bytes()).hexdigest(),
+        rubric_hash=execution.execution_binding.inputs.rubric_hash,
+        qa_policy_content_hash=policy.content_hash,
+        evaluator=REVIEW_TOOL,
+        proof="technical",
+        observations=(GenerationObservation(
+            requirement_id="duration",
+            verdict="FAIL",
+            observation="Measured duration violates the frozen generation requirement.",
+        ),),
+    )
+    commercial_gap = GenerationEvaluationSource(
+        request_hash=execution.request.request_input_hash,
+        artifact_sha256=hashlib.sha256(VIDEO.read_bytes()).hexdigest(),
+        rubric_hash=execution.execution_binding.inputs.rubric_hash,
+        qa_policy_content_hash=policy.content_hash,
+        evaluator=COMMERCIAL_EVALUATOR,
+        proof="human",
+        observations=tuple(
+            GenerationObservation(
+                requirement_id=requirement_id,
+                verdict="NOT_EVALUATED",
+                observation="Exact commercial evidence is still incomplete.",
+            )
+            for requirement_id in (
+                "shot.identity.main_character", "shot.motion.required"
+            )
+        ),
+    )
+    record_attempt_evaluation(
+        committer=ProductionStateCommitter(tmp_path),
+        attempt_id=execution.attempt_id,
+        evaluation_sources=(commercial_gap, duration_failure),
+    )
+    loaded = load_production_project(tmp_path / "project.yaml")
+    state = next(
+        item.video_generation_state for item in loaded.manifest.attempts
+        if item.attempt_id == execution.attempt_id
+    )
+    assert state is not None
+    ProductionStateCommitter(tmp_path).abandon_video_generation(
+        attempt_id=execution.attempt_id,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        experience_content_hash=state.generation_experiences[-1].content_hash,
+        actor=ActorIdentity(
+            actor_id="offline-ecommerce-reviewer", actor_kind="automation"
+        ),
+        reason="Known duration failure and commercial evidence gap remain unresolved.",
+    )
+    projected = job.inspect(request, handoff, shot_execution=shots)
+    replay = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE,
+        shot_execution=shots,
+    )
+    assert projected.next_action is EcommerceJobNextAction.BLOCKED
+    assert projected.blocker is not None
+    assert projected.blocker.blocker_code == "ECOMMERCE_SHOT_REPAIR_ABANDONED"
+    assert replay == projected
     assert reviewer.calls == 1
     assert provider.submit_calls == 1
 

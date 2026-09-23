@@ -2362,8 +2362,11 @@ def _real_input(
 
 
 @pytest.mark.parametrize("qa_revision_after_first", (False, True))
+@pytest.mark.parametrize("first_declared_attempt_changed", (False, True))
 def test_canonical_two_shot_reopen_resumes_second_and_replay_has_zero_effects(
-    tmp_path: Path, qa_revision_after_first: bool,
+    tmp_path: Path,
+    qa_revision_after_first: bool,
+    first_declared_attempt_changed: bool,
 ) -> None:
     handoff, request, skeleton = _bootstrapped_canonical_job(tmp_path)
     inputs = _activate_offline_ecommerce_policy(
@@ -2440,6 +2443,11 @@ def test_canonical_two_shot_reopen_resumes_second_and_replay_has_zero_effects(
         shot_id="shot-hero",
         composition_spec=after_first_spec,
     )
+    if first_declared_attempt_changed:
+        reopened_first = replace(
+            reopened_first,
+            attempt_id="canonical-ecommerce-shot-hero-new-declared-attempt",
+        )
     reopened_second, second_provider = _real_input(
         root=tmp_path,
         execution=skeleton,

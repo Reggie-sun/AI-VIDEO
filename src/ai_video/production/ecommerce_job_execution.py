@@ -13,7 +13,12 @@ from ai_video.production.ecommerce_ad_coordinator import (
 )
 from ai_video.production.ecommerce_job_assembly import validate_ecommerce_plan_binding
 from ai_video.production.ecommerce_job_contracts import EcommerceProductionHandoff
-from ai_video.production.ecommerce_job_repair import EcommerceShotRepairContext
+from ai_video.production.ecommerce_job_repair import (
+    EcommerceShotRepairContext,
+    bound_generation_attempt_ids_for_shot,
+)
+from ai_video.production.models import StateCommitStatus, VideoAttemptPhase
+from ai_video.production.project import load_production_project
 
 
 @dataclass(frozen=True)
@@ -180,17 +185,57 @@ class EcommerceShotExecutionPlan:
     ) -> dict[str, ActivatedCommercialShotCheckpoint]:
         """Read canonical activations without realizing deferred execution inputs."""
 
+        from ai_video.production._video_project_reader import (
+            load_video_request_receipt,
+        )
+
+        loaded = load_production_project(
+            Path(self.shots[0].service.project_root) / "project.yaml"
+        )
         checkpoints = {}
         for item in self.shots:
-            if item.service.current_bound_commercial_request_identity(
-                attempt_id=item.attempt_id
-            ) is None:
-                continue
-            checkpoint = item.service.current_activated_commercial_checkpoint(
-                attempt_id=item.attempt_id
+            active_shot = next(
+                (shot for shot in loaded.shots if shot.shot_id == item.shot_id),
+                None,
             )
-            if checkpoint is not None:
+            attempt_ids = bound_generation_attempt_ids_for_shot(
+                loaded.root, self, shot_id=item.shot_id
+            )
+            for attempt_id in reversed(attempt_ids):
+                attempt = next(
+                    stored for stored in loaded.manifest.attempts
+                    if stored.attempt_id == attempt_id
+                )
+                state = attempt.video_generation_state
+                if (
+                    attempt.status is not StateCommitStatus.SUCCEEDED
+                    or state is None
+                    or state.phase is not VideoAttemptPhase.ACTIVATE
+                ):
+                    continue
+                request = load_video_request_receipt(loaded.root, state.request)
+                scope = request.activation_scope
+                if active_shot is None or scope is None or not any(
+                    role.role == scope.request.target_asset_role
+                    and role.asset_ids == (request.output_asset_id,)
+                    for role in active_shot.required_asset_roles
+                ):
+                    continue
+                checkpoint = item.service.current_activated_commercial_checkpoint(
+                    attempt_id=attempt_id
+                )
+                if checkpoint is None:
+                    raise ValueError("Canonical active Shot has no activation checkpoint")
                 checkpoints[item.shot_id] = checkpoint
+                break
+            if not attempt_ids and item.service.current_bound_commercial_request_identity(
+                attempt_id=item.attempt_id
+            ) is not None:
+                checkpoint = item.service.current_activated_commercial_checkpoint(
+                    attempt_id=item.attempt_id
+                )
+                if checkpoint is not None:
+                    checkpoints[item.shot_id] = checkpoint
         return checkpoints
 
     def build_facades(

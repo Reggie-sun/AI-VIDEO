@@ -484,7 +484,11 @@ class EcommerceProductionJobService:
                     bound_attempt_ids = set(
                         bound_generation_attempt_ids(request.project_root, shot_execution)
                     )
-                    requested_attempt_ids = {item.attempt_id for item in shot_execution.shots}
+                    requested_attempt_ids = {
+                        item.attempt_id
+                        for item in shot_execution.shots
+                        if item.shot_id == current.next_shot_id
+                    }
                     if len(bound_attempt_ids | requested_attempt_ids) > request.max_new_generation_attempts:
                         return self._blocked(
                             request,
