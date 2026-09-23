@@ -14,6 +14,7 @@ from pydantic import (
     model_validator,
 )
 
+from ai_video.production.artifact_contracts import QaPolicyPointer
 from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 
 
@@ -777,6 +778,7 @@ class CommercialShotEvaluationPhase(str, Enum):
 class CommercialShotEvaluationState(_PaidLifecycleModel):
     phase: CommercialShotEvaluationPhase
     intent: CommercialShotEvaluationIntentPointer
+    qa_policy: QaPolicyPointer | None = None
     evidence: GeneratedCommercialShotEvidencePointer | None = None
     probe: VideoProbeReceiptPointer | None = None
     provenance: VideoProvenanceReceiptPointer | None = None
@@ -786,6 +788,8 @@ class CommercialShotEvaluationState(_PaidLifecycleModel):
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, object]:
         data = handler(self)
+        if self.qa_policy is None:
+            data.pop("qa_policy", None)
         if self.evidence is None:
             data.pop("evidence", None)
         if self.probe is None:

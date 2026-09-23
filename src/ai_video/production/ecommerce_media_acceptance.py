@@ -343,8 +343,8 @@ def adjudicate_generated_commercial_shot_evidence(
     finding_ids = tuple(item.requirement_id for item in measured.findings)
     if finding_ids != selected_binding.applicable_requirement_ids:
         return QaVerdict.NOT_EVALUATED
+    if any(item.verdict is QaVerdict.NOT_EVALUATED for item in measured.findings):
+        return QaVerdict.NOT_EVALUATED
     if any(item.verdict is QaVerdict.FAIL for item in measured.findings):
         return QaVerdict.FAIL
-    if any(item.verdict is not QaVerdict.PASS for item in measured.findings):
-        return QaVerdict.NOT_EVALUATED
     return QaVerdict.PASS

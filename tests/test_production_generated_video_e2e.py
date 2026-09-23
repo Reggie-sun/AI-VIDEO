@@ -1693,6 +1693,46 @@ def test_commercial_candidate_rejects_current_policy_replacement(
     assert stale.value.code is ErrorCode.PRODUCTION_STATE_INVALID
 
 
+def test_historical_commercial_pass_rejects_original_policy_byte_change(
+    tmp_path: Path,
+) -> None:
+    _, provider, _, committer = _reach_fetch(tmp_path, commercial=True)
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.fetch_once(attempt_id=ATTEMPT_ID)
+    service.fetch_and_activate(
+        attempt_id=ATTEMPT_ID,
+        commercial_reviewer=_CountingCommercialShotReviewer(),
+    )
+    loaded = load_production_project(tmp_path / "project.yaml")
+    assert loaded.qa_policy is not None
+    original_pointer = loaded.manifest.active_qa_policy
+    assert original_pointer is not None
+    checkpoint = next(
+        item.video_generation_state.commercial_evaluation
+        for item in loaded.manifest.attempts
+        if item.attempt_id == ATTEMPT_ID
+    )
+    assert checkpoint.qa_policy == original_pointer
+    revised = seal_artifact(loaded.qa_policy.model_copy(update={
+        "revision": loaded.qa_policy.revision + 1,
+        "policy_version": loaded.qa_policy.policy_version + "-later",
+        "creation_receipt_id": loaded.qa_policy.creation_receipt_id + "-later",
+        "content_hash": "0" * 64,
+    }))
+    committer.activate_qa_policy(
+        revised,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id="later-commercial-pass-policy",
+    )
+    assert load_production_project(tmp_path / "project.yaml").qa_policy == revised
+
+    policy_path = tmp_path / original_pointer.path
+    policy_path.write_bytes(policy_path.read_bytes() + b"\n")
+    with pytest.raises(AiVideoError) as tampered:
+        load_production_project(tmp_path / "project.yaml")
+    assert tampered.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
 def test_commercial_start_rejects_caller_supplied_unapproved_product_hashes(
     tmp_path: Path,
 ) -> None:

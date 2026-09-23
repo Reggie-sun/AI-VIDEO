@@ -250,6 +250,29 @@ def test_generated_commercial_shot_evidence_aggregates_exact_requirements(
     ) is expected
 
 
+def test_mixed_commercial_failure_and_missing_evidence_repair_evidence_first() -> None:
+    from ai_video.production.ecommerce_media_acceptance import (
+        GeneratedCommercialShotEvidence,
+        adjudicate_generated_commercial_shot_evidence,
+    )
+
+    binding, intent, evidence = _shot_evidence(verdict=QaVerdict.FAIL)
+    mixed = GeneratedCommercialShotEvidence.create(
+        intent=intent,
+        strength=evidence.strength,
+        findings=(
+            evidence.findings[0],
+            evidence.findings[1].model_copy(
+                update={"verdict": QaVerdict.NOT_EVALUATED}
+            ),
+            evidence.findings[2],
+        ),
+    )
+    assert adjudicate_generated_commercial_shot_evidence(
+        mixed, binding=binding
+    ) is QaVerdict.NOT_EVALUATED
+
+
 def test_generated_commercial_shot_evidence_rejects_drift_and_partial_coverage() -> None:
     from ai_video.production.ecommerce_media_acceptance import (
         GeneratedCommercialShotEvidence,

@@ -758,16 +758,23 @@ def _activate_commercial_generation_policy(
     )
 
 
-def _revise_selected_qa(root: Path) -> None:
+def _revise_selected_qa(
+    root: Path, *, change_generation_acceptance: bool = False
+) -> None:
     loaded = load_production_project(root / "project.yaml")
     policy = loaded.qa_policy
     assert policy is not None
-    revised = seal_artifact(policy.model_copy(update={
+    updates = {
         "revision": policy.revision + 1,
         "policy_version": policy.policy_version + "-later",
         "creation_receipt_id": policy.creation_receipt_id + "-later",
         "content_hash": "0" * 64,
-    }))
+    }
+    if change_generation_acceptance:
+        updates["generation_acceptance"] = acceptance_policy(
+            (fixture_generation_expression(OUTPUT),)
+        )
+    revised = seal_artifact(policy.model_copy(update=updates))
     ProductionStateCommitter(root).activate_qa_policy(
         revised,
         expected_manifest_revision=loaded.manifest.manifest_revision,
@@ -1270,6 +1277,159 @@ def test_unclosed_commercial_failure_reopens_after_later_qa_revision(
     _revise_selected_qa(tmp_path)
 
 
+def test_tagged_commercial_failure_with_changed_generation_qa_stops_repair(
+    tmp_path: Path,
+) -> None:
+    handoff, plan, compiled = _handoff_and_compiled()
+    request = _request(tmp_path, handoff, attempts=2)
+    _bootstrap(tmp_path, handoff, compiled.composition_spec)
+    _activate_commercial_generation_policy(tmp_path)
+    execution, provider = _real_input(
+        root=tmp_path,
+        execution=SimpleNamespace(handoff=compiled),
+        shot_id="shot-proof",
+        composition_spec=compiled.composition_spec,
+        output=OUTPUT,
+        artifact_bytes=VIDEO.read_bytes(),
+        use_current_generation_acceptance=True,
+        commercial_requirement_ids=(
+            "shot.identity.main_character", "shot.motion.required"
+        ),
+        authored_commercial_prompt=True,
+    )
+    shots = EcommerceShotExecutionPlan(
+        handoff=compiled,
+        plan=plan,
+        shots=(replace(
+            execution,
+            commercial_reviewer=_CountingCommercialShotReviewer(
+                verdict=QaVerdict.FAIL
+            ),
+        ),),
+    )
+    assert EcommerceProductionJobService().advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.GENERATE_SHOT,
+        shot_execution=shots,
+    ).next_action is EcommerceJobNextAction.REPAIR_SHOT_MEDIA
+    from ai_video.production.ecommerce_generation_bridge import (
+        commercial_failure_evaluation_source,
+    )
+
+    record_attempt_evaluation(
+        committer=ProductionStateCommitter(tmp_path),
+        attempt_id=execution.attempt_id,
+        evaluation_sources=(commercial_failure_evaluation_source(
+            root=tmp_path,
+            attempt_id=execution.attempt_id,
+        ),),
+    )
+    _revise_selected_qa(tmp_path, change_generation_acceptance=True)
+    reopened = EcommerceProductionJobService().inspect(
+        request, handoff, shot_execution=shots
+    )
+    assert reopened.next_action is EcommerceJobNextAction.BLOCKED
+    assert reopened.blocker is not None
+    assert reopened.blocker.blocker_code == "ECOMMERCE_COMMERCIAL_REPAIR_QA_CHANGED"
+    assert provider.submit_calls == 1
+
+
+def test_mixed_commercial_findings_repair_evidence_before_media(
+    tmp_path: Path,
+) -> None:
+    from ai_video.production.ecommerce_media_acceptance import (
+        GeneratedCommercialShotEvidence,
+    )
+
+    class MixedReviewer(_CountingCommercialShotReviewer):
+        def __call__(self, held_fd, request, measured, intent):
+            evidence = super().__call__(held_fd, request, measured, intent)
+            return GeneratedCommercialShotEvidence.create(
+                intent=intent,
+                strength=evidence.strength,
+                findings=(
+                    evidence.findings[0],
+                    evidence.findings[1].model_copy(
+                        update={"verdict": QaVerdict.NOT_EVALUATED}
+                    ),
+                ),
+            )
+
+    handoff, plan, compiled = _handoff_and_compiled()
+    request = _request(tmp_path, handoff, attempts=2)
+    _bootstrap(tmp_path, handoff, compiled.composition_spec)
+    _activate_commercial_generation_policy(tmp_path)
+    execution, provider = _real_input(
+        root=tmp_path,
+        execution=SimpleNamespace(handoff=compiled),
+        shot_id="shot-proof",
+        composition_spec=compiled.composition_spec,
+        output=OUTPUT,
+        artifact_bytes=VIDEO.read_bytes(),
+        use_current_generation_acceptance=True,
+        commercial_requirement_ids=(
+            "shot.identity.main_character", "shot.motion.required"
+        ),
+        authored_commercial_prompt=True,
+    )
+    first_reviewer = MixedReviewer(verdict=QaVerdict.FAIL)
+    shots = EcommerceShotExecutionPlan(
+        handoff=compiled,
+        plan=plan,
+        shots=(replace(execution, commercial_reviewer=first_reviewer),),
+    )
+    job = EcommerceProductionJobService()
+    first = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.GENERATE_SHOT,
+        shot_execution=shots,
+    )
+    assert first.next_action is EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE
+    first_state = next(
+        item.video_generation_state
+        for item in load_production_project(tmp_path / "project.yaml").manifest.attempts
+        if item.attempt_id == execution.attempt_id
+    )
+    assert first_state is not None
+    assert first_state.commercial_evaluation is not None
+    first_evidence = first_state.commercial_evaluation.evidence
+    bypass_reviewer = _CountingCommercialShotReviewer(verdict=QaVerdict.PASS)
+    bypass_reviewer.intent = first_reviewer.intent
+    bypass = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE,
+        shot_execution=replace(
+            shots,
+            shots=(replace(execution, commercial_reviewer=bypass_reviewer),),
+        ),
+    )
+    assert bypass.next_action is EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE
+    bypass_state = next(
+        item.video_generation_state
+        for item in load_production_project(tmp_path / "project.yaml").manifest.attempts
+        if item.attempt_id == execution.attempt_id
+    )
+    assert bypass_state is not None
+    assert bypass_state.commercial_evaluation is not None
+    assert bypass_state.commercial_evaluation.evidence == first_evidence
+    repaired_reviewer = _CountingCommercialShotReviewer(verdict=QaVerdict.FAIL)
+    repaired_reviewer.intent = first_reviewer.intent
+    repaired = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE,
+        shot_execution=replace(
+            shots,
+            shots=(replace(execution, commercial_reviewer=repaired_reviewer),),
+        ),
+    )
+    assert repaired.next_action is EcommerceJobNextAction.REPAIR_SHOT_MEDIA
+    assert provider.submit_calls == 1
+
+
 def test_unknown_local_submit_remains_stopped_after_explicit_recovery_without_proof(
     tmp_path: Path,
 ) -> None:
@@ -1455,6 +1615,12 @@ def test_commercial_failure_abandonment_cannot_authorize_media_repair(
         ),
         reason="Duration proof remained unavailable after same-bytes evidence repair.",
     )
+    projected = EcommerceProductionJobService().inspect(
+        request, handoff, shot_execution=shots
+    )
+    assert projected.next_action is EcommerceJobNextAction.BLOCKED
+    assert projected.blocker is not None
+    assert projected.blocker.blocker_code == "ECOMMERCE_SHOT_REPAIR_ABANDONED"
     diagnosis = diagnose_exact_result(
         experience.evidence[0],
         experience.evidence,
@@ -1522,7 +1688,7 @@ def test_commercial_failure_abandonment_cannot_authorize_media_repair(
     )
     assert result.next_action is EcommerceJobNextAction.BLOCKED
     assert result.blocker is not None
-    assert result.blocker.blocker_code == "ECOMMERCE_SHOT_REPAIR_EVIDENCE_MISMATCH"
+    assert result.blocker.blocker_code == "ECOMMERCE_SHOT_REPAIR_ABANDONED"
     assert provider.submit_calls == 1
 
 

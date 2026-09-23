@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.ecommerce_generation_bridge import (
-    commercial_failure_mapping_is_available,
+    commercial_failure_repair_readiness,
 )
 from ai_video.production.ecommerce_job_assembly import (
     EcommerceCompositionExecutionPlan,
@@ -256,7 +256,20 @@ def project_ecommerce_job_progress(
                         item for item in loaded.manifest.attempts
                         if item.attempt_id == shot_attempts[-1]
                     )
-                    repair_mapping_available = commercial_failure_mapping_is_available(
+                    state = failed_attempt.video_generation_state
+                    if state is None:
+                        raise ValueError("Failed Shot has no generation state")
+                    abandoned = False
+                    if state.quality_rejection is not None:
+                        from ai_video.production._generation_feedback_reader import (
+                            load_generation_quality_rejection,
+                        )
+
+                        rejection = load_generation_quality_rejection(
+                            request.project_root, state.quality_rejection
+                        )
+                        abandoned = rejection.abandonment_reason is not None
+                    repair_readiness = commercial_failure_repair_readiness(
                         root=request.project_root,
                         loaded=loaded,
                         attempt=failed_attempt,
@@ -271,7 +284,27 @@ def project_ecommerce_job_progress(
                         required_action="Reopen the exact failed Shot attempt.",
                         manifest_revision=revision,
                     )
-                if not repair_mapping_available:
+                if abandoned:
+                    return block_ecommerce_job(
+                        request,
+                        blocker_code="ECOMMERCE_SHOT_REPAIR_ABANDONED",
+                        stage="shot_repair",
+                        subject_id=shot_id,
+                        failure_classification="QUALITY_REJECTION_INCOMPLETE",
+                        required_action="The prior attempt was abandoned with unresolved evidence; it cannot authorize a new media repair. Reconcile the exact Shot through its canonical owner.",
+                        manifest_revision=revision,
+                    )
+                if repair_readiness == "QA_CHANGED":
+                    return block_ecommerce_job(
+                        request,
+                        blocker_code="ECOMMERCE_COMMERCIAL_REPAIR_QA_CHANGED",
+                        stage="shot_repair",
+                        subject_id=shot_id,
+                        failure_classification="AUTHORING_REVISION_REQUIRED",
+                        required_action="Reconcile the selected generation QA with the original failed Shot before a new attempt; historical evidence cannot be remapped.",
+                        manifest_revision=revision,
+                    )
+                if repair_readiness != "READY":
                     return block_ecommerce_job(
                         request,
                         blocker_code="ECOMMERCE_COMMERCIAL_REPAIR_QA_UNMAPPED",

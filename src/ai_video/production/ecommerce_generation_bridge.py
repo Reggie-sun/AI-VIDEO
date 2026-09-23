@@ -168,10 +168,11 @@ def commercial_failure_evaluation_source(
     )
 
 
-def commercial_failure_mapping_is_available(*, root: Path, loaded, attempt) -> bool:
-    """Project authoring readiness without changing the failed attempt."""
+def commercial_failure_repair_readiness(*, root: Path, loaded, attempt) -> str:
+    """Project current QA readiness without changing the failed attempt."""
 
     from ai_video.production._video_project_reader import (
+        load_commercial_shot_evaluation_intent,
         load_generation_experience,
         load_video_request_receipt,
     )
@@ -181,18 +182,40 @@ def commercial_failure_mapping_is_available(*, root: Path, loaded, attempt) -> b
 
     state = attempt.video_generation_state
     if state is None:
-        return False
-    for pointer in state.generation_experiences:
-        experience = load_generation_experience(root, pointer)
-        if any(
-            source.commercial_evidence_content_hash is not None
-            for source in experience.evaluation_sources
-        ):
-            return True  # Strict project reopen already checked this frozen source.
+        return "UNMAPPED"
     request = load_video_request_receipt(root, state.request)
     binding = request.commercial_binding
     if binding is None:
-        return False
+        return "UNMAPPED"
+    if state.generation_experiences:
+        experience = load_generation_experience(
+            root, state.generation_experiences[-1]
+        )
+        tagged = tuple(
+            source for source in experience.evaluation_sources
+            if source.commercial_evidence_content_hash is not None
+        )
+        if tagged:
+            if len(tagged) != 1:
+                return "UNMAPPED"
+            acceptance = selected_shot_generation_acceptance(
+                loaded, binding.target_shot_id
+            )
+            if (
+                tagged[0].commercial_qa_policy != loaded.manifest.active_qa_policy
+                or acceptance is None
+                or tagged[0].rubric_hash != acceptance.profile_content_hash
+            ):
+                return "QA_CHANGED"
+            return "READY"  # Strict project reopen checked the frozen source.
+    evaluation = state.commercial_evaluation
+    if evaluation is not None:
+        intent = load_commercial_shot_evaluation_intent(root, evaluation.intent)
+        if (
+            loaded.qa_policy is None
+            or intent.qa_policy_content_hash != loaded.qa_policy.content_hash
+        ):
+            return "QA_CHANGED"
     try:
         _commercial_failure_source(
             root=root,
@@ -205,8 +228,8 @@ def commercial_failure_mapping_is_available(*, root: Path, loaded, attempt) -> b
             ),
         )
     except ValueError:
-        return False
-    return True
+        return "UNMAPPED"
+    return "READY"
 
 
 def load_frozen_commercial_qa_policy(root: Path, content_hash: str) -> QaPolicy:
@@ -232,3 +255,19 @@ def load_frozen_commercial_qa_policy(root: Path, content_hash: str) -> QaPolicy:
         file_sha256=snapshot.file_sha256,
     )
     return load_qa_policy(root, pointer)
+
+
+def load_commercial_checkpoint_qa_policy(root, evaluation, intent) -> QaPolicy:
+    """Verify the original policy pointer when the checkpoint records its bytes."""
+
+    if evaluation.qa_policy is None:
+        policy = load_frozen_commercial_qa_policy(
+            root, intent.qa_policy_content_hash
+        )
+    else:
+        from ai_video.production.project import load_qa_policy
+
+        policy = load_qa_policy(root, evaluation.qa_policy)
+    if policy.content_hash != intent.qa_policy_content_hash:
+        raise ValueError("Commercial evaluation QA policy identity changed")
+    return policy

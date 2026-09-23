@@ -239,6 +239,7 @@ def checkpoint_generated_commercial_shot(
                 "commercial_evaluation": CommercialShotEvaluationState(
                     phase=CommercialShotEvaluationPhase.INTENT,
                     intent=intent_pointer,
+                    qa_policy=manifest.active_qa_policy,
                 )
             }
         )
@@ -324,6 +325,7 @@ def checkpoint_generated_commercial_shot(
                 "commercial_evaluation": CommercialShotEvaluationState(
                     phase=CommercialShotEvaluationPhase.EVIDENCED,
                     intent=evaluation_state.intent,
+                    qa_policy=evaluation_state.qa_policy,
                     evidence=evidence_pointer,
                 )
             }
@@ -369,6 +371,7 @@ def checkpoint_generated_commercial_shot(
                     "commercial_evaluation": CommercialShotEvaluationState(
                         phase=CommercialShotEvaluationPhase.INTENT,
                         intent=evaluation_state.intent,
+                        qa_policy=evaluation_state.qa_policy,
                     )
                 }
             )
@@ -411,7 +414,19 @@ def checkpoint_generated_commercial_shot(
                 commercial_policy_content_hash,
                 commercial_authorities,
             )
-            if replacement.content_hash == evidence.content_hash:
+            known_failures = {
+                item.requirement_id for item in evidence.findings
+                if item.verdict is QaVerdict.FAIL
+            }
+            remaining_failures = {
+                item.requirement_id for item in replacement.findings
+                if item.verdict is QaVerdict.FAIL
+            }
+            duplicate_evidence = replacement.content_hash == evidence.content_hash
+            if (
+                duplicate_evidence
+                or not known_failures <= remaining_failures
+            ):
                 restored_state = state.model_copy(
                     update={"commercial_evaluation": previous_evaluation_state}
                 )
@@ -434,6 +449,8 @@ def checkpoint_generated_commercial_shot(
                     code=ErrorCode.REVIEW_EVIDENCE_INVALID,
                     user_message=(
                         "Commercial evidence repair did not produce new exact evidence."
+                        if duplicate_evidence
+                        else "Commercial evidence repair cannot clear known failures."
                     ),
                     retryable=False,
                 )
@@ -462,6 +479,7 @@ def checkpoint_generated_commercial_shot(
                     "commercial_evaluation": CommercialShotEvaluationState(
                         phase=CommercialShotEvaluationPhase.EVIDENCED,
                         intent=evaluation_state.intent,
+                        qa_policy=evaluation_state.qa_policy,
                         evidence=evidence_pointer,
                     )
                 }
