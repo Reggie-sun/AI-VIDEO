@@ -530,8 +530,7 @@
       ],
       "presentation_ids": [],
       "copy_ids": [
-        "copy-headline",
-        "copy-sub-hook"
+        "copy-headline"
       ],
       "audio_event_ids": [
         "audio-vo-hook"
@@ -553,8 +552,7 @@
         "presentation-intro"
       ],
       "copy_ids": [
-        "copy-product-label",
-        "copy-sub-intro"
+        "copy-product-label"
       ],
       "audio_event_ids": [
         "audio-vo-intro"
@@ -580,8 +578,7 @@
         "copy-proof-highbeam",
         "copy-proof-brighter71",
         "copy-benefit",
-        "copy-real-label",
-        "copy-sub-demo"
+        "copy-real-label"
       ],
       "audio_event_ids": [
         "audio-vo-demo"
@@ -600,13 +597,12 @@
         "shot-proof"
       ],
       "presentation_ids": [
-        "presentation-hero"
+        "presentation-proof"
       ],
       "copy_ids": [
         "copy-price-series",
         "copy-price-n3-85c",
-        "copy-disclaimer",
-        "copy-sub-proof"
+        "copy-disclaimer"
       ],
       "audio_event_ids": [
         "audio-vo-proof"
@@ -625,12 +621,12 @@
         "shot-close"
       ],
       "presentation_ids": [
-        "presentation-cta"
+        "presentation-cta",
+        "presentation-hero"
       ],
       "copy_ids": [
         "copy-cta",
-        "copy-end-card",
-        "copy-sub-close"
+        "copy-end-card"
       ],
       "audio_event_ids": [
         "audio-vo-close"
@@ -665,7 +661,7 @@
     {
       "presentation_id": "presentation-demo",
       "role": "DEMONSTRATION",
-      "mode": "DEDICATED_HERO_SHOT",
+      "mode": "GRAPHIC_REVEAL",
       "beat_id": "beat-demo",
       "shot_id": "shot-demo",
       "start_seconds": 8,
@@ -689,23 +685,48 @@
       ]
     },
     {
-      "presentation_id": "presentation-hero",
-      "role": "HERO_SHOT",
-      "mode": "DEDICATED_HERO_SHOT",
+      "presentation_id": "presentation-proof",
+      "role": "BENEFIT_PROOF",
+      "mode": "GRAPHIC_REVEAL",
       "beat_id": "beat-proof",
       "shot_id": "shot-proof",
       "start_seconds": 16,
+      "duration_seconds": 7,
+      "product_source_asset_id": "asset-alc-sticker",
+      "talent_interaction": "NONE",
+      "occlusion_required": false,
+      "lighting_shadow_required": false,
+      "copy_cue_ids": [
+        "copy-price-series",
+        "copy-price-n3-85c",
+        "copy-disclaimer"
+      ],
+      "audio_cue_ids": [
+        "audio-vo-proof"
+      ],
+      "fallback_policy": "NONE",
+      "capability_requirement_ids": [
+        "req-product-asset",
+        "req-ad-graphics"
+      ]
+    },
+    {
+      "presentation_id": "presentation-hero",
+      "role": "HERO_SHOT",
+      "mode": "DEDICATED_HERO_SHOT",
+      "beat_id": "beat-close",
+      "shot_id": "shot-close",
+      "start_seconds": 23,
       "duration_seconds": 7,
       "product_source_asset_id": "asset-n3-85c-front",
       "talent_interaction": "NONE",
       "occlusion_required": false,
       "lighting_shadow_required": true,
       "copy_cue_ids": [
-        "copy-price-series",
-        "copy-price-n3-85c"
+        "copy-end-card"
       ],
       "audio_cue_ids": [
-        "audio-vo-proof"
+        "audio-vo-close"
       ],
       "fallback_policy": "NONE",
       "capability_requirement_ids": [
@@ -722,7 +743,7 @@
       "shot_id": "shot-close",
       "start_seconds": 23,
       "duration_seconds": 7,
-      "product_source_asset_id": "asset-n3-85c-front",
+      "product_source_asset_id": "asset-n3-85c-badge",
       "talent_interaction": "NONE",
       "occlusion_required": false,
       "lighting_shadow_required": false,
@@ -808,24 +829,6 @@
       "treatment_id": "treatment-hook-headline"
     },
     {
-      "copy_id": "copy-sub-hook",
-      "role": "DIALOGUE_SUBTITLE",
-      "text": "晚上骑车，最怕看不清",
-      "priority": 3,
-      "beat_id": "beat-hook",
-      "shot_id": "shot-hook",
-      "safe_area_intent": "底部字幕安全区",
-      "avoidance_intent": "避开车头与光束",
-      "entrance_intent": "与 VO 对齐逐句出现",
-      "exit_intent": "VO 结束后消失",
-      "keyword_emphasis": [],
-      "brand_token_reference": "caption-default",
-      "synchronized_event_ids": [
-        "audio-vo-hook"
-      ],
-      "treatment_id": "treatment-caption"
-    },
-    {
       "copy_id": "copy-product-label",
       "role": "PRODUCT_LABEL",
       "text": "九号 N3 85C · ALC全境光幕照明系统",
@@ -846,24 +849,6 @@
         "presentation-intro"
       ],
       "treatment_id": "treatment-product-label"
-    },
-    {
-      "copy_id": "copy-sub-intro",
-      "role": "DIALOGUE_SUBTITLE",
-      "text": "九号 N3 系列，ALC 全境光幕照明系统",
-      "priority": 3,
-      "beat_id": "beat-intro",
-      "shot_id": "shot-intro",
-      "safe_area_intent": "底部字幕安全区",
-      "avoidance_intent": "不遮挡车身",
-      "entrance_intent": "与 VO 对齐",
-      "exit_intent": "VO 结束后消失",
-      "keyword_emphasis": [],
-      "brand_token_reference": "caption-default",
-      "synchronized_event_ids": [
-        "audio-vo-intro"
-      ],
-      "treatment_id": "treatment-caption"
     },
     {
       "copy_id": "copy-proof-65000cd",
@@ -964,24 +949,6 @@
       "treatment_id": "treatment-proof"
     },
     {
-      "copy_id": "copy-sub-demo",
-      "role": "DIALOGUE_SUBTITLE",
-      "text": "亮度六万五千坎德拉，远光升级，亮度提升百分之七十一",
-      "priority": 3,
-      "beat_id": "beat-demo",
-      "shot_id": "shot-demo",
-      "safe_area_intent": "底部字幕安全区",
-      "avoidance_intent": "避开光幕下沿",
-      "entrance_intent": "与 VO 对齐",
-      "exit_intent": "VO 结束后消失",
-      "keyword_emphasis": [],
-      "brand_token_reference": "caption-default",
-      "synchronized_event_ids": [
-        "audio-vo-demo"
-      ],
-      "treatment_id": "treatment-caption"
-    },
-    {
       "copy_id": "copy-price-series",
       "role": "PROOF_LABEL",
       "text": "九号 N3 系列 到手价 ¥3499 起",
@@ -998,7 +965,7 @@
       "brand_token_reference": "ninebot-price-tag",
       "synchronized_event_ids": [
         "audio-vo-proof",
-        "presentation-hero"
+        "presentation-proof"
       ],
       "treatment_id": "treatment-price"
     },
@@ -1018,7 +985,7 @@
       ],
       "brand_token_reference": "ninebot-price-tag",
       "synchronized_event_ids": [
-        "presentation-hero"
+        "presentation-proof"
       ],
       "treatment_id": "treatment-price"
     },
@@ -1036,27 +1003,9 @@
       "keyword_emphasis": [],
       "brand_token_reference": "ninebot-disclaimer",
       "synchronized_event_ids": [
-        "presentation-hero"
+        "presentation-proof"
       ],
       "treatment_id": "treatment-disclaimer"
-    },
-    {
-      "copy_id": "copy-sub-proof",
-      "role": "DIALOGUE_SUBTITLE",
-      "text": "九号 N3 系列，到手价三千四百九十九元起",
-      "priority": 3,
-      "beat_id": "beat-proof",
-      "shot_id": "shot-proof",
-      "safe_area_intent": "底部字幕安全区",
-      "avoidance_intent": "避开价格卡",
-      "entrance_intent": "与 VO 对齐",
-      "exit_intent": "VO 结束后消失",
-      "keyword_emphasis": [],
-      "brand_token_reference": "caption-default",
-      "synchronized_event_ids": [
-        "audio-vo-proof"
-      ],
-      "treatment_id": "treatment-caption"
     },
     {
       "copy_id": "copy-cta",
@@ -1097,24 +1046,6 @@
         "presentation-cta"
       ],
       "treatment_id": "treatment-end-card"
-    },
-    {
-      "copy_id": "copy-sub-close",
-      "role": "DIALOGUE_SUBTITLE",
-      "text": "浩口九号智能电动车，到店试灯，一试就知道",
-      "priority": 3,
-      "beat_id": "beat-close",
-      "shot_id": "shot-close",
-      "safe_area_intent": "底部字幕安全区",
-      "avoidance_intent": "避开 CTA 按钮区",
-      "entrance_intent": "与 VO 对齐",
-      "exit_intent": "停留至最后一帧",
-      "keyword_emphasis": [],
-      "brand_token_reference": "caption-default",
-      "synchronized_event_ids": [
-        "audio-vo-close"
-      ],
-      "treatment_id": "treatment-caption"
     }
   ],
   "audio_plan": {
@@ -1343,8 +1274,7 @@
       "camera_intent": "夜间街道低机位缓慢推进，车身剪影大半陷入黑暗，约1.2秒车灯点亮瞬间切入",
       "presentation_ids": [],
       "copy_ids": [
-        "copy-headline",
-        "copy-sub-hook"
+        "copy-headline"
       ],
       "audio_event_ids": [
         "audio-vo-hook"
@@ -1365,8 +1295,7 @@
         "presentation-intro"
       ],
       "copy_ids": [
-        "copy-product-label",
-        "copy-sub-intro"
+        "copy-product-label"
       ],
       "audio_event_ids": [
         "audio-vo-intro"
@@ -1391,8 +1320,7 @@
         "copy-proof-highbeam",
         "copy-proof-brighter71",
         "copy-benefit",
-        "copy-real-label",
-        "copy-sub-demo"
+        "copy-real-label"
       ],
       "audio_event_ids": [
         "audio-vo-demo"
@@ -1406,22 +1334,21 @@
       "start_seconds": 16,
       "end_seconds": 23,
       "duration_basis": "PROOF_READABILITY",
-      "product_state": "N3 85C 车灯点亮特写 hero 画面",
+      "product_state": "生成的车灯点亮特写 base + ALC 贴纸实拍 inset 作为证据",
       "talent_action": null,
       "camera_intent": "受控车头灯特写缓慢推近",
       "presentation_ids": [
-        "presentation-hero"
+        "presentation-proof"
       ],
       "copy_ids": [
         "copy-price-series",
         "copy-price-n3-85c",
-        "copy-disclaimer",
-        "copy-sub-proof"
+        "copy-disclaimer"
       ],
       "audio_event_ids": [
         "audio-vo-proof"
       ],
-      "visual_strategy_need": "dedicated hero shot，价格卡 graphic overlay 需 disclaimer 小字"
+      "visual_strategy_need": "由 ff-proof 生成的车灯特写 base；ALC 贴纸 inset 与价格卡为承认的 graphic overlay，含 disclaimer 小字"
     },
     {
       "shot_id": "shot-close",
@@ -1434,17 +1361,17 @@
       "talent_action": null,
       "camera_intent": "锁定片尾构图",
       "presentation_ids": [
-        "presentation-cta"
+        "presentation-cta",
+        "presentation-hero"
       ],
       "copy_ids": [
         "copy-cta",
-        "copy-end-card",
-        "copy-sub-close"
+        "copy-end-card"
       ],
       "audio_event_ids": [
         "audio-vo-close"
       ],
-      "visual_strategy_need": "advertising copy graphics 层叠加在 approved product asset 上"
+      "visual_strategy_need": "hero 产品画面 + advertising copy graphics（CTA/end card/徽标 inset）叠加"
     }
   ],
   "cta": {
@@ -1515,24 +1442,9 @@
           "audio-vo-intro",
           "audio-vo-demo",
           "audio-vo-proof",
-          "audio-vo-close",
-          "audio-music",
-          "audio-sfx-light-hit",
-          "audio-sfx-close-hit"
+          "audio-vo-close"
         ],
-        "summary": "请求 canonical P4 audio authoring；exact timing 归 ResolvedTimeline owner"
-      },
-      {
-        "proposal_id": "proposal-caption",
-        "target": "CaptionTrack",
-        "source_ids": [
-          "copy-sub-hook",
-          "copy-sub-intro",
-          "copy-sub-demo",
-          "copy-sub-proof",
-          "copy-sub-close"
-        ],
-        "summary": "仅 VO 对齐字幕可投影为 CaptionTrack；商业图文角色保持独立"
+        "summary": "VO 由各领域 Shot 的 H3 原生音频承载（KEEP），提取注册为 narration track；exact timing 归 ResolvedTimeline owner"
       }
     ],
     "requirements": [
@@ -1540,13 +1452,13 @@
         "requirement_id": "req-product-asset",
         "capability": "product_source_asset",
         "classification": "SUPPORTED_CURRENTLY",
-        "rationale": "registered 门店实拍照片可支持静态画面与显式 graphic layer"
+        "rationale": "registered 门店实拍照片与实拍视频可支持静态画面与显式 graphic layer"
       },
       {
         "requirement_id": "req-product-animation",
         "capability": "product_source_generation",
         "classification": "SUPPORTED_CURRENTLY",
-        "rationale": "demo 夜骑镜头需要由 registered image 生成 in-scene 动态画面；本地 image-to-video generation seam 已在既有 ecommerce production job 使用，执行仍须通过既有 Provider Gate 与 Per-Shot Gate"
+        "rationale": "各 Shot 由 registered 首帧经本地 image-to-video 生成，执行仍须通过既有 Provider Gate 与 Per-Shot Gate"
       },
       {
         "requirement_id": "req-ad-graphics",
@@ -1558,13 +1470,7 @@
         "requirement_id": "req-audio",
         "capability": "audio_authoring",
         "classification": "SUPPORTED_CURRENTLY",
-        "rationale": "VO/music/SFX 可在显式 Runtime materialization 后由 P4 authoring 承接"
-      },
-      {
-        "requirement_id": "req-caption",
-        "capability": "dialogue_caption_binding",
-        "classification": "SUPPORTED_CURRENTLY",
-        "rationale": "VO 逐句字幕可请求 audio-aligned CaptionTrack"
+        "rationale": "VO 由 Shot 原生音频 KEEP 提取注册为 narration 资产"
       }
     ],
     "classified_gaps": [
@@ -1596,14 +1502,13 @@
         "rationale": "记录商业图文表达面缺口，不声称已有 Runtime 执行能力"
       },
       {
-        "gap_id": "gap-audio-caption",
+        "gap_id": "gap-audio",
         "classification": "SUPPORTED_CURRENTLY",
         "requirement_ids": [
-          "req-audio",
-          "req-caption"
+          "req-audio"
         ],
         "blocker_code": null,
-        "rationale": "authoring requests 可指向 P4 owner；实际混音与字幕仍是 Runtime 工作"
+        "rationale": "原生音频提取注册为 narration 资产；混音与字幕不属于本片范围"
       }
     ]
   },
@@ -1653,9 +1558,9 @@
           "copy-product-label",
           "copy-end-card",
           "copy-cta",
-          "audio-music"
+          "audio-vo-close"
         ],
-        "message": "product name 可见（PRODUCT_LABEL+end card）且可听（VO）；audio coverage 覆盖0-30秒；CTA 与品牌收束齐全"
+        "message": "product name 可见（PRODUCT_LABEL+end card）且可听（原生 VO）；audio coverage 由逐 Shot 原生音频覆盖0-30秒；CTA 与品牌收束齐全"
       },
       {
         "code": "runtime-gap-classified",
@@ -1678,5 +1583,5 @@
     ]
   },
   "unresolved_items": [],
-  "package_id": "281b2e6e273b40eb33f1e768b492400d0fd2d15a95e5dc9983bb70a1920ffd5b"
+  "package_id": "958cb8b92aa4bc584ff283b62aff9bf1d5db360f3f880140ccd79e58f7c27135"
 }
