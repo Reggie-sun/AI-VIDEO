@@ -545,15 +545,15 @@ def test_inspect_projects_blocked_when_failed_shot_has_no_repair_capacity(
     service = _FakeVideoService(QaVerdict.FAIL, tmp_path.resolve())
     execution = _execution(service, handoff)
     monkeypatch.setattr(
-        "ai_video.production.ecommerce_job.canonical_repair_frontier",
+        "ai_video.production.ecommerce_job_projection.canonical_repair_frontier",
         lambda *_: (EcommerceJobNextAction.REPAIR_SHOT_MEDIA, "shot-hero"),
     )
     monkeypatch.setattr(
-        "ai_video.production.ecommerce_job.bound_generation_attempt_ids",
+        "ai_video.production.ecommerce_job_projection.bound_generation_attempt_ids",
         lambda *_: ("failed-attempt",),
     )
     monkeypatch.setattr(
-        "ai_video.production.ecommerce_job.bound_generation_attempt_ids_for_shot",
+        "ai_video.production.ecommerce_job_projection.bound_generation_attempt_ids_for_shot",
         lambda *_, **__: ("failed-attempt",),
     )
 

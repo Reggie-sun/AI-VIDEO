@@ -19,7 +19,6 @@ from ai_video.production.ecommerce_job_contracts import (
 from ai_video.production.ecommerce_job_assembly import (
     EcommerceCompositionExecutionPlan,
     advance_ecommerce_job_assembly,
-    inspect_ecommerce_job_assembly,
 )
 from ai_video.production.ecommerce_job_execution import (
     EcommerceShotExecutionInput,
@@ -30,7 +29,6 @@ from ai_video.production.ecommerce_job_repair import (
     bound_generation_attempt_ids_for_shot,
     attempt_requires_explicit_recovery,
     canonical_attempt_identity,
-    canonical_repair_frontier,
     ecommerce_attempt_status,
     ecommerce_manifest_revision,
     input_attempt_identity,
@@ -42,16 +40,14 @@ from ai_video.production.ecommerce_job_repair import (
 from ai_video.production.ecommerce_job_projection import (
     block_ecommerce_job,
     project_ecommerce_job,
-    project_ecommerce_review_frontier,
+    project_ecommerce_job_progress,
 )
 from ai_video.production.ecommerce_job_review import (
     EcommerceDeliveryExecutionPlan,
     EcommercePostMediaExecutionPlan,
-    inspect_ecommerce_review_frontier,
 )
 from ai_video.production.models import (
     QaVerdict,
-    ReviewLifecycle,
     StateCommitStatus,
 )
 from ai_video.production.project import load_production_project
@@ -264,209 +260,14 @@ class EcommerceProductionJobService:
                 manifest_revision=revision,
             )
 
-        if shot_execution is not None:
-            try:
-                shot_execution.validate(
-                    handoff,
-                    project_root=request.project_root,
-                )
-                repair = canonical_repair_frontier(
-                    request.project_root,
-                    shot_execution,
-                    loaded.manifest,
-                )
-            except (AiVideoError, OSError, TypeError, ValueError):
-                return self._blocked(
-                    request,
-                    blocker_code="ECOMMERCE_SHOT_EXECUTION_INVALID",
-                    stage="shot_execution",
-                    subject_id=request.job_id,
-                    failure_classification="EXECUTION_INPUT_INVALID",
-                    required_action="Repair the exact Shot execution inputs through their owner.",
-                    manifest_revision=revision,
-                )
-            if repair is not None:
-                action, shot_id = repair
-                if action is EcommerceJobNextAction.REPAIR_SHOT_MEDIA:
-                    try:
-                        shot_attempts = bound_generation_attempt_ids_for_shot(
-                            request.project_root, shot_execution, shot_id=shot_id
-                        )
-                        job_attempts = bound_generation_attempt_ids(
-                            request.project_root, shot_execution
-                        )
-                        if not shot_attempts:
-                            raise ValueError("Failed Shot has no bound generation attempt")
-                    except (AiVideoError, OSError, TypeError, ValueError):
-                        return self._blocked(
-                            request,
-                            blocker_code="ECOMMERCE_SHOT_EXECUTION_INVALID",
-                            stage="shot_repair",
-                            subject_id=shot_id,
-                            failure_classification="EXECUTION_INPUT_INVALID",
-                            required_action="Reopen the exact failed Shot attempt.",
-                            manifest_revision=revision,
-                        )
-                    if len(job_attempts) >= request.max_new_generation_attempts:
-                        return self._blocked(
-                            request,
-                            blocker_code="ECOMMERCE_JOB_GENERATION_CEILING_EXHAUSTED",
-                            stage="shot_repair",
-                            subject_id=shot_id,
-                            failure_classification="ATTEMPT_CEILING",
-                            required_action="Stop or authorize a new finite Job request.",
-                            manifest_revision=revision,
-                        )
-                    if len(shot_attempts) - 1 >= request.max_repairs_per_shot:
-                        return self._blocked(
-                            request,
-                            blocker_code="ECOMMERCE_SHOT_REPAIR_CEILING_EXHAUSTED",
-                            stage="shot_repair",
-                            subject_id=shot_id,
-                            failure_classification="ATTEMPT_CEILING",
-                            required_action="Stop or authorize a new finite Shot repair request.",
-                            manifest_revision=revision,
-                        )
-                return self._projection(
-                    request,
-                    next_action=action,
-                    manifest_revision=revision,
-                    next_shot_id=shot_id,
-                )
-
-        for shot in loaded.shots:
-            if any(not role.asset_ids for role in shot.required_asset_roles):
-                if shot_execution is not None:
-                    try:
-                        bound_attempts = bound_generation_attempt_ids(
-                            request.project_root, shot_execution
-                        )
-                    except (AiVideoError, OSError, TypeError, ValueError):
-                        return self._blocked(
-                            request,
-                            blocker_code="ECOMMERCE_SHOT_EXECUTION_INVALID",
-                            stage="shot_execution",
-                            subject_id=shot.shot_id,
-                            failure_classification="EXECUTION_INPUT_INVALID",
-                            required_action="Reopen the exact Shot execution inputs.",
-                            manifest_revision=revision,
-                        )
-                else:
-                    bound_attempts = ()
-                if len(bound_attempts) >= request.max_new_generation_attempts:
-                    return self._blocked(
-                        request,
-                        blocker_code="ECOMMERCE_JOB_GENERATION_CEILING_EXHAUSTED",
-                        stage="shot_execution",
-                        subject_id=shot.shot_id,
-                        failure_classification="ATTEMPT_CEILING",
-                        required_action="Stop or authorize a new finite Job request.",
-                        manifest_revision=revision,
-                    )
-                return self._projection(
-                    request,
-                    next_action=EcommerceJobNextAction.GENERATE_SHOT,
-                    manifest_revision=revision,
-                    next_shot_id=shot.shot_id,
-                )
-
-        assembly = inspect_ecommerce_job_assembly(
-            composition_execution,
-            handoff,
-            project_root=request.project_root,
-        )
-        if assembly.error is not None:
-            return self._blocked(
-                request,
-                blocker_code="ECOMMERCE_COMPOSITION_EXECUTION_INVALID",
-                stage="composition",
-                subject_id=request.job_id,
-                failure_classification="EXECUTION_INPUT_INVALID",
-                required_action="Repair the exact composition inputs through their owner.",
-                error_code=(
-                    assembly.error.code
-                    if isinstance(assembly.error, AiVideoError)
-                    else ErrorCode.PRODUCTION_STATE_INVALID
-                ),
-                manifest_revision=revision,
-            )
-        if assembly.next_action is not EcommerceJobNextAction.REVIEW_FINAL:
-            return self._projection(
-                request,
-                next_action=assembly.next_action,
-                manifest_revision=revision,
-            )
-        acceptance = loaded.manifest.final_acceptance_state
-        if (
-            acceptance is None
-            or acceptance.lifecycle is not ReviewLifecycle.FRESH
-            or acceptance.active_receipt is None
-        ):
-            if review_execution is not None:
-                try:
-                    frontier = review_execution.inspect_frontier(
-                        handoff,
-                        project_root=request.project_root,
-                    )
-                except (AiVideoError, OSError, TypeError, ValueError) as exc:
-                    return self._blocked(
-                        request,
-                        blocker_code="ECOMMERCE_FINAL_REVIEW_BINDING_INVALID",
-                        stage="final_review",
-                        subject_id=request.job_id,
-                        failure_classification="EXECUTION_INPUT_INVALID",
-                        required_action=(
-                            "Repair the exact review policy, evidence, or handoff binding."
-                        ),
-                        error_code=(
-                            exc.code
-                            if isinstance(exc, AiVideoError)
-                            else ErrorCode.REVIEW_EVIDENCE_INVALID
-                        ),
-                        manifest_revision=revision,
-                    )
-                return project_ecommerce_review_frontier(
-                    request,
-                    frontier=frontier,
-                    manifest_revision=revision,
-                )
-            return project_ecommerce_review_frontier(
-                request,
-                frontier=inspect_ecommerce_review_frontier(request.project_root),
-                manifest_revision=revision,
-            )
-        if delivery_execution is not None:
-            try:
-                packaged = delivery_execution.inspect(
-                    handoff,
-                    project_root=request.project_root,
-                    job_id=request.job_id,
-                )
-            except (AiVideoError, OSError, TypeError, ValueError) as exc:
-                return self._blocked(
-                    request,
-                    blocker_code="ECOMMERCE_DELIVERY_BUNDLE_INVALID",
-                    stage="delivery",
-                    subject_id=request.job_id,
-                    failure_classification="DELIVERY_INTEGRITY",
-                    required_action="Repair or remove the invalid delivery bundle.",
-                    error_code=(
-                        exc.code
-                        if isinstance(exc, AiVideoError)
-                        else ErrorCode.PRODUCTION_STATE_INVALID
-                    ),
-                    manifest_revision=revision,
-                )
-            if packaged is not None:
-                return self._projection(
-                    request,
-                    next_action=EcommerceJobNextAction.COMPLETE,
-                    manifest_revision=revision,
-                )
-        return self._projection(
+        return project_ecommerce_job_progress(
             request,
-            next_action=EcommerceJobNextAction.PACKAGE_DELIVERY,
-            manifest_revision=revision,
+            handoff,
+            loaded=loaded,
+            shot_execution=shot_execution,
+            composition_execution=composition_execution,
+            review_execution=review_execution,
+            delivery_execution=delivery_execution,
         )
 
     def advance_once(

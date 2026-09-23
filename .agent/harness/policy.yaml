@@ -149,6 +149,10 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_ecommerce_ad_workflow_skill.py, -q]
     cwd: .
     description: Verify the ecommerce advertising authoring Skill, schemas, validator, fixtures, and no-I/O boundaries.
+  aoci_project_cognition_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_aoci_project_cognition.py, -q]
+    cwd: .
+    description: Verify tracked AOCI cognition roots, contained baseline paths, and Git exclusion of runtime history.
   ecommerce_production_job_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_ecommerce_job.py, tests/test_production_ecommerce_job_repair.py, tests/test_production_ecommerce_job_assembly.py, tests/test_production_ecommerce_job_contracts.py, tests/test_production_ecommerce_job_compiler.py, tests/test_production_ecommerce_job_projection.py, tests/test_production_ecommerce_job_review.py, tests/test_production_ecommerce_post_media_e2e.py, tests/test_production_delivery_packager.py, tests/test_ecommerce_ad_workflow_handoff.py, -q]
     cwd: .
@@ -1240,6 +1244,30 @@ categories:
       - tests/test_production_voice_candidate.py
     check_ids:
       - minimax_speech_batch_tests
+      - task_architecture_gate
+  aoci_project_cognition:
+    patterns:
+      - .aoci/.gitignore
+      - .aoci/baseline.json
+      - .aoci/config.json
+      - .aoci/curation.json
+      - aoci.txt
+      - aoci.meta.txt
+      - aoci.code.txt
+      - tests/test_aoci_project_cognition.py
+    check_ids:
+      - aoci_project_cognition_tests
+  ninebot_ecommerce_authoring:
+    patterns:
+      - artifacts/ninebot-n3-lighting-ad-20260920/build_package.py
+      - artifacts/ninebot-n3-lighting-ad-20260920/build_visual_contracts.py
+      - artifacts/ninebot-n3-lighting-ad-20260920/compile-profile.json
+      - artifacts/ninebot-n3-lighting-ad-20260920/ecommerce-package.json
+      - artifacts/ninebot-n3-lighting-ad-20260920/layout-plan.json
+      - artifacts/ninebot-n3-lighting-ad-20260920/runtime-handoff.json
+    check_ids:
+      - ecommerce_ad_workflow_skill_tests
+      - ecommerce_production_job_tests
       - task_architecture_gate
   product_runtime_skill_boundary_test:
     patterns:

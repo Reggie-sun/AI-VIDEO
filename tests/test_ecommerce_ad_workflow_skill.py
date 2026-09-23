@@ -1459,3 +1459,27 @@ def test_internal_failure_is_exit_3_with_sanitized_stable_json(
         "status": "error",
     }
     assert "PRIVATE-INTERNAL-BODY" not in captured.out
+
+
+def test_ninebot_authoring_artifacts_bind_the_exact_runtime_handoff() -> None:
+    from ai_video.production.ecommerce_job_contracts import EcommerceProductionHandoff
+
+    artifact_root = ROOT / "artifacts" / "ninebot-n3-lighting-ad-20260920"
+    source_input = artifact_root / "ecommerce-input.json"
+    package_path = artifact_root / "ecommerce-package.json"
+    validated = _run_cli("package", package_path, source_input_path=source_input)
+    assert validated.returncode == 0, validated.stdout
+
+    package = _load_json(package_path)
+    handoff = EcommerceProductionHandoff.model_validate_json(
+        (artifact_root / "runtime-handoff.json").read_text(encoding="utf-8")
+    )
+    assert handoff.source_package_id == package["package_id"]
+    assert handoff.source_input_hash == package["source_input_hash"]
+    for filename, model in (
+        ("delivery-profile.json", handoff.delivery_profile),
+        ("visual-system-profile.json", handoff.visual_system_profile),
+        ("layout-plan.json", handoff.layout_plan),
+        ("compile-profile.json", handoff.compile_profile),
+    ):
+        assert model.model_dump(mode="json") == _load_json(artifact_root / filename)
