@@ -11,7 +11,10 @@ from ai_video.errors import AiVideoError
 from ai_video.production._caption_quality_p6 import CaptionReviewExecution
 from ai_video.production.caption_quality import reopen_caption_review_chain
 from ai_video.production.caption_quality_contracts import (
+    CAPTION_REQUIREMENT_GROUPS,
+    CaptionCoverageStatus,
     CaptionEvidencePayload,
+    CaptionFindingReasonCode,
     CaptionRequirementGroup,
 )
 from ai_video.production.ad_creative_types import AdCreativePlan, CompiledAdCreativeHandoff
@@ -66,21 +69,52 @@ def _caption_repair_frontier(project, pointer) -> EcommerceFinalReviewFrontier:
         )
         if reopened.verdict is not QaVerdict.FAIL:
             return EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
-        failed_groups = {
-            finding.requirement_group
+        findings = tuple(
+            finding
             for evidence in reopened.evidence
             for finding in CaptionEvidencePayload.model_validate(
                 dict(evidence.measured_payload)
             ).findings
-            if finding.verdict == "fail"
-        }
+        )
     except (AiVideoError, OSError, TypeError, ValueError):
         return EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
-    if failed_groups and failed_groups.issubset(
-        {
-            CaptionRequirementGroup.TIMING_CONTRACT,
-            CaptionRequirementGroup.LAYOUT_READABILITY,
+    if (
+        {finding.requirement_group for finding in findings}
+        != set(CAPTION_REQUIREMENT_GROUPS)
+        or any(
+            finding.verdict == "not_evaluated"
+            or finding.coverage_status is not CaptionCoverageStatus.COMPLETE
+            for finding in findings
+        )
+    ):
+        return EcommerceFinalReviewFrontier.EVIDENCE_REPAIR_REQUIRED
+    failed = tuple(finding for finding in findings if finding.verdict == "fail")
+    if any(
+        finding.reason_code
+        in {
+            CaptionFindingReasonCode.COVERAGE_PARTIAL,
+            CaptionFindingReasonCode.UNSUPPORTED_LANGUAGE_OR_TOOL,
+            CaptionFindingReasonCode.LOW_CONFIDENCE,
+            CaptionFindingReasonCode.IDENTITY_MISMATCH,
+            CaptionFindingReasonCode.CONFLICTING_EVIDENCE,
         }
+        for finding in failed
+    ) or any(
+        finding.requirement_group == passed.requirement_group
+        for finding in failed
+        for passed in findings
+        if passed.verdict == "pass"
+    ):
+        return EcommerceFinalReviewFrontier.EVIDENCE_REPAIR_REQUIRED
+    local_reasons = {
+        CaptionRequirementGroup.TIMING_CONTRACT:
+            CaptionFindingReasonCode.TIMING_OUT_OF_BOUNDS,
+        CaptionRequirementGroup.LAYOUT_READABILITY:
+            CaptionFindingReasonCode.LAYOUT_UNREADABLE,
+    }
+    if failed and all(
+        local_reasons.get(finding.requirement_group) is finding.reason_code
+        for finding in failed
     ):
         return EcommerceFinalReviewFrontier.PREPARE_COMPOSITION
     return EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED

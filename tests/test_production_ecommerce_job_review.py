@@ -241,6 +241,16 @@ def test_unattributed_layout_failure_requires_diagnosis_before_composition_repai
             CaptionFindingReasonCode.LAYOUT_UNREADABLE,
             EcommerceFinalReviewFrontier.PREPARE_COMPOSITION,
         ),
+        (
+            CaptionRequirementGroup.LAYOUT_READABILITY,
+            CaptionFindingReasonCode.CONFLICTING_EVIDENCE,
+            EcommerceFinalReviewFrontier.EVIDENCE_REPAIR_REQUIRED,
+        ),
+        (
+            CaptionRequirementGroup.TIMING_CONTRACT,
+            CaptionFindingReasonCode.UNINTENDED_TEXT_DETECTED,
+            EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED,
+        ),
     ),
 )
 def test_caption_failure_requires_exact_group_before_local_repair(
@@ -254,20 +264,7 @@ def test_caption_failure_requires_exact_group_before_local_repair(
     project = SimpleNamespace(
         manifest=SimpleNamespace(active_review_receipts=(pointer,))
     )
-    payload = CaptionEvidencePayload(
-        caption_policy_hash="a" * 64,
-        caption_context_hash="b" * 64,
-        findings=(
-            CaptionRequirementFinding(
-                requirement_group=group,
-                verdict="fail",
-                reason_code=reason,
-                raw_evidence_references=("exact-render",),
-                coverage_status=CaptionCoverageStatus.COMPLETE,
-                observation_fingerprint="c" * 64,
-            ),
-        ),
-    )
+    payload = _caption_payload(failed_group=group, failed_reason=reason)
     monkeypatch.setattr(
         "ai_video.production.ecommerce_job_review.load_production_project",
         lambda _path: project,
@@ -288,6 +285,92 @@ def test_caption_failure_requires_exact_group_before_local_repair(
     )
 
     assert inspect_ecommerce_review_frontier(tmp_path) is expected
+
+
+def _caption_payload(
+    *,
+    failed_group: CaptionRequirementGroup,
+    failed_reason: CaptionFindingReasonCode,
+    unevaluated_group: CaptionRequirementGroup | None = None,
+    omitted_group: CaptionRequirementGroup | None = None,
+) -> CaptionEvidencePayload:
+    findings = []
+    for group in CaptionRequirementGroup:
+        if group is omitted_group:
+            continue
+        verdict = (
+            "fail"
+            if group is failed_group
+            else "not_evaluated"
+            if group is unevaluated_group
+            else "pass"
+        )
+        findings.append(
+            CaptionRequirementFinding(
+                requirement_group=group,
+                verdict=verdict,
+                reason_code=(
+                    failed_reason
+                    if verdict == "fail"
+                    else CaptionFindingReasonCode.LOW_CONFIDENCE
+                    if verdict == "not_evaluated"
+                    else CaptionFindingReasonCode.REQUIREMENT_CONFIRMED
+                ),
+                raw_evidence_references=("exact-render",),
+                coverage_status=CaptionCoverageStatus.COMPLETE,
+                observation_fingerprint="c" * 64,
+            )
+        )
+    return CaptionEvidencePayload(
+        caption_policy_hash="a" * 64,
+        caption_context_hash="b" * 64,
+        findings=tuple(findings),
+    )
+
+
+@pytest.mark.parametrize(
+    ("unevaluated_group", "omitted_group"),
+    (
+        (CaptionRequirementGroup.UNINTENDED_TEXT, None),
+        (None, CaptionRequirementGroup.UNINTENDED_TEXT),
+    ),
+)
+def test_caption_failure_with_incomplete_required_evidence_repairs_evidence_first(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    unevaluated_group: CaptionRequirementGroup | None,
+    omitted_group: CaptionRequirementGroup | None,
+) -> None:
+    pointer = object()
+    payload = _caption_payload(
+        failed_group=CaptionRequirementGroup.TIMING_CONTRACT,
+        failed_reason=CaptionFindingReasonCode.TIMING_OUT_OF_BOUNDS,
+        unevaluated_group=unevaluated_group,
+        omitted_group=omitted_group,
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_review.load_production_project",
+        lambda _path: SimpleNamespace(
+            manifest=SimpleNamespace(active_review_receipts=(pointer,))
+        ),
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_review.load_review_receipt",
+        lambda _root, _pointer: SimpleNamespace(
+            verdict=QaVerdict.FAIL, layer=QaLayer.CAPTION
+        ),
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_review.reopen_caption_review_chain",
+        lambda **_kwargs: SimpleNamespace(
+            verdict=QaVerdict.FAIL,
+            evidence=(SimpleNamespace(measured_payload=payload.model_dump(mode="json")),),
+        ),
+    )
+
+    assert inspect_ecommerce_review_frontier(
+        tmp_path
+    ) is EcommerceFinalReviewFrontier.EVIDENCE_REPAIR_REQUIRED
 
 
 def test_persisted_not_evaluated_caption_evidence_is_not_blindly_rerun(
