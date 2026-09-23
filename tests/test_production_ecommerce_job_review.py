@@ -142,6 +142,49 @@ def test_plan_bound_cta_failure_cannot_use_composition_repair_frontier() -> None
     assert frontier is EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
 
 
+def test_review_execution_blocks_cta_repair_before_a_render_attempt(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    runtime_handoff, execution = _execution(
+        tmp_path,
+        policy=SimpleNamespace(caption_policy=None, required_layers=()),
+    )
+    pointer = object()
+    evidence_pointer = object()
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_review.validate_ecommerce_final_output_contract",
+        lambda *_args: None,
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_review.load_production_project",
+        lambda _path: SimpleNamespace(
+            manifest=SimpleNamespace(
+                final_acceptance_state=None,
+                active_review_receipts=(pointer,),
+            )
+        ),
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_review.load_review_receipt",
+        lambda _root, _pointer: SimpleNamespace(
+            verdict=QaVerdict.FAIL,
+            layer=QaLayer.SEMANTIC,
+            evidence=(evidence_pointer,),
+        ),
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_review.load_review_evidence",
+        lambda _root, _pointer: _semantic_evidence(
+            domain_verdict=QaVerdict.PASS, cta_verdict="fail"
+        ),
+    )
+
+    assert execution.inspect_frontier(
+        runtime_handoff, project_root=tmp_path
+    ) is EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
+
+
 @pytest.mark.parametrize(
     ("layer", "expected"),
     (

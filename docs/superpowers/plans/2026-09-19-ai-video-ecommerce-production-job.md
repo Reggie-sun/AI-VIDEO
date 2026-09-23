@@ -2,9 +2,9 @@
 
 ## Status
 
-M0–M7 offline deterministic implementation has a committed code checkpoint on local `main`（原 milestone range `cd6edd7..5f743ca`，后续修复 commits `6834cd0`、`8584bc4`）。Governing design：`docs/superpowers/specs/2026-09-19-ai-video-ecommerce-production-job.md`。
+M0–M7 offline deterministic implementation and later review repairs are committed on local `main` through `ee52f57`. Governing design：`docs/superpowers/specs/2026-09-19-ai-video-ecommerce-production-job.md`。Contracts、pure Skill-side exporter、canonical compiler/bootstrap、read-only projection/resume、bounded ordered Shot execution、composition/render、whole-video QC、delivery 与 offline tests 均有代码；当前 M7 final acceptance 仍开放。
 
-Contracts、pure Skill-side exporter、canonical artifact compiler / bootstrap adapter、read-only projection / resume、ordered Shot execution with bounded repair、composition / final render、whole-video QC / Final Acceptance / delivery bundle 与 offline E2E 均已实现，并有 milestone 级 offline 验证。`5f743ca` 的 exact-range Harness receipt（`.agent/harness/runs/ecommerce-production-job-m4-m7-final-20260919-05/receipt.json`）passed 且 closure_eligible；该 snapshot 的历史 Kimi review 无 P0/P1。后续 Native Codex review 找到三个 blocking candidates，已在 `6834cd0`、`8584bc4` 修复。新 exact-range Harness run（`.agent/harness/runs/ecommerce-production-job-m4-m7-followup-20260923-01/receipt.json`）因其他新增路径尚未进入 `.agent/harness/policy.yaml` 而在 `policy_audit_check` 失败；该文件当前有其他 writer 的 staged changes，等待 ownership / sequence 决定。新 snapshot 尚无 passing final receipt 或双独立 review，最终 closure 仍开放。详细证据见 `docs/record_for_agent/2026-09-19-ecommerce-production-job-m4.md` 至 `2026-09-19-ecommerce-production-job-m7-offline-code.md`。
+`b86052a` 的 exact-range Harness receipt（`.agent/harness/runs/ecommerce-production-job-review-repairs-20260923-01/receipt.json`）PASS 且 freshness/integrity/closure checks 为真。随后 Native review 发现 plan-bound CTA failure 被错误投影为 composition-only repair；`ee52f57` 已改为 fail-closed diagnosis，并保留 caption-only repair frontier。该后续 snapshot 的 exact Harness 与 final dual independent review 尚未完成；canonical two-Shot test 证明到 composition frontier，后续 final render/review/delivery 则由分层 owner tests 与 fake Job scenario 覆盖，尚无一条全 canonical 的跨阶段 E2E。详细证据见 `docs/record_for_agent/2026-09-19-ecommerce-production-job-m4.md` 至 `2026-09-19-ecommerce-production-job-m7-offline-code.md`。
 
 本文不授权 live Provider/media execution，也不改变 current Production、release 或 Final Acceptance truth；未运行真实 Provider submit、真实 render、Production activation 或人工观看验收。
 
@@ -428,7 +428,7 @@ Prove the application path against deterministic fakes and exact artifacts, then
 3. First Shot `NOT_EVALUATED` -> evidence repair -> re-evaluate without Provider resubmit.
 4. Second Shot known failure -> one repair -> full revalidation -> continue.
 5. Provider submit outcome unknown -> stop -> explicit recovery -> resume.
-6. Final caption/CTA failure -> composition-local repair -> re-render -> final review; accepted Shots unchanged.
+6. Final caption failure with a corrected, newly sealed composition revision -> composition-local repair -> re-render -> final review; accepted Shots unchanged. Plan-bound CTA text, position or color failure -> `BLOCKED` for explicit authoring handoff and immutable Project revision reconciliation; it must not be presented as a composition-only repair.
 7. Exact completed replay -> zero external effects and same bundle identity.
 
 ### Documentation
