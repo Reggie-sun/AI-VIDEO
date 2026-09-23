@@ -11,7 +11,7 @@ import production_project_factory as project_factory
 import pytest
 from ecommerce_job_factory import make_ecommerce_handoff
 from production_project_factory import make_composition_spec
-from test_production_ecommerce_job_assembly import _plan_and_handoff
+from test_production_ecommerce_job_assembly import _execution, _plan_and_handoff
 from test_production_ecommerce_post_media_e2e import _passing_payload
 from test_production_ecommerce_post_media_e2e import TOOL as REVIEW_TOOL
 from test_production_hyperframes import (
@@ -48,12 +48,16 @@ from ai_video.production.ecommerce_job_compiler import (
     bootstrap_ecommerce_production_project,
     compile_ecommerce_production_handoff,
 )
+from ai_video.production.ecommerce_job import EcommerceProductionJobService
 from ai_video.production.ecommerce_job_contracts import (
     EcommerceAssetRequirement,
+    EcommerceJobNextAction,
     EcommerceLayoutPlan,
     EcommerceProductionCompileProfile,
     EcommerceProductionHandoff,
+    EcommerceProductionJobRequest,
 )
+from ai_video.production.ecommerce_job_review import EcommerceDeliveryExecutionPlan
 from ai_video.production.ecommerce_media_acceptance import (
     create_qingyan_ecommerce_acceptance_profile,
 )
@@ -692,6 +696,71 @@ def test_exact_final_accepted_render_packages_without_production_mutation(
         if "secret" in key.lower() or "permit" in key.lower()
     }
     assert (tmp_path / "state/manifest.json").read_bytes() == manifest_before
+
+
+def test_real_job_projects_canonical_final_acceptance_to_delivery_and_exact_replay(
+    tmp_path: Path,
+) -> None:
+    _final_accepted_project(tmp_path)
+    handoff, plan, compiled, _ = _identities()
+    request = EcommerceProductionJobRequest(
+        schema_version="ecommerce-production-job-request/1",
+        job_id="job-delivery",
+        project_root=tmp_path.resolve(),
+        handoff_id=handoff.handoff_id,
+        expected_project_id="project-product-one",
+        execution_policy_id=handoff.compile_profile.profile_id,
+        delivery_profile_id=handoff.delivery_profile.profile_id,
+        max_new_generation_attempts=1,
+        max_repairs_per_shot=0,
+    )
+    composition = _execution(compiled, plan, tmp_path)
+    delivery = EcommerceDeliveryExecutionPlan(
+        delivery_root=tmp_path / "deliveries",
+        plan=plan,
+        compiled_handoff=compiled,
+        exported_at=EXPORTED_AT,
+        tool_identity=PACKAGER,
+    )
+    job = EcommerceProductionJobService()
+    before = (tmp_path / "state/manifest.json").read_bytes()
+
+    projected = job.inspect(
+        request,
+        handoff,
+        composition_execution=composition,
+        delivery_execution=delivery,
+    )
+    published = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.PACKAGE_DELIVERY,
+        composition_execution=composition,
+        delivery_execution=delivery,
+    )
+    bundle_before = {
+        path.relative_to(delivery.delivery_root): (path.read_bytes(), path.stat().st_mtime_ns)
+        for path in delivery.delivery_root.rglob("*")
+        if path.is_file()
+    }
+    replay = EcommerceProductionJobService().advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.PACKAGE_DELIVERY,
+        composition_execution=composition,
+        delivery_execution=delivery,
+    )
+
+    assert projected.next_action is EcommerceJobNextAction.PACKAGE_DELIVERY
+    assert published.next_action is EcommerceJobNextAction.COMPLETE
+    assert replay.next_action is EcommerceJobNextAction.COMPLETE
+    assert bundle_before
+    assert {
+        path.relative_to(delivery.delivery_root): (path.read_bytes(), path.stat().st_mtime_ns)
+        for path in delivery.delivery_root.rglob("*")
+        if path.is_file()
+    } == bundle_before
+    assert (tmp_path / "state/manifest.json").read_bytes() == before
 
 
 def test_nonaccepted_project_is_refused_without_bundle(tmp_path: Path) -> None:
