@@ -329,6 +329,28 @@ class EcommerceProductionJobService:
                     ),
                     manifest_revision=current.manifest_revision,
                 )
+            if (
+                expected_action is EcommerceJobNextAction.PREPARE_COMPOSITION
+                and assembly.next_action is EcommerceJobNextAction.REVIEW_FINAL
+            ):
+                reopened = self.inspect(
+                    request,
+                    handoff,
+                    **{**inspect_kwargs, "composition_execution": composition_execution},
+                )
+                if reopened.next_action is EcommerceJobNextAction.PREPARE_COMPOSITION:
+                    return self._blocked(
+                        request,
+                        blocker_code="ECOMMERCE_COMPOSITION_REPAIR_UNCHANGED",
+                        stage="composition",
+                        subject_id=request.job_id,
+                        failure_classification="WHOLE_VIDEO_FAILURE",
+                        required_action=(
+                            "Change the diagnosed composition inputs before re-rendering."
+                        ),
+                        manifest_revision=reopened.manifest_revision,
+                    )
+                return reopened
             return self._projection(
                 request,
                 next_action=assembly.next_action,

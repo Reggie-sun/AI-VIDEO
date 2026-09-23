@@ -33,7 +33,10 @@ from ai_video.production.models import (
     ReviewLifecycle,
     ToolIdentity,
 )
-from ai_video.production.paths import _read_regular_file_nofollow
+from ai_video.production.paths import (
+    _open_regular_file_nofollow,
+    _read_regular_file_nofollow,
+)
 from ai_video.production.project import (
     load_final_acceptance_receipt,
     load_production_project,
@@ -500,12 +503,37 @@ def _verify_bundle(
     expected = {"bundle.json", "final.mp4", "lineage.json"}
     if {item.name for item in bundle_path.iterdir()} != expected:
         raise _invalid("Delivery bundle inventory is incomplete or contains extras.")
-    if (bundle_path / "lineage.json").read_bytes() != lineage_payload:
+    try:
+        lineage = _read_regular_file_nofollow(
+            bundle_path / "lineage.json", contained_by=bundle_path
+        )
+        inventory = _read_regular_file_nofollow(
+            bundle_path / "bundle.json", contained_by=bundle_path
+        )
+        if lineage.link_count != 1 or inventory.link_count != 1:
+            raise ValueError("Delivery bundle metadata must own its bytes.")
+        digest = hashlib.sha256()
+        size = 0
+        with _open_regular_file_nofollow(
+            bundle_path / "final.mp4", contained_by=bundle_path
+        ) as (descriptor, opened):
+            if opened.st_nlink != 1:
+                raise ValueError("Delivery media must own its bytes.")
+            while chunk := os.read(descriptor, 1024 * 1024):
+                digest.update(chunk)
+                size += len(chunk)
+            final = os.fstat(descriptor)
+            if final.st_nlink != 1 or final.st_size != size:
+                raise ValueError("Delivery media changed during verification.")
+    except (OSError, ValueError) as exc:
+        raise _invalid(
+            "Delivery bundle entries must be independent regular files.", detail=str(exc)
+        ) from exc
+    if lineage.data != lineage_payload:
         raise _invalid("Delivery lineage bytes do not match the accepted render.")
-    if (bundle_path / "bundle.json").read_bytes() != bundle_payload:
+    if inventory.data != bundle_payload:
         raise _invalid("Delivery inventory bytes are invalid.")
-    actual_hash, actual_size = _file_identity(bundle_path / "final.mp4")
-    if actual_hash != source_hash or actual_size != source_size:
+    if digest.hexdigest() != source_hash or size != source_size:
         raise _invalid("Delivery media bytes do not match the accepted render.")
 
 

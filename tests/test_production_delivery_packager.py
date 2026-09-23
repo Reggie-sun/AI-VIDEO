@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+import os
 from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
@@ -35,7 +36,10 @@ from ai_video.production.dependency import (
     desired_fingerprints,
     resolve_dependency_state,
 )
-from ai_video.production.delivery_packager import package_ecommerce_delivery
+from ai_video.production.delivery_packager import (
+    inspect_ecommerce_delivery,
+    package_ecommerce_delivery,
+)
 from ai_video.production.domain_acceptance import DomainAcceptancePolicy
 from ai_video.production.ecommerce_ad_coordinator import (
     close_ecommerce_post_media_candidate,
@@ -794,6 +798,30 @@ def test_exact_package_replay_reuses_same_bundle_without_copy(
     )
 
     assert replay == first
+
+
+@pytest.mark.parametrize("link_kind", ("symlink", "hardlink"))
+def test_existing_bundle_linked_media_is_refused_on_inspect_and_replay(
+    tmp_path: Path,
+    link_kind: str,
+) -> None:
+    _final_accepted_project(tmp_path)
+    kwargs = _package_kwargs(tmp_path)
+    first = package_ecommerce_delivery(**kwargs)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    assert loaded.render_state is not None
+    source = tmp_path / loaded.render_state.output.path
+    published = first.bundle_path / "final.mp4"
+    published.unlink()
+    if link_kind == "symlink":
+        published.symlink_to(source)
+    else:
+        os.link(source, published)
+
+    with pytest.raises(AiVideoError, match="regular file"):
+        inspect_ecommerce_delivery(**kwargs)
+    with pytest.raises(AiVideoError, match="regular file"):
+        package_ecommerce_delivery(**kwargs)
 
 
 def test_unbound_handoff_is_refused_before_delivery_directory_creation(

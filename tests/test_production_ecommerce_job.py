@@ -1391,6 +1391,60 @@ def test_prepare_composition_is_pure_and_projects_exact_render(
     assert execution.rendered == []
 
 
+def test_prepare_composition_rejects_unchanged_render_after_final_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    handoff = _runtime_handoff_without_external_assets()
+    request = _request(tmp_path, handoff)
+    execution = _FakeCompositionExecution(state="active")
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.advance_ecommerce_job_assembly",
+        lambda *_args, **_kwargs: EcommerceAssemblyDecision(
+            EcommerceJobNextAction.REVIEW_FINAL
+        ),
+    )
+
+    job = _FinalJob()
+    job.state = EcommerceFinalReviewFrontier.PREPARE_COMPOSITION.value
+    result = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.PREPARE_COMPOSITION,
+        composition_execution=execution,
+    )
+
+    assert result.next_action is EcommerceJobNextAction.BLOCKED
+    assert result.blocker is not None
+    assert result.blocker.blocker_code == "ECOMMERCE_COMPOSITION_REPAIR_UNCHANGED"
+    assert execution.rendered == []
+
+
+def test_prepare_composition_reuses_active_render_without_final_failure(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    handoff = _runtime_handoff_without_external_assets()
+    request = _request(tmp_path, handoff)
+    execution = _FakeCompositionExecution(state="active")
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.advance_ecommerce_job_assembly",
+        lambda *_args, **_kwargs: EcommerceAssemblyDecision(
+            EcommerceJobNextAction.REVIEW_FINAL
+        ),
+    )
+
+    result = _CompositionJob().advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.PREPARE_COMPOSITION,
+        composition_execution=execution,
+    )
+
+    assert result.next_action is EcommerceJobNextAction.REVIEW_FINAL
+    assert execution.rendered == []
+
+
 def test_render_final_invokes_once_and_exact_replay_has_no_effect(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
