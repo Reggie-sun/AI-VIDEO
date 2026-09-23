@@ -9,6 +9,37 @@ evidence_index_version: "1"
 
 Date: 2026-09-19
 
+## Supersession Notice — 2026-09-24
+
+本记录下方 `5f743ca` 与后续 snapshot 的 Harness / review 状态均为各自当时的历史
+证据，不代表当前 `main` 的 M7 验收。当前任务代码 checkpoint 是 `b404e91`：
+`9b739c7` 让 Job 在预检中识别持久化 Final Review 失败和 `NOT_EVALUATED`，
+`a6fad2e` 增加真实 Job 对 canonical Final Acceptance → delivery → exact replay 的
+测试，`481c2a5` 收紧 CAPTION 局部修复的失败原因和缺失证据路由。`481c2a5` 的
+两份独立只读审查均复现：CAPTION 总裁决 `FAIL` 会遮住其他必需组因 cue 覆盖或工具
+授权不足而产生的 `NOT_EVALUATED`，Job 仅看 raw findings 会错误投影重合成。
+`b404e91` 在 P6 唯一 adjudicator 中暴露同一次裁决的 per-group verdict 和已授权
+findings，Job 只消费这份 canonical 结果；不建立第二套 QA 或 activation truth。
+
+修复先有失败回归，再通过 `.venv/bin/python -m pytest -q`
+`tests/test_production_ecommerce_job.py`、`tests/test_production_caption_quality.py`、
+`tests/test_production_ecommerce_job_review.py`、
+`tests/test_production_ecommerce_job_projection.py`，结果 `74 passed`。针对
+`481c2a5` 的 Harness run
+`.agent/harness/runs/ecommerce-production-job-final-481c2a5-20260924-01/receipt.json`
+在所有 checks 执行时工作区 HEAD 已推进，`workspace_stable_confirmed=false`，
+整体 `status=failed`；不得把其各子项通过当成当前 fresh closure。`b404e91`
+之后的 final exact-range Harness 与同快照双审在本记录写入时尚未完成。
+
+M0–M6 code 与部分 M7 offline scenarios 已实现；M7 full canonical cross-stage E2E
+仍未通过。现有真实双 Shot Job 测试止于 `PREPARE_COMPOSITION`，而已有 delivery
+集成测试从另一个已 Final Accepted Project 开始。前者的 generated-video fixture
+为 64×64、1 秒，封存 Shot / delivery 需要 3 秒、1080×1920。离线合成的临时
+9:16 MP4 可以满足媒体事实，但还须使真实 creative projection、产品图层、音频、
+P6 与 delivery identity 在同一 Project 串联；不能用 scripted projection、fake
+metadata 或拆开的 owner tests 冒充该 E2E。当前没有 remote/paid Provider submit、
+真实产品媒体生成、Production activation、人工视觉验收、push 或 release。
+
 ## Supersession Notice — 2026-09-23
 
 下文关于 `5f743ca` 的 final Harness PASS 与 Kimi review 仅是该旧 snapshot 的历史证据，
