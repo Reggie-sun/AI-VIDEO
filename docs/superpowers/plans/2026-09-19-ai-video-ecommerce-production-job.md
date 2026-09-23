@@ -2,9 +2,9 @@
 
 ## Status
 
-M0–M7 offline deterministic implementation and later review repairs are committed on local `main` through `ee52f57`. Governing design：`docs/superpowers/specs/2026-09-19-ai-video-ecommerce-production-job.md`。Contracts、pure Skill-side exporter、canonical compiler/bootstrap、read-only projection/resume、bounded ordered Shot execution、composition/render、whole-video QC、delivery 与 offline tests 均有代码；当前 M7 final acceptance 仍开放。
+M0–M6 implementation and M7 partial offline scenarios are committed on local `main` through `a6fad2e`. Governing design：`docs/superpowers/specs/2026-09-19-ai-video-ecommerce-production-job.md`。Contracts、pure Skill-side exporter、canonical compiler/bootstrap、read-only projection/resume、bounded ordered Shot execution、composition/render、whole-video QC、delivery 与 offline tests 均有代码；M7 full canonical cross-stage E2E and final acceptance remain open.
 
-`b86052a` 的 exact-range Harness receipt（`.agent/harness/runs/ecommerce-production-job-review-repairs-20260923-01/receipt.json`）PASS 且 freshness/integrity/closure checks 为真。随后 Native review 发现 plan-bound CTA failure 被错误投影为 composition-only repair；`ee52f57` 已改为 fail-closed diagnosis，并保留 caption-only repair frontier。该后续 snapshot 的 exact Harness 与 final dual independent review 尚未完成；canonical two-Shot test 证明到 composition frontier，后续 final render/review/delivery 则由分层 owner tests 与 fake Job scenario 覆盖，尚无一条全 canonical 的跨阶段 E2E。详细证据见 `docs/record_for_agent/2026-09-19-ecommerce-production-job-m4.md` 至 `2026-09-19-ecommerce-production-job-m7-offline-code.md`。
+`c24ef92` 的 exact-range Harness receipt（`.agent/harness/runs/ecommerce-production-job-cta-repair-20260924-01/receipt.json`）PASS 且 freshness/integrity/closure checks 为真。其后 dual independent review 发现 final failure 可在 Job pre-inspect 跳过、CAPTION `NOT_EVALUATED` 会盲目重开、CAPTION `UNINTENDED_TEXT` 被误认为局部合成修复；`9b739c7` 已使这些情况 fail closed，并以 focused 和 owner-level tests 验证。`a6fad2e` 增加真实 Job 对 canonical Final Acceptance → delivery → exact replay 的集成测试。最终 snapshot 的 exact Harness 与重审仍待执行；canonical 双 Shot test 只到 composition frontier，尚无一条贯通 generation、render、review、delivery 和 caption repair 的全 canonical E2E。现有生成测试 fixture 是 64×64 MP4，封存 Ecommerce delivery profile 为 1080×1920；`resolve_composition` 严格拒绝尺寸不符。补齐测试需要与 9:16 profile 一致的 exact offline media fixture，不能伪造 metadata 或把不匹配素材当作合格成片。详细证据见 `docs/record_for_agent/2026-09-19-ecommerce-production-job-m4.md` 至 `2026-09-19-ecommerce-production-job-m7-offline-code.md`。
 
 本文不授权 live Provider/media execution，也不改变 current Production、release 或 Final Acceptance truth；未运行真实 Provider submit、真实 render、Production activation 或人工观看验收。
 
@@ -428,7 +428,7 @@ Prove the application path against deterministic fakes and exact artifacts, then
 3. First Shot `NOT_EVALUATED` -> evidence repair -> re-evaluate without Provider resubmit.
 4. Second Shot known failure -> one repair -> full revalidation -> continue.
 5. Provider submit outcome unknown -> stop -> explicit recovery -> resume.
-6. Final caption failure with a corrected, newly sealed composition revision -> composition-local repair -> re-render -> final review; accepted Shots unchanged. Plan-bound CTA text, position or color failure -> `BLOCKED` for explicit authoring handoff and immutable Project revision reconciliation; it must not be presented as a composition-only repair.
+6. Final CAPTION failure whose exact evidence identifies cue timing or layout readability, with a corrected, newly sealed composition revision -> composition-local repair -> re-render -> final review; accepted Shots unchanged. CAPTION `UNINTENDED_TEXT` and plan-bound CTA text, position or color failure -> `BLOCKED` for diagnosis and, where plan-bound, explicit authoring handoff plus immutable Project revision reconciliation; they must not be presented as composition-only repair. Persisted CAPTION `NOT_EVALUATED` requires evidence repair through the canonical review owner before retry.
 7. Exact completed replay -> zero external effects and same bundle identity.
 
 ### Documentation
