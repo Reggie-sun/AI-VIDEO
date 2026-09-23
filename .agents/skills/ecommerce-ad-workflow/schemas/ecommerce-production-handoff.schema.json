@@ -3159,6 +3159,17 @@
         },
         "visual_strategy": {
           "$ref": "#/$defs/VisualStrategy"
+        },
+        "voice_routing": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/VoiceRoutingRequirement"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         }
       },
       "required": [
@@ -3459,6 +3470,16 @@
       "title": "VisualStrategy",
       "type": "string"
     },
+    "VoiceMode": {
+      "enum": [
+        "auto",
+        "native_required",
+        "separate_required",
+        "no_voice"
+      ],
+      "title": "VoiceMode",
+      "type": "string"
+    },
     "VoiceProfile": {
       "additionalProperties": false,
       "properties": {
@@ -3481,6 +3502,111 @@
         "voice_hint"
       ],
       "title": "VoiceProfile",
+      "type": "object"
+    },
+    "VoiceRoutingRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "contract_version": {
+          "const": "voice-routing/1",
+          "default": "voice-routing/1",
+          "title": "Contract Version",
+          "type": "string"
+        },
+        "mode": {
+          "$ref": "#/$defs/VoiceMode",
+          "default": "auto"
+        },
+        "native_sound_required": {
+          "default": false,
+          "title": "Native Sound Required",
+          "type": "boolean"
+        },
+        "speakers": {
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/VoiceSpeakerRequirement"
+          },
+          "title": "Speakers",
+          "type": "array"
+        }
+      },
+      "title": "VoiceRoutingRequirement",
+      "type": "object"
+    },
+    "VoiceSpeakerRequirement": {
+      "additionalProperties": false,
+      "properties": {
+        "consistency": {
+          "default": "single_shot",
+          "enum": [
+            "single_shot",
+            "cross_shot_fixed"
+          ],
+          "title": "Consistency",
+          "type": "string"
+        },
+        "language": {
+          "pattern": "^[a-z]{2,3}(?:-[A-Z][a-z]{3})?(?:-(?:[A-Z]{2}|[0-9]{3}))?(?:-(?:[A-Za-z0-9]{5,8}|[0-9][A-Za-z0-9]{3}))*$",
+          "title": "Language",
+          "type": "string"
+        },
+        "reference_asset_id": {
+          "anyOf": [
+            {
+              "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,255}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference Asset Id"
+        },
+        "reference_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Reference Sha256"
+        },
+        "script_text": {
+          "minLength": 1,
+          "title": "Script Text",
+          "type": "string"
+        },
+        "speaker_id": {
+          "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,255}$",
+          "title": "Speaker Id",
+          "type": "string"
+        },
+        "voice_id": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Voice Id"
+        }
+      },
+      "required": [
+        "speaker_id",
+        "language",
+        "script_text"
+      ],
+      "title": "VoiceSpeakerRequirement",
       "type": "object"
     }
   },
