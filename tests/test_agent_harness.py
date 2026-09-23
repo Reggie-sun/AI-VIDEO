@@ -2043,6 +2043,9 @@ def test_inspection_falls_back_to_full_tests_and_task_architecture_gate() -> Non
         ("package-lock.json", "renderer_toolchain"),
         ("pyproject.toml", "python_toolchain"),
         ("tests/fixtures/generated_video/fake-video.mp4", "production_video_provider"),
+        ("tests/fixtures/ecommerce_job/vertical-3s.mp4", "ecommerce_production_job"),
+        ("tests/fixtures/ecommerce_job/vertical-6s-audio.mp4", "ecommerce_production_job"),
+        ("tests/production_ecommerce_job_render_support.py", "ecommerce_production_job"),
         (
             "tests/fixtures/hyperframes/silent_image/timeline.json",
             "production_composition_audio",
