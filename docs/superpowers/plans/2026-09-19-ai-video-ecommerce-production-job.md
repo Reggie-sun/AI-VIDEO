@@ -2,9 +2,9 @@
 
 ## Status
 
-M0–M7 offline deterministic implementation complete on local `main`（exact range `cd6edd7..5f743ca`）。Governing design：`docs/superpowers/specs/2026-09-19-ai-video-ecommerce-production-job.md`。
+M0–M7 offline deterministic implementation has a committed code checkpoint on local `main`（原 milestone range `cd6edd7..5f743ca`，后续修复 commits `6834cd0`、`8584bc4`）。Governing design：`docs/superpowers/specs/2026-09-19-ai-video-ecommerce-production-job.md`。
 
-Contracts、pure Skill-side exporter、canonical artifact compiler / bootstrap adapter、read-only projection / resume、ordered Shot execution with bounded repair、composition / final render、whole-video QC / Final Acceptance / delivery bundle 与 offline E2E 均已实现并通过 milestone 级验证；fresh exact-range Harness receipt（`.agent/harness/runs/ecommerce-production-job-m4-m7-final-20260919-05/receipt.json`）passed 且 closure_eligible；Kimi 独立 review 无 P0/P1（4 个 P2 follow-up 见 record）。Native Codex 半数 dual review 因额度未执行，最终 closure 仍开放；任何对 M4–M7 文件的后续修复都会使现有 review 失效。详细证据见 `docs/record_for_agent/2026-09-19-ecommerce-production-job-m4.md` 至 `2026-09-19-ecommerce-production-job-m7-offline-code.md`。
+Contracts、pure Skill-side exporter、canonical artifact compiler / bootstrap adapter、read-only projection / resume、ordered Shot execution with bounded repair、composition / final render、whole-video QC / Final Acceptance / delivery bundle 与 offline E2E 均已实现，并有 milestone 级 offline 验证。`5f743ca` 的 exact-range Harness receipt（`.agent/harness/runs/ecommerce-production-job-m4-m7-final-20260919-05/receipt.json`）passed 且 closure_eligible；该 snapshot 的历史 Kimi review 无 P0/P1。后续 Native Codex review 找到三个 blocking candidates，已在 `6834cd0`、`8584bc4` 修复。新 exact-range Harness run（`.agent/harness/runs/ecommerce-production-job-m4-m7-followup-20260923-01/receipt.json`）因其他新增路径尚未进入 `.agent/harness/policy.yaml` 而在 `policy_audit_check` 失败；该文件当前有其他 writer 的 staged changes，等待 ownership / sequence 决定。新 snapshot 尚无 passing final receipt 或双独立 review，最终 closure 仍开放。详细证据见 `docs/record_for_agent/2026-09-19-ecommerce-production-job-m4.md` 至 `2026-09-19-ecommerce-production-job-m7-offline-code.md`。
 
 本文不授权 live Provider/media execution，也不改变 current Production、release 或 Final Acceptance truth；未运行真实 Provider submit、真实 render、Production activation 或人工观看验收。
 

@@ -9,6 +9,32 @@ evidence_index_version: "1"
 
 Date: 2026-09-19
 
+## Supersession Notice — 2026-09-23
+
+下文关于 `5f743ca` 的 final Harness PASS 与 Kimi review 仅是该旧 snapshot 的历史证据，
+不代表后续修复已经通过 final closure。Native Codex 对 `5f743ca` 的独立审查发现三个
+blocking candidates：修复额度耗尽仍投影修复动作、重复 `NOT_EVALUATED` 证据导致
+Manifest 卡在 `INTENT`、以及旧 attempt / Gate evidence 可驱动新的 media repair。
+代码修复分别提交为 `6834cd049bdb0b357ce15bebdca94574cfdccc8d` 和
+`8584bc4d7e5ad4f947eb54b2f52b2f8a27049307`；原审查结论不能转用于新 snapshot。
+
+修复后 `tests/test_production_ecommerce_job.py` 全模块 `40 passed`，
+`tests/test_production_generated_video_e2e.py` 为 `49 passed`。更广的 Ecommerce
+focused suite 曾得 `111 passed`，但运行早于最后一项零额度投影修复；随后已单独重跑
+Job 模块。exact range `86e39fe..8584bc4` 的 Harness inspection 确认本任务只有五个
+changed paths、`closure_eligible=true`，但 run
+`.agent/harness/runs/ecommerce-production-job-m4-m7-followup-20260923-01/receipt.json`
+在 `policy_audit_check` 失败，后续 checks 被跳过。全仓 policy audit 报告七个其他
+voice / runtime-repair 文件缺少 mapping，其中三个 test 缺少 check 引用；修复需要
+修改当前由其他 writer staged 的 `.agent/harness/policy.yaml`，本轮未触碰该文件。
+因此新 snapshot 没有 fresh passing Harness receipt，M4–M7 最终 closure 仍被阻断。
+新的 Kimi deep review 对旧 snapshot 的执行结果为 `OUTCOME_UNKNOWN`（上游 502），
+不构成 review verdict；修复后的 snapshot 尚未完成所需独立审查。
+
+本轮只有 offline code、tests 和本记录；没有 remote/paid Provider submit、媒体生成、
+真实 Production activation、人工视觉验收、push 或 release。现有 unrelated staged / dirty
+work 保留；独立 RAG index 未刷新。
+
 ## Continuation — Final Harness Receipt And Kimi Independent Review
 
 Date: 2026-09-20
