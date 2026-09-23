@@ -854,7 +854,9 @@ def _verify_commercial_capture_checkpoint(
     ):
         raise _invalid("Commercial capture checkpoint is incomplete.")
     try:
-        from ai_video.production.project import load_qa_policy
+        from ai_video.production.ecommerce_generation_bridge import (
+            load_frozen_commercial_qa_policy,
+        )
 
         intent = load_commercial_shot_evaluation_intent(bundle.root, evaluation.intent)
         evidence = load_generated_commercial_shot_evidence(
@@ -862,7 +864,9 @@ def _verify_commercial_capture_checkpoint(
         )
         probe = load_video_probe_receipt(bundle.root, evaluation.probe)
         provenance = load_video_provenance_receipt(bundle.root, evaluation.provenance)
-        policy = load_qa_policy(bundle.root, bundle.manifest.active_qa_policy)
+        policy = load_frozen_commercial_qa_policy(
+            bundle.root, intent.qa_policy_content_hash
+        )
         evaluation_bundle = bundle.model_copy(update={"qa_policy": policy})
         approval = bound_commercial_source_approval(
             evaluation_bundle,
@@ -900,10 +904,7 @@ def verify_video_evidence(
     request_owners: list[str] = []
     for state in states:
         request = load_video_request_receipt(root, state.request)
-        verify_generation_feedback(
-            root, state, request,
-            qa_policy=None if bundle is None else bundle.qa_policy,
-        )
+        verify_generation_feedback(root, state, request)
         if (
             (
                 request.commercial_binding is not None

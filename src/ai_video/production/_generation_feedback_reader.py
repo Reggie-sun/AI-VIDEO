@@ -165,7 +165,7 @@ def load_qualification_execution_binding(
 
 
 
-def verify_generation_feedback(root, state, request, *, qa_policy=None):
+def verify_generation_feedback(root, state, request):
     for pointer, loader, label in (
         (state.execution_binding, load_generation_execution_binding, "Generation"),
         (state.qualification_binding, load_qualification_execution_binding, "Qualification"),
@@ -186,15 +186,18 @@ def verify_generation_feedback(root, state, request, *, qa_policy=None):
             from ai_video.production.ecommerce_generation_bridge import (
                 validate_commercial_failure_evaluation_source,
             )
+            from ai_video.production.project import load_qa_policy
 
-            if len(tagged) != 1 or qa_policy is None:
+            if len(tagged) != 1 or tagged[0].commercial_qa_policy is None:
                 raise _invalid("Commercial generation source has no exact QA checkpoint.")
             try:
+                frozen_policy = load_qa_policy(root, tagged[0].commercial_qa_policy)
                 validate_commercial_failure_evaluation_source(
                     root=root,
                     state=state,
                     request=request,
-                    qa_policy=qa_policy,
+                    qa_policy=frozen_policy,
+                    qa_policy_pointer=tagged[0].commercial_qa_policy,
                     acceptance=experience.candidate.recipe.acceptance_policy,
                     source=tagged[0],
                 )
@@ -253,6 +256,10 @@ def verify_generation_feedback(root, state, request, *, qa_policy=None):
         or not experience.evaluation_sources
         or any(
             source.qa_policy_content_hash != receipt.qa_policy_content_hash
+            or (
+                source.commercial_qa_policy is not None
+                and source.commercial_qa_policy != receipt.qa_policy
+            )
             for source in experience.evaluation_sources
         )
         or tuple(

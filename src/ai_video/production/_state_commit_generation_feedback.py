@@ -133,6 +133,7 @@ class _StateCommitGenerationFeedbackMixin:
                                 state=state,
                                 request=request,
                                 qa_policy=loaded.qa_policy,
+                                qa_policy_pointer=loaded.manifest.active_qa_policy,
                                 acceptance=candidate.recipe.acceptance_policy,
                                 source=tagged[0],
                             )

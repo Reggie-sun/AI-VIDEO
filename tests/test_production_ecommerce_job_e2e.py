@@ -758,6 +758,24 @@ def _activate_commercial_generation_policy(
     )
 
 
+def _revise_selected_qa(root: Path) -> None:
+    loaded = load_production_project(root / "project.yaml")
+    policy = loaded.qa_policy
+    assert policy is not None
+    revised = seal_artifact(policy.model_copy(update={
+        "revision": policy.revision + 1,
+        "policy_version": policy.policy_version + "-later",
+        "creation_receipt_id": policy.creation_receipt_id + "-later",
+        "content_hash": "0" * 64,
+    }))
+    ProductionStateCommitter(root).activate_qa_policy(
+        revised,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id="later-commercial-generation-qa-policy",
+    )
+    assert load_production_project(root / "project.yaml").qa_policy == revised
+
+
 @pytest.mark.parametrize(
     "first_verdict",
     (QaVerdict.PASS, QaVerdict.NOT_EVALUATED, QaVerdict.FAIL),
@@ -840,6 +858,12 @@ def test_canonical_two_shot_job_closes_offline_and_replays_without_effect(
             root=tmp_path,
             attempt_id=execution.attempt_id,
         )
+        with pytest.raises(ValueError, match="frozen QA pointer"):
+            GenerationEvaluationSource.model_validate(
+                source.model_copy(update={"commercial_qa_policy": None}).model_dump(
+                    mode="python"
+                )
+            )
         for altered in (
             source.model_copy(
                 update={"commercial_evidence_content_hash": "0" * 64}
@@ -979,7 +1003,7 @@ def test_canonical_two_shot_job_closes_offline_and_replays_without_effect(
         )
         assert mismatched.next_action is EcommerceJobNextAction.BLOCKED
         assert mismatched.blocker is not None
-        assert mismatched.blocker.blocker_code == "ECOMMERCE_SHOT_REPAIR_EVIDENCE_MISMATCH"
+        assert mismatched.blocker.blocker_code == "ECOMMERCE_SHOT_REPAIR_EVIDENCE_MISMATCH", mismatched.blocker
         assert provider.submit_calls == 1
         wrong_intervention = replace(
             repaired_input.repair_context,
@@ -1190,6 +1214,60 @@ def test_canonical_two_shot_job_closes_offline_and_replays_without_effect(
         for path in delivery.delivery_root.rglob("*")
         if path.is_file()
     } == files_before
+    if first_verdict is QaVerdict.FAIL:
+        _revise_selected_qa(tmp_path)
+
+
+def test_unclosed_commercial_failure_reopens_after_later_qa_revision(
+    tmp_path: Path,
+) -> None:
+    handoff, plan, compiled = _handoff_and_compiled()
+    request = _request(tmp_path, handoff, attempts=2)
+    _bootstrap(tmp_path, handoff, compiled.composition_spec)
+    _activate_commercial_generation_policy(tmp_path)
+    execution, provider = _real_input(
+        root=tmp_path,
+        execution=SimpleNamespace(handoff=compiled),
+        shot_id="shot-proof",
+        composition_spec=compiled.composition_spec,
+        output=OUTPUT,
+        artifact_bytes=VIDEO.read_bytes(),
+        use_current_generation_acceptance=True,
+        commercial_requirement_ids=(
+            "shot.identity.main_character", "shot.motion.required"
+        ),
+        authored_commercial_prompt=True,
+    )
+    shots = EcommerceShotExecutionPlan(
+        handoff=compiled,
+        plan=plan,
+        shots=(replace(
+            execution,
+            commercial_reviewer=_CountingCommercialShotReviewer(
+                verdict=QaVerdict.FAIL
+            ),
+        ),),
+    )
+    assert EcommerceProductionJobService().advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.GENERATE_SHOT,
+        shot_execution=shots,
+    ).next_action is EcommerceJobNextAction.REPAIR_SHOT_MEDIA
+    from ai_video.production.ecommerce_generation_bridge import (
+        commercial_failure_evaluation_source,
+    )
+
+    record_attempt_evaluation(
+        committer=ProductionStateCommitter(tmp_path),
+        attempt_id=execution.attempt_id,
+        evaluation_sources=(commercial_failure_evaluation_source(
+            root=tmp_path,
+            attempt_id=execution.attempt_id,
+        ),),
+    )
+    assert provider.submit_calls == 1
+    _revise_selected_qa(tmp_path)
 
 
 def test_unknown_local_submit_remains_stopped_after_explicit_recovery_without_proof(
@@ -1273,7 +1351,10 @@ def test_commercial_failure_without_frozen_generation_mapping_stops(
         expected_action=EcommerceJobNextAction.GENERATE_SHOT,
         shot_execution=shots,
     )
-    assert stopped.next_action is EcommerceJobNextAction.REPAIR_SHOT_MEDIA
+    assert stopped.next_action is EcommerceJobNextAction.BLOCKED
+    assert stopped.blocker is not None
+    assert stopped.blocker.blocker_code == "ECOMMERCE_COMMERCIAL_REPAIR_QA_UNMAPPED"
+    assert "QA" in stopped.blocker.required_action
     from ai_video.production.ecommerce_generation_bridge import (
         commercial_failure_evaluation_source,
     )
@@ -1284,9 +1365,10 @@ def test_commercial_failure_without_frozen_generation_mapping_stops(
             attempt_id=execution.attempt_id,
         )
     assert provider.submit_calls == 1
-    assert job.inspect(request, handoff, shot_execution=shots).next_action is (
-        EcommerceJobNextAction.REPAIR_SHOT_MEDIA
-    )
+    reopened = job.inspect(request, handoff, shot_execution=shots)
+    assert reopened.next_action is EcommerceJobNextAction.BLOCKED
+    assert reopened.blocker is not None
+    assert reopened.blocker.blocker_code == "ECOMMERCE_COMMERCIAL_REPAIR_QA_UNMAPPED"
 
 
 def test_commercial_failure_abandonment_cannot_authorize_media_repair(

@@ -434,15 +434,17 @@ Ecommerce Job contract suite；`tests/test_ecommerce_ad_workflow_skill.py`
 ### Ecommerce Commercial Failure Projection
 
 `ecommerce_generation_bridge.py` 只读投影原始 `GeneratedCommercialShotEvidence`，保留其
-content hash、exact fetched MP4、request、QA policy、evaluator、verdict 和 rationale；
+content hash、exact fetched MP4、request、evaluation-time `QaPolicyPointer`、evaluator、verdict 和 rationale；
 `_state_commit_generation_feedback.py` 与 `_generation_feedback_reader.py` 在写入和重开时
-共同验证该投影。只有 submit 前已封存的 generation QA 含对应 raw-generation criterion、
+共同验证该投影，历史 source 由原始 pointer 重开，已激活的商业 PASS 由原始 intent 的
+policy hash 重开 canonical QA artifact，不误用后来激活的 policy。只有 submit 前已封存的 generation QA 含对应 raw-generation criterion、
 proof 和 evaluator authority，且 compiled request 真正表达批准的 Shot intent，商业 `FAIL`
 才可进入既有 `GenerationFeedback` / Router。唯一拒绝写入仍由
 `ProductionStateCommitter.reject_video_generation()` 完成；`ecommerce_job_repair.py`
 要求完整 `/1` rejection、同一原始商业证据、匹配的 diagnosis / intervention 与新 attempt
 identity。未映射商业要求、晚改 QA、伪造技术 `FAIL`、caller 手添 evidence hash 或
-`abandon_video_generation()` 均不得授权新 submit。Focused verification：
+`abandon_video_generation()` 均不得授权新 submit；缺少映射时 Job 明确阻断并要求
+authoring/QA revision。Focused verification：
 `python -m pytest -p no:cacheprovider tests/test_production_ecommerce_job_e2e.py
 tests/test_production_ecommerce_job.py tests/test_generation_feedback.py
 tests/test_generation_evaluation.py tests/test_generation_quality_rejection.py

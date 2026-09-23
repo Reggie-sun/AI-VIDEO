@@ -348,7 +348,6 @@ def canonical_attempt_identity(
 def commercial_media_repair_is_exact(
     root: Path,
     *,
-    loaded: Any,
     prior_attempt: Any,
     context: EcommerceShotRepairContext,
     execution_binding: Any,
@@ -369,6 +368,7 @@ def commercial_media_repair_is_exact(
     from ai_video.production.ecommerce_media_acceptance import (
         adjudicate_generated_commercial_shot_evidence,
     )
+    from ai_video.production.project import load_qa_policy
 
     state = prior_attempt.video_generation_state
     if (
@@ -396,11 +396,15 @@ def commercial_media_repair_is_exact(
         )
         if len(tagged) != 1:
             return False
+        frozen_pointer = tagged[0].commercial_qa_policy
+        if frozen_pointer is None:
+            return False
         validate_commercial_failure_evaluation_source(
             root=root,
             state=state,
             request=request,
-            qa_policy=loaded.qa_policy,
+            qa_policy=load_qa_policy(root, frozen_pointer),
+            qa_policy_pointer=frozen_pointer,
             acceptance=experience.candidate.recipe.acceptance_policy,
             source=tagged[0],
         )

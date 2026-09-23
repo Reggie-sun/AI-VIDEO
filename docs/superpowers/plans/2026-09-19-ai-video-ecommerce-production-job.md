@@ -315,7 +315,7 @@ Connect the application service to existing Shot readiness、generation feedback
    - `NOT_EVALUATED` -> evidence repair first；
    - unknown -> explicit recovery stop。
 4. Implement repair controller only as a small owner around existing decision/diagnosis contracts.
-   For commercial-only `FAIL`, admit a generation evaluation source only when the frozen generation QA and original commercial Gate share exact requirement IDs, proof and evaluator authority; retain the original commercial evidence hash and validate it in both committer and strict reader. Unmapped criteria stop rather than inventing a technical failure or changing the rubric after submit. The Job requires the exact complete rejection receipt and commercial failed requirements in the bounded intervention; abandonment or caller-edited diagnosis does not authorize submit.
+   For commercial-only `FAIL`, admit a generation evaluation source only when the frozen generation QA and original commercial Gate share exact requirement IDs, proof and evaluator authority; retain the original commercial evidence hash and selected QA pointer, then validate both in committer and strict reader even after later QA revisions. Reopen activated commercial PASS against the policy named by its original intent. Unmapped criteria project an explicit authoring/QA blocker rather than inventing a technical failure or changing the rubric after submit. The Job requires the exact complete rejection receipt and commercial failed requirements in the bounded intervention; abandonment or caller-edited diagnosis does not authorize submit.
 5. Enforce per-Shot and job-level finite ceilings.
 6. A provider switch creates new routing/binding/permit/attempt identity and invalidates provider-specific evidence.
 

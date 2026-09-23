@@ -3,6 +3,9 @@
 from __future__ import annotations
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.ecommerce_generation_bridge import (
+    commercial_failure_mapping_is_available,
+)
 from ai_video.production.ecommerce_job_assembly import (
     EcommerceCompositionExecutionPlan,
     inspect_ecommerce_job_assembly,
@@ -246,6 +249,36 @@ def project_ecommerce_job_progress(
                         subject_id=shot_id,
                         failure_classification="ATTEMPT_CEILING",
                         required_action="Stop or authorize a new finite Shot repair request.",
+                        manifest_revision=revision,
+                    )
+                try:
+                    failed_attempt = next(
+                        item for item in loaded.manifest.attempts
+                        if item.attempt_id == shot_attempts[-1]
+                    )
+                    repair_mapping_available = commercial_failure_mapping_is_available(
+                        root=request.project_root,
+                        loaded=loaded,
+                        attempt=failed_attempt,
+                    )
+                except (AiVideoError, OSError, StopIteration, TypeError, ValueError):
+                    return block_ecommerce_job(
+                        request,
+                        blocker_code="ECOMMERCE_SHOT_EXECUTION_INVALID",
+                        stage="shot_repair",
+                        subject_id=shot_id,
+                        failure_classification="EXECUTION_INPUT_INVALID",
+                        required_action="Reopen the exact failed Shot attempt.",
+                        manifest_revision=revision,
+                    )
+                if not repair_mapping_available:
+                    return block_ecommerce_job(
+                        request,
+                        blocker_code="ECOMMERCE_COMMERCIAL_REPAIR_QA_UNMAPPED",
+                        stage="shot_repair",
+                        subject_id=shot_id,
+                        failure_classification="AUTHORING_REVISION_REQUIRED",
+                        required_action="Revise approved Shot authoring and selected generation QA before a new attempt; the original failed media cannot be remapped after submit.",
                         manifest_revision=revision,
                     )
             return project_ecommerce_job(

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from ai_video.production.artifact_contracts import QaPolicyPointer
 from ai_video.production.ecommerce_media_acceptance import (
     adjudicate_generated_commercial_shot_evidence,
 )
@@ -15,12 +16,13 @@ from ai_video.production.models import (
     CommercialShotEvaluationPhase,
     EvidenceStrength,
     QaVerdict,
+    QaPolicy,
     StateCommitStatus,
     VideoAttemptPhase,
 )
 
 
-def _commercial_failure_source(*, root, state, request, qa_policy, acceptance):
+def _commercial_failure_source(*, root, state, request, qa_policy, qa_policy_pointer, acceptance):
     from ai_video.production._video_project_reader import (
         load_commercial_shot_evaluation_intent,
         load_generated_commercial_shot_evidence,
@@ -39,6 +41,8 @@ def _commercial_failure_source(*, root, state, request, qa_policy, acceptance):
         or binding is None
         or fetch_pointer is None
         or qa_policy is None
+        or qa_policy_pointer is None
+        or qa_policy_pointer.content_hash != qa_policy.content_hash
         or acceptance is None
         or acceptance.profile_payload.get("requirement_semantics_version")
         or qa_policy.domain_acceptance is None
@@ -102,21 +106,25 @@ def _commercial_failure_source(*, root, state, request, qa_policy, acceptance):
             for item in evidence.findings
         ),
         commercial_evidence_content_hash=evidence.content_hash,
+        commercial_qa_policy=qa_policy_pointer,
     )
 
 
 def validate_commercial_failure_evaluation_source(
-    *, root, state, request, qa_policy, acceptance, source
+    *, root, state, request, qa_policy, qa_policy_pointer, acceptance, source
 ) -> None:
     """Reopen the original Gate evidence; a caller cannot append its hash by hand."""
 
     if source.commercial_evidence_content_hash is None:
         raise ValueError("generation source has no commercial evidence identity")
+    if source.commercial_qa_policy != qa_policy_pointer:
+        raise ValueError("generation source has no exact evaluation-time QA pointer")
     expected = _commercial_failure_source(
         root=root,
         state=state,
         request=request,
         qa_policy=qa_policy,
+        qa_policy_pointer=qa_policy_pointer,
         acceptance=acceptance,
     )
     if source != expected:
@@ -153,7 +161,74 @@ def commercial_failure_evaluation_source(
         state=state,
         request=request,
         qa_policy=loaded.qa_policy,
+        qa_policy_pointer=loaded.manifest.active_qa_policy,
         acceptance=selected_shot_generation_acceptance(
             loaded, binding.target_shot_id
         ),
     )
+
+
+def commercial_failure_mapping_is_available(*, root: Path, loaded, attempt) -> bool:
+    """Project authoring readiness without changing the failed attempt."""
+
+    from ai_video.production._video_project_reader import (
+        load_generation_experience,
+        load_video_request_receipt,
+    )
+    from ai_video.production.production_strategy_reader import (
+        selected_shot_generation_acceptance,
+    )
+
+    state = attempt.video_generation_state
+    if state is None:
+        return False
+    for pointer in state.generation_experiences:
+        experience = load_generation_experience(root, pointer)
+        if any(
+            source.commercial_evidence_content_hash is not None
+            for source in experience.evaluation_sources
+        ):
+            return True  # Strict project reopen already checked this frozen source.
+    request = load_video_request_receipt(root, state.request)
+    binding = request.commercial_binding
+    if binding is None:
+        return False
+    try:
+        _commercial_failure_source(
+            root=root,
+            state=state,
+            request=request,
+            qa_policy=loaded.qa_policy,
+            qa_policy_pointer=loaded.manifest.active_qa_policy,
+            acceptance=selected_shot_generation_acceptance(
+                loaded, binding.target_shot_id
+            ),
+        )
+    except ValueError:
+        return False
+    return True
+
+
+def load_frozen_commercial_qa_policy(root: Path, content_hash: str) -> QaPolicy:
+    """Reopen the canonical policy named by a historical commercial intent."""
+
+    from ai_video.production.paths import (
+        _read_regular_file_nofollow,
+        canonical_qa_policy_path,
+    )
+    from ai_video.production.project import load_qa_policy
+
+    root = Path(root).resolve(strict=True)
+    relative = canonical_qa_policy_path(content_hash)
+    snapshot = _read_regular_file_nofollow(
+        root / relative, contained_by=root / "state"
+    )
+    candidate = QaPolicy.model_validate_json(snapshot.data)
+    pointer = QaPolicyPointer(
+        path=relative,
+        policy_id=candidate.policy_id,
+        policy_version=candidate.policy_version,
+        content_hash=content_hash,
+        file_sha256=snapshot.file_sha256,
+    )
+    return load_qa_policy(root, pointer)

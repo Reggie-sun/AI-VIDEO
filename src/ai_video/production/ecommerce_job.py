@@ -605,7 +605,6 @@ class EcommerceProductionJobService:
                             )
                         if not commercial_media_repair_is_exact(
                             request.project_root,
-                            loaded=loaded,
                             prior_attempt=latest_attempt,
                             context=context,
                             execution_binding=item.execution_binding,
@@ -734,7 +733,10 @@ class EcommerceProductionJobService:
                     handoff,
                     shot_execution=shot_execution,
                 )
-                if reopened.next_action is EcommerceJobNextAction.RECOVER_UNKNOWN_OUTCOME:
+                if reopened.next_action in {
+                    EcommerceJobNextAction.RECOVER_UNKNOWN_OUTCOME,
+                    EcommerceJobNextAction.BLOCKED,
+                }:
                     return reopened
                 verdict = shot_gate_verdict(
                     request.project_root,
