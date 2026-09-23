@@ -9,6 +9,40 @@ evidence_index_version: "1"
 
 Date: 2026-09-19
 
+## Supersession Notice — 2026-09-24 Offline Code Checkpoint
+
+下方 `c5ec8e0`、`5f743ca` 等状态与 receipt 是各自快照的历史记录，不再描述
+当前 `main`。本轮从 `d1bb4f7` 到 `f4f0dc4` 的五个 task commit 闭合了
+commercial-only `FAIL` 的有界 Shot 修复、历史 QA/商业证据的严格读取、
+同媒体补证的持久证据链，以及单次 `advance_once()` 只推进当前 Shot 的边界。
+`f4f0dc4` 还从 canonical active attempt 恢复已修复 Shot 的完成检查点，并阻断
+已经终止的 evidence repair，避免旧 plan attempt 阻断下一 Shot 或再次进入 reviewer。
+Job 仍委托现有 coordinator、Manifest committer、`ResolvedTimeline`、HyperFrames、
+P6 与 delivery owner，没有建立第二套 lifecycle、timeline 或验收状态。
+
+M7 现有同一 Project 的双 Shot offline E2E：direct PASS、同媒体 evidence repair、
+commercial-only media repair、CAPTION timing `FAIL` 后局部重新封存 composition、
+rerender、fresh review、delivery 与 exact replay。Fixture runner / evaluator 是确定性
+替身；这只证明代码连接和失败边界。`f4f0dc4` 后的六模块 focused suite 为
+`153 passed`，两位针对同一 immutable commit 的独立只读审查均返回空发现集。
+Harness 跳过的 Ecommerce Job 与 authoring Skill policy checks 在当前代码上另行通过
+`148 passed` 和 `95 passed`；这些单独结果不能代替 failed Harness receipt。
+exact range `d1bb4f7..f4f0dc4` 的 Harness receipt 位于
+`.agent/harness/runs/ecommerce-production-job-f4f0dc4-final-20260924-01/receipt.json`。
+该运行在隔离 checkout 的前 10 项检查通过，`production_contract_tests` 为
+`3667 passed, 1 failed, 3 skipped`；唯一失败是
+`tests/test_architecture_gate.py::test_current_repository_records_split_production_state_baseline`
+发现 `_state_commit_video.py` 的既有 `ARCH002 new-oversized-module`。该文件和
+`.architecture/architecture-baseline.json` 从 `d1bb4f7` 到 `f4f0dc4` 均未变化；
+前者 source blob 相同，后者在两个提交都没有该文件的基线项。因此此失败不是本轮
+Ecommerce delta 的 regression；同次 Harness 的 task-delta Architecture Gate 已通过，
+但 policy 后续检查被跳过，receipt 整体 `failed`。
+`verify-receipt` 确认 receipt / artifact integrity，且不提供 fresh passing closure。
+不得通过静默刷新 architecture baseline 隐藏这项仓库债务。
+
+本轮没有 remote / paid Provider submit、真实媒体生成、Production activation、
+人工观看验收、push 或 release。技术 PASS 不等于真实电商广告成片好看。
+
 ## Supersession Notice — 2026-09-24
 
 本记录下方 `5f743ca` 与后续 snapshot 的 Harness / review 状态均为各自当时的历史

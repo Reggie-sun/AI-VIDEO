@@ -8,6 +8,13 @@ learning_eligibility: ineligible
 
 Date: 2026-09-19
 
+## Supersession Notice — 2026-09-24
+
+下方“M4–M6 仍未实现”等结论是 2026-09-19 架构审计时的历史状态。
+M0–M7 offline application implementation 现已提交至 `f4f0dc4`；当前精确
+验证与未验收边界见 [M7 Offline Code Record](2026-09-19-ecommerce-production-job-m7-offline-code.md)。
+这不证明真实商品广告的视觉质量或 live Production delivery。
+
 ## Supersession Notice — 2026-09-19
 
 下文 `Specification And Plan Checkpoint` 中“只有文档与设计证据”已被

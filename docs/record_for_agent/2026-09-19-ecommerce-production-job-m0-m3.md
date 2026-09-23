@@ -8,6 +8,13 @@ learning_eligibility: ineligible
 
 Date: 2026-09-19
 
+## Supersession Notice — 2026-09-24
+
+本文件下方的 M0–M3 状态和“M4–M7 尚未实现”边界只描述当时的 checkpoint。
+M4–M7 offline implementation 已提交至 `f4f0dc4`，当前代码与验证状态见
+[M7 Offline Code Record](2026-09-19-ecommerce-production-job-m7-offline-code.md)。
+新证据仍不包含真实商品广告媒体、Provider submit、Production activation 或人工视觉验收。
+
 ## Purpose
 
 记录 `EcommerceProductionJob` 首个 implementation slice 的当前 runtime truth、视觉合同决策、
