@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
+
+import pytest
 
 from ai_video.production import (
     EcommerceJobNextAction,
@@ -11,6 +14,11 @@ from ai_video.production.ecommerce_job_compiler import (
     bootstrap_ecommerce_production_project,
     compile_ecommerce_production_handoff,
 )
+from ai_video.production.ecommerce_job_projection import (
+    project_ecommerce_job_progress,
+    project_ecommerce_review_frontier,
+)
+from ai_video.production.ecommerce_job_review import EcommerceFinalReviewFrontier
 from ecommerce_job_factory import make_ecommerce_handoff
 
 
@@ -97,3 +105,108 @@ def test_inspect_partial_canonical_root_fails_closed(tmp_path: Path) -> None:
     assert projection.next_action is EcommerceJobNextAction.BLOCKED
     assert projection.blocker is not None
     assert projection.blocker.blocker_code == "ECOMMERCE_CANONICAL_STATE_INCOMPLETE"
+
+
+def test_failed_final_review_blocks_before_changed_composition_is_prepared(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    handoff, request = _request(tmp_path)
+    assembly_calls: list[object] = []
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_projection.inspect_ecommerce_job_assembly",
+        lambda execution, *_args, **_kwargs: assembly_calls.append(execution)
+        or SimpleNamespace(next_action=EcommerceJobNextAction.PREPARE_COMPOSITION, error=None),
+    )
+    loaded = SimpleNamespace(
+        shots=(
+            SimpleNamespace(
+                required_asset_roles=(SimpleNamespace(asset_ids=("accepted-shot",)),)
+            ),
+        ),
+        manifest=SimpleNamespace(
+            manifest_revision=7,
+            active_render_state=object(),
+            active_review_receipts=(object(),),
+            final_acceptance_state=None,
+        ),
+    )
+    review = SimpleNamespace(
+        inspect_frontier=lambda *_args, **_kwargs: (
+            EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
+        )
+    )
+
+    projection = project_ecommerce_job_progress(
+        request,
+        handoff,
+        loaded=loaded,
+        composition_execution=object(),
+        review_execution=review,
+    )
+
+    assert projection.next_action is EcommerceJobNextAction.BLOCKED
+    assert assembly_calls == []
+
+
+def test_persisted_incomplete_final_evidence_projects_explicit_repair_stop(
+    tmp_path: Path,
+) -> None:
+    _, request = _request(tmp_path)
+
+    projection = project_ecommerce_review_frontier(
+        request,
+        frontier=EcommerceFinalReviewFrontier.EVIDENCE_REPAIR_REQUIRED,
+        manifest_revision=7,
+    )
+
+    assert projection.next_action is EcommerceJobNextAction.BLOCKED
+    assert projection.blocker is not None
+    assert projection.blocker.blocker_code == "ECOMMERCE_FINAL_EVIDENCE_REPAIR_REQUIRED"
+
+
+def test_diagnosed_caption_failure_allows_only_a_changed_composition_frontier(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    handoff, request = _request(tmp_path)
+    assembly_calls: list[object] = []
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_projection.inspect_ecommerce_job_assembly",
+        lambda execution, *_args, **_kwargs: assembly_calls.append(execution)
+        or SimpleNamespace(next_action=EcommerceJobNextAction.RENDER_FINAL, error=None),
+    )
+    loaded = SimpleNamespace(
+        shots=(
+            SimpleNamespace(
+                required_asset_roles=(SimpleNamespace(asset_ids=("accepted-shot",)),)
+            ),
+        ),
+        manifest=SimpleNamespace(
+            manifest_revision=7,
+            active_render_state=object(),
+            active_review_receipts=(object(),),
+            final_acceptance_state=None,
+        ),
+    )
+    review = SimpleNamespace(
+        inspect_frontier=lambda *_args, **_kwargs: (
+            EcommerceFinalReviewFrontier.PREPARE_COMPOSITION
+        )
+    )
+    composition = object()
+
+    before = project_ecommerce_job_progress(
+        request, handoff, loaded=loaded, review_execution=review
+    )
+    after = project_ecommerce_job_progress(
+        request,
+        handoff,
+        loaded=loaded,
+        composition_execution=composition,
+        review_execution=review,
+    )
+
+    assert before.next_action is EcommerceJobNextAction.PREPARE_COMPOSITION
+    assert after.next_action is EcommerceJobNextAction.RENDER_FINAL
+    assert assembly_calls == [composition]

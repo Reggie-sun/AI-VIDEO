@@ -7,7 +7,13 @@ from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
 
+from ai_video.errors import AiVideoError
 from ai_video.production._caption_quality_p6 import CaptionReviewExecution
+from ai_video.production.caption_quality import reopen_caption_review_chain
+from ai_video.production.caption_quality_contracts import (
+    CaptionEvidencePayload,
+    CaptionRequirementGroup,
+)
 from ai_video.production.ad_creative_types import AdCreativePlan, CompiledAdCreativeHandoff
 from ai_video.production.delivery_packager import (
     EcommerceDeliveryBundleResult,
@@ -47,7 +53,37 @@ class EcommerceFinalReviewFrontier(str, Enum):
     PACKAGE_DELIVERY = "package_delivery"
     PREPARE_COMPOSITION = "prepare_composition"
     REVIEW_FINAL = "review_final"
+    EVIDENCE_REPAIR_REQUIRED = "evidence_repair_required"
     DIAGNOSIS_REQUIRED = "diagnosis_required"
+
+
+def _caption_repair_frontier(project, pointer) -> EcommerceFinalReviewFrontier:
+    """Only cue timing/readability failures justify a composition-only repair."""
+
+    try:
+        reopened = reopen_caption_review_chain(
+            project=project, receipt_pointer=pointer
+        )
+        if reopened.verdict is not QaVerdict.FAIL:
+            return EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
+        failed_groups = {
+            finding.requirement_group
+            for evidence in reopened.evidence
+            for finding in CaptionEvidencePayload.model_validate(
+                dict(evidence.measured_payload)
+            ).findings
+            if finding.verdict == "fail"
+        }
+    except (AiVideoError, OSError, TypeError, ValueError):
+        return EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
+    if failed_groups and failed_groups.issubset(
+        {
+            CaptionRequirementGroup.TIMING_CONTRACT,
+            CaptionRequirementGroup.LAYOUT_READABILITY,
+        }
+    ):
+        return EcommerceFinalReviewFrontier.PREPARE_COMPOSITION
+    return EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
 
 
 def _semantic_repair_frontier(
@@ -76,17 +112,22 @@ def inspect_ecommerce_review_frontier(
 ) -> EcommerceFinalReviewFrontier:
     """Fail closed when no exact execution plan can diagnose semantic evidence."""
 
-    manifest = load_production_project(project_root / "project.yaml").manifest
+    project = load_production_project(project_root / "project.yaml")
+    manifest = project.manifest
     receipts = tuple(
-        load_review_receipt(project_root, pointer)
+        (pointer, load_review_receipt(project_root, pointer))
         for pointer in manifest.active_review_receipts
     )
-    failed_layers = {
-        receipt.layer for receipt in receipts if receipt.verdict is QaVerdict.FAIL
-    }
-    if failed_layers == {QaLayer.CAPTION}:
-        return EcommerceFinalReviewFrontier.PREPARE_COMPOSITION
-    if failed_layers:
+    if any(receipt.verdict is QaVerdict.NOT_EVALUATED for _, receipt in receipts):
+        return EcommerceFinalReviewFrontier.EVIDENCE_REPAIR_REQUIRED
+    failed = [
+        (pointer, receipt)
+        for pointer, receipt in receipts
+        if receipt.verdict is QaVerdict.FAIL
+    ]
+    if len(failed) == 1 and failed[0][1].layer is QaLayer.CAPTION:
+        return _caption_repair_frontier(project, failed[0][0])
+    if failed:
         return EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
     return EcommerceFinalReviewFrontier.REVIEW_FINAL
 
@@ -149,15 +190,23 @@ class EcommercePostMediaExecutionPlan:
         ):
             return EcommerceFinalReviewFrontier.PACKAGE_DELIVERY
         failed = []
+        not_evaluated = False
         for pointer in manifest.active_review_receipts:
             receipt = load_review_receipt(project_root, pointer)
             if receipt.verdict is QaVerdict.FAIL:
                 failed.append((pointer, receipt))
+            elif receipt.verdict is QaVerdict.NOT_EVALUATED:
+                not_evaluated = True
+        if not_evaluated:
+            return EcommerceFinalReviewFrontier.EVIDENCE_REPAIR_REQUIRED
         if not failed:
             return EcommerceFinalReviewFrontier.REVIEW_FINAL
         failed_layers = {receipt.layer for _, receipt in failed}
-        if failed_layers == {QaLayer.CAPTION}:
-            return EcommerceFinalReviewFrontier.PREPARE_COMPOSITION
+        if len(failed) == 1 and failed[0][1].layer is QaLayer.CAPTION:
+            return _caption_repair_frontier(
+                load_production_project(project_root / "project.yaml"),
+                failed[0][0],
+            )
         if failed_layers - {QaLayer.LAYOUT, QaLayer.CAPTION, QaLayer.SEMANTIC}:
             return EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
         semantic = [item for item in failed if item[1].layer is QaLayer.SEMANTIC]

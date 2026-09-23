@@ -10,6 +10,13 @@ from ai_video.production.ecommerce_job_review import (
     _semantic_repair_frontier,
     inspect_ecommerce_review_frontier,
 )
+from ai_video.production.caption_quality_contracts import (
+    CaptionCoverageStatus,
+    CaptionEvidencePayload,
+    CaptionFindingReasonCode,
+    CaptionRequirementFinding,
+    CaptionRequirementGroup,
+)
 from ai_video.production.ecommerce_media_acceptance import (
     EcommerceAcceptanceEvidencePayload,
     EcommerceRequirementFinding,
@@ -189,7 +196,7 @@ def test_review_execution_blocks_cta_repair_before_a_render_attempt(
     ("layer", "expected"),
     (
         (QaLayer.LAYOUT, EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED),
-        (QaLayer.CAPTION, EcommerceFinalReviewFrontier.PREPARE_COMPOSITION),
+        (QaLayer.CAPTION, EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED),
     ),
 )
 def test_unattributed_layout_failure_requires_diagnosis_before_composition_repair(
@@ -210,8 +217,99 @@ def test_unattributed_layout_failure_requires_diagnosis_before_composition_repai
             verdict=QaVerdict.FAIL, layer=layer
         ),
     )
+    def invalid_caption_chain(**_kwargs):
+        raise ValueError("no exact caption evidence")
+
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_review.reopen_caption_review_chain",
+        invalid_caption_chain,
+    )
 
     assert inspect_ecommerce_review_frontier(tmp_path) is expected
+
+
+@pytest.mark.parametrize(
+    ("group", "reason", "expected"),
+    (
+        (
+            CaptionRequirementGroup.UNINTENDED_TEXT,
+            CaptionFindingReasonCode.UNINTENDED_TEXT_DETECTED,
+            EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED,
+        ),
+        (
+            CaptionRequirementGroup.LAYOUT_READABILITY,
+            CaptionFindingReasonCode.LAYOUT_UNREADABLE,
+            EcommerceFinalReviewFrontier.PREPARE_COMPOSITION,
+        ),
+    ),
+)
+def test_caption_failure_requires_exact_group_before_local_repair(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    group: CaptionRequirementGroup,
+    reason: CaptionFindingReasonCode,
+    expected: EcommerceFinalReviewFrontier,
+) -> None:
+    pointer = object()
+    project = SimpleNamespace(
+        manifest=SimpleNamespace(active_review_receipts=(pointer,))
+    )
+    payload = CaptionEvidencePayload(
+        caption_policy_hash="a" * 64,
+        caption_context_hash="b" * 64,
+        findings=(
+            CaptionRequirementFinding(
+                requirement_group=group,
+                verdict="fail",
+                reason_code=reason,
+                raw_evidence_references=("exact-render",),
+                coverage_status=CaptionCoverageStatus.COMPLETE,
+                observation_fingerprint="c" * 64,
+            ),
+        ),
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_review.load_production_project",
+        lambda _path: project,
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_review.load_review_receipt",
+        lambda _root, _pointer: SimpleNamespace(
+            verdict=QaVerdict.FAIL, layer=QaLayer.CAPTION
+        ),
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_review.reopen_caption_review_chain",
+        lambda **_kwargs: SimpleNamespace(
+            verdict=QaVerdict.FAIL,
+            evidence=(SimpleNamespace(measured_payload=payload.model_dump(mode="json")),)
+        ),
+        raising=False,
+    )
+
+    assert inspect_ecommerce_review_frontier(tmp_path) is expected
+
+
+def test_persisted_not_evaluated_caption_evidence_is_not_blindly_rerun(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_review.load_production_project",
+        lambda _path: SimpleNamespace(
+            manifest=SimpleNamespace(active_review_receipts=(object(),))
+        ),
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_review.load_review_receipt",
+        lambda _root, _pointer: SimpleNamespace(
+            verdict=QaVerdict.NOT_EVALUATED, layer=QaLayer.CAPTION
+        ),
+    )
+
+    assert inspect_ecommerce_review_frontier(
+        tmp_path
+    ) is EcommerceFinalReviewFrontier.EVIDENCE_REPAIR_REQUIRED
 
 
 def test_semantic_domain_failure_requires_diagnosis() -> None:

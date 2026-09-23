@@ -104,6 +104,21 @@ def project_ecommerce_review_frontier(
             next_action=action,
             manifest_revision=manifest_revision,
         )
+    if frontier is EcommerceFinalReviewFrontier.EVIDENCE_REPAIR_REQUIRED:
+        return block_ecommerce_job(
+            request,
+            blocker_code="ECOMMERCE_FINAL_EVIDENCE_REPAIR_REQUIRED",
+            stage="final_review",
+            subject_id=request.job_id,
+            failure_classification="REVIEW_EVIDENCE_INCOMPLETE",
+            required_action=(
+                "Repair the exact NOT_EVALUATED evidence through the canonical review "
+                "owner before another final review attempt; active CAPTION receipts "
+                "cannot be blindly rerun."
+            ),
+            error_code=ErrorCode.REVIEW_EVIDENCE_INVALID,
+            manifest_revision=manifest_revision,
+        )
     return block_ecommerce_job(
         request,
         blocker_code="ECOMMERCE_FINAL_REPAIR_DIAGNOSIS_REQUIRED",
@@ -111,10 +126,48 @@ def project_ecommerce_review_frontier(
         subject_id=request.job_id,
         failure_classification="WHOLE_VIDEO_FAILURE",
         required_action=(
-            "Diagnose the exact failed final requirement. Plan-bound CTA or other "
-            "commercial graphic changes require a new authoring handoff and immutable "
-            "Project revision before re-rendering."
+            "Diagnose the exact failed or incomplete final evidence through its "
+            "canonical review owner. Plan-bound CTA or other commercial graphic "
+            "changes require a new authoring handoff and immutable Project revision "
+            "before re-rendering."
         ),
+        manifest_revision=manifest_revision,
+    )
+
+
+def _project_current_review_frontier(
+    request: EcommerceProductionJobRequest,
+    handoff: EcommerceProductionHandoff,
+    *,
+    manifest_revision: int,
+    review_execution: EcommercePostMediaExecutionPlan | None,
+) -> EcommerceProductionJobProjection:
+    try:
+        frontier = (
+            review_execution.inspect_frontier(
+                handoff, project_root=request.project_root
+            )
+            if review_execution is not None
+            else inspect_ecommerce_review_frontier(request.project_root)
+        )
+    except (AiVideoError, OSError, TypeError, ValueError) as exc:
+        return block_ecommerce_job(
+            request,
+            blocker_code="ECOMMERCE_FINAL_REVIEW_BINDING_INVALID",
+            stage="final_review",
+            subject_id=request.job_id,
+            failure_classification="EXECUTION_INPUT_INVALID",
+            required_action="Repair the exact review policy, evidence, or handoff binding.",
+            error_code=(
+                exc.code
+                if isinstance(exc, AiVideoError)
+                else ErrorCode.REVIEW_EVIDENCE_INVALID
+            ),
+            manifest_revision=manifest_revision,
+        )
+    return project_ecommerce_review_frontier(
+        request,
+        frontier=frontier,
         manifest_revision=manifest_revision,
     )
 
@@ -238,6 +291,30 @@ def project_ecommerce_job_progress(
                 next_shot_id=shot.shot_id,
             )
 
+    acceptance = loaded.manifest.final_acceptance_state
+    acceptance_fresh = (
+        acceptance is not None
+        and acceptance.lifecycle is ReviewLifecycle.FRESH
+        and acceptance.active_receipt is not None
+    )
+    prior_review = None
+    if (
+        loaded.manifest.active_render_state is not None
+        and loaded.manifest.active_review_receipts
+        and not acceptance_fresh
+    ):
+        prior_review = _project_current_review_frontier(
+            request,
+            handoff,
+            manifest_revision=revision,
+            review_execution=review_execution,
+        )
+        if prior_review.next_action is EcommerceJobNextAction.BLOCKED or (
+            prior_review.next_action is EcommerceJobNextAction.PREPARE_COMPOSITION
+            and composition_execution is None
+        ):
+            return prior_review
+
     assembly = inspect_ecommerce_job_assembly(
         composition_execution,
         handoff,
@@ -264,44 +341,14 @@ def project_ecommerce_job_progress(
             next_action=assembly.next_action,
             manifest_revision=revision,
         )
-    acceptance = loaded.manifest.final_acceptance_state
-    if (
-        acceptance is None
-        or acceptance.lifecycle is not ReviewLifecycle.FRESH
-        or acceptance.active_receipt is None
-    ):
-        if review_execution is not None:
-            try:
-                frontier = review_execution.inspect_frontier(
-                    handoff,
-                    project_root=request.project_root,
-                )
-            except (AiVideoError, OSError, TypeError, ValueError) as exc:
-                return block_ecommerce_job(
-                    request,
-                    blocker_code="ECOMMERCE_FINAL_REVIEW_BINDING_INVALID",
-                    stage="final_review",
-                    subject_id=request.job_id,
-                    failure_classification="EXECUTION_INPUT_INVALID",
-                    required_action=(
-                        "Repair the exact review policy, evidence, or handoff binding."
-                    ),
-                    error_code=(
-                        exc.code
-                        if isinstance(exc, AiVideoError)
-                        else ErrorCode.REVIEW_EVIDENCE_INVALID
-                    ),
-                    manifest_revision=revision,
-                )
-            return project_ecommerce_review_frontier(
-                request,
-                frontier=frontier,
-                manifest_revision=revision,
-            )
-        return project_ecommerce_review_frontier(
+    if not acceptance_fresh:
+        if prior_review is not None:
+            return prior_review
+        return _project_current_review_frontier(
             request,
-            frontier=inspect_ecommerce_review_frontier(request.project_root),
+            handoff,
             manifest_revision=revision,
+            review_execution=review_execution,
         )
     if delivery_execution is not None:
         try:
