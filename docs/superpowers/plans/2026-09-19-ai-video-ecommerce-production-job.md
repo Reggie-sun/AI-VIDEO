@@ -308,7 +308,7 @@ Connect the application service to existing Shot readiness、generation feedback
 ### Implementation
 
 1. `advance_once(GENERATE_SHOT)` builds the exact existing execution facade from request, selected project state and sealed policies.
-2. Delegate ordered execution to the current ecommerce coordinator rather than duplicating its algorithm.
+2. Delegate ordered execution to the current ecommerce coordinator rather than duplicating its algorithm. Bound each `advance_once()` to the projected Shot; the next Shot requires another projection and call.
 3. Convert gate outcomes into typed next actions:
    - `PASS` -> canonical activation and next Shot；
    - `FAIL` -> diagnosis then bounded media repair；

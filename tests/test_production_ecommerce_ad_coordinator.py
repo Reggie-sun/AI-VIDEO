@@ -220,6 +220,28 @@ def test_coordinator_realizes_each_facade_after_prior_shot_activation() -> None:
     assert realized == ["shot-b", "shot-a", "shot-later"]
 
 
+def test_coordinator_stops_after_exact_shot_without_realizing_next() -> None:
+    handoff, facades = _facades()
+    realized: list[str] = []
+
+    def realize(shot_id: str):
+        realized.append(shot_id)
+        return facades[shot_id]
+
+    result = run_ecommerce_ad_generation(
+        handoff,
+        facade_factory=realize,
+        stop_after_shot_id="shot-b",
+    )
+
+    assert result.complete is False
+    assert result.stop_reason is EcommerceStopReason.USER_STOP
+    assert result.stopped_shot_id == "shot-b"
+    assert tuple(item.shot_id for item in result.activated_shots) == ("shot-b",)
+    assert realized == ["shot-b"]
+    assert facades["shot-a"].effects == []
+
+
 @pytest.mark.parametrize("failed_shot", ("shot-b", "shot-a", "shot-later"))
 @pytest.mark.parametrize("verdict", (QaVerdict.FAIL, QaVerdict.NOT_EVALUATED))
 def test_any_shot_nonpass_stops_before_activation_and_later_submit(

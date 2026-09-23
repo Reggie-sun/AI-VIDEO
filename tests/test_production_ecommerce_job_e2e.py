@@ -842,6 +842,38 @@ def test_canonical_two_shot_job_closes_offline_and_replays_without_effect(
     if first_verdict is QaVerdict.NOT_EVALUATED:
         assert advanced.next_action is EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE
         assert first_reviewer.calls == 1
+        from ai_video.production.ecommerce_media_acceptance import (
+            GeneratedCommercialShotEvidence,
+        )
+
+        class SecondEvidenceReviewer(_CountingCommercialShotReviewer):
+            def __call__(self, held_fd, request, measured, intent):
+                evidence = super().__call__(held_fd, request, measured, intent)
+                return GeneratedCommercialShotEvidence.create(
+                    intent=intent,
+                    strength=evidence.strength,
+                    findings=(
+                        evidence.findings[0].model_copy(
+                            update={"rationale": "second exact review remained unevaluated"}
+                        ),
+                        *evidence.findings[1:],
+                    ),
+                )
+
+        second_reviewer = SecondEvidenceReviewer(verdict=QaVerdict.NOT_EVALUATED)
+        second_reviewer.intent = first_reviewer.intent
+        second_execution = replace(
+            execution, commercial_reviewer=second_reviewer
+        )
+        second = job.advance_once(
+            request,
+            handoff,
+            expected_action=EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE,
+            shot_execution=replace(shots, shots=(second_execution,)),
+        )
+        assert second.next_action is EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE
+        assert second_reviewer.calls == 1
+        assert provider.submit_calls == 1
         repaired_reviewer = _CountingCommercialShotReviewer(verdict=QaVerdict.PASS)
         repaired_reviewer.intent = first_reviewer.intent
         execution = replace(execution, commercial_reviewer=repaired_reviewer)
@@ -853,6 +885,13 @@ def test_canonical_two_shot_job_closes_offline_and_replays_without_effect(
             shot_execution=shots,
         )
         assert repaired_reviewer.calls == 1
+        evidence_state = next(
+            item.video_generation_state.commercial_evaluation
+            for item in load_production_project(tmp_path / "project.yaml").manifest.attempts
+            if item.attempt_id == execution.attempt_id
+        )
+        assert evidence_state is not None
+        assert len(evidence_state.evidence_history) == 2
     elif first_verdict is QaVerdict.FAIL:
         assert advanced.next_action is EcommerceJobNextAction.REPAIR_SHOT_MEDIA, advanced.blocker
         from ai_video.production.ecommerce_generation_bridge import (
@@ -1335,6 +1374,57 @@ def test_tagged_commercial_failure_with_changed_generation_qa_stops_repair(
     assert provider.submit_calls == 1
 
 
+def test_commercial_evidence_repair_with_changed_qa_stops_before_effect(
+    tmp_path: Path,
+) -> None:
+    handoff, plan, compiled = _handoff_and_compiled()
+    request = _request(tmp_path, handoff, attempts=2)
+    _bootstrap(tmp_path, handoff, compiled.composition_spec)
+    _activate_commercial_generation_policy(tmp_path)
+    execution, provider = _real_input(
+        root=tmp_path,
+        execution=SimpleNamespace(handoff=compiled),
+        shot_id="shot-proof",
+        composition_spec=compiled.composition_spec,
+        output=OUTPUT,
+        artifact_bytes=VIDEO.read_bytes(),
+        use_current_generation_acceptance=True,
+        commercial_requirement_ids=(
+            "shot.identity.main_character", "shot.motion.required"
+        ),
+        authored_commercial_prompt=True,
+    )
+    reviewer = _CountingCommercialShotReviewer(verdict=QaVerdict.NOT_EVALUATED)
+    shots = EcommerceShotExecutionPlan(
+        handoff=compiled,
+        plan=plan,
+        shots=(replace(execution, commercial_reviewer=reviewer),),
+    )
+    job = EcommerceProductionJobService()
+    first = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.GENERATE_SHOT,
+        shot_execution=shots,
+    )
+    assert first.next_action is EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE
+    assert reviewer.calls == 1
+    _revise_selected_qa(tmp_path, change_generation_acceptance=True)
+    reopened = job.inspect(request, handoff, shot_execution=shots)
+    replay = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE,
+        shot_execution=shots,
+    )
+    assert reopened.next_action is EcommerceJobNextAction.BLOCKED
+    assert reopened.blocker is not None
+    assert reopened.blocker.blocker_code == "ECOMMERCE_COMMERCIAL_REPAIR_QA_CHANGED"
+    assert replay == reopened
+    assert reviewer.calls == 1
+    assert provider.submit_calls == 1
+
+
 def test_mixed_commercial_findings_repair_evidence_before_media(
     tmp_path: Path,
 ) -> None:
@@ -1428,6 +1518,20 @@ def test_mixed_commercial_findings_repair_evidence_before_media(
     )
     assert repaired.next_action is EcommerceJobNextAction.REPAIR_SHOT_MEDIA
     assert provider.submit_calls == 1
+    repaired_state = next(
+        item.video_generation_state
+        for item in load_production_project(tmp_path / "project.yaml").manifest.attempts
+        if item.attempt_id == execution.attempt_id
+    )
+    assert repaired_state is not None
+    assert repaired_state.commercial_evaluation is not None
+    assert repaired_state.commercial_evaluation.evidence_history == (first_evidence,)
+    assert first_evidence is not None
+    original_evidence = tmp_path / first_evidence.path
+    original_evidence.write_bytes(original_evidence.read_bytes() + b"\n")
+    with pytest.raises(AiVideoError) as tampered:
+        load_production_project(tmp_path / "project.yaml")
+    assert tampered.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
 
 
 def test_unknown_local_submit_remains_stopped_after_explicit_recovery_without_proof(

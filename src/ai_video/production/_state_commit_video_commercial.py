@@ -103,7 +103,7 @@ def validate_current_commercial_video_state(
     state,
     request,
 ):
-    """Reopen one PASS checkpoint against the exact current Manifest owners."""
+    """Reopen one PASS checkpoint against its exact canonical owners."""
 
     evaluation = state.commercial_evaluation
     if request.commercial_binding is None and evaluation is None:
@@ -128,14 +128,24 @@ def validate_current_commercial_video_state(
         provenance = committer._reopen_video_provenance_receipt(
             evaluation.provenance
         )
-        policy = load_qa_policy(
-            committer._project_root, manifest.active_qa_policy
-        )
         loaded = committer._load_production_project(
             committer._project_root / "project.yaml"
         )
         if loaded.manifest != manifest:
             raise ValueError("active commercial Manifest changed")
+        if state.phase is VideoAttemptPhase.ACTIVATE:
+            from ai_video.production.ecommerce_generation_bridge import (
+                load_commercial_checkpoint_qa_policy,
+            )
+
+            policy = load_commercial_checkpoint_qa_policy(
+                committer._project_root, evaluation, intent
+            )
+            loaded = loaded.model_copy(update={"qa_policy": policy})
+        else:
+            policy = load_qa_policy(
+                committer._project_root, manifest.active_qa_policy
+            )
         approval = bound_commercial_source_approval(
             loaded,
             request.commercial_binding,
@@ -372,6 +382,10 @@ def checkpoint_generated_commercial_shot(
                         phase=CommercialShotEvaluationPhase.INTENT,
                         intent=evaluation_state.intent,
                         qa_policy=evaluation_state.qa_policy,
+                        evidence_history=(
+                            *evaluation_state.evidence_history,
+                            evaluation_state.evidence,
+                        ),
                     )
                 }
             )
@@ -481,6 +495,7 @@ def checkpoint_generated_commercial_shot(
                         intent=evaluation_state.intent,
                         qa_policy=evaluation_state.qa_policy,
                         evidence=evidence_pointer,
+                        evidence_history=evaluation_state.evidence_history,
                     )
                 }
             )

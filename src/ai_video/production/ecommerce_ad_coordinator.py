@@ -469,6 +469,7 @@ def run_ecommerce_ad_generation(
         str, ActivatedCommercialShotCheckpoint
     ] | None = None,
     stop_requested: Callable[[], bool] | None = None,
+    stop_after_shot_id: str | None = None,
 ) -> EcommerceAdGenerationResult:
     """Run Provider Shots strictly in proposal order with a synchronous PASS barrier."""
 
@@ -486,6 +487,8 @@ def run_ecommerce_ad_generation(
         for shot_id in proposal_ids
         if projection_by_shot[shot_id].invoke_video_provider
     )
+    if stop_after_shot_id is not None and stop_after_shot_id not in provider_shot_ids:
+        raise ValueError("Bounded stop Shot is not a Provider Shot")
     if (facades is None) == (facade_factory is None):
         raise ValueError("Provide exactly one Ecommerce Shot facade source")
     completed = completed_checkpoints or {}
@@ -535,6 +538,12 @@ def run_ecommerce_ad_generation(
                     reason=EcommerceStopReason.CHECKPOINT_INVALID,
                 )
             activated.append(checkpoint)
+            if shot_id == stop_after_shot_id and shot_id != provider_shot_ids[-1]:
+                return _stopped(
+                    activated,
+                    shot_id=shot_id,
+                    reason=EcommerceStopReason.USER_STOP,
+                )
             continue
         try:
             facade = (
@@ -583,6 +592,12 @@ def run_ecommerce_ad_generation(
         if isinstance(outcome, EcommerceAdGenerationResult):
             return outcome
         activated.append(outcome)
+        if shot_id == stop_after_shot_id and shot_id != provider_shot_ids[-1]:
+            return _stopped(
+                activated,
+                shot_id=shot_id,
+                reason=EcommerceStopReason.USER_STOP,
+            )
 
     return EcommerceAdGenerationResult(
         complete=True,

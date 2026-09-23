@@ -271,3 +271,19 @@ def load_commercial_checkpoint_qa_policy(root, evaluation, intent) -> QaPolicy:
     if policy.content_hash != intent.qa_policy_content_hash:
         raise ValueError("Commercial evaluation QA policy identity changed")
     return policy
+
+
+def validate_commercial_evidence_history(root, evaluation, intent) -> None:
+    """Reopen every retained pre-repair finding against its exact intent."""
+
+    from ai_video.production._video_project_reader import (
+        load_generated_commercial_shot_evidence,
+    )
+
+    for pointer in evaluation.evidence_history:
+        evidence = load_generated_commercial_shot_evidence(root, pointer)
+        if (
+            evidence.intent_content_hash != intent.content_hash
+            or evidence.evaluation_fingerprint != intent.evaluation_fingerprint
+        ):
+            raise ValueError("Commercial evidence history differs from its intent")

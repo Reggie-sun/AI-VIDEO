@@ -842,6 +842,22 @@ def _verify_commercial_capture_checkpoint(
     if evaluation is None:
         return
     if evaluation.probe is None:
+        if evaluation.qa_policy is not None:
+            from ai_video.production.ecommerce_generation_bridge import (
+                load_commercial_checkpoint_qa_policy,
+            )
+
+            try:
+                intent = load_commercial_shot_evaluation_intent(
+                    bundle.root, evaluation.intent
+                )
+                load_commercial_checkpoint_qa_policy(
+                    bundle.root, evaluation, intent
+                )
+            except (AiVideoError, OSError, ValidationError, ValueError) as exc:
+                raise _invalid(
+                    "Commercial checkpoint QA policy is not exact.", str(exc)
+                ) from exc
         if state.phase in {VideoAttemptPhase.CANDIDATE, VideoAttemptPhase.ACTIVATE}:
             raise _invalid("Commercial capture checkpoint is incomplete.")
         return
@@ -986,6 +1002,16 @@ def verify_video_evidence(
             intent = load_commercial_shot_evaluation_intent(
                 root, state.commercial_evaluation.intent
             )
+            from ai_video.production.ecommerce_generation_bridge import (
+                validate_commercial_evidence_history,
+            )
+
+            try:
+                validate_commercial_evidence_history(
+                    root, state.commercial_evaluation, intent
+                )
+            except (AiVideoError, OSError, ValueError) as exc:
+                raise _invalid("Commercial Shot evidence history is not exact.", str(exc)) from exc
             if (
                 request.commercial_binding is None
                 or intent.binding_content_hash

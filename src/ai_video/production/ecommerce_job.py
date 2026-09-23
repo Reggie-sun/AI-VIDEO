@@ -672,6 +672,7 @@ class EcommerceProductionJobService:
                         shot_execution.handoff,
                         facade_factory=facade_factory,
                         completed_checkpoints=completed_checkpoints,
+                        stop_after_shot_id=current.next_shot_id,
                     )
                 except (AiVideoError, OSError, TypeError, ValueError) as exc:
                     if expected_action is EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE:
@@ -714,6 +715,20 @@ class EcommerceProductionJobService:
                         request,
                         next_action=EcommerceJobNextAction.PREPARE_COMPOSITION,
                         manifest_revision=revision,
+                    )
+
+                if (
+                    result.stop_reason is EcommerceStopReason.USER_STOP
+                    and result.stopped_shot_id == current.next_shot_id
+                    and any(
+                        checkpoint.shot_id == current.next_shot_id
+                        for checkpoint in result.activated_shots
+                    )
+                ):
+                    return self.inspect(
+                        request,
+                        handoff,
+                        shot_execution=shot_execution,
                     )
 
                 shot_id = result.stopped_shot_id

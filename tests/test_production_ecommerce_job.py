@@ -1903,6 +1903,16 @@ def test_offline_two_shot_job_runs_bootstrap_through_delivery_and_exact_replay(
         expected_action=EcommerceJobNextAction.GENERATE_SHOT,
         shot_execution=shot_execution,
     )
+    after_first = {
+        item.shot_id: tuple(item.service.effects)
+        for item in shot_execution.shots
+    }
+    generated_second = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.GENERATE_SHOT,
+        shot_execution=shot_execution,
+    )
     composition = _FakeCompositionExecution()
     prepared = job.advance_once(
         request,
@@ -1952,7 +1962,10 @@ def test_offline_two_shot_job_runs_bootstrap_through_delivery_and_exact_replay(
         delivery_execution=delivery,
     )
 
-    assert generated.next_action is EcommerceJobNextAction.PREPARE_COMPOSITION
+    assert generated.next_action is EcommerceJobNextAction.GENERATE_SHOT
+    assert generated.next_shot_id == "shot-proof"
+    assert after_first["shot-proof"] == ()
+    assert generated_second.next_action is EcommerceJobNextAction.PREPARE_COMPOSITION
     assert prepared.next_action is EcommerceJobNextAction.RENDER_FINAL
     assert rendered.next_action is EcommerceJobNextAction.REVIEW_FINAL
     assert reviewed.next_action is EcommerceJobNextAction.PACKAGE_DELIVERY
@@ -2348,8 +2361,9 @@ def _real_input(
     )
 
 
+@pytest.mark.parametrize("qa_revision_after_first", (False, True))
 def test_canonical_two_shot_reopen_resumes_second_and_replay_has_zero_effects(
-    tmp_path: Path,
+    tmp_path: Path, qa_revision_after_first: bool,
 ) -> None:
     handoff, request, skeleton = _bootstrapped_canonical_job(tmp_path)
     inputs = _activate_offline_ecommerce_policy(
@@ -2371,7 +2385,7 @@ def test_canonical_two_shot_reopen_resumes_second_and_replay_has_zero_effects(
     )
     first_factory_calls: list[str] = []
 
-    def interrupt_after_first(shot_id: str):
+    def realize_first_only(shot_id: str):
         first_factory_calls.append(shot_id)
         if shot_id == "shot-proof":
             loaded = load_production_project(tmp_path / "project.yaml")
@@ -2379,25 +2393,40 @@ def test_canonical_two_shot_reopen_resumes_second_and_replay_has_zero_effects(
                 item.asset_id == "canonical-ecommerce-shot-hero-video"
                 for item in loaded.registry.assets
             )
-            raise ValueError("simulated process interruption before Shot 2 binding")
+            raise ValueError("the first bounded action must not realize Shot 2")
         return first_input
 
     first_plan = replace(
         skeleton,
         shots=(first_input, second_declared),
-        input_factory=interrupt_after_first,
+        input_factory=realize_first_only,
     )
-    interrupted = EcommerceProductionJobService().advance_once(
+    first_advanced = EcommerceProductionJobService().advance_once(
         request,
         handoff,
         expected_action=EcommerceJobNextAction.GENERATE_SHOT,
         shot_execution=first_plan,
     )
 
-    assert interrupted.next_action is EcommerceJobNextAction.BLOCKED
-    assert first_factory_calls == ["shot-hero", "shot-proof"]
+    assert first_advanced.next_action is EcommerceJobNextAction.GENERATE_SHOT
+    assert first_advanced.next_shot_id == "shot-proof"
+    assert first_factory_calls == ["shot-hero"]
     assert first_provider.submit_calls == 1
     assert first_provider.fetch_calls == 1
+    if qa_revision_after_first:
+        loaded = load_production_project(tmp_path / "project.yaml")
+        assert loaded.qa_policy is not None
+        revised = seal_artifact(loaded.qa_policy.model_copy(update={
+            "revision": loaded.qa_policy.revision + 1,
+            "policy_version": loaded.qa_policy.policy_version + "-later",
+            "creation_receipt_id": loaded.qa_policy.creation_receipt_id + "-later",
+            "content_hash": "0" * 64,
+        }))
+        ProductionStateCommitter(tmp_path).activate_qa_policy(
+            revised,
+            expected_manifest_revision=loaded.manifest.manifest_revision,
+            attempt_id="ecommerce-canonical-reopen-qa-revision",
+        )
 
     after_first_spec = build_video_candidate_composition_spec(
         base_spec,
@@ -2478,3 +2507,63 @@ def test_canonical_two_shot_reopen_resumes_second_and_replay_has_zero_effects(
         "canonical-ecommerce-shot-hero-video",
         "canonical-ecommerce-shot-proof-video",
     }
+
+
+def test_evidence_repair_of_first_shot_does_not_submit_second_shot(
+    tmp_path: Path,
+) -> None:
+    handoff, request, skeleton = _bootstrapped_canonical_job(tmp_path)
+    inputs = _activate_offline_ecommerce_policy(
+        tmp_path,
+        _dependency_inputs(tmp_path, skeleton),
+    )
+    first_input, first_provider = _real_input(
+        root=tmp_path,
+        execution=skeleton,
+        shot_id="shot-hero",
+        composition_spec=inputs.composition_spec,
+    )
+    second_declared, second_provider = _real_input(
+        root=tmp_path,
+        execution=skeleton,
+        shot_id="shot-proof",
+        composition_spec=inputs.composition_spec,
+    )
+    first_reviewer = _CountingCommercialShotReviewer(
+        verdict=QaVerdict.NOT_EVALUATED
+    )
+    first_input = replace(first_input, commercial_reviewer=first_reviewer)
+    first_plan = replace(
+        skeleton,
+        shots=(first_input, second_declared),
+        input_factory=lambda shot_id: first_input if shot_id == "shot-hero" else second_declared,
+    )
+    job = EcommerceProductionJobService()
+    first = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.GENERATE_SHOT,
+        shot_execution=first_plan,
+    )
+    assert first.next_action is EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE
+    assert first_provider.submit_calls == 1
+    assert second_provider.submit_calls == 0
+
+    repaired_reviewer = _CountingCommercialShotReviewer(verdict=QaVerdict.PASS)
+    repaired_reviewer.intent = first_reviewer.intent
+    repaired_input = replace(first_input, commercial_reviewer=repaired_reviewer)
+    repaired_plan = replace(
+        first_plan,
+        shots=(repaired_input, second_declared),
+        input_factory=lambda shot_id: repaired_input if shot_id == "shot-hero" else second_declared,
+    )
+    repaired = job.advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE,
+        shot_execution=repaired_plan,
+    )
+    assert repaired.next_action is EcommerceJobNextAction.GENERATE_SHOT
+    assert repaired.next_shot_id == "shot-proof"
+    assert first_provider.submit_calls == 1
+    assert second_provider.submit_calls == 0

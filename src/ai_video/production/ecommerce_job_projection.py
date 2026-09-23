@@ -211,6 +211,46 @@ def project_ecommerce_job_progress(
             )
         if repair is not None:
             action, shot_id = repair
+            if action is EcommerceJobNextAction.REPAIR_SHOT_EVIDENCE:
+                from ai_video.production._video_project_reader import (
+                    load_commercial_shot_evaluation_intent,
+                )
+
+                try:
+                    shot_attempts = bound_generation_attempt_ids_for_shot(
+                        request.project_root, shot_execution, shot_id=shot_id
+                    )
+                    attempt = next(
+                        item for item in loaded.manifest.attempts
+                        if item.attempt_id == shot_attempts[-1]
+                    )
+                    evaluation = attempt.video_generation_state.commercial_evaluation
+                    intent = load_commercial_shot_evaluation_intent(
+                        request.project_root, evaluation.intent
+                    )
+                except (AiVideoError, AttributeError, OSError, IndexError, StopIteration, TypeError, ValueError):
+                    return block_ecommerce_job(
+                        request,
+                        blocker_code="ECOMMERCE_SHOT_EXECUTION_INVALID",
+                        stage="shot_repair",
+                        subject_id=shot_id,
+                        failure_classification="EXECUTION_INPUT_INVALID",
+                        required_action="Reopen the exact Shot evidence attempt.",
+                        manifest_revision=revision,
+                    )
+                if (
+                    loaded.qa_policy is None
+                    or intent.qa_policy_content_hash != loaded.qa_policy.content_hash
+                ):
+                    return block_ecommerce_job(
+                        request,
+                        blocker_code="ECOMMERCE_COMMERCIAL_REPAIR_QA_CHANGED",
+                        stage="shot_repair",
+                        subject_id=shot_id,
+                        failure_classification="AUTHORING_REVISION_REQUIRED",
+                        required_action="Reconcile the selected generation QA with the original Shot before evidence repair.",
+                        manifest_revision=revision,
+                    )
             if action is EcommerceJobNextAction.REPAIR_SHOT_MEDIA:
                 try:
                     shot_attempts = bound_generation_attempt_ids_for_shot(

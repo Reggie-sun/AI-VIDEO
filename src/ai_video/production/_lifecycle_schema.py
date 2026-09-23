@@ -780,6 +780,7 @@ class CommercialShotEvaluationState(_PaidLifecycleModel):
     intent: CommercialShotEvaluationIntentPointer
     qa_policy: QaPolicyPointer | None = None
     evidence: GeneratedCommercialShotEvidencePointer | None = None
+    evidence_history: tuple[GeneratedCommercialShotEvidencePointer, ...] = ()
     probe: VideoProbeReceiptPointer | None = None
     provenance: VideoProvenanceReceiptPointer | None = None
 
@@ -792,6 +793,8 @@ class CommercialShotEvaluationState(_PaidLifecycleModel):
             data.pop("qa_policy", None)
         if self.evidence is None:
             data.pop("evidence", None)
+        if not self.evidence_history:
+            data.pop("evidence_history", None)
         if self.probe is None:
             data.pop("probe", None)
         if self.provenance is None:
@@ -816,6 +819,21 @@ class CommercialShotEvaluationState(_PaidLifecycleModel):
             raise ValueError(
                 "commercial Shot evaluation evidence does not match its intent"
             )
+        if any(
+            prior.intent_content_hash != self.intent.content_hash
+            or prior.evaluation_fingerprint != self.intent.evaluation_fingerprint
+            or prior.binding_content_hash != self.intent.binding_content_hash
+            or prior.artifact_sha256 != self.intent.artifact_sha256
+            for prior in self.evidence_history
+        ) or len({prior.content_hash for prior in self.evidence_history}) != len(
+            self.evidence_history
+        ) or (
+            self.evidence is not None
+            and self.evidence.content_hash in {
+                prior.content_hash for prior in self.evidence_history
+            }
+        ):
+            raise ValueError("commercial Shot evidence history is not exact")
         if (self.probe is None) != (self.provenance is None):
             raise ValueError(
                 "commercial capture checkpoint requires probe and provenance together"

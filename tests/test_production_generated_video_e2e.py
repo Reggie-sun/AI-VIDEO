@@ -1725,6 +1725,48 @@ def test_historical_commercial_pass_rejects_original_policy_byte_change(
         attempt_id="later-commercial-pass-policy",
     )
     assert load_production_project(tmp_path / "project.yaml").qa_policy == revised
+    checkpoint_after_qa = service.current_activated_commercial_checkpoint(
+        attempt_id=ATTEMPT_ID
+    )
+    assert checkpoint_after_qa is not None
+    assert checkpoint_after_qa.verdict is QaVerdict.PASS
+
+    policy_path = tmp_path / original_pointer.path
+    policy_path.write_bytes(policy_path.read_bytes() + b"\n")
+    with pytest.raises(AiVideoError) as tampered:
+        load_production_project(tmp_path / "project.yaml")
+    assert tampered.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+@pytest.mark.parametrize("verdict", (QaVerdict.FAIL, QaVerdict.NOT_EVALUATED))
+def test_historical_commercial_nonpass_rejects_original_policy_byte_change(
+    tmp_path: Path, verdict: QaVerdict
+) -> None:
+    _, provider, _, committer = _reach_fetch(tmp_path, commercial=True)
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.fetch_once(attempt_id=ATTEMPT_ID)
+    with pytest.raises(AiVideoError) as nonpass:
+        service.validate_once(
+            attempt_id=ATTEMPT_ID,
+            commercial_reviewer=_CountingCommercialShotReviewer(verdict=verdict),
+        )
+    assert nonpass.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+    loaded = load_production_project(tmp_path / "project.yaml")
+    assert loaded.qa_policy is not None
+    original_pointer = loaded.manifest.active_qa_policy
+    assert original_pointer is not None
+    revised = seal_artifact(loaded.qa_policy.model_copy(update={
+        "revision": loaded.qa_policy.revision + 1,
+        "policy_version": loaded.qa_policy.policy_version + "-later",
+        "creation_receipt_id": loaded.qa_policy.creation_receipt_id + "-later",
+        "content_hash": "0" * 64,
+    }))
+    committer.activate_qa_policy(
+        revised,
+        expected_manifest_revision=loaded.manifest.manifest_revision,
+        attempt_id="later-commercial-nonpass-policy",
+    )
+    assert load_production_project(tmp_path / "project.yaml").qa_policy == revised
 
     policy_path = tmp_path / original_pointer.path
     policy_path.write_bytes(policy_path.read_bytes() + b"\n")
@@ -2088,6 +2130,11 @@ def test_interrupted_commercial_evidence_repair_is_unknown_and_not_repeated(
             attempt_id=ATTEMPT_ID,
             commercial_reviewer=first_reviewer,
         )
+    before = committer._read_manifest().attempts[-1].video_generation_state
+    assert before is not None
+    assert before.commercial_evaluation is not None
+    prior_evidence = before.commercial_evaluation.evidence
+    assert prior_evidence is not None
 
     repair_reviewer = _CountingCommercialShotReviewer(
         fail_during_evaluation=True
@@ -2108,6 +2155,7 @@ def test_interrupted_commercial_evidence_repair_is_unknown_and_not_repeated(
         interrupted_state.commercial_evaluation.phase
         is CommercialShotEvaluationPhase.INTENT
     )
+    assert interrupted_state.commercial_evaluation.evidence_history == (prior_evidence,)
 
     with pytest.raises(AiVideoError) as replay:
         service.validate_once(

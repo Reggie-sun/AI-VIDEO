@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ai_video.errors import ErrorCode
+from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import (
     ProductionManifest,
     RecoveryDisposition,
@@ -86,9 +86,24 @@ class _StateCommitVideoRecoveryMixin:
                                 "Recoverable continuity evidence does not match its intent."
                             )
                 if state.commercial_evaluation is not None:
+                    from ai_video.production.ecommerce_generation_bridge import (
+                        validate_commercial_evidence_history,
+                    )
+
                     commercial_intent = self._reopen_commercial_shot_evaluation_intent(
                         state.commercial_evaluation.intent
                     )
+                    try:
+                        validate_commercial_evidence_history(
+                            self._project_root,
+                            state.commercial_evaluation,
+                            commercial_intent,
+                        )
+                    except (AiVideoError, OSError, ValueError) as exc:
+                        raise _state_invalid(
+                            "Recoverable commercial evidence history is not exact.",
+                            str(exc),
+                        ) from exc
                     if state.commercial_evaluation.evidence is not None:
                         commercial_evidence = (
                             self._reopen_generated_commercial_shot_evidence(
