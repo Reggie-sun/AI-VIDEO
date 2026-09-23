@@ -374,6 +374,7 @@ def prepare_generation_execution(
     task_id: str,
     compiler_id: str,
     compiler_version: str,
+    final_output_goal=None,
 ) -> PreparedGenerationExecution:
     """Build one executable decision from the loaded production project.
 
@@ -536,6 +537,7 @@ def prepare_generation_execution(
         compiler_contract=compiler,
         output_requirement=output,
         recipe=recipe,
+        final_output_goal=final_output_goal,
     )
     inputs = DecisionInputs(
         projection_hash=projection.projection_hash,

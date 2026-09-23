@@ -2130,6 +2130,10 @@ def _dependency_inputs(root: Path, execution) -> ProductionDependencyInputs:
 def _activate_offline_ecommerce_policy(
     root: Path,
     inputs: ProductionDependencyInputs,
+    *,
+    output: VideoOutputRequirement = OUTPUT,
+    final_output=None,
+    required_layers=None,
 ) -> ProductionDependencyInputs:
     committer = ProductionStateCommitter(root)
     manifest = committer._read_manifest()
@@ -2158,9 +2162,15 @@ def _activate_offline_ecommerce_policy(
     )
     profile = create_qingyan_ecommerce_acceptance_profile()
     policy = _commercial_policy()
+    policy_updates = {}
+    if final_output is not None:
+        policy_updates["final_output"] = final_output
+    if required_layers is not None:
+        policy_updates["required_layers"] = required_layers
     policy = seal_artifact(
         policy.model_copy(
             update={
+                **policy_updates,
                 "artifact_id": "qa-policy-ecommerce-job-canonical-e2e",
                 "revision": policy.revision + 1,
                 "content_hash": "0" * 64,
@@ -2191,7 +2201,7 @@ def _activate_offline_ecommerce_policy(
     return activate_fixture_generation_qa_policy(
         root=root,
         inputs=refreshed,
-        output=OUTPUT,
+        output=output,
     )
 
 
@@ -2201,6 +2211,8 @@ def _real_input(
     execution,
     shot_id: str,
     composition_spec,
+    output: VideoOutputRequirement = OUTPUT,
+    artifact_bytes: bytes | None = None,
 ) -> tuple[EcommerceShotExecutionInput, LocalVideoProviderDouble]:
     loaded = load_production_project(root / "project.yaml")
     inputs = ProductionDependencyInputs(
@@ -2256,7 +2268,7 @@ def _real_input(
         negative_prompt_text="",
         image_bindings=(),
         commercial_binding=commercial_binding,
-        output_requirement=OUTPUT,
+        output_requirement=output,
         seed=19,
         base_project=loaded.manifest.active_project,
         base_registry=loaded.manifest.active_registry,
@@ -2272,7 +2284,7 @@ def _real_input(
         execution_kind=VideoExecutionKind.LOCAL,
         billing_kind=BillingKind.LOCAL_UNMETERED,
         mode=VideoGenerationMode.TEXT_TO_VIDEO,
-        output=OUTPUT,
+        output=output,
         allowed_image_roles=(),
         required_first_frame=False,
         max_reference_count=0,
@@ -2291,7 +2303,7 @@ def _real_input(
             provider_name=provider_kind,
             variants=(variant,),
         ),
-        artifact_bytes=FIXTURE.read_bytes(),
+        artifact_bytes=FIXTURE.read_bytes() if artifact_bytes is None else artifact_bytes,
         native_prompt_text=request.prompt_text,
     )
     prepared = prepare_generation_execution(
@@ -2301,6 +2313,9 @@ def _real_input(
         task_id=f"canonical-ecommerce-{shot_id}",
         compiler_id="local-video-state-fixture",
         compiler_version="1",
+        final_output_goal=(
+            None if loaded.qa_policy is None else loaded.qa_policy.final_output
+        ),
     )
     service = VideoGenerationService(
         committer=ProductionStateCommitter(
