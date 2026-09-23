@@ -111,8 +111,9 @@ def project_ecommerce_review_frontier(
         subject_id=request.job_id,
         failure_classification="WHOLE_VIDEO_FAILURE",
         required_action=(
-            "Diagnose the exact failed final requirement and select its smallest "
-            "canonical repair frontier."
+            "Diagnose the exact failed final requirement. Plan-bound CTA or other "
+            "commercial graphic changes require a new authoring handoff and immutable "
+            "Project revision before re-rendering."
         ),
         manifest_revision=manifest_revision,
     )

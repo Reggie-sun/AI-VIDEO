@@ -8,13 +8,14 @@ from ai_video.production.ecommerce_job_review import EcommercePostMediaExecution
 from ai_video.production.ecommerce_job_review import (
     EcommerceFinalReviewFrontier,
     _semantic_repair_frontier,
+    inspect_ecommerce_review_frontier,
 )
 from ai_video.production.ecommerce_media_acceptance import (
     EcommerceAcceptanceEvidencePayload,
     EcommerceRequirementFinding,
     create_qingyan_ecommerce_acceptance_profile,
 )
-from ai_video.production.models import QaVerdict, ToolIdentity
+from ai_video.production.models import QaLayer, QaVerdict, ToolIdentity
 
 
 def _execution(tmp_path: Path, *, policy):
@@ -133,19 +134,46 @@ def _semantic_evidence(*, domain_verdict: QaVerdict, cta_verdict: str):
     )
 
 
-def test_semantic_cta_failure_uses_explicit_composition_repair_frontier() -> None:
+def test_plan_bound_cta_failure_cannot_use_composition_repair_frontier() -> None:
     frontier = _semantic_repair_frontier(
         _semantic_evidence(domain_verdict=QaVerdict.PASS, cta_verdict="fail"),
-        composition_repair_requirement_ids=frozenset({"cta"}),
     )
 
-    assert frontier is EcommerceFinalReviewFrontier.PREPARE_COMPOSITION
+    assert frontier is EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
+
+
+@pytest.mark.parametrize(
+    ("layer", "expected"),
+    (
+        (QaLayer.LAYOUT, EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED),
+        (QaLayer.CAPTION, EcommerceFinalReviewFrontier.PREPARE_COMPOSITION),
+    ),
+)
+def test_unattributed_layout_failure_requires_diagnosis_before_composition_repair(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    layer: QaLayer,
+    expected: EcommerceFinalReviewFrontier,
+) -> None:
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_review.load_production_project",
+        lambda _path: SimpleNamespace(
+            manifest=SimpleNamespace(active_review_receipts=(object(),))
+        ),
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job_review.load_review_receipt",
+        lambda _root, _pointer: SimpleNamespace(
+            verdict=QaVerdict.FAIL, layer=layer
+        ),
+    )
+
+    assert inspect_ecommerce_review_frontier(tmp_path) is expected
 
 
 def test_semantic_domain_failure_requires_diagnosis() -> None:
     frontier = _semantic_repair_frontier(
         _semantic_evidence(domain_verdict=QaVerdict.FAIL, cta_verdict="fail"),
-        composition_repair_requirement_ids=frozenset({"cta"}),
     )
 
     assert frontier is EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED

@@ -52,28 +52,22 @@ class EcommerceFinalReviewFrontier(str, Enum):
 
 def _semantic_repair_frontier(
     evidence: object,
-    *,
-    composition_repair_requirement_ids: frozenset[str],
 ) -> EcommerceFinalReviewFrontier:
     payload = getattr(evidence, "measured_payload", {})
     try:
         domain = EcommerceAcceptanceEvidencePayload.model_validate(
             payload.get("domain_acceptance")
         )
-        final_output = FinalOutputObservation.model_validate(
+        FinalOutputObservation.model_validate(
             payload.get("final_output")
         )
     except (TypeError, ValueError):
         return EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
     if any(item.verdict is not QaVerdict.PASS for item in domain.findings):
         return EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
-    failed = {
-        item.requirement_id
-        for item in final_output.findings
-        if item.verdict == "fail"
-    }
-    if failed and failed.issubset(composition_repair_requirement_ids):
-        return EcommerceFinalReviewFrontier.PREPARE_COMPOSITION
+    # A semantic finding does not prove that its fix is independent of the
+    # sealed AdCreativePlan. CTA and other plan-bound graphics need a new
+    # authoring handoff, not a CompositionSpec-only repair.
     return EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
 
 
@@ -90,7 +84,7 @@ def inspect_ecommerce_review_frontier(
     failed_layers = {
         receipt.layer for receipt in receipts if receipt.verdict is QaVerdict.FAIL
     }
-    if failed_layers and failed_layers.issubset({QaLayer.LAYOUT, QaLayer.CAPTION}):
+    if failed_layers == {QaLayer.CAPTION}:
         return EcommerceFinalReviewFrontier.PREPARE_COMPOSITION
     if failed_layers:
         return EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
@@ -114,7 +108,6 @@ class EcommercePostMediaExecutionPlan:
     review_id: str
     final_acceptance_id: str
     caption_review_execution: CaptionReviewExecution | None = None
-    composition_repair_requirement_ids: tuple[str, ...] = ()
 
     def _validate_runtime_binding(
         self,
@@ -130,18 +123,6 @@ class EcommercePostMediaExecutionPlan:
         if policy is None:
             raise ValueError("Selected QA policy is required for Ecommerce review")
         validate_ecommerce_final_output_contract(runtime_handoff, policy)
-        required_final = {
-            item.requirement_id
-            for item in runtime_handoff.acceptance_requirements
-            if item.scope == "FINAL_OUTPUT"
-        }
-        repair_ids = set(self.composition_repair_requirement_ids)
-        if len(repair_ids) != len(self.composition_repair_requirement_ids):
-            raise ValueError("Composition repair requirement IDs must be unique")
-        if not repair_ids.issubset(required_final):
-            raise ValueError(
-                "Composition repair requirements must belong to the exact handoff"
-            )
         if timeline.caption_cues and (
             policy.caption_policy is None
             or QaLayer.CAPTION not in policy.required_layers
@@ -175,7 +156,7 @@ class EcommercePostMediaExecutionPlan:
         if not failed:
             return EcommerceFinalReviewFrontier.REVIEW_FINAL
         failed_layers = {receipt.layer for _, receipt in failed}
-        if failed_layers.issubset({QaLayer.LAYOUT, QaLayer.CAPTION}):
+        if failed_layers == {QaLayer.CAPTION}:
             return EcommerceFinalReviewFrontier.PREPARE_COMPOSITION
         if failed_layers - {QaLayer.LAYOUT, QaLayer.CAPTION, QaLayer.SEMANTIC}:
             return EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
@@ -188,12 +169,7 @@ class EcommercePostMediaExecutionPlan:
         )
         if len(evidence) != 1:
             return EcommerceFinalReviewFrontier.DIAGNOSIS_REQUIRED
-        return _semantic_repair_frontier(
-            evidence[0],
-            composition_repair_requirement_ids=frozenset(
-                self.composition_repair_requirement_ids
-            ),
-        )
+        return _semantic_repair_frontier(evidence[0])
 
     def run(
         self,
