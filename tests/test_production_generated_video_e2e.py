@@ -1987,6 +1987,53 @@ def test_commercial_not_evaluated_evidence_repair_reuses_media_without_submit(
     assert provider.call_counts.submit == submit_calls
 
 
+def test_known_duplicate_evidence_repair_preserves_prior_checkpoint(
+    tmp_path: Path,
+) -> None:
+    _, provider, _, committer = _reach_fetch(tmp_path, commercial=True)
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.fetch_once(attempt_id=ATTEMPT_ID)
+    first_reviewer = _CountingCommercialShotReviewer(
+        verdict=QaVerdict.NOT_EVALUATED
+    )
+    with pytest.raises(AiVideoError):
+        service.validate_once(
+            attempt_id=ATTEMPT_ID,
+            commercial_reviewer=first_reviewer,
+        )
+    before = committer._read_manifest()
+    previous = before.attempts[-1].video_generation_state.commercial_evaluation
+    assert previous is not None and previous.evidence is not None
+    submit_calls = provider.call_counts.submit
+
+    duplicate_reviewer = _CountingCommercialShotReviewer(
+        verdict=QaVerdict.NOT_EVALUATED
+    )
+    duplicate_reviewer.intent = first_reviewer.intent
+    with pytest.raises(AiVideoError) as duplicate:
+        service.validate_once(
+            attempt_id=ATTEMPT_ID,
+            commercial_reviewer=duplicate_reviewer,
+            repair_commercial_evidence=True,
+        )
+    assert duplicate.value.code is ErrorCode.REVIEW_EVIDENCE_INVALID
+    after = committer._read_manifest()
+    retained = after.attempts[-1].video_generation_state.commercial_evaluation
+    assert retained is not None
+    assert retained.phase is CommercialShotEvaluationPhase.EVIDENCED
+    assert retained.evidence == previous.evidence
+    assert provider.call_counts.submit == submit_calls
+
+    passing_reviewer = _CountingCommercialShotReviewer(verdict=QaVerdict.PASS)
+    passing_reviewer.intent = first_reviewer.intent
+    service.validate_once(
+        attempt_id=ATTEMPT_ID,
+        commercial_reviewer=passing_reviewer,
+        repair_commercial_evidence=True,
+    )
+    assert provider.call_counts.submit == submit_calls
+
+
 def test_interrupted_commercial_evidence_repair_is_unknown_and_not_repeated(
     tmp_path: Path,
 ) -> None:

@@ -363,6 +363,7 @@ def checkpoint_generated_commercial_shot(
                 raise _state_invalid(
                     "Commercial evidence repair requires NOT_EVALUATED evidence."
                 )
+            previous_evaluation_state = evaluation_state
             repair_intent_state = state.model_copy(
                 update={
                     "commercial_evaluation": CommercialShotEvaluationState(
@@ -411,8 +412,30 @@ def checkpoint_generated_commercial_shot(
                 commercial_authorities,
             )
             if replacement.content_hash == evidence.content_hash:
-                raise _state_invalid(
-                    "Commercial evidence repair did not produce new exact evidence."
+                restored_state = state.model_copy(
+                    update={"commercial_evaluation": previous_evaluation_state}
+                )
+                restored_attempt = _validated_transition(
+                    attempt,
+                    {"video_generation_state": restored_state},
+                )
+                restored_manifest = _validated_transition(
+                    manifest,
+                    {
+                        "manifest_revision": manifest.manifest_revision + 1,
+                        "attempts": tuple(
+                            restored_attempt if item.attempt_id == attempt_id else item
+                            for item in manifest.attempts
+                        ),
+                    },
+                )
+                committer._write_manifest_atomic(restored_manifest)
+                raise AiVideoError(
+                    code=ErrorCode.REVIEW_EVIDENCE_INVALID,
+                    user_message=(
+                        "Commercial evidence repair did not produce new exact evidence."
+                    ),
+                    retryable=False,
                 )
             evidence_artifact = _prepared_artifact(
                 canonical_generated_commercial_shot_evidence_path(

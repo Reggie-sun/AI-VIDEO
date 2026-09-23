@@ -43,8 +43,11 @@ from ai_video.production.ecommerce_job import (
 )
 from ai_video.production.ecommerce_job_assembly import EcommerceAssemblyDecision
 from ai_video.production.ecommerce_job_repair import (
+    EcommerceAttemptIdentity,
+    EcommerceShotRepairContext,
     bound_generation_attempt_ids,
     canonical_repair_frontier,
+    input_attempt_identity,
     shots_match_handoff,
 )
 from ai_video.production.ecommerce_job_compiler import (
@@ -115,6 +118,7 @@ from test_production_generated_video_e2e import (
     FIXTURE,
     _CountingCommercialShotReviewer,
 )
+from test_production_ecommerce_job_repair import _diagnosis, _intervention
 from test_production_local_video_state import LocalVideoProviderDouble
 
 
@@ -162,7 +166,11 @@ def _bootstrapped_job(tmp_path: Path, *, attempts: int = 1):
     )
     assert (
         EcommerceProductionJobService().inspect(request, handoff).next_action
-        is EcommerceJobNextAction.GENERATE_SHOT
+        is (
+            EcommerceJobNextAction.GENERATE_SHOT
+            if attempts > 0
+            else EcommerceJobNextAction.BLOCKED
+        )
     )
     return handoff, request
 
@@ -477,6 +485,22 @@ def test_advance_enforces_job_generation_ceiling_before_any_effect(tmp_path: Pat
     assert service.effects == []
 
 
+def test_inspect_projects_blocked_before_initial_generation_at_zero_ceiling(
+    tmp_path: Path,
+) -> None:
+    handoff, request = _bootstrapped_job(tmp_path, attempts=0)
+    service = _FakeVideoService(QaVerdict.PASS, tmp_path.resolve())
+
+    projected = EcommerceProductionJobService().inspect(
+        request, handoff, shot_execution=_execution(service, handoff)
+    )
+
+    assert projected.next_action is EcommerceJobNextAction.BLOCKED
+    assert projected.blocker is not None
+    assert projected.blocker.blocker_code == "ECOMMERCE_JOB_GENERATION_CEILING_EXHAUSTED"
+    assert service.effects == []
+
+
 def test_generation_ceiling_counts_prior_bound_attempts_across_service_instances(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -499,6 +523,161 @@ def test_generation_ceiling_counts_prior_bound_attempts_across_service_instances
     assert result.next_action is EcommerceJobNextAction.BLOCKED
     assert result.blocker is not None
     assert result.blocker.blocker_code == "ECOMMERCE_JOB_GENERATION_CEILING_EXHAUSTED"
+    assert service.effects == []
+
+
+@pytest.mark.parametrize(
+    ("job_ceiling", "shot_ceiling", "expected_blocker"),
+    (
+        (1, 1, "ECOMMERCE_JOB_GENERATION_CEILING_EXHAUSTED"),
+        (2, 0, "ECOMMERCE_SHOT_REPAIR_CEILING_EXHAUSTED"),
+    ),
+)
+def test_inspect_projects_blocked_when_failed_shot_has_no_repair_capacity(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    job_ceiling: int,
+    shot_ceiling: int,
+    expected_blocker: str,
+) -> None:
+    handoff, request = _bootstrapped_job(tmp_path, attempts=job_ceiling)
+    request = request.model_copy(update={"max_repairs_per_shot": shot_ceiling})
+    service = _FakeVideoService(QaVerdict.FAIL, tmp_path.resolve())
+    execution = _execution(service, handoff)
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.canonical_repair_frontier",
+        lambda *_: (EcommerceJobNextAction.REPAIR_SHOT_MEDIA, "shot-hero"),
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.bound_generation_attempt_ids",
+        lambda *_: ("failed-attempt",),
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.bound_generation_attempt_ids_for_shot",
+        lambda *_, **__: ("failed-attempt",),
+    )
+
+    projected = EcommerceProductionJobService().inspect(
+        request, handoff, shot_execution=execution
+    )
+
+    assert projected.next_action is EcommerceJobNextAction.BLOCKED
+    assert projected.blocker is not None
+    assert projected.blocker.blocker_code == expected_blocker
+    assert service.effects == []
+
+
+@pytest.mark.parametrize(
+    ("prior_attempt_id", "diagnosis_hash", "expected_blocker"),
+    (
+        ("attempt-old", "d" * 64, "ECOMMERCE_SHOT_REPAIR_IDENTITY_MISMATCH"),
+        ("attempt-latest", "a" * 64, "ECOMMERCE_SHOT_REPAIR_EVIDENCE_MISMATCH"),
+        ("attempt-latest", "d" * 64, None),
+    ),
+)
+def test_media_repair_rejects_stale_attempt_or_gate_evidence_before_execution(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    prior_attempt_id: str,
+    diagnosis_hash: str,
+    expected_blocker: str | None,
+) -> None:
+    class _RepairJob(EcommerceProductionJobService):
+        def inspect(self, request, handoff, *, shot_execution=None):
+            return self._projection(
+                request,
+                next_action=EcommerceJobNextAction.REPAIR_SHOT_MEDIA,
+                manifest_revision=2,
+                next_shot_id="shot-hero",
+            )
+
+    handoff, request = _bootstrapped_job(tmp_path, attempts=3)
+    request = request.model_copy(update={"max_repairs_per_shot": 2})
+    service = _FakeVideoService(QaVerdict.PASS, tmp_path.resolve())
+    base = _execution(service, handoff)
+    proposed = replace(base.shots[0], attempt_id="attempt-proposed")
+    prior = EcommerceAttemptIdentity(
+        attempt_id=prior_attempt_id,
+        routing_binding_hash="c" * 64,
+        permit_id="permit-prior",
+        resolved_generation_hash="a" * 64,
+    )
+    context = EcommerceShotRepairContext(
+        shot_id="shot-hero",
+        verdict=QaVerdict.FAIL,
+        outcome_known=True,
+        diagnosis=_diagnosis("QUALITY_FAILURE").model_copy(
+            update={"evidence_hashes": (diagnosis_hash,)}
+        ),
+        intervention=_intervention(),
+        prior_attempt=prior,
+        proposed_attempt=input_attempt_identity(proposed),
+        existing_job_attempts=2,
+        existing_shot_repairs=1,
+        request_delta_verified=True,
+    )
+    execution = replace(
+        base, shots=(replace(proposed, repair_context=context),)
+    )
+    latest = SimpleNamespace(
+        attempt_id="attempt-latest",
+        video_generation_state=SimpleNamespace(
+            commercial_evaluation=SimpleNamespace(
+                evidence=SimpleNamespace(content_hash="d" * 64)
+            )
+        ),
+    )
+    loaded = SimpleNamespace(
+        manifest=SimpleNamespace(manifest_revision=2, attempts=(latest,))
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.load_production_project",
+        lambda *_: loaded,
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.bound_generation_attempt_ids",
+        lambda *_: ("attempt-old", "attempt-latest"),
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.bound_generation_attempt_ids_for_shot",
+        lambda *_, **__: ("attempt-old", "attempt-latest"),
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.canonical_attempt_identity",
+        lambda _root, _attempt_id: prior,
+    )
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.repair_request_delta_is_verified",
+        lambda *_, **__: True,
+    )
+    generation_calls: list[str] = []
+
+    def run_generation(*_args, **_kwargs):
+        if expected_blocker is not None:
+            pytest.fail("stale repair reached generation")
+        generation_calls.append("run")
+        return SimpleNamespace(complete=True)
+
+    monkeypatch.setattr(
+        "ai_video.production.ecommerce_job.run_ecommerce_ad_generation",
+        run_generation,
+    )
+
+    result = _RepairJob().advance_once(
+        request,
+        handoff,
+        expected_action=EcommerceJobNextAction.REPAIR_SHOT_MEDIA,
+        shot_execution=execution,
+    )
+
+    if expected_blocker is None:
+        assert result.next_action is EcommerceJobNextAction.PREPARE_COMPOSITION
+        assert generation_calls == ["run"]
+    else:
+        assert result.next_action is EcommerceJobNextAction.BLOCKED
+        assert result.blocker is not None
+        assert result.blocker.blocker_code == expected_blocker
+        assert generation_calls == []
     assert service.effects == []
 
 
