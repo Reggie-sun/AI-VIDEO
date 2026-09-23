@@ -583,6 +583,25 @@ class EcommerceProductionJobService:
                             None if latest_attempt is None
                             else latest_attempt.video_generation_state
                         )
+                        if (
+                            latest_attempt is None
+                            or latest_attempt.status is not StateCommitStatus.FAILED
+                            or latest_state is None
+                            or latest_state.quality_rejection is None
+                        ):
+                            return self._blocked(
+                                request,
+                                blocker_code="ECOMMERCE_SHOT_REPAIR_PRIOR_UNCLOSED",
+                                stage="shot_repair",
+                                subject_id=shot_id or request.job_id,
+                                failure_classification="QUALITY_REJECTION_REQUIRED",
+                                required_action=(
+                                    "Close the exact known media failure through "
+                                    "ProductionStateCommitter.reject_video_generation "
+                                    "before a new Shot attempt."
+                                ),
+                                manifest_revision=loaded.manifest.manifest_revision,
+                            )
                         evaluation = (
                             None if latest_state is None
                             else latest_state.commercial_evaluation

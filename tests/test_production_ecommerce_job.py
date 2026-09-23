@@ -621,7 +621,9 @@ def test_media_repair_rejects_stale_attempt_or_gate_evidence_before_execution(
     )
     latest = SimpleNamespace(
         attempt_id="attempt-latest",
+        status=StateCommitStatus.FAILED,
         video_generation_state=SimpleNamespace(
+            quality_rejection=object(),
             commercial_evaluation=SimpleNamespace(
                 evidence=SimpleNamespace(content_hash="d" * 64)
             )
@@ -2218,6 +2220,7 @@ def _real_input(
     output: VideoOutputRequirement = OUTPUT,
     artifact_bytes: bytes | None = None,
     caption_style_fingerprints: tuple[tuple[str, str], ...] = (),
+    local_batch_limit: int = 1,
 ) -> tuple[EcommerceShotExecutionInput, LocalVideoProviderDouble]:
     loaded = load_production_project(root / "project.yaml")
     inputs = ProductionDependencyInputs(
@@ -2321,6 +2324,7 @@ def _real_input(
         final_output_goal=(
             None if loaded.qa_policy is None else loaded.qa_policy.final_output
         ),
+        local_batch_limit=local_batch_limit,
     )
     service = VideoGenerationService(
         committer=ProductionStateCommitter(

@@ -375,6 +375,7 @@ def prepare_generation_execution(
     compiler_id: str,
     compiler_version: str,
     final_output_goal=None,
+    local_batch_limit: int = 1,
 ) -> PreparedGenerationExecution:
     """Build one executable decision from the loaded production project.
 
@@ -554,7 +555,7 @@ def prepare_generation_execution(
             ),
             paid_submit_ceiling=1 if capability.billing_kind is BillingKind.METERED else 0,
             paid_submits_used=0,
-            local_batch_limit=1,
+            local_batch_limit=local_batch_limit,
             local_batch_used=0,
             local_total_used=0,
             local_resource_available=True,

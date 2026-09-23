@@ -262,8 +262,10 @@ Provider switching is allowed only as an explicit new routing decision whose cap
 - Tool/Provider success is only candidate production, never acceptance.
 - `PASS` requires exact-byte, current-intent, current-revision evidence.
 - `FAIL` invokes failure classification and only the bounded repair action allowed by the diagnosis.
+- A known failed fetched attempt must be explicitly closed by `ProductionStateCommitter.reject_video_generation()` with exact durable evaluation evidence before a new media-repair attempt can submit; Job preflight blocks an unclosed prior attempt.
 - `NOT_EVALUATED` invokes `EVIDENCE_REPAIR_FIRST`; it MUST NOT regenerate media merely to hide missing evidence.
 - `OUTCOME_UNKNOWN` stops and routes to explicit recovery; no blind retry or permit remint.
+- Recovery resumes only after the canonical owner establishes a known accepted effect or verified no-effect with the required authorization; an unresolved local submit remains stopped after `recover()`.
 - Each media repair is a new exact attempt with new identity and full revalidation.
 - Local repair MUST preserve already accepted product identity、continuity、timing、audio and narrative invariants. If the repair would degrade final-output quality, it is rejected.
 - Exhausted attempt ceiling returns `BLOCKED`; it does not restart the whole pipeline.

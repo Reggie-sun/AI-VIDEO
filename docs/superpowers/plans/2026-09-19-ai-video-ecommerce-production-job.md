@@ -2,7 +2,7 @@
 
 ## Status
 
-M0–M7 offline implementation and deterministic scenarios are committed on local `main` through `f07d7de`. Governing design：`docs/superpowers/specs/2026-09-19-ai-video-ecommerce-production-job.md`。Contracts、pure Skill-side exporter、canonical compiler/bootstrap、read-only projection/resume、bounded ordered Shot execution、composition/render、whole-video QC and delivery all use existing Production owners. M7 now includes a full canonical two-Shot Job through render、review、delivery and exact replay, plus a separate CAPTION timing `FAIL` → newly sealed composition → rerender → fresh review → delivery path. The M7 focused suite passed `133` tests. Final closure evidence must still be checked against the exact later Harness receipt and independent review recorded for that snapshot.
+M0–M7 offline implementation and deterministic scenarios are on local `main`; the latest M7 repair-closure checkpoint is pending final exact-range verification. Governing design：`docs/superpowers/specs/2026-09-19-ai-video-ecommerce-production-job.md`。Contracts、pure Skill-side exporter、canonical compiler/bootstrap、read-only projection/resume、bounded ordered Shot execution、composition/render、whole-video QC and delivery all use existing Production owners. M7 now includes full canonical two-Shot Job paths through render、review、delivery and exact replay for direct PASS、evidence repair and one known-failure media repair, plus CAPTION timing `FAIL` → newly sealed composition → rerender → fresh review → delivery. The expanded focused suite passed `140` tests, including generation-execution helper tests. Final closure evidence must still be checked against the exact later Harness receipt and independent review recorded for that snapshot.
 
 `c24ef92` 的历史 exact-range Harness receipt（`.agent/harness/runs/ecommerce-production-job-cta-repair-20260924-01/receipt.json`）只证明该 snapshot。后续 `b404e91`、`c5ec8e0` 修正 P6 CAPTION per-group evidence/coverage，`8c72763` 加入与封存要求一致的 1080×1920、3 秒 Shot 和 6 秒 final offline MP4 fixture，`f07d7de` 证明 CAPTION 局部修复跨完整 Job 后仍保留已接受 Shot。Fixture runner/evaluator 为确定性替身，未产生真实商品广告或人工视觉验收。详细 evidence 与当前 final gate 见 `docs/record_for_agent/2026-09-19-ecommerce-production-job-m7-offline-code.md`。
 
@@ -425,9 +425,9 @@ Prove the application path against deterministic fakes and exact artifacts, then
 
 1. Fresh project -> bootstrap -> two Shots -> per-Shot pass -> composition -> final pass -> delivery.
 2. Interruption after first Shot activation -> reopen -> second Shot only.
-3. First Shot `NOT_EVALUATED` -> evidence repair -> re-evaluate without Provider resubmit.
-4. Second Shot known failure -> one repair -> full revalidation -> continue.
-5. Provider submit outcome unknown -> stop -> explicit recovery -> resume.
+3. First Provider-executed Shot `NOT_EVALUATED` -> evidence repair -> re-evaluate without Provider resubmit.
+4. Second Shot known failure -> exact evaluation and committer-owned rejection closure -> one bounded new attempt -> full revalidation -> continue; an unclosed failed attempt cannot proceed to another submit.
+5. Provider submit outcome unknown -> stop -> explicit recovery. Resume only if the canonical owner proves a known accepted task or verified no-effect under its applicable authorization; otherwise remain stopped without resubmit. An unresolved local submit has no evidence-free resume path.
 6. Final CAPTION failure whose exact evidence identifies cue timing or layout readability, with a corrected, newly sealed composition revision -> composition-local repair -> re-render -> final review; accepted Shots unchanged. CAPTION `UNINTENDED_TEXT` and plan-bound CTA text, position or color failure -> `BLOCKED` for diagnosis and, where plan-bound, explicit authoring handoff plus immutable Project revision reconciliation; they must not be presented as composition-only repair. Persisted CAPTION `NOT_EVALUATED` requires evidence repair through the canonical review owner before retry.
 7. Exact completed replay -> zero external effects and same bundle identity.
 
