@@ -5,10 +5,10 @@ AGENTS.md[SG9M]: F:定义 AI-VIDEO 仓库的长期权限、owner、产品不变�
 README.md[SG7M]: F:介绍 Legacy local-first CLI 与 Production API 的入口、使用和文档导航 | R:code:src/ai_video/cli.py,code:src/ai_video/production/project.py,code:docs/v0.2-runtime-baseline.md | A:ai-video validate,ai-video run,ai-video resume | S:README 的历史状态陈述不能替代当前 runtime baseline 或当前源码验证
 
 ===/home/reggie/vscode_folder/AI-VIDEO/.agent/harness/===
-policy.yaml[OQ9L]: F:按变更路径将仓库修改映射到必需的 Harness 检查与证据路由 | R:code:AGENTS.md,code:docs/agent-primary-contract-matrix.md | A:changed-path category,mandatory checks | S:未映射 owned path 必须 fail safe；实际完成验证以 exact staged snapshot 或 commit range 的 receipt 为准
+policy.yaml[OQ9L]: F:按变更路径将仓库修改映射到必需的 Harness 检查与证据路由 | R:code:AGENTS.md,code:docs/agent-primary-contract-matrix.md | A:changed-path category,mandatory checks | S:AOCI 正式资产由 aoci_project_cognition_tests 核验；未映射 owned path 必须 fail safe；完成验证以 exact staged snapshot 或 commit range 的 receipt 为准
 
 ===/home/reggie/vscode_folder/AI-VIDEO/docs/===
-agent-primary-contract-matrix.md[SG9L]: F:维护跨 surface 的唯一 owner、禁止旁路、关键 invariant 与 focused verification 映射 | R:code:AGENTS.md,code:.agent/harness/policy.yaml,code:src/ai_video/production/state_commit.py | A:surface owner,focused verification | S:新增跨模块行为必须回到 canonical owner；矩阵与 policy 的检查路由不得分叉
+agent-primary-contract-matrix.md[SG9L]: F:维护跨 surface 的唯一 owner、禁止旁路、关键 invariant 与 focused verification 映射 | R:code:AGENTS.md,code:.agent/harness/policy.yaml,code:src/ai_video/production/state_commit.py | A:surface owner,focused verification | S:AOCI 只作 advisory cognition，不建立第二 Production owner；新增跨模块行为回到 canonical owner；矩阵与 policy 检查路由不得分叉；runtime repair 仅准最新已知同 Shot RUNTIME_FAILURE 使用 one-use grant，unknown、旧证据或额度耗尽不得重试
 v0.2-agentic-production-roadmap.md[SW8M]: F:记录 v0.2 phase 依赖、状态、下一 slice 与 gate 方向 | R:code:docs/v0.2-runtime-baseline.md,code:AGENTS.md | A:phase dependency map,future gates | S:规划状态不是实现或验收证据；执行前仍须复核当前代码和 runtime baseline
 v0.2-runtime-baseline.md[SG9L]: F:记录当前实现、local/origin/release truth 及已验证和未验证边界 | R:code:AGENTS.md,code:docs/v0.2-agentic-production-roadmap.md,code:src/ai_video/production/state_commit.py | A:runtime evidence boundary | S:离线测试、历史 receipt、开发侧实验不得推导 live Provider、媒体质量或 Final Acceptance 已通过
 

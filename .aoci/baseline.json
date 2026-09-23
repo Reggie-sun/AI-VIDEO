@@ -1,12 +1,12 @@
 {
   "version": 1,
   "created_at": "2026-09-23T13:22:44Z",
-  "updated_at": "2026-09-23T13:57:41Z",
+  "updated_at": "2026-09-23T14:50:30Z",
   "files": {
     ".agent/harness/policy.yaml": {
-      "sha256": "1ff464783e5505da202208a0d2dd06a07cde7a8b909e6168ac05e6f430583ab0",
-      "size": 65577,
-      "normalized_sha256": "1ff464783e5505da202208a0d2dd06a07cde7a8b909e6168ac05e6f430583ab0"
+      "sha256": "dcd3859b1ef14522678b948a0e6c35a5d17e8261125af248e4876ccc42ca1cdf",
+      "size": 66922,
+      "normalized_sha256": "dcd3859b1ef14522678b948a0e6c35a5d17e8261125af248e4876ccc42ca1cdf"
     },
     ".agents/skills/distill-ai-video-learning/SKILL.md": {
       "role": "observe",
@@ -253,9 +253,9 @@
       "normalized_sha256": "ea5c42fd129d883ba5bb736f4e411938d91c358ca4c96eb5486c7889b448bc31"
     },
     "aoci.code.txt": {
-      "sha256": "b1afbb3bd505f1f41a33b0f26db3c7c2e0bf6eaa3f2462849896d618ac918609",
-      "size": 12742,
-      "normalized_sha256": "b1afbb3bd505f1f41a33b0f26db3c7c2e0bf6eaa3f2462849896d618ac918609"
+      "sha256": "fdba21719cb3c0b16efd3a40f114207ee071331a767f5b75dfe1e3d8eca8afb8",
+      "size": 12984,
+      "normalized_sha256": "fdba21719cb3c0b16efd3a40f114207ee071331a767f5b75dfe1e3d8eca8afb8"
     },
     "aoci.meta.txt": {
       "role": "index",
@@ -324,9 +324,9 @@
       "normalized_sha256": "0fef49ad05fa6bc0bf5023f583a5f25a03320ee29aee8d83a20cd299c2616327"
     },
     "docs/agent-primary-contract-matrix.md": {
-      "sha256": "f6d871f2eb37b664857508885d2f00c522b20eccc2125c91b1e041c946a51ef2",
-      "size": 132730,
-      "normalized_sha256": "f6d871f2eb37b664857508885d2f00c522b20eccc2125c91b1e041c946a51ef2"
+      "sha256": "186c84e002e3d9b23356fb20fb33b3cd83cbf95eeb353b9d07cb65d41e57c053",
+      "size": 133893,
+      "normalized_sha256": "186c84e002e3d9b23356fb20fb33b3cd83cbf95eeb353b9d07cb65d41e57c053"
     },
     "docs/ai-video-ecommerce-cooperation-wechat.txt": {
       "role": "observe",
@@ -3346,9 +3346,9 @@
     },
     "src/ai_video/production/ecommerce_job.py": {
       "role": "observe",
-      "sha256": "ccfb51195ce54968865fc428f297b1e872046b4d41717b4da911298ea422c606",
-      "size": 44278,
-      "normalized_sha256": "ccfb51195ce54968865fc428f297b1e872046b4d41717b4da911298ea422c606"
+      "sha256": "cb6844196c6808e26a5980eb42c4dca31d4f82845bfc53d770c89f246afea452",
+      "size": 34881,
+      "normalized_sha256": "cb6844196c6808e26a5980eb42c4dca31d4f82845bfc53d770c89f246afea452"
     },
     "src/ai_video/production/ecommerce_job_assembly.py": {
       "role": "observe",
@@ -3375,9 +3375,9 @@
     },
     "src/ai_video/production/ecommerce_job_projection.py": {
       "role": "observe",
-      "sha256": "fd37651e068902a86c12fc82a6e1dac551b53504ba6d834ae6a57f4a63e0a326",
-      "size": 3435,
-      "normalized_sha256": "fd37651e068902a86c12fc82a6e1dac551b53504ba6d834ae6a57f4a63e0a326"
+      "sha256": "abbb0568e1f91a1717f17ebf327d8d360a63f01d1fdfff58375e928026fb6a8e",
+      "size": 13617,
+      "normalized_sha256": "abbb0568e1f91a1717f17ebf327d8d360a63f01d1fdfff58375e928026fb6a8e"
     },
     "src/ai_video/production/ecommerce_job_repair.py": {
       "role": "observe",
@@ -4491,6 +4491,12 @@
       "size": 127161,
       "normalized_sha256": "332cd80fffc239f4b09d34b912255953a31a9ab442564d1921d0c602b4e6d7df"
     },
+    "tests/test_aoci_project_cognition.py": {
+      "role": "observe",
+      "sha256": "17fa08f20eff5133207bb70360fd39e358eac2c732f3af82e5b2d2479e294381",
+      "size": 1909,
+      "normalized_sha256": "17fa08f20eff5133207bb70360fd39e358eac2c732f3af82e5b2d2479e294381"
+    },
     "tests/test_architecture_gate.py": {
       "role": "observe",
       "sha256": "af5df9693e472fe8c670b19ab4df64e15e311fe8b4339ec80a6ac191442b12c1",
@@ -4577,9 +4583,9 @@
     },
     "tests/test_ecommerce_ad_workflow_skill.py": {
       "role": "observe",
-      "sha256": "2a454842e1c7f0ea2b0689d3f56294478e6e176a0aa22b1b507024af6815b4ce",
-      "size": 54022,
-      "normalized_sha256": "2a454842e1c7f0ea2b0689d3f56294478e6e176a0aa22b1b507024af6815b4ce"
+      "sha256": "e1df57bdfc3bb8075830596b49c2246d6ab877b772f2de8f31004f970e2e8ae5",
+      "size": 55200,
+      "normalized_sha256": "e1df57bdfc3bb8075830596b49c2246d6ab877b772f2de8f31004f970e2e8ae5"
     },
     "tests/test_errors.py": {
       "role": "observe",
@@ -4913,9 +4919,9 @@
     },
     "tests/test_production_ecommerce_job.py": {
       "role": "observe",
-      "sha256": "acbefba8251bc7fdc2fd023c9532eb3e05fa7009128b4e27ee2616e07fe7691b",
-      "size": 83347,
-      "normalized_sha256": "acbefba8251bc7fdc2fd023c9532eb3e05fa7009128b4e27ee2616e07fe7691b"
+      "sha256": "70131666de9a71ac1b1ce8f5a9baf94b143b4f11bc9a810078ffeb8e50ae68f7",
+      "size": 83380,
+      "normalized_sha256": "70131666de9a71ac1b1ce8f5a9baf94b143b4f11bc9a810078ffeb8e50ae68f7"
     },
     "tests/test_production_ecommerce_job_assembly.py": {
       "role": "observe",
