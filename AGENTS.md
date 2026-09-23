@@ -168,6 +168,89 @@ Preflight` 维护。External Skills MUST NOT invent or own canonical Character/S
 Asset Registry、Manifest、Dependency Graph、timeline、renderer、Provider lifecycle、review、
 repair 或 delivery state。
 
+## Agent Workflow Routing
+
+Canonical contract for how any agent runtime (Codex, Claude Code, future runtimes) selects
+skills, specs, plans, review, and verification depth. Runtime adapters (`.codex/`、`CLAUDE.md`、
+`.claude/`) only wire this contract and must not carry a second copy. Operational detail lives in
+`.agent/context/control-plane-playbook.md`; the design spec is
+`docs/superpowers/specs/2026-09-20-claude-code-harness-adapter.md`。
+
+### Instruction Hierarchy
+
+确定性优先级（高到低），冲突时低位阶不得推翻高位阶：
+
+1. 用户当前明确指令。
+2. 当前代码、测试与已验证 runtime evidence。
+3. 本 `AGENTS.md` 及其委托的 contract matrix、policy.yaml、playbook。
+4. 当前 slice 的 accepted spec 与 approved plan。
+5. Skill instructions（含 superpowers 与 `.agents/skills/`）。
+6. Reviewer feedback（advisory，由 parent 裁决后落地）。
+7. Runtime 默认行为（含插件 skill 的默认触发门控）。
+
+Skill 默认门控与本节 routing 冲突时，以本节为准。
+
+### Task Tiers And Skill Routing
+
+按 semantic risk / blast radius 分级，不按代码行数：
+
+| Tier | 判据 | 必需流程 |
+| --- | --- | --- |
+| T0 局部低风险 | 单文件、可逆、无契约面变化 | implement + targeted validation |
+| T1 中等 | 多文件、边界清晰、无 shared contract 变化 | （必要时 research）→ plan → implement → verify |
+| T2 高风险 | architecture / workflow state machine / Provider contract / Harness 行为 / shared schema / acceptance criteria / cross-module 变化 | research → specs → plan → implement → verification → implementation review |
+| T3 关键契约 | canonical ownership、verification contract、paid/credential/recovery/QA acceptance 语义变化 | T2 全部 + final dual independent review |
+| Bug | 任意 tier 的 bug | 先 systematic-debugging 做 root-cause，再按 tier 走流程，末做 regression validation |
+
+Skill 命中即触发、不预载全部：设计不清 → brainstorming；写 plan → writing-plans（落
+`docs/superpowers/plans/`）；执行已批准 plan → executing-plans /
+subagent-driven-development；bug → systematic-debugging；声称完成前 →
+verification-before-completion；到达 review 边界 → 本节 reviewer 机制；项目 skill 与
+creative skill 按本文件既有 routing 表。
+
+### Specs / Plan / Review Triggers
+
+- Specs 触发：architecture contract、workflow state machine、Provider contract、Harness
+  行为、acceptance criteria、Shot generation/regeneration policy、shared schema、
+  persistent project rule、cross-module 行为变化，或用户明确要求。普通小修复不触发。
+- Plan 触发：多文件且顺序非显而易见、多阶段、T2/T3、architecture/Provider/workflow
+  修改、涉及迁移/回滚/兼容性。复用 writing-plans，不重新实现。T0/T1 简单任务不产
+  plan artifact。
+- Review 只在完整稳定 target 的边界触发：T2/T3 的 spec 完成后、plan 完成后、
+  implementation 到达完整 checkpoint 后；T3 在声明完成前做 final dual review。T0/T1
+  不触发独立 review。禁止碎片化 reviewer loop；`review executed` / `PARSED` 不等于
+  `accepted`。
+
+### Dual Independent Review
+
+T3（及 parent 判定的高风险 spec/plan）必须双独立审查：两个 reviewer 针对同一 immutable
+review target（exact commit 或 exact staged snapshot，target ID 记入证据）独立审查；
+互不先看对方结论；双方都无 blocking issue 才允许 acceptance；不用多数票；冲突由
+parent 调查具体 evidence 裁决；reviewer 不修改 acceptance criteria；修复后生成新
+target，两个 reviewer 基于同一新状态重审。两个 reviewer 可以是同一 runtime 上两个隔离
+context 的独立 subagent 实例，也可以是跨 runtime；后者独立性更强，可用时优先。
+
+### Verification Levels And Evidence
+
+声称完成前区分五级，不得以下位替代上位：execution success、structural validity、
+functional correctness、acceptance criteria、final review acceptance。局部机器指标不能
+替代最终成片目标（禁止 metric substitution）。所有 PASS / DONE / ACCEPTED 必须附
+evidence；无法验证的项明确标 `NOT_EVALUATED`。
+
+### Roles
+
+- Parent（主会话）：理解最终目标、按本节决定 routing、分派任务、裁决 reviewer
+  disagreement、唯一执行最终 acceptance 判断。
+- Worker：实施具体任务，不得自行降低 acceptance criteria。
+- Reviewer：独立、read-only 优先、输出 evidence + severity、不继承主会话历史、不负责
+  让任务通过。
+
+### Context Control
+
+常驻 context 仅限用户全局规则、runtime adapter 文件与 canonical 规则正文；skill 正文、
+spec、plan、provider/workflow 文档按需加载（progressive disclosure），降低 context
+pollution 与 stale context。
+
 ## Module Boundaries
 
 `docs/agent-primary-contract-matrix.md` 是 detailed surface owner、module boundary、forbidden

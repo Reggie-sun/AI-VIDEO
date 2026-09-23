@@ -32,6 +32,14 @@ PATCH_PATH_PATTERN = re.compile(
 )
 PATCH_MOVE_PATTERN = re.compile(r"^\*\*\* Move to: (?P<path>.+)$", re.MULTILINE)
 SESSION_RECORD_PREFIX = "docs/record_for_agent/"
+# Claude Code write tools carry the target path in tool_input; Codex uses
+# apply_patch instead. Both runtimes share this single hook script.
+CLAUDE_WRITE_TOOL_PATH_KEYS = {
+    "Edit": "file_path",
+    "MultiEdit": "file_path",
+    "Write": "file_path",
+    "NotebookEdit": "notebook_path",
+}
 
 
 def _git_bytes(project_root: Path, *args: str) -> bytes:
@@ -306,7 +314,16 @@ def _task_owned_paths(
             payload.get("tool_input"), project_root, event_cwd
         )
     if tool_name != "apply_patch":
-        return []
+        path_key = CLAUDE_WRITE_TOOL_PATH_KEYS.get(str(tool_name))
+        if path_key is None:
+            return []
+        tool_input = payload.get("tool_input")
+        if not isinstance(tool_input, Mapping):
+            return []
+        relative = _normalize_owned_path(
+            project_root, tool_input.get(path_key), base_dir=event_cwd
+        )
+        return [relative] if relative is not None else []
     patch = _patch_text(payload.get("tool_input"))
     if patch is None:
         return []

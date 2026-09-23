@@ -31,6 +31,7 @@ sensitive_patterns:
 
 audit_patterns:
   - AGENTS.md
+  - CLAUDE.md
   - README.md
   - Makefile
   - .gitattributes
@@ -38,7 +39,10 @@ audit_patterns:
   - .github/workflows/**
   - .agent/harness/*.yaml
   - .architecture/architecture-baseline.json
+  - .claude/settings.json
   - .claude/settings/*.json
+  - .claude/agents/**
+  - .claude/skills/**
   - .codex/*.toml
   - .codex/hooks.json
   - .mcp.json
@@ -171,13 +175,17 @@ checks:
     execution_priority: 18
     description: Reject Agent Skill imports, loaders, paths, and direct Skill identities in Product Runtime source.
   harness_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_docs_contract_gate.py, tests/test_agent_harness.py, tests/test_record_ai_video_session_hook.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_docs_contract_gate.py, tests/test_agent_harness.py, tests/test_record_ai_video_session_hook.py, tests/test_claude_code_adapter.py, -q]
     cwd: .
     description: Verify Harness scope, routing, isolation, receipts, and Make targets.
   local_comfyui_supervisor_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_comfyui_supervisor.py, -q]
     cwd: .
     description: Verify explicit user-systemd ownership, loopback health checks, and scoped local ComfyUI lifecycle controls.
+  minimax_speech_batch_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_minimax_speech_batch.py, tests/test_production_voice_candidate.py, -q]
+    cwd: .
+    description: Verify MiniMax speech batch orchestration and voice candidate lifecycle.
   architecture_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_architecture_gate.py, tests/test_architecture_gate_cli.py, -q]
     cwd: .
@@ -340,6 +348,7 @@ checks:
       - product_runtime_skill_boundary_tests
       - harness_tests
       - local_comfyui_supervisor_tests
+      - minimax_speech_batch_tests
       - architecture_tests
       - cli_config_tests
       - workflow_tests
@@ -1220,6 +1229,16 @@ categories:
     check_ids:
       - experience_learning_skill_tests
       - task_architecture_gate
+  minimax_speech_batch:
+    patterns:
+      - scripts/minimax_speech_batch.py
+      - src/ai_video/production/minimax_speech_batch.py
+      - src/ai_video/production/voice_candidate.py
+      - tests/test_production_minimax_speech_batch.py
+      - tests/test_production_voice_candidate.py
+    check_ids:
+      - minimax_speech_batch_tests
+      - task_architecture_gate
   product_runtime_skill_boundary_test:
     patterns:
       - tests/test_runtime_skill_boundary.py
@@ -1229,9 +1248,13 @@ categories:
   control_plane:
     patterns:
       - AGENTS.md
+      - CLAUDE.md
       - .gitattributes
       - .gitignore
+      - .claude/settings.json
       - .claude/settings/*.json
+      - .claude/agents/**
+      - .claude/skills/**
       - .codex/.gitignore
       - .codex/config.toml
       - .codex/hooks.json
@@ -1246,5 +1269,6 @@ categories:
       - .agent/harness/policy.yaml
       - scripts/__init__.py
       - tests/test_record_ai_video_session_hook.py
+      - tests/test_claude_code_adapter.py
     check_ids:
       - harness_tests

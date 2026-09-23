@@ -941,3 +941,92 @@ def test_acknowledge_rejects_unknown_capture_request_id(tmp_path: Path) -> None:
         project_root=repo,
         state_root=tmp_path / "state",
     ) is False
+
+
+def test_claude_edit_tool_marks_file_path_as_session_owned(tmp_path: Path) -> None:
+    hook = _load_hook_module()
+    repo, tracked = _repository(tmp_path)
+    state_root = tmp_path / "state"
+    result = hook.process_event(
+        _event(
+            "PostToolUse",
+            repo,
+            tool_name="Edit",
+            tool_input={"file_path": str(tracked)},
+            tool_response={"isError": False},
+        ),
+        project_root=repo,
+        state_root=state_root,
+    )
+    assert result == {"continue": True}
+    # owned path 登记后 fingerprint 即偏离空 acked 基线，Stop 必须 block
+    # （与既有 _post_patch -> Stop 行为一致）。
+    stop = hook.process_event(
+        _event("Stop", repo), project_root=repo, state_root=state_root
+    )
+    assert stop.get("decision") == "block"
+
+
+def test_claude_write_and_multiedit_tools_claim_exact_paths(tmp_path: Path) -> None:
+    hook = _load_hook_module()
+    repo, _tracked = _repository(tmp_path)
+    state_root = tmp_path / "state"
+    for tool_name, key in (
+        ("Write", "file_path"),
+        ("MultiEdit", "file_path"),
+        ("NotebookEdit", "notebook_path"),
+    ):
+        target = repo / f"{tool_name.lower()}-target.txt"
+        target.write_text("payload\n", encoding="utf-8")
+        result = hook.process_event(
+            _event(
+                "PostToolUse",
+                repo,
+                tool_name=tool_name,
+                tool_input={key: str(target)},
+            ),
+            project_root=repo,
+            state_root=state_root,
+        )
+        assert result == {"continue": True}
+    stop = hook.process_event(
+        _event("Stop", repo), project_root=repo, state_root=state_root
+    )
+    assert stop.get("decision") == "block"
+
+
+def test_claude_edit_outside_project_and_failed_tool_are_ignored(
+    tmp_path: Path,
+) -> None:
+    hook = _load_hook_module()
+    repo, _tracked = _repository(tmp_path)
+    state_root = tmp_path / "state"
+    outside = tmp_path / "outside.txt"
+    outside.write_text("nope\n", encoding="utf-8")
+    result = hook.process_event(
+        _event(
+            "PostToolUse",
+            repo,
+            tool_name="Edit",
+            tool_input={"file_path": str(outside)},
+        ),
+        project_root=repo,
+        state_root=state_root,
+    )
+    assert result == {"continue": True}
+    failed = hook.process_event(
+        _event(
+            "PostToolUse",
+            repo,
+            tool_name="Write",
+            tool_input={"file_path": str(repo / "failed.txt")},
+            tool_response={"isError": True},
+        ),
+        project_root=repo,
+        state_root=state_root,
+    )
+    assert failed == {"continue": True}
+    stop = hook.process_event(
+        _event("Stop", repo), project_root=repo, state_root=state_root
+    )
+    assert stop == {"continue": True}

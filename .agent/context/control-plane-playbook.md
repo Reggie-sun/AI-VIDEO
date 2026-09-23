@@ -450,3 +450,28 @@ signature 时，完成前才允许一次 focused follow-up；不得把重复检�
 stable-boundary evaluation、record/no-record 决定、supersession、verification/checkpoint 与 ACK 步骤。
 完成 substantial record 后按 `AGENTS.md` 的 `Experience Learning Routing` 自动执行学习评估。
 本 section 只保留入口，不复制流程，也不因缺少 hook request 而免除主动评估。
+
+## Agent Workflow Operations
+
+Runtime-agnostic 操作细节，配合 `AGENTS.md` 的 `Agent Workflow Routing` 使用。
+
+### Constructing An Immutable Review Target
+
+1. 确认工作树中 target 相关文件完整：`git status --short`。
+2. 选择 target 形式：exact commit（`git rev-parse HEAD`）或 exact staged snapshot（`git add <specific-files>` 后记录 `git diff --staged --stat` 与涉及文件列表）。
+3. 把 target ID（commit SHA 或 staged 文件清单 + 时间）写进派发消息；两个 reviewer 必须使用同一 ID。
+
+### Dispatching Dual Reviewers
+
+- Reviewer A 视角：correctness / risk / failure path。
+- Reviewer B 视角：contract compliance / acceptance criteria / metric-substitution 检查。
+- 两次派发使用独立 subagent context；不得把 A 的结论放进 B 的 prompt，反之亦然。
+- Claude Code 实现：`.claude/agents/harness-reviewer.md`（name: `harness-reviewer`）。
+- 跨 runtime reviewer（如 HarnessMesh 资格化的外部 reviewer）可用时优先，替换不改变裁决规则。
+
+### Adjudication
+
+- 双方都 `VERDICT: NO_BLOCKING_ISSUES` → parent 可做 acceptance 判断。
+- 任一 `VERDICT: BLOCKING_ISSUES` → parent 逐条调查 evidence；成立的修复，不成立的记录驳回理由。
+- 修复产生新 target → 两个 reviewer 对新 target 全量重审（不是增量确认）。
+- reviewer 间的结论冲突不投票、不迁就，由 parent 以 evidence 裁决。

@@ -1,6 +1,28 @@
 {
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup|resume|clear|compact",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"/home/reggie/vscode_folder/AI-VIDEO/.agents/skills/record-ai-video-session/scripts/session_record_hook.py\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
+      {
+        "matcher": "^(Edit|Write|MultiEdit|NotebookEdit|Bash)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"/home/reggie/vscode_folder/AI-VIDEO/.agents/skills/record-ai-video-session/scripts/session_record_hook.py\"",
+            "timeout": 5
+          }
+        ]
+      },
       {
         "matcher": "^(Bash|.*[Vv]ideo.*)$",
         "hooks": [
@@ -9,6 +31,29 @@
             "command": "env PYTHONPATH=\"/home/reggie/vscode_folder/AI-VIDEO/src\" \"/home/reggie/.local/share/ai-video/video-analysis-mcp/bin/python\" -m ai_video_mcp.analysis_hook post-tool-use",
             "timeout": 2,
             "statusMessage": "Queueing generated-video analysis"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "manual|auto",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"/home/reggie/vscode_folder/AI-VIDEO/.agents/skills/record-ai-video-session/scripts/session_record_hook.py\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"/home/reggie/vscode_folder/AI-VIDEO/.agents/skills/record-ai-video-session/scripts/session_record_hook.py\"",
+            "timeout": 5
           }
         ]
       }
