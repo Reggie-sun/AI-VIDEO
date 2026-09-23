@@ -2134,6 +2134,7 @@ def _activate_offline_ecommerce_policy(
     output: VideoOutputRequirement = OUTPUT,
     final_output=None,
     required_layers=None,
+    caption_policy=None,
 ) -> ProductionDependencyInputs:
     committer = ProductionStateCommitter(root)
     manifest = committer._read_manifest()
@@ -2167,6 +2168,9 @@ def _activate_offline_ecommerce_policy(
         policy_updates["final_output"] = final_output
     if required_layers is not None:
         policy_updates["required_layers"] = required_layers
+    if caption_policy is not None:
+        policy_updates["schema_version"] = "2.1"
+        policy_updates["caption_policy"] = caption_policy
     policy = seal_artifact(
         policy.model_copy(
             update={
@@ -2213,6 +2217,7 @@ def _real_input(
     composition_spec,
     output: VideoOutputRequirement = OUTPUT,
     artifact_bytes: bytes | None = None,
+    caption_style_fingerprints: tuple[tuple[str, str], ...] = (),
 ) -> tuple[EcommerceShotExecutionInput, LocalVideoProviderDouble]:
     loaded = load_production_project(root / "project.yaml")
     inputs = ProductionDependencyInputs(
@@ -2223,7 +2228,7 @@ def _real_input(
         resolver_contract_fingerprint="1" * 64,
         source_materializer_contract_fingerprint="2" * 64,
         render_contract_fingerprint="3" * 64,
-        caption_style_fingerprints=(),
+        caption_style_fingerprints=caption_style_fingerprints,
     )
     shot = next(item for item in loaded.shots if item.shot_id == shot_id)
     projection = next(
