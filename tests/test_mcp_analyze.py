@@ -848,9 +848,17 @@ def test_project_hook_registers_generated_video_analysis_after_tool_use() -> Non
 def test_claude_project_hook_reuses_the_local_analysis_queue() -> None:
     config = json.loads(CLAUDE_HOOK_CONFIG_PATH.read_text(encoding="utf-8"))
     registrations = config["hooks"]["PostToolUse"]
+    analysis_registrations = [
+        registration
+        for registration in registrations
+        if any(
+            "ai_video_mcp.analysis_hook post-tool-use" in hook["command"]
+            for hook in registration["hooks"]
+        )
+    ]
 
-    assert len(registrations) == 1
-    registration = registrations[0]
+    assert len(analysis_registrations) == 1
+    registration = analysis_registrations[0]
     assert registration["matcher"] == "^(Bash|.*[Vv]ideo.*)$"
     hook_config = registration["hooks"][0]
     assert hook_config["timeout"] == 2

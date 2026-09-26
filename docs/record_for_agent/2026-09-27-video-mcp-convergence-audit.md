@@ -8,6 +8,10 @@ learning_eligibility: ineligible
 
 Date: 2026-09-27
 
+## Supersession Notice — 2026-09-27
+
+用户随后提供准确 repository `https://github.com/EthanBobbyTR/VideoMCP.git`，解除下文 target identity blocker；实际注册名为 `video-mcp`。已完成适用通用 visual-context 路由与 project-client 接入，原 hook-selection 测试不一致已修正，相关组合 `279 passed, 1 skipped`。当前结果见 [routing record](2026-09-27-video-mcp-convergence-routing.md)。下文保留早先 blocked checkpoint 的调查与失败证据；ASR/完全等价能力仍未验证，无 public tool/core 删除。
+
 ## Scope And Status
 
 执行 [Video MCP Convergence Plan](../superpowers/plans/2026-09-26-video-mcp-convergence.md) 的现有能力审计与本地验证。原 plan 由用户本轮要求实施；不是 schema migration、Provider/media Production submit 或 QA acceptance 授权。Milestone 1 的原服务审计已完成，替代 identity/coverage blocked；Milestone 2/3 未完成，不声称收敛实现完成。

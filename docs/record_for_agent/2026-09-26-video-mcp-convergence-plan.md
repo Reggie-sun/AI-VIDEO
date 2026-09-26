@@ -8,6 +8,10 @@ learning_eligibility: ineligible
 
 Date: 2026-09-26
 
+## Supersession Notice — 2026-09-27
+
+用户已要求实施，并提供准确 EthanBobbyTR/VideoMCP repository；目标身份现已确认，实际注册名 `video-mcp`。适用通用 visual-context 路由与客户端接入结果见 [routing record](2026-09-27-video-mcp-convergence-routing.md) 和更新后的 plan。下文 `draft` / plan-only / identity 尚未定位为当时历史状态，不再作为当前 blocker；完全等价/ASR 与媒体质量未宣称通过。
+
 ## Scope And Decision
 
 本轮交付 [Video MCP Convergence Plan](../superpowers/plans/2026-09-26-video-mcp-convergence.md)，状态为 draft。用户只要求编写 plan；未替换 MCP、删代码、修改客户端配置或推进 Production state。

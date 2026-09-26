@@ -1,5 +1,17 @@
 {
   "mcpServers": {
+    "video-mcp": {
+      "command": "/usr/bin/env",
+      "args": [
+        "--chdir=/home/reggie/vscode_folder/MCP/VideoMCP",
+        "/home/reggie/.local/share/video-mcp/venv/bin/video-mcp"
+      ],
+      "env": {
+        "PATH": "/home/reggie/miniconda3/bin:/usr/local/bin:/usr/bin:/bin",
+        "PYTHONUNBUFFERED": "1",
+        "VIDEO_MCP_WHISPER_DEVICE": "cpu"
+      }
+    },
     "video-analysis": {
       "command": "/home/reggie/.local/share/ai-video/video-analysis-mcp/bin/python",
       "args": ["-m", "ai_video_mcp"],

@@ -306,8 +306,18 @@ Safety / Applicable Authorization Or Local Exemption
 - 不要在测试中用裸 YAML/JSON parsing 绕过标准 `load_workflow_template()` 或 Production loader。
 - Production invalidation 不得退化为 Shot-order blanket stale；只沿 canonical typed dependency edges 传播。
 - 不要让 native media audio 绕过 canonical P4 mixer，也不要让 graph、Provider 或 Skill 重算 `ResolvedTimeline`。
-- Project-local `video-analysis` 是本仓库默认视频检查工具；全局 `videoscan` 只可作为 metadata/frame helper，不能成为 Production QA owner。
+- 普通视频概览按下方 Generic Video Context Tool Selection 使用 `video-mcp`；exact-media 检查、逐 Shot Gate、生成反馈与 QA 继续使用 project-local `video-analysis`。全局 `videoscan` 只可作为 metadata/frame helper，不能成为 Production QA owner。
 - 交付 generated-video 时只提供真实 live/fetched/validated output；不得把 preflight、fake fixture、smoke artifact、technical evidence 或 fetch success冒充 activated、quality-accepted 或 final delivery truth。
+
+### Generic Video Context Tool Selection
+
+- 通用视频概览首选 EthanBobbyTR/VideoMCP 的实际注册名 `video-mcp`，调用 `process_video` 接收带时间戳的 text/image blocks，Agent 负责理解；它本身不调用 VLM。用户确认该 repository 后，历史 plan 中 `video-context-mcp` 的未知身份已解除，不建立另一个 alias。
+- 本机已安装于 `/home/reggie/vscode_folder/MCP/VideoMCP`，独立环境 executable 为 `/home/reggie/.local/share/video-mcp/venv/bin/video-mcp`。Codex 使用已有用户级配置，Claude Code 使用 project `.mcp.json`。必须使用安装目录作为 cwd，避免读取 AI-VIDEO 的 `.env`；Claude 配置通过既有 `/usr/bin/env --chdir` 显式固定启动目录，不依赖其忽略的 JSON `cwd`。使用前核对实际安装与配置，重连客户端后生效。
+- 已验证 no-audio fixture 的 metadata、整数秒间隔抽帧、hard-cut scene 图片、native image/text 返回、重复缓存读取和 missing-file 错误。它没有 standalone probe、独立 scene timestamp list、逐调用 image quality/width、ASR disable、language 或 word timing 参数。需要这些控制或精确帧/时间取证时直接选择原 `video-analysis`，不通过新 wrapper 模拟。
+- 带音轨输入会自动运行 Whisper；本轮 ASR 未实测。不允许为普通查看自动下载模型、上传媒体或调用 remote Provider；仅在所选模型已本地可用且当前任务允许本地转写时使用该音轨路径，否则选择支持 `transcribe_audio=false` 的原服务。
+- 外部缓存只绑定 first-1MB MD5 + size 与部分参数，忽略 `max_frames`、image quality/format 等；实测同一视频先请求 4 张再请求 1 张仍从缓存返回 4 张。`max_frames` 不能作为硬资源 ceiling；有严格帧数预算或 fresh/exact-byte 要求时直接使用原服务。新服务不提供 Production exact replay/freshness 证明，也不参加原分析 worker lock。
+- 消费返回时核对图片实际可解码、数量/时间戳是否适用，检查 text 中的错误和 failed-image placeholder；missing-file error 实测 `isError=false`，tool success 不能证明拿到了 usable context。结果只作 advisory context，不重标为 `GenerationAnalysisEvidence`、逐 Shot Gate receipt、Production raw evidence、P6 或 Final Acceptance。
+- 原 `video_analyze`、review、feedback、hook 与共享 core/public schema 保留，deterministic frame-window/hash/permit、continuity/caption/replay/committer 契约不变。失败不能自动重复运行生成 Provider，也不能绕过既有 Gate。
 
 ### Per-Shot Post-Media Gate
 

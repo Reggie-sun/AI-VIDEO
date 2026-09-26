@@ -2,11 +2,23 @@
 
 Date: 2026-09-26
 
-Status: implementation requested；2026-09-27 已完成现有服务审计和本地 smoke，Milestone 1 的替代服务 identity/coverage 仍 blocked；Milestone 2/3 未完成。未替换或删除 MCP。
+Status: scoped routing implemented；2026-09-27 用户提供准确 repository 后确认目标为已安装的 `video-mcp`，完成通用 visual-context 路由收敛；删除集为空。真实 ASR/完整等价覆盖仍未验证，验证结果见 execution record 与 exact-snapshot Harness。
 
-## Execution Checkpoint — 2026-09-27
+## Current Execution Result — 2026-09-27
 
-用户本轮要求实施本计划。审计 source checkpoint 为 `7fa6dbd`；当前 `.codex/config.toml` 的既有 AOCI 改动保留。下方 Starting Point、矩阵和 Self-Review 保留 planning 时的判断；矩阵中的 `Replace` 是满足前置条件后的候选方向，当前所有候选实现仍为 `Keep`，删除集为空。
+用户本轮提供 `https://github.com/EthanBobbyTR/VideoMCP.git`，该明确选择替代了先前排除同一 repository 的判断。实际注册名是 `video-mcp`，source commit `e01b745ba3f0efdd667d4886f39eef16c10271a7`，已安装于独立本地环境。没有名为 `video-context-mcp` 的额外服务或 alias，也没有重复安装或更换 dependency stack。
+
+- Milestone 1：已读取当前源码和真实 schema，以 no-audio hard-cut synthetic fixture 验证 metadata、四张固定间隔 native MCP images、两张 scene images、秒级时间标签、cache hit/listing、missing-file text error。ASR、OCR、word timing、完整连续帧/semantic continuity 保持独立 gap；不声明全面等价。
+- Milestone 2：`README.md` / playbook 将适用的普通视频概览优先路由到 `video-mcp.process_video`；project `.mcp.json` 接入已安装服务供 Claude Code 使用，Codex 保留现有用户级 registration。`.codex/config.toml` 的既有 AOCI dirty work 原样保留。strict count、精确 timestamp/probe、逐 Shot Gate、feedback、QA 和 Production evidence 继续原 seam；Skills 中的 per-Shot Gate 调用无需迁移。
+- Removal decision：公开八工具 schema 与 core 全部 `Keep`。Generic visual-context 只 `Replace` 工具选择；已确认共享 consumers，没有可安全删除的独立实现。本轮不增加 wrapper、不改 durable schema、不改 Production owner，也不清理 optimization subsystem。
+- Milestone 3：两边真实 stdio 调用与相关回归分别验证。原 Claude analysis-hook 测试已复现失败原因：它错误地要求全部 `PostToolUse` 注册只有一条；修正为筛选 exact analysis hook 并继续要求唯一注册、相同 matcher/timeout/command，与既有 Codex 测试模式一致，不删除任何 hook。
+- 新服务限制：cache key 只覆盖 first-1MB MD5 + size 与部分设置，忽略 `max_frames` 等；实测先请求四张再请求一张仍返回四张。缺失文件 `isError=false`，必须检查错误文字。无 `transcribe_audio=false` / language / word timing，带音轨会调用 Whisper；本轮无音轨 fixture 没有下载/加载模型。有 hard frame ceiling、fresh exact evidence 或缺少本地模型时，选择原服务。
+
+Generic smoke：`.agent/harness/runs/video-mcp-convergence-live-20260927/smoke.json`；最终 project-client smoke：`.agent/harness/runs/video-mcp-convergence-client-native-20260927/smoke.json`。实际 `claude mcp get video-mcp` 已返回 `Connected`；Claude 忽略 JSON `cwd`，最终配置用既有 `/usr/bin/env --chdir` 固定安装目录，未新增 wrapper 文件。原 `video-analysis` smoke 仍见上轮 audit artifact。新服务输出不作为 Production evidence 或 human acceptance。最终 tests/Harness 与 publication state 见 [implementation record](../../record_for_agent/2026-09-27-video-mcp-convergence-routing.md)。
+
+## Historical Blocked Checkpoint — 2026-09-27
+
+该历史停点的审计 source checkpoint 为 `7fa6dbd`；`.codex/config.toml` 的既有 AOCI 改动保留。当时所有候选实现为 `Keep`，替代方向尚无 identity evidence。此处保留当时调查结果；上方 Current Execution Result 与下方更新后的矩阵描述当前状态。
 
 - 已检查 project `.codex/config.toml`、`.mcp.json`，用户级 Codex/Claude 配置、Claude Desktop 配置与本地 MCP 安装目录，未定位 `video-context-mcp`。用户指定 session `01a0de3d-d9f4-7ef3-9d2a-0e13d462005d` 的原始记录同样只证明 EthanBobbyTR/VideoMCP 安装，且随后明确排除它；提供的 `src/ai_video_mcp` 仍为原服务源码。不能由该历史 session 推断替代身份。
 - 当前 `server.py` 注册八个公开 tools；`tools/analyze.py` 直接复用 `probe.py`、`frames.py`、`scene_detect.py`、`transcribe.py`。`tools/review.py` 的 legacy 分支和 `analysis_hook.py` 消费该 core；`generation_feedback.py` / `analysis_client.py` 经 stdio 消费 `video_analyze`，`GenerationAnalysisEvidence` 仍固定 tool name、path、summary 和 measured size。CodeGraph 已调用；其对同名工具的部分调用定位混淆 server wrapper 与 core，最终 import/caller 结论以源码为准。
@@ -18,13 +30,13 @@ Status: implementation requested；2026-09-27 已完成现有服务审计和本�
 
 ## Goal And Scope
 
-将通用的“视频 → 抽帧/转写 → Agent 理解”入口交给经实际验证的 `video-context-mcp`，减少重复维护，同时保留 AI-VIDEO 的精确媒体取证、确定性 QA、生成反馈和 Harness 契约。收敛单位是具体能力与调用链，不是整个 MCP 或目录。
+将通用的“视频 → 抽帧/转写 → Agent 理解”入口交给经实际验证的 `video-mcp`（用户确认的 EthanBobbyTR/VideoMCP），减少重复维护，同时保留 AI-VIDEO 的精确媒体取证、确定性 QA、生成反馈和 Harness 契约。只迁移已验证的适用用途；收敛单位是具体能力与调用链，不是整个 MCP 或目录。
 
 本计划约束 Agent 工具选择与可证明冗余的公开入口。第一批实现保持现有 Production、MCP evidence schema 和内部 QA 调用兼容；不新建 wrapper、Provider adapter、分析抽象层或第二套验收 owner。若审计证明没有可安全删除的独立实现，只收敛工具路由，并记录保留原因。
 
 依据：当前 `AGENTS.md`、[contract matrix](../../agent-primary-contract-matrix.md)、[Harness policy](../../../.agent/harness/policy.yaml)、[control-plane playbook](../../../.agent/context/control-plane-playbook.md)，以及下方当前源码。无已接受的 MCP 迁移 spec；本文不授权修改 shared schema、durable evidence 或 acceptance semantics。后续若确需改变这些契约，先按仓库 T2/T3 routing 补齐对应 spec/approval/review，不能把它作为本计划的附带清理。
 
-## Verified Starting Point
+## Historical Verified Starting Point
 
 - 原有服务由 `src/ai_video_mcp/server.py` 注册为 `video-analysis`。本轮真实 stdio `initialize/list_tools` 返回八个工具：`video_probe`、`video_extract_frames`、`video_transcribe`、`video_scene_detect`、`video_analyze`、`video_review`、`video_optimize_plan`、`video_apply_optimization`。
 - `tools/analyze.py` 聚合元数据、图片、scene detection 与转写，不调用 VLM；Agent 消费这些 raw observations。`tools/review.py` 另外包含按 Production 帧窗口测量、产物 hash 校验和 committer-issued one-use permit 校验的 Python 分支。公开 `server.video_review` 不接受这个 permit 对象，不能将普通 MCP tool call 等同于该 Production 分支。
@@ -35,15 +47,15 @@ Status: implementation requested；2026-09-27 已完成现有服务审计和本�
 
 ## Capability Matrix
 
-`Replace` 表示完成 Milestone 1 后可收敛的普通 Agent 使用入口；不自动允许删除被 QA 复用的底层实现。没有一项当前获得无条件 `Remove`。
+下表是 target identity 已确认后的当前决策。`Replace` 仅指已验证用途的工具选择；不意味着 public API 或共享底层实现被删除。没有一项获得 `Remove`。
 
-| Existing capability / owner | Coverage by video-context-mcp | AI-VIDEO-specific responsibility | Decision |
+| Existing capability / owner | Coverage by video-mcp | AI-VIDEO-specific responsibility | Decision |
 | --- | --- | --- | --- |
-| `tools/probe.py`：普通元数据查询 | NOT_EVALUATED | 普通查询非专有；Production held-FD probe、codec/count/hash validation 是专有边界 | Replace 普通入口；Keep QA/生成/渲染 probe |
-| `tools/frames.py`：间隔抽帧、base64 图片 | NOT_EVALUATED | 普通看图非专有；现有 review/analyze 内部依赖须保留 | Replace 普通入口；内部依赖存在时 Keep 实现 |
-| `tools/scene_detect.py`：hard-cut timestamps | NOT_EVALUATED | 一般 scene hints 非专有；不能证明相邻帧或动作连续性 | Replace 普通入口；Keep 仍被 QA/evidence 使用的实现 |
-| `tools/transcribe.py`：Whisper segments、语言与时间戳 | NOT_EVALUATED | 普通 transcript 非专有；语言/精度/错误语义需要逐项对照 | Replace 完整等价的普通转写入口；不足则 Keep |
-| `tools/analyze.py` / `server.video_analyze`：聚合视频上下文 | NOT_EVALUATED | 已被 generation feedback、typed evidence、hook 和 legacy review 消费 | Replace 普通使用路由；Keep 既有 QA tool/schema/core |
+| `tools/probe.py`：普通元数据查询 | Basic metadata 随 overview 返回已验证；非独立 probe / structured exact schema | Production held-FD probe、codec/count/hash validation 是专有边界 | Replace overview 内的 basic metadata 路由；Keep standalone/QA/生成/渲染 probe |
+| `tools/frames.py`：间隔抽帧、base64 图片 | 整数秒间隔/native JPEG image blocks 已验证；无逐调用 width/quality/format，cached `max_frames` 不生效 | review/analyze 内部依赖、hard count 与精确取证保留 | Replace 普通 overview 路由；Keep core 与原 public tool |
+| `tools/scene_detect.py`：hard-cut timestamps | fixture 的 2s hard-cut 图片/标签已验证；没有原独立 scene list / min-length schema | 相邻帧或动作连续性不能由 scene hints 证明 | Replace overview scene hints 路由；Keep standalone tool 与 QA/evidence 实现 |
+| `tools/transcribe.py`：Whisper segments、语言与时间戳 | 源码自动 ASR；真实转写 NOT_EVALUATED；无 disable/language/word timing 参数 | transcript 精度、错误语义与已有消费者尚未等价 | Keep tool/core；不声明完整覆盖 |
+| `tools/analyze.py` / `server.video_analyze`：聚合视频上下文 | no-audio visual overview 的 usable text/images/cache 已验证；typed response 不等价 | generation feedback、typed evidence、hook、legacy review 消费 | Replace 普通 visual overview 路由；Keep 既有 tool/schema/core |
 | `tools/review.py`：帧窗口、重复度、luminance/audio measurements、hash/permit | NOT_EVALUATED | exact render/timeline/window-bound raw evidence；verdict 仍归 Production | Keep，不以 VLM 判断替换 |
 | `production/review.py`、`quality_gate_coordinator.py`：黑画面/静音/削波/required-motion freeze 等裁决 | NOT_EVALUATED | policy-selected deterministic adjudication、coverage、FAIL/NOT_EVALUATED blocking | Keep；裁决器不是测量器，须保留对应证据来源 |
 | `continuity_evaluator.py`、`continuity_onnx_backend.py`、review coordinator | NOT_EVALUATED | exact frame-index sampling、模型/profile identity、主体 tracking 与 human fallback | Keep；稀疏采样不宣称完整相邻帧覆盖 |
@@ -63,13 +75,13 @@ Status: implementation requested；2026-09-27 已完成现有服务审计和本�
 
 完整覆盖必须包含当前用途所需的控制参数、输出可用性、时间精度、错误与缓存行为。OCR、word timing、连续帧、freeze 或 semantic continuity 只有真实 schema、源码和执行证据支持时才可标为覆盖。MCP 抽帧成功只证明 Agent 收到图片，不证明模型理解正确或质量通过。
 
-产物：更新本计划矩阵为证据绑定的 `Keep / Replace / Remove` 决策，为每个拟删除项列出 exact paths、调用方迁移及最接近的测试；在任何删除前向用户展示简短执行范围。找不到目标服务时停止替代阶段，完成现有能力审计即可，不猜 alias、不使用上轮 `video-mcp` 冒充目标。
+产物：更新本计划矩阵为证据绑定的 `Keep / Replace / Remove` 决策，为每个拟删除项列出 exact paths、调用方迁移及最接近的测试；在任何删除前向用户展示简短执行范围。找不到用户确认的准确目标服务时停止替代阶段，完成现有能力审计即可，不猜 alias、不以其他服务冒充目标。
 
 ### Milestone 2: Converge Generic Agent Entry Points
 
 条件性修改面：`README.md` 的 MCP 使用说明、`.agent/context/control-plane-playbook.md` 的工具选择说明，以及确实引用普通理解入口的 Skill。仅当需要 durable routing anchor 时修改 `AGENTS.md`；matrix/policy 分别保留唯一 human/machine owner，不复制完整能力 catalog。
 
-通用视频概览和内容理解首选已通过 Milestone 1 的 `video-context-mcp`。逐 Shot Gate、生成反馈、Production review、exact evidence 与显式 QA 继续走原 canonical seams；新 MCP 的图片、文字或 VLM verdict 不得被重标为这些 seams 的原始证据或 accepted receipt。保留 `GenerationAnalysisEvidence` 兼容、exact replay zero-effects、fail-closed、permit 与 committer ownership。
+通用视频概览和内容理解在 Milestone 1 已验证的适用用途内首选 `video-mcp`。逐 Shot Gate、生成反馈、Production review、exact evidence 与显式 QA 继续走原 canonical seams；新 MCP 的图片、文字或 VLM verdict 不得被重标为这些 seams 的原始证据或 accepted receipt。保留 `GenerationAnalysisEvidence` 兼容、exact replay zero-effects、fail-closed、permit 与 committer ownership。
 
 候选代码面为 `src/ai_video_mcp/server.py` 和 `tools/{frames,scene_detect,transcribe,analyze,probe}.py`。先核对每个工具公开 schema、内部 imports 与所有 consumers：确认完全覆盖且调用方已迁移的独立重复实现才 `Remove`；仍由 review/analyze/feedback 使用的函数 `Keep`，不为了删除文件复制到新模块。公开 tool catalog/schema 的删除属于另一个兼容性决策，不能当作无语义变化的路由调整；未满足 applicable contract gate 时保持 catalog。
 
@@ -106,6 +118,6 @@ PYTHONPATH=src:. .venv/bin/python -m pytest tests/test_agent_harness.py tests/te
 - Relevant tests、真实通用入口 smoke 和 exact-snapshot mandatory Harness 各自有证据；不混同三者证明范围。
 - 目标服务缺失、覆盖不足、同文件 ownership 冲突、需要未经接受的 schema/acceptance migration、真实 mandatory check failure 或 required review 不可用时停止受影响 slice，报告最小恢复条件。不删除底层函数来强行满足收敛目标，也不刷新 baseline 隐藏问题。
 
-## Parent Self-Review
+## Historical Parent Self-Review
 
-已对照用户要求检查：研究先于修改；矩阵显式区分 unknown coverage 与专有验证；公开工具、内部共享实现、typed evidence、自动 hook 和 Production owners 分开；未承诺尚未验证的 OCR/连续帧/转写覆盖；明确 retained references 与 dead references 的区别；当前交付是 plan-only，实施与 QA/媒体验收均未发生。
+Planning 时已对照用户要求检查：研究先于修改；矩阵显式区分 unknown coverage 与专有验证；公开工具、内部共享实现、typed evidence、自动 hook 和 Production owners 分开；未承诺尚未验证的 OCR/连续帧/转写覆盖；明确 retained references 与 dead references 的区别。该历史交付是 plan-only；当前 scoped implementation 以本文件 Current Execution Result 和 execution record 为准。
