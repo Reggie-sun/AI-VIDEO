@@ -8,6 +8,12 @@ learning_eligibility: ineligible
 
 Date: 2026-09-23
 
+## Supersession Notice — 2026-09-27
+
+下文 AOCI `code_stale` / `observed_pending` 停点已由[索引维护记录](2026-09-27-aoci-index-maintenance.md)
+接替：完成逐项复核和官方 batch 更新后，Verify / Check / Guide 已证明 governance aligned。
+原停点保留为历史事实；这不改变当时业务修改或 Harness 的证据边界。
+
 ## Scope And Ownership
 
 本轮继续精简 root `AGENTS.md`，将逐项阅读顺序移至

@@ -8,6 +8,12 @@ learning_eligibility: ineligible
 
 Date: 2026-09-26
 
+## Supersession Notice — 2026-09-27
+
+下文未解决的 AOCI stale / observed pending 缺口已由[索引维护记录](2026-09-27-aoci-index-maintenance.md)
+接替，当前治理验证已对齐。历史 attestation 格式错误及媒体质量 FAIL 的结论不因此改变；
+索引更新不产生新成片、视觉验收或 Production acceptance。
+
 ## Purpose And Root Cause
 
 用户要求从根本上纠正“明知视频存在导演/表达问题仍交付”的行为，覆盖广告与电视剧。当前 Production FinalOutputContract / Review / Final Acceptance 已能拒绝合同内有效 FAIL 和缺项，但任意 shell 渲染后直接分享链接不经过正式交付 owner。已有 Final-output-first 规则没有被 Agent 完整执行，不能把原因全归结为缺少代码 Gate。

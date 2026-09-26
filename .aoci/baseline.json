@@ -1,12 +1,12 @@
 {
   "version": 1,
   "created_at": "2026-09-23T13:22:44Z",
-  "updated_at": "2026-09-23T14:50:30Z",
+  "updated_at": "2026-09-26T17:34:46Z",
   "files": {
     ".agent/harness/policy.yaml": {
-      "sha256": "dcd3859b1ef14522678b948a0e6c35a5d17e8261125af248e4876ccc42ca1cdf",
-      "size": 66922,
-      "normalized_sha256": "dcd3859b1ef14522678b948a0e6c35a5d17e8261125af248e4876ccc42ca1cdf"
+      "sha256": "5c3db617555ccf7b6a048732a931866fec969cef6f1b34e7fdb202ae52f7e289",
+      "size": 67189,
+      "normalized_sha256": "5c3db617555ccf7b6a048732a931866fec969cef6f1b34e7fdb202ae52f7e289"
     },
     ".agents/skills/distill-ai-video-learning/SKILL.md": {
       "role": "observe",
@@ -160,9 +160,15 @@
     },
     ".agents/skills/open-video/SKILL.md": {
       "role": "observe",
-      "sha256": "9c32545d62563e9c5c676db606e94eb7139d1b82ef920d439d688816e06d45e7",
-      "size": 20913,
-      "normalized_sha256": "9c32545d62563e9c5c676db606e94eb7139d1b82ef920d439d688816e06d45e7"
+      "sha256": "43e9e781c6e99f534fd9f6f921bda61c22516d16287b0149fb4d8a2453eb4aa3",
+      "size": 21285,
+      "normalized_sha256": "43e9e781c6e99f534fd9f6f921bda61c22516d16287b0149fb4d8a2453eb4aa3"
+    },
+    ".agents/skills/open-video/references/creative-completion.md": {
+      "role": "observe",
+      "sha256": "8d3f999b692fca3d458cc8e821966cd11351ae30bd5c680ffa2bae4a5f1b4626",
+      "size": 7058,
+      "normalized_sha256": "8d3f999b692fca3d458cc8e821966cd11351ae30bd5c680ffa2bae4a5f1b4626"
     },
     ".agents/skills/open-video/scripts/validate_director_coverage.py": {
       "role": "observe",
@@ -243,19 +249,19 @@
       "normalized_sha256": "64ef037b47db1f8134af23b90427d2b90995721a324b6e4607e15db5dce98bc3"
     },
     "AGENTS.md": {
-      "sha256": "12add6eab25adc6ed3eea0f476bffd89fea2c8f1c85c3bc81458ddb9c65e1a9e",
-      "size": 32838,
-      "normalized_sha256": "12add6eab25adc6ed3eea0f476bffd89fea2c8f1c85c3bc81458ddb9c65e1a9e"
+      "sha256": "47ad9d005f5075cc8f4626a5dd11c44583afe7bb20feea078b07329d23eb7953",
+      "size": 27729,
+      "normalized_sha256": "47ad9d005f5075cc8f4626a5dd11c44583afe7bb20feea078b07329d23eb7953"
     },
     "README.md": {
-      "sha256": "ea5c42fd129d883ba5bb736f4e411938d91c358ca4c96eb5486c7889b448bc31",
-      "size": 47338,
-      "normalized_sha256": "ea5c42fd129d883ba5bb736f4e411938d91c358ca4c96eb5486c7889b448bc31"
+      "sha256": "dd12e97578244b362163d39071549fec8d4797cc8a0d8f6d102c10c4a74b5fb9",
+      "size": 47818,
+      "normalized_sha256": "dd12e97578244b362163d39071549fec8d4797cc8a0d8f6d102c10c4a74b5fb9"
     },
     "aoci.code.txt": {
-      "sha256": "fdba21719cb3c0b16efd3a40f114207ee071331a767f5b75dfe1e3d8eca8afb8",
-      "size": 12984,
-      "normalized_sha256": "fdba21719cb3c0b16efd3a40f114207ee071331a767f5b75dfe1e3d8eca8afb8"
+      "sha256": "6e7a33cc33e113269f252a4cec18e715b65a682873bdd2cd9620fff1bd543245",
+      "size": 13508,
+      "normalized_sha256": "6e7a33cc33e113269f252a4cec18e715b65a682873bdd2cd9620fff1bd543245"
     },
     "aoci.meta.txt": {
       "role": "index",
@@ -324,9 +330,9 @@
       "normalized_sha256": "0fef49ad05fa6bc0bf5023f583a5f25a03320ee29aee8d83a20cd299c2616327"
     },
     "docs/agent-primary-contract-matrix.md": {
-      "sha256": "186c84e002e3d9b23356fb20fb33b3cd83cbf95eeb353b9d07cb65d41e57c053",
-      "size": 133893,
-      "normalized_sha256": "186c84e002e3d9b23356fb20fb33b3cd83cbf95eeb353b9d07cb65d41e57c053"
+      "sha256": "53b927f0010cf3b7d49afc66a91e80d3bd884a37e84052601430b32cb09c0340",
+      "size": 136547,
+      "normalized_sha256": "53b927f0010cf3b7d49afc66a91e80d3bd884a37e84052601430b32cb09c0340"
     },
     "docs/ai-video-ecommerce-cooperation-wechat.txt": {
       "role": "observe",
@@ -1350,15 +1356,15 @@
     },
     "docs/record_for_agent/2026-09-19-ecommerce-ad-architecture-audit.md": {
       "role": "observe",
-      "sha256": "f2bb202d2f3e4b6a418a63dcd4f65cac4e247f54d9a27c441d5d0833b9160a1a",
-      "size": 8821,
-      "normalized_sha256": "f2bb202d2f3e4b6a418a63dcd4f65cac4e247f54d9a27c441d5d0833b9160a1a"
+      "sha256": "5eedf91741c00198055876e8042b8c3fcd2c11803b7380084dabbacb4832fabe",
+      "size": 9224,
+      "normalized_sha256": "5eedf91741c00198055876e8042b8c3fcd2c11803b7380084dabbacb4832fabe"
     },
     "docs/record_for_agent/2026-09-19-ecommerce-production-job-m0-m3.md": {
       "role": "observe",
-      "sha256": "3966e57f877597f37a68d1d582bd823621fb027d2440d66861343b599280fbac",
-      "size": 5435,
-      "normalized_sha256": "3966e57f877597f37a68d1d582bd823621fb027d2440d66861343b599280fbac"
+      "sha256": "e404d7d5635760d291a5aaef06a7dd485fef96219e9bb713dd02493e3a747a35",
+      "size": 5860,
+      "normalized_sha256": "e404d7d5635760d291a5aaef06a7dd485fef96219e9bb713dd02493e3a747a35"
     },
     "docs/record_for_agent/2026-09-19-ecommerce-production-job-m4.md": {
       "role": "observe",
@@ -1380,9 +1386,9 @@
     },
     "docs/record_for_agent/2026-09-19-ecommerce-production-job-m7-offline-code.md": {
       "role": "observe",
-      "sha256": "646e841ebc71ef31979b1de788217b9e851497b8077b2cf531a2522bfedc1caf",
-      "size": 13485,
-      "normalized_sha256": "646e841ebc71ef31979b1de788217b9e851497b8077b2cf531a2522bfedc1caf"
+      "sha256": "9b653cc317e834b44c6eb27cb7cb3709bb823d7129294643bd667c7ea55b6248",
+      "size": 18863,
+      "normalized_sha256": "9b653cc317e834b44c6eb27cb7cb3709bb823d7129294643bd667c7ea55b6248"
     },
     "docs/record_for_agent/2026-09-20-claude-code-harness-adapter.md": {
       "role": "observe",
@@ -1407,6 +1413,48 @@
       "sha256": "cb78c607d80f5f63abfc88ae76eb721223b7f034145326553de72ddbc8600b79",
       "size": 8779,
       "normalized_sha256": "cb78c607d80f5f63abfc88ae76eb721223b7f034145326553de72ddbc8600b79"
+    },
+    "docs/record_for_agent/2026-09-23-agent-guide-context-loading.md": {
+      "role": "observe",
+      "sha256": "56b4fddf3706c7d6a5eee347212cd2d5c13d484119a4241700b02a1b507fc9f7",
+      "size": 2707,
+      "normalized_sha256": "56b4fddf3706c7d6a5eee347212cd2d5c13d484119a4241700b02a1b507fc9f7"
+    },
+    "docs/record_for_agent/2026-09-26-creative-completion-loop.md": {
+      "role": "observe",
+      "sha256": "3a487c7d30a5a3c7f7be89cabffd39791c6c81d943246179a25186ef25543835",
+      "size": 6347,
+      "normalized_sha256": "3a487c7d30a5a3c7f7be89cabffd39791c6c81d943246179a25186ef25543835"
+    },
+    "docs/record_for_agent/2026-09-26-ecommerce-sample-local-preview.md": {
+      "role": "observe",
+      "sha256": "c4d1358e43c69608cc6bb2a3b23556ce1578ee6c3ba53d11d4810d0949e4d00d",
+      "size": 8377,
+      "normalized_sha256": "c4d1358e43c69608cc6bb2a3b23556ce1578ee6c3ba53d11d4810d0949e4d00d"
+    },
+    "docs/record_for_agent/2026-09-26-video-mcp-convergence-plan.md": {
+      "role": "observe",
+      "sha256": "ccca461a44dc60855d88b2b569d3d5799f9a14e3796c3598a7bc3cfad77d7ba8",
+      "size": 3739,
+      "normalized_sha256": "ccca461a44dc60855d88b2b569d3d5799f9a14e3796c3598a7bc3cfad77d7ba8"
+    },
+    "docs/record_for_agent/2026-09-27-aoci-index-maintenance.md": {
+      "role": "observe",
+      "sha256": "e9c83c45878806f2f8eff314b6f736f1b80f99d55659b10bbd6e74f5a83c281d",
+      "size": 3907,
+      "normalized_sha256": "e9c83c45878806f2f8eff314b6f736f1b80f99d55659b10bbd6e74f5a83c281d"
+    },
+    "docs/record_for_agent/2026-09-27-video-mcp-convergence-audit.md": {
+      "role": "observe",
+      "sha256": "274cf085e7065c183fee0cf7c1f72e861573d360262b4979344a630bd3a8466b",
+      "size": 7857,
+      "normalized_sha256": "274cf085e7065c183fee0cf7c1f72e861573d360262b4979344a630bd3a8466b"
+    },
+    "docs/record_for_agent/2026-09-27-video-mcp-convergence-routing.md": {
+      "role": "observe",
+      "sha256": "08e4944724ba759a3b0be8c845b0acc7c7dae6c3986c51622ddecb3e6127b225",
+      "size": 9734,
+      "normalized_sha256": "08e4944724ba759a3b0be8c845b0acc7c7dae6c3986c51622ddecb3e6127b225"
     },
     "docs/record_for_agent/learning/h3-i2v-first-frame-condition-renders-at-head.md": {
       "role": "observe",
@@ -1782,15 +1830,27 @@
     },
     "docs/superpowers/plans/2026-09-19-ai-video-ecommerce-production-job.md": {
       "role": "observe",
-      "sha256": "978d8e2a10df0eebba04818a53244ba0295680595ab640d71f83f58e2b0637e1",
-      "size": 26525,
-      "normalized_sha256": "978d8e2a10df0eebba04818a53244ba0295680595ab640d71f83f58e2b0637e1"
+      "sha256": "7fc9b26eeb09f67be11e8147c81630e17c7d85e8712aaad56e8f7cbe09f33701",
+      "size": 28815,
+      "normalized_sha256": "7fc9b26eeb09f67be11e8147c81630e17c7d85e8712aaad56e8f7cbe09f33701"
     },
     "docs/superpowers/plans/2026-09-20-claude-code-harness-adapter.md": {
       "role": "observe",
       "sha256": "524127ecc128bce97a32a51380dac5de2454b6c4070c6558f2497bfc67d03244",
       "size": 32817,
       "normalized_sha256": "524127ecc128bce97a32a51380dac5de2454b6c4070c6558f2497bfc67d03244"
+    },
+    "docs/superpowers/plans/2026-09-26-creative-completion-loop.md": {
+      "role": "observe",
+      "sha256": "afb2f5620c7e11eefc10de4f2e8a0ed9bc9e578cc7724b9a310bc3325761551b",
+      "size": 2924,
+      "normalized_sha256": "afb2f5620c7e11eefc10de4f2e8a0ed9bc9e578cc7724b9a310bc3325761551b"
+    },
+    "docs/superpowers/plans/2026-09-26-video-mcp-convergence.md": {
+      "role": "observe",
+      "sha256": "c26ef3393b6eacea30dea1cd041fc0a54873fe05c16875adb8859e88e1c052b3",
+      "size": 21363,
+      "normalized_sha256": "c26ef3393b6eacea30dea1cd041fc0a54873fe05c16875adb8859e88e1c052b3"
     },
     "docs/superpowers/specs/2026-04-30-local-long-video-system-design.md": {
       "role": "observe",
@@ -2004,9 +2064,9 @@
     },
     "docs/superpowers/specs/2026-09-19-ai-video-ecommerce-production-job.md": {
       "role": "observe",
-      "sha256": "1d224c35f30a0728212cdc77a466f00a16af151178dd4a72e76ebbd695d388f7",
-      "size": 24321,
-      "normalized_sha256": "1d224c35f30a0728212cdc77a466f00a16af151178dd4a72e76ebbd695d388f7"
+      "sha256": "1c4ac9b4671960b28282d84f8cf8e6020e690fad0c6c3223d9680a8f878907c6",
+      "size": 26536,
+      "normalized_sha256": "1c4ac9b4671960b28282d84f8cf8e6020e690fad0c6c3223d9680a8f878907c6"
     },
     "docs/superpowers/specs/2026-09-20-claude-code-harness-adapter.md": {
       "role": "observe",
@@ -2020,6 +2080,12 @@
       "size": 6627,
       "normalized_sha256": "0ca98808fffa431a1402a50f7ea11ec3976f8ab5f124c482f056a17f2788f1ee"
     },
+    "docs/superpowers/specs/2026-09-26-creative-completion-loop.md": {
+      "role": "observe",
+      "sha256": "29828d87dae32d91065566ff9fd1a72cdce8d9da374320c3855b2199a1ddf58c",
+      "size": 5443,
+      "normalized_sha256": "29828d87dae32d91065566ff9fd1a72cdce8d9da374320c3855b2199a1ddf58c"
+    },
     "docs/superpowers/specs/5min_test.md": {
       "role": "observe",
       "sha256": "3b3cf510f7f60bb05d0143486a1915693991ad5f1424a5be3553f77280941611",
@@ -2027,14 +2093,14 @@
       "normalized_sha256": "3b3cf510f7f60bb05d0143486a1915693991ad5f1424a5be3553f77280941611"
     },
     "docs/v0.2-agentic-production-roadmap.md": {
-      "sha256": "a56a35f5a2dae24af6a925075b3d7d8b5504a2ddc160d9c55f0ac7d6d4fd0983",
-      "size": 36076,
-      "normalized_sha256": "a56a35f5a2dae24af6a925075b3d7d8b5504a2ddc160d9c55f0ac7d6d4fd0983"
+      "sha256": "8f4a9f0b0eb5dc323957d33c59c62161b5032cb812a1287e564cf92550b30553",
+      "size": 36729,
+      "normalized_sha256": "8f4a9f0b0eb5dc323957d33c59c62161b5032cb812a1287e564cf92550b30553"
     },
     "docs/v0.2-runtime-baseline.md": {
-      "sha256": "49e62cce6dadd276b64ec4e2b1ef0cd672a064b7f00cab01d7e831ecc34fbf84",
-      "size": 141697,
-      "normalized_sha256": "49e62cce6dadd276b64ec4e2b1ef0cd672a064b7f00cab01d7e831ecc34fbf84"
+      "sha256": "92cad576d6f2f28201d2e0ade1eb2388bed47e97e58c1be0af923332037cffbc",
+      "size": 144461,
+      "normalized_sha256": "92cad576d6f2f28201d2e0ade1eb2388bed47e97e58c1be0af923332037cffbc"
     },
     "docs/vidu-ad-provider.md": {
       "role": "observe",
@@ -2050,9 +2116,9 @@
     },
     "docs/visual-quality-gate.md": {
       "role": "observe",
-      "sha256": "4ba1bf3aa08f04060b7002956c6dc51fc7ad01a79a74543ddc69fe486a58957c",
-      "size": 5821,
-      "normalized_sha256": "4ba1bf3aa08f04060b7002956c6dc51fc7ad01a79a74543ddc69fe486a58957c"
+      "sha256": "12f4a1251791f7f79fd7f266a54b474ee41e2c8d7a37851232edeb2e746dae61",
+      "size": 7019,
+      "normalized_sha256": "12f4a1251791f7f79fd7f266a54b474ee41e2c8d7a37851232edeb2e746dae61"
     },
     "docs/when_to_do/2026-08-22-continuity-review-coordinator-and-human-evidence-ui-implementation-recap.md": {
       "role": "observe",
@@ -2528,9 +2594,9 @@
     },
     "scripts/visual_quality_report.py": {
       "role": "observe",
-      "sha256": "bce02b1cd1375fcd440d522f0582661431b8bb25e882f87107cc3d2d60cd4d1f",
-      "size": 13692,
-      "normalized_sha256": "bce02b1cd1375fcd440d522f0582661431b8bb25e882f87107cc3d2d60cd4d1f"
+      "sha256": "4aabda99332f1c1b888ec0c864f80a253937b65e9c0076fca7b4954ba8125ceb",
+      "size": 15397,
+      "normalized_sha256": "4aabda99332f1c1b888ec0c864f80a253937b65e9c0076fca7b4954ba8125ceb"
     },
     "src/ai_video/__init__.py": {
       "role": "observe",
@@ -2782,9 +2848,9 @@
     },
     "src/ai_video/production/_generation_feedback_reader.py": {
       "role": "observe",
-      "sha256": "f1e42f1055dca90bae6f898c165caa96a3498a1834c9c2752df0fac9dd34b329",
-      "size": 13951,
-      "normalized_sha256": "f1e42f1055dca90bae6f898c165caa96a3498a1834c9c2752df0fac9dd34b329"
+      "sha256": "19d39a2751c6b04ef9916b961cb355a81294d7fe27a4ffad05ca48f09959e2c7",
+      "size": 15349,
+      "normalized_sha256": "19d39a2751c6b04ef9916b961cb355a81294d7fe27a4ffad05ca48f09959e2c7"
     },
     "src/ai_video/production/_generation_history_schema.py": {
       "role": "observe",
@@ -2824,9 +2890,9 @@
     },
     "src/ai_video/production/_lifecycle_schema.py": {
       "role": "observe",
-      "sha256": "c84a7f8c554e06af25037d829196af823f4abfa1a6e8c5af05b59969133c4fb3",
-      "size": 62807,
-      "normalized_sha256": "c84a7f8c554e06af25037d829196af823f4abfa1a6e8c5af05b59969133c4fb3"
+      "sha256": "e8a9f08e34b6c7a085790fc6a7a0ef280ac331ee825115ebbd051322a63d9e7e",
+      "size": 63904,
+      "normalized_sha256": "e8a9f08e34b6c7a085790fc6a7a0ef280ac331ee825115ebbd051322a63d9e7e"
     },
     "src/ai_video/production/_paid_provider_project_reader.py": {
       "role": "observe",
@@ -2926,9 +2992,9 @@
     },
     "src/ai_video/production/_state_commit_generation_feedback.py": {
       "role": "observe",
-      "sha256": "671d7aac8de56f4e04d05a6f456d09b67f4223d520ce07c2907df04af1735fb8",
-      "size": 11576,
-      "normalized_sha256": "671d7aac8de56f4e04d05a6f456d09b67f4223d520ce07c2907df04af1735fb8"
+      "sha256": "31eb98cc60a691d9ec74f5d97d78a4f2a77e976fd04a192525dd48905f756df7",
+      "size": 12721,
+      "normalized_sha256": "31eb98cc60a691d9ec74f5d97d78a4f2a77e976fd04a192525dd48905f756df7"
     },
     "src/ai_video/production/_state_commit_generation_history.py": {
       "role": "observe",
@@ -3064,9 +3130,9 @@
     },
     "src/ai_video/production/_state_commit_video_commercial.py": {
       "role": "observe",
-      "sha256": "58fcf7c5a9c88aebb05b440719c1867087274f5167902ee39ae2708a6b7b85d1",
-      "size": 20271,
-      "normalized_sha256": "58fcf7c5a9c88aebb05b440719c1867087274f5167902ee39ae2708a6b7b85d1"
+      "sha256": "6bff45841e70d2daf559743b933a02898573901acc2f524654d8cd5e1b2022fd",
+      "size": 21799,
+      "normalized_sha256": "6bff45841e70d2daf559743b933a02898573901acc2f524654d8cd5e1b2022fd"
     },
     "src/ai_video/production/_state_commit_video_continuity.py": {
       "role": "observe",
@@ -3076,9 +3142,9 @@
     },
     "src/ai_video/production/_state_commit_video_recovery.py": {
       "role": "observe",
-      "sha256": "3f2d38546cc0203668e7c0e44379bbb98dfbb5132b668956089f7c019c551034",
-      "size": 12070,
-      "normalized_sha256": "3f2d38546cc0203668e7c0e44379bbb98dfbb5132b668956089f7c019c551034"
+      "sha256": "fdc2fc11598422a87f2179dbd9b626f0f143b9b60ef3f3ae7e3f8c7b79c04a3f",
+      "size": 12791,
+      "normalized_sha256": "fdc2fc11598422a87f2179dbd9b626f0f143b9b60ef3f3ae7e3f8c7b79c04a3f"
     },
     "src/ai_video/production/_state_commit_video_source_boundary.py": {
       "role": "observe",
@@ -3130,9 +3196,9 @@
     },
     "src/ai_video/production/_video_project_reader.py": {
       "role": "observe",
-      "sha256": "1564bf8b1bfc85e8cda3090adf879e3befc153dc6cbf46d4ec0fdf886a7e0407",
-      "size": 66190,
-      "normalized_sha256": "1564bf8b1bfc85e8cda3090adf879e3befc153dc6cbf46d4ec0fdf886a7e0407"
+      "sha256": "a210c30269f60bdba3918ee24838e77f053e3abaf528d91355170a0e641aeeb6",
+      "size": 67424,
+      "normalized_sha256": "a210c30269f60bdba3918ee24838e77f053e3abaf528d91355170a0e641aeeb6"
     },
     "src/ai_video/production/_video_requirement_routing.py": {
       "role": "observe",
@@ -3189,9 +3255,9 @@
     },
     "src/ai_video/production/caption_quality.py": {
       "role": "observe",
-      "sha256": "5957023627ad4b87000ea28deac4e36412fe4ba40bff0b7bb7edcfee5cdb72a2",
-      "size": 18628,
-      "normalized_sha256": "5957023627ad4b87000ea28deac4e36412fe4ba40bff0b7bb7edcfee5cdb72a2"
+      "sha256": "af13f32b4e0b46937d175405dba9152144a7e652775633e5348f25d8be922597",
+      "size": 20848,
+      "normalized_sha256": "af13f32b4e0b46937d175405dba9152144a7e652775633e5348f25d8be922597"
     },
     "src/ai_video/production/caption_quality_contracts.py": {
       "role": "observe",
@@ -3323,9 +3389,9 @@
     },
     "src/ai_video/production/delivery_packager.py": {
       "role": "observe",
-      "sha256": "c378e6e40ec3f63a10c3fac7d3d0b4c6eb41016520704c8a1043aac1fb1092ac",
-      "size": 25184,
-      "normalized_sha256": "c378e6e40ec3f63a10c3fac7d3d0b4c6eb41016520704c8a1043aac1fb1092ac"
+      "sha256": "08ff4c79491ec2d6cbc6ecce00f6dc3489a2c712b3254d757abb2a9c185c8cc5",
+      "size": 26283,
+      "normalized_sha256": "08ff4c79491ec2d6cbc6ecce00f6dc3489a2c712b3254d757abb2a9c185c8cc5"
     },
     "src/ai_video/production/dependency.py": {
       "sha256": "1917eb14ef70d302e9c7648cb94c9c9d1fa3a844e4fb9a7bd724b5eac400554e",
@@ -3340,15 +3406,21 @@
     },
     "src/ai_video/production/ecommerce_ad_coordinator.py": {
       "role": "observe",
-      "sha256": "0ca94ec78b453b0b4a52fef8382ea3a9fcfc663a2e959b1512b0c8438a9df031",
-      "size": 38857,
-      "normalized_sha256": "0ca94ec78b453b0b4a52fef8382ea3a9fcfc663a2e959b1512b0c8438a9df031"
+      "sha256": "21c06aa848aeb155ac84bc44d03d89192c1336ff685675ae357013aa108ca6d8",
+      "size": 39552,
+      "normalized_sha256": "21c06aa848aeb155ac84bc44d03d89192c1336ff685675ae357013aa108ca6d8"
+    },
+    "src/ai_video/production/ecommerce_generation_bridge.py": {
+      "role": "observe",
+      "sha256": "9ff88d98d76d12fafb7c68c5697736449707317c4ae132164d2416a96f30c41d",
+      "size": 11614,
+      "normalized_sha256": "9ff88d98d76d12fafb7c68c5697736449707317c4ae132164d2416a96f30c41d"
     },
     "src/ai_video/production/ecommerce_job.py": {
       "role": "observe",
-      "sha256": "cb6844196c6808e26a5980eb42c4dca31d4f82845bfc53d770c89f246afea452",
-      "size": 34881,
-      "normalized_sha256": "cb6844196c6808e26a5980eb42c4dca31d4f82845bfc53d770c89f246afea452"
+      "sha256": "cbf021aa3da61a83f30b87994c46a9ff7280a9d094c9cc3497a5729b6210d5a8",
+      "size": 37697,
+      "normalized_sha256": "cbf021aa3da61a83f30b87994c46a9ff7280a9d094c9cc3497a5729b6210d5a8"
     },
     "src/ai_video/production/ecommerce_job_assembly.py": {
       "role": "observe",
@@ -3369,33 +3441,33 @@
       "normalized_sha256": "c7a42b4b5d8015f14a951fcac319eba8c1231abf9e85f62be1d773b8422283e1"
     },
     "src/ai_video/production/ecommerce_job_execution.py": {
-      "sha256": "86681f4e19d3edc0f712c90cbbda43689fdb64ea12073bc9ba737bdf4f8856a7",
-      "size": 8723,
-      "normalized_sha256": "86681f4e19d3edc0f712c90cbbda43689fdb64ea12073bc9ba737bdf4f8856a7"
+      "sha256": "9e7af90729b631d0c8107c776083b2c9360261d2ef24225f85f8280f79b8f9d3",
+      "size": 10774,
+      "normalized_sha256": "9e7af90729b631d0c8107c776083b2c9360261d2ef24225f85f8280f79b8f9d3"
     },
     "src/ai_video/production/ecommerce_job_projection.py": {
       "role": "observe",
-      "sha256": "abbb0568e1f91a1717f17ebf327d8d360a63f01d1fdfff58375e928026fb6a8e",
-      "size": 13617,
-      "normalized_sha256": "abbb0568e1f91a1717f17ebf327d8d360a63f01d1fdfff58375e928026fb6a8e"
+      "sha256": "0100a139116f7de7170b3759bf52b91d7d281d8cc9e31cc09a406eeeceec92d6",
+      "size": 22899,
+      "normalized_sha256": "0100a139116f7de7170b3759bf52b91d7d281d8cc9e31cc09a406eeeceec92d6"
     },
     "src/ai_video/production/ecommerce_job_repair.py": {
       "role": "observe",
-      "sha256": "0bbc8d858c12b692d40dfcb9b4fceda1989265652ce028f3c547fa8281b82ba6",
-      "size": 20894,
-      "normalized_sha256": "0bbc8d858c12b692d40dfcb9b4fceda1989265652ce028f3c547fa8281b82ba6"
+      "sha256": "fbe682612b0ec23550c458b4c6f751349d1d831987dbe53e245ebee2c15dd511",
+      "size": 24448,
+      "normalized_sha256": "fbe682612b0ec23550c458b4c6f751349d1d831987dbe53e245ebee2c15dd511"
     },
     "src/ai_video/production/ecommerce_job_review.py": {
       "role": "observe",
-      "sha256": "a80953d19505346e462797d566cb9a749433ba72e3b644c1924024969b8db8ec",
-      "size": 10406,
-      "normalized_sha256": "a80953d19505346e462797d566cb9a749433ba72e3b644c1924024969b8db8ec"
+      "sha256": "53f94c05241d5380e683125da7c84a9f7a05a145450453853fccd1c3ed0c43b6",
+      "size": 12914,
+      "normalized_sha256": "53f94c05241d5380e683125da7c84a9f7a05a145450453853fccd1c3ed0c43b6"
     },
     "src/ai_video/production/ecommerce_media_acceptance.py": {
       "role": "observe",
-      "sha256": "57603481c6ea6a3e46d42953652ef3e34ff095789955c96a52d1d817f412c719",
-      "size": 14185,
-      "normalized_sha256": "57603481c6ea6a3e46d42953652ef3e34ff095789955c96a52d1d817f412c719"
+      "sha256": "c75bddf5a54daab0ba2fd517b0a296cf00cf727acf16c0ca69a46c25e93df283",
+      "size": 14190,
+      "normalized_sha256": "c75bddf5a54daab0ba2fd517b0a296cf00cf727acf16c0ca69a46c25e93df283"
     },
     "src/ai_video/production/ecommerce_quality_gate.py": {
       "role": "observe",
@@ -3446,9 +3518,9 @@
     },
     "src/ai_video/production/generation_evaluation.py": {
       "role": "observe",
-      "sha256": "a5a0c732312d158dcefcf2546669d2f70eeabd0c412a48ef879f3f54709537ea",
-      "size": 18120,
-      "normalized_sha256": "a5a0c732312d158dcefcf2546669d2f70eeabd0c412a48ef879f3f54709537ea"
+      "sha256": "f8eee73c07cb27ca1562fa09964629989866186c77060b932ddc0c63a5368482",
+      "size": 18768,
+      "normalized_sha256": "f8eee73c07cb27ca1562fa09964629989866186c77060b932ddc0c63a5368482"
     },
     "src/ai_video/production/generation_evaluation_criteria.py": {
       "role": "observe",
@@ -4286,6 +4358,16 @@
       "size": 14857,
       "normalized_sha256": "1a068c8da112a6c58acb0eb7d239af62c5fbda52b6ce2310ce396585c706cf18"
     },
+    "tests/fixtures/ecommerce_job/vertical-3s.mp4": {
+      "role": "observe",
+      "sha256": "aaecbb5f7a3496dff4823d5fc3bd91212d51a6e97c4562ab104c42942fadabdf",
+      "size": 343187
+    },
+    "tests/fixtures/ecommerce_job/vertical-6s-audio.mp4": {
+      "role": "observe",
+      "sha256": "84ddb7215a86ccfef7aff0dcc0586dae04f57b83995b623342e48986878d99d0",
+      "size": 707707
+    },
     "tests/fixtures/generated_video/fake-video.mp4": {
       "role": "observe",
       "sha256": "02e3a2b47b59cdc0a4c1463d86614425428523b7a61c134324d5f7aed4886fbe",
@@ -4449,11 +4531,17 @@
       "size": 85538,
       "normalized_sha256": "d1095de19c6533dc6c3f828a6556b15bf7a5189572c260e5dae3a09737864544"
     },
+    "tests/production_ecommerce_job_render_support.py": {
+      "role": "observe",
+      "sha256": "de88be0a8fc541e6a4a28882d3079771030d884f301abea633089f49006b5387",
+      "size": 5063,
+      "normalized_sha256": "de88be0a8fc541e6a4a28882d3079771030d884f301abea633089f49006b5387"
+    },
     "tests/production_generation_execution_factory.py": {
       "role": "observe",
-      "sha256": "7913e4ecd47c465b32108959192cbf68059c039accb60136b0841ac93f7bb58f",
-      "size": 22294,
-      "normalized_sha256": "7913e4ecd47c465b32108959192cbf68059c039accb60136b0841ac93f7bb58f"
+      "sha256": "69eba4128482833f5bd47d5703f04499d1ce9d39774fc06c80bd448cd90e55ec",
+      "size": 23013,
+      "normalized_sha256": "69eba4128482833f5bd47d5703f04499d1ce9d39774fc06c80bd448cd90e55ec"
     },
     "tests/production_project_factory.py": {
       "role": "observe",
@@ -4481,9 +4569,9 @@
     },
     "tests/test_agent_harness.py": {
       "role": "observe",
-      "sha256": "d7b67e86aa804d3abce899d960ef69dc73f7e05e8a58ca90d05d80fbccd39c54",
-      "size": 114836,
-      "normalized_sha256": "d7b67e86aa804d3abce899d960ef69dc73f7e05e8a58ca90d05d80fbccd39c54"
+      "sha256": "b1504552014185ea491435d3be3609220c7b367678dcc5c0e5507a36dcf29a5a",
+      "size": 115104,
+      "normalized_sha256": "b1504552014185ea491435d3be3609220c7b367678dcc5c0e5507a36dcf29a5a"
     },
     "tests/test_agent_memory.py": {
       "role": "observe",
@@ -4703,9 +4791,9 @@
     },
     "tests/test_mcp_analyze.py": {
       "role": "observe",
-      "sha256": "3fc1757294b0e930731528c0630ff6904431585a4dca981d26eb5fe91fb29047",
-      "size": 27669,
-      "normalized_sha256": "3fc1757294b0e930731528c0630ff6904431585a4dca981d26eb5fe91fb29047"
+      "sha256": "f61aa56182b1a805d51579a8608ff607539a780694437c73a16e947a7c5711e6",
+      "size": 27933,
+      "normalized_sha256": "f61aa56182b1a805d51579a8608ff607539a780694437c73a16e947a7c5711e6"
     },
     "tests/test_mcp_apply_optimization.py": {
       "role": "observe",
@@ -4811,9 +4899,9 @@
     },
     "tests/test_production_caption_quality.py": {
       "role": "observe",
-      "sha256": "bfc9c86c8ea64df697910b8aefd9f09cee3e882c02436f199faa21522d29700b",
-      "size": 15543,
-      "normalized_sha256": "bfc9c86c8ea64df697910b8aefd9f09cee3e882c02436f199faa21522d29700b"
+      "sha256": "249536bd2e8ce9ca7ab1c418b252c94fbec6b74080fe194bbf2609b1124ad1d5",
+      "size": 18846,
+      "normalized_sha256": "249536bd2e8ce9ca7ab1c418b252c94fbec6b74080fe194bbf2609b1124ad1d5"
     },
     "tests/test_production_captions.py": {
       "role": "observe",
@@ -4901,9 +4989,9 @@
     },
     "tests/test_production_delivery_packager.py": {
       "role": "observe",
-      "sha256": "b7fac049d776f7e71ad7fcfe58dd432a41f3ad1e6100332f66c6036ffb364dea",
-      "size": 30382,
-      "normalized_sha256": "b7fac049d776f7e71ad7fcfe58dd432a41f3ad1e6100332f66c6036ffb364dea"
+      "sha256": "fee85d8ed95eac2f4175ef50d89a8e19dffc05f4031e604178a8ea818bac9b09",
+      "size": 33924,
+      "normalized_sha256": "fee85d8ed95eac2f4175ef50d89a8e19dffc05f4031e604178a8ea818bac9b09"
     },
     "tests/test_production_dependency.py": {
       "role": "observe",
@@ -4913,15 +5001,15 @@
     },
     "tests/test_production_ecommerce_ad_coordinator.py": {
       "role": "observe",
-      "sha256": "924137859a75bbe1b7f498153d9caf758bf0cf868dad2d68ed060ef930f06876",
-      "size": 11903,
-      "normalized_sha256": "924137859a75bbe1b7f498153d9caf758bf0cf868dad2d68ed060ef930f06876"
+      "sha256": "e34d4c98007a36466951f6d1f162fb2204a03bcc9055c735e79a798e08276d91",
+      "size": 12582,
+      "normalized_sha256": "e34d4c98007a36466951f6d1f162fb2204a03bcc9055c735e79a798e08276d91"
     },
     "tests/test_production_ecommerce_job.py": {
       "role": "observe",
-      "sha256": "70131666de9a71ac1b1ce8f5a9baf94b143b4f11bc9a810078ffeb8e50ae68f7",
-      "size": 83380,
-      "normalized_sha256": "70131666de9a71ac1b1ce8f5a9baf94b143b4f11bc9a810078ffeb8e50ae68f7"
+      "sha256": "7d0dab46ac9341bea31583e1d846a824d10b993ad8ce13909aca38cc83b1cfa0",
+      "size": 90235,
+      "normalized_sha256": "7d0dab46ac9341bea31583e1d846a824d10b993ad8ce13909aca38cc83b1cfa0"
     },
     "tests/test_production_ecommerce_job_assembly.py": {
       "role": "observe",
@@ -4941,11 +5029,17 @@
       "size": 9577,
       "normalized_sha256": "72093f8e70b07b0ce126299a1cc3f8651b40f8ee17e616b11540b14f64555bf2"
     },
+    "tests/test_production_ecommerce_job_e2e.py": {
+      "role": "observe",
+      "sha256": "bdea276211e2ddbd65c51ab14ed3ab2d1b0fcf5e637c2e86ecbf64209ca2a9ef",
+      "size": 88471,
+      "normalized_sha256": "bdea276211e2ddbd65c51ab14ed3ab2d1b0fcf5e637c2e86ecbf64209ca2a9ef"
+    },
     "tests/test_production_ecommerce_job_projection.py": {
       "role": "observe",
-      "sha256": "765745a1974ceb5300af1a6478c84eca27379f0d83acce6af3f5cf09d8a3449c",
-      "size": 3539,
-      "normalized_sha256": "765745a1974ceb5300af1a6478c84eca27379f0d83acce6af3f5cf09d8a3449c"
+      "sha256": "6efd4e4339757296ef1f58004d514482856ffe7e092322b977153e2eb20da94a",
+      "size": 7285,
+      "normalized_sha256": "6efd4e4339757296ef1f58004d514482856ffe7e092322b977153e2eb20da94a"
     },
     "tests/test_production_ecommerce_job_repair.py": {
       "role": "observe",
@@ -4955,15 +5049,15 @@
     },
     "tests/test_production_ecommerce_job_review.py": {
       "role": "observe",
-      "sha256": "89faf5692a3ef4975658d1b024bb6e78d2edc2935713f339137a7ac92eefee65",
-      "size": 5146,
-      "normalized_sha256": "89faf5692a3ef4975658d1b024bb6e78d2edc2935713f339137a7ac92eefee65"
+      "sha256": "7d173e4ed436a3c6f9a35852347aafa47472d640207eb957935b70a2309f8123",
+      "size": 17471,
+      "normalized_sha256": "7d173e4ed436a3c6f9a35852347aafa47472d640207eb957935b70a2309f8123"
     },
     "tests/test_production_ecommerce_media_acceptance.py": {
       "role": "observe",
-      "sha256": "be81e7aa6a6c9adcd110cd171333f52ddbe3e905e57ed938a182a3869addd8f5",
-      "size": 9852,
-      "normalized_sha256": "be81e7aa6a6c9adcd110cd171333f52ddbe3e905e57ed938a182a3869addd8f5"
+      "sha256": "31ed592008312a7b4717817f003cbedd0fc94c00a1a1f8431472437d0f92f89e",
+      "size": 10638,
+      "normalized_sha256": "31ed592008312a7b4717817f003cbedd0fc94c00a1a1f8431472437d0f92f89e"
     },
     "tests/test_production_ecommerce_post_media_e2e.py": {
       "role": "observe",
@@ -5009,9 +5103,9 @@
     },
     "tests/test_production_generated_video_e2e.py": {
       "role": "observe",
-      "sha256": "8b63b9037288ea1508e12bf7cd06d8577d271dbbb2f6884366c45e76c21000ad",
-      "size": 113727,
-      "normalized_sha256": "8b63b9037288ea1508e12bf7cd06d8577d271dbbb2f6884366c45e76c21000ad"
+      "sha256": "e6ea37b499b9a6deb8db39db7fcac108cab15c0fa4af5512b593861820caf95b",
+      "size": 117745,
+      "normalized_sha256": "e6ea37b499b9a6deb8db39db7fcac108cab15c0fa4af5512b593861820caf95b"
     },
     "tests/test_production_generation_decision.py": {
       "role": "observe",
@@ -5597,9 +5691,9 @@
     },
     "tests/test_visual_quality_report.py": {
       "role": "observe",
-      "sha256": "6eed0b4418fe8bb14ffd5de19e60ac5bd6712bf3d73dae6a15286d6489ebc118",
-      "size": 6591,
-      "normalized_sha256": "6eed0b4418fe8bb14ffd5de19e60ac5bd6712bf3d73dae6a15286d6489ebc118"
+      "sha256": "4065977ddc4ece2c3e7fee32502a676e999ea7371f7f035f7a84469db26c998b",
+      "size": 10822,
+      "normalized_sha256": "4065977ddc4ece2c3e7fee32502a676e999ea7371f7f035f7a84469db26c998b"
     },
     "tests/test_voice_routing_binding.py": {
       "role": "observe",

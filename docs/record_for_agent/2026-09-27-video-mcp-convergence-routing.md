@@ -8,6 +8,12 @@ learning_eligibility: ineligible
 
 Date: 2026-09-27
 
+## Supersession Notice — 2026-09-27
+
+下文 AOCI Governance Gap 已由[索引维护记录](2026-09-27-aoci-index-maintenance.md)
+接替：7 个 stale entries 和 50 个 observed pending 已完成复核与官方维护，
+Verify / Check / Guide 证明治理对齐。原 VideoMCP 能力与验收限制仍有效。
+
 ## Scope And Current Runtime Truth
 
 用户提供 `https://github.com/EthanBobbyTR/VideoMCP.git`，明确了 [convergence plan](../superpowers/plans/2026-09-26-video-mcp-convergence.md) 的目标身份。该指令 supersede 先前对同一 repository 的排除，不再需要另一个 `video-context-mcp` 启动配置。实际服务名仍是 `video-mcp`，没有新增 alias。
