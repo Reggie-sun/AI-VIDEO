@@ -4,6 +4,15 @@ enable_fanout = true
 multi_agent = true
 multi_agent_v2 = true
 
+[mcp_servers.video-mcp]
+command = "/home/reggie/.local/share/video-mcp/venv/bin/video-mcp"
+cwd = "/home/reggie/vscode_folder/MCP/VideoMCP"
+
+[mcp_servers.video-mcp.env]
+PATH = "/home/reggie/miniconda3/bin:/usr/local/bin:/usr/bin:/bin"
+PYTHONUNBUFFERED = "1"
+VIDEO_MCP_WHISPER_DEVICE = "cpu"
+
 [mcp_servers.video-analysis]
 command = "/home/reggie/.local/share/ai-video/video-analysis-mcp/bin/python"
 args = ["-m", "ai_video_mcp"]
