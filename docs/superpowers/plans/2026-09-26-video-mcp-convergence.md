@@ -2,7 +2,19 @@
 
 Date: 2026-09-26
 
-Status: draft；本轮只编写计划，不实施 MCP 替换或删除。
+Status: implementation requested；2026-09-27 已完成现有服务审计和本地 smoke，Milestone 1 的替代服务 identity/coverage 仍 blocked；Milestone 2/3 未完成。未替换或删除 MCP。
+
+## Execution Checkpoint — 2026-09-27
+
+用户本轮要求实施本计划。审计 source checkpoint 为 `7fa6dbd`；当前 `.codex/config.toml` 的既有 AOCI 改动保留。下方 Starting Point、矩阵和 Self-Review 保留 planning 时的判断；矩阵中的 `Replace` 是满足前置条件后的候选方向，当前所有候选实现仍为 `Keep`，删除集为空。
+
+- 已检查 project `.codex/config.toml`、`.mcp.json`，用户级 Codex/Claude 配置、Claude Desktop 配置与本地 MCP 安装目录，未定位 `video-context-mcp`。用户指定 session `01a0de3d-d9f4-7ef3-9d2a-0e13d462005d` 的原始记录同样只证明 EthanBobbyTR/VideoMCP 安装，且随后明确排除它；提供的 `src/ai_video_mcp` 仍为原服务源码。不能由该历史 session 推断替代身份。
+- 当前 `server.py` 注册八个公开 tools；`tools/analyze.py` 直接复用 `probe.py`、`frames.py`、`scene_detect.py`、`transcribe.py`。`tools/review.py` 的 legacy 分支和 `analysis_hook.py` 消费该 core；`generation_feedback.py` / `analysis_client.py` 经 stdio 消费 `video_analyze`，`GenerationAnalysisEvidence` 仍固定 tool name、path、summary 和 measured size。CodeGraph 已调用；其对同名工具的部分调用定位混淆 server wrapper 与 core，最终 import/caller 结论以源码为准。
+- 通过真实 project command 的 stdio handshake/calls 验证原服务：八个工具、probe、三张可解码 `160x120` JPEG、时间戳、scene detection、聚合分析、公开 legacy review、重复 probe 返回相等、`no_audio_stream` / `file_not_found`。图片在 text/structured JSON 的 base64 字段中返回；不宣称原服务输出 native MCP image blocks。无音轨 synthetic fixture，不加载 Whisper、不下载模型、不调用媒体 Provider、不写 Production state。
+- Smoke artifact：`.agent/harness/runs/video-mcp-audit-smoke-20260927/smoke.json`，SHA-256 `be15f6beb72289d4a35dd1ee9db4dc3ea3a76967325d2f9ded2f4fee3215d96d`；fixture SHA-256 `156d231b9dc1cc05bbcb08ebfcc362e04f3439f7d58018d4d268875dd0dfc532`。重复返回只证明本次结果一致，不是 Production exact replay 的 zero-effects 证明。
+- Focused regression：`tests/test_mcp_*.py` 加 generation feedback/evaluation/quality rejection 四组，`132 passed, 1 skipped, 1 failed`。唯一失败为 `tests/test_mcp_analyze.py::test_claude_project_hook_reuses_the_local_analysis_queue`：测试要求全部 `PostToolUse` 注册仅一个，HEAD 的 Claude 配置已有 record 与 analysis 两个 hook。单测再次复现；两个文件都与 HEAD 一致，属于已有不一致，不删除正常 hook 或修改测试来伪造收敛通过。
+
+替代 coverage 仍全部 `NOT_EVALUATED`；没有达到通用入口迁移、公开 catalog 删除或底层实现删除条件。下一最小输入是准确的目标服务启动 command / 安装路径 / repository identity。取得它后继续 Milestone 1 的 schema、synthetic fixture、failure/cache 验证，满足条件再实施 Milestone 2。真实 QA 完整回归仍受上述已有失败影响；新服务 ASR/OCR、连续帧与语义质量均未验证。详见 [execution audit record](../../record_for_agent/2026-09-27-video-mcp-convergence-audit.md)。
 
 ## Goal And Scope
 
