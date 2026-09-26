@@ -8,6 +8,10 @@ learning_eligibility: ineligible
 
 Date: 2026-09-26
 
+## Supersession Notice — 2026-09-26
+
+下文技术渲染、解码和新增文案布局数据保留为历史事实，但不能作为这段样片质量合格或创作任务完成的依据。对同一 MP4 `f8f775e4357d4ec8030142f93e8f07d2631d370884e4717ff97f35d42353c6ce` 的[后续逐项复核](2026-09-26-creative-completion-loop.md)已确认1秒和5秒商品包装文字有明显异常，开发合同整体 FAIL；音频与人类完整观看仍未评估。该片仅可作为失败诊断证据，不能以“预览”名义放行。原记录未签 Final Acceptance 的事实不免除 Agent 交付前的基础审片责任。
+
 ## Purpose
 
 用户要求生成一段可观看的视频，并选择“用仓库现有电商样例做演示”。本轮从已有登记素材重新剪辑、排版和配乐，实际产出新的本地竖屏 MP4；没有新增 Video Provider submit，没有修改既有项目，也没有 push / release。
