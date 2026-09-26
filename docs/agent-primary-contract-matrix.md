@@ -7,6 +7,8 @@
 全片观看声明。`ProductionStateCommitter` 继续独占 QA activation、review 和最终验收。
 旧 visual_dimension 缺省 bytes/hash 不变；无视觉要求的历史政策不追溯改变。
 `scripts/visual_quality_report.py` 仅生成绑定现有 MP4/截图的开发侧 HTML/JSON，
+可消费原完整 `FinalOutputContract`，保留非视觉要求并复用同一裁决器；旧视觉专用
+packet 不被提升成完整作品验收，报告不自动检测叙事/音频或拦截聊天交付。
 不是 Production writer 或人类验收 host。详细使用与边界见
 [Visual Quality Gate](visual-quality-gate.md)；focused checks 为
 `tests/test_production_visual_quality.py`、`tests/test_visual_quality_report.py`，

@@ -55,6 +55,20 @@ Production 验证 selected evaluator 的测量声明，不重新解码 MP4/JPEG�
 
 ## Local Report
 
+完整作品的开发侧审片使用 `prepare --contract /path/to/final-output-contract.json`，
+同时提供该作品的 `--direction` 和 `--content-kind`。`--contract` 读取原
+`FinalOutputContract`，保留 `goal_id`、`goal_version`、`user_goal` 与所有 requirements；
+其中五项视觉要求必须与 direction 完全一致，差异在 probe/抽帧/建目录前拒绝。
+叙事、表演、商品、声音等普通要求不会被视觉要求替换或过滤，任何有效 FAIL 都阻断
+整体 PASS，缺项为 NOT_EVALUATED，仍使用同一个 `adjudicate_final_output`。
+
+此模式产生 `visual-review-packet/2` 与 `review_scope=full_contract`。不传 contract
+则保持旧 `/1` packet 和 `review_scope=visual_only`；旧 Python positional API、已有
+packet 与旧合同身份继续兼容。HTML 显示原目标和所有要求，非视觉项使用原 requirement ID。
+`full_contract` 仅描述 caller 输入范围：工具不会自动理解叙事、听音频、验证合同穷尽原意，
+也不拦截 Agent 直接发链接。原始 brief 到合同的覆盖和审片纪律见
+[Creative Completion Practice](../.agents/skills/open-video/references/creative-completion.md)。
+
 以下私有开发工具读取现有 MP4，使用 ffprobe 与 ffmpeg 生成截图和 HTML；不写
 Production Manifest、Registry、ReviewReceipt 或 FinalAcceptanceReceipt。
 

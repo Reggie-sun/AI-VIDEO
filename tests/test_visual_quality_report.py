@@ -141,3 +141,88 @@ def test_matching_genre_cli_creates_bound_packet_and_rejects_removed_label(packe
     write_json(output / "packet.json", saved)
     with pytest.raises(ValueError, match="Content kind differs"):
         reopen(output)
+
+
+def complete_goal(kind):
+    from ai_video.production.final_output_contracts import FinalOutputContract, FinalOutputRequirement
+    from ai_video.production.visual_quality import VisualDirection, visual_requirements
+
+    authored = VisualDirection.model_validate({**direction().model_dump(), "content_kind": kind})
+    extra = FinalOutputRequirement(
+        requirement_id="product.identity" if kind == "advertising" else "scene.result",
+        observable="商品包装文字与真实参考一致" if kind == "advertising" else "观众能看见人物发现信件后改变行动",
+        proof="evaluator",
+    )
+    goal = FinalOutputContract(goal_id="authored-film", goal_version="3",
+        user_goal="保留原始完整目标 <不要缩成视觉测试>",
+        requirements=(*visual_requirements(authored), extra))
+    return authored, goal
+
+
+@pytest.mark.parametrize("kind", ["advertising", "drama"])
+@pytest.mark.parametrize("extra_verdict,expected", [("pass", "pass"), ("fail", "fail"), (None, "not_evaluated")])
+def test_complete_goal_cannot_be_replaced_by_visual_pass(packet, tmp_path, kind, extra_verdict, expected):
+    from scripts.visual_quality_report import reopen
+
+    authored, goal = complete_goal(kind)
+    source = Path(json.loads((packet / "packet.json").read_text())["video_path"])
+    output = tmp_path / "complete"
+    result = prepare(source, authored, output, (0, 1000), final_output_contract=goal)
+    assert result["verdict"] == "not_evaluated"
+    assert result["review_scope"] == "full_contract"
+    saved, reopened = reopen(output)
+    assert saved["schema_version"] == "visual-review-packet/2"
+    assert reopened == goal
+    assert reopened.contract_hash == goal.contract_hash
+    path = answers(output)
+    data = json.loads(path.read_text())
+    if extra_verdict is None:
+        data["observation"]["findings"].pop()
+    else:
+        data["observation"]["findings"][-1].update(verdict=extra_verdict, observation="Observed <script>defect</script>")
+    write_json(path, data)
+    checked = check(output, path)
+    assert checked["verdict"] == expected
+    assert checked["production_acceptance"] == "not_evaluated"
+    html = (output / "report.html").read_text()
+    assert goal.requirements[-1].requirement_id in html
+    assert goal.requirements[-1].observable in html
+    assert "保留原始完整目标 &lt;不要缩成视觉测试&gt;" in html
+    assert "<script>" not in html
+
+
+@pytest.mark.parametrize("mutation", ["genre", "visual_text"])
+def test_complete_goal_mismatch_rejected_before_media_effects(tmp_path, monkeypatch, mutation):
+    authored, goal = complete_goal("advertising")
+    if mutation == "genre":
+        _, goal = complete_goal("drama")
+    else:
+        changed = goal.requirements[0].model_copy(update={"observable": "Silently weakened visual requirement"})
+        goal = goal.model_copy(update={"requirements": (changed, *goal.requirements[1:])})
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("No media probe or extraction before contract validation")
+
+    monkeypatch.setattr(subprocess, "run", forbidden)
+    output = tmp_path / "review"
+    with pytest.raises(ValueError, match="visual requirements"):
+        prepare(tmp_path / "missing.mp4", authored, output, (0,), final_output_contract=goal)
+    assert not output.exists()
+
+
+def test_complete_contract_cli_and_visual_only_scope(packet, tmp_path):
+    from scripts.visual_quality_report import main
+
+    authored, goal = complete_goal("drama")
+    config, contract = tmp_path / "direction.json", tmp_path / "goal.json"
+    write_json(config, authored.model_dump(mode="json"))
+    write_json(contract, goal.model_dump(mode="json"))
+    source = json.loads((packet / "packet.json").read_text())["video_path"]
+    output = tmp_path / "complete"
+    assert main(["prepare", "--video", source, "--direction", str(config),
+        "--content-kind", "drama", "--contract", str(contract), "--output", str(output),
+        "--timestamps-ms", "0", "1000"]) == 0
+    result = json.loads((output / "result.json").read_text())
+    assert result["review_scope"] == "full_contract"
+    assert result["verdict"] == "not_evaluated"
+    assert check(packet, answers(packet))["review_scope"] == "visual_only"

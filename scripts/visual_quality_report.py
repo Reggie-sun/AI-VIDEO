@@ -54,7 +54,18 @@ def write_json(path, value):
     Path(path).write_text(json.dumps(value, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def prepare(video: Path, direction: VisualDirection, output: Path, timestamps: tuple[int, ...]):
+def prepare(video: Path, direction: VisualDirection, output: Path, timestamps: tuple[int, ...],
+            *, final_output_contract: FinalOutputContract | None = None):
+    visual = visual_requirements(direction)
+    if final_output_contract is not None:
+        supplied = {r.requirement_id: r for r in final_output_contract.requirements if r.visual_dimension}
+        if direction.content_kind is None or supplied != {r.requirement_id: r for r in visual}:
+            raise ValueError("Complete contract visual requirements must match the explicit direction")
+        contract = final_output_contract
+    else:
+        contract = FinalOutputContract(goal_id="overall-visual-quality", goal_version="1",
+            user_goal="字体、配色、排版、画风一致性和最终观感符合选定视觉方向。",
+            requirements=visual)
     video = video.resolve(strict=True)
     before = file_hash(video)
     probe = json.loads(subprocess.run(["ffprobe", "-v", "error", "-show_format",
@@ -74,10 +85,7 @@ def prepare(video: Path, direction: VisualDirection, output: Path, timestamps: t
             "frame_sha256": file_hash(path), "render_output_sha256": before})
     if file_hash(video) != before:
         raise ValueError("Video changed during extraction")
-    contract = FinalOutputContract(goal_id="overall-visual-quality", goal_version="1",
-        user_goal="字体、配色、排版、画风一致性和最终观感符合选定视觉方向。",
-        requirements=visual_requirements(direction))
-    packet = {"schema_version": "visual-review-packet/1", "authority": "development_only",
+    packet = {"schema_version": "visual-review-packet/2" if final_output_contract is not None else "visual-review-packet/1", "authority": "development_only",
         "video_path": str(video), "video_sha256": before, "video_size_bytes": video.stat().st_size,
         "duration_ms": duration_ms, "contract": contract.model_dump(mode="json"), "frames": frames}
     if direction.content_kind is not None:
@@ -100,7 +108,8 @@ def prepare(video: Path, direction: VisualDirection, output: Path, timestamps: t
 def reopen(output: Path):
     packet = json.loads((output / "packet.json").read_text(encoding="utf-8"))
     body = {k: v for k, v in packet.items() if k != "subject_hash"}
-    if packet.get("schema_version") != "visual-review-packet/1" or packet.get("authority") != "development_only":
+    version = packet.get("schema_version")
+    if version not in {"visual-review-packet/1", "visual-review-packet/2"} or packet.get("authority") != "development_only":
         raise ValueError("Unsupported visual review packet")
     if canonical_sha256(body) != packet["subject_hash"]:
         raise ValueError("Packet identity changed; prepare a new packet")
@@ -108,13 +117,18 @@ def reopen(output: Path):
     if video.stat().st_size != packet["video_size_bytes"] or file_hash(video) != packet["video_sha256"]:
         raise ValueError("Video bytes changed; old review cannot be reused")
     contract = FinalOutputContract.model_validate(packet["contract"])
-    if {r.visual_dimension for r in contract.requirements} != set(LABELS):
+    visual = tuple(r for r in contract.requirements if r.visual_dimension is not None)
+    if {r.visual_dimension for r in visual} != set(LABELS):
         raise ValueError("Packet must retain all five visual requirements")
+    if version == "visual-review-packet/1" and visual != contract.requirements:
+        raise ValueError("Legacy packet supports only visual requirements")
     kind = packet.get("content_kind")
+    if version == "visual-review-packet/2" and kind is None:
+        raise ValueError("Complete contract requires an explicit content kind")
     if "content_kind" in packet and (not isinstance(kind, str) or kind not in CONTENT_LABELS):
         raise ValueError("Unknown visual content kind")
     prefix = "visual" if kind is None else f"visual.{kind}"
-    if any(r.requirement_id != f"{prefix}.{r.visual_dimension}" for r in contract.requirements):
+    if any(r.requirement_id != f"{prefix}.{r.visual_dimension}" for r in visual):
         raise ValueError("Content kind differs from sealed visual requirements")
     for frame in packet["frames"]:
         path = output / frame["path"]
@@ -153,6 +167,7 @@ def check(output: Path, answers: Path):
     item = LocalEvidence(answer.strength, packet["video_sha256"], {"final_output": source.model_dump(mode="json")})
     verdict = adjudicate_final_output(contract, (item,), review_request_content_hash=packet["subject_hash"])
     result = {"authority": "development_only", "verdict": verdict.value,
+        "review_scope": "full_contract" if packet["schema_version"] == "visual-review-packet/2" else "visual_only",
         "production_acceptance": "not_evaluated", "subject_hash": packet["subject_hash"],
         "video_sha256": packet["video_sha256"], "answers_sha256": file_hash(answers),
         "evaluator_name": answer.evaluator_name, "strength": answer.strength.value,
@@ -170,12 +185,13 @@ def render_html(packet, contract, result):
     for rule in contract.requirements:
         finding = findings.get(rule.requirement_id, {"verdict": "not_evaluated", "observation": "缺少该项评审。", "visual_frames": []})
         stamps = " · ".join(f'{f["timestamp_ms"] / 1000:.2f}s' for f in finding["visual_frames"])
-        cards.append(f'<article><div class="row"><h3>{escape(LABELS[rule.visual_dimension])}</h3>'
+        cards.append(f'<article><div class="row"><h3>{escape(LABELS.get(rule.visual_dimension, rule.requirement_id))}</h3>'
             f'<b class="{finding["verdict"]}">{finding["verdict"].upper()}</b></div>'
             f'<p class="muted">标准 · {escape(rule.observable)}</p><p>{escape(finding["observation"])}</p>'
             f'<small>{escape(stamps)}</small></article>')
     frames = ''.join(f'<figure><img src="{escape(f["path"], quote=True)}" alt="成片 {f["timestamp_ms"] / 1000:.2f} 秒">'
         f'<figcaption>{f["timestamp_ms"] / 1000:.2f}s</figcaption></figure>' for f in packet["frames"])
+    scope_label = "完整合同逐项评审" if result["review_scope"] == "full_contract" else "仅视觉要求评审"
     return f'''<!doctype html><html lang="zh-CN"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>成片视觉评审</title>
 <style>body{{margin:0;background:#f4f3ef;color:#202523;font:16px/1.7 system-ui,sans-serif}}
@@ -188,10 +204,12 @@ main{{max-width:1240px;margin:auto;padding:48px 24px}}h1{{font-size:38px;line-he
 @media(max-width:720px){{.grid{{grid-template-columns:1fr}}.frames{{grid-template-columns:repeat(2,1fr)}}h1{{font-size:30px}}}}</style>
 <main><div class="eyebrow">VISUAL REVIEW / 成片整体视觉</div><h1>让视觉问题有据可查</h1>
 <p>{escape(Path(packet["video_path"]).name)} · {packet["duration_ms"] / 1000:.3f}s · {CONTENT_LABELS.get(packet.get("content_kind"), "历史未分类方向")}</p>
-<p class="{result["verdict"]}"><strong>本次视觉检查：{result["verdict"].upper()}</strong></p>
+<p>{scope_label} · 原目标：{escape(contract.user_goal)}</p>
+<p class="{result["verdict"]}"><strong>本次检查：{result["verdict"].upper()}</strong></p>
 <p class="muted">开发侧评审报告。截图不证明全片观看；本报告不写入 Production 验收状态。
-下方单项标签是评审者的原始回答，最终结论还会检查证据与观看要求。</p>
-<section><h2>视觉方向与逐项评审</h2><div class="grid">{''.join(cards)}</div></section>
+下方单项标签是评审者的原始回答，最终结论还会检查证据与观看要求。
+合同覆盖范围由创作者明确；报告不自动检测叙事、表演或音频质量，也不证明已包含全部用户要求。</p>
+<section><h2>要求与逐项评审</h2><div class="grid">{''.join(cards)}</div></section>
 <section><h2>成片画面证据</h2><div class="frames">{frames}</div></section>
 <section class="identity">MP4 SHA-256: {packet["video_sha256"]}<br>Review subject: {packet["subject_hash"]}<br>
 Evaluator: {escape(result["evaluator_name"])} / {escape(result["strength"])}</section></main></html>'''
@@ -203,6 +221,7 @@ def main(argv=None):
     prep = sub.add_parser("prepare")
     prep.add_argument("--video", type=Path, required=True)
     prep.add_argument("--direction", type=Path, required=True)
+    prep.add_argument("--contract", type=Path, help="Complete authored FinalOutputContract; preserves nonvisual requirements")
     prep.add_argument("--content-kind", choices=tuple(CONTENT_LABELS), required=True)
     prep.add_argument("--output", type=Path, required=True)
     prep.add_argument("--timestamps-ms", type=int, nargs="+", required=True)
@@ -215,7 +234,8 @@ def main(argv=None):
             direction = VisualDirection.model_validate_json(args.direction.read_text())
             if direction.content_kind != args.content_kind:
                 raise ValueError("Explicit content kind must match the direction file")
-            result = prepare(args.video, direction, args.output, tuple(args.timestamps_ms))
+            contract = FinalOutputContract.model_validate_json(args.contract.read_text()) if args.contract else None
+            result = prepare(args.video, direction, args.output, tuple(args.timestamps_ms), final_output_contract=contract)
         else:
             result = check(args.packet, args.answers)
     except (ValueError, OSError, KeyError, subprocess.SubprocessError) as exc:
