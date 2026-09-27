@@ -70,7 +70,7 @@ Parent 初始预算封存 local batch ceiling 2 / total ceiling 4，两次 initi
 
 没有扩大 ceiling、重置计数、用新 task ID 躲避此边界或降低 rubric。API 两次初始提交完成，paid repair ceiling 0。operator upper bound 仅为预配置 Budget Guard 上限，不代表官方价格或余额。
 
-local queue 确认 running/pending 均为空后，supervisor 停止 own `ai-video-comfyui-d543579794064c1fbfd6e17e47253b99.service`，readback inactive；恢复 `jianji-qwen3-vl.service`，readback active/running、MainPID `2569280`、InvocationID `f4ab67bc26c542b2be41c122699adbc9`。`R/service-restoration.json` 留存；未额外验证模型服务健康。声明的 GPU wall budget 未有独立仪表计量，不能把 prompt elapsed 当作 GPU 总时长。
+local queue 确认 running/pending 均为空后，supervisor 停止 own `ai-video-comfyui-d543579794064c1fbfd6e17e47253b99.service`，readback inactive。VLLM 初次恢复只短暂 active，后因 free memory 20.62 GiB 小于所需 24.14 GiB、KV cache 6.46 / 6.73 GiB 小于所需 6.75 GiB 而退出；不能将那个 PID 当作稳定恢复。未停止其他 Jianji FFmpeg 任务或改变配置，等显存释放后服务原自动重启策略成功，最终 `jianji-qwen3-vl.service` active/running、MainPID `2659509`、InvocationID `8d0779c188af4e8d985709d42fb723bb`，`GET /health` 实测 HTTP 200，available KV cache 7.2 GiB。`R/service-restoration.json` 留存，没有 inference submit。声明的 GPU wall budget 未有独立仪表计量，不能把 prompt elapsed 当作 GPU 总时长。
 
 ## Evidence Index
 
