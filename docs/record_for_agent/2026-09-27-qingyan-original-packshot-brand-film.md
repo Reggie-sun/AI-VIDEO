@@ -9,6 +9,10 @@ evidence_index_version: "1"
 
 Date: 2026-09-27
 
+## Supersession Notice — 2026-09-27
+
+用户随后明确否定本片“全程一张图”的创作结果，并指出此前已要求从根本上改进。当前创作结论为**该方案被用户拒绝，需要重新设计**，不能将下文历史技术检查或“候选”称谓作为任务完成依据。原 MP4、合同、技术测量及 full-contract `NOT_EVALUATED` 均保留，不追溯改成另一项 QA verdict。反馈来源与后续待批准设计见 [Creative Goal Preservation Spec Record](2026-09-27-creative-goal-preservation-spec.md#user-feedback)。下文 Purpose 中选择静态品牌片的理由属于历史 Agent 决策，不代表用户同意该降级。
+
 ## Purpose
 
 用户要求再次生成视频观看。此前六秒样片的生成包装有可见文字问题；本次选用用户提供的真实商品照片，创作 10 秒竖屏原图动态图文品牌短片。此选择不声称实现真人、物理喷雾演示或产品功效验证。
@@ -62,6 +66,7 @@ Exact documentation verification receipt location：`.agent/harness/runs/qingyan
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | qingyan-packshot-technical | nonq0:qingyan-packshot-render-02:52e76fde12b77677ee7e69ef639b638e5ae1e9b49eee80bc490cd6c90d662d39 | qingyan-original-packshot-brand-film-20260927 | qingyan-packshot-render-02 | N/A | 25cd328bcbf395660a0e213d0c541c1c68bd49dc6304eedb936b912aeefa76a6 | TECHNICAL | PASS | NONE | NEW_ATTEMPT | NONE | runs/ecommerce-qingyan-packshot-20260927-001/production-v2/state/render/render-receipts/fb8d04e5dcd3d5c0b75ab1071bd7c8b4216182641014a2dc9b4ecdb0ba7256dc.json |
 | qingyan-packshot-full-contract | nonq0:qingyan-packshot-render-02:52e76fde12b77677ee7e69ef639b638e5ae1e9b49eee80bc490cd6c90d662d39 | qingyan-original-packshot-brand-film-20260927 | qingyan-packshot-render-02 | N/A | 25cd328bcbf395660a0e213d0c541c1c68bd49dc6304eedb936b912aeefa76a6 | EXPLICIT_EVALUATOR | NOT_EVALUATED | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | qingyan-packshot-technical | runs/ecommerce-qingyan-packshot-20260927-001/preflight/review/result.json |
+| qingyan-packshot-user-feedback | nonq0:qingyan-packshot-render-02:52e76fde12b77677ee7e69ef639b638e5ae1e9b49eee80bc490cd6c90d662d39 | qingyan-original-packshot-brand-film-20260927 | qingyan-packshot-render-02 | N/A | 25cd328bcbf395660a0e213d0c541c1c68bd49dc6304eedb936b912aeefa76a6 | USER_FEEDBACK | REJECTED | CREATIVE_INADEQUACY | SAME_EVIDENCE_NEW_PROOF_LAYER | qingyan-packshot-technical | docs/record_for_agent/2026-09-27-creative-goal-preservation-spec.md#user-feedback |
 
 ## Learning Evaluation And Boundaries
 

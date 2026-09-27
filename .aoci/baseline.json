@@ -1,7 +1,7 @@
 {
   "version": 1,
   "created_at": "2026-09-23T13:22:44Z",
-  "updated_at": "2026-09-26T19:26:44Z",
+  "updated_at": "2026-09-27T08:49:35Z",
   "files": {
     ".agent/harness/policy.yaml": {
       "sha256": "5c3db617555ccf7b6a048732a931866fec969cef6f1b34e7fdb202ae52f7e289",
@@ -1444,11 +1444,17 @@
       "size": 3907,
       "normalized_sha256": "e9c83c45878806f2f8eff314b6f736f1b80f99d55659b10bbd6e74f5a83c281d"
     },
+    "docs/record_for_agent/2026-09-27-creative-goal-preservation-spec.md": {
+      "role": "observe",
+      "sha256": "7a92187120bfe28c76088498940d1edd788fbc0964c3dfe59de6345265ea8616",
+      "size": 6338,
+      "normalized_sha256": "7a92187120bfe28c76088498940d1edd788fbc0964c3dfe59de6345265ea8616"
+    },
     "docs/record_for_agent/2026-09-27-qingyan-original-packshot-brand-film.md": {
       "role": "observe",
-      "sha256": "a125007f8e8009183a1fa3320ef909472fcf6bef046b60595577f5a49893cd17",
-      "size": 7970,
-      "normalized_sha256": "a125007f8e8009183a1fa3320ef909472fcf6bef046b60595577f5a49893cd17"
+      "sha256": "74c61fba4f69cdca2353ac38464c01068770db91723d6969ff0e929df6aea55f",
+      "size": 9126,
+      "normalized_sha256": "74c61fba4f69cdca2353ac38464c01068770db91723d6969ff0e929df6aea55f"
     },
     "docs/record_for_agent/2026-09-27-video-mcp-convergence-audit.md": {
       "role": "observe",
@@ -2091,6 +2097,12 @@
       "sha256": "29828d87dae32d91065566ff9fd1a72cdce8d9da374320c3855b2199a1ddf58c",
       "size": 5443,
       "normalized_sha256": "29828d87dae32d91065566ff9fd1a72cdce8d9da374320c3855b2199a1ddf58c"
+    },
+    "docs/superpowers/specs/2026-09-27-creative-goal-preservation-and-completion.md": {
+      "role": "observe",
+      "sha256": "87eea5307cf6199733525d687e3d6076ff4959ef3f00b22ea529a1a859309bcb",
+      "size": 17045,
+      "normalized_sha256": "87eea5307cf6199733525d687e3d6076ff4959ef3f00b22ea529a1a859309bcb"
     },
     "docs/superpowers/specs/5min_test.md": {
       "role": "observe",
