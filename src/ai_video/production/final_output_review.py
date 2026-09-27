@@ -1,6 +1,7 @@
 """Review-owned final-output adjudication; no media effects or state writes."""
 
 from collections.abc import Mapping
+from dataclasses import dataclass
 from typing import Literal
 
 from pydantic import Field
@@ -27,46 +28,88 @@ class FinalOutputObservation(StrictModel):
     findings: tuple[FinalOutputFinding, ...] = Field(min_length=1)
 
 
-def adjudicate_final_output(contract, evidence, *, review_request_content_hash):
-    """Require all authored observations; never infer a human viewing verdict."""
+@dataclass(frozen=True)
+class RequirementResult:
+    requirement_id: str
+    verdict: QaVerdict
+    evidence_gaps: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class FinalOutputAdjudication:
+    """Ephemeral calculation, not a persisted review or acceptance artifact."""
+
+    verdict: QaVerdict
+    requirements: tuple[RequirementResult, ...]
+    evidence_gaps: tuple[str, ...]
+
+
+def adjudicate_final_output_details(contract, evidence, *, review_request_content_hash):
+    """Compute eligible observations once, retaining global incomplete evidence."""
     rules = {r.requirement_id: r for r in contract.requirements}
     observations = {name: [] for name in rules}
-    incomplete = False
+    gaps = {name: [] for name in rules}
+    global_gaps = []
     for item in evidence:
         payload = item.measured_payload.get("final_output")
         if not isinstance(payload, Mapping):
-            incomplete = True
+            global_gaps.append("missing_observation")
             continue
         try:
             source = FinalOutputObservation.model_validate(dict(payload))
         except ValueError:
-            incomplete = True
+            global_gaps.append("invalid_observation")
             continue
         if (source.contract_hash != contract.contract_hash
                 or source.review_request_content_hash != review_request_content_hash):
-            incomplete = True
+            if source.contract_hash != contract.contract_hash:
+                global_gaps.append("contract_identity_mismatch")
+            if source.review_request_content_hash != review_request_content_hash:
+                global_gaps.append("request_identity_mismatch")
             continue
         ids = [f.requirement_id for f in source.findings]
         if len(ids) != len(set(ids)) or not set(ids) <= set(rules):
-            incomplete = True
+            if len(ids) != len(set(ids)):
+                global_gaps.append("duplicate_findings")
+            if not set(ids) <= set(rules):
+                global_gaps.append("unknown_findings")
             continue
         for finding in source.findings:
             rule = rules[finding.requirement_id]
             if rule.visual_dimension is not None and not valid_visual_finding(rule, finding, source, item):
-                incomplete = True
+                gaps[finding.requirement_id].append("invalid_visual_proof")
                 continue
             if rule.proof == "human" and (
                 item.strength is not EvidenceStrength.HUMAN
                 or source.viewing_speed_milli != 1000
             ):
-                incomplete = True
+                gaps[finding.requirement_id].append("invalid_human_proof")
                 continue
             observations[finding.requirement_id].append(finding.verdict)
+    requirements = []
+    for name, values in observations.items():
+        if "fail" in values:
+            verdict = QaVerdict.FAIL
+        elif not values or any(v != "pass" for v in values):
+            verdict = QaVerdict.NOT_EVALUATED
+            gaps[name].append("missing_observation" if not values else "not_evaluated_observation")
+        else:
+            verdict = QaVerdict.PASS
+        requirements.append(RequirementResult(name, verdict, tuple(dict.fromkeys(gaps[name]))))
+    incomplete = bool(global_gaps) or any(gaps.values())
     if any("fail" in values for values in observations.values()):
-        return QaVerdict.FAIL
-    if incomplete or any(not values or any(v != "pass" for v in values) for values in observations.values()):
-        return QaVerdict.NOT_EVALUATED
-    return QaVerdict.PASS
+        verdict = QaVerdict.FAIL
+    elif incomplete or any(not values or any(v != "pass" for v in values) for values in observations.values()):
+        verdict = QaVerdict.NOT_EVALUATED
+    else:
+        verdict = QaVerdict.PASS
+    return FinalOutputAdjudication(verdict, tuple(requirements), tuple(dict.fromkeys(global_gaps)))
+
+
+def adjudicate_final_output(contract, evidence, *, review_request_content_hash):
+    """Preserve the aggregate API as a projection of the shared calculation."""
+    return adjudicate_final_output_details(contract, evidence,
+        review_request_content_hash=review_request_content_hash).verdict
 
 
 def adjudicate_semantic_review(policy, evidence, *, review_request_content_hash):

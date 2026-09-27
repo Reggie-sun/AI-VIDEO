@@ -64,6 +64,62 @@ def test_review_cannot_inherit_stale_or_non_normal_speed_human_conclusions(chang
         review_request_content_hash="a" * 64) is QaVerdict.NOT_EVALUATED
 
 
+@pytest.mark.parametrize("mutation,expected_gap", [
+    ("human_strength", "invalid_human_proof"), ("speed", "invalid_human_proof"),
+    ("contract", "contract_identity_mismatch"), ("request", "request_identity_mismatch"),
+    ("unknown", "unknown_findings"), ("duplicate", "duplicate_findings"),
+    ("malformed", "invalid_observation"), ("missing", "missing_observation")])
+def test_detailed_results_expose_ineligible_raw_pass(mutation, expected_gap):
+    from ai_video.production.final_output_review import adjudicate_final_output, adjudicate_final_output_details
+
+    policy = viewing_policy()
+    item = viewing_evidence(policy, dict.fromkeys(("timing", "natural", "audio"), "pass"))
+    payload = {**item.measured_payload}
+    source = {**payload["final_output"]}
+    if mutation == "human_strength": item = item.model_copy(update={"strength": EvidenceStrength.EXPLICIT_EVALUATOR})
+    elif mutation == "speed": source["viewing_speed_milli"] = 2000
+    elif mutation == "contract": source["contract_hash"] = "b" * 64
+    elif mutation == "request": source["review_request_content_hash"] = "b" * 64
+    elif mutation == "unknown": source["findings"] = (*source["findings"], {**source["findings"][0], "requirement_id": "unknown"})
+    elif mutation == "duplicate": source["findings"] = (*source["findings"], source["findings"][0])
+    elif mutation == "malformed": source["findings"] = "malformed"
+    elif mutation == "missing": source = None
+    payload["final_output"] = source
+    item = item.model_copy(update={"measured_payload": payload})
+    result = adjudicate_final_output_details(policy.final_output, (item,), review_request_content_hash="a" * 64)
+    assert result.verdict is QaVerdict.NOT_EVALUATED
+    assert all(row.verdict is QaVerdict.NOT_EVALUATED for row in result.requirements)
+    gaps = (*result.evidence_gaps, *(gap for row in result.requirements for gap in row.evidence_gaps))
+    assert expected_gap in gaps
+    assert adjudicate_final_output(policy.final_output, (item,), review_request_content_hash="a" * 64) is result.verdict
+
+
+@pytest.mark.parametrize("fail", [False, True])
+def test_details_keep_global_incomplete_even_with_complete_valid_observations(fail):
+    from ai_video.production.final_output_review import adjudicate_final_output_details
+
+    policy = viewing_policy()
+    valid = viewing_evidence(policy, {"timing": "fail" if fail else "pass", "natural": "pass", "audio": "pass"})
+    invalid = valid.model_copy(update={"measured_payload": {"final_output": {"malformed": True}}})
+    result = adjudicate_final_output_details(policy.final_output, (valid, invalid), review_request_content_hash="a" * 64)
+    assert result.verdict is (QaVerdict.FAIL if fail else QaVerdict.NOT_EVALUATED)
+    assert [r.verdict for r in result.requirements] == [QaVerdict.FAIL if fail else QaVerdict.PASS, QaVerdict.PASS, QaVerdict.PASS]
+    assert result.evidence_gaps == ("invalid_observation",)
+
+
+def test_detailed_sampled_visual_answers_use_original_visual_eligibility():
+    from ai_video.production.final_output_review import adjudicate_final_output_details
+    from test_production_visual_quality import visual_policy, visual_evidence
+
+    qa = visual_policy()
+    item = visual_evidence(qa, viewing_mode="sampled_frames").model_copy(
+        update={"strength": EvidenceStrength.EXPLICIT_EVALUATOR})
+    result = adjudicate_final_output_details(qa.final_output, (item,), review_request_content_hash="a" * 64)
+    assert result.verdict is QaVerdict.NOT_EVALUATED
+    assert result.requirements[-1].verdict is QaVerdict.NOT_EVALUATED
+    assert "invalid_visual_proof" in result.requirements[-1].evidence_gaps
+
+
 def approved_repair(tmp_path, *, with_goal=False):
     fixture = make_manifest_25_failed_layout_review_fixture(tmp_path)
     bundle = load_production_project(tmp_path / "project.yaml")
