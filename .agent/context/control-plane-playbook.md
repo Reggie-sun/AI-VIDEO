@@ -23,7 +23,8 @@
 
 新创作、实质重剪及字幕/图形/配乐设计必须在执行前和交付前使用 `open-video` 的
 [Creative Completion Practice](../../.agents/skills/open-video/references/creative-completion.md)。
-包括复用现有素材与短预览：完整用户目标不能缩成“能播放”，独立审片必须面对 exact
+包括跨轮原始意图、独立 concept 判断及新开发侧 goal-binding/packet `/3` 入口；具体步骤
+与 diagnostics 仅由该 reference 和工具 owner 维护。完整用户目标不能缩成“能播放”，独立审片必须面对 exact
 成片而非作者解释，已知缺陷进入有限修复。广告与电视剧采用各自内容判断，不固定镜头
 数量、节奏或 CTA。开发侧报告以原 `FinalOutputContract` 保留全部适用要求；报告不
 拦截任意聊天/脚本，也不代签 Production 或人类验收。纯复制已验收 exact bytes 沿原

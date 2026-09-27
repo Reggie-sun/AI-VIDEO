@@ -1,8 +1,8 @@
 # Creative Goal Preservation And Completion
 
 Date: 2026-09-27
-Status: Draft — Pending user approval
-Scope: Development authoring、导演决策与成片复核；本轮仅讨论、spec 与 plan，不实现或生成媒体。
+Status: Approved for offline implementation — 2026-09-27
+Scope: Development authoring、导演决策与成片复核；用户后续明确要求实现配套 plan，未授权业务媒体或 empirical acceptance。
 Companion Plan: [Creative Goal Preservation And Completion Implementation Plan](../plans/2026-09-27-creative-goal-preservation-and-completion.md)
 
 ## Goal
@@ -132,4 +132,4 @@ AI 不能填写 `HUMAN`，未完成原速完整观看、聆听的项目保持 `N
 
 不增加 Provider / 模型、runtime dependency、公共 `ai-video` CLI、Manifest / Registry schema、renderer、timeline、第二套 QA / delivery truth 或自动发布；不改通用授权、permit、recovery 和质量底线；不建立聊天拦截器、自动审美评分或固定镜头配额；不宣称能消除所有创作失败。
 
-用户随后明确要求同时编写 spec 与 plan，因此附配套实施计划；两份文档仍为待批准设计，不构成代码实现或媒体执行授权。旧 [Creative Completion Loop](2026-09-26-creative-completion-loop.md) 已实现的完整合同报告保持有效；本 spec 补充其上游目标承接与下游执行责任，不将旧实现重述为未完成。
+用户先要求同时编写 spec 与 plan，随后于 2026-09-27 明确要求实现配套 plan，批准此处的 offline implementation scope；业务媒体执行和 empirical acceptance 仍须各任务具备授权。旧 [Creative Completion Loop](2026-09-26-creative-completion-loop.md) 已实现的完整合同报告保持有效；本 spec 补充其上游目标承接与下游执行责任，不将旧实现重述为未完成。工程实证及未验证边界见 [implementation record](../../record_for_agent/2026-09-27-creative-goal-preservation-implementation.md)。

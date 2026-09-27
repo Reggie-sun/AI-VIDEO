@@ -14,6 +14,28 @@ packet 不被提升成完整作品验收，报告不自动检测叙事/音频或
 `tests/test_production_visual_quality.py`、`tests/test_visual_quality_report.py`，
 mandatory routing 由 Harness `visual_quality_tests` 独占。
 
+## Creative Goal Development Binding
+
+`scripts/creative_goal_binding.py` 是 development-only 的只读引用检查 owner，显式加载既有
+Director v4 validator，消费 exact UTF-8 source、coverage 和 `FinalOutputContract`。它只校验
+intent→constraint→unit→requirement 关系及 contained file identities，不提取用户意图、推断
+自然语言 scope、裁决创意或写 Production state。v3 与合法空 v4 inventory 的旧 validator
+行为保留；新链要求有效 inventory 和完整 user bindings。
+
+`scripts/visual_quality_report.py` 消费相同 preflight，`/3` packet 保存四份 original-byte
+snapshot，reopen 只读封存文件，拒绝 drift/escape；`/1`、`/2` 仍按旧范围可读。
+`final_output_review.py::adjudicate_final_output_details` 独占共用有效逐项计算和全局 gaps，
+原 `adjudicate_final_output` 仅投影 aggregate，FAIL 优先/incomplete 阻断语义保持不变。
+报告分开展示 raw answers、有效结果和引用来源，不新增 persisted schema/acceptance truth。
+Product Runtime 禁止反向 import `scripts` 或 Skill；源引用与结构 PASS 不证明语义充分、
+实际观看、用户满意或 Production acceptance。
+
+Focused verification：`tests/test_creative_goal_binding.py`、`tests/test_visual_quality_report.py`、
+`tests/test_production_final_output.py`、`tests/test_open_video_skill.py`、
+`tests/test_runtime_skill_boundary.py`；新 helper 与报告 mandatory routing 由 Harness
+`creative_goal_binding_tests` 独占。创作操作细节由
+[Creative Completion Practice](../.agents/skills/open-video/references/creative-completion.md) 维护。
+
 ## Voice Source Routing
 
 `voice_routing_contracts.py` 拥有可选 `voice-routing/1` authoring；`voice_routing.py` 只读构造

@@ -69,6 +69,25 @@ packet 与旧合同身份继续兼容。HTML 显示原目标和所有要求，�
 也不拦截 Agent 直接发链接。原始 brief 到合同的覆盖和审片纪律见
 [Creative Completion Practice](../.agents/skills/open-video/references/creative-completion.md)。
 
+新目标承接入口先使用 `python -m scripts.creative_goal_binding --binding PATH` 做只读检查，
+再给 `prepare` 同时传 `--contract PATH --goal-binding PATH`。封套要求 Director v4、三份
+contained exact file references 与完整 intent bindings；无效输入或合同冲突在 probe/抽帧/
+mkdir 前拒绝。它不改变公共 `ai-video` CLI。封套字段与创作闭环只由上方 reference 维护。
+
+显式传 goal binding 时产生 `visual-review-packet/3`：封套及三个依赖以预检已读的原始 bytes
+保存于 `creative/`，保留相对引用，identity 纳入 `subject_hash`。即使外部输入后来变化/移动，
+reopen/check 只消费封存 snapshot；缺文件、symlink、改 quote/映射/合同/hash 都拒绝。
+JSON bytes SHA 与 `contract_hash` 分别验证文件和语义，不能互相替代。旧 packet 不静默升级，
+结果明确 `goal_chain=not_evaluated`；`/3` 的 `verified` 也只证明结构完整。
+
+JSON/HTML 保留 evaluator 原始 `findings`，另列原 owner
+`adjudicate_final_output_details` 的 `effective_requirements` 和全局 `evidence_gaps`。
+不合格 human/sample/身份证据的 raw PASS 不显示为已证明；有效 FAIL 仍优先，任何全局
+incomplete 仍阻断整体 PASS。旧 aggregate API、Production schema 与 acceptance 条件不变。
+`completion_summary` 列出 exact identity、实际声明的复核范围、待修/补证要求及用户反馈来源；
+用户语义仍需 Parent 核对和披露，不由机器判断拒绝是否撤回，不新建 accepted 状态。
+所有 packet 的 `production_acceptance` 仍为 `not_evaluated`。
+
 以下私有开发工具读取现有 MP4，使用 ffprobe 与 ffmpeg 生成截图和 HTML；不写
 Production Manifest、Registry、ReviewReceipt 或 FinalAcceptanceReceipt。
 
@@ -91,7 +110,7 @@ python -m scripts.visual_quality_report check \
 先打开 `report.html` 看方向和截图，再复制 `observations.template.json` 填写实际
 评审。帧引用必须来自 packet；未观察到的项目保持 not_evaluated，不能为了通过
 填写 human 或 full_playback。`prepare` 成功退出 0 只表示材料已生成；`check`
-只有开发侧 visual PASS 退出 0，FAIL/NOT_EVALUATED 退出 1，输入无效退出 2。
+只有相应范围的开发侧 PASS 退出 0，FAIL/NOT_EVALUATED 退出 1，输入无效退出 2。
 
 每次 check 重验 MP4、截图和封存 packet，清除旧派生 result/report 后重建，
 防止换片后旧 PASS 报告继续留下。报告是可重算的开发侧观察，不是受控 human
@@ -103,4 +122,5 @@ host，也不具备签发 Production 验收的权限。
 tests/test_visual_quality_report.py -q` 验证逐项阻断、真实 committer/strict reopen、
 旧序列化、实际 ffmpeg 抽帧、替换 MP4/截图、陈旧回答、HTML 转义与缺少全片观看。
 Harness 的 `visual_quality_tests` 路由这些检查，相关 Review / Repair 回归继续执行。
+新封套与 `/3` 实际入口由 `creative_goal_binding_tests` 路由，并验证 Runtime 单向边界。
 测试通过不代表某条成片已达到用户的审美要求。

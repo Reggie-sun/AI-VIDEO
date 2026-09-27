@@ -189,7 +189,7 @@ def test_creative_goal_binding_routes_to_real_entry_and_boundary_checks(path):
     assert not inspection["fallback_paths"]
     assert "creative_goal_binding_tests" in inspection["check_ids"]
     assert {"tests/test_creative_goal_binding.py", "tests/test_visual_quality_report.py",
-        "tests/test_open_video_skill.py", "tests/test_runtime_skill_boundary.py"} <= set(
+        "tests/test_open_video_skill.py", "tests/test_production_visual_quality.py", "tests/test_runtime_skill_boundary.py"} <= set(
             policy["checks"]["creative_goal_binding_tests"]["argv"])
 
 

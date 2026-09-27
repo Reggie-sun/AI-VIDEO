@@ -8,6 +8,12 @@ learning_eligibility: ineligible
 
 Date: 2026-09-27
 
+## Supersession Notice — 2026-09-27
+
+用户后续明确要求实现配套 plan，已批准 M1–M4 offline scope，工程 implementation evidence 见
+[implementation record](2026-09-27-creative-goal-preservation-implementation.md)。下文“待批准、
+未开始代码”描述此前文档阶段；业务媒体授权、真实广告/剧情验收及青颜用户拒绝边界未改变。
+
 ## Purpose
 
 用户要求“和claude讨论下这个事情该怎么做，然后写一个specs”。本轮完成只读讨论和待批准 spec，未获 implementation 或新媒体授权，不能把设计写成已修复的产品行为。

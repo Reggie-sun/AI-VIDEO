@@ -11,7 +11,8 @@ description: Use for AI-VIDEO Director coverage when raw creative input—missin
 
 > **Creative completion:** For new creation or a creative re-edit, including reused footage,
 > read [Creative Completion Practice](references/creative-completion.md) before authoring.
-> Keep the original viewer goal through coverage, independent candidate review, bounded repair,
+> Preserve relevant cross-turn intent, check the concept independently, and use the practice's
+> exact goal binding and review packet before bounded repair,
 > and delivery. A technically valid preview with known defects does not complete the work.
 
 ## 1. What open-video does

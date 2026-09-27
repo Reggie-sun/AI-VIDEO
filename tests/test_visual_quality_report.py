@@ -226,3 +226,177 @@ def test_complete_contract_cli_and_visual_only_scope(packet, tmp_path):
     assert result["review_scope"] == "full_contract"
     assert result["verdict"] == "not_evaluated"
     assert check(packet, answers(packet))["review_scope"] == "visual_only"
+
+
+@pytest.fixture
+def bound_packet(packet, tmp_path):
+    from test_creative_goal_binding import goal_inputs
+    from scripts.visual_quality_report import reopen
+
+    authored, goal = complete_goal("drama")
+    goal = goal.model_copy(update={"requirements": (*goal.requirements[:-1],
+        goal.requirements[-1].model_copy(update={"proof": "human"}))})
+    binding, _, _, _ = goal_inputs(tmp_path / "authoring", kind="drama", contract=goal)
+    output = tmp_path / "bound-review"
+    source = Path(reopen(packet)[0]["video_path"])
+    prepare(source, authored, output, (0, 1000), final_output_contract=goal, goal_binding=binding)
+    return output, binding, goal
+
+
+def test_goal_binding_python_roundtrip_reopens_only_sealed_inputs(bound_packet):
+    from scripts.visual_quality_report import reopen
+    output, binding, goal = bound_packet
+    packet, reopened = reopen(output)
+    assert packet["schema_version"] == "visual-review-packet/3"
+    assert reopened == goal
+    assert packet["goal_binding"]["path"] == "creative/binding.json"
+    for source in binding.parent.iterdir():
+        assert (output / "creative" / source.name).read_bytes() == source.read_bytes()
+    binding.parent.rename(binding.parent.with_name("moved-original-inputs"))
+    assert reopen(output)[1] == goal
+    checked = check(output, answers(output))
+    assert checked["verdict"] == "pass"
+    assert checked["goal_chain"] == "verified"
+    assert checked["completion_summary"]["requirements_to_address"] == []
+    assert checked["completion_summary"]["user_feedback"]["assessment"] == "parent_review_required"
+    assert checked["production_acceptance"] == "not_evaluated"
+
+
+@pytest.mark.parametrize("mutation", ["binding", "source", "coverage", "contract", "missing", "symlink", "path_escape"])
+def test_goal_snapshot_tampering_removes_old_pass(bound_packet, mutation):
+    from ai_video.production.hashing import canonical_sha256
+    output, _, _ = bound_packet
+    path = answers(output)
+    check(output, path)
+    packet = json.loads((output / "packet.json").read_text())
+    creative = output / "creative"
+    target = {"binding": "binding.json", "source": "input.txt", "coverage": "coverage.json",
+        "contract": "contract.json"}.get(mutation, "input.txt")
+    if mutation == "missing": (creative / target).unlink()
+    elif mutation == "symlink":
+        (creative / target).rename(creative / "substitute.txt")
+        (creative / target).symlink_to(creative / "substitute.txt")
+    elif mutation == "path_escape":
+        packet["goal_binding"]["path"] = "creative/../creative/binding.json"
+        packet["subject_hash"] = canonical_sha256({k: v for k, v in packet.items() if k != "subject_hash"})
+        write_json(output / "packet.json", packet)
+    else:
+        with (creative / target).open("ab") as stream: stream.write(b"changed")
+    with pytest.raises(ValueError):
+        check(output, path)
+    assert not (output / "result.json").exists()
+    assert not (output / "report.html").exists()
+
+
+@pytest.mark.parametrize("mutation", ["missing_contract", "different_contract", "stale_source", "invalid_mapping"])
+def test_binding_preflight_runs_before_probe_extraction_or_mkdir(tmp_path, monkeypatch, mutation):
+    from test_creative_goal_binding import goal_inputs
+    authored, goal = complete_goal("advertising")
+    path, envelope, _, _ = goal_inputs(tmp_path / "authoring", contract=goal)
+    if mutation == "missing_contract": goal = None
+    elif mutation == "different_contract": goal = goal.model_copy(update={"goal_version": "2"})
+    elif mutation == "stale_source": (path.parent / "input.txt").write_text("different")
+    else:
+        envelope["bindings"].pop(0)
+        write_json(path, envelope)
+    def forbidden(*args, **kwargs):
+        pytest.fail("Binding rejection must precede media effects")
+    monkeypatch.setattr(subprocess, "run", forbidden)
+    output = tmp_path / "review"
+    with pytest.raises(ValueError):
+        prepare(tmp_path / "missing.mp4", authored, output, (0,), final_output_contract=goal, goal_binding=path)
+    assert not output.exists()
+
+
+def test_snapshot_uses_preflight_bytes_even_if_external_inputs_drift_during_probe(packet, tmp_path, monkeypatch):
+    from test_creative_goal_binding import goal_inputs
+    from scripts.visual_quality_report import reopen
+    authored, goal = complete_goal("advertising")
+    binding, _, _, _ = goal_inputs(tmp_path / "authoring", contract=goal)
+    original = (binding.parent / "input.txt").read_bytes()
+    real_run = subprocess.run
+    def drift(*args, **kwargs):
+        (binding.parent / "input.txt").write_bytes(b"changed after validation")
+        return real_run(*args, **kwargs)
+    monkeypatch.setattr(subprocess, "run", drift)
+    output = tmp_path / "frozen"
+    prepare(Path(reopen(packet)[0]["video_path"]), authored, output, (0,),
+        final_output_contract=goal, goal_binding=binding)
+    assert (output / "creative/input.txt").read_bytes() == original
+    assert reopen(output)[1] == goal
+
+
+def test_effective_requirement_summary_never_displays_raw_human_pass_as_proven(bound_packet):
+    output, _, goal = bound_packet
+    path = answers(output)
+    raw = json.loads(path.read_text())
+    raw["strength"] = "explicit_evaluator"
+    raw["observation"].update(viewing_mode="sampled_frames", viewing_speed_milli=None)
+    write_json(path, raw)
+    result = check(output, path)
+    assert all(f["verdict"] == "pass" for f in result["findings"])
+    effective = {r["requirement_id"]: r for r in result["effective_requirements"]}
+    extra = goal.requirements[-1].requirement_id
+    assert effective[extra]["verdict"] == "not_evaluated"
+    assert "invalid_human_proof" in effective[extra]["evidence_gaps"]
+    assert extra in {r["requirement_id"] for r in result["completion_summary"]["requirements_to_address"]}
+    html = (output / "report.html").read_text()
+    assert "有效结果" in html and "原始回答" in html and "invalid_human_proof" in html
+    assert result["verdict"] == "not_evaluated"
+
+
+def test_goal_binding_cli_consumes_same_preflight_and_reopen(packet, tmp_path):
+    from scripts.visual_quality_report import main, reopen
+    from test_creative_goal_binding import goal_inputs
+    authored, goal = complete_goal("drama")
+    binding, _, _, _ = goal_inputs(tmp_path / "authoring", kind="drama", contract=goal)
+    config = tmp_path / "direction.json"
+    write_json(config, authored.model_dump(mode="json"))
+    output = tmp_path / "cli"
+    args = ["prepare", "--video", reopen(packet)[0]["video_path"], "--direction", str(config),
+        "--content-kind", "drama", "--output", str(output), "--timestamps-ms", "0", "1000",
+        "--goal-binding", str(binding)]
+    assert main(args) == 2
+    assert not output.exists()
+    assert main(args + ["--contract", str(binding.parent / "contract.json")]) == 0
+    assert reopen(output)[0]["schema_version"] == "visual-review-packet/3"
+    assert main(["check", "--packet", str(output), "--answers", str(answers(output))]) == 0
+
+
+@pytest.mark.parametrize("rejected", [False, True])
+def test_feedback_revision_is_sealed_new_input_and_never_rewrites_old_report(bound_packet, packet, tmp_path, rejected):
+    from scripts.visual_quality_report import reopen
+    from test_creative_goal_binding import reseal
+    output, binding, goal = bound_packet
+    check(output, answers(output))
+    old = {p: p.read_bytes() for p in output.rglob("*") if p.is_file()}
+    old_subject = reopen(output)[0]["subject_hash"]
+    envelope = json.loads(binding.read_text())
+    coverage = json.loads((binding.parent / "coverage.json").read_text())
+    feedback = "用户拒绝全程单图，要求重新设计。" if rejected else "用户同意当前方案，仍待实际观看。"
+    source = (binding.parent / "input.txt").read_text() + feedback + "\n"
+    (binding.parent / "input.txt").write_text(source)
+    import hashlib
+    envelope["creative_input"]["sha256"] = hashlib.sha256(source.encode()).hexdigest()
+    coverage["request"]["creative_input_evidence"] = source
+    for intent in coverage["intent_items"]:
+        intent["source_refs"][0]["source_hash"] = envelope["creative_input"]["sha256"]
+    reseal(binding, envelope, "coverage", coverage)
+    revision = goal.model_copy(update={"goal_version": "2"})
+    reseal(binding, envelope, "final_output_contract", revision.model_dump(mode="json"))
+    new = tmp_path / "new-revision"
+    authored, _ = complete_goal("drama")
+    result = prepare(Path(reopen(packet)[0]["video_path"]), authored, new, (0,),
+        final_output_contract=revision, goal_binding=binding)
+    assert result["subject_hash"] != old_subject
+    assert result["completion_summary"]["user_feedback"]["assessment"] == "parent_review_required"
+    assert result["completion_summary"]["user_feedback"]["source"]["sha256"] == envelope["creative_input"]["sha256"]
+    assert feedback in (new / "creative/input.txt").read_text()
+    assert {p: p.read_bytes() for p in output.rglob("*") if p.is_file()} == old
+    assert reopen(output)[1] == goal
+
+
+def test_legacy_packet_reports_absence_of_goal_chain(packet):
+    result = check(packet, answers(packet))
+    assert result["goal_chain"] == "not_evaluated"
+    assert "目标引用链未核对" in (packet / "report.html").read_text()

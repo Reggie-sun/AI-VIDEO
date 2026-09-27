@@ -1,11 +1,11 @@
 # Creative Goal Preservation And Completion Implementation Plan
 
 Date: 2026-09-27
-Status: Draft — Pending implementation approval
+Status: Approved for offline implementation — 2026-09-27
 
 ## Goal And Authority
 
-执行配套 [spec](../specs/2026-09-27-creative-goal-preservation-and-completion.md)，减少跨轮目标丢失、避险式创作降级及交出文件后提前结束任务。用户本轮要求写 spec 与 plan，仅授权文档；本计划不代表已实施，不授权新媒体、Provider、Production activation、push 或 release。
+执行配套 [spec](../specs/2026-09-27-creative-goal-preservation-and-completion.md)，减少跨轮目标丢失、避险式创作降级及交出文件后提前结束任务。用户于 2026-09-27 后续明确要求实现本 plan，批准 M1–M4 offline engineering；不授权业务媒体、Provider、Production activation、push 或 release。实际工程 closure 与 evidence limits 由 [implementation record](../../record_for_agent/2026-09-27-creative-goal-preservation-implementation.md) 记录，plan 本身不替代实证。
 
 Native Codex 是 lifecycle owner，后续获准后在当前 working tree 串行执行。当前基线为 `2e70a3a`；开始每个阶段前重新检查 target ownership。当前 `.codex/config.toml` 为 unrelated dirty，保留。同文件发生新的未知改动时停止该文件写入并报告，不创建 worktree 规避 ownership。
 

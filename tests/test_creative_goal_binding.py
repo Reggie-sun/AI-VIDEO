@@ -202,6 +202,31 @@ def test_director_choice_cannot_replace_a_missing_user_binding(tmp_path):
         binding.load_goal_binding(path)
 
 
+def test_director_normalized_origin_cannot_hide_an_unbound_user_intent(tmp_path):
+    path, envelope, coverage, _ = goal_inputs(tmp_path)
+    coverage["intent_items"][0]["origin"] = "Explicit User"
+    coverage["intent_items"][0]["source_refs"][0]["origin"] = "Explicit User"
+    envelope["bindings"].pop(0)
+    reseal(path, envelope, "coverage", coverage)
+    assert _load_validator().validate_director_coverage(coverage)["status"] == "passed"
+    with pytest.raises(binding.GoalBindingError, match="unbound_user_intent"):
+        binding.load_goal_binding(path)
+
+
+def test_join_consumes_existing_director_scope_and_constraint_normalization(tmp_path):
+    path, envelope, coverage, _ = goal_inputs(tmp_path, strategy="multi_shot")
+    coverage["request"]["creative_constraints"][0]["scope"] = "Beat Specific"
+    for unit in coverage["coverage_units"]:
+        unit["constraint_ids"][0] = "Action"
+    reseal(path, envelope, "coverage", coverage)
+    assert _load_validator().validate_director_coverage(coverage)["status"] == "passed"
+    assert binding.load_goal_binding(path).diagnostics == ()
+    envelope["bindings"][0]["unit_ids"].pop()
+    write_json(path, envelope)
+    with pytest.raises(binding.GoalBindingError, match="uncovered_intent_unit"):
+        binding.load_goal_binding(path)
+
+
 def test_approved_static_brand_direction_and_vague_semantics_are_only_structurally_verified(tmp_path):
     path, envelope, coverage, contract = goal_inputs(tmp_path)
     source = "用户：同意固定商品静物品牌片。不要凭空增加人物。\n"

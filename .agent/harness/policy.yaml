@@ -98,8 +98,9 @@ checks:
     cwd: .
     description: Verify visual requirements through existing semantic/final acceptance, exact media report binding and missing-review blocking; no Provider calls.
   creative_goal_binding_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_creative_goal_binding.py, tests/test_open_video_skill.py, tests/test_visual_quality_report.py, tests/test_runtime_skill_boundary.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_creative_goal_binding.py, tests/test_open_video_skill.py, tests/test_production_visual_quality.py, tests/test_visual_quality_report.py, tests/test_runtime_skill_boundary.py, -q]
     cwd: .
+    covers_check_ids: [open_video_skill_tests, visual_quality_tests, product_runtime_skill_boundary_tests]
     description: Verify exact development intent joins, sealed review snapshots, Director compatibility and one-way runtime boundaries without Provider calls.
   paid_reconciliation_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_paid_provider_no_effect_reconciliation.py, -q]

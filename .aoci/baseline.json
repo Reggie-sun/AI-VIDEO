@@ -1,12 +1,12 @@
 {
   "version": 1,
   "created_at": "2026-09-23T13:22:44Z",
-  "updated_at": "2026-09-27T09:14:34Z",
+  "updated_at": "2026-09-27T09:45:53Z",
   "files": {
     ".agent/harness/policy.yaml": {
-      "sha256": "5c3db617555ccf7b6a048732a931866fec969cef6f1b34e7fdb202ae52f7e289",
-      "size": 67189,
-      "normalized_sha256": "5c3db617555ccf7b6a048732a931866fec969cef6f1b34e7fdb202ae52f7e289"
+      "sha256": "b229d75c3411d179d299c015437f05c8aac28f3cb49748555b0ce2639dc04faf",
+      "size": 68017,
+      "normalized_sha256": "b229d75c3411d179d299c015437f05c8aac28f3cb49748555b0ce2639dc04faf"
     },
     ".agents/skills/distill-ai-video-learning/SKILL.md": {
       "role": "observe",
@@ -160,15 +160,15 @@
     },
     ".agents/skills/open-video/SKILL.md": {
       "role": "observe",
-      "sha256": "43e9e781c6e99f534fd9f6f921bda61c22516d16287b0149fb4d8a2453eb4aa3",
-      "size": 21285,
-      "normalized_sha256": "43e9e781c6e99f534fd9f6f921bda61c22516d16287b0149fb4d8a2453eb4aa3"
+      "sha256": "557de1a7b4c0fd504b3262554f43a26044825feec914a8430d7650c4b6a87ba9",
+      "size": 21346,
+      "normalized_sha256": "557de1a7b4c0fd504b3262554f43a26044825feec914a8430d7650c4b6a87ba9"
     },
     ".agents/skills/open-video/references/creative-completion.md": {
       "role": "observe",
-      "sha256": "8d3f999b692fca3d458cc8e821966cd11351ae30bd5c680ffa2bae4a5f1b4626",
-      "size": 7058,
-      "normalized_sha256": "8d3f999b692fca3d458cc8e821966cd11351ae30bd5c680ffa2bae4a5f1b4626"
+      "sha256": "f4d3fff385f1cc48a393fbef60e433c42b6df17be58e9e00394b2ac7c52cc74c",
+      "size": 12226,
+      "normalized_sha256": "f4d3fff385f1cc48a393fbef60e433c42b6df17be58e9e00394b2ac7c52cc74c"
     },
     ".agents/skills/open-video/scripts/validate_director_coverage.py": {
       "role": "observe",
@@ -259,9 +259,9 @@
       "normalized_sha256": "dd12e97578244b362163d39071549fec8d4797cc8a0d8f6d102c10c4a74b5fb9"
     },
     "aoci.code.txt": {
-      "sha256": "6e7a33cc33e113269f252a4cec18e715b65a682873bdd2cd9620fff1bd543245",
-      "size": 13508,
-      "normalized_sha256": "6e7a33cc33e113269f252a4cec18e715b65a682873bdd2cd9620fff1bd543245"
+      "sha256": "cbd6df506ecef52c0e71b8d48a9894944ed9114005515f036670c7ac861024e8",
+      "size": 13611,
+      "normalized_sha256": "cbd6df506ecef52c0e71b8d48a9894944ed9114005515f036670c7ac861024e8"
     },
     "aoci.meta.txt": {
       "role": "index",
@@ -330,9 +330,9 @@
       "normalized_sha256": "0fef49ad05fa6bc0bf5023f583a5f25a03320ee29aee8d83a20cd299c2616327"
     },
     "docs/agent-primary-contract-matrix.md": {
-      "sha256": "53b927f0010cf3b7d49afc66a91e80d3bd884a37e84052601430b32cb09c0340",
-      "size": 136547,
-      "normalized_sha256": "53b927f0010cf3b7d49afc66a91e80d3bd884a37e84052601430b32cb09c0340"
+      "sha256": "6b392f6848196435946a3ef5efa42d7f6f80d78d229e1d97f741f80d4fbdeecd",
+      "size": 138200,
+      "normalized_sha256": "6b392f6848196435946a3ef5efa42d7f6f80d78d229e1d97f741f80d4fbdeecd"
     },
     "docs/ai-video-ecommerce-cooperation-wechat.txt": {
       "role": "observe",
@@ -1444,11 +1444,17 @@
       "size": 3907,
       "normalized_sha256": "e9c83c45878806f2f8eff314b6f736f1b80f99d55659b10bbd6e74f5a83c281d"
     },
+    "docs/record_for_agent/2026-09-27-creative-goal-preservation-implementation.md": {
+      "role": "observe",
+      "sha256": "5dccc401110935fe7c9437f2eb0fc17a505ee73db3c81a2b2f8b1b18cfb8f4c5",
+      "size": 5553,
+      "normalized_sha256": "5dccc401110935fe7c9437f2eb0fc17a505ee73db3c81a2b2f8b1b18cfb8f4c5"
+    },
     "docs/record_for_agent/2026-09-27-creative-goal-preservation-spec.md": {
       "role": "observe",
-      "sha256": "8eb656ced2ebf45f44bf5df90c85838593a16f5e0f23d457b4e38c453650e6f7",
-      "size": 9557,
-      "normalized_sha256": "8eb656ced2ebf45f44bf5df90c85838593a16f5e0f23d457b4e38c453650e6f7"
+      "sha256": "7aef51fb45e2d946080f6bfe85b19aa9d797164a982a4e16e5344f0a88aa1625",
+      "size": 9946,
+      "normalized_sha256": "7aef51fb45e2d946080f6bfe85b19aa9d797164a982a4e16e5344f0a88aa1625"
     },
     "docs/record_for_agent/2026-09-27-qingyan-original-packshot-brand-film.md": {
       "role": "observe",
@@ -1866,9 +1872,9 @@
     },
     "docs/superpowers/plans/2026-09-27-creative-goal-preservation-and-completion.md": {
       "role": "observe",
-      "sha256": "3566869d07ab569fa738c31307ae19ee8e214e2ce9cefd0bc9b04bd43903927e",
-      "size": 17620,
-      "normalized_sha256": "3566869d07ab569fa738c31307ae19ee8e214e2ce9cefd0bc9b04bd43903927e"
+      "sha256": "1f8d4b77c661e58d79ddae3c36c7f46d050c66e85c36b746468d685bd079c1e5",
+      "size": 17826,
+      "normalized_sha256": "1f8d4b77c661e58d79ddae3c36c7f46d050c66e85c36b746468d685bd079c1e5"
     },
     "docs/superpowers/specs/2026-04-30-local-long-video-system-design.md": {
       "role": "observe",
@@ -2106,9 +2112,9 @@
     },
     "docs/superpowers/specs/2026-09-27-creative-goal-preservation-and-completion.md": {
       "role": "observe",
-      "sha256": "b628d06fba55c6a00bcb0b1837913f7148b745e8b897c8e8a9dd743267d4ac0e",
-      "size": 17297,
-      "normalized_sha256": "b628d06fba55c6a00bcb0b1837913f7148b745e8b897c8e8a9dd743267d4ac0e"
+      "sha256": "1e83270bf8184ee47b05b5b7853a4394eef04ebf30c9ea0f718fcb446bc1144e",
+      "size": 17540,
+      "normalized_sha256": "1e83270bf8184ee47b05b5b7853a4394eef04ebf30c9ea0f718fcb446bc1144e"
     },
     "docs/superpowers/specs/5min_test.md": {
       "role": "observe",
@@ -2122,9 +2128,9 @@
       "normalized_sha256": "8f4a9f0b0eb5dc323957d33c59c62161b5032cb812a1287e564cf92550b30553"
     },
     "docs/v0.2-runtime-baseline.md": {
-      "sha256": "92cad576d6f2f28201d2e0ade1eb2388bed47e97e58c1be0af923332037cffbc",
-      "size": 144461,
-      "normalized_sha256": "92cad576d6f2f28201d2e0ade1eb2388bed47e97e58c1be0af923332037cffbc"
+      "sha256": "9990caa972a732181749de15343c4381cb434d6ced92422abd7287fafdde825e",
+      "size": 146154,
+      "normalized_sha256": "9990caa972a732181749de15343c4381cb434d6ced92422abd7287fafdde825e"
     },
     "docs/vidu-ad-provider.md": {
       "role": "observe",
@@ -2140,9 +2146,9 @@
     },
     "docs/visual-quality-gate.md": {
       "role": "observe",
-      "sha256": "12f4a1251791f7f79fd7f266a54b474ee41e2c8d7a37851232edeb2e746dae61",
-      "size": 7019,
-      "normalized_sha256": "12f4a1251791f7f79fd7f266a54b474ee41e2c8d7a37851232edeb2e746dae61"
+      "sha256": "899f92c73f5e23e53c7f6aaa964ef2561745cf55615e5e5c29bbee5705ab8edb",
+      "size": 8771,
+      "normalized_sha256": "899f92c73f5e23e53c7f6aaa964ef2561745cf55615e5e5c29bbee5705ab8edb"
     },
     "docs/when_to_do/2026-08-22-continuity-review-coordinator-and-human-evidence-ui-implementation-recap.md": {
       "role": "observe",
@@ -2556,6 +2562,12 @@
       "size": 8580,
       "normalized_sha256": "299e73b3dcbbcd239cd2d852fee5a2c250285638165a57deb16e699e5d3bde36"
     },
+    "scripts/creative_goal_binding.py": {
+      "role": "observe",
+      "sha256": "e7f6c3f41f9f8d7333bc00b7d2762e05c7c9adef7d9513e90f08491784f1133d",
+      "size": 8593,
+      "normalized_sha256": "e7f6c3f41f9f8d7333bc00b7d2762e05c7c9adef7d9513e90f08491784f1133d"
+    },
     "scripts/docs_contract_gate.py": {
       "role": "observe",
       "sha256": "61c71ed1ebf973b2e7617925a9fddadda20658576569a935238f53330dc478bb",
@@ -2618,9 +2630,9 @@
     },
     "scripts/visual_quality_report.py": {
       "role": "observe",
-      "sha256": "4aabda99332f1c1b888ec0c864f80a253937b65e9c0076fca7b4954ba8125ceb",
-      "size": 15397,
-      "normalized_sha256": "4aabda99332f1c1b888ec0c864f80a253937b65e9c0076fca7b4954ba8125ceb"
+      "sha256": "9c0b7962dd5363430550a03674c882efed46c405e993c0cf3ea98f6efd17c39d",
+      "size": 20487,
+      "normalized_sha256": "9c0b7962dd5363430550a03674c882efed46c405e993c0cf3ea98f6efd17c39d"
     },
     "src/ai_video/__init__.py": {
       "role": "observe",
@@ -3518,9 +3530,9 @@
       "normalized_sha256": "4866903df339588552a45e560cca2a00baf5f3c11dac025216d70ac78d8498ad"
     },
     "src/ai_video/production/final_output_review.py": {
-      "sha256": "00898ebb907dfbe507fc78a3bfc914753c291f575ea1d041171b7cd4afa6a35c",
-      "size": 15475,
-      "normalized_sha256": "00898ebb907dfbe507fc78a3bfc914753c291f575ea1d041171b7cd4afa6a35c"
+      "sha256": "e4a218acdb19680ee0cdc0a0645466586ddf679ab7d385ffcf7c432d48ee15ed",
+      "size": 17445,
+      "normalized_sha256": "e4a218acdb19680ee0cdc0a0645466586ddf679ab7d385ffcf7c432d48ee15ed"
     },
     "src/ai_video/production/generated_video_audio.py": {
       "role": "observe",
@@ -4593,9 +4605,9 @@
     },
     "tests/test_agent_harness.py": {
       "role": "observe",
-      "sha256": "b1504552014185ea491435d3be3609220c7b367678dcc5c0e5507a36dcf29a5a",
-      "size": 115104,
-      "normalized_sha256": "b1504552014185ea491435d3be3609220c7b367678dcc5c0e5507a36dcf29a5a"
+      "sha256": "020b0cec537ad9a500932be55d539d1a73a482495efa87903c4a09356aa780d8",
+      "size": 115891,
+      "normalized_sha256": "020b0cec537ad9a500932be55d539d1a73a482495efa87903c4a09356aa780d8"
     },
     "tests/test_agent_memory.py": {
       "role": "observe",
@@ -4668,6 +4680,12 @@
       "sha256": "50f349bd6e592bc0e2009b8e4357da8fab1bd9116af63e2c86bc15a4c5b7e4a5",
       "size": 5974,
       "normalized_sha256": "50f349bd6e592bc0e2009b8e4357da8fab1bd9116af63e2c86bc15a4c5b7e4a5"
+    },
+    "tests/test_creative_goal_binding.py": {
+      "role": "observe",
+      "sha256": "1f43254587899ee0c141b92444b149868232c38a297f53a8a3371e6a06b98790",
+      "size": 15328,
+      "normalized_sha256": "1f43254587899ee0c141b92444b149868232c38a297f53a8a3371e6a06b98790"
     },
     "tests/test_distill_ai_video_learning_skill.py": {
       "role": "observe",
@@ -5115,9 +5133,9 @@
     },
     "tests/test_production_final_output.py": {
       "role": "observe",
-      "sha256": "a1c75b769dde47b2e7481f03aa5f393d7bbf57269f20fc3889a562e4d8da7e1c",
-      "size": 25829,
-      "normalized_sha256": "a1c75b769dde47b2e7481f03aa5f393d7bbf57269f20fc3889a562e4d8da7e1c"
+      "sha256": "479dcd3ced27b5f8a356b77828afb2a0de534e312d963ba192e6214c9619df31",
+      "size": 29469,
+      "normalized_sha256": "479dcd3ced27b5f8a356b77828afb2a0de534e312d963ba192e6214c9619df31"
     },
     "tests/test_production_generated_video_audio.py": {
       "role": "observe",
@@ -5565,9 +5583,9 @@
     },
     "tests/test_runtime_skill_boundary.py": {
       "role": "observe",
-      "sha256": "6df303c768b65f7dd59496526d1e28f0fb80734eb65cd700f923e3e70d18fd51",
-      "size": 3133,
-      "normalized_sha256": "6df303c768b65f7dd59496526d1e28f0fb80734eb65cd700f923e3e70d18fd51"
+      "sha256": "f600d85bbc9f04d44982b6caf159783e362582bbcf3c1271c9488e3bbe3690c2",
+      "size": 3325,
+      "normalized_sha256": "f600d85bbc9f04d44982b6caf159783e362582bbcf3c1271c9488e3bbe3690c2"
     },
     "tests/test_s01_strategy_regression.py": {
       "role": "observe",
@@ -5715,9 +5733,9 @@
     },
     "tests/test_visual_quality_report.py": {
       "role": "observe",
-      "sha256": "4065977ddc4ece2c3e7fee32502a676e999ea7371f7f035f7a84469db26c998b",
-      "size": 10822,
-      "normalized_sha256": "4065977ddc4ece2c3e7fee32502a676e999ea7371f7f035f7a84469db26c998b"
+      "sha256": "f47ac0757f2b12574846fcd1a7578f6fbed4021e50ab7edd07311b35a273b84a",
+      "size": 20083,
+      "normalized_sha256": "f47ac0757f2b12574846fcd1a7578f6fbed4021e50ab7edd07311b35a273b84a"
     },
     "tests/test_voice_routing_binding.py": {
       "role": "observe",

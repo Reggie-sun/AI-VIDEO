@@ -118,16 +118,19 @@ def _director_validator():
     spec = importlib.util.spec_from_file_location("creative_goal_director_validator", path)
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    return module.validate_director_coverage
+    return module
 
 
-def _validate_join(envelope, coverage, contract):
+def _validate_join(envelope, coverage, contract, director):
     intents = {item["intent_item_id"]: item for item in coverage["intent_items"]}
-    users = {name for name, item in intents.items() if item["origin"] == "explicit_user"}
+    users = {name for name, item in intents.items()
+        if director._enum(item["origin"], director.INTENT_ORIGINS, "origin") == "explicit_user"}
     if not intents:
         raise GoalBindingError("unbound_user_intent")
-    constraints = {item["constraint_id"]: item["scope"] for item in coverage["request"]["creative_constraints"]}
-    units = {unit["unit_id"]: set(unit["constraint_ids"]) for unit in coverage["coverage_units"]}
+    constraints = {item["constraint_id"]: director._enum(item["scope"], director.CONSTRAINT_SCOPES, "scope")
+        for item in coverage["request"]["creative_constraints"]}
+    units = {unit["unit_id"]: {director._normalized(name) for name in unit["constraint_ids"]}
+        for unit in coverage["coverage_units"]}
     requirements = {rule.requirement_id for rule in contract.requirements}
     seen = set()
     for row in envelope.bindings:
@@ -152,7 +155,7 @@ def _validate_join(envelope, coverage, contract):
         required_units = set()
         for name in row.constraint_ids:
             if constraints[name] == "beat_specific":
-                referenced = {unit for unit, ids in units.items() if name in ids}
+                referenced = {unit for unit, ids in units.items() if director._normalized(name) in ids}
                 if not referenced:
                     raise GoalBindingError("unresolved_intent_scope")
                 required_units.update(referenced)
@@ -187,8 +190,9 @@ def load_goal_binding(path: Path) -> VerifiedGoalBinding:
         raise GoalBindingError("unsupported_coverage_version")
     if not isinstance(coverage.get("request"), dict) or coverage["request"].get("creative_input_evidence") != source:
         raise GoalBindingError("source_identity_mismatch")
+    director = _director_validator()
     try:
-        _director_validator()(coverage)
+        director.validate_director_coverage(coverage)
     except ValueError:
         raise GoalBindingError("invalid_coverage") from None
     contract_payload = _json(files[3].data, "invalid_contract")
@@ -196,7 +200,7 @@ def load_goal_binding(path: Path) -> VerifiedGoalBinding:
         contract = FinalOutputContract.model_validate(contract_payload)
     except ValueError:
         raise GoalBindingError("invalid_contract") from None
-    _validate_join(envelope, coverage, contract)
+    _validate_join(envelope, coverage, contract, director)
     return VerifiedGoalBinding(tuple(files), payload, coverage, contract)
 
 
