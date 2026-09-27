@@ -1,7 +1,7 @@
 {
   "version": 1,
   "created_at": "2026-09-23T13:22:44Z",
-  "updated_at": "2026-09-27T08:49:35Z",
+  "updated_at": "2026-09-27T09:14:34Z",
   "files": {
     ".agent/harness/policy.yaml": {
       "sha256": "5c3db617555ccf7b6a048732a931866fec969cef6f1b34e7fdb202ae52f7e289",
@@ -1446,9 +1446,9 @@
     },
     "docs/record_for_agent/2026-09-27-creative-goal-preservation-spec.md": {
       "role": "observe",
-      "sha256": "7a92187120bfe28c76088498940d1edd788fbc0964c3dfe59de6345265ea8616",
-      "size": 6338,
-      "normalized_sha256": "7a92187120bfe28c76088498940d1edd788fbc0964c3dfe59de6345265ea8616"
+      "sha256": "8eb656ced2ebf45f44bf5df90c85838593a16f5e0f23d457b4e38c453650e6f7",
+      "size": 9557,
+      "normalized_sha256": "8eb656ced2ebf45f44bf5df90c85838593a16f5e0f23d457b4e38c453650e6f7"
     },
     "docs/record_for_agent/2026-09-27-qingyan-original-packshot-brand-film.md": {
       "role": "observe",
@@ -1864,6 +1864,12 @@
       "size": 21363,
       "normalized_sha256": "c26ef3393b6eacea30dea1cd041fc0a54873fe05c16875adb8859e88e1c052b3"
     },
+    "docs/superpowers/plans/2026-09-27-creative-goal-preservation-and-completion.md": {
+      "role": "observe",
+      "sha256": "3566869d07ab569fa738c31307ae19ee8e214e2ce9cefd0bc9b04bd43903927e",
+      "size": 17620,
+      "normalized_sha256": "3566869d07ab569fa738c31307ae19ee8e214e2ce9cefd0bc9b04bd43903927e"
+    },
     "docs/superpowers/specs/2026-04-30-local-long-video-system-design.md": {
       "role": "observe",
       "sha256": "be3cb318235e4f2dbda6b714b5fc77301eead5f1e72570944666b66ff93ced13",
@@ -2100,9 +2106,9 @@
     },
     "docs/superpowers/specs/2026-09-27-creative-goal-preservation-and-completion.md": {
       "role": "observe",
-      "sha256": "87eea5307cf6199733525d687e3d6076ff4959ef3f00b22ea529a1a859309bcb",
-      "size": 17045,
-      "normalized_sha256": "87eea5307cf6199733525d687e3d6076ff4959ef3f00b22ea529a1a859309bcb"
+      "sha256": "b628d06fba55c6a00bcb0b1837913f7148b745e8b897c8e8a9dd743267d4ac0e",
+      "size": 17297,
+      "normalized_sha256": "b628d06fba55c6a00bcb0b1837913f7148b745e8b897c8e8a9dd743267d4ac0e"
     },
     "docs/superpowers/specs/5min_test.md": {
       "role": "observe",

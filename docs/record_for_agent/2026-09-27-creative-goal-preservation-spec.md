@@ -54,4 +54,22 @@ Documentation Harness receipt：`.agent/harness/runs/creative-goal-spec-20260927
 
 ## Next Work
 
-用户审阅 spec 后再进入 implementation plan。后续工程验证只证明映射/接线与报告条件；实际广告和剧情质量改善必须分别有真实作品及相应观看反馈，不能用本轮文档、模型讨论或 Harness PASS 代替。
+初版 spec 后用户继续明确要求“写specs和plan”。已增加[实施计划](../superpowers/plans/2026-09-27-creative-goal-preservation-and-completion.md)，两份文档相互链接；这取代原“等待下一轮写 plan”的 next action。当前仍待 implementation approval，没有开始代码或媒体执行。
+
+## Plan Follow-up — 2026-09-27
+
+采用 `superpowers:writing-plans`，Native Codex 保持 lifecycle owner。计划按四个阶段串行：M1 source/intent/constraint/unit/requirement binding；M2 原 adjudicator 的有效逐项结果与 aggregate 等价重构；M3 现有 report prepare/reopen/check 的 packet `/3` 接线；M4 创作实践、离线集成和文档/Harness closure。另列广告与剧情的实际媒体验证条件，不将其混入 offline acceptance。
+
+本次只更新 spec 的配套链接与用户新授权说明，没有宣布 spec 已正式批准。计划明确 Developer helper 单向调用既有 validator、三份 exact 输入文件与 contained snapshot、版本兼容、test-first 顺序、A1–A10 映射、rollback/ownership stop 和未来 verification。两份文档均无 implemented 或 media-quality PASS 声明。
+
+planning preflight 的 experience 检索返回 last-good/stale 的 2026-09-26 creative-completion record，已直接重开对应文件；另一条无关 Blender 结果未采用。没有等待后台刷新或主动 rebuild。Parent 完成 spec coverage、placeholder、类型/函数与测试路径 self-review，没有运行未来 implementation tests。
+
+独立 Native `reviewer_xhigh` 对 tree `77492dc3fc8d8a4893231ae7a51469cc36856e43` 的 spec / plan finding set 为空。受管 Kimi worker 另做有界 acceptance-trace 检查，invocation `e14dcfdb-f361-4577-a3e2-5e65becfe4b8`、seal `d701db2190de422f4bc44e0d05c4ef4094c0cc316c0572d01714107d3d797958`，2 次 k3-256k/high identity-verified 请求；receipt `PARSED`、两个文档 observed reads 完整、report SHA-256 `ba13c7cdae0d163e78b53c89b3a8784cab110ace74d88674dae9a2405cc2d825` 已核对。最初 inspect 提示输出预算低于当前 route minimum，调整为有限 2097152 bytes 后才执行，没有运行被拒绝的配置。
+
+Kimi 指出 A9 没有具体测试指针、A4 的 Director 兼容验证可更明确。Parent 核对真实测试后补充确切函数及 `stale` 分支，并显式标注 M1 的 v3/v4 兼容验证；这是 verification 明细，不变更设计、QA 语义或验收标准。原 Kimi 报告只对应补充前文档，不能宣称其审过最终 bytes。
+
+最终 Native targeted re-review 绑定 tree `47c38a7d7ed3eb78f19e0502ad6a58a44e6c129b`：spec SHA-256 `b628d06fba55c6a00bcb0b1837913f7148b745e8b897c8e8a9dd743267d4ac0e`、plan SHA-256 `3566869d07ab569fa738c31307ae19ee8e214e2ce9cefd0bc9b04bd43903927e`，finding set 为空。Parent 接受为完整、待用户批准的 spec / plan 文档；不等于 implementation acceptance。
+
+本次文档 verification receipt：`.agent/harness/runs/creative-goal-plan-20260927-01/receipt.json`，以该 receipt 的 exact commit range 和复验结果为准，前述 spec receipt 仍仅证明此前 checkpoint。
+
+自动 learning 再评估仍为 `no_candidate`：只增加设计拆解，没有新的独立媒体证据或可更新的同范围 Learning Claim。后续工程验证只证明映射/接线与报告条件；实际广告和剧情质量改善必须分别有真实作品及相应观看反馈，不能用本轮文档、模型讨论或 Harness PASS 代替。
