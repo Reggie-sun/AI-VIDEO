@@ -8,6 +8,8 @@ learning_eligibility: ineligible
 
 Date: 2026-09-27
 
+Supersession notice (2026-09-27)：后续 [真实 API/local 测试记录](2026-09-27-creative-goal-real-api-local-tests.md) 已执行广告、剧情各两条路径。原文的 real-media 待执行状态是本工程 checkpoint 的历史状态；新结果为三个质量失败候选和一个本地 OOM，完整成片及 human acceptance 仍未通过。下方原工程验证与当时无 Provider/media execution 的事实保持不变。
+
 ## Authority And Scope
 
 用户明确要求实现 [plan](../superpowers/plans/2026-09-27-creative-goal-preservation-and-completion.md)，
