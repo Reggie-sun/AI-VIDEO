@@ -251,9 +251,9 @@ def render_html(packet, contract, result):
     return f'''<!doctype html><html lang="zh-CN"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1"><title>成片视觉评审</title>
 <style>body{{margin:0;background:#f4f3ef;color:#202523;font:16px/1.7 system-ui,sans-serif}}
-main{{max-width:1240px;margin:auto;padding:48px 24px}}h1{{font-size:38px;line-height:1.2}}h3,p{{margin:8px 0}}
+main{{max-width:1240px;margin:auto;padding:48px 24px;overflow-wrap:anywhere}}h1{{font-size:38px;line-height:1.2}}h3,p{{margin:8px 0}}
 .eyebrow{{color:#53675b;letter-spacing:3px}}.muted,small{{color:#626b65}}.row{{display:flex;justify-content:space-between;gap:20px;align-items:center}}
-.grid{{display:grid;grid-template-columns:1fr 1fr;gap:16px}}article{{background:white;border:1px solid #dce1db;border-radius:14px;padding:22px}}
+.row{{flex-wrap:wrap}}.grid{{display:grid;grid-template-columns:1fr 1fr;gap:16px}}article{{background:white;border:1px solid #dce1db;border-radius:14px;padding:22px}}
 .fail{{color:#a42c26}}.pass{{color:#29613e}}.not_evaluated{{color:#855e20}}b{{font-size:13px;white-space:nowrap}}
 .frames{{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}}figure{{margin:0}}img{{width:100%;border-radius:8px}}figcaption{{font-size:13px}}
 .identity{{overflow-wrap:anywhere;font:12px/1.8 monospace}}section{{margin-top:36px}}
