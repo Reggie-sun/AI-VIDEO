@@ -97,6 +97,10 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_visual_quality.py, tests/test_visual_quality_report.py, -q]
     cwd: .
     description: Verify visual requirements through existing semantic/final acceptance, exact media report binding and missing-review blocking; no Provider calls.
+  creative_goal_binding_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_creative_goal_binding.py, tests/test_open_video_skill.py, tests/test_visual_quality_report.py, tests/test_runtime_skill_boundary.py, -q]
+    cwd: .
+    description: Verify exact development intent joins, sealed review snapshots, Director compatibility and one-way runtime boundaries without Provider calls.
   paid_reconciliation_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_paid_provider_no_effect_reconciliation.py, -q]
     cwd: .
@@ -333,6 +337,7 @@ checks:
     execution_priority: 30
     covers_check_ids:
       - visual_quality_tests
+      - creative_goal_binding_tests
       - paid_reconciliation_tests
       - vidu_ad_tests
       - voice_source_routing_tests
@@ -811,6 +816,14 @@ categories:
       - docs/visual-quality-gate.md
     check_ids:
       - visual_quality_tests
+      - creative_goal_binding_tests
+      - task_architecture_gate
+  creative_goal_binding:
+    patterns:
+      - scripts/creative_goal_binding.py
+      - tests/test_creative_goal_binding.py
+    check_ids:
+      - creative_goal_binding_tests
       - task_architecture_gate
   commercial_source_preparation:
     patterns:

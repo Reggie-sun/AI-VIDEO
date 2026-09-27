@@ -181,6 +181,18 @@ def test_visual_quality_changes_require_executable_gate_checks(path):
     assert "tests/test_visual_quality_report.py" in policy["checks"]["visual_quality_tests"]["argv"]
 
 
+@pytest.mark.parametrize("path", ["scripts/creative_goal_binding.py", "tests/test_creative_goal_binding.py",
+    "scripts/visual_quality_report.py", "tests/test_visual_quality_report.py"])
+def test_creative_goal_binding_routes_to_real_entry_and_boundary_checks(path):
+    policy = agent_harness.load_policy(POLICY_PATH)
+    inspection = agent_harness.inspect_paths([path], policy)
+    assert not inspection["fallback_paths"]
+    assert "creative_goal_binding_tests" in inspection["check_ids"]
+    assert {"tests/test_creative_goal_binding.py", "tests/test_visual_quality_report.py",
+        "tests/test_open_video_skill.py", "tests/test_runtime_skill_boundary.py"} <= set(
+            policy["checks"]["creative_goal_binding_tests"]["argv"])
+
+
 def test_repository_policy_v2_loads_and_references_known_checks() -> None:
     policy = agent_harness.load_policy(POLICY_PATH)
 

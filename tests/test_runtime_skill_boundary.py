@@ -73,6 +73,9 @@ def test_product_runtime_has_no_agent_skill_dependency_or_invocation_path() -> N
             elif isinstance(node, ast.ImportFrom) and node.module:
                 modules = (node.module,)
             for module in modules:
+                assert module != "scripts" and not module.startswith("scripts."), (
+                    f"{source_path}:{node.lineno} imports development tooling {module!r}"
+                )
                 assert not {"skill", "skills"}.intersection(
                     _identifier_tokens(module)
                 ), f"{source_path}:{node.lineno} imports Agent Skill module {module!r}"
