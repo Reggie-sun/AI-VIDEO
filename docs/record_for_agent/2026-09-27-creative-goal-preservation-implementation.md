@@ -55,8 +55,77 @@ headless 实际渲染 2 秒 lavfi fixture 的 `/3` 报告，DOM 与截图复核�
 NOT_EVALUATED 分开，补证要求和 Production acceptance 边界清晰。输出位于
 `/tmp/creative-goal-browser-_mp03q98/`；此 fixture 只证明报告显示，不是业务成片或人类观看。
 
-最终 exact Harness 与 T2 implementation review 在本 checkpoint 仍待完成，不能以当前记录
-代替最终 receipt/Parent adjudication。完成后在本节追加 exact identities 和结果。
+最终 code checkpoint 已完成 exact Harness 与 T2 implementation review；下面分别记录
+机器验证、审查与 Parent adjudication，不以本记录替代原 receipts。
+
+### Exact Code Checkpoint
+
+`ce6ec9be2b6d0f890423ad57c4bc370974423a9a..6019f3969cb49e68f30c5f29f85c284c747f7a0e`
+的 Harness 已完成，receipt 位于
+`.agent/harness/runs/creative-goal-implementation-20260927-01/receipt.json`。
+12 个执行 checks PASS，`open_video_skill_tests` 由同一 run 的完整覆盖 check 承接；
+`verify-receipt` 在该 exact code checkpoint 返回 `fresh=true`、`integrity=true`、
+`artifact_integrity=true`、`coverage_closed_same_run=true`。关键 suites 包含 Production Review
+664 PASS、Final-output / No-regression 63 PASS、visual quality 69 PASS、goal binding 161 PASS；
+无 unmapped/fallback paths。后续记录提交不改变该 code checkpoint 的测试字节或验收标准，
+记录 closure 的 freshness 由其独立 exact receipt 核验，不把旧 HEAD receipt 描述为新 HEAD 的证明。
+
+### Gstack Browser Verification
+
+用户后续明确要求使用 gstack browser，按 `browse` Skill 实际打开同一 fixture 报告。
+accessibility snapshot、console、media 与页面 JS 检查通过：无 console error、两张帧图
+均加载；375px / 1280px 的 `scrollWidth` 等于 viewport width，没有横向溢出。
+手机、平板、桌面截图已保存并复核，raw PASS 与有效 NOT_EVALUATED、补证项和当前来源
+均可见。证据目录仍为 `/tmp/creative-goal-browser-_mp03q98/`，包括
+`gstack-checks.json`、`gstack-{mobile,tablet,desktop}.png` 和 `gstack-snapshot.txt`。
+`gstack-checks.json` SHA-256 为
+`d82c9e0a802eb6282ca915aadbb4bac0de95c5f6fcd500bd261cd24f9956830b`。
+这证明开发报告的实际显示；fixture 不证明任何广告或剧情内容质量。
+
+### Independent Review And Parent Adjudication
+
+本变更按 accepted plan 的 T2 contract 要求 stable implementation review；原 aggregate QA、
+persisted schema、acceptance criteria 和 canonical owners 未变，不把详细计算升级为新验收语义。
+采用一个受管、read-only Kimi `deep` reviewer，sealed inputs、Docker containment 和 matching
+qualification `4f2d5dc8-4234-4665-b382-e82f1ad6cc00`。两轮均绑定同一 code commit；
+过程中只更新本记录，不改 code/tests/Spec/Plan/criteria，未叠加 Native reviewer。
+
+- Round 1 `ab33aa6b-f491-4dfe-88de-05c4d2e77dd5`：1200s 上限超时，15 wire requests，
+  `OUTCOME_UNKNOWN`，无 terminal report；保留全部 consumed/receipt 与隔离 partial 输出，
+  不视作完成的 review 或 acceptance。Parent 检查了 canonical receipt 和过滤后的事件计数：
+  32 次 Read、0 tool errors、无 terminal。只读 containment 与未变 code bytes 确认后，
+  用较小 context 发起独立有界 round 2，不重放该未知 response。
+- Round 2 `bf2be738-db45-4fc3-bf71-f091676d19d1`：900s/16-request ceiling，实际 517.15s、
+  7 wire requests，正常退出、`PARSED`；16 complete Native Reads，覆盖全部 13 required paths。
+  所有 observed file hashes 与当前 bytes 一致，canonical artifacts 的 size/SHA 核验通过。
+  request/response model 均由 authenticated endpoint 机械观察为 `k3`，effort 为 `max`，
+  route 为 qualified `deep`；这与 fake containment 的 `live_identity=NOT_EVALUATED` 分开。
+  `worker-report.json` SHA-256：
+  `370b4125f8a213965e2a5699b3d68c388cc2b36280a59cf330a17908fde85b98`。
+
+Latest report 的 findings/questions 均为空；Parent 未把 `PARSED` 自动当作 acceptance。
+对其 uncertainties，Parent 从 exact base `ce6ec9b` 重开源码，确认提供给 reviewer 的原
+aggregate algorithm 与 baseline bytes 相同，`--content-kind` 在基线已为 required；
+直接读取 `StrictModel` 的 `extra="forbid"`，并复核 policy 的完整 check argv / covers_check_ids。
+其余 freshness 与真实媒体范围的限制保留为本文明确边界，不构成 offline engineering blocker。
+
+Paper cases 的独立判断引用原始拒绝与包装/广告表达差异、信件的行动/反应及关系变化、能力
+不足时保留使用 requirement 的具体选项，未以镜头数或 template score 判断作品。
+Parent 结合源代码、旧 oracle、fresh-at-code-checkpoint Harness 与可核验 review，裁决
+`6019f3969cb49e68f30c5f29f85c284c747f7a0e` 的 M1–M4 offline engineering 为 KEEP。
+没有 unresolved implementation blocker；广告/剧情 empirical 与人类验收仍未执行。
+
+### Managed Cognition And Publication
+
+最终 code 稳定后按 AOCI 当前流程更新四个受管理对象；Verify、Check 和 Guide 均确认 aligned。
+记录收尾仅更新 observe fingerprint，不制造新的索引语义。压缩后的 Whole-Index 交付已确认，
+attestation 输入两次未被 Schema 接受（含一次纯字段修正），未继续尝试；完整模型认知验证
+仍未完成，不主张完整系统掌握。治理对齐与模型认知证明分开，业务结论基于实际 source/tests。
+
+Task commits 为 `949a05a`、`beb8112`、`6019f39`；本记录及 observe metadata 的 closure 另行
+提交，并以 `.agent/harness/runs/creative-goal-record-20260927-02/receipt.json` 独占该
+closure 的执行结果/freshness。publication 为 local-only，未 push/release，unrelated
+`.codex/config.toml` 未 stage/commit。
 
 ## Acceptance Boundaries
 
