@@ -9,6 +9,10 @@ evidence_index_version: "1"
 
 Date: 2026-09-27
 
+## Continuation Notice — 2026-09-28
+
+用户后续要求增加参考图后重测；最新首尾帧输入、四次新提交、广告参考兼容性漏检及修正图未提交的 batch blocker 见 [first/last reference retests](2026-09-28-creative-goal-first-last-reference-retests.md)。新 API 剧情末态钥匙归属改善，但因果动作仍 FAIL；新 local 剧情在 novram 下仍 OOM。下文是首帧-only 的历史结果，不代表当前全部尝试；旧失败未被抹除或转换成通过。下文 local H3 / T8 标签的实际 profile 为 stock `minimax_h3_fl2va`，不是 T8 Turbo。
+
 ## Purpose And Authority
 
 承接 [implementation record](2026-09-27-creative-goal-preservation-implementation.md)。用户要求真实广告、剧情各测一次，并分别尝试 API 和本地；另明确允许停止占用显存的 VLLM 服务后跑本地。四条路径各有一次真实生成提交，共 local 2、API 2；API repair ceiling 为 0。本轮是有界 development experiment，不是完整广告交付或 Production qualification。
