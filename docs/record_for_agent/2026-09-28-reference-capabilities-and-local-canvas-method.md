@@ -13,7 +13,7 @@ Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef
 
 ## Current Continuation — Third Repair Implemented, Pre-Submit Recovery Review Blocked
 
-2026-09-29 continuation：用户批准第三份exact local runtime repair后，共享契约已实现并提交`c959456`，真实第三份grant已登记但未消耗；**累计local video submit仍3、MP4 0**。当前blocker为`REVIEW_ESCALATION_REQUIRED`：task wrapper的known pre-submit correction需targeted re-review，三轮budget已耗尽且后两轮没有可采纳terminal report。不是GPU不可用、不是local付费quota、不是新增媒体outcome unknown；本轮没有attempt-05或新的submit intent。已请求用户明确允许追加一轮审查，尚未获得回复。
+2026-09-29 continuation：用户批准第三份exact local runtime repair后，共享契约已实现并提交`c959456`，真实第三份grant已登记但未消耗；**累计local video submit仍3、MP4 0**。当前blocker为`REVIEW_ESCALATION_REQUIRED`：task wrapper的known pre-submit correction需targeted re-review，原三轮耗尽后，用户明确“允许”追加一轮；第4轮也在报告返回期间连接中断，没有可采纳terminal report。不是GPU不可用、不是local付费quota、不是新增媒体outcome unknown；本轮没有attempt-05或新的submit intent。追加的一轮已经执行，没有擅自启动第5轮。
 
 本节`R8`为`runs/coco-nosha-lora-memory-20260929-001/`。traceback定位QKV `LoRAAdapter.h`的完整up output，在base output已存在时分配；原profile的518个converted LoRA tensors均2D，ranks16/64，QKV down64×5376/up21504×64。重hash文件与profile pinned SHA-256 `5b8ad6cb7ac206852006f4efa3ce2d679cd6ffb5d5b8a4edce8e981393289df5`一致。failure没有实测tensor shape，因此以下large case是代表性kernel验证，不冒充原失败的exact shape。
 
@@ -43,9 +43,17 @@ Review round2 `f91b18c7-c058-4132-ab6c-4459d346df29` full Read，**UPSTREAM_GENE
 
 ### Restored Runtime And Actual Delivery Boundary
 
+#### Authorized Fourth Review — 2026-09-29 03:19 +08:00
+
+用户明确允许追加一次targeted review并继续原17 s GPU生成。Parent封存`R8/review-round-4-snapshot.json`和546行packet（SHA-256 `0dfc77eb1a2d28100f50f1a3d39f8c151039ec0a30034831abb0ca0e3804713b`），核对corrected wrapper、shared implementation及kernel bytes未变；相对旧snapshot仅record/baseline更新状态。Qualified deep/k3/max invocation `a11a51b1-7794-40e5-8804-b2ce05ae67e7`，seal `658336d3212bc49746558c025ad07bd82f5350c81d01f9bb2e975804311ace23`，预算480 s/240 idle/3 requests/16000 generation tokens/8 MiB output。完整Read accepted Spec/Plan和packet已核验。
+
+本轮在**361.067 s、2 wire requests**后以`OUTCOME_UNKNOWN`结束；第二请求`CONNECTION_ERROR / RESPONSE_BODY`，344.434 s、1495730 upstream bytes，不是wall预算耗尽。无terminal worker report，partial输出不采纳；canonical receipt和全部artifact hashes已核验，见`R8/review-round-4-receipt.json`及`R8/review-round-4-adjudication.json`。第4轮用户授权已消耗；required review仍未完成，没有第5轮授权或调用。此external transport failure不改变原3次video的known FAILED，也不证明代码存在review finding。
+
+本轮宿主机实测RTX 5090，总32607 MiB、free22620 MiB；原GPU默认ComfyUI仍为下述PID240543，active/loopback、queue empty，见`R8/round-4-restored-runtime-preflight.json`及`R8/round-4-terminal-runtime-health.json`。没有重新启用overlay、切换服务、停止Jianji或其他任务。Canonical loader重新确认Manifest revision28、3个实际submitted attempts均FAILED、没有attempt-05、第三grant未消耗。原budget started_at `2026-09-28T18:40:58.266294+00:00`未重置；终态审计elapsed2405.927 s/7200 s，剩余窗口随时间递减，不是永久本地额度。
+
 确认本目标没有新submit、own queue empty及unit/InvocationID后，经supervisor停止temporary overlay service并恢复原Python、GPU默认/sage配置，actual argv无lowvram/novram/cpu/gpu-only/Triton。本次restored unit `ai-video-comfyui-806e641e7c6347ccb727bd620ee9e9dc.service` / PID **240543** / InvocationID `23bc6cd693864ff49fc4a15b6b86e6cc`，active/loopback healthy、queue empty，见`R8/service-restoration-health.json`。Installed ComfyUI/weights未改，LoRA patch仅临时进程加载、恢复后不再激活；Jianji与未知任务保留。VLLM从本目标开始就inactive，未被停止、无需启动；Nomad Drive Demo先前自行退出，未发信号。
 
-**本目标仍未完成：video submit3 / MP4 0 / remote-paid media0**。没有media Gate、完整观看/实际聆听、QA activation、P6或Final Acceptance，17 s/完整因果/原声线全部NOT_EVALUATED。旧广告/剧情片不作为本次成果。最小下一步：取得明确追加review budget，完成exact corrected wrapper的required review；重新核对当前restored service/queue/GPU、finite elapsed window及同一existing grant，显式恢复task-local overlay后沿canonical seam执行唯一剩余slot。不得直接重跑main、重建budget/grant、伪造attempt-03失败、blind submit或重用permit；expired window也不得静默重置。
+**本目标仍未完成：video submit3 / MP4 0 / remote-paid media0**。没有media Gate、完整观看/实际聆听、QA activation、P6或Final Acceptance，17 s/完整因果/原声线全部NOT_EVALUATED。旧广告/剧情片不作为本次成果。最小继续条件：先解决已重复两次的review报告传输失败，并在适用授权下完成exact corrected wrapper的required review；然后重新核对当前restored service/queue/GPU、finite elapsed window及同一existing grant，显式恢复task-local overlay后沿canonical seam执行唯一剩余slot。不能把当前“允许追加一轮”当作无限审查预算；不得直接重跑main、重建budget/grant、伪造attempt-03失败、blind submit或重用permit；expired window也不得静默重置。本轮自动learning evaluation为`no_candidate`：同一修正的未完成审查不产生新的媒体能力claim，record仍为ineligible session_summary，不创建placeholder、不刷新RAG。
 
 Git publication保持local-only，`.codex/config.toml` unrelated dirty保留。Shared implementation已commit，task-local runtime/proof artifacts留在ignored `R8`，不提升为Production qualification。
 
