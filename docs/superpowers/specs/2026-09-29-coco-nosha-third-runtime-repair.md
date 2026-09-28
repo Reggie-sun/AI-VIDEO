@@ -32,3 +32,13 @@ unknown outcome停止并显式恢复；known terminal后只恢复本任务临时
 批准后自动生成durable implementation plan。Executable coverage必须包括旧cap2默认拒绝、exact local ceiling3仅一个新增grant、paid/remote拒绝扩展、task/Shot/evidence/actor/revision mismatch、tamper/double-use/unknown拒绝、旧v1 receipt bytes/hash/replay兼容，以及新intent原子消耗/累计计数不归零。按真实changed paths完成policy verification及适用Implementation Review Risk Gate后，才执行唯一新增submit。
 
 Self-review：本契约不把local quota与runtime-repair cap混为一谈；不借新task/Shot绕过history；不将isolated exact numerical对照外推成17 s media或所有GEMM equivalence。新增权限严格限定一个local exact repair；批准不替代implementation及适用verification gates。Publication保持local-only，无push/release或worktree授权。
+
+## Approved Continuation Window Amendment — 2026-09-29
+
+用户在明确解释“审查未完成、原两小时实验window已过期、原remaining slot仍在，继续需要完成审查并续期window”之后回复“继续”。本次授权据此限为**一个新增targeted review round（第5轮）**，以及该review通过后为同一未消耗slot提供**一次7200 s window extension**；仍只有一个新增physical video submit，active prompt wall仍5400 s。Global新seal采用用户已选择的`kimi-maximum-v1`，不把64 wire requests解释为64轮review；第5轮失败后不自动启动第6轮。
+
+续期前必须重开当前canonical Manifest（revision28、actual submitted3均FAILED、无attempt-05、prepared-only03无side effects）、原第三grant `48342361f437b2f6e9276f008c50b5c0b8048faebbb0ca4b6f368a96367d19b4`未消耗，以及原budget exact SHA-256 `74c5efa98ee983ca8d1481f2da9054df9199951b4de5c51c5c6c25a00aaa0c42`。Required review acceptance和source/runtime hashes必须先验证。只允许task-owned experiment budget的`elapsed_ceiling_seconds`延长到review通过后操作时刻加7200 s对应的原始clock offset；`started_at=2026-09-28T18:40:58.266294+00:00`和其余所有budget fields原样保留。
+
+原budget exact bytes必须独立保存；一次续期evidence先记录original/new budget hashes、原/new ceiling、固定started_at、authorized7200 s extension、exact task/Shot/grant/review identity、Manifest revision和count3，然后通过same-directory atomic replace更新task budget。存在续期evidence或old-budget/hash/state不符即拒绝重复执行，不删除旧证据或补造permit。崩溃造成receipt/budget不一致时禁止media side effect，须按exact hashes显式恢复。此操作不写Production Manifest、不新增grant/intent、不会改写旧sealed review，也不改变canonical writer、unknown recovery、QA/activation或17 s frozen output。
+
+Self-review：expired clock与local/unmetered额度分开；只续期尚未提交的同一slot，保留原clock与已耗时，不更名task逃避history。Required review未通过前无budget activation或media submit；本次“继续”不授权更多生成、付费媒体fallback、无限review或再次续期。

@@ -36,3 +36,14 @@
 ## Self Review
 
 receipt version兼容通过conditional serializer而非改旧bytes；新module按完整runtime-repair职责拆分，transaction lock/atomic write归属不变。operator扩展输入必须显式精确绑定，不能凭caller布尔声称local。isolated kernel proof不替代全模型/媒体验证；approval已有，不再添加重复用户gate。
+
+## Approved Recovery Continuation — 2026-09-29
+
+承接spec的Approved Continuation Window Amendment：用户“继续”授权一个新增targeted review和一次同slot7200 s window extension。Native Codex为唯一task writer；本轮不修改共享implementation、已验证LoRA/Triton code、generation/recovery wrapper或installed package。
+
+1. **Exact Review Candidate**：保存fresh snapshot/最小packet，绑定accepted spec/plan amendment、corrected `generate_next.py` / `recover_pre_submit.py`、已通过guard/AST证明、当前3 FAILED/revision28/unconsumed grant及续期proposal；完成actual changed-path documentation checks。新seal核对deep/max/1M及maximum有限budgets，只发起第5轮。Canonical receipt/route/artifact hashes/full Read与terminal report由Parent核验并裁决；无report/未解决blocker即停止，不消费video slot。
+2. **One Auditable Clock Extension**：review通过后，重新读取same Manifest、grant和original budget exact hash；独立保留原budget bytes，计算从固定original started_at到now+7200 s的new elapsed ceiling，其余fields逐项相同。保存单次extension evidence、new budget hash/原始clock/当前revision/count3/review identity后atomic replace；拒绝重复续期，mixed state fail closed。只修改task budget，不通过新writer修改Product state。
+3. **Exact Owned GPU Runtime And Existing-Grant Recovery**：重新核验own unit/PID/InvocationID与empty queue，保存旧ownership observations，沿已有supervisor切换相同pinned combined launcher。start返回结果单独保留，main_pid以status取证，核对activation-PID/source hashes。调用原 `recover_pre_submit.py`，不能重跑 `generate_next.main()`或remint grant/budget；canonical seam一次submit，剩余elapsed和active wall同时约束。
+4. **Terminal Artifact Or Blocker**：known terminal后恢复本任务临时切换服务并验证健康；unknown不重提、不杀未知prompt。实际MP4必须video-analysis及完整观看/聆听、逐项frozen Gate，否则如实保留NOT_EVALUATED。按session record/learning routing保存新状态与task-owned commit，unrelated dirty保留。
+
+Self-review：本次新增的是task-local finite window activation，不改变receipt/schema/CLI或共享owner；review input显式包含续期contract，避免审完后追加未审scope。原window、3次失败、prepared-only03及第三grant均保留。只有review通过才续期，不让review耗时提前吃掉新的7200 s generation window；剩余physical submit仍1，无第五次physical submit授权。
