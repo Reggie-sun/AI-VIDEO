@@ -11,9 +11,9 @@ Session window: 2026-09-27–2026-09-28, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
-## Current Supersession — Local Quota Corrected, Third Submit Running
+## Current Supersession — Local Quota Corrected, Third Submit Failed
 
-2026-09-28 22:31 +08:00 checkpoint：用户澄清“本地的额度应该是无限的”后，已撤回下节的未批准 renewal-ledger proposal，按当前授权修正现有 local/unmetered submit-limits owner。**累计真实 local video submit 3、MP4 0；第三个请求正在执行，尚无 terminal result。目标仍未完成。** 下节 quota blocker、需先批准新 ledger 和 restored-service 状态均为历史，不再是当前继续条件。
+2026-09-28 22:57 +08:00 terminal result：用户澄清“本地的额度应该是无限的”后，已撤回下节的未批准 renewal-ledger proposal，按当前授权修正现有 local/unmetered submit-limits owner。**累计真实 local video submit 3、MP4 0；第三个请求已知失败，在 GPU LoRA 运算发生 OOM。目标仍未完成。** 本节取代 22:31 的 RUNNING checkpoint；下节 quota blocker、需先批准新 ledger 和旧 restored-service identity 均为历史，不再是当前继续条件。
 
 本节 `R6` 为 `runs/coco-nosha-local-unmetered-20260928-003/`，`R4` / `R5` 保持原 run identity。实现 commit `21fd766b56a571644efc80b885ad32ce6ca5af9b`，exact staged tree `8b17165477a85e331bad8225fad4a24e15f1f6c2`；只在 `_require_persisted_generation_limits` 取消当前 selected sealed `local/local_unmetered` 的 prior-local permanent-ceiling 单调限制。`local_total_limit=None` 表示无累计额度；finite current batch / 显式 total limit、same-task durable intent/receipt counters、paid/remote、runtime-repair cap、history/latest、unknown、one-use permit 和 QA 不变。无新 dependency/schema/ledger/CLI/Provider path；现有文件没有净行数增长。原 `.codex/config.toml` dirty work 保留。
 
@@ -23,17 +23,29 @@ Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef
 
 新增 quota-correction scope 的受管 Kimi deep review 三轮封存独立预算；前两轮完整 Reads 后触发 `UPSTREAM_GENERATION_LIMIT`，没有 terminal report 或 partial acceptance。第三轮缩小为 exact executable diff、changed owner 与 direct guards/tests、accepted spec/plan，invocation `a6becf82-0548-483b-9d47-79a794e5c0e5` 为 `PARSED`，两份 required Read 完整、route identity / artifact hashes 已核验。Reviewer 未提出 blocking code defect，但问到 pending-intent-only test 和无 Harness receipt。Parent 重开已通过的 `test_pending_submit_intent_on_another_shot_reserves_task_count`、unknown/fetched-history tests，并机械比较所有 packet source excerpts、current/staged hashes、tree 与 14 个 log hashes，关闭 evidence-visibility question；no-worktree 边界如实保留。详见 `R6/kimi-worker-report-03.json`、`parent-review-adjudication.json`、`review-acceptance.json`。这是新 scope 的第三轮，不是旧 duration review 的第四轮；不继续新增 review。
 
-### Exact Third Submit And Active Recovery Boundary
+### Exact Third Submit And Historical Active Checkpoint
 
 新 current batch 保持原 task `user-approved:coco-nosha-local-17s-20260928`、used=2、batch bound=3、total limit=None，仅一个新增 submit，active wall 5400 s / elapsed 7200 s。旧 budget 不改，两个 failed submits 保留；prepared-only `coco-nosha-attempt-03` 经 canonical evaluation 记录为 `not_submitted`，不伪造 runtime failure。使用原第二个 unconsumed runtime-repair grant、新 local intent / one-use permit，不 remint 旧 grant、不复用 permit。
 
 `coco-nosha-attempt-04` / `coco-nosha-generation-04` 于 **14:21:17.349935 UTC** 真实提交，Provider prompt ID `768b1c3b-bedc-4099-9db2-19b3cdcb4879`，resolved hash `8b17840a3d705bc0f66b20dedef7e738319dcf186ba6ddbc951865557eff1035`。原 prompt、image/audio bindings、17 s output 和 V3 profile 均与实际 attempt-02 相同；canonical fresh runtime repair seed 1583761482→1583761483，不把准备但未提交的 attempt 当新 sample。`R6/attempt-04/control-comparison.json` 保存 held constants 和 attribution boundary；submit/decision/binding/preview 已落盘。
 
-仅切换 exact owned、empty-queue ComfyUI，经既有 supervisor / R5 pinned launcher 启用 `--novram --use-sage-attention --enable-triton-backend`。当前 unit `ai-video-comfyui-ed2c7f860774467d863d2aad85653b10.service`、PID 1601951、InvocationID `37a28a62ada641478ef024f826131357`，loopback 健康。现有 isolated kernel bytes/proof 和 installed package 未改；本轮实际模型成功仍未证明。初始游戏/Jianji exports 保留；exports 自行结束后用户另明确允许结束 `Nomad Drive Demo`，14:26 实测该游戏已退出，**未发信号**，free VRAM 18754 MiB，见 `R6/authorized-game-release.json`。其他任务保留，VLLM 没有被停止。
+仅切换 exact owned、empty-queue ComfyUI，经既有 supervisor / R5 pinned launcher 启用 `--novram --use-sage-attention --enable-triton-backend`。该临时 unit 为 `ai-video-comfyui-ed2c7f860774467d863d2aad85653b10.service`、PID 1601951、InvocationID `37a28a62ada641478ef024f826131357`；提交时 loopback 健康，现已在 known terminal 后停止。现有 isolated kernel bytes/proof 和 installed package 未改。初始游戏/Jianji exports 保留；exports 自行结束后用户另明确允许结束 `Nomad Drive Demo`，14:26 实测该游戏已退出，**未发信号**，free VRAM 18754 MiB，见 `R6/authorized-game-release.json`。其他任务保留，VLLM 没有被停止；后续 Jianji 导出重新运行也未被本任务停止。
 
 22:31 checkpoint 的 queue 仍只有本 prompt，elapsed 589 s，history 尚无 terminal result；reference/encoder logs 有执行活动，未报告 error，但不能把“仍在 running”当成功。`R6/execution.log` / `runtime-monitor.jsonl` 保存进度。请求运行期间**不得 stop/restart 服务、重提、remint permit 或恢复原服务参数**；继续观察现有 request，known terminal 后按原 seam fetch/record，unknown 必须显式恢复。正常结束且 queue empty 后恢复原 Python / lowvram/sage 配置并验证健康。
 
-尚无 MP4，因此未运行 `video-analysis`，未观看/聆听成片；17 s 一镜到底、正常速度、完整因果链、身份/声线与视觉质量全部 `NOT_EVALUATED`，无 activation/P6/Final Acceptance。此 record 是 accepted code + durable actual submit 的 stable continuation checkpoint，**不是视频交付或目标完成**；生成仍继续。自动 `distill-ai-video-learning` 判 `no_candidate`：新的 quota fix 是直接契约纠正，当前只有一个 active model request，尚不构成可推广的真实媒体 mitigation pattern；不创建 placeholder，不刷新失败的 Agent Memory index。
+### Known GPU Failure And Completed Restoration
+
+`R6/attempt-04/observation.json` 于 **14:57:12.031244 UTC** 记录 `failed`；ComfyUI history 为 `status_str=error`、node 10 `SamplerCustomAdvanced`、`torch.OutOfMemoryError`，queue empty。`completed=false` 不覆盖明确的 execution_error，也不被解释成 unknown。日志记录本次执行 **00:35:53**。canonical evaluation 已由既有 committer 完成：attempt-04 FAILED、一个 runtime-failure experience、local submit receipt 存在、fetch receipt 不存在，见 `R6/attempt-04/canonical-terminal.json`。prepared-only attempt-03 仍不计为真实 submit。
+
+实际 journal 确认 Triton backend 启用；此前 eager INT8 conversion 失败点此次不再是终态失败点。新的 traceback 在 `comfy/weight_adapter/lora.py:366` 的 `out = op(hidden, up)`（linear 分支为 `F.linear`），上层 `bypass.py` 已先保留 `base_out`，随后还需 LoRA scale/add 的输出。全尺寸输出及并存 buffer 是源码支持的峰值风险；没有测得该失败调用的 exact tensor shape，不能从 isolated kernel shape 推导本次所需额外显存。OOM summary 为 current allocated 10973 MiB、peak allocated 13371 MiB、reserved 17952 MiB；这些是 Torch allocator 数字，不是全卡空闲显存。证据为 `R6/attempt-04/history.json`、`service-journal.log`。
+
+用户问“为什么不用gpu”：本次 **GPU 确实用于视频采样**，但 `--novram` 把约 14960 MB 的 CLIP/text encoder 放在 CPU；journal 明确记录 load/offload/current device 均为 cpu，长编码期间 GPU 使用低。Parent 为保持此前 offload 模式、隔离 Triton mitigation 而沿用 novram，未充分考虑 CPU 编码延迟。当前源码 `model_management.text_encoder_device` 支持 NORMAL/HIGH 或 dynamic 条件下的 GPU encoder 和后续 offload；单纯 lowvram 并不在所有条件下保证 GPU encoder，`--gpu-only` 也不能解决大模型总显存需求。改善编码 placement 与修复采样 LoRA peak 是两个问题，前者不能证明后者已解决。
+
+known error、empty queue 和 unit/PID/InvocationID 核验后，已通过既有 supervisor 恢复原 Python / `--lowvram --use-sage-attention`，不保留任务 Triton flag。restored unit `ai-video-comfyui-010309db15b040cca09837230ce0c3ae.service`、PID **1960989**、InvocationID `7311744cf8c545a4abdc9e04c937eeb4`；loopback health 与 empty queue 已验证，见 `R6/service-restoration-health.json`、`service-restoration.log`。VLLM 原本 inactive、未被停止，无需恢复；游戏未发信号；Jianji 与未知任务保留。
+
+本 finite batch 的唯一新增 slot 已用完，既有两个 runtime-repair grants 已用于实际 repairs；未执行第四次 submit、重置 task/history 或 remint permit。这是当前自动修复边界，不是恢复永久本地累计 quota。继续出片需先找到可执行、保持原 model/profile/17 s/声线/因果链的 LoRA peak mitigation 或足够 headroom，再沿 canonical repair policy 封存下一有限实验；若确需改变已接受的 repair cap/contract，按其 owner 与 Decision Gates 处理。不能用仅切换编码 device 的重复提交冒充已定位修复。
+
+尚无 MP4，因此未运行 `video-analysis`，未观看/聆听成片；17 s 一镜到底、正常速度、完整因果链、身份/声线与视觉质量全部 `NOT_EVALUATED`，无 activation/P6/Final Acceptance。自动 `distill-ai-video-learning` 判 `no_candidate`：这一个 full-model Triton attempt 的 LoRA OOM 未隔离成功 mitigation，旧 eager failures 与 kernel unit proof不能替代对照成片，不创建 placeholder，不刷新失败的 Agent Memory index。记录过程无额外 media/Provider/network call；source correction `21fd766` 的已通过验证与 review 不被此次模型 OOM 混为质量验收。
 
 ## Historical Snapshot — Sampler Mitigation Verified, Canonical Renewal Blocked
 
@@ -152,16 +164,16 @@ known error / empty queue / unit InvocationID / PID ownership 核验后，已停
 | 第二轮参考图 | 6 次 image generation，5 张最终可用新参考；错误广告尾帧已排除，修正图未提交 |
 | 用户即梦画布 | 已取得 exact served 三图/声线；意外 composer chip 已恢复并 reload 验证；无画布生成 |
 | 当前用户目标 | 本地复刻 COCO/诺萨片段，保留角色、声线、完整因果链、正常速度与一镜到底 |
-| COCO/诺萨本地生成 | `LOCAL_SUBMIT_CEILING_RENEWAL_UNIMPLEMENTED`；local submit 2，known OOM 2，MP4 0；第三个 prepared attempt 没有 intent/permit/submit |
+| COCO/诺萨本地生成 | local submit 3，known OOM 3，MP4 0；attempt-03 为 prepared-only，attempt-04 为第三次实际提交 |
 | 17 s engineering | `17aca10` local commit；265 focused PASS，12 policy commands PASS；无 canonical Harness receipt |
-| 最新综合记录 | 本轮 isolated kernel GPU proof PASS；canonical quota 拒绝追加 submit；已恢复原服务，续期 proposal 待批准 |
+| 最新综合记录 | local/unmetered quota 已纠正；第三次在 GPU LoRA 运算 OOM，原服务已恢复；未交付视频 |
 | Quality / Production / release | 未获 human full-speed acceptance、P6、Final Acceptance；无 push / release |
 
 ## Purpose And Scope
 
 用户要求记录当前 API / local 对即梦画布参考方式的支持情况，然后本地按照画布方法生成，随后明确指出需要“一个非常完整的记录”。本文件承接 [implementation](2026-09-27-creative-goal-preservation-implementation.md)、[first-frame tests](2026-09-27-creative-goal-real-api-local-tests.md)、[first/last retests](2026-09-28-creative-goal-first-last-reference-retests.md) 与 [Jimeng canvas comparison](2026-09-28-jimeng-canvas-method-comparison.md)。本轮请求授权任务内 local generation，但不授权新的 remote / paid generation、自动 activation、P6 或发布。
 
-本记录区分能力声明、当前封装、历史技术证据、本轮运行条件与实际媒体效果。用户已明确选择复刻画布里的 COCO/诺萨片段，不再做广告/剧情替代测试。旧窗口在环境/素材/时长上被阻断；本次 continuation 已恢复环境、取得素材并实现显式 17 s profile，但两次真实提交均 OOM，视频目标未完成。
+本记录区分能力声明、当前封装、历史技术证据、本轮运行条件与实际媒体效果。用户已明确选择复刻画布里的 COCO/诺萨片段，不再做广告/剧情替代测试。旧窗口在环境/素材/时长上被阻断；本次 continuation 已恢复环境、取得素材并实现显式 17 s profile，但三次真实提交均 OOM，视频目标未完成。
 
 ## Request History And Authority
 
