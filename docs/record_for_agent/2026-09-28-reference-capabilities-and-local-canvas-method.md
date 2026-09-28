@@ -7,9 +7,27 @@ learning_eligibility: ineligible
 # Creative Goal Tests, Jimeng Canvas Comparison And Local Replication — Full Record
 
 Date: 2026-09-28
-Session window: 2026-09-27–2026-09-28, Asia/Hong_Kong
+Session window: 2026-09-27–2026-09-29, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
+
+## Current Continuation — LoRA Kernel Verified, Repair Cap Still Blocks Media
+
+2026-09-29 continuation：用户“继续”后，当前GPU配置仍生效。本轮未再提交完整视频；**累计local video submit仍3、MP4 0**。已知第三次LoRA OOM的task-local allocation mitigation已完成隔离GPU对照，但未安装到ComfyUI；目前实际阻挡下一submit的是既有同Shot runtime-repair cap2，两份grants均consumed，不能靠换task/Shot、清history或monkeypatch constant绕过。
+
+本节`R8`为`runs/coco-nosha-lora-memory-20260929-001/`。traceback定位QKV `LoRAAdapter.h`的完整up output，在base output已存在时分配；原profile的518个converted LoRA tensors均2D，ranks16/64，QKV down64×5376/up21504×64。重hash文件与profile pinned SHA-256 `5b8ad6cb7ac206852006f4efa3ce2d679cd6ffb5d5b8a4edce8e981393289df5`一致。failure没有实测tensor shape，因此以下large case是代表性kernel验证，不冒充原失败的exact shape。
+
+Parent编写未激活的`R8/lora_chunk.py`，SHA-256 `0b438b1a259317c8ca26696167fa8bb841ed288f512979d3ef3f78a961b856b7`：保留全量down projection，up projection按64MiB delta分块，保持scale rounding后add的顺序，在plain linear inference的独立contiguous base中加回；training/conv/mid/DoRA/reshape/不兼容dtype/device/layout与输入storage alias保留stock path。没有修改安装的ComfyUI、模型、LoRA weights、workflow或17 s output contract。公开[H3 long-sequence源码](https://github.com/ByronLeeeee/ComfyUI-MiniMax-H3-Optimization-Suite/blob/main/plugins/ComfyUI-H3-Long-Sequence/nodes.py)提供LoRA row-chunking的prior art；本候选保留原stock scale rounding，不采用其fused alpha-add，也未引入其base-MLP量化/attention/solver优化。
+
+`R8/verify_lora.py`一次有限GPU验证，55.360 s、8 checks全部PASS：6个FP16/BF16小case（None/noninteger/negative scale、多个chunks及非整除tail）exact equal；输入alias fallback不修改x且exact equal；BF16 `[100032,5376,21504,64]`large stock/chunked全部**2151088128**个输出元素比较，relative RMS/max absolute error均0。stock peak allocated **14007132160 bytes（13.05GiB）**，candidate **5469888512 bytes（5.09GiB）**。预设relative RMS≤0.005和peak<stock×0.6均满足；不是所有GEMM/layout、完整model或media equivalence证明，也不将kernel timing作为完整推理速度。证据为`R8/kernel-verification.json`、log、header inspection及candidate bytes。
+
+受管Kimi deep诊断invocation `cd501bcb-e1b7-4b9d-a3b2-ab92398a8bcc`完成sealed packet Read后到达300s wall budget，classification `OUTCOME_UNKNOWN`、无terminal worker report；route/Read/artifact hashes已检查，不采纳partial conclusions、不自动retry。这是external diagnostic outcome，不改写原三次video的known failed状态，也不声称通过independent implementation review。Parent的kernel proof与该未完成诊断分开保存。
+
+当前`MAX_RUNTIME_REPAIRS_PER_SHOT=2`、sole committer的count guard及`test_runtime_repair_budget_is_per_shot`已重开；Manifest保留attempt-01与attempt-02的两份consumed grants。用户明确选择“A：批准这 1 次任务内扩展并继续生成”，批准[task-scoped third repair spec](../superpowers/specs/2026-09-29-coco-nosha-third-runtime-repair.md)的exact local task/Shot有限repair（2→3）；[durable plan](../superpowers/plans/2026-09-29-coco-nosha-third-runtime-repair.md)已生成。Source candidate采用typed exact extension、`runtime-repair/2`与兼容旧`/1`的serializer，并将完整runtime-repair职责移入同一committer的private helper，保留原MRO与public methods；未签发真实grant/permit或新submit。RED为9 failed/14 passed（新接口尚不存在）；首轮GREEN 23 passed，补充paid/remote及unknown后继续完整policy验证和implementation review。初版增加MRO owner，引起structure assertion；补齐该test后新增全量Production contract检查在1800 s时约79% timeout、没有打印断言失败，不能称PASS。最终采用private helper保留原MRO并恢复原structure test exact HEAD bytes；据最终实际changed paths重新运行全部必需checks，不更改policy或豁免验证。
+
+原NORMAL GPU服务unit `ai-video-comfyui-2b389280edc64f3c94160ac9231670b8.service`、PID2192367、InvocationID `77eb01457c304a5e925ab972ca4a8615`仍健康、queue empty，见`R8/runtime-after-kernel.json`；本轮无restart、无other-task signals、无paid媒体submit。Jianji与未知任务保留。没有MP4，故未调用media Gate或观看/聆听；17 s/完整因果/原声线仍NOT_EVALUATED，未完成用户目标。
+
+按`record-ai-video-session`更新同一primary record，自动learning为`no_candidate`：此处是deterministic kernel equivalence/capacity验证链，尚无独立full-model/media mitigation pattern；既有learning family无匹配claim。Agent Memory仍沿用本任务既有library-incompatible failure，不retry/rebuild或刷新index，不制造adoption candidate。
 
 ## Current Runtime — GPU Encoding Default Applied
 

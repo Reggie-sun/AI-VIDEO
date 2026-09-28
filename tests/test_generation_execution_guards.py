@@ -10,6 +10,22 @@ from ai_video.production._state_commit_video import _StateCommitVideoMixin
 from ai_video.production.generation_decision import DecisionPolicy, ExecutionLimits
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import StateCommitStatus, VideoAttemptPhase, PaidProviderAttemptPhase
+from ai_video.production.generation_runtime_repair import LocalRuntimeRepairExtension
+
+
+@pytest.mark.parametrize("execution_kind,billing_kind", [
+    ("remote", "remote_metered"),
+    ("local", "remote_metered"),
+    ("remote", "local_unmetered"),
+])
+def test_runtime_repair_extension_rejects_remote_or_metered_selected_variant(execution_kind, billing_kind):
+    extension = LocalRuntimeRepairExtension(task_id="guard-task", shot_id="guard-shot",
+        failed_binding_hash="a" * 64, expected_manifest_revision=0)
+    binding = _binding(limits=_limits(), policy=DecisionPolicy(),
+                       execution_kind=execution_kind, billing_kind=billing_kind)
+    with pytest.raises(AiVideoError, match="exact local/unmetered"):
+        from ai_video.production._state_commit_video_runtime_repair import require_local_extension_scope
+        require_local_extension_scope(extension, binding)
 
 
 def _limits(**updates):

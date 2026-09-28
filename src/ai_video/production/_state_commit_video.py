@@ -18,7 +18,6 @@ from ai_video.production._lifecycle_schema import (
     LocalVideoStatusReceiptPointer,
     LocalVideoSubmitIntentPointer,
     LocalVideoSubmitReceiptPointer,
-    RuntimeRepairAuthorizationPointer,
 )
 from ai_video.production._video_project_reader import (
     load_commercial_shot_evaluation_intent,
@@ -145,153 +144,26 @@ class _StateCommitVideoMixin:
     ):
         return load_qualification_execution_binding(self._project_root, pointer)
 
-    def _reopen_runtime_repair_authorization(
-        self, pointer: RuntimeRepairAuthorizationPointer
-    ):
-        from ai_video.production._generation_feedback_reader import (
-            load_runtime_repair_authorization,
-        )
+    def _reopen_runtime_repair_authorization(self, pointer):
+        from ._generation_feedback_reader import load_runtime_repair_authorization
 
         return load_runtime_repair_authorization(self._project_root, pointer)
 
     def record_runtime_repair_authorization(
-        self,
-        *,
-        attempt_id: str,
-        repair_basis: str,
-        actor,
-        evidence_hash: str | None = None,
-    ) -> RuntimeRepairAuthorizationPointer:
-        """Authorize one bounded re-execution after a repaired local runtime failure.
+        self, *, attempt_id: str, repair_basis: str, actor,
+        evidence_hash: str | None = None, local_extension=None,
+    ):
+        from ._state_commit_video_runtime_repair import register_runtime_repair_authorization
 
-        The attempt must be FAILED with durable ``runtime_failure`` evidence; the
-        grant is per-Shot capped and one-use (consumed by the replacement submit
-        intent inside the same atomic write).  Re-recording the same evidence
-        returns the existing pointer unchanged.
-        """
-
-        from ai_video.production.generation_runtime_repair import (
-            MAX_RUNTIME_REPAIRS_PER_SHOT,
-            RuntimeRepairAuthorization,
-            runtime_repair_artifact_path,
+        return register_runtime_repair_authorization(
+            self, attempt_id=attempt_id, repair_basis=repair_basis, actor=actor,
+            evidence_hash=evidence_hash, local_extension=local_extension,
         )
-
-        if not isinstance(repair_basis, str) or not repair_basis.strip():
-            raise _state_invalid("Runtime repair requires an explicit repair basis.")
-        with self._exclusive_lock():
-            manifest = self._read_manifest()
-            attempt = self._video_attempt(manifest, attempt_id)
-            state = attempt.video_generation_state
-            if attempt.status is not StateCommitStatus.FAILED or state is None:
-                raise _state_invalid("Runtime repair requires a failed video attempt.")
-            if not state.generation_experiences:
-                raise _state_invalid(
-                    "Runtime repair requires durable runtime failure evidence."
-                )
-            experience = self._reopen_generation_experience(
-                state.generation_experiences[-1]
-            )
-            failures = [
-                e for e in experience.evidence if e.outcome == "runtime_failure"
-            ]
-            if not failures:
-                raise _state_invalid(
-                    "Runtime repair requires a runtime_failure outcome evidence."
-                )
-            failure = failures[-1]
-            if evidence_hash is not None and evidence_hash != failure.evidence_hash:
-                raise _state_invalid(
-                    "Runtime repair evidence hash does not match the durable runtime failure."
-                )
-            for item in manifest.attempts:
-                prior = item.video_generation_state
-                if prior is None:
-                    continue
-                for pointer in prior.runtime_repairs:
-                    if pointer.evidence_hash == failure.evidence_hash:
-                        return pointer
-            request = self._reopen_video_request(state.request)
-            scope = request.activation_scope
-            if scope is None:
-                raise _state_invalid("Runtime repair requires a verifiable Shot scope.")
-            granted = 0
-            for item in manifest.attempts:
-                prior = item.video_generation_state
-                if prior is None or not prior.runtime_repairs:
-                    continue
-                prior_request = self._reopen_video_request(prior.request)
-                prior_scope = prior_request.activation_scope
-                if (
-                    prior_scope is None
-                    or prior_scope.request.target_shot_id != scope.request.target_shot_id
-                ):
-                    continue
-                granted += len(prior.runtime_repairs)
-            if granted >= MAX_RUNTIME_REPAIRS_PER_SHOT:
-                raise _state_invalid("Runtime repair budget is exhausted for this Shot.")
-            authorization = RuntimeRepairAuthorization.create(
-                attempt_id=attempt_id,
-                evidence_hash=failure.evidence_hash,
-                repair_basis=repair_basis,
-                actor=actor,
-                expected_manifest_revision=manifest.manifest_revision + 1,
-            )
-            artifact = _artifact(
-                runtime_repair_artifact_path(authorization.content_hash), authorization
-            )
-            pointer = RuntimeRepairAuthorizationPointer(
-                path=artifact.relative_path,
-                content_hash=authorization.content_hash,
-                attempt_id=attempt_id,
-                evidence_hash=failure.evidence_hash,
-                consumed=False,
-                file_sha256=artifact.file_sha256,
-            )
-            self._write_immutable_artifact(artifact, attempt_id=attempt_id)
-            next_state = state.model_copy(
-                update={"runtime_repairs": (*state.runtime_repairs, pointer)}
-            )
-            next_attempt = _validated_transition(
-                attempt, {"video_generation_state": next_state}
-            )
-            next_manifest = _validated_transition(
-                manifest,
-                {
-                    "manifest_revision": manifest.manifest_revision + 1,
-                    "attempts": tuple(
-                        next_attempt if item.attempt_id == attempt_id else item
-                        for item in manifest.attempts
-                    ),
-                },
-            )
-            self._write_manifest_atomic(next_manifest)
-            self._reopen_runtime_repair_authorization(pointer)
-            return pointer
 
     def _require_runtime_repair_grant(self, manifest, binding):
-        repair = binding.decision.runtime_repair
-        if repair is None:
-            return None
-        prior = self._video_attempt(manifest, repair.attempt_id)
-        prior_state = prior.video_generation_state
-        pointer = next(
-            (
-                p
-                for p in (prior_state.runtime_repairs if prior_state else ())
-                if p.attempt_id == repair.attempt_id
-                and p.evidence_hash == repair.evidence_hash
-            ),
-            None,
-        )
-        if pointer is None or pointer.consumed:
-            raise _state_invalid("Runtime repair grant is unavailable.")
-        if pointer.content_hash != repair.content_hash:
-            raise _state_invalid("Runtime repair grant identity mismatch.")
-        if self._reopen_runtime_repair_authorization(pointer) != repair:
-            raise _state_invalid(
-                "Runtime repair grant does not match the durable receipt."
-            )
-        return repair
+        from ._state_commit_video_runtime_repair import require_runtime_repair_grant
+
+        return require_runtime_repair_grant(self, manifest, binding)
 
     def _require_submit_execution_binding(self, manifest, state, request):
         """Reject old request records before any new Provider intent or permit."""

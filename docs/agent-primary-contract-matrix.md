@@ -219,6 +219,11 @@ QA owner 的 `generation_evaluation_authorities` 显式绑定 evaluator 与 proo
 `generation_runtime_repair.py` 的 one-use grant 只对最新已知 `RUNTIME_FAILURE` 的同 Shot
 re-execution 生效；committer 在 replacement submit intent 的同一原子写入中消耗 grant，
 unknown outcome、旧 evidence 或耗尽的 per-Shot ceiling 不获得 retry 权限。
+默认per-Shot runtime-repair ceiling仍2；显式`LocalRuntimeRepairExtension`只在两个同task/Shot
+local/unmetered grants已消耗后增加第三份，封存source binding、当前Manifest revision与同runtime actor。
+`_state_commit_video_runtime_repair.py`拥有完整registration transaction和submit前scope重验；仍为
+唯一committer的同一lock/atomic writer。Receipt `/2`携带exact extension，`/1`省略新字段，保留旧bytes/hash/read/replay；
+Manifest pointer/layout不变。paid/remote、unknown、scope mismatch及第四份grant拒绝；intent写入和grant消耗保持原子。
 strict local/unmetered 的当前 selected capability 可以设置新的有限 batch bound，
 `local_total_limit=None` 表示本地无累计 quota；旧 local ceiling 不永久锁定后续请求。
 same-task durable submit/intent counters 不归零，当前 finite limits仍执行，
