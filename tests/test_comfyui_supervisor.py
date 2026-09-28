@@ -76,7 +76,7 @@ def test_start_uses_detached_user_systemd_service(monkeypatch, tmp_path):
     assert "--property=Restart=no" in command
     assert "--property=KillMode=mixed" in command
     assert "--property=TimeoutStopSec=30s" in command
-    assert command[-9:] == [
+    assert command[-8:] == [
         str(root / ".venv" / "bin" / "python"),
         str(root / "main.py"),
         "--listen",
@@ -84,12 +84,12 @@ def test_start_uses_detached_user_systemd_service(monkeypatch, tmp_path):
         "--port",
         "8188",
         "--disable-auto-launch",
-        "--lowvram",
         "--use-sage-attention",
     ]
+    assert not {"--lowvram", "--novram", "--gpu-only", "--cpu"}.intersection(command)
 
 
-def test_start_novram_replaces_lowvram_without_changing_other_runtime_flags(
+def test_start_novram_overrides_default_memory_mode_without_changing_other_runtime_flags(
     monkeypatch, tmp_path
 ):
     supervisor = _load_supervisor()
@@ -128,6 +128,7 @@ def test_start_novram_replaces_lowvram_without_changing_other_runtime_flags(
     command = commands[0]
     assert "--novram" in command
     assert "--lowvram" not in command
+    assert "--gpu-only" not in command
     assert command[-1] == "--use-sage-attention"
 
 

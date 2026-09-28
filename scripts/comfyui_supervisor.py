@@ -215,7 +215,7 @@ def _start_serialized(args: argparse.Namespace) -> int:
 
     unit_name = f"{UNIT_PREFIX}{uuid.uuid4().hex}"
     unit_service = f"{unit_name}.service"
-    memory_mode = "--novram" if args.novram else "--lowvram"
+    memory_args = ["--novram"] if args.novram else []
     command = [
         "systemd-run",
         "--user",
@@ -237,7 +237,7 @@ def _start_serialized(args: argparse.Namespace) -> int:
         "--port",
         str(args.port),
         "--disable-auto-launch",
-        memory_mode,
+        *memory_args,
         "--use-sage-attention",
     ]
     result = _run(command)
@@ -378,7 +378,7 @@ def _parser() -> argparse.ArgumentParser:
     start.add_argument(
         "--novram",
         action="store_true",
-        help="use ComfyUI --novram instead of the default --lowvram",
+        help="use ComfyUI --novram instead of its default GPU memory management",
     )
     start.set_defaults(handler=_start)
 

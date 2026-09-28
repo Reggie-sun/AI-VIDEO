@@ -11,6 +11,18 @@ Session window: 2026-09-27–2026-09-28, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
+## Current Runtime — GPU Encoding Default Applied
+
+2026-09-28 用户明确要求“代码改成gpu”，本轮只修正既有 supervisor 的默认memory-mode参数：不再隐式传`--lowvram`，保留显式`--novram`；不使用当前ComfyUI不支持的`--normalvram`，也不使用`--gpu-only`固定全部模型驻留。`scripts/comfyui_supervisor.py`仍是唯一启动/停止owner，loopback、unique transient unit、ownership、health与generation gates不变。旧记录中的lowvram默认值与旧服务identity从此为历史；第三次known LoRA OOM终态仍成立。
+
+本节`R7`为`runs/coco-nosha-gpu-encoding-20260928-004/`。本机原Python加载当前ComfyUI源码，实际device-selection检查返回`NORMAL_VRAM`、compute/text-encoder load device=`cuda:0`、offload device=`cpu`，见`R7/gpu-device-selection.json`。这是设备选择与CUDA初始化证明，**没有执行完整text encoder，也不证明17 s视频或LoRA显存峰值已通过**。source/tests RED为1 FAIL / 16 PASS；修正后supervisor与Harness focused共199 PASS，command assertions同时覆盖默认无强制VRAM flags和显式novram。
+
+只有核实原unit/InvocationID/PID、loopback和queue empty后，才经既有supervisor显式stop/start应用新默认值。当前unit `ai-video-comfyui-2b389280edc64f3c94160ac9231670b8.service`、PID **2192367**、InvocationID `77eb01457c304a5e925ab972ca4a8615`；actual argv无lowvram/novram/gpu-only/cpu，保留sage-attention；health与empty queue已验证，见`R7/service-health.json`。这是用户要求持续采用的新配置，不是临时停止后应恢复的旧lowvram实验。没有停止Jianji或未知进程；本轮新增video submit **0**，累计仍 **3 / MP4 0**，remote/paid媒体0。
+
+受管Kimi worker只读mapping invocation `265e0eba-5aa3-4dbd-acc5-8756a35d3b81`，两次authenticated `k3-256k/high`请求，sealed packet完整Read及route/artifact hashes已核验；建议去掉强制flag，指出FP16/dynamic-VRAM条件和无full-model证明。Parent以当前源码、device selection与实际服务补证，并加入默认flags排除断言；不把mapping当final implementation acceptance。packet/receipt/Parent adjudication位于`R7/`，未修改ComfyUI安装或模型。
+
+同一记录按`record-ai-video-session`更新，自动learning evaluation为`no_candidate`：这是局部配置修正及device/lifecycle证明，没有新的独立成片对照；不创建claim，不刷新已有失败的Agent Memory索引。原17 s、一镜到底、正常速度、原声线与完整因果链目标不变；其媒体验证仍`NOT_EVALUATED`，下一次提交前仍须解决已知LoRA allocation及既有有限repair边界。unrelated `.codex/config.toml`保留，无push/release。
+
 ## Current Supersession — Local Quota Corrected, Third Submit Failed
 
 2026-09-28 22:57 +08:00 terminal result：用户澄清“本地的额度应该是无限的”后，已撤回下节的未批准 renewal-ledger proposal，按当前授权修正现有 local/unmetered submit-limits owner。**累计真实 local video submit 3、MP4 0；第三个请求已知失败，在 GPU LoRA 运算发生 OOM。目标仍未完成。** 本节取代 22:31 的 RUNNING checkpoint；下节 quota blocker、需先批准新 ledger 和旧 restored-service identity 均为历史，不再是当前继续条件。

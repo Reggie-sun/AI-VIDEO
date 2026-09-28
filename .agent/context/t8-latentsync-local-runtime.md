@@ -76,12 +76,12 @@ python scripts/comfyui_supervisor.py logs --lines 100
 ```
 
 `start` 创建一次性的 `ai-video-comfyui-<32-lowercase-hex>.service` user-systemd
-transient unit，固定 `127.0.0.1:8188`、`Restart=no`、`--lowvram` 与
-`--use-sage-attention`。启动后仍需单独检查应用 queue；service active 不能证明
+transient unit，固定 `127.0.0.1:8188`、`Restart=no` 与
+`--use-sage-attention`；默认不传强制VRAM mode。启动后仍需单独检查应用 queue；service active 不能证明
 queue empty、生成成功或媒体质量通过。
 
-`--lowvram`是默认memory mode。只有task明确授权以更高CPU offload换取更低GPU占用时，才在
-`start`后追加`--novram`；supervisor会用ComfyUI `--novram`替换`--lowvram`，不会同时传递两者：
+默认使用ComfyUI的NORMAL GPU memory management；在支持FP16的CUDA设备上，text encoder可在GPU执行，使用后仍可offload到CPU。当前版本没有`--normalvram`参数，不使用`--gpu-only`固定全部模型在显存中。该device selection不保证所有模型能完整驻留显存，也不证明LoRA采样OOM已修复。只有task明确授权以更高CPU offload换取更低GPU占用时，才在
+`start`后追加`--novram`；它会让text encoder走CPU。既有显式选项继续可用，默认不再隐式传递`--lowvram`：
 
 ```bash
 python scripts/comfyui_supervisor.py start \
