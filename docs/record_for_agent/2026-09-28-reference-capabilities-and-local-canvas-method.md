@@ -11,7 +11,43 @@ Session window: 2026-09-27–2026-09-28, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
-## Current Supersession — Host Recovery And Bounded Runtime Failure
+## Current Supersession — Sampler Mitigation Verified, Canonical Renewal Blocked
+
+2026-09-28 20:47 +08:00 更新：用户“继续”后，本窗口已对 sampler allocation 路径完成源码诊断和真实 GPU kernel 验证。**本目标仍未完成，累计 local video submit 2、MP4 0；本窗口新增 video submit 0**。当前 blocker 是 `LOCAL_SUBMIT_CEILING_RENEWAL_UNIMPLEMENTED`，不是宿主机不可访问，也不是已确认 Triton 视频仍 OOM。下节保留此前两次失败及服务恢复的历史；其服务 PID、下一步条件与“未准备第三个 attempt”已被本节替代。
+
+本节 `R5` 指 `runs/coco-nosha-sampler-recovery-20260928-002/`；`R4` 仍指原 host-recovery run。17 s creative scope、原素材和 implementation commit 不变；本窗口未改 tracked executable source、profile、model、installed package 或 user desktop tasks。
+
+### Source Diagnosis And Isolated GPU Proof
+
+Torch CUDA 12.8 下，ComfyUI 当前源码禁用 comfy-kitchen CUDA backend；未传已有 `--enable-triton-backend` 时 Triton 也禁用，所以先前两次实际使用 eager INT8。eager `int8_linear` 创建完整 INT32 输出，再以 float chunk scaling / conversion / concatenation 形成最终输出。仅卸载权重不能消除这些临时分配。安装的 `comfy_kitchen 0.2.31` 已有 fused Triton INT8 backend，但两种 GEMM 与逐行量化的 address arithmetic 使用 32 位 index。
+
+任务独立复制完整 package，只在 `backends/triton/quantization.py` 增加 **5 处 int64 address casts**：两个 GEMM 的 row/column offsets 共四处，rowwise quantizer 的 row index 一处。原文件 SHA-256 `caa360f0ada87c639d45b7d31017444ca71f60905a198c60520ec809c0beaeae`；patched SHA-256 `860943a6d090ed05e9d554a8db978a17dba96136db7bde4373f590f7d3573c3f`。48-file manifest SHA-256 `513e81a94de358ecc24e0c7c261cfd3f9e6e0c5f5f13f2d1597d18634f00fa7c`，其他 files 与已安装源相同。既有 supervisor 的 explicit Python path 使用任务 launcher；它先 rehash manifest / package / GPU proof，再 exec 原 Python 与已有 Triton flag。没有 dependency installation 或新的 Provider seam。
+
+`R5/kernel-verification.json` 为真实 RTX 5090 proof，所有 checks PASS：四组 BF16 / FP16 / F32、scalar/per-channel、bias/ConvRot/SwiGLU 小矩阵与原 Triton **exact equal**；与 eager 的 relative RMS 最大 0.002927，低于预设 0.02。大 QKV case `m=100032,n=21504,k=5376` 输出 2151088128 elements，跨 signed32 boundary，peak allocated 7385197568 bytes；大 quantizer case `m=400032,n=128,k=5376` 输入 2150572032 elements，peak allocated 11135618560 bytes。两者全行 finite，head/middle/tail 样本与 eager relative RMS=0。未运行会触发非法地址风险的原 kernel 大矩阵；样本检查不是全矩阵逐元素证明，也不是 actual 17 s model/quality acceptance。
+
+官方 [comfy-kitchen issue 136](https://github.com/Comfy-Org/comfy-kitchen/issues/136) 提供 MiniMax H3 QKV 32-bit output-index overflow 的独立问题报告；本任务另核对 rowwise quantizer 的 input-index boundary。该外部报告不能证明本任务 17 s 请求成功。
+
+受管 Kimi 本次是独立 kernel diagnosis，不是此前 implementation review 的第四轮。invocation `f0a1c36a-cbf7-4888-b0f5-fdeb9fa90542` 在 480 s wall budget 超时，classification `OUTCOME_UNKNOWN`，无可接受 terminal report；没有重试或采纳 partial output 为 review acceptance。sealed packet / route receipt 位于 `R5/kernel-packet/` 与 `kimi-kernel-run.json`。Parent 自行核对源码及 GPU proof，未把该诊断宣称为通过的独立 review。
+
+### Canonical Preparation And Actual Blocker
+
+新 caller-side finite budget提出两个新增 slots，其中仅一个 runtime repair，绑定旧 budget 与 unchanged approved executable bytes；不是有效的 durable quota extension。初次 `prepare` 被 `LOCAL_BATCH_REVIEW_REQUIRED` 拒绝。Parent 重开两次 terminal failure / experience / queue，补充 `R5/batch-review.json`，保留原 renewal budget started_at；没有新 media effects。之后 canonical decision 为 `GENERATE_ONCE`，compiled request hash `8d7f81290d092efec578df9aff4a411eda2de218b5d3b4c82cba451337758a4f`，canonical seed 1583761483；prompt、image/audio bindings、output 与 profile 均与前次一致。preflight PASS。
+
+`service.start` 注册了 `coco-nosha-attempt-03` prepared state / execution binding，但 `submit_local_once` 在 `_require_persisted_generation_limits` 拒绝 **同 task local_total_limit 2→4**。尚未写 local submit intent 或签发 permit，也没有 Provider job / 第三次 submit。源码同时明确 bare batch review hash 不能 reset durable local batch count；即便只把 caller limit 改为 3，仍缺 canonical renewal relationship。Parent 不改 task ID、清 history、编辑已有 binding 或直接 POST。`R5/canonical-submit-blocker.json` 重开 Manifest 证明原两个 failed attempts 有 submit receipts，新 prepared attempt 没有 intent/receipt；无 unknown video outcome。
+
+第二个 runtime-repair authorization 已在 sole committer 登记但未消费；Shot 最大 runtime repairs 仍为 2，其中旧 repair 已 consumed、新 grant unconsumed。后续不能 remint 同 evidence，不能把 prepared attempt 当 runtime failure；新执行必须遵循正式 recovery / renewal contract，不能复用旧 permit。
+
+待批准 [local renewal proposal](../superpowers/specs/2026-09-28-local-generation-budget-renewal.md) 缩小为**累计 ceiling 2→3，仅 1 次新增 submit**，同 task / used=2，不 reset batch；sole committer strict reopen、content-addressed renewal、atomic one-use consume，保持 runtime-repair cap、unknown fail-closed、local-only 与原成片要求。它是 `PROPOSED / NOT APPROVED / NOT IMPLEMENTED`，不是已恢复的执行能力。原 17 s 批准不覆盖新 persistent quota contract；下一步须批准该 scope 后 plan / implementation / verification / 适用 T3 review，不能再仅封存 caller JSON 就 submit。
+
+### Restoration, Acceptance And Learning
+
+仅停止 verified task-owned Triton unit `ai-video-comfyui-65878e01e36b4ec0b8b2f8ae5772ca71.service` / PID 702372，核对 queue empty 和未提交 prepared state 后恢复原 Python / `--lowvram --use-sage-attention`。当前 restored unit `ai-video-comfyui-d179ad6088ff43e9bff08c2f268e6e82.service`，PID 771248，InvocationID `197f71220fd34ed9b0ac621ca741bf14`；20:47 loopback HTTP 200、queue empty。见 `R5/service-restoration-health.json`；R4 ownership file 已更新。VLLM 未被本任务停止，无需启动；未知 graphics / exports 保留，已安装 comfy-kitchen 全部原 bytes 保持。
+
+没有 MP4，未调用 `video-analysis`、未观看/聆听成片，所有 creative / voice / full-watch findings 仍 `NOT_EVALUATED`；无 activation / P6 / Final Acceptance。隔离 kernel proof 只解决了一部分 deterministic uncertainty，实际模型显存、17 s 动作/声线质量仍未验证。
+
+本稳定 blocker 由 `record-ai-video-session` 更新同一 primary record，自动 `distill-ai-video-learning` 判 `no_candidate`：一个 kernel unit-validation chain 和未提交 preparation，不证明真实长视频 mitigation，也不满足新的独立媒体 pattern；旧两次不同 seed/mode OOM 保留其边界。现有 learning family search 无匹配 claim；Agent Memory 本任务已有 library-incompatible failure，不重试或 rebuild。本文保持 `session_summary / ineligible`，不制造独立实验或学习 placeholder。
+
+## Historical Snapshot — Host Recovery And Bounded Runtime Failure
 
 2026-09-28 18:33 +08:00 更新：旧窗口的 sandbox、素材未取得、固定 5.167 s profile 与 `.git` 只读状态均已被本节的实际宿主机证据替代。下文 `Selected COCO / Nosha Target And Inputs`、`Verified Preflight And Blocker`、`Recovery And Continuation Conditions` 及原记录扩写验证保留旧窗口历史；其中 submit 0、没有 sealed attempt、无法控制服务和无法 commit **不再是当前状态**。
 
@@ -92,9 +128,9 @@ known error / empty queue / unit InvocationID / PID ownership 核验后，已停
 | 第二轮参考图 | 6 次 image generation，5 张最终可用新参考；错误广告尾帧已排除，修正图未提交 |
 | 用户即梦画布 | 已取得 exact served 三图/声线；意外 composer chip 已恢复并 reload 验证；无画布生成 |
 | 当前用户目标 | 本地复刻 COCO/诺萨片段，保留角色、声线、完整因果链、正常速度与一镜到底 |
-| COCO/诺萨本地生成 | `LOCAL_GENERATION_BLOCKED_AFTER_BOUNDED_RUNTIME_REPAIR`；local submit 2，known OOM 2，MP4 0 |
+| COCO/诺萨本地生成 | `LOCAL_SUBMIT_CEILING_RENEWAL_UNIMPLEMENTED`；local submit 2，known OOM 2，MP4 0；第三个 prepared attempt 没有 intent/permit/submit |
 | 17 s engineering | `17aca10` local commit；265 focused PASS，12 policy commands PASS；无 canonical Harness receipt |
-| 最新综合记录 | 本轮更新实际宿主机/素材/profile/两次失败与健康恢复；旧 `.git` 只读已解除 |
+| 最新综合记录 | 本轮 isolated kernel GPU proof PASS；canonical quota 拒绝追加 submit；已恢复原服务，续期 proposal 待批准 |
 | Quality / Production / release | 未获 human full-speed acceptance、P6、Final Acceptance；无 push / release |
 
 ## Purpose And Scope
