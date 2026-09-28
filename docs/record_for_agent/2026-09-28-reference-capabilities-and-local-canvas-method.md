@@ -11,7 +11,35 @@ Session window: 2026-09-27–2026-09-29, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
+## Current Continuation — Fourth Physical Submit Failed At MLP Rotation
+
+2026-09-29 06:43 +08:00更新取代下方旧review/window/remaining-slot状态：**本目标实际local video submit4，全部known FAILED，MP4 0**。第7轮required targeted review已取得完整report并经Parent核验、裁决通过；一次已授权的window续期已执行，原第三grant由actual attempt-05消耗。现在的blocker是实际GPU MLP activation rotation OOM及本次唯一新增submit已用完，不再是review未完成、GPU不可见或local付费额度。没有attempt-06、第四grant、paid media、fetch、activation或Final Acceptance；prepared-only attempt-03的零side-effect历史保持。
+
+### Accepted Review And One-Time Window Renewal
+
+用户明确继续最多两轮review，第6轮`088c92aa-c8a9-4fb3-bec5-5de5be7aa92b`为TLS_ERROR/CONNECT、5.796 s、1 wire attempt、0 Reads、无report，保留其canonical receipt。两次连续无凭据TLS预检通过后，第7轮`ad2d2249-1979-45b0-9d60-1e13c4f8d095`最终**PARSED / 338.698 s / 2 wire requests**，实际authenticated endpoint identity为k3/max；qualified Docker route、seal `0d44bbe41b4b75ab42ec87543ef11edae3c403ad8a25e719c87f1fdc97dab991`、所有artifact hashes及三份完整Read均核验。Report SHA-256 `fc57bd3e131bc658a9fad9f00423764c82f7fd1663f409e5ef0c6fa7b0322609`未发现blocking candidate。Parent以原budget exact hash/fields、一次续期absence check和durable ordering关闭两项evidence questions；proposal中的historical additional_review_rounds=1不被当作第8轮权限，remaining review rounds记录为0。证据`R8/review-round-7-receipt.json`、`review-round-7-adjudication.json`、`review-acceptance.json`。Review只覆盖guard/recovery/window，初始共享实现与kernel审查独立保留，不产生media acceptance。
+
+续期在`2026-09-28T22:40:04.960999+00:00`执行前，通过canonical loader确认Manifest28、actual submitted3均FAILED、第三grant未消耗及no attempt05。保存原budget exact bytes（SHA-256 `74c5efa98ee983ca8d1481f2da9054df9199951b4de5c51c5c6c25a00aaa0c42`），保持started_at `2026-09-28T18:40:58.266294+00:00`及其余所有fields，只将elapsed ceiling7200改为21546，对应操作时刻加7200 s。原/new hashes、review/report/Parent identity与count3先落`R8/continuation-window-renewal.json`，再same-directory atomic replace并核验；new budget SHA-256 `b7da06064d00ccb3bcbb3b94992360e2981ca60409aa07a9926927b74c592410`。没有reset/remint或重复续期；budget中的used3是sealed pre-submit历史，current count4以Manifest为准。
+
+### Actual GPU Attempt And New Failure Boundary
+
+Fresh RTX 5090预检总32607 MiB、free23366 MiB，own service/loopback/queue empty。通过supervisor只切换verified idle own unit，新temporary unit `ai-video-comfyui-e49df81101f744ac80ee693e00662bf1.service`、PID1585842、InvocationID `441a9b1ca2c94b76bce2cbf06b2d2975`，原Python3.13、NORMAL_VRAM、Sage及verified LoRA/Triton overlay；无lowvram/novram/cpu/gpu-only。完整runtime hashes与activation-PID验证后，调用原`recover_pre_submit.py`重开existing grant并沿canonical seam签发new exact intent/one-use permit；不运行会remint的main。
+
+`coco-nosha-attempt-05`于**22:42:52.911690 UTC**实际submit，prompt **e5d7d03a-a1f7-47c9-b26e-6ceb7320ce48**，resolved hash **04e4e80b590f37c55b8aad0b32a298a02660e56869f3c1a632f1f45852b67989**。完整prompt、三图/voice bindings、17 s output、V3 profile均与actual attempt-04相同，canonical fresh repair seed1583761483→1583761484；`R8/attempt-05/control-comparison.json`保存对比。Comfy实际执行**38.69 s**后known OOM，canonical observation于22:43:32.998689 UTC记录FAILED；没有MP4，不能调用不存在素材的media Gate或声称观看/聆听。
+
+本次trace落在`comfy/ldm/minimax/model.py:183`的`MLP.forward -> comfy.ops.linear_input_act -> comfy_kitchen.backends.triton.quantization.int8_linear -> tensor.int8_utils._rotate_activation:72 -> torch.matmul(x_grouped,h)`；与上次LoRA up-projection分配失败的位置不同。服务自身memory summary记录peak allocated19157 MiB、peak reserved21952 MiB、失败时allocated16424 MiB；不将reserved当actual allocated，也不凭该表推导全机同时peak、错误tensor实测shape或GPU utilization。源码显示fc1完整输出、SwiGLU和旋转物化属于MLP路径；仅给旋转分块但保留完整中间结果不自动证明整体peak可承受。候选下一方向是整个MLP按独立token rows处理，仍须独立验证数值和显存；当前未实施或验证，不把到达更后方OOM当完整LoRA/model equivalence。证据`R8/attempt-05/comfy-terminal-evidence.json`及`service-journal-tail.txt`。
+
+### Canonical Terminal State And Restoration
+
+标准loader重开Manifest **33**、actual submits4均FAILED、3份runtime-repair grants全部consumed、attempt05 latest observation存在且fetch receipt为空；experience `ad4688691d40dcea336dc2d9f4273d6c8c7ad24b9f905cac9a2a9a42b25f5a63`为runtime_failure。`R8/attempt-05/terminal-state-audit.json`保存remaining submit0/MP4 0；不用prepared-only03或sealed budget pre-count制造额外slot。
+
+known terminal/empty queue及exact unit/InvocationID核验后恢复原GPU默认服务：`ai-video-comfyui-95d7a154556348f5831e2159ba7b887b.service`、PID **1643363**、InvocationID `b2e6779e2a0b4cb1a97706043653ca84`，active/loopback healthy/queue empty，原Python/Sage、无temporary overlay/Triton/lowvram/novram/cpu/gpu-only。旧ownership/restoration证据独立保留，见`R8/service-restoration-health.json`。Jianji/未知任务未停止；VLLM原本inactive，未停止且无需启动。用户新增Repeated Kimi Failure Fallback规则已读取；本轮7已有完整可用输出，无需追加重复native review，后续命中连续故障时按该规则接手。
+
+下一最小条件见[pending第四runtime repair提案](../superpowers/specs/2026-09-29-coco-nosha-fourth-runtime-repair.md)：先验证完整MLP allocation mitigation，再按sole committer扩展exact local repair ceiling3→4及仅一个新增physical slot，保留default2、全部旧receipt/hash/history和17 s原要求。提案尚未批准/实现，不授权新submit、再次clock续期或绕过Gate。按`record-ai-video-session`记录此真实blocker；自动`distill-ai-video-learning`为`no_candidate`：新MLP failure只有一个完整model attempt，未形成isolated multi-arm/full-model mitigation或既有claim更新，kernel对照不外推media结论。未刷新RAG、未创建claim；记录过程无额外Provider/media/network动作。Git保持local-only，无push/release，unrelated `.codex/config.toml`保留。
+
 ## Current Continuation — Third Repair Implemented, Pre-Submit Recovery Review Blocked
+
+以下为截至05:46 +08:00的历史checkpoint；当前状态由上节替代。
 
 2026-09-29 continuation：用户批准第三份exact local runtime repair后，共享契约已实现并提交`c959456`，真实第三份grant已登记但未消耗；**累计local video submit仍3、MP4 0**。用户在解释review及expired window两个继续条件后回复“继续”，批准一轮新增review及review通过后一次同slot7200 s extension，已落在spec/plan amendment与`f9fde46`。第5轮现已执行，**TLS_ERROR / CONNECT / 5.946 s / 1 wire attempt / 0 Reads**，无terminal report；required review仍blocked、未启动第6轮。原budget未改、续期未激活，Manifest revision28、没有attempt-05或新intent。不是GPU不可用或local付费quota；新Kimi maximum policy已生效，但不能解决实测间歇性TLS失败。
 
