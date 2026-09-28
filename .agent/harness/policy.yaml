@@ -253,7 +253,7 @@ checks:
     cwd: .
     description: Verify image contracts, local adapter, truthful import, activation, and recovery.
   production_video_provider_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_budget_extension.py, tests/test_production_paid_submit_quota.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_video_pre_generation.py, tests/test_production_ecommerce_shot_candidate_gate.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_shot_continuity_source_review.py, tests/test_shot_continuity_source_operator.py, tests/test_shot_continuity_source_transport.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_budget_extension.py, tests/test_production_paid_submit_quota.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_video_pre_generation.py, tests/test_production_ecommerce_shot_candidate_gate.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_comfy_t8_native_long_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_shot_continuity_source_review.py, tests/test_shot_continuity_source_operator.py, tests/test_shot_continuity_source_transport.py, -q]
     cwd: .
     covered_by_check_ids: [production_contract_tests]
     description: Verify paid-provider safety and generated-video contracts without live submit.
@@ -292,7 +292,7 @@ checks:
     cwd: .
     description: Verify provider-neutral Video Planner proposals and Main Agent STOP semantics.
   provider_neutral_video_requirement_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_video_requirement.py, tests/test_production_video_intent_validation.py, tests/test_production_h3_prompt.py, tests/test_planning_video_planner.py, tests/test_production_shot_router.py, tests/test_production_video_fake.py, tests/test_production_provider_neutral_adapters.py, tests/test_production_video.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_video_requirement.py, tests/test_production_reference_projection.py, tests/test_production_video_intent_validation.py, tests/test_production_h3_prompt.py, tests/test_planning_video_planner.py, tests/test_production_shot_router.py, tests/test_production_video_fake.py, tests/test_production_provider_neutral_adapters.py, tests/test_production_video.py, -q]
     cwd: .
     description: Verify the sealed neutral requirement, Router binding, adapter compiler result, and lifecycle lineage.
   shot_readiness_gate_tests:
@@ -952,6 +952,9 @@ categories:
       - workflows/bindings/minimax_h3_t8_*_turbo_native_v2*
       - workflows/profiles/minimax_h3_t8_*_turbo_native_v2*
       - workflows/templates/minimax_h3_t8_*_turbo_native_v2*
+      - workflows/bindings/minimax_h3_t8_ref2va_turbo_native_17s_v3*
+      - workflows/profiles/minimax_h3_t8_ref2va_turbo_native_17s_v3*
+      - workflows/templates/minimax_h3_t8_ref2va_turbo_native_17s_v3*
       - src/ai_video/production/minimax_h3.py
       - src/ai_video/production/minimax_hailuo.py
       - src/ai_video/production/vidu.py
@@ -1046,6 +1049,7 @@ categories:
       - tests/test_production_comfy_t8_video.py
       - tests/test_production_comfy_t8_turbo_video.py
       - tests/test_production_comfy_t8_native_turbo_video.py
+      - tests/test_production_comfy_t8_native_long_video.py
       - tests/test_production_local_h3_provider_family.py
       - tests/test_shot_continuity_m0_caller.py
       - tests/test_shot_continuity_m0_feasibility.py
@@ -1109,6 +1113,7 @@ categories:
       - src/ai_video/production/_video_requirement_routing.py
       - src/ai_video/production/video_compiler.py
       - tests/test_production_video_requirement.py
+      - tests/test_production_reference_projection.py
       - tests/test_production_video_intent_validation.py
       - tests/test_production_h3_prompt.py
       - tests/test_production_provider_neutral_adapters.py

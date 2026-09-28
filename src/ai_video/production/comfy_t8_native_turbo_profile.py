@@ -204,6 +204,23 @@ class T8NativeTurboBinding(StrictModel):
         return self
 
 
+class T8NativeTurboLongBinding(T8NativeTurboBinding):
+    output_duration: tuple[str | int, ...]
+    output_trim_node_id: Literal["13"]
+
+    @model_validator(mode="after")
+    def _long_paths(self) -> "T8NativeTurboLongBinding":
+        if (
+            self.length != ("6", "inputs", "length")
+            or self.output_duration != ("13", "inputs", "duration_seconds")
+            or self.conditioning_node_id != "6"
+            or self.output_node_id != "12"
+            or self.dynamic_node_start != 14
+        ):
+            raise ValueError("long binding must preserve sampling and output owners")
+        return self
+
+
 class T8NativeTurboExecutionProfile(StrictModel):
     schema_version: Literal["2"]
     capability_id: str = Field(min_length=1)
@@ -271,6 +288,9 @@ class T8NativeTurboExecutionProfile(StrictModel):
     max_reference_audio_bytes: int = Field(strict=True, gt=0)
     profile_content_hash: str = Field(pattern=_SHA256)
 
+    def _canonical_identity(self) -> tuple[str, ...]:
+        return _TASK_IDENTITIES[self.task_type]
+
     @field_validator("workflow_path", "binding_path")
     @classmethod
     def _relative(cls, value: Path) -> Path:
@@ -296,7 +316,7 @@ class T8NativeTurboExecutionProfile(StrictModel):
             self.neutral_mode,
             self.provider_mode,
         )
-        if identity != _TASK_IDENTITIES[self.task_type]:
+        if identity != self._canonical_identity():
             raise ValueError("profile task identity is not canonical")
         component_roles = tuple(item.role for item in self.components)
         if self.task_type == "Ref2VA":
@@ -380,6 +400,32 @@ class T8NativeTurboExecutionProfile(StrictModel):
             provisional.model_dump(mode="json", exclude={"profile_content_hash"})
         )
         return cls.model_validate(data)
+
+
+class T8NativeTurboLongExecutionProfile(T8NativeTurboExecutionProfile):
+    """Explicit 17s output; one 413-frame sample with trailing padding removed."""
+
+    schema_version: Literal["3"]
+    profile_version: Literal["v3"]
+    task_type: Literal["Ref2VA"]
+    frame_count: Literal[408]
+    sampling_frame_count: Literal[413]
+
+    def _canonical_identity(self) -> tuple[str, ...]:
+        return (
+            "minimax-h3-t8-ref2va-turbo-native-17s-v3",
+            "minimax_h3_t8_ref2va_turbo_native_17s",
+            "minimax-h3-t8-ref2va-turbo-native-17s",
+            "minimax_h3_t8_ref2va_turbo_native_17s_v3_local",
+            "reference_to_video",
+            "reference_to_video",
+        )
+
+    @model_validator(mode="after")
+    def _long_output(self) -> "T8NativeTurboLongExecutionProfile":
+        if "MiniMaxH3OutputTrimT8" not in self.required_nodes:
+            raise ValueError("long profile requires sealed joint AV output trim")
+        return self
 
 
 def _expected_lora_tensor_shapes() -> dict[str, tuple[int, ...]]:
@@ -484,7 +530,13 @@ def node_schema_seals(
 
 def load_t8_native_turbo_binding(payload: bytes) -> T8NativeTurboBinding:
     try:
-        return T8NativeTurboBinding.model_validate(yaml.safe_load(payload))
+        values = yaml.safe_load(payload)
+        binding_type = (
+            T8NativeTurboLongBinding
+            if isinstance(values, dict) and "output_trim_node_id" in values
+            else T8NativeTurboBinding
+        )
+        return binding_type.model_validate(values)
     except (UnicodeError, ValueError, yaml.YAMLError) as exc:
         raise _invalid("T8-native Turbo V2 binding is invalid.", str(exc)) from exc
 
@@ -509,6 +561,26 @@ def validate_native_turbo_workflow(
     sampler = workflow["7"]["inputs"]
     lora = workflow["2"]["inputs"]
     output = workflow[binding.output_node_id]["inputs"]
+    is_long = isinstance(profile, T8NativeTurboLongExecutionProfile)
+    if is_long != isinstance(binding, T8NativeTurboLongBinding):
+        raise _invalid("Profile and binding output contracts do not match.")
+    output_source = "13" if is_long else "11"
+    if is_long:
+        trim = workflow.get("13", {})
+        if (
+            classes.count("MiniMaxH3OutputTrimT8") != 1
+            or classes.count("SamplerCustomAdvanced") != 1
+            or workflow.get("11", {}).get("class_type") != "MiniMaxH3AVDecodeT8"
+            or trim.get("class_type") != "MiniMaxH3OutputTrimT8"
+            or trim.get("inputs") != {
+                "frames": ["11", 0], "audio": ["11", 1],
+                "start_seconds": 0.0, "duration_seconds": 17.0, "fps": 24.0,
+            }
+            or conditioning.get("length") != profile.sampling_frame_count
+            or conditioning.get("width") != profile.width
+            or conditioning.get("height") != profile.height
+        ):
+            raise _invalid("Long native output must remove only trailing AV padding.")
     unet = workflow["1"]["inputs"].get("unet_name")
     media_keys = {
         "first_frame",
@@ -544,8 +616,8 @@ def validate_native_turbo_workflow(
         or sampler.get("shift_audio") != profile.shift_audio
         or sampler.get("sampler_name") != profile.sampler
         or sampler.get("scheduler") != profile.scheduler
-        or output.get("images") != ["11", 0]
-        or output.get("audio") != ["11", 1]
+        or output.get("images") != [output_source, 0]
+        or output.get("audio") != [output_source, 1]
         or output.get("frame_rate") != float(profile.fps)
         or output.get("format") != "video/h264-mp4"
         or output.get("pix_fmt") != "yuv420p"
@@ -572,7 +644,12 @@ def load_t8_native_turbo_execution_profile(
         payload = json.loads(Path(path).read_bytes())
         if not isinstance(payload, dict):
             raise ValueError("profile payload must be a JSON object")
-        profile = T8NativeTurboExecutionProfile.model_validate(payload)
+        profile_type = (
+            T8NativeTurboLongExecutionProfile
+            if payload.get("schema_version") == "3"
+            else T8NativeTurboExecutionProfile
+        )
+        profile = profile_type.model_validate(payload)
     except (OSError, ValueError) as exc:
         raise _invalid("T8-native Turbo V2 profile is invalid.", str(exc)) from exc
     root = Path(artifact_root).resolve(strict=True)
@@ -593,8 +670,10 @@ def load_t8_native_turbo_execution_profile(
 
 __all__ = [
     "T8NativeTurboBinding",
+    "T8NativeTurboLongBinding",
     "T8NativeTurboComponent",
     "T8NativeTurboExecutionProfile",
+    "T8NativeTurboLongExecutionProfile",
     "T8NativeTurboLoraSeal",
     "T8NativeTurboNodeSchemaSeal",
     "T8NativeTurboRuntimeInspection",

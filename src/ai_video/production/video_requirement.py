@@ -802,21 +802,38 @@ class ProviderNeutralGenerationIntentProjection(StrictModel):
             raise ValueError(
                 "text-to-video generation cannot carry media reference roles or assets"
             )
+        reference_only = (
+            self.generation_operation in {
+                GenerationOperation.VIDEO_EDIT, GenerationOperation.VIDEO_EXTEND,
+            }
+            or (
+                self.generation_operation is GenerationOperation.AUTO
+                and bool(self.semantic_reference_roles)
+                and not set(self.semantic_reference_roles).intersection({
+                    SemanticReferenceRole.FIRST_FRAME,
+                    SemanticReferenceRole.LAST_FRAME,
+                    SemanticReferenceRole.CONTINUITY_TERMINAL,
+                    SemanticReferenceRole.APPROVED_ENDPOINT,
+                })
+            )
+        )
         if (
             self.generation_intent.primary_camera_motion is not None
             and self.conditioning_compatibility is None
             and self.generation_operation is not GenerationOperation.TEXT_TO_VIDEO
+            and not reference_only
         ):
             raise ValueError("rich generation intent requires conditioning compatibility")
         if (
             (
                 self.generation_intent.primary_camera_motion is None
                 or self.generation_operation is GenerationOperation.TEXT_TO_VIDEO
+                or reference_only
             )
             and self.conditioning_compatibility is not None
         ):
             raise ValueError(
-                "historical or text-to-video intent cannot carry conditioning compatibility"
+                "historical, text-to-video or reference-only intent cannot carry conditioning compatibility"
             )
         if self.generation_intent.primary_camera_motion is not None:
             from ai_video.production._video_intent_validation import (
@@ -833,7 +850,7 @@ class ProviderNeutralGenerationIntentProjection(StrictModel):
                     "projection requires complete rich generation intent: "
                     + ", ".join(diagnostics)
                 )
-            if self.generation_operation is not GenerationOperation.TEXT_TO_VIDEO:
+            if self.generation_operation is not GenerationOperation.TEXT_TO_VIDEO and not reference_only:
                 conditioning_diagnostics = validate_conditioning_compatibility(
                     self.conditioning_compatibility
                 )

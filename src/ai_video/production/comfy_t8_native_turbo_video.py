@@ -19,10 +19,13 @@ from ai_video.production.comfy_image import (
 from ai_video.production.comfy_t8_native_turbo_profile import (
     T8NativeTurboBinding,
     T8NativeTurboExecutionProfile,
+    T8NativeTurboLongBinding,
+    T8NativeTurboLongExecutionProfile,
     T8NativeTurboRuntimeInspection,
     load_t8_native_turbo_binding,
     node_schema_seals,
     validate_t8_native_turbo_lora,
+    validate_native_turbo_workflow,
 )
 from ai_video.production.comfy_t8_video import ComfyUIT8VideoProvider
 from ai_video.production._h3_prompt import H3PromptCompilation, compile_h3_prompt
@@ -195,8 +198,12 @@ def t8_native_turbo_capabilities(
         timing_modes=("frame_count",),
         frame_count_min=profile.frame_count,
         frame_count_max=profile.frame_count,
-        frame_count_step=17,
-        frame_count_remainder=5,
+        frame_count_step=(
+            1 if isinstance(profile, T8NativeTurboLongExecutionProfile) else 17
+        ),
+        frame_count_remainder=(
+            0 if isinstance(profile, T8NativeTurboLongExecutionProfile) else 5
+        ),
         dimension_modes=("exact",),
         min_width=profile.width,
         max_width=profile.width,
@@ -292,17 +299,33 @@ def render_t8_native_turbo_workflow(
         (binding.seed, request.effective_seed, "seed"),
         (binding.width, output.width, "width"),
         (binding.height, output.height, "height"),
-        (binding.length, output.frame_count, "length"),
+        (
+            binding.length,
+            getattr(profile, "sampling_frame_count", output.frame_count),
+            "length",
+        ),
         (binding.steps, profile.steps, "steps"),
         (binding.sampler, profile.sampler, "sampler"),
         (binding.scheduler, profile.scheduler, "scheduler"),
         (
             binding.output_prefix,
-            f"MiniMaxH3/ai_video_h3_t8_native_v2_{request.resolved_generation_hash[:16]}",
+            f"MiniMaxH3/ai_video_h3_t8_native_{profile.profile_version}_{request.resolved_generation_hash[:16]}",
             "output_prefix",
         ),
     ):
         _set_path(rendered, list(path), value, label)
+    if isinstance(profile, T8NativeTurboLongExecutionProfile):
+        if (
+            not isinstance(binding, T8NativeTurboLongBinding)
+            or output.frame_count != profile.frame_count
+        ):
+            raise _invalid("Long native output must match its exact output contract.")
+        _set_path(
+            rendered,
+            list(binding.output_duration),
+            output.frame_count / profile.fps,
+            "output_duration",
+        )
     if profile.task_type in {"I2VA", "FL2VA"}:
         frame_names = tuple(
             name
@@ -351,6 +374,51 @@ def render_t8_native_turbo_workflow(
                 conditioning[f"{group}.{prefix}_{ordinal}"] = [node_id, 0]
         conditioning.pop("ref_video_audios", None)
     return rendered
+
+
+def _long_reference_prompt(
+    prompt: H3PromptCompilation,
+    provider_bound: ProviderBoundVideoRequest,
+    requirement: ProviderNeutralVideoRequirement,
+) -> H3PromptCompilation:
+    """Name sealed references in the same ordinal order as request compilation."""
+    cues = []
+    images = sorted(
+        (asset for role, asset in zip(
+            provider_bound.binding_roles, provider_bound.input_assets, strict=True
+        ) if role == "reference"),
+        key=lambda asset: asset.asset_id,
+    )
+    for ordinal, asset in enumerate(images, 1):
+        owner = asset.canonical_owner_id
+        kind = asset.canonical_owner_kind or "visual"
+        cues.append(
+            f"<Picture {ordinal}> is the {kind} reference"
+            + (f" for {owner}." if owner is not None else ".")
+        )
+    audios = sorted(
+        (asset for role, asset in zip(
+            provider_bound.binding_roles, provider_bound.input_assets, strict=True
+        ) if role == "reference_audio"),
+        key=lambda asset: asset.asset_id,
+    )
+    dialogue = requirement.generation_intent.dialogue_intent
+    for ordinal, asset in enumerate(audios, 1):
+        if len(audios) == 1 and dialogue is not None and dialogue.mode == "dialogue":
+            cues.append(
+                f"Speaker 1 (S1), {dialogue.speaker_id}, preserves the voice, "
+                f"timbre and pitch range of <Audio {ordinal}>."
+            )
+        else:
+            cues.append(f"<Audio {ordinal}> is reference audio.")
+    if cues and "[Shot 1] " not in prompt.prompt_text:
+        raise _invalid("Native reference cues require the sealed Shot marker.")
+    text = prompt.prompt_text.replace("[Shot 1] ", "[Shot 1] " + " ".join(cues) + " ", 1)
+    return H3PromptCompilation(
+        prompt_text=text,
+        prompt_sha256=hashlib.sha256(text.encode("utf-8")).hexdigest(),
+        expressed_control_paths=prompt.expressed_control_paths,
+    )
 
 
 class ComfyUIT8NativeTurboVideoProvider(ComfyUIT8VideoProvider):
@@ -407,6 +475,8 @@ class ComfyUIT8NativeTurboVideoProvider(ComfyUIT8VideoProvider):
         )
         self._workflow = load_workflow_template(self._root / profile.workflow_path)
         self._binding = load_t8_native_turbo_binding(binding_payload)
+        if isinstance(profile, T8NativeTurboLongExecutionProfile):
+            validate_native_turbo_workflow(profile, self._workflow, self._binding)
         self._poll_interval_seconds = poll_interval_seconds
         self._timeout_seconds = timeout_seconds
 
@@ -431,7 +501,7 @@ class ComfyUIT8NativeTurboVideoProvider(ComfyUIT8VideoProvider):
             request.provider_name != _PROVIDER_NAME
             or request.provider_kind != capability.provider_kind
             or request.model_id != capability.model_id
-            or request.provider_profile.profile_version != "v2"
+            or request.provider_profile.profile_version != self.profile.profile_version
             or request.provider_profile.profile_sha256
             != self.profile.profile_content_hash
             or request.capability_id != capability.capability_id
@@ -457,6 +527,8 @@ class ComfyUIT8NativeTurboVideoProvider(ComfyUIT8VideoProvider):
                     reason=ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
                     unsupported_field_paths=prompt.unsupported_field_paths,
                 )
+            if isinstance(self.profile, T8NativeTurboLongExecutionProfile):
+                prompt = _long_reference_prompt(prompt, provider_bound, requirement)
             native_prompt = ProviderNativePrompt(
                 grammar_contract="h3-three-field-v1",
                 prompt_text=prompt.prompt_text,
@@ -467,7 +539,7 @@ class ComfyUIT8NativeTurboVideoProvider(ComfyUIT8VideoProvider):
             provider_bound=provider_bound,
             requirement=requirement,
             compiler_id=_COMPILER_ID,
-            compiler_version="2",
+            compiler_version=self.profile.schema_version,
             capabilities=self.capabilities(),
             native_prompt=native_prompt,
         )
@@ -481,7 +553,7 @@ class ComfyUIT8NativeTurboVideoProvider(ComfyUIT8VideoProvider):
             request.provider_name != _PROVIDER_NAME
             or request.provider_kind != capability.provider_kind
             or request.model_id != capability.model_id
-            or request.provider_profile.profile_version != "v2"
+            or request.provider_profile.profile_version != self.profile.profile_version
             or request.provider_profile.profile_sha256
             != self.profile.profile_content_hash
             or request.mode is not capability.mode
