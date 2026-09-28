@@ -13,7 +13,7 @@ Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef
 
 ## Current Continuation — Third Repair Implemented, Pre-Submit Recovery Review Blocked
 
-2026-09-29 continuation：用户批准第三份exact local runtime repair后，共享契约已实现并提交`c959456`，真实第三份grant已登记但未消耗；**累计local video submit仍3、MP4 0**。当前blocker为`REVIEW_ESCALATION_REQUIRED`：task wrapper的known pre-submit correction需targeted re-review，原三轮耗尽后，用户明确“允许”追加一轮；第4轮也在报告返回期间连接中断，没有可采纳terminal report。不是GPU不可用、不是local付费quota、不是新增媒体outcome unknown；本轮没有attempt-05或新的submit intent。追加的一轮已经执行，没有擅自启动第5轮。
+2026-09-29 continuation：用户批准第三份exact local runtime repair后，共享契约已实现并提交`c959456`，真实第三份grant已登记但未消耗；**累计local video submit仍3、MP4 0**。当前blocker为`REVIEW_ESCALATION_REQUIRED`：task wrapper的known pre-submit correction需targeted re-review，原三轮耗尽后，用户明确“允许”追加一轮；第4轮也在报告返回期间连接中断，没有可采纳terminal report。不是GPU不可用、不是local付费quota、不是新增媒体outcome unknown；本轮没有attempt-05或新的submit intent。用户随后表示修复已完成；2026-09-29 05:14 +08:00起的本地核对确认新Kimi maximum sizing policy已在active installation生效，但没有执行第5轮或取得新report，原7200 s生成window也已到期。
 
 本节`R8`为`runs/coco-nosha-lora-memory-20260929-001/`。traceback定位QKV `LoRAAdapter.h`的完整up output，在base output已存在时分配；原profile的518个converted LoRA tensors均2D，ranks16/64，QKV down64×5376/up21504×64。重hash文件与profile pinned SHA-256 `5b8ad6cb7ac206852006f4efa3ce2d679cd6ffb5d5b8a4edce8e981393289df5`一致。failure没有实测tensor shape，因此以下large case是代表性kernel验证，不冒充原失败的exact shape。
 
@@ -42,6 +42,14 @@ Parent将task wrapper guard限定为actual local intent/receipt，提交/fetch b
 Review round2 `f91b18c7-c058-4132-ab6c-4459d346df29` full Read，**UPSTREAM_GENERATION_LIMIT / 253.985 s / 2 requests**，8192 cap耗尽，无可采纳report；调查后最终round3采用已成功的16000 cap/480 s、同一小scope。Round3 `5c9507a8-5e67-4d5c-8573-4615f71cc9f6` full Read，**OUTCOME_UNKNOWN / 363.308 s / 2 requests**，第二个wire request `CONNECTION_ERROR / RESPONSE_BODY`、无terminal report。没有采纳partial输出或启动第四轮；`R8/review-acceptance.json`已设parent_accepted/required_review_complete=false，保存first acceptance单独历史。按`SUBAGENTS.md`三轮规则标`REVIEW_ESCALATION_REQUIRED`并请求明确追加1轮审查；此处external review unknown不改写三次local video known FAILED。
 
 ### Restored Runtime And Actual Delivery Boundary
+
+#### Active Maximum Policy Check — 2026-09-29 05:14 +08:00
+
+用户“现在修复了,你看看”后，Parent只读核对global router安装、当前task文件和最近receipts，没有改动router工作树。Router source checkpoint `bb5f619`落实`kimi-maximum-v1`；其`223da83`记录中的installation blocked是历史状态，当前active entry关键source/Skill hashes已与新policy一致。Project-local原review acceptance仍false，未出现本目标新terminal report；其他任务的receipt不能替代本目标review。
+
+本地`subagent doctor --backend kimi`的Docker/native containment检查通过，`live_identity=NOT_EVALUATED`。随后只执行`inspect`，没有`run`：`R8/resource-policy-inspection.json`保存seal **170dc72bc9594c6f8fc89e8afc60c086d0e234ea0a2434a9dac17b500bbd85e4**，effective route deep/k3[1m]/max、context1048576 tokens，generation32000、wall3600 s、idle1800 s、request_limit64、output16777216 bytes、context8388608 bytes；`resource_policy`明示原480/240/3/16000等低额度输入。CLI实测证明新seal采用最高有限资源，不修改旧seal、不消耗第5轮，也不证明先前`CONNECTION_ERROR / RESPONSE_BODY`已经修复或required review完成。新增真实Provider requests和video submits均0。
+
+原`experiment-budget.json`的started_at `2026-09-28T18:40:58.266294+00:00`和elapsed ceiling7200 s未改；本轮首个时间观察为`2026-09-28T21:14:07.675611+00:00`，旧window已于`20:40:58.266294 UTC`到期。保留同一task/Shot、3次实际FAILED、原第三grant未消耗和remaining physical slot1。若继续，需适用授权下的新增有限review round及可审计window extension；不得重置started_at、旧history或grant、借新task逃避边界，也不得把maximum requests64视为64轮review。用户本次“看看”没有被解释为扩大review round或重置generation window。该检查仅确认安装/封存行为，无新的full-model或媒体证明；自动learning evaluation仍`no_candidate`。
 
 #### Authorized Fourth Review — 2026-09-29 03:19 +08:00
 
