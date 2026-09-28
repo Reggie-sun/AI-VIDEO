@@ -42,3 +42,9 @@ Self-review：本契约不把local quota与runtime-repair cap混为一谈；不�
 原budget exact bytes必须独立保存；一次续期evidence先记录original/new budget hashes、原/new ceiling、固定started_at、authorized7200 s extension、exact task/Shot/grant/review identity、Manifest revision和count3，然后通过same-directory atomic replace更新task budget。存在续期evidence或old-budget/hash/state不符即拒绝重复执行，不删除旧证据或补造permit。崩溃造成receipt/budget不一致时禁止media side effect，须按exact hashes显式恢复。此操作不写Production Manifest、不新增grant/intent、不会改写旧sealed review，也不改变canonical writer、unknown recovery、QA/activation或17 s frozen output。
 
 Self-review：expired clock与local/unmetered额度分开；只续期尚未提交的同一slot，保留原clock与已耗时，不更名task逃避history。Required review未通过前无budget activation或media submit；本次“继续”不授权更多生成、付费媒体fallback、无限review或再次续期。
+
+## Additional Review Authority — Rounds 6 And 7
+
+第5轮TLS失败后，Parent明确询问“是否允许最多再2轮审查，通过后继续原1次17秒GPU生成”，用户回复“继续”。本次授权限第6、7轮，任一取得有效完整report并由Parent解决blocking findings后停止追加review；required latest review可为第6或7轮，取代上节仅第5轮的时间条件。每轮live前先执行有限、无凭据且保持certificate validation的同broker路径TLS检查；preflight零request refusal不计round，已发出wire attempt的TLS/transport/unknown照计。不自动启动第8轮，global maximum sizing不扩大该轮数。
+
+唯一physical submit、原未消耗grant、原started_at/history和一次7200 s window extension继续沿上节契约；不重复请求既有window授权，不重复续期，不减少17 s要求，不放宽unknown、permit、scope或media Gate。

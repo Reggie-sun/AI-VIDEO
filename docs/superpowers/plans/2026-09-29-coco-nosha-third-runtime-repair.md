@@ -47,3 +47,9 @@ receipt version兼容通过conditional serializer而非改旧bytes；新module�
 4. **Terminal Artifact Or Blocker**：known terminal后恢复本任务临时切换服务并验证健康；unknown不重提、不杀未知prompt。实际MP4必须video-analysis及完整观看/聆听、逐项frozen Gate，否则如实保留NOT_EVALUATED。按session record/learning routing保存新状态与task-owned commit，unrelated dirty保留。
 
 Self-review：本次新增的是task-local finite window activation，不改变receipt/schema/CLI或共享owner；review input显式包含续期contract，避免审完后追加未审scope。原window、3次失败、prepared-only03及第三grant均保留。只有review通过才续期，不让review耗时提前吃掉新的7200 s generation window；剩余physical submit仍1，无第五次physical submit授权。
+
+## Authorized Additional Review Execution
+
+用户在Parent明确提出最多2轮后回复“继续”，对应spec的Rounds 6 And 7授权。复用已恢复并qualified的task-local sandbox；每轮前重新核对pinned runtime/entry/image、zero-effect canonical state和无凭据TLS。Fresh minimum packet保留完整corrected wrapper、original ready source、AST/guard proof、原budget/third grant与一次window proposal；本次不改共享source或wrapper。按新maximum seal执行第6轮；只有outcome已核验且确有必要时使用第7轮，不机械追求模型一致，不启动第8轮。
+
+其余milestones按上节原样执行，required latest review限定第6或7轮。通过后一次clock extension、exact owned idle service transition、原 `recover_pre_submit.py` 与canonical单次submit衔接；不是先续期再等待review。Known terminal恢复任务临时切换服务，未知outcome保持证据并停止。Self-review：新增2轮仅解锁明确耗尽的审查预算，不增加video slot、grant或window次数；没有新Product writer/schema或新媒体方案。
