@@ -28,7 +28,7 @@ def _limits(**updates):
     return ExecutionLimits(**values)
 
 
-def _binding(*, limits, policy, shot_id="guard-shot"):
+def _binding(*, limits, policy, shot_id="guard-shot", execution_kind="local", billing_kind="local_unmetered"):
     candidate = SimpleNamespace(
         candidate_id="local-candidate",
         capability_id="local-capability",
@@ -36,7 +36,8 @@ def _binding(*, limits, policy, shot_id="guard-shot"):
             variants=(
                 SimpleNamespace(
                     capability_id="local-capability",
-                    execution_kind=SimpleNamespace(value="local"),
+                    execution_kind=SimpleNamespace(value=execution_kind),
+                    billing_kind=SimpleNamespace(value=billing_kind),
                 ),
             )
         ),
@@ -164,6 +165,52 @@ def test_durable_local_submit_count_cannot_be_reset_by_input_projection() -> Non
         committer._require_persisted_generation_limits(
             manifest, current_state, current
         )
+
+
+@pytest.mark.parametrize("total_limit", [None, 3])
+def test_local_unmetered_can_continue_with_a_new_finite_batch(total_limit):
+    previous = _binding(limits=_limits(local_batch_limit=1, local_total_limit=1), policy=DecisionPolicy())
+    current = _binding(limits=_limits(local_batch_limit=2, local_batch_used=1,
+        local_total_limit=total_limit, local_total_used=1), policy=DecisionPolicy())
+    prior = _attempt(attempt_id="old", binding="previous", request="old-request", local_submit=True)
+    committer = _Committer({"previous": previous}, {"old-request": _request()})
+    committer._require_persisted_generation_limits(
+        SimpleNamespace(attempts=(prior,)), SimpleNamespace(generation_id="new"), current)
+
+
+@pytest.mark.parametrize("execution_kind,billing_kind", [("remote", "metered"), ("local", "metered")])
+def test_metered_or_remote_cannot_expand_persisted_local_limits(execution_kind, billing_kind):
+    previous = _binding(limits=_limits(local_batch_limit=1), policy=DecisionPolicy())
+    current = _binding(limits=_limits(local_batch_limit=2), policy=DecisionPolicy(),
+        execution_kind=execution_kind, billing_kind=billing_kind)
+    prior = _attempt(attempt_id="old", binding="previous", request="old-request")
+    committer = _Committer({"previous": previous}, {"old-request": _request()})
+    with pytest.raises(AiVideoError, match="ceilings cannot expand"):
+        committer._require_persisted_generation_limits(
+            SimpleNamespace(attempts=(prior,)), SimpleNamespace(generation_id="new"), current)
+
+
+def test_local_unmetered_continuation_does_not_expand_paid_quota():
+    previous = _binding(limits=_limits(paid_submit_ceiling=1), policy=DecisionPolicy())
+    current = _binding(limits=_limits(paid_submit_ceiling=2), policy=DecisionPolicy())
+    prior = _attempt(attempt_id="old", binding="previous", request="old-request")
+    committer = _Committer({"previous": previous}, {"old-request": _request()})
+    with pytest.raises(AiVideoError, match="ceilings cannot expand"):
+        committer._require_persisted_generation_limits(
+            SimpleNamespace(attempts=(prior,)), SimpleNamespace(generation_id="new"), current)
+
+
+@pytest.mark.parametrize("limit", ["batch", "total"])
+def test_local_unmetered_still_respects_current_finite_limit(limit):
+    updates = {"local_total_limit": None, "local_batch_limit": 1} if limit == "batch" else {
+        "local_total_limit": 1, "local_batch_limit": 2}
+    previous = _binding(limits=_limits(), policy=DecisionPolicy())
+    current = _binding(limits=_limits(local_batch_used=1, local_total_used=1, **updates), policy=DecisionPolicy())
+    prior = _attempt(attempt_id="old", binding="previous", request="old-request", local_submit=True)
+    committer = _Committer({"previous": previous}, {"old-request": _request()})
+    with pytest.raises(AiVideoError, match="local submit limit is exhausted"):
+        committer._require_persisted_generation_limits(
+            SimpleNamespace(attempts=(prior,)), SimpleNamespace(generation_id="new"), current)
 
 
 @pytest.mark.parametrize("task_id", ["guard-task", "new-task-name"])

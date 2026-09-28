@@ -244,6 +244,29 @@ def test_runtime_repair_budget_is_per_shot(tmp_path):
             attempt_id="repair-budget-3", repair_basis=REPAIR_BASIS, actor=ACTOR)
 
 
+def test_local_unmetered_new_batch_keeps_history_and_one_use_runtime_grant(tmp_path):
+    provider, committer, caller, service, limits, sequence = _orchestrator(
+        tmp_path, status_state=VideoTaskState.FAILED)
+    initial = limits.model_copy(update={"local_batch_limit": 1, "local_total_limit": 1})
+    _fail_attempt(committer=committer, caller=caller, service=service, limits=initial,
+        sequence=sequence, number=0, attempt_id="unmetered-initial")
+    pointer = committer.record_runtime_repair_authorization(
+        attempt_id="unmetered-initial", repair_basis=REPAIR_BASIS, actor=ACTOR)
+    sequence[0] = 1
+    continued = initial.model_copy(update={"local_batch_limit": 2, "local_total_limit": None})
+    prepared = caller.start(committer=committer, attempt_id="unmetered-continued", limits=continued)
+    assert prepared.inputs.limits.local_total_used == prepared.inputs.limits.local_batch_used == 1
+    assert prepared.decision.runtime_repair.evidence_hash == pointer.evidence_hash
+    provider.status_state = VideoTaskState.SUCCEEDED
+    service.submit_local_once(attempt_id="unmetered-continued")
+    assert service.refresh_local_once(attempt_id="unmetered-continued").state is VideoTaskState.SUCCEEDED
+    assert _attempt(committer, "unmetered-initial").video_generation_state.runtime_repairs[0].consumed
+    assert provider.submit_calls == 2
+    with pytest.raises(AiVideoError):
+        service.submit_local_once(attempt_id="unmetered-continued")
+    assert provider.submit_calls == 2
+
+
 def test_earlier_quality_failure_does_not_block_runtime_repair_for_runtime_failure():
     """`diagnosis` is computed per-latest-attempt via `diagnose_exact_result`,
     which early-returns when `latest.outcome != "media"`. A previous

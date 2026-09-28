@@ -489,10 +489,18 @@ class _StateCommitVideoMixin:
                 raise _state_invalid("Previous production component required findings are not all PASS.")
 
     def _require_persisted_generation_limits(self, manifest, state, binding) -> None:
-        """Use durable submits and prior bindings; caller limits may only tighten."""
+        """Retain durable counts; unmetered local batches are not paid quotas."""
 
         current_limits = binding.inputs.limits
         current_policy = binding.inputs.policy
+        variant = next(
+            item
+            for candidate in binding.inputs.candidates
+            if candidate.candidate_id == binding.decision.selected_candidate_id
+            for item in candidate.capabilities.variants
+            if item.capability_id == candidate.capability_id
+        )
+        local_unmetered = variant.execution_kind.value == "local" and variant.billing_kind.value == "local_unmetered"
         from ai_video.production.production_strategy_reader import production_family_shot_ids
 
         loaded = self._load_production_project(self._project_root / "project.yaml")
@@ -564,15 +572,17 @@ class _StateCommitVideoMixin:
                     current_limits.paid_submit_ceiling > prior_limits.paid_submit_ceiling
                     and not quota_raise_is_retained(prior_limits)
                 )
-                or current_limits.local_batch_limit > prior_limits.local_batch_limit
-                or (
-                    prior_limits.local_total_limit is not None
-                    and (
-                        current_limits.local_total_limit is None
-                        or current_limits.local_total_limit
-                        > prior_limits.local_total_limit
+                or (not local_unmetered and (
+                    current_limits.local_batch_limit > prior_limits.local_batch_limit
+                    or (
+                        prior_limits.local_total_limit is not None
+                        and (
+                            current_limits.local_total_limit is None
+                            or current_limits.local_total_limit
+                            > prior_limits.local_total_limit
+                        )
                     )
-                )
+                ))
             ):
                 raise _state_invalid(
                     "Generation submit ceilings cannot expand within one task."
@@ -588,16 +598,6 @@ class _StateCommitVideoMixin:
             raise _state_invalid(
                 "Generation submit counters are below durable submit receipts."
             )
-        selected = next(
-            candidate
-            for candidate in binding.inputs.candidates
-            if candidate.candidate_id == binding.decision.selected_candidate_id
-        )
-        variant = next(
-            item
-            for item in selected.capabilities.variants
-            if item.capability_id == selected.capability_id
-        )
         if variant.execution_kind.value == "remote":
             if len(submitted["remote"]) >= current_limits.paid_submit_ceiling:
                 raise _state_invalid("Durable paid submit ceiling is exhausted.")

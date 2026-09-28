@@ -2,6 +2,8 @@
 
 ## Status And Authority
 
+**SUPERSEDED — 2026-09-28**：用户明确纠正本地无累计额度。当前源码已有 `local_total_limit=None`，应按[local limits correction](2026-09-28-local-unmetered-generation-limits.md)修正 prior-local ceiling gate；不实施本文提出的新 ledger / Manifest migration。下文保留未批准 proposal 的历史，不再请求一次性 quota renewal 批准。
+
 `PROPOSED — NOT APPROVED / NOT IMPLEMENTED`。此文只提出解除当前 canonical quota blocker 的具体 contract，不授权新的 submit。既有 17 s creative scope 已获批准，不需要重复批准；本次待批准的是 local submit quota 的显式续期与对应持久化 contract。
 
 ## Verified Problem

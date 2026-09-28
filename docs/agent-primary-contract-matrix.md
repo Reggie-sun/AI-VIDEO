@@ -219,6 +219,10 @@ QA owner 的 `generation_evaluation_authorities` 显式绑定 evaluator 与 proo
 `generation_runtime_repair.py` 的 one-use grant 只对最新已知 `RUNTIME_FAILURE` 的同 Shot
 re-execution 生效；committer 在 replacement submit intent 的同一原子写入中消耗 grant，
 unknown outcome、旧 evidence 或耗尽的 per-Shot ceiling 不获得 retry 权限。
+strict local/unmetered 的当前 selected capability 可以设置新的有限 batch bound，
+`local_total_limit=None` 表示本地无累计 quota；旧 local ceiling 不永久锁定后续请求。
+same-task durable submit/intent counters 不归零，当前 finite limits仍执行，
+remote/metered 与 paid quota扩张保持原receipt gate；one-use permit、runtime repair与unknown规则不变。
 `ProductionStateCommitter` 通过既有 video mixin 和 `_state_commit_generation_feedback.py`
 独占 binding/evaluator projection 持久化与 permit 前重验；`_generation_feedback_reader.py`
 重开 exact binding/experience/qualification receipts，video reader 复用它。Qualification 仅由原
