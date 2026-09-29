@@ -60,6 +60,35 @@ Parent随后修正matrix中两处历史grant计数prose，final tree `0bd6685fee
 
 本次稳定记录按`record-ai-video-session`更新，`distill-ai-video-learning`为`no_candidate`：单次完整no-pin生成与不同seed的GPU失败未隔离显存混杂因素，不能推出稳定full-model或媒体recipe；同一视频的多个ASR/proof layers不增加attempt independence。保留既有claims，不创建placeholder、不adopt或刷新RAG。记录未触发新增Provider/media、external network或额外全套tests，loopback health复核属于服务恢复验收；当前checkpoint docs仅按真实documentation policy验证，receipt为R12 `documentation-verification.json`。Unrelated `.codex/config.toml`保留；local-only，无push/release。此checkpoint交付actual failed-quality candidate及真实未满足项，**不宣称faithful COCO / Nosha目标完成**。
 
+## Current Research — Model Quality, Prompt Adaptation And API Input Compatibility
+
+2026-09-29核对官方文档、selected canvas capture、R11 resolved request及当前adapter源码。此项回答用户关于模型和参数格式的疑问，不是新增媒体对照；本轮没有Seedance、MiniMax hosted或Vidu媒体submit，不改变上节的8次physical submit、质量拒绝或未完成状态。
+
+### Local Input And Attribution Boundary
+
+Canvas `runs/jimeng-canvas-diagnosis-20260928-001/selected-video-ui.json`选择Seedance2.5 / 全能参考 / 17 s，原prompt为6326 characters；R11 `attempt-08/resolved.json`实际保存的compiled `prompt_text`为3724 characters、SHA-256 `43e7f3d409764fb2038dd6b100a2dc216a1fd6fe53b29c2835c0e58dd76d2c4e`。其采用`integrated_multimodal_description`、`overall_soundscape`、`non_diegetic_music`，并插入`<Picture 1>`至`<Picture 3>`及`<Audio 1>`。两条prompt并非原样传递；长度差本身不证明要求被删除，也不证明编译正确。Current renderer把compiled prompt交给conditioning node，三图和reference audio分别接入Ref2VA，不能把失败解释为素材根本未接入。
+
+Actual配置为INT8 convrot Ref2VA加4-step Turbo LoRA及custom17s profile。H3官方[model release](https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/README.md)发布范围为4–15 s；同时说明H3-Context-IR对质量重要且未包含在open release。本地自有prompt编译与完整官方context-processing系统存在差异。Official [Ref2VA prompt guide](https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/docs/VIDEO_PROMPT_WRITING_GUIDE_ref_en.md)还区分reference/full与base prompt指导；不能未核对当前Comfy parser和conditioning契约便照搬另一grammar。
+
+因此模型能力、INT8/Turbo推理设置、长时长扩展、prompt适配均为待隔离hypotheses。上节的切镜、对白重复和形态错误是独立的质量失败，GPU OOM是runtime失败；显存修复不自动修复前者。没有同素材受控模型/step/precision/时长/context comparison，不能归因为单一因素、断言整个H3不支持，或声称Seedance必然质量更好。下一次实验应先验证prompt编译和素材ordinal/职责，再只改变一个有依据的质量变量；任何短时长诊断arm只能是diagnosis，不能替代用户17 s完整交付。
+
+### Vendor API Versus Current Adapter
+
+| Vendor path | Official reference input | Published output duration | This target's structural compatibility |
+| --- | --- | --- | --- |
+| Seedance2.5 reference generation | 图片、视频、音频及对应reference roles | 4–30 s | 可表达三图、6.504 s原声线参考和17 s；质量、account access与live readiness未验 |
+| Seedance2.0 reference generation | 图片、视频、音频reference roles | 4–15 s | 支持多模态，但17 s不在范围 |
+| MiniMax H3 V2 reference-to-video | 最多9图、3视频、3音频；包括`reference_audio` | H3 4–15 s；H3-Max 5–15 s | 不是只有Seedance能接声线素材，但此hosted接口不覆盖17 s |
+| Vidu Q3 subjects-reference-to-video | 多图及`subjects[].voice_id`，可使用cloned voice ID | 3–16 s | 声线机制不同且不覆盖17 s；clone endpoint要求原音频至少10 s，本次6.504 s不满足 |
+
+Primary sources：[Seedance create task API](https://docs.volcengine.com/docs/ark/create-video-generation-task-api?lang=zh&redirect=1)、[Seedance2.5 prompt guide](https://docs.volcengine.com/docs/ark/seedance-2-5-prompt-guide?lang=zh)、[MiniMax H3 V2 API](https://platform.minimax.io/docs/api-reference/video-generation-v2-create)、[Vidu reference-to-video](https://platform.vidu.com/docs/reference-to-video)、[Vidu voice clone](https://platform.vidu.com/docs/voice-clone)。此表为2026-09-29公开vendor declaration，不把当前仓库尚未接线的字段、账号权限或未做live proof当作已实现。Seedance当前adapter已有`image_url`/`video_url`/`audio_url`及reference roles投影，但声明和源码不构成真实媒体通过。
+
+画布的素材chips、`@`引用和分时段导演文本不是可跨Provider原样通用的JSON schema。API决定素材如何传入及duration/resolution等合法字段；prompt表达身份、镜头和因果链；实际模型是否遵循仍需同exact素材的媒体验收。Official参数支持不能保证frame-exact timing、一镜到底或原声纹。
+
+### Research Evidence And Learning Evaluation
+
+Native read-only `parameter_mapping`核对current artifacts、prompt compilation和reference wiring；Parent重新计算R11 prompt length/hash并核对官方文档。独立受管Kimi invocation `345edb6a-ad10-4702-8839-e30b86f43098`为PARSED、171.429 s、2 wire及1完整packet Read，report SHA `6a21c446cea31fc66d9a3bbee60c8adb341fdd5b725505fd980753b4650af988`；qualified deep route、authenticated response identity、4份frozen sources及4份artifacts的hash/size经Parent核验。它仅作causal/compatibility critique，不承担账号验证、源码review或媒体验收；`runs/coco-nosha-parameter-research-20260929-001/kimi-receipt.json`及`research-adjudication.json`保存证据。Parent拒绝将三vendor核查扩大成全球API排他性结论，也未执行reviewer提出的15 s diagnosis：单次stochastic输出不能确证或彻底排除duration因果，诊断arm不能替代已授权17 s交付。本checkpoint按`record-ai-video-session`更新同一primary record；`distill-ai-video-learning`为`no_candidate`，公开能力声明及单一已有质量失败不构成隔离变量的跨实验质量结论，无placeholder/adoption。Experience retrieval曾报告last-good stale hit并排队detached refresh；本轮结论重开exact sources，不声称refresh已完成，record自身没有刷新index。
+
 ## Historical Continuation — Sixth Physical Submit Completed Sampling, Host OOM During Decode
 
 2026-09-29 20:48 +08:00已完成本次actual failure恢复：`R10 = runs/coco-nosha-sync-offload-20260929-001/`的`coco-nosha-attempt-07` / prompt `8e0e92e6-3665-4895-990c-7ee873201c9b`完成4/4 GPU sampling，但在随后的video VAE decode阶段worker PID611184被kernel global OOM杀掉，MP4仍0。下方第五次失败和restricted-window记录保留历史，不再代表当前阻塞位置。Original refs/voice/model/LoRA/profile/prompt/17 s全部保持，canonical fresh seed1583761486，不声称same-seed媒体A/B。
@@ -624,6 +653,8 @@ current composer 不是 exact historical submit receipt：其文字与七段时�
 这说明上轮并没有在相同输入方式和制作条件下复现用户的方法。Parent 应先修正这些可定位的制作/编排问题；不能用模型、QA checks、technical PASS 或“已经交了 candidate”解释掉未达目标，也不能为了记录完整而越权重生成。
 
 ## Current Capability Matrix
+
+本节为2026-09-28的仓库adapter/selected-profile快照，保留其历史边界。2026-09-29 vendor API的新核查见文件上方`Current Research`；17 s本地实际产物和当前质量失败见`Current Continuation`。尤其不能把当时Vidu adapter没有voice binding推成当前Vidu官方API没有voice clone/`voice_id`，或把旧124帧profile当作当前17 s attempt。
 
 | Path | Images | Reference audio | Reference video | Output duration |
 | --- | --- | --- | --- | --- |
