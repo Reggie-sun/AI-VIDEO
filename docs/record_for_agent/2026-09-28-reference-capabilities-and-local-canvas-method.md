@@ -11,7 +11,56 @@ Session window: 2026-09-27–2026-09-29, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
-## Current Continuation — Sixth Physical Submit Completed Sampling, Host OOM During Decode
+## Current Continuation — Actual 17-Second GPU Video, Quality Rejected And Resample OOM
+
+2026-09-29 22:19 +08:00标准loader与actual files重新核对：**本目标累计8次physical submit、1个保留的17 s MP4**，Manifest59、6份runtime grants全consumed。`coco-nosha-attempt-08`成功生成并fetch，之后因真实质量失败由canonical owner关闭；`coco-nosha-attempt-09`的单次有界resample发生known GPU OOM，没有新视频。下方所有dated continuation sections为历史，旧MP4=0、ceiling6未实现、review pending与host decode OOM不再是当前状态。目标仍是原三图/COCO voice、17 s、一镜到底、正常速度及完整因果链；faithful replication尚未完成，已有广告/剧情视频不计本目标成果。
+
+### Actual GPU Media And Exact Identity
+
+`R11 = runs/coco-nosha-host-pin-recovery-20260929-001/`沿canonical generation seam提交attempt08，prompt `4e7ad1b8-6e3d-4715-b15b-a66bd3b25698`，seed1583761487，resolved hash `2e2afcd6ed6c2ccbb7b462d89d33f8f724aef2bb16aef05f7f8689fc12b688a5`。UTC13:31:43.189504实际submit、13:43:07.406生成结束，Comfy elapsed00:11:24；canonical fetch于13:43:08.263968完成。原canvas-served三图和voice exact bytes、prompt/profile/model/LoRA及17 s输出保持，没有付费媒体或直接Comfy submit。
+
+实际文件为`runs/coco-nosha-host-recovery-20260928-001/production/state/video-generation/fetch/files/ee9a20d880bb82bbeb0bdd019c78f9f5a5c8f3f477e988363a708eec0b99752f.mp4`，SHA-256 `ee9a20d880bb82bbeb0bdd019c78f9f5a5c8f3f477e988363a708eec0b99752f`、18,310,943 bytes。Project-local video-analysis MCP实际probe测得H264、17.000 s、408帧、24 fps、1344×768，AAC stereo/32000 Hz。该文件是原始Provider candidate，不是accepted Final Output，也没有activation、P6或Final Acceptance。
+
+Task-only runtime关闭host pin和async offload，保留CUDA/Sage/Triton及数值一致的既有LoRA/MLP overlays。Own unit `ai-video-comfyui-053a0f65463e491a993391d4e820a52b.service` / PID1046486 / InvocationID `879d0158cadc45c183a5a46b9f8f2cf6`完成4/4 GPU sampling和VAE decode。133个telemetry samples中global GPU used peak31734 MiB、utilization peak100%，host MemAvailable最低55,168,065,536 bytes，own worker RSS最高12,328,771,584 bytes、locked memory为0。这些是离散采样值，不冒充unsampled exact peak或全部进程同时峰值；证据为R11 `gpu-ram-telemetry.jsonl`及R12 `terminal-audit.json`。只证明该attempt实际完成，后续反例禁止升级为稳定可重复能力。
+
+### Exact Media Gate And Evidence Recovery
+
+MP4落盘后显式调用project-local video-analysis MCP：17个1 s间隔帧、metadata、Whisper base，以及对同SHA的第二次small ASR；raw responses保存在R11 `attempt-08/video-analysis-mcp.json`和`asr-small-mcp.json`。全部408 decoded frames另保存在`full-frame-review/sheet-01.jpg`至`sheet-26.jpg`；Parent实际检查17个MCP帧及sheet14/15/16/26，不能把生成contact sheets本身称为全片观看。
+
+| Requirement / proof layer | Verdict | Exact evidence and boundary |
+| --- | --- | --- |
+| Numeric duration / frames / dimensions | PASS | 17.000 s / 408 / 24 fps / 1344×768；只证明数值输出 |
+| pets | FAIL | A呈rabbit-like形态；D未保留要求的三根独立眼柄与五条弯曲足 |
+| props | FAIL | 果实呈orange-like圆形肋纹/绿柄，未保留透明六瓣螺旋造型及规定的吞咽变化 |
+| camera | FAIL | decoded frame221→222，9.2083→9.2500 s视角和姿态突变，确有切镜；threshold0.4只检测一scene不能证明一镜到底 |
+| audio | FAIL | base/small均检测到开头及约12 s重复对白和额外speech；small起点0.34 / 12.22 s，违反唯一3.5–9.5 s对白窗口 |
+| timing whole criterion | NOT_EVALUATED | 完整criterion还要求正常速度连续动作；数值metadata不能将整个criterion标为technical PASS |
+| identity / action / visual | NOT_EVALUATED | 部分帧不足以证明全部接触、角色/形态连续性、因果链与视觉要求 |
+| original voice / complete watch-listen | NOT_EVALUATED | 本模型不能实际聆听；ASR不是声线或human听觉验收，原MP3直接transcribe返回`no_video_stream`，错误保留而未伪造替代输入 |
+
+Canonical review首次bootstrap失败的root cause已核实：`ProjectAnalysisSession`对configured venv interpreter执行`resolve(strict=True)`，把venv symlink变为缺少mcp SDK的base Python3.11。直接使用configured venv interpreter运行真正`ai_video_mcp.analysis_client`成功。Task-only regular executable shim `attempt-08/analysis-python`保留literal venv path，随后canonical controlled presentation实际调用成功；没有安装dependency、修改core bridge、伪造MCP response或私造proof token。
+
+Analyzer与technical两层分别保存、按同task/Shot/request/artifact/recipe/rubric/stage由existing diagnosis合并；保持audio/camera/pets/props FAIL与其余NOT_EVALUATED。第二层补齐timing的显式NOT_EVALUATED后，`ProductionStateCommitter.abandon_video_generation`从Manifest52→54关闭known mixed `EVIDENCE_GAP / QUALITY_FAILURE`，保留fetch和失败证据。R11 `attempt-08/quality-close.json`、`canonical-raw-analysis.json`、`canonical-raw-analysis-technical.json`和三份canonical-review logs保存known恢复顺序；首次启动/缺criterion失败未被当成Provider unknown或重新submit理由。
+
+### Bounded Quality Resample And Current Restoration
+
+`R12 = runs/coco-nosha-quality-resample-20260929-001/`只新增一个finite quality sample：predecessor R11 budget/hash、actual used7→batch ceiling8、new submit1、paid0、7200/5400 s bounds。Canonical feedback给出`resample`、limit1、changed_variables=(seed)，没有mint新runtime grant；原prompt/images/voice/output/profile/runtime exact bytes保持，fresh seed1583761488。该sample只测试另一seed，不宣称已修复prompt或保证质量。
+
+Actual attempt09 / prompt `5c523c89-624b-4298-b029-a6095321432a`在41.12 s后于node10 `SamplerCustomAdvanced`发生`torch.OutOfMemoryError`，stack为Triton rms_rope的eager fallback→`rms_norm`→`torch.rms_norm`。这是GPU allocation失败，不是R10的kernel host OOM；history保存、canonical observation及evaluation已完成，无新MP4或blind retry。R12 `comfy-terminal-history.json` SHA `8a2ed9edee05b4d04fd47a4b6deb1c8eaccb73d2000d51040bdd92cc154bdfb2`、`terminal-summary.json`和`attempt-09/observation.json`绑定exact known outcome。所有8个submitted attempts的canonical status现为FAILED，其中08为保留媒体的quality rejection；prepared-only03仍无submit，不计physical count。
+
+Known terminal和empty owned queue后，经原supervisor恢复正常Python3.13/Sage GPU服务。22:19 +08:00fresh status确认unit `ai-video-comfyui-d5cc41d07caa467b8b0bbfe4b65c342d.service` / PID1280847 / InvocationID `eb557d3ff5bf4db6a9b86b555b9b820c`，active/running、strict loopback、queue empty，argv无temporary overlays/Triton/no-pin/async-offload flags。初始shell缺user-bus environment的`No medium found`在设置已验证的本用户bus路径后消失，不推导host service损坏。Jianji及未知任务保留。
+
+本次GPU查询还发现同Codex parent的video-analysis MCP PID3875264占2622 MiB。它可能增加显存压力，但没有controlled comparison证明它是本次OOM的唯一原因，未杀该managed MCP或未知工作。下一次生成之前先验证R12 rms_rope fallback allocation及可安全回收的task-owned GPU caches，并取得可信memory mitigation，再按当前默认任务授权封存新的有限unit；不能重跑R11/R12 controller、复用permit或改写失败历史。原形态、单次对白、一镜到底和实际声线仍须真实媒体重新验证，不能用metadata、算子PASS或换seed替代修复证据。
+
+### Implementation, Verification And Learning Boundary
+
+`df90028c739c0e1a03be59417dcb788c4a2faa86`实现typed ceiling6，default cap2/ceiling3和sole committer guards保持。Focused80 PASS；最初reviewed tree `73f3f111b463ca21c6417a9c08ab02445d9be500`的10项direct policy checks实际通过。受管Kimi invocation `7bd5fecd-7502-4d7a-90e2-46dd0b8d4865`为PARSED / 386.579 s / 7 wire / 18完整Reads，qualified route/response identity及canonical artifacts/source hashes由Parent核验；report SHA `80af80f52549d06d19030268ae0526ca4b3b36ef8a9920eb1aaf27de938fdf71`无blocking finding，Q1 cancellation-response question由pinned source关闭，未为review实际cancel任务。
+
+Parent随后修正matrix中两处历史grant计数prose，final tree `0bd6685fee5e7687f4d2767380efd0bd5b9e8847`完成3项fresh docs/diff/policy checks，7项未变semantic checks显式绑定旧tree复用；R11 `review-doc-delta.json`保存exact delta和old/new hashes，不虚称Kimi看过新bytes。`policy-verification.json`与`review-acceptance.json`记录该边界。R12只调用已验证public seams、改变canonical seed和新增finite operational unit，无新增shared authority或recovery behavior，Parent判定T1/KIMI_REVIEW_NOT_REQUIRED；不声称原Kimi review覆盖R12 adapter或本次文档新bytes。用户禁止worktree，canonical isolated Harness receipt始终None。
+
+本次稳定记录按`record-ai-video-session`更新，`distill-ai-video-learning`为`no_candidate`：单次完整no-pin生成与不同seed的GPU失败未隔离显存混杂因素，不能推出稳定full-model或媒体recipe；同一视频的多个ASR/proof layers不增加attempt independence。保留既有claims，不创建placeholder、不adopt或刷新RAG。记录未触发新增Provider/media、external network或额外全套tests，loopback health复核属于服务恢复验收；当前checkpoint docs仅按真实documentation policy验证，receipt为R12 `documentation-verification.json`。Unrelated `.codex/config.toml`保留；local-only，无push/release。此checkpoint交付actual failed-quality candidate及真实未满足项，**不宣称faithful COCO / Nosha目标完成**。
+
+## Historical Continuation — Sixth Physical Submit Completed Sampling, Host OOM During Decode
 
 2026-09-29 20:48 +08:00已完成本次actual failure恢复：`R10 = runs/coco-nosha-sync-offload-20260929-001/`的`coco-nosha-attempt-07` / prompt `8e0e92e6-3665-4895-990c-7ee873201c9b`完成4/4 GPU sampling，但在随后的video VAE decode阶段worker PID611184被kernel global OOM杀掉，MP4仍0。下方第五次失败和restricted-window记录保留历史，不再代表当前阻塞位置。Original refs/voice/model/LoRA/profile/prompt/17 s全部保持，canonical fresh seed1583761486，不声称same-seed媒体A/B。
 

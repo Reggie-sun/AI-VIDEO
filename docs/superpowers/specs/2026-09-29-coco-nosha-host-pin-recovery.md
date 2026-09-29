@@ -4,7 +4,13 @@
 
 `SCOPE AUTHORIZED / SELF-REVIEWED`。依用户的任务内默认授权继续原17 s、一镜到底、正常速度、完整因果链和原声线。仅关闭当前Comfy支持的host pinned-memory缓存，保留GPU计算和已经验证的同步offload / MLP / LoRA / Triton；增加第六份exact local repair及最多一次新physical submit。无新的用户批准步骤、worktree或paid media fallback。
 
-## Current Evidence And Diagnosis
+## Execution Result — 2026-09-29
+
+本spec的第六grant已由`df90028`实现、验证和独立review；actual attempt08沿canonical seam在00:11:24后生成并fetch17.000 s/408帧/24 fps/1344×768 MP4，SHA `ee9a20d880bb82bbeb0bdd019c78f9f5a5c8f3f477e988363a708eec0b99752f`。Host pin关闭后的这一完整attempt未发生host OOM；不同seed的后续单次quality resample却在rms_rope eager fallback发生GPU OOM，不能推出稳定可重复能力或pin是全部failure的唯一cause。
+
+MP4实际MCP/帧/ASR检查确认形态/果实偏差、约9.25 s切镜、重复且错时对白；canonical mixed quality/evidence rejection已关闭，原声线、完整观看/聆听仍NOT_EVALUATED，没有activation或Final Acceptance。当前Manifest59、8次physical submits、6 consumed grants、1个保留MP4，正常GPU服务已恢复。完整evidence与review/direct-policy/Harness边界见[当前记录](../../record_for_agent/2026-09-28-reference-capabilities-and-local-canvas-method.md#current-continuation--actual-17-second-gpu-video-quality-rejected-and-resample-oom)。以下诊断/计数是本spec实施前的历史依据；accepted scope与质量要求没有降低。
+
+## Historical Pre-Execution Evidence And Diagnosis
 
 实现`543f22c`、10项fresh exact-staged direct policy checks与受管Kimi第二轮`ae185bcf-435a-4579-9285-c1d82bfadc73`的完整report已由Parent核验。`runs/coco-nosha-sync-offload-20260929-001/`实际attempt07/prompt `8e0e92e6-3665-4895-990c-7ee873201c9b`于2026-09-29 20:41 +08:00完成4/4 GPU sampling，之后进入VAE decode时worker PID611184被kernel global OOM杀掉。Kernel记载anon-rss60143584 kB，systemd journal的4/4与termination绑定同InvocationID；进程和endpoint消失，exact output-prefix为空。由existing canonical `record_video_provider_failure`和`record_attempt_evaluation`显式记录known runtime failure，没有伪造Comfy history/observation或重置permit。当前Manifest45、6个actual submitted FAILED、5份consumed grants、fetch0/MP4=0；prepared-only03不计submit。原默认GPU服务已恢复健康、队列空，Jianji/未知任务保留。
 

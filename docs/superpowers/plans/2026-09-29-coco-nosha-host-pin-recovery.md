@@ -4,6 +4,12 @@
 
 按[spec](../specs/2026-09-29-coco-nosha-host-pin-recovery.md)继续原17 s本地成片目标。Parent完成scope/self-review，Native Codex串行实施。唯一新runtime variable是`--disable-pinned-memory`；既有同步offload和所有数学overlay保持。Canonical第六grant只允许一个新实际submit。
 
+## Execution Checkpoint — 2026-09-29
+
+Milestones1/2已完成：native pin dispatch/CUDA局部对照、typed ceiling6实现、80 focused PASS、exact staged direct-policy及受管Kimi/Parent review均有记录，code commit `df90028`。Milestone3的单次attempt08已实际完成GPU生成/canonical fetch17 s MP4，并执行exact-media Gate；质量FAIL/NOT_EVALUATED保留，未达到faithful目标或Final Acceptance。原正常GPU服务恢复后，独立finite quality resample仅改seed，actual attempt09 known GPU OOM，无新媒体；当前Manifest59、8 physical submits、6 consumed grants、retained MP4=1。
+
+本plan不授权重跑已消费的controller/permit。后续须针对实际rms_rope allocation和known质量偏差形成新的有据有限unit，默认任务授权仍适用；current evidence与真实未满足项见[当前记录](../../record_for_agent/2026-09-28-reference-capabilities-and-local-canvas-method.md#current-continuation--actual-17-second-gpu-video-quality-rejected-and-resample-oom)。下方Manifest45/MP4=0为本plan开始时的历史precondition，不是当前状态。
+
 ## Contracts And Invariants
 
 Typed ceiling增加6，default3/cap2不变；sole committer及one-use/known-outcome/binding/revision检查保持，旧v1及v2 ceiling3/4/5 bytes/hash/read/replay保持。Manifest45、actual6 FAILED、5 consumed，prepared-only03不计；不删除/重写旧预算、grants、intents、permit和review证据。原17 s、三图/voice/prompt/model/profile不变，保留Jianji/未知工作，无paid media、worktree、push/release。
