@@ -7,11 +7,33 @@ learning_eligibility: ineligible
 # Creative Goal Tests, Jimeng Canvas Comparison And Local Replication — Full Record
 
 Date: 2026-09-28
-Session window: 2026-09-27–2026-09-29, Asia/Hong_Kong
+Session window: 2026-09-27–2026-09-30, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
-## Authorized Next Window — Vidu Q3 Subject Voice Binding And Multi-Shot Replication
+## Current Supersession — Vidu Q3 Named Subjects Wired, Original Voice Still Blocked
+
+2026-09-30 按用户的当前任务继续执行，不再把下方 `Authorized Next Window` 当作待生成的续接 prompt。用户允许分 Shot、没有固定 17 秒或一镜到底要求；正常速度、四只宠物的职责、A→B→C→诺萨→推车/果篮→水果→D 的完整因果链、角色/道具连续性、COCO 原声线和唯一一次原文对白仍是目标。只选择 Vidu Q3，没有其他 Provider、素材、发布或 release 授权。旧 H3 的八次 physical submit、已消耗 grants/permits 和失败证据全部保留。
+
+### Current Official Capability And Input Evidence
+
+[国内 Vidu R2V](https://platform.vidu.cn/docs/reference-to-video) 虽列出 `subjects[].voice_id`，但注明该参数在 Q3 参考生中不生成；[国内主体库](https://platform.vidu.cn/docs/subjects) 更明确指出 Q3 系列不支持音色 ID。[国际 R2V](https://platform.vidu.com/docs/reference-to-video) 列出字段并不能推翻该限制。因而旧 `Current Research` 表格中“Vidu Q3 可使用 cloned voice ID”的表述仅是当时的国际站字段推断，**已被本轮官方证据纠正**；不能以有字段或账号 GET 成功放行原声线。公开页面的本轮只读提取见 `runs/coco-nosha-vidu-q3-20260929-001/current-official-voice-prerequisites.json`。R2V 使用 `viduq3` / `viduq3-turbo`，不偷换为 I2V 的 `viduq3-pro`。
+
+标准 `load_production_project` 重开原 bundle，Manifest revision 59、Registry revision `0e5f5bf52d2655fe115e3f17a5ec92772eaf0908caa449d64be8184435d67931`，a-scene、b-COCO、c-Nosha 与 d-COCO-voice 的 registered bytes/SHA 均核对；详见 `runs/coco-nosha-vidu-q3-20260929-001/current-input-identity.json`。原 COCO MP3 仍是 6504 ms / 208173 bytes / SHA `32b3e405b704bff738882fe433c9cb2aa984f08b991109541668170b5db15c7a`，[clone API](https://platform.vidu.com/docs/voice-clone) 要求至少十秒。Project-local `video-analysis` 对纯 MP3 返回 `no_video_stream`；随后仅用已有本地 Whisper small 在 CPU 对同 SHA 做对白转写，得到“科长，他们找到陆科长了……”而非目标“快看！新一集又千万播放诶，大家都在好奇怎么做到的！”。该 ASR 仅用于核对词句，可能有识别误差，不是声纹或实际聆听验收；不能把这段不同台词直接覆盖到成片。结果在 `runs/coco-nosha-vidu-q3-20260929-001/original-source-dialogue-asr.json`。
+
+通过既有 Secret Service credential supplier 的本用户 bus 注入密钥，在内存中执行两次只读 Vidu GET：credits 为 HTTP 200，private subjects 为 HTTP 200 / 0 条；`runs/coco-nosha-vidu-q3-20260929-001/input-preflight-user-bus.json` 仅保存脱敏状态与响应 hash。空 private subjects 不证明独立 clone voice ID 全部不存在，GET 200 不证明 Q3 对 `voice_id` 有效或账号具备所需 entitlement。没有读取其他 secret source，也没有提交新视频或 clone。
+
+### Engineering Checkpoint And Media Boundary
+
+新 `video_subjects.py` 与 `_vidu_subjects.py` 从 canonical Character / Scene / Shot 和 owner-bound Router 输入构造 typed `subjects[].name/images`，验证完整唯一图片 partition、角色/场景归属与 Registry/revision/hash。`_vidu_prompt.py` 将 `@name` 绑定到 canonical 职责和对白 speaker，限制补齐标签后的 5000 字符；`video_compiler.py` 仍唯一构造请求。`video.py` / `video_request_models.py`、`generation_execution.py`、`shot_router.py` 和 `vidu.py` 将 populated subjects 绑定至 request/resolved/activation hashes、执行重开与 only-subjects payload；空字段和旧 flat 请求/hash/replay 保持。Q3 capability 明确 `voice_ids_supported=False`，populated ID 在 secret/permit/transport 前 typed 拒绝；当前 named compiler v4 也未与 `NATIVE` 或 `SEPARATE` 声线轨道配对，不悄悄 clone、直接 submit 或把自动人声冒充 COCO。详细边界在 [spec](../superpowers/specs/2026-09-29-vidu-named-subject-binding.md)、[plan](../superpowers/plans/2026-09-29-vidu-named-subject-binding.md) 和 [Vidu Provider](../vidu-provider.md)。
+
+修订后的 exact staged tree `530af29162dfddbe2ce53b0d44bb34cfb97aa045` 上，15 项 changed-path policy checks 为 14 `passed` / 1 `covered`，新 Vidu subject suite 16/16 通过，日志、JUnit、source hashes 与 staged tree 均复核。证据在 `runs/coco-nosha-vidu-q3-20260929-001/candidate-04/direct-policy-verification.json`；最初的过长提示词测试确实先失败再修复。用户明确不创建 worktree，故仅执行当前 working tree 上的 direct policy checks，`canonical_isolated_harness_receipt=null`；不能将其冒充仓库要求的 detached Harness receipt。18 个 task-owned files 以 exact tree 提交为 `9f4c242`，未暂存或修改原有 `.codex/config.toml`。
+
+独立审查第一次受管 read-only Kimi attempt 在旧 tree `790f457e96170f2dc7de8b9bba3fea7dc9395ae4` 上虽完成 27 次实际读取，但最终结果在 JSON 前多出文本，归类 `PROTOCOL_ERROR`，没有有效 canonical report；Parent 从隔离的 partial output 核实并修复 5000 字符和 compiler ID/version 问题，明确另两项为当前能力缺口或不影响本目标。第二次在最终 tree 上的受管 Kimi attempt 发生上游响应体 `CONNECTION_ERROR`，11 次 wire requests 后归类 `OUTCOME_UNKNOWN`，没有可用报告，也不盲目重试。两次 invocation `5c8bd109-6b29-4b59-a28a-c3f2cfdf205e` / `0c1d44fd-b44d-46b5-b1b1-8a7549d621b2` 的原始消费和 canonical receipts 保留在 `candidate-03/kimi-receipt.json` / `candidate-04/kimi-receipt.json`。按 `SUBAGENTS.md` 连续故障回退，唯一 read-only native `reviewer_xhigh` 对同一最终 staged tree 返回空 findings；Parent 复核 scope、diff、source hashes 和 tests 后接受此工程候选，裁决记录在 `candidate-04/native-review-adjudication.json`。原生回退不冒充 Kimi 的 Docker/route proof，也不构成声音或媒体验收。现有 `docs/record_for_agent/learning/vidu-s01-native-dialogue-burned-captions.md` 属于另一 I2V 媒体案例；本次没有新的可独立归纳的媒体结果，learning 为 `no_candidate`。
+
+本任务 Vidu 视频 POST 0、clone POST 0，新 Vidu MP4 0，未封存可实际执行的分 Shot 调用预算或激活 candidate。当前没有已验证归属且有效的 COCO voice ID，也没有合格的新 clone 原素材；更关键的是当前 Q3 documented/control capability 不支持该 ID。仅补长音频或提交无原声线 Q3 sample 都不能满足目标。需先取得可核验、对本账号/目标 Q3 真正生效的原声线控制与 COCO voice identity；若新建 clone，另需至少十秒的合格原始录音。届时才能冻结分 Shot authoring、最小有限预算和 exact permit，沿标准生成 seam 逐 Shot submit/显式 video-analysis Gate，再用 canonical timeline 合成与完整观看聆听。此前所有新 Vidu Shot / 成片身份、视觉因果、原声线和最终质量均为 `NOT_EVALUATED`；旧 17 秒 H3 MP4 仍是已拒绝的质量失败证据，不能算新目标成果。
+
+## Historical Authorized Next Window — Vidu Q3 Subject Voice Binding And Multi-Shot Replication
 
 2026-09-29用户先明确“不考虑秒数，可以分shot”，随后指定`$next-window 接入vidu q3 voice_id然后尝试复现`。因此接收窗口的当前目标是：在canonical Vidu Q3 reference-to-video路径接入`subjects[].voice_id`及角色参考绑定，再按分Shot方式有界尝试COCO / Nosha复现。下方17 s / 一镜到底是旧local attempt的约束和证据，不再是新Vidu目标的硬要求；角色身份、原声线、正常速度、完整因果链、对白只说一次及最终观看质量继续保留。新目标不授权Seedance或其他Provider fallback，也不复用或重置旧H3 grants/permits/history。
 
@@ -23,7 +45,7 @@ Exact source入口：`runs/coco-nosha-host-recovery-20260928-001/reference-prove
 
 本窗口仅准备handoff并保存真实目标变更，无implementation、clone、Vidu media submit或新spec/plan。`record-ai-video-session`更新既有primary record，`distill-ai-video-learning`为`no_candidate`：授权变化和schema mapping不产生新的独立媒体证据。旧record/actual MP4与全部失败历史保留，next step由H3 recovery修正为Vidu subjects/voice canonical seam audit。
 
-## Current Continuation — Actual 17-Second GPU Video, Quality Rejected And Resample OOM
+## Historical Continuation — Actual 17-Second GPU Video, Quality Rejected And Resample OOM
 
 2026-09-29 22:19 +08:00标准loader与actual files重新核对：**本目标累计8次physical submit、1个保留的17 s MP4**，Manifest59、6份runtime grants全consumed。`coco-nosha-attempt-08`成功生成并fetch，之后因真实质量失败由canonical owner关闭；`coco-nosha-attempt-09`的单次有界resample发生known GPU OOM，没有新视频。下方所有dated continuation sections为历史，旧MP4=0、ceiling6未实现、review pending与host decode OOM不再是当前状态。目标仍是原三图/COCO voice、17 s、一镜到底、正常速度及完整因果链；faithful replication尚未完成，已有广告/剧情视频不计本目标成果。
 
@@ -72,7 +94,7 @@ Parent随后修正matrix中两处历史grant计数prose，final tree `0bd6685fee
 
 本次稳定记录按`record-ai-video-session`更新，`distill-ai-video-learning`为`no_candidate`：单次完整no-pin生成与不同seed的GPU失败未隔离显存混杂因素，不能推出稳定full-model或媒体recipe；同一视频的多个ASR/proof layers不增加attempt independence。保留既有claims，不创建placeholder、不adopt或刷新RAG。记录未触发新增Provider/media、external network或额外全套tests，loopback health复核属于服务恢复验收；当前checkpoint docs仅按真实documentation policy验证，receipt为R12 `documentation-verification.json`。Unrelated `.codex/config.toml`保留；local-only，无push/release。此checkpoint交付actual failed-quality candidate及真实未满足项，**不宣称faithful COCO / Nosha目标完成**。
 
-## Current Research — Model Quality, Prompt Adaptation And API Input Compatibility
+## Historical Research — Model Quality, Prompt Adaptation And API Input Compatibility
 
 2026-09-29核对官方文档、selected canvas capture、R11 resolved request及当前adapter源码。此项回答用户关于模型和参数格式的疑问，不是新增媒体对照；本轮没有Seedance、MiniMax hosted或Vidu媒体submit，不改变上节的8次physical submit、质量拒绝或未完成状态。
 
