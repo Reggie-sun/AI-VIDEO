@@ -1,5 +1,9 @@
 # Scoped Fourth Runtime Repair For COCO / Nosha
 
+## Authorization Supersession — 2026-09-29
+
+用户已将任务内 shared contract、有限预算与 recovery规则变更设为默认授权，见[规则变更记录](../../record_for_agent/2026-09-29-default-task-contract-budget-recovery-authority.md)。下文 `NOT APPROVED`及“须获批准”保留为历史 proposal状态，不能再要求用户逐项批准。技术内容仍是待 Parent对当前 source核对、self-review及定稿的 candidate；本次规则变更未实施MLP mitigation、cap4 contract、grant/window/permit或视频 submit，不声称 runtime ready。
+
 ## Status And Goal
 
 `PROPOSED / NOT APPROVED / NOT IMPLEMENTED`。目标仍为原COCO / Nosha **17 s、一镜到底、正常速度、完整因果链与原声线**。本提案先处理已知MLP GPU allocation failure，再允许同task/Shot第四份runtime-repair grant和**仅一次**新增physical video submit；不要求用户再次批准既有17 s要求或已完成审查，不把本地unmetered解释为永久自动重试。

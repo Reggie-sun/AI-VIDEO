@@ -165,6 +165,7 @@ Skill 按需触发、不预载：设计不清用 brainstorming，写 plan 用 wr
 
 ### Specs / Plan / Review Triggers
 
+- 在 `Decision Gates` 的默认任务授权范围内，spec / plan 由 Parent 定稿、self-review并绑定任务授权后直接继续，无需用户逐份批准；用户明确要求 spec-only、先审后做或给出不可调整上限时仍须遵守。文档存在或 self-review不替代实现、验证、适用独立审查或真实媒体验收。
 - Specs：architecture、workflow state machine、Provider/Harness contract、acceptance criteria、Shot generation/regeneration policy、shared schema、persistent project rule、cross-module behavior 变化或用户明确要求时触发；普通小修复不触发。
 - Plan：多文件且顺序不明显、多阶段、T2/T3、architecture/Provider/workflow 修改或迁移/回滚/兼容性时触发；复用 writing-plans。简单 T0/T1 不产 plan artifact。
 - Review：仅在完整稳定 target 上触发 T2/T3 spec、plan、implementation review；T3 完成前 final dual review。T0/T1 无独立 review；禁止碎片化循环，`PARSED` 或 review 执行不等于 acceptance。
@@ -223,7 +224,7 @@ alternate path 与 focused verification 的唯一 human-readable owner。实现�
 - Raw credential 不得进入 repository、`.env`、artifact、prompt、argument、fixture、log、error、repr 或 receipt；lookup 只经 injected supplier，失败时 fail closed，不搜索其他 secret source。本机引用与查找步骤见 [Provider Credential And Paid Execution Details](.agent/context/control-plane-playbook.md#3-provider-credential-and-paid-execution-details)。Credential 存在不证明 access、余额或授权。
 - 用户明确要求完成必含 remote/paid call 的任务，即授权该 accepted Provider/model、inputs 与最少有限 submit count，不因付费重复询问；docs-only、plan、review、可行性分析、历史执行或旧 run 不授权 live call，也不得复用于 benchmark、额外 variants 或扩大后的 scope。未指定 count 时按已接受输出与 Shot 数封存最小 ceiling，不为此询价、查价、计算预计账单或刷新 pricing snapshot。
 - 每次 submit 仍须 remaining-count check、exact preview、既有 Budget Guard/reservation、cloud-egress approval、secret reference、durable intent 与 one-use permit；现有 monetary ledger 不因此变成 count-based schema。Runtime monetary fields 仅消费预先配置并 sealed 的 operator upper bound，不代表官方实际价格。
-- Ceiling 耗尽、scope/Provider/egress 变化、确需新增调用或上次 outcome unknown 时停止报告，禁止 blind retry、remint permit 或扩大授权。纯 operator upper bound 续期只按 [Operator Ceiling Renewal](.agent/context/control-plane-playbook.md#operator-ceiling-renewal)；缺失上限、真实市场报价过期或不符合续期条件仍是 compatibility blocker。
+- Ceiling 耗尽或确需新增调用时先停止当前 attempt，核对已授权目标、真实消费和 known outcome；目标与已授权 Provider/model/inputs/egress不变时，按 `Decision Gates` 自主封存或实现有依据的新有限预算，无需仅为预算契约变化再次询问。Scope/Provider/egress超出原授权或上次 outcome unknown时停止报告，禁止 blind retry、remint permit 或扩大外部授权。纯 operator upper bound 续期只按 [Operator Ceiling Renewal](.agent/context/control-plane-playbook.md#operator-ceiling-renewal)；缺失上限、真实市场报价过期或不符合续期条件仍是 compatibility blocker。
 
 ## Local ComfyUI Authorization Exemption
 
@@ -232,15 +233,14 @@ alternate path 与 focused verification 的唯一 human-readable owner。实现�
 
 ## Decision Gates
 
-除非用户的当前明确请求已经批准对应 scope，否则以下变更必须先暂停并确认：
+用户已对明确任务目标内所需的**共享契约、预算及恢复规则变更**提供默认授权。Parent 自主判断必要性、定稿 spec / plan、封存有限预算、实现、验证并记录；不得仅因改变 schema / CLI / shared contract、任务内 submit / repair ceiling、时间窗口或 recovery policy而请求逐项批准。前文的“显式批准”在此范围内可由该默认授权和可追溯的 Parent scope/self-review满足；用户明确要求先审后做、spec-only或不可调整上限时不适用。
 
-- 引入新 dependency、公共 CLI command/argument/exit semantics，或 schema / Manifest / artifact layout migration。
-- 改变 local-first default、允许 remote fallback、引入新的 Provider selection path，或更改 canonical renderer/timeline/activation owner。
-- 引入新的 v2 writer、自动 recovery、automatic candidate activation，或把 mutation 移入 reader/registry/dependency/adapter。
-- 引入 frontend、API server、queue manager 或其他新的 product subsystem。
-- 引入超出已验收 P4 audio/caption contract 的新音频子系统，或改变 canonical audio / timeline ownership。
-- 开始新的 runtime slice、非 local-ComfyUI live smoke / benchmark、remote/paid Provider submit 或 quality-acceptance claim。符合 `Local ComfyUI Authorization Exemption` 的 lifecycle、generation、retry、variant 与 benchmark 无需暂停确认，但仍必须执行全部适用技术 gates。
-- 放宽 crash safety、secret handling、Budget Guard、Cloud Egress、provenance、replay、recovery 或 QA acceptance contract。
+- 有限预算耗尽时停止当前 attempt，核对真实 outcome、历史消费与下一次修复依据；在相同任务目标内可自主封存有理由的新有限执行单元，或经 canonical owner实现预算/repair contract扩展，无需为每次续期、加一个slot或已知失败修复重新询问。保存 predecessor、old/new bounds、真实计数和停止条件，不能改名任务、删除历史、重置 consumed permit/grant或追溯改写旧sealed evidence；不得把“无需批准”解释为无限执行。
+- 必须同步代码、测试与 canonical 文档；当前 runtime 不支持时先实施并验证所需契约，不能只改规则文件便绕过执行 guard、裸写 Manifest、直接 submit或声称能力已实现。
+- 恢复变更必须仍由 canonical owner执行，先核对当前状态、exact identity与已知结果。Unknown outcome继续 fail closed，禁止 blind retry、permit remint、猜测 mixed state或自动激活；需补齐证据/显式恢复，而不是重新询问同一工程规则的批准。
+- 默认授权不扩大用户目标，不授权付费/remote fallback、新的未获授权 Provider / inputs / cloud egress、发布或 release；不得放宽或取消 local-first、凭据保护、crash safety、Budget Guard、Cloud Egress、唯一 writer/timeline、provenance、replay、one-use、质量底线与真实验收的保护语义。任务内有限预算数值的有据调整不等于取消预算守卫。已获授权的 paid任务仍走其有限预算、reservation及egress gates，不能借规则修改扩大外部执行范围。
+
+只有真实超出当前目标的 product/scope选择、未获授权的外部效果、destructive/irreversible操作或same-file ownership conflict需要用户决定。对范围内的工程变更报告判断与验证结果，不将程序技术 gates变成用户批准步骤。
 
 ## Repository-Specific Don't Repeat This
 

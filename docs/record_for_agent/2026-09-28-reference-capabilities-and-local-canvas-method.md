@@ -11,6 +11,10 @@ Session window: 2026-09-27–2026-09-29, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
+## Authorization Supersession — 2026-09-29
+
+用户已要求任务内 shared contract、有限预算和 recovery规则默认授权，见[规则变更记录](2026-09-29-default-task-contract-budget-recovery-authority.md)。下方旧 proposal中“须先获用户批准”的机械步骤不再是继续条件；Parent自主完成 scope/self-review、plan、实现、验证与适用审查。规则修改未修复MLP OOM或实现第四grant：上一已验证媒体 checkpoint仍为4个 known FAILED submits、0 MP4；旧计数、消耗、sealed evidence及 unknown-outcome停止要求保持。
+
 ## Current Continuation — Fourth Physical Submit Failed At MLP Rotation
 
 2026-09-29 06:43 +08:00更新取代下方旧review/window/remaining-slot状态：**本目标实际local video submit4，全部known FAILED，MP4 0**。第7轮required targeted review已取得完整report并经Parent核验、裁决通过；一次已授权的window续期已执行，原第三grant由actual attempt-05消耗。现在的blocker是实际GPU MLP activation rotation OOM及本次唯一新增submit已用完，不再是review未完成、GPU不可见或local付费额度。没有attempt-06、第四grant、paid media、fetch、activation或Final Acceptance；prepared-only attempt-03的零side-effect历史保持。
