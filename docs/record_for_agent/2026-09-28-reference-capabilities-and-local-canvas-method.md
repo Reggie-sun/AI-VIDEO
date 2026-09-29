@@ -11,6 +11,18 @@ Session window: 2026-09-27–2026-09-29, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
+## Authorized Next Window — Vidu Q3 Subject Voice Binding And Multi-Shot Replication
+
+2026-09-29用户先明确“不考虑秒数，可以分shot”，随后指定`$next-window 接入vidu q3 voice_id然后尝试复现`。因此接收窗口的当前目标是：在canonical Vidu Q3 reference-to-video路径接入`subjects[].voice_id`及角色参考绑定，再按分Shot方式有界尝试COCO / Nosha复现。下方17 s / 一镜到底是旧local attempt的约束和证据，不再是新Vidu目标的硬要求；角色身份、原声线、正常速度、完整因果链、对白只说一次及最终观看质量继续保留。新目标不授权Seedance或其他Provider fallback，也不复用或重置旧H3 grants/permits/history。
+
+Handoff准备重新核对HEAD `83d0741723b1730b27088b28a5e8ba862af92b03`、main及唯一unrelated dirty `.codex/config.toml`。Current `vidu.py`只把图片投影成flat `images`，没有subjects/voice-ID绑定；`vidu_profile.py`的R2V model IDs为`viduq3` / `viduq3-turbo`，不能误用I2V的`viduq3-pro`身份。Provider mapping、prompt和capability/profile owners见contract matrix的`Vidu Cloud Adapter`及`docs/vidu-provider.md`；接收窗口须先定位typed sealed subject/voice identity应该进入的canonical owner，再按风险完成spec/self-review、plan、implementation与verification。旧host-pin plan不是这项新接入的implementation plan。
+
+Exact source入口：`runs/coco-nosha-host-recovery-20260928-001/reference-provenance.json`、`production/project.yaml`、`production/assets/registry.0e5f5bf52d2655fe115e3f17a5ec92772eaf0908caa449d64be8184435d67931.json`及R11 `attempt-08/resolved.json`。COCO source audio为6.504 s / 208173 bytes / SHA `32b3e405b704bff738882fe433c9cb2aa984f08b991109541668170b5db15c7a`。它不满足当前Vidu clone minimum10 s；已有同COCO的valid voice ID、账号access及更长原素材均尚未核实。此条件阻断用这份音频直接新建clone，不阻断独立implementation；不能用重复/补静音/合成或已失败candidate的音轨冒充更长原声线，不得默认改成builtin voice。先核验可复用ID及其归属/有效性；若最终缺少合格素材或可用ID，完成独立工程工作后报告具体media blocker并只请求真正缺失的输入。
+
+用户请求授权该Vidu Q3目标内必要的最小有界remote effects；clone仅在需要且素材合格时纳入独立finite quota，各Shot initial/repair数量在authoring冻结后封存，保留真实消费、predecessor和known/unknown outcome。Credential supplier、operator ceiling、cloud egress、intent/one-use permit、sole committer、post-media analysis和QA gates仍必需；不需要为同任务工程契约、预算或恢复变更再逐项批准，也不能直接HTTP submit或blind retry。Receiving window应继续到实际有界复现/验证或真实阻塞，不以字段接线、mock PASS或一个commit充当视频交付。
+
+本窗口仅准备handoff并保存真实目标变更，无implementation、clone、Vidu media submit或新spec/plan。`record-ai-video-session`更新既有primary record，`distill-ai-video-learning`为`no_candidate`：授权变化和schema mapping不产生新的独立媒体证据。旧record/actual MP4与全部失败历史保留，next step由H3 recovery修正为Vidu subjects/voice canonical seam audit。
+
 ## Current Continuation — Actual 17-Second GPU Video, Quality Rejected And Resample OOM
 
 2026-09-29 22:19 +08:00标准loader与actual files重新核对：**本目标累计8次physical submit、1个保留的17 s MP4**，Manifest59、6份runtime grants全consumed。`coco-nosha-attempt-08`成功生成并fetch，之后因真实质量失败由canonical owner关闭；`coco-nosha-attempt-09`的单次有界resample发生known GPU OOM，没有新视频。下方所有dated continuation sections为历史，旧MP4=0、ceiling6未实现、review pending与host decode OOM不再是当前状态。目标仍是原三图/COCO voice、17 s、一镜到底、正常速度及完整因果链；faithful replication尚未完成，已有广告/剧情视频不计本目标成果。
