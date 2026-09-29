@@ -11,6 +11,12 @@ Session window: 2026-09-27–2026-09-29, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
+## Current Execution Blocker — Restricted Window Recheck
+
+2026-09-29 18:28 +08:00用户要求继续生成后，本窗口重新验证：`/dev/nvidia*`为空，独立`nvidia-smi`退出9，`systemctl --user`不能连接bus，`127.0.0.1:8188/queue`不可达。当前受限namespace无法访问宿主机GPU/service/loopback，不能据此判断host driver损坏、显存不足或host ComfyUI停机；不得绕过平台权限。标准 `load_production_project`在现有Python3.13重开确认Manifest33、actual submits4全部FAILED、3份grant全consumed、fetch0；本轮新增submit/service mutation均0。误选的Python3.11环境缺少numpy，未安装dependency，改用已有Python3.13后loader成功。Evidence见 `runs/coco-nosha-sandbox-recheck-20260929-001/preflight.json`，Manifest bytes SHA-256 `78e097c82f23e918812e31a31d7e979bb53a9d8d8905aadb096b8088e6cfc545`。
+
+继续条件是平台提供可访问本机GPU、用户service manager和ComfyUI loopback的执行窗口；届时先实测MLP mitigation并自主完成任务内cap4 contract/有限预算所需实现与验证，再经canonical seam生成。旧grant/window/permit不复用，不再请求同类规则变更批准。17 s、一镜到底、正常速度、完整因果链及原声线不变；目标仍未完成、MP4 0。该段是read-only preflight的真实blocker记录，不是新media experiment；learning评估`no_candidate`，未进行额外模型调用、RAG rebuild、GPU tests或服务操作。
+
 ## Authorization Supersession — 2026-09-29
 
 用户已要求任务内 shared contract、有限预算和 recovery规则默认授权，见[规则变更记录](2026-09-29-default-task-contract-budget-recovery-authority.md)。下方旧 proposal中“须先获用户批准”的机械步骤不再是继续条件；Parent自主完成 scope/self-review、plan、实现、验证与适用审查。规则修改未修复MLP OOM或实现第四grant：上一已验证媒体 checkpoint仍为4个 known FAILED submits、0 MP4；旧计数、消耗、sealed evidence及 unknown-outcome停止要求保持。
