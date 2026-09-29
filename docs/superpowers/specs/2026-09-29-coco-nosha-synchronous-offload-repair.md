@@ -1,5 +1,9 @@
 # COCO / Nosha Synchronous GPU Offload Repair
 
+## Execution Result And Supersession — 2026-09-29
+
+本slice已实现`543f22c`、10项exact-staged direct policy PASS及受管Kimi/Parent acceptance。R10 actual attempt07完成4/4 GPU sampling，随后VAE decode时PID611184被kernel global OOM杀掉；explicit canonical failure recovery后Manifest45、actual6 FAILED、5 consumed grants、fetch0/MP4=0。原服务已恢复loopback健康/队列空，单次slot已消耗，不重跑旧controller。下方scope/计数是执行前历史；下一有据候选由[host pin recovery spec](2026-09-29-coco-nosha-host-pin-recovery.md)独占，完整证据见[primary record](../../record_for_agent/2026-09-28-reference-capabilities-and-local-canvas-method.md#current-continuation--sixth-physical-submit-completed-sampling-host-oom-during-decode)。采样完成不等于成片/声线验收。
+
 ## Goal And Authority
 
 `SCOPE AUTHORIZED / SELF-REVIEWED`。依当前任务默认授权继续原 COCO / Nosha 17 s、一镜到底、正常速度、完整因果链和原声线；只为最新已知失败增加一份 exact local runtime-repair grant 和最多一次 physical submit。Parent 自主定稿，Native Codex 串行实施；无需新增用户批准。

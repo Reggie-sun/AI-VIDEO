@@ -34,13 +34,13 @@ def runtime_repair_artifact_path(content_hash: str) -> Path:
 
 
 class LocalRuntimeRepairExtension(StrictModel):
-    """Explicit third through fifth ceiling for one exact local task/Shot failure."""
+    """Explicit third through sixth ceiling for one exact local task/Shot failure."""
 
     task_id: str = Field(min_length=1)
     shot_id: str = Field(min_length=1)
     failed_binding_hash: str = Field(pattern=_SHA256)
     expected_manifest_revision: int = Field(strict=True, ge=0)
-    ceiling: Literal[3, 4, 5] = 3
+    ceiling: Literal[3, 4, 5, 6] = 3
 
 
 class RuntimeRepairAuthorization(StrictModel):

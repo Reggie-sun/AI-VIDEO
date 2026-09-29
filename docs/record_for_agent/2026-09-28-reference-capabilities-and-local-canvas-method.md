@@ -11,7 +11,23 @@ Session window: 2026-09-27–2026-09-29, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
-## Current Continuation — Fifth Physical Submit Failed At Vbar Prefetch
+## Current Continuation — Sixth Physical Submit Completed Sampling, Host OOM During Decode
+
+2026-09-29 20:48 +08:00已完成本次actual failure恢复：`R10 = runs/coco-nosha-sync-offload-20260929-001/`的`coco-nosha-attempt-07` / prompt `8e0e92e6-3665-4895-990c-7ee873201c9b`完成4/4 GPU sampling，但在随后的video VAE decode阶段worker PID611184被kernel global OOM杀掉，MP4仍0。下方第五次失败和restricted-window记录保留历史，不再代表当前阻塞位置。Original refs/voice/model/LoRA/profile/prompt/17 s全部保持，canonical fresh seed1583761486，不声称same-seed媒体A/B。
+
+`543f22c`实现exact第五grant，default cap2/ceiling3保留，10项fresh exact-staged direct policy checks全PASS（tree `ce8b7c1c57bad862b561fe47ce5331c208c508ba`）；用户禁止worktree，所以canonical Harness receipt为None。受管Kimi round1 `95d31f7f-16f9-49f7-818a-de11a85b1591`为response-body CONNECTION_ERROR/OUTCOME_UNKNOWN，8 wire/21 Reads，无完整report；收窄相同source snapshot的packet后round2 `ae185bcf-435a-4579-9285-c1d82bfadc73` PARSED / 304.521 s / 3 wire / 4 Reads，qualified Docker/deep route、response identity、receipt/report/source hashes经Parent核验。Report SHA `2f78a2e3f340ecfb86854576b1a1ee49881423799653279d4cf68024dc947516`无blocking findings；三个evidence questions由Parent检查local receipt必须绑定intent、旧runtime拒绝新5以及read-only telemetry/restore owner后关闭，见R10 `review-adjudication.json`、`review-acceptance.json`。PARSED只作为review证据，不是媒体通过。
+
+新finite unit保留R9 budget/hash、actual used5→batch ceiling6、local total=None、paid0、new submit1、7200/5400 s bounds；第五grant由actual07 consumed，没有改名task或重置历史。`--disable-async-offload`保留CUDA运算，temporary unit `ai-video-comfyui-eb94d306f73a4f9c907e517071dd3a38.service`、InvocationID `9bb82621e77242c5a00b2868c2496a7c`。同Invocation/PID journal记录4/4 sampling、7:06采样时间及VideoVAE开始；GPU telemetry曾约30 GiB/100%，采样完成后约15 GiB。20:41:52 kernel明确记载global_oom杀掉PID611184、anon-rss60143584 kB（约57.4 GiB）；不是新CUDA OOM，也不把systemd的早期MemoryPeak或failure后free RAM当完整峰值。
+
+进程和8188 endpoint消失，Comfy volatile history不再可取；exact output prefix `ai_video_h3_t8_native_3_bbaf736636abe9f6` inventory为空，没有fetch或AV文件。绑定证据在R10 `comfy-host-termination.jsonl`、`kernel-host-termination.log`、`host-termination-evidence.json`（SHA `be7cd0a6ad053aff2927dba3b7755b108879cf33263479ec6ddebc0da18201fa`）。核实own poll controller PID620985/argv后只SIGINT停止其无结果history poll，exit130，不杀未知任务。用existing canonical `record_video_provider_failure`显式记录known worker failure，再`record_attempt_evaluation`；没有合成Comfy history或Provider observation，没有裸写Manifest、remint或重试。
+
+Public loader重开Manifest45、6个actual submitted全FAILED、5份grants全consumed、fetch0/MP4=0，prepared-only03不计submit。Actual07 binding `25ea6c94d581176bdd5481e7cd4e04e48d65858cffe1f3c0d0a90f6ddae47a98`。R10 `terminal-audit.json`保存canonical恢复依据和计数。OOM后的`--collect` unit已消失，旧restore要求active/idle的前置条件不成立；先证明exact worker死亡、supervisor无unit/无endpoint，再复用原serialized supervisor恢复正常Python3.13/Sage GPU服务，未stop任何unknown service。恢复unit `ai-video-comfyui-f03994349044422b97809ba255e283a2.service` / PID793442 / InvocationID `56a4d91f35f14dea892b75da443b7ece`，active/loopback healthy/queue empty，见R10 `service-before-restoration.json`、`restoration-health.json`。Jianji/未知任务保留。
+
+下一候选见[host pin recovery spec](../superpowers/specs/2026-09-29-coco-nosha-host-pin-recovery.md)及[plan](../superpowers/plans/2026-09-29-coco-nosha-host-pin-recovery.md)：pinned H3 VAE已经内置空间/时间分块，`decode_tiled`为regular alias；针对RAM failure验证关闭额外host pinned-memory缓存，保留GPU推理/原算法和17 s。原单次slot已消耗，不能重跑R10 controller；新finite unit仍需runtime proof、canonical ceiling6实现/验证和适用review。Task默认授权覆盖，不再为同类工程调整请求批准。
+
+真实delivery仍未完成。全部media/原声线/完整因果链/完整观看聆听为NOT_EVALUATED；本runtime完成4/4不等于最终成片能力或视觉验收。本模型输入接口无法实际聆听audio，原MP3 listening记录为NOT_EVALUATED（R10 `reference-listening-boundary.json`），不能把ASR当timbre或听觉证明。Automatic learning evaluation为`no_candidate`：这次是单一host OOM incident，局部配置对照不支持完整模型RAM或成片recipe；保留既有claim，无placeholder/adoption。没有仅为record增加测试/network/media，RAG未刷新，unrelated `.codex/config.toml`保留，无push/release。
+
+## Historical Continuation — Fifth Physical Submit Failed At Vbar Prefetch
 
 2026-09-29 19:41 +08:00实际执行已取代下方restricted namespace与cap4 pending状态。本窗口可以访问RTX 5090、user manager和strict-loopback ComfyUI；没有绕过平台权限，没有修改installed Comfy/model或停止Jianji/未知任务。共享实现`b25c2ac`保留默认cap2及旧ceiling3，只新增exact ceiling4与typed revalidation；15项fresh exact-staged direct policy checks全部PASS，staged tree `550f5a46bb6ee682aa52ba27f6e0440ee73bbdf1`。`R9= runs/coco-nosha-mlp-memory-20260929-001/`的`policy-verification.json`保存逐项log/hash；用户禁止worktree，所以没有canonical Harness receipt。
 
