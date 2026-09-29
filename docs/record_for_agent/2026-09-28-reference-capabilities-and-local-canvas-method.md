@@ -11,7 +11,31 @@ Session window: 2026-09-27–2026-09-29, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
-## Current Execution Blocker — Restricted Window Recheck
+## Current Continuation — Fifth Physical Submit Failed At Vbar Prefetch
+
+2026-09-29 19:41 +08:00实际执行已取代下方restricted namespace与cap4 pending状态。本窗口可以访问RTX 5090、user manager和strict-loopback ComfyUI；没有绕过平台权限，没有修改installed Comfy/model或停止Jianji/未知任务。共享实现`b25c2ac`保留默认cap2及旧ceiling3，只新增exact ceiling4与typed revalidation；15项fresh exact-staged direct policy checks全部PASS，staged tree `550f5a46bb6ee682aa52ba27f6e0440ee73bbdf1`。`R9= runs/coco-nosha-mlp-memory-20260929-001/`的`policy-verification.json`保存逐项log/hash；用户禁止worktree，所以没有canonical Harness receipt。
+
+### Equivalent Local Kernel And Independent Review
+
+完整MLP row-only分块最初在真实宽度65569-row LoRA组合出现max absolute error0.0001373291015625，已拒绝并保留历史；保留full-row LoRA down projection后，最终8项GPU对照全PASS。实际hidden5376/FFN14336的plain与LoRA各比较352498944个output elements、max error0、input unchanged，峰值stock→candidate比约0.186/0.181。最终candidate SHA `afdf3e9a2182b653ffa751c2c3858e2430b2cab670cee200db89107d5e4d4858`，原失败token rows未测量，100032-row stock曾OOM，不能把代表case当exact failure shape或完整模型通过。Metadata guard误读属性后的known验证失败及有限修订均保存于R9，无数值标准降级。
+
+受管Kimi第一轮`51a1def5-f2ff-4a43-9603-ee677a39fd75`为TLS_ERROR/CONNECT、6.248 s/1 request/0 Reads，无report；有限无凭据握手证明间歇性TLS，未改变route/CA。第二轮`c360d2e1-da8e-424a-b783-456e009cdcb2`于888.480 s/5 wire requests后得到完整canonical report，20个Read覆盖exact source/spec/plan/packet。Docker image `8f399afdd9208aa6e6b37a6fd15ba3c0afdf1617c60fdc55dc11d3515d8bc720`、deep/k3[1m]/max和runtime/response identity及全部artifacts/source hashes均核验。Review report无blocking finding；Parent核对policy-result hash与policy-YAML hash属于不同文件、确认direct-check限制，另用read-only helper证明ceiling4对remote/metered仍拒绝。`R9/review-adjudication.json`与`review-acceptance.json`记录最终裁决及exact source snapshot，不把PARSED或kernel PASS当media acceptance。
+
+### Actual Fifth Submit And Terminal Recovery
+
+新R9有限unit保存R8 budget/hash为predecessor、actual used4→batch ceiling5、local total=None、paid0、new physical ceiling1、window7200 s/active5400 s。由sole committer登记第四份grant `752e0b808a0c4743ee0930684b2bfc2a16b138b8f5bebe232bc94d0a6efdb9aa`，实际由`coco-nosha-attempt-06`消耗。Frozen三图、COCO voice、prompt/model/LoRA/profile和17 s输出保持，canonical fresh seed1583761485；不声称same-seed A/B。
+
+Owned task-only GPU unit `ai-video-comfyui-9d4ee16763954761a8bc213bfecb2682.service` / PID127208 / InvocationID `365e7c760aeb445ba5020b19606d24ff`加载原Triton、LoRA及MLP overlay。Actual prompt `2822aecf-549a-49b4-840f-3fdc931ed82f`运行41.46 s，于0/4采样阶段报`VRAM grow failed: 646288384 bytes`，stack为`model_prefetch.prefetch_queue_pop -> cast_modules_with_vbar -> get_cast_buffer -> VRAMBuffer.get`。这是新异步预取buffer failure，不能称旧MLP rotation已完成全模型证明，也不能从失败后free VRAM推断失败时峰值。
+
+Public loader与Comfy history核对后，Manifest revision39、5个actual submitted attempts均FAILED、4份grants全consumed、fetch0/MP4=0，prepared-only03仍RUNNING但没有submit意图/receipt，不计物理提交。Actual06 binding `7b314cae21434c1e2d704dd01c2b6142bc08b9bd23fb0432976149252a8e0c19`；`R9/terminal-audit.json`、`attempt-06/observation.json`与`comfy-history.json`保存known outcome，controller exit0只表示已记录失败。新单次slot已消耗，禁止重跑R9 controller或复用grant/permit。
+
+Known terminal/empty queue后经原supervisor恢复默认GPU ComfyUI：unit `ai-video-comfyui-b211c66af9174f28ba5b63c0681eed50.service` / PID207059 / InvocationID `e0555d522af44fbaacb520def14e6ae2`，loopback healthy、队列空，argv为正常Python3.13/Sage、不带临时overlay/Triton flags。`R9/restoration-health.json`保存恢复证明。新诊断是使用pinned Comfy现有`--disable-async-offload`避开预取/异步buffer；两个隔离CUDA进程在4.813 s内证实NUM_STREAMS2→0、queue/stream停用、小MLP16640 output elements bytes hash相同，但未执行dynamic全模型。新spec/plan见[synchronous offload repair](../superpowers/specs/2026-09-29-coco-nosha-synchronous-offload-repair.md)，后续仅一个新有限unit，不盲重试、不降低17 s成片要求。
+
+### Delivery And Learning Boundary
+
+目标仍未完成；COCO / Nosha MP4=0，完整观看/聆听、原声线与完整因果链均NOT_EVALUATED。这里记录工程/恢复与已知media failure，未新运行测试、网络或media仅为记录，未push/release，unrelated `.codex/config.toml`保留，RAG未刷新。Automatic learning evaluation为`no_candidate`：本记录不外推模型媒体能力；数学对照只约束exact task-local算子，新offload配置只证明dispatch，尚无足够full-model或成片证据支持新的media recipe/adoption。历史失败、反证及局部数值结果继续可检索，未创建placeholder claim。
+
+## Historical Execution Blocker — Restricted Window Recheck
 
 2026-09-29 18:28 +08:00用户要求继续生成后，本窗口重新验证：`/dev/nvidia*`为空，独立`nvidia-smi`退出9，`systemctl --user`不能连接bus，`127.0.0.1:8188/queue`不可达。当前受限namespace无法访问宿主机GPU/service/loopback，不能据此判断host driver损坏、显存不足或host ComfyUI停机；不得绕过平台权限。标准 `load_production_project`在现有Python3.13重开确认Manifest33、actual submits4全部FAILED、3份grant全consumed、fetch0；本轮新增submit/service mutation均0。误选的Python3.11环境缺少numpy，未安装dependency，改用已有Python3.13后loader成功。Evidence见 `runs/coco-nosha-sandbox-recheck-20260929-001/preflight.json`，Manifest bytes SHA-256 `78e097c82f23e918812e31a31d7e979bb53a9d8d8905aadb096b8088e6cfc545`。
 

@@ -393,7 +393,7 @@ def test_v2_extension_tamper_and_version_mismatch_are_rejected(tmp_path):
             actor=ACTOR, expected_manifest_revision=0, local_extension=extension)
 
 
-@pytest.mark.parametrize("ceiling", [3, 4])
+@pytest.mark.parametrize("ceiling", [3, 4, 5])
 def test_runtime_repair_extension_cannot_authorize_unknown_submit(tmp_path, ceiling):
     from ai_video.errors import ErrorCode
     from ai_video.production.generation_runtime_repair import LocalRuntimeRepairExtension
@@ -440,32 +440,53 @@ def _fourth_extension(committer, **updates):
     })
 
 
-def test_exact_fourth_local_repair_preserves_history_replay_and_one_use(tmp_path):
-    provider, committer, caller, service, limits, sequence = _consumed_third_local_repair(tmp_path)
-    before = committer._read_manifest()
-    extension = _fourth_extension(committer)
-    pointer = committer.record_runtime_repair_authorization(
+def _consumed_fourth_local_repair(tmp_path):
+    runtime = _consumed_third_local_repair(tmp_path)
+    provider, committer, caller, service, limits, sequence = runtime
+    committer.record_runtime_repair_authorization(
         attempt_id="extension-failure-3", repair_basis=REPAIR_BASIS, actor=ACTOR,
+        local_extension=_fourth_extension(committer))
+    limits = limits.model_copy(update={"local_batch_limit": 6})
+    _fail_attempt(committer=committer, caller=caller, service=service, limits=limits,
+                  sequence=sequence, number=4, attempt_id="extension-failure-4")
+    return provider, committer, caller, service, limits, sequence
+
+
+@pytest.mark.parametrize("ceiling", [4, 5])
+def test_exact_extended_local_repair_preserves_history_replay_and_one_use(tmp_path, ceiling):
+    from ai_video.production.generation_runtime_repair import LocalRuntimeRepairExtension
+    setup = _consumed_third_local_repair if ceiling == 4 else _consumed_fourth_local_repair
+    provider, committer, caller, service, limits, sequence = setup(tmp_path)
+    source_attempt = f"extension-failure-{ceiling - 1}"
+    state = _attempt(committer, source_attempt).video_generation_state
+    binding = committer._reopen_generation_execution_binding(state.execution_binding)
+    extension = LocalRuntimeRepairExtension(
+        task_id=binding.inputs.limits.task_id, shot_id=binding.context.target_shot_id,
+        failed_binding_hash=binding.binding_hash,
+        expected_manifest_revision=committer._read_manifest().manifest_revision, ceiling=ceiling)
+    before = committer._read_manifest()
+    pointer = committer.record_runtime_repair_authorization(
+        attempt_id=source_attempt, repair_basis=REPAIR_BASIS, actor=ACTOR,
         local_extension=extension)
     receipt = committer._reopen_runtime_repair_authorization(pointer)
     assert receipt.schema_version == "runtime-repair/2"
-    assert receipt.local_extension.ceiling == 4
+    assert receipt.local_extension.ceiling == ceiling
     revision = committer._read_manifest().manifest_revision
     assert committer.record_runtime_repair_authorization(
-        attempt_id="extension-failure-3", repair_basis=REPAIR_BASIS, actor=ACTOR,
+        attempt_id=source_attempt, repair_basis=REPAIR_BASIS, actor=ACTOR,
         local_extension=extension) == pointer
     assert committer._read_manifest().manifest_revision == revision
     assert committer._read_manifest().attempts[:-1] == before.attempts[:-1]
-    sequence[0] = 4
+    sequence[0] = ceiling
     prepared = caller.start(committer=committer, attempt_id="fourth-last", limits=limits)
-    assert prepared.inputs.limits.local_batch_used == prepared.inputs.limits.local_total_used == 4
+    assert prepared.inputs.limits.local_batch_used == prepared.inputs.limits.local_total_used == ceiling
     assert prepared.decision.runtime_repair.evidence_hash == pointer.evidence_hash
     service.submit_local_once(attempt_id="fourth-last")
-    assert provider.submit_calls == 5
-    assert _attempt(committer, "extension-failure-3").video_generation_state.runtime_repairs[0].consumed
+    assert provider.submit_calls == ceiling + 1
+    assert _attempt(committer, source_attempt).video_generation_state.runtime_repairs[0].consumed
     with pytest.raises(AiVideoError):
         service.submit_local_once(attempt_id="fourth-last")
-    assert provider.submit_calls == 5
+    assert provider.submit_calls == ceiling + 1
     service.refresh_local_once(attempt_id="fourth-last")
     from ai_video.production.generation_feedback import record_attempt_evaluation
     record_attempt_evaluation(committer=committer, attempt_id="fourth-last")
@@ -480,21 +501,23 @@ def test_exact_fourth_local_repair_preserves_history_replay_and_one_use(tmp_path
             local_extension=reused)
     assert committer._read_manifest() == final
     states = [a.video_generation_state for a in final.attempts if a.video_generation_state is not None]
-    assert sum(len(s.runtime_repairs) for s in states) == 4
+    assert sum(len(s.runtime_repairs) for s in states) == ceiling
     assert all(p.consumed for s in states for p in s.runtime_repairs)
 
 
-def test_fourth_extension_cannot_skip_third_grant(tmp_path):
+@pytest.mark.parametrize("ceiling", [4, 5])
+def test_extension_cannot_skip_prior_grants(tmp_path, ceiling):
     provider, committer, _, _, _, _ = _exhausted_local_repairs(tmp_path)
     before = committer._read_manifest()
     with pytest.raises(AiVideoError, match="extension is premature"):
         committer.record_runtime_repair_authorization(
             attempt_id="extension-failure-2", repair_basis=REPAIR_BASIS, actor=ACTOR,
-            local_extension=_extension(committer, ceiling=4))
+            local_extension=_extension(committer, ceiling=ceiling))
     assert committer._read_manifest() == before
     assert provider.submit_calls == 3
 
 
+@pytest.mark.parametrize("ceiling", [4, 5])
 @pytest.mark.parametrize("updates, actor, evidence_hash", [
     ({"task_id": "different-task"}, ACTOR, None),
     ({"shot_id": "different-shot"}, ACTOR, None),
@@ -503,27 +526,36 @@ def test_fourth_extension_cannot_skip_third_grant(tmp_path):
     ({}, ActorIdentity(actor_id="other-owner", actor_kind="automation"), None),
     ({}, ACTOR, "0" * 64),
 ])
-def test_fourth_repair_rejects_identity_and_stale_revision(tmp_path, updates, actor, evidence_hash):
-    provider, committer, _, _, _, _ = _consumed_third_local_repair(tmp_path)
+def test_extended_repair_rejects_identity_and_stale_revision(tmp_path, updates, actor, evidence_hash, ceiling):
+    setup = _consumed_third_local_repair if ceiling == 4 else _consumed_fourth_local_repair
+    provider, committer, _, _, _, _ = setup(tmp_path)
+    source_attempt = f"extension-failure-{ceiling - 1}"
+    state = _attempt(committer, source_attempt).video_generation_state
+    binding = committer._reopen_generation_execution_binding(state.execution_binding)
+    from ai_video.production.generation_runtime_repair import LocalRuntimeRepairExtension
+    values = {"task_id": binding.inputs.limits.task_id, "shot_id": binding.context.target_shot_id,
+              "failed_binding_hash": binding.binding_hash,
+              "expected_manifest_revision": committer._read_manifest().manifest_revision,
+              "ceiling": ceiling, **updates}
     before = committer._read_manifest()
     with pytest.raises(AiVideoError):
         committer.record_runtime_repair_authorization(
-            attempt_id="extension-failure-3", repair_basis=REPAIR_BASIS, actor=actor,
-            evidence_hash=evidence_hash, local_extension=_fourth_extension(committer, **updates))
+            attempt_id=source_attempt, repair_basis=REPAIR_BASIS, actor=actor,
+            evidence_hash=evidence_hash, local_extension=LocalRuntimeRepairExtension(**values))
     assert committer._read_manifest() == before
-    assert provider.submit_calls == 4
+    assert provider.submit_calls == ceiling
 
 
 def test_runtime_repair_extension_rejects_unbounded_ceiling():
     from ai_video.production.generation_runtime_repair import LocalRuntimeRepairExtension
     with pytest.raises(ValueError):
         LocalRuntimeRepairExtension(task_id="task", shot_id="shot", failed_binding_hash="b" * 64,
-            expected_manifest_revision=0, ceiling=5)
+            expected_manifest_revision=0, ceiling=6)
 
 
 def test_runtime_repair_extension_revalidates_copied_models_before_mutation(tmp_path):
     provider, committer, _, _, _, _ = _exhausted_local_repairs(tmp_path)
-    extension = _extension(committer).model_copy(update={"ceiling": 5})
+    extension = _extension(committer).model_copy(update={"ceiling": 6})
     before = committer._read_manifest()
     with pytest.raises(AiVideoError, match="typed and exact"):
         committer.record_runtime_repair_authorization(
@@ -533,7 +565,8 @@ def test_runtime_repair_extension_revalidates_copied_models_before_mutation(tmp_
     assert provider.submit_calls == 3
 
 
-def test_existing_v2_ceiling_three_payload_remains_exact():
+@pytest.mark.parametrize("ceiling", [3, 4])
+def test_existing_v2_extension_payload_remains_exact(ceiling):
     from ai_video.production.hashing import canonical_sha256
     payload = {
         "schema_version": "runtime-repair/2", "attempt_id": "old-third",
@@ -541,7 +574,7 @@ def test_existing_v2_ceiling_three_payload_remains_exact():
         "actor": ACTOR.model_dump(mode="json"), "expected_manifest_revision": 9,
         "content_hash": "0" * 64,
         "local_extension": {"task_id": "task", "shot_id": "shot",
-            "failed_binding_hash": "b" * 64, "expected_manifest_revision": 8, "ceiling": 3},
+            "failed_binding_hash": "b" * 64, "expected_manifest_revision": 8, "ceiling": ceiling},
     }
     payload["content_hash"] = canonical_sha256(payload)
     reopened = RuntimeRepairAuthorization.model_validate(payload)

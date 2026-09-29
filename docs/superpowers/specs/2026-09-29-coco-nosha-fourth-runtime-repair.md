@@ -1,5 +1,9 @@
 # Scoped Fourth Runtime Repair For COCO / Nosha
 
+## Execution Result — 2026-09-29
+
+下方implementation pending/预执行边界已由实际证据取代：共享实现提交`b25c2ac`，15项exact-staged direct policy checks通过，qualified Kimi完整审查及Parent裁决通过。第四份grant已由attempt06消耗；实际累计5次physical submits、Manifest39、4 consumed grants、fetch0/MP4=0。Attempt06在GPU上41.46 s后失败于异步vbar prefetch缓冲646288384 bytes分配，并非已完成媒体。自有临时服务已恢复为原默认GPU服务/空队列。前述MLP逐元素对照继续有效，只是局部数学证明；新诊断单元见[synchronous offload spec](2026-09-29-coco-nosha-synchronous-offload-repair.md)。本spec的唯一新增physical slot已消耗，禁止重跑旧controller。
+
 ## Authorization Supersession — 2026-09-29
 
 用户已将任务内 shared contract、有限预算与 recovery规则变更设为默认授权，见[规则变更记录](../../record_for_agent/2026-09-29-default-task-contract-budget-recovery-authority.md)。下文 `NOT APPROVED`及“须获批准”保留为历史 proposal状态，不能再要求用户逐项批准。技术内容仍是待 Parent对当前 source核对、self-review及定稿的 candidate；本次规则变更未实施MLP mitigation、cap4 contract、grant/window/permit或视频 submit，不声称 runtime ready。
