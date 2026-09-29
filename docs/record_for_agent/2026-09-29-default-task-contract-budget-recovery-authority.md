@@ -33,7 +33,9 @@ Evidence root：`runs/default-task-authority-20260929-001/`。
 
 受管 Kimi review invocation `c4186d11-c6a1-420c-a41c-ebe95dfb11ac`、seal `9347ad9c6637a09606ceb338a799411581734b1b3f02f9d91e20b073c40d8f2e`实际 PARSED；392.105 s、4 wire requests、k3/max，qualified Docker route与 artifact hashes、完整 Read均已核验。`review-round-1-receipt.json`、`review-round-1-report.json`、`review-round-1-adjudication.json`保存 evidence和 Parent裁决。F1安全保护措辞已补齐；F2指出的全局路径混淆已由不同真实 owner及 hashes纠正。报告未审查后来补充的 global review预算段落，不宣称旧审查覆盖新 bytes。
 
-窗口随后切换为 restricted filesystem/network，`.git`及宿主机写入路径不可写，新的受管 Kimi seal/复核未执行。Final independent re-review与 Git checkpoint未完成；这是当前环境限制，不是等待用户批准变更。现有修改保留，不绕过平台权限。
+窗口随后切换为 restricted filesystem/network，宿主机 state写入不在 writable roots，新的受管 Kimi seal/复核未执行。Final independent re-review尚未完成；这是当前环境限制，不是等待用户批准变更。初轮报告不升级为修改后全部 bytes的 Kimi acceptance。
+
+受限环境里的最终复测：diff、documentation、policy及 task-delta Architecture Gate仍通过；runtime-skill 2、open-video 48、seedance 8通过。Harness组为260 PASS/1 FAIL，`test_network_guard_installation_blocks_external_dns`在创建 UDP socket时被OS拒绝（`PermissionError: [Errno 1] Operation not permitted`），尚未运行到该socket的 guard断言；之前同一组261 PASS保留，不能将最终复测描述为全PASS。Exact logs见 `final-*.log`。受限复测脚本的 `git write-tree`及一次 `git add`也因 `index.lock`只读失败；之后普通独立 `git commit`实际成功为 `41b02d9`，6个 owned repository files已提交，unrelated config未纳入。Git结论以该实际结果为准，不把部分命令的沙箱拒绝当作宿主机Git损坏；本记录随后同步这些真实边界。
 
 ## Media Boundary And Supersession
 
