@@ -43,6 +43,14 @@ def register_runtime_repair_authorization(
 
     if not isinstance(repair_basis, str) or not repair_basis.strip():
         raise _state_invalid("Runtime repair requires an explicit repair basis.")
+    if local_extension is not None:
+        if not isinstance(local_extension, LocalRuntimeRepairExtension):
+            raise _state_invalid("Runtime repair extension must be typed and exact.")
+        try:
+            local_extension = LocalRuntimeRepairExtension.model_validate_json(
+                local_extension.model_dump_json())
+        except ValueError:
+            raise _state_invalid("Runtime repair extension must be typed and exact.") from None
     with self._exclusive_lock():
         manifest = self._read_manifest()
         attempt = self._video_attempt(manifest, attempt_id)
@@ -100,10 +108,8 @@ def register_runtime_repair_authorization(
         granted = len(grants)
         ceiling = MAX_RUNTIME_REPAIRS_PER_SHOT
         if local_extension is not None:
-            if granted != MAX_RUNTIME_REPAIRS_PER_SHOT:
+            if granted != local_extension.ceiling - 1:
                 raise _state_invalid("Runtime repair budget is exhausted or extension is premature.")
-            if not isinstance(local_extension, LocalRuntimeRepairExtension):
-                raise _state_invalid("Runtime repair extension must be typed and exact.")
             if state.execution_binding is None:
                 raise _state_invalid("Runtime repair extension requires a sealed execution binding.")
             binding = self._reopen_generation_execution_binding(state.execution_binding)
