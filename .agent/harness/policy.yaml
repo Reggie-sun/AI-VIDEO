@@ -119,7 +119,7 @@ checks:
     cwd: .
     description: Verify final-output requirements, exact repair baselines, known-violation refusal and complete fresh review through existing owners; no Provider or media effects.
   production_vidu_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_vidu.py, tests/test_production_vidu_download.py, tests/test_production_vidu_prompt.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_vidu.py, tests/test_production_vidu_download.py, tests/test_production_vidu_prompt.py, tests/test_production_vidu_subjects.py, -q]
     cwd: .
     description: Verify Vidu Q3 payloads, paid permit, task identity, and bounded downloads offline.
   scope_diff_check:
@@ -959,6 +959,8 @@ categories:
       - src/ai_video/production/minimax_hailuo.py
       - src/ai_video/production/vidu.py
       - src/ai_video/production/_vidu_prompt.py
+      - src/ai_video/production/_vidu_subjects.py
+      - src/ai_video/production/video_subjects.py
       - src/ai_video/production/vidu_profile.py
       - src/ai_video/production/vidu_download.py
       - src/ai_video/production/vidu_source.py
@@ -1029,6 +1031,7 @@ categories:
       - tests/test_production_minimax_hailuo.py
       - tests/test_production_vidu.py
       - tests/test_production_vidu_prompt.py
+      - tests/test_production_vidu_subjects.py
       - tests/test_production_vidu_download.py
       - tests/test_production_seedance.py
       - tests/test_production_seedance_local_video.py

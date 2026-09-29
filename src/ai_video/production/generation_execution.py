@@ -114,6 +114,11 @@ class GenerationDecisionExecutionBinding(StrictModel):
         sealed = request.activation_scope.request if request.activation_scope else None
         if sealed is None:
             raise ValueError("production execution binding requires an activation scope")
+        if request.subject_bindings or (request.adapter_compiler_id == "vidu-video-compiler"
+                                       and request.adapter_compiler_version == "4"):
+            from ai_video.production._vidu_subjects import validate_vidu_subject_prompt
+
+            validate_vidu_subject_prompt(self.projection.requirement, bound, request.subject_bindings, request.prompt_text)
         if recipe is not None:
             expected_seed = recipe.seed.value
             if request.effective_seed != expected_seed or sealed.seed != expected_seed:
@@ -207,6 +212,13 @@ class GenerationDecisionExecutionBinding(StrictModel):
         shot = shots[0]
         if shot != self.projection.requirement.target_shot:
             raise ValueError("generation execution must retain the exact canonical Shot")
+        if request.subject_bindings:
+            requirement = self.projection.requirement
+            current_characters = {c.character_id: c for c in project.characters}
+            current_scenes = {s.scene_id: s for s in project.scenes}
+            if (any(current_characters.get(c.character_id) != c for c in requirement.characters)
+                    or current_scenes.get(requirement.scene.scene_id) != requirement.scene):
+                raise ValueError("named subject artifacts differ from the current canonical project")
         if self.projection.requirement.voice_routing is not None:
             from ai_video.production.voice_routing import validate_voice_execution
 

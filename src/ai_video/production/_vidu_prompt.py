@@ -43,6 +43,41 @@ class ViduPromptCompilation(_ViduPromptModel):
 ViduPromptResult = ViduPromptCompilation | ViduPromptUnsupported
 
 
+def compile_vidu_subject_prompt(requirement, bound, subjects) -> ViduPromptResult:
+    """Add canonical subject roles to the existing versioned prose grammar."""
+    if requirement.contract_version == "provider-neutral-video-requirement/4":
+        from ai_video.production._remote_video_native_prompt import compile_remote_video_prompt
+
+        base = compile_remote_video_prompt(requirement, voice_route=bound.voice_route)
+    else:
+        base = compile_vidu_prompt(requirement)
+    if base.outcome != "compiled":
+        return ViduPromptUnsupported(unsupported_field_paths=base.unsupported_field_paths)
+    characters = {c.character_id: c for c in requirement.characters}
+    labels = []
+    for subject in subjects:
+        if subject.canonical_owner_kind == "character":
+            character = characters[subject.canonical_owner_id]
+            labels.append(f"@{subject.name} is {character.name}; use its images only for this character's identity and appearance.")
+        else:
+            labels.append(f"@{subject.name} is the scene reference; preserve its environment, layout and visible props.")
+    dialogue = requirement.generation_intent.dialogue_intent
+    controls = list(base.expressed_control_paths)
+    separate = bound.voice_route is not None and bound.voice_route.route.value == "separate"
+    if dialogue is not None and dialogue.mode == "dialogue" and not separate:
+        matching = tuple(s for s in subjects if s.canonical_owner_kind == "character"
+                         and s.canonical_owner_id == dialogue.speaker_id)
+        if len(matching) != 1:
+            return ViduPromptUnsupported(unsupported_field_paths=("voice_routing.speakers",))
+        labels.append(f"Dialogue speaker: @{matching[0].name}. Other characters do not repeat the dialogue.")
+        controls.append("generation_intent.dialogue_intent.speaker_id")
+    text = unicodedata.normalize("NFC", " ".join((*labels, base.prompt_text)))
+    if len(text) > 5000:
+        return ViduPromptUnsupported(unsupported_field_paths=("generation_intent",))
+    return ViduPromptCompilation(prompt_text=text, prompt_sha256=hashlib.sha256(text.encode()).hexdigest(),
+                                 expressed_control_paths=tuple(controls))
+
+
 _REFERENCE_SENTENCES = {
     "identity": "保持提供的人物身份参考中的外观连续一致。",
     "scene": "保持提供的场景参考中的空间和环境连续一致。",

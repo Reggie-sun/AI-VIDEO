@@ -14,6 +14,7 @@ from pydantic import (
 )
 
 from ai_video.production.models import StrictModel
+from ai_video.production.video_subjects import VideoSubjectCapability
 
 
 _SAFE_ID = r"^[A-Za-z0-9._:/-]{1,256}$"
@@ -563,6 +564,8 @@ class VideoOutputRecoveryStrategy(str, Enum):
 class VideoCapabilityContractMixin:
     """Additive serialization and invariant checks for capability variants."""
 
+    subject_reference_capability: VideoSubjectCapability | None = None
+
     @model_serializer(mode="wrap")
     def _serialize_additive_output_recovery_strategy(
         self, handler: SerializerFunctionWrapHandler
@@ -570,10 +573,14 @@ class VideoCapabilityContractMixin:
         data = handler(self)
         if self.output_recovery_strategy is None:
             data.pop("output_recovery_strategy", None)
+        if self.subject_reference_capability is None:
+            data.pop("subject_reference_capability", None)
         return data
 
     @model_validator(mode="after")
     def _validate_variant(self) -> Self:
+        if self.subject_reference_capability is not None and self.mode.value != "reference_to_video":
+            raise ValueError("named subject capability requires reference-to-video mode")
         if (self.output is None) == (self.output_capability is None):
             raise ValueError("video capability requires exactly one output contract")
         if len(set(self.allowed_image_roles)) != len(self.allowed_image_roles):

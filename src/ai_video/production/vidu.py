@@ -194,7 +194,26 @@ class ViduVideoProvider(_ViduAdMethods):
             )
         current_recipe = (provider_bound.generation_recipe is not None
                           and requirement.contract_version == "provider-neutral-video-requirement/4")
-        if current_recipe:
+        named = (provider_bound.compiler_contract.compiler_id == "vidu-video-compiler"
+                 and provider_bound.compiler_contract.compiler_version == "4")
+        subjects = ()
+        if named:
+            from ai_video.production._vidu_subjects import derive_vidu_subjects
+            from ai_video.production._vidu_prompt import compile_vidu_subject_prompt
+
+            try:
+                subjects = derive_vidu_subjects(requirement, provider_bound)
+            except ValueError:
+                return ProviderRequirementUnsupported(
+                    requirement_hash=requirement.requirement_hash,
+                    provider_bound_request_hash=provider_bound.provider_bound_request_hash,
+                    selected_capability_id=provider_bound.capability_id,
+                    reason=ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH,
+                    unsupported_field_paths=("subject_bindings",),
+                )
+            prompt = compile_vidu_subject_prompt(requirement, provider_bound, subjects)
+            compiled_prompt = isinstance(prompt, ViduPromptCompilation)
+        elif current_recipe:
             from ai_video.production._remote_video_native_prompt import (
                 compile_remote_video_prompt, RemoteVideoPromptCompilation,
             )
@@ -213,13 +232,14 @@ class ViduVideoProvider(_ViduAdMethods):
             )
         return compile_provider_video_request(
             provider_bound=provider_bound, requirement=requirement,
-            compiler_id="vidu-video-compiler", compiler_version="3" if current_recipe else "2",
+            compiler_id="vidu-video-compiler", compiler_version="4" if named else "3" if current_recipe else "2",
             capabilities=self.capabilities(),
             native_prompt=ProviderNativePrompt(
-                grammar_contract="vidu-prose-v3" if current_recipe else "vidu-prose-v2",
+                grammar_contract="vidu-subject-prose-v4" if named else "vidu-prose-v3" if current_recipe else "vidu-prose-v2",
                 prompt_text=prompt.prompt_text,
                 prompt_sha256=prompt.prompt_sha256,
                 expressed_control_paths=prompt.expressed_control_paths,
+                subject_bindings=subjects,
             ),
         )
 
@@ -230,7 +250,7 @@ class ViduVideoProvider(_ViduAdMethods):
             or request.provider_profile != self._profile.pointer()
             or not isinstance(output, VideoFlexibleOutputRequirement)
             or request.negative_prompt_text
-            or len(request.prompt_text) > (2000 if request.mode in (
+            or len(request.prompt_text) > (2000 if not request.subject_bindings and request.mode in (
                 VideoGenerationMode.REFERENCE_TO_VIDEO, VideoGenerationMode.VIDEO_EXTEND,
             ) else 5000)
             or (request.seed is not None and not 1 <= request.seed <= 2_147_483_647)
@@ -238,6 +258,7 @@ class ViduVideoProvider(_ViduAdMethods):
             raise _error("Vidu request does not match the sealed profile.", ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED)
         variants = tuple(v for v in self.capabilities().variants
                          if v.model_id == request.model_id and v.mode is request.mode
+                         and (v.subject_reference_capability is not None) == bool(request.subject_bindings)
                          and v.output_capability.supports(output))
         if len(variants) != 1:
             raise _error("Vidu request does not match one capability.", ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED)
@@ -312,6 +333,7 @@ class ViduVideoProvider(_ViduAdMethods):
             del payload["off_peak"]
         if request.image_bindings:
             images = []
+            images_by_id = {}
             for binding in sorted(request.image_bindings, key=lambda b: b.role != "first_frame"):
                 try:
                     raw = self._image_resolver(binding) if self._image_resolver else None
@@ -320,8 +342,19 @@ class ViduVideoProvider(_ViduAdMethods):
                 if (not isinstance(raw, bytes) or len(raw) != binding.size_bytes
                         or hashlib.sha256(raw).hexdigest() != binding.asset_sha256):
                     raise _error("Vidu image bytes do not match binding.", ErrorCode.VIDEO_REQUEST_INVALID)
-                images.append(f"data:{binding.mime_type};base64," + base64.b64encode(raw).decode("ascii"))
-            payload["images"] = images
+                encoded = f"data:{binding.mime_type};base64," + base64.b64encode(raw).decode("ascii")
+                images.append(encoded)
+                images_by_id[binding.asset_id] = encoded
+            if request.subject_bindings:
+                payload["subjects"] = [
+                    {"name": subject.name,
+                     "images": [images_by_id[asset_id] for asset_id in subject.image_asset_ids],
+                     **({"voice_id": subject.voice_id} if subject.voice_id is not None else {})}
+                    for subject in request.subject_bindings
+                ]
+                payload["auto_subjects"] = False
+            else:
+                payload["images"] = images
             if request.mode is VideoGenerationMode.IMAGE_TO_VIDEO and len(images) == 2:
                 endpoint = "start-end2video"
         if (

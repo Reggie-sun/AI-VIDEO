@@ -325,8 +325,16 @@ Project、timeline 或 QA state，也不会注册成普通 Shot capability。Foc
 Harness 的 `vidu_ad_tests`；使用与兼容边界见 [Vidu ad source](vidu-ad-provider.md)。
 
 `src/ai_video/production/vidu.py` 独占 Vidu payload/status/download mapping，
-`_vidu_prompt.py` 独占 Vidu version `2` 的自然语言 prompt 编译；新编译不接受 version `1`，
+`_vidu_prompt.py` 独占 Vidu version `2` 的自然语言 prompt 与 version `4` named grammar，
+完整 requirement `/4` 的 version `3` 消费既有 remote native prose；新编译不接受 version `1`，
 历史请求恢复保留原始 bytes。无法表达的语义与 native hard control 必须拒绝，不能静默丢弃。
+`video_subjects.py` 独占 immutable named binding、partition 与兼容序列化，
+`_vidu_subjects.py` 只从 canonical Character / Scene / Shot 与 Router owner-bound references
+推导映射。`video_compiler.py` 仍独占 request construction；compiler / execution binding 重算
+exact subject 与 prompt。`shot_router.py` 检查 named capability 与 compiler v4 配对。
+空字段保留历史 hash；Q3 voice ID 不声明 supported，不创建 clone 或放宽 voice qualification。
+`video_request_models.py` 保存 request fingerprint 投影，`video.py` 保持 public constructor 与 validator，
+请求 hash 的新主体字段接入不能继续增长 oversized module。
 `vidu_profile.py` 独占 dated profile、能力、下载信任模式与 per-call ceiling；
 `vidu_download.py` 独占 credential-free public-IP pinned HTTPS（原域名 TLS、无 redirect）；`vidu_source.py`
 只验证延长输入的 canonical submit/fetch/probe receipts，不拥有 lifecycle。显式 registry 注入，
@@ -334,7 +342,7 @@ Harness 的 `vidu_ad_tests`；使用与兼容边界见 [Vidu ad source](vidu-ad-
 fallback、重试 POST 或 activation。Profile hash、task/model、creation ID、exact egress、
 one-use permit 与 sealed download trust 均 fail closed。显式 `authenticated_task` 无需
 预知 CDN；默认 `fixed_origins` 保持旧 profile hash，额外约束 exact origin。
-Focused verification：`python -m pytest -p no:cacheprovider tests/test_production_vidu.py tests/test_production_vidu_download.py tests/test_production_vidu_prompt.py -q`；
+Focused verification：`python -m pytest -p no:cacheprovider tests/test_production_vidu.py tests/test_production_vidu_download.py tests/test_production_vidu_prompt.py tests/test_production_vidu_subjects.py -q`；
 Harness 路由为 `production_video_provider`，包含 `production_vidu_tests` 与既有
 Provider / neutral requirement / Architecture checks。配置边界见 [Vidu Provider](vidu-provider.md)。
 

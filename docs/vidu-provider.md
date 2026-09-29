@@ -8,7 +8,7 @@
 `first_frame + last_frame` 首尾帧模式。另外支持 `viduq3`、`viduq3-turbo` 的
 R2V／多主体图片参考，以及 `viduq2-pro`、`viduq2-turbo` 的 `VIDEO_EXTEND`。
 R2V 的官方模型 ID 是 `viduq3`，不将 `viduq3-pro` 静默改名；Q3 不声明延长能力。
-主体库管理、命名 `subjects`、视频参考编辑和自动选路不属于本次接入。
+支持显式选择的命名 `subjects` 图片参考；主体库管理、创建 clone、视频参考编辑和自动选路不属于本次接入。
 
 ## Configuration
 
@@ -73,8 +73,10 @@ MIME 与比例，然后在内存编码 data URI；完整 JSON body 不得超过 
 新请求使用 `vidu-video-compiler` version `2`，由 `_vidu_prompt.py` 将受支持的
 neutral requirement 编译为自然语言，保留已编写的动作、空间、镜头及声音约束，
 不把内部 ID、hash 或控制字段序列化给模型。新编译拒绝 version `1`；历史请求仍按
-原始 prompt/payload 读取与恢复，不重新编译。`/4`、无法表达的语义及 native hard
-control 继续 typed unsupported，文字描述固定机位不等于 API 硬控制能力。
+原始 prompt/payload 读取与恢复，不重新编译。完整 requirement `/4` + sealed recipe 使用
+version `3` 的现有 remote native prose；命名 R2V 使用 version `4`，保留完整 intent 并增加
+canonical 主体引用。无法表达的语义及 native hard control 继续 typed unsupported，
+文字描述固定机位不等于 API 硬控制能力。
 
 Version `2` 的 I2V／首尾帧请求显式发送 `is_rec=false`，使用提交的 prompt；其他
 endpoint 不附加此字段。官方文档没有明确省略该字段时的默认行为，因此不能断言
@@ -94,6 +96,38 @@ Native audio 仍由 `native_audio` 显式控制；neutral compiler 尚不提供�
 比例严格介于 1:4 与 4:1，prompt 最多 2000 字符；
 Q3 R2V 时长为 3–16 秒，ratio 为 16:9、9:16、1:1，使用 exact geometry。
 `native_audio` 显式选择，视频／音频 reference 不会被静默丢弃或改为图片。
+
+### Named Subjects And Original Voice Boundary
+
+显式选择 `viduq3-r2v-subjects-v1` 或 `viduq3-turbo-r2v-subjects-v1`，必须配对
+`vidu-video-compiler` version `4`。既有 flat capability IDs、profile pointers、请求 bytes
+及 replay hashes 保持。新增 `VideoSubjectBinding` 为空时从 JSON 完全省略；populated
+字段使用 request `/9`、resolved `/10`、activation `/8`、compilation `/2` 的 hash。
+
+`_vidu_subjects.py` 只连接 requirement 的 Character / Scene 与 owner-bound Router inputs，
+核对 owner ID/hash、canonical reference membership、Registry revision 和 exact image identity。
+确定性 `char_…` / `scene_…` alias 由 canonical ID 的 SHA-256 前 16 位推导，prompt 将
+`@alias` 对应到 canonical Character name / Scene 职责；dialogue 使用已封存的
+`DialogueIntent.speaker_id`，脚本只表达一次。通用 compiler 和 execution binding 重算主体及
+exact prompt，防止重新封存的换位或文字替换。字段不形成第二套 authoring 或 voice owner。
+
+每主体 1–3 张图片，最多七主体且图片总数最多七；全部图片必须组成唯一完整 partition。
+发送 `subjects[].name/images`、`auto_subjects=false`，不同时发送 top-level `images`；
+prompt 最多 5000 字符，其余图像/时长/geometry/body 限制保持。所有图片仍进入 exact egress
+并在内存编码前重验 bytes/SHA/size。依据：[international R2V](https://platform.vidu.com/docs/reference-to-video)。
+
+compiler v4 的 named 请求当前不能与任何 `voice_route` 配对：Router 尚未准入 v4 的
+`NATIVE` / `SEPARATE`，且 SEPARATE 的既有 prompt equality 不接受附加的主体标签。
+这是显式能力缺口，不把无声 named 请求或未接通的独立声轨当作原声线完成。
+
+Typed projection 保存可选 `voice_id` 及 paired 原声音频 reference identity，但当前
+Q3 capability 为 `voice_ids_supported=False`，compile/resolve 在任何 effects 前拒绝。
+[国内 subject library](https://platform.vidu.cn/docs/subjects) 明确限制 Q3 音色 ID；
+[国内 R2V](https://platform.vidu.cn/docs/reference-to-video) 也附有 Q3 限制，国际 R2V 页面
+列有字段但不足以证明模型实际使用它。不得静默忽略 ID、偷偷 clone 或把 native audio 当原声线验收。
+现有 native voice qualification blocker 保持，ASR 不能证明声线身份。
+[clone API](https://platform.vidu.com/docs/voice-clone) 要求原音频至少十秒；短素材不能重复、补静音或合成冒充。
+这些边界尚无本任务 live Q3 原声线媒体证据。
 
 ## Video Extension
 

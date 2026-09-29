@@ -22,10 +22,11 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.remote_media import RemoteMediaMaterializationReceipt
 from ai_video.production.commercial_video_contracts import (
-    CommercialVideoBindingMixin,
     GeneratedCommercialShotBinding as GeneratedCommercialShotBinding,
 )
+from ai_video.production.video_subjects import VideoSubjectBindingMixin, subject_capability_errors
 from ai_video.production.video_request_models import (
+    generation_request_fingerprint_payload,
     ProviderProfilePointer as ProviderProfilePointer,
     VideoImageReferenceBinding as VideoImageReferenceBinding,
     VideoOutputRequirement as VideoOutputRequirement,
@@ -166,7 +167,7 @@ class VideoTaskState(str, Enum):
     FAILED = "failed"
 
 
-class VideoGenerationRequest(CommercialVideoBindingMixin, _VideoStrictModel):
+class VideoGenerationRequest(VideoSubjectBindingMixin, _VideoStrictModel):
     generation_id: str = Field(pattern=_SAFE_ID.pattern)
     provider_name: str = Field(pattern=_SAFE_ID.pattern)
     provider_kind: str = Field(pattern=_SAFE_ID.pattern)
@@ -213,81 +214,7 @@ class VideoGenerationRequest(CommercialVideoBindingMixin, _VideoStrictModel):
 
     @staticmethod
     def _fingerprint_payload(data: dict[str, object]) -> dict[str, object]:
-        media_bindings = data.get("media_bindings")
-        mode = data.get("mode")
-        output = data.get("output_requirement")
-        image_bindings = data.get("image_bindings")
-        continuity = data.get("continuity_binding")
-        hard_cut = data.get("hard_cut_keyframe_binding")
-        c4_binding = data.get("c4_multi_anchor_binding")
-        execution_stack_hash = data.get("execution_stack_hash")
-        commercial_binding = data.get("commercial_binding")
-        seal_terminal_frame = data.get("seal_terminal_frame", False)
-        lineage_fields = (
-            "requirement_hash",
-            "provider_bound_request_hash",
-            "adapter_compiler_id",
-            "adapter_compiler_version",
-            "adapter_compiler_hash",
-        )
-        uses_provider_neutral_lineage = all(
-            data.get(field) is not None for field in lineage_fields
-        )
-        advanced = bool(
-            media_bindings
-            or mode
-            in {
-                VideoGenerationMode.REFERENCE_TO_VIDEO.value,
-                VideoGenerationMode.VIDEO_EDIT.value,
-                VideoGenerationMode.VIDEO_EXTEND.value,
-            }
-            or isinstance(output, dict)
-            and "timing_mode" in output
-            or isinstance(image_bindings, list)
-            and any(binding.get("role") == "last_frame" for binding in image_bindings)
-        )
-        selected = {
-            key: value
-            for key, value in data.items()
-            if key not in {"generation_id", "request_input_hash"}
-        }
-        if not advanced:
-            selected.pop("media_bindings", None)
-        if continuity is None:
-            selected.pop("continuity_binding", None)
-        if c4_binding is None:
-            selected.pop("c4_multi_anchor_binding", None)
-        if hard_cut is None:
-            selected.pop("hard_cut_keyframe_binding", None)
-        if execution_stack_hash is None:
-            selected.pop("execution_stack_hash", None)
-        if commercial_binding is None:
-            selected.pop("commercial_binding", None)
-        if not seal_terminal_frame:
-            selected.pop("seal_terminal_frame", None)
-        if not uses_provider_neutral_lineage:
-            for field in lineage_fields:
-                selected.pop(field, None)
-        return {
-            "schema": (
-                "ai-video-generation-request/8"
-                if commercial_binding is not None
-                else "ai-video-generation-request/7"
-                if execution_stack_hash is not None
-                else "ai-video-generation-request/6"
-                if c4_binding is not None
-                else "ai-video-generation-request/5"
-                if uses_provider_neutral_lineage
-                else "ai-video-generation-request/4"
-                if hard_cut is not None
-                else "ai-video-generation-request/3"
-                if continuity is not None or seal_terminal_frame
-                else "ai-video-generation-request/2"
-                if advanced
-                else "ai-video-generation-request/1"
-            ),
-            **selected,
-        }
+        return generation_request_fingerprint_payload(data)
 
     @model_validator(mode="after")
     def _validate_request(self) -> "VideoGenerationRequest":
@@ -666,7 +593,9 @@ class VideoActivationScope(_VideoStrictModel):
             request_payload.pop("execution_stack_hash", None)
         return {
             "schema": (
-                "ai-video-activation-scope/7"
+                "ai-video-activation-scope/8"
+                if request.subject_bindings
+                else "ai-video-activation-scope/7"
                 if uses_commercial_binding
                 else "ai-video-activation-scope/6"
                 if uses_execution_stack
@@ -713,7 +642,7 @@ class VideoActivationScope(_VideoStrictModel):
         )
 
 
-class ResolvedVideoGenerationRequest(CommercialVideoBindingMixin, _VideoStrictModel):
+class ResolvedVideoGenerationRequest(VideoSubjectBindingMixin, _VideoStrictModel):
     generation_id: str = Field(pattern=_SAFE_ID.pattern)
     request_input_hash: str = Field(pattern=_SHA256)
     provider_name: str = Field(pattern=_SAFE_ID.pattern)
@@ -780,7 +709,9 @@ class ResolvedVideoGenerationRequest(CommercialVideoBindingMixin, _VideoStrictMo
             },
         )
         schema = (
-            "ai-video-resolved-request/9"
+            "ai-video-resolved-request/10"
+            if self.subject_bindings
+            else "ai-video-resolved-request/9"
             if self.commercial_binding is not None
             else "ai-video-resolved-request/8"
             if self.execution_stack_hash is not None
@@ -841,6 +772,7 @@ class ResolvedVideoGenerationRequest(CommercialVideoBindingMixin, _VideoStrictMo
                 or request.mode is not self.mode
                 or request.prompt_text != self.prompt_text
                 or request.image_bindings != self.image_bindings
+                or request.subject_bindings != self.subject_bindings
                 or request.c4_multi_anchor_binding
                 != self.c4_multi_anchor_binding
                 or request.continuity_binding != self.continuity_binding
@@ -901,6 +833,11 @@ class ResolvedVideoGenerationRequest(CommercialVideoBindingMixin, _VideoStrictMo
             raise _video_error(
                 ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                 "Video output requirement is not an exact supported capability combination.",
+            )
+        if subject_capability_errors(request.subject_bindings, capability):
+            raise _video_error(
+                ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
+                "Named subject or voice controls are unsupported by the selected capability.",
             )
         if (
             request.negative_prompt_text
@@ -995,6 +932,7 @@ class ResolvedVideoGenerationRequest(CommercialVideoBindingMixin, _VideoStrictMo
             "mode": request.mode,
             "prompt_text": request.prompt_text,
             "image_bindings": request.image_bindings,
+            "subject_bindings": request.subject_bindings,
             "c4_multi_anchor_binding": request.c4_multi_anchor_binding,
             "continuity_binding": request.continuity_binding,
             "hard_cut_keyframe_binding": request.hard_cut_keyframe_binding,
@@ -1023,7 +961,9 @@ class ResolvedVideoGenerationRequest(CommercialVideoBindingMixin, _VideoStrictMo
             warnings=False,
         )
         schema = (
-            "ai-video-resolved-request/9"
+            "ai-video-resolved-request/10"
+            if candidate.subject_bindings
+            else "ai-video-resolved-request/9"
             if candidate.commercial_binding is not None
             else "ai-video-resolved-request/8"
             if candidate.execution_stack_hash is not None

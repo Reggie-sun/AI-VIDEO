@@ -522,6 +522,13 @@ class VideoGenerationResolver:
         unsupported = requirement_route_is_unsupported(
             requirement, context, expected_mode, decision, output_requirement
         )
+        if capabilities.provider_name == "vidu":
+            selected = next((v for v in capabilities.variants if v.capability_id == selected_capability_id), None)
+            if selected is not None and (
+                (selected.subject_reference_capability is not None)
+                != (compiler_contract.compiler_id == "vidu-video-compiler" and compiler_contract.compiler_version == "4")
+            ):
+                unsupported = True
         if unsupported and decision.outcome is RoutingOutcome.SELECTED:
             decision = as_capability_blocked(
                 decision,

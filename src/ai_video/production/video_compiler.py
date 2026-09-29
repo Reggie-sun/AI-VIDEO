@@ -7,7 +7,7 @@ import unicodedata
 from enum import Enum
 from typing import Literal, Protocol, runtime_checkable
 
-from pydantic import ConfigDict, Field, ValidationError, model_validator
+from pydantic import ConfigDict, Field, ValidationError, model_serializer, model_validator
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production._video_requirement_routing import (
@@ -17,7 +17,7 @@ from ai_video.production._video_requirement_routing import (
 )
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.generation_recipe import expression_errors
-from ai_video.production.commercial_video_contracts import CommercialVideoBindingMixin
+from ai_video.production.video_subjects import VideoSubjectBinding, VideoSubjectBindingMixin, subject_capability_errors
 from ai_video.production.models import (
     DependencyGraphSnapshotPointer,
     ProjectSnapshotPointer,
@@ -95,6 +95,14 @@ class ProviderNativePrompt(_CompilerModel):
     prompt_text: str = Field(min_length=1)
     prompt_sha256: str = Field(pattern=_SHA256)
     expressed_control_paths: tuple[str, ...] = ()
+    subject_bindings: tuple[VideoSubjectBinding, ...] = ()
+
+    @model_serializer(mode="wrap")
+    def _serialize_subjects(self, handler):
+        data = handler(self)
+        if not self.subject_bindings:
+            data.pop("subject_bindings", None)
+        return data
 
     @model_validator(mode="after")
     def _validate_prompt_hash(self) -> "ProviderNativePrompt":
@@ -186,7 +194,7 @@ def require_compiled_provider_request(
     return result
 
 
-class VideoGenerationRequestCompilation(CommercialVideoBindingMixin, _CompilerModel):
+class VideoGenerationRequestCompilation(VideoSubjectBindingMixin, _CompilerModel):
     """Typed, hash-bound input to the sole request constructor owner."""
 
     compilation_kind: Literal[
@@ -268,7 +276,7 @@ class VideoGenerationRequestCompilation(CommercialVideoBindingMixin, _CompilerMo
             )
         expected = canonical_sha256(
             {
-                "schema": "video-generation-request-compilation/1",
+                "schema": "video-generation-request-compilation/2" if self.subject_bindings else "video-generation-request-compilation/1",
                 **self.model_dump(mode="json", exclude={"compilation_hash"}),
             }
         )
@@ -291,7 +299,7 @@ class VideoGenerationRequestCompilation(CommercialVideoBindingMixin, _CompilerMo
         candidate = cls.model_construct(**data, compilation_hash="0" * 64)
         data["compilation_hash"] = canonical_sha256(
             {
-                "schema": "video-generation-request-compilation/1",
+                "schema": "video-generation-request-compilation/2" if candidate.subject_bindings else "video-generation-request-compilation/1",
                 **candidate.model_dump(
                     mode="json",
                     exclude={"compilation_hash"},
@@ -444,6 +452,25 @@ def compile_provider_video_request(
             ("selection",),
         )
     capability = selected[0]
+    subjects = native_prompt.subject_bindings if native_prompt is not None else ()
+    if capability.subject_reference_capability is not None or subjects or (
+        compiler_id == "vidu-video-compiler" and compiler_version == "4"
+    ):
+        from ai_video.production._vidu_subjects import validate_vidu_subject_prompt
+
+        try:
+            if compiler_id != "vidu-video-compiler" or compiler_version != "4":
+                raise ValueError("named subjects require the selected subject compiler")
+            if native_prompt is None or native_prompt.grammar_contract != "vidu-subject-prose-v4":
+                raise ValueError("named subjects require the selected native grammar")
+            validate_vidu_subject_prompt(requirement, provider_bound, subjects, native_prompt.prompt_text)
+        except ValueError:
+            return _unsupported(provider_bound, requirement,
+                ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH, ("subject_bindings",))
+        errors = subject_capability_errors(subjects, capability)
+        if errors:
+            return _unsupported(provider_bound, requirement,
+                ProviderRequirementUnsupportedReason.NATIVE_CONTROL_UNSUPPORTED, errors)
     if (
         provider_bound.provider_name != capabilities.provider_name
         or provider_bound.provider_kind != capability.provider_kind
@@ -601,6 +628,7 @@ def compile_provider_video_request(
         prompt_text=prompt,
         negative_prompt_text="",
         image_bindings=bindings,
+        subject_bindings=subjects,
         c4_multi_anchor_binding=requirement.c4_multi_anchor_binding,
         continuity_binding=lifecycle.continuity_binding,
         hard_cut_keyframe_binding=lifecycle.hard_cut_keyframe_binding,

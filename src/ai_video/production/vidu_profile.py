@@ -12,6 +12,7 @@ from pydantic import ConfigDict, Field, model_serializer, model_validator
 
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import StrictModel
+from ai_video.production.video_subjects import VideoSubjectCapability
 from ai_video.production.video import (
     BillingKind, ProviderProfilePointer, VideoCapabilityVariant,
     VideoExecutionKind, VideoGenerationMode, VideoOutputCapability, VideoMediaCapability,
@@ -166,4 +167,13 @@ def vidu_capabilities() -> VideoProviderCapabilities:
             idempotent_submit=False, lookup_supported=True,
             output_recovery_strategy=VideoOutputRecoveryStrategy.REQUERY_BY_EFFECT_ID,
         ))
+        if not extend:
+            variants.append(VideoCapabilityVariant.model_validate({
+                **variants[-1].model_dump(mode="python"),
+                "capability_id": f"{model}-r2v-subjects-v1",
+                "subject_reference_capability": VideoSubjectCapability(
+                    max_subjects=7, max_images_per_subject=3, max_total_images=7,
+                    voice_ids_supported=False,
+                ),
+            }))
     return VideoProviderCapabilities.create(provider_name="vidu", variants=tuple(variants))
