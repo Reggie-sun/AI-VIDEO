@@ -12,7 +12,7 @@ import pytest
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.vidu import ViduVideoProvider, ViduTransportResponse, ViduTransportRequest, HttpxViduTransport
-from ai_video.production.vidu_profile import ViduProviderProfile
+from ai_video.production.vidu_profile import ViduProviderProfile, ViduProfileReaffirmation
 from ai_video.production.video import (
     VideoGenerationMode, VideoProviderRegistry, VideoGenerationRequest,
     VideoFlexibleOutputRequirement, VideoImageReferenceBinding, VideoSubmission,
@@ -49,6 +49,25 @@ def _profile(**changes):
     )
     values.update(changes)
     return ViduProviderProfile(**values)
+
+
+def test_operator_ceiling_reaffirmation_accepts_only_pure_dated_profile_change():
+    previous = _profile()
+    current = previous.model_copy(update={
+        "pricing_observed_at": NOW + timedelta(days=2),
+        "pricing_expires_at": NOW + timedelta(days=2, minutes=45),
+    })
+    proof = ViduProfileReaffirmation(previous=previous, current=current)
+    assert proof.previous.pointer() != proof.current.pointer()
+    for change in (
+        {"cost_upper_bound_microunits": previous.cost_upper_bound_microunits + 1},
+        {"result_trust": "authenticated_task", "result_origins": ()},
+        {"origin": "https://api.vidu.com"},
+        {"max_download_bytes": previous.max_download_bytes + 1},
+        {"pricing_expires_at": current.pricing_observed_at + timedelta(hours=2)},
+    ):
+        with pytest.raises(ValueError, match="reaffirmation"):
+            ViduProfileReaffirmation(previous=previous, current=current.model_copy(update=change))
 
 
 def test_registry_accepts_explicit_vidu_provider():

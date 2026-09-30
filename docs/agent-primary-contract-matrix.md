@@ -180,6 +180,14 @@ bound request 的兼容性观察；`_bind_requirement()` 是 Router 内部 exact
 后者仅拥有 Provider/model/mode、可比 rubric 和特征 cohort 的观测估计，不把 confidence 当成功率。
 `generation_feedback.py` 是共同 input/intervention producer；从重新打开的 authoring/context、
 registered variants 和 durable experience 构造 `DecisionInputs`，Router 仍独占选择。
+Vidu 纯 operator upper bound 时间续期由 `vidu_profile.py::ViduProfileReaffirmation` 验证
+旧/新完整 profile 非时间字段相同和新窗口最多一小时。共同 feedback 只在 proof 与
+exact baseline、当前 Vidu candidate 同时匹配时声明 `provider_profile` + `seed` 的真实
+resample delta；`generation_decision.py` 独占其准入，并跨 profile pointer 保留同 Shot、
+同 Provider/model/mode 已提交 resample 计数。Compiler 仍检查完整 native request delta；
+`ProductionPlanningService.prepare_generation()` 透传 typed proof；baseline 已到当前 pointer
+后同一 feedback orchestrator 不再注入已消费 proof。proof 不是费用事实、submit quota、
+permit 或质量结论，旧无 proof 输入的 bytes/hash 不变。
 `generation_evaluation.py` 保存 Review 边界的 raw-generation evaluator document 并投影 Finding；
 committer 必须重验 document hash、request/artifact/rubric/current QA identity、selected evaluator，
 不能只保存 caller 手填的 Finding/source hash。该契约不替代真实 analyzer/human 调用或 Gate。

@@ -9,6 +9,7 @@ from ai_video.production.project import load_production_project
 from ai_video.production.production_strategy_materialization import (
     build_strategy_composition, prepare_strategy_commit,
 )
+from ai_video.production.vidu_profile import ViduProfileReaffirmation
 
 
 def _invalid(message):
@@ -96,7 +97,8 @@ class ProductionPlanningService:
                                           composition_id=composition_id)
         return spec, resolve_composition(loaded, spec, renderer_version)
 
-    def prepare_generation(self, *, component_shot_id, context_loader, limits, generation_policy):
+    def prepare_generation(self, *, component_shot_id, context_loader, limits, generation_policy,
+                           profile_reaffirmation: ViduProfileReaffirmation | None = None):
         """Only a selected missing dynamic component reaches Generation Orchestrator."""
         from ai_video.production.generation_feedback import GenerationFeedbackOrchestrator
 
@@ -125,4 +127,4 @@ class ProductionPlanningService:
 
         return GenerationFeedbackOrchestrator.for_project(committer=self.committer,
             targets=self.targets, context_loader=selected_context,
-            policy=generation_policy).prepare(limits=limits)
+            policy=generation_policy, profile_reaffirmation=profile_reaffirmation).prepare(limits=limits)

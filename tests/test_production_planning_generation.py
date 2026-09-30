@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime, timedelta
+
 import pytest
 
 from ai_video.errors import AiVideoError, ErrorCode
@@ -16,6 +18,7 @@ from ai_video.production.production_strategy_reader import (
     selected_shot_generation_acceptance,
 )
 from ai_video.production.project import load_production_project
+from ai_video.production.vidu_profile import ViduProfileReaffirmation, ViduProviderProfile
 from production_strategy_factory import make_persisted_strategy_fixture
 from test_generation_feedback import NativeFixtureProvider
 from test_production_generation_decision import setup_decision
@@ -89,12 +92,14 @@ def test_only_materialized_missing_component_reaches_generation_handoff(tmp_path
             observed["limits"] = limits
             return sentinel
 
-    def _for_project(*, committer, targets, context_loader, policy):
+    def _for_project(*, committer, targets, context_loader, policy,
+                     profile_reaffirmation=None):
         observed.update(
             committer=committer,
             targets=targets,
             context_loader=context_loader,
             policy=policy,
+            profile_reaffirmation=profile_reaffirmation,
         )
         return _Orchestrator()
 
@@ -114,6 +119,24 @@ def test_only_materialized_missing_component_reaches_generation_handoff(tmp_path
     assert observed["targets"] == (target,)
     assert observed["limits"].task_id == fixture.task_id
     assert observed["policy"] == generation_policy
+    assert observed["profile_reaffirmation"] is None
+
+    now = datetime(2026, 9, 30, tzinfo=UTC)
+    previous = ViduProviderProfile(origin="https://api.vidu.cn",
+        result_origins=("https://media.vidu.example",), cost_upper_bound_microunits=3_000_000,
+        pricing_observed_at=now, pricing_expires_at=now + timedelta(minutes=40))
+    current = previous.model_copy(update={
+        "pricing_observed_at": now + timedelta(hours=1),
+        "pricing_expires_at": now + timedelta(hours=1, minutes=40),
+    })
+    proof = ViduProfileReaffirmation(previous=previous, current=current)
+    assert service.prepare_generation(
+        component_shot_id=fixture.child_shot_id,
+        context_loader=lambda *_: pytest.fail("handoff spy must not invoke context"),
+        limits=_limits(fixture.task_id), generation_policy=generation_policy,
+        profile_reaffirmation=proof,
+    ) is sentinel
+    assert observed["profile_reaffirmation"] is proof
 
 
 def test_pending_component_rejects_a_generation_task_identity_change(tmp_path):

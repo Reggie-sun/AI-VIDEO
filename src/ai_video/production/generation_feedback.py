@@ -27,6 +27,7 @@ from ai_video.production.video_compiler import ProviderRequirementUnsupported
 from ai_video.production.generation_rejection import GenerationQualityRejectionReceipt
 from ai_video.production.generation_runtime_repair import RuntimeRepairGrant
 from ai_video.production.generation_evaluation import project_generation_evaluation_sources
+from ai_video.production.vidu_profile import ViduProfileReaffirmation
 
 bind_experience_models(GenerationCandidate)
 
@@ -143,7 +144,8 @@ def create_generation_candidates(*, projection, targets, acceptance, baseline=No
     return tuple(candidates), providers
 
 
-def derive_generation_interventions(*, projection, candidates, history, policy):
+def derive_generation_interventions(*, projection, candidates, history, policy,
+                                    profile_reaffirmation: ViduProfileReaffirmation | None = None):
     """Version 1: bounded sampling or evidence-backed reassessment, never prose repair.
 
     A reference incompatibility is a typed authoring fact. Empirical failures
@@ -208,6 +210,13 @@ def derive_generation_interventions(*, projection, candidates, history, policy):
     candidate = current
     purpose = "resample"
     changed = ("seed",) if current.recipe.seed.kind != "uncontrolled" else ()
+    if (profile_reaffirmation is not None and history.baseline_request is not None
+            and history.baseline_request.provider_name == "vidu"
+            and history.baseline_request.provider_profile == profile_reaffirmation.previous.pointer()
+            and prior.candidate.provider_profile == profile_reaffirmation.previous.pointer()
+            and current.capabilities.provider_name == "vidu"
+            and current.provider_profile == profile_reaffirmation.current.pointer()):
+        changed = tuple(sorted((*changed, "provider_profile")))
     hypothesis = "One bounded independent sample tests whether this failure recurs; no prompt repair is inferred."
     if alternatives:
         # Selection between proposed Providers remains the Router's job. Emit
@@ -252,11 +261,13 @@ class GenerationFeedbackOrchestrator:
     """Reopen canonical context/history for every decision, compile only its winner."""
 
     def __init__(self, *, targets, context_loader: Callable, history_loader: Callable,
-                 policy: DecisionPolicy):
+                 policy: DecisionPolicy,
+                 profile_reaffirmation: ViduProfileReaffirmation | None = None):
         self.targets = tuple(targets)
         self.context_loader = context_loader
         self.history_loader = history_loader
         self.policy = policy
+        self.profile_reaffirmation = profile_reaffirmation
 
     def prepare(self, *, limits: ExecutionLimits) -> PreparedGeneration:
         # The existing authoring/reader owner supplies projection/context,
@@ -265,6 +276,11 @@ class GenerationFeedbackOrchestrator:
         if current.get("production_task_id", limits.task_id) != limits.task_id:
             raise ValueError("production component cannot reset its parent task identity")
         history = self.history_loader()
+        reaffirmation = self.profile_reaffirmation
+        if (reaffirmation is not None and history.baseline_request is not None
+                and history.baseline_request.provider_name == "vidu"
+                and history.baseline_request.provider_profile == reaffirmation.current.pointer()):
+            reaffirmation = None
         submitted = {"local": set(), "remote": set()}
         for experience in history.experiences:
             variant = next(v for v in experience.candidate.capabilities.variants
@@ -291,7 +307,8 @@ class GenerationFeedbackOrchestrator:
         limits = limits.model_copy(update={"paid_submits_used": max(limits.paid_submits_used,
             len(submitted["remote"]) + voice_used)})
         interventions, conflicts = derive_generation_interventions(
-            projection=current["projection"], candidates=candidates, history=history, policy=self.policy)
+            projection=current["projection"], candidates=candidates, history=history, policy=self.policy,
+            profile_reaffirmation=reaffirmation)
         evidence = {e.evidence_hash: e for x in history.experiences for e in x.evidence}
         historical = {x.candidate.scope_hash: x.candidate for x in history.experiences}
         projection = current["projection"]
@@ -305,6 +322,7 @@ class GenerationFeedbackOrchestrator:
             baseline_request=history.baseline_request,
             experiences=history.experiences, feature_scope=extract_generation_features(projection),
             abandoned_result=history.abandoned_result, runtime_repairs=history.runtime_repairs,
+            profile_reaffirmation=reaffirmation,
         )
         arguments = {name: current[name] for name in ("projection", "context", "policy", "lifecycle")}
         if "continuity_routing" in current:
@@ -352,7 +370,8 @@ class GenerationFeedbackOrchestrator:
                 technical_detail=str(exc), retryable=False) from exc
 
     @classmethod
-    def for_project(cls, *, committer, targets, context_loader, policy):
+    def for_project(cls, *, committer, targets, context_loader, policy,
+                    profile_reaffirmation: ViduProfileReaffirmation | None = None):
         """Use the standard project loader and committer's durable feedback store.
 
         The authoring adapter receives the freshly loaded canonical project and
@@ -427,7 +446,8 @@ class GenerationFeedbackOrchestrator:
 
         from ai_video.production.video_generation import VideoGenerationService
 
-        return cls(targets=targets, context_loader=current, history_loader=history, policy=policy)
+        return cls(targets=targets, context_loader=current, history_loader=history, policy=policy,
+                   profile_reaffirmation=profile_reaffirmation)
 
     @staticmethod
     def record_evaluation(*, committer, prepared, attempt_id, outcome, artifact_sha256=None,

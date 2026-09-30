@@ -27,6 +27,7 @@ from ai_video.production.video import (
 from ai_video.production.video_contracts import VideoFlexibleOutputRequirement
 from ai_video.production.voice_routing import VoiceRouteBinding, route_blockers
 from ai_video.production.voice_routing_contracts import VoiceRoute
+from ai_video.production.vidu_profile import ViduProfileReaffirmation
 
 
 class GenerationCandidate(StrictModel):
@@ -132,12 +133,15 @@ class DecisionInputs(StrictModel):
     feature_scope: "GenerationFeatures | None" = None
     abandoned_result: GenerationQualityRejectionReceipt | None = None
     runtime_repairs: tuple[RuntimeRepairGrant, ...] = ()
+    profile_reaffirmation: ViduProfileReaffirmation | None = None
 
     @model_serializer(mode="wrap")
     def _serialize_abandonment(self, handler):
         data = handler(self)
         if self.abandoned_result is None:
             data.pop("abandoned_result", None)
+        if self.profile_reaffirmation is None:
+            data.pop("profile_reaffirmation", None)
         return data
 
     @model_validator(mode="after")
@@ -164,6 +168,15 @@ class DecisionInputs(StrictModel):
             raise ValueError("execution scope names an absent candidate")
         if len({c.recipe.rubric_hash for c in self.candidates}) != 1:
             raise ValueError("candidates cannot compare different rubrics")
+        if self.profile_reaffirmation is not None:
+            proof = self.profile_reaffirmation
+            if (self.baseline_request is None
+                    or self.baseline_request.provider_name != "vidu"
+                    or self.baseline_request.provider_profile != proof.previous.pointer()
+                    or not any(c.capabilities.provider_name == "vidu"
+                               and c.provider_profile == proof.current.pointer()
+                               for c in self.candidates)):
+                raise ValueError("Vidu reaffirmation must bind exact baseline and current candidate")
         if len({c.final_output_goal for c in self.candidates}) != 1:
             raise ValueError("candidates cannot compare different final-output goals")
         rubric_projections = {
@@ -501,6 +514,13 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
                 if target is None:
                     raise ValueError("resample candidate is absent")
                 expected_delta = () if target.recipe.seed.kind == "uncontrolled" else ("seed",)
+                proof = inputs.profile_reaffirmation
+                if (proof is not None and inputs.baseline_request is not None
+                        and inputs.baseline_request.provider_name == "vidu"
+                        and inputs.baseline_request.provider_profile == proof.previous.pointer()
+                        and target.capabilities.provider_name == "vidu"
+                        and target.provider_profile == proof.current.pointer()):
+                    expected_delta = tuple(sorted((*expected_delta, "provider_profile")))
                 if tuple(sorted(proposed.changed_variables)) != expected_delta:
                     continue
                 def strategy(candidate):
@@ -510,7 +530,10 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
                 sampling_history = []
                 for entry in inputs.evidence:
                     if (entry.shot_id != context.target_shot_id or entry.intervention_id is None
-                            or entry.outcome == "not_submitted" or set(entry.actual_delta) - {"seed"}):
+                            or entry.outcome == "not_submitted"
+                            or (target.recipe.seed.kind != "uncontrolled"
+                                and set(entry.actual_delta) == {"provider_profile"})
+                            or set(entry.actual_delta) - {"seed", "provider_profile"}):
                         continue
                     prior_candidate = next((c for c in (*candidates, *inputs.historical_recipes)
                                             if c.scope_hash == entry.recipe_scope_hash), None)

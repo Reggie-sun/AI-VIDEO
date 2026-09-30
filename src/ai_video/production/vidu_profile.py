@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import ipaddress
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Literal
 from urllib.parse import urlsplit
@@ -91,6 +91,30 @@ class ViduProviderProfile(StrictModel):
             profile_id="vidu-official-q3", profile_version=VIDU_PROFILE_VERSION,
             profile_path=Path(f"provider-profiles/{digest}.json"), profile_sha256=digest,
         )
+
+
+class ViduProfileReaffirmation(StrictModel):
+    """Exact proof of a dated reaffirmation of the same internal Vidu ceiling."""
+
+    model_config = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True)
+
+    previous: ViduProviderProfile
+    current: ViduProviderProfile
+
+    @model_validator(mode="after")
+    def _pure_dated_renewal(self) -> "ViduProfileReaffirmation":
+        previous = self.previous.model_dump(mode="json")
+        current = self.current.model_dump(mode="json")
+        for name in ("pricing_observed_at", "pricing_expires_at"):
+            previous.pop(name)
+            current.pop(name)
+        if previous != current:
+            raise ValueError("Vidu reaffirmation must preserve every non-time profile field")
+        if (self.current.pricing_observed_at <= self.previous.pricing_observed_at
+                or self.current.pricing_expires_at <= self.previous.pricing_expires_at
+                or self.current.pricing_expires_at - self.current.pricing_observed_at > timedelta(hours=1)):
+            raise ValueError("Vidu reaffirmation requires a later window of at most one hour")
+        return self
 
 
 class ViduAdProviderProfile(ViduProviderProfile):

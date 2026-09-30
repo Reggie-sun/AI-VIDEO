@@ -1,10 +1,11 @@
 """Offline integration of real Router/compiler with the reusable input producer."""
 
 import hashlib
+from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from ai_video.production.generation_decision import DecisionPolicy
+from ai_video.production.generation_decision import DecisionInputs, DecisionPolicy
 from ai_video.production.generation_experience import GenerationExperience, empirical_assessment, extract_generation_features
 from ai_video.production.generation_feedback import (
     GenerationFeedbackOrchestrator, GenerationHistory, RegisteredGenerationTarget,
@@ -13,6 +14,10 @@ from ai_video.production.generation_feedback import (
 from ai_video.production.video_compiler import ProviderNativePrompt, compile_provider_video_request
 from ai_video.production.video_fake import ScriptedFakeVideoProvider
 from ai_video.production.generation_diagnosis import Finding
+from ai_video.production.vidu_profile import (
+    VIDU_PROFILE_VERSION, ViduProfileReaffirmation, ViduProviderProfile,
+)
+from ai_video.production.video import VideoProviderCapabilities
 from test_production_generation_decision import setup_decision, evidence, decide
 
 
@@ -90,6 +95,102 @@ def test_cohort_survives_profile_renewal_without_exact_hash_pass():
     assert assessment.empirical.observed_success_fraction == 1
     assert assessment.empirical.interval_95[0] < 0.3  # one sample is weak evidence
     assert assessment.fit == "supported"
+
+
+def test_pure_vidu_profile_reaffirmation_compiles_bounded_seed_resample():
+    setup = setup_decision(remote=True)
+    original = setup["inputs"].candidates[0]
+    variant = original.capabilities.variants[0].model_copy(update={
+        "provider_kind": "vidu", "profile_version": VIDU_PROFILE_VERSION,
+    })
+    capabilities = VideoProviderCapabilities.create(provider_name="vidu", variants=(variant,))
+    now = datetime(2026, 9, 30, tzinfo=UTC)
+    previous = ViduProviderProfile(origin="https://api.vidu.cn",
+        result_origins=("https://media.vidu.example",), cost_upper_bound_microunits=3_000_000,
+        pricing_observed_at=now, pricing_expires_at=now + timedelta(minutes=40))
+    current_profile = previous.model_copy(update={
+        "pricing_observed_at": now + timedelta(hours=1),
+        "pricing_expires_at": now + timedelta(hours=1, minutes=40),
+    })
+    proof = ViduProfileReaffirmation(previous=previous, current=current_profile)
+    provider = NativeFixtureProvider(capabilities=capabilities, artifact_bytes=b"unused-offline")
+    context = {key: value for key, value in setup.items() if key != "inputs"}
+    context["acceptance"] = original.recipe.acceptance_policy
+    history = [GenerationHistory()]
+    limits = setup["inputs"].limits.model_copy(update={
+        "allowed_remote_candidates": (f"vidu/{variant.capability_id}",),
+    })
+
+    def target(profile):
+        return RegisteredGenerationTarget(provider, profile.pointer(),
+            original.compiler_contract, original.output_requirement)
+
+    first_route = GenerationFeedbackOrchestrator(targets=(target(previous),),
+        context_loader=lambda: context, history_loader=lambda: history[0],
+        policy=DecisionPolicy(allow_bounded_exploration=True))
+    first = first_route.prepare(limits=limits)
+    assert first.decision.disposition == "GENERATE_ONCE"
+    assert first.compilation.outcome == "compiled"
+    finding = Finding(requirement_id="duration", rubric_hash=first.inputs.rubric_hash,
+        stage="raw_generation", proof="technical", verdict="FAIL", source_sha256="c" * 64,
+        observation="Only two usable seconds.")
+    failed = project_attempt_evidence(prepared=first, task_id="task",
+        shot_id=context["context"].target_shot_id, attempt_id="first", outcome="media",
+        artifact_sha256="d" * 64, findings=(finding,))
+    history[0] = GenerationHistory((GenerationExperience(projection=context["projection"],
+        candidate=first.inputs.candidates[0], evidence=(failed,)),),
+        failed.evidence_hash, first.compilation.request)
+    context["lifecycle"] = context["lifecycle"].model_copy(update={"generation_id": "repair"})
+    repair_route = GenerationFeedbackOrchestrator(targets=(target(current_profile),),
+        context_loader=lambda: context, history_loader=lambda: history[0],
+        policy=DecisionPolicy(allow_bounded_exploration=True), profile_reaffirmation=proof)
+    repaired = repair_route.prepare(limits=limits)
+    assert repaired.decision.disposition == "GENERATE_ONCE"
+    assert repaired.decision.intervention.changed_variables == ("provider_profile", "seed")
+    assert repaired.compilation.outcome == "compiled"
+    assert repaired.compilation.request.seed == first.compilation.request.seed + 1
+    assert repaired.compilation.request.provider_profile == current_profile.pointer()
+    assert repaired.compilation.request.prompt_text == first.compilation.request.prompt_text
+    assert "profile_reaffirmation" in repaired.inputs.model_dump(mode="json")
+    assert "profile_reaffirmation" not in first.inputs.model_dump(mode="json")
+    assert DecisionInputs.model_validate(repaired.inputs.model_dump(mode="json")) == repaired.inputs
+    wrong_previous = previous.model_copy(update={
+        "pricing_observed_at": now - timedelta(minutes=1),
+    })
+    with pytest.raises(ValueError, match="exact baseline"):
+        DecisionInputs.model_validate({**repaired.inputs.model_dump(mode="python"),
+            "profile_reaffirmation": ViduProfileReaffirmation(
+                previous=wrong_previous, current=current_profile)})
+
+    without_proof = GenerationFeedbackOrchestrator(targets=(target(current_profile),),
+        context_loader=lambda: context, history_loader=lambda: history[0],
+        policy=DecisionPolicy(allow_bounded_exploration=True)).prepare(limits=limits)
+    assert without_proof.compilation.outcome == "unsupported"
+    assert without_proof.compilation.unsupported_field_paths == (
+        "generation_recipe.comparison.actual_delta",)
+
+    second_failure = project_attempt_evidence(prepared=repaired, task_id="task",
+        shot_id=context["context"].target_shot_id, attempt_id="repair", outcome="media",
+        artifact_sha256="e" * 64, findings=(finding,))
+    history[0] = GenerationHistory((*history[0].experiences,
+        GenerationExperience(projection=context["projection"],
+            candidate=repaired.inputs.candidates[0], evidence=(second_failure,))),
+        second_failure.evidence_hash, repaired.compilation.request)
+    reused = repair_route.prepare(limits=limits)
+    assert reused.decision.disposition == "REASSESS_FEASIBILITY"
+    assert reused.compilation is None
+    third_profile = current_profile.model_copy(update={
+        "pricing_observed_at": now + timedelta(hours=2),
+        "pricing_expires_at": now + timedelta(hours=2, minutes=40),
+    })
+    third_route = GenerationFeedbackOrchestrator(targets=(target(third_profile),),
+        context_loader=lambda: context, history_loader=lambda: history[0],
+        policy=DecisionPolicy(allow_bounded_exploration=True),
+        profile_reaffirmation=ViduProfileReaffirmation(
+            previous=current_profile, current=third_profile))
+    stopped = third_route.prepare(limits=limits)
+    assert stopped.decision.disposition == "REASSESS_FEASIBILITY"
+    assert stopped.compilation is None
 
 
 def test_wrong_provider_and_changed_rubric_are_excluded_from_empirical_fit():

@@ -678,6 +678,29 @@ def test_policy_resample_cap_counts_submitted_cross_task_semantic_experiment_onl
     assert fail_closed.disposition == "UNKNOWN_OUTCOME"
 
 
+def test_profile_only_repair_does_not_consume_seed_resample_cap():
+    setup = setup_decision()
+    baseline = compile_decision(decide(setup), setup).request
+    latest = evidence(setup, verdict="FAIL", task_id="task", attempt="current",
+                      request_hash=baseline.request_input_hash)
+    proposal = intervention(latest, purpose="resample", resample_limit=1,
+                            changed_variables=("seed",), held_constants=("prompt_text", "image_bindings"))
+    original = setup["inputs"].candidates[0]
+    changed = original.model_copy(update={"recipe": original.recipe.model_copy(
+        update={"seed": SeedPolicy(kind="fixed", value=43)})})
+    setup = {**setup, "inputs": setup["inputs"].model_copy(
+        update={"candidates": (changed,), "historical_recipes": (original,)})}
+    profile_only = evidence(setup, candidate=original, verdict="FAIL",
+                            task_id="previous-task", attempt="profile-only")
+    profile_only = profile_only.model_copy(update={
+        "intervention_id": "renewed-profile", "intervention_semantic_hash": "d" * 64,
+        "actual_delta": ("provider_profile",)})
+    result = decide(setup, evidence=(profile_only, latest),
+                    latest_attempt_hash=latest.evidence_hash, interventions=(proposal,),
+                    baseline_request=baseline, policy=DecisionPolicy(max_resamples=1))
+    assert result.disposition == "GENERATE_ONCE", result.rationale
+
+
 def test_prediction_outcome_is_observational_and_protects_declared_requirements():
     from ai_video.production.generation_diagnosis import Diagnosis
 
