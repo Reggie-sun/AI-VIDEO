@@ -23,7 +23,7 @@ from test_production_generation_decision import setup_decision, evidence, decide
 
 class NativeFixtureProvider(ScriptedFakeVideoProvider):
     def compile_request(self, provider_bound, requirement):
-        text = "Generate 4 seconds."
+        text = getattr(self, "prompt_text", "Generate 4 seconds.")
         return compile_provider_video_request(
             provider_bound=provider_bound, requirement=requirement,
             compiler_id="test-native", compiler_version="2", capabilities=self._capabilities,
@@ -367,3 +367,93 @@ def test_pass_breaks_failure_streak_instead_of_accumulating_lifetime_failures():
         candidates=first.inputs.candidates, history=history[0], policy=orchestrator.policy)
     assert len(proposals) == 1
     assert proposals[0].purpose == "resample"
+
+
+def authored_repair_setup():
+    setup, provider, current, history, orchestrator = feedback_setup()
+    records = []
+    for number in range(2):
+        prepared = orchestrator.prepare(limits=setup["inputs"].limits)
+        assert prepared.decision.disposition == "GENERATE_ONCE"
+        entry = project_attempt_evidence(prepared=prepared, task_id="task",
+            shot_id=current["context"].target_shot_id, attempt_id=f"failed-{number}",
+            outcome="media", artifact_sha256=hashlib.sha256(str(number).encode()).hexdigest(),
+            findings=(Finding(requirement_id="duration", rubric_hash=prepared.inputs.rubric_hash,
+                stage="raw_generation", proof="technical", verdict="FAIL",
+                source_sha256="c" * 64, observation="Only two usable seconds."),))
+        candidate = next(c for c in prepared.inputs.candidates
+                         if c.candidate_id == prepared.decision.selected_candidate_id)
+        records.append(GenerationExperience(projection=current["projection"],
+            candidate=candidate, evidence=(entry,)))
+        history[0] = GenerationHistory(tuple(records), entry.evidence_hash, prepared.compilation.request)
+    assert orchestrator.prepare(limits=setup["inputs"].limits).decision.disposition == "REASSESS_FEASIBILITY"
+    from ai_video.production.generation_diagnosis import Intervention
+    from ai_video.production.hashing import canonical_sha256
+
+    provider.prompt_text = "Generate 4 seconds with continuous motion through the endpoint."
+    proposal = Intervention(intervention_id="authored-motion-route", candidate_id=candidate.candidate_id,
+        purpose="production_repair", disposition="GENERATE_ONCE", closes=("duration",),
+        support=(entry.evidence_hash,), changed_variables=("prompt_text", "seed"),
+        held_constants=("output_requirement", "image_bindings"), uncontrolled_variables=(),
+        regression_risks=("duration",), hypothesis="Endpoint staging may prematurely stop useful motion.",
+        confidence_basis="Exact two-second result; revised staging is an unproven hypothesis.",
+        improvement_prediction="Four usable seconds are measured.",
+        falsification_prediction="Measured usable duration remains short.",
+        insufficient_evidence_condition="Missing exact measurement cannot establish repair success.",
+        semantic_variable_hashes=(("prompt_text", canonical_sha256({"value": provider.prompt_text})),))
+    return setup, provider, current, history, orchestrator, proposal
+
+
+def test_authored_repair_compiles_after_resample_exhaustion_and_cannot_be_renamed(monkeypatch):
+    setup, provider, current, history, orchestrator, proposal = authored_repair_setup()
+    repaired = orchestrator.prepare(limits=setup["inputs"].limits, interventions=(proposal,))
+    assert repaired.decision.disposition == "GENERATE_ONCE"
+    assert repaired.execution_binding is not None
+    assert repaired.decision.intervention == proposal
+    assert repaired.compilation.request.prompt_text == provider.prompt_text
+    assert repaired.inputs.experiences == history[0].experiences
+    assert repaired.compilation.request.seed == history[0].baseline_request.seed + 1
+    from ai_video.production.video_generation import VideoGenerationService
+
+    started = []
+    monkeypatch.setattr(VideoGenerationService, "start", lambda self, **kwargs: started.append(kwargs))
+    start_result = orchestrator.start(committer=object(), attempt_id="authored-start",
+        limits=setup["inputs"].limits, interventions=(proposal,))
+    assert started == [{"attempt_id": "authored-start", "request": start_result.resolved_request,
+                        "execution_binding": start_result.execution_binding}]
+    failed = project_attempt_evidence(prepared=repaired, task_id="task",
+        shot_id=current["context"].target_shot_id, attempt_id="authored-failed", outcome="media",
+        artifact_sha256="f" * 64, findings=(Finding(requirement_id="duration",
+            rubric_hash=repaired.inputs.rubric_hash, stage="raw_generation", proof="technical",
+            verdict="FAIL", source_sha256="c" * 64, observation="Still only two seconds."),))
+    candidate = next(c for c in repaired.inputs.candidates if c.candidate_id == proposal.candidate_id)
+    history[0] = GenerationHistory((*history[0].experiences, GenerationExperience(
+        projection=current["projection"], candidate=candidate, evidence=(failed,))),
+        failed.evidence_hash, repaired.compilation.request)
+    renamed = proposal.model_copy(update={"intervention_id": "new-name", "support": (failed.evidence_hash,)})
+    stopped = orchestrator.prepare(limits=setup["inputs"].limits, interventions=(renamed,))
+    assert stopped.decision.disposition == "CAPABILITY_BOUNDARY"
+    assert stopped.decision.intervention.semantic_hash != proposal.semantic_hash
+    assert stopped.compilation is None
+    assert provider.call_counts.submit == provider.call_counts.fetch == 0
+
+
+@pytest.mark.parametrize("defect", ["stale_support", "undeclared_delta", "wrong_target_value"])
+def test_authored_repair_retains_evidence_and_compiled_comparison_guards(defect):
+    setup, provider, _, _, orchestrator, proposal = authored_repair_setup()
+    updates = {"stale_support": {"support": ("0" * 64,)},
+        "undeclared_delta": {"changed_variables": ("prompt_text",)},
+        "wrong_target_value": {"semantic_variable_hashes": (("prompt_text", "0" * 64),)}}
+    if defect == "stale_support":
+        with pytest.raises(ValueError, match="intervention cites missing evidence"):
+            orchestrator.prepare(limits=setup["inputs"].limits,
+                interventions=(proposal.model_copy(update=updates[defect]),))
+        assert provider.call_counts.submit == provider.call_counts.fetch == 0
+        return
+    stopped = orchestrator.prepare(limits=setup["inputs"].limits,
+        interventions=(proposal.model_copy(update=updates[defect]),))
+    assert stopped.execution_binding is None
+    from ai_video.production.video_compiler import ProviderRequirementUnsupported
+
+    assert isinstance(stopped.compilation, ProviderRequirementUnsupported)
+    assert provider.call_counts.submit == provider.call_counts.fetch == 0

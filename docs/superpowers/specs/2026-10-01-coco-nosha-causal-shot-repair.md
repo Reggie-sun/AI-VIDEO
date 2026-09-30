@@ -74,3 +74,11 @@ Parent核对：没有删原动作/身份、没有新的输入或Provider、没�
 第五次platform-only5秒片 `b7830b76679dd7cf19c3941af868980966c28680453680336cac96e9a24bbd07` 的显式MCP11个半秒帧和51个0.1秒帧已建立A左前离台、B留在平台，仍未建立B侧腹冲量和随后沿平台出画；A正面仅呈现一对眼睛、足部爪趾样，原四眼与六吸盘足身份尚未建立，不误证全身只有四足。技术输出与静音PASS、动作/连续性FAIL、身份NE分别保留；不能把地面动作归到当前平台失败，也不能把样本当作必须补四图的证明。
 
 下一单次实验只改变B相对A的开场位置及路线这一空间编排变量：B在A右侧近处，先向内侧腹碰A，再沿平台后侧滑出，避免从后追尾并停在前角。A仍活动并观察镜头，不自行走下平台；5秒、同三图、原A/B形态文本、正常速度和既有QA4/五镜coverage不变。空间路线修复不自动解决身份证据缺口，全部required仍须PASS。同TASK仅新增一次slot5→6，内部operator ceiling15M→18M、per-call3M不变；保留前五个reservation及所有历史。重新封存profile时间窗、exact preview/authorization、新REQUEST与one-use permit，由原committer执行预算和quota扩展。模型随机性仍是混杂因素，不宣称严格因果实验。若该次FAIL/NE，先补证和核对是否仍有不同、可归因的修复；不得自动重发同prompt或以预算耗尽本身要求用户回复继续。
+
+## Authored Intervention Input Amendment
+
+第六次disposable编译返回`REASSESS_FEASIBILITY`，未发生Provider效果：共同feedback仅自动生成resample，既有resample上限正确阻断；空间路线变化没有作为typed干预进入Router。Router原有`DecisionInputs.interventions`已经支持显式修复与完整history/actual-delta校验。
+
+为接通该既有能力，`GenerationFeedbackOrchestrator.prepare`与`start`增加可选keyword-only `interventions: tuple[Intervention, ...] = ()`，在重新打开的当前context/history和自动干预之外加入caller封存提案。Router仍独占是否准入、候选选择、baseline比较与语义实验去重；不修改decision policy、resample limit、QA、失败历史、prediction或permit规则。显式提案不是授权、事实或已证明有效的修复。默认空值保留原行为。非法/陈旧证据、重复实验、known violations和未声明实际编译变化仍fail closed；`start`只将通过同一binding的新REQUEST交给committer，不submit或activate。
+
+Parent self-review：这是共同producer的缺失输入接线，不另造Resolver/编译执行路径。当前Vidu未提供seed控制，空间prompt和纯时间profile变化均须如实声明、绑定目标值；不能借文字换名重发同一实验。只针对动作/连续性失败提出假设，身份NE仍阻断下一Shot。纳入本任务stable exact snapshot验证和适用独立审查，完成后继续原真实实验。

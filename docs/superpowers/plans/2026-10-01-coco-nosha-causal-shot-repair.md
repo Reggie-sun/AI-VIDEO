@@ -53,3 +53,15 @@ Disposable compile复现旧QA abandonment被反馈history无条件投影到新QA
 先经第五次exact Gate、technical-first durable proof和analyzer/committer关闭已知失败，保留QA4与全部五次消费。在 `runs/coco-nosha-vidu-side-route-repair-20261001-001/` 只细化provider-neutral GenerationIntent中的B初始相对位置/侧碰后路径，不改当前Shot身份、5秒、三图、QA predicates或五镜coverage。新finite slot5→6、operator ceiling15M→18M由原typed extension/committer执行；先在regular disposable副本验证当前QA history、planning/feedback/compile、五个physical marker、新REQUEST/quota和最终submit guard，真实项目保持不变。
 
 fresh exact packet完成相关direct policy与适用独立审查后，最多一次实际POST；所有required PASS前不提交地面。保留第五次身份回退/NE和B留台改善，空间修复不视为身份修复。末镜D旧intent中的“Shot 01见过眼柄”是已记录non-blocking后续缺陷，D准备前须通过canonical Shot/story/storyboard修正为floor-and-line并核对先前证据适用性，不能宣称平台已有D可见锚点。
+
+## Authored Intervention Input Milestone
+
+**Goal / Scope:** 在共同feedback producer透传既有typed干预，接通同QA下的空间路线修复；不放宽任何gate或历史计数。
+
+**Files / Owners:** `generation_feedback.py`仅接线`prepare`与`start`的可选干预；`tests/test_generation_feedback.py`覆盖默认/显式路径、history去重、陈旧支持与实际delta拒绝；contract matrix与runtime baseline记录真实API边界。task-owned `runs/coco-nosha-vidu-side-route-repair-20261001-001/`保存之前blocked结果、新exact提案/编译/预算/审查/媒体证据。
+
+**Compatibility / Invariants:** 默认空tuple与旧行为相同；同一Router、typed `Intervention`、baseline、history、QA4、五镜coverage、三图、operator per-call3M、同TASK五次消费与unknown fail-closed保留。只有committer写REQUEST，仍须新preview/authorization/one-use permit，显式输入本身不产生外部效果。
+
+**Acceptance / Verification:** 先以failing integration test复现缺失入口，再验证显式修复可编译且重复语义实验/陈旧支持/未声明真实delta不可编译；运行focused反馈与execution/decision suites及exact staged direct policy checks。最终candidate审查通过后，以regular disposable副本核验QA/Shot未变及预算/REQUEST/quota/submit guard，然后才在真实ROOT封存一次新REQUEST并提交。旧blocked文件保留，目标prompt/profile值与真实compiled delta严格一致。
+
+**Self-Review / Continuation:** spec新增入口全部在此milestone覆盖，不更换lifecycle owner、不生成worktree、不将direct checks称Harness receipt。通过后继续逐Shot显式MCP和technical-first证据；若required未PASS，停止该attempt并调查有界修复而非结束已授权任务。

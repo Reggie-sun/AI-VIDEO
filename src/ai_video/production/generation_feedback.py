@@ -269,7 +269,8 @@ class GenerationFeedbackOrchestrator:
         self.policy = policy
         self.profile_reaffirmation = profile_reaffirmation
 
-    def prepare(self, *, limits: ExecutionLimits) -> PreparedGeneration:
+    def prepare(self, *, limits: ExecutionLimits,
+                interventions: tuple[Intervention, ...] = ()) -> PreparedGeneration:
         # The existing authoring/reader owner supplies projection/context,
         # routing policy, lifecycle and active acceptance; never cached here.
         current = self.context_loader()
@@ -306,7 +307,7 @@ class GenerationFeedbackOrchestrator:
             if c.voice_route is not None and c.voice_route.readiness is not None), default=0)
         limits = limits.model_copy(update={"paid_submits_used": max(limits.paid_submits_used,
             len(submitted["remote"]) + voice_used)})
-        interventions, conflicts = derive_generation_interventions(
+        derived_interventions, conflicts = derive_generation_interventions(
             projection=current["projection"], candidates=candidates, history=history, policy=self.policy,
             profile_reaffirmation=reaffirmation)
         evidence = {e.evidence_hash: e for x in history.experiences for e in x.evidence}
@@ -318,7 +319,8 @@ class GenerationFeedbackOrchestrator:
                 mode="json", exclude={"requirement_id", "requirement_hash"})),
             rubric_hash=current["acceptance"].profile_content_hash, policy=self.policy, limits=limits,
             candidates=candidates, evidence=tuple(evidence.values()), latest_attempt_hash=history.latest_attempt_hash,
-            interventions=interventions, conflicts=conflicts, historical_recipes=tuple(historical.values()),
+            interventions=(*derived_interventions, *interventions), conflicts=conflicts,
+            historical_recipes=tuple(historical.values()),
             baseline_request=history.baseline_request,
             experiences=history.experiences, feature_scope=extract_generation_features(projection),
             abandoned_result=history.abandoned_result, runtime_repairs=history.runtime_repairs,
@@ -343,7 +345,8 @@ class GenerationFeedbackOrchestrator:
         return PreparedGeneration(inputs, decision, compilation, resolved, provider, binding,
                                   current["context"].target_shot_id)
 
-    def start(self, *, committer, attempt_id, limits):
+    def start(self, *, committer, attempt_id, limits,
+              interventions: tuple[Intervention, ...] = ()):
         """Prepare from fresh inputs, then enter the sole durable execution owner.
 
         This persists a request only. Submit still needs the existing local or
@@ -351,7 +354,7 @@ class GenerationFeedbackOrchestrator:
         """
         from ai_video.production.video_generation import VideoGenerationService
 
-        prepared = self.prepare(limits=limits)
+        prepared = self.prepare(limits=limits, interventions=interventions)
         if prepared.execution_binding is not None:
             VideoGenerationService(committer=committer, provider=prepared.provider).start(
                 attempt_id=attempt_id, request=prepared.resolved_request,

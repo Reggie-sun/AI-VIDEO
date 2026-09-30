@@ -180,6 +180,10 @@ bound request 的兼容性观察；`_bind_requirement()` 是 Router 内部 exact
 后者仅拥有 Provider/model/mode、可比 rubric 和特征 cohort 的观测估计，不把 confidence 当成功率。
 `generation_feedback.py` 是共同 input/intervention producer；从重新打开的 authoring/context、
 registered variants 和 durable experience 构造 `DecisionInputs`，Router 仍独占选择。
+`prepare(..., interventions=())` 与 `start` 可加入 author 封存的 typed `Intervention`；
+默认仍自动推导，不重建或替换当前 history。显式输入同样经过原 Router 的证据、
+protected requirements、known violations、semantic experiment 去重和实际编译 delta 校验，
+本身不授权 submit、接受质量或改写 QA。未声明变化、陈旧引用或重复实验仍阻断。
 Vidu 纯 operator upper bound 时间续期由 `vidu_profile.py::ViduProfileReaffirmation` 验证
 旧/新完整 profile 非时间字段相同和新窗口最多一小时。共同 feedback 只在 proof 与
 exact baseline、当前 Vidu candidate 同时匹配时声明 `provider_profile` + `seed` 的真实
