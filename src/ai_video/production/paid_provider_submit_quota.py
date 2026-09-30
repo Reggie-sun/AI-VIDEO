@@ -82,6 +82,42 @@ def _artifact(path, model):
     )
 
 
+def retained_submit_quota_allows(*, committer, manifest, state, current_limits, prior_limits):
+    """Read an applied task ceiling without replaying its target authorization."""
+    current = next((item for item in manifest.attempts
+                    if item.video_generation_state == state), None)
+    if current is None:
+        return False
+    pointer = manifest.active_paid_provider_budget
+    if pointer is None or state.execution_binding is None:
+        return False
+    budget = committer._reopen_paid_budget(pointer)
+    for entry in budget.submit_quota_extensions:
+        if (entry.task_id != current_limits.task_id
+                or entry.old_paid_submit_ceiling < prior_limits.paid_submit_ceiling
+                or entry.new_paid_submit_ceiling != current_limits.paid_submit_ceiling):
+            continue
+        if (entry.target_attempt_id == current.attempt_id
+                and entry.target_binding == state.execution_binding):
+            return True
+        ancestor = next((item for item in manifest.attempts
+                         if item.attempt_id == entry.target_attempt_id), None)
+        if ancestor is None or ancestor.attempt_id == current.attempt_id:
+            continue
+        prior = ancestor.video_generation_state
+        paid = ancestor.paid_provider_state
+        if (ancestor.status.value not in {"failed", "succeeded"}
+                or prior is None or prior.execution_binding != entry.target_binding
+                or prior.paid_submit_receipt is None or prior.fetch_receipt is None
+                or paid is None or paid.phase.value not in {"accepted", "settled"}):
+            continue
+        limits = committer._reopen_generation_execution_binding(entry.target_binding).inputs.limits
+        if (limits.task_id == current_limits.task_id
+                and limits.paid_submit_ceiling == entry.new_paid_submit_ceiling):
+            return True
+    return False
+
+
 def _verified_new_goal_running_prior(*, committer, loaded, target, prior, target_binding,
                                      prior_binding, target_request, prior_request):
     """Return whether one fetched, evaluated prior may remain validating for a new goal.

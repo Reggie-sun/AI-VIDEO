@@ -441,7 +441,8 @@ def _pending(tmp_path, *, used=1, local_batch_limit=1):
     authorization = PaidProviderAuthorizationDecision.create(**auth_values)
     writer = ProductionStateCommitter(tmp_path,
         paid_provider_authorizer=lambda exact: authorization if exact == preview else None,
-        paid_provider_clock=lambda: authorization.issued_at)
+        paid_provider_clock=lambda: authorization.issued_at,
+        video_candidate_preparer=committer._video_candidate_preparer)
     service = VideoGenerationService(committer=writer, provider=provider)
     service.start(attempt_id=NEXT, request=request, execution_binding=binding)
     provider._scenario = replace(provider._scenario, external_effect_id="quota-next-effect")
@@ -493,6 +494,71 @@ def test_same_task_extension_resumes_pending_request_and_preserves_durable_used_
     assert _bytes(tmp_path) == before
     with pytest.raises(AiVideoError):
         service.submit_once(attempt_id=NEXT, paid_preview=preview, reservation_id="quota-reservation-other")
+    assert _bytes(tmp_path) == before
+
+
+def _successor_guard_inputs(writer, *, used=2, ceiling=2, task_id=None):
+    manifest = load_production_project(writer.project_root / "project.yaml").manifest
+    ancestor = next(item for item in manifest.attempts if item.attempt_id == NEXT)
+    state = ancestor.video_generation_state.model_copy(update={"generation_id": "quota-successor"})
+    successor = ancestor.model_copy(update={"attempt_id": "quota-successor", "video_generation_state": state})
+    binding = writer._reopen_generation_execution_binding(state.execution_binding)
+    limits = binding.inputs.limits.model_copy(update={
+        "paid_submit_ceiling": ceiling, "paid_submits_used": used,
+        **({"task_id": task_id} if task_id is not None else {}),
+    })
+    binding = binding.model_copy(update={"inputs": binding.inputs.model_copy(update={"limits": limits})})
+    return manifest.model_copy(update={"attempts": (*manifest.attempts, successor)}), state, binding
+
+
+def test_applied_quota_is_inherited_and_original_durable_ceiling_still_stops_successor(tmp_path):
+    writer, service, preview, prior = _pending(tmp_path)
+    writer.extend_paid_provider_submit_quota(_entry(writer, prior))
+    service.submit_once(attempt_id=NEXT, paid_preview=preview, reservation_id="quota-reservation")
+    service.refresh_once(attempt_id=NEXT)
+    writer.settle_paid_provider_reservation(attempt_id=NEXT, actual_cost_microunits=1_000_000)
+    service.fetch_and_activate(attempt_id=NEXT)
+    before = _bytes(tmp_path)
+    manifest, state, binding = _successor_guard_inputs(writer)
+    with pytest.raises(AiVideoError, match="Durable paid submit ceiling is exhausted"):
+        writer._require_persisted_generation_limits(manifest, state, binding)
+    assert _bytes(tmp_path) == before
+    manifest, state, binding = _successor_guard_inputs(writer, used=1)
+    with pytest.raises(AiVideoError, match="counters are below durable"):
+        writer._require_persisted_generation_limits(manifest, state, binding)
+    manifest, state, binding = _successor_guard_inputs(writer, ceiling=3)
+    with pytest.raises(AiVideoError, match="ceilings cannot expand"):
+        writer._require_persisted_generation_limits(manifest, state, binding)
+    from ai_video.production.paid_provider_submit_quota import retained_submit_quota_allows
+    ancestor = next(item for item in manifest.attempts if item.attempt_id == NEXT)
+    for invalid in (
+        ancestor.model_copy(update={"status": type(ancestor.status).OUTCOME_UNKNOWN}),
+        ancestor.model_copy(update={"status": type(ancestor.status).RUNNING}),
+        ancestor.model_copy(update={"video_generation_state": ancestor.video_generation_state.model_copy(
+            update={"fetch_receipt": None})}),
+        ancestor.model_copy(update={"paid_provider_state": None}),
+    ):
+        amended = manifest.model_copy(update={"attempts": tuple(
+            invalid if item.attempt_id == NEXT else item for item in manifest.attempts)})
+        assert not retained_submit_quota_allows(
+            committer=writer, manifest=amended, state=state,
+            current_limits=binding.inputs.limits.model_copy(update={"paid_submit_ceiling": 2}),
+            prior_limits=binding.inputs.limits.model_copy(update={"paid_submit_ceiling": 1}),
+        )
+    assert not retained_submit_quota_allows(
+        committer=writer, manifest=manifest, state=state,
+        current_limits=binding.inputs.limits.model_copy(update={"task_id": "other-task", "paid_submit_ceiling": 2}),
+        prior_limits=binding.inputs.limits.model_copy(update={"paid_submit_ceiling": 1}),
+    )
+
+
+def test_unsubmitted_quota_target_does_not_establish_inherited_cap(tmp_path):
+    writer, _, _, prior = _pending(tmp_path)
+    writer.extend_paid_provider_submit_quota(_entry(writer, prior))
+    before = _bytes(tmp_path)
+    manifest, state, binding = _successor_guard_inputs(writer, used=1)
+    with pytest.raises(AiVideoError, match="ceilings cannot expand"):
+        writer._require_persisted_generation_limits(manifest, state, binding)
     assert _bytes(tmp_path) == before
 
 
