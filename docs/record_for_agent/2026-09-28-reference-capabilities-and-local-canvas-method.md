@@ -7,9 +7,19 @@ learning_eligibility: ineligible
 # Creative Goal Tests, Jimeng Canvas Comparison And Local Replication — Full Record
 
 Date: 2026-09-28
-Session window: 2026-09-27–2026-09-30, Asia/Hong_Kong
+Session window: 2026-09-27–2026-10-01, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
+
+## Current Handoff Amendment — Causal Gate Proportionality Needs Verification
+
+2026-10-01 用户追问因果 gate 是否过重。Parent 承认此前把过多接触细节用作硬门槛，并从两次 seed 对照失败直接推到“必须补四只宠物参考图才能继续”，证据不足。原两次视频的 known FAIL、exact bytes、质量拒绝和真实消费不变；下方及 `reference-feasibility-after-two-vidu-attempts.json` 的必需补图结论作为当时停止判断保留，不再作为未经复核的下一窗口前置条件。用户未回答新增参考图的授权问题；现有三图仍是唯一已批准的生成图像输入。
+
+“gate 应更合比例”目前是待核对的 task-level 判断，不是已经实施的 QA contract，也不自动把原文明确要求的动作或形态降为 preference。正常速度下可读的关键触发、事件顺序、角色/道具连续性仍属目标；切镜已获允许，但不能借切镜省掉必要因果。下一窗口先逐项对照 `creative-input.txt`、当前 selected QA 的 sealed `generation_requirements`、两份 exact MP4 Gate findings 和 `director-coverage.json`，区分显式用户要求、确有叙事必要性的 hard predicate、导演细节及证据不足，不把角色形态/构图失败混称为因果失败。
+
+入口修订为：先形成该任务的 requirement-to-source 对照和有依据的保留/修订判断，再在现有素材内评估进一步拆 Shot 是否能隔离动作密度。确需新 rubric 或 coverage 时，经现有 QA/authoring owner 产生新 revision，并按适用 spec/self-review、plan、verification 和 review 执行；不追改历史 sealed rubric、FAIL 或 rejection，不建立全局“放松 gate”旁路。若有安全、可归因的最小真实实验，保留已消费 2/4 个 Vidu video slots 后封存有限新单元；旧 profile/preview/permit 不直接复用，unknown outcome 继续停止。只有当前证据证明确需新增素材且现有输入无法完成下一有界动作时，才请求真正缺失的输入/授权。
+
+本窗口仅准备 `$next-window` prompt 并更新此交接判断，没有实现 gate/rubric 变更、重新分析媒体、调用 Provider、生成素材、刷新 RAG、push 或 release。声音仍为已登记的原画布一次对白 WAV 候选；与独立 `COCO声线.mp3` 的同声纹和最终混音聆听仍 `NOT_EVALUATED`。Learning 评估为 `no_candidate`：本次是对既有证据推断边界的纠正，没有新的独立媒体试验或可采纳的通用规则。
 
 ## Current Continuation — Original Canvas Dialogue Recovered, Two Vidu Q3 Shots Rejected
 
@@ -25,7 +35,7 @@ Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef
 
 在保留首次消费后，只把 operator upper bound 有据续期并封存一次 seed resample；纯时间 profile 续期 typed proof 与旧／新 pointer绑定，实际 request delta 仅 `provider_profile`、`seed`。任务 submit ceiling 3→4、内部 operator upper bound 9,000,000→12,000,000 microunits 为任务内有限上限，不是官方报价；budget／quota 由原 committer 扩展，旧 permit、reservation、消费不重置。第二笔 physical submit 返回 HTTP 200、result success；执行脚本在 fetch 后写日志时遇到 `TypeError`，但 canonical Manifest 与 fetch receipt 重新打开后确认 outcome 已知、exact MP4 已保存，故没有再次 POST。第二笔文件 `0a38740995a5e7963d253a0cb5137f8ee658a7719d40f57883a0296a49ddbe54`，6,035,293 bytes、8.042 s／193 帧、24 fps、1280×720、无音轨。项目本地 `video-analysis.video_analyze`／`video_review` 实际检查完整 0–8 s 的 17 个半秒帧；通用自动 review 的空 issues 不覆盖剧情。`shot01-repair01-post-media-gate-v1.json` 对 `shot-output`、`shot-identity`、`shot-action`、`shot-continuity` 判 `FAIL`，`shot-muted-source` 为 `PASS`：B先落下、A随后坠落而无可读侧撞；Nosha 头眼未入镜；A在结尾已碰 C；B、A 和 D 的形态仍漂移。两层 controlled presentation／technical feedback 写入同一 exact media identity，`ProductionStateCommitter.reject_video_generation` 将该 attempt 关闭为 `video_quality_rejected`，Manifest revision 104；`shot01-repair01-quality-rejection.json` 保存 rejection hash。Shot 2 没有提交，Production activation／P6／Final Acceptance 均为 false。本任务 Vidu video physical submits 实际为 2，clone 0；原 H3 八次另计。
 
-### Current Input Blocker And Engineering Boundary
+### Historical Input-Gap Stop Assessment And Engineering Boundary
 
 只读检查所选画布原视频 0／2／4／6／8／10／12／14／16 s 画面：A有部分眼／耳／尾锚点，但 B 是大型分节软体而非要求的小型三鳍湿囊，D 是浅色圆身而非三角软壳；原场景图也没有足以锁定四只宠物的各自清晰身份图。这些画面没有被偷偷截帧注册为新的生成输入。两次同参考、同8 s authoring、仅 seed／有效期不同的 Vidu 输出重复宠物形态与 B→A 因果失败。分拆 Shot 可降低动作密度，但不能凭空补齐 A/B/C/D 参考身份；在本次“不新增素材”的边界下，第三次同输入付费采样缺少可归因的修复变量，因此保留剩余 2 个 task-level video submit slots，停止当前 attempt。精确判断见 `runs/coco-nosha-vidu-voice-recovery-20260930-001/reference-feasibility-after-two-vidu-attempts.json`。要重启 Shot 1，至少需要用户选定且可用于本任务的 A、B 形态参考；完整后续镜头还需 C、D 的相应参考。未把旧 canvas candidate 或两个失败 Vidu MP4 当成成片、视觉参考或声线验收。
 
