@@ -52,3 +52,11 @@
 ## Self-Review
 
 Parent核对：没有删原动作/身份、没有新的输入或Provider、没有倒填旧PASS；时长改变复用现有nominal contract，证据缺失保持NE。原文一镜到底/固定时间明确被当前用户覆盖；其余显式约束仍保留。声音人类听觉与最终同步能力缺口未被工程通过掩盖。
+
+## Bounded Repair Amendment
+
+首个拆分5秒片 `be14259bb64444e1c90e02828018f7ea1c80bec6c60b0bef4c304ddcbc210af9` 已经真实生成、显式MCP半秒11帧及0.1秒51帧检查：B侧撞先于A坠落、A碰碗先于碗运动均有改善；4.2–5秒未建立逃跑末状态，六吸盘足及意外入镜D形态保持NE。committer在Manifest129显式abandon保留QUALITY_FAILURE/EVIDENCE_GAP，不接受或追改该片。
+
+下一有限单元仅使用剩余第4个Vidu slot，把隔离A/B单元延长至8 nominal秒；其余三镜、三图、原对白、角色/动作/终点要求不改。主要修复变量是该单元可用时间，不是再次盲改seed。新coverage/Shot/project及其QA coverage binding前瞻封存revision3；FinalOutput goal version3仅标识这次前瞻authoring contract，要求正文与version2逐字相同，不授权删动作、降低identity、reset消费/repair预算或重验旧失败为PASS。profile仅有限纯时间续期，金额/Provider/model/egress不扩张；seed等附带不受控差异如实保留。全部required通过仍是推进条件，失败后先取证，不能把这次样本当成证明补四图必要。
+
+标准 disposable compile暴露旧QA的abandonment回执被history producer当作新QA执行例外，binding正确阻断。修复只在`GenerationFeedbackOrchestrator.for_project`按current selected QA筛选`abandoned_result`；旧experience、latest evidence、baseline与receipt完整保留，binding的QA equality guard不变。真实canonical fixture覆盖同QA继续修复与新QA不继承旧权限两支；新contract仍需通过原Router/QA/planning/paid guards，切换QA本身不授权重试或重置消费。

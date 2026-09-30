@@ -248,7 +248,9 @@ permit 从 Manifest 顺序推导同 Shot 的最新有效结果，优先实际提
 requirement 必须已有对应 proof 的观察，未知项仍为 `NOT_EVALUATED`。原 `/1` 收据与
 `reject_video_generation()` 的完整质量失败条件不变；`/2` 绑定放弃理由和重算的未知项，
 不改变 Manifest schema、原评价、付费预留、activation 或 recovery。标准 reader 重验全部 joins。
-Feedback 从 Manifest 投影 exact latest `/2` 到 `DecisionInputs.abandoned_result`；Router
+Feedback 只将绑定当前 selected QA 的 exact latest `/2` 投影到 `DecisionInputs.abandoned_result`；
+切换 QA 后仍保留原 experience、latest evidence、baseline 与 terminal receipt，旧 QA 的
+abandonment 不成为新 QA 的执行例外。Router
 仅据此继续原质量修复评估，保留完整 diagnosis、保护原 PASS，并要求新片完整重验。
 新 execution 重验 canonical terminal pointer 与当前 QA；caller 自报、旧片/旧评价/旧 QA
 或未知 Provider outcome 不获得例外。终结不发 permit、不追加额度，也不自动 retry。

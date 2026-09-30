@@ -233,7 +233,8 @@ def test_abandoned_result_reaches_router_without_erasing_gap_or_authorizing_subm
     assert committer._read_manifest() == closed
 
 
-def test_abandoned_result_real_feedback_binding_start_roundtrip(tmp_path):
+@pytest.mark.parametrize("prospective_qa", [False, True])
+def test_abandoned_result_real_feedback_binding_start_roundtrip(tmp_path, prospective_qa):
     from ai_video.production.generation_decision import DecisionPolicy
     from ai_video.production.generation_feedback import GenerationFeedbackOrchestrator, RegisteredGenerationTarget
     from ai_video.production._video_project_reader import load_generation_execution_binding
@@ -246,6 +247,17 @@ def test_abandoned_result_real_feedback_binding_start_roundtrip(tmp_path):
         expected_manifest_revision=manifest.manifest_revision,
         experience_content_hash=state.generation_experiences[-1].content_hash,
         actor=ACTOR, reason="Explicit proof remains unobservable after same-bytes review.")
+    if prospective_qa:
+        loaded = load_production_project(tmp_path / "project.yaml")
+        policy = seal_artifact(loaded.qa_policy.model_copy(update={
+            "revision": loaded.qa_policy.revision + 1,
+            "policy_version": loaded.qa_policy.policy_version + "-prospective",
+            "creation_receipt_id": loaded.qa_policy.creation_receipt_id + "-prospective",
+            "content_hash": "0" * 64,
+        }))
+        committer.activate_qa_policy(policy,
+            expected_manifest_revision=loaded.manifest.manifest_revision,
+            attempt_id="prospective-qa-policy")
     candidate = experience.candidate
     provider = NativeFixtureVideoProvider(capabilities=candidate.capabilities, artifact_bytes=b"unused",
         compiler_id=candidate.compiler_contract.compiler_id,
@@ -265,6 +277,21 @@ def test_abandoned_result_real_feedback_binding_start_roundtrip(tmp_path):
         targets=(RegisteredGenerationTarget(provider, candidate.provider_profile,
             candidate.compiler_contract, candidate.output_requirement),),
         context_loader=context, policy=DecisionPolicy())
+    history = caller.history_loader()
+    assert history.experiences == committer.read_generation_experiences()
+    assert history.baseline_request == template.compiled_request.activation_scope.request
+    assert history.latest_attempt_hash == history.experiences[-1].evidence[-1].evidence_hash
+    if prospective_qa:
+        assert history.abandoned_result is None
+        loaded = load_production_project(tmp_path / "project.yaml")
+        old_attempt = next(a for a in loaded.manifest.attempts if a.attempt_id == ATTEMPT_ID)
+        retained = committer._reopen_generation_quality_rejection(
+            old_attempt.video_generation_state.quality_rejection)
+        assert retained.qa_policy != loaded.manifest.active_qa_policy
+        assert retained.abandonment_reason is not None
+        assert provider.call_counts.submit == provider.call_counts.status == provider.call_counts.fetch == 0
+        return
+    assert history.abandoned_result.attempt_id == ATTEMPT_ID
     limits = template.inputs.limits.model_copy(update={"allowed_remote_candidates": tuple(
             f"{candidate.capabilities.provider_name}/{variant.capability_id}"
             for variant in candidate.capabilities.variants)})

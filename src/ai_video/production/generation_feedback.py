@@ -428,7 +428,8 @@ class GenerationFeedbackOrchestrator:
                     request = committer._reopen_video_request(state.request)
                     if state.quality_rejection is not None:
                         receipt = committer._reopen_generation_quality_rejection(state.quality_rejection)
-                        if receipt.abandonment_reason is not None:
+                        if (receipt.abandonment_reason is not None
+                                and receipt.qa_policy == current_context["source_project"].manifest.active_qa_policy):
                             abandoned_result = receipt
                 if request.activation_scope is not None:
                     baseline = request.activation_scope.request

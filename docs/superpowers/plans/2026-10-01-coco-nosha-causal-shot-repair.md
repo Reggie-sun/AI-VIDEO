@@ -35,3 +35,9 @@ exact MP4落盘后显式MCP probe/visual review；逐required requirement以及i
 ## Self-Review
 
 四项milestone覆盖spec每个owner、预算、媒体及交付边界；没有placeholder、runtime旁路或自动接受旧片。任务仍以实际复现为目标，known失败且无有据修复路径时如实报告能力/输入缺口。
+
+## Bounded Eight-Second Repair
+
+在 `runs/coco-nosha-vidu-platform-repair-20261001-001/` 准备前瞻revision3：只把第一单元由5改8秒并更新对应coverage/creative-goal绑定、第一Shot/brief/project及QA ancestry。story、storyboard、其他Shot与Registry保留原bytes。原generation_requirements与FinalOutput requirements逐字保持；不把version变化当作额外sample许可，真实physical仍3/4。通过标准committer和planning/feedback/Router编译，保留第三次abandonment及完整历史。使用fresh纯时间profile与newpreview/authorization/intent/one-use permit，不复用上次permit；stable exact packet经dual review后最多新增一次physical POST。每镜MCP Gate、NE补证、原对白/P4及真实成片目标继续适用。
+
+Disposable compile复现旧QA abandonment被反馈history无条件投影到新QA、随后被execution binding正确拒绝的问题。先以真实committer fixture复现，仅在history producer按当前selected QA筛选`abandoned_result`；不改变binding重验、旧回执、evaluation、完整history、baseline、latest evidence或消费推导。完成targeted regression和同一8秒candidate的disposable canonical compile，再封存source/artifact快照验证与dual review。
