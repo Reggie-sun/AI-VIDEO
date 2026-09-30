@@ -316,6 +316,12 @@ compiler/provider categories。Focused verification：
 
 ## Vidu Cloud Adapter
 
+`_video_requirement_routing.py::requirement_output_matches` 允许 `content_driven`
+映射既有 `nominal_seconds` output；声明的秒数、fps、geometry、MIME 和 audio
+仍须匹配。`fixed` 和 `voice_driven` 不因此接受 nominal timing；实测时长仍由
+`VideoFlexibleOutputRequirement.matches_timing_measurement` 独占，最多允许一个终点帧。
+Focused regression：`tests/test_production_provider_neutral_adapters.py`。
+
 验证所依赖的既有文件也必须有明确路由：`image_import_video_frame.py` 归属 image import，
 由 `production_image_tests` 验证原始视频帧 provenance；
 `paid_provider_no_effect_reconciliation.py` 归属既有 paid video recovery，

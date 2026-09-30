@@ -141,7 +141,7 @@ def requirement_output_matches(
     selected_timing_mode = getattr(output, "timing_mode", "exact_seconds")
     expected_timing_modes = {
         "fixed": {"exact_seconds"},
-        "content_driven": {"exact_seconds", "provider_selected"},
+        "content_driven": {"exact_seconds", "nominal_seconds", "provider_selected"},
         "voice_driven": {"exact_seconds", "provider_selected"},
         "provider_selected": {"provider_selected"},
         "frame_count": {"frame_count"},

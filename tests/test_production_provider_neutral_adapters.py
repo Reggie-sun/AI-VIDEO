@@ -358,6 +358,49 @@ def test_requirement_output_rejects_unproven_duration_and_ratio() -> None:
     assert not requirement_output_matches(ratio_requirement, exact_output)
 
 
+@pytest.mark.parametrize(
+    ("timing_mode", "allowed"),
+    [("content_driven", True), ("fixed", False), ("voice_driven", False)],
+)
+def test_requirement_nominal_output_preserves_timing_intent(
+    timing_mode: str, allowed: bool
+) -> None:
+    context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
+    requirement = _replace_requirement(
+        _verified_requirement(context),
+        output_need=OutputNeed(
+            timing_mode=timing_mode,
+            duration_seconds=5,
+            width=1280,
+            height=720,
+            fps=24,
+            container_mime="video/mp4",
+        ),
+        audio_need=AudioNeed.FORBIDDEN,
+    ).requirement
+    output = VideoFlexibleOutputRequirement(
+        timing_mode="nominal_seconds",
+        duration_seconds=5,
+        dimension_mode="exact",
+        width=1280,
+        height=720,
+        resolution_label="720p",
+        ratio="16:9",
+        fps=24,
+        container="mp4",
+        mime_type="video/mp4",
+        native_audio=False,
+    )
+
+    assert requirement_output_matches(requirement, output) is allowed
+    assert not requirement_output_matches(
+        requirement, output.model_copy(update={"duration_seconds": 6})
+    )
+    assert output.matches_timing_measurement(duration_milliseconds=5042, frame_count=121)
+    assert not output.matches_timing_measurement(duration_milliseconds=5043, frame_count=121)
+    assert not output.matches_timing_measurement(duration_milliseconds=5042, frame_count=122)
+
+
 def test_minimax_h3_compiles_neutral_t2v_to_exact_offline_capability() -> None:
     context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
     output = _h3_output()

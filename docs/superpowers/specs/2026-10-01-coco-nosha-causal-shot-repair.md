@@ -1,0 +1,54 @@
+# COCO / Nosha Causal Shot Repair
+
+## Goal And Authority
+
+继续用户已授权的 Vidu Q3 复现：只用三张已批准图片和原画布一次对白 WAV，正常速度呈现原剧情、角色、道具和可读因果链。用户允许分 Shot，无固定总长。当前任务授权包含必要的 task-level QA/coverage revision 和有限预算；不授权新增图片、其他 Provider、publish/release。
+
+## Current Evidence
+
+标准 `load_production_project` 重开 `runs/coco-nosha-vidu-voice-recovery-20260930-001/production-v2/project.yaml`：Manifest 104，QA `1177e77cb005559b3e657504e754a02d9eaaabb58c46258124f86f037d2b13e0`，两次 Vidu physical submit 均 fetched 后 quality rejected，2/4 consumed。原 H3 八次另行保留。两次只改 seed/profile 时间，不足以证明拆 Shot 无效或必须补四图。
+
+## Requirement Decisions
+
+| Selected requirement | Source / necessity | Prospective treatment |
+| --- | --- | --- |
+| `shot-output` | 正常速度来自 `creative-input.txt`；8/8/7秒、192帧是 Director v1 配置。两片8.042秒/193帧不证明动作速度异常。 | 保留1280×720/24fps和可解码媒体；改用现有 `VideoFlexibleOutputRequirement.nominal_seconds` 的唯一 timing matcher，允许一个终点帧。不得变速、冻结或删关键动作。 |
+| `shot-identity` | 原文明确 A四眼/扇耳/六吸盘足/长尾，B湿囊/三鳍/无虫形，C六瓣吸盘体，D三眼柄/五足/三角软壳；COCO/Nosha和手机等身份不变。 | 按当前 Shot 的已封存出场范围检查，身份实错与遮挡缺证分开。背景未入镜不自动证明变形；不可把所有角色都必须在每镜清楚入镜作为额外门槛。 |
+| `shot-action` | 原文 B侧撞A→坠落/翻滚/逃跑、A惊C→C扑附Nosha→失衡、Nosha→车→篮→果→D。 | 保留明确动作和关键触发/顺序/结果；正常速度观众能辨认谁触发什么。每个微接触逐帧无遮挡不是独立要求；明确要求的接触仍不能删。Nosha头部不在画面是看屏 `NOT_EVALUATED`，不能推断没有看屏。 |
+| `shot-continuity` | 原文角色职责和唯一道具、同一空间/方向、事件连续；旧 `A尚未碰C` 是旧Shot2的接点。 | 新 coverage 重新封存接点，允许匹配切镜，承接已接受前镜真实末状态。不能省去刺激C、容器、推车和果篮的关键原因；不从未接受失败片造accepted terminal。 |
+| `shot-muted-source` | 用户原声线/唯一一次对白；既有 SourceAudioPolicy 分配原WAV到P4。 | raw request仍 `native_audio=false`；raw音轨存在/缺失按真实技术证据记录。原声、单次对白、同步和最终混音只由P4/成片验证，不提前声称PASS。 |
+
+原片两次 FAIL/rejection、旧 rubric、消费和原QA bytes不可改。新版本不是历史片重新验收，也不把模型随机失败归结为图片数量。
+
+## Coverage Contract
+
+进一步拆原 Shot1，保留同一 project/task/history，4个有序单元：
+
+1. `fall-and-line` revision2，5 nominal秒：仅A/B平台侧撞→A吸盘脱离坠落→侧落/翻滚两圈→接触木碗后碗滚动→翻正开始逃跑；B沿平台滑出。D已藏在同一低架/木箱间，前段可见锚点明确分配至下一单元；COCO/Nosha可在背景，尚无对白。身份和明确动作不删。
+2. `floor-and-line`，7 nominal秒：承接A落地逃跑，沿同一方向穿行；D在同一低架/木箱间必须短暂露出转动的三眼柄，保留原文翻滚逃跑后的前段可见锚点；COCO持唯一手机移动、避让A、抵达Nosha举屏；Nosha头部可见并看屏，C仍在脚边，D藏处维持。原5秒WAV只覆盖此单元一次，末镜引用此已接受前段锚点。
+3. `contact-and-fruit`，8 nominal秒：保持原 A尾触容器→刺激C→C立即扑附头→Nosha即刻失衡→撞推车→车撞果篮→六瓣果滚出，不能定住展示。
+4. `d-eats-fruit`，7 nominal秒：同果滚入同货架，D观察/移动/逐瓣咬食/咀嚼/吞咽，末状态仍有动作。
+
+上述时长是生成与剪辑安排，不是用户固定成片长度。镜头1将碰撞、坠落从人物举屏中隔离，测试动作负载这一有依据的主要变量；三图、Provider/model、静音路线和原声轨保持。seed实际是否受控、profile时间续期等附带变化必须如实记录，不能宣称严格单变量质量证明。图片中的其他宠物形态不覆盖原文A/B/C/D身份。
+
+## Owners And Compatibility
+
+原 authoring/QA types封存 coverage、Shot、FinalOutput goal version2、QA policy version2；`ProductionStateCommitter.commit` 原子发布 project/graph，`activate_qa_policy` 发布QA。Registry图片/WAV bytes不变。`VideoPlanner`→feedback→Router→compiler→`VideoGenerationService`维持唯一执行链。用现有dependency transition helper重建所选target，不裸写Manifest或造state。前序末状态只作analysis evidence，不新增生成图像输入。
+
+当前 pure compile 暴露共享 matcher 未接通 `content_driven` 与已有 `nominal_seconds` output，导致 compatible route 为 false。仅补此映射；不改变 schema、Provider capability、measurement tolerance、`fixed` 或 `voice_driven` 的限制。回归测试验证 content-driven 可匹配、错误秒数不可匹配、固定/voice-driven不可匹配，以及终点帧上限。此 necessary shared seam 属于本任务授权，纳入同一T3 review snapshot。
+
+## Budget And Stop Conditions
+
+先使用剩余2个slot，第一新单元最多1个physical submit；停止同prompt改seed的无据循环。若新片known FAIL，先评估真实修复变量。若镜头1/2通过且目标还需后续镜头，保留真实计数并经现有committer逐次有据扩展有限quota和operator upper bound；不得重置history/permit或用改名逃避上限。profile/preview/authorization/intent/one-use permit全部重新封存。Unknown outcome或未授权输入/Provider/egress停止。
+
+每镜exact MP4必须显式调用project-local `video-analysis`并按selected required IDs判PASS/FAIL/NOT_EVALUATED；下一镜仅在全部required PASS后submit。证据不足先补证；required真实失败不降级。成片只走CompositionSpec/ResolvedTimeline/P4/HyperFrames，原WAV一次，完整观看/聆听未取得就保持NOT_EVALUATED。
+
+本 development bundle 保持原有顶层 Shot，不声称其具有 Production component lineage 的自动 predecessor enforcement。task-local `task_gate.py` 在 prepare/execute 前只消费 committer 重开的 current-QA exact predecessor diagnosis 和 unchanged fetched bytes；不存在第二份持久PASS truth。逐镜脚本必须调用同一 consumer。反馈脚本支持 required 全PASS的持久反馈与 known QUALITY_FAILURE rejection 两条分支，activation仍为独立canonical action。0.5秒抽帧经既有任务专用MCP shim提供，验证实测interval/timestamps，不仅信Gate自填数量。
+
+## Verification And Review
+
+运行Director v4和creative-goal-binding验证、requirement semantic admission、canonical candidate load、exact native编译/preview、历史count/asset/rejection保持检查，以及相关已有timing/QA/feedback/project tests。风险T3只限本任务QA prospective contract，最终stable candidate绑定hash作双独立read-only review。Parent裁决，不以测试或review替代媒体验收。用户禁止worktree，使用direct policy checks并明确canonical detached Harness receipt为null。
+
+## Self-Review
+
+Parent核对：没有删原动作/身份、没有新的输入或Provider、没有倒填旧PASS；时长改变复用现有nominal contract，证据缺失保持NE。原文一镜到底/固定时间明确被当前用户覆盖；其余显式约束仍保留。声音人类听觉与最终同步能力缺口未被工程通过掩盖。
