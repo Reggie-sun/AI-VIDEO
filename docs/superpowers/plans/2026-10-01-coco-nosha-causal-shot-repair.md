@@ -41,3 +41,9 @@ exact MP4落盘后显式MCP probe/visual review；逐required requirement以及i
 在 `runs/coco-nosha-vidu-platform-repair-20261001-001/` 准备前瞻revision3：只把第一单元由5改8秒并更新对应coverage/creative-goal绑定、第一Shot/brief/project及QA ancestry。story、storyboard、其他Shot与Registry保留原bytes。原generation_requirements与FinalOutput requirements逐字保持；不把version变化当作额外sample许可，真实physical仍3/4。通过标准committer和planning/feedback/Router编译，保留第三次abandonment及完整历史。使用fresh纯时间profile与newpreview/authorization/intent/one-use permit，不复用上次permit；stable exact packet经dual review后最多新增一次physical POST。每镜MCP Gate、NE补证、原对白/P4及真实成片目标继续适用。
 
 Disposable compile复现旧QA abandonment被反馈history无条件投影到新QA、随后被execution binding正确拒绝的问题。先以真实committer fixture复现，仅在history producer按当前selected QA筛选`abandoned_result`；不改变binding重验、旧回执、evaluation、完整history、baseline、latest evidence或消费推导。完成targeted regression和同一8秒candidate的disposable canonical compile，再封存source/artifact快照验证与dual review。
+
+## Platform-Only Repair
+
+在 `runs/coco-nosha-vidu-platform-only-20261001-001/` 准备5/5/7/8/7五镜coverage：平台只到A离开、B滑出，新增地面镜完整承接落地/两圈翻滚/期间碰碗/翻正逃跑，后续人物/唯一原WAV/C车篮水果/D不删。新Shot、Story/Storyboard、project及QA4由原types/seal/committer发布；与QA3逐字比较required和FinalOutput正文，保留Registry和历史四片。
+
+纯prepare后在regular disposable目录重复真实publication、金额扩容12M→15M、planning/feedback/compile、REQUEST、quota4→5及提交guard；对exact当前profile/secret reference/preview/authorization/subject bytes、四个physical marker和逐项技术先于analyzer顺序给出verification。封存单次平台实验packet，经适用dual review及文档direct policy验证；实际执行复用该新sealed packet，不能重建旧permit或直接HTTP。每次exact MP4落盘仍先显式MCP Gate；平台全部required PASS才准备地面镜。

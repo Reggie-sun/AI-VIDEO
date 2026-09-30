@@ -60,3 +60,11 @@ Parent核对：没有删原动作/身份、没有新的输入或Provider、没�
 下一有限单元仅使用剩余第4个Vidu slot，把隔离A/B单元延长至8 nominal秒；其余三镜、三图、原对白、角色/动作/终点要求不改。主要修复变量是该单元可用时间，不是再次盲改seed。新coverage/Shot/project及其QA coverage binding前瞻封存revision3；FinalOutput goal version3仅标识这次前瞻authoring contract，要求正文与version2逐字相同，不授权删动作、降低identity、reset消费/repair预算或重验旧失败为PASS。profile仅有限纯时间续期，金额/Provider/model/egress不扩张；seed等附带不受控差异如实保留。全部required通过仍是推进条件，失败后先取证，不能把这次样本当成证明补四图必要。
 
 标准 disposable compile暴露旧QA的abandonment回执被history producer当作新QA执行例外，binding正确阻断。修复只在`GenerationFeedbackOrchestrator.for_project`按current selected QA筛选`abandoned_result`；旧experience、latest evidence、baseline与receipt完整保留，binding的QA equality guard不变。真实canonical fixture覆盖同QA继续修复与新QA不继承旧权限两支；新contract仍需通过原Router/QA/planning/paid guards，切换QA本身不授权重试或重置消费。
+
+## Platform-Only Repair Amendment
+
+第四次exact8秒MP4 `5f139f918f8802abe95321ff69731dae8c8298e2d32bc09d467a89749aa39e45` 已取回并经显式MCP17个半秒帧、81个0.1秒帧检查。A末尾开始左向逃跑，但B随A坠落，地面两次翻滚未成立；identity遮挡/足部结构缺证仍NE，不推断四足或必须新增四图。technical-first后analyzer的durable diagnosis保留QUALITY_FAILURE/EVIDENCE_GAP，committer终结候选；原FAIL/QA/receipt与4次physical消费均保留。
+
+下一最小实验将第一单元进一步拆为平台5秒与地面5秒，随后原7/8/7秒三镜保持。平台只到B侧碰→A离开平台、B继续沿平台滑出；地面承接已接受末状态，侧落→翻滚两圈期间身体碰碗才使碗滚动→第二圈末顺势翻正并立即逃跑。不得新增“第二圈完后才碰碗”的顺序条件，不用失败帧作新的reference，不省略原对白或后段因果。平台镜保持此前有效5秒长度，主要诊断变量为动作范围/构图；去除第一镜中的地面和人物任务，不是删全片动作。模型随机性和新profile仍是混杂因素，不宣称严格单变量质量证明。
+
+通过原authoring/QA owner形成revision4及五镜coverage；所有generation_requirements和FinalOutput正文逐字保留，goal version4仅标识前瞻contract。现有三图/WAV/Provider/egress不改。只封存一次新的platform submit：同TASK ceiling4→5、内部project operator上限12M→15M microunits、per-call3M不变；原4个reservation/permit/消费与预算lineage不可清除。原committer执行金额扩容与exact prior/target binding的quota entry，未通过标准loading/preview/submit guard不得提交。平台FAIL/NE阻断地面，known结果先补证、核对下一修复依据；unknown立即停止。之后镜头的有限预算仍须另行有据封存，不在本单元预发多次permit。

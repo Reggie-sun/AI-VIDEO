@@ -11,7 +11,31 @@ Session window: 2026-09-27–2026-10-01, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
+## Current Execution Checkpoint — Source-Bound Gate And Further Shot Isolation
+
+2026-10-01已继续实际执行，当前标准loader重开Manifest163、QA3 `86717de44cd711127d5c37407983f69a7cf1908a1779a42eb361aa112f18bce4`。`runs/coco-nosha-vidu-causal-repair-20261001-001/requirement-to-source.json` 和 `requirement-parent-adjudication.json` 完成原文/QA/两份旧Gate/coverage对照：保留明确动作、角色和关键触发；导演技术秒数与终点帧不当作因果或正常速度失败，Nosha头部出画只证明看屏缺证，身份和因果分别判断。新的task-level prospective QA/coverage由原authoring types及committer发布；没有全局放松gate、修改历史rubric/FAIL/rejection或新增参考图。
+
+### Two Further Exact Media Attempts
+
+使用相同三图、`viduq3` named-subject R2V与静音路线，把第一镜从人物/举屏任务中隔离。第三次physical submit生成5.042s/121帧 MP4 `be14259bb64444e1c90e02828018f7ea1c80bec6c60b0bef4c304ddcbc210af9`（2,551,132 bytes）：显式MCP半秒11帧及0.1秒51帧后，B侧碰→A落下、A碰碗→碗动有改善，但逃跑末状态未成立，足部和意外背景宠物形态仍NE。technical-first及analyzer记录后，committer在Manifest129显式abandon为QUALITY_FAILURE/EVIDENCE_GAP，未激活。fetch后日志Path转JSON的错误没有引起新POST；重开canonical fetch确认结果已知，新执行脚本已使用`str(relative_path)`。
+
+第四次主要增加同一A/B单元的可用时长5→8秒，required/FinalOutput正文不变；fresh纯时间profile、preview、authorization及新intent/permit经过同一标准链。2026-09-30 21:35:33 UTC Provider接受POST，21:39:12取回8.042s/193帧 MP4 `5f139f918f8802abe95321ff69731dae8c8298e2d32bc09d467a89749aa39e45`（4,853,687 bytes）。显式MCP半秒17帧和0.1秒81帧、held-fd canonical probe确认1280×720/24fps/无音轨；按nominal matcher保留一个终点帧，technical output/mute PASS。A7.5–8s开始向左走，但B3.5–5s随A跌下、没有沿平台滑出；地面未建立两次翻滚。action/continuity FAIL，六吸盘足等缺证NE，不从遮挡推断四足。`runs/coco-nosha-vidu-platform-repair-20261001-001/platform-post-media-gate-v2.json`（SHA `4492568174aaad5b7e161d0179bd5e01092f59bb83f1e16070051b04a3091e2a`）保留逐项事实；technical durable proof先于analyzer，committer在Manifest163以receipt `58050fc65cc889636ecaafaaf0342f68112f784409bdfbbec0f9024441f73699` abandon，不激活或接受。完整正常速度连续播放/听觉验收未取得，不冒充已观看/聆听。
+
+本任务Vidu video physical为4/4、clone0；H3八次另保留，四个Vidureservation及全部旧permit/grant/history不重置。原一次WAV `52975f4a3df74a4ec294f712d6afdc563d1da770323bc59f912dba2d58fffb77`/P4不改，声纹、逐字听辨和最终同步/混音仍NE。Shot2及后续没有提交，尚无接受成片。
+
+### Engineering And Next Authorized Unit
+
+`d0ced3b`补通既有content-driven→nominal matcher；`162f602`修复同TASK已应用quota向known terminal fetched successor继承；`d0796fb`让feedback只投影当前QA的abandonment执行例外，保留旧experience/latest/baseline/receipt及binding QA equality guard。后一缺口先red复现，再40项targetedPASS；10项direct policy全PASS、staged tree `5030c3d9f735efa5c76c773977047c46c3002611`不变。双独立审查target `bbe9662f1ee68654e5ed8d43d790587e4fa664d2f85ed096b89b68f38fc88747` 无blocking：xhigh空，max的`CN-P8-01`指出包装器analyzer-first可能先封存错误technical PASS；Parent仅按held-fd检查、technical durable proof先于analyzer的exact recipe接纳，不声称全局修复。source/receipt边界见runtime baseline与 [spec](../superpowers/specs/2026-10-01-coco-nosha-causal-shot-repair.md)、[plan](../superpowers/plans/2026-10-01-coco-nosha-causal-shot-repair.md)。两次受管Kimi review transport/protocol失败及原receipts保留，按SUBAGENTS使用native fallback，不把OUTCOME_UNKNOWN/PARSED当可用review。禁止worktree，所有本轮`canonical_harness_receipt=null`；direct checks不冒充detached Harness。
+
+当前已定稿的下一有界方向是平台单独5秒，地面动作另5秒，再保留原7/8/7秒三镜；平台主要变量为动作范围和构图，保留曾建立侧碰的5秒长度。地面按原文在翻滚中碰碗、第二圈末翻正，不额外加“完成两圈后才能碰碗”。下一次仅新增一个platform submit，同TASK拟4→5、内部project operator上限12M→15M、per-call3M不变，全部须由原budget/quota owner、fresh exact packet、verification/review及媒体Gate执行。该scope尚未发布或提交，不是已证明修复成功；平台required全部PASS才可推进地面。已有证据仍不能确立必须新增四张宠物图的绝对blocker。
+
+### Learning Evaluation
+
+`distill-ai-video-learning`评估为`no_candidate`：四个exact failure有不同动作scope/时长与不受控模型随机性；第三次侧碰改善也是反证，不能把输入数量、时长或gate宽严作稳定通用原因。已有Vidu native-dialogue字幕claim属于不同I2V/native-audio scope，不受这组静音R2V支持或推翻；既有claims保留，无placeholder/adoption。最新experience检索返回library-incompatible并自动排队本地derived refresh，本段只据当前source/receipts/rawframes，不宣称RAG已刷新。记录是失败候选和已验证工程checkpoint，任务继续；没有push/release或真实复现完成声明。
+
 ## Current Handoff Amendment — Causal Gate Proportionality Needs Verification
+
+以下保留1772efe窗口的交接判断；其“尚未实施”和2/4状态已由上方实际执行checkpoint取代，原历史媒体结果保持。
 
 2026-10-01 用户追问因果 gate 是否过重。Parent 承认此前把过多接触细节用作硬门槛，并从两次 seed 对照失败直接推到“必须补四只宠物参考图才能继续”，证据不足。原两次视频的 known FAIL、exact bytes、质量拒绝和真实消费不变；下方及 `reference-feasibility-after-two-vidu-attempts.json` 的必需补图结论作为当时停止判断保留，不再作为未经复核的下一窗口前置条件。用户未回答新增参考图的授权问题；现有三图仍是唯一已批准的生成图像输入。
 
