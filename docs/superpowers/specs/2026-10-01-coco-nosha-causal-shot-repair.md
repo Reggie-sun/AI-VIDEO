@@ -68,3 +68,9 @@ Parent核对：没有删原动作/身份、没有新的输入或Provider、没�
 下一最小实验将第一单元进一步拆为平台5秒与地面5秒，随后原7/8/7秒三镜保持。平台只到B侧碰→A离开平台、B继续沿平台滑出；地面承接已接受末状态，侧落→翻滚两圈期间身体碰碗才使碗滚动→第二圈末顺势翻正并立即逃跑。不得新增“第二圈完后才碰碗”的顺序条件，不用失败帧作新的reference，不省略原对白或后段因果。平台镜保持此前有效5秒长度，主要诊断变量为动作范围/构图；去除第一镜中的地面和人物任务，不是删全片动作。模型随机性和新profile仍是混杂因素，不宣称严格单变量质量证明。
 
 通过原authoring/QA owner形成revision4及五镜coverage；所有generation_requirements和FinalOutput正文逐字保留，goal version4仅标识前瞻contract。现有三图/WAV/Provider/egress不改。只封存一次新的platform submit：同TASK ceiling4→5、内部project operator上限12M→15M microunits、per-call3M不变；原4个reservation/permit/消费与预算lineage不可清除。原committer执行金额扩容与exact prior/target binding的quota entry，未通过标准loading/preview/submit guard不得提交。平台FAIL/NE阻断地面，known结果先补证、核对下一修复依据；unknown立即停止。之后镜头的有限预算仍须另行有据封存，不在本单元预发多次permit。
+
+## Side-Route Repair Amendment
+
+第五次platform-only5秒片 `b7830b76679dd7cf19c3941af868980966c28680453680336cac96e9a24bbd07` 的显式MCP11个半秒帧和51个0.1秒帧已建立A左前离台、B留在平台，仍未建立B侧腹冲量和随后沿平台出画；A正面仅呈现一对眼睛、足部爪趾样，原四眼与六吸盘足身份尚未建立，不误证全身只有四足。技术输出与静音PASS、动作/连续性FAIL、身份NE分别保留；不能把地面动作归到当前平台失败，也不能把样本当作必须补四图的证明。
+
+下一单次实验只改变B相对A的开场位置及路线这一空间编排变量：B在A右侧近处，先向内侧腹碰A，再沿平台后侧滑出，避免从后追尾并停在前角。A仍活动并观察镜头，不自行走下平台；5秒、同三图、原A/B形态文本、正常速度和既有QA4/五镜coverage不变。空间路线修复不自动解决身份证据缺口，全部required仍须PASS。同TASK仅新增一次slot5→6，内部operator ceiling15M→18M、per-call3M不变；保留前五个reservation及所有历史。重新封存profile时间窗、exact preview/authorization、新REQUEST与one-use permit，由原committer执行预算和quota扩展。模型随机性仍是混杂因素，不宣称严格因果实验。若该次FAIL/NE，先补证和核对是否仍有不同、可归因的修复；不得自动重发同prompt或以预算耗尽本身要求用户回复继续。

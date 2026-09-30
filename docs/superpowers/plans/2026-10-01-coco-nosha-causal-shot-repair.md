@@ -47,3 +47,9 @@ Disposable compile复现旧QA abandonment被反馈history无条件投影到新QA
 在 `runs/coco-nosha-vidu-platform-only-20261001-001/` 准备5/5/7/8/7五镜coverage：平台只到A离开、B滑出，新增地面镜完整承接落地/两圈翻滚/期间碰碗/翻正逃跑，后续人物/唯一原WAV/C车篮水果/D不删。新Shot、Story/Storyboard、project及QA4由原types/seal/committer发布；与QA3逐字比较required和FinalOutput正文，保留Registry和历史四片。
 
 纯prepare后在regular disposable目录重复真实publication、金额扩容12M→15M、planning/feedback/compile、REQUEST、quota4→5及提交guard；对exact当前profile/secret reference/preview/authorization/subject bytes、四个physical marker和逐项技术先于analyzer顺序给出verification。封存单次平台实验packet，经适用dual review及文档direct policy验证；实际执行复用该新sealed packet，不能重建旧permit或直接HTTP。每次exact MP4落盘仍先显式MCP Gate；平台全部required PASS才准备地面镜。
+
+## Side-Route Repair
+
+先经第五次exact Gate、technical-first durable proof和analyzer/committer关闭已知失败，保留QA4与全部五次消费。在 `runs/coco-nosha-vidu-side-route-repair-20261001-001/` 只细化provider-neutral GenerationIntent中的B初始相对位置/侧碰后路径，不改当前Shot身份、5秒、三图、QA predicates或五镜coverage。新finite slot5→6、operator ceiling15M→18M由原typed extension/committer执行；先在regular disposable副本验证当前QA history、planning/feedback/compile、五个physical marker、新REQUEST/quota和最终submit guard，真实项目保持不变。
+
+fresh exact packet完成相关direct policy与适用独立审查后，最多一次实际POST；所有required PASS前不提交地面。保留第五次身份回退/NE和B留台改善，空间修复不视为身份修复。末镜D旧intent中的“Shot 01见过眼柄”是已记录non-blocking后续缺陷，D准备前须通过canonical Shot/story/storyboard修正为floor-and-line并核对先前证据适用性，不能宣称平台已有D可见锚点。

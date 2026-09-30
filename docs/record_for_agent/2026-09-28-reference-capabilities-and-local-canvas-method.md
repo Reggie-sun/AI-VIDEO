@@ -11,7 +11,21 @@ Session window: 2026-09-27–2026-10-01, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
-## Current Execution Checkpoint — Source-Bound Gate And Further Shot Isolation
+## Current Execution Checkpoint — Five Known Failures And One Side-Route Repair
+
+2026-10-01当前标准loader重开Manifest190、QA4 `bcb05eafce21fa7de2efaa920866f296f802727e1d2299b09bb88bac40dc24fb`，五个Vidu video attempts均已known FAIL并由committer质量关闭；physical5/5、clone0、五个reservation及H3八次历史不重置。五镜coverage为5/5/7/8/7秒，Registry三图与唯一原WAV不改；ground及后续镜头未提交，无accepted成片。
+
+第五次是平台与地面动作进一步隔离后的platform-only5秒：2026-09-30 22:13:01 UTC POST HTTP200，22:15:21 fetch MP4 `b7830b76679dd7cf19c3941af868980966c28680453680336cac96e9a24bbd07`，2,856,719 bytes、5.042秒/121帧/24fps/1280×720、无音轨。Parent在exact fetch后显式调用project-local MCP，完整11个半秒帧和51个0.1秒帧；held-fd canonical probe先于Gate，technical proof durable重开后再写analyzer。`runs/coco-nosha-vidu-platform-only-20261001-001/platform-post-media-gate-v2.json` SHA `59367b4d25987d522c873a1eb2c561c2b4930d4ca372976df8358c453c553109` 分别记录：A左前离台、B留在平台有改善，但B从后右追近而侧腹冲量缺证，片尾停在前角而未滑出；action/continuity FAIL，正面四眼与六吸盘足/腹褶形态未建立为identity NE，不误证全身仅四足。地面落地/两圈翻滚/期间碰碗属于下一Shot，不列为当前平台失败。
+
+durable技术experience `f9fbb9e90e9f682a01ffbbea8c6fdd56f46b70df95041b1b7a6d89a96c0c3fee` 与analyzer `d94134fda21430f90e889addf97f1d9dde0b941541e64dbfc97ac7d0f0ba5339` 保留QUALITY_FAILURE/EVIDENCE_GAP；committer在Manifest190以receipt `fda589457f1ba443a2e6bd5db03a02a045d529e0963804cbb5cddf2f33334dc5` abandon exact candidate，不激活或接受。第五次packet `6a5e54718528df16bf0c82d028071b6e7d25b450d9c9fff1acf9bb30c3bd8be6` 的37项hash、disposable canonical paid/quota/submit guard、7个历史marker tests与4个documentation direct checks均通过；双独立native fallback无blocking。`CN-PO5-01` 指出末镜D旧intent仍称“Shot 01见过眼柄”，须在D实际准备前canonical修正并核对此前证据适用性；当前平台不声称D已可见。source保持`d0796fb`，文档checkpoint `55b71eb`，canonical Harness receipt仍null，不把direct checks冒充detached receipt。
+
+按same-bytes补证与有界诊断，仍有一个不同变量的最小修复：只改变B相对A的开场位置/路线，先右侧向内碰A，再沿后侧平台滑出，避免追尾和前角停住；保留5秒、原A/B形态文本、三图、原对白、QA4与五镜coverage。下一单次单元 `runs/coco-nosha-vidu-side-route-repair-20261001-001/` 正在无Provider副本验证，拟同TASK slot5→6、内部operator ceiling15M→18M、per-call3M不变，不是官方报价。尚未新增第六次POST；所有required PASS才可提交ground。此修复不自动补齐身份，不能宣称现有输入必定成功或必须新增四图。
+
+完整正常速度连续播放、原COCO参考同声纹、逐字听辨和最终同步/混音仍NOT_EVALUATED；没有repeat/pad/synthesis/clone，没有其他Provider、新参考图、push或release。`record-ai-video-session`在该真实失败stable checkpoint维护本记录；`distill-ai-video-learning`仍为`no_candidate`：第五片B留台是分拆后局部改善，伴随眼睛形态回退与随机性，不能形成输入数量/时长/全局Gate宽严的因果规则，既有不同I2V/native-audio claim保留。
+
+## Historical Execution Checkpoint — Source-Bound Gate And Further Shot Isolation
+
+以下Manifest163、physical4/4和下一平台单元尚未提交是前一stable checkpoint，已由上方第五次实际记录取代；原exact失败证据不改。
 
 2026-10-01已继续实际执行，当前标准loader重开Manifest163、QA3 `86717de44cd711127d5c37407983f69a7cf1908a1779a42eb361aa112f18bce4`。`runs/coco-nosha-vidu-causal-repair-20261001-001/requirement-to-source.json` 和 `requirement-parent-adjudication.json` 完成原文/QA/两份旧Gate/coverage对照：保留明确动作、角色和关键触发；导演技术秒数与终点帧不当作因果或正常速度失败，Nosha头部出画只证明看屏缺证，身份和因果分别判断。新的task-level prospective QA/coverage由原authoring types及committer发布；没有全局放松gate、修改历史rubric/FAIL/rejection或新增参考图。
 
