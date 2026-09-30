@@ -11,7 +11,31 @@ Session window: 2026-09-27–2026-09-30, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
-## Current Supersession — Vidu Q3 Named Subjects Wired, Original Voice Still Blocked
+## Current Continuation — Original Canvas Dialogue Recovered, Two Vidu Q3 Shots Rejected
+
+2026-09-30 当前目标仍是只用 Vidu Q3 和已选三张生成参考图，按需要分 Shot 复现 COCO／Nosha、A/B/C/D、完整因果链与唯一一次原句对白；本轮没有其他 Provider、clone、发布或 release。旧 H3 八次 physical submit 与所有 permit/grant 继续保留。下方旧段落的“原声线必须等待 voice ID 或更长录音”“Vidu POST 0”“新 MP4 0”均已由以下实证取代；旧 Q3 `subjects[].voice_id` 不可用的官方能力判断仍成立。
+
+### Source Voice And Canonical Audio Route
+
+用户登录后从其即梦画布选中的 `视频 10 (17)` 取得原 17.056 s AAC 视频，exact SHA-256 `0ed3948ce0d4c4c2049c447c9d9ee7548ace40f28bf0bc0258f24a2e00a0cab3`。只解码、按样本裁切其中一次完整目标对白，并将 44.1 kHz PCM 重采样为 48 kHz、5.000 s stereo WAV `52975f4a3df74a4ec294f712d6afdc563d1da770323bc59f912dba2d58fffb77`，通过 Registry 登记为 `coco-canvas-dialogue`，由 `SourceAudioPolicy` 明确分配给最终唯一 P4 对白轨。没有重复、补静音、合成、内置声线或失败 candidate 音轨；Vidu raw Shot 均请求静音。`runs/coco-nosha-vidu-voice-recovery-20260930-001/source-provenance.json` 保存原视频、裁切样本、WAV 与 ASR provenance。ASR 支持句子出现一次，但不能证明声纹、主观音质或最终混音；三项听觉验收仍为 `NOT_EVALUATED`。原 6.504 s MP3 不含目标对白且不足 Vidu clone 十秒，本轮 clone POST 为 0。
+
+### Exact Live Attempts And Per-Shot Gate
+
+经用户已完成的 Vidu 登录与既有 Secret Service supplier，账号只读 access 检查通过；正式 remote 调用仍逐次走 `GenerationFeedbackOrchestrator`／编译器、`VideoGenerationService`、Budget Guard、cloud-egress、durable intent、one-use permit 与 `ProductionStateCommitter`。冻结三图 `a-scene`、`b-COCO`、`c-Nosha` 的 named-subject 输入和无原生声线请求；第一笔 `viduq3` R2V submit 产生静音 8.042 s／193 帧 MP4 `5f325e0f69644f4bc1eaeb5b69a68c45626122cf46f287eb91185a8f8cd598f9`。逐帧 Gate 认定 B→A 接触、Nosha 看屏、宠物／道具形态与 A→C 交接失败，`shot01-post-media-gate-v1.json` 保留精确事实，candidate 已由唯一 committer 质量拒绝。
+
+在保留首次消费后，只把 operator upper bound 有据续期并封存一次 seed resample；纯时间 profile 续期 typed proof 与旧／新 pointer绑定，实际 request delta 仅 `provider_profile`、`seed`。任务 submit ceiling 3→4、内部 operator upper bound 9,000,000→12,000,000 microunits 为任务内有限上限，不是官方报价；budget／quota 由原 committer 扩展，旧 permit、reservation、消费不重置。第二笔 physical submit 返回 HTTP 200、result success；执行脚本在 fetch 后写日志时遇到 `TypeError`，但 canonical Manifest 与 fetch receipt 重新打开后确认 outcome 已知、exact MP4 已保存，故没有再次 POST。第二笔文件 `0a38740995a5e7963d253a0cb5137f8ee658a7719d40f57883a0296a49ddbe54`，6,035,293 bytes、8.042 s／193 帧、24 fps、1280×720、无音轨。项目本地 `video-analysis.video_analyze`／`video_review` 实际检查完整 0–8 s 的 17 个半秒帧；通用自动 review 的空 issues 不覆盖剧情。`shot01-repair01-post-media-gate-v1.json` 对 `shot-output`、`shot-identity`、`shot-action`、`shot-continuity` 判 `FAIL`，`shot-muted-source` 为 `PASS`：B先落下、A随后坠落而无可读侧撞；Nosha 头眼未入镜；A在结尾已碰 C；B、A 和 D 的形态仍漂移。两层 controlled presentation／technical feedback 写入同一 exact media identity，`ProductionStateCommitter.reject_video_generation` 将该 attempt 关闭为 `video_quality_rejected`，Manifest revision 104；`shot01-repair01-quality-rejection.json` 保存 rejection hash。Shot 2 没有提交，Production activation／P6／Final Acceptance 均为 false。本任务 Vidu video physical submits 实际为 2，clone 0；原 H3 八次另计。
+
+### Current Input Blocker And Engineering Boundary
+
+只读检查所选画布原视频 0／2／4／6／8／10／12／14／16 s 画面：A有部分眼／耳／尾锚点，但 B 是大型分节软体而非要求的小型三鳍湿囊，D 是浅色圆身而非三角软壳；原场景图也没有足以锁定四只宠物的各自清晰身份图。这些画面没有被偷偷截帧注册为新的生成输入。两次同参考、同8 s authoring、仅 seed／有效期不同的 Vidu 输出重复宠物形态与 B→A 因果失败。分拆 Shot 可降低动作密度，但不能凭空补齐 A/B/C/D 参考身份；在本次“不新增素材”的边界下，第三次同输入付费采样缺少可归因的修复变量，因此保留剩余 2 个 task-level video submit slots，停止当前 attempt。精确判断见 `runs/coco-nosha-vidu-voice-recovery-20260930-001/reference-feasibility-after-two-vidu-attempts.json`。要重启 Shot 1，至少需要用户选定且可用于本任务的 A、B 形态参考；完整后续镜头还需 C、D 的相应参考。未把旧 canvas candidate 或两个失败 Vidu MP4 当成成片、视觉参考或声线验收。
+
+本轮工程补丁 `0afe72d` 为 Vidu profile 纯时间续期提供 typed/hash-bound 证明，使标准反馈链在现有受控 seed 的一次有界 resample 中如实声明 `provider_profile`＋`seed` 两项 delta；旧无 proof 请求序列化/hash 保持。独立 read-only reviewer 的计数边界 finding 以 red→green 测试修复；受控 seed 的纯 profile-only repair 不消耗 seed resample，未受控 seed 的每次已提交随机样本仍消耗原上限。后续双独立审查发现同一 orchestrator 复用时继续注入已消费 proof，以及 `ProductionPlanningService.prepare_generation()` 无法透传 proof；分别以复用结果回归和上层 typed pass-through 回归确认修复。最终两个 read-only native reviewer 在同一 exact staged tree 上均返回空 finding。对应 [spec](../superpowers/specs/2026-09-30-vidu-reaffirmed-profile-resample.md)、[plan](../superpowers/plans/2026-09-30-vidu-reaffirmed-profile-resample.md) 与 `profile-reaffirmation-final-policy-verification-v2.json` 记录契约和验证。用户禁止创建 worktree，故 `canonical_harness_receipt=null`，不能将 direct checks 冒充 detached Harness receipt；最终媒体仍未交付，音色和完整观看／聆听为 `NOT_EVALUATED`。
+
+最终 exact staged tree `17477ef5709fee05a0598720dfb401bc18b1b081` 的 16 项 changed-path direct checks 全部 exit 0；scope、policy SHA-256、staged patch SHA-256 与 index 在 commit 前核对，报告为 `runs/coco-nosha-vidu-voice-recovery-20260930-001/profile-reaffirmation-final-policy-verification-v2.json`（SHA-256 `395e20fb7ddd576f8622b1b4277164495fc1a47a864c0748c4149d1af126b403`）。第一次 architecture 命令漏传 `--base-ref HEAD` 而误扫未修改的 `_state_commit_video.py` 旧债，该诊断失败留在报告中；任务差异限定命令重跑 PASS，仅有 `generation_decision.py` fan-out INFO。Generation Feedback、Production Strategy、Final Output、Vidu、Provider 生命周期及其他选中 checks 均通过；新增回归及邻近路径 159 PASS。两次视频失败是在这些 engineering checks 之外的真实媒体结果，不因测试通过而改变。
+
+`distill-ai-video-learning` 的本轮结论为 `no_candidate`：两个 physical Vidu samples 属于同一组参考与同一密集 Shot 的 seed 对照，能证明这两个 exact output 都失败，却不能隔离“缺宠物专属参考”与动作密度、prompt、模型随机性等原因，尚无适于写入通用 Provider Policy 或 Gate 的单一可验证规则。现有 learning claims 保留，未创建 placeholder、未 adopt；Agent Memory 本次查询返回 stale last-good 片段并自动排队本地 derived-index refresh，不把 RAG 片段当作本轮视频证据。
+
+## Historical Supersession — Vidu Q3 Named Subjects Wired, Original Voice Then Blocked
 
 2026-09-30 按用户的当前任务继续执行，不再把下方 `Authorized Next Window` 当作待生成的续接 prompt。用户允许分 Shot、没有固定 17 秒或一镜到底要求；正常速度、四只宠物的职责、A→B→C→诺萨→推车/果篮→水果→D 的完整因果链、角色/道具连续性、COCO 原声线和唯一一次原文对白仍是目标。只选择 Vidu Q3，没有其他 Provider、素材、发布或 release 授权。旧 H3 的八次 physical submit、已消耗 grants/permits 和失败证据全部保留。
 
