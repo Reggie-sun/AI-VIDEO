@@ -13,6 +13,12 @@ Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef
 
 ## Current Execution Checkpoint — Five Known Failures And One Side-Route Repair
 
+### Authored Intervention Engineering Checkpoint
+
+2026-10-01：第六次仍未submit，真实ROOT保持Manifest190、QA4、5/5消费和五个known失败。`315fdbf`为共同feedback增加可选typed `interventions`透传；Router、history、QA、compiled comparison与paid/one-use gates不变。78项focused tests、10项exact staged direct checks通过，证据为`runs/coco-nosha-vidu-side-route-repair-20261001-001/source-direct-policy-verification.json`与`source-direct-policy-integrity.json`；`canonical_harness_receipt=null`，不作为真实媒体或delivery验收。
+
+副本最初自动resample在原计数上限返回`REASSESS_FEASIBILITY`；显式空间提案随后进入Router，但原compiler又以`generation_recipe.comparison.actual_delta`拒绝。pure diagnostic确认当前Q3的受控seed1496616717→1496616718也变化，初版只声明prompt/profile是不完整的。两个blocked checkpoint保存在同run的`blocked-auto-resample/`与`blocked-undeclared-seed/`，均0 Provider effects。正在声明真实三项delta后重做canonical副本/paid guard和适用审查，不以fixture编译冒充真实Vidu通过。主要修复假设仍为B右侧接近→内向侧碰→沿平台后侧退出；身份NE仍阻断后镜，原三图和对白不变。record/learning评估保持`no_candidate`：这些输入接线和副本拒绝没有形成独立媒体能力证据。
+
 2026-10-01当前标准loader重开Manifest190、QA4 `bcb05eafce21fa7de2efaa920866f296f802727e1d2299b09bb88bac40dc24fb`，五个Vidu video attempts均已known FAIL并由committer质量关闭；physical5/5、clone0、五个reservation及H3八次历史不重置。五镜coverage为5/5/7/8/7秒，Registry三图与唯一原WAV不改；ground及后续镜头未提交，无accepted成片。
 
 第五次是平台与地面动作进一步隔离后的platform-only5秒：2026-09-30 22:13:01 UTC POST HTTP200，22:15:21 fetch MP4 `b7830b76679dd7cf19c3941af868980966c28680453680336cac96e9a24bbd07`，2,856,719 bytes、5.042秒/121帧/24fps/1280×720、无音轨。Parent在exact fetch后显式调用project-local MCP，完整11个半秒帧和51个0.1秒帧；held-fd canonical probe先于Gate，technical proof durable重开后再写analyzer。`runs/coco-nosha-vidu-platform-only-20261001-001/platform-post-media-gate-v2.json` SHA `59367b4d25987d522c873a1eb2c561c2b4930d4ca372976df8358c453c553109` 分别记录：A左前离台、B留在平台有改善，但B从后右追近而侧腹冲量缺证，片尾停在前角而未滑出；action/continuity FAIL，正面四眼与六吸盘足/腹褶形态未建立为identity NE，不误证全身仅四足。地面落地/两圈翻滚/期间碰碗属于下一Shot，不列为当前平台失败。

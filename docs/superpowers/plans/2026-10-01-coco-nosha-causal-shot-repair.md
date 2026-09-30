@@ -65,3 +65,5 @@ fresh exact packet完成相关direct policy与适用独立审查后，最多一�
 **Acceptance / Verification:** 先以failing integration test复现缺失入口，再验证显式修复可编译且重复语义实验/陈旧支持/未声明真实delta不可编译；运行focused反馈与execution/decision suites及exact staged direct policy checks。最终candidate审查通过后，以regular disposable副本核验QA/Shot未变及预算/REQUEST/quota/submit guard，然后才在真实ROOT封存一次新REQUEST并提交。旧blocked文件保留，目标prompt/profile值与真实compiled delta严格一致。
 
 **Self-Review / Continuation:** spec新增入口全部在此milestone覆盖，不更换lifecycle owner、不生成worktree、不将direct checks称Harness receipt。通过后继续逐Shot显式MCP和technical-first证据；若required未PASS，停止该attempt并调查有界修复而非结束已授权任务。
+
+**Measured Delta Correction:** 实际Vidu compiler已拒绝初版仅声明prompt/profile的提案；诊断测得受控seed1496616717→1496616718也是变化。保留`blocked-auto-resample/`与`blocked-undeclared-seed/`，不追改拒绝结果。新提案声明三项变化、semantic hash仅绑定空间prompt，seed/profile不能被用来给同一空间实验改名。typed planning projection已有新路线；只有原compiler对实际delta和目标prompt严格通过才可推进。

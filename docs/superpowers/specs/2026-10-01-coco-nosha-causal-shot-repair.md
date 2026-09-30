@@ -81,4 +81,4 @@ Parent核对：没有删原动作/身份、没有新的输入或Provider、没�
 
 为接通该既有能力，`GenerationFeedbackOrchestrator.prepare`与`start`增加可选keyword-only `interventions: tuple[Intervention, ...] = ()`，在重新打开的当前context/history和自动干预之外加入caller封存提案。Router仍独占是否准入、候选选择、baseline比较与语义实验去重；不修改decision policy、resample limit、QA、失败历史、prediction或permit规则。显式提案不是授权、事实或已证明有效的修复。默认空值保留原行为。非法/陈旧证据、重复实验、known violations和未声明实际编译变化仍fail closed；`start`只将通过同一binding的新REQUEST交给committer，不submit或activate。
 
-Parent self-review：这是共同producer的缺失输入接线，不另造Resolver/编译执行路径。当前Vidu未提供seed控制，空间prompt和纯时间profile变化均须如实声明、绑定目标值；不能借文字换名重发同一实验。只针对动作/连续性失败提出假设，身份NE仍阻断下一Shot。纳入本任务stable exact snapshot验证和适用独立审查，完成后继续原真实实验。
+Parent self-review：这是共同producer的缺失输入接线，不另造Resolver/编译执行路径。初始提案误把当前Q3 seed视为uncontrolled，真实compiler正确拒绝未声明的seed变化；pure diagnostic测得实际delta为`provider_profile`、`prompt_text`、`seed`，seed为1496616717→1496616718。新提案须声明三项、保留全部其他compiled constants，不能声称严格单变量实验。semantic target hash只绑定空间prompt，附带seed推进/profile时间不作为新空间实验身份；当前profile仍由原binding/typed reaffirmation精确核验。不能借文字换名重发同一实验。只针对动作/连续性失败提出假设，身份NE仍阻断下一Shot。纳入本任务stable exact snapshot验证和适用独立审查，完成后继续原真实实验。
