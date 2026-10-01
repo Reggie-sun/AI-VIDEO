@@ -346,6 +346,10 @@ Project、timeline 或 QA state，也不会注册成普通 Shot capability。Foc
 Harness 的 `vidu_ad_tests`；使用与兼容边界见 [Vidu ad source](vidu-ad-provider.md)。
 
 `src/ai_video/production/vidu.py` 独占 Vidu payload/status/download mapping，
+submit 在 one-use permit 的 durable 校验及 consume 完成后、POST 前重新核验实际时钟，
+授权或 profile 到期则零 POST，并由既有 service 封存 `KNOWN_NO_EFFECT`、保留 consumed permit。
+`_state_commit_paid_provider.py` 在耗时 execution-binding guard 后、首次 durable write 前
+重新核验授权，拒绝到期后写入 paid intent 或 reservation；历史 evidence 不追改。
 `_vidu_prompt.py` 独占 Vidu version `2` 的自然语言 prompt 与 version `4` named grammar，
 完整 requirement `/4` 的 version `3` 消费既有 remote native prose；新编译不接受 version `1`，
 历史请求恢复保留原始 bytes。无法表达的语义与 native hard control 必须拒绝，不能静默丢弃。

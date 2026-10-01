@@ -414,6 +414,9 @@ class _StateCommitPaidProviderMixin:
             gate_artifact = _artifact(
                 canonical_paid_provider_gate_path(gate.gate_receipt_fingerprint), gate
             )
+            validate_paid_provider_authorization(
+                preview, authorization, now=self._paid_provider_clock()
+            )
             self._write_immutable_artifact(budget_artifact, attempt_id=preview.attempt_id)
             self._write_immutable_artifact(gate_artifact, attempt_id=preview.attempt_id)
             budget_pointer = PaidProviderBudgetSnapshotPointer(

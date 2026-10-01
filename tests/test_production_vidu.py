@@ -414,6 +414,131 @@ def test_real_service_durable_permit_and_restart_replay(tmp_path):
     assert len(transport.calls) == 1
 
 
+@pytest.mark.parametrize("offset_us", [-1, 0, 1])
+def test_paid_intent_rechecks_clock_after_video_guard_before_any_write(tmp_path, monkeypatch, offset_us):
+    from production_remote_generation_factory import prepare_remote_generation
+    from ai_video.production.project import load_production_project
+    from ai_video.production.state_commit import ProductionStateCommitter
+    from ai_video.production.video_generation import VideoGenerationService
+    provider, _, _ = _setup()
+    prepared = prepare_remote_generation(root=tmp_path, provider=provider, request=_request(),
+        compiler_id="vidu-video-compiler", compiler_version="3")
+    provider, transport, (resolved, _, paid, auth, _) = _setup(prepared.compilation.request)
+    clock = [NOW]
+    committer = ProductionStateCommitter(tmp_path,
+        paid_provider_authorizer=lambda exact: auth if exact == paid else None,
+        paid_provider_clock=lambda: clock[0])
+    VideoGenerationService(committer=committer, provider=provider).start(
+        attempt_id=paid.attempt_id, request=resolved, execution_binding=prepared.execution_binding)
+    before = {path.relative_to(tmp_path): path.read_bytes()
+              for path in (tmp_path / "state").rglob("*") if path.is_file()}
+    original = committer._require_submit_execution_binding
+
+    def slow_guard(*args):
+        result = original(*args)
+        clock[0] = auth.expires_at + timedelta(microseconds=offset_us)
+        return result
+
+    monkeypatch.setattr(committer, "_require_submit_execution_binding", slow_guard)
+    if offset_us < 0:
+        permit = committer.record_paid_provider_submit_intent(paid, reservation_id="reservation")
+        assert permit is not None
+        loaded = load_production_project(tmp_path / "project.yaml")
+        attempt = next(a for a in loaded.manifest.attempts if a.attempt_id == paid.attempt_id)
+        assert attempt.paid_provider_state.phase.value == "submit_intent"
+    else:
+        with pytest.raises(AiVideoError) as error:
+            committer.record_paid_provider_submit_intent(paid, reservation_id="reservation")
+        assert error.value.code is ErrorCode.PAID_PROVIDER_LIVE_AUTHORIZATION_REQUIRED
+        after = {path.relative_to(tmp_path): path.read_bytes()
+                 for path in (tmp_path / "state").rglob("*") if path.is_file()}
+        assert after == before
+        loaded = load_production_project(tmp_path / "project.yaml")
+        attempt = next(a for a in loaded.manifest.attempts if a.attempt_id == paid.attempt_id)
+        assert attempt.paid_provider_state is None
+        assert attempt.video_generation_state.phase.value == "request"
+    assert transport.calls == []
+
+
+@pytest.mark.parametrize("expiry", ["authorization", "pricing"])
+@pytest.mark.parametrize("offset_us", [-1, 0, 1])
+def test_submit_rechecks_clock_after_permit_durability_before_post(expiry, offset_us):
+    profile = _profile(pricing_expires_at=NOW + timedelta(minutes=1 if expiry == "pricing" else 60))
+    provider, transport, (resolved, preview, paid, auth, _) = _setup(profile=profile)
+    clock = [NOW]
+    provider._now = lambda: clock[0]
+    binding = build_video_paid_permit_binding(resolved, preview, paid, auth)
+    validation_calls = []
+
+    def slow_durability():
+        validation_calls.append(True)
+        if len(validation_calls) == 2:
+            expires = profile.pricing_expires_at if expiry == "pricing" else auth.expires_at
+            clock[0] = expires + timedelta(microseconds=offset_us)
+        return True
+
+    permit = _DurablePaidProviderSubmitPermit(_PAID_PROVIDER_PERMIT_TOKEN,
+        binding=binding, durability_validator=slow_durability)
+    if offset_us < 0:
+        provider.submit(resolved, preview, paid, auth, permit)
+        assert len(transport.calls) == 1
+    else:
+        with pytest.raises(AiVideoError) as error:
+            provider.submit(resolved, preview, paid, auth, permit)
+        assert error.value.code is ErrorCode.VIDEO_PROVIDER_FAILED
+        assert transport.calls == []
+    assert len(validation_calls) == 2
+    assert not permit._consume_paid_provider_operation_permit(**binding)
+    assert len(validation_calls) == 2
+
+
+@pytest.mark.parametrize("expiry", ["authorization", "pricing"])
+def test_service_records_known_no_effect_after_permit_durability_expiry(tmp_path, monkeypatch, expiry):
+    from production_remote_generation_factory import prepare_remote_generation
+    from ai_video.production.project import load_production_project
+    from ai_video.production.state_commit import ProductionStateCommitter
+    from ai_video.production.video_generation import VideoGenerationService
+    profile = _profile(pricing_expires_at=NOW + timedelta(minutes=1 if expiry == "pricing" else 60))
+    provider, _, _ = _setup(profile=profile)
+    prepared = prepare_remote_generation(root=tmp_path, provider=provider, request=_request(profile),
+        compiler_id="vidu-video-compiler", compiler_version="3")
+    provider, transport, (resolved, _, paid, auth, _) = _setup(prepared.compilation.request, profile=profile)
+    clock = [NOW]
+    provider._now = lambda: clock[0]
+    committer = ProductionStateCommitter(tmp_path,
+        paid_provider_authorizer=lambda exact: auth if exact == paid else None,
+        paid_provider_clock=lambda: clock[0])
+    service = VideoGenerationService(committer=committer, provider=provider)
+    service.start(attempt_id=paid.attempt_id, request=resolved, execution_binding=prepared.execution_binding)
+    original = committer._paid_intent_is_current
+    validation_calls = []
+
+    def slow_durability(*args):
+        result = original(*args)
+        validation_calls.append(True)
+        if len(validation_calls) == 2:
+            clock[0] = profile.pricing_expires_at if expiry == "pricing" else auth.expires_at
+        return result
+
+    monkeypatch.setattr(committer, "_paid_intent_is_current", slow_durability)
+    with pytest.raises(AiVideoError) as error:
+        service.submit_once(attempt_id=paid.attempt_id, paid_preview=paid, reservation_id="reservation")
+    assert error.value.code is ErrorCode.VIDEO_PROVIDER_FAILED
+    assert transport.calls == []
+    assert len(validation_calls) == 2
+    loaded = load_production_project(tmp_path / "project.yaml")
+    attempt = next(a for a in loaded.manifest.attempts if a.attempt_id == paid.attempt_id)
+    assert attempt.status.value == "failed"
+    assert attempt.paid_provider_state.phase.value == "known_no_effect"
+    receipt = committer._reopen_paid_submit(attempt.paid_provider_state.submit_receipt)
+    assert receipt.outcome is PaidProviderSubmitOutcome.KNOWN_NO_EFFECT
+    assert receipt.external_effect_id is None
+    with pytest.raises(AiVideoError):
+        service.submit_once(attempt_id=paid.attempt_id, paid_preview=paid, reservation_id="reservation")
+    assert transport.calls == []
+    assert load_production_project(tmp_path / "project.yaml").manifest == loaded.manifest
+
+
 @pytest.mark.parametrize("change", [{"seed": 0}, {"seed": 2**32}, {"negative_prompt_text": "bad"}, {"model_id": "viduq2"}, {"prompt_text": "a" * 5001}])
 def test_invalid_request_rejected_before_transport(change):
     provider, transport, _ = _setup()

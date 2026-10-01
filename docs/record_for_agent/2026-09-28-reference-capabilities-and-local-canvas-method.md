@@ -13,6 +13,14 @@ Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef
 
 ## Current Execution Checkpoint — Sixth Media FAIL And Supported Inertia Repair
 
+### Fresh REAL Preparation And Clock Boundary Repair — 2026-10-02
+
+本节取代下方旧 Manifest202/profile13 尚未创建的当前状态，旧记录保留。Canonical snapshot/money/compile/paid 已完成，REAL Manifest205 SHA `640a5630c433bd20f2a5fc83a37572ae1ec92a146de6157f67e24ad3cc85d49d`；四阶段实际 221.502/853.547/1593.179/526.813 秒、均 PASS、零 Provider effects。Copy 与 REAL 的 typed inputs/non-time profile/native body 等价核对通过；旧 copy12 仍不是新日期/source 的同 bytes receipt。Profile13 为六小时 2026-10-01 19:05:04.103336 至 2026-10-02 01:05:04.103336 UTC。第七次尚无 attempt、paid intent、permit 或 physical POST；六次 known failed、旧 H3 八次及所有消费保留。真实新 monetary ceiling 已 18M→21M；submit quota 6→7 尚未执行。当前授权仅同实验最多新增一次 POST。
+
+Source `f002578` 上的 round1 双独立审查绑定旧 target `3a1e1eba01d56dd2238d4c475d38fa71022d0fd44e66f8ad95a5f680c79d0e38`。一份无 blocking finding，另一份提出两处时钟边界；Parent 查源码并可靠复现为 8 项预期失败、3 PASS，拒绝接受旧 target。修复在 paid execution-binding guard 后首次 durable write 前，以及 Vidu permit consume/durability 校验后 POST 前重新读实际时钟；后者零 transport effect 的到期失败沿 existing `KNOWN_NO_EFFECT` 封存，permit 保持 consumed。修复后 11 项新用例及 217 项相关测试 PASS；旧 review/receipts 不追改，新 staged checks 与 round2 dual review 仍待完成。
+
+Exact artifacts 位于 `runs/coco-nosha-vidu-platform-inertia-execution-20261001-001/`：`real-canonical-preparation.json`、`copy-to-real-parameter-equivalence.json`、两份 `native-review-six-hour-*-round01.json`、`clock-boundary-red-verification.json`、`clock-boundary-green-verification.json`。继续当前 source verification→新 source/REAL 输入只读核验→round2 同一 exact snapshot 双审→真实 start/quota/submit→exact MP4 MCP Gate；若 profile 到期须新 immutable bounded identity，不省略校验赶时钟。工程检查不算成片完成。Learning evaluation 为 `no_candidate`：时钟修复不建立模型质量、参考素材或声线验收结论；record 保持 session_summary/ineligible，不修改 global memory 或 adopted claim。用户禁止 worktree，canonical Harness receipt 仍 null；unrelated `.codex/config.toml` 保留，无 push/release。
+
 ### Measured Execution Window Update — 2026-10-02
 
 以下新计时取代旧三小时“不再扩大”的窗口假设，历史paragraph、source5ae8b2f及copy12 bytes不追改。REAL仍Manifest202/SHA `424dce6e803a2c9b6488d3fb5e16efecb9062f58944df3e7453e0da44b7b423e`，六次known failed/fetched/closed，profile13、第七次physical marker、paid intent和accepted media均没有。copy12前七阶段PASS/零POST；money/compile/paid/start/quota实际905.160/1740.261/526.121/1192.593/2545.227秒，guard16:56:51 UTC开始、17:31:38完成main preflight，截至18:13仍在canonical guard。仅真实路径的共同阶段已超过180分钟，review/service/paid-intent额外成本未计。原等待器17:56:58到期退出；额外30分钟有限等待receipt保留，Parent停止自动REAL准备后，按新spec/plan只将内部operator纯时间上限3→6小时。7项预期red已证实旧source拒绝六小时，当前candidate覆盖120项focused；direct policy checks及最终双独立review仍必须完成后才真实执行。所有非时间字段、费用数值、六笔消费、最大新1 POST、三图/WAV/QA4和POST前actual-clock/one-use/unknown guards保持。

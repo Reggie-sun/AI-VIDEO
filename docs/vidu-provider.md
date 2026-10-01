@@ -26,6 +26,11 @@ R2V 的官方模型 ID 是 `viduq3`，不将 `viduq3-pro` 静默改名；Q3 不�
 的实际成本选择最短可行窗口；不能覆盖历史 profile 或改变旧提交的恢复绑定。
 Runtime 仍拒绝过期 profile；该流程没有改变 schema 或取消 freshness 校验。
 
+Paid intent 在耗时的 execution-binding 校验结束后、第一次 durable write 前重新核验授权时钟。
+Vidu submit 保留 consume 前检查，并在 one-use permit 的 durable 校验完成后、POST 前
+重新核验授权和 profile 有效期。后者到期时 permit 保持 consumed、transport 不调用，
+`VideoGenerationService` 通过既有 `KNOWN_NO_EFFECT` receipt 封存失败；不自动重试或 remint。
+
 首次接入可显式设置 `result_trust="authenticated_task"`，此时 `result_origins` 必须为空
 （可以省略）。下载 URL 只来自 official API 对 exact task 的认证查询，并在 fetch 时
 重新验证同一 creation；无需先生成历史任务来发现 CDN。该模式进入 profile hash。

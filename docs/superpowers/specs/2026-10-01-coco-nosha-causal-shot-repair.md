@@ -140,3 +140,13 @@ Self-review：review前仅允许已授权committer的有限budget/graph准备，
 保留source5ae8b2f三小时下已执行的copy12 receipts，明确它们是旧source、旧时间值的零效果共同逻辑证据，不能称新source/六小时profile13的同bytesreceipt。新source的六小时准入/超界/preview clock、feedback/history与production proof通过可执行验证；fresh REAL compiler/preview/authorization及exact parameter comparison再证明新dated参数实际接通。共同逻辑与native payload/intent/QA不变，最终同一source+fresh time03 target双独立审查裁决此组合证据是否充足，存在缺口则补证后再submit，不追改copy或旧source证据。
 
 Self-review：本任务默认授权允许必要的有限时间窗修复；本次是实际阶段成本驱动的修订，非价格、调用次数、媒体criteria或外部范围变化。原三小时和等待器脚本保持历史bytes，使用新的six-hour helper封存真实UTC窗口；review前仍只有canonical snapshot/money/graph/compiler准备，没有paid intent/permit/POST。保留旧profile、所有消费/准备/审查历史。源码/任务参数的direct验证不冒充detached Harness receipt或媒体接受，工程完成后继续同一真实复现。
+
+## Blocking Clock Boundary Repair Amendment
+
+2026-10-01 20:09 UTC，round1双审对 target `3a1e1eba01d56dd2238d4c475d38fa71022d0fd44e66f8ad95a5f680c79d0e38` 分别给出空 findings 和 `INERTIA6H-01/02`。Parent核对源码确认：paid intent入口校验后有耗时guard，首次durable write前没有clock复核；Vidu在permit消费内部的durability reread返回后直接POST。REAL仍M205，无第七次attempt、intent、permit或POST。该target尚未获Parent放行，原六小时Source/REAL/copy证据继续保留。
+
+修复边界仅为现有canonical owner的实际时钟：`record_paid_provider_submit_intent` 在全部guard和artifact准备完成后、首次durable write前复核当前authorization；拒绝时不写budget、Gate、Manifest或mint permit。`ViduVideoProvider.submit` 在one-use permit消费内部的阻塞检查返回后、transport之前再以同一actual-clock读数校验authorization及operator profile；到期阻断保持零POST，已消费permit不得复用。此已知pre-transport拒绝使用现有 `VIDEO_PROVIDER_FAILED` → `KNOWN_NO_EFFECT` receipt路径，不将transport未知结果归入零效果，也不新增retry或自动recovery。
+
+标准fixture的injected clock必须覆盖到期前一微秒、到期点及到期后一微秒；分别覆盖authorization/profile和service持久化的零效果记录。原入口、pre-consume、exact bytes、egress、credential、durability、budget/quota/history和unknown保护继续执行。无schema迁移、费用/时间上限变化、全局cache、额外Provider或输入；保留sameTask最多一个新的physical POST和全部历史消费。
+
+Self-review：这两项是当前cold guard已有87分钟实测背景下的具体安全缺口，增加窗口不能替代边界检查。按已授权的任务内必要共享契约/恢复规则修复执行；先red复现，再最小owner修复、focused和真实changed-path verification，同一新exact target双独立round2 re-review。旧REAL参数不能被追改成新source验证；补齐新source与该参数的标准seam证据，当前时窗不足时按既有有限续期规则封存新identity，绝不复用过期preview/permit或重置计数。通过后继续真实媒体任务。

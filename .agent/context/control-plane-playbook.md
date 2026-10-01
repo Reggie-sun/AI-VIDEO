@@ -217,6 +217,7 @@ code/tests；`AGENTS.md` 的 `Canonical Ownership` 继续提供顶层 durable bo
 - Agent 不得为了 task authorization、submit ceiling 或单次调用准备而浏览官方 pricing、搜索当前单价、计算预计账单、刷新 pricing snapshot，或要求用户提供价格。正常 paid execution 的 orchestration 约束是 task-level submit count；每个 exact attempt 仍必须独立 reservation 并消费 one-use permit。
 - 现有 runtime monetary fields 只允许消费 repository/provider profile 中预先配置并 sealed 的 operator upper bound；该值只作为兼容的内部 Budget Guard evidence，不代表官方实际价格，不得触发 Agent-side research。纯 operator upper bound 的续期按下节执行；真实市场报价或缺失上限仍须报告 compatibility blocker。
 - Task-scoped authorization 不替代 Paid Provider Gate。调用前仍需 Agent orchestration 的 remaining submit-count check、exact preview、适用的既有 runtime Budget Guard/reservation、cloud-egress approval、secret reference、durable submit intent 与 one-use permit；这不把现有 monetary ledger 或 historical receipts 解释为 count-based runtime schema。
+- 时钟检查须覆盖耗时的 canonical 校验边界：paid committer 在 execution-binding guard 完成后、第一次 durable write 前重新核验授权；Vidu 在 permit durability 校验及 consume 完成后、POST 前重新核验授权和 profile。到期前没有 transport 调用的失败沿既有 `KNOWN_NO_EFFECT` 路径封存，已消费 permit 不复用；已发生或无法排除外部效果时仍按 unknown-outcome fail closed。
 - Task-level submit ceiling耗尽或确需新增调用时先停止当前 attempt并核对授权目标、真实消费和 known outcome；仅当Provider/model/inputs/egress仍在原授权内，才按 `AGENTS.md` 的 `Decision Gates` 自主封存/实现新的有限预算，不能绕过现有runtime contract。Scope/provider/egress超出原授权或上一次 outcome unknown时停止并报告；不得 blind retry、remint permit、改写旧消费或把授权解释为无限调用。
 - 历史 live evidence、offline tests、现有 credential/余额或旧 run 不授权新的调用。
 

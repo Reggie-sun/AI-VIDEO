@@ -423,6 +423,14 @@ class ViduVideoProvider(_ViduAdMethods):
             raise _error("Vidu preview changed before submit.", ErrorCode.VIDEO_REQUEST_INVALID)
         if not permit._consume_paid_provider_operation_permit(**binding):
             raise _error("Vidu permit is consumed.", ErrorCode.PAID_PROVIDER_AUTHORIZATION_REQUIRED)
+        # Consuming a permit reopens durable evidence and can cross the time boundary.
+        now = self._now()
+        try:
+            validate_paid_provider_authorization(paid_preview, authorization, now=now)
+        except AiVideoError:
+            raise _error("Vidu authorization is not current before POST.") from None
+        if not self._profile.pricing_observed_at <= now < self._profile.pricing_expires_at:
+            raise _error("Vidu operator profile is not current before POST.")
         try:
             response = self._transport.request(transport_request)
         except Exception:

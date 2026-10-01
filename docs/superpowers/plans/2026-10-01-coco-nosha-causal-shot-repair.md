@@ -127,3 +127,15 @@ fresh exact packet完成相关direct policy与适用独立审查后，最多一�
 **Execution / Stop:** 旧自动准备等待器由Parent停止，无REAL mutation。用新six-hour helpers且真实决定时间封profile13，canonical money/graph/compiler和fresh paid authorization；不复用旧preview/permit或改名重置预算。review后start、quota、sole submit重做全部检查，POST前actual clock仍须通过。copy FAIL/有限等待耗尽先保留known zero effects并核对下一证据路径；unknown Provider outcome立即停止。MP4落盘即explicit MCP逐项Gate，继续其余Shot与canonical成片；commit/test/review不是终点。
 
 **Self-Review:** 已测共同阶段已超原窗口，增加有限余量比在paid intent后等待到期再恢复更安全。无新材料/Provider/egress或费用数值变化；six-hour日期只是内部operator上限有效期，不产生账号/余额/官方价格事实。
+
+## Blocking Clock Boundary Repair Milestone
+
+**Goal / Scope / Owner:** 关闭round1 `INERTIA6H-01/02` 后继续同一个第七次实验。Parent串行修改 `_state_commit_paid_provider.py` 的首次write前authorization检查及 `vidu.py` 的permit消费后、POST前authorization/profile检查；`tests/test_production_vidu.py` 使用现有 `prepare_remote_generation` / `VideoGenerationService` 标准fixture复现与覆盖。matrix、Provider doc、playbook、baseline与主record只同步实际行为和证据边界。
+
+**Current / Target Contract:** 原入口/consume前校验均保留。guard期间到期在任何durable side effect前拒绝；permit消费期间到期阻断POST并保留one-use，走已有已知零效果receipt，不新增retry、permit remint或未知结果推断。六小时cap、sameTASK6→7、operator18M→21M、per-call3M及最大新一个POST、原三图/WAV/QA4均不扩大。没有public schema/layout迁移；不抽离正确性关键transaction来做机械拆分。
+
+**Verification / Acceptance:** 先运行新增injected-clock boundary cases，旧source应出现可靠red；随后focused Vidu/paid/state/service和no-effect recovery tests通过。分别断言到期前一微秒可执行、到期及之后拒绝、guard拒绝不新增任何state bytes/permit、consume后拒绝零POST且permit不可再次消费、service记录exact `KNOWN_NO_EFFECT` 并阻止replay；existing transport unknown仍unknown。按真实changed paths运行policy checks并绑定新source/staged hashes，canonical Harness继续null，不冒充detached receipt。双独立review针对同一新source+packet进行round2，旧round1及第六次4轮完整保留；confirmed blocker修复和验证证据缺口未关闭不得start/submit。
+
+**Execution / Stop:** REAL目前M205且未start，修复期间不发Provider调用。不修改sealed round1 snapshots、旧copy/profile/helpers或消费。新source对当前REAL参数重新走适用标准验证seam；如时间不足，真实UTC封新的有限同实验profile/preview/intent identity，保留predecessor及当前counts。放行后start、quota、sole submit仍重做完整current guard，随后exact MP4显式MCP Gate和其余Shot/成片。工程checkpoint不是任务终点。
+
+**Self-Review:** 两个测试分别约束canonical write和Provider send边界，避免用额外时间余量隐藏缺口；不增加第二owner、cache或宽泛error重分类。没有新用户批准步骤，未知结果仍fail closed。
