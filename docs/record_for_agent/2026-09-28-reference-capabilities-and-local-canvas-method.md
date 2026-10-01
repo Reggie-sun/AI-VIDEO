@@ -15,6 +15,8 @@ Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef
 
 ### Sixth Live Media Gate Checkpoint
 
+**Window sequencing amendment:** profile11的零POST副本在preflight实际910.171秒后因profile过期停止；此前money/compile/paid分别756.147/1562.381/577.115秒。profile12正在新的三小时窗口中完成共同逻辑的八阶段验证。Parent已定稿separate verification/execution windows：12全部PASS后才为同一第七次实验封fresh13/time03、canonical REAL money/graph/compiler、fresh preview和exact最终packet双审查；不复用旧preview/permit，不把12 receipt称作13同bytes验证，不扩大三小时上限、不重置六次消费。review前无paid intent/POST，source/runtime gates与逐Shot媒体验收保持。当前仍无第七次真实提交。
+
 **Current engineering checkpoint:** 第七次还没有REAL attempt或POST，真实项目保持Manifest202、六次known失败及消费6。`runs/coco-nosha-vidu-platform-inertia-repair-20261001-001/` 的60分钟profile11在canonical副本money阶段实际耗时756.147秒，后续仍需多阶段校验、review与真实执行，不能借过期profile或省略history/Budget Guard赶时钟。Parent在原owner将纯operator reaffirmation最大窗口1→3小时，非时间字段、严格向后日期和Provider实际clock检查不变；不是官方报价、费用数值或submit次数扩张。新边界先取得5个预期red，再经114项focused验证，包括三小时边界前PASS、到期/未生效及超界拒绝、非时间变化拒绝、feedback/history与ProductionPlanningService透传；最终policy/dual review仍待完成。旧profile11、副本及计数证据保留。
 
 同一第七次惯性实验的time02准备位于 `runs/coco-nosha-vidu-platform-inertia-window-recovery-20261001-001/`，脚本只更新新preparation identity、profile12引用及runner路径，原几何、truck_left、QA4、三图和最大新1 POST不变，40项pure task guards通过。profile12尚未封存；source检查和脚本就绪后以真实UTC决定时间创建有限窗口，重新走canonical副本及同一exact source+packet双独立review。当前单元review最多3轮、原第六次4轮和全部六次真实消费保留，不能将未提交副本当新媒体或重新归零。automatic learning仍no_candidate，当前source/window工程不产生Provider质量、必须补图或媒体验收结论。

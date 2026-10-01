@@ -122,3 +122,11 @@ Self-review：支持平台出口与侧撞均是原文动作，不是额外像素
 唯一类型owner仍为 `vidu_profile.py::ViduProfileReaffirmation`；不增加schema字段、配置入口或Provider路径。旧/新profile所有非时间字段必须相同，决定时间和到期时间均须严格向后，窗口大于3小时仍拒绝；Provider preview/submit继续按实际clock拒绝过期或尚未生效的profile。旧proof和profile bytes/hash、原三图、QA4、seed计数、总预算、sameTASK quota及one-use/unknown-outcome规则均保留。这个内部上限窗口不产生官方市场报价或余额事实，不适用于其他Provider的真实pricing snapshot。
 
 新的time02准备只替代未使用的profile11时钟，仍是同一第七次惯性实验、最多1个新POST、真实消费6和6→7/18M→21M边界；旧copy、时间证据及全部审查/消费保留。source/脚本准备完后才以真实UTC决定时间封fresh profile12，重新绑定preview/intent/permit和canonical副本验证。已知零效果的旧准备可显式关闭或保留为未提交副本证据，未知结果禁止续封重提。Self-review：扩大有限operator确认窗口解决已观察的历史校验运行成本，不放松媒体criteria、费用数值、调用次数或runtime expiry，不引入cache或绕过canonical校验；没有新增外部授权。
+
+## Separate Verification And Execution Windows
+
+旧profile11副本preflight实际910.171秒后因过期明确停止，零POST；money/compile/paid此前分别756.147/1562.381/577.115秒。把完整copy、review和REAL preparation重复串入同一窗口，会让已验证的准备再次被时钟耗尽。Parent在同任务默认授权内将纯验证与真实执行分为两个有限时间单元，不再要求同一profile覆盖两遍cold历史校验。
+
+profile12副本须先完成全部八阶段，保留exact bytes、M202及零POST证据。随后仅在known zero-effect条件下，为同一未提交第七次实验创建fresh profile13/time03；实际baseline仍是第六次profile10，真实消费仍6，最大新POST仍1，三小时上限不再扩大。time03脚本仅变更preparation identity、profile引用和路径；其非时间profile、原三图、QA4/coverage、typed intent、预算/计数保护和物理payload必须逐项比较。通过canonical REAL money/graph/compiler准备fresh request后封fresh preview/authorization，禁止复用12的preview/permit或将12的copy称为13的同bytesreceipt。copy12验证只证明共同逻辑；新的exact source+time03 packet须双独立review，真实start/submit仍按当前项目和实际clock重新执行所有guard、durable intent与one-use。
+
+Self-review：review前仅允许已授权committer的有限budget/graph准备，不启动付费intent或POST；final review仍在真实start/submit前。non-time或native payload差异超出上述声明、unknown effect、required review或clock未通过时停止，不能用参数等价掩盖新的语义变化。全部旧准备、轮次与消费保留，最终媒体Gate和实际出片目标不变。

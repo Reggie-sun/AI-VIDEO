@@ -109,3 +109,11 @@ fresh exact packet完成相关direct policy与适用独立审查后，最多一�
 **Verification / Execution:** 先red验证3小时边界可接受、超出一个微秒拒绝、非时间变化仍拒绝；green后重跑Provider preview在未生效及到期边界无network拒绝、共同feedback/production proof透传和policy所需检查。稳定source checkpoint commit后，保留11准备并为同一未提交第七次封time02/profile12、fresh request/preview/authorization。完成新的canonical副本全部阶段、同一exact source+packet双独立review及Parent裁决，按原单POST单元真实执行。新review预算沿第七次单元3轮，不重置原六次消费和第六次四轮review。
 
 **Self-Review:** 这是有据的task运行窗口契约修复；不把工程PASS当媒体通过，不接受旧失败片，不越过逐Shot gate，也不因窗口修复结束实际复现目标。
+
+## Separate Window Execution Milestone
+
+**Evidence / Scope:** profile11 copy已在15分钟preflight后因过期零POST停止；已完成阶段合计超过63分钟。保留profile12八阶段验证，把之后同一第七次实验的REAL preparation置于fresh profile13/time03三小时单元；不继续扩大shared上限，也不重置消费或审查预算。
+
+**Verification / Execution:** 12全部copy stages PASS后封13；逐项比较12→13仅声明的identity/path/time变更、非时间profile相等、typed intent/QA/输入/计数规则相等和native body hash一致。REAL只经committer做money/graph和canonical compiler准备，随后fresh paid preview/authorization并封存当前REAL manifest与exact source+packet。最终双独立review覆盖新的实际target及parameter-equivalence evidence，12旧receipt明确作为共同逻辑验证而非13的同bytesreceipt。通过后REAL start重做完整preflight、quota和唯一submit重做canonical submit guard；不重复独立preflight/guard命令，但不省略其中检查。成功落盘即显式MCP Gate，再继续其余镜头和composition。
+
+**Self-Review:** 前置预算/graph准备是授权内可恢复canonical mutation；未审查前禁止paid intent/permit/POST。边界改变或参数等价无法证明则停止该转接。record与learning保留全部旧准备及known结果；没有新外部输入、Provider或媒体接受授权。
