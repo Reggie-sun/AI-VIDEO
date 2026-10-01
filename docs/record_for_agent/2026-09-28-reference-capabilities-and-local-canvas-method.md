@@ -21,11 +21,11 @@ Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef
 
 fetch后立即显式调用project-local MCP，whole0.5秒11帧与同MP4的0.1秒51帧补证，held-fd probe同样确认5.042秒/121帧/24fps/1280×720/H264/无音轨。Gate `runs/coco-nosha-vidu-side-route-sealed-quota-20261001-001/platform-post-media-gate-v2.json` SHA `9db46eaa522039add681d41d7c39cc243c2b5884df7947c0c106ffade23f03db`：技术/静音PASS；侧接触2.8–3.1秒先于A离台3.3–4.3秒已有可读证据，A四琥珀眼、两扇膜、吸盘状足有明确改善，不沿用第五次两眼判断；B却在4.6–4.9秒跟A从同一前角跌落，支持平台后侧退出为FAIL，action/continuity FAIL。六足总数及B连续腹褶收缩仍缺证，identity NE；COCO后段两手似为空、未见合理交接，phone retention也NE，未伪证第二个因果失败。ground动作不属于当前平台Gate。
 
-technical proof已先durable记录为experience `f5049e8328fc82b16028ad601785bd5441afc1dc00850cb15cd301dc17773a4e`，analyzer正在canonical处理；quality closure尚未完成，不说当前六次都已committer关闭。当前片不接受、不激活、不裁取充当前序，ground未提交，没有实际成片。文件/分析/Gate/source/count/submit/fetch evidence保留在同run与原production-v2；采样检查不是完整正常速度播放，音频输入工具明确不支持本channel听觉，timbre/逐字听辨/最终混音仍NOT_EVALUATED。
+technical proof已先durable记录为experience `f5049e8328fc82b16028ad601785bd5441afc1dc00850cb15cd301dc17773a4e`，随后analyzer experience `63770bbb1fc5582c56c5fd0f04195ff3b7107aad269ee271432a7210b9f5bbe7` 保留EVIDENCE_GAP/QUALITY_FAILURE。committer以receipt `a1dad0fa9b48c71a958d6345e03a00c764cd2754c694403db927e843fd7af692` 显式abandon并标准loader重开Manifest202，failed/video_quality_rejected、identity unresolved及六笔消费均保留；same-bytes补证不能修复B实际跌落，因此关闭当前候选，不伪改未决形态。`platform-quality-abandonment.json` 记录exact closure；当前片不接受、不激活、不裁取充当前序，ground未提交，没有实际成片。文件/分析/Gate/source/count/submit/fetch evidence保留在同run与原production-v2；采样检查不是完整正常速度播放，音频输入工具明确不支持本channel听觉，timbre/逐字听辨/最终混音仍NOT_EVALUATED。
 
 下一有界假设在 `runs/coco-nosha-vidu-platform-inertia-repair-20261001-001/` 准备：原BACK-RIGHT折返是候选导演细节，原文要求B保持惯性；改为右→左、前缘A与有连续木面支撑的后侧B通路分离。只读authoring审查AUTHOR-01指出固定镜头会取消原文明示左横移，Parent采纳并撤回固定镜头候选，保留原tracking/Shot4/QA4，typed GenerationIntent/Intervention细化同一目标。最多新1 POST，同TASK6→7、operator18M→21M，经原owner封存并核验；旧review单元4轮不重置，新单元有限3轮review。当前尚无第七次POST或新授权材料，不能以预算耗尽要求用户回复继续。geometry仍待实际MP4验证，既有三图下还有具体可检验修复，不建立必须补四图的绝对blocker。
 
-record/learning自动评估为`no_candidate`：本次支持一个exact任务内的修复/缺证边界，prompt、profile和seed共同变化，不能推出新增四参考必需、Provider整体优劣或通用gate调整；不创建placeholder、不adopt、不刷新RAG。AOCI既有blocked未对齐保留。本记录更新是媒体稳定checkpoint，之后继续analyzer/closure和已授权修复，不是复现完成。
+record/learning自动评估为`no_candidate`：本次支持一个exact任务内的修复/缺证边界，prompt、profile和seed共同变化，不能推出新增四参考必需、Provider整体优劣或通用gate调整；不创建placeholder、不adopt、不刷新RAG。AOCI既有blocked未对齐保留。文档checkpoint `884bf30` 的四项direct policy检查通过，canonical Harness receipt仍null；本次补记实际closure后继续第七次已授权修复，不是复现完成。
 
 以下Five Known Failures及unused第六次准备/审查状态为历史checkpoint，以上真实第六次结果替代其current-facing状态，旧字节、计数和失败报告不改。
 
