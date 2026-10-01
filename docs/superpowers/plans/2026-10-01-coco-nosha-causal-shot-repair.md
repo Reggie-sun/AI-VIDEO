@@ -83,3 +83,7 @@ fresh exact packet完成相关direct policy与适用独立审查后，最多一�
 **Verification:** 先以standard-loaded真实fixture建立关闭/重放/继承失败测试；验证actor/reason/CAS、缺证据、paid/local intent、reservation、unknown及tampered evidence全部拒绝且无写入。关闭后预算/消费/请求/经验不变，successor仍受原cap及complete history guard。对任务copy注入graph commit后中断并重跑；analyzer无exact durable technical source时在seal及MCP前拒绝。运行changed-path direct mandatory checks，canonical Harness receipt保持null。
 
 **Continuation / Self-Review:** exact stable source和08任务packet经双独立复审；最后才续封fresh窗口并执行真实一次POST。到期REQUEST经新canonical方法关闭，再用同TASK新identity和全部not_submitted history续接，不形成新空间实验或额外slot。新动作仍须per-Shot全部required PASS才推进。
+
+## Unapplied Quota Recovery Milestone
+
+**Scope / Verification:** 修复SIDEROUTE-04，以standard fixture分别在quota应用前/后关闭REQUEST，验证完整history successor及canonical submit guard；没有extension时必须拒绝submit，然后只应用一次原额度extension。quota owner排除verified closed且未获quota的较高提案，wrapper按ledger判断实际应用/继承。保留08 immutable packet及第二轮review；09仅续封同一未消费空间实验。source mandatory direct checks通过后冻结source/packet，第三轮dual review及Parent裁决后继续真实ROOT执行。预算仍仅6次/18M，真实消费5；未知结果及identity/QA不变。

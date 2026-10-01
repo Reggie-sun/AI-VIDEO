@@ -271,7 +271,10 @@ def _extend_paid_provider_submit_quota(committer, entry):
                 raise ValueError("unresolved attempt is not the verified prior new-goal result")
             target_limits = target_binding.inputs.limits
             prior_limits = prior_binding.inputs.limits
-            same_task_limits = []
+            same_task_limits = [
+                applied.new_paid_submit_ceiling for applied in budget.submit_quota_extensions
+                if applied.task_id == entry.task_id
+            ]
             durable_remote = set()
             for item in manifest.attempts:
                 state = item.video_generation_state
@@ -282,7 +285,22 @@ def _extend_paid_provider_submit_quota(committer, entry):
                 if limits.task_id != entry.task_id:
                     continue
                 if item.attempt_id != entry.target_attempt_id:
-                    same_task_limits.append(limits.paid_submit_ceiling)
+                    from ai_video.production._state_commit_video_unsubmitted import (
+                        is_verified_closed_unsubmitted_video_attempt,
+                    )
+
+                    unapplied_closed_proposal = (
+                        limits.paid_submit_ceiling > prior_limits.paid_submit_ceiling
+                        and is_verified_closed_unsubmitted_video_attempt(
+                            committer, manifest=manifest, attempt=item,
+                        )
+                        and not retained_submit_quota_allows(
+                            committer=committer, manifest=manifest, state=state,
+                            current_limits=limits, prior_limits=prior_limits,
+                        )
+                    )
+                    if not unapplied_closed_proposal:
+                        same_task_limits.append(limits.paid_submit_ceiling)
                 if (
                     state.paid_submit_receipt is not None
                     or (

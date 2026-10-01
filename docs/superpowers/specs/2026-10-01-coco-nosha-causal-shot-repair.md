@@ -96,3 +96,7 @@ Parent self-review：这是共同producer的缺失输入接线，不另造Resolv
 `ProductionStateCommitter.close_unsubmitted_video_generation`仅在standard reopen、exact REQUEST、无paid/local intent/receipt/status/fetch、无该attempt reservation、存在exact canonical `not_submitted` experience时将RUNNING关闭为FAILED/`video_generation_not_submitted`。保留request/binding/experience、graph及budget，existing error metadata记录typed actor/reason。CAS保护首次关闭，exact replay无写入；unknown/intent/错误证据拒绝。新generation identity的同TASK successor保留全部history和实际消费；已应用quota仅经这个verified closed ancestor继承原ceiling，不追加额度、不重放旧授权或permit。普通RUNNING/REQUEST、INTERRUPTED或unknown不能继承。
 
 task-local新packet在graph mutation前检查fresh profile；重入仅复用canonical已成功提交且desired graph/states相等的checkpoint。analyzer必须先核对当前Gate/request/media/QA的durable technical source，缺失或错误时在seal/MCP前拒绝。Parent self-review：仅补未发生外部效果的生命周期收口，不将paid未知结果改成未提交；schema既有字段保持，新的specific error code与公开method前瞻添加。纳入T3 direct policy和同一稳定snapshot双独立review；通过后继续第六次真实实验及成片目标。
+
+## Unapplied Quota Proposal Amendment
+
+第二轮review的SIDEROUTE-04由standard-loader fixture复现：`start`后、`quota`前关闭的verified zero-effect REQUEST仅封存了较高ceiling提案，尚未应用extension。canonical quota owner计算历史已生效上限时，仅对此类已验证关闭且未获任何retained quota的高上限提案排除；保留其完整attempt/binding/experience与真实消费。已应用extension、普通FAILED、RUNNING、UNKNOWN、INTERRUPTED不能借此排除。后继仍须针对最新Manifest/base ledger及最后真实prior封存原5→6的exact extension；已应用额度仅只读继承。task wrapper每次quota阶段调用同一canonical owner，并按实际ledger判断应用或继承，不能按“存在关闭检查点”猜测额度已生效。Parent self-review确认不扩大ceiling或清零消费，采用pre-quota/post-quota两种关闭边界的完整submit guard测试及最终第三轮双独立review。

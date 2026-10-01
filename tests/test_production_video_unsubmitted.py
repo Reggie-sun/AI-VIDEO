@@ -71,7 +71,8 @@ def test_submitted_or_unknown_attempt_cannot_be_relabelled_unsubmitted(tmp_path)
     assert _bytes(tmp_path) == before
 
 
-def test_closed_request_can_start_fresh_successor_with_complete_history_and_same_cap(tmp_path):
+@pytest.mark.parametrize('quota_applied', [False, True])
+def test_closed_request_can_start_fresh_successor_with_complete_history_and_same_cap(tmp_path, quota_applied):
     from ai_video.production.generation_execution import GenerationDecisionExecutionBinding
     from ai_video.production.shot_router import VideoGenerationResolver
     from ai_video.production.video import VideoGenerationRequest
@@ -79,7 +80,8 @@ def test_closed_request_can_start_fresh_successor_with_complete_history_and_same
     import test_production_generated_video_e2e as e2e
 
     writer, service, _, prior = _pending(tmp_path)
-    writer.extend_paid_provider_submit_quota(_entry(writer, prior))
+    if quota_applied:
+        writer.extend_paid_provider_submit_quota(_entry(writer, prior))
     experience = record_attempt_evaluation(committer=writer, attempt_id=NEXT)
     _close(writer)
     loaded = load_production_project(tmp_path/'project.yaml')
@@ -106,10 +108,28 @@ def test_closed_request_can_start_fresh_successor_with_complete_history_and_same
     service.start(attempt_id='fresh-successor',request=request,execution_binding=successor)
     manifest=load_production_project(tmp_path/'project.yaml').manifest
     state=next(a for a in manifest.attempts if a.attempt_id=='fresh-successor').video_generation_state
+    if not quota_applied:
+        from ai_video.production.paid_provider_submit_quota import PaidProviderSubmitQuotaExtension
+
+        with pytest.raises(AiVideoError, match='ceilings cannot expand'):
+            writer._require_submit_execution_binding(manifest,state,request)
+        values = _entry(writer, prior).model_dump(mode='python', exclude={'content_hash'})
+        values.update(target_attempt_id='fresh-successor', target_binding=state.execution_binding)
+        writer.extend_paid_provider_submit_quota(PaidProviderSubmitQuotaExtension.create(**values))
+        manifest = load_production_project(tmp_path/'project.yaml').manifest
     writer._require_submit_execution_binding(manifest,state,request)
     budget=writer._reopen_paid_budget(manifest.active_paid_provider_budget)
     assert len(budget.reservations)==1
     assert len(budget.submit_quota_extensions)==1
+    from ai_video.production.paid_provider_submit_quota import PaidProviderSubmitQuotaExtension
+
+    values = _entry(writer, prior).model_dump(mode='python', exclude={'content_hash'})
+    values.update(extension_id='duplicate-ceiling-proposal',
+                  target_attempt_id='fresh-successor', target_binding=state.execution_binding)
+    before = _bytes(tmp_path)
+    with pytest.raises(AiVideoError, match='bindings are invalid'):
+        writer.extend_paid_provider_submit_quota(PaidProviderSubmitQuotaExtension.create(**values))
+    assert _bytes(tmp_path) == before
 
 
 @pytest.mark.parametrize('code',[ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN,ErrorCode.VIDEO_PROVIDER_FAILED])
