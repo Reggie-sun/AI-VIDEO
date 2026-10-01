@@ -13,6 +13,16 @@ Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef
 
 ## Current Execution Checkpoint — Five Known Failures And One Side-Route Repair
 
+### Known-Unsubmitted Recovery Engineering Checkpoint
+
+2026-10-01：07 exact snapshot `c7516f92558f18bd9b028fe01afeff5517f329e2b74d7602ffc310696a89e58f`双独立review中，xhigh无findings，max发现REQUEST到期无canonical收口、graph commit后重入与technical-first顺序三项问题。Parent保留两份报告，在08 packet修复；第六次真实effect尚未发生，不把07空findings当作最终acceptance。
+
+`772345d`新增`ProductionStateCommitter.close_unsubmitted_video_generation`，只关闭exact无paid/local intent/status/fetch/reservation且保留canonical not_submitted experience的REQUEST；specific terminal code保留actor/reason和全部history。sameTASK新identity只读继承原未消费quota，未增加slot或清零消费。完整history submit guard的真实fixture与负向/replay覆盖通过；source最终exact staged tree `7848d997dfbb933560920f90c82df4ee589ceff2`的16项mandatory direct checks全PASS，`runs/coco-nosha-vidu-side-route-recovery-20261001-001/source-direct-policy-verification.json`及`source-direct-policy-integrity.json`绑定scope/policy/bytes；用户禁止worktree，canonical Harness receipt仍null。Architecture Gate曾拒绝God Module增长，移到cohesive closure/feedback边界后重验PASS，未改debt baseline。
+
+08任务脚本36项guard/checkpoint验证PASS：canonical graph commit后注入中断可重开且无重复写入，analyzer缺失当前Gate/request/media/QA的durable technical source时在seal/MCP前拒绝。独立副本将实际到期的07 REQUEST显式记录not_submitted并关闭至Manifest197，无新Provider效果；真实ROOT仍Manifest190/五次known FAIL。正式提交校验副本另从真实Manifest190复制，避免混入恢复实验history。08仍是同一unused空间提案，new preparation identity不构成新实验；native实际delta仍prompt/profile/seed，1496616717→1496616718，三图/named subjects/model/mute不变；fresh exact packet最终复审仍待完成。
+
+AOCI收尾核验返回stopped/blocked：6个managed stale对象及67项observed pending为现有治理未对齐，没有machine authoring candidates或正式写入。本轮不扩大Scope、刷新baseline隐藏债务或声称完整认知aligned；CodeGraph已重新index并检查新closure关系。该advisory索引状态不代替当前source、tests、标准loader及媒体gate。stable record后的learning自动评估为`no_candidate`：没有新的实际媒体或可隔离的跨实验结论，不提炼参考图绝对必要性。
+
 ### Authored Intervention Engineering Checkpoint
 
 2026-10-01：第六次仍未submit，真实ROOT保持Manifest190、QA4、5/5消费和五个known失败。`315fdbf`为共同feedback增加可选typed `interventions`透传；Router、history、QA、compiled comparison与paid/one-use gates不变。78项focused tests、10项exact staged direct checks通过，证据为`runs/coco-nosha-vidu-side-route-repair-20261001-001/source-direct-policy-verification.json`与`source-direct-policy-integrity.json`；`canonical_harness_receipt=null`，不作为真实媒体或delivery验收。
