@@ -67,3 +67,11 @@ fresh exact packet完成相关direct policy与适用独立审查后，最多一�
 **Self-Review / Continuation:** spec新增入口全部在此milestone覆盖，不更换lifecycle owner、不生成worktree、不将direct checks称Harness receipt。通过后继续逐Shot显式MCP和technical-first证据；若required未PASS，停止该attempt并调查有界修复而非结束已授权任务。
 
 **Measured Delta Correction:** 实际Vidu compiler已拒绝初版仅声明prompt/profile的提案；诊断测得受控seed1496616717→1496616718也是变化。保留`blocked-auto-resample/`与`blocked-undeclared-seed/`，不追改拒绝结果。新提案声明三项变化、semantic hash仅绑定空间prompt，seed/profile不能被用来给同一空间实验改名。typed planning projection已有新路线；只有原compiler对实际delta和目标prompt严格通过才可推进。
+
+## Phase Checkpoint Milestone
+
+**Scope / Owner:** 保留05/06未完成校验副本及历史证据，在`runs/coco-nosha-vidu-side-route-resume-20261001-001/`为同一unused第六次空间实验封存07。task wrapper独占编排，原`VideoGenerationService`和`ProductionStateCommitter`继续独占状态迁移及paid/permit规则。
+
+**Verification / Execution:** 对persistent disposable copy逐阶段验证snapshot、money、compile、paid preview、credential preflight、REQUEST、quota和submit guard，每阶段落盘收据且确认真实Manifest未改变、Provider效果为零。阶段守卫验证unknown/terminal/残留paid与local evidence拒绝、GET阶段禁止POST和exact quota replay。稳定packet绑定当前source commit、direct checks、QA4/三图/原音轨、native delta及全部task scripts，完成适用双独立审查后才在真实ROOT按阶段执行一次submit；fetch后立即显式MCP并执行technical-first gate。profile最多一小时且submit前仍须fresh，时间续期不增加实验身份或消费额度。
+
+**Self-Review:** 不重新调用`start`冒充resume，不拆开paid intent与POST，不重置消费，不把expired或中断校验算PASS。仅原canonical owner可应用精确预算entry或其replay；只从known unsubmitted REQUEST推进。通过工程校验及review后持续原出片目标，known媒体失败先诊断，unknown outcome停止。

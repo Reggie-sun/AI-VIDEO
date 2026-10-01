@@ -82,3 +82,9 @@ Parent核对：没有删原动作/身份、没有新的输入或Provider、没�
 为接通该既有能力，`GenerationFeedbackOrchestrator.prepare`与`start`增加可选keyword-only `interventions: tuple[Intervention, ...] = ()`，在重新打开的当前context/history和自动干预之外加入caller封存提案。Router仍独占是否准入、候选选择、baseline比较与语义实验去重；不修改decision policy、resample limit、QA、失败历史、prediction或permit规则。显式提案不是授权、事实或已证明有效的修复。默认空值保留原行为。非法/陈旧证据、重复实验、known violations和未声明实际编译变化仍fail closed；`start`只将通过同一binding的新REQUEST交给committer，不submit或activate。
 
 Parent self-review：这是共同producer的缺失输入接线，不另造Resolver/编译执行路径。初始提案误把当前Q3 seed视为uncontrolled，真实compiler正确拒绝未声明的seed变化；pure diagnostic测得实际delta为`provider_profile`、`prompt_text`、`seed`，seed为1496616717→1496616718。新提案须声明三项、保留全部其他compiled constants，不能声称严格单变量实验。semantic target hash只绑定空间prompt，附带seed推进/profile时间不作为新空间实验身份；当前profile仍由原binding/typed reaffirmation精确核验。不能借文字换名重发同一实验。只针对动作/连续性失败提出假设，身份NE仍阻断下一Shot。纳入本任务stable exact snapshot验证和适用独立审查，完成后继续原真实实验。
+
+## Phase Checkpoint Amendment
+
+两次未提交的disposable校验进程结束后没有最终收据；保留副本及中断记录，原因保持`NOT_EVALUATED`。真实ROOT仍为Manifest190、五次known failed/fetched，不存在第六次paid intent或physical marker。到期的05/06仅为未执行准备，不复用其preview或permit。
+
+同一第六次空间修复在07窗口重新封存，operator per-call3M及五次真实消费保持不变，有限上限仍仅5→6、15M→18M。task-local wrapper分开`start`、`quota`、`submit`、`poll`、`fetch`；每阶段标准重开Project并调用原canonical service/committer。`submit_once`内部paid intent、permit和POST保持一个不可重启单元。只允许无paid/local副作用的exact `RUNNING/REQUEST`继续准备；submit intent、unknown、terminal、identity drift均停止。已接受提交只能同task GET/fetch，不能再POST或通过窗口续期重发。Parent self-review确认该调整只改变任务编排，不修改共享恢复契约、质量标准或预算owner。
