@@ -223,6 +223,8 @@ code/tests；`AGENTS.md` 的 `Canonical Ownership` 继续提供顶层 durable bo
 
 ### Operator Ceiling Renewal
 
+Quota extension 的首次 publication 也须在完整 binding/history 和 next Manifest 准备后、首次 durable write 前核验 actual clock。已经合法发布的 identical entry 只读 replay 与既有 quota inheritance 保留；发行授权到期不追溯删除历史额度或消费。后续 submit 仍独立校验当前 dated authorization/profile。
+
 用户明确授权生成或继续生成时，Agent 可以为新 exact attempt 续期已有的纯 operator upper bound；该权限是任务内本地配置委托，不新增 submit quota，也不把 docs-only 请求变成执行授权。
 
 - 仅适用于 Provider contract 明确定义为内部定额上限的 profile（当前 Vidu）；不适用于包含实际单价、token 费率或市场观察的 pricing snapshot（不得推用于 Seedance 的实际报价字段）。

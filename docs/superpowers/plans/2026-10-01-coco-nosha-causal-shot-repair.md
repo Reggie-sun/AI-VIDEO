@@ -139,3 +139,13 @@ fresh exact packet完成相关direct policy与适用独立审查后，最多一�
 **Execution / Stop:** REAL目前M205且未start，修复期间不发Provider调用。不修改sealed round1 snapshots、旧copy/profile/helpers或消费。新source对当前REAL参数重新走适用标准验证seam；如时间不足，真实UTC封新的有限同实验profile/preview/intent identity，保留predecessor及当前counts。放行后start、quota、sole submit仍重做完整current guard，随后exact MP4显式MCP Gate和其余Shot/成片。工程checkpoint不是任务终点。
 
 **Self-Review:** 两个测试分别约束canonical write和Provider send边界，避免用额外时间余量隐藏缺口；不增加第二owner、cache或宽泛error重分类。没有新用户批准步骤，未知结果仍fail closed。
+
+## Quota Clock And Time04 Recovery Milestone
+
+**Goal / Owner / Scope:** Parent在唯一quota owner的首次durable write前增加fresh expiry check，保留已应用授权的read-only replay/继承。Exact Source4f942755 red2fail/1pass已经定位，没有未经核对地修改历史quota、FAIL或消费。仅quota owner、标准test、spec/plan和canonical docs变化。
+
+**Verification:** -1/0/+1微秒cases约束成功/拒绝及全部state bytes不变，合法已应用entry过期后的replay仍不写。运行实际changed-path policy checks，绑定新Source，direct evidence不冒充worktree Harness；此前Source4f94275上两个paid/POST clock fixes及其217/15check evidence保留并明确Source边界。新Source稳定checkpoint commit后使用新helpers封fresh time04 profile/request/paid preview与canonical REAL compiler准备，只读核对与旧未提交experiment的typed/non-time/body/seed/QA/参考图等价。原21M已应用snapshot直接消费，六旧reservation保留，不再次money扩展。
+
+**Review / Execution / Stop:** Current unit round3/3，沿用原两个native profiles进行full final review同一新Source+time04 packet；旧两轮、prior sixth4轮及两次Kimi故障不重置。Required blocker未关不start/intent/permit/POST。通过后自动真实start→6到7quota→sole submit→poll/fetch→exact MP4显式project-local MCP Gate，再完成其余Shot与唯一WAV/HyperFrames成片。未知Provider outcome立即停、过期zero-effect准备按canonical owner恢复；工程checkpoint不是终点。
+
+**Self-Review:** 新日期解决本次修复占用准备窗口，未增加一个physical slot或费用上限。原profile13/preview/source/snapshots/copy全部保留；Task ID与真实消费不变。授权默认允许这些任务内变更，无需逐项用户确认。

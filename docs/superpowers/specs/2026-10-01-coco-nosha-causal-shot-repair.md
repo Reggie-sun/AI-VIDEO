@@ -150,3 +150,13 @@ Self-review：本任务默认授权允许必要的有限时间窗修复；本次
 标准fixture的injected clock必须覆盖到期前一微秒、到期点及到期后一微秒；分别覆盖authorization/profile和service持久化的零效果记录。原入口、pre-consume、exact bytes、egress、credential、durability、budget/quota/history和unknown保护继续执行。无schema迁移、费用/时间上限变化、全局cache、额外Provider或输入；保留sameTask最多一个新的physical POST和全部历史消费。
 
 Self-review：这两项是当前cold guard已有87分钟实测背景下的具体安全缺口，增加窗口不能替代边界检查。按已授权的任务内必要共享契约/恢复规则修复执行；先red复现，再最小owner修复、focused和真实changed-path verification，同一新exact target双独立round2 re-review。旧REAL参数不能被追改成新source验证；补齐新source与该参数的标准seam证据，当前时窗不足时按既有有限续期规则封存新identity，绝不复用过期preview/permit或重置计数。通过后继续真实媒体任务。
+
+## Quota Publication Clock And Fresh Same-Experiment Window Amendment
+
+Round2 target `ae6039f0d4cbaa441d851c5be9952e412ad52a219e62122497425548f41b50ce` 的双独立 review 都提出 `CLOCK-R02-QUOTA-01`。Parent 在 Source4f942755 的标准 `_pending` / `_entry` fixture 复现2项预期失败：binding reopening 期间跨过到期点，首次 quota artifact/Manifest 仍写入；-1微秒成功及合法已应用额度过期后只读 replay 对照通过。旧 review、Source、消费和 snapshots 保留；问题是首次 publication 的到期校验，不能追溯取消已合法发布额度。
+
+新增实现范围仅 `paid_provider_submit_quota.py::_extend_paid_provider_submit_quota`：完整 binding/history guard、artifact/pointer 和 next Manifest 准备完成后、第一次 durable artifact write 前复核 `entry.valid_at(actual_clock)`；拒绝保持全部 state bytes 不变。已应用 identical entry 的 early read-only replay、retained quota inheritance 和 canonical history/count guards不变。测试覆盖 -1/0/+1微秒；source/tests/docs验证后 round3 dual exact snapshot 再审，没有七次 submit、permit 或强制补图。
+
+Profile13 六小时始于19:05 UTC，准备和两次修复/复审已消耗约两小时。已测 start/quota/guard 单元1192/2545/7318秒，还未计 service/intent/permit 的额外重开；剩余窗口不应靠省略 guards 或碰运气填满。Source稳定后，为同一未提交 supported-inertia 实验用真实UTC封 fresh profile14/time04，最多六小时，保留13和全部三小时copy evidence。复用的是已合法发布的21M内部 budget snapshot及六笔reservation，不能重新应用 money extension、重置消费或复用旧authorization/preview/permit。新compiler/profile引用、dated authorization、generation/attempt identity通过canonical seams形成，非时间配置、native body/seed1496616719、三图/WAV/QA4、同task最多1个新增POST和6→7 quota要求保持。所有typed输入、旧/新hash和当前source标准loader/preview/body等价证明须封存，最终Source+fresh time04同snapshot双审后才start/quota/submit。
+
+Self-Review：这是默认任务授权内的过期首次publication拒绝和已观察准备成本下的有限窗口恢复，不扩大素材、Provider/model/egress、monetary数值、physical ceiling或QA。没有第二writer/timeline、cache、自动retry或未知结果推断；全部工程证据不能充当成片完成。

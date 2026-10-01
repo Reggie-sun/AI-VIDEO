@@ -341,11 +341,13 @@ def _extend_paid_provider_submit_quota(committer, entry):
             content_hash=updated.content_hash,
             file_sha256=artifact.file_sha256,
         )
-        committer._write_immutable_artifact(artifact, attempt_id=entry.extension_id)
         next_manifest = _validated_transition(manifest, {
             "manifest_revision": manifest.manifest_revision + 1,
             "active_paid_provider_budget": pointer,
         })
+        if not entry.valid_at(committer._paid_provider_clock()):
+            raise _state_invalid("Paid Provider submit quota extension expired before publication.")
+        committer._write_immutable_artifact(artifact, attempt_id=entry.extension_id)
         committer._write_manifest_atomic(next_manifest)
         committer._reopen_paid_budget(pointer)
         return committer._read_manifest()

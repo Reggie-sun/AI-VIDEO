@@ -13,6 +13,14 @@ Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef
 
 ## Current Execution Checkpoint — Sixth Media FAIL And Supported Inertia Repair
 
+### Quota Publication Boundary And Fresh Time04 Recovery — 2026-10-02
+
+本节取代下方 pending round2 状态。Source `4f942755bdf85412ceaebd168463e7c39a7fd76e` 已提交，15项 staged direct policy checks全部PASS（tree `446dc13e7672886ef91481f9a9a9ea9c4b5748f6`），当前source标准loader+resolve/preview/native body与REAL M205/原packet一致，零secret lookup/Provider/Manifest effects。Round2 target `ae6039f0d4cbaa441d851c5be9952e412ad52a219e62122497425548f41b50ce` 的145个hash及Source/tree由Parent和两个reviewer各自核验；两份独立报告提出 `CLOCK-R02-QUOTA-01`。Parent查源码并用标准quota fixture得到2项预期失败、1项合法成功/过期后replay对照：问题是耗时binding/history重验后到期仍首次publication，不是取消历史已应用quota。该target未获放行。
+
+新candidate仅在canonical quota owner完成artifact/next Manifest准备后、首次write前检查actual expiry，合法已应用entry只读replay/继承保持；Source验证和round3双审待完成。修复/复审已占profile13窗口约两小时，已测后续start/quota/guard单元约20/42/122分钟，service/intent/permit另有开销；拟在Source稳定后为同一未提交supported-inertia实验用真实UTC封fresh profile14/time04，并经canonical compiler和fresh paid preview/authorization取证，不借旧preview/permit或省略guards。原13/12/11及两轮review保留，已应用21M budget/六笔reservation只消费不重新money扩展；sameTask消费6、最多新增1 physical POST/6→7 quota、seed1496616719/相同native body/三图/WAV/QA4保持。现在REAL仍M205，无第七次attempt/intent/permit/POST或accepted媒体。
+
+Exact新证据继续在 `runs/coco-nosha-vidu-platform-inertia-execution-20261001-001/`：`clock-boundary-direct-policy-verification.json`、`clock-source-real-input-revalidation.json`、`review-snapshot-round02.json`、两份 `native-review-clock-*-round02.json`、`parent-quota-clock-round02-adjudication.json`、`quota-clock-red-verification.json`。这是有据的工程修复，不是终点；Source/参数round3通过后立即真实生成及exact MP4 MCP Gate，再继续其余Shot/唯一原对白成片。Learning仍 `no_candidate`，canonical worktree Harness仍null，无push/release或新素材授权；unrelated `.codex/config.toml`保留。
+
 ### Fresh REAL Preparation And Clock Boundary Repair — 2026-10-02
 
 本节取代下方旧 Manifest202/profile13 尚未创建的当前状态，旧记录保留。Canonical snapshot/money/compile/paid 已完成，REAL Manifest205 SHA `640a5630c433bd20f2a5fc83a37572ae1ec92a146de6157f67e24ad3cc85d49d`；四阶段实际 221.502/853.547/1593.179/526.813 秒、均 PASS、零 Provider effects。Copy 与 REAL 的 typed inputs/non-time profile/native body 等价核对通过；旧 copy12 仍不是新日期/source 的同 bytes receipt。Profile13 为六小时 2026-10-01 19:05:04.103336 至 2026-10-02 01:05:04.103336 UTC。第七次尚无 attempt、paid intent、permit 或 physical POST；六次 known failed、旧 H3 八次及所有消费保留。真实新 monetary ceiling 已 18M→21M；submit quota 6→7 尚未执行。当前授权仅同实验最多新增一次 POST。

@@ -5,7 +5,7 @@ from datetime import timedelta
 
 import pytest
 
-from ai_video.errors import AiVideoError
+from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.generation_execution import GenerationDecisionExecutionBinding
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import ActorIdentity
@@ -679,6 +679,36 @@ def test_resealed_wrong_authorization_refuses_without_writes(tmp_path, field, va
     with pytest.raises(AiVideoError):
         writer.extend_paid_provider_submit_quota(entry)
     assert _bytes(tmp_path) == before
+
+
+@pytest.mark.parametrize("offset_us", [-1, 0, 1])
+def test_quota_rechecks_clock_after_binding_reopen_before_any_write(tmp_path, monkeypatch, offset_us):
+    writer, _, _, prior = _pending(tmp_path)
+    entry = _entry(writer, prior)
+    clock = [entry.issued_at]
+    writer._paid_provider_clock = lambda: clock[0]
+    original = writer._reopen_generation_execution_binding
+    before = _bytes(tmp_path)
+
+    def slow_reopen(*args):
+        binding = original(*args)
+        clock[0] = entry.expires_at + timedelta(microseconds=offset_us)
+        return binding
+
+    monkeypatch.setattr(writer, "_reopen_generation_execution_binding", slow_reopen)
+    if offset_us < 0:
+        amended = writer.extend_paid_provider_submit_quota(entry)
+        budget = writer._reopen_paid_budget(amended.active_paid_provider_budget)
+        assert budget.submit_quota_extensions[-1] == entry
+        published = _bytes(tmp_path)
+        clock[0] = entry.expires_at + timedelta(days=1)
+        assert writer.extend_paid_provider_submit_quota(entry) == amended
+        assert _bytes(tmp_path) == published
+    else:
+        with pytest.raises(AiVideoError) as error:
+            writer.extend_paid_provider_submit_quota(entry)
+        assert error.value.code is ErrorCode.PRODUCTION_STATE_INVALID
+        assert _bytes(tmp_path) == before
 
 
 def test_expired_and_missing_opt_in_are_not_authorization(tmp_path):

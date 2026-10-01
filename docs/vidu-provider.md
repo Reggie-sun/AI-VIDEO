@@ -30,6 +30,8 @@ Paid intent 在耗时的 execution-binding 校验结束后、第一次 durable w
 Vidu submit 保留 consume 前检查，并在 one-use permit 的 durable 校验完成后、POST 前
 重新核验授权和 profile 有效期。后者到期时 permit 保持 consumed、transport 不调用，
 `VideoGenerationService` 通过既有 `KNOWN_NO_EFFECT` receipt 封存失败；不自动重试或 remint。
+Task quota 首次扩展在历史/binding 校验后、首次 write 前核验 extension clock；已合法
+发布的 ceiling 继续保留，后续新 profile 仍须 fresh preview/authorization/intent/permit。
 
 首次接入可显式设置 `result_trust="authenticated_task"`，此时 `result_origins` 必须为空
 （可以省略）。下载 URL 只来自 official API 对 exact task 的认证查询，并在 fetch 时
