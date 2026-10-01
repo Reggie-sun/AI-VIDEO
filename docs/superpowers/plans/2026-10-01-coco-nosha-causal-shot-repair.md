@@ -91,3 +91,13 @@ fresh exact packet完成相关direct policy与适用独立审查后，最多一�
 ## Unapplied Prior Milestone
 
 **Scope / Verification / Review:** SIDEROUTE-05的standard-loader red确认未生效提案可经prior选择冒充applied ceiling。移除依赖prior ceiling的排除条件，继续以canonical closed verifier及ledger retention判定；负向cap跳跃无写入，合法原扩展及duplicate拒绝重验。source10项mandatory direct checks、fresh同一空间packet的8阶段canonical副本验证完成后，做有据有限第四轮dual review；保持三轮报告、实际计数及旧sealed输入，不通过重命名重置预算。review通过后立即在真实ROOT运行一次POST及exact MP4 gate，不能把本里程碑当出片完成。
+
+## Supported Inertia Repair Milestone
+
+**Evidence / Scope:** 第六次known fetched片以same-bytes显式MCP补证后，先记录technical再analyzer，原committer关闭其known quality failure和未决项。保留该次原QA、bytes、六笔消费及前四轮review。下一单元只在 `runs/coco-nosha-vidu-platform-inertia-repair-20261001-001/` 实施现有三图下的宽平台后侧惯性通路、原左向横移及画外人物安排，不用失败片或原画布抽帧作新Provider材料。AUTHOR-01已由Parent采纳，固定镜头提案撤回，不进入成片候选。
+
+**Authoring / Execution:** 原Director tracking、Shot4/QA4原required及五镜coverage均保持exact bytes，通过原typed GenerationIntent/Intervention owner细化已批准侧撞/沿平台退出目标；不为移除不存在于Shot4中的BACK-RIGHT限定制造新QA版本。canonical feedback收到新spatial intervention，以第六次actual baseline比较真实prompt/profile/seed delta；先实测是否保持seed，不绕过compiler。只封存一次新POST：同TASK quota6→7、operator18M→21M，前六个reservation完整保留，profile纯时间窗遵循现有最多60分钟。quality closure与脚本准备后才封fresh窗口；过期零效果走既有close/继承，未知停止。新preview/authorization/intent/permit，旧physical和review计数不可重置。
+
+**Verification / Review:** 新packet在disposable canonical copy验证authoring、graph、预算、编译、preflight、start、quota、submit guard；运行task guards和doc policy checks。shared source不变时保留其exact verified checkpoint，不为新媒体假设扩大源码工程。按paid wrapper风险做同一stable exact packet双独立read-only review，新单元review最多3轮，旧单元4轮不复用为通过证据；沿当前任务已记录的Repeated Kimi Failure Fallback使用native profiles。Parent裁决后真实执行1次→GET/fetch→explicit MCP whole/fine evidence→逐项Gate。全部required PASS后继续其余四镜与composition；FAIL/NE先补证/有限修复判断，unknown或真正新增input/Provider边界停止。
+
+**Self-Review:** 当前候选的右向折返不是原文必须项，supported rear-platform exit才是；改通路和机位不删原动作或身份，也不替失败片签发accepted terminal。records/learning在稳定边界更新，工程里程碑不结束实际复现目标。

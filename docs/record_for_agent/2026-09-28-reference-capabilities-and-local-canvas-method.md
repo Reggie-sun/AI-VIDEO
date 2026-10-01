@@ -11,7 +11,23 @@ Session window: 2026-09-27–2026-10-01, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
-## Current Execution Checkpoint — Five Known Failures And One Side-Route Repair
+## Current Execution Checkpoint — Sixth Media FAIL And Supported Inertia Repair
+
+### Sixth Live Media Gate Checkpoint
+
+2026-10-01：第四轮双独立review对同一83项exact snapshot `920e5d821baad791d697e380e5c0a69200ffb2e9f74a05573d80d20644d4fcd2` 均为空findings；Parent核对hash后在 `parent-final-review-adjudication.json` 只准入一次第六次POST。08/09旧被拒快照、四轮review及未提交准备完整保留，不能把本次acceptance回写成前三轮通过。全部8个canonical副本阶段PASS，shared source为`b93cc0a`、文档checkpoint为`0233210`；source10项direct checks和task36项检查不是媒体验收，canonical Harness receipt仍null。
+
+真实ROOT经committer将operator ceiling15M→18M、sameTASK quota5→6，五笔旧reservation不重置。fresh profile10窗口11:26:36–12:26:36 UTC、原三图named subjects、`viduq3`、5秒/720p/静音不变，actual compiled delta为prompt/profile/seed，1496616717→1496616718；native body SHA `586224a57b6e01513a43a4793b2487cb0d3bec0c8ad3c538851c219e5803ff92`、7,562,002 bytes。12:12:20 UTC唯一POST、HTTP200，12:15:22 durable submission/paid receipt接受；12:24:47首次GET为succeeded，12:34:33 fetch exact MP4 `96e611dec19e82717ddd0cdb8cd3dcbbd4825aa7bf51e9d329c20f4814505da6`，3,110,364 bytes。task Vidu消费6/6、clone0；H3八次另计，operator bound不是官方报价或实际收费。
+
+fetch后立即显式调用project-local MCP，whole0.5秒11帧与同MP4的0.1秒51帧补证，held-fd probe同样确认5.042秒/121帧/24fps/1280×720/H264/无音轨。Gate `runs/coco-nosha-vidu-side-route-sealed-quota-20261001-001/platform-post-media-gate-v2.json` SHA `9db46eaa522039add681d41d7c39cc243c2b5884df7947c0c106ffade23f03db`：技术/静音PASS；侧接触2.8–3.1秒先于A离台3.3–4.3秒已有可读证据，A四琥珀眼、两扇膜、吸盘状足有明确改善，不沿用第五次两眼判断；B却在4.6–4.9秒跟A从同一前角跌落，支持平台后侧退出为FAIL，action/continuity FAIL。六足总数及B连续腹褶收缩仍缺证，identity NE；COCO后段两手似为空、未见合理交接，phone retention也NE，未伪证第二个因果失败。ground动作不属于当前平台Gate。
+
+technical proof已先durable记录为experience `f5049e8328fc82b16028ad601785bd5441afc1dc00850cb15cd301dc17773a4e`，analyzer正在canonical处理；quality closure尚未完成，不说当前六次都已committer关闭。当前片不接受、不激活、不裁取充当前序，ground未提交，没有实际成片。文件/分析/Gate/source/count/submit/fetch evidence保留在同run与原production-v2；采样检查不是完整正常速度播放，音频输入工具明确不支持本channel听觉，timbre/逐字听辨/最终混音仍NOT_EVALUATED。
+
+下一有界假设在 `runs/coco-nosha-vidu-platform-inertia-repair-20261001-001/` 准备：原BACK-RIGHT折返是候选导演细节，原文要求B保持惯性；改为右→左、前缘A与有连续木面支撑的后侧B通路分离。只读authoring审查AUTHOR-01指出固定镜头会取消原文明示左横移，Parent采纳并撤回固定镜头候选，保留原tracking/Shot4/QA4，typed GenerationIntent/Intervention细化同一目标。最多新1 POST，同TASK6→7、operator18M→21M，经原owner封存并核验；旧review单元4轮不重置，新单元有限3轮review。当前尚无第七次POST或新授权材料，不能以预算耗尽要求用户回复继续。geometry仍待实际MP4验证，既有三图下还有具体可检验修复，不建立必须补四图的绝对blocker。
+
+record/learning自动评估为`no_candidate`：本次支持一个exact任务内的修复/缺证边界，prompt、profile和seed共同变化，不能推出新增四参考必需、Provider整体优劣或通用gate调整；不创建placeholder、不adopt、不刷新RAG。AOCI既有blocked未对齐保留。本记录更新是媒体稳定checkpoint，之后继续analyzer/closure和已授权修复，不是复现完成。
+
+以下Five Known Failures及unused第六次准备/审查状态为历史checkpoint，以上真实第六次结果替代其current-facing状态，旧字节、计数和失败报告不改。
 
 ### Unapplied Prior Authority Checkpoint
 

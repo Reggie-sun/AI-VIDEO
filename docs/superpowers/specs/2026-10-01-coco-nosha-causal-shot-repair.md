@@ -104,3 +104,13 @@ task-local新packet在graph mutation前检查fresh profile；重入仅复用cano
 ## Unapplied Prior Rejection Amendment
 
 第三轮SIDEROUTE-05由canonical fixture实际复现：把未应用cap-2的verified closed请求用作prior，原实现会错误应用2→3，即实际cap-1跳到cap-3。排除未应用closed提案必须独立于entry自行选定的prior ceiling；所有verified closed且没有retained quota的提案均不作为已生效上限，ledger-applied ceiling及实际非关闭history继续保留。新负向测试要求扩展拒绝且全部字节无写入，既有合法扩展/完整submit guard保持。Parent确认这是有限授权计数的真实缺陷，保持前三轮与原预算，将同一review单元有限扩展一次（总上限4轮），只复审最终修复和同一unused第六次packet，非新任务/新实验或review计数重置。
+
+## Supported Inertia Repair Amendment
+
+第六次真实 MP4 `96e611dec19e82717ddd0cdb8cd3dcbbd4825aa7bf51e9d329c20f4814505da6` 经显式 project-local MCP 全段11个半秒帧、51个0.1秒帧补证后，侧接触先于A离台已有可读证据；A四琥珀眼、两扇膜及吸盘状足明显改善，不能沿用第五次的两眼结论。B却在4.6–4.9秒跟A从同一前角跌落，supported exit FAIL；精确六足总数、B腹褶持续收缩和手机保留仍未关闭。原QA4与本次FAIL/NE均保留，不接受或剪取失败片充当前序。
+
+Parent发现上一修复把B右侧向内的滑行改接BACK-RIGHT退出，要求它改变原滑行方向；这只是导演候选，原文要求的是保持惯性沿平台后侧出画。下一有界假设改为宽平台上的右→左后侧通路，A靠前缘，B通路位于A接触侧但远离前缘，B侧腹接触使A向左前方失去支撑，B仍沿原左向惯性滑行并在后侧有连续木面支撑的位置退出画框。保留原文沿平台边缘的左向横移，只在本镜看平台、不追至地面；人物及同一手机留在画外原空间，下一镜仍须匹配。保留原A/B形态、正常速度、侧接触和各自明确结局，不要求每个微接触逐帧完全展示，也不将画外人物改判为通过。
+
+这是known结果之后新的第七次空间修复单元，最多新增1 POST，同TASK真实消费6→7、operator ceiling18M→21M、per-call3M不变；不是第六次review单元的重命名或计数重置。旧四轮审查和六次物理消费完整保留。seed先按canonical编译实测核对，若现有编译器推进seed则如实声明actual delta，不为保持seed绕过Router或新建控制路径；不宣称严格单变量质量归因。只使用现有三图和原WAV，不新增参考帧/裁图或其他Provider。profile纯时间窗遵循当前ViduProfileReaffirmation至多60分钟；第六次已有同样窗口内完整guard/POST的真实证据，不为延长等待修改共享契约。只在本次quality closure与任务脚本准备完成后续封fresh窗口；过期且零副作用才走既有known-unsubmitted恢复，unknown不得续封重提。Operator Ceiling Renewal、exact preview/authorization、Budget Guard/egress、新identity/intent/one-use均保留。
+
+Self-review：支持平台出口与侧撞均是原文动作，不是额外像素级门槛；左后侧通路修正了候选的惯性冲突，未删B动作或改变宠物职责。只读authoring复核的AUTHOR-01指出固定镜头会取消原文明确的左横移，Parent采纳并撤回固定镜头候选；AUTHOR-02指出若改Director camera treatment必须另封coverage/QA，当前方案保留原tracking及Shot4/QA4，通过typed GenerationIntent和Intervention表达同一已批准目标内的路线细化，不制造无必要的QA revision。宽后侧木面仍是待真实验证的布局假设。新的有限单元先纯canonical验证、适用独立review，再真实取证。若FAIL/NE，先同bytes补证再判断是否有可归因修复；无依据时停止该单元，不同prompt盲改seed、不默认必须补四图，不把测试/commit当成复现完成。
