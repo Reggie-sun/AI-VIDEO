@@ -100,3 +100,7 @@ task-local新packet在graph mutation前检查fresh profile；重入仅复用cano
 ## Unapplied Quota Proposal Amendment
 
 第二轮review的SIDEROUTE-04由standard-loader fixture复现：`start`后、`quota`前关闭的verified zero-effect REQUEST仅封存了较高ceiling提案，尚未应用extension。canonical quota owner计算历史已生效上限时，仅对此类已验证关闭且未获任何retained quota的高上限提案排除；保留其完整attempt/binding/experience与真实消费。已应用extension、普通FAILED、RUNNING、UNKNOWN、INTERRUPTED不能借此排除。后继仍须针对最新Manifest/base ledger及最后真实prior封存原5→6的exact extension；已应用额度仅只读继承。task wrapper每次quota阶段调用同一canonical owner，并按实际ledger判断应用或继承，不能按“存在关闭检查点”猜测额度已生效。Parent self-review确认不扩大ceiling或清零消费，采用pre-quota/post-quota两种关闭边界的完整submit guard测试及最终第三轮双独立review。
+
+## Unapplied Prior Rejection Amendment
+
+第三轮SIDEROUTE-05由canonical fixture实际复现：把未应用cap-2的verified closed请求用作prior，原实现会错误应用2→3，即实际cap-1跳到cap-3。排除未应用closed提案必须独立于entry自行选定的prior ceiling；所有verified closed且没有retained quota的提案均不作为已生效上限，ledger-applied ceiling及实际非关闭history继续保留。新负向测试要求扩展拒绝且全部字节无写入，既有合法扩展/完整submit guard保持。Parent确认这是有限授权计数的真实缺陷，保持前三轮与原预算，将同一review单元有限扩展一次（总上限4轮），只复审最终修复和同一unused第六次packet，非新任务/新实验或review计数重置。

@@ -71,8 +71,8 @@ def test_submitted_or_unknown_attempt_cannot_be_relabelled_unsubmitted(tmp_path)
     assert _bytes(tmp_path) == before
 
 
-@pytest.mark.parametrize('quota_applied', [False, True])
-def test_closed_request_can_start_fresh_successor_with_complete_history_and_same_cap(tmp_path, quota_applied):
+@pytest.mark.parametrize('quota_applied,cap_jump', [(False, False), (True, False), (False, True)])
+def test_closed_request_can_start_fresh_successor_with_complete_history_and_same_cap(tmp_path, quota_applied, cap_jump):
     from ai_video.production.generation_execution import GenerationDecisionExecutionBinding
     from ai_video.production.shot_router import VideoGenerationResolver
     from ai_video.production.video import VideoGenerationRequest
@@ -95,8 +95,9 @@ def test_closed_request_can_start_fresh_successor_with_complete_history_and_same
         request=provider.resolve(VideoGenerationRequest.create(**values)),
         task_id=old_binding.inputs.limits.task_id,compiler_id='generated-video-e2e-fixture',compiler_version='1')
     binding = fresh.binding
+    limits = old_binding.inputs.limits.model_copy(update={'paid_submit_ceiling':3}) if cap_jump else old_binding.inputs.limits
     inputs=binding.inputs.model_copy(update={
-        'limits':old_binding.inputs.limits,'evidence':experience.evidence,
+        'limits':limits,'evidence':experience.evidence,
         'experiences':(experience,), 'latest_attempt_hash':experience.evidence[-1].evidence_hash,
     })
     decision=VideoGenerationResolver().resolve_requirement(projection=binding.projection,
@@ -108,6 +109,18 @@ def test_closed_request_can_start_fresh_successor_with_complete_history_and_same
     service.start(attempt_id='fresh-successor',request=request,execution_binding=successor)
     manifest=load_production_project(tmp_path/'project.yaml').manifest
     state=next(a for a in manifest.attempts if a.attempt_id=='fresh-successor').video_generation_state
+    if cap_jump:
+        from ai_video.production.paid_provider_submit_quota import PaidProviderSubmitQuotaExtension
+
+        values = _entry(writer, prior).model_dump(mode='python', exclude={'content_hash'})
+        values.update(target_attempt_id='fresh-successor', target_binding=state.execution_binding,
+                      prior_attempt_id=NEXT, prior_binding=previous.video_generation_state.execution_binding,
+                      old_paid_submit_ceiling=2, new_paid_submit_ceiling=3)
+        before = _bytes(tmp_path)
+        with pytest.raises(AiVideoError, match='bindings are invalid'):
+            writer.extend_paid_provider_submit_quota(PaidProviderSubmitQuotaExtension.create(**values))
+        assert _bytes(tmp_path) == before
+        return
     if not quota_applied:
         from ai_video.production.paid_provider_submit_quota import PaidProviderSubmitQuotaExtension
 

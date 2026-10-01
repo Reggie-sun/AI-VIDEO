@@ -87,3 +87,7 @@ fresh exact packet完成相关direct policy与适用独立审查后，最多一�
 ## Unapplied Quota Recovery Milestone
 
 **Scope / Verification:** 修复SIDEROUTE-04，以standard fixture分别在quota应用前/后关闭REQUEST，验证完整history successor及canonical submit guard；没有extension时必须拒绝submit，然后只应用一次原额度extension。quota owner排除verified closed且未获quota的较高提案，wrapper按ledger判断实际应用/继承。保留08 immutable packet及第二轮review；09仅续封同一未消费空间实验。source mandatory direct checks通过后冻结source/packet，第三轮dual review及Parent裁决后继续真实ROOT执行。预算仍仅6次/18M，真实消费5；未知结果及identity/QA不变。
+
+## Unapplied Prior Milestone
+
+**Scope / Verification / Review:** SIDEROUTE-05的standard-loader red确认未生效提案可经prior选择冒充applied ceiling。移除依赖prior ceiling的排除条件，继续以canonical closed verifier及ledger retention判定；负向cap跳跃无写入，合法原扩展及duplicate拒绝重验。source10项mandatory direct checks、fresh同一空间packet的8阶段canonical副本验证完成后，做有据有限第四轮dual review；保持三轮报告、实际计数及旧sealed输入，不通过重命名重置预算。review通过后立即在真实ROOT运行一次POST及exact MP4 gate，不能把本里程碑当出片完成。

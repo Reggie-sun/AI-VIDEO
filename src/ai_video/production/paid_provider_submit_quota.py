@@ -290,8 +290,7 @@ def _extend_paid_provider_submit_quota(committer, entry):
                     )
 
                     unapplied_closed_proposal = (
-                        limits.paid_submit_ceiling > prior_limits.paid_submit_ceiling
-                        and is_verified_closed_unsubmitted_video_attempt(
+                        is_verified_closed_unsubmitted_video_attempt(
                             committer, manifest=manifest, attempt=item,
                         )
                         and not retained_submit_quota_allows(
