@@ -75,3 +75,11 @@ fresh exact packet完成相关direct policy与适用独立审查后，最多一�
 **Verification / Execution:** 对persistent disposable copy逐阶段验证snapshot、money、compile、paid preview、credential preflight、REQUEST、quota和submit guard，每阶段落盘收据且确认真实Manifest未改变、Provider效果为零。阶段守卫验证unknown/terminal/残留paid与local evidence拒绝、GET阶段禁止POST和exact quota replay。稳定packet绑定当前source commit、direct checks、QA4/三图/原音轨、native delta及全部task scripts，完成适用双独立审查后才在真实ROOT按阶段执行一次submit；fetch后立即显式MCP并执行technical-first gate。profile最多一小时且submit前仍须fresh，时间续期不增加实验身份或消费额度。
 
 **Self-Review:** 不重新调用`start`冒充resume，不拆开paid intent与POST，不重置消费，不把expired或中断校验算PASS。仅原canonical owner可应用精确预算entry或其replay；只从known unsubmitted REQUEST推进。通过工程校验及review后持续原出片目标，known媒体失败先诊断，unknown outcome停止。
+
+## Known-Unsubmitted Recovery Milestone
+
+**Scope / Ownership:** 新cohesive `_state_commit_video_unsubmitted.py`由committer独占zero-effect关闭与exact verifier；feedback保留not_submitted分类及history；quota owner只读继承已应用未消费ceiling。原paid intent/unknown recovery/permit不改。08任务packet修复graph重入及technical-first，07快照与review不改。
+
+**Verification:** 先以standard-loaded真实fixture建立关闭/重放/继承失败测试；验证actor/reason/CAS、缺证据、paid/local intent、reservation、unknown及tampered evidence全部拒绝且无写入。关闭后预算/消费/请求/经验不变，successor仍受原cap及complete history guard。对任务copy注入graph commit后中断并重跑；analyzer无exact durable technical source时在seal及MCP前拒绝。运行changed-path direct mandatory checks，canonical Harness receipt保持null。
+
+**Continuation / Self-Review:** exact stable source和08任务packet经双独立复审；最后才续封fresh窗口并执行真实一次POST。到期REQUEST经新canonical方法关闭，再用同TASK新identity和全部not_submitted history续接，不形成新空间实验或额外slot。新动作仍须per-Shot全部required PASS才推进。

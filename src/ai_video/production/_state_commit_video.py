@@ -254,15 +254,11 @@ class _StateCommitVideoMixin:
                                for e in prior_evidence):
                         raise _state_invalid("Prior fetched generation lacks exact media evaluation.")
                 elif item.status is StateCommitStatus.FAILED:
-                    from ai_video.production.paid_provider_no_effect_reconciliation import (
-                        is_verified_reconciled_no_effect_video_attempt,
+                    from ._state_commit_video_unsubmitted import (
+                        failed_generation_history_outcome,
                     )
-
-                    recovered_no_effect = is_verified_reconciled_no_effect_video_attempt(
-                        self, attempt_id=item.attempt_id
-                    )
-                    required_outcome = (
-                        "not_submitted" if recovered_no_effect else "runtime_failure"
+                    required_outcome = failed_generation_history_outcome(
+                        self, manifest=manifest, attempt=item,
                     )
                     if not any(e.outcome == required_outcome for e in prior_evidence):
                         raise _state_invalid("Prior failed generation lacks runtime evidence.")

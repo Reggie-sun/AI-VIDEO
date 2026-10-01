@@ -88,3 +88,11 @@ Parent self-review：这是共同producer的缺失输入接线，不另造Resolv
 两次未提交的disposable校验进程结束后没有最终收据；保留副本及中断记录，原因保持`NOT_EVALUATED`。真实ROOT仍为Manifest190、五次known failed/fetched，不存在第六次paid intent或physical marker。到期的05/06仅为未执行准备，不复用其preview或permit。
 
 同一第六次空间修复在07窗口重新封存，operator per-call3M及五次真实消费保持不变，有限上限仍仅5→6、15M→18M。task-local wrapper分开`start`、`quota`、`submit`、`poll`、`fetch`；每阶段标准重开Project并调用原canonical service/committer。`submit_once`内部paid intent、permit和POST保持一个不可重启单元。只允许无paid/local副作用的exact `RUNNING/REQUEST`继续准备；submit intent、unknown、terminal、identity drift均停止。已接受提交只能同task GET/fetch，不能再POST或通过窗口续期重发。Parent self-review确认该调整只改变任务编排，不修改共享恢复契约、质量标准或预算owner。
+
+## Known-Unsubmitted Recovery Amendment
+
+07 exact snapshot的独立审查定位REQUEST窗口到期后无canonical关闭路径、graph commit后中断不可重入和analyzer可先封错误技术Gate三个问题。真实ROOT仍Manifest190、五次physical FAIL；07没有真实第六次effect。此处前瞻扩展恢复契约，不追改旧记录。
+
+`ProductionStateCommitter.close_unsubmitted_video_generation`仅在standard reopen、exact REQUEST、无paid/local intent/receipt/status/fetch、无该attempt reservation、存在exact canonical `not_submitted` experience时将RUNNING关闭为FAILED/`video_generation_not_submitted`。保留request/binding/experience、graph及budget，existing error metadata记录typed actor/reason。CAS保护首次关闭，exact replay无写入；unknown/intent/错误证据拒绝。新generation identity的同TASK successor保留全部history和实际消费；已应用quota仅经这个verified closed ancestor继承原ceiling，不追加额度、不重放旧授权或permit。普通RUNNING/REQUEST、INTERRUPTED或unknown不能继承。
+
+task-local新packet在graph mutation前检查fresh profile；重入仅复用canonical已成功提交且desired graph/states相等的checkpoint。analyzer必须先核对当前Gate/request/media/QA的durable technical source，缺失或错误时在seal/MCP前拒绝。Parent self-review：仅补未发生外部效果的生命周期收口，不将paid未知结果改成未提交；schema既有字段保持，新的specific error code与公开method前瞻添加。纳入T3 direct policy和同一稳定snapshot双独立review；通过后继续第六次真实实验及成片目标。

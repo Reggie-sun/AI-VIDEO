@@ -509,6 +509,20 @@ def record_attempt_evaluation(*, committer, attempt_id, evaluation_sources=(), a
     from ai_video.production.video_generation import VideoGenerationService
 
     attempt, state = VideoGenerationService(committer=committer, provider=None)._state(attempt_id)
+    from ai_video.errors import ErrorCode
+
+    if attempt.error_code == ErrorCode.VIDEO_GENERATION_NOT_SUBMITTED.value:
+        from ai_video.production._state_commit_video_unsubmitted import (
+            is_verified_closed_unsubmitted_video_attempt,
+        )
+        from ai_video.production.project import load_production_project
+
+        loaded = load_production_project(committer.project_root / "project.yaml")
+        if (evaluation_sources or analysis_proof is not None or presentation_proof is not None
+                or not is_verified_closed_unsubmitted_video_attempt(
+                    committer, manifest=loaded.manifest, attempt=attempt)):
+            raise ValueError("closed unsubmitted request cannot accept changed evaluation")
+        return committer._reopen_generation_experience(state.generation_experiences[-1])
     if state.quality_rejection is not None:
         from ai_video.production.project import load_production_project
 

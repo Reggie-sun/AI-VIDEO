@@ -106,10 +106,20 @@ def retained_submit_quota_allows(*, committer, manifest, state, current_limits, 
             continue
         prior = ancestor.video_generation_state
         paid = ancestor.paid_provider_state
-        if (ancestor.status.value not in {"failed", "succeeded"}
-                or prior is None or prior.execution_binding != entry.target_binding
-                or prior.paid_submit_receipt is None or prior.fetch_receipt is None
-                or paid is None or paid.phase.value not in {"accepted", "settled"}):
+        if prior is None or prior.execution_binding != entry.target_binding:
+            continue
+        from ai_video.production._state_commit_video_unsubmitted import (
+            is_verified_closed_unsubmitted_video_attempt,
+        )
+
+        closed_unsubmitted = is_verified_closed_unsubmitted_video_attempt(
+            committer, manifest=manifest, attempt=ancestor,
+        )
+        fetched_terminal = (ancestor.status.value in {"failed", "succeeded"}
+                            and prior.paid_submit_receipt is not None
+                            and prior.fetch_receipt is not None and paid is not None
+                            and paid.phase.value in {"accepted", "settled"})
+        if not closed_unsubmitted and not fetched_terminal:
             continue
         limits = committer._reopen_generation_execution_binding(entry.target_binding).inputs.limits
         if (limits.task_id == current_limits.task_id

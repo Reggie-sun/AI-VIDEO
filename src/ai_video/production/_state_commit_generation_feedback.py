@@ -33,6 +33,16 @@ def _experience_hash(experience: GenerationExperience) -> str:
 
 
 class _StateCommitGenerationFeedbackMixin:
+    def close_unsubmitted_video_generation(
+        self, *, attempt_id, expected_manifest_revision, actor, reason,
+    ):
+        from ._state_commit_video_unsubmitted import close_unsubmitted_video_generation
+
+        return close_unsubmitted_video_generation(
+            self, attempt_id=attempt_id, expected_manifest_revision=expected_manifest_revision,
+            actor=actor, reason=reason,
+        )
+
     def _reopen_generation_experience(self, pointer):
         from ai_video.production._video_project_reader import (
             load_generation_experience,
@@ -65,6 +75,21 @@ class _StateCommitGenerationFeedbackMixin:
                 raise _state_invalid(
                     "Generation experience requires a persisted production decision binding."
                 )
+            from ai_video.errors import ErrorCode
+
+            if attempt.error_code == ErrorCode.VIDEO_GENERATION_NOT_SUBMITTED.value:
+                from ai_video.production._state_commit_video_unsubmitted import (
+                    is_verified_closed_unsubmitted_video_attempt,
+                )
+                from ai_video.production.project import load_production_project
+
+                load_production_project(self._project_root / "project.yaml")
+                if (is_verified_closed_unsubmitted_video_attempt(
+                        self, manifest=manifest, attempt=attempt)
+                        and _experience_hash(experience) in
+                        {p.content_hash for p in state.generation_experiences}):
+                    return manifest
+                raise _state_invalid("Closed unsubmitted request cannot accept changed evidence.")
             if state.quality_rejection is not None:
                 if (
                     state.generation_experiences
