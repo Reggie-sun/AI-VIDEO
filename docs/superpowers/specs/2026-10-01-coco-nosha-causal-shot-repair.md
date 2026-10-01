@@ -130,3 +130,13 @@ Self-review：支持平台出口与侧撞均是原文动作，不是额外像素
 profile12副本须先完成全部八阶段，保留exact bytes、M202及零POST证据。随后仅在known zero-effect条件下，为同一未提交第七次实验创建fresh profile13/time03；实际baseline仍是第六次profile10，真实消费仍6，最大新POST仍1，三小时上限不再扩大。time03脚本仅变更preparation identity、profile引用和路径；其非时间profile、原三图、QA4/coverage、typed intent、预算/计数保护和物理payload必须逐项比较。通过canonical REAL money/graph/compiler准备fresh request后封fresh preview/authorization，禁止复用12的preview/permit或将12的copy称为13的同bytesreceipt。copy12验证只证明共同逻辑；新的exact source+time03 packet须双独立review，真实start/submit仍按当前项目和实际clock重新执行所有guard、durable intent与one-use。
 
 Self-review：review前仅允许已授权committer的有限budget/graph准备，不启动付费intent或POST；final review仍在真实start/submit前。non-time或native payload差异超出上述声明、unknown effect、required review或clock未通过时停止，不能用参数等价掩盖新的语义变化。全部旧准备、轮次与消费保留，最终媒体Gate和实际出片目标不变。
+
+## Measured Execution Window Amendment
+
+2026-10-01 18:13 UTC新计时取代上文“上限不再扩大”的三小时假设。copy12 money/compile/paid/start/quota已分别耗时905.160/1740.261/526.121/1192.593/2545.227秒；guard从16:56:51开始，17:31:38才完成main前置流程，截至18:13仍在canonical guard。仅上述真实路径共同阶段的已测开销已超过180分钟，尚未计入独立review、service重开和durable paid intent写入。当前REAL仍M202、profile13未封存、无第七次POST。零POST等待器的17:56:58到期和额外30分钟等待均保留；Parent停止自动REAL准备，先修复有限窗口。
+
+唯一source变化仍在 `ViduProfileReaffirmation._pure_dated_renewal`，最大内部operator窗口3→6小时。选择六小时为该次完整cold验证/审查/提交保留有限余量，不声称某函数是CPU热点、不引入cache或省略任何历史/当前性检查。所有非时间字段相同、strict later dates、actual-clock preview/submit、费用数值、per-call3M、sameTASK6→7、最大新1 POST、原三图/WAV/QA4及unknown/one-use保护不变；大于六小时仍拒绝。这不适用于官方市场报价或其他Provider。
+
+保留source5ae8b2f三小时下已执行的copy12 receipts，明确它们是旧source、旧时间值的零效果共同逻辑证据，不能称新source/六小时profile13的同bytesreceipt。新source的六小时准入/超界/preview clock、feedback/history与production proof通过可执行验证；fresh REAL compiler/preview/authorization及exact parameter comparison再证明新dated参数实际接通。共同逻辑与native payload/intent/QA不变，最终同一source+fresh time03 target双独立审查裁决此组合证据是否充足，存在缺口则补证后再submit，不追改copy或旧source证据。
+
+Self-review：本任务默认授权允许必要的有限时间窗修复；本次是实际阶段成本驱动的修订，非价格、调用次数、媒体criteria或外部范围变化。原三小时和等待器脚本保持历史bytes，使用新的six-hour helper封存真实UTC窗口；review前仍只有canonical snapshot/money/graph/compiler准备，没有paid intent/permit/POST。保留旧profile、所有消费/准备/审查历史。源码/任务参数的direct验证不冒充detached Harness receipt或媒体接受，工程完成后继续同一真实复现。

@@ -64,13 +64,13 @@ def test_operator_ceiling_reaffirmation_accepts_only_pure_dated_profile_change()
         {"result_trust": "authenticated_task", "result_origins": ()},
         {"origin": "https://api.vidu.com"},
         {"max_download_bytes": previous.max_download_bytes + 1},
-        {"pricing_expires_at": current.pricing_observed_at + timedelta(hours=3, microseconds=1)},
+        {"pricing_expires_at": current.pricing_observed_at + timedelta(hours=6, microseconds=1)},
     ):
         with pytest.raises(ValueError, match="reaffirmation"):
             ViduProfileReaffirmation(previous=previous, current=current.model_copy(update=change))
 
 
-@pytest.mark.parametrize("minutes", [60, 120, 180])
+@pytest.mark.parametrize("minutes", [60, 120, 180, 360])
 def test_operator_reaffirmation_accepts_bounded_cold_history_window(minutes):
     previous = _profile()
     observed = NOW + timedelta(days=2)
@@ -83,26 +83,28 @@ def test_operator_reaffirmation_accepts_bounded_cold_history_window(minutes):
     assert set(proof.model_dump(mode="json")) == {"previous", "current"}
 
 
-@pytest.mark.parametrize("offset, allowed", [
-    (timedelta(microseconds=-1), False),
-    (timedelta(hours=3, microseconds=-1), True),
-    (timedelta(hours=3), False),
-    (timedelta(hours=3, microseconds=1), False),
+@pytest.mark.parametrize("window_hours", [3, 6])
+@pytest.mark.parametrize("time_field, offset_us, allowed", [
+    ("pricing_observed_at", -1, False),
+    ("pricing_expires_at", -1, True),
+    ("pricing_expires_at", 0, False),
+    ("pricing_expires_at", 1, False),
 ])
-def test_longer_operator_window_keeps_actual_preview_clock_gate(offset, allowed):
+def test_longer_operator_window_keeps_actual_preview_clock_gate(window_hours, time_field, offset_us, allowed):
     previous = _profile()
     observed = NOW + timedelta(days=2)
     current = previous.model_copy(update={
         "pricing_observed_at": observed,
-        "pricing_expires_at": observed + timedelta(hours=3),
+        "pricing_expires_at": observed + timedelta(hours=window_hours),
     })
     ViduProfileReaffirmation(previous=previous, current=current)
 
     def forbidden():
         raise AssertionError("preview must not resolve a credential")
 
+    preview_now = getattr(current, time_field) + timedelta(microseconds=offset_us)
     provider = ViduVideoProvider(profile=current, transport=None,
-        credential=forbidden, now=lambda: observed + offset)
+        credential=forbidden, now=lambda: preview_now)
     request = provider.resolve(_request(profile=current))
     if allowed:
         assert provider.preview(request).estimated_cost_upper_bound_microunits == current.cost_upper_bound_microunits

@@ -117,3 +117,13 @@ fresh exact packet完成相关direct policy与适用独立审查后，最多一�
 **Verification / Execution:** 12全部copy stages PASS后封13；逐项比较12→13仅声明的identity/path/time变更、非时间profile相等、typed intent/QA/输入/计数规则相等和native body hash一致。REAL只经committer做money/graph和canonical compiler准备，随后fresh paid preview/authorization并封存当前REAL manifest与exact source+packet。最终双独立review覆盖新的实际target及parameter-equivalence evidence，12旧receipt明确作为共同逻辑验证而非13的同bytesreceipt。通过后REAL start重做完整preflight、quota和唯一submit重做canonical submit guard；不重复独立preflight/guard命令，但不省略其中检查。成功落盘即显式MCP Gate，再继续其余镜头和composition。
 
 **Self-Review:** 前置预算/graph准备是授权内可恢复canonical mutation；未审查前禁止paid intent/permit/POST。边界改变或参数等价无法证明则停止该转接。record与learning保留全部旧准备及known结果；没有新外部输入、Provider或媒体接受授权。
+
+## Measured Execution Window Milestone
+
+**Goal / Scope:** 新spec amendment取代原三小时“不再扩大”的成本假设。已测money/compile/paid/start/quota加仍运行的guard超过180分钟；REAL尚未准备。仅在原reaffirmation owner把有限最大窗口3→6小时，维持同一个未提交第七次实验、六次历史消费和最多一个新POST。保留三小时source/copy/等待超时与脚本，不实施性能cache或省略验证。
+
+**Verification / Compatibility:** 先red覆盖六小时准入、六小时加一微秒拒绝、非时间变化拒绝、actual preview的未生效/到期边界及feedback/production proof；green后运行真实changed-path direct policy checks，canonical Harness receipt继续null。旧三小时cases仍覆盖兼容范围。保留copy12旧source共同逻辑证据，逐项说明新source仅有限validator上限变化，并由fresh六小时REAL compile/preview/parameter equivalence覆盖日期/pointer参数。两份独立review对同一exact source+time03 packet判断证据与保护语义，缺口未关闭不得submit。
+
+**Execution / Stop:** 旧自动准备等待器由Parent停止，无REAL mutation。用新six-hour helpers且真实决定时间封profile13，canonical money/graph/compiler和fresh paid authorization；不复用旧preview/permit或改名重置预算。review后start、quota、sole submit重做全部检查，POST前actual clock仍须通过。copy FAIL/有限等待耗尽先保留known zero effects并核对下一证据路径；unknown Provider outcome立即停止。MP4落盘即explicit MCP逐项Gate，继续其余Shot与canonical成片；commit/test/review不是终点。
+
+**Self-Review:** 已测共同阶段已超原窗口，增加有限余量比在paid intent后等待到期再恢复更安全。无新材料/Provider/egress或费用数值变化；six-hour日期只是内部operator上限有效期，不产生账号/余额/官方价格事实。

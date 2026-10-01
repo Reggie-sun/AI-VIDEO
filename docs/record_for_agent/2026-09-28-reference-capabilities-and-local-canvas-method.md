@@ -7,11 +7,19 @@ learning_eligibility: ineligible
 # Creative Goal Tests, Jimeng Canvas Comparison And Local Replication — Full Record
 
 Date: 2026-09-28
-Session window: 2026-09-27–2026-10-01, Asia/Hong_Kong
+Session window: 2026-09-27–2026-10-02, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
 ## Current Execution Checkpoint — Sixth Media FAIL And Supported Inertia Repair
+
+### Measured Execution Window Update — 2026-10-02
+
+以下新计时取代旧三小时“不再扩大”的窗口假设，历史paragraph、source5ae8b2f及copy12 bytes不追改。REAL仍Manifest202/SHA `424dce6e803a2c9b6488d3fb5e16efecb9062f58944df3e7453e0da44b7b423e`，六次known failed/fetched/closed，profile13、第七次physical marker、paid intent和accepted media均没有。copy12前七阶段PASS/零POST；money/compile/paid/start/quota实际905.160/1740.261/526.121/1192.593/2545.227秒，guard16:56:51 UTC开始、17:31:38完成main preflight，截至18:13仍在canonical guard。仅真实路径的共同阶段已超过180分钟，review/service/paid-intent额外成本未计。原等待器17:56:58到期退出；额外30分钟有限等待receipt保留，Parent停止自动REAL准备后，按新spec/plan只将内部operator纯时间上限3→6小时。7项预期red已证实旧source拒绝六小时，当前candidate覆盖120项focused；direct policy checks及最终双独立review仍必须完成后才真实执行。所有非时间字段、费用数值、六笔消费、最大新1 POST、三图/WAV/QA4和POST前actual-clock/one-use/unknown guards保持。
+
+copy12按旧三小时source/日期执行，只能保留共同逻辑历史证据；不能当fresh六小时profile13的同bytesreceipt或当前ready。新source测试、fresh REAL compiler/preview/authorization和parameter equivalence须覆盖新dated参数，最终同一exact source+time03 packet双审查裁决证据；缺口先补证，不省略loader或提前paid intent。旧helper/script的bytes保留，使用新six-hour helpers。source/commit/review完成后继续真实第七次→exact MP4显式MCP Gate→其余Shot/成片，不能把工程里程碑当复现完成。
+
+只读composition映射发现active五Shot的 `content_driven` 与当前P3 resolver不兼容，Parent已从 `_duration_frames_by_shot` 复核；该转换在接受媒体后经canonical owner解决，不能用修改Shot policy静默绕过旧generation/review lineage。原WAV只允许一个240000-sample span，声音听辨/声纹/同步仍NE。第二次只读性能映射误调用 `CodeGraph index({})` 写tool-owned cache，违反no-write Scope；Parent已停止继续index并保留事件，未删除缓存、修改source/Manifest或产生Provider效果。映射确认重复loader/reopen边界，但无函数级计时，不把猜测当CPU根因；无cache优化实现或新learning adoption。
 
 ### Sixth Live Media Gate Checkpoint
 

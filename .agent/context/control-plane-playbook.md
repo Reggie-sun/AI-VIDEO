@@ -226,7 +226,7 @@ code/tests；`AGENTS.md` 的 `Canonical Ownership` 继续提供顶层 durable bo
 
 - 仅适用于 Provider contract 明确定义为内部定额上限的 profile（当前 Vidu）；不适用于包含实际单价、token 费率或市场观察的 pricing snapshot（不得推用于 Seedance 的实际报价字段）。
 - 必须有可追溯的旧 sealed profile、已授权且剩余次数大于零的 task quota，以及 known outcome。Provider、model、输入和输出规格、egress 均须在已授权范围内；续期不能自动增加费用上限、币种、总预算或调用次数。
-- 创建新 immutable profile，沿用旧上限及非时间配置，使用本次真实决定时间和最多三小时的有效期；按本任务 preparation/review/execution 的实际成本选择最短可行窗口，runtime 仍拒绝未生效或过期 profile。不得覆盖旧 profile 或把新 profile 用于旧 submit 的 fetch/recovery。
+- 创建新 immutable profile，沿用旧上限及非时间配置，使用本次真实决定时间和最多六小时的有效期；按本任务 preparation/review/execution 的实际成本选择最短可行窗口，runtime 仍拒绝未生效或过期 profile。不得覆盖旧 profile 或把新 profile 用于旧 submit 的 fetch/recovery。
 - 在 attempt preparation 中保存续期证据：旧/新 profile hash、用户任务授权来源、scope、剩余 submit count、原上限及币种、决定时间、失效时间，并明确 `operator_ceiling_reaffirmation`，不是官方报价或余额观察。Vidu 的历史字段名 `pricing_observed_at` / `pricing_expires_at` 在此承载内部上限重新确认的有效窗口，不产生市场定价事实。
 - 重新走 Planner/readiness、Router、compiler、exact preview 和既有 Budget Guard/reservation，签发新 intent/one-use permit。任何其他 Gate 失败仍停止；同一失败/unknown submit 不得通过续期重试，quota 耗尽也不得续期重置。
 

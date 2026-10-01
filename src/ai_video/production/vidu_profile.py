@@ -112,8 +112,8 @@ class ViduProfileReaffirmation(StrictModel):
             raise ValueError("Vidu reaffirmation must preserve every non-time profile field")
         if (self.current.pricing_observed_at <= self.previous.pricing_observed_at
                 or self.current.pricing_expires_at <= self.previous.pricing_expires_at
-                or self.current.pricing_expires_at - self.current.pricing_observed_at > timedelta(hours=3)):
-            raise ValueError("Vidu reaffirmation requires a later window of at most three hours")
+                or self.current.pricing_expires_at - self.current.pricing_observed_at > timedelta(hours=6)):
+            raise ValueError("Vidu reaffirmation requires a later window of at most six hours")
         return self
 
 

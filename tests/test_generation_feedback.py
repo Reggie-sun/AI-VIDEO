@@ -97,7 +97,7 @@ def test_cohort_survives_profile_renewal_without_exact_hash_pass():
     assert assessment.fit == "supported"
 
 
-@pytest.mark.parametrize("window_minutes", [40, 180])
+@pytest.mark.parametrize("window_minutes", [40, 180, 360])
 def test_pure_vidu_profile_reaffirmation_compiles_bounded_seed_resample(window_minutes):
     setup = setup_decision(remote=True)
     original = setup["inputs"].candidates[0]
