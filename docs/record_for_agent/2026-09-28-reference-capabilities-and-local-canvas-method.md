@@ -13,6 +13,14 @@ Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef
 
 ## Current Execution Checkpoint — Five Known Failures And One Side-Route Repair
 
+### Pre-Quota Closure Recovery Checkpoint
+
+08 exact snapshot `84d6b8c46f67ec050fcb5f34ce04de3df21d0ba628b282ae09e2b6af2458940c`第二轮双独立review：xhigh空，max的SIDEROUTE-04被Parent以standard-loader fixture确认；quota前关闭的无效果REQUEST所封存的高上限只是未应用提案，后继原5→6扩展被误拒绝。08未获Parent acceptance，报告和immutable packet保持。
+
+`9bb2fa8`修复canonical quota计算：仅排除verified closed且没有retained quota的高上限提案，历史最大值同时保留全部已应用ledger extensions。两种关闭边界均通过完整history submit guard；未扩展前submit拒绝、扩展后可用、重复申请同一上限拒绝且无写入。51项targeted tests及最终exact staged tree `858eb55c81cf71b1f4300c036ae9dd3a211fa9d4`的10项mandatory direct checks PASS，36项task检查PASS。09 wrapper按实际ledger调用原owner应用/继承；证据在`runs/coco-nosha-vidu-side-route-quota-recovery-20261001-001/`。canonical Harness receipt为null，source verification不代表媒体通过。
+
+09仍为同一unused第六次空间修复；窗口10:55:15–11:55:15 UTC、三图/QA4/named subjects/model/mute及native body SHA不变，真实ROOT仍Manifest190/五次known FAIL。副本编译与paid/preflight正在验证，第三轮dual review待执行。Parent额外实际尝试音频输入，filesystem工具明确返回当前channel不支持audio input；声纹/逐字听辨保持NOT_EVALUATED，ASR不替代听觉验收。AOCI既有blocked状态保留，不声称aligned。record后的learning评估no_candidate：新证据为恢复工程测试，尚无新实际媒体或可隔离的跨实验能力结论。
+
 ### Known-Unsubmitted Recovery Engineering Checkpoint
 
 2026-10-01：07 exact snapshot `c7516f92558f18bd9b028fe01afeff5517f329e2b74d7602ffc310696a89e58f`双独立review中，xhigh无findings，max发现REQUEST到期无canonical收口、graph commit后重入与technical-first顺序三项问题。Parent保留两份报告，在08 packet修复；第六次真实effect尚未发生，不把07空findings当作最终acceptance。
