@@ -15,6 +15,10 @@ Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef
 
 ### Sixth Live Media Gate Checkpoint
 
+**Current engineering checkpoint:** 第七次还没有REAL attempt或POST，真实项目保持Manifest202、六次known失败及消费6。`runs/coco-nosha-vidu-platform-inertia-repair-20261001-001/` 的60分钟profile11在canonical副本money阶段实际耗时756.147秒，后续仍需多阶段校验、review与真实执行，不能借过期profile或省略history/Budget Guard赶时钟。Parent在原owner将纯operator reaffirmation最大窗口1→3小时，非时间字段、严格向后日期和Provider实际clock检查不变；不是官方报价、费用数值或submit次数扩张。新边界先取得5个预期red，再经114项focused验证，包括三小时边界前PASS、到期/未生效及超界拒绝、非时间变化拒绝、feedback/history与ProductionPlanningService透传；最终policy/dual review仍待完成。旧profile11、副本及计数证据保留。
+
+同一第七次惯性实验的time02准备位于 `runs/coco-nosha-vidu-platform-inertia-window-recovery-20261001-001/`，脚本只更新新preparation identity、profile12引用及runner路径，原几何、truck_left、QA4、三图和最大新1 POST不变，40项pure task guards通过。profile12尚未封存；source检查和脚本就绪后以真实UTC决定时间创建有限窗口，重新走canonical副本及同一exact source+packet双独立review。当前单元review最多3轮、原第六次4轮和全部六次真实消费保留，不能将未提交副本当新媒体或重新归零。automatic learning仍no_candidate，当前source/window工程不产生Provider质量、必须补图或媒体验收结论。
+
 2026-10-01：第四轮双独立review对同一83项exact snapshot `920e5d821baad791d697e380e5c0a69200ffb2e9f74a05573d80d20644d4fcd2` 均为空findings；Parent核对hash后在 `parent-final-review-adjudication.json` 只准入一次第六次POST。08/09旧被拒快照、四轮review及未提交准备完整保留，不能把本次acceptance回写成前三轮通过。全部8个canonical副本阶段PASS，shared source为`b93cc0a`、文档checkpoint为`0233210`；source10项direct checks和task36项检查不是媒体验收，canonical Harness receipt仍null。
 
 真实ROOT经committer将operator ceiling15M→18M、sameTASK quota5→6，五笔旧reservation不重置。fresh profile10窗口11:26:36–12:26:36 UTC、原三图named subjects、`viduq3`、5秒/720p/静音不变，actual compiled delta为prompt/profile/seed，1496616717→1496616718；native body SHA `586224a57b6e01513a43a4793b2487cb0d3bec0c8ad3c538851c219e5803ff92`、7,562,002 bytes。12:12:20 UTC唯一POST、HTTP200，12:15:22 durable submission/paid receipt接受；12:24:47首次GET为succeeded，12:34:33 fetch exact MP4 `96e611dec19e82717ddd0cdb8cd3dcbbd4825aa7bf51e9d329c20f4814505da6`，3,110,364 bytes。task Vidu消费6/6、clone0；H3八次另计，operator bound不是官方报价或实际收费。

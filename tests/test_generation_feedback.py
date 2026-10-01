@@ -97,7 +97,8 @@ def test_cohort_survives_profile_renewal_without_exact_hash_pass():
     assert assessment.fit == "supported"
 
 
-def test_pure_vidu_profile_reaffirmation_compiles_bounded_seed_resample():
+@pytest.mark.parametrize("window_minutes", [40, 180])
+def test_pure_vidu_profile_reaffirmation_compiles_bounded_seed_resample(window_minutes):
     setup = setup_decision(remote=True)
     original = setup["inputs"].candidates[0]
     variant = original.capabilities.variants[0].model_copy(update={
@@ -110,7 +111,7 @@ def test_pure_vidu_profile_reaffirmation_compiles_bounded_seed_resample():
         pricing_observed_at=now, pricing_expires_at=now + timedelta(minutes=40))
     current_profile = previous.model_copy(update={
         "pricing_observed_at": now + timedelta(hours=1),
-        "pricing_expires_at": now + timedelta(hours=1, minutes=40),
+        "pricing_expires_at": now + timedelta(hours=1, minutes=window_minutes),
     })
     proof = ViduProfileReaffirmation(previous=previous, current=current_profile)
     provider = NativeFixtureProvider(capabilities=capabilities, artifact_bytes=b"unused-offline")
@@ -180,8 +181,8 @@ def test_pure_vidu_profile_reaffirmation_compiles_bounded_seed_resample():
     assert reused.decision.disposition == "REASSESS_FEASIBILITY"
     assert reused.compilation is None
     third_profile = current_profile.model_copy(update={
-        "pricing_observed_at": now + timedelta(hours=2),
-        "pricing_expires_at": now + timedelta(hours=2, minutes=40),
+        "pricing_observed_at": current_profile.pricing_expires_at + timedelta(hours=1),
+        "pricing_expires_at": current_profile.pricing_expires_at + timedelta(hours=1, minutes=40),
     })
     third_route = GenerationFeedbackOrchestrator(targets=(target(third_profile),),
         context_loader=lambda: context, history_loader=lambda: history[0],

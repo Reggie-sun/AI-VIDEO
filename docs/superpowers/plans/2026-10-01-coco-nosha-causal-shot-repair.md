@@ -101,3 +101,11 @@ fresh exact packet完成相关direct policy与适用独立审查后，最多一�
 **Verification / Review:** 新packet在disposable canonical copy验证authoring、graph、预算、编译、preflight、start、quota、submit guard；运行task guards和doc policy checks。shared source不变时保留其exact verified checkpoint，不为新媒体假设扩大源码工程。按paid wrapper风险做同一stable exact packet双独立read-only review，新单元review最多3轮，旧单元4轮不复用为通过证据；沿当前任务已记录的Repeated Kimi Failure Fallback使用native profiles。Parent裁决后真实执行1次→GET/fetch→explicit MCP whole/fine evidence→逐项Gate。全部required PASS后继续其余四镜与composition；FAIL/NE先补证/有限修复判断，unknown或真正新增input/Provider边界停止。
 
 **Self-Review:** 当前候选的右向折返不是原文必须项，supported rear-platform exit才是；改通路和机位不删原动作或身份，也不替失败片签发accepted terminal。records/learning在稳定边界更新，工程里程碑不结束实际复现目标。
+
+## Cold History Window Milestone
+
+**Evidence / Scope:** 第七次copy money实际756.147秒，单阶段已消费约13分钟；完整fresh preparation/review/REAL链不能依赖旧五次历史下的46分钟估计。Parent保留profile11及零POST副本证据，在原reaffirmation owner将有限最大窗口1→3小时；原price upper bound、非时间字段、严格更晚时间、所有expiry/paid/count/recovery/media gates不变。同步matrix/playbook/provider文档，不新增schema字段或旁路。
+
+**Verification / Execution:** 先red验证3小时边界可接受、超出一个微秒拒绝、非时间变化仍拒绝；green后重跑Provider preview在未生效及到期边界无network拒绝、共同feedback/production proof透传和policy所需检查。稳定source checkpoint commit后，保留11准备并为同一未提交第七次封time02/profile12、fresh request/preview/authorization。完成新的canonical副本全部阶段、同一exact source+packet双独立review及Parent裁决，按原单POST单元真实执行。新review预算沿第七次单元3轮，不重置原六次消费和第六次四轮review。
+
+**Self-Review:** 这是有据的task运行窗口契约修复；不把工程PASS当媒体通过，不接受旧失败片，不越过逐Shot gate，也不因窗口修复结束实际复现目标。

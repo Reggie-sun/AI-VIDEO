@@ -185,7 +185,8 @@ registered variants 和 durable experience 构造 `DecisionInputs`，Router 仍�
 protected requirements、known violations、semantic experiment 去重和实际编译 delta 校验，
 本身不授权 submit、接受质量或改写 QA。未声明变化、陈旧引用或重复实验仍阻断。
 Vidu 纯 operator upper bound 时间续期由 `vidu_profile.py::ViduProfileReaffirmation` 验证
-旧/新完整 profile 非时间字段相同和新窗口最多一小时。共同 feedback 只在 proof 与
+旧/新完整 profile 非时间字段相同和新窗口最多三小时；实际 preview/submit 仍校验
+当前时钟，内部上限确认不产生市场报价或调用授权。共同 feedback 只在 proof 与
 exact baseline、当前 Vidu candidate 同时匹配时声明 `provider_profile` + `seed` 的真实
 resample delta；`generation_decision.py` 独占其准入，并跨 profile pointer 保留同 Shot、
 同 Provider/model/mode 已提交 resample 计数。Compiler 仍检查完整 native request delta；

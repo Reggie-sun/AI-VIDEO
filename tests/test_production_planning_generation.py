@@ -127,7 +127,7 @@ def test_only_materialized_missing_component_reaches_generation_handoff(tmp_path
         pricing_observed_at=now, pricing_expires_at=now + timedelta(minutes=40))
     current = previous.model_copy(update={
         "pricing_observed_at": now + timedelta(hours=1),
-        "pricing_expires_at": now + timedelta(hours=1, minutes=40),
+        "pricing_expires_at": now + timedelta(hours=4),
     })
     proof = ViduProfileReaffirmation(previous=previous, current=current)
     assert service.prepare_generation(
