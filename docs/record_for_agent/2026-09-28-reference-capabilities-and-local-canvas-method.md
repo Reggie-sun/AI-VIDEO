@@ -13,6 +13,14 @@ Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef
 
 ## Current Execution Checkpoint — Five Known Failures And One Side-Route Repair
 
+### Unapplied Prior Authority Checkpoint
+
+09 exact snapshot `6463361d1bca8c6b899a943b41d4afd9867f3142fdaafc88abb56b37560a33b1`第三轮review：max空，xhigh的SIDEROUTE-05由Parent标准loader fixture确认；未应用cap-2的关闭请求可被选作prior，原计算误放行2→3，实际ledger仍cap-1。新负向red发生了错误的canonical quota写入，不能把空findings当acceptance；09实际Provider效果为零，真实ROOT仍Manifest190。前三轮报告保留，同一review单元有据有限扩展一轮（总4轮），不是新任务或计数重置。
+
+`b93cc0a`让未应用closed提案判定独立于选定prior ceiling；已应用ledger ceilings始终保留。合法pre-quota/post-quota successor、缺额度拒绝、duplicate ceiling拒绝及新的prior跳跃无写入均PASS。最终exact staged tree `e6fcc4b05f011ce63b902f08d8a40ce92e91d511`的10项mandatory direct checks全PASS；36项task checks PASS。证据在`runs/coco-nosha-vidu-side-route-sealed-quota-20261001-001/`，canonical Harness receipt为null。10 packet自动在no-network paid preparation封存exact native payload，再进行preflight，保留原三图、QA4、5→6/15M→18M有限上限及同一spatial semantic identity；窗口11:26:36–12:26:36 UTC。全部8阶段副本验证及第四轮dual review仍在执行，工程checkpoint不算出片完成。
+
+Parent显式调用project-local MCP重查原画布MP4 SHA `0ed3948ce0d4c4c2049c447c9d9ee7548ace40f28bf0bc0258f24a2e00a0cab3`，18个1秒rawframes只作readonly源证据，不新增Provider图像输入、不据它们删除creative-input明确形态/动作要求。当前channel不支持audio input，听觉/timbre仍NOT_EVALUATED。stable record的automatic learning为no_candidate：恢复工程不是独立媒体能力实验，原素材绝对必需性仍未由这组证据确立；AOCI既有blocked未对齐保持。
+
 ### Pre-Quota Closure Recovery Checkpoint
 
 08 exact snapshot `84d6b8c46f67ec050fcb5f34ce04de3df21d0ba628b282ae09e2b6af2458940c`第二轮双独立review：xhigh空，max的SIDEROUTE-04被Parent以standard-loader fixture确认；quota前关闭的无效果REQUEST所封存的高上限只是未应用提案，后继原5→6扩展被误拒绝。08未获Parent acceptance，报告和immutable packet保持。
