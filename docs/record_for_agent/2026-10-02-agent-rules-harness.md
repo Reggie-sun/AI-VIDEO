@@ -8,6 +8,13 @@ learning_eligibility: ineligible
 
 Date: 2026-10-02
 
+## AOCI Maintenance Update — 2026-10-02
+
+下文 AOCI stopped/blocked 状态是当时的历史 checkpoint，已由
+[AOCI Index Maintenance](2026-10-02-aoci-index-maintenance.md) 取代：87 个 observe 路径已完成
+model review，6 个 stale Entry 已经官方事务更新；Verify、Check、Guide 证明治理 aligned、
+`complete=true`、`next_action=none`。原实现、审查和媒体证明边界不变。
+
 ## Scope And Runtime Truth
 
 用户要求精简 `AGENTS.md` 和 `.agent/context/`，把适合机械验证的规则迁到现有 Harness。
