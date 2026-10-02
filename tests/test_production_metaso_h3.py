@@ -243,3 +243,30 @@ def test_metaso_status_and_fetch_bind_task_and_never_forward_bearer():
     transport.query_response = MiniMaxH3TransportResponse(200, {},
         b'{"task":{"id":"wrong-task","status":"succeeded"}}')
     with pytest.raises(AiVideoError): provider.get_status(submission, receipt)
+
+
+def test_real_transport_handles_case_insensitive_http_download_headers(monkeypatch):
+    from contextlib import contextmanager
+    from io import BytesIO
+    from types import SimpleNamespace
+    import httpx
+    import ai_video.production.metaso_h3 as module
+    body = b'\x00\x00\x00\x18ftypisom' + b'\x00' * 32
+    @contextmanager
+    def public_stream(url, *, timeout_seconds):
+        assert url == 'https://cdn.example.org/out.mp4'
+        yield SimpleNamespace(status_code=200,
+            headers={'Content-Type':'video/mp4;charset=UTF-8','Content-Length':str(len(body))},
+            iter_bytes=lambda:iter((body,)))
+    monkeypatch.setattr(module,'stream_public_video',public_stream)
+    with httpx.Client(transport=httpx.MockTransport(lambda _:httpx.Response(200,json={
+        'task':{'id':'task-h3-1','status':'succeeded','content':{'url':'https://cdn.example.org/out.mp4'}}}))) as client:
+        transport = module.HttpxMetasoH3Transport(client=client)
+        provider, request, _, paid, *_ = setup(transport=transport)
+        receipt = _paid_submit_receipt(request,paid)
+        submission = VideoSubmission.from_paid_submit_receipt(resolved=request,receipt=receipt)
+        observed = provider.get_status(submission,receipt)
+        sink = BytesIO()
+        result = provider.fetch(submission,receipt,observed,sink)
+    assert sink.getvalue()==body
+    assert result.size_bytes==len(body)

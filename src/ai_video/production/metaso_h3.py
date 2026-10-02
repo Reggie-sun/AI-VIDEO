@@ -11,6 +11,7 @@ import hashlib
 import json
 import os
 from collections.abc import Callable
+from contextlib import contextmanager
 from datetime import datetime
 from pathlib import Path
 from typing import Literal
@@ -82,10 +83,15 @@ class MetasoH3Profile(StrictModel):
 class HttpxMetasoH3Transport(HttpxMiniMaxH3Transport):
     """API transport plus credential-free, public-address-pinned result GET."""
 
+    @contextmanager
     def stream(self, request):
-        if request.method != "GET" or dict(request.headers) != {"accept": "video/mp4"}:
+        if request.method != "GET" or request.body or dict(request.headers) != {"accept": "video/mp4"}:
             raise _error(ErrorCode.VIDEO_ARTIFACT_INVALID, "Invalid METASO download request.")
-        return stream_public_video(request.url, timeout_seconds=120)
+        with stream_public_video(request.url, timeout_seconds=120) as response:
+            # http.client preserves wire casing; the inherited consumer expects
+            # httpx-style lowercase lookup for these case-insensitive headers.
+            response.headers = {key.lower(): value for key, value in response.headers.items()}
+            yield response
 
 
 class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
