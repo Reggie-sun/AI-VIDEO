@@ -9,6 +9,7 @@ from ai_video.production.video_transition import (
     CausalDimension,
     CausalEdgeSemantics,
     CausalTransitionMode,
+    ContinuityObligation,
     ContinuityTransitionPolicy,
 )
 from ai_video.production.video_requirement import (
@@ -265,33 +266,82 @@ def validate_causal_transition_readiness(
     except ValidationError:
         return ("continuity_transition_policy.policy_hash",)
     diagnostics: list[str] = []
-    if policy.schema_version != "2":
+    if (
+        policy.schema_version != "2"
+        and requirement.contract_version == "provider-neutral-video-requirement/4"
+        and requirement.continuity_mode is not ContinuityMode.NONE
+    ):
         diagnostics.append("continuity_transition_policy.schema_version")
-    if previous_shot_state is None:
-        diagnostics.append("current_request.previous_shot_state")
-    else:
-        if (
-            policy.source_shot.artifact_id
-            != previous_shot_state.previous_shot_artifact_id
-            or policy.source_shot.revision
-            != previous_shot_state.previous_shot_revision
-            or policy.source_shot.content_hash
-            != previous_shot_state.previous_shot_content_hash
+    if policy.schema_version == "2":
+        if previous_shot_state is None:
+            if policy.continuity_obligation is not ContinuityObligation.SUBSTANTIAL_RESET:
+                diagnostics.append("current_request.previous_shot_state")
+        else:
+            if (
+                policy.source_shot.artifact_id
+                != previous_shot_state.previous_shot_artifact_id
+                or policy.source_shot.revision
+                != previous_shot_state.previous_shot_revision
+                or policy.source_shot.content_hash
+                != previous_shot_state.previous_shot_content_hash
+            ):
+                diagnostics.append("continuity_transition_policy.source_shot")
+            if (
+                policy.source_generation_intent_hash
+                != previous_shot_state.previous_generation_intent_hash
+            ):
+                diagnostics.append(
+                    "continuity_transition_policy.source_generation_intent_hash"
+                )
+    diagnostics.extend(
+        validate_causal_transition_intent(policy, requirement=requirement)
+    )
+    if policy.continuity_obligation is ContinuityObligation.FULL_CONTINUITY:
+        if requirement.continuity_mode not in {
+            ContinuityMode.EXACT_TERMINAL,
+            ContinuityMode.MULTI_ANCHOR,
+            ContinuityMode.REFERENCE,
+        }:
+            diagnostics.append("generation_requirement.continuity_mode")
+        if requirement.generation_mode not in {
+            GenerationMode.IMAGE_TO_VIDEO,
+            GenerationMode.FIRST_LAST_FRAME_VIDEO,
+        }:
+            diagnostics.append("generation_requirement.generation_mode")
+        if not set(requirement.semantic_reference_roles).intersection(
+            {SemanticReferenceRole.FIRST_FRAME, SemanticReferenceRole.CONTINUITY_TERMINAL}
         ):
-            diagnostics.append("continuity_transition_policy.source_shot")
-        if (
-            policy.source_generation_intent_hash
-            != previous_shot_state.previous_generation_intent_hash
-        ):
-            diagnostics.append(
-                "continuity_transition_policy.source_generation_intent_hash"
-            )
+            diagnostics.append("generation_requirement.semantic_reference_roles")
+    elif (
+        policy.continuity_obligation is ContinuityObligation.SUBSTANTIAL_RESET
+        and requirement.continuity_mode is not ContinuityMode.NONE
+    ):
+        diagnostics.append("generation_requirement.continuity_mode")
+    elif (
+        policy.continuity_obligation is ContinuityObligation.IDENTITY_STYLE_CARRYOVER
+        and requirement.continuity_mode
+        not in {ContinuityMode.REFERENCE, ContinuityMode.SEMANTIC}
+    ):
+        diagnostics.append("generation_requirement.continuity_mode")
+    return tuple(dict.fromkeys(diagnostics))
+
+
+def validate_causal_transition_intent(
+    policy: ContinuityTransitionPolicy,
+    *,
+    requirement: ProviderNeutralVideoRequirement,
+) -> tuple[str, ...]:
+    """Validate the sealed target and versioned carry declarations at both gates."""
+
+    diagnostics: list[str] = []
     if (
         policy.target_shot.artifact_id != requirement.target_shot.artifact_id
         or policy.target_shot.revision != requirement.target_shot.revision
         or policy.target_shot.content_hash != requirement.target_shot.content_hash
     ):
         diagnostics.append("continuity_transition_policy.target_shot")
+    if policy.schema_version == "1":
+        return tuple(diagnostics)
     if policy.target_generation_intent_hash != requirement.generation_intent_hash:
         diagnostics.append(
             "continuity_transition_policy.target_generation_intent_hash"
@@ -329,6 +379,7 @@ __all__ = [
     "validate_conditioning_compatibility",
     "validate_camera_subject_relation",
     "validate_causal_transition_readiness",
+    "validate_causal_transition_intent",
     "validate_requirement_conditioning_compatibility",
     "validate_generation_intent_for_continuity",
 ]

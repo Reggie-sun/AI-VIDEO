@@ -15,7 +15,7 @@ from ai_video.production.video_requirement import (
     ProviderNeutralVideoRequirement,
     SemanticReferenceRole,
 )
-from ai_video.production.video_transition import ContinuityObligation
+from ai_video.production.video_transition import BoundaryKind, ContinuityObligation
 
 
 def requirement_mode(mode: GenerationMode) -> VideoGenerationMode | None:
@@ -332,7 +332,18 @@ def validate_continuity_transition(
         raise ValueError(
             "continuity policy requires matching context and requirement modes"
         )
-    _validate_obligation_mode(policy, requirement)
+    _validate_obligation_mode(policy, requirement, lifecycle)
+    if policy.schema_version == "2":
+        from ai_video.production._video_intent_validation import (
+            validate_causal_transition_intent,
+        )
+
+        diagnostics = validate_causal_transition_intent(policy, requirement=requirement)
+        if diagnostics:
+            raise ValueError(
+                "causal transition does not match the sealed requirement: "
+                + ", ".join(diagnostics)
+            )
     if (target.artifact_id, target.revision, target.content_hash) != (
         context.activated_shot.artifact_id,
         context.target_shot_revision,
@@ -364,10 +375,19 @@ def validate_continuity_transition(
     return continuity_routing
 
 
-def _validate_obligation_mode(policy: Any, requirement: Any) -> None:
+def _validate_obligation_mode(policy: Any, requirement: Any, lifecycle: Any) -> None:
     mode = requirement.continuity_mode.value
     obligation = policy.continuity_obligation
     if obligation is ContinuityObligation.FULL_CONTINUITY:
+        if (
+            lifecycle.hard_cut_keyframe_binding is not None
+            and policy.boundary_kind is not BoundaryKind.HARD_CUT
+        ):
+            raise ValueError("hard-cut keyframe requires a hard-cut boundary")
+        if lifecycle.hard_cut_keyframe_binding is not None:
+            if mode != "reference":
+                raise ValueError("hard-cut keyframe requires reference continuity mode")
+            return
         if mode not in {"exact_terminal", "multi_anchor"}:
             raise ValueError(
                 "full continuity requires terminal-bearing continuity mode"
@@ -425,6 +445,9 @@ def _validate_full_continuity_terminal(
     terminal = context.upstream_terminal
     c4_binding = projection.requirement.c4_multi_anchor_binding
     lifecycle_binding = lifecycle.continuity_binding
+    hard_cut_binding = lifecycle.hard_cut_keyframe_binding
+    if hard_cut_binding is not None:
+        _validate_hard_cut_keyframe(context, hard_cut_binding)
     if lifecycle_binding is not None and (
         lifecycle_binding.target_shot_id,
         lifecycle_binding.target_shot_revision,
@@ -440,6 +463,7 @@ def _validate_full_continuity_terminal(
     evidence = (
         lifecycle_binding.terminal_frame
         if lifecycle_binding is not None
+        else hard_cut_binding.terminal_frame if hard_cut_binding is not None
         else c4_binding.terminal if c4_binding is not None else None
     )
     if terminal is None or evidence is None:
@@ -483,6 +507,37 @@ def _validate_full_continuity_terminal(
         )
 
 
+def _validate_hard_cut_keyframe(context: Any, binding: Any) -> None:
+    keyframe = context.shot_keyframe
+    if (
+        keyframe is None
+        or (
+            binding.target_shot_id,
+            binding.target_shot_revision,
+            binding.target_shot_content_hash,
+            binding.keyframe_asset_id,
+            binding.keyframe_asset_sha256,
+            binding.keyframe_mime_type,
+            binding.keyframe_size_bytes,
+            binding.keyframe_width,
+            binding.keyframe_height,
+        ) != (
+            context.target_shot_id,
+            context.target_shot_revision,
+            context.target_shot_content_hash,
+            keyframe.asset_id,
+            keyframe.asset_sha256,
+            keyframe.mime_type,
+            keyframe.size_bytes,
+            keyframe.width,
+            keyframe.height,
+        )
+    ):
+        raise ValueError(
+            "hard-cut keyframe does not match the exact current routing target and asset"
+        )
+
+
 def _validate_cross_stack_spatial_intent(requirement: Any, policy: Any) -> None:
     intent = requirement.generation_intent
     required_dimensions = {"camera_velocity", "screen_axis", "subject_position"}
@@ -502,6 +557,7 @@ def apply_continuity_transition(
     *,
     decision: Any,
     context: Any,
+    lifecycle: Any,
     provider_profile: Any,
     capabilities: Any,
     selected_capability_id: str,
@@ -557,11 +613,9 @@ def apply_continuity_transition(
                 ),
             )
     if (
-        policy.source_execution_stack_hash
-        != policy.destination_execution_stack_hash
-        and policy.continuity_obligation
-        is ContinuityObligation.FULL_CONTINUITY
+        policy.continuity_obligation is ContinuityObligation.FULL_CONTINUITY
         and not _uses_exact_terminal_frame(decision, context, selected)
+        and not _uses_hard_cut_keyframe(decision, context, selected, lifecycle, policy)
     ):
         reason_type = type(decision.reason_codes[0])
         outcome_type = type(decision.outcome)
@@ -570,8 +624,9 @@ def apply_continuity_transition(
             reason_code=reason_type("CONTINUITY_FRAME_CONDITIONING_REQUIRED"),
             outcome=outcome_type("blocked_capability"),
             rationale=(
-                "A cross-stack full-continuity route must condition the destination "
-                "Provider on the exact previous terminal as its first frame."
+                "The requested full-continuity obligation requires first-frame conditioning "
+                "on the exact previous terminal or its bound hard-cut keyframe; "
+                "soft references cannot satisfy it."
             ),
         )
     return decision
@@ -613,6 +668,28 @@ def _uses_exact_terminal_frame(
         and decision.input_assets
         and terminal is not None
         and decision.input_assets[0] == terminal
+    )
+
+
+def _uses_hard_cut_keyframe(
+    decision: Any,
+    context: Any,
+    selected: Any,
+    lifecycle: Any,
+    policy: Any,
+) -> bool:
+    return bool(
+        policy.boundary_kind is BoundaryKind.HARD_CUT
+        and context.continuity_mode.value == "reference"
+        and lifecycle.hard_cut_keyframe_binding is not None
+        and selected is not None
+        and selected.mode is VideoGenerationMode.IMAGE_TO_VIDEO
+        and "first_frame" in selected.allowed_image_roles
+        and decision.required_binding_roles
+        and decision.required_binding_roles[0] == "first_frame"
+        and decision.input_assets
+        and context.shot_keyframe is not None
+        and decision.input_assets[0] == context.shot_keyframe
     )
 
 

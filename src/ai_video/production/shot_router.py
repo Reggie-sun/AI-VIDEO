@@ -494,6 +494,7 @@ class VideoGenerationResolver:
             decision = apply_continuity_transition(
                 decision=decision,
                 context=context,
+                lifecycle=lifecycle,
                 provider_profile=provider_profile,
                 capabilities=capabilities,
                 selected_capability_id=selected_capability_id,
@@ -541,6 +542,7 @@ class VideoGenerationResolver:
         decision = apply_continuity_transition(
             decision=decision,
             context=context,
+            lifecycle=lifecycle,
             provider_profile=provider_profile,
             capabilities=capabilities,
             selected_capability_id=selected_capability_id,

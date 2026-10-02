@@ -4,7 +4,7 @@ from collections.abc import Callable
 from typing import Any, TypeVar
 
 from ai_video.planning._asset_readiness import (
-    is_initial_first_frame_request as _is_initial_first_frame_request,
+    is_shot_first_frame_request as _is_shot_first_frame_request,
     asset_matches_role as _asset_matches_role,
     available_role as _available_role,
     current_review as _current_review,
@@ -279,8 +279,8 @@ def _dynamic_decision(
         _append_unique(reasons, ReasonCode.TEXT_TO_VIDEO_EXPLICIT)
         return GenerationMode.TEXT_TO_VIDEO, PlanOutcome.PROPOSED, ()
     if (
-        _is_initial_first_frame_request(request)
-        and continuity is ContinuityMode.NONE
+        _is_shot_first_frame_request(request)
+        and continuity in {ContinuityMode.NONE, ContinuityMode.REFERENCE}
     ):
         has_last_frame = SemanticReferenceRole.LAST_FRAME in declared_roles
         required = (

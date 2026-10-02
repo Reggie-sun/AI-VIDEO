@@ -14,13 +14,13 @@ from ai_video.production.video_requirement import GenerationOperation, SemanticR
 _FINAL_VISUAL_ROLE = "final_visual"
 
 
-def is_initial_first_frame_request(request: VideoPlanningRequest) -> bool:
+def is_shot_first_frame_request(request: VideoPlanningRequest) -> bool:
     intent = request.generation_intent
+    previous = request.previous_shot_state
     return (
         request.planning_contract_version == "video-planner/3"
         and request.target_shot.visual_strategy is VisualStrategy.GENERATED_VIDEO
         and request.commercial_execution_projection is None
-        and request.previous_shot_state is None
         and intent is not None
         and intent.generation_operation is GenerationOperation.AUTO
         and intent.semantic_reference_roles in {
@@ -30,6 +30,14 @@ def is_initial_first_frame_request(request: VideoPlanningRequest) -> bool:
                 SemanticReferenceRole.LAST_FRAME,
             ),
         }
+        and (
+            previous is None
+            or (
+                previous.is_angle_change
+                and not previous.semantic_jump
+                and intent.semantic_reference_roles == (SemanticReferenceRole.FIRST_FRAME,)
+            )
+        )
     )
 
 
@@ -116,7 +124,7 @@ def _is_shot_bound_final_visual(
         )
     if (
         asset.role is AssetRole.APPROVED_KEYFRAME
-        and is_initial_first_frame_request(request)
+        and is_shot_first_frame_request(request)
     ):
         return any(
             requirement.role == "first_frame"
@@ -192,7 +200,7 @@ def asset_matches_role(
         )
         return not selection or asset.asset_id in selection
     if role is AssetRole.LAST_FRAME:
-        if is_initial_first_frame_request(request):
+        if is_shot_first_frame_request(request):
             return (
                 asset.canonical_owner_id == request.target_shot.shot_id
                 and _content_binding_matches(

@@ -16,8 +16,10 @@ from ai_video.planning import (
     PlanWarning,
     VideoPlanner,
     VideoPlanningRequest,
+    require_current_video_plan,
 )
-from ai_video.production.models import Shot, VisualStrategy
+from ai_video.production.hashing import seal_artifact
+from ai_video.production.models import AssetRoleRequirement, AssetType, Shot, VisualStrategy
 from ai_video.production.video_requirement import (
     AudioNeed,
     ConditioningCompatibilityEvidence,
@@ -28,14 +30,17 @@ from ai_video.production.video_requirement import (
     OutputNeed,
     ProviderNeutralGenerationIntentProjection,
     QualityNeed,
+    SemanticReferenceRole,
     SubjectAction,
     VerifiedGenerationRequirementProjection,
 )
 from ai_video.production.video_transition import (
+    BoundaryKind,
     CausalDimension,
     CausalEdgeSemantics,
     CausalStateChange,
     CausalTransitionMode,
+    ContinuityObligation,
     ContinuityTransitionPolicy,
     CreativeArtifactIdentity,
 )
@@ -180,6 +185,7 @@ def _complete_causal_policy(
     target_shot: Shot,
     *,
     omit_dimension: CausalDimension | None = None,
+    schema_version: str = "2",
 ) -> ContinuityTransitionPolicy:
     original = _transition_policy(source=1, target=2, stack_hash="0" * 64)
     excluded = {
@@ -209,7 +215,7 @@ def _complete_causal_policy(
     )
     return ContinuityTransitionPolicy.create(
         **base,
-        schema_version="2",
+        schema_version=schema_version,
         source_shot=CreativeArtifactIdentity(
             artifact_id="shot-0-artifact",
             revision=1,
@@ -220,10 +226,12 @@ def _complete_causal_policy(
             revision=target_shot.revision,
             content_hash=target_shot.content_hash,
         ),
-        source_generation_intent_hash="3" * 64,
-        target_generation_intent_hash=requirement_hash,
-        causal_edge_semantics=CausalEdgeSemantics.DIRECT_CONTINUITY,
-        causal_state_changes=changes,
+        **({
+            "source_generation_intent_hash": "3" * 64,
+            "target_generation_intent_hash": requirement_hash,
+            "causal_edge_semantics": CausalEdgeSemantics.DIRECT_CONTINUITY,
+            "causal_state_changes": changes,
+        } if schema_version == "2" else {}),
     )
 
 
@@ -250,6 +258,193 @@ def test_v4_continuity_blocks_without_pairwise_causal_policy() -> None:
     assert binding.payload.failure_field_paths == (
         "continuity_transition_policy",
     )
+
+
+def _hard_cut_first_frame_request(*, rich_intent: bool, defect: str | None = None):
+    original = _current_v4_causal_request()
+    shot = seal_artifact(original.target_shot.model_copy(update={
+        "required_asset_roles": (
+            AssetRoleRequirement(role="final_visual", asset_ids=(), allowed_asset_types=(AssetType.VIDEO,)),
+            AssetRoleRequirement(
+                role="first_frame", asset_ids=("other-frame" if defect == "unbound" else "derived-opening",),
+                allowed_asset_types=(AssetType.IMAGE,),
+            ),
+        ),
+    }))
+    intent = original.generation_intent if rich_intent else _generation_intent()
+    intent = ProviderNeutralGenerationIntentProjection.create(**{
+        **{name: getattr(intent, name) for name in type(intent).model_fields if name != "projection_hash"},
+        "semantic_reference_roles": (SemanticReferenceRole.FIRST_FRAME,),
+        **({"conditioning_compatibility": intent.conditioning_compatibility.model_copy(update={
+            "first_anchor_id": "derived-opening",
+        })} if rich_intent else {}),
+    })
+    frame = make_available_asset(
+        asset_id="derived-opening", role=AssetRole.APPROVED_KEYFRAME,
+        canonical_owner_id="other-shot" if defect == "wrong_owner" else shot.shot_id,
+        canonical_owner_content_hash=TWO_HASH if defect == "stale_owner" else shot.content_hash,
+    )
+    previous = original.previous_shot_state.model_copy(update={
+        "is_same_action": defect == "continuous_take",
+        "is_angle_change": defect != "continuous_take",
+        "has_terminal_frame_asset_id": None if defect == "continuous_take" else "anchor-first",
+    })
+    return VideoPlanningRequest.create(**{
+        **original.model_dump(mode="python", exclude={"request_content_hash"}),
+        "target_shot": shot, "generation_intent": intent, "previous_shot_state": previous,
+        "available_assets": () if defect == "missing" else (frame,),
+        "shot_intent_evidence": make_intent_evidence(target_shot=shot, character_action_required=True),
+    })
+
+
+@pytest.mark.parametrize("rich_intent", [False, True])
+def test_full_hard_cut_first_frame_reaches_standard_planner_and_readiness(rich_intent):
+    request = _hard_cut_first_frame_request(rich_intent=rich_intent)
+    plan = VideoPlanner().plan(request)
+    assert plan.outcome is PlanOutcome.PROPOSED
+    assert plan.generation_mode.value == "image_to_video"
+    assert plan.continuity_mode.value == "reference"
+    requirement = plan.generation_requirement
+    assert requirement is not None
+    policy = _complete_causal_policy(requirement.generation_intent_hash, request.target_shot)
+    projection = require_current_video_plan(
+        current_request=request, plan=plan, continuity_transition_policy=policy,
+    )
+    assert projection.requirement == requirement
+    assert requirement.capability_need.needs_first_frame
+    assert requirement.semantic_reference_roles == (SemanticReferenceRole.FIRST_FRAME,)
+    assert requirement.asset_evidence[0].asset_id == "derived-opening"
+
+
+@pytest.mark.parametrize("defect", ["wrong_owner", "stale_owner", "unbound", "missing", "continuous_take"])
+def test_hard_cut_first_frame_keeps_exact_asset_and_terminal_guards(defect):
+    request = _hard_cut_first_frame_request(rich_intent=False, defect=defect)
+    plan = VideoPlanner().plan(request)
+    assert plan.outcome is PlanOutcome.BLOCKED
+    with pytest.raises(AiVideoError):
+        require_current_video_plan(current_request=request, plan=plan)
+
+
+@pytest.mark.parametrize("schema_version", ["1", "2"])
+def test_readiness_explicit_full_policy_cannot_be_ignored_by_none_mode(schema_version) -> None:
+    api = _gate_api()
+    original = _current_dynamic_request()
+    current_request = VideoPlanningRequest.create(**{
+        **original.model_dump(mode="python", exclude={"request_content_hash"}),
+        "previous_shot_state": None,
+    })
+    plan = VideoPlanner().plan(current_request)
+    requirement = plan.generation_requirement
+    assert requirement is not None
+    assert requirement.continuity_mode.value == "none"
+    policy = _complete_causal_policy(
+        requirement.generation_intent_hash, requirement.target_shot, schema_version=schema_version,
+    )
+    result = api.ShotReadinessGate().evaluate(api.ShotReadinessRequest.create(
+        request_id="explicit-full-none-downgrade", current_request=current_request,
+        plan=plan, contract_version="shot-readiness-gate/2", continuity_transition_policy=policy,
+    ))
+    assert result.status.value == "blocked"
+    assert "causal_transition_invalid" in {r.value for r in result.checks[0].reason_codes}
+
+
+@pytest.mark.parametrize("schema_version", ["1", "2"])
+def test_readiness_substantial_reset_remains_legal_without_previous_conditioning(schema_version) -> None:
+    api = _gate_api()
+    current_request = _current_dynamic_request()
+    plan = VideoPlanner().plan(current_request)
+    requirement = plan.generation_requirement
+    assert requirement is not None
+    assert requirement.continuity_mode.value == "none"
+    original = _complete_causal_policy(
+        requirement.generation_intent_hash, requirement.target_shot, schema_version=schema_version,
+    )
+    policy = ContinuityTransitionPolicy.create(**{
+        **{name: getattr(original, name) for name in type(original).model_fields if name != "policy_hash"},
+        "boundary_kind": BoundaryKind.SCENE_BOUNDARY,
+        "continuity_obligation": ContinuityObligation.SUBSTANTIAL_RESET,
+        **({"causal_edge_semantics": CausalEdgeSemantics.SCENE_RESET} if schema_version == "2" else {}),
+        "required_carryover_dimensions": (),
+        "anchors": (),
+    })
+    result = api.ShotReadinessGate().evaluate(api.ShotReadinessRequest.create(
+        request_id="explicit-reset-without-conditioning", current_request=current_request,
+        plan=plan, contract_version="shot-readiness-gate/2", continuity_transition_policy=policy,
+    ))
+    assert result.status.value == "ready", result.checks[0].payload.failure_field_paths
+
+
+@pytest.mark.parametrize("obligation", [
+    ContinuityObligation.FULL_CONTINUITY,
+    ContinuityObligation.IDENTITY_STYLE_CARRYOVER,
+])
+def test_readiness_legacy_v1_policy_preserves_valid_conditioning_paths(obligation) -> None:
+    api = _gate_api()
+    original = _current_v4_causal_request()
+    previous = original.previous_shot_state.model_copy(update={
+        "previous_shot_artifact_id": None, "previous_shot_revision": None,
+        "previous_generation_intent_hash": None,
+        "is_same_action": obligation is ContinuityObligation.FULL_CONTINUITY,
+        "is_angle_change": obligation is ContinuityObligation.IDENTITY_STYLE_CARRYOVER,
+    })
+    current_request = VideoPlanningRequest.create(**{
+        **original.model_dump(mode="python", exclude={"request_content_hash"}),
+        "generation_intent": _generation_intent(), "previous_shot_state": previous,
+    })
+    plan = VideoPlanner().plan(current_request)
+    requirement = plan.generation_requirement
+    assert requirement is not None and requirement.contract_version.endswith("/1")
+    original = _complete_causal_policy(
+        requirement.generation_intent_hash, requirement.target_shot, schema_version="1",
+    )
+    policy = ContinuityTransitionPolicy.create(**{
+        **{name: getattr(original, name) for name in type(original).model_fields if name != "policy_hash"},
+        "continuity_obligation": obligation,
+    })
+    result = api.ShotReadinessGate().evaluate(api.ShotReadinessRequest.create(
+        request_id="legacy-v1-continuity", current_request=current_request,
+        plan=plan, contract_version="shot-readiness-gate/2", continuity_transition_policy=policy,
+    ))
+    assert result.status.value == "ready", result.checks[0].payload.failure_field_paths
+
+
+def test_readiness_v4_continuity_still_requires_v2_causality() -> None:
+    api = _gate_api()
+    current_request = _current_v4_causal_request()
+    plan = VideoPlanner().plan(current_request)
+    requirement = plan.generation_requirement
+    policy = _complete_causal_policy(
+        requirement.generation_intent_hash, requirement.target_shot, schema_version="1",
+    )
+    result = api.ShotReadinessGate().evaluate(api.ShotReadinessRequest.create(
+        request_id="v4-cannot-use-legacy-causality", current_request=current_request,
+        plan=plan, contract_version="shot-readiness-gate/2", continuity_transition_policy=policy,
+    ))
+    assert result.status.value == "blocked"
+    assert "continuity_transition_policy.schema_version" in result.checks[0].payload.failure_field_paths
+
+
+def test_readiness_legacy_policy_still_binds_exact_target() -> None:
+    api = _gate_api()
+    current_request = _current_dynamic_request()
+    plan = VideoPlanner().plan(current_request)
+    requirement = plan.generation_requirement
+    original = _complete_causal_policy(
+        requirement.generation_intent_hash, requirement.target_shot, schema_version="1",
+    )
+    policy = ContinuityTransitionPolicy.create(**{
+        **{name: getattr(original, name) for name in type(original).model_fields if name != "policy_hash"},
+        "boundary_kind": BoundaryKind.SCENE_BOUNDARY,
+        "continuity_obligation": ContinuityObligation.SUBSTANTIAL_RESET,
+        "required_carryover_dimensions": (), "anchors": (),
+        "target_shot": original.target_shot.model_copy(update={"content_hash": "5" * 64}),
+    })
+    result = api.ShotReadinessGate().evaluate(api.ShotReadinessRequest.create(
+        request_id="legacy-v1-wrong-target", current_request=current_request,
+        plan=plan, contract_version="shot-readiness-gate/2", continuity_transition_policy=policy,
+    ))
+    assert result.status.value == "blocked"
+    assert "continuity_transition_policy.target_shot" in result.checks[0].payload.failure_field_paths
 
 
 def test_v4_continuity_ready_only_with_exact_complete_pairwise_policy() -> None:

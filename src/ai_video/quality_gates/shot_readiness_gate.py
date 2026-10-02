@@ -128,9 +128,13 @@ class ShotReadinessGate:
         causal_diagnostics: tuple[str, ...] = ()
         if (
             requirement is not None
-            and requirement.contract_version
-            == "provider-neutral-video-requirement/4"
-            and requirement.continuity_mode is not ContinuityMode.NONE
+            and (
+                request.continuity_transition_policy is not None
+                or (
+                    requirement.contract_version == "provider-neutral-video-requirement/4"
+                    and requirement.continuity_mode is not ContinuityMode.NONE
+                )
+            )
         ):
             causal_diagnostics = validate_causal_transition_readiness(
                 request.continuity_transition_policy,

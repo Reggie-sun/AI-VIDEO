@@ -57,6 +57,7 @@ from ai_video.production.video import (
     ContinuityArtifactIdentity,
     ContinuityConstraintSet,
     ContinuityReferenceBinding,
+    HardCutKeyframeBinding,
     ProviderProfilePointer,
     TerminalFrameEvidence,
     VideoCapabilityVariant,
@@ -78,6 +79,10 @@ from ai_video.production.video_execution_stack import (
 )
 from ai_video.production.video_transition import (
     BoundaryKind,
+    CausalDimension,
+    CausalEdgeSemantics,
+    CausalStateChange,
+    CausalTransitionMode,
     ContinuityAnchorBinding,
     ContinuityAnchorRole,
     ContinuityObligation,
@@ -93,6 +98,367 @@ HASH_D = "d" * 64
 HASH_E = "e" * 64
 HASH_F = "f" * 64
 HASH_0 = "0" * 64
+
+
+def _reseal_projection(projection, **updates):
+    requirement = ProviderNeutralVideoRequirement.create(
+        **{
+            **projection.requirement.model_dump(
+                mode="python", exclude={"requirement_id", "requirement_hash"}
+            ),
+            **updates,
+        }
+    )
+    return VerifiedGenerationRequirementProjection.create(
+        **{
+            **projection.model_dump(mode="python", exclude={"projection_hash"}),
+            "requirement": requirement,
+        }
+    )
+
+
+def _causal_policy(policy, projection, **updates):
+    states = {
+        CausalDimension.CHARACTER_PRESENCE: "COCO and Nosha present",
+        CausalDimension.PROP_IDENTITY: "same C",
+        CausalDimension.PROP_HOLDER: "floor; no holder",
+        CausalDimension.PROP_FUNCTIONAL_STATE: "C detached from Nosha",
+        CausalDimension.ACTION_PHASE: "release completed",
+        CausalDimension.SCREEN_MOTION_AXIS: "moving right",
+    }
+    return ContinuityTransitionPolicy.create(
+        **{
+            **{name: getattr(policy, name) for name in type(policy).model_fields if name != "policy_hash"},
+            "schema_version": "2",
+            "source_generation_intent_hash": HASH_C,
+            "target_generation_intent_hash": projection.requirement.generation_intent_hash,
+            "causal_edge_semantics": (
+                CausalEdgeSemantics.SCENE_RESET
+                if policy.continuity_obligation is ContinuityObligation.SUBSTANTIAL_RESET
+                else CausalEdgeSemantics.DIRECT_CONTINUITY
+            ),
+            "causal_state_changes": tuple(
+                CausalStateChange(
+                    dimension=dimension,
+                    source_close=states.get(dimension, "stable"),
+                    target_open=states.get(dimension, "stable"),
+                    transition_mode=CausalTransitionMode.CARRY,
+                )
+                for dimension in sorted(CausalDimension, key=lambda item: item.value)
+            ),
+            **updates,
+        }
+    )
+
+
+def _metaso_continuity_fixture(obligation=ContinuityObligation.FULL_CONTINUITY, *, schema_version="2"):
+    from ai_video.production.metaso_h3 import MetasoH3Profile, MetasoH3VideoProvider
+    from ai_video.production.video_requirement import OutputGeometryPolicy
+
+    def forbidden(*args):
+        pytest.fail("routing must not read credentials, resolve bytes, or contact a Provider")
+
+    profile = MetasoH3Profile(
+        duration=4, resolution="768P", aspect_ratio="16:9", context_ir=True,
+        cost_upper_bound_microunits=1,
+    )
+    provider = MetasoH3VideoProvider(
+        profile=profile, transport=None, credential=forbidden, reference_resolver=forbidden,
+    )
+    character = seal_artifact(make_character().model_copy(update={
+        "appearance_bible": "Canonical standard view: C still attached to Nosha",
+    }))
+    identity = _asset(
+        "character_reference", "old-standard-state", HASH_A,
+        canonical_owner_id=character.character_id,
+        canonical_owner_content_hash=character.content_hash,
+    )
+    video = _asset(
+        "reference_video", "previous-detached-state", HASH_D,
+        mime_type="video/mp4", duration_millis=4000, fps=24,
+    )
+    mode = {
+        ContinuityObligation.FULL_CONTINUITY: ContinuityMode.EXACT_TERMINAL,
+        ContinuityObligation.IDENTITY_STYLE_CARRYOVER: ContinuityMode.REFERENCE,
+        ContinuityObligation.SUBSTANTIAL_RESET: ContinuityMode.NONE,
+    }[obligation]
+    source = _context(
+        shot_id="shot-1", character_references=(identity,),
+        character_bible_hashes=(character.content_hash,), reference_videos=(video,),
+        shot_intent="C detached and placed on floor; release completed; move right",
+    )
+    target = _context(
+        shot_id="shot-2", continuity=mode,
+        terminal=_asset("continuity_terminal", "detached-terminal", HASH_E),
+        continuity_state=_continuity_state(), character_references=(identity,),
+        character_bible_hashes=(character.content_hash,), reference_videos=(video,),
+        shot_intent="Hard cut: C remains detached; do not release again; move right",
+    )
+    evidence = tuple(AssetEvidence(
+        role=role, asset_id=asset.asset_id, asset_sha256=asset.asset_sha256,
+        canonical_owner_id=asset.canonical_owner_id,
+        canonical_owner_content_hash=asset.canonical_owner_content_hash,
+        mime_type=asset.mime_type, size_bytes=asset.size_bytes,
+        width=asset.width, height=asset.height,
+        duration_millis=asset.duration_millis, fps=asset.fps,
+    ) for role, asset in (
+        (SemanticReferenceRole.IDENTITY, identity),
+        (SemanticReferenceRole.SCENE, source.canonical_scene_reference),
+        (SemanticReferenceRole.VIDEO_REFERENCE, video),
+    ))
+
+    def projection(context):
+        return _reseal_projection(
+            _verified_requirement(context), characters=(character,),
+            generation_mode=RequirementGenerationMode.REFERENCE_TO_VIDEO,
+            continuity_mode=RequirementContinuityMode(context.continuity_mode.value),
+            asset_evidence=evidence, semantic_reference_roles=tuple(e.role for e in evidence),
+            output_need=OutputNeed(
+                timing_mode="content_driven", duration_seconds=4,
+                geometry_policy=OutputGeometryPolicy.ADAPTIVE, fps=24,
+                container_mime="video/mp4",
+            ), audio_need=AudioNeed.REQUIRED,
+            generation_intent=GenerationIntent(
+                open_state={"kind": "typed_text", "state_text": "C detached; release completed"},
+                close_state={"kind": "typed_text", "state_text": "C on floor; moving right"},
+            ),
+        )
+
+    compiler = AdapterCompilerContract.create(compiler_id="metaso-h3-video-compiler", compiler_version="1")
+    common = dict(
+        policy=_policy(remote_authorized=True, budget_authorized=True),
+        provider_profile=profile.pointer(), capabilities=provider.capabilities(),
+        selected_capability_id=provider.capabilities().variants[0].capability_id,
+        output_requirement=profile.output(), compiler_contract=compiler,
+    )
+    source_lifecycle = _lifecycle(source).model_copy(update={
+        "generation_id": "generation-source", "output_asset_id": "source-video",
+        "input_artifact_ids": (source.target_shot_id, *(e.asset_id for e in evidence)),
+    })
+    source_result = VideoGenerationResolver()._bind_requirement(
+        projection=projection(source), context=source, lifecycle=source_lifecycle, **common,
+    )
+    previous = source_result.provider_bound_request
+    assert previous is not None, source_result.decision
+    lifecycle = _terminal_lifecycle(target, source_context=source, source_bound_request=previous)
+    lifecycle = lifecycle.model_copy(update={
+        "input_artifact_ids": tuple(dict.fromkeys((*lifecycle.input_artifact_ids, *(e.asset_id for e in evidence)))),
+        "continuity_binding": lifecycle.continuity_binding if obligation is ContinuityObligation.FULL_CONTINUITY else None,
+    })
+    route = _bound_route_identity(previous)
+    projected = projection(target)
+    transition = _transition_policy(
+        source_context=source, target_context=target, lifecycle=lifecycle,
+        boundary=BoundaryKind.SCENE_BOUNDARY if obligation is ContinuityObligation.SUBSTANTIAL_RESET else BoundaryKind.HARD_CUT,
+        obligation=obligation, source_route=route, destination_route=route,
+    )
+    if schema_version == "2":
+        transition = _causal_policy(transition, projected)
+    sequence = _continuity_routing(
+        transition=transition, previous_bound=previous,
+        previous_shot=source.activated_shot, destination_route=route,
+    )
+    assert transition.source_execution_stack_hash == transition.destination_execution_stack_hash
+    return dict(projection=projected, context=target, lifecycle=lifecycle, continuity_routing=sequence, **common)
+
+
+@pytest.mark.parametrize("schema_version", ["1", "2"])
+def test_full_continuity_same_stack_cannot_downgrade_to_metaso_soft_references(schema_version):
+    fixture = _metaso_continuity_fixture(schema_version=schema_version)
+    result = VideoGenerationResolver()._bind_requirement(**fixture)
+    assert result.decision.outcome is RoutingOutcome.BLOCKED_CAPABILITY
+    assert result.decision.reason_codes == (RouterReasonCode.CONTINUITY_FRAME_CONDITIONING_REQUIRED,)
+    assert result.provider_bound_request is None
+
+
+def test_public_generation_resolver_cannot_explore_full_continuity_with_soft_metaso():
+    from test_production_generation_decision import setup_decision
+    from ai_video.planning.video_planner import VideoPlanner
+
+    fixture = _metaso_continuity_fixture()
+    original = setup_decision(remote=True, seed_supported=False)["inputs"]
+    candidate = original.candidates[0]
+    recipe = candidate.recipe.model_copy(update={
+        "requirement_hash": fixture["projection"].requirement.requirement_hash,
+        "profile_sha256": fixture["provider_profile"].profile_sha256,
+        "compiler_hash": fixture["compiler_contract"].compiler_hash,
+    })
+    candidate = candidate.model_copy(update={
+        "provider_profile": fixture["provider_profile"], "capabilities": fixture["capabilities"],
+        "capability_id": fixture["selected_capability_id"], "compiler_contract": fixture["compiler_contract"],
+        "output_requirement": fixture["output_requirement"], "recipe": recipe,
+    })
+    inputs = original.model_copy(update={
+        "projection_hash": fixture["projection"].projection_hash,
+        "facts_hash": VideoPlanner.generation_difficulty(fixture["projection"])["facts_hash"],
+        "candidates": (candidate,),
+    })
+    result = VideoGenerationResolver().resolve_requirement(
+        **{key: fixture[key] for key in ("projection", "context", "policy", "lifecycle", "continuity_routing")},
+        inputs=inputs,
+    )
+    assert result.disposition == "BLOCKED_EXECUTION"
+    assert result.routing is None
+    assert result.assessments[0].compatible is False
+    assert "CONTINUITY_FRAME_CONDITIONING_REQUIRED" in result.assessments[0].reasons
+
+
+@pytest.mark.parametrize("obligation", [
+    ContinuityObligation.IDENTITY_STYLE_CARRYOVER,
+    ContinuityObligation.SUBSTANTIAL_RESET,
+])
+def test_metaso_soft_references_remain_legal_for_carryover_and_reset(obligation):
+    result = VideoGenerationResolver()._bind_requirement(**_metaso_continuity_fixture(obligation))
+    assert result.decision.outcome is RoutingOutcome.SELECTED
+    assert result.provider_bound_request is not None
+    assert result.provider_bound_request.binding_roles == ("reference", "reference", "reference_video")
+
+
+@pytest.mark.parametrize("mismatch", ["carry", "target_intent", "missing_dimension"])
+def test_router_rechecks_v2_causal_state_before_provider_binding(mismatch):
+    fixture = _metaso_continuity_fixture(ContinuityObligation.IDENTITY_STYLE_CARRYOVER)
+    sequence = fixture["continuity_routing"]
+    policy = sequence.transition_policy
+    changes = policy.causal_state_changes
+    updates = {
+        "carry": {"causal_state_changes": tuple(
+            item.model_copy(update={"target_open": "C attached again"})
+            if item.dimension is CausalDimension.PROP_FUNCTIONAL_STATE else item
+            for item in changes
+        )},
+        "target_intent": {"target_generation_intent_hash": HASH_F},
+        "missing_dimension": {"causal_state_changes": tuple(
+            item for item in changes if item.dimension is not CausalDimension.PROP_HOLDER
+        )},
+    }[mismatch]
+    policy = _causal_policy(policy, fixture["projection"], **updates)
+    fixture["continuity_routing"] = _continuity_routing(
+        transition=policy, previous_bound=sequence.previous_provider_bound_request,
+        previous_shot=sequence.previous_shot, destination_route=sequence.destination_route,
+    )
+    with pytest.raises(ValueError, match="causal transition"):
+        VideoGenerationResolver()._bind_requirement(**fixture)
+
+
+def _hard_cut_full_fixture():
+    source, previous, original_target, original_lifecycle, terminal = _sequence_fixture()
+    keyframe = _asset("first_frame", "derived-new-camera", HASH_D)
+    context = _context(
+        continuity=ContinuityMode.REFERENCE, terminal=terminal, keyframe=keyframe,
+        continuity_state=_continuity_state(), important=False,
+    )
+    original_binding = original_lifecycle.continuity_binding
+    assert original_binding is not None
+    binding = HardCutKeyframeBinding.create(
+        role="hard_cut_keyframe", terminal_frame=original_binding.terminal_frame,
+        keyframe_asset_id=keyframe.asset_id, keyframe_asset_sha256=keyframe.asset_sha256,
+        keyframe_mime_type="image/png", keyframe_width=keyframe.width,
+        keyframe_height=keyframe.height, keyframe_size_bytes=keyframe.size_bytes,
+        keyframe_request_fingerprint=HASH_B, keyframe_provenance_receipt_id="derived-image-provenance",
+        target_shot_id=context.target_shot_id, target_shot_revision=context.target_shot_revision,
+        target_shot_content_hash=context.target_shot_content_hash, constraints=original_binding.constraints,
+    )
+    lifecycle = _lifecycle(context).model_copy(update={
+        "hard_cut_keyframe_binding": binding,
+        "input_artifact_ids": (context.target_shot_id, terminal.asset_id, keyframe.asset_id),
+    })
+    projection = _reseal_projection(
+        _first_frame_projection(context), continuity_mode=RequirementContinuityMode.REFERENCE,
+        generation_intent=_exact_terminal_projection(original_target).requirement.generation_intent,
+    )
+    variant = _variant(VideoGenerationMode.IMAGE_TO_VIDEO)
+    capabilities = _capabilities(variant)
+    compiler = AdapterCompilerContract.create(compiler_id="continuity-test-compiler", compiler_version="1")
+    route = _selected_route_identity(
+        provider_name=capabilities.provider_name, variant=variant,
+        provider_profile=_profile(), compiler_contract=compiler,
+    )
+    transition = _causal_policy(_transition_policy(
+        source_context=source, target_context=context, lifecycle=lifecycle,
+        boundary=BoundaryKind.HARD_CUT, obligation=ContinuityObligation.FULL_CONTINUITY,
+        source_route=_bound_route_identity(previous), destination_route=route,
+    ), projection)
+    return dict(
+        projection=projection, context=context, policy=_policy(), lifecycle=lifecycle,
+        provider_profile=_profile(), capabilities=capabilities,
+        selected_capability_id=variant.capability_id, output_requirement=_output(), compiler_contract=compiler,
+        continuity_routing=_continuity_routing(
+            transition=transition, previous_bound=previous,
+            previous_shot=source.activated_shot, destination_route=route,
+        ),
+    )
+
+
+def test_full_continuity_hard_cut_reuses_existing_derived_keyframe_i2v():
+    fixture = _hard_cut_full_fixture()
+    result = VideoGenerationResolver()._bind_requirement(**fixture)
+    assert result.decision.outcome is RoutingOutcome.SELECTED
+    bound = result.provider_bound_request
+    assert bound is not None
+    assert bound.binding_roles == ("first_frame",)
+    assert bound.input_assets == (fixture["context"].shot_keyframe,)
+    assert bound.input_assets[0] != fixture["context"].upstream_terminal
+    compiled = compile_provider_video_request(
+        provider_bound=bound, requirement=fixture["projection"].requirement,
+        compiler_id=fixture["compiler_contract"].compiler_id,
+        compiler_version=fixture["compiler_contract"].compiler_version,
+        capabilities=fixture["capabilities"],
+    )
+    assert compiled.request.hard_cut_keyframe_binding == fixture["lifecycle"].hard_cut_keyframe_binding
+    assert compiled.request.image_bindings[0].asset_id == fixture["context"].shot_keyframe.asset_id
+
+
+def test_exact_terminal_cannot_be_replaced_by_a_derived_hard_cut_keyframe():
+    fixture = _hard_cut_full_fixture()
+    fixture["context"] = fixture["context"].model_copy(update={
+        "continuity_mode": ContinuityMode.EXACT_TERMINAL,
+    })
+    fixture["projection"] = _reseal_projection(
+        fixture["projection"], continuity_mode=RequirementContinuityMode.EXACT_TERMINAL,
+    )
+    with pytest.raises(ValueError, match="hard-cut keyframe requires reference continuity mode"):
+        VideoGenerationResolver()._bind_requirement(**fixture)
+
+
+def test_continuous_take_cannot_use_a_derived_hard_cut_keyframe():
+    fixture = _hard_cut_full_fixture()
+    sequence = fixture["continuity_routing"]
+    source_route = sequence.source_route
+    transition = _causal_policy(sequence.transition_policy, fixture["projection"],
+        boundary_kind=BoundaryKind.WITHIN_CONTINUOUS_TAKE, take_id="same-take",
+        destination_execution_stack_hash=sequence.source_execution_stack.execution_stack_hash,
+    )
+    fixture["continuity_routing"] = _continuity_routing(
+        transition=transition, previous_bound=sequence.previous_provider_bound_request,
+        previous_shot=sequence.previous_shot, destination_route=source_route,
+    )
+    with pytest.raises(ValueError, match="hard-cut keyframe requires a hard-cut boundary"):
+        VideoGenerationResolver()._bind_requirement(**fixture)
+
+
+@pytest.mark.parametrize("mutation", ["keyframe", "terminal", "target", "absent"])
+def test_full_hard_cut_rejects_wrong_derived_keyframe_lineage(mutation):
+    fixture = _hard_cut_full_fixture()
+    lifecycle = fixture["lifecycle"]
+    binding = lifecycle.hard_cut_keyframe_binding
+    updates = {
+        "keyframe": {"keyframe_asset_sha256": HASH_F},
+        "terminal": {"terminal_frame": binding.terminal_frame.model_copy(update={"extracted_width": 512})},
+        "target": {"target_shot_content_hash": HASH_F},
+        "absent": {},
+    }[mutation]
+    if mutation == "terminal":
+        updates["terminal_frame"] = TerminalFrameEvidence.create(**{
+            **binding.terminal_frame.model_dump(mode="python", exclude={"content_hash"}),
+            "extracted_width": 512,
+        })
+    fixture["lifecycle"] = lifecycle.model_copy(update={
+        "hard_cut_keyframe_binding": None if mutation == "absent" else HardCutKeyframeBinding.create(**{
+            **binding.model_dump(mode="python", exclude={"binding_hash"}), **updates,
+        }),
+    })
+    with pytest.raises(ValueError, match="hard-cut|terminal"):
+        VideoGenerationResolver()._bind_requirement(**fixture)
 
 
 def test_additional_scene_reference_keeps_exact_requirement_binding():
