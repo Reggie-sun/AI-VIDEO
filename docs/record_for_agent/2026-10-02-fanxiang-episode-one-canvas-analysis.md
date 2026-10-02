@@ -14,6 +14,8 @@ Date: 2026-10-02
 
 源：[即梦画布](https://jimeng.jianying.com/ai-tool/ai-canvas/f25d6070-5936-44a7-b8af-10f81e9d0511)。本记录先完成作品拆解，测试结果必须由后续真实 request、exact MP4 和评估证据补充，不能由本拆解预先宣称。
 
+Follow-up（2026-10-02 UTC）：已完成[一次METASO MiniMax-H3气窗片段复现](2026-10-02-fanxiang-transom-metaso-h3-test.md)。真实MP4已落盘；整体创作评估FAIL，主要是长颈异化不足与气窗空间关系偏离；执行成功不等于复现成功。原片与结果、输入、逐项裁决和下载恢复由该测试记录保存，替代本文“后续测试”的pending状态。
+
 这份画布的具体价值是把校园恐怖故事分成有明确任务的短组：人物身份与空间资产先固定，每组改变少量状态，再用观察、反应、行动、后果推进。最值得学的是“每组究竟让观众知道什么、人物因此做什么”，以及参考图职责和首尾状态的写法。诸如“好莱坞”“ILM”“Wētā”是风格意图；实际画面质量需要另外判断。
 
 阅读顺序：Story Structure → Character Functions → Visual And Spatial Design → Detailed Shot Cases → Prompt And Reference Method → Shot Inventory。案例中的时间是本次下载视频的抽帧时间，不把当前 composer 时间轴冒充历史成片的精确切点。
@@ -25,6 +27,8 @@ Date: 2026-10-02
 读取了39个视频节点的当前 composer；它们显示 Seedance 2.5 / 全能参考 / 16:9 / 720P，时长有7、9、10、15、16、20、23秒，以15秒为主。当前文字、当前参数和当前预览**不保证属于同一次历史提交**。可见46个 current/history resources，不据此推导生成次数、付费次数或制作耗时。
 
 下载并 SHA-256 固定了14段当前预览：V01、V03、V07、V13、V19、V20、V24、V27、V32、V35、V36、V37、V38、V39；每段抽看6帧，共84个时点。另明确调用 project-local `video-analysis` MCP，对 V01 做 metadata / keyframes / zh ASR，对 V37 做 zh ASR。未完成整集剪辑版或全部素材的正常速度观看与人工聆听，因此不评价整集完成度、精确口型同步、整体混音或观众接受。
+
+后续复现阶段额外将原V36以Chrome 1x静音播放至ended，记录32次截图及video clock，并观察约12秒的明确长颈状态；证据在测试目录的 `source-normal-speed.json` 与 `source-normal-speed/`。这项补证仅涉及V36，不将其他13段的抽帧观察升级为完整播放或人工聆听。
 
 本地证据根目录为 `runs/jimeng-fanxiang-analysis-20261002-001/`，下称 `R/`。`inventory.json`、`composers.json`保存UI观察；`media-captures.json`绑定节点/resource/bytes/hash；`sheets/`为抽帧板。下载资源是 canvas-served bytes，不声称恢复了用户上传前原始文件。签名媒体URL与登录凭据没有写入记录。
 
@@ -264,3 +268,5 @@ V06曾亮角色段落中出现“小龙角色开发板(1)”chip，与人物名�
 `record-ai-video-session`在只读作品观察稳定后执行。本次experience检索返回 `library-incompatible`，按Skill排队，未前台重建或循环重试；当前判断依据重新打开的实际文件与媒体。`distill-ai-video-learning` outcome为 **no_candidate**：这是单个画布的观察，无controlled multi-arm实验或独立可归因模型比较，故 `research_note / ineligible`，不将84个抽帧当作84份独立实验。
 
 本记录仅本地文档与ignored观察素材；不push/release，不修改画布或Production状态。保留unrelated staged `.codex/config.toml`。后续已获用户授权的METASO H3测试独立封存request与1次submit预算，生成成功仍须exact MP4、project-local MCP和逐项结果评估，不能直接称复现成功。
+
+上段描述作品观察阶段的边界。后续H3测试已完成，创建独立Development attempt并持久化至fetch/validate，未activation或生产验收；最终结果及publication边界见本文开头的Follow-up记录。
