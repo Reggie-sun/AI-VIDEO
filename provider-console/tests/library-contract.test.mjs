@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
+import { libraryWorkspaceBatch, loadLibraryWorkspaces } from "../src/library-load-contract.js";
 
 import {
   buildLibraryEntries,
@@ -8,6 +9,45 @@ import {
   selectLibraryEntry,
   versionGroups,
 } from "../src/library-contract.js";
+
+test("initial library reads only recent workspaces and retains explicit older selections", () => {
+  const workspaces = Array.from({ length: 192 }, (_, index) => ({ workspace: `run-${index}/project.yaml` }));
+  assert.deepEqual(libraryWorkspaceBatch(workspaces, 6, new Set()).map((item) => item.workspace), workspaces.slice(0, 6).map((item) => item.workspace));
+  const requested = new Set([workspaces[100].workspace, "removed/project.yaml"]);
+  const batch = libraryWorkspaceBatch(workspaces, 12, requested);
+  assert.equal(batch.length, 13);
+  assert.equal(batch.at(-1).workspace, workspaces[100].workspace);
+});
+
+test("workspace reads reserve browser connections, publish progressively and cancel queued work", async () => {
+  const controller = new AbortController();
+  const pending = [];
+  const results = [];
+  let active = 0;
+  let peak = 0;
+  const request = async (url, signal) => {
+    assert.equal(signal, controller.signal);
+    active += 1; peak = Math.max(peak, active);
+    return new Promise((resolve, reject) => pending.push({ url, resolve: (value) => { active -= 1; resolve(value); }, reject: () => { active -= 1; reject(new Error("invalid workspace")); } }));
+  };
+  const loading = loadLibraryWorkspaces(Array.from({ length: 20 }, (_, i) => ({ workspace: `run ${i}/project.yaml` })), controller.signal, request, (workspace, result) => results.push({ workspace, result }));
+  assert.equal(pending.length, 2);
+  assert.match(pending[0].url, /workspace=run%200%2Fproject.yaml$/);
+  pending[0].resolve({ status: "valid" });
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(results.length, 1, "a slow peer must not block a completed detail");
+  pending[1].reject();
+  await new Promise((resolve) => setImmediate(resolve));
+  assert.equal(results[1].result.error, "invalid workspace");
+  controller.abort();
+  for (const item of pending.slice(2)) item.resolve({ status: "valid" });
+  await loading;
+  assert.equal(peak, 2);
+  assert.equal(pending.length, 4, "abort prevents remaining queued reads");
+  assert.equal(results.length, 2, "late aborted responses cannot update the library");
+});
+
+
 
 const sha = (letter) => letter.repeat(64);
 

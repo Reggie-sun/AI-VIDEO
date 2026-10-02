@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { attachRunsMediaIndex, readExternalCatalogResponse, runsMediaContextNotice } from "./external-media-contract.js";
+import { LIBRARY_WORKSPACE_PAGE_SIZE, libraryWorkspaceBatch, loadLibraryWorkspaces } from "./library-load-contract.js";
 import { useLibraryLiveUpdates } from "./library-live-updates.js";
 
 async function readJson(url, signal) {
@@ -20,15 +21,21 @@ export function useLibraryData() {
   const [runsError, setRunsError] = useState("");
   const [externalError, setExternalError] = useState("");
   const [mediaIndex, setMediaIndex] = useState(null);
-  const [indexLoading, setIndexLoading] = useState(true);
-  const [indexNotice, setIndexNotice] = useState("");
+  const [indexLoading, setIndexLoading] = useState(false);
+  const [indexNotice, setIndexNotice] = useState("尚未执行全量关联；未确认的 Runs 绑定保持未评估。");
+  const indexEnabled = useRef(false);
+  const workspaceLimit = useRef(LIBRARY_WORKSPACE_PAGE_SIZE);
+  const requestedWorkspaces = useRef(new Set());
+  const loadedWorkspaces = useRef(new Set());
   const indexRequest = useRef(null);
   const runsRequest = useRef(null);
   const externalRequest = useRef(null);
   const runsInFlight = useRef(false);
   const runsQueued = useRef(false);
+  const runsReloadQueued = useRef(false);
 
   const refreshIndex = useCallback(async () => {
+    indexEnabled.current = true;
     indexRequest.current?.abort();
     const controller = new AbortController();
     indexRequest.current = controller;
@@ -42,35 +49,37 @@ export function useLibraryData() {
     } finally { if (!controller.signal.aborted) setIndexLoading(false); }
   }, []);
 
-  const refreshRuns = useCallback(async () => {
-    if (runsInFlight.current) { runsQueued.current = true; return; }
+  const refreshRuns = useCallback(async ({ reload = true } = {}) => {
+    if (runsInFlight.current) {
+      runsQueued.current = true;
+      runsReloadQueued.current ||= reload;
+      return;
+    }
     runsInFlight.current = true;
     const controller = new AbortController();
     runsRequest.current = controller;
     setRunsLoading(true);
     setRunsError("");
+    let reloadDetails = reload;
     try {
       do {
         runsQueued.current = false;
+        runsReloadQueued.current = false;
         const body = await readJson("/api/runs", controller.signal);
         if (controller.signal.aborted) return;
         setCatalog(body);
         const workspaces = body.workspaces || [];
         const keys = new Set(workspaces.map((item) => item.workspace));
-        setDetails((current) => Object.fromEntries(Object.entries(current).filter(([key]) => keys.has(key)).map(([key, value]) => [key, { ...value, refreshing: true }])));
-        // Catalog order loads recently updated render-only workspaces promptly too.
-        const pending = [...workspaces];
-        const worker = async () => {
-          while (pending.length && !controller.signal.aborted) {
-            const item = pending.shift();
-            let result;
-            try {
-              result = { detail: await readJson(`/api/runs/detail?workspace=${encodeURIComponent(item.workspace)}`, controller.signal) };
-            } catch (error) { result = { error: error.message }; }
-            if (!controller.signal.aborted) setDetails((current) => ({ ...current, [item.workspace]: result }));
-          }
-        };
-        await Promise.all(Array.from({ length: 3 }, worker));
+        loadedWorkspaces.current = new Set([...loadedWorkspaces.current].filter((key) => keys.has(key)));
+        const batch = libraryWorkspaceBatch(workspaces, workspaceLimit.current, new Set([...requestedWorkspaces.current, ...loadedWorkspaces.current]));
+        const pending = reloadDetails ? batch : batch.filter((item) => !loadedWorkspaces.current.has(item.workspace));
+        const refreshing = new Set(pending.map((item) => item.workspace));
+        setDetails((current) => Object.fromEntries(Object.entries(current).filter(([key]) => keys.has(key)).map(([key, value]) => [key, refreshing.has(key) ? { ...value, refreshing: true } : value])));
+        await loadLibraryWorkspaces(pending, controller.signal, readJson, (workspace, result) => {
+          loadedWorkspaces.current.add(workspace);
+          setDetails((current) => ({ ...current, [workspace]: result }));
+        });
+        reloadDetails = runsReloadQueued.current;
       } while (runsQueued.current && !controller.signal.aborted);
     } catch (error) {
       if (!controller.signal.aborted) setRunsError(error.message);
@@ -81,6 +90,15 @@ export function useLibraryData() {
       }
     }
   }, []);
+
+  const loadMoreRuns = useCallback(() => {
+    workspaceLimit.current += LIBRARY_WORKSPACE_PAGE_SIZE;
+    return refreshRuns({ reload: false });
+  }, [refreshRuns]);
+  const loadWorkspace = useCallback((workspace) => {
+    requestedWorkspaces.current.add(workspace);
+    return refreshRuns({ reload: false });
+  }, [refreshRuns]);
 
   const refreshExternal = useCallback(async ({ force = false } = {}) => {
     externalRequest.current?.abort();
@@ -102,17 +120,16 @@ export function useLibraryData() {
   useEffect(() => {
     refreshRuns();
     refreshExternal();
-    refreshIndex();
     return () => {
       runsRequest.current?.abort();
       runsInFlight.current = false;
       externalRequest.current?.abort();
       indexRequest.current?.abort();
     };
-  }, [refreshRuns, refreshExternal, refreshIndex]);
-  const refreshRunsAndIndex = useCallback(() => Promise.all([refreshRuns(), refreshIndex()]), [refreshRuns, refreshIndex]);
+  }, [refreshRuns, refreshExternal]);
+  const refreshRunsAndIndex = useCallback(() => Promise.all([refreshRuns(), ...(indexEnabled.current ? [refreshIndex()] : [])]), [refreshRuns, refreshIndex]);
   const connection = useLibraryLiveUpdates({ refreshRuns: refreshRunsAndIndex, refreshExternal });
   const loaded = useMemo(() => Object.values(details).flatMap((result) => result.detail ? [result.detail] : []), [details]);
   const enrichedExternal = useMemo(() => attachRunsMediaIndex(external, mediaIndex), [external, mediaIndex]);
-  return { catalog, details, loaded, external: enrichedExternal, runsLoading, externalLoading, runsError, externalError, indexLoading, indexNotice, connection, refreshRuns: refreshRunsAndIndex, refreshExternal };
+  return { catalog, details, loaded, external: enrichedExternal, runsLoading, externalLoading, runsError, externalError, indexLoading, indexNotice, connection, refreshRuns: refreshRunsAndIndex, refreshExternal, refreshIndex, loadMoreRuns, loadWorkspace };
 }
