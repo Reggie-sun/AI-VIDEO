@@ -11,7 +11,33 @@ Session window: 2026-09-27–2026-10-02, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
-## Current Execution Checkpoint — Seventh Raw Media FAIL, Canonical Feedback Pending
+## Current Execution Checkpoint — Seventh Known Failure Closed, Glancing Repair Preparation
+
+### Canonical Feedback Closure And Source Verification — 2026-10-02
+
+本节取代下方reader policy/review pending、旧technical仍运行和第七尚未canonical关闭的状态，历史Gate/失败/消费/拒绝不追改。Reader source`c262073`已完成251 focused tests、12项exact staged direct policy checks及同target双独立审查；Parent逐项核24个bound hashes、patch/tree后仅接受source fix。Actual standard loader25.3828秒、原Manifest211字节不变仍是只读工程证据；不是媒体通过。Exact source review target`34f62f60698fb98384609bb6dac16b5e1c76af26b6cc19a0c2969fbdd5782737`与验证/裁决在`runs/coco-nosha-vidu-post-seventh-coverage-assessment-20261002-001/`。
+
+原technical最终自然CLI0完成，experience`35ba28a1fb288a87ff704054fe353789af26e326c61d3d526adabe277174cc74`，output/muted-source PASS。Parent没有重做technical；随后原project-local MCP controlled analyzer一次登记experience`fa21318439606db9cf4c3f55618041409f4b02d96a89ff781f784d05ae48b870`，diagnosis EVIDENCE_GAP/QUALITY_FAILURE、action/continuity FAIL、identity未决。09:12:46 UTC原committer `abandon_video_generation`后standard loader重开Manifest214，receipt`fe4e1856ed60b770c379ffca0e0d6cc2e15416af17352bcca96db66a6ccc06f5`，exact MP4/QA4/Gate、七次physical consumption、七reservation及21M operator upper bound均保留，accepted/activated false，ground未提交。原time04目录新增`platform-quality-abandonment.json`，旧rawfinding不改。
+
+独立source/CodeGraph mapping证明Gate seal是committer publication之前的raw步骤，sidecar缺失不能证明零写入。Parent封存[local recovery spec](../superpowers/specs/2026-10-02-coco-nosha-local-feedback-recovery.md) / [plan](../superpowers/plans/2026-10-02-coco-nosha-local-feedback-recovery.md)与run-local helper：冻结owned原实例后standard重开、零pointer/无orphan和完整durable identity/bytes一致才允许中断；首signal前exclusive fsynced intent、已封startticks/pidfd及保守阶段标记保护一次预算和异步异常。首轮双review三个同类blocking问题均CONFIRMED并修复；54 tests/4 fresh direct checks及round2双review，25 original/frozen hashes与tree均核对，source/spec checkpoint`f65b99c`。Actual helper发现原PID已自然消失，在intent/pidfd/signal前拒绝，零控制效果；不得把helper review或preflight exit1称作真实恢复成功。前一次unsealed-Gate拒绝及全部review轮次保留，未追加Kimi请求或重置消费。
+
+第八prospective unit在`runs/coco-nosha-vidu-glancing-contact-repair-20261002-001/`，mainvariable是B头尾轴沿后侧LEFT通路、头先过A、侧腹短擦、尾部独立受支撑退出；原LEFT tracking、QA4/五镜、A左前坠落和完整identity均保持。44 task guards/checkpoints通过，standard ROOT的filesystem副本正在snapshot/money/compile/paid验证、无Provider或真实secret lookup；它不是worktree，不代替REAL的fresh profile/preview/intent/permit。拟同task7→8、operator21M→24M、percall3M不变/max1新POST，所有前驱保留；reader修复后候选采用最短可行的一小时pure-time窗口，不默认再耗六小时。当前无第八真实paid intent/permit/POST，也未证明新pose会成功或必须新增四张参考图。
+
+Automatic learning为no_candidate：质量/素材/声线的通用结论仍未隔离，source回归与local控制测试进入各自owner而非adopted学习。Advisory experience检索exit3，library-incompatible shards已按Skill排队，继续current证据、不前台build/retry。AOCI本次33条完整交付/Challenge9/10达到strict pass，治理仍dirty，先前维护blocked/0candidates与既有pending保留；不声称系统治理可靠。原WAV试听async请求无答复，听觉/逐字/同声纹/正常速度完整观看/最终同步混音仍NE。canonical Harness=null（user禁worktree）、无push/release，unrelated `.codex/config.toml`保留。继续真实媒体和成片目标，不在record/commit处停止。
+
+## Historical Execution Checkpoint — Budget Reader Repair, Seventh Feedback Pending
+
+### Bounded Reader Performance Repair — 2026-10-02
+
+本节取代下方“profiling尚未建立根因”的状态，保留第七raw FAIL/identity NE及所有已消费记录。Source3fd的独立standard loader partial cProfile在1385.133秒后由Parent停止纯只读诊断、exit130；1035264369 calls中budget loader14771次、execution binding7377次，仍在paid-evidence ancestry重复展开，不是loader PASS。独立`code_mapper`核对active/Gate/reconciliation与first-derived递归路径，私有`_seen`只有ancestry guard而无completed-node合并；不会把文件体积或网络等待当已证实根因。
+
+Parent按同任务默认授权定稿separate [reader spec](../superpowers/specs/2026-10-02-paid-budget-read-traversal.md) / [plan](../superpowers/plans/2026-10-02-paid-budget-read-traversal.md)。新candidate仅在原reader owner为单次paid-evidence traversal复用完整验证节点；public新call fresh、每次实际访问仍检查当前bytes/适用pointer身份，cycle guard和完整ceiling/quota/derived/binding/Gate关系保留，无global cache或预算/QA policy放宽。标准fixtures两项可靠RED复现同节点1/2/6/18/27次验证；新13项用例及相关suite共251 PASS。07:44:24 UTC真实production-v2 standard loader完成25.3828秒，Manifest211 SHA`c10a21515a276b4febca10bef12c88ef90405c9ab1c326003e4eb724ed3af578`前后不变、QA4保持。当前actual staged policy checks与新Source双独立审查仍待完成，尚不准入新真实生成。
+
+Owned旧Source3fd `--technical`进程不因磁盘源码更新而重载。Parent尝试“未seal/零feedback写入”的安全中断preflight时，发现Gate刚已seal，因此preflight拒绝、没有signal；Manifest仍211/当前attempt无experience，不能把缺少terminal artifact当整条反馈未写的充分证据，保持原进程并禁止重复登记。新的诊断、RED/GREEN、actual loader、concept v2和恢复拒绝证据都在`runs/coco-nosha-vidu-post-seventh-coverage-assessment-20261002-001/`。AOCI fresh33-entry交付及strict Challenge10/10完成；维护只评一次返回blocked、0candidates，六条stale及73条既有observed pending未裁决，不ack/改写formal Index，不声称治理已对齐。
+
+第七known失败仍待canonical technical→analyzer→mixed diagnosis显式abandon。下个prospective experiment已经撤回下追镜头候选，concept packet-v2 SHA`85f210d927356accd39ff0abeb12677d7a2e27a692d6a930f481d0c3636f2e1c`独立检查无finding，只支持新准备而非模型PASS：B头尾轴沿受支撑后侧LEFT通路，头先经过A、侧腹短暂擦撞、尾部独立退出，原LEFT camera tracking/QA4/五镜5-5-7-8-7秒及A左前逃跑保持。[Glancing plan](../superpowers/plans/2026-10-02-coco-nosha-glancing-contact-repair.md)拟同task7→8、21M→24M/max1新增POST，尚无新profile/preview/permit/POST。不以第七失败证明新增四图必需。原WAV听觉反馈仍pending、完整正常速度观看及最终混音同步NE，成片未完成。Learning本checkpoint为no_candidate：可归因reader性能证据属于原owner regression验证，素材/模型/声线仍不产生可adopt通用claim；无push/release，unrelated config保留，canonical Harness=null。
+
+## Historical Execution Checkpoint — Seventh Raw Media FAIL, Canonical Feedback Pending
 
 ### Exact Seventh Fetch And Explicit Media Gate — 2026-10-02
 

@@ -159,4 +159,14 @@ Round2 target `ae6039f0d4cbaa441d851c5be9952e412ad52a219e62122497425548f41b50ce`
 
 Profile13 六小时始于19:05 UTC，准备和两次修复/复审已消耗约两小时。已测 start/quota/guard 单元1192/2545/7318秒，还未计 service/intent/permit 的额外重开；剩余窗口不应靠省略 guards 或碰运气填满。Source稳定后，为同一未提交 supported-inertia 实验用真实UTC封 fresh profile14/time04，最多六小时，保留13和全部三小时copy evidence。复用的是已合法发布的21M内部 budget snapshot及六笔reservation，不能重新应用 money extension、重置消费或复用旧authorization/preview/permit。新compiler/profile引用、dated authorization、generation/attempt identity通过canonical seams形成，非时间配置、native body/seed1496616719、三图/WAV/QA4、同task最多1个新增POST和6→7 quota要求保持。所有typed输入、旧/新hash和当前source标准loader/preview/body等价证明须封存，最终Source+fresh time04同snapshot双审后才start/quota/submit。
 
+## Glancing Contact Orientation Repair Amendment — 2026-10-02
+
+第七次exact MP4 `3ed3b9e1d5895e240c2ea19c4af64dfd30159e2b22f13852df8e963fc3b88d3d`已canonical fetch，显式MCP全11半秒帧及选定0.1秒细帧检查；raw Gate `f750e5c65e52b7d72ee242fe396abc50e479405436361d4f8ef288e62c2bf15b`显示B2.0–2.1秒先接触A、持续以尖端贴A，B4.3–4.9秒随A坠落。Output/mute PASS、action/continuity FAIL、六足/水滴体积/腹褶identity NE；canonical technical/analyzer/closure须完成后才能进入新执行，不能把raw Gate当durable rejection。旧七次实耗、旧H3八次及所有历史证据保留。
+
+Parent拒绝下降跟拍v1候选：独立concept finding `CC07-01`指出B自身supported exit的可见交接不足，`CC07-02`纠正其误写的右向逃跑；不是用camera移走B求PASS。新候选`runs/coco-nosha-vidu-post-seventh-coverage-assessment-20261002-001/concept-check-packet-v2.md` SHA`85f210d927356accd39ff0abeb12677d7a2e27a692d6a930f481d0c3636f2e1c`由独立read-only context重开原文/coverage/two Gates后无findings，仍不证明模型执行效果。主修复变量仅为B头尾轴/接触pose：B头端朝LEFT沿后侧平台通道先通过A，较宽中部侧腹在通过瞬间擦撞A，随后身体/尾部沿原通道自然分离并自身出画；不能尖端持续顶A或从前缘追落。保留原平台高度左向tracking、5秒、三PNG、原WAV、QA4/coverage5/5/7/8/7及所有原动作/身份。Ground仍承接A左前方下降，左侧落地、两圈翻滚/期间碰碗、第二圈末立即左前方逃跑；无新QA inventory、全局Gate旁路或历史修改。
+
+新有限执行单元使用同`user-approved:coco-nosha-vidu-q3-20260930`，最多新增1个Vidu `viduq3` R2V physical POST，clone0；拟quota7→8、内部project operator ceiling21M→24M，per-call3M不变，原七reservations/permits/grants/消耗不释放、不重置。该数值是预设内部上限而非官方价格。由既有budget/quota、reaffirmation、planning/compiler/feedback、service/committer owners执行，fresh profile仅在闭合baseline且准备窗口有依据时封存；reader修复后本候选用最短可行的一小时窗口，copy/REAL各自fresh日期/preview，不默认消耗六小时、不复用旧profile/preview/authorization/permit。Intent和exact native delta必须绑定第七次current-QA known terminal、actual prompt/seed/profile变化和held constants，不把一个主创作变量描述为严格单变量质量证明。
+
+**Self-Review:** 默认任务授权覆盖此有据finite unit；范围没有新素材/Provider/egress/release、接受标准或canonical ownership变化。不同朝向pose具有第七片持续尖端接触的直接证据，比同prompt改seed更可归因，但身份NE仍须完整重验且未宣称必然成功。完成第七canonical反馈/明确closure→新durable plan→最小helper变更/原fixture和canonical副本验证→exact target适用独立审查后才真实submit；每片立即MCP Gate，required未全PASS不推进ground。第八失败/缺证结束该单元，后续只能依据新证据和不同可隔离路径决定修复，不机械续期或重复同变量。Unknown outcome立即停。声音实际channel不支持听觉，已发出的源音频试听反馈和final mix分别保留NE；不会以ASR或沉默关闭。
+
 Self-Review：这是默认任务授权内的过期首次publication拒绝和已观察准备成本下的有限窗口恢复，不扩大素材、Provider/model/egress、monetary数值、physical ceiling或QA。没有第二writer/timeline、cache、自动retry或未知结果推断；全部工程证据不能充当成片完成。
