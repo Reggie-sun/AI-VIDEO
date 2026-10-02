@@ -82,13 +82,34 @@ receipt freshness/scope/artifact/policy 验证通过。两位独立 reviewer 各
 blocking_candidate：FC-R1（v1 policy 误封）与 FC2-EXACT-001（派生图冒充 exact terminal）。
 Parent 均用本地复现确认并采纳，四项新可靠 RED 后完成修复；最新五组 targeted suites
 为 170 PASS，无新 warnings。新 snapshot 的 Harness 002 与双独立复审是最终 completion
-前的一次 checkpoint，不复用旧 PASS。
+前的一次 checkpoint，最终证据以如下 Harness 003 为准。
 Harness 002 实际 PASS 且 receipt 校验通过；该 tree 的双独立复审第一位无 findings，第二位
 提出 FC2-HANDOFF-002（non_blocking）：C2 的标准 Planner 首帧分支要求 previous=None。
 Parent 核对并复现：legacy intent 为 BLOCKED，rich intent 因 Ref2VA conditioning mismatch
 抛 ValidationError。该问题属于用户要求 P2，故补上既有分支的有限换机位条件；两项可靠 RED
 后修复，新增五项错误资产/continuous-take controls。六组最新 targeted suites 为
 314 PASS；最终 Harness 003 和同一 snapshot 双独立审查另行封存。
+
+## Final Verified Checkpoint
+
+代码与 Spec/Plan 已本地提交 `d234233`，tree
+`576752aa0c81c4df1828a4858c670eb05b00e2dd` 与第三轮双独立审查完全相同。
+实际 [Harness 003 receipt](../../.agent/harness/runs/full-continuity-capability-20261003-003/receipt.json)
+为 PASS：13 checks PASS、1 covered skip（seedance_local_video_tests 被同轮 PASS 的
+production_video_provider_tests 覆盖）。Provider suite 860 PASS/20 项已有 Pydantic warnings，
+voice source 47、Vidu 194、neutral requirement 435、router 363、planner 140、readiness 245 PASS；
+这些 suites 有重叠，不合计成 unique test 数。Targeted 六组 314 PASS 无新 warnings。
+commit 前实际 `make harness-receipt` 的 scope/policy/artifact hashes/freshness/snapshot、
+same-run coverage、workspace stability/cleanup 与 complete_completion_proof 均为 true。
+staged receipt 绑定的是该 commit 前快照，不宣称后续文档 checkpoint 仍是同一 staged scope。
+
+第三轮 reviewer 2 无 findings，reviewer 1 的 FC-R2 为 non_blocking：rich intent 首帧
+缺失/wrong owner/stale owner/unbound 时，requirement constructor 抛 ValidationError，
+而非返回 BLOCKED plan。Parent 对四类输入分别运行 new C2 与 unchanged initial-frame lane，
+均得到相同 `asset_evidence.first_anchor / capability_need.needs_first_frame` 失败；没有 plan
+或可提交请求。此项为沿用的 error-shape debt，保留为 limitation，不扩大 scope 重做 Planner。
+没有 unresolved blocking finding；Parent 调查和裁决见
+[review adjudication](../../.agent/harness/runs/full-continuity-capability-20261003-003/review-adjudication.md)。
 
 ## Media Evidence Boundary
 
@@ -104,6 +125,8 @@ Provider continuity capability PASS。本轮没有改这些历史证据或把 FA
 本轮不重做 Planner，不自动更换 Provider，不生成 derived keyframe。
 typed equality/lineage 与 first-frame conditioning 不证明媒体中 C 的实际状态、动作或运动
 连续性；原逐 Shot exact-media Gate 仍必需。
+rich intent 的无效/缺失首帧在既有 requirement constructor 可能抛 ValidationError；fail closed
+保持，但统一为标准 BLOCKED plan/typed STOP 的错误输出改进未包含在本 slice。
 
 要声称 H3 质量改善，后续仍需单独授权、同输入受控的真实 A/B 和 exact raw verdict。
 离线 submit 前阻断修复的成立不依赖新付费实验；editorial repair 不能代替 raw acceptance。
@@ -113,10 +136,11 @@ typed equality/lineage 与 first-frame conditioning 不证明媒体中 C 的实�
 Native Codex 是唯一 writer；一次 read-only mapping 已完成。当前禁 credential/paid remote
 约束下未调用 Kimi，不制造 failure fallback receipt；T3 使用同一 candidate 的两次独立
 Native read-only review，Parent 保留 findings 裁决及最终责任。未建 development worktree。
-Publication 当前为 local working candidate，待 required checks/reviews 后仅本地 commit。
+Publication 为 source `d234233` 的本地 commit，当前工程记录完成 checkpoint；没有 push、release
+或 deploy。没有真实 credential lookup/Provider POST/remote generation/新媒体 effect。
 
 AOCI `aoci_maintain` 实际返回 `stopped / blocked`、candidates=[]、零正式索引写入：
-当前 scope 有 24 个 observed pending paths（含任务前已有漂移），以及本轮 baseline stale。
+最终维护尝试的 scope 有 25 个 observed pending paths（含任务前已有漂移），以及本轮 baseline stale。
 工具要求先复核全部 observe 证据；未 blanket acknowledge 未核验的其他 paths，也未修改
 scope/index 旁路。此次分析以当前源码、CodeGraph 和 tests 为证据，不宣称 AOCI 全量对齐。
 
