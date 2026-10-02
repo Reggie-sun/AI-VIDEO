@@ -11,7 +11,19 @@ Session window: 2026-09-27–2026-10-02, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
-## Current Execution Checkpoint — Sixth Media FAIL And Supported Inertia Repair
+## Current Execution Checkpoint — Seventh Raw Media FAIL, Canonical Feedback Pending
+
+### Exact Seventh Fetch And Explicit Media Gate — 2026-10-02
+
+本节取代下方第七次fetch尚在运行的状态，历史submit/GET/工程证据保留。Canonical `--fetch`于2026-10-02 06:01:54.353415 UTC返回、CLI exit0，同一task没有新增POST。Exact MP4为`runs/coco-nosha-vidu-voice-recovery-20260930-001/production-v2/state/video-generation/fetch/files/3ed3b9e1d5895e240c2ea19c4af64dfd30159e2b22f13852df8e963fc3b88d3d.mp4`，SHA与文件名一致，2,984,373 bytes、5.042秒/121帧/24fps/1280×720/H264、无音轨。Parent在落盘后显式调用project-local video-analysis，11个半秒帧全部检查，并检查所列0.1秒细帧；held-fd canonical probe核对nominal5秒的终点帧容差。Raw responses、`canonical-fetch-result.json`、`platform-canonical-heldfd-probe.json`和`platform-post-media-gate-v2.json`均在`runs/coco-nosha-vidu-platform-inertia-clock-quota-recovery-20261001-001/`；Gate SHA为`f750e5c65e52b7d72ee242fe396abc50e479405436361d4f8ef288e62c2bf15b`。
+
+当前QA4仍为`bcb05eafce21fa7de2efaa920866f296f802727e1d2299b09bb88bac40dc24fb`。Gate将output/muted-source判PASS；B在2.0–2.1秒接触A右侧，早于A离台，但持续以尖端贴A，4.3–4.9秒跟随A越过同一前缘坠落，supported rear-platform exit未发生，action/continuity为FAIL。A四琥珀眼、花瓣口、扇耳膜、长尾可辨；总六吸盘足、非对称水滴体积和B连续腹褶推进未建立，identity为NOT_EVALUATED，不从四只可见足推断总数错误。Ground两圈/碰碗属于下一Shot，不当作此片失败。已消费Vidu7/7、clone0，旧H3八次与所有消费保留；此片fetched unactivated，canonical technical反馈进程正在运行，analyzer及明确known-failure closure尚未完成，不能声称已canonical reject/abandon或接受Shot2。
+
+当前通道已实际尝试通过filesystem读取并呈现原WAV audio，返回`audio content omitted because you do not support audio input`。原WAV SHA`52975f4a3df74a4ec294f712d6afdc563d1da770323bc59f912dba2d58fffb77`、960124 bytes、48kHz/stereo/240000 samples保持，原COCO MP3 SHA`32b3e405b704bff738882fe433c9cb2aa984f08b991109541668170b5db15c7a`亦重验。声音源比较的async试听问题已发出，尚无用户反馈；该实际channel限制不证明声线不符，不将ASR当听觉验收。Full正常速度观看、同声纹/逐字听辨、最终同步和混音仍NOT_EVALUATED，无repeat/pad/synthesis/clone。
+
+下一修复尚未sealed或提交。`runs/coco-nosha-vidu-post-seventh-coverage-assessment-20261002-001/concept-check-packet.md`提出下降跟拍候选；独立read-only `reviewer_high`发现其缺少B自身supported exit的可见窗口，且“右向逃跑”与当前左前方coverage冲突，Parent确认并停止直接采用。不会通过camera裁掉B来补假PASS；须保留可读退出、正常坠落和同一动作交接，再决定是否有新的有限真实实验。另在standard loader的原路径做read-only CPU profiling，不省略校验或重复当前feedback。七次失败仍不能证明必须新增四张参考图。Learning为`no_candidate`：不同prompt/seed下重复B坠落是当前素材与coverage的失败观察，未隔离出通用成因/可采纳规则；既有claims保留。Source仍`3fd251c6`、canonical Harness receipt为null，无worktree/新素材/其他媒体Provider/push/release，unrelated `.codex/config.toml`保留；本checkpoint不结束未完成复现任务。
+
+## Historical Execution Checkpoint — Sixth Media FAIL And Supported Inertia Repair
 
 ### Seventh Physical Submit Accepted, GET Succeeded And Fetch In Progress — 2026-10-02
 
