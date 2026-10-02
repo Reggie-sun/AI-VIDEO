@@ -374,6 +374,8 @@ Focused verification：`python -m pytest -p no:cacheprovider tests/test_producti
 Harness 路由为 `production_video_provider`，包含 `production_vidu_tests` 与既有
 Provider / neutral requirement / Architecture checks。配置边界见 [Vidu Provider](vidu-provider.md)。
 
+`metaso_h3.py` 显式提供 METASO `MiniMax-H3` Ref2VA，复用既有 request/receipt、paid guard、Service/committer 和 public-IP pinned download；唯一默认 credential source 为环境 `METASO_API_KEY`。Exact reference bytes、profile/context flag、egress 与 one-use permit 绑定；禁止自动选路、POST retry、activation 或持久化 key/signed URL。公开 contract 与 focused tests 见 [METASO H3 Provider](metaso-h3-provider.md)，changed paths 路由 `production_video_provider`。
+
 本文件是修改代码前使用的契约路由索引。它回答四个问题：谁拥有该行为、哪些不变量必须保持、哪些替代路径禁止出现，以及最小相关验证是什么。
 
 本文件不是 runtime 状态总账、phase tracker、implementation authorization 或历史验收记录。当前实现真相、阶段方向与 Agent 权限分别由下表中的 canonical source 管理；代码、测试和已验证运行时行为始终优先于文档摘要。
