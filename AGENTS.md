@@ -235,6 +235,7 @@ alternate path 与 focused verification 的唯一 human-readable owner。实现�
 
 用户已对明确任务目标内所需的**共享契约、预算及恢复规则变更**提供默认授权。Parent 自主判断必要性、定稿 spec / plan、封存有限预算、实现、验证并记录；不得仅因改变 schema / CLI / shared contract、任务内 submit / repair ceiling、时间窗口或 recovery policy而请求逐项批准。前文的“显式批准”在此范围内可由该默认授权和可追溯的 Parent scope/self-review满足；用户明确要求先审后做、spec-only或不可调整上限时不适用。
 
+- 用户明确授权 Parent 在任务范围内自主修订经证据判断不合理的 Gate 与 Harness，无需逐项请求批准。判断必须站在观众以正常速度观看、聆听成片的角度，结合用户显式要求，说明原规则为何误判、过度约束或未能有效保护观看质量，以及修订如何改善叙事可读性、连续性、节奏、音画同步或整体体验。不得为了简化任务、减少工作量、避免重生成或让检查通过而修改规则，不得偷降质量底线、删除未满足的用户要求或追改历史 FAIL / NOT_EVALUATED 与消费记录。修订仍须经 canonical owner，保留变更依据与新旧规则，完成适用的 spec / plan、代码与测试同步、验证及审查；安全、外部授权和真实验收的保护语义仍按本节执行。
 - 有限预算耗尽时停止当前 attempt，核对真实 outcome、历史消费与下一次修复依据；在相同任务目标内可自主封存有理由的新有限执行单元，或经 canonical owner实现预算/repair contract扩展，无需为每次续期、加一个slot或已知失败修复重新询问。保存 predecessor、old/new bounds、真实计数和停止条件，不能改名任务、删除历史、重置 consumed permit/grant或追溯改写旧sealed evidence；不得把“无需批准”解释为无限执行。
 - 必须同步代码、测试与 canonical 文档；当前 runtime 不支持时先实施并验证所需契约，不能只改规则文件便绕过执行 guard、裸写 Manifest、直接 submit或声称能力已实现。
 - 恢复变更必须仍由 canonical owner执行，先核对当前状态、exact identity与已知结果。Unknown outcome继续 fail closed，禁止 blind retry、permit remint、猜测 mixed state或自动激活；需补齐证据/显式恢复，而不是重新询问同一工程规则的批准。
