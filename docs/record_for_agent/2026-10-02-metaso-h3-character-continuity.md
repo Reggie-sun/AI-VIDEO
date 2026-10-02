@@ -9,6 +9,10 @@ evidence_index_version: "1"
 
 Date: 2026-10-02
 
+## Supersession Notice — 2026-10-03
+
+用户观看旧三段拼接后明确拒绝“每个shot的转场没有关联”，并澄清不要求一镜到底。下文主角可辨及单片内部camera观察PASS仍只是有限证据，**不能作为跨镜连续性PASS**；拼接后的切换关系当前为FAIL，旧S03重置了相对位置/手机姿态。原MP4、单项gate和两次消费保留，不追改旧测量。用户随后授权重做/修改，最新exact观看版、两个新submit及raw失败见 [Cut Continuity Repair Record](2026-10-03-metaso-h3-cut-continuity-repair.md)；下方继续实验建议仅为历史结论，不授权自动追加。
+
 ## Goal And Boundary
 
 用户在首段视觉FAIL、声音接受之后明确要求：“这个不重要我觉得关键是后面能不能保持一致性,角色你再做两个shot看看”。本轮以S01实际外观为连续性基准，验证COCO/Nosha后续转头、互动和移动；不修原宠物解剖，不改写[S01 FAIL](2026-10-02-metaso-h3-canvas-method.md)。独立封存最多两个新提交，每镜一个候选，未重抽。未调用其他Provider、新增图片、重新配音或重构架构。
