@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from dataclasses import dataclass, field
 from pathlib import Path
 
 from pydantic import ValidationError
@@ -52,10 +53,23 @@ def _root_and_path(root: str | Path, stored: Path) -> tuple[Path, Path]:
     return resolved_root, resolved
 
 
+@dataclass
+class _BudgetReadTraversal:
+    # Private to one top-level read; never shared across public calls or locks.
+    completed: set[tuple[Path, str, str]] = field(default_factory=set)
+
+
 def load_paid_provider_budget(
     root: str | Path, pointer: PaidProviderBudgetSnapshotPointer, *, _seen=frozenset()
 ) -> PaidProviderBudgetSnapshot:
-    if pointer.content_hash in _seen:
+    return _load_paid_provider_budget(root, pointer, _seen, _BudgetReadTraversal())
+
+
+def _load_paid_provider_budget(
+    root: str | Path, pointer: PaidProviderBudgetSnapshotPointer,
+    seen, traversal: _BudgetReadTraversal,
+) -> PaidProviderBudgetSnapshot:
+    if pointer.content_hash in seen:
         raise _invalid("Paid Provider budget extension base is cyclic.")
     resolved_root, resolved = _root_and_path(root, pointer.path)
     try:
@@ -69,13 +83,27 @@ def load_paid_provider_budget(
         or budget.content_hash != pointer.content_hash
     ):
         raise _invalid("Paid Provider budget pointer identity is invalid.")
-    seen = _seen | {pointer.content_hash}
-    _verify_budget_extensions(resolved_root, budget, seen)
-    _verify_submit_quota_extensions(resolved_root, budget, seen)
+    _verify_budget_history(resolved_root, budget, raw.file_sha256, seen, traversal)
     return budget
 
 
-def _verify_budget_extensions(root: Path, budget: PaidProviderBudgetSnapshot, seen) -> None:
+def _verify_budget_history(
+    root: Path, budget: PaidProviderBudgetSnapshot, file_sha256: str,
+    seen, traversal: _BudgetReadTraversal,
+) -> None:
+    key = (root, budget.content_hash, file_sha256)
+    if key in traversal.completed:
+        return
+    ancestry = seen | {budget.content_hash}
+    _verify_budget_extensions(root, budget, ancestry, traversal)
+    _verify_submit_quota_extensions(root, budget, ancestry, traversal)
+    # A failure in either verifier must never become a reusable node.
+    traversal.completed.add(key)
+
+
+def _verify_budget_extensions(
+    root: Path, budget: PaidProviderBudgetSnapshot, seen, traversal: _BudgetReadTraversal,
+) -> None:
     extensions = budget.ceiling_extensions
     if len({item.extension_id for item in extensions}) != len(extensions):
         raise _invalid("Paid Provider budget extension IDs are duplicated.")
@@ -90,7 +118,7 @@ def _verify_budget_extensions(root: Path, budget: PaidProviderBudgetSnapshot, se
         if previous is not None and entry.old_ceiling_microunits != previous.new_ceiling_microunits:
             raise _invalid("Paid Provider budget extension chain is discontinuous.")
         try:
-            base = load_paid_provider_budget(root, entry.base_budget, _seen=seen)
+            base = _load_paid_provider_budget(root, entry.base_budget, seen, traversal)
         except AiVideoError as exc:
             raise _invalid("Paid Provider budget extension base is invalid.", str(exc)) from exc
         if (
@@ -118,7 +146,9 @@ def _verify_budget_extensions(root: Path, budget: PaidProviderBudgetSnapshot, se
         )
         if budget.content_hash != expected.content_hash:
             try:
-                derived = load_paid_provider_budget_by_content_hash(root, expected.content_hash)
+                derived = _load_paid_provider_budget_by_content_hash(
+                    root, expected.content_hash, seen, traversal
+                )
             except AiVideoError as exc:
                 raise _invalid("Paid Provider first extension snapshot is missing.", str(exc)) from exc
             if derived != expected:
@@ -128,14 +158,16 @@ def _verify_budget_extensions(root: Path, budget: PaidProviderBudgetSnapshot, se
         raise _invalid("Paid Provider budget extension ceiling regressed.")
 
 
-def _verify_submit_quota_extensions(root: Path, budget: PaidProviderBudgetSnapshot, seen) -> None:
+def _verify_submit_quota_extensions(
+    root: Path, budget: PaidProviderBudgetSnapshot, seen, traversal: _BudgetReadTraversal,
+) -> None:
     """Verify the immutable publication chain without treating it as lifecycle."""
     extensions = budget.submit_quota_extensions
     if len({item.extension_id for item in extensions}) != len(extensions):
         raise _invalid("Paid Provider submit quota extension IDs are duplicated.")
     for index, entry in enumerate(extensions):
         try:
-            base = load_paid_provider_budget(root, entry.base_budget, _seen=seen)
+            base = _load_paid_provider_budget(root, entry.base_budget, seen, traversal)
             from ai_video.production._generation_feedback_reader import (
                 load_generation_execution_binding,
             )
@@ -174,7 +206,9 @@ def _verify_submit_quota_extensions(root: Path, budget: PaidProviderBudgetSnapsh
         )
         if budget.content_hash != expected.content_hash:
             try:
-                derived = load_paid_provider_budget_by_content_hash(root, expected.content_hash)
+                derived = _load_paid_provider_budget_by_content_hash(
+                    root, expected.content_hash, seen, traversal
+                )
             except AiVideoError as exc:
                 raise _invalid("Paid Provider first submit quota snapshot is missing.", str(exc)) from exc
             if derived != expected:
@@ -185,7 +219,16 @@ def load_paid_provider_budget_by_content_hash(
     root: str | Path, content_hash: str
 ) -> PaidProviderBudgetSnapshot:
     """Reopen one immutable historical budget by its sealed content identity."""
+    return _load_paid_provider_budget_by_content_hash(
+        root, content_hash, frozenset(), _BudgetReadTraversal()
+    )
 
+
+def _load_paid_provider_budget_by_content_hash(
+    root: str | Path, content_hash: str, seen, traversal: _BudgetReadTraversal,
+) -> PaidProviderBudgetSnapshot:
+    if content_hash in seen:
+        raise _invalid("Paid Provider budget extension base is cyclic.")
     resolved_root, resolved = _root_and_path(
         root, canonical_paid_provider_budget_path(content_hash)
     )
@@ -196,8 +239,7 @@ def load_paid_provider_budget_by_content_hash(
         raise _invalid("Could not reopen historical paid Provider budget.", str(exc)) from exc
     if budget.content_hash != content_hash:
         raise _invalid("Historical paid Provider budget identity is invalid.")
-    _verify_budget_extensions(resolved_root, budget, {content_hash})
-    _verify_submit_quota_extensions(resolved_root, budget, {content_hash})
+    _verify_budget_history(resolved_root, budget, raw.file_sha256, seen, traversal)
     return budget
 
 
@@ -274,7 +316,8 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
     ]
     if pointer is None:
         return
-    budget = load_paid_provider_budget(root, pointer)
+    traversal = _BudgetReadTraversal()
+    budget = _load_paid_provider_budget(root, pointer, frozenset(), traversal)
     if any(entry.project_id != manifest.project_id for entry in budget.ceiling_extensions):
         raise _invalid("Paid Provider budget extension project is invalid.")
     if any(entry.project_id != manifest.project_id for entry in budget.submit_quota_extensions):
@@ -339,7 +382,7 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
         ):
             raise _invalid("Paid Provider attempt status is inconsistent with its phase.")
         gate = load_paid_provider_gate_receipt(root, state.gate_receipt)
-        gate_budget = load_paid_provider_budget(
+        gate_budget = _load_paid_provider_budget(
             root,
             PaidProviderBudgetSnapshotPointer(
                 path=Path(
@@ -350,6 +393,7 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
                 content_hash=gate.budget_snapshot_content_hash,
                 file_sha256=gate.budget_snapshot_file_sha256,
             ),
+            frozenset(), traversal,
         )
         gate_initial_ceiling = (
             gate_budget.ceiling_extensions[0].old_ceiling_microunits
@@ -475,7 +519,9 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
                 prior = load_paid_provider_submit_receipt(
                     root, reconciliation.prior_submit_receipt
                 )
-                base_budget = load_paid_provider_budget(root, reconciliation.base_budget)
+                base_budget = _load_paid_provider_budget(
+                    root, reconciliation.base_budget, frozenset(), traversal
+                )
                 if (
                     state.phase is not PaidProviderAttemptPhase.KNOWN_NO_EFFECT
                     or reconciliation.project_id != manifest.project_id
@@ -509,8 +555,8 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
                         prior_receipt=prior,
                         corrective_receipt=submit,
                     )
-                    retained = load_paid_provider_budget_by_content_hash(
-                        root, expected_budget.content_hash
+                    retained = _load_paid_provider_budget_by_content_hash(
+                        root, expected_budget.content_hash, frozenset(), traversal
                     )
                 except AiVideoError as exc:
                     raise _invalid("Paid Provider no-effect reconciliation budget is invalid.", str(exc)) from exc
