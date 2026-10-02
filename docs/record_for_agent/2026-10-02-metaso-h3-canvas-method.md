@@ -74,10 +74,15 @@ Provider task created→updated **70秒**；首次success观察 **128.212秒**�
 | Morphology / props | FAIL | A兔样爪足；B鱼形爪足而非无足腹褶滑行；C四肢软宠而非六瓣吸盘；D蛙/蜥蜴爪足、头口而非指定软壳/五足/腹口；水果橘/南瓜状。Nosha白手套符合Image3，不是失败。 |
 | Camera continuity | PASS | 正常速度低→高→低→木箱运动自然连续，MCP threshold.25为一个scene；不证明精确逆时针轨迹或排除所有隐蔽转场。 |
 | Dialogue text / count | PASS | 目标句ASR完整一次，0–4.74秒，无额外transcribed speech。 |
-| Audio placement / voice | FAIL / NOT_EVALUATED | 对白从片头开始，早于约3–5秒手机展示；5秒PCM correlation.6543/lag.00025秒支持对齐使用，不能代替输出声线人工验收。 |
+| Audio placement | FAIL observation | 对白从片头开始，早于约3–5秒手机展示；此项描述音画节奏偏差，不否定用户对声音的接受。 |
+| Audio quality / voice | PASS user | 用户随后确认本H3输出“声音可以”。取代此前机器层声线NOT_EVALUATED；5秒PCM correlation.6543/lag.00025秒仍只为客观对照，不是人工验收依据。 |
 | Added cuts / roles / dialogue | PASS observation | 未见乱切镜/串角色或额外ASR对白；手机有可见UI/text，违反不可读屏幕要求。 |
 
 Overall creative goal **FAIL**：形态、角色动作与音画职责偏差，非API未跑通。Raw findings在 `evaluation.json`，第一轮止步，不自动第二次，不降低标准或激活失败成片。
+
+### User Audio Acceptance — 2026-10-02
+
+用户明确反馈“fail主要体现在哪里,声音可以”。Exact task/MP4绑定在 `output-audio-user-feedback.json`；`evaluation-after-user-audio-feedback.json`只补充用户声音PASS，原 `evaluation.json`及音画时间戳完整保留。当前主要失败依据是宠物/果实形态、B跟随A坠落及C附着动作；声音本身不再是未验收项。用户未另行确认手机展示同步或整体画面，不据此激活、改写视觉FAIL或生成第二次。
 
 ## Evidence Index
 
@@ -88,6 +93,7 @@ Overall creative goal **FAIL**：形态、角色动作与音画职责偏差，�
 | H3-FETCH | metaso:2106005640266379264 | coco-nosha-metaso-h3-canvas-method | metaso-h3-canvas-attempt01 | N/A | 7ff47f55bbf19e9014aa7443d37f3a45a1a56bea62a0565707b583469046aba4 | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | runs/coco-nosha-metaso-h3-canvas-method-20261002-001/fetch-receipt.json |
 | H3-MEDIA | metaso:2106005640266379264 | coco-nosha-metaso-h3-canvas-method | metaso-h3-canvas-attempt01 | N/A | 7ff47f55bbf19e9014aa7443d37f3a45a1a56bea62a0565707b583469046aba4 | AGENT_VISUAL | FAIL | MORPHOLOGY_ACTION_AUDIO_PLACEMENT | SAME_EVIDENCE_NEW_PROOF_LAYER | H3-FETCH | runs/coco-nosha-metaso-h3-canvas-method-20261002-001/evaluation.json |
 | H3-ASR | metaso:2106005640266379264 | coco-nosha-metaso-h3-canvas-method | metaso-h3-canvas-attempt01 | N/A | 7ff47f55bbf19e9014aa7443d37f3a45a1a56bea62a0565707b583469046aba4 | ANALYZER | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | H3-FETCH | runs/coco-nosha-metaso-h3-canvas-method-20261002-001/mcp-transcript.json |
+| H3-AUDIO-USER | metaso:2106005640266379264 | coco-nosha-metaso-h3-canvas-method | metaso-h3-canvas-attempt01 | N/A | 7ff47f55bbf19e9014aa7443d37f3a45a1a56bea62a0565707b583469046aba4 | HUMAN_AUDIO | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | H3-FETCH | runs/coco-nosha-metaso-h3-canvas-method-20261002-001/output-audio-user-feedback.json |
 
 ## Learning Evaluation And Next Experiment
 
@@ -97,4 +103,4 @@ Overall creative goal **FAIL**：形态、角色动作与音画职责偏差，�
 
 ## Publication And Remaining Boundaries
 
-代码与记录仅local commits，无push/release。Run/media为任务授权的ignored evidence。Unrelated staged `.codex/config.toml`及另session文件保持，不stage/commit。记录期间零Provider/media生成，未前台刷新RAG或解决AOCI历史debt。输出声线、原画布成片受控比较、Production qualification及真实成片验收仍未完成。
+代码与记录仅local commits，无push/release。Run/media为任务授权的ignored evidence。Unrelated staged `.codex/config.toml`及另session文件保持，不stage/commit。记录及声音反馈补证期间零Provider/media生成，未前台刷新RAG或解决AOCI历史debt。输出声音已获用户接受；原画布成片受控比较、Production qualification及整体成片验收仍未完成。新增human proof仍为同一个attempt，automatic learning evaluation继续no_candidate。
