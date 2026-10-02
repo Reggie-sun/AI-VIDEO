@@ -110,6 +110,7 @@ Harness 不生成媒体或读 secret；CI 自产证据；remote enforcement 必�
 区分 deterministic 与 model-quality uncertainty；后者主导且有安全、有界、已授权或 local exemption、可负担、
 可归因的最小实验时先取证。先核对 exact inputs、remaining budget、outcome、identity/seam、GPU/依赖和归因设计。
 缺 prerequisite 先完成最小补齐；用户明确先做 contract 则遵从。纯确定性任务不生成媒体。
+记录 triage 时说明 `next_empirical_question`、`cheapest_valid_experiment` 与 `blocking_prerequisite`。
 实验隔离于 active truth，PASS/FAIL 不授权 qualification、activation、P6/acceptance，不改变 frozen rubric。
 
 ### HyperFrames Caption Source Readiness

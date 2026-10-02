@@ -120,6 +120,9 @@ def test_new_context_requires_explicit_registration(tmp_path: Path) -> None:
         "../outside.md",
         'missing.md "Safety rules"',
         '../outside.md "Safety rules"',
+        "\nmissing.md\n",
+        "\n.agent/context/detail.md#missing\n",
+        '../outside.md\n "Safety rules"',
     ],
 )
 def test_broken_or_escaping_document_link_is_rejected(
@@ -158,6 +161,19 @@ def test_valid_titled_and_reference_links(tmp_path: Path) -> None:
         '# Guide\n[Detail](.agent/context/detail.md#safety "Safety")\n'
         '[Safety][rules]\n\n[rules]: .agent/context/detail.md#safety "Safety"\n'
     )
+    assert gate.check_repository(root) == []
+
+
+@pytest.mark.parametrize(
+    "target",
+    [
+        "\n.agent/context/detail.md#safety\n",
+        '.agent/context/detail.md#safety\n "Safety rules"',
+    ],
+)
+def test_valid_multiline_links(tmp_path: Path, target: str) -> None:
+    root = fixture_root(tmp_path)
+    (root / "AGENTS.md").write_text(f"# Guide\n[link]({target})\n")
     assert gate.check_repository(root) == []
 
 

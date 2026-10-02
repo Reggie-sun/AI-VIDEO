@@ -52,7 +52,7 @@ def _links(root: Path, path: Path, text: str) -> list[str]:
     errors = []
     # These guides support inline and reference links; reject unparsed targets.
     text = re.sub(r"(?ms)^```.*?^```[^\n]*", "", text)
-    targets = re.findall(r"\]\(([^)\n]*)\)", text)
+    targets = re.findall(r"\]\(([^)]*)\)", text)
     references = {}
     for label, target in re.findall(r"(?m)^ {0,3}\[([^]\n]+)\]:\s*(.+)$", text):
         key = " ".join(label.casefold().split())

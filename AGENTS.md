@@ -124,11 +124,13 @@ paths，使用 `git add <specific-files>`。不 reset/clean/overwrite 他人工�
 遵循现有 patterns、public compatibility 和 module boundaries；distinct responsibility 不追加到 God Module。
 800 effective LOC 与 dependency direction 由 Architecture Gate 管理。行为变更有 public/boundary/failure-path 验证；
 nontrivial frontend 用 integrated browser testing。结构关系按需 CodeGraph，AOCI 只提供 advisory cognition。
+非任务涉及不编辑 `.workflow/`、`runs/` 或生成媒体；tests 使用标准 Production loading/execution seam，不以裸解析旁路造证。
 
 ## Decision Gates
 
 任务目标内必要的 shared contract、有限预算、时间窗口和 recovery rule 变更默认授权 Parent 自主判断、
 self-review、实现、验证并记录。不要逐项请批；用户 spec-only、先审后做、不可调整上限仍优先。
+默认授权与 Gate/Harness 修订不得削弱 Product Invariants、凭据、预算、egress、permit 或真实验收保护。
 Gate/Harness 修订须说明如何改善实际观看体验，保留旧/新规则与真实历史，不为让测试通过降低质量。
 预算耗尽先停止 attempt，核对真实计数/outcome，再有据封存下一有限单元，保留 predecessor/old/new bounds。
 不绕过 guard、重置消费、改写历史或无限执行。Unknown outcome 禁止 retry/remint，先证据/显式 recovery。
@@ -157,6 +159,7 @@ Unmapped path fail safe 到 full tests + task Architecture Gate；不刷新 base
 迁移的 deterministic invariants 由 `agent_rule_invariants` 与原 changed-path suites 验证。离线 PASS 仅证明所测行为。
 Harness 不调度 Agent、不读 Provider secret、不运行 live media、不 mutation Production。CI 自产 evidence；
 workflow 文件不证明 server enforcement。Tool exit 0 / `PARSED` / tests 不代替 required review 或真实验收。
+区分 execution、structure、function、criteria 与 final review 五层证据；`PASS/DONE/ACCEPTED` 须有对应证据，无法验证标 `NOT_EVALUATED`。
 
 ## Completion Standard
 
