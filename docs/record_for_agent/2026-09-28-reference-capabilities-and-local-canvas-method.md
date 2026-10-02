@@ -13,15 +13,15 @@ Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef
 
 ## Current Execution Checkpoint — Sixth Media FAIL And Supported Inertia Repair
 
-### Seventh Physical Submit Accepted And GET Recovery In Progress — 2026-10-02
+### Seventh Physical Submit Accepted, GET Succeeded And Fetch In Progress — 2026-10-02
 
 本节取代下方time04 start尚未返回、只有六次physical消费的当前状态，全部旧证据保留。Canonical `--start` 于2026-10-01 22:54:04.498698 UTC成功登记REQUEST；`--quota` 于23:34:05.904624成功应用6→7，均零Provider effects，保留21M ledger及六笔历史reservation。`--submit` 的fresh preflight于2026-10-02 00:07:21.588929 PASS；唯一第七次POST于01:58:16.386530发出、01:58:17.472928收到HTTP200。Native body仍为SHA `fe3f0cf8f325b837a9c6ac63934650e7a15b252fd8757b1e8ae50cd3f7444570`，三PNG/seed/QA4/profile14输入保持。Actual POST发生在profile14到期前；HTTP响应未被提前当作durable acceptance。
 
-02:37:17.483362 UTC，standard service/committer返回`submit_accepted`、CLI exit0：paid receipt `b91ae9daf79ba6a3d99431579aa9a204ff9eff0bf2d9221b76792f4c57accea7`，submission `5560a08be995cb69fa8527e1a4d428562e2a279566e10418e9bb90ae799fcaf3`。最新观测为Manifest209、video `submitted` / paid `accepted`、receipt存在；观测只读字段不代替standard-loader验证。现有七次physical Vidu消费/clone0，本有限unit新增1/1 POST、quota7/7；旧H3八次和所有permit/grant保留。Physical marker保留“请求开始时待响应/receipt”的原始记录，terminal outcome由canonical receipt证明，不追改marker。
+02:37:17.483362 UTC，standard service/committer返回`submit_accepted`、CLI exit0：paid receipt `b91ae9daf79ba6a3d99431579aa9a204ff9eff0bf2d9221b76792f4c57accea7`，submission `5560a08be995cb69fa8527e1a4d428562e2a279566e10418e9bb90ae799fcaf3`。Submit返回时观测为Manifest209、video `submitted` / paid `accepted`、receipt存在；观测只读字段不代替standard-loader验证。现有七次physical Vidu消费/clone0，本有限unit新增1/1 POST、quota7/7；旧H3八次和所有permit/grant保留。Physical marker保留“请求开始时待响应/receipt”的原始记录，terminal outcome由canonical receipt证明，不追改marker。
 
-新真实证据在 `runs/coco-nosha-vidu-platform-inertia-clock-quota-recovery-20261001-001/`：`canonical-start-result.json`、`canonical-quota-result.json`、`canonical-submit-result.json`和`platform-live-events.jsonl`。02:38 UTC起对同一已接受task执行canonical `--poll` GET，当前等待返回；之后继续`--fetch`和exact MP4 project-local video-analysis Gate。原profile14可用于同一已提交task的GET/fetch恢复，不能据此重新submit或复用旧permit。Seventh媒体、逐Shot质量、声音比较与成片仍未验收；本checkpoint不是任务终点。
+新真实证据在 `runs/coco-nosha-vidu-platform-inertia-clock-quota-recovery-20261001-001/`：`canonical-start-result.json`、`canonical-quota-result.json`、`canonical-submit-result.json`、`canonical-poll-result.json`和`platform-live-events.jsonl`。02:38 UTC启动的canonical `--poll`在本地校验后于04:20:10.935660记录ordinal0 GET开始，04:20:11.304319收到HTTP200，04:20:11.334341返回canonical observation `succeeded`，CLI exit0；没有新增POST。随后启动同一task的canonical `--fetch`（exec session23000），当前等待exact MP4落盘，之后立即执行project-local video-analysis Gate。原profile14用于同一已提交task的GET/fetch恢复，不授权重新submit或复用旧permit。生成状态成功不证明媒体质量；Seventh逐Shot质量、声音比较与成片仍未验收，本checkpoint不是任务终点。
 
-本记录更新不改变runtime source、spec/plan、generation requirements或当前输入；Source implementation仍为`3fd251c6`，此前post-review documentation checkpoint为`3a97eb3`。Learning为`no_candidate`：新证据目前仅证明一次真实submit及durable receipt，未取得新媒体结果，不产生模型/素材/声线claim。canonical Harness仍null，无worktree/push/release/新素材/其他Provider；unrelated `.codex/config.toml`保留。后续真实已知质量结果形成有据修复或通过Gate后，继续剩余Shot和唯一原对白成片，有限额度不足时按task默认授权和canonical owner保留真实消费封存必要的新有限单元，不盲目追加实验。
+本记录更新不改变runtime source、spec/plan、generation requirements或当前输入；Source implementation仍为`3fd251c6`，此前post-review documentation checkpoints为`3a97eb3`和`7dff1bb`。Learning为`no_candidate`：新证据证明真实submit、durable receipt和同一task的GET成功，尚无exact新媒体质量结果，不能产生模型/素材/声线claim。canonical Harness仍null，无worktree/push/release/新素材/其他Provider；unrelated `.codex/config.toml`保留。后续真实已知质量结果形成有据修复或通过Gate后，继续剩余Shot和唯一原对白成片，有限额度不足时按task默认授权和canonical owner保留真实消费封存必要的新有限单元，不盲目追加实验。
 
 ### Round3 Engineering Review Complete And Canonical Start In Progress — 2026-10-02
 
