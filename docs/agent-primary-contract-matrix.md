@@ -1,5 +1,16 @@
 # AI-VIDEO Contract Routing Matrix
 
+## Agent Rule Migration
+
+`.agent/harness/agent-rules.yaml` 只拥有 migrated rule 的 existing check references、offline
+proof boundary 与 guide/context budgets，不复制 surface owners、argv 或 changed-path patterns。
+`scripts/agent_rules_gate.py` 是只读 Development Governance owner，校验非空 registry、known/routed
+checks、context registration、UTF-8 bytes/lines 与 contained Markdown links/anchors；
+`agent_rules_check` 每轮执行，control-plane/Harness delta 另跑 `agent_rule_invariants` 的 existing
+CLI/reader/timeline/dependency/replay tests。Mutation/failure evidence：`tests/test_agent_rules_gate.py`。
+全部 argv/routing 仍由 policy 独占；不 import Product Runtime、不读 credential、不 intercept arbitrary
+Agent commands、不代替逐 Shot MCP、外部授权或成片 human acceptance。Host recipe 的未自动化部分明确保留。
+
 ## Overall Visual Quality
 
 `visual_quality.py` 只提供视觉 authoring 与 evidence 叶类型；五项要求进入原

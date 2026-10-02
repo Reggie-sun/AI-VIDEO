@@ -1,268 +1,74 @@
 # T8 And LatentSync Local Runtime
 
-## Purpose
+## Purpose And Evidence
 
-本文记录 2026-08-25 在当前 RTX 5090 主机上实际验证过的 MiniMax H3 T8
-生成、LatentSync v1.6 嘴型校正、SyncNet 检测与硬字幕运行方式。它是
-Development-side 操作记录，不是 Production Provider profile、Manifest、Registry、
-P6、Final Acceptance 或自动启动授权。
+按需读取的 host-native advisory recipe，不是 Production profile、自动启动授权或 acceptance。
+历史版本、weights hashes、实验结果见
+[2026-08-25 experiment](../../docs/record_for_agent/2026-08-25-t8-latentsync-speaking-subtitle-experiment.md)。
+下面路径/版本先核对当前存在与依赖，不把历史配置当作 current runtime。
 
-运行原则：ComfyUI/T8 与 LatentSync 串行使用 GPU。先完成 T8 生成并显式停止
-ComfyUI，再启动 LatentSync；不要让两套大模型同时驻留显存。
+## Lifecycle And Workflow
 
-## Validated Host Environment
-
-| Surface | Validated value |
-| --- | --- |
-| GPU | `NVIDIA GeForce RTX 5090`, `32607 MiB` |
-| NVIDIA driver | `595.84` |
-| ComfyUI checkout | `/home/reggie/ComfyUI` at `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa` |
-| ComfyUI Python | `/home/reggie/miniconda3/bin/python`, Python `3.13.5` |
-| ComfyUI Torch | `2.9.0+cu128`; torchvision `0.24.0`; SageAttention `2.2.0` |
-| T8 custom node | `/home/reggie/ComfyUI/custom_nodes/minimax-h3-audio-T8` at `28cb160827c245b2d6a37539df30c1d7c5e7aecd` |
-| LatentSync checkout | `/home/reggie/.cache/ai-video/latentsync-v1.6` at `a229c3948406bc2cf6eaf4873e662e70c6a04746` |
-| LatentSync Python | `.venv-5090/bin/python`, Python `3.12.13` |
-| LatentSync Torch | `2.11.0+cu130`; torchvision `0.26.0+cu130` |
-| Main LatentSync packages | diffusers `0.32.2`, transformers `4.48.0`, onnxruntime-gpu `1.21.0`, insightface `0.7.3` |
-
-Current T8 model files used by the quality/20-step route include:
-
-```text
-/home/reggie/ComfyUI/models/diffusion_models/minimax_h3_fl2va_pruned_int8_convrot.safetensors
-/home/reggie/ComfyUI/models/text_encoders/qwen3vl_32b_minimax_h3_nvfp4_awq.safetensors
-/home/reggie/ComfyUI/models/vae/minimax_h3_video_vae_fp16.safetensors
-/home/reggie/ComfyUI/models/vae/minimax_h3_audio_vae_fp32.safetensors
-```
-
-## T8-Only Workflow Boundary
-
-本路线的生成 graph 使用 T8 自有组件：
-
-```text
-MiniMaxH3AudioConditioningT8
-  -> MiniMaxH3DualClockSamplerT8
-  -> MiniMaxH3AVDecodeT8
-```
-
-`/home/reggie/ComfyUI/custom_nodes/ComfyUI-MiniMax-H3-Turbo` 是主机上预先存在的
-checkout，但本路线不安装、不更新、不修改也不调用它。T8-only request 必须满足：
-
-- 不出现 `MiniMaxH3TurboLoRA`；
-- 不出现 `MiniMaxH3TurboSampler`；
-- 不出现 `LoraLoaderBypassModelOnly`；
-- 不加载任何 Turbo LoRA；
-- sampling-policy owner 只有一个 `MiniMaxH3DualClockSamplerT8`。
-
-ComfyUI 启动时可能发现并注册所有已安装 custom nodes；节点被注册不等于 workflow
-使用它。是否使用 Larry/Turbo 必须以 exact submitted graph 为准。
-
-## Supervised ComfyUI Lifecycle
-
-只使用 repository owner `scripts/comfyui_supervisor.py`。不要用 `nohup`、后台 shell、
-可复用 unit name 或直接运行长期 `main.py`。
+T8 与 LatentSync 串行占 GPU；完成 T8 fetch/decode 后显式停止 ComfyUI，再启动 lip-sync。
+ComfyUI 仅用 repository `scripts/comfyui_supervisor.py`，不 nohup/裸 main.py/复用 unit。
 
 ```bash
-cd /home/reggie/vscode_folder/AI-VIDEO
-
 python scripts/comfyui_supervisor.py status
-
-python scripts/comfyui_supervisor.py start \
-  --comfy-root /home/reggie/ComfyUI \
-  --python /home/reggie/miniconda3/bin/python \
-  --port 8188 \
-  --health-timeout 60
-
+python scripts/comfyui_supervisor.py start --comfy-root /home/reggie/ComfyUI --python /home/reggie/miniconda3/bin/python --port 8188 --health-timeout 60
 python scripts/comfyui_supervisor.py logs --lines 100
-```
-
-`start` 创建一次性的 `ai-video-comfyui-<32-lowercase-hex>.service` user-systemd
-transient unit，固定 `127.0.0.1:8188`、`Restart=no` 与
-`--use-sage-attention`；默认不传强制VRAM mode。启动后仍需单独检查应用 queue；service active 不能证明
-queue empty、生成成功或媒体质量通过。
-
-默认使用ComfyUI的NORMAL GPU memory management；在支持FP16的CUDA设备上，text encoder可在GPU执行，使用后仍可offload到CPU。当前版本没有`--normalvram`参数，不使用`--gpu-only`固定全部模型在显存中。该device selection不保证所有模型能完整驻留显存，也不证明LoRA采样OOM已修复。只有task明确授权以更高CPU offload换取更低GPU占用时，才在
-`start`后追加`--novram`；它会让text encoder走CPU。既有显式选项继续可用，默认不再隐式传递`--lowvram`：
-
-```bash
-python scripts/comfyui_supervisor.py start \
-  --comfy-root /home/reggie/ComfyUI \
-  --python /home/reggie/miniconda3/bin/python \
-  --port 8188 \
-  --health-timeout 60 \
-  --novram
-```
-
-```bash
-curl --fail --silent http://127.0.0.1:8188/system_stats >/dev/null
-curl --fail --silent http://127.0.0.1:8188/queue | jq .
-```
-
-提交工作前确认 queue empty；只提交 accepted scope 内的 exact request。生成完成、输出
-fetch 与 decode 验证结束后：
-
-```bash
-cd /home/reggie/vscode_folder/AI-VIDEO
+curl --fail --silent http://127.0.0.1:8188/queue
 python scripts/comfyui_supervisor.py stop
-python scripts/comfyui_supervisor.py status
-ss -ltnp | rg ':8188\b' || true
 ```
 
-若非登录 shell 报 `Failed to connect to bus`，先确认当前用户 runtime bus 实际存在，
-再在同一用户 session 中恢复以下 task-scoped values；不要切换到 root systemd：
+使用前确认 queue empty、unique request 与 exact loopback listener ownership；service active 不证明媒体成功。
+默认 normal GPU memory management + SageAttention，无隐式 lowvram；仅 accepted task 要 CPU offload 时显式 novram。
+非登录 shell 的 bus failure 先核对同用户 `/run/user/<uid>/bus`；不切 root systemd。
+T8-only graph 必须包含 Conditioning/DualClockSampler/AVDecode T8，单一 sampling owner；
+不能用 TurboLoRA/TurboSampler/BypassModelOnly 或 Turbo weights。已注册 plugin 不证明提交 graph 用了它。
+这些 lifecycle/profile 约束由 policy `local_comfyui_supervisor_tests` 与 Provider suites 验证；live graph 仍须重开核对。
 
-```bash
-export XDG_RUNTIME_DIR="/run/user/$(id -u)"
-export DBUS_SESSION_BUS_ADDRESS="unix:path=$XDG_RUNTIME_DIR/bus"
-test -S "$XDG_RUNTIME_DIR/bus"
-```
+## LatentSync Preflight And Inference
 
-## LatentSync Weights
-
-Validated files:
-
-| File | SHA-256 |
-| --- | --- |
-| `checkpoints/latentsync_unet.pt` | `0a478e89eb660f82da4c35dbdde8a5adfb27f99d1b4e50edd03729e1e98316d3` |
-| `checkpoints/auxiliary/syncnet_v2.model` | `961e8696f888fce4f3f3a6c3d5b3267cf5b343100b238e79b2659bff2c605442` |
-| `checkpoints/auxiliary/sfd_face.pth` | `d54a87c2b7543b64729c9a25eafd188da15fd3f6e02f0ecec76ae1b30d86c491` |
-| `checkpoints/whisper/tiny.pt` | `65147644a518d12f04e32d6f3b26facc3f8dd46e5390956a9424a650c0ce22b9` |
-
-LatentSync 的 `.venv-5090` 是基于本机 ComfyUI Python 3.12 environment 的 isolated
-overlay；不要用 `/home/reggie/miniconda3/bin/python` 运行 LatentSync。
-
-## CUDA 13 NVRTC Preflight
-
-Torch `2.11.0+cu130` 需要 CUDA 13 NVRTC builtins。库已存在，但 overlay 启动时若
-没有正确的 dynamic-library search path，会在 face affine transform 阶段失败：
-
-```text
-nvrtc: error: failed to open libnvrtc-builtins.so.13.0
-```
-
-不要重装整套 CUDA 或 blind retry。先设置本次进程使用的精确目录并运行最小复现：
-
-```bash
-export LATENTSYNC_CUDA_LIB=/home/reggie/micromamba/envs/comfyui/lib/python3.12/site-packages/nvidia/cu13/lib
-export LD_LIBRARY_PATH="$LATENTSYNC_CUDA_LIB${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-
-/home/reggie/.cache/ai-video/latentsync-v1.6/.venv-5090/bin/python - <<'PY'
-import torch
-x = torch.eye(2, device="cuda")
-print(torch.__version__, torch.version.cuda, torch.det(x.float()).item())
-PY
-```
-
-Validated result is Torch `2.11.0+cu130`, CUDA `13.0`, determinant `1.0`.
-
-## LatentSync Inference
-
-先确认 ComfyUI 已停止，并为输入 MP4 提取 exact 16 kHz mono PCM：
-
-```bash
-INPUT_VIDEO=/absolute/path/to/t8-source-audio.mp4
-INPUT_AUDIO=/tmp/t8-source-16k.wav
-OUTPUT_VIDEO=/absolute/path/to/latentsync-output.mp4
-
-ffmpeg -y -v error -i "$INPUT_VIDEO" -vn \
-  -ac 1 -ar 16000 -c:a pcm_s16le "$INPUT_AUDIO"
-
-ss -ltnp | rg ':8188\b' || true
-nvidia-smi --query-gpu=name,memory.used,memory.free --format=csv,noheader
-```
-
-从 LatentSync checkout 运行：
+使用 `/home/reggie/.cache/ai-video/latentsync-v1.6/.venv-5090/bin/python`，不使用 ComfyUI Python。
+先核对 GPU、checkout、weights 和每帧 usable face；拒绝只为修嘴型破坏已满足整体观看要求的方案。
+CUDA 13 NVRTC 缺 builtins 先最小复现，不重装 CUDA/blind retry。下例独立 task paths 用实际 identity 替换，
+existing outputs 不覆盖；ComfyUI 必须已经停止。
 
 ```bash
 cd /home/reggie/.cache/ai-video/latentsync-v1.6
-
 export LATENTSYNC_CUDA_LIB=/home/reggie/micromamba/envs/comfyui/lib/python3.12/site-packages/nvidia/cu13/lib
 export LD_LIBRARY_PATH="$LATENTSYNC_CUDA_LIB${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-
-HF_HOME=/home/reggie/.cache/ai-video/huggingface \
-HF_HUB_CACHE=/home/reggie/.cache/ai-video/huggingface/hub \
-HF_HUB_OFFLINE=1 \
-TRANSFORMERS_OFFLINE=1 \
-NO_ALBUMENTATIONS_UPDATE=1 \
+.venv-5090/bin/python -c 'import torch; print(torch.det(torch.eye(2,device="cuda")).item())'
+ffmpeg -v error -i /absolute/task/source.mp4 -vn -ac 1 -ar 16000 -c:a pcm_s16le /absolute/task/source-16k.wav
+HF_HUB_OFFLINE=1 TRANSFORMERS_OFFLINE=1 NO_ALBUMENTATIONS_UPDATE=1 \
 .venv-5090/bin/python -m scripts.inference \
-  --unet_config_path configs/unet/stage2_512.yaml \
-  --inference_ckpt_path checkpoints/latentsync_unet.pt \
-  --inference_steps 20 \
-  --guidance_scale 1.5 \
-  --seed 1247 \
-  --video_path "$INPUT_VIDEO" \
-  --audio_path "$INPUT_AUDIO" \
-  --video_out_path "$OUTPUT_VIDEO" \
-  --temp_dir /tmp/latentsync-task-temp
+  --unet_config_path configs/unet/stage2_512.yaml --inference_ckpt_path checkpoints/latentsync_unet.pt \
+  --inference_steps 20 --guidance_scale 1.5 --seed 1247 \
+  --video_path /absolute/task/source.mp4 --audio_path /absolute/task/source-16k.wav \
+  --video_out_path /absolute/task/corrected.mp4 --temp_dir /absolute/task/latentsync-temp
 ```
 
-LatentSync v1.6 会把视频规范化到 25 fps；这不是 T8 generation setting 变化。
-输出后必须重新 `ffprobe` 并做 video/audio full decode。
+历史 v1.6 输出规范化为 25 fps；重新 probe + video/audio full decode，不把它当 T8 setting 变化。
+离线 env 不授权自动模型下载；缺依赖停在当前证据边界。
 
-## SyncNet Comparison
+## SyncNet And Subtitles
 
-对原 T8 source 与 LatentSync output 使用不同的 `--temp_dir`，保持同一模型：
+同一 SyncNet model，对 source/output 分开 temp dirs：
 
 ```bash
-cd /home/reggie/.cache/ai-video/latentsync-v1.6
-
-NO_ALBUMENTATIONS_UPDATE=1 \
-.venv-5090/bin/python -m eval.eval_sync_conf \
+NO_ALBUMENTATIONS_UPDATE=1 .venv-5090/bin/python -m eval.eval_sync_conf \
   --initial_model checkpoints/auxiliary/syncnet_v2.model \
-  --video_path "$INPUT_VIDEO" \
-  --temp_dir /tmp/syncnet-source
-
-NO_ALBUMENTATIONS_UPDATE=1 \
-.venv-5090/bin/python -m eval.eval_sync_conf \
-  --initial_model checkpoints/auxiliary/syncnet_v2.model \
-  --video_path "$OUTPUT_VIDEO" \
-  --temp_dir /tmp/syncnet-output
+  --video_path /absolute/task/corrected.mp4 --temp_dir /absolute/task/syncnet-output
 ```
 
-若该 shell 没有继承前述 `LD_LIBRARY_PATH`，先重新执行 CUDA 13 NVRTC preflight。
-SyncNet confidence/offset 只属于 automated technical evidence；它不能证明中文逐字
-viseme、自然度、声音语义或 human full-speed acceptance。
+若 NVRTC 失败重查本次 library path；分别报告 source/output metrics。confidence/offset 不证明中文逐字 viseme、
+声音语义/自然度或 human full-speed acceptance。
+字幕从 accepted dialogue 或实际转写/人工确认取时间，不能把 prompt 当 native audio 事实。
+先核对当前 ffmpeg filter/font availability；libass 不可用时 drawtext 使用 exact Noto CJK font 和 UTF-8 textfile，
+编码 video、`-c:a copy`。最终 full decode + decoded PCM hash 比较；字幕排版/遮挡与嘴型仍需观看。
 
-## Burned Chinese Subtitles
+## Completion Boundary
 
-当前 `/home/reggie/miniconda3` ffmpeg 没有 `subtitles/libass` filter，但有
-`drawtext/libfreetype`。使用 Noto CJK 字体烧录固定文本，音轨用 `-c:a copy`：
-
-```bash
-CAPTION_TEXT=/tmp/caption.txt
-SUBTITLED_VIDEO=/absolute/path/to/subtitled-output.mp4
-
-printf '%s\n' '我们快到了，再往前走一段。' >"$CAPTION_TEXT"
-
-ffmpeg -y -v error -i "$OUTPUT_VIDEO" \
-  -vf "drawtext=fontfile=/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc:textfile=$CAPTION_TEXT:fontcolor=white:fontsize=36:borderw=2:bordercolor=black:x=(w-text_w)/2:y=h-text_h-42:enable='between(t\,0.8\,3.9)'" \
-  -c:v libx264 -preset medium -crf 17 -pix_fmt yuv420p \
-  -c:a copy -movflags +faststart "$SUBTITLED_VIDEO"
-```
-
-字幕时间必须来自 accepted dialogue contract 或实际转写/人工确认，不能把 prompt 文本
-自动当作 native audio 的逐字事实。烧录后再次 full decode，并比较烧录前后 decoded PCM
-hash，确认字幕步骤没有更换音轨。
-
-## Validation Checklist
-
-```text
-[ ] exact request graph contains T8 nodes and no Larry/Turbo/LoRA nodes
-[ ] supervised unit owns exact 127.0.0.1:8188 listener
-[ ] queue empty before unique submit
-[ ] T8 output has video and audible audio streams
-[ ] full video/audio decode passes
-[ ] ComfyUI is stopped before LatentSync
-[ ] CUDA 13 torch.det preflight passes
-[ ] every source frame retains a usable face before lip-sync processing
-[ ] LatentSync output full decode passes
-[ ] source/output SyncNet metrics are reported separately
-[ ] subtitle render is visually inspected and preserves corrected audio
-[ ] human full-speed lip-sync and voice verdict remains explicit
-```
-
-## Provenance Boundary
-
-这套环境目前是 host-native checkout + isolated Python overlay，不是 Docker。不要因为
-本文存在就自动下载、更新、启动、提交媒体、retry、fallback 或进入 Production lifecycle。
-Larry plugin 的 installed presence、T8 technical completion、LatentSync success 与 SyncNet
-offset `0` 均不能单独升级为 Production qualification、P6 或 Final Acceptance。
+逐 Shot 使用显式 video-analysis Gate；全部媒体 effects 走当前 accepted seams，不裸 submit、自动 retry/fallback。
+本 recipe 没有通用 lip-sync execution Harness：当前 GPU/queue、CUDA、face availability 与输出仍须实际取证。
+Host-native checkout 不是 Docker；technical completion、SyncNet offset 0、历史实验不产生 qualification/P6/Final Acceptance。

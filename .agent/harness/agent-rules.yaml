@@ -1,0 +1,55 @@
+version: 1
+context_max_bytes: 24000
+documents:
+  - path: AGENTS.md
+    max_lines: 180
+    max_bytes: 14000
+  - path: .agent/context/control-plane-playbook.md
+    max_lines: 210
+    max_bytes: 18000
+  - path: .agent/context/t8-latentsync-local-runtime.md
+    max_lines: 90
+    max_bytes: 6000
+
+# Only proof references; argv and changed-path ownership stay in policy.yaml.
+rules:
+  - id: legacy-validate-resume
+    checks: [agent_rule_invariants, cli_config_tests, legacy_runtime_tests]
+    proof: offline_regression
+    remaining: CLI compatibility and recovery tests do not authorize new runtime effects.
+  - id: strict-read-only-project
+    checks: [agent_rule_invariants, production_reader_tests]
+    proof: offline_regression
+    remaining: Selected live artifact bytes still need strict reopening.
+  - id: canonical-timeline
+    checks: [agent_rule_invariants, production_composition_audio_tests]
+    proof: offline_regression
+    remaining: Deterministic timeline tests do not establish final audio or visual acceptance.
+  - id: precise-invalidation
+    checks: [agent_rule_invariants, production_dependency_tests]
+    proof: offline_regression
+    remaining: Dependency tests cover typed graph behavior rather than creative quality.
+  - id: unknown-outcome-and-replay
+    checks: [agent_rule_invariants, production_video_provider_tests]
+    proof: offline_regression
+    remaining: Actual outcome must be established by canonical evidence before recovery.
+  - id: runtime-skill-boundary
+    checks: [product_runtime_skill_boundary_tests]
+    proof: structure_only
+    remaining: Source scanning cannot intercept arbitrary Agent shell commands or verify Skill selection.
+  - id: final-output-no-regression
+    checks: [final_output_no_regression_tests, visual_quality_tests]
+    proof: offline_regression
+    remaining: Exact final media viewing and all applicable human findings remain required.
+  - id: director-coverage
+    checks: [open_video_skill_tests, seedance_authoring_skill_tests]
+    proof: offline_regression
+    remaining: Validator coverage does not prove natural-language constraint completeness or Director judgment.
+  - id: local-supervisor
+    checks: [local_comfyui_supervisor_tests]
+    proof: offline_regression
+    remaining: Runtime GPU occupancy, queue, dependencies and media quality require current host evidence.
+  - id: documentation-and-receipts
+    checks: [agent_rules_check, docs_contract_check, harness_tests, policy_audit_check]
+    proof: structure_only
+    remaining: Receipt integrity and documentation consistency never grant publish or Production acceptance.

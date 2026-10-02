@@ -85,6 +85,7 @@ audit_unreferenced_test_exempt_patterns:
 always_check_ids:
   - scope_diff_check
   - docs_contract_check
+  - agent_rules_check
   - policy_audit_check
   - product_runtime_skill_boundary_tests
 
@@ -93,6 +94,31 @@ fallback_check_ids:
   - task_architecture_gate
 
 checks:
+  agent_rules_check:
+    argv: [python, -m, scripts.agent_rules_gate]
+    cwd: .
+    execution_priority: 12
+    description: Verify rule-to-check references, guide/context byte and line budgets, contained links and context registration; no Product effects.
+  agent_rule_invariants:
+    argv:
+      - python
+      - -m
+      - pytest
+      - -p
+      - no:cacheprovider
+      - tests/test_agent_rules_gate.py
+      - tests/test_cli.py::test_validate_returns_zero_for_example_project
+      - tests/test_pipeline.py::test_resume_skips_completed_shots
+      - tests/test_pipeline.py::test_resume_manifest_write_failure_rolls_back_promoted_artifacts
+      - tests/test_production_project.py::test_load_rejects_active_project_symlink_escape
+      - tests/test_production_project.py::test_reader_reopens_exact_generated_voice_graph_without_writes_or_network
+      - tests/test_production_composition.py::test_p4_resolves_all_audio_kinds_and_captions_in_one_timeline
+      - tests/test_production_dependency.py::test_resolve_dependency_state_keeps_unrelated_node_fresh_across_graph_revision
+      - tests/test_production_paid_provider.py::test_unknown_outcome_keeps_reservation_unsettled_and_never_releases_zero
+      - tests/test_production_video_unsubmitted.py::test_close_retains_exact_request_history_budget_and_replays_without_writes
+      - -q
+    cwd: .
+    description: Execute migrated guide invariants through existing public CLI, reader, timeline, dependency and recovery tests; offline regression proof only.
   visual_quality_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_visual_quality.py, tests/test_visual_quality_report.py, -q]
     cwd: .
@@ -337,6 +363,7 @@ checks:
     timeout_seconds: 1800
     execution_priority: 30
     covers_check_ids:
+      - agent_rule_invariants
       - visual_quality_tests
       - creative_goal_binding_tests
       - paid_reconciliation_tests
@@ -510,15 +537,18 @@ categories:
       - Makefile
       - docs/agent-primary-contract-matrix.md
       - scripts/docs_contract_gate.py
+      - scripts/agent_rules_gate.py
       - scripts/agent_harness_audit.py
       - scripts/agent_harness.py
       - scripts/agent_harness_*.py
       - scripts/harness_pytest_guard.py
       - tests/test_agent_harness.py
       - tests/test_docs_contract_gate.py
+      - tests/test_agent_rules_gate.py
       - .agent/harness/**
     check_ids:
       - harness_tests
+      - agent_rule_invariants
   generation_feedback:
     patterns:
       - docs/superpowers/artifacts/drama/jieshi-episode-01/s02-prospective-qa-v2.json
@@ -1324,8 +1354,7 @@ categories:
       - skills-lock.json
       - provider-console/.gitignore
       - docs/agent-primary-contract-matrix.md
-      - .agent/context/control-plane-playbook.md
-      - .agent/context/session-handoff.md
+      - .agent/context/**
       - .agent/bug-memory/**
       - .agent/harness/policy.yaml
       - scripts/__init__.py
@@ -1333,3 +1362,4 @@ categories:
       - tests/test_claude_code_adapter.py
     check_ids:
       - harness_tests
+      - agent_rule_invariants
