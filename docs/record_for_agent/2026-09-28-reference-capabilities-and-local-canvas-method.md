@@ -11,7 +11,25 @@ Session window: 2026-09-27–2026-10-02, Asia/Hong_Kong
 Original checkpoint: `dfb11626d9bab4f6c4c9a19db2ea2c5c5d102d7c`
 Continuation implementation checkpoint: `17aca1057783a2fde6c442e9ebceb8acc010cef9`
 
-## Current Execution Checkpoint — Seventh Known Failure Closed, Glancing Repair Preparation
+## Current Execution Checkpoint — Eighth Quality Rejection, Stop Additional Experiments
+
+2026-10-02：本节取代下方第八尚在副本准备、七次消费和源音试听未回答的当前状态；全部历史rubric、FAIL、rejection、permit/grant和消费保留。任务仍未交付成片，ground与其余Shots未提交。
+
+第八有限单元位于`runs/coco-nosha-vidu-glancing-contact-repair-20261002-001/`，原三PNG/QA4/五镜/原WAV保持，只测试B头先经过A、身体中段擦撞及独立受支撑离开。准备副本为filesystem mirror而非worktree；实际fresh profile15窗口09:39:53–10:39:53 UTC，REAL preview/Authorization重新封存。首轮exact双审发现task transport在audit fsync/event/stdout后缺少实际POST时钟复核，Parent确认并用两项可靠RED复现；run-local callback补在inner POST前，保留已消费permit/fence和canonical UNKNOWN拒绝语义。49项检查通过，旧副本的证明明确不覆盖该新POST分支。Round2两独立context对target`1e87067a092a2355696bed81d1599d2f8d41e2b541cfef45eea4f92c08d36395`均无findings，Parent核90 original/frozen hashes后只准入1次提交；未增加Kimi请求或重置其故障/消费。
+
+原service/committer于10:16:13登记REQUEST、10:23:35应用同task quota7→8；Budget Guard、credential supplier、exact body/preview/Authorization、egress、paid intent及one-use permit均沿原owner。10:29:30唯一POST、HTTP200，10:30:22 durable acceptance：paid receipt`b2cbe99adc0131c925cf64b0004ba2d4ee8766c2afdf9585626804fdadb49e5c`、submission`b11519c61895067aa6f3e236d1bcd6f264efbe2863f6007eab2b36241ffa563d`。一次GET为succeeded，10:34:24 fetch落盘。Actual native body SHA`4fa69144cb1fbbe4f45f2c771003942dcc1c7d8a874fa2419467e74d310f48c3`、7,562,856 bytes，delta为声明的prompt/seed；没有其他media Provider、新素材或第二次POST。
+
+Exact MP4为`runs/coco-nosha-vidu-voice-recovery-20260930-001/production-v2/state/video-generation/fetch/files/cc346d60706ee2d7774ea4e39c60c4e3536d1169c158917f1878ddad06c2ae84.mp4`，SHA同文件名，3,391,546 bytes、5.042秒/121帧/24fps/1280×720/H264/静音。落盘后立即显式project-local video-analysis：11个半秒帧全部检查，51个0.1秒细帧中实际检查14个1280px帧，held-fd canonical probe一致。Gate`platform-post-media-gate-v2.json` SHA`13fbc5820d0a6b143e32941c8b6691446ad8bc9eb63383b9672574e5557fcf0c`：output/mute PASS，action/continuity/identity FAIL。B接触早于A反应已有证据、头3.2秒先经过A，但4.3–4.8秒仍从同一前左边缘跟随坠落；1.8/2.2/2.5/2.8秒清晰正面显示A六只琥珀眼，违背原文四眼。总六足/体积/腹褶等仍单列NE，不从遮挡推断错误，不增加逐帧无遮挡微接触要求。Standard loader重开Manifest223的fetch/request/QA身份和八reservations/24M内部operator ceiling一致；此上限不是官方报价。
+
+Canonical technical proof已登记experience`b5eeb4f5fa68238323a0aaa1bc80d8e5005d26f76d64b8a98ee5e040ee443fc0`，两technical required PASS；analyzer experience`b373501d6372ef19215994b1179b10ca2bbff704200b692cde9148017c1507f6`记录三个视觉required FAIL，diagnosis为QUALITY_FAILURE。原committer `reject_video_generation`已返回并由standard loader重开Manifest226，status failed / video_quality_rejected，receipt`4fe9742fd74528f050c416b52775fc76af1e99705bbf9b80687e854f4e1be9b7`，消费8完整保留。证据见同目录`platform-feedback-technical.json`、`platform-feedback-analyzer.json`、`platform-quality-rejection.json`。Media未接受/激活，完整正常速度观看及成片检查未完成。
+
+用户已实际试听并回复“已试听：声线一致，目标对白完整且只说一次”。`source-audio-user-listening-feedback.json`重核原MP3和WAV bytes，source voice/完整单次对白为PASS_USER_LISTENING；此证据取代下方历史未回答状态，不能代替final mix、同步或成片对白次数。无repeat/pad/synthesis/clone，唯一原WAV SHA`52975f4a3df74a4ec294f712d6afdc563d1da770323bc59f912dba2d58fffb77`保持。
+
+Parent停止追加付费实验：第八再次出现B追落，新增六眼身份违背；目前没有可隔离且有证据的新修复变量支持第九次，不机械续预算/换seed或生成后续Shot。前两次仅改seed/profile未隔离成因，之后分Shot与空间/接触路径修复仍未得到可接受平台末状态；早期gate过重和历史校验工程造成额外等待，工程检查不能算媒体进展。这个停止判断不证明必须补四图或当前Provider普遍无效；恢复须先有新的可归因修复依据，涉及新素材/其他Provider时再取得对应授权。后续仍需合格平台/其余Shot、canonical content-driven timeline问题处理、P4/HyperFrames合成、最终观看/聆听与同步验收。
+
+Automatic learning为no_candidate：多次失败保存为本任务观察，prompt/seed变化未隔离通用修正规则，无新的adoption target；不制造Learning Claim或改变Gate。AOCI本continuation完整交付已确认，strict attestation因Schema未完成而不声称可靠完整认知；稳定后一次maintain返回blocked/0candidates、六stale/75 observed pending，无formal写入或scope ACK，按当前源码调查。无push/release/worktree，canonical Harness=null，unrelated `.codex/config.toml`保留。
+
+## Historical Execution Checkpoint — Seventh Known Failure Closed, Glancing Repair Preparation
 
 ### Canonical Feedback Closure And Source Verification — 2026-10-02
 

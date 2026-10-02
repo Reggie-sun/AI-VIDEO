@@ -170,3 +170,9 @@ Parent拒绝下降跟拍v1候选：独立concept finding `CC07-01`指出B自身s
 **Self-Review:** 默认任务授权覆盖此有据finite unit；范围没有新素材/Provider/egress/release、接受标准或canonical ownership变化。不同朝向pose具有第七片持续尖端接触的直接证据，比同prompt改seed更可归因，但身份NE仍须完整重验且未宣称必然成功。完成第七canonical反馈/明确closure→新durable plan→最小helper变更/原fixture和canonical副本验证→exact target适用独立审查后才真实submit；每片立即MCP Gate，required未全PASS不推进ground。第八失败/缺证结束该单元，后续只能依据新证据和不同可隔离路径决定修复，不机械续期或重复同变量。Unknown outcome立即停。声音实际channel不支持听觉，已发出的源音频试听反馈和final mix分别保留NE；不会以ASR或沉默关闭。
 
 Self-Review：这是默认任务授权内的过期首次publication拒绝和已观察准备成本下的有限窗口恢复，不扩大素材、Provider/model/egress、monetary数值、physical ceiling或QA。没有第二writer/timeline、cache、自动retry或未知结果推断；全部工程证据不能充当成片完成。
+
+## Glancing Unit Outcome And Source Listening — 2026-10-02
+
+第八有限单元已实际消费唯一POST并fetch exact MP4`cc346d60706ee2d7774ea4e39c60c4e3536d1169c158917f1878ddad06c2ae84`。当前QA4/原要求保持：显式MCP发现B仍跟随A从前左边缘坠落，A六眼违背原四眼；action/continuity/identity FAIL，技术/静音PASS。Canonical technical/analyzer及原committer质量拒绝已完成，standard重开Manifest226，不把raw Gate当activation。8/8、clone0及全部历史保留，缺少新的可隔离修复依据时停止，不继续换seed/续预算。没有据此增设必需四图blocker或授权新素材/其他Provider。
+
+用户实际试听已确认source声线一致、完整目标对白仅一次，exact证据为`runs/coco-nosha-vidu-glancing-contact-repair-20261002-001/source-audio-user-listening-feedback.json`，取代上方历史pending/NE源音状态；final mix/同步/成片观看聆听仍NE。此处仅登记已执行结果，不改变sealed requirements或原音轨。
