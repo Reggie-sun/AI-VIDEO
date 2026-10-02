@@ -9,6 +9,10 @@ evidence_index_version: "1"
 
 Date: 2026-10-02
 
+## Follow-up Scope — 2026-10-02
+
+用户随后要求“关键是后面能不能保持一致性,角色你再做两个shot看看”，另行授权两个后续H3 Shot，使用同三PNG及前段视频参考。结果见[角色连续性记录](2026-10-02-metaso-h3-character-continuity.md)：有限转头/俯身/侧向行走中的COCO/Nosha可辨外观保持，次要宠物/道具承接仍不完整。下文第一轮FAIL、消费和声音接受保持；末尾原“下一次宠物职责修复”建议属于当时历史方向，不代表已执行或当前要求。
+
 ## Purpose And Boundary
 
 先读取任务初始HEAD `13cad76`（第八次Vidu quality rejection）、原画布记录及当前baseline，只接METASO MiniMax-H3并验证一次完整multimodal画布方法。用户明确排除新大Spec/Plan、Seedance、T8、本地H3、MiniMax官方API、新Vidu、新素材、UI、fallback与连续抽卡。原Vidu 8/8及旧local H3消费保持；本轮独立 **1 request / 1 candidate**。
