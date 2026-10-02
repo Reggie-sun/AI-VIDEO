@@ -113,7 +113,14 @@ def test_new_context_requires_explicit_registration(tmp_path: Path) -> None:
 
 
 @pytest.mark.parametrize(
-    "target", ["missing.md", ".agent/context/detail.md#missing", "../outside.md"]
+    "target",
+    [
+        "missing.md",
+        ".agent/context/detail.md#missing",
+        "../outside.md",
+        'missing.md "Safety rules"',
+        '../outside.md "Safety rules"',
+    ],
 )
 def test_broken_or_escaping_document_link_is_rejected(
     tmp_path: Path, target: str
@@ -128,6 +135,30 @@ def test_document_symlink_is_rejected(tmp_path: Path) -> None:
     (root / "AGENTS.md").unlink()
     (root / "AGENTS.md").symlink_to(root / ".agent/context/detail.md")
     assert any("symlink" in e for e in gate.check_repository(root))
+
+
+@pytest.mark.parametrize(
+    "reference",
+    [
+        "[safety][rules]\n\n[rules]: missing.md",
+        '[safety][rules]\n\n[rules]: ../outside.md "Safety"',
+        "[rules][]\n\n[rules]: missing.md",
+        "[safety][missing]",
+    ],
+)
+def test_broken_reference_links_fail_closed(tmp_path: Path, reference: str) -> None:
+    root = fixture_root(tmp_path)
+    (root / "AGENTS.md").write_text("# Guide\n" + reference + "\n")
+    assert gate.check_repository(root)
+
+
+def test_valid_titled_and_reference_links(tmp_path: Path) -> None:
+    root = fixture_root(tmp_path)
+    (root / "AGENTS.md").write_text(
+        '# Guide\n[Detail](.agent/context/detail.md#safety "Safety")\n'
+        '[Safety][rules]\n\n[rules]: .agent/context/detail.md#safety "Safety"\n'
+    )
+    assert gate.check_repository(root) == []
 
 
 def test_total_context_budget_and_non_markdown_anchor(tmp_path: Path) -> None:

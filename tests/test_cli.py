@@ -1,5 +1,11 @@
+import builtins
+import io
+import socket
 from pathlib import Path
 
+import pytest
+
+from ai_video import cli
 from ai_video.cli import main
 
 
@@ -20,6 +26,46 @@ def test_validate_returns_one_for_bad_config(tmp_path, capsys):
     captured = capsys.readouterr()
     assert code == 1
     assert "config" in captured.err.lower() or "validation" in captured.err.lower()
+
+
+@pytest.mark.parametrize("invalid", [False, True])
+def test_validate_has_no_filesystem_network_or_generation_effects(
+    example_project_files, tmp_path, monkeypatch, invalid
+):
+    project, shots = example_project_files
+    if invalid:
+        project.write_text("project_name: incomplete\n", encoding="utf-8")
+    before = {
+        str(p.relative_to(tmp_path)): p.read_bytes() if p.is_file() else None
+        for p in tmp_path.rglob("*")
+    }
+
+    def reject_effect(*args, **kwargs):
+        raise AssertionError("validate must not create artifacts, connect or generate")
+
+    def read_only_open(original):
+        def guarded(file, mode="r", *args, **kwargs):
+            if any(flag in mode for flag in "wax+"):
+                reject_effect()
+            return original(file, mode, *args, **kwargs)
+
+        return guarded
+
+    monkeypatch.setattr(builtins, "open", read_only_open(builtins.open))
+    monkeypatch.setattr(io, "open", read_only_open(io.open))
+    monkeypatch.setattr(Path, "mkdir", reject_effect)
+    monkeypatch.setattr(socket, "getaddrinfo", reject_effect)
+    monkeypatch.setattr(socket.socket, "connect", reject_effect)
+    monkeypatch.setattr(socket.socket, "connect_ex", reject_effect)
+    monkeypatch.setattr(cli, "PipelineRunner", reject_effect)
+
+    assert main(["validate", "--project", str(project), "--shots", str(shots)]) == (
+        1 if invalid else 0
+    )
+    assert before == {
+        str(p.relative_to(tmp_path)): p.read_bytes() if p.is_file() else None
+        for p in tmp_path.rglob("*")
+    }
 
 
 def test_validate_accepts_ui_workflow_template(tmp_path, capsys):

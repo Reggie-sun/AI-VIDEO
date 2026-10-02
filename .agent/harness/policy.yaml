@@ -107,7 +107,7 @@ checks:
       - -p
       - no:cacheprovider
       - tests/test_agent_rules_gate.py
-      - tests/test_cli.py::test_validate_returns_zero_for_example_project
+      - tests/test_cli.py::test_validate_has_no_filesystem_network_or_generation_effects
       - tests/test_pipeline.py::test_resume_skips_completed_shots
       - tests/test_pipeline.py::test_resume_manifest_write_failure_rolls_back_promoted_artifacts
       - tests/test_production_project.py::test_load_rejects_active_project_symlink_escape

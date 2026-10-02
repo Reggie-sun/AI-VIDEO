@@ -50,9 +50,28 @@ def _anchors(text: str) -> set[str]:
 
 def _links(root: Path, path: Path, text: str) -> list[str]:
     errors = []
-    # Inline Markdown links in these controlled guide files; fenced recipes are ignored.
+    # These guides support inline and reference links; reject unparsed targets.
     text = re.sub(r"(?ms)^```.*?^```[^\n]*", "", text)
-    for target in re.findall(r"\]\(([^\s)]+)\)", text):
+    targets = re.findall(r"\]\(([^)\n]*)\)", text)
+    references = {}
+    for label, target in re.findall(r"(?m)^ {0,3}\[([^]\n]+)\]:\s*(.+)$", text):
+        key = " ".join(label.casefold().split())
+        references[key] = target
+        targets.append(target)
+    for label, reference in re.findall(r"\[([^]\n]+)\]\[([^]\n]*)\]", text):
+        key = " ".join((reference or label).casefold().split())
+        if key not in references:
+            errors.append(f"undefined reference: {path.relative_to(root)} -> {key}")
+    for raw in targets:
+        match = re.fullmatch(
+            r"\s*(?:<([^<>\n]+)>|([^\s]+?))"
+            r"(?:\s+(?:\"[^\"\n]*\"|'[^'\n]*'|\([^\n]*\)))?\s*",
+            raw,
+        )
+        if match is None:
+            errors.append(f"unsupported link target: {path.relative_to(root)}")
+            continue
+        target = match.group(1) or match.group(2)
         url = urlsplit(target.strip("<>"))
         if url.scheme or url.netloc:
             continue
