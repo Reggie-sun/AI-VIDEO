@@ -382,6 +382,7 @@ class ShotRoutingContext(_RouterModel):
     important_character_ids: tuple[str, ...]
     canonical_character_references: tuple[RouterAssetIdentity, ...]
     canonical_scene_reference: RouterAssetIdentity | None
+    additional_scene_references: tuple[RouterAssetIdentity, ...] = ()
     approved_existing_video: RouterAssetIdentity | None
     shot_keyframe: RouterAssetIdentity | None
     upstream_terminal: RouterAssetIdentity | None
@@ -393,6 +394,13 @@ class ShotRoutingContext(_RouterModel):
     semantic_continuity_state: RouterContinuityState | None
     allowed_visual_strategies: tuple[VisualStrategy, ...] = Field(min_length=1)
     allowed_generation_modes: tuple[VideoGenerationMode, ...] = Field(min_length=1)
+
+    @model_serializer(mode="wrap")
+    def _serialize_additional_scene_references(self, handler):
+        data = handler(self)
+        if not self.additional_scene_references:
+            data.pop("additional_scene_references", None)
+        return data
 
     @model_validator(mode="after")
     def _validate_exact_context(self) -> "ShotRoutingContext":
@@ -434,6 +442,7 @@ class ShotRoutingContext(_RouterModel):
             )
         identities = (
             *self.canonical_character_references,
+            *self.additional_scene_references,
             *(
                 (self.canonical_scene_reference,)
                 if self.canonical_scene_reference is not None
@@ -455,6 +464,7 @@ class ShotRoutingContext(_RouterModel):
             raise ValueError("routing asset role and ID pairs must be unique")
         canonical_references = (
             *self.canonical_character_references,
+            *self.additional_scene_references,
             *((self.canonical_scene_reference,) if self.canonical_scene_reference else ()),
         )
         if len({item.asset_id for item in canonical_references}) != len(
@@ -491,16 +501,22 @@ class ShotRoutingContext(_RouterModel):
                 raise ValueError(
                     "character reference must match an exact important Character"
                 )
-        if self.canonical_scene_reference is not None:
+        scene_references = (
+            *((self.canonical_scene_reference,) if self.canonical_scene_reference else ()),
+            *self.additional_scene_references,
+        )
+        if self.additional_scene_references and self.canonical_scene_reference is None:
+            raise ValueError("additional scene references require the canonical scene reference")
+        for scene_reference in scene_references:
             self._require_asset(
-                self.canonical_scene_reference,
+                scene_reference,
                 "scene_reference",
                 "scene reference",
             )
             if (
-                self.canonical_scene_reference.canonical_owner_id
+                scene_reference.canonical_owner_id
                 != self.activated_shot.scene_id
-                or self.canonical_scene_reference.canonical_owner_content_hash
+                or scene_reference.canonical_owner_content_hash
                 != self.scene_content_hash
             ):
                 raise ValueError("scene reference must match the exact target Scene")

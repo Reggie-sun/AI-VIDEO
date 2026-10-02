@@ -91,6 +91,7 @@ def requirement_bindings(
 ) -> tuple[tuple[str, ...], tuple[Any, ...]] | None:
     pool = (
         *context.canonical_character_references,
+        *getattr(context, "additional_scene_references", ()),
         *(
             (context.canonical_scene_reference,)
             if context.canonical_scene_reference

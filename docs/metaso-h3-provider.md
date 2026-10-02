@@ -19,6 +19,12 @@
 
 Profile 封存 requested ratio 和 Context IR。输出 pixel geometry 与物理 FPS 由 Provider 决定；现有 flexible requirement 使用 adaptive geometry / 24 FPS nominal 声明，实际 MP4 必须独立 probe。内部 `cost_upper_bound_microunits` 是 operator 上限，真实 credits/cost 只从可确认的 Provider response 取证。
 
+## Multiple Reference Views
+
+Planner 允许同一个 Character 的多个 exact reference views，但仍要求覆盖 Shot 的全部重要角色；同一角色的两张图不能补足缺失角色。Scene 可提供多个 reference views。`ShotRoutingContext.additional_scene_references` 只能补充已有 `canonical_scene_reference`，每张都校验同一个 target Scene 的 ID/content hash、selected Registry、role 与唯一 asset ID，并经原有 requirement binding 和 compiler 进入请求。默认空值不进入旧 context 的序列化，保持旧 snapshot/hash 兼容。
+
+《反相之地》的原文复现实验使用显式注册的 task-local native compiler，保持画布全文，仅将 reference 名称改成 H3 的 `Image N` 语法。它仍经过 typed intent、完整输入 identity、Generation Decision、paid preview、one-use permit 和原生 payload 校验；不是默认 compiler 或任意 raw request 旁路。五图一视频的 exact inputs 与视频最低时长适配见 [实验记录](record_for_agent/2026-10-02-fanxiang-transom-metaso-h3-test.md)。
+
 ## Verification
 
 `PYTHONPATH=src:tests python -m pytest -p no:cacheprovider tests/test_production_metaso_h3.py tests/test_production_minimax_h3.py tests/test_production_vidu_download.py -q`。新增 adapter / tests 路由既有 `production_video_provider`；离线 PASS 不证明 live、声线复刻或 production qualification。

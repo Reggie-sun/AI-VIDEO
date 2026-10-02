@@ -222,9 +222,9 @@ def available_role(request: VideoPlanningRequest, role: AssetRole) -> bool:
     if role is AssetRole.CHARACTER_REFERENCE:
         target_characters = set(request.target_shot.character_ids)
         owners = tuple(asset.canonical_owner_id for asset in matches)
-        return set(owners) == target_characters and len(owners) == len(
-            target_characters
-        )
+        return set(owners) == target_characters
+    if role is AssetRole.SCENE_REFERENCE:
+        return bool(matches)
     if role in {AssetRole.EXISTING_VIDEO, AssetRole.REFERENCE_AUDIO} and (
         request.generation_intent is not None
         and request.generation_intent.media_reference_asset_ids

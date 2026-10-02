@@ -597,6 +597,7 @@ class VideoGenerationResolver:
     ) -> tuple[RouterAssetIdentity, ...]:
         references = (
             *context.canonical_character_references,
+            *context.additional_scene_references,
             context.canonical_scene_reference,
         )
         return tuple(sorted(references, key=lambda asset: asset.asset_id))

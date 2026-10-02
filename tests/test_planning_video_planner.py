@@ -2093,3 +2093,44 @@ def test_consumer_allows_auditable_static_fallback_warning_when_resolved():
     assert PlanWarning.REQUIRES_HUMAN_REVIEW not in plan.warnings
     projection = require_current_video_plan(current_request=request, plan=plan)
     assert isinstance(projection, VerifiedGenerationRequirementProjection)
+
+def test_same_character_and_scene_can_have_multiple_exact_reference_views():
+    from ai_video.planning._asset_readiness import available_role
+    from tests.fixtures.planning_factory import make_request, make_available_asset
+    from ai_video.planning import AssetRole
+
+    base = make_request()
+    hero = base.character_context[0]
+    scene = base.scene_context
+    assets = tuple(make_available_asset(
+        role=role, asset_id=asset_id, canonical_owner_id=owner,
+        canonical_owner_content_hash=content_hash,
+    ) for role, asset_id, owner, content_hash in (
+        (AssetRole.CHARACTER_REFERENCE, "normal", hero.character_id, hero.content_hash),
+        (AssetRole.CHARACTER_REFERENCE, "elongated", hero.character_id, hero.content_hash),
+        (AssetRole.SCENE_REFERENCE, "transom", scene.scene_id, scene.content_hash),
+        (AssetRole.SCENE_REFERENCE, "closed-door", scene.scene_id, scene.content_hash),
+    ))
+    request = make_request(available_assets=assets, planning_contract_version="video-planner/3",
+                           generation_intent=_neutral_generation_intent())
+    assert available_role(request, AssetRole.CHARACTER_REFERENCE)
+    assert available_role(request, AssetRole.SCENE_REFERENCE)
+
+
+def test_multiple_views_do_not_replace_a_missing_character_reference():
+    from ai_video.planning._asset_readiness import available_role
+    from tests.fixtures.planning_factory import make_request, make_available_asset, make_character, make_shot
+    from ai_video.planning import AssetRole
+
+    hero = make_character()
+    second = make_character(character_id="friend")
+    request = make_request(
+        target_shot=make_shot(character_ids=(hero.character_id, second.character_id)),
+        character_context=(hero, second), planning_contract_version="video-planner/3",
+        generation_intent=_neutral_generation_intent(),
+        available_assets=tuple(make_available_asset(
+            role=AssetRole.CHARACTER_REFERENCE, asset_id=asset_id,
+            canonical_owner_id=hero.character_id, canonical_owner_content_hash=hero.content_hash,
+        ) for asset_id in ("normal", "elongated")),
+    )
+    assert not available_role(request, AssetRole.CHARACTER_REFERENCE)

@@ -95,6 +95,50 @@ HASH_F = "f" * 64
 HASH_0 = "0" * 64
 
 
+def test_additional_scene_reference_keeps_exact_requirement_binding():
+    from ai_video.production.video_requirement import AssetEvidence, SemanticReferenceRole
+
+    context = _context()
+    extra = _asset("scene_reference", "closed-door", HASH_C)
+    payload = context.model_dump(mode="python")
+    payload["additional_scene_references"] = (extra,)
+    expanded = ShotRoutingContext.model_validate(payload)
+    requirement = SimpleNamespace(asset_evidence=(AssetEvidence(
+        role=SemanticReferenceRole.SCENE, asset_id=extra.asset_id,
+        asset_sha256=extra.asset_sha256,
+        canonical_owner_id=extra.canonical_owner_id,
+        canonical_owner_content_hash=extra.canonical_owner_content_hash,
+        mime_type=extra.mime_type,
+    ),), c4_multi_anchor_binding=None)
+    roles, assets = requirement_bindings(requirement, expanded)
+    assert roles == ("reference",)
+    assert assets == (extra,)
+    assert extra in VideoGenerationResolver._canonical_references(expanded)
+
+
+@pytest.mark.parametrize("mutation", ["owner", "hash", "registry", "role", "duplicate"])
+def test_additional_scene_reference_rejects_wrong_lineage(mutation):
+    context = _context()
+    extra = _asset("scene_reference", "closed-door", HASH_C)
+    changes = {
+        "owner": {"canonical_owner_id": "another-scene"},
+        "hash": {"canonical_owner_content_hash": HASH_F},
+        "registry": {"source_registry_revision_id": HASH_A},
+        "role": {"role": "character_reference"},
+        "duplicate": {"asset_id": context.canonical_scene_reference.asset_id},
+    }
+    payload = context.model_dump(mode="python")
+    payload["additional_scene_references"] = (extra.model_copy(update=changes[mutation]),)
+    with pytest.raises(ValidationError):
+        ShotRoutingContext.model_validate(payload)
+
+
+def test_absent_additional_scene_references_preserves_serialized_context():
+    context = _context()
+    assert "additional_scene_references" not in context.model_dump(mode="json")
+    assert ShotRoutingContext.model_validate_json(context.model_dump_json()) == context
+
+
 def _asset(
     role: str,
     suffix: str,
