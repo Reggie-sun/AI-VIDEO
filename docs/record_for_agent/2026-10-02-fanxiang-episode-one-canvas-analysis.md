@@ -16,6 +16,8 @@ Date: 2026-10-02
 
 Follow-up（2026-10-02 UTC）：已完成[一次METASO MiniMax-H3气窗片段复现](2026-10-02-fanxiang-transom-metaso-h3-test.md)。真实MP4已落盘；整体创作评估FAIL，主要是长颈异化不足与气窗空间关系偏离；执行成功不等于复现成功。原片与结果、输入、逐项裁决和下载恢复由该测试记录保存，替代本文“后续测试”的pending状态。
 
+Follow-up（2026-10-03 Asia/Hong_Kong）：按用户要求再做一次，已实际提交完整当前composer原文和全部五张图片/一个视频reference，仅替换引用标签与为视频补三帧满足两秒下界。长颈形态已出现，但8.5417秒发生额外景别跳切、末段出现禁止的“龙哥”字幕，整体仍FAIL；累计两次POST、没有付费修复或activation。输入保真、第二轮exact MP4和逐项裁决见[同一测试记录](2026-10-02-fanxiang-transom-metaso-h3-test.md#attempt-two--full-canvas-inputs)。当前composer与真正历史请求的区别仍适用。
+
 这份画布的具体价值是把校园恐怖故事分成有明确任务的短组：人物身份与空间资产先固定，每组改变少量状态，再用观察、反应、行动、后果推进。最值得学的是“每组究竟让观众知道什么、人物因此做什么”，以及参考图职责和首尾状态的写法。诸如“好莱坞”“ILM”“Wētā”是风格意图；实际画面质量需要另外判断。
 
 阅读顺序：Story Structure → Character Functions → Visual And Spatial Design → Detailed Shot Cases → Prompt And Reference Method → Shot Inventory。案例中的时间是本次下载视频的抽帧时间，不把当前 composer 时间轴冒充历史成片的精确切点。
