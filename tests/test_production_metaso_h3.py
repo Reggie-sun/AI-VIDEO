@@ -219,3 +219,27 @@ def test_reference_video_uses_official_content_role_and_rejects_geometry():
     with pytest.raises(AiVideoError):
         provider.resolve(original.model_copy(update={'media_bindings': (
             video.model_copy(update={'width': 12800}),)}))
+
+
+def test_metaso_status_and_fetch_bind_task_and_never_forward_bearer():
+    from io import BytesIO
+    from test_production_minimax_h3 import _download_response
+    body = b'\x00\x00\x00\x18ftypisom' + b'\x00' * 32
+    transport = _FakeTransport(query_response=MiniMaxH3TransportResponse(200, {},
+        json.dumps({'task': {'id': 'task-h3-1', 'model': 'MiniMax-H3',
+            'status': 'succeeded', 'content': {'url': 'https://cdn.example.org/out.mp4?token=short'}}}).encode()),
+        download_response=_download_response(body=body))
+    provider, request, _, paid, *_ = setup(transport=transport)
+    receipt = _paid_submit_receipt(request, paid)
+    submission = VideoSubmission.from_paid_submit_receipt(resolved=request, receipt=receipt)
+    observation = provider.get_status(submission, receipt)
+    sink = BytesIO()
+    fetched = provider.fetch(submission, receipt, observation, sink)
+    assert sink.getvalue() == body
+    assert fetched.artifact_sha256 == hashlib.sha256(body).hexdigest()
+    assert transport.calls[0].url == METASO_BASE_URL + '/v2/query/video_generation/task-h3-1'
+    assert dict(transport.stream_calls[0].headers) == {'accept':'video/mp4'}
+    assert 'short' not in repr(fetched) + repr(transport.stream_calls[0])
+    transport.query_response = MiniMaxH3TransportResponse(200, {},
+        b'{"task":{"id":"wrong-task","status":"succeeded"}}')
+    with pytest.raises(AiVideoError): provider.get_status(submission, receipt)
