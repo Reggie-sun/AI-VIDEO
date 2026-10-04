@@ -16,12 +16,12 @@ from ai_video.production.generation_execution import (
 )
 from ai_video.production._sequence_source import (
     accepted_sequence_source, causal_state_column_hash, require_causal_columns, require_sequence_source,
+    sequence_authoring_evidence_hash,
 )
 from ai_video.production._shot_router_contracts import (
     ContinuityProviderRouteBinding, ProviderRouteIdentity, VideoGenerationLifecycleEnvelope,
 )
 from ai_video.production._video_continuity import validate_hard_cut_keyframe_binding_against_project
-from ai_video.production.hashing import canonical_sha256
 from ai_video.production.project import load_production_project
 from ai_video.production.video_execution_stack import GenerationExecutionStackIdentity
 from ai_video.production.video_transition import (
@@ -54,10 +54,9 @@ def require_current_sequence_route(*, loaded, routing: ContinuityProviderRouteBi
             destination_route=routing.destination_route, source_request_content_hash=seed.request_content_hash)
         if selection.projection != require_current_video_plan(current_request=seed, plan=VideoPlanner().plan(seed)):
             raise ValueError("destination selection lacks the exact Planner-derived seed projection")
-    expected = canonical_sha256({"storyboard": loaded.storyboard.content_hash,
-        "source_execution_binding": binding.binding_hash, "accepted_media": accepted,
-        "target_request": seed.request_content_hash,
-        "causal_state_changes": [c.model_dump(mode="json") for c in policy.causal_state_changes]})
+    expected = sequence_authoring_evidence_hash(loaded=loaded, binding=binding,
+        accepted_media=accepted, target_request_hash=seed.request_content_hash,
+        changes=policy.causal_state_changes)
     if policy.authoring_evidence_hash != expected:
         raise ValueError("sequence authoring evidence seal is stale")
 
@@ -200,12 +199,9 @@ def build_sequence_video_planning_request(
             continuity_grade="c4_native_boundary_motion",
             required_carryover_dimensions=tuple(sorted(set(required_carryover_dimensions))),
             anchors=tuple(sorted(anchors, key=lambda a: a.role.value)), qa_policy_hash=loaded.qa_policy.content_hash,
-            authoring_evidence_hash=canonical_sha256({
-                "storyboard": loaded.storyboard.content_hash,
-                "source_execution_binding": binding.binding_hash, "accepted_media": accepted_hashes,
-                "target_request": current_request.request_content_hash,
-                "causal_state_changes": [c.model_dump(mode="json") for c in changes],
-            }), source_generation_intent_hash=source_generation_intent_hash,
+            authoring_evidence_hash=sequence_authoring_evidence_hash(loaded=loaded, binding=binding,
+                accepted_media=accepted_hashes, target_request_hash=current_request.request_content_hash,
+                changes=changes), source_generation_intent_hash=source_generation_intent_hash,
             target_generation_intent_hash=intent.projection_hash,
             causal_edge_semantics=causal_edge_semantics, causal_state_changes=changes,
         )

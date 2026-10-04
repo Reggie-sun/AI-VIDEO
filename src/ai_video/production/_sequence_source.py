@@ -103,6 +103,14 @@ def require_causal_columns(changes, source_intent, target_intent):
         raise ValueError("CARRY cannot change causal state")
 
 
+def sequence_authoring_evidence_hash(*, loaded, binding, accepted_media, target_request_hash, changes):
+    """Use one authoring seal at construction and Production reopen."""
+    return canonical_sha256({"storyboard": loaded.storyboard.content_hash,
+        "source_execution_binding": binding.binding_hash, "accepted_media": accepted_media,
+        "target_request": target_request_hash,
+        "causal_state_changes": [c.model_dump(mode="json") for c in changes]})
+
+
 def require_sequence_source(*, loaded, routing, requirement, lifecycle):
     """Reopen exact activation evidence; a pointer alone is never authority."""
     if routing.source_activation_registry is None:
@@ -125,7 +133,7 @@ def require_sequence_source(*, loaded, routing, requirement, lifecycle):
     source = next(s for s in loaded.shots if s.shot_id == order[index - 1])
     accepted = accepted_sequence_source(loaded, source,
         require_causal_close=policy.continuity_obligation is ContinuityObligation.FULL_CONTINUITY)
-    binding, request, _, _, registry = accepted
+    binding, request, _, accepted_hashes, registry = accepted
     if (routing.previous_shot != binding.projection.requirement.target_shot
             or routing.previous_provider_bound_request != binding.decision.routing.provider_bound_request
             or policy.source_generation_intent_hash != binding.projection.requirement.generation_intent_hash
@@ -137,10 +145,15 @@ def require_sequence_source(*, loaded, routing, requirement, lifecycle):
         raise ValueError("sequence execution stack is stale")
     if policy.source_execution_stack_hash != policy.destination_execution_stack_hash:
         from ai_video.production.generation_execution import require_sequence_destination_selection
-        require_sequence_destination_selection(selection=routing.destination_selection_binding,
+        selection = require_sequence_destination_selection(selection=routing.destination_selection_binding,
             target_shot=target, target_generation_intent_hash=requirement.generation_intent_hash,
             destination_execution_stack=routing.destination_execution_stack, lifecycle=lifecycle,
             destination_route=routing.destination_route, project=loaded)
+        if policy.authoring_evidence_hash != sequence_authoring_evidence_hash(
+                loaded=loaded, binding=binding, accepted_media=accepted_hashes,
+                target_request_hash=selection.projection.requirement.source_request_content_hash,
+                changes=policy.causal_state_changes):
+            raise ValueError("sequence authoring evidence seal has a stale planning seed")
     require_causal_columns(policy.causal_state_changes,
         binding.projection.requirement.generation_intent, requirement.generation_intent)
     if loaded.qa_policy is None or policy.qa_policy_hash != loaded.qa_policy.content_hash:

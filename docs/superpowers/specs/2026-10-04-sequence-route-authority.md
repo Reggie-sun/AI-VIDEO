@@ -32,13 +32,17 @@ lifecycle、exact stack 与 selected route，且不得自身携带 continuity ro
 JSON representation；不是第二 schema/receipt。缺字段保持旧 bytes/hash。新 cross-stack preparation
 和 execution 必须重新反序列化既有 type、重算 selection、核验当前 project。历史 pure parsing 与
 compatibility prediction 不因此变成 new execution authority。
+所有 cross-stack Production reopen 还须以既有 authoring seal 核验 prior selection 的 exact seed
+hash；builder、feedback 与共享 reopen 使用同一 seal payload，合法但来自另一 seed 的 binding
+不能成为当前 policy 的 authority。无需新增 seed/route schema。
 same-stack old bindings 无需此新增 evidence，route equality 与 source activation proof 继续强制。
 
 ## Acceptance And Non-Goals
 
 覆盖用户十项 tests：same-stack inheritance/forgery；cross-stack canonical selection 与任意 route
 拒绝；Router mismatch；final stack equality；neutral Planner；METASO FULL、C2、carryover/reset。
-补充 stale/tampered/circular selection evidence 与 Production reopen 的否定路径。
+补充 stale/tampered/circular selection evidence 与 Production reopen 的否定路径，包括合法的
+other-seed binding 替换后、public Resolver 与完全重新封存的 execution binding 的拒绝行为。
 不改 Planner derivation、generation ranking、registry、Provider capability/prompt、paid/credential、
 committer、media/verdict/timeline，不调用 Provider、不读取 secret、不生成真实媒体。
 

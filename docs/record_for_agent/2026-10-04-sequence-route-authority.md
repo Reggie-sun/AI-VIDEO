@@ -91,7 +91,8 @@ cross-stack 必须带 existing `GenerationDecisionExecutionBinding`。其 owner 
 既有 `ContinuityProviderRouteBinding` additive 保存该 existing type 的 canonical JSON，避免
 循环 model import；不是新的 schema、receipt 或 Router。None 省略，保留旧 binding bytes/hash。
 `require_sequence_source` 在新 Production preparation / public resolution / execution reopen 时
-再次强制 cross-stack evidence；历史纯解析与 compatibility prediction 不签发新 execution 权。
+再次强制 cross-stack evidence，并以同一既有 authoring-seal payload 核验 prior selection 的 neutral
+seed hash；历史纯解析与 compatibility prediction 不签发新 execution 权。
 
 合法的 cross-stack 顺序为：neutral seed Planner/Readiness → existing canonical Router selection /
 compiled binding → sequence policy materialization → sequence-aware Planner/Readiness → existing
@@ -99,13 +100,29 @@ Router final selection/validation → native compilation。先前 binding 不能
 最终 Router 可拒绝 mismatch 或 FULL/C2 incompatibility，不能静默替换 immutable destination。
 这复用已有 binding checkpoint，不新增 preselection orchestrator；缺 proof 就 STOP。
 
+## Independent Review Reproduction And Consolidation
+
+第一 candidate `76790a84163a523e11f4e62da59b0221ca4cd82a` 的 16 项 exact commit-range Harness
+checks 已通过；两个同快照独立 native reviewer 分别给出 `SA-001` / `SAR-001`：builder/feedback
+核验 exact neutral seed，但 public Resolver/execution 的共享 reopen 缺少同一 authoring-seal 关联。
+Parent 没有以 verdict 代替验证，而是从改变 `production_policy.accept_static_image_fallback` 的
+另一合法 seed 正常取得 canonical selection，替换 proof 并重新封存 routing/execution binding。
+RED 为 **2 failed（Resolver/execution）、1 passed（feedback）**，确认入口差异。
+
+最小修复将既有 authoring-seal hash 计算归并到 `_sequence_source`；所有 cross-stack reopen
+以 source binding、accepted media、当前 Storyboard、causal changes 和 prior seed hash 重算 seal。
+builder/feedback 复用相同 payload；没有新增 schema、selector、receipt 或 planning request 字段。
+同一替换回归 GREEN 为 **3 passed**。第一轮 receipt/review 只保留为历史，不能替代修复快照的新
+Harness 与双独立复审。具体 Parent 裁决保存在 run `001` 的 `final-review-round1.json`。
+
 ## Verification And Evidence
 
 - RED：原实现 same-stack omission 两项失败，bare cross-stack route 到达被禁止的 Planner，三项
   regression 先证实失败，再修复。
-- Final native sequence suite：`tests/test_planning_sequence_continuity.py`，**44 passed**；覆盖继承、
+- Final native sequence suite：`tests/test_planning_sequence_continuity.py`，**47 passed**；覆盖继承、
   same-stack forgery、有效 cross-stack prior selection、最终 route/stack 一致、bare route、stale
-  route/stack/lifecycle/seed/target、tampered decision、candidate tie、circular proof、legacy bypass。
+  route/stack/lifecycle/seed/target、tampered decision、candidate tie、circular proof、legacy bypass，
+  以及 other-seed binding 替换在 feedback/public Resolver/resealed execution 的拒绝行为。
 - 其他相关 native suites：Planner、Router、transition、Readiness、feedback、execution/guards、
   generation decision，**395 passed**。包括 METASO soft Ref2VA FULL gate、HardCutKeyframe C2、
   identity/style carryover 与 reset；没有修改这些媒体/capability contracts。
@@ -113,7 +130,7 @@ Router final selection/validation → native compilation。先前 binding 不能
   effective LOC `951 → 954`。增加的是既有 cohesive binding 的 evidence 字段/None serialization，
   admission/reopen logic 位于既有 execution owner；未刷新 debt baseline 或清理 unrelated code。
 - `git diff --check`：PASS。最终 exact Harness 与两个独立 T3 review 的 evidence 存于
-  `.agent/harness/runs/sequence-route-authority-20261004-001/`；须分别核验 snapshot、policy、artifact
+  `.agent/harness/runs/sequence-route-authority-20261004-002/`；须分别核验 snapshot、policy、artifact
   与 freshness，不能从本记录或 native tests 推定它们通过。
 
 ## Remaining Evidence Boundaries
@@ -122,7 +139,7 @@ Router final selection/validation → native compilation。先前 binding 不能
 本轮没有真实 Provider 请求、credential lookup、视频生成、QA/P6/Final Acceptance mutation 或
 历史 media verdict 变更。源/目标编译与临时 project 的 fake acceptance 是离线测试。
 
-AOCI `aoci_maintain` 返回 `stopped / blocked`，没有发放可写 candidate；已有 41 条 observed-scope
+AOCI `aoci_maintain` 返回 `stopped / blocked`，没有发放可写 candidate；最新有 42 条 observed-scope
 review 与 5 个 stale owner 阻挡 whole-index alignment，包括 task-owned matrix/baseline/execution
 与 unrelated `AGENTS.md` / Harness policy。当前 Guide 要求全 scope review；不虚假 acknowledge
 未审查的 unrelated 历史，也不修改其正式资产。结论依靠当前源码、CodeGraph 与 executable tests，

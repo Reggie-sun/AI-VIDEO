@@ -848,6 +848,50 @@ def test_cross_stack_legacy_binding_cannot_bypass_production_reopen(activated_so
         binding.model_copy(update={"continuity_routing": legacy}).validate_current_project(loaded)
 
 
+@pytest.mark.parametrize("entrypoint", ["feedback", "resolver", "execution"])
+def test_cross_stack_other_seed_selection_cannot_bypass_production_reopen(activated_source, entrypoint):
+    from ai_video.production.generation_decision import resolve_generation_decision
+    from ai_video.production.generation_execution import GenerationDecisionExecutionBinding
+    from ai_video.production.shot_router import ContinuityProviderRouteBinding, VideoGenerationResolver
+    inputs = _cross_stack_inputs(activated_source)
+    seed = inputs["current_request"]
+    initial = _prepare_sequence_generation(activated_source, inputs, seed)
+    inputs["destination_selection_binding"] = initial.execution_binding
+    request, routing = build_sequence_video_planning_request(**inputs)
+    prepared = _prepare_sequence_generation(activated_source, inputs, request, routing)
+    binding = prepared.execution_binding
+    other_seed = VideoPlanningRequest.create(**{
+        **{n: getattr(seed, n) for n in type(seed).model_fields if n != "request_content_hash"},
+        "production_policy": seed.production_policy.model_copy(update={
+            "accept_static_image_fallback": not seed.production_policy.accept_static_image_fallback})})
+    other = _prepare_sequence_generation(activated_source, inputs, other_seed).execution_binding
+    assert other is not None
+    assert other.selected_provider_route == initial.execution_binding.selected_provider_route
+    assert other.projection.requirement.generation_intent_hash == seed.generation_intent.projection_hash
+    assert other.projection.requirement.source_request_content_hash != seed.request_content_hash
+    substituted = ContinuityProviderRouteBinding.create(**{
+        **{n: getattr(routing, n) for n in type(routing).model_fields if n != "binding_hash"},
+        "destination_selection_binding": other.model_dump(mode="json")})
+    loaded = load_production_project(activated_source["root"] / "project.yaml")
+    arguments = dict(projection=binding.projection, context=binding.context, policy=binding.policy,
+        lifecycle=binding.lifecycle, inputs=binding.inputs, continuity_routing=substituted)
+    if entrypoint == "feedback":
+        with pytest.raises(ValueError, match="seed|authoring evidence"):
+            _prepare_sequence_generation(activated_source, inputs, request, substituted)
+    elif entrypoint == "resolver":
+        with pytest.raises(ValueError, match="seed|authoring evidence"):
+            VideoGenerationResolver().resolve_requirement(**arguments, source_project=loaded)
+    else:
+        decision = resolve_generation_decision(VideoGenerationResolver(), **arguments)
+        assert decision.disposition == "GENERATE_ONCE"
+        compiled = activated_source["provider"].compile_request(
+            decision.routing.provider_bound_request, binding.projection.requirement)
+        resealed = GenerationDecisionExecutionBinding.create(**arguments, decision=decision,
+            compiled_request=activated_source["provider"].resolve(compiled.request))
+        with pytest.raises(ValueError, match="seed|authoring evidence"):
+            resealed.validate_current_project(loaded)
+
+
 def test_final_router_rejects_candidate_destination_route_mismatch(activated_source):
     from ai_video.production.shot_router import VideoGenerationResolver
     inputs = _cross_stack_inputs(activated_source)
