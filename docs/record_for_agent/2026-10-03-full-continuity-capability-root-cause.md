@@ -7,6 +7,13 @@ evidence_index_version: "1"
 
 # Full Continuity Capability Root Cause
 
+## Continuation Notice — 2026-10-04
+
+[Sequence materialization record](2026-10-04-sequence-continuity-materialization.md)补齐下文提及的
+authoring→typed edge接缝：标准sequence adapter现在构造previous state与policy v2并送入readiness。
+本记录的Provider gate、历史raw FAIL/edited边界及无真实H3 quality proof结论继续有效。
+没有typed authoring evidence的旧run不会自动升级，独立NONE仍合法。
+
 ## Goal And Scope
 
 基于 current source `b16ec55`，调查 COCO / Nosha METASO H3 S03 raw

@@ -132,11 +132,13 @@ def verify_current_generation_requirement_projection(
             )
         )
         current_assets = {
-            (asset.asset_id, asset.asset_sha256): asset
+            (asset.asset_id, asset.asset_sha256, asset.canonical_owner_id,
+             asset.canonical_owner_content_hash): asset
             for asset in current_request.available_assets
         }
         for evidence in requirement.asset_evidence:
-            asset = current_assets.get((evidence.asset_id, evidence.asset_sha256))
+            asset = current_assets.get((evidence.asset_id, evidence.asset_sha256,
+                evidence.canonical_owner_id, evidence.canonical_owner_content_hash))
             if asset is None or (
                 evidence.canonical_owner_id != asset.canonical_owner_id
                 or evidence.canonical_owner_content_hash

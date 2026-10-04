@@ -891,7 +891,15 @@ class ContinuityProviderRouteBinding(_RouterModel):
     destination_route: ProviderRouteIdentity
     source_execution_stack: GenerationExecutionStackIdentity
     destination_execution_stack: GenerationExecutionStackIdentity
+    source_activation_registry: RegistrySnapshotPointer | None = None
     binding_hash: str = Field(pattern=_SHA256)
+
+    @model_serializer(mode="wrap")
+    def _serialize_activation(self, handler):
+        payload = handler(self)
+        if self.source_activation_registry is None:
+            payload.pop("source_activation_registry", None)
+        return payload
 
     @model_validator(mode="after")
     def _validate_binding(self) -> "ContinuityProviderRouteBinding":
@@ -917,7 +925,7 @@ class ContinuityProviderRouteBinding(_RouterModel):
             raise ValueError(
                 "continuity policy and previous request must match the exact source Shot"
             )
-        if (
+        if self.source_activation_registry is None and (
             policy.project != previous.lifecycle.base_project
             or policy.registry != previous.lifecycle.base_registry
         ):

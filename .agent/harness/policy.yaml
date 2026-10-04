@@ -314,7 +314,7 @@ checks:
     cwd: .
     description: Verify read-only recovery observations, canonical history, source identity and non-vacuous strategy controls without media or Provider effects.
   video_planner_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_planning_video_planner.py, tests/test_errors.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_planning_video_planner.py, tests/test_planning_sequence_continuity.py, tests/test_errors.py, -q]
     cwd: .
     description: Verify provider-neutral Video Planner proposals and Main Agent STOP semantics.
   provider_neutral_video_requirement_tests:
@@ -577,6 +577,7 @@ categories:
       - src/ai_video/production/generation_rejection.py
       - src/ai_video/production/_state_commit_generation_rejection.py
       - src/ai_video/production/_generation_feedback_reader.py
+      - src/ai_video/production/_sequence_source.py
       - src/ai_video/production/_remote_video_native_prompt.py
       - tests/test_generation_feedback.py
       - tests/test_generation_execution.py
@@ -1127,8 +1128,10 @@ categories:
   video_planning:
     patterns:
       - src/ai_video/planning/**
+      - src/ai_video/production/_sequence_source.py
       - tests/fixtures/planning_factory.py
       - tests/test_planning_video_planner.py
+      - tests/test_planning_sequence_continuity.py
     check_ids:
       - video_planner_tests
       - provider_neutral_video_requirement_tests

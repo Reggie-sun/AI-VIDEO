@@ -2,8 +2,14 @@
 from ai_video.planning import require_current_video_plan
 
 
-def require_feedback_context(*, loaded, planning_request, video_plan, context, routing_policy, lifecycle):
-    projection = require_current_video_plan(current_request=planning_request, plan=video_plan)
+def require_feedback_context(*, loaded, planning_request, video_plan, context, routing_policy, lifecycle,
+                             continuity_routing=None):
+    transition = planning_request.continuity_transition_policy
+    if transition is not None and (continuity_routing is None
+            or continuity_routing.transition_policy != transition):
+        raise ValueError("configured sequence policy requires its exact continuity routing binding")
+    projection = require_current_video_plan(current_request=planning_request, plan=video_plan,
+        continuity_transition_policy=continuity_routing.transition_policy if continuity_routing else None)
     shot = next((x for x in loaded.shots if x.shot_id == context.target_shot_id), None)
     if shot is None or shot != planning_request.target_shot or shot.scene_id != planning_request.scene_context.scene_id:
         raise ValueError("configured planning target is stale")
@@ -24,5 +30,12 @@ def require_feedback_context(*, loaded, planning_request, video_plan, context, r
             or lifecycle.base_registry != loaded.manifest.active_registry
             or lifecycle.base_dependency_graph != loaded.manifest.active_dependency_graph):
         raise ValueError("configured routing or lifecycle lineage is stale")
-    return {"projection": projection, "context": context,
-            "policy": routing_policy, "lifecycle": lifecycle}
+    if continuity_routing is not None:
+        from ai_video.planning.sequence_continuity import require_current_sequence_route
+        require_current_sequence_route(loaded=loaded, routing=continuity_routing,
+            planning_request=planning_request, projection=projection, lifecycle=lifecycle)
+    result = {"projection": projection, "context": context,
+              "policy": routing_policy, "lifecycle": lifecycle}
+    if continuity_routing is not None:
+        result["continuity_routing"] = continuity_routing
+    return result

@@ -35,6 +35,7 @@ from ai_video.production.video_requirement import (
     ProviderNeutralGenerationIntentProjection,
     ProviderNeutralVideoRequirement,
 )
+from ai_video.production.video_transition import ContinuityTransitionPolicy
 
 
 _SAFE_ID = r"^[A-Za-z0-9._:/-]{1,256}$"
@@ -303,6 +304,7 @@ class VideoPlanningRequest(StrictModel):
     review_decision: ReviewDecisionProjection | None
     production_policy: ProductionPolicyInput
     generation_intent: ProviderNeutralGenerationIntentProjection | None = None
+    continuity_transition_policy: ContinuityTransitionPolicy | None = None
     commercial_execution_projection: CommercialExecutionProjection | None = None
     approved_commercial_source: ApprovedCommercialSourceBinding | None = None
     product_reference_set: ProductReferenceSet | None = None
@@ -310,6 +312,13 @@ class VideoPlanningRequest(StrictModel):
     active_commercial_source_approval: CommercialSourceApprovalPointer | None = None
     planning_contract_version: Literal["video-planner/2", "video-planner/3"]
     request_content_hash: str = Field(pattern=_SHA256)
+
+    @model_serializer(mode="wrap")
+    def _serialize_sequence_policy(self, handler):
+        data = handler(self)
+        if self.continuity_transition_policy is None:
+            data.pop("continuity_transition_policy", None)
+        return data
 
     @model_validator(mode="after")
     def _validate_versioned_intent(self) -> "VideoPlanningRequest":
@@ -373,6 +382,7 @@ class VideoPlanningRequest(StrictModel):
     def model_dump(self, *args: object, **kwargs: object) -> dict[str, object]:
         payload = super().model_dump(*args, **kwargs)
         for field in (
+            "continuity_transition_policy",
             "commercial_execution_projection",
             "approved_commercial_source",
             "product_reference_set",

@@ -377,6 +377,8 @@ def prepare_generation_execution(
     final_output_goal=None,
     local_batch_limit: int = 1,
     use_current_generation_acceptance: bool = False,
+    planning_request=None,
+    execution_stack_hash: str | None = None,
 ) -> PreparedGenerationExecution:
     """Build one executable decision from the loaded production project.
 
@@ -492,6 +494,12 @@ def prepare_generation_execution(
         target_shot_revision=shot.revision,
         target_shot_content_hash=shot.content_hash,
     )
+    if planning_request is not None:
+        from ai_video.planning import require_current_video_plan
+
+        projection = require_current_video_plan(
+            current_request=planning_request, plan=VideoPlanner().plan(planning_request))
+        requirement = projection.requirement
     lifecycle = _router_lifecycle(context).model_copy(
         update={
             "generation_id": sealed.generation_id,
@@ -505,7 +513,7 @@ def prepare_generation_execution(
             "continuity_binding": sealed.continuity_binding,
             "hard_cut_keyframe_binding": sealed.hard_cut_keyframe_binding,
             "seal_terminal_frame": sealed.seal_terminal_frame,
-            "execution_stack_hash": sealed.execution_stack_hash,
+            "execution_stack_hash": execution_stack_hash or sealed.execution_stack_hash,
         }
     )
     capabilities = provider.capabilities()

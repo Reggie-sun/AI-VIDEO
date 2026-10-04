@@ -70,7 +70,8 @@ class GenerationDecisionExecutionBinding(StrictModel):
         )
         if self.binding_hash != expected_hash:
             raise ValueError("generation execution binding hash is invalid")
-        expected = VideoGenerationResolver().resolve_requirement(
+        from ai_video.production.generation_decision import resolve_generation_decision
+        expected = resolve_generation_decision(VideoGenerationResolver(),
             projection=self.projection,
             context=self.context,
             policy=self.policy,
@@ -172,6 +173,10 @@ class GenerationDecisionExecutionBinding(StrictModel):
                                  voice_attempt_id: str | None = None) -> None:
         """Bind a self-consistent decision to the currently loaded source bytes."""
 
+        if self.continuity_routing is not None:
+            from ai_video.production._sequence_source import require_sequence_source
+            require_sequence_source(loaded=project, routing=self.continuity_routing,
+                requirement=self.projection.requirement, lifecycle=self.lifecycle)
         if self.inputs.policy.version != "3":
             raise ValueError("new execution requires final-output no-regression decision policy/3")
         if self.inputs.abandoned_result is not None:

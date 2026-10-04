@@ -13,7 +13,9 @@ import base64
 from ai_video.planning import VideoPlanningRequest, VideoGenerationPlan
 from ai_video.planning.generation_feedback_context import require_feedback_context
 from ai_video.production.generation_decision import DecisionPolicy, ExecutionLimits
-from ai_video.production._shot_router_contracts import ShotRoutingContext, VideoRoutingPolicy, VideoGenerationLifecycleEnvelope
+from ai_video.production._shot_router_contracts import (
+    ShotRoutingContext, VideoRoutingPolicy, VideoGenerationLifecycleEnvelope, ContinuityProviderRouteBinding,
+)
 from ai_video.production.video_contracts import VideoFlexibleOutputRequirement
 from ai_video.production.seedance_profile import SeedanceProviderProfile
 from ai_video.production.seedance_asset import SeedanceAssetMaterializationReceipt, SeedanceAssetReferenceResolver
@@ -39,6 +41,7 @@ class DriverConfiguration:
     output: VideoFlexibleOutputRequirement
     reference_receipts: tuple[SeedanceAssetMaterializationReceipt, ...] = ()
     reference_confirmations: dict[str, bytes] = field(default_factory=dict)
+    continuity_routing: ContinuityProviderRouteBinding | None = None
 
     @classmethod
     def from_json(cls, raw: dict) -> "DriverConfiguration":
@@ -46,7 +49,7 @@ class DriverConfiguration:
             raise ValueError("unsupported generation feedback driver configuration")
         required = {"schema_version", "planning_request", "video_plan", "context", "routing_policy",
                     "lifecycle", "decision_policy", "execution_limits", "seedance_profile", "output_requirement"}
-        if not required <= set(raw) or set(raw) - required - {"reference_receipts", "reference_confirmations_base64"}:
+        if not required <= set(raw) or set(raw) - required - {"reference_receipts", "reference_confirmations_base64", "continuity_routing"}:
             raise ValueError("driver configuration has missing or unknown fields")
         return cls(
             VideoPlanningRequest.model_validate(raw["planning_request"]),
@@ -61,6 +64,8 @@ class DriverConfiguration:
             tuple(SeedanceAssetMaterializationReceipt.model_validate(x) for x in raw.get("reference_receipts", ())),
             {key: base64.b64decode(value, validate=True)
              for key, value in raw.get("reference_confirmations_base64", {}).items()},
+            ContinuityProviderRouteBinding.model_validate(raw["continuity_routing"])
+            if raw.get("continuity_routing") is not None else None,
         )
 
     def reference_resolver(self):
@@ -70,7 +75,7 @@ class DriverConfiguration:
     def context_loader(self, loaded):
         return require_feedback_context(loaded=loaded, planning_request=self.planning_request,
             video_plan=self.video_plan, context=self.context, routing_policy=self.routing_policy,
-            lifecycle=self.lifecycle)
+            lifecycle=self.lifecycle, continuity_routing=self.continuity_routing)
 
 
 def _forbidden(*_a, **_k): raise RuntimeError("offline preparation cannot use transport or credentials")

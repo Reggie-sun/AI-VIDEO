@@ -113,6 +113,8 @@ class VideoGenerationResolver:
         requirement_input_assets: tuple[RouterAssetIdentity, ...] | None = None,
         requirement_lineage_current: bool = True,
         commercial_source_preparation: bool = False,
+        causal_transition_verified: bool = False,
+        identity_carryover_verified: bool = False,
     ) -> VideoGenerationRoutingDecision:
         base: dict[str, object] = {
             "target_shot_id": context.target_shot_id,
@@ -161,6 +163,7 @@ class VideoGenerationResolver:
             context.continuity_mode
             in {ContinuityMode.EXACT_TERMINAL, ContinuityMode.REFERENCE}
             and context.upstream_terminal is None
+            and not (context.continuity_mode is ContinuityMode.REFERENCE and identity_carryover_verified)
         ):
             return self._blocked(
                 base,
@@ -172,6 +175,7 @@ class VideoGenerationResolver:
             context.continuity_mode
             in {ContinuityMode.REFERENCE, ContinuityMode.SEMANTIC}
             and context.semantic_continuity_state is None
+            and not causal_transition_verified
         ):
             return self._blocked(
                 base,
@@ -412,11 +416,20 @@ class VideoGenerationResolver:
 
     def resolve_requirement(
         self, *, projection, context, policy, lifecycle, inputs,
-        continuity_routing=None,
+        continuity_routing=None, source_project=None,
     ):
-        """Pure candidate/evidence decision. Caller preselection is not accepted."""
+        """Verify current activation lineage, then resolve the pure decision."""
         from ai_video.production.generation_decision import resolve_generation_decision
 
+        if continuity_routing is not None and (source_project is not None
+                or continuity_routing.source_activation_registry is not None):
+            if source_project is None:
+                raise ValueError("sequence activation requires the current project")
+            from ai_video.production.project import load_production_project
+            from ai_video.production._sequence_source import require_sequence_source
+            loaded = load_production_project(source_project.root / "project.yaml")
+            require_sequence_source(loaded=loaded, routing=continuity_routing,
+                requirement=projection.requirement, lifecycle=lifecycle)
         return resolve_generation_decision(
             self, projection=projection, context=context, policy=policy,
             lifecycle=lifecycle, inputs=inputs, continuity_routing=continuity_routing,
@@ -516,6 +529,11 @@ class VideoGenerationResolver:
             requirement_input_assets=input_assets,
             requirement_lineage_current=commercial_current,
             commercial_source_preparation=commercial_source_preparation,
+            causal_transition_verified=bool(transition is not None
+                and transition.transition_policy.schema_version == "2"),
+            identity_carryover_verified=bool(transition is not None
+                and transition.transition_policy.schema_version == "2"
+                and transition.transition_policy.continuity_obligation.value == "identity_style_carryover"),
         )
         decision = enforce_c4_requirement_gate(
             requirement, context, capabilities, selected_capability_id, decision

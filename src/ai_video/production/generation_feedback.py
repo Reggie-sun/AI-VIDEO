@@ -329,7 +329,8 @@ class GenerationFeedbackOrchestrator:
         arguments = {name: current[name] for name in ("projection", "context", "policy", "lifecycle")}
         if "continuity_routing" in current:
             arguments["continuity_routing"] = current["continuity_routing"]
-        decision = VideoGenerationResolver().resolve_requirement(**arguments, inputs=inputs)
+        decision = VideoGenerationResolver().resolve_requirement(**arguments, inputs=inputs,
+            source_project=current.get("source_project"))
         if decision.disposition != "GENERATE_ONCE":
             return PreparedGeneration(inputs, decision, target_shot_id=current["context"].target_shot_id)
         provider = providers[decision.selected_candidate_id]

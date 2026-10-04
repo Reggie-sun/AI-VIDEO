@@ -324,6 +324,9 @@ def validate_continuity_transition(
         continuity_routing.model_dump(mode="python")
     )
     policy = continuity_routing.transition_policy
+    if (continuity_routing.source_activation_registry is not None
+            and lifecycle.execution_stack_hash != policy.destination_execution_stack_hash):
+        raise ValueError("sequence destination execution stack is stale")
     target = policy.target_shot
     requirement = projection.requirement
     context_mode = context.continuity_mode.value
@@ -366,6 +369,7 @@ def validate_continuity_transition(
             lifecycle,
             continuity_routing.previous_shot,
             continuity_routing.previous_provider_bound_request,
+            continuity_routing.source_activation_registry,
         )
         if (
             policy.source_execution_stack_hash
@@ -441,6 +445,7 @@ def _validate_full_continuity_terminal(
     lifecycle: Any,
     previous_shot: Any,
     previous_provider_bound_request: Any,
+    source_activation_registry: Any = None,
 ) -> None:
     terminal = context.upstream_terminal
     c4_binding = projection.requirement.c4_multi_anchor_binding
@@ -483,7 +488,7 @@ def _validate_full_continuity_terminal(
             previous_shot.content_hash,
             previous_provider_bound_request.lifecycle.output_asset_id,
             previous_provider_bound_request.lifecycle.generation_id,
-            previous_provider_bound_request.lifecycle.base_registry,
+            source_activation_registry or previous_provider_bound_request.lifecycle.base_registry,
         )
         or (
             evidence.extracted_asset_id,

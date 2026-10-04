@@ -24,6 +24,11 @@ from ai_video.planning.video_planner import (
     prepare_shot_for_existing_production,
     require_current_video_plan,
 )
+from ai_video.planning.sequence_continuity import (
+    build_sequence_video_planning_request,
+    causal_state_column_hash,
+    prepare_sequence_shot_for_existing_production,
+)
 
 __all__ = [
     "AssetRole",
@@ -46,4 +51,7 @@ __all__ = [
     "build_commercial_video_planning_request",
     "prepare_shot_for_existing_production",
     "require_current_video_plan",
+    "build_sequence_video_planning_request",
+    "causal_state_column_hash",
+    "prepare_sequence_shot_for_existing_production",
 ]

@@ -843,6 +843,16 @@ def require_current_video_plan(
         require_ready,
     )
 
+    embedded = current_request.continuity_transition_policy
+    if embedded is not None:
+        if continuity_transition_policy is not None and continuity_transition_policy != embedded:
+            from ai_video.errors import AiVideoError, ErrorCode
+
+            raise AiVideoError(code=ErrorCode.PLANNING_PREFLIGHT_BLOCKED,
+                user_message="Sequence continuity policy conflicts with the sealed planning request.",
+                retryable=False)
+        continuity_transition_policy = embedded
+
     readiness_request = ShotReadinessRequest.create(
         request_id=f"readiness-{current_request.target_shot.shot_id}",
         current_request=current_request,
@@ -869,6 +879,7 @@ def prepare_shot_for_existing_production(
         plan=plan,
         continuity_transition_policy=continuity_transition_policy,
     )
+    continuity_transition_policy = continuity_transition_policy or current_request.continuity_transition_policy
     handoff: dict[str, object] = {
         "current_shot": current_request.target_shot,
         "generation_requirement": projection,

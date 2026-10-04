@@ -1,5 +1,21 @@
 # AI-VIDEO Contract Routing Matrix
 
+## Sequence Authoring Boundary
+
+顺序 owner：selected `Storyboard.beats[].shot_ids`；authoring/revision 与 mutable acceptance
+仍由 `ProductionProject`、Registry、Manifest 和唯一 `ProductionStateCommitter` 管理。
+`planning/sequence_continuity.py::build_sequence_video_planning_request` 是唯一通用 typed edge
+adapter，复用 `PreviousShotState` constructor 和 `ContinuityTransitionPolicy v2`；
+source accepted execution/close state 与 target sealed open state按完整 causal column核验。
+`prepare_sequence_shot_for_existing_production` 经 Planner/Readiness，feedback handoff重开source
+activation及authoring seal。缺证不得降NONE；独立/reset/carryover显式分类。
+`production/_sequence_source.py`共用只读accepted proof，public resolver/execution重验activation、
+adjacency、intent及stack；FULL source close要求exact hash-bound analyzer/human PASS，技术PASS不足。
+C2 keyframe preparation仍属既有image/committer owner，adapter不生成或伪造图。
+禁止prompt推断、第二state/schema/sequence writer、legacy state token代替v2事实，或把工程READY
+当真实媒体PASS。验证由existing Harness `video_planner_tests`、Readiness/Router/feedback suites路由；
+具体scope见[bounded spec](superpowers/specs/2026-10-04-sequence-continuity-materialization.md)。
+
 ## Agent Rule Migration
 
 `.agent/harness/agent-rules.yaml` 只拥有 migrated rule 的 existing check references、offline
