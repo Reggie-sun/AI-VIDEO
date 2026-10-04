@@ -18,6 +18,8 @@ exact assertion。cross-stack不得消费裸route/candidate作为selection：必
 既有route binding additive保存该type的canonical JSON，Production reopen重算decision并重验
 current target/intent/snapshots/lifecycle/stack，并以既有authoring seal核对prior selection的seed hash，
 public resolver/execution不能跳过此关联。先前selection不授权最终sequence requirement；
+binding保存既有materialized `VideoPlanningRequest`的canonical preimage；reopen校验实际final
+requirement的source request hash、内嵌policy及prior neutral seed，禁止完整policy/proof移用于另一个request。
 最终仍经Planner/Readiness/Router，不允许循环使用自身continuity route完成初始selection。
 当前sequence API的仓库内caller只有tests，不能把test callback称为已交付production driver。
 禁止prompt推断、第二state/schema/sequence writer、legacy state token代替v2事实，或把工程READY

@@ -7,6 +7,7 @@ learning_eligibility: ineligible
 # Sequence Destination Route Authority Record
 
 Date: 2026-10-04
+Updated: 2026-10-05
 
 ## Purpose And Research Baseline
 
@@ -100,6 +101,12 @@ Router final selection/validation → native compilation。先前 binding 不能
 最终 Router 可拒绝 mismatch 或 FULL/C2 incompatibility，不能静默替换 immutable destination。
 这复用已有 binding checkpoint，不新增 preselection orchestrator；缺 proof 就 STOP。
 
+cross-stack binding 另保存已有 materialized `VideoPlanningRequest` 的 canonical JSON preimage。
+共享 reopen 以其内容 hash 对照实际 final requirement 的 `source_request_content_hash`，核对内嵌
+policy，然后从相同 preimage 移除 sequence policy、恢复 `previous_shot_state=None`，核验 prior
+neutral seed hash 和 authoring seal。这里只验证既有数据身份，不推导 Planner requirement、引入
+Production → Planning import 或第二 schema。same-stack omission 保持历史 binding hash。
+
 ## Independent Review Reproduction And Consolidation
 
 第一 candidate `76790a84163a523e11f4e62da59b0221ca4cd82a` 的 16 项 exact commit-range Harness
@@ -115,22 +122,35 @@ builder/feedback 复用相同 payload；没有新增 schema、selector、receipt
 同一替换回归 GREEN 为 **3 passed**。第一轮 receipt/review 只保留为历史，不能替代修复快照的新
 Harness 与双独立复审。具体 Parent 裁决保存在 run `001` 的 `final-review-round1.json`。
 
+第二 candidate `ac9dfa5a0fef6aea6360d8ea2eb5969df746966d` 的 16 项 checks 与 freshness 也通过，
+但 round 2 review 仍发现 `SA-001` / `SAR-001` 未关闭：完整合法 other-seed policy+binding 与原
+final projection 配对时，内部 seal 一致但不能证明实际 final planning lineage。Parent 从正常
+builder 生成完整替换 package，在 public Resolver/resealed execution 复现 **2 failed**。
+将同一场景纳入 repository test 后为 **2 failed、feedback 1 passed**；feedback 原有 exact-policy
+检查已经阻断，不把测试的错误消息匹配差异当作新的 runtime bug。
+
+上述 request-preimage 最小补强直接关联 final request/policy/prior seed；九项核心 GREEN 包括
+完整替换、单 selection 替换、缺 preimage 和合法 cross-stack 对照。run `002` 保存 Parent RED、
+双审与历史 receipt；passing Harness 不代替 blocking review finding。最终新 snapshot 仍须独立
+核验 run `003` 与 round 3 review，不以旧 passing receipts 代替。
+
 ## Verification And Evidence
 
 - RED：原实现 same-stack omission 两项失败，bare cross-stack route 到达被禁止的 Planner，三项
   regression 先证实失败，再修复。
-- Final native sequence suite：`tests/test_planning_sequence_continuity.py`，**47 passed**；覆盖继承、
+- Final native sequence suite：`tests/test_planning_sequence_continuity.py`，**51 passed**；覆盖继承、
   same-stack forgery、有效 cross-stack prior selection、最终 route/stack 一致、bare route、stale
   route/stack/lifecycle/seed/target、tampered decision、candidate tie、circular proof、legacy bypass，
-  以及 other-seed binding 替换在 feedback/public Resolver/resealed execution 的拒绝行为。
+  以及单 selection / 完整合法 policy+binding 替换和缺 planning request preimage 在
+  feedback/public Resolver/resealed execution 的拒绝行为。
 - 其他相关 native suites：Planner、Router、transition、Readiness、feedback、execution/guards、
   generation decision，**395 passed**。包括 METASO soft Ref2VA FULL gate、HardCutKeyframe C2、
   identity/style carryover 与 reset；没有修改这些媒体/capability contracts。
 - Task Architecture Gate：PASS；`_shot_router_contracts.py` 有既有 oversized-module growth WARN，
-  effective LOC `951 → 954`。增加的是既有 cohesive binding 的 evidence 字段/None serialization，
+  effective LOC `951 → 957`。增加的是既有 cohesive binding 的 evidence 字段/None serialization，
   admission/reopen logic 位于既有 execution owner；未刷新 debt baseline 或清理 unrelated code。
 - `git diff --check`：PASS。最终 exact Harness 与两个独立 T3 review 的 evidence 存于
-  `.agent/harness/runs/sequence-route-authority-20261004-002/`；须分别核验 snapshot、policy、artifact
+  `.agent/harness/runs/sequence-route-authority-20261004-003/`；须分别核验 snapshot、policy、artifact
   与 freshness，不能从本记录或 native tests 推定它们通过。
 
 ## Remaining Evidence Boundaries

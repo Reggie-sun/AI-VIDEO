@@ -205,15 +205,6 @@ def build_sequence_video_planning_request(
             target_generation_intent_hash=intent.projection_hash,
             causal_edge_semantics=causal_edge_semantics, causal_state_changes=changes,
         )
-        routing = ContinuityProviderRouteBinding.create(
-            transition_policy=policy, previous_shot=source_requirement.target_shot,
-            previous_provider_bound_request=bound, source_route=source_route,
-            destination_route=destination_route, source_execution_stack=source_execution_stack,
-            destination_execution_stack=destination_execution_stack,
-            source_activation_registry=source_registry,
-            destination_selection_binding=(destination_selection_binding.model_dump(mode="json")
-                if destination_selection_binding is not None else None),
-        )
         state = (None if continuity_obligation is ContinuityObligation.SUBSTANTIAL_RESET else
             VideoPlanner.derive_previous_shot_state(
                 previous_shot=source_requirement.target_shot, target_shot=target,
@@ -224,8 +215,20 @@ def build_sequence_video_planning_request(
                 has_terminal_frame_asset_id=terminal.extracted_asset_id if terminal is not None else None))
         payload = {name: getattr(current_request, name) for name in type(current_request).model_fields
                    if name != "request_content_hash"}
-        return VideoPlanningRequest.create(**{**payload, "previous_shot_state": state,
-            "continuity_transition_policy": policy}), routing
+        request = VideoPlanningRequest.create(**{**payload, "previous_shot_state": state,
+            "continuity_transition_policy": policy})
+        routing = ContinuityProviderRouteBinding.create(
+            transition_policy=policy, previous_shot=source_requirement.target_shot,
+            previous_provider_bound_request=bound, source_route=source_route,
+            destination_route=destination_route, source_execution_stack=source_execution_stack,
+            destination_execution_stack=destination_execution_stack,
+            source_activation_registry=source_registry,
+            destination_selection_binding=(destination_selection_binding.model_dump(mode="json")
+                if destination_selection_binding is not None else None),
+            destination_planning_request=(request.model_dump(mode="json")
+                if destination_selection_binding is not None else None),
+        )
+        return request, routing
     except (AttributeError, KeyError, StopIteration, TypeError, ValueError) as exc:
         raise AiVideoError(code=ErrorCode.PLANNING_PREFLIGHT_BLOCKED,
             user_message="Sequence continuity needs exact authoring evidence before planning.",

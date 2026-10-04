@@ -111,6 +111,23 @@ def sequence_authoring_evidence_hash(*, loaded, binding, accepted_media, target_
         "causal_state_changes": [c.model_dump(mode="json") for c in changes]})
 
 
+def _sequence_planning_seed_hash(routing, requirement):
+    """Verify the existing Planner request preimage, then its neutral seed identity."""
+    request = routing.destination_planning_request
+    if request is None:
+        raise ValueError("cross-stack sequence requires its sealed planning request")
+    payload = {name: value for name, value in request.items()
+               if name not in {"request_id", "request_content_hash"}}
+    request_hash = canonical_sha256(payload)
+    if (request.get("request_content_hash") != request_hash
+            or requirement.source_request_content_hash != request_hash
+            or request.get("continuity_transition_policy") != routing.transition_policy.model_dump(mode="json")):
+        raise ValueError("sequence planning request does not match the exact final requirement and policy")
+    payload.pop("continuity_transition_policy")
+    payload["previous_shot_state"] = None
+    return canonical_sha256(payload)
+
+
 def require_sequence_source(*, loaded, routing, requirement, lifecycle):
     """Reopen exact activation evidence; a pointer alone is never authority."""
     if routing.source_activation_registry is None:
@@ -145,13 +162,15 @@ def require_sequence_source(*, loaded, routing, requirement, lifecycle):
         raise ValueError("sequence execution stack is stale")
     if policy.source_execution_stack_hash != policy.destination_execution_stack_hash:
         from ai_video.production.generation_execution import require_sequence_destination_selection
-        selection = require_sequence_destination_selection(selection=routing.destination_selection_binding,
+        seed_hash = _sequence_planning_seed_hash(routing, requirement)
+        require_sequence_destination_selection(selection=routing.destination_selection_binding,
             target_shot=target, target_generation_intent_hash=requirement.generation_intent_hash,
             destination_execution_stack=routing.destination_execution_stack, lifecycle=lifecycle,
-            destination_route=routing.destination_route, project=loaded)
+            destination_route=routing.destination_route, project=loaded,
+            source_request_content_hash=seed_hash)
         if policy.authoring_evidence_hash != sequence_authoring_evidence_hash(
                 loaded=loaded, binding=binding, accepted_media=accepted_hashes,
-                target_request_hash=selection.projection.requirement.source_request_content_hash,
+                target_request_hash=seed_hash,
                 changes=policy.causal_state_changes):
             raise ValueError("sequence authoring evidence seal has a stale planning seed")
     require_causal_columns(policy.causal_state_changes,

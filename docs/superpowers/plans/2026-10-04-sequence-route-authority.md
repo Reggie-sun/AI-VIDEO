@@ -27,6 +27,9 @@ Production source proof seam 在 resolver/preparation/execution reopen 时重新
 因此手工重建 routing 不能旁路 builder 的限制。初始 selection 不允许 continuity-route 预选循环。
 将既有 authoring-seal payload 归并到 source proof owner，所有 cross-stack reopen 关联 prior seed；
 以 another valid neutral-seed selection 替换测试覆盖 feedback/public Resolver/resealed execution。
+保存既有 materialized `VideoPlanningRequest` 的 canonical preimage，在 shared reopen 将 final
+requirement hash、内嵌 policy 和去除 sequence fields 后的 neutral seed 关联起来；补完整合法
+policy+binding 替换及缺 preimage 的否定测试。既有 None serialization 保留 historical hashes。
 
 **Acceptance:** 用户 ten-test inventory 与 stale/tampered/legacy bypass 否定路径通过；有效 cross-stack
 先前 Router selection 可被消费，最终 Router 仍可拒绝 destination mismatch。

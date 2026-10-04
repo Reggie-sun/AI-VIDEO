@@ -822,7 +822,8 @@ def test_cross_stack_rejects_stale_or_tampered_selection(activated_source, chang
         build_sequence_video_planning_request(**inputs)
 
 
-def test_cross_stack_legacy_binding_cannot_bypass_production_reopen(activated_source):
+@pytest.mark.parametrize("omission", ["destination_selection_binding", "destination_planning_request"])
+def test_cross_stack_legacy_binding_cannot_bypass_production_reopen(activated_source, omission):
     from ai_video.production.shot_router import ContinuityProviderRouteBinding, VideoGenerationResolver
     from ai_video.planning.generation_feedback_context import require_feedback_context
     from test_production_shot_router import _policy
@@ -833,23 +834,24 @@ def test_cross_stack_legacy_binding_cannot_bypass_production_reopen(activated_so
     prepared = _prepare_sequence_generation(activated_source, inputs, request, routing)
     legacy = ContinuityProviderRouteBinding.create(**{
         **{n: getattr(routing, n) for n in type(routing).model_fields
-           if n not in {"binding_hash", "destination_selection_binding"}}})
-    assert "destination_selection_binding" not in legacy.model_dump(mode="json")
+           if n not in {"binding_hash", omission}}})
+    assert omission not in legacy.model_dump(mode="json")
     loaded = load_production_project(activated_source["root"] / "project.yaml")
     binding = prepared.execution_binding
-    with pytest.raises(ValueError, match="prior Router execution binding"):
+    with pytest.raises(ValueError, match="prior Router execution binding|sealed planning request"):
         require_feedback_context(loaded=loaded, planning_request=request, video_plan=VideoPlanner().plan(request),
             context=binding.context, routing_policy=_policy(), lifecycle=inputs["lifecycle"], continuity_routing=legacy)
-    with pytest.raises(ValueError, match="prior Router execution binding"):
+    with pytest.raises(ValueError, match="prior Router execution binding|sealed planning request"):
         VideoGenerationResolver().resolve_requirement(projection=binding.projection, context=binding.context,
             policy=binding.policy, lifecycle=binding.lifecycle, inputs=binding.inputs,
             continuity_routing=legacy, source_project=loaded)
-    with pytest.raises(ValueError, match="prior Router execution binding"):
+    with pytest.raises(ValueError, match="prior Router execution binding|sealed planning request"):
         binding.model_copy(update={"continuity_routing": legacy}).validate_current_project(loaded)
 
 
 @pytest.mark.parametrize("entrypoint", ["feedback", "resolver", "execution"])
-def test_cross_stack_other_seed_selection_cannot_bypass_production_reopen(activated_source, entrypoint):
+@pytest.mark.parametrize("replacement", ["selection", "policy"])
+def test_cross_stack_other_seed_selection_cannot_bypass_production_reopen(activated_source, entrypoint, replacement):
     from ai_video.production.generation_decision import resolve_generation_decision
     from ai_video.production.generation_execution import GenerationDecisionExecutionBinding
     from ai_video.production.shot_router import ContinuityProviderRouteBinding, VideoGenerationResolver
@@ -869,17 +871,22 @@ def test_cross_stack_other_seed_selection_cannot_bypass_production_reopen(activa
     assert other.selected_provider_route == initial.execution_binding.selected_provider_route
     assert other.projection.requirement.generation_intent_hash == seed.generation_intent.projection_hash
     assert other.projection.requirement.source_request_content_hash != seed.request_content_hash
-    substituted = ContinuityProviderRouteBinding.create(**{
-        **{n: getattr(routing, n) for n in type(routing).model_fields if n != "binding_hash"},
-        "destination_selection_binding": other.model_dump(mode="json")})
+    if replacement == "selection":
+        substituted = ContinuityProviderRouteBinding.create(**{
+            **{n: getattr(routing, n) for n in type(routing).model_fields if n != "binding_hash"},
+            "destination_selection_binding": other.model_dump(mode="json")})
+    else:
+        other_request, substituted = build_sequence_video_planning_request(**{
+            **inputs, "current_request": other_seed, "destination_selection_binding": other})
+        assert other_request.request_content_hash != request.request_content_hash
     loaded = load_production_project(activated_source["root"] / "project.yaml")
     arguments = dict(projection=binding.projection, context=binding.context, policy=binding.policy,
         lifecycle=binding.lifecycle, inputs=binding.inputs, continuity_routing=substituted)
     if entrypoint == "feedback":
-        with pytest.raises(ValueError, match="seed|authoring evidence"):
+        with pytest.raises(ValueError, match="seed|authoring evidence|planning request|exact continuity routing"):
             _prepare_sequence_generation(activated_source, inputs, request, substituted)
     elif entrypoint == "resolver":
-        with pytest.raises(ValueError, match="seed|authoring evidence"):
+        with pytest.raises(ValueError, match="seed|authoring evidence|planning request"):
             VideoGenerationResolver().resolve_requirement(**arguments, source_project=loaded)
     else:
         decision = resolve_generation_decision(VideoGenerationResolver(), **arguments)
@@ -888,7 +895,7 @@ def test_cross_stack_other_seed_selection_cannot_bypass_production_reopen(activa
             decision.routing.provider_bound_request, binding.projection.requirement)
         resealed = GenerationDecisionExecutionBinding.create(**arguments, decision=decision,
             compiled_request=activated_source["provider"].resolve(compiled.request))
-        with pytest.raises(ValueError, match="seed|authoring evidence"):
+        with pytest.raises(ValueError, match="seed|authoring evidence|planning request"):
             resealed.validate_current_project(loaded)
 
 
