@@ -15,9 +15,39 @@
 
 ## Ownership And Safety
 
-`metaso_h3.py` 显式实现 Ref2VA payload/query mapping；复用现有 video request/receipt、remote prose compiler、paid budget/egress/one-use permit、`VideoGenerationService` 与唯一 `ProductionStateCommitter`。下载复用 public-IP pinned HTTPS，禁 redirect。raw key 唯一默认来源是进程环境 `METASO_API_KEY`，不回退其他 secret；request repr 与错误不包含 credential。不注册 default、不 retry POST、不激活 candidate。
+`metaso_h3.py` 显式实现 Ref2VA 和 frame payload/query mapping；复用现有 video request/receipt、remote prose compiler、paid budget/egress/one-use permit、`VideoGenerationService` 与唯一 `ProductionStateCommitter`。下载复用 public-IP pinned HTTPS，禁 redirect。raw key 唯一默认来源是进程环境 `METASO_API_KEY`，不回退其他 secret；request repr 与错误不包含 credential。不注册 default、不 retry POST、不激活 candidate。
 
 Profile 封存 requested ratio 和 Context IR。输出 pixel geometry 与物理 FPS 由 Provider 决定；现有 flexible requirement 使用 adaptive geometry / 24 FPS nominal 声明，实际 MP4 必须独立 probe。内部 `cost_upper_bound_microunits` 是 operator 上限，真实 credits/cost 只从可确认的 Provider response 取证。
+
+## First And Optional Last Frame — 2026-10-05
+
+重新核对 upstream commit `0d1c72b1d80a54237b40adb111ae74d7fe38f4b4` 的
+[first/last nodes](https://github.com/meta-sota/ComfyUI-MiniMaxH3-API/blob/0d1c72b1d80a54237b40adb111ae74d7fe38f4b4/nodes.py#L128)
+和 [client payload](https://github.com/meta-sota/ComfyUI-MiniMaxH3-API/blob/0d1c72b1d80a54237b40adb111ae74d7fe38f4b4/api_client.py#L98)。
+`metaso-h3-ref2va-v1` 字段、fingerprint、native body、Context IR、media references 保持。
+当 profile 的 `aspect_ratio="adaptive"` 时额外注册 `metaso-h3-fl2va-v1`：
+`IMAGE_TO_VIDEO`、`allowed_image_roles=("first_frame", "last_frame")`、
+`required_first_frame=True`；一个 variant 支持 first-only 和 first+last。
+legacy profile version/pointer serialization 不变；新增 variant 改变 adaptive profile 的
+provider-wide capabilities fingerprint，selected Ref2VA variant fingerprint 不变。
+
+native content 顺序为 text → image_url(role=first_frame) → optional image_url(role=last_frame)，
+仍调用同一 `/v2/video_generation` / `MiniMax-H3`。frame 模式省略 ratio，跟随图片；
+固定 ratio profile 只暴露 Ref2VA，避免静默丢弃 profile intent。禁止将普通 reference 当首帧。
+frame 不接受独立 identity/scene/audio/video references；身份和场景必须已体现在 conditioning image 中。
+
+first/last 均需 measured size、png/jpeg/webp、单张 ≤30 MiB、宽高 256–5760、ratio 0.4–2.5。
+使用 injected Registry resolver 验证 exact bytes/SHA256/size，encoded MIME/geometry 与 binding 一致。
+不 crop/resize/transcode；无 direct URL 旁路。upstream 逐图校验、未声明 pair geometry equality，
+因此不额外要求等尺寸/等比例；server pair behavior 尚无 live proof。未声明 seed、水印控制或媒体质量保证。
+
+offline Router fixtures 验证 EXACT_TERMINAL terminal 与 HardCut C2 derived image 选择
+first_frame，并经现有 compiler/resolve/preview/native body；不是 accepted source 或媒体证明。
+现有 remote prose compiler 只表达 text 状态；canonical sequence 的 typed-hash open/close
+仍返回 `PROMPT_EXPRESSION_UNSUPPORTED`。本 slice 保留 fail-closed，不修改 prompt/continuity owner。
+因此 API conditioning coverage 已补齐，真实 B arm 仍缺 fresh accepted source 和合法 hash-state native expression。
+详见 [研究](research/2026-10-05-metaso-h3-frame-conditioning.md) 与
+[continuation record](record_for_agent/2026-10-05-metaso-h3-frame-capability.md)。
 
 ## Multiple Reference Views
 

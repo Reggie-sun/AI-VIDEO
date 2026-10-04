@@ -270,3 +270,339 @@ def test_real_transport_handles_case_insensitive_http_download_headers(monkeypat
         result = provider.fetch(submission,receipt,observed,sink)
     assert sink.getvalue()==body
     assert result.size_bytes==len(body)
+
+
+def _frame_setup(*, last=False, aspect_ratio="adaptive"):
+    from io import BytesIO
+    from PIL import Image
+
+    raw, images = {}, []
+    for role in ("first_frame", "last_frame") if last else ("first_frame",):
+        sink = BytesIO()
+        Image.new("RGB", (512, 288), "navy" if role == "first_frame" else "green").save(sink, format="PNG")
+        raw[role] = sink.getvalue()
+        images.append(VideoImageReferenceBinding(role=role, asset_id=role,
+            asset_sha256=hashlib.sha256(raw[role]).hexdigest(), mime_type="image/png",
+            width=512, height=288, size_bytes=len(raw[role])))
+
+    def forbidden(*args, **kwargs):
+        pytest.fail("offline frame preparation must not read credentials or contact a Provider")
+
+    from types import SimpleNamespace
+    profile = MetasoH3Profile(duration=4, resolution="768P", aspect_ratio=aspect_ratio,
+        context_ir=True, cost_upper_bound_microunits=1)
+    provider = MetasoH3VideoProvider(profile=profile,
+        transport=SimpleNamespace(request=forbidden, stream=forbidden), credential=forbidden,
+        reference_resolver=lambda binding: raw[binding.asset_id])
+    request = _request(provider_name="metaso_h3", provider_kind="metaso_h3",
+        provider_profile=profile.pointer(), mode=VideoGenerationMode.IMAGE_TO_VIDEO,
+        image_bindings=tuple(images), output_requirement=profile.output())
+    return provider, request, raw
+
+
+def test_frame_capability_and_ref2va_serialization_are_deterministic():
+    from ai_video.production.video import VideoProviderCapabilities
+    provider, _, _ = _frame_setup()
+    capabilities = provider.capabilities()
+    assert capabilities == provider.capabilities()
+    assert VideoProviderCapabilities.model_validate_json(capabilities.model_dump_json()) == capabilities
+    ref, frame = capabilities.variants
+    from ai_video.production._video_capability_fingerprint import capability_variant_fingerprint
+    assert capability_variant_fingerprint(ref) == "fcfca8c570a0244792f956f9cdfb25c370d81c5ea454a7f220962ca57d78c24f"
+    assert ref.capability_id == "metaso-h3-ref2va-v1"
+    assert frame.capability_id == "metaso-h3-fl2va-v1"
+    assert frame.mode is VideoGenerationMode.IMAGE_TO_VIDEO
+    assert frame.allowed_image_roles == ("first_frame", "last_frame")
+    assert frame.required_first_frame and frame.max_reference_count == 0
+    assert not frame.media_capabilities and not frame.seed_supported
+    fixed, _, _ = _frame_setup(aspect_ratio="16:9")
+    assert fixed.capabilities().variants == (ref,)
+    assert provider._profile.pointer().profile_version == ref.profile_version
+
+
+@pytest.mark.parametrize("last", [False, True])
+def test_frame_native_exact_bytes_roles_order_and_pre_submit(last):
+    import base64
+    provider, request, raw = _frame_setup(last=last)
+    resolved = provider.resolve(request)
+    assert resolved.capability_id == "metaso-h3-fl2va-v1"
+    assert provider.preview(resolved).resolved_generation_hash == resolved.resolved_generation_hash
+    body = json.loads(provider.native_payload(resolved))
+    assert {k: v for k, v in body.items() if k != "content"} == {
+        "model": "MiniMax-H3", "duration": 4, "resolution": "768P", "context_ir_enabled": True}
+    assert body["content"][0] == {"type": "text", "text": request.prompt_text}
+    expected = ["first_frame", "last_frame"] if last else ["first_frame"]
+    assert [item["role"] for item in body["content"][1:]] == expected
+    for item in body["content"][1:]:
+        assert item["type"] == "image_url"
+        assert base64.b64decode(item["image_url"]["url"].split(",", 1)[1]) == raw[item["role"]]
+
+
+@pytest.mark.parametrize("roles", [(), ("last_frame",), ("reference",),
+    ("first_frame", "reference"), ("first_frame", "first_frame"),
+    ("first_frame", "last_frame", "last_frame")])
+def test_frame_invalid_roles_block(roles):
+    provider, request, _ = _frame_setup()
+    image = request.image_bindings[0]
+    bindings = tuple(image.model_copy(update={"role": role, "asset_id": f"frame-{i}"})
+        for i, role in enumerate(roles))
+    with pytest.raises((AiVideoError, ValueError)):
+        provider.resolve(_request(**{**request.model_dump(exclude={"request_input_hash"}),
+            "image_bindings": bindings}))
+
+
+@pytest.mark.parametrize("updates", [
+    {"width": 255}, {"height": 255}, {"width": 5761}, {"height": 5761},
+    {"width": 1000, "height": 256}, {"width": 256, "height": 1000},
+    {"mime_type": "image/gif"}, {"size_bytes": None}, {"size_bytes": 30 * 1024 * 1024 + 1},
+])
+def test_frame_invalid_metadata_blocks(updates):
+    provider, request, _ = _frame_setup()
+    with pytest.raises((AiVideoError, ValueError)):
+        provider.resolve(_request(**{**request.model_dump(exclude={"request_input_hash"}),
+            "image_bindings": (request.image_bindings[0].model_copy(update=updates),)}))
+
+
+@pytest.mark.parametrize("role", ["first_frame", "last_frame"])
+@pytest.mark.parametrize("defect", ["hash", "size", "encoded_geometry", "encoded_mime", "invalid_image"])
+def test_frame_exact_bytes_and_encoded_metadata_block_before_effect(role, defect):
+    provider, request, raw = _frame_setup(last=True)
+    updates = {}
+    if defect == "hash":
+        original = raw[role]
+        raw[role] = bytes([original[0] ^ 1]) + original[1:]
+    elif defect == "size":
+        raw[role] += b"extra"
+    elif defect == "encoded_geometry":
+        updates = {"width": 640}
+    elif defect == "encoded_mime":
+        updates = {"mime_type": "image/jpeg"}
+    else:
+        raw[role] = b"not an image"
+        updates = {"size_bytes": len(raw[role]), "asset_sha256": hashlib.sha256(raw[role]).hexdigest()}
+    request = _request(**{**request.model_dump(exclude={"request_input_hash"}),
+        "image_bindings": tuple(b.model_copy(update=updates) if b.role == role else b
+            for b in request.image_bindings)})
+    with pytest.raises(AiVideoError):
+        provider.native_payload(provider.resolve(request))
+
+
+def test_frame_ratio_profile_and_media_cannot_be_silently_dropped():
+    provider, request, _ = _frame_setup(aspect_ratio="16:9")
+    with pytest.raises(AiVideoError):
+        provider.resolve(request)
+    provider, request, _ = _frame_setup()
+    audio = VideoMediaReferenceBinding(kind="audio", role="reference_audio", asset_id="audio",
+        asset_sha256="a" * 64, mime_type="audio/wav", size_bytes=4, duration_millis=4000)
+    with pytest.raises((AiVideoError, ValueError)):
+        provider.resolve(_request(**{**request.model_dump(exclude={"request_input_hash"}),
+            "media_bindings": (audio,)}))
+
+
+def test_optional_last_has_independently_legal_geometry():
+    from io import BytesIO
+    from PIL import Image
+    provider, request, raw = _frame_setup(last=True)
+    sink = BytesIO()
+    Image.new("RGB", (640, 640)).save(sink, format="PNG")
+    raw["last_frame"] = sink.getvalue()
+    last = request.image_bindings[1].model_copy(update={"width": 640, "height": 640,
+        "size_bytes": len(raw["last_frame"]), "asset_sha256": hashlib.sha256(raw["last_frame"]).hexdigest()})
+    request = _request(**{**request.model_dump(exclude={"request_input_hash"}),
+        "image_bindings": (request.image_bindings[0], last)})
+    assert json.loads(provider.native_payload(provider.resolve(request)))["content"][-1]["role"] == "last_frame"
+
+
+@pytest.mark.parametrize("image_format,mime", [("PNG", "image/png"), ("JPEG", "image/jpeg"), ("WEBP", "image/webp")])
+def test_frame_supported_encoded_image_formats(image_format, mime):
+    from io import BytesIO
+    from PIL import Image
+    provider, request, raw = _frame_setup()
+    sink = BytesIO()
+    Image.new("RGB", (512, 288)).save(sink, format=image_format)
+    raw["first_frame"] = sink.getvalue()
+    binding = request.image_bindings[0].model_copy(update={"mime_type": mime,
+        "asset_sha256": hashlib.sha256(raw["first_frame"]).hexdigest(), "size_bytes": len(raw["first_frame"])})
+    request = _request(**{**request.model_dump(exclude={"request_input_hash"}), "image_bindings": (binding,)})
+    uri = json.loads(provider.native_payload(provider.resolve(request)))["content"][1]["image_url"]["url"]
+    assert uri.startswith(f"data:{mime};base64,")
+
+
+def _metaso_frame_router_fixture(monkeypatch, *, hard_cut):
+    import test_production_shot_router as r
+    from ai_video.production.shot_router import AdapterCompilerContract
+    from ai_video.production.video_requirement import OutputNeed, AudioNeed, OutputGeometryPolicy
+    from tests.test_production_video_intent_validation import _complete_intent, _compatible_fl2va
+    from ai_video.production.video_requirement import ConditioningLane
+    provider, request, raw = _frame_setup(last=True)
+    variant = next(v for v in provider.capabilities().variants if v.mode is VideoGenerationMode.IMAGE_TO_VIDEO)
+    compiler = AdapterCompilerContract.create(compiler_id="metaso-h3-video-compiler", compiler_version="1")
+    common = dict(policy=r._policy(remote_authorized=True, budget_authorized=True),
+        provider_profile=provider._profile.pointer(), capabilities=provider.capabilities(),
+        selected_capability_id=variant.capability_id, output_requirement=provider._profile.output(),
+        compiler_contract=compiler)
+
+    def nominal_projection(projection):
+        intent = _complete_intent().model_copy(update={
+            "pacing": r.GenerationIntent().pacing.model_copy(update={"shot_duration_seconds": 4}),
+        })
+        return r._reseal_projection(projection,
+            contract_version="provider-neutral-video-requirement/4", generation_intent=intent,
+            conditioning_compatibility=_compatible_fl2va().model_copy(update={
+                "lane": ConditioningLane.I2VA, "first_anchor_id": projection.requirement.asset_evidence[0].asset_id,
+                "last_anchor_id": None, "available_duration_seconds": 4,
+            }),
+            output_need=OutputNeed(timing_mode="content_driven", duration_seconds=4,
+                geometry_policy=OutputGeometryPolicy.ADAPTIVE, aspect_ratio="adaptive",
+                fps=24, container_mime="video/mp4"), audio_need=AudioNeed.REQUIRED)
+
+    def metaso_source_route(context, **kwargs):
+        result = r.VideoGenerationResolver()._bind_requirement(context=context,
+            projection=nominal_projection(r._first_frame_projection(context)),
+            lifecycle=kwargs["lifecycle"], **common)
+        assert result.provider_bound_request is not None, result.decision
+        return result.provider_bound_request
+
+    # The existing terminal/C2 fixtures now derive their source from the same
+    # real METASO capability through Router; no production source is fabricated.
+    monkeypatch.setattr(r, "_route_first_frame", metaso_source_route)
+    original_asset = r._asset
+
+    def frame_asset(role, suffix, sha256, **kwargs):
+        if role in {"first_frame", "continuity_terminal"}:
+            image = request.image_bindings[1] if suffix == "derived-new-camera" else request.image_bindings[0]
+            # Separate terminal and derived keyframe identities, with exact offline image bytes.
+            kwargs.update(width=image.width, height=image.height, size_bytes=image.size_bytes)
+            sha256 = image.asset_sha256
+            asset = original_asset(role, suffix, sha256, **kwargs)
+            raw[asset.asset_id] = raw[image.role]
+            return asset
+        return original_asset(role, suffix, sha256, **kwargs)
+
+    monkeypatch.setattr(r, "_asset", frame_asset)
+    if hard_cut:
+        fixture = r._hard_cut_full_fixture()
+    else:
+        source, previous, context, lifecycle, _ = r._sequence_fixture()
+        fixture = dict(context=context, lifecycle=lifecycle,
+            projection=r._exact_terminal_projection(context))
+    fixture["projection"] = nominal_projection(fixture["projection"])
+    fixture.update(common)
+    route = r._selected_route_identity(provider_name="metaso_h3", variant=variant,
+        provider_profile=provider._profile.pointer(), compiler_contract=compiler)
+    if hard_cut:
+        sequence = fixture["continuity_routing"]
+        transition = r._causal_policy(sequence.transition_policy, fixture["projection"],
+            destination_execution_stack_hash=r._execution_stack_identity(route).execution_stack_hash)
+        fixture["continuity_routing"] = r._continuity_routing(transition=transition,
+            previous_bound=sequence.previous_provider_bound_request, previous_shot=sequence.previous_shot,
+            destination_route=route)
+    else:
+        transition = r._causal_policy(r._transition_policy(source_context=source,
+            target_context=context, lifecycle=lifecycle, boundary=r.BoundaryKind.WITHIN_CONTINUOUS_TAKE,
+            obligation=r.ContinuityObligation.FULL_CONTINUITY,
+            source_route=r._bound_route_identity(previous), destination_route=route), fixture["projection"])
+        fixture["continuity_routing"] = r._continuity_routing(transition=transition,
+            previous_bound=previous, previous_shot=source.activated_shot, destination_route=route)
+    return provider, fixture
+
+
+@pytest.mark.parametrize("hard_cut", [False, True])
+def test_metaso_exact_terminal_and_hard_cut_c2_reach_native_pre_submit(monkeypatch, hard_cut):
+    from ai_video.production.shot_router import VideoGenerationResolver, RoutingOutcome
+    from ai_video.production.video_compiler import require_compiled_provider_request
+    provider, fixture = _metaso_frame_router_fixture(monkeypatch, hard_cut=hard_cut)
+    result = VideoGenerationResolver()._bind_requirement(**fixture)
+    assert result.decision.outcome is RoutingOutcome.SELECTED, result.decision
+    assert result.decision.required_binding_roles == ("first_frame",)
+    bound = result.provider_bound_request
+    expected = fixture["context"].shot_keyframe if hard_cut else fixture["context"].upstream_terminal
+    assert bound.input_assets == (expected,)
+    sequence = fixture["continuity_routing"]
+    assert sequence.source_route == sequence.destination_route
+    assert sequence.source_execution_stack == sequence.destination_execution_stack
+    compiled = require_compiled_provider_request(provider.compile_request(bound, fixture["projection"].requirement))
+    assert compiled.request.image_bindings[0].asset_id == expected.asset_id
+    resolved = provider.resolve(compiled.request)
+    assert resolved.capability_id == "metaso-h3-fl2va-v1"
+    assert provider.preview(resolved).resolved_generation_hash == resolved.resolved_generation_hash
+    assert json.loads(provider.native_payload(resolved))["content"][1]["role"] == "first_frame"
+    if hard_cut:
+        assert compiled.request.hard_cut_keyframe_binding == fixture["lifecycle"].hard_cut_keyframe_binding
+        assert bound.input_assets[0] != fixture["context"].upstream_terminal
+    else:
+        assert compiled.request.continuity_binding == fixture["lifecycle"].continuity_binding
+
+
+def test_added_frame_variant_does_not_change_explicit_soft_full_block():
+    import test_production_shot_router as r
+    from ai_video.production.shot_router import VideoGenerationResolver, RouterReasonCode
+    provider, _, _ = _frame_setup()
+    fixture = r._metaso_continuity_fixture()
+    fixture["capabilities"] = provider.capabilities()
+    result = VideoGenerationResolver()._bind_requirement(**fixture)
+    assert RouterReasonCode.CONTINUITY_FRAME_CONDITIONING_REQUIRED in result.decision.reason_codes
+    assert result.provider_bound_request is None
+
+
+def test_metaso_first_last_requirement_compiles_through_router(monkeypatch):
+    import test_production_shot_router as r
+    from ai_video.production.video_requirement import (
+        AssetEvidence, CapabilityNeed, ConditioningLane, GenerationMode, SemanticReferenceRole,
+        ContinuityMode,
+    )
+    from ai_video.production.video_compiler import require_compiled_provider_request
+    from tests.test_production_video_intent_validation import _compatible_fl2va
+    provider, fixture = _metaso_frame_router_fixture(monkeypatch, hard_cut=True)
+    _, request, _ = _frame_setup(last=True)
+    last = request.image_bindings[1]
+    endpoint = r._asset("last_frame", "endpoint", last.asset_sha256,
+        size_bytes=last.size_bytes, width=last.width, height=last.height).model_copy(update={"asset_id": last.asset_id})
+    context = fixture["context"].model_copy(update={"continuity_mode": r.ContinuityMode.NONE,
+        "upstream_terminal": None, "last_frame": endpoint})
+    first = context.shot_keyframe
+    fixture["projection"] = r._reseal_projection(fixture["projection"],
+        generation_mode=GenerationMode.FIRST_LAST_FRAME_VIDEO, continuity_mode=ContinuityMode.NONE,
+        semantic_reference_roles=(SemanticReferenceRole.FIRST_FRAME, SemanticReferenceRole.LAST_FRAME),
+        asset_evidence=tuple(AssetEvidence(role=role, asset_id=a.asset_id, asset_sha256=a.asset_sha256,
+            mime_type=a.mime_type, size_bytes=a.size_bytes, width=a.width, height=a.height)
+            for role, a in ((SemanticReferenceRole.FIRST_FRAME, first), (SemanticReferenceRole.LAST_FRAME, endpoint))),
+        capability_need=CapabilityNeed(needs_first_frame=True, needs_last_frame=True),
+        conditioning_compatibility=_compatible_fl2va().model_copy(update={
+            "lane": ConditioningLane.FL2VA, "first_anchor_id": first.asset_id,
+            "last_anchor_id": endpoint.asset_id, "available_duration_seconds": 4}))
+    fixture["context"] = context
+    fixture["lifecycle"] = fixture["lifecycle"].model_copy(update={
+        "hard_cut_keyframe_binding": None,
+        "input_artifact_ids": (context.target_shot_id, first.asset_id, endpoint.asset_id)})
+    del fixture["continuity_routing"]
+    bound = r.VideoGenerationResolver()._bind_requirement(**fixture).provider_bound_request
+    assert bound is not None
+    compiled = require_compiled_provider_request(provider.compile_request(bound, fixture["projection"].requirement))
+    assert tuple(b.role for b in compiled.request.image_bindings) == ("first_frame", "last_frame")
+    body = json.loads(provider.native_payload(provider.resolve(compiled.request)))
+    assert [item["role"] for item in body["content"][1:]] == ["first_frame", "last_frame"]
+
+
+def test_typed_hash_sequence_prompt_remains_explicitly_unsupported(monkeypatch):
+    import test_production_shot_router as r
+    from ai_video.planning.sequence_continuity import causal_state_column_hash
+    from ai_video.production.video_requirement import TypedStateReference
+    from ai_video.production.video_compiler import ProviderRequirementUnsupported, ProviderRequirementUnsupportedReason
+    provider, fixture = _metaso_frame_router_fixture(monkeypatch, hard_cut=True)
+    sequence = fixture["continuity_routing"]
+    state_hash = causal_state_column_hash(sequence.transition_policy.causal_state_changes, endpoint="target_open")
+    intent = fixture["projection"].requirement.generation_intent.model_copy(update={
+        "open_state": TypedStateReference(kind="typed_hash", state_hash=state_hash),
+        "close_state": TypedStateReference(kind="typed_hash", state_hash=state_hash)})
+    fixture["projection"] = r._reseal_projection(fixture["projection"], generation_intent=intent)
+    fixture["continuity_routing"] = r._continuity_routing(
+        transition=r._causal_policy(sequence.transition_policy, fixture["projection"]),
+        previous_bound=sequence.previous_provider_bound_request, previous_shot=sequence.previous_shot,
+        destination_route=sequence.destination_route)
+    bound = r.VideoGenerationResolver()._bind_requirement(**fixture).provider_bound_request
+    assert bound is not None
+    result = provider.compile_request(bound, fixture["projection"].requirement)
+    assert isinstance(result, ProviderRequirementUnsupported)
+    assert result.reason is ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED
+    assert set(result.unsupported_field_paths) == {"generation_intent.open_state", "generation_intent.close_state"}

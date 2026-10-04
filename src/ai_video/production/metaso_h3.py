@@ -1,4 +1,4 @@
-"""METASO H3 Ref2VA using the existing video and paid execution contracts.
+"""METASO H3 Ref2VA and frame conditioning using existing execution contracts.
 
 Reference bytes are supplied by the caller's verified Registry resolver. The
 adapter never uploads separately, writes lifecycle state, or retries a submit.
@@ -13,11 +13,13 @@ import os
 from collections.abc import Callable
 from contextlib import contextmanager
 from datetime import datetime
+from io import BytesIO
 from pathlib import Path
 from typing import Literal
 from urllib.parse import quote
 
 from pydantic import ConfigDict, Field
+from PIL import Image
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
@@ -44,6 +46,7 @@ METASO_BASE_URL = METASO_ORIGIN + "/api/minimax"
 METASO_MODEL_ID = "MiniMax-H3"
 _NAME = "metaso_h3"
 _VERSION = "metaso-h3-ref2va-v1"
+_FRAME_CAPABILITY = "metaso-h3-fl2va-v1"
 _MAX_BODY_BYTES = 64 * 1024 * 1024
 
 
@@ -128,7 +131,19 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
             idempotent_submit=False, lookup_supported=True,
             output_recovery_strategy=VideoOutputRecoveryStrategy.REQUERY_BY_EFFECT_ID,
         )
-        return VideoProviderCapabilities.create(provider_name=_NAME, variants=(variant,))
+        variants = (variant,)
+        # Frame mode follows its input images; a fixed profile ratio cannot be
+        # silently dropped when the upstream frame API omits the ratio field.
+        if self._profile.aspect_ratio == "adaptive":
+            variants += (variant.model_copy(update={
+                "capability_id": _FRAME_CAPABILITY,
+                "mode": VideoGenerationMode.IMAGE_TO_VIDEO,
+                "allowed_image_roles": ("first_frame", "last_frame"),
+                "required_first_frame": True,
+                "max_reference_count": 0,
+                "media_capabilities": (),
+            }),)
+        return VideoProviderCapabilities.create(provider_name=_NAME, variants=variants)
 
     def compile_request(self, provider_bound, requirement):
         from ai_video.production._remote_video_native_prompt import (
@@ -157,16 +172,20 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
         )
 
     def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:
+        capability = next((v for v in self.capabilities().variants if v.mode is request.mode), None)
         if (request.provider_name != _NAME or request.provider_kind != _NAME
                 or request.model_id != METASO_MODEL_ID
                 or request.provider_profile != self._profile.pointer()
-                or request.mode is not VideoGenerationMode.REFERENCE_TO_VIDEO
+                or capability is None
                 or request.output_requirement != self._profile.output()
                 or request.subject_bindings or request.c4_multi_anchor_binding is not None
                 or len(request.prompt_text) > 7000
                 or not (request.image_bindings or any(b.kind == "video" for b in request.media_bindings))):
             raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
-                         "METASO request does not match its sealed Ref2VA profile.")
+                         "METASO request does not match its sealed profile.")
+        if request.mode is VideoGenerationMode.IMAGE_TO_VIDEO and any(
+                not b.size_bytes for b in request.image_bindings):
+            raise _error(ErrorCode.VIDEO_REQUEST_INVALID, "METASO frame size is missing.")
         for kind in ("audio", "video"):
             refs = tuple(b for b in request.media_bindings if b.kind == kind)
             if sum(b.duration_millis for b in refs) > 15000:
@@ -182,7 +201,7 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
             raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                          "METASO reference video FPS is unsupported.")
         return ResolvedVideoGenerationRequest.create(
-            request=request, capability=self.capabilities().variants[0],
+            request=request, capability=capability,
             effective_output=self._profile.output(), effective_seed=None,
             effective_negative_prompt_text="",
         )
@@ -215,6 +234,7 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
         self._validate_resolved(request)
         content = [{"type": "text", "text": request.prompt_text}]
         # Canonical image/media binding order is also H3's per-kind numbering.
+        frame_mode = request.mode is VideoGenerationMode.IMAGE_TO_VIDEO
         for binding in (*request.image_bindings, *request.media_bindings):
             try:
                 raw = self._reference_resolver(binding)
@@ -224,12 +244,24 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
                     or hashlib.sha256(raw).hexdigest() != binding.asset_sha256):
                 raise _error(ErrorCode.VIDEO_REQUEST_INVALID, "METASO reference bytes changed.")
             kind = "image" if binding in request.image_bindings else binding.kind
+            if frame_mode:
+                try:
+                    with Image.open(BytesIO(raw)) as image:
+                        if (Image.MIME.get(image.format) != binding.mime_type
+                                or image.size != (binding.width, binding.height)):
+                            raise ValueError("frame metadata mismatch")
+                        image.verify()
+                except Exception:
+                    raise _error(ErrorCode.VIDEO_REQUEST_INVALID,
+                                 "METASO frame bytes do not match their image metadata.") from None
             content.append({"type": f"{kind}_url", f"{kind}_url": {
                 "url": f"data:{binding.mime_type};base64," + base64.b64encode(raw).decode("ascii")},
-                "role": f"reference_{kind}"})
+                "role": binding.role if frame_mode else f"reference_{kind}"})
         payload = {"model": METASO_MODEL_ID, "content": content,
                    "duration": self._profile.duration, "resolution": self._profile.resolution,
                    "ratio": self._profile.aspect_ratio, "context_ir_enabled": self._profile.context_ir}
+        if frame_mode:
+            del payload["ratio"]
         body = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()
         if len(body) > _MAX_BODY_BYTES:
             raise _error(ErrorCode.VIDEO_REQUEST_INVALID, "METASO request is too large.")
