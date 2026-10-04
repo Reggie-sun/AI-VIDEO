@@ -9,6 +9,34 @@ evidence_index_version: "1"
 
 Date: 2026-10-04
 
+## Final Checkpoint And Supersession Notice — 2026-10-04
+
+本节取代下文将`003`称为最终fresh receipt的current-facing说明；保留原有candidate chronology。
+implementation commit为`e733d468b86eb6b930de8c097a9b646357cff33d`，只包含23个task-owned paths；
+在该commit上，各path bytes均与双独立最终review的tree `0540aa891cbb5383fff9b94fa497a99f7a80726e`
+一致，两个reviewer均无未解决findings。另一个session的`597d7f5`仅改`AGENTS.md`，本任务未编辑或
+提交该file；exact commit-range检查scope含该unrelated change，不能将其归为本任务ownership。
+
+最终targeted sequence suite为29 PASS（88.21s）。最终机器证据为
+`.agent/harness/runs/sequence-continuity-20261004-004/receipt.json`：整体PASS，17项执行检查通过，
+1项由同run已通过Provider suite覆盖。一个historical archive可用性probe因checkout没有archive而
+skip，其self-contained fixtures仍通过。`freshness-verification.json`在上述implementation commit上
+确认integrity、scope、policy/artifact hashes、freshness、cleanup与workspace stability均为true。
+`completion.json`绑定publication、review与证据边界；`001`、`002`、`003`均为superseded candidate
+receipts，不构成completion evidence。本次后续record-only checkpoint不把旧receipt冒充新HEAD的
+fresh verification，也不为记录重跑tests。
+
+最终AOCI维护返回stopped/blocked、candidates=[]；四个本任务managed entries stale，取代下文
+早期“三个”的计数，另有unrelated observed-pending debt。没有正式索引写入或完整认知对齐claim。
+本任务未push/release/deploy，未调用真实Provider、paid API、credential或新真实媒体；offline PASS
+不构成Production或H3 quality acceptance。RAG index未刷新，可能仍含stale fragments。
+
+本次record evaluation绑定`capture_request_id=ai-video-record-4f767d5412965b4d`，更新同一primary
+record，不创建重复记录。自动`distill-ai-video-learning` evaluation为`no_candidate`：本窗口只有
+architecture/implementation及离线工程回归，没有新增独立真实media attempts、controlled arms或
+满足admission threshold的existing-claim update；不创建placeholder，不修改learning claims或
+adoption targets。记录过程只使用现有本地证据，不触发Provider、media、network或额外tests。
+
 ## Purpose And Current Truth
 
 基于 `a0682cbd`，补齐 Canvas authoring method / sequence 到现有 typed continuity 的上游接缝。
