@@ -12,9 +12,17 @@ activation及authoring seal。缺证不得降NONE；独立/reset/carryover显式
 `production/_sequence_source.py`共用只读accepted proof，public resolver/execution重验activation、
 adjacency、intent及stack；FULL source close要求exact hash-bound analyzer/human PASS，技术PASS不足。
 C2 keyframe preparation仍属既有image/committer owner，adapter不生成或伪造图。
+same-stack destination route从accepted source execution binding唯一派生，supplied route/stack仅作
+exact assertion。cross-stack不得消费裸route/candidate作为selection：必须由既有
+`GenerationDecisionExecutionBinding`证明exact neutral seed已经经canonical Router选择；
+既有route binding additive保存该type的canonical JSON，Production reopen重算decision并重验
+current target/intent/snapshots/lifecycle/stack。先前selection不授权最终sequence requirement；
+最终仍经Planner/Readiness/Router，不允许循环使用自身continuity route完成初始selection。
+当前sequence API的仓库内caller只有tests，不能把test callback称为已交付production driver。
 禁止prompt推断、第二state/schema/sequence writer、legacy state token代替v2事实，或把工程READY
 当真实媒体PASS。验证由existing Harness `video_planner_tests`、Readiness/Router/feedback suites路由；
-具体scope见[bounded spec](superpowers/specs/2026-10-04-sequence-continuity-materialization.md)。
+具体scope见[bounded spec](superpowers/specs/2026-10-04-sequence-continuity-materialization.md)与
+[route authority amendment](superpowers/specs/2026-10-04-sequence-route-authority.md)。
 
 ## Agent Rule Migration
 

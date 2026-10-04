@@ -15,6 +15,7 @@ from pydantic import Field, PrivateAttr, model_validator
 
 from ai_video.production._shot_router_contracts import (
     ContinuityProviderRouteBinding,
+    ProviderRouteIdentity,
     ShotRoutingContext,
     VideoGenerationLifecycleEnvelope,
     VideoRoutingPolicy,
@@ -165,6 +166,13 @@ class GenerationDecisionExecutionBinding(StrictModel):
         )
         return cls.model_validate(values)
 
+    @property
+    def selected_provider_route(self) -> ProviderRouteIdentity:
+        bound = self.decision.routing.provider_bound_request
+        return ProviderRouteIdentity.create(**{name: getattr(bound, name) for name in (
+            "provider_name", "provider_kind", "model_id", "provider_profile", "capability_id",
+            "capability_fingerprint", "execution_kind", "billing_kind", "compiler_contract")})
+
     def validate_request(self, request: ResolvedVideoGenerationRequest) -> None:
         if request != self.compiled_request:
             raise ValueError("generation execution request is stale or altered")
@@ -270,6 +278,36 @@ class GenerationDecisionExecutionBinding(StrictModel):
                 or binding.asset_id not in project.asset_paths
             ):
                 raise ValueError("generation execution media reference is not current")
+
+
+def require_sequence_destination_selection(
+    *, selection, target_shot, target_generation_intent_hash, destination_execution_stack,
+    lifecycle, destination_route=None, project=None, source_request_content_hash=None,
+) -> GenerationDecisionExecutionBinding:
+    """Recompute prior Router authority; never promote a route/candidate/hash to it."""
+    if selection is None:
+        raise ValueError("cross-stack sequence requires a prior Router execution binding")
+    selection = GenerationDecisionExecutionBinding.model_validate(
+        selection.model_dump(mode="python") if isinstance(selection, GenerationDecisionExecutionBinding)
+        else selection)
+    if selection.continuity_routing is not None:
+        raise ValueError("destination selection cannot depend on a preselected continuity route")
+    requirement = selection.projection.requirement
+    if (requirement.target_shot != target_shot
+            or requirement.generation_intent_hash != target_generation_intent_hash
+            or selection.lifecycle != lifecycle
+            or selection.compiled_request.execution_stack_hash != destination_execution_stack.execution_stack_hash
+            or lifecycle.execution_stack_hash != destination_execution_stack.execution_stack_hash
+            or destination_route is not None and selection.selected_provider_route != destination_route):
+        raise ValueError("destination selection does not match exact target, intent, lifecycle, stack or route")
+    ContinuityProviderRouteBinding._validate_route_stack(
+        selection.selected_provider_route, destination_execution_stack)
+    if (source_request_content_hash is not None
+            and requirement.source_request_content_hash != source_request_content_hash):
+        raise ValueError("destination selection is not bound to the exact unmaterialized planning seed")
+    if project is not None:
+        selection.validate_current_project(project)
+    return selection
 
 
 class _QualificationExecutionBinding(StrictModel):

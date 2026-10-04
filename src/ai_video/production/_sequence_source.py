@@ -135,6 +135,12 @@ def require_sequence_source(*, loaded, routing, requirement, lifecycle):
     if (request.execution_stack_hash != policy.source_execution_stack_hash
             or lifecycle.execution_stack_hash != policy.destination_execution_stack_hash):
         raise ValueError("sequence execution stack is stale")
+    if policy.source_execution_stack_hash != policy.destination_execution_stack_hash:
+        from ai_video.production.generation_execution import require_sequence_destination_selection
+        require_sequence_destination_selection(selection=routing.destination_selection_binding,
+            target_shot=target, target_generation_intent_hash=requirement.generation_intent_hash,
+            destination_execution_stack=routing.destination_execution_stack, lifecycle=lifecycle,
+            destination_route=routing.destination_route, project=loaded)
     require_causal_columns(policy.causal_state_changes,
         binding.projection.requirement.generation_intent, requirement.generation_intent)
     if loaded.qa_policy is None or policy.qa_policy_hash != loaded.qa_policy.content_hash:

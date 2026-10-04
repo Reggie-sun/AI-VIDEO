@@ -8,7 +8,12 @@ from pathlib import Path
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.planning._planner_models import VideoPlanningRequest, _canonical_hash_without
-from ai_video.planning.video_planner import VideoPlanner, prepare_shot_for_existing_production
+from ai_video.planning.video_planner import (
+    VideoPlanner, prepare_shot_for_existing_production, require_current_video_plan,
+)
+from ai_video.production.generation_execution import (
+    GenerationDecisionExecutionBinding, require_sequence_destination_selection,
+)
 from ai_video.production._sequence_source import (
     accepted_sequence_source, causal_state_column_hash, require_causal_columns, require_sequence_source,
 )
@@ -41,6 +46,14 @@ def require_current_sequence_route(*, loaded, routing: ContinuityProviderRouteBi
     seed = VideoPlanningRequest.create(**{**planning_request.model_dump(mode="python",
         exclude={"request_content_hash", "previous_shot_state", "continuity_transition_policy"}),
         "previous_shot_state": None})
+    if routing.destination_selection_binding is not None:
+        selection = require_sequence_destination_selection(
+            selection=routing.destination_selection_binding, target_shot=seed.target_shot,
+            target_generation_intent_hash=seed.generation_intent.projection_hash,
+            destination_execution_stack=routing.destination_execution_stack, lifecycle=lifecycle,
+            destination_route=routing.destination_route, source_request_content_hash=seed.request_content_hash)
+        if selection.projection != require_current_video_plan(current_request=seed, plan=VideoPlanner().plan(seed)):
+            raise ValueError("destination selection lacks the exact Planner-derived seed projection")
     expected = canonical_sha256({"storyboard": loaded.storyboard.content_hash,
         "source_execution_binding": binding.binding_hash, "accepted_media": accepted,
         "target_request": seed.request_content_hash,
@@ -62,13 +75,15 @@ def build_sequence_video_planning_request(
     source_execution_stack: GenerationExecutionStackIdentity | None = None,
     destination_execution_stack: GenerationExecutionStackIdentity | None = None,
     destination_route: ProviderRouteIdentity | None = None,
+    destination_selection_binding: GenerationDecisionExecutionBinding | None = None,
     lifecycle: VideoGenerationLifecycleEnvelope | None = None,
     take_id: str | None = None,
 ) -> tuple[VideoPlanningRequest, ContinuityProviderRouteBinding | None]:
     """Explicit None means independent; incomplete declared edges always STOP.
 
-    Called after the destination route/profile is known, before Planner and
-    Provider binding. Source facts are reopened, never supplied as a fake state.
+    Same-stack destination inherits accepted source authority. A new stack needs
+    prior canonical Router selection for the exact neutral seed, then this edge
+    reaches sequence-aware Planner/Router afresh; the prior binding cannot execute it.
     """
     try:
         loaded = load_production_project(Path(project_root) / "project.yaml")
@@ -91,7 +106,8 @@ def build_sequence_video_planning_request(
         if continuity_obligation is None:
             if any((boundary_kind, causal_edge_semantics, source_shot, source_generation_intent_hash,
                     causal_state_changes, required_carryover_dimensions, anchors,
-                    source_execution_stack, destination_execution_stack, destination_route, lifecycle, take_id)):
+                    source_execution_stack, destination_execution_stack, destination_route,
+                    destination_selection_binding, lifecycle, take_id)):
                 raise ValueError("independent Shot cannot discard an authored edge")
             return current_request, None
         if (not isinstance(continuity_obligation, ContinuityObligation)
@@ -100,12 +116,31 @@ def build_sequence_video_planning_request(
             raise ValueError("sequence classification requires typed authoring enums")
         if (index == 0 or boundary_kind is None or causal_edge_semantics is None
                 or source_shot is None or source_generation_intent_hash is None
-                or source_execution_stack is None or destination_execution_stack is None
-                or destination_route is None or lifecycle is None or loaded.qa_policy is None):
+                or source_execution_stack is None or lifecycle is None or loaded.qa_policy is None):
             raise ValueError("declared edge requires exact source, semantics, stacks, route and QA")
         previous = next(s for s in loaded.shots if s.shot_id == order[index - 1])
         binding, source_request, terminal, accepted_hashes, source_registry = accepted_sequence_source(loaded, previous, require_causal_close=continuity_obligation is ContinuityObligation.FULL_CONTINUITY)
         source_requirement = binding.projection.requirement
+        bound = binding.decision.routing.provider_bound_request
+        source_route = binding.selected_provider_route
+        destination_execution_stack = destination_execution_stack or source_execution_stack
+        if destination_execution_stack.execution_stack_hash == source_execution_stack.execution_stack_hash:
+            if destination_route is not None and destination_route != source_route:
+                raise ValueError("same-stack destination must inherit the accepted source Provider route")
+            if destination_selection_binding is not None:
+                raise ValueError("same-stack destination inherits source authority without a new selection")
+            destination_route = source_route
+        else:
+            destination_selection_binding = require_sequence_destination_selection(
+                selection=destination_selection_binding, target_shot=target,
+                target_generation_intent_hash=current_request.generation_intent.projection_hash,
+                destination_execution_stack=destination_execution_stack, lifecycle=lifecycle,
+                destination_route=destination_route, project=loaded,
+                source_request_content_hash=current_request.request_content_hash)
+            if destination_selection_binding.projection != require_current_video_plan(
+                    current_request=current_request, plan=VideoPlanner().plan(current_request)):
+                raise ValueError("destination selection lacks the exact Planner-derived seed projection")
+            destination_route = destination_selection_binding.selected_provider_route
         if (_identity(source_requirement.target_shot) != source_shot
                 or source_requirement.generation_intent_hash != source_generation_intent_hash):
             raise ValueError("source Shot identity or generation intent hash is stale")
@@ -174,17 +209,14 @@ def build_sequence_video_planning_request(
             target_generation_intent_hash=intent.projection_hash,
             causal_edge_semantics=causal_edge_semantics, causal_state_changes=changes,
         )
-        bound = binding.decision.routing.provider_bound_request
-        source_route = ProviderRouteIdentity.create(
-            **{name: getattr(bound, name) for name in (
-                "provider_name", "provider_kind", "model_id", "provider_profile", "capability_id",
-                "capability_fingerprint", "execution_kind", "billing_kind", "compiler_contract")})
         routing = ContinuityProviderRouteBinding.create(
             transition_policy=policy, previous_shot=source_requirement.target_shot,
             previous_provider_bound_request=bound, source_route=source_route,
             destination_route=destination_route, source_execution_stack=source_execution_stack,
             destination_execution_stack=destination_execution_stack,
             source_activation_registry=source_registry,
+            destination_selection_binding=(destination_selection_binding.model_dump(mode="json")
+                if destination_selection_binding is not None else None),
         )
         state = (None if continuity_obligation is ContinuityObligation.SUBSTANTIAL_RESET else
             VideoPlanner.derive_previous_shot_state(

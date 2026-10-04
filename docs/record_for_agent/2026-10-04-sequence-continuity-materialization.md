@@ -9,6 +9,14 @@ evidence_index_version: "1"
 
 Date: 2026-10-04
 
+## Route Authority Supersession Notice — 2026-10-04
+
+下文的source/causal/FULL/C2工程证据保持，但“supplied destination route/stack已知”的边界
+不能证明Router selection authority。后续[ownership review与修复](2026-10-04-sequence-route-authority.md)
+独立复现了bare cross-stack route排除其他候选，补强same-stack source inheritance与existing
+Router execution binding admission/reopen。原29-test receipt和双review未覆盖该ownership问题；
+不得用原checkpoint宣称最新route authority已验证。当前仓库sequence caller仍只有tests。
+
 ## Final Checkpoint And Supersession Notice — 2026-10-04
 
 本节取代下文将`003`称为最终fresh receipt的current-facing说明；保留原有candidate chronology。

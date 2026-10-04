@@ -5,7 +5,7 @@ from __future__ import annotations
 from enum import Enum
 from typing import Literal
 
-from pydantic import ConfigDict, Field, model_serializer, model_validator
+from pydantic import ConfigDict, Field, JsonValue, model_serializer, model_validator
 
 from ai_video.production._video_requirement_routing import (
     validate_provider_bound_projection,
@@ -892,6 +892,9 @@ class ContinuityProviderRouteBinding(_RouterModel):
     source_execution_stack: GenerationExecutionStackIdentity
     destination_execution_stack: GenerationExecutionStackIdentity
     source_activation_registry: RegistrySnapshotPointer | None = None
+    # Canonical JSON of the existing GenerationDecisionExecutionBinding, reopened
+    # by its owner for new cross-stack execution; not a route-selection schema.
+    destination_selection_binding: dict[str, JsonValue] | None = None
     binding_hash: str = Field(pattern=_SHA256)
 
     @model_serializer(mode="wrap")
@@ -899,6 +902,8 @@ class ContinuityProviderRouteBinding(_RouterModel):
         payload = handler(self)
         if self.source_activation_registry is None:
             payload.pop("source_activation_registry", None)
+        if self.destination_selection_binding is None:
+            payload.pop("destination_selection_binding", None)
         return payload
 
     @model_validator(mode="after")

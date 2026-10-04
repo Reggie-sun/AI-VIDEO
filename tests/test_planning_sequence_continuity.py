@@ -672,3 +672,229 @@ def test_legacy_pointer_omission_cannot_authorize_new_production(tmp_path, monke
         decision=pure, compiled_request=source["provider"].resolve(compiled.request))
     with pytest.raises(ValueError, match="activation pointer"):
         legacy_binding.validate_current_project(loaded)
+
+
+def _cross_stack_inputs(source):
+    from ai_video.production.shot_router import ProviderRouteIdentity
+    from ai_video.production.video import VideoProviderCapabilities
+    from ai_video.production._video_capability_fingerprint import capability_variant_fingerprint
+    from test_production_shot_router import _execution_stack_identity
+    inputs = _edge_inputs(source)
+    variant = source["provider"].capabilities().variants[0].model_copy(update={
+        "model_id": "sequence-destination-model", "capability_id": "sequence-destination-i2v"})
+    source["provider"]._capabilities = VideoProviderCapabilities.create(
+        provider_name=source["route"].provider_name, variants=(variant,))
+    route = ProviderRouteIdentity.create(**{
+        **{n: getattr(source["route"], n) for n in type(source["route"]).model_fields
+           if n != "route_identity_hash"},
+        "model_id": variant.model_id, "capability_id": variant.capability_id,
+        "capability_fingerprint": capability_variant_fingerprint(variant)})
+    stack = _execution_stack_identity(route)
+    inputs.update(destination_route=route, destination_execution_stack=stack,
+        lifecycle=inputs["lifecycle"].model_copy(update={"execution_stack_hash": stack.execution_stack_hash}),
+        required_carryover_dimensions=tuple(sorted(set(inputs["required_carryover_dimensions"])
+            | {"camera_velocity", "screen_axis", "subject_position"})))
+    request = inputs["current_request"]
+    intent = request.generation_intent
+    authored = intent.generation_intent.model_copy(update={
+        "space_continuity": intent.generation_intent.space_continuity.model_copy(update={
+            "subject_position": "right", "screen_direction": "right"}),
+        "axis_continuity": intent.generation_intent.axis_continuity.model_copy(update={
+            "camera_axis": "fixed axis", "framing_continuity": "same subject"})})
+    intent = ProviderNeutralGenerationIntentProjection.create(**{
+        **{n: getattr(intent, n) for n in type(intent).model_fields if n != "projection_hash"},
+        "generation_intent": authored})
+    inputs["current_request"] = VideoPlanningRequest.create(**{
+        **{n: getattr(request, n) for n in type(request).model_fields if n != "request_content_hash"},
+        "generation_intent": intent})
+    source["provider"]._native_prompt_text += " right fixed axis same subject"
+    return inputs
+
+
+@pytest.mark.parametrize("boundary", [BoundaryKind.WITHIN_CONTINUOUS_TAKE, BoundaryKind.HARD_CUT])
+def test_same_stack_full_inherits_destination_without_caller_selection(activated_source, boundary):
+    inputs = _edge_inputs(activated_source, boundary=boundary,
+        roles=(SemanticReferenceRole.CONTINUITY_TERMINAL,) if boundary is BoundaryKind.WITHIN_CONTINUOUS_TAKE
+              else (SemanticReferenceRole.FIRST_FRAME,))
+    inputs.pop("destination_route")
+    inputs.pop("destination_execution_stack")
+    request, routing = build_sequence_video_planning_request(**inputs)
+    assert routing.destination_route == routing.source_route == activated_source["route"]
+    assert routing.destination_execution_stack == routing.source_execution_stack
+    plan = VideoPlanner().plan(request)
+    assert plan.continuity_mode.value == (
+        "exact_terminal" if boundary is BoundaryKind.WITHIN_CONTINUOUS_TAKE else "reference")
+    assert not {"provider_name", "model_id", "provider_profile", "capability_id"}.intersection(
+        type(plan.generation_requirement).model_fields)
+
+
+def test_cross_stack_bare_route_stops_before_planner_or_handoff(activated_source, monkeypatch):
+    inputs = _cross_stack_inputs(activated_source)
+    monkeypatch.setattr(VideoPlanner, "plan", lambda *_: pytest.fail("bare route reached Planner"))
+    with pytest.raises(AiVideoError, match="authoring evidence"):
+        prepare_sequence_shot_for_existing_production(**inputs,
+            production_handoff=lambda **kw: pytest.fail("bare route reached handoff"))
+
+
+def _prepare_sequence_generation(source, inputs, request, routing=None):
+    from ai_video.planning.generation_feedback_context import require_feedback_context
+    from ai_video.production.generation_feedback import GenerationFeedbackOrchestrator, RegisteredGenerationTarget
+    from ai_video.production.state_commit import ProductionStateCommitter
+    from test_production_shot_router import _policy
+    plan = VideoPlanner().plan(request)
+    route = inputs["destination_route"]
+
+    def current(loaded):
+        return require_feedback_context(loaded=loaded, planning_request=request, video_plan=plan,
+            context=_context(loaded, request, plan, source["terminal"]),
+            routing_policy=_policy(remote_authorized=True, budget_authorized=True),
+            lifecycle=inputs["lifecycle"], continuity_routing=routing)
+
+    return GenerationFeedbackOrchestrator.for_project(committer=ProductionStateCommitter(source["root"]),
+        targets=(RegisteredGenerationTarget(provider=source["provider"], profile=route.provider_profile,
+            compiler_contract=route.compiler_contract, output_requirement=source["binding"].compiled_request.effective_output),),
+        context_loader=current, policy=source["binding"].inputs.policy).prepare(
+            limits=source["binding"].inputs.limits.model_copy(update={"task_id": "sequence-destination",
+                "allowed_remote_candidates": tuple(f"{route.provider_name}/{v.capability_id}"
+                    for v in source["provider"].capabilities().variants)}))
+
+
+def test_cross_stack_consumes_prior_canonical_selection_and_reselects_final_requirement(activated_source):
+    inputs = _cross_stack_inputs(activated_source)
+    selected = _prepare_sequence_generation(activated_source, inputs, inputs["current_request"])
+    assert selected.execution_binding is not None, (selected.decision.disposition, selected.compilation)
+    assert selected.execution_binding.continuity_routing is None
+    assert selected.execution_binding.selected_provider_route == inputs["destination_route"]
+    inputs["destination_selection_binding"] = selected.execution_binding
+    asserted_route = inputs.pop("destination_route")
+    request, routing = build_sequence_video_planning_request(**inputs)
+    assert routing.destination_route == asserted_route
+    assert routing.destination_selection_binding == selected.execution_binding.model_dump(mode="json")
+    inputs["destination_route"] = asserted_route
+    prepared = _prepare_sequence_generation(activated_source, inputs, request, routing)
+    assert prepared.execution_binding is not None, (prepared.decision.disposition, prepared.compilation)
+    assert prepared.execution_binding.projection != selected.execution_binding.projection
+    assert prepared.execution_binding.selected_provider_route == asserted_route
+    assert prepared.execution_binding.lifecycle.execution_stack_hash == routing.transition_policy.destination_execution_stack_hash
+    prepared.execution_binding.validate_current_project(load_production_project(activated_source["root"] / "project.yaml"))
+
+
+def test_same_stack_caller_cannot_forge_destination_route(activated_source):
+    from ai_video.production.shot_router import ProviderRouteIdentity
+    inputs = _edge_inputs(activated_source)
+    route = inputs["destination_route"]
+    inputs["destination_route"] = ProviderRouteIdentity.create(**{
+        **{n: getattr(route, n) for n in type(route).model_fields if n != "route_identity_hash"},
+        "model_id": "caller-selected-model"})
+    with pytest.raises(AiVideoError) as stopped:
+        build_sequence_video_planning_request(**inputs)
+    assert "inherit" in stopped.value.technical_detail
+
+
+@pytest.mark.parametrize("change", ["route", "stack", "lifecycle", "seed", "decision", "target"])
+def test_cross_stack_rejects_stale_or_tampered_selection(activated_source, change):
+    inputs = _cross_stack_inputs(activated_source)
+    selected = _prepare_sequence_generation(activated_source, inputs, inputs["current_request"])
+    assert selected.execution_binding is not None, (selected.decision.disposition, selected.compilation)
+    proof = selected.execution_binding
+    if change == "route":
+        inputs["destination_route"] = activated_source["route"]
+    elif change == "stack":
+        from ai_video.production.video_execution_stack import GenerationExecutionStackIdentity
+        stack = inputs["destination_execution_stack"]
+        inputs["destination_execution_stack"] = GenerationExecutionStackIdentity.create(**{
+            **{n: getattr(stack, n) for n in type(stack).model_fields if n != "execution_stack_hash"},
+            "deployment_identity": "different-deployment"})
+    elif change == "lifecycle":
+        inputs["lifecycle"] = inputs["lifecycle"].model_copy(update={"output_asset_id": "different-output"})
+    elif change == "seed":
+        request = inputs["current_request"]
+        inputs["current_request"] = VideoPlanningRequest.create(**{
+            **{n: getattr(request, n) for n in type(request).model_fields if n != "request_content_hash"},
+            "production_policy": request.production_policy.model_copy(update={
+                "accept_static_image_fallback": not request.production_policy.accept_static_image_fallback})})
+    elif change == "target":
+        proof = activated_source["binding"]
+    else:
+        proof = proof.model_copy(update={"decision": proof.decision.model_copy(update={"selected_candidate_id": "forged"})})
+    inputs["destination_selection_binding"] = proof
+    with pytest.raises(AiVideoError, match="authoring evidence"):
+        build_sequence_video_planning_request(**inputs)
+
+
+def test_cross_stack_legacy_binding_cannot_bypass_production_reopen(activated_source):
+    from ai_video.production.shot_router import ContinuityProviderRouteBinding, VideoGenerationResolver
+    from ai_video.planning.generation_feedback_context import require_feedback_context
+    from test_production_shot_router import _policy
+    inputs = _cross_stack_inputs(activated_source)
+    initial = _prepare_sequence_generation(activated_source, inputs, inputs["current_request"])
+    inputs["destination_selection_binding"] = initial.execution_binding
+    request, routing = build_sequence_video_planning_request(**inputs)
+    prepared = _prepare_sequence_generation(activated_source, inputs, request, routing)
+    legacy = ContinuityProviderRouteBinding.create(**{
+        **{n: getattr(routing, n) for n in type(routing).model_fields
+           if n not in {"binding_hash", "destination_selection_binding"}}})
+    assert "destination_selection_binding" not in legacy.model_dump(mode="json")
+    loaded = load_production_project(activated_source["root"] / "project.yaml")
+    binding = prepared.execution_binding
+    with pytest.raises(ValueError, match="prior Router execution binding"):
+        require_feedback_context(loaded=loaded, planning_request=request, video_plan=VideoPlanner().plan(request),
+            context=binding.context, routing_policy=_policy(), lifecycle=inputs["lifecycle"], continuity_routing=legacy)
+    with pytest.raises(ValueError, match="prior Router execution binding"):
+        VideoGenerationResolver().resolve_requirement(projection=binding.projection, context=binding.context,
+            policy=binding.policy, lifecycle=binding.lifecycle, inputs=binding.inputs,
+            continuity_routing=legacy, source_project=loaded)
+    with pytest.raises(ValueError, match="prior Router execution binding"):
+        binding.model_copy(update={"continuity_routing": legacy}).validate_current_project(loaded)
+
+
+def test_final_router_rejects_candidate_destination_route_mismatch(activated_source):
+    from ai_video.production.shot_router import VideoGenerationResolver
+    inputs = _cross_stack_inputs(activated_source)
+    initial = _prepare_sequence_generation(activated_source, inputs, inputs["current_request"])
+    inputs["destination_selection_binding"] = initial.execution_binding
+    request, routing = build_sequence_video_planning_request(**inputs)
+    prepared = _prepare_sequence_generation(activated_source, inputs, request, routing)
+    binding = prepared.execution_binding
+    other = activated_source["binding"].inputs.candidates[0]
+    other = other.model_copy(update={"recipe": other.recipe.model_copy(update={
+        "requirement_hash": binding.projection.requirement.requirement_hash})})
+    inputs = binding.inputs.model_copy(update={"candidates": (other,), "limits": binding.inputs.limits.model_copy(
+        update={"allowed_remote_candidates": (other.candidate_id,)})})
+    decision = VideoGenerationResolver().resolve_requirement(projection=binding.projection,
+        context=binding.context, policy=binding.policy, lifecycle=binding.lifecycle, inputs=inputs,
+        continuity_routing=routing, source_project=load_production_project(activated_source["root"] / "project.yaml"))
+    assert decision.selected_candidate_id is None
+    assert "CONTINUITY_DESTINATION_ROUTE_MISMATCH" in decision.assessments[0].reasons
+
+
+def test_route_candidate_is_not_selection_and_forced_decision_cannot_be_resealed(activated_source):
+    from ai_video.production.video import VideoProviderCapabilities
+    from ai_video.production.generation_execution import GenerationDecisionExecutionBinding
+    inputs = _cross_stack_inputs(activated_source)
+    initial = _prepare_sequence_generation(activated_source, inputs, inputs["current_request"])
+    provider = activated_source["provider"]
+    other = provider.capabilities().variants[0].model_copy(update={
+        "model_id": "another-destination-model", "capability_id": "another-destination-i2v"})
+    provider._capabilities = VideoProviderCapabilities.create(provider_name=inputs["destination_route"].provider_name,
+        variants=(provider.capabilities().variants[0], other))
+    ambiguous = _prepare_sequence_generation(activated_source, inputs, inputs["current_request"])
+    assert ambiguous.execution_binding is None
+    assert ambiguous.decision.disposition == "UNRESOLVED_TIE"
+    proof = initial.execution_binding
+    with pytest.raises(ValueError, match="stale or altered"):
+        GenerationDecisionExecutionBinding.create(projection=proof.projection, context=proof.context,
+            policy=proof.policy, lifecycle=proof.lifecycle, inputs=ambiguous.inputs,
+            decision=proof.decision, compiled_request=proof.compiled_request)
+
+
+def test_cross_stack_cannot_reuse_sequence_decision_as_its_own_initial_selection(activated_source):
+    inputs = _cross_stack_inputs(activated_source)
+    initial = _prepare_sequence_generation(activated_source, inputs, inputs["current_request"])
+    inputs["destination_selection_binding"] = initial.execution_binding
+    request, routing = build_sequence_video_planning_request(**inputs)
+    final = _prepare_sequence_generation(activated_source, inputs, request, routing)
+    inputs["destination_selection_binding"] = final.execution_binding
+    with pytest.raises(AiVideoError) as stopped:
+        build_sequence_video_planning_request(**inputs)
+    assert "preselected continuity route" in stopped.value.technical_detail
