@@ -81,3 +81,11 @@ forbidden_targets = ["ai_video.production.state_commit"]
 target_match = "exact"
 contract_ref = "docs/agent-primary-contract-matrix.md#cross-cutting-contracts"
 severity = "error"
+
+[[dependency_exceptions]]
+rule_id = "ARCH103"
+source_path = "src/ai_video/production/_sequence_source.py"
+target_module = "ai_video.planning.video_planner"
+owner_ref = "docs/agent-primary-contract-matrix.md#sequence-authoring-boundary"
+reason = "Read-only cross-stack reopen reuses exact neutral-seed Planner/Readiness derivation; no selection, handoff or effect."
+review_by = "2026-11-05"

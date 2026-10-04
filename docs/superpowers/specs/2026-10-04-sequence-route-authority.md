@@ -38,9 +38,18 @@ hash；builder、feedback 与共享 reopen 使用同一 seal payload，合法但
 既有 route binding 同时保存 materialized `VideoPlanningRequest` 的 canonical JSON preimage。
 共享 reopen 校验其内容 hash 等于实际 final requirement 的 `source_request_content_hash`、内嵌
 policy 等于当前 routing policy，再从同一 preimage 去掉 sequence fields，核验 prior neutral seed。
-此 evidence 只绑定既有类型的字节身份，不新增 Planner derivation 或 Production → Planning import。
+此 evidence 只绑定既有类型的字节身份，不新增 Planner derivation。
 完整合法 policy+selection 来自另一 request 时，也不能授权当前 final requirement。
 same-stack old bindings 无需此新增 evidence，route equality 与 source activation proof 继续强制。
+
+hash 一致不证明 prior projection 是该 seed 的 Planner 输出。共享 reopen 必须重新创建 exact
+neutral `VideoPlanningRequest`，调用既有 `VideoPlanner.plan` / `require_current_video_plan`，比较
+完整 verified projection。采用 `ARCH103` 的唯一 exact source/target read-only exception：
+`production/_sequence_source.py` → `planning.video_planner`，仅用于纯 derivation/readiness 验证，
+不调用 handoff、selection、Provider 或其他 effect；review-by 为 `2026-11-05`。
+其他 Production → Planning / QA / Q0 依赖仍阻断，不新增 callback registration、私有 proof cache
+或复制 Planner 规则。该任务内 contract amendment 由 Parent self-review；canonical derivation
+owner 保持 Planning，增强真实 admission，而非将 caller 的自洽 hash 当作 authority。
 
 ## Acceptance And Non-Goals
 
@@ -49,6 +58,8 @@ same-stack old bindings 无需此新增 evidence，route equality 与 source act
 补充 stale/tampered/circular selection evidence 与 Production reopen 的否定路径，包括合法的
 other-seed binding 单独替换、完整合法 policy+binding 替换，以及缺 request preimage 后，public
 Resolver 与完全重新封存的 execution binding 的拒绝行为。
+另覆盖 same-seed/hash 的自洽伪造 prior projection，在 builder/feedback/public Resolver/resealed
+execution 四个入口均拒绝；exact dependency exception 不扩大到其他 path 或 QA target。
 不改 Planner derivation、generation ranking、registry、Provider capability/prompt、paid/credential、
 committer、media/verdict/timeline，不调用 Provider、不读取 secret、不生成真实媒体。
 

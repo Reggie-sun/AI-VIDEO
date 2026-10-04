@@ -1704,10 +1704,18 @@ def test_t10_planning_import_boundary_and_no_runtime_skill_calls():
                 assert module not in skill_tokens
 
 
-def test_t10_production_does_not_reverse_import_planning():
+def test_t10_production_does_not_reverse_import_planning_outside_sequence_proof_reopen():
     for path in Path("src/ai_video/production").glob("*.py"):
         tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
         for node in ast.walk(tree):
+            if (path.name == "_sequence_source.py" and isinstance(node, ast.ImportFrom)
+                    and node.module == "ai_video.planning.video_planner"
+                    and {alias.name for alias in node.names} == {
+                        "VideoPlanner", "VideoPlanningRequest", "require_current_video_plan"}):
+                reopen = next(n for n in tree.body if isinstance(n, ast.FunctionDef)
+                              and n.name == "require_sequence_source")
+                assert node in tuple(ast.walk(reopen))
+                continue
             if isinstance(node, ast.Import):
                 modules = tuple(alias.name for alias in node.names)
             elif isinstance(node, ast.ImportFrom) and node.module:

@@ -30,6 +30,9 @@ Production source proof seam 在 resolver/preparation/execution reopen 时重新
 保存既有 materialized `VideoPlanningRequest` 的 canonical preimage，在 shared reopen 将 final
 requirement hash、内嵌 policy 和去除 sequence fields 后的 neutral seed 关联起来；补完整合法
 policy+binding 替换及缺 preimage 的否定测试。既有 None serialization 保留 historical hashes。
+共享 reopen 复用既有 Planner/Readiness 重新派生 exact neutral seed 并比较完整 projection；
+`architecture_gate.toml` 的 reviewed exact `ARCH103` exception 只覆盖该只读调用，其他依赖仍阻断。
+不复制 Planner、不新增 verifier registry；补四入口 resealed projection forgery 与窄例外测试。
 
 **Acceptance:** 用户 ten-test inventory 与 stale/tampered/legacy bypass 否定路径通过；有效 cross-stack
 先前 Router selection 可被消费，最终 Router 仍可拒绝 destination mismatch。
@@ -38,6 +41,9 @@ policy+binding 替换及缺 preimage 的否定测试。既有 None serialization
 
 **Files:** `docs/agent-primary-contract-matrix.md`、`docs/v0.2-runtime-baseline.md`、本 spec/plan、
 `docs/record_for_agent/2026-10-04-sequence-route-authority.md`；直接相关旧 record 仅添加 supersession。
+补充 `architecture_gate.toml` / `tests/test_architecture_gate.py` 的 exact dependency contract verification。
+`tests/test_planning_video_planner.py` 的反向依赖检查只允许同一proof函数的三个pure Planning symbols，
+保留所有其他imports的阻断；这是显式contract amendment，不以降低质量或模糊owner通过测试。
 
 运行 `python -m pytest -p no:cacheprovider tests/test_planning_sequence_continuity.py
 tests/test_planning_video_planner.py tests/test_production_shot_router.py tests/test_production_video_transition.py
@@ -52,3 +58,14 @@ tests/test_generation_execution_guards.py tests/test_production_generation_decis
 
 两个 milestone 完整覆盖 spec；source 与 destination evidence validation 不新增 selection owner。
 不制造 worktree、依赖、额外 Provider 调用或 approval gate；没有 production sequence driver 的事实保留。
+
+## Review Budget Extension
+
+predecessor 为同任务前三轮（`76790a8`、`ac9dfa5`、`30a312e`），全部计入消费；不得重置历史。
+round 3 的 `SA-001` / `SAR-001` 已关闭，但 Parent 独立 probe 确认 `SA-002` / `SAR-002`：
+同 seed hash 的非 Planner projection 在 public Resolver/execution 被接受，实际 `2 failed / 2 passed`。
+暂停该 review 单元并按 `SUBAGENTS.md` 的 `REVIEW_ESCALATION_REQUIRED` 做 targeted investigation。
+本任务内封存追加上限 **2 rounds**，只覆盖此 root cause 修复及其必要语义修正；每轮仍需同一
+exact snapshot 双独立 native read-only T3 review。先 native/Harness verify，再复审；零 Provider effects。
+追加单元结束条件为 verified closure，或两轮耗尽/新 scope/unknown outcome/无法完成 required proof；
+耗尽后停止，不机械续跑，不以换 snapshot/run 名称归零，也不以 passing Harness 关闭 review blocker。

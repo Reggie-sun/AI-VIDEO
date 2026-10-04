@@ -163,11 +163,22 @@ def require_sequence_source(*, loaded, routing, requirement, lifecycle):
     if policy.source_execution_stack_hash != policy.destination_execution_stack_hash:
         from ai_video.production.generation_execution import require_sequence_destination_selection
         seed_hash = _sequence_planning_seed_hash(routing, requirement)
-        require_sequence_destination_selection(selection=routing.destination_selection_binding,
+        selection = require_sequence_destination_selection(selection=routing.destination_selection_binding,
             target_shot=target, target_generation_intent_hash=requirement.generation_intent_hash,
             destination_execution_stack=routing.destination_execution_stack, lifecycle=lifecycle,
             destination_route=routing.destination_route, project=loaded,
             source_request_content_hash=seed_hash)
+        # ARCH103's exact read-only exception reuses the Planning owner; hashes
+        # alone cannot prove that this projection was derived from the seed.
+        from ai_video.planning.video_planner import (
+            VideoPlanner, VideoPlanningRequest, require_current_video_plan,
+        )
+        seed = VideoPlanningRequest.create(**{
+            **{name: value for name, value in routing.destination_planning_request.items()
+               if name not in {"request_content_hash", "previous_shot_state", "continuity_transition_policy"}},
+            "previous_shot_state": None})
+        if selection.projection != require_current_video_plan(current_request=seed, plan=VideoPlanner().plan(seed)):
+            raise ValueError("destination selection lacks the exact Planner-derived seed projection")
         if policy.authoring_evidence_hash != sequence_authoring_evidence_hash(
                 loaded=loaded, binding=binding, accepted_media=accepted_hashes,
                 target_request_hash=seed_hash,

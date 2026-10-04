@@ -873,6 +873,27 @@ def test_new_high_fan_out_is_reviewer_information(tmp_path: Path):
     assert not result.has_errors
 
 
+def test_sequence_reopen_exception_preserves_other_production_dependency_blocks(tmp_path: Path):
+    repository_root = Path(__file__).resolve().parents[1]
+    shutil.copyfile(repository_root / "architecture_gate.toml", tmp_path / "architecture_gate.toml")
+    _write_module(tmp_path, "src/ai_video/production/_sequence_source.py", [
+        "import ai_video.planning.video_planner",
+        "import ai_video.quality_gates.shot_readiness_gate",
+    ])
+    _write_module(tmp_path, "src/ai_video/production/service.py", [
+        "import ai_video.planning.video_planner",
+    ])
+    update_baseline(tmp_path)
+
+    result = check_architecture(tmp_path)
+
+    blocked = {(item.path, item.measurements["line"]) for item in result.findings if item.code == "ARCH103"}
+    assert blocked == {
+        ("src/ai_video/production/_sequence_source.py", 2),
+        ("src/ai_video/production/service.py", 1),
+    }
+
+
 def test_check_never_rewrites_baseline(architecture_repo: Path):
     _sized_module(architecture_repo, "src/app/legacy.py", 801)
     baseline_path = update_baseline(architecture_repo)

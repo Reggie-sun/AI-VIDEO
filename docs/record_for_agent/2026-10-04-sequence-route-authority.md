@@ -105,7 +105,8 @@ cross-stack binding 另保存已有 materialized `VideoPlanningRequest` 的 cano
 共享 reopen 以其内容 hash 对照实际 final requirement 的 `source_request_content_hash`，核对内嵌
 policy，然后从相同 preimage 移除 sequence policy、恢复 `previous_shot_state=None`，核验 prior
 neutral seed hash 和 authoring seal。这里只验证既有数据身份，不推导 Planner requirement、引入
-Production → Planning import 或第二 schema。same-stack omission 保持历史 binding hash。
+第二 schema。same-stack omission 保持历史 binding hash。下方round 3进一步证明，仅检查hash仍
+不足以核验Planner derivation，需要显式的窄只读owner调用。
 
 ## Independent Review Reproduction And Consolidation
 
@@ -134,15 +135,37 @@ builder 生成完整替换 package，在 public Resolver/resealed execution 复�
 双审与历史 receipt；passing Harness 不代替 blocking review finding。最终新 snapshot 仍须独立
 核验 run `003` 与 round 3 review，不以旧 passing receipts 代替。
 
+round 3 在 `30a312e53f7743fed1846b4ac744943d7e58a10f` 关闭上述 `SA-001` / `SAR-001`，但
+确认新增 `SA-002` / `SAR-002`：保持seed hash、target、intent、lifecycle和route，改写 prior
+requirement的`capability_need.accepts_local_execution=False`，正常create projection、重算
+Router decision、compile并reseal，只替换prior binding。Parent probe实际 **2 failed（公开
+Resolver/execution）、2 passed（builder/feedback）**；不是未重算的坏hash或model意见。
+run `003` 的未完成Harness由Parent停止，exit `130`、isolated checkout清理已观察；原partial
+receipt不改写、不声明PASS/freshness。实际probe/RED与双审/裁决保存于`final-review-round3.json`。
+
+最小修复复用既有 `VideoPlanner.plan` / `require_current_video_plan` 在shared reopen验证exact
+neutral seed并比较完整projection。单独再封存plan/hash仍可被caller整包重算；复制Planner则
+产生第二derivation owner；callback/proof cache无法独立证明durable reopen。因此显式修订
+`ARCH103`：唯一exact source/target只读例外为`_sequence_source.py`→`planning.video_planner`，
+review-by `2026-11-05`。不调用handoff/selection/effect；其他反向imports仍阻断，测试额外约束
+该proof函数只导入三个pure symbols。没有改Planner实现或Router选择算法。
+相同临时probe修复后 **4 passed**；persistent四入口回归随新snapshot验证。
+
+三轮消费全部保留，按`SUBAGENTS.md`停止原单元并标记`REVIEW_ESCALATION_REQUIRED`。
+Parent完成上述direct investigation后，在accepted plan封存追加上限两轮，只覆盖已确认root
+cause及必要语义修正，不重置history；新snapshot需native/Harness与双独立T3复审完成后才交付。
+
 ## Verification And Evidence
 
 - RED：原实现 same-stack omission 两项失败，bare cross-stack route 到达被禁止的 Planner，三项
   regression 先证实失败，再修复。
-- Final native sequence suite：`tests/test_planning_sequence_continuity.py`，**51 passed**；覆盖继承、
+- Final native sequence suite：`tests/test_planning_sequence_continuity.py`，**55 passed**；覆盖继承、
   same-stack forgery、有效 cross-stack prior selection、最终 route/stack 一致、bare route、stale
   route/stack/lifecycle/seed/target、tampered decision、candidate tie、circular proof、legacy bypass，
   以及单 selection / 完整合法 policy+binding 替换和缺 planning request preimage 在
   feedback/public Resolver/resealed execution 的拒绝行为。
+  与Architecture Gate/CLI suites一起执行为 **114 passed**，包含same-seed resealed non-Planner
+  projection四入口拒绝，以及dependency exception不扩大到其他Production path/QA target。
 - 其他相关 native suites：Planner、Router、transition、Readiness、feedback、execution/guards、
   generation decision，**395 passed**。包括 METASO soft Ref2VA FULL gate、HardCutKeyframe C2、
   identity/style carryover 与 reset；没有修改这些媒体/capability contracts。
@@ -150,7 +173,7 @@ builder 生成完整替换 package，在 public Resolver/resealed execution 复�
   effective LOC `951 → 957`。增加的是既有 cohesive binding 的 evidence 字段/None serialization，
   admission/reopen logic 位于既有 execution owner；未刷新 debt baseline 或清理 unrelated code。
 - `git diff --check`：PASS。最终 exact Harness 与两个独立 T3 review 的 evidence 存于
-  `.agent/harness/runs/sequence-route-authority-20261004-003/`；须分别核验 snapshot、policy、artifact
+  `.agent/harness/runs/sequence-route-authority-20261004-004/`；须分别核验 snapshot、policy、artifact
   与 freshness，不能从本记录或 native tests 推定它们通过。
 
 ## Remaining Evidence Boundaries

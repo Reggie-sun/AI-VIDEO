@@ -949,3 +949,71 @@ def test_cross_stack_cannot_reuse_sequence_decision_as_its_own_initial_selection
     with pytest.raises(AiVideoError) as stopped:
         build_sequence_video_planning_request(**inputs)
     assert "preselected continuity route" in stopped.value.technical_detail
+
+
+@pytest.mark.parametrize("entrypoint", ["builder", "feedback", "resolver", "execution"])
+def test_resealed_non_planner_prior_projection_cannot_authorize_sequence(activated_source, entrypoint):
+    from ai_video.production.video_requirement import (
+        ProviderNeutralVideoRequirement, VerifiedGenerationRequirementProjection,
+    )
+    from ai_video.production.generation_decision import resolve_generation_decision
+    from ai_video.production.generation_execution import GenerationDecisionExecutionBinding
+    from ai_video.production.generation_experience import extract_generation_features
+    from ai_video.production.shot_router import ContinuityProviderRouteBinding, VideoGenerationResolver
+    source = activated_source
+    inputs = _cross_stack_inputs(source)
+    initial = _prepare_sequence_generation(source, inputs, inputs["current_request"]).execution_binding
+    assert initial is not None
+    inputs["destination_selection_binding"] = initial
+    request, routing = build_sequence_video_planning_request(**inputs)
+    final = _prepare_sequence_generation(source, inputs, request, routing).execution_binding
+    assert final is not None
+    requirement = initial.projection.requirement
+    assert requirement.capability_need.accepts_local_execution is True
+    forged_requirement = ProviderNeutralVideoRequirement.create(**{
+        **{n: getattr(requirement, n) for n in type(requirement).model_fields
+           if n not in {"requirement_id", "requirement_hash"}},
+        "capability_need": requirement.capability_need.model_copy(update={"accepts_local_execution": False})})
+    forged_projection = VerifiedGenerationRequirementProjection.create(**{
+        **{n: getattr(initial.projection, n) for n in type(initial.projection).model_fields
+           if n != "projection_hash"}, "requirement": forged_requirement})
+    forged_inputs = initial.inputs.model_copy(update={
+        "projection_hash": forged_projection.projection_hash,
+        "facts_hash": canonical_sha256(forged_requirement.model_dump(mode="json",
+            exclude={"requirement_id", "requirement_hash"})),
+        "feature_scope": extract_generation_features(forged_projection),
+        "candidates": tuple(c.model_copy(update={"recipe": c.recipe.model_copy(update={
+            "requirement_hash": forged_requirement.requirement_hash})}) for c in initial.inputs.candidates)})
+    prior_arguments = dict(projection=forged_projection, context=initial.context, policy=initial.policy,
+        lifecycle=initial.lifecycle, inputs=forged_inputs)
+    prior_decision = resolve_generation_decision(VideoGenerationResolver(), **prior_arguments)
+    assert prior_decision.disposition == "GENERATE_ONCE"
+    compiled = source["provider"].compile_request(prior_decision.routing.provider_bound_request, forged_requirement)
+    forged = GenerationDecisionExecutionBinding.create(**prior_arguments, decision=prior_decision,
+        compiled_request=source["provider"].resolve(compiled.request))
+    assert forged.projection.requirement.source_request_content_hash == requirement.source_request_content_hash
+    assert forged.selected_provider_route == initial.selected_provider_route
+    forged.validate_current_project(load_production_project(source["root"] / "project.yaml"))
+    substituted = ContinuityProviderRouteBinding.create(**{
+        **{n: getattr(routing, n) for n in type(routing).model_fields if n != "binding_hash"},
+        "destination_selection_binding": forged.model_dump(mode="json")})
+    loaded = load_production_project(source["root"] / "project.yaml")
+    arguments = dict(projection=final.projection, context=final.context, policy=final.policy,
+        lifecycle=final.lifecycle, inputs=final.inputs, continuity_routing=substituted)
+    if entrypoint == "builder":
+        with pytest.raises(AiVideoError, match="authoring evidence"):
+            build_sequence_video_planning_request(**{**inputs, "destination_selection_binding": forged})
+    elif entrypoint == "feedback":
+        with pytest.raises(ValueError, match="Planner-derived seed projection"):
+            _prepare_sequence_generation(source, inputs, request, substituted)
+    elif entrypoint == "resolver":
+        with pytest.raises(ValueError, match="Planner-derived seed projection"):
+            VideoGenerationResolver().resolve_requirement(**arguments, source_project=loaded)
+    else:
+        decision = resolve_generation_decision(VideoGenerationResolver(), **arguments)
+        assert decision.disposition == "GENERATE_ONCE"
+        compiled = source["provider"].compile_request(decision.routing.provider_bound_request, final.projection.requirement)
+        resealed = GenerationDecisionExecutionBinding.create(**arguments, decision=decision,
+            compiled_request=source["provider"].resolve(compiled.request))
+        with pytest.raises(ValueError, match="Planner-derived seed projection"):
+            resealed.validate_current_project(loaded)

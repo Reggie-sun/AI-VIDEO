@@ -20,6 +20,10 @@ current target/intent/snapshots/lifecycle/stack，并以既有authoring seal核�
 public resolver/execution不能跳过此关联。先前selection不授权最终sequence requirement；
 binding保存既有materialized `VideoPlanningRequest`的canonical preimage；reopen校验实际final
 requirement的source request hash、内嵌policy及prior neutral seed，禁止完整policy/proof移用于另一个request。
+同seed hash的自洽projection也不是Planner证明：shared reopen调用既有`VideoPlanner.plan` /
+`require_current_video_plan`重新验证exact neutral seed，并比较完整projection。`ARCH103`只对
+`production/_sequence_source.py`→`planning.video_planner`开放这一pure verification例外；
+不调用handoff/selection/effect，其他Production→Planning/QA/Q0依赖仍阻断，review-by `2026-11-05`。
 最终仍经Planner/Readiness/Router，不允许循环使用自身continuity route完成初始selection。
 当前sequence API的仓库内caller只有tests，不能把test callback称为已交付production driver。
 禁止prompt推断、第二state/schema/sequence writer、legacy state token代替v2事实，或把工程READY
@@ -311,7 +315,8 @@ Manifest的可选`imported_generation_experiences`只适用于具备video-genera
 导入不接受新MCP analysis evidence或无binding来源凭空声明的受控intervention。
 `VideoGenerationService` 在 effect 前重验当前真实 adapter compiler/resolve，Ecommerce facade
 传递同一 execution binding。Commercial identity 由既有 lifecycle→compiler 保真传递。
-Production 不 import Planning/Q0/Dev records/RAG/Skills，不增加 quota ledger、Gate 或 activation owner。
+Production 不 import Q0/Dev records/RAG/Skills；Planning依赖仅限上述sequence proof只读校验例外，
+不增加 quota ledger、Gate 或 activation owner。
 重复失败可触发有界 resample、Provider 建议或 authoring feasibility；不宣称学习策略的质量收益。
 
 `planning/generation_feedback_context.py` 只校验当前 plan/context，不 import execution service。
