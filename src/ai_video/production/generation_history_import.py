@@ -229,6 +229,7 @@ class ImportedGenerationExperienceReceipt(StrictModel):
                     sources=self.experience.evaluation_sources,
                     evidence=evidence,
                     qa_policy=self.evaluation_policy,
+                    requirement=self.experience.projection.requirement,
                 )
         except (AttributeError, ValueError) as exc:
             raise ValueError("imported generation evaluation sources are invalid") from exc

@@ -515,10 +515,12 @@ class ComfyUIT8NativeTurboVideoProvider(ComfyUIT8VideoProvider):
         self,
         provider_bound: ProviderBoundVideoRequest,
         requirement: ProviderNeutralVideoRequirement,
+        *, continuity_expression=None,
     ) -> ProviderRequestCompilationResult:
         native_prompt = None
         if requirement.contract_version == "provider-neutral-video-requirement/4":
-            prompt = compile_h3_prompt(requirement)
+            prompt = compile_h3_prompt(requirement, provider_bound=provider_bound,
+                continuity_expression=continuity_expression)
             if not isinstance(prompt, H3PromptCompilation):
                 return ProviderRequirementUnsupported(
                     requirement_hash=requirement.requirement_hash,
@@ -542,6 +544,7 @@ class ComfyUIT8NativeTurboVideoProvider(ComfyUIT8VideoProvider):
             compiler_version=self.profile.schema_version,
             capabilities=self.capabilities(),
             native_prompt=native_prompt,
+            continuity_expression=continuity_expression,
         )
 
     def resolve(

@@ -158,7 +158,7 @@ class _StateCommitGenerationRejectionMixin:
             try:
                 unresolved = unresolved_generation_requirements(
                     evidence, history, experience.candidate.recipe,
-                    evaluation_sources=sources) if reason is not None else ()
+                    evaluation_sources=sources, requirement=experience.projection.requirement) if reason is not None else ()
             except ValueError as exc:
                 raise _state_invalid("Abandonment evidence is invalid.", str(exc)) from exc
             receipt = GenerationQualityRejectionReceipt.create(

@@ -488,6 +488,8 @@ def _video_artifact(history: dict[str, Any], output_node_id: str) -> tuple[str, 
 
 
 class ComfyUIVideoProvider:
+    causal_expression_grammar = "h3-three-field-v1"
+
     def __init__(
         self,
         profile: LocalVideoExecutionProfile,
@@ -602,6 +604,7 @@ class ComfyUIVideoProvider:
         self,
         provider_bound: ProviderBoundVideoRequest,
         requirement: ProviderNeutralVideoRequirement,
+        *, continuity_expression=None,
     ) -> ProviderRequestCompilationResult:
         try:
             ProviderNeutralVideoRequirement.model_validate(
@@ -655,7 +658,8 @@ class ComfyUIVideoProvider:
         compiler_version = "2" if is_v4 else "1"
         native_prompt = None
         if compiler_version == "2":
-            result = compile_h3_prompt(requirement)
+            result = compile_h3_prompt(requirement, provider_bound=provider_bound,
+                continuity_expression=continuity_expression)
             if not isinstance(result, H3PromptCompilation):
                 return ProviderRequirementUnsupported(
                     requirement_hash=requirement.requirement_hash,
@@ -681,6 +685,7 @@ class ComfyUIVideoProvider:
             compiler_version=compiler_version,
             capabilities=self.capabilities(),
             native_prompt=native_prompt,
+            continuity_expression=continuity_expression,
         )
 
     def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:

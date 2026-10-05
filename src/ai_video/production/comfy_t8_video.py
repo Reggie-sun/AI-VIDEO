@@ -579,6 +579,8 @@ def _final_av_artifact(
 
 
 class ComfyUIT8VideoProvider:
+    causal_expression_grammar = "h3-three-field-v1"
+
     def __init__(
         self,
         profile: T8ExecutionProfile,
@@ -702,6 +704,7 @@ class ComfyUIT8VideoProvider:
         self,
         provider_bound: ProviderBoundVideoRequest,
         requirement: ProviderNeutralVideoRequirement,
+        *, continuity_expression=None,
     ) -> ProviderRequestCompilationResult:
         unsupported = _preflight_t8_compiler_request(
             provider_bound=provider_bound,
@@ -710,7 +713,8 @@ class ComfyUIT8VideoProvider:
         )
         if unsupported is not None:
             return unsupported
-        prompt = compile_h3_prompt(requirement)
+        prompt = compile_h3_prompt(requirement, provider_bound=provider_bound,
+                continuity_expression=continuity_expression)
         if not isinstance(prompt, H3PromptCompilation):
             return ProviderRequirementUnsupported(
                 requirement_hash=requirement.requirement_hash,
@@ -725,6 +729,7 @@ class ComfyUIT8VideoProvider:
             compiler_id=_COMPILER_ID,
             compiler_version=_T2VA_COMPILER_VERSION,
             capabilities=self.capabilities(),
+            continuity_expression=continuity_expression,
             native_prompt=ProviderNativePrompt(
                 grammar_contract="h3-three-field-v1",
                 prompt_text=prompt.prompt_text,

@@ -376,25 +376,50 @@ def compile_provider_video_request(
         )
     from ai_video.production.voice_routing import validate_voice_compilation, voice_expression_recipe
 
-    if native_prompt is not None and "generation_intent.open_state.state_hash" in native_prompt.expressed_control_paths:
+    hash_endpoints = tuple(endpoint for endpoint in ("open_state", "close_state")
+        if getattr(requirement.generation_intent, endpoint).kind.value == "typed_hash")
+    if native_prompt is None and requirement.generation_intent.subject_action.endpoint.state_hash is not None:
+        return _unsupported(provider_bound, requirement,
+            ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+            ("generation_intent.subject_action.endpoint",))
+    if hash_endpoints and (native_prompt is None
+            or requirement.contract_version == "provider-neutral-video-requirement/4"
+            or native_prompt is not None and any(f"generation_intent.{endpoint}.state_hash"
+                in native_prompt.expressed_control_paths for endpoint in hash_endpoints)):
         # A claimed seal path is not coverage by itself. Reopen the same
         # owner-issued expression even for callers bypassing an adapter.
         from ai_video.production._remote_video_native_prompt import compile_remote_video_prompt
 
-        expected = compile_remote_video_prompt(requirement, voice_route=provider_bound.voice_route,
-            provider_bound=provider_bound, continuity_expression=continuity_expression)
+        if native_prompt is not None and native_prompt.grammar_contract == "h3-three-field-v1":
+            if compiler_id not in {"comfy-local-h3-video-compiler", "comfy-local-h3-t8-video-compiler",
+                    "comfy-local-h3-t8-turbo-video-compiler", "comfy-local-h3-t8-native-turbo-video-compiler"}:
+                return _unsupported(provider_bound, requirement,
+                    ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED, ("native_prompt.grammar_contract",))
+            from ai_video.production._h3_prompt import compile_h3_prompt
+
+            expected = compile_h3_prompt(requirement, provider_bound=provider_bound,
+                continuity_expression=continuity_expression)
+            if (expected.outcome == "compiled"
+                    and compiler_id == "comfy-local-h3-t8-native-turbo-video-compiler"
+                    and compiler_version == "3"):
+                from ai_video.production.comfy_t8_native_turbo_video import _long_reference_prompt
+
+                expected = _long_reference_prompt(expected, provider_bound, requirement)
+        else:
+            expected = compile_remote_video_prompt(requirement, voice_route=provider_bound.voice_route,
+                provider_bound=provider_bound, continuity_expression=continuity_expression)
         subject_compiler = (compiler_id == "vidu-video-compiler" and compiler_version == "4"
-            and native_prompt.grammar_contract == "vidu-subject-prose-v4")
+            and native_prompt is not None and native_prompt.grammar_contract == "vidu-subject-prose-v4")
         # This selected compiler must pass its exact subject recompile below.
         # A caller-supplied grammar label never grants that exception.
-        if (expected.outcome != "compiled" or (
+        if (native_prompt is None or expected.outcome != "compiled" or (
                 not subject_compiler and (
                     expected.prompt_text != native_prompt.prompt_text
                     or expected.prompt_sha256 != native_prompt.prompt_sha256
                     or expected.expressed_control_paths != native_prompt.expressed_control_paths))):
             return _unsupported(provider_bound, requirement,
                 ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
-                ("generation_intent.open_state",))
+                tuple(f"generation_intent.{endpoint}" for endpoint in hash_endpoints))
 
     voice_errors = validate_voice_compilation(requirement, provider_bound, native_prompt,
         continuity_expression=continuity_expression)
@@ -621,14 +646,16 @@ def compile_provider_video_request(
                                 ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
                                 ("generation_recipe.native_expression",))
         expression_recipe = voice_expression_recipe(recipe, requirement, provider_bound.voice_route)
-        if "generation_intent.open_state.state_hash" in native_prompt.expressed_control_paths:
+        for endpoint in hash_endpoints:
+            if f"generation_intent.{endpoint}.state_hash" not in native_prompt.expressed_control_paths:
+                continue
             # The verified native projection above covers this seal through
             # facts. Its digest remains in the persisted recipe/QA contract,
             # but is never a lexical narrative obligation.
-            state_hash = requirement.generation_intent.open_state.state_hash
+            state_hash = getattr(requirement.generation_intent, endpoint).state_hash
             expression_recipe = expression_recipe.model_copy(update={"expressions": tuple(
                 item.model_copy(update={"native_text": tuple(text for text in item.native_text
-                    if text != state_hash)}) if "generation_intent.open_state.state_hash" in item.intent_paths
+                    if text != state_hash)}) if f"generation_intent.{endpoint}.state_hash" in item.intent_paths
                 else item for item in expression_recipe.expressions)})
         missing = expression_errors(expression_recipe, requirement, prompt, native_prompt.expressed_control_paths)
         if missing:
@@ -823,12 +850,16 @@ def _tuple_value(values: tuple[str, ...]) -> str:
 
 def _state_value(state: TypedStateReference) -> str:
     kind = state.kind.value
-    value = state.state_ref or state.state_text or state.state_hash or "unspecified"
+    if kind == "typed_hash":
+        raise ValueError("opaque state hash cannot be neutral prompt prose")
+    value = state.state_ref or state.state_text or "unspecified"
     return f"{kind}:{value}:change={str(state.required_change).lower()}"
 
 
 def _endpoint_value(endpoint: ActionEndpoint) -> str:
-    return endpoint.state_ref or endpoint.state_text or endpoint.state_hash or "unspecified"
+    if endpoint.state_hash is not None:
+        raise ValueError("opaque action endpoint hash cannot be neutral prompt prose")
+    return endpoint.state_ref or endpoint.state_text or "unspecified"
 
 
 def _required_measurement(value: int | None, label: str) -> int:

@@ -136,7 +136,11 @@ def _speech_cue_field_paths(value: object, *, path: str) -> tuple[str, ...]:
 
 
 def _state_text(state: object) -> str:
-    for field in ("state_ref", "state_text", "state_hash"):
+    kind = getattr(state, "kind", None)
+    if kind is not None:
+        field = {"typed_ref": "state_ref", "typed_text": "state_text"}.get(kind.value)
+        return str(getattr(state, field)) if field is not None else "unspecified"
+    for field in ("state_ref", "state_text"):
         value = getattr(state, field, None)
         if value:
             return str(value)
@@ -149,7 +153,30 @@ def _h3_dialogue_language(language: str | None) -> str | None:
     return _H3_DIALOGUE_LANGUAGE_BY_PRIMARY_TAG.get(language.split("-", 1)[0])
 
 
-def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptResult:
+def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement, *, provider_bound=None,
+                     continuity_expression=None) -> H3PromptResult:
+    from ai_video.production._causal_state_expression import causal_endpoint_text
+
+    state_texts, state_controls, state_errors = {}, [], []
+    for endpoint in ("open_state", "close_state"):
+        state = getattr(requirement.generation_intent, endpoint)
+        if state.kind.value == "typed_hash":
+            try:
+                if requirement.contract_version != "provider-neutral-video-requirement/4":
+                    raise ValueError("causal expression requires the complete native grammar")
+                state_texts[endpoint] = causal_endpoint_text(requirement, provider_bound,
+                    endpoint=endpoint, opening_expression=continuity_expression)
+                state_controls.append(f"generation_intent.{endpoint}.state_hash")
+                if endpoint == "close_state":
+                    state_controls.append("generation_intent.close_causal_facts")
+            except (AttributeError, TypeError, ValueError):
+                state_errors.append(f"generation_intent.{endpoint}")
+        else:
+            state_texts[endpoint] = _state_text(state)
+    if requirement.generation_intent.subject_action.endpoint.state_hash is not None:
+        state_errors.append("generation_intent.subject_action.endpoint")
+    if state_errors:
+        return H3PromptUnsupported(unsupported_field_paths=tuple(state_errors))
     if (
         requirement.contract_version == "provider-neutral-video-requirement/1"
         and requirement.generation_mode is GenerationMode.TEXT_TO_VIDEO
@@ -256,10 +283,10 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptR
     visual = (
         "[Shot 1] "
         + (f"dialogue {dialogue_text}; " if dialogue.mode == "dialogue" else "")
-        + f"scene {requirement.scene.scene_id}; open state {_state_text(intent.open_state)}; "
+        + f"scene {requirement.scene.scene_id}; open state {state_texts['open_state']}; "
         f"action {intent.subject_action.start_state} -> {intent.subject_action.progression} "
         f"-> {_state_text(intent.subject_action.endpoint)}; "
-        f"close state {_state_text(intent.close_state)}; "
+        f"close state {state_texts['close_state']}; "
         f"performance trigger {performance.trigger}; "
         f"visible response {performance.visible_response}; "
         f"gaze {performance.gaze_target}; body {performance.body_behavior}; "
@@ -314,6 +341,7 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement) -> H3PromptR
         prompt_text=prompt,
         prompt_sha256=hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
         expressed_control_paths=(
+            *state_controls,
             "generation_intent.primary_camera_motion.movement_kind",
             "generation_intent.primary_camera_motion.amplitude_class",
             "generation_intent.primary_camera_motion.speed_class",

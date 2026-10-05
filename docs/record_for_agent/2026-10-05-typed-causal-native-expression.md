@@ -4,6 +4,14 @@ topic_id: verified-causal-opening-native-expression
 learning_eligibility: ineligible
 ---
 
+## Supersession Notice — 2026-10-05 Current Close
+
+下文current close缺少独立authored preimage的engineering blocker由
+[current-close implementation](2026-10-05-current-shot-close-expression.md)有界取代：existing
+`GenerationIntent.close_causal_facts`拥有完整hash-bound current close，compiler与controlled QA
+重开同一事实。旧opening evidence仍不授权closing，历史FAIL/NOT_EVALUATED和live source边界不变。
+scripted bootstrap成功不构成真实fresh accepted source，也不证明real A/B仅剩一个前置。
+
 # Verified Causal Opening Native Expression Record
 
 Date: 2026-10-05

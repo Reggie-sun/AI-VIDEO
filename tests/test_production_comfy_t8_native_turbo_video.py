@@ -482,9 +482,11 @@ def test_fl2va_compiler_preserves_neutral_first_last_frame_mode(
     )
 
 
+@pytest.mark.parametrize("with_close_facts", [False, True])
 def test_i2va_compiler_uses_native_h3_prompt_for_v4_requirement(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    with_close_facts: bool,
 ) -> None:
     profile = _load("I2VA")
     seconds = 124 / 24
@@ -509,6 +511,15 @@ def test_i2va_compiler_uses_native_h3_prompt_for_v4_requirement(
             ),
         }
     )
+    if with_close_facts:
+        from test_current_shot_close_expression import close_facts
+        from ai_video.production.video_requirement import TypedStateReference
+
+        facts = close_facts()
+        facts["dialogue_turn"] = "announcer has finished speaking"
+        intent = type(intent).model_validate({**intent.model_dump(mode="python"),
+            "close_state": TypedStateReference(kind="typed_hash", state_hash=canonical_sha256(facts)),
+            "close_causal_facts": facts})
     payload = _v4_requirement_kwargs()
     payload.update(
         generation_intent=intent,
@@ -636,6 +647,9 @@ def test_i2va_compiler_uses_native_h3_prompt_for_v4_requirement(
     assert "<d>[Chinese] 林砚，请在终点站下车。</d>" in compiled.provider_native_prompt
     assert "dolly in with subtle amplitude at slow speed" in compiled.provider_native_prompt
     assert compiled.request.mode is VideoGenerationMode.IMAGE_TO_VIDEO
+    if with_close_facts:
+        assert all(fact in compiled.provider_native_prompt for fact in facts.values())
+        assert intent.close_state.state_hash not in compiled.provider_native_prompt
 
     blocked_intent = intent.model_copy(
         update={

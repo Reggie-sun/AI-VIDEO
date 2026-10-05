@@ -97,6 +97,7 @@ def verified_fetched_prior_for_new_goal(committer, loaded, prior):
                     sources=experience.evaluation_sources, evidence=evidence,
                     qa_policy=snapshot, size_bytes=fetched.size_bytes,
                     acceptance=candidate.recipe.acceptance_policy,
+                    requirement=binding.projection.requirement,
                 )
         required = {r.requirement_id for r in candidate.recipe.expressions
                     if r.level == "acceptance" and r.stage == "raw_generation"}

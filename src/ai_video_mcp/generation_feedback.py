@@ -89,7 +89,8 @@ class ControlledPresentationVerifier:
                 actor_version=self.evaluator.version, items=presented.evaluation_items,
                 answers_json=json.dumps(source.answer_payload(), sort_keys=True, separators=(",", ":")))
             bound = source.model_copy(update={"presentation_evidence": captured})
-            project_generation_evaluation_sources(sources=(bound,), acceptance=review_input.recipe.acceptance_policy)
+            project_generation_evaluation_sources(sources=(bound,), acceptance=review_input.recipe.acceptance_policy,
+                requirement=review_input.projection.requirement)
             documents.append(bound)
         sources = tuple(documents)
         if not sources:
@@ -129,7 +130,8 @@ def _diagnosis(committer, experience):
     experiences = committer.read_generation_experiences()
     history = tuple(e for x in experiences for e in x.evidence)
     return diagnose_exact_result(entry, history, experience.candidate.recipe,
-        evaluation_sources=tuple(s for x in experiences for s in x.evaluation_sources))
+        evaluation_sources=tuple(s for x in experiences for s in x.evaluation_sources),
+        requirement=experience.projection.requirement)
 
 
 async def review_generation_attempt(*, committer, attempt_id, session, adjudicate,
@@ -198,7 +200,8 @@ async def review_generation_attempt(*, committer, attempt_id, session, adjudicat
                      if c.candidate_id == binding.decision.selected_candidate_id)
     items = evaluation_items(acceptance=candidate.recipe.acceptance_policy,
         qa_policy_content_hash=loaded.qa_policy.content_hash, request_hash=request.request_input_hash,
-        artifact_sha256=receipt.artifact_sha256, size_bytes=receipt.size_bytes)
+        artifact_sha256=receipt.artifact_sha256, size_bytes=receipt.size_bytes,
+        requirement=binding.projection.requirement)
     review_input = GenerationReviewInput(request, binding.projection, candidate.recipe,
                                         loaded.qa_policy, analysis, items)
     if analysis_only:

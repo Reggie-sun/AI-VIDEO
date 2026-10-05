@@ -119,20 +119,29 @@ def compile_remote_video_prompt(
     )
     opening_controls = ()
     if intent.open_state.kind is ContinuityStateKind.TYPED_HASH and continuity_expression is not None:
-        from ai_video.production._causal_prompt_context import VerifiedCausalOpeningExpression
+        from ai_video.production._causal_state_expression import causal_endpoint_text
 
         try:
-            if type(continuity_expression) is not VerifiedCausalOpeningExpression:
-                raise ValueError("causal expression must be owner-issued")
-            facts = continuity_expression.opening_facts(requirement, provider_bound)
+            opening = causal_endpoint_text(requirement, provider_bound, endpoint="open_state",
+                opening_expression=continuity_expression)
         except (AttributeError, TypeError, ValueError):
             return RemoteVideoPromptUnsupported(unsupported_field_paths=("generation_intent.open_state",))
-        opening = "; ".join(f"{dimension.value.replace('_', ' ')}: {fact}" for dimension, fact in facts)
         opening_errors = ()
         opening_controls = ("generation_intent.open_state.state_hash",)
     closing, closing_errors = _state_text(
         intent.close_state, "generation_intent.close_state"
     )
+    closing_controls = ()
+    if intent.close_state.kind is ContinuityStateKind.TYPED_HASH:
+        from ai_video.production._causal_state_expression import causal_endpoint_text
+
+        try:
+            closing = causal_endpoint_text(requirement, provider_bound, endpoint="close_state")
+        except (AttributeError, TypeError, ValueError):
+            closing_errors = ("generation_intent.close_state",)
+        else:
+            closing_errors = ()
+            closing_controls = ("generation_intent.close_state.state_hash", "generation_intent.close_causal_facts")
     endpoint, endpoint_errors = _endpoint_text(intent.subject_action.endpoint)
     if opening_errors or closing_errors or endpoint_errors:
         return RemoteVideoPromptUnsupported(
@@ -158,7 +167,7 @@ def compile_remote_video_prompt(
     assert motion is not None and relation is not None
 
     sentences: list[str] = []
-    controls: list[str] = list(opening_controls)
+    controls: list[str] = list((*opening_controls, *closing_controls))
     _append(sentences, f"Opening state: {opening}.")
     if intent.open_state.required_change:
         sentences.append("The opening state must visibly change during this shot.")

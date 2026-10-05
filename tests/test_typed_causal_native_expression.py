@@ -18,7 +18,8 @@ from ai_video.production.video_requirement import (
 from ai_video.production._remote_video_native_prompt import compile_remote_video_prompt
 
 
-def canonical_expression_fixture(tmp_path, *, exact_terminal=False, source=None, duration=1, close_hash=False):
+def canonical_expression_fixture(tmp_path, *, exact_terminal=False, source=None, duration=1, close_hash=False,
+                                 equal_close=False, arbitrary_close=False):
     import test_planning_sequence_continuity as s
     import test_production_shot_router as r
     from test_production_video_intent_validation import _complete_intent, _compatible_fl2va
@@ -38,6 +39,10 @@ def canonical_expression_fixture(tmp_path, *, exact_terminal=False, source=None,
         "pacing": Pacing(shot_duration_seconds=duration),
         "ambience_intent": AmbienceIntent(environment_bed="none", explicitly_silent=True),
     })
+    if equal_close:
+        intent = intent.model_copy(update={"close_state": intent.open_state})
+    elif arbitrary_close:
+        intent = intent.model_copy(update={"close_state": TypedStateReference(kind="typed_hash", state_hash="f" * 64)})
     first = next(a for a in seed.available_assets if a.role.value == (
         "previous_shot_terminal" if exact_terminal else "approved_keyframe"))
     authored = ProviderNeutralGenerationIntentProjection.create(**{

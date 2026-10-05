@@ -141,7 +141,8 @@ class _StateCommitGenerationFeedbackMixin:
                     try:
                         validate_generation_evaluation_sources(
                             sources=experience.evaluation_sources, evidence=evidence,
-                            qa_policy=loaded.qa_policy, loaded=loaded, size_bytes=fetch.size_bytes)
+                            qa_policy=loaded.qa_policy, loaded=loaded, size_bytes=fetch.size_bytes,
+                            requirement=binding.projection.requirement)
                         tagged = tuple(
                             source for source in experience.evaluation_sources
                             if source.commercial_evidence_content_hash is not None

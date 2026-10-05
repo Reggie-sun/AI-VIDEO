@@ -100,7 +100,8 @@ class GenerationExperience(StrictModel):
                or e.rubric_hash != self.candidate.recipe.rubric_hash
                or e.shot_id != requirement.target_shot.shot_id for e in self.evidence):
             raise ValueError("experience evidence does not match its exact source")
-        if self.candidate.recipe.acceptance_policy.profile_payload.get("requirement_semantics_version"):
+        if (self.candidate.recipe.acceptance_policy.profile_payload.get("requirement_semantics_version")
+                or requirement.generation_intent.close_causal_facts is not None):
             for entry in self.evidence:
                 if entry.outcome != "media":
                     continue
@@ -110,7 +111,7 @@ class GenerationExperience(StrictModel):
                 if snapshot is None:
                     raise ValueError("marked experience needs original sealed QA")
                 validate_generation_evaluation_sources(sources=self.evaluation_sources, evidence=entry,
-                    qa_policy=snapshot, acceptance=self.candidate.recipe.acceptance_policy)
+                    qa_policy=snapshot, acceptance=self.candidate.recipe.acceptance_policy, requirement=requirement)
         return self
 
     @property
@@ -163,7 +164,8 @@ def empirical_assessment(candidate, features, experiences) -> EmpiricalEstimate:
                 continue
             hashes.add(entry.evidence_hash)
             diagnosis = diagnose_exact_result(entry, all_evidence, old.recipe,
-                evaluation_sources=tuple(s for x in experiences for s in x.evaluation_sources))
+                evaluation_sources=tuple(s for x in experiences for s in x.evaluation_sources),
+                requirement=experience.projection.requirement)
             if "QUALITY_FAILURE" in diagnosis.failure_classes:
                 rejected.add(entry.artifact_sha256)
                 failed_ids.update(diagnosis.failed_requirements)

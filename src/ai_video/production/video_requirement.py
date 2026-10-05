@@ -19,6 +19,7 @@ from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import Character, Scene, Shot, StrictModel
 from ai_video.production._video_continuity import C4MultiAnchorBinding
 from ai_video.production.voice_routing_contracts import VoiceRoutingRequirement
+from ai_video.production.video_transition import CausalDimension
 
 
 _REQUIREMENT_CONTRACT_VERSION = "provider-neutral-video-requirement/1"
@@ -519,6 +520,7 @@ class MusicIntent(StrictModel):
 class GenerationIntent(StrictModel):
     open_state: TypedStateReference = Field(default_factory=TypedStateReference)
     close_state: TypedStateReference = Field(default_factory=TypedStateReference)
+    close_causal_facts: dict[CausalDimension, str] | None = None
     identity_continuity: IdentityContinuity = Field(
         default_factory=IdentityContinuity
     )
@@ -541,6 +543,23 @@ class GenerationIntent(StrictModel):
         validation_alias=AliasChoices("primary_camera_motion", "camera_motion"),
     )
     camera_subject_relation: CameraSubjectRelation | None = None
+
+    @field_validator("close_causal_facts")
+    @classmethod
+    def _canonical_close_facts(cls, facts):
+        if facts is None:
+            return None
+        from ai_video.production._causal_state_expression import canonical_close_facts
+
+        return dict(canonical_close_facts(facts))
+
+    @model_validator(mode="after")
+    def _validate_close_facts(self):
+        if self.close_causal_facts is not None:
+            from ai_video.production._causal_state_expression import require_current_close_facts
+
+            require_current_close_facts(self)
+        return self
 
     @model_validator(mode="after")
     def _validate_camera_relation(self) -> "GenerationIntent":
@@ -565,6 +584,7 @@ class GenerationIntent(StrictModel):
     ) -> dict[str, object]:
         data = handler(self)
         for field in (
+            "close_causal_facts",
             "performance_intent",
             "visual_treatment",
             "lighting_intent",

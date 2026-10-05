@@ -38,13 +38,23 @@ class EvaluationItem(StrictModel):
         return canonical_sha256({**self.model_dump(mode="json"), "question_text": self.question_text})
 
 
-def evaluation_items(*, acceptance, qa_policy_content_hash, request_hash, artifact_sha256, size_bytes):
+def evaluation_items(*, acceptance, qa_policy_content_hash, request_hash, artifact_sha256, size_bytes,
+                     requirement=None):
     rules = validate_semantic_inventory(acceptance.profile_payload, acceptance.required_requirement_ids)
+    def measurement(rule):
+        if rule.intent_paths == ("generation_intent.close_state.state_hash",):
+            from ai_video.production._causal_state_expression import close_evaluation_measurement
+
+            if requirement is None:
+                raise ValueError("close-state evaluation needs the sealed semantic preimage")
+            return close_evaluation_measurement(rule, requirement)
+        return rule.measurement
+
     return tuple(EvaluationItem(qa_policy_content_hash=qa_policy_content_hash,
         rubric_hash=acceptance.profile_content_hash, request_hash=request_hash,
         artifact_sha256=artifact_sha256, size_bytes=size_bytes, requirement_id=r.requirement_id,
         category=r.semantics.category, proof=r.proof, observable=r.observable,
-        tolerance=r.tolerance, measurement=r.measurement, measurement_spec=r.measurement_spec)
+        tolerance=r.tolerance, measurement=measurement(r), measurement_spec=r.measurement_spec)
         for r in rules if r.level == "acceptance" and r.stage == "raw_generation")
 
 

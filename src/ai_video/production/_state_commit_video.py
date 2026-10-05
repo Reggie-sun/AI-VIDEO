@@ -352,7 +352,8 @@ class _StateCommitVideoMixin:
             experience, latest = pairs[-1]
             diagnosis = diagnose_exact_result(latest,
                 tuple(e for _, e in pairs), experience.candidate.recipe,
-                evaluation_sources=tuple(s for x, _ in pairs for s in x.evaluation_sources))
+                evaluation_sources=tuple(s for x, _ in pairs for s in x.evaluation_sources),
+                requirement=experience.projection.requirement)
             if not diagnosis.all_required_observed_pass:
                 raise _state_invalid("Previous production component required findings are not all PASS.")
 

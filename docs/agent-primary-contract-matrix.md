@@ -1,5 +1,20 @@
 # AI-VIDEO Contract Routing Matrix
 
+## Current Shot Close Expression
+
+`video_requirement.py::GenerationIntent.close_causal_facts` 是existing intent内的optional authored
+current-close preimage；复用`video_transition.CausalDimension`，十维必须完整且与唯一
+`close_state.state_hash`精确一致。author逐维声明，不从局部action/performance/space/camera推测。
+`_causal_state_expression.py`拥有canonical ordering、hash/endpoint验证与deterministic fact rendering；
+current close从sealed requirement独立投影，不由sequence opening evidence授权，等digest亦不例外。
+remote/local保持独立native grammar；local H3/T8 consumers共用existing sequence opening owner和close
+projection，arbitrary hashes unsupported。compiler重编exact grammar，seal仅在verified lexical view中移除。
+`generation_evaluation_criteria.evaluation_items`从execution requirement派生完整close问题；selected QA
+仍引用exact close hash，question绑定requirement/Shot及raw request/media。presentation/experience/diagnosis
+重开同一preimage；新facts不接受hash-only旧问题的PASS。旧无facts serialization与历史证据不重写。
+offline scripted bootstrap只证明标准reader/committer/evaluator wiring，不证明real terminal quality。
+见[current-close spec](superpowers/specs/2026-10-05-current-shot-close-expression.md)。
+
 ## Sequence Authoring Boundary
 
 顺序 owner：selected `Storyboard.beats[].shot_ids`；authoring/revision 与 mutable acceptance

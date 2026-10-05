@@ -76,6 +76,16 @@ def _expressions(acceptance, requirement):
     inventory = acceptance.profile_payload.get("generation_requirements")
     if not inventory:
         raise ValueError("selected acceptance owner has no generation requirement projection")
+    if requirement.generation_intent.close_causal_facts is not None:
+        from ai_video.production._causal_state_expression import close_evaluation_measurement
+
+        close_rules = tuple(RequirementExpression.model_validate(raw) for raw in inventory
+            if raw.get("intent_paths") in (["generation_intent.close_state.state_hash"],
+                                          ("generation_intent.close_state.state_hash",)))
+        if not acceptance.profile_payload.get("requirement_semantics_version") or not close_rules:
+            raise ValueError("authored close requires a selected semantic close-state QA rule")
+        for rule in close_rules:
+            close_evaluation_measurement(rule, requirement)
     payload = requirement.model_dump(mode="python")
     result = []
     for raw in inventory:
@@ -166,7 +176,8 @@ def derive_generation_interventions(*, projection, candidates, history, policy,
         return (), conflicts
     prior = next(x for x in history.experiences if latest in x.evidence)
     sources = tuple(s for x in history.experiences for s in x.evaluation_sources)
-    diagnosis = diagnose_exact_result(latest, evidence, prior.candidate.recipe, evaluation_sources=sources)
+    diagnosis = diagnose_exact_result(latest, evidence, prior.candidate.recipe, evaluation_sources=sources,
+        requirement=prior.projection.requirement)
     if not diagnosis.failed_requirements:
         return (), conflicts
     features = extract_generation_features(projection)
@@ -196,7 +207,8 @@ def derive_generation_interventions(*, projection, candidates, history, policy,
             seen_attempts.add(identity)
             if entry.evidence_hash not in comparable:
                 break
-            result = diagnose_exact_result(entry, evidence, experience.candidate.recipe, evaluation_sources=sources)
+            result = diagnose_exact_result(entry, evidence, experience.candidate.recipe, evaluation_sources=sources,
+                requirement=experience.projection.requirement)
             if "QUALITY_FAILURE" not in result.failure_classes:
                 break
             failure_streak += 1
@@ -464,7 +476,8 @@ class GenerationFeedbackOrchestrator:
         candidate = next(c for c in prepared.inputs.candidates
                          if c.candidate_id == prepared.decision.selected_candidate_id)
         findings, refs = project_generation_evaluation_sources(
-            sources=evaluation_sources, acceptance=candidate.recipe.acceptance_policy)
+            sources=evaluation_sources, acceptance=candidate.recipe.acceptance_policy,
+            requirement=prepared.execution_binding.projection.requirement)
         evidence = project_attempt_evidence(
             prepared=prepared, task_id=prepared.inputs.limits.task_id,
             shot_id=prepared.execution_binding.context.target_shot_id,
@@ -579,7 +592,8 @@ def record_attempt_evaluation(*, committer, attempt_id, evaluation_sources=(), a
         raise ValueError("no-media attempt cannot consume evaluator findings")
     intervention = binding.decision.intervention
     findings, refs = project_generation_evaluation_sources(
-        sources=evaluation_sources, acceptance=candidate.recipe.acceptance_policy)
+        sources=evaluation_sources, acceptance=candidate.recipe.acceptance_policy,
+        requirement=binding.projection.requirement)
     evidence = AttemptEvidence(
         task_id=binding.inputs.limits.task_id, shot_id=binding.context.target_shot_id,
         attempt_id=attempt_id, recipe_scope_hash=candidate.scope_hash,

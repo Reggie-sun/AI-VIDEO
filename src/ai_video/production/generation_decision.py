@@ -253,7 +253,9 @@ def _assess(candidate, inputs, routing):
         if e.outcome != "media" or e.stage != "raw_generation":
             continue
         diagnosis = diagnose_exact_result(e, relevant, recipe,
-            evaluation_sources=tuple(s for x in inputs.experiences for s in x.evaluation_sources))
+            evaluation_sources=tuple(s for x in inputs.experiences for s in x.evaluation_sources),
+            requirement=next((x.projection.requirement for x in inputs.experiences
+                if x.candidate.recipe.requirement_hash == recipe.requirement_hash), None))
         for rule in recipe.expressions:
             if rule.requirement_id in diagnosis.failed_requirements:
                 failed.add(rule.dimension)
@@ -424,7 +426,9 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
             return GenerationDecision(**base, disposition="EVIDENCE_GAP",
                                       rationale=("include the prior exact recipe for diagnosis",))
         diagnosis = diagnose_exact_result(latest, inputs.evidence, old_recipe,
-            evaluation_sources=tuple(s for x in inputs.experiences for s in x.evaluation_sources))
+            evaluation_sources=tuple(s for x in inputs.experiences for s in x.evaluation_sources),
+            requirement=next((x.projection.requirement for x in inputs.experiences
+                if x.candidate.recipe.requirement_hash == old_recipe.requirement_hash), None))
         base["diagnosis"] = diagnosis
         if inputs.policy.version == "3" and latest.rubric_hash != inputs.rubric_hash:
             old_goal = next(c.final_output_goal for c in (*candidates, *inputs.historical_recipes)
@@ -558,7 +562,9 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
                     continue
                 prediction_outcomes.append(intervention_prediction_outcome(
                     proposed, diagnose_exact_result(entry, inputs.evidence, old_recipe,
-                        evaluation_sources=tuple(s for x in inputs.experiences for s in x.evaluation_sources)),
+                        evaluation_sources=tuple(s for x in inputs.experiences for s in x.evaluation_sources),
+                        requirement=next((x.projection.requirement for x in inputs.experiences
+                            if x.candidate.recipe.requirement_hash == old_recipe.requirement_hash), None)),
                     require_all=inputs.policy.version == "3"))
             # A non-resample experiment may run once.  Its observed outcome is
             # retained to distinguish evidence repair from a relabeled retry.

@@ -130,14 +130,17 @@ def validate_quality_rejection_experience(
         sources=experience.evaluation_sources,
         evidence=evidence,
         qa_policy=qa_policy,
+        requirement=experience.projection.requirement,
     )
     return diagnose_exact_result(evidence, history, experience.candidate.recipe,
-        evaluation_sources=(*evaluation_sources, *experience.evaluation_sources))
+        evaluation_sources=(*evaluation_sources, *experience.evaluation_sources),
+        requirement=experience.projection.requirement)
 
 
-def unresolved_generation_requirements(evidence, history, recipe, *, evaluation_sources=()) -> tuple[str, ...]:
+def unresolved_generation_requirements(evidence, history, recipe, *, evaluation_sources=(), requirement=None) -> tuple[str, ...]:
     """Retain explicitly unobservable requirements; missing proof is not exhaustion."""
-    diagnosis = diagnose_exact_result(evidence, history, recipe, evaluation_sources=evaluation_sources)
+    diagnosis = diagnose_exact_result(evidence, history, recipe, evaluation_sources=evaluation_sources,
+        requirement=requirement)
     if "RUBRIC_OR_STAGE_ERROR" in diagnosis.failure_classes:
         raise ValueError("abandonment cannot reinterpret conflicting evaluation evidence")
     exact_hashes = set(diagnosis.evidence_hashes)
@@ -169,7 +172,8 @@ def validate_abandoned_result(receipt, *, experience, evidence, history, evaluat
             or receipt.experience_content_hash != canonical_sha256(experience.model_dump(mode="json"))
             or evidence not in experience.evidence
             or receipt.diagnosis != diagnose_exact_result(evidence, history, experience.candidate.recipe,
-                                                        evaluation_sources=sources)
+                                                        evaluation_sources=sources, requirement=experience.projection.requirement)
             or receipt.unresolved_requirements != unresolved_generation_requirements(
-                evidence, history, experience.candidate.recipe, evaluation_sources=sources)):
+                evidence, history, experience.candidate.recipe, evaluation_sources=sources,
+                requirement=experience.projection.requirement)):
         raise ValueError("abandoned result differs from exact latest evidence")

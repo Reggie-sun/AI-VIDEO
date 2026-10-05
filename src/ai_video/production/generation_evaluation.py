@@ -224,15 +224,19 @@ class GenerationEvaluationSource(StrictModel):
                      for item in self.unresolved_quality_observations)
 
 
-def _validate_marked_source(source, acceptance):
+def _validate_marked_source(source, acceptance, requirement=None):
     rules = validate_semantic_inventory(acceptance.profile_payload, acceptance.required_requirement_ids)
     marked = bool(rules)
+    if (requirement is not None and requirement.generation_intent.close_causal_facts is not None
+            and not marked):
+        raise ValueError("authored causal close requires semantic preimage presentation")
     if marked != (source.schema_version == "generation-evaluation/2"):
         raise ValueError("selected QA semantics require the matching evaluation version")
     if not marked:
         return
     items = evaluation_items(acceptance=acceptance, qa_policy_content_hash=source.qa_policy_content_hash,
-        request_hash=source.request_hash, artifact_sha256=source.artifact_sha256, size_bytes=source.size_bytes)
+        request_hash=source.request_hash, artifact_sha256=source.artifact_sha256, size_bytes=source.size_bytes,
+        requirement=requirement)
     by_id = {item.requirement_id: item for item in items}
     rule_by_id = {r.requirement_id: r for r in rules}
     ids = [o.requirement_id for o in (*source.observations, *source.advisory_observations)]
@@ -281,12 +285,12 @@ def _validate_marked_source(source, acceptance):
             raise ValueError("unresolved quality requires verified original answer evidence")
 
 
-def project_generation_evaluation_sources(*, sources, acceptance):
+def project_generation_evaluation_sources(*, sources, acceptance, requirement=None):
     """The sole source-to-findings/refs projection, shared by all entrypoints."""
     findings, refs = [], []
     for source in sources:
         source = GenerationEvaluationSource.model_validate(source.model_dump(mode="python"))
-        _validate_marked_source(source, acceptance)
+        _validate_marked_source(source, acceptance, requirement)
         findings.extend(source.project_findings())
         refs.extend(source.unresolved_refs())
     return tuple(findings), tuple(sorted(set(refs)))
@@ -303,7 +307,7 @@ def require_generation_evaluation_authorities(qa_policy, acceptance):
 
 
 def validate_generation_evaluation_sources(*, sources, evidence, qa_policy, loaded=None, size_bytes=None,
-                                          acceptance=None):
+                                          acceptance=None, requirement=None):
     """Reopen exact source identity and the current policy-selected authority."""
     if not sources:
         raise ValueError("media evaluation requires the original evaluator sources")
@@ -343,6 +347,7 @@ def validate_generation_evaluation_sources(*, sources, evidence, qa_policy, load
         if not any(item.evaluator == source.evaluator and item.proof == source.proof
                    for item in qa_policy.generation_evaluation_authorities):
             raise ValueError("generation evaluator is not authorized for this proof kind")
-    projected, refs = project_generation_evaluation_sources(sources=sources, acceptance=acceptance)
+    projected, refs = project_generation_evaluation_sources(sources=sources, acceptance=acceptance,
+        requirement=requirement)
     if tuple(projected) != evidence.findings or refs != getattr(evidence, "unresolved_quality_refs", ()):
         raise ValueError("generation findings differ from original evaluator sources")

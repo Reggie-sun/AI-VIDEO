@@ -146,7 +146,7 @@ def _diagnose_findings(attempt: AttemptEvidence, recipe: GenerationRecipe) -> Di
                      all_required_observed_pass=bool(preserved) and not classes)
 
 
-def _validated_findings(attempt, recipe, evaluation_sources):
+def _validated_findings(attempt, recipe, evaluation_sources, requirement=None):
     """Reuse source admission before bare marked Findings can establish quality."""
     if (attempt.outcome != "media"
             or not recipe.acceptance_policy.profile_payload.get("requirement_semantics_version")):
@@ -178,7 +178,7 @@ def _validated_findings(attempt, recipe, evaluation_sources):
             validate_generation_evaluation_sources(sources=(source,),
                 evidence=attempt.model_copy(update={"findings": findings,
                     "unresolved_quality_refs": source.unresolved_refs()}),
-                qa_policy=source.qa_policy_snapshot, acceptance=recipe.acceptance_policy)
+                qa_policy=source.qa_policy_snapshot, acceptance=recipe.acceptance_policy, requirement=requirement)
             projected.update(canonical_sha256(f.model_dump(mode="json")) for f in findings)
             refs.update(source.unresolved_refs())
             qa_hashes.add(source.qa_policy_content_hash)
@@ -204,17 +204,17 @@ def _with_source_conflict(diagnosis, conflict):
         "next_owner": "acceptance_owner" if "RUBRIC_OR_STAGE_ERROR" in classes else "evidence_owner"})
 
 
-def diagnose_attempt(attempt: AttemptEvidence, recipe: GenerationRecipe, *, evaluation_sources=()) -> Diagnosis:
+def diagnose_attempt(attempt: AttemptEvidence, recipe: GenerationRecipe, *, evaluation_sources=(), requirement=None) -> Diagnosis:
     attempt = AttemptEvidence.model_validate(attempt.model_dump(mode="python"))
     recipe = GenerationRecipe.model_validate(recipe.model_dump(mode="python"))
-    findings, conflict, _ = _validated_findings(attempt, recipe, evaluation_sources)
+    findings, conflict, _ = _validated_findings(attempt, recipe, evaluation_sources, requirement)
     diagnosis = _diagnose_findings(attempt.model_copy(update={"findings": findings}), recipe)
     return _with_source_conflict(diagnosis, conflict).model_copy(
         update={"evidence_hashes": (attempt.evidence_hash,)})
 
 
 def diagnose_exact_result(attempt: AttemptEvidence, evidence: tuple[AttemptEvidence, ...],
-                          recipe: GenerationRecipe, *, evaluation_sources=()) -> Diagnosis:
+                          recipe: GenerationRecipe, *, evaluation_sources=(), requirement=None) -> Diagnosis:
     """Combine proof layers for one exact result without rewriting source evidence."""
     attempt = AttemptEvidence.model_validate(attempt.model_dump(mode="python"))
     if attempt.outcome != "media":
@@ -227,7 +227,7 @@ def diagnose_exact_result(attempt: AttemptEvidence, evidence: tuple[AttemptEvide
         if entry.outcome == "media" and all(getattr(entry, name) == getattr(attempt, name)
                                             for name in identity_fields):
             records[entry.evidence_hash] = entry
-    checked = tuple(_validated_findings(entry, recipe, evaluation_sources) for entry in records.values())
+    checked = tuple(_validated_findings(entry, recipe, evaluation_sources, requirement) for entry in records.values())
     conflicts = {conflict for _, conflict, _ in checked}
     conflicts.discard(None)
     if len({qa_hash for _, _, hashes in checked for qa_hash in hashes}) > 1:

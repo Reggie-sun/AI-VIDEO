@@ -79,7 +79,8 @@ def accepted_sequence_source(loaded, source, *, require_causal_close=False):
             if require_causal_close and not close_rules:
                 raise ValueError("source causal close state lacks exact semantic acceptance criterion")
             diagnosis = diagnose_exact_result(entry, entries, experience.candidate.recipe,
-                evaluation_sources=tuple(s for x in experiences for s in x.evaluation_sources))
+                evaluation_sources=tuple(s for x in experiences for s in x.evaluation_sources),
+                requirement=binding.projection.requirement)
             if not diagnosis.all_required_observed_pass:
                 raise ValueError("source exact media evaluation is not PASS")
             if require_causal_close and not set(close_rules) <= set(diagnosis.preserved_requirements):
@@ -237,8 +238,8 @@ def build_verified_causal_opening_expression(*, loaded, routing, requirement, pr
 
 
 def compile_with_sequence_expression(provider, provider_bound, requirement, *, loaded=None, routing=None):
-    """Keep legacy grammars/calls intact; shared remote grammars opt in explicitly."""
-    if (getattr(provider, "causal_expression_grammar", None) != "remote-video-prose-v1"
+    """Keep legacy calls intact; native grammars share the sequence-issued facts."""
+    if (getattr(provider, "causal_expression_grammar", None) not in {"remote-video-prose-v1", "h3-three-field-v1"}
             or requirement.contract_version != "provider-neutral-video-requirement/4"
             or requirement.generation_intent.open_state.kind is not ContinuityStateKind.TYPED_HASH
             or routing is None):
