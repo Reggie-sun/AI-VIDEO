@@ -110,11 +110,14 @@ stable substantial record 后自动评估 `distill-ai-video-learning`；只可�
 
 Native Codex 为默认 primary；按 semantic risk 分级：T0 局部可逆 targeted validation；T1 bounded multi-file
 必要时 plan；T2 architecture/workflow/Provider/Harness/shared schema 走 research → spec → plan → implement → verify
-→ review；T3 ownership/verification/paid/credential/recovery/QA contract 另需同一 exact snapshot 双独立 final review。
+→ review；T3 ownership/verification/paid/credential/recovery/QA contract 保留严格验证，不自动触发双审。
 Bug 先 root-cause/systematic-debugging 再 regression validation。Skill 按需加载，不自动成为 lifecycle owner。
-Spec/plan 在任务授权内 Parent self-review 后继续；authorized written spec 自动触发 `superpowers:writing-plans`。
-Review 在 stable target 上执行，read-only、无 nested delegation；Parent 调查 findings，语义修复后重新验证/审查。
-Spec/plan 默认 self-review，高风险按需 independent review；implementation review 按 applicable Risk Gate。
+Spec/plan 默认 Parent self-review，不默认 Kimi/native reviewer；authorized written spec 自动触发
+`superpowers:writing-plans`。Implementation 先 tests/Harness，再按 `/home/reggie/.codex/SUBAGENTS.md`
+的低频 Risk Gate 判断；未触发由 Parent 完成，触发只增加一名 Kimi read-only reviewer，不叠加 native reviewer。
+Kimi review → Codex Parent 裁决/修复 → verification → 必要 targeted/full Kimi re-review；exact snapshot、
+有限轮次及连续故障 native 替换均由 SUBAGENTS.md 独占。细节见 playbook 的 Implementation Review。
+本规则取代旧 Spec/Plan 从 T3 推导的双审默认；历史证据保留，额外 reviewer 仅按用户新的明确要求。
 
 ## Change Rules
 

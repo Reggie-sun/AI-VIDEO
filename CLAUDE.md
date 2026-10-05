@@ -10,5 +10,5 @@
 
 - Session-record hooks 接线在 `.claude/settings.json`，与 `.codex/hooks.json` 共用同一 `.agents/skills/record-ai-video-session/scripts/session_record_hook.py`。
 - 项目 skill 唯一实体在 `.agents/skills/`；`.claude/skills/` 只是指向它们的可见性接缝（symlink），不得在 `.claude/skills/` 维护第二份正文。
-- 独立 reviewer subagent 定义在 `.claude/agents/harness-reviewer.md`；dual review 的触发边界与裁决规则见 `AGENTS.md` 的 `Agent Workflow Routing`。
+- `.claude/agents/harness-reviewer.md` 仅为显式授权的可选 reviewer 定义，不主动派发双审；低频 Risk Gate 与 Kimi → Codex Parent 流程见 `AGENTS.md` 的 `Agent Workflow Routing`。
 - Specs / plans 约定：`docs/superpowers/specs|plans/YYYY-MM-DD-<slug>.md`；plan 编写复用 `superpowers:writing-plans`。
