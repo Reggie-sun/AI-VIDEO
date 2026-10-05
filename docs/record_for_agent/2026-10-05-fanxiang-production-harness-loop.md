@@ -11,6 +11,77 @@ Date: 2026-10-05
 
 ## Current Status
 
+### Supersession — Two Actual Split Candidates And Unaccepted Handoff
+
+2026-10-06 Hong Kong / 2026-10-05 UTC，用户“可以”接受拆分后，真实执行 Ba-01 与一次
+针对性 Ba-02 retake。本段取代下方“尚未执行 split requests”的停点；历史六次结果保留。
+当前 physical submits 为八，全部 known succeeded/fetched，无 unknown outcome。
+close-state 与此前 source blocker 修复仍已 push；本轮不修改 Product source、通用 continuity
+schema/interface、spec 或 plan。新媒体与 task-local helpers 位于 ignored `B/`，不是已发布的
+通用 Production Harness CLI。
+
+- 第一 generation sequence 保留原分镜一至六的文字与 0–10.6 秒时间，request 为 11 秒，
+  末尾 0.4 秒明确延续当前袭击；第二段预留原分镜七至九：拿键盘、重击、吃痛缩回。
+  首段使用同一七张 captured canvas images 的 bytes/order，移除完整 V37 video guide，
+  不把后段动作留在共享 guidance。`Image 4` 是黄衣潘子，`Image 2` 是黑衣小龙，
+  room / door 分别为 `Image 6` / `Image 3`。A-02→Ba editorial join 仍为 NOT_EVALUATED。
+- 沿用 existing `Shot sequence-B`、Planner、Router、compiler、QA、committer owners。
+  经既有 creative artifact commit 把该 Shot 改为首段 fixed 11 秒；不是修改公共 duration contract。
+  用户接受 partition 后登记 final goal version `3` 和首段八项 raw QA：action、camera、close、
+  identity、no-overlay、opening、sound、space。原完整九分镜的 final requirements 保持不变，
+  旧 goal、旧 FAIL、A-02 的旧七项 PASS 均保留；不能把首段 QA 解释成完整成片通过。
+  在相同 goal version 内换 rubric 的预检曾被拒绝，改用显式新版本后才准备执行。
+- managed Kimi read-only input audit invocation `2089b8d2-b8a9-4826-9533-44bf4d573d88`
+  为 PARSED。Parent 确认 primary locked camera 与原第六镜后撤冲突，改用 existing dolly_out /
+  follow 字段并明确只约束第六镜；补齐原文已有 motion / foley，不新增 schema。
+  sealed 旧 bytes 留存，修订 bytes 是 Parent verified，未伪称 Kimi 审过新 bytes。
+  首段 master 为 3038 characters；native body SHA
+  `5ae06451d596c7d1769caee11a800af1fa5b4d9b43dd7e6a4ccf65b6813a1b02`。
+  compiler 对 music `none` 的 lexical expression 曾拒绝编译；改用实际 verbatim dialogue 作为
+  同一完整 sound observable 的 expression anchor，保留无配乐与全部音频验收要求。上述拒绝
+  都在 POST 前，没有消费调用数；不是为过 Gate 新增 schema 或假签声音 PASS。
+- Ba-01 task `2107166621276991488`；raw SHA
+  `5c265179f817280b979fc79866cf7add8e46a5162efeaf455aef102e1448e67b`，11,024,846 bytes。
+  explicit project-local MCP 23 frames 和 exact-hash 1×静音播放到 ended
+  （11.7127 秒 wall、46 captures）后，action / camera / close / no-overlay FAIL，
+  identity / space PASS，opening / sound NOT_EVALUATED。约 2–2.7 秒烧录“兄弟们”字幕；
+  末段头颈停在门边悬垂，持续袭向潘子的动作未成立。canonical experience
+  `d0f481a6d2b8acf455b7c1e3457e6e154c950dcaff45f22c845b89f299c7ab2f`，
+  explicit abandonment 后 strict reload FAILED，Manifest revision 187。
+- Ba-02 保留相同模型、七图、11 秒 profile、stack、compiler 与原六镜。
+  native request 只有 `content[0].text` 变化：明确对白仅进入声音、不得成为字幕；要求头颈在
+  尾段持续逼近黄衣潘子。master 为 3319 characters；lint PASS、100/100，只是结构证明。
+  body SHA `886d2ab29997016d2068c1dc9bc21c3aab9c40ec25f937f8c1951dfb8d2300ad`。
+  比较明确声明 `prompt_text` 变化，seed uncontrolled；不是 controlled A/B。
+- Ba-02 task `2107169914993008640`；raw SHA
+  `3e33ac328c92d5df3104410a75a6e971c3f7d3eed199206357aead7a2a6c3ede`，11,562,174 bytes。
+  MCP 23 frames 与 exact-hash 1×静音播放到 ended（11.7125 秒 wall、46 captures）确认：
+  action / identity PASS；camera / close / no-overlay / space FAIL；opening / sound
+  NOT_EVALUATED。9.4–10.2 秒袭向黄衣潘子、潘子后退明显改善；但字幕再次出现，
+  3–4.5 秒三人面朝镜头、绿色门在身后，视线未指向门上方，后段改朝门却没有可读的转向；
+  结尾小龙仍看头颈/人物，没有必要的键盘 gaze。canonical experience
+  `8e535db9063e780bea96ec8be5487d120f8e4e78a1bf69e81796b19b737a606c`，
+  diagnosis evidence `41099faebddef88a0f2e23d6ddc8c4c7ffa9872d617ada21839ac16dcc88871a`。
+  `abandon_video_generation` 保留全部 findings 后 strict reload FAILED，Manifest revision 201。
+  不是把局部 action PASS 扩大为选 take；没有 activation、accepted Ba source 或后段 submit。
+- 两条 raw 均 H.264、1344×768、24 fps、277 frames、format duration 11.550 秒、
+  AAC stereo / 32 kHz。真实长度没有归一化成 nominal 11 秒，也未做 VALIDATE/ACTIVATE
+  来宣称 duration accepted。submit→succeeded / fetch 分别为 54.876 / 74.750 秒与
+  54.731 / 82.897 秒。durable request started→physical POST 分别约 115.707 秒与
+  224.045 秒，本地校验耗时已超过模型生成；这是当前制作流程的实测耗时，不推断具体根因。
+  调用数只增加 6→7→8；operator monetary ceiling 为 12,000,000→14,000,000→16,000,000
+  microCNY，保留实际计数、held reservations、`actual_cost=null`，不是账单或伪造 SETTLED。
+
+本轮 blocker 是 actual raw quality：拆分与 targeted prompt 改善了攻击对象和运动，但两条首段
+都未达到完整要求。不能继续给字幕叠禁止词并盲抽，不能跳过 gaze / space，不能把失败末帧冒充
+accepted handoff。下一步应改 reference 准备，把三人朝门的视线/站位、攻击目标和交接姿态先做成
+可检视的制作 reference，再在同一 production sequence 内用 MiniMax 验证；尚未执行或证明该策略。
+第二段仍待首段全项 PASS。现有 scripts 已覆盖编译、byte audit、permit/submit/poll/fetch、MCP
+检查入口及 QA persistence；创作 reference、表演/空间裁决、原声验收、选 take 与最终剪接仍未闭环。
+没有 20–40 秒 final MP4；旧 composition content_driven blocker 与 A-02 原画布 fidelity 边界仍保留。
+自动 learning evaluation 为 `no_candidate`：同一片段的 dependent retakes、uncontrolled seed 和
+变动 inputs 不建立通用 MiniMax 能力结论；既有 local H3 claim 不外推到 remote Ref2VA。
+
 ### Supersession — Sixth Actual Take And Motion Guidance Failure
 
 2026-10-06 Hong Kong / 2026-10-05 UTC，用户“继续”后实际执行了一个有界 B-04-motion candidate。
@@ -302,3 +373,7 @@ non-Q0 identity 绑定 actual METASO task、同一 Production attempt、request 
 | B3-USER-OVERALL | metaso-task:2107149534800142336 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-take-03-final | N/A | 1ceae93f8c88f1b2f002a6559e0282d6a02198a8a3a76187789450b38f5a321b | USER_OVERALL | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | B3-FETCH | `B/sequence-B-take-03-final/user-feedback.json` |
 | B4-FETCH | metaso-task:2107157729280548864 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-take-04-motion | N/A | d443b4413b649a0f477283fd0a94e913885cddef50f3e218ec84d38b9565780f | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | `B/sequence-B-take-04-motion/terminal.json` |
 | B4-RAW-QA | metaso-task:2107157729280548864 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-take-04-motion | N/A | d443b4413b649a0f477283fd0a94e913885cddef50f3e218ec84d38b9565780f | ANALYZER_QA | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | B4-FETCH | `B/sequence-B-take-04-motion/diagnosis.json` |
+| Ba1-FETCH | metaso-task:2107166621276991488 | fanxiang-production-loop-20261005 | fanxiang-production-loop-Ba-take-01 | N/A | 5c265179f817280b979fc79866cf7add8e46a5162efeaf455aef102e1448e67b | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | `B/sequence-Ba-take-01/terminal.json` |
+| Ba1-RAW-QA | metaso-task:2107166621276991488 | fanxiang-production-loop-20261005 | fanxiang-production-loop-Ba-take-01 | N/A | 5c265179f817280b979fc79866cf7add8e46a5162efeaf455aef102e1448e67b | ANALYZER_QA | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | Ba1-FETCH | `B/sequence-Ba-take-01/diagnosis.json` |
+| Ba2-FETCH | metaso-task:2107169914993008640 | fanxiang-production-loop-20261005 | fanxiang-production-loop-Ba-take-02 | N/A | 3e33ac328c92d5df3104410a75a6e971c3f7d3eed199206357aead7a2a6c3ede | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | `B/sequence-Ba-take-02/terminal.json` |
+| Ba2-RAW-QA | metaso-task:2107169914993008640 | fanxiang-production-loop-20261005 | fanxiang-production-loop-Ba-take-02 | N/A | 3e33ac328c92d5df3104410a75a6e971c3f7d3eed199206357aead7a2a6c3ede | ANALYZER_QA | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | Ba2-FETCH | `B/sequence-Ba-take-02/diagnosis.json` |
