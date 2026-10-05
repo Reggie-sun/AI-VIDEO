@@ -69,6 +69,7 @@ class _StateCommitGeneratedVideoAudioMixin:
         *,
         toolchain: AudioProbeToolchain,
         runner=subprocess.run,
+        dependency_transition_preparer=None,
     ):
         with self._generated_video_audio_effect_lock(request):
             return register_generated_video_audio(
@@ -76,4 +77,5 @@ class _StateCommitGeneratedVideoAudioMixin:
                 request,
                 toolchain=toolchain,
                 runner=runner,
+                dependency_transition_preparer=dependency_transition_preparer,
             )

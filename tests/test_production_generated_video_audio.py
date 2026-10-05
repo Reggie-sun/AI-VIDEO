@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+from dataclasses import replace
 import json
 import os
 import shutil
@@ -265,7 +266,7 @@ def test_same_attempt_different_asset_waits_then_rejects_before_duplicate_extrac
     assert runner.extract_calls == 1
 
 
-def test_rejects_unsettled_source_before_ffmpeg(tmp_path: Path) -> None:
+def test_registers_known_success_before_billing_without_claiming_settlement(tmp_path: Path) -> None:
     source_root = tmp_path / "source"
     target_root = tmp_path / "target"
     source_root.mkdir()
@@ -274,14 +275,103 @@ def test_rejects_unsettled_source_before_ffmpeg(tmp_path: Path) -> None:
     _write_audio_target(target_root)
     from tests.test_production_generated_video_e2e import ATTEMPT_ID, _reach_fetch
 
-    _reach_fetch(source_root, settle=False)
+    _inputs, provider, _resolved, source_committer = _reach_fetch(source_root, settle=False)
+    VideoGenerationService(committer=source_committer, provider=provider).fetch_once(attempt_id=ATTEMPT_ID)
     runner = _AudioToolRunner()
 
-    with pytest.raises(AiVideoError, match="settled"):
-        ProductionStateCommitter(target_root).register_generated_video_audio(
-            _request(source_root, ATTEMPT_ID), toolchain=_toolchain(tmp_path), runner=runner
-        )
+    committer = ProductionStateCommitter(target_root)
+    request = _request(source_root, ATTEMPT_ID)
+    committed = committer.register_generated_video_audio(
+        request, toolchain=_toolchain(tmp_path), runner=runner
+    )
+    loaded = load_production_project(target_root / "project.yaml")
+    asset = next(a for a in loaded.registry.assets if a.asset_id == request.asset_id)
+    receipt_path = canonical_generated_video_audio_receipt_path(asset.audio_metadata.provenance_receipt_id)
+    receipt = GeneratedVideoAudioReceipt.model_validate_json((target_root / receipt_path).read_bytes())
+    assert receipt.source_reservation.status.value == "reserved"
+    assert receipt.source_reservation.actual_cost_microunits is None
+    assert receipt.source_reservation.upper_bound_microunits is not None
+    assert committer.register_generated_video_audio(request, toolchain=_toolchain(tmp_path), runner=runner) == committed
+    assert runner.extract_calls == 1
+
+
+def test_generated_ambient_audio_has_no_fabricated_speech_identity(tmp_path: Path) -> None:
+    source_root = tmp_path / "source"
+    target_root = tmp_path / "target"
+    source_root.mkdir()
+    target_root.mkdir()
+    project_factory.write_production_project(source_root)
+    _write_audio_target(target_root)
+    source_attempt_id = _settled_source(source_root)
+    speech = _request(source_root, source_attempt_id)
+    request = GeneratedVideoAudioRequest.model_validate({
+        **speech.model_dump(mode="python"), "audio_kind": AudioKind.AMBIENCE,
+        "speaker_id": None, "voice_id": None, "language": None, "script_hash": None,
+    })
+    ProductionStateCommitter(target_root).register_generated_video_audio(
+        request, toolchain=_toolchain(tmp_path), runner=_AudioToolRunner()
+    )
+    asset = load_production_project(target_root / "project.yaml").registry.assets[-1]
+    assert asset.audio_metadata.audio_kind is AudioKind.AMBIENCE
+    assert asset.audio_metadata.speaker_id is None
+    with pytest.raises(ValueError, match="speech identity"):
+        GeneratedVideoAudioRequest.model_validate({**request.model_dump(mode="python"), "speaker_id": "fake"})
+
+
+def test_manifest_27_audio_preserves_registry_22_and_dependency_closure(tmp_path: Path) -> None:
+    from ai_video.production.dependency import (
+        build_production_dependency_graph, build_applied_dependency_evidence,
+        resolve_dependency_state, desired_fingerprints,
+    )
+    from ai_video.production.state_commit import prepare_dependency_graph_transition
+    from tests.test_production_generated_video_e2e import ATTEMPT_ID, _reach_fetch
+
+    source_root = tmp_path / "source"
+    target_root = tmp_path / "target"
+    source_root.mkdir()
+    target_root.mkdir()
+    project_factory.write_production_project(source_root)
+    _, provider, _, source_committer = _reach_fetch(source_root, settle=False)
+    service = VideoGenerationService(committer=source_committer, provider=provider)
+    service.fetch_once(attempt_id=ATTEMPT_ID)
+    service.validate_once(attempt_id=ATTEMPT_ID)
+    service.activate_once(attempt_id=ATTEMPT_ID)
+    inputs = project_factory.make_p8_video_generation_base(target_root)
+    committer = ProductionStateCommitter(target_root)
+    request = _request(source_root, ATTEMPT_ID)
+    runner = _AudioToolRunner()
+    with pytest.raises(AiVideoError, match="dependency transition preparer"):
+        committer.register_generated_video_audio(request, toolchain=_toolchain(tmp_path), runner=runner)
     assert runner.extract_calls == 0
+
+    def prepare(commit):
+        base = load_production_project(target_root / "project.yaml")
+        payload = next(a.payload for a in commit.artifacts if a.relative_path == commit.next_registry.path)
+        registry = AssetRegistrySnapshot.model_validate_json(payload)
+        candidate = base.model_copy(update={"registry": registry, "manifest": base.manifest.model_copy(
+            update={"active_project": commit.next_project, "active_registry": commit.next_registry})})
+        candidate_inputs = replace(inputs, project=candidate)
+        graph = build_production_dependency_graph(candidate_inputs)
+        states = resolve_dependency_state(graph, build_applied_dependency_evidence(candidate_inputs, None)).states
+        transition = prepare_dependency_graph_transition(
+            expected_manifest_revision=commit.expected_manifest_revision,
+            base_dependency_graph=base.manifest.active_dependency_graph, candidate_graph=graph,
+            candidate_dependency_states=states, expected_desired_fingerprints=desired_fingerprints(graph))
+        raw = _canonical_json_bytes(graph)
+        return replace(commit, dependency_graph_transition=transition,
+            artifacts=tuple(sorted((*commit.artifacts, PreparedArtifact(
+                transition.candidate_dependency_graph.path, raw, hashlib.sha256(raw).hexdigest())),
+                key=lambda a: a.relative_path.as_posix())))
+
+    manifest = committer.register_generated_video_audio(request, toolchain=_toolchain(tmp_path),
+        runner=runner, dependency_transition_preparer=prepare)
+    loaded = load_production_project(target_root / "project.yaml")
+    assert loaded.manifest.schema_version == "2.7"
+    assert loaded.registry.schema_version == "2.2"
+    assert loaded.manifest.active_dependency_graph is not None
+    assert committer.register_generated_video_audio(request, toolchain=_toolchain(tmp_path),
+        runner=runner, dependency_transition_preparer=prepare) == manifest
+    assert runner.extract_calls == 1
 
 
 def test_rejects_changed_fetched_bytes_before_ffmpeg(tmp_path: Path) -> None:

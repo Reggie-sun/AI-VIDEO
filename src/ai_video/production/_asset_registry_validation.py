@@ -87,7 +87,9 @@ def validate_asset_record(
         ) > Decimal("0.001"):
             raise ValueError("video duration does not match measured metadata")
     if record.egress.remote and not (
-        record.asset_type in {voice_type, video_type}
+        (record.asset_type in {voice_type, video_type}
+         or (record.asset_type.value == "sfx"
+             and record.creation_receipt_id.startswith("generated-video-audio-")))
         and record.source_kind is generated_source
     ):
         raise ValueError(

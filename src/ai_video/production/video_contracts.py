@@ -299,17 +299,23 @@ class VideoFlexibleOutputRequirement(_VideoContractModel):
                 duration_milliseconds == expected_duration_milliseconds
                 and frame_count == expected_frames
             )
-        endpoint_duration_milliseconds = (
-            expected_duration_milliseconds + (1000 + self.fps - 1) // self.fps
-        )
+        # Actual METASO H3 outputs include two endpoint frames at 24 fps.
+        # Keep nominal timing bounded and require duration/frame agreement.
+        endpoint_frames = frame_count - expected_frames
+        endpoint_lower = expected_duration_milliseconds + (
+            (endpoint_frames - 1) * 1000 + self.fps - 1
+        ) // self.fps
+        endpoint_upper = expected_duration_milliseconds + (
+            endpoint_frames * 1000 + self.fps - 1
+        ) // self.fps
         return (
             duration_milliseconds == expected_duration_milliseconds
             and frame_count == expected_frames
         ) or (
-            expected_duration_milliseconds
+            endpoint_frames in {1, 2}
+            and endpoint_lower
             < duration_milliseconds
-            <= endpoint_duration_milliseconds
-            and frame_count == expected_frames + 1
+            <= endpoint_upper
         )
 
 

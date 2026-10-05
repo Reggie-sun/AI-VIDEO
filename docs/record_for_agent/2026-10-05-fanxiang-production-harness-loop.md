@@ -11,6 +11,35 @@ Date: 2026-10-05
 
 ## Current Status
 
+### Subsequent Production Checkpoint
+
+以下是继续制作后的当前状态；下文原始 NE 与 blocking observations 保留其历史时间边界。
+
+- close-state 与费用 coverage 修复均已 push，后者 commit `59838ff`。其 exact staged Harness
+  `.agent/harness/runs/fanxiang-known-success-reservation-20261005-001/receipt.json` PASS，
+  production contract suite 3865 PASS / 3 SKIP；receipt freshness、scope、policy、artifact hashes
+  与 checkout cleanup 全部核验通过。Parent Risk Gate 为 NOT_REQUIRED；没有修改 submit authority、
+  凭据、egress 或 unknown-outcome fence，held reservation 与 later settlement strict reload 已验证。
+- A-02 经 actual MCP frames、1×播放、真实 reference 比对及用户两次原声确认，七项 raw requirements
+  已全部 PASS，最新 diagnosis evidence 为 `539f8f9bcc0d37411906989eef5cac1ae4f7382c12293d1a19a8d724def459d2`。
+  offscreen 身体、手部和未发生新事件的状态承接明确作为 cinematic inference；没有声称直接看见隐藏部位。
+  Final Acceptance 仍 NOT_EVALUATED。A-02 已通过 canonical candidate/activation，accepted source 已严格重开。
+- 两条 H3 原片的 362 frames / 15.083 seconds 实际触发旧 nominal endpoint 容限。修复最多两帧且要求
+  duration/frame 一致；第三帧、错配与 exact timing 仍拒绝。相关 video suites 107 PASS。
+  原 request 没有 seal terminal，故没有补签 P7：从实际 A-02 最后一帧 361 提取、登记 `z-A2-actual-terminal`
+  为软参考，source MP4、PNG、tool identity 与 derivation receipt 可追溯。没有硬首帧保证。
+- 原生音轨入口实际拒绝 Manifest 2.7，故仅为真实 compose 修复既有 owner，覆盖 current version、
+  held cost coverage、ACTIVATE source、dependency transition 与 non-speech identity。
+  A-02 原声已实际登记，32 kHz / stereo，strict reload 成功；WAV SHA256
+  `f6a057fec61d67f613bc24419d3336be7312163bff63b58dd190f5e18728bf27`。
+  登记未增加 Provider submit，没有把 unknown cost 写成零或上界。
+- B 仍处于真实 generation preflight；尚未生成 B 或 compose 成片。其目标为整条撞窗→袭击→抓键盘重击→缩回
+  事件链，一次 15 秒 request。A 原片实际超过 H3 video reference 15 秒上限，故 B 使用真实尾帧软参考和八张
+  原场景/角色/键盘 references。declare IDENTITY_STYLE_CARRYOVER，实际起始长颈/完整玻璃须由 raw QA 裁决。
+
+本轮学习判定为 `no_candidate`：这是同一 production 的依赖 retake 链，seed 未控制，没有两个独立 A/B
+arms；不能由工程 PASS 或一次声音确认推导通用模型能力。没有新 specs/plans 或 continuity schemas。
+
 close-state slice 与未发布 commits 已收尾并 push。随后实际启动 Production loop，进行了两次 METASO H3 付费 submit，得到两条真实 15.083 秒 MP4。没有单独开启 H3 A/B 研究或扩展通用 continuity architecture。
 
 第一条完整目标仍为约 30 秒；目前只生成了 sequence A 及其针对性 retake，sequence B 尚未 submit，也没有完成 compose、30 秒成片或 Final Acceptance。第二个 take 获用户实际声音确认，但没有成为 canonical accepted source。

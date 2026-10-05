@@ -20,6 +20,7 @@ from ai_video.production.models import (
     AssetRegistrySnapshot,
     AssetSourceKind,
     AssetType,
+    AUDIO_KIND_TO_ASSET_TYPE,
     LoadedProductionProject,
     PaidProviderAttemptPhase,
     ProductionProject,
@@ -27,7 +28,7 @@ from ai_video.production.models import (
     ToolIdentity,
     VideoAttemptPhase,
 )
-from ai_video.production.paid_provider import BudgetReservationStatus, PaidProviderSubmitOutcome
+from ai_video.production.paid_provider import PaidProviderSubmitOutcome, video_reservation_has_cost_coverage
 from ai_video.production.paths import _read_regular_file_nofollow
 from ai_video.production.registry import registry_semantic_sha256
 from ai_video.production.video import (
@@ -113,8 +114,7 @@ def _validate_source_closure(receipt: GeneratedVideoAudioReceipt) -> None:
         or receipt.source_budget_pointer.revision != budget.revision
         or receipt.source_budget_pointer.file_sha256 != _canonical_model_file_sha256(budget)
         or reservation not in budget.reservations
-        or reservation.status is not BudgetReservationStatus.SETTLED
-        or reservation.actual_cost_microunits is None
+        or not video_reservation_has_cost_coverage(reservation)
         or reservation.attempt_id != receipt.source_attempt_id
         or reservation.request_fingerprint != request.resolved_generation_hash
         or reservation.preview_fingerprint != gate.preview.preview_fingerprint
@@ -187,7 +187,7 @@ def _verify_derived_asset(bundle: LoadedProductionProject, asset) -> str:
             update={"provenance_receipt_id": "pending-generated-video-audio-receipt"}
         )
         or asset.source_kind is not AssetSourceKind.GENERATED
-        or asset.asset_type is not AssetType.VOICE
+        or asset.asset_type is not AUDIO_KIND_TO_ASSET_TYPE[receipt.target_audio_metadata.audio_kind]
         or receipt.target_audio_metadata.source.kind is not AssetSourceKind.GENERATED
         or receipt.target_audio_metadata.source.provider_or_tool
         != ToolIdentity(
@@ -259,6 +259,13 @@ def _verify_derived_asset(bundle: LoadedProductionProject, asset) -> str:
         (asset.artifact_path.as_posix(), asset.sha256),
         (canonical_generated_video_audio_receipt_path(receipt_id).as_posix(), receipt_id),
     )
+    if attempt.base_dependency_graph is not None:
+        if attempt.candidate_dependency_graph is None:
+            raise _invalid("Generated video audio target dependency closure is missing.")
+        expected_artifacts += ((
+            attempt.candidate_dependency_graph.path.as_posix(),
+            attempt.candidate_dependency_graph.file_sha256,
+        ),)
     if attempt.candidate_artifacts_hash != _artifact_hash(expected_artifacts):
         raise _invalid("Generated video audio target artifact closure is invalid.")
     return asset.asset_id
@@ -269,6 +276,9 @@ def verify_derived_generated_video_audio(bundle: LoadedProductionProject) -> set
 
     claims: set[str] = set()
     for asset in bundle.registry.assets:
+        if (asset.asset_type is AssetType.SFX and asset.source_kind is AssetSourceKind.GENERATED
+                and asset.creation_receipt_id.startswith("generated-video-audio-")):
+            _verify_derived_asset(bundle, asset)
         if asset.asset_type is AssetType.VOICE and asset.source_kind is AssetSourceKind.GENERATED:
             try:
                 claim = _verify_derived_asset(bundle, asset)

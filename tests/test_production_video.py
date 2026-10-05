@@ -1527,8 +1527,10 @@ def test_flexible_output_rejects_ambiguous_timing_and_container_mime_pairs():
         )
 
 
-def test_nominal_seconds_accepts_one_inclusive_endpoint_frame_without_weakening_exact(
+@pytest.mark.parametrize("endpoint_frames", [1, 2])
+def test_nominal_seconds_accepts_bounded_endpoint_frames_without_weakening_exact(
     tmp_path: Path,
+    endpoint_frames: int,
 ):
     nominal = video_contracts.VideoFlexibleOutputRequirement(
         timing_mode="nominal_seconds",
@@ -1580,8 +1582,8 @@ def test_nominal_seconds_accepts_one_inclusive_endpoint_frame_without_weakening_
                 "width": 1280,
                 "height": 720,
                 "avg_frame_rate": "24/1",
-                "duration": "15.041667",
-                "nb_frames": "361",
+                "duration": str(15 + endpoint_frames / 24),
+                "nb_frames": str(360 + endpoint_frames),
             }
         ],
         "format": {"format_name": "mov,mp4", "duration": "15.041667"},
@@ -1596,8 +1598,8 @@ def test_nominal_seconds_accepts_one_inclusive_endpoint_frame_without_weakening_
         )
 
     assert nominal.exact_duration_milliseconds() is None
-    assert measured.duration_milliseconds == 15_042
-    assert measured.frame_count == 361
+    assert measured.duration_milliseconds == round((15 + endpoint_frames / 24) * 1000)
+    assert measured.frame_count == 360 + endpoint_frames
 
     for mismatched_pair in (
         {
@@ -1608,6 +1610,18 @@ def test_nominal_seconds_accepts_one_inclusive_endpoint_frame_without_weakening_
                     "duration": "15.041667",
                     "nb_frames": "360",
                 }
+            ],
+        },
+        {
+            **inclusive_endpoint_probe,
+            "streams": [
+                {**inclusive_endpoint_probe["streams"][0], "duration": "15.125", "nb_frames": "363"}
+            ],
+        },
+        {
+            **inclusive_endpoint_probe,
+            "streams": [
+                {**inclusive_endpoint_probe["streams"][0], "duration": "15.083333", "nb_frames": "361"}
             ],
         },
         {

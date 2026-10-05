@@ -420,8 +420,8 @@ def prepare_audio_registry_commit(
         != manifest.active_registry.file_sha256
     ):
         raise _state_invalid("Audio registry base does not match the active Manifest snapshot.")
-    if registry.schema_version != "2.1":
-        raise _state_invalid("Audio registry commits require Asset Registry 2.1.")
+    if registry.schema_version not in {"2.1", "2.2"}:
+        raise _state_invalid("Audio registry commits require Asset Registry 2.1 or 2.2.")
     if registry.assets[: len(base_registry.assets)] != base_registry.assets:
         raise _state_invalid("Audio registry candidate must preserve every base record exactly.")
     new_records = registry.assets[len(base_registry.assets) :]

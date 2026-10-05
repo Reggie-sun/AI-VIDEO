@@ -48,7 +48,8 @@ from ai_video.production.models import (
     ToolIdentity,
     VideoAttemptPhase,
 )
-from ai_video.production.paid_provider import BudgetReservationStatus, PaidProviderSubmitOutcome
+from ai_video.production.paid_provider import PaidProviderSubmitOutcome, video_reservation_has_cost_coverage
+from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
     canonical_audio_asset_path,
@@ -91,15 +92,18 @@ class GeneratedVideoAudioRequest(StrictModel):
 
     @model_validator(mode="after")
     def _require_generated_speech_identity(self) -> "GeneratedVideoAudioRequest":
-        if self.audio_kind not in {AudioKind.DIALOGUE, AudioKind.NARRATION}:
-            raise ValueError("generated video audio extraction supports dialogue or narration only")
-        if (
+        speech = self.audio_kind in {AudioKind.DIALOGUE, AudioKind.NARRATION}
+        if not speech and self.audio_kind not in {AudioKind.AMBIENCE, AudioKind.SFX}:
+            raise ValueError("generated video audio extraction requires speech, ambience or SFX")
+        if speech and (
             not self.speaker_id
             or not self.voice_id
             or not self.language
             or self.script_hash is None
         ):
             raise ValueError("generated speech extraction requires speaker, voice, language, and script")
+        if not speech and any((self.speaker_id, self.voice_id, self.language, self.script_hash)):
+            raise ValueError("generated non-speech audio cannot claim a speech identity")
         try:
             resolved = self.source_project_root.resolve(strict=True)
         except (OSError, RuntimeError) as exc:
@@ -119,17 +123,21 @@ def _read_source_binding(
     if (
         attempt is None
         or attempt.operation != "video_generation"
-        or attempt.status.value != "running"
         or attempt.video_generation_state is None
-        or attempt.video_generation_state.phase is not VideoAttemptPhase.VALIDATE
+        or (attempt.status.value, attempt.video_generation_state.phase) not in {
+            ("running", VideoAttemptPhase.VALIDATE),
+            ("succeeded", VideoAttemptPhase.ACTIVATE),
+        }
         or attempt.video_generation_state.fetch_receipt is None
         or attempt.video_generation_state.latest_observation is None
         or attempt.paid_provider_state is None
-        or attempt.paid_provider_state.phase is not PaidProviderAttemptPhase.SETTLED
+        or attempt.paid_provider_state.phase not in {
+            PaidProviderAttemptPhase.ACCEPTED, PaidProviderAttemptPhase.SETTLED
+        }
         or attempt.paid_provider_state.submit_receipt is None
         or source.manifest.active_paid_provider_budget is None
     ):
-        raise _audio_invalid("Generated video audio requires exact settled fetched source evidence.")
+        raise _audio_invalid("Generated video audio requires exact successful fetched source evidence.")
     state = attempt.video_generation_state
     paid = attempt.paid_provider_state
     resolved = load_video_request_receipt(request.source_project_root, state.request)
@@ -162,15 +170,13 @@ def _read_source_binding(
         or submit.preview_fingerprint != gate.preview.preview_fingerprint
         or submit.gate_receipt_fingerprint != gate.gate_receipt_fingerprint
         or submit.reservation_id != gate.reservation_id
-        or reservation is None
-        or reservation.status is not BudgetReservationStatus.SETTLED
-        or reservation.actual_cost_microunits is None
+        or not video_reservation_has_cost_coverage(reservation)
         or reservation.attempt_id != request.source_attempt_id
         or reservation.request_fingerprint != resolved.resolved_generation_hash
         or reservation.preview_fingerprint != gate.preview.preview_fingerprint
         or reservation.submit_receipt_fingerprint != submit.submit_receipt_fingerprint
     ):
-        raise _audio_invalid("Generated video audio requires exact settled source reservation evidence.")
+        raise _audio_invalid("Generated video audio requires exact source cost coverage evidence.")
     try:
         artifact = _read_regular_file_nofollow(
             request.source_project_root / state.fetch_receipt.artifact_path,
@@ -260,10 +266,10 @@ def _active_registry(committer):
 
 
 def _require_supported_target(manifest, loaded) -> None:
-    if manifest.schema_version not in {"2.0", "2.1", "2.2"}:
-        raise _audio_invalid("Generated video audio supports Manifest versions through 2.2 only.")
-    if loaded.registry.schema_version != "2.1":
-        raise _audio_invalid("Generated video audio requires Asset Registry 2.1.")
+    if manifest.schema_version not in {"2.0", "2.1", "2.2", "2.7"}:
+        raise _audio_invalid("Generated video audio supports Manifest 2.0, 2.1, 2.2 and 2.7.")
+    if loaded.registry.schema_version not in {"2.1", "2.2"}:
+        raise _audio_invalid("Generated video audio requires Asset Registry 2.1 or 2.2.")
 
 
 def _replay_if_exact(
@@ -371,11 +377,15 @@ def register_generated_video_audio(
     *,
     toolchain: AudioProbeToolchain,
     runner: _Runner = subprocess.run,
+    dependency_transition_preparer=None,
 ):
     """Register a derived WAV through the sole target ``ProductionStateCommitter``."""
 
     target_manifest, target_loaded = _active_registry(committer)
     _require_supported_target(target_manifest, target_loaded)
+    if (manifest_supports(target_manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH)
+            and dependency_transition_preparer is None):
+        raise _audio_invalid("Generated video audio requires its dependency transition preparer.")
     existing_receipt = _existing_receipt(committer, request)
     binding, source_bytes = _read_source_binding(
         request,
@@ -483,7 +493,7 @@ def register_generated_video_audio(
         audio_metadata=metadata,
     )
     registry = AssetRegistrySnapshot(
-        schema_version="2.1",
+        schema_version=loaded.registry.schema_version,
         revision_id="0" * 64,
         content_hash="0" * 64,
         assets=loaded.registry.assets + (record,),
@@ -524,8 +534,7 @@ def register_generated_video_audio(
     )
     if rechecked_binding != binding or rechecked_source != source_bytes:
         raise _audio_invalid("Generated video audio source changed before registration.")
-    return committer.commit(
-        StateCommitRequest(
+    commit_request = StateCommitRequest(
             attempt_id=request.attempt_id,
             operation="audio_import",
             expected_manifest_revision=manifest.manifest_revision,
@@ -533,4 +542,16 @@ def register_generated_video_audio(
             next_project=base.next_project,
             next_registry=base.next_registry,
         )
-    )
+    if manifest_supports(manifest.schema_version, ManifestCapability.DEPENDENCY_GRAPH):
+        prepared = dependency_transition_preparer(commit_request)
+        if (not isinstance(prepared, StateCommitRequest)
+                or prepared.attempt_id != commit_request.attempt_id
+                or prepared.operation != commit_request.operation
+                or prepared.expected_manifest_revision != commit_request.expected_manifest_revision
+                or prepared.next_project != commit_request.next_project
+                or prepared.next_registry != commit_request.next_registry
+                or prepared.dependency_graph_transition is None
+                or not set(commit_request.artifacts).issubset(prepared.artifacts)):
+            raise _audio_invalid("Generated video audio dependency preparer changed the owned candidate.")
+        commit_request = prepared
+    return committer.commit(commit_request)
