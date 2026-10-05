@@ -125,6 +125,27 @@ OUTCOME_UNKNOWN，未用partial report；缩小三文件的新任务
 `fcb8c955-43cd-42fc-bb1e-64d4498da667` receipt/Read/artifact hashes核验，Parent核对结论。
 工程研究不属于Video Provider effect或Product acceptance。
 
+## Final Checkpoint And Publication
+
+`typed-causal-native-expression-20261005-final-7` 已结束为 `passed`：18 checks PASS，
+2 checks由同run实际PASS覆盖；`workspace_stable=true`。receipt为
+`.agent/harness/runs/typed-causal-native-expression-20261005-final-7/receipt.json`。
+提交前scope/policy/artifact integrity、freshness、snapshot、coverage与cleanup核验全部true；
+原receipt保持immutable，提交后的scope变化不冒称它仍是current staged freshness。
+最终Provider 898 PASS、Vidu 194 PASS、voice routing 47 PASS；新typed-expression 26项
+及sequence 55项的focused证据保持。旧full calibration FAIL与baseline复现未改判。
+
+implementation commit `ecb4aa1ee2c7b08ccc7700037d8b978a28fb4f5b` 仅含本任务24 paths，
+逐文件证明committed blobs等于verified staged snapshot中的owned blobs，已正常push main；
+发布后实测HEAD与origin/main均为该commit。另7个Harness staged paths及其bytes完整保留，
+不属于本任务提交。ignored `final-7-publication-proof.json`保存receipt hash及publication核验。
+本节是之后的documentation-only checkpoint，不能将implementation发布状态冒充本节已发布。
+
+本次hook `ai-video-record-684b2163295de9be` 复用并更新同一primary record，不创建重复记录。
+automatic learning evaluation仍为`no_candidate`：本链是离线工程修复，没有独立real media
+实验或controlled quality比较；不建Learning Claim、不修改adoption target、不刷新RAG。
+记录阶段不触发Provider、media、network或新tests；仅检查owned diff并做本地record checkpoint。
+
 ## Changed Paths
 
 production：`_remote_video_native_prompt.py`、`_causal_prompt_context.py`、`_sequence_source.py`、
