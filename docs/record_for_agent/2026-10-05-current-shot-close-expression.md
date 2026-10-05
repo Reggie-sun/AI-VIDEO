@@ -49,6 +49,9 @@ local/provider-neutral/schema/evaluator boundary checkpoint：232 PASS。
 缺close QA现在submit前拒绝，activation-pointer负例改用满足当前QA的source，修正后的两个targeted reruns：2 PASS。
 这些旧测试失败日志没有改写；没有把任何历史media FAIL改PASS。
 Architecture Gate：0 errors、28 existing warnings、16 info；`agent_rules_gate.py`与`git diff --check` PASS。
+以baseline ref比较的task Architecture Gate亦PASS：0 errors、5 growth warnings。
+这些warnings对应既有oversized owner的validation/argument glue；distinct causal责任已进入独立leaf，
+没有为消除warning改写baseline或越界拆分现有owners。
 fresh no-previous-edge fixture经Planner/Router/selected METASO compiler/exact pre-submit保持REQUEST、0真实effects。
 offline scripted backend提供fixture MP4；controlled analyzer收到完整facts，scripted PASS经existing
 committer记录，随后validate/activate/terminal extraction，accepted_sequence_source(require_causal_close=True)重开成功。
@@ -56,6 +59,10 @@ committer记录，随后validate/activate/terminal extraction，accepted_sequenc
 exact最终snapshot的Harness scope/result由`.agent/harness/runs/`内receipt独占，最终交付引用实际receipt。
 初始code checkpoint `0331b0a` 的exact range Harness在policy audit停止：两个旧opening paths与
 本任务新leaf/test未映射。用户选择由原policy owner补充并提交；本任务不修改或提交其staged paths。
+最终code candidate为`68e85d194f297fc77aafc77c92e08d02f7ffe7f0`（前置`0331b0a`）。
+该exact range失败receipt：`.agent/harness/runs/current-shot-close-68e85d1/receipt.json`；
+receipt integrity、exact committed policy hash、scope identity、workspace stability与cleanup已核验。
+record checkpoint的fresh range receipt使用`.agent/harness/runs/current-shot-close-final/receipt.json`。
 
 ## Review And Tool Boundaries
 
@@ -78,3 +85,6 @@ actual exact-media analyzer/human verdict与existing activation/terminal proof�
 旧FAIL/NOT_EVALUATED与S02/S03保留。
 当前为engineering candidate，completion被exact Harness policy映射ownership阻断；
 不将本地commit称为通过completion gate的远端交付。
+当前未push；required Harness失败是publication blocker，不能用focused PASS替代。
+恢复条件：原policy owner提交opening/closing路径映射及对应test argv，随后重跑exact range Harness、
+完成stable snapshot Risk Gate判断，并按现有授权push到远端main；不需要新的Provider效果。
