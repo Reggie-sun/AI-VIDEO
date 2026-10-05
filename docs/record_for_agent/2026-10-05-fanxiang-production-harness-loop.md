@@ -11,6 +11,118 @@ Date: 2026-10-05
 
 ## Current Status
 
+### Supersession — Editorial Salvage Audit Before Any Further Generation
+
+2026-10-06，用户要求先检查全部真实素材、实际 prompt/reference 顺序和 QA，再决定最小补镜。
+本段取代下方“先重做 reaction / 原 4–9 均未有可用素材”的制作建议；保留历史失败和 receipts。
+本轮没有 Provider submit、prompt 修改、Production activation、accepted continuity source 或成片输出。
+核对开始时本地 `main` 和远端 `main` 都为 `67df22ec460b4a47d0f217f2f33c09dcb8327e5f`，working tree clean。
+
+#### Evidence And Corrections
+
+审阅十条 Production raw、两条 2026-10-02 H3 raw 与原 V36/V37，共十四条 MP4。
+逐条核对 bytes/hash/ffprobe，并实际观察原生解码的联系表；十条 Production raw 均显式调用
+project-local `video-analysis` MCP 抽帧。A2、B3、B4、Ba2、reaction 又经本地 Chrome 1×静音
+播放至 ended，保存约 125ms 间隔的画面采样及 identity，关键窗口另取密集帧。
+这是视觉剪辑诊断；本轮没有实际听音，不新增 sound PASS。历史 exact A2/B2 USER_AUDIO
+观察保留，不能自动移植到重剪后的声画。未做跨镜头成片 normal-speed acceptance。
+
+证据目录 `E = runs/fanxiang-editorial-audit-20261006-001/`（ignored，未发布）：
+`inventory.json`、`input-audit.json`、`playback-summary.json`、五条 `*-1x.json`、
+十四条联系表、`A2-tail.jpg`、`B3-block.jpg`、`B3-end.jpg`、`B4-impact.jpg`、
+`Ba2-attack.jpg`、`references.jpg` 与 `audit-artifact-hashes.json`。原 MP4 未修改。
+
+- A1 实际在约 4s/6s 有小龙反应切镜；旧“没有反应镜头/全程单镜”判断撤回。
+  狗哥身后的室内床铺/空间问题仍存在，A1 不优先于 A2。
+- A2 原片在 14.0–14.5s 可见烧录“龙哥”；旧 no-overlay PASS 不能证明全条无字幕。
+  此次原生密集解码、MCP 与正常速度画面采样相互印证。旧 selection/QA 不改写，
+  当前仅提出字幕前窗口；完整台词及末段仍需修复/重剪后复验。
+- B4 原片左上持续可见“AI生成”；10.6–10.9s 有局部键盘/脸接触与遮挡，
+  没有充分可读的重击偏转。不能把局部接触升级为完整动作 PASS，也不能直接当干净成片。
+- reaction 约 2.9s 后狗哥已经出现在上亮窗，且存在额外切镜；失败末帧保持非 accepted。
+  但此前约 0–1.5s 的潘子低眼/听声反应仍是可用画面候选，不整条丢弃。
+
+#### Candidate Windows
+
+以下是 source seconds 的保守剪辑候选，不是 raw acceptance；切点仍须在 exact timeline
+逐帧对齐、接镜和实际听音后确认。`B = runs/fanxiang-production-loop-20261005-001/`。
+
+| Source | Seconds | Editorial Use | Remaining Boundary |
+| --- | --- | --- | --- |
+| `B/sequence-A-take-02/output.mp4` | 0–4；4–6；6–13.75 | 最佳完整伸颈 reveal coverage：门窗 POV、小龙反应、连续伸颈贴窗 | 不含已发现字幕时段；删尾可能截台词，声音不能直接随之截断；不是自动 A2→B3 join |
+| `B/sequence-B-reveal-take-01/output.mp4` | 0–1.5 | 潘子低眼、听声后开始抬眼的近景 | 保留“兄弟们”需实际听音与定时；不沿用约 3s 后提前显脸的末态 |
+| `B/sequence-B-take-03-final/output.mp4` | 3.75–4.75 | 三人转向门上亮窗，此时没有狗哥露脸 | 4–4.75 更适合作为共同视线已落定的短镜；足以替代单独重抽 reaction 的部分义务 |
+| `B/sequence-B-take-03-final/output.mp4` | 4.8–8.75 | 空窗→脸升起→一次破窗→头进入，连续可读 | 最佳 B 段 reveal/break 主干；不能接在 A2 已贴窗末态后又重复从空窗显脸 |
+| `B/sequence-Ba-take-02/output.mp4` | 9.2–10.2 | 狗哥确实扑向黄衣潘子，潘子后撤 | 短 attack insert；接镜需对齐破口形态、轴线与人物位置，不使用末帧作为 accepted source |
+| `B/sequence-B-take-03-final/output.mp4` | 10.75–11.25 | 从桌上取键盘的动机 insert | 双手握两端，未满足单端持握；不是合格反击开头，可留作备用 |
+| `B/sequence-B-take-03-final/output.mp4` | 14.5–15.0 | 怪物离开后的破窗空镜 | 只能接在有真实可信命中/撤退因果的镜头后，不能用空镜倒推击打成功 |
+| `B/sequence-B-take-04-motion/output.mp4` | 10.6–11.6 | 局部接触/退缩的研究或修复候选 | 持续烧录文字、弱受力反馈、握法与受袭目标问题；目前不列为直接干净可剪素材 |
+
+B1 有重复的早段脸部，但室内多出怪物躯干、方向和空挥问题，没有比上表更好的主干。
+B2 的破窗/靠近可作备用，后段空窗→重新出现造成重置；原声 USER_AUDIO PASS 仅属该 raw。
+Ba1 的显脸/破窗可备用，但有字幕与错误视线；Ba3 约 10.5–11.3s 的键盘视线可研究为
+局部 insert，前段玻璃重置、错误 reference eyeline 与冻结怪物不能一并继承。
+两条早期 H3 raw 含显著镜头/空间/字幕问题，无优于 A2/B3 的完整事件链；原 V36/V37
+可作为动作意图参考，但含烧录“AI生成”，不直接冒充干净 Production output。
+
+#### Input Findings And Failure Classes
+
+十条 `compiled-prompt.txt` 与对应 `resolved-request.json.prompt_text` 逐条字节相等；
+本轮检查的 bindings 顺序和 B4/Ba3 native input-fidelity receipts 没有显示漏图或重排。
+当前 adapter 保留 image/media 遍历顺序。全部是 `MiniMax-H3` / `reference_to_video`，
+effective seed 为 null。输入 fidelity 与旧 QA 误判分别裁决，不能用前者证明媒体正确。
+
+- **Code / chain**：当前没有足够证据把空挥或提前显脸归为 adapter 丢输入。
+  确认的问题是旧 QA 对 A1 切镜、A2 字幕的判读错误；需要修正证据结论，不扩架构。
+- **Reference preparation**：B3 的 Video1 近黑 2s 几乎没有动作指导；B4 Video1
+  是含烧录文字的原动作片段。Ba3/reaction 的 Image8 来自 FAILED Ba1，黑衣小龙
+  仍望向 camera，而非正确上亮窗；文字“排除错误 eyeline”没有把图修正。
+  reaction 虽要求狗哥画外，Image1 仍提供完整长颈/脸；这是提前显脸的竞争 conditioning
+  假设，未做受控实验，不能宣称唯一原因。
+- **Prompt / performance**：人物视线、潘子后撤、小龙持键盘一端、挥击路径和受力反馈
+  没有组成同一个可读事件。追加更长的多镜头/时间表不能替代正确起始姿态。
+- **H3 boundary**：当前这组 Ref2VA 对多人视线、准确切镜时刻和接触受力的联合控制不稳定。
+  B4 已有短暂接触，不支持“H3 一概不能生成碰撞”；无 seed 控制，也不宣称成功率或因果归因。
+- **Editing**：可去掉多余铺垫/重置、截出好窗口、用已有转头与扑击。剪辑不能凭空补出
+  清晰接触或正确握法；音效不能把空挥伪装成击中。字幕/水印处理须保留构图并另验。
+
+#### Minimal Missing Shot And Next Test
+
+当前 B 段最佳剪辑主干是 B3；伸颈 reveal 最佳单条仍是 A2，Pan attack 最佳短窗是 Ba2。
+最小硬缺口是一个正确方向的短反击镜：键盘接触狗哥脸部→明确头部偏转/后缩。
+共同望窗、脸升起和破窗已有窗口，不应继续为这几项重抽整段。
+
+下一制作单元仅补这一击。优先只改变关键 conditioning：**正确的击打起始构图/reference**。
+小龙已单端握键盘，对侧端留出朝狗哥脸部的挥击路径；潘子已经后撤，曾亮不挡路；
+破窗与颈部位置保持同一轴线。固定机位，只要求一次挥击→接触→偏转/后缩，不同时试
+新台词、运镜、人物身份或另一套动作。不得把失败 take 末帧登记为 accepted source；
+若基于候选帧准备新图，明确记录其是 repaired reference，并先检查构图/握法/轴线。
+
+现有 `metaso_h3.py` 的 `IMAGE_TO_VIDEO` / adaptive lane 支持 `first_frame`，
+但不同时支持 Ref2VA 的 identity reference 列表。采用该 lane 属于新补镜的输入封存，
+不能伪称在原 15s request 仅换一个字段的 controlled A/B；没有此场景的 I2V 实测证据。
+本轮只提出建议，不生成 reference、不 author 新提交 prompt、不发 POST。
+
+“上次最主要的失败是 B-03 的键盘挥击没有形成可见接触与受力反馈，这次只通过正确的击打起始构图/reference 去验证它；如果命中后的头部偏转仍失败，就停止继续堆 prompt，改用其他制作策略。”
+
+失败后的策略：保留已有 reaction/reveal/break/attack，改为单独制作真实键盘/手部击打 insert，
+结合匹配轴线的狗哥头颈局部合成与受力运动；再接经过核对的破窗空镜。先有可见接触和
+受力，再做同步音效。不是靠剪辑或音效假造成功，也不默默切换 Provider。
+
+#### Delegation And Learning Evaluation
+
+本轮 managed Kimi deep read-only input audit invocation
+`27075a18-1215-466f-8f86-a9573fd89153`，qualified route
+`4f2d5dc8-4234-4665-b382-e82f1ad6cc00`；五个实际 read 的 frozen hash 已核对。
+canonical receipt transport classification 为 PARSED，但 redacted worker report 无法解析为
+完整 JSON；报告隔离，不接受其因果判断或 verdict，不据此做媒体 acceptance。
+Parent 上述结论独立来自 exact 输入、当前源码和真实解码/播放；不把该 audit 冒称 required
+implementation review。本轮没有代码 implementation，亦未扩展 router 修复 scope。
+
+本次增量是同一话题的 editorial session summary；自动 learning evaluation：`no_candidate`。
+同一批 dependent retakes 的再观察不是新独立实验，当前不新增通用 claim、不修改 Skill/Policy/Gate。
+媒体 acceptance、A2→B join、成片实际听音和完整 final-output review 保持 NOT_EVALUATED。
+
 ### Supersession — Five-Second Reaction Unit Actually Generated And Failed
 
 2026-10-06，用户继续后将真实制作单元缩为原事件 1–3，而不是把同一 11s request
