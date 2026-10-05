@@ -490,12 +490,16 @@ def verify_inspection(
         cwd = (resolved_execution_root / config.get("cwd", ".")).resolve()
         if not cwd.is_relative_to(resolved_execution_root):
             raise ValueError(f"check {check_id!r} cwd escaped execution root")
+        timeout_seconds = float(
+            config.get("timeout_seconds", policy["default_timeout_seconds"])
+        )
+        print(f"[harness] START {check_id} timeout={timeout_seconds:g}s", flush=True)
         started = time.monotonic()
         try:
             result = runner(
                 argv,
                 cwd,
-                float(config.get("timeout_seconds", policy["default_timeout_seconds"])),
+                timeout_seconds,
                 env,
             )
         except Exception as exc:
@@ -535,6 +539,11 @@ def verify_inspection(
             check_record["status"] = "failed"
             check_record["error"] = f"artifact write failed: {type(exc).__name__}: {exc}"
         receipt["checks"].append(check_record)
+        print(
+            f"[harness] {check_record['status'].upper()} {check_id} "
+            f"duration={duration_ms / 1000:.3f}s",
+            flush=True,
+        )
         if result.stdout:
             print(result.stdout, end="" if result.stdout.endswith("\n") else "\n")
         if result.stderr:

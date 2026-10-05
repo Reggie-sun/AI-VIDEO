@@ -210,7 +210,7 @@ checks:
     execution_priority: 18
     description: Reject Agent Skill imports, loaders, paths, and direct Skill identities in Product Runtime source.
   harness_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_docs_contract_gate.py, tests/test_agent_harness.py, tests/test_record_ai_video_session_hook.py, tests/test_claude_code_adapter.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_docs_contract_gate.py, tests/test_agent_harness.py, tests/test_agent_harness_policy.py, tests/test_record_ai_video_session_hook.py, tests/test_claude_code_adapter.py, -q, --durations=20, --durations-min=0.1]
     cwd: .
     description: Verify Harness scope, routing, isolation, receipts, and Make targets.
   local_comfyui_supervisor_tests:
@@ -226,7 +226,7 @@ checks:
     cwd: .
     description: Verify deterministic Architecture Gate behavior and CLI contracts.
   cli_config_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_cli.py, tests/test_config.py, tests/test_errors.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_cli.py, tests/test_config.py, tests/test_errors.py, -q, --durations=20, --durations-min=0.1]
     cwd: .
     description: Verify CLI, config, path, and typed-error contracts.
   workflow_tests:
@@ -279,7 +279,7 @@ checks:
     cwd: .
     description: Verify image contracts, local adapter, truthful import, activation, and recovery.
   production_video_provider_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_budget_extension.py, tests/test_paid_budget_read_traversal.py, tests/test_production_paid_submit_quota.py, tests/test_production_video_unsubmitted.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_video_pre_generation.py, tests/test_production_ecommerce_shot_candidate_gate.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_comfy_t8_native_long_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_metaso_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_shot_continuity_source_review.py, tests/test_shot_continuity_source_operator.py, tests/test_shot_continuity_source_transport.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_budget_extension.py, tests/test_paid_budget_read_traversal.py, tests/test_production_paid_submit_quota.py, tests/test_production_video_unsubmitted.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_video_pre_generation.py, tests/test_production_ecommerce_shot_candidate_gate.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_comfy_t8_native_long_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_metaso_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_shot_continuity_source_review.py, tests/test_shot_continuity_source_operator.py, tests/test_shot_continuity_source_transport.py, -q, --durations=20, --durations-min=0.1]
     cwd: .
     covered_by_check_ids: [production_contract_tests]
     description: Verify paid-provider safety and generated-video contracts without live submit.
@@ -293,14 +293,20 @@ checks:
     cwd: .
     description: Verify deterministic Shot Continuity P0 preparation, immutable stack/policy evidence, and fail-closed persistence.
   production_shot_router_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_generation_decision.py, tests/test_production_shot_router.py, tests/test_production_video.py, tests/test_production_dependency.py, tests/test_production_selective_rebuild.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_generation_decision.py, tests/test_production_shot_router.py, tests/test_production_video.py, tests/test_production_dependency.py, tests/test_production_selective_rebuild.py, -q, --durations=20, --durations-min=0.1]
     cwd: .
     covered_by_check_ids: [production_contract_tests]
     description: Verify pure Shot routing, exact video capabilities, and dependency isolation.
   generation_feedback_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_generation_feedback.py, tests/test_generation_evaluation.py, tests/test_requirement_semantics.py, tests/test_generation_evaluation_binding.py, tests/test_requirement_semantics_replay.py, tests/test_s02_prospective_review.py, tests/test_generation_execution.py, tests/test_generation_execution_guards.py, tests/test_generation_runtime_repair.py, tests/test_generation_historical_replay.py, tests/test_generation_provider_wiring.py, tests/test_generation_local_wiring.py, tests/test_generation_feedback_driver.py, tests/test_generation_feedback_review.py, tests/test_generation_history_import.py, tests/test_generation_history_import_receipt.py, tests/test_generation_quality_rejection.py, tests/test_production_generation_decision.py, -q]
+    execution_priority: 80
+    covers_check_ids: [typed_causal_native_expression_tests]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_generation_feedback.py, tests/test_generation_evaluation.py, tests/test_requirement_semantics.py, tests/test_generation_evaluation_binding.py, tests/test_requirement_semantics_replay.py, tests/test_s02_prospective_review.py, tests/test_generation_execution.py, tests/test_generation_execution_guards.py, tests/test_generation_runtime_repair.py, tests/test_generation_historical_replay.py, tests/test_generation_provider_wiring.py, tests/test_generation_local_wiring.py, tests/test_generation_feedback_driver.py, tests/test_generation_feedback_review.py, tests/test_generation_history_import.py, tests/test_generation_history_import_receipt.py, tests/test_generation_quality_rejection.py, tests/test_production_generation_decision.py, tests/test_typed_causal_native_expression.py, tests/test_current_shot_close_expression.py, -q, --durations=20, --durations-min=0.1]
     cwd: .
     description: Verify evidence-derived decisions, transferable cohorts, execution binding and frozen historical replay without Provider effects.
+  typed_causal_native_expression_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_typed_causal_native_expression.py, tests/test_current_shot_close_expression.py, -q, --durations=20, --durations-min=0.1]
+    cwd: .
+    description: Verify exact causal opening and closing expression, canonical source proof and all native adapter boundaries without unrelated local repair history fixtures.
   voice_source_routing_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_voice_routing_contracts.py, tests/test_voice_routing_integration.py, tests/test_voice_routing_guards.py, tests/test_voice_routing_handoff.py, tests/test_voice_routing_execution.py, tests/test_voice_routing_p4.py, tests/test_voice_routing_binding.py, tests/test_voice_routing_identity.py, -q]
     cwd: .
@@ -314,11 +320,11 @@ checks:
     cwd: .
     description: Verify read-only recovery observations, canonical history, source identity and non-vacuous strategy controls without media or Provider effects.
   video_planner_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_planning_video_planner.py, tests/test_planning_sequence_continuity.py, tests/test_errors.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_planning_video_planner.py, tests/test_planning_sequence_continuity.py, tests/test_errors.py, -q, --durations=20, --durations-min=0.1]
     cwd: .
     description: Verify provider-neutral Video Planner proposals and Main Agent STOP semantics.
   provider_neutral_video_requirement_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_video_requirement.py, tests/test_production_reference_projection.py, tests/test_production_video_intent_validation.py, tests/test_production_h3_prompt.py, tests/test_planning_video_planner.py, tests/test_production_shot_router.py, tests/test_production_video_fake.py, tests/test_production_provider_neutral_adapters.py, tests/test_production_video.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_video_requirement.py, tests/test_production_reference_projection.py, tests/test_production_video_intent_validation.py, tests/test_production_h3_prompt.py, tests/test_planning_video_planner.py, tests/test_production_shot_router.py, tests/test_production_video_fake.py, tests/test_production_provider_neutral_adapters.py, tests/test_production_video.py, -q, --durations=20, --durations-min=0.1]
     cwd: .
     description: Verify the sealed neutral requirement, Router binding, adapter compiler result, and lifecycle lineage.
   shot_readiness_gate_tests:
@@ -326,7 +332,9 @@ checks:
     cwd: .
     description: Verify exact planning lineage, structural readiness, typed STOP diagnostics, and compatibility handoff.
   quality_intelligence_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_quality_experience_capture.py, tests/test_quality_experience_models.py, tests/test_quality_experience_store.py, tests/test_quality_experience_dataset.py, tests/test_quality_experience_rag_projection.py, tests/test_agent_memory.py, -q]
+    execution_priority: 90
+    covers_check_ids: [agent_memory_tests]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_quality_experience_capture.py, tests/test_quality_experience_models.py, tests/test_quality_experience_store.py, tests/test_quality_experience_dataset.py, tests/test_quality_experience_rag_projection.py, tests/test_agent_memory.py, -q, --durations=20, --durations-min=0.1]
     cwd: .
     description: Verify passive Quality Experience schemas, immutable closure, exact lookup, sanitized projection, and Agent Memory isolation without live Provider or index rebuild.
   provider_console_python_tests:
@@ -358,9 +366,9 @@ checks:
     cwd: .
     description: Verify the read-only developer Agent Memory index and retrieval boundaries.
   full_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, -v, -o, faulthandler_timeout=120, --durations=20, --durations-min=0.1]
     cwd: .
-    timeout_seconds: 1800
+    timeout_seconds: 7200
     execution_priority: 30
     covers_check_ids:
       - agent_rule_invariants
@@ -371,6 +379,7 @@ checks:
       - voice_source_routing_tests
       - repair_input_admission_tests
       - generation_feedback_tests
+      - typed_causal_native_expression_tests
       - production_vidu_tests
       - commercial_source_preparation_tests
       - composition_playbook_tests
@@ -425,6 +434,21 @@ checks:
     description: Report repository health against the version-controlled architecture baseline.
 
 categories:
+  typed_causal_native_expression:
+    patterns:
+      - src/ai_video/production/_causal_prompt_context.py
+      - src/ai_video/production/_causal_state_expression.py
+      - tests/test_typed_causal_native_expression.py
+      - tests/test_current_shot_close_expression.py
+    check_ids:
+      - typed_causal_native_expression_tests
+      - video_planner_tests
+      - provider_neutral_video_requirement_tests
+      - production_shot_router_tests
+      - production_video_provider_tests
+      - production_vidu_tests
+      - final_output_no_regression_tests
+      - task_architecture_gate
   paid_no_effect_reconciliation:
     patterns:
       - src/ai_video/production/paid_provider_no_effect_reconciliation.py
@@ -543,6 +567,7 @@ categories:
       - scripts/agent_harness_*.py
       - scripts/harness_pytest_guard.py
       - tests/test_agent_harness.py
+      - tests/test_agent_harness_policy.py
       - tests/test_docs_contract_gate.py
       - tests/test_agent_rules_gate.py
       - .agent/harness/**
