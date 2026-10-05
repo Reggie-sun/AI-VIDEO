@@ -11,6 +11,79 @@ Date: 2026-10-05
 
 ## Current Status
 
+### Supersession — Five-Second Reaction Unit Actually Generated And Failed
+
+2026-10-06，用户继续后将真实制作单元缩为原事件 1–3，而不是把同一 11s request
+重新分配 camera labels。本段取代下方“九次 submit / 更小单元尚未 author/submit”的当前状态。
+累计十次物理 submit 均有 known fetched outcome；当前 reaction take raw QA FAIL，未 activation，
+未产生 accepted handoff、下一破窗单元或完整 20–40s 成片。Product source、通用 continuity
+schema/contract、spec/plan 均未修改，task-local helpers/media 仍在 ignored `runs/`，不是已发布通用 CLI。
+
+- 本次单元为 5s / 两个实际目标机位：0–1.8s 潘子低眼，1.8–3s 同机位听一次“兄弟们”
+  后眼睛停顿/抬下巴，3–4.8s 三人共同望向门上亮窗，最后 .2s 保持。原事件 4–6
+  的“暗脸升起→同机位撞破/连续进入→袭向潘子”仍留在下一约 6s 单元，事件 7–9
+  的“抓键盘→击中/痛吼→缩回”留在后续约 4s 单元；这些是未执行制作义务，不是结果。
+  初始 7s / 原 1–4 候选在 POST 前废止，边界从 6.8s 移到 4.8s，避免把脸升起→破窗
+  的原不切镜动作跨 Provider request 拆断。
+- 沿用原七图和已登记的三人站位图，共八图；移除未来受袭姿态图。站位图来自 FAILED take，
+  只继承轴线/位置、排除错误 eyeline，`accepted_source=false`。无视频或音频 reference，
+  `previous_shot_state=None` 仅声明独立 replacement unit；A2→本段 join 未验证。
+  H3 native master 5280 characters / SHA `08d121258d3ac1fae8e5529073a9048206f780371a27c3f41a39ebede6727f86`，
+  60 项既有 typed control expression、prompt lint 100。六节英文/Chinese dialogue tag 对照
+  [MiniMax-H3 primary guide](https://huggingface.co/MiniMaxAI/MiniMax-H3/raw/main/docs/VIDEO_PROMPT_WRITING_GUIDE_ref_en.md)，
+  仅证明输入，不证明媒介执行或 literal canvas replay。
+- managed Kimi invocation `480bed08-0eac-48cc-bc32-3b8d2bddd1d3` / route
+  `4f2d5dc8-4234-4665-b382-e82f1ad6cc00` 的 read-only input audit 为 PARSED；receipt
+  与两个实际 read hashes 已核验。它审的是 archived 7s 原 1–4 master，不是之后的 5s bytes。
+  Parent 确认台词结束/反应窗口挤压与颈部提前泄漏问题，明确短台词约 2.55s 前结束、
+  听声 onset 后可开始反应，并将狗哥改为本段完全画外。新 5s 由 Parent 核对，未冒称 Kimi 复审。
+- 现有 FinalOutputContract goal 3 的 `sequence` 仍要求原九事件单次请求，与实测后拆分
+  恢复冲突。经既有 QA owner 激活 goal 4，仅同步这一条及 user-goal 叙述；其余 final
+  requirements 逐项相等断言通过，故事事件、声音和观看质量均未删减。raw acceptance
+  scoped 为原 1–3 的八项要求。旧 profile/goal/failure 保留；没有调高失败阈值或屏蔽历史。
+  `qa-scope.json` 明示 `final_requirements_unchanged=false`，不可误称所有 final 文字未变。
+- 零 Provider effect 阶段修复两个 task-local 调用错误：requirements list 包进现有 canonical
+  hash 的 mapping；补全缺失的已有 typed camera motion/relation 并校验完整 intent。
+  后者只补对应现有 prompt 的轻微上移/停住及人物关系，不新增 schema。canonical prepare
+  为 `GENERATE_ONCE`，exact body preflight PASS；`context_ir=false`、MiniMax-H3 / 768P / 5s。
+- task `2107199862996754432`，一次 POST / HTTP 200；native body SHA
+  `1b9089c37ab3423d89e925df2ca236791e54fdf1592b1aeac0b39437dccf6361`；raw SHA
+  `cb92bb572364f4a007f22e165f87bebe9e632196556326dd9f153d193f709b74`，4,840,753 bytes。
+  原视频 H.264 / 1344×768 / 24 fps / 124 frames / format 5.175s；AAC stereo / 32 kHz。
+  既有 quota 9→10 / operator ceiling 18M→20M microunits 保留全部历史与 held reservations，
+  `actual_cost=null`，不声称账单、结算或重置消费。durable request→POST 556.183s；
+  submit→首次 observed succeeded 101.910s、fetch/reload/copy 完成 150.905s，均含本地开销。
+- 落盘后显式 project-local MCP 21 帧 / .25s；exact-hash 1×静音播放至 ended，5.3311s wall
+  / 26 captures；强制 zh Whisper base 检出一次“兄弟们”于 .86–1.40s。实际约 1.6s
+  多切到另一侧脸/门构图，约 2.9s 再切三人，违反 0–3s 同机位；狗哥约 3s 起已在
+  上亮窗露面，违反本单元 voice-only / intact-glass-before-reveal 末态。声音 onset 比封存
+  1.8s 提前约 .94s，超过 .5s 容差；潘子约 1.25s 抬眼，实际听声→反应顺序改善，
+  但原低眼持续时段不成立。不能继续沿用前次“先反应后声音”诊断解释本条。
+  MCP threshold .3 自动检出一场景不代表没有可见 cuts；Parent 实际观看优先于该计数。
+- canonical diagnosis：action / camera / close / identity / opening / sound FAIL，space /
+  no-overlay PASS。identity 的三名室内角色可读，但完整 criterion 还要求狗哥不露脸；
+  sound 只据已观察 timing 失败，音色/配乐/自然度仍 NOT_EVALUATED，ASR 不替代实际听音。
+  无字幕/水印的视觉 PASS 只属于这条未修改 raw；AIGC metadata 不等于烧录文字。
+  同时改变长度/参考/Context IR/表述且 seed uncontrolled，不据此归因某一参数消除了字幕。
+  canonical experience `1b36f3a7d8ba0d377336ab2ccfe7609ff350a1f20fc56271bcf94890ab412965`，
+  reject 后 Manifest revision 252 / attempt `failed`，保留 phase `validate` 和全部证据。
+
+当前真实 blocker 是仍未合格的 raw 制作，不是要求新增 continuity architecture。
+继续堆更长 prompt 或把这条失败末帧当 accepted source 没有依据；后续 repair 应针对表演时段、
+机位与未揭脸的正确 reference/conditioning 取证，任何 I2V/FL2VA 比较留在同一真实 sequence，
+不能凭本轮 PASS 子项推进。normal-speed sound、原 4–9、A2 editorial join、选 take、compose
+及最终 MP4 仍未完成。自动 learning evaluation `no_candidate`：dependent retakes、多变量改动
+及不同 scope 不支持独立通用能力结论，未新增 advisory claim 或修改 Skill/Policy/Gate。
+
+Verification：本轮 exact staged record 的五项 documentation Harness PASS，policy audit
+869 candidates / unmapped 0，product runtime skill boundary 两项 tests PASS；receipt
+`.agent/harness/runs/fanxiang-reaction-production-checkpoint-20261006-002/receipt.json`。
+Implementation Review Risk Gate 为 `KIMI_REVIEW_NOT_REQUIRED`：base `db93ef9`，tracked
+candidate 只有本记录；Product source/credential/permit/recovery owner 未改，task-local
+有限单次 submit 与已关闭失败由实际证据核验，无用户指定 implementation review，也无具体
+critical authority/state-damage failure path 或重大后果且未验证的语义缺口。早期 Kimi input
+audit 不冒充 final implementation review，raw quality FAIL 不因 Harness 或 review 结论解除。
+
 ### Supersession — Pose References And Native Adaptation Still Fail
 
 2026-10-06 Hong Kong / 2026-10-05 UTC，用户继续后实际完成 Ba-03。本段取代下方
@@ -437,3 +510,7 @@ non-Q0 identity 绑定 actual METASO task、同一 Production attempt、request 
 | Ba2-RAW-QA | metaso-task:2107169914993008640 | fanxiang-production-loop-20261005 | fanxiang-production-loop-Ba-take-02 | N/A | 3e33ac328c92d5df3104410a75a6e971c3f7d3eed199206357aead7a2a6c3ede | ANALYZER_QA | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | Ba2-FETCH | `B/sequence-Ba-take-02/diagnosis.json` |
 | Ba3-FETCH | metaso-task:2107181047953514496 | fanxiang-production-loop-20261005 | fanxiang-production-loop-Ba-take-03 | N/A | 42b7be665bac350e65ba5f04db8444cb01505293d2d972cb4b4699ec3a316d51 | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | `B/sequence-Ba-take-03/terminal.json` |
 | Ba3-RAW-QA | metaso-task:2107181047953514496 | fanxiang-production-loop-20261005 | fanxiang-production-loop-Ba-take-03 | N/A | 42b7be665bac350e65ba5f04db8444cb01505293d2d972cb4b4699ec3a316d51 | ANALYZER_QA | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | Ba3-FETCH | `B/sequence-Ba-take-03/diagnosis.json` |
+| Reaction1-FETCH | metaso-task:2107199862996754432 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-reveal-take-01 | N/A | cb92bb572364f4a007f22e165f87bebe9e632196556326dd9f153d193f709b74 | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | `B/sequence-B-reveal-take-01/terminal.json` |
+| Reaction1-RAW-QA | metaso-task:2107199862996754432 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-reveal-take-01 | N/A | cb92bb572364f4a007f22e165f87bebe9e632196556326dd9f153d193f709b74 | ANALYZER_QA | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | Reaction1-FETCH | `B/sequence-B-reveal-take-01/diagnosis.json` |
+| Reaction1-VOICE-TIMING | metaso-task:2107199862996754432 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-reveal-take-01 | N/A | cb92bb572364f4a007f22e165f87bebe9e632196556326dd9f153d193f709b74 | ANALYZER_DIALOGUE | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | Reaction1-FETCH | `B/sequence-B-reveal-take-01/explicit-transcription-tool.json` |
+| Reaction1-ACTUAL-SOUND | metaso-task:2107199862996754432 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-reveal-take-01 | N/A | cb92bb572364f4a007f22e165f87bebe9e632196556326dd9f153d193f709b74 | ANALYZER_AUDIO | NOT_EVALUATED | EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | Reaction1-FETCH | `B/sequence-B-reveal-take-01/actual-findings.json` |
