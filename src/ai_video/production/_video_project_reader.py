@@ -70,7 +70,7 @@ from ai_video.production.models import (
     VideoRequestReceiptPointer,
     VideoStatusReceiptPointer,
 )
-from ai_video.production.paid_provider import BudgetReservationStatus
+from ai_video.production.paid_provider import video_reservation_has_cost_coverage
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
     canonical_commercial_shot_evaluation_intent_path,
@@ -1484,14 +1484,15 @@ def _verify_generated_video_candidate(
         != fetch.paid_submit_receipt_fingerprint
         or provenance.local_submit_result_fingerprint is not None
         or paid_state is None
-        or paid_state.phase is not PaidProviderAttemptPhase.SETTLED
-        or reservation is None
-        or reservation.status is not BudgetReservationStatus.SETTLED
+        or paid_state.phase not in {
+            PaidProviderAttemptPhase.ACCEPTED,
+            PaidProviderAttemptPhase.SETTLED,
+        }
+        or not video_reservation_has_cost_coverage(reservation)
         or reservation.attempt_id != attempt.attempt_id
         or reservation.request_fingerprint != request.resolved_generation_hash
         or reservation.submit_receipt_fingerprint
         != provenance.paid_submit_receipt_fingerprint
-        or reservation.actual_cost_microunits is None
     ):
         raise _invalid("Active remote video provenance chain is invalid.")
     _verify_active_terminal_frame(bundle, attempt, request, asset, provenance)

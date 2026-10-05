@@ -2934,26 +2934,30 @@ def test_candidate_rejects_fetch_path_replacement_after_held_fd_probe(tmp_path: 
     assert not (tmp_path / "assets/files" / f"{state.fetch_receipt.artifact_sha256}.mp4").exists()
 
 
-def test_candidate_rejects_unsettled_budget_before_any_candidate_write(tmp_path: Path):
+def test_known_success_video_activates_with_reserved_upper_bound_without_claiming_cost(tmp_path: Path):
     _, provider, _, committer = _reach_fetch(tmp_path, settle=False)
     VideoGenerationService(committer=committer, provider=provider).fetch_once(
         attempt_id=ATTEMPT_ID
     )
-    before_files = tuple(
-        sorted(path.relative_to(tmp_path) for path in tmp_path.rglob("*") if path.is_file())
-    )
-
-    with pytest.raises(AiVideoError, match="settled evidence"):
-        committer.prepare_video_activation_candidate(attempt_id=ATTEMPT_ID)
-
-    after = committer._read_manifest()
-    attempt = after.attempts[-1]
+    committer.prepare_video_activation_candidate(attempt_id=ATTEMPT_ID)
+    committer.activate_video_candidate(attempt_id=ATTEMPT_ID)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    attempt = next(a for a in loaded.manifest.attempts if a.attempt_id == ATTEMPT_ID)
     assert attempt.video_generation_state is not None
-    assert attempt.video_generation_state.phase is VideoAttemptPhase.VALIDATE
-    assert attempt.candidate_project is None
-    assert tuple(
-        sorted(path.relative_to(tmp_path) for path in tmp_path.rglob("*") if path.is_file())
-    ) == before_files
+    assert attempt.video_generation_state.phase is VideoAttemptPhase.ACTIVATE
+    assert attempt.paid_provider_state.phase.value == "accepted"
+    budget = committer._reopen_paid_budget(loaded.manifest.active_paid_provider_budget)
+    reservation = next(r for r in budget.reservations if r.attempt_id == ATTEMPT_ID)
+    assert reservation.status.value == "reserved"
+    assert reservation.upper_bound_microunits is not None
+    assert reservation.actual_cost_microunits is None
+    committer.settle_paid_provider_reservation(
+        attempt_id=ATTEMPT_ID, actual_cost_microunits=300,
+    )
+    settled = load_production_project(tmp_path / "project.yaml")
+    settled_attempt = next(a for a in settled.manifest.attempts if a.attempt_id == ATTEMPT_ID)
+    assert settled_attempt.paid_provider_state.phase.value == "settled"
+    assert settled_attempt.video_generation_state.phase is VideoAttemptPhase.ACTIVATE
 
 
 @pytest.mark.parametrize(

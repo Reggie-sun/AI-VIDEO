@@ -1232,9 +1232,11 @@ def _validate_video_attempt(attempt: Any) -> None:
                     PaidProviderAttemptPhase.SETTLED,
                 },
                 VideoAttemptPhase.CANDIDATE: {
+                    PaidProviderAttemptPhase.ACCEPTED,
                     PaidProviderAttemptPhase.SETTLED,
                 },
                 VideoAttemptPhase.ACTIVATE: {
+                    PaidProviderAttemptPhase.ACCEPTED,
                     PaidProviderAttemptPhase.SETTLED,
                 },
             }[state.phase]

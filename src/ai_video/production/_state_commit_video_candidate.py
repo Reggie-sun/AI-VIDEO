@@ -15,7 +15,7 @@ from ai_video.production.models import (
     VideoProbeReceiptPointer,
     VideoProvenanceReceiptPointer,
 )
-from ai_video.production.paid_provider import BudgetReservationStatus
+from ai_video.production.paid_provider import video_reservation_has_cost_coverage
 from ai_video.production.paths import (
     _open_regular_file_nofollow,
     _read_regular_file_nofollow,
@@ -203,11 +203,14 @@ class _StateCommitVideoCandidateMixin:
                     or state.latest_observation is None
                     or state.paid_submit_receipt is None
                     or paid_state is None
-                    or paid_state.phase is not PaidProviderAttemptPhase.SETTLED
+                    or paid_state.phase not in {
+                        PaidProviderAttemptPhase.ACCEPTED,
+                        PaidProviderAttemptPhase.SETTLED,
+                    }
                     or manifest.active_paid_provider_budget is None
                 ):
                     raise _state_invalid(
-                        "Remote video validation requires exact settled evidence."
+                        "Remote video validation requires exact accepted submit evidence."
                     )
                 budget = self._reopen_paid_budget(manifest.active_paid_provider_budget)
                 reservation = next(
@@ -219,17 +222,15 @@ class _StateCommitVideoCandidateMixin:
                     None,
                 )
                 if (
-                    reservation is None
-                    or reservation.status is not BudgetReservationStatus.SETTLED
+                    not video_reservation_has_cost_coverage(reservation)
                     or reservation.attempt_id != attempt_id
                     or reservation.request_fingerprint
                     != state.request.resolved_generation_hash
                     or reservation.submit_receipt_fingerprint
                     != state.paid_submit_receipt.submit_receipt_fingerprint
-                    or reservation.actual_cost_microunits is None
                 ):
                     raise _state_invalid(
-                        "Video validation requires the exact settled budget receipt."
+                        "Video validation requires exact reserved or settled cost coverage."
                     )
                 fetch_pointer = state.fetch_receipt
                 observation = self._reopen_video_status(state.latest_observation)

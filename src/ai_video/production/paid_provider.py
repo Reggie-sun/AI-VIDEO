@@ -252,6 +252,25 @@ class PaidProviderBudgetReservation(_PaidStrictModel):
         return self
 
 
+def video_reservation_has_cost_coverage(
+    reservation: PaidProviderBudgetReservation | None,
+) -> bool:
+    """Keep an accepted video's sealed upper bound held until actual billing arrives.
+
+    Callers still verify the successful media, accepted submit and exact identity.
+    This does not settle, release, or authorize another Provider call.
+    """
+    if reservation is None or reservation.submit_receipt_fingerprint is None:
+        return False
+    if reservation.status is BudgetReservationStatus.SETTLED:
+        return reservation.actual_cost_microunits is not None
+    return (
+        reservation.status is BudgetReservationStatus.RESERVED
+        and reservation.upper_bound_microunits is not None
+        and reservation.actual_cost_microunits is None
+    )
+
+
 class PaidProviderBudgetSnapshot(_PaidStrictModel):
     schema_version: Literal["1"] = "1"
     revision: int = Field(strict=True, ge=1)

@@ -20,6 +20,7 @@ from ai_video.production.paid_provider import (
     reserve_paid_provider_budget,
     settle_paid_provider_budget,
     validate_paid_provider_authorization,
+    video_reservation_has_cost_coverage,
 )
 
 
@@ -102,6 +103,33 @@ def _reserved_gate():
         budget_snapshot_file_sha256=ONE_HASH,
     )
     return preview, authorization, snapshot, reservation, gate
+
+
+@pytest.mark.parametrize(
+    "status,upper_bound,actual_cost,submit_fingerprint,covered",
+    (
+        (BudgetReservationStatus.RESERVED, 2_000_000, None, ONE_HASH, True),
+        (BudgetReservationStatus.SETTLED, 2_000_000, 100, ONE_HASH, True),
+        (BudgetReservationStatus.RESERVED, None, None, ONE_HASH, False),
+        (BudgetReservationStatus.RESERVED, 2_000_000, None, None, False),
+        (BudgetReservationStatus.UNSETTLED, 2_000_000, None, ONE_HASH, False),
+        (BudgetReservationStatus.RELEASED, 2_000_000, 0, ONE_HASH, False),
+    ),
+)
+def test_video_cost_coverage_preserves_unknown_and_unreserved_fences(
+    status, upper_bound, actual_cost, submit_fingerprint, covered,
+):
+    _, _, _, reservation, _ = _reserved_gate()
+    values = reservation.model_dump(mode="python") | {
+        "status": status,
+        "upper_bound_microunits": upper_bound,
+        "actual_cost_microunits": actual_cost,
+        "submit_receipt_fingerprint": submit_fingerprint,
+    }
+    reservation = type(reservation).model_validate(values)
+    assert video_reservation_has_cost_coverage(reservation) is covered
+    assert reservation.model_dump(mode="python") == values
+    assert video_reservation_has_cost_coverage(None) is False
 
 
 def test_preview_is_strict_frozen_self_sealed_and_secret_free():

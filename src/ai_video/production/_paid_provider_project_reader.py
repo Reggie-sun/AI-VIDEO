@@ -13,6 +13,7 @@ from ai_video.production.models import (
     PaidProviderSubmitReceiptPointer,
     ProductionManifest,
     StateCommitStatus,
+    VideoAttemptPhase,
 )
 from ai_video.production.paid_provider import (
     BudgetReservationStatus,
@@ -354,8 +355,14 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
         accepted_video_terminal = (
             attempt.operation == "video_generation"
             and state.phase is PaidProviderAttemptPhase.ACCEPTED
-            and attempt.status
-            in {StateCommitStatus.FAILED, StateCommitStatus.INTERRUPTED}
+            and (
+                attempt.status in {StateCommitStatus.FAILED, StateCommitStatus.INTERRUPTED}
+                or (
+                    attempt.status is StateCommitStatus.SUCCEEDED
+                    and attempt.video_generation_state is not None
+                    and attempt.video_generation_state.phase is VideoAttemptPhase.ACTIVATE
+                )
+            )
         )
         accepted_minimax_voice = (
             attempt.operation == "voice_generation"
