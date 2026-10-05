@@ -11,6 +11,64 @@ Date: 2026-10-05
 
 ## Current Status
 
+### Supersession — Pose References And Native Adaptation Still Fail
+
+2026-10-06 Hong Kong / 2026-10-05 UTC，用户继续后实际完成 Ba-03。本段取代下方
+“八次 submit / reference strategy 尚未执行”的当前状态；此前真实结果保留。
+当前第九次 Provider 结果 known fetched，但 raw quality FAIL，没有选 take、activation 或 Bb。
+本轮仍未修改 Product source、通用 continuity contract、spec 或 plan。
+
+- 原七图之外，新增两个已登记 DERIVED 的 native PNG：Ba-01 frame 84 / 3.5s 的三人
+  站位/门轴，与 Ba-02 frame 240 / 10s 的潘子受袭空间关系。只继承这些具体属性，
+  明确排除错误 eyeline；两者来自 FAILED media，`accepted_source=false`，不是交接末帧。
+  未裁切、重绘或去水印，也没有使用原 V37 的带字视频作为 conditioning。
+- 首段六个事件窗口保持 0–10.6s，末尾延续至 11s；原文适配为 H3 Ref2VA 六节英文
+  prompt 与一次 tagged Chinese dialogue，而非原画布 literal replay。九图 exact identities、
+  66 项 typed control expression、6998-character native master 和 lint 100 均只证明输入。
+  managed Kimi invocation `d98e61a9-b096-42d9-b86b-a4edb91d5c69` 的 exact two-file
+  input audit 为 PARSED；Parent 未发现阻断输入缺陷。这不是媒体验收。
+  前一次 invocation `3dbf3f8a-9714-4180-88b7-0b65b42a1c54` 是
+  STRUCTURED_OUTPUT_EXHAUSTED，没有可用 report，其 partial result 未用于判断。
+- Ba-03 task `2107181047953514496`；body SHA
+  `71fff81637cd238c5a8b3fafcb45dafb85746715614aaadbfca4e3512923c878`；raw SHA
+  `42b7be665bac350e65ba5f04db8444cb01505293d2d972cb4b4699ec3a316d51`，10,851,846 bytes。
+  raw 为 H.264 / 1344×768 / 24 fps / 277 frames / format 11.550s，AAC stereo / 32 kHz。
+  显式 project-local MCP 23 frames、exact-hash 1×静音播放到 ended
+  （11.7218s wall、47 captures）和 8.25s / 9s native PNG 共同确认：action / camera /
+  close / no-overlay / opening / space FAIL，identity PASS，sound NOT_EVALUATED。
+  约 2.1–3.1s 烧录“兄弟们”字幕；约 6.9s 多切一次，9s 完整磨砂玻璃重新出现且头的位置
+  重置；末段小龙看键盘改善，但头颈与潘子停住，持续攻击未成立。
+- 强制中文 ASR 只检出一次“兄弟们”于 1.9–2.76s；潘子在此前已抬眼/抬下巴。
+  自动语言识别曾误判 Korean。尝试提供 actual audio 后，当前 assistant runtime 明确报告
+  audio input unsupported，不能据 ASR 签配乐、人声自然度、音色或同步 PASS。
+  canonical experience `8462e3debbca15ef1bbb8a0ee13895ed3f8ea36045700b79688a776ec57cc812`；
+  `abandon_video_generation` 保留 findings，strict reload FAILED，Manifest revision 226。
+- durable request→physical POST 为 500.815s；整体本地 pre-POST 约 12m30。
+  terminal 的 106.492s 是 submit→首次 observed succeeded，包含本地 commit 延迟，不能当作
+  纯模型计算耗时。保留全部九次消费与 held reservations，`actual_cost=null`；不是账单证据。
+
+Ba-04 preparation 使用同九图，将六个事件归入四个实际 camera shots，existing profile
+`context_ir=false`；master 6999 characters、66 项 control proof 与 lint 100。原六个 source
+block hashes 和九图 identities 均未改变。第一次 prepare 的 task-local field 拼写错误在任何
+Provider effect 前被 strict model 拒绝，改用已有 `context_ir` 字段后继续；未改 schema。
+一次 daemon restart 中断了本地准备；确认进程已退出、request/fence/terminal 均不存在后
+恢复同一 zero-effect preparation，没有重发 Provider。
+
+canonical decision 最终为 `SPLIT_SHOT`，不是 compiler unsupported：三条 raw whole-result
+失败触发 existing feedback feasibility intervention，该 proposal 以三份失败证据优先于新一份
+输入策略 proposal。未创建 native request、paid attempt、permit 或第十次 submit；仅有本地
+creative/profile/dependency 准备。没有调高 failure threshold、屏蔽 history、删除旧 findings
+或修改 Gate 来继续采样。`B/sequence-Ba-take-04/preparation-blocker.json` 封存 exact decision 与九次 actual count。
+关闭 Context IR 尚未获得实测，不能归因它造成或消除了字幕。
+
+输入完整不等于模型能按动作、时间与切镜执行；没有原 uploaded image bytes、原历史模型与
+sampling 条件，也不能称“完全复现画布”。当前可行性停点是未通过的 raw quality 与现有
+recipe feedback Gate。下一制作单元应进一步区分听声抬眼/见脸、破窗袭击、反击缩回，保持
+每段完整事件关系，重新核定各段 QA 与真实 accepted handoff；不要只换四个 cut labels
+继续同一 11s 请求。尚未 author/submit 这些更小的单元。Bb、选 take、compose 与 final MP4 未完成。
+自动 learning evaluation：`no_candidate`；dependent retakes、seed uncontrolled、同时改变输入
+不能支持通用能力/adoption claim，也不外推已有 local H3 claim 至 remote Ref2VA。
+
 ### Supersession — Two Actual Split Candidates And Unaccepted Handoff
 
 2026-10-06 Hong Kong / 2026-10-05 UTC，用户“可以”接受拆分后，真实执行 Ba-01 与一次
@@ -377,3 +435,5 @@ non-Q0 identity 绑定 actual METASO task、同一 Production attempt、request 
 | Ba1-RAW-QA | metaso-task:2107166621276991488 | fanxiang-production-loop-20261005 | fanxiang-production-loop-Ba-take-01 | N/A | 5c265179f817280b979fc79866cf7add8e46a5162efeaf455aef102e1448e67b | ANALYZER_QA | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | Ba1-FETCH | `B/sequence-Ba-take-01/diagnosis.json` |
 | Ba2-FETCH | metaso-task:2107169914993008640 | fanxiang-production-loop-20261005 | fanxiang-production-loop-Ba-take-02 | N/A | 3e33ac328c92d5df3104410a75a6e971c3f7d3eed199206357aead7a2a6c3ede | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | `B/sequence-Ba-take-02/terminal.json` |
 | Ba2-RAW-QA | metaso-task:2107169914993008640 | fanxiang-production-loop-20261005 | fanxiang-production-loop-Ba-take-02 | N/A | 3e33ac328c92d5df3104410a75a6e971c3f7d3eed199206357aead7a2a6c3ede | ANALYZER_QA | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | Ba2-FETCH | `B/sequence-Ba-take-02/diagnosis.json` |
+| Ba3-FETCH | metaso-task:2107181047953514496 | fanxiang-production-loop-20261005 | fanxiang-production-loop-Ba-take-03 | N/A | 42b7be665bac350e65ba5f04db8444cb01505293d2d972cb4b4699ec3a316d51 | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | `B/sequence-Ba-take-03/terminal.json` |
+| Ba3-RAW-QA | metaso-task:2107181047953514496 | fanxiang-production-loop-20261005 | fanxiang-production-loop-Ba-take-03 | N/A | 42b7be665bac350e65ba5f04db8444cb01505293d2d972cb4b4699ec3a316d51 | ANALYZER_QA | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | Ba3-FETCH | `B/sequence-Ba-take-03/diagnosis.json` |
