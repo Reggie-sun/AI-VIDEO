@@ -11,6 +11,87 @@ Date: 2026-10-05
 
 ## Current Status
 
+### Supersession — One First-Frame I2V Hit Insert And Strategy Stop
+
+2026-10-06，用户明确授权仅生成一次 2–4s 键盘反击补镜，优先 first-frame I2V，
+只验收握法、接触、即时受力反应与接回现有素材。本段取代下方“尚未准备起始图、
+未实测 I2V、下一步再试短反击”的当前建议；旧十四条素材诊断与失败记录保留。
+开始时 working tree clean，本地及远端 `main` 均已为 `7d0e69e59a6d1b215bfe48b897100a2f2c24dbd5`，
+该诊断记录已经 push，无需重复收尾。没有修改通用源码、continuity architecture 或 schema。
+
+#### Exact Inputs And Execution
+
+`H = runs/fanxiang-production-loop-20261005-001/sequence-B-hit-i2v-take-01/`（ignored/local media evidence）。
+从 Ba-02 exact MP4 的 10.0s 提取原生画面，使用一次 built-in `image_gen` edit 准备
+`H/first-frame.png`：小龙在右侧，只握键盘右短端，另一手支撑手腕，自由端与狗哥脸侧
+留出路径；潘子、曾亮在左侧避开路径，狗哥头颈已经穿过破上亮窗。保留同一冷光与门内轴线。
+新图是用户授权的 repaired reference，不是 Ba-02 FAILED 末帧，也不登记为 accepted continuity source。
+PNG 为 1659×948、1,528,127 bytes，SHA-256
+`6bdd1c4497d7f1520b99badd22ee75603b002a69cca15afbd6f5c69d93440bc5`；实际 native base64 解码后逐字节相等。
+
+实际请求 `MiniMax-H3` / `metaso-h3-fl2va-v1` / `image_to_video`，4s、768P、adaptive geometry，
+`context_ir_enabled=false`。content 顺序为 text → 唯一 `first_frame`；没有额外人物、视频、音频或 last-frame reference。
+封存意图为固定机位，只负责一次挥击→接触→偏转/后缩，无台词、新运镜或重演前段剧情。
+`H/input-fidelity.json`、`preflight.json`、`prompt-lint.json` 证明实际 bytes、角色、顺序与输入 lint，
+不证明 upstream conditioning 执行或媒体质量。native body SHA-256
+`9294f80313e81997a039adae165b7d25aa4e1883904b61e43cdf267e973257ce`，lint 为 100、无 issues。
+
+通过现有 Shot、Registry、QA policy、goal version、Planner/Router/compiler、VideoGenerationService
+和 ProductionStateCommitter 封存当前补镜范围。raw policy 仅四项；final-output requirements 的内容保持相等，
+goal version 从 4→5 显式记录当前用户的 salvage＋短补镜方向，历史整段 FAIL 保留，未改 Gate。
+task-local driver 的 first-frame role/Shot owner binding 与报告序列化问题均在 POST 前修正；
+未提交的准备失败不计为生成。正式 submit 前本地历史/binding 校验显著耗时，不能据此判断 H3 动作能力。
+
+提交前明确写出：“上次最主要的失败是 B-03 的键盘挥击没有形成可见接触与受力反馈，
+这次只通过正确的击打起始构图/reference 去验证它；如果命中后的头部偏转仍失败，
+就停止继续堆 prompt，改用其他制作策略。”
+
+本轮仅一个视频 POST，HTTP 200，job `2107221754490675200`，同 job poll/fetch 成功；
+没有 retry、remint 或第二次生成。existing physical ceiling 10→11、实际旧消费 10 保留；
+operator-configured upper bound 每次 2,000,000 microCNY，actual cost 仍 null，不是价格估计或结算。
+exact MP4 SHA-256 `3ef7ec8ae0ef95bbdfaf249e74d03709a2ae7eda4ec7743ac00d9fb95f148105`，
+3,553,330 bytes；实测 4.458s、107 frames、24fps、1344×768、7:4、H.264/AAC。
+实际长度超过请求的 4s，如需使用须裁窗，不能报告为 exact 4s output。
+
+#### Four Scoped Findings And Salvage
+
+MP4 落盘后显式调用 project-local `video-analysis` MCP probe/extract；另解码 1.75–2.875s
+的 27 个连续原生帧。Chrome 1×静音播放 raw 到 ended：4.6126s wall、55 samples，hash/bytes 一致。
+接镜仅制作 review derivative：Ba-02 9.208333–10.0s → 本 take 1.708333–4.458333s →
+B-03-final 14.5–15.0s，实际 1×播放到 ended，4.0417s、48 samples；
+`join-review.mp4` SHA-256 `c5139f228b24aa4499350d0353ba89b5b61b4edd296fce590b2fa49ccbcf919f`。
+它是诊断衍生物，未成为 ResolvedTimeline、Production render 或 final film；没有 sound PASS。
+
+| Finding | Verdict | Observed Evidence |
+| --- | --- | --- |
+| grip | PASS | 同一短端持握、另一手支撑手腕，远端自由；动作过程中保留 |
+| contact | FAIL | 约 2.083–2.333s 有脸侧/颈侧贴合、遮挡与模糊，但整体是平推追随/下压，未形成可读挥击碰撞；承认局部 apparent contact，不称全程空挥 |
+| reaction | FAIL | 约 2.167–2.5s 确有左移，却继续朝潘子伸颈；没有独立、可信的即时受力偏转/后缩。约 3.5s 后较晚回移不能补足 impact beat |
+| edit_join | FAIL | 人物、站位、轴线与光线基本可接，空间兼容保留；实际接到空窗后仍缺可信击中→撤退因果，末帧头颈仍在室内 |
+
+`H/actual-findings.json` 绑定 exact request、artifact、四个 canonical question/item hash。
+四项结果已通过 ProjectAnalysisSession / ControlledPresentationVerifier 写入 canonical feedback，
+`H/diagnosis.json` 为 QUALITY_FAILURE，只有 grip 保留 PASS；随后经既有 committer 拒绝本 attempt。
+本条不作为完整反击 accepted take，也不把末帧当 accepted continuity source。
+约 0–1.5s 仍是正确握姿/准备画面，可裁短作为准备 insert；不整条丢弃，也不冒充成功命中。
+原有 A-02 reveal、B-03 主干/空窗与 Ba-02 attack 窗口继续保留，当前最佳主干仍为 B-03-final。
+
+#### Strategy Stop And Learning Evaluation
+
+停止继续堆 prompt，立即改用两镜头制作策略：键盘/手部攻击 insert ＋ 狗哥头颈受击反应镜，
+用匹配方向、撞击 SFX 与切点建立因果，再接既有破窗空镜。两镜必须各自提供真实攻击与受力运动，
+不能靠音效把这条的平推/弱反馈伪装成合格命中。本轮没有执行后续两镜头生成。
+这次失败属于该 exact H3 I2V take 的表演/接触动力学结果；输入 role/order/bytes 正确，
+没有证据归因于 adapter 漏图。first frame 解决握法与初始布局，没有解决可信碰撞；
+仅单次实测、seed 未控、策略/时长/范围不同，不宣称普遍 H3 能力边界或 controlled A/B。
+
+managed Kimi deep read-only input audit invocation `4cda05e9-be2a-40f6-a285-2b5539115f21`，
+qualified route `4f2d5dc8-4234-4665-b382-e82f1ad6cc00`，sealed source reads/hash 核对完成。
+报告的 I2V 输入兼容判断经 Parent 当前源码/实际 preview 裁决；它不是媒体验收或 implementation review。
+自动 learning evaluation：`no_candidate`。旧 local H3 claims 的 scope 不覆盖这次 remote contact 实验，
+不据单例新建 claim、改 Skill/Policy/Gate 或扩大旧 claim。experience retrieval stale-shard fallback
+只用于发现历史，无重建 RAG；当前结论来自实际输入、媒体和 receipts。整片听音与 Final Acceptance 仍 NOT_EVALUATED。
+
 ### Supersession — Editorial Salvage Audit Before Any Further Generation
 
 2026-10-06，用户要求先检查全部真实素材、实际 prompt/reference 顺序和 QA，再决定最小补镜。
@@ -626,3 +707,6 @@ non-Q0 identity 绑定 actual METASO task、同一 Production attempt、request 
 | Reaction1-RAW-QA | metaso-task:2107199862996754432 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-reveal-take-01 | N/A | cb92bb572364f4a007f22e165f87bebe9e632196556326dd9f153d193f709b74 | ANALYZER_QA | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | Reaction1-FETCH | `B/sequence-B-reveal-take-01/diagnosis.json` |
 | Reaction1-VOICE-TIMING | metaso-task:2107199862996754432 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-reveal-take-01 | N/A | cb92bb572364f4a007f22e165f87bebe9e632196556326dd9f153d193f709b74 | ANALYZER_DIALOGUE | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | Reaction1-FETCH | `B/sequence-B-reveal-take-01/explicit-transcription-tool.json` |
 | Reaction1-ACTUAL-SOUND | metaso-task:2107199862996754432 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-reveal-take-01 | N/A | cb92bb572364f4a007f22e165f87bebe9e632196556326dd9f153d193f709b74 | ANALYZER_AUDIO | NOT_EVALUATED | EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | Reaction1-FETCH | `B/sequence-B-reveal-take-01/actual-findings.json` |
+| HitI2V1-FETCH | metaso-task:2107221754490675200 | fanxiang-hit-i2v-20261006 | fanxiang-production-loop-B-hit-i2v-take-01 | N/A | 3ef7ec8ae0ef95bbdfaf249e74d03709a2ae7eda4ec7743ac00d9fb95f148105 | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | `H/terminal.json` |
+| HitI2V1-FOUR-RAW-QA | metaso-task:2107221754490675200 | fanxiang-hit-i2v-20261006 | fanxiang-production-loop-B-hit-i2v-take-01 | N/A | 3ef7ec8ae0ef95bbdfaf249e74d03709a2ae7eda4ec7743ac00d9fb95f148105 | ANALYZER_QA | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | HitI2V1-FETCH | `H/actual-findings.json` |
+| HitI2V1-EDIT-JOIN | metaso-task:2107221754490675200 | fanxiang-hit-i2v-20261006 | fanxiang-production-loop-B-hit-i2v-take-01 | N/A | 3ef7ec8ae0ef95bbdfaf249e74d03709a2ae7eda4ec7743ac00d9fb95f148105 | EDITORIAL_REVIEW_DERIVATIVE | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | HitI2V1-FETCH | `H/join-review-provenance.json` / `H/join-review-1x.json` |
