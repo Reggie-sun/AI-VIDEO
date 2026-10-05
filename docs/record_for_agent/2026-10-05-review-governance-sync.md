@@ -66,6 +66,29 @@ Standing delegation 使用一次新的四文件、read-only Kimi `explorer` 做�
 `082c409dd2244b576c2ea00746b83e07e66c014fd85c0eaf7f961abd0ecd2070`，
 invocation `9239cd08-4129-46d4-9164-66c35722a497`。本记录形成时它仍 pending，不能据此验收。
 
+## Verified Result
+
+上述 pending 已由 canonical receipt 核验取代：一次新 explorer 调用在 135.772 秒产生完整
+`PARSED` 报告、exit0、两次 HTTP200 / `IDENTITY_VERIFIED` / `k3` / `max` / cap32000，
+无截断或 orchestration retry。四个 files 均有 complete actual Read，结束后五个 frozen
+sources 全部与 seal 相符；report SHA
+`565b01e53fbfc54f8fb232152ecc8fed71167513fdb8032a713ae3de5a96fd44`。
+没有派 native reviewer 或追加 Kimi 轮次；此调用不改成独立 implementation review。
+
+Parent 裁决：直接逐条核对四入口的 source/diff，确认无新矛盾。T2 generic review 一词
+受紧随其后的单 reviewer/Risk Gate clauses 约束，不构成额外 reviewer 的理由。可选 Claude
+profile 的 Bash 工具与 prompt-only read-only 限制是既有边界，本次未改 tools/model 或声称
+该 profile 具备受管 Kimi 的机械 containment；连续故障替换仍选择全局 named native profile。
+用户新同步规则、原 global delegation 和低频 final review 是各自不同的决策，不混为新的双审。
+
+四入口与 record 的初始 checkpoint 为 `c698ecd`，path-limited commit 仅含五个本任务文件。
+隔离 exact-range `d3cdc4c..c698ecd` 的 canonical Harness
+`.agent/harness/runs/review-governance-sync-20261005-exact1/receipt.json` 为 passed，10 checks
+全部通过，architecture gate 0 errors/0 warnings，receipt integrity/freshness 已机械核验。
+最终 working-tree focused tests 为 169 passed；未触发 full_tests，未运行真实媒体/付费生成。
+本节是 evidence/record 更新，四个治理 owner bytes 与 explorer/初始 Harness snapshot 完全一致；
+最终 record checkpoint 的 exact-range 验证另在 completion 留下 receipt，不要求额外模型重审。
+
 ## Learning And Publication Boundary
 
 `record-ai-video-session` 的 substantial documentation checkpoint 适用。
