@@ -279,6 +279,8 @@ def _consume_permit(permit: object, binding: dict[str, str]) -> bool:
 
 
 class SeedanceVideoProvider:
+    causal_expression_grammar = "remote-video-prose-v1"
+
     def __init__(
         self,
         *,
@@ -313,11 +315,13 @@ class SeedanceVideoProvider:
         self,
         provider_bound: ProviderBoundVideoRequest,
         requirement: ProviderNeutralVideoRequirement,
+        *, continuity_expression=None,
     ) -> ProviderRequestCompilationResult:
         native_prompt = None
         compiler_version = "1"
         if provider_bound.generation_recipe is not None:
-            compiled_prompt = compile_remote_video_prompt(requirement, voice_route=provider_bound.voice_route)
+            compiled_prompt = compile_remote_video_prompt(requirement, voice_route=provider_bound.voice_route,
+                provider_bound=provider_bound, continuity_expression=continuity_expression)
             if not isinstance(compiled_prompt, RemoteVideoPromptCompilation):
                 return ProviderRequirementUnsupported(
                     requirement_hash=requirement.requirement_hash,
@@ -340,6 +344,7 @@ class SeedanceVideoProvider:
             compiler_version=compiler_version,
             capabilities=self._capabilities,
             native_prompt=native_prompt,
+            continuity_expression=continuity_expression,
         )
 
     def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:

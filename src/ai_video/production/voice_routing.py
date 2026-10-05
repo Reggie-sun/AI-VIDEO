@@ -482,7 +482,7 @@ def expand_voice_candidates(candidate, *, requirement, source=None, context=None
     return tuple(result)
 
 
-def validate_voice_compilation(requirement, bound, native_prompt):
+def validate_voice_compilation(requirement, bound, native_prompt, *, continuity_expression=None):
     """Fail closed even when an adapter is called outside the orchestrator."""
     voice, binding = requirement.voice_routing, bound.voice_route
     if voice is None:
@@ -506,7 +506,8 @@ def validate_voice_compilation(requirement, bound, native_prompt):
         # Compare with the exact compiler output rather than searching for
         # script substrings (a short utterance can also be legitimate visuals).
         from ai_video.production._remote_video_native_prompt import compile_remote_video_prompt
-        expected = compile_remote_video_prompt(requirement, voice_route=binding)
+        expected = compile_remote_video_prompt(requirement, voice_route=binding,
+            provider_bound=bound, continuity_expression=continuity_expression)
         if (expected.outcome != "compiled" or expected.prompt_text != native_prompt.prompt_text
                 or expected.prompt_sha256 != native_prompt.prompt_sha256
                 or expected.expressed_control_paths != native_prompt.expressed_control_paths):

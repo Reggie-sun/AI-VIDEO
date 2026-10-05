@@ -443,6 +443,8 @@ def _validate_submission(
 
 
 class MiniMaxHailuoVideoProvider:
+    causal_expression_grammar = "remote-video-prose-v1"
+
     def __init__(
         self,
         *,
@@ -463,11 +465,13 @@ class MiniMaxHailuoVideoProvider:
         self,
         provider_bound: ProviderBoundVideoRequest,
         requirement: ProviderNeutralVideoRequirement,
+        *, continuity_expression=None,
     ) -> ProviderRequestCompilationResult:
         native_prompt = None
         compiler_version = "1"
         if provider_bound.generation_recipe is not None:
-            compiled_prompt = compile_remote_video_prompt(requirement)
+            compiled_prompt = compile_remote_video_prompt(requirement,
+                provider_bound=provider_bound, continuity_expression=continuity_expression)
             if not isinstance(compiled_prompt, RemoteVideoPromptCompilation):
                 return ProviderRequirementUnsupported(
                     requirement_hash=requirement.requirement_hash,
@@ -490,6 +494,7 @@ class MiniMaxHailuoVideoProvider:
             compiler_version=compiler_version,
             capabilities=_CAPABILITIES,
             native_prompt=native_prompt,
+            continuity_expression=continuity_expression,
         )
 
     def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:

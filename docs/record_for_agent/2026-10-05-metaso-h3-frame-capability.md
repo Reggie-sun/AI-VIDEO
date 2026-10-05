@@ -8,6 +8,14 @@ learning_eligibility: ineligible
 
 Date: 2026-10-05
 
+## Supersession Notice — Typed Opening Expression
+
+下文“canonical sequence typed-hash prose仍unsupported”已由
+[verified causal opening slice](2026-10-05-typed-causal-native-expression.md)有界取代：
+exact owner-issued、complete/hash-matching target-open facts可表达并到达METASO HardCut pre-submit。
+current-close hash缺独立facts、无证hash及cross-stack无证seed仍unsupported；真实source/A-B未验收。
+旧frame capability证据、effect计数与历史FAIL保持不变。
+
 ## Baseline And Scope
 
 baseline main/origin/main `bf2c81d2bbd2d568a0da78d86b9d4184aacbd05d`，写前 working tree 干净。

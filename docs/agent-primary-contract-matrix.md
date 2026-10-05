@@ -346,6 +346,13 @@ recipe 必须与 selected `DomainAcceptancePolicy` 的 sealed `generation_requir
 投影。compiler 检查 raw prompt expression 的 canonical value/native text 和未表达 authored
 text；非文本控制必须由 native grammar owner 提供 `expressed_control_paths`。output/audio
 native controls 使用既有 request 检查，不要求重复进入 prose。不支持时 typed unsupported。
+Verified sequence opening `TYPED_HASH` 仅由 `_sequence_source.py` 重开 current canonical source、
+policy/columns、target/intent、final Planner preimage与bound seals后签发 ephemeral
+`_causal_prompt_context.py` evidence；`_remote_video_native_prompt.py` 是唯一 prose owner，
+只表达 `target_open`，逐次重算两列 hash，不把 seal当文本。新hash coverage不能仅由caller
+自报，recipe digest只从已验证的临时lexical projection移除；原recipe/QA seal不变。
+previous source-close不证明current close；后者hash缺独立事实、arbitrary hash和TYPED_REF
+均继续 unsupported。adapter仅传输入，FULL capability/route/QA gates不变。
 此 conservative lexical coverage 不是语义理解或模型遵循证明。历史无 recipe 的 bound/request
 序列化保持原 hash。显式 fixed/paired/randomized seed 与 lifecycle identity 分离；repair 的
 comparison 由 Router 从 validated exact baseline request 导出，compiler 再检查实际 delta；

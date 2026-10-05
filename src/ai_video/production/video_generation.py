@@ -133,9 +133,14 @@ class VideoGenerationService:
             routing = binding.decision.routing
             if routing is None or routing.provider_bound_request is None:
                 raise ValueError("submit decision has no bound request")
-            result = self._provider.compile_request(
+            from ai_video.production._sequence_source import compile_with_sequence_expression
+            from ai_video.production.project import load_production_project
+            result = compile_with_sequence_expression(self._provider,
                 routing.provider_bound_request,
                 binding.projection.requirement,
+                loaded=(load_production_project(self._committer.project_root / "project.yaml")
+                    if binding.continuity_routing is not None else None),
+                routing=binding.continuity_routing,
             )
             if not isinstance(result, CompiledProviderVideoRequest):
                 raise ValueError("current Provider compiler cannot express the bound recipe")

@@ -225,8 +225,7 @@ def build_sequence_video_planning_request(
             source_activation_registry=source_registry,
             destination_selection_binding=(destination_selection_binding.model_dump(mode="json")
                 if destination_selection_binding is not None else None),
-            destination_planning_request=(request.model_dump(mode="json")
-                if destination_selection_binding is not None else None),
+            destination_planning_request=request.model_dump(mode="json"),
         )
         return request, routing
     except (AttributeError, KeyError, StopIteration, TypeError, ValueError) as exc:

@@ -337,6 +337,7 @@ def compile_provider_video_request(
     capabilities: VideoProviderCapabilities,
     supports_native_control: bool = False,
     native_prompt: ProviderNativePrompt | None = None,
+    continuity_expression=None,
 ) -> ProviderRequestCompilationResult:
     """Compile mechanical provider grammar without selecting or invoking a Provider."""
 
@@ -375,7 +376,28 @@ def compile_provider_video_request(
         )
     from ai_video.production.voice_routing import validate_voice_compilation, voice_expression_recipe
 
-    voice_errors = validate_voice_compilation(requirement, provider_bound, native_prompt)
+    if native_prompt is not None and "generation_intent.open_state.state_hash" in native_prompt.expressed_control_paths:
+        # A claimed seal path is not coverage by itself. Reopen the same
+        # owner-issued expression even for callers bypassing an adapter.
+        from ai_video.production._remote_video_native_prompt import compile_remote_video_prompt
+
+        expected = compile_remote_video_prompt(requirement, voice_route=provider_bound.voice_route,
+            provider_bound=provider_bound, continuity_expression=continuity_expression)
+        subject_compiler = (compiler_id == "vidu-video-compiler" and compiler_version == "4"
+            and native_prompt.grammar_contract == "vidu-subject-prose-v4")
+        # This selected compiler must pass its exact subject recompile below.
+        # A caller-supplied grammar label never grants that exception.
+        if (expected.outcome != "compiled" or (
+                not subject_compiler and (
+                    expected.prompt_text != native_prompt.prompt_text
+                    or expected.prompt_sha256 != native_prompt.prompt_sha256
+                    or expected.expressed_control_paths != native_prompt.expressed_control_paths))):
+            return _unsupported(provider_bound, requirement,
+                ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+                ("generation_intent.open_state",))
+
+    voice_errors = validate_voice_compilation(requirement, provider_bound, native_prompt,
+        continuity_expression=continuity_expression)
     if voice_errors:
         return _unsupported(provider_bound, requirement,
             ProviderRequirementUnsupportedReason.NATIVE_CONTROL_UNSUPPORTED, voice_errors)
@@ -463,7 +485,8 @@ def compile_provider_video_request(
                 raise ValueError("named subjects require the selected subject compiler")
             if native_prompt is None or native_prompt.grammar_contract != "vidu-subject-prose-v4":
                 raise ValueError("named subjects require the selected native grammar")
-            validate_vidu_subject_prompt(requirement, provider_bound, subjects, native_prompt.prompt_text)
+            validate_vidu_subject_prompt(requirement, provider_bound, subjects, native_prompt.prompt_text,
+                continuity_expression=continuity_expression)
         except ValueError:
             return _unsupported(provider_bound, requirement,
                 ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH, ("subject_bindings",))
@@ -598,6 +621,15 @@ def compile_provider_video_request(
                                 ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
                                 ("generation_recipe.native_expression",))
         expression_recipe = voice_expression_recipe(recipe, requirement, provider_bound.voice_route)
+        if "generation_intent.open_state.state_hash" in native_prompt.expressed_control_paths:
+            # The verified native projection above covers this seal through
+            # facts. Its digest remains in the persisted recipe/QA contract,
+            # but is never a lexical narrative obligation.
+            state_hash = requirement.generation_intent.open_state.state_hash
+            expression_recipe = expression_recipe.model_copy(update={"expressions": tuple(
+                item.model_copy(update={"native_text": tuple(text for text in item.native_text
+                    if text != state_hash)}) if "generation_intent.open_state.state_hash" in item.intent_paths
+                else item for item in expression_recipe.expressions)})
         missing = expression_errors(expression_recipe, requirement, prompt, native_prompt.expressed_control_paths)
         if missing:
             return _unsupported(provider_bound, requirement,

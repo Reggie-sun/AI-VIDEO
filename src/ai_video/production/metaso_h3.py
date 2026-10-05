@@ -145,7 +145,7 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
             }),)
         return VideoProviderCapabilities.create(provider_name=_NAME, variants=variants)
 
-    def compile_request(self, provider_bound, requirement):
+    def compile_request(self, provider_bound, requirement, *, continuity_expression=None):
         from ai_video.production._remote_video_native_prompt import (
             RemoteVideoPromptCompilation, compile_remote_video_prompt,
         )
@@ -153,7 +153,8 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
             ProviderNativePrompt, ProviderRequirementUnsupported,
             ProviderRequirementUnsupportedReason, compile_provider_video_request,
         )
-        compiled = compile_remote_video_prompt(requirement)
+        compiled = compile_remote_video_prompt(requirement,
+            provider_bound=provider_bound, continuity_expression=continuity_expression)
         if not isinstance(compiled, RemoteVideoPromptCompilation):
             return ProviderRequirementUnsupported(
                 requirement_hash=requirement.requirement_hash,
@@ -166,6 +167,7 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
             provider_bound=provider_bound, requirement=requirement,
             compiler_id="metaso-h3-video-compiler", compiler_version="1",
             capabilities=self.capabilities(),
+            continuity_expression=continuity_expression,
             native_prompt=ProviderNativePrompt(grammar_contract="remote-video-prose-v1",
                 prompt_text=compiled.prompt_text, prompt_sha256=compiled.prompt_sha256,
                 expressed_control_paths=compiled.expressed_control_paths),

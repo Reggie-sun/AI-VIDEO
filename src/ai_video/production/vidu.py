@@ -159,6 +159,8 @@ class _SourceVerificationSink:
 
 
 class ViduVideoProvider(_ViduAdMethods):
+    causal_expression_grammar = "remote-video-prose-v1"
+
     def __init__(self, *, profile: ViduProviderProfile, transport: ViduTransport,
                  credential: Callable[[], str],
                  image_resolver: Callable[[VideoImageReferenceBinding], bytes] | None = None,
@@ -178,7 +180,7 @@ class ViduVideoProvider(_ViduAdMethods):
         return f"{self._profile.origin}/{self._profile.pointer().profile_sha256}/{model_id}"
 
     def compile_request(self, provider_bound: ProviderBoundVideoRequest,
-                        requirement: ProviderNeutralVideoRequirement) -> ProviderRequestCompilationResult:
+                        requirement: ProviderNeutralVideoRequirement, *, continuity_expression=None) -> ProviderRequestCompilationResult:
         try:
             # Reopen identities before native expression; a placeholder prompt
             # cannot serve as requirement coverage for a new sealed recipe.
@@ -211,13 +213,15 @@ class ViduVideoProvider(_ViduAdMethods):
                     reason=ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH,
                     unsupported_field_paths=("subject_bindings",),
                 )
-            prompt = compile_vidu_subject_prompt(requirement, provider_bound, subjects)
+            prompt = compile_vidu_subject_prompt(requirement, provider_bound, subjects,
+                continuity_expression=continuity_expression)
             compiled_prompt = isinstance(prompt, ViduPromptCompilation)
         elif current_recipe:
             from ai_video.production._remote_video_native_prompt import (
                 compile_remote_video_prompt, RemoteVideoPromptCompilation,
             )
-            prompt = compile_remote_video_prompt(requirement, voice_route=provider_bound.voice_route)
+            prompt = compile_remote_video_prompt(requirement, voice_route=provider_bound.voice_route,
+                provider_bound=provider_bound, continuity_expression=continuity_expression)
             compiled_prompt = isinstance(prompt, RemoteVideoPromptCompilation)
         else:
             prompt = compile_vidu_prompt(requirement)
@@ -234,6 +238,7 @@ class ViduVideoProvider(_ViduAdMethods):
             provider_bound=provider_bound, requirement=requirement,
             compiler_id="vidu-video-compiler", compiler_version="4" if named else "3" if current_recipe else "2",
             capabilities=self.capabilities(),
+            continuity_expression=continuity_expression,
             native_prompt=ProviderNativePrompt(
                 grammar_contract="vidu-subject-prose-v4" if named else "vidu-prose-v3" if current_recipe else "vidu-prose-v2",
                 prompt_text=prompt.prompt_text,

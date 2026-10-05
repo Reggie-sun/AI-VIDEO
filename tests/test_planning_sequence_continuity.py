@@ -124,8 +124,10 @@ def _activated_source(tmp_path, *, seal_terminal=True, close_evaluation=True, cl
     from ai_video.production.video import VideoProviderCapabilities
     from ai_video.production._video_capability_fingerprint import capability_variant_fingerprint
     from ai_video.production.shot_router import ProviderRouteIdentity
-    variant = provider.capabilities().variants[0].model_copy(update={"max_image_bytes": 4096})
-    provider._capabilities = VideoProviderCapabilities.create(provider_name="fake-video", variants=(variant,))
+    variant = next(v for v in provider.capabilities().variants if v.capability_id == template.capability_id)
+    if provider.capabilities().provider_name == "fake-video":
+        variant = variant.model_copy(update={"max_image_bytes": 4096})
+        provider._capabilities = VideoProviderCapabilities.create(provider_name="fake-video", variants=(variant,))
     route = _bound_route_identity(original.decision.routing.provider_bound_request)
     source_route = ProviderRouteIdentity.create(**{**route.model_dump(mode="python", exclude={"route_identity_hash"}),
         "capability_fingerprint": capability_variant_fingerprint(variant)})
@@ -134,7 +136,7 @@ def _activated_source(tmp_path, *, seal_terminal=True, close_evaluation=True, cl
     provider._native_prompt_text = "release completed; continue walking right; continue right; " + (
         authored.generation_intent.generation_intent.open_state.state_hash)
     prepared = prepare_generation_execution(project=inputs.project, provider=provider, request=template,
-        task_id="sequence-source", compiler_id="generated-video-e2e-fixture", compiler_version="1",
+        task_id="sequence-source", compiler_id=provider._compiler_id, compiler_version="1",
         planning_request=authored, execution_stack_hash=stack.execution_stack_hash,
         use_current_generation_acceptance=close_evaluation)
     preview = _paid_preview(prepared.resolved, attempt_id=ATTEMPT_ID, video_preview=provider.preview(prepared.resolved))
@@ -191,7 +193,7 @@ def _identity(artifact):
         revision=artifact.revision, content_hash=artifact.content_hash)
 
 
-def _prepare_keyframe(source):
+def _prepare_keyframe(source, *, width=2, height=1):
     import test_production_generated_video_e2e as e
     loaded = load_production_project(source["root"] / "project.yaml")
     target, terminal = loaded.shots[1], source["terminal"]
@@ -202,7 +204,7 @@ def _prepare_keyframe(source):
     request = e.ImageGenerationRequest.create(attempt_id="sequence-c2-keyframe",
         provider_kind="fake-local", model_id="fixture-image-model-1", target_shot_id=target.shot_id,
         target_asset_role="first_frame", prompt_text="explicit typed rightward continuation with new camera angle",
-        negative_prompt_text="", parameters=e.ImageProviderParameters(seed=23, width=2, height=1,
+        negative_prompt_text="", parameters=e.ImageProviderParameters(seed=23, width=width, height=height,
             output_format="png", generation_revision=1), references=(
             e.ImageReferenceBinding(role="character", creative_artifact_id=character.artifact_id,
                 creative_revision=character.revision, creative_content_hash=character.content_hash,
@@ -221,7 +223,7 @@ def _prepare_keyframe(source):
     class FixtureProvider:
         def generate(self, candidate, auth, permit):
             assert permit._consume_image_generation_permit(request_fingerprint=candidate.request_fingerprint)
-            return e.make_image_provider_result(candidate, auth, e._p7_png())
+            return e.make_image_provider_result(candidate, auth, e._p7_png(width, height))
 
     e.ProductionStateCommitter(source["root"], image_candidate_preparer=e.make_p7_image_candidate_preparer(
         source["inputs"])).generate_image_asset(request, preview, authorization, FixtureProvider())

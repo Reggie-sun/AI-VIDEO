@@ -43,12 +43,13 @@ class ViduPromptCompilation(_ViduPromptModel):
 ViduPromptResult = ViduPromptCompilation | ViduPromptUnsupported
 
 
-def compile_vidu_subject_prompt(requirement, bound, subjects) -> ViduPromptResult:
+def compile_vidu_subject_prompt(requirement, bound, subjects, *, continuity_expression=None) -> ViduPromptResult:
     """Add canonical subject roles to the existing versioned prose grammar."""
     if requirement.contract_version == "provider-neutral-video-requirement/4":
         from ai_video.production._remote_video_native_prompt import compile_remote_video_prompt
 
-        base = compile_remote_video_prompt(requirement, voice_route=bound.voice_route)
+        base = compile_remote_video_prompt(requirement, voice_route=bound.voice_route,
+            provider_bound=bound, continuity_expression=continuity_expression)
     else:
         base = compile_vidu_prompt(requirement)
     if base.outcome != "compiled":

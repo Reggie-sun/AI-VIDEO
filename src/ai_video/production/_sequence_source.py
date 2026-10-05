@@ -115,7 +115,7 @@ def _sequence_planning_seed_hash(routing, requirement):
     """Verify the existing Planner request preimage, then its neutral seed identity."""
     request = routing.destination_planning_request
     if request is None:
-        raise ValueError("cross-stack sequence requires its sealed planning request")
+        raise ValueError("sequence requires its sealed planning request")
     payload = {name: value for name, value in request.items()
                if name not in {"request_id", "request_content_hash"}}
     request_hash = canonical_sha256(payload)
@@ -128,7 +128,7 @@ def _sequence_planning_seed_hash(routing, requirement):
     return canonical_sha256(payload)
 
 
-def require_sequence_source(*, loaded, routing, requirement, lifecycle):
+def require_sequence_source(*, loaded, routing, requirement, lifecycle, provider_bound=None):
     """Reopen exact activation evidence; a pointer alone is never authority."""
     if routing.source_activation_registry is None:
         raise ValueError("sequence activation pointer is required for new execution")
@@ -188,4 +188,63 @@ def require_sequence_source(*, loaded, routing, requirement, lifecycle):
         binding.projection.requirement.generation_intent, requirement.generation_intent)
     if loaded.qa_policy is None or policy.qa_policy_hash != loaded.qa_policy.content_hash:
         raise ValueError("sequence QA policy is stale")
+    if provider_bound is not None:
+        # Reuse this owner's existing exact read-only Planning exception.
+        from ai_video.planning.video_planner import VideoPlanner, VideoPlanningRequest, require_current_video_plan
+
+        seed_hash = _sequence_planning_seed_hash(routing, requirement)
+        request = VideoPlanningRequest.model_validate(routing.destination_planning_request)
+        projection = require_current_video_plan(current_request=request, plan=VideoPlanner().plan(request))
+        if (projection.requirement != requirement
+                or projection.projection_hash != provider_bound.verified_projection_hash
+                or projection.plan_hash != provider_bound.plan_hash
+                or policy.authoring_evidence_hash != sequence_authoring_evidence_hash(
+                    loaded=loaded, binding=binding, accepted_media=accepted_hashes,
+                    target_request_hash=seed_hash, changes=policy.causal_state_changes)):
+            raise ValueError("causal expression lacks exact Planner/authoring lineage")
     return accepted
+
+
+def build_verified_causal_opening_expression(*, loaded, routing, requirement, provider_bound):
+    """Issue compiler-only facts after exact current sequence/Planner reopen."""
+    from ai_video.production._shot_router_contracts import (
+        ContinuityProviderRouteBinding, ProviderBoundVideoRequest, ProviderRouteIdentity,
+    )
+    from ai_video.production._video_intent_validation import validate_causal_transition_intent
+    from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
+    from ai_video.production.project import load_production_project
+    from ai_video.production._causal_prompt_context import _issue_causal_opening_expression
+
+    loaded = load_production_project(loaded.root / "project.yaml")
+    routing = ContinuityProviderRouteBinding.model_validate(routing.model_dump(mode="python"))
+    requirement = ProviderNeutralVideoRequirement.model_validate(requirement.model_dump(mode="python"))
+    bound = ProviderBoundVideoRequest.model_validate(provider_bound.model_dump(mode="python"))
+    policy = routing.transition_policy
+    route = ProviderRouteIdentity.create(**{name: getattr(bound, name) for name in (
+        "provider_name", "provider_kind", "model_id", "provider_profile", "capability_id",
+        "capability_fingerprint", "execution_kind", "billing_kind", "compiler_contract")})
+    if (policy.schema_version != "2" or bound.requirement_hash != requirement.requirement_hash
+            or (bound.target_shot_id, bound.target_shot_revision, bound.target_shot_content_hash)
+            != (requirement.target_shot.shot_id, requirement.target_shot.revision, requirement.target_shot.content_hash)
+            or route != routing.destination_route
+            or validate_causal_transition_intent(policy, requirement=requirement)):
+        raise ValueError("causal expression requires exact selected target/intent/policy/route")
+    accepted = require_sequence_source(loaded=loaded, routing=routing,
+        requirement=requirement, lifecycle=bound.lifecycle, provider_bound=bound)
+    source_binding = accepted[0]
+    return _issue_causal_opening_expression(requirement=requirement, provider_bound=bound,
+        routing=routing, source_intent=source_binding.projection.requirement.generation_intent)
+
+
+def compile_with_sequence_expression(provider, provider_bound, requirement, *, loaded=None, routing=None):
+    """Keep legacy grammars/calls intact; shared remote grammars opt in explicitly."""
+    if (getattr(provider, "causal_expression_grammar", None) != "remote-video-prose-v1"
+            or requirement.contract_version != "provider-neutral-video-requirement/4"
+            or requirement.generation_intent.open_state.kind is not ContinuityStateKind.TYPED_HASH
+            or routing is None):
+        return provider.compile_request(provider_bound, requirement)
+    if loaded is None:
+        raise ValueError("causal expression requires the current sequence project")
+    evidence = build_verified_causal_opening_expression(loaded=loaded, routing=routing,
+        requirement=requirement, provider_bound=provider_bound)
+    return provider.compile_request(provider_bound, requirement, continuity_expression=evidence)

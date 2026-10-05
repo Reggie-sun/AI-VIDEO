@@ -89,7 +89,7 @@ def _optional(label: str, value: str | None) -> str | None:
 
 def compile_remote_video_prompt(
     requirement: ProviderNeutralVideoRequirement,
-    *, voice_route=None,
+    *, voice_route=None, provider_bound=None, continuity_expression=None,
 ) -> RemoteVideoPromptResult:
     """Compile the current complete intent into remote-provider prose.
 
@@ -117,6 +117,19 @@ def compile_remote_video_prompt(
     opening, opening_errors = _state_text(
         intent.open_state, "generation_intent.open_state"
     )
+    opening_controls = ()
+    if intent.open_state.kind is ContinuityStateKind.TYPED_HASH and continuity_expression is not None:
+        from ai_video.production._causal_prompt_context import VerifiedCausalOpeningExpression
+
+        try:
+            if type(continuity_expression) is not VerifiedCausalOpeningExpression:
+                raise ValueError("causal expression must be owner-issued")
+            facts = continuity_expression.opening_facts(requirement, provider_bound)
+        except (AttributeError, TypeError, ValueError):
+            return RemoteVideoPromptUnsupported(unsupported_field_paths=("generation_intent.open_state",))
+        opening = "; ".join(f"{dimension.value.replace('_', ' ')}: {fact}" for dimension, fact in facts)
+        opening_errors = ()
+        opening_controls = ("generation_intent.open_state.state_hash",)
     closing, closing_errors = _state_text(
         intent.close_state, "generation_intent.close_state"
     )
@@ -145,7 +158,7 @@ def compile_remote_video_prompt(
     assert motion is not None and relation is not None
 
     sentences: list[str] = []
-    controls: list[str] = []
+    controls: list[str] = list(opening_controls)
     _append(sentences, f"Opening state: {opening}.")
     if intent.open_state.required_change:
         sentences.append("The opening state must visibly change during this shot.")

@@ -334,7 +334,10 @@ class GenerationFeedbackOrchestrator:
         if decision.disposition != "GENERATE_ONCE":
             return PreparedGeneration(inputs, decision, target_shot_id=current["context"].target_shot_id)
         provider = providers[decision.selected_candidate_id]
-        compilation = provider.compile_request(decision.routing.provider_bound_request, projection.requirement)
+        from ai_video.production._sequence_source import compile_with_sequence_expression
+        compilation = compile_with_sequence_expression(provider,
+            decision.routing.provider_bound_request, projection.requirement,
+            loaded=current.get("source_project"), routing=arguments.get("continuity_routing"))
         if isinstance(compilation, ProviderRequirementUnsupported):
             return PreparedGeneration(inputs, decision, compilation=compilation,
                                       target_shot_id=current["context"].target_shot_id)

@@ -56,10 +56,11 @@ def validate_vidu_subjects(requirement, bound, subjects) -> None:
         raise ValueError("named subject projection differs from canonical inputs")
 
 
-def validate_vidu_subject_prompt(requirement, bound, subjects, prompt_text) -> None:
+def validate_vidu_subject_prompt(requirement, bound, subjects, prompt_text, *, continuity_expression=None) -> None:
     from ai_video.production._vidu_prompt import compile_vidu_subject_prompt
 
     validate_vidu_subjects(requirement, bound, subjects)
-    prompt = compile_vidu_subject_prompt(requirement, bound, subjects)
+    prompt = compile_vidu_subject_prompt(requirement, bound, subjects,
+        continuity_expression=continuity_expression)
     if prompt.outcome != "compiled" or prompt.prompt_text != prompt_text:
         raise ValueError("named subject prompt differs from the canonical projection")
