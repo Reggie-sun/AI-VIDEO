@@ -11,9 +11,89 @@ Date: 2026-10-05
 
 ## Current Status
 
-### Subsequent Production Checkpoint
+### Supersession — Five Actual Takes And Canvas Diagnosis
 
-以下是继续制作后的当前状态；下文原始 NE 与 blocking observations 保留其历史时间边界。
+以下状态取代下文的“B 尚未 submit”“A 尚未激活”和旧账单等待动作；原始 chronology 与失败证据保留。
+本 checkpoint 完成于 2026-10-06 Hong Kong / 2026-10-05 UTC。用户当前要求先分析为什么画布迁移失败，
+因此停止新增生成；本轮没有第六次 physical POST，也没有最终 compose MP4。
+
+- close-state 已收尾并 push。真实 endpoint timing / native audio blocker 修复已以
+  `32cafb32346a113ef750811701cd12b080a8068e` push 到 `main`。
+  exact staged receipt `.agent/harness/runs/fanxiang-native-audio-and-real-timing-20261005-003/receipt.json`
+  为 PASS，16 selected checks；production contract suite 3868 PASS / 3 SKIP / 2064 deselected，
+  1787.83 秒。提交前已核验 freshness、snapshot、policy、artifact integrity 与 checkout cleanup。
+  当前 2.7 Manifest / 2.2 Registry、dependency transition、strict reload、已激活 source、held reservation
+  及 replay 不重复提取均有 targeted evidence。Parent final Risk Gate 为 KIMI_REVIEW_NOT_REQUIRED。
+  Harness PASS 不构成下列视频的质量验收。
+- physical submits 总数为五：A 两次、B 三次，均已知 succeeded/fetched；没有 unknown outcome。
+  A-02 在早期改写后的 criteria 下七项 PASS，并已 canonical ACTIVATE/SUCCEEDED；该历史不撤销。
+  但原画布 fidelity 与最终成片未验收，不能把旧 PASS 扩大到用户后来明确的完整画布要求。
+  A-02 原声 WAV 已登记并 strict reopen；末帧和尾段只是软参考，不证明 hard frame conditioning。
+- B-01 与 B-02 视觉 FAIL，均 canonical FAILED。B-02 用户明确原声合理，同时明确表情、动作与末段
+  12 秒衔接错误；其 USER_AUDIO PASS 不能迁移到 B-03。
+- B-03-final 恢复原九分镜全文、七张参考图与原 2 秒 video reference，继续使用用户明确指定的
+  METASO MiniMax-H3。actual MCP 31 frames 与 exact-hash 1×静音播放已检查。
+  canonical diagnosis `7dab6b431aef69695e56f3925e7cc340091084e0da7d5eca313f2f7315b96ebf`：
+  action/camera FAIL，identity/space/visible close PASS，opening/sound NOT_EVALUATED。
+  用户整体评价 FAIL 后经 committer abandon；strict reopen status FAILED，不激活、不供下一段使用。
+  已知画面失败不靠继续询问用户听音来补成 PASS。
+- 曾有 `sequence-B-take-03` 的 repair-policy preflight failure，以及 final driver 的 compiler mismatch；
+  两者均发生在 POST 前。前者经 canonical `not_submitted` evaluation 与 close 封存，后者在确证纯 REQUEST、
+  无 paid/fence 消费后恢复同一 intent。原四次消费不重置；有界扩展至五次后仅新增一次实际 POST。
+  所有 reservations 保持 held，`actual_cost=null`；无伪造结算，也未把上界当实际费用。
+- 真实 composition preflight 尚有 `Shot sequence-A content_driven duration is unsupported.` blocker，
+  见 `B/composition-preflight-blocker.json`。本 checkpoint 未修 composition、未建立第二 timeline；
+  首先解决原片动作质量与实际剪接关系，再考虑既有 owner 的最小修复。
+
+### Canvas Transfer Diagnosis
+
+此前 A/B authoring 并非完整模仿画布：把原 coverage 重写为三段、删除“兄弟们”与吃痛吼叫、
+用 A-02 的真实尾段代替原 video reference。这是 Parent 的制作偏离，不是用户授权的忠实迁移。
+下文旧 Director choice 仅保留为历史，不能作为当前 creative authority。
+
+B-03-final 的真实 native POST body 已逐字重建并逐个 base64 解码核对：原全文只替换七个 reference
+label，5570→5557 characters；七图、一视频的 SHA 与所取 Registry bytes 一致。
+但这个 audit 只证明客户端对 captured inputs 的 fidelity，不能称“原画布生成条件完整复现”：
+
+1. **已确认的输入语义歧义**：文中仍写“参考图1：606宿舍室内大远景”和“参考图2：606宿舍门内侧特写”，
+   H3 ordered aliases 的 Image 1 / Image 2 却分别是长颈狗哥 / 小龙；宿舍和门实际是 Image 6 / Image 3。
+   attached labels 已替换，但 prose 编号未消歧。它是需要修正的迁移缺陷；当前没有隔离实验证明它导致重击失败。
+2. **动作未被参考视频示范**：原 `11 - 副本` reference 是约 1.881 秒、45 frames 的近黑视频。
+   actual MCP 四帧与全部 45 decoded frames 核对，无可见人物或重击动作；全分辨率 grayscale max 2/255。
+   音轨存在，不声称静音或已知用途。兼容版仅 clone 三个末帧至 2 秒，前 45 decoded frames 与 AAC packets
+   保持，SHA `b581e8f36e3df91af6012d1265557fee9bf8c13e68911fe38f82430ac3371f56`。
+   原成功 V37 的攻击/受击 MP4 并未被当作 motion reference 输入。
+3. **已知差异与不可证部分**：current canvas composer 显示 Seedance 2.5，实际执行 MiniMax-H3，符合用户选型；
+   当前 UI 不证明原成功视频的历史 submit model/seed。使用的七图为 720px preview WEBP，
+   尚未核验原 4K 上传 bytes。`context_ir_enabled=true`，响应未返回 IR text，不能认定服务端未改写，
+   也不能把 Context IR 当作已证明的失败原因。
+
+原成功 V37 与新 raw MP4 对比：B-03 约 1.8 秒由潘子侧脸切到正面近景，违背“同一机位，不立刻切”。
+11.872–12.122 秒小龙挥键盘后，12.37–13.12 秒狗哥仍继续伸向潘子，没有清楚的命中面门、头部带偏、
+吃痛撤回链；原 V37 同段有明显受击表演。新片修掉了 B-02 的“先空窗后再出现正脸”，
+但不能因此把重击因果标为 PASS。原物料 SHA：V37
+`65cb5e6889b3824725bdaab64f2397e7b20ac39eafb6974c30c6e48b4c9518ef`。
+
+当前结论是客户端语义迁移存在缺陷、该实际 H3 take 的镜头与动作执行失败；并无证据证明
+continuity schema 缺失、H3 普遍无法完成或单一 IR 参数就是根因。
+下一制作动作应先统一 reference aliases，再评估原成功 V37 可追溯动作素材的有界视频指导，
+明确这属于改变 conditioning strategy，不能继续称原输入 exact replay。当前未制作或提交该新 candidate。
+只有真实效果仍失败时再依据失败拆 sequence；不预先拆成逐镜请求，不开启泛化架构研究。
+
+诊断 anchors：`B/sequence-B-take-03-final/input-fidelity-audit.json`、
+`original-reference-black-frame-audit.json`（同目录）、`actual-analysis-tool.json`、
+`normal-speed-playback-metadata.json`、`actual-findings.json`、`diagnosis.json`、`user-feedback.json`；
+原片分析为 `B/canvas-V37-actual-analysis.json`。静音播放不能证明声音合格；Whisper small 自动识别为 ko
+也不能证明实际韩文台词。本轮不追问用户为已拒绝的画面补声音结论。
+
+Driver 已能自动执行 canonical planning/submit/poll/fetch、input byte checks、MCP 抽帧、原声登记与
+QA persistence，但仍是 task-local prototype；reference 语义映射、表演/动作裁决、策略选择与最终成片验收
+尚不能宣称自动化。学习评估仍为 `no_candidate`：依赖 retake 链、多个变量变化与 uncontrolled seed，
+不推导普遍模型能力；没有新 specs/plans、continuity contracts 或 learning adoption。
+
+### Historical Production Checkpoint
+
+以下为 B 生成前的 checkpoint。其待办、费用与 quality 状态已按上文 supersede，保留原始时间边界。
 
 - close-state 与费用 coverage 修复均已 push，后者 commit `59838ff`。其 exact staged Harness
   `.agent/harness/runs/fanxiang-known-success-reservation-20261005-001/receipt.json` PASS，
@@ -144,7 +224,17 @@ non-Q0 identity 绑定 actual METASO task、同一 Production attempt、request 
 | A1-VISUAL | metaso-task:2107120446158958592 | fanxiang-production-loop-20261005 | fanxiang-production-loop-A-take-01 | N/A | af7547f32603e042b60a8db452acb42fc2e110c2d104b74534219cc8cc098a94 | ANALYZER_VISUAL | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | A1-FETCH | `B/sequence-A-take-01/actual-findings.json` |
 | A1-DIALOGUE-CORRECTION | metaso-task:2107120446158958592 | fanxiang-production-loop-20261005 | fanxiang-production-loop-A-take-01 | N/A | af7547f32603e042b60a8db452acb42fc2e110c2d104b74534219cc8cc098a94 | ANALYZER_DIALOGUE | NOT_EVALUATED | EVIDENCE_GAP | CONCLUSION_SUPERSEDED | A1-VISUAL | `B/sequence-A-take-01/dialogue-evidence-correction.json` |
 | A2-FETCH | metaso-task:2107123515718922240 | fanxiang-production-loop-20261005 | fanxiang-production-loop-A-take-02 | N/A | bfa4216dfa8eb77dbd3f61a0b397c10ecb4c082b83c02ce03f1827f31a305fd7 | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | `B/sequence-A-take-02/terminal.json` |
-| A2-RAW-QA | metaso-task:2107123515718922240 | fanxiang-production-loop-20261005 | fanxiang-production-loop-A-take-02 | N/A | bfa4216dfa8eb77dbd3f61a0b397c10ecb4c082b83c02ce03f1827f31a305fd7 | ANALYZER_QA | NOT_EVALUATED | EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | A2-FETCH | `B/sequence-A-take-02/diagnosis.json` |
+| A2-RAW-QA | metaso-task:2107123515718922240 | fanxiang-production-loop-20261005 | fanxiang-production-loop-A-take-02 | N/A | bfa4216dfa8eb77dbd3f61a0b397c10ecb4c082b83c02ce03f1827f31a305fd7 | ANALYZER_QA | NOT_EVALUATED | EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | A2-FETCH | `B/sequence-A-take-02/diagnosis-before-user-audio-and-spatial-review.json` |
 | A2-USER-AUDIO | metaso-task:2107123515718922240 | fanxiang-production-loop-20261005 | fanxiang-production-loop-A-take-02 | N/A | bfa4216dfa8eb77dbd3f61a0b397c10ecb4c082b83c02ce03f1827f31a305fd7 | USER_AUDIO | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | A2-FETCH | `B/sequence-A-take-02/user-audio-feedback.json` |
 | A2-ACTIVATION | metaso-task:2107123515718922240 | fanxiang-production-loop-20261005 | fanxiang-production-loop-A-take-02 | N/A | bfa4216dfa8eb77dbd3f61a0b397c10ecb4c082b83c02ce03f1827f31a305fd7 | CANONICAL_ACTIVATION | BLOCKED | EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | A2-FETCH | `B/sequence-A-take-02/activation-blocker.json` |
 | A2-FINAL-QUALITY | metaso-task:2107123515718922240 | fanxiang-production-loop-20261005 | fanxiang-production-loop-A-take-02 | N/A | bfa4216dfa8eb77dbd3f61a0b397c10ecb4c082b83c02ce03f1827f31a305fd7 | HUMAN_FINAL_ACCEPTANCE | NOT_EVALUATED | EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | A2-FETCH | `B/final-output-contract.json` |
+| A2-OLD-CRITERIA-QA | metaso-task:2107123515718922240 | fanxiang-production-loop-20261005 | fanxiang-production-loop-A-take-02 | N/A | bfa4216dfa8eb77dbd3f61a0b397c10ecb4c082b83c02ce03f1827f31a305fd7 | ANALYZER_QA | PASS | NONE | CONCLUSION_SUPERSEDED | A2-RAW-QA | `B/sequence-A-take-02/diagnosis.json` |
+| A2-ACTIVATED-OLD-SCOPE | metaso-task:2107123515718922240 | fanxiang-production-loop-20261005 | fanxiang-production-loop-A-take-02 | N/A | bfa4216dfa8eb77dbd3f61a0b397c10ecb4c082b83c02ce03f1827f31a305fd7 | CANONICAL_ACTIVATION | PASS | NONE | CONCLUSION_SUPERSEDED | A2-ACTIVATION | `B/sequence-A-take-02/selection.json` |
+| B1-FETCH | metaso-task:2107140087601061888 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-take-01 | N/A | 9a1238dfdae49e5698ae508ddad4c4a426c1ab5ba3ccaaa7273ca0edd3659761 | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | `B/sequence-B-take-01/terminal.json` |
+| B1-RAW-QA | metaso-task:2107140087601061888 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-take-01 | N/A | 9a1238dfdae49e5698ae508ddad4c4a426c1ab5ba3ccaaa7273ca0edd3659761 | ANALYZER_QA | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | B1-FETCH | `B/sequence-B-take-01/diagnosis.json` |
+| B2-FETCH | metaso-task:2107141969118650368 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-take-02 | N/A | af54906e2e744ee0e79d5f7670839f99e96f607e07f7262809df1dad212706b3 | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | `B/sequence-B-take-02/terminal.json` |
+| B2-RAW-QA | metaso-task:2107141969118650368 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-take-02 | N/A | af54906e2e744ee0e79d5f7670839f99e96f607e07f7262809df1dad212706b3 | ANALYZER_QA | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | B2-FETCH | `B/sequence-B-take-02/diagnosis.json` |
+| B2-USER-AUDIO | metaso-task:2107141969118650368 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-take-02 | N/A | af54906e2e744ee0e79d5f7670839f99e96f607e07f7262809df1dad212706b3 | USER_AUDIO | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | B2-FETCH | `B/sequence-B-take-02/user-feedback.json` |
+| B3-FETCH | metaso-task:2107149534800142336 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-take-03-final | N/A | 1ceae93f8c88f1b2f002a6559e0282d6a02198a8a3a76187789450b38f5a321b | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | `B/sequence-B-take-03-final/terminal.json` |
+| B3-RAW-QA | metaso-task:2107149534800142336 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-take-03-final | N/A | 1ceae93f8c88f1b2f002a6559e0282d6a02198a8a3a76187789450b38f5a321b | ANALYZER_QA | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | B3-FETCH | `B/sequence-B-take-03-final/diagnosis.json` |
+| B3-USER-OVERALL | metaso-task:2107149534800142336 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-take-03-final | N/A | 1ceae93f8c88f1b2f002a6559e0282d6a02198a8a3a76187789450b38f5a321b | USER_OVERALL | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | B3-FETCH | `B/sequence-B-take-03-final/user-feedback.json` |

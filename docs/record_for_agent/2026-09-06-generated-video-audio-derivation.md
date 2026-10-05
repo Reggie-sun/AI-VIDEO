@@ -8,6 +8,16 @@ learning_eligibility: ineligible
 
 Date: 2026-09-06
 
+## Runtime Supersession — 2026-10-05
+
+下文 native-audio 的 settled-only、VALIDATE-only、Manifest 2.0–2.2 / Registry 2.1 与
+dialogue/narration-only 边界已由真实《反向之地》制作 blocker 的最小修复部分取代。
+commit `32cafb3` 已 push：既有 owner 支持 Manifest 2.7 / Registry 2.2、已激活的成功 source、
+known-success held reservation、non-speech identity 与 dependency transition；unknown outcome 仍拒绝。
+真实 A-02 原声已登记并 strict reopen。详见
+[Production loop record](2026-10-05-fanxiang-production-harness-loop.md#current-status)；
+旧 S01 的 hand-motion FAIL 与历史 measurements 保留，不因此升级媒体验收。
+
 ## Supersession — 2026-09-08 Human Gap Finding Received
 
 用户已对exact attempt09回复“手部出现明显变型”及间隙“看不清”。手部自然性、

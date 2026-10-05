@@ -2,6 +2,13 @@
 
 Date: 2026-08-19
 
+## Supersession Notice — 2026-10-05
+
+下方 2026-09-06 notice 的版本与 settled/VALIDATE-only 限制已由 commit `32cafb3` 的
+真实 Production blocker 修复部分取代；A-02 native audio 已实际登记。当前验证边界见
+[Production loop record](2026-10-05-fanxiang-production-harness-loop.md#current-status)。
+P4 / ResolvedTimeline / HyperFrames 的最终混音 ownership 与禁止 direct mux 的边界保持。
+
 ## Supersession Notice — 2026-09-06
 
 下文“generated-audio extraction尚未实现”已被有界[原生音轨派生入口](2026-09-06-generated-video-audio-derivation.md)部分取代：已结算、已fetch且处于VALIDATE的remote/metered语音可经committer派生PCM WAV并登记，目标限Manifest2.0–2.2/Registry2.1。临时fixture验证不等于真实Provider素材已登记。P4仍独占最终混音，visual MP4保持静音，禁止direct mux与第二timeline；本更新不恢复旧blanket native-audio默认策略。
