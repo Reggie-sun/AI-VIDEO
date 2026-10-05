@@ -34,7 +34,8 @@ def canonical_expression_fixture(tmp_path, *, exact_terminal=False, source=None,
     # separately authored text. Existing source and historical fixtures stay intact.
     intent = _complete_intent().model_copy(update={
         "open_state": seed.generation_intent.generation_intent.open_state,
-        "close_state": seed.generation_intent.generation_intent.close_state if close_hash else TypedStateReference(
+        "close_state": TypedStateReference(kind="typed_hash", state_hash=s.causal_state_column_hash(
+            s.causal_changes(), endpoint="source_close")) if close_hash else TypedStateReference(
             kind="typed_text", state_text="actors continue along the right path"),
         "pacing": Pacing(shot_duration_seconds=duration),
         "ambience_intent": AmbienceIntent(environment_bed="none", explicitly_silent=True),
@@ -378,9 +379,8 @@ def metaso_canonical_fixture(tmp_path, monkeypatch, *, target_acceptance=False):
             artifact_bytes=fixture_media.read_bytes(), scenario=e.FakeVideoScenario(status_events=(e.VideoTaskState.SUCCEEDED,)))
         scripted.resolve = provider.resolve
         template = scripted.resolve(source_request)
-        source_planning = planning(loaded, target, s.causal_changes())
-        scripted._native_prompt_text = "release completed; continue walking right; continue right; " + (
-            source_planning.generation_intent.generation_intent.open_state.state_hash)
+        source_planning = s._fresh_source_planning(loaded, target, s.causal_changes())
+        scripted._native_prompt_text = s._source_native_text(source_planning)
         prepared = prepare_generation_execution(project=loaded, provider=scripted, request=template,
             task_id="metaso-scripted-source", compiler_id="metaso-h3-video-compiler", compiler_version="1",
             planning_request=source_planning)
@@ -401,15 +401,19 @@ def metaso_canonical_fixture(tmp_path, monkeypatch, *, target_acceptance=False):
         # A new target rubric is authored in this temporary fixture. The
         # accepted source's old close-hash rubric and evidence stay immutable.
         loaded = load_production_project(tmp_path / "project.yaml")
-        duration = source["binding"].inputs.candidates[0].recipe.expressions[-1]
+        duration = source["binding"].inputs.candidates[0].recipe.expressions[-1].model_copy(update={"semantics": None})
         opening = RequirementExpression(requirement_id="opening-causal-state", level="acceptance",
             stage="raw_generation", dimension="causal_state",
             observable=s.causal_state_column_hash(s.causal_changes(), endpoint="target_open"),
             tolerance="exact", measurement="fixture exact opening", proof="human",
             intent_paths=("generation_intent.open_state.state_hash",), production_owner="test_fixture")
         current = loaded.qa_policy
+        from ai_video.production.models import GenerationEvaluationAuthority
+
         updated = seal_artifact(current.model_copy(update={"revision": current.revision + 1,
-            "content_hash": "0" * 64, "generation_acceptance": acceptance_policy((duration, opening))}))
+            "content_hash": "0" * 64, "generation_acceptance": acceptance_policy((duration, opening)),
+            "generation_evaluation_authorities": (*current.generation_evaluation_authorities,
+                GenerationEvaluationAuthority(evaluator=current.semantic_authorities[0], proof="human"))}))
         ProductionStateCommitter(tmp_path).activate_qa_policy(updated,
             expected_manifest_revision=loaded.manifest.manifest_revision, attempt_id="authored-target-qa")
     return provider, canonical_expression_fixture(tmp_path, source=source, duration=6)

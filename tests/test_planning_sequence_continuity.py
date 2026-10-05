@@ -25,14 +25,38 @@ from ai_video.production.video_requirement import (
 
 
 def _intent(changes):
+    closing = _terminal_facts()
     return GenerationIntent(
         open_state=TypedStateReference(kind="typed_hash", state_hash=causal_state_column_hash(
             changes, endpoint="target_open")),
-        close_state=TypedStateReference(kind="typed_hash", state_hash=causal_state_column_hash(
-            changes, endpoint="source_close")),
+        close_state=TypedStateReference(kind="typed_hash", state_hash=canonical_sha256(closing)),
+        close_causal_facts=closing,
         subject_action=SubjectAction(start_state="release completed", progression="continue walking right",
                                     endpoint=ActionEndpoint(state_text="continue right")),
     )
+
+
+def _fresh_source_planning(loaded, shot, changes):
+    seed = _planning(loaded, shot, changes)
+    authored = seed.generation_intent
+    facts = {c.dimension: c.source_close for c in changes}
+    intent = GenerationIntent.model_validate({**authored.generation_intent.model_dump(mode="python"),
+        "open_state": TypedStateReference(kind="typed_text", state_text="actors start releasing prop P"),
+        "close_state": TypedStateReference(kind="typed_hash", state_hash=canonical_sha256(facts)),
+        "close_causal_facts": facts})
+    authored = ProviderNeutralGenerationIntentProjection.create(**{
+        **{n: getattr(authored, n) for n in type(authored).model_fields if n != "projection_hash"},
+        "generation_intent": intent})
+    return VideoPlanningRequest.create(**{
+        **{n: getattr(seed, n) for n in type(seed).model_fields if n != "request_content_hash"},
+        "generation_intent": authored})
+
+
+def _source_native_text(authored):
+    from ai_video.production._causal_state_expression import require_current_close_facts, render_causal_facts
+
+    return authored.generation_intent.generation_intent.open_state.state_text + "; release completed; continue walking right; continue right; " + render_causal_facts(
+        require_current_close_facts(authored.generation_intent.generation_intent))
 
 
 def _planning(loaded, shot, changes, *, roles=(SemanticReferenceRole.FIRST_FRAME,), terminal=None):
@@ -99,28 +123,30 @@ def _activated_source(tmp_path, *, seal_terminal=True, close_evaluation=True, cl
 
     inputs, provider, template, original, _, _ = _runtime(tmp_path, seal_terminal_frame=seal_terminal,
         activate_second_shot=True, status_events=(VideoTaskState.SUCCEEDED,))
-    if close_evaluation:
-        from dataclasses import replace
-        from test_production_generation_decision import acceptance_policy
-        from ai_video.production.generation_recipe import RequirementExpression
-        from ai_video.production.hashing import seal_artifact
-        from ai_video.production.models import GenerationEvaluationAuthority
-        current = inputs.project.qa_policy
-        duration = original.inputs.candidates[0].recipe.expressions[0]
-        close_hash = causal_state_column_hash(causal_changes(), endpoint="source_close")
-        acceptance = acceptance_policy((RequirementExpression(requirement_id="causal-close",
-            level="acceptance", stage="raw_generation", dimension="causal_state",
-            observable=close_hash, tolerance="exact", measurement="exact close-state evaluation",
-            proof="human", intent_paths=("generation_intent.close_state.state_hash",),
-            native_text=(close_hash,), production_owner="test_fixture"), duration))
-        updated = seal_artifact(current.model_copy(update={"revision": current.revision + 1,
-            "content_hash": "0" * 64, "generation_acceptance": acceptance,
-            "generation_evaluation_authorities": (*current.generation_evaluation_authorities,
-                GenerationEvaluationAuthority(evaluator=current.semantic_authorities[0], proof="human"))}))
-        ProductionStateCommitter(tmp_path).activate_qa_policy(updated,
-            expected_manifest_revision=inputs.project.manifest.manifest_revision,
-            attempt_id="sequence-causal-qa")
-        inputs = replace(inputs, project=load_production_project(tmp_path / "project.yaml"))
+    from dataclasses import replace
+    from test_requirement_semantics import semantic_rule, marked_policy
+    from ai_video.production.hashing import seal_artifact
+    from ai_video.production.models import GenerationEvaluationAuthority
+    current = inputs.project.qa_policy
+    duration = original.inputs.candidates[0].recipe.expressions[0]
+    duration_rule = semantic_rule("duration")
+    duration_rule.update(observable=duration.observable, tolerance=duration.tolerance,
+        dimension=duration.dimension, measurement="Scripted fixture duration observation",
+        intent_paths=list(duration.intent_paths))
+    close_hash = causal_state_column_hash(causal_changes(), endpoint="source_close")
+    close_rule = semantic_rule("causal-close")
+    close_rule.update(dimension="causal_state", observable=close_hash, tolerance="exact",
+        measurement="Inspect the explicitly authored fixture terminal column",
+        intent_paths=["generation_intent.close_state.state_hash"])
+    acceptance = marked_policy([close_rule, duration_rule] if close_evaluation else [duration_rule])
+    updated = seal_artifact(current.model_copy(update={"revision": current.revision + 1,
+        "content_hash": "0" * 64, "generation_acceptance": acceptance,
+        "generation_evaluation_authorities": (*current.generation_evaluation_authorities,
+            GenerationEvaluationAuthority(evaluator=current.semantic_authorities[0], proof="analyzer"))}))
+    ProductionStateCommitter(tmp_path).activate_qa_policy(updated,
+        expected_manifest_revision=inputs.project.manifest.manifest_revision,
+        attempt_id="sequence-causal-qa")
+    inputs = replace(inputs, project=load_production_project(tmp_path / "project.yaml"))
     from ai_video.production.video import VideoProviderCapabilities
     from ai_video.production._video_capability_fingerprint import capability_variant_fingerprint
     from ai_video.production.shot_router import ProviderRouteIdentity
@@ -132,13 +158,12 @@ def _activated_source(tmp_path, *, seal_terminal=True, close_evaluation=True, cl
     source_route = ProviderRouteIdentity.create(**{**route.model_dump(mode="python", exclude={"route_identity_hash"}),
         "capability_fingerprint": capability_variant_fingerprint(variant)})
     stack = _execution_stack_identity(source_route)
-    authored = _planning(inputs.project, inputs.project.shots[0], causal_changes())
-    provider._native_prompt_text = "release completed; continue walking right; continue right; " + (
-        authored.generation_intent.generation_intent.open_state.state_hash)
+    authored = _fresh_source_planning(inputs.project, inputs.project.shots[0], causal_changes())
+    provider._native_prompt_text = _source_native_text(authored)
     prepared = prepare_generation_execution(project=inputs.project, provider=provider, request=template,
         task_id="sequence-source", compiler_id=provider._compiler_id, compiler_version="1",
         planning_request=authored, execution_stack_hash=stack.execution_stack_hash,
-        use_current_generation_acceptance=close_evaluation)
+        use_current_generation_acceptance=True)
     preview = _paid_preview(prepared.resolved, attempt_id=ATTEMPT_ID, video_preview=provider.preview(prepared.resolved))
     authorization = _paid_authorization(preview)
     committer = ProductionStateCommitter(tmp_path, video_candidate_preparer=make_p8_video_candidate_preparer(inputs),
@@ -152,21 +177,31 @@ def _activated_source(tmp_path, *, seal_terminal=True, close_evaluation=True, cl
     service.fetch_and_activate(attempt_id=ATTEMPT_ID)
     loaded = load_production_project(tmp_path / "project.yaml")
     candidate = prepared.binding.inputs.candidates[0]
-    evaluations = [
-        GenerationEvaluationSource(request_hash=prepared.resolved.request_input_hash,
-            artifact_sha256=hashlib.sha256(FIXTURE.read_bytes()).hexdigest(),
-            rubric_hash=candidate.recipe.rubric_hash, qa_policy_content_hash=loaded.qa_policy.content_hash,
-            evaluator=loaded.qa_policy.semantic_authorities[0], proof="technical",
-            observations=(GenerationObservation(requirement_id="duration", verdict="PASS",
-                observation="offline fixture duration PASS; no live semantic qualification"),))]
-    if close_evaluation and close_verdict is not None:
-        evaluations.append(GenerationEvaluationSource(request_hash=prepared.resolved.request_input_hash,
-            artifact_sha256=hashlib.sha256(FIXTURE.read_bytes()).hexdigest(),
-            rubric_hash=candidate.recipe.rubric_hash, qa_policy_content_hash=loaded.qa_policy.content_hash,
-            evaluator=loaded.qa_policy.semantic_authorities[0], proof="human",
-            observations=(GenerationObservation(requirement_id="causal-close", verdict=close_verdict,
-                observation="scripted close-column verdict; no real human or media qualification"),)))
-    record_attempt_evaluation(committer=committer, attempt_id=ATTEMPT_ID, evaluation_sources=tuple(evaluations))
+    import asyncio
+    from ai_video.production.generation_evaluation_criteria import evaluation_items
+    from ai_video_mcp.generation_feedback import ControlledPresentationVerifier, GenerationReviewInput
+    items = evaluation_items(acceptance=candidate.recipe.acceptance_policy,
+        qa_policy_content_hash=loaded.qa_policy.content_hash, request_hash=prepared.resolved.request_input_hash,
+        artifact_sha256=hashlib.sha256(FIXTURE.read_bytes()).hexdigest(), size_bytes=len(FIXTURE.read_bytes()),
+        requirement=prepared.binding.projection.requirement)
+    def scripted_evaluation(presented):
+        return (GenerationEvaluationSource(schema_version="generation-evaluation/2",
+            request_hash=prepared.resolved.request_input_hash, artifact_sha256=items[0].artifact_sha256,
+            size_bytes=items[0].size_bytes, rubric_hash=candidate.recipe.rubric_hash,
+            qa_policy_content_hash=loaded.qa_policy.content_hash, qa_policy_snapshot=loaded.qa_policy,
+            evaluator=loaded.qa_policy.semantic_authorities[0], proof="analyzer",
+            observations=tuple(GenerationObservation(requirement_id=item.requirement_id,
+                verdict="PASS" if item.requirement_id == "duration" else close_verdict,
+                observation="scripted fixture observation; no real media qualification",
+                evaluation_item_hash=item.evaluation_item_hash, question_text=item.question_text,
+                presentation_ref=presented.presentation_ref, answer_ref=presented.answer_ref)
+                for item in presented.evaluation_items if item.requirement_id != "causal-close" or close_verdict is not None)),)
+    verified = asyncio.run(ControlledPresentationVerifier(evaluator=loaded.qa_policy.semantic_authorities[0],
+        proof="analyzer", adjudicate=scripted_evaluation).present_and_verify(review_input=GenerationReviewInput(
+            prepared.resolved, prepared.binding.projection, candidate.recipe, loaded.qa_policy, None, items),
+            attempt_id=ATTEMPT_ID))
+    record_attempt_evaluation(committer=committer, attempt_id=ATTEMPT_ID, evaluation_sources=verified.sources,
+        presentation_proof=verified.recording_proof)
     loaded = load_production_project(tmp_path / "project.yaml")
     from ai_video.production._video_project_reader import load_terminal_frame_evidence
     state = next(a.video_generation_state for a in loaded.manifest.attempts if a.attempt_id == ATTEMPT_ID)
@@ -505,8 +540,8 @@ def test_soft_only_metaso_full_is_still_blocked():
     assert RouterReasonCode.CONTINUITY_FRAME_CONDITIONING_REQUIRED in result.decision.reason_codes
 
 
-def causal_changes():
-    values = {
+def _terminal_facts():
+    return {
         CausalDimension.CHARACTER_PRESENCE: "actor-a and actor-b present",
         CausalDimension.PROP_IDENTITY: "prop-P detached",
         CausalDimension.PROP_HOLDER: "ground; no holder",
@@ -518,6 +553,10 @@ def causal_changes():
         CausalDimension.SCREEN_MOTION_AXIS: "right",
         CausalDimension.AUDIO_BRIDGE: "continuous footsteps",
     }
+
+
+def causal_changes():
+    values = _terminal_facts()
     return tuple(CausalStateChange(
         dimension=dimension, source_close=values[dimension], target_open=values[dimension],
         transition_mode=CausalTransitionMode.CARRY,
@@ -536,10 +575,15 @@ def test_missing_causal_dimension_cannot_be_hashed_as_complete_truth():
         causal_state_column_hash(causal_changes()[:-1], endpoint="source_close")
 
 
-def test_full_edge_cannot_accept_technical_only_source(tmp_path):
-    source = _activated_source(tmp_path, close_evaluation=False)
-    with pytest.raises(AiVideoError, match="authoring evidence"):
-        build_sequence_video_planning_request(**_edge_inputs(source))
+def test_full_edge_cannot_accept_technical_only_source(tmp_path, monkeypatch):
+    from ai_video.production.video_generation import VideoGenerationService
+
+    monkeypatch.setattr(VideoGenerationService, "submit_once",
+        lambda *_args, **_kwargs: pytest.fail("missing close QA reached submit"))
+    # Complete authored closing is rejected earlier than sequence admission
+    # when the selected source recipe omits its semantic acceptance criterion.
+    with pytest.raises(ValueError, match="selected semantic close-state QA rule"):
+        _activated_source(tmp_path, close_evaluation=False)
 
 
 @pytest.mark.parametrize("verdict", [None, "FAIL", "NOT_EVALUATED"])
@@ -611,7 +655,7 @@ def test_legacy_pointer_omission_cannot_authorize_new_production(tmp_path, monke
     from ai_video.production.generation_feedback import GenerationFeedbackOrchestrator, RegisteredGenerationTarget
     from ai_video.production.state_commit import ProductionStateCommitter
     from test_production_shot_router import _policy
-    source = _activated_source(tmp_path, close_evaluation=False)
+    source = _activated_source(tmp_path)
     inputs = _edge_inputs(source, boundary=BoundaryKind.WITHIN_CONTINUOUS_TAKE, roles=())
     seed, lifecycle, loaded = inputs["current_request"], inputs["lifecycle"], source["loaded"]
     policy = ContinuityTransitionPolicy.create(schema_version="2", policy_id="legacy-omission",

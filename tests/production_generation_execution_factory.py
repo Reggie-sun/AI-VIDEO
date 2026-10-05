@@ -109,6 +109,8 @@ class NativeFixtureVideoProvider(ScriptedFakeVideoProvider):
 
     def compile_request(self, provider_bound, requirement):
         prompt_text = self._native_prompt_text
+        controls = (("generation_intent.close_state.state_hash", "generation_intent.close_causal_facts")
+            if requirement.generation_intent.close_causal_facts is not None else ())
         return compile_provider_video_request(
             provider_bound=provider_bound,
             requirement=requirement,
@@ -119,6 +121,7 @@ class NativeFixtureVideoProvider(ScriptedFakeVideoProvider):
                 grammar_contract=f"{self._compiler_id}-v1",
                 prompt_text=prompt_text,
                 prompt_sha256=hashlib.sha256(prompt_text.encode("utf-8")).hexdigest(),
+                expressed_control_paths=controls,
             ),
         )
 

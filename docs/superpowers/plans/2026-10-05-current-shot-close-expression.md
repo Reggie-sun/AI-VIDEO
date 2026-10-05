@@ -23,9 +23,10 @@ Acceptance：schema/requirement负例、hash congruence、wrong Shot/stale bindi
 
 ### Milestone 2: Native Expression
 
-Files：`_remote_video_native_prompt.py`、`_h3_prompt.py`、`video_compiler.py`，以及四个local H3 consumers。
+Files：`_remote_video_native_prompt.py`、`_h3_prompt.py`、`video_compiler.py`、`generation_recipe.py`，以及四个local H3 consumers。
 remote closing 从 sealed requirement独立获取；local arbitrary hashes拒绝，verified opening使用existing owner，
 closing复用同一leaf；exact compiler按grammar重新验证，不由adapter拼truth。
+seal不作为lexical prose obligation；所有current close仍须独立preimage，caller声明opening coverage亦须owner evidence。
 Acceptance：endpoint authority separation/equal digest、remote regression、local与text goldens。
 
 ### Milestone 3: QA Preimage And Offline Bootstrap
@@ -36,6 +37,7 @@ Files：`generation_evaluation_criteria.py`、`generation_evaluation.py`、`gene
 QA facts从execution projection派生并bound到question/item；完整recipe规则保留close hash，
 fresh事实要求marked evaluator问题，不接受hash-only的PASS。
 Tests：new `tests/test_current_shot_close_expression.py`，复用existing standard project/runtime factory。
+旧sequence source factory同步迁移到explicit close authoring与controlled semantic presentation，保留历史records。
 Acceptance：fresh Planner/Router/selected METASO compiler/exact pre-submit 0 effects；
 scripted fetched result → controlled analyzer PASS → activation/terminal → accepted_source，
 明确为offline lifecycle evidence；缺失/过期preimage与question均阻断。
@@ -45,7 +47,7 @@ scripted fetched result → controlled analyzer PASS → activation/terminal →
 更新contract matrix/runtime baseline；focused tests与Architecture Gate后对owned commit range运行Harness，
 核验receipt scope/policy/artifact hashes。Parent self-review与Implementation Risk Gate绑定stable candidate。
 按record-ai-video-session记录并评估learning；只commit/push owned paths，不夹带existing staged Harness changes。
-若review所需外部route违背当前0 effects约束，明确边界并使用只读native工程review。
+若required review route违背禁止项且无已授权alternative，保持review blocked；普通mapping不替代required review。
 
 ## Self Review
 

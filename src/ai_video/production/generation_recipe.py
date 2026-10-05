@@ -174,7 +174,9 @@ def _unexpressed_authored_text(requirement, prompt, control_paths):
             return
         if isinstance(node, dict):
             for key, value in node.items():
-                if key.endswith(("_id", "_ids")) or key == "kind":
+                if key.endswith(("_id", "_ids")) or key in {"kind", "state_hash"}:
+                    # Seals are checked by the endpoint/compiler owner, never
+                    # required as lexical prose or inferred semantic coverage.
                     continue
                 visit(value, default.get(key) if isinstance(default, dict) else None, f"{path}.{key}")
         elif isinstance(node, (tuple, list)):

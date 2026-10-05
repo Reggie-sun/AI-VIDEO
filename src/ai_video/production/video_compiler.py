@@ -378,14 +378,35 @@ def compile_provider_video_request(
 
     hash_endpoints = tuple(endpoint for endpoint in ("open_state", "close_state")
         if getattr(requirement.generation_intent, endpoint).kind.value == "typed_hash")
-    if native_prompt is None and requirement.generation_intent.subject_action.endpoint.state_hash is not None:
+    if native_prompt is not None and any(getattr(requirement.generation_intent, endpoint).state_hash
+            in native_prompt.prompt_text for endpoint in hash_endpoints):
+        return _unsupported(provider_bound, requirement,
+            ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+            tuple(f"generation_intent.{endpoint}" for endpoint in hash_endpoints))
+    expressed_hash_endpoints = tuple(endpoint for endpoint in hash_endpoints
+        if endpoint == "close_state" or native_prompt is not None
+        and f"generation_intent.{endpoint}.state_hash" in native_prompt.expressed_control_paths)
+    if expressed_hash_endpoints:
+        from ai_video.production._causal_state_expression import causal_endpoint_text
+
+        try:
+            for endpoint in expressed_hash_endpoints:
+                facts_text = causal_endpoint_text(requirement, provider_bound, endpoint=endpoint,
+                    opening_expression=continuity_expression)
+                if native_prompt is None or facts_text not in native_prompt.prompt_text:
+                    raise ValueError("native endpoint is not its authoritative causal column")
+        except (AttributeError, TypeError, ValueError):
+            return _unsupported(provider_bound, requirement,
+                ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+                tuple(f"generation_intent.{endpoint}" for endpoint in expressed_hash_endpoints))
+    if requirement.generation_intent.subject_action.endpoint.state_hash is not None:
         return _unsupported(provider_bound, requirement,
             ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
             ("generation_intent.subject_action.endpoint",))
     if hash_endpoints and (native_prompt is None
             or requirement.contract_version == "provider-neutral-video-requirement/4"
-            or native_prompt is not None and any(f"generation_intent.{endpoint}.state_hash"
-                in native_prompt.expressed_control_paths for endpoint in hash_endpoints)):
+            or native_prompt is not None and native_prompt.grammar_contract
+                in {"remote-video-prose-v1", "h3-three-field-v1"}):
         # A claimed seal path is not coverage by itself. Reopen the same
         # owner-issued expression even for callers bypassing an adapter.
         from ai_video.production._remote_video_native_prompt import compile_remote_video_prompt

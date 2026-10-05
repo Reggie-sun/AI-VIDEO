@@ -40,6 +40,10 @@ fresh source 需要 existing marked QA / controlled analyzer presentation，huma
 复用 Planner → Readiness → Router → selected compiler → exact pre-submit，selection/authority 不变。
 local consumers 共用 shared endpoint seam；unsupported 不降级 legacy prompt。
 compiler boundary 重编 exact native grammar，防止 forged hash control-path coverage。
+current-close preimage guard 同时覆盖 legacy custom-native `/1`；已知 endpoint digest 出现在
+native prompt 即拒绝。历史 `/1` 未声称表达的 opening seal 不获得 semantic coverage。
+scripted source fixture 改为独立 textual opening、authored hash-bound close 与 controlled analyzer 问题，
+不再借 fake grammar 放入 digest 或借旧 hash-only human PASS 构造新 source。
 无facts历史 TYPED_TEXT goldens、public lifecycle/Manifest schema/StateCommitter ownership 不变。
 
 ## Acceptance And Verification

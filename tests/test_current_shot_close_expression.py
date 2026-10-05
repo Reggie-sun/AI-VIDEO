@@ -302,6 +302,41 @@ def test_native_compiler_rejects_forged_close_control_paths(tmp_path, monkeypatc
     assert result.reason.value == "PROMPT_EXPRESSION_UNSUPPORTED"
 
 
+@pytest.mark.parametrize("endpoint", ["open_state", "close_state", "action_endpoint"])
+def test_legacy_native_grammar_cannot_bypass_causal_endpoint_authority(tmp_path, monkeypatch, endpoint):
+    import hashlib
+    from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
+    from ai_video.production.shot_router import ProviderBoundVideoRequest
+    from ai_video.production.video_compiler import compile_provider_video_request, ProviderNativePrompt
+
+    f = fresh_fixture(tmp_path, monkeypatch)
+    requirement = f["requirement"]
+    state = requirement.generation_intent.close_state
+    if endpoint == "action_endpoint":
+        from ai_video.production.video_requirement import SubjectAction, ActionEndpoint
+
+        intent = GenerationIntent(subject_action=SubjectAction(endpoint=ActionEndpoint(state_hash=state.state_hash)))
+    else:
+        intent = GenerationIntent(**{endpoint: state})
+    requirement = ProviderNeutralVideoRequirement.create(**{
+        **requirement.model_dump(mode="python", exclude={"requirement_id", "requirement_hash"}),
+        "contract_version": "provider-neutral-video-requirement/1", "generation_intent": intent,
+        "conditioning_compatibility": None})
+    bound = ProviderBoundVideoRequest.create(**{
+        **{name: getattr(f["provider_bound"], name) for name in ProviderBoundVideoRequest.model_fields
+            if name != "provider_bound_request_hash"},
+        "requirement_hash": requirement.requirement_hash, "generation_recipe": None})
+    for text in ("Generate a Shot.", "Causal state: " + state.state_hash):
+        result = compile_provider_video_request(provider_bound=bound, requirement=requirement,
+            compiler_id=bound.compiler_contract.compiler_id, compiler_version=bound.compiler_contract.compiler_version,
+            capabilities=f["provider"].capabilities(), native_prompt=ProviderNativePrompt(
+                grammar_contract="legacy-fixture/1", prompt_text=text,
+                prompt_sha256=hashlib.sha256(text.encode()).hexdigest(),
+                expressed_control_paths=(f"generation_intent.{endpoint}.state_hash",)))
+        assert result.outcome == "unsupported"
+        assert result.reason.value == "PROMPT_EXPRESSION_UNSUPPORTED"
+
+
 def test_offline_fresh_source_raw_pass_activation_terminal_and_reopen(tmp_path, monkeypatch):
     import asyncio
     import hashlib

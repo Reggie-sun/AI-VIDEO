@@ -10,7 +10,7 @@ existing staged Harness granularity paths 属于其他任务，保留且不纳�
 **Case C**。`production/video_requirement.py::GenerationIntent.close_state` 是独立 typed seal；
 `ProviderNeutralGenerationIntentProjection.create` 封存 author 提供的 intent，
 `planning/_planner_models.py::VideoPlanningRequest.generation_intent` 消费该 projection，
-`planning/video_planner.py::_typed_requirement` 透传至 requirement。Planner 不创作终态。
+`planning/video_planner.py::_build_generation_requirement` 透传至 requirement。Planner 不创作终态。
 canonical creative owner 是 approved Shot/context 的 author，durable input owner 仍是 `GenerationIntent`。
 
 `SubjectAction.endpoint`、`PerformanceIntent.terminal_performance_state`、`SpaceContinuity.exit_state`、

@@ -31,6 +31,11 @@ remote/local native grammar共用endpoint验证与fact renderer；不共享整�
 local H3、T8 Quality/Turbo/Native/Long不再使用state_hash作为semantic prose；无verified preimage拒绝。
 complete close在exact requirement/Shot/bound request重验后表达，不能用opening授权closing，等digest仍拒绝。
 compiler重编claimed hash coverage，persisted recipe与QA seal保留；只从verified临时lexical view移除digest。
+Parent审查补充公共compiler的legacy custom-native `/1`边界：current close仍须完整preimage与
+native完整column，任何已知endpoint digest进入native prompt都拒绝。旧`/1`未声称表达的
+opening seal不取得semantic coverage；真实remote/local grammar仍须owner-issued opening。
+离线sequence source factory改为独立text opening、explicit close facts、marked controlled analyzer QA；
+不改已存在S02/S03或历史媒体/判定。old fake source hash-as-prose不再作为新fixture的构造方式。
 QA selected raw semantic rule仍引用exact close hash；controlled question从同一execution requirement
 派生complete facts并绑定requirement/Shot/request/media。source/experience/diagnosis重开同一问题。
 
@@ -38,11 +43,19 @@ QA selected raw semantic rule仍引用exact close hash；controlled question从�
 
 Red tests复现authoring字段缺失及local任意hash仍compiled。focused text/local adapter/evaluator suites：203 PASS。
 existing remote opening regressions：26 PASS。local selected T8 Native I2VA新增hash-bound close compile：2 PASS。
+最终close + opening suite：56 PASS（30 close、26 opening）；final compiler/recipe boundary suite：107 PASS。
+local/provider-neutral/schema/evaluator boundary checkpoint：232 PASS。
+较广generation/sequence/evaluation组合运行：234 PASS、2个旧fixture前置条件FAIL；
+缺close QA现在submit前拒绝，activation-pointer负例改用满足当前QA的source，修正后的两个targeted reruns：2 PASS。
+这些旧测试失败日志没有改写；没有把任何历史media FAIL改PASS。
+Architecture Gate：0 errors、28 existing warnings、16 info；`agent_rules_gate.py`与`git diff --check` PASS。
 fresh no-previous-edge fixture经Planner/Router/selected METASO compiler/exact pre-submit保持REQUEST、0真实effects。
 offline scripted backend提供fixture MP4；controlled analyzer收到完整facts，scripted PASS经existing
 committer记录，随后validate/activate/terminal extraction，accepted_sequence_source(require_causal_close=True)重开成功。
 新QA负例覆盖hash-only、stale、missing与wrong Shot问题；它们不是实际媒体观察。
 exact最终snapshot的Harness scope/result由`.agent/harness/runs/`内receipt独占，最终交付引用实际receipt。
+初始code checkpoint `0331b0a` 的exact range Harness在policy audit停止：两个旧opening paths与
+本任务新leaf/test未映射。用户选择由原policy owner补充并提交；本任务不修改或提交其staged paths。
 
 ## Review And Tool Boundaries
 
@@ -53,6 +66,8 @@ Agent Memory检索exit 3，按Skill未重试/前台重建；AOCI维护返回`sto
 existing managed scope包含非本任务stale/pending对象且未发可写candidate；未越界治理，索引仍不aligned。
 record-ai-video-session主动评估为record；distill-ai-video-learning评估为no_candidate：
 本次是一个implementation/fixture链，缺少独立真实实验，不创建learning/adoption artifact。
+Parent完成owned diff与关键claim检查；Implementation Risk Gate final decision等待required Harness成功，
+没有用mapping调查、tests PASS或scripted QA替代该completion prerequisite。
 
 ## Remaining Boundary
 
@@ -61,3 +76,5 @@ actual exact-media analyzer/human verdict与existing activation/terminal proof�
 原有未实现边界保持阻断；本slice可用controlled analyzer，不伪造human PASS。
 没有运行真实fresh source或H3 A/B，也未核对当前两臂live输入与授权，不能宣称fresh accepted source为唯一前置。
 旧FAIL/NOT_EVALUATED与S02/S03保留。
+当前为engineering candidate，completion被exact Harness policy映射ownership阻断；
+不将本地commit称为通过completion gate的远端交付。
