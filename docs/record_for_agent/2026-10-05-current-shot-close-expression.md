@@ -8,6 +8,18 @@ learning_eligibility: ineligible
 
 Date: 2026-10-05
 
+## Closure Notice — 2026-10-05
+
+原 unmapped-path blocker 已由 `93240b4` 与 `d20c50f` 收尾并 push 到远端 `main`。
+exact unpublished range 的 fresh Harness 为
+`.agent/harness/runs/close-state-production-closure-20261005-002/receipt.json`：20 PASS、2 同 run coverage。
+receipt freshness、scope/policy/artifact integrity 与 workspace stability 已核验。
+三项 predecessor guard fixture 的缺失 projection 已补齐，未削弱 runtime admission。
+详细收尾和历史边界见 [Harness record](2026-10-05-harness-policy-granularity.md#closure-notice--2026-10-05)。
+以下 blocked receipts、离线 scripted PASS 和禁止 live 的历史 scope 保留；它们不表示当前 publication
+仍 blocked，也不构成真实 accepted source。后续已进入用户授权的 Fanxiang production loop，
+真实媒体、QA 与 selection 将由该 run 独立留证，不再以通用 continuity 扩建作为下一主线。
+
 ## Purpose And Baseline
 
 解决source-bootstrap authoring/preimage缺口与local H3 hash-as-text。初始fetch确认

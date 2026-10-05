@@ -8,6 +8,25 @@ learning_eligibility: ineligible
 
 Date: 2026-10-05
 
+## Closure Notice — 2026-10-05
+
+下方 commit/push blocked 状态已被本次真实收尾取代；旧 snapshot、receipt 与失败历史保留。
+`93240b4` 提交原七个 staged paths，并补齐 closing helper/test 的 category 映射和两组真实 pytest argv。
+policy audit 对 869 candidate paths 无 unmapped/unreferenced/unverified paths。
+新 range 回归发现 predecessor guard 的三个旧 stub 缺少当前 requirement projection；
+`d20c50f` 仅补齐 stub，24 个 guard tests PASS，没有回退 runtime 的 exact requirement 检查。
+
+exact range：`d607726643a25bcbaadd3debaa0ec7ef36337201` →
+`d20c50fef55d78284325bc6716981c5aea2802c9`。
+fresh receipt：`.agent/harness/runs/close-state-production-closure-20261005-002/receipt.json`，
+20 checks PASS、2 checks 由同 run 实际 passing suites 完整覆盖；freshness、scope、policy、artifact
+integrity、workspace stability/cleanup 全部核验通过。第一轮的三个 fixture FAIL receipt 原样保留。
+2026-10-05 push 后远端 `main` 精确确认上述 HEAD，包含五个未发布 commits。
+Parent Risk Gate 为 `KIMI_REVIEW_NOT_REQUIRED`：映射和测试数据修正不引入 critical credential、
+authority 或 durable-state 后果；exact-range verification 后无剩余重大语义缺口。
+本次收尾不构成媒体验收，也没有修改旧 full-suite memory calibration FAIL 或刷新 baseline。
+automatic learning evaluation：`no_candidate`，这是 engineering closure，不提供新的独立媒体实验。
+
 ## Current Snapshot Notice
 
 最终核验时，并发 owner 已将 review 规则同步提交为
