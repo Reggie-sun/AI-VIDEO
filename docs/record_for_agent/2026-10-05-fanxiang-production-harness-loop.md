@@ -11,7 +11,69 @@ Date: 2026-10-05
 
 ## Current Status
 
-### Supersession — Five Actual Takes And Canvas Diagnosis
+### Supersession — Sixth Actual Take And Motion Guidance Failure
+
+2026-10-06 Hong Kong / 2026-10-05 UTC，用户“继续”后实际执行了一个有界 B-04-motion candidate。
+本段取代下方“五次 submit”“没有第六次 POST”与仅分析的停点；下方 chronology 保留为历史。
+当前 physical submits 为六：A 两次、B 四次，全部 known succeeded/fetched；没有 unknown outcome。
+本轮没有改 Product source、通用 continuity architecture、schema、contract、spec 或 plan。
+
+- 沿用 METASO `MiniMax-H3`、七张参考图的 exact bytes/order、原九分镜、台词、无配乐要求与七项
+  required QA。把 room / door 的冲突数字明确改成 `Image 6` / `Image 3`，并以原画布实际 V37
+  的派生视频作为 `Video 1` 动作/表演参考，替换近黑的原 2 秒 video reference。
+  这是一条改变输入策略的 production retake，不能称原画布 exact replay。
+- V37 原片 SHA `65cb5e6889b3824725bdaab64f2397e7b20ac39eafb6974c30c6e48b4c9518ef`。
+  实际提交的 guide SHA `9b9c7d8958e6d93d9b792392fed11acfe41002a6f780a720386cc3fab6bf1194`，
+  6,904,359 bytes、1280×720、24 fps、359 frames、format duration 14.959 秒。
+  ffmpeg 转码并裁去末尾约 114 ms，保留原声与可见空破口，未声称 decoded frames / audio bytes
+  不变；最先得到的 15.001 秒 derivative 未提交。guide 经 Registry 登记为 DERIVED，
+  不是 accepted predecessor，不能证明 A-02→B 的连续性。
+- 有界 Kimi read-only input audit invocation `83449d5c-0a4f-4584-8826-55d416b358e6` 为 PARSED。
+  Parent 确认其双重 timing authority finding：参考片实际剪点与原文时间不同。
+  因此在 POST 前明确“原分镜时间/顺序为主，Video 1 仅指导动作、表演、受力反馈”。
+  旧 sealed snapshot 留存；修订后的 bytes 为 Parent verified，未伪称 Kimi 审过新 bytes。
+  receipt/report/adjudication 分别位于 `B/sequence-B-take-04-motion/input-review-*.json`；
+  subagent input audit 不是媒体 QA 或 acceptance。
+- sealed prompt 为 5792 characters；native body SHA
+  `3c442f5d32013bdd16a90046d34253b2c22f51c77b288b3ab9c138add62870de`。
+  `input-fidelity-audit.json` 与 `reference-slot-map.json` 核验七图、一视频和 aliases；
+  comparison 明确申报 `adapter_compiler_hash`、`adapter_compiler_id`、`media_bindings`、`prompt_text`
+  四个变化，seed 未受控。前期 compiler delta 未申报时 LINEAGE_MISMATCH 在 POST 前阻断，
+  修正申报后才继续；没有以普通 resample 隐藏 input delta。
+- 本轮仅一次实际 POST，task `2107157729280548864`。raw MP4 SHA
+  `d443b4413b649a0f477283fd0a94e913885cddef50f3e218ec84d38b9565780f`，4,422,314 bytes，
+  H.264、1344×768、24 fps、362 frames、15.083 秒，AAC stereo / 32 kHz。
+  submit→fetch 103.246 秒；success/fetch 不构成选 take。
+- explicit project-local `video-analysis` MCP 的 31 frames、exact-hash 1×静音播放到 ended
+  （wall 15.4396 秒、62 captures）及 native frame 击打段复查后：action / camera **FAIL**；
+  identity / space / visible close PASS；opening / sound NOT_EVALUATED。
+  实际 8 秒破窗后约 9.2 秒冲向黑衣小龙，原要求的袭向黄衣潘子没有成立。
+  10.65–10.9 秒可读到键盘接触面侧及头部偏转，随后抽回，是局部改善；
+  但反击比原 12–14 秒提前，12.5 秒已持续空窗，完整九分镜节奏仍失败。
+  全片左上角出现“AI生成”标记，违反 prompt 的无水印要求；guide 本身含此标记，
+  复制来源为合理推断，未隔离其因果。正常速度播放明确 muted，不能宣称听取了新原声。
+- canonical experience hash `fd2fc1d3243894d9e1ba4d68d39f59e1810321f98e2eae5633ed9f1b30708014`；
+  `diagnosis.json` 保留 QUALITY_FAILURE / EVIDENCE_GAP。视觉失败不能靠同 bytes 补听音修复，
+  经 `ProductionStateCommitter.abandon_video_generation` 明确弃用，strict reopen 为 FAILED，
+  Manifest revision 157。未激活、不供下一段使用、不要求用户再次筛查这条明显失败候选。
+- 有界 submit count 5→6，已消费五次历史保留，仅新增一次；旧/新 monetary ceiling
+  10,000,000→12,000,000 microCNY 是 operator upper bound，不是实际账单。
+  旧 reservations 保留，`actual_cost=null`；无伪造 SETTLED、无 permit reuse 或 consumption reset。
+
+本轮停点是已知失败的 production candidate，不是新的架构 blocker。完整事件链已经尝试原文恢复与
+实际动作视频指导，后者局部改善击打却丢失正确攻击对象、节奏并新增水印；证据不支持再照同配置重抽。
+下一次制作应在原第六/第七分镜之间拆成两个相互承接的 generation sequences：前段保留沉思、
+三人抬头、破窗及袭潘子，后段保留抓键盘、重击、吃痛缩回；保留完整事件与实际状态承接，
+不是一镜头一 request。后段只能在前段 exact required QA 通过后 submit；若时间需 trim，仍由
+现有 ResolvedTimeline / HyperFrames 所有者负责。此处是制作策略判断，尚未执行新的 split requests。
+
+close-state 与此前 source blocker 修复仍已 push；composition 的 content_driven duration blocker
+未变化，没有 20–40 秒 final MP4 或 Final Acceptance。调用、fetch、byte audit、MCP 抽帧及 QA
+persistence 已有 task-local 自动化，动作/表演判断、策略选择、音频验收与最终剪接仍需裁决。
+自动 learning evaluation 为 `no_candidate`：本轮是多个变量变化、uncontrolled seed 的 dependent
+retake，不由它建立“MiniMax 普遍不能复现”或“视频参考必然有效”的通用规则；没有 adoption。
+
+### Historical Checkpoint — Five Actual Takes And Canvas Diagnosis
 
 以下状态取代下文的“B 尚未 submit”“A 尚未激活”和旧账单等待动作；原始 chronology 与失败证据保留。
 本 checkpoint 完成于 2026-10-06 Hong Kong / 2026-10-05 UTC。用户当前要求先分析为什么画布迁移失败，
@@ -238,3 +300,5 @@ non-Q0 identity 绑定 actual METASO task、同一 Production attempt、request 
 | B3-FETCH | metaso-task:2107149534800142336 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-take-03-final | N/A | 1ceae93f8c88f1b2f002a6559e0282d6a02198a8a3a76187789450b38f5a321b | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | `B/sequence-B-take-03-final/terminal.json` |
 | B3-RAW-QA | metaso-task:2107149534800142336 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-take-03-final | N/A | 1ceae93f8c88f1b2f002a6559e0282d6a02198a8a3a76187789450b38f5a321b | ANALYZER_QA | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | B3-FETCH | `B/sequence-B-take-03-final/diagnosis.json` |
 | B3-USER-OVERALL | metaso-task:2107149534800142336 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-take-03-final | N/A | 1ceae93f8c88f1b2f002a6559e0282d6a02198a8a3a76187789450b38f5a321b | USER_OVERALL | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | B3-FETCH | `B/sequence-B-take-03-final/user-feedback.json` |
+| B4-FETCH | metaso-task:2107157729280548864 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-take-04-motion | N/A | d443b4413b649a0f477283fd0a94e913885cddef50f3e218ec84d38b9565780f | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | `B/sequence-B-take-04-motion/terminal.json` |
+| B4-RAW-QA | metaso-task:2107157729280548864 | fanxiang-production-loop-20261005 | fanxiang-production-loop-B-take-04-motion | N/A | d443b4413b649a0f477283fd0a94e913885cddef50f3e218ec84d38b9565780f | ANALYZER_QA | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | B4-FETCH | `B/sequence-B-take-04-motion/diagnosis.json` |
