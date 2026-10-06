@@ -11,6 +11,9 @@ Date: 2026-10-06
 
 ## Current Status — User Rejection Supersedes Prior Pass
 
+最新[短动作参考准备](2026-10-06-fanxiang-short-motion-reference-preflight.md)已从画布V37取出2s动作窗，
+拟用1视频+4图片，取代下节旧三视频/人工接触示范提议。已知源挥击方向、切景与水印风险仍在；没有新生成/混音或整片验收。
+
 ### User Decision — Omitted Contact Rejected And Voice Needs Reperformance
 
 用户明确审片决定：**不接受动作省略，保留明确命中的原要求**；“兄弟们”声音太正气，不符合形象，需调整。
