@@ -11,7 +11,62 @@ Date: 2026-10-06
 
 ## Current Status — User Rejection Supersedes Prior Pass
 
-### Latest Revision — Restore Native Trigger And Remove Floating Head
+### Latest Attempt — One Authorized Contact Retake Rejected In The Full Cut
+
+用户明确授权本轮一个 `metaso_h3 / MiniMax-H3` I2V候选，沿用已展示的B03第287帧和修订prompt，
+请求4s raw、最多一次提交、operator上限2 CNY（不是官方报价或实扣金额）。实际提交一次并取回，
+没有重抽。**可信键盘命中仍未补成，候选REJECTED；保留13.875s原稿，成片NOT_ACCEPTED，下一单元BLOCKED**。
+证据前缀 `C = runs/fanxiang-contact-retake-20261006-003/`、
+`U = runs/fanxiang-production-loop-20261005-001/sequence-B-contact-retake-take-01/`。
+
+- 先读取`N/attack-minimal-retake.md`，实际查看B03 286/287/288帧与接镜对照。
+  first-frame是B03 zero-based287/11.958333s原解码PNG，SHA
+  `379c0f78e97132ab5773ec559986d2bb9e30159762be560c356f65ffc0121a36`；没有图像生成或贴图编辑。
+  新raw `U/output.mp4`为107frames/24fps、4.458333s、1344×768，SHA
+  `cef1954d5bae5311a294c935092e575574df6e8831cd113a0ae364d6ae9230ba`。
+  返回raw超出请求时长保持真实历史，outcome `FETCHED_UNACTIVATED`，不伪造generation activation。
+- 实际新raw从第2帧起把黑色电脑键盘变成带黑白琴键的乐器；对照现有keyboard reference可确认道具错误。
+  动作变成顶在头/脸旁停住，只有轻微头部位移，缺乏一次可信接触。头颈和原破窗连接局部改善，
+  不能抵消道具与命中FAIL，也不能凭此前局部PASS保留这个镜头。
+- 已用既有Registry / SourceUseEvidence / CompositionSpec / ResolvedTimeline / P4 / HyperFrames /
+  ProductionStateCommitter实际接回整段：B03 [0,287) → new raw [0,17) → recoil [77,107)
+  → B03空窗[348,362)，均为各自source的zero-based半开区间；新插镜0.708333s。
+  `C/contact-join-rejected-review.mp4`为348frames/24fps、video14.5s、container14.522s、
+  H264/48k stereo AAC，SHA `8b51a0f034961d960138d7dfabf2394fc654939eb36f2f2d35248beca112aefc`。
+  这是**未采用的失败对照**，独立editorial项目技术render activation不代表正式成片或候选QA通过。
+- 对照保留原B03节目声及台词时序，原声main到11.958333s、gain -3dB，之后静底桥接；
+  new raw原声不入混音。失败对照没有撞击SFX，避免用声音掩盖未成立的接触；
+  原13.875s稿的声轨、取键盘、撤退及既有SFX均未修改，exact SHA仍为下节原值。
+- `C/requested-contact-use-policy-17f.json`、`requested-contact-use-evidence-17f.json`及
+  `requested-contact-use-assessment-17f.json`经现有typed public owner实际评估为FAIL，绑定当前17帧和正确接触用途。
+  diagnostic-window-use只证明identity/range/format可进入失败审片，不等于接触PASS；旧18帧证据和旧QA不回写。
+  `C/explicit-raw-mcp-review.json`与`explicit-join-mcp-review.json`保留两次显式project-local调用，
+  工具无issues不推翻Parent从实际画面确定的道具/动作失败。
+- `C/playback-execution-summary.json`绑定exact对照SHA：真实1×、非静音播放至ended，wall14.6862s、
+  dropped delta0。Parent查看62张实际播放捕获中的整段采样与11.7–13.2s密集接点帧，
+  琴键突变、顶住脸的停顿及切入撤退仍不成立；详见`C/whole-join-adjudication.json`。
+  **不能实际听辨，actual hearing NOT_EVALUATED**；播放/波形/采样画面不升级为整体声画验收。
+- 新scope task `user-approved:fanxiang-contact-retake-20261006-003`仅一Shot、submit limit1，
+  正常通过既有paid gate与one-use permit；上传输入和native prompt保持本轮授权的exact bytes。
+  原项目准备阶段停止于外部effects之前，计划扩界没有生效；其13次历史和paid ledger原样保留。
+  新任务消耗1，parent physical chain为13→14，external task `2107467303215857664`，actual cost unknown。
+  `C/scoped-task-lineage.json`、`U/physical-submit-consumption.json`、`U/terminal.json`为边界证据；
+  新单次授权不重置旧任务，不释放旧held预算，不改continuity / Router / Provider架构。
+- 本地首次18帧/349frames诊断render因实际音频比delivery contract少32samples而失败，没有绕过验证。
+  删去一个已停住的尾帧并经既有committer同步Shot duration、dependency revision后，17帧/348frames
+  诊断render成功并strict reopen；失败attempt与旧revision保留。只修产品素材选择，没有通用代码修改。
+- 受管Kimi deep `80596e9b-6222-4ac1-9245-22bb286f02e5`只读审查sealed文本方案；
+  Parent核验receipt、source read和report hashes并逐项裁决。它没有观看或听辨媒体，不拥有QA验收。
+  本轮无共享产品实现变更，Implementation Review Risk Gate未触发，不叠加独立实现review。
+
+媒体和receipt仍ignored/local-only，只有此记录及直接supersession notices进入Git。
+文档exact staged Harness receipt：
+`.agent/harness/runs/fanxiang-contact-rejection-record-20261006/receipt.json`，只证明记录路径checks。
+自动调用`distill-ai-video-learning`评估为`no_candidate`：单次道具失败、同一未验收修复链，
+没有足够独立支持/受控比较或现有claim更新依据；不把“拆镜+选窗”升格为成功经验，不修改Skill/Policy/Gate。
+剩余：可信接触仍缺失；原台词、接缝声音与整段节奏需要人工听看。预算耗尽停止本轮，不再堆prompt或生成。
+
+### Retained Base — Restore Native Trigger And Remove Floating Head
 
 用户继续要求修14.125s稿的0–4.8s静音与11.21–12.29s悬空攻击镜。本轮只修这两个接点，
 无通用架构修改、无媒体生成，旧raw/旧QA/两个此前局部短窗确认保持历史。
@@ -44,7 +99,7 @@ Date: 2026-10-06
   已检查真实播放捕获的开场与11.75–13.5s切点；只作采样画面检查，没有真实连续听辨。
   `N/explicit-mcp-review.json`为exact MP4显式project-local调用，无issues不等于质量PASS。
 - `N/attack-minimal-retake.md`只提出一个0.7–1.0s可用攻击窗口：真实颈部连接原破口、
-  单端握键盘一次接触并下偏，尾态接现有recoil。**方案未执行，无新增Provider提交**。
+  单端握键盘一次接触并下偏，尾态接现有recoil。此处方案当时未执行；后续一次授权执行及失败见上节。
 - 受管Kimi deep `0710ece5-d7d9-4ee9-a1fa-988a72ac02f9`只审音频恢复计划，实际read/report hashes
   已核验；Parent用最终CompositionSpec核实0/0起点、578000samples结束、旧intro全移除。
   不称其审过成片。普通可逆素材编辑未触发Implementation Review Risk Gate，无新增产品代码。
