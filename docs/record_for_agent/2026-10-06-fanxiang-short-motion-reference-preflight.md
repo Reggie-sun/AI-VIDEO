@@ -9,6 +9,14 @@ evidence_index_version: "1"
 
 Date: 2026-10-06
 
+## Supersession Notice — 2026-10-06
+
+本文 `Minimal Blender Replacement` 的未来制作提议，已由用户后续授权完成为
+[可编辑白模连续动作参考](2026-10-06-fanxiang-blender-motion-reference.md)。新素材固定B03左右轴线，
+实际渲染一次挥击、接触后立即受力并经原破口回缩；已查看并修正输出，不再处于“没有制作新动画”。
+本文V37派生物、source SHA、反向挥击/切景的历史局限与原付费提交边界保留；
+新白模仍local-only，向H3的运动迁移未验证，没有新的Provider提交、正式素材选择或成片验收。
+
 ## Decision And Scope
 
 按用户要求改为一条最短动作视频加少量外观图片，准备并核查输入，**没有付费生成、上传、permit、
