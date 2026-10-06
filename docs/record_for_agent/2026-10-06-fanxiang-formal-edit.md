@@ -11,7 +11,25 @@ Date: 2026-10-06
 
 ## Current Status — User Rejection Supersedes Prior Pass
 
-### Paused — Preserve Both Versions And Await The User Decision
+### User Decision — Omitted Contact Rejected And Voice Needs Reperformance
+
+用户明确审片决定：**不接受动作省略，保留明确命中的原要求**；“兄弟们”声音太正气，不符合形象，需调整。
+13.875s基线及13.375s备选exact SHA重验未变，现有审片入口已显示上述决定；整体NOT_ACCEPTED。
+`runs/fanxiang-action-match-20261006-004/user-review-decision.json`绑定两版SHA与原反馈，
+不回写旧QA、Manifest、`final-status.json`或暂停instruction；下文pending表达状态已被这次人工拒绝取代。
+核查上一轮接触补镜：`resolved-request.json`为`image_to_video`，只有B03第287帧首帧，
+`media_bindings=[]`；实际`request.json`仅`text`/`image_url`，**没有视频参考**。
+当前`metaso_h3`另有`REFERENCE_TO_VIDEO`视频参考入口，但此接触镜尚未实测，不能保证命中成立。
+具体未授权方案见`runs/fanxiang-action-match-20261006-004/user-feedback-repair-proposal.md`：
+一次候选复用现有挥击/撤退参考，并补人工实拍的2–3s键盘接触软质道具参考（当前缺失），不改通用架构；
+声音拟只人工重录原句，先听辨气质和核对原混合音轨的对白分离，不能盲改整轨。
+本次media generation/export/audio edits均0，不重复创建暂停记录；补拍仍需新exact输入授权。
+受管Kimi deep `d093213c-213b-4e68-bd4c-7ea30a0dd8cc`仅审查sealed文本方案，Parent核验exact Read与report SHA；
+它没有独立读原请求或看听媒体。Parent直接核查原请求；审片入口仅验证两版metadata/暂停状态，未作新感知验收。
+本次文档检查receipt：`.agent/harness/runs/fanxiang-user-review-decision-20261006/receipt.json`；媒体和方案仍local-only。
+`distill-ai-video-learning`评估`no_candidate`：同一未验收修复链的新人工反证，无新独立实验或相关既有claim。
+
+### Historical Pause — Preserve Both Versions And Await The User Decision
 
 用户明确要求收尾保存并暂停本段自动修复。保留13.875s基线和13.375s动作省略备选，
 现有`runs/fanxiang-action-match-20261006-004/review.html`同时提供两版审片入口。
@@ -23,7 +41,7 @@ Date: 2026-10-06
 记录检查receipt为`.agent/harness/runs/fanxiang-edit-pause-record-20261006/receipt.json`；
 `distill-ai-video-learning`评估`no_candidate`，没有新实验或经验claim。
 
-### Retained Alternative — Action Match With Contact Omitted, Pending User Review
+### Historical Alternative — Action Match With Contact Omitted, Later Rejected By User
 
 用户要求以保留的13.875s稿为基线，只做一版动作匹配剪辑，不生成、不改架构，不用闪白/黑帧或
 夸张音效掩盖缺口。**本版只验证省略接触时反击→撤退能否读懂，表达是否接受由用户决定；
