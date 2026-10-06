@@ -54,6 +54,14 @@ class FixedTransform(StrictModel):
     scale_x_milli: int = Field(default=1000, gt=0)
     scale_y_milli: int = Field(default=1000, gt=0)
     rotation_millidegrees: int = 0
+    video_fit: Literal["exact", "cover"] = "exact"
+
+    @model_serializer(mode="wrap")
+    def _serialize_video_fit(self, handler: SerializerFunctionWrapHandler) -> dict[str, object]:
+        data = handler(self)
+        if self.video_fit == "exact":
+            data.pop("video_fit", None)
+        return data
 
 
 class DuckingSpec(StrictModel):

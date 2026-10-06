@@ -210,6 +210,9 @@ acceptance inventory 的 proof 与 source/raw stage；Registry 技术有效不�
 window、transform、图层、音轨、字幕与有序 coverage，禁止仅凭旧 lineage 证明新用途。
 `production_strategy_materialization.py` 仅构造原 committer 的
 `StateCommitRequest` 或原 CompositionSpec。不得写入第二个 strategy lifecycle、timeline 或 quota。
+MP4 的不同实测画幅只有显式 `FixedTransform.video_fit=cover` 才允许固定居中填满裁切；
+默认 `exact` 保持同画幅校验与历史序列化。用途证据绑定该 transform，旧全幅证据不资格化新裁切；
+此选择不修改 raw generation 历史或证明其 activation。
 `production_strategy_dependency.py` 通过既有 P5 resolver/transition 将 authoring revision 交回唯一
 committer；保留未受影响的 authoring→asset edges、fingerprint 和 lifecycle。受影响的旧 render
 domain 退出当前图，新 render graph 仍需由原 dependency builder 消费新的 CompositionSpec 构建。

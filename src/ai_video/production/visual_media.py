@@ -79,8 +79,8 @@ def resolved_video_trim_duration(
             f"Video asset {asset.asset_id} must be H.264 in MP4."
         )
     if (
-        metadata.width != delivery_profile.width
-        or metadata.height != delivery_profile.height
+        (layer.transform.video_fit == "exact" and
+         (metadata.width != delivery_profile.width or metadata.height != delivery_profile.height))
         or asset.width not in {None, metadata.width}
         or asset.height not in {None, metadata.height}
     ):

@@ -1280,6 +1280,26 @@ def test_rejects_tampered_or_unreadable_mp4_bytes(tmp_path):
     _assert_invalid(loaded, spec)
 
 
+def test_explicit_video_cover_allows_measured_source_geometry(tmp_path):
+    from ai_video.production.models import FixedTransform
+
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    loaded, spec = _with_video_layer(tmp_path, loaded, spec,
+                                    metadata_changes={"width": 1440, "height": 736})
+    # The asset dimensions must agree with its measured metadata.
+    asset = loaded.registry.assets[0].model_copy(update={"width": 1440, "height": 736})
+    loaded = loaded.model_copy(update={"registry": loaded.registry.model_copy(
+        update={"assets": (asset, *loaded.registry.assets[1:])})})
+    _assert_invalid(loaded, spec)
+    cover = FixedTransform(video_fit="cover")
+    layer = spec.layers[0].model_copy(update={"transform": cover})
+    spec = seal_artifact(spec.model_copy(update={"layers": (layer, *spec.layers[1:])}))
+    timeline = resolve_composition(loaded, spec, renderer_version="0.7.103")
+    assert timeline.visual_spans[0].transform == cover
+    assert timeline.visual_spans[0].trim_duration_frames == 48
+    assert "video_fit" not in FixedTransform().model_dump()
+
+
 def test_p4_audio_and_captions_keep_the_same_timeline_with_mp4_visual(tmp_path):
     loaded, spec = make_p4_composition_fixture(tmp_path)
     baseline = resolve_composition(loaded, spec, renderer_version="0.7.103")

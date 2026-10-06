@@ -154,7 +154,10 @@ def test_wrong_window_or_role_is_not_evaluated():
     assert _assess(policy, role="insert") == "NOT_EVALUATED"
 
 
-def test_full_frame_evidence_cannot_qualify_a_different_reframe():
+@pytest.mark.parametrize("transform", [
+    {"translate_x_px": 20}, {"video_fit": "cover"},
+])
+def test_full_frame_evidence_cannot_qualify_a_different_reframe(transform):
     from ai_video.production.composition_contracts import FixedTransform
 
     acceptance = _acceptance()
@@ -163,7 +166,7 @@ def test_full_frame_evidence_cannot_qualify_a_different_reframe():
         task_id="task-1", component_id="component-1", asset_id="asset-1", asset_sha256=ASSET_HASH,
         size_bytes=123, role="reuse", timebase="frames", start=0, duration=24,
         requirement_ids=("action", "timing"), evidence_ids=("evidence-1",),
-        transform=FixedTransform(translate_x_px=20)) == "NOT_EVALUATED"
+        transform=FixedTransform(**transform)) == "NOT_EVALUATED"
 
 
 def test_profile_and_evaluator_tampering_are_rejected():
