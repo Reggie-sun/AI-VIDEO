@@ -11,7 +11,16 @@ Date: 2026-10-05
 
 ## Current Status
 
-### Supersession — Two Real Inserts And A Usable Visual Cut
+### Supersession — Formal Production Edit With Impact SFX
+
+2026-10-06，停止生成后已用既有 SourceUseEvidence / Timeline / P4 / HyperFrames 完成
+12.5s正式剪辑与当前editorial项目render activation，并加入同步撞击SFX。
+本段取代下方“正式 Production compose 仍 BLOCKED”的当前状态；旧raw失败与recoil QA误绑定保留为历史。
+画面判定PASS、实际1×非静音播放完成且0掉帧；听感与human Final Acceptance仍NOT_EVALUATED。
+exact素材窗口、MP4 SHA、声音处理、验证与制作经验见
+[Formal edit record](2026-10-06-fanxiang-formal-edit.md)。
+
+### Historical Supersession — Two Real Inserts And A Usable Visual Cut
 
 2026-10-06，继续用户明确授权的两镜拆分：攻击插镜和受击反应镜各生成一个候选，
 不重抽上一条完整 4s hit I2V，不修改通用架构。开始时 clean `main` 为
