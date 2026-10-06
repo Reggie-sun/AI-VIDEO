@@ -9,7 +9,45 @@ evidence_index_version: "1"
 
 Date: 2026-10-06
 
-## Current Status
+## Current Status — User Rejection Supersedes Prior Pass
+
+2026-10-06，用户实际观看后指出“明显声音和有些shot不对”，并确认“都有”。
+用户反馈绑定下方12.5s输出SHA `af37152c6acce2feaa9c64bb44d957d22e8cf7bb352397d384c3049a23f69c61`。
+当前状态为 **REJECTED_BY_USER / NOT_ACCEPTED，下一剧情单元BLOCKED**。
+下方“视觉剪辑判定PASS、可作为下一单元基线”只保留为历史误判，不再是当前质量结论。
+原raw/旧QA/用户此前两个短窗与3.625s局部join的确认不回写；本次拒绝的是完整组合。
+
+Parent实际执行过播放器1×播放并查看采样帧，没有完成真实连贯声画观看与听辨。
+把这种证据升级为整段视觉PASS/剧情可用，是本次验收错误；0掉帧、工具无issues、工程Harness
+与声波时间对应均不证明完整质量。视频分析MCP仅提供metadata/frames/ASR等证据，不代替感知验收。
+
+Current evidence prefix `R = runs/fanxiang-edit-rejection-20261006-001/`。
+
+- `R/quality-rejection.json`、`R/rejected-v5.mp4` 保留用户拒绝和原exact bytes。
+- 原“room tone”实际取B03 14.5–15.0s：RMS -7.429dBFS、peak -0.263dBFS；
+  -9dB后每0.45s重播0.5s，开头7段、后部9段。未经听辨就将高能量尾音当环境底循环，
+  是已核实的混音配方错误；`R/audio-measurements.json`不是耳听验收。
+- Ba02 [221,240)可见黄衣潘子在头前抬臂，未给出黑衣小龙连续取键盘的动作；
+  把这个窗口写成“小龙开始反击”缺少证据。破窗再出现落玻璃，跨镜接点也不能仅凭局部因果判PASS。
+  原源帧证据为`R/Ba02-first.png`、`R/Ba02-last.png`、`R/B03-wide.png`。
+- 只执行一次有界compose修订，new generations=0：删Ba02，B03改用[0,269)，保留其黑衣小龙
+  取键盘的准备；attack [9,35)、recoil [77,107)、empty [348,362)保持。
+  高频尾音循环撤掉，换原B03 3.0–4.5s低能量片段，RMS -56.466dBFS、peak -43.782dBFS，
+  gain -3dB、1.5s片段/1.4s周期。保留原撞击SFX，新contact frame293/12.208333s。
+  这仅是已知配方/接点的修正，不构成听感PASS。
+- `R/revision-review.mp4`为 **修订待审稿**：339frames、14.125s，container14.147s，6,956,513bytes，
+  SHA `c32159a86584f927ee39c4055b13ae71aa3c70b042bfcadb3e1ac354190a8ca4`。
+  由同一canonical owners完成render/activation/strict reopen，不更改原项目或generation activation。
+  `R/revision-playback-summary.json`记录真实1×非静音执行、339frames/0掉帧；只证明播放执行。
+  `R/revision-explicit-mcp-review.json`为该exact文件的显式project-local MCP调用。
+- `R/revision-status.json`保持NOT_ACCEPTED：攻击近景的背景玻璃与前后破窗形态/光照仍需裁决，
+  主观听感仍NOT_EVALUATED。当前环境不能直接听辨；没有后续Shot submit。
+
+制作经验继续作为待验证的局部方法保存，不能把“拆镜+选窗”写成这条正式成片已成功。
+自动learning evaluation仍为`no_candidate`：同一素材修复链，并出现完整成片的明确反证。
+没有修改Skill/Policy/Gate，也没有重跑或改写原工程PASS来制造媒体验收。
+
+## Historical Status — Initial Formal Edit
 
 停止生成后，复用 B-03、Ba-02、attack、recoil 原始 bytes，通过既有 SourceUseEvidence /
 CompositionSpec / ResolvedTimeline / P4 / HyperFrames / ProductionStateCommitter 完成正式剪辑与 render activation。
