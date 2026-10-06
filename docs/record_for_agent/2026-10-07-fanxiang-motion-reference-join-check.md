@@ -8,6 +8,14 @@ learning_eligibility: ineligible
 
 Date: 2026-10-07
 
+## H3 Transfer Follow-up — 2026-10-07
+
+009最终2.750秒Video 1＋原四图已完成一次真实混合Ref2VA迁移，见
+[H3 transfer record](2026-10-07-fanxiang-h3-full-withdraw-transfer.md)。实际raw与完整接镜已交付，
+短促命中/即时受力节奏及前接点未通过；本次单候选额度用完，停止且不重抽。
+下方009白模可用判断及其当轮H3=0是历史事实，不等于当前迁移仍未执行或H3已通过。
+009/008/007文件、原对白及旧撤退镜均保持，不自动进入下一剧情单元。
+
 ## Full Withdrawal Follow-up — 2026-10-07
 
 用户本轮明确改变剪辑目标：不强接旧撤退近景，由白模自己完成接触、即时偏转、头颈撤回破口
