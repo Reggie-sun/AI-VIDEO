@@ -5,6 +5,7 @@ import { classifyPlaybackFailure, keepOneAudio, playbackFailureLabel } from "./l
 import { durationLabel, entryTitle, VideoLibraryRail } from "./video-library-rail.jsx";
 import { attemptId } from "./run-detail-contract.js";
 import { libraryLiveStatus } from "./library-refresh-contract.js";
+import { MediaFolderButton } from "./media-folder.jsx";
 import "./library-browser.css";
 
 export function ExactPlayer({ entry, measurement, onMeasured, onUnavailable }) {
@@ -54,7 +55,7 @@ function Preview({ entry, measurements, onMeasured, onUnavailable, entries, rend
   const members = context?.versionKey ? groups.get(context.versionKey)?.contexts || [] : [];
   const measurement = measurements[entry.id];
   return <section className="library-preview" aria-label="视频预览详情">
-    <header><span className="library-eyebrow">视频预览</span><h1>{context?.title || entryTitle(entry)}</h1><p>{context?.model || entry.model || "模型未提供"} · {durationLabel(measurement)}{measurement?.width ? ` · ${measurement.width} × ${measurement.height}` : " · 实测尺寸未提供"}</p></header>
+    <header><div className="library-preview-heading"><div><span className="library-eyebrow">视频预览</span><h1>{context?.title || entryTitle(entry)}</h1></div><MediaFolderButton key={`${entry.id}:${entry.url}`} entry={entry} /></div><p>{context?.model || entry.model || "模型未提供"} · {durationLabel(measurement)}{measurement?.width ? ` · ${measurement.width} × ${measurement.height}` : " · 实测尺寸未提供"}</p></header>
     <ExactPlayer key={`${entry.id}:${entry.url}`} entry={entry} measurement={measurement} onMeasured={onMeasured} onUnavailable={onUnavailable} />
     <StatusSummary context={context} available={entry.available} playbackError={measurement?.playbackError} />
     <ContextPicker entry={entry} value={contextId} onChange={setContextId} />

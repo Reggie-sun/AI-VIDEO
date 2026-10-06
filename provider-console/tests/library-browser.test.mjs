@@ -33,6 +33,13 @@ test("default browser offers one cross-source search, records and explicit follo
   try {
     const { LibraryBrowser, ExactPlayer, StatusSummary } = await server.ssrLoadModule("/src/library-browser.jsx");
     const { VideoLibraryRail } = await server.ssrLoadModule("/src/video-library-rail.jsx");
+    const { MediaFolderButton } = await server.ssrLoadModule("/src/media-folder.jsx");
+    const folder = renderToStaticMarkup(React.createElement(MediaFolderButton, { entry: { available: true, url: "/api/runs/media/exacttoken" } }));
+    assert.match(folder, /打开所在文件夹/);
+    assert.doesNotMatch(folder, /disabled/);
+    for (const entry of [{ available: false }, { available: true, url: "https://example.com/video.mp4" }]) {
+      assert.match(renderToStaticMarkup(React.createElement(MediaFolderButton, { entry })), /disabled/);
+    }
     const markup = renderToStaticMarkup(React.createElement(LibraryBrowser, { renderContext() {}, renderRecord() {} }));
     assert.match(markup, /视频库/);
     assert.match(markup, /生成记录/);

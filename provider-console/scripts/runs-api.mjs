@@ -6,6 +6,7 @@ import path from "node:path";
 import { promisify } from "node:util";
 
 import { catalogExternalMedia, publicExternalMediaProjection } from "./external-media.mjs";
+import { handleMediaFolderRequest, openMediaFolder } from "./media-folder.mjs";
 
 const execFileAsync = promisify(execFile);
 const JSON_HEADERS = { "Content-Type": "application/json; charset=utf-8" };
@@ -474,6 +475,7 @@ export function createRunsApiHandler({
   externalSources = [],
   externalCatalog = catalogExternalMedia,
   changeFeed = null,
+  openFolder = openMediaFolder,
 }) {
   const runsRoot = path.join(repoRoot, "runs");
   const mediaCache = new Map();
@@ -567,6 +569,19 @@ export function createRunsApiHandler({
     }
 
     try {
+      const folderMatch = /^\/api\/(runs|external-media)\/media\/([A-Za-z0-9_-]{6,128})\/open-folder$/.exec(parsed.pathname);
+      if (folderMatch) {
+        await handleMediaFolderRequest(req, res, {
+          openFolder,
+          resolveMedia: async () => {
+            if (folderMatch[1] === "runs") return mediaCache.get(folderMatch[2]);
+            const descriptor = externalDescriptors.get(folderMatch[2]);
+            if (!descriptor) return null;
+            return validatedMedia(descriptor, externalSourceRoots.get(descriptor.source_id));
+          },
+        });
+        return;
+      }
       if (isEventsRequest) {
         if (req.method !== "GET") return methodNotAllowed(res, "GET");
         if (!changeFeed) {

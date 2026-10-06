@@ -1222,6 +1222,7 @@ categories:
       - provider-console/scripts/experiment-evidence.mjs
       - provider-console/scripts/external-media.mjs
       - provider-console/scripts/runs-api.mjs
+      - provider-console/scripts/media-folder.mjs
       - provider-console/tests/external-media.test.mjs
       - provider-console/tests/runs-api.test.mjs
       - provider-console/tests/library-media.test.mjs

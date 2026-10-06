@@ -492,6 +492,13 @@ Provider / neutral requirement / Architecture checks。配置边界见 [Vidu Pro
 | --- | --- | --- | --- | --- |
 | Unified Video Library | `provider_console.py` 的 strict detail、`provider_console_render.py` 的已验证 active render 投影与 `provider_console_media_index.py` 的 evidence association；`runs-api.mjs` / `external-media.mjs` 的本机 transport；`library-contract.js` / `library-data.js` / `library-browser.jsx` 的临时浏览状态 | 内容按 SHA-256 + bytes 去重并保留来源和角色；成片只消费 strict reader 的 active render，恢复旁证不得提供 render token；版本只来自 verified workspace/project/Shot identity；所有来源使用同一筛选；手动 pin 不随刷新变化；播放与双视频比较只读，实测值来自 exact 视频解码；请求、预览 decoder 与分页有界。新增 library contract/browser/media Node tests 与现有 bridge checks 共用 `provider_console_node_tests`。 | 裸扫 fetch、第二 catalog/state owner、相似标题推导版本、任取歧义 Prompt/verdict、把播放或旁证提升为 P6/Final Acceptance、刷新期间提前删除有效媒体 cache、远端 fallback、Provider/Manifest mutation。 | `python -m pytest -p no:cacheprovider tests/test_provider_console.py tests/test_provider_console_media_index.py -q`；`node --test provider-console/tests/library-contract.test.mjs provider-console/tests/library-browser.test.mjs provider-console/tests/library-media.test.mjs provider-console/tests/runs-api.test.mjs provider-console/tests/external-media.test.mjs`；offline Vite compile 与 exact snapshot Harness；真实本机 A1–A10/browser QA 另验。 |
 
+视频库“打开所在文件夹”由 `runs-api.mjs` 与 `provider-console/scripts/media-folder.mjs` 提供本机桌面入口。
+仅用户点击触发 same-origin、带专用 action header 的 POST，参数只有既有 opaque video token；
+服务端重验已登记文件的 no-follow、containment、size 与 identity，再用 GIO 打开父目录。
+Browser 不接收 absolute path，不允许任意 path/root，不写 Production state；其他浏览 API 保持只读。
+缺失、变化、跨站或 desktop activation 失败均拒绝并显示 sanitized error；验证归入既有
+`provider_console_node_tests`，真实桌面打开另经本机 Browser QA。
+
 ## Development Control Surface
 
 | Surface | Primary Owner | Invariants | Forbidden Alternate Path | Focused Verification |
