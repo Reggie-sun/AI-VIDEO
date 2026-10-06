@@ -1,13 +1,63 @@
 ---
 record_kind: media_experiment
 topic_id: fanxiang-v36-v37-production-loop
-learning_eligibility: eligible
+learning_eligibility: needs_identity
 evidence_index_version: "1"
 ---
 
 # Fanxiang H3 Full Withdrawal Transfer
 
 Date: 2026-10-07
+
+## Current Editorial Follow-up — 2026-10-07
+
+按用户新指令只做一次局部节奏修订，**动作本身仍不成立，停止，不进入撞击声或混音阶段**。
+这更新当前后期救援的结论，不取代下方真实H3 raw和原接镜的历史FAIL，也不是第二次生成实验。
+未生成、未改白模、prompt或通用架构；未拼回旧撤退近景，未覆盖任何历史版本。
+
+独立目录 `E = runs/fanxiang-h3-local-rhythm-20261007-011/`：
+
+- `E/local-rhythm-silent-review.mp4`：完整无声待审对照，1344×768、24fps、385frames、
+  16.041667秒、无音轨；SHA `159fa0a152fc376d9586f9d06b22c65bf5d7d442ffdf497cb36b4c45a98bae08`。
+- `E/review.html` 同时保留新完整无声对照与原17秒有声FAIL版本入口。
+- `E/retimed-contact-window.mp4`：84frames、3.500秒的独立后期衍生源，SHA
+  `91577d60864feb313f93b88ebeef03b6f769272d66fa0af8c38af455cb7a77a0`；不是Provider新candidate。
+
+24fps、zero-based half-open：原B03 `[0,287)` → 衍生源 `[0,84)` → 原B03空窗 `[348,362)`。
+衍生源只跳过raw前两帧重复抬手；raw `[2,6)`原速保留挥击及首次接触，raw `[6,32)`的26帧
+贴脸段选 `[6,12,18,24,30]`，将1.083333秒压为0.208333秒（窗口时长比5.2:1，段内选帧步长6）；
+raw `[32,107)`完整原速保留后缩、头颈退窗及自然空窗。没有全片加速、冻结补时或插帧。
+逐帧映射及原raw SHA见 `E/edit-brief.json`、`E/derived-source-provenance.json`。
+
+仍由既有 `SourceUseEvidence / CompositionSpec / ResolvedTimeline / HyperFrames / ProductionStateCommitter`
+组成独立诊断工程；当前SourceUse用途是检查这一个后期救援版本，不认证命中。原Production与
+generation activation不动。`E/canonical-compose-binding.json`绑定canonical render和导出相同bytes。
+
+exact衍生源及完整MP4均显式调用project-local `video-analysis` MCP probe/extract，整段decode无错。
+实际Chrome无声1×播放完整16.041667秒至ended，385个连续capture、0播放器丢帧；Parent核对
+`E/actual-1x-front-contact-sheet.jpg` 与 `E/actual-1x-full-join-sheet.jpg` 后裁决：
+前接点重复抬手减轻，电脑键盘、头颈连续撤退和空窗结果可读，但约12.1–12.4秒仍托住下脸再
+脱开，缺少短促命中后的即时后缩。压缩停留没有补出缺失的受力起点，整体视觉为FAIL。
+具体裁决见 `E/review-decision.json`；播放成功及局部观察PASS不能替代完整动作验收。
+
+视觉未成立，因此该次交付明确为**无声诊断版本**，没有继续处理撞击声或声音接缝。
+原对白WAV及13.875秒保留版、13.375秒备选、旧撤退镜、四图与白模等11项source SHA复核不变，
+见 `E/preserved-sources.json`。原raw与旧QA保持，`E/historical-failure-preservation.json`留存hash。
+“兄弟们太正气”的声音反馈仍暂停待听辨；没有声音验收、封版或下一剧情单元放行。
+
+自动learning evaluation仍为 `no_candidate`：本次剪辑是同一raw的派生proof layer，不增加独立
+support，不建立“局部变速能救接触”或“H3不能迁移动作”的通用claim。
+任务文件未改变公共代码，implementation required review不触发；受管Kimi仅审查封存的frame-map
+算术和停止边界，不能推翻Parent对实际画面的FAIL。invocation
+`9adb8113-f9ef-417f-890c-9ec7e052d389`，2 wire requests，terminal `PARSED`；receipt、report与
+实际Read的SHA核验。Parent区分窗口总长比和选帧步长，确认f31属于有意抽帧；仅在
+`E/frame-map-clarification.json`明确tuple第三项为duration，未改封存brief或任何媒体。
+裁决见 `E/kimi-parent-adjudication.json`；没有采纳再加帧或再剪建议。媒体仅本地交付，不是发布。
+
+本次记录时只读identity validator发现下方历史Evidence Index的proof_layer小写及跨artifact的
+`SAME_EVIDENCE_NEW_PROOF_LAYER`不符合现有schema。保留旧实验、SHA与FAIL，不伪造相同artifact
+或新增独立key；envelope明确降为 `needs_identity`，未把该索引用于learning admission。
+详情见 `E/evidence-identity-validation.json`。该历史索引问题不改变实际视频审片结论。
 
 ## Outcome
 
