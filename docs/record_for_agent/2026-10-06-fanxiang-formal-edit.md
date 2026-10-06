@@ -11,7 +11,19 @@ Date: 2026-10-06
 
 ## Current Status — User Rejection Supersedes Prior Pass
 
-### Latest Alternative — Action Match With Contact Omitted, Pending User Review
+### Paused — Preserve Both Versions And Await The User Decision
+
+用户明确要求收尾保存并暂停本段自动修复。保留13.875s基线和13.375s动作省略备选，
+现有`runs/fanxiang-action-match-20261006-004/review.html`同时提供两版审片入口。
+本次没有生成、导出、改prompt、改切点或改声音，两个MP4 exact SHA与下文原值重验一致。
+用户认为现有画面能表达挥击后撤退，同时明确画内接触缺失和头颈姿态跳变仍在；
+这不是接受省略接触表达，也不是画内命中或整段声画PASS。原要求、原对白和素材历史不改，声音听感待用户确认。
+下一步只等待用户明确决定：接受后再最终混音与封版；不接受则单独讨论制作缺口，不能自动启动补拍或修复循环。
+本暂停instruction只保存Agent操作边界，不重写Production QA、Manifest activation或旧receipt。
+记录检查receipt为`.agent/harness/runs/fanxiang-edit-pause-record-20261006/receipt.json`；
+`distill-ai-video-learning`评估`no_candidate`，没有新实验或经验claim。
+
+### Retained Alternative — Action Match With Contact Omitted, Pending User Review
 
 用户要求以保留的13.875s稿为基线，只做一版动作匹配剪辑，不生成、不改架构，不用闪白/黑帧或
 夸张音效掩盖缺口。**本版只验证省略接触时反击→撤退能否读懂，表达是否接受由用户决定；
