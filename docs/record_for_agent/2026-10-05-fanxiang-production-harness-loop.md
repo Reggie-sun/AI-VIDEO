@@ -11,6 +11,116 @@ Date: 2026-10-05
 
 ## Current Status
 
+### Supersession — Two Real Inserts And A Usable Visual Cut
+
+2026-10-06，继续用户明确授权的两镜拆分：攻击插镜和受击反应镜各生成一个候选，
+不重抽上一条完整 4s hit I2V，不修改通用架构。开始时 clean `main` 为
+`6eec3619e3cc8e03019a25e4e19fe834d62f23ed`，与远端一致；`7d0e69e` 诊断已发布。
+本段取代下方“尚未执行后续两镜生成”的当前状态。A-02、B-03-final 与 Ba-02 主干保留。
+**两个自然短窗口的视觉验收 PASS，正常速度硬切能形成击中→撤退；正式 Production compose 仍 BLOCKED。**
+这不是整条 raw、canonical activation、听音或 Final Acceptance 的 PASS。
+
+#### Exact References And Real Submits
+
+`A = runs/fanxiang-production-loop-20261005-001/sequence-B-attack-insert-take-01/`；
+`R = runs/fanxiang-production-loop-20261005-001/sequence-B-recoil-insert-take-01/`；
+`C = runs/fanxiang-production-loop-20261005-001/two-insert-20261006/`，均为 ignored/local evidence。
+
+- 攻击：一次 built-in imagegen edit 从上一条正确首帧派生近景 `A/first-frame.png`，
+  1672×941，SHA-256 `265f8a39b5baa6e33765c75aace8d7a481414013ea5efa06e5372101284627ea`。
+  仅手、单端持握键盘、狗哥局部头；自由端路径开放，小龙手在右、狗哥在左。
+- 反应：post-impact imagegen 请求被 `MODERATION_BLOCKED_OUTPUT` 拒绝，未重试。
+  使用已有 B-03-final exact MP4 的 13.25s 原生帧，固定 crop `840:424:420:32`，
+  得到 `R/first-frame.png`，840×424，SHA-256
+  `52e7a1d51c76cb2910b5bc48bacf13363e1cd4d510882751bdc8a61539cb50f4`。
+  头在左下、颈连右上原破窗，只有头颈/门窗。它仅是独立姿态 reference，
+  不证明原片受击，也不是 failed take 的 accepted endpoint。
+
+实际均为 `MiniMax-H3` / `metaso-h3-fl2va-v1` / `image_to_video`，唯一 FIRST_FRAME，
+768P、adaptive、`context_ir_enabled=false`，无额外人物、视频、音频或 last-frame reference。
+原生 profile 最短 4s；提交前已说明每个新镜请求 4s raw，再取自然 1–2s 窗口，
+未声称生成原生 1–2s。固定机位、无台词、新运镜或重演前段剧情；两份 lint 为 100、无 issues。
+`input-fidelity.json` 绑定实际图像 bytes，两个 native body SHA-256 分别为
+`ffa735fb2aa93fdc288390415894e6f48ac613f273d07264eb555f3d3244226c` 与
+`dab6025ef770fa00fe559162a9c416312b26b263262421b9227884b13a938314`。
+
+攻击 job `2107419331035955200`、反应 job `2107436217718177792`，各一次 POST/HTTP 200，
+同 job poll/fetch 成功，无 retake。physical ceiling 11→12→13，历史消费保留；
+每次仅消费既有 operator upper bound 2,000,000 microCNY，actual cost null，不是价格或结算。
+攻击执行曾在 POST 前被“继续”打断；核实 exact REQUEST、无 paid intent/reservation/fence、
+binding/body 未变及已完成预算扩展后，只恢复原未消费请求。未重做预算、remint 已用 permit 或重试未知效果。
+`A/resume-zero-effect-proof.json` 保留此恢复边界。反应执行没有恢复或重复提交。
+本地 canonical 校验耗时较长，与模型表演能力无关；第二次 POST 前已完成攻击 exact 媒体 MCP 与 scoped 视觉判定。
+
+| Candidate | Exact Raw SHA-256 | Actual Media | Natural Selected Window |
+| --- | --- | --- | --- |
+| attack | `e99337ed803b6d05087e64b1a5a7f65735e58c9e081c2b1ba801df0d04a899b8` | 4,048,944 bytes；107 frames / 24fps；4.458333s；1344×768 | `[9/24,35/24)` = 0.375–1.458333s；1.083333s |
+| recoil | `48385ccfb03c78cdf58dc154aded6f1c40529b9e3f6ec95d10e342a8eae67785` | 2,982,291 bytes；107 frames / 24fps；4.458333s；1440×736 | `[77/24,107/24)` = 3.208333–4.458333s；1.25s |
+
+两条均 H.264/AAC 32kHz stereo。原 MP4 不变；源 AAC 仅 scratch，排除最终音频，不新增 sound PASS。
+
+#### Scoped Visual Findings And Actual Join
+
+逐条落盘后显式 project-local `video-analysis` MCP probe/extract，按 0.2s 抽帧；
+攻击接触另有连续原生帧。两条 raw 又用 Chrome 1×静音实际播放至 ended，各 55 samples，
+hash/bytes 相等。短窗及四段硬切也实际 1×播放，未变速或重动画。
+
+| Shot Criterion | Verdict | Observed Evidence |
+| --- | --- | --- |
+| attack contact | PASS | 约 1.33–1.46s 快速挥入，自由端停在太阳穴/耳前头部边缘，接触可读，无可见穿透；不以 SFX 代判 |
+| attack direction | PASS | 单端握法持续，一次右→左/向下挥击；所选窗口无第二次挥击，保留原室内轴线 |
+| recoil force response | PASS within selected window | 原片前段慢，未满足 native prose 的 0s/1.7s 表演时限；后段自然窗口从头部下偏姿态开始，随即下扣并明显向右上后缩，颈部连续跟随。不把整条 raw 叫即时受击 |
+| recoil empty-window join | PASS within selected window | 同一连续画面中头颈完整退出原破窗，约 4.17s 后为空窗；无内部跳切藏退出，末尾自然接 B-03 空窗 |
+
+攻击 `A/actual-findings.json` 与 canonical `diagnosis.json` 记录 contact/direction PASS。
+反应正确范围的 Parent 视觉评审为 `R/scoped-visual-findings.json`；其 canonical QA 另有下述阻断，
+不能将这份本地评审冒充已写入 canonical feedback。
+
+最终 review-only 硬切链为 Ba-02 9.208333–10.0s → 攻击上述窗口 → 反应上述窗口 →
+B-03-final 14.5–15.0s。`C/join-review-final.mp4` SHA-256
+`3e1755d38a7fa2cb552a6af6dd91381aae5c926ef6c98d231ea9e45060f553b8`，1,364,389 bytes，
+3.625s / 87 frames / 24fps，统一 1344×768 fixed center crop，无新运镜。
+早期带 letterbox 的 `join-review.mp4` 保留，只被此版替代。
+final review derivative 显式 MCP 抽帧并 1×播放至 ended：3.6301s wall、43 samples，身份一致。
+接触后约两帧切入下偏/后缩，颈部真实撤回，再切同轴冷光空窗，**视觉因果 PASS**。
+`C/combined-causality-findings.json` 与 exact 四源 provenance 保留判断；不做视觉 retake。
+撞击 SFX 应钉接触 transient，约此回看链 `43/24s`，不能迟到撤退结束后。
+尚未制作 SFX、P4 mix、ResolvedTimeline 或 HyperFrames 成片；该 MP4 仅诊断，不是第二 Production timeline。
+
+#### Canonical Holds And Completion Boundary
+
+攻击正确的两项 QA 已经 canonical 记录，随后 `validate_once` 返回 `VIDEO_ARTIFACT_INVALID`：
+封存 nominal 4s / 24fps 期望 96 frames，现有 contract 只接受 1–2 个额外 endpoint frames；
+实测 107 frames / 4458ms，超出范围。通过既有 `record_video_provider_failure` 关闭 known
+Provider delivery failure，保留成功远端 job、paid/fetch/QA、消费与原片；不改成 QUALITY_FAILURE。
+`A/activation-blocker.json` / `runtime-closure.json` 保留 Manifest 284 与严格 reader reopen。
+
+反应另发现 task-local 准备错误：`prepare-unit-qa.py` 写出正确的 reaction/empty_window_join
+定义，却漏用 `--commit` 激活；因此 immutable recipe 实际仍是攻击 contact/direction rubric，
+hash `aaff5a14a4e3738cc42d2ce2da2938126523b556c1e64c1c6363bf13ebb8d111`，
+而计划反应 rubric 为 `0168cd57b3511cae06a88802709e3d419272333a30bd937bfff162b6319b7ae3`。
+`R/canonical-evaluation-items.json` 与 `canonical-rubric-mismatch.json` 直接证明此问题。
+未回答错误题目、改 immutable binding 或补造 canonical PASS；反应 canonical QA 为 NOT_EVALUATED。
+其 raw 同样 107 frames / 4458ms，正式激活仍受时长契约阻断，保留 `R/activation-blocker.json`
+与既有 committer 的 known delivery closure evidence（Manifest 296、严格 reader reopen）。
+关闭后经原 QA owner 激活正确的当前反应范围，policy hash
+`331ab7a9f414e79e6fb0dd237e9f5e1d8ed3bc4d3644240e8b3f9c75b42eb7b8`，
+`R/qa-scope.json` 证明 final requirements hash 前后相等、Provider calls 0；这只更正当前配置，
+不改旧 immutable recipe、补签历史反馈或解除 held raw 的阻断。
+后续不能靠重抽合格视觉、导入 DERIVED asset、
+改 raw bytes 或放宽 Gate 消除此问题；恢复须经既有 QA/binding 与 measured-output owner，保留历史。
+
+managed Kimi deep 概念/能力核验 invocation `db57d88b-5c2d-4e54-8891-ac12fc2e4fcf`，
+qualified route `4f2d5dc8-4234-4665-b382-e82f1ad6cc00`，精确封存读 hash 经 Parent 核对。
+它提示 native 最短 4s 和 axis 风险，不是媒体 QA、canonical rubric 正确证明或 implementation review。
+没有修改 Product 源码、Gate、architecture 或 shared schema；stable record 依照 Risk Gate 由 Parent 自检，
+不增加重复 reviewer。最终区分：**视觉素材已可推进 SFX/剪辑；正式 compose/activation 未就绪，整片 Final Acceptance NOT_EVALUATED。**
+
+自动 `distill-ai-video-learning` evaluation：`no_candidate`。这是不同 scope/reference、seed 未控的
+同一 production 修复链，不构成隔离变量的 controlled A/B 或两个独立支持实验；既有 local H3 claims
+排除 remote lane。本次 timing/rubric 事实保留，不外推模型定律，不改 Skill/Policy/Gate 或 adopted claim。
+已有 retrieval 不兼容/stale 的边界保留，未重新构建 RAG；记录与媒体当前证据优先。
+
 ### Supersession — One First-Frame I2V Hit Insert And Strategy Stop
 
 2026-10-06，用户明确授权仅生成一次 2–4s 键盘反击补镜，优先 first-frame I2V，
@@ -710,3 +820,11 @@ non-Q0 identity 绑定 actual METASO task、同一 Production attempt、request 
 | HitI2V1-FETCH | metaso-task:2107221754490675200 | fanxiang-hit-i2v-20261006 | fanxiang-production-loop-B-hit-i2v-take-01 | N/A | 3ef7ec8ae0ef95bbdfaf249e74d03709a2ae7eda4ec7743ac00d9fb95f148105 | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | `H/terminal.json` |
 | HitI2V1-FOUR-RAW-QA | metaso-task:2107221754490675200 | fanxiang-hit-i2v-20261006 | fanxiang-production-loop-B-hit-i2v-take-01 | N/A | 3ef7ec8ae0ef95bbdfaf249e74d03709a2ae7eda4ec7743ac00d9fb95f148105 | ANALYZER_QA | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | HitI2V1-FETCH | `H/actual-findings.json` |
 | HitI2V1-EDIT-JOIN | metaso-task:2107221754490675200 | fanxiang-hit-i2v-20261006 | fanxiang-production-loop-B-hit-i2v-take-01 | N/A | 3ef7ec8ae0ef95bbdfaf249e74d03709a2ae7eda4ec7743ac00d9fb95f148105 | EDITORIAL_REVIEW_DERIVATIVE | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | HitI2V1-FETCH | `H/join-review-provenance.json` / `H/join-review-1x.json` |
+| AttackInsert1-FETCH | metaso-task:2107419331035955200 | fanxiang-two-insert-20261006 | fanxiang-production-loop-B-attack-insert-take-01 | N/A | e99337ed803b6d05087e64b1a5a7f65735e58c9e081c2b1ba801df0d04a899b8 | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | `A/terminal.json` |
+| AttackInsert1-SCOPED-QA | metaso-task:2107419331035955200 | fanxiang-two-insert-20261006 | fanxiang-production-loop-B-attack-insert-take-01 | N/A | e99337ed803b6d05087e64b1a5a7f65735e58c9e081c2b1ba801df0d04a899b8 | ANALYZER_QA | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | AttackInsert1-FETCH | `A/actual-findings.json` / `A/diagnosis.json` |
+| AttackInsert1-TIMING | metaso-task:2107419331035955200 | fanxiang-two-insert-20261006 | fanxiang-production-loop-B-attack-insert-take-01 | N/A | e99337ed803b6d05087e64b1a5a7f65735e58c9e081c2b1ba801df0d04a899b8 | CANONICAL_ACTIVATION | BLOCKED | OUTPUT_CONTRACT_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | AttackInsert1-FETCH | `A/activation-blocker.json` / `A/runtime-closure.json` |
+| RecoilInsert1-FETCH | metaso-task:2107436217718177792 | fanxiang-two-insert-20261006 | fanxiang-production-loop-B-recoil-insert-take-01 | N/A | 48385ccfb03c78cdf58dc154aded6f1c40529b9e3f6ec95d10e342a8eae67785 | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | `R/terminal.json` |
+| RecoilInsert1-SCOPED-VISUAL | metaso-task:2107436217718177792 | fanxiang-two-insert-20261006 | fanxiang-production-loop-B-recoil-insert-take-01 | N/A | 48385ccfb03c78cdf58dc154aded6f1c40529b9e3f6ec95d10e342a8eae67785 | PARENT_SCOPED_VISUAL | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | RecoilInsert1-FETCH | `R/scoped-visual-findings.json` |
+| RecoilInsert1-CANONICAL-QA | metaso-task:2107436217718177792 | fanxiang-two-insert-20261006 | fanxiang-production-loop-B-recoil-insert-take-01 | N/A | 48385ccfb03c78cdf58dc154aded6f1c40529b9e3f6ec95d10e342a8eae67785 | ANALYZER_QA | NOT_EVALUATED | RUBRIC_BINDING_MISMATCH | SAME_EVIDENCE_NEW_PROOF_LAYER | RecoilInsert1-FETCH | `R/canonical-rubric-mismatch.json` / `R/canonical-evaluation-items.json` |
+| RecoilInsert1-TIMING | metaso-task:2107436217718177792 | fanxiang-two-insert-20261006 | fanxiang-production-loop-B-recoil-insert-take-01 | N/A | 48385ccfb03c78cdf58dc154aded6f1c40529b9e3f6ec95d10e342a8eae67785 | CANONICAL_ACTIVATION | BLOCKED | OUTPUT_CONTRACT_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | RecoilInsert1-FETCH | `R/activation-blocker.json` / `R/runtime-closure.json` |
+| TwoInsert1-VISUAL-JOIN | metaso-task:2107419331035955200 | fanxiang-two-insert-20261006 | fanxiang-production-loop-B-attack-insert-take-01 | N/A | e99337ed803b6d05087e64b1a5a7f65735e58c9e081c2b1ba801df0d04a899b8 | EDITORIAL_REVIEW_DERIVATIVE | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | AttackInsert1-FETCH | `C/join-review-final-provenance.json` / `C/combined-causality-findings.json`；artifact 列绑定原攻击生成，实际四源 derivative SHA 见上文，不新计实验 |
