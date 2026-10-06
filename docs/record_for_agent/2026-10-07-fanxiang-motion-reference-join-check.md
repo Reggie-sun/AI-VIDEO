@@ -8,6 +8,52 @@ learning_eligibility: ineligible
 
 Date: 2026-10-07
 
+## Endpoint Alignment Follow-up — 2026-10-07
+
+本轮按用户要求只处理白模终态与原撤退开头，不提交H3。下方007交付保留为历史；
+当前候选及新取证在独立 `E = runs/fanxiang-motion-endpoint-align-20261007-008/`。
+**当前接镜仍为NOT_ESTABLISHED，不能把清单存在标成最终1视频＋4图已可用。**
+
+先实际抽取原撤退30–106帧：77以前的悬停摆头不能充当持续撤离；78–86帧开始下偏却仍有
+景别差异；最终取已进入破口的 `[93,107)`。新白模重做后段到“入窗但尚未消失”，不再以
+空窗结束后接回仍在窗外的头。前12帧RGBA像素与007逐帧相同（PNG metadata bytes不同），
+第5帧接触、第6帧即时反应保持；只在12帧之后连续重构图和改变后缩路径，未缩放头部。
+
+- `E/Video-1-endpoint-motion.mp4`：1344×768、24fps、48frames、2.000秒、无音轨；
+  SHA `fef41312b4c512f31eff87143b26cd0c5fe82761de306600c5ff7f57fc7b7796`。
+- `E/endpoint-join-review.mp4`：1344×768、24fps、363frames、15.125秒、无音轨；
+  SHA `4e357c3d4e650bec90d2372b042c7272163f7aa1917e5b60592eb0942483a070`。
+- 对照是B03 `[0,287)` → 完整新Video1 `[0,48)` → recoil `[93,107)` → B03空窗 `[348,362)`。
+  HyperFrames/Timeline/SourceUseEvidence/committer复用于独立诊断bundle，没有修改通用架构。
+- `E/reference-list.json` 前4项与007完全一致，图像SHA逐项重验；Video1仅更换为当前候选。
+  原13.875/13.375版、raw与4图均重验未改，见`E/preserved-source-check.json`。
+
+重开最终`.blend`采样96个整帧/半帧，手臂定长、颈部最大gap0.000829，所测head surface vertices
+进入墙/窗框盒体为0，第5帧3D接触norm0.999995。早期后段穿窗框的本地诊断版本保留，未交付为最终。
+这些是有限proxy几何取证，不证明物理模拟、真人结果或视觉验收。
+
+project-local `video-analysis` MCP对两份exact MP4均probe/extract，完整decode通过。
+Chrome实际1×参考2.0011秒/48捕获帧，对照15.1256秒/363捕获帧，均0播放器丢帧。
+Parent查看`E/actual-1x-join-sheet.jpg`、`endpoint-boundary-board.jpg`与`terminal-state-comparison.jpg`：
+头部尺寸/位置跳变明显减小，后缩不重复；但破窗上沿切点下跳、白模面朝向偏正仍可见。
+**剩余缺口在motion reference终态机位/破口投影与头部朝向，现有recoil93–106仍有保留价值；
+不能据此宣布旧撤退源本身必须废弃。** 本轮停止，不自动修复下一版或提交H3。
+
+受管Kimi只读`endpoint-brief.json`与旧007脚本，invocation
+`fab0fcd6-fa0d-4cdf-821f-ab83c470153c`，k3/max、2 wire requests、277.897秒、PARSED。
+canonical report SHA与observed Read SHA核验，Parent裁决见`E/kimi-parent-adjudication.json`。
+Kimi未看视频或审最终bytes；其报告不是媒体验收。Risk Gate仍为KIMI_REVIEW_NOT_REQUIRED，
+本轮没有通用代码/付费/凭据或critical state-contract改动。
+
+新对照刻意无声，未覆盖、循环或调整原对白；声音反馈继续待用户确认。
+H3 calls=0，迁移NOT_EVALUATED，成片NOT_ACCEPTED，媒体local-only，未push或发布。
+`record-ai-video-session`在本地诊断交付checkpoint更新本记录；`distill-ai-video-learning`
+为no_candidate：同一制作链的后段迭代，没有独立迁移实验，不创建placeholder或改Skill/Policy/Gate。
+不因记录追加Provider/media或全量tests；foreign `skills-lock.json` 与新安装skills保持不动。
+
+本次exact staged记录验证：`.agent/harness/runs/fanxiang-endpoint-alignment-record-20261007/receipt.json`。
+该receipt只证明文档检查，不将当前NOT_ESTABLISHED提升为视觉PASS。
+
 ## Scope And Delivery
 
 本轮只解决 Video 1。先对照原 V37 与13.875秒保留版的实际切点，确认V37挥击左右方向相反、
