@@ -11,7 +11,51 @@ Date: 2026-10-06
 
 ## Current Status — User Rejection Supersedes Prior Pass
 
-### Latest Attempt — One Authorized Contact Retake Rejected In The Full Cut
+### Latest Alternative — Action Match With Contact Omitted, Pending User Review
+
+用户要求以保留的13.875s稿为基线，只做一版动作匹配剪辑，不生成、不改架构，不用闪白/黑帧或
+夸张音效掩盖缺口。**本版只验证省略接触时反击→撤退能否读懂，表达是否接受由用户决定；
+原画内命中要求UNSATISFIED_UNCHANGED，整体NOT_ACCEPTED，下一剧情单元仍BLOCKED**。
+证据前缀 `M = runs/fanxiang-action-match-20261006-004/`。
+
+- Parent实际查看B03 258–291及recoil 68–106帧：B03 289仍是快速挥击中的手/电脑键盘，
+  recoil 84已经低头后开始向右上破窗回缩。只选B03 [0,290) → recoil [84,101) → B03空窗[348,362)，
+  均为source零基半开区间；去掉原recoil [77,84)慢起步及[101,107)多余空窗，main多保留一帧速度段。
+  没有变速、补帧、定格、闪白、黑帧、叠加贴图或新生成素材，空窗窗口保持基线。
+- `M/action-match-review.mp4`实际完成：1344×768 H264、48k stereo AAC、321frames/24fps，
+  video13.375s、container13.397s、6,768,267bytes，SHA
+  `5b127a6f5af7a848e64bfc9cc6ac50025c09f6bfed2d280f14e702578df20def`。
+  `M/production-action-match-01/project.yaml`经既有Registry / SourceUseEvidence / CompositionSpec /
+  ResolvedTimeline / P4 / HyperFrames / ProductionStateCommitter实际render activation及strict reopen。
+  独立待审项目的source-use admission只覆盖此诊断表达，绝不等于原接触QA通过；旧QA/raw历史不回写。
+- 复用基线完全相同的`main-native.wav`，main programme从sample0到580000、gain -3dB，
+  原对白和“兄弟们”触发时序保持。`M/audio-preservation-measurements.json`实测输出前0–4.8s
+  解码samples与13.875s基线完全相同（correlation1.0、max absolute difference0）。
+  尾段只复用已有静底一次、62000samples，不循环、不新覆盖开头、不新合成/删除台词。
+- 沿用同一Mixkit `hit-blow`及-4dB，第一次导出发现旧5681samples补偿不是当前解码WAV的实际峰值；
+  实测stereo峰值为8829samples，仅在备选中改为start571171、峰值580000/12.083333s，对应挥击→后缩切点。
+  两次本地render是同一套cuts的SFX落点校正，首稿完整保留在`M/first-sfx-placement/`；只交付一个备选。
+  最终解码peak -1.478dBFS、fullscale samples0；这只证明电平/placement，不证明实际听感或画内命中。
+- `M/playback-execution-summary.json`绑定最终SHA，真实Chrome HTML视频1×非静音播放至ended，
+  wall13.5575s、0掉帧；累计decode delta317不冒充实际成片321帧。Parent检查68张实际播放捕获，
+  包括整段采样及11.5s以后的密集接点：切入后缩没有原慢低头开头，但头颈姿态跳变、破口/景别差异仍在。
+  不声明完整因果成立；由用户决定省略接触表达是否可接受。**实际听辨NOT_EVALUATED**。
+  初次Chrome MCP evaluate无响应，取消的调用不作证明；随后仅启动自有有界Chrome进程实际播放，已关闭。
+  `M/explicit-mcp-review.json`为最终exact MP4显式project-local分析调用，无issues不升级为视觉/声音PASS。
+- 受管Kimi deep `1323a73b-a391-4072-b378-43446ad6e5c5`只读审查cuts/sample算术、对白保留和验收边界，
+  134.808s、2 wire requests，Parent核验exact source Read及canonical report SHA、逐项裁决。
+  其文本报告未看听媒体，也未评价后来8829samples落点；最终placement来自Parent实测及当前CompositionSpec。
+  未触发Implementation Review Risk Gate：无通用代码/共享契约/安全权属变化，现有owners完成可逆独立待审输出。
+
+`M/final-status.json`保持PENDING_USER expression acceptance；13.875s原稿SHA
+`48f94931e2bc09ee52dc9c049f1cbf91aae2df5668a6aab98cf8ba256917d27e`重验未变。
+本轮media generation calls0，parent paid-media physical chain仍14；不自动补拍或改prompt。
+媒体/receipts均local-only；文档checkpoint的exact staged Harness receipt为
+`.agent/harness/runs/fanxiang-action-match-record-20261006/receipt.json`，不作为感知验收证明。
+`distill-ai-video-learning`自动评估`no_candidate`：同一未验收修复链的一个表达备选，不是受控模型比较，
+没有独立成功支持或相关既有claim可更新。不改Skill/Policy/Gate；RAG返回stale advisory后继续现有媒体取证，无前台重建。
+
+### Historical Attempt — One Authorized Contact Retake Rejected In The Full Cut
 
 用户明确授权本轮一个 `metaso_h3 / MiniMax-H3` I2V候选，沿用已展示的B03第287帧和修订prompt，
 请求4s raw、最多一次提交、operator上限2 CNY（不是官方报价或实扣金额）。实际提交一次并取回，

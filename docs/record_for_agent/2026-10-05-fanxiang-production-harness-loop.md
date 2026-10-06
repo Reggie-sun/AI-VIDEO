@@ -20,6 +20,8 @@ Date: 2026-10-05
 后续新授权一个H3接触候选，实际一次提交并接回14.5s对照；电脑键盘变乐器琴键、接触呈顶住脸的停顿，
 候选FAIL且未采用，13.875s原稿保持。原13次历史和paid ledger不重置，新任务用1次、physical chain共14次；
 没有重抽，也没有因技术播放/render成功宣布成片通过。
+最新按用户要求零生成输出13.375s动作匹配备选，切已启动后缩、保留恢复对白，并校正同一撞击声落点。
+13.875s基线保持；省略接触是否接受由用户决定，不降低原画内命中要求或宣布整体通过。
 不宣称完整声画质量通过；问题证据与新状态见
 [Formal edit record](2026-10-06-fanxiang-formal-edit.md#current-status--user-rejection-supersedes-prior-pass)。
 
