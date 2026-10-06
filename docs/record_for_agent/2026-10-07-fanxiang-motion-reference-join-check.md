@@ -8,6 +8,61 @@ learning_eligibility: ineligible
 
 Date: 2026-10-07
 
+## Full Withdrawal Follow-up — 2026-10-07
+
+用户本轮明确改变剪辑目标：不强接旧撤退近景，由白模自己完成接触、即时偏转、头颈撤回破口
+和空窗，再接B03空窗。008“强配旧近景未成立”的裁决保留为历史，未被改写为PASS；当前可用范围
+是**完整白模动作参考**，不等于H3真人迁移或正式成片通过。旧撤退镜继续保留备用。
+
+本轮独立目录 `F = runs/fanxiang-motion-full-withdraw-20261007-009/`：
+
+- `F/Video-1-full-withdraw-final.mp4`：1344×768、24fps、66frames、2.750秒、H264/yuv420p、无音轨；
+  SHA `065dae8a24e57f3b61766b502401d82aa9d670109ce06fb0f8ec122d3954c4b2`。
+- `F/full-withdraw-join-review.mp4`：1344×768、24fps、367frames、15.291667秒、无音轨；
+  SHA `9ac93147845e9e1837ec4df71c8165cf79209e3416a1a262f596243f80ac357d`。
+- `F/full-withdraw.blend`、`build-full-withdraw.py`、`review.html`、`README.md`与`reference-list.json`
+  是可编辑源、播放入口和最终1视频＋4图名单。4图前4项与007全等，SHA逐项重验。
+
+前12帧直接复用007原render PNG，第5帧接触、第6帧立即偏转，见`contact-source-reuse-proof.json`。
+66帧白模重开渲染的第9、10帧各有1像素RGB数值差异，kinematics不变；保留这些render原件，
+实际采用原12帧，未以新render差异冒充原画面字节相同。后段固定相机、头部尺寸和破窗geometry，
+按自然回撤增加时长，末尾保留可读空窗；没有追旧近景的reframe、再次攻击、循环、插值补帧或变速。
+当前`metaso_h3.py`本地adapter的reference_video约束为2–15秒、24–60fps、最多50MiB；当前2.75秒
+232361bytes输入符合离线limits，上游接收与动作继承未测。没有调用H3或改prompt。
+
+独立project复用`SourceUseEvidence`、`ResolvedTimeline`、HyperFrames及committer，24fps half-open
+剪辑B03 `[0,287)` → 新Video1 `[0,66)` → B03空窗 `[348,362)`，全程不使用旧recoil。
+`canonical-compose-binding.json`绑定exact timeline与export/canonical output SHA。
+不改原Production、raw历史、candidate/旧QA/activation或通用架构；无产品代码变更。
+
+Blender5.2.1/Workbench/headless/factory-startup重开132整帧/半帧：camera matrix无变化，手臂长度
+0.71999985–0.72000009，颈部endpoint gap最大0.000829，头部surface落入所测窗框/墙盒体为0，
+第5帧keyboard case/头部完整3D接触norm0.999995。额外evaluated neck mesh检查发现35.5、36帧
+有2个vertex轻微进入窗台背侧（最大约9.6mm），camera ray均先命中窗台，当前render没有可见断颈
+或背侧相交点；此粗模局限保留，不宣称连续物理碰撞通过，不再为此自动精修。
+
+project-local `video-analysis` MCP对两份exact MP4逐份probe/extract；完整decode通过。
+Chrome实际1×参考2.753秒/66捕获帧/0丢帧，对照首次15.295秒/363帧/4播放器丢帧；保留观测，
+降低取证负荷复播15.2946秒/367帧/0丢帧。媒体未因此重剪或覆盖。
+Parent查看真实播放帧板与`join-boundary-board.jpg`：接触→即时受力→连续入同一破口→空窗可读，
+前接点轴线/挥击起势一致；后接点在退出后切到原空窗特写，没有重复撤退或头部姿态切跳。
+该后接点是明确中景到空窗特写，不是同景别逐像素匹配；灰模/真人外观差异继续视为diagnostic占位。
+裁决`USABLE_FOR_MOTION_PREVIS_ONLY`，到动作参考程度即停止，不提升为成片质量PASS。
+
+本轮只读Kimi source/brief/有限几何审计与Parent视频裁决分开；其报告不代签媒体质量。
+Risk Gate为KIMI_REVIEW_NOT_REQUIRED：局部可逆预演/诊断，没有通用implementation、安全、付费
+或critical durable-state契约变更。源代码审计不是另加required final-review gate。
+
+原13.875秒、13.375秒、008参考/对照、B03/recoil raw均重验SHA未改；旧撤退素材保持备用。
+新对照刻意无音轨，原对白未覆盖/循环/调整，声音形象与听感仍待用户确认。
+本轮H3 submits=0，真人命中及H3迁移NOT_EVALUATED，原成片NOT_ACCEPTED，未自动推进下一剧情单元。
+媒体local-only，未上传、发布、push；foreign `AGENTS.md`、`skills-lock.json`及新安装skills不修改或stage。
+`record-ai-video-session`在本地交付checkpoint更新；自动`distill-ai-video-learning`为no_candidate：
+同一制作链，替换撤退、镜头与时长同时变化，不算隔离变量的独立迁移实验；不创建placeholder或adoption。
+
+本轮exact staged文档检查：`.agent/harness/runs/fanxiang-full-withdraw-record-20261007/receipt.json`。
+文档receipt只证明文档检查，不认证真人动作、声音或成片验收。
+
 ## Endpoint Alignment Follow-up — 2026-10-07
 
 本轮按用户要求只处理白模终态与原撤退开头，不提交H3。下方007交付保留为历史；
