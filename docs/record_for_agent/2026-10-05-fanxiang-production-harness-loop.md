@@ -15,7 +15,8 @@ Date: 2026-10-05
 
 2026-10-06，用户观看12.5s正式组合后确认声音和部分shot均不对。
 下方完整组合的画面PASS/可推进结论撤回，当前NOT_ACCEPTED、下一剧情单元BLOCKED。
-原两条短窗及局部3.625s join的历史确认保留。一次零生成修订已输出14.125s待审稿，
+原两条短窗及局部3.625s join的历史确认保留。14.125s修订也存在触发声误删和悬空攻击镜；
+最新零生成编辑恢复原“兄弟们”声、撤下攻击近景，输出13.875s待审稿，仍缺画内接触与人工听音。
 不宣称完整声画质量通过；问题证据与新状态见
 [Formal edit record](2026-10-06-fanxiang-formal-edit.md#current-status--user-rejection-supersedes-prior-pass)。
 

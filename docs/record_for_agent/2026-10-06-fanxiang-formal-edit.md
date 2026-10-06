@@ -11,6 +11,52 @@ Date: 2026-10-06
 
 ## Current Status — User Rejection Supersedes Prior Pass
 
+### Latest Revision — Restore Native Trigger And Remove Floating Head
+
+用户继续要求修14.125s稿的0–4.8s静音与11.21–12.29s悬空攻击镜。本轮只修这两个接点，
+无通用架构修改、无媒体生成，旧raw/旧QA/两个此前局部短窗确认保持历史。
+当前输出改为 **13.875s修订待审稿，NOT_ACCEPTED，下一剧情单元BLOCKED**。
+新证据前缀`N = runs/fanxiang-av-repair-20261006-002/`。
+
+- 开头误删触发声成立：原B03 master prompt规定门外“兄弟们。”引起潘子抬眼、三人转头；
+  中文Whisper small识别源1.3–2.22s“兄弟们”，只作佐证，不是听音裁决。
+  旧主声轨从sample144000开始，前三秒替换底声。现恢复原生混合节目0–12.041667s，
+  原时序、gain -3dB，删除所有intro loops；不重写/合成/去除台词。
+  按原剧情逐字文本绑定language/script_hash，现有AudioImportRequest登记为DIALOGUE，
+  `CompositionSpec`绑定main Shot；P4仍独占placement/mix。
+- 源攻击镜完整头部下方没有颈部连接，背景破窗接不上；`N/attack-survey.jpg`保留实际帧。
+  `N/attack-crop-test.jpg`证明紧裁切仅移出轮廓与窗，不能修复空间，本轮拒绝该裁切方案。
+  攻击近景撤下；现用B03 [0,289)取键盘/挥击起势→recoil [77,107)→B03空窗[348,362)。
+  在source frame289之前切出，排除随后头部继续袭潘子的失败状态。**画内击中接触仍缺失**，
+  不把结果反应或SourceUseEvidence窗口用途PASS当作完整接触动作已成立。
+- 同一Mixkit撞击SFX移到12.041667s反应切点，输入前导补偿5681samples、gain -4dB；
+  0.5s自然片段含尾部淡出。静底只从main结束后桥接，没有重复响尾音或新BGM。
+- `N/revision-av-review.mp4`为333frames/24fps、1344×768 H264、48k stereo AAC，
+  video13.875s、container13.897s、6,872,598bytes，
+  SHA `48f94931e2bc09ee52dc9c049f1cbf91aae2df5668a6aab98cf8ba256917d27e`。
+  当前独立editorial项目经既有owners实际render/activation/strict reopen；原项目不回写。
+- `N/audio-restoration-measurements.json`：前4.8s RMS从-59.616恢复为-22.333dBFS；
+  触发段RMS从-59.245恢复为-16.675dBFS。导出与输入原声相差1024samples/21.333ms，
+  补偿该编码偏移后的相关度0.999919、增益-3.010dB；全片decode peak -3.298dBFS、无满幅samples。
+  这些只证明节目声恢复，不证明台词清晰、音色正确、撞击同步听感或整体声画连贯。
+- `N/playback-execution-summary.json`绑定exact SHA，实际rate1/nonmuted播放至ended、0掉帧；
+  浏览器累计decode counter337并非成片frame count333，包含加载/seek。
+  已检查真实播放捕获的开场与11.75–13.5s切点；只作采样画面检查，没有真实连续听辨。
+  `N/explicit-mcp-review.json`为exact MP4显式project-local调用，无issues不等于质量PASS。
+- `N/attack-minimal-retake.md`只提出一个0.7–1.0s可用攻击窗口：真实颈部连接原破口、
+  单端握键盘一次接触并下偏，尾态接现有recoil。**方案未执行，无新增Provider提交**。
+- 受管Kimi deep `0710ece5-d7d9-4ee9-a1fa-988a72ac02f9`只审音频恢复计划，实际read/report hashes
+  已核验；Parent用最终CompositionSpec核实0/0起点、578000samples结束、旧intro全移除。
+  不称其审过成片。普通可逆素材编辑未触发Implementation Review Risk Gate，无新增产品代码。
+
+仍需人工听原台词的可懂度/门外距离感、撞击音色/同步、整段正常速度节奏；画内接触缺口单独保留。
+当前没有整体声画验收，不能进入下一剧情单元。记录文档Harness receipt：
+`.agent/harness/runs/fanxiang-av-repair-record-20261006/receipt.json`；不作为媒体质量证明。
+自动learning evaluation为`no_candidate`：同一修复链且完整成片存在反证，不增加独立成功计数。
+RAG返回stale advisory fragments后继续当前取证，未等待/重试索引刷新；未修改Skill/Policy/Gate。
+
+### Historical Revision — 14.125s Still Rejected
+
 2026-10-06，用户实际观看后指出“明显声音和有些shot不对”，并确认“都有”。
 用户反馈绑定下方12.5s输出SHA `af37152c6acce2feaa9c64bb44d957d22e8cf7bb352397d384c3049a23f69c61`。
 当前状态为 **REJECTED_BY_USER / NOT_ACCEPTED，下一剧情单元BLOCKED**。
