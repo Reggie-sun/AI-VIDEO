@@ -9,6 +9,33 @@ evidence_index_version: "1"
 
 Date: 2026-10-07
 
+## Local Composite Asset Check — 2026-10-07
+
+用户结束该H3候选的prompt、重抽和变速修复，改查动画直接控制的局部合成。实际只读打开
+19个已有Blender工程，查看4张参考图、B03起势、raw接触/撤退及V37动作段。当前结论是：
+**本轮资产不足以直接交付可信的局部接镜小样；没有产出合成MP4，未进行合成画面验收。**
+这是资产可行性判断，不是一次已经渲染的合成FAIL，也不代表局部合成技术普遍不可行。
+
+证据目录 `C = runs/fanxiang-local-composite-check-20261007-012/`。
+`C/existing-blend-inventory.json`显示19个工程均无图片纹理材质；早期6版有primitive UV和打包
+参考图，不能当成已完成角色贴图。当前模型为球体头部加独立眼鼻、曲线长颈和单臂代理，动作
+可复用，真人外观并未建好。`C/asset-feasibility-board.jpg`对照既有真实帧和灰模姿态：真实源
+为双手握键盘，手/键盘/下脸/颈部遮挡已合在MP4里，proxy命中后的转头与落手关系不同。
+
+只换键盘会留下原错误头部反应；简单移动头部贴片不能补出转面、下颌/颈根及新露出的像素。
+后段同机位空窗可帮助补部分背景，键盘参考图可复用为刚性道具，但还需贴合真人轮廓的局部
+头颈表面、角度对应外观与约12–24帧的多层抠像/擦除/遮挡处理，再收口光照、运动模糊和接点。
+Parent粗估约2–4人天人工镜头特效，不是实测工时或效果承诺；无须重做完整角色和场景，
+但已超出本轮禁止精细建模/大量逐帧修复的边界，因此没有展开贴图头或灰模成片小样。
+
+`C/feasibility-decision.json`区分事实、推断与估算；`C/preservation-check.json`证明19个.blend
+和11个保留源bytes未变。媒体生成调用0，未修改白模、架构、原对白或原raw FAIL。
+本次仅增加资产诊断，不形成新的动作迁移实验，learning evaluation为 `no_candidate`。
+受管Kimi只读审查资产说明与动作脚本，invocation `ce302dba-c092-4f19-823b-ab6d21796d09`，
+2 wire requests，receipt/Read/report SHA核验。其确认屏幕轨迹可驱动2.5D贴片，但未查看画面；
+Parent依据实际遮挡和转面缺口裁决该技术可行性不构成成片可用性，未将无UV作为单独阻断理由。
+见 `C/kimi-parent-adjudication.json`。本轮检查不请求下一次制作授权或启动新修复循环。
+
 ## Current Editorial Follow-up — 2026-10-07
 
 按用户新指令只做一次局部节奏修订，**动作本身仍不成立，停止，不进入撞击声或混音阶段**。
