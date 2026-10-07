@@ -12,6 +12,30 @@
       "sourceType": "github",
       "skillPath": "skill/open-video/SKILL.md",
       "computedHash": "736401d7ffc1a3a716618c243525689a59fcf2546c22c0067a8fdd35e851ff6f"
+    },
+    "scenario-blender-animation": {
+      "source": "scenario-labs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/dcc/blender/scenario-blender-animation/SKILL.md",
+      "computedHash": "c0e5d5a9485f0ca5dc1e7f1c29d0d2ac00f5b5d036c74246c633069ec722b7c6"
+    },
+    "scenario-blender-expert": {
+      "source": "scenario-labs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/dcc/blender/scenario-blender-expert/SKILL.md",
+      "computedHash": "57900e93cf973ac01f3b0593582e68befd089e06d749ad69804456d92d142714"
+    },
+    "scenario-blender-previs-storyboard": {
+      "source": "scenario-labs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/dcc/blender/scenario-blender-previs-storyboard/SKILL.md",
+      "computedHash": "37f2d49880a8c98843e4634f9269b69a4843495f347dc5965bd2a112cebd82d4"
+    },
+    "scenario-blender-rigging": {
+      "source": "scenario-labs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/dcc/blender/scenario-blender-rigging/SKILL.md",
+      "computedHash": "5a7bd0daad0aa7b0d7e6a3784437892b91cf34c43892de475aff31b75ec5b4df"
     }
   }
 }

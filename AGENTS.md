@@ -89,6 +89,7 @@ stable substantial record 后自动评估 `distill-ai-video-learning`；只可�
 用户 exact confirmation 与 target owner verification 前不修改 Skill/Policy/Gate 或标 `ADOPTED`。
 
 ## Creative Skill Routing
+Blender 资产/参考制作见 [routing](docs/blender-routing.md)。
 
 | Concern | Route |
 | --- | --- |
@@ -167,7 +168,7 @@ workflow 文件不证明 server enforcement。Tool exit 0 / `PARSED` / tests 不
 ## Completion Standard
 
 稳定 substantial checkpoint/blocker/handoff 前使用 `record-ai-video-session` 主动评估 record/no_record，
-记录后自动 learning evaluation；repository 外 effects 与无 hook 也计入。每次代码修改完成并通过相关 verification 后，MUST 先按精确 owned paths commit，再 push 到远端 `main`；push 失败或受阻时 MUST 明确报告，禁止 force push 或夹带 unrelated changes。
+记录后自动 learning evaluation；repository 外 effects 与无 hook 也计入。所有修改（含文档、规则、配置）验证后 MUST 按 owned paths commit；每次 commit 后 MUST push 到远端 `main` 并核验 SHA。失败/受阻须报告，禁止 force push 或夹带无关改动。
 Final 报 changed content、实际 verification、receipt 相对路径、publication state 和未验证风险。
 
 <!-- aoci:begin -->
