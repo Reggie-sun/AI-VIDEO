@@ -8,6 +8,10 @@ learning_eligibility: ineligible
 
 Date: 2026-10-07
 
+## Supersession Notice
+
+2026-10-07 后续核对纠正：实际首帧及输出第0帧已有门中央暗矩形面板；新增的是后段红色发光和文字，下面“首帧没有此物”的原判断错误，不再适用。来源原因未证实。用户明确反馈表情和动作均僵硬，随后批准第二条；当前结果见 [Second Take](2026-10-07-door-question-second-take.md)。下文保留第一条当时的判断与时间线，不代表当前待授权状态。
+
 ## Scope And Exact Media
 
 用户回复“确认”，批准《门挡不住？》提案的第一条；第二条仍需具体问题与用户另行确认。原故事 `runs/jimeng-fanxiang-analysis-20261002-001/composers.json` 的视频15潘子求证段发生在完整第一条规则之后；本单元不冒充与《广播叫停》引言无缝衔接。
