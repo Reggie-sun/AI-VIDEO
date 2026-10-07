@@ -116,10 +116,15 @@ def test_canonical_routing_selects_seedance_without_expanding_higgsfield() -> No
     agents = _read(ROOT / "AGENTS.md")
     playbook = _read(ROOT / ".agent" / "context" / "control-plane-playbook.md")
 
-    assert "Approved Shot + selected Seedance target | `seedance-authoring`" in agents
-    assert "Non-Seedance model / Provider prompt adaptation | `higgsfield`" in agents
+    assert "相关操作前 MUST 按 concern 读取" in agents
+    assert (
+        ".agent/context/control-plane-playbook.md#1-creative-skill-routing-and-preflight"
+        in agents
+    )
+    assert "首次 creative prompt/contract/script 前读取" in agents
     assert "`seedance-authoring` MUST use" in playbook
-    assert "Non-Seedance" in playbook
+    assert "approved Shot + requirement + selected Seedance" in playbook
+    assert "Non-Seedance guidance 用 `higgsfield`" in playbook
     assert "-> seedance-authoring:" in playbook
     assert "MUST NOT direct-dispatch" in playbook
     for retired in (

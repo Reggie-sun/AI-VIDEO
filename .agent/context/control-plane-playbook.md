@@ -99,8 +99,8 @@ reservation、egress、durable intent、one-use permit。Local video 仍经 `Vid
 ## 4. Verification, Pilot And Delivery Details
 
 `make harness-inspect` → exact staged snapshot 或 commit range 的 `make harness-verify` / `make harness-verify-range`
-→ `make harness-receipt`。Freshness、hash、isolation、fallback 已由原 Harness tests 验证；不在此复制字段。
-新 gate 每轮检查 rules/check references、links 与 guide/context budgets；doc/control-plane delta 同时跑真实 invariant tests。
+→ `make harness-receipt`。核验 scope/policy/artifact hashes/freshness；isolation/fallback 由 Harness tests 验证。
+`agent_rules_check` 每轮检查 rules/check references、links/anchors、guide/context budgets；`agent_rule_invariants` 与原 changed-path suites 验证迁移 invariant。
 Harness 不生成媒体或读 secret；CI 自产证据；remote enforcement 必须当前 server evidence。
 真实批量媒体前先完成约 30–60 秒、4–8 连续 Shots 的代表性 Pilot，包含任务主要 media/audio/captions/composition，
 人实际观看给 GO/NO-GO；NO-GO 不扩量。Reference asset 不自动成为 Final Shot Visual，跨非连续 Shot 复用须导演理由和人工 review。
@@ -180,13 +180,19 @@ learning evaluation。Trivial/unfinished 明确 no_record；无合格学习 evid
 
 ## Agent Workflow Operations
 
+### Workflow Selection
+Native Codex 默认 primary；Skill 按需加载，不自动拥有 lifecycle。T0 局部可逆用 targeted validation；T1 bounded multi-file 必要时 plan；T2 architecture/workflow/Provider/Harness/shared schema 走 research → spec → plan → implement → verify → review；T3 ownership/verification/paid/credential/recovery/QA contract 保留严格验证，不自动双审。Bug 先 root-cause/systematic-debugging，再 regression validation。Spec/plan 默认 Parent self-review，不默认独立 reviewer；authorized written spec 自动使用 `superpowers:writing-plans`。
+
+### Cognition Tools
+跨模块修改、架构理解、影响分析、复杂 bug、重构或重要功能开发时，按需先用 AOCI 获取职责、语义关系、API 与约束，再用 CodeGraph 核对 symbol、reference、dependency/call graph，以源码/LSP 为具体事实、tests 为最终验证。简单局部任务没有实际 AOCI 认知需求时，禁止仅为流程完整机械调用 AOCI。
+AOCI cognition 永远不是 source of truth；Overview、Entry 与检索结果只作 advisory context，不能代替当前源码、tests、已验证 runtime evidence 或 canonical contracts。AOCI 正式认知位于 `aoci.txt`、`aoci.meta.txt`、`aoci.code.txt`；当前状态、维护顺序和安全停点以项目 AOCI MCP 的 `aoci_rules`、实时 Guide、工具返回及官方文档为准。索引语义必须基于当前源码和契约证据由模型编写；若认知与源码或 CodeGraph 不符，应修正认知，不能覆盖源码事实。受管理对象在最终稳定状态后按 AOCI 官方流程维护，不能把未对齐索引称为完整认知。
+
 ### Constructing An Immutable Review Target
 
 先完成实际 verification；使用 exact commit/tree 或 staged tree hash，绑定 diff、source byte hashes、spec/plan 和 receipt。
 仅 staged 清单+时间不能证明 immutable bytes；Kimi 绑定 exact target，read-only，不 nested delegation。
 
 ### Implementation Review
-
 先完成 project-native tests/Harness，再按 `/home/reggie/.codex/SUBAGENTS.md` 的低频 Risk Gate 判断。
 T3、Spec/Plan 存在、diff 大小或 Kimi 可用都不自动触发；未触发由 Codex Parent 正常完成。
 触发时只增加一名 Kimi adversarial read-only reviewer，Codex Parent 是 orchestrator/fixer/adjudicator；
