@@ -8,6 +8,18 @@ learning_eligibility: ineligible
 
 Date: 2026-10-07
 
+## Canvas Retake — 2026-10-08
+
+用户明确要求“所以你现在按照画布的再做一次”，授权恢复原画布 Group26 / 视频15 / 分镜三的潘子近景，取代下方历史“没有第三次授权”的当时状态；不恢复同配置连续重抽。原源为 `runs/jimeng-fanxiang-analysis-20261002-001/composers.json` 的 `node_jxawv40nkz`。此前求安慰、退回坐稳及曾亮看门是 Agent 改编，不能归到原画布。
+
+本次恢复上铺侧前方近景、前景床栏、下方两人虚焦、缓慢推近、越想越怕及问后抓栏；完整潘子原句保留。只制作此镜，不声称完成原五镜组；原3.5秒槽位改用15秒上限已事前披露。首帧生成2次，第二次纠正曾亮按小龙肩的关系；实际检查后仅提交修正图。H3 实际1次，本单元累计3次、原链21次；没有追加生成或修改原声时序。
+
+Run：`runs/fanxiang-door-canvas-20261008-003/`；原片 `output.mp4` SHA-256 `8406e8082a3e93fb91c50f4db4612ec794a752908923326971554ddb7c2b315c`，11,258,581 bytes，15.083秒，1344×768、24fps、H264/AAC。`opening.png`、`compiled-prompt.txt`、`submission.json`、`fetch-receipt.json` 保存实际输入与结果，未激活或判采用。
+
+Parent 显式调用 project-local video-analysis probe、逐秒抽帧及本地 ASR，并检查0–15秒图像；全片声画解码成功。这不是正常速度连续声画审片，未实际听辨。上铺近景及推近可见，未见红光；门桌在画外，不能称本片直接展示堵门。约7–10秒手指有卷握变化，11秒后手逐渐被推近裁掉，14–15秒完整抓栏手已不可见，结尾构图存在明确偏差。注意和恐惧变化的自然度尚未验收。ASR 在约9–14.8秒识别出重复条件与后果，仅列为疑点交用户听辨，不据此判台词重复、缺失或通过。
+
+`actual-findings.json`、`diagnosis.json`、`qa-handoff.json` 保留 visual FAIL 及声音/因果等 NOT_EVALUATED。一次 Kimi 文本概念检查 `51826b61-03f7-4851-94c3-effc573a56bc` 核对原句与镜头范围，不构成媒体验收。当前等待用户完整听看，无自动第四次授权；旧素材、广播003采用状态与旧反击未完成状态保持。按 `record-ai-video-session` 保存本段，`distill-ai-video-learning` 评估 `no_candidate`：首帧、景别、表演安排同时变化，且新结果未获人确认，不能推导近景必然改善表情或H3模型定律。没有代码、架构或Spec/Plan变更。
+
 ## Production Assessment — 2026-10-08
 
 用户反馈表情僵硬跨片段存在，本条未获采用确认。只比较已有《广播叫停》003和《门挡不住？》001、002；原始首帧逐张检查，三份 `compiled-prompt.txt` 与实际 `request.json` 文本一致，request bytes 与已消费提交记录 SHA 一致。原片 SHA 均与原记录相符。
