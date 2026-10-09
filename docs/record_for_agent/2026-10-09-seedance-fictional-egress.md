@@ -1,5 +1,11 @@
 # Seedance Fictional Reference Admission
 
+## Supersession Notice — 2026-10-10 API Submission
+
+下文“生成提交0 / mixed API未接通”是网页上传阶段的历史状态。后续已接通并实际POST一次，
+方舟以 `InputImageSensitiveContentDetected.PrivacyInformation` 拒绝，仍无成片、未重试。
+当前证据见[API提交记录](2026-10-10-group26-seedance-api-rejection.md)；旧上传及审查证据保留。
+
 ## Scope And Authority
 
 用户明确要求“修改harness再上传”，并确认使用虚构角色、不走真人认证。此次只修改
