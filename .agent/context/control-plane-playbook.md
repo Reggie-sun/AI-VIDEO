@@ -50,7 +50,7 @@ Agent 根据 beats、空间/动作轨迹、viewpoint、reveal/pacing、continuit
 ### Skill Selection
 
 依赖顺序：memory（命中 trigger 时）→ ecommerce/Director → semantic continuity → selected Provider authoring
-→ deterministic composition。只用 matching concerns，实际读取各 Skill；schema/操作/限制不在此复制。
+→ deterministic composition。只用 matching concerns，实际读取各 Skill；schema/操作/限制不在此复制。连续画布先读[制作方法](../../docs/canvas-continuous-production.md)，默认480p。
 
 - `ecommerce-ad-workflow`：仅 ecommerce/SKU/product advertising；不接管 AI comic/drama。
 - `open-video`：concept/script/raw input/ordered coverage；不安装运行外部 engine 或生成/judge/stitch。

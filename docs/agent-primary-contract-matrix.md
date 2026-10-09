@@ -17,6 +17,11 @@ offline scripted bootstrap只证明标准reader/committer/evaluator wiring，不
 
 ## Sequence Authoring Boundary
 
+Development-only入口`scripts/canvas_sequence_packet.py`保留显式节点/原timeline顺序、完整原文、
+共享引用和typed boundary authoring；缺边界BLOCKED，不推断生成间state。旧rich packet入口不变。
+该包不写Production、不授权submit或验收，现有sequence adapter仍唯一拥有accepted source materialization；
+操作见[Continuous Canvas Production](canvas-continuous-production.md)。Focused checks归既有canvas_reference_packet_tests。
+
 顺序 owner：selected `Storyboard.beats[].shot_ids`；authoring/revision 与 mutable acceptance
 仍由 `ProductionProject`、Registry、Manifest 和唯一 `ProductionStateCommitter` 管理。
 `planning/sequence_continuity.py::build_sequence_video_planning_request` 是唯一通用 typed edge
