@@ -62,7 +62,32 @@ Parent 用 fresh Harness receipt 和 `rg src tests .agent/harness` 无命中结�
 该候选有损，不冒称原像素一致；因用户要求忠实复刻，已明确请求这项输入适配确认，
 在收到答复前不上传或替换，原素材不覆盖。
 
+## Approved JPEG Upload
+
+用户随后回复“可以”，批准上述同尺寸JPEG适配。该文件上传后，页面五份参考均为
+`done`：小龙图片1、潘子图片2、曾亮图片3、宿舍图片4、参考视频1。宿舍图片的
+`SubmitContentRisk` 返回 `Code=0 / Decision=PASS`，请求身份
+`20261010002536090BCB3AB6DC750E6076`。原PNG未覆盖；JPEG不是像素一致副本。
+证据：`runs/seedance-fictional-egress-20261009-001/dormitory-jpeg-approval-and-upload.json`。
+
+生成提交仍为0。重新核对 `generation_feedback_driver.py`：当前driver注入的
+`SeedanceAssetReferenceResolver`需要真实asset materialization receipt；网页参考区的
+上传结果不构成该receipt。现有synthetic resolver仍是PNG、image-only入口，故这组
+JPEG/PNG/外部参考视频尚未接通canonical生成提交。不能伪造asset://入库观察，也不能把
+页面上传成功写成可直接执行完整Production请求。原文的chip出现顺序是小龙、曾亮、
+潘子、宿舍，与图片编号顺序不同；候选正文仅按身份替换四处引用，最终native binding
+和提交载荷仍待完成。
+
+Claude只读审查已返回，确认候选正文四句对白、五段分镜和引用身份一致；Parent以逐字符
+比较复核，差异只有四处chip标签替换。候选SHA-256为
+`09b6e4e0b6a4fe7a5d5a933a31898459d1ba6459c26e167abf49e55ad34e9eee`。
+Claude报告把JPEG字节数误写为5,631,222；Parent重读文件确认5,631,225，以实测为准。
+这是内容候选审查，不是最终native提交载荷审查；视频适配证据仍由原
+`reference-video-adaptation.json`保存，不以审查者未读取该文件判定证据不存在。
+审查和裁决保存在同一run的`claude-upload-review.json`与
+`claude-upload-review-adjudication.json`。
+
 ## Learning Evaluation
 
 使用 `record-ai-video-session` 记录真实阻断；`distill-ai-video-learning` 评估为
-`no_candidate`：本轮仅有确定性代码验证和上传工具路径错误，不形成模型或制作质量经验。
+`no_candidate`：证据限于代码验证、上传恢复及单次输入检查，不形成模型或制作质量经验。
