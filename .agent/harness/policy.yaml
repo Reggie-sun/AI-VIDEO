@@ -288,7 +288,7 @@ checks:
     covered_by_check_ids: [production_contract_tests]
     description: Verify paid-provider safety and generated-video contracts without live submit.
   seedance_local_video_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_seedance.py, tests/test_production_seedance_local_video.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_seedance.py, tests/test_production_seedance_local_video.py, tests/test_production_seedance_mixed_reference.py, -q]
     cwd: .
     covered_by_check_ids: [production_video_provider_tests]
     description: Verify exact non-identity local-video materialization and Seedance request binding without live submit.
@@ -1035,6 +1035,9 @@ categories:
       - src/ai_video/production/vidu_source.py
       - src/ai_video/production/seedance.py
       - src/ai_video/production/seedance_asset.py
+      - src/ai_video/production/seedance_mixed_reference.py
+      - src/ai_video/production/seedance_reference_image.py
+      - src/ai_video/production/seedance_native_prompt.py
       - src/ai_video/production/seedance_capabilities.py
       - src/ai_video/production/seedance_local_video.py
       - src/ai_video/production/seedance_reference_duration.py
@@ -1107,6 +1110,7 @@ categories:
       - tests/test_production_vidu_download.py
       - tests/test_production_seedance.py
       - tests/test_production_seedance_local_video.py
+      - tests/test_production_seedance_mixed_reference.py
       - tests/test_production_video.py
       - tests/test_production_ecommerce_shot_candidate_gate.py
       - tests/test_video_candidate.py

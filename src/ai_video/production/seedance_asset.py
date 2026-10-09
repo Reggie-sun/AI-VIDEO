@@ -16,7 +16,7 @@ from pydantic import ConfigDict, Field, model_validator
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
-from ai_video.production.image import measure_png_bytes
+from ai_video.production.seedance_reference_image import measure_reference_image
 from ai_video.production.models import (
     ActorIdentity,
     AssetRegistrySnapshot,
@@ -396,7 +396,7 @@ class SeedanceRemoteReferenceResolver:
 
 
 class SeedanceSyntheticImageReferenceReceipt(StrictModel):
-    """Human-attested eligibility and exact local identity for one synthetic PNG."""
+    """Human-attested eligibility and exact local identity for one reference image."""
 
     model_config = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True)
 
@@ -408,7 +408,7 @@ class SeedanceSyntheticImageReferenceReceipt(StrictModel):
     source_asset_id: str = Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9._:-]{0,255}$")
     source_registry_revision_id: str = Field(pattern=r"^[0-9a-f]{64}$")
     source_asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    source_mime_type: Literal["image/png"]
+    source_mime_type: Literal["image/png", "image/jpeg"]
     source_size_bytes: int = Field(
         strict=True, gt=0, lt=SEEDANCE_MAX_SYNTHETIC_IMAGE_BYTES
     )
@@ -621,6 +621,7 @@ def _validate_policy_against_preview(
     policy: SeedanceSyntheticImageEgressPolicyReceipt,
     receipts: tuple[SeedanceSyntheticImageReferenceReceipt, ...],
     preview: PaidProviderCallPreview,
+    media_bindings: tuple[VideoMediaReferenceBinding, ...] = (),
 ) -> None:
     egress = {item.item_id: item for item in preview.egress_items}
     prompt = egress.get("prompt")
@@ -637,7 +638,16 @@ def _validate_policy_against_preview(
         or prompt.sha256 != policy.prompt_sha256
         or prompt.size_bytes != policy.prompt_size_bytes
         or prompt.mime_type != "text/plain"
-        or set(egress) != {"prompt", *(receipt.source_asset_id for receipt in receipts)}
+        or set(egress) != {"prompt", *(receipt.source_asset_id for receipt in receipts),
+                          *(binding.asset_id for binding in media_bindings)}
+        or any(
+            (item := egress.get(binding.asset_id)) is None
+            or item.purpose != "reference"
+            or item.sha256 != binding.asset_sha256
+            or item.size_bytes != binding.size_bytes
+            or item.mime_type != binding.mime_type
+            for binding in media_bindings
+        )
         or any(
             (item := egress.get(receipt.source_asset_id)) is None
             or item.purpose != "reference"
@@ -692,7 +702,7 @@ class SeedanceSyntheticImageAuthorizer:
 
 
 class SeedanceSyntheticImageReferenceResolver:
-    """Resolve exact human-attested synthetic PNG bytes to an in-memory data URI."""
+    """Resolve exact human-attested image bytes to an in-memory data URI."""
 
     def __init__(
         self,
@@ -721,9 +731,9 @@ class SeedanceSyntheticImageReferenceResolver:
             if not isinstance(payload, bytes):
                 raise _invalid("Seedance synthetic input bytes are unavailable.")
             try:
-                measured = measure_png_bytes(payload)
+                measured = measure_reference_image(payload, receipt.source_mime_type)
             except (AiVideoError, ValueError, TypeError):
-                raise _invalid("Seedance synthetic input PNG is invalid.") from None
+                raise _invalid("Seedance synthetic input image is invalid.") from None
             if (
                 receipt.source_registry_revision_id != registry.revision_id
                 or measured.sha256 != receipt.source_asset_sha256
@@ -792,6 +802,8 @@ class SeedanceSyntheticImageReferenceResolver:
         request: ResolvedVideoGenerationRequest,
         preview: PaidProviderCallPreview,
         authorization: PaidProviderAuthorizationDecision,
+        *,
+        verified_media_bindings: tuple[VideoMediaReferenceBinding, ...] = (),
     ) -> None:
         policy = self._policy_receipt
         prompt_bytes = request.prompt_text.encode()
@@ -810,7 +822,7 @@ class SeedanceSyntheticImageReferenceResolver:
             or scope.request.base_registry.revision_id != self._registry.revision_id
             or scope.request.base_registry.content_hash != self._registry.content_hash
             or scope.request.base_registry.file_sha256 != self._registry_snapshot_sha256
-            or request.media_bindings
+            or request.media_bindings != verified_media_bindings
             or len(expected_children) != len(request.image_bindings)
             or expected_children != policy.children
             or any(
@@ -836,6 +848,9 @@ class SeedanceSyntheticImageReferenceResolver:
             raise _egress_denied(
                 "Seedance synthetic egress authorization does not match the exact receipt."
             )
+        _validate_policy_against_preview(
+            policy, tuple(self._by_source.values()), preview, verified_media_bindings
+        )
 
     def __call__(self, binding: VideoImageReferenceBinding) -> str:
         if type(binding) is not VideoImageReferenceBinding:

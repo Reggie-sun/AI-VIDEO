@@ -27,6 +27,7 @@ from ai_video.production.paid_provider import (
     PaidProviderCallPreview,
     PaidProviderSubmitOutcome,
     PaidProviderSubmitReceipt,
+    SecretReference,
     validate_paid_provider_authorization,
 )
 from ai_video.production.remote_media import (
@@ -57,6 +58,8 @@ from ai_video.production.seedance_asset import (
 from ai_video.production.seedance_local_video import (
     SeedanceLocalVideoReferenceResolver,
 )
+from ai_video.production.seedance_mixed_reference import SeedanceMixedReferenceResolver
+from ai_video.production.seedance_native_prompt import SeedanceNativePromptBinding
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
     VideoFetchReceipt,
@@ -292,14 +295,20 @@ class SeedanceVideoProvider:
             | SeedanceRemoteReferenceResolver
             | SeedanceSyntheticImageReferenceResolver
             | SeedanceLocalVideoReferenceResolver
+            | SeedanceMixedReferenceResolver
         ),
         now: Callable[[], datetime] | None = None,
+        native_prompt_binding: SeedanceNativePromptBinding | None = None,
+        credential_reference: SecretReference | None = None,
     ) -> None:
         self._profile = profile
         self._transport = transport
         self._credential = credential
         self._input_reference = input_reference
         self._now = now or (lambda: datetime.now(UTC))
+        self._native_prompt_binding = native_prompt_binding
+        self._credential_reference = credential_reference or SecretReference(
+            kind="secret_store", reference_id=ARK_API_KEY_REFERENCE)
         self._profiles_by_capability = {
             entry.variant.capability_id: entry for entry in profile.capabilities
         }
@@ -337,6 +346,9 @@ class SeedanceVideoProvider:
                 prompt_sha256=compiled_prompt.prompt_sha256,
                 expressed_control_paths=compiled_prompt.expressed_control_paths,
             )
+            if self._native_prompt_binding is not None:
+                native_prompt = self._native_prompt_binding.compile(
+                    provider_bound, compiled_prompt.expressed_control_paths, requirement=requirement)
         return compile_provider_video_request(
             provider_bound=provider_bound,
             requirement=requirement,
@@ -547,13 +559,14 @@ class SeedanceVideoProvider:
         ]
         return bool(
             actual == expected
-            and preview.secret_reference.kind == "secret_store"
-            and preview.secret_reference.reference_id == ARK_API_KEY_REFERENCE
+            and preview.secret_reference == self._credential_reference
         )
 
     def _asset_reference(
         self, binding: VideoImageReferenceBinding | VideoMediaReferenceBinding
     ) -> str:
+        if type(self._input_reference) is SeedanceMixedReferenceResolver:
+            return self._input_reference(binding)
         if type(self._input_reference) is SeedanceSyntheticImageReferenceResolver:
             if type(binding) is not VideoImageReferenceBinding:
                 raise _error(
@@ -619,6 +632,7 @@ class SeedanceVideoProvider:
         if type(self._input_reference) in {
             SeedanceRemoteReferenceResolver,
             SeedanceLocalVideoReferenceResolver,
+            SeedanceMixedReferenceResolver,
         }:
             if type(self._input_reference) is SeedanceLocalVideoReferenceResolver:
                 try:
@@ -836,7 +850,8 @@ class SeedanceVideoProvider:
                 "Seedance submit requires Paid Provider authorization.",
             )
         validate_paid_provider_authorization(paid_preview, authorization, now=self._now())
-        if type(self._input_reference) is SeedanceSyntheticImageReferenceResolver:
+        if type(self._input_reference) in {SeedanceSyntheticImageReferenceResolver,
+                                         SeedanceMixedReferenceResolver}:
             self._input_reference.validate_submit(request, paid_preview, authorization)
         binding = build_video_paid_permit_binding(
             request, video_preview, paid_preview, authorization
