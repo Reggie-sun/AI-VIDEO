@@ -38,8 +38,29 @@ Parent 用 fresh Harness receipt 和 `rg src tests .agent/harness` 无命中结�
 没有引入credential、跨项目权限或durable-state写入，现有来源与授权负向检查保留。
 审查和离线通过不等于上传或平台验收。
 本地允许提交、浏览器上传、平台审核、生成成功与用户成片验收是不同结论。
-需要修复浏览器工具的 workspace roots 配置或用户手动选取这些原文件才能继续上传；
+上述路径阻断已由下述2026-10-10上传交接修复取代；历史零上传结论只适用于前两次失败。
 生成仍需要完整输入接入和用户先前要求的最终 Claude 审查。
+
+## Upload Recovery 2026-10-10
+
+用户要求修复并继续上传。核对当前Chrome MCP `McpContext.roots()`：支持`os.tmpdir()`
+作为交接目录，项目root未生效不意味着禁止该受支持路径。只把五份已授权文件复制到专用
+临时目录并逐一核对SHA-256；未修改MCP源码、未启用unrestricted paths、未重启浏览器。
+这是使用现有支持的交接目录恢复上传，不宣称项目root协商本身已修复。
+
+一次五文件上传的五个对象存储PUT均返回200。页面三个角色`xiaolong.jpg`、`panzi.png`、
+`zengliang.png`及`reference-guide-2s.mp4`状态为`done`，对应页面素材检查返回`PASS`。
+原宿舍PNG的检查返回`Code=1001 / size exceeds the maximum limit`，所以没有留在参考区。
+不能将此解释成人物身份拒绝，也不能将页面素材检查通过外推为生成API接受、asset://入库
+或成片验收。生成提交仍为0。脱敏证据：
+`runs/seedance-fictional-egress-20261009-001/upload-observation-20261010.json`。
+
+宿舍PNG为27,256,502 bytes、5632×3168；无损PNG重压27,142,627 bytes，无损WebP
+23,557,944 bytes，两份均通过逐像素一致校验，但未重复上传。另备JPEG quality95、
+4:4:4、同尺寸候选5,631,225 bytes，SHA-256
+`00f4b958acb94dcd2047a2e26f2e5ed2ed6c54a1970a5426cfa506dadcb257ac`。
+该候选有损，不冒称原像素一致；因用户要求忠实复刻，已明确请求这项输入适配确认，
+在收到答复前不上传或替换，原素材不覆盖。
 
 ## Learning Evaluation
 
