@@ -128,6 +128,10 @@ checks:
     cwd: .
     covers_check_ids: [open_video_skill_tests, visual_quality_tests, product_runtime_skill_boundary_tests]
     description: Verify exact development intent joins, sealed review snapshots, Director compatibility and one-way runtime boundaries without Provider calls.
+  canvas_reference_packet_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_canvas_reference_packet.py, -q]
+    cwd: .
+    description: Verify offline canvas node coverage and identity-bound rich prompt references without provider effects.
   paid_reconciliation_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_paid_provider_no_effect_reconciliation.py, -q]
     cwd: .
@@ -374,6 +378,7 @@ checks:
       - agent_rule_invariants
       - visual_quality_tests
       - creative_goal_binding_tests
+      - canvas_reference_packet_tests
       - paid_reconciliation_tests
       - vidu_ad_tests
       - voice_source_routing_tests
@@ -881,6 +886,13 @@ categories:
       - tests/test_creative_goal_binding.py
     check_ids:
       - creative_goal_binding_tests
+      - task_architecture_gate
+  canvas_reference_packet:
+    patterns:
+      - scripts/canvas_reference_packet.py
+      - tests/test_canvas_reference_packet.py
+    check_ids:
+      - canvas_reference_packet_tests
       - task_architecture_gate
   commercial_source_preparation:
     patterns:
