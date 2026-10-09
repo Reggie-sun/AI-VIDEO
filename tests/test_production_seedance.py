@@ -2734,7 +2734,7 @@ def test_photorealistic_fictional_authorizer_reopens_source_evidence(
         ),
     ],
 )
-def test_photorealistic_fictional_authorizer_denies_valid_ark_egress(
+def test_photorealistic_fictional_authorizer_allows_attested_exact_egress(
     mode,
     binding_role,
     permitted_use,
@@ -2781,11 +2781,7 @@ def test_photorealistic_fictional_authorizer_denies_valid_ark_egress(
         ),
     )
 
-    with pytest.raises(AiVideoError) as exc_info:
-        authorizer(paid_preview)
-
-    assert exc_info.value.code is ErrorCode.PAID_PROVIDER_EGRESS_NOT_AUTHORIZED
-    assert "photorealistic person-like references are disabled" in str(exc_info.value)
+    assert authorizer(paid_preview) == authorization
 
 
 def test_synthetic_submit_rejects_registry_snapshot_pointer_mismatch_before_network():
@@ -3041,7 +3037,7 @@ def test_synthetic_reference_to_video_rejects_media_before_permit_consumption(
         ),
     ],
 )
-def test_photorealistic_fictional_inline_submit_is_denied_before_network(
+def test_photorealistic_fictional_inline_submit_preserves_bytes_and_consumes_once(
     mode,
     binding_role,
     permitted_use,
@@ -3090,20 +3086,19 @@ def test_photorealistic_fictional_inline_submit_is_denied_before_network(
 
     permit = _permit(resolved, video_preview, paid_preview, authorization)
 
-    with pytest.raises(AiVideoError) as exc_info:
-        provider.submit(
-            resolved,
-            video_preview,
-            paid_preview,
-            authorization,
-            permit,
-        )
+    result = provider.submit(
+        resolved, video_preview, paid_preview, authorization, permit
+    )
 
-    assert exc_info.value.code is ErrorCode.PAID_PROVIDER_EGRESS_NOT_AUTHORIZED
-    assert "photorealistic person-like references are disabled" in str(exc_info.value)
-    assert transport.requests == []
-    assert credential_calls == []
-    assert permit._validate_paid_provider_operation_permit(
+    assert result.external_effect_id == "task-photorealistic-fictional-inline-1"
+    assert len(transport.requests) == 1
+    assert credential_calls == [None]
+    image_content = json.loads(transport.requests[0].body)["content"][1]
+    assert image_content["image_url"]["url"] == resolver(resolved.image_bindings[0])
+    assert image_content["role"] == (
+        "first_frame" if binding_role == "first_frame" else "reference_image"
+    )
+    assert not permit._validate_paid_provider_operation_permit(
         **build_video_paid_permit_binding(
             resolved,
             video_preview,
