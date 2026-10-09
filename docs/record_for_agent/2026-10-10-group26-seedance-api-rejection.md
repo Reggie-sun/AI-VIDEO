@@ -9,6 +9,12 @@ evidence_index_version: "1"
 
 Date: 2026-10-10
 
+## Follow-up — Authorized Text Recast
+
+用户随后明确授权撤下三张人脸参考，以新角色文字描述保持写实风格。
+[新一条独立请求](2026-10-10-group26-text-recast.md) 已成功生成；下文仅描述原五参考失败请求，
+其 HTTP400、输入、消费及未验收事实不变。新输出也尚未获完整听看验收。
+
 ## Current Runtime Truth
 
 用户要求执行后，Group26 已经通过 canonical `VideoGenerationService` 向火山方舟
