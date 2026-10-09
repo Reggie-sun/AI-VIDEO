@@ -4,6 +4,7 @@ from collections.abc import Callable
 from typing import Any, TypeVar
 
 from ai_video.planning._asset_readiness import (
+    is_new_text_cast_request as _is_new_text_cast_request,
     is_shot_first_frame_request as _is_shot_first_frame_request,
     asset_matches_role as _asset_matches_role,
     available_role as _available_role,
@@ -326,7 +327,7 @@ def _dynamic_decision(
             and SemanticReferenceRole.CONTINUITY_TERMINAL not in roles
         ):
             roles.append(SemanticReferenceRole.CONTINUITY_TERMINAL)
-        if important_character:
+        if important_character and not _is_new_text_cast_request(request):
             for role in (
                 SemanticReferenceRole.IDENTITY,
                 SemanticReferenceRole.SCENE,

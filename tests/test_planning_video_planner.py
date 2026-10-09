@@ -118,6 +118,57 @@ def _neutral_generation_intent(
     )
 
 
+@pytest.mark.parametrize("identity_guard", [None, "canonical", "exact", "bounded", "previous", "undeclared"])
+def test_v3_new_text_cast_keeps_scene_reference_without_fabricated_portrait(identity_guard):
+    from ai_video.production.video_requirement import IdentityContinuity, IdentityPreservation
+
+    character = make_character()
+    if identity_guard != "canonical":
+        character = seal_artifact(character.model_copy(update={"reference_asset_ids": ()}))
+    scene = make_scene()
+    shot = make_shot(visual_strategy=VisualStrategy.GENERATED_VIDEO)
+    projection = _neutral_generation_intent(
+        semantic_reference_roles=(() if identity_guard == "undeclared" else (SemanticReferenceRole.SCENE,)),
+    )
+    if identity_guard in {"exact", "bounded"}:
+        intent = projection.generation_intent.model_copy(update={
+            "identity_continuity": IdentityContinuity(
+                character_ids=("hero",),
+                preservation=(IdentityPreservation.EXACT if identity_guard == "exact" else IdentityPreservation.BOUNDED_VARIATION),
+            ),
+        })
+        projection = ProviderNeutralGenerationIntentProjection.create(
+            generation_intent=intent, output_need=projection.output_need,
+            audio_need=projection.audio_need, quality_need=projection.quality_need,
+            semantic_reference_roles=projection.semantic_reference_roles,
+        )
+    request = make_request(
+        target_shot=shot, character_context=(character,), scene_context=scene,
+        available_assets=(AvailableAsset(
+            role=AssetRole.SCENE_REFERENCE, asset_id="reference-room", asset_sha256=ONE_HASH,
+            canonical_owner_id=scene.scene_id, canonical_owner_content_hash=scene.content_hash,
+            mime_type="image/png", width=1280, height=720, size_bytes=1000,
+        ),),
+        previous_shot_state=(make_previous_state() if identity_guard == "previous" else None),
+        shot_intent_evidence=make_intent_evidence(target_shot=shot, character_action_required=True),
+        review_decision=None, planning_contract_version="video-planner/3", generation_intent=projection,
+    )
+    plan = VideoPlanner().plan(request)
+    if identity_guard is not None:
+        assert plan.outcome is PlanOutcome.BLOCKED
+        with pytest.raises(AiVideoError):
+            require_current_video_plan(current_request=request, plan=plan)
+        return
+    assert plan.outcome is PlanOutcome.PROPOSED
+    verified = require_current_video_plan(current_request=request, plan=plan)
+    assert verified.requirement.generation_mode.value == "reference_to_video"
+    assert verified.requirement.characters == (character,)
+    assert verified.requirement.target_shot.character_ids == ("hero",)
+    assert not verified.requirement.capability_need.needs_identity_reference
+    assert verified.requirement.capability_need.needs_scene_reference
+    assert [asset.asset_id for asset in verified.requirement.asset_evidence] == ["reference-room"]
+
+
 def test_v3_dynamic_plan_blocks_prose_only_unspecified_generation_semantics():
     shot = _generated_shot(character_ids=())
     projection = ProviderNeutralGenerationIntentProjection.create(

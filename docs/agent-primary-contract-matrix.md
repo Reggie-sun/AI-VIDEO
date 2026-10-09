@@ -464,6 +464,17 @@ Provider / neutral requirement / Architecture checks。配置边界见 [Vidu Pro
 
 ## Cross-Cutting Contracts
 
+### Initial Text-Described Cast With Scene References
+
+`planning._asset_readiness.is_new_text_cast_request()` 限定 `/3`、无前镜、`AUTO`、显式
+`SCENE`（可带 video/audio reference）、完整文字 Character 且无已登记或已提供人像，
+并要求 `IdentityContinuity()` 未声明任何旧身份继承。`VideoPlanner` 在此路径保留人物
+与场景/media 绑定，不追加不存在的 identity reference；reference 可用性仍逐项验证。
+已有 canonical portrait、exact/bounded identity、前镜或未声明 reference roles 仍走原检查，
+不允许清空 Shot 人物、伪造人像或降为裸 T2V。该路径不保证片内人物一致或平台审核通过。
+Focused verification：`tests/test_planning_video_planner.py`、`tests/test_shot_readiness_gate.py`、
+`tests/test_production_shot_router.py`。
+
 ### Initial Shot First-Frame Input
 
 `validation.validate_shot_strategy()` 允许 pending generated-video 输出位附带一个已绑定

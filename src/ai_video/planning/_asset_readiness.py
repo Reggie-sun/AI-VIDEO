@@ -8,10 +8,31 @@ from ai_video.planning._planner_models import (
     VideoPlanningRequest,
 )
 from ai_video.production.models import AssetType, VisualStrategy
-from ai_video.production.video_requirement import GenerationOperation, SemanticReferenceRole
+from ai_video.production.video_requirement import GenerationOperation, IdentityContinuity, SemanticReferenceRole
 
 
 _FINAL_VISUAL_ROLE = "final_visual"
+
+
+def is_new_text_cast_request(request: VideoPlanningRequest) -> bool:
+    """A new described cast has no prior visual identity to preserve."""
+    projection = request.generation_intent
+    return (
+        request.planning_contract_version == "video-planner/3"
+        and request.previous_shot_state is None
+        and projection is not None
+        and projection.generation_operation is GenerationOperation.AUTO
+        and SemanticReferenceRole.SCENE in projection.semantic_reference_roles
+        and set(projection.semantic_reference_roles).issubset({
+            SemanticReferenceRole.SCENE, SemanticReferenceRole.VIDEO_REFERENCE,
+            SemanticReferenceRole.AUDIO_REFERENCE,
+        })
+        and projection.generation_intent.identity_continuity == IdentityContinuity()
+        and bool(request.character_context)
+        and {item.character_id for item in request.character_context} == set(request.target_shot.character_ids)
+        and all(item.appearance_bible.strip() and not item.reference_asset_ids for item in request.character_context)
+        and not any(item.role is AssetRole.CHARACTER_REFERENCE for item in request.available_assets)
+    )
 
 
 def is_shot_first_frame_request(request: VideoPlanningRequest) -> bool:
