@@ -621,9 +621,14 @@ tests/test_production_project.py -q`。
 Standalone synthetic图片入口仍拒绝media；只有mixed resolver可传入已核验的exact media set，
 全量egress必须与paid preview一致。该能力不证明平台接受或模型质量。
 
+同一mixed resolver可组合原始WAV/MP3参考：`verify_reference_audio`验证human授权、文件签名、
+exact Registry SHA/size/MIME及已测duration后封存原bytes，以inline Base64提交，不转码或网页上传。
+音频必须进入完整request/preview/permit绑定，独立图片入口仍拒绝未核验media。
+
 `seedance_native_prompt.py`提供显式原文绑定：只适用exact provider-bound request hash，
 正文hash必须一致，现有意图验证与recipe expression覆盖检查继续执行；不从画布标题猜引用、
 不覆盖角色/场景/输出参数。Source evidence hash由实际输入审查核对，不构成模型复刻保证。
+原文binding允许最多65536字符，这是本地有界防护而非上游支持保证；request总bytes限制仍执行。
 
 `src/ai_video/production/seedance_local_video.py` 独占本地普通或合成非身份视频到
 Seedance `reference_video` 的受控 HTTPS materialization seam。Exact preview 必须绑定

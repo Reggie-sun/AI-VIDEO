@@ -14,7 +14,8 @@ from ai_video.production.video_compiler import ProviderNativePrompt
 
 class SeedanceNativePromptBinding(StrictModel):
     provider_bound_request_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
-    prompt_text: str = Field(min_length=1, max_length=5000)
+    # Local bounded authoring guard, not a claim about the Provider text limit.
+    prompt_text: str = Field(min_length=1, max_length=65536)
     prompt_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     source_evidence_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
@@ -40,6 +41,9 @@ class SeedanceNativePromptBinding(StrictModel):
             motion = requirement.generation_intent.primary_camera_motion
             if (motion is not None and motion.movement_kind == "dolly_in"
                     and motion.direction == "forward" and "推近" in self.prompt_text):
+                controls = (*controls, "generation_intent.primary_camera_motion.direction")
+            if (motion is not None and motion.movement_kind == "orbit_left"
+                    and motion.direction == "left" and "同一条逆时针弧线移动" in self.prompt_text):
                 controls = (*controls, "generation_intent.primary_camera_motion.direction")
         return ProviderNativePrompt(
             grammar_contract="remote-video-prose-v1", prompt_text=self.prompt_text,
