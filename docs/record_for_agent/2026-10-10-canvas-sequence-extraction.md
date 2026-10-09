@@ -6,6 +6,43 @@ learning_eligibility: ineligible
 
 # Continuous Canvas Workflow Extraction
 
+## Team Review Correction — 2026-10-10
+
+用户要求独立Team复核commit `a658a7d9411245c8d2b46a3ea9635e643ddba8f1`。本次只读审查代码与原画布，未修复实现、未生成/改动媒体。
+原27 tests及Harness通过仍是真实工程事实，但不足以完成“提取共同连续制作方法到Harness”的用户目标：
+两份真实packet的10条边界均未编写具体planned open/close/carryover，且没有packet→Production实际consumer。
+`next_owner`只是字符串；既有continuity adapter仍拒绝缺少真实accepted source的执行。不能将此入口称为连续工作流已接通。
+
+### Confirmed Findings
+
+- 制作证据：反向第25组小龙开场、末段都握长杆；第26组却写“没有拿到任何东西，双手仍然空着”。
+  `docs/canvas-continuous-production.md`第34行直接归一为“空手”，遗漏原文矛盾。正确处理是显式标出待决定的状态变化，不能自行改写任一组。
+- `canvas_sequence_packet.py`允许raw document混入自洽hash的`generation_nodes`覆盖真实`generationDraft`正文。
+  Parent纯内存反例已确认导出替换正文；两份历史实际包未发现被这样篡改。
+- `_boundary`仅验证单项enum，不验证canonical组合。现有test fixture把`scene_boundary + identity_style_carryover + scene_reset + []`
+  当作正确authoring，实际`ContinuityTransitionPolicy v2`拒绝该组合。Parent亦复现continuous_take+scene_reset被准备器接受。
+  这是准备契约缺陷；下游owner仍重验，不是生产授权或媒体验收绕过。
+- `selection.boundaries[].required_carryover_dimensions`被静默丢弃，FULL进入既有adapter仍缺必需carryover声明；Parent已复现。
+- 非object source JSON `[]`导致AttributeError/raw traceback/exit1，未走CLI的exit2错误封装；Parent通过临时输入复现，无输出文件。
+
+### Scope Limits And Disagreement
+
+白带子8段timeline顺序和clip选择未发现错误，共享素材与480p默认可以保留。
+但unit没有保存所选输出resourceId/hash；完整source archive能回查当时指针，不等于packet冻结了输出bytes。
+source quote只检子串不能自动证明开头/结尾语义，这属于需人工裁决的证据边界，不能要求字符串校验器冒充导演。
+制作与架构成员交叉质疑后同意：首要工作是补出具体承接状态并揭示长杆冲突；单加bridge不够。
+离线handoff接入既有Storyboard/sequence owner可以是后续窄范围工作，无需扩成无人值守driver。
+
+### Independent Evidence And Parent Adjudication
+
+Native `continuity_workflow_review`（context_search_agent）负责真实源文与连续制作；
+`harness_integration_review`（architecture_auditor）负责调用链与canonical语义，两者完成一轮交叉质疑。
+受管Kimi reviewer invocation `8a03bb3d-2754-4bf0-94f3-9760bc543cc5`，PARSED、5份实际读取，canonical receipt已核验；
+其职责仅代码/测试反例，没有读完整画布，不冒充制作侧审片。Parent分别复现上述实现缺陷并逐字核对道具冲突。
+Kimi的CLI与enum findings CONFIRMED；quote位置语义finding按当前spec裁为已知人工判断边界，不声称安全漏洞。
+测试通过事实保留，当前用户目标状态修正为INCOMPLETE，代码缺陷尚未修复。无新Spec/Plan、无第二次实现review循环。
+record-ai-video-session复用本记录；distill-ai-video-learning为no_candidate，不从审查结论创造模型质量规律。
+
 ## Scope And Evidence
 
 用户要求把反向之地与白带子共用方法提入Harness，并明确包含整张画布的连续制作，默认480p。
