@@ -133,7 +133,7 @@ checks:
     cwd: .
     description: Verify offline canvas node coverage and identity-bound rich prompt references without provider effects.
   canvas_production_workflow_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_canvas_reference_packet.py, tests/test_canvas_sequence_packet.py, tests/test_canvas_sequence_handoff.py, tests/test_canvas_production_source.py, tests/test_canvas_assets.py, tests/test_canvas_authoring.py, tests/test_canvas_planning.py, tests/test_canvas_production.py, tests/test_canvas_render.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_canvas_reference_packet.py, tests/test_canvas_sequence_packet.py, tests/test_canvas_sequence_handoff.py, tests/test_canvas_production_source.py, tests/test_canvas_assets.py, tests/test_canvas_authoring.py, tests/test_canvas_planning.py, tests/test_canvas_production.py, tests/test_canvas_recovery.py, tests/test_canvas_render.py, -q]
     cwd: .
     description: Verify faithful source inspection and shared canonical authoring, accepted-source handoff, replay, unknown stop, graph revision, native audio and scripted final rendering; no live media acceptance.
   paid_reconciliation_tests:
@@ -913,6 +913,7 @@ categories:
       - tests/test_canvas_authoring.py
       - tests/test_canvas_planning.py
       - tests/test_canvas_production.py
+      - tests/test_canvas_recovery.py
       - tests/test_canvas_render.py
     check_ids:
       - canvas_production_workflow_tests

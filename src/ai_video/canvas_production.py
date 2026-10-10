@@ -155,11 +155,10 @@ class CanvasProductionService:
             if shot.visual_strategy.value != "generated_video":
                 continue
             attempts = self._attempts(loaded, shot_id)
-            if len(attempts) > 1:
-                raise _blocked("Multiple attempts require explicit adopted-version/recovery decisions.")
             if not attempts:
                 return CanvasWorkflowPosition(row["occurrence_id"], shot_id, None, "prepare")
-            attempt = attempts[0]
+            from ai_video.canvas_recovery import current_canvas_attempt
+            attempt = current_canvas_attempt(self.committer, attempts)
             action = VideoGenerationService(committer=self.committer, provider=None).resume_next_action(
                 attempt_id=attempt.attempt_id)
             if action == "done":
@@ -169,15 +168,23 @@ class CanvasProductionService:
             return CanvasWorkflowPosition(row["occurrence_id"], shot_id, attempt.attempt_id, action)
         return CanvasWorkflowPosition(None, None, None, "compose")
 
-    def _orchestrator(self, row):
+    def _orchestrator(self, row, *, repair_receipt=None):
         if self.routing_policy is None or self.decision_policy is None:
             raise _blocked("Configure the existing routing/decision policies before generation.")
 
         def context(loaded):
             # Every prepare reopens source bytes, approved director binding and actual predecessor.
             self._load()
-            return canvas_feedback_context(loaded=loaded, row=row, policy=self.routing_policy,
+            current = canvas_feedback_context(loaded=loaded, row=row, policy=self.routing_policy,
                 execution_stack=self.execution_stack, handoff_preparer=self.handoff_preparer)
+            if repair_receipt is not None:
+                from ai_video.canvas_authoring import input_hash
+                identity = input_hash({"generation": current["lifecycle"].generation_id,
+                                       "rejection": repair_receipt.content_hash})[:32]
+                current["lifecycle"] = current["lifecycle"].model_copy(update={
+                    "generation_id": f"canvas-generation-repair-{identity}",
+                    "output_asset_id": f"canvas-video-repair-{identity}"})
+            return current
 
         return GenerationFeedbackOrchestrator.for_project(committer=self.committer,
             targets=self.targets, context_loader=context, policy=self.decision_policy)
@@ -189,6 +196,42 @@ class CanvasProductionService:
             raise _blocked(f"Current canvas action is {position.next_action}; do not create another attempt.")
         row = next(r for r in self.direction["shots"] if r["occurrence_id"] == position.occurrence_id)
         return self._orchestrator(row).prepare(limits=limits)
+
+    def _repair_context(self, limits, interventions):
+        position = self.position()
+        if not interventions or position.next_action != "stop" or position.attempt_id is None:
+            raise _blocked("Explicit repair requires an intervention and a closed quality failure.")
+        loaded = self._load()
+        attempt = next(a for a in loaded.manifest.attempts if a.attempt_id == position.attempt_id)
+        pointer = attempt.video_generation_state.quality_rejection
+        if pointer is None:
+            raise _blocked("Explicit repair requires a closed quality failure; unknown stops remain closed.")
+        binding = self.committer._reopen_generation_execution_binding(
+            attempt.video_generation_state.execution_binding)
+        if limits.task_id != binding.inputs.limits.task_id:
+            raise _blocked("Explicit repair must retain the predecessor task identity.")
+        receipt = self.committer._reopen_generation_quality_rejection(pointer)
+        row = next(r for r in self.direction["shots"] if r["occurrence_id"] == position.occurrence_id)
+        return position, row, receipt
+
+    @_input_errors
+    def prepare_repair(self, *, limits, interventions):
+        """Explicitly hand a closed exact result to the existing decision owner."""
+        _, row, receipt = self._repair_context(limits, interventions)
+        return self._orchestrator(row, repair_receipt=receipt).prepare(
+            limits=limits, interventions=interventions)
+
+    @_input_errors
+    def start_repair(self, *, limits, interventions):
+        """Start at most one proven successor; never submit or close old media."""
+        position = self.position()
+        if position.attempt_id is not None and position.next_action != "stop":
+            if len(self._attempts(self._load(), position.shot_id)) > 1:
+                return position
+        position, row, receipt = self._repair_context(limits, interventions)
+        prepared = self._orchestrator(row, repair_receipt=receipt).prepare(
+            limits=limits, interventions=interventions)
+        return self._start_prepared(position, prepared, limits)
 
     def generate_voice(self, *, prepared, **authorized_runtime):
         """Use the existing selected voice handoff, then reprepare from its Registry."""
@@ -206,6 +249,9 @@ class CanvasProductionService:
             return position
         row = next(r for r in self.direction["shots"] if r["occurrence_id"] == position.occurrence_id)
         prepared = self._orchestrator(row).prepare(limits=limits)
+        return self._start_prepared(position, prepared, limits)
+
+    def _start_prepared(self, position, prepared, limits):
         if prepared.execution_binding is None:
             return prepared  # Router's typed capability/authoring exit, no Provider effect.
         from ai_video.canvas_authoring import input_hash

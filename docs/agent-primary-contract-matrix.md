@@ -24,6 +24,9 @@ offline scripted bootstrap只证明标准reader/committer/evaluator wiring，不
 缺 boundary 不默认为独立，declared continuity 不允许降级。`canvas_dependencies` 只调用既有 graph/resolver 和
 strategy transition；`canvas_composition` 只构建 CompositionSpec，不解释源 ticks 或建立第二 timeline。
 逐镜显式 MCP evaluation 后才 validate/activate/下一镜；resume、unknown、permit、paid 和恢复仍由既有 owners 裁决。
+`prepare_repair` / `start_repair` 只把同task的显式 intervention 交给原 GenerationFeedbackOrchestrator，
+前序须有 exact terminal quality-rejection；不自动关闭失败或POST。`canvas_recovery` 仅从 canonical binding
+与关闭receipt选择无分支的唯一successor，不按日期/Manifest顺序猜当前版本；unknown、未关闭、fork均阻断。
 native WAV 提取仍归 `generated_video_audio`，其 Manifest 能力判断复用 `manifest_schema`；不降低 Registry/源 bytes/预算检查。
 render replay 重开原始 begin identity，deliver 只读 exact final target，不签 human acceptance。
 验证归 `canvas_production_workflow_tests` 与原 production/audio/voice checks，scripted PASS 不证明制作效果。

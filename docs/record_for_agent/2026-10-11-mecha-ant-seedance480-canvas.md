@@ -19,7 +19,7 @@ Date: 2026-10-11
 初次analyzer未实际听看声音/完整连续运动，保持NOT_EVALUATED；用户后续已确认声音，见下节独立human证据。
 canonical experience仍为`EVIDENCE_GAP + QUALITY_FAILURE`，
 `validate`实际被Gate拒绝，Manifest未变；没有activation、composition、render或下一Shot提交。
-attempt仍`running`/phase`validate`，这是有证据的阻断，不伪造terminal failed、quality rejection或abandonment。
+初始停点为`running`/phase`validate`；后续正常owner已显式abandon，见下节superseding证据，未更改原诊断。
 完整spec尚未完成，AC-2完整资格仍PARTIAL，AC-7尚未验收。
 
 ## Source And Creative Decisions
@@ -104,7 +104,37 @@ experience fileSHA`316642e05f6bf2a580b24221983f5d3a3410df65a4fe8158a579c817d66fa
 用户对exact诊断MP4完整声音核对回复“音效符合要求，无配乐或对白”。
 `human-audio-confirmation.json`绑定同MP4 SHA/size、实际request item与回复，作为独立`HUMAN_AUDIO`证据。
 它补齐声音反馈，不推出用户完整视觉认可；也不把真实human observation改称analyzer调用、覆盖旧source中的
-NOT_EVALUATED或签Production/P6/Final Acceptance。已知POV失败和其余未完整运动取证保持。
+NOT_EVALUATED或签Production/P6/Final Acceptance。已知POV失败保持。
+
+### Human Motion Confirmation
+
+用户对同一exact诊断MP4回复“这些动作都能看清，过程连贯”。问题明确核对顺时针围瓶、受撞后继续、
+穿叶绕石、脱圈带出同伴与动作连续，且预先披露第一人称FAIL不属于本次动作确认。
+`human-motion-confirmation.json`保留actual reply/item、MP4 SHA/size与human身份；不代签POV、旧analyzer或最终接受。
+
+## Known-Failure Closure And Shared Repair
+
+上述human证据不属于POST前选定的旧analyzer-only authority。两次真实MCP分析与canonical replay不能
+在同bytes上提供完整听辨/连续动作proof；继续同一抽样路线不能补齐formal gaps或改变POV pixels。
+Parent记录这个明确补证耗尽理由，正常`ProductionStateCommitter.abandon_video_generation`关闭已知结果。
+`known-failure-closure.json`与canonical `generation-quality-rejection/2` receipt保留原FAIL、10项NE及原QA：
+Manifest26→27、attempt `failed`，closure hash`ce239bba1e96380c4e65d6282dd7849cebd5406aac861c5c9607e67e49ceca1c`。
+原experience file SHA仍`316642e05f6bf2a580b24221983f5d3a3410df65a4fe8158a579c817d66fa7e4`，原MP4未改，
+没有new attempt/POST、费用settlement或adoption。两次closure后的诊断metadata helper序列化失败，
+仅按exact attempt读回真实receipt修复metadata，没有重新关闭或恢复未知结果。
+
+readonly `canvas_repair_path` mapping证实底层已支持closed mixed failure后的manual intervention，
+Canvas facade却只允许无attempt准备，或因multiple attempts一律阻断。新`prepare_repair` / `start_repair`
+调用原orchestrator并保留same-task历史/消费；`canvas_recovery`只从已关闭前序的canonical binding读取无分支
+唯一successor，不以日期/顺序猜版本，不新增writer/permit/自动retry。
+最初RED复现缺入口；新7项回归实际验证normal committer/reader下的失败closure→explicit planner→successor，
+完整后继submit/fetch/Gate/validate/activate→下一Shot，另验预算耗尽、task改名、unknown、fork、mixed closure和replay。
+独立生成的scripted green MP4只防止测试错误复用old failed bytes，不证明真实POV或Provider效果。
+两Canvas suites共同14项通过（追加mixed test后repair suite7项通过）；共享slice的exact Harness单独运行。
+
+下一媒体候选`repair-prompt-v1/`只调整native prompt结构与观察者视野几何，保留reference/model/mode、
+15秒480p、原文动作和声音。它是待独立concept审查及preflight的candidate；至此累计实际POST仍2，
+没有新封套、permit或新片PASS。完整spec/holdout/final render/用户最终听看仍未完成。
 
 ## Shared MCP Invocation Repair
 
@@ -127,14 +157,15 @@ concept审查不冒充code review，补充protocol失败也不构成已通过的
 | mecha-provider-result | provider-request:628e66a4f86191ff5f1a46d0490e9ae3e2f70a94a3de7c61b8dae0f57ababa19 | canvas-mecha-ant-unit-20261011 | canvas-a69856aa5c2b934893fe53a1a5f28cbf94be0fc7 | N/A | 265d4135906be4a8d4edfc744bc9db0233093a05ec3a4b0bc0dadda2254c3f36 | PROVIDER_RECEIPT | PASS | NONE | NEW_ATTEMPT | NONE | runs/canvas-mecha-seedance480-20261011-001/fetch-result.json |
 | mecha-pov-gate | provider-request:628e66a4f86191ff5f1a46d0490e9ae3e2f70a94a3de7c61b8dae0f57ababa19 | canvas-mecha-ant-unit-20261011 | canvas-a69856aa5c2b934893fe53a1a5f28cbf94be0fc7 | N/A | 265d4135906be4a8d4edfc744bc9db0233093a05ec3a4b0bc0dadda2254c3f36 | ANALYZER | FAIL | POV_NOT_SATISFIED_WITH_EVIDENCE_GAPS | SAME_EVIDENCE_NEW_PROOF_LAYER | mecha-provider-result | runs/canvas-mecha-seedance480-20261011-001/generation-evaluation-source.json |
 | mecha-human-audio | provider-request:628e66a4f86191ff5f1a46d0490e9ae3e2f70a94a3de7c61b8dae0f57ababa19 | canvas-mecha-ant-unit-20261011 | canvas-a69856aa5c2b934893fe53a1a5f28cbf94be0fc7 | N/A | 265d4135906be4a8d4edfc744bc9db0233093a05ec3a4b0bc0dadda2254c3f36 | HUMAN_AUDIO | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | mecha-provider-result | runs/canvas-mecha-seedance480-20261011-001/human-audio-confirmation.json |
+| mecha-human-motion | provider-request:628e66a4f86191ff5f1a46d0490e9ae3e2f70a94a3de7c61b8dae0f57ababa19 | canvas-mecha-ant-unit-20261011 | canvas-a69856aa5c2b934893fe53a1a5f28cbf94be0fc7 | N/A | 265d4135906be4a8d4edfc744bc9db0233093a05ec3a4b0bc0dadda2254c3f36 | HUMAN_VIDEO | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | mecha-provider-result | runs/canvas-mecha-seedance480-20261011-001/human-motion-confirmation.json |
 
 同一attempt只有一个独立单元；31帧、四个失败requirement、两次MCP及两层proof不增加独立实验数。
 
 ## Remaining Work And Record Outcome
 
-当前先`EVIDENCE_REPAIR_FIRST`：声音已获上述human确认，完整运动及formal选定QA proof仍须各自取证。
+原片声音/完整运动已获上述human确认；旧formal analyzer gaps保持，已通过明确补证耗尽closure封存。
 保留已知POV失败，缺连续运动证据不靠重复生成补齐。下一次repair需要明确不同的视点表达变量，
-按同Shot历史、原recovery/planning和新的有限paid单元执行，不另开目录清零，不改成第三人称求PASS。
+按同Shot历史、原recovery/planning和新的有限paid单元执行，不另开Production根清零，不改成第三人称求PASS。
 最终还需真正holdout短剧情单元、canonical原声composition/HyperFrames和用户完整听看认可。
 当前媒体可用于失败诊断，不能以candidate/preview名称结束作品目标或签AC-7。
 

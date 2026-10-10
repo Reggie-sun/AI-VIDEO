@@ -77,6 +77,23 @@ AC-7仍需真正holdout完整单元、canonical final render和用户完整听�
 用户随后完整声音核对回复“音效符合要求，无配乐或对白”，已绑定exact MP4保存为独立`HUMAN_AUDIO`证据。
 此human observation补齐声音反馈，不改写较早analyzer source中的NOT_EVALUATED，也不代签视觉、adoption或最终验收。
 
+### Known-Failure Repair Continuation
+
+用户又确认“这些动作都能看清，过程连贯”，同bytes的独立human动作反馈已保存，POV仍FAIL。
+旧QA在POST前选了analyzer-only完整听看，而实际MCP仅能提供probe/抽帧；不能把新human回复冒充旧analyzer。
+原committer已依据明确same-bytes补证耗尽理由abandon这份已知失败，Manifest26→27、attempt failed，
+原experience SHA未变，10项formal NE与失败/费用历史保留，零新POST。
+
+底层已支持上述closed mixed failure后的manual intervention，但Canvas原入口不能准备或重开successor。
+按[bounded repair plan](2026-10-11-canvas-known-failure-repair.md)补共享`prepare_repair` / `start_repair`，
+重开只沿exact关闭前序的无分支canonical lineage，不创建第二lifecycle或猜最新版本。
+7项新回归已覆盖同task完整历史、预算拒绝、unknown/fork、mixed closure及完整继任Gate/采用推进。
+共享bytes变更后旧holdout证据不外推；新的exact Harness与Risk Gate单独执行。
+
+下一媒体候选只改变native prompt表达结构与观察者视野几何，保留原图/model/mode/15秒480p、故事、动作与声音。
+独立concept检查、prospective正确proof分工、完整历史/有限计数和paid preflight齐全前不POST。
+原片与原QA不修改；AC-2/AC-7保持未完成。
+
 ## Current Evidence
 
 工程commit `a4eb0939a57daa370ecace209108a2fafeafdc43`已push到main并核对远端SHA。

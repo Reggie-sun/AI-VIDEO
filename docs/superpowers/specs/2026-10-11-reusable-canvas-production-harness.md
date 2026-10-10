@@ -1,7 +1,7 @@
 # Reusable Canvas Production Harness
 
 Date: 2026-10-11
-Status: Engineering implemented — AC-2部分验证；机甲480p原片已生成，声音获用户确认，POV失败与完整运动证据缺口阻断，AC-7尚未验收。
+Status: Engineering implemented — AC-2部分验证；机甲480p原片声音/动作获用户确认，POV失败已正式关闭；共享repair接续验证中，AC-7尚未验收。
 
 ## Goal
 
@@ -124,6 +124,12 @@ HTML 保存成功不证明媒体、连线或历史版本已经保存。只有 MD
 参考策略按镜头需要选择，不要求每镜都用上一尾帧，也不把增加参考数量当作通用修复。
 
 ## Ownership And Change Boundaries
+
+显式same-Shot repair复用既有terminal quality-rejection、intervention与GenerationFeedbackOrchestrator。
+原task、完整消费与失败bytes不可清零；application只准备/start，不自行关闭、提交或采用。
+多个attempt必须由canonical execution binding的前序evidence与关闭receipt构成无分支唯一链，
+才能重开successor；未关闭、unknown、fork不按时间或Manifest顺序选择。新媒体全部要求重新取证，
+用户对原片声音/动作的确认不升级为新片合格或原analyzer的完整听看。
 
 | Responsibility | Existing owner to reuse |
 | --- | --- |

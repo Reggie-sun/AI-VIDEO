@@ -31,7 +31,7 @@ def runtime(tmp_path, *, status_events=(VideoTaskState.SUCCEEDED,), native_media
         provider._artifact_bytes = native_media
     def compile_canvas_fixture(self, bound, requirement):
         from ai_video.production.video_compiler import compile_provider_video_request, ProviderNativePrompt
-        text = "Walk into the road."
+        text = getattr(self, "prompt_text", "Walk into the road.")
         return compile_provider_video_request(provider_bound=bound, requirement=requirement,
             compiler_id="generated-video-e2e-fixture", compiler_version="1", capabilities=self.capabilities(),
             native_prompt=ProviderNativePrompt(grammar_contract="generated-video-e2e-fixture-v1",
