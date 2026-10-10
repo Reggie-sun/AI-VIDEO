@@ -1,0 +1,292 @@
+"""Shared entry reaches real reader/committer/Router with scripted media only."""
+import asyncio
+from copy import deepcopy
+import hashlib
+from types import MethodType
+
+import pytest
+
+from ai_video.canvas_production import CanvasProductionService
+from ai_video.canvas_dependencies import canvas_video_candidate_preparer
+from ai_video.production.generation_feedback import RegisteredGenerationTarget
+from ai_video.production.models import AssetRegistrySnapshot
+from ai_video.production.registry import registry_semantic_sha256
+from ai_video.production.state_commit import PreparedArtifact, ProductionStateCommitter
+from ai_video.production.video import VideoProviderCapabilities, VideoTaskState
+from ai_video.production.generation_evaluation import GenerationEvaluationSource, GenerationObservation
+from test_canvas_authoring import direction, packet
+from test_generation_feedback_review import Session
+from test_production_generated_video_e2e import _runtime
+from test_production_video import _paid_preview, _paid_authorization
+
+
+def runtime(tmp_path, *, status_events=(VideoTaskState.SUCCEEDED,), native_media=None):
+    template = tmp_path / "template"
+    template.mkdir()
+    inputs, provider, _, prepared, _, _ = _runtime(template, status_events=status_events)
+    if native_media is not None:
+        variant = provider.capabilities().variants[0]
+        variant = variant.model_copy(update={"output": variant.output.model_copy(update={"native_audio": True})})
+        provider._capabilities = VideoProviderCapabilities.create(provider_name="fake-video", variants=(variant,))
+        provider._artifact_bytes = native_media
+    def compile_canvas_fixture(self, bound, requirement):
+        from ai_video.production.video_compiler import compile_provider_video_request, ProviderNativePrompt
+        text = "Walk into the road."
+        return compile_provider_video_request(provider_bound=bound, requirement=requirement,
+            compiler_id="generated-video-e2e-fixture", compiler_version="1", capabilities=self.capabilities(),
+            native_prompt=ProviderNativePrompt(grammar_contract="generated-video-e2e-fixture-v1",
+                prompt_text=text, prompt_sha256=hashlib.sha256(text.encode()).hexdigest(),
+                expressed_control_paths=("generation_intent.subject_action.progression",)))
+    provider.compile_request = MethodType(compile_canvas_fixture, provider)
+    root = tmp_path / "canvas"
+    root.mkdir()
+    data = direction()
+    data["delivery_profile"] = {"width": 64, "height": 64, "fps": 24}
+    source = inputs.project.registry.assets[0]
+    source = source.model_copy(update={"input_artifact_ids": ()})
+    registry = AssetRegistrySnapshot(revision_id="0" * 64, content_hash="0" * 64, assets=(source,))
+    sha = registry_semantic_sha256(registry)
+    registry = registry.model_copy(update={"revision_id": sha, "content_hash": sha})
+    for row in data["shots"]:
+        row["shot"]["required_asset_roles"].append({"role": "first_frame", "asset_ids": [source.asset_id],
+                                                    "allowed_asset_types": ["image"]})
+        row["generation"] = {"generation_intent": {"subject_action": {"progression": "walk into the road"}},
+            "audio_need": "required" if native_media is not None else "forbidden", "quality_need": {},
+            "references": [{"role": "approved_keyframe", "asset_id": source.asset_id}],
+            "intent_evidence": {"character_action_required": True}}
+        row["composition"] = {"muted": native_media is None}
+    binding = prepared
+    candidate = binding.inputs.candidates[0]
+    output = candidate.output_requirement.model_copy(update={"native_audio": True}) if native_media is not None else candidate.output_requirement
+    target = RegisteredGenerationTarget(provider, candidate.provider_profile, candidate.compiler_contract, output)
+    authorizations = {}
+    committer = ProductionStateCommitter(root, video_candidate_preparer=canvas_video_candidate_preparer(),
+        paid_provider_authorizer=lambda preview: authorizations.get(preview.preview_fingerprint),
+        paid_provider_clock=lambda: next(iter(authorizations.values())).issued_at)
+    service = CanvasProductionService(committer=committer, packet=packet(), direction=data,
+        targets=(target,), routing_policy=binding.policy, decision_policy=binding.inputs.policy)
+    payload = inputs.project.asset_paths[source.asset_id].read_bytes()
+    bundle = service.author(registry=registry, asset_artifacts=(PreparedArtifact(source.artifact_path,
+        payload, hashlib.sha256(payload).hexdigest()),))
+    service.approve_authoring(bundle=bundle, attempt_id="canvas-author", qa_policy=inputs.project.qa_policy)
+    limits = binding.inputs.limits.model_copy(update={"task_id": "canvas-task", "paid_submit_ceiling": 2,
+        "allowed_remote_candidates": ("registered-0-fake-video-i2v-1s-64px",)})
+    # Candidate IDs are generated by the existing candidate producer, not story code.
+    from ai_video.production.generation_feedback import create_generation_candidates
+    from ai_video.canvas_planning import canvas_feedback_context
+    loaded = service._load()
+    context = canvas_feedback_context(loaded=loaded, row=data["shots"][0], policy=binding.policy)
+    candidates, _ = create_generation_candidates(projection=context["projection"], targets=(target,),
+        acceptance=loaded.qa_policy.selected_generation_acceptance())
+    limits = limits.model_copy(update={"allowed_remote_candidates": tuple(c.candidate_id for c in candidates)})
+    return service, provider, limits, authorizations
+
+
+def pass_evaluation(review):
+    return (GenerationEvaluationSource(request_hash=review.request.request_input_hash,
+        artifact_sha256=review.analysis.artifact_sha256, rubric_hash=review.recipe.rubric_hash,
+        qa_policy_content_hash=review.qa_policy.content_hash, analysis_evidence=review.analysis,
+        evaluator=review.qa_policy.semantic_authorities[0], proof="technical",
+        observations=(GenerationObservation(requirement_id="duration", verdict="PASS",
+            observation="Explicit scripted duration observation; no live media acceptance"),)),)
+
+
+def submit_and_fetch(service, provider, limits, authorizations):
+    position = service.start(limits=limits)
+    _, state = service._service(position.attempt_id)._state(position.attempt_id)
+    request = service.committer._reopen_video_request(state.request)
+    preview = _paid_preview(request, attempt_id=position.attempt_id, video_preview=provider.preview(request))
+    authorization = _paid_authorization(preview)
+    authorizations[preview.preview_fingerprint] = authorization
+    service.execute(action="submit", paid_preview=preview, reservation_id="reservation-" + position.attempt_id)
+    service.execute(action="poll")
+    service.committer.settle_paid_provider_reservation(attempt_id=position.attempt_id, actual_cost_microunits=1_000_000)
+    service.execute(action="fetch")
+    return position
+
+
+def test_shared_flow_requires_explicit_gate_and_resumes_without_resubmit(tmp_path):
+    service, provider, limits, auth = runtime(tmp_path)
+    assert service.position().next_action == "prepare"
+    first = service.prepare(limits=limits)
+    assert first.execution_binding is not None, first.decision
+    assert provider.call_counts.submit == 0
+    position = submit_and_fetch(service, provider, limits, auth)
+    assert service.position().next_action == "validate"
+    with pytest.raises(Exception, match="media Gate"):
+        service.execute(action="validate")
+    session = Session()
+    result = asyncio.run(service.evaluate(session=session, adjudicate=pass_evaluation))
+    assert result.all_required_observed_pass
+    service.execute(action="validate")
+    service.execute(action="activate")
+    reopened = CanvasProductionService(committer=ProductionStateCommitter(service.committer.project_root,
+        video_candidate_preparer=canvas_video_candidate_preparer()), packet=service.packet,
+        direction=service.direction, targets=service.targets, routing_policy=service.routing_policy,
+        decision_policy=service.decision_policy)
+    assert reopened.position().shot_id == "two"
+    assert reopened.position().next_action == "prepare"
+    assert provider.call_counts.submit == 1
+    assert session.calls == 1
+    assert reopened.start(limits=limits).next_action == "submit"
+    assert reopened.start(limits=limits).next_action == "submit"
+    assert provider.call_counts.submit == 1
+
+
+def test_changed_director_data_is_blocked_before_provider_effect(tmp_path):
+    service, provider, limits, _ = runtime(tmp_path)
+    changed = deepcopy(service.direction)
+    changed["shots"][0]["shot"]["dialogue"] = "invented line"
+    reopened = CanvasProductionService(committer=service.committer, packet=service.packet, direction=changed,
+        targets=service.targets, routing_policy=service.routing_policy, decision_policy=service.decision_policy)
+    with pytest.raises(Exception, match="director data changed"):
+        reopened.prepare(limits=limits)
+    assert provider.call_counts.submit == 0
+
+
+def test_authoring_revision_rebases_canonical_graph_without_rewriting_history(tmp_path):
+    from ai_video.production.dependency import desired_fingerprints
+    service, provider, _, _ = runtime(tmp_path)
+    before = service._load()
+    old_bytes = {p: p.read_bytes() for p in service.committer.project_root.rglob("*") if p.is_file()}
+    changed = deepcopy(service.direction)
+    changed["shots"][0]["shot"]["intent"] = "Observe an arrival from the side"
+    revised = CanvasProductionService(committer=service.committer, packet=service.packet, direction=changed)
+    revised.revise_authoring(attempt_id="canvas-director-revision")
+    after = revised._load()
+    assert after.project.revision == before.project.revision + 1
+    assert after.shots[0].revision == before.shots[0].revision + 1
+    assert after.shots[1] == before.shots[1]
+    assert after.brief == before.brief and after.story == before.story and after.scenes == before.scenes
+    old, new = desired_fingerprints(before.dependency_graph), desired_fingerprints(after.dependency_graph)
+    affected = {node for node in old if old[node] != new.get(node)}
+    assert affected
+    assert all("one" in node for node in affected), affected
+    assert all(p.read_bytes() == value for p, value in old_bytes.items()
+               if p.name not in {"manifest.json", "project.yaml"})
+    assert provider.call_counts.submit == 0
+
+
+def test_revision_preserves_an_unrelated_already_adopted_shot(tmp_path):
+    service, provider, limits, auth = runtime(tmp_path)
+    submit_and_fetch(service, provider, limits, auth)
+    asyncio.run(service.evaluate(session=Session(), adjudicate=pass_evaluation))
+    service.execute(action="validate")
+    service.execute(action="activate")
+    before = service._load()
+    changed = deepcopy(service.direction)
+    changed["shots"][1]["shot"]["intent"] = "Watch the road from a new viewpoint"
+    revised = CanvasProductionService(committer=service.committer, packet=service.packet, direction=changed)
+    revised.revise_authoring(attempt_id="second-director-revision")
+    after = revised._load()
+    assert after.shots[0] == before.shots[0]
+    assert after.project.artifacts.shots[0] == before.project.artifacts.shots[0]
+    assert after.registry == before.registry
+    assert revised.position().shot_id == "two"
+    assert revised.position().next_action == "prepare"
+    assert provider.call_counts.submit == 1
+
+
+def test_missing_director_boundary_does_not_become_an_independent_shot():
+    from ai_video.canvas_authoring import author_canvas_project
+    data = direction()
+    data["shots"][1].pop("boundary")
+    with pytest.raises(ValueError, match="explicit boundary"):
+        author_canvas_project(packet=packet(), direction=data)
+
+
+def test_unknown_does_not_remint_or_start_next_shot(tmp_path):
+    from dataclasses import replace
+    from ai_video.errors import AiVideoError
+    service, provider, limits, auth = runtime(tmp_path)
+    provider._scenario = replace(provider._scenario, submit_outcome="outcome_unknown")
+    position = service.start(limits=limits)
+    _, state = service._service(position.attempt_id)._state(position.attempt_id)
+    request = service.committer._reopen_video_request(state.request)
+    preview = _paid_preview(request, attempt_id=position.attempt_id, video_preview=provider.preview(request))
+    auth[preview.preview_fingerprint] = _paid_authorization(preview)
+    with pytest.raises(AiVideoError):
+        service.execute(action="submit", paid_preview=preview, reservation_id="unknown-reservation")
+    assert service.position().next_action == "stop"
+    attempt_count = len(service._load().manifest.attempts)
+    assert service.start(limits=limits).next_action == "stop"
+    with pytest.raises(Exception, match="durable next action"):
+        service.execute(action="submit", paid_preview=preview, reservation_id="new-reservation")
+    assert provider.call_counts.submit == 1
+    assert len(service._load().manifest.attempts) == attempt_count
+
+
+def test_same_entry_generates_two_shots_then_renders_and_delivers(tmp_path, monkeypatch):
+    from dataclasses import replace
+    import subprocess
+    from production_e2e_support import DeterministicHyperFramesRunner, require_audio_toolchain
+    from ai_video.production.hyperframes import RendererCommandResult
+    from test_canvas_render import _executable
+    service, provider, limits, auth = runtime(tmp_path)
+    tools = require_audio_toolchain()
+    second_media = tmp_path / "second-scripted.mp4"
+    subprocess.run([str(tools.ffmpeg_path), "-nostdin", "-v", "error", "-y", "-f", "lavfi",
+        "-i", "color=c=green:s=64x64:r=24:d=1", "-c:v", "libx264", "-pix_fmt", "yuv420p",
+        "-threads", "1", str(second_media)], capture_output=True, check=True)
+    for index in range(2):
+        if index:
+            provider._artifact_bytes = second_media.read_bytes()
+        provider._scenario = replace(provider._scenario, external_effect_id=f"canvas-effect-{index}")
+        submit_and_fetch(service, provider, limits, auth)
+        asyncio.run(service.evaluate(session=Session(), adjudicate=pass_evaluation))
+        service.execute(action="validate")
+        service.execute(action="activate")
+    assert service.position().next_action == "compose"
+    spec, timeline = service.compose()
+    assert spec.shot_ids == ("one", "two")
+    assert [span.start_frame for span in timeline.visual_spans] == [0, 24]
+    assert all(span.asset_id.startswith("canvas-video-") for span in timeline.visual_spans)
+    class TwoSecondRenderer(DeterministicHyperFramesRunner):
+        def run(self, command, args, **kwargs):
+            if command != "render":
+                return super().run(command, args, **kwargs)
+            output = args[args.index("-o") + 1]
+            result = subprocess.run([str(tools.ffmpeg_path), "-nostdin", "-v", "error", "-y",
+                "-f", "lavfi", "-i", "color=c=blue:s=64x64:r=24:d=2", "-c:v", "libx264",
+                "-pix_fmt", "yuv420p", "-threads", "1", output], capture_output=True, check=False)
+            return RendererCommandResult(returncode=result.returncode, stdout=result.stdout.decode(),
+                                         stderr=result.stderr.decode())
+    runner = TwoSecondRenderer(tools.ffmpeg_path)
+    import ai_video.production.hyperframes as hyperframes
+    monkeypatch.setattr(hyperframes, "_NetworkIsolatedHyperFramesRunner", lambda **kwargs: runner)
+    fake_tools = tmp_path / "tools"
+    toolchain = {"binary_path": fake_tools / "node_modules/.bin/hyperframes",
+        **{name + "_path": _executable(fake_tools / name) for name in ("browser", "unshare", "ip", "bash")},
+        "ffmpeg_path": tools.ffmpeg_path, "ffprobe_path": tools.ffprobe_path}
+    service.render(attempt_id="canvas-generated-render", toolchain=toolchain)
+    delivered, final_timeline = service.deliver()
+    assert final_timeline == timeline
+    assert delivered.render_state.output.size_bytes > 0
+    assert provider.call_counts.submit == 2
+
+
+def test_native_audio_registration_uses_exact_accepted_video_and_replays(tmp_path):
+    import subprocess
+    from production_e2e_support import require_audio_toolchain
+    tools = require_audio_toolchain()
+    media = tmp_path / "native-scripted.mp4"
+    subprocess.run([str(tools.ffmpeg_path), "-nostdin", "-v", "error", "-y", "-f", "lavfi",
+        "-i", "color=c=red:s=64x64:r=24:d=1", "-f", "lavfi", "-i", "sine=frequency=440:duration=1",
+        "-c:v", "libx264", "-pix_fmt", "yuv420p", "-threads", "1", "-c:a", "aac", "-ar", "48000",
+        "-ac", "2", str(media)], capture_output=True, check=True)
+    service, provider, limits, auth = runtime(tmp_path, native_media=media.read_bytes())
+    submit_and_fetch(service, provider, limits, auth)
+    asyncio.run(service.evaluate(session=Session(), adjudicate=pass_evaluation))
+    service.execute(action="validate")
+    service.execute(action="activate")
+    args = {"shot_id": "one", "audio_kind": "ambience", "usage_license": "fixture-only", "toolchain": tools}
+    registered = service.register_native_audio(**args)
+    current = service._load()
+    audio = next(a for a in current.registry.assets if a.audio_metadata is not None)
+    assert audio.audio_metadata.source.input_fingerprint == next(
+        a.sha256 for a in current.registry.assets if a.asset_type.value == "video")
+    assert audio.audio_metadata.duration_samples > 0
+    before = current.manifest.manifest_revision
+    assert service.register_native_audio(**args) == registered
+    assert service._load().manifest.manifest_revision == before
+    assert provider.call_counts.submit == 1

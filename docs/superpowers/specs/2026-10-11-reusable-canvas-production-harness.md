@@ -1,7 +1,7 @@
 # Reusable Canvas Production Harness
 
 Date: 2026-10-11
-Status: Proposed — spec-only；尚未实施，未授权媒体调用。
+Status: Implementation authorized — 工程实现进行中；真实媒体调用与 AC-7 尚未授权或验收。
 
 ## Goal
 
@@ -12,7 +12,9 @@ Status: Proposed — spec-only；尚未实施，未授权媒体调用。
 
 这里的“通用”指在声明支持的制作类型与 Provider 能力范围内复用，不承诺支持任意平台节点、任意模型、
 任意剪辑效果或逐像素复刻。复用原画布的创作内容、参考职责和依赖结构，不保证随机生成结果与原片完全一致。
-本 spec 定义目标与验收；本轮不写 implementation plan、不改代码、不抓取新画布、不生成或修改媒体、不训练模型。
+原 spec-only 回合未授权实现。2026-10-11 用户的“完成这个specs”明确授权工程实现、implementation plan
+与只读画布取证；不因此授权新的付费媒体调用或训练模型。实际进度与证据边界由 implementation plan、
+runtime baseline 和 session record 报告，本 spec 不自签验收。
 
 ## Current Baseline And Scope Correction
 
@@ -142,7 +144,7 @@ ASR、抽帧、播放成功、音轨存在只能证明各自检查项；无法�
 
 ## Acceptance Criteria
 
-以下是未来实现验收，不是本 spec 已通过的测试：
+以下是实现验收要求；是否通过须引用相应当前证据，不能从本表推定：
 
 | ID | Criterion | Required evidence |
 | --- | --- | --- |
@@ -181,7 +183,7 @@ ASR、抽帧、播放成功、音轨存在只能证明各自检查项；无法�
 
 Parent self-review：目标是可重复的多故事生产，不是两个案例专用工具；连续性与完整声画交付都进入验收。
 采用现有 owner，未设第二状态/时间线或新自动验收权；保留集防止在旧样本上自证。
-本文件是 proposed spec，不能作为已实施 baseline、模型定律或付费执行许可。
+本文件是当前授权目标，不能作为已实施 baseline、模型定律或付费执行许可。
 
 仍需后续取证：新增画布链接和完整数据、代表性/采用评价、可独立保留的样本、各原始输出版本对应关系。
 来源格式与实际能力缺口可能影响实现范围；应先按本 spec 的少量样本调查再写实现计划，

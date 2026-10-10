@@ -266,8 +266,10 @@ def _active_registry(committer):
 
 
 def _require_supported_target(manifest, loaded) -> None:
-    if manifest.schema_version not in {"2.0", "2.1", "2.2", "2.7"}:
-        raise _audio_invalid("Generated video audio supports Manifest 2.0, 2.1, 2.2 and 2.7.")
+    if manifest.schema_version not in {"2.0", "2.1", "2.2"} and not manifest_supports(
+        manifest.schema_version, ManifestCapability.VIDEO_GENERATION
+    ):
+        raise _audio_invalid("Generated video audio requires a supported video-generation Manifest or legacy audio target.")
     if loaded.registry.schema_version not in {"2.1", "2.2"}:
         raise _audio_invalid("Generated video audio requires Asset Registry 2.1 or 2.2.")
 
