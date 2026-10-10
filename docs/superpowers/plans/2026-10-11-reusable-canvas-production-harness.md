@@ -1,13 +1,44 @@
 # Reusable Canvas Production Harness Implementation Plan
 
 Date: 2026-10-11
-Status: Engineering implemented and published; holdout production qualification partial, AC-7 not evaluated.
+Status: Engineering implemented and published; first authorized 480p submit rejected, complete-film AC-7 not evaluated.
 
 ## Goal And Scope
 
 落实[spec](../specs/2026-10-11-reusable-canvas-production-harness.md)的可重复多故事生产入口。
 当前请求取代 spec 当时的 spec-only 限制，授权工程实现与只读画布取证；不因此授权付费视频生成。
 默认 Native Codex 在 current `main` 串行拥有集成与最终裁决，独立 source inspection 单元可委托。
+
+## Authorized Live Continuation
+
+后续用户明确授权 Seedance 480p，确认虚构角色与素材使用权，选择保留原对白/音效、无配乐/字幕。
+本次 credential supplier 只读用户指定的 repository `.env` 中 `SEEDANCE_API_KEY`，值不输出、不持久化；
+不把当前明确来源例外扩散为新默认。原 Secret Service exact lookup 未得到可用值、零 Provider 请求。
+
+候选 Pilot 为《美丑》原 timeline 的 indices 1–4：醉酒进门→初次揭盖→再次确认→苹果堵嘴，共60秒。
+正常导演选择保持原引用职责和剧情；前三段原观察为Seedance2.0，第四段为2.5，不能隐藏此差异。
+先封存首段15秒、`doubao-seedance-2-0-260128` / R2V / `480p` / native audio 的最小实测，
+仅1次物理 submit，0次自动重抽，bounded polling ≤120次/20分钟；不以此冒充完整 Pilot 或 AC-7。
+首段有两个原始摄影段落，先以Director v4核对coverage与原文，再沿现有CanvasProductionService/paid owner执行。
+现有operator内部upper bound仅作为守门定额，非市场价/账单；profile与完整授权在POST前单独封存。
+首段exact MP4落盘后立即显式project-local video-analysis，完整视觉/声音与逐项Gate未PASS前不提交后镜。
+后续连续性、跨model执行和真实renderer必须从实际accepted source准备，不能预填PASS、降为独立镜头或直接mux。
+
+Parent self-review：新授权限于本目标内Seedance480p与用户提供的确切凭据来源；未放宽reference admission、
+one-use permit、unknown STOP、canonical写入或真实听看要求。一次最小实测先回答平台是否接收这组虚构人物参考，
+随后才评估表演/声音，避免在输入被拒或未验收时扩量。共享运行代码与v2 holdout冻结保持不变。
+
+### First Live Outcome
+
+《美丑》首段通过同一入口完成真实素材Registry、Director批准、完整intent、Router/Compiler、
+exact preview、human来源声明、egress admission、budget与durable intent/one-use permit。
+实际POST仅1次：`doubao-seedance-2-0-260128`、R2V、15秒、480p、`generate_audio=true`、5张原参考图。
+API返回HTTP400 / `InputImageSensitiveContentDetected.PrivacyInformation`；没有task ID或MP4。
+canonical paid outcome为`KNOWN_NO_EFFECT`，failure experience已保存，重开返回`stop`；零重试、零后镜提交。
+原文720p仅是保留观察值，实际wire为480p。未删角色、换模型、换入口或将拒绝改称质量失败。
+完整60秒Pilot、逐镜媒体Gate、renderer与人类听看仍`NOT_EVALUATED`。
+来源数量充足；当前阻断为人物参考的上游接收，而非凭据缺失。
+细节与最小后续选择见[live record](../../record_for_agent/2026-10-11-beauty-seedance480-input-rejection.md)。
 
 ## Current Evidence
 

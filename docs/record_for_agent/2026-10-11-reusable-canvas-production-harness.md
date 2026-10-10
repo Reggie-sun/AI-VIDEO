@@ -8,6 +8,15 @@ learning_eligibility: ineligible
 
 Date: 2026-10-11
 
+## Supersession Notice — Authorized Live Unit
+
+下方“没有新Provider submit/没有已授权媒体单元”描述初始工程checkpoint，现已被
+[《美丑》480p输入拒绝记录](2026-10-11-beauty-seedance480-input-rejection.md)部分取代。
+用户后续授权后，同一入口已实际提交1次Seedance2.0 R2V；上游HTTP400，canonical `KNOWN_NO_EFFECT`，
+没有task ID或MP4，resume为`stop`，零重试。凭据与授权前提已补齐；当前阻断是人物参考被上游拒绝。
+工程验证与v2冻结仍有效；AC-2完整生产资格仍PARTIAL，AC-7完整成片/听看仍NOT_EVALUATED，
+没有逐镜媒体或最终采用结论。以下初始计数与历史边界保留，不将Provider拒绝变成媒体FAIL。
+
 ## Purpose And Completion Boundary
 
 用户授权完成[spec](../superpowers/specs/2026-10-11-reusable-canvas-production-harness.md)，并提供已登录的即梦画布。

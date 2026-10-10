@@ -1,7 +1,7 @@
 # Reusable Canvas Production Harness
 
 Date: 2026-10-11
-Status: Engineering implemented and offline verified — AC-2仅完成来源/素材/authoring验证，AC-7未执行；完整目标尚未验收。
+Status: Engineering implemented and offline verified — AC-2部分验证；首次授权480p提交被Provider拒绝，AC-7完整成片尚未验收。
 
 ## Goal
 
@@ -15,6 +15,12 @@ Status: Engineering implemented and offline verified — AC-2仅完成来源/素
 原 spec-only 回合未授权实现。2026-10-11 用户的“完成这个specs”明确授权工程实现、implementation plan
 与只读画布取证；不因此授权新的付费媒体调用或训练模型。实际进度与证据边界由 implementation plan、
 runtime baseline 和 session record 报告，本 spec 不自签验收。
+
+2026-10-11 后续用户明确授权“给你权限调用seedacnce 用480p的”，新增 Seedance 480p 有限实测授权。
+用户确认人物均为虚构生成角色、所提供参考有权用于本项目，并明确保留原对白与音效、不加配乐或字幕；
+指定本 repository `.env` 为本次私密 credential supplier 的 exact 来源，取代本次默认 Secret Service lookup。
+值仅驻内存；这一例外不改变其他任务的 credential routing，不授权 unknown 重试、改人物或静默升档。
+具体输入、model/profile、调用数与逐镜停点见 plan；实际提交、媒体与人类验收仍分别取证。
 
 ## Current Baseline And Scope Correction
 
