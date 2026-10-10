@@ -25,8 +25,9 @@ canonical experience仍为`EVIDENCE_GAP + QUALITY_FAILURE`，
 后续修复入口已验证并发布；第二次机甲物理POST被HTTP403 / `AccountOverdueError`拒绝，
 canonical `KNOWN_NO_EFFECT`、attempt failed、next action stop，没有新task ID或MP4。
 当前任务累计3次物理POST（Beauty1、机甲原片1、修复1），本次追加单元已耗尽，未重复提交。
-账号侧解除计费阻断是继续媒体实测的外部前提。最初仅有error；用户说明火山账户仍有余额后，
-只读打开当前已登录方舟首页，实际显示negative账户余额，见下节。未查询明细账单或推断市场费用。
+当前选定`doubao-seedance-2-0-fast-260128` / 480p仍受该计费拒绝阻断。用户随后明确“别用2.5太贵了”，
+停止切换2.5的准备，本任务2.5提交数为0。用户购买的2.5资源包确实仍有余量，但不能抵扣2.0 Fast；
+不把cash negative扩大解释为所有Seedance模型都不可用。详情与证据边界见下节，未估算市场费用。
 
 ## Source And Creative Decisions
 
@@ -201,6 +202,31 @@ quota extension hash`d6d092d9397c4eb683e430d75355ca98f6e41d15ef6dfa4ea850b0c1e92
 尚未独立验证该登录账号与API key所属账号一致，未读取/reveal任何新credential、明细账单或实际生成费用，
 未充值、开通服务或再提交视频。上句“余额未取证”只描述该只读核对前的历史停点。
 
+### Resource Package Correction And Selected Model Constraint
+
+用户提供调用汇总截图并说明购买了500万tokens的Seedance2.5资源包。2026-10-11约04:03 +08:00，
+当前已登录资源包管理页只读核对该包为`生效中`，total `5000千tokens`，remaining
+`3845.5999998773千tokens`（约384.56万tokens），region华北2（北京），有效期至2027-01-06。
+选择字段的观测保存在`repair-prompt-v3/resource-package-observation.json`，不保存账号姓名或实例标识。
+用量汇总、资源包余量与cash余额是不同观察，不能互相替代，也不据此推算账单。
+
+[官方资源包规则](https://docs.volcengine.com/docs/ark/seedance-2-0-model-resource-pack-rules?lang=zh)
+经实际页面核对：开通资格与抵扣分开，每次调用按具体模型结算，资源包只抵扣对应模型。
+本任务三次实际POST分别是2.0、2.0 Fast、2.0 Fast，均不是2.5；这份2.5包不覆盖当前Fast请求。
+因此先前将negative现金余额当作整个Seedance路线阻断的解释被限缩，保留原403/余额观测作为历史。
+未遍历全部资源包页面，不能声称账户不存在任何2.0包；API key与console账号一致性仍NOT_EVALUATED。
+
+Parent曾提出按已购资源包准备2.5，尚未提交或改变Production。用户最新明确拒绝2.5；当前选择保持
+`doubao-seedance-2-0-fast-260128` / 480p。不为使用这份资源包切换模型，不查询价格、不充值或购买其他包，
+没有新Video Provider POST、permit或预算扩展。2.0 Fast的known-no-effect失败及耗尽有限单元保持；
+必须先解除所选API账户/模型的计费拒绝，再核对canonical恢复条件和新有限单元，不能盲目重试。
+
+用户禁止2.5之前启动的受管只读model-reroute mapping已由Parent停止。invocation
+`a9563bbe-9c45-4398-b614-653ac90ca074`的canonical receipt保留6次wire request、16次Read、
+process `cancelled`及classification `OUTCOME_UNKNOWN`，没有terminal report，不采用partial输出或重试。
+这是独立Kimi调查的结果状态，不改写上述Seedance physical POST的`KNOWN_NO_EFFECT`，
+不构成恢复实现、required review、新model选择或媒体验收；封存inputs和历史消费保持。
+
 ### Published Repair Verification
 
 MCP调用修复commit`40a26924a084e9b02390f0f255a2bbfba0117bef`已push并核对remote main SHA；
@@ -247,7 +273,7 @@ concept审查不冒充code review，补充protocol失败也不构成已通过的
 
 原片声音/完整运动已获上述human确认；旧formal analyzer gaps保持，已通过明确补证耗尽closure封存。
 保留已知POV失败，缺连续运动证据不靠重复生成补齐。新的视点表达单元已准备并被账号错误拒绝，
-不是POV实测失败或成功。恢复账号额度后先核对closed known-no-effect状态和全部3次物理POST，
+不是POV实测失败或成功。用户禁止2.5，当前Fast2.0计费拒绝解除后先核对closed known-no-effect状态和全部3次物理POST，
 按原recovery/planning、exact preview/actual clock及下一有限单元执行；当前已消费permit/封套不能复用，
 不另开Production根清零、不改成第三人称求PASS，也不自动重试。
 最终还需真正holdout短剧情单元、canonical原声composition/HyperFrames和用户完整听看认可。
@@ -257,7 +283,10 @@ concept审查不冒充code review，补充protocol失败也不构成已通过的
 `distill-ai-video-learning`评估`no_candidate`：一次机甲POV失败与Beauty输入拒绝涉及不同model、素材及
 观察层，未隔离共同变量；新修复没有媒体outcome，账号拒绝不能成为POV对照臂；SDK调用回归没有第二独立实验
 或controlled multi-arm，不制造通用学习规则。learning outcome仍`no_candidate`。
+资源包观察与官方抵扣规则补正不是第二次模型实测或受控POV对照，不改变该learning outcome。
 record不改Skill/Policy/Gate，不重建RAG，也不为记录增加Provider/media或额外测试。
 实现verification分别绑定上文MCP与repair receipts；收尾文档exact snapshot证据入口为
 `.agent/harness/runs/reusable-canvas-account-blocker-20261011/receipt.json`，状态与scope以实际receipt核验为准。
+资源包解释与用户禁止2.5的本次文档snapshot另验
+`.agent/harness/runs/reusable-canvas-no-seedance25-20261011-v2/receipt.json`，不外推旧receipt到新bytes。
 publication以实际main SHA为准；原11-check/1475-test receipt只保留原snapshot证明范围。

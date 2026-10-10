@@ -115,6 +115,16 @@ oldQA、失败receipt/bytes/全部NE保持，实际planner是explicit goal revis
 解除该API账户计费阻断后，先核对完整known-no-effect历史与新有限单元，再重走当前preview/预算/intent/permit；
 不能复用已消费封套或重置task计数，未恢复前不重复POST。详见[current media record](../../record_for_agent/2026-10-11-mecha-ant-seedance480-canvas.md)。
 
+### Resource Package And Latest Model Constraint
+
+用户已购500万tokens的Seedance2.5包，正常console只读观察仍生效、剩约384.56万tokens。
+官方规则区分开通资格与具体模型抵扣；该包不能覆盖当前2.0 Fast的POST，不以cash negative断言所有模型不可用。
+Parent提出2.5方向后，用户明确“别用2.5太贵了”。停止该方向；选定model仍
+`doubao-seedance-2-0-fast-260128`、480p，本任务2.5提交0、总物理POST仍3。
+没有新的budget/permit/Production写入。解除当前选定API账户/模型的计费拒绝后，再核对known-no-effect
+正常恢复与新的有限单元；不能切模型、改task/Shot/root或借pre-transport reconciliation抹掉实际POST。
+本修订只保存执行约束与解释纠正，不预先宣称恢复已实现、账号匹配或完整spec验收。
+
 ## Current Evidence
 
 工程commit `a4eb0939a57daa370ecace209108a2fafeafdc43`已push到main并核对远端SHA。

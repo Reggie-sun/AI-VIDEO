@@ -18,6 +18,8 @@ Date: 2026-10-11
 共享same-Shot repair入口已发布，9项Harness checks及114 Canvas tests通过。
 修复表达单元实际追加一次POST，被HTTP403 / `AccountOverdueError`拒绝，canonical `KNOWN_NO_EFFECT`，
 没有新视频；总物理POST为3，不重复提交。当前登录方舟首页只读显示negative余额，API key所属账号仍未独立核对。
+后续只读核对2.5资源包仍生效、剩约384.56万tokens；官方抵扣规则只覆盖对应模型，该包不抵扣当前2.0 Fast。
+用户明确禁止2.5，保持Fast2.0/480p；2.5未提交，不把cash余额解释为所有模型的共同阻断，详见同一mecha记录。
 AC-2完整资格仍PARTIAL，AC-7未验收；旧v2冻结只证明旧bytes，不外推新repair实现。
 
 ## Supersession Notice — Authorized Live Unit
