@@ -49,20 +49,28 @@ def test_canvas_handoff_reaches_canonical_owner(activated_source):
                       for p in args["project_root"].rglob("*") if p.is_file()}
 
 
-@pytest.mark.parametrize("damage", ["order", "stale", "missing", "conflict", "override", "resolution", "source_intent"])
+@pytest.mark.parametrize("damage", ["order", "stale", "accepted_stale", "missing", "conflict", "pending",
+                                    "no_source", "override", "resolution", "source_intent"])
 def test_handoff_fails_closed(activated_source, damage):
     args = inputs_for(activated_source)
     if damage == "order":
         args["shot_bindings"] = {"a": args["shot_bindings"]["b"], "b": args["shot_bindings"]["a"]}
     elif damage == "stale":
         args["shot_bindings"]["a"] = args["shot_bindings"]["a"].model_copy(update={"content_hash": "f" * 64})
+    elif damage == "accepted_stale":
+        identity = args["execution_evidence"]["source_shot"]
+        args["execution_evidence"]["source_shot"] = identity.model_copy(update={"content_hash": "f" * 64})
     elif damage == "missing":
         args["selection"]["boundaries"] = []
-    elif damage == "conflict":
+    elif damage in {"conflict", "pending"}:
         args["selection"]["boundaries"][0]["source_analysis"] = {
             "source_quotes": ["生物遮满镜头"], "target_quotes": ["从遮挡中继续前冲"],
             "planned_source_close": "遮挡", "planned_target_open": "前冲", "carryover": [],
-            "gaps": [], "conflicts": ["fixture unresolved conflict"]}
+            "gaps": [], "conflicts": ["fixture unresolved conflict"] if damage == "conflict" else []}
+        if damage == "pending":
+            args["selection"]["boundaries"][0].pop("boundary_kind")
+    elif damage == "no_source":
+        args["execution_evidence"].pop("source_shot")
     elif damage == "override":
         args["execution_evidence"]["continuity_obligation"] = None
     elif damage == "resolution":

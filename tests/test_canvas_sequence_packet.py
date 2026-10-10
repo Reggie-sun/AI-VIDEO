@@ -192,6 +192,11 @@ def test_analysis_does_not_erase_conflict_or_invent_verbatim_quote():
     result = build_sequence_packet(document(), selection)
     assert result["boundaries"][0]["status"] == "BLOCKED_SOURCE_CONFLICT"
     assert "planning_arguments" not in result["boundaries"][0]
+    edge["source_analysis"]["conflicts"] = []
+    edge.pop("boundary_kind")
+    pending = build_sequence_packet(document(), selection)["boundaries"][0]
+    assert pending["status"] == "ANALYZED_PENDING_SHOT_AUTHORING"
+    assert "planning_arguments" not in pending
     edge["source_analysis"]["source_quotes"] = ["不存在的引文"]
     with pytest.raises(ValueError, match="verbatim"):
         build_sequence_packet(document(), selection)

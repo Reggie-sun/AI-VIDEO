@@ -6,6 +6,60 @@ learning_eligibility: ineligible
 
 # Continuous Canvas Workflow Extraction
 
+## Corrective Implementation — 2026-10-10
+
+用户在Team审查后授权继续。下方“代码缺陷尚未修复”是历史checkpoint；本次修复准备器并实现只读handoff，
+没有生成/改动视频、上传素材或改变任何真实Production state。默认新准备480p，原720p参数/原声/失败记录保留。
+
+### Source Extraction
+
+`docs/canvas-sequences/fanxiang.json`与`baidaizi.json`保存既定4+8单元原文、引用职责、输出resource指针、
+10条边界的逐侧原句/计划开闭状态/继承项/缺口；expected_source_snapshot_sha256绑定完整旧源快照。
+Parent逐一重开源快照，验证12单元正文/hash/引用身份/输出指针与保存的evidence_units完全一致。
+结果和核验记录在`runs/canvas-sequence-correction-20261010-001/`，旧run不覆盖。
+
+当前6边为ANALYZED_PENDING_SHOT_AUTHORING，3边为BLOCKED_SOURCE_GAPS，1边为BLOCKED_SOURCE_CONFLICT。
+6边有明确承接方法，但没有冒充已批准Shot状态列；真实accepted media仍须canonical owner重验。
+反向25→26的持杆/空手冲突继续阻断，26→27不能因未提长杆就宣布道具消失。
+白带子前两边分别缺终端身份/信号切换说明、深空信号到巨兽世界的切换说明；不补造复位或传送。
+后五边原文支持生物实体遮挡与摄影机前冲，明确释放前世界身份，不强求同一物种/场景/光源；
+遮挡速度、方向、透光及声音匹配保留为media_checks，不伪装成原文剧情冲突或实际媒体失败。
+这些结论来自实际prompt/原timeline；本轮没有连续播放/听辨，resourceId也不是输出字节SHA或timeline variant验收。
+
+### Implementation And Ownership
+
+修复raw/rich混用覆盖原prompt、非法enum组合、carryover丢失、异常JSON traceback；引用chip之间插入文本边界，
+防止拼出不存在的连续引文。边界组合规则从`ContinuityTransitionPolicy`抽出共用函数，仍归production唯一owner，
+不构造假的Project/Shot/stack/hash来验证准备资料。缺证/冲突分析不会产生planning_arguments。
+新`scripts/canvas_sequence_handoff.py`重开source/selection、核验occurrence→当前Shot identity与Storyboard连续顺序，
+核对480p尺寸断言，并真实调用既有sequence adapter；采用时source revision与当前revision分别核验。
+执行证据不得覆盖边界分类。此入口不自动批准/创建Shot、不提交、不替代Planner/Router/Registry/Manifest或真实验收。
+
+### Verification And Review Boundary
+
+Red阶段8个回归失败已复现；修复后相关49项通过。最终Harness `canvas-sequence-correction-20261010-002`
+10项检查全通过：canvas准备/交接54 tests、生产连续性366 tests、Harness275、规则44、runtime boundary2及Architecture Gate。
+实际committer/reader fixture覆盖正常交接、Production bytes不变、错序/陈旧身份/冲突/缺证/覆盖参数/分辨率不符，
+缺真实source close评价由canonical owner拒绝；fake fixture不证明真实视频可用或连续成片。
+首轮Harness `...-001`因新negative fixture选择了更早的QA失败路径而失败；改用缺失close verdict后验证准确拒绝路径，失败receipt保留。
+
+Native `continuity_workflow_review`本次只读提取10边，Parent校正不连续摘录并逐字重验；
+独立Kimi核对绑定staged tree `80d91e64ae3b383f0b140890c11887c824cc9c3c`与上述fresh Harness；
+invocation `d007df25-15cc-40fc-91e0-8d498dc69d53`，deep/8份实际读取，PARSED/exit0，canonical receipt已核验。
+Parent裁决：F-SEQ-1是中间状态测试缺口，补pending状态及handoff拒绝断言；F-SEQ-2裸KeyError已独立Red复现，
+最小修复为缺source_shot显式ValueError；F-SEQ-3是有意的owner分层，不复制accepted identity验证，补陈旧采用身份的拒绝测试。
+三个findings均non_blocking，没有发现错误accept；第一项所述自动提升会进入adapter的后果并不成立，缺planning_arguments也会先失败。
+Kimi没有读取真实链JSON或fixture内部，不将其报告扩称源画布/真实媒体审查；这些由Parent与native提取核对。
+主体实现`9501be1`已通过上述完整Harness并push，远端SHA一致；后续仅上述窄拒绝路径、测试和本记录，
+按changed-path进行独立final receipt，不重复未改变的366项生产套件。此窄修复由Parent验证，不声称Kimi已审新bytes。
+Risk Gate：无新的明确Kimi强制review指令、无关键凭据/authority/durable-state后果；入口read-only且无effect，
+focused fixture与canonical回归覆盖主要失败路径，KIMI_REVIEW_NOT_REQUIRED。仍依standing delegation执行一次有界Kimi独立核对，
+不增加native reviewer、不把PARSED当验收。Parent拥有最终finding裁决与diff review。
+最终收尾验证入口为`.agent/harness/runs/canvas-sequence-correction-20261010-003/receipt.json`，实际状态以该receipt为准。
+
+record-ai-video-session复用本记录；distill-ai-video-learning评估no_candidate：这是确定性提取/集成与工程修复，
+不是新增模型质量实验或可归因的token节约证明。RAG stale advisory未作当前事实依据；未等待或强制刷新索引。
+
 ## Team Review Correction — 2026-10-10
 
 用户要求独立Team复核commit `a658a7d9411245c8d2b46a3ea9635e643ddba8f1`。本次只读审查代码与原画布，未修复实现、未生成/改动媒体。

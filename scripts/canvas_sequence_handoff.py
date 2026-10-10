@@ -62,6 +62,8 @@ def build_canvas_sequence_planning_request(
                         "lifecycle", "take_id"}
     if set(execution_evidence) - allowed_evidence:
         raise ValueError("execution evidence cannot override canvas authoring")
+    if "source_shot" not in execution_evidence:
+        raise ValueError("accepted source Shot evidence is required")
     accepted_identity = CreativeArtifactIdentity.model_validate(execution_evidence["source_shot"])
     if accepted_identity.artifact_id != identities[occurrences[target_index - 1]].artifact_id:
         raise ValueError("accepted source belongs to another canvas Shot")
