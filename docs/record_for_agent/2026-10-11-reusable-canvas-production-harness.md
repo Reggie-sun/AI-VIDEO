@@ -8,6 +8,14 @@ learning_eligibility: ineligible
 
 Date: 2026-10-11
 
+## Supersession Notice — Mecha Raw Media And QA Repair
+
+用户已选择改用机甲，最新[mecha record](2026-10-11-mecha-ant-seedance480-canvas.md)证明同一入口
+又提交1次并取得480p原MP4，累计2次含《美丑》拒绝。真实逐镜MCP/experience已保存，POV失败及未完整运动取证
+阻断validate；未activation/render/final acceptance。下方“没有逐镜媒体”是较早checkpoint的历史。
+实测另外修复共享MCP Python symlink调用路径；旧v2冻结source/authoring证明保留，未补签保留集生产资格。
+完整spec仍未验收。用户随后已确认同bytes音效符合要求、无配乐/对白；当前补完整运动证据，再有界修复视点偏差。
+
 ## Supersession Notice — Authorized Live Unit
 
 下方“没有新Provider submit/没有已授权媒体单元”描述初始工程checkpoint，现已被

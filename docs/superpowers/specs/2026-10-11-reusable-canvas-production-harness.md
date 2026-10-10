@@ -1,7 +1,7 @@
 # Reusable Canvas Production Harness
 
 Date: 2026-10-11
-Status: Engineering implemented and offline verified — AC-2部分验证；首次授权480p提交被Provider拒绝，AC-7完整成片尚未验收。
+Status: Engineering implemented — AC-2部分验证；机甲480p原片已生成，声音获用户确认，POV失败与完整运动证据缺口阻断，AC-7尚未验收。
 
 ## Goal
 
@@ -21,6 +21,12 @@ runtime baseline 和 session record 报告，本 spec 不自签验收。
 指定本 repository `.env` 为本次私密 credential supplier 的 exact 来源，取代本次默认 Secret Service lookup。
 值仅驻内存；这一例外不改变其他任务的 credential routing，不授权 unknown 重试、改人物或静默升档。
 具体输入、model/profile、调用数与逐镜停点见 plan；实际提交、媒体与人类验收仍分别取证。
+
+用户随后选择“改用现有机甲画布验证流程，保留《美丑》失败证据”。《机魂觉醒》的15秒蚂蚁脱困
+开发单元通过同一入口一次生成480p原片；原《美丑》一次拒绝保持，总物理submit为2。
+该单元的逐镜MCP证据显示第三人称后方跟拍，未满足封存的主角第一人称视点；用户已确认音效符合要求、无配乐或对白。
+Gate阻断validate/adoption，未生成final composition，不能用开发样本或原片替代AC-7。
+实际阻断及MCP虚拟环境调用修复见[mecha record](../../record_for_agent/2026-10-11-mecha-ant-seedance480-canvas.md)。
 
 ## Current Baseline And Scope Correction
 

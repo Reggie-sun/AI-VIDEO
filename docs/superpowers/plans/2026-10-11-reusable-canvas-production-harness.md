@@ -1,7 +1,7 @@
 # Reusable Canvas Production Harness Implementation Plan
 
 Date: 2026-10-11
-Status: Engineering implemented and published; first authorized 480p submit rejected, complete-film AC-7 not evaluated.
+Status: Engineering published; mecha480p raw generation succeeded, per-ShotGate blocked by POV failure/evidence gaps; AC-7 not accepted.
 
 ## Goal And Scope
 
@@ -39,6 +39,43 @@ canonical paid outcome为`KNOWN_NO_EFFECT`，failure experience已保存，重�
 完整60秒Pilot、逐镜媒体Gate、renderer与人类听看仍`NOT_EVALUATED`。
 来源数量充足；当前阻断为人物参考的上游接收，而非凭据缺失。
 细节与最小后续选择见[live record](../../record_for_agent/2026-10-11-beauty-seedance480-input-rejection.md)。
+
+### User-Selected Mecha Continuation
+
+用户明确改用现有机甲画布，保留《美丑》失败。选择《机魂觉醒》`node_fgfrmwy9ss`的完整15秒蚂蚁
+脱困单元：围破瓶顺时针循环→受撞后坚持穿叶绕石→一次逃脱并带出同伴。它是原development样本，
+不补标holdout、完整机甲影片或30–60秒代表性Pilot。原文无对白，保留原生音效、不新增BGM/字幕。
+来源只有一张群体场景参考，不虚构独立Character portrait或精确身份锁；主角动作、视点和逃脱义务仍完整保留。
+720×408平台预览WebP以同像素RGB PNG导入Registry，原1920×1088仅为来源观察值，不冒充已取得的原图。
+
+按原画布Fast2.0观察映射选定`doubao-seedance-2-0-fast-260128` / R2V / 15秒 / 480p / native audio，
+本新单元只增加1次submit、0自动重抽；《美丑》历史1次不清零，累计上限与实际数均为2。
+新immutable operator profile、授权、preview、egress、durable intent和permit独立封存；未查市场价/账单。
+受管独立concept审查指出POV/双重逃脱等歧义，Parent修正为字面主角眼睛视点、只在末段脱圈，
+补齐全程顺时针与动作/分镜/音效检查。补充复核因`STRUCTURED_OUTPUT_EXHAUSTED`没有可采纳报告，
+不冒称新bytes已独立通过；原意见逐项裁决、结构与正常compiler检查实际通过。
+
+实际POST一次被接收，同task经7次成功状态GET及1次fetch前重查落盘原MP4。
+实测15.104秒、864×496、24fps、H264/AAC。直接逐镜MCP抽31帧，canonical bridge另分析同bytes并保存experience。
+第5/10秒可见主角完整背部，POV明确FAIL；声音/连续运动的未取证部分保持NOT_EVALUATED。
+canonical诊断为`EVIDENCE_GAP + QUALITY_FAILURE`；validate实际拒绝、Manifest未变，未activate/render或提交后镜。
+durable next action仍为`validate`，是被Gate阻断的状态，不伪造terminal failed/已abandon。
+
+### Live QA Client Repair
+
+实测复现`ProjectAnalysisSession`对Python symlink使用`resolve()`后绕过配置venv、找不到`mcp`SDK。
+修复只保留配置executable的absolute调用路径，仍strict验证目标存在；没有新增依赖/解释器fallback或改QA标准。
+回归先失败后通过，相关suite31项通过，随后同一MP4的真实MCP/feedback持久化与无副作用replay通过。
+两次本地poll客户端缺transport、fetch后辅助JSON序列化失败分别记录；均从canonical状态重开，未重复POST/fetch。
+当前共享QA调用修复独立于原v2 source/authoring byte-proof；旧冻结和receipt保存，未补签保留集完整生产资格。
+
+剩余先走`EVIDENCE_REPAIR_FIRST`：取得同bytes的声音与连续运动证据，再为已知POV失败设计有明确变量的
+有限repair，经原history/recovery/planning/paid owners执行；不能用新目录或改名隐藏旧失败、清零次数。
+AC-7仍需真正holdout完整单元、canonical final render和用户完整听看认可。详见
+[current media record](../../record_for_agent/2026-10-11-mecha-ant-seedance480-canvas.md)。
+
+用户随后完整声音核对回复“音效符合要求，无配乐或对白”，已绑定exact MP4保存为独立`HUMAN_AUDIO`证据。
+此human observation补齐声音反馈，不改写较早analyzer source中的NOT_EVALUATED，也不代签视觉、adoption或最终验收。
 
 ## Current Evidence
 

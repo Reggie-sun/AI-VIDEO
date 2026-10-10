@@ -9,6 +9,13 @@ evidence_index_version: "1"
 
 Date: 2026-10-11
 
+## Supersession Notice — Source Choice
+
+用户随后明确选择“改用现有机甲画布验证流程，保留《美丑》失败证据”。
+最新[mecha record](2026-10-11-mecha-ant-seedance480-canvas.md)记录一次新的480p生成及POV失败/证据缺口停点。
+下方等待来源选择的next action已被取代；《美丑》本身仍为一次`KNOWN_NO_EFFECT`拒绝，无MP4、无重试，
+不是被新来源的成功接收修复或转为媒体质量结论。
+
 ## Purpose And Current Status
 
 推进[reusable canvas spec](../superpowers/specs/2026-10-11-reusable-canvas-production-harness.md)的真实制作验证。

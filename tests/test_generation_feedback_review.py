@@ -9,6 +9,39 @@ from ai_video_mcp.generation_feedback import review_generation_attempt
 from test_production_local_video_state import _runtime
 
 
+def test_analysis_session_invokes_configured_virtualenv_symlink(tmp_path, monkeypatch):
+    import json
+    import sys
+    from ai_video_mcp.generation_feedback import ProjectAnalysisSession
+
+    interpreter = tmp_path / "venv" / "bin" / "python"
+    interpreter.parent.mkdir(parents=True)
+    interpreter.symlink_to(sys.executable)
+    observed = []
+
+    class Process:
+        returncode = 0
+
+        async def communicate(self):
+            return json.dumps({"content": [], "isError": False}).encode(), b""
+
+    async def spawn(*argv, **kwargs):
+        observed.append(argv)
+        return Process()
+
+    monkeypatch.setattr(asyncio, "create_subprocess_exec", spawn)
+    session = ProjectAnalysisSession(interpreter)
+    asyncio.run(session.call_tool("video_analyze", {"video_path": "exact.mp4"}))
+    assert observed == [(str(interpreter), "-m", "ai_video_mcp.analysis_client", "exact.mp4")]
+
+
+def test_analysis_session_rejects_missing_interpreter(tmp_path):
+    from ai_video_mcp.generation_feedback import ProjectAnalysisSession
+
+    with pytest.raises(FileNotFoundError):
+        ProjectAnalysisSession(tmp_path / "missing-python")
+
+
 class Session:
     def __init__(self, *, fail=False, alter=None):
         self.calls = 0

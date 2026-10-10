@@ -102,7 +102,10 @@ class ProjectAnalysisSession:
     """Use the installed isolated MCP runtime without adding a production SDK."""
 
     def __init__(self, python):
-        self.python = str(Path(python).resolve(strict=True))
+        interpreter = Path(python)
+        interpreter.resolve(strict=True)
+        # Python detects a virtualenv from the invoked path, not its target.
+        self.python = str(interpreter.absolute())
 
     async def call_tool(self, name, arguments):
         if name != "video_analyze":
