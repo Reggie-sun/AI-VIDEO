@@ -6,6 +6,14 @@ learning_eligibility: ineligible
 
 # Continuous Canvas Workflow Extraction
 
+## Supersession Notice — 2026-10-11 Implementation
+
+下方Proposed/spec-only、未写plan/未实施是先前回合的历史状态，已由
+[共享production入口的工程实现](2026-10-11-reusable-canvas-production-harness.md)取代。
+当前工程commit为`a4eb0939a57daa370ecace209108a2fafeafdc43`；离线整链控制流已验证。
+两份新holdout仅完成来源/素材/authoring验证，AC-2仍PARTIAL，AC-7未执行。
+旧作品持物、转场和声画偏差、未验收结论均未改写，不从新代码测试推断旧素材通过。
+
 ## Generic Scope Correction And Spec — 2026-10-11
 
 用户明确指出目标是通用 Harness，而不是适配两部作品。下方案例的持物冲突、转场及声画未评估状态仍保留，

@@ -1,7 +1,7 @@
 # Reusable Canvas Production Harness
 
 Date: 2026-10-11
-Status: Implementation authorized — 工程实现进行中；真实媒体调用与 AC-7 尚未授权或验收。
+Status: Engineering implemented and offline verified — AC-2仅完成来源/素材/authoring验证，AC-7未执行；完整目标尚未验收。
 
 ## Goal
 
@@ -185,6 +185,7 @@ Parent self-review：目标是可重复的多故事生产，不是两个案例�
 采用现有 owner，未设第二状态/时间线或新自动验收权；保留集防止在旧样本上自证。
 本文件是当前授权目标，不能作为已实施 baseline、模型定律或付费执行许可。
 
-仍需后续取证：新增画布链接和完整数据、代表性/采用评价、可独立保留的样本、各原始输出版本对应关系。
-来源格式与实际能力缺口可能影响实现范围；应先按本 spec 的少量样本调查再写实现计划，
-不因截图显示画布很多就提前承诺全部支持。
+新增来源快照及冻结后的保留样本已取证，工程实现和证据边界见
+[implementation record](../../record_for_agent/2026-10-11-reusable-canvas-production-harness.md)。
+仍需补齐完整生产单元的参考职责、采用版本、实际Provider能力/授权，以及用户完整听看；
+保留画布的素材导入和创作数据落盘不等于整链生产资格。unsupported来源不承诺全部支持。

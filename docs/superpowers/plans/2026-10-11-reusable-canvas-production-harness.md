@@ -1,7 +1,7 @@
 # Reusable Canvas Production Harness Implementation Plan
 
 Date: 2026-10-11
-Status: Implementation authorized by the current user request; source investigation in progress.
+Status: Engineering implemented and published; holdout production qualification partial, AC-7 not evaluated.
 
 ## Goal And Scope
 
@@ -10,6 +10,17 @@ Status: Implementation authorized by the current user request; source investigat
 默认 Native Codex 在 current `main` 串行拥有集成与最终裁决，独立 source inspection 单元可委托。
 
 ## Current Evidence
+
+工程commit `a4eb0939a57daa370ecace209108a2fafeafdc43`已push到main并核对远端SHA。
+exact staged engineering receipt为`.agent/harness/runs/reusable-canvas-production-20261011-engineering-v2/receipt.json`：
+全部11个policy checks通过、1475 tests通过、3个显式live-renderer tests跳过；fresh receipt核验通过。
+初轮coverage catalog缺项已修复，失败receipt保留；没有降低验证或媒体验收规则。
+
+以下初始样本分配为历史v1。默认480p修复为保持显式来源比例后，原两份holdout转为development；
+v2在读取前固定`STORMII 复刻`和《美丑》为新holdout。共享代码/语义冻结后没有再改动。
+两份新来源通过同一入口完成inspection、实际PNG选择/Registry、authoring与严格重开；
+完整Reference ownership、Generation、连续性与声画交付仍未在这些真实来源上qualify，AC-2为PARTIAL。
+详见[record](../../record_for_agent/2026-10-11-reusable-canvas-production-harness.md)。
 
 `runs/reusable-canvas-production-20261011-001/corpus.json`登记分配。
 现有开发样本为反向之地和白带子；新增开发样本为搜山、校园短片和机魂觉醒。
