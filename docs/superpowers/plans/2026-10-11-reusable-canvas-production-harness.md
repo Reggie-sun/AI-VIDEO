@@ -1,7 +1,7 @@
 # Reusable Canvas Production Harness Implementation Plan
 
 Date: 2026-10-11
-Status: Engineering published; mecha480p raw generation succeeded, per-ShotGate blocked by POV failure/evidence gaps; AC-7 not accepted.
+Status: Engineering published; known-failure repair verified; next media unit rejected with AccountOverdueError; AC-2 partial / AC-7 not accepted.
 
 ## Goal And Scope
 
@@ -93,6 +93,27 @@ AC-7仍需真正holdout完整单元、canonical final render和用户完整听�
 下一媒体候选只改变native prompt表达结构与观察者视野几何，保留原图/model/mode/15秒480p、故事、动作与声音。
 独立concept检查、prospective正确proof分工、完整历史/有限计数和paid preflight齐全前不POST。
 原片与原QA不修改；AC-2/AC-7保持未完成。
+
+### Repair Unit Outcome And Current Resume Condition
+
+上述待preflight候选阶段已完成。shared repair commit`e11744514c0a47f6ec76c880722cad5be227a3e2`
+已push/remote-SHA核对；exact staged repair receipt的9checks全部PASS，含114 Canvas tests。
+Implementation Risk Gate按已验证snapshot裁决`KIMI_REVIEW_NOT_REQUIRED`，actualconcept审查不代替code review。
+受管Kimi对v1提出两处“跟随”表达澄清，Parent v2/v3修正和actual compiler比较确认仅`prompt_text`改变；
+原model/mode/reference/15秒480p/native audio、原文动作与声音目标保持。
+
+normal owner选择prospective QA/goal：15项raw与18项final hard observables保持；
+完整运动/听辨13项选择fresh human proof，局部POV/近景存在2项选择analyzer。
+oldQA、失败receipt/bytes/全部NE保持，实际planner是explicit goal revision `GENERATE_ONCE`、`intervention=None`，
+未宣称canonical修复已成功。新单元1POST/0重抽，同task ceiling1→2、全任务物理ceiling2→3，旧计数保留。
+现有operator每call upper bound保持，project ceiling显式扩展，旧费用未知不清零；不是市场价格或账单。
+
+新attempt`canvas-b632cd4c587aa7a8df7640c34bd99cfb57d9749c`一次POST返回HTTP403 / `AccountOverdueError`。
+正常状态为failed / known_no_effect / next action stop，Manifest33，new reservation released / actual0。
+累计Beauty1、机甲原片1、修复1共3次物理POST；没有task ID、新MP4、MCP媒体验收、activation或final render。
+用户说明火山账户还有余额；当前已登录方舟首页只读显示negative余额，API key所属账号及具体账单未独立核对。
+解除该API账户计费阻断后，先核对完整known-no-effect历史与新有限单元，再重走当前preview/预算/intent/permit；
+不能复用已消费封套或重置task计数，未恢复前不重复POST。详见[current media record](../../record_for_agent/2026-10-11-mecha-ant-seedance480-canvas.md)。
 
 ## Current Evidence
 

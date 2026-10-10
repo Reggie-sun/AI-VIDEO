@@ -14,7 +14,11 @@ Date: 2026-10-11
 又提交1次并取得480p原MP4，累计2次含《美丑》拒绝。真实逐镜MCP/experience已保存，POV失败及未完整运动取证
 阻断validate；未activation/render/final acceptance。下方“没有逐镜媒体”是较早checkpoint的历史。
 实测另外修复共享MCP Python symlink调用路径；旧v2冻结source/authoring证明保留，未补签保留集生产资格。
-完整spec仍未验收。用户随后已确认同bytes音效符合要求、无配乐/对白；当前补完整运动证据，再有界修复视点偏差。
+完整spec仍未验收。用户随后确认同bytes声音/动作符合要求，POV失败经正常owner关闭；
+共享same-Shot repair入口已发布，9项Harness checks及114 Canvas tests通过。
+修复表达单元实际追加一次POST，被HTTP403 / `AccountOverdueError`拒绝，canonical `KNOWN_NO_EFFECT`，
+没有新视频；总物理POST为3，不重复提交。当前登录方舟首页只读显示negative余额，API key所属账号仍未独立核对。
+AC-2完整资格仍PARTIAL，AC-7未验收；旧v2冻结只证明旧bytes，不外推新repair实现。
 
 ## Supersession Notice — Authorized Live Unit
 

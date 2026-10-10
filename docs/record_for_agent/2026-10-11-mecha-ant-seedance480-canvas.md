@@ -22,6 +22,12 @@ canonical experience仍为`EVIDENCE_GAP + QUALITY_FAILURE`，
 初始停点为`running`/phase`validate`；后续正常owner已显式abandon，见下节superseding证据，未更改原诊断。
 完整spec尚未完成，AC-2完整资格仍PARTIAL，AC-7尚未验收。
 
+后续修复入口已验证并发布；第二次机甲物理POST被HTTP403 / `AccountOverdueError`拒绝，
+canonical `KNOWN_NO_EFFECT`、attempt failed、next action stop，没有新task ID或MP4。
+当前任务累计3次物理POST（Beauty1、机甲原片1、修复1），本次追加单元已耗尽，未重复提交。
+账号侧解除计费阻断是继续媒体实测的外部前提。最初仅有error；用户说明火山账户仍有余额后，
+只读打开当前已登录方舟首页，实际显示negative账户余额，见下节。未查询明细账单或推断市场费用。
+
 ## Source And Creative Decisions
 
 证据根：`runs/canvas-mecha-seedance480-20261011-001/`。source node`node_fgfrmwy9ss`，
@@ -136,6 +142,81 @@ Canvas facade却只允许无attempt准备，或因multiple attempts一律阻断�
 15秒480p、原文动作和声音。它是待独立concept审查及preflight的candidate；至此累计实际POST仍2，
 没有新封套、permit或新片PASS。完整spec/holdout/final render/用户最终听看仍未完成。
 
+### Prospective Proof And One Bounded Submission
+
+上述candidate checkpoint现由`repair-prompt-v3/`的真实准备/提交结果取代，v1/v2证据保留。
+同一Production根、Shot和task继续；实际native compiler前后比较仅`prompt_text`变化，
+model/profile/mode/场景PNG/15秒480p/native audio保持，随机seed不可控单列。
+新的表达删除序列化enum/default，按原3/8/4秒段落组织观察者视野：贴地视点、侧方蚂蚁腿、前方叶隙/石头，
+不把主角背部放在主观段前方；原文行动/声音及一次脱圈保持，未采用参考图导致POV偏差的未经证实假设。
+
+受管read-only concept调用`288df287-d04f-4c94-ba32-f3cc24fa9b1e`，deep qualified route，
+seal`d4279170d6ffa3f388fa5db17d020887cffa59cc3f0f25f0d15cfde4463645a6`，
+reportSHA`31392808185cb8f96f169bc6156df3b9627a31e7110edfb583d552cbb862d06b`。
+actual5个Read、2个wire requests、exit0；Parent核对exact read bytes并裁决残余“跟随”措辞。
+Kimi只审v1，v2/v3两行视点说明及exact原文substring的compiler修正由Parent检查，不冒称新bytes独立审过。
+这不证明实际视频效果，也不替代implementation Risk Gate。
+
+原QA把完整运动/听辨选给只能probe/sample的analyzer，后续human回答不能倒填旧source。
+正常`activate_qa_policy`选择prospective policy v3 / final-output goal v2，保留15项raw hard observables与
+18项final observables，13项连续运动/声音/复合要求选择fresh human proof，`pov`/`closeups`只选局部帧观察。
+新QA SHA`e027a9395d90e7cf0e8c9d3d1404b8f3b1d3cec79327316d4a7a24bde9149c11`；
+旧QA、quality-rejection、全部NE和失败媒体bytes保持。当前human authority没有新片finding。
+既有planner实际返回`GENERATE_ONCE` / `intervention=None`：explicit goal revision保留旧失败，
+不宣称canonical intervention已选中或修复成功。单变量比较另由actual compiled comparison核验。
+
+Parent在当前任务有限预算/恢复授权内封存追加单元1次POST、0重抽、45分钟；
+保留旧机甲1次消费、原ceiling1，显式扩展same-task ceiling到2，任务总物理ceiling2→3。
+现有operator bound每call`50_000_000`microCNY保持，project ceiling`50_000_000`→`100_000_000`，
+不是价格或账单；旧原片actual cost未知、reserved状态保持。
+normal money extension hash`937fb1b05f4794d74547ac6b083ca64523d795c0e219f91fda5ed28e8ae6d570`，
+quota extension hash`d6d092d9397c4eb683e430d75355ca98f6e41d15ef6dfa4ea850b0c1e928baff`，
+新exact preview/authorization/egress、Director/goal-binding和pre-submit preflight均在POST前封存。
+没有新Provider、credential来源、图像或模式切换。
+
+| Item | Repair submission evidence |
+| --- | --- |
+| Attempt | `canvas-b632cd4c587aa7a8df7640c34bd99cfb57d9749c` |
+| Resolved SHA | `e22c01f75a96be433ce1d3d7710c59c3fb95863e0d3689f1fc771b825796cc59` |
+| Preview SHA | `fb3ac57c3604ec4fc8563476c9a8ac733385d75602078139eb3f8456096401a7` |
+| Prompt SHA | `3adfc42f3c4aa2892be3de13b4bc7d72a1ab1a53165fbd7601501b3ce263a0e6` |
+| POST | 2026-10-10T19:45:07Z；756131bytes；bodySHA`60f2c5eafc56678e77c8b185fa324df2c33d2fa82971a5551f8e8fd399c785c4` |
+| Response | HTTP403 / `AccountOverdueError`；212bytes；responseSHA`7756484c317ee10bc504072ae30d41177ddb5ae80a27123077444368735758bf` |
+| Canonical receipt | `production/state/paid-provider/submits/6f556558f90421f7e2b55ebe541c991751a0da4b0b19696734abfe53022a11f0.json` |
+| Receipt file SHA | `37817c196e6316758cc7a892eb69fe4e45b285df5cf15cf147168547e42e32b6` |
+| Reopen | Manifest33；attempt failed；paid phase known_no_effect；next action stop；external_effect_id null |
+| Budget | active revision7，new reservation released / actual0；old reservation仍reserved / actual unknown |
+
+本地结果保存为`repair-prompt-v3/submit-error.json`、`canonical-submit-failure-state.json`与
+`canonical-paid-failure-summary.json`；读取正常owner失败状态没有再次POST或重铸permit。
+辅助readonly metadata读取曾用错dataclass/Pydantic字段，修正后重开，未触发Production写入或Provider请求。
+新片未生成，故新媒体Gate、POV效果、完整运动/声音、adoption及final render均NOT_EVALUATED，
+原片human声音/动作反馈不转移为新片PASS。用户已收到账号侧恢复额度请求；余额和原因细项未取证。
+
+用户随后表示仍有余额并确认查看的是火山方舟/火山引擎。Parent只读核对公开
+[官方错误码](https://docs.volcengine.com/docs/ark/error-codes?lang=zh)：文档分别说明欠费及计费项未开通，
+不能只凭error推定用户账户实际金额。当前adapter固定origin为`https://ark.cn-beijing.volces.com`；
+当前已登录方舟首页经正常余额显示按钮实际显示negative余额，观测保存在
+`repair-prompt-v3/account-console-observation.json`。这是当前console页面观察，与error相符；
+尚未独立验证该登录账号与API key所属账号一致，未读取/reveal任何新credential、明细账单或实际生成费用，
+未充值、开通服务或再提交视频。上句“余额未取证”只描述该只读核对前的历史停点。
+
+### Published Repair Verification
+
+MCP调用修复commit`40a26924a084e9b02390f0f255a2bbfba0117bef`已push并核对remote main SHA；
+exact staged receipt`.agent/harness/runs/reusable-canvas-production-20261011-mecha/receipt.json`的11checks全部PASS。
+共享repair commit`e11744514c0a47f6ec76c880722cad5be227a3e2`同样已push并核对remote SHA；
+`.agent/harness/runs/reusable-canvas-repair-20261011/receipt.json`的9checks全部PASS，含114 Canvas、
+275 Harness、44 invariant及2 runtime-boundary tests。staged tree`ebb3c94744e37cc4c63a9950ad8692b5b513a82b`，
+receipt SHA`e91d5d34a6ce13544ad90144c5650b49852946c867310afdfa397db28202ad55`，commit前fresh验证通过。
+两份staged receipt只证明各自snapshot；不把commit后的staged freshness当当前证明。
+
+Implementation Risk Gate在上述native verification后裁决`KIMI_REVIEW_NOT_REQUIRED`，exact decision
+保存在`repair-implementation-review-risk.json`。没有新增credential/Provider/permit/schema/state writer；
+canonical current-attempt选择风险经closed lineage、same-task/history、fork/unknown拒绝、预算耗尽、
+mixed closure、完整successor Gate/采用及replay覆盖，Parent未发现需adversarial review的实质剩余gap。
+只读concept报告不被计为implementation review，也没有叠加额外reviewer。
+
 ## Shared MCP Invocation Repair
 
 `ProjectAnalysisSession.__init__`原先把配置Python symlink`resolve(strict=True)`后作为executable调用。
@@ -158,20 +239,25 @@ concept审查不冒充code review，补充protocol失败也不构成已通过的
 | mecha-pov-gate | provider-request:628e66a4f86191ff5f1a46d0490e9ae3e2f70a94a3de7c61b8dae0f57ababa19 | canvas-mecha-ant-unit-20261011 | canvas-a69856aa5c2b934893fe53a1a5f28cbf94be0fc7 | N/A | 265d4135906be4a8d4edfc744bc9db0233093a05ec3a4b0bc0dadda2254c3f36 | ANALYZER | FAIL | POV_NOT_SATISFIED_WITH_EVIDENCE_GAPS | SAME_EVIDENCE_NEW_PROOF_LAYER | mecha-provider-result | runs/canvas-mecha-seedance480-20261011-001/generation-evaluation-source.json |
 | mecha-human-audio | provider-request:628e66a4f86191ff5f1a46d0490e9ae3e2f70a94a3de7c61b8dae0f57ababa19 | canvas-mecha-ant-unit-20261011 | canvas-a69856aa5c2b934893fe53a1a5f28cbf94be0fc7 | N/A | 265d4135906be4a8d4edfc744bc9db0233093a05ec3a4b0bc0dadda2254c3f36 | HUMAN_AUDIO | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | mecha-provider-result | runs/canvas-mecha-seedance480-20261011-001/human-audio-confirmation.json |
 | mecha-human-motion | provider-request:628e66a4f86191ff5f1a46d0490e9ae3e2f70a94a3de7c61b8dae0f57ababa19 | canvas-mecha-ant-unit-20261011 | canvas-a69856aa5c2b934893fe53a1a5f28cbf94be0fc7 | N/A | 265d4135906be4a8d4edfc744bc9db0233093a05ec3a4b0bc0dadda2254c3f36 | HUMAN_VIDEO | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | mecha-provider-result | runs/canvas-mecha-seedance480-20261011-001/human-motion-confirmation.json |
+| mecha-repair-account-rejection | provider-request:e22c01f75a96be433ce1d3d7710c59c3fb95863e0d3689f1fc771b825796cc59 | canvas-mecha-ant-unit-20261011 | canvas-b632cd4c587aa7a8df7640c34bd99cfb57d9749c | N/A | NO_ARTIFACT:ACCOUNT_OVERDUE | PROVIDER_RECEIPT | FAIL | ACCOUNT_OVERDUE | NEW_ATTEMPT | NONE | runs/canvas-mecha-seedance480-20261011-001/production/state/paid-provider/submits/6f556558f90421f7e2b55ebe541c991751a0da4b0b19696734abfe53022a11f0.json |
 
 同一attempt只有一个独立单元；31帧、四个失败requirement、两次MCP及两层proof不增加独立实验数。
 
 ## Remaining Work And Record Outcome
 
 原片声音/完整运动已获上述human确认；旧formal analyzer gaps保持，已通过明确补证耗尽closure封存。
-保留已知POV失败，缺连续运动证据不靠重复生成补齐。下一次repair需要明确不同的视点表达变量，
-按同Shot历史、原recovery/planning和新的有限paid单元执行，不另开Production根清零，不改成第三人称求PASS。
+保留已知POV失败，缺连续运动证据不靠重复生成补齐。新的视点表达单元已准备并被账号错误拒绝，
+不是POV实测失败或成功。恢复账号额度后先核对closed known-no-effect状态和全部3次物理POST，
+按原recovery/planning、exact preview/actual clock及下一有限单元执行；当前已消费permit/封套不能复用，
+不另开Production根清零、不改成第三人称求PASS，也不自动重试。
 最终还需真正holdout短剧情单元、canonical原声composition/HyperFrames和用户完整听看认可。
 当前媒体可用于失败诊断，不能以candidate/preview名称结束作品目标或签AC-7。
 
 使用`record-ai-video-session`记录真实稳定阻断和共享修复，并对工程/Beauty记录作直接supersession。
 `distill-ai-video-learning`评估`no_candidate`：一次机甲POV失败与Beauty输入拒绝涉及不同model、素材及
-观察层，未隔离共同变量；SDK调用回归没有第二独立实验或controlled multi-arm，不制造通用学习规则。
+观察层，未隔离共同变量；新修复没有媒体outcome，账号拒绝不能成为POV对照臂；SDK调用回归没有第二独立实验
+或controlled multi-arm，不制造通用学习规则。learning outcome仍`no_candidate`。
 record不改Skill/Policy/Gate，不重建RAG，也不为记录增加Provider/media或额外测试。
-本次publication及verification以`.agent/harness/runs/reusable-canvas-production-20261011-mecha/receipt.json`
-和实际main SHA为准；原11-check/1475-test receipt只保留原snapshot证明范围。
+实现verification分别绑定上文MCP与repair receipts；收尾文档exact snapshot证据入口为
+`.agent/harness/runs/reusable-canvas-account-blocker-20261011/receipt.json`，状态与scope以实际receipt核验为准。
+publication以实际main SHA为准；原11-check/1475-test receipt只保留原snapshot证明范围。

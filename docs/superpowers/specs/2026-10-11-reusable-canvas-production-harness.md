@@ -1,7 +1,7 @@
 # Reusable Canvas Production Harness
 
 Date: 2026-10-11
-Status: Engineering implemented — AC-2部分验证；机甲480p原片声音/动作获用户确认，POV失败已正式关闭；共享repair接续验证中，AC-7尚未验收。
+Status: Engineering published — AC-2部分验证；机甲原片声音/动作获用户确认，POV失败保持；repair已验证，追加实测被AccountOverdueError阻断，AC-7尚未验收。
 
 ## Goal
 
@@ -27,6 +27,12 @@ runtime baseline 和 session record 报告，本 spec 不自签验收。
 该单元的逐镜MCP证据显示第三人称后方跟拍，未满足封存的主角第一人称视点；用户已确认音效符合要求、无配乐或对白。
 Gate阻断validate/adoption，未生成final composition，不能用开发样本或原片替代AC-7。
 实际阻断及MCP虚拟环境调用修复见[mecha record](../../record_for_agent/2026-10-11-mecha-ant-seedance480-canvas.md)。
+
+后续同入口repair实现已通过9项Harness checks、114 Canvas tests并发布。
+保留原失败/消费，prospective QA保留全部hard observables并将完整听看交给fresh human proof；
+追加单元只改变native prompt表达，1次实际POST被HTTP403 / `AccountOverdueError`拒绝，
+canonical `KNOWN_NO_EFFECT`、无新MP4。当前累计3次物理POST，未重试；账号侧计费阻断待解除。
+原片用户声音/动作反馈不转移为新片接受，新的POV效果、holdout完整生产与final render仍未验证。
 
 ## Current Baseline And Scope Correction
 

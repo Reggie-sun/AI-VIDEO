@@ -1,7 +1,7 @@
 # Canvas Known-Failure Repair Continuation
 
 Date: 2026-10-11
-Status: Implementation authorized; Native Codex execution.
+Status: Implemented and published; 9 Harness checks / 114 Canvas tests passed; actual media repair blocked by AccountOverdueError.
 
 ## Goal And Scope
 
@@ -11,7 +11,7 @@ Status: Implementation authorized; Native Codex execution.
 
 ## Current And Target Behavior
 
-目前单次失败返回 stop，两个同Shot attempts直接阻断；generic owner已有 exact rejection、
+实现前单次失败返回 stop，两个同Shot attempts直接阻断；generic owner已有 exact rejection、
 intervention、budget与execution guards，但Canvas无法调用或恢复。增加显式
 `prepare_repair(limits, interventions)` / `start_repair(limits, interventions)`，只在当前
 exact terminal quality-rejection上可用；旧start、unknown stop和所有提交gate保持。
@@ -48,3 +48,13 @@ durable successor→reopen，拒绝fork/unknown及未关闭状态。执行change
 及policy要求的exact snapshot Harness；真实媒体和最终听看独立取证。
 本slice补application缺口，恢复权仍归ProductionStateCommitter；不以新目录、新task或QA降标清掉旧失败。
 共享实现再次变化后重新冻结证明范围，旧holdout结果仅证明旧bytes；AC-2/AC-7不能由这次修复自签。
+
+## Verified Checkpoint And Live Boundary
+
+commit`e11744514c0a47f6ec76c880722cad5be227a3e2`已push并核验remote SHA；
+`.agent/harness/runs/reusable-canvas-repair-20261011/receipt.json`的9checks全部PASS，含114 Canvas tests。
+Parent依据exact staged snapshot/verification裁决`KIMI_REVIEW_NOT_REQUIRED`，没有增加runtime authority或state writer。
+同task真实追加单元已通过concept/Director/goal/native compiler/actual单变量比较、prospective proof和paid preflight，
+仅1次POST被HTTP403 / `AccountOverdueError`拒绝，known_no_effect、无新媒体，累计物理POST3。
+这替代上节未准备封套的历史停点，不证明新视点表达有效。待解除API账户计费阻断后按原owner有限恢复，
+保留失败/消费/旧bytes，不复用permit、不自动重试；详见[media record](../../record_for_agent/2026-10-11-mecha-ant-seedance480-canvas.md)。
