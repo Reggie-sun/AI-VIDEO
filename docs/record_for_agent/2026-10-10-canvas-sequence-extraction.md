@@ -6,6 +6,34 @@ learning_eligibility: ineligible
 
 # Continuous Canvas Workflow Extraction
 
+## Generic Scope Correction And Spec — 2026-10-11
+
+用户明确指出目标是通用 Harness，而不是适配两部作品。下方案例的持物冲突、转场及声画未评估状态仍保留，
+但仅属于对应素材，不是通用 Harness 必须先修好的全局 blocker。上一轮 preparation/handoff 实现与测试
+也不等于完整多故事制作流程已经完成；旧“先补两链所有边界”的建议不再作为新目标的默认推进方式。
+
+本轮按“写一个specs”仅新增
+[Reusable Canvas Production Harness](../superpowers/specs/2026-10-11-reusable-canvas-production-harness.md)，
+状态 Proposed/spec-only，未实施、未写 plan、未生成或修改媒体。定义结构化来源与 MD/HTML 投影的区别、
+多画布覆盖和保留集、连续性/参考职责、既有 Production owners 的整链衔接、人工听看与默认480p。
+五个提取样本加两个保留样本是起步取证规模，不是硬编码数量或泛化保证；新画布仍未提供/读取。
+独立新故事仅改项目数据、无需故事专属代码是工程验收；未来真实短片获用户完整听看认可另为制作验收。
+旧案例无需重拍，训练模型不属于本 scope；未把规范设计写成模型经验结论。
+
+Parent 重开当前 preparation/handoff/sequence owner 与 contract 文档，CodeGraph 核对后者的
+accepted_sequence_source、Project reader、Planner/Router 关系；当前只读交接要求既有 Shot 和真实前序证据。
+按 standing delegation 使用受管 Kimi 作现有能力调查，非 spec reviewer；spec 由 Parent self-review。
+invocation `9831b93f-2d8f-4f8d-bda9-3e2c47d6a300` 已核验 canonical receipt，deep、exit0、未截断，
+实际读三份入口源码及AGENTS。Parent采纳“已有准备/交接不等于完整AV流程”的有限结论；
+“缺跨画布合并”超出用户目标，不新增fan-in系统；min尺寸断言也不足以证明“不支持任意宽高比”，不采纳此推论。
+未读全库的gap不作为全仓缺失证据；spec明确多画布首先指跨作品复用，而非合并作品。
+本轮只改 spec 和本记录，无实现变更，Implementation Review Risk Gate 不触发。
+首轮文档检查通过；上述范围澄清后最终 receipt 入口：`.agent/harness/runs/reusable-canvas-spec-20261011-002/receipt.json`，
+结果以实际 receipt 为准，不复用旧代码测试冒充本轮新行为验证。
+
+record-ai-video-session 复用本主记录；distill-ai-video-learning 评估 `no_candidate`：本轮为需求边界和
+spec，不增加独立制作实验。项目 RAG 返回 stale advisory，未以历史片段代替当前源码，也未前台重建索引。
+
 ## Corrective Implementation — 2026-10-10
 
 用户在Team审查后授权继续。下方“代码缺陷尚未修复”是历史checkpoint；本次修复准备器并实现只读handoff，
