@@ -2,6 +2,8 @@ from copy import deepcopy
 import json
 import subprocess
 import sys
+import hashlib
+from pathlib import Path
 
 import pytest
 
@@ -33,8 +35,10 @@ def document():
 def boundary():
     return {"source_occurrence_id": "a", "target_occurrence_id": "b",
             "boundary_kind": "scene_boundary", "continuity_obligation": "identity_style_carryover",
-            "causal_edge_semantics": "scene_reset", "source_close_quote": "生物遮满镜头",
-            "target_open_quote": "从遮挡中继续前冲", "causal_state_changes": []}
+            "causal_edge_semantics": "causal_ellipsis", "source_close_quote": "生物遮满镜头",
+            "target_open_quote": "从遮挡中继续前冲", "required_carryover_dimensions": ["screen_motion_axis"],
+            "causal_state_changes": [{"dimension": "screen_motion_axis", "source_close": "向前",
+                                      "target_open": "向前", "transition_mode": "carry"}]}
 
 
 def test_shared_assets_do_not_imply_continuity_or_acceptance():
@@ -108,6 +112,7 @@ def test_complete_causal_inventory_is_only_an_authored_handoff():
     from ai_video.production.video_transition import CausalDimension
     edge = boundary()
     edge.update(continuity_obligation="full_continuity", boundary_kind="within_continuous_take",
+                required_carryover_dimensions=sorted(d.value for d in CausalDimension),
                 causal_edge_semantics="direct_continuity", causal_state_changes=[
                     {"dimension": d.value, "source_close": "已锁定状态", "target_open": "已锁定状态",
                      "transition_mode": "carry"} for d in CausalDimension])
@@ -138,3 +143,107 @@ def test_cli_is_offline_and_does_not_overwrite(tmp_path):
     original = output.read_bytes()
     assert subprocess.run(argv, capture_output=True).returncode == 2
     assert output.read_bytes() == original
+
+
+def test_raw_source_cannot_override_prompt_with_observed_nodes():
+    source = document()
+    source["generation_nodes"] = []
+    with pytest.raises(ValueError, match="mixed"):
+        build_sequence_packet(source, {"node_ids": ["a", "b"]})
+
+
+@pytest.mark.parametrize("kind,obligation,semantics", [
+    ("within_continuous_take", "identity_style_carryover", "direct_continuity"),
+    ("scene_boundary", "identity_style_carryover", "scene_reset"),
+    ("scene_boundary", "substantial_reset", "causal_ellipsis"),
+    ("scene_boundary", "identity_style_carryover", "commercial_cut"),
+])
+def test_illegal_canonical_combination_rejected(kind, obligation, semantics):
+    edge = boundary()
+    edge.update(boundary_kind=kind, continuity_obligation=obligation, causal_edge_semantics=semantics)
+    with pytest.raises(ValueError):
+        build_sequence_packet(document(), {"node_ids": ["a", "b"], "boundaries": [edge]})
+
+
+def test_preserves_carryover_and_output_resource_identity():
+    result = build_sequence_packet(document(), {"node_ids": ["a", "b"], "boundaries": [boundary()]})
+    assert result["boundaries"][0]["planning_arguments"]["required_carryover_dimensions"] == ["screen_motion_axis"]
+    assert result["units"][0]["output_resource_id"] == "a-output"
+
+
+@pytest.mark.parametrize("bad", [[], None, "invalid", 42])
+def test_cli_invalid_source_shape_is_sanitized(tmp_path, bad):
+    source, selection, output = [tmp_path / p for p in ["source.json", "selection.json", "packet.json"]]
+    source.write_text(json.dumps(bad))
+    selection.write_text(json.dumps({"node_ids": ["a", "b"]}))
+    result = subprocess.run([sys.executable, "-m", "scripts.canvas_sequence_packet", "--source", str(source),
+                            "--selection", str(selection), "--output", str(output)], capture_output=True, text=True)
+    assert result.returncode == 2
+    assert "Traceback" not in result.stderr
+    assert not output.exists()
+
+
+def test_analysis_does_not_erase_conflict_or_invent_verbatim_quote():
+    edge = boundary()
+    edge["source_analysis"] = {"source_quotes": ["生物遮满镜头"], "target_quotes": ["从遮挡中继续前冲"],
+        "planned_source_close": "前进遮挡", "planned_target_open": "揭开前进", "carryover": ["前进"],
+        "gaps": [], "conflicts": ["必须明确的未解决冲突"]}
+    selection = {"node_ids": ["a", "b"], "boundaries": [edge]}
+    result = build_sequence_packet(document(), selection)
+    assert result["boundaries"][0]["status"] == "BLOCKED_SOURCE_CONFLICT"
+    assert "planning_arguments" not in result["boundaries"][0]
+    edge["source_analysis"]["source_quotes"] = ["不存在的引文"]
+    with pytest.raises(ValueError, match="verbatim"):
+        build_sequence_packet(document(), selection)
+
+
+def test_reference_chip_cannot_create_a_fake_contiguous_quote():
+    source = document()
+    parts = source["nodes"][2]["data"]["generationDraft"]["parts"]
+    parts[:] = [{"type": "text", "text": "前段"}, parts[1], {"type": "text", "text": "结束"}]
+    edge = boundary()
+    edge["source_close_quote"] = "前段结束"
+    with pytest.raises(ValueError, match="verbatim"):
+        build_sequence_packet(source, {"node_ids": ["a", "b"], "boundaries": [edge]})
+
+
+@pytest.mark.parametrize("name,count", [("fanxiang", 3), ("baidaizi", 7)])
+def test_preserved_real_source_boundary_evidence(name, count):
+    from scripts.canvas_sequence_packet import _boundary
+    selection = json.loads(Path(f"docs/canvas-sequences/{name}.json").read_text())
+    units = selection["evidence_units"]
+    assert len(units) == count + 1
+    assert len(selection["boundaries"]) == count
+    for unit in units:
+        assert hashlib.sha256(unit["source_text"].encode()).hexdigest() == unit["source_text_sha256"]
+        assert unit["reference_role_evidence"] in unit["source_text"]
+        assert unit["output_resource_id"]
+    results = [_boundary(a, b, e) for a, b, e in zip(units, units[1:], selection["boundaries"])]
+    assert all(r["source_analysis"]["source_quotes"] and r["source_analysis"]["target_quotes"] for r in results)
+    if name == "fanxiang":
+        assert results[1]["status"] == "BLOCKED_SOURCE_CONFLICT"
+        assert "小龙握着长杆" in results[1]["source_analysis"]["source_quotes"][0]
+        assert "双手仍然空着" in results[1]["source_analysis"]["target_quotes"][0]
+
+
+def test_bound_source_snapshot_rejects_drift():
+    from scripts.canvas_sequence_packet import _hash
+    source = document()
+    selection = {"node_ids": ["a", "b"], "expected_source_snapshot_sha256": _hash(source)}
+    source["nodes"][2]["data"]["resourceId"] = "other-output"
+    with pytest.raises(ValueError, match="snapshot changed"):
+        build_sequence_packet(source, selection)
+
+
+@pytest.mark.parametrize("damage", ["empty_changes", "no_carries", "release_direct"])
+def test_incomplete_authoring_is_not_prepared(damage):
+    edge = boundary()
+    if damage == "empty_changes":
+        edge["causal_state_changes"] = []
+    elif damage == "no_carries":
+        edge["required_carryover_dimensions"] = []
+    else:
+        edge["causal_edge_semantics"] = "direct_continuity"
+        edge["causal_state_changes"][0]["transition_mode"] = "authorized_release"
+    with pytest.raises(ValueError):
+        build_sequence_packet(document(), {"node_ids": ["a", "b"], "boundaries": [edge]})

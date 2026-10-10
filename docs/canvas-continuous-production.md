@@ -31,7 +31,8 @@
 3. 哪些变化可见地发生，哪些在明确切镜/换场后允许释放；光源、场景与天气仍归各Shot对应状态。
 4. 用首帧、尾帧、视频、共享资产中的哪种参考来帮助承接，具体角色由导演决定；不得默认每镜继承上一尾帧。
 
-反向之地24→25→26→27组要保留小龙从上铺下来、空手、门口堵桌、手机照明，以及曾亮按肩后的关系。
+反向之地24→25→26→27组要保留门口堵桌、手机照明、人物上下铺/地面与曾亮按肩后的关系。
+原文24末段和25写小龙持长杆，26却明确双手空着，没有放下长杆的过渡；此冲突必须保留并阻断，不能概括成全程空手。
 白带子8段链后半部分用「生物贴镜遮满→下一异世界从遮挡中继续前冲」接续，
 保留运动趋势和叙事目标，同时允许生态、场景和局部光源改变；不能误标成同一地点完整状态不变。
 这些是原文里的制作安排，不是本轮重新审片得到的质量结论。
@@ -52,7 +53,13 @@ PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_sequence_packet \
 
 可选`boundaries`以source_occurrence_id/target_occurrence_id绑定相邻段，timeline使用clipId，显式node列表使用nodeId。
 每项包含两侧正文的source_close_quote/target_open_quote，以及现有BoundaryKind、ContinuityObligation、
-CausalEdgeSemantics枚举值和causal_state_changes；full_continuity必须提供完整十维。
+CausalEdgeSemantics枚举值、causal_state_changes和required_carryover_dimensions；组合由production唯一owner校验。
+full_continuity必须提供完整十维及所有carry项。source_analysis保留原句、计划开闭状态、继承项及gaps/conflicts；
+冲突或缺证分别输出BLOCKED_SOURCE_CONFLICT/BLOCKED_SOURCE_GAPS，不因正文存在就放行。
+有明确承接方法但尚未形成批准Shot状态列时为ANALYZED_PENDING_SHOT_AUTHORING，不能进入执行。
+两链的原句、计划状态、参考职责与输出指针分别保存在[反向之地](canvas-sequences/fanxiang.json)与[白带子](canvas-sequences/baidaizi.json)；
+文件含expected_source_snapshot_sha256，可直接作为selection重开对应源快照；源漂移拒绝。白带子后五边只继承遮挡/前冲，
+明确释放世界身份；运动矢量、透光和音轨实际匹配属于media_checks，不把不同物种误当剧情冲突。
 没有boundary时导出BLOCKED_MISSING_AUTHORING；完整时也只是AUTHORED_NOT_MEDIA_VERIFIED，不是READY或PASS。
 `--resolution 720p`或`1080p`只在用户明确要求时使用；模型不支持480p时返回能力问题，不静默升级。
 
@@ -64,6 +71,14 @@ CausalEdgeSemantics枚举值和causal_state_changes；full_continuity必须提�
 跨段通过`build_sequence_video_planning_request`及`prepare_sequence_shot_for_existing_production`进入既有Planner/Router。
 真实accepted source、实际末态、Registry bytes和route由这些owners重开，不以原prompt的结尾描述代替。
 新工具未实现全自动画布→ProductionProject编译器，亦不声称已存在通用无人值守连续生成driver。
+
+`scripts.canvas_sequence_handoff.build_canvas_sequence_planning_request`是实际可调用的只读交接入口：
+传入原source/selection、target_occurrence_id、project_root、current_request、逐occurrence的当前Shot identity、
+execution_evidence（source_shot采用时identity、source_generation_intent_hash、stack、anchors、lifecycle等）。
+它重建准备包、拒绝有冲突/缺证的边界，核对已有Storyboard连续顺序与当前Shot修订，再调用canonical sequence adapter。
+同canvas节点在timeline重复出现时仍需不同Shot身份；首单元走既有single-Shot入口。source adopted revision和当前revision分开核验。
+原输出resourceId只作为快照指针保存，未读取MP4时不伪造SHA或验收。输出尺寸必须符合新准备默认480p（显式override除外）；
+不会改写已批准request。这个入口不自动创建/批准Storyboard或Shot、不提交、不签媒体PASS。
 
 下一次同链修改只重新读取受影响节点、相邻边界和引用身份；输入未变时复用封存资料，
 新提交仍必须核对当前源身份与用户授权。通过当前实际输入预览审查后，沿用现有单次执行与逐镜Gate。

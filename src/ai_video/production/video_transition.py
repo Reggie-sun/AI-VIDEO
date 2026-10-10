@@ -98,6 +98,87 @@ class CausalStateChange(_TransitionModel):
         return self
 
 
+def require_boundary_obligation(boundary_kind: BoundaryKind, continuity_obligation: ContinuityObligation) -> None:
+    allowed = {
+        BoundaryKind.WITHIN_CONTINUOUS_TAKE: {
+            ContinuityObligation.FULL_CONTINUITY
+        },
+        BoundaryKind.HARD_CUT: {
+            ContinuityObligation.FULL_CONTINUITY,
+            ContinuityObligation.IDENTITY_STYLE_CARRYOVER,
+        },
+        BoundaryKind.SCENE_BOUNDARY: {
+            ContinuityObligation.IDENTITY_STYLE_CARRYOVER,
+            ContinuityObligation.SUBSTANTIAL_RESET,
+        },
+    }
+    if continuity_obligation not in allowed[boundary_kind]:
+        raise ValueError("boundary and continuity obligation are incompatible")
+
+
+def require_causal_boundary(
+    boundary_kind: BoundaryKind, continuity_obligation: ContinuityObligation,
+    causal_edge_semantics: CausalEdgeSemantics, causal_state_changes: tuple[CausalStateChange, ...],
+) -> None:
+    """Shared authoring semantics; no fabricated runtime policy or identities needed."""
+    require_boundary_obligation(boundary_kind, continuity_obligation)
+    if not causal_state_changes:
+        raise ValueError("v2 transition requires typed causal state changes")
+    if (
+        boundary_kind is BoundaryKind.WITHIN_CONTINUOUS_TAKE
+        and causal_edge_semantics
+        is not CausalEdgeSemantics.DIRECT_CONTINUITY
+    ):
+        raise ValueError(
+            "continuous take requires direct causal continuity"
+        )
+    if (
+        continuity_obligation is ContinuityObligation.FULL_CONTINUITY
+        and causal_edge_semantics
+        is not CausalEdgeSemantics.DIRECT_CONTINUITY
+    ):
+        raise ValueError(
+            "full continuity requires direct causal continuity"
+        )
+    if (
+        causal_edge_semantics is CausalEdgeSemantics.SCENE_RESET
+        and (
+            boundary_kind is not BoundaryKind.SCENE_BOUNDARY
+            or continuity_obligation
+            is not ContinuityObligation.SUBSTANTIAL_RESET
+        )
+    ):
+        raise ValueError(
+            "scene reset requires a substantial scene boundary reset"
+        )
+    if (
+        continuity_obligation is ContinuityObligation.SUBSTANTIAL_RESET
+        and causal_edge_semantics
+        is not CausalEdgeSemantics.SCENE_RESET
+    ):
+        raise ValueError(
+            "substantial reset requires scene_reset causal semantics"
+        )
+    if (
+        causal_edge_semantics is CausalEdgeSemantics.COMMERCIAL_CUT
+        and boundary_kind is not BoundaryKind.HARD_CUT
+    ):
+        raise ValueError("commercial cut requires a hard-cut boundary")
+    dimensions = tuple(item.dimension for item in causal_state_changes)
+    if dimensions != tuple(sorted(set(dimensions), key=lambda item: item.value)):
+        raise ValueError("causal dimensions must be unique and canonically ordered")
+    releases = tuple(
+        item
+        for item in causal_state_changes
+        if item.transition_mode is CausalTransitionMode.AUTHORIZED_RELEASE
+    )
+    if (
+        releases
+        and causal_edge_semantics is CausalEdgeSemantics.DIRECT_CONTINUITY
+    ):
+        raise ValueError("direct continuity cannot authorize causal release")
+
+
 class CreativeArtifactIdentity(_TransitionModel):
     artifact_id: str = Field(min_length=1)
     revision: int = Field(strict=True, ge=1)
@@ -165,21 +246,7 @@ class ContinuityTransitionPolicy(_TransitionModel):
     def _validate_policy(self) -> "ContinuityTransitionPolicy":
         if self.source_shot.artifact_id == self.target_shot.artifact_id:
             raise ValueError("transition policy requires distinct source and target Shots")
-        allowed = {
-            BoundaryKind.WITHIN_CONTINUOUS_TAKE: {
-                ContinuityObligation.FULL_CONTINUITY
-            },
-            BoundaryKind.HARD_CUT: {
-                ContinuityObligation.FULL_CONTINUITY,
-                ContinuityObligation.IDENTITY_STYLE_CARRYOVER,
-            },
-            BoundaryKind.SCENE_BOUNDARY: {
-                ContinuityObligation.IDENTITY_STYLE_CARRYOVER,
-                ContinuityObligation.SUBSTANTIAL_RESET,
-            },
-        }
-        if self.continuity_obligation not in allowed[self.boundary_kind]:
-            raise ValueError("boundary and continuity obligation are incompatible")
+        require_boundary_obligation(self.boundary_kind, self.continuity_obligation)
         if self.boundary_kind is BoundaryKind.WITHIN_CONTINUOUS_TAKE:
             if not self.take_id:
                 raise ValueError("continuous take policy requires take_id")
@@ -226,59 +293,8 @@ class ContinuityTransitionPolicy(_TransitionModel):
                 or not self.causal_state_changes
             ):
                 raise ValueError("v2 transition requires typed causal state changes")
-            if (
-                self.boundary_kind is BoundaryKind.WITHIN_CONTINUOUS_TAKE
-                and self.causal_edge_semantics
-                is not CausalEdgeSemantics.DIRECT_CONTINUITY
-            ):
-                raise ValueError(
-                    "continuous take requires direct causal continuity"
-                )
-            if (
-                self.continuity_obligation is ContinuityObligation.FULL_CONTINUITY
-                and self.causal_edge_semantics
-                is not CausalEdgeSemantics.DIRECT_CONTINUITY
-            ):
-                raise ValueError(
-                    "full continuity requires direct causal continuity"
-                )
-            if (
-                self.causal_edge_semantics is CausalEdgeSemantics.SCENE_RESET
-                and (
-                    self.boundary_kind is not BoundaryKind.SCENE_BOUNDARY
-                    or self.continuity_obligation
-                    is not ContinuityObligation.SUBSTANTIAL_RESET
-                )
-            ):
-                raise ValueError(
-                    "scene reset requires a substantial scene boundary reset"
-                )
-            if (
-                self.continuity_obligation is ContinuityObligation.SUBSTANTIAL_RESET
-                and self.causal_edge_semantics
-                is not CausalEdgeSemantics.SCENE_RESET
-            ):
-                raise ValueError(
-                    "substantial reset requires scene_reset causal semantics"
-                )
-            if (
-                self.causal_edge_semantics is CausalEdgeSemantics.COMMERCIAL_CUT
-                and self.boundary_kind is not BoundaryKind.HARD_CUT
-            ):
-                raise ValueError("commercial cut requires a hard-cut boundary")
-            dimensions = tuple(item.dimension for item in self.causal_state_changes)
-            if dimensions != tuple(sorted(set(dimensions), key=lambda item: item.value)):
-                raise ValueError("causal dimensions must be unique and canonically ordered")
-            releases = tuple(
-                item
-                for item in self.causal_state_changes
-                if item.transition_mode is CausalTransitionMode.AUTHORIZED_RELEASE
-            )
-            if (
-                releases
-                and self.causal_edge_semantics is CausalEdgeSemantics.DIRECT_CONTINUITY
-            ):
-                raise ValueError("direct continuity cannot authorize causal release")
+            require_causal_boundary(self.boundary_kind, self.continuity_obligation,
+                                    self.causal_edge_semantics, self.causal_state_changes)
         expected = canonical_sha256(
             self.model_dump(mode="json", exclude={"policy_hash"})
         )

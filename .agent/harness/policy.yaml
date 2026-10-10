@@ -129,7 +129,7 @@ checks:
     covers_check_ids: [open_video_skill_tests, visual_quality_tests, product_runtime_skill_boundary_tests]
     description: Verify exact development intent joins, sealed review snapshots, Director compatibility and one-way runtime boundaries without Provider calls.
   canvas_reference_packet_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_canvas_reference_packet.py, tests/test_canvas_sequence_packet.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_canvas_reference_packet.py, tests/test_canvas_sequence_packet.py, tests/test_canvas_sequence_handoff.py, -q]
     cwd: .
     description: Verify offline canvas node coverage and identity-bound rich prompt references without provider effects.
   paid_reconciliation_tests:
@@ -893,6 +893,9 @@ categories:
       - tests/test_canvas_reference_packet.py
       - scripts/canvas_sequence_packet.py
       - tests/test_canvas_sequence_packet.py
+      - scripts/canvas_sequence_handoff.py
+      - tests/test_canvas_sequence_handoff.py
+      - docs/canvas-sequences/*.json
     check_ids:
       - canvas_reference_packet_tests
       - task_architecture_gate

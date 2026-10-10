@@ -14,6 +14,7 @@ from pathlib import Path
 from ai_video.production.video_transition import (
     BoundaryKind, CausalDimension, CausalEdgeSemantics, CausalStateChange,
     ContinuityObligation,
+    require_causal_boundary,
 )
 from scripts.canvas_reference_packet import _index, build_packet
 
@@ -71,7 +72,7 @@ def _unit_source(node: dict, observed: dict | None) -> tuple[dict, str, object, 
             text.append(part["text"])
         elif (part["type"] == "extension" and part.get("extension_type") == "node"
               and part["object_id"] in slots):
-            continue
+            text.append("\n")
         else:
             raise ValueError("unsupported or unbound prompt part")
     for ref in refs:
@@ -90,23 +91,61 @@ def _boundary(source: dict, target: dict, authored: dict | None) -> dict:
               "status": "BLOCKED_MISSING_AUTHORING"}
     if authored is None:
         return result
+    if "source_analysis" in authored:
+        analysis = authored["source_analysis"]
+        for key, unit in [("source_quotes", source), ("target_quotes", target)]:
+            quotes = analysis[key]
+            if not isinstance(quotes, list) or any(
+                    not isinstance(q, str) or not q.strip() or q not in unit["source_text"] for q in quotes):
+                raise ValueError("analysis quote is not verbatim source evidence")
+        for key in ("planned_source_close", "planned_target_open"):
+            if not isinstance(analysis[key], str) or not analysis[key].strip():
+                raise ValueError("analysis must name planned states or their absence")
+        for key in ("carryover", "gaps", "conflicts"):
+            if not isinstance(analysis[key], list) or any(
+                    not isinstance(v, str) or not v.strip() for v in analysis[key]):
+                raise ValueError("invalid continuity analysis")
+        result["source_analysis"] = deepcopy(analysis)
+        if analysis["conflicts"]:
+            result["status"] = "BLOCKED_SOURCE_CONFLICT"
+            return result
+        if analysis["gaps"] or not analysis["source_quotes"] or not analysis["target_quotes"]:
+            result["status"] = "BLOCKED_SOURCE_GAPS"
+            return result
+        if "boundary_kind" not in authored:
+            result["status"] = "ANALYZED_PENDING_SHOT_AUTHORING"
+            return result
     for key, unit in [("source_close_quote", source), ("target_open_quote", target)]:
         quote = authored[key]
         if not isinstance(quote, str) or not quote.strip() or quote not in unit["source_text"]:
             raise ValueError("continuity quote is not verbatim source evidence")
         result[key] = quote
     obligation = ContinuityObligation(authored["continuity_obligation"])
-    changes = [CausalStateChange.model_validate(c) for c in authored["causal_state_changes"]]
+    changes = sorted([CausalStateChange.model_validate(c) for c in authored["causal_state_changes"]],
+                     key=lambda c: c.dimension.value)
     dimensions = [c.dimension for c in changes]
     if len(set(dimensions)) != len(dimensions):
         raise ValueError("duplicate causal dimensions")
     if obligation is ContinuityObligation.FULL_CONTINUITY and set(dimensions) != set(CausalDimension):
         raise ValueError("full continuity requires all causal dimensions")
+    kind = BoundaryKind(authored["boundary_kind"])
+    semantics = CausalEdgeSemantics(authored["causal_edge_semantics"])
+    require_causal_boundary(kind, obligation, semantics, tuple(changes))
+    carries = authored["required_carryover_dimensions"]
+    if (not isinstance(carries, list) or any(not isinstance(d, str) or not d.strip() for d in carries)
+            or len(set(carries)) != len(carries)):
+        raise ValueError("carryover dimensions must be explicit and unique")
+    if (obligation is ContinuityObligation.SUBSTANTIAL_RESET) != (not carries):
+        raise ValueError("carryover dimensions do not match obligation")
+    if obligation is ContinuityObligation.FULL_CONTINUITY and not {
+            c.dimension.value for c in changes if c.transition_mode.value == "carry"} <= set(carries):
+        raise ValueError("full continuity requires all authored carryover dimensions")
     result["planning_arguments"] = {
-        "boundary_kind": BoundaryKind(authored["boundary_kind"]).value,
+        "boundary_kind": kind.value,
         "continuity_obligation": obligation.value,
-        "causal_edge_semantics": CausalEdgeSemantics(authored["causal_edge_semantics"]).value,
+        "causal_edge_semantics": semantics.value,
         "causal_state_changes": [c.model_dump(mode="json") for c in changes],
+        "required_carryover_dimensions": sorted(carries),
     }
     result["status"] = "AUTHORED_NOT_MEDIA_VERIFIED"
     return result
@@ -118,10 +157,17 @@ def build_sequence_packet(source: dict, selection: dict, *, resolution: str = "4
 The result cannot authorize submission or materialize accepted source state.
 Original ticks are retained without inferring a timebase or rendering a timeline.
 """
+    if not isinstance(source, dict) or not isinstance(selection, dict):
+        raise ValueError("source and selection must be objects")
+    if ("expected_source_snapshot_sha256" in selection
+            and selection["expected_source_snapshot_sha256"] != _hash(source)):
+        raise ValueError("canvas source snapshot changed")
     if resolution not in {"480p", "720p", "1080p"}:
         raise ValueError("unsupported preparation resolution")
     if "source_graph" in source and "source_composers" not in source:
         raise ValueError("preserved canvas packet is missing source composers")
+    if "source_graph" not in source and ({"generation_nodes", "source_composers"} & source.keys()):
+        raise ValueError("mixed raw and observed source lanes")
     graph = source.get("source_graph", source)
     nodes = _index(graph["nodes"], "id")
     edges = _index(graph["edges"], "id")
@@ -160,6 +206,7 @@ Original ticks are retained without inferring a timebase or rendering a timeline
             ref.update(resource_id=resource_id, kind=asset["type"])
             assets[asset["id"]] = deepcopy(asset)
         units.append({**occurrence, "title": node["data"].get("title"),
+                      "output_resource_id": node["data"].get("resourceId"),
                       "prompt_source": prompt, "source_text": text,
                       "source_text_sha256": hashlib.sha256(text.encode()).hexdigest(),
                       "prompt_source_sha256": _hash(prompt),
@@ -202,7 +249,7 @@ def main() -> int:
         with args.output.open("x", encoding="utf-8") as output:
             json.dump(result, output, ensure_ascii=False, indent=2)
             output.write("\n")
-    except (ValueError, KeyError, TypeError, OSError) as error:
+    except (ValueError, KeyError, TypeError, AttributeError, OSError) as error:
         parser.exit(2, f"Canvas sequence preparation failed ({type(error).__name__}); no provider call.\n")
     print(f"Prepared {len(result['units'])} units and {len(result['boundaries'])} boundaries. No provider call.")
     return 0

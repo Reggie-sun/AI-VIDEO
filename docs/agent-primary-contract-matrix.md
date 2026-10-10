@@ -19,6 +19,8 @@ offline scripted bootstrap只证明标准reader/committer/evaluator wiring，不
 
 Development-only入口`scripts/canvas_sequence_packet.py`保留显式节点/原timeline顺序、完整原文、
 共享引用和typed boundary authoring；缺边界BLOCKED，不推断生成间state。旧rich packet入口不变。
+`scripts/canvas_sequence_handoff.py`重验source/selection、Shot identity及Storyboard顺序后调用既有adapter；
+原文冲突/缺证阻断，计划引文不是实际末态；边界组合校验复用`production/video_transition.py`。
 该包不写Production、不授权submit或验收，现有sequence adapter仍唯一拥有accepted source materialization；
 操作见[Continuous Canvas Production](canvas-continuous-production.md)。Focused checks归既有canvas_reference_packet_tests。
 
@@ -45,7 +47,7 @@ requirement的source request hash、内嵌policy及prior neutral seed，禁止�
 `production/_sequence_source.py`→`planning.video_planner`开放这一pure verification例外；
 不调用handoff/selection/effect，其他Production→Planning/QA/Q0依赖仍阻断，review-by `2026-11-05`。
 最终仍经Planner/Readiness/Router，不允许循环使用自身continuity route完成初始selection。
-当前sequence API的仓库内caller只有tests，不能把test callback称为已交付production driver。
+当前sequence API有development-only canvas handoff caller；没有自动创作/提交driver，测试不证明真实画布媒体已接通。
 禁止prompt推断、第二state/schema/sequence writer、legacy state token代替v2事实，或把工程READY
 当真实媒体PASS。验证由existing Harness `video_planner_tests`、Readiness/Router/feedback suites路由；
 具体scope见[bounded spec](superpowers/specs/2026-10-04-sequence-continuity-materialization.md)与

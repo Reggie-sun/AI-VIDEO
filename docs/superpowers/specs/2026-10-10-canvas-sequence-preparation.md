@@ -28,6 +28,25 @@ Storyboard、accepted source、Manifest、Registry、ResolvedTimeline仍归既�
 
 ## Acceptance And Verification
 
+## Corrective Scope — 2026-10-10
+
+Team审查后用户授权继续。上一版仅完成资料准备，未完成连续方法提取；本修订补齐具体边界证据和可调用交接。
+两条既定链的12单元/10边界必须保存逐侧原句、计划开闭状态、继承职责、缺证及冲突；长杆→空手不得自动修辞消除。
+这些是authoring evidence而非媒体事实；有冲突/缺证的边界禁止进入规划。没有真实accepted media时仍不能执行。
+原图、原prompt和旧输出不改；保留selected output resourceId但不伪造output字节hash。
+
+修复raw/rich输入混用、非法连续性组合、carryover丢失与异常JSON traceback。组合校验复用production唯一owner，
+不创建假Production identities来验证准备资料。新增development-only bridge重新从source/selection验证，
+核对显式occurrence→已有Shot identity绑定与Storyboard连续顺序，再调用既有sequence adapter；不写Production。
+调用方必须提供真实source intent/stack/lifecycle/anchors，不能由文本或canvas resourceId补造。
+默认480p用于新准备，不改已有approved request输出尺寸；实际调用方若未满足准备尺寸须显式拒绝而不是隐式升档。
+
+验收覆盖真实两链离线提取、全部10边界有具体证据或明确缺口、冲突阻断、错序/陈旧绑定拒绝、
+经真实committer/reader fixture进入canonical sequence owner，以及缺accepted source拒绝；无live Provider请求。
+Self-review：补充符合原用户连续性目标，未引入第二schema/state writer/timeline或自动生成；原有限准备scope不再代表完成目标。
+
+## Original Verification Scope
+
 验证两种输入结构、多片段顺序、同节点重复出现、引用身份、缺失/错序/越界拒绝、source quote绑定、
 缺边界显式阻断、480p默认与显式override、输入不变及CLI独占创建。
 用两套真实本地捕获件进行离线提取；不将成功提取称为整片连续性验证。
