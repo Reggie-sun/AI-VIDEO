@@ -8,6 +8,14 @@ learning_eligibility: ineligible
 
 Date: 2026-10-11
 
+## Supersession Notice — Original Input, 2026-10-11
+
+用户本次明确指定 Fast2.0 后，新的[原文输入记录](2026-10-11-mecha-fast20-original-input.md)证明
+一次 480p 原文/原图请求成功生成；累计物理 POST 为 4，未重试。新片动作与声音分别 human PASS，
+POV 仍 FAIL，完整 spec / AC-7 未验收。显式 approved-source 编译入口已有代码与 exact Harness 证明。
+下方旧扩写原片、旧 HTTP403 与“POST 3”的 checkpoint 为历史；新请求不重写这些证据或证明套餐归因。
+Fast2.0 仅为本次明确授权，先前把费用提醒当成永久禁止 2.5 的误判已撤销。
+
 ## Supersession Notice — Mecha Raw Media And QA Repair
 
 用户已选择改用机甲，最新[mecha record](2026-10-11-mecha-ant-seedance480-canvas.md)证明同一入口

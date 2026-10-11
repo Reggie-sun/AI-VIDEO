@@ -9,6 +9,14 @@ evidence_index_version: "1"
 
 Date: 2026-10-11
 
+## Supersession Notice — Original Input, 2026-10-11
+
+用户本次明确指定 Fast2.0 后，新的[原文输入记录](2026-10-11-mecha-fast20-original-input.md)证明
+单次 480p 请求已生成新 MP4，原文/原 PNG identity 保持；累计物理 POST 为 4，自动重抽为 0。
+新片声音与连续动作已获独立 human PASS，第一人称仍 FAIL，未 activation 或 Final Acceptance。
+旧扩写视频、旧修复 HTTP403 及其结论保持历史；下方“总 POST 3 / 当前计费阻断”的状态已被新请求部分取代。
+Fast2.0 仅为本次明确授权，不能外推用户永久禁止 2.5；先前对此的误判已撤销。
+
 ## Goal And Current Outcome
 
 用户选择现有机甲画布继续[spec](../superpowers/specs/2026-10-11-reusable-canvas-production-harness.md)，
