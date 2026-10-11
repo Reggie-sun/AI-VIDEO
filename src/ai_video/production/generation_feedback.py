@@ -76,9 +76,9 @@ def _expressions(acceptance, requirement):
     inventory = acceptance.profile_payload.get("generation_requirements")
     if not inventory:
         raise ValueError("selected acceptance owner has no generation requirement projection")
-    if requirement.generation_intent.close_causal_facts is not None:
-        from ai_video.production._causal_state_expression import close_evaluation_measurement
+    from ai_video.production._causal_state_expression import close_evaluation_measurement, has_current_close_facts
 
+    if has_current_close_facts(requirement):
         close_rules = tuple(RequirementExpression.model_validate(raw) for raw in inventory
             if raw.get("intent_paths") in (["generation_intent.close_state.state_hash"],
                                           ("generation_intent.close_state.state_hash",)))

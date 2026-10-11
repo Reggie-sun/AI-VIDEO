@@ -7,6 +7,11 @@ from ai_video.production.hashing import canonical_sha256
 from ai_video.production.video_transition import CausalDimension
 
 
+def has_current_close_facts(requirement):
+    expression = requirement.target_shot.preserved_source_expression
+    return requirement.generation_intent.close_causal_facts is not None or bool(expression and expression.closing)
+
+
 def canonical_close_facts(facts):
     if facts is None or set(facts) != set(CausalDimension):
         raise ValueError("current close requires every causal dimension exactly once")
@@ -31,6 +36,16 @@ def current_close_facts(requirement):
     from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
 
     reopened = ProviderNeutralVideoRequirement.model_validate(requirement.model_dump(mode="python"))
+    if reopened.target_shot.preserved_source_expression is not None:
+        from ai_video.production.seedance_source_expression import source_state_facts
+
+        facts = source_state_facts(reopened.target_shot.preserved_source_expression, "closing")
+        if (not facts or reopened.generation_intent.close_causal_facts is not None
+                or reopened.generation_intent.close_state.kind.value != "typed_hash"
+                or reopened.generation_intent.close_state.state_hash
+                != canonical_sha256({d.value: fact for d, fact in facts.items()})):
+            raise ValueError("source-grounded close must match its sole approved preimage")
+        return tuple(sorted(facts.items(), key=lambda item: item[0].value))
     return require_current_close_facts(reopened.generation_intent)
 
 

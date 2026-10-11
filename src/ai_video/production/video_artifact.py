@@ -34,6 +34,7 @@ from ai_video.production.local_video import (
     LocalVideoTaskObservation,
 )
 from ai_video.production.models import (
+    ActorIdentity,
     AssetRecord,
     AssetSourceKind,
     AssetType,
@@ -50,6 +51,7 @@ from ai_video.production.review import (
     adjudicate_generated_shot_continuity,
 )
 from ai_video.production.video_contracts import matches_video_timing_measurement
+from ai_video.production.video_timing_recovery import VideoNominalEndpointRecovery
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
     TerminalFrameEvidence,
@@ -335,10 +337,13 @@ class VideoProbeReceipt(_VideoArtifactStrictModel):
     measured: MeasuredVideoMetadata
     continuity_evidence: GeneratedShotContinuityEvidence | None = None
     commercial_evidence: GeneratedCommercialShotEvidence | None = None
+    nominal_endpoint_recovery: VideoNominalEndpointRecovery | None = None
     content_hash: str = Field(pattern=_SHA256)
 
     @model_validator(mode="after")
     def _validate_seal(self) -> "VideoProbeReceipt":
+        if self.nominal_endpoint_recovery is not None:
+            self.nominal_endpoint_recovery.validate_probe_binding(probe_receipt=self)
         if self.content_hash != canonical_sha256(
             self.model_dump(mode="json", exclude={"content_hash"})
         ):
@@ -354,6 +359,8 @@ class VideoProbeReceipt(_VideoArtifactStrictModel):
             data.pop("continuity_evidence", None)
         if self.commercial_evidence is None:
             data.pop("commercial_evidence", None)
+        if self.nominal_endpoint_recovery is None:
+            data.pop("nominal_endpoint_recovery", None)
         return data
 
     @classmethod
@@ -365,7 +372,12 @@ class VideoProbeReceipt(_VideoArtifactStrictModel):
         measured: MeasuredVideoMetadata,
         continuity_evidence: GeneratedShotContinuityEvidence | None = None,
         commercial_evidence: GeneratedCommercialShotEvidence | None = None,
+        nominal_endpoint_recovery: VideoNominalEndpointRecovery | None = None,
     ) -> "VideoProbeReceipt":
+        if nominal_endpoint_recovery is not None:
+            nominal_endpoint_recovery.validate_binding(
+                request=request, fetch_receipt=fetch_receipt, measured=measured,
+            )
         data = {
             "request_receipt_fingerprint": request.desired_generation_fingerprint,
             "resolved_generation_hash": request.resolved_generation_hash,
@@ -373,6 +385,7 @@ class VideoProbeReceipt(_VideoArtifactStrictModel):
             "measured": measured,
             "continuity_evidence": continuity_evidence,
             "commercial_evidence": commercial_evidence,
+            "nominal_endpoint_recovery": nominal_endpoint_recovery,
         }
         candidate = cls.model_construct(**data, content_hash="0" * 64)
         return cls.model_validate(
@@ -834,6 +847,7 @@ def _probe_generated_video_candidate(
     continuity_policy_content_hash: str | None = None,
     continuity_authorities: tuple[ToolIdentity, ...] = (),
     defer_continuity_review: bool,
+    nominal_endpoint_recovery: tuple[ActorIdentity, str] | None = None,
     max_size_bytes: int = 2_147_483_648,
 ) -> tuple[bytes, MeasuredVideoMetadata, VideoProbeReceipt]:
     """Measure one held regular MP4 and reject Provider-claimed metadata."""
@@ -906,6 +920,17 @@ def _probe_generated_video_candidate(
         duration_milliseconds=measured.duration_milliseconds,
         frame_count=measured.frame_count,
     )
+    timing_recovery = None
+    if nominal_endpoint_recovery is not None:
+        actor, reason = nominal_endpoint_recovery
+        try:
+            timing_recovery = VideoNominalEndpointRecovery.create(
+                request=expected_request, fetch_receipt=fetch_receipt,
+                measured=measured, actor=actor, reason=reason,
+            )
+        except ValueError as exc:
+            raise _video_artifact_error("Nominal endpoint recovery is invalid.") from exc
+        timing_matches = True
     if (
         output.container != "mp4"
         or output.mime_type != "video/mp4"
@@ -938,6 +963,7 @@ def _probe_generated_video_candidate(
         fetch_receipt=fetch_receipt,
         measured=measured,
         continuity_evidence=continuity_evidence,
+        nominal_endpoint_recovery=timing_recovery,
     )
     return b"".join(chunks), measured, receipt
 

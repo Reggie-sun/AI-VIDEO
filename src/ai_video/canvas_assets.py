@@ -8,6 +8,7 @@ from pathlib import Path
 import hashlib
 
 from ai_video.canvas_authoring import input_hash, _safe_id
+from ai_video.canvas_subject import subject_material_references
 from ai_video.production.image import _measure_png
 from ai_video.production.models import AssetRecord, AssetRegistrySnapshot, AssetSourceKind, AssetType, ToolIdentity
 from ai_video.production.paths import canonical_image_asset_path
@@ -20,13 +21,29 @@ def prepare_canvas_png_assets(*, packet, selections, allowed_asset_root):
     """Compute identities from ordinary node/resource/file selections, without writes."""
     root = Path(allowed_asset_root).resolve(strict=True)
     source_assets = {a["id"]: a for a in packet["assets"]}
+    subject_members = {}
+    for selection in selections:
+        node_id = selection.get("node_id")
+        source = source_assets.get(node_id)
+        if source is None or source.get("type") != "subject" or node_id in subject_members:
+            continue
+        bundle = subject_material_references(source)
+        members = {bundle["main"]["resource_id"]: {"role": "main"}}
+        members.update({a["resource_id"]: {"role": "auxiliary", "index": a["index"]}
+                       for a in bundle["auxiliaries"]})
+        selected = [s.get("resource_id") for s in selections if s.get("node_id") == node_id]
+        if len(selected) != len(members) or set(selected) != set(members):
+            raise ValueError("subject PNG selection must preserve every main and auxiliary resource exactly once")
+        subject_members[node_id] = members
     records, artifacts = [], {}
     for selection in selections:
         if set(selection) != {"asset_id", "node_id", "resource_id", "path", "usage_license"}:
             raise ValueError("PNG selection requires asset label, node/resource, path and license")
         aid = _safe_id(selection["asset_id"])
         source = source_assets[selection["node_id"]]
-        if source["type"] != "image" or source["data"]["resourceId"] != selection["resource_id"]:
+        member = subject_members.get(selection["node_id"], {}).get(selection["resource_id"])
+        if member is None and (source["type"] != "image"
+                              or source["data"]["resourceId"] != selection["resource_id"]):
             raise ValueError("selected PNG pointer differs from the preserved canvas reference")
         raw = _read_regular_file_nofollow(Path(selection["path"]), contained_by=root)
         measured = _measure_png(raw.data)
@@ -36,6 +53,8 @@ def prepare_canvas_png_assets(*, packet, selections, allowed_asset_root):
             "node_id": selection["node_id"], "resource_id": selection["resource_id"],
             "asset_id": aid, "sha256": measured.sha256, "size_bytes": measured.size_bytes,
             "width": measured.width, "height": measured.height, "usage_license": selection["usage_license"]}
+        if member is not None:
+            observation["subject_material"] = member
         identity = input_hash(observation)
         path = canonical_image_asset_path(measured.sha256)
         records.append(AssetRecord(asset_id=aid, asset_type=AssetType.IMAGE, artifact_path=path,

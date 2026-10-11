@@ -116,6 +116,10 @@ class GenerationDecisionExecutionBinding(StrictModel):
         sealed = request.activation_scope.request if request.activation_scope else None
         if sealed is None:
             raise ValueError("production execution binding requires an activation scope")
+        if self.projection.requirement.target_shot.preserved_source_expression is not None:
+            from ai_video.production.seedance_source_expression import validate_preserved_seedance_request
+
+            validate_preserved_seedance_request(bound, self.projection.requirement, request)
         if request.subject_bindings or (request.adapter_compiler_id == "vidu-video-compiler"
                                        and request.adapter_compiler_version == "4"):
             from ai_video.production._vidu_subjects import validate_vidu_subject_prompt
@@ -174,11 +178,12 @@ class GenerationDecisionExecutionBinding(StrictModel):
             "capability_fingerprint", "execution_kind", "billing_kind", "compiler_contract")})
 
     def validate_request(self, request: ResolvedVideoGenerationRequest) -> None:
-        if request != self.compiled_request:
+        reopened = GenerationDecisionExecutionBinding.model_validate(self.model_dump(mode="python"))
+        if request != reopened.compiled_request:
             raise ValueError("generation execution request is stale or altered")
 
     def validate_current_project(self, project, *, preparing_voice: bool = False,
-                                 voice_attempt_id: str | None = None) -> None:
+                                 voice_attempt_id: str | None = None, selection_only: bool = False) -> None:
         """Bind a self-consistent decision to the currently loaded source bytes."""
 
         if self.continuity_routing is not None:
@@ -225,7 +230,18 @@ class GenerationDecisionExecutionBinding(StrictModel):
         shot = shots[0]
         if shot != self.projection.requirement.target_shot:
             raise ValueError("generation execution must retain the exact canonical Shot")
-        if request.subject_bindings:
+        if (shot.preserved_source_expression is not None and shot.preserved_source_expression.opening
+                and self.continuity_routing is None and not selection_only):
+            raise ValueError("source-grounded Router seed cannot execute without its materialized sequence edge")
+        if shot.preserved_source_expression is not None and self.continuity_routing is not None:
+            from ai_video.production._sequence_source import build_verified_causal_opening_expression
+            from ai_video.production.seedance_source_expression import compile_preserved_seedance_source
+
+            bound = self.decision.routing.provider_bound_request
+            expression = build_verified_causal_opening_expression(loaded=project,
+                routing=self.continuity_routing, requirement=self.projection.requirement, provider_bound=bound)
+            compile_preserved_seedance_source(bound, self.projection.requirement, continuity_expression=expression)
+        if request.subject_bindings or shot.preserved_source_expression is not None:
             requirement = self.projection.requirement
             current_characters = {c.character_id: c for c in project.characters}
             current_scenes = {s.scene_id: s for s in project.scenes}
@@ -306,7 +322,7 @@ def require_sequence_destination_selection(
             and requirement.source_request_content_hash != source_request_content_hash):
         raise ValueError("destination selection is not bound to the exact unmaterialized planning seed")
     if project is not None:
-        selection.validate_current_project(project)
+        selection.validate_current_project(project, selection_only=True)
     return selection
 
 

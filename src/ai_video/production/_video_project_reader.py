@@ -1466,6 +1466,13 @@ def _verify_generated_video_candidate(
         or asset.usage_license != provenance.usage_license
     ):
         raise _invalid("Active generated video provenance chain is invalid.")
+    if probe.nominal_endpoint_recovery is not None:
+        try:
+            probe.nominal_endpoint_recovery.validate_binding(
+                request=request, fetch_receipt=fetch, measured=probe.measured,
+            )
+        except ValueError as exc:
+            raise _invalid("Active generated video timing recovery is not exact.") from exc
     if local_lane:
         if (
             state.local_submit_receipt is None

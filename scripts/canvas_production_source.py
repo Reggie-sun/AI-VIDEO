@@ -13,6 +13,7 @@ import json
 from pathlib import Path
 from typing import Any
 
+from ai_video.canvas_subject import subject_material_references
 from scripts.canvas_reference_packet import build_packet
 from scripts.canvas_sequence_packet import build_sequence_packet
 
@@ -142,13 +143,11 @@ def _generation_inventory(node: dict, data: dict, observed: dict | None, issues:
                 if not isinstance(part.get("text"), str):
                     issues.append(_issue("invalid_prompt_text", "Text prompt part is missing string text.",
                                          node_id=node_id, part_index=index))
-            elif part.get("type") == "extension" and part.get("extension_type") == "node":
+            elif (part.get("type") == "extension"
+                  and part.get("extension_type") in {"node", "subject"}):
                 if part.get("object_id") not in slot_ids:
                     issues.append(_issue("unbound_prompt_slot", "Prompt node extension does not resolve to a declared slot.",
                                          node_id=node_id, part_index=index, object_id=part.get("object_id")))
-            elif part.get("type") == "extension" and part.get("extension_type") == "subject":
-                issues.append(_issue("unsupported_subject_capability", "Subject prompt extensions are preserved but unsupported by the sequence packet capability.",
-                                     node_id=node_id, part_index=index, object_id=part.get("object_id")))
             else:
                 issues.append(_issue("unsupported_prompt_part", "Prompt part kind is not supported by the sequence packet capability.",
                                      node_id=node_id, part_index=index, part_type=part.get("type")))
@@ -188,8 +187,12 @@ def _node_inventory(graph: dict, observed_nodes: dict[str, dict], issues: list[d
             data = {}
         if not isinstance(node_type, str) or not node_type:
             issues.append(_issue("missing_node_type", "Canvas node is missing a type.", node_id=node_id))
+        subject_materials = None
         if node_type == "subject":
-            issues.append(_issue("unsupported_subject_capability", "Subject nodes are preserved but are not supported by the sequence packet capability.", node_id=node_id))
+            try:
+                subject_materials = subject_material_references(node)
+            except ValueError as error:
+                issues.append(_issue("invalid_subject_resource_snapshot", str(error), node_id=node_id))
         elif not isinstance(node_type, str) or node_type not in KNOWN_NODE_TYPES:
             issues.append(_issue("unsupported_node_kind", "Canvas node type is not recognized by this source inspector.",
                                  node_id=node_id, node_type=node_type))
@@ -211,10 +214,75 @@ def _node_inventory(graph: dict, observed_nodes: dict[str, dict], issues: list[d
             "resource_versions": resource_versions,
             "version_selection": version_selection,
             "generation": generation,
-            "capability": "supported" if isinstance(node_type, str) and node_type in (MEDIA_TYPES | {"timeline", "group", "text"}) else "unsupported",
+            "capability": "supported" if isinstance(node_type, str) and (
+                node_type in (MEDIA_TYPES | {"timeline", "group", "text"})
+                or (node_type == "subject" and subject_materials is not None)) else "unsupported",
         }
+        if node_type == "subject":
+            entry["material_references"] = subject_materials
+            entry["provenance"] = deepcopy(data.get("provenance"))
         inventory.append(entry)
     return inventory, by_id
+
+
+def _post_edit_provenance_issue(edge: dict, nodes: dict[str, dict]) -> dict | None:
+    source_id, target_id = edge.get("source"), edge.get("target")
+    source = nodes.get(source_id) if isinstance(source_id, str) else None
+    target = nodes.get(target_id) if isinstance(target_id, str) else None
+    source_data = source.get("data") if isinstance(source, dict) else None
+    target_data = target.get("data") if isinstance(target, dict) else None
+    valid = (
+        isinstance(source_data, dict) and isinstance(target_data, dict)
+        and source.get("type") in MEDIA_TYPES and target.get("type") in MEDIA_TYPES
+        and isinstance(source_data.get("resourceId"), str) and bool(source_data["resourceId"].strip())
+        and isinstance(target_data.get("resourceId"), str) and bool(target_data["resourceId"].strip())
+        and target_data.get("source") == "post_edit_generated"
+    )
+    if valid:
+        return None
+    return _issue("invalid_post_edit_provenance",
+                  "Post-edit provenance must connect materialized media to a materialized post-edit media node.",
+                  edge_id=edge.get("id"), source_node_id=source_id, target_node_id=target_id,
+                  node_id=source_id if isinstance(source_id, str) else None)
+
+
+def _post_edit_cycle_issues(edges: list, nodes: dict[str, dict], issues: list[dict]) -> None:
+    adjacency: dict[str, list[tuple[str, str | None]]] = {}
+    for edge in edges:
+        if not isinstance(edge, dict) or edge.get("type") != "post_edit_provenance":
+            continue
+        source_id, target_id = edge.get("source"), edge.get("target")
+        if (isinstance(source_id, str) and source_id in nodes
+                and isinstance(target_id, str) and target_id in nodes):
+            adjacency.setdefault(source_id, []).append((target_id, edge.get("id")))
+
+    state: dict[str, int] = {}
+    path: list[str] = []
+    emitted: set[frozenset[str]] = set()
+
+    def visit(node_id: str) -> None:
+        state[node_id] = 1
+        path.append(node_id)
+        for target_id, edge_id in adjacency.get(node_id, []):
+            if state.get(target_id) == 1:
+                start = path.index(target_id)
+                cycle = path[start:] + [target_id]
+                identity = frozenset(cycle[:-1])
+                if identity not in emitted:
+                    emitted.add(identity)
+                    issues.append(_issue(
+                        "post_edit_provenance_cycle",
+                        "Post-edit provenance edges cannot contain a cycle.",
+                        node_id=node_id, source_node_id=node_id, target_node_id=target_id,
+                        edge_id=edge_id, cycle_node_ids=cycle))
+            elif state.get(target_id, 0) == 0:
+                visit(target_id)
+        path.pop()
+        state[node_id] = 2
+
+    for node_id in nodes:
+        if state.get(node_id, 0) == 0:
+            visit(node_id)
 
 
 def _edge_inventory(graph: dict, nodes: dict[str, dict], issues: list[dict]) -> list[dict]:
@@ -240,11 +308,16 @@ def _edge_inventory(graph: dict, nodes: dict[str, dict], issues: list[dict]) -> 
             issues.append(_issue("dangling_edge", "Canvas edge endpoint is absent from the node inventory.",
                                  edge_id=edge_id, source_node_id=source_id, target_node_id=target_id,
                                  node_id=target_id if isinstance(target_id, str) and target_id in nodes else None))
-        if edge.get("type") != "reference":
+        if edge.get("type") == "post_edit_provenance":
+            issue = _post_edit_provenance_issue(edge, nodes)
+            if issue:
+                issues.append(issue)
+        elif edge.get("type") != "reference":
             issues.append(_issue("uninterpreted_non_reference_edge", "Edge type is preserved but not interpreted as a selected reference dependency.",
                                  edge_id=edge_id, edge_type=edge.get("type"), target_node_id=target_id))
         result.append({"edge_id": edge_id, "source_node_id": source_id, "target_node_id": target_id,
                        "edge_type": deepcopy(edge.get("type")), "source_edge": deepcopy(edge)})
+    _post_edit_cycle_issues(raw_edges, nodes, issues)
     return result
 
 
@@ -308,7 +381,7 @@ def _clip_inventory(clip: dict, track: dict, track_index: int, clip_index: int,
         target_type = nodes[node_id].get("type")
         expected_type = "video" if track_kind == "visual" else "audio" if track_kind == "audio" else None
         if target_type == "subject":
-            issues.append(_issue("unsupported_subject_capability", "Timeline source subject cannot be used as a media clip.", **context))
+            issues.append(_issue("subject_not_media", "Timeline source subject cannot be used as a media clip.", **context))
         elif expected_type is None or clip_kind != expected_type or target_type != expected_type:
             issues.append(_issue("timeline_media_kind_mismatch", "Timeline track, clip, and source node media kinds do not agree.",
                                  **context, track_kind=track_kind, clip_kind=clip_kind, source_node_type=target_type))
@@ -509,7 +582,30 @@ def _project_selection(source: dict, graph: dict, selection: dict, by_id: dict[s
     return projected_source, projected_selection
 
 
-def _related_issues(issues: list[dict], selected_ids: set[str], timeline_id: str | None) -> list[dict]:
+HISTORICAL_GENERATION_ISSUES = {
+    "missing_generation_draft", "invalid_generation_draft", "missing_generation_parts",
+    "missing_generation_parameters", "missing_generation_references", "missing_observed_prompt",
+    "missing_observed_parameters", "missing_observed_references", "unbound_prompt_slot",
+    "unsupported_prompt_part", "missing_reference_node", "missing_reference_edge",
+    "reference_instance_mismatch", "unrepresented_reference_edge",
+}
+
+
+def _direct_reference_ids(by_id: dict[str, dict], unit_ids: set[str]) -> set[str]:
+    result = set()
+    for identity in unit_ids:
+        node = by_id.get(identity)
+        data = node.get("data") if isinstance(node, dict) else None
+        draft = data.get("generationDraft") if isinstance(data, dict) else None
+        references = draft.get("references") if isinstance(draft, dict) else None
+        if isinstance(references, list):
+            result.update(reference.get("nodeId") for reference in references
+                          if isinstance(reference, dict) and isinstance(reference.get("nodeId"), str))
+    return result
+
+
+def _related_issues(issues: list[dict], selected_ids: set[str], timeline_id: str | None,
+                    unit_ids: set[str], direct_reference_ids: set[str]) -> list[dict]:
     related = []
     for item in issues:
         if "timeline_id" in item and item.get("timeline_id") != timeline_id:
@@ -517,7 +613,12 @@ def _related_issues(issues: list[dict], selected_ids: set[str], timeline_id: str
         if (any(isinstance(item.get(key), str) and item.get(key) in selected_ids
                 for key in ("node_id", "target_node_id", "source_node_id"))
                 or (timeline_id is not None and item.get("timeline_id") == timeline_id)):
-            related.append(deepcopy(item))
+            observed = deepcopy(item)
+            if (observed.get("node_id") in direct_reference_ids
+                    and observed.get("node_id") not in unit_ids
+                    and observed.get("code") in HISTORICAL_GENERATION_ISSUES):
+                observed["relevance"] = "materialized_reference_ancestry"
+            related.append(observed)
     return related
 
 
@@ -526,9 +627,10 @@ BLOCKING_SOURCE_ISSUES = {
     "missing_generation_draft", "invalid_generation_draft", "missing_generation_parts",
     "missing_generation_parameters", "missing_generation_references", "missing_observed_prompt",
     "missing_observed_parameters", "missing_observed_references", "unbound_prompt_slot",
-    "unsupported_subject_capability", "unsupported_prompt_part", "missing_reference_node",
+    "invalid_subject_resource_snapshot", "unsupported_prompt_part", "missing_reference_node",
     "missing_reference_edge", "reference_instance_mismatch", "dangling_edge",
-    "uninterpreted_non_reference_edge",
+    "uninterpreted_non_reference_edge", "invalid_post_edit_provenance",
+    "post_edit_provenance_cycle", "subject_not_media",
     "dangling_timeline_source", "unsupported_clip_kind", "unsupported_timeline_source_kind",
     "timeline_media_kind_mismatch", "unsupported_node_kind", "unsupported_timeline_clip_fields",
     "unsupported_timeline_track_fields", "unsupported_timeline_trim_fields", "current_pointer_not_in_history",
@@ -628,13 +730,16 @@ def inspect_canvas_source(source: object, selection: dict | None = None) -> dict
         if isinstance(references, list):
             selected_ids.update(r["nodeId"] for r in references
                                 if isinstance(r, dict) and isinstance(r.get("nodeId"), str))
-    related = _related_issues(report["issues"], selected_ids, timeline_id)
+    direct_reference_ids = _direct_reference_ids(by_id, unit_ids)
+    related = _related_issues(report["issues"], selected_ids, timeline_id,
+                              unit_ids, direct_reference_ids)
     report["selection"]["related_issues"] = related
     try:
         selected_source, selected_selection = _project_selection(source, graph, selection, by_id)
         packet = build_sequence_packet(selected_source, selected_selection)
     except (ValueError, KeyError, TypeError, AttributeError) as error:
-        relevant = _related_issues(report["issues"], selected_ids, timeline_id)
+        relevant = _related_issues(report["issues"], selected_ids, timeline_id,
+                                   unit_ids, direct_reference_ids)
         code = "canonical_sequence_packet_rejected"
         message = str(error) or type(error).__name__
         if "mixed raw" in message:
@@ -643,6 +748,14 @@ def inspect_canvas_source(source: object, selection: dict | None = None) -> dict
             code = "source_snapshot_mismatch"
         elif "generation draft" in message:
             code = "missing_generation_draft"
+        elif "prompt extension type" in message:
+            code = "prompt_reference_extension_type_mismatch"
+        elif "source node type" in message or "reference node type" in message:
+            code = "prompt_reference_node_type_mismatch"
+        elif "subject" in message:
+            code = "invalid_subject_resource_snapshot"
+        elif "unbound prompt reference" in message:
+            code = "unbound_prompt_slot"
         elif "unbound prompt" in message or "unsupported" in message:
             code = "unsupported_or_unbound_selected_source"
         blocker = _issue(code, "Explicit selection could not be prepared: " + message,
@@ -658,7 +771,9 @@ def inspect_canvas_source(source: object, selection: dict | None = None) -> dict
     packet["selected_closure_sha256"] = packet["source_snapshot_sha256"]
     packet["source_snapshot_sha256"] = report["source_snapshot_sha256"]
     report["selection"]["sequence_packet_sha256"] = _hash(packet)
-    blockers = [deepcopy(i) for i in related if i["code"] in BLOCKING_SOURCE_ISSUES]
+    blockers = [deepcopy(i) for i in related
+                if i["code"] in BLOCKING_SOURCE_ISSUES
+                and i.get("relevance") != "materialized_reference_ancestry"]
     if blockers:
         report["selection"]["status"] = "BLOCKED_SOURCE_GAPS"
         report["selection"]["blockers"] = blockers

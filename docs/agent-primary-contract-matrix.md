@@ -17,6 +17,29 @@ offline scripted bootstrap只证明标准reader/committer/evaluator wiring，不
 
 ## Sequence Authoring Boundary
 
+原文复刻使用 Shot optional `preserved_source_expression` 封存原始 text/reference parts、
+implicit first frame、exact imported image IDs/SHA/roles 和有据的 opening/closing 子集。
+`production/seedance_source_expression.py` 唯一拥有纯模型/原文到 `图片N` 的机械映射与状态 grounding；
+quote 必须字面来自原 text，reference 仅表达 exact selected image 的静态身份，不覆盖动态状态。
+`ContinuityTransitionPolicy/3` 只用于 `identity_style_carryover` + `causal_ellipsis` 的叙事切镜：
+缺维表示未要求，禁止填假状态；partial column 必须与双方 approved source grounding 完全一致，
+opening 仍由现有 sequence owner 在重开 accepted predecessor 后签发，禁止 caller 自证。
+跨 stack 的 prior Router seed 可由该 owner 签发静态身份 selection expression；它重开
+current snapshot/adjacent accepted media，不能执行。Production execution binding 没有物化
+sequence edge 时拒绝 start/submit；selection-only validation 仅归 destination selection owner。
+Seedance compiler/3 与 common compiler 重编唯一 `seedance-preserved-source-v1` grammar；
+原文 text 逐字保留，只有 chips 转图片序号；不代替 v4、voice、conditioned 或 FULL 路径。
+`generation_execution` 在 binding 创建与执行前重开封存数据，并由同一 source owner
+重验最终 prose、完整 image bindings 及 measured metadata；重新计算 hash 不授权扩写或遗漏引用。
+同一 source owner 还重验 typed opening/closing 的 authored facts/hash、subject endpoint 和
+common compiler 的 recipe expression coverage；原文及图片正确不允许未表达的 rich intent。
+实际执行重验由现有 sequence owner 从 current project 重开 opening authority，
+selection-only seed 不获得执行权限，完整 compiler 与执行边界共用原有 coverage 算法。
+Canvas subject 的 main/aux 全部保留 IDENTITY，planning 仍要求 exact Character owner；
+authoring revision 在 source 校验前使用显式 Registry 或 current `previous.registry`。
+旧无 optional field 的 Shot bytes/hash、v2 十维、物理末态/C2/C4 和 QA/activation 约束保持。
+partial close QA 从同一 authored preimage派生，原文/字节映射不证明模型身份或视觉连续性。
+
 `canvas_production.CanvasProductionService` 是 application caller：消费 source adapter 的完整 inspection
 及显式导演数据，生成既有 creative artifacts 的 identity/hash，经唯一 committer 批准/bootstrap/revise。
 `canvas_assets` 仅测量显式本地 PNG 并准备 Registry；source pointer 是导演声明，不证明平台 bytes 或采用。
@@ -463,6 +486,24 @@ one-use permit 与 sealed download trust 均 fail closed。显式 `authenticated
 Focused verification：`python -m pytest -p no:cacheprovider tests/test_production_vidu.py tests/test_production_vidu_download.py tests/test_production_vidu_prompt.py tests/test_production_vidu_subjects.py -q`；
 Harness 路由为 `production_video_provider`，包含 `production_vidu_tests` 与既有
 Provider / neutral requirement / Architecture checks。配置边界见 [Vidu Provider](vidu-provider.md)。
+
+Source-preserving Canvas只给秒数而没有明确timing mode时，`canvas_planning.py`
+默认使用既有 `content_driven` need，可选Provider的 `nominal_seconds` 有界标称输出；
+普通复刻不要求生成原片精确帧终止。显式 `fixed` / `frame_count` 和legacy路径保持原语义，
+最终使用帧数与source trim仍归 `ResolvedTimeline`。
+`seedance_capabilities.py` 为 Fast 2.0 同时声明 `exact_seconds` 和 `nominal_seconds`；
+native payload 均保持整数秒 `duration`，nominal 仅调整有界落盘验收。
+既有 exact-only immutable profile 保持可重开，新选择使用新的 profile hash，禁止改写旧调用。
+
+`video_timing_recovery.py` 独占显式 `VideoNominalEndpointRecovery` 的有界 timing exception：
+普通无conditioned/commercial/approved-endpoint绑定的 flexible `exact_seconds` 请求，只能经
+`ProductionStateCommitter.recover_nominal_video_endpoint` 准备 inactive candidate。
+既有 `VideoProbeReceipt` 嵌入不可变恢复记录，绑定original output、unchanged request/fetch、
+真实完整measurement、actor/reason和original exact mismatch；仅使用既有 `nominal_seconds`
+一至两帧末帧容差，默认exact、其他media契约、paid/permit及QA不变。
+Registry/provenance/candidate artifacts、strict reader、recovery与activation/replay重开同一probe链，
+不增第二accepted-state owner，不改原片或历史请求，不自动activation或生成。
+验证见 `tests/test_video_nominal_endpoint_recovery.py`，路由 `production_video_provider`。
 
 `metaso_h3.py` 显式提供 METASO `MiniMax-H3` Ref2VA，复用既有 request/receipt、paid guard、Service/committer 和 public-IP pinned download；唯一默认 credential source 为环境 `METASO_API_KEY`。Exact reference bytes、profile/context flag、egress 与 one-use permit 绑定；禁止自动选路、POST retry、activation 或持久化 key/signed URL。公开 contract 与 focused tests 见 [METASO H3 Provider](metaso-h3-provider.md)，changed paths 路由 `production_video_provider`。
 

@@ -1,0 +1,513 @@
+"""Sealed source parts and a partial, source-grounded Seedance projection."""
+
+from __future__ import annotations
+
+import hashlib
+import re
+import unicodedata
+from typing import Annotated, Literal
+
+from pydantic import Field, field_validator, model_validator
+
+from ai_video.production.artifact_contracts import StrictModel
+from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
+
+
+_SAFE_ID = r"^[A-Za-z0-9._:/-]{1,256}$"
+_SHA256 = r"^[0-9a-f]{64}$"
+_DIMENSION = Literal[
+    "character_presence",
+    "prop_identity",
+    "prop_holder",
+    "hand_contact",
+    "prop_functional_state",
+    "action_phase",
+    "gaze_target",
+    "dialogue_turn",
+    "screen_motion_axis",
+    "audio_bridge",
+]
+_ASSET_ROLE = Literal["identity", "scene", "first_frame", "last_frame"]
+_GROUNDABLE_REFERENCE_DIMENSIONS = {"character_presence", "prop_identity"}
+
+
+class SourceTextPart(StrictModel):
+    type: Literal["text"] = "text"
+    text: str
+
+
+class SourceReferenceMaterial(StrictModel):
+    asset_id: str = Field(pattern=_SAFE_ID)
+    asset_sha256: str = Field(pattern=_SHA256)
+    role: _ASSET_ROLE
+
+
+class SourceReferencePart(StrictModel):
+    type: Literal["reference"] = "reference"
+    slot_id: str = Field(pattern=_SAFE_ID)
+    materials: tuple[SourceReferenceMaterial, ...] = Field(min_length=1)
+
+
+SourcePart = Annotated[
+    SourceTextPart | SourceReferencePart,
+    Field(discriminator="type"),
+]
+
+
+class SourceStateGrounding(StrictModel):
+    dimension: _DIMENSION
+    kind: Literal["quote", "reference"]
+    fact: str = Field(min_length=1)
+    asset_id: str | None = Field(default=None, pattern=_SAFE_ID)
+    asset_sha256: str | None = Field(default=None, pattern=_SHA256)
+
+    @model_validator(mode="after")
+    def _validate_grounding_kind(self) -> "SourceStateGrounding":
+        if not self.fact.strip() or unicodedata.normalize("NFC", self.fact) != self.fact:
+            raise ValueError("source grounding fact must be nonempty NFC text")
+        if self.fact.strip().casefold() == "unspecified":
+            raise ValueError("source grounding cannot use an unspecified sentinel")
+        if re.fullmatch(_SHA256, self.fact.strip()):
+            raise ValueError("source grounding fact cannot be a digest")
+        if self.kind == "quote":
+            if self.asset_id is not None or self.asset_sha256 is not None:
+                raise ValueError("quoted source grounding cannot carry image identity")
+        else:
+            if self.dimension not in _GROUNDABLE_REFERENCE_DIMENSIONS:
+                raise ValueError("source image grounding only supports static identity facts")
+            if self.asset_id is None or self.asset_sha256 is None:
+                raise ValueError("source image grounding requires exact asset ID and SHA-256")
+        return self
+
+
+def _model_data(value: object) -> dict[str, object]:
+    if isinstance(value, StrictModel):
+        return value.model_dump(mode="json")
+    if isinstance(value, dict):
+        return dict(value)
+    raise TypeError("source parts must be validated models or mappings")
+
+
+def source_parts_sha256(
+    parts: tuple[SourcePart, ...] | list[SourcePart],
+    implicit_references: tuple[SourceReferenceMaterial, ...]
+    | list[SourceReferenceMaterial] = (),
+) -> str:
+    """Hash the raw ordered source parts and implicit first-frame references."""
+    return canonical_sha256(
+        {
+            "parts": [_model_data(part) for part in parts],
+            "implicit_references": [
+                _model_data(reference) for reference in implicit_references
+            ],
+        }
+    )
+
+
+class PreservedSourceExpression(StrictModel):
+    contract_version: Literal["seedance-preserved-source/1"] = (
+        "seedance-preserved-source/1"
+    )
+    source_sha256: str = Field(pattern=_SHA256)
+    parts: tuple[SourcePart, ...] = Field(min_length=1)
+    implicit_references: tuple[SourceReferenceMaterial, ...] = ()
+    opening: tuple[SourceStateGrounding, ...] = ()
+    closing: tuple[SourceStateGrounding, ...] = ()
+
+    @field_validator("opening", "closing")
+    @classmethod
+    def _canonical_groundings(
+        cls, value: tuple[SourceStateGrounding, ...]
+    ) -> tuple[SourceStateGrounding, ...]:
+        dimensions = tuple(item.dimension for item in value)
+        if len(dimensions) != len(set(dimensions)):
+            raise ValueError("source endpoint dimensions must be unique")
+        return tuple(sorted(value, key=lambda item: item.dimension))
+
+    @model_validator(mode="after")
+    def _validate_source_expression(self) -> "PreservedSourceExpression":
+        if self.source_sha256 != source_parts_sha256(
+            self.parts, self.implicit_references
+        ):
+            raise ValueError("preserved source parts hash does not match")
+
+        slots = tuple(
+            part.slot_id for part in self.parts if isinstance(part, SourceReferencePart)
+        )
+        if len(slots) != len(set(slots)):
+            raise ValueError("source reference slots must be unique")
+        materials = [
+            material
+            for part in self.parts
+            if isinstance(part, SourceReferencePart)
+            for material in part.materials
+        ]
+        materials.extend(self.implicit_references)
+        asset_ids = tuple(material.asset_id for material in materials)
+        if len(asset_ids) != len(set(asset_ids)):
+            raise ValueError("preserved source image references must be unique")
+        if any(material.role != "first_frame" for material in self.implicit_references):
+            raise ValueError("only first-frame images may be implicit source references")
+        if any(
+            material.role not in {"identity", "scene"}
+            for part in self.parts
+            if isinstance(part, SourceReferencePart)
+            for material in part.materials
+        ):
+            raise ValueError("source reference chips only support identity or scene images")
+
+        text_parts = tuple(
+            part.text for part in self.parts if isinstance(part, SourceTextPart)
+        )
+        exact_materials = {
+            (material.asset_id, material.asset_sha256, material.role): material
+            for material in materials
+        }
+        for endpoint in (self.opening, self.closing):
+            for grounding in endpoint:
+                if grounding.kind == "quote":
+                    if not any(grounding.fact in text for text in text_parts):
+                        raise ValueError("quoted grounding must occur in original source text")
+                elif (
+                    (grounding.asset_id, grounding.asset_sha256, "identity")
+                    not in exact_materials
+                ):
+                    raise ValueError(
+                        "reference grounding must match an exact selected identity image"
+                    )
+        return self
+
+
+def source_state_facts(
+    expression: PreservedSourceExpression,
+    endpoint: Literal["opening", "closing"],
+) -> dict[object, str]:
+    """Return only authored partial facts, keyed by the existing dimension enum."""
+    if endpoint not in {"opening", "closing"}:
+        raise ValueError("source endpoint must be opening or closing")
+    if type(expression) is not PreservedSourceExpression:
+        raise ValueError("source state facts require the exact preserved expression model")
+    reopened = PreservedSourceExpression.model_validate(
+        expression.model_dump(mode="python")
+    )
+    from ai_video.production.video_transition import CausalDimension
+
+    return {
+        CausalDimension(item.dimension): item.fact
+        for item in getattr(reopened, endpoint)
+    }
+
+
+def _validated_source_expression(shot):
+    expression = getattr(shot, "preserved_source_expression", None)
+    if type(expression) is not PreservedSourceExpression:
+        raise ValueError("approved Shot has no preserved Seedance source expression")
+    return PreservedSourceExpression.model_validate(
+        expression.model_dump(mode="python")
+    )
+
+
+def _source_materials(expression: PreservedSourceExpression):
+    return tuple(
+        material
+        for part in expression.parts
+        if isinstance(part, SourceReferencePart)
+        for material in part.materials
+    ) + expression.implicit_references
+
+
+def _image_indices(bound, requirement, expression: PreservedSourceExpression):
+    from ai_video.production._video_requirement_routing import (
+        context_asset_role,
+        native_binding_role,
+    )
+    from ai_video.production.video_compiler import _ROLE_ORDER
+
+    evidence = tuple(requirement.asset_evidence)
+    expected = tuple(
+        (item.role.value, item.asset_id, item.asset_sha256) for item in evidence
+    )
+    source = tuple(
+        (item.role, item.asset_id, item.asset_sha256)
+        for item in _source_materials(expression)
+    )
+    if len(expected) != len(source) or set(expected) != set(source):
+        raise ValueError("source references must exactly match selected image evidence")
+    if len(set(expected)) != len(expected):
+        raise ValueError("selected source image evidence must be unique")
+
+    if len(bound.binding_roles) != len(bound.input_assets):
+        raise ValueError("provider-bound source image roles do not match selected assets")
+    paired = tuple(zip(bound.binding_roles, bound.input_assets, strict=True))
+    image_pairs = []
+    for native_role, asset in paired:
+        if native_role not in _ROLE_ORDER:
+            raise ValueError("preserved source does not support non-image input references")
+        matching = tuple(
+            item
+            for item in evidence
+            if item.asset_id == asset.asset_id
+            and item.asset_sha256 == asset.asset_sha256
+            and native_binding_role(item.role) == native_role
+            and context_asset_role(item.role) == asset.role
+        )
+        if len(matching) != 1:
+            raise ValueError("bound source images do not match exact selected roles and bytes")
+        image_pairs.append(
+            (
+                native_role,
+                asset.asset_id,
+                asset.asset_sha256,
+                matching[0].role.value,
+            )
+        )
+    if len(image_pairs) != len(expected):
+        raise ValueError("bound source images do not match selected evidence count")
+    bound_keys = tuple(
+        (native_role, asset_id, asset_sha256)
+        for native_role, asset_id, asset_sha256, _ in image_pairs
+    )
+    expected_bound_keys = tuple(
+        (native_binding_role(item.role), item.asset_id, item.asset_sha256)
+        for item in evidence
+    )
+    if len(set(bound_keys)) != len(bound_keys) or set(bound_keys) != set(expected_bound_keys):
+        raise ValueError("bound source image references must exactly match selected role and byte identities")
+    indices = {
+        (role, asset_id, asset_sha256): index
+        for index, (_, asset_id, asset_sha256, role) in enumerate(
+            sorted(image_pairs, key=lambda item: (_ROLE_ORDER[item[0]], item[1])),
+            start=1,
+        )
+    }
+    return indices
+
+
+def _adapt_source_text(
+    expression: PreservedSourceExpression,
+    image_indices: dict[tuple[str, str, str], int],
+) -> str:
+    chunks: list[str] = []
+    for part in expression.parts:
+        if isinstance(part, SourceTextPart):
+            chunks.append(part.text)
+        else:
+            chunks.append(
+                "、".join(
+                    f"图片{image_indices[(material.role, material.asset_id, material.asset_sha256)]}"
+                    for material in part.materials
+                )
+            )
+    return "".join(chunks)
+
+
+def _require_source_identity(bound, requirement, shot):
+    from ai_video.production.models import Shot
+    from ai_video.production.shot_router import ProviderBoundVideoRequest
+    from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
+
+    if type(shot) is not Shot or not verify_artifact_hash(shot):
+        raise ValueError("preserved source requires an exact sealed approved Shot")
+    if type(requirement) is not ProviderNeutralVideoRequirement:
+        raise ValueError("preserved source requires a provider-neutral requirement")
+    if type(bound) is not ProviderBoundVideoRequest:
+        raise ValueError("preserved source requires a provider-bound request")
+    reopened_requirement = ProviderNeutralVideoRequirement.model_validate(
+        requirement.model_dump(mode="python")
+    )
+    reopened_bound = ProviderBoundVideoRequest.model_validate(
+        bound.model_dump(mode="python")
+    )
+    if (
+        reopened_bound.requirement_hash != reopened_requirement.requirement_hash
+        or reopened_bound.provider_name != "seedance"
+        or reopened_bound.target_shot_id != shot.shot_id
+        or reopened_bound.target_shot_revision != shot.revision
+        or reopened_bound.target_shot_content_hash != shot.content_hash
+        or reopened_requirement.target_shot != shot
+    ):
+        raise ValueError("preserved source is not bound to the exact approved Shot")
+    if reopened_bound.generation_recipe is None:
+        raise ValueError("preserved source requires a sealed Seedance generation recipe")
+    return reopened_bound, reopened_requirement, reopened_requirement.target_shot
+
+
+def _source_endpoint_controls(requirement, expression):
+    from ai_video.production.video_requirement import ContinuityStateKind
+
+    intent = requirement.generation_intent
+    opening = intent.open_state
+    opening_facts = source_state_facts(expression, "opening")
+    opening_control = "generation_intent.open_state.state_hash"
+    if opening.kind is ContinuityStateKind.TYPED_HASH:
+        if not opening_facts:
+            raise ValueError("typed source opening hash requires authored partial facts")
+        if opening.state_hash != canonical_sha256({d.value: fact for d, fact in opening_facts.items()}):
+            raise ValueError("typed source opening hash differs from authored facts")
+        opening_controls = (opening_control,)
+    else:
+        if opening.state_ref is not None or opening.state_text is not None:
+            raise ValueError("preserved source supports only verified typed-hash openings")
+        if opening_facts:
+            raise ValueError("source opening facts require a typed-hash opening")
+        opening_controls = ()
+
+    closing = intent.close_state
+    closing_facts = source_state_facts(expression, "closing")
+    closing_control = "generation_intent.close_state.state_hash"
+    if closing.kind is ContinuityStateKind.TYPED_HASH:
+        if not closing_facts:
+            raise ValueError("typed source closing hash requires authored partial facts")
+        expected_hash = canonical_sha256(
+            {dimension.value: fact for dimension, fact in closing_facts.items()}
+        )
+        if expected_hash != closing.state_hash:
+            raise ValueError("typed source closing hash differs from authored facts")
+        closing_controls = (closing_control,)
+    else:
+        if closing.state_ref is not None or closing.state_text is not None:
+            raise ValueError("preserved source supports only grounded typed-hash closings")
+        if closing_facts:
+            raise ValueError("source closing facts require a typed-hash closing")
+        closing_controls = ()
+
+    if intent.close_causal_facts is not None:
+        raise ValueError("preserved source uses partial endpoint facts, not close_causal_facts")
+    endpoint = intent.subject_action.endpoint
+    if endpoint.state_ref is not None or endpoint.state_text is not None or endpoint.state_hash is not None:
+        raise ValueError("preserved source does not support typed subject endpoints")
+    return opening_controls + closing_controls
+
+
+def _require_endpoint_groundings(requirement, expression, continuity_expression, bound):
+    from ai_video.production._causal_prompt_context import VerifiedCausalOpeningExpression
+    from ai_video.production.video_requirement import ContinuityStateKind
+
+    controls = _source_endpoint_controls(requirement, expression)
+    if requirement.generation_intent.open_state.kind is ContinuityStateKind.TYPED_HASH:
+        if type(continuity_expression) is not VerifiedCausalOpeningExpression:
+            raise ValueError("typed source opening requires sequence-issued evidence")
+        if dict(continuity_expression.opening_facts(requirement, bound)) != source_state_facts(expression, "opening"):
+            raise ValueError("verified opening facts differ from source groundings")
+    elif continuity_expression is not None:
+        raise ValueError("source opening facts require a typed-hash opening")
+    return controls
+
+
+def _source_projection(bound, requirement):
+    """Reopen source identity, prose and images without minting opening authority."""
+    from ai_video.production.video_requirement import GenerationMode
+
+    shot = getattr(requirement, "target_shot", None)
+    bound, requirement, shot = _require_source_identity(bound, requirement, shot)
+    expression = _validated_source_expression(shot)
+    if expression.contract_version != "seedance-preserved-source/1":
+        raise ValueError("unsupported preserved source expression contract")
+
+    if (
+        requirement.contract_version == "provider-neutral-video-requirement/4"
+        or requirement.generation_mode
+        not in {
+            GenerationMode.TEXT_TO_VIDEO,
+            GenerationMode.IMAGE_TO_VIDEO,
+            GenerationMode.REFERENCE_TO_VIDEO,
+        }
+        or requirement.voice_routing is not None
+        or bound.voice_route is not None
+        or requirement.conditioning_compatibility is not None
+    ):
+        raise ValueError("preserved source cannot replace rich, voice, or conditioned intent")
+    if bound.mode.value != requirement.generation_mode.value:
+        raise ValueError("preserved source mode differs from its provider-bound request")
+
+    mode = requirement.generation_mode
+    source_references = tuple(
+        material
+        for part in expression.parts
+        if isinstance(part, SourceReferencePart)
+        for material in part.materials
+    )
+    if mode is GenerationMode.TEXT_TO_VIDEO:
+        if source_references or expression.implicit_references:
+            raise ValueError("text-to-video source cannot carry selected image references")
+    elif mode is GenerationMode.IMAGE_TO_VIDEO:
+        roles = tuple(role.value for role in requirement.semantic_reference_roles)
+        if (
+            roles != ("first_frame",)
+            or len(requirement.asset_evidence) != 1
+            or requirement.asset_evidence[0].role.value != "first_frame"
+            or source_references
+            or len(expression.implicit_references) != 1
+        ):
+            raise ValueError("source I2V requires one implicit first-frame image and no reference chip")
+    else:
+        if expression.implicit_references or not source_references:
+            raise ValueError("source R2V images must be represented by explicit reference chips")
+
+    image_indices = _image_indices(bound, requirement, expression)
+    prompt = _adapt_source_text(expression, image_indices)
+    if not prompt:
+        raise ValueError("preserved source prompt must contain original text")
+    if shot.intent != prompt:
+        raise ValueError("approved Shot intent must equal mechanically adapted source prose")
+
+    intent = requirement.generation_intent
+    if intent.subject_action.progression != prompt:
+        raise ValueError("source subject-action progression must equal adapted source prose")
+    duration = intent.pacing.shot_duration_seconds
+    output_duration = getattr(bound.output_requirement, "duration_seconds", None)
+    if duration is None or output_duration is None or duration != output_duration:
+        raise ValueError("preserved source pacing duration must equal bound output duration")
+    return bound, requirement, expression, prompt
+
+
+def validate_preserved_seedance_request(bound, requirement, request):
+    """Recheck final source payload when a sealed binding crosses execution."""
+    from ai_video.production.video_compiler import _compile_image_bindings, _native_recipe_expression_errors
+
+    bound, requirement, expression, prompt = _source_projection(bound, requirement)
+    native = _source_native_prompt(bound, requirement, prompt, _source_endpoint_controls(requirement, expression))
+    if _native_recipe_expression_errors(bound, requirement, native):
+        raise ValueError("preserved source has unexpressed authored intent")
+    if (bound.compiler_contract.compiler_id != "seedance-video-compiler"
+            or bound.compiler_contract.compiler_version != "3"
+            or request.prompt_text != prompt
+            or request.image_bindings != _compile_image_bindings(bound)
+            or request.media_bindings or request.subject_bindings
+            or request.effective_negative_prompt_text):
+        raise ValueError("compiled request differs from preserved source prose or exact image bindings")
+
+
+def compile_preserved_seedance_source(bound, requirement, continuity_expression=None):
+    """Compile source parts without rewriting prose or inventing state facts."""
+    bound, requirement, expression, prompt = _source_projection(bound, requirement)
+    endpoint_controls = _require_endpoint_groundings(
+        requirement, expression, continuity_expression, bound
+    )
+    return _source_native_prompt(bound, requirement, prompt, endpoint_controls)
+
+
+def _source_native_prompt(bound, requirement, prompt, endpoint_controls):
+    from ai_video.production.video_compiler import ProviderNativePrompt
+
+    intent = requirement.generation_intent
+    controls = (
+        "generation_intent.subject_action.progression",
+        "generation_intent.pacing.shot_duration_seconds",
+        *endpoint_controls,
+    )
+    ambience = intent.ambience_intent
+    if ambience is not None and not ambience.explicitly_silent:
+        if not bound.output_requirement.native_audio:
+            raise ValueError("source sound intent requires native audio output")
+        controls += ("generation_intent.ambience_intent.explicitly_silent",)
+    dialogue = intent.dialogue_intent
+    if dialogue is not None and dialogue.mode == "none":
+        controls += ("generation_intent.dialogue_intent.lip_sync_required",)
+
+    return ProviderNativePrompt(
+        grammar_contract="seedance-preserved-source-v1",
+        prompt_text=prompt,
+        prompt_sha256=hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
+        expressed_control_paths=controls,
+    )

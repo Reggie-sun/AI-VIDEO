@@ -136,6 +136,10 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_canvas_reference_packet.py, tests/test_canvas_sequence_packet.py, tests/test_canvas_sequence_handoff.py, tests/test_canvas_production_source.py, tests/test_canvas_assets.py, tests/test_canvas_authoring.py, tests/test_canvas_planning.py, tests/test_canvas_production.py, tests/test_canvas_recovery.py, tests/test_canvas_render.py, -q]
     cwd: .
     description: Verify faithful source inspection and shared canonical authoring, accepted-source handoff, replay, unknown stop, graph revision, native audio and scripted final rendering; no live media acceptance.
+  canvas_preserved_source_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_canvas_source_subject.py, tests/test_canvas_source_expression.py, tests/test_seedance_source_expression.py, tests/test_source_grounded_sequence.py, tests/test_source_grounded_route_selection.py, -q]
+    cwd: .
+    description: Verify exact original source/subject references, common-compiler revalidation and source-grounded sequence authority; no Provider effects or media acceptance.
   paid_reconciliation_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_paid_provider_no_effect_reconciliation.py, -q]
     cwd: .
@@ -287,7 +291,7 @@ checks:
     cwd: .
     description: Verify image contracts, local adapter, truthful import, activation, and recovery.
   production_video_provider_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_budget_extension.py, tests/test_paid_budget_read_traversal.py, tests/test_production_paid_submit_quota.py, tests/test_production_video_unsubmitted.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_video_pre_generation.py, tests/test_production_ecommerce_shot_candidate_gate.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_comfy_t8_native_long_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_metaso_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_seedance_source_prompt.py, tests/test_shot_continuity_source_review.py, tests/test_shot_continuity_source_operator.py, tests/test_shot_continuity_source_transport.py, -q, --durations=20, --durations-min=0.1]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_budget_extension.py, tests/test_paid_budget_read_traversal.py, tests/test_production_paid_submit_quota.py, tests/test_production_video_unsubmitted.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_nominal_endpoint_recovery.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_video_pre_generation.py, tests/test_production_ecommerce_shot_candidate_gate.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_comfy_t8_native_long_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_metaso_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_seedance_source_prompt.py, tests/test_shot_continuity_source_review.py, tests/test_shot_continuity_source_operator.py, tests/test_shot_continuity_source_transport.py, -q, --durations=20, --durations-min=0.1]
     cwd: .
     covered_by_check_ids: [production_contract_tests]
     description: Verify paid-provider safety and generated-video contracts without live submit.
@@ -384,6 +388,7 @@ checks:
       - creative_goal_binding_tests
       - canvas_reference_packet_tests
       - canvas_production_workflow_tests
+      - canvas_preserved_source_tests
       - paid_reconciliation_tests
       - vidu_ad_tests
       - voice_source_routing_tests
@@ -918,6 +923,17 @@ categories:
     check_ids:
       - canvas_production_workflow_tests
       - task_architecture_gate
+  canvas_preserved_source:
+    patterns:
+      - src/ai_video/production/seedance_source_expression.py
+      - tests/test_canvas_source_subject.py
+      - tests/test_canvas_source_expression.py
+      - tests/test_seedance_source_expression.py
+      - tests/test_source_grounded_sequence.py
+      - tests/test_source_grounded_route_selection.py
+    check_ids:
+      - canvas_preserved_source_tests
+      - task_architecture_gate
   commercial_source_preparation:
     patterns:
       - src/ai_video/production/ecommerce_ad_coordinator.py
@@ -1081,6 +1097,7 @@ categories:
       - src/ai_video/production/local_continuity_reviewer.py
       - src/ai_video/production/continuity_review_coordinator.py
       - src/ai_video/production/video_artifact.py
+      - src/ai_video/production/video_timing_recovery.py
       - src/ai_video/production/video_contracts.py
       - src/ai_video/production/video_dependency.py
       - src/ai_video/production/video_requirement.py
@@ -1137,6 +1154,7 @@ categories:
       - tests/test_production_seedance_mixed_reference.py
       - tests/test_seedance_source_prompt.py
       - tests/test_production_video.py
+      - tests/test_video_nominal_endpoint_recovery.py
       - tests/test_production_ecommerce_shot_candidate_gate.py
       - tests/test_video_candidate.py
       - tests/test_video_generation.py

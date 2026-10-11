@@ -122,10 +122,9 @@ def test_materialized_image_ancestry_is_preserved_without_becoming_an_execution_
     source = source_document()
     room = source["nodes"][0]
     room["data"].update(source="model_generated", generationDraft={
-        "parts": [{"type": "text", "text": "Use the earlier generated image."}],
+        "parts": [{"type": "extension", "extension_type": "subject", "object_id": "missing-history-slot"}],
         "contentSettings": {"modelName": "image-model"},
-        "references": [{"slotId": "ancestor-slot", "nodeId": "ancestor", "sourceInstanceId": "ancestor",
-                        "type": "extension", "extensionType": "node", "role": "reference"}],
+        "references": [],
     })
     source["nodes"].append({"id": "ancestor", "type": "image", "data": {
         "resourceId": "ancestor-v1", "resourceBatches": [{"id": "ancestor-batch", "resourceIds": ["ancestor-v1"]}],
@@ -136,11 +135,21 @@ def test_materialized_image_ancestry_is_preserved_without_becoming_an_execution_
     }})
     source["edges"].append({"id": "ancestor-room", "source": "ancestor", "target": "room", "type": "reference"})
     report = inspect_canvas_source(source, {"node_ids": ["shot"]})
-    assert "unsupported_subject_capability" in issue_codes(report, "ancestor")
+    assert "unbound_prompt_slot" in issue_codes(report, "ancestor")
+    assert "unbound_prompt_slot" in issue_codes(report, "room")
     assert report["source_snapshot"] == source
     assert report["selection"]["status"] == "CANONICAL_PACKET_AVAILABLE"
     assert report["selection"]["blockers"] == []
+    assert any(item.get("node_id") == "room" and item["code"] == "unbound_prompt_slot"
+               and item.get("relevance") == "materialized_reference_ancestry"
+               for item in report["selection"]["related_issues"])
     assert [a["id"] for a in report["selection"]["sequence_packet"]["assets"]] == ["room"]
+
+    source["edges"].append({"id": "dangling-room", "source": "missing-node", "target": "room", "type": "reference"})
+    structurally_blocked = inspect_canvas_source(source, {"node_ids": ["shot"]})
+    assert structurally_blocked["selection"]["status"] == "BLOCKED_SOURCE_GAPS"
+    assert "dangling_edge" in {b["code"] for b in structurally_blocked["selection"]["blockers"]}
+    source["edges"].pop()
 
     room["data"].pop("resourceId")
     blocked = inspect_canvas_source(source, {"node_ids": ["shot"]})
@@ -201,7 +210,7 @@ def test_timeline_keeps_each_visual_and_audio_occurrence_and_unhandled_fields():
     ("slot", "unbound_prompt_slot"),
     ("resource", "missing_resource_id"),
     ("edge", "dangling_edge"),
-    ("subject", "unsupported_subject_capability"),
+    ("subject", "invalid_subject_resource_snapshot"),
 ])
 def test_selected_chain_damage_is_reported_as_a_blocker(damage, expected):
     source = source_document()
@@ -227,6 +236,75 @@ def test_selected_chain_damage_is_reported_as_a_blocker(damage, expected):
     assert report["selection"]["status"] == "BLOCKED"
     assert expected in {b["code"] for b in report["selection"]["blockers"]}
     assert report["production_acceptance"] == "NOT_EVALUATED"
+
+
+def test_subject_reference_keeps_grouped_resource_snapshots_and_original_node():
+    source = source_document()
+    subject = next(node for node in source["nodes"] if node["id"] == "subject")
+    subject["data"].update(
+        main={"refType": "resource_snapshot", "resourceId": "subject-main"},
+        auxiliaries=[{"refType": "resource_snapshot", "resourceId": "subject-aux"}],
+        provenance={"origin_subject_id": "original-subject"},
+    )
+    draft = next(node for node in source["nodes"] if node["id"] == "shot")["data"]["generationDraft"]
+    draft["parts"].append({"type": "extension", "extension_type": "subject", "object_id": "subject-slot"})
+    draft["references"].append({
+        "slotId": "subject-slot", "nodeId": "subject", "sourceInstanceId": "subject",
+        "type": "extension", "extensionType": "subject", "role": "reference",
+    })
+    source["edges"].append({"id": "subject-shot", "source": "subject", "target": "shot", "type": "reference"})
+
+    report = inspect_canvas_source(source, {"node_ids": ["shot"]})
+
+    assert report["selection"]["status"] == "CANONICAL_PACKET_AVAILABLE"
+    unit = report["selection"]["sequence_packet"]["units"][0]
+    assert unit["source_text"] == "Keep the room quiet.\n\n"
+    subject_reference = unit["references"][1]
+    assert subject_reference == {
+        "slot_id": "subject-slot",
+        "node_id": "subject",
+        "canvas_role": "reference",
+        "kind": "subject",
+        "extension_type": "subject",
+        "semantic_role": "identity",
+        "material_references": {
+            "main": {"ref_type": "resource_snapshot", "resource_id": "subject-main"},
+            "auxiliaries": [{"index": 0, "ref_type": "resource_snapshot", "resource_id": "subject-aux"}],
+        },
+        "provenance": {"origin_subject_id": "original-subject"},
+    }
+    assert next(asset for asset in report["selection"]["sequence_packet"]["assets"]
+                if asset["id"] == "subject") == subject
+
+
+@pytest.mark.parametrize("damage,expected", [
+    ("unbound_slot", "unbound_prompt_slot"),
+    ("extension_type", "prompt_reference_extension_type_mismatch"),
+    ("node_type", "prompt_reference_node_type_mismatch"),
+])
+def test_subject_prompt_chip_must_match_declared_slot_and_node_type(damage, expected):
+    source = source_document()
+    subject = next(node for node in source["nodes"] if node["id"] == "subject")
+    subject["data"].update(main={"refType": "resource_snapshot", "resourceId": "subject-main"})
+    draft = next(node for node in source["nodes"] if node["id"] == "shot")["data"]["generationDraft"]
+    draft["parts"].append({"type": "extension", "extension_type": "subject", "object_id": "subject-slot"})
+    draft["references"].append({
+        "slotId": "subject-slot", "nodeId": "subject", "sourceInstanceId": "subject",
+        "type": "extension", "extensionType": "subject", "role": "reference",
+    })
+    source["edges"].append({"id": "subject-shot", "source": "subject", "target": "shot", "type": "reference"})
+    if damage == "unbound_slot":
+        draft["parts"][-1]["object_id"] = "missing-slot"
+    elif damage == "extension_type":
+        draft["references"][-1]["extensionType"] = "node"
+    else:
+        draft["references"][-1]["nodeId"] = "room"
+        draft["references"][-1]["sourceInstanceId"] = "room"
+
+    report = inspect_canvas_source(source, {"node_ids": ["shot"]})
+
+    assert report["selection"]["status"] == "BLOCKED"
+    assert expected in {item["code"] for item in report["selection"]["blockers"]}
 
 
 def test_mixed_raw_and_rich_source_is_explicitly_blocked():
@@ -269,14 +347,71 @@ def test_missing_reference_edge_is_located_at_selected_generation_node():
 
 def test_selected_non_reference_dependency_is_reported_as_uninterpreted():
     source = source_document()
-    source["edges"].append({"id": "post-edit", "source": "room", "target": "shot", "type": "post_edit_provenance"})
+    source["edges"].append({"id": "future-edge", "source": "room", "target": "shot", "type": "compositor_input"})
 
     report = inspect_canvas_source(source, {"node_ids": ["shot"]})
 
     assert report["selection"]["status"] == "BLOCKED_SOURCE_GAPS"
-    assert any(i["code"] == "uninterpreted_non_reference_edge" and i["edge_type"] == "post_edit_provenance"
+    assert any(i["code"] == "uninterpreted_non_reference_edge" and i["edge_type"] == "compositor_input"
                for i in report["selection"]["blockers"])
     assert report["selection"]["sequence_packet"] is not None
+
+
+def test_post_edit_provenance_is_reported_as_media_derivation_without_becoming_a_reference():
+    source = source_document()
+    source["nodes"].append({"id": "trim", "type": "video", "data": {
+        "title": "Shot trim", "source": "post_edit_generated", "resourceId": "trim-v1",
+        "resourceBatches": [{"id": "trim-batch", "resourceIds": ["trim-v1"]}],
+    }})
+    edge = {"id": "shot-trim", "source": "shot", "target": "trim", "type": "post_edit_provenance"}
+    source["edges"].append(edge)
+
+    report = inspect_canvas_source(source, {"node_ids": ["shot"]})
+
+    assert report["selection"]["status"] == "CANONICAL_PACKET_AVAILABLE"
+    assert any(item["source_edge"] == edge for item in report["inventory"]["edges"])
+    assert not any(item["code"] == "uninterpreted_non_reference_edge"
+                   and item.get("edge_type") == "post_edit_provenance"
+                   for item in report["selection"]["blockers"])
+    assert report["selection"]["sequence_packet"]["units"][0]["node_id"] == "shot"
+
+
+@pytest.mark.parametrize("damage,expected", [
+    ("non_media", "invalid_post_edit_provenance"),
+    ("not_materialized", "invalid_post_edit_provenance"),
+    ("cycle", "post_edit_provenance_cycle"),
+])
+def test_invalid_post_edit_provenance_is_reported_and_blocks_related_selection(damage, expected):
+    source = source_document()
+    source["nodes"].append({"id": "trim", "type": "video", "data": {
+        "title": "Shot trim", "source": "post_edit_generated", "resourceId": "trim-v1",
+        "resourceBatches": [{"id": "trim-batch", "resourceIds": ["trim-v1"]}],
+    }})
+    source["edges"].append({"id": "shot-trim", "source": "shot", "target": "trim", "type": "post_edit_provenance"})
+    if damage == "non_media":
+        source["edges"][-1]["target"] = "subject"
+    elif damage == "not_materialized":
+        source["nodes"][-1]["data"]["source"] = "model_generated"
+    else:
+        source["edges"].append({"id": "trim-shot", "source": "trim", "target": "shot", "type": "post_edit_provenance"})
+
+    report = inspect_canvas_source(source, {"node_ids": ["shot"]})
+
+    assert expected in {item["code"] for item in report["selection"]["blockers"]}
+
+
+def test_post_edit_child_without_own_draft_is_not_a_generation_unit():
+    source = source_document()
+    source["nodes"].append({"id": "trim", "type": "video", "data": {
+        "title": "Shot trim", "source": "post_edit_generated", "resourceId": "trim-v1",
+        "resourceBatches": [{"id": "trim-batch", "resourceIds": ["trim-v1"]}],
+    }})
+    source["edges"].append({"id": "shot-trim", "source": "shot", "target": "trim", "type": "post_edit_provenance"})
+
+    report = inspect_canvas_source(source, {"node_ids": ["trim"]})
+
+    assert report["selection"]["status"] == "BLOCKED"
+    assert any(item["code"] == "missing_generation_draft" for item in report["selection"]["blockers"])
 
 
 def test_unknown_timeline_media_kind_is_explicitly_reported():

@@ -12,6 +12,7 @@ from ai_video.production.composition_contracts import (
     AudioTrackSpec, CaptionTrackBinding, FixedTransform,
 )
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.seedance_source_expression import PreservedSourceExpression
 
 SHA256 = r"^[0-9a-f]{64}$"
 
@@ -175,11 +176,12 @@ class ProductionSelectedUnit(StrictModel):
 class ProductionShotMixin(StrictModel):
     production_intent: ProductionIntent | None = None
     production_lineage: ProductionComponentLineage | None = None
+    preserved_source_expression: PreservedSourceExpression | None = None
 
     @model_serializer(mode="wrap")
     def _serialize_production_contract(self, handler):
         data = handler(self)
-        for field in ("production_intent", "production_lineage"):
+        for field in ("production_intent", "production_lineage", "preserved_source_expression"):
             if getattr(self, field) is None:
                 data.pop(field, None)
         return data

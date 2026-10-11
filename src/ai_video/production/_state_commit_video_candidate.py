@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Callable
 
 from ai_video.production.models import (
+    ActorIdentity,
     EgressMetadata,
     PaidProviderAttemptPhase,
     SourceBoundaryEvaluationPhase,
@@ -39,6 +40,7 @@ from ai_video.production.video_artifact import (
     build_terminal_frame_asset_record,
     extract_terminal_frame_candidate,
     probe_generated_video_candidate,
+    _probe_generated_video_candidate,
 )
 
 from ._state_commit_common import (
@@ -106,6 +108,7 @@ class _StateCommitVideoCandidateMixin:
         commercial_reviewer: GeneratedCommercialShotReviewer | None = None,
         source_boundary_reviewer=None,
         repair_commercial_evidence: bool = False,
+        _nominal_endpoint_recovery: tuple[ActorIdentity, str] | None = None,
     ):
         """Measure fetched bytes and persist an inactive exact bundle candidate."""
 
@@ -260,25 +263,32 @@ class _StateCommitVideoCandidateMixin:
                     self._project_root / "state" / "video-generation" / "fetch"
                 ),
             ) as (held_fd, _):
-                fetched_bytes, measured, probe_receipt = (
-                    _measure_generated_video_candidate_for_committer(
-                        held_fd,
-                        request,
-                        fetch_receipt,
-                        probe=probe,
+                if _nominal_endpoint_recovery is not None:
+                    fetched_bytes, measured, probe_receipt = _probe_generated_video_candidate(
+                        held_fd, request, fetch_receipt, probe=probe,
+                        defer_continuity_review=False,
+                        nominal_endpoint_recovery=_nominal_endpoint_recovery,
                     )
-                    if request.continuity_binding is not None
-                    or request.commercial_binding is not None
-                    else probe_generated_video_candidate(
-                        held_fd,
-                        request,
-                        fetch_receipt,
-                        probe=probe,
-                        continuity_reviewer=continuity_reviewer,
-                        continuity_policy_content_hash=continuity_policy_content_hash,
-                        continuity_authorities=continuity_authorities,
+                else:
+                    fetched_bytes, measured, probe_receipt = (
+                        _measure_generated_video_candidate_for_committer(
+                            held_fd,
+                            request,
+                            fetch_receipt,
+                            probe=probe,
+                        )
+                        if request.continuity_binding is not None
+                        or request.commercial_binding is not None
+                        else probe_generated_video_candidate(
+                            held_fd,
+                            request,
+                            fetch_receipt,
+                            probe=probe,
+                            continuity_reviewer=continuity_reviewer,
+                            continuity_policy_content_hash=continuity_policy_content_hash,
+                            continuity_authorities=continuity_authorities,
+                        )
                     )
-                )
                 if request.commercial_binding is not None:
                     manifest, attempt, state, commercial_evidence = (
                         checkpoint_generated_commercial_shot(
@@ -687,6 +697,20 @@ class _StateCommitVideoCandidateMixin:
             )
             self._write_manifest_atomic(candidate_manifest)
             return self._read_manifest()
+
+    def recover_nominal_video_endpoint(
+        self, *, attempt_id: str, actor: ActorIdentity, reason: str,
+        probe: Callable[[int], dict] | None = None,
+    ):
+        """Prepare an inactive candidate with an explicit bounded timing receipt.
+
+        The original request, fetched bytes, cost coverage and QA gates remain
+        unchanged. Activation still requires the normal separate owner action.
+        """
+        return self.prepare_video_activation_candidate(
+            attempt_id=attempt_id, probe=probe,
+            _nominal_endpoint_recovery=(actor, reason),
+        )
 
     def recover_source_boundary_review(
         self,

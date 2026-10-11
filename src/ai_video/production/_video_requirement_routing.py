@@ -336,7 +336,7 @@ def validate_continuity_transition(
             "continuity policy requires matching context and requirement modes"
         )
     _validate_obligation_mode(policy, requirement, lifecycle)
-    if policy.schema_version == "2":
+    if policy.schema_version in {"2", "3"}:
         from ai_video.production._video_intent_validation import (
             validate_causal_transition_intent,
         )

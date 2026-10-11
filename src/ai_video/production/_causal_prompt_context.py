@@ -26,9 +26,10 @@ class VerifiedCausalOpeningExpression:
     changes: tuple[CausalStateChange, ...]
     _seal: str
     _issuer: object | None = None
+    state_contract: str = "complete-causal/2"
 
     def _payload(self):
-        return {
+        payload = {
             "requirement_hash": self.requirement_hash,
             "provider_bound_request_hash": self.provider_bound_request_hash,
             "policy_hash": self.policy_hash,
@@ -36,6 +37,9 @@ class VerifiedCausalOpeningExpression:
             "source_close_state_hash": self.source_close_state_hash,
             "changes": [c.model_dump(mode="json") for c in self.changes],
         }
+        if self.state_contract != "complete-causal/2":
+            payload["state_contract"] = self.state_contract
+        return payload
 
     def opening_facts(self, requirement, provider_bound):
         """Revalidate exact immutable issuance and both column seals per use."""
@@ -54,8 +58,11 @@ class VerifiedCausalOpeningExpression:
         changes = tuple(CausalStateChange.model_validate(c.model_dump(mode="python")) for c in self.changes)
         opening = requirement.generation_intent.open_state
         if (opening.kind is not ContinuityStateKind.TYPED_HASH
-                or causal_state_column_hash(changes, endpoint="target_open") != opening.state_hash
-                or causal_state_column_hash(changes, endpoint="source_close") != self.source_close_state_hash):
+                or self.state_contract not in {"complete-causal/2", "source-grounded/3", "source-grounded-selection/3"}
+                or causal_state_column_hash(changes, endpoint="target_open",
+                    complete=self.state_contract == "complete-causal/2") != opening.state_hash
+                or causal_state_column_hash(changes, endpoint="source_close",
+                    complete=self.state_contract == "complete-causal/2") != self.source_close_state_hash):
             raise ValueError("causal opening expression column seal is stale")
         return tuple((c.dimension, c.target_open) for c in sorted(changes, key=lambda c: c.dimension.value))
 
@@ -69,7 +76,22 @@ def _issue_causal_opening_expression(*, requirement, provider_bound, routing, so
         provider_bound_request_hash=provider_bound.provider_bound_request_hash,
         policy_hash=routing.transition_policy.policy_hash, route_binding_hash=routing.binding_hash,
         source_close_state_hash=source_intent.close_state.state_hash,
-        changes=routing.transition_policy.causal_state_changes, _seal="", _issuer=_ISSUER)
+        changes=routing.transition_policy.causal_state_changes, _seal="", _issuer=_ISSUER,
+        state_contract="source-grounded/3" if routing.transition_policy.schema_version == "3" else "complete-causal/2")
+    sealed = replace(candidate, _seal=canonical_sha256(candidate._payload()))
+    _ISSUED[sealed] = sealed._seal
+    return sealed
+
+
+def _issue_source_selection_expression(*, requirement, provider_bound, source_intent, changes, evidence_hash):
+    """Native-expression proof only; the executable binding requires an edge."""
+    from dataclasses import replace
+
+    candidate = VerifiedCausalOpeningExpression(requirement_hash=requirement.requirement_hash,
+        provider_bound_request_hash=provider_bound.provider_bound_request_hash,
+        policy_hash=evidence_hash, route_binding_hash=evidence_hash,
+        source_close_state_hash=source_intent.close_state.state_hash, changes=changes,
+        _seal="", _issuer=_ISSUER, state_contract="source-grounded-selection/3")
     sealed = replace(candidate, _seal=canonical_sha256(candidate._payload()))
     _ISSUED[sealed] = sealed._seal
     return sealed

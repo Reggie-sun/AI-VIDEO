@@ -24,6 +24,20 @@ def compile_seedance_request(provider_bound, requirement, *, capabilities, bindi
 
     native_prompt = None
     compiler_version = "1"
+    if requirement.target_shot.preserved_source_expression is not None:
+        from ai_video.production.seedance_source_expression import compile_preserved_seedance_source
+
+        native_prompt = compile_preserved_seedance_source(provider_bound, requirement,
+            continuity_expression=continuity_expression)
+        if binding is not None:
+            binding._exact_text()
+            if (not binding.source_preservation or binding.provider_bound_request_hash
+                    != provider_bound.provider_bound_request_hash
+                    or binding.prompt_text != native_prompt.prompt_text):
+                raise ValueError("Seedance binding differs from its approved preserved source")
+        return compile_provider_video_request(provider_bound=provider_bound, requirement=requirement,
+            compiler_id="seedance-video-compiler", compiler_version="3", capabilities=capabilities,
+            native_prompt=native_prompt, continuity_expression=continuity_expression)
     if binding is not None and binding.source_preservation and provider_bound.generation_recipe is None:
         raise ValueError("Seedance source preservation requires a sealed recipe")
     if provider_bound.generation_recipe is not None:

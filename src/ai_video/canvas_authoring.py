@@ -96,6 +96,8 @@ def author_canvas_project(*, packet, direction, registry=None, asset_artifacts=(
     pid = _safe_id(direction["project_id"])
     if previous is not None and previous.project.project_id != pid:
         raise ValueError("authoring revision cannot cross Project identity")
+    if registry is None and previous is not None:
+        registry = previous.registry
     source = direction_reference(packet, direction)
     provenance = (SourceReference(kind="imported", reference="canvas-source-snapshot",
         content_hash=packet["source_snapshot_sha256"]), source)
@@ -173,6 +175,9 @@ def author_canvas_project(*, packet, direction, registry=None, asset_artifacts=(
                 if {k: edge.get(k) for k in source_edge["planning_arguments"]} != source_edge["planning_arguments"]:
                     raise ValueError("director boundary differs from the source authoring")
         original = unit["source_text"]
+        from ai_video.canvas_source_expression import require_canvas_source_expression
+
+        require_canvas_source_expression(packet=packet, unit=unit, row=row, registry=registry)
         adapted = row["shot"]["intent"]
         reason = row.get("adaptation_reason", "")
         if original != adapted and (not isinstance(reason, str) or not reason.strip()):
@@ -194,8 +199,6 @@ def author_canvas_project(*, packet, direction, registry=None, asset_artifacts=(
         default_language=direction["language"], delivery_profile=profile,
         renderer_policy=RendererPolicy(), artifacts=ProjectArtifactRefs(brief=brief, story=story,
             characters=characters, scenes=scenes, storyboard=storyboard, shots=tuple(shots))))
-    if registry is None:
-        registry = previous.registry if previous is not None else None
     if registry is None:
         registry = AssetRegistrySnapshot(revision_id="0" * 64, content_hash="0" * 64, assets=())
         identity = registry_semantic_sha256(registry)

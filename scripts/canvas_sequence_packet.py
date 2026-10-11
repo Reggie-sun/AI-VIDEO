@@ -16,6 +16,7 @@ from ai_video.production.video_transition import (
     ContinuityObligation,
     require_causal_boundary,
 )
+from ai_video.canvas_subject import subject_material_references
 from scripts.canvas_reference_packet import _index, build_packet
 
 
@@ -54,7 +55,7 @@ def _occurrences(nodes: dict, selection: dict) -> tuple[list[dict], dict | None]
     return result, deepcopy(timeline)
 
 
-def _unit_source(node: dict, observed: dict | None) -> tuple[dict, str, object, list[dict]]:
+def _unit_source(node: dict, observed: dict | None, nodes: dict[str, dict]) -> tuple[dict, str, object, list[dict]]:
     if observed is not None:
         text = observed["prompt"]
         if hashlib.sha256(text.encode()).hexdigest() != observed["prompt_sha256"]:
@@ -66,21 +67,55 @@ def _unit_source(node: dict, observed: dict | None) -> tuple[dict, str, object, 
         raise ValueError("selected video lacks its generation draft")
     refs = draft["references"]
     slots = _index(refs, "slotId")
+    part_extensions = {
+        part.get("object_id"): part.get("extension_type")
+        for part in draft["parts"]
+        if isinstance(part, dict) and part.get("type") == "extension"
+    }
+    bound_references = {}
+    for slot_id, reference in slots.items():
+        node_id = reference.get("nodeId")
+        if reference.get("sourceInstanceId", node_id) != node_id:
+            raise ValueError("draft reference instance mismatch")
+        source = nodes.get(node_id)
+        if source is None:
+            raise ValueError("draft reference points to a missing node")
+        expected_type = "subject" if source.get("type") == "subject" else "node"
+        extension_type = reference.get("extensionType", expected_type)
+        prompt_extension_type = part_extensions.get(slot_id)
+        if prompt_extension_type is not None and prompt_extension_type != extension_type:
+            raise ValueError("prompt extension type does not match its reference extensionType")
+        if extension_type != expected_type:
+            raise ValueError("draft reference extensionType does not match its source node type")
+        if "type" in reference and reference.get("type") != "extension":
+            raise ValueError("draft reference is not an extension")
+        if expected_type == "node" and source.get("type") not in {"image", "video", "audio"}:
+            raise ValueError("draft reference node type is unsupported")
+        bound_references[slot_id] = reference
     text = []
     for part in draft["parts"]:
         if part["type"] == "text":
             text.append(part["text"])
-        elif (part["type"] == "extension" and part.get("extension_type") == "node"
-              and part["object_id"] in slots):
+        elif part["type"] == "extension" and part.get("extension_type") in {"node", "subject"}:
+            reference = bound_references.get(part.get("object_id"))
+            if reference is None:
+                raise ValueError("unbound prompt reference slot")
             text.append("\n")
         else:
             raise ValueError("unsupported or unbound prompt part")
+    prepared_references = []
     for ref in refs:
-        if ref.get("sourceInstanceId", ref["nodeId"]) != ref["nodeId"]:
-            raise ValueError("draft reference instance mismatch")
-    return (deepcopy(draft), "".join(text), deepcopy(draft["contentSettings"]),
-            [{"slot_id": r["slotId"], "node_id": r["nodeId"],
-              "canvas_role": r.get("role")} for r in refs])
+        source = nodes[ref["nodeId"]]
+        prepared = {"slot_id": ref["slotId"], "node_id": ref["nodeId"],
+                    "canvas_role": ref.get("role")}
+        if source.get("type") == "subject":
+            prepared.update(
+                kind="subject", extension_type="subject", semantic_role="identity",
+                material_references=subject_material_references(source),
+                provenance=deepcopy(source.get("data", {}).get("provenance")),
+            )
+        prepared_references.append(prepared)
+    return (deepcopy(draft), "".join(text), deepcopy(draft["contentSettings"]), prepared_references)
 
 
 def _boundary(source: dict, target: dict, authored: dict | None) -> dict:
@@ -185,7 +220,7 @@ Original ticks are retained without inferring a timebase or rendering a timeline
         node = nodes[occurrence["node_id"]]
         if node["type"] != "video":
             raise ValueError("sequence must select video nodes")
-        prompt, text, parameters, references = _unit_source(node, observed.get(node["id"]))
+        prompt, text, parameters, references = _unit_source(node, observed.get(node["id"]), nodes)
         if not text.strip():
             raise ValueError("empty video prompt")
         _index(references, "slot_id")
@@ -197,6 +232,15 @@ Original ticks are retained without inferring a timebase or rendering a timeline
             raise ValueError("reference edges and material bindings differ")
         for ref in references:
             asset = nodes[ref["node_id"]]
+            if asset["type"] == "subject":
+                expected_materials = subject_material_references(asset)
+                if (ref.get("kind") != "subject" or ref.get("extension_type") != "subject"
+                        or ref.get("semantic_role") != "identity"
+                        or ref.get("material_references") != expected_materials
+                        or ref.get("provenance") != asset.get("data", {}).get("provenance")):
+                    raise ValueError("subject reference identity mismatch")
+                assets[asset["id"]] = deepcopy(asset)
+                continue
             resource_id = asset["data"]["resourceId"]
             if (not isinstance(resource_id, str) or not resource_id
                     or asset["type"] not in {"image", "video", "audio"}

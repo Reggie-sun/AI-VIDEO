@@ -225,9 +225,11 @@ class GenerationEvaluationSource(StrictModel):
 
 
 def _validate_marked_source(source, acceptance, requirement=None):
+    from ai_video.production._causal_state_expression import has_current_close_facts
+
     rules = validate_semantic_inventory(acceptance.profile_payload, acceptance.required_requirement_ids)
     marked = bool(rules)
-    if (requirement is not None and requirement.generation_intent.close_causal_facts is not None
+    if (requirement is not None and has_current_close_facts(requirement)
             and not marked):
         raise ValueError("authored causal close requires semantic preimage presentation")
     if marked != (source.schema_version == "generation-evaluation/2"):

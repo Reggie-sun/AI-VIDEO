@@ -145,6 +145,10 @@ from ai_video.production.video_artifact import (
     VideoProvenanceReceipt,
 )
 from ai_video.production.video_generation import VideoGenerationService
+from ai_video.production.video_contracts import (
+    VideoFlexibleOutputRequirement,
+    VideoOutputCapability,
+)
 from ai_video.production.project import load_production_project
 from production_project_factory import (
     _p7_png,
@@ -380,6 +384,8 @@ def _runtime(
     commercial_plan_hash: str = "a" * 64,
     status_events: tuple[VideoTaskState | str, ...] | None = None,
     activate_shot: bool = True,
+    flexible_output: bool = False,
+    provider_factory=NativeFixtureVideoProvider,
 ):
     inputs = make_p8_video_generation_base(
         root,
@@ -475,6 +481,21 @@ def _runtime(
         mime_type="video/mp4",
         native_audio=False,
     )
+    output_capability = None
+    if flexible_output:
+        output = VideoFlexibleOutputRequirement(
+            **output.model_dump(mode="json"),
+            timing_mode="exact_seconds", dimension_mode="exact",
+            resolution_label="64p", ratio="1:1",
+        )
+        output_capability = VideoOutputCapability(
+            min_duration_seconds=1, max_duration_seconds=1,
+            provider_selected_duration=False, timing_modes=("exact_seconds",),
+            dimension_modes=("exact",), min_width=64, max_width=64,
+            min_height=64, max_height=64, dimension_multiple=1,
+            resolution_labels=("64p",), ratios=("1:1",), fps_values=(24,),
+            containers=("mp4",), native_audio_options=(False,),
+        )
     inputs = activate_fixture_generation_qa_policy(root=root, inputs=inputs, output=output)
     loaded = inputs.project
     shot = loaded.shots[0]
@@ -596,7 +617,8 @@ def _runtime(
         execution_kind=VideoExecutionKind.REMOTE,
         billing_kind=BillingKind.METERED,
         mode=VideoGenerationMode.IMAGE_TO_VIDEO,
-        output=output,
+        output=None if flexible_output else output,
+        output_capability=output_capability,
         allowed_image_roles=("first_frame",),
         required_first_frame=True,
         max_reference_count=0,
@@ -613,7 +635,7 @@ def _runtime(
             VideoOutputRecoveryStrategy.REQUERY_BY_EFFECT_ID
         ),
     )
-    provider = NativeFixtureVideoProvider(
+    provider = provider_factory(
         native_prompt_text="A sealed one-second archive-room push-in.",
         compiler_id="generated-video-e2e-fixture",
         capabilities=VideoProviderCapabilities.create(

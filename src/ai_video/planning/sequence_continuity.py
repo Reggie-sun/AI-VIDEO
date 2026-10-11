@@ -146,7 +146,14 @@ def build_sequence_video_planning_request(
         changes = tuple(sorted((CausalStateChange.model_validate(c.model_dump(mode="python"))
                                 for c in causal_state_changes), key=lambda c: c.dimension.value))
         intent = current_request.generation_intent
-        require_causal_columns(changes, source_requirement.generation_intent, intent.generation_intent)
+        source_expression = source_requirement.target_shot.preserved_source_expression
+        target_expression = target.preserved_source_expression
+        partial = source_expression is not None and target_expression is not None
+        if partial and (continuity_obligation is not ContinuityObligation.IDENTITY_STYLE_CARRYOVER
+                        or causal_edge_semantics is not CausalEdgeSemantics.CAUSAL_ELLIPSIS):
+            raise ValueError("source-grounded expressions require identity/style narrative cuts")
+        require_causal_columns(changes, source_requirement.generation_intent, intent.generation_intent,
+            partial=partial, source_expression=source_expression, target_expression=target_expression)
         if continuity_obligation is ContinuityObligation.FULL_CONTINUITY:
             carries = {c.dimension.value for c in changes if c.transition_mode is CausalTransitionMode.CARRY}
             if not carries <= set(required_carryover_dimensions) or terminal is None:
@@ -190,7 +197,7 @@ def build_sequence_video_planning_request(
             if first.source_kind != "registered_asset" or first.source_identity != expected_first:
                 raise ValueError("FULL first-frame anchor requires exact materialized conditioning")
         policy = ContinuityTransitionPolicy.create(
-            schema_version="2", policy_id=f"sequence-{previous.shot_id}-{target.shot_id}",
+            schema_version="3" if partial else "2", policy_id=f"sequence-{previous.shot_id}-{target.shot_id}",
             project=loaded.manifest.active_project, registry=loaded.manifest.active_registry,
             source_shot=source_shot, target_shot=_identity(target), boundary_kind=boundary_kind,
             continuity_obligation=continuity_obligation, take_id=take_id,

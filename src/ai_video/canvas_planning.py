@@ -60,11 +60,19 @@ def canvas_feedback_context(*, loaded, row, policy, execution_stack=None, handof
     if authored.get("close_causal_facts") is not None:
         authored.setdefault("close_state", {"kind": "typed_hash",
             "state_hash": canonical_sha256(authored["close_causal_facts"])})
+    if shot.preserved_source_expression is not None:
+        from ai_video.production.seedance_source_expression import source_state_facts
+
+        closing = source_state_facts(shot.preserved_source_expression, "closing")
+        if closing:
+            authored.setdefault("close_state", {"kind": "typed_hash",
+                "state_hash": canonical_sha256({d.value: fact for d, fact in closing.items()})})
     edge = row.get("boundary")
     if edge is not None and edge.get("independent") is not True:
         changes = tuple(CausalStateChange.model_validate(c) for c in edge["causal_state_changes"])
         authored.setdefault("open_state", {"kind": "typed_hash",
-            "state_hash": causal_state_column_hash(changes, endpoint="target_open")})
+            "state_hash": causal_state_column_hash(changes, endpoint="target_open",
+                complete=shot.preserved_source_expression is None)})
     generation["generation_intent"] = authored
     if set(evidence) & {"target_shot_id", "target_shot_content_hash"}:
         raise ValueError("intent evidence identities are computed from the selected Shot")
@@ -118,6 +126,9 @@ def canvas_feedback_context(*, loaded, row, policy, execution_stack=None, handof
     generation.setdefault("output_need", {"duration_seconds": shot.duration_policy.seconds,
         "width": loaded.project.delivery_profile.width, "height": loaded.project.delivery_profile.height,
         "fps": loaded.project.delivery_profile.fps, "container_mime": "video/mp4"})
+    generation["output_need"] = dict(generation["output_need"])
+    if shot.preserved_source_expression is not None:
+        generation["output_need"].setdefault("timing_mode", "content_driven")
     generation.setdefault("semantic_reference_roles", tuple(sorted({_ROLES[a.role] for a in selected},
                                                                    key=lambda r: r.value)))
     fields = ProviderNeutralGenerationIntentProjection.model_fields
@@ -157,7 +168,8 @@ def canvas_feedback_context(*, loaded, row, policy, execution_stack=None, handof
         source, _, _, _, _ = accepted_sequence_source(loaded, previous,
             require_causal_close=obligation is ContinuityObligation.FULL_CONTINUITY)
         supplemental = handoff_preparer(loaded, row, source, lifecycle) if handoff_preparer else {}
-        if set(supplemental) - {"lifecycle", "anchors", "current_request"}:
+        if set(supplemental) - {"lifecycle", "anchors", "current_request", "destination_execution_stack",
+                               "destination_route", "destination_selection_binding"}:
             raise ValueError("handoff preparer cannot override sequence identities or semantics")
         lifecycle = supplemental.get("lifecycle", lifecycle)
         neutral = supplemental.get("current_request", neutral)
@@ -172,6 +184,9 @@ def canvas_feedback_context(*, loaded, row, policy, execution_stack=None, handof
             causal_state_changes=tuple(CausalStateChange.model_validate(c) for c in edge["causal_state_changes"]),
             required_carryover_dimensions=tuple(edge["required_carryover_dimensions"]),
             anchors=tuple(supplemental.get("anchors", ())), source_execution_stack=execution_stack,
+            destination_execution_stack=supplemental.get("destination_execution_stack"),
+            destination_route=supplemental.get("destination_route"),
+            destination_selection_binding=supplemental.get("destination_selection_binding"),
             lifecycle=lifecycle, take_id=edge.get("take_id"))
         # Materialized C2/C4 conditioning may change actual selected assets.
         # Rebuild the Router projection from that verified request, not stale
@@ -218,5 +233,7 @@ def canvas_feedback_context(*, loaded, row, policy, execution_stack=None, handof
         motion_requirement=projection.requirement.motion_requirement.value,
         continuity_mode=projection.requirement.continuity_mode.value, semantic_continuity_state=None,
         allowed_visual_strategies=(shot.visual_strategy,), allowed_generation_modes=tuple(VideoGenerationMode))
-    return require_feedback_context(loaded=loaded, planning_request=neutral, video_plan=plan,
+    current = require_feedback_context(loaded=loaded, planning_request=neutral, video_plan=plan,
         context=context, routing_policy=policy, lifecycle=lifecycle, continuity_routing=routing)
+    current["planning_request"] = neutral
+    return current

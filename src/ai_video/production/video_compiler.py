@@ -328,6 +328,33 @@ def compile_video_generation_request(
     )
 
 
+def _compile_image_bindings(provider_bound):
+    """Project exact image metadata in the common compiler's native order."""
+    return tuple(sorted((VideoImageReferenceBinding(
+        role=role, asset_id=asset.asset_id, asset_sha256=asset.asset_sha256,
+        mime_type=asset.mime_type, width=_required_measurement(asset.width, "width"),
+        height=_required_measurement(asset.height, "height"), size_bytes=asset.size_bytes,
+    ) for role, asset in zip(provider_bound.binding_roles, provider_bound.input_assets, strict=True)
+        if role in {"first_frame", "last_frame", "reference"}),
+        key=lambda item: (_ROLE_ORDER[item.role], item.asset_id)))
+
+
+def _native_recipe_expression_errors(provider_bound, requirement, native_prompt):
+    """Reopen the same recipe coverage at compile and execution boundaries."""
+    from ai_video.production.voice_routing import voice_expression_recipe
+
+    expression_recipe = voice_expression_recipe(provider_bound.generation_recipe, requirement, provider_bound.voice_route)
+    for endpoint in ("open_state", "close_state"):
+        if f"generation_intent.{endpoint}.state_hash" not in native_prompt.expressed_control_paths:
+            continue
+        state_hash = getattr(requirement.generation_intent, endpoint).state_hash
+        expression_recipe = expression_recipe.model_copy(update={"expressions": tuple(
+            item.model_copy(update={"native_text": tuple(text for text in item.native_text if text != state_hash)})
+            if f"generation_intent.{endpoint}.state_hash" in item.intent_paths else item
+            for item in expression_recipe.expressions)})
+    return expression_errors(expression_recipe, requirement, native_prompt.prompt_text, native_prompt.expressed_control_paths)
+
+
 def compile_provider_video_request(
     *,
     provider_bound: ProviderBoundVideoRequest,
@@ -374,8 +401,23 @@ def compile_provider_video_request(
             ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH,
             ("requirement_hash",),
         )
-    from ai_video.production.voice_routing import validate_voice_compilation, voice_expression_recipe
+    from ai_video.production.voice_routing import validate_voice_compilation
 
+    preserved_source = requirement.target_shot.preserved_source_expression is not None
+    if preserved_source or native_prompt is not None and native_prompt.grammar_contract == "seedance-preserved-source-v1":
+        from ai_video.production.seedance_source_expression import compile_preserved_seedance_source
+
+        try:
+            if (not preserved_source or compiler_id != "seedance-video-compiler" or compiler_version != "3"):
+                raise ValueError("preserved source needs its exact selected compiler")
+            expected = compile_preserved_seedance_source(provider_bound, requirement,
+                continuity_expression=continuity_expression)
+            if native_prompt != expected:
+                raise ValueError("native source differs from exact approved recompile")
+        except (AttributeError, TypeError, ValueError):
+            return _unsupported(provider_bound, requirement,
+                ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+                ("target_shot.preserved_source_expression",))
     hash_endpoints = tuple(endpoint for endpoint in ("open_state", "close_state")
         if getattr(requirement.generation_intent, endpoint).kind.value == "typed_hash")
     if native_prompt is not None and any(getattr(requirement.generation_intent, endpoint).state_hash
@@ -386,7 +428,7 @@ def compile_provider_video_request(
     expressed_hash_endpoints = tuple(endpoint for endpoint in hash_endpoints
         if endpoint == "close_state" or native_prompt is not None
         and f"generation_intent.{endpoint}.state_hash" in native_prompt.expressed_control_paths)
-    if expressed_hash_endpoints:
+    if expressed_hash_endpoints and not preserved_source:
         from ai_video.production._causal_state_expression import causal_endpoint_text
 
         try:
@@ -403,7 +445,7 @@ def compile_provider_video_request(
         return _unsupported(provider_bound, requirement,
             ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
             ("generation_intent.subject_action.endpoint",))
-    if hash_endpoints and (native_prompt is None
+    if hash_endpoints and not preserved_source and (native_prompt is None
             or requirement.contract_version == "provider-neutral-video-requirement/4"
             or native_prompt is not None and native_prompt.grammar_contract
                 in {"remote-video-prose-v1", "h3-three-field-v1"}):
@@ -604,28 +646,7 @@ def compile_provider_video_request(
             unsupported_quality,
         )
 
-    bindings = tuple(
-        sorted(
-            (
-                VideoImageReferenceBinding(
-                    role=role,
-                    asset_id=asset.asset_id,
-                    asset_sha256=asset.asset_sha256,
-                    mime_type=asset.mime_type,
-                    width=_required_measurement(asset.width, "width"),
-                    height=_required_measurement(asset.height, "height"),
-                    size_bytes=asset.size_bytes,
-                )
-                for role, asset in zip(
-                    provider_bound.binding_roles,
-                    provider_bound.input_assets,
-                    strict=True,
-                )
-                if role in {"first_frame", "last_frame", "reference"}
-            ),
-            key=lambda item: (_ROLE_ORDER[item.role], item.asset_id),
-        )
-    )
+    bindings = _compile_image_bindings(provider_bound)
     media_bindings = tuple(
         sorted(
             (
@@ -666,19 +687,7 @@ def compile_provider_video_request(
             return _unsupported(provider_bound, requirement,
                                 ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
                                 ("generation_recipe.native_expression",))
-        expression_recipe = voice_expression_recipe(recipe, requirement, provider_bound.voice_route)
-        for endpoint in hash_endpoints:
-            if f"generation_intent.{endpoint}.state_hash" not in native_prompt.expressed_control_paths:
-                continue
-            # The verified native projection above covers this seal through
-            # facts. Its digest remains in the persisted recipe/QA contract,
-            # but is never a lexical narrative obligation.
-            state_hash = getattr(requirement.generation_intent, endpoint).state_hash
-            expression_recipe = expression_recipe.model_copy(update={"expressions": tuple(
-                item.model_copy(update={"native_text": tuple(text for text in item.native_text
-                    if text != state_hash)}) if f"generation_intent.{endpoint}.state_hash" in item.intent_paths
-                else item for item in expression_recipe.expressions)})
-        missing = expression_errors(expression_recipe, requirement, prompt, native_prompt.expressed_control_paths)
+        missing = _native_recipe_expression_errors(provider_bound, requirement, native_prompt)
         if missing:
             return _unsupported(provider_bound, requirement,
                                 ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,

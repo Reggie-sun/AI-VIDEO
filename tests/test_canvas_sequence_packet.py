@@ -101,6 +101,69 @@ def test_existing_rich_packet_uses_identity_not_chip_order():
     assert unit["prompt_source"]["document"] == composers["results"][0]["document"]
 
 
+def test_subject_slot_keeps_grouped_material_references_and_original_asset_node():
+    source = document()
+    subject = {"id": "character", "type": "subject", "data": {
+        "title": "Character",
+        "main": {"refType": "resource_snapshot", "resourceId": "character-main"},
+        "auxiliaries": [{"refType": "resource_snapshot", "resourceId": "character-aux"}],
+        "provenance": {"origin_subject_id": "source-character"},
+    }}
+    source["nodes"].append(subject)
+    source["edges"].extend([
+        {"id": "character-a", "source": "character", "target": "a", "type": "reference"},
+        {"id": "character-b", "source": "character", "target": "b", "type": "reference"},
+    ])
+    for node in source["nodes"]:
+        if node.get("id") not in {"a", "b"}:
+            continue
+        draft = node["data"]["generationDraft"]
+        draft["parts"].append({"type": "text", "text": " 主角："})
+        draft["parts"].append({"type": "extension", "extension_type": "subject", "object_id": "character-slot"})
+        draft["references"].append({"slotId": "character-slot", "nodeId": "character",
+                                     "sourceInstanceId": "character", "type": "extension",
+                                     "extensionType": "subject", "role": "reference"})
+
+    result = build_sequence_packet(source, {"node_ids": ["a", "b"]})
+    reference = result["units"][0]["references"][-1]
+
+    assert reference == {
+        "slot_id": "character-slot", "node_id": "character", "canvas_role": "reference",
+        "kind": "subject", "extension_type": "subject", "semantic_role": "identity",
+        "material_references": {
+            "main": {"ref_type": "resource_snapshot", "resource_id": "character-main"},
+            "auxiliaries": [{"index": 0, "ref_type": "resource_snapshot", "resource_id": "character-aux"}],
+        },
+        "provenance": {"origin_subject_id": "source-character"},
+    }
+    assert result["units"][0]["source_text"].endswith(" 主角：\n")
+    assert next(asset for asset in result["assets"] if asset["id"] == "character") == subject
+
+
+@pytest.mark.parametrize("damage", ["snapshot", "extension_type", "node_type"])
+def test_subject_reference_malformed_inputs_are_rejected(damage):
+    source = document()
+    subject = {"id": "character", "type": "subject", "data": {
+        "main": {"refType": "resource_snapshot", "resourceId": "character-main"}}}
+    source["nodes"].append(subject)
+    source["edges"].append({"id": "character-a", "source": "character", "target": "a", "type": "reference"})
+    draft = source["nodes"][2]["data"]["generationDraft"]
+    draft["parts"].append({"type": "extension", "extension_type": "subject", "object_id": "character-slot"})
+    draft["references"].append({"slotId": "character-slot", "nodeId": "character",
+                                 "sourceInstanceId": "character", "type": "extension",
+                                 "extensionType": "subject", "role": "reference"})
+    if damage == "snapshot":
+        subject["data"]["main"]["refType"] = "upload"
+    elif damage == "extension_type":
+        draft["references"][-1]["extensionType"] = "node"
+    else:
+        draft["references"][-1]["nodeId"] = "room"
+        draft["references"][-1]["sourceInstanceId"] = "room"
+
+    with pytest.raises(ValueError):
+        build_sequence_packet(source, {"node_ids": ["a"]})
+
+
 def test_full_continuity_requires_all_causal_dimensions():
     edge = boundary()
     edge["continuity_obligation"] = "full_continuity"

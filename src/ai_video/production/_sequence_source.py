@@ -19,13 +19,16 @@ from ai_video.production.video_transition import (
 
 def causal_state_column_hash(
     changes: tuple[CausalStateChange, ...], *, endpoint: Literal["source_close", "target_open"],
+    complete: bool = True,
 ) -> str:
     """Seal an explicit complete column in the existing TypedStateReference."""
     if endpoint not in {"source_close", "target_open"}:
         raise ValueError("unknown causal endpoint")
-    if (len(changes) != len(CausalDimension)
+    if complete and (len(changes) != len(CausalDimension)
             or {item.dimension for item in changes} != set(CausalDimension)):
         raise ValueError("complete causal declaration requires every dimension exactly once")
+    if not changes or len({item.dimension for item in changes}) != len(changes):
+        raise ValueError("causal declaration requires nonempty unique dimensions")
     if any(not getattr(item, endpoint).strip() or getattr(item, endpoint) == "unspecified"
            for item in changes):
         raise ValueError("complete causal declaration cannot contain unresolved values")
@@ -93,9 +96,18 @@ def accepted_sequence_source(loaded, source, *, require_causal_close=False):
     return binding, request, terminal, tuple(sorted(accepted)), attempt.candidate_registry
 
 
-def require_causal_columns(changes, source_intent, target_intent):
-    source_column = causal_state_column_hash(changes, endpoint="source_close")
-    target_column = causal_state_column_hash(changes, endpoint="target_open")
+def require_causal_columns(changes, source_intent, target_intent, *, partial=False,
+                           source_expression=None, target_expression=None):
+    if partial:
+        from ai_video.production.seedance_source_expression import source_state_facts
+
+        if source_expression is None or target_expression is None:
+            raise ValueError("source-grounded cut requires both approved expressions")
+        if (source_state_facts(source_expression, "closing") != {c.dimension: c.source_close for c in changes}
+                or source_state_facts(target_expression, "opening") != {c.dimension: c.target_open for c in changes}):
+            raise ValueError("source-grounded columns differ from approved source facts")
+    source_column = causal_state_column_hash(changes, endpoint="source_close", complete=not partial)
+    target_column = causal_state_column_hash(changes, endpoint="target_open", complete=not partial)
     close, opening = source_intent.close_state, target_intent.open_state
     if (close.kind is not ContinuityStateKind.TYPED_HASH or close.state_hash != source_column
             or opening.kind is not ContinuityStateKind.TYPED_HASH or opening.state_hash != target_column):
@@ -186,7 +198,10 @@ def require_sequence_source(*, loaded, routing, requirement, lifecycle, provider
                 changes=policy.causal_state_changes):
             raise ValueError("sequence authoring evidence seal has a stale planning seed")
     require_causal_columns(policy.causal_state_changes,
-        binding.projection.requirement.generation_intent, requirement.generation_intent)
+        binding.projection.requirement.generation_intent, requirement.generation_intent,
+        partial=policy.schema_version == "3",
+        source_expression=binding.projection.requirement.target_shot.preserved_source_expression,
+        target_expression=requirement.target_shot.preserved_source_expression)
     if loaded.qa_policy is None or policy.qa_policy_hash != loaded.qa_policy.content_hash:
         raise ValueError("sequence QA policy is stale")
     if provider_bound is not None:
@@ -224,7 +239,7 @@ def build_verified_causal_opening_expression(*, loaded, routing, requirement, pr
     route = ProviderRouteIdentity.create(**{name: getattr(bound, name) for name in (
         "provider_name", "provider_kind", "model_id", "provider_profile", "capability_id",
         "capability_fingerprint", "execution_kind", "billing_kind", "compiler_contract")})
-    if (policy.schema_version != "2" or bound.requirement_hash != requirement.requirement_hash
+    if (policy.schema_version not in {"2", "3"} or bound.requirement_hash != requirement.requirement_hash
             or (bound.target_shot_id, bound.target_shot_revision, bound.target_shot_content_hash)
             != (requirement.target_shot.shot_id, requirement.target_shot.revision, requirement.target_shot.content_hash)
             or route != routing.destination_route
@@ -239,8 +254,15 @@ def build_verified_causal_opening_expression(*, loaded, routing, requirement, pr
 
 def compile_with_sequence_expression(provider, provider_bound, requirement, *, loaded=None, routing=None):
     """Keep legacy calls intact; native grammars share the sequence-issued facts."""
+    preserved = requirement.target_shot.preserved_source_expression is not None
+    if preserved and requirement.generation_intent.open_state.kind is ContinuityStateKind.TYPED_HASH and routing is None:
+        if loaded is None:
+            raise ValueError("source selection expression requires the current sequence project")
+        expression = build_verified_source_selection_expression(loaded=loaded, requirement=requirement,
+            provider_bound=provider_bound)
+        return provider.compile_request(provider_bound, requirement, continuity_expression=expression)
     if (getattr(provider, "causal_expression_grammar", None) not in {"remote-video-prose-v1", "h3-three-field-v1"}
-            or requirement.contract_version != "provider-neutral-video-requirement/4"
+            or (requirement.contract_version != "provider-neutral-video-requirement/4" and not preserved)
             or requirement.generation_intent.open_state.kind is not ContinuityStateKind.TYPED_HASH
             or routing is None):
         return provider.compile_request(provider_bound, requirement)
@@ -249,3 +271,46 @@ def compile_with_sequence_expression(provider, provider_bound, requirement, *, l
     evidence = build_verified_causal_opening_expression(loaded=loaded, routing=routing,
         requirement=requirement, provider_bound=provider_bound)
     return provider.compile_request(provider_bound, requirement, continuity_expression=evidence)
+
+
+def build_verified_source_selection_expression(*, loaded, requirement, provider_bound):
+    """Reopen static identity carries for the prior, non-executable Router seed."""
+    from ai_video.production.project import load_production_project
+    from ai_video.production.seedance_source_expression import source_state_facts
+    from ai_video.production._causal_prompt_context import _issue_source_selection_expression
+    from ai_video.production._shot_router_contracts import ProviderBoundVideoRequest
+    from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
+
+    loaded = load_production_project(loaded.root / "project.yaml")
+    requirement = ProviderNeutralVideoRequirement.model_validate(requirement.model_dump(mode="python"))
+    bound = ProviderBoundVideoRequest.model_validate(provider_bound.model_dump(mode="python"))
+    target = next((s for s in loaded.shots if s == requirement.target_shot), None)
+    if (target is None or target.preserved_source_expression is None
+            or bound.requirement_hash != requirement.requirement_hash
+            or bound.lifecycle.base_project != loaded.manifest.active_project
+            or bound.lifecycle.base_registry != loaded.manifest.active_registry
+            or bound.lifecycle.base_dependency_graph != loaded.manifest.active_dependency_graph):
+        raise ValueError("source selection target/snapshot is stale")
+    order = tuple(i for beat in loaded.storyboard.beats for i in beat.shot_ids)
+    index = order.index(target.shot_id)
+    if index == 0:
+        raise ValueError("source selection requires an adjacent accepted predecessor")
+    previous = next(s for s in loaded.shots if s.shot_id == order[index - 1])
+    source, _, _, accepted, _ = accepted_sequence_source(loaded, previous, require_causal_close=True)
+    expression = source.projection.requirement.target_shot.preserved_source_expression
+    if expression is None:
+        raise ValueError("source selection requires an approved source-grounded predecessor")
+    closing = source_state_facts(expression, "closing")
+    opening = source_state_facts(target.preserved_source_expression, "opening")
+    if (not opening or closing != opening or not set(opening) <= {
+            CausalDimension.PROP_IDENTITY, CausalDimension.CHARACTER_PRESENCE}):
+        raise ValueError("source selection only supports exact static identity carries")
+    changes = tuple(CausalStateChange(dimension=d, source_close=fact, target_open=fact,
+        transition_mode=CausalTransitionMode.CARRY) for d, fact in sorted(opening.items(), key=lambda x: x[0].value))
+    require_causal_columns(changes, source.projection.requirement.generation_intent,
+        requirement.generation_intent, partial=True, source_expression=expression,
+        target_expression=target.preserved_source_expression)
+    return _issue_source_selection_expression(requirement=requirement, provider_bound=bound,
+        source_intent=source.projection.requirement.generation_intent, changes=changes,
+        evidence_hash=canonical_sha256({"source_binding": source.binding_hash,
+            "accepted_media": accepted, "target": target.content_hash, "bound": bound.provider_bound_request_hash}))

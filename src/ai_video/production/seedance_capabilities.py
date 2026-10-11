@@ -362,6 +362,8 @@ def _output_capability(model_id: str, mode: VideoGenerationMode) -> VideoOutputC
             if model_id == "doubao-seedance-2-0-mini-260615"
             else "exact_seconds"
         )
+        if model_id == "doubao-seedance-2-0-fast-260128":
+            timing_modes.append("nominal_seconds")
     if spec.provider_selected_duration:
         timing_modes.append("provider_selected")
     if spec.frame_contract is not None:
@@ -600,7 +602,8 @@ def validate_seedance_capability_subset(
     """Validate that ``entries`` form a non-empty subset of official capabilities.
 
     Each (model_id, mode) pair must map to an official catalog entry. Exact
-    equality is required for each variant and its output rasters, and every
+    equality is required for each variant and its output rasters, except for
+    historical Fast 2.0 exact-only timing profiles, and every
     selected model must retain its complete official mode set. Provider execution
     fields and an ``ep-*`` endpoint binding remain governed by
     :class:`SeedanceCapabilityProfile`. Duplicates and unknown pairs are rejected.
@@ -641,9 +644,26 @@ def validate_seedance_capability_subset(
             raise ValueError(
                 "Selected Seedance capability must bind an official Model ID and mode"
             )
+        comparable_variant = entry.variant
+        output = entry.variant.output_capability
+        official_output = official.variant.output_capability
+        if (
+            entry.variant.model_id == "doubao-seedance-2-0-fast-260128"
+            and output is not None
+            and official_output is not None
+            and output.timing_modes == tuple(
+                mode for mode in official_output.timing_modes
+                if mode != "nominal_seconds"
+            )
+        ):
+            comparable_variant = entry.variant.model_copy(
+                update={"output_capability": output.model_copy(
+                    update={"timing_modes": official_output.timing_modes}
+                )}
+            )
         legacy_recovery_compatible = (
-            entry.variant.output_recovery_strategy is None
-            and entry.variant.model_copy(
+            comparable_variant.output_recovery_strategy is None
+            and comparable_variant.model_copy(
                 update={
                     "output_recovery_strategy": (
                         official.variant.output_recovery_strategy
@@ -652,7 +672,7 @@ def validate_seedance_capability_subset(
             )
             == official.variant
         )
-        if entry.variant != official.variant and not legacy_recovery_compatible:
+        if comparable_variant != official.variant and not legacy_recovery_compatible:
             raise ValueError(
                 "Selected Seedance capability must remain variant-exact to the official matrix"
             )

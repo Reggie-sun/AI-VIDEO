@@ -4597,6 +4597,56 @@ def _active_profile(model_id: str) -> SeedanceProviderProfile:
     )
 
 
+def test_fast_nominal_timing_keeps_duration_payload_bounds_and_historical_profiles():
+    model_id = "doubao-seedance-2-0-fast-260128"
+    profile = _active_profile(model_id)
+    transport = _FakeTransport()
+    provider = SeedanceVideoProvider(profile=profile, transport=transport,
+        credential=lambda: pytest.fail("timing selection must not read credentials"),
+        input_reference=_provider_asset_reference, now=lambda: FIXED_NOW)
+    exact = VideoFlexibleOutputRequirement(timing_mode="exact_seconds", duration_seconds=15,
+        dimension_mode="exact", width=864, height=496, resolution_label="480p", ratio="16:9",
+        fps=24, container="mp4", mime_type="video/mp4", native_audio=True)
+    nominal = exact.model_copy(update={"timing_mode": "nominal_seconds"})
+    resolved_exact = provider.resolve(_request(profile, model_id=model_id, output=exact))
+    resolved_nominal = provider.resolve(_request(profile, model_id=model_id, output=nominal))
+    assert provider._payload(resolved_nominal) == provider._payload(resolved_exact)
+    assert provider._payload(resolved_nominal)["duration"] == 15
+    assert resolved_nominal.effective_output.matches_timing_measurement(
+        duration_milliseconds=15042, frame_count=361)
+    assert not resolved_nominal.effective_output.matches_timing_measurement(
+        duration_milliseconds=15125, frame_count=363)
+    assert resolved_exact.resolved_generation_hash != resolved_nominal.resolved_generation_hash
+
+    historical = profile.model_dump(mode="json")
+    for entry in historical["capabilities"]:
+        output = entry["variant"]["output_capability"]
+        output["timing_modes"] = [mode for mode in output["timing_modes"] if mode != "nominal_seconds"]
+    historical["profile_sha256"] = canonical_sha256(
+        {key: value for key, value in historical.items() if key != "profile_sha256"})
+    reopened = SeedanceProviderProfile.model_validate(historical)
+    assert reopened.model_dump(mode="json") == historical
+    for changed_output in (
+        {"max_duration_seconds": 16},
+        {"fps_values": [30]},
+        {"timing_modes": ["exact_seconds"]},
+    ):
+        tampered = json.loads(json.dumps(historical))
+        tampered["capabilities"][0]["variant"]["output_capability"].update(changed_output)
+        tampered["profile_sha256"] = canonical_sha256(
+            {key: value for key, value in tampered.items() if key != "profile_sha256"})
+        with pytest.raises(ValidationError):
+            SeedanceProviderProfile.model_validate(tampered)
+    old_provider = SeedanceVideoProvider(profile=reopened, transport=transport,
+        credential=lambda: pytest.fail("historical reopen must not read credentials"),
+        input_reference=_provider_asset_reference, now=lambda: FIXED_NOW)
+    old_provider.resolve(_request(reopened, model_id=model_id, output=exact))
+    with pytest.raises(AiVideoError) as error:
+        old_provider.resolve(_request(reopened, model_id=model_id, output=nominal))
+    assert error.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+    assert transport.requests == []
+
+
 def test_select_seedance_capabilities_returns_official_base_subset_byte_exact():
     from ai_video.production.seedance_capabilities import (
         default_seedance_capabilities,

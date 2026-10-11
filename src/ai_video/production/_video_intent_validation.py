@@ -267,12 +267,12 @@ def validate_causal_transition_readiness(
         return ("continuity_transition_policy.policy_hash",)
     diagnostics: list[str] = []
     if (
-        policy.schema_version != "2"
+        policy.schema_version not in {"2", "3"}
         and requirement.contract_version == "provider-neutral-video-requirement/4"
         and requirement.continuity_mode is not ContinuityMode.NONE
     ):
         diagnostics.append("continuity_transition_policy.schema_version")
-    if policy.schema_version == "2":
+    if policy.schema_version in {"2", "3"}:
         if previous_shot_state is None:
             if policy.continuity_obligation is not ContinuityObligation.SUBSTANTIAL_RESET:
                 diagnostics.append("current_request.previous_shot_state")
@@ -348,7 +348,22 @@ def validate_causal_transition_intent(
         )
 
     changes = {item.dimension: item for item in policy.causal_state_changes}
-    for dimension in CausalDimension:
+    required_dimensions = CausalDimension
+    if policy.schema_version == "3":
+        from ai_video.production.seedance_source_expression import source_state_facts
+        from ai_video.production.hashing import canonical_sha256
+
+        expression = requirement.target_shot.preserved_source_expression
+        if expression is None:
+            diagnostics.append("target_shot.preserved_source_expression")
+        else:
+            facts = source_state_facts(expression, "opening")
+            if (not facts or facts != {d: c.target_open for d, c in changes.items()}
+                    or requirement.generation_intent.open_state.state_hash
+                    != canonical_sha256({d.value: fact for d, fact in facts.items()})):
+                diagnostics.append("continuity_transition_policy.causal_state_changes")
+        required_dimensions = ()
+    for dimension in required_dimensions:
         if dimension not in changes:
             diagnostics.append(
                 f"continuity_transition_policy.causal_state_changes.{dimension.value}"

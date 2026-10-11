@@ -204,7 +204,7 @@ class ContinuityAnchorBinding(_TransitionModel):
 
 
 class ContinuityTransitionPolicy(_TransitionModel):
-    schema_version: Literal["1", "2"] = "1"
+    schema_version: Literal["1", "2", "3"] = "1"
     policy_id: str = Field(min_length=1)
     project: ProjectSnapshotPointer
     registry: RegistrySnapshotPointer
@@ -295,6 +295,14 @@ class ContinuityTransitionPolicy(_TransitionModel):
                 raise ValueError("v2 transition requires typed causal state changes")
             require_causal_boundary(self.boundary_kind, self.continuity_obligation,
                                     self.causal_edge_semantics, self.causal_state_changes)
+            if self.schema_version == "3":
+                if (self.continuity_obligation is not ContinuityObligation.IDENTITY_STYLE_CARRYOVER
+                        or self.causal_edge_semantics is not CausalEdgeSemantics.CAUSAL_ELLIPSIS):
+                    raise ValueError("source-grounded v3 is reserved for identity/style narrative cuts")
+                carries = {c.dimension.value for c in self.causal_state_changes
+                           if c.transition_mode is CausalTransitionMode.CARRY}
+                if not carries or carries != set(self.required_carryover_dimensions):
+                    raise ValueError("source-grounded carry dimensions must match the declared carries")
         expected = canonical_sha256(
             self.model_dump(mode="json", exclude={"policy_hash"})
         )

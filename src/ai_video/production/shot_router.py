@@ -530,9 +530,9 @@ class VideoGenerationResolver:
             requirement_lineage_current=commercial_current,
             commercial_source_preparation=commercial_source_preparation,
             causal_transition_verified=bool(transition is not None
-                and transition.transition_policy.schema_version == "2"),
+                and transition.transition_policy.schema_version in {"2", "3"}),
             identity_carryover_verified=bool(transition is not None
-                and transition.transition_policy.schema_version == "2"
+                and transition.transition_policy.schema_version in {"2", "3"}
                 and transition.transition_policy.continuity_obligation.value == "identity_style_carryover"),
         )
         decision = enforce_c4_requirement_gate(
