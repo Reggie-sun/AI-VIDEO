@@ -59,7 +59,7 @@ from ai_video.production.seedance_local_video import (
     SeedanceLocalVideoReferenceResolver,
 )
 from ai_video.production.seedance_mixed_reference import SeedanceMixedReferenceResolver
-from ai_video.production.seedance_native_prompt import SeedanceNativePromptBinding
+from ai_video.production.seedance_native_prompt import SeedanceNativePromptBinding, compile_seedance_request
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
     VideoFetchReceipt,
@@ -78,16 +78,8 @@ from ai_video.production.video import (
     build_video_paid_permit_binding,
 )
 from ai_video.production.shot_router import ProviderBoundVideoRequest
-from ai_video.production._remote_video_native_prompt import (
-    RemoteVideoPromptCompilation,
-    compile_remote_video_prompt,
-)
 from ai_video.production.video_compiler import (
-    ProviderNativePrompt,
     ProviderRequestCompilationResult,
-    ProviderRequirementUnsupported,
-    ProviderRequirementUnsupportedReason,
-    compile_provider_video_request,
 )
 from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
 
@@ -326,38 +318,8 @@ class SeedanceVideoProvider:
         requirement: ProviderNeutralVideoRequirement,
         *, continuity_expression=None,
     ) -> ProviderRequestCompilationResult:
-        native_prompt = None
-        compiler_version = "1"
-        if provider_bound.generation_recipe is not None:
-            compiled_prompt = compile_remote_video_prompt(requirement, voice_route=provider_bound.voice_route,
-                provider_bound=provider_bound, continuity_expression=continuity_expression)
-            if not isinstance(compiled_prompt, RemoteVideoPromptCompilation):
-                return ProviderRequirementUnsupported(
-                    requirement_hash=requirement.requirement_hash,
-                    provider_bound_request_hash=provider_bound.provider_bound_request_hash,
-                    selected_capability_id=provider_bound.capability_id,
-                    reason=ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
-                    unsupported_field_paths=compiled_prompt.unsupported_field_paths,
-                )
-            compiler_version = "2"
-            native_prompt = ProviderNativePrompt(
-                grammar_contract="remote-video-prose-v1",
-                prompt_text=compiled_prompt.prompt_text,
-                prompt_sha256=compiled_prompt.prompt_sha256,
-                expressed_control_paths=compiled_prompt.expressed_control_paths,
-            )
-            if self._native_prompt_binding is not None:
-                native_prompt = self._native_prompt_binding.compile(
-                    provider_bound, compiled_prompt.expressed_control_paths, requirement=requirement)
-        return compile_provider_video_request(
-            provider_bound=provider_bound,
-            requirement=requirement,
-            compiler_id="seedance-video-compiler",
-            compiler_version=compiler_version,
-            capabilities=self._capabilities,
-            native_prompt=native_prompt,
-            continuity_expression=continuity_expression,
-        )
+        return compile_seedance_request(provider_bound, requirement, capabilities=self._capabilities,
+            binding=self._native_prompt_binding, continuity_expression=continuity_expression)
 
     def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:
         if (
