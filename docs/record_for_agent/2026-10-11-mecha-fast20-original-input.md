@@ -8,6 +8,12 @@ learning_eligibility: ineligible
 
 Date: 2026-10-11
 
+## Supersession Notice — Video7 Human Acceptance
+
+下方 Video7 notice 当时的“视听验收待确认”已由用户“可以通过下一个”取代，
+视频7原片当前 human ACCEPTED；见[Video7当前记录](2026-10-11-mecha-video7-fast20-original-input.md)。
+原视频6 POV测量及完整spec尚未验收的边界保持，不把两份同画布单镜当作完整保留故事链。
+
 ## Supersession Notice — 2026-10-11 Video7
 
 用户随后明确“那不管这种也算过继续下一个视频”，已对本记录视频6的 exact MP4

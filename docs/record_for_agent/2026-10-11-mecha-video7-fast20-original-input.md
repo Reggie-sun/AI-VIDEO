@@ -8,6 +8,16 @@ learning_eligibility: ineligible
 
 Date: 2026-10-11
 
+## Supersession Notice — Human Acceptance And Harness Readiness
+
+用户在完整视听确认问题之后回复“可以通过下一个”，已接受本记录 exact 视频7原片；
+`runs/canvas-mecha-fast20-video7-20261011-001/human-acceptance.json` 绑定原 MP4 SHA。
+这取代下文“用户未回复/完整视听待确认”的当前状态，仅覆盖该原片的人工接受；
+更强的核心紫光在问题中已明确展示。旧 analyzer 的2项PASS/4项NOT_EVALUATED保留，
+human接受不倒填 immutable分析、不自动activation，也不变成完整spec或保留集声画交付。
+用户随后允许在取证已足够时转向Harness；readiness与实际剩余Gate见
+[Harness readiness checkpoint](2026-10-11-canvas-harness-readiness.md)。
+
 ## Goal And Current Outcome
 
 用户接受上一份蚂蚁视频6的已知 POV 偏差，并明确继续下一个视频。本次选择《机魂觉醒》视频7，
