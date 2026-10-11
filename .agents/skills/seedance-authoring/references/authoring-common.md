@@ -16,9 +16,22 @@ facts 冲突时，保留各自的 authority，不得混合：
 不得将一次成功 lint、一个 upstream template 或一个 observed clip 升级为 current runtime 或
 Production acceptance truth。
 
+## Generation Input Boundary
+
+来源保留任务消费用户已选定并封存的原 prompt 与参考绑定，Shot Contract 的结构化不自动授权改写实际
+生成文本。核对将要提交的 exact native prompt，而不只检查“保存了原文”或“包含了原文”。必要的
+Provider grammar / reference-role 技术适配须展示原文与实际输入的差异，不标为原样 baseline；不得借
+适配新增故事、机位、对白或验收要求。创作性调整沿当前 task 的授权与 human decision gate。
+
+内部 enums、`unspecified`、验证结果、完整 Shot Contract / coverage 序列化不是给模型的创作指令，
+不得机械拼入 prompt。已授权创作时，只表达该 Shot 需要的可观察内容与必要 reference jobs；不以
+prompt 更长、lint PASS 或 source quote 仍存在来证明语义保真或模型遵从提高。
+
 ## Prompt Grammar
 
-使用可观察的表达，并保持 chronology 清晰：
+以下起草 guidance 适用于已授权创作/优化或对应 repair；来源保留沿 Generation Input Boundary，
+发现 event density 或 grammar 不适配时报告缺口，不静默缩减原动作或重写原文。起草使用可观察的表达，
+并保持 chronology 清晰：
 
 ```text
 subject 与 stable identity

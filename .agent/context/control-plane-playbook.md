@@ -15,7 +15,7 @@
 
 新创作、实质重剪及字幕/图形/配乐设计，执行前与交付前使用 `open-video` 的
 [Creative Completion Practice](../../.agents/skills/open-video/references/creative-completion.md)。
-保持完整用户目标、exact 成片独立观看、有限缺陷修复；纯复制已验收 bytes 沿原交付路径核验。
+保持完整目标、exact 成片独立观看与有界修复；忠实复刻不等于创作性重剪，纯复制已验收 bytes 沿原交付路径核验。
 
 ### Final-output-first Repair Preflight
 
@@ -39,13 +39,13 @@ semantic open/close state、continuity、actual reference/terminal handoff、axi
 
 #### Raw Creative Input Director Strategy Gate
 
-所有未形成 approved Shot/coverage 的 `DIRECTOR_PREFLIGHT_REQUEST`（missing、direction、draft prompt）先入
-`open-video`。prompt presence、时长阈值、Provider 单次上限、`VIDEO_EXTEND`/尾帧/no-cut 不代替 Director 判断。
-按 Skill current schema 编写 evidence 与 verbatim constraints inventory，逐项核对原始要求与 coverage 是否遗漏/反转，
-执行 [validate_director_coverage.py](../../.agents/skills/open-video/scripts/validate_director_coverage.py)，失败停止。
-Agent 根据 beats、空间/动作轨迹、viewpoint、reveal/pacing、continuity 与用户偏好选择 single_take/multi_shot，
-保留 rationale/user evidence；downstream capability 不可行时回 Director，不让 adapter 静默改 strategy。
-结构 validator 不理解自然语言完整性；通过后翻译为 AI-VIDEO approved artifacts 才进入 Provider authoring。
+请求分来源保留、新创作/已授权优化（design）、已知失败 repair；边界归 [`open-video` Step 1](../../.agents/skills/open-video/SKILL.md)。
+已选来源核对原文/reference，转为语义不变 approved Shot；缺 artifact 不授权优化，缺证据不编造。
+来源保持 actual prompt/reference；技术适配展示 diff；repair 保全目标与已满足项，实质改写沿 human gate。
+仅 design 的未批准 raw input 作为 `DIRECTOR_PREFLIGHT_REQUEST` 入 `open-video`。
+prompt presence、时长阈值、`VIDEO_EXTEND` 不代替 design 判断；封存 verbatim inventory。
+核对 raw→inventory→coverage，执行 [validator](../../.agents/skills/open-video/scripts/validate_director_coverage.py)，FAIL 停止；选 single_take/multi_shot，保留 rationale/user evidence。
+Provider capability 归 current profile；结构 PASS 不证明语义/质量。内部字段不机械拼入 native prompt；canonical/paid/media gates 不变。
 
 ### Skill Selection
 

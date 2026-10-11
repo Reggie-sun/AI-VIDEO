@@ -1,11 +1,13 @@
 ---
 name: open-video
-description: Use for AI-VIDEO Director coverage when raw creative input—missing, vague direction, concept, script, reference-led brief, or draft prompt—must be optimized into approved Shots and ordered coverage; guidance is advisory and must return to AI-VIDEO contracts.
+description: Use for AI-VIDEO Director review of selected source plans, or Director design when raw creative input for new creation or authorized optimization—missing, vague direction, concept, script, reference-led brief, or draft prompt—needs approved Shots and ordered coverage; guidance is advisory and must return to AI-VIDEO contracts.
 ---
 
 # open-video — autonomous director skill
 
-> **AI-VIDEO routing:** Raw creative input uses this Director preflight even for one short clip.
+> **AI-VIDEO routing:** Classify the task purpose before deciding whether to optimize raw creative input.
+> Selected-source reproduction uses source-preserving review; new creation or authorized optimization
+> uses Director design, even for one short clip. Missing project artifacts alone do not authorize redesign.
 > [`h3-video`](../h3-video/SKILL.md) is eligible only after an approved Shot exists; the upstream
 > v0.0.1 single-clip preference below must not bypass this boundary.
 
@@ -14,6 +16,8 @@ description: Use for AI-VIDEO Director coverage when raw creative input—missin
 > Preserve relevant cross-turn intent, check the concept independently, and use the practice's
 > exact goal binding and review packet before bounded repair,
 > and delivery. A technically valid preview with known defects does not complete the work.
+> Faithful source reproduction is distinct from creative re-editing; retaining the source does
+> not remove exact media review or delivery gates.
 
 ## 1. What open-video does
 
@@ -42,19 +46,41 @@ Single open models still cap ~15s/shot; longer output needs multi-shot orchestra
 
 ## 2. Agentic procedure — run these steps in order
 
-**Step 1 — Understand the request.** First distinguish raw creative input from an approved AI-VIDEO
-Shot / ordered coverage. A user prompt is raw input, not approval. Classify raw input as
-`missing`, `direction`, or `draft_prompt`; preserve its subject, action, style, product facts,
-references, exclusions, and other explicit constraints. Fill bounded creative gaps when the
-direction is adequate; ask a focused question only when an unresolved choice would materially
-change product direction or exceed the accepted scope.
+**Step 1 — Understand the request.** Classify the user's task purpose before checking whether
+an AI-VIDEO Shot / ordered coverage artifact exists. A selected existing canvas or prompt can be
+creatively fixed while still needing faithful import into canonical project artifacts.
 
-**Raw creative input Director boundary.** Every request without an approved Shot / ordered coverage
-is a `DIRECTOR_PREFLIGHT_REQUEST`, whether the user supplied no prompt, a vague direction, a
-concept/script, a reference-led brief, or a detailed draft prompt. Every such request requires
-`director_skill=open-video`. The Agent must optimize raw input into Director coverage and select
-exactly one `coverage_strategy`: `single_take` or `multi_shot`. It must not treat prompt presence,
-prompt detail, duration, or Provider capability as approval.
+- **Selected-source reproduction or exact-input baseline:** require the user's selected source,
+  exact prompt and reference identities/roles/order. Review source completeness, observable intent
+  and current selected Provider capability. Preserve the source prompt in the generation input;
+  construct a semantically unchanged approved Shot Contract rather than redesigning coverage.
+  Missing project artifacts do not by themselves make this a `DIRECTOR_PREFLIGHT_REQUEST`.
+  Missing source evidence, substantive ambiguity or a contract that cannot represent the source
+  faithfully is a gap to report, not permission to invent camera, action, dialogue or hard criteria.
+  Keep user-authorized model/resolution differences explicit. Necessary Provider grammar adaptation
+  needs an exact source/input diff and is not an unchanged-input baseline. Source reuse still requires
+  canonical Shot validation and all normal authorization, budget, egress, permit and media gates;
+  it is not an exact-replay authorization or a promise of identical generated pixels.
+- **New creation or authorized creative optimization:** classify raw input as `missing`, `direction`
+  or `draft_prompt` and use the Director design boundary below. Preserve explicit constraints, fill
+  only authorized creative gaps and disclose Director choices. A user prompt is raw input, not approval
+  of new Director choices; the task's explicit source-preservation constraint takes precedence.
+- **Known-failure repair:** bind the exact failed result and unmet requirement, retain the full goal
+  and already satisfied properties, and propose a bounded change only for that failure. Show the
+  source/input delta; substantive creative changes follow the task's human decision gate. A failed
+  result does not by itself authorize a fresh full-film redesign, retry or new paid call.
+
+Continue the coverage-design procedure below only for the design branch. Source-preserving review
+and bounded repair return to existing AI-VIDEO contracts and the selected adapter. The legacy H3
+prompt/backend steps below must not rewrite a selected Seedance source.
+
+**Raw creative input Director boundary.** Within new creation or authorized optimization, every
+request without an approved Shot / ordered coverage is a `DIRECTOR_PREFLIGHT_REQUEST`, whether
+it supplies no prompt, a vague direction, a concept/script, a reference-led brief or a draft prompt.
+Every such request requires `director_skill=open-video`. Optimize that raw input into Director
+coverage and select exactly one `coverage_strategy`: `single_take` or `multi_shot`. Within this
+design scope, prompt presence/detail, duration and Provider capability do not establish approval.
+Director review does not require a new camera decision for already selected source coverage.
 
 Choose the strategy from the ordered narrative beats, whether action/space/time changes need a
 viewpoint reset, whether one camera/blocking trajectory can carry every visible change, pacing and
@@ -139,10 +165,15 @@ execution treatments, not the Director decision. They are valid only when the se
 `single_take`; if that strategy has multiple evolving internal coverage units, every non-final
 transition must remain continuous. `multi_shot` requires at least two ordered units and cut-class
 non-final transitions. `strategy_source=user_requested` requires direct user evidence;
-`strategy_source=agent_directed` requires no invented user evidence. Director optimization may
+`strategy_source=agent_directed` requires no invented user evidence. Within the authorized design
+scope, Director optimization may
 expand gaps or restructure a draft, but must preserve explicit user constraints and disclose its
-own decisions through the rationale. An already approved Shot does not re-enter this validator
-unless the task changes its creative intent or coverage.
+own decisions through the rationale. Selected-source reproduction does not become optimization
+merely because its source has not yet been imported as an approved project artifact. An already
+approved Shot does not re-enter this validator unless the task changes its creative intent or coverage.
+Internal enums, validation output and serialized Shot/coverage fields must not be mechanically
+appended to the model prompt. Review the exact generation input and source diff before submission;
+keeping the original quote inside a longer rewritten prompt does not prove faithful reproduction.
 
 The validator proves declared-inventory structure, verbatim source anchoring, and binding
 completeness; it does not prove exhaustive constraint extraction or natural-language entailment.

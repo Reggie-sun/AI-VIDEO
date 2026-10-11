@@ -146,7 +146,7 @@ def test_selected_profile_preserves_exact_runtime_identity() -> None:
     )
 
 
-def test_all_raw_creative_input_routes_to_director_before_seedance() -> None:
+def test_design_branch_routes_raw_creative_input_to_director_before_seedance() -> None:
     seedance = _read(SKILL_PATH)
     open_video = _read(OPEN_VIDEO_SKILL_PATH)
     playbook = _read(ROOT / ".agent" / "context" / "control-plane-playbook.md")

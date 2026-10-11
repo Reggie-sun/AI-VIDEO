@@ -25,14 +25,21 @@ prompt/reference 专家，不是 Seedance workflow、router、Provider adapter �
 - deterministic motion graphics、pacing 或 composition -> `video-shotcraft`；
 - capability selection、execution、activation 或 QA -> 当前 AI-VIDEO code 与 contracts。
 
-任何尚未形成 approved Shot / ordered coverage 的请求都不是该 Skill 可消费的 Shot。无论用户给出
-空白、模糊方向、concept/script、reference-led brief 或完整 draft prompt，都必须先作为
-`DIRECTOR_PREFLIGHT_REQUEST` route 到 `open-video` 做 Director optimization；prompt presence 不等于
-approval。只有已经批准且本次不修改 creative intent/coverage 的 Shot 才可直接进入本 Skill。
-`open-video` 必须保留用户明确的 subject、action、style、product facts、references 与 exclusions，
+先按用户目标区分已选来源复刻/原样 baseline、新创作或已授权优化、已知失败 repair；详细边界归
+`open-video` 的 Step 1。尚未导入 approved Shot 不等于创作方案尚未确定，也不自动授权改写。
+已选画布/原 prompt 的来源保留任务先核对 exact source/reference，并构造语义不变的 approved
+Shot Contract，再进入本 Skill；不因缺少项目格式就将其归成任意 draft optimization。
+原样生成文本消费封存原文；必要 Provider grammar 技术适配须展示差异，不能冒称原样 baseline。
+缺来源证据、实质歧义或 contract 无法无损表达时报告缺口，不新增机位/动作来填满制作字段。
+新创作或已授权优化中，尚未形成 approved Shot / ordered coverage 的空白、模糊方向、concept/script、
+reference-led brief 或完整 draft prompt，先作为 `DIRECTOR_PREFLIGHT_REQUEST` route 到 `open-video`
+做 Director optimization；在该设计范围内 prompt presence 不等于 approval。已知失败 repair 绑定失败项、
+完整目标与已满足部分，只做有界对应调整；实质改写沿 task 的 human decision gate。
+所有分支仍须 approved Shot 与 selected profile，且不能绕过 Provider/paid/egress/permit/media gates。
+Director design 分支中，`open-video` 必须保留用户明确的 subject、action、style、product facts、references 与 exclusions，
 不得以“优化”为名覆盖 hard constraints；其 validator 只验证 declared constraint inventory 的结构、
 verbatim source anchoring 与 coverage binding，不证明 raw input 的约束已提全或语义保真。进入本 Skill
-前必须由 Agent 依次 review `raw evidence -> inventory` 与 `inventory -> coverage`。
+前，该 design 分支必须由 Agent 依次 review `raw evidence -> inventory` 与 `inventory -> coverage`。
 Agent 必须在 Director 层根据 narrative beats、action/space progression、camera/blocking trajectory、
 pacing 与 continuity 风险选择 `coverage_strategy=single_take|multi_shot`，不得按时长阈值选择。
 Seedance 2.5 技术性支持单次 `30s` 既不自动证明应当 single-take，也不强制 multi-shot；它只影响
@@ -81,8 +88,11 @@ support、role cardinality 与 transport mapping 仍是 deterministic runtime fa
    输入的 semantic roles。缺少字段时显式标记，不得用 heuristic 补全。
 2. 建立 reference-role map。对每个输入保留现有 identity 与 state：`primary_role`、允许的
    `transfers` 和 `must_not_transfer` constraints。
-3. 从 approved Shot 起草 prompt：subject、visible action、scene、spatial relation、camera、
-   lighting、audio intent、chronology 与 negative constraints。不得新增 story 或 continuity facts。
+3. 来源保留任务输出封存原 prompt，按 `references/authoring-common.md` 的 Generation Input Boundary
+   核对实际输入与差异；结构化 Shot 不自动授权扩写。仅已授权创作/优化才从 approved Shot 起草
+   subject、visible action、scene、spatial relation、camera、lighting、audio intent、chronology 与
+   negative constraints；repair 限于已声明失败项。不得新增 story 或 continuity facts，也不得机械
+   拼入内部 enums、`unspecified`、验证结果或完整 contract 序列化。
 4. 只应用 selected version overlay。将 authoring advice、current runtime facts 与
    empirical/community observations 分开。
 5. 检查 prompt/reference consistency：每个被提及的 reference 都存在；每个 asset 只有一个清晰

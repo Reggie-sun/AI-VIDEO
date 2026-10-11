@@ -8,7 +8,15 @@ learning_eligibility: ineligible
 
 Date: 2026-08-30
 
-## Current Supersession Notice — Raw Creative Input Boundary
+## Current Supersession Notice — Source Preservation
+
+2026-10-11 的 [Director Source Preservation Record](2026-10-11-director-source-preservation.md)
+替换下方“尚未形成 approved Shot 就必须优化”的普适边界。现先区分来源保留、新创作/已授权优化与
+已知失败 repair：用户已选完整画布/原 prompt 先保留实际输入并无损导入 approved Shot，缺项目格式
+不授权 redesign。新创作/已授权优化仍沿 Director design；canonical Shot、Provider/paid 与媒体 Gate 保持。
+下方旧 routing、verification 和 review 是历史 snapshot，不证明今天的普适输入分类。
+
+## Historical Supersession Notice — Raw Creative Input Boundary
 
 Implementation commit `107e025bf27216bff90db760620adb540d5caf77` supersedes the
 promptless-only routing contract from `f83f42ac7981aba0caa634c2a4c38a4362dee117`.
@@ -61,9 +69,9 @@ duration-based creative classification，而不是调整 threshold 数值。
 “有 prompt 但没有 Director coverage”时复现。Current implementation 因此改用 approved Shot ownership
 作为唯一 routing boundary。
 
-## Current Corrected Contract
+## Historical Corrected Contract — Superseded
 
-Implementation commit `107e025bf27216bff90db760620adb540d5caf77` 实现以下 current boundary：
+Implementation commit `107e025bf27216bff90db760620adb540d5caf77` 曾实现以下 boundary，现按上方 notice 限定 design scope：
 
 - 所有尚未形成 approved Shot / ordered coverage 的输入都是 `DIRECTOR_PREFLIGHT_REQUEST`；missing、
   vague direction、concept/script、reference-led brief 与 draft prompt 一律先进入 `open-video`；
@@ -92,7 +100,7 @@ Implementation commit `107e025bf27216bff90db760620adb540d5caf77` 实现以下 cu
 - `runtime_skill_calls = 0`、Product Runtime isolation、Provider authorization、per-Shot media Gate、
   Manifest/Registry/P6/Final Acceptance ownership 均保持不变。
 
-## Current Verification And Review
+## Historical Verification And Review — Raw Creative Input
 
 Focused working-tree verification：
 
