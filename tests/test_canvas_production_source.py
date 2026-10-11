@@ -118,6 +118,36 @@ def test_unselected_source_gaps_do_not_block_an_explicit_supported_chain():
     assert report["production_acceptance"] == "NOT_EVALUATED"
 
 
+def test_materialized_image_ancestry_is_preserved_without_becoming_an_execution_dependency():
+    source = source_document()
+    room = source["nodes"][0]
+    room["data"].update(source="model_generated", generationDraft={
+        "parts": [{"type": "text", "text": "Use the earlier generated image."}],
+        "contentSettings": {"modelName": "image-model"},
+        "references": [{"slotId": "ancestor-slot", "nodeId": "ancestor", "sourceInstanceId": "ancestor",
+                        "type": "extension", "extensionType": "node", "role": "reference"}],
+    })
+    source["nodes"].append({"id": "ancestor", "type": "image", "data": {
+        "resourceId": "ancestor-v1", "resourceBatches": [{"id": "ancestor-batch", "resourceIds": ["ancestor-v1"]}],
+        "source": "model_generated", "generationDraft": {
+            "parts": [{"type": "extension", "extension_type": "subject", "object_id": "subject-slot"}],
+            "contentSettings": {}, "references": [],
+        },
+    }})
+    source["edges"].append({"id": "ancestor-room", "source": "ancestor", "target": "room", "type": "reference"})
+    report = inspect_canvas_source(source, {"node_ids": ["shot"]})
+    assert "unsupported_subject_capability" in issue_codes(report, "ancestor")
+    assert report["source_snapshot"] == source
+    assert report["selection"]["status"] == "CANONICAL_PACKET_AVAILABLE"
+    assert report["selection"]["blockers"] == []
+    assert [a["id"] for a in report["selection"]["sequence_packet"]["assets"]] == ["room"]
+
+    room["data"].pop("resourceId")
+    blocked = inspect_canvas_source(source, {"node_ids": ["shot"]})
+    assert blocked["selection"]["status"] != "CANONICAL_PACKET_AVAILABLE"
+    assert "missing_resource_id" in {b["code"] for b in blocked["selection"]["blockers"]}
+
+
 @pytest.mark.parametrize("damage", ["none", "packet", "source", "blocker"])
 def test_workflow_rejects_modified_inspection_projection_before_writes(tmp_path, damage):
     from ai_video.canvas_production import CanvasProductionService

@@ -613,13 +613,14 @@ def inspect_canvas_source(source: object, selection: dict | None = None) -> dict
         report["selection"]["status"] = "BLOCKED"
         report["selection"]["blockers"] = [deepcopy(issue)]
         return report
-    selected_ids = set(_selected_ids(graph, selection))
+    unit_ids = set(_selected_ids(graph, selection))
+    selected_ids = set(unit_ids)
     timeline_id = selection.get("timeline_id")
     selected_edges = [e for e in graph.get("edges", [])
                       if isinstance(e, dict) and isinstance(e.get("target"), str)
                       and e.get("target") in selected_ids]
     selected_ids.update(e.get("source") for e in selected_edges if isinstance(e.get("source"), str))
-    for identity in list(selected_ids):
+    for identity in unit_ids:
         node = by_id.get(identity)
         data = node.get("data") if isinstance(node, dict) else None
         draft = data.get("generationDraft") if isinstance(data, dict) else None

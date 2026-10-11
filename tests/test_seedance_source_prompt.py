@@ -13,14 +13,16 @@ from ai_video.production.video_requirement import AudioNeed, GenerationIntent, O
 from test_production_generation_decision import acceptance_policy
 from test_production_provider_neutral_adapters import _replace_requirement
 from test_production_seedance import _profile, _profile_pointer, _request
-from test_production_shot_router import _context, _lifecycle, _policy, _verified_requirement
+from test_production_shot_router import _asset, _context, _first_frame_projection, _lifecycle, _policy, _verified_requirement
 
 
-def _case(*, added_camera=None):
+def _case(*, added_camera=None, first_frame=False):
     profile = _profile()
+    model_id = "doubao-seedance-2-0-fast-260128" if first_frame else _request(profile).model_id
     output = _request(profile).output_requirement
-    context = _context(important=False)
-    base = _verified_requirement(context)
+    context = _context(important=False, keyframe=_asset("first_frame", "original-opening", "a" * 64)
+        if first_frame else None)
+    base = _first_frame_projection(context) if first_frame else _verified_requirement(context)
     source = base.requirement.target_shot.intent
     intent = GenerationIntent(subject_action=SubjectAction(progression=source),
         pacing=Pacing(shot_duration_seconds=output.duration_seconds))
@@ -33,8 +35,8 @@ def _case(*, added_camera=None):
         audio_need=AudioNeed.REQUIRED)
     provider = SeedanceVideoProvider(profile=profile, transport=object(),
         credential=lambda: pytest.fail("offline compile must not read credentials"), input_reference=object())
-    selected = next(v for v in provider.capabilities().variants if v.model_id == _request(profile).model_id
-        and v.mode == _request(profile).mode and v.output_capability.supports(output))
+    selected = next(v for v in provider.capabilities().variants if v.model_id == model_id
+        and v.mode.value == projection.requirement.generation_mode.value and v.output_capability.supports(output))
     compiler = AdapterCompilerContract.create(compiler_id="seedance-video-compiler", compiler_version="2")
     expression = RequirementExpression(requirement_id="source", level="acceptance", stage="raw_generation",
         dimension="source_fidelity", observable=source, tolerance="verbatim", measurement="human review",
@@ -44,10 +46,13 @@ def _case(*, added_camera=None):
     recipe = GenerationRecipe(seed=SeedPolicy(kind="uncontrolled"), profile_sha256=profile.profile_sha256,
         compiler_hash=compiler.compiler_hash, requirement_hash=projection.requirement.requirement_hash,
         rubric_hash=acceptance.profile_content_hash, acceptance_policy=acceptance, expressions=(expression,))
+    lifecycle = _lifecycle(context)
+    if first_frame:
+        lifecycle = lifecycle.model_copy(update={"input_artifact_ids": (*lifecycle.input_artifact_ids, context.shot_keyframe.asset_id)})
     routed = VideoGenerationResolver()._bind_requirement(projection=projection, context=context,
         policy=_policy(remote_authorized=True, budget_authorized=True), provider_profile=_profile_pointer(profile),
         capabilities=provider.capabilities(), selected_capability_id=selected.capability_id,
-        output_requirement=output, lifecycle=_lifecycle(context), compiler_contract=compiler)
+        output_requirement=output, lifecycle=lifecycle, compiler_contract=compiler)
     assert routed.provider_bound_request is not None
     bound = ProviderBoundVideoRequest.create(**{
         **{k: getattr(routed.provider_bound_request, k) for k in ProviderBoundVideoRequest.model_fields
@@ -75,6 +80,31 @@ def test_verbatim_approved_shot_compiles_without_invented_rich_intent():
     assert result.request.provider_bound_request_hash == bound.provider_bound_request_hash
     assert requirement.generation_intent.primary_camera_motion is None
     assert requirement.generation_intent.lighting_intent is None
+
+
+def test_verbatim_single_first_frame_preserves_i2v_role_and_original_bytes_identity():
+    profile, bound, requirement, source = _case(first_frame=True)
+    result = _compile(profile, bound, requirement, source)
+    assert isinstance(result, CompiledProviderVideoRequest)
+    assert result.request.mode.value == "image_to_video"
+    assert result.request.prompt_text.encode() == source.encode()
+    assert len(result.request.image_bindings) == 1
+    image = result.request.image_bindings[0]
+    assert image.role == "first_frame"
+    assert image.asset_id == "asset-original-opening"
+    assert image.asset_sha256 == "a" * 64
+
+
+@pytest.mark.parametrize("damage", ["extra_role", "conditioned"])
+def test_verbatim_first_frame_does_not_replace_other_conditioning_shapes(damage):
+    from ai_video.production.video_requirement import SemanticReferenceRole
+
+    profile, bound, requirement, source = _case(first_frame=True)
+    changes = ({"semantic_reference_roles": (SemanticReferenceRole.FIRST_FRAME, SemanticReferenceRole.LAST_FRAME)}
+        if damage == "extra_role" else {"conditioning_compatibility": object()})
+    altered = requirement.model_copy(update=changes)
+    with pytest.raises(ValueError, match="conditioned|single first frame"):
+        _compile(profile, bound, altered, source)
 
 
 def test_incomplete_new_creation_still_refused():

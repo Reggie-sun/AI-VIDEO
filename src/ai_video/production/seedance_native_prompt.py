@@ -78,11 +78,16 @@ class SeedanceNativePromptBinding(StrictModel):
         if self.prompt_text != requirement.target_shot.intent:
             raise ValueError("Seedance preserved text must equal the approved Shot intent")
         if (requirement.contract_version == "provider-neutral-video-requirement/4"
-                or requirement.generation_mode.value not in {"text_to_video", "reference_to_video"}
+                or requirement.generation_mode.value not in {"text_to_video", "reference_to_video", "image_to_video"}
                 or requirement.voice_routing is not None
                 or provider_bound.voice_route is not None
                 or requirement.conditioning_compatibility is not None):
             raise ValueError("Seedance source compilation cannot replace rich or conditioned intent")
+        if requirement.generation_mode.value == "image_to_video":
+            if (tuple(role.value for role in requirement.semantic_reference_roles) != ("first_frame",)
+                    or len(requirement.asset_evidence) != 1
+                    or requirement.asset_evidence[0].role.value != "first_frame"):
+                raise ValueError("Seedance source I2V requires exactly one single first frame")
         intent = requirement.generation_intent
         if intent.subject_action.progression != self.prompt_text:
             raise ValueError("Seedance preserved progression must equal the approved Shot intent")

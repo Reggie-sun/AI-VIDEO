@@ -651,7 +651,8 @@ exact Registry SHA/size/MIME及已测duration后封存原bytes，以inline Base6
 正文hash必须一致，现有意图验证与recipe expression覆盖检查继续执行；不从画布标题猜引用、
 不覆盖角色/场景/输出参数。Source evidence hash由实际输入审查核对，不构成模型复刻保证。
 原文binding允许最多65536字符，这是本地有界防护而非上游支持保证；request总bytes限制仍执行。
-显式 `source_preservation=true` 才选择 standalone T2V/R2V 原文入口：prompt 必须与已批准
+显式 `source_preservation=true` 才选择 standalone T2V/R2V 或单首帧 I2V 原文入口：I2V仅接受
+一个 `FIRST_FRAME` asset/semantic role，不接受多锚或 continuity conditioning。prompt 必须与已批准
 `Shot.intent`、canonical action progression 和 source text SHA 完全一致。缺少原文未指定的
 丰富意图保持缺失，沿既有非 v4 requirement 编译；不得伪造 fixed camera/lighting/performance。
 v4、conditioned/typed-hash continuity 与 separate voice 不适用此入口。时长及原生音频 controls
