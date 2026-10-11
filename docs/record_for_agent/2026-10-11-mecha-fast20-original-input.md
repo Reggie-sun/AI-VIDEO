@@ -8,6 +8,19 @@ learning_eligibility: ineligible
 
 Date: 2026-10-11
 
+## Supersession Notice — 2026-10-11 Video7
+
+用户随后明确“那不管这种也算过继续下一个视频”，已对本记录视频6的 exact MP4
+作出 `ACCEPTED_WITH_KNOWN_DEVIATION`；这取代下文当时的 Agent 禁止进入下一镜结论，
+仅限该蚂蚁片的已知 POV 偏差。历史 analyzer POV/source_fidelity FAIL 保留，未倒填 PASS、
+未 activation，也不推导合成连续性或未来镜头的质量豁免。证据为原 run 的
+`human-acceptance-with-pov-deviation.json`。
+
+独立选择的原画布视频7已经一次 Fast2.0 / 480p 生成，新增单首帧原文 I2V 入口已实现并验证。
+旧 T2V/R2V-only 能力说明及四次累计提交上限属于历史单元；新单元继承历史4次、新增1次、累计5次。
+视频7视听验收仍待确认，完整 spec 仍未完成。当前证据见
+[Video7 record](2026-10-11-mecha-video7-fast20-original-input.md)。
+
 ## Goal And Current Outcome
 
 用户购买同账号资源后明确要求“再复刻用fast 2.0”，继续 480p。此次只执行《机魂觉醒》
