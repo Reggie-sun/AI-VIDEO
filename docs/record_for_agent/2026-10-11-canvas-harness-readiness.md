@@ -8,6 +8,13 @@ learning_eligibility: ineligible
 
 Date: 2026-10-11
 
+## Scope Clarification — 2026-10-12
+
+[实际原文多镜 preflight](2026-10-12-canvas-original-multishot-preflight.md) 已确认：
+《机魂觉醒》相邻段依赖主体素材包与视频修剪来源，当前 source 入口仍阻断；原文 compiler 也未支持
+typed continuity。下文“足够固化”只适用于所述工程骨架，不能解释为这段可仅换数据直接生成。
+历史单镜接受和 scripted 两镜控制流证据保留；本次没有新 Seedance 请求或连续性接受。
+
 ## Decision And Human Acceptance
 
 用户先接受视频7并要求下一个，随后明确“或者已经觉得可以制作harness的程度你就说”。
