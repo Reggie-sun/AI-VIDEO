@@ -62,6 +62,32 @@ Parent用官方资料及actual decoder裁决：重复图强制去重建议无因
 
 ## Existing Owner And Minimum Recovery
 
+### Historical Counterexamples And No-Opening Decision
+
+本节修正下面较早的“最小方向”：原 PNG 精确面貌若保持，入库仍是一个候选；
+用户已拒绝开通，并批准首次文字选角的新面貌，所以入库不再是当前单元必要条件。
+账号 `aigc_writable=false` 只证明当前虚拟库写入路径受阻，不证明全部 Seedance 调用受阻。
+
+通过 canonical reader 重开并实际核对输入与输出文件，历史有两个不同反例：
+`qingyan-seedance2-fast-dialogue-benefit-20260828-002` 用同一 Fast 2.0，仅发送无人物瓶图，
+人物由文字生成；真实 MP4 SHA `309b919c00fc86bfd9540802c445a2fca2b1db36ebf44f87c94db3c14c65ff5b`。
+`t8-h3-seedance-3shot-continuity-20260822-v7` 的 Mini I2V 实际接受 H3 生成的写实女性首帧，
+输入 SHA `b49071d0cd7009d2880aedf5ad3c972e837d6dccfc451641478e1e301b076446`；
+真实 MP4 SHA `24f4c0c307480ab1b44057b7ad7ca7782ee3eee1975404a28c28ba4e1a7f683f`。
+后者被用户否决身份/摄影连续性；前者也没有完整 QA acceptance。
+它们证明历史存在未入库生成，不保证本次 Fast 接受普通中间帧，也不构成连续性 PASS。
+
+本次额外受管 Kimi audit invocation `8cfabf74-ace4-4810-bae9-ed5bfc304349` 为 PARSED；
+报告 SHA `c5765d4de3b8069d99a4c73ca5347aacc1c792a87a9f29bff394280168f1d577`。
+其“所给五例没有写实人物参考成功”只在所给 scope 内成立；Parent 找到上述 scope 外反例。
+旧 local inline retirement 阻断结论已被当前 runtime 和两个实际 POST supersede。
+详细 reader/input/hash 对比与 Parent 裁决保存在
+`runs/canvas-jieshi-two-shot-20261013-001/historical-input-audit/`。
+
+用户 A 已接受 `no-opening-preflight.md` 的换貌差异及最多两次新 submit，零重抽/repair，
+50 CNY/次与100 CNY/单元为原预配置内部 upper bound，累计9保留、上限11。
+授权不证明当前首镜生成、参考准入、后镜接续或最终声画结果；以下旧研究 checkpoint 保留。
+
 `SeedanceAssetMaterializationReceipt -> SeedanceAssetReferenceResolver -> SeedanceVideoProvider`已有
 exact source PNG/confirmation/Active identity绑定与`asset://`输出，不需要第二生成链。
 它导入的是已实际入库的human-observed素材；没有自动CreateAssetGroup/CreateAsset owner。

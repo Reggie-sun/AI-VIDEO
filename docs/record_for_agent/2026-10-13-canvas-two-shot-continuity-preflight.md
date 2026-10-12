@@ -8,6 +8,61 @@ learning_eligibility: ineligible
 
 Date: 2026-10-13
 
+## Approved No-Opening Textcast Unit And Shared Runtime Repair
+
+用户最新 A 明确接受 `no-opening-preflight.md` 的差异：新 A 以文字确立林砚新面貌，
+B 只消费新 accepted A 的实际普通中间状态。不开通、不上传旧 PNG、不把普通帧伪装为受信尾帧。
+同 Fast 2.0、480p、各15秒 nominal、原生声音；最多2次新增 submit、零重抽/paid repair。
+历史7及本项目两次 known_no_effect、累计9全部保留；新项目 ceiling4、累计 ceiling11。
+50 CNY/次、100 CNY/单元为原预配置内部上限，非市场价/账单。
+
+精确批准候选 data SHA `fab5be91fc4f0e771266e8fa31935417c72bca75e68789bfdac81799bb661879`，
+source SHA `3ee139ad7c5c4fff614727ff965f82108641e61d3c3301957cdbfa046c14a0e7`。
+执行数据只将 pending 授权状态替换为实际 A、为新选角单元登记独立 Shot IDs，并显式表达已批准
+`generation_operation=text_to_video`，SHA `84a8ba61a45c9bd37edd5ad10018101dedcf1aa1c8affdb1be0b9a4db24ebfaf`。
+同一 Production root 经共享 CLI revise 到 project revision6 / Manifest34；旧请求、失败、permit、
+counter 和 immutable evidence 未删除或改分类。没有通过改 task identity 清空消费。
+
+Prepare 实测定位一处共享 runtime 缺口：Planner 的 explicit T2V 可表达首次文字选角，
+Router 原规则仍不分已存在身份与新选角，一律返回 `IMPORTANT_CHARACTER_REQUIRES_VISUAL_ANCHOR`。
+Parent 只修复既有 requirement routing：verified independent `/1` requirement、完整无参考
+Character、无 Scene/Shot/input anchors、无 identity continuity 才派生私有 first-cast proof。
+裸 capability inspection 不接收该豁免，原 identity/continuity/paid/egress/media Gate 不降级。
+无新增故事执行器、timeline、状态库、renderer 或模型 fallback。
+
+TDD 正例先复现 BLOCKED_POLICY；修复后与既有 Router/Planner 共249 tests PASS。
+负例覆盖旧人像、缺 appearance bible、exact identity、keyframe、Scene anchor；原 explicit-T2V
+guard suites 保留。真实共享 Prepare 已得到 `GENERATE_ONCE` 与 execution binding，Provider calls=0。
+代码、exact staged Harness、publication 与 paid preflight 完成后继续本单元，不把工程 PASS 当媒体完成。
+本节工程 checkpoint 的学习评估为 `no_candidate`：旧研究不同模型/输入/音频等变量混杂，
+没有可归因的连续性结论；新单元尚无实际 MP4/逐镜 MCP/剪辑证据。
+
+## Current Account Entitlement Blocker — 2026-10-13
+
+> Superseded for the approved textcast unit: 用户已明确拒绝开通，并批准首镜文字生成新面貌。
+> 下文只保留原 exact PNG 入库路径的历史阻断，不能再解释为当前两镜的必需步骤。
+
+用户再次要求生成，并完成受控Chrome方舟控制台登录后，Parent实际打开素材管理及高级创作权益页。
+当前页面已有`GetAssetQuota`响应的allowlisted投影为`aigc_writable=false`、`aigc_readable=true`；
+真人读写为true，素材/组均0/50。我的资产只显示真人人像入口，没有当前可用的私域AIGC上传入口。
+这次live观察取代历史账号状态推测，但不把真人入口用于本虚构人物。
+
+用户问“这个要钱吗”后，已核对[官方权益说明](https://docs.volcengine.com/docs/ark/seedance-2-0-purchase-guide?lang=zh)
+及current authenticated开通页：`高级创作权益包 Entry`为免费0元/月，支持虚拟人像入库，50素材/50组、3QPM。
+不能把“高级创作权益”推导为本实验必须购买高价套餐。当前页面明确提示“仅支持企业账号开通”，
+免费试用按钮disabled；actual blocker是企业认证及免费Entry未开通，不是已知欠费或视频代码拒绝。
+Agent未代填/提交企业身份、风险评测或手机号校验，也未购买权益。
+
+canonical reader重开成功：Manifest29、项目actual paid submits2，均known_no_effect；历史7、累计9保留。
+原PNG的SHA/size仍为`1a21ac10047cab19b441bfefd84ab91fef8de4b6787b7a5c558794903ff18b55`/1801377。
+本轮video submit/poll/fetch、Assets create/upload及credential lookup均0，Production无mutation。
+sanitized证据：`runs/canvas-jieshi-two-shot-20261013-001/asset-entitlement-check-20261013.json`；
+不保存cookie/header/raw quota response或账号身份。既有operator profile已过期，quota未扩展；
+下一最多两次submit的单元仍NOT_PREPARED，恢复先核验写入权限及Active原图，再走新runtime/exact previews/Gates。
+两镜MP4、逐镜MCP、实际状态绑定、trim/音轨/HyperFrames和human验收仍未完成。
+record-ai-video-session更新同一primary record；distill-ai-video-learning为no_candidate：
+账号权益与免费开通条件是当前操作事实，不构成新的跨实验模型质量/adoption证据。RAG返回stale advisory，未前台重建。
+
 ## Current Recovery Assessment — 2026-10-13
 
 用户质疑代码并要求查社区与官方后，已完成实际资料/请求核对，详见

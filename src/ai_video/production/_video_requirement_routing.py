@@ -11,11 +11,35 @@ from ai_video.production.video_contracts import VideoFlexibleOutputRequirement
 from ai_video.production.video_requirement import (
     AudioNeed,
     GenerationMode,
+    IdentityContinuity,
     OutputGeometryPolicy,
     ProviderNeutralVideoRequirement,
     SemanticReferenceRole,
 )
 from ai_video.production.video_transition import BoundaryKind, ContinuityObligation
+
+
+def is_first_text_cast_requirement(requirement, context) -> bool:
+    """Only a verified independent first cast may establish a new face in T2V."""
+    return (
+        requirement.contract_version == "provider-neutral-video-requirement/1"
+        and requirement.generation_mode is GenerationMode.TEXT_TO_VIDEO
+        and requirement.continuity_mode.value == context.continuity_mode.value == "none"
+        and not requirement.asset_evidence
+        and not requirement.target_shot.continuity_constraints
+        and requirement.generation_intent.identity_continuity == IdentityContinuity()
+        and bool(requirement.characters)
+        and {c.character_id for c in requirement.characters}
+            == set(requirement.target_shot.character_ids) == set(context.important_character_ids)
+        and all(c.appearance_bible.strip() and not c.reference_asset_ids for c in requirement.characters)
+        and not requirement.scene.visual_reference_asset_ids
+        and not context.canonical_character_references
+        and context.canonical_scene_reference is None
+        and not context.additional_scene_references
+        and context.shot_keyframe is None and context.upstream_terminal is None
+        and context.last_frame is None and context.approved_existing_video is None
+        and not context.reference_videos and not context.reference_audios
+    )
 
 
 def requirement_mode(mode: GenerationMode) -> VideoGenerationMode | None:

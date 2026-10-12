@@ -33,6 +33,7 @@ from ai_video.production._video_requirement_routing import (
     commercial_requirement_context_is_current,
     effective_policy_for_requirement,
     enforce_c4_requirement_gate,
+    is_first_text_cast_requirement,
     requirement_bindings,
     requirement_mode,
     requirement_output_matches,
@@ -116,6 +117,7 @@ class VideoGenerationResolver:
         commercial_source_preparation: bool = False,
         causal_transition_verified: bool = False,
         identity_carryover_verified: bool = False,
+        first_text_cast_verified: bool = False,
     ) -> VideoGenerationRoutingDecision:
         base: dict[str, object] = {
             "target_shot_id": context.target_shot_id,
@@ -344,6 +346,7 @@ class VideoGenerationResolver:
         if (
             context.important_character_ids
             and required_mode is VideoGenerationMode.TEXT_TO_VIDEO
+            and not first_text_cast_verified
         ):
             return self._blocked(
                 base,
@@ -538,6 +541,8 @@ class VideoGenerationResolver:
             identity_carryover_verified=bool(transition is not None
                 and transition.transition_policy.schema_version in {"2", "3"}
                 and transition.transition_policy.continuity_obligation.value == "identity_style_carryover"),
+            first_text_cast_verified=bool(transition is None
+                and is_first_text_cast_requirement(requirement, context)),
         )
         decision = enforce_c4_requirement_gate(
             requirement, context, capabilities, selected_capability_id, decision

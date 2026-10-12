@@ -582,6 +582,15 @@ Registry/provenance/candidate artifacts、strict reader、recovery与activation/
 Focused verification：`tests/test_planning_video_planner.py`、`tests/test_shot_readiness_gate.py`、
 `tests/test_production_shot_router.py`。
 
+### Explicit First Text Casting Without References
+
+既有 explicit `TEXT_TO_VIDEO` Planner 输出经 verified requirement 交给 Router；
+`_video_requirement_routing.is_first_text_cast_requirement()` 仅放行独立 `/1` requirement、
+完整无旧参考 Character、无 Scene/Shot/Registry 输入锚点与身份继承义务的首次文字选角。
+只由 requirement binding 派生 private routing proof，裸 capability inspection 不能自报豁免。
+既有 portrait、keyframe、continuity 与 exact identity 仍阻断 T2V；人物 QA、预算、permit 和真实
+逐镜验收保持原 owner。Focused verification：`tests/test_production_shot_router.py` 的 first-text-cast cases。
+
 ### Initial Shot First-Frame Input
 
 `validation.validate_shot_strategy()` 允许 pending generated-video 输出位附带一个已绑定

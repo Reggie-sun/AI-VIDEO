@@ -4513,3 +4513,74 @@ def test_router_selected_capability_fingerprint_includes_canonical_constraints()
     assert decision.outcome is RoutingOutcome.SELECTED
     legacy_dump = variant.model_dump(mode="json", exclude={"binding_cardinality_constraints"})
     assert decision.selected_capability_fingerprint != canonical_sha256(legacy_dump)
+
+
+def _first_text_cast(guard=None):
+    from ai_video.planning import VideoPlanner, require_current_video_plan
+    from ai_video.production.video_requirement import (
+        GenerationOperation, IdentityContinuity, IdentityPreservation,
+        ProviderNeutralGenerationIntentProjection, QualityNeed, SubjectAction,
+    )
+    from tests.fixtures.planning_factory import make_request
+
+    context = _context()
+    characters = tuple(seal_artifact(make_character(character_id=cid).model_copy(
+        update={"reference_asset_ids": ()})) for cid in context.activated_shot.character_ids)
+    if guard == "portrait":
+        characters = tuple(make_character(character_id=c.character_id) for c in characters)
+    if guard == "missing_bible":
+        characters = tuple(seal_artifact(c.model_copy(update={"appearance_bible": ""})) for c in characters)
+    context = context.model_copy(update={
+        "canonical_character_references": (), "canonical_scene_reference": None,
+        "shot_keyframe": None, "upstream_terminal": None, "last_frame": None,
+        "character_bible_content_hashes": tuple(c.content_hash for c in characters),
+    })
+    if guard == "keyframe":
+        context = context.model_copy(update={"shot_keyframe": _asset("first_frame", "keyframe", "a" * 64)})
+    identity = IdentityContinuity()
+    if guard == "identity":
+        identity = IdentityContinuity(character_ids=context.activated_shot.character_ids,
+            preservation=IdentityPreservation.EXACT)
+    scene = seal_artifact(make_scene(scene_id=context.activated_shot.scene_id).model_copy(
+        update={"visual_reference_asset_ids": ()}))
+    if guard == "scene_anchor":
+        scene = make_scene(scene_id=context.activated_shot.scene_id)
+    request = make_request(target_shot=context.activated_shot, scene_context=scene,
+        character_context=characters, available_assets=(), review_decision=None,
+        planning_contract_version="video-planner/3",
+        generation_intent=ProviderNeutralGenerationIntentProjection.create(
+            generation_operation=GenerationOperation.TEXT_TO_VIDEO,
+            generation_intent=GenerationIntent(
+                subject_action=SubjectAction(start_state="seated", progression="raises phone"),
+                identity_continuity=identity),
+            output_need=OutputNeed(duration_seconds=4, width=1024, height=576, fps=24,
+                container_mime="video/mp4"), audio_need=AudioNeed.FORBIDDEN,
+            quality_need=QualityNeed(objective_tier="preview")))
+    projection = require_current_video_plan(current_request=request, plan=VideoPlanner().plan(request))
+    return context, projection
+
+
+def _route_first_text_cast(context, projection):
+    return VideoGenerationResolver()._bind_requirement(context=context, projection=projection,
+        policy=_policy(), provider_profile=_profile(),
+        capabilities=_capabilities(_variant(VideoGenerationMode.TEXT_TO_VIDEO)),
+        selected_capability_id="capability-text_to_video", output_requirement=_output(),
+        lifecycle=_lifecycle(context), compiler_contract=AdapterCompilerContract.create(
+            compiler_id="fake-video-compiler", compiler_version="1"))
+
+
+def test_explicit_first_text_cast_reaches_t2v_with_no_invented_portrait():
+    context, projection = _first_text_cast()
+    result = _route_first_text_cast(context, projection)
+    assert result.decision.outcome is RoutingOutcome.SELECTED
+    assert result.provider_bound_request.input_assets == ()
+    assert result.provider_bound_request.binding_roles == ()
+    assert result.provider_bound_request.requirement_hash == projection.requirement.requirement_hash
+
+
+@pytest.mark.parametrize("guard", ["portrait", "missing_bible", "identity", "keyframe", "scene_anchor"])
+def test_first_text_cast_does_not_override_existing_identity_or_visual_anchor(guard):
+    context, projection = _first_text_cast(guard)
+    result = _route_first_text_cast(context, projection)
+    assert result.decision.outcome is RoutingOutcome.BLOCKED_POLICY
+    assert result.provider_bound_request is None
