@@ -8,7 +8,81 @@ learning_eligibility: ineligible
 
 Date: 2026-10-13
 
-## Current Authorization And Runtime Stop
+## Current Jieshi Unit And Input Stop
+
+2026-10-13，用户进一步将目标改为新建两镜测试项目、只填项目数据并使用已发布共享入口，
+随后选择“可以用界蚀尝试”。当前候选改为林砚地铁持机→抬眼看门并起身，不复刻原剧集，
+不采用旧镜头作为新 accepted source。下文机魂候选和凭据失败保留为历史，当前状态以本节为准。
+旧 A 的 Fast2.0、480p、各15秒 nominal、native audio、最多新增2次 submit、零自动重抽/repair、
+50 CNY/call 与100 CNY/unit 内部 upper bound保留；历史7/7不重置，累计上限9。
+更换后的 exact PNG 虚构身份/用途声明尚未取得；原机器人输入授权不冒充新人物声明。
+
+用户对指定私有字段迁移决定回复 A 后，exact Secret Service supplier已可达。
+核验使用 `application=ai-video/provider=seedance/credential=ARK_API_KEY`，只输出 availability；
+没有将 `.env` 用作 Provider 执行来源，没有保存 key 或为核对账号调用 Provider。
+当时 owned session bus已有相同选定 credential，因此未重复 store。
+旧单元 `credential-migration-session-bus-receipt.json` 与新单元 `credential-readiness.json`
+证明的是 supplier 可达，不证明账号余额、模型质量或付费调用资格。
+
+当前新单元根为 `J = runs/canvas-jieshi-two-shot-20261013-001/`，Production在 `J/production/`。
+project bytes SHA为 `0bdbf41466a635c0056496cdd5ce0df68f643244abdca268336e395e2e69597f`。
+source是新 authored fixture，symbolic video resource metadata 不声明已有视频或验收。
+已实际运行共享inspect/author、canonical authoring revision/QA activation和 Planner/Router/compiler
+pure Prepare；未添加故事执行脚本、第二 timeline、state store、renderer或工程代码。
+一镜坐姿右手手机由膝抬胸并低头看屏；二镜必须消费新一镜 accepted 实际帧，
+从低头持机继续抬眼看右方关闭车门，左手压座面，身体向前/上起身。
+同轴线中景、continuous train ambience、首镜一次提前结束的buzz、后镜衣料/起身声；
+无对白/广播/BGM/文字/新人或特效。七项连续性要求和逐镜MCP Gate均保持。
+
+参考PNG为旧image_gen的合成林砚，SHA
+`1a21ac10047cab19b441bfefd84ab91fef8de4b6787b7a5c558794903ff18b55`，941×1672，1,801,377 bytes。
+同bytes分别绑定人物identity和门区scene；author-only actual-state placeholder 禁止submit。
+受管只读Kimi概念检查第一次 `fcced3ae-9070-4fdd-8c81-ce973182c425` 结构输出失败；
+第二次最小raw-input/coverage单元 `15cc5746-0eb0-49e5-8969-a2b98f87f8eb` 为PARSED。
+Parent核对实际Read hashes、report bytes并补入“buzz在抬机/接点前完全结束”和
+“后镜从低头看屏开始”；报告不是视频QA或human acceptance。
+
+## Jieshi Exact Pending State And Blocker
+
+当前Manifest revision15。首镜 attempt `canvas-087700e07c4f24fe06033bde615d4397e6d20272`
+是running/REQUEST，next_action=submit；尚无paid state、budget reservation、Provider task、
+submit intent/permit/receipt、fetch或新MP4。新视频Provider submit/poll/fetch全部0。
+首镜resolved request为 `a3b52721df93019e4a98186155c5dee6815a2c1daf470e121b4aefff2df9f37d`；
+Paid preview fingerprint为 `9beabf0f23cc65cb659842469805e004f9c9bcf059af75b692b89d365ab073dd`。
+首镜REQUEST在完成写实人物provenance检查之前过早建立；保留原 immutable request/Registry，
+未覆盖、清空、重置，也未制造paid失败来取得repair资格。
+
+实际检查发现：共享PNG selection将Registry source_kind设为 `imported`，
+而 `SeedanceSyntheticImageReferenceResolver` 对synthetic_photorealistic_person要求
+有sealed生成/派生来源的 `generated` 或 `derived`、准确tool/creation_receipt和许可值。
+当前两份asset元数据不满足此条件，door-layout的描述式license也不属于精确许可枚举。
+人类 exact project-owned-fictional/no-protected-identity 声明仍为NOT_EVALUATED。
+这证明该候选当前输入绑定不能submit，不证明已接受Harness工程整体失效或模型质量差。
+不能把imported直接改标签为generated，也不能把人物改分类为ordinary image绕检查。
+
+committer有 evaluated-unsubmitted closure；当前Canvas repair selector只接受quality rejection或
+closed paid known-no-effect。保留这个已建立REQUEST的候选时，还需正确接续零效果准备历史；
+没有调用closure或自行绕过repair selector。最新“只填项目数据”约束下未编辑共享工程，
+已集中请求：是否允许必要的共享provenance/unsubmitted recovery适配并确认exact人物声明。
+这是新的输入/scope缺项，不重问旧模型、次数、预算或是否开始。
+
+| Evidence | Boundary |
+| --- | --- |
+| `J/preflight.md` | 可审阅原文、参考职责、生成/剪辑顺序、state/Gate/trim/audio要求和当前阻断；不是交接prompt |
+| `J/first-prepare.json`, `J/first-paid-preview.json` | actual shared pure Prepare和sealed exact paid preview；未提交 |
+| `J/runtime-input-blocker.json` | exact Registry谓词、REQUEST状态和零Provider效果；文件SHA `ede595a19acd058cad6a6c2557d3ec6fb74d33e14edb93a584c87a260976c38d` |
+| `J/kimi-concept-parent-resolution.json` | 独立概念检查与Parent实际裁决；未签媒体PASS |
+
+真实两镜、逐镜MCP findings、accepted实际state提取/input binding、canonical trim/native audio、
+剪辑接点、HyperFrames验证片、human acceptance以及完整故事AC-7均NOT_EVALUATED。
+`record-ai-video-session`在真实输入/数据范围blocker处记录；automatic
+`distill-ai-video-learning`结果为no_candidate：无新增独立媒体实验或可采纳的跨实验质量结论。
+本次record-only checkpoint按exact staged Harness验证后发布；本地runs证据不随source commit上传。
+本次独立receipt路径为 `.agent/harness/runs/canvas-jieshi-input-stop-record-20261013/receipt.json`；
+只有实际fresh验证及对应Git核验完成才报告PASS/publication，不复用旧receipt。
+已有foreign spec/plan/baseline/record改动和untracked paid-no-effect-retarget plan继续保留。
+
+## Historical Mecha Authorization And Credential Stop
 
 2026-10-13，用户对集中决定项回复 A：批准本候选两镜与上限，补齐并核验共享runtime后执行。
 这项新授权取代下文批准前的“paid scope尚未明确批准”；不取代逐镜Gate、exact preview或permit。
