@@ -5,9 +5,12 @@ Date: 2026-10-12
 ## Status
 
 实现包含 SuperGrok OAuth、只读订阅 usage、image/video adapter，以及现有 Production 的连接。
-默认 live generation 为 `BLOCKED`：公开 billing response 能观察 usage，但不能证明 exact media
-endpoint 的服务端 `included_only` 扣费边界。用户没有授权额外现金支出，余额、usage percentage、
-OAuth 登录或客户端次数限制不能替代此边界。没有 Console key fallback、自动充值或重发。
+默认 live generation 为 `BLOCKED`。显式注入 `GrokIncludedOnlyAuthority` 才能核验统一订阅池的
+included-only 边界：每次重开固定 credits 与 auto-topup GET，要求 finite current quota、零
+on-demand cap / used / prepaid balance，以及官方 schema 的 disabled/no-rule。失败立即停止。
+余额、usage percentage、OAuth 登录或客户端次数限制单独不构成该证明。模型资格、creative
+preflight、预算、egress、durable intent / one-use permit 仍独立执行；无 Console key fallback、
+配置 mutation、自动充值或重发。
 来源：[xAI announcement](https://x.ai/news/grok-openclaw)、
 [OpenClaw xAI integration](https://docs.openclaw.ai/providers/xai)、
 [Grok FAQ](https://docs.x.ai/grok/faq)。
@@ -35,6 +38,18 @@ client，项目没有独立注册 client。[当前官方 discovery](https://auth
 `login` / `refresh` 对同一 item 使用 Linux 跨进程互斥；另一个 `login` / `refresh` 在凭据读取和 HTTP 前返回 busy。
 空的 coordination lock 位于当前 UID 的 private runtime directory，不包含 token，关闭 FD 释放；
 缺失或不安全的 runtime directory / lock 直接停止，不切换 credential source。
+
+当前官方 device page 可为 exact `https://accounts.x.ai/oauth2/device`；仅当响应的 complete URI
+严格等于可信 base 加本次 public `user_code` 时展示完整链接。其他 complete URI 不展示，
+device code 不泄漏；token/device/userinfo 的固定 `auth.x.ai` endpoint authority 保持。
+
+`GrokIncludedOnlyAuthority.observe(model_id=..., operation_path=...)` 返回五分钟内到期、精确
+绑定 account/model/operation/period 的 public binding。将同一 authority 注入 selected adapter
+的 `subscription_guard`，durable permit 前与 transport 前重开服务端状态；任何 enabled、
+nonzero、quota 耗尽、unknown schema、redirect、陈旧/跨账号证据均拒绝。`quota` 仍只观察 usage，
+不启用生成。实现依据 xAI [billing schema](https://github.com/xai-org/grok-build/blob/2bdd1d6a6369de0e8c68132ea4539e9abd9e14a8/crates/codegen/xai-grok-shell/src/extensions/billing.rs)、
+[PAYG handling](https://github.com/xai-org/grok-build/blob/2bdd1d6a6369de0e8c68132ea4539e9abd9e14a8/crates/codegen/xai-grok-pager/src/app/dispatch/billing.rs)
+与 [known disabled rule](https://github.com/xai-org/grok-build/blob/2bdd1d6a6369de0e8c68132ea4539e9abd9e14a8/crates/codegen/xai-grok-pager/src/views/credit_bar.rs)。
 
 ## Video Contract
 

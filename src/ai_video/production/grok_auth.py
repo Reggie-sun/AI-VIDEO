@@ -11,7 +11,7 @@ from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from typing import Literal, Protocol
-from urllib.parse import urlsplit
+from urllib.parse import urlencode, urlsplit
 
 import httpx
 
@@ -242,6 +242,9 @@ class GrokOAuthManager:
         device = self._request_device_code(endpoints.device_authorization)
         verification_uri = _trusted_verification_uri(device.get("verification_uri"))
         user_code = _nonblank_string(device.get("user_code"), max_length=128)
+        complete_uri = f"{verification_uri}?{urlencode({'user_code': user_code})}"
+        if device.get("verification_uri_complete") == complete_uri:
+            verification_uri = complete_uri
         device_code = _nonblank_string(device.get("device_code"), max_length=4096)
         expires_in = _positive_seconds(
             device.get("expires_in"), maximum=_MAX_DEVICE_CODE_LIFETIME_SECONDS,
@@ -561,14 +564,14 @@ def _trusted_verification_uri(value: object) -> str:
         raise GrokAuthError("xAI OAuth verification URI is invalid.") from None
     if (
         parsed.scheme != "https"
-        or parsed.hostname != "auth.x.ai"
+        or parsed.hostname not in ("auth.x.ai", "accounts.x.ai")
         or parsed.username is not None
         or parsed.password is not None
         or port not in (None, 443)
         or not parsed.path.startswith("/")
         or parsed.query
         or parsed.fragment
-        or value != f"{AUTH_ISSUER}{parsed.path}"
+        or value not in (f"{AUTH_ISSUER}{parsed.path}", "https://accounts.x.ai/oauth2/device")
     ):
         raise GrokAuthError("xAI OAuth verification URI is not trusted.")
     return value

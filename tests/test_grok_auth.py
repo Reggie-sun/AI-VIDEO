@@ -44,6 +44,8 @@ class FakeOAuthTransport:
             "expires_in": 3600,
         }
         self.account_sub = ACCOUNT_SUB
+        self.verification_uri = f"{AUTH_ORIGIN}/activate"
+        self.verification_uri_complete = f"{AUTH_ORIGIN}/activate?device_code={DEVICE_CODE}"
 
     def request(self, method, url, *, headers=None, data=None):
         fields = dict(data or {})
@@ -60,10 +62,8 @@ class FakeOAuthTransport:
             return _response(200, {
                 "device_code": DEVICE_CODE,
                 "user_code": "ABCD-EFGH",
-                "verification_uri": f"{AUTH_ORIGIN}/activate",
-                "verification_uri_complete": (
-                    f"{AUTH_ORIGIN}/activate?device_code={DEVICE_CODE}"
-                ),
+                "verification_uri": self.verification_uri,
+                "verification_uri_complete": self.verification_uri_complete,
                 "expires_in": 300,
                 "interval": 1,
             })
@@ -264,6 +264,61 @@ def test_device_login_uses_trusted_oauth_endpoints_and_hides_device_code():
     assert DEVICE_CODE not in repr(status)
     assert ACCESS_TOKEN not in repr(status)
     assert REFRESH_TOKEN not in repr(status)
+
+
+@pytest.mark.parametrize("uri", [
+    "https://accounts.x.ai/oauth2/device",
+    "https://accounts.x.ai/activate",
+    "https://accounts.x.ai/oauth2/device?code=ABCD-EFGH",
+    "https://accounts.x.ai/oauth2/device#verify",
+    "https://accounts.x.ai.evil.example/oauth2/device",
+    "https://accounts.x.ai@evil.example/oauth2/device",
+    "https://evil.example@accounts.x.ai/oauth2/device",
+    "https://accounts.x.ai:443/oauth2/device",
+    "http://accounts.x.ai/oauth2/device",
+])
+def test_device_login_accepts_only_exact_official_accounts_verification_uri(uri):
+    transport = FakeOAuthTransport()
+    transport.verification_uri = uri
+    service = FakeSecretService()
+    manager = _manager(transport, secret_service=service)
+    displayed = []
+    callback = lambda page, code: displayed.append((page, code))
+    if uri == "https://accounts.x.ai/oauth2/device":
+        status = manager.login(on_device_code=callback)
+        assert status.state == "ready"
+        assert displayed == [(uri, "ABCD-EFGH")]
+        assert all(call[1].startswith(AUTH_ORIGIN + "/") for call in transport.calls)
+    else:
+        with pytest.raises(GrokAuthError, match="verification URI is not trusted"):
+            manager.login(on_device_code=callback)
+        assert len(transport.calls) == 2
+        assert displayed == []
+        assert service.value is None
+
+
+@pytest.mark.parametrize("complete_uri", [
+    "https://accounts.x.ai/oauth2/device?user_code=ABCD-EFGH",
+    "https://accounts.x.ai/oauth2/device?user_code=OTHER-CODE",
+    f"https://accounts.x.ai/oauth2/device?device_code={DEVICE_CODE}",
+    "https://accounts.x.ai/oauth2/device?user_code=ABCD-EFGH&extra=1",
+    "https://accounts.x.ai/oauth2/device?user_code=ABCD-EFGH#verify",
+    "https://evil.example/oauth2/device?user_code=ABCD-EFGH",
+])
+def test_device_login_displays_complete_uri_only_for_exact_bound_user_code(complete_uri):
+    transport = FakeOAuthTransport()
+    transport.verification_uri = "https://accounts.x.ai/oauth2/device"
+    transport.verification_uri_complete = complete_uri
+    displayed = []
+    status = _manager(transport).login(
+        on_device_code=lambda uri, code: displayed.append((uri, code)),
+    )
+    assert status.state == "ready"
+    expected = "https://accounts.x.ai/oauth2/device?user_code=ABCD-EFGH"
+    assert displayed == [(expected if complete_uri == expected else transport.verification_uri,
+                          "ABCD-EFGH")]
+    assert DEVICE_CODE not in repr(displayed)
+    assert all(call[1].startswith(AUTH_ORIGIN + "/") for call in transport.calls)
 
 
 def test_credential_supplier_checks_identity_expiry_and_never_refreshes():

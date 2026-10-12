@@ -1,5 +1,25 @@
 # SuperGrok Media Provider Implementation Plan
 
+## Live Subscription Follow-Up — 2026-10-12
+
+用户要求真实 Grok 生成测试并已完成官方 OAuth。既有交付状态为历史证据；本单元先修复
+official `accounts.x.ai/oauth2/device` 与 exact `user_code` complete URI，再在现有 billing owner
+增加显式、注入式 included-only authority。Default reject guard 与 `quota` 的只读行为保持。
+Authority 每次重开固定 billing / auto-topup GET：统一订阅池、finite current quota、零
+on-demand cap / used / prepaid balance、官方 schema 的 disabled/no-rule 必须全部成立。
+证据精确绑定 account/model/operation/period；失败不签零金额 preview，不提交、不重试。
+
+Primary source 为 xAI `grok-build` commit `2bdd1d6a6369de0e8c68132ea4539e9abd9e14a8`
+的 `billing.rs` / `credit_bar.rs`：positive cap 才启用 PAYG；backend reports none 为 known disabled。
+当前 authenticated catalog 的视频目录 404 与普通 `/models` 只有 LLM，不能冒称视频资格 PASS。
+仅在 qualification 与 canonical creative/permit admission 全部成立后，允许最多一次 Classic
+T2V、3s/480p/16:9、现金上限 0 的实验；known rejection/unknown 均停止，未产出则媒体 Gate
+为 NOT_EVALUATED。不得为了 smoke 增设账户 fallback、裸 POST 或虚构 binding。
+
+Owned files 为 `grok_auth.py` / `grok_billing.py` 及对应 tests、Grok guide、本 Plan 和 primary
+record；foreign Canvas 源码/文档不修改。验证先 boundary tests，再 exact staged Harness，
+最后按 Risk Gate 决定必要 independent review；真实 server observations 不等于媒体验收。
+
 Date: 2026-10-12
 Status: authorized implementation; Parent self-reviewed; offline-only evidence boundaries
 
