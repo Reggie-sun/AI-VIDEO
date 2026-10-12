@@ -8,7 +8,87 @@ learning_eligibility: ineligible
 
 Date: 2026-10-13
 
-## Current Runtime Stop — 2026-10-13
+## Current Input Admission Blocker — 2026-10-13
+
+用户要求“视频呢,修复给视频啊”后，Parent完成共享Seedance拒绝诊断修复并发布
+`17e1e96e1a4fc73909278352002723cf26cfa501`，远端main SHA已核验。随后沿原canonical
+known-no-effect recovery执行一个新有限单元的首个POST，收到HTTP400
+`InputImageSensitiveContentDetected.PrivacyInformation`。无Provider task、无新MP4；
+当前停止原因是actual输入图片准入拒绝，下方“具体根因NOT_EVALUATED”属于旧checkpoint。
+诊断修复使拒绝原因可见，不表示图片准入或视频生成已修复。
+
+### Image Origin And Provider Boundary
+
+沿用《界蚀》原林砚参考PNG，SHA
+`1a21ac10047cab19b441bfefd84ab91fef8de4b6787b7a5c558794903ff18b55`。
+来源record实际标为`image_gen`，版本未记录；本轮没有生成或替换这张图。用户原fictional/no-protected-identity
+声明和原source record保持；Provider错误类别不能证明图中存在真实人物，也不改签图片来源或身份声明。
+该图是首镜identity/scene输入；后镜ordinary state reference仍只允许取新accepted前镜实际帧，当前未提取。
+
+[方舟官方肖像素材说明](https://docs.volcengine.com/docs/ark/seedance-portrait-asset-guide?lang=zh)
+声明其人脸信任路径限定同账号、有效期内的指定方舟模型原始产物，跨平台产物不在该范围；
+本PNG的`image_gen`来源不构成此Provider信任证明。官方列出的Seedance受信图片是其返回尾帧，
+没有声明任意本地中间帧都受信；不能为平台准入把本实验ordinary状态参考静默改成强制尾帧。
+恢复要求可核验的compatible exact输入及适用授权；本轮没有去脸、换身份、改画风或改classification再提交。
+
+### Shared Diagnostic Proof
+
+新增`seedance_rejection.py`仅从有界JSON投影allowlisted错误码/参数名；不转发raw message/body、
+headers、request ID、URL、prompt或credential。Seedance adapter的4xx known_no_effect、429/5xx/transport
+unknown及one-use permit语义保持，未知/畸形/超限body回落原HTTP摘要。policy只补新路径和相关test映射。
+先复现adapter丢失错误码，再修复；focused验证155 PASS。最终exact staged Harness required checks全部满足，
+包含942 Provider tests、194 Vidu、444 neutral及原Harness/invariant suites，fresh receipt已核验：
+`.agent/harness/runs/canvas-seedance-rejection-diagnostic-exact-20261013/receipt.json`。
+初版unmapped-path失败和后续取消的旧snapshot run保留，不充当final证据。
+
+Implementation Risk Gate为KIMI_REVIEW_NOT_REQUIRED：只读诊断投影无新增authority或durable状态行为，
+secret projection、400/403 known outcome、429/500 unknown和exact一次POST/禁止permit重放均有tests。
+受管deep Kimi诊断调查`ea837b12-6e8d-42a3-a0f4-731e8a96970e`实际6 wire requests、217.840秒，
+结果STRUCTURED_OUTPUT_EXHAUSTED，没有可用报告、没有采用partial findings或重试；Parent独立核对源码/tests。
+这不是required implementation review，不宣称Kimi PASS。receipt在`J/kimi-rejection-receipt.json`。
+
+### Exact Recovery And Finite Count
+
+`J`仍代表`runs/canvas-jieshi-two-shot-20261013-001/`。原单元/历史计数不变，用户repair指令与任务内
+有限恢复授权封存于`J/repair-unit-001-authorization.json`：新单元最多2次POST以覆盖fresh A+B，
+零自动重抽；task ceiling从2扩到3、累计ceiling从9扩到10，每次50 CNY/unit100 CNY内部上限不变，
+不是市场报价或账单。原one-use permit不重用。
+
+第一次恢复operator调用被local quota guard在POST前拒绝，Manifest25，无新增reservation/intent/permit/POST。
+随后使用原`extend_paid_provider_submit_quota`，CAS绑定旧failed attempt、新pending request及原Budget，
+保留used1，typed quota extension将task ceiling2→3，Manifest26；没有更改guard或历史消费。
+再次执行新request得到下表actual拒绝；canonical runtime evaluation已落盘，当前Manifest29。
+
+| Evidence | Current Exact Identity / Outcome |
+| --- | --- |
+| Project data / revision | SHA `421e7f4399cdd179876c23a8f390b13de6d5ab7ca2980c6cead54c60a53a2643` / revision4，原两镜intent未改 |
+| New attempt | `canvas-293bebb27dd2322c484e104df678ac97ff5bbd4f` |
+| Request / generation hashes | `61ceab8a9b6e3c6ca73d525f894267de7ebb205b4c6839aa3eade0478564dddf` / `375dd128a3ee3383157112bccaa02d1d40f6767b681d0c5067642edec510c665` |
+| Exact paid preview | `99ea0358fa2f8c5d04fca00a3645947ebf3b61592fbfce4cfe0ff9965cefe02d` |
+| Canonical submit receipt | `b5d0fc3ab35bf401880f70826eaf336b565aab585f79aa2088607f8cc5549b68`；2026-10-12T19:40:32Z；known_no_effect、external_effect_id=null |
+| Runtime evidence | `00ef6c479567ad289086a1096e91f92384b8ca1c0ff7bea699d8b0a2bfdefcc4`；runtime_failure、findings空、artifact_sha256=null |
+| Main local evidence | `J/repair-unit-001-runtime-rejection-receipt.json`、`J/repair-unit-001-live-submit-error.json`、`J/repair-unit-001-runtime-evaluation.json` |
+| Finite unit / history | 当前repair unit1/2；项目实际POST2、ceiling3；历史7保留、累计9、ceiling10；剩余1不够fresh A+B |
+| Budget | 两次reservation均released，内部actual_cost_microunits=0；不证明Provider真实账单 |
+
+每次POST前核验exact private supplier、预配置上限有效期、原950 UTF8 bytes prompt、reference职责、
+axis/action/camera/audio、lint、synthetic/source/Registry及canonical execution binding。当前没有额外Provider
+账号/历史状态查询。新source输入已明确拒绝，停止原图重提；不能把failed当unknown，也不能靠重置计数继续。
+兼容输入的准备边界是保留原创作契约或明确表达其必要diff，不承诺改参考后必然准入/连续性PASS。
+
+### Unfinished Media Goal And Record
+
+共享离线工程PASS并已发布；真实模型A/B质量、逐镜project-local MCP、approved实际状态提取/后镜绑定、
+后镜自身七项findings、canonical trim/原生音轨/接点、HyperFrames声画验证片、human正常速度完整听看
+均为NOT_EVALUATED。无MP4所以未调用video-analysis冒充检查；后镜POST0。完整故事AC-7保持NOT_EVALUATED，
+development状态不变。没有故事执行脚本、第二timeline、state store或renderer。
+
+record-ai-video-session在actual输入blocker更新同一primary record；自动distill-ai-video-learning判no_candidate：
+两次使用相同输入的拒绝不构成独立模型连续性证据，旧generic400没有同错误类别证据，不能推导一般人脸识别结论。
+无learning placeholder、Skill/Policy/Gate adoption或RAG rebuild；本机runs未随源码发布。
+本记录按owned-path exact documentation Harness验证后commit/push；其他旧spec/plan/baseline/record dirty paths保留。
+
+## Historical Generic HTTP400 Stop — Superseded On 2026-10-13
 
 《界蚀》独立两镜测试已完成必要共享修复与真实前镜POST，未形成新视频。已发布工程
 `91b868527014987ad15c83d149261a480558d34d`，当次远端main SHA已核验一致。
