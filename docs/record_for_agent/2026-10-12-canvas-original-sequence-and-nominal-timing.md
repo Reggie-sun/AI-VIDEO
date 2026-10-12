@@ -16,6 +16,7 @@ Date: 2026-10-12
 第一镜原片已经逐镜 Gate、用户完整听看及 canonical activation；第二镜已按原文生成并 fetch exact MP4。
 两镜连续观看页已可播放；第二镜完整听看、canonical Gate/adoption、最终 composition/HyperFrames render
 和完整 spec 验收仍未完成。
+用户随后表示看不出两镜之间的连续性；当前结果不能作为镜头连续性复刻通过的证据。
 
 受管 Kimi 第一轮 HTTP403 后，用户明确授权原生只读审查。原生第一轮的三个发现已由 Parent
 实际复现、裁决并修复；该 candidate 的完整 Harness 已 PASS。第二轮又发现完整 source 语义
@@ -119,6 +120,23 @@ Chrome MCP integrated QA 确认两份视频和全部参考加载、无横向溢�
 当前两项 required findings 为 `NOT_EVALUATED`，见 `gate-assessment.json`；position 为 `validate`。
 没有执行第二镜 adoption、注册音轨、合成或最终 render；累计POST为7/7，不自动追加 generation。
 本记录不续期 pricing snapshot，不构成新调用授权。
+
+## Continuity Scope Clarification
+
+用户询问原视频是否也是两个分开的镜头，并反馈“我看不出来这两个镜头之间的连续性”。
+Parent 重新核对原 `mecha-document.json`、当前 `direction.json` 和只读画布节点/连接：
+原时间线1有17个视觉片段，开头为视频7的修剪片段，随后是视频2的四份修剪片段。
+画布还存在视频2修剪产物→截帧图片→视频3的参考链；不能从两份父生成节点推断原作没有续镜。
+当前选择的7→2则只封存 `identity_style_carryover`、`hard_cut` 与 `prop_identity=怪物`，
+没有以新第一镜末帧作为第二镜图像条件，也没有表达动作、机位或空间状态的承接。
+两份完整15秒原片的顺序播放没有复现原作修剪接点；身份一致不能代替用户所要求的镜头连续性。
+
+此轮只核对来源结构及当前输入，没有完整听看原时间线成片，不能断言原作的衔接好坏。
+尝试打开原时间线节点时，节点未变为可交互，未取得原接点播放证据。
+用户反馈保留为本次选段的连续性感受不足，不补签完整听看 PASS，也不凭这句反馈改写 canonical QA。
+第一镜已有接受历史保留，第二镜与最终成片仍未接受；下一步应先核对原修剪产物和实际接点，
+再确定忠实于来源的续镜验证对象，而不是把两个完整原片连播当作连续性验收。
+本次未修改代码、prompt、预算、Provider 输入或 Product state，没有追加生成。
 
 ## Native Verification And Review Blocker
 
@@ -239,6 +257,8 @@ exact request、MP4 与不可变恢复收据构成身份锚点；此处不制造
 第二轮补齐的语义攻击测试仍属于工程 contract 验证，不构成第二个时长恢复媒体实验。
 第二镜虽也测得额外末帧，尚无同契约恢复、媒体 Gate 或完整听看结论；新增此 raw evidence 后仍为 `no_candidate`。
 此处不将不同 mode/Shot 的两份样本概括成模型保证，也没有符合证据阈值的现有 claim 更新。
+连续性范围澄清后再评估仍为 `no_candidate`：这是一组原片的用户反馈及来源核对，
+没有受控的续镜比较或第二个独立连续性实验，不创建 Learning Claim 或采用新规则。
 
 记录过程没有 Provider/media 调用、网络研究或额外测试；只做记录相关只读证据核对与文档验证。
 Documentation contract gate 为 PASS；Evidence Index validator exit0、无 identity errors，未把记录标为已 admitted claim。
@@ -247,3 +267,7 @@ candidate9 的 receipt 只覆盖旧 tree；最新 source 修复产生的新 tree
 unrelated dirty/index work 保持不变；第三轮裁决后只发布已绑定 exact tree 的42个 owned paths。
 学习再评估仍为 `no_candidate`，工程边界复现和审查不是独立媒体实验，不创建学习 placeholder。
 experience follow-up 已运行并得到带 freshness 的 advisory fragments；未为记录手动刷新 RAG，索引整体 freshness 未另行验证。
+
+本次连续性诊断追加按 hook 的禁止额外测试/联网约束，只做本地 Documentation contract、
+Evidence Index identity 与 diff whitespace 核对；不运行新的 Harness/test，不复用旧 receipt 冒充新文档字节证明。
+追加只保存本地记录 checkpoint，不执行 push；未调用 Provider、媒体工具或网络。
