@@ -428,18 +428,37 @@ def test_frame_supported_encoded_image_formats(image_format, mime):
     assert uri.startswith(f"data:{mime};base64,")
 
 
-def _metaso_frame_router_fixture(monkeypatch, *, hard_cut):
+def _metaso_frame_router_fixture(monkeypatch, *, hard_cut, provider_name="metaso_h3"):
     import test_production_shot_router as r
     from ai_video.production.shot_router import AdapterCompilerContract
     from ai_video.production.video_requirement import OutputNeed, AudioNeed, OutputGeometryPolicy
     from tests.test_production_video_intent_validation import _complete_intent, _compatible_fl2va
     from ai_video.production.video_requirement import ConditioningLane
     provider, request, raw = _frame_setup(last=True)
+    output = provider._profile.output()
+    compiler_id = "metaso-h3-video-compiler"
+    if provider_name == "grok":
+        from ai_video.production.grok import GrokVideoProvider
+        from test_generation_provider_wiring import forbidden
+        from test_grok_video_operations import _image
+        from test_production_grok import _profile, _request
+
+        first, first_bytes = _image("opening", "first_frame")
+        last, last_bytes = _image("derived", "last_frame")
+        profile = _profile()
+        output = _request().output_requirement.model_copy(update={
+            "duration_seconds": 4, "native_audio": True})
+        request = _request(profile, images=True, image_bindings=(first, last),
+            input_artifact_ids=("shot", first.asset_id, last.asset_id))
+        raw = {"first_frame": first_bytes, "last_frame": last_bytes}
+        provider = GrokVideoProvider(profile=profile, transport=forbidden, credential=forbidden,
+            image_resolver=lambda binding: raw[binding.asset_id])
+        compiler_id = "grok-video-compiler"
     variant = next(v for v in provider.capabilities().variants if v.mode is VideoGenerationMode.IMAGE_TO_VIDEO)
-    compiler = AdapterCompilerContract.create(compiler_id="metaso-h3-video-compiler", compiler_version="1")
+    compiler = AdapterCompilerContract.create(compiler_id=compiler_id, compiler_version="1")
     common = dict(policy=r._policy(remote_authorized=True, budget_authorized=True),
         provider_profile=provider._profile.pointer(), capabilities=provider.capabilities(),
-        selected_capability_id=variant.capability_id, output_requirement=provider._profile.output(),
+        selected_capability_id=variant.capability_id, output_requirement=output,
         compiler_contract=compiler)
 
     def nominal_projection(projection):
@@ -454,7 +473,7 @@ def _metaso_frame_router_fixture(monkeypatch, *, hard_cut):
             }),
             output_need=OutputNeed(timing_mode="content_driven", duration_seconds=4,
                 geometry_policy=OutputGeometryPolicy.ADAPTIVE, aspect_ratio="adaptive",
-                fps=24, container_mime="video/mp4"), audio_need=AudioNeed.REQUIRED)
+                fps=output.fps, container_mime="video/mp4"), audio_need=AudioNeed.REQUIRED)
 
     def metaso_source_route(context, **kwargs):
         result = r.VideoGenerationResolver()._bind_requirement(context=context,
@@ -488,7 +507,7 @@ def _metaso_frame_router_fixture(monkeypatch, *, hard_cut):
             projection=r._exact_terminal_projection(context))
     fixture["projection"] = nominal_projection(fixture["projection"])
     fixture.update(common)
-    route = r._selected_route_identity(provider_name="metaso_h3", variant=variant,
+    route = r._selected_route_identity(provider_name=provider_name, variant=variant,
         provider_profile=provider._profile.pointer(), compiler_contract=compiler)
     if hard_cut:
         sequence = fixture["continuity_routing"]

@@ -128,12 +128,163 @@ def test_grok_subscription_models_through_common_caller(images):
     provider = GrokVideoProvider(profile=profile, transport=forbidden, credential=forbidden,
         image_resolver=forbidden)
     result = prepare(provider, profile.pointer(), output, "grok-video-compiler", "1",
+        authorized_model="grok-imagine-video-1.5",
         setup=conditioned_setup("image_to_video") if images else None)
     assert result.decision.disposition == "GENERATE_ONCE"
     assert result.compilation.outcome == "compiled"
     assert result.execution_binding is not None
     assert result.resolved_request.provider_kind == "grok"
     assert result.resolved_request.effective_output.fps is None
+
+
+@pytest.mark.parametrize("model,mode", [
+    (model, mode) for model, modes in [
+        ("grok-imagine-video-1.5", ("text_to_video", "image_to_video",
+                                  "first_last_frame_video", "reference_to_video")),
+        ("grok-imagine-video-1.5-lite", ("text_to_video", "image_to_video")),
+        ("grok-imagine-video", ("text_to_video", "image_to_video", "reference_to_video",
+                                "video_edit", "video_extend")),
+    ] for mode in modes
+])
+def test_grok_all_video_modes_through_common_caller(model, mode):
+    from ai_video.production.grok import GrokVideoProvider
+    from test_production_grok import _profile, _request
+
+    profile = _profile()
+    output = _request().output_requirement.model_copy(update={
+        "native_audio": True,
+        **({"duration_seconds": 9} if mode == "video_extend" else {}),
+    })
+    provider = GrokVideoProvider(profile=profile, transport=forbidden, credential=forbidden,
+        image_resolver=forbidden, media_resolver=forbidden)
+    result = prepare(provider, profile.pointer(), output, "grok-video-compiler", "1", model,
+        None if mode == "text_to_video" else conditioned_setup(
+            mode, image_references=mode == "reference_to_video"))
+    assert result.execution_binding is not None, result
+    assert result.compilation.outcome == "compiled"
+    assert result.resolved_request.model_id == model
+    assert result.resolved_request.mode.value == (
+        "image_to_video" if mode == "first_last_frame_video" else mode)
+
+
+@pytest.mark.parametrize("motion", ["none", "light_transform", "graphic", "character_action",
+                                    "free_complex"])
+@pytest.mark.parametrize("strategy", ["generated_video", "hybrid"])
+def test_grok_generated_shot_motion_categories_through_common_caller(motion, strategy):
+    from ai_video.production.grok import GrokVideoProvider
+    from ai_video.production.shot_router import MotionRequirement as RouterMotion
+    from ai_video.production.video_requirement import MotionRequirement
+    from test_production_grok import _profile, _request
+    from test_production_shot_router import _context, _lifecycle, _verified_requirement
+    from ai_video.production.models import VisualStrategy
+
+    profile = _profile()
+    setup = setup_decision()
+    context = _context(important=False, motion=RouterMotion(motion), visual_strategy=VisualStrategy(strategy))
+    setup.update(context=context, lifecycle=_lifecycle(context))
+    setup["projection"] = _replace_requirement(_verified_requirement(context),
+        motion_requirement=MotionRequirement(motion))
+    provider = GrokVideoProvider(profile=profile, transport=forbidden, credential=forbidden)
+    result = prepare(provider, profile.pointer(), _request().output_requirement,
+        "grok-video-compiler", "1", "grok-imagine-video-1.5", setup)
+    assert result.execution_binding is not None, result
+
+
+@pytest.mark.parametrize("mode", ["video_edit", "video_extend"])
+def test_grok_hero_repair_requires_exact_source_video(mode):
+    from ai_video.production.grok import GrokVideoProvider
+    from ai_video.production.shot_router import MotionRequirement as RouterMotion
+    from ai_video.production.video_requirement import MotionRequirement
+    from test_production_grok import _profile, _request
+
+    profile = _profile()
+    setup = conditioned_setup(mode)
+    setup["context"] = setup["context"].model_copy(update={
+        "motion_requirement": RouterMotion.HERO_OR_REPAIR})
+    setup["projection"] = _replace_requirement(setup["projection"],
+        motion_requirement=MotionRequirement.HERO_OR_REPAIR)
+    output = _request().output_requirement.model_copy(update={"native_audio": True,
+        "duration_seconds": 9 if mode == "video_extend" else 5})
+    provider = GrokVideoProvider(profile=profile, transport=forbidden, credential=forbidden,
+        media_resolver=forbidden)
+    result = prepare(provider, profile.pointer(), output, "grok-video-compiler", "1",
+        "grok-imagine-video", setup)
+    assert result.execution_binding is not None, result
+
+
+def test_grok_hero_cannot_fall_back_to_unconditioned_generation():
+    from ai_video.production.grok import GrokVideoProvider
+    from ai_video.production.shot_router import MotionRequirement as RouterMotion
+    from ai_video.production.video_requirement import MotionRequirement
+    from test_production_grok import _profile, _request
+
+    profile = _profile()
+    setup = setup_decision()
+    setup["context"] = setup["context"].model_copy(update={
+        "motion_requirement": RouterMotion.HERO_OR_REPAIR})
+    setup["projection"] = _replace_requirement(setup["projection"],
+        motion_requirement=MotionRequirement.HERO_OR_REPAIR)
+    provider = GrokVideoProvider(profile=profile, transport=forbidden, credential=forbidden)
+    result = prepare(provider, profile.pointer(), _request().output_requirement,
+        "grok-video-compiler", "1", "grok-imagine-video-1.5", setup)
+    assert result.execution_binding is None
+
+
+@pytest.mark.parametrize("controls", ["keyframe", "voices", "both", "voice_only"])
+def test_grok_profile_controls_through_common_caller(controls):
+    from ai_video.production.grok import GrokVideoProvider
+    from ai_video.production.grok_profile import GrokTimedKeyframe
+    from test_production_grok import _profile, _request
+
+    setup = conditioned_setup("reference_to_video", image_references=True) if controls != "voice_only" else None
+    values = {}
+    if controls in {"keyframe", "both"}:
+        asset = setup["projection"].requirement.asset_evidence[0]
+        values["keyframes"] = (GrokTimedKeyframe(asset_id=asset.asset_id,
+            asset_sha256=asset.asset_sha256, timestamp_ticks=3),)
+    if controls in {"voices", "both", "voice_only"}:
+        values["reference_voices"] = ("eve", "leo", "rex")
+    profile = _profile(**values)
+    provider = GrokVideoProvider(profile=profile, transport=forbidden, credential=forbidden,
+        image_resolver=forbidden)
+    output = _request(profile).output_requirement.model_copy(update={"native_audio": True})
+    result = prepare(provider, profile.pointer(), output, "grok-video-compiler", "1",
+        "grok-imagine-video-1.5", setup)
+    assert result.execution_binding is not None, result
+    assert result.resolved_request.provider_profile == profile.pointer()
+    assert result.resolved_request.model_id == "grok-imagine-video-1.5"
+
+
+@pytest.mark.parametrize("hard_cut", [False, True])
+def test_grok_exact_terminal_and_derived_hard_cut_reach_native_payload(monkeypatch, hard_cut):
+    import json
+    from ai_video.production.shot_router import VideoGenerationResolver, RoutingOutcome
+    from ai_video.production.video_compiler import require_compiled_provider_request
+    from ai_video.production.grok_video_request import build_grok_video_operation
+    from test_production_metaso_h3 import _metaso_frame_router_fixture
+
+    provider, fixture = _metaso_frame_router_fixture(monkeypatch,
+        hard_cut=hard_cut, provider_name="grok")
+    result = VideoGenerationResolver()._bind_requirement(**fixture)
+    assert result.decision.outcome is RoutingOutcome.SELECTED, result.decision
+    compiled = require_compiled_provider_request(provider.compile_request(
+        result.provider_bound_request, fixture["projection"].requirement))
+    resolved = provider.resolve(compiled.request)
+    expected = fixture["context"].shot_keyframe if hard_cut else fixture["context"].upstream_terminal
+    assert resolved.image_bindings[0].asset_id == expected.asset_id
+    assert resolved.capability_id == "grok-imagine-video-1.5-i2v-v1"
+    operation = build_grok_video_operation(resolved, profile=provider._profile,
+        capabilities=provider.capabilities(), image_resolver=provider._image_resolver,
+        media_resolver=None)
+    payload = json.loads(operation.body)
+    assert payload["image"]["url"].startswith("data:image/png;base64,")
+    assert payload["prompt"] == compiled.provider_native_prompt
+    assert "last_frame" not in payload
+    if hard_cut:
+        assert resolved.hard_cut_keyframe_binding == fixture["lifecycle"].hard_cut_keyframe_binding
+        assert expected != fixture["context"].upstream_terminal
+    else:
+        assert resolved.continuity_binding == fixture["lifecycle"].continuity_binding
 
 
 def conditioned_setup(mode, *, image_references=False):

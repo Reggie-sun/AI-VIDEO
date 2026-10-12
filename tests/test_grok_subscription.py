@@ -47,3 +47,40 @@ def test_exact_fake_boundary_can_be_bound_without_asserting_real_account_eligibi
     proof = binding()
     assert require_current_subscription(proof, account_fingerprint="a" * 64,
         model_id=proof.model_id, destination=proof.destination, now=NOW) == proof
+
+
+@pytest.mark.parametrize("path", ["/v1/videos/generations", "/v1/videos/edits",
+                                   "/v1/videos/extensions"])
+def test_classic_subscription_boundary_must_bind_exact_operation(path):
+    proof = binding(model_id="grok-imagine-video", operation_path=path)
+    assert require_current_subscription(proof, account_fingerprint="a" * 64,
+        model_id=proof.model_id, destination=proof.destination, now=NOW,
+        operation_path=path) == proof
+    wrong = "/v1/videos/edits" if path != "/v1/videos/edits" else "/v1/videos/extensions"
+    with pytest.raises(AiVideoError):
+        require_current_subscription(proof, account_fingerprint="a" * 64,
+            model_id=proof.model_id, destination=proof.destination, now=NOW,
+            operation_path=wrong)
+
+
+def test_legacy_generation_binding_hash_surface_is_preserved():
+    proof = binding()
+    assert "operation_path" not in proof.model_dump(mode="json")
+    assert require_current_subscription(proof, account_fingerprint="a" * 64,
+        model_id=proof.model_id, destination=proof.destination, now=NOW,
+        operation_path="/v1/videos/generations") == proof
+
+
+@pytest.mark.parametrize("model", ["grok-imagine-video", "grok-imagine-video-1.5-lite"])
+def test_new_models_need_operation_bound_included_only_evidence(model):
+    with pytest.raises(AiVideoError):
+        require_current_subscription(binding(model_id=model), account_fingerprint="a" * 64,
+            model_id=model, destination="https://cli-chat-proxy.grok.com", now=NOW,
+            operation_path="/v1/videos/generations")
+
+
+@pytest.mark.parametrize("model", ["grok-imagine-video-1.5", "grok-imagine-video-1.5-lite",
+                                    "grok-imagine-image-2.0"])
+def test_subscription_cannot_bind_edit_to_an_unsupported_model(model):
+    with pytest.raises(ValueError):
+        binding(model_id=model, operation_path="/v1/videos/edits")

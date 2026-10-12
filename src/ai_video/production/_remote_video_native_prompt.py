@@ -19,6 +19,7 @@ from ai_video.production._video_intent_validation import (
     validate_generation_intent_for_continuity,
 )
 from ai_video.production.models import StrictModel
+from ai_video.production._remote_video_product_prompt import product_fidelity_sentences
 from ai_video.production.video_requirement import (
     AudioNeed,
     ContinuityStateKind,
@@ -339,6 +340,7 @@ def compile_remote_video_prompt(
             "generation_intent.camera_subject_relation.relation_kind",
         )
     )
+    sentences.extend(product_fidelity_sentences(requirement))
     prompt = unicodedata.normalize("NFC", " ".join(sentences))
     if not prompt or len(prompt) > 5_000:
         return RemoteVideoPromptUnsupported(

@@ -774,7 +774,8 @@ def test_multi_anchor_context_fails_closed_without_sealed_c4_requirement():
 
 
 
-def test_c4_static_requirement_routes_and_compiles_exact_request():
+@pytest.mark.parametrize("provider_name", ["local_test", "grok"])
+def test_c4_static_requirement_routes_and_compiles_exact_request(provider_name):
     from ai_video.production._video_continuity import C4SemanticBoundaryState
     from test_production_video import (
         _c4_binding,
@@ -790,7 +791,7 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
         ),
     )
     compiler = AdapterCompilerContract.create(
-        compiler_id="test-c4-compiler",
+        compiler_id="grok-video-compiler" if provider_name == "grok" else "test-c4-compiler",
         compiler_version="1",
     )
     source_context = _context(
@@ -834,6 +835,9 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
             "target_shot_content_hash": context.target_shot_content_hash,
             "registry_revision_id": HASH_F,
             "duration_milliseconds": 4_000,
+            **({"asset_width": continuity_lifecycle.continuity_binding.terminal_frame.extracted_width,
+                "asset_height": continuity_lifecycle.continuity_binding.terminal_frame.extracted_height}
+               if provider_name == "grok" else {}),
         },
         semantic_boundary=C4SemanticBoundaryState.create(
             target_shot_id=context.target_shot_id,
@@ -921,6 +925,27 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
             framing_continuity="preserve subject scale",
         ),
     )
+    output = _output()
+    conditioning = None
+    if provider_name == "grok":
+        from ai_video.production.video_requirement import ConditioningCompatibilityEvidence
+        from test_production_video_intent_validation import _complete_intent
+        from test_production_grok import _request
+
+        intent = _complete_intent().model_copy(update={
+            "space_continuity": intent.space_continuity,
+            "axis_continuity": intent.axis_continuity,
+            "ambience_intent": _complete_intent().ambience_intent.model_copy(update={
+                "environment_bed": "none", "foley_cues": (), "explicitly_silent": True}),
+            "pacing": _complete_intent().pacing.model_copy(update={"shot_duration_seconds": 4}),
+        })
+        output = _request().output_requirement.model_copy(update={
+            "duration_seconds": 4, "timing_mode": "exact_seconds"})
+        conditioning = ConditioningCompatibilityEvidence(lane="fl2va",
+            first_anchor_id=terminal_asset.asset_id, last_anchor_id=endpoint_asset.asset_id,
+            same_subject_scale=True, composition_compatible=True, screen_order_compatible=True,
+            axis_compatible=True, camera_path_reachable=True, character_prop_state_reachable=True,
+            action_endpoint_reachable=True, available_duration_seconds=4)
     character = make_character().model_copy(
         update={
             "artifact_id": "character-001",
@@ -937,6 +962,9 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
         characters=(character,),
         asset_evidence=evidence,
         c4_multi_anchor_binding=binding,
+        conditioning_compatibility=conditioning,
+        **({"capability_need": CapabilityNeed(needs_first_frame=True, needs_last_frame=True)}
+           if provider_name == "grok" else {}),
         generation_mode=RequirementGenerationMode.IMAGE_TO_VIDEO,
         continuity_mode=RequirementContinuityMode.MULTI_ANCHOR,
         motion_requirement=RequirementMotionRequirement.CHARACTER_ACTION,
@@ -944,9 +972,12 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
         semantic_reference_roles=tuple(item.role for item in evidence),
         output_need=OutputNeed(
             duration_seconds=4,
-            width=1024,
-            height=576,
-            fps=24,
+            timing_mode="fixed",
+            geometry_policy="adaptive" if provider_name == "grok" else "exact",
+            aspect_ratio="adaptive" if provider_name == "grok" else None,
+            width=output.width,
+            height=output.height,
+            fps=output.fps,
             container_mime="video/mp4",
         ),
         audio_need=AudioNeed.FORBIDDEN,
@@ -992,10 +1023,25 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
     )
     profile = _profile()
     capabilities = _capabilities(variant)
+    variant = capabilities.variants[0]
+    provider = None
+    if provider_name == "grok":
+        from ai_video.production.grok import GrokVideoProvider
+        from test_generation_provider_wiring import forbidden
+        from test_production_grok import _profile as grok_profile
+
+        provider = GrokVideoProvider(profile=grok_profile(), credential=forbidden,
+            transport=forbidden, image_resolver=forbidden)
+        profile = grok_profile().pointer()
+        capabilities = provider.capabilities()
+        variant = next(v for v in capabilities.variants
+            if v.capability_id == "grok-imagine-video-1.5-i2v-c4-static-v1")
     source_route = _bound_route_identity(previous_bound)
+    route_policy = _policy(remote_authorized=provider_name == "grok",
+        budget_authorized=provider_name == "grok")
     destination_route = _selected_route_identity(
         provider_name=capabilities.provider_name,
-        variant=capabilities.variants[0],
+        variant=variant,
         provider_profile=profile,
         compiler_contract=compiler,
     )
@@ -1042,11 +1088,11 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
     incomplete = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
-        policy=_policy(),
+        policy=route_policy,
         provider_profile=profile,
         capabilities=incomplete_capabilities,
         selected_capability_id=incomplete_variant.capability_id,
-        output_requirement=_output(),
+        output_requirement=output,
         lifecycle=lifecycle,
         compiler_contract=compiler,
         continuity_routing=incomplete_routing,
@@ -1101,6 +1147,10 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
             ),
             "c4_multi_anchor_binding": stale_binding,
             "asset_evidence": stale_evidence,
+            **({"conditioning_compatibility": conditioning.model_copy(update={
+                "first_anchor_id": stale_binding.terminal.extracted_asset_id,
+                "last_anchor_id": stale_binding.approved_endpoint.asset_id})}
+               if conditioning is not None else {}),
         }
     )
     stale_projection = VerifiedGenerationRequirementProjection.create(
@@ -1119,11 +1169,11 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
         VideoGenerationResolver()._bind_requirement(
             projection=stale_projection,
             context=context,
-            policy=_policy(),
+            policy=route_policy,
             provider_profile=profile,
             capabilities=capabilities,
             selected_capability_id=variant.capability_id,
-            output_requirement=_output(),
+            output_requirement=output,
             lifecycle=lifecycle,
             compiler_contract=compiler,
             continuity_routing=continuity_routing,
@@ -1132,11 +1182,11 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
     routed = VideoGenerationResolver()._bind_requirement(
         projection=projection,
         context=context,
-        policy=_policy(),
+        policy=route_policy,
         provider_profile=profile,
         capabilities=capabilities,
         selected_capability_id=variant.capability_id,
-        output_requirement=_output(),
+        output_requirement=output,
         lifecycle=lifecycle,
         compiler_contract=compiler,
         continuity_routing=continuity_routing,
@@ -1149,7 +1199,8 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
         routed.decision.rationale,
     )
     assert routed.provider_bound_request is not None
-    compiled = compile_provider_video_request(
+    compiled = provider.compile_request(provider_bound=routed.provider_bound_request,
+        requirement=requirement) if provider is not None else compile_provider_video_request(
         provider_bound=routed.provider_bound_request,
         requirement=requirement,
         compiler_id=compiler.compiler_id,
@@ -1162,6 +1213,10 @@ def test_c4_static_requirement_routes_and_compiles_exact_request():
         "last_frame",
         "reference",
     )
+    if provider is not None:
+        resolved = provider.resolve(compiled.request)
+        assert resolved.c4_multi_anchor_binding == binding
+        assert resolved.effective_output.timing_mode == "exact_seconds"
 
 
 def _output() -> VideoOutputRequirement:
@@ -3443,7 +3498,8 @@ def test_reference_routing_generalizes_across_distinct_references_and_prompts() 
     }.isdisjoint(binding.asset_sha256 for binding in requests[1].image_bindings)
 
 
-def test_semantic_continuity_carries_state_but_never_terminal_pixels() -> None:
+@pytest.mark.parametrize("provider_name", ["local_test", "grok"])
+def test_semantic_continuity_carries_state_but_never_terminal_pixels(provider_name) -> None:
     terminal = _asset("continuity_terminal", "available-but-unused", HASH_C)
     state = _continuity_state()
     context = _context(
@@ -3452,15 +3508,25 @@ def test_semantic_continuity_carries_state_but_never_terminal_pixels() -> None:
         continuity_state=state,
     )
 
+    profile = _profile()
+    capabilities = _capabilities(_variant(VideoGenerationMode.REFERENCE_TO_VIDEO))
+    selected_id = "capability-reference_to_video"
+    output = _output()
+    if provider_name == "grok":
+        from ai_video.production.grok_profile import grok_capabilities
+        from test_production_grok import _profile as grok_profile, _request
+
+        profile = grok_profile().pointer()
+        capabilities = grok_capabilities(grok_profile())
+        selected_id = "grok-imagine-video-1.5-r2v-v1"
+        output = _request().output_requirement
     decision = VideoGenerationResolver()._resolve_capability(
         context=context,
-        policy=_policy(),
-        provider_profile=_profile(),
-        capabilities=_capabilities(
-            _variant(VideoGenerationMode.REFERENCE_TO_VIDEO)
-        ),
-        selected_capability_id="capability-reference_to_video",
-        output_requirement=_output(),
+        policy=_policy(remote_authorized=provider_name == "grok", budget_authorized=provider_name == "grok"),
+        provider_profile=profile,
+        capabilities=capabilities,
+        selected_capability_id=selected_id,
+        output_requirement=output,
     )
 
     assert decision.outcome is RoutingOutcome.SELECTED

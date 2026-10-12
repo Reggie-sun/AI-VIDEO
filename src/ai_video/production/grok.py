@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import base64
 import hashlib
 import json
 import re
@@ -26,6 +25,13 @@ from ai_video.production.grok_profile import (
     GROK_VIDEO_MODEL,
     GrokProviderProfile,
     grok_capabilities,
+)
+from ai_video.production.grok_video_request import (
+    MAX_GROK_POST_BODY_BYTES,
+    build_grok_video_operation,
+    grok_endpoint_for_mode,
+    grok_egress_inputs,
+    validate_grok_video_request,
 )
 from ai_video.production.grok_subscription import (
     GROK_CREDENTIAL_REFERENCE,
@@ -51,6 +57,7 @@ from ai_video.production.video import (
     VideoGenerationPreview,
     VideoGenerationRequest,
     VideoImageReferenceBinding,
+    VideoMediaReferenceBinding,
     VideoProviderCapabilities,
     VideoProviderTaskBinding,
     VideoSubmission,
@@ -72,7 +79,7 @@ from ai_video.production.video_requirement import ProviderNeutralVideoRequiremen
 _API_BASE = "https://cli-chat-proxy.grok.com/v1"
 _API_ORIGIN = "https://cli-chat-proxy.grok.com"
 _MAX_JSON_BYTES = 1_000_000
-_MAX_BODY_BYTES = 30 * 1024 * 1024
+_MAX_BODY_BYTES = MAX_GROK_POST_BODY_BYTES
 _SAFE_ID = re.compile(r"^[A-Za-z0-9._:-]{1,256}$")
 _KNOWN_SUBMIT_REJECTIONS = frozenset({400, 401, 403, 404, 405, 413, 415, 422})
 
@@ -196,7 +203,14 @@ class HttpxGrokTransport:
             or parsed.fragment
             or parsed.username is not None
             or parsed.password is not None
-            or (request.method == "POST" and parsed.path != "/v1/videos/generations")
+            or (
+                request.method == "POST"
+                and parsed.path not in {
+                    "/v1/videos/generations",
+                    "/v1/videos/edits",
+                    "/v1/videos/extensions",
+                }
+            )
             or (
                 request.method == "GET"
                 and (not parsed.path.startswith("/v1/videos/")
@@ -255,6 +269,7 @@ class GrokVideoProvider:
         | None = None,
         transport: GrokTransport | None = None,
         image_resolver: Callable[[VideoImageReferenceBinding], bytes] | None = None,
+        media_resolver: Callable[[VideoMediaReferenceBinding], bytes] | None = None,
         now: Callable[[], datetime] | None = None,
     ) -> None:
         self._profile = profile
@@ -262,13 +277,15 @@ class GrokVideoProvider:
         self._subscription_guard = subscription_guard or reject_unverified_included_only
         self._transport = transport or HttpxGrokTransport()
         self._image_resolver = image_resolver
+        self._media_resolver = media_resolver
         self._now = now or (lambda: datetime.now(UTC))
 
     def capabilities(self) -> VideoProviderCapabilities:
-        return grok_capabilities()
+        return grok_capabilities(self._profile)
 
-    def _target_id(self, model_id: str) -> str:
-        return f"{_API_BASE}/videos/generations/{self._profile.pointer().profile_sha256}/{model_id}"
+    def _target_id(self, model_id: str, mode: VideoGenerationMode) -> str:
+        endpoint = grok_endpoint_for_mode(mode)
+        return f"{_API_BASE}/videos/{endpoint}/{self._profile.pointer().profile_sha256}/{model_id}"
 
     def compile_request(
         self,
@@ -329,18 +346,15 @@ class GrokVideoProvider:
 
     def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:
         output = request.output_requirement
+        capabilities = self.capabilities()
         if (
             request.provider_name != "grok"
             or request.provider_kind != "grok"
             or request.provider_profile != self._profile.pointer()
-            or request.model_id != GROK_VIDEO_MODEL
+            or request.model_id not in {variant.model_id for variant in capabilities.variants}
             or not isinstance(output, VideoFlexibleOutputRequirement)
             or request.negative_prompt_text
             or request.seed is not None
-            or request.media_bindings
-            or request.c4_multi_anchor_binding is not None
-            or request.hard_cut_keyframe_binding is not None
-            or request.seal_terminal_frame
             or output.fps is not None
         ):
             raise _error(
@@ -349,51 +363,46 @@ class GrokVideoProvider:
             )
         variants = tuple(
             variant
-            for variant in self.capabilities().variants
+            for variant in capabilities.variants
             if variant.model_id == request.model_id
             and variant.mode is request.mode
             and variant.output_capability is not None
             and variant.output_capability.supports(output)
         )
-        if len(variants) != 1:
+        if not variants:
             raise _error(
-                "Grok request does not match one documented video capability.",
+                "Grok request does not match a documented video capability.",
                 ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
             )
-        if request.mode is VideoGenerationMode.TEXT_TO_VIDEO:
-            if request.image_bindings:
-                raise _error("Grok text-to-video cannot contain image references.", ErrorCode.VIDEO_REQUEST_INVALID)
-        elif request.mode is VideoGenerationMode.IMAGE_TO_VIDEO:
-            if (
-                len(request.image_bindings) != 1
-                or request.image_bindings[0].role != "first_frame"
-            ):
-                raise _error("Grok image-to-video requires exactly one first frame.", ErrorCode.VIDEO_REQUEST_INVALID)
-            image = request.image_bindings[0]
-            if (
-                image.size_bytes is None
-                or image.size_bytes > variants[0].max_image_bytes
-                or image.mime_type not in variants[0].allowed_image_mime_types
-                or image.width < variants[0].min_image_width
-                or image.height < variants[0].min_image_height
-            ):
-                raise _error("Grok first-frame image is outside the documented capability.", ErrorCode.VIDEO_REQUEST_INVALID)
-        else:
+        compatible: list[ResolvedVideoGenerationRequest] = []
+        for variant in variants:
+            try:
+                resolved = ResolvedVideoGenerationRequest.create(
+                    request=request,
+                    capability=variant,
+                    effective_output=output,
+                    effective_seed=None,
+                    effective_negative_prompt_text="",
+                    provider_task_binding=VideoProviderTaskBinding(
+                        request_target_id=self._target_id(request.model_id, request.mode),
+                        response_model_id=request.model_id,
+                    ),
+                )
+                validate_grok_video_request(
+                    resolved,
+                    profile=self._profile,
+                    capabilities=capabilities,
+                    variant=variant,
+                )
+            except AiVideoError:
+                continue
+            compatible.append(resolved)
+        if len(compatible) != 1:
             raise _error(
-                "Grok video mode is not supported.",
+                "Grok request does not identify exactly one supported model and operation shape.",
                 ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
             )
-        return ResolvedVideoGenerationRequest.create(
-            request=request,
-            capability=variants[0],
-            effective_output=output,
-            effective_seed=None,
-            effective_negative_prompt_text="",
-            provider_task_binding=VideoProviderTaskBinding(
-                request_target_id=self._target_id(request.model_id),
-                response_model_id=request.model_id,
-            ),
-        )
+        return compatible[0]
 
     def preview(self, request: ResolvedVideoGenerationRequest) -> VideoGenerationPreview:
         if (
@@ -411,7 +420,10 @@ class GrokVideoProvider:
             estimated_cost_upper_bound_microunits=0,
             currency="USD",
             destination=self._profile.origin,
-            egress_item_ids=("prompt", *(item.asset_id for item in request.image_bindings)),
+            egress_item_ids=(
+                "prompt",
+                *(item.asset_id for item in grok_egress_inputs(request)),
+            ),
         )
 
     def _headers(self, *, method: Literal["GET", "POST"]) -> dict[str, str]:
@@ -443,12 +455,18 @@ class GrokVideoProvider:
         paid_preview: PaidProviderCallPreview,
     ) -> GrokSubscriptionBinding:
         binding = paid_preview.subscription_binding
+        operation_path = f"/v1/videos/{grok_endpoint_for_mode(request.mode)}"
+        legacy_generation_binding = (
+            request.model_id == GROK_VIDEO_MODEL
+            and operation_path == "/v1/videos/generations"
+            and getattr(binding, "operation_path", None) is None
+        )
         if (
             paid_preview.billing_mode != "remote_subscription"
             or binding is None
             or paid_preview.provider_kind != "grok"
             or paid_preview.operation != "video_generation"
-            or paid_preview.model_id != GROK_VIDEO_MODEL
+            or paid_preview.model_id != request.model_id
             or paid_preview.destination != self._profile.origin
             or paid_preview.currency != "USD"
             or paid_preview.estimated_cost_upper_bound_microunits != 0
@@ -456,6 +474,10 @@ class GrokVideoProvider:
             or binding.model_id != request.model_id
             or binding.destination != self._profile.origin
             or binding.credential_reference_id != GROK_CREDENTIAL_REFERENCE
+            or (
+                getattr(binding, "operation_path", None) != operation_path
+                and not legacy_generation_binding
+            )
             or paid_preview.secret_reference.kind != "secret_store"
             or paid_preview.secret_reference.reference_id != GROK_CREDENTIAL_REFERENCE
             or paid_preview.subscription_binding != binding
@@ -477,6 +499,7 @@ class GrokVideoProvider:
             account_fingerprint=self._profile.account_fingerprint,
             model_id=request.model_id,
             destination=self._profile.origin,
+            operation_path=f"/v1/videos/{grok_endpoint_for_mode(request.mode)}",
             now=now,
         )
         try:
@@ -494,41 +517,6 @@ class GrokVideoProvider:
                 ErrorCode.PAID_PROVIDER_BUDGET_REJECTED,
             )
 
-    def _payload(self, request: ResolvedVideoGenerationRequest) -> bytes:
-        output = request.effective_output
-        if not isinstance(output, VideoFlexibleOutputRequirement):
-            raise _error("Grok output requirement is invalid.", ErrorCode.VIDEO_REQUEST_INVALID)
-        payload: dict[str, object] = {
-            "model": request.model_id,
-            "prompt": request.prompt_text,
-            "duration": output.duration_seconds,
-            "resolution": output.resolution_label,
-            "generate_audio": output.native_audio,
-        }
-        if request.mode is VideoGenerationMode.IMAGE_TO_VIDEO:
-            binding = request.image_bindings[0]
-            try:
-                image = self._image_resolver(binding) if self._image_resolver else None
-            except Exception:
-                raise _error("Grok first-frame bytes are unavailable.", ErrorCode.VIDEO_REQUEST_INVALID) from None
-            if (
-                not isinstance(image, bytes)
-                or len(image) != binding.size_bytes
-                or hashlib.sha256(image).hexdigest() != binding.asset_sha256
-            ):
-                raise _error("Grok first-frame bytes do not match their sealed binding.", ErrorCode.VIDEO_REQUEST_INVALID)
-            encoded = f"data:{binding.mime_type};base64," + base64.b64encode(image).decode("ascii")
-            payload["image"] = {"url": encoded}
-        try:
-            body = json.dumps(
-                payload, ensure_ascii=False, separators=(",", ":"), allow_nan=False
-            ).encode("utf-8")
-        except (TypeError, ValueError):
-            raise _error("Grok request payload is invalid.", ErrorCode.VIDEO_REQUEST_INVALID) from None
-        if len(body) > _MAX_BODY_BYTES:
-            raise _error("Grok request exceeds the body size limit.", ErrorCode.VIDEO_REQUEST_INVALID)
-        return body
-
     def _validate_egress(self, request, paid_preview: PaidProviderCallPreview) -> None:
         prompt = request.prompt_text.encode("utf-8")
         expected = {
@@ -536,9 +524,15 @@ class GrokVideoProvider:
                 hashlib.sha256(prompt).hexdigest(), len(prompt), "text/plain", "prompt"
             )
         }
+        exact_inputs = grok_egress_inputs(request)
         expected.update({
-            item.asset_id: (item.asset_sha256, item.size_bytes, item.mime_type, "reference")
-            for item in request.image_bindings
+            item.asset_id: (
+                item.asset_sha256,
+                item.size_bytes,
+                item.mime_type,
+                "reference",
+            )
+            for item in exact_inputs
         })
         actual = {
             item.item_id: (item.sha256, item.size_bytes, item.mime_type, item.purpose)
@@ -548,7 +542,7 @@ class GrokVideoProvider:
             actual != expected
             or len(actual) != len(paid_preview.egress_items)
             or tuple(item.item_id for item in paid_preview.egress_items)
-            != ("prompt", *(item.asset_id for item in request.image_bindings))
+            != ("prompt", *(item.asset_id for item in exact_inputs))
         ):
             raise _error("Grok egress does not bind exact input bytes.", ErrorCode.VIDEO_REQUEST_INVALID)
 
@@ -591,7 +585,14 @@ class GrokVideoProvider:
             )
 
         self._require_current_subscription(request, binding)
-        body = self._payload(request)
+        operation = build_grok_video_operation(
+            request,
+            profile=self._profile,
+            capabilities=self.capabilities(),
+            image_resolver=self._image_resolver,
+            media_resolver=self._media_resolver,
+        )
+        body = operation.body
         headers = self._headers(method="POST")
         validate_paid_provider_authorization(
             paid_preview, authorization, now=self._now()
@@ -613,7 +614,7 @@ class GrokVideoProvider:
             raise _error("Grok authorization is no longer current before POST.") from None
 
         transport_request = GrokTransportRequest(
-            "POST", f"{_API_BASE}/videos/generations", headers, body
+            "POST", f"{_API_BASE}/videos/{operation.endpoint}", headers, body
         )
         try:
             response = self._transport.request(transport_request)
@@ -647,15 +648,23 @@ class GrokVideoProvider:
         receipt: PaidProviderSubmitReceipt,
     ) -> str:
         task_binding = submission.provider_task_binding
+        allowed_targets = {
+            self._target_id(variant.model_id, variant.mode)
+            for variant in self.capabilities().variants
+        }
         if (
             receipt.outcome is not PaidProviderSubmitOutcome.ACCEPTED
             or receipt.submit_receipt_fingerprint
             != submission.paid_submit_receipt_fingerprint
             or receipt.request_fingerprint != submission.resolved_generation_hash
             or task_binding is None
-            or task_binding.response_model_id != GROK_VIDEO_MODEL
-            or task_binding.request_target_id
-            != self._target_id(task_binding.response_model_id)
+            or task_binding.request_target_id not in allowed_targets
+            or not any(
+                variant.model_id == task_binding.response_model_id
+                and self._target_id(variant.model_id, variant.mode)
+                == task_binding.request_target_id
+                for variant in self.capabilities().variants
+            )
         ):
             raise _error("Grok submission evidence does not match.", ErrorCode.VIDEO_REQUEST_INVALID)
         return _identifier(receipt.external_effect_id)

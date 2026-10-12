@@ -51,6 +51,8 @@ from ai_video.production.review import (
     adjudicate_generated_shot_continuity,
 )
 from ai_video.production.video_contracts import matches_video_timing_measurement
+from ai_video.production.video_geometry import matches_video_geometry
+from ai_video.production.grok_video_measurement import matches_grok_video_measurement
 from ai_video.production.video_timing_recovery import VideoNominalEndpointRecovery
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
@@ -912,8 +914,6 @@ def _probe_generated_video_candidate(
         raise _video_artifact_error("Generated video probe evidence is invalid.") from exc
 
     output = expected_request.effective_output
-    expected_width = getattr(output, "width", None)
-    expected_height = getattr(output, "height", None)
     expected_fps = getattr(output, "fps", None)
     timing_matches = matches_video_timing_measurement(
         output,
@@ -934,10 +934,8 @@ def _probe_generated_video_candidate(
     if (
         output.container != "mp4"
         or output.mime_type != "video/mp4"
-        or expected_width is not None
-        and measured.width != expected_width
-        or expected_height is not None
-        and measured.height != expected_height
+        or not matches_video_geometry(output, width=measured.width, height=measured.height)
+        or not matches_grok_video_measurement(expected_request, measured)
         or expected_fps is not None
         and Fraction(measured.fps_numerator, measured.fps_denominator) != expected_fps
         or not timing_matches

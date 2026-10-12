@@ -38,7 +38,10 @@ def commercial_requirement_values(
     if approval is None or references is None:
         return {}
     return {
-        "contract_version": "provider-neutral-video-requirement/3",
+        "contract_version": ("provider-neutral-video-requirement/4"
+            if request.generation_intent is not None
+            and request.generation_intent.generation_intent.primary_camera_motion is not None
+            else "provider-neutral-video-requirement/3"),
         "commercial_execution_class": "product_interaction",
         "product_fidelity_requirement": ProductFidelityRequirement(
             product_id=references.product_id,
@@ -179,6 +182,8 @@ def build_commercial_video_planning_request(
     intent = checked_request.generation_intent
     commercial_intent = ProviderNeutralGenerationIntentProjection.create(
         generation_intent=intent.generation_intent,
+        voice_routing=intent.voice_routing,
+        conditioning_compatibility=intent.conditioning_compatibility,
         generation_operation=intent.generation_operation,
         semantic_reference_roles=(SemanticReferenceRole.FIRST_FRAME,),
         media_reference_asset_ids=(),

@@ -22,6 +22,7 @@ from ai_video.production._shot_router_contracts import (
     VideoRoutingPolicy,
 )
 from ai_video.production._shot_visual_resolver import ShotVisualResolver
+from ai_video.production._video_hero_routing import has_exact_hero_source
 from ai_video.production._video_capability_fingerprint import (
     binding_roles_satisfy_variant,
     capability_variant_fingerprint,
@@ -217,12 +218,15 @@ class VideoGenerationResolver:
                 RouterReasonCode.ROUTER_REQUIRES_GENERATED_VIDEO_SHOT,
                 "Video generation routing only consumes an activated generated-video Shot.",
             )
-        if context.motion_requirement is MotionRequirement.HERO_OR_REPAIR:
+        if context.motion_requirement is MotionRequirement.HERO_OR_REPAIR and not has_exact_hero_source(
+            requirement_mode, requirement_binding_roles, requirement_input_assets,
+            lineage_current=requirement_lineage_current,
+        ):
             return self._blocked(
                 base,
                 RoutingOutcome.BLOCKED_POLICY,
                 RouterReasonCode.HERO_SHOT_REQUIRES_HYBRID_OR_V2V,
-                "Hero or repair routing requires a future exact media-binding slice.",
+                "Hero or repair routing requires an exact measured source-video edit or extension.",
             )
         required_mode: VideoGenerationMode
         required_roles: tuple[str, ...]
@@ -482,7 +486,7 @@ class VideoGenerationResolver:
         commercial_source_preparation = bool(
             commercial_current
             and requirement.contract_version
-            == "provider-neutral-video-requirement/3"
+            in {"provider-neutral-video-requirement/3", "provider-neutral-video-requirement/4"}
             and requirement.capability_need.needs_product_fidelity
         )
         if expected_mode is None or binding_projection is None:

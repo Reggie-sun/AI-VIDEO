@@ -22,6 +22,68 @@ Grok OAuth、只读 usage、image/video adapters 与 canonical Production wiring
 image/video POST 或媒体生成。Fake tests 与工程 review 不构成账号资格、媒体质量或 P6/Final Acceptance。
 现有操作说明归 [Grok Provider](../grok-provider.md)，契约归 accepted Spec/Plan、matrix 与 runtime baseline。
 
+## All-Shot Expansion Checkpoint
+
+用户随后要求“所有需要shot的类型都接入,所有grok视频生成能力都要接入”。继续在上述明确
+授权的 development worktree，从已发布 `153bd4f7d3dce5cdc1b7e671cd3cd54aad7695d5` 扩展。
+accepted [Spec](../superpowers/specs/2026-10-12-grok-all-shot-video-capabilities.md) /
+[Plan](../superpowers/plans/2026-10-12-grok-all-shot-video-capabilities.md) 已由 Parent self-review。
+以下是新增 slice 的开发 checkpoint，不复用首轮 receipt 冒充新 source 验收。
+
+新增 Full 1.5 / Lite / Classic 的五种适用模式，首尾/last-only、14 references、4 keyframes、
+3 preset voices、公开 ratios、source edit/extend。Keyframes/voices 归 sealed profile；exact input
+仍进入原 Registry request，POST paths 和 subscription model/operation 精确绑定。
+不改写 `<IMAGE_n>` / `<AUDIO_n>` 的已封存 prompt，不猜 actor/tag 映射；preset 不是 voice qualification。
+Pure I2V 继承首图比例；edit/extend 无未经文档支持的 output override，拒绝 >720p source 自动缩小。
+canonical artifact 与 reader 同时重验 ratio/resolution 和继承尺寸/时长。
+
+Shot tests 覆盖 Generated Video / Hybrid、所有适用 motion categories、semantic continuity、
+exact terminal / hard-cut derived first-frame、static C4 和 exact-source hero repair。
+产品交互的标准 project loading / approved source / Planner / Router / Grok compiler 路径实际走通；
+修复 commercial handoff 丢 conditioning 和固定 v3 的断层，完整意图采用已有 v4，同等复验 approved
+first-frame lineage，并在 shared native grammar 表达原 product fidelity。历史 v3 仍通过。
+图表/End Card/controlled product Hero 保持 deterministic composition；motion-tail、native camera、
+partner custom audio 和未资格的 actor voice obligation 仍明确阻断，不因“全部”削弱质量或授权。
+
+Native scoped evidence：`/tmp/grok-expansion-native.log` 为 **345 passed, 2 warnings**；
+补充 Shot/continuous-take/hard-cut 验证 `/tmp/grok-all-shot-native.log` 为 **224 passed**。
+两组重叠，不求和。Commercial first red 为 **2 failed / 2 passed**（丢 conditioning），修复后的
+standard seam 为 **4 passed**；C4 integration 发现 nominal 无 exact endpoint，专用 variant 改为
+exact_seconds，FPS 仍 None；strict milliseconds 不冒充 frame-count。
+当前扩展的完整 policy Harness 与 final Risk Gate 在 native checkpoint 后执行，最终状态绑定
+`.agent/harness/runs/grok-all-shot-20261012-candidate-4/receipt.json`，此处不提前宣称 PASS。
+candidate-1 在 scope diff 检查发现本 record 的行尾空白，尚未运行其他 checks；修正后重新封存。
+candidate-2 在 Parent 最终输入审查发现 repeated frame 限制后显式中断，不采 partial PASS 为 completion。
+新增重复首尾/不同时间同图的测试先 **2 failed**，修复为按唯一 bytes 核验、按位置保留 payload；
+相同 asset_id 的 SHA/metadata 冲突仍拒绝，profile 不偷渡新输入。下一验证单元绑定新 snapshot。
+最终 frozen-source 前的扩展 native group 为 **415 passed, 2 warnings, 42.07s**，log
+`/tmp/grok-expansion-native-final.log`；warnings 来自既有 legacy serialized-preview/budget seam。
+candidate-2 的 receipt 保留 unfinished/pending 状态，不升级为 completion；被中断的子进程已退出。
+candidate-3 在 Parent 兼容性检查复现 exact raster 被新增 ratio 等式误拒后显式中断；
+此前已完成的 Grok 247、GenerationFeedback 459/1 skipped、voice 47、Harness 275 和规则 44
+仅是该历史 snapshot 的部分结果，不能代替完整验收；receipt 保留 unfinished/pending。
+标准 Seedance resolve 接受 `864x496` / `16:9`，canonical artifact probe 新回归先
+**1 failed / 26 passed**。修正为 exact raster 以原宽高验收、仅 adaptive raster 验精确 ratio，
+同组 **27 passed**，同时保留 adaptive wrong-ratio 拒绝；没有通过修改旧 Provider 输出过测试。
+Parent self-review 将该 compatibility 明确到 Spec；下一有限单元封存新 staged snapshot。
+修正后的完整 native group 为 **416 passed, 2 warnings, 41.85s**，log
+`/tmp/grok-expansion-native-candidate4.log`；与历史 415 项重叠，不累加独立计数。
+
+受管 Kimi read-only mapping invocation `38bb4101-b686-462b-a992-ba5320ebabd9`，seal
+`251e93012c69cd8295781acb67cf02e95b5f7160623725cd854319dd08ca3467`；canonical receipt 已
+机械核验，`PARSED`、4 wire requests、244.2s、actual authenticated `api.kimi.ai/k3/max`，
+effective `deep/k3[1m]/max`。报告 SHA256
+`55d2c1ef23850d82c396d53af3779a44f45dda965a498ce5cbacda6e5fd3b2f7`。
+四个 required Reads 的 exact hashes/完整性匹配，整个 frozen set 在 receipt 核验前未写；
+父方 proof 位于 `/tmp/grok-expansion-map/parent-mapping-proof.json`。
+建议仅 advisory，采用既有 media roles/profile owner，未建立第二 control map 或 voice authority。
+两个 native workers 的 profile 与 adapter paths 完全不相交，完成后交回 Parent，无 stage/commit。
+该 mapping 不替代最终 implementation review；官方协议与最终 diff/验收由 Parent 判断。
+
+扩展没有真实 Grok credential、OAuth、billing、上传、generation、媒体 Gate 或 human acceptance。
+RAG 查询返回 stale last-good advisory，未前台重建/安装/补网络；与 Grok 无关的片段不作实现证据。
+自动 learning evaluation 为 `no_candidate`：engineering/fake evidence 没有独立媒体实验。
+
 ## Implementation And Ownership
 
 OAuth token 仅存 exact OS Secret Service item；显式 refresh 在 POST 前封存 unknown marker，

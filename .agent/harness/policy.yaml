@@ -96,7 +96,7 @@ fallback_check_ids:
 checks:
   grok_media_provider_tests:
     execution_priority: 70
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_grok_auth.py, tests/test_grok_billing.py, tests/test_grok_subscription.py, tests/test_grok_subscription_lifecycle.py, tests/test_grok_output_contract.py, tests/test_grok_remote_image_lifecycle.py, tests/test_production_grok.py, tests/test_production_grok_image.py, tests/test_generation_provider_wiring.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_grok_auth.py, tests/test_grok_billing.py, tests/test_grok_subscription.py, tests/test_grok_subscription_lifecycle.py, tests/test_grok_output_contract.py, tests/test_grok_remote_image_lifecycle.py, tests/test_grok_video_capabilities.py, tests/test_grok_video_operations.py, tests/test_production_grok.py, tests/test_production_grok_image.py, tests/test_generation_provider_wiring.py, -q]
     cwd: .
     description: Verify subscription-only OAuth media adapters, included-only rejection, finite counts, exact provenance and canonical service wiring with fake effects only.
   agent_rules_check:
@@ -531,6 +531,7 @@ categories:
       - src/ai_video/production/_shot_router_contracts.py
       - src/ai_video/production/video_compiler.py
       - src/ai_video/production/_remote_video_native_prompt.py
+      - src/ai_video/production/_remote_video_product_prompt.py
       - src/ai_video/production/vidu.py
       - src/ai_video/production/seedance.py
       - src/ai_video/production/generated_video_audio.py
@@ -641,6 +642,7 @@ categories:
       - src/ai_video/production/_generation_feedback_reader.py
       - src/ai_video/production/_sequence_source.py
       - src/ai_video/production/_remote_video_native_prompt.py
+      - src/ai_video/production/_remote_video_product_prompt.py
       - tests/test_generation_feedback.py
       - tests/test_generation_execution.py
       - tests/test_generation_execution_guards.py
@@ -1121,6 +1123,7 @@ categories:
       - src/ai_video/production/video_artifact.py
       - src/ai_video/production/video_timing_recovery.py
       - src/ai_video/production/video_contracts.py
+      - src/ai_video/production/video_geometry.py
       - src/ai_video/production/video_dependency.py
       - src/ai_video/production/video_requirement.py
       - src/ai_video/production/_video_requirement_routing.py
@@ -1226,6 +1229,7 @@ categories:
       - src/ai_video/production/_shot_router_contracts.py
       - src/ai_video/production/_shot_visual_resolver.py
       - src/ai_video/production/shot_router.py
+      - src/ai_video/production/_video_hero_routing.py
       - tests/test_production_shot_router.py
     check_ids:
       - production_shot_router_tests

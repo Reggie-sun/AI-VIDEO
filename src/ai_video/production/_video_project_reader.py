@@ -71,6 +71,8 @@ from ai_video.production.models import (
     VideoStatusReceiptPointer,
 )
 from ai_video.production.paid_provider import video_reservation_has_cost_coverage
+from ai_video.production.video_geometry import matches_video_geometry
+from ai_video.production.grok_video_measurement import matches_grok_video_measurement
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
     canonical_commercial_shot_evaluation_intent_path,
@@ -1439,6 +1441,9 @@ def _verify_generated_video_candidate(
         or probe.measured.size_bytes != asset.size_bytes
         or probe.measured.width != metadata.width
         or probe.measured.height != metadata.height
+        or not matches_video_geometry(request.effective_output,
+            width=probe.measured.width, height=probe.measured.height)
+        or not matches_grok_video_measurement(request, probe.measured)
         or probe.measured.fps_numerator != metadata.fps_numerator
         or probe.measured.fps_denominator != metadata.fps_denominator
         or probe.measured.duration_milliseconds != metadata.duration_milliseconds

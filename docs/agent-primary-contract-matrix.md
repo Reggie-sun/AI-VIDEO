@@ -12,6 +12,14 @@ Grok identity、complete egress/cost、strict image/paid lineage；旧 local ser
 订阅次数单独识别零现金 reservation，不替换同币种既有现金账本。`fps=None` 不允许 frame-count
 timing；fixed requirement 不降级为 nominal。协议/live 阻断见 [Grok Provider](grok-provider.md)，
 checks 归 `grok_media_provider_tests` 与原 shared suites。
+`grok_profile` / `grok_video_controls` 独占不可变模型清单与 keyframe/voice hard controls；
+`grok_video_request` 只投影 exact Registry bytes 到三个固定 operation paths。subscription authority
+封存 model + operation，edit 不授权 extend。`grok_video_measurement` 在 canonical artifact/reader
+重验 requested resolution、pure I2V 比例与 edit/extend 继承 raster/duration；`video_geometry`
+重验 adaptive raster 的显式 ratio，不能用 metadata 自我断言代替 probe。
+Commercial Planner handoff 完整意图采用已有 v4 并保留 conditioning/voice routing；Router 对
+v3/v4 执行同一 approved-first-frame lineage 校验。`_remote_video_product_prompt` 从 sealed product
+fidelity 投影 native prose，由 shared remote grammar 重编；无新 approval 或 identity owner。
 
 ## Current Shot Close Expression
 

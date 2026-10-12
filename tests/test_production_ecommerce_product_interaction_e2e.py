@@ -528,9 +528,11 @@ def _base_commercial_planning_request(loaded) -> VideoPlanningRequest:
 
 
 @pytest.mark.parametrize("source_plan_shot_id", ("shot-03", "shot-04"))
+@pytest.mark.parametrize("provider_name", ("local_test", "grok"))
 def test_offline_qingyan_approved_source_routes_exact_i2v_and_compiles_product_fidelity(
     tmp_path,
     source_plan_shot_id: str,
+    provider_name: str,
 ) -> None:
     loaded, projection, approved_binding, _ = _approved_commercial_project(
         tmp_path,
@@ -574,7 +576,9 @@ def test_offline_qingyan_approved_source_routes_exact_i2v_and_compiles_product_f
         "first_frame",
         selected_asset.asset_id,
         selected_asset.sha256,
-    ).model_copy(update={"asset_id": selected_asset.asset_id})
+    ).model_copy(update={"asset_id": selected_asset.asset_id,
+        "mime_type": selected_asset.mime_type, "width": selected_asset.width,
+        "height": selected_asset.height, "size_bytes": selected_asset.size_bytes})
     character_references = tuple(
         _router_asset(
             "character_reference",
@@ -642,8 +646,35 @@ def test_offline_qingyan_approved_source_routes_exact_i2v_and_compiles_product_f
             }
         ).model_dump(mode="python")
     )
+    base_request = _base_commercial_planning_request(loaded)
+    output = _output()
+    if provider_name == "grok":
+        from ai_video.production.video_requirement import ConditioningCompatibilityEvidence
+        from test_production_video_intent_validation import _complete_intent
+        from test_production_grok import _request as grok_request
+
+        output = grok_request().output_requirement.model_copy(update={"duration_seconds": 4})
+        intent = _complete_intent().model_copy(update={
+            "pacing": _complete_intent().pacing.model_copy(update={"shot_duration_seconds": 4}),
+            "ambience_intent": _complete_intent().ambience_intent.model_copy(update={
+                "environment_bed": "none", "foley_cues": (), "explicitly_silent": True}),
+        })
+        payload = base_request.model_dump(mode="python", exclude={"request_content_hash"})
+        payload["generation_intent"] = ProviderNeutralGenerationIntentProjection.create(
+            generation_intent=intent, output_need=OutputNeed(timing_mode="content_driven",
+                duration_seconds=4, geometry_policy="adaptive", aspect_ratio="adaptive",
+                container_mime="video/mp4"), audio_need=AudioNeed.FORBIDDEN,
+            quality_need=production.QualityNeed(objective_tier="production"),
+            conditioning_compatibility=ConditioningCompatibilityEvidence(lane="i2va",
+                first_anchor_id=keyframe.asset_id, same_subject_scale=True,
+                composition_compatible=True, screen_order_compatible=True, axis_compatible=True,
+                camera_path_reachable=True, character_prop_state_reachable=True,
+                action_endpoint_reachable=True, available_duration_seconds=4))
+        payload["production_policy"] = ProductionPolicyInput(local_resources_available=True,
+            remote_authorized=True, budget_authorized=True)
+        base_request = VideoPlanningRequest.create(**payload)
     request = planning.build_commercial_video_planning_request(
-        base_request=_base_commercial_planning_request(loaded),
+        base_request=base_request,
         execution_projection=projection,
         loaded_project=loaded,
     )
@@ -656,7 +687,8 @@ def test_offline_qingyan_approved_source_routes_exact_i2v_and_compiles_product_f
     requirement = verified.requirement
 
     assert plan.outcome is PlanOutcome.PROPOSED
-    assert requirement.contract_version == "provider-neutral-video-requirement/3"
+    assert requirement.contract_version == ("provider-neutral-video-requirement/4"
+        if provider_name == "grok" else "provider-neutral-video-requirement/3")
     assert requirement.commercial_execution_class == "product_interaction"
     assert requirement.capability_need.needs_product_fidelity is True
     assert requirement.product_fidelity_requirement.product_id == "qingyan-spray"
@@ -666,7 +698,7 @@ def test_offline_qingyan_approved_source_routes_exact_i2v_and_compiles_product_f
     )
 
     compiler = AdapterCompilerContract.create(
-        compiler_id="offline-commercial-video-compiler",
+        compiler_id="grok-video-compiler" if provider_name == "grok" else "offline-commercial-video-compiler",
         compiler_version="1",
     )
     assert loaded.manifest.active_dependency_graph is not None
@@ -683,35 +715,53 @@ def test_offline_qingyan_approved_source_routes_exact_i2v_and_compiles_product_f
             }
         ).model_dump(mode="python")
     )
+    provider = None
+    profile = _profile()
+    capabilities = _capabilities(_variant(VideoGenerationMode.IMAGE_TO_VIDEO))
+    selected_id = "capability-image_to_video"
+    route_policy = _routing_policy(remote_authorized=provider_name == "grok",
+        budget_authorized=provider_name == "grok")
+    if provider_name == "grok":
+        from ai_video.production.grok import GrokVideoProvider
+        from test_generation_provider_wiring import forbidden
+        from test_production_grok import _profile as grok_profile
+
+        profile = grok_profile().pointer()
+        provider = GrokVideoProvider(profile=grok_profile(), credential=forbidden,
+            transport=forbidden, image_resolver=forbidden)
+        capabilities = provider.capabilities()
+        selected_id = "grok-imagine-video-1.5-i2v-v1"
     selected = VideoGenerationResolver()._bind_requirement(
         projection=verified,
         context=context,
-        policy=_routing_policy(),
-        provider_profile=_profile(),
-        capabilities=_capabilities(_variant(VideoGenerationMode.IMAGE_TO_VIDEO)),
-        selected_capability_id="capability-image_to_video",
-        output_requirement=_output(),
+        policy=route_policy,
+        provider_profile=profile,
+        capabilities=capabilities,
+        selected_capability_id=selected_id,
+        output_requirement=output,
         lifecycle=lifecycle,
         compiler_contract=compiler,
     )
     denied_t2v = VideoGenerationResolver()._bind_requirement(
         projection=verified,
         context=context,
-        policy=_routing_policy(),
-        provider_profile=_profile(),
-        capabilities=_capabilities(_variant(VideoGenerationMode.TEXT_TO_VIDEO)),
-        selected_capability_id="capability-text_to_video",
-        output_requirement=_output(),
+        policy=route_policy,
+        provider_profile=profile,
+        capabilities=capabilities if provider is not None else _capabilities(_variant(VideoGenerationMode.TEXT_TO_VIDEO)),
+        selected_capability_id="grok-imagine-video-1.5-t2v-v1" if provider is not None else "capability-text_to_video",
+        output_requirement=output,
         lifecycle=lifecycle,
         compiler_contract=compiler,
     )
 
-    assert selected.decision.outcome is RoutingOutcome.SELECTED
+    assert selected.decision.outcome is RoutingOutcome.SELECTED, (
+        selected.decision.reason_codes, selected.decision.rationale)
     assert selected.provider_bound_request is not None
     assert selected.provider_bound_request.binding_roles == ("first_frame",)
     assert denied_t2v.decision.outcome is RoutingOutcome.BLOCKED_CAPABILITY
 
-    compiled = compile_provider_video_request(
+    compiled = provider.compile_request(provider_bound=selected.provider_bound_request,
+        requirement=requirement) if provider is not None else compile_provider_video_request(
         provider_bound=selected.provider_bound_request,
         requirement=requirement,
         compiler_id=compiler.compiler_id,
@@ -725,6 +775,15 @@ def test_offline_qingyan_approved_source_routes_exact_i2v_and_compiles_product_f
     assert tuple(item.asset_id for item in compiled.request.image_bindings) == (
         approval.keyframe_asset_id,
     )
+    if provider is not None:
+        assert provider.resolve(compiled.request).model_id == "grok-imagine-video-1.5"
+        stale_context = context.model_copy(update={"shot_keyframe": context.shot_keyframe.model_copy(
+            update={"asset_sha256": "0" * 64})})
+        stale = VideoGenerationResolver()._bind_requirement(projection=verified, context=stale_context,
+            policy=route_policy, provider_profile=profile, capabilities=capabilities,
+            selected_capability_id=selected_id, output_requirement=output,
+            lifecycle=lifecycle, compiler_contract=compiler)
+        assert stale.provider_bound_request is None
 
 
 def test_product_reference_change_invalidates_only_source_and_generated_shot_chain(

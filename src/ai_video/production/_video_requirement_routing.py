@@ -231,7 +231,9 @@ def commercial_requirement_context_is_current(
     requirement: ProviderNeutralVideoRequirement,
     context: Any,
 ) -> bool:
-    if requirement.contract_version != "provider-neutral-video-requirement/3":
+    if requirement.contract_version not in {
+        "provider-neutral-video-requirement/3", "provider-neutral-video-requirement/4"
+    } or not requirement.capability_need.needs_product_fidelity:
         return not requirement.capability_need.needs_product_fidelity
     approval = requirement.approved_commercial_source
     keyframe = context.shot_keyframe

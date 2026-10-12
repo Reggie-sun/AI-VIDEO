@@ -40,14 +40,49 @@ client，项目没有独立注册 client。[当前官方 discovery](https://auth
 
 `GrokVideoProvider` 实现原 `VideoProvider` protocol，注入 `VideoProviderRegistry`；选择/编译仍归
 Planner/Router/compiler，执行归 `VideoGenerationService` / `ProductionStateCommitter`。
-origin 固定 `https://cli-chat-proxy.grok.com`，model `grok-imagine-video-1.5`。
-支持 T2V、单 first-frame I2V、1–15 秒 duration、480p/720p/1080p 和显式 `generate_audio`。
-adaptive geometry 与 `fps=None` 如实声明未请求 FPS；seed、negative、last-frame、soft references
-和 exact frame-count 不支持。内容驱动目标可使用 nominal duration；fixed requirement 不能降级。
+origin 固定 `https://cli-chat-proxy.grok.com`。
+模型须在任务 candidate limits 中明确选择；多个模型出现选择平局时不猜默认值。
+
+| Model | Generation | Native Controls | Output Limits |
+| --- | --- | --- | --- |
+| `grok-imagine-video-1.5` | T2V / I2V / R2V | first/last、14 refs、4 interior keyframes、3 preset voices | 1–15s；普通 T2V/I2V 可请求480p/720p/native1080p；reference controls ≤720p |
+| `grok-imagine-video-1.5-lite` | T2V / I2V | first image、native audio | 1–15s、480p/720p/1080p；1080p 是720p upscale |
+| `grok-imagine-video` | T2V / I2V / R2V / edit / extend | first image、7 refs、source video | generation ≤15s；R2V ≤10s；≤720p |
+
+Full 支持 last-only R2V、first + refs、first/last + refs；纯 I2V 继承首图比例。
+T2V/R2V 可显式请求 `1:1,16:9,9:16,4:3,3:4,3:2,2:3,21:9,5:2`；
+`adaptive` raster 的宽高保持未知，命名比例独立封存并在实际 probe 中核验。
+既有 exact raster 按封存宽高核验，保留其原 Provider 允许的 rounded geometry。
+FPS 保持 `None`，不宣称 frame-count；seed/negative/native camera/motion-tail 不支持。
+内容驱动目标使用 nominal duration；static C4 专用 exact_seconds，严格核验输出毫秒。
+图表、End Card、controlled product Hero 使用原合成路径；角色/生活场景/产品交互、Hybrid 的
+generated-video layer、static multi-anchor 与 exact source hero repair 可选 Grok。
+产品交互保留已审核 source、产品血缘与完整意图；native prose 表达包装/标识/文字保护要求。
+
+`GrokProviderProfile.keyframes` 是有序 `GrokTimedKeyframe(asset_id,asset_sha256,timestamp_ticks)`，
+每秒3 tick，≤4项，严格位于 duration 内且不得同 tick。asset 必须已作为 exact request
+`reference` image 绑定；wire 移至 `keyframes`，不再重复进入 `reference_images`。
+同一 exact image 可重复用于首尾或多个时间位置；同 asset ID 的 hash/metadata 必须一致，
+egress 按唯一 bytes 验证、wire 保留各位置，不能用重复 ID 偷换素材。
+`reference_voices=("eve","leo","rex")` 等 ≤3 preset ID 顺序封存为 `<AUDIO_0..2>`。
+approved intent/prompt 需按实际顺序表达 `<IMAGE_n>` / `<AUDIO_n>`：first image 占 IMAGE_0，
+其余 reference images 顺次编号；adapter 不补写、猜测或重排标签，不切断 compiler hash。
+这不是 actor voice identity qualification；自定义音频仅 trusted partners，普通订阅不声明支持。
+
+编辑仅 Classic `/v1/videos/edits`，source MP4 ≤8700ms，输出继承源尺寸、比例、时长。
+延长仅 Classic `/v1/videos/extensions`，source 2–15s、追加2–10s；canonical request duration
+表示总时长，wire duration 表示追加时长。小数 source 用 provider_selected edit；extension
+必须能表达精确整数追加时长。两者不发送 resolution/aspect/duration override（extend 仅追加）。
+输入 >720p 时拒绝，避免自动缩小源片；`resolution_label="source"` 保留实际低于720p的 raster。
+exact byte supplier 验 size/hash/MP4 envelope 后发 data URI，无额外上传；128MiB source / 400MiB
+aggregate body 是本地保守上限。artifact 与 reader 同时重验继承尺寸/时长及 declared resolution。
 POST 返回真实 `request_id`，GET 同一 ID 的 pending/done/failed；done 必须匹配 model 与 moderation。
 fetch 重开同一 task，无凭据 public-IP pinned 下载 trusted temporary MP4。
 来源：[video generation](https://docs.x.ai/developers/model-capabilities/video/generation)、
-[image-to-video](https://docs.x.ai/developers/model-capabilities/video/image-to-video)。
+[image-to-video](https://docs.x.ai/developers/model-capabilities/video/image-to-video)、
+[reference-to-video](https://docs.x.ai/developers/model-capabilities/video/reference-to-video)、
+[editing](https://docs.x.ai/developers/model-capabilities/video/editing)、
+[extension](https://docs.x.ai/developers/model-capabilities/video/extension)。
 
 ## Image Contract
 
@@ -64,10 +99,11 @@ JPEG/WebP 经已安装 Pillow 保尺寸 lossless PNG conversion。Reader 重做�
 
 ## Subscription And Injection
 
-`GrokSubscriptionBinding` 绑定 exact account/model/origin、5 分钟内 quota 观察、period end 与
+`GrokSubscriptionBinding` 绑定 exact account/model/origin/operation_path、5 分钟内 quota 观察、period end 与
 独立 included-only evidence。构造 model 不构成授权；默认 `subscription_guard` 拒绝未验证边界。
 图片入口在 intent 前检查；视频遵循原 service 的 durable intent 后、POST 前检查。
 不可配置假 evidence 或 no-op guard 启用 live，真实 guard 必须由授权 owner 重验。
+旧未指定 operation_path 的 Full1.5 binding 仅兼容 generation，不授权 Classic/Lite 或 edit/extend。
 paid preview 使用 `remote_subscription`、每次现金 upper bound 零和 sealed finite
 `subscription_submit_limit`；同币种既有现金 reservations 保留，订阅计数单独识别。
 known failure 仍消耗一次；unknown 不释放、不结算、不自动重试。没有第二账本或 writer。

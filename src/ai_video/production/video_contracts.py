@@ -240,7 +240,7 @@ class VideoFlexibleOutputRequirement(_VideoContractModel):
     width: int | None = Field(default=None, strict=True, gt=0, le=16384)
     height: int | None = Field(default=None, strict=True, gt=0, le=16384)
     resolution_label: str = Field(pattern=_SAFE_ID)
-    ratio: Literal["21:9", "16:9", "4:3", "1:1", "3:4", "9:16", "adaptive"]
+    ratio: Literal["21:9", "16:9", "4:3", "1:1", "3:4", "9:16", "3:2", "2:3", "5:2", "adaptive"]
     fps: int | None = Field(strict=True, gt=0, le=240)
     container: Literal["mp4", "mov"]
     mime_type: Literal["video/mp4", "video/quicktime"]
@@ -262,11 +262,7 @@ class VideoFlexibleOutputRequirement(_VideoContractModel):
         if self.dimension_mode == "exact":
             dimensions_valid = self.width is not None and self.height is not None
         else:
-            dimensions_valid = (
-                self.width is None
-                and self.height is None
-                and self.ratio == "adaptive"
-            )
+            dimensions_valid = self.width is None and self.height is None
         if not dimensions_valid:
             raise ValueError("flexible video dimensions do not match dimension mode")
 
@@ -370,7 +366,7 @@ class VideoOutputCapability(_VideoContractModel):
     dimension_multiple: int | None = Field(default=None, strict=True, gt=0)
     resolution_labels: tuple[str, ...] = Field(min_length=1)
     ratios: tuple[
-        Literal["21:9", "16:9", "4:3", "1:1", "3:4", "9:16", "adaptive"], ...
+        Literal["21:9", "16:9", "4:3", "1:1", "3:4", "9:16", "3:2", "2:3", "5:2", "adaptive"], ...
     ] = Field(min_length=1)
     fps_values: tuple[int | None, ...] = Field(min_length=1)
     containers: tuple[Literal["mp4", "mov"], ...] = Field(min_length=1)

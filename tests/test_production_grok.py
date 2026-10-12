@@ -26,9 +26,11 @@ from ai_video.production._state_commit_contracts import (
 )
 from ai_video.production.grok_profile import (
     GROK_VIDEO_MODEL,
+    GROK_VIDEO_MODEL_CLASSIC,
+    GROK_VIDEO_MODEL_LITE,
     GrokProviderProfile,
-    grok_capabilities,
 )
+from ai_video.production.grok_video_request import grok_endpoint_for_mode, grok_egress_inputs
 from ai_video.production.grok_subscription import GrokSubscriptionBinding
 from ai_video.production.paid_provider import (
     PaidProviderAuthorizationDecision,
@@ -140,6 +142,7 @@ def _binding(profile=None, **changes):
 
 def _request(profile=None, *, images=False, **changes):
     profile = profile or _profile()
+    model_id = changes.pop("model_id", GROK_VIDEO_MODEL)
     image_bindings = ()
     input_artifact_ids = ("shot",)
     if images:
@@ -152,14 +155,17 @@ def _request(profile=None, *, images=False, **changes):
         generation_id="grok-generation",
         provider_name="grok",
         provider_kind="grok",
-        model_id=GROK_VIDEO_MODEL,
+        model_id=model_id,
         provider_profile=profile.pointer(),
         target_shot_id="shot",
         target_shot_revision=1,
         target_shot_content_hash="b" * 64,
         target_asset_role="primary_visual",
         target_visual_strategy="generated_video",
-        mode=VideoGenerationMode.IMAGE_TO_VIDEO if images else VideoGenerationMode.TEXT_TO_VIDEO,
+        mode=changes.pop(
+            "mode",
+            VideoGenerationMode.IMAGE_TO_VIDEO if images else VideoGenerationMode.TEXT_TO_VIDEO,
+        ),
         prompt_text="A paper boat drifts down a quiet stream.",
         negative_prompt_text="",
         image_bindings=image_bindings,
@@ -190,9 +196,19 @@ def _request(profile=None, *, images=False, **changes):
 
 
 def _setup(*, request=None, profile=None, binding=None, guard=True, now=None,
-           credential=None, transport=None, image_resolver=None):
+           credential=None, transport=None, image_resolver=None, media_resolver=None):
     profile = profile or _profile()
-    subscription = binding or _binding(profile)
+    request = request or _request(profile)
+    operation_path = f"/v1/videos/{grok_endpoint_for_mode(request.mode)}"
+    legacy_generation_binding = (
+        request.model_id == GROK_VIDEO_MODEL
+        and operation_path == "/v1/videos/generations"
+    )
+    subscription = binding or _binding(
+        profile,
+        model_id=request.model_id,
+        **({} if legacy_generation_binding else {"operation_path": operation_path}),
+    )
     transport = transport or FakeTransport()
     clock = [NOW]
     guard_calls = []
@@ -204,7 +220,8 @@ def _setup(*, request=None, profile=None, binding=None, guard=True, now=None,
 
             require_current_subscription(
                 exact, account_fingerprint=profile.account_fingerprint,
-                model_id=GROK_VIDEO_MODEL, destination=profile.origin,
+                model_id=request.model_id, destination=profile.origin,
+                operation_path=operation_path,
                 now=now() if now is not None else clock[0],
             )
         elif callable(guard):
@@ -215,9 +232,9 @@ def _setup(*, request=None, profile=None, binding=None, guard=True, now=None,
         credential=credential or (lambda: "private-grok-access-token"),
         subscription_guard=check_subscription if guard is not None else None,
         image_resolver=image_resolver or (lambda _binding: IMAGE),
+        media_resolver=media_resolver,
         now=now or (lambda: clock[0]),
     )
-    request = request or _request(profile)
     resolved = provider.resolve(request)
     preview = provider.preview(resolved)
     prompt = resolved.prompt_text.encode("utf-8")
@@ -228,7 +245,7 @@ def _setup(*, request=None, profile=None, binding=None, guard=True, now=None,
     egress.extend(PaidProviderEgressItem(
         item_id=b.asset_id, sha256=b.asset_sha256, size_bytes=b.size_bytes,
         mime_type=b.mime_type, purpose="reference",
-    ) for b in resolved.image_bindings)
+    ) for b in grok_egress_inputs(resolved))
     paid = PaidProviderCallPreview.create(
         attempt_id="grok-attempt-1", operation="video_generation",
         provider_kind="grok", model_id=resolved.model_id,
@@ -283,9 +300,15 @@ def test_registry_and_capabilities_expose_only_documented_video_modes():
     assert VideoProviderRegistry((("grok", provider),)).resolve("grok") is provider
     variants = provider.capabilities().variants
     assert {item.mode for item in variants} == {
-        VideoGenerationMode.TEXT_TO_VIDEO, VideoGenerationMode.IMAGE_TO_VIDEO,
+        VideoGenerationMode.TEXT_TO_VIDEO,
+        VideoGenerationMode.IMAGE_TO_VIDEO,
+        VideoGenerationMode.REFERENCE_TO_VIDEO,
+        VideoGenerationMode.VIDEO_EDIT,
+        VideoGenerationMode.VIDEO_EXTEND,
     }
-    assert all(item.model_id == GROK_VIDEO_MODEL for item in variants)
+    assert {item.model_id for item in variants} == {
+        GROK_VIDEO_MODEL, GROK_VIDEO_MODEL_CLASSIC, GROK_VIDEO_MODEL_LITE,
+    }
     assert all(item.output_capability.fps_values == (None,) for item in variants)
     assert all(
         item.output_recovery_strategy is VideoOutputRecoveryStrategy.REQUERY_BY_EFFECT_ID

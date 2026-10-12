@@ -6,7 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Literal
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_serializer, model_validator
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.models import StrictModel
@@ -28,13 +28,33 @@ class GrokSubscriptionBinding(StrictModel):
     account_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     credential_reference_id: Literal["GROK_OAUTH"]
     destination: Literal["https://cli-chat-proxy.grok.com"]
-    model_id: Literal["grok-imagine-video-1.5", "grok-imagine-image-2.0"]
+    model_id: Literal["grok-imagine-video-1.5", "grok-imagine-video-1.5-lite",
+                      "grok-imagine-video", "grok-imagine-image-2.0"]
+    operation_path: Literal["/v1/videos/generations", "/v1/videos/edits",
+                            "/v1/videos/extensions", "/v1/images/edits"] | None = None
     quota_observed_at: datetime
     quota_expires_at: datetime
     period_end: datetime
     used_percent: float = Field(ge=0, lt=100, allow_inf_nan=False)
     overage_policy: Literal["included_only"] = "included_only"
     included_only_evidence_id: str = Field(pattern=r"^[A-Za-z0-9._:/-]{1,256}$")
+
+    @model_serializer(mode="wrap")
+    def _preserve_legacy_binding(self, handler):
+        data = handler(self)
+        if self.operation_path is None:
+            data.pop("operation_path", None)
+        return data
+
+    @model_validator(mode="after")
+    def _model_operation(self):
+        if self.operation_path is not None:
+            allowed = ({"/v1/images/edits"} if self.model_id == "grok-imagine-image-2.0"
+                else {"/v1/videos/generations", "/v1/videos/edits", "/v1/videos/extensions"}
+                if self.model_id == "grok-imagine-video" else {"/v1/videos/generations"})
+            if self.operation_path not in allowed:
+                raise ValueError("subscription model and operation do not match")
+        return self
 
     @model_validator(mode="after")
     def _finite_window(self):
@@ -49,10 +69,13 @@ class GrokSubscriptionBinding(StrictModel):
 
 def require_current_subscription(binding: GrokSubscriptionBinding, *,
         account_fingerprint: str, model_id: str, destination: str,
-        now: datetime) -> GrokSubscriptionBinding:
+        now: datetime, operation_path: str | None = None) -> GrokSubscriptionBinding:
     checked = GrokSubscriptionBinding.model_validate(binding.model_dump(mode="python"))
     if (checked != binding or binding.account_fingerprint != account_fingerprint
             or binding.model_id != model_id or binding.destination != destination
+            or operation_path is not None and binding.operation_path != operation_path
+            and not (binding.operation_path is None and model_id == "grok-imagine-video-1.5"
+                     and operation_path == "/v1/videos/generations")
             or now.tzinfo is None
             or not binding.quota_observed_at <= now < binding.quota_expires_at):
         raise AiVideoError(code=ErrorCode.PAID_PROVIDER_BUDGET_REJECTED,
