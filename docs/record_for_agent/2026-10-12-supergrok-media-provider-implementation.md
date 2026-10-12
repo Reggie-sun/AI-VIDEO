@@ -28,7 +28,8 @@ image/video POST 或媒体生成。Fake tests 与工程 review 不构成账号�
 授权的 development worktree，从已发布 `153bd4f7d3dce5cdc1b7e671cd3cd54aad7695d5` 扩展。
 accepted [Spec](../superpowers/specs/2026-10-12-grok-all-shot-video-capabilities.md) /
 [Plan](../superpowers/plans/2026-10-12-grok-all-shot-video-capabilities.md) 已由 Parent self-review。
-以下是新增 slice 的开发 checkpoint，不复用首轮 receipt 冒充新 source 验收。
+本节保留新增 slice 的开发历史；当前交付见下方 Delivery And Evidence，不复用首轮 receipt
+冒充新 source 验收。
 
 新增 Full 1.5 / Lite / Classic 的五种适用模式，首尾/last-only、14 references、4 keyframes、
 3 preset voices、公开 ratios、source edit/extend。Keyframes/voices 归 sealed profile；exact input
@@ -50,8 +51,9 @@ Native scoped evidence：`/tmp/grok-expansion-native.log` 为 **345 passed, 2 wa
 两组重叠，不求和。Commercial first red 为 **2 failed / 2 passed**（丢 conditioning），修复后的
 standard seam 为 **4 passed**；C4 integration 发现 nominal 无 exact endpoint，专用 variant 改为
 exact_seconds，FPS 仍 None；strict milliseconds 不冒充 frame-count。
-当前扩展的完整 policy Harness 与 final Risk Gate 在 native checkpoint 后执行，最终状态绑定
-`.agent/harness/runs/grok-all-shot-20261012-candidate-4/receipt.json`，此处不提前宣称 PASS。
+扩展的完整 policy Harness 与 final Risk Gate 已完成，当前工程证据绑定
+`.agent/harness/runs/grok-all-shot-20261012-candidate-4/receipt.json`；下面 candidate-1/2/3
+保留为历史尝试，不升级其 partial 或 unfinished 结果。
 candidate-1 在 scope diff 检查发现本 record 的行尾空白，尚未运行其他 checks；修正后重新封存。
 candidate-2 在 Parent 最终输入审查发现 repeated frame 限制后显式中断，不采 partial PASS 为 completion。
 新增重复首尾/不同时间同图的测试先 **2 failed**，修复为按唯一 bytes 核验、按位置保留 payload；
@@ -83,6 +85,57 @@ effective `deep/k3[1m]/max`。报告 SHA256
 扩展没有真实 Grok credential、OAuth、billing、上传、generation、媒体 Gate 或 human acceptance。
 RAG 查询返回 stale last-good advisory，未前台重建/安装/补网络；与 Grok 无关的片段不作实现证据。
 自动 learning evaluation 为 `no_candidate`：engineering/fake evidence 没有独立媒体实验。
+
+### Delivery And Evidence
+
+Code commit `a7a8b31cef9bdbb70364ef75f944479b9e6a4480` 已推送远端 `main` 并经 SSH
+`ls-remote` 核验同 SHA；commit tree 与验证时的 staged tree 完全一致：
+`92e92afdb2749b85a5f4c25ea0f01f4c2e49608a`。全部 32 个 task-owned paths，原工作区
+foreign dirty files 未修改、stage、commit、reset 或 checkout。
+
+candidate-4 完整 Harness 为 `passed`：21 个 selected checks，20 个实际执行通过，1 个
+policy-declared same-run covered alias。提交前 `make harness-receipt` 机械核验
+`fresh=true`、`complete_completion_proof=true`、`coverage_closed_same_run=true`、
+workspace stable / cleanup confirmed、scope/policy/artifact integrity；receipt SHA256
+`8f6f7517be05e7fc5e878c97f35a2b7d56ab4121f5bf9f181c0c534862dc042f`。
+这是 exact staged snapshot 的提交前证明；不声称改变 Git HEAD 后仍通过 staged freshness。
+
+| Verification | Result |
+| --- | --- |
+| Native scoped group | 416 passed, 2 legacy serializer warnings |
+| Grok Harness | 248 passed, 2 legacy serializer warnings |
+| GenerationFeedback | 459 passed, 1 skipped |
+| Voice routing / Harness / rule invariants | 47 / 275 / 44 passed |
+| Final-output no-regression | 63 passed |
+| Shot Router / video Provider / reader | 366 / 927 / 569 passed |
+| Commercial source preparation | 1015 passed |
+| Vidu / provider-neutral requirement | 194 / 444 passed |
+
+各组重叠，不求和为独立测试数。`seedance_local_video_tests` 在 policy 中由
+`production_video_provider_tests` 覆盖，但主 argv 未列出 local-video 和 mixed-reference
+两个文件。Parent 在同一不变 staged tree 补跑这两个 exact files，**26 passed, 1.19s**，
+JUnit 为同目录 `parent-seedance-supplement.junit.xml`；不伪称 Harness 实际执行了这两份文件。
+现有 coverage 声明未借本任务改写；补充可执行证据已完成。
+Architecture Gate 为 PASS，保留 `_video_project_reader.py` 1492→1497 effective LOC 的
+thin-wiring WARN；新逻辑进入 leaf modules，没有刷新 baseline 或降低断言。
+
+Parent 在全部 native / Harness 后对 exact snapshot 判断
+`KIMI_REVIEW_NOT_REQUIRED`，decision / source hashes / verification bindings 归同目录
+`risk-gate.json`、`candidate-source.json`。新增 operation 仍是同 pinned origin 下的 literal
+paths，redirect/ambient auth 禁止不变；model/operation、素材 bytes 与 source approval 的
+拒绝路径已实际验证，未新增 project/state/activation authority。修正后的 exact-raster
+compatibility 与 alias 测试缺口已获得 executable evidence。没有识别出剩余已启用路径的
+重大语义验证缺口；外部账号/扣费/质量问题仍由 default guard 阻断，工程 reviewer 不能代证。
+既有 Kimi mapping 不作为本 candidate 的 final review；不机械因新 backend/diff size 追加 reviewer。
+
+此后仅更新本 record，code / policy / Spec / Plan / tests bytes 保持不变；文档 delta 另经
+`.agent/harness/runs/grok-all-shot-20261012-record-final-range/receipt.json` 的 exact commit-range
+验证。当前 publication 与 source-byte equivalence 的机器证据归 candidate-4 同目录
+`publication-proof.json`；不把文档 receipt 当作完整代码重新执行的证明。
+真实 Grok credential/OAuth/billing/upload/generation 为 **0**；账号/proxy admission、included-only
+扣费与媒体质量未验证，live 仍 **BLOCKED**，P6 / human acceptance **NOT_EVALUATED**。
+record / automatic distill 已评估为 `recorded` / `no_candidate`；无新 Learning Claim、adoption
+或 RAG rebuild。
 
 ## Implementation And Ownership
 
