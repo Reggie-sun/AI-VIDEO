@@ -8,6 +8,18 @@ learning_eligibility: ineligible
 
 Date: 2026-10-12
 
+## Partial Supersession Notice — 2026-10-12
+
+用户随后选择补齐入口并实测。[新原文多镜与时长恢复记录](2026-10-12-canvas-original-sequence-and-nominal-timing.md)
+证明 staged implementation 已通过完整 Harness；新第一镜已生成、逐镜 Gate、完整听看及 canonical activation，
+第二镜无调用准备已通过，随后按原文生成并取回，连续观看页可用，完整听看和 Gate 尚待完成。
+下文 source capability blocker 和等待方向选择是当时事实；
+Kimi HTTP403 后已按用户明确授权改用原生只读审查；第一轮发现修复后的新快照通过完整 Harness，
+第二轮语义入口修复后52项 focused tests 通过，最新完整 Harness 与第三轮只读复核已完成，
+特殊 literal-hash 输入差异保留为非阻塞限制；实现 `a545090` 已 push 至 `main` 并核对 remote SHA。
+两镜成片与完整 spec 仍未验收。
+原修剪 timebase 未证明的限制及本记录的零调用历史保持不变。
+
 ## Goal And Current Result
 
 用户要求实际制作原画布的连续段来观看，延续 Fast 2.0、480p、保留原文与参考素材的约束。

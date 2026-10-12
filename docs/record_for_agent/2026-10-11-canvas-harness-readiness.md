@@ -8,6 +8,18 @@ learning_eligibility: ineligible
 
 Date: 2026-10-11
 
+## Partial Supersession Notice — 2026-10-12
+
+[原文多镜与时长恢复记录](2026-10-12-canvas-original-sequence-and-nominal-timing.md) 补齐了下方 scope clarification
+所述来源入口和 partial continuity 的 staged implementation，并通过 exact Harness。
+新第一镜已 canonical activation，第二镜按原文生成并取回，连续观看页可用，完整听看和 Gate 尚待完成；
+Kimi HTTP403 后用户已授权原生只读替代。
+第一轮修复后的快照通过完整 Harness；第二轮补齐语义入口后52项 focused tests 通过，
+最新快照的完整 Harness 与第三轮只读复核已完成，特殊 literal-hash 输入差异保留为非阻塞限制；
+实现 `a545090` 已 push 至 `main` 并核对 remote SHA。
+该新第一镜不是下文历史视频7 artifact，不能把新采用状态或累计调用数写回旧 run。
+完整 spec 的 holdout、两镜最终 render 和完整听看要求仍未满足；原文末帧的有界时长恢复不替代这些验收。
+
 ## Scope Clarification — 2026-10-12
 
 [实际原文多镜 preflight](2026-10-12-canvas-original-multishot-preflight.md) 已确认：
