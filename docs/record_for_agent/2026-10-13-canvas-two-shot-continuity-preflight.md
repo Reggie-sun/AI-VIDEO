@@ -8,7 +8,27 @@ learning_eligibility: ineligible
 
 Date: 2026-10-13
 
-## Current Jieshi Unit And Input Stop
+## Current Approval And Shared Seam Repair
+
+用户对本记录上一checkpoint的集中决定回复A：允许必要共享provenance/unsubmitted recovery修复，
+并确认exact林砚PNG为project-owned fictional/no-protected-identity、用于Seedance R2V。
+这取代下方“PNG声明/scope缺项待决定”；既有模型、两个新增submit、零自动重抽和100 CNY内部上限不变。
+实际授权封存在 `runs/canvas-jieshi-two-shot-20261013-001/accepted-jieshi-authorization.json`，
+仅Development authority，不是operation permit。此前早建REQUEST保持immutable，无新增Provider调用。
+
+最小共享修复契约见 [implementation plan](../superpowers/plans/2026-10-13-canvas-generated-source-unsubmitted.md)。
+PNG optional generated_source验证来源record原bytes/hash和实测image SHA/size/dimensions，
+exact copy派生证据复用原immutable authoring-input并绑定Project provenance；默认PNG仍imported。
+来源证明不替代human/egress/Provider qualification或媒体验收。Registry-only revise不改Director原文。
+未提交恢复仍先由原committer关闭、再由共享入口重开exact not_submitted evidence，保留same task、
+旧request/Registry和真实计数，unknown/未关闭/fork及paid-no-effect缺grant均继续阻断。
+原入口两个恢复测试和生成来源正向测试已先复现失败；补齐后focused source/recovery/data suites
+65 PASS，另一个existing Seedance synthetic resolver集成测试1 PASS。完整exact Harness和适用独立检查
+随后执行；不能将这些offline结果描述为模型连续性、逐镜MCP或HyperFrames成片通过。
+本次独立工程receipt为 `.agent/harness/runs/canvas-generated-source-unsubmitted-20261013/receipt.json`，
+实际结果和publication由对应本地receipt/Git核验决定。下方保留此前输入阻断的历史证据。
+
+## Historical Jieshi Unit And Input Stop
 
 2026-10-13，用户进一步将目标改为新建两镜测试项目、只填项目数据并使用已发布共享入口，
 随后选择“可以用界蚀尝试”。当前候选改为林砚地铁持机→抬眼看门并起身，不复刻原剧集，

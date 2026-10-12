@@ -14,6 +14,83 @@ from test_canvas_production import runtime, submit_and_fetch, pass_evaluation
 from test_generation_feedback_review import Session
 
 
+def closed_unsubmitted_canvas(tmp_path):
+    from ai_video.production.generation_feedback import record_attempt_evaluation
+    service, provider, limits, _ = runtime(tmp_path)
+    service.decision_policy = service.decision_policy.model_copy(update={"max_resamples": 0})
+    old = service.start(limits=limits)
+    experience = record_attempt_evaluation(committer=service.committer, attempt_id=old.attempt_id)
+    service.committer.close_unsubmitted_video_generation(attempt_id=old.attempt_id,
+        expected_manifest_revision=service._load().manifest.manifest_revision,
+        actor=ActorIdentity(actor_id="canvas-test", actor_kind="codex"),
+        reason="superseded_before_submit")
+    return service, provider, limits, old, experience
+
+
+def test_closed_unsubmitted_preparation_preserves_history_and_zero_consumption(tmp_path):
+    service, provider, limits, old, experience = closed_unsubmitted_canvas(tmp_path)
+    history = service.committer.read_generation_experiences()
+    prepared = service.prepare_repair(limits=limits)
+    assert prepared.execution_binding is not None, prepared.decision
+    assert prepared.inputs.limits.paid_submits_used == 0
+    assert prepared.inputs.latest_attempt_hash == experience.evidence[-1].evidence_hash
+    assert prepared.inputs.experiences == history
+    current = service.start_repair(limits=limits)
+    assert current.attempt_id != old.attempt_id
+    assert current.next_action == "submit"
+    assert service.position() == current
+    assert service.start_repair(limits=limits) == current
+    assert service.committer.read_generation_experiences() == history
+    assert provider.call_counts.submit == 0
+    reopened = CanvasProductionService(committer=service.committer, packet=service.packet,
+        direction=service.direction, targets=service.targets,
+        routing_policy=service.routing_policy, decision_policy=service.decision_policy)
+    assert reopened.position() == current
+
+
+def test_closed_unsubmitted_revision_cannot_rename_task(tmp_path):
+    service, provider, limits, _, _ = closed_unsubmitted_canvas(tmp_path)
+    before = service._load().manifest
+    with pytest.raises(Exception, match="predecessor task identity"):
+        service.start_repair(limits=limits.model_copy(update={"task_id": "renamed"}))
+    assert service._load().manifest == before
+    assert provider.call_counts.submit == 0
+
+
+@pytest.mark.parametrize("damage", ["fork", "closure_metadata"])
+def test_unsubmitted_successor_refuses_fork_or_false_closure(tmp_path, damage):
+    from ai_video.canvas_recovery import current_canvas_attempt
+    service, provider, limits, _, _ = closed_unsubmitted_canvas(tmp_path)
+    service.start_repair(limits=limits)
+    attempts = service._attempts(service._load(), "one")
+    if damage == "fork":
+        attempts.append(attempts[-1].model_copy(update={"attempt_id": "forked-unsubmitted"}))
+    else:
+        attempts[0] = attempts[0].model_copy(update={"error_message": "unverified assertion"})
+    with pytest.raises(Exception):
+        current_canvas_attempt(service.committer, attempts)
+    assert provider.call_counts.submit == 0
+
+
+def test_registry_only_revision_preserves_creative_input_and_closed_history(tmp_path):
+    from ai_video.production.registry import registry_semantic_sha256
+    service, provider, limits, old, _ = closed_unsubmitted_canvas(tmp_path)
+    previous = service._load()
+    record = previous.registry.assets[0].model_copy(update={"usage_license": "updated-explicit-license"})
+    registry = previous.registry.model_copy(update={"assets": (record,)})
+    digest = registry_semantic_sha256(registry)
+    registry = registry.model_copy(update={"revision_id": digest, "content_hash": digest})
+    service.revise_authoring(attempt_id="registry-only-provenance", registry=registry)
+    loaded = service._load()
+    assert loaded.registry == registry
+    assert loaded.shots == previous.shots
+    assert loaded.project.revision == previous.project.revision + 1
+    assert next(a for a in loaded.manifest.attempts if a.attempt_id == old.attempt_id) == next(
+        a for a in previous.manifest.attempts if a.attempt_id == old.attempt_id)
+    assert service.start_repair(limits=limits).next_action == "submit"
+    assert provider.call_counts.submit == 0
+
+
 def failed_canvas(tmp_path, *, mixed=False):
     service, provider, limits, auth = runtime(tmp_path)
     service.decision_policy = service.decision_policy.model_copy(update={"max_resamples": 0})

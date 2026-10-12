@@ -107,7 +107,8 @@ class CanvasProductionService:
         from ai_video.production.production_strategy_dependency import prepare_strategy_dependency_transition
         from ai_video.production.models import ProductionBrief, Story, Character, Scene, Storyboard, Shot
         previous = load_production_project(self.committer.project_root / "project.yaml")
-        if direction_reference(self.packet, self.direction) in previous.project.source_provenance:
+        if (direction_reference(self.packet, self.direction) in previous.project.source_provenance
+                and (registry is None or registry == previous.registry)):
             return previous.manifest
         bundle = author_canvas_project(packet=self.packet, direction=self.direction, previous=previous,
             registry=registry, asset_artifacts=asset_artifacts)
@@ -193,6 +194,7 @@ class CanvasProductionService:
             if repair_receipt is not None:
                 from ai_video.canvas_authoring import input_hash
                 receipt_hash = (getattr(repair_receipt, "content_hash", None)
+                                or getattr(repair_receipt, "evidence_hash", None)
                                 or repair_receipt.submit_receipt_fingerprint)
                 identity = input_hash({"generation": current["lifecycle"].generation_id,
                                        "rejection": receipt_hash})[:32]
@@ -227,8 +229,11 @@ class CanvasProductionService:
                 raise _blocked("Closed quality repair requires an explicit intervention.")
             receipt = self.committer._reopen_generation_quality_rejection(pointer)
         else:
-            from ai_video.production._state_commit_video_runtime_repair import closed_paid_no_effect_receipt
-            receipt = closed_paid_no_effect_receipt(self.committer, attempt)
+            from ai_video.canvas_recovery import closed_unsubmitted_evidence
+            receipt = closed_unsubmitted_evidence(self.committer, attempt)
+            if receipt is None:
+                from ai_video.production._state_commit_video_runtime_repair import closed_paid_no_effect_receipt
+                receipt = closed_paid_no_effect_receipt(self.committer, attempt)
         binding = self.committer._reopen_generation_execution_binding(
             attempt.video_generation_state.execution_binding)
         if limits.task_id != binding.inputs.limits.task_id:

@@ -64,12 +64,15 @@ partial close QA 从同一 authored preimage派生，原文/字节映射不证�
 `canvas_production.CanvasProductionService` 是 application caller：消费 source adapter 的完整 inspection
 及显式导演数据，生成既有 creative artifacts 的 identity/hash，经唯一 committer 批准/bootstrap/revise。
 `canvas_assets` 仅测量显式本地 PNG 并准备 Registry；source pointer 是导演声明，不证明平台 bytes 或采用。
+optional generated-source copy由 `canvas_image_provenance` 重验contained外部生成record的原bytes及
+实测image身份并准备immutable provenance artifacts；不推断fictional identity或替代Seedance human/egress gate。
 `canvas_planning` 派生 current Planner/Router 输入，实际 accepted source/末态/C2 materialization 仍归下列 owners；
 缺 boundary 不默认为独立，declared continuity 不允许降级。`canvas_dependencies` 只调用既有 graph/resolver 和
 strategy transition；`canvas_composition` 只构建 CompositionSpec，不解释源 ticks 或建立第二 timeline。
 逐镜显式 MCP evaluation 后才 validate/activate/下一镜；resume、unknown、permit、paid 和恢复仍由既有 owners 裁决。
 `prepare_repair` / `start_repair` 只把同task的显式 intervention 交给原 GenerationFeedbackOrchestrator，
 前序须有 exact terminal quality-rejection；不自动关闭失败或POST。`canvas_recovery` 仅从 canonical binding
+（或原committer验证的closed-unsubmitted evidence；必须无任何paid intent/reservation/effect）
 与关闭receipt选择无分支的唯一successor，不按日期/Manifest顺序猜当前版本；unknown、未关闭、fork均阻断。
 native WAV 提取仍归 `generated_video_audio`，其 Manifest 能力判断复用 `manifest_schema`；不降低 Registry/源 bytes/预算检查。
 render replay 重开原始 begin identity，deliver 只读 exact final target，不签 human acceptance。

@@ -103,8 +103,19 @@ def author_canvas_project(*, packet, direction, registry=None, asset_artifacts=(
     director_data = {"packet": packet, "direction": direction}
     director_reference = authoring_input_reference(director_data)
     director_bytes = authoring_input_payload(director_data)
+    from ai_video.production.authoring_input import PREFIX, require_authoring_input
+    asset_sources = [] if previous is None else [r for r in previous.project.source_provenance
+                                               if r.reference.startswith(PREFIX)]
+    for artifact in asset_artifacts:
+        if artifact.relative_path.as_posix().startswith(PREFIX):
+            reference = authoring_input_reference(json.loads(artifact.payload))
+            require_authoring_input(reference, artifact.payload)
+            if reference.reference != artifact.relative_path.as_posix():
+                raise ValueError("asset source evidence path differs from its sealed input")
+            if reference not in asset_sources:
+                asset_sources.append(reference)
     provenance = (SourceReference(kind="imported", reference="canvas-source-snapshot",
-        content_hash=packet["source_snapshot_sha256"]), source, director_reference)
+        content_hash=packet["source_snapshot_sha256"]), source, director_reference, *asset_sources)
     artifacts = [PreparedArtifact(Path(director_reference.reference),
         director_bytes, hashlib.sha256(director_bytes).hexdigest())]
     models, adaptations = [], []
@@ -199,7 +210,7 @@ def author_canvas_project(*, packet, direction, registry=None, asset_artifacts=(
         from ai_video.canvas_source_expression import require_canvas_source_expression
 
         require_canvas_source_expression(packet=packet, unit=unit, row=row, registry=registry,
-                                         previous=previous)
+                                         previous=previous, asset_artifacts=asset_artifacts)
         adapted = row["shot"]["intent"]
         reason = row.get("adaptation_reason", "")
         if original != adapted and (not isinstance(reason, str) or not reason.strip()):

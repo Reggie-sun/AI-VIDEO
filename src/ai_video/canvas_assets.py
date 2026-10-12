@@ -37,7 +37,8 @@ def prepare_canvas_png_assets(*, packet, selections, allowed_asset_root):
         subject_members[node_id] = members
     records, artifacts = [], {}
     for selection in selections:
-        if set(selection) != {"asset_id", "node_id", "resource_id", "path", "usage_license"}:
+        required = {"asset_id", "node_id", "resource_id", "path", "usage_license"}
+        if not required <= set(selection) or set(selection) - required - {"generated_source"}:
             raise ValueError("PNG selection requires asset label, node/resource, path and license")
         aid = _safe_id(selection["asset_id"])
         source = source_assets[selection["node_id"]]
@@ -57,12 +58,18 @@ def prepare_canvas_png_assets(*, packet, selections, allowed_asset_root):
             observation["subject_material"] = member
         identity = input_hash(observation)
         path = canonical_image_asset_path(measured.sha256)
-        records.append(AssetRecord(asset_id=aid, asset_type=AssetType.IMAGE, artifact_path=path,
-            sha256=measured.sha256, size_bytes=measured.size_bytes, mime_type="image/png",
-            width=measured.width, height=measured.height, source_kind=AssetSourceKind.IMPORTED,
+        provenance = dict(source_kind=AssetSourceKind.IMPORTED,
             tool=ToolIdentity(name="canvas-local-png-selection", version="1"),
             input_fingerprint=identity, creation_receipt_id=(f"canvas-local-selection:"
-                f"{packet['source_snapshot_sha256']}:{selection['node_id']}:{selection['resource_id']}"),
+                f"{packet['source_snapshot_sha256']}:{selection['node_id']}:{selection['resource_id']}"))
+        if "generated_source" in selection:
+            from ai_video.canvas_image_provenance import prepare_generated_canvas_source
+            provenance, evidence = prepare_generated_canvas_source(declared=selection["generated_source"],
+                measured=measured, observation=observation, root=root)
+            artifacts.update({a.relative_path: a for a in evidence})
+        records.append(AssetRecord(asset_id=aid, asset_type=AssetType.IMAGE, artifact_path=path,
+            sha256=measured.sha256, size_bytes=measured.size_bytes, mime_type="image/png",
+            width=measured.width, height=measured.height, **provenance,
             usage_license=selection["usage_license"]))
         artifacts[path] = PreparedArtifact(path, raw.data, hashlib.sha256(raw.data).hexdigest())
     if len({a.asset_id for a in records}) != len(records):

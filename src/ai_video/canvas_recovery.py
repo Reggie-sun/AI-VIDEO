@@ -2,6 +2,19 @@
 from ai_video.production.models import StateCommitStatus
 
 
+def closed_unsubmitted_evidence(committer, attempt):
+    """Return evidence only after the sole committer's exact closure validation."""
+    from ai_video.production._state_commit_video_unsubmitted import is_verified_closed_unsubmitted_video_attempt
+    manifest = committer._read_manifest()
+    current = next((a for a in manifest.attempts if a.attempt_id == attempt.attempt_id), None)
+    if current != attempt or not is_verified_closed_unsubmitted_video_attempt(
+            committer, manifest=manifest, attempt=attempt):
+        return None
+    state = attempt.video_generation_state
+    experience = committer._reopen_generation_experience(state.generation_experiences[-1])
+    return experience.evidence[-1]
+
+
 def current_canvas_attempt(committer, attempts):
     if len(attempts) == 1:
         return attempts[0]
@@ -30,6 +43,11 @@ def current_canvas_attempt(committer, attempts):
                     or receipt.artifact_sha256 != evidence.artifact_sha256
                     or binding.inputs.abandoned_result is not None
                         and binding.inputs.abandoned_result != receipt):
+                raise ValueError(message)
+        elif (unsubmitted := closed_unsubmitted_evidence(committer, parent)) is not None:
+            if (unsubmitted != evidence or evidence.outcome != "not_submitted"
+                    or binding.decision.runtime_repair is not None
+                    or binding.inputs.abandoned_result is not None):
                 raise ValueError(message)
         else:
             from ai_video.production._state_commit_video_runtime_repair import closed_paid_no_effect_receipt

@@ -19,8 +19,16 @@ PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production author \
 - [text-reproduction](canvas-projects/text-reproduction/project.json)：原文 T2V、480p、15秒 nominal 输出。
 - [subject-reference](canvas-projects/subject-reference/project.json)：主体主/辅图、场景参考、实际中间帧计划。
 
-示例 PNG 无真实人物/动作资格，两个示例不算 holdout。`images` 只填
+示例 PNG 无真实人物/动作资格，两个示例不算 holdout。`images` 默认只填
 `asset_id/node_id/resource_id/path/usage_license`；入口测量目录内的 PNG 并计算内部 hash/receipt。
+已有外部生成图可额外填 `generated_source`：`record_path`（data目录内的生成记录JSON）、
+`record_sha256`（记录原bytes）、`tool`（明确声明的generator ToolIdentity）。记录的
+`sha256/size_bytes/width/height`必须与实测PNG逐项相符；入口封存原记录和exact copy派生证据，
+不接受source_kind标签代替来源。默认仍为imported。来源记录不证明Provider qualification、
+human fictional identity attestation或媒体acceptance；这些由各自gate独立检查。
+显式Registry元数据修订可在Director原文不变时经 `revise_authoring` 提交，旧snapshot保留。
+preserved-source引用重开该派生copy的sealed observation和原record，对齐原snapshot、node/resource、
+asset及image事实；不只比较新的receipt标签。后续修订保留原immutable source evidence。
 平台 URL 和资源 ID 不等于已验证 bytes。重启读取 canonical Project 指向的 immutable authoring input，
 不需要再次下载初始素材；修改输入使用显式 `revise`，状态读取不会批准新数据。
 示例 generation raster 使用 Seedance 2.0 的 480p `864x496`；换模型时按已封存 capability
@@ -74,6 +82,10 @@ CLI：`--runtime trusted_operator_module:function` 返回 `committer` 和 servic
 runtime 注入不能 JSON 化的对象。`approve` 需要 `attempt_id` 与 selected `qa_policy`：
 共用 runtime 可注入已批准的 typed policy，或传入 canonical sealed policy 文件路径；用户无需手算内部 hash。
 `prepare_repair/start_repair` 是显式已知失败恢复入口，`generate_voice` 接通既有 selected voice route。
+准备阶段REQUEST尚无任何外部效果时，先经原feedback owner记录 `not_submitted`，再由committer
+以 `superseded_before_submit` 或 `expired_execution_window` 关闭；同task的shared repair入口可接续
+该核验通过的历史。不能把未关闭REQUEST当失败，也不能用此路径释放reservation或恢复unknown。
+旧request/Registry/evidence与submit计数全部保留，唯一successor从canonical binding选择。
 `execute` 的 action 必须等于当前 next action；resume 不重复已完成提交，unknown 不重试或改 ID。
 
 ## Shot Continuity

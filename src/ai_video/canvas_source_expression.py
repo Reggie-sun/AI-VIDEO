@@ -16,7 +16,7 @@ def adapted_canvas_prompt(expression):
     return _adapt_source_text(expression, indices)
 
 
-def require_canvas_source_expression(*, packet, unit, row, registry, previous=None):
+def require_canvas_source_expression(*, packet, unit, row, registry, previous=None, asset_artifacts=()):
     data = row["shot"].get("preserved_source_expression")
     if data is None:
         return
@@ -49,21 +49,30 @@ def require_canvas_source_expression(*, packet, unit, row, registry, previous=No
             asset = assets.get(material.asset_id)
             receipt = (f"canvas-local-selection:{packet['source_snapshot_sha256']}:"
                        f"{ref['node_id']}:{resource_id}")
+            def require_original(asset):
+                if asset is None:
+                    raise ValueError("preserved source material is missing")
+                if asset.creation_receipt_id != receipt:
+                    from ai_video.canvas_image_provenance import require_generated_canvas_selection
+                    require_generated_canvas_selection(asset=asset,
+                        snapshot=packet["source_snapshot_sha256"], node_id=ref["node_id"],
+                        resource_id=resource_id, artifacts=asset_artifacts, previous=previous)
             replacements = row.get("reference_replacements", {})
             replacement = replacements.get(material.asset_id)
             if replacement is not None:
                 original = assets.get(replacement["original_asset_id"])
-                if (previous is None or original is None or original.creation_receipt_id != receipt
-                        or asset is None or asset.sha256 != material.asset_sha256):
+                require_original(original)
+                if (previous is None or asset is None or asset.sha256 != material.asset_sha256):
                     raise ValueError("state reference replacement lacks its original source binding")
                 from ai_video.canvas_handoff import require_canvas_state_reference
                 evidence = require_canvas_state_reference(loaded=previous, asset=asset)
                 if (evidence["source_shot_id"] != replacement["source_shot_id"]
                         or evidence["reference"]["frame_index"] != replacement["frame_index"]):
                     raise ValueError("state reference replacement source or frame changed")
-            elif (asset is None or asset.sha256 != material.asset_sha256
-                    or asset.creation_receipt_id != receipt):
-                raise ValueError("preserved source material differs from its exact imported canvas resource")
+            else:
+                require_original(asset)
+                if asset.sha256 != material.asset_sha256:
+                    raise ValueError("preserved source material differs from its exact imported canvas resource")
         used.add(ref["slot_id"])
 
     for raw, part in zip(original, expression.parts, strict=True):

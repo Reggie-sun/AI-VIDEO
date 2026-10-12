@@ -40,7 +40,7 @@ def test_original_canvas_parts_are_reopened_at_authoring(damage):
             author_canvas_project(packet=source, direction=data)
 
 
-def subject_source(tmp_path, *, scene_auxiliary=False):
+def subject_source(tmp_path, *, scene_auxiliary=False, generated=False):
     """Inspect/import real fixture bytes before canonical authoring and planning."""
     from ai_video.canvas_assets import prepare_canvas_png_assets
     from tests.production_project_factory import _p7_png
@@ -74,6 +74,16 @@ def subject_source(tmp_path, *, scene_auxiliary=False):
         selections.append({"asset_id": asset_id, "node_id": "room" if asset_id == "room" else "robot",
                            "resource_id": "room-resource" if asset_id == "room" else asset_id,
                            "path": path, "usage_license": "fixture-only"})
+        if generated and asset_id == "robot-main":
+            import hashlib
+            import json
+            raw_image = path.read_bytes()
+            record = tmp_path / "generated-source.json"
+            record.write_text(json.dumps({"sha256": hashlib.sha256(raw_image).hexdigest(),
+                "size_bytes": len(raw_image), "width": 320, "height": 320}))
+            selections[-1]["generated_source"] = {"record_path": record.name,
+                "record_sha256": hashlib.sha256(record.read_bytes()).hexdigest(),
+                "tool": {"name": "external-image-tool", "version": "not-recorded"}}
     registry, artifacts = prepare_canvas_png_assets(packet=source, selections=selections,
                                                    allowed_asset_root=tmp_path)
     materials = [{"asset_id": a.asset_id, "asset_sha256": a.sha256,
@@ -113,7 +123,7 @@ class LoadedFixture:
     project: object
 
 
-def subject_service(tmp_path):
+def subject_service(tmp_path, *, generated=False):
     from ai_video.canvas_dependencies import initialize_canvas_graph
     from ai_video.canvas_production import CanvasProductionService
     from ai_video.production.generation_decision import DecisionPolicy, ExecutionLimits
@@ -126,7 +136,7 @@ def subject_service(tmp_path):
     from test_production_seedance import _profile, _profile_pointer, _request
     from test_production_shot_router import _policy
 
-    source, data, registry, artifacts = subject_source(tmp_path)
+    source, data, registry, artifacts = subject_source(tmp_path, generated=generated)
     root = tmp_path / "project"
     root.mkdir()
     profile = _profile()
@@ -154,6 +164,64 @@ def subject_service(tmp_path):
                                         if v.model_id == model), paid_submit_ceiling=1, paid_submits_used=0,
         local_batch_limit=1, local_batch_used=0, local_total_used=0, local_resource_available=True)
     return service, limits
+
+
+def test_generated_copy_retains_original_subject_binding_and_revision(tmp_path):
+    service, limits = subject_service(tmp_path, generated=True)
+    before = service._load()
+    assert service.prepare(limits=limits).execution_binding is not None
+    service.direction["title"] = "Generated source retained"
+    service.revise_authoring(attempt_id="generated-source-title")
+    after = service._load()
+    assert after.registry == before.registry and after.shots == before.shots
+    assert all(r in after.project.source_provenance for r in before.project.source_provenance
+               if r.reference.startswith("evidence/authoring-input/"))
+    assert service.prepare(limits=limits).execution_binding is not None
+
+
+@pytest.mark.parametrize("damage", ["missing", "bytes", "node_id", "resource_id", "sha256", "record"])
+def test_generated_copy_cannot_replace_original_binding_with_resealed_evidence(tmp_path, damage):
+    import hashlib
+    import json
+    from pathlib import Path
+    from ai_video.production.authoring_input import authoring_input_reference, authoring_input_payload
+    from ai_video.production.registry import registry_semantic_sha256
+    from ai_video.production.state_commit import PreparedArtifact
+    source, data, registry, artifacts = subject_source(tmp_path, generated=True)
+    asset = next(a for a in registry.assets if a.asset_id == "robot-main")
+    path = Path(f"evidence/authoring-input/{asset.input_fingerprint}.json")
+    artifact = next(a for a in artifacts if a.relative_path == path)
+    changed = [a for a in artifacts if a != artifact]
+    if damage == "bytes":
+        changed.append(PreparedArtifact(path, artifact.payload + b" ", artifact.file_sha256))
+    elif damage != "missing":
+        value = json.loads(artifact.payload)
+        if damage == "record":
+            record_artifact = next(a for a in artifacts
+                if str(a.relative_path) == value["generated_source"]["record_path"])
+            wrapper = json.loads(record_artifact.payload)
+            record = json.loads(wrapper["record_utf8"])
+            record["width"] += 1
+            wrapper["record_utf8"] = json.dumps(record)
+            wrapper["record_sha256"] = hashlib.sha256(wrapper["record_utf8"].encode()).hexdigest()
+            ref = authoring_input_reference(wrapper)
+            payload = authoring_input_payload(wrapper)
+            changed = [a for a in changed if a != record_artifact]
+            changed.append(PreparedArtifact(Path(ref.reference), payload, hashlib.sha256(payload).hexdigest()))
+            value["generated_source"].update(record_path=ref.reference, record_sha256=wrapper["record_sha256"])
+        else:
+            value[damage] = "wrong-resource" if damage != "sha256" else "b" * 64
+        ref = authoring_input_reference(value)
+        payload = authoring_input_payload(value)
+        changed.append(PreparedArtifact(Path(ref.reference), payload, hashlib.sha256(payload).hexdigest()))
+        replacement = asset.model_copy(update={"input_fingerprint": ref.content_hash,
+            "creation_receipt_id": f"canvas-generated-image-source:{ref.content_hash}"})
+        registry = registry.model_copy(update={"assets": tuple(replacement if a == asset else a
+                                                               for a in registry.assets)})
+        digest = registry_semantic_sha256(registry)
+        registry = registry.model_copy(update={"revision_id": digest, "content_hash": digest})
+    with pytest.raises(ValueError):
+        author_canvas_project(packet=source, direction=data, registry=registry, asset_artifacts=tuple(changed))
 
 
 def test_subject_materials_have_character_owners_through_real_common_compiler(tmp_path):
