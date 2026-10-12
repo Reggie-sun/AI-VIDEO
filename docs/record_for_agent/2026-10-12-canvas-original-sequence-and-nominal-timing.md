@@ -17,6 +17,8 @@ Date: 2026-10-12
 两镜连续观看页已可播放；第二镜完整听看、canonical Gate/adoption、最终 composition/HyperFrames render
 和完整 spec 验收仍未完成。
 用户随后表示看不出两镜之间的连续性；当前结果不能作为镜头连续性复刻通过的证据。
+随后按用户要求，只读核对原画布的截帧引用和原时间线第5–7片段，已取回实际源素材并建立核对页。
+原作通过中间状态参考、修剪和驾驶员插入镜头承接；这项来源核对不补签新生成7→2的连续性或最终接受。
 
 受管 Kimi 第一轮 HTTP403 后，用户明确授权原生只读审查。原生第一轮的三个发现已由 Parent
 实际复现、裁决并修复；该 candidate 的完整 Harness 已 PASS。第二轮又发现完整 source 语义
@@ -123,6 +125,8 @@ Chrome MCP integrated QA 确认两份视频和全部参考加载、无横向溢�
 
 ## Continuity Scope Clarification
 
+本节保留前一轮结构检查的历史边界；实际源片和时间线现已取得，最新证据见下一节。
+
 用户询问原视频是否也是两个分开的镜头，并反馈“我看不出来这两个镜头之间的连续性”。
 Parent 重新核对原 `mecha-document.json`、当前 `direction.json` 和只读画布节点/连接：
 原时间线1有17个视觉片段，开头为视频7的修剪片段，随后是视频2的四份修剪片段。
@@ -137,6 +141,49 @@ Parent 重新核对原 `mecha-document.json`、当前 `direction.json` 和只读
 第一镜已有接受历史保留，第二镜与最终成片仍未接受；下一步应先核对原修剪产物和实际接点，
 再确定忠实于来源的续镜验证对象，而不是把两个完整原片连播当作连续性验收。
 本次未修改代码、prompt、预算、Provider 输入或 Product state，没有追加生成。
+
+## Original Canvas Continuity Audit
+
+用户要求“验证下镜头连续性按照画布的方式”。本轮沿
+[Continuous Canvas Production](../canvas-continuous-production.md) 区分参考链、实际开闭状态和时间线采用，
+不扩写原文、不改画布、不提交新生成。来源快照 SHA 保持
+`fdd269a825073290021a84850c5f508bb2667ba64bf3565114b8d5387d02169d`。
+证据目录为 `runs/canvas-mecha-continuity-audit-20261012-001/`，
+`source-evidence.json` 保存节点、引用、clip身份和导出文件 SHA；`review.html` 提供原素材核对。
+
+实际参考链为 `node_44chrfmntz` → `node_1c7fcr1g7d` → `node_p91r1ngv5e` → `node_p6w6ygcqxy`。
+视频3使用该截帧图及既有机甲主体、怪物参考，原角色为普通 `reference`，不是强制 `firstFrame`。
+画布显示的720×405 WebP参考图保留夕阳云层、机甲从下方托举菱形怪物和橙色推进特效；
+video-analysis 的视频3原片0秒图显示相近姿态、构图与场景，后段进入太空。
+对视频2修剪源片297个解码帧作有损预览比对，最接近的是 index202 / 8.4秒，
+见 `reference-match-diagnostic.json`。这支持“中间状态参考”，不证明平台历史截帧索引或原JPEG bytes。
+该修剪素材末段实际变为机甲面部特写，不能称参考图是上一段最后一帧。
+
+原时间线1实际采用顺序为下表。正常UI预览已打开、播放并核对DOM clip identity，
+不同生成节点内部也可有多个景别；参考边不等于成片直接邻接。
+
+| Original occurrence | Adopted source | Observed visual role | Downloaded MP4 SHA-256 |
+| --- | --- | --- | --- |
+| 第5片段 / `bc64c4c3-11d4-4af2-a57b-89445c4cc3fe` | `node_1c7fcr1g7d` 视频2修剪 | 托举上升→夕阳云层→机甲面部 | `ee618fcb1cfc8754de03a09f8633d866893a555b63e99f6b6f93790daf8d0da1` |
+| 第6片段 / `4ef0ff5f-01c6-407b-b191-eb5325defa98` | `node_25vy8t7mw2` 视频4修剪 | 驾驶员用力特写 | `814b5c392fd040fec79dfcac7a861193889278b002545611a53e886df2f20f7c` |
+| 第7片段 / `fe256edb-6708-4887-bcf8-70e3dcbf165a` | `node_cekw4hfw1n` 视频3修剪 | 机甲面部开场→继续托举→进入太空 | `c88d876d97cd0412384d1570c6c0e472f5df0be4eb350ef75e96d8bead7527f8` |
+
+视频3完整原片 SHA 为 `f8b4685c4999399fc1fafdbdf8a6cf5952eacce355cc0dabfe158278882daa96`；
+正常UI资源刷新响应也包含来源快照中的 `9967c954-db1f-48b5-b4bd-cdc351248e79`。
+实际时间线使用的视频3修剪版从机甲面部开场，移除了原生成素材的夕阳远景开头。
+因此“原视频2完整结尾→原视频3完整开头”不是原作的真实剪辑接点。
+project-local video-analysis 显式检查四份MP4；抽帧支持上述状态与构图观察，
+单次自动scene detection未识别出全部视觉切换，不能以scene_count=1声称一镜到底。
+原片包含视频时间戳／rate metadata差异，未把probe返回的60fps名义rate用作固定帧数契约。
+
+核对页连播原下载修剪源片，保留文件自身端点，未重新编码，也未建立新的Production成片。
+它没有混入原时间线的独立歌曲，不能证明原作整片混音或精确逐帧剪辑。
+Chrome检查所有素材加载、两张对照图与连播控制；用户完整听看的连续性感受仍待独立答复。
+`review-browser-proof.json` 保存第5→6→7片段各自真实play/ended事件；均rate=1、未静音、
+无media error，页面没有横向溢出。这只证明正常顺序播放功能，不代表已听辨声桥或观看质量通过。
+工程／播放器证据不代签human视觉、声音桥、canonical media Gate或Final Acceptance。
+当前7→2新生成结果仍不证明镜头连续性；第一镜既有采用历史、第二镜待验收状态均保留。
+本轮付费submit为0，不续期7/7生成上限，不修改原画布document、Registry或Manifest。
 
 ## Native Verification And Review Blocker
 
@@ -243,6 +290,7 @@ exact request、MP4 与不可变恢复收据构成身份锚点；此处不制造
 | adoption-readback | seedance:19aa3893efd1f5aa8bc30014505b6b9339123e18b4503ccca6811acb0968e52a | original-canvas-nominal-endpoint-recovery | canvas-3f3ec6d01abc19572eb9ee9213ae0bd7481b715e | N/A | bcc082fb332715a4c394aab5aa67a8e8ee3f8328eb0c757d2705b7fedf311b92 | CANONICAL_STATE | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | bounded-recovery | runs/canvas-mecha-original-multishot-fast20-20261012-001/timing-rule-live-proof.json |
 | second-raw-measurement | seedance:2726ac8dca3708c999fa3cb22c37e6aa7dfa3173e5b0504fca0b5c3b029a7e57 | original-canvas-two-shot-source-reproduction | canvas-595820ad1302d39d4f40528e12065d4f4a0e9477 | N/A | a4be0d52c9bda82af227fa33e04c7b28cd778e7815c8ac9d2ae4253d80f3da79 | TECHNICAL | PASS | NONE | NEW_ATTEMPT | NONE | runs/canvas-mecha-original-multishot-fast20-20261012-001/second-shot-ceiling-r1/project-video-analysis-observation.json |
 | second-pending-gate | seedance:2726ac8dca3708c999fa3cb22c37e6aa7dfa3173e5b0504fca0b5c3b029a7e57 | original-canvas-two-shot-source-reproduction | canvas-595820ad1302d39d4f40528e12065d4f4a0e9477 | N/A | a4be0d52c9bda82af227fa33e04c7b28cd778e7815c8ac9d2ae4253d80f3da79 | ANALYZER | NOT_EVALUATED | EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | second-raw-measurement | runs/canvas-mecha-original-multishot-fast20-20261012-001/second-shot-ceiling-r1/gate-assessment.json |
+| original-source-continuity-observation | observed-media:f8b4685c4999399fc1fafdbdf8a6cf5952eacce355cc0dabfe158278882daa96 | original-canvas-reference-and-edit-audit | canvas-source-audit-observation-20261012-001 | N/A | f8b4685c4999399fc1fafdbdf8a6cf5952eacce355cc0dabfe158278882daa96 | SOURCE_MEDIA_OBSERVATION | NOT_EVALUATED | HUMAN_CONTINUITY_REVIEW_PENDING | NEW_ATTEMPT | NONE | runs/canvas-mecha-continuity-audit-20261012-001/source-evidence.json |
 
 ## Record And Learning Evaluation
 
@@ -271,3 +319,13 @@ experience follow-up 已运行并得到带 freshness 的 advisory fragments；�
 本次连续性诊断追加按 hook 的禁止额外测试/联网约束，只做本地 Documentation contract、
 Evidence Index identity 与 diff whitespace 核对；不运行新的 Harness/test，不复用旧 receipt 冒充新文档字节证明。
 追加只保存本地记录 checkpoint，不执行 push；未调用 Provider、媒体工具或网络。
+
+上段是前一hook-only续记的历史限制。本轮用户主动要求来源连续性核对，已沿正常UI读取现有原素材，
+做只读媒体分析和播放器核验；没有追加生成。`record-ai-video-session` 与
+`distill-ai-video-learning` 本轮再次评估为 `no_candidate`：来源观察是一个检查单元，
+原平台生成attempt/seed不可追溯，没有隔离“有无截帧参考”的受控比较；先前新7→2与原2→3也不是同条件两臂。
+没有借来源图、多个MP4或不同证明层增加独立实验计数，不创建通用连续性规则或learning placeholder。
+最终文档验证和publication结果由本轮receipt及Git状态单独记录，不复用旧H10证明新字节。
+本轮owned文档范围的Harness输出路径为
+`.agent/harness/runs/canvas-source-continuity-audit-20261012-docs1/receipt.json`；
+范围不包含共享working tree中的foreign源码／spec／plan changes，也不替它们签验证。
