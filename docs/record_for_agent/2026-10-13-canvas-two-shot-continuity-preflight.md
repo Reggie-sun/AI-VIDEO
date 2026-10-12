@@ -4,11 +4,94 @@ topic_id: canvas-real-two-shot-continuity
 learning_eligibility: ineligible
 ---
 
-# Canvas Two-Shot Continuity Preflight
+# Canvas Two-Shot Continuity Execution
 
 Date: 2026-10-13
 
-## Current Approval And Shared Seam Repair
+## Current Runtime Stop — 2026-10-13
+
+《界蚀》独立两镜测试已完成必要共享修复与真实前镜POST，未形成新视频。已发布工程
+`91b868527014987ad15c83d149261a480558d34d`，当次远端main SHA已核验一致。
+下方preflight/输入阻断保留历史；当前阻断是这次actual Seedance HTTP 400，不是旧AccountOverdueError。
+不重提、不poll无task的请求、不提交后镜、不扩大有限单元；整体连续性目标仍未完成。
+
+### Shared Engineering Proof
+
+1. exact PNG外部生成record与派生copy证据落入原immutable authoring-input/Registry，独立human
+   fictional identity attestation绑定当前A授权；不把source record的PENDING状态改签为媒体接受。
+2. 原REQUEST `canvas-087700e07c4f24fe06033bde615d4397e6d20272`先记录not_submitted，再经唯一
+   committer以superseded_before_submit关闭。Registry-only canonical revise升Project到revision4，
+   原Shots保持一致；same-task successor保留旧request/Registry/evidence及计数。
+3. 实际pure revise曾被旧preserved-source receipt检查拒绝，标准author/reader/compiler回归先复现失败。
+   共享适配重开copy/source evidence，对齐原snapshot、node/resource/asset及image事实；重新seal的错误
+   node/resource/image/record、缺证/bytes损坏均拒绝。没有故事专属执行脚本、第二timeline或renderer。
+4. focused final source/assets/recovery 57 PASS。最终exact staged Harness十项checks全部PASS，包含
+   197 canvas workflow、58 preserved-source、275 Harness和44 migrated invariants；fresh receipt完整性、
+   snapshot、coverage均已核验。receipt：`.agent/harness/runs/canvas-generated-source-unsubmitted-final-20261013/receipt.json`。
+   初版receipt也保留；后续semantic适配以final receipt为准。
+
+Implementation Review Risk Gate为KIMI_REVIEW_NOT_REQUIRED：没有新增committer/secret/cloud authority，
+canonical closure、unknown/task/fork及sealed-source边界均有执行证据；新暴露的source兼容缺口已复现/修复，
+不存在未解决重大语义缺口。另一次受管只读Kimi边界调查绑定初版stable snapshot，实际deep/k3/max/Docker、
+3 wire requests、199.929秒，invocation `c8e1f424-ef28-4f73-8cdb-225de1026223`，canonical PARSED receipt
+与报告SHA `fbfadd124ae1f809dff0722a523c061d104f1d861c30401c56cba4f8f9cd9d1c`已核验。没有具体绕过反例；
+parent核对其sole caller/closure边界后裁决。该调查不覆盖随后新增的source-expression validator，不冒充final
+工程review或媒体质量接受；最终delta由parent、回归和exact Harness核验。
+
+### Exact Live Attempt And Receipt
+
+以下`J`代表 `runs/canvas-jieshi-two-shot-20261013-001/`；runs证据在本机，未随源码commit上传。
+
+| Evidence | Actual Identity / Outcome |
+| --- | --- |
+| Project data | SHA `421e7f4399cdd179876c23a8f390b13de6d5ab7ca2980c6cead54c60a53a2643`；Project revision4 |
+| Registry | content hash `7d4ff7ac7725b63596138619880d93594ed8af7ef6ba260dab7a151502ea467e`；file SHA `60c2c4014e98a8629a1a9258b601a1a5cbbfc011fce724c995c5705232840b03` |
+| New source attempt | `canvas-c0c0b8b61a8e03045050bcd3e09d6afa72e12605` |
+| Request input hash | `5d378b413a71cc754c95def284a5baa8882730a7d96aeadeb47c58e3d2b6ea70` |
+| Resolved generation hash | `604fbcbc3379ef78e3ea6f27278b80c6405ffbf21d1ea344b9d6c06af48179c8`；paid preview按此绑定，不用input hash代替 |
+| Paid preview | `f64ec0f9413df4ca5ea07a355089499afdaa56994b0933ef744ba089afee42e6` |
+| Synthetic egress policy | `f8f370af99f754be968bab8d7b0b737d6e0eb85e7a296336f2d54441ce696c8c`；exact PNG SHA `1a21ac10047cab19b441bfefd84ab91fef8de4b6787b7a5c558794903ff18b55` |
+| Provider call | actual POST：`doubao-seedance-2-0-fast-260128`、480p/16:9、duration15 nominal、generate_audio=true、两个inline reference_image |
+| Canonical submit receipt | `70b4f75df0cb6d29f655e0f54eb351a92f51ebadaa1b4b8e85223a5681ed230c`；2026-10-12T19:11:56Z，known_no_effect，external_effect_id=null |
+| Budget | CNY内部unit100/per-call50上限不变；reservation released、internal actual_cost_microunits=0；非市场价格/账单 |
+| Runtime evaluation | exact failed attempt已经原record_attempt_evaluation落runtime_failure，findings空、artifact_sha256=null；Manifest revision23 |
+| Main local receipt | `J/runtime-rejection-receipt.json`；错误摘要 `J/first-live-submit-error.json` |
+| Input and wire boundary | `J/rejected-payload-reconstruction.json`是exact sealed request的纯重建，非server response/wire capture；无额外Provider调用 |
+
+共享operator在submit前重开Registry/synthetic/source records、重新验证generation binding、pure payload和
+exact Secret Service supplier，original Director coverage lint PASS。Paid Gate、reservation、durable intent及
+one-use permit均由原committer执行。HTTP 400由adapter归known_no_effect；没有Provider task、fetch或MP4。
+当前adapter将4xx收敛为通用HTTP状态，没有保留服务端error code/message，故具体根因NOT_EVALUATED。
+不能仅据400断言欠费、key有效、人物限制、模型不可用或prompt错误；未额外查账号/历史状态。
+
+actual新POST计数1/2，历史7保留、累计8、剩余1。不因reservation释放重置POST消费，也不重用permit。
+只剩一次提交不能完成“fresh A + fresh B”的原两镜目标；零自动重抽/paid repair约束继续有效。
+
+### Media And Delivery Boundary
+
+| Proof Layer | Status |
+| --- | --- |
+| Shared engineering / exact Harness | PASS，源码已发布；不代表模型连续性 |
+| Real Provider execution | FAILED / known_no_effect，HTTP400；根因未判定 |
+| Exact A MP4 / per-Shot project-local MCP | NOT_EVALUATED，没有可分析的新MP4，未用历史片或技术decode代签 |
+| Approved actual state extraction / B input binding | NOT_EVALUATED，没有accepted新前镜 |
+| B generation / own identity, props, action, space, motion_direction, camera, audio findings | NOT_EVALUATED，未提交 |
+| Canonical trim/native audio/cut / HyperFrames validation film | NOT_EVALUATED，未形成两镜输入；只核对现有renderer0.7.103及analysis/Whisper运行时 |
+| Human normal-speed full viewing/listening | NOT_EVALUATED，无验证片 |
+| Full story AC-7 | NOT_EVALUATED；两镜实验不等于完整故事，原development状态不变 |
+
+恢复前需取得具体Provider拒绝原因；当前响应body已未被adapter保存，不能通过重提旧任务补证。
+下一次真实调用前，应沿canonical recovery绑定known-no-effect history、明确修正的accepted inputs/模型及新的
+有限单元/计数授权，重新exact preview/budget/egress/intent/permit。原单元剩余一次不授权自动repair或新两镜。
+本次不建立下一permit、不续期Seedance profile、不申请不具体的“是否继续”。
+
+### Record And Learning Evaluation
+
+本记录由record-ai-video-session在真实blocker更新。自动distill-ai-video-learning为no_candidate：
+一项Provider拒绝没有模型媒体、不能形成两次独立连续性支持或新的可归因跨实验结论；不创建placeholder，
+不改Skill/Policy/Gate，不重建RAG。记录独立走exact staged documentation Harness后commit/push、核验远端SHA。
+
+## Approval And Shared Seam Repair (Historical Preparation)
 
 用户对本记录上一checkpoint的集中决定回复A：允许必要共享provenance/unsubmitted recovery修复，
 并确认exact林砚PNG为project-owned fictional/no-protected-identity、用于Seedance R2V。
