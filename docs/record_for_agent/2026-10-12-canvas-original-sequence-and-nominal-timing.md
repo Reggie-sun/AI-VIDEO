@@ -19,6 +19,8 @@ Date: 2026-10-12
 用户随后表示看不出两镜之间的连续性；当前结果不能作为镜头连续性复刻通过的证据。
 随后按用户要求，只读核对原画布的截帧引用和原时间线第5–7片段，已取回实际源素材并建立核对页。
 原作通过中间状态参考、修剪和驾驶员插入镜头承接；这项来源核对不补签新生成7→2的连续性或最终接受。
+用户已对原素材第5→6→7片段完整观看回复“动作与叙事接续清楚”；原素材视觉接续的人工见证已补齐，
+原作完整混音、新生成两镜连续性与最终成片仍未接受。
 
 受管 Kimi 第一轮 HTTP403 后，用户明确授权原生只读审查。原生第一轮的三个发现已由 Parent
 实际复现、裁决并修复；该 candidate 的完整 Harness 已 PASS。第二轮又发现完整 source 语义
@@ -178,12 +180,42 @@ project-local video-analysis 显式检查四份MP4；抽帧支持上述状态与
 
 核对页连播原下载修剪源片，保留文件自身端点，未重新编码，也未建立新的Production成片。
 它没有混入原时间线的独立歌曲，不能证明原作整片混音或精确逐帧剪辑。
-Chrome检查所有素材加载、两张对照图与连播控制；用户完整听看的连续性感受仍待独立答复。
+Chrome检查所有素材加载、两张对照图与连播控制；该检查时用户连续性感受仍待独立答复。
 `review-browser-proof.json` 保存第5→6→7片段各自真实play/ended事件；均rate=1、未静音、
 无media error，页面没有横向溢出。这只证明正常顺序播放功能，不代表已听辨声桥或观看质量通过。
 工程／播放器证据不代签human视觉、声音桥、canonical media Gate或Final Acceptance。
 当前7→2新生成结果仍不证明镜头连续性；第一镜既有采用历史、第二镜待验收状态均保留。
 本轮付费submit为0，不续期7/7生成上限，不修改原画布document、Registry或Manifest。
+
+### Human Source Continuity Confirmation
+
+用户随后对核对页第5→6→7片段正常速度完整观看的问题回复“动作与叙事接续清楚”。
+问题明确核对“托举上升→驾驶员特写→继续推进进入太空”的原素材，且明确不是验收之前新生成的两段。
+question item为`["request_user_input_async","call_34c7b75f93ac4427ad89bc7f3c883eca",0]`。
+本次记录重新核对四份原MP4的实际SHA，均与`source-evidence.json`及上表一致。
+这是同一个来源观察单元新增的`HUMAN_VISUAL_SOURCE_CONTINUITY`证明层，
+只将原素材视觉/叙事接续的人工待评估项补齐；不覆盖原工具观测、不补签声音桥、Production adoption或Final Acceptance。
+
+## Harness Implementation Handoff
+
+用户认为现在到了制作Harness的阶段，随后明确要求“别在这里实现，给我prompt在下个窗口实现”。
+本窗口不追加运行时代码、Spec/Plan变更或付费生成，只整理下一窗口可使用的实现交接。
+Parent判断现有来源方法与工程骨架已足够进入收敛：不再以继续扩大单镜抽样或凑样本数量作为开工条件。
+原Spec目标仍是跨故事复用同一入口、保留来源原文与参考职责、通过真实逐镜交接、完整声音编排及成片交付。
+原画布本次观察提供“中间状态参考＋续接动作＋修剪/插入镜头”的具体开发案例，
+不是所有故事都必须使用的模板，也不要求每镜自动继承上一尾帧。
+
+现有`CanvasProductionService`及已发布多镜/source/timing实现应复用；下一窗口先对当前代码、
+适用计划与AC-1至AC-7作差距检查，只补实际缺口，避免另建timeline、状态库、renderer或故事专属执行脚本。
+冻结后至少两个独立保留画布的数据级复用、canonical连续链、恢复及完整声画交付分别举证。
+《机魂觉醒》已经用于开发，不能再次冒充未参与设计的holdout；当前7→2的新视频也不能作为连续性PASS。
+具体源tick时基、声音桥和完整成片仍需各自证据，不由本次视觉答复推定。
+
+交接时`main`的已发布HEAD为`b6d3a8f1f2adcf9c8bbee21b4ad67cd303d20ab4`。
+旧Spec/Plan、baseline、canvas facade/recovery等仍有foreign dirty修改；本窗口仅只读使用，
+下一窗口必须先检查当前Git状态和实际writer ownership，不擅自接管、覆盖或夹带提交。
+工程既有receipt和原生三轮审查只证明对应历史exact snapshot，不签新的工程差异。
+本次没有修改模型、输入、预算、Production state或原画布；付费提交仍为7/7。
 
 ## Native Verification And Review Blocker
 
@@ -291,6 +323,7 @@ exact request、MP4 与不可变恢复收据构成身份锚点；此处不制造
 | second-raw-measurement | seedance:2726ac8dca3708c999fa3cb22c37e6aa7dfa3173e5b0504fca0b5c3b029a7e57 | original-canvas-two-shot-source-reproduction | canvas-595820ad1302d39d4f40528e12065d4f4a0e9477 | N/A | a4be0d52c9bda82af227fa33e04c7b28cd778e7815c8ac9d2ae4253d80f3da79 | TECHNICAL | PASS | NONE | NEW_ATTEMPT | NONE | runs/canvas-mecha-original-multishot-fast20-20261012-001/second-shot-ceiling-r1/project-video-analysis-observation.json |
 | second-pending-gate | seedance:2726ac8dca3708c999fa3cb22c37e6aa7dfa3173e5b0504fca0b5c3b029a7e57 | original-canvas-two-shot-source-reproduction | canvas-595820ad1302d39d4f40528e12065d4f4a0e9477 | N/A | a4be0d52c9bda82af227fa33e04c7b28cd778e7815c8ac9d2ae4253d80f3da79 | ANALYZER | NOT_EVALUATED | EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | second-raw-measurement | runs/canvas-mecha-original-multishot-fast20-20261012-001/second-shot-ceiling-r1/gate-assessment.json |
 | original-source-continuity-observation | observed-media:f8b4685c4999399fc1fafdbdf8a6cf5952eacce355cc0dabfe158278882daa96 | original-canvas-reference-and-edit-audit | canvas-source-audit-observation-20261012-001 | N/A | f8b4685c4999399fc1fafdbdf8a6cf5952eacce355cc0dabfe158278882daa96 | SOURCE_MEDIA_OBSERVATION | NOT_EVALUATED | HUMAN_CONTINUITY_REVIEW_PENDING | NEW_ATTEMPT | NONE | runs/canvas-mecha-continuity-audit-20261012-001/source-evidence.json |
+| original-source-human-continuity | observed-media:f8b4685c4999399fc1fafdbdf8a6cf5952eacce355cc0dabfe158278882daa96 | original-canvas-reference-and-edit-audit | canvas-source-audit-observation-20261012-001 | N/A | f8b4685c4999399fc1fafdbdf8a6cf5952eacce355cc0dabfe158278882daa96 | HUMAN_VISUAL_SOURCE_CONTINUITY | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | original-source-continuity-observation | docs/record_for_agent/2026-10-12-canvas-original-sequence-and-nominal-timing.md#human-source-continuity-confirmation |
 
 ## Record And Learning Evaluation
 
@@ -329,3 +362,10 @@ Evidence Index identity 与 diff whitespace 核对；不运行新的 Harness/tes
 本轮owned文档范围的Harness输出路径为
 `.agent/harness/runs/canvas-source-continuity-audit-20261012-docs1/receipt.json`；
 范围不包含共享working tree中的foreign源码／spec／plan changes，也不替它们签验证。
+
+交接前再次运行`distill-ai-video-learning`评估，结果仍为`no_candidate`：原素材用户视觉见证与
+此前工具观察属于同一个来源审查单元，没有新受控对比、第二个同范围独立实验或可更新的既有同范围claim。
+本次不创建Learning Claim，也不把来源方法升格为Provider通用规则。
+本次单文件续记的fresh文档receipt路径为
+`.agent/harness/runs/canvas-harness-handoff-20261012-docs1/receipt.json`；
+此前docs1只覆盖旧记录字节，不作为本次新字节的证明。没有手动刷新RAG或新增媒体/Provider工作。
