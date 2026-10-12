@@ -22,6 +22,7 @@ from urllib.parse import quote, urlsplit
 import httpx
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.seedance_rejection import submit_rejection_message
 from ai_video.production.paid_provider import (
     PaidProviderAuthorizationDecision,
     PaidProviderCallPreview,
@@ -853,7 +854,7 @@ class SeedanceVideoProvider:
             if 400 <= response.status_code < 500 and response.status_code != 429:
                 raise _error(
                     ErrorCode.VIDEO_PROVIDER_FAILED,
-                    f"Seedance submit was rejected with HTTP {response.status_code}.",
+                    submit_rejection_message(response.status_code, response.body),
                 )
             raise _unknown_submit()
         try:

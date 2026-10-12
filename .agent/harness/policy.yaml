@@ -296,7 +296,7 @@ checks:
     cwd: .
     description: Verify image contracts, local adapter, truthful import, activation, and recovery.
   production_video_provider_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_budget_extension.py, tests/test_paid_budget_read_traversal.py, tests/test_production_paid_submit_quota.py, tests/test_production_video_unsubmitted.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_nominal_endpoint_recovery.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_video_pre_generation.py, tests/test_production_ecommerce_shot_candidate_gate.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_comfy_t8_native_long_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_metaso_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_seedance_source_prompt.py, tests/test_shot_continuity_source_review.py, tests/test_shot_continuity_source_operator.py, tests/test_shot_continuity_source_transport.py, -q, --durations=20, --durations-min=0.1]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_budget_extension.py, tests/test_paid_budget_read_traversal.py, tests/test_production_paid_submit_quota.py, tests/test_production_video_unsubmitted.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_nominal_endpoint_recovery.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_video_pre_generation.py, tests/test_production_ecommerce_shot_candidate_gate.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_comfy_t8_native_long_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_metaso_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_production_seedance_rejection.py, tests/test_seedance_source_prompt.py, tests/test_shot_continuity_source_review.py, tests/test_shot_continuity_source_operator.py, tests/test_shot_continuity_source_transport.py, -q, --durations=20, --durations-min=0.1]
     cwd: .
     covered_by_check_ids: [production_contract_tests]
     description: Verify paid-provider safety and generated-video contracts without live submit.
@@ -1106,6 +1106,7 @@ categories:
       - src/ai_video/production/vidu_download.py
       - src/ai_video/production/vidu_source.py
       - src/ai_video/production/seedance.py
+      - src/ai_video/production/seedance_rejection.py
       - src/ai_video/production/seedance_asset.py
       - src/ai_video/production/seedance_mixed_reference.py
       - src/ai_video/production/seedance_reference_image.py
@@ -1183,6 +1184,7 @@ categories:
       - tests/test_production_vidu_subjects.py
       - tests/test_production_vidu_download.py
       - tests/test_production_seedance.py
+      - tests/test_production_seedance_rejection.py
       - tests/test_production_seedance_local_video.py
       - tests/test_production_seedance_mixed_reference.py
       - tests/test_seedance_source_prompt.py
