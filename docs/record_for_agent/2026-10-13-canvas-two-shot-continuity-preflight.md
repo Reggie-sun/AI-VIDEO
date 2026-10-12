@@ -8,6 +8,19 @@ learning_eligibility: ineligible
 
 Date: 2026-10-13
 
+## Current Recovery Assessment — 2026-10-13
+
+用户质疑代码并要求查社区与官方后，已完成实际资料/请求核对，详见
+[AI portrait input admission audit](../research/2026-10-13-seedance-ai-portrait-input-admission.md)。
+上轮只解释AI图被拦，漏查了保留自有原人物的私域AIGC入库路径，结论不完整；当前actual HTTP400保持，
+不能把该拒绝推导为必须换图/换画风。官方与ComfyUI真实源码支持入库Active后`asset://`，本仓库已有此resolver。
+本次纯重开failed request、解码Base64并核对原SHA，未发现API schema/参数构造缺陷；8项相关tests PASS。
+受管Kimi调查`97b75bad-471d-4a89-9495-838549ef4fe6`实际PARSED、2 requests、124.010秒，Parent已裁决。
+研究未改源码、未生成媒体或调用Assets；无current账号权益/AK/SK/Active asset证明，未将方案实施或准入标PASS。
+旧事实/计数及以下历史保留。record-ai-video-session更新本primary record；distill-ai-video-learning判no_candidate：
+官方接口与外部实现是research evidence，社区自报没有可核验的独立exact request/artifact，不能充当重复媒体实验或adoption。
+记录和research只走owned documentation Harness/commit/push；RAG已有stale advisory命中，未为本记录重建索引。
+
 ## Current Input Admission Blocker — 2026-10-13
 
 用户要求“视频呢,修复给视频啊”后，Parent完成共享Seedance拒绝诊断修复并发布
