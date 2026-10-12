@@ -8,6 +8,15 @@ learning_eligibility: ineligible
 
 Date: 2026-10-12
 
+## Supersession Notice — Live Smoke 2026-10-12
+
+下文各开发 checkpoint 的“OAuth/billing/generation 为 0”“live BLOCKED”是当时的历史状态。
+用户随后要求真实测试并完成官方 OAuth；当前工程交付为 `e03737d65f169c1c732f9c2a3c359e01884271c0`，
+显式 included-only authority 已实测，本次 Classic T2V 的唯一 POST 被接受并取回 exact MP4。
+最新身份、调用数、下载恢复和逐 Shot verdict 见文末 Live Subscription Smoke Checkpoint。
+本次媒体 Gate 为 `NOT_EVALUATED`，没有 activation、Production qualification 或 human acceptance；
+其他 Grok 模型/模式与图片仍没有本轮真实生成证明。旧 measurements/receipts 原样保留。
+
 ## Scope And Current Status
 
 用户要求将已购买的 SuperGrok 接入图片和视频 Provider，优先使用订阅；随后明确要求
@@ -262,3 +271,118 @@ Project RAG 在本 worktree 缺失 index，按 retrieve Skill 停止；没有 re
 
 `distill-ai-video-learning` 结果 `no_candidate`。这是代码/protocol integration 及 fake regression
 证据，没有独立真实生成实验或受控媒体比较；不创建 Learning Claim，不标记 ADOPTED。
+
+## Live Subscription Smoke Checkpoint — 2026-10-12
+
+### Authentication And Included-Only Boundary
+
+用户要求“真实grok生成测试”，已完成官方 device authorization。修复 browser verification URI
+只允许官方 `accounts.x.ai/oauth2/device`，complete URI 必须精确绑定 public `user_code`；
+token/device/userinfo 的固定 transport authority 不变。真实 credential 仅由 injected supplier
+查 exact OS Secret Service reference `GROK_OAUTH`，没有 Console key、Cookie、环境或其他 item fallback。
+
+`GrokIncludedOnlyAuthority` 显式注入，default guard 继续拒绝。两条固定只读 GET 分别重开 usage
+和 auto-topup-rule：观察到 unified billing、current quota 8%、有效 period，以及
+`onDemandCap.val=0` / `onDemandUsed.val=0` / `prepaidBalance.val=0`；auto-topup-rule 为已知无 rule。
+`SAVED_PAYMENT_METHOD` 不被误当成已启用自动充值，空未知 billing schema 不被当作零费用。
+这些是 submit 前真实 observations 和 sealed zero-cash admission，不是事后账单或市场价格证明。
+没有修改账号扣费配置、启用 PAYG/Auto Top Up 或购买 credits。
+
+普通 `/models` 只有 LLM、视频目录 404 不构成没有视频资格的证据。本次 accepted POST 证明
+这个账号的 Classic `grok-imagine-video` 可执行；没有将该观察升级为全部模型 entitlement。
+工程 correction 已提交并推送 `main`，SHA 为上述 `e03737d`，提交时远端同 SHA。
+
+### Exact Attempt And Canonical Effect
+
+本轮有限边界为一次 T2V、nominal 3s/480p/16:9、native_audio=false、cash upper bound 0，
+只发送 synthetic prompt，不上传图片/视频/reference。coverage v4 lint 和 exact native prompt
+在 submit 前检查，四个 required findings 由 `media-gate-contract.json` 先封存。
+canonical `GenerationFeedbackOrchestrator` / Grok compiler / `VideoGenerationService` /
+`ProductionStateCommitter` 完成 preview、authorization、reservation、one-use permit、submit 和 fetch。
+仅复用标准 repository fixture factory 来 seed disposable experimental project；credential、
+guard、HTTPX transport 和上述 effect lifecycle 为真实运行，没有 fixture evaluator 签质量或资格。
+
+| Identity | Value |
+| --- | --- |
+| Attempt | `grok-real-smoke-20261012-1` |
+| Provider task | `a440518a-4cec-916b-b58b-c4df0ab1d8d4` |
+| Model / operation | `grok-imagine-video` / `/v1/videos/generations` |
+| Media POST count | **1**，HTTP 200；recovery POST **0** |
+| Resolved request hash | `ed77dd6e2adb162857c12ec36c73f19e3bf36836661ca9e286333846c9ffebbf` |
+| Execution binding | `82ae2495613bfe2408d2ae53da90012088ccc83e24d7b790ac11f6144f3a6b92` |
+| Fetch fingerprint | `bf4823c52128561dba70dfec40ea7ca4bdf14e887d227ac9d09c5f36a27bee5f` |
+| Exact MP4 SHA256 | `d5dc2116bbadbe58f787536ad6e2a94e525c457c8e8fbfacc4796e0470fdd2ee` |
+| Bytes / measured output | 311868 / H.264 High、848×480、24fps、73 frames、3.042s、无音轨 |
+| Manifest phase | `validate`；未登记候选验收或 activation |
+
+实验与 exact 原媒体位于 repository 外：
+`/tmp/grok-live-preflight-w9192798/smoke-project/state/video-generation/fetch/files/`，
+文件名为上述 MP4 SHA256 加 `.mp4`。同 root 的 canonical fetch receipt 为
+`state/video-generation/fetch/receipts/bf4823c52128561dba70dfec40ea7ca4bdf14e887d227ac9d09c5f36a27bee5f.json`，
+receipt SHA256 `4c1ce030bf803c4493d6b63313c3f2e86430926cd33ccc17ff9ba703cfd4c8a3`。
+随后按同 SHA 核验并保留 byte-identical raw artifact 副本于
+`runs/grok-real-smoke-20261012-1/artifacts/grok-classic-t2v.mp4`；selected sanitized MCP/recovery
+evidence 归同 run 的 `evidence/`，身份映射和 hashes 归 `archive-proof.json`。
+这是 ignored local media archive，不进入 Git publication、Registry、Manifest 或 Production acceptance；
+原 canonical experimental root 仍在 `/tmp`，没有移动或重写其 identity。
+
+### Fetch Recovery And Evidence Correction
+
+真实结果来自既有 allowlist 的 `https://vidgen.x.ai`，并没有换 CDN domain。
+首次 fetch 被公网地址校验拒绝，因为 active Mihomo fake-IP 将其解析为 `198.18.2.5`。
+早先“返回新域名”的判断已由 locator shape 和当前 resolver 证据纠正；未扩大 origins。
+对同一 accepted task，仅在本次恢复进程、实际 HTTPS DoH observation 的 TTL 内，为
+`vidgen.x.ai` 使用已观察到的公网 addresses；保留 public-IP pin、原 hostname TLS/SNI、证书
+和 redirect/credential guards。其他域名与全局 DNS/代理配置不变，没有 root 配置或新 media POST。
+canonical fetch 实际成功落盘并推进 `validate`；scratch reporter 随后错误读取不存在的
+`fetch_receipt_fingerprint`，其 AttributeError 不代表 fetch 失败。核对 Manifest 和 bytes 后写
+`fetch-recovery-confirmed.json` supersede reporter，未为修正报告重复 fetch/submit。
+同样保留 scratch `generation-intent.json`，另由原 canonical execution binding 投影保存
+`sealed-generation-intent.json` / `sealed-intent-source-proof.json`；scratch 未反映 factory 的
+最终 projection，不作为 exact intent authority，也没有改写原 binding/request。
+
+### Per-Shot Media Gate And Acceptance Boundary
+
+exact MP4 取回后显式调用 project-local `video-analysis` MCP 的 probe、0.5s samples、
+0.1s endpoint samples 和 scene detection。raw evidence 保存于同一 `/tmp` root 的
+`video-analysis-probe.json` / `video-analysis-frames.json` / `video-analysis-dense-end-frames.json` /
+`video-analysis-scene.json`。Parent verdict 为 `per-shot-gate-verdict.json`，SHA256
+`03a870e6e0fdaf7946f8db30096650fdc165e91eea1640dc4647cd18a97740be`。
+
+| Finding | Verdict | Evidence And Limit |
+| --- | --- | --- |
+| media | PASS | exact H.264 可抽取可见 frames；nominal 3s/480p 实测如上，named ratio 仍为 request metadata |
+| action | NOT_EVALUATED | 右手一次拿杯与末端持杯可见；sealed intent 的站立要求因下半身裁切无法确认，未正常速度人工验收 |
+| camera-continuity | PASS | 七个 0.5s samples 的人物/杯子/固定中景一致，scene detector 检测到一个 scene |
+| audio | PASS | probe 无 audio stream，与声明 silence 一致 |
+
+overall `NOT_EVALUATED`，本轮 STOP，remaining submit count 0，next submit 不允许。
+请求 16:9，但实际 848×480 为 `53:30`；没有宣称 exact equality，也没有降低 canonical
+strict-ratio verifier。candidate/output validation **NOT_EVALUATED**，不能把 fetch 成功当成
+Registry acceptance。仅该 Classic raw generation/download 已获得真实证明；其余 operations、
+图片、Full/Lite、continuity/voice、P4、P6、human normal-speed review 均未被本轮验证。
+
+### Verification, Review And Learning
+
+Auth/Billing targeted native group 为 **107 passed**；exact staged Harness
+`.agent/harness/runs/grok-live-auth-boundary-20261012-1/receipt.json` 全部七项 selected checks PASS，
+Grok suite **285 passed, 2 legacy warnings**；提交前机械核验 fresh/complete/integrity/workspace stable。
+clean authorized worktree 的 exact code commit-range 另绑定
+`.agent/harness/runs/grok-live-auth-boundary-20261012-final-range/receipt.json`：七项 checks PASS，
+Grok suite **285 passed, 2 legacy warnings**，机械核验 fresh/complete/integrity/cleanup。
+三个 owned docs 的 staged delta 归 `.agent/harness/runs/grok-real-smoke-20261012-record-isolated/receipt.json`，
+五项 selected checks 单独验证，
+不把 docs receipt 冒充全仓代码或媒体质量证明。
+Risk Gate `KIMI_REVIEW_NOT_REQUIRED` 的来源、snapshot 和 reasons 位于 staged receipt 同目录
+`risk-gate.json`；read-only managed Kimi mapping `627d7823-79dc-4dfc-86c2-db5dd4f56afc`
+及已核验 route receipt 只作 advisory，不冒充 final review、账单或媒体验收。
+
+Foreign Canvas source/policy/docs、dirty/index work 保持原 ownership，没有 stage/commit 夹带。
+首轮 docs snapshot PASS 后更新归档说明；main 的下一 staged 尝试遇到并发 writer 新 stage 的
+Canvas path，scope guard 在运行 checks 前拒绝。只撤回本任务三个 paths 的暂存，foreign
+index 保留，转至既有用户授权 clean worktree 封存并验证 exact docs snapshot。
+记录阶段没有新增 Provider/media/network effects 或为了 record 补测试；Harness 仅完成 task
+publication 所需 verification。RAG 在本次查询时为 fresh，record 更新后未主动 rebuild。
+自动 `distill-ai-video-learning` 为 `no_candidate`：只有一个真实媒体 attempt，probe/frame/scene/
+fetch recovery 都属于同一 evidence chain，没有 independent comparison 或已有相关 claim 的 material update。
+保留 `architecture_implementation` / `ineligible` envelope，不建 placeholder 或 adoption。

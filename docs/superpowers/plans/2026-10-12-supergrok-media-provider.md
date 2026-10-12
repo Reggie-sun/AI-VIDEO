@@ -20,6 +20,18 @@ Owned files 为 `grok_auth.py` / `grok_billing.py` 及对应 tests、Grok guide�
 record；foreign Canvas 源码/文档不修改。验证先 boundary tests，再 exact staged Harness，
 最后按 Risk Gate 决定必要 independent review；真实 server observations 不等于媒体验收。
 
+### Live Checkpoint Result
+
+`e03737d` 已发布到 `main`；真实官方 OAuth 和 submit 前两条 fixed GET admission 完成。
+Classic `grok-imagine-video` 的一次 canonical T2V 被接受并 fetched：3.042s、848×480、24fps、
+无音轨，media POST=1。下载恢复针对同一 task、仅本次进程修复 fake-IP DNS，不更改 global
+配置或 repeat POST。逐 Shot action 因 sealed standing posture 无法在裁切画面确认而
+`NOT_EVALUATED`，本轮停止；canonical candidate/output validation、human acceptance 与其他
+模型/模式仍未验证。actual raster 不是 exact16:9，未弱化既有 verifier。
+exact identities、receipt 与新旧证据边界归
+[Implementation Record](../../record_for_agent/2026-10-12-supergrok-media-provider-implementation.md#live-subscription-smoke-checkpoint--2026-10-12)。
+下方 initial offline-only Status / Current Behavior 保留为原实施规划历史。
+
 Date: 2026-10-12
 Status: authorized implementation; Parent self-reviewed; offline-only evidence boundaries
 

@@ -8,6 +8,14 @@ learning_eligibility: ineligible
 
 Date: 2026-10-12
 
+## Supersession Notice — Live Smoke 2026-10-12
+
+本文件及下方首轮 supersession 的“included-only 未知、live BLOCKED”现为历史状态。
+用户已完成 OAuth，`e03737d` 的显式 authority 核对真实 subscription/cash/auto-topup 状态；
+一次 Classic T2V accepted POST 已取得 exact MP4。当前逐 Shot `NOT_EVALUATED`、其余模型/图片
+未实测与 publication 边界见 [Implementation Record](2026-10-12-supergrok-media-provider-implementation.md#live-subscription-smoke-checkpoint--2026-10-12)。
+保留此前调查，不将一次 raw generation 升级为 qualification 或 Final Acceptance。
+
 ## Supersession Notice — 2026-10-12
 
 下方等待共享 writer、implementation 尚未开始的状态已由用户“开workree实现”及
