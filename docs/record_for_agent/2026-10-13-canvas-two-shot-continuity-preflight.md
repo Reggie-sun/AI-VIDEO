@@ -8,7 +8,65 @@ learning_eligibility: ineligible
 
 Date: 2026-10-13
 
+## Current Stop — Accepted T2V Task Failed Output Review
+
+用户 A 已批准的新无开通单元实际新增一次 POST；不再是仅 Prepare 或 credentials blocker。
+首镜 `canvas-dd96f97f176b769bbf07d3c08b05e2789371adec` 经共享 `CanvasProductionService`
+和 `VideoGenerationService` 完成 Budget Guard/reservation、durable intent、one-use permit 与提交。
+Fast 2.0 实际接受纯 T2V：943 UTF-8 bytes prompt、零 image/media bindings、480p/16:9、
+15秒 nominal、原生声音。没有开通权益、Assets 上传或旧失败任务重提。
+
+本新任务的7次 canonical poll 后，2026-10-12T20:56:46.264012Z 返回 `failed`。
+Parent 为补足失败原因，对**本次新失败任务**做一次有界 read-only diagnostic GET，
+仍使用 exact Secret Service supplier、selected adapter，重验 task/model identity。
+HTTP200、model仍为 `doubao-seedance-2-0-fast-260128`、state=failed，实际 error code 为
+`OutputVideoSensitiveContentDetected.PolicyViolation`。响应 body SHA
+`862af54fd4d13121a853067d60e041c2547336dda39b0093f240190b7cf0efb2`；
+只保存 allowlisted状态/公开错误码及 hashes，不保存 raw error prose、headers、URL 或 key。
+[官方 API Explorer](https://api.volcengine.com/api-explorer/?action=CreateContentsGenerationsTasks&groupName=%E8%A7%86%E9%A2%91%E7%94%9F%E6%88%90API&serviceCode=ark&version=2024-01-01)
+将 base `OutputVideoSensitiveContentDetected` 说明为生成的视频可能包含敏感信息。
+当前子码来自 actual response；未取得被拒输出，不能推断具体触发画面或保证改写能成功。
+
+这是 accepted task 后的 terminal failure，**不是 known_no_effect、unknown 或 MP4质量验收**。
+canonical runtime diagnosis 为 `RUNTIME_FAILURE`；Manifest46 / project revision6，next_action=stop。
+项目实际 POST3、历史7、累计10/11，新单元已消费1/2。余下一次原用于B；A未接受，B submit=0。
+零自动重抽/paid repair边界保持，不重置消费、不重用 permit、不用余下后镜额度重抽A。
+新A reservation仍为 reserved内部50 CNY upper bound；没有账单成本证据，不伪填 actual0或50。
+
+没有 exact MP4，故逐镜实际 MCP findings、accepted frame/state提取、B input binding/生成、
+native audio/trim/接点/HyperFrames、human完整1.0x听看均为 `NOT_EVALUATED`。
+实际 project-local MCP initialize/ListTools成功只证明 runtime可用，不冒充视频审查。
+两镜目标未完成，完整故事AC-7保持open；离线工程 proof 独立报告。
+
+共享 first-text-cast修复已发布 `7f7d18753d848ffcb0b1f219f4fcc53141ef2ab9`，
+origin/main exact SHA已核验。249 focused tests及exact staged Harness13 checks全PASS；
+receipt `.agent/harness/runs/canvas-textcast-runtime-20261013-001/receipt.json`
+在对应 staged snapshot上integrity/fresh/closure全部true，Architecture Gate零finding。
+Parent按Risk Gate判 `KIMI_REVIEW_NOT_REQUIRED`：未改凭据/paid authority或durable writes，
+已有anchor/identity/continuity负例覆盖且无剩余工程语义验证缺口；Kimi历史audit不冒充实现review。
+本次模型输出审核失败没有被工程tests或Harness代签通过。
+
+本轮按 `record-ai-video-session` 在真实 blocker处更新同一primary record；
+`distill-ai-video-learning=no_candidate`：只有一次新结果且看不到被拒视频，历史对比变量混杂。
+不制造跨实验因果claim。保留用户指定foreign dirty spec/plan/baseline/record及untracked plan。
+后续需要当前失败的明确恢复方案及新的repair授权/输入决定；现有单元不授权重抽或扩大累计上限。
+
+| Local Evidence | Actual Boundary |
+| --- | --- |
+| `runs/canvas-jieshi-two-shot-20261013-001/no-opening-authorization.json` | 用户A、原候选/source与技术适配data hashes、历史和有限上限 |
+| `runs/canvas-jieshi-two-shot-20261013-001/no-opening-A-creative-preflight.json` | exact model/mode/source/reference/axis/action/camera/audio与实际lint seam |
+| `runs/canvas-jieshi-two-shot-20261013-001/no-opening-quota-extension.json` | canonical cap3→4 extension，绑定old/new attempts，不重置消费 |
+| `runs/canvas-jieshi-two-shot-20261013-001/no-opening-A-submit-result.json` | 实际 accepted submission，不等于生成成功或验收 |
+| `runs/canvas-jieshi-two-shot-20261013-001/no-opening-A-poll-007.json` | fresh terminal failed observation |
+| `runs/canvas-jieshi-two-shot-20261013-001/no-opening-A-failure-diagnostic.json` | 一次current-task失败原因补证、公开子码与body hash |
+| `runs/canvas-jieshi-two-shot-20261013-001/no-opening-A-runtime-diagnosis.json` | canonical RUNTIME_FAILURE，无media PASS |
+| `runs/canvas-jieshi-two-shot-20261013-001/no-opening-current-stop.json` | Manifest/used/ceiling/remaining/STOP与各交付边界 |
+| `runs/canvas-jieshi-two-shot-20261013-001/no-opening-runtime-review-risk.json` | exact source hashes/staged tree/Harness receipt与Parent review风险裁决 |
+
 ## Approved No-Opening Textcast Unit And Shared Runtime Repair
+
+> 此节 Prepare-only checkpoint 已被上面的真实 accepted-task / output-failure 证据更新；
+> 原授予次数与 protected requirements 不变。
 
 用户最新 A 明确接受 `no-opening-preflight.md` 的差异：新 A 以文字确立林砚新面貌，
 B 只消费新 accepted A 的实际普通中间状态。不开通、不上传旧 PNG、不把普通帧伪装为受信尾帧。
