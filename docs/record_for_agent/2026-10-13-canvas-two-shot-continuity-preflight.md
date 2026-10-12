@@ -27,7 +27,11 @@ Date: 2026-10-13
 新单元Provider调用及physical submit仍为0，Production目录仍无文件。
 shared CLI的runtime注入口已确认存在，但新单元实际绑定与综合qualification仍未完成；
 尚未创建fresh upper-bound profile、budget reservation、exact paid preview、submit intent或one-use permit。
-恢复条件是用户在本机恢复上述exact supplier，不能把key发在聊天中。
+用户随后明确指定私有文件 `/home/reggie/vscode_folder/AI-VIDEO/.env`。在该指定文件中核对字段：
+`ARK_API_KEY`不存在，Seedance相关字段只有旧名 `SEEDANCE_API_KEY`；未输出key或文件内容，未把旧字段用于Provider。
+Provider Details明确禁止自动改用旧字段，因此已集中提出一次性迁入canonical Secret Service的决定；
+这项凭据来源决定不重问两镜或预算。证据为 `B/user-private-reference-readiness.json`。
+恢复条件是用户在本机补齐上述exact supplier，或明确允许从指定旧字段一次性迁入；不能把key发在聊天中。
 两镜/model/inputs及有限预算已批准，恢复后无需再次询问是否开始或重复批准同一单元；
 继续完成shared runtime/QA、exact prepare和逐次submit gate，再执行真实两镜。
 
@@ -42,7 +46,8 @@ shared CLI的runtime注入口已确认存在，但新单元实际绑定与综合
 `no_candidate`，单次credential availability失败不能产生跨实验学习claim。
 批准前记录已由commit `69120ac88f2b1e5d95e7bd0b9eb8c92694a78621` 发布到远端main并核对SHA。
 本次只更新同一owned record，foreign dirty paths保持原状；新documentation receipt为
-`.agent/harness/runs/canvas-two-shot-credential-stop-20261013/receipt.json`，结果需以实际运行核验为准。
+`.agent/harness/runs/canvas-two-shot-credential-stop-20261013/receipt.json` 已PASS且fresh；
+私有文件字段核对补记另外绑定fresh exact staged receipt，不能把前一receipt用于后来修改的bytes。
 
 ## Pre-Authorization Preflight (Historical)
 
