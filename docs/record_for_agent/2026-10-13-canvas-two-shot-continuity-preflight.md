@@ -8,7 +8,45 @@ learning_eligibility: ineligible
 
 Date: 2026-10-13
 
-## Current Result
+## Current Authorization And Runtime Stop
+
+2026-10-13，用户对集中决定项回复 A：批准本候选两镜与上限，补齐并核验共享runtime后执行。
+这项新授权取代下文批准前的“paid scope尚未明确批准”；不取代逐镜Gate、exact preview或permit。
+接受的项目数据SHA为 `4e8346af2af4c250c3c525fce9cb4920a3e597d58f8a5942c818e5ca3dac8020`，
+本次重新核对项目bytes及5份初始PNG的SHA/size，全部一致；第五份仍是禁止submit的author占位图。
+授权接受Fast2.0、480p、每镜nominal15秒、原生声音、四份原素材与后镜实际accepted帧参考，
+最多新增2次submit、零自动重抽/repair，历史7/7保留、累计上限9。
+内部operator bound为每次50 CNY、新单元100 CNY；不描述为市场价或实际账单。
+
+实际调用既有 `scripts.generation_feedback_driver._credential` 的exact injected supplier一次，
+返回 `ValueError: credential supplier unavailable`。只输出availability和failure type，未输出或保存key。
+指定引用是Secret Service的 `ARK_API_KEY`，attributes为 `application=ai-video`、
+`provider=seedance`、`credential=ARK_API_KEY`。lookup失败后停止，不重试、不搜其他secret source。
+这是当前凭据可达性失败，不证明账号余额/欠费，不沿旧AccountOverdueError调用Provider核对。
+
+新单元Provider调用及physical submit仍为0，Production目录仍无文件。
+shared CLI的runtime注入口已确认存在，但新单元实际绑定与综合qualification仍未完成；
+尚未创建fresh upper-bound profile、budget reservation、exact paid preview、submit intent或one-use permit。
+恢复条件是用户在本机恢复上述exact supplier，不能把key发在聊天中。
+两镜/model/inputs及有限预算已批准，恢复后无需再次询问是否开始或重复批准同一单元；
+继续完成shared runtime/QA、exact prepare和逐次submit gate，再执行真实两镜。
+
+| New evidence | Identity / boundary |
+| --- | --- |
+| `B/accepted-unit-authorization.json` | 文件SHA `33f54a580a49663592fb1366fcf1094eca73cac4b27a402988cfc82e422565ee`；current user A，仅Development授权记录，不是operation permit |
+| `B/runtime-readiness-after-authorization.json` | 文件SHA `7f6fc7a72583bf4f6044ac738cb4ee09837b8d88de0785a30d1d4bf8dddec9ae`；一次exact supplier失败、零Provider效果与剩余2次 |
+
+两镜连续性、逐镜MCP findings、actual state binding、trim/audio/cut、HyperFrames验证片及human acceptance
+均未取得；完整故事AC-7也仍为NOT_EVALUATED。没有工程代码修改或新的媒体质量结论。
+本次真实external prerequisite blocker触发 `record-ai-video-session`；automatic learning evaluation为
+`no_candidate`，单次credential availability失败不能产生跨实验学习claim。
+批准前记录已由commit `69120ac88f2b1e5d95e7bd0b9eb8c92694a78621` 发布到远端main并核对SHA。
+本次只更新同一owned record，foreign dirty paths保持原状；新documentation receipt为
+`.agent/harness/runs/canvas-two-shot-credential-stop-20261013/receipt.json`，结果需以实际运行核验为准。
+
+## Pre-Authorization Preflight (Historical)
+
+以下保留A批准前的preflight、建议上限及缺项历史；当前授权与停止原因以上节为准。
 
 承接已发布 `601b4f7` / `28d4fb48b0c672fc82dfc2bb2556d8e0e105d6c4` 的 Reusable Canvas Production Harness，
 本次选出确有普通中间状态参考依赖的《机魂觉醒》视频2→视频3，实际运行共用CLI `inspect` 和 `author`。
@@ -121,6 +159,8 @@ publication是否完成以对应本地publication receipt与最终Git核验为�
 `runs/`证据保持workspace-local，未作为source commit发布。
 
 ## Remaining Work And Learning Evaluation
+
+以下“先取得集中决定”是批准前的历史next action，现已被上节current user A与credential blocker取代。
 
 先取得集中决定的当前Provider/model/inputs与新有限paid单元授权；再在既有owners内封存fresh
 operator upper bound/预算、配置并验证shared runtime、批准QA、产出exact preview与egress/intent/permit。
