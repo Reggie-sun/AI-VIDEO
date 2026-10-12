@@ -73,6 +73,15 @@ strategy transition；`canvas_composition` 只构建 CompositionSpec，不解释
 与关闭receipt选择无分支的唯一successor，不按日期/Manifest顺序猜当前版本；unknown、未关闭、fork均阻断。
 native WAV 提取仍归 `generated_video_audio`，其 Manifest 能力判断复用 `manifest_schema`；不降低 Registry/源 bytes/预算检查。
 render replay 重开原始 begin identity，deliver 只读 exact final target，不签 human acceptance。
+`canvas_project_data` / `scripts.canvas_production` 是共用数据入口；sealed input 由
+`production.authoring_input` 验证，经 bootstrap/committer 存入 immutable evidence，reader 重开。
+`canvas_handoff` 只准备 accepted source 的实测普通中间帧及 selected-state MCP Gate；
+中间交接必须有 approved `state_reference`，缺计划/缺证均阻断后镜，不能制造 terminal/semantic acceptance。
+`canvas_target_gate` 只投影/核验同一后镜的 selected generation QA rows 与原 generation findings，
+source-frame Gate 不能代替后镜；不新增 acceptance store 或 review lifecycle。
+`composition_order` 只投影到 CompositionSpec；native WAV 匹配 exact request 并用 canonical trim。
+`canvas_review` 从 ResolvedTimeline 构建接点材料，沿既有 P6 与 final-output policy，
+没有第二 QA lifecycle。操作见 [Canvas Production Harness](canvas-production-harness.md)。
 验证归 `canvas_production_workflow_tests` 与原 production/audio/voice checks，scripted PASS 不证明制作效果。
 
 Development-only入口`scripts/canvas_sequence_packet.py`保留显式节点/原timeline顺序、完整原文、
@@ -358,6 +367,14 @@ QA owner 的 `generation_evaluation_authorities` 显式绑定 evaluator 与 proo
 `generation_runtime_repair.py` 的 one-use grant 只对最新已知 `RUNTIME_FAILURE` 的同 Shot
 re-execution 生效；committer 在 replacement submit intent 的同一原子写入中消耗 grant，
 unknown outcome、旧 evidence 或耗尽的 per-Shot ceiling 不获得 retry 权限。
+`PaidNoEffectRetarget` 只在 canonical paid `KNOWN_NO_EFFECT` 的 exact latest failed receipt 上登记；
+`runtime-repair/3` 绑定失败 receipt 与唯一目标 candidate scope，与 local extension 互斥。
+允许同 Provider model/profile/compiler/raster 适配，但冻结 intent、rubric、duration/fps/audio、seed、
+voice route 和 FinalOutput goal；新 submit 仍独立经过 preview/budget/egress/permit，不改历史消费。
+候选 owner 对最新 runtime_failure 保留已封存 baseline seed，quality resample 才推进 seed。
+`seedance_source_expression.py` 的 preserved-source `/2` 保留重复 chip 和 tray-only ordinary image
+参考；重复表达必须绑定一致的 slot/material role/bytes，native input 由同一 compiler owner 去重。
+Canvas source owner 逐份核对 implicit materials 与原始 reference tray；旧 `/1` 行为与 bytes 不变。
 默认per-Shot runtime-repair ceiling仍2；显式`LocalRuntimeRepairExtension.ceiling`仅允许3、4、5或6，default3；
 分别在两个、三个、四个或五个同task/Shot local/unmetered grants已消耗后增加一份，封存source binding、当前Manifest revision与同runtime actor。
 `_state_commit_video_runtime_repair.py`拥有完整registration transaction和submit前scope重验；仍为
@@ -512,6 +529,9 @@ Source-preserving Canvas只给秒数而没有明确timing mode时，`canvas_plan
 默认使用既有 `content_driven` need，可选Provider的 `nominal_seconds` 有界标称输出；
 普通复刻不要求生成原片精确帧终止。显式 `fixed` / `frame_count` 和legacy路径保持原语义，
 最终使用帧数与source trim仍归 `ResolvedTimeline`。
+`production._composition_source_duration` 是 composition owner 的辅助解析器：已有
+`content_driven` Shot 从唯一采用主视频的真实帧区间解析时长，保留显式 min/max；
+`seconds` 仅作为标称生成提示，`fixed` 与其他视觉策略的契约不放宽。
 `seedance_capabilities.py` 为 Fast 2.0 同时声明 `exact_seconds` 和 `nominal_seconds`；
 native payload 均保持整数秒 `duration`，nominal 仅调整有界落盘验收。
 既有 exact-only immutable profile 保持可重开，新选择使用新的 profile hash，禁止改写旧调用。

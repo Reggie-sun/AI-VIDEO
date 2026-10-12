@@ -14,6 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from ai_video.canvas_subject import subject_material_references
+from ai_video.canvas_external_image import external_image_asset
 from scripts.canvas_reference_packet import build_packet
 from scripts.canvas_sequence_packet import build_sequence_packet
 
@@ -339,6 +340,14 @@ def _reference_issues(graph: dict, nodes: dict[str, dict], issues: list[dict]) -
         expected_sources = set()
         for index, reference in enumerate(references):
             if not isinstance(reference, dict):
+                continue
+            try:
+                external = external_image_asset(reference)
+            except (ValueError, TypeError):
+                issues.append(_issue("reference_instance_mismatch", "External image URI/history identity is invalid.",
+                                     node_id=owner_id, reference_index=index))
+                continue
+            if external is not None:
                 continue
             source_id = reference.get("nodeId")
             if isinstance(source_id, str):

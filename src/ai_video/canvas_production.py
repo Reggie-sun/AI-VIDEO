@@ -100,7 +100,7 @@ class CanvasProductionService:
             expected_manifest_revision=manifest.manifest_revision)
 
     @_input_errors
-    def revise_authoring(self, *, attempt_id):
+    def revise_authoring(self, *, attempt_id, registry=None, asset_artifacts=()):
         """Approve new director input; preserve history and let the P5 owner rebase."""
         from dataclasses import replace
         from ai_video.production.state_commit import prepare_project_registry_commit
@@ -109,7 +109,8 @@ class CanvasProductionService:
         previous = load_production_project(self.committer.project_root / "project.yaml")
         if direction_reference(self.packet, self.direction) in previous.project.source_provenance:
             return previous.manifest
-        bundle = author_canvas_project(packet=self.packet, direction=self.direction, previous=previous)
+        bundle = author_canvas_project(packet=self.packet, direction=self.direction, previous=previous,
+            registry=registry, asset_artifacts=asset_artifacts)
         request = prepare_project_registry_commit(manifest=previous.manifest, project=bundle.project,
             registry=bundle.registry, attempt_id=attempt_id)
         request = replace(request, artifacts=tuple(sorted((*request.artifacts, *bundle.artifacts),
@@ -156,6 +157,18 @@ class CanvasProductionService:
                 continue
             attempts = self._attempts(loaded, shot_id)
             if not attempts:
+                plan = row.get("state_reference")
+                if plan is not None:
+                    expected = {k: plan[k] for k in ("source_shot_id", "frame_index")}
+                    expected["original_asset_id"] = plan["replace_asset_id"]
+                    bound = [a for a, evidence in row.get("reference_replacements", {}).items() if evidence == expected]
+                    if len(bound) != 1:
+                        return CanvasWorkflowPosition(row["occurrence_id"], shot_id, None, "handoff_reference")
+                    from ai_video.canvas_handoff import require_canvas_state_reference
+                    asset = next(a for a in loaded.registry.assets if a.asset_id == bound[0])
+                    evidence = require_canvas_state_reference(loaded=loaded, asset=asset)
+                    if evidence["assessment"]["context"]["checks"] != plan["checks"]:
+                        raise _blocked("Selected state reference Gate no longer covers the authored requirements.")
                 return CanvasWorkflowPosition(row["occurrence_id"], shot_id, None, "prepare")
             from ai_video.canvas_recovery import current_canvas_attempt
             attempt = current_canvas_attempt(self.committer, attempts)
@@ -179,8 +192,10 @@ class CanvasProductionService:
                 execution_stack=self.execution_stack, handoff_preparer=self.handoff_preparer)
             if repair_receipt is not None:
                 from ai_video.canvas_authoring import input_hash
+                receipt_hash = (getattr(repair_receipt, "content_hash", None)
+                                or repair_receipt.submit_receipt_fingerprint)
                 identity = input_hash({"generation": current["lifecycle"].generation_id,
-                                       "rejection": repair_receipt.content_hash})[:32]
+                                       "rejection": receipt_hash})[:32]
                 current["lifecycle"] = current["lifecycle"].model_copy(update={
                     "generation_id": f"canvas-generation-repair-{identity}",
                     "output_asset_id": f"canvas-video-repair-{identity}"})
@@ -199,30 +214,37 @@ class CanvasProductionService:
 
     def _repair_context(self, limits, interventions):
         position = self.position()
-        if not interventions or position.next_action != "stop" or position.attempt_id is None:
-            raise _blocked("Explicit repair requires an intervention and a closed quality failure.")
+        if position.next_action != "stop" or position.attempt_id is None:
+            raise _blocked("Explicit repair requires a closed quality or known-no-effect failure.")
         loaded = self._load()
         attempt = next(a for a in loaded.manifest.attempts if a.attempt_id == position.attempt_id)
+        from ai_video.production.models import StateCommitStatus
+        if attempt.status is not StateCommitStatus.FAILED:
+            raise _blocked("Explicit repair requires a closed quality or known-no-effect failure; unknown stops remain closed.")
         pointer = attempt.video_generation_state.quality_rejection
-        if pointer is None:
-            raise _blocked("Explicit repair requires a closed quality failure; unknown stops remain closed.")
+        if pointer is not None:
+            if not interventions:
+                raise _blocked("Closed quality repair requires an explicit intervention.")
+            receipt = self.committer._reopen_generation_quality_rejection(pointer)
+        else:
+            from ai_video.production._state_commit_video_runtime_repair import closed_paid_no_effect_receipt
+            receipt = closed_paid_no_effect_receipt(self.committer, attempt)
         binding = self.committer._reopen_generation_execution_binding(
             attempt.video_generation_state.execution_binding)
         if limits.task_id != binding.inputs.limits.task_id:
             raise _blocked("Explicit repair must retain the predecessor task identity.")
-        receipt = self.committer._reopen_generation_quality_rejection(pointer)
         row = next(r for r in self.direction["shots"] if r["occurrence_id"] == position.occurrence_id)
         return position, row, receipt
 
     @_input_errors
-    def prepare_repair(self, *, limits, interventions):
+    def prepare_repair(self, *, limits, interventions=()):
         """Explicitly hand a closed exact result to the existing decision owner."""
         _, row, receipt = self._repair_context(limits, interventions)
         return self._orchestrator(row, repair_receipt=receipt).prepare(
             limits=limits, interventions=interventions)
 
     @_input_errors
-    def start_repair(self, *, limits, interventions):
+    def start_repair(self, *, limits, interventions=()):
         """Start at most one proven successor; never submit or close old media."""
         position = self.position()
         if position.attempt_id is not None and position.next_action != "stop":
@@ -295,18 +317,26 @@ class CanvasProductionService:
                     result = diagnose_exact_result(entry, entries, experience.candidate.recipe,
                         evaluation_sources=sources, requirement=experience.projection.requirement)
                     if result.all_required_observed_pass:
+                        from ai_video.canvas_target_gate import require_target_state_findings
+                        row = next(r for r in self.direction["shots"]
+                                   if r["shot"]["shot_id"] == entry.shot_id)
+                        try:
+                            require_target_state_findings(loaded=self._load(), row=row, entry=entry)
+                        except ValueError as error:
+                            raise _blocked(str(error)) from error
                         return result
                     raise _blocked("Exact media Gate is FAIL or NOT_EVALUATED; stop this attempt.")
         raise _blocked("Exact media Gate evidence is missing or stale.")
 
-    async def evaluate(self, *, session, adjudicate, repair_evidence=False):
+    async def evaluate(self, *, session, adjudicate=None, repair_evidence=False, presentation_verifier=None):
         """Explicit project-local video-analysis path; replay stays in its owner."""
         from ai_video_mcp.generation_feedback import review_generation_attempt
         position = self.position()
         if position.attempt_id is None or position.next_action == "stop":
             raise _blocked("No known fetched attempt is eligible for media evaluation.")
         return await review_generation_attempt(committer=self.committer, attempt_id=position.attempt_id,
-            session=session, adjudicate=adjudicate, repair_evidence=repair_evidence)
+            session=session, adjudicate=adjudicate, repair_evidence=repair_evidence,
+            presentation_verifier=presentation_verifier)
 
     def execute(self, *, action, **arguments):
         """Perform one exact next action using current existing gates/permits."""
@@ -347,6 +377,85 @@ class CanvasProductionService:
         return self.committer.current_final_media_target()
 
     @_input_errors
+    def cut_packet(self):
+        from ai_video.canvas_review import canvas_cut_packet
+        loaded, timeline = self.deliver()
+        return canvas_cut_packet(loaded=loaded, timeline=timeline, direction=self.direction)
+
+    @_input_errors
+    def review_delivery(self, **arguments):
+        from ai_video.canvas_review import review_canvas_delivery
+        return review_canvas_delivery(service=self, **arguments)
+
+    @_input_errors
+    def handoff_reference(self, *, source_shot_id, target_occurrence_id, frame_index,
+                          replace_asset_id, usage_license, checks, session, adjudicate, tool_identity):
+        """Bind a measured intermediate frame as an ordinary source reference.
+
+        The target keeps its original prose and chip. The replacement and its
+        accepted-source provenance are explicit; no last-frame assertion or
+        semantic state verdict is manufactured.
+        """
+        from ai_video.canvas_handoff import prepare_canvas_state_reference, replace_state_reference
+        from ai_video.production.registry import registry_semantic_sha256
+        from ai_video.production.state_commit import prepare_project_registry_commit
+        from ai_video.production.production_strategy_dependency import prepare_strategy_dependency_transition
+        from dataclasses import replace
+        loaded = self._load()
+        row = next(r for r in self.direction["shots"] if r["occurrence_id"] == target_occurrence_id)
+        supplied = {"source_shot_id": source_shot_id, "frame_index": frame_index,
+                    "replace_asset_id": replace_asset_id, "checks": checks, "usage_license": usage_license}
+        if row.get("state_reference") is None:
+            raise _blocked("Intermediate handoff requires an approved state reference plan.")
+        if row["state_reference"] != supplied:
+            raise _blocked("State reference differs from the approved selected scene reference plan.")
+        expected = {"original_asset_id": replace_asset_id, "source_shot_id": source_shot_id,
+                    "frame_index": frame_index}
+        replays = [a for a, evidence in row.get("reference_replacements", {}).items() if evidence == expected]
+        if len(replays) == 1:
+            from ai_video.canvas_handoff import require_canvas_state_reference
+            registered = next(a for a in loaded.registry.assets if a.asset_id == replays[0])
+            evidence = require_canvas_state_reference(loaded=loaded, asset=registered)
+            if registered.usage_license != usage_license or evidence["assessment"]["context"]["checks"] != checks:
+                raise _blocked("State reference replay changes its license or required checks.")
+            return registered
+        position = self.position()
+        if (position.occurrence_id != target_occurrence_id
+                or position.next_action not in {"prepare", "handoff_reference"}):
+            raise _blocked("State reference handoff requires the current unsubmitted target.")
+        selected = prepare_canvas_state_reference(loaded=loaded, source_shot_id=source_shot_id,
+            frame_index=frame_index, usage_license=usage_license)
+        revised = replace_state_reference(direction=self.direction, loaded=loaded,
+            target_occurrence_id=target_occurrence_id, replace_asset_id=replace_asset_id,
+            asset=selected.asset, source_shot_id=source_shot_id, frame_index=frame_index)
+        from ai_video.canvas_handoff import assess_canvas_state_reference
+        selected = assess_canvas_state_reference(loaded=loaded, selected=selected, checks=checks,
+            session=session, adjudicate=adjudicate, tool_identity=tool_identity)
+        revised = replace_state_reference(direction=self.direction, loaded=loaded,
+            target_occurrence_id=target_occurrence_id, replace_asset_id=replace_asset_id,
+            asset=selected.asset, source_shot_id=source_shot_id, frame_index=frame_index)
+        existing = next((a for a in loaded.registry.assets if a.asset_id == selected.asset.asset_id), None)
+        if existing is None:
+            registry = loaded.registry.model_copy(update={"assets": tuple(sorted(
+                (*loaded.registry.assets, selected.asset), key=lambda a: a.asset_id))})
+            digest = registry_semantic_sha256(registry)
+            registry = registry.model_copy(update={"revision_id": digest, "content_hash": digest})
+            request = prepare_project_registry_commit(manifest=loaded.manifest, project=loaded.project,
+                registry=registry, attempt_id=f"canvas-state-register-{selected.asset.input_fingerprint}")
+            request = replace(request, artifacts=tuple(sorted((*request.artifacts, *selected.artifacts),
+                key=lambda a: a.relative_path.as_posix())))
+            candidate = loaded.model_copy(update={"registry": registry})
+            request = prepare_strategy_dependency_transition(base_loaded=loaded,
+                candidate_loaded=candidate, request=request)
+            self.committer.commit(request)
+            loaded = self._load()
+        elif existing != selected.asset:
+            raise _blocked("State reference identity was reused with different inputs.")
+        self.direction = revised
+        self.revise_authoring(attempt_id=f"canvas-state-bind-{selected.asset.input_fingerprint}")
+        return selected.asset
+
+    @_input_errors
     def register_native_audio(self, *, shot_id, audio_kind, usage_license, toolchain,
                               speaker_id=None, voice_id=None, language=None):
         """Extract exact adopted video audio through its existing owner, never mux."""
@@ -357,7 +466,9 @@ class CanvasProductionService:
         loaded = self._load()
         shot = next(s for s in loaded.shots if s.shot_id == shot_id)
         _, request, _, _, _ = accepted_sequence_source(loaded, shot)
-        matches = self._attempts(loaded, shot_id)
+        matches = [a for a in self._attempts(loaded, shot_id)
+                   if self.committer._reopen_video_request(a.video_generation_state.request)
+                   == request]
         if len(matches) != 1:
             raise _blocked("Native audio requires one exact accepted source attempt.")
         kind = AudioKind(audio_kind)

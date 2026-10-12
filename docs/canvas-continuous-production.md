@@ -2,6 +2,9 @@
 
 ## Reusable Production Entry
 
+完整数据入口、实际状态交接 Gate、生成/剪辑顺序与音轨操作见
+[Reusable Canvas Production Harness](canvas-production-harness.md)。
+
 先从 exact source 和显式 selection 生成 inspection；未选链、selected source gaps、unsupported subject/edge/track
 均定位报告，其他未选择单元的失败不禁止当前合法链。
 

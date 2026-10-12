@@ -82,7 +82,7 @@ def author_canvas_project(*, packet, direction, registry=None, asset_artifacts=(
     """
     packet, direction = deepcopy(packet), deepcopy(direction)
     allowed = {"project_id", "title", "language", "brief", "story", "characters", "scenes",
-               "storyboard", "shots", "delivery_profile"}
+               "storyboard", "shots", "delivery_profile", "composition_order", "cut_requirements"}
     if set(direction) - allowed:
         raise ValueError("unknown director input fields")
     if packet.get("authority") != "development_preparation_only_not_production_state":
@@ -99,9 +99,15 @@ def author_canvas_project(*, packet, direction, registry=None, asset_artifacts=(
     if registry is None and previous is not None:
         registry = previous.registry
     source = direction_reference(packet, direction)
+    from ai_video.production.authoring_input import authoring_input_reference, authoring_input_payload
+    director_data = {"packet": packet, "direction": direction}
+    director_reference = authoring_input_reference(director_data)
+    director_bytes = authoring_input_payload(director_data)
     provenance = (SourceReference(kind="imported", reference="canvas-source-snapshot",
-        content_hash=packet["source_snapshot_sha256"]), source)
-    artifacts, models, adaptations = [], [], []
+        content_hash=packet["source_snapshot_sha256"]), source, director_reference)
+    artifacts = [PreparedArtifact(Path(director_reference.reference),
+        director_bytes, hashlib.sha256(director_bytes).hexdigest())]
+    models, adaptations = [], []
     previous_models = {} if previous is None else {m.artifact_id: m for m in (
         previous.brief, previous.story, *previous.characters, *previous.scenes,
         previous.storyboard, *previous.shots)}
@@ -152,11 +158,26 @@ def author_canvas_project(*, packet, direction, registry=None, asset_artifacts=(
     order = [s for b in direction["storyboard"]["beats"] for s in b["shot_ids"]]
     if len(set(shot_ids)) != len(shot_ids) or order != shot_ids:
         raise ValueError("Storyboard must retain exact selected occurrence order and distinct Shot IDs")
+    composition_order = direction.get("composition_order", occurrences)
+    if (not isinstance(composition_order, list) or len(composition_order) != len(occurrences)
+            or set(composition_order) != set(occurrences)):
+        raise ValueError("composition_order must contain every selected occurrence exactly once")
     shots = []
     for index, (unit, row) in enumerate(zip(units, rows, strict=True)):
         if set(row) - {"occurrence_id", "shot", "adaptation_reason", "source_dialogue",
-                       "generation", "composition", "boundary"}:
+                       "generation", "composition", "boundary", "reference_replacements", "state_reference"}:
             raise ValueError("unknown Shot director fields")
+        state_plan = row.get("state_reference")
+        if state_plan is not None:
+            from ai_video.canvas_review import DIMENSIONS
+            if (not isinstance(state_plan, dict) or set(state_plan) != {"source_shot_id", "frame_index",
+                    "replace_asset_id", "checks", "usage_license"}
+                    or state_plan["source_shot_id"] not in [r["shot"]["shot_id"] for r in rows[:index]]
+                    or type(state_plan["frame_index"]) is not int or state_plan["frame_index"] < 0
+                    or not isinstance(state_plan["checks"], dict) or not state_plan["checks"]
+                    or set(state_plan["checks"]) - DIMENSIONS
+                    or any(not isinstance(v, str) or not v.strip() for v in state_plan["checks"].values())):
+                raise ValueError("state_reference needs an earlier selected source, exact frame and observable checks")
         edge = row.get("boundary")
         if index == 0 and edge is not None:
             raise ValueError("first occurrence cannot have a predecessor boundary")
@@ -177,7 +198,8 @@ def author_canvas_project(*, packet, direction, registry=None, asset_artifacts=(
         original = unit["source_text"]
         from ai_video.canvas_source_expression import require_canvas_source_expression
 
-        require_canvas_source_expression(packet=packet, unit=unit, row=row, registry=registry)
+        require_canvas_source_expression(packet=packet, unit=unit, row=row, registry=registry,
+                                         previous=previous)
         adapted = row["shot"]["intent"]
         reason = row.get("adaptation_reason", "")
         if original != adapted and (not isinstance(reason, str) or not reason.strip()):

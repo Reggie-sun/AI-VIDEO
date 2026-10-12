@@ -163,6 +163,18 @@ class _StateCommitBootstrapMixin:
         )
 
         artifacts_by_path = {item.relative_path: item for item in artifacts}
+        from ai_video.production.authoring_input import PREFIX, require_authoring_input
+        for reference in project.source_provenance:
+            if reference.reference.startswith(PREFIX):
+                path = Path(reference.reference)
+                artifact = artifacts_by_path.get(path)
+                if artifact is None:
+                    raise _state_invalid("Production bootstrap is missing its sealed authoring input.")
+                try:
+                    require_authoring_input(reference, artifact.payload)
+                except ValueError as error:
+                    raise _state_invalid("Production bootstrap authoring input is invalid.") from error
+                required_paths.add(path)
         from ai_video.production.repair_input_admission import REPAIR_INPUT_TOOL, repair_input_receipt_path
         required_paths.update(repair_input_receipt_path(item.creation_receipt_id)
                               for item in registry.assets if item.tool == REPAIR_INPUT_TOOL)

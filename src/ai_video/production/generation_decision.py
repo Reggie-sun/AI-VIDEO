@@ -455,11 +455,20 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
                           and g.authorization.evidence_hash == latest.evidence_hash
                           and g.authorization.attempt_id == latest.attempt_id), None)
             if grant is not None:
+                retarget = grant.authorization.paid_no_effect_retarget
+                requested_scope = retarget.target_scope_hash if retarget else latest.recipe_scope_hash
                 repair_candidate = next(
-                    (c for c in candidates if c.scope_hash == latest.recipe_scope_hash), None)
+                    (c for c in candidates if c.scope_hash == requested_scope), None)
                 if repair_candidate is None:
                     return GenerationDecision(**base, disposition="EVIDENCE_GAP",
                         rationale=("runtime repair requires the historical generation strategy",))
+                if retarget is not None:
+                    from ai_video.production.generation_runtime_repair import retarget_preserves_strategy
+                    previous = next(c for c in (*candidates, *inputs.historical_recipes)
+                                    if c.scope_hash == latest.recipe_scope_hash)
+                    if not retarget_preserves_strategy(previous, repair_candidate):
+                        return GenerationDecision(**base, disposition="EVIDENCE_GAP",
+                            rationale=("paid retarget must preserve the frozen intent and acceptance strategy",))
                 runtime_repair = grant.authorization
         for reason in ("UNKNOWN_OUTCOME", "RUNTIME_FAILURE", "RUBRIC_OR_STAGE_ERROR", "EVIDENCE_GAP"):
             if goal_changed and reason == "EVIDENCE_GAP":

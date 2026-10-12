@@ -151,13 +151,14 @@ class _StateCommitVideoMixin:
 
     def record_runtime_repair_authorization(
         self, *, attempt_id: str, repair_basis: str, actor,
-        evidence_hash: str | None = None, local_extension=None,
+        evidence_hash: str | None = None, local_extension=None, paid_no_effect_retarget=None,
     ):
         from ._state_commit_video_runtime_repair import register_runtime_repair_authorization
 
         return register_runtime_repair_authorization(
             self, attempt_id=attempt_id, repair_basis=repair_basis, actor=actor,
             evidence_hash=evidence_hash, local_extension=local_extension,
+            paid_no_effect_retarget=paid_no_effect_retarget,
         )
 
     def _require_runtime_repair_grant(self, manifest, binding):
@@ -916,36 +917,9 @@ class _StateCommitVideoMixin:
             next_attempt = _validated_transition(
                 attempt, {"video_generation_state": next_state}
             )
-            attempts = []
-            for item in manifest.attempts:
-                if item.attempt_id == attempt_id:
-                    attempts.append(next_attempt)
-                elif (
-                    runtime_repair is not None
-                    and item.attempt_id == runtime_repair.attempt_id
-                ):
-                    # Consume the one-use grant in the same atomic write as the
-                    # replacement submit intent; the repaired outcome can never
-                    # be re-authorized from the same runtime failure evidence.
-                    prior_state = item.video_generation_state
-                    consumed_state = prior_state.model_copy(
-                        update={
-                            "runtime_repairs": tuple(
-                                p.model_copy(update={"consumed": True})
-                                if p.attempt_id == runtime_repair.attempt_id
-                                and p.evidence_hash == runtime_repair.evidence_hash
-                                else p
-                                for p in prior_state.runtime_repairs
-                            )
-                        }
-                    )
-                    attempts.append(
-                        _validated_transition(
-                            item, {"video_generation_state": consumed_state}
-                        )
-                    )
-                else:
-                    attempts.append(item)
+            from ._state_commit_video_runtime_repair import submit_attempts_with_consumed_repair
+
+            attempts = submit_attempts_with_consumed_repair(manifest, next_attempt, runtime_repair)
             next_manifest = _validated_transition(
                 manifest,
                 {

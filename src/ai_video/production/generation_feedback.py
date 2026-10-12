@@ -109,7 +109,8 @@ def _expressions(acceptance, requirement):
 
 
 def create_generation_candidates(*, projection, targets, acceptance, baseline=None, final_output_goal=None,
-                                 source_project=None, voice_context=None, generation_id=None, task_id=None):
+                                 source_project=None, voice_context=None, generation_id=None, task_id=None,
+                                 preserve_baseline_seed=False):
     """Enumerate actual registered variants; Router owns compatibility/ranking."""
     expressions = _expressions(acceptance, projection.requirement)
     candidates = []
@@ -126,7 +127,7 @@ def create_generation_candidates(*, projection, targets, acceptance, baseline=No
             if (baseline is not None and baseline.provider_name == capabilities.provider_name
                     and baseline.model_id == variant.model_id and baseline.mode == variant.mode
                     and baseline.seed is not None and baseline.seed >= 0):
-                seed = (baseline.seed + 1) % (2**31 - 1)
+                seed = baseline.seed if preserve_baseline_seed else (baseline.seed + 1) % (2**31 - 1)
             recipe = GenerationRecipe(
                 seed=SeedPolicy(kind="paired", value=seed) if variant.seed_supported
                 else SeedPolicy(kind="uncontrolled"),
@@ -314,7 +315,9 @@ class GenerationFeedbackOrchestrator:
             acceptance=current["acceptance"], baseline=history.baseline_request,
             final_output_goal=current.get("final_output_goal"), source_project=current.get("source_project"),
             voice_context=current.get("voice_context"), generation_id=current["lifecycle"].generation_id,
-            task_id=limits.task_id)
+            task_id=limits.task_id,
+            preserve_baseline_seed=any(e.evidence_hash == history.latest_attempt_hash
+                and e.outcome == "runtime_failure" for x in history.experiences for e in x.evidence))
         voice_used = max((c.voice_route.readiness.voice_submits_used for c in candidates
             if c.voice_route is not None and c.voice_route.readiness is not None), default=0)
         limits = limits.model_copy(update={"paid_submits_used": max(limits.paid_submits_used,

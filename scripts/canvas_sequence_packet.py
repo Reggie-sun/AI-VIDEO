@@ -17,6 +17,7 @@ from ai_video.production.video_transition import (
     require_causal_boundary,
 )
 from ai_video.canvas_subject import subject_material_references
+from ai_video.canvas_external_image import external_image_asset
 from scripts.canvas_reference_packet import _index, build_packet
 
 
@@ -74,6 +75,11 @@ def _unit_source(node: dict, observed: dict | None, nodes: dict[str, dict]) -> t
     }
     bound_references = {}
     for slot_id, reference in slots.items():
+        if external_image_asset(reference) is not None:
+            if part_extensions.get(slot_id, "image") != "image":
+                raise ValueError("external image prompt extension type mismatch")
+            bound_references[slot_id] = reference
+            continue
         node_id = reference.get("nodeId")
         if reference.get("sourceInstanceId", node_id) != node_id:
             raise ValueError("draft reference instance mismatch")
@@ -96,15 +102,23 @@ def _unit_source(node: dict, observed: dict | None, nodes: dict[str, dict]) -> t
     for part in draft["parts"]:
         if part["type"] == "text":
             text.append(part["text"])
-        elif part["type"] == "extension" and part.get("extension_type") in {"node", "subject"}:
+        elif part["type"] == "extension" and part.get("extension_type") in {"node", "subject", "image"}:
             reference = bound_references.get(part.get("object_id"))
             if reference is None:
                 raise ValueError("unbound prompt reference slot")
+            if part.get("extension_type") == "image" and external_image_asset(reference) is None:
+                raise ValueError("image prompt part requires its exact external reference")
             text.append("\n")
         else:
             raise ValueError("unsupported or unbound prompt part")
     prepared_references = []
     for ref in refs:
+        external = external_image_asset(ref)
+        if external is not None:
+            prepared_references.append({"slot_id": ref["slotId"], "node_id": external["id"],
+                "canvas_role": ref["role"], "source_binding_kind": "external_uri",
+                "source_reference": deepcopy(ref), "resource_id": ref["uri"], "kind": "image"})
+            continue
         source = nodes[ref["nodeId"]]
         prepared = {"slot_id": ref["slotId"], "node_id": ref["nodeId"],
                     "canvas_role": ref.get("role")}
@@ -228,10 +242,13 @@ Original ticks are retained without inferring a timebase or rendering a timeline
                     if e["target"] == node["id"] and e["type"] == "reference"]
         if len(set(incoming)) != len(incoming):
             raise ValueError("duplicate reference edge")
-        if set(incoming) != {r["node_id"] for r in references}:
+        if set(incoming) != {r["node_id"] for r in references if r.get("source_binding_kind") != "external_uri"}:
             raise ValueError("reference edges and material bindings differ")
         for ref in references:
-            asset = nodes[ref["node_id"]]
+            asset = (external_image_asset(ref["source_reference"])
+                     if ref.get("source_binding_kind") == "external_uri" else nodes[ref["node_id"]])
+            if asset["id"] != ref["node_id"]:
+                raise ValueError("external image inventory identity changed")
             if asset["type"] == "subject":
                 expected_materials = subject_material_references(asset)
                 if (ref.get("kind") != "subject" or ref.get("extension_type") != "subject"

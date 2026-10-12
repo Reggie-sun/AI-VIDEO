@@ -1,0 +1,166 @@
+{
+  "schema_version": "canvas-project-data/1",
+  "source": "source.json",
+  "selection": {
+    "node_ids": [
+      "a",
+      "b"
+    ]
+  },
+  "direction": {
+    "project_id": "canvas-demo",
+    "title": "Canvas demo",
+    "language": "zh",
+    "brief": {
+      "objective": "Show an arrival",
+      "audience": "General",
+      "format": "short drama"
+    },
+    "story": {
+      "logline": "An arrival",
+      "synopsis": "A traveller arrives.",
+      "beats": [
+        {
+          "beat_id": "arrival",
+          "summary": "Arrival"
+        }
+      ]
+    },
+    "characters": [],
+    "scenes": [
+      {
+        "scene_id": "road",
+        "location": "road",
+        "time": "day",
+        "mood": "quiet"
+      }
+    ],
+    "storyboard": {
+      "beats": [
+        {
+          "beat_id": "arrival",
+          "scene_id": "road",
+          "shot_ids": [
+            "one",
+            "two"
+          ],
+          "narrative_intent": "Arrival"
+        }
+      ]
+    },
+    "shots": [
+      {
+        "occurrence_id": "a",
+        "adaptation_reason": "Director authored a fixture intent",
+        "shot": {
+          "shot_id": "one",
+          "scene_id": "road",
+          "storyboard_beat_id": "arrival",
+          "duration_policy": {
+            "mode": "content_driven",
+            "seconds": 15
+          },
+          "visual_strategy": "generated_video",
+          "generated_video_rationale": "Walking",
+          "required_asset_roles": [
+            {
+              "role": "primary_visual",
+              "asset_ids": [],
+              "allowed_asset_types": [
+                "video"
+              ]
+            }
+          ]
+        },
+        "generation": {
+          "references": [],
+          "audio_need": "required",
+          "quality_need": {},
+          "generation_intent": {
+            "pacing": {
+              "shot_duration_seconds": 15
+            }
+          },
+          "output_need": {
+            "duration_seconds": 15,
+            "width": 864,
+            "height": 496,
+            "fps": 24,
+            "container_mime": "video/mp4",
+            "timing_mode": "content_driven"
+          }
+        },
+        "composition": {
+          "muted": false
+        }
+      },
+      {
+        "occurrence_id": "b",
+        "adaptation_reason": "Director authored a fixture intent",
+        "shot": {
+          "shot_id": "two",
+          "scene_id": "road",
+          "storyboard_beat_id": "arrival",
+          "duration_policy": {
+            "mode": "content_driven",
+            "seconds": 15
+          },
+          "visual_strategy": "generated_video",
+          "generated_video_rationale": "Walking",
+          "required_asset_roles": [
+            {
+              "role": "primary_visual",
+              "asset_ids": [],
+              "allowed_asset_types": [
+                "video"
+              ]
+            }
+          ]
+        },
+        "boundary": {
+          "independent": true,
+          "reason": "Explicit fixture scene reset"
+        },
+        "generation": {
+          "references": [],
+          "audio_need": "required",
+          "quality_need": {},
+          "generation_intent": {
+            "pacing": {
+              "shot_duration_seconds": 15
+            }
+          },
+          "output_need": {
+            "duration_seconds": 15,
+            "width": 864,
+            "height": 496,
+            "fps": 24,
+            "container_mime": "video/mp4",
+            "timing_mode": "content_driven"
+          }
+        },
+        "composition": {
+          "muted": false
+        }
+      }
+    ],
+    "cut_requirements": [
+      {
+        "from_occurrence_id": "a",
+        "to_occurrence_id": "b",
+        "kind": "scene_reset",
+        "checks": {
+          "action": "按原文检查遮挡后继续前冲的叙事关系；缺观察不通过",
+          "motion_direction": "原文所要求的前冲方向仍可辨认",
+          "audio": "检查真实声音接点"
+        }
+      }
+    ],
+    "delivery_profile": {
+      "width": 864,
+      "height": 496,
+      "fps": 24
+    }
+  },
+  "images": []
+}

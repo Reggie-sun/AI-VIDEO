@@ -203,3 +203,101 @@ def test_forked_successors_remain_ambiguous(tmp_path):
     sibling = attempts[1].model_copy(update={"attempt_id": "other-successor"})
     with pytest.raises(ValueError, match="Multiple attempts"):
         current_canvas_attempt(service.committer, (*attempts, sibling))
+
+
+def rejected_canvas(tmp_path):
+    from ai_video.errors import AiVideoError
+    from ai_video.production.generation_feedback import record_attempt_evaluation
+    from test_production_video import _paid_preview, _paid_authorization
+    service, provider, limits, auth = runtime(tmp_path)
+    provider._scenario = replace(provider._scenario, submit_outcome="rejected")
+    old = service.start(limits=limits)
+    state = service._service(old.attempt_id)._state(old.attempt_id)[1]
+    request = service.committer._reopen_video_request(state.request)
+    preview = _paid_preview(request, attempt_id=old.attempt_id, video_preview=provider.preview(request))
+    auth[preview.preview_fingerprint] = _paid_authorization(preview)
+    with pytest.raises(AiVideoError):
+        service.execute(action="submit", paid_preview=preview, reservation_id="rejected-source")
+    experience = record_attempt_evaluation(committer=service.committer, attempt_id=old.attempt_id)
+    assert experience.evidence[-1].outcome == "runtime_failure"
+    assert service.position().next_action == "stop"
+    return service, provider, limits, auth, old, experience
+
+
+def test_paid_no_effect_stays_blocked_without_explicit_runtime_grant(tmp_path):
+    service, provider, limits, _, old, experience = rejected_canvas(tmp_path)
+    before = service._load().manifest
+    blocked = service.prepare_repair(limits=limits)
+    assert blocked.decision.disposition == "RUNTIME_FAILURE"
+    assert blocked.inputs.latest_attempt_hash == experience.evidence[-1].evidence_hash
+    assert blocked.inputs.limits.paid_submits_used == 1
+    assert service.start_repair(limits=limits).execution_binding is None
+    assert service._load().manifest == before
+    assert service.position().attempt_id == old.attempt_id
+    assert provider.call_counts.submit == 1
+
+
+def test_explicit_paid_retarget_preserves_history_and_consumes_grant_atomically(tmp_path):
+    import hashlib
+    from pathlib import Path
+    from ai_video.production.generation_runtime_repair import PaidNoEffectRetarget
+    from ai_video.production.generation_feedback import RegisteredGenerationTarget
+    from ai_video.production.state_commit import PreparedArtifact
+    from test_production_video import _paid_preview, _paid_authorization
+    service, provider, limits, auth, old, experience = rejected_canvas(tmp_path)
+    target = service.targets[0]
+    payload = b'{"scripted-profile":"replacement"}'
+    sha = hashlib.sha256(payload).hexdigest()
+    profile = target.profile.model_copy(update={"profile_sha256": sha,
+        "profile_path": Path(f"provider-profiles/{sha}.json")})
+    service.committer._write_immutable_artifact(PreparedArtifact(profile.profile_path, payload, sha),
+        attempt_id="scripted-replacement-profile")
+    service.targets = (RegisteredGenerationTarget(provider, profile, target.compiler_contract,
+        target.output_requirement),)
+    blocked = service.prepare_repair(limits=limits)
+    replacement = blocked.inputs.candidates[0]
+    assert replacement.scope_hash != experience.candidate.scope_hash
+    assert replacement.recipe.seed == experience.candidate.recipe.seed
+    failed = next(a for a in service._load().manifest.attempts if a.attempt_id == old.attempt_id)
+    receipt = service.committer._reopen_paid_submit(failed.paid_provider_state.submit_receipt)
+    scope = PaidNoEffectRetarget(submit_receipt_fingerprint=receipt.submit_receipt_fingerprint,
+        target_scope_hash=replacement.scope_hash)
+    args = dict(attempt_id=old.attempt_id, repair_basis="scripted same-provider model/profile recovery",
+        actor=ActorIdentity(actor_id="canvas-test", actor_kind="codex"), paid_no_effect_retarget=scope)
+    pointer = service.committer.record_runtime_repair_authorization(**args)
+    assert service.committer.record_runtime_repair_authorization(**args) == pointer
+    history = service.committer.read_generation_experiences()
+    current = service.start_repair(limits=limits)
+    assert hasattr(current, "next_action"), current.decision.rationale
+    assert current.next_action == "submit" and current.attempt_id != old.attempt_id
+    assert service.position() == current
+    assert service.start_repair(limits=limits) == current
+    assert provider.call_counts.submit == 1
+    assert service.committer.read_generation_experiences() == history
+    assert service._load().manifest.attempts[-1].video_generation_state.execution_binding is not None
+    provider._scenario = replace(provider._scenario, submit_outcome="accepted",
+        external_effect_id="paid-replacement-effect")
+    state = service._service(current.attempt_id)._state(current.attempt_id)[1]
+    request = service.committer._reopen_video_request(state.request)
+    preview = _paid_preview(request, attempt_id=current.attempt_id, video_preview=provider.preview(request))
+    auth[preview.preview_fingerprint] = _paid_authorization(preview)
+    service.execute(action="submit", paid_preview=preview, reservation_id="replacement-reservation")
+    failed = next(a for a in service._load().manifest.attempts if a.attempt_id == old.attempt_id)
+    assert failed.video_generation_state.runtime_repairs[0].consumed
+    assert provider.call_counts.submit == 2
+    assert service.position().next_action == "poll"
+    assert service.committer.read_generation_experiences() == history
+
+
+def test_paid_retarget_rejects_wrong_receipt_without_mutation(tmp_path):
+    from ai_video.errors import AiVideoError
+    from ai_video.production.generation_runtime_repair import PaidNoEffectRetarget
+    service, provider, _, _, old, experience = rejected_canvas(tmp_path)
+    before = service._load().manifest
+    with pytest.raises(AiVideoError, match="exact failed receipt"):
+        service.committer.record_runtime_repair_authorization(attempt_id=old.attempt_id,
+            repair_basis="scripted mismatch", actor=ActorIdentity(actor_id="canvas-test", actor_kind="codex"),
+            paid_no_effect_retarget=PaidNoEffectRetarget(submit_receipt_fingerprint="d" * 64,
+                target_scope_hash=experience.candidate.scope_hash))
+    assert service._load().manifest == before
+    assert provider.call_counts.submit == 1

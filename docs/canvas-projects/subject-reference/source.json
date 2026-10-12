@@ -1,0 +1,247 @@
+{
+  "nodes": [
+    {
+      "id": "room",
+      "type": "image",
+      "data": {
+        "resourceId": "room-resource",
+        "resourceBatches": [
+          {
+            "id": "room-adopted",
+            "resourceIds": [
+              "room-resource"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "voice",
+      "type": "audio",
+      "data": {
+        "resourceId": "voice-resource"
+      }
+    },
+    {
+      "id": "a",
+      "type": "video",
+      "data": {
+        "resourceId": "a-output",
+        "generationDraft": {
+          "parts": [
+            {
+              "type": "text",
+              "text": "Robot "
+            },
+            {
+              "type": "extension",
+              "extension_type": "subject",
+              "object_id": "robot-slot"
+            },
+            {
+              "type": "text",
+              "text": " lifts its hands in "
+            },
+            {
+              "type": "extension",
+              "extension_type": "node",
+              "object_id": "room-slot"
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ],
+          "contentSettings": {
+            "resolution": "720p",
+            "durationSeconds": 15
+          },
+          "references": [
+            {
+              "slotId": "robot-slot",
+              "nodeId": "robot",
+              "role": "reference",
+              "type": "extension",
+              "extensionType": "subject",
+              "sourceInstanceId": "robot"
+            },
+            {
+              "slotId": "room-slot",
+              "nodeId": "room",
+              "role": "reference"
+            }
+          ]
+        },
+        "resourceBatches": [
+          {
+            "id": "adopted-a",
+            "resourceIds": [
+              "a-output"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "b",
+      "type": "video",
+      "data": {
+        "resourceId": "b-output",
+        "generationDraft": {
+          "parts": [
+            {
+              "type": "text",
+              "text": "Robot "
+            },
+            {
+              "type": "extension",
+              "extension_type": "subject",
+              "object_id": "robot-slot"
+            },
+            {
+              "type": "text",
+              "text": " lifts its hands in "
+            },
+            {
+              "type": "extension",
+              "extension_type": "node",
+              "object_id": "room-slot"
+            },
+            {
+              "type": "text",
+              "text": "."
+            }
+          ],
+          "contentSettings": {
+            "resolution": "720p",
+            "durationSeconds": 15
+          },
+          "references": [
+            {
+              "slotId": "robot-slot",
+              "nodeId": "robot",
+              "role": "reference",
+              "type": "extension",
+              "extensionType": "subject",
+              "sourceInstanceId": "robot"
+            },
+            {
+              "slotId": "room-slot",
+              "nodeId": "room",
+              "role": "reference"
+            }
+          ]
+        },
+        "resourceBatches": [
+          {
+            "id": "adopted-b",
+            "resourceIds": [
+              "b-output"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "timeline",
+      "type": "timeline",
+      "data": {
+        "tracks": [
+          {
+            "kind": "visual",
+            "muted": true,
+            "clips": [
+              {
+                "clipId": "clip-0",
+                "kind": "video",
+                "source": {
+                  "kind": "canvas-node",
+                  "nodeId": "a"
+                },
+                "sourceRange": {
+                  "startTick": 11,
+                  "durationTick": 101
+                },
+                "speed": 1,
+                "volume": 0.5,
+                "muted": false
+              },
+              {
+                "clipId": "clip-1",
+                "kind": "video",
+                "source": {
+                  "kind": "canvas-node",
+                  "nodeId": "b"
+                },
+                "sourceRange": {
+                  "startTick": 11,
+                  "durationTick": 101
+                },
+                "speed": 1,
+                "volume": 0.5,
+                "muted": false
+              },
+              {
+                "clipId": "clip-2",
+                "kind": "video",
+                "source": {
+                  "kind": "canvas-node",
+                  "nodeId": "a"
+                },
+                "sourceRange": {
+                  "startTick": 11,
+                  "durationTick": 101
+                },
+                "speed": 1,
+                "volume": 0.5,
+                "muted": false
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "robot",
+      "type": "subject",
+      "data": {
+        "main": {
+          "refType": "resource_snapshot",
+          "resourceId": "robot-main"
+        },
+        "auxiliaries": [
+          {
+            "refType": "resource_snapshot",
+            "resourceId": "robot-aux"
+          }
+        ]
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "robot-a",
+      "source": "robot",
+      "target": "a",
+      "type": "reference"
+    },
+    {
+      "id": "room-a",
+      "source": "room",
+      "target": "a",
+      "type": "reference"
+    },
+    {
+      "id": "robot-b",
+      "source": "robot",
+      "target": "b",
+      "type": "reference"
+    },
+    {
+      "id": "room-b",
+      "source": "room",
+      "target": "b",
+      "type": "reference"
+    }
+  ]
+}

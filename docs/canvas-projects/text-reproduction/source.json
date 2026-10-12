@@ -1,0 +1,134 @@
+{
+  "nodes": [
+    {
+      "id": "room",
+      "type": "image",
+      "data": {
+        "resourceId": "room-resource"
+      }
+    },
+    {
+      "id": "voice",
+      "type": "audio",
+      "data": {
+        "resourceId": "voice-resource"
+      }
+    },
+    {
+      "id": "a",
+      "type": "video",
+      "data": {
+        "resourceId": "a-output",
+        "generationDraft": {
+          "parts": [
+            {
+              "type": "text",
+              "text": "前段：生物遮满镜头。"
+            }
+          ],
+          "contentSettings": {
+            "resolution": "720p",
+            "durationSeconds": 15
+          },
+          "references": []
+        },
+        "resourceBatches": [
+          {
+            "id": "adopted-a",
+            "resourceIds": [
+              "a-output"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "b",
+      "type": "video",
+      "data": {
+        "resourceId": "b-output",
+        "generationDraft": {
+          "parts": [
+            {
+              "type": "text",
+              "text": "后段：从遮挡中继续前冲。"
+            }
+          ],
+          "contentSettings": {
+            "resolution": "720p",
+            "durationSeconds": 15
+          },
+          "references": []
+        },
+        "resourceBatches": [
+          {
+            "id": "adopted-b",
+            "resourceIds": [
+              "b-output"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "timeline",
+      "type": "timeline",
+      "data": {
+        "tracks": [
+          {
+            "kind": "visual",
+            "muted": true,
+            "clips": [
+              {
+                "clipId": "clip-0",
+                "kind": "video",
+                "source": {
+                  "kind": "canvas-node",
+                  "nodeId": "a"
+                },
+                "sourceRange": {
+                  "startTick": 11,
+                  "durationTick": 101
+                },
+                "speed": 1,
+                "volume": 0.5,
+                "muted": false
+              },
+              {
+                "clipId": "clip-1",
+                "kind": "video",
+                "source": {
+                  "kind": "canvas-node",
+                  "nodeId": "b"
+                },
+                "sourceRange": {
+                  "startTick": 11,
+                  "durationTick": 101
+                },
+                "speed": 1,
+                "volume": 0.5,
+                "muted": false
+              },
+              {
+                "clipId": "clip-2",
+                "kind": "video",
+                "source": {
+                  "kind": "canvas-node",
+                  "nodeId": "a"
+                },
+                "sourceRange": {
+                  "startTick": 11,
+                  "durationTick": 101
+                },
+                "speed": 1,
+                "volume": 0.5,
+                "muted": false
+              }
+            ]
+          }
+        ]
+      }
+    }
+  ],
+  "edges": []
+}

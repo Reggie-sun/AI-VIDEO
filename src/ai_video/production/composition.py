@@ -6,6 +6,7 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production._composition_source_duration import content_driven_video_frames
 from ai_video.production.ad_composition import (
     classify_composition_layer,
     resolve_commercial_graphics,
@@ -303,6 +304,11 @@ def _duration_frames_by_shot(
             result[shot.shot_id] = _frames_for_fixed_seconds(
                 policy.seconds, spec.delivery_profile.fps
             )
+        elif policy.mode == "content_driven":
+            try:
+                result[shot.shot_id] = content_driven_video_frames(project, spec, shot)
+            except VisualMediaValidationError as exc:
+                raise _invalid(str(exc)) from exc
         elif spec.schema_version == "2.0":
             raise _invalid(f"Shot {shot.shot_id} requires a fixed duration in P3.")
         elif policy.mode == "voice_driven":

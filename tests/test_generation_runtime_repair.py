@@ -44,6 +44,51 @@ def test_runtime_failure_blocks_without_grant():
     assert result.runtime_repair is None
 
 
+def _retarget_case(*, required_hash=None):
+    from ai_video.production.generation_runtime_repair import PaidNoEffectRetarget
+    setup = setup_decision(remote=True, seed_supported=False)
+    old = setup["inputs"].candidates[0]
+    profile = old.provider_profile.model_copy(update={"profile_sha256": "a" * 64,
+        "profile_path": Path("provider-profiles/" + "a" * 64 + ".json")})
+    recipe = old.recipe.model_copy(update={"profile_sha256": profile.profile_sha256,
+        **({"requirement_hash": required_hash} if required_hash else {})})
+    target = old.model_copy(update={"provider_profile": profile, "recipe": recipe})
+    entry = evidence(setup, outcome="runtime_failure", task_id="task")
+    grant = RuntimeRepairGrant(authorization=RuntimeRepairAuthorization.create(
+        schema_version="runtime-repair/3", attempt_id=entry.attempt_id,
+        evidence_hash=entry.evidence_hash, repair_basis="explicit model/profile recovery after paid rejection",
+        actor=ACTOR, expected_manifest_revision=0,
+        paid_no_effect_retarget=PaidNoEffectRetarget(
+            submit_receipt_fingerprint="d" * 64, target_scope_hash=target.scope_hash)), consumed=False)
+    limits = setup["inputs"].limits.model_copy(update={"allowed_remote_candidates": (target.candidate_id,)})
+    return setup, old, target, entry, grant, limits
+
+
+def test_paid_no_effect_retarget_selects_only_exact_authorized_strategy():
+    setup, old, target, entry, grant, limits = _retarget_case()
+    result = decide(setup, candidates=(target,), historical_recipes=(old,), limits=limits,
+        evidence=(entry,), latest_attempt_hash=entry.evidence_hash, runtime_repairs=(grant,))
+    assert target.scope_hash != old.scope_hash
+    assert result.disposition == "GENERATE_ONCE"
+    assert result.runtime_repair == grant.authorization
+    assert result.routing.provider_bound_request.provider_profile == target.provider_profile
+
+
+def test_paid_retarget_cannot_replace_frozen_generation_requirement():
+    setup, old, target, entry, grant, limits = _retarget_case(required_hash="e" * 64)
+    with pytest.raises(ValueError, match="stale candidate requirement"):
+        decide(setup, candidates=(target,), historical_recipes=(old,), limits=limits,
+            evidence=(entry,), latest_attempt_hash=entry.evidence_hash, runtime_repairs=(grant,))
+
+
+def test_old_runtime_grant_cannot_retarget_new_profile():
+    setup, old, target, entry, _, limits = _retarget_case()
+    result = decide(setup, candidates=(target,), historical_recipes=(old,), limits=limits,
+        evidence=(entry,), latest_attempt_hash=entry.evidence_hash, runtime_repairs=(_grant(entry),))
+    assert result.disposition == "EVIDENCE_GAP"
+    assert result.routing is None
+
+
 def test_runtime_repair_grant_authorizes_exact_reexecution():
     setup = setup_decision()
     entry = evidence(setup, outcome="runtime_failure", task_id="task")

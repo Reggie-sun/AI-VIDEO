@@ -17,6 +17,16 @@ def _build_loaded_project(
 ) -> LoadedProductionProject:
     from ai_video.production.project import _resolve_input, _load_referenced_artifact
     from ai_video.production.production_strategy_reader import load_production_parents, load_production_allocation_policies
+    from ai_video.production.authoring_input import PREFIX, reopen_authoring_input
+    from ai_video.errors import AiVideoError, ErrorCode
+
+    for reference in project.source_provenance:
+        if reference.reference.startswith(PREFIX):
+            try:
+                reopen_authoring_input(root, reference)
+            except (ValueError, OSError) as error:
+                raise AiVideoError(ErrorCode.PRODUCTION_PROJECT_INVALID,
+                    "Selected authoring input is missing or changed.", retryable=False) from error
 
     asset_root = _resolve_input(root, project.asset_root, allowed_root=root / "assets")
     registry, asset_paths = load_asset_registry(registry_path, root, asset_root)

@@ -46,6 +46,8 @@ def canvas_feedback_context(*, loaded, row, policy, execution_stack=None, handof
     inferred from an original prompt or generated here as a PASS receipt.
     """
     shot = next(s for s in loaded.shots if s.shot_id == row["shot"]["shot_id"])
+    from ai_video.canvas_target_gate import require_target_state_inventory
+    require_target_state_inventory(loaded=loaded, row=row)
     scene = next(s for s in loaded.scenes if s.scene_id == shot.scene_id)
     characters = tuple(sorted((c for c in loaded.characters if c.character_id in shot.character_ids),
                               key=lambda c: c.character_id))
@@ -85,6 +87,9 @@ def canvas_feedback_context(*, loaded, row, policy, execution_stack=None, handof
         if role not in _ROLES:
             raise ValueError("unsupported canvas planning reference role")
         a = assets[ref["asset_id"]]
+        if a.creation_receipt_id.startswith("canvas-state-reference:"):
+            from ai_video.canvas_handoff import require_canvas_state_reference
+            require_canvas_state_reference(loaded=loaded, asset=a)
         owner = None
         selected_owner_id, selected_owner_hash = shot.shot_id, shot.content_hash
         if role is AssetRole.CHARACTER_REFERENCE:

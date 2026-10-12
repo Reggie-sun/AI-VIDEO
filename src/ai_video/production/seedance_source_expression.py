@@ -7,7 +7,7 @@ import re
 import unicodedata
 from typing import Annotated, Literal
 
-from pydantic import Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_serializer, model_validator
 
 from ai_video.production.artifact_contracts import StrictModel
 from ai_video.production.hashing import canonical_sha256, verify_artifact_hash
@@ -46,6 +46,13 @@ class SourceReferencePart(StrictModel):
     type: Literal["reference"] = "reference"
     slot_id: str = Field(pattern=_SAFE_ID)
     materials: tuple[SourceReferenceMaterial, ...] = Field(min_length=1)
+
+
+class SourceImageAlias(StrictModel):
+    """Approved literal image label mapped to the original tray's materials."""
+
+    label: str = Field(pattern=r"^(?:图|图片)(?:[1-9][0-9]*|[一二三四五六七八九十]+)$")
+    asset_ids: tuple[str, ...] = Field(min_length=1)
 
 
 SourcePart = Annotated[
@@ -93,7 +100,7 @@ def source_parts_sha256(
     implicit_references: tuple[SourceReferenceMaterial, ...]
     | list[SourceReferenceMaterial] = (),
 ) -> str:
-    """Hash the raw ordered source parts and implicit first-frame references."""
+    """Hash the raw ordered source parts and exact implicit references."""
     return canonical_sha256(
         {
             "parts": [_model_data(part) for part in parts],
@@ -105,7 +112,7 @@ def source_parts_sha256(
 
 
 class PreservedSourceExpression(StrictModel):
-    contract_version: Literal["seedance-preserved-source/1"] = (
+    contract_version: Literal["seedance-preserved-source/1", "seedance-preserved-source/2"] = (
         "seedance-preserved-source/1"
     )
     source_sha256: str = Field(pattern=_SHA256)
@@ -113,6 +120,14 @@ class PreservedSourceExpression(StrictModel):
     implicit_references: tuple[SourceReferenceMaterial, ...] = ()
     opening: tuple[SourceStateGrounding, ...] = ()
     closing: tuple[SourceStateGrounding, ...] = ()
+    image_aliases: tuple[SourceImageAlias, ...] = ()
+
+    @model_serializer(mode="wrap")
+    def _serialize_version(self, handler):
+        result = handler(self)
+        if self.contract_version == "seedance-preserved-source/1":
+            result.pop("image_aliases", None)
+        return result
 
     @field_validator("opening", "closing")
     @classmethod
@@ -134,7 +149,8 @@ class PreservedSourceExpression(StrictModel):
         slots = tuple(
             part.slot_id for part in self.parts if isinstance(part, SourceReferencePart)
         )
-        if len(slots) != len(set(slots)):
+        legacy = self.contract_version == "seedance-preserved-source/1"
+        if legacy and len(slots) != len(set(slots)):
             raise ValueError("source reference slots must be unique")
         materials = [
             material
@@ -144,10 +160,21 @@ class PreservedSourceExpression(StrictModel):
         ]
         materials.extend(self.implicit_references)
         asset_ids = tuple(material.asset_id for material in materials)
-        if len(asset_ids) != len(set(asset_ids)):
+        if legacy and len(asset_ids) != len(set(asset_ids)):
             raise ValueError("preserved source image references must be unique")
-        if any(material.role != "first_frame" for material in self.implicit_references):
+        if legacy and any(material.role != "first_frame" for material in self.implicit_references):
             raise ValueError("only first-frame images may be implicit source references")
+        if not legacy:
+            by_slot, by_asset = {}, {}
+            for part in self.parts:
+                if isinstance(part, SourceReferencePart):
+                    if part.slot_id in by_slot and by_slot[part.slot_id] != part.materials:
+                        raise ValueError("repeated source slot changed its exact materials")
+                    by_slot[part.slot_id] = part.materials
+            for material in materials:
+                if material.asset_id in by_asset and by_asset[material.asset_id] != material:
+                    raise ValueError("repeated source image changed its role or bytes")
+                by_asset[material.asset_id] = material
         if any(
             material.role not in {"identity", "scene"}
             for part in self.parts
@@ -159,6 +186,16 @@ class PreservedSourceExpression(StrictModel):
         text_parts = tuple(
             part.text for part in self.parts if isinstance(part, SourceTextPart)
         )
+        if legacy and self.image_aliases:
+            raise ValueError("image label adaptation requires preserved source /2")
+        if len({a.label for a in self.image_aliases}) != len(self.image_aliases):
+            raise ValueError("source image aliases must be unique")
+        for alias in self.image_aliases:
+            if (not any(re.search(re.escape(alias.label) + r"(?![0-9一二三四五六七八九十])", text)
+                    for text in text_parts)
+                    or len(set(alias.asset_ids)) != len(alias.asset_ids)
+                    or not set(alias.asset_ids) <= set(asset_ids)):
+                raise ValueError("source image alias requires original text and exact selected materials")
         exact_materials = {
             (material.asset_id, material.asset_sha256, material.role): material
             for material in materials
@@ -208,12 +245,15 @@ def _validated_source_expression(shot):
 
 
 def _source_materials(expression: PreservedSourceExpression):
-    return tuple(
+    materials = tuple(
         material
         for part in expression.parts
         if isinstance(part, SourceReferencePart)
         for material in part.materials
     ) + expression.implicit_references
+    if expression.contract_version == "seedance-preserved-source/2":
+        return tuple({m.asset_id: m for m in materials}.values())
+    return materials
 
 
 def _image_indices(bound, requirement, expression: PreservedSourceExpression):
@@ -288,9 +328,15 @@ def _adapt_source_text(
     image_indices: dict[tuple[str, str, str], int],
 ) -> str:
     chunks: list[str] = []
+    indices_by_asset = {asset_id: index for (_, asset_id, _), index in image_indices.items()}
+    aliases = {alias.label: "、".join(f"图片{indices_by_asset[aid]}" for aid in alias.asset_ids)
+        for alias in expression.image_aliases}
+    pattern = ("|".join(re.escape(label) for label in sorted(aliases, key=len, reverse=True))
+        + r"(?![0-9一二三四五六七八九十])") if aliases else None
     for part in expression.parts:
         if isinstance(part, SourceTextPart):
-            chunks.append(part.text)
+            chunks.append(re.sub(pattern, lambda match: aliases[match.group()], part.text)
+                if pattern else part.text)
         else:
             chunks.append(
                 "、".join(
@@ -401,7 +447,7 @@ def _source_projection(bound, requirement):
     shot = getattr(requirement, "target_shot", None)
     bound, requirement, shot = _require_source_identity(bound, requirement, shot)
     expression = _validated_source_expression(shot)
-    if expression.contract_version != "seedance-preserved-source/1":
+    if expression.contract_version not in {"seedance-preserved-source/1", "seedance-preserved-source/2"}:
         raise ValueError("unsupported preserved source expression contract")
 
     if (
@@ -441,8 +487,12 @@ def _source_projection(bound, requirement):
         ):
             raise ValueError("source I2V requires one implicit first-frame image and no reference chip")
     else:
-        if expression.implicit_references or not source_references:
+        if expression.contract_version == "seedance-preserved-source/1" and (
+                expression.implicit_references or not source_references):
             raise ValueError("source R2V images must be represented by explicit reference chips")
+        if not _source_materials(expression) or any(m.role not in {"identity", "scene"}
+                for m in _source_materials(expression)):
+            raise ValueError("source R2V requires ordinary identity or scene reference images")
 
     image_indices = _image_indices(bound, requirement, expression)
     prompt = _adapt_source_text(expression, image_indices)

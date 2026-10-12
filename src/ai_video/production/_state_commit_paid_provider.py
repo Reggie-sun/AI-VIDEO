@@ -245,6 +245,7 @@ class _StateCommitPaidProviderMixin:
             ):
                 raise _state_invalid("Paid Provider submit intent requires a provider-aware Manifest.")
             attempt = self._paid_attempt(manifest, preview.attempt_id)
+            runtime_repair = None
             if (
                 attempt.status is not StateCommitStatus.RUNNING
                 or attempt.paid_provider_state is not None
@@ -374,7 +375,7 @@ class _StateCommitPaidProviderMixin:
                 _paid_binding, runtime_repair = self._require_submit_execution_binding(
                     manifest, video_state, request
                 )
-                if runtime_repair is not None:
+                if runtime_repair is not None and runtime_repair.paid_no_effect_retarget is None:
                     raise _state_invalid(
                         "Paid Provider submit cannot consume a runtime repair grant."
                     )
@@ -453,6 +454,8 @@ class _StateCommitPaidProviderMixin:
                     )
                 )
             next_attempt = _validated_transition(attempt, attempt_update)
+            from ._state_commit_video_runtime_repair import submit_attempts_with_consumed_repair
+
             next_manifest = _validated_transition(
                 manifest,
                 {
@@ -463,10 +466,7 @@ class _StateCommitPaidProviderMixin:
                     ),
                     "manifest_revision": manifest.manifest_revision + 1,
                     "active_paid_provider_budget": budget_pointer,
-                    "attempts": tuple(
-                        next_attempt if item.attempt_id == attempt.attempt_id else item
-                        for item in manifest.attempts
-                    ),
+                    "attempts": submit_attempts_with_consumed_repair(manifest, next_attempt, runtime_repair),
                 },
             )
             self._write_manifest_atomic(next_manifest)

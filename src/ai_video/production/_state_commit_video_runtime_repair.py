@@ -8,7 +8,7 @@ from ai_video.production._state_commit_common import (
     _canonical_json_bytes, _state_invalid, _validated_transition,
 )
 from ai_video.production._state_commit_contracts import PreparedArtifact
-from ai_video.production.generation_runtime_repair import LocalRuntimeRepairExtension
+from ai_video.production.generation_runtime_repair import LocalRuntimeRepairExtension, PaidNoEffectRetarget
 from ai_video.production.models import StateCommitStatus
 
 
@@ -26,6 +26,7 @@ def register_runtime_repair_authorization(
     actor,
     evidence_hash: str | None = None,
     local_extension: LocalRuntimeRepairExtension | None = None,
+    paid_no_effect_retarget: PaidNoEffectRetarget | None = None,
 ) -> RuntimeRepairAuthorizationPointer:
     """Authorize one bounded re-execution after a repaired local runtime failure.
 
@@ -43,6 +44,11 @@ def register_runtime_repair_authorization(
 
     if not isinstance(repair_basis, str) or not repair_basis.strip():
         raise _state_invalid("Runtime repair requires an explicit repair basis.")
+    if paid_no_effect_retarget is not None:
+        if not isinstance(paid_no_effect_retarget, PaidNoEffectRetarget) or local_extension is not None:
+            raise _state_invalid("Paid retarget requires its exact typed scope and no local extension.")
+        paid_no_effect_retarget = PaidNoEffectRetarget.model_validate_json(
+            paid_no_effect_retarget.model_dump_json())
     if local_extension is not None:
         if not isinstance(local_extension, LocalRuntimeRepairExtension):
             raise _state_invalid("Runtime repair extension must be typed and exact.")
@@ -72,6 +78,17 @@ def register_runtime_repair_authorization(
                 "Runtime repair requires a runtime_failure outcome evidence."
             )
         failure = failures[-1]
+        if paid_no_effect_retarget is not None:
+            receipt = closed_paid_no_effect_receipt(self, attempt)
+            request = self._reopen_video_request(state.request)
+            binding = self._reopen_generation_execution_binding(state.execution_binding)
+            if (receipt.submit_receipt_fingerprint != paid_no_effect_retarget.submit_receipt_fingerprint
+                    or failure.attempt_id != attempt_id
+                    or failure.request_hash != request.request_input_hash
+                    or failure.task_id != binding.inputs.limits.task_id
+                    or failure.shot_id != binding.context.target_shot_id):
+                raise _state_invalid("Paid retarget does not match the exact failed receipt and evidence.")
+            _require_latest_local_failure(self, manifest, attempt_id, failure.shot_id)
         if evidence_hash is not None and evidence_hash != failure.evidence_hash:
             raise _state_invalid(
                 "Runtime repair evidence hash does not match the durable runtime failure."
@@ -82,9 +99,10 @@ def register_runtime_repair_authorization(
                 continue
             for pointer in prior.runtime_repairs:
                 if pointer.evidence_hash == failure.evidence_hash:
-                    if local_extension is not None:
+                    if local_extension is not None or paid_no_effect_retarget is not None:
                         existing = self._reopen_runtime_repair_authorization(pointer)
                         if (existing.local_extension != local_extension
+                                or existing.paid_no_effect_retarget != paid_no_effect_retarget
                                 or existing.actor != actor or existing.repair_basis != repair_basis):
                             raise _state_invalid("Runtime repair extension replay identity mismatch.")
                     return pointer
@@ -135,8 +153,10 @@ def register_runtime_repair_authorization(
         if granted >= ceiling:
             raise _state_invalid("Runtime repair budget is exhausted for this Shot.")
         authorization = RuntimeRepairAuthorization.create(
-            schema_version="runtime-repair/2" if local_extension is not None else "runtime-repair/1",
+            schema_version=("runtime-repair/3" if paid_no_effect_retarget is not None else
+                "runtime-repair/2" if local_extension is not None else "runtime-repair/1"),
             local_extension=local_extension,
+            paid_no_effect_retarget=paid_no_effect_retarget,
             attempt_id=attempt_id,
             evidence_hash=failure.evidence_hash,
             repair_basis=repair_basis,
@@ -198,6 +218,22 @@ def require_runtime_repair_grant(self, manifest, binding):
         raise _state_invalid(
             "Runtime repair grant does not match the durable receipt."
         )
+    if repair.paid_no_effect_retarget is not None:
+        from ai_video.production.generation_runtime_repair import retarget_preserves_strategy
+        receipt = closed_paid_no_effect_receipt(self, prior)
+        old_binding = self._reopen_generation_execution_binding(prior_state.execution_binding)
+        old = next(c for c in old_binding.inputs.candidates
+                   if c.candidate_id == old_binding.decision.selected_candidate_id)
+        target = next(c for c in binding.inputs.candidates
+                      if c.candidate_id == binding.decision.selected_candidate_id)
+        if (receipt.submit_receipt_fingerprint != repair.paid_no_effect_retarget.submit_receipt_fingerprint
+                or target.scope_hash != repair.paid_no_effect_retarget.target_scope_hash
+                or old_binding.inputs.limits.task_id != binding.inputs.limits.task_id
+                or old_binding.context.target_shot_id != binding.context.target_shot_id
+                or binding.inputs.latest_attempt_hash != repair.evidence_hash
+                or not retarget_preserves_strategy(old, target)):
+            raise _state_invalid("Paid retarget does not match the exact authorized strategy and failure.")
+        _require_latest_local_failure(self, manifest, prior.attempt_id, binding.context.target_shot_id)
     if repair.local_extension is not None:
         require_local_extension_scope(repair.local_extension, binding)
         if (prior.status is not StateCommitStatus.FAILED
@@ -205,6 +241,48 @@ def require_runtime_repair_grant(self, manifest, binding):
                 or prior_state.execution_binding.binding_hash != repair.local_extension.failed_binding_hash):
             raise _state_invalid("Runtime repair extension source failure binding mismatch.")
     return repair
+
+
+def submit_attempts_with_consumed_repair(manifest, next_attempt, repair):
+    """Select intent and consume the already verified grant in one Manifest write."""
+    attempts = []
+    for item in manifest.attempts:
+        if item.attempt_id == next_attempt.attempt_id:
+            attempts.append(next_attempt)
+        elif repair is not None and item.attempt_id == repair.attempt_id:
+            state = item.video_generation_state.model_copy(update={"runtime_repairs": tuple(
+                p.model_copy(update={"consumed": True})
+                if p.content_hash == repair.content_hash else p
+                for p in item.video_generation_state.runtime_repairs)})
+            attempts.append(_validated_transition(item, {"video_generation_state": state}))
+        else:
+            attempts.append(item)
+    return tuple(attempts)
+
+
+def closed_paid_no_effect_receipt(committer, attempt):
+    """Read canonical terminal proof; a physical rejection remains submitted."""
+    from ai_video.production._lifecycle_schema import PaidProviderAttemptPhase
+    from ai_video.production.paid_provider import PaidProviderSubmitOutcome
+
+    state, paid = attempt.video_generation_state, attempt.paid_provider_state
+    if (attempt.status is not StateCommitStatus.FAILED or state is None or paid is None
+            or paid.phase is not PaidProviderAttemptPhase.KNOWN_NO_EFFECT
+            or paid.submit_receipt is None
+            or state.paid_submit_receipt is not None and state.paid_submit_receipt != paid.submit_receipt
+            or state.execution_binding is None or state.quality_rejection is not None
+            or any(getattr(state, name) is not None for name in
+                ("fetch_receipt", "local_fetch_receipt", "latest_observation", "local_latest_observation",
+                 "provider_file_id", "local_submit_intent", "local_submit_receipt"))):
+        raise _state_invalid("Paid recovery requires an exact closed known-no-effect attempt.")
+    receipt = committer._reopen_paid_submit(paid.submit_receipt)
+    request = committer._reopen_video_request(state.request)
+    if (receipt.outcome is not PaidProviderSubmitOutcome.KNOWN_NO_EFFECT
+            or receipt.external_effect_id is not None or receipt.no_effect_reconciliation is not None
+            or receipt.attempt_id != attempt.attempt_id
+            or receipt.request_fingerprint != request.resolved_generation_hash):
+        raise _state_invalid("Paid recovery receipt does not match the physical failed request.")
+    return receipt
 
 def require_local_extension_scope(extension, binding):
     selected = next(c for c in binding.inputs.candidates
@@ -227,7 +305,8 @@ def _require_latest_local_failure(self, manifest, attempt_id, shot_id):
         scope = request.activation_scope
         if scope is None or scope.request.target_shot_id != shot_id:
             continue
-        if state.local_submit_intent is not None or state.paid_submit_receipt is not None:
+        if (state.local_submit_intent is not None or state.paid_submit_receipt is not None
+                or attempt.paid_provider_state is not None):
             submitted.append(attempt.attempt_id)
     if not submitted or submitted[-1] != attempt_id:
         raise _state_invalid("Runtime repair extension requires the latest known local failure.")

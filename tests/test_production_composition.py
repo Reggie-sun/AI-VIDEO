@@ -1250,6 +1250,41 @@ def test_omitted_mp4_trim_duration_resolves_to_exact_shot_duration(tmp_path):
     assert timeline.visual_spans[0].trim_duration_frames == 48
 
 
+@pytest.mark.parametrize("trim_duration", [None, 35])
+def test_content_driven_video_resolves_actual_source_interval(tmp_path, trim_duration):
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    loaded, spec = _with_video_layer(
+        tmp_path, loaded, spec, trim_start_frame=12,
+        trim_duration_frames=trim_duration,
+        metadata_changes={"frame_count": 59, "duration_milliseconds": 2458},
+    )
+    loaded = _replace_shot(
+        loaded, 0, duration_policy=DurationPolicy(mode="content_driven", seconds=2),
+    )
+
+    timeline = resolve_composition(loaded, spec, renderer_version="0.7.103")
+
+    frames = 47 if trim_duration is None else trim_duration
+    assert timeline.visual_spans[0].duration_frames == frames
+    assert timeline.visual_spans[0].trim_duration_frames == frames
+    assert timeline.visual_spans[1].start_frame == frames
+    assert timeline.total_frames == frames + 48
+    assert timeline.total_samples == (frames + 48) * 2000
+
+
+@pytest.mark.parametrize("bounds", [{"minimum_seconds": 3}, {"maximum_seconds": 1}])
+def test_content_driven_video_respects_explicit_duration_bounds(tmp_path, bounds):
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    loaded, spec = _with_video_layer(
+        tmp_path, loaded, spec, trim_start_frame=12, trim_duration_frames=None,
+    )
+    loaded = _replace_shot(
+        loaded, 0,
+        duration_policy=DurationPolicy(mode="content_driven", **bounds),
+    )
+    _assert_invalid(loaded, spec)
+
+
 @pytest.mark.parametrize(
     "metadata_changes",
     [

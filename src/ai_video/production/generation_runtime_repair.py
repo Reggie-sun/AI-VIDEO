@@ -43,6 +43,13 @@ class LocalRuntimeRepairExtension(StrictModel):
     ceiling: Literal[3, 4, 5, 6] = 3
 
 
+class PaidNoEffectRetarget(StrictModel):
+    """Explicit replacement strategy after one exact paid no-effect rejection."""
+
+    submit_receipt_fingerprint: str = Field(pattern=_SHA256)
+    target_scope_hash: str = Field(pattern=_SHA256)
+
+
 class RuntimeRepairAuthorization(StrictModel):
     """One-use authorization to re-execute after a repaired runtime failure.
 
@@ -51,7 +58,7 @@ class RuntimeRepairAuthorization(StrictModel):
     receipt.
     """
 
-    schema_version: Literal["runtime-repair/1", "runtime-repair/2"] = "runtime-repair/1"
+    schema_version: Literal["runtime-repair/1", "runtime-repair/2", "runtime-repair/3"] = "runtime-repair/1"
     attempt_id: str = Field(min_length=1)
     evidence_hash: str = Field(pattern=_SHA256)
     repair_basis: str = Field(min_length=1)
@@ -59,18 +66,23 @@ class RuntimeRepairAuthorization(StrictModel):
     expected_manifest_revision: int = Field(strict=True, ge=0)
     content_hash: str = Field(pattern=_SHA256)
     local_extension: LocalRuntimeRepairExtension | None = None
+    paid_no_effect_retarget: PaidNoEffectRetarget | None = None
 
     @model_serializer(mode="wrap")
     def _serialize_version(self, handler):
         result = handler(self)
         if self.schema_version == "runtime-repair/1":
             result.pop("local_extension", None)
+        if self.schema_version != "runtime-repair/3":
+            result.pop("paid_no_effect_retarget", None)
         return result
 
     @model_validator(mode="after")
     def _exact_runtime_repair(self) -> "RuntimeRepairAuthorization":
         if (self.schema_version == "runtime-repair/2") != (self.local_extension is not None):
             raise ValueError("runtime repair version and local extension do not match")
+        if (self.schema_version == "runtime-repair/3") != (self.paid_no_effect_retarget is not None):
+            raise ValueError("runtime repair version and paid retarget do not match")
         if (self.local_extension is not None and self.expected_manifest_revision
                 != self.local_extension.expected_manifest_revision + 1):
             raise ValueError("runtime repair extension revision is invalid")
@@ -96,3 +108,19 @@ class RuntimeRepairGrant:
 
     authorization: RuntimeRepairAuthorization
     consumed: bool
+
+
+def retarget_preserves_strategy(old, target):
+    """Model/profile recovery cannot edit frozen intent, acceptance or audio."""
+    previous = next(v for v in old.capabilities.variants if v.capability_id == old.capability_id)
+    current = next(v for v in target.capabilities.variants if v.capability_id == target.capability_id)
+    return (old.capabilities.provider_name == target.capabilities.provider_name
+        and previous.mode == current.mode
+        and previous.execution_kind.value == current.execution_kind.value == "remote"
+        and previous.billing_kind.value == current.billing_kind.value == "metered"
+        and old.recipe.model_dump(mode="json", exclude={"profile_sha256", "compiler_hash", "comparison"})
+            == target.recipe.model_dump(mode="json", exclude={"profile_sha256", "compiler_hash", "comparison"})
+        and old.output_requirement.model_dump(mode="json", exclude={"width", "height"})
+            == target.output_requirement.model_dump(mode="json", exclude={"width", "height"})
+        and old.final_output_goal == target.final_output_goal
+        and old.voice_route == target.voice_route)

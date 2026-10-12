@@ -10,6 +10,7 @@ from ai_video.production.seedance_source_expression import (
     PreservedSourceExpression,
     SourceReferenceMaterial,
     SourceReferencePart,
+    SourceImageAlias,
     SourceStateGrounding,
     SourceTextPart,
     _adapt_source_text,
@@ -28,6 +29,37 @@ def _expression(parts, *, implicit_references=(), opening=(), closing=()):
         opening=opening,
         closing=closing,
     )
+
+
+@pytest.mark.parametrize("changed", ["slot_bytes", "asset_role"])
+def test_v2_repeated_material_conflicts_fail_closed(changed):
+    material = SourceReferenceMaterial(asset_id="same", asset_sha256="a" * 64, role="identity")
+    other = material.model_copy(update={"asset_sha256": "b" * 64} if changed == "slot_bytes"
+        else {"role": "scene"})
+    parts = (SourceReferencePart(slot_id="slot", materials=(material,)),
+        SourceReferencePart(slot_id="slot" if changed == "slot_bytes" else "other", materials=(other,)))
+    with pytest.raises(ValueError, match="repeated source"):
+        PreservedSourceExpression(contract_version="seedance-preserved-source/2",
+            source_sha256=source_parts_sha256(parts), parts=parts)
+    # Historical /1 still rejects even an identical repeated chip.
+    duplicate = (parts[0], parts[0])
+    with pytest.raises(ValueError, match="slots must be unique"):
+        _expression(duplicate)
+
+
+def test_v2_explicit_literal_alias_uses_actual_native_index_and_preserves_source():
+    parts = (SourceTextPart(text="图1 locks the device; 图10 is unrelated prose."),)
+    implicit = (SourceReferenceMaterial(asset_id="device", asset_sha256="a" * 64, role="scene"),)
+    expression = PreservedSourceExpression(contract_version="seedance-preserved-source/2",
+        source_sha256=source_parts_sha256(parts, implicit), parts=parts, implicit_references=implicit,
+        image_aliases=(SourceImageAlias(label="图1", asset_ids=("device",)),))
+    assert _adapt_source_text(expression, {("scene", "device", "a" * 64): 2}) == (
+        "图片2 locks the device; 图10 is unrelated prose.")
+    assert expression.parts[0].text == parts[0].text
+    with pytest.raises(ValueError, match="exact selected materials"):
+        PreservedSourceExpression.model_validate(expression.model_dump(mode="python") | {
+            "image_aliases": [{"label": "图1", "asset_ids": ["other"]}]})
+    assert "image_aliases" not in _expression((SourceTextPart(text="Legacy"),)).model_dump()
 
 
 def _rebind_source_expression(bound, requirement, expression, prompt):

@@ -1,0 +1,269 @@
+{
+  "schema_version": "canvas-project-data/1",
+  "source": "source.json",
+  "selection": {
+    "node_ids": [
+      "a",
+      "b"
+    ]
+  },
+  "direction": {
+    "project_id": "canvas-demo",
+    "title": "Canvas demo",
+    "language": "zh",
+    "brief": {
+      "objective": "Show an arrival",
+      "audience": "General",
+      "format": "short drama"
+    },
+    "story": {
+      "logline": "An arrival",
+      "synopsis": "A traveller arrives.",
+      "beats": [
+        {
+          "beat_id": "arrival",
+          "summary": "Arrival"
+        }
+      ]
+    },
+    "characters": [
+      {
+        "character_id": "robot",
+        "name": "Robot",
+        "identity": "Robot",
+        "appearance_bible": "Metal body",
+        "reference_asset_ids": [
+          "robot-main",
+          "robot-aux"
+        ]
+      }
+    ],
+    "scenes": [
+      {
+        "scene_id": "road",
+        "location": "road",
+        "time": "day",
+        "mood": "quiet",
+        "visual_reference_asset_ids": [
+          "room"
+        ]
+      },
+      {
+        "scene_id": "road-state",
+        "location": "road",
+        "time": "day",
+        "mood": "quiet",
+        "visual_reference_asset_ids": [
+          "room"
+        ]
+      }
+    ],
+    "storyboard": {
+      "beats": [
+        {
+          "beat_id": "arrival",
+          "scene_id": "road",
+          "shot_ids": [
+            "one"
+          ],
+          "narrative_intent": "Arrival"
+        },
+        {
+          "beat_id": "next",
+          "scene_id": "road-state",
+          "shot_ids": [
+            "two"
+          ],
+          "narrative_intent": "原文后镜，状态参考待实测"
+        }
+      ]
+    },
+    "shots": [
+      {
+        "occurrence_id": "a",
+        "adaptation_reason": "Director authored a fixture intent",
+        "shot": {
+          "shot_id": "one",
+          "scene_id": "road",
+          "storyboard_beat_id": "arrival",
+          "duration_policy": {
+            "mode": "content_driven",
+            "seconds": 15
+          },
+          "visual_strategy": "generated_video",
+          "generated_video_rationale": "Walking",
+          "required_asset_roles": [
+            {
+              "role": "primary_visual",
+              "asset_ids": [],
+              "allowed_asset_types": [
+                "video"
+              ]
+            }
+          ],
+          "character_ids": [
+            "robot"
+          ]
+        },
+        "generation": {
+          "references": [
+            {
+              "role": "character_reference",
+              "asset_id": "robot-main"
+            },
+            {
+              "role": "character_reference",
+              "asset_id": "robot-aux"
+            },
+            {
+              "role": "scene_reference",
+              "asset_id": "room"
+            }
+          ],
+          "intent_evidence": {
+            "character_action_required": true
+          },
+          "generation_intent": {
+            "pacing": {
+              "shot_duration_seconds": 15
+            }
+          },
+          "audio_need": "required",
+          "quality_need": {},
+          "output_need": {
+            "duration_seconds": 15,
+            "width": 864,
+            "height": 496,
+            "fps": 24,
+            "container_mime": "video/mp4",
+            "timing_mode": "content_driven"
+          }
+        },
+        "composition": {
+          "muted": false
+        }
+      },
+      {
+        "occurrence_id": "b",
+        "adaptation_reason": "Director authored a fixture intent",
+        "shot": {
+          "shot_id": "two",
+          "scene_id": "road-state",
+          "storyboard_beat_id": "next",
+          "duration_policy": {
+            "mode": "content_driven",
+            "seconds": 15
+          },
+          "visual_strategy": "generated_video",
+          "generated_video_rationale": "Walking",
+          "required_asset_roles": [
+            {
+              "role": "primary_visual",
+              "asset_ids": [],
+              "allowed_asset_types": [
+                "video"
+              ]
+            }
+          ],
+          "character_ids": [
+            "robot"
+          ]
+        },
+        "boundary": {
+          "independent": true,
+          "reason": "Explicit fixture scene reset"
+        },
+        "generation": {
+          "references": [
+            {
+              "role": "character_reference",
+              "asset_id": "robot-main"
+            },
+            {
+              "role": "character_reference",
+              "asset_id": "robot-aux"
+            },
+            {
+              "role": "scene_reference",
+              "asset_id": "room"
+            }
+          ],
+          "intent_evidence": {
+            "character_action_required": true
+          },
+          "generation_intent": {
+            "pacing": {
+              "shot_duration_seconds": 15
+            }
+          },
+          "audio_need": "required",
+          "quality_need": {},
+          "output_need": {
+            "duration_seconds": 15,
+            "width": 864,
+            "height": 496,
+            "fps": 24,
+            "container_mime": "video/mp4",
+            "timing_mode": "content_driven"
+          }
+        },
+        "composition": {
+          "muted": false
+        },
+        "state_reference": {
+          "source_shot_id": "one",
+          "frame_index": 120,
+          "replace_asset_id": "room",
+          "usage_license": "example-only",
+          "checks": {
+            "identity": "Robot 主体身份与前镜一致",
+            "action": "核对 frame 120 实际举手阶段后再选择后镜输入",
+            "space": "核对实际房间空间状态"
+          }
+        }
+      }
+    ],
+    "delivery_profile": {
+      "width": 864,
+      "height": 496,
+      "fps": 24
+    },
+    "cut_requirements": [
+      {
+        "from_occurrence_id": "a",
+        "to_occurrence_id": "b",
+        "kind": "continuous",
+        "checks": {
+          "identity": "Robot 主辅图对应的角色身份保持",
+          "action": "按实际参考状态检查后镜动作接续",
+          "space": "空间状态接续",
+          "camera": "摄影关系保持可读",
+          "audio": "实际声音接续"
+        }
+      }
+    ]
+  },
+  "images": [
+    {
+      "asset_id": "robot-main",
+      "node_id": "robot",
+      "resource_id": "robot-main",
+      "path": "robot-main.png",
+      "usage_license": "example-only"
+    },
+    {
+      "asset_id": "robot-aux",
+      "node_id": "robot",
+      "resource_id": "robot-aux",
+      "path": "robot-aux.png",
+      "usage_license": "example-only"
+    },
+    {
+      "asset_id": "room",
+      "node_id": "room",
+      "resource_id": "room-resource",
+      "path": "room.png",
+      "usage_license": "example-only"
+    }
+  ]
+}
