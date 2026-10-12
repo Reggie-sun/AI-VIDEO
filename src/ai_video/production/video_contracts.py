@@ -241,7 +241,7 @@ class VideoFlexibleOutputRequirement(_VideoContractModel):
     height: int | None = Field(default=None, strict=True, gt=0, le=16384)
     resolution_label: str = Field(pattern=_SAFE_ID)
     ratio: Literal["21:9", "16:9", "4:3", "1:1", "3:4", "9:16", "adaptive"]
-    fps: int = Field(strict=True, gt=0, le=240)
+    fps: int | None = Field(strict=True, gt=0, le=240)
     container: Literal["mp4", "mov"]
     mime_type: Literal["video/mp4", "video/quicktime"]
     native_audio: bool
@@ -256,6 +256,8 @@ class VideoFlexibleOutputRequirement(_VideoContractModel):
             timing_valid = self.duration_seconds is None and self.frame_count is None
         if not timing_valid:
             raise ValueError("flexible video timing fields do not match timing mode")
+        if self.fps is None and self.timing_mode == "frame_count":
+            raise ValueError("frame-count timing requires an explicit FPS")
 
         if self.dimension_mode == "exact":
             dimensions_valid = self.width is not None and self.height is not None
@@ -293,6 +295,9 @@ class VideoFlexibleOutputRequirement(_VideoContractModel):
         if self.duration_seconds is None:
             return False
         expected_duration_milliseconds = self.duration_seconds * 1000
+        if self.fps is None:
+            # A nominal duration is a request, not a claim about output cadence.
+            return duration_milliseconds == expected_duration_milliseconds
         expected_frames = self.duration_seconds * self.fps
         if self.timing_mode == "exact_seconds":
             return (
@@ -367,7 +372,7 @@ class VideoOutputCapability(_VideoContractModel):
     ratios: tuple[
         Literal["21:9", "16:9", "4:3", "1:1", "3:4", "9:16", "adaptive"], ...
     ] = Field(min_length=1)
-    fps_values: tuple[int, ...] = Field(min_length=1)
+    fps_values: tuple[int | None, ...] = Field(min_length=1)
     containers: tuple[Literal["mp4", "mov"], ...] = Field(min_length=1)
     native_audio_options: tuple[bool, ...] = Field(min_length=1)
 

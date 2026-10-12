@@ -546,6 +546,8 @@ def _result_fingerprint(
                 "preview_fingerprint": summary.preview_fingerprint,
                 "authorization_fingerprint": summary.authorization_fingerprint,
                 "terminal_status": "succeeded",
+                **({"remote_evidence": receipt.remote_evidence.model_dump(mode="json")}
+                   if receipt.remote_evidence is not None else {}),
             }
         )
     )
@@ -615,20 +617,27 @@ def _verify_evidence(
     result_value, result_sha256 = _read_canonical_json(
         bundle.root, result_path, label="image provider result"
     )
-    if "image_bytes" in result_value:
+    if "image_bytes" in result_value or "wire_image_bytes" in result_value:
         raise ValueError("durable image result must store metadata only")
-    result = ImageProviderResult.model_validate(
-        {**result_value, "image_bytes": image_snapshot.data}
+    from ai_video.production._remote_image_reader import (
+        reopen_remote_image_result,
     )
-    authorization = ImageGenerationAuthorization(
-        request_fingerprint=summary.request_fingerprint,
-        preview_fingerprint=summary.preview_fingerprint,
-        provider_enabled=True,
-        local_only=True,
-        usage_license=summary.usage_license,
-        policy_receipt_id=summary.policy_receipt_id,
-        authorization_fingerprint=summary.authorization_fingerprint,
-    )
+    from ai_video.production.remote_image import remote_image_egress
+    wire_pairs = ()
+    if receipt.remote:
+        authorization, result, wire_pairs = reopen_remote_image_result(
+            bundle.root, attempt, receipt, image_snapshot.data, result_value)
+    else:
+        result = ImageProviderResult.model_validate({**result_value, "image_bytes": image_snapshot.data})
+        authorization = ImageGenerationAuthorization(
+            request_fingerprint=summary.request_fingerprint,
+            preview_fingerprint=summary.preview_fingerprint,
+            provider_enabled=True,
+            local_only=True,
+            usage_license=summary.usage_license,
+            policy_receipt_id=summary.policy_receipt_id,
+            authorization_fingerprint=summary.authorization_fingerprint,
+        )
     checked_measured, checked_receipt = validate_image_result(
         request, authorization, result
     )
@@ -669,13 +678,14 @@ def _verify_evidence(
         or asset.input_artifact_ids != expected_inputs
         or asset.input_fingerprint != request.request_fingerprint
         or asset.usage_license != receipt.usage_license
-        or asset.egress.remote
-        or asset.cost_receipt_id is not None
+        or asset.egress != remote_image_egress(authorization.remote_binding)
+        or asset.cost_receipt_id != receipt.cost_receipt_id
     ):
         raise ValueError("active generated image provenance is inconsistent")
     return (
         (request_path, request_sha256),
         *profile_pairs,
+        *wire_pairs,
         (result_path, result_sha256),
         (receipt_path, receipt_sha256),
         (asset.artifact_path, image_snapshot.file_sha256),
@@ -688,7 +698,7 @@ def _verify_candidate_artifacts_hash(
     pairs: tuple[tuple[Path, str], ...],
 ) -> None:
     normalized = sorted((path.as_posix(), digest) for path, digest in pairs)
-    expected_count = 9 if attempt.image_request.provider_kind == "comfyui_local" else 8
+    expected_count = 9 if attempt.image_request.provider_kind in {"comfyui_local", "grok"} else 8
     if (
         len(normalized) != expected_count
         or len({path for path, _ in normalized}) != expected_count
@@ -707,7 +717,8 @@ def _verify_image_activation_chronology(
 ) -> None:
     """Bind activation-time state evidence without freezing later P5 results."""
 
-    activation_revision = attempt.base_manifest_revision + 4
+    activation_revision = attempt.base_manifest_revision + (
+        6 if attempt.image_request.provider_kind == "grok" else 4)
     if manifest.manifest_revision < activation_revision:
         raise ValueError("active image Manifest revision predates activation")
     if manifest.manifest_revision == activation_revision:

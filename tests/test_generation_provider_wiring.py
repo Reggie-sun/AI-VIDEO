@@ -31,8 +31,9 @@ def prepare(provider, profile, output, compiler_id, compiler_version="2", author
     projection = _replace_requirement(setup["projection"],
         contract_version="provider-neutral-video-requirement/4", generation_intent=intent,
         conditioning_compatibility=conditioning,
-        output_need=OutputNeed(timing_mode="provider_selected" if getattr(output, "timing_mode", None)
-            == "provider_selected" else "fixed", duration_seconds=output.duration_seconds, width=output.width,
+        output_need=OutputNeed(timing_mode={"provider_selected": "provider_selected",
+            "nominal_seconds": "content_driven"}.get(getattr(output, "timing_mode", None), "fixed"),
+            duration_seconds=output.duration_seconds, width=output.width,
             height=output.height, geometry_policy=getattr(output, "dimension_mode", "exact"),
             aspect_ratio=getattr(output, "ratio", None), fps=output.fps, container_mime=output.mime_type),
         audio_need=AudioNeed.REQUIRED if output.native_audio else AudioNeed.FORBIDDEN)
@@ -115,6 +116,24 @@ def test_vidu_registered_t2v_models_through_common_caller(model):
     # All registered variants were created; task scope limits execution, not
     # inventory discovery or assessment of other models/modes.
     assert len(result.inputs.candidates) == len(provider.capabilities().variants)
+
+
+@pytest.mark.parametrize("images", [False, True])
+def test_grok_subscription_models_through_common_caller(images):
+    from ai_video.production.grok import GrokVideoProvider
+    from test_production_grok import _profile, _request
+
+    profile = _profile()
+    output = _request().output_requirement
+    provider = GrokVideoProvider(profile=profile, transport=forbidden, credential=forbidden,
+        image_resolver=forbidden)
+    result = prepare(provider, profile.pointer(), output, "grok-video-compiler", "1",
+        setup=conditioned_setup("image_to_video") if images else None)
+    assert result.decision.disposition == "GENERATE_ONCE"
+    assert result.compilation.outcome == "compiled"
+    assert result.execution_binding is not None
+    assert result.resolved_request.provider_kind == "grok"
+    assert result.resolved_request.effective_output.fps is None
 
 
 def conditioned_setup(mode, *, image_references=False):

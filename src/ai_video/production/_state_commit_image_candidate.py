@@ -13,6 +13,7 @@ from ai_video.production.image import (
     validate_image_result,
 )
 from ai_video.production.models import LoadedProductionProject
+from ai_video.production._remote_image_reader import remote_image_wire_path
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
     canonical_image_asset_path,
@@ -67,7 +68,7 @@ class _StateCommitImageCandidateMixin:
     ) -> tuple[
         MeasuredPng,
         ImageProvenanceReceipt,
-        tuple[PreparedArtifact, PreparedArtifact, PreparedArtifact],
+        tuple[PreparedArtifact, ...],
     ]:
         measured, receipt = validate_image_result(request, authorization, result)
         result_artifact = self.prepare_artifact(
@@ -85,12 +86,16 @@ class _StateCommitImageCandidateMixin:
             canonical_image_receipt_path(receipt.content_hash),
             _canonical_json_bytes(receipt),
         )
-        for artifact in (result_artifact, image_artifact, receipt_artifact):
+        artifacts = (result_artifact, image_artifact, receipt_artifact)
+        if result.remote_evidence is not None:
+            artifacts += (self.prepare_artifact(request.attempt_id,
+                remote_image_wire_path(result.remote_evidence), result.wire_image_bytes),)
+        for artifact in artifacts:
             self._write_immutable_artifact(
                 artifact, attempt_id=request.attempt_id
             )
             self._reopen_exact_image_artifact(artifact)
-        return measured, receipt, (result_artifact, image_artifact, receipt_artifact)
+        return measured, receipt, artifacts
 
     def _prepare_validated_image_candidate(
         self,

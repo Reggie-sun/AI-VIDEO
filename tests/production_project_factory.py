@@ -2442,6 +2442,7 @@ def make_p7_image_candidate_preparer(base_inputs):
         canonical_image_shot_revision_path,
     )
     from ai_video.production.image import _reference_graph_input_ids
+    from ai_video.production.remote_image import remote_image_egress
 
     def prepare(
         base_project,
@@ -2480,7 +2481,8 @@ def make_p7_image_candidate_preparer(base_inputs):
             input_fingerprint=request.request_fingerprint,
             creation_receipt_id=receipt.content_hash,
             usage_license=authorization.usage_license,
-            egress=EgressMetadata(remote=False),
+            egress=remote_image_egress(authorization.remote_binding),
+            cost_receipt_id=receipt.cost_receipt_id,
         )
         candidate_registry = base_project.registry.model_copy(
             update={

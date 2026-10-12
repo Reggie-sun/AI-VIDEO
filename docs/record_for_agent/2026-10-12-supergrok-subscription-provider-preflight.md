@@ -8,6 +8,16 @@ learning_eligibility: ineligible
 
 Date: 2026-10-12
 
+## Supersession Notice — 2026-10-12
+
+下方等待共享 writer、implementation 尚未开始的状态已由用户“开workree实现”及
+[Implementation Record](2026-10-12-supergrok-media-provider-implementation.md) 取代。
+Grok auth/image/video 与 canonical wiring 已在 dedicated worktree 实现，candidate-8
+完整离线 Harness 已通过；真实 generation 仍因 included-only 扣费边界未知而 `BLOCKED`。
+首次必要审查触及输出上限，不构成 review PASS；最终整合、审查和 publication 必须读取
+新 record 所指 exact delivery evidence。保留本文件其余历史调查与原 scope，不把
+preflight publication 当作 activation。
+
 ## Purpose And User Direction
 
 用户购买 SuperGrok 后要求接入 AI-VIDEO；明确选择视频/图片媒体 Provider、优先消费订阅权益。

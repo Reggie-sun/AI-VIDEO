@@ -1,0 +1,82 @@
+# Grok Media Provider
+
+Date: 2026-10-12
+
+## Status
+
+实现包含 SuperGrok OAuth、只读订阅 usage、image/video adapter，以及现有 Production 的连接。
+默认 live generation 为 `BLOCKED`：公开 billing response 能观察 usage，但不能证明 exact media
+endpoint 的服务端 `included_only` 扣费边界。用户没有授权额外现金支出，余额、usage percentage、
+OAuth 登录或客户端次数限制不能替代此边界。没有 Console key fallback、自动充值或重发。
+来源：[xAI announcement](https://x.ai/news/grok-openclaw)、
+[OpenClaw xAI integration](https://docs.openclaw.ai/providers/xai)、
+[Grok FAQ](https://docs.x.ai/grok/faq)。
+
+## Authentication
+
+从 repository root 使用现有 Python 环境与 `PYTHONPATH=src:.`：
+
+```bash
+python scripts/grok_auth.py login
+python scripts/grok_auth.py status
+python scripts/grok_auth.py quota
+python scripts/grok_auth.py refresh
+```
+
+`login` 显示官方 verification URI 与 user code，由用户在官方页面授权。采用 OpenClaw 公开共享
+client，项目没有独立注册 client。[当前官方 discovery](https://auth.x.ai/.well-known/openid-configuration)
+提供 `/oauth2/device/code`、`/oauth2/token`、`/oauth2/userinfo`；账号资格仍需实际登录验证。
+需要已有 `secret-tool` 与 unlocked OS Secret Service；token 仅保存到 exact
+`application ai-video / provider grok / credential GROK_OAUTH` item。无文件、`.env`、Cookie 或其他账号 fallback。
+`status` 只输出 public account fingerprint、expiry 和状态；`quota` 只做一次固定 billing GET，
+输出 usage 和 `generation_state=blocked` 并返回 exit 1，不启用生成。
+`refresh` 显式调用，POST 前保存 `refresh_unknown`；丢失响应或保存失败停止，不自动刷新/重试。
+这类未知认证状态需重新官方登录恢复。
+`login` / `refresh` 对同一 item 使用 Linux 跨进程互斥；另一个 `login` / `refresh` 在凭据读取和 HTTP 前返回 busy。
+空的 coordination lock 位于当前 UID 的 private runtime directory，不包含 token，关闭 FD 释放；
+缺失或不安全的 runtime directory / lock 直接停止，不切换 credential source。
+
+## Video Contract
+
+`GrokVideoProvider` 实现原 `VideoProvider` protocol，注入 `VideoProviderRegistry`；选择/编译仍归
+Planner/Router/compiler，执行归 `VideoGenerationService` / `ProductionStateCommitter`。
+origin 固定 `https://cli-chat-proxy.grok.com`，model `grok-imagine-video-1.5`。
+支持 T2V、单 first-frame I2V、1–15 秒 duration、480p/720p/1080p 和显式 `generate_audio`。
+adaptive geometry 与 `fps=None` 如实声明未请求 FPS；seed、negative、last-frame、soft references
+和 exact frame-count 不支持。内容驱动目标可使用 nominal duration；fixed requirement 不能降级。
+POST 返回真实 `request_id`，GET 同一 ID 的 pending/done/failed；done 必须匹配 model 与 moderation。
+fetch 重开同一 task，无凭据 public-IP pinned 下载 trusted temporary MP4。
+来源：[video generation](https://docs.x.ai/developers/model-capabilities/video/generation)、
+[image-to-video](https://docs.x.ai/developers/model-capabilities/video/image-to-video)。
+
+## Image Contract
+
+`GrokImageProvider` 经 `ProductionStateCommitter.generate_remote_image_asset()` 执行；local seam
+拒绝 remote authority。同步 `/v1/images/edits`，model `grok-imagine-image-2.0`，一张输出，1k/2k。
+保留 char/scene 等 2–5 条 ordered exact Registry references，同 asset 不按 ID 去重丢角色。
+seed/negative/尺寸要求不能忽略；remote request 使用显式 `None` / empty 来表达未要求这些控制。
+`b64_json` 原 PNG/JPEG/WebP 保存到 content-addressed `assets/files/grok-wire/`；PNG identity，
+JPEG/WebP 经已安装 Pillow 保尺寸 lossless PNG conversion。Reader 重做转换比较 exact bytes。
+同步 API 未承诺 job ID；`grok-content:<digest>` 是 request + wire 派生的 content identity。
+完整 remote egress、paid receipt 与 conversion lineage 进入 provenance/Registry；所有 mutable writes
+仍归 committer。POST permit 与 submit 后 activation proof 权限不同；unknown 不重发。
+来源：[multi-image editing](https://docs.x.ai/developers/model-capabilities/images/multi-image-editing)。
+
+## Subscription And Injection
+
+`GrokSubscriptionBinding` 绑定 exact account/model/origin、5 分钟内 quota 观察、period end 与
+独立 included-only evidence。构造 model 不构成授权；默认 `subscription_guard` 拒绝未验证边界。
+图片入口在 intent 前检查；视频遵循原 service 的 durable intent 后、POST 前检查。
+不可配置假 evidence 或 no-op guard 启用 live，真实 guard 必须由授权 owner 重验。
+paid preview 使用 `remote_subscription`、每次现金 upper bound 零和 sealed finite
+`subscription_submit_limit`；同币种既有现金 reservations 保留，订阅计数单独识别。
+known failure 仍消耗一次；unknown 不释放、不结算、不自动重试。没有第二账本或 writer。
+Video credential 注入 `GrokOAuthManager.credential_supplier(profile.account_fingerprint)`；
+image 注入 `GrokOAuthManager.credential` 并重验返回 credential 的 account/reference/expiry。
+transport 使用 `HttpxGrokTransport` / `HttpxGrokImageTransport`，禁止 redirect、client auth/cookies 注入。
+
+## Verification Boundary
+
+Focused argv/routing 归 Harness `grok_media_provider_tests`。Fake 证明 protocol、finite count、
+canonical service、unknown、provenance 和 replay；不证明账号登录、quota/扣费资格、真实媒体或质量。
+真实执行仍需账号/扣费 prerequisites、exact inputs、finite permits 与逐 Shot MCP Gate。

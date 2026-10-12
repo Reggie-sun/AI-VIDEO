@@ -204,6 +204,7 @@ def release_unsettled_paid_provider_reservation(
         policy_id=snapshot.policy_id,
         currency=snapshot.currency,
         project_ceiling_microunits=snapshot.project_ceiling_microunits,
+        subscription_submit_limit=snapshot.subscription_submit_limit,
         reservations=tuple(
             released if item.reservation_id == released.reservation_id else item
             for item in snapshot.reservations

@@ -28,6 +28,7 @@ from ._state_commit_common import (
     _validated_transition,
 )
 from ._state_commit_contracts import CommitPhase, _DurableImageSubmitPermit
+from ._state_commit_remote_image import _DurableRemoteImageActivationPermit
 
 
 def _image_outcome_unknown(exc: BaseException, message: str) -> AiVideoError:
@@ -57,6 +58,10 @@ class _StateCommitImageActivationMixin:
         execution_profile: LocalImageExecutionProfile | None = None,
     ) -> ProductionManifest:
         """Invoke exactly one permitted local Provider call, then activate its result."""
+
+        if not authorization.local_only or preview.remote:
+            raise AiVideoError(code=ErrorCode.IMAGE_REQUEST_INVALID,
+                user_message="Remote images must use the paid image orchestration seam.")
 
         replay = self._exact_image_replay(
             request,
@@ -226,7 +231,8 @@ class _StateCommitImageActivationMixin:
     ) -> ProductionManifest:
         """Persist a validated image candidate and atomically select its bundle."""
 
-        if not isinstance(permit, _DurableImageSubmitPermit) or not (
+        expected_type = _DurableImageSubmitPermit if authorization.local_only else _DurableRemoteImageActivationPermit
+        if type(permit) is not expected_type or not (
             permit._image_generation_was_consumed(
                 request_fingerprint=request.request_fingerprint
             )
@@ -333,7 +339,7 @@ class _StateCommitImageActivationMixin:
                 *reopened_candidates,
             )
             expected_artifact_count = (
-                9 if request.provider_kind == "comfyui_local" else 8
+                9 if request.provider_kind == "comfyui_local" or not authorization.local_only else 8
             )
             if len(exact_artifacts) != expected_artifact_count:
                 raise _state_invalid(

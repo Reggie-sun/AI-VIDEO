@@ -13,6 +13,7 @@ from pydantic import ConfigDict, Field, field_validator, model_validator, model_
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import ActorIdentity, StrictModel
+from ai_video.production.grok_subscription import GrokSubscriptionBinding
 from ai_video.production.paid_provider_budget_extension import PaidProviderBudgetCeilingExtension
 from ai_video.production.paid_provider_no_effect_reconciliation import (
     PaidProviderNoEffectReconciliationPointer,
@@ -75,11 +76,12 @@ class PaidProviderEgressItem(_PaidStrictModel):
 
 class PaidProviderCallPreview(_PaidStrictModel):
     attempt_id: str = Field(pattern=_SAFE_SHORT_ID.pattern)
-    operation: Literal["voice_generation", "video_generation", "ad_generation"]
+    operation: Literal["voice_generation", "video_generation", "ad_generation", "image_generation"]
     provider_kind: str = Field(pattern=_SAFE_SHORT_ID.pattern)
     model_id: str = Field(pattern=_SAFE_SHORT_ID.pattern)
     request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
-    billing_mode: Literal["remote_metered", "minimax_speech_batch"]
+    billing_mode: Literal["remote_metered", "minimax_speech_batch", "remote_subscription"]
+    subscription_binding: GrokSubscriptionBinding | None = None
     currency: str = Field(pattern=r"^[A-Z]{3}$")
     estimated_cost_upper_bound_microunits: int | None = Field(strict=True, ge=0)
     destination: str
@@ -90,6 +92,13 @@ class PaidProviderCallPreview(_PaidStrictModel):
     secret_reference: SecretReference
     preview_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
 
+    @model_serializer(mode="wrap")
+    def _legacy_preview(self, handler):
+        data = handler(self)
+        if data.get("subscription_binding") is None:
+            data.pop("subscription_binding", None)
+        return data
+
     @field_validator("destination")
     @classmethod
     def _destination_is_canonical(cls, value: str) -> str:
@@ -97,6 +106,17 @@ class PaidProviderCallPreview(_PaidStrictModel):
 
     @model_validator(mode="after")
     def _validate_seal(self) -> "PaidProviderCallPreview":
+        if self.billing_mode == "remote_subscription":
+            binding = self.subscription_binding
+            if (binding is None or self.provider_kind != "grok"
+                    or self.operation not in {"image_generation", "video_generation"}
+                    or self.model_id != binding.model_id or self.destination != binding.destination
+                    or self.secret_reference.kind != "secret_store"
+                    or self.secret_reference.reference_id != binding.credential_reference_id
+                    or self.currency != "USD" or self.estimated_cost_upper_bound_microunits != 0):
+                raise ValueError("subscription preview requires the exact included-only media binding")
+        elif self.subscription_binding is not None:
+            raise ValueError("subscription binding cannot authorize another billing mode")
         if self.billing_mode == "minimax_speech_batch":
             if (self.operation != "voice_generation"
                     or self.provider_kind != "minimax-speech"
@@ -133,9 +153,10 @@ class PaidProviderAuthorizationDecision(_PaidStrictModel):
     opt_in_policy_receipt_id: str = Field(pattern=_SAFE_SHORT_ID.pattern)
     budget_policy_id: str = Field(pattern=_SAFE_SHORT_ID.pattern)
     budget_currency: str = Field(pattern=r"^[A-Z]{3}$")
-    project_budget_ceiling_microunits: int | None = Field(strict=True, gt=0)
+    project_budget_ceiling_microunits: int | None = Field(strict=True, ge=0)
     per_call_ceiling_microunits: int | None = Field(strict=True, ge=0)
     voice_batch_submit_limit: int | None = Field(default=None, strict=True, gt=0)
+    subscription_submit_limit: int | None = Field(default=None, strict=True, gt=0)
     egress_authorized: Literal[True]
     egress_policy_receipt_id: str = Field(pattern=_SAFE_SHORT_ID.pattern)
     live_test_authorized: Literal[True]
@@ -150,10 +171,18 @@ class PaidProviderAuthorizationDecision(_PaidStrictModel):
         data = handler(self)
         if self.voice_batch_submit_limit is None:
             data.pop("voice_batch_submit_limit", None)
+        if self.subscription_submit_limit is None:
+            data.pop("subscription_submit_limit", None)
         return data
 
     @model_validator(mode="after")
     def _validate_seal_and_time(self) -> "PaidProviderAuthorizationDecision":
+        if self.subscription_submit_limit is not None:
+            if (self.project_budget_ceiling_microunits is None
+                    or self.per_call_ceiling_microunits != 0 or self.voice_batch_submit_limit is not None):
+                raise ValueError("subscription authorization requires zero per-call cash and a finite count")
+        elif self.project_budget_ceiling_microunits == 0:
+            raise ValueError("zero project cash requires subscription count authority")
         if self.voice_batch_submit_limit is None:
             if (self.project_budget_ceiling_microunits is None
                     or self.per_call_ceiling_microunits is None):
@@ -202,6 +231,9 @@ def validate_paid_provider_authorization(
             "Paid Provider budget currency does not match the preview.",
         )
     batch = preview.billing_mode == "minimax_speech_batch"
+    if (preview.billing_mode == "remote_subscription") != (authorization.subscription_submit_limit is not None):
+        raise _paid_error(ErrorCode.PAID_PROVIDER_BUDGET_REJECTED,
+                          "Subscription count authority does not match the billing mode.")
     if batch != (authorization.voice_batch_submit_limit is not None):
         raise _paid_error(ErrorCode.PAID_PROVIDER_BUDGET_REJECTED,
                           "Voice batch authorization does not match the billing mode.")
@@ -233,14 +265,24 @@ class PaidProviderBudgetReservation(_PaidStrictModel):
     request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     preview_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     upper_bound_microunits: int | None = Field(strict=True, ge=0)
+    subscription_account_fingerprint: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     status: BudgetReservationStatus
     actual_cost_microunits: int | None = Field(default=None, strict=True, ge=0)
     submit_receipt_fingerprint: str | None = Field(
         default=None, pattern=r"^[0-9a-f]{64}$"
     )
 
+    @model_serializer(mode="wrap")
+    def _legacy_reservation(self, handler):
+        data = handler(self)
+        if data.get("subscription_account_fingerprint") is None:
+            data.pop("subscription_account_fingerprint", None)
+        return data
+
     @model_validator(mode="after")
     def _validate_state(self) -> "PaidProviderBudgetReservation":
+        if self.subscription_account_fingerprint is not None and self.upper_bound_microunits != 0:
+            raise ValueError("subscription reservation cannot authorize cash")
         if self.status is BudgetReservationStatus.SETTLED:
             if self.actual_cost_microunits is None:
                 raise ValueError("settled reservation requires actual cost")
@@ -276,8 +318,9 @@ class PaidProviderBudgetSnapshot(_PaidStrictModel):
     revision: int = Field(strict=True, ge=1)
     policy_id: str = Field(pattern=_SAFE_SHORT_ID.pattern)
     currency: str = Field(pattern=r"^[A-Z]{3}$")
-    project_ceiling_microunits: int | None = Field(strict=True, gt=0)
+    project_ceiling_microunits: int | None = Field(strict=True, ge=0)
     voice_batch_submit_limit: int | None = Field(default=None, strict=True, gt=0)
+    subscription_submit_limit: int | None = Field(default=None, strict=True, gt=0)
     reservations: tuple[PaidProviderBudgetReservation, ...] = ()
     ceiling_extensions: tuple[PaidProviderBudgetCeilingExtension, ...] = ()
     submit_quota_extensions: tuple[PaidProviderSubmitQuotaExtension, ...] = ()
@@ -289,6 +332,8 @@ class PaidProviderBudgetSnapshot(_PaidStrictModel):
         data = handler(self)
         if self.voice_batch_submit_limit is None:
             data.pop("voice_batch_submit_limit", None)
+        if self.subscription_submit_limit is None:
+            data.pop("subscription_submit_limit", None)
         if not self.ceiling_extensions:
             data.pop("ceiling_extensions", None)
         if not self.submit_quota_extensions:
@@ -297,6 +342,16 @@ class PaidProviderBudgetSnapshot(_PaidStrictModel):
 
     @model_validator(mode="after")
     def _validate_seal_and_uniqueness(self) -> "PaidProviderBudgetSnapshot":
+        subscription_reservations = tuple(r for r in self.reservations
+            if r.subscription_account_fingerprint is not None)
+        if self.subscription_submit_limit is not None:
+            if (self.project_ceiling_microunits is None or self.voice_batch_submit_limit is not None
+                    or len(subscription_reservations) > self.subscription_submit_limit):
+                raise ValueError("subscription ledger must retain its finite count")
+        elif subscription_reservations:
+            raise ValueError("subscription reservations require finite count authority")
+        elif self.project_ceiling_microunits == 0:
+            raise ValueError("zero cash ledger requires subscription count authority")
         if self.voice_batch_submit_limit is None:
             if (self.project_ceiling_microunits is None
                     or any(r.upper_bound_microunits is None for r in self.reservations)):
@@ -370,6 +425,7 @@ def reserve_paid_provider_budget(
                 authorization.project_budget_ceiling_microunits
             ),
             voice_batch_submit_limit=authorization.voice_batch_submit_limit,
+            subscription_submit_limit=authorization.subscription_submit_limit,
             reservations=(),
             blocked=False,
         )
@@ -384,6 +440,8 @@ def reserve_paid_provider_budget(
         or snapshot.project_ceiling_microunits
         != authorization.project_budget_ceiling_microunits
         or snapshot.voice_batch_submit_limit != authorization.voice_batch_submit_limit
+        or (authorization.subscription_submit_limit is not None
+            and snapshot.subscription_submit_limit not in {None, authorization.subscription_submit_limit})
     ):
         raise _paid_error(
             ErrorCode.PAID_PROVIDER_BUDGET_REJECTED,
@@ -398,6 +456,14 @@ def reserve_paid_provider_budget(
             "Paid Provider attempt or reservation was already recorded.",
         )
     upper_bound = preview.estimated_cost_upper_bound_microunits
+    subscription_limit = snapshot.subscription_submit_limit or authorization.subscription_submit_limit
+    if authorization.subscription_submit_limit is not None:
+        if any(r.status is BudgetReservationStatus.UNSETTLED for r in snapshot.reservations):
+            raise _paid_error(ErrorCode.PAID_PROVIDER_OUTCOME_UNKNOWN,
+                              "Subscription has an unknown submit outcome.")
+        if sum(r.subscription_account_fingerprint is not None for r in snapshot.reservations) >= subscription_limit:
+            raise _paid_error(ErrorCode.PAID_PROVIDER_BUDGET_REJECTED,
+                              "Subscription submit count is exhausted.")
     if snapshot.voice_batch_submit_limit is not None:
         if any(r.status is BudgetReservationStatus.UNSETTLED for r in snapshot.reservations):
             raise _paid_error(ErrorCode.PAID_PROVIDER_OUTCOME_UNKNOWN,
@@ -416,6 +482,8 @@ def reserve_paid_provider_budget(
         request_fingerprint=preview.request_fingerprint,
         preview_fingerprint=preview.preview_fingerprint,
         upper_bound_microunits=upper_bound,
+        subscription_account_fingerprint=(preview.subscription_binding.account_fingerprint
+            if preview.subscription_binding is not None else None),
         status=BudgetReservationStatus.RESERVED,
     )
     updated = PaidProviderBudgetSnapshot.create(
@@ -424,6 +492,7 @@ def reserve_paid_provider_budget(
         currency=snapshot.currency,
         project_ceiling_microunits=snapshot.project_ceiling_microunits,
         voice_batch_submit_limit=snapshot.voice_batch_submit_limit,
+        subscription_submit_limit=subscription_limit,
         reservations=snapshot.reservations + (reservation,),
         ceiling_extensions=snapshot.ceiling_extensions,
         submit_quota_extensions=snapshot.submit_quota_extensions,
@@ -538,6 +607,7 @@ def _replace_reservation(
         currency=snapshot.currency,
         project_ceiling_microunits=snapshot.project_ceiling_microunits,
         voice_batch_submit_limit=snapshot.voice_batch_submit_limit,
+        subscription_submit_limit=snapshot.subscription_submit_limit,
         reservations=reservations,
         ceiling_extensions=snapshot.ceiling_extensions,
         submit_quota_extensions=snapshot.submit_quota_extensions,
@@ -645,6 +715,7 @@ def settle_paid_provider_budget(
             policy_id=next_snapshot.policy_id,
             currency=next_snapshot.currency,
             project_ceiling_microunits=next_snapshot.project_ceiling_microunits,
+            subscription_submit_limit=next_snapshot.subscription_submit_limit,
             reservations=next_snapshot.reservations,
             ceiling_extensions=next_snapshot.ceiling_extensions,
             submit_quota_extensions=next_snapshot.submit_quota_extensions,

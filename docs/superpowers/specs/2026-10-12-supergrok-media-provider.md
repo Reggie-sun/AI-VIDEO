@@ -1,17 +1,20 @@
 # SuperGrok Media Provider Spec
 
 Date: 2026-10-12
-Status: authorized task scope; Parent self-reviewed; implementation not started
+Status: authorized task scope; Parent self-reviewed; implementation in authorized worktree
 
 ## Goal And Authority
 
 为 AI-VIDEO 接入 Grok 图片与视频生成，优先消费用户已经购买的 SuperGrok 订阅权益。
-用户明确选择媒体 Provider 和订阅优先，并要求先等另一任务提交共享文件，再修改这些文件。
+用户明确选择媒体 Provider 和订阅优先；后来明确要求“开workree实现”，取代先等共享文件的顺序。
+实现使用 `/home/reggie/vscode_folder/AI-VIDEO-supergrok-media`，base `75849c7`；原工作区不接管。
 本 Spec 不新增用户批准步骤；账号登录仍由用户完成，真实生成仍需满足当前项目的显式 inputs、
 有限 submit count、egress、budget、durable intent 和 one-use permit。没有授权额外充值、
 Auto Top Up、按次计费 API fallback、网页 Cookie 提取或 Provider 自动切换。
 
-## Verified Current Behavior
+## Verified Base Behavior
+
+下述是 implementation base 的缺口；current target 与证据由本任务实现、Plan 和 baseline 描述。
 
 - `production/video.py::VideoProviderRegistry` 是注入式精确查找，Provider 名称没有硬编码枚举。
   独立 adapter 可以实现现有 `VideoProvider` protocol，不能让 registry 变成第二 Router。
@@ -56,6 +59,8 @@ token、refresh token、device_code、signed URL 不进入 repo、prompt、argv�
 receipt 仅保留 public reference、account fingerprint 和安全的 evidence identity。
 无可用 token 时零 generation。Refresh lost response 属于未知 rotation outcome，停止并显式恢复，
 不得自动重试；401/403 不触发 Console key 或其他账号 fallback。
+同一 private item 的登录和 refresh 必须跨进程互斥；busy 在 lookup/HTTP 前停止，
+不能由较早读取的 ready record 覆盖另一调用的 unknown。Coordination lock 不保存凭据。
 auth、billing、generation、result-download origins 分开固定并验证，下载不向 CDN 转发 Bearer token。
 
 ### Subscription Billing
@@ -95,7 +100,10 @@ Provider 不支持 seed、negative prompt 或 geometry 时必须拒绝这些控�
 PNG 是当前内部素材边界；若 wire output 不是 PNG，单独保存原 wire identity，使用已安装
 可验证 decoder 做保尺寸 conversion，测量转换后的 exact PNG，并记录转换 lineage。
 conversion 不 resize、不去水印、不改变 declared composition；格式或尺寸不符合则失败。
-同步或异步 wire 均保留唯一 intent 和 unknown 封存；poll 不能重发 generation。
+第一版使用同步多图 editing；unknown 封存，不重新 POST。API 未承诺同步 job ID，因此以
+request + wire 派生的 `grok-content:<digest>` 表达已收到的 output content identity。
+POST 消费现有 paid permit；submit 后 activation proof 只证明 accepted paid/image joins，不能再 POST。
+remote wire 使用独立 content-addressed 路径，避免 identity PNG 与 canonical PNG 路径冲突。
 
 ### Compatibility And Ownership
 
@@ -122,10 +130,9 @@ creative state、QA acceptance、local ComfyUI exemption 或现有 paid Provider
 
 ## Execution Boundary And Self-Review
 
-用户选择先等待另一任务提交共享文件。因此本 checkpoint 只写新 Spec、Plan 和 session record，
-不编辑既有 shared source/policy/baseline/matrix，也不 stage/commit 另一任务内容。
-恢复实现前重新检查 current HEAD、dirty paths、live ownership 和共享 contracts。
+用户后续明确要求 dedicated worktree，已按新的顺序执行；原工作区 dirty/staged 内容保持。
+新 worktree 的 auth、video、image bounded writers target files 不相交，Parent 独占共享契约和整合。
 compiler 是否需要编辑以实际 grammar seam 为准；独立 video registry 不需为名称注册而修改。
 Parent self-review：媒体范围、订阅优先、零额外现金、两个 Provider lifecycle、兼容、
-no-fallback/no-retry、真实验收和等待顺序均有对应契约；未验证的登录、capability 和扣费资格
+no-fallback/no-retry、真实验收与新的 worktree 顺序均有对应契约；未验证的登录、capability 和扣费资格
 保留为 admission blockers，没有转换成 READY。

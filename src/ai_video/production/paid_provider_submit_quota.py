@@ -329,6 +329,7 @@ def _extend_paid_provider_submit_quota(committer, entry):
             policy_id=budget.policy_id,
             currency=budget.currency,
             project_ceiling_microunits=budget.project_ceiling_microunits,
+            subscription_submit_limit=budget.subscription_submit_limit,
             reservations=budget.reservations,
             ceiling_extensions=budget.ceiling_extensions,
             submit_quota_extensions=(*budget.submit_quota_extensions, entry),

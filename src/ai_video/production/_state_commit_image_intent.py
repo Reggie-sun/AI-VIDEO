@@ -114,14 +114,19 @@ class _StateCommitImageIntentMixin:
             or preview.request_fingerprint != request.request_fingerprint
             or preview.reference_asset_ids
             != tuple(item.asset_id for item in request.references)
-            or not preview.local_only
-            or preview.remote
+            or preview.local_only != authorization.local_only
+            or preview.remote != (authorization.remote_binding is not None)
             or preview.output_count != 1
             or preview.output_mime_type != "image/png"
             or authorization.request_fingerprint != request.request_fingerprint
             or authorization.preview_fingerprint != preview.preview_fingerprint
             or not authorization.provider_enabled
-            or not authorization.local_only
+            or (preview.remote and (request.provider_kind != "grok"
+                or preview.remote_call != authorization.remote_binding.preview
+                or preview.remote_call.request_fingerprint != request.request_fingerprint
+                or preview.remote_call.attempt_id != request.attempt_id
+                or preview.remote_call.provider_kind != request.provider_kind
+                or preview.remote_call.model_id != request.model_id))
         ):
             raise _image_invalid(
                 "Image preview or authorization does not match the immutable request."
@@ -421,7 +426,7 @@ class _StateCommitImageIntentMixin:
         authorization: ImageGenerationAuthorization,
         *,
         execution_profile: LocalImageExecutionProfile | None = None,
-    ) -> _DurableImageSubmitPermit:
+    ) -> _DurableImageSubmitPermit | None:
         """Persist exact image R+2 intent before minting a one-use permit."""
 
         receipt = self._image_receipt(request, preview, authorization)
@@ -546,6 +551,10 @@ class _StateCommitImageIntentMixin:
                 "evidence_hash": aggregate,
                 "submit_intent_sha256": intent_artifact.file_sha256,
             }
+            if not authorization.local_only:
+                # Remote POST authority is minted only by the paid owner after
+                # this exact image intent is durable; no local permit is issued.
+                return None
             return _DurableImageSubmitPermit(
                 _IMAGE_PERMIT_TOKEN,
                 binding=binding,

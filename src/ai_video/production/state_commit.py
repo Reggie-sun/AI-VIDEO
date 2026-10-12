@@ -222,6 +222,7 @@ from ._state_commit_commercial_source_recovery import (
     _StateCommitCommercialSourceRecoveryMixin,
 )
 from ._state_commit_image_activation import _StateCommitImageActivationMixin
+from ._state_commit_remote_image import _StateCommitRemoteImageMixin
 from ._state_commit_image_candidate import _StateCommitImageCandidateMixin
 from ._state_commit_image_intent import _StateCommitImageIntentMixin
 from ._state_commit_image_recovery import _StateCommitImageRecoveryMixin
@@ -285,6 +286,7 @@ class ProductionStateCommitter(
     _StateCommitImageIntentMixin,
     _StateCommitImageCandidateMixin,
     _StateCommitImageActivationMixin,
+    _StateCommitRemoteImageMixin,
     _StateCommitVoiceIntentMixin,
     _StateCommitVoiceCandidateMixin,
     _StateCommitVoiceActivationMixin,

@@ -111,7 +111,8 @@ def _register_remote_inputs(*, root, inputs, project, bindings, input_bytes):
     return load_production_project(root / "project.yaml")
 
 
-def prepare_remote_generation(*, root, provider, request, compiler_id, compiler_version="2", input_bytes=None):
+def prepare_remote_generation(*, root, provider, request, compiler_id, compiler_version="2", input_bytes=None,
+        requirement_timing_mode="fixed"):
     """Author/activate the fixture Shot, then use the common production caller."""
     inputs = activate_generated_video_shot(
         root=root, inputs=make_p8_video_generation_base(root, schema_version="2.7"))
@@ -196,6 +197,7 @@ def prepare_remote_generation(*, root, provider, request, compiler_id, compiler_
         motion_requirement="free_complex", generation_intent=intent,
         semantic_reference_roles=semantic_roles, asset_evidence=evidence, capability_need=capability_need,
         output_need=OutputNeed(
+            timing_mode=requirement_timing_mode,
             duration_seconds=output.duration_seconds,
             geometry_policy=OutputGeometryPolicy(getattr(output, "dimension_mode", "exact")),
             width=output.width,

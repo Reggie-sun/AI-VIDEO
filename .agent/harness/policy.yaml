@@ -94,6 +94,11 @@ fallback_check_ids:
   - task_architecture_gate
 
 checks:
+  grok_media_provider_tests:
+    execution_priority: 70
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_grok_auth.py, tests/test_grok_billing.py, tests/test_grok_subscription.py, tests/test_grok_subscription_lifecycle.py, tests/test_grok_output_contract.py, tests/test_grok_remote_image_lifecycle.py, tests/test_production_grok.py, tests/test_production_grok_image.py, tests/test_generation_provider_wiring.py, -q]
+    cwd: .
+    description: Verify subscription-only OAuth media adapters, included-only rejection, finite counts, exact provenance and canonical service wiring with fake effects only.
   agent_rules_check:
     argv: [python, -m, scripts.agent_rules_gate]
     cwd: .
@@ -256,7 +261,7 @@ checks:
   production_contract_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests, -k, "production or video_candidate or video_generation", -q]
     cwd: .
-    timeout_seconds: 1800
+    timeout_seconds: 2400
     description: Verify all Production surfaces for shared schema, reader, writer, and lifecycle owners.
   production_reader_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_models.py, tests/test_production_validation.py, tests/test_production_registry.py, tests/test_production_project.py, tests/test_config.py, tests/test_cli.py, -q]
@@ -394,6 +399,7 @@ checks:
       - voice_source_routing_tests
       - repair_input_admission_tests
       - generation_feedback_tests
+      - grok_media_provider_tests
       - typed_causal_native_expression_tests
       - production_vidu_tests
       - commercial_source_preparation_tests
@@ -449,6 +455,22 @@ checks:
     description: Report repository health against the version-controlled architecture baseline.
 
 categories:
+  grok_media_provider:
+    patterns:
+      - src/ai_video/production/grok*.py
+      - src/ai_video/production/_grok_auth_lock.py
+      - src/ai_video/production/remote_image.py
+      - src/ai_video/production/image_bytes.py
+      - src/ai_video/production/_remote_image_reader.py
+      - src/ai_video/production/_state_commit_remote_image.py
+      - scripts/grok_auth.py
+      - tests/test_grok*.py
+      - tests/test_production_grok*.py
+      - tests/production_remote_generation_factory.py
+      - docs/grok-provider.md
+    check_ids:
+      - grok_media_provider_tests
+      - task_architecture_gate
   typed_causal_native_expression:
     patterns:
       - src/ai_video/production/_causal_prompt_context.py

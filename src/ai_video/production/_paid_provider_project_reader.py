@@ -140,6 +140,7 @@ def _verify_budget_extensions(
             policy_id=base.policy_id,
             currency=base.currency,
             project_ceiling_microunits=entry.new_ceiling_microunits,
+            subscription_submit_limit=base.subscription_submit_limit,
             reservations=base.reservations,
             ceiling_extensions=(*base.ceiling_extensions, entry),
             submit_quota_extensions=base.submit_quota_extensions,
@@ -200,6 +201,7 @@ def _verify_submit_quota_extensions(
             policy_id=base.policy_id,
             currency=base.currency,
             project_ceiling_microunits=base.project_ceiling_microunits,
+            subscription_submit_limit=base.subscription_submit_limit,
             reservations=base.reservations,
             ceiling_extensions=base.ceiling_extensions,
             submit_quota_extensions=(*base.submit_quota_extensions, entry),
@@ -380,12 +382,19 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
             and state.phase is PaidProviderAttemptPhase.ACCEPTED
             and attempt.status in {StateCommitStatus.SUCCEEDED, StateCommitStatus.FAILED}
         )
+        accepted_image_terminal = (
+            attempt.operation == "image_generation"
+            and state.phase is PaidProviderAttemptPhase.ACCEPTED
+            and attempt.status in {StateCommitStatus.SUCCEEDED, StateCommitStatus.FAILED,
+                                   StateCommitStatus.INTERRUPTED, StateCommitStatus.OUTCOME_UNKNOWN}
+        )
         if (
             required_status is not None
             and attempt.status is not required_status
             and not accepted_video_terminal
             and not accepted_minimax_voice
             and not accepted_ad_terminal
+            and not accepted_image_terminal
         ):
             raise _invalid("Paid Provider attempt status is inconsistent with its phase.")
         gate = load_paid_provider_gate_receipt(root, state.gate_receipt)
@@ -410,6 +419,10 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
         # if a rehashed active snapshot has stripped its optional extension field.
         if (
             gate_budget.policy_id != gate.authorization.budget_policy_id
+            or (gate.authorization.subscription_submit_limit is not None
+                and gate_budget.subscription_submit_limit != gate.authorization.subscription_submit_limit)
+            or (gate_budget.subscription_submit_limit is not None
+                and budget.subscription_submit_limit != gate_budget.subscription_submit_limit)
             or gate_budget.voice_batch_submit_limit != gate.authorization.voice_batch_submit_limit
             or budget.voice_batch_submit_limit != gate_budget.voice_batch_submit_limit
             or gate_budget.currency != gate.authorization.budget_currency
@@ -451,6 +464,10 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
             != gate.preview.estimated_cost_upper_bound_microunits
             or gate_reservation.upper_bound_microunits
             != gate.preview.estimated_cost_upper_bound_microunits
+            or reservation.subscription_account_fingerprint != (
+                gate.preview.subscription_binding.account_fingerprint
+                if gate.preview.subscription_binding is not None else None)
+            or gate_reservation.subscription_account_fingerprint != reservation.subscription_account_fingerprint
             or gate_reservation.status is not BudgetReservationStatus.RESERVED
             or gate_reservation.actual_cost_microunits is not None
             or gate_reservation.submit_receipt_fingerprint is not None

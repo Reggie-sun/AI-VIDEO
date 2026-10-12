@@ -1,5 +1,18 @@
 # AI-VIDEO Contract Routing Matrix
 
+## Grok Subscription Media
+
+`grok_auth` 独占 device OAuth、exact Secret Service、account/expiry 和显式 refresh；未知 rotation
+不重试。`grok_subscription` / `grok_billing` 只读 usage，不能证明 included-only；默认阻断 live。
+`grok` / `grok_image` 只拥有 native payload、response 和 bounded transport；selection、paid/count
+ledger、intent 与 unknown 仍归原 Router/service/committer。`remote_image` / `_remote_image_reader`
+重验 paid joins、wire 与 conversion；post-submit activation proof 不授权 POST。
+`image_bytes` 独占 exact PNG measurement，原 public imports 保持。remote generated PNG 必须具
+Grok identity、complete egress/cost、strict image/paid lineage；旧 local serializers/hash 不变。
+订阅次数单独识别零现金 reservation，不替换同币种既有现金账本。`fps=None` 不允许 frame-count
+timing；fixed requirement 不降级为 nominal。协议/live 阻断见 [Grok Provider](grok-provider.md)，
+checks 归 `grok_media_provider_tests` 与原 shared suites。
+
 ## Current Shot Close Expression
 
 `video_requirement.py::GenerationIntent.close_causal_facts` 是existing intent内的optional authored

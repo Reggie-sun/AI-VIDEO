@@ -3,17 +3,18 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-import struct
 import unicodedata
-import zlib
 from dataclasses import dataclass, replace
 from pathlib import Path
 from typing import TYPE_CHECKING, Annotated, Literal, Protocol, TypeAlias
 
 import yaml
-from pydantic import ConfigDict, Field, ValidationError, field_validator, model_validator
+from pydantic import ConfigDict, Field, ValidationError, field_validator, model_validator, model_serializer
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production.image_bytes import MeasuredPng, measure_png_bytes, _image_bytes_invalid
+from ai_video.production.paid_provider import PaidProviderCallPreview
+from ai_video.production.remote_image import RemoteImageAuthorization, RemoteImageEvidence, remote_image_egress
 from ai_video.production.dependency import (
     DependencyResolution,
     ProductionDependencyInputs,
@@ -85,24 +86,9 @@ _REFERENCE_ROLE_ORDER = {
     "scene": 2,
     "style": 3,
 }
-_PNG_SIGNATURE = b"\x89PNG\r\n\x1a\n"
-_PNG_BIT_DEPTHS = {
-    0: {1, 2, 4, 8, 16},
-    2: {8, 16},
-    3: {1, 2, 4, 8},
-    4: {8, 16},
-    6: {8, 16},
-}
 _IMAGE_ACTIVATION_TOKEN = object()
 
 
-def _image_bytes_invalid(message: str, detail: str | None = None) -> AiVideoError:
-    return AiVideoError(
-        code=ErrorCode.IMAGE_ASSET_INVALID,
-        user_message=message,
-        technical_detail=detail,
-        retryable=False,
-    )
 
 
 def _image_scope_invalid(message: str, detail: str | None = None) -> AiVideoError:
@@ -123,9 +109,9 @@ class _ImageStrictModel(StrictModel):
 
 
 class ImageProviderParameters(_ImageStrictModel):
-    seed: int = Field(strict=True)
-    width: int = Field(strict=True, gt=0)
-    height: int = Field(strict=True, gt=0)
+    seed: int | None = Field(strict=True)
+    width: int | None = Field(strict=True, gt=0)
+    height: int | None = Field(strict=True, gt=0)
     output_format: Literal["png"]
     generation_revision: int = Field(strict=True, ge=1)
 
@@ -283,6 +269,9 @@ class ImageGenerationRequest(_ImageStrictModel):
         )
         return {
             "schema": (
+                "ai-video-image-request/3"
+                if data["provider_kind"] == "grok"
+                else
                 "ai-video-image-request/2"
                 if uses_continuity_terminal
                 else "ai-video-image-request/1"
@@ -311,6 +300,12 @@ class ImageGenerationRequest(_ImageStrictModel):
 
     @model_validator(mode="after")
     def _validate_sealed_request(self) -> "ImageGenerationRequest":
+        if self.provider_kind != "grok" and any(value is None for value in (
+            self.parameters.seed, self.parameters.width, self.parameters.height,
+        )):
+            raise ValueError("local image requests require explicit seed and geometry")
+        if (self.parameters.width is None) != (self.parameters.height is None):
+            raise ValueError("image geometry must specify both dimensions or neither")
         keys = tuple(_reference_sort_key(item) for item in self.references)
         if keys != tuple(sorted(keys)):
             raise ValueError("image references must use canonical order")
@@ -376,16 +371,26 @@ class ImageGenerationRequest(_ImageStrictModel):
 
 class ImageGenerationPreview(_ImageStrictModel):
     request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
-    local_only: Literal[True]
-    remote: Literal[False]
+    local_only: bool = Field(strict=True)
+    remote: bool = Field(strict=True)
+    remote_call: PaidProviderCallPreview | None = None
     output_count: Literal[1]
     output_mime_type: Literal["image/png"]
     reference_asset_ids: tuple[str, ...] = Field(min_length=2)
     reference_total_bytes: int = Field(strict=True, ge=0)
     preview_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
 
+    @model_serializer(mode="wrap")
+    def _legacy_preview(self, handler):
+        data = handler(self)
+        if self.remote_call is None:
+            data.pop("remote_call", None)
+        return data
+
     @model_validator(mode="after")
     def _validate_sealed_preview(self) -> "ImageGenerationPreview":
+        if self.local_only == self.remote or self.remote != (self.remote_call is not None):
+            raise ValueError("image preview must identify its exact local or remote lane")
         data = self.model_dump(mode="json", exclude={"preview_fingerprint"})
         if canonical_sha256(data) != self.preview_fingerprint:
             raise ValueError("preview_fingerprint does not match image preview")
@@ -397,16 +402,19 @@ class ImageGenerationPreview(_ImageStrictModel):
         *,
         request: ImageGenerationRequest,
         reference_total_bytes: int,
+        remote_call: PaidProviderCallPreview | None = None,
     ) -> "ImageGenerationPreview":
         data: dict[str, object] = {
             "request_fingerprint": request.request_fingerprint,
-            "local_only": True,
-            "remote": False,
+            "local_only": remote_call is None,
+            "remote": remote_call is not None,
             "output_count": 1,
             "output_mime_type": "image/png",
             "reference_asset_ids": tuple(item.asset_id for item in request.references),
             "reference_total_bytes": reference_total_bytes,
         }
+        if remote_call is not None:
+            data["remote_call"] = remote_call.model_dump(mode="json")
         data["preview_fingerprint"] = canonical_sha256(data)
         return cls.model_validate(data)
 
@@ -415,13 +423,23 @@ class ImageGenerationAuthorization(_ImageStrictModel):
     request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     preview_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     provider_enabled: Literal[True]
-    local_only: Literal[True]
+    local_only: bool = Field(strict=True)
+    remote_binding: RemoteImageAuthorization | None = None
     usage_license: str = Field(min_length=1)
     policy_receipt_id: str = Field(min_length=1)
     authorization_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
 
+    @model_serializer(mode="wrap")
+    def _legacy_authorization(self, handler):
+        data = handler(self)
+        if self.remote_binding is None:
+            data.pop("remote_binding", None)
+        return data
+
     @model_validator(mode="after")
     def _validate_sealed_authorization(self) -> "ImageGenerationAuthorization":
+        if self.local_only == (self.remote_binding is not None):
+            raise ValueError("image authorization must identify its exact lane")
         data = self.model_dump(mode="json", exclude={"authorization_fingerprint"})
         if canonical_sha256(data) != self.authorization_fingerprint:
             raise ValueError(
@@ -437,17 +455,22 @@ class ImageGenerationAuthorization(_ImageStrictModel):
         preview: ImageGenerationPreview,
         usage_license: str,
         policy_receipt_id: str,
+        remote_binding: RemoteImageAuthorization | None = None,
     ) -> "ImageGenerationAuthorization":
         if preview.request_fingerprint != request.request_fingerprint:
             raise ValueError("image preview does not match request")
+        if preview.remote_call != (remote_binding.preview if remote_binding else None):
+            raise ValueError("image authorization does not match the remote preview")
         data: dict[str, object] = {
             "request_fingerprint": request.request_fingerprint,
             "preview_fingerprint": preview.preview_fingerprint,
             "provider_enabled": True,
-            "local_only": True,
+            "local_only": remote_binding is None,
             "usage_license": usage_license,
             "policy_receipt_id": policy_receipt_id,
         }
+        if remote_binding is not None:
+            data["remote_binding"] = remote_binding.model_dump(mode="json")
         data["authorization_fingerprint"] = canonical_sha256(data)
         return cls.model_validate(data)
 
@@ -462,6 +485,7 @@ class ImageProviderResult(_ImageStrictModel):
     request_id: str = Field(pattern=r"^[0-9a-f]{64}$")
     request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     image_bytes: bytes = Field(min_length=1)
+    wire_image_bytes: bytes | None = Field(default=None, exclude=True, repr=False)
     image_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     content_type: Literal["image/png"]
     provider_request_id: str | None = None
@@ -470,7 +494,15 @@ class ImageProviderResult(_ImageStrictModel):
     preview_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     authorization_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
     terminal_status: Literal["succeeded"]
+    remote_evidence: RemoteImageEvidence | None = None
     result_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_serializer(mode="wrap")
+    def _legacy_result(self, handler):
+        data = handler(self)
+        if self.remote_evidence is None:
+            data.pop("remote_evidence", None)
+        return data
 
     @field_validator("provider_request_id")
     @classmethod
@@ -493,10 +525,16 @@ class ImageProviderResult(_ImageStrictModel):
             "preview_fingerprint": data["preview_fingerprint"],
             "authorization_fingerprint": data["authorization_fingerprint"],
             "terminal_status": data["terminal_status"],
+            **({"remote_evidence": data["remote_evidence"]} if data.get("remote_evidence") is not None else {}),
         }
 
     @model_validator(mode="after")
     def _validate_sealed_result(self) -> "ImageProviderResult":
+        if self.remote_evidence is not None:
+            wire = self.wire_image_bytes
+            if (wire is None or len(wire) != self.remote_evidence.wire_size_bytes
+                    or hashlib.sha256(wire).hexdigest() != self.remote_evidence.wire_sha256):
+                raise ValueError("remote image wire bytes do not match their provenance")
         expected_image = hashlib.sha256(self.image_bytes).hexdigest()
         if self.image_sha256 != expected_image:
             raise ValueError("image_sha256 does not match exact image_bytes")
@@ -518,6 +556,8 @@ class ImageProviderResult(_ImageStrictModel):
         provider_request_id: str | None,
         adapter: ToolIdentity,
         resource_evidence: ImageLocalResourceEvidence,
+        remote_evidence: RemoteImageEvidence | None = None,
+        wire_image_bytes: bytes | None = None,
     ) -> "ImageProviderResult":
         if authorization.request_fingerprint != request.request_fingerprint:
             raise ValueError("image authorization does not match request")
@@ -534,12 +574,16 @@ class ImageProviderResult(_ImageStrictModel):
             "authorization_fingerprint": authorization.authorization_fingerprint,
             "terminal_status": "succeeded",
         }
+        if remote_evidence is not None:
+            data["remote_evidence"] = remote_evidence
+        if wire_image_bytes is not None:
+            data["wire_image_bytes"] = wire_image_bytes
         serializable = {
             key: value.model_dump(mode="json")
             if isinstance(value, StrictModel)
             else value
             for key, value in data.items()
-            if key != "image_bytes"
+            if key not in {"image_bytes", "wire_image_bytes"}
         }
         data["result_fingerprint"] = canonical_sha256(
             cls._fingerprint_payload(serializable)
@@ -547,14 +591,6 @@ class ImageProviderResult(_ImageStrictModel):
         return cls.model_validate(data)
 
 
-class MeasuredPng(_ImageStrictModel):
-    sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    size_bytes: int = Field(strict=True, gt=0)
-    mime_type: Literal["image/png"]
-    width: int = Field(strict=True, gt=0)
-    height: int = Field(strict=True, gt=0)
-    bit_depth: Literal[1, 2, 4, 8, 16]
-    color_type: Literal[0, 2, 3, 4, 6]
 
 
 class ImageProvenanceReceipt(_ImageStrictModel):
@@ -574,9 +610,17 @@ class ImageProvenanceReceipt(_ImageStrictModel):
     policy_receipt_id: str = Field(min_length=1)
     references: tuple[ImageGenerationReferenceBinding, ...]
     resource_evidence: ImageLocalResourceEvidence
-    remote: Literal[False]
-    cost_receipt_id: None = None
+    remote: bool = Field(strict=True)
+    cost_receipt_id: str | None = None
+    remote_evidence: RemoteImageEvidence | None = None
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_serializer(mode="wrap")
+    def _legacy_provenance(self, handler):
+        data = handler(self)
+        if self.remote_evidence is None:
+            data.pop("remote_evidence", None)
+        return data
 
     @field_validator("provider_request_id")
     @classmethod
@@ -587,6 +631,8 @@ class ImageProvenanceReceipt(_ImageStrictModel):
 
     @model_validator(mode="after")
     def _validate_content_hash(self) -> "ImageProvenanceReceipt":
+        if self.remote != (self.remote_evidence is not None) or self.remote != (self.cost_receipt_id is not None):
+            raise ValueError("image provenance requires truthful remote evidence and cost join")
         if image_receipt_semantic_sha256(self) != self.content_hash:
             raise ValueError("content_hash does not match image provenance receipt")
         return self
@@ -622,70 +668,6 @@ def image_receipt_semantic_sha256(
     return canonical_sha256(payload)
 
 
-def measure_png_bytes(payload: bytes) -> MeasuredPng:
-    if not payload.startswith(_PNG_SIGNATURE):
-        raise _image_bytes_invalid("Image provider output is not a PNG file.")
-
-    cursor = len(_PNG_SIGNATURE)
-    chunk_index = 0
-    saw_idat = False
-    saw_iend = False
-    width = height = bit_depth = color_type = None
-    while cursor < len(payload):
-        if len(payload) - cursor < 12:
-            raise _image_bytes_invalid("PNG output contains a truncated chunk.")
-        length = struct.unpack(">I", payload[cursor : cursor + 4])[0]
-        kind = payload[cursor + 4 : cursor + 8]
-        chunk_end = cursor + 12 + length
-        if chunk_end > len(payload):
-            raise _image_bytes_invalid("PNG output contains a truncated chunk.")
-        chunk_data = payload[cursor + 8 : cursor + 8 + length]
-        expected_crc = struct.unpack(">I", payload[cursor + 8 + length : chunk_end])[0]
-        measured_crc = zlib.crc32(kind + chunk_data) & 0xFFFFFFFF
-        if expected_crc != measured_crc:
-            raise _image_bytes_invalid("PNG output contains an invalid chunk checksum.")
-
-        if chunk_index == 0:
-            if kind != b"IHDR" or length != 13:
-                raise _image_bytes_invalid("PNG output must start with a complete IHDR chunk.")
-            (
-                width,
-                height,
-                bit_depth,
-                color_type,
-                compression,
-                filter_method,
-                interlace,
-            ) = struct.unpack(">IIBBBBB", chunk_data)
-            if width <= 0 or height <= 0:
-                raise _image_bytes_invalid("PNG output has invalid dimensions.")
-            if bit_depth not in _PNG_BIT_DEPTHS.get(color_type, set()):
-                raise _image_bytes_invalid("PNG output has an invalid color type or bit depth.")
-            if compression != 0 or filter_method != 0 or interlace not in {0, 1}:
-                raise _image_bytes_invalid("PNG output has unsupported IHDR methods.")
-        elif kind == b"IHDR":
-            raise _image_bytes_invalid("PNG output contains more than one IHDR chunk.")
-
-        if kind == b"IDAT":
-            saw_idat = True
-        if kind == b"IEND":
-            if length != 0 or not saw_idat or chunk_end != len(payload):
-                raise _image_bytes_invalid("PNG output has an invalid IEND boundary.")
-            saw_iend = True
-        cursor = chunk_end
-        chunk_index += 1
-
-    if not saw_iend or width is None or height is None:
-        raise _image_bytes_invalid("PNG output is incomplete.")
-    return MeasuredPng(
-        sha256=hashlib.sha256(payload).hexdigest(),
-        size_bytes=len(payload),
-        mime_type="image/png",
-        width=width,
-        height=height,
-        bit_depth=bit_depth,
-        color_type=color_type,
-    )
 
 
 # Private compatibility alias for existing sealed image readers/importers.
@@ -709,14 +691,23 @@ def validate_image_result(
 
     measured = measure_png_bytes(result.image_bytes)
     if (
-        measured.width != request.parameters.width
-        or measured.height != request.parameters.height
+        request.parameters.width is not None and measured.width != request.parameters.width
+        or request.parameters.height is not None and measured.height != request.parameters.height
     ):
         raise _image_bytes_invalid(
             "Image provider output dimensions do not match the request.",
             f"expected={request.parameters.width}x{request.parameters.height}, "
             f"measured={measured.width}x{measured.height}",
         )
+    remote = authorization.remote_binding
+    if (remote is None) != (result.remote_evidence is None):
+        raise _image_scope_invalid("Image result remote provenance does not match its authority.")
+    if remote is not None:
+        submit = result.remote_evidence.submit_receipt
+        if (submit.attempt_id != request.attempt_id or submit.request_fingerprint != request.request_fingerprint
+                or submit.preview_fingerprint != remote.preview.preview_fingerprint
+                or submit.external_effect_id != result.provider_request_id):
+            raise _image_scope_invalid("Image submit receipt does not match its exact request.")
     receipt = ImageProvenanceReceipt.create(
         request_id=request.request_id,
         request_fingerprint=request.request_fingerprint,
@@ -734,8 +725,9 @@ def validate_image_result(
         policy_receipt_id=authorization.policy_receipt_id,
         references=request.references,
         resource_evidence=result.resource_evidence,
-        remote=False,
-        cost_receipt_id=None,
+        remote=remote is not None,
+        cost_receipt_id=(result.remote_evidence.submit_receipt.submit_receipt_fingerprint if remote else None),
+        **({"remote_evidence": result.remote_evidence} if remote else {}),
     )
     return measured, receipt
 
@@ -986,8 +978,8 @@ def validate_image_activation_candidate(
         input_fingerprint=request.request_fingerprint,
         creation_receipt_id=receipt.content_hash,
         usage_license=authorization.usage_license,
-        egress=EgressMetadata(remote=False),
-        cost_receipt_id=None,
+        egress=remote_image_egress(authorization.remote_binding),
+        cost_receipt_id=receipt.cost_receipt_id,
     )
     if candidate_registry.assets[-1] != expected_record:
         raise _image_scope_invalid(

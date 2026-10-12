@@ -15,6 +15,7 @@ PRIVATE_MODULES = (
     "_state_commit_image_intent.py",
     "_state_commit_image_candidate.py",
     "_state_commit_image_activation.py",
+    "_state_commit_remote_image.py",
     "_state_commit_dependency.py",
     "_state_commit_render_lifecycle.py",
     "_state_commit_render_support.py",
@@ -172,10 +173,12 @@ def test_image_candidate_and_activation_methods_have_private_domain_owners() -> 
     activation = importlib.import_module(
         "ai_video.production._state_commit_image_activation"
     )
+    remote = importlib.import_module("ai_video.production._state_commit_remote_image")
     committer = facade.ProductionStateCommitter
     assert committer._prepare_validated_image_candidate.__module__ == candidate.__name__
     assert committer.generate_image_asset.__module__ == activation.__name__
     assert committer.activate_image_asset.__module__ == activation.__name__
+    assert committer.generate_remote_image_asset.__module__ == remote.__name__
 
 
 def test_video_candidate_and_activation_methods_have_private_domain_owners() -> None:
@@ -227,6 +230,7 @@ def test_committer_mro_preserves_approved_domain_order() -> None:
         "_StateCommitImageIntentMixin",
         "_StateCommitImageCandidateMixin",
         "_StateCommitImageActivationMixin",
+        "_StateCommitRemoteImageMixin",
         "_StateCommitVoiceIntentMixin",
         "_StateCommitVoiceCandidateMixin",
         "_StateCommitVoiceActivationMixin",

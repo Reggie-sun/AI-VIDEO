@@ -149,6 +149,7 @@ class _StateCommitPaidProviderMixin:
                 policy_id=budget.policy_id,
                 currency=budget.currency,
                 project_ceiling_microunits=entry.new_ceiling_microunits,
+                subscription_submit_limit=budget.subscription_submit_limit,
                 reservations=budget.reservations,
                 ceiling_extensions=(*budget.ceiling_extensions, entry),
                 submit_quota_extensions=budget.submit_quota_extensions,
@@ -350,6 +351,12 @@ class _StateCommitPaidProviderMixin:
                                 "Routed voice and selected video do not fit the current shared budget.",
                                 str(exc),
                             ) from exc
+            elif preview.operation == "image_generation":
+                from ai_video.production._remote_image_reader import validate_remote_image_paid_intent
+                try:
+                    validate_remote_image_paid_intent(self._project_root, attempt, preview, authorization)
+                except (ValueError, OSError) as exc:
+                    raise _state_invalid("Image paid intent does not match its durable request.") from exc
             elif preview.operation == "ad_generation":
                 from ai_video.production.vidu_ad_reader import validate_ad_intent
                 try:
@@ -514,6 +521,14 @@ class _StateCommitPaidProviderMixin:
             manifest = ProductionManifest.model_validate_json(raw.data)
             attempt = self._paid_attempt(manifest, binding["attempt_id"])
             state = attempt.paid_provider_state
+            if attempt.operation == "image_generation":
+                from ai_video.production._remote_image_reader import (
+                    validate_remote_image_paid_intent, reopen_remote_image_authority,
+                )
+                gate = self._reopen_paid_gate(state.gate_receipt)
+                validate_remote_image_paid_intent(self._project_root, attempt, gate.preview, gate.authorization)
+                request, preview, _ = reopen_remote_image_authority(self._project_root, attempt)
+                self._validate_image_request_context(manifest, request, preview)
             if attempt.operation == "ad_generation":
                 from ai_video.production.vidu_ad_reader import reopen_ad_request, validate_ad_images
                 from ai_video.production.vidu_ad_provider import ad_preview
