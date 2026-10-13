@@ -145,6 +145,11 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_canvas_reference_packet.py, tests/test_canvas_sequence_packet.py, tests/test_canvas_sequence_handoff.py, tests/test_canvas_production_source.py, tests/test_canvas_assets.py, tests/test_canvas_authoring.py, tests/test_canvas_planning.py, tests/test_canvas_production.py, tests/test_canvas_recovery.py, tests/test_canvas_render.py, tests/test_canvas_project_data.py, tests/test_canvas_edit_order.py, tests/test_canvas_continuity.py, tests/test_canvas_external_image.py, -q]
     cwd: .
     description: Verify faithful source inspection and shared canonical authoring, accepted-source handoff, replay, unknown stop, graph revision, native audio and scripted final rendering; no live media acceptance.
+  canvas_project_data_check:
+    argv: [python, -m, scripts.agent_harness_canvas_data]
+    cwd: .
+    scope_paths: true
+    description: Reopen affected Canvas source and assets through strict read-only author/preflight; no Production lifecycle or media acceptance.
   canvas_preserved_source_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_canvas_source_subject.py, tests/test_canvas_source_expression.py, tests/test_seedance_source_expression.py, tests/test_seedance_source_dialogue.py, tests/test_source_grounded_sequence.py, tests/test_source_grounded_route_selection.py, -q]
     cwd: .
@@ -231,7 +236,7 @@ checks:
     execution_priority: 18
     description: Reject Agent Skill imports, loaders, paths, and direct Skill identities in Product Runtime source.
   harness_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_docs_contract_gate.py, tests/test_agent_harness.py, tests/test_agent_harness_policy.py, tests/test_record_ai_video_session_hook.py, tests/test_claude_code_adapter.py, -q, --durations=20, --durations-min=0.1]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_docs_contract_gate.py, tests/test_agent_harness.py, tests/test_agent_harness_policy.py, tests/test_agent_harness_canvas_data.py, tests/test_record_ai_video_session_hook.py, tests/test_claude_code_adapter.py, -q, --durations=20, --durations-min=0.1]
     cwd: .
     description: Verify Harness scope, routing, isolation, receipts, and Make targets.
   local_comfyui_supervisor_tests:
@@ -266,6 +271,7 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests, -k, "production or video_candidate or video_generation", -q]
     cwd: .
     timeout_seconds: 2400
+    covers_check_ids: [production_image_reader_tests, production_image_state_tests, production_image_dependency_tests]
     description: Verify all Production surfaces for shared schema, reader, writer, and lifecycle owners.
   production_reader_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_models.py, tests/test_production_validation.py, tests/test_production_registry.py, tests/test_production_project.py, tests/test_config.py, tests/test_cli.py, -q]
@@ -296,9 +302,24 @@ checks:
     cwd: .
     description: Verify product-aware commercial source projection, registered import, semantic approval, planner routing, scoped repair, replay, and recovery without Provider effects.
   production_image_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_image.py, tests/test_production_image_e2e.py, tests/test_production_comfy_image.py, tests/test_production_image_import.py, tests/test_production_p7_1_local_image_e2e.py, tests/test_production_models.py, tests/test_production_registry.py, tests/test_production_validation.py, tests/test_production_project.py, tests/test_production_dependency.py, tests/test_production_selective_rebuild.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, tests/test_comfy_client.py, tests/test_workflow_loader.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_image.py, tests/test_production_image_e2e.py, tests/test_production_comfy_image.py, tests/test_production_image_import.py, tests/test_production_p7_1_local_image_e2e.py, tests/test_comfy_client.py, tests/test_workflow_loader.py, -q]
     cwd: .
-    description: Verify image contracts, local adapter, truthful import, activation, and recovery.
+    description: Verify image contracts, local adapter, truthful import, activation, and image recovery E2E; shared reader/graph/writer tests route through their own changed boundaries.
+  production_image_reader_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_models.py, tests/test_production_registry.py, tests/test_production_validation.py, tests/test_production_project.py, -k, "image or p7", -q]
+    cwd: .
+    covered_by_check_ids: [production_reader_tests]
+    description: Verify image/P7 model, strict reader and evidence boundaries; skip only after the full reader owner passes in this run.
+  production_image_state_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -k, "image or p7", -q]
+    cwd: .
+    covered_by_check_ids: [production_state_tests]
+    description: Verify image/P7 permit, activation, replay, unknown and process-crash recovery boundaries; skip only after the full state owner passes in this run.
+  production_image_dependency_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_dependency.py, tests/test_production_selective_rebuild.py, -k, "image or p7", -q]
+    cwd: .
+    covered_by_check_ids: [production_dependency_tests]
+    description: Verify image/P7 graph and selective rebuild boundaries; skip only after the full dependency owner passes in this run.
   production_video_provider_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_paid_provider.py, tests/test_production_paid_budget_extension.py, tests/test_paid_budget_read_traversal.py, tests/test_production_paid_submit_quota.py, tests/test_production_video_unsubmitted.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_nominal_endpoint_recovery.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_video_pre_generation.py, tests/test_production_ecommerce_shot_candidate_gate.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_comfy_t8_native_long_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_metaso_h3.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_production_seedance_rejection.py, tests/test_seedance_source_prompt.py, tests/test_shot_continuity_source_review.py, tests/test_shot_continuity_source_operator.py, tests/test_shot_continuity_source_transport.py, -q, --durations=20, --durations-min=0.1]
     cwd: .
@@ -436,6 +457,9 @@ checks:
       - production_dependency_tests
       - production_review_tests
       - production_image_tests
+      - production_image_reader_tests
+      - production_image_state_tests
+      - production_image_dependency_tests
       - final_output_no_regression_tests
       - production_video_provider_tests
       - seedance_local_video_tests
@@ -611,6 +635,7 @@ categories:
       - scripts/harness_pytest_guard.py
       - tests/test_agent_harness.py
       - tests/test_agent_harness_policy.py
+      - tests/test_agent_harness_canvas_data.py
       - tests/test_docs_contract_gate.py
       - tests/test_agent_rules_gate.py
       - .agent/harness/**
@@ -943,7 +968,6 @@ categories:
     patterns:
       - scripts/canvas_production.py
       - src/ai_video/production/authoring_input.py
-      - docs/canvas-projects/**
       - tests/test_canvas_project_data.py
       - tests/test_canvas_edit_order.py
       - tests/test_canvas_continuity.py
@@ -960,6 +984,13 @@ categories:
     check_ids:
       - canvas_production_workflow_tests
       - task_architecture_gate
+  canvas_project_data:
+    patterns:
+      - docs/canvas-projects/**
+    exclude_patterns:
+      - docs/canvas-projects/**/*.md
+    check_ids:
+      - canvas_project_data_check
   canvas_preserved_source:
     patterns:
       - src/ai_video/production/seedance_source_expression.py
@@ -1018,8 +1049,21 @@ categories:
       - tests/test_production_image_import.py
       - tests/test_production_p7_1_local_image_e2e.py
       - tests/fixtures/p7_1/**
+    exclude_patterns:
+      - src/ai_video/production/_image_project_reader.py
+      - src/ai_video/production/_image_video_lineage.py
     check_ids:
       - production_image_tests
+      - production_image_reader_tests
+      - production_image_state_tests
+      - production_image_dependency_tests
+      - task_architecture_gate
+  production_image_lineage:
+    patterns:
+      - src/ai_video/production/_image_project_reader.py
+      - src/ai_video/production/_image_video_lineage.py
+    check_ids:
+      - production_reader_tests
       - task_architecture_gate
   seedream_image:
     patterns:

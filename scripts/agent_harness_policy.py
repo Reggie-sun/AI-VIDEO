@@ -52,6 +52,12 @@ def matches_any(path: str, patterns: Iterable[str]) -> bool:
     return any(matches(path, pattern) for pattern in patterns)
 
 
+def matches_category(path: str, category: Mapping[str, Any]) -> bool:
+    return matches_any(path, category["patterns"]) and not matches_any(
+        path, category.get("exclude_patterns", [])
+    )
+
+
 def string_list(mapping: Mapping[str, Any], key: str) -> list[str]:
     value = mapping.get(key, [])
     if not isinstance(value, list) or not all(isinstance(item, str) for item in value):
@@ -102,7 +108,7 @@ def validate_policy(policy: object, *, source: str | Path) -> dict[str, Any]:
         check_timeout = config.get("timeout_seconds", timeout)
         if not isinstance(check_timeout, (int, float)) or check_timeout <= 0:
             raise ValueError(f"check {check_id!r} timeout_seconds must be positive")
-        for flag in ("scope_diff", "task_architecture"):
+        for flag in ("scope_diff", "task_architecture", "scope_paths"):
             if not isinstance(config.get(flag, False), bool):
                 raise ValueError(f"check {check_id!r} {flag} must be boolean")
         for dependency_path in string_list(
@@ -154,6 +160,7 @@ def validate_policy(policy: object, *, source: str | Path) -> dict[str, Any]:
             isinstance(item, str) for item in patterns
         ):
             raise ValueError(f"category {category_name!r} patterns must be list[str]")
+        string_list(category, "exclude_patterns")
         referenced.extend(string_list(category, "check_ids"))
     unknown = sorted(set(referenced) - known_check_ids)
     if unknown:
@@ -253,9 +260,8 @@ def inspect_paths(paths: Iterable[str | Path], policy: Mapping[str, Any]) -> dic
     category_checks: list[str] = []
     matched_paths: set[str] = set()
     for category_name, category in policy["categories"].items():
-        patterns = category["patterns"]
         category_matches = [
-            path for path in active_paths if matches_any(path, patterns)
+            path for path in active_paths if matches_category(path, category)
         ]
         if category_matches:
             categories.append(category_name)

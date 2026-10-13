@@ -101,6 +101,7 @@ reservation、egress、durable intent、one-use permit。Local video 仍经 `Vid
 `make harness-inspect` → exact staged snapshot 或 commit range 的 `make harness-verify` / `make harness-verify-range`
 → `make harness-receipt`。核验 scope/policy/artifact hashes/freshness；isolation/fallback 由 Harness tests 验证。
 `agent_rules_check` 每轮检查 rules/check references、links/anchors、guide/context budgets；`agent_rule_invariants` 与原 changed-path suites 验证迁移 invariant。
+迭代跑 focused tests，修复完成且 owned bytes 稳定后再跑最终 exact Harness；运行中不修改 snapshot，drift/读取失败停余项。数据/工程、image/shared-boundary 的 routing 与覆盖只归 policy，失效 receipt 不复用。
 Harness 不生成媒体或读 secret；CI 自产证据；remote enforcement 必须当前 server evidence。
 真实批量媒体前先完成约 30–60 秒、4–8 连续 Shots 的代表性 Pilot，包含任务主要 media/audio/captions/composition，
 人实际观看给 GO/NO-GO；NO-GO 不扩量。Reference asset 不自动成为 Final Shot Visual，跨非连续 Shot 复用须导演理由和人工 review。
@@ -112,6 +113,7 @@ Harness 不生成媒体或读 secret；CI 自产证据；remote enforcement 必�
 缺 prerequisite 先完成最小补齐；用户明确先做 contract 则遵从。纯确定性任务不生成媒体。
 记录 triage 时说明 `next_empirical_question`、`cheapest_valid_experiment` 与 `blocking_prerequisite`。
 实验隔离于 active truth，PASS/FAIL 不授权 qualification、activation、P6/acceptance，不改变 frozen rubric。
+制作前先绑定用户原 source、目标片段与声画 AC；自编技术样例仅证明其测试对象，不能替代原剧本验收。能力已满足时直接制作，只有当前输入或 runtime 证据证明缺口才修改共享工程。
 
 ### HyperFrames Caption Source Readiness
 
@@ -181,11 +183,10 @@ learning evaluation。Trivial/unfinished 明确 no_record；无合格学习 evid
 ## Agent Workflow Operations
 
 ### Workflow Selection
-Native Codex 默认 primary；Skill 按需加载，不自动拥有 lifecycle。T0 局部可逆用 targeted validation；T1 bounded multi-file 必要时 plan；T2 architecture/workflow/Provider/Harness/shared schema 走 research → spec → plan → implement → verify → review；T3 ownership/verification/paid/credential/recovery/QA contract 保留严格验证，不自动双审。Bug 先 root-cause/systematic-debugging，再 regression validation。Spec/plan 默认 Parent self-review，不默认独立 reviewer；authorized written spec 自动使用 `superpowers:writing-plans`。
+Native Codex 默认 primary；settled bounded task 直接实施与 focused verification，不因 documentation、configuration、Harness 或多文件强制 full workflow。重大未决 architecture/contract 才先设计，必要时 research；authorized written spec 自动使用 `superpowers:writing-plans`。Spec/Plan 默认 Parent self-review；paid/credential/recovery/QA 的严格 gates 保留，review 按下文 Risk Gate，不自动双审。
 
 ### Cognition Tools
-跨模块修改、架构理解、影响分析、复杂 bug、重构或重要功能开发时，按需先用 AOCI 获取职责、语义关系、API 与约束，再用 CodeGraph 核对 symbol、reference、dependency/call graph，以源码/LSP 为具体事实、tests 为最终验证。简单局部任务没有实际 AOCI 认知需求时，禁止仅为流程完整机械调用 AOCI。
-AOCI cognition 永远不是 source of truth；Overview、Entry 与检索结果只作 advisory context，不能代替当前源码、tests、已验证 runtime evidence 或 canonical contracts。AOCI 正式认知位于 `aoci.txt`、`aoci.meta.txt`、`aoci.code.txt`；当前状态、维护顺序和安全停点以项目 AOCI MCP 的 `aoci_rules`、实时 Guide、工具返回及官方文档为准。索引语义必须基于当前源码和契约证据由模型编写；若认知与源码或 CodeGraph 不符，应修正认知，不能覆盖源码事实。受管理对象在最终稳定状态后按 AOCI 官方流程维护，不能把未对齐索引称为完整认知。
+结构关系使用 CodeGraph；职责/语义确有缺口才加 AOCI，简单局部任务禁止机械调用。源码/LSP/tests/runtime 与 canonical contracts 是事实，AOCI 永远 advisory；不符时修正索引，不能覆盖源码。正式认知归 `aoci.txt`、`aoci.meta.txt`、`aoci.code.txt`，语义由模型基于当前 source/contract evidence 编写；状态、维护顺序和安全停点遵从项目 MCP 的 `aoci_rules`、实时 Guide、工具返回及官方文档。稳定后按官方流程维护，不把未对齐索引称为完整认知。
 
 ### Constructing An Immutable Review Target
 

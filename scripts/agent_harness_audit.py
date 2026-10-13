@@ -9,8 +9,10 @@ from typing import Any
 
 try:
     from scripts import docs_contract_gate
+    from scripts.agent_harness_policy import matches_category
 except ModuleNotFoundError:  # Direct ``python scripts/agent_harness.py`` execution.
     import docs_contract_gate  # type: ignore[no-redef]
+    from agent_harness_policy import matches_category  # type: ignore[no-redef]
 
 
 NON_BEHAVIORAL_CHECK_IDS = {"scope_diff_check", "task_architecture_gate"}
@@ -39,16 +41,15 @@ def audit_policy_coverage(
         and not _matches_any(path, policy["audit_exempt_patterns"])
     ]
     categories = policy["categories"].values()
-    category_patterns = [
-        pattern for category in categories for pattern in category["patterns"]
-    ]
-    unmapped = [path for path in candidates if not _matches_any(path, category_patterns)]
+    unmapped = [path for path in candidates if not any(
+        matches_category(path, category) for category in categories
+    )]
     unverified = []
     for path in candidates:
         check_ids = {
             check_id
             for category in policy["categories"].values()
-            if _matches_any(path, category["patterns"])
+            if matches_category(path, category)
             for check_id in category.get("check_ids", [])
         }
         if path not in unmapped and not (check_ids - NON_BEHAVIORAL_CHECK_IDS):

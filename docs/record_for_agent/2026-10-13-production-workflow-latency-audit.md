@@ -8,6 +8,10 @@ learning_eligibility: ineligible
 
 Date: 2026-10-13
 
+## Supersession Notice - 2026-10-14
+
+用户已要求实施；[Harness implementation](2026-10-14-harness-latency-implementation.md) 落实数据/runtime routing、image boundary 去重、只读 lineage routing、early snapshot drift stop 与 focused/final cadence。下文诊断及历史计数保留；“所有建议保持未采用”仅描述审计当时。全局 Kimi mandatory/maximum policy 与真实媒体验收要求保持原样。
+
 ## Scope And Evidence
 
 用户要求查看近期 Codex 制作会话，识别重复流程与过宽 Harness 验证。本次是诊断，

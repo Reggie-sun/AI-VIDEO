@@ -387,9 +387,18 @@ def _check_argv(
     if config.get("task_architecture"):
         base_oid = scope["head_oid"] if scope["mode"] == "staged" else scope["base_oid"]
         argv = (*argv, "--base-ref", str(base_oid))
+    if config.get("scope_paths"):
+        argv = (*argv, *(f"--paths={path}" for path in scope["changed_paths"]))
     if junit_path is not None and "pytest" in argv:
         argv = (*argv, f"--junitxml={junit_path}")
     return argv
+
+
+def _verification_snapshot(snapshot_after, source_snapshot):
+    try:
+        return dict(snapshot_after() if snapshot_after else source_snapshot)
+    except (OSError, subprocess.CalledProcessError, ValueError) as exc:
+        return {"error": f"{type(exc).__name__}: {exc}"}
 
 
 def verify_inspection(
@@ -457,9 +466,20 @@ def verify_inspection(
 
     env = build_check_environment()
     passed = True
+    drift_snapshot = None
     passed_check_ids: set[str] = set()
     check_ids = list(inspection["check_ids"])
     for check_index, check_id in enumerate(check_ids, start=1):
+        checkpoint = _verification_snapshot(snapshot_after, source_snapshot)
+        if checkpoint != dict(source_snapshot):
+            passed = False
+            drift_snapshot = checkpoint
+            for skipped_id in check_ids[check_index - 1:]:
+                receipt["checks"].append({
+                    "check_id": skipped_id, "status": "skipped",
+                    "reason": "blocked by source scope change",
+                })
+            break
         config = policy["checks"][check_id]
         passed_covering_group = next(
             (
@@ -566,10 +586,9 @@ def verify_inspection(
         passed_check_ids.add(check_id)
         receipt_io.write_receipt(receipt_path, receipt)
 
-    try:
-        after = dict(snapshot_after() if snapshot_after else source_snapshot)
-    except (OSError, subprocess.CalledProcessError, ValueError) as exc:
-        after = {"error": f"{type(exc).__name__}: {exc}"}
+    after = drift_snapshot if drift_snapshot is not None else _verification_snapshot(
+        snapshot_after, source_snapshot
+    )
     receipt["source_snapshot_after"] = after
     receipt["workspace_stable"] = dict(source_snapshot) == after
     if not receipt["workspace_stable"]:

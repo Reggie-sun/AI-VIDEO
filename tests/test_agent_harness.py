@@ -1012,6 +1012,10 @@ def test_production_policy_commands_cover_repository_mandatory_contract_tests() 
         "tests/test_production_registry.py",
         "tests/test_production_validation.py",
         "tests/test_production_project.py",
+    ):
+        assert path in policy["checks"]["production_reader_tests"]["argv"]
+        assert path not in image_argv
+    for path in (
         "tests/test_comfy_client.py",
         "tests/test_workflow_loader.py",
     ):
