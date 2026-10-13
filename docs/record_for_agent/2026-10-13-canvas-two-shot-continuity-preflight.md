@@ -26,6 +26,14 @@ HTTP200、model仍为 `doubao-seedance-2-0-fast-260128`、state=failed，实际 
 [官方 API Explorer](https://api.volcengine.com/api-explorer/?action=CreateContentsGenerationsTasks&groupName=%E8%A7%86%E9%A2%91%E7%94%9F%E6%88%90API&serviceCode=ark&version=2024-01-01)
 将 base `OutputVideoSensitiveContentDetected` 说明为生成的视频可能包含敏感信息。
 当前子码来自 actual response；未取得被拒输出，不能推断具体触发画面或保证改写能成功。
+2026-10-13 对用户“为什么失败、耗钱了吗”的补证：
+[官方错误码文档](https://docs.volcengine.com/docs/ark/error-codes?lang=en)
+对 exact `OutputVideoSensitiveContentDetected.PolicyViolation` 的解释为生成的视频可能涉及版权限制。
+这是平台审核分类；没有被拒视频，不能确定具体触发内容或判定是否误判。
+[官方视频生成计费说明](https://docs.volcengine.com/docs/ark/model-pricing?lang=zh)
+明确仅对成功生成的视频计费，因审核等原因失败不收费。因此本任务按规则应不收费；
+未逐条核验账户账单，规则证据不冒充实际结算，不写入 actual0、不释放 reservation或恢复 submit额度。
+50 CNY 仍只是内部 operator upper bound，不是已经扣款；本次补证没有新增 Provider或媒体调用。
 
 这是 accepted task 后的 terminal failure，**不是 known_no_effect、unknown 或 MP4质量验收**。
 canonical runtime diagnosis 为 `RUNTIME_FAILURE`；Manifest46 / project revision6，next_action=stop。
