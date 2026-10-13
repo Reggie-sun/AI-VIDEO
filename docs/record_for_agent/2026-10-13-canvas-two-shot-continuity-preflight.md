@@ -8,6 +8,14 @@ learning_eligibility: ineligible
 
 Date: 2026-10-13
 
+## Original Story Scope Correction — 2026-10-13
+
+用户已明确：下方asset-first抬手机A/起身B是Agent简化测试，不是《界蚀》原S01/S02。
+不能将其input、六项视觉findings或剩余B额度作为原剧本执行/accepted source/新paid许可。
+历史媒体、receipt、NOT_EVALUATED和消费计数全部保留，B仍未提交。
+当前目标及实际候选/缺口见[原S01→S02记录](2026-10-13-jieshi-original-s01-s02-candidate.md)：
+原两镜仅覆盖0–7秒，原前15秒还包括S03/S04；新的image/video POST仍为0。
+
 ## Asset First A Fetched — Evidence Repair Required
 
 本节取代下节“视频0次”的当前状态；旧计数仍作为历史保留。共享原图与 original-video

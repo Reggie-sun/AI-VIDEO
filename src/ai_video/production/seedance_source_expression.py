@@ -561,6 +561,7 @@ def compile_preserved_seedance_source(bound, requirement, continuity_expression=
 
 def _source_native_prompt(bound, requirement, prompt, endpoint_controls):
     from ai_video.production.video_compiler import ProviderNativePrompt
+    from ai_video.production.seedance_source_dialogue import source_dialogue_controls
 
     intent = requirement.generation_intent
     controls = (
@@ -576,6 +577,7 @@ def _source_native_prompt(bound, requirement, prompt, endpoint_controls):
     dialogue = intent.dialogue_intent
     if dialogue is not None and dialogue.mode == "none":
         controls += ("generation_intent.dialogue_intent.lip_sync_required",)
+    controls += source_dialogue_controls(dialogue, prompt, bound.output_requirement)
 
     return ProviderNativePrompt(
         grammar_contract="seedance-preserved-source-v1",

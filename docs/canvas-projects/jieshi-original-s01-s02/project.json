@@ -1,0 +1,404 @@
+{
+  "schema_version": "canvas-project-data/1",
+  "source": "source.json",
+  "selection": {
+    "node_ids": [
+      "S01",
+      "S02"
+    ]
+  },
+  "direction": {
+    "project_id": "jieshi-original-s01-s02",
+    "title": "界蚀 原剧本 S01→S02 候选",
+    "language": "zh",
+    "brief": {
+      "objective": "忠实执行原剧本前两镜0–7s；不代表S01–S04完整前15s或AC-7。",
+      "audience": "短剧观众",
+      "format": "9:16 short drama"
+    },
+    "story": {
+      "logline": "林砚没有倒影，广播点名，随后向邻座求证。",
+      "synopsis": "本候选仅S01→S02；后续S03否认广播、S04乘客毫无异常反应保持映射但不授权生成。",
+      "beats": [
+        {
+          "beat_id": "B01",
+          "summary": "倒影异常与点名广播、字幕同时构成3s钩子。"
+        },
+        {
+          "beat_id": "B02",
+          "summary": "林砚求证。"
+        }
+      ]
+    },
+    "characters": [
+      {
+        "character_id": "linyan",
+        "name": "林砚",
+        "identity": "24岁男性，普通上班族；观察、求证，不主动解释未知机制。 窄长脸、直眉、短黑发左侧自然分缝，干净下颌；身高约178cm，偏瘦；不使用演员或既有作品人物相貌。",
+        "appearance_bible": "24岁男性，普通上班族；观察、求证，不主动解释未知机制。 窄长脸、直眉、短黑发左侧自然分缝，干净下颌；身高约178cm，偏瘦；不使用演员或既有作品人物相貌。\nWardrobe：深灰短夹克敞开；浅灰圆领T恤；黑色直筒长裤；灰白运动鞋；蓝色挂绳矩形白工牌。\nGoal / Knowledge：和女孩一起离开异常列车，并确认父母安全。 知道自己所乘是环线；第一次预见前不懂能力；看见重复动作后才敢干预。\nEmotion / Relationship：困惑→自我怀疑→克制恐惧→承担救人风险→短暂放松→存在性失落。 不认识女孩；她阻止他应答，他提前拉开她，形成互救。\nVoice / Props：自然普通话，中低音，短句；不播音腔、不喊规则。 唯一黑壳手机；通常解剖右手持机，抓女孩前用左手；S34收进右裤袋，S49取出。工牌全程挂胸前。\nAllowed Change：倒影缺席只发生于S01，S05恢复；属于界蚀初期观测异常，不算额外一次预见；S33后工作群里他的成员记录消失；S37后工牌头像姓名消失，其余版面和挂绳保持；结尾母亲不认识他且历史监控追溯性缺席；在女孩的直接视野中仍可见",
+        "reference_asset_ids": []
+      },
+      {
+        "character_id": "suyao",
+        "name": "苏遥",
+        "identity": "约20岁女性，制作角色名苏遥；本集对白、手机文字和监控提示均不揭露她的姓名或身份，只显示她更早警觉，绝不证实短信由她发送。 椭圆脸、齐肩深黑直发、中分、无刘海，身高约165cm。",
+        "appearance_bible": "约20岁女性，制作角色名苏遥；本集对白、手机文字和监控提示均不揭露她的姓名或身份，只显示她更早警觉，绝不证实短信由她发送。 椭圆脸、齐肩深黑直发、中分、无刘海，身高约165cm。\nWardrobe：米白短外套；墨绿圆领上衣；深蓝直筒牛仔裤；白色帆布鞋。\nGoal / Knowledge：活着离开，避免让广播锁定更多回应。 看见重复异常和陌生信息，能提出观察与怀疑；不知道界蚀原理，不说全知解释。\nEmotion / Relationship：戒备→判断对方也被困→惊吓→因为被救而信任→发现他看见黑屏文字后重新不安。 初见时回避；S31被救后主动用身体让开逃生路线；结尾成为唯一在场见证者。\nVoice / Props：自然普通话，中音偏低，压低音量但字头清楚；非耳语气声。 唯一乳白手机壳，解剖左手持机；右手示警、拉袖口、被林砚左手抓住右腕。\nAllowed Change：恐惧强度和呼吸变化；衣服完整，无伤口无换装",
+        "reference_asset_ids": []
+      },
+      {
+        "character_id": "zhouboxiang",
+        "name": "周伯祥",
+        "identity": "65岁左右男性乘客，第一位下车者；异常投影的性质不解释。 灰白短发，瘦脸，圆肩。",
+        "appearance_bible": "65岁左右男性乘客，第一位下车者；异常投影的性质不解释。 灰白短发，瘦脸，圆肩。\nWardrobe：棕色针织开衫；灰衬衫；黑裤；黑布鞋。\nGoal / Knowledge：表面离站，实则形成诱导。 不表达内心信息。\nEmotion / Relationship：恒定温和、无夸张表情。 陌生乘客。\nVoice / Props：无台词。 无手杖、无包；仅解剖右手挥动。\nAllowed Change：S20消失、S21出现在远端属于明确异常；不得生成瞬移拖影或实体变形",
+        "reference_asset_ids": []
+      },
+      {
+        "character_id": "chenli",
+        "name": "陈立",
+        "identity": "约35岁男性乘客，起初邻座，后堵门。 方脸、短寸发，中等身形。",
+        "appearance_bible": "约35岁男性乘客，起初邻座，后堵门。 方脸、短寸发，中等身形。\nWardrobe：灰色连帽卫衣；深蓝长裤；黑鞋。\nGoal / Knowledge：堵住出口并把女孩挤向站台，意图只通过行为显现。 不解释。\nEmotion / Relationship：前段平常；S30之后动作无表情。 与两人无熟识关系。\nVoice / Props：普通话，漫不经心。 黑色耳机和深蓝手机；S27把手机放回卫衣前袋。\nAllowed Change：坐下→起身→单次肩撞→伸右手挡门；无受伤表现",
+        "reference_asset_ids": []
+      },
+      {
+        "character_id": "xuwen",
+        "name": "许雯",
+        "identity": "静态背景乘客，不增加支线。 30岁，短发，海军蓝风衣、黑裤，黑色手机",
+        "appearance_bible": "静态背景乘客，不增加支线。 30岁，短发，海军蓝风衣、黑裤，黑色手机\nWardrobe：30岁，短发，海军蓝风衣、黑裤，黑色手机。\nGoal / Knowledge：正常时维持日常；异常时形成静态阻挡。 不表达。\nEmotion / Relationship：平常→无表情。 陌生背景乘客。\nVoice / Props：无台词。 30岁，短发，海军蓝风衣、黑裤，黑色手机\nAllowed Change：单次抬眼或站起；不群跑、不新增独立动作",
+        "reference_asset_ids": []
+      },
+      {
+        "character_id": "guoxiangdong",
+        "name": "郭向东",
+        "identity": "静态背景乘客，不增加支线。 40岁，黑色棒球帽、深蓝棉外套、灰裤，无独立道具",
+        "appearance_bible": "静态背景乘客，不增加支线。 40岁，黑色棒球帽、深蓝棉外套、灰裤，无独立道具\nWardrobe：40岁，黑色棒球帽、深蓝棉外套、灰裤，无独立道具。\nGoal / Knowledge：正常时维持日常；异常时形成静态阻挡。 不表达。\nEmotion / Relationship：平常→无表情。 陌生背景乘客。\nVoice / Props：无台词。 40岁，黑色棒球帽、深蓝棉外套、灰裤，无独立道具\nAllowed Change：单次抬眼或站起；不群跑、不新增独立动作",
+        "reference_asset_ids": []
+      },
+      {
+        "character_id": "shenjiacheng",
+        "name": "沈嘉程",
+        "identity": "静态背景乘客，不增加支线。 25岁，细黑框眼镜、卡其夹克、黑裤，无独立道具",
+        "appearance_bible": "静态背景乘客，不增加支线。 25岁，细黑框眼镜、卡其夹克、黑裤，无独立道具\nWardrobe：25岁，细黑框眼镜、卡其夹克、黑裤，无独立道具。\nGoal / Knowledge：正常时维持日常；异常时形成静态阻挡。 不表达。\nEmotion / Relationship：平常→无表情。 陌生背景乘客。\nVoice / Props：无台词。 25岁，细黑框眼镜、卡其夹克、黑裤，无独立道具\nAllowed Change：单次抬眼或站起；不群跑、不新增独立动作",
+        "reference_asset_ids": []
+      },
+      {
+        "character_id": "hejing",
+        "name": "何静",
+        "identity": "静态背景乘客，不增加支线。 45岁，低马尾、酒红针织衫、黑裤。",
+        "appearance_bible": "静态背景乘客，不增加支线。 45岁，低马尾、酒红针织衫、黑裤。\nWardrobe：酒红针织衫；黑裤。\nGoal / Knowledge：正常时维持日常；异常时形成静态阻挡。 不表达。\nEmotion / Relationship：平常→无表情。 陌生背景乘客。\nVoice / Props：无台词。 唯一灰布袋：S01–S33放膝上；S34省略的起身过程把袋留原座位，此后何静空手，袋不随人移动。\nAllowed Change：单次抬眼或站起；不群跑、不新增独立动作；S34由坐到站时放袋，灰布袋留原座位。",
+        "reference_asset_ids": []
+      }
+    ],
+    "scenes": [
+      {
+        "scene_id": "SC01-opening",
+        "location": "虚构城市环线地铁车厢；A1与相邻A2共用同一车厢几何，以门区与空置状态区分。\nEntry：林砚坐A区，苏遥在B区，六人各在固定位置。 Exit：林砚和苏遥从A2的D2侧门离车。\n\n- 固定空间：A区座位在D侧门左后；B区是D门内侧，黄色门槛线；C连接门在车厢纵轴前端。A1人物逃生沿纵轴朝C，不横穿站台。\n- 主轴摄影机在过道靠左座椅一侧，看向C；对话林砚屏幕左/苏遥屏幕右。反打经正面中性构图过渡；不凭切镜左右互换。\n- 六名普通乘客周伯祥-何静，加林砚和苏遥，共八名实体。周伯祥下车后A1剩七名实体；S34之后五名异常乘客可分局部拍，不增加群众。\n- 深灰地胶、蓝色长椅、银色立杆、D门黄色门槛；纵向扶杆间距与电子屏位置固定。\n- A1正常→停顿→异常停靠；未来废弃版只改材质和空置状态，不能重建门窗。A2空置正常版；没有凭空多一节第三车厢。 正常站末段允许相邻既有车门的门框插入，只作他人先下车证据，不建立第三车厢内景。\n- D侧门：S17打开，S28错误现实关闭；回现实仍打开；S31堵门后保持打开至两人进入A2。C门：S38前关闭，S39打开，S41关闭。\n- 车窗倒影例外只按逐镜声明；其他时刻人数、物理左右和脸一致。",
+        "time": "深夜",
+        "mood": "都市异常",
+        "visual_reference_asset_ids": []
+      },
+      {
+        "scene_id": "SC01-handoff",
+        "location": "虚构城市环线地铁车厢；A1与相邻A2共用同一车厢几何，以门区与空置状态区分。\nEntry：林砚坐A区，苏遥在B区，六人各在固定位置。 Exit：林砚和苏遥从A2的D2侧门离车。\n\n- 固定空间：A区座位在D侧门左后；B区是D门内侧，黄色门槛线；C连接门在车厢纵轴前端。A1人物逃生沿纵轴朝C，不横穿站台。\n- 主轴摄影机在过道靠左座椅一侧，看向C；对话林砚屏幕左/苏遥屏幕右。反打经正面中性构图过渡；不凭切镜左右互换。\n- 六名普通乘客周伯祥-何静，加林砚和苏遥，共八名实体。周伯祥下车后A1剩七名实体；S34之后五名异常乘客可分局部拍，不增加群众。\n- 深灰地胶、蓝色长椅、银色立杆、D门黄色门槛；纵向扶杆间距与电子屏位置固定。\n- A1正常→停顿→异常停靠；未来废弃版只改材质和空置状态，不能重建门窗。A2空置正常版；没有凭空多一节第三车厢。 正常站末段允许相邻既有车门的门框插入，只作他人先下车证据，不建立第三车厢内景。\n- D侧门：S17打开，S28错误现实关闭；回现实仍打开；S31堵门后保持打开至两人进入A2。C门：S38前关闭，S39打开，S41关闭。\n- 车窗倒影例外只按逐镜声明；其他时刻人数、物理左右和脸一致。",
+        "time": "深夜",
+        "mood": "都市异常",
+        "visual_reference_asset_ids": [
+          "future-state-placeholder"
+        ]
+      }
+    ],
+    "storyboard": {
+      "beats": [
+        {
+          "beat_id": "B01",
+          "scene_id": "SC01-opening",
+          "shot_ids": [
+            "S01"
+          ],
+          "narrative_intent": "原倒影钩子。"
+        },
+        {
+          "beat_id": "B02",
+          "scene_id": "SC01-handoff",
+          "shot_ids": [
+            "S02"
+          ],
+          "narrative_intent": "原求证。"
+        }
+      ]
+    },
+    "shots": [
+      {
+        "occurrence_id": "S01",
+        "adaptation_reason": "Derived from exact original Shot-card paragraphs; labels and reference grammar made explicit; original dialogue/windows/action/camera retained. Screen Text is assigned to canonical CaptionTrack. Historical PNG is review-only, not admitted/accepted or paid authorization. Explicit same-line native dialogue declaration expresses exact typed windows/screen/lip controls. Current Character Bible appearance/wardrobe and props copied into prose; future plot facts not added. Original S01 Next/Risk clean-plate duty remains a blocked composition requirement, not implicitly replaced by model guessing.",
+        "source_dialogue": "林砚，请在终点站下车。",
+        "shot": {
+          "shot_id": "S01",
+          "scene_id": "SC01-opening",
+          "storyboard_beat_id": "B01",
+          "duration_policy": {
+            "mode": "fixed",
+            "seconds": 3
+          },
+          "dialogue": "林砚，请在终点站下车。",
+          "narration": "",
+          "visual_strategy": "generated_video",
+          "generated_video_rationale": "原剧本逐镜复刻；请求4s，S01采用前3s、S02采用4s。",
+          "required_asset_roles": [
+            {
+              "role": "primary_visual",
+              "asset_ids": [],
+              "allowed_asset_types": [
+                "video"
+              ]
+            }
+          ],
+          "character_ids": [
+            "linyan",
+            "suyao",
+            "zhouboxiang",
+            "chenli",
+            "xuwen",
+            "guoxiangdong",
+            "shenjiacheng",
+            "hejing"
+          ],
+          "review_policy": {
+            "required_checks": [
+              "original-story",
+              "identity-props-space",
+              "hand-reflection",
+              "native-audio",
+              "camera",
+              "lip-sync"
+            ]
+          }
+        },
+        "generation": {
+          "references": [
+            {
+              "role": "approved_keyframe",
+              "asset_id": "historical-opening-review"
+            }
+          ],
+          "intent_evidence": {
+            "character_action_required": true,
+            "subject_motion_directive_present": true
+          },
+          "generation_intent": {
+            "pacing": {
+              "shot_duration_seconds": 4
+            },
+            "dialogue_intent": {
+              "mode": "dialogue",
+              "language": "zh",
+              "speaker_id": "broadcast",
+              "verbatim_text": "林砚，请在终点站下车。",
+              "start_seconds": 0.1,
+              "end_seconds": 2.7,
+              "on_screen": false,
+              "response_obligation": "林砚嘴唇不动，目光固定空座。",
+              "lip_sync_required": false
+            }
+          },
+          "audio_need": "required",
+          "quality_need": {
+            "objective_tier": "preview"
+          },
+          "output_need": {
+            "duration_seconds": 4,
+            "width": 496,
+            "height": 864,
+            "fps": 24,
+            "container_mime": "video/mp4",
+            "timing_mode": "content_driven"
+          }
+        },
+        "composition": {
+          "trim_start_frame": 0,
+          "trim_duration_frames": 72,
+          "muted": false
+        }
+      },
+      {
+        "occurrence_id": "S02",
+        "adaptation_reason": "Derived from exact original Shot-card paragraphs; labels and reference grammar made explicit; original dialogue/windows/action/camera retained. Screen Text is assigned to canonical CaptionTrack. Historical PNG is review-only, not admitted/accepted or paid authorization. Explicit same-line native dialogue declaration expresses exact typed windows/screen/lip controls. Current Character Bible appearance/wardrobe and props copied into prose; future plot facts not added. Original S01 Next/Risk clean-plate duty remains a blocked composition requirement, not implicitly replaced by model guessing.",
+        "source_dialogue": "刚才……叫的是我？",
+        "shot": {
+          "shot_id": "S02",
+          "scene_id": "SC01-handoff",
+          "storyboard_beat_id": "B02",
+          "duration_policy": {
+            "mode": "fixed",
+            "seconds": 4
+          },
+          "dialogue": "刚才……叫的是我？",
+          "narration": "",
+          "visual_strategy": "generated_video",
+          "generated_video_rationale": "原剧本逐镜复刻；请求4s，S01采用前3s、S02采用4s。",
+          "required_asset_roles": [
+            {
+              "role": "primary_visual",
+              "asset_ids": [],
+              "allowed_asset_types": [
+                "video"
+              ]
+            }
+          ],
+          "character_ids": [
+            "linyan",
+            "chenli"
+          ],
+          "review_policy": {
+            "required_checks": [
+              "original-story",
+              "identity-props-space",
+              "hand-reflection",
+              "native-audio",
+              "camera",
+              "lip-sync"
+            ]
+          }
+        },
+        "generation": {
+          "references": [
+            {
+              "role": "scene_reference",
+              "asset_id": "future-state-placeholder"
+            }
+          ],
+          "intent_evidence": {
+            "character_action_required": true,
+            "subject_motion_directive_present": true
+          },
+          "generation_intent": {
+            "pacing": {
+              "shot_duration_seconds": 4
+            },
+            "dialogue_intent": {
+              "mode": "dialogue",
+              "language": "zh",
+              "speaker_id": "linyan",
+              "verbatim_text": "刚才……叫的是我？",
+              "start_seconds": 0.6,
+              "end_seconds": 3.5,
+              "on_screen": true,
+              "response_obligation": "求证；眉头微蹙，没有喊叫。",
+              "lip_sync_required": true
+            }
+          },
+          "audio_need": "required",
+          "quality_need": {
+            "objective_tier": "preview"
+          },
+          "output_need": {
+            "duration_seconds": 4,
+            "width": 496,
+            "height": 864,
+            "fps": 24,
+            "container_mime": "video/mp4",
+            "timing_mode": "content_driven"
+          }
+        },
+        "composition": {
+          "trim_start_frame": 0,
+          "trim_duration_frames": 96,
+          "muted": false
+        },
+        "boundary": {
+          "boundary_kind": "hard_cut",
+          "continuity_obligation": "identity_style_carryover",
+          "causal_edge_semantics": "causal_ellipsis",
+          "causal_state_changes": [
+            {
+              "dimension": "character_presence",
+              "source_close": "林砚",
+              "target_open": "林砚",
+              "transition_mode": "carry",
+              "bridge_beat": null
+            }
+          ],
+          "required_carryover_dimensions": [
+            "character_presence"
+          ]
+        },
+        "state_reference": {
+          "source_shot_id": "S01",
+          "frame_index": 71,
+          "replace_asset_id": "future-state-placeholder",
+          "usage_license": "project-owned fictional material; future accepted source only",
+          "conditioning": "source_video",
+          "checks": {
+            "identity": "林砚及陈立身份与原S01 actual accepted source对应，服装和蓝挂绳白工牌保持。",
+            "props": "林砚唯一黑壳手机仍解剖右手持有；左手未拿手机。",
+            "action": "采用接点左手在窗前约2cm悬停，后镜从该真实状态收手、先看扬声器再看屏幕右陈立，吸气停顿后求证。",
+            "space": "同一SC01 A区末位、窗和蓝椅、邻座关系与D门扬声器位置保持，镜位改变不重造车厢。",
+            "motion_direction": "收左手，目光向扬声器后转屏幕右邻座，不镜像或倒序。",
+            "camera": "原S01 28mm锁定斜侧中广景切原S02 50mm侧面近景小幅右pan；只继承空间/轴线，不把前镜构图变成后镜first frame。",
+            "audio": "广播原句在前镜0.1–2.7s完整结束；同车厢声场接续，后镜0.6–3.5s林砚说原句，不能重复广播；PNG不代签声音。"
+          }
+        }
+      }
+    ],
+    "delivery_profile": {
+      "width": 496,
+      "height": 864,
+      "fps": 24
+    },
+    "composition_order": [
+      "S01",
+      "S02"
+    ],
+    "cut_requirements": [
+      {
+        "from_occurrence_id": "S01",
+        "to_occurrence_id": "S02",
+        "kind": "continuous",
+        "checks": {
+          "identity": "林砚及陈立身份与原S01 actual accepted source对应，服装和蓝挂绳白工牌保持。",
+          "props": "林砚唯一黑壳手机仍解剖右手持有；左手未拿手机。",
+          "action": "采用接点左手在窗前约2cm悬停，后镜从该真实状态收手、先看扬声器再看屏幕右陈立，吸气停顿后求证。",
+          "space": "同一SC01 A区末位、窗和蓝椅、邻座关系与D门扬声器位置保持，镜位改变不重造车厢。",
+          "motion_direction": "收左手，目光向扬声器后转屏幕右邻座，不镜像或倒序。",
+          "camera": "原S01 28mm锁定斜侧中广景切原S02 50mm侧面近景小幅右pan；只继承空间/轴线，不把前镜构图变成后镜first frame。",
+          "audio": "广播原句在前镜0.1–2.7s完整结束；同车厢声场接续，后镜0.6–3.5s林砚说原句，不能重复广播；PNG不代签声音。"
+        }
+      }
+    ]
+  },
+  "images": [
+    {
+      "asset_id": "historical-opening-review",
+      "node_id": "opening",
+      "resource_id": "historical-original-s01-firstframe",
+      "path": "historical-opening-review.png",
+      "usage_license": "historical project fictional image; review-only imported bytes; no provider admission or accepted state"
+    },
+    {
+      "asset_id": "future-state-placeholder",
+      "node_id": "handoff-placeholder",
+      "resource_id": "future-accepted-s01-state",
+      "path": "historical-opening-review.png",
+      "usage_license": "AUTHORING PLACEHOLDER ONLY; never submit; not actual S01 state"
+    }
+  ],
+  "source_grounding": {
+    "S01": {
+      "closing": [
+        {
+          "dimension": "character_presence",
+          "kind": "quote",
+          "fact": "林砚"
+        }
+      ]
+    },
+    "S02": {
+      "opening": [
+        {
+          "dimension": "character_presence",
+          "kind": "quote",
+          "fact": "林砚"
+        }
+      ]
+    }
+  }
+}

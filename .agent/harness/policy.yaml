@@ -146,7 +146,7 @@ checks:
     cwd: .
     description: Verify faithful source inspection and shared canonical authoring, accepted-source handoff, replay, unknown stop, graph revision, native audio and scripted final rendering; no live media acceptance.
   canvas_preserved_source_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_canvas_source_subject.py, tests/test_canvas_source_expression.py, tests/test_seedance_source_expression.py, tests/test_source_grounded_sequence.py, tests/test_source_grounded_route_selection.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_canvas_source_subject.py, tests/test_canvas_source_expression.py, tests/test_seedance_source_expression.py, tests/test_seedance_source_dialogue.py, tests/test_source_grounded_sequence.py, tests/test_source_grounded_route_selection.py, -q]
     cwd: .
     description: Verify exact original source/subject references, common-compiler revalidation and source-grounded sequence authority; no Provider effects or media acceptance.
   paid_reconciliation_tests:
@@ -963,9 +963,11 @@ categories:
   canvas_preserved_source:
     patterns:
       - src/ai_video/production/seedance_source_expression.py
+      - src/ai_video/production/seedance_source_dialogue.py
       - tests/test_canvas_source_subject.py
       - tests/test_canvas_source_expression.py
       - tests/test_seedance_source_expression.py
+      - tests/test_seedance_source_dialogue.py
       - tests/test_source_grounded_sequence.py
       - tests/test_source_grounded_route_selection.py
     check_ids:
