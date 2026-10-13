@@ -430,20 +430,39 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
             requirement=next((x.projection.requirement for x in inputs.experiences
                 if x.candidate.recipe.requirement_hash == old_recipe.requirement_hash), None))
         base["diagnosis"] = diagnosis
+        known_failure_grant = next((g for g in inputs.runtime_repairs
+            if not g.consumed and g.authorization.paid_known_failure_retarget is not None
+            and g.authorization.evidence_hash == latest.evidence_hash
+            and g.authorization.attempt_id == latest.attempt_id), None)
         if inputs.policy.version == "3" and latest.rubric_hash != inputs.rubric_hash:
-            old_goal = next(c.final_output_goal for c in (*candidates, *inputs.historical_recipes)
-                if c.scope_hash == latest.recipe_scope_hash)
-            new_goal = candidates[0].final_output_goal
-            new_acceptance = candidates[0].recipe.acceptance_policy.profile_payload
-            legacy_prospective = (old_goal is None and new_goal is not None
-                and not old_recipe.acceptance_policy.profile_payload.get("requirement_semantics_version")
-                and new_acceptance.get("requirement_semantics_version") == "requirement-semantics/1"
-                and new_acceptance.get("prospective_from_rubric_hash") == old_recipe.rubric_hash)
-            goal_changed = bool(legacy_prospective or old_goal is not None and new_goal is not None
-                and (old_goal.goal_id, old_goal.goal_version) != (new_goal.goal_id, new_goal.goal_version))
-            if not goal_changed:
-                return GenerationDecision(**base, disposition="RUBRIC_OR_STAGE_ERROR",
-                    rationale=("Final-output repair cannot replace its frozen goal requirements; retain the old failure and author a new goal version explicitly",))
+            known_failure_scope_preserved = False
+            if (known_failure_grant is not None and latest.outcome == "runtime_failure"
+                    and diagnosis.failure_classes == ("RUNTIME_FAILURE",)):
+                from ai_video.production.generation_runtime_repair import (
+                    paid_failure_retarget_preserves_strategy,
+                )
+                target_hash = known_failure_grant.authorization.paid_known_failure_retarget.target_scope_hash
+                previous = next((c for c in (*candidates, *inputs.historical_recipes)
+                                 if c.scope_hash == latest.recipe_scope_hash), None)
+                target = next((c for c in candidates if c.scope_hash == target_hash), None)
+                known_failure_scope_preserved = bool(
+                    previous is not None and target is not None
+                    and paid_failure_retarget_preserves_strategy(previous, target)
+                )
+            if not known_failure_scope_preserved:
+                old_goal = next(c.final_output_goal for c in (*candidates, *inputs.historical_recipes)
+                    if c.scope_hash == latest.recipe_scope_hash)
+                new_goal = candidates[0].final_output_goal
+                new_acceptance = candidates[0].recipe.acceptance_policy.profile_payload
+                legacy_prospective = (old_goal is None and new_goal is not None
+                    and not old_recipe.acceptance_policy.profile_payload.get("requirement_semantics_version")
+                    and new_acceptance.get("requirement_semantics_version") == "requirement-semantics/1"
+                    and new_acceptance.get("prospective_from_rubric_hash") == old_recipe.rubric_hash)
+                goal_changed = bool(legacy_prospective or old_goal is not None and new_goal is not None
+                    and (old_goal.goal_id, old_goal.goal_version) != (new_goal.goal_id, new_goal.goal_version))
+                if not goal_changed:
+                    return GenerationDecision(**base, disposition="RUBRIC_OR_STAGE_ERROR",
+                        rationale=("Final-output repair cannot replace its frozen goal requirements; retain the old failure and author a new goal version explicitly",))
         # A runtime repair authorizes exactly one re-execution of the identical
         # strategy after the runtime owner diagnosed and fixed an environmental
         # failure.  It never overrides quality findings, unknown outcomes, or
@@ -456,7 +475,10 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
                           and g.authorization.attempt_id == latest.attempt_id), None)
             if grant is not None:
                 retarget = grant.authorization.paid_no_effect_retarget
-                requested_scope = retarget.target_scope_hash if retarget else latest.recipe_scope_hash
+                known_failure_retarget = grant.authorization.paid_known_failure_retarget
+                requested_scope = (retarget.target_scope_hash if retarget else
+                    known_failure_retarget.target_scope_hash if known_failure_retarget else
+                    latest.recipe_scope_hash)
                 repair_candidate = next(
                     (c for c in candidates if c.scope_hash == requested_scope), None)
                 if repair_candidate is None:
@@ -469,6 +491,16 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
                     if not retarget_preserves_strategy(previous, repair_candidate):
                         return GenerationDecision(**base, disposition="EVIDENCE_GAP",
                             rationale=("paid retarget must preserve the frozen intent and acceptance strategy",))
+                if known_failure_retarget is not None:
+                    from ai_video.production.generation_runtime_repair import (
+                        paid_failure_retarget_preserves_strategy,
+                    )
+                    previous = next((c for c in (*candidates, *inputs.historical_recipes)
+                                     if c.scope_hash == latest.recipe_scope_hash), None)
+                    if (previous is None or not paid_failure_retarget_preserves_strategy(
+                            previous, repair_candidate)):
+                        return GenerationDecision(**base, disposition="EVIDENCE_GAP",
+                            rationale=("accepted FAILED recovery must preserve the exact final-output requirements",))
                 runtime_repair = grant.authorization
         for reason in ("UNKNOWN_OUTCOME", "RUNTIME_FAILURE", "RUBRIC_OR_STAGE_ERROR", "EVIDENCE_GAP"):
             if goal_changed and reason == "EVIDENCE_GAP":

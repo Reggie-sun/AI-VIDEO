@@ -128,10 +128,38 @@ def test_intermediate_reference_consumes_accepted_bytes_and_replays_without_effe
     assert service._load().manifest.manifest_revision == revision
     assert args["session"].calls == 1
     assert provider.call_counts.submit == 1
+    assert service.author(registry=loaded.registry).registry == loaded.registry
     path = loaded.asset_paths[asset.asset_id]
     path.write_bytes(b"forged frame")
     with pytest.raises(Exception):
         service.prepare(limits=limits)
+    assert provider.call_counts.submit == 1
+
+
+def test_source_video_handoff_binds_accepted_mp4_and_replays_before_successor_prepare(tmp_path):
+    service, provider, limits, auth, aid = state_target(tmp_path)
+    service.direction["shots"][1]["state_reference"]["conditioning"] = "source_video"
+    service.revise_authoring(attempt_id="source-video-conditioning")
+    accept_current(service, provider, limits, auth)
+
+    gate = reference_gate(service)
+    args = dict(source_shot_id="one", target_occurrence_id="b", frame_index=7,
+        replace_asset_id=aid, usage_license="fixture-only", **gate)
+    state = service.handoff_reference(**args)
+    loaded = service._load()
+    source_video_id = state.input_artifact_ids[0]
+    source_video = next(asset for asset in loaded.registry.assets if asset.asset_id == source_video_id)
+    successor = next(row for row in service.direction["shots"] if row["occurrence_id"] == "b")
+
+    assert service.position().next_action == "prepare"
+    assert successor["generation"]["references"] == [{"asset_id": source_video_id, "role": "existing_video"}]
+    assert source_video.asset_type.value == "video"
+    assert source_video.sha256 == require_canvas_state_reference(loaded=loaded, asset=state)[
+        "reference"]["source_video_sha256"]
+    revision = loaded.manifest.manifest_revision
+    assert service.handoff_reference(**args) == state
+    assert service._load().manifest.manifest_revision == revision
+    assert args["session"].calls == 1
     assert provider.call_counts.submit == 1
 
 
@@ -160,6 +188,170 @@ def test_state_reference_gate_missing_or_failed_observations_do_not_bind_target(
     assert service.position().next_action == "handoff_reference"
     assert service.start(limits=limits).next_action == "handoff_reference"
     assert provider.call_counts.submit == 1
+
+
+def test_source_video_conditioning_keeps_approved_frame_as_separate_proof(monkeypatch):
+    from types import SimpleNamespace
+    from ai_video.canvas_handoff import replace_state_reference
+    from ai_video.production.models import AssetType
+    from ai_video.production.seedance_source_expression import (
+        PreservedSourceExpression, SourceImageAlias, SourceReferenceMaterial,
+        SourceReferencePart, SourceTextPart, source_parts_sha256,
+    )
+
+    original = SimpleNamespace(asset_id="selected-still", sha256="a" * 64,
+        asset_type=AssetType.IMAGE)
+    video = SimpleNamespace(asset_id="accepted-video", sha256="b" * 64,
+        asset_type=AssetType.VIDEO)
+    source = SimpleNamespace(shot_id="one", scene_id="before")
+    monkeypatch.setattr("ai_video.canvas_handoff.accepted_sequence_source",
+        lambda loaded, shot: (None, SimpleNamespace(output_asset_id=video.asset_id,
+            request_input_hash="accepted-request"), None, None, None))
+    monkeypatch.setattr("ai_video.canvas_handoff.require_canvas_video_reference",
+        lambda **_kwargs: None)
+    loaded = SimpleNamespace(shots=(source,), registry=SimpleNamespace(assets=(original, video)))
+    materials = (SourceReferenceMaterial(asset_id=original.asset_id, asset_sha256=original.sha256, role="scene"),)
+    parts = (SourceTextPart(text="图片1接续动作。"), SourceReferencePart(slot_id="scene", materials=materials))
+    expression = PreservedSourceExpression(contract_version="seedance-preserved-source/2",
+        source_sha256=source_parts_sha256(parts), parts=parts,
+        image_aliases=(SourceImageAlias(label="图片1", asset_ids=(original.asset_id,)),))
+    direction = {"shots": [
+        {"occurrence_id": "a", "shot": {"shot_id": "one"}},
+        {"occurrence_id": "b", "shot": {"shot_id": "two", "scene_id": "after",
+            "intent": "图片1接续动作。图片1", "preserved_source_expression": expression.model_dump(mode="json"),
+            "required_asset_roles": [{"role": "scene_reference", "asset_ids": [original.asset_id],
+                "allowed_asset_types": ["image"]}]},
+         "generation": {"references": [{"asset_id": original.asset_id, "role": "scene_reference"}],
+            "generation_intent": {"subject_action": {"progression": "图片1接续动作。图片1"}}},
+         "state_reference": {"conditioning": "source_video"}}],
+        "scenes": [{"scene_id": "after", "visual_reference_asset_ids": [original.asset_id]}]}
+
+    revised = replace_state_reference(direction=direction, loaded=loaded, target_occurrence_id="b",
+        replace_asset_id=original.asset_id, asset=SimpleNamespace(asset_id="approved-frame", sha256="c" * 64),
+        source_shot_id="one", frame_index=7)
+
+    invalid = deepcopy(direction)
+    invalid["shots"][1]["state_reference"]["conditioning"] = "unknown"
+    with pytest.raises(ValueError, match="unsupported conditioning"):
+        replace_state_reference(direction=invalid, loaded=loaded, target_occurrence_id="b",
+            replace_asset_id=original.asset_id,
+            asset=SimpleNamespace(asset_id="approved-frame", sha256="c" * 64),
+            source_shot_id="one", frame_index=7)
+
+    row = revised["shots"][1]
+    assert row["generation"]["references"] == [{"asset_id": video.asset_id, "role": "existing_video"}]
+    assert row["shot"]["required_asset_roles"] == [{"role": "scene_reference",
+        "asset_ids": [original.asset_id], "allowed_asset_types": ["image"]}]
+    preserved = row["shot"]["preserved_source_expression"]
+    assert preserved["parts"][1]["materials"] == [{"asset_id": video.asset_id,
+        "asset_sha256": video.sha256, "role": "video_reference"}]
+    assert row["shot"]["intent"] == "视频1接续动作。视频1"
+    assert row["generation"]["generation_intent"]["subject_action"]["progression"] == row["shot"]["intent"]
+    assert revised["scenes"][0]["visual_reference_asset_ids"] == [original.asset_id]
+    assert row["reference_replacements"] == {"approved-frame": {
+        "original_asset_id": original.asset_id, "source_shot_id": "one", "frame_index": 7,
+        "conditioning": "source_video", "video_asset_id": video.asset_id,
+        "video_asset_sha256": video.sha256}}
+
+
+def test_preserved_source_reopens_same_accepted_video_and_state_frame(monkeypatch):
+    from types import SimpleNamespace
+    from ai_video.canvas_source_expression import require_canvas_source_expression
+    from ai_video.production.seedance_source_expression import (
+        PreservedSourceExpression, SourceReferenceMaterial, SourceReferencePart,
+        SourceTextPart, source_parts_sha256,
+    )
+
+    snapshot = "e" * 64
+    original = SimpleNamespace(asset_id="selected-still", sha256="a" * 64,
+        creation_receipt_id=f"canvas-local-selection:{snapshot}:node:resource")
+    video = SimpleNamespace(asset_id="accepted-video", sha256="b" * 64)
+    frame = SimpleNamespace(asset_id="approved-frame", sha256="c" * 64)
+    material = SourceReferenceMaterial(asset_id=video.asset_id, asset_sha256=video.sha256,
+        role="video_reference")
+    parts = (SourceTextPart(text="保留动作文字。"), SourceReferencePart(slot_id="scene", materials=(material,)))
+    expression = PreservedSourceExpression(contract_version="seedance-preserved-source/2",
+        source_sha256=source_parts_sha256(parts), parts=parts)
+    replacement = {"original_asset_id": original.asset_id, "source_shot_id": "one", "frame_index": 7,
+        "conditioning": "source_video", "video_asset_id": video.asset_id,
+        "video_asset_sha256": video.sha256}
+    row = {"shot": {"preserved_source_expression": expression.model_dump(mode="json")},
+        "generation": {"references": [{"asset_id": video.asset_id, "role": "existing_video"}]},
+        "reference_replacements": {frame.asset_id: replacement}}
+    packet = {"source_snapshot_sha256": snapshot,
+        "assets": [{"id": "node", "type": "image", "data": {"resourceId": "resource"}}]}
+    unit = {"prompt_source": {"parts": [{"type": "text", "text": "保留动作文字。"},
+        {"type": "extension", "object_id": "scene"}]},
+        "references": [{"slot_id": "scene", "node_id": "node"}]}
+    registry = SimpleNamespace(assets=(original, video, frame))
+    loaded = object()
+    monkeypatch.setattr("ai_video.canvas_handoff.require_canvas_state_reference",
+        lambda *, loaded, asset: {"source_shot_id": "one", "source_request_hash": "accepted-request",
+            "reference": {"frame_index": 7, "source_video_sha256": video.sha256}}
+        if asset.asset_id == frame.asset_id else pytest.fail("wrong state frame"))
+    monkeypatch.setattr("ai_video.canvas_handoff.require_canvas_video_reference",
+        lambda *, loaded, asset, source_shot_id: {"source_shot_id": source_shot_id,
+            "request_input_hash": "accepted-request", "asset_id": asset.asset_id, "sha256": asset.sha256})
+
+    require_canvas_source_expression(packet=packet, unit=unit, row=row, registry=registry, previous=loaded)
+
+    changed = {**row, "reference_replacements": {frame.asset_id: {**replacement,
+        "video_asset_sha256": "f" * 64}}}
+    with pytest.raises(ValueError, match="exact original reference"):
+        require_canvas_source_expression(packet=packet, unit=unit, row=changed, registry=registry, previous=loaded)
+
+
+def test_source_video_reference_checks_exact_accepted_mp4_bytes(tmp_path, monkeypatch):
+    import hashlib
+    from types import SimpleNamespace
+    from ai_video.canvas_handoff import require_canvas_video_reference
+    from ai_video.production.models import AssetType
+
+    path = tmp_path / "accepted.mp4"
+    path.write_bytes(b"exact accepted video")
+    video = SimpleNamespace(asset_id="accepted-video", asset_type=AssetType.VIDEO,
+        mime_type="video/mp4", video_metadata=object(), sha256=hashlib.sha256(
+            b"exact accepted video").hexdigest(), size_bytes=len(b"exact accepted video"))
+    source = SimpleNamespace(shot_id="one")
+    request = SimpleNamespace(output_asset_id=video.asset_id, request_input_hash="accepted-request")
+    monkeypatch.setattr("ai_video.canvas_handoff.accepted_sequence_source",
+        lambda loaded, shot: (None, request, None, None, None))
+    loaded = SimpleNamespace(shots=(source,), registry=SimpleNamespace(assets=(video,)),
+        asset_paths={video.asset_id: path}, root=tmp_path)
+
+    assert require_canvas_video_reference(loaded=loaded, asset=video,
+        source_shot_id="one")["request_input_hash"] == request.request_input_hash
+    path.write_bytes(b"changed video")
+    with pytest.raises(ValueError, match="bytes changed"):
+        require_canvas_video_reference(loaded=loaded, asset=video, source_shot_id="one")
+
+
+def test_source_video_preflight_keeps_state_gate_separate_from_input_admission():
+    from types import SimpleNamespace
+    from ai_video.canvas_preflight import canvas_reference_preflight
+
+    plan = {"source_shot_id": "one", "frame_index": 7, "replace_asset_id": "scene-placeholder",
+        "checks": {"action": "Hand remains on the phone"}, "usage_license": "fixture-only",
+        "conditioning": "source_video"}
+    replacement = {"original_asset_id": "scene-placeholder", "source_shot_id": "one", "frame_index": 7,
+        "conditioning": "source_video", "video_asset_id": "accepted-a", "video_asset_sha256": "a" * 64}
+    packet = {"source_snapshot_sha256": "b" * 64, "units": [{"occurrence_id": "b",
+        "source_text": "视频1继续动作。", "prompt_source": {"parts": []}}]}
+    direction = {"project_id": "continuity-test", "shots": [{"occurrence_id": "b",
+        "shot": {"shot_id": "two", "intent": "视频1继续动作。"}, "generation": {
+            "references": [{"asset_id": "accepted-a", "role": "existing_video"}]},
+        "state_reference": plan, "reference_replacements": {"state-frame": replacement}}],
+        "cut_requirements": []}
+
+    report = canvas_reference_preflight(packet=packet, direction=direction, registry=SimpleNamespace(assets=()))
+
+    state = report["shots"][0]["state_reference"]
+    assert state["input_kind"] == "source_video"
+    assert state["binding_status"] == "DECLARED_BINDING_REQUIRES_GATE"
+    assert state["bound_asset_ids"] == ["state-frame"]
+    assert state["accepted_video_asset_ids"] == ["accepted-a"]
+    assert "same_accepted_original_video_reference_binding" in state["required_evidence"]
+    assert state["provider_admission"] == state["state_acceptance"] == "NOT_EVALUATED"
 
 
 def test_unplanned_intermediate_handoff_cannot_skip_successor_requirements(tmp_path):

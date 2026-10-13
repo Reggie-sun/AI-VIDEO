@@ -27,7 +27,7 @@ _DIMENSION = Literal[
     "screen_motion_axis",
     "audio_bridge",
 ]
-_ASSET_ROLE = Literal["identity", "scene", "first_frame", "last_frame"]
+_ASSET_ROLE = Literal["identity", "scene", "first_frame", "last_frame", "video_reference"]
 _GROUNDABLE_REFERENCE_DIMENSIONS = {"character_presence", "prop_identity"}
 
 
@@ -49,9 +49,9 @@ class SourceReferencePart(StrictModel):
 
 
 class SourceImageAlias(StrictModel):
-    """Approved literal image label mapped to the original tray's materials."""
+    """Approved literal media label mapped to the original tray's materials."""
 
-    label: str = Field(pattern=r"^(?:图|图片)(?:[1-9][0-9]*|[一二三四五六七八九十]+)$")
+    label: str = Field(pattern=r"^(?:(?:图|图片|视频)(?:[1-9][0-9]*|[一二三四五六七八九十]+))$")
     asset_ids: tuple[str, ...] = Field(min_length=1)
 
 
@@ -176,12 +176,12 @@ class PreservedSourceExpression(StrictModel):
                     raise ValueError("repeated source image changed its role or bytes")
                 by_asset[material.asset_id] = material
         if any(
-            material.role not in {"identity", "scene"}
+            material.role not in {"identity", "scene", "video_reference"}
             for part in self.parts
             if isinstance(part, SourceReferencePart)
             for material in part.materials
         ):
-            raise ValueError("source reference chips only support identity or scene images")
+            raise ValueError("source reference chips only support identity/scene images or video references")
 
         text_parts = tuple(
             part.text for part in self.parts if isinstance(part, SourceTextPart)
@@ -261,7 +261,7 @@ def _image_indices(bound, requirement, expression: PreservedSourceExpression):
         context_asset_role,
         native_binding_role,
     )
-    from ai_video.production.video_compiler import _ROLE_ORDER
+    from ai_video.production.video_compiler import _MEDIA_ROLE_ORDER, _ROLE_ORDER
 
     evidence = tuple(requirement.asset_evidence)
     expected = tuple(
@@ -272,7 +272,7 @@ def _image_indices(bound, requirement, expression: PreservedSourceExpression):
         for item in _source_materials(expression)
     )
     if len(expected) != len(source) or set(expected) != set(source):
-        raise ValueError("source references must exactly match selected image evidence")
+        raise ValueError("source references must exactly match selected media evidence")
     if len(set(expected)) != len(expected):
         raise ValueError("selected source image evidence must be unique")
 
@@ -280,9 +280,10 @@ def _image_indices(bound, requirement, expression: PreservedSourceExpression):
         raise ValueError("provider-bound source image roles do not match selected assets")
     paired = tuple(zip(bound.binding_roles, bound.input_assets, strict=True))
     image_pairs = []
+    video_pairs = []
     for native_role, asset in paired:
-        if native_role not in _ROLE_ORDER:
-            raise ValueError("preserved source does not support non-image input references")
+        if native_role not in {*_ROLE_ORDER, "reference_video"}:
+            raise ValueError("preserved source does not support audio or other input references")
         matching = tuple(
             item
             for item in evidence
@@ -293,26 +294,25 @@ def _image_indices(bound, requirement, expression: PreservedSourceExpression):
         )
         if len(matching) != 1:
             raise ValueError("bound source images do not match exact selected roles and bytes")
-        image_pairs.append(
-            (
-                native_role,
-                asset.asset_id,
-                asset.asset_sha256,
-                matching[0].role.value,
-            )
-        )
-    if len(image_pairs) != len(expected):
-        raise ValueError("bound source images do not match selected evidence count")
-    bound_keys = tuple(
-        (native_role, asset_id, asset_sha256)
-        for native_role, asset_id, asset_sha256, _ in image_pairs
-    )
+        pair = (native_role, asset.asset_id, asset.asset_sha256, matching[0].role.value)
+        if native_role == "reference_video":
+            if matching[0].role.value != "video_reference" or asset.role != "reference_video":
+                raise ValueError("bound source videos do not match exact selected video roles and bytes")
+            video_pairs.append(pair)
+        else:
+            if matching[0].role.value == "video_reference" or asset.role == "reference_video":
+                raise ValueError("bound source image does not match its selected image role")
+            image_pairs.append(pair)
+    if len(image_pairs) + len(video_pairs) != len(expected):
+        raise ValueError("bound source media does not match selected evidence count")
+    bound_keys = tuple((native_role, asset_id, asset_sha256)
+        for native_role, asset_id, asset_sha256, _ in (*image_pairs, *video_pairs))
     expected_bound_keys = tuple(
         (native_binding_role(item.role), item.asset_id, item.asset_sha256)
         for item in evidence
     )
     if len(set(bound_keys)) != len(bound_keys) or set(bound_keys) != set(expected_bound_keys):
-        raise ValueError("bound source image references must exactly match selected role and byte identities")
+        raise ValueError("bound source media references must exactly match selected role and byte identities")
     indices = {
         (role, asset_id, asset_sha256): index
         for index, (_, asset_id, asset_sha256, role) in enumerate(
@@ -320,6 +320,13 @@ def _image_indices(bound, requirement, expression: PreservedSourceExpression):
             start=1,
         )
     }
+    indices.update({
+        (role, asset_id, asset_sha256): index
+        for index, (_, asset_id, asset_sha256, role) in enumerate(
+            sorted(video_pairs, key=lambda item: (_MEDIA_ROLE_ORDER[item[0]], item[1])),
+            start=1,
+        )
+    })
     return indices
 
 
@@ -328,8 +335,12 @@ def _adapt_source_text(
     image_indices: dict[tuple[str, str, str], int],
 ) -> str:
     chunks: list[str] = []
-    indices_by_asset = {asset_id: index for (_, asset_id, _), index in image_indices.items()}
-    aliases = {alias.label: "、".join(f"图片{indices_by_asset[aid]}" for aid in alias.asset_ids)
+    indices_by_asset = {asset_id: (role, index)
+        for (role, asset_id, _), index in image_indices.items()}
+    def label(asset_id):
+        role, index = indices_by_asset[asset_id]
+        return f"视频{index}" if role == "video_reference" else f"图片{index}"
+    aliases = {alias.label: "、".join(label(aid) for aid in alias.asset_ids)
         for alias in expression.image_aliases}
     pattern = ("|".join(re.escape(label) for label in sorted(aliases, key=len, reverse=True))
         + r"(?![0-9一二三四五六七八九十])") if aliases else None
@@ -340,7 +351,7 @@ def _adapt_source_text(
         else:
             chunks.append(
                 "、".join(
-                    f"图片{image_indices[(material.role, material.asset_id, material.asset_sha256)]}"
+                    label(material.asset_id)
                     for material in part.materials
                 )
             )
@@ -489,10 +500,10 @@ def _source_projection(bound, requirement):
     else:
         if expression.contract_version == "seedance-preserved-source/1" and (
                 expression.implicit_references or not source_references):
-            raise ValueError("source R2V images must be represented by explicit reference chips")
-        if not _source_materials(expression) or any(m.role not in {"identity", "scene"}
+            raise ValueError("source R2V media must be represented by explicit reference chips")
+        if not _source_materials(expression) or any(m.role not in {"identity", "scene", "video_reference"}
                 for m in _source_materials(expression)):
-            raise ValueError("source R2V requires ordinary identity or scene reference images")
+            raise ValueError("source R2V requires identity/scene images or video references")
 
     image_indices = _image_indices(bound, requirement, expression)
     prompt = _adapt_source_text(expression, image_indices)
@@ -513,17 +524,28 @@ def _source_projection(bound, requirement):
 
 def validate_preserved_seedance_request(bound, requirement, request):
     """Recheck final source payload when a sealed binding crosses execution."""
-    from ai_video.production.video_compiler import _compile_image_bindings, _native_recipe_expression_errors
+    from ai_video.production.video_compiler import (
+        _MEDIA_ROLE_ORDER, _compile_image_bindings, _native_recipe_expression_errors,
+        _required_measurement,
+    )
+    from ai_video.production.video_contracts import VideoMediaReferenceBinding
 
     bound, requirement, expression, prompt = _source_projection(bound, requirement)
     native = _source_native_prompt(bound, requirement, prompt, _source_endpoint_controls(requirement, expression))
+    media_bindings = tuple(sorted((VideoMediaReferenceBinding(
+        kind="video", role=role, asset_id=asset.asset_id, asset_sha256=asset.asset_sha256,
+        mime_type=asset.mime_type, duration_millis=_required_measurement(asset.duration_millis, "duration_millis"),
+        size_bytes=_required_measurement(asset.size_bytes, "size_bytes"), width=asset.width,
+        height=asset.height, fps=asset.fps)
+        for role, asset in zip(bound.binding_roles, bound.input_assets, strict=True)
+        if role == "reference_video"), key=lambda item: (_MEDIA_ROLE_ORDER[item.role], item.asset_id)))
     if _native_recipe_expression_errors(bound, requirement, native):
         raise ValueError("preserved source has unexpressed authored intent")
     if (bound.compiler_contract.compiler_id != "seedance-video-compiler"
             or bound.compiler_contract.compiler_version != "3"
             or request.prompt_text != prompt
             or request.image_bindings != _compile_image_bindings(bound)
-            or request.media_bindings or request.subject_bindings
+            or request.media_bindings != media_bindings or request.subject_bindings
             or request.effective_negative_prompt_text):
         raise ValueError("compiled request differs from preserved source prose or exact image bindings")
 

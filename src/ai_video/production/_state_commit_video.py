@@ -152,6 +152,7 @@ class _StateCommitVideoMixin:
     def record_runtime_repair_authorization(
         self, *, attempt_id: str, repair_basis: str, actor,
         evidence_hash: str | None = None, local_extension=None, paid_no_effect_retarget=None,
+        paid_known_failure_retarget=None,
     ):
         from ._state_commit_video_runtime_repair import register_runtime_repair_authorization
 
@@ -159,6 +160,7 @@ class _StateCommitVideoMixin:
             self, attempt_id=attempt_id, repair_basis=repair_basis, actor=actor,
             evidence_hash=evidence_hash, local_extension=local_extension,
             paid_no_effect_retarget=paid_no_effect_retarget,
+            paid_known_failure_retarget=paid_known_failure_retarget,
         )
 
     def _require_runtime_repair_grant(self, manifest, binding):

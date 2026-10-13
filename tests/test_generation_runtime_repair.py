@@ -74,6 +74,151 @@ def test_paid_no_effect_retarget_selects_only_exact_authorized_strategy():
     assert result.routing.provider_bound_request.provider_profile == target.provider_profile
 
 
+def _paid_known_failure_reference_case():
+    from ai_video.production.final_output_contracts import (
+        FinalOutputContract,
+        FinalOutputRequirement,
+    )
+    from ai_video.production.generation_runtime_repair import PaidKnownFailureRetarget
+
+    old_setup = setup_decision(remote=True, seed_supported=False)
+    setup = setup_decision(remote=True, seed_supported=False, reference_hash="f" * 64)
+    goal = FinalOutputContract(
+        goal_id="asset-first-continuity",
+        goal_version="1",
+        user_goal="Preserve the approved action and continuity in the final output.",
+        requirements=(FinalOutputRequirement(
+            requirement_id="continuous-action",
+            observable="The approved action remains continuous through the cut.",
+            proof="human",
+        ),),
+    )
+    old = old_setup["inputs"].candidates[0].model_copy(update={
+        "final_output_goal": goal,
+    })
+    target = setup["inputs"].candidates[0].model_copy(update={
+        "final_output_goal": goal,
+    })
+    setup["inputs"] = setup["inputs"].model_copy(update={"candidates": (target,)})
+    entry = evidence(old_setup, candidate=old, outcome="runtime_failure", task_id="task")
+    grant = RuntimeRepairGrant(authorization=RuntimeRepairAuthorization.create(
+        schema_version="runtime-repair/4",
+        attempt_id=entry.attempt_id,
+        evidence_hash=entry.evidence_hash,
+        repair_basis="explicit original-image input strategy after accepted terminal failure",
+        actor=ACTOR,
+        expected_manifest_revision=1,
+        paid_known_failure_retarget=PaidKnownFailureRetarget(
+            paid_submit_receipt_fingerprint="d" * 64,
+            failed_observation_fingerprint="e" * 64,
+            target_scope_hash=target.scope_hash,
+        ),
+    ), consumed=False)
+    limits = setup["inputs"].limits.model_copy(update={
+        "allowed_remote_candidates": (target.candidate_id,),
+    })
+    return setup, old, target, entry, grant, limits
+
+
+def test_paid_known_failure_retarget_selects_exact_reference_strategy_and_keeps_goal():
+    setup, old, target, entry, grant, limits = _paid_known_failure_reference_case()
+    result = decide(setup, candidates=(target,), historical_recipes=(old,), limits=limits,
+        evidence=(entry,), latest_attempt_hash=entry.evidence_hash, runtime_repairs=(grant,))
+    assert old.capabilities.variants[0].mode.value == "text_to_video"
+    assert target.capabilities.variants[0].mode.value == "image_to_video"
+    assert target.final_output_goal == old.final_output_goal
+    assert target.recipe.expressions == old.recipe.expressions
+    assert result.disposition == "GENERATE_ONCE"
+    assert result.runtime_repair == grant.authorization
+    assert result.selected_candidate_id == target.candidate_id
+
+
+def test_paid_known_failure_retarget_rejects_changed_output_or_acceptance_criteria():
+    from ai_video.production.generation_runtime_repair import paid_failure_retarget_preserves_strategy
+
+    _, old, target, _, _, _ = _paid_known_failure_reference_case()
+    changed_output = target.model_copy(update={
+        "output_requirement": target.output_requirement.model_copy(update={
+            "duration_seconds": target.output_requirement.duration_seconds + 1,
+        }),
+    })
+    changed_goal = target.model_copy(update={
+        "final_output_goal": target.final_output_goal.model_copy(update={
+            "requirements": (target.final_output_goal.requirements[0].model_copy(update={
+                "observable": "The action may break before the cut.",
+            }),),
+        }),
+    })
+    changed_criterion = target.model_copy(update={
+        "recipe": target.recipe.model_copy(update={
+            "expressions": (target.recipe.expressions[0].model_copy(update={
+                "observable": "The approved action may be discontinuous.",
+            }),),
+        }),
+    })
+    assert not paid_failure_retarget_preserves_strategy(old, changed_output)
+    assert not paid_failure_retarget_preserves_strategy(old, changed_goal)
+    assert not paid_failure_retarget_preserves_strategy(old, changed_criterion)
+
+
+def test_paid_known_failure_retarget_accepts_fresh_same_contract_operator_profile():
+    from ai_video.production.generation_runtime_repair import paid_failure_retarget_preserves_strategy
+    _, old, target, _, _, _ = _paid_known_failure_reference_case()
+    digest = "e" * 64 if old.provider_profile.profile_sha256 != "e" * 64 else "f" * 64
+    renewed = target.provider_profile.model_copy(update={"profile_sha256": digest,
+        "profile_path": Path("provider-profiles/" + digest + ".json")})
+    target = target.model_copy(update={"provider_profile": renewed,
+        "recipe": target.recipe.model_copy(update={"profile_sha256": renewed.profile_sha256})})
+    assert paid_failure_retarget_preserves_strategy(old, target)
+    changed = target.model_copy(update={"provider_profile": renewed.model_copy(update={"profile_version": "different"})})
+    assert not paid_failure_retarget_preserves_strategy(old, changed)
+
+
+def test_paid_known_failure_retarget_allows_profile_hash_drift_with_same_requirements():
+    from ai_video.production.generation_runtime_repair import PaidKnownFailureRetarget
+    from ai_video.production.hashing import canonical_sha256
+
+    setup, old, target, entry, grant, limits = _paid_known_failure_reference_case()
+    acceptance = target.recipe.acceptance_policy
+    payload = acceptance.profile_payload.copy()
+    payload.pop("content_hash")
+    payload["profile_id"] = "asset-first-rubric-revision"
+    payload["profile_version"] = "2"
+    digest = canonical_sha256(payload)
+    revised_acceptance = acceptance.model_copy(update={
+        "profile_id": payload["profile_id"],
+        "profile_version": payload["profile_version"],
+        "profile_content_hash": digest,
+        "profile_payload": {**payload, "content_hash": digest},
+    })
+    target = target.model_copy(update={"recipe": target.recipe.model_copy(update={
+        "acceptance_policy": revised_acceptance,
+        "rubric_hash": digest,
+    })})
+    auth = RuntimeRepairAuthorization.create(
+        schema_version="runtime-repair/4",
+        attempt_id=entry.attempt_id,
+        evidence_hash=entry.evidence_hash,
+        repair_basis=grant.authorization.repair_basis,
+        actor=ACTOR,
+        expected_manifest_revision=1,
+        paid_known_failure_retarget=PaidKnownFailureRetarget(
+            paid_submit_receipt_fingerprint=grant.authorization.paid_known_failure_retarget.paid_submit_receipt_fingerprint,
+            failed_observation_fingerprint=grant.authorization.paid_known_failure_retarget.failed_observation_fingerprint,
+            target_scope_hash=target.scope_hash,
+        ),
+    )
+    limits = limits.model_copy(update={"allowed_remote_candidates": (target.candidate_id,)})
+    result = decide(setup, candidates=(target,), historical_recipes=(old,), limits=limits,
+        evidence=(entry,), latest_attempt_hash=entry.evidence_hash,
+        runtime_repairs=(RuntimeRepairGrant(authorization=auth, consumed=False),),
+        rubric_hash=digest)
+    assert target.recipe.rubric_hash != old.recipe.rubric_hash
+    assert target.final_output_goal == old.final_output_goal
+    assert result.disposition == "GENERATE_ONCE"
+    assert result.runtime_repair == auth
+
+
 def test_paid_retarget_cannot_replace_frozen_generation_requirement():
     setup, old, target, entry, grant, limits = _retarget_case(required_hash="e" * 64)
     with pytest.raises(ValueError, match="stale candidate requirement"):

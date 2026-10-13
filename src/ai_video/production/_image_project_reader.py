@@ -698,7 +698,7 @@ def _verify_candidate_artifacts_hash(
     pairs: tuple[tuple[Path, str], ...],
 ) -> None:
     normalized = sorted((path.as_posix(), digest) for path, digest in pairs)
-    expected_count = 9 if attempt.image_request.provider_kind in {"comfyui_local", "grok"} else 8
+    expected_count = 9 if attempt.image_request.provider_kind in {"comfyui_local", "grok", "seedream"} else 8
     if (
         len(normalized) != expected_count
         or len({path for path, _ in normalized}) != expected_count
@@ -718,7 +718,7 @@ def _verify_image_activation_chronology(
     """Bind activation-time state evidence without freezing later P5 results."""
 
     activation_revision = attempt.base_manifest_revision + (
-        6 if attempt.image_request.provider_kind == "grok" else 4)
+        6 if attempt.image_request.provider_kind in {"grok", "seedream"} else 4)
     if manifest.manifest_revision < activation_revision:
         raise ValueError("active image Manifest revision predates activation")
     if manifest.manifest_revision == activation_revision:

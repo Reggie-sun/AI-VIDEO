@@ -269,6 +269,9 @@ class ImageGenerationRequest(_ImageStrictModel):
         )
         return {
             "schema": (
+                "ai-video-image-request/4"
+                if data["provider_kind"] == "seedream"
+                else
                 "ai-video-image-request/3"
                 if data["provider_kind"] == "grok"
                 else
@@ -300,7 +303,7 @@ class ImageGenerationRequest(_ImageStrictModel):
 
     @model_validator(mode="after")
     def _validate_sealed_request(self) -> "ImageGenerationRequest":
-        if self.provider_kind != "grok" and any(value is None for value in (
+        if self.provider_kind not in {"grok", "seedream"} and any(value is None for value in (
             self.parameters.seed, self.parameters.width, self.parameters.height,
         )):
             raise ValueError("local image requests require explicit seed and geometry")
@@ -313,7 +316,12 @@ class ImageGenerationRequest(_ImageStrictModel):
         if len(unique) != len(self.references):
             raise ValueError("image references must be unique by role and asset_id")
         roles = {item.role for item in self.references}
-        if "continuity_terminal" in roles:
+        if self.provider_kind == "seedream":
+            if (self.model_id != "doubao-seedream-5-0-pro-260628" or self.references
+                    or self.parameters.seed is not None or self.parameters.width is None
+                    or self.parameters.height is None or self.negative_prompt_text):
+                raise ValueError("Seedream original-image requests require the exact text-only profile")
+        elif "continuity_terminal" in roles:
             if (
                 len(self.references) != 2
                 or tuple(item.role for item in self.references).count("character") != 1
@@ -376,7 +384,7 @@ class ImageGenerationPreview(_ImageStrictModel):
     remote_call: PaidProviderCallPreview | None = None
     output_count: Literal[1]
     output_mime_type: Literal["image/png"]
-    reference_asset_ids: tuple[str, ...] = Field(min_length=2)
+    reference_asset_ids: tuple[str, ...]
     reference_total_bytes: int = Field(strict=True, ge=0)
     preview_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
 
@@ -391,6 +399,11 @@ class ImageGenerationPreview(_ImageStrictModel):
     def _validate_sealed_preview(self) -> "ImageGenerationPreview":
         if self.local_only == self.remote or self.remote != (self.remote_call is not None):
             raise ValueError("image preview must identify its exact local or remote lane")
+        if self.remote_call is not None and self.remote_call.provider_kind == "seedream":
+            if self.reference_asset_ids or self.reference_total_bytes != 0:
+                raise ValueError("Seedream text-only preview cannot contain reference bytes")
+        elif len(self.reference_asset_ids) < 2:
+            raise ValueError("image preview requires at least two reference assets")
         data = self.model_dump(mode="json", exclude={"preview_fingerprint"})
         if canonical_sha256(data) != self.preview_fingerprint:
             raise ValueError("preview_fingerprint does not match image preview")
@@ -708,6 +721,11 @@ def validate_image_result(
                 or submit.preview_fingerprint != remote.preview.preview_fingerprint
                 or submit.external_effect_id != result.provider_request_id):
             raise _image_scope_invalid("Image submit receipt does not match its exact request.")
+    if request.provider_kind == "seedream":
+        if (remote is None or result.adapter != ToolIdentity(name="seedream", version="seedream-original-png/1")
+                or result.wire_image_bytes != result.image_bytes
+                or result.remote_evidence.conversion != "identity-png"):
+            raise _image_scope_invalid("Seedream requires original PNG bytes and its exact remote adapter provenance.")
     receipt = ImageProvenanceReceipt.create(
         request_id=request.request_id,
         request_fingerprint=request.request_fingerprint,

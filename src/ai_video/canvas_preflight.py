@@ -40,14 +40,29 @@ def canvas_reference_preflight(*, packet, direction, registry):
         if plan is not None:
             expected = {"source_shot_id": plan["source_shot_id"], "frame_index": plan["frame_index"],
                         "original_asset_id": plan["replace_asset_id"]}
-            bound = [aid for aid, evidence in replacements.items() if evidence == expected]
-            state = {**deepcopy(plan), "input_kind": "extracted_frame",
-                "binding_status": "DECLARED_BINDING_REQUIRES_GATE" if bound else "PENDING_ACCEPTED_SOURCE",
-                "bound_asset_ids": bound, "provider_admission": "NOT_EVALUATED",
+            conditioning = plan.get("conditioning", "extracted_frame")
+            bound = [aid for aid, evidence in replacements.items()
+                if all(evidence.get(key) == value for key, value in expected.items())
+                and evidence.get("conditioning", "extracted_frame") == conditioning]
+            video_ids = sorted({evidence["video_asset_id"] for evidence in replacements.values()
+                if evidence.get("conditioning") == "source_video"
+                and all(evidence.get(key) == value for key, value in expected.items())
+                and isinstance(evidence.get("video_asset_id"), str)})
+            video_inputs = sorted({reference["asset_id"] for reference in row.get("generation", {}).get("references", [])
+                if reference.get("role") == "existing_video"})
+            exact_video_binding = (conditioning != "source_video"
+                or (len(video_ids) == 1 and video_ids == video_inputs))
+            state = {**deepcopy(plan), "input_kind": conditioning,
+                "binding_status": "DECLARED_BINDING_REQUIRES_GATE" if bound and exact_video_binding
+                    else "PENDING_ACCEPTED_SOURCE",
+                "bound_asset_ids": bound if exact_video_binding else [],
+                "accepted_video_asset_ids": video_ids if exact_video_binding else [],
+                "provider_admission": "NOT_EVALUATED",
                 "state_acceptance": "NOT_EVALUATED",
                 "required_evidence": ["source_exact_mp4_per_shot_pass", "approved_state_reference",
-                    "exact_extraction_and_reference_binding", "selected_provider_input_admission",
-                    "successor_own_per_shot_pass"]}
+                    "exact_extraction_and_reference_binding",
+                    *( ["same_accepted_original_video_reference_binding"] if conditioning == "source_video" else []),
+                    "selected_provider_input_admission", "successor_own_per_shot_pass"]}
         shot = row["shot"]
         shots.append({"occurrence_id": row["occurrence_id"], "shot_id": shot["shot_id"],
             "source_text": unit["source_text"], "authored_text": shot["intent"],

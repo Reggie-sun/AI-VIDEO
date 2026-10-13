@@ -52,6 +52,17 @@ def require_generated_canvas_selection(*, asset, snapshot, node_id, resource_id,
                                        artifacts=(), previous=None):
     """Reopen the sealed copy evidence before preserving an original reference."""
     from ai_video.production.authoring_input import require_authoring_input, reopen_authoring_input, PREFIX
+    if asset.source_kind is AssetSourceKind.GENERATED and asset.tool.name == "seedream":
+        # The canvas resource explicitly names an existing canonical output.
+        # Its paid/wire/request chain was checked by the standard project reader.
+        from ai_video.production.project import load_production_project
+        if previous is None or resource_id != asset.asset_id:
+            raise ValueError("canonical generated selection must name its exact original output")
+        reopened = load_production_project(previous.root / "project.yaml")
+        if (reopened.manifest != previous.manifest or asset not in reopened.registry.assets
+                or not asset.egress.remote or asset.cost_receipt_id is None):
+            raise ValueError("canonical generated selection lacks current paid image provenance")
+        return
     if (asset.source_kind is not AssetSourceKind.DERIVED
             or asset.tool != ToolIdentity(name="canvas-generated-image-source", version="1")
             or asset.creation_receipt_id != f"canvas-generated-image-source:{asset.input_fingerprint}"):

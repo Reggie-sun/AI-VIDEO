@@ -82,8 +82,13 @@ class CanvasProductionService:
             from ai_video.canvas_assets import prepare_canvas_png_assets
             registry, asset_artifacts = prepare_canvas_png_assets(packet=self.packet,
                 selections=png_selections, allowed_asset_root=allowed_asset_root)
+        previous = None
+        if self.committer is not None:
+            project_path = self.committer.project_root / "project.yaml"
+            if project_path.exists():
+                previous = load_production_project(project_path)
         return author_canvas_project(packet=self.packet, direction=self.direction,
-            registry=registry, asset_artifacts=asset_artifacts)
+            registry=registry, asset_artifacts=asset_artifacts, previous=previous)
 
     def approve_authoring(self, *, bundle, attempt_id, qa_policy):
         """Persist explicit creative approval and the supplied existing QA policy."""
@@ -146,6 +151,44 @@ class CanvasProductionService:
                 found.append(attempt)
         return found
 
+    def _bound_state_reference(self, loaded, row):
+        from ai_video.canvas_handoff import require_canvas_state_reference, require_canvas_video_reference
+        plan = row["state_reference"]
+        expected = {"source_shot_id": plan["source_shot_id"], "frame_index": plan["frame_index"],
+                    "original_asset_id": plan["replace_asset_id"]}
+        matches = [(aid, value) for aid, value in row.get("reference_replacements", {}).items()
+                   if all(value.get(key) == value_ for key, value_ in expected.items())]
+        if not matches:
+            return None
+        if len(matches) != 1:
+            raise _blocked("Selected state reference has ambiguous lineage.")
+        aid, replacement = matches[0]
+        asset = next(a for a in loaded.registry.assets if a.asset_id == aid)
+        state = require_canvas_state_reference(loaded=loaded, asset=asset)
+        if (state["source_shot_id"] != plan["source_shot_id"]
+                or state["reference"]["frame_index"] != plan["frame_index"]
+                or asset.usage_license != plan["usage_license"]
+                or state["assessment"]["context"]["checks"] != plan["checks"]):
+            raise _blocked("Selected state reference Gate no longer covers the authored requirements.")
+        conditioning = plan.get("conditioning", "extracted_frame")
+        if conditioning == "source_video":
+            video_asset = next(a for a in loaded.registry.assets
+                               if a.asset_id == replacement.get("video_asset_id"))
+            video = require_canvas_video_reference(loaded=loaded, asset=video_asset,
+                                                   source_shot_id=plan["source_shot_id"])
+            expected.update(conditioning="source_video", video_asset_id=video_asset.asset_id,
+                            video_asset_sha256=video_asset.sha256)
+            selected = [ref for ref in row["generation"]["references"]
+                        if ref.get("asset_id") == video_asset.asset_id and ref.get("role") == "existing_video"]
+            if (len(selected) != 1 or state["reference"]["source_video_sha256"] != video_asset.sha256
+                    or state["source_request_hash"] != video["request_input_hash"]):
+                raise _blocked("Selected original MP4 and approved state do not share accepted-source lineage.")
+        elif conditioning != "extracted_frame":
+            raise _blocked("Unsupported state reference conditioning.")
+        if replacement != expected:
+            raise _blocked("State reference replacement differs from the approved conditioning plan.")
+        return asset
+
     @_input_errors
     def position(self):
         """Reopen progress from actual requests/adoption, never occurrence counters."""
@@ -160,16 +203,8 @@ class CanvasProductionService:
             if not attempts:
                 plan = row.get("state_reference")
                 if plan is not None:
-                    expected = {k: plan[k] for k in ("source_shot_id", "frame_index")}
-                    expected["original_asset_id"] = plan["replace_asset_id"]
-                    bound = [a for a, evidence in row.get("reference_replacements", {}).items() if evidence == expected]
-                    if len(bound) != 1:
+                    if self._bound_state_reference(loaded, row) is None:
                         return CanvasWorkflowPosition(row["occurrence_id"], shot_id, None, "handoff_reference")
-                    from ai_video.canvas_handoff import require_canvas_state_reference
-                    asset = next(a for a in loaded.registry.assets if a.asset_id == bound[0])
-                    evidence = require_canvas_state_reference(loaded=loaded, asset=asset)
-                    if evidence["assessment"]["context"]["checks"] != plan["checks"]:
-                        raise _blocked("Selected state reference Gate no longer covers the authored requirements.")
                 return CanvasWorkflowPosition(row["occurrence_id"], shot_id, None, "prepare")
             from ai_video.canvas_recovery import current_canvas_attempt
             attempt = current_canvas_attempt(self.committer, attempts)
@@ -195,6 +230,7 @@ class CanvasProductionService:
                 from ai_video.canvas_authoring import input_hash
                 receipt_hash = (getattr(repair_receipt, "content_hash", None)
                                 or getattr(repair_receipt, "evidence_hash", None)
+                                or getattr(repair_receipt, "observation_fingerprint", None)
                                 or repair_receipt.submit_receipt_fingerprint)
                 identity = input_hash({"generation": current["lifecycle"].generation_id,
                                        "rejection": receipt_hash})[:32]
@@ -232,8 +268,21 @@ class CanvasProductionService:
             from ai_video.canvas_recovery import closed_unsubmitted_evidence
             receipt = closed_unsubmitted_evidence(self.committer, attempt)
             if receipt is None:
-                from ai_video.production._state_commit_video_runtime_repair import closed_paid_no_effect_receipt
-                receipt = closed_paid_no_effect_receipt(self.committer, attempt)
+                from ai_video.production._lifecycle_schema import PaidProviderAttemptPhase
+                paid = attempt.paid_provider_state
+                if (paid is not None and paid.phase in {
+                        PaidProviderAttemptPhase.ACCEPTED,
+                        PaidProviderAttemptPhase.SETTLED,
+                }):
+                    from ai_video.production._state_commit_video_runtime_repair import (
+                        closed_paid_known_failure_proof,
+                    )
+                    _paid_receipt, _submission, receipt, _request = closed_paid_known_failure_proof(
+                        self.committer, attempt
+                    )
+                else:
+                    from ai_video.production._state_commit_video_runtime_repair import closed_paid_no_effect_receipt
+                    receipt = closed_paid_no_effect_receipt(self.committer, attempt)
         binding = self.committer._reopen_generation_execution_binding(
             attempt.video_generation_state.execution_binding)
         if limits.task_id != binding.inputs.limits.task_id:
@@ -395,7 +444,7 @@ class CanvasProductionService:
     @_input_errors
     def handoff_reference(self, *, source_shot_id, target_occurrence_id, frame_index,
                           replace_asset_id, usage_license, checks, session, adjudicate, tool_identity):
-        """Bind a measured intermediate frame as an ordinary source reference.
+        """Assess an intermediate state and bind the explicitly selected source.
 
         The target keeps its original prose and chip. The replacement and its
         accepted-source provenance are explicit; no last-frame assertion or
@@ -412,17 +461,12 @@ class CanvasProductionService:
                     "replace_asset_id": replace_asset_id, "checks": checks, "usage_license": usage_license}
         if row.get("state_reference") is None:
             raise _blocked("Intermediate handoff requires an approved state reference plan.")
+        if "conditioning" in row["state_reference"]:
+            supplied["conditioning"] = row["state_reference"]["conditioning"]
         if row["state_reference"] != supplied:
             raise _blocked("State reference differs from the approved selected scene reference plan.")
-        expected = {"original_asset_id": replace_asset_id, "source_shot_id": source_shot_id,
-                    "frame_index": frame_index}
-        replays = [a for a, evidence in row.get("reference_replacements", {}).items() if evidence == expected]
-        if len(replays) == 1:
-            from ai_video.canvas_handoff import require_canvas_state_reference
-            registered = next(a for a in loaded.registry.assets if a.asset_id == replays[0])
-            evidence = require_canvas_state_reference(loaded=loaded, asset=registered)
-            if registered.usage_license != usage_license or evidence["assessment"]["context"]["checks"] != checks:
-                raise _blocked("State reference replay changes its license or required checks.")
+        registered = self._bound_state_reference(loaded, row)
+        if registered is not None:
             return registered
         position = self.position()
         if (position.occurrence_id != target_occurrence_id

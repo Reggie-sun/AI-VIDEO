@@ -62,6 +62,31 @@ def test_v2_explicit_literal_alias_uses_actual_native_index_and_preserves_source
     assert "image_aliases" not in _expression((SourceTextPart(text="Legacy"),)).model_dump()
 
 
+def test_source_video_reference_uses_its_own_video_number_and_preserved_literal():
+    from ai_video.production.video_requirement import SemanticReferenceRole
+
+    digest = "c" * 64
+    scene = SourceReferenceMaterial(asset_id="scene-still", asset_sha256="d" * 64, role="scene")
+    material = SourceReferenceMaterial(asset_id="accepted-a", asset_sha256=digest, role="video_reference")
+    parts = (SourceTextPart(text="图片1继续动作。"),
+             SourceReferencePart(slot_id="media", materials=(scene, material)))
+    expression = PreservedSourceExpression(contract_version="seedance-preserved-source/2",
+        source_sha256=source_parts_sha256(parts), parts=parts,
+        image_aliases=(SourceImageAlias(label="图片1", asset_ids=("accepted-a",)),))
+    requirement = SimpleNamespace(asset_evidence=(
+        SimpleNamespace(role=SemanticReferenceRole.SCENE, asset_id="scene-still", asset_sha256="d" * 64),
+        SimpleNamespace(role=SemanticReferenceRole.VIDEO_REFERENCE, asset_id="accepted-a", asset_sha256=digest)))
+    bound = SimpleNamespace(binding_roles=("reference", "reference_video"), input_assets=(
+        SimpleNamespace(asset_id="scene-still", asset_sha256="d" * 64, role="scene_reference"),
+        SimpleNamespace(asset_id="accepted-a", asset_sha256=digest, role="reference_video")))
+
+    indices = _image_indices(bound, requirement, expression)
+
+    assert indices == {("scene", "scene-still", "d" * 64): 1,
+                       ("video_reference", "accepted-a", digest): 1}
+    assert _adapt_source_text(expression, indices) == "视频1继续动作。图片1、视频1"
+
+
 def _rebind_source_expression(bound, requirement, expression, prompt):
     from ai_video.production.shot_router import ProviderBoundVideoRequest
     from ai_video.production.video_requirement import ProviderNeutralVideoRequirement

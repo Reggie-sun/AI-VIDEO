@@ -301,6 +301,38 @@ def rejected_canvas(tmp_path):
     return service, provider, limits, auth, old, experience
 
 
+def failed_paid_canvas(tmp_path):
+    from ai_video.production.generation_feedback import record_attempt_evaluation
+    from ai_video.production.models import StateCommitStatus
+    from ai_video.production._lifecycle_schema import PaidProviderAttemptPhase
+    from ai_video.production.video import VideoTaskState
+    from test_production_video import _paid_preview, _paid_authorization
+
+    service, provider, limits, auth = runtime(
+        tmp_path, status_events=(VideoTaskState.FAILED,))
+    old = service.start(limits=limits)
+    state = service._service(old.attempt_id)._state(old.attempt_id)[1]
+    request = service.committer._reopen_video_request(state.request)
+    preview = _paid_preview(request, attempt_id=old.attempt_id,
+        video_preview=provider.preview(request))
+    auth[preview.preview_fingerprint] = _paid_authorization(preview)
+    service.execute(action="submit", paid_preview=preview,
+        reservation_id="accepted-failed-" + old.attempt_id)
+    service.execute(action="poll")
+    experience = record_attempt_evaluation(
+        committer=service.committer, attempt_id=old.attempt_id)
+    attempt = next(a for a in service._load().manifest.attempts
+        if a.attempt_id == old.attempt_id)
+    assert attempt.status is StateCommitStatus.FAILED
+    assert attempt.paid_provider_state.phase is PaidProviderAttemptPhase.ACCEPTED
+    assert attempt.video_generation_state.latest_observation is not None
+    assert attempt.video_generation_state.fetch_receipt is None
+    assert attempt.video_generation_state.provider_file_id is None
+    assert experience.evidence[-1].outcome == "runtime_failure"
+    assert service.position().next_action == "stop"
+    return service, provider, limits, auth, old, experience
+
+
 def test_paid_no_effect_stays_blocked_without_explicit_runtime_grant(tmp_path):
     service, provider, limits, _, old, experience = rejected_canvas(tmp_path)
     before = service._load().manifest
@@ -311,6 +343,47 @@ def test_paid_no_effect_stays_blocked_without_explicit_runtime_grant(tmp_path):
     assert service.start_repair(limits=limits).execution_binding is None
     assert service._load().manifest == before
     assert service.position().attempt_id == old.attempt_id
+    assert provider.call_counts.submit == 1
+
+
+def test_paid_accepted_failed_observation_stays_blocked_without_explicit_retarget(tmp_path):
+    service, provider, limits, _, old, experience = failed_paid_canvas(tmp_path)
+    before = service._load().manifest
+    blocked = service.prepare_repair(limits=limits)
+    assert blocked.decision.disposition == "RUNTIME_FAILURE"
+    assert blocked.inputs.latest_attempt_hash == experience.evidence[-1].evidence_hash
+    assert blocked.inputs.limits.paid_submits_used == 1
+    assert service.start_repair(limits=limits).execution_binding is None
+    assert service._load().manifest == before
+    assert service.position().attempt_id == old.attempt_id
+    assert provider.call_counts.submit == 1
+
+
+@pytest.mark.parametrize("field", ["paid_submit_receipt_fingerprint", "failed_observation_fingerprint"])
+def test_paid_known_failure_retarget_requires_exact_accepted_failed_proof_without_mutation(tmp_path, field):
+    from ai_video.errors import AiVideoError
+    from ai_video.production.generation_runtime_repair import PaidKnownFailureRetarget
+    from ai_video.production._state_commit_video_runtime_repair import closed_paid_known_failure_proof
+
+    service, provider, _, _, old, experience = failed_paid_canvas(tmp_path)
+    attempt = next(a for a in service._load().manifest.attempts if a.attempt_id == old.attempt_id)
+    receipt, _, observation, _ = closed_paid_known_failure_proof(service.committer, attempt)
+    values = {
+        "paid_submit_receipt_fingerprint": receipt.submit_receipt_fingerprint,
+        "failed_observation_fingerprint": observation.observation_fingerprint,
+        "target_scope_hash": experience.candidate.scope_hash,
+    }
+    values[field] = "0" * 64
+    before = service._load().manifest
+    with pytest.raises(AiVideoError, match="exact accepted task and failure evidence"):
+        service.committer.record_runtime_repair_authorization(
+            attempt_id=old.attempt_id,
+            repair_basis="explicit accepted FAILED evidence test",
+            actor=ActorIdentity(actor_id="canvas-test", actor_kind="codex"),
+            paid_known_failure_retarget=PaidKnownFailureRetarget(**values),
+        )
+    assert service._load().manifest == before
+    assert experience.evidence[-1].outcome == "runtime_failure"
     assert provider.call_counts.submit == 1
 
 
@@ -378,3 +451,75 @@ def test_paid_retarget_rejects_wrong_receipt_without_mutation(tmp_path):
                 target_scope_hash=experience.candidate.scope_hash))
     assert service._load().manifest == before
     assert provider.call_counts.submit == 1
+
+
+def test_accepted_failed_t2v_retarget_consumes_exact_grant_on_i2v_submit(tmp_path):
+    from copy import deepcopy
+    from ai_video.production.video import VideoProviderCapabilities, VideoGenerationMode, VideoTaskState
+    from ai_video.production.generation_feedback import record_attempt_evaluation, create_generation_candidates
+    from ai_video.canvas_planning import canvas_feedback_context
+    from ai_video.production.generation_runtime_repair import PaidKnownFailureRetarget
+    from ai_video.production._state_commit_video_runtime_repair import closed_paid_known_failure_proof
+    from test_production_video import _paid_preview, _paid_authorization
+    service, provider, limits, auth = runtime(tmp_path, status_events=(VideoTaskState.FAILED,))
+    original = deepcopy(service.direction)
+    variant = provider.capabilities().variants[0].model_copy(update={"seed_supported": False})
+    text_variant = variant.model_copy(update={"capability_id": "fake-video-t2v",
+        "mode": VideoGenerationMode.TEXT_TO_VIDEO, "required_first_frame": False,
+        "allowed_image_roles": (), "max_reference_count": 0})
+    provider._capabilities = VideoProviderCapabilities.create(provider_name="fake-video", variants=(variant, text_variant))
+    row = service.direction["shots"][0]
+    row["shot"]["required_asset_roles"] = [r for r in row["shot"]["required_asset_roles"] if r["role"] != "first_frame"]
+    row["generation"].update(references=[], generation_operation="text_to_video")
+    service.revise_authoring(attempt_id="fixture-text-predecessor")
+    def scoped_limits():
+        loaded = service._load()
+        context = canvas_feedback_context(loaded=loaded, row=service.direction["shots"][0], policy=service.routing_policy)
+        candidates, _ = create_generation_candidates(projection=context["projection"], targets=service.targets,
+            acceptance=loaded.qa_policy.selected_generation_acceptance())
+        return limits.model_copy(update={"allowed_remote_candidates": tuple(c.candidate_id for c in candidates)})
+    limits = scoped_limits()
+    old = service.start(limits=limits)
+    def submit(position, reservation):
+        state = service._service(position.attempt_id)._state(position.attempt_id)[1]
+        request = service.committer._reopen_video_request(state.request)
+        preview = _paid_preview(request, attempt_id=position.attempt_id, video_preview=provider.preview(request))
+        auth[preview.preview_fingerprint] = _paid_authorization(preview)
+        service.execute(action="submit", paid_preview=preview, reservation_id=reservation)
+    submit(old, "fixture-old-reservation")
+    service.execute(action="poll")
+    experience = record_attempt_evaluation(committer=service.committer, attempt_id=old.attempt_id)
+    service.direction = original
+    service.direction["shots"][0]["generation"]["generation_operation"] = "auto"
+    service.revise_authoring(attempt_id="fixture-image-successor")
+    limits = scoped_limits()
+    blocked = service.prepare_repair(limits=limits)
+    assert blocked.decision.disposition == "RUNTIME_FAILURE"
+    replacement = next(c for c in blocked.inputs.candidates if c.capability_id == variant.capability_id)
+    from ai_video.production.generation_runtime_repair import paid_failure_retarget_preserves_strategy
+    assert paid_failure_retarget_preserves_strategy(experience.candidate, replacement), {
+        key: (getattr(experience.candidate, key), getattr(replacement, key))
+        for key in ("recipe", "output_requirement", "final_output_goal", "voice_route")
+        if getattr(experience.candidate, key) != getattr(replacement, key)}
+    failed = next(a for a in service._load().manifest.attempts if a.attempt_id == old.attempt_id)
+    receipt, _, observation, _ = closed_paid_known_failure_proof(service.committer, failed)
+    args = dict(attempt_id=old.attempt_id, evidence_hash=experience.evidence[-1].evidence_hash,
+        actor=ActorIdentity(actor_id="canvas-test", actor_kind="codex"), repair_basis="Approved original image retarget",
+        paid_known_failure_retarget=PaidKnownFailureRetarget(
+            paid_submit_receipt_fingerprint=receipt.submit_receipt_fingerprint,
+            failed_observation_fingerprint=observation.observation_fingerprint, target_scope_hash=replacement.scope_hash))
+    pointer = service.committer.record_runtime_repair_authorization(**args)
+    assert service.committer.record_runtime_repair_authorization(**args) == pointer
+    current = service.start_repair(limits=limits)
+    assert hasattr(current, "next_action"), current.decision.rationale
+    assert current.next_action == "submit" and current.attempt_id != old.attempt_id
+    assert service.start_repair(limits=limits) == current
+    history = service.committer.read_generation_experiences()
+    provider._scenario = replace(provider._scenario, external_effect_id="fixture-image-successor-effect")
+    submit(current, "fixture-new-reservation")
+    failed = next(a for a in service._load().manifest.attempts if a.attempt_id == old.attempt_id)
+    assert failed.video_generation_state.runtime_repairs[0].consumed
+    assert provider.call_counts.submit == 2
+    assert service.start_repair(limits=limits).next_action == "poll"
+    assert provider.call_counts.submit == 2
+    assert service.committer.read_generation_experiences() == history

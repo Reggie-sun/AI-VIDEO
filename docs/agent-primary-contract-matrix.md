@@ -8,7 +8,7 @@
 ledger、intent 与 unknown 仍归原 Router/service/committer。`remote_image` / `_remote_image_reader`
 重验 paid joins、wire 与 conversion；post-submit activation proof 不授权 POST。
 `image_bytes` 独占 exact PNG measurement，原 public imports 保持。remote generated PNG 必须具
-Grok identity、complete egress/cost、strict image/paid lineage；旧 local serializers/hash 不变。
+所选 image adapter identity、complete egress/cost、strict image/paid lineage；旧 local serializers/hash 不变。
 订阅次数单独识别零现金 reservation，不替换同币种既有现金账本。`fps=None` 不允许 frame-count
 timing；fixed requirement 不降级为 nominal。协议/live 阻断见 [Grok Provider](grok-provider.md)，
 checks 归 `grok_media_provider_tests` 与原 shared suites。
@@ -20,6 +20,19 @@ checks 归 `grok_media_provider_tests` 与原 shared suites。
 Commercial Planner handoff 完整意图采用已有 v4 并保留 conditioning/voice routing；Router 对
 v3/v4 执行同一 approved-first-frame lineage 校验。`_remote_video_product_prompt` 从 sealed product
 fidelity 投影 native prose，由 shared remote grammar 重编；无新 approval 或 identity owner。
+
+## Seedream Original Image
+
+`seedream.py` 只拥有已选 `doubao-seedream-5-0-pro-260628` 的单张纯 T2I、exact Ark endpoint、
+bounded transport 与原始 PNG response；不注入 Grok identity、订阅资格、自动重抽或素材库准入。
+`ImageGenerationRequest /4` 允许该 profile 无参考输入，保留旧 request/preview hash；
+`image_candidate.make_image_candidate_preparer` 纯构造原 image activation candidate，
+`canvas_image` 只装配既有 P5 inputs，不重算 timeline。remote submit 前必须已注入 preparer。
+写入仍由 `ProductionStateCommitter.generate_remote_image_asset` 独占，Paid Provider owner
+封存内部 upper bound、exact egress 与一用 permit。reader 核对 `seedream-wire` 原字节、paid join、
+request/result/Registry 身份；原 PNG 不转换，unknown 不重试。Canvas 引用 canonical 生成图时，
+resource ID 必须是当前严格重开的 output asset ID；该映射不证明 Provider admission 或人类验收。
+检查归 `seedream_image_tests` 与既有 image/Registry/Canvas suites。
 
 ## Current Shot Close Expression
 
@@ -840,5 +853,11 @@ Harness check owner为`drama_authoring_source_binding_tests`；实际当前run�
 只登记满足至少一项的entry：跨canonical owner、产生local/external/paid effect、durable write、replay/recovery-sensitive、normal caller与internal seam易混淆，或bypass会破坏Product invariant。不得登记private helper、ordinary pure utility、data class、receipt/pointer model、trivial loader、Provider内部helper、test-only API、函数签名副本或volatile runtime/provider status。本节不要求新增普通API时登记，也不得升级为独立registry、parser、schema、Harness/Architecture gate或第二ownership matrix。
 
 ## Completion Use
+
+Canvas 的显式 `source_video` handoff 仍由 `CanvasProductionService.handoff_reference()` 消费 accepted
+前镜并登记 approved state；Provider reference 是原 MP4，state PNG 是独立核验依据，二者必须同源。
+`ProductionStateCommitter.record_runtime_repair_authorization()` 的 `runtime-repair/4`
+只授权 exact accepted-terminal-FAILED/no-media 的新 scope；旧 paid receipts、reservation 和消费保留，
+不是 `known_no_effect`，不授权 unknown retry，且后继 start/submit 重新核验并消费 one-use grant。
 
 本矩阵只定义 surface-level focused gate。最终交付仍必须遵守 `AGENTS.md`：检查实际 diff ownership，通过 Development Harness 运行全部受影响 surface 的 mandatory checks，报告 fresh receipt path，区分本轮执行证据与历史记录，并明确 remaining risk、未验证区域和 publication 状态。

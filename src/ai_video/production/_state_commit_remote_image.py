@@ -34,6 +34,8 @@ class _StateCommitRemoteImageMixin:
         remote = authorization.remote_binding
         if remote is None or authorization.local_only:
             raise _state_invalid("remote image generation requires exact paid image authority")
+        if self._image_candidate_preparer is None:
+            raise _state_invalid("remote image generation requires its deterministic candidate preparer before submission")
         provider.preflight(request, authorization)
         self.begin_image_generation(request, preview, authorization)
         self.record_image_submit_intent(request, preview, authorization)
@@ -61,7 +63,7 @@ class _StateCommitRemoteImageMixin:
                 outcome=(PaidProviderSubmitOutcome.KNOWN_NO_EFFECT if known else PaidProviderSubmitOutcome.OUTCOME_UNKNOWN),
                 external_effect_id=None, recorded_at=self._paid_provider_clock()))
             raise AiVideoError(code=(ErrorCode.IMAGE_PROVIDER_FAILED if known else ErrorCode.IMAGE_PROVIDER_OUTCOME_UNKNOWN),
-                user_message="Grok image submit failed; the durable outcome forbids automatic retry.") from None
+                user_message="Remote image submit failed; the durable outcome forbids automatic retry.") from None
         self.record_paid_provider_submit_receipt(result.remote_evidence.submit_receipt)
         def current():
             try:

@@ -121,7 +121,7 @@ class _StateCommitImageIntentMixin:
             or authorization.request_fingerprint != request.request_fingerprint
             or authorization.preview_fingerprint != preview.preview_fingerprint
             or not authorization.provider_enabled
-            or (preview.remote and (request.provider_kind != "grok"
+            or (preview.remote and (request.provider_kind not in {"grok", "seedream"}
                 or preview.remote_call != authorization.remote_binding.preview
                 or preview.remote_call.request_fingerprint != request.request_fingerprint
                 or preview.remote_call.attempt_id != request.attempt_id

@@ -122,6 +122,23 @@ def prepare_canvas_state_reference(*, loaded, source_shot_id, frame_index, usage
     return CanvasStateReference(asset, artifacts, source_shot_id, request.request_input_hash, reference)
 
 
+def require_canvas_video_reference(*, loaded, asset, source_shot_id):
+    """Require the exact Registry MP4 produced by an accepted predecessor Shot."""
+    source = next((shot for shot in loaded.shots if shot.shot_id == source_shot_id), None)
+    if source is None:
+        raise ValueError("source video reference requires an exact accepted predecessor Shot")
+    _, request, _, _, _ = accepted_sequence_source(loaded, source)
+    video = next((item for item in loaded.registry.assets if item.asset_id == request.output_asset_id), None)
+    if (video is None or video.asset_type is not AssetType.VIDEO or asset != video
+            or video.mime_type != "video/mp4" or video.video_metadata is None):
+        raise ValueError("source video reference must be the predecessor's exact accepted original MP4")
+    raw = _read_regular_file_nofollow(loaded.asset_paths[video.asset_id], contained_by=loaded.root)
+    if raw.file_sha256 != video.sha256 or len(raw.data) != video.size_bytes:
+        raise ValueError("accepted source video bytes changed before successor binding")
+    return {"source_shot_id": source_shot_id, "request_input_hash": request.request_input_hash,
+            "asset_id": video.asset_id, "sha256": video.sha256, "size_bytes": video.size_bytes}
+
+
 def require_canvas_state_reference(*, loaded, asset):
     if asset.tool != ToolIdentity(name="canvas-accepted-state-frame", version="1"):
         raise ValueError("state reference requires its measured extraction owner")
@@ -184,17 +201,33 @@ def replace_state_reference(*, direction, loaded, target_occurrence_id, replace_
     if source.scene_id == row["shot"]["scene_id"]:
         raise ValueError("state replacement needs a target Scene reference owner separate from the source")
     refs = row["generation"]["references"]
+    state_plan = row.get("state_reference") or {}
+    conditioning = state_plan.get("conditioning", "extracted_frame")
+    if conditioning not in {"extracted_frame", "source_video"}:
+        raise ValueError("state reference has an unsupported conditioning mode")
+    accepted_video = None
+    if conditioning == "source_video":
+        _, request, _, _, _ = accepted_sequence_source(loaded, source)
+        accepted_video = next((a for a in loaded.registry.assets if a.asset_id == request.output_asset_id), None)
+        if accepted_video is None or accepted_video.asset_type is not AssetType.VIDEO:
+            raise ValueError("source video conditioning requires the accepted predecessor's Registry MP4")
+        require_canvas_video_reference(loaded=loaded, asset=accepted_video, source_shot_id=source_shot_id)
     matches = [r for r in refs if r["asset_id"] == replace_asset_id]
     if len(matches) != 1 or matches[0]["role"] != "scene_reference":
         raise ValueError("ordinary state replacement requires one selected scene reference")
     scene = next(s for s in data["scenes"] if s["scene_id"] == row["shot"]["scene_id"])
     if replace_asset_id not in scene.get("visual_reference_asset_ids", ()):
         raise ValueError("state replacement differs from the target Scene selection")
-    matches[0]["asset_id"] = asset.asset_id
-    scene["visual_reference_asset_ids"] = [asset.asset_id if a == replace_asset_id else a
-                                          for a in scene["visual_reference_asset_ids"]]
-    for role in row["shot"]["required_asset_roles"]:
-        role["asset_ids"] = [asset.asset_id if a == replace_asset_id else a for a in role["asset_ids"]]
+    replacement_asset = asset if conditioning == "extracted_frame" else accepted_video
+    replacement_role = "scene_reference" if conditioning == "extracted_frame" else "existing_video"
+    matches[0]["asset_id"] = replacement_asset.asset_id
+    matches[0]["role"] = replacement_role
+    if conditioning == "extracted_frame":
+        scene["visual_reference_asset_ids"] = [asset.asset_id if a == replace_asset_id else a
+                                              for a in scene["visual_reference_asset_ids"]]
+        for role in row["shot"]["required_asset_roles"]:
+            role["asset_ids"] = [asset.asset_id if a == replace_asset_id else a
+                                  for a in role["asset_ids"]]
     expression = row["shot"].get("preserved_source_expression")
     if expression is not None:
         materials = [m for p in expression["parts"] if p["type"] == "reference" for m in p["materials"]]
@@ -203,14 +236,20 @@ def replace_state_reference(*, direction, loaded, target_occurrence_id, replace_
         if not selected or any(m["role"] != "scene" for m in selected):
             raise ValueError("ordinary state replacement must retain its original scene chip")
         for material in selected:
-            material.update(asset_id=asset.asset_id, asset_sha256=asset.sha256)
+            material.update(asset_id=replacement_asset.asset_id, asset_sha256=replacement_asset.sha256,
+                            role="scene" if conditioning == "extracted_frame" else "video_reference")
         for alias in expression.get("image_aliases", ()):
-            alias["asset_ids"] = [asset.asset_id if aid == replace_asset_id else aid for aid in alias["asset_ids"]]
+            alias["asset_ids"] = [replacement_asset.asset_id if aid == replace_asset_id else aid
+                                   for aid in alias["asset_ids"]]
         expression["source_sha256"] = source_parts_sha256(expression["parts"], expression.get("implicit_references", ()))
         from ai_video.canvas_source_expression import adapted_canvas_prompt
         prompt = adapted_canvas_prompt(expression)
         row["shot"]["intent"] = prompt
         row["generation"]["generation_intent"]["subject_action"]["progression"] = prompt
-    row.setdefault("reference_replacements", {})[asset.asset_id] = {
-        "original_asset_id": replace_asset_id, "source_shot_id": source_shot_id, "frame_index": frame_index}
+    replacement = {"original_asset_id": replace_asset_id, "source_shot_id": source_shot_id,
+                   "frame_index": frame_index}
+    if conditioning == "source_video":
+        replacement.update(conditioning="source_video", video_asset_id=accepted_video.asset_id,
+                           video_asset_sha256=accepted_video.sha256)
+    row.setdefault("reference_replacements", {})[asset.asset_id] = replacement
     return data

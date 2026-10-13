@@ -89,7 +89,7 @@ class _StateCommitImageCandidateMixin:
         artifacts = (result_artifact, image_artifact, receipt_artifact)
         if result.remote_evidence is not None:
             artifacts += (self.prepare_artifact(request.attempt_id,
-                remote_image_wire_path(result.remote_evidence), result.wire_image_bytes),)
+                remote_image_wire_path(result.remote_evidence, request.provider_kind), result.wire_image_bytes),)
         for artifact in artifacts:
             self._write_immutable_artifact(
                 artifact, attempt_id=request.attempt_id

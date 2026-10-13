@@ -5,14 +5,23 @@ from ai_video.production.seedance_source_expression import PreservedSourceExpres
 
 
 def adapted_canvas_prompt(expression):
-    """Use the compiler's image order and source grammar, without creative prose."""
+    """Use the compiler's per-media order and source grammar, without creative prose."""
     from ai_video.production.seedance_source_expression import _adapt_source_text, _source_materials
-    from ai_video.production.video_compiler import _ROLE_ORDER
+    from ai_video.production.video_compiler import _MEDIA_ROLE_ORDER, _ROLE_ORDER
     expression = PreservedSourceExpression.model_validate(expression)
     materials = _source_materials(expression)
-    native_role = lambda m: m.role if m.role in {"first_frame", "last_frame"} else "reference"
-    ordered = sorted(materials, key=lambda m: (_ROLE_ORDER[native_role(m)], m.asset_id))
-    indices = {(m.role, m.asset_id, m.asset_sha256): i for i, m in enumerate(ordered, 1)}
+    def order(material):
+        if material.role == "video_reference":
+            return (1, _MEDIA_ROLE_ORDER["reference_video"], material.asset_id)
+        role = material.role if material.role in {"first_frame", "last_frame"} else "reference"
+        return (0, _ROLE_ORDER[role], material.asset_id)
+    image_materials = sorted((m for m in materials if m.role != "video_reference"),
+        key=lambda m: order(m)[1:])
+    video_materials = sorted((m for m in materials if m.role == "video_reference"),
+        key=lambda m: order(m)[1:])
+    indices = {(m.role, m.asset_id, m.asset_sha256): i
+        for group in (image_materials, video_materials)
+        for i, m in enumerate(group, 1)}
     return _adapt_source_text(expression, indices)
 
 
@@ -59,7 +68,39 @@ def require_canvas_source_expression(*, packet, unit, row, registry, previous=No
                         resource_id=resource_id, artifacts=asset_artifacts, previous=previous)
             replacements = row.get("reference_replacements", {})
             replacement = replacements.get(material.asset_id)
-            if replacement is not None:
+            video_replacements = [(frame_id, value) for frame_id, value in replacements.items()
+                if value.get("conditioning") == "source_video"
+                and value.get("video_asset_id") == material.asset_id]
+            if len(video_replacements) > 1:
+                raise ValueError("source video reference has ambiguous accepted-state lineage")
+            if video_replacements:
+                if material.role != "video_reference" or replacement is not None:
+                    raise ValueError("accepted source video must retain its explicit video reference role")
+                frame_id, replacement = video_replacements[0]
+                original = assets.get(replacement["original_asset_id"])
+                require_original(original)
+                if (asset is None or replacement.get("video_asset_sha256") != material.asset_sha256
+                        or asset.sha256 != material.asset_sha256):
+                    raise ValueError("source video replacement differs from its exact original reference")
+                if previous is None:
+                    raise ValueError("source video reference requires its accepted predecessor Registry")
+                from ai_video.canvas_handoff import require_canvas_state_reference, require_canvas_video_reference
+                frame = assets.get(frame_id)
+                if frame is None:
+                    raise ValueError("source video reference lost its separately approved state frame")
+                state = require_canvas_state_reference(loaded=previous, asset=frame)
+                video = require_canvas_video_reference(loaded=previous, asset=asset,
+                    source_shot_id=replacement["source_shot_id"])
+                if (state["source_shot_id"] != replacement["source_shot_id"]
+                        or state["reference"]["frame_index"] != replacement["frame_index"]
+                        or state["reference"]["source_video_sha256"] != asset.sha256
+                        or video["request_input_hash"] != state["source_request_hash"]):
+                    raise ValueError("source video and approved state frame do not share the exact accepted source")
+                selected = [ref for ref in row.get("generation", {}).get("references", ())
+                    if ref.get("asset_id") == asset.asset_id and ref.get("role") == "existing_video"]
+                if len(selected) != 1:
+                    raise ValueError("accepted source video is not the exact selected generation input")
+            elif replacement is not None:
                 original = assets.get(replacement["original_asset_id"])
                 require_original(original)
                 if (previous is None or asset is None or asset.sha256 != material.asset_sha256):

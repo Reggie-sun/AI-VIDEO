@@ -8,6 +8,35 @@ learning_eligibility: ineligible
 
 Date: 2026-10-13
 
+## Asset First Authorization And Implementation
+
+用户已对 `asset-first-candidate.md` 回复 A，接受新增 Seedream pro 原图及后镜原始 MP4 输入路线；
+exact 记录为 `runs/canvas-jieshi-two-shot-20261013-001/harness-admission/asset-first-authorization.json`。
+最多1次图片、2次视频、零自动重抽；图片和视频各50 CNY内部 upper bound，单元150 CNY；
+历史视频10保留，累计视频12，图片计数独立。内部上限不代表价格、扣费或账单。
+下节等待授权以及后续 T2V STOP 是历史 checkpoint，不能据此重复询问或复用旧 permit。
+
+共享能力实现限定为 Seedream 原始 PNG adapter、production image candidate preparer、
+Canvas 明确 original-video conditioning，以及 accepted-terminal-FAILED 的窄 `runtime-repair/4`。
+Spec/Plan 为 `2026-10-13-canvas-asset-first-seedream-continuity.md`；保持 canonical image/paid/
+video/review/committer owners，不新增故事执行脚本或第二 timeline。
+工程验证与真实生成仍在执行，不能由该记录推导新图片、两镜或声音已 PASS；human acceptance、AC-7 未关闭。
+
+focused evidence：图片/Grok/既有 image suites 57 PASS，Canvas 图片激活单测1 PASS，
+图片/接续组合30 PASS，恢复 suites80 PASS，后补 source-video 接续集成与 compiler 聚焦4 PASS，
+fresh operator profile/known-failure 4 PASS。Parent 增补 public T2V FAILED → I2V one-use 提交测试，
+发现 paid intent 仍只支持旧 retarget 类型；补齐相同 owner 后该完整链1 PASS（6.39秒）。
+不由这些可能重叠的计数推导独立媒体实验数。exact staged Harness 的本轮位置为
+`.agent/harness/runs/canvas-asset-first-20261013-r2/receipt.json`，状态以该 receipt 实际结果为准。
+r1 在 generation suite 期间由 Parent 停止，以补齐实际生成图的 author/preflight reopening 回归；
+不作为完成证据。该测试已复现原图来源缺少 previous context，修复保持只读 standard reopen，
+不将 canonical Seedream output 重新贴为 imported，也不修改旧素材历史。
+修复后图片、project-data 与 continuity 组合51 PASS（118.57秒），随后重新封存 r2 exact staged snapshot。
+当前 canonical Secret Service supplier 可用；旧 accepted/FAILED receipt 在 standard reopen 下匹配，
+readiness 文件为 `harness-admission/asset-first-runtime-proof-preflight.json`；该检查零 Provider 调用。
+本 checkpoint 使用 `record-ai-video-session`，automatic learning evaluation 为 `no_candidate`：
+当前是同一工程链的离线验证与恢复补齐，没有新增独立模型质量证据。
+
 ## Shared Reference Preflight Implementation
 
 用户要求“写入harness，然后生成”。新增共享 CLI `preflight`，`author` 也输出相同全序列准备报告；
@@ -44,7 +73,7 @@ canonical receipt、report、逐项裁决位于 `harness-admission/`。该 mappi
 `record-ai-video-session` 更新同一 primary record；`distill-ai-video-learning=no_candidate`：本次为共享
 只读准备能力与边界修订，没有新独立媒体实验，不创建学习 claim 或声称模型问题已修复。
 
-## Current Stop — Accepted T2V Task Failed Output Review
+## Historical Stop — Accepted T2V Task Failed Output Review
 
 用户 A 已批准的新无开通单元实际新增一次 POST；不再是仅 Prepare 或 credentials blocker。
 首镜 `canvas-dd96f97f176b769bbf07d3c08b05e2789371adec` 经共享 `CanvasProductionService`

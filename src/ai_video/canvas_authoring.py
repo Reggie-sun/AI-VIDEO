@@ -181,13 +181,17 @@ def author_canvas_project(*, packet, direction, registry=None, asset_artifacts=(
         state_plan = row.get("state_reference")
         if state_plan is not None:
             from ai_video.canvas_review import DIMENSIONS
+            state_fields = {"source_shot_id", "frame_index", "replace_asset_id", "checks", "usage_license"}
+            conditioning = state_plan.get("conditioning", "extracted_frame") if isinstance(state_plan, dict) else None
             if (not isinstance(state_plan, dict) or set(state_plan) != {"source_shot_id", "frame_index",
                     "replace_asset_id", "checks", "usage_license"}
+                    and set(state_plan) != state_fields | {"conditioning"}
                     or state_plan["source_shot_id"] not in [r["shot"]["shot_id"] for r in rows[:index]]
                     or type(state_plan["frame_index"]) is not int or state_plan["frame_index"] < 0
                     or not isinstance(state_plan["checks"], dict) or not state_plan["checks"]
                     or set(state_plan["checks"]) - DIMENSIONS
-                    or any(not isinstance(v, str) or not v.strip() for v in state_plan["checks"].values())):
+                    or any(not isinstance(v, str) or not v.strip() for v in state_plan["checks"].values())
+                    or conditioning not in {"extracted_frame", "source_video"}):
                 raise ValueError("state_reference needs an earlier selected source, exact frame and observable checks")
         edge = row.get("boundary")
         if index == 0 and edge is not None:

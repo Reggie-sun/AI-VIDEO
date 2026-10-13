@@ -88,9 +88,11 @@ def verify_remote_image_submit(root, attempt, authorization, evidence):
         raise ValueError("remote image paid provenance join is inconsistent")
 
 
-def remote_image_wire_path(evidence):
+def remote_image_wire_path(evidence, provider_kind="grok"):
     suffix = {"image/png": "png", "image/jpeg": "jpg", "image/webp": "webp"}[evidence.wire_mime_type]
-    return Path(f"assets/files/grok-wire/{evidence.wire_sha256}.{suffix}")
+    if provider_kind not in {"grok", "seedream"}:
+        raise ValueError("unsupported remote image wire owner")
+    return Path(f"assets/files/{provider_kind}-wire/{evidence.wire_sha256}.{suffix}")
 
 
 def reopen_remote_image_result(root, attempt, receipt, png_bytes, result_value):
@@ -98,13 +100,18 @@ def reopen_remote_image_result(root, attempt, receipt, png_bytes, result_value):
     from ai_video.production.grok_image_bytes import decode_grok_image
 
     root = Path(root)
-    _, _, authorization = reopen_remote_image_authority(root, attempt)
+    request, _, authorization = reopen_remote_image_authority(root, attempt)
     evidence = receipt.remote_evidence
-    wire_path = remote_image_wire_path(evidence)
+    wire_path = remote_image_wire_path(evidence, request.provider_kind)
     wire = _read_regular_file_nofollow(root / wire_path, contained_by=root / "assets/files")
     if wire.file_sha256 != evidence.wire_sha256 or wire.size_bytes != evidence.wire_size_bytes:
         raise ValueError("remote image wire bytes do not match provenance")
-    decoded, mime, conversion = decode_grok_image(wire.data)
+    if request.provider_kind == "seedream":
+        from ai_video.production.image import measure_png_bytes
+        measure_png_bytes(wire.data)
+        decoded, mime, conversion = wire.data, "image/png", "identity-png"
+    else:
+        decoded, mime, conversion = decode_grok_image(wire.data)
     if decoded != png_bytes or mime != evidence.wire_mime_type or conversion != evidence.conversion:
         raise ValueError("remote image PNG differs from its preserved wire conversion")
     verify_remote_image_submit(root, attempt, authorization, evidence)

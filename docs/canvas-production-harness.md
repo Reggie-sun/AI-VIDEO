@@ -78,6 +78,17 @@ CLI：`--runtime trusted_operator_module:function` 返回 `committer` 和 servic
 未配置 runtime 时 inspect/author/preflight 可用；prepare/execute 必须补齐当前 canonical runtime。
 凭据不得进入项目 JSON、`--arguments` 或 CLI argv，只沿现有 injected supplier。
 
+## Original Asset Preparation
+
+已明确选择 Ark 原图路线时，`SeedreamImageProvider` 通过现有
+`ProductionStateCommitter.generate_remote_image_asset` 执行单张 PNG；
+`canvas_image_candidate_preparer` 注入既有 image activation 和 P5 owner。
+model、纯文字 prompt、exact geometry、PNG/watermark、内部预算有效期进入 preview；
+凭据仍由 private supplier 注入。生成次数和预算不会由 Canvas 自动增加。
+原始 PNG 同时保留 Provider wire 与 Registry 身份。要在批准的 source 中选择该图，
+resource ID 明确指向当前 canonical image output asset ID，保留原始 generation/paid 证据。
+原图完成只提供下一镜的输入；仍须核验构图与引用职责，不能视为视频准入或连续性 PASS。
+
 ## Production Flow
 
 | Stage | Operation | Required evidence |
@@ -133,6 +144,19 @@ source-frame 的 match 不代签后镜。实际比较所用的 frame/source evid
 用 `seal_artifact` 与既有 `activate_qa_policy` 批准新版本，不自行制造 hash。
 缺任何 requirement 或用户完整听看保持 NOT_EVALUATED，明确失败为 FAIL；原片认可不移给新片。
 receipt/final acceptance 沿 P6 owners。`deliver` 只读 exact render，不签人类验收。
+
+## Original Video Conditioning And Known Failure Recovery
+
+`state_reference.conditioning` 默认 `extracted_frame`，显式 `source_video` 才将 Provider 输入改为
+accepted 前镜的原始 Registry MP4。两种模式都先对 approved frame_index 的实际中间状态执行 Gate；
+帧证据继续独立登记，视频参考绑定原始 SHA、source Shot 与 request identity。Scene 的 image ownership
+不变，Seedance source-expression 的视频采用独立 `视频N` 编号。后镜自身 QA 不能由参考匹配代签。
+
+已被 Provider 接受、随后 exact normalized observation 为 FAILED 且无输出媒体的 paid task，
+仅可经 `runtime-repair/4` 的 `PaidKnownFailureRetarget` 显式恢复。grant 绑定旧 submit receipt、
+FAILED observation、runtime-failure evidence 和新 candidate scope，one-use；必须保留同 task/Shot、
+Provider/model、完整 final-output goal 及质量要求。T2V 到 I2V 的输入变更不等于 known_no_effect，
+不释放旧 reservation、不重置消费，unknown/已有输出/错身份拒绝。新 POST 仍经全部 paid gates。
 
 ## Audio And Verification
 

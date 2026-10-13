@@ -375,7 +375,8 @@ class _StateCommitPaidProviderMixin:
                 _paid_binding, runtime_repair = self._require_submit_execution_binding(
                     manifest, video_state, request
                 )
-                if runtime_repair is not None and runtime_repair.paid_no_effect_retarget is None:
+                if (runtime_repair is not None and runtime_repair.paid_no_effect_retarget is None
+                        and runtime_repair.paid_known_failure_retarget is None):
                     raise _state_invalid(
                         "Paid Provider submit cannot consume a runtime repair grant."
                     )

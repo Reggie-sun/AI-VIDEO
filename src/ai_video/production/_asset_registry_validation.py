@@ -88,7 +88,7 @@ def validate_asset_record(
             raise ValueError("video duration does not match measured metadata")
     if record.egress.remote and not (
         (record.asset_type in {voice_type, video_type}
-         or (record.asset_type.value == "image" and record.tool.name == "grok"
+         or (record.asset_type.value == "image" and record.tool.name in {"grok", "seedream"}
              and record.mime_type == "image/png" and record.cost_receipt_id is not None)
          or (record.asset_type.value == "sfx"
              and record.creation_receipt_id.startswith("generated-video-audio-")))

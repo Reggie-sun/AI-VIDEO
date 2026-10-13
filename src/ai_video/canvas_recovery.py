@@ -50,9 +50,46 @@ def current_canvas_attempt(committer, attempts):
                     or binding.inputs.abandoned_result is not None):
                 raise ValueError(message)
         else:
-            from ai_video.production._state_commit_video_runtime_repair import closed_paid_no_effect_receipt
-            receipt = closed_paid_no_effect_receipt(committer, parent)
             repair = binding.decision.runtime_repair
+            known_failure = repair.paid_known_failure_retarget if repair is not None else None
+            if known_failure is not None:
+                from ai_video.production._state_commit_video_runtime_repair import (
+                    closed_paid_known_failure_proof,
+                )
+                from ai_video.production.generation_runtime_repair import (
+                    paid_failure_retarget_preserves_strategy,
+                )
+                paid_receipt, _submission, observation, request = closed_paid_known_failure_proof(
+                    committer, parent
+                )
+                old_binding = committer._reopen_generation_execution_binding(
+                    parent.video_generation_state.execution_binding
+                )
+                old_candidate = next(c for c in old_binding.inputs.candidates
+                    if c.candidate_id == old_binding.decision.selected_candidate_id)
+                target_candidate = next(c for c in binding.inputs.candidates
+                    if c.candidate_id == binding.decision.selected_candidate_id)
+                if (
+                    paid_receipt.submit_receipt_fingerprint
+                        != known_failure.paid_submit_receipt_fingerprint
+                    or observation.observation_fingerprint
+                        != known_failure.failed_observation_fingerprint
+                    or target_candidate.scope_hash != known_failure.target_scope_hash
+                    or old_binding.inputs.limits.task_id != binding.inputs.limits.task_id
+                    or old_binding.context.target_shot_id != binding.context.target_shot_id
+                    or evidence.outcome != "runtime_failure"
+                    or evidence.artifact_sha256 is not None
+                    or evidence.request_hash != request.request_input_hash
+                    or evidence.task_id != old_binding.inputs.limits.task_id
+                    or evidence.shot_id != old_binding.context.target_shot_id
+                    or binding.inputs.latest_attempt_hash != evidence.evidence_hash
+                    or not paid_failure_retarget_preserves_strategy(old_candidate, target_candidate)
+                ):
+                    raise ValueError(message)
+                receipt = observation
+            else:
+                from ai_video.production._state_commit_video_runtime_repair import closed_paid_no_effect_receipt
+                receipt = closed_paid_no_effect_receipt(committer, parent)
             pointer = next((p for p in parent.video_generation_state.runtime_repairs
                             if repair is not None and p.content_hash == repair.content_hash), None)
             if (pointer is None or repair.attempt_id != parent.attempt_id
