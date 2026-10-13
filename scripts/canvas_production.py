@@ -10,6 +10,7 @@ import json
 from pathlib import Path
 
 from ai_video.canvas_project_data import open_canvas_project
+from ai_video.canvas_preflight import canvas_reference_preflight
 from ai_video.errors import AiVideoError
 from ai_video.production.paths import _read_regular_file_nofollow
 from ai_video.production.state_commit import ProductionStateCommitter
@@ -28,7 +29,7 @@ def run(*, data_path, project_root, action, runtime_factory=None, arguments=None
     inspection = inspect_canvas_source(source, definition["selection"])
     if action == "inspect":
         return inspection
-    if runtime_factory is not None:
+    if runtime_factory is not None and action != "preflight":
         module, name = runtime_factory.split(":", 1)
         runtime = getattr(importlib.import_module(module), name)(project_root=Path(project_root))
     else:
@@ -38,10 +39,17 @@ def run(*, data_path, project_root, action, runtime_factory=None, arguments=None
     service, registry, artifacts = open_canvas_project(inspection=inspection, definition=definition,
         data_root=root, committer=committer, resume=action not in {"author", "approve", "revise"}, **runtime)
     arguments = {} if arguments is None else arguments
-    if action in {"author", "approve"}:
+    if action in {"author", "approve", "preflight"}:
         bundle = service.author(registry=registry, asset_artifacts=artifacts)
-        if action == "author":
+        if action in {"author", "preflight"}:
+            preflight = canvas_reference_preflight(packet=service.packet,
+                direction=service.direction, registry=bundle.registry)
+            if action == "preflight":
+                preflight["position"] = asdict(service.position()) if (
+                    Path(project_root) / "project.yaml").exists() else None
+                return preflight
             return {"project": bundle.project.model_dump(mode="json"), "adaptations": bundle.adaptations,
+                    "preflight": preflight,
                     "production_acceptance": "NOT_EVALUATED"}
         from ai_video.production.models import QaPolicy
         arguments = operator_arguments(action, service, arguments)
@@ -67,7 +75,7 @@ def run(*, data_path, project_root, action, runtime_factory=None, arguments=None
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=("inspect", "author", "approve", "revise", "status", "prepare", "start",
+    parser.add_argument("action", choices=("inspect", "preflight", "author", "approve", "revise", "status", "prepare", "start",
         "prepare_repair", "start_repair", "generate_voice",
         "execute", "evaluate", "handoff_reference", "register_native_audio", "compose", "render", "cut_packet",
         "review_delivery", "deliver"))

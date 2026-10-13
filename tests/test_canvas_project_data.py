@@ -92,6 +92,88 @@ def test_generic_cli_requires_only_data_for_authoring(tmp_path):
     assert list((tmp_path / "project").iterdir()) == []
 
 
+def test_sequence_preflight_exposes_future_state_before_first_generation(tmp_path):
+    from scripts.canvas_production import run
+    source, definition = text_data()
+    rows = definition["direction"]["shots"]
+    rows[1]["state_reference"] = {"source_shot_id": "one", "frame_index": 12,
+        "replace_asset_id": "future-state", "checks": {"action": "Right hand holds phone"},
+        "usage_license": "provider-output"}
+    definition["direction"]["composition_order"] = ["b", "a"]
+    (tmp_path / "source.json").write_text(json.dumps(source))
+    path = tmp_path / "data.json"
+    path.write_text(json.dumps(definition))
+    production = tmp_path / "production"
+    production.mkdir()
+    result = run(data_path=path, project_root=production, action="preflight",
+        runtime_factory="does_not_exist:must_not_be_loaded")
+    assert result["generation_order"] == ["one", "two"]
+    assert result["composition_order"] == ["two", "one"]
+    assert result["shots"][0]["source_text"] == "前段：生物遮满镜头。"
+    state = result["shots"][1]["state_reference"]
+    assert state["input_kind"] == "extracted_frame"
+    assert state["source_shot_id"] == "one" and state["frame_index"] == 12
+    assert state["binding_status"] == "PENDING_ACCEPTED_SOURCE"
+    assert state["provider_admission"] == "NOT_EVALUATED"
+    assert result["production_acceptance"] == "NOT_EVALUATED"
+    assert list(production.iterdir()) == []
+
+
+def test_preflight_resumes_sealed_direction_not_mutable_project_data(tmp_path):
+    from scripts.canvas_production import run
+    source, definition = text_data()
+    production = tmp_path / "production"
+    production.mkdir()
+    service, registry, artifacts = open_canvas_project(
+        inspection=inspect_canvas_source(source, definition["selection"]),
+        definition=definition, data_root=tmp_path, committer=ProductionStateCommitter(production))
+    service.author(registry=registry, asset_artifacts=artifacts).bootstrap(
+        committer=service.committer, attempt_id="preflight-input")
+    definition["direction"]["shots"][0]["shot"]["intent"] = "UNAPPROVED EDIT"
+    (tmp_path / "source.json").write_text(json.dumps(source))
+    path = tmp_path / "data.json"
+    path.write_text(json.dumps(definition))
+    before = {p.relative_to(production): p.read_bytes() for p in production.rglob("*") if p.is_file()}
+    result = run(data_path=path, project_root=production, action="preflight")
+    assert result["shots"][0]["authored_text"] == "前段：生物遮满镜头。"
+    assert before == {p.relative_to(production): p.read_bytes() for p in production.rglob("*") if p.is_file()}
+
+
+def test_author_preflight_separates_asset_provenance_from_provider_admission(tmp_path):
+    from pathlib import Path
+    from scripts.canvas_production import run
+    root = Path(__file__).resolve().parents[1] / "docs/canvas-projects/subject-reference"
+    tmp_path.mkdir(exist_ok=True)
+    result = run(data_path=root / "project.json", project_root=tmp_path, action="author")
+    report = result["preflight"]
+    refs = report["shots"][0]["references"]
+    assert len(refs) == 3
+    assert {r["role"] for r in refs} == {"character_reference", "scene_reference"}
+    assert all(len(r["identity"]["sha256"]) == 64 for r in refs)
+    assert all(r["provider_admission"] == "NOT_EVALUATED" for r in refs)
+    definition = json.loads((root / "project.json").read_text())
+    assert report["shots"][0]["generation_requirements"]["audio_need"] == (
+        definition["direction"]["shots"][0]["generation"]["audio_need"])
+    successor = report["shots"][1]
+    placeholder = successor["state_reference"]["replace_asset_id"]
+    assert next(r for r in successor["references"] if r["asset_id"] == placeholder)[
+        "source_status"] == "AUTHORING_PLACEHOLDER_NOT_ACCEPTED_STATE"
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_preflight_rejects_invalid_authoring_instead_of_projecting_it(tmp_path):
+    from scripts.canvas_production import main
+    source, definition = text_data()
+    definition["direction"]["shots"][1]["state_reference"] = {"source_shot_id": "one"}
+    (tmp_path / "source.json").write_text(json.dumps(source))
+    (tmp_path / "data.json").write_text(json.dumps(definition))
+    production = tmp_path / "production"
+    production.mkdir()
+    assert main(["preflight", "--data", str(tmp_path / "data.json"),
+        "--project-root", str(production)]) == 2
+    assert list(production.iterdir()) == []
+
+
 def test_data_entry_rejects_forged_inspection_identity(tmp_path):
     from test_canvas_source_expression import subject_source
     source, data, registry, _ = subject_source(tmp_path)

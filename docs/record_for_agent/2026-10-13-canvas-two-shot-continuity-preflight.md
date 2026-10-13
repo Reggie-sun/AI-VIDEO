@@ -8,6 +8,42 @@ learning_eligibility: ineligible
 
 Date: 2026-10-13
 
+## Shared Reference Preflight Implementation
+
+用户要求“写入harness，然后生成”。新增共享 CLI `preflight`，`author` 也输出相同全序列准备报告；
+实现 owner 为 `canvas_preflight`，复用既有 author validation/immutable input reader，未修改 paid、
+generation/recovery、逐镜 MCP 或 rendering owners。Playbook 的 Creative Preflight 现在明确要求
+首镜付费前检查全部后镜的素材路线，不将本地 synthetic 声明或 Registry 记录当作 Provider 准入。
+报告列出原文/参考职责/来源/状态提取依赖/生成与剪辑顺序/音频需求；普通中间帧不自动替换成尾帧或视频。
+无网络的准备报告保持 admission/quality `NOT_EVALUATED`，不是新的媒体验收或禁止规则。
+
+已对真实 root 运行该共享入口，结果见
+`runs/canvas-jieshi-two-shot-20261013-001/harness-admission/current-preflight.json`：
+A canonical position 仍 stop，B `PENDING_ACCEPTED_SOURCE`。重开 Manifest46 和3份 submit receipts，
+前两次 known_no_effect、第三次 accepted 后 failed；历史7 + 当前3 = 累计10，未新增图片/视频调用。
+旧一次剩余额度指定给 B，未挪作重抽，没有重新分类 accepted failure 或修改 reservation。
+
+新的资产先行候选已具体化为同目录 `asset-first-candidate.md`：Seedream pro 原图 → A →
+accepted 原始 MP4 参考 B → 原生音轨/trim/HyperFrames；明确不等价于旧“只用普通中间 PNG”。
+这还需要共享 Seedream image adapter、Canvas video-reference 映射及已知 accepted failure 的恢复契约。
+新增图片模型/外部效果、后镜输入差异和有限单元已集中询问；在答复前不生成、不把候选当作许可。
+目标仍未完成，human acceptance 与完整故事 AC-7 均未关闭。
+
+四项新增回归覆盖完整依赖报告、immutable resume、精确来源/职责与 admission 分离、坏输入拒绝；
+最终 focused 4 PASS。相关 Canvas suites 70 PASS；工程 exact staged receipt 的权威位置为
+`.agent/harness/runs/canvas-reference-preflight-20261013-r4/receipt.json`，publication 以实际远端 SHA 核验为准。
+前三次 Harness 在 playbook byte budget 处停止；已将细节保留于 Harness 文档、playbook 缩为最小触发提示，
+没有提高文件预算或削弱 checks。
+现有旧 spec/plan/baseline/record foreign dirty files 未改动，`runs/` 证据保持 local。
+
+受管 Kimi mapping invocation `213c423d-1336-481b-9765-feb173fc6494`，deep/k3/max/Docker，
+6 wire requests、511.806秒、PARSED；report SHA
+`f69ee67cdfa17610091b944a9eeb479f692867b5a0977e58037a0bb0c410c589` 已核验。
+Parent 拒绝将 accepted failed task 视作 known_no_effect，以及用本地 attestation 推导 ADMITTED 的建议；
+canonical receipt、report、逐项裁决位于 `harness-admission/`。该 mapping 不替代工程 review 或媒体证明。
+`record-ai-video-session` 更新同一 primary record；`distill-ai-video-learning=no_candidate`：本次为共享
+只读准备能力与边界修订，没有新独立媒体实验，不创建学习 claim 或声称模型问题已修复。
+
 ## Current Stop — Accepted T2V Task Failed Output Review
 
 用户 A 已批准的新无开通单元实际新增一次 POST；不再是仅 Prepare 或 credentials blocker。

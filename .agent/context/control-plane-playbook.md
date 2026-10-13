@@ -35,7 +35,7 @@ Runtime seam 见 [matrix](../../docs/agent-primary-contract-matrix.md#final-outp
 
 首次 prompt/continuity/script 创作前读取匹配 Skill 并声明作用；live/paid preview、permit 或 POST 前报告
 semantic open/close state、continuity、actual reference/terminal handoff、axis/action/camera endpoint、prompt 具体适配、lint。
-缺失即 fail closed；纯 state/assets/schema/dependency/execution 工作不触发 creative authoring。
+缺失 fail closed；纯 state/assets/schema/dependency/execution 不触发 creative authoring。连续单元先跑 preflight。
 
 #### Raw Creative Input Director Strategy Gate
 

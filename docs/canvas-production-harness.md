@@ -11,10 +11,22 @@ PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production inspect \
   --data docs/canvas-projects/subject-reference/project.json --project-root /tmp/canvas-example
 PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production author \
   --data docs/canvas-projects/subject-reference/project.json --project-root /tmp/canvas-example
+PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production preflight \
+  --data docs/canvas-projects/subject-reference/project.json --project-root /tmp/canvas-example
 ```
 
 `inspect` 保留完整原始快照、版本指针、引用职责、主体主/辅图、timeline 与重复 occurrence，定位缺项。
-`author` 无 Production 写入，展示原文、适配文本与 unified diff。示例是 development 测试数据：
+`author` 无 Production 写入，展示原文、适配文本与 unified diff，并附带全序列 `preflight`。
+`preflight` 忽略 `--runtime`，不实例化 Provider、不调用凭据或媒体工具；已存在项目时重开 immutable
+Director input。它同时列出全部镜头的角色/场景/道具参考职责、exact bytes 与来源、普通状态提取依赖、
+generation/composition order、声音表达及 cut requirements，供首镜付费前审核后镜路线。
+待替换图片明确标为 authoring placeholder，不能作为 accepted 状态。`REGISTERED_BYTES` 只说明
+Registry 中有该记录；synthetic 来源、同模型生成或本地抽帧都不自动证明 Provider admission。
+报告中的 `NOT_EVALUATED` 必须由对应 owner 的真实证据补足，不能据此宣称禁止所有中间帧或已经可提交。
+未来状态未产生时先核对路线，不要求伪造未来 bytes；若准入只能实测，明确 uncertainty 与有界实验，
+不因离线报告齐全而投原失败请求碰运气。
+Provider 返回尾帧、原始视频与普通中间 PNG 保持不同输入；改变路线须明确表达差异，不能自动替代。
+示例是 development 测试数据：
 
 - [text-reproduction](canvas-projects/text-reproduction/project.json)：原文 T2V、480p、15秒 nominal 输出。
 - [subject-reference](canvas-projects/subject-reference/project.json)：主体主/辅图、场景参考、实际中间帧计划。
@@ -63,7 +75,7 @@ API：`open_canvas_project(..., committer=..., targets=..., routing_policy=..., 
 CLI：`--runtime trusted_operator_module:function` 返回 `committer` 和 service configuration；可提供
 `action_arguments(action, service, ordinary_arguments)` 注入 limits/session/adjudicator/toolchain 等对象。
 这是共用运行环境接线，不能承载故事执行逻辑、自动扩大预算、换 Provider 或 fallback。
-未配置 runtime 时 inspect/author 可用；prepare/execute 必须补齐当前 canonical runtime。
+未配置 runtime 时 inspect/author/preflight 可用；prepare/execute 必须补齐当前 canonical runtime。
 凭据不得进入项目 JSON、`--arguments` 或 CLI argv，只沿现有 injected supplier。
 
 ## Production Flow
@@ -72,6 +84,7 @@ CLI：`--runtime trusted_operator_module:function` 返回 `committer` 和 servic
 | --- | --- | --- |
 | Inspect | `inspect` | exact snapshot、明确 selection、无 selected closure blocker |
 | Author | `author` → `approve` / `revise` | diff、显式 approved 数据与 selected QaPolicy |
+| Preflight | `preflight` | 全镜头参考职责/来源、后镜输入准入路线、占位与实际状态分离；不代替 paid preview |
 | Prepare | `prepare` → `start` | current Planner/Router、exact inputs、真实累计 limits |
 | Execute | `execute(submit/poll/fetch)` → `evaluate` → `execute(validate/activate)` | paid/local gates、显式 project-local `video_analyze`、逐项 PASS |
 | Handoff | `handoff_reference` 或既有 terminal/C2/C4 | accepted source、实测提取与所选实际状态检查 |

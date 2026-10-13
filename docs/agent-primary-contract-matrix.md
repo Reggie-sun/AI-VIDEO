@@ -78,6 +78,9 @@ native WAV 提取仍归 `generated_video_audio`，其 Manifest 能力判断复�
 render replay 重开原始 begin identity，deliver 只读 exact final target，不签 human acceptance。
 `canvas_project_data` / `scripts.canvas_production` 是共用数据入口；sealed input 由
 `production.authoring_input` 验证，经 bootstrap/committer 存入 immutable evidence，reader 重开。
+`canvas_preflight` 只投影已校验 source/Director/Registry 的全序列参考职责、来源与待提取状态；
+共享 CLI 在 author validation 后输出，resume 沿上述 immutable reader，不实例化 operator runtime。
+它不拥有 Provider admission、paid permission 或 QA acceptance；未产生状态不伪装为真实输入。
 `canvas_handoff` 只准备 accepted source 的实测普通中间帧及 selected-state MCP Gate；
 中间交接必须有 approved `state_reference`，缺计划/缺证均阻断后镜，不能制造 terminal/semantic acceptance。
 `canvas_target_gate` 只投影/核验同一后镜的 selected generation QA rows 与原 generation findings，
