@@ -35,5 +35,9 @@ Native Codex primary，当前 main；保留 foreign dirty files。两个 read-on
 
 ## Verification Boundary
 
+实际运行暴露的 P7 authoring successor 缺口由 `_image_video_lineage` reader owner 补齐；
+验证生成→两次 authoring commit→standard reopen，并拒绝缺失提交边和变更 snapshot bytes。
+实际项目只用 canonical committer 修复追加顺序，保留错误 Registry 版本，不新增图片或视频调用。
+
 工程PASS不证明模型准入或连续性；不重复旧失败任务，不挪用旧 B 剩余额度，无自动重抽。
 每个稳定变更包的文件归属由 Parent 在修改前精确列出；同文件冲突必须用户决定，read-only mapping不写文件。

@@ -935,10 +935,13 @@ def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
                 shot_id, role, placed_ids, receipt_id = placements[0]
                 if (shot_id == summary.target_shot_id and role == summary.target_asset_role
                         and placed_ids == (asset_id,) and receipt_id != asset.creation_receipt_id):
-                    from ai_video.production._image_video_lineage import has_exact_video_successor
+                    from ai_video.production._image_video_lineage import (
+                        has_exact_authoring_successor, has_exact_video_successor,
+                    )
 
                     shot = next(item for item in bundle.shots if item.shot_id == shot_id)
-                    if has_exact_video_successor(bundle, shot, asset):
+                    if (has_exact_video_successor(bundle, shot, asset)
+                            or has_exact_authoring_successor(bundle, shot, asset)):
                         placements = [(shot_id, role, placed_ids, asset.creation_receipt_id)]
             if (
                 summary is None

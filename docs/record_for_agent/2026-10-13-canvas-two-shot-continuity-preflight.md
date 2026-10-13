@@ -8,6 +8,38 @@ learning_eligibility: ineligible
 
 Date: 2026-10-13
 
+## Asset First Actual Image And Lineage Recovery
+
+共享能力已发布 `81f23c63be6ed306ba4bcadd7873417f66b3bfca`，远端 main SHA 已核对。
+工程 receipt `.agent/harness/runs/canvas-asset-first-20261013-r2/receipt.json` 的24组检查全部 PASS，
+fresh exact staged receipt 校验通过。Risk Gate 为 `KIMI_REVIEW_NOT_REQUIRED`；精确理由见
+`runs/canvas-jieshi-two-shot-20261013-001/harness-admission/asset-first-review-risk.json`。
+
+本单元实际执行1次 Seedream 图片 POST并成功沿 canonical image owner 激活原始 PNG：
+`image-3bb276475a7f90384e8ca653d0bfa8a51f022c882746c0ccfa9ead26621fff64`，
+SHA `24c6636f075d9428b51216e2e34dfb70995a7da87acc81e753274e7d5383f602`，2048×1152。
+原始 bytes 位于 run 的 `production/assets/files/<SHA>.png`，未转换，保留 AI watermark。
+Parent 已实际查看原图：右手唯一手机在膝上、左手左膝、灰衣蓝挂绳白工牌、主体左门杆右。
+开场构图参考 PASS 不代签视频动作、声音、Seedance 准入或 human acceptance。
+
+图片绑定后的 `revise_authoring` 暴露 reader 缺少 retained P7 image 的 authoring successor 证明。
+新增 exact succeeded project commit 链的只读验证；原 P7 receipt、同 Shot/role/asset placement、
+base/candidate bytes与历史前缀保持严格。回归先 RED，再1 PASS；图片及既有 reader/video lineage
+组合12 PASS（16.10秒）。新修复的 exact Harness 位置为
+`.agent/harness/runs/canvas-image-authoring-lineage-20261013-r1/receipt.json`，以实际 receipt 判状态。
+
+Parent 本次组装 Registry 时另有排序错误；没有放宽既有前缀规则，而是经
+`asset-first-registry-order-recovery-001` canonical commit 与 P5 transition 恢复原追加顺序，
+错误版本保留。standard reader 实际重开 PASS，Manifest61，Project9；原图与付费历史保留。
+证明见 `harness-admission/asset-first-image-authoring-lineage-reopen.json`。
+前一次空 first_frame authoring 和缺 resource batch 的数据准备也在视频 submit 前被拒绝，均零 Provider effects。
+
+当前本单元图片1次、视频0次；历史视频仍10，剩余视频最多2次，零自动重抽。
+本次预算通过 canonical extension 从100提升到200 CNY内部账本上限，保留旧占用50，容纳新单元150；
+这不是实际扣费账单。A/B实际视频、逐镜 MCP、状态提取、剪辑、HyperFrames 与人完整听看仍未验证。
+本节更新按 `record-ai-video-session`，automatic learning 为 `no_candidate`；没有把一次原图成功
+推断为“同账号素材可通过 Seedance”或真实连续性结论。
+
 ## Asset First Authorization And Implementation
 
 用户已对 `asset-first-candidate.md` 回复 A，接受新增 Seedream pro 原图及后镜原始 MP4 输入路线；

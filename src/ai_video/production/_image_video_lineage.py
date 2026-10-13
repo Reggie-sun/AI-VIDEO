@@ -1,6 +1,59 @@
-"""Read-only provenance for a retained P7 image after video activation."""
+"""Read-only provenance for a retained P7 image after canonical revisions."""
 
 from ai_video.production.models import StateCommitStatus, VideoAttemptPhase
+
+
+def has_exact_authoring_successor(bundle, shot, image_asset) -> bool:
+    """Trace unchanged image placement through succeeded project commits.
+
+    Each edge reopens its exact immutable base and candidate. A changed Shot
+    receipt is insufficient; the chain must reach the original P7 placement
+    or an independently verified video successor. The caller still verifies
+    the complete original image attempt and its activation chronology.
+    """
+    from ai_video.production.paths import _read_regular_file_nofollow
+    from ai_video.production.project import load_production_project_candidate
+
+    def reopen(project, registry):
+        for pointer in (project, registry):
+            raw = _read_regular_file_nofollow(bundle.root / pointer.path, contained_by=bundle.root)
+            if raw.file_sha256 != pointer.file_sha256:
+                raise ValueError("image authoring successor snapshot bytes changed")
+        candidate = load_production_project_candidate(bundle.root, bundle.manifest,
+            project.path, registry.path)
+        if (candidate.project.project_id != bundle.project.project_id
+                or candidate.project.content_hash != project.content_hash
+                or candidate.registry.content_hash != registry.content_hash):
+            raise ValueError("image authoring successor snapshot identity changed")
+        return candidate
+
+    def placement(value):
+        return tuple((r.role, r.asset_ids) for r in value.required_asset_roles
+                     if image_asset.asset_id in r.asset_ids)
+
+    current, before_revision = shot, bundle.manifest.manifest_revision
+    for attempt in sorted(bundle.manifest.attempts,
+                          key=lambda a: a.base_manifest_revision, reverse=True):
+        if (attempt.operation != "commit_project_registry"
+                or attempt.status is not StateCommitStatus.SUCCEEDED
+                or attempt.base_manifest_revision >= before_revision
+                or any(p is None for p in (attempt.base_project, attempt.base_registry,
+                    attempt.candidate_project, attempt.candidate_registry))):
+            continue
+        candidate = reopen(attempt.candidate_project, attempt.candidate_registry)
+        if (next((s for s in candidate.shots if s.shot_id == current.shot_id), None) != current
+                or image_asset not in candidate.registry.assets):
+            continue
+        base = reopen(attempt.base_project, attempt.base_registry)
+        prior = next((s for s in base.shots if s.shot_id == current.shot_id), None)
+        if (prior is None or image_asset not in base.registry.assets
+                or not placement(prior) or placement(prior) != placement(current)):
+            return False
+        if (prior.creation_receipt_id == image_asset.creation_receipt_id
+                or has_exact_video_successor(bundle, prior, image_asset)):
+            return True
+        current, before_revision = prior, attempt.base_manifest_revision
+    return False
 
 
 def has_exact_video_successor(bundle, shot, image_asset) -> bool:

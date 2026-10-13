@@ -14,6 +14,8 @@
 图片生成沿 ImageAssetProvider / remote_image / Paid Provider / 唯一 committer；新增 Seedream adapter
 只负责 native payload、bounded transport、原始 PNG/result/provenance。凭据沿已选 injected supplier，
 不得读取 .env、直接发无permit POST 或注册虚假 Grok 身份。保留原图字节，不以重编码文件冒充 Provider 原始输出。
+实际原图绑定后的 authoring revision 必须能沿 succeeded project commit 的 exact base/candidate
+链重开 P7 placement；保留同 Shot/role/asset、原生成凭证和 Registry 追加历史，不复制图片 provenance。
 
 Canvas source/authoring/planning 只增加明确视频参考映射，消费原始 A 的 Registry asset；不得预填
 未生成的素材身份。A exact MP4 逐镜全部 PASS 后，才能检查所选中间状态并绑定 B；B自身 findings独立裁决。

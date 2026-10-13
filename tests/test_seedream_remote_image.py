@@ -212,3 +212,23 @@ def test_seedream_image_activates_in_canvas_authoring_graph(tmp_path):
         before = (root / "state/manifest.json").read_bytes()
         assert service.author(registry=result.registry).registry == result.registry
         assert (root / "state/manifest.json").read_bytes() == before
+        service.revise_authoring(attempt_id="bind-original-generated-image", registry=result.registry)
+        revised = service._load()
+        assert asset in revised.registry.assets
+        row["shot"]["generated_video_rationale"] += "; preserve the approved original image"
+        service.revise_authoring(attempt_id="revise-image-shot-again")
+        revised = service._load()
+        assert asset in revised.registry.assets and len(calls) == 1
+        from ai_video.production._image_project_reader import verify_active_image_evidence
+        history = tuple(a for a in revised.manifest.attempts
+                        if a.attempt_id != "bind-original-generated-image")
+        broken = revised.model_copy(update={"manifest": revised.manifest.model_copy(
+            update={"attempts": history})})
+        with pytest.raises(AiVideoError, match="Active P7 image"):
+            verify_active_image_evidence(broken)
+        revision = next(a for a in revised.manifest.attempts
+                        if a.attempt_id == "bind-original-generated-image")
+        path = root / revision.base_project.path
+        path.write_bytes(path.read_bytes() + b"\n")
+        with pytest.raises(AiVideoError):
+            load_production_project(root / "project.yaml")

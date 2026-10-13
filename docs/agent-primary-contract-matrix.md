@@ -486,6 +486,10 @@ rubric、facts 或 policy 的改变产生新审计 identity；只有实际 recip
 P7 image 被后续视频保留时，`_image_video_lineage.py` 只验证 reader 的后继关系：succeeded video
 attempt、exact input image bytes、video 输出所在 role、immutable candidate Shot 与完整 video
 evidence 必须一致；P7 原 receipt 仍需完整重开，不增加 activation 或 lineage writer。
+已提交的 authoring revision 保留同一生成图时，reader 逐边重开 succeeded
+`commit_project_registry` 的 base/candidate 文件哈希、Shot 与完整 AssetRecord，保留同 Shot/role/asset
+placement 并追溯到原 P7 或已核验 video successor。单个新 Shot receipt 不构成来源证明；
+缺边、错 bytes、错身份及 Registry 历史前缀改变仍拒绝。
 
 Harness owner：`production_shot_router`（新纯模块与测试）、`video_planning`（Planner）及已有
 compiler/provider categories。Focused verification：
