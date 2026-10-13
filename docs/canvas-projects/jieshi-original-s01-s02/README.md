@@ -2,7 +2,9 @@
 
 ## Status And Entry
 
-本目录只准备《界蚀》原 S01→S02；共享 `inspect/author/preflight` 已实际运行。**不是已准入的 Provider 请求、已验收前镜或成片**。两镜新图片/视频 POST 均为 0。2026-10-14 已经唯一 `ProductionStateCommitter` bootstrap 初始项目并建立 dependency graph，Manifest revision3；没有激活 QA、发出 paid intent/permit 或验收媒体。精确 source-native expression 见 [S01](S01-native-input.txt)、[S02](S02-native-input.txt)，后者当前标签 `图片1` 指历史占位，必须在实际 S01 全 PASS 后经 canonical handoff 换为 accepted source 的 `视频1`、actual MP4 identity，再重新 prepare。
+本目录承接《界蚀》原 S01→S02；共享 `inspect/author/preflight` 已实际运行。2026-10-14 用户已授权下述最多2 PNG+2视频的有限单元。实际新增1次Seedream图片 POST、0次视频 POST；底图落盘但视觉 QA 为 **FAIL**，没有合格原S01首帧、已验收前镜或成片。另有本地 materialize 错误，Manifest revision12 的 image attempt 为 `outcome_unknown`，paid receipt 则是 `ACCEPTED`；两者不能混淆。失败后未重抽、未编辑第二张、未提交视频，未激活 QA。详见[真实执行记录](../../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#authorized-base-execution-and-stop--2026-10-14)。
+
+精确 source-native expression 见 [S01](S01-native-input.txt)、[S02](S02-native-input.txt)，后者当前标签 `图片1` 指历史占位，必须在实际 S01 全 PASS 后经 canonical handoff 换为 accepted source 的 `视频1`、actual MP4 identity，再重新 prepare。
 
 普通数据入口为 [project.json](project.json)，原 Canvas parts 为 [source.json](source.json)。[source-mapping.json](source-mapping.json) 保存原 Open/Action/Close/Camera/Dialogue/Prompt/Screen Text/Next-Risk；原 episode SHA-256 为 `a8c3aaaa77e9c5c7904d7dee83265ae14e6100c168e5d5a520387a070c3d53df`。不存在故事执行脚本或第二 timeline。
 
@@ -60,13 +62,13 @@ PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production preflight --data 
 | --- | --- | --- |
 | Original source → shared author | source parts和typed dialogue可核对；原外观Bible不会自动成为source model prose | 本目录显式复制当前外观/道具/空间，列明所有追加；没有删除原动作、声音、字幕/Next-Risk |
 | Typed source dialogue | 原 compiler缺6个mapping paths，实际复现 | 新 `seedance_source_dialogue.py` 仅精确 same-line 约束表达；其余 fields仍 fail closed。不是声音验收 |
-| First-frame/original image/identity | 历史PNG SHA `4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb` 941×1672，仅 REGISTERED_BYTES；未admit | asset-first可准备新原图，但新单元未授权。旧图不自动升为approved视觉源；first-frame七倒影/服装/几何须独立核验 |
+| First-frame/original image/identity | 历史PNG SHA `4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb` 941×1672，仅 REGISTERED_BYTES；未admit。新授权base SHA `14ce8688fd567c1d2ff7518a1de112cd505e5dec395bf22299219a00fed3ec73` 落盘但QA FAIL | 倒影平面及左右手要求失败，不能作为后续edit或视频源；零重抽边界下停止。旧图不自动升为approved视觉源 |
 | Reflection / clean plate | 原 Next/Risk 要求几何一致窗内plate，但未规定最终视频overlay。现选择首帧准备：同一Seedream模型、单 PNG reference + 作者审查的 bbox编辑；shared adapter已补，见single-reference spec。现有video+局部PNG仍不宣称支持 | **BLOCKED于实际素材**。先正常几何/人物base，再用同源exact图只处理林砚反射区域并验七倒影保护，所得plate作为S01首帧。真实坐标/plate bytes未产生，不能编造；raw MP4仍须全PASS。无需为本单元扩建视频compositor |
 | Hand / camera switch | source prose及state/cut七维可以表达；视频参考可换摄影而carry空间 | actual S01全PASS后source_video+帧71 observation；S02自身验收。边界character_presence为partial，不代表动态事实全通过 |
 | Audio analysis / trusted evidence | 实际audio输入再次返回unsupported；本次MCP medium转写旧原片为 `林燕請在終點站下車`、0–2.24s，虽要求word_timestamps却未返回逐字时间。ControlledPresentationVerifier只接受technical/analyzer、明确拒绝human；Console七项continuity不含声音 | **EVIDENCE_REPAIR_FIRST**。需能实际听音的合格分析环境及selected authority，或接入exact-bound可信human presentation host后由真实人听判；不能把播放网页/文本答复直接当registered verifier、AAC/ASR当音义PASS。当前未接human host，不重生成补证 |
 | Native audio composition | existing exact source audio registration / auto matching native WAV tracks / canonical sample trim | S01/S02真实accepted source落地后逐镜注册，保留dialogue audio_kind；必须实际验证输出声音，不能静音/重配音 |
 | Captions | existing CaptionTrack、style、source audio clock、CompositionSpec.caption_tracks、HyperFrames | hook是非口述字幕；不能伪造ASR alignment说广播读了hook。需明确authored caption provenance+原生音轨时钟，实际绑定style和sample/frame；目前只有职责，未登记或render |
-| Planner/Router/runtime | shared entry存在；pure source-native diagnostic已运行；current qualified factory/profile、binding、budget/egress/permit未为原unit封存 | qualified prepare与完整paid preview `NOT_EVALUATED`；不得用本目录文本或历史150CNY许可直接POST |
+| Planner/Router/runtime | shared entry存在；首张图片已有fresh exact preview、profile、budget/egress、durable intent和consumed one-use permit，Provider receipt ACCEPTED。本地candidate validation拒绝 unrelated dependency node | 图片未Registry activate，不能重放POST恢复；视频qualified prepare及完整paid preview仍 `NOT_EVALUATED`，听音路线仍阻断 |
 
 ## Explicit Adaptations
 
@@ -88,7 +90,7 @@ PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production preflight --data 
 
 | Call | Exactness now | Dependency / stop |
 | --- | --- | --- |
-| 技术base PNG | exact text/body/request/preview已落盘，strict project reopen及byte核对PASS；未submit | 新单元授权、current runtime/profile与paid gates；输出八人/八倒影和可编辑几何未验收 |
+| 技术base PNG | 已真实POST一次；exact PNG/provenance PASS，视觉QA FAIL；本地candidate materialize失败 | 倒置车顶反射、林砚双手握手机、苏遥右手持机；不能推进第二张或视频，不重抽 |
 | 单PNG clean plate编辑 | 同一model/1152×2048、仅删林砚反射、保留七倒影的职责已确定；没有虚构exact reference或bbox | actual base落盘、独立QA和Registry/Scene binding后测坐标，才生成exact preview；否则STOP |
 | 原S01 Fast4s、采用3s | 原source-native文字完整；当前历史图仅占位，不是final paid payload | plate全项通过且替换原reference；qualified听音/登记路线和完整Router/Provider gates齐备；否则不submit |
 | 原S02 Fast4s、采用4s | 原source-native文字完整；actual source_video依赖未满足 | S01 raw所有required findings PASS，再实际state提取/核验/绑定；后镜独立QA，不预先提交 |
@@ -97,13 +99,13 @@ PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production preflight --data 
 
 新的受管只读核查 `audio-review-route-20261014/` 确认：最终 `review_canvas_delivery` 的human `whole-playback`、full_playback/1.0x属于独立P6入口；它不能补签raw逐镜Gate。raw受控verifier与marked source validator都明确拒绝human。必要共享接点已经存在于 `presentation_verifier` + exact-bound `VerifiedEvaluationBinding` + one-use recording proof，缺的是实际听音host/真实presentation→answer采集，不是允许从JSON伪造human verdict。没有修改这些guard，也没有登记虚假听判。原候选尚无active QA，不能宣称某个真实音义profile已封存。
 
-## Bounded New Unit Proposal — Not Authorization
+## Bounded New Unit — Authorized 2026-10-14
 
 更新候选：最多2次 `doubao-seedream-5-0-pro-260628` PNG（1152×2048）：一次技术base，完整八人/八倒影用于定位；一次单参考编辑，只删林砚倒影、保留其他七人/窗几何，形成S01首帧。base是隔离准备素材，绝不冒充原S01首帧。bbox必须等actual base后审查，不能现在伪造exact编辑payload。之后最多2次 `doubao-seedance-2-0-fast-260128` 视频（每次请求4s、480p496×864、24fps、原生声音）；零重抽、零自动fallback。各素材独立验收；plate成功不证明视频始终没有手倒影。
 
 拟议内部上限为每图片50 CNY、每视频50 CNY、单元总200 CNY，仅operator upper bound，不是市场价/账单。前次1图片+2视频/150 CNY只是未授权提案，无法同时证明base与clean plate编辑，保留为历史。历史视频10+旧抬手机A1=11真实计数保留；新单元最多增加2则累计13。旧累计cap12及已用1/1图片、1/2视频是历史，剩余旧B不能挪用，不修改旧记录来凑额。
 
-新单元仍未授权，本提案不是one-use permit。首个准备请求已可审阅；后续exact参考/bbox/视频状态只能由实际前序素材产生。若用户授予这一完整有限单元，可先按逐次fresh gates准备图片；**声音证据路线未qualified前不得提交视频**。没有用授权或第一张图成功解除后续依赖。逐次仍需current profile/window、preview、reservation、egress、durable intent和one-use permit；S01任何required finding缺证/失败就停止，不能消费S02。
+上述提案原先未授权；用户随后明确回复“授权”，对应 `authorized-unit-20261014-001/unit-authorization.json`，不是把本文当作one-use permit。已按逐次fresh gates执行第一张；实际底图QA失败，因此本单元停止。剩余一张仅为通过底图后的同源编辑，不能挪为重抽。**声音证据路线未qualified前不得提交视频**；授权不会解除素材、质量或声音依赖。逐次仍需current profile/window、preview、reservation、egress、durable intent和one-use permit；S01任何required finding缺证/失败就停止，不能消费S02。
 
 ## Evidence And Acceptance Boundary
 

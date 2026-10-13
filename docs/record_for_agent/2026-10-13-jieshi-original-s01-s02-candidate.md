@@ -1,18 +1,23 @@
 ---
-record_kind: session_summary
+record_kind: media_experiment
 topic_id: jieshi-original-s01-s02-fidelity
-learning_eligibility: ineligible
+learning_eligibility: eligible
+evidence_index_version: "1"
 ---
 
 # Jieshi Original S01–S02 Candidate Record
 
 Date: 2026-10-13
 
+## Supersession Notice — 2026-10-14
+
+用户已明确授权最多2 Seedream PNG+2原S01/S02 Fast4s、480p/native audio、零重抽的200 CNY内部上限单元。下文此前“新单元未授权/新增POST=0/Manifest revision3”为历史checkpoint，已被文末真实执行取代：新增1图片POST、0视频POST，exact底图视觉QA FAIL，未进入第二张或视频。paid receipt ACCEPTED与本地materialize `outcome_unknown`分开保留；不是Provider结果未知，也不是原S01成功。
+
 ## Current Goal And Boundary
 
 用户明确纠正：旧抬手机/起身两镜为 Agent 简化测试，不是原开场。本次从已发布 shared inspect/author/preflight 继续，准备原 S01→S02 候选及逐项忠实度矩阵，不重建执行链。原开场两镜采用0–3/3–7秒；S03/S04才补足7–15秒，当前只保留映射、不扩4次生成。
 
-当前真实停止点为原S01的实际几何一致clean plate 尚未产生/准入，以及声音语义没有合格听音/登记路线的 `EVIDENCE_REPAIR_FIRST`。对原文“clean plate必须最终视频overlay”的过早解读已撤回：原文只要求几何一致且只删除林砚映像，可以先准备首帧。已补同一Seedream adapter的单PNG参考；不签实际plate或raw video成功。2026-10-14 已完成首张技术base的exact candidate request/preview/native body及canonical初始项目数据bootstrap；没有激活QA、qualified视频runtime或paid intent/permit。另无原剧本新图片/视频调用授权。未生成新的原剧本MP4、没有前镜accepted source、没有state handoff/后镜submit、没有HyperFrames成片；human1.0x及故事AC-7 `NOT_EVALUATED`。
+当前真实停止点为已授权底图的 `QUALITY_FAILURE`，并有本地candidate materialization阻断；声音语义仍缺合格听音/登记路线的 `EVIDENCE_REPAIR_FIRST`。对原文“clean plate必须最终视频overlay”的过早解读已撤回：原文只要求几何一致且只删除林砚映像，可以先准备首帧。已补同一Seedream adapter的单PNG参考；本轮底图失败不能签实际plate或raw video成功。没有激活QA或qualified视频runtime。未生成新的原剧本MP4、没有前镜accepted source、没有state handoff/后镜submit、没有HyperFrames成片；human1.0x及故事AC-7 `NOT_EVALUATED`。
 
 ## Owned Work
 
@@ -84,7 +89,7 @@ Kimi invocation `ea1727fb-280f-4baa-8eaf-4843245a5881`，sealed deep profile、q
 | static PNG可以generic叠video | FALSE_POSITIVE；现有classifier/graphic契约需要graphic_layer_id和AdCreativePlan；不能把原剧情plate标成广告graphic绕契约 |
 | raw Gate不能由composition签 | CONFIRMED，不改Gate、验收顺序或历史media verdict |
 
-## Authorization And Finite Proposal
+## Historical Authorization And Finite Proposal
 
 新增image/video POST=0。旧asset-first单元仍为图片1/1、视频1/2；历史10视频+旧A1=11，旧cap12保留，未挪用B。前次1原图+2原S01/S02 Fast4s/150 CNY为未批准的历史提案，不提供同源base与plate两阶段证据。本轮可审阅新提案为最多2 Seedream PNG（1152×2048），先准备正常八人/八倒影的技术base，再单参考只编辑林砚反射区域；技术base不能冒充原S01首帧。actual base后才可测/审bbox，不能先伪造exact edit payload。最多2原S01/S02 Fast4s、480p、native audio、零重抽；若以后批准，累计视频最多13而非重置历史。每素材50、总200 CNY只为operator upper bound，不是价或账单。本次没有发出新paid permit或付费批准请求；可听音且可登记的Gate路线与qualified exact previews补齐后集中提出唯一新单元决定。
 
@@ -130,3 +135,49 @@ Parent确认raw `CanvasProductionService.evaluate`→`review_generation_attempt`
 未新增假human verifier、未声称听过、未把ASR或网页播放当semantic PASS，未重分类历史attempt09。声音恢复条件为qualified可听音analyzer/selected authority，或实际集成并验证exact-bound真人presentation host后由真实人听判。未满足前不提交视频；图片准备成功或新预算授权都不能解除这条依赖。
 
 完整新单元仍是最多2 PNG+2 Fast4s/480p原生声音、零重抽，内部各50/合计200 CNY；非价格/账单。首张输入已可审阅，可集中请求新单元授权；之后也只在实际前序依赖及逐次fresh gates满足时执行，不消费旧B、不提交声音证据仍不可验的镜头。这是授权缺失与能力Gate分离的真实阻断，不宣称只要授权就一定有合格视频。自动learning再次为 `no_candidate`：新增只读mapping与candidate request，零新媒体，不构成独立质量实验。
+
+## Authorized Base Execution And Stop — 2026-10-14
+
+用户随后明确回复“授权”，沿已发布共享image owner实际执行上述有限单元。证据根为 `runs/canvas-jieshi-original-s01-s02-20261013-001/authorized-unit-20261014-001/`，`unit-authorization.json` 的 scope SHA `14458924df070bd0c71fcfee9c4f6959d3aff73121eb46cf587909c7e8597e5c`。边界保持2图片、2视频、各50/总200 CNY内部 upper bound、零重抽；旧图片/视频单元和历史11视频不重分类、不重置、不挪旧B。
+
+初次 exact supplier lookup 因进程未接同用户D-Bus session而失败，transport调用0，canonical receipt `6935f89d86475dce2075f8d1d96e03f8b448ac2b4a90c660f5dab6d1c1c4eca9` 为 `KNOWN_NO_EFFECT`，原reservation已释放为actual cost0。只修复已核实的session注入，仍用原exact injected supplier；readiness实际通过，没有查替代secret source。封存一次 task-necessary known-no-effect runtime恢复，保留旧attempt/receipt，gen_revision1→2仅区分新request identity，native模型输入2819 bytes及SHA `d48502a7bd27fd80786e7f54cf8e56a06b26e08dbddd54a10cf24695f5812e1d`不变，未扩额度或复用permit。这不是重抽已生成素材。
+
+恢复attempt `original-preparation-base-20261014-qualified-001`、request fingerprint `4225a10af7b88649f33bbfa08f8df705363780f78b07abae1847dcd230845801` 经 `generate_remote_image_asset` 真实POST一次。fresh exact profile/window、preview、budget reservation、egress、durable submit intent和one-use permit均沿现有owner核验。Provider receipt `aa2c38927dace8d98eddd50dc005e9748a56b70764b9ca755827caf369ff1469` 是 **ACCEPTED**；原PNG与wire PNG均已落盘：`production/assets/files/14ce8688fd567c1d2ff7518a1de112cd505e5dec395bf22299219a00fed3ec73.png`，SHA同文件名，1152×2048，4,265,121 bytes。标准result/provenance validation及wire/local同bytes实际PASS。
+
+本地activation随后失败：Manifest revision12，image attempt `outcome_unknown`、phase `materialize`；paid phase仍 `accepted`。Registry没有准入新图，candidate pointers为空。write-free重建同一持久result并调用shared preparer/validator，实际重现 `IMAGE_REQUEST_INVALID: Image candidate resolution contains an unrelated dependency node.`，位置 `production/image.py:1212`；Manifest bytes前后不变。没有放宽guard、手写candidate pointers、猜mixed state或再POST。已保存的PNG必须保留，不能把本地unknown误报为Provider未知、未返回图片或预算被冻结：budget revision5、blocked=false，50 CNY upper-bound reservation为reserved，actual cost尚null；不是实际账单。
+
+`runtime-repair-001/execution-receipt.json` 保留原错误码；首次 `current-unknown-boundary.json` 的外部结果恢复建议被 `current-state-reconciled.json` 明确纠正为paid ACCEPTED/本地materialize失败，不覆盖历史。`materialization-diagnosis.json` 绑定exact PNG/result/provenance和无mutation复现。现有 `paid_provider_no_effect_reconciliation` 仅支持video的verified pre-transport failure，不能用于此已POST且ACCEPTED的image释放预算；本轮没有执行该reconciliation。
+
+## Exact Base Visual Review
+
+在同一已封存 `base-review-contract.json` 下，Parent经 `view_image(detail=original)` 实际查看exact PNG，并独立测PNG bytes/尺寸。`base-image-review.json`保存每个required ID和观察；这属于技术准备图的实际审查，不是canonical raw-shot QA、human正常速度视频验收或后镜准入。
+
+| Required finding | Verdict | Actual observation |
+| --- | --- | --- |
+| base-eight-entities | PASS | 七名坐姿人物加门边苏遥，共八名实体，角色服装可辨 |
+| base-eight-matched-reflections | FAIL | 上方八人反射倒置在车顶平面，不是原要求的对应侧窗几何，不能认定完整正确窗内倒影 |
+| base-linyan-identity-props-hands | FAIL | 林砚坐姿/工牌/黑手机可见，但双手接触手机，左手未为空 |
+| base-other-identities-props | FAIL | 正面苏遥用解剖右手持乳白手机，左手垂下，违反左手职责 |
+| base-camera-space | FAIL | 倒置车顶映像替代本人/侧窗对应关系，林砚后方实际侧窗没有所需映像 |
+| base-isolated-editable-reflection | NOT_EVALUATED | 几何未通过，不制作猜测bbox或宣称可保护七倒影 |
+| base-png-and-unburned-caption | PASS | exact 1152×2048 PNG，无故事字幕/说明或拼图，保留预先声明的厂商watermark |
+
+全项不PASS，结论 **QUALITY_FAILURE / STOP**。没有第二张edit、重抽、video submit或自动fallback；剩余图片为后续同源编辑，不能挪为换底图。新增实际图片POST1/2、视频0/2，历史视频仍11；S01/S02 raw QA、实际状态交接、原生音轨/字幕、canonical trim、HyperFrames及human1.0x均NOT_EVALUATED，完整前15秒和故事AC-7仍未交付。原source/native输入未删改；没有继续生成旧抬手机B。
+
+恢复需要可忠实准入的准备素材与可审阅新输入；本单元零重抽不能自动扩大。shared candidate需按P5精确比较查明无关dependency frontier，并通过唯一owner显式处理本地materialization；不能白名单无关节点或为了准入删S02。视频之前仍需qualified可听音且可登记的真实证据路线。修正输入/有限新调用必须有适用明确授权；已有授权不再次请求，当前失败不以“继续”或授权文本代签PASS。
+
+## Evidence Index
+
+此表只为本次原开场准备单元建立identity；历史其他实验不并入。本次remote boundary为Seedream/`doubao-seedream-5-0-pro-260628`、Ark shared image owner、1152×2048 PNG。同一图片的receipt、bytes、materialization和visual proof使用同一request fingerprint independence_key，只贡献一个图片样本；预transport失败不是第二个视觉样本。
+
+| evidence_id | independence_key | experiment_id | attempt_id | arm_id | artifact_sha256 | proof_layer | verdict | failure_class | relation_kind | related_evidence_id | source |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| credential-before-post | native-image:463e47e5d7b07c89d5db8f82db5d06f06867b08d7eac9d2066acb860adf74ac3 | jieshi-original-preparation-20261014 | original-preparation-base-20261014-candidate | N/A | NO_ARTIFACT:PRE_TRANSPORT_CREDENTIAL_FAILURE | PROVIDER_RECEIPT | KNOWN_NO_EFFECT | CREDENTIAL_READINESS | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/authorized-unit-20261014-001/base-known-no-effect-current.json |
+| base-submit | native-image:4225a10af7b88649f33bbfa08f8df705363780f78b07abae1847dcd230845801 | jieshi-original-preparation-20261014 | original-preparation-base-20261014-qualified-001 | N/A | 14ce8688fd567c1d2ff7518a1de112cd505e5dec395bf22299219a00fed3ec73 | PROVIDER_RECEIPT | ACCEPTED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/production/state/paid-provider/submits/aa2c38927dace8d98eddd50dc005e9748a56b70764b9ca755827caf369ff1469.json |
+| base-bytes | native-image:4225a10af7b88649f33bbfa08f8df705363780f78b07abae1847dcd230845801 | jieshi-original-preparation-20261014 | original-preparation-base-20261014-qualified-001 | N/A | 14ce8688fd567c1d2ff7518a1de112cd505e5dec395bf22299219a00fed3ec73 | TECHNICAL_BYTES | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | base-submit | runs/canvas-jieshi-original-s01-s02-20261013-001/authorized-unit-20261014-001/runtime-repair-001/materialization-diagnosis.json |
+| base-materialization | native-image:4225a10af7b88649f33bbfa08f8df705363780f78b07abae1847dcd230845801 | jieshi-original-preparation-20261014 | original-preparation-base-20261014-qualified-001 | N/A | 14ce8688fd567c1d2ff7518a1de112cd505e5dec395bf22299219a00fed3ec73 | LOCAL_MATERIALIZATION | OUTCOME_UNKNOWN | CANDIDATE_VALIDATION | SAME_EVIDENCE_NEW_PROOF_LAYER | base-submit | runs/canvas-jieshi-original-s01-s02-20261013-001/authorized-unit-20261014-001/runtime-repair-001/current-state-reconciled.json |
+| base-visual | native-image:4225a10af7b88649f33bbfa08f8df705363780f78b07abae1847dcd230845801 | jieshi-original-preparation-20261014 | original-preparation-base-20261014-qualified-001 | N/A | 14ce8688fd567c1d2ff7518a1de112cd505e5dec395bf22299219a00fed3ec73 | VISUAL_INSPECTION | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | base-submit | runs/canvas-jieshi-original-s01-s02-20261013-001/authorized-unit-20261014-001/base-image-review.json |
+
+## Record And Learning Update
+
+按 `record-ai-video-session` 更新本主记录和候选README，保留原文/媒体/receipt及foreign dirty。按 `distill-ai-video-learning` 自动评估仍为 **no_candidate**：一个视觉样本，无controlled multi-arm或两个独立支持样本；不是既有Vidu对白/burned-caption claim的material update。eligible envelope仅让明确identity可验证，不代表满足claim admission。没有更新Skill/Policy/Gate、RAG或全局memory。shared code未修改，工程检查只证明这两份记录，不解除素材/声音/本地state阻断；publication以本轮exact Harness和commit/push/remote SHA证明为准。
