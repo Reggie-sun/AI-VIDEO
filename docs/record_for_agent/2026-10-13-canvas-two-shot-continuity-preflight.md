@@ -8,6 +8,51 @@ learning_eligibility: ineligible
 
 Date: 2026-10-13
 
+## Asset First A Fetched — Evidence Repair Required
+
+本节取代下节“视频0次”的当前状态；旧计数仍作为历史保留。共享原图与 original-video
+conditioning 工程已发布 `81f23c63be6ed306ba4bcadd7873417f66b3bfca`；image authoring lineage
+修复已发布 `7988da054f00d88c7ea59e6d705f676ffed65633`，对应 exact Harness 分别24组与11组
+全部 PASS，fresh receipt 已校验，远端 main SHA 已核对。后者 receipt 为
+`.agent/harness/runs/canvas-image-authoring-lineage-20261013-r1/receipt.json`。
+
+本单元已实际成功生成1张 Seedream 原图和1段 Fast 2.0 视频，零重抽；B 尚未提交。
+历史视频10次保留，当前累计11，剩余仅 B 的1次额度。实际账单未查询；内部单次50 CNY
+上限不代表价格或实际扣费。没有购买私域人像权益，也没有上传到私域素材库。
+
+A attempt 为 `canvas-069348f125ec927cf6091304d73ba6704cdac69b`，480p、15秒 nominal、
+原生声音、I2V 输入为下节同账号生成的未修改原始 PNG。MP4 SHA 为
+`acb838b64b26dd119a841e01b672c7aa2aa2af00eca4031107e77b867674f92d`，2778184 bytes；
+路径为 `runs/canvas-jieshi-two-shot-20261013-001/production/state/video-generation/fetch/files/<SHA>.mp4`。
+实际 H264 864×496、24fps、361帧，container 15.104秒，AAC stereo 32000Hz。
+
+落盘后已显式调用 project-local `video-analysis` MCP，取得0–15秒每0.5秒共31帧和单场景证据，
+Parent 实际逐张查看；另调用 MCP Whisper base，返回空 transcript。完整音轨 decode 无错误，
+peak -23.596120 dBFS、RMS -37.812796 dBFS，未检测到 -60 dBFS 下至少0.1秒静音。
+这些技术结果不证明振动次数/时序、列车/衣料声语义、无配乐或音画同步。
+当前 Agent runtime 明确不支持 audio input，不能声称实际听过该音轨。
+
+通过现有 `service.evaluate`、实际 `ProjectAnalysisSession`、`ControlledPresentationVerifier`
+及 committer 落盘逐项结果：`source-camera`、`source-close-anchor`、`source-identity`、
+`source-motion_direction`、`source-props`、`source-space` PASS；`source-action` 与
+`source-audio` 为 NOT_EVALUATED。抽帧显示约4.5秒开始抬机，约8秒到胸前，12秒和末段稳定持机，
+左手仍在左膝；完整正常速度动作及听音还未验证，不用抽帧或 ASR 代签。
+canonical diagnosis 为 `EVIDENCE_GAP`、`next_owner=evidence_owner`、
+`all_required_observed_pass=false`，没有判定模型质量 FAIL。
+
+精确证据均在 run 的 `harness-admission/`：`asset-first-A-fetched.json`、
+`asset-first-A-mcp-raw.json`、`asset-first-A-mcp-transcription.json`、
+`asset-first-A-observations.json`、`asset-first-A-evaluation-source.json`、
+`asset-first-A-diagnosis.json`。同一原片已交用户完整1.0x听看；等待真实证据补齐，
+不得重新生成 A、挪用 B 次数、删除要求或把该片称作完整两镜成片。
+A 尚未 activate；approved state reference 尚未正式提取/绑定，B、trim接点、HyperFrames
+验证片、human acceptance 与完整故事 AC-7 均未完成。恢复应针对同一 exact MP4
+经 canonical `repair_evidence` 补证，然后才能 validate/activate 和继续 B。
+
+本 checkpoint 按 `record-ai-video-session` 更新同一记录；`distill-ai-video-learning`
+评估为 `no_candidate`：一次原图→视频成功不能推导通用人像准入、模型连续性或声音质量结论。
+记录动作未新增 Provider 调用，foreign dirty files 保持不动；RAG 索引未刷新。
+
 ## Asset First Actual Image And Lineage Recovery
 
 共享能力已发布 `81f23c63be6ed306ba4bcadd7873417f66b3bfca`，远端 main SHA 已核对。
