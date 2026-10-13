@@ -35,6 +35,16 @@ HTTP200、model仍为 `doubao-seedance-2-0-fast-260128`、state=failed，实际 
 未逐条核验账户账单，规则证据不冒充实际结算，不写入 actual0、不释放 reservation或恢复 submit额度。
 50 CNY 仍只是内部 operator upper bound，不是已经扣款；本次补证没有新增 Provider或媒体调用。
 
+2026-10-13 用户进一步询问社区 AI drama 制作法。已补充
+[一手社区与官方工作流研究](../research/2026-10-13-seedance-ai-portrait-input-admission.md#community-ai-drama-workflows)：
+推荐资产先行、逐镜验收、实际状态交接及剪辑；官方同账号原始产物的受信路径不自动覆盖本地普通中间PNG。
+首镜T2V成功也不能单独解决后镜的准入证据缺口。原视频/Provider尾帧是不同候选输入，未替换现有中间帧契约。
+本轮无新增视频/图片生成、无Production mutation，累计10/11及STOP保持。
+受管Kimi只读来源摘要核查完成（invocation `92a648cd-f139-436e-9481-51c157ebf5fa`）；
+Parent纠正了其“必须改尾帧”及“再投同prompt”的越界/无证据建议，细节见研究文档及local adjudication。
+`record-ai-video-session`评估为更新现有primary record；`distill-ai-video-learning=no_candidate`，
+社区自报与官方接口文档不构成新的受控本地模型实验，也不自动升级Skill/Policy或媒体验收。
+
 这是 accepted task 后的 terminal failure，**不是 known_no_effect、unknown 或 MP4质量验收**。
 canonical runtime diagnosis 为 `RUNTIME_FAILURE`；Manifest46 / project revision6，next_action=stop。
 项目实际 POST3、历史7、累计10/11，新单元已消费1/2。余下一次原用于B；A未接受，B submit=0。
