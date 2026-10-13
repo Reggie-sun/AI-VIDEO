@@ -129,7 +129,7 @@
     "shots": [
       {
         "occurrence_id": "S01",
-        "adaptation_reason": "Derived from exact original Shot-card paragraphs; labels and reference grammar made explicit; original dialogue/windows/action/camera retained. Screen Text is assigned to canonical CaptionTrack. Historical PNG is review-only, not admitted/accepted or paid authorization. Explicit same-line native dialogue declaration expresses exact typed windows/screen/lip controls. Current Character Bible appearance/wardrobe and props copied into prose; future plot facts not added. Original S01 Next/Risk clean-plate duty remains a blocked composition requirement, not implicitly replaced by model guessing.",
+        "adaptation_reason": "Derived from exact original Shot-card paragraphs; labels and reference grammar made explicit; original dialogue/windows/action/camera retained. Screen Text is assigned to canonical CaptionTrack. Historical PNG is review-only, not admitted/accepted or paid authorization. Explicit same-line native dialogue declaration expresses exact typed windows/screen/lip controls. Current Character Bible appearance/wardrobe and props copied into prose; future plot facts not added. Original S01 Next/Risk clean-plate duty is assigned to single-reference first-frame preparation; actual geometry/plate admission remains blocked, and raw video findings must independently PASS.",
         "source_dialogue": "林砚，请在终点站下车。",
         "shot": {
           "shot_id": "S01",
@@ -221,7 +221,7 @@
       },
       {
         "occurrence_id": "S02",
-        "adaptation_reason": "Derived from exact original Shot-card paragraphs; labels and reference grammar made explicit; original dialogue/windows/action/camera retained. Screen Text is assigned to canonical CaptionTrack. Historical PNG is review-only, not admitted/accepted or paid authorization. Explicit same-line native dialogue declaration expresses exact typed windows/screen/lip controls. Current Character Bible appearance/wardrobe and props copied into prose; future plot facts not added. Original S01 Next/Risk clean-plate duty remains a blocked composition requirement, not implicitly replaced by model guessing.",
+        "adaptation_reason": "Derived from exact original Shot-card paragraphs; labels and reference grammar made explicit; original dialogue/windows/action/camera retained. Screen Text is assigned to canonical CaptionTrack. Historical PNG is review-only, not admitted/accepted or paid authorization. Explicit same-line native dialogue declaration expresses exact typed windows/screen/lip controls. Current Character Bible appearance/wardrobe and props copied into prose; future plot facts not added. Original S01 Next/Risk clean-plate duty is assigned to single-reference first-frame preparation; actual geometry/plate admission remains blocked, and raw video findings must independently PASS.",
         "source_dialogue": "刚才……叫的是我？",
         "shot": {
           "shot_id": "S02",

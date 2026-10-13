@@ -269,7 +269,7 @@ class ImageGenerationRequest(_ImageStrictModel):
         )
         return {
             "schema": (
-                "ai-video-image-request/4"
+                ("ai-video-image-request/5" if references else "ai-video-image-request/4")
                 if data["provider_kind"] == "seedream"
                 else
                 "ai-video-image-request/3"
@@ -317,10 +317,12 @@ class ImageGenerationRequest(_ImageStrictModel):
             raise ValueError("image references must be unique by role and asset_id")
         roles = {item.role for item in self.references}
         if self.provider_kind == "seedream":
-            if (self.model_id != "doubao-seedream-5-0-pro-260628" or self.references
+            from ai_video.production.seedream_reference import validate_seedream_references
+            validate_seedream_references(self.references)
+            if (self.model_id != "doubao-seedream-5-0-pro-260628"
                     or self.parameters.seed is not None or self.parameters.width is None
                     or self.parameters.height is None or self.negative_prompt_text):
-                raise ValueError("Seedream original-image requests require the exact text-only profile")
+                raise ValueError("Seedream requests require the exact model and PNG geometry")
         elif "continuity_terminal" in roles:
             if (
                 len(self.references) != 2
@@ -400,8 +402,8 @@ class ImageGenerationPreview(_ImageStrictModel):
         if self.local_only == self.remote or self.remote != (self.remote_call is not None):
             raise ValueError("image preview must identify its exact local or remote lane")
         if self.remote_call is not None and self.remote_call.provider_kind == "seedream":
-            if self.reference_asset_ids or self.reference_total_bytes != 0:
-                raise ValueError("Seedream text-only preview cannot contain reference bytes")
+            from ai_video.production.seedream_reference import validate_seedream_preview_references
+            validate_seedream_preview_references(self)
         elif len(self.reference_asset_ids) < 2:
             raise ValueError("image preview requires at least two reference assets")
         data = self.model_dump(mode="json", exclude={"preview_fingerprint"})
@@ -722,7 +724,9 @@ def validate_image_result(
                 or submit.external_effect_id != result.provider_request_id):
             raise _image_scope_invalid("Image submit receipt does not match its exact request.")
     if request.provider_kind == "seedream":
-        if (remote is None or result.adapter != ToolIdentity(name="seedream", version="seedream-original-png/1")
+        from ai_video.production.seedream_reference import seedream_adapter_version
+        if (remote is None or result.adapter != ToolIdentity(name="seedream",
+                version=seedream_adapter_version(request.references))
                 or result.wire_image_bytes != result.image_bytes
                 or result.remote_evidence.conversion != "identity-png"):
             raise _image_scope_invalid("Seedream requires original PNG bytes and its exact remote adapter provenance.")

@@ -21,9 +21,9 @@ Commercial Planner handoff 完整意图采用已有 v4 并保留 conditioning/vo
 v3/v4 执行同一 approved-first-frame lineage 校验。`_remote_video_product_prompt` 从 sealed product
 fidelity 投影 native prose，由 shared remote grammar 重编；无新 approval 或 identity owner。
 
-## Seedream Original Image
+## Seedream Original Image And Single Reference
 
-`seedream.py` 只拥有已选 `doubao-seedream-5-0-pro-260628` 的单张纯 T2I、exact Ark endpoint、
+`seedream.py` 只拥有已选 `doubao-seedream-5-0-pro-260628` 的单张 T2I/显式单 PNG 参考、exact Ark endpoint、
 bounded transport 与原始 PNG response；不注入 Grok identity、订阅资格、自动重抽或素材库准入。
 `ImageGenerationRequest /4` 允许该 profile 无参考输入，保留旧 request/preview hash；
 `image_candidate.make_image_candidate_preparer` 纯构造原 image activation candidate，
@@ -33,6 +33,14 @@ bounded transport 与原始 PNG response；不注入 Grok identity、订阅资�
 request/result/Registry 身份；原 PNG 不转换，unknown 不重试。Canvas 引用 canonical 生成图时，
 resource ID 必须是当前严格重开的 output asset ID；该映射不证明 Provider admission 或人类验收。
 检查归 `seedream_image_tests` 与既有 image/Registry/Canvas suites。
+
+单参考必须 opt-in `allow_single_png_reference=true` 的新 immutable profile；旧 profile 的
+序列化/hash 与纯文字 request `/4`、result `seedream-original-png/1` 保持。新 request `/5`
+只允许一个 `scene` binding，`seedream_reference` 独占 exact PNG/bytes/geometry measurement、
+reference accounting 与 result version `seedream-single-reference-png/1`；injected resolver 沿
+canonical Registry binding 返回原 bytes，adapter不读任意路径/URL、不猜 bbox/mask、不改写prompt。
+preview封存图片SHA/bytes/MIME，permit前重验同一preview，原PNG output及其 paid/provenance不变。
+坐标编辑接口支持不证明clean plate几何/七倒影保护，也不授权POST；raw MP4逐镜Gate独立保留。
 
 ## Current Shot Close Expression
 

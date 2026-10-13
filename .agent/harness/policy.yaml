@@ -1024,6 +1024,7 @@ categories:
   seedream_image:
     patterns:
       - src/ai_video/production/seedream.py
+      - src/ai_video/production/seedream_reference.py
       - src/ai_video/production/image.py
       - src/ai_video/production/image_candidate.py
       - src/ai_video/production/_asset_registry_validation.py

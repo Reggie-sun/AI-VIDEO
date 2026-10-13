@@ -89,6 +89,14 @@ model、纯文字 prompt、exact geometry、PNG/watermark、内部预算有效�
 resource ID 明确指向当前 canonical image output asset ID，保留原始 generation/paid 证据。
 原图完成只提供下一镜的输入；仍须核验构图与引用职责，不能视为视频准入或连续性 PASS。
 
+首帧需要基于已有场景图做局部准备时，同一 adapter 可显式选择
+`SeedreamProfile(allow_single_png_reference=True, ...)` 和 injected `image_resolver(binding)`。
+request 只接受一个 exact `scene` PNG reference；preview 列出该图的 SHA/bytes/MIME，
+native payload 使用同一原图的 inline PNG。默认纯文字 profile 不接受参考，旧 hash 不变。
+实际编辑区域由作者依据当前图片审核后放入 prompt；不自动计算坐标、遮罩或保护区。
+原图、准备后的 clean plate 和影片须分别核验；首帧编辑不能代签 raw MP4 或下一镜质量。
+该 shared capability 不授权新的图片/视频调用，也不启用图层拆分或新的 renderer。
+
 ## Production Flow
 
 | Stage | Operation | Required evidence |

@@ -1,4 +1,4 @@
-"""One original Ark Seedream PNG through the shared paid image owner."""
+"""One Ark Seedream PNG through the shared paid image owner."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from contextlib import contextmanager
 from datetime import UTC, datetime
 
 import httpx
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_serializer, model_validator
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production._state_commit_contracts import _DurablePaidProviderSubmitPermit
@@ -26,6 +26,9 @@ from ai_video.production.paid_provider import (
     validate_paid_provider_authorization,
 )
 from ai_video.production.remote_image import RemoteImageEvidence, remote_image_permit_binding
+from ai_video.production.seedream_reference import (
+    resolve_seedream_reference, seedream_adapter_version, SEEDREAM_REFERENCE_VERSION,
+)
 
 
 SEEDREAM_MODEL = "doubao-seedream-5-0-pro-260628"
@@ -42,6 +45,14 @@ class SeedreamProfile(StrictModel):
     upper_bound_microunits: int = Field(strict=True, gt=0)
     observed_at: datetime
     expires_at: datetime
+    allow_single_png_reference: bool = Field(default=False, strict=True)
+
+    @model_serializer(mode="wrap")
+    def _legacy_text_only(self, handler):
+        data = handler(self)
+        if not self.allow_single_png_reference:
+            data.pop("allow_single_png_reference", None)
+        return data
 
     @model_validator(mode="after")
     def _validity(self):
@@ -52,7 +63,8 @@ class SeedreamProfile(StrictModel):
 
     @property
     def content_hash(self):
-        return canonical_sha256({"schema": SEEDREAM_VERSION, "model": SEEDREAM_MODEL,
+        version = SEEDREAM_REFERENCE_VERSION if self.allow_single_png_reference else SEEDREAM_VERSION
+        return canonical_sha256({"schema": version, "model": SEEDREAM_MODEL,
             "origin": SEEDREAM_ORIGIN, **self.model_dump(mode="json")})
 
 
@@ -109,10 +121,11 @@ class HttpxSeedreamImageTransport:
 
 
 class SeedreamImageProvider:
-    def __init__(self, profile, transport, credential, *, now=None):
+    def __init__(self, profile, transport, credential, *, now=None, image_resolver=None):
         self._profile = SeedreamProfile.model_validate_json(profile.model_dump_json())
         self._transport = transport
         self._credential = credential
+        self._image_resolver = image_resolver
         self._now = now or (lambda: datetime.now(UTC))
 
     def _settings(self, request):
@@ -125,7 +138,8 @@ class SeedreamImageProvider:
             now = self._now()
             width, height = checked.parameters.width, checked.parameters.height
             if (checked != request or checked.provider_kind != "seedream" or checked.model_id != SEEDREAM_MODEL
-                    or checked.references or checked.negative_prompt_text or checked.parameters.seed is not None
+                    or (checked.references and not self._profile.allow_single_png_reference)
+                    or checked.negative_prompt_text or checked.parameters.seed is not None
                     or checked.parameters.output_format != "png" or width is None or height is None
                     or not 921600 <= width * height <= 4624220 or not 1/16 <= width/height <= 16
                     or not self._profile.observed_at <= now < self._profile.expires_at):
@@ -134,14 +148,22 @@ class SeedreamImageProvider:
         except Exception:
             raise _invalid() from None
 
-    def preview(self, request):
+    def _prepare_preview(self, request):
         request = self._check(request)
+        try:
+            reference = resolve_seedream_reference(request.references, self._image_resolver)
+        except Exception:
+            raise _invalid() from None
         items = []
         for name, raw, mime in (("prompt", request.prompt_text.encode(), "text/plain"),
                 ("settings", json.dumps(self._settings(request), sort_keys=True,
                     separators=(",", ":")).encode(), "application/json")):
             items.append(PaidProviderEgressItem(item_id=name, sha256=hashlib.sha256(raw).hexdigest(),
                 size_bytes=len(raw), mime_type=mime, purpose=name))
+        if reference is not None:
+            items.append(PaidProviderEgressItem(item_id="reference-1-scene",
+                sha256=hashlib.sha256(reference).hexdigest(), size_bytes=len(reference),
+                mime_type="image/png", purpose="reference"))
         paid = PaidProviderCallPreview.create(attempt_id=request.attempt_id, operation="image_generation",
             provider_kind="seedream", model_id=SEEDREAM_MODEL, request_fingerprint=request.request_fingerprint,
             billing_mode="remote_metered", currency="CNY",
@@ -149,11 +171,15 @@ class SeedreamImageProvider:
             destination=SEEDREAM_ORIGIN, method="POST", egress_items=tuple(items),
             retention_mode="provider_standard", provider_policy_snapshot_id=self._profile.content_hash,
             secret_reference=SecretReference(kind="secret_store", reference_id="ARK_API_KEY"))
-        return ImageGenerationPreview.create(request=request, reference_total_bytes=0, remote_call=paid)
+        return ImageGenerationPreview.create(request=request,
+            reference_total_bytes=len(reference) if reference is not None else 0, remote_call=paid), reference
 
-    def preflight(self, request, authorization):
+    def preview(self, request):
+        return self._prepare_preview(request)[0]
+
+    def _preflight_data(self, request, authorization):
         try:
-            preview = self.preview(request)
+            preview, reference = self._prepare_preview(request)
             auth = ImageGenerationAuthorization.model_validate_json(authorization.model_dump_json())
             if (auth != authorization or auth.local_only or auth.remote_binding is None
                     or auth.request_fingerprint != request.request_fingerprint
@@ -162,9 +188,12 @@ class SeedreamImageProvider:
                 raise ValueError("authority mismatch")
             validate_paid_provider_authorization(preview.remote_call, auth.remote_binding.authorization,
                 now=self._now())
-            return preview
+            return preview, reference
         except Exception:
             raise _invalid() from None
+
+    def preflight(self, request, authorization):
+        return self._preflight_data(request, authorization)[0]
 
     def generate(self, request, authorization, permit, *, gate_receipt):
         started = time.monotonic()
@@ -179,9 +208,14 @@ class SeedreamImageProvider:
             key = self._credential()
             if not isinstance(key, str) or not key or any(c.isspace() for c in key):
                 raise ValueError("credential unavailable")
-            self.preflight(request, authorization)
-            body = json.dumps({**self._settings(request), "prompt": request.prompt_text},
+            _, reference = self._preflight_data(request, authorization)
+            payload = {**self._settings(request), "prompt": request.prompt_text}
+            if reference is not None:
+                payload["image"] = "data:image/png;base64," + base64.b64encode(reference).decode("ascii")
+            body = json.dumps(payload,
                 ensure_ascii=False, separators=(",", ":")).encode()
+            self._check(request)
+            validate_paid_provider_authorization(remote.preview, remote.authorization, now=self._now())
             if len(body) > MAX_JSON_BYTES or not permit._consume_paid_provider_operation_permit(
                     **remote_image_permit_binding(remote)):
                 raise ValueError("exact one-use permit required")
@@ -218,7 +252,7 @@ class SeedreamImageProvider:
                 outcome=PaidProviderSubmitOutcome.ACCEPTED, external_effect_id=effect_id, recorded_at=self._now())
             return ImageProviderResult.create(request=request, authorization=authorization,
                 image_bytes=wire, wire_image_bytes=wire, content_type="image/png", provider_request_id=effect_id,
-                adapter=ToolIdentity(name="seedream", version=SEEDREAM_VERSION),
+                adapter=ToolIdentity(name="seedream", version=seedream_adapter_version(request.references)),
                 resource_evidence=ImageLocalResourceEvidence(
                     elapsed_milliseconds=max(0, int((time.monotonic()-started)*1000)), device_kind="unknown"),
                 remote_evidence=RemoteImageEvidence(submit_receipt=receipt, wire_sha256=measured.sha256,

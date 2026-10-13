@@ -24,7 +24,7 @@ PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production preflight --data 
 | S01 Action：首帧六乘客及苏遥完整倒影；唯独林砚为空 | 同一 source 原句；eight character_ids；first-frame asset | 原 Action 与 Prompt 全句进入 S01 input；追加明确不得删除其他倒影 | 首帧和采用段全程逐人对应，实体8人、其他完整倒影7人、只缺林砚；不是逐渐消失 |
 | S01：看空位、抬解剖左手 | subject_action.progression 原文，无抬手机替代 | `林砚看向空位并抬左手靠玻璃，玻璃里没有手。` | 动作全过程、视线对象、左右手身份；不能靠静帧代签 |
 | S01 Close：距窗约2cm停住并保持到切出 | 原 Close/Prompt；S02 state_reference frame_index=71 | 两句原文保留；计划 frame71 为采用3秒内最后帧，不是4秒素材末帧 | 帧71及切点前动作，实际间隙/悬停；若 frame71 没到正确状态，本单元停而不猜 |
-| S01：玻璃也没有他的手 | source Action/Prompt；clean plate 责任 | 模型输入明确没有手；**原 Next/Risk 的几何一致 clean plate / 只删除林砚映像尚无实际绑定，BLOCKED** | 实际 plate/matte identity、保护七倒影区域、窗几何和边缘无污染；原/合成对比 |
+| S01：玻璃也没有他的手 | source Action/Prompt；首帧 clean plate 准备责任 | 模型输入明确没有手；**选择首帧准备路线，实际几何一致 plate / 只删除林砚映像仍未绑定，BLOCKED** | source/plate exact identities、实测编辑区与保护七倒影区域、窗几何和边缘无污染；原图/plate对比及 raw MP4 全程无手倒影 |
 | 原右手手机职责、蓝挂绳白工牌 | 林砚 Character Bible；两镜 source 当前道具描述 | `林砚右手保持唯一黑壳手机原职责，蓝色挂绳白工牌保持。` | 唯一手机、右手稳定持机，左手空；无抬手机/换手/新增手机 |
 | 八人身份/服装/道具 | characters appearance_bible；原图 review-only，尚無独立 identity sheets | 两镜原外观/服装已显式复制进 source input，不依赖 Bible 自动进入模型；S01另含苏遥左手乳白手机、陈立耳机/深蓝手机、何静膝上灰布袋 | first-frame admission + 两镜 exact video 身份/服装/道具逐人核验；文字不是视觉identity证明 |
 | SC01 A/B区、D/C门与蓝椅/银杆固定空间 | 两个 scene ownership IDs，同一原 SC01 location | `固定空间：A区座位在D侧门左后…深灰地胶、蓝色长椅、银色立杆…` | 空间、门、窗和邻座位置一致，镜位切换不得重造车厢 |
@@ -61,9 +61,9 @@ PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production preflight --data 
 | Original source → shared author | source parts和typed dialogue可核对；原外观Bible不会自动成为source model prose | 本目录显式复制当前外观/道具/空间，列明所有追加；没有删除原动作、声音、字幕/Next-Risk |
 | Typed source dialogue | 原 compiler缺6个mapping paths，实际复现 | 新 `seedance_source_dialogue.py` 仅精确 same-line 约束表达；其余 fields仍 fail closed。不是声音验收 |
 | First-frame/original image/identity | 历史PNG SHA `4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb` 941×1672，仅 REGISTERED_BYTES；未admit | asset-first可准备新原图，但新单元未授权。旧图不自动升为approved视觉源；first-frame七倒影/服装/几何须独立核验 |
-| Reflection / clean plate | 原 Next/Risk 明确要求几何一致窗内plate，只删除林砚。现有Canvas composition单primary layer，settings没有plate/matte；canonical resolver虽支持多层，混合video+局部PNG不能据此宣称已支持 | **BLOCKED**。需要真实几何一致plate+受保护区域，再经已有asset/composition/HyperFrames owner补通必要的通用局部修复路径和验证；不能依赖模型随机删人代替plate义务。本窗口未伪造plate、mask或完成receipt |
+| Reflection / clean plate | 原 Next/Risk 要求几何一致窗内plate，但未规定最终视频overlay。现选择首帧准备：同一Seedream模型、单 PNG reference + 作者审查的 bbox编辑；shared adapter已补，见single-reference spec。现有video+局部PNG仍不宣称支持 | **BLOCKED于实际素材**。先正常几何/人物base，再用同源exact图只处理林砚反射区域并验七倒影保护，所得plate作为S01首帧。真实坐标/plate bytes未产生，不能编造；raw MP4仍须全PASS。无需为本单元扩建视频compositor |
 | Hand / camera switch | source prose及state/cut七维可以表达；视频参考可换摄影而carry空间 | actual S01全PASS后source_video+帧71 observation；S02自身验收。边界character_presence为partial，不代表动态事实全通过 |
-| Audio analysis | 本窗口实际调用video-analysis probe/transcribe及audio输入；平台明确不支持本会话audio input，Whisper有错名且窗口粗 | **EVIDENCE_REPAIR_FIRST**。需要能实际听音的合格分析环境/同exact bytes人的声音证据；不能把AAC存在、decode/响度/转写代成音义PASS，也不重生成补证 |
+| Audio analysis / trusted evidence | 实际audio输入再次返回unsupported；本次MCP medium转写旧原片为 `林燕請在終點站下車`、0–2.24s，虽要求word_timestamps却未返回逐字时间。ControlledPresentationVerifier只接受technical/analyzer、明确拒绝human；Console七项continuity不含声音 | **EVIDENCE_REPAIR_FIRST**。需能实际听音的合格分析环境及selected authority，或接入exact-bound可信human presentation host后由真实人听判；不能把播放网页/文本答复直接当registered verifier、AAC/ASR当音义PASS。当前未接human host，不重生成补证 |
 | Native audio composition | existing exact source audio registration / auto matching native WAV tracks / canonical sample trim | S01/S02真实accepted source落地后逐镜注册，保留dialogue audio_kind；必须实际验证输出声音，不能静音/重配音 |
 | Captions | existing CaptionTrack、style、source audio clock、CompositionSpec.caption_tracks、HyperFrames | hook是非口述字幕；不能伪造ASR alignment说广播读了hook。需明确authored caption provenance+原生音轨时钟，实际绑定style和sample/frame；目前只有职责，未登记或render |
 | Planner/Router/runtime | shared entry存在；pure source-native diagnostic已运行；current qualified factory/profile、binding、budget/egress/permit未为原unit封存 | qualified prepare与完整paid preview `NOT_EVALUATED`；不得用本目录文本或历史150CNY许可直接POST |
@@ -77,17 +77,20 @@ PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production preflight --data 
 5. 历史PNG复制原字节只做数据绑定审阅；S02同图是 `AUTHORING_PLACEHOLDER_ONLY`。两个scene IDs只隔离reference ownership，物理地点仍同SC01，未更换场景。
 6. 480p候选496×864/24fps取用户新约束，S01/S02分别请求4s、采用3/4s；不套用旧15秒nominal测试长度。
 7. 对clean plate、qualified runtime、caption实际binding及声音证据的缺项明确保留，未靠删原要求通过检查。
+8. 经源码/原文和独立mapping复核，撤回“clean plate必须在最终视频局部合成”的过早判断；机制改为首帧准备，不改原S01动态或raw Gate。纯文字Seedream不能担任精确编辑，已加显式single-reference profile；这不代表plate已制作。
 
 ## Bounded New Unit Proposal — Not Authorization
 
-拟议一次最多1张 `doubao-seedream-5-0-pro-260628` 原始PNG（1152×2048，原S01八人/七倒影/空位构图）＋最多2次 `doubao-seedance-2-0-fast-260128` 视频（每次请求4s、480p496×864、24fps、原生声音）；零重抽、零自动fallback。原图初始source仍须审查身份、服装和几何；生成不能自动满足clean plate义务。
+更新候选：最多2次 `doubao-seedream-5-0-pro-260628` PNG（1152×2048）：一次技术base，完整八人/八倒影用于定位；一次单参考编辑，只删林砚倒影、保留其他七人/窗几何，形成S01首帧。base是隔离准备素材，绝不冒充原S01首帧。bbox必须等actual base后审查，不能现在伪造exact编辑payload。之后最多2次 `doubao-seedance-2-0-fast-260128` 视频（每次请求4s、480p496×864、24fps、原生声音）；零重抽、零自动fallback。各素材独立验收；plate成功不证明视频始终没有手倒影。
 
-拟议内部上限为图片50 CNY、每视频50 CNY、单元总150 CNY，仅operator upper bound，不是市场价/账单。历史视频10+旧抬手机A1=11真实计数保留；新单元最多增加2则累计13。旧累计cap12及已用1/1图片、1/2视频是历史，剩余旧B不能挪用，不修改旧记录来凑额。
+拟议内部上限为每图片50 CNY、每视频50 CNY、单元总200 CNY，仅operator upper bound，不是市场价/账单。前次1图片+2视频/150 CNY只是未授权提案，无法同时证明base与clean plate编辑，保留为历史。历史视频10+旧抬手机A1=11真实计数保留；新单元最多增加2则累计13。旧累计cap12及已用1/1图片、1/2视频是历史，剩余旧B不能挪用，不修改旧记录来凑额。
 
-**目前不提交付费批准请求**：clean plate输入/共享路径、可听音Gate证据路线以及qualified完整paid preview仍有前置缺口。所有这些具体候选补齐后，唯一新的外部决定才是是否授予上述exact原剧本输入的新有限调用单元；本提案不是one-use permit。授权前不会POST；即使以后授权，逐次仍需current profile/window、preview、reservation、egress、durable intent和one-use permit。S01任何required finding缺证/失败就停止，不能消费S02。
+**目前不提交付费批准请求**：共享single-reference准备能力已补；实际plate、可听音且能登记的Gate证据路线，以及qualified完整paid preview仍缺。唯一新的外部决定仍为是否授予补齐后的原剧本输入新有限调用单元，尚未提出或授予；本提案不是one-use permit。授权前不会POST；即使以后授权，逐次仍需current profile/window、preview、reservation、egress、durable intent和one-use permit。S01任何required finding缺证/失败就停止，不能消费S02。
 
 ## Evidence And Acceptance Boundary
 
 当前证据根 `runs/canvas-jieshi-original-s01-s02-20261013-001/`：`inspection.json`、`author.json`、`preflight.json`、`native-dialogue-gap.json`（修复前6paths拒绝）、`native-expression-preview.json`（修复后source-native表达）；`audio-capability-probe.json`及Kimi read-only mapping receipt/report。它们没有Production acceptance权。
+
+首帧准备职责修订后的fresh共享入口证据在 `single-reference-current/{inspection,author,preflight,source-identity}.json`：当前数据SHA `e10b3422406011616927fd48480b541de8df2ab9e9634951a0f9064fbff4e253`；source/native文本字节保持。旧 `native-expression-preview.json` 是此前诊断，不冒充当前qualified Provider replay。`clean-plate-capability/`保存新一轮独立mapping、Parent裁决与当前声音能力报告；不是媒体QA。共享单参考工程的exact Harness见 `.agent/harness/runs/jieshi-single-reference-20261013-r1/receipt.json`，实际状态以receipt为准。
 
 声音实测使用旧原S01 attempt09 bytes做能力探针，未重分类其质量，未改旧MP4/receipt；Whisper的 `零燕請在終點站下車` 不等于原姓名正确，也不证明0.1–2.7s或完整听音。新的原S01尚无MP4，新的per-shot Gate、handoff、剪辑/render、human听看全部 `NOT_EVALUATED`。
