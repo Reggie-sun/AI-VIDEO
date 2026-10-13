@@ -12,7 +12,7 @@ Date: 2026-10-13
 
 用户明确纠正：旧抬手机/起身两镜为 Agent 简化测试，不是原开场。本次从已发布 shared inspect/author/preflight 继续，准备原 S01→S02 候选及逐项忠实度矩阵，不重建执行链。原开场两镜采用0–3/3–7秒；S03/S04才补足7–15秒，当前只保留映射、不扩4次生成。
 
-当前真实停止点为原S01的实际几何一致clean plate 尚未产生/准入，以及声音语义没有合格听音/登记路线的 `EVIDENCE_REPAIR_FIRST`。对原文“clean plate必须最终视频overlay”的过早解读已撤回：原文只要求几何一致且只删除林砚映像，可以先准备首帧。本轮已补同一Seedream adapter的单PNG参考；不签实际plate或raw video成功。另无原剧本新图片/视频调用授权，未封存qualified完整paid preview。未生成新的原剧本MP4、没有前镜accepted source、没有state handoff/后镜submit、没有HyperFrames成片；human1.0x及故事AC-7 `NOT_EVALUATED`。
+当前真实停止点为原S01的实际几何一致clean plate 尚未产生/准入，以及声音语义没有合格听音/登记路线的 `EVIDENCE_REPAIR_FIRST`。对原文“clean plate必须最终视频overlay”的过早解读已撤回：原文只要求几何一致且只删除林砚映像，可以先准备首帧。已补同一Seedream adapter的单PNG参考；不签实际plate或raw video成功。2026-10-14 已完成首张技术base的exact candidate request/preview/native body及canonical初始项目数据bootstrap；没有激活QA、qualified视频runtime或paid intent/permit。另无原剧本新图片/视频调用授权。未生成新的原剧本MP4、没有前镜accepted source、没有state handoff/后镜submit、没有HyperFrames成片；human1.0x及故事AC-7 `NOT_EVALUATED`。
 
 ## Owned Work
 
@@ -101,3 +101,32 @@ Kimi invocation `ea1727fb-280f-4baa-8eaf-4843245a5881`，sealed deep profile、q
 使用 `record-ai-video-session` 达成substantial候选/工程及真实声音blocker checkpoint。自动按 `distill-ai-video-learning` 评估为 `no_candidate`：没有新的原剧本媒体attempt或controlled comparison；历史同bytes的能力复查是同证据新proof layer，不能算独立实验或更新Vidu质量claim。memory查询已因incompatible library exit3停止，没有重建或刷新RAG。
 
 保持用户列明foreign dirty五个tracked文件和untracked retarget plan；只stage/commit owned paths。Publication由完成后的main commit/push及remote SHA核验报告，技术receipt不构成publisher/human/media acceptance。
+
+## Original First Request Checkpoint — 2026-10-14
+
+用户继续要求原剧情真实视频。沿已发布asset-first准备路线，S01仅添加单个已bound `first_frame` image role，使用同字节historical PNG作准备槽；其usage仍review-only。没有新增制作镜头、第二timeline/state owner、故事执行脚本或Provider。技术base不算原S01首帧，不能发送到视频生成；必须另做clean plate并独立验收。原S01/S02 source-native原句、动作、摄影、声音和subtitle职责未删改。
+
+初次新增pending image roles被strict bootstrap拒绝：generated_video只允许一个pending video role。这是known-no-effect，Production目录当时无文件；撤回该candidate，未改validator。随后复用现有bound first_frame角色，`CanvasAuthoringBundle.bootstrap`→唯一committer→`initialize_canvas_graph`→标准`load_production_project`真实重开成功，Manifest revision3。只是项目数据/graph；没有QA policy或媒体acceptance，不再沿用此前“Production为空”的current描述。
+
+证据在 `runs/canvas-jieshi-original-s01-s02-20261013-001/original-input-preview-20261014/`：
+
+| Evidence | Actual conclusion / boundary |
+| --- | --- |
+| `rejected-pending-image-roles.json` | 拒绝原因、候选撤回、known-no-effect；没有POST或Production write |
+| `inspect.json`、`author.json`、`preflight.json` | 当前数据重新运行共享三个入口；不签真实图片/video Gate |
+| `request.json`、`preview.json`、`native-body.json` | `SeedreamImageProvider.preview`实际生成首张exact candidate；1152×2048 PNG、固定model、无reference，禁止transport/credential回调未调用 |
+| `operator-bound-proposal.json`、`receipt.json` | 实际决定时间起一小时的拟议内部上限；不是qualified profile、调用授权、reservation、intent或permit；过期必须重新prepare |
+
+当前project data SHA `cbc4682c543529d07297205f01e6af4df19016d80677599d1d48a88fa0b8b74f`；base prompt SHA `ce6fcc5ee93f034dcf2385bffb936d2e088fbf0663f0659b1860bf0bc1a264d7`；native body SHA `d48502a7bd27fd80786e7f54cf8e56a06b26e08dbddd54a10cf24695f5812e1d`，2819 bytes。Parent实际校验三项current snapshot pointer、native body/settings/完整prompt、无reference egress、未active QA，均PASS。后续edit的actual base identity/bbox以及视频first-frame/source_video依赖仍未产生；不把source-native诊断写成完整qualified视频request。
+
+本次只有ordinary data/prose修改，无共享code或Gate变更。适用Harness receipt为 `.agent/harness/runs/jieshi-original-first-preview-20261014-r1/receipt.json`，以实际receipt及fresh verify为准。Risk Gate在最终exact snapshot验证后判断；mapping不冒充implementation review。原新图片/视频POST继续为0；旧B额度、历史11视频计数及全部receipt未改。
+
+## Raw Listening Route Checkpoint — 2026-10-14
+
+受管只读Kimi invocation `c2d12ad7-8593-420d-bfac-e0fd970b0f1d`，sealed deep、qualified Docker containment，actual k3/max三次authenticated requests，PARSED/exit0/未截断；worker report SHA `80ed564df93412ea19b1c998d39ed6327498b23dbd60f4c0468562d9b72e5bb9`。九个冻结source当前hash全部一致，六个source实际Read完整；原canonical报告按hash复制。证据 `audio-review-route-20261014/{receipt,report,parent-adjudication}.json`。Standing Kimi授权不授予图片/视频POST。
+
+Parent确认raw `CanvasProductionService.evaluate`→`review_generation_attempt`的controlled verifier与marked source validator均拒绝human；缺可信真人host/实际听音环境。最终 `review_canvas_delivery` 已有独立human whole-playback、full_playback/1000要求及exact render/one-use permit验证，不能补签raw Gate。最小共享接点已存在于presentation_verifier/VerifiedEvaluationBinding/one-use recording proof；缺实际presentation→answer和selected actor的可信采集，而不是缺一个允许任意JSON填写PASS的enum。本候选尚未active QA，不能声称真实音义profile/measurement方法已sealed。
+
+未新增假human verifier、未声称听过、未把ASR或网页播放当semantic PASS，未重分类历史attempt09。声音恢复条件为qualified可听音analyzer/selected authority，或实际集成并验证exact-bound真人presentation host后由真实人听判。未满足前不提交视频；图片准备成功或新预算授权都不能解除这条依赖。
+
+完整新单元仍是最多2 PNG+2 Fast4s/480p原生声音、零重抽，内部各50/合计200 CNY；非价格/账单。首张输入已可审阅，可集中请求新单元授权；之后也只在实际前序依赖及逐次fresh gates满足时执行，不消费旧B、不提交声音证据仍不可验的镜头。这是授权缺失与能力Gate分离的真实阻断，不宣称只要授权就一定有合格视频。自动learning再次为 `no_candidate`：新增只读mapping与candidate request，零新媒体，不构成独立质量实验。

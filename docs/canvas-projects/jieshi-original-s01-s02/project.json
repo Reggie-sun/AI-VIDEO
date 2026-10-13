@@ -145,6 +145,15 @@
           "generated_video_rationale": "原剧本逐镜复刻；请求4s，S01采用前3s、S02采用4s。",
           "required_asset_roles": [
             {
+              "role": "first_frame",
+              "asset_ids": [
+                "historical-opening-review"
+              ],
+              "allowed_asset_types": [
+                "image"
+              ]
+            },
+            {
               "role": "primary_visual",
               "asset_ids": [],
               "allowed_asset_types": [

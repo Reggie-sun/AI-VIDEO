@@ -2,7 +2,7 @@
 
 ## Status And Entry
 
-本目录只准备《界蚀》原 S01→S02；共享 `inspect/author/preflight` 已实际运行。**不是已准入的 Provider 请求、已验收前镜或成片**。两镜新图片/视频 POST 均为 0；Production state 为空。精确 source-native expression 见 [S01](S01-native-input.txt)、[S02](S02-native-input.txt)，后者当前标签 `图片1` 指历史占位，必须在实际 S01 全 PASS 后经 canonical handoff 换为 accepted source 的 `视频1`、actual MP4 identity，再重新 prepare。
+本目录只准备《界蚀》原 S01→S02；共享 `inspect/author/preflight` 已实际运行。**不是已准入的 Provider 请求、已验收前镜或成片**。两镜新图片/视频 POST 均为 0。2026-10-14 已经唯一 `ProductionStateCommitter` bootstrap 初始项目并建立 dependency graph，Manifest revision3；没有激活 QA、发出 paid intent/permit 或验收媒体。精确 source-native expression 见 [S01](S01-native-input.txt)、[S02](S02-native-input.txt)，后者当前标签 `图片1` 指历史占位，必须在实际 S01 全 PASS 后经 canonical handoff 换为 accepted source 的 `视频1`、actual MP4 identity，再重新 prepare。
 
 普通数据入口为 [project.json](project.json)，原 Canvas parts 为 [source.json](source.json)。[source-mapping.json](source-mapping.json) 保存原 Open/Action/Close/Camera/Dialogue/Prompt/Screen Text/Next-Risk；原 episode SHA-256 为 `a8c3aaaa77e9c5c7904d7dee83265ae14e6100c168e5d5a520387a070c3d53df`。不存在故事执行脚本或第二 timeline。
 
@@ -78,6 +78,24 @@ PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production preflight --data 
 6. 480p候选496×864/24fps取用户新约束，S01/S02分别请求4s、采用3/4s；不套用旧15秒nominal测试长度。
 7. 对clean plate、qualified runtime、caption实际binding及声音证据的缺项明确保留，未靠删原要求通过检查。
 8. 经源码/原文和独立mapping复核，撤回“clean plate必须在最终视频局部合成”的过早判断；机制改为首帧准备，不改原S01动态或raw Gate。纯文字Seedream不能担任精确编辑，已加显式single-reference profile；这不代表plate已制作。
+9. S01添加既有 `first_frame` role，绑定同字节的 `historical-opening-review`，仅用于已有 asset-first 的准备槽与image request目标；不是新视觉准入。没有创建额外待生成图片role、制作镜头或第二状态库。技术base及后续plate均沿现有image owner；base不得作为视频输入。首张请求没有reference，历史PNG不会发送给模型。
+
+## First Exact Request And Remaining Dependencies
+
+2026-10-14 首张准备图的确切模型文字见 [S01-preparation-base-input.txt](S01-preparation-base-input.txt)。它明确是隔离技术base：正常八人/八倒影，供后续测量并只删除林砚反射；不是原S01首帧。新增的“左手为空、尚未开始靠窗动作”和反射区可独立定位是静态准备约束，没有删改原视频动作。原S01/S02 source-native文本未改。
+
+实际 write-free `SeedreamImageProvider.preview()` 证据在 `runs/canvas-jieshi-original-s01-s02-20261013-001/original-input-preview-20261014/`：`request.json`、`preview.json`、`native-body.json`、`operator-bound-proposal.json`、`receipt.json`。Native body SHA为 `d48502a7bd27fd80786e7f54cf8e56a06b26e08dbddd54a10cf24695f5812e1d`，2819 bytes；model=`doubao-seedream-5-0-pro-260628`、size=`1152x2048`、PNG/b64_json、watermark=true、无reference。创建preview时使用禁止transport和禁止credential回调，均未调用。此候选的profile窗口只是实际决定时间起一小时的拟议内部上限，**不是qualified runtime或付费授权**；将来submit必须重新封存current profile/window/preview及所有paid gates，不复用过期proposal。
+
+| Call | Exactness now | Dependency / stop |
+| --- | --- | --- |
+| 技术base PNG | exact text/body/request/preview已落盘，strict project reopen及byte核对PASS；未submit | 新单元授权、current runtime/profile与paid gates；输出八人/八倒影和可编辑几何未验收 |
+| 单PNG clean plate编辑 | 同一model/1152×2048、仅删林砚反射、保留七倒影的职责已确定；没有虚构exact reference或bbox | actual base落盘、独立QA和Registry/Scene binding后测坐标，才生成exact preview；否则STOP |
+| 原S01 Fast4s、采用3s | 原source-native文字完整；当前历史图仅占位，不是final paid payload | plate全项通过且替换原reference；qualified听音/登记路线和完整Router/Provider gates齐备；否则不submit |
+| 原S02 Fast4s、采用4s | 原source-native文字完整；actual source_video依赖未满足 | S01 raw所有required findings PASS，再实际state提取/核验/绑定；后镜独立QA，不预先提交 |
+
+初次尝试新增pending `preparation_base/first_frame` image roles被现有strict bootstrap拒绝，known-no-effect；候选已撤回，未写入Production。`rejected-pending-image-roles.json`保留该证据。现在复用已发布的单个bound `first_frame` image slot，不降低generated_video的pending video契约；该数据准备成功不能证明历史图或未来技术base是原S01合格首帧。
+
+新的受管只读核查 `audio-review-route-20261014/` 确认：最终 `review_canvas_delivery` 的human `whole-playback`、full_playback/1.0x属于独立P6入口；它不能补签raw逐镜Gate。raw受控verifier与marked source validator都明确拒绝human。必要共享接点已经存在于 `presentation_verifier` + exact-bound `VerifiedEvaluationBinding` + one-use recording proof，缺的是实际听音host/真实presentation→answer采集，不是允许从JSON伪造human verdict。没有修改这些guard，也没有登记虚假听判。原候选尚无active QA，不能宣称某个真实音义profile已封存。
 
 ## Bounded New Unit Proposal — Not Authorization
 
@@ -85,12 +103,14 @@ PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production preflight --data 
 
 拟议内部上限为每图片50 CNY、每视频50 CNY、单元总200 CNY，仅operator upper bound，不是市场价/账单。前次1图片+2视频/150 CNY只是未授权提案，无法同时证明base与clean plate编辑，保留为历史。历史视频10+旧抬手机A1=11真实计数保留；新单元最多增加2则累计13。旧累计cap12及已用1/1图片、1/2视频是历史，剩余旧B不能挪用，不修改旧记录来凑额。
 
-**目前不提交付费批准请求**：共享single-reference准备能力已补；实际plate、可听音且能登记的Gate证据路线，以及qualified完整paid preview仍缺。唯一新的外部决定仍为是否授予补齐后的原剧本输入新有限调用单元，尚未提出或授予；本提案不是one-use permit。授权前不会POST；即使以后授权，逐次仍需current profile/window、preview、reservation、egress、durable intent和one-use permit。S01任何required finding缺证/失败就停止，不能消费S02。
+新单元仍未授权，本提案不是one-use permit。首个准备请求已可审阅；后续exact参考/bbox/视频状态只能由实际前序素材产生。若用户授予这一完整有限单元，可先按逐次fresh gates准备图片；**声音证据路线未qualified前不得提交视频**。没有用授权或第一张图成功解除后续依赖。逐次仍需current profile/window、preview、reservation、egress、durable intent和one-use permit；S01任何required finding缺证/失败就停止，不能消费S02。
 
 ## Evidence And Acceptance Boundary
 
 当前证据根 `runs/canvas-jieshi-original-s01-s02-20261013-001/`：`inspection.json`、`author.json`、`preflight.json`、`native-dialogue-gap.json`（修复前6paths拒绝）、`native-expression-preview.json`（修复后source-native表达）；`audio-capability-probe.json`及Kimi read-only mapping receipt/report。它们没有Production acceptance权。
 
 首帧准备职责修订后的fresh共享入口证据在 `single-reference-current/{inspection,author,preflight,source-identity}.json`：当前数据SHA `e10b3422406011616927fd48480b541de8df2ab9e9634951a0f9064fbff4e253`；source/native文本字节保持。旧 `native-expression-preview.json` 是此前诊断，不冒充当前qualified Provider replay。`clean-plate-capability/`保存新一轮独立mapping、Parent裁决与当前声音能力报告；不是媒体QA。共享单参考工程的exact Harness见 `.agent/harness/runs/jieshi-single-reference-20261013-r1/receipt.json`，实际状态以receipt为准。
+
+上段为此前checkpoint。2026-10-14当前数据SHA为 `cbc4682c543529d07297205f01e6af4df19016d80677599d1d48a88fa0b8b74f`；fresh共享三个入口及strict reopen/首张body byte核对在 `original-input-preview-20261014/`。初始state有数据和graph，无QA/media acceptance；不沿用“Production为空”描述当前状态。`audio-review-route-20261014/{receipt,report,parent-adjudication}.json`是独立mapping、9个冻结source全部hash相同，仍不是媒体QA。
 
 声音实测使用旧原S01 attempt09 bytes做能力探针，未重分类其质量，未改旧MP4/receipt；Whisper的 `零燕請在終點站下車` 不等于原姓名正确，也不证明0.1–2.7s或完整听音。新的原S01尚无MP4，新的per-shot Gate、handoff、剪辑/render、human听看全部 `NOT_EVALUATED`。
