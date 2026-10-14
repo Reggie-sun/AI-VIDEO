@@ -389,7 +389,7 @@ def prepare_canvas_image_assets(
         schema_version=registry.schema_version,
         revision_id="0" * 64,
         content_hash="0" * 64,
-        assets=tuple(sorted((*registry.assets, *new_records), key=lambda asset: asset.asset_id)),
+        assets=(*registry.assets, *new_records),
     )
     merged_hash = registry_semantic_sha256(merged)
     merged = merged.model_copy(update={"revision_id": merged_hash, "content_hash": merged_hash})

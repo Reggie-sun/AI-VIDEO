@@ -13,7 +13,7 @@ from ai_video.canvas_image import canvas_image_candidate_preparer
 from ai_video.canvas_dependencies import initialize_canvas_graph
 from ai_video.errors import AiVideoError
 from ai_video.production.image import (
-    ImageGenerationAuthorization, ImageGenerationRequest, ImageProviderResult,
+    ImageGenerationAuthorization, ImageGenerationRequest, ImageGenerationPreview, ImageProviderResult,
     ImageLocalResourceEvidence,
 )
 from ai_video.production.models import (
@@ -163,6 +163,148 @@ class ScriptedProvider:
             adapter=ToolIdentity(name="comfyui-local-image", version=self.profile.profile_content_hash[:16]),
             resource_evidence=ImageLocalResourceEvidence(elapsed_milliseconds=1,
                 device_kind="cpu", measured_peak_memory_bytes=None))
+
+
+def generated_runtime(tmp_path):
+    service, _, source = runtime(tmp_path)
+    prepared = prepare(service)
+    profile, request, preview = (prepared[k] for k in ("execution_profile", "request", "preview"))
+    edited = source.copy()
+    edited.putpixel((100, 100), (255, 0, 0))
+    provider = ScriptedProvider(profile, png(edited))
+    authorization = ImageGenerationAuthorization.create(request=request, preview=preview,
+        usage_license="scripted-only", policy_receipt_id="scripted-mask-policy")
+    service.committer.generate_image_asset(request, preview, authorization, provider,
+        execution_profile=profile)
+    return service, request
+
+
+def prepared_authoring(service, *, legacy_sort=False, mutation=None, attempt_id="post-image-preparation"):
+    from ai_video.production.image_preparation import CanvasImagePreparationOperation
+    before = service._load()
+    source = next(a for a in before.registry.assets if a.asset_id == "scene")
+    prepared = service.prepare_image_assets(operations=[CanvasImagePreparationOperation(
+        kind="crop", source_asset_id="scene", source_sha256=source.sha256,
+        new_asset_id=f"crop-{attempt_id}", usage_license="fixture explicit crop",
+        crop_box=(32, 32, 128, 160))])
+    data = deepcopy(service.direction)
+    data["characters"][0]["reference_asset_ids"].append(prepared.assets[0].asset_id)
+    service.direction = data
+    records = prepared.registry.assets
+    if legacy_sort:
+        records = tuple(sorted(records, key=lambda a: a.asset_id))
+    if mutation:
+        records = mutation(records)
+        available = {a.asset_id for a in records}
+        data["characters"][0]["reference_asset_ids"] = [
+            aid for aid in data["characters"][0]["reference_asset_ids"] if aid in available]
+        service.direction = data
+    registry = prepared.registry.model_copy(update={"assets": records})
+    digest = registry_semantic_sha256(registry)
+    registry = registry.model_copy(update={"revision_id": digest, "content_hash": digest})
+    service.revise_authoring(attempt_id=attempt_id, registry=registry,
+        asset_artifacts=prepared.artifacts)
+    return before, prepared
+
+
+def test_preparation_after_generation_preserves_exact_registry_prefix(tmp_path):
+    service, request = generated_runtime(tmp_path)
+    before, _ = prepared_authoring(service)
+    after = service._load()
+    assert after.registry.assets[:len(before.registry.assets)] == before.registry.assets
+    assert after.asset_paths[request.output_asset_id].read_bytes() == before.asset_paths[request.output_asset_id].read_bytes()
+
+
+def test_legacy_sorted_authoring_reopens_without_rewriting_state_or_history(tmp_path):
+    service, request = generated_runtime(tmp_path)
+    before, _ = prepared_authoring(service, legacy_sort=True)
+    frozen = {p.relative_to(tmp_path): p.read_bytes() for p in tmp_path.rglob("*") if p.is_file()}
+    after = service._load()
+    assert after.registry.assets[:len(before.registry.assets)] != before.registry.assets
+    assert after.manifest.attempts[:len(before.manifest.attempts)] == before.manifest.attempts
+    assert after.asset_paths[request.output_asset_id].read_bytes() == before.asset_paths[request.output_asset_id].read_bytes()
+    assert frozen == {p.relative_to(tmp_path): p.read_bytes() for p in tmp_path.rglob("*") if p.is_file()}
+
+
+def test_registry_authoring_chain_reopens_multiple_exact_edges(tmp_path):
+    service, _ = generated_runtime(tmp_path)
+    prepared_authoring(service, legacy_sort=True, attempt_id="first-edge")
+    first = service._load()
+    prepared_authoring(service, legacy_sort=True, attempt_id="second-edge")
+    after = service._load()
+    assert all(record in after.registry.assets for record in first.registry.assets)
+    assert after.manifest.manifest_revision == first.manifest.manifest_revision + 2
+
+
+def test_restored_prefix_allows_next_generation_without_extending_reorder_exception(tmp_path):
+    service, _ = generated_runtime(tmp_path)
+    before, _ = prepared_authoring(service, legacy_sort=True)
+    current = service._load()
+    retained = {a.asset_id for a in before.registry.assets}
+    records = (*before.registry.assets,
+               *(a for a in current.registry.assets if a.asset_id not in retained))
+    registry = current.registry.model_copy(update={"assets": records})
+    digest = registry_semantic_sha256(registry)
+    registry = registry.model_copy(update={"revision_id": digest, "content_hash": digest})
+    service.revise_authoring(attempt_id="restore-registry-order", registry=registry)
+    restored = service._load()
+    assert restored.registry.assets[:len(before.registry.assets)] == before.registry.assets
+    prepared = prepare(service)
+    request = prepared["request"].model_copy()
+    values = request.model_dump(mode="json", exclude={"request_id", "request_fingerprint", "output_asset_id"})
+    values["attempt_id"] = "next-masked-local"
+    request = ImageGenerationRequest.create(**values)
+    preview = ImageGenerationPreview.create(request=request,
+        reference_total_bytes=prepared["preview"].reference_total_bytes)
+    source = Image.open(BytesIO(restored.asset_paths["scene"].read_bytes())).convert("RGB")
+    source.putpixel((100, 100), (0, 255, 0))
+    provider = ScriptedProvider(prepared["execution_profile"], png(source))
+    authorization = ImageGenerationAuthorization.create(request=request, preview=preview,
+        usage_license="scripted-only", policy_receipt_id="scripted-mask-policy")
+    service.committer.generate_image_asset(request, preview, authorization, provider,
+        execution_profile=prepared["execution_profile"])
+    assert load_production_project(tmp_path / "project.yaml").manifest.attempts[-1].status is StateCommitStatus.SUCCEEDED
+
+
+@pytest.mark.parametrize("change", ["record-mutation", "record-deletion", "unreferenced-addition"])
+def test_registry_reorder_cannot_hide_old_record_changes_or_unreferenced_additions(tmp_path, change):
+    service, _ = generated_runtime(tmp_path)
+    def mutation(records):
+        if change == "record-mutation":
+            return tuple(a.model_copy(update={"usage_license": "changed"})
+                if a.asset_id == "character" else a for a in records)
+        if change == "record-deletion":
+            return tuple(a for a in records if a.asset_id != "character")
+        record = next(a for a in records if a.asset_id == "character")
+        return (*records, record.model_copy(update={"asset_id": "unused-reference"}))
+    with pytest.raises(AiVideoError):
+        prepared_authoring(service, legacy_sort=True, mutation=mutation)
+        load_production_project(tmp_path / "project.yaml")
+
+
+@pytest.mark.parametrize("change", ["missing-edge", "wrong-operation", "broken-base", "snapshot-bytes"])
+def test_registry_reorder_requires_exact_succeeded_authoring_chain(tmp_path, change):
+    service, _ = generated_runtime(tmp_path)
+    prepared_authoring(service, legacy_sort=True)
+    path = tmp_path / "state/manifest.json"
+    from ai_video.production.models import ProductionManifest
+    manifest = ProductionManifest.model_validate_json(path.read_bytes())
+    edge = manifest.attempts[-1]
+    if change == "snapshot-bytes":
+        snapshot = tmp_path / edge.base_registry.path
+        snapshot.write_bytes(snapshot.read_bytes() + b" ")
+    else:
+        if change == "missing-edge":
+            attempts = manifest.attempts[:-1]
+        elif change == "wrong-operation":
+            attempts = (*manifest.attempts[:-1], edge.model_copy(update={"operation": "repair"}))
+        else:
+            attempts = (*manifest.attempts[:-1], edge.model_copy(update={
+                "base_registry": manifest.attempts[0].base_registry}))
+        manifest = manifest.model_copy(update={"attempts": attempts})
+        path.write_text(manifest.model_dump_json())
+    with pytest.raises(AiVideoError):
+        load_production_project(tmp_path / "project.yaml")
 
 
 def test_canonical_generation_reopens_mask_lineage_and_replays_without_provider(tmp_path):

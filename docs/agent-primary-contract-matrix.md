@@ -522,7 +522,13 @@ evidence 必须一致；P7 原 receipt 仍需完整重开，不增加 activation
 已提交的 authoring revision 保留同一生成图时，reader 逐边重开 succeeded
 `commit_project_registry` 的 base/candidate 文件哈希、Shot 与完整 AssetRecord，保留同 Shot/role/asset
 placement 并追溯到原 P7 或已核验 video successor。单个新 Shot receipt 不构成来源证明；
-缺边、错 bytes、错身份及 Registry 历史前缀改变仍拒绝。
+缺边、错 bytes、错身份及未经证明的 Registry 历史前缀改变仍拒绝。
+原P7 base→candidate严格append-one不变。active前缀改变仅可由同一只读owner
+`has_exact_registry_authoring_successor`从exact active Project/Registry沿连续、递减chronology的
+SUCCEEDED `commit_project_registry`边证明；每边重开pointer file hash/identity，全部旧
+AssetRecord逐字段保留，新增限被candidate Character/Scene/Shot引用的IMPORTED/DERIVED IMAGE，
+直到仍有原P7精确前缀的base。普通集合membership、非authoring变更、未引用新增、删改旧record
+不构成此证明。原receipt、placement、activation与全部bytes检查仍独立执行；无writer/回滚。
 
 Harness owner：`production_shot_router`（新纯模块与测试）、`video_planning`（Planner）及已有
 compiler/provider categories。Focused verification：

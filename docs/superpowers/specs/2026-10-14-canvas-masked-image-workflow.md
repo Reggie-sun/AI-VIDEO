@@ -41,6 +41,16 @@ Canonical Registry/Manifest/committer/P5/ResolvedTimeline/HyperFrames owners不�
 
 Parent self-review：该补充是接通真实输入的必要缺项，操作是可重放的像素准备；source职责与原accepted state、mask内模型质量分开。padding保持原区域所有像素及尺度，cropped identity不代表已确认原手部或服装，mask区域须作者实际审阅。原剧情requirement、paid计数和QA阈值不变。
 
+## Retained Registry Order Repair
+
+真实首图生成后的下一次素材准备暴露历史链缺口：准备入口对整个Registry排序，已成功authoring提交重排了P7候选前缀。后续准备必须保持旧tuple为精确前缀，只追加新records。现有成功历史不回滚、不改写，不通过裸candidate loader手工修Manifest。
+
+为重开已提交状态，标准reader仅增加一种可验证替代证明：原P7 base→candidate仍严格append-one；active前缀不等时，必须从exact active Project/Registry沿连续、chronology递减、SUCCEEDED `commit_project_registry`边重开hash-bound base/candidate，直到原P7候选前缀。每边全部旧AssetRecord逐字段保留；新增只允许被candidate Character/Scene/Shot明确引用的IMPORTED/DERIVED IMAGE。缺边、非authoring变化、未引用新增、删除或改写旧record、快照bytes变化均拒绝。原P7 receipt、bytes、placement与activation检查仍独立完整执行，不把集合membership当作充分证明。
+
+Parent self-review：Registry顺序影响immutable identity，但不拥有剪辑timeline；该例外保留每个历史快照并以已成功事务链证明重排来源，避免第二恢复writer或篡改已成功历史。修订限于read-only admission和准备合并，不更改付费/permit/QA阈值。必须先以标准generation→preparation→authoring→reopen复现，再测真实旧排序、连续多边和所有拒绝路径。
+
+恢复标准reopen后、任何新生成前，沿既有 `revise_authoring`发布仅顺序修复的新Registry：保留最后P7候选完整tuple为前缀，其他现有records原顺序追加，所有AssetRecord与媒体bytes不变。保留坏排序的成功历史边。该read-only例外不跨越非authoring生成事务；恢复前缀使后续普通append生成继续沿旧严格路径，不扩大例外为通用状态恢复。
+
 ## Acceptance Criteria
 
 1. 共享请求、Canvas preparation、committer intent/activation与标准reader均可识别同一mask lineage；未选中/stale/错误SHA的mask在副作用前拒绝。

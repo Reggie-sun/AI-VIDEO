@@ -54,3 +54,13 @@ Verification：标准Production loader/committer集成测试，三引用lineage�
 首个local unit已用1/1，exact PNG落盘/技术准入但广域窗面编辑破坏他人身份与空间；保护区1,096,780像素变化0。该attempt STOP/QA FAIL保留。新local unit有明确输入差异：恢复原始布局，选择实际被编辑角色自己的identity crop，仅改Zhou站姿；target-specific检查与非目标保护通过后，仅改He右缘完整性。最多2新submit、每次1200秒、本地累计cap3、paid0、blind retry0；不是重抽旧单元或无条件追加预算。
 
 完整七倒影/身份/道具/摄影/缺席要求持续追踪，单个人物修复的中间图不冒充合格S01。Z target FAIL/NOT_EVALUATED不提交H，unknown立即停止；新unit预算或可归因变量耗尽时报告原剧情缺项，不再扩量。原Scene/Shot/Gate不简化，没有第二timeline、renderer或故事执行脚本。
+
+## Retained Registry Order Repair
+
+Parent拥有 `production/image_preparation.py` append-only merge、`_image_video_lineage.py`只读完整Registry authoring-chain proof、`_image_project_reader.py`条件消费者和 `tests/test_canvas_masked_image_workflow.py`回归；matrix同步最窄例外。原生code_mapper已确认无成功commit回滚API，普通recover不能修此状态。耦合修复由Parent串行处理，避免新的state writer。
+
+RED先覆盖真实generate后prepare产生prefix破坏，以及旧排序authoring提交后standard loader失败。实现后核验正常追加、旧排序连续多边重开、record mutation/deletion、未引用/生成资产新增、missing/非成功边、快照篡改拒绝；相关tests/Architecture/exact commit-range Harness后按Risk Gate判断一次并owned commit/push。实际Manifest27重新完整只读加载，证明其bytes/history未改，无新POST。随后继续已封存Z单元，不能重复输入authoring提交。
+
+在Z POST前，使用标准service把Registry顺序以新authoring commit恢复为原最后P7候选前缀＋现有额外records，不改record/图/剧情/Character参考。此为独立metadata repair attempt而非重放Z输入attempt。标准reopen通过并测试下一次generation后全部旧P7仍有效；例外不跨非authoring效果链。
+
+Self-review：原P7 append-one、receipt/placement及unknown规则不变；例外以完整成功事务链替换特定active-prefix证据，没有凭空membership放行。真实MP4/音频/人验收仍未完成。

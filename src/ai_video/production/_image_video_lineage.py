@@ -1,6 +1,68 @@
 """Read-only provenance for a retained P7 image after canonical revisions."""
 
-from ai_video.production.models import StateCommitStatus, VideoAttemptPhase
+from ai_video.production.models import AssetSourceKind, AssetType, StateCommitStatus, VideoAttemptPhase
+
+
+def has_exact_registry_authoring_successor(bundle, original_registry) -> bool:
+    """Prove a reordered Registry through complete, retained authoring edges.
+
+    Membership alone cannot admit a reorder. Every edge must connect the exact
+    active pointers to a snapshot retaining the original P7 candidate prefix.
+    This is read-only and never repairs or rewrites successful history.
+    """
+    from ai_video.production.paths import _read_regular_file_nofollow
+    from ai_video.production.project import load_production_project_candidate
+
+    project, registry = bundle.manifest.active_project, bundle.manifest.active_registry
+    if (bundle.project.content_hash != project.content_hash
+            or bundle.registry.content_hash != registry.content_hash):
+        return False
+
+    def reopen(project_pointer, registry_pointer):
+        for pointer in (project_pointer, registry_pointer):
+            raw = _read_regular_file_nofollow(bundle.root / pointer.path, contained_by=bundle.root)
+            if raw.file_sha256 != pointer.file_sha256:
+                raise ValueError("registry authoring successor snapshot bytes changed")
+        value = load_production_project_candidate(bundle.root, bundle.manifest,
+            project_pointer.path, registry_pointer.path)
+        if (value.project.project_id != bundle.project.project_id
+                or value.project.content_hash != project_pointer.content_hash
+                or value.project.revision != project_pointer.revision
+                or value.registry.content_hash != registry_pointer.content_hash
+                or value.registry.revision_id != registry_pointer.revision_id):
+            raise ValueError("registry authoring successor snapshot identity changed")
+        return value
+
+    before_revision = bundle.manifest.manifest_revision
+    while True:
+        edges = [a for a in bundle.manifest.attempts
+            if a.operation == "commit_project_registry"
+            and a.status is StateCommitStatus.SUCCEEDED
+            and a.base_manifest_revision + 2 <= before_revision
+            and a.candidate_project == project and a.candidate_registry == registry
+            and a.base_project is not None and a.base_registry is not None]
+        if len(edges) != 1:
+            return False
+        edge = edges[0]
+        candidate = reopen(project, registry)
+        base = reopen(edge.base_project, edge.base_registry)
+        old = {a.asset_id: a for a in base.registry.assets}
+        current = {a.asset_id: a for a in candidate.registry.assets}
+        if any(current.get(asset_id) != record for asset_id, record in old.items()):
+            return False
+        references = {aid for c in candidate.characters for aid in c.reference_asset_ids}
+        references.update(aid for s in candidate.scenes for aid in s.visual_reference_asset_ids)
+        references.update(aid for s in candidate.shots for role in s.required_asset_roles
+                          for aid in role.asset_ids)
+        if any(a.asset_type is not AssetType.IMAGE
+                or a.source_kind not in {AssetSourceKind.IMPORTED, AssetSourceKind.DERIVED}
+                or a.asset_id not in references
+                for a in candidate.registry.assets if a.asset_id not in old):
+            return False
+        if base.registry.assets[:len(original_registry.assets)] == original_registry.assets:
+            return True
+        project, registry = edge.base_project, edge.base_registry
+        before_revision = edge.base_manifest_revision
 
 
 def has_exact_authoring_successor(bundle, shot, image_asset) -> bool:

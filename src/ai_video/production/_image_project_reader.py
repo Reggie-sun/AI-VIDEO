@@ -772,13 +772,17 @@ def verify_image_attempt_evidence(
         _, graph_sha256 = _read_candidate_graph(bundle, attempt)
         base_project = _read_base_project(bundle, attempt)
         base_registry = _read_base_registry(bundle, attempt)
+        retained_prefix = (bundle.registry.assets[:len(candidate_registry.assets)]
+                           == candidate_registry.assets)
+        if not retained_prefix:
+            from ai_video.production._image_video_lineage import has_exact_registry_authoring_successor
+            retained_prefix = has_exact_registry_authoring_successor(bundle, candidate_registry)
         if (
             attempt.candidate_image_asset_ids != (asset_id,)
             or len(candidate_registry.assets) != len(base_registry.assets) + 1
             or candidate_registry.assets[:-1] != base_registry.assets
             or candidate_registry.assets[-1] != asset
-            or bundle.registry.assets[: len(candidate_registry.assets)]
-            != candidate_registry.assets
+            or not retained_prefix
             or candidate_project.creation_receipt_id != asset.creation_receipt_id
         ):
             raise ValueError("selected image candidate history is not retained")
