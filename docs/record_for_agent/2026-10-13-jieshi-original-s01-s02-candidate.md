@@ -348,6 +348,14 @@ Parent实际original-resolution `view_image`：Zhou身份/衣物与原图对应�
 
 `record-ai-video-session`在此真实Gate失败的stable checkpoint更新同一主record。`distill-ai-video-learning`自动评估仍为 **no_candidate**：两个local attempt共用未accepted synthetic底图但编辑目标/角色参考/mask/prompt/seed不同，不是隔离变量对照；技术硬合成保护已由当前contract拥有，不能由两次不同质量失败推导通用Qwen能力结论或修改Skill/Policy/Gate。未找到需material update的相关existing claim，旧Vidu对白claim不在本scope；工程测试/派生crop/mask/多proof层不另计独立媒体。RAG prior failure不重试、不刷新，全局memory未写。
 
+## Community Pose Repair Research — 2026-10-15
+
+针对 Z 仍站立的已知 FAIL，完成 [研究续记](../research/2026-10-14-jimeng-community-workflows.md#pose-repair-follow-up--2026-10-15)：社区有只改姿势却改身份/背景、局部修改不遵循目标和 DWPose 参考失效案例；AnyPose 作者也公开多人/背景失效边界。它们是公开自述与产品/模型作者指导，不是本项目成功证据。
+
+重开 exact `Z-workflow.exact.json` 与 pinned ComfyUI node：实际语义输入只有原场景＋脸 crop，mask 负责 noise/composite，没有坐姿参考或适配 Pose/Depth。40 steps/denoise 1 已实际使用。节点内部 reference latent 缩放与采样 latent 尺寸不同，是待审查的对齐风险，未证明为姿势失败原因。建议隔离目标单人、补明确坐姿/接触几何、通过共享 reference/profile/authoring 接入后再按原位置合成；不能以全图多人 AnyPose、增加 prompt 或盲抽替代。
+
+本轮是资料研究与已有 evidence 核对，新增模型/图片/视频 submit、模型下载、ComfyUI 启动和 Production mutation 均为 0；旧 FAIL、剩余 H slot、原剧情及视频/声音验收边界不变。`record-ai-video-session` 更新同一主 record；`distill-ai-video-learning` 评估 **no_candidate**：公开案例未在本项目受控复现，现有不同目标 local attempts 不隔离变量，未形成可采用的新 bounded claim。无 Skill/Policy/Gate 或 global memory/RAG index 更新。文档研究不触发 implementation Risk Gate，不新增 reviewer；foreign staged/dirty 保留。
+
 ## Evidence Index
 
 此表只为本次原开场准备单元建立identity；历史其他实验不并入。remote boundary为Seedream/`doubao-seedream-5-0-pro-260628`、Ark shared image owner、1152×2048 PNG；新增local boundary为Qwen-Image-Edit-2511/三引用masked profile、944×1672 PNG，不与remote合同或计数合并。同一图片的receipt、bytes、materialization和visual proof使用同一request fingerprint independence_key，只贡献一个图片样本；预transport失败不是第二个视觉样本。

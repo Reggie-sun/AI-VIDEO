@@ -123,3 +123,35 @@ Ark 文档的字段内容本次经官方页面搜索索引核验；普通抓取�
 - 官方工作流只说明节点图和条件输入存在；未在本机安装、运行或验证模型，不据此声称当前主机具备相同能力。
 - 没有找到带可复现输入/输出、能解决该地铁七倒影与林砚缺席关系的案例。候选工作流的实际效果仍为 **NOT_EVALUATED**。
 - 本文不判断账户功能当前开放情况、费用或资格，也不把即梦 UI 功能推断为 Ark API 或 ComfyUI 能力。
+
+## Pose Repair Follow-up — 2026-10-15
+
+本节针对实际 Z 输出“蒙版内像素改变，但老人仍站立扶杆”。前文未实现 masked lane 的能力映射是 2026-10-14 初查时的历史状态；当前共享 masked lane 已实现并真实运行，区域保护通过，目标坐姿失败。公开案例支持补足姿态输入的方向，不构成本项目修复成功或新 submit 许可。本轮只查资料、读取已有 evidence，不生成、不下载模型、不启动 ComfyUI、不修改 Production state。
+
+### Community Failure And Counter Evidence
+
+| Firsthand source | Reported observation | Applicable limit |
+| --- | --- | --- |
+| [Qwen/FLUX pose retargeting discussion](https://www.reddit.com/r/comfyui/comments/1urnagm/qwen_edit_and_flux_2_klien_issue/) | 用户只想改姿势并保留身份、衣物和背景，仍遇到背景畸变、服装重绘、身份漂移；评论提出姿态参考、适配 ControlNet、分阶段 depth 和最终 mask 合回 | 是作者/评论者自述；不同模型版本混杂，不能把某条成功回复当通用解法 |
+| [Qwen 2511 painted-region editing](https://www.reddit.com/r/comfyui/comments/1resmvu/qwen_image_edit_2511_easy_inpainting_and_face/) | 作者把编辑区直接涂进 RGB 输入并引用第二图；一位评论者报告白发人物坐向门成功，同帖也有无效、复制参考人物或背景的反馈 | RGB 可见色块与 latent noise mask 不是同一种条件；色块标记可作候选，不保证坐姿/镜面几何 |
+| [DWPose adherence failure](https://www.reddit.com/r/comfyui/comments/1tgxr6r/qwen_image_edit_failing_to_properly_follow_dwpose/) | 使用 DWPose 作为图像参考仍报告姿态局部不符合 | 把骨架图送入普通图像参考不等于经过兼容 ControlNet 的结构约束，更不等于 QA PASS |
+| [AnyPose creator model card](https://huggingface.co/lilylilith/AnyPose) | 提供 Qwen-Image-Edit-2511 base/helper pose LoRA 与原人物＋目标姿态双图方法；作者明确列出背景继承、复杂姿势和多人输入失败 | Apache-2.0；本机未安装/资格验证。作者建议完整身体和地面可见；不能直接对整张多人车厢承诺有效 |
+
+[Dreamina 官方 pose changer 指南](https://dreamina.capcut.com/tools/ai-pose-changer)同样建议原人物图与目标姿态图、清楚可见的身体，以及局部 Inpaint。它是国际消费者产品的操作建议，不证明中国即梦当前账号界面、Ark 参数或本地模型有同等能力；没有发现该七倒影场景的可复现实测。
+
+### Exact Current Lane And Missing Input
+
+重新读取实际 `local-targeted-repair-20261014-001/Z-workflow.exact.json`：`TextEncodeQwenImageEditPlus` 的 `image1` 为原场景、`image2` 为 128×144 身份脸 crop，**没有 `image3` 坐姿参考**。mask 接 `SetLatentNoiseMask` 和 `ImageCompositeMasked`，没有作为可见姿态图送入图像编码器，也没有 Pose/Depth ControlNet。三份 Registry 引用是 character、scene、edit_mask，不是三个语义图像参考。
+
+`KSampler` 已为 40 steps、cfg 4、Euler/simple、denoise 1；不能把本次失败解释为未增加 denoise，或继续换 seed 盲抽。实际 PNG `102c1ec74f873a0de8297d2cf9de1477a9ae1cf0b0fc654836e6e8dc7e127557` 的 1,536,514 个保护像素变化为零，目标仍站立：编辑范围保护与目标姿态遵循须分开判断。没有输入目标身体几何是可确认的能力缺项，尚未通过受控比较证明它是唯一失败原因。
+
+本机 pinned ComfyUI `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa` 的 `comfy_extras/nodes_qwen.py` 支持三个语义图像槽；VL 图缩放至约 384² 面积，reference latent 缩放至约 1024² 面积，而当前采样 scene latent 为 944×1672。[上游 #9481](https://github.com/Comfy-Org/ComfyUI/issues/9481)讨论不同 latent 尺寸可能导致放大/对齐问题。本机尺寸路径差异已确认，但该 issue 不是本输出站姿失败的因果证明；不能直接禁用 VL 输入、改源码或绕 sealed profile 来“修复”。
+
+### Recommended Bounded Adaptation
+
+1. 用相同机位/反射透视准备明确的目标坐姿图，覆盖头、躯干、膝、脚、座椅接触与地面；身份图负责身份，姿态图负责几何。先审查能否在不侵占邻座的空间内成立。
+2. 隔离 Z 单人编辑区，保留足够座椅/地面背景；mask 必须覆盖旧站姿占位、目标坐姿占位和需要恢复的背景。现有 r2 是否足够仍需几何检查，不能先断言扩大 mask 就能解决。颜色填空只能用于独立 conditioning 派生图，原 source/最终黑区保护继续保留。
+3. 优先适配现有 Qwen 节点的明确姿态参考职责，经共享 typed reference、Registry provenance、profile/preview 与标准 authoring seam 接入；目前不是即插即用。普通参考仍是软约束；若评估 AnyPose 或 ControlNet，须在隔离单人区域核验匹配版本、权重/节点、许可与 runtime，不对全车多人直接套用，不擅自安装依赖或云调用。
+4. 按原坐标把通过的局部结果合回，逐项检查身份、完整坐姿、双手/脚、扶杆接触解除、邻座与背景，再验完整七倒影与林砚缺席。像素保护 PASS 不能代签动作或原 S01；失败仍 STOP，不能改剧情、挪 H slot 重抽 Z 或提前生成视频。
+
+这是可审阅的修复方向，效果 **NOT_EVALUATED**。LanPaint 等训练外 inpainting 方案可参考 [creator repository](https://github.com/scraed/LanPaint)，但区域保护已有效，尚无证据表明换 mask sampler 会补足坐姿；本轮不增加第二实现路径。研究没有形成需要自动采用的通用模型结论。
