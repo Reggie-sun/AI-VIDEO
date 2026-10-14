@@ -2,6 +2,8 @@
 
 ## Status And Entry
 
+2026-10-15最新媒体checkpoint：用户要求图完成后生成原视频，实际新增3次Codex内置修图，七名完整他人倒影/最右何静裁边与老人坐姿保留，但最新图仍有苏遥镜像持机FAIL、陈立耳机及完整镜面几何NOT_EVALUATED；不能当原S01 accepted source。当前声音输入实际再次被拒绝，raw可信听音host未接入，Manifest33/Project7仍无active QA policy与原视频attempt。图片未导入/激活，原视频0、历史视频11；内置图片累计4（本轮3），paid准备图2/local模型图2及旧web UNKNOWN保留。现有单元STOP，需首帧完整证据与qualified声音/QA路线后才重走视频fresh gates。详见[实际修图与视频停止证据](../../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#original-frame-completion-attempt-and-video-stop--2026-10-15)。以下latest/historical段为此前checkpoint，非新调用许可。
+
 2026-10-15最新checkpoint：共享Registry历史链修复已发布 `a45fa113b2ffb10bbd071bfa51753849aa82c911`，原生审查的两处时序缺口经standard-loader RED→GREEN及fresh Harness关闭。标准metadata authoring恢复历史前缀后，真实Z单人修复已生成PNG `102c1ec74f873a0de8297d2cf9de1477a9ae1cf0b0fc654836e6e8dc7e127557`；保护区1,536,514像素变化0，但老人仍站立扶杆，target QA **FAIL/STOP**。H未提交，原视频0；当前Manifest33，累计原paid准备图2/local模型图2，新增paid0，无accepted S01/actual handoff/HyperFrames声画交付。自有ComfyUI服务已停止。实际声义仍EVIDENCE_REPAIR_FIRST、human1.0x/完整故事AC-7未验。详见[最新真实证据与恢复条件](../../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#registry-retention-repair-and-actual-targeted-z)。以下2026-10-14准备/授权段为保留历史，不能据旧剩余额度重抽或提交。
 
 2026-10-14最新续执行：共享本地masked工作流工程已发布 `d37d0482e4a0d6205b2c546ba010e24433dccd8c`，实际只读runtime预检PASS，尚未进行GPU推理。用户要求继续，现准备一个最多1次的strict-loopback local单元，保留前两次paid图的FAIL与计数，不转用旧edit/B。历史审阅图仅作为布局/身份准备source，经显式3px补边、人物crop与玻璃内部binary mask及canonical revision绑定后才可进模型；不是accepted S01。新静态模型文字见 [S01-local-masked-preparation-input.txt](S01-local-masked-preparation-input.txt)。本路线直接准备原首帧七倒影/林砚缺席，不再额外要求八实体全可见或正常八倒影底图；下方旧technical-base文本与单元留作历史，不作为新路线输入。

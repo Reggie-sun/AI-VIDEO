@@ -11,7 +11,9 @@ Date: 2026-10-13
 
 ## Supersession Notice — 2026-10-15
 
-最新治理续执行见 **Community Validation Principle And Checkpoint — 2026-10-15**：用户要求把“遇到问题参考社区、实际验证、写回工作流”写入AGENTS，仅新增薄原则/已有owner锚点；原暂存的native reviewer迁移不夹带。本轮不生成媒体、不修改Production或LearningClaim，原S01/声音/UNKNOWN边界保持。
+最新媒体checkpoint见 **Original Frame Completion Attempt And Video Stop — 2026-10-15**：按“继续图做完了就生成视频啊”新增3次Codex内置修图，七名他人完整倒影与老人坐姿保住，陈立手机补出；镜像持机/耳机仍有FAIL或NOT_EVALUATED，首帧未完成。实际声音输入再次被平台拒绝，当前Manifest33没有active QA policy或原视频attempt。未导入/激活新图、未提交视频；累计内置图片4（本轮3）、paid准备图2、local模型图2、原视频0、历史视频11，旧web UNKNOWN保留。
+
+此前治理续执行见 **Community Validation Principle And Checkpoint — 2026-10-15**：用户要求把“遇到问题参考社区、实际验证、写回工作流”写入AGENTS，仅新增薄原则/已有owner锚点；原暂存的native reviewer迁移不夹带。该治理轮不生成媒体、不修改Production或LearningClaim，原S01/声音/UNKNOWN边界保持。
 
 最新checkpoint见 **Codex Direct Image And Authoring Workflow Rule — 2026-10-15**：用户明确改用Codex内置工具，独立1次实际生成并exact copy落盘；老人坐下/放开扶杆，target static 5 PASS/1 NOT_EVALUATED。原图944×1672、输出943×1668，精确像素保护及完整原S01仍未通过，未导入/激活、Manifest33不变。用户随后明确要求把默认生图规则写入现有工作流，并批准只改playbook生图小节、独立提交且保留原暂存修改；无新增Provider调用或产品adapter。
 
@@ -410,6 +412,26 @@ Native Codex Parent串行完成这一有界文档变更；没有源码/parser/li
 
 `record-ai-video-session`核对已有稳定checkpoint并更新同一主record；`ai-video-record-2331904e3bd70b88`已以recorded/no_candidate ACK，acknowledged=true。`distill-ai-video-learning`仍为 **no_candidate**：没有新媒体或受控对照，只有用户明确的新工作原则和前次bounded效果，不制造通用模型结论、LearningClaim或第二确认；后续capture按实际新ID另核验，不重ACK旧request。
 
+## Original Frame Completion Attempt And Video Stop — 2026-10-15
+
+用户要求先完成图片、随后视频。Parent沿默认`imagegen`生图入口继续实际原S01准备，不再修改工作流规则或调用Qwen。证据根为`runs/canvas-jieshi-original-s01-s02-20261013-001/codex-original-frame-repair-20261015-002/`。先封存最多2次的顺序单元：H补最右何静裁边，H通过才C补陈立原道具。每次先保存exact参数/前图SHA及一次调用意图，实际输出exact copy，不resize/crop/重编码；原工具输出与全部旧失败保留。
+
+| Actual image / Request | Exact PNG / Geometry | Parent static verdict |
+| --- | --- | --- |
+| H：`ec84f2686d92d674a6840219eb8249bfd116d4fc80a5067bf7e9afe2c1c8b6ae` | `s01-seven-reflections-H-candidate.png`，SHA `a2239581824f32f1ce4e9982913286bb588ed2085df068fffaa80ae8a8dc5c02`；943×1668，2,165,453 bytes | target PASS：何静头到脚/膝上灰布袋在画内；六坐一站共七倒影、老人坐姿、林砚本人手机/空左手保持。原全镜仍未验 |
+| C：`dc249193b5d938df088f4426dece4982c43a7a62c91f96baf372920764178462` | `s01-chen-props-C-candidate.png`，SHA `5c4fe971f222bacda47cc39ae9cb9b5503b0d59e3968e207808a740d5829b099`；943×1668，2,101,348 bytes | 深蓝手机存在PASS；镜面右手和黑耳机不可明确证明，target NOT_EVALUATED，停止该attempt。2/2已消费 |
+| 明确镜像画面侧修正：`78091e512ad2621c17d9bf9000efce732401c5246f62d0b6af00fcdd22c4ef57` | `s01-mirrored-props-candidate.png`，SHA `64359f615d10e112ff7aaa68181c3b815cf8178382c199dc4073d17519f810dc`；943×1667，2,116,264 bytes | 后续独立1次有限单元，保留前2次消费，把解剖左右改为明确画面侧；陈立手机降低并改握法，但苏遥白手机仍未移至指定镜像侧，FAIL；陈立耳机/完整手侧及林砚对应空位几何仍NOT_EVALUATED，1/1后STOP |
+
+本轮工具技术SUCCEEDED不等于原首帧PASS。原生镜面持机不能沿用普通正面照左右判断；缺耳机或几何证据不能删原要求。最后图与前图高度相差1px，精确保护区及dimension等价未验，没有隐式尺寸修正。以上为实际`view_image`静态语义检查，不代人类身份、镜头/镜面标定、抬手动作、声音或完整剧情验收。当前有限单元没有继续重抽、fallback或把旧edit/B额度搬过来。
+
+声音能力在本窗口用既有历史WAV `daa154cb46f2a89ce3e95f5dcab6edb019c14a18ea67aef5de4031e0ffeec2d4`重新探测；平台实际返回`audio content omitted because you do not support audio input`。`audio-capability-current.json`保留EVIDENCE_REPAIR_FIRST，未声称听过、未生成新音视频补证。原生`code_mapper` `/root/original_video_readiness`核对共享导入/prepare/QA/presentation接点，Parent重开相关源码与标准loader：Manifest33、Project7、`qa_policy=None`、原视频attempt0。Agent使用CodeGraph时创建`.codegraph-cache`，属其read-only scope以外的派生缓存副作用，已披露；无源码/Production/Provider变更，不冒充纯只读执行证明。
+
+当前`prepare`缺selected generation QA投影；可信raw听音host或qualified audio analyzer也未接入。`ControlledPresentationVerifier`只接受technical/analyzer，不可伪造human answer；最终P6完整1.0x听看不能回签raw逐镜Gate。共享`generated_source`/`revise_authoring`存在，但完整素材使用要求未过，因此本轮不导入/激活；`production-after.json`核验project、Manifest和Registry模型hash与上一exact快照全部相同。原授权的2次Fast4s480p/native视频仍未消费，历史授权不是当前qualified runtime、reservation或permit。
+
+恢复条件：修复并取得原首帧完整道具/镜像几何证据；在现有QA/presentation owner接入真实exact-media听音证据并选定完整原镜policy；再核验current video runtime/profile/window与逐次paid gates。原S01采用3s、S02采用4s及原文/广播/对白/字幕全部保留，S03/S04仍是原前15s的后续映射，不能把两镜7s或这张静图宣称完整前15s。没有accepted S01、handoff、S02或HyperFrames交付；human1.0x/完整故事AC-7仍NOT_EVALUATED。
+
+使用`record-ai-video-session`更新同一主record及候选README状态锚点；`distill-ai-video-learning`评估no_candidate：同一递进图片链的不同修复目标与提示并非两次独立支持或受控多臂对照；H局部成功也不能支持通用镜面/生图能力claim。没有Skill/Policy/Gate或全局memory/RAG变更。本轮除上述3次内置修图外paid/视频/Comfy调用均0，记录期间不额外调用媒体/Provider。原foreign staged/dirty保留。
+
 ## Evidence Index
 
 此表只为本次原开场准备单元建立identity；历史其他实验不并入。remote boundary为Seedream/`doubao-seedream-5-0-pro-260628`、Ark shared image owner、1152×2048 PNG；新增local boundary为Qwen-Image-Edit-2511/三引用masked profile、944×1672 PNG，不与remote合同或计数合并。同一图片的receipt、bytes、materialization和visual proof使用同一request fingerprint independence_key，只贡献一个图片样本；预transport失败不是第二个视觉样本。
@@ -433,6 +455,12 @@ Native Codex Parent串行完成这一有界文档变更；没有源码/parser/li
 | pose-web-invocation | external-authoring:8811e001d70794f03f8d34edfcdf9d5ea26f20bd53fa907e41d09e84d537fc2b | jieshi-original-pose-reference-trial-20261015 | original-s01-pose-reference-web-20261015-001 | N/A | NO_ARTIFACT:OUTCOME_UNKNOWN | LOCAL_TOOL_EXECUTION | OUTCOME_UNKNOWN | EXECUTION_EVIDENCE_GAP | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/pose-reference-trial-20261015-001/mcp-call-timeout.json |
 | codex-direct-generation | native-image:9cdd1fdf7ea2a660361cd3a5b145ccf9557924d74b31bcb9df1ba70c969610d2 | jieshi-original-codex-direct-image-20261015 | original-s01-codex-direct-image-20261015-001 | N/A | f9128ccfde3868ed8aaea420f953e306b37c003e139fd0d85943774eea057e93 | TOOL_GENERATION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-direct-image-trial-20261015-001/generation-record.json |
 | codex-direct-static | native-image:9cdd1fdf7ea2a660361cd3a5b145ccf9557924d74b31bcb9df1ba70c969610d2 | jieshi-original-codex-direct-image-20261015 | original-s01-codex-direct-image-20261015-001 | N/A | f9128ccfde3868ed8aaea420f953e306b37c003e139fd0d85943774eea057e93 | VISUAL_INSPECTION | NOT_EVALUATED | EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | codex-direct-generation | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-direct-image-trial-20261015-001/static-image-review.json |
+| codex-H-generation | native-image:ec84f2686d92d674a6840219eb8249bfd116d4fc80a5067bf7e9afe2c1c8b6ae | jieshi-original-codex-frame-repair-20261015 | original-s01-codex-H-20261015-002 | N/A | a2239581824f32f1ce4e9982913286bb588ed2085df068fffaa80ae8a8dc5c02 | TOOL_GENERATION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-original-frame-repair-20261015-002/H-generation-record.json |
+| codex-H-static | native-image:ec84f2686d92d674a6840219eb8249bfd116d4fc80a5067bf7e9afe2c1c8b6ae | jieshi-original-codex-frame-repair-20261015 | original-s01-codex-H-20261015-002 | N/A | a2239581824f32f1ce4e9982913286bb588ed2085df068fffaa80ae8a8dc5c02 | VISUAL_INSPECTION | NOT_EVALUATED | EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | codex-H-generation | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-original-frame-repair-20261015-002/H-static-review.json |
+| codex-C-generation | native-image:dc249193b5d938df088f4426dece4982c43a7a62c91f96baf372920764178462 | jieshi-original-codex-frame-repair-20261015 | original-s01-codex-C-20261015-002 | N/A | 5c4fe971f222bacda47cc39ae9cb9b5503b0d59e3968e207808a740d5829b099 | TOOL_GENERATION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-original-frame-repair-20261015-002/C-generation-record.json |
+| codex-C-static | native-image:dc249193b5d938df088f4426dece4982c43a7a62c91f96baf372920764178462 | jieshi-original-codex-frame-repair-20261015 | original-s01-codex-C-20261015-002 | N/A | 5c4fe971f222bacda47cc39ae9cb9b5503b0d59e3968e207808a740d5829b099 | VISUAL_INSPECTION | NOT_EVALUATED | EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | codex-C-generation | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-original-frame-repair-20261015-002/C-static-review.json |
+| codex-mirror-generation | native-image:78091e512ad2621c17d9bf9000efce732401c5246f62d0b6af00fcdd22c4ef57 | jieshi-original-codex-mirrored-props-20261015 | original-s01-codex-mirrored-props-20261015-003 | N/A | 64359f615d10e112ff7aaa68181c3b815cf8178382c199dc4073d17519f810dc | TOOL_GENERATION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-original-frame-repair-20261015-002/mirror-generation-record.json |
+| codex-mirror-static | native-image:78091e512ad2621c17d9bf9000efce732401c5246f62d0b6af00fcdd22c4ef57 | jieshi-original-codex-mirrored-props-20261015 | original-s01-codex-mirrored-props-20261015-003 | N/A | 64359f615d10e112ff7aaa68181c3b815cf8178382c199dc4073d17519f810dc | VISUAL_INSPECTION | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | codex-mirror-generation | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-original-frame-repair-20261015-002/mirror-static-review.json |
 
 ## Historical Record And Learning Update
 
