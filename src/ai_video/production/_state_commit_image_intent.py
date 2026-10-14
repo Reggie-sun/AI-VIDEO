@@ -247,7 +247,7 @@ class _StateCommitImageIntentMixin:
                 allowed_asset_ids = (
                     creative.reference_asset_ids if creative is not None else ()
                 )
-            elif reference.role == "scene":
+            elif reference.role in {"scene", "edit_mask"}:
                 creative = scenes.get(reference.creative_artifact_id)
                 allowed_asset_ids = (
                     creative.visual_reference_asset_ids if creative is not None else ()
@@ -273,6 +273,9 @@ class _StateCommitImageIntentMixin:
             raise _image_invalid(
                 "Image preview reference byte total does not match the active Registry."
             )
+        from ai_video.production.image_edit_mask import validate_registered_edit_mask
+        validate_registered_edit_mask(request=request, root=self._project_root,
+                                      registry=loaded.registry)
 
     def _image_prepared_artifact(
         self, attempt_id: str, relative_path: Path, payload: bytes

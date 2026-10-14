@@ -13,6 +13,7 @@ from pydantic import ConfigDict, Field, ValidationError, field_validator, model_
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.image_bytes import MeasuredPng, measure_png_bytes, _image_bytes_invalid
+from ai_video.production.image_edit_mask import validate_edit_mask_request, validate_registered_edit_mask
 from ai_video.production.paid_provider import PaidProviderCallPreview
 from ai_video.production.remote_image import RemoteImageAuthorization, RemoteImageEvidence, remote_image_egress
 from ai_video.production.dependency import (
@@ -85,6 +86,7 @@ _REFERENCE_ROLE_ORDER = {
     "continuity_terminal": 1,
     "scene": 2,
     "style": 3,
+    "edit_mask": 4,
 }
 _IMAGE_ACTIVATION_TOKEN = object()
 
@@ -117,7 +119,7 @@ class ImageProviderParameters(_ImageStrictModel):
 
 
 class ImageReferenceBinding(_ImageStrictModel):
-    role: Literal["character", "scene", "style"]
+    role: Literal["character", "scene", "style", "edit_mask"]
     creative_artifact_id: str = Field(min_length=1)
     creative_revision: int = Field(strict=True, ge=1)
     creative_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -269,6 +271,11 @@ class ImageGenerationRequest(_ImageStrictModel):
         )
         return {
             "schema": (
+                "ai-video-image-request/6"
+                if data["provider_kind"] == "comfyui_local" and any(
+                    (item.get("role") if isinstance(item, dict) else item.role) == "edit_mask"
+                    for item in references)
+                else
                 ("ai-video-image-request/5" if references else "ai-video-image-request/4")
                 if data["provider_kind"] == "seedream"
                 else
@@ -316,6 +323,7 @@ class ImageGenerationRequest(_ImageStrictModel):
         if len(unique) != len(self.references):
             raise ValueError("image references must be unique by role and asset_id")
         roles = {item.role for item in self.references}
+        validate_edit_mask_request(self)
         if self.provider_kind == "seedream":
             from ai_video.production.seedream_reference import validate_seedream_references
             validate_seedream_references(self.references)
@@ -930,7 +938,7 @@ def validate_image_activation_candidate(
             allowed_asset_ids = (
                 creative.reference_asset_ids if creative is not None else ()
             )
-        elif reference.role == "scene":
+        elif reference.role in {"scene", "edit_mask"}:
             creative = scenes.get(reference.creative_artifact_id)
             allowed_asset_ids = (
                 creative.visual_reference_asset_ids if creative is not None else ()
@@ -959,6 +967,8 @@ def validate_image_activation_candidate(
         raise _image_scope_invalid(
             "Image activation candidate does not carry the exact validated result."
         )
+    validate_registered_edit_mask(request=request, root=base_project.root,
+        registry=base_project.registry, output_bytes=result.image_bytes)
 
     base_assets = base_project.registry.assets
     if (

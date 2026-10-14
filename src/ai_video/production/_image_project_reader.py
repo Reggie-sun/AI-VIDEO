@@ -245,6 +245,7 @@ def _read_creative_reference(
     artifact_id: str,
     role: str,
 ) -> Character | Scene:
+    role = "scene" if role == "edit_mask" else role
     if role not in {"character", "scene"}:
         raise ValueError(f"unsupported image reference role: {role}")
     references = (
@@ -643,6 +644,9 @@ def _verify_evidence(
     )
     if checked_measured != measured or checked_receipt != receipt:
         raise ValueError("image request, result and receipt are not exact")
+    from ai_video.production.image_edit_mask import validate_registered_edit_mask
+    validate_registered_edit_mask(request=request, root=bundle.root,
+        registry=base_registry, output_bytes=image_snapshot.data)
 
     candidate_shot, shot_path, shot_sha256 = _read_candidate_shot(
         bundle, candidate_project, request

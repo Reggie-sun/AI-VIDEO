@@ -15,6 +15,16 @@ from pydantic import Field, field_validator, model_validator
 from ai_video.comfy_client import ComfyClient, JobStatus
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.comfy_image_workflow_contract import (
+    SEALED_NODE_CLASSES as _SEALED_NODE_CLASSES,
+    input_edge as _input_edge,
+    loader_consumers as _loader_consumers,
+    validate_sealed_workflow_contract as _validate_sealed_workflow_contract,
+)
+from ai_video.production.image_edit_mask import (
+    validate_edit_mask_inputs,
+    validate_edit_mask_output,
+)
 from ai_video.production.image import (
     ImageGenerationReferenceBinding,
     ImageGenerationAuthorization,
@@ -93,7 +103,11 @@ class LocalImageRequiredNode(StrictModel):
 
 class LocalImageExecutionProfile(StrictModel):
     schema_version: Literal["1"]
-    lane_id: Literal["qwen_image_edit_2511_local", "flux2_klein_4b_local"]
+    lane_id: Literal[
+        "qwen_image_edit_2511_local",
+        "qwen_image_edit_2511_masked_local",
+        "flux2_klein_4b_local",
+    ]
     adapter_contract_version: Literal["1"]
     model_repository_id: str = Field(min_length=1)
     model_repository_revision: str = Field(pattern=_REVISION_PATTERN)
@@ -110,7 +124,7 @@ class LocalImageExecutionProfile(StrictModel):
     binding_path: Path
     binding_sha256: str = Field(pattern=_SHA256_PATTERN)
     supported_reference_roles: tuple[
-        Literal["character", "scene", "style", "continuity_terminal"], ...
+        Literal["character", "scene", "style", "continuity_terminal", "edit_mask"], ...
     ]
     min_references: int = Field(strict=True, ge=1)
     max_references: int = Field(strict=True, ge=1)
@@ -156,12 +170,21 @@ class LocalImageExecutionProfile(StrictModel):
             raise ValueError("profile reference bounds are invalid")
         if self.min_width > self.max_width or self.min_height > self.max_height:
             raise ValueError("profile dimension bounds are invalid")
-        if self.lane_id == "qwen_image_edit_2511_local":
+        if self.lane_id in {
+            "qwen_image_edit_2511_local",
+            "qwen_image_edit_2511_masked_local",
+        }:
             if self.model_repository_id != "Qwen/Qwen-Image-Edit-2511":
                 raise ValueError("Qwen lane requires the exact official repository")
             diffusion = self.components[0]
             if diffusion.precision.lower() != "bf16" or self.optional_lora_enabled or "lora" in roles:
                 raise ValueError("Qwen profile requires declared BF16 diffusion with LoRA disabled")
+            if self.lane_id == "qwen_image_edit_2511_masked_local" and (
+                self.supported_reference_roles != ("character", "scene", "edit_mask")
+                or self.min_references != 3
+                or self.max_references != 3
+            ):
+                raise ValueError("Masked Qwen profile requires ordered character, scene, and edit_mask references")
         else:
             if self.model_repository_id != "black-forest-labs/FLUX.2-klein-4B":
                 raise ValueError("FLUX lane requires the exact distilled 4B repository")
@@ -260,191 +283,6 @@ def load_local_image_workflow(path: str | Path) -> dict[str, Any]:
     return load_workflow_template(path)
 
 
-_SEALED_NODE_CLASSES = {
-    "qwen_image_edit_2511_local": {
-        "170:145": "ModelSamplingAuraFlow",
-        "170:146": "VAELoader",
-        "170:147": "FluxKontextMultiReferenceLatentMethod",
-        "170:148": "FluxKontextMultiReferenceLatentMethod",
-        "170:149": "TextEncodeQwenImageEditPlus",
-        "170:151": "TextEncodeQwenImageEditPlus",
-        "170:152": "CFGNorm",
-        "170:156": "VAEEncode",
-        "170:158": "VAEDecode",
-        "170:160": "ImageScale",
-        "170:161": "UNETLoader",
-        "170:162": "CLIPLoader",
-        "170:169": "KSampler",
-        "41": "LoadImage",
-        "83": "LoadImage",
-        "9": "SaveImage",
-    },
-    "flux2_klein_4b_local": {
-        "76": "LoadImage",
-        "81": "LoadImage",
-        "92:101": "KSamplerSelect",
-        "92:102": "Flux2Scheduler",
-        "92:103": "CFGGuider",
-        "92:104": "SamplerCustomAdvanced",
-        "92:105": "VAEDecode",
-        "92:106": "RandomNoise",
-        "92:107": "UNETLoader",
-        "92:108": "CLIPLoader",
-        "92:109": "CLIPTextEncode",
-        "92:110": "VAELoader",
-        "92:111": "ImageScale",
-        "92:112:115": "ReferenceLatent",
-        "92:112:116": "VAEEncode",
-        "92:112:117": "ReferenceLatent",
-        "92:113": "EmptyFlux2LatentImage",
-        "92:114": "GetImageSize",
-        "92:84:118": "ReferenceLatent",
-        "92:84:119": "VAEEncode",
-        "92:84:120": "ReferenceLatent",
-        "92:85": "ImageScaleToTotalPixels",
-        "92:86": "CLIPTextEncode",
-        "94": "SaveImage",
-    },
-}
-
-
-def _input_edge(workflow: dict[str, Any], node_id: str, input_name: str) -> Any:
-    return workflow.get(node_id, {}).get("inputs", {}).get(input_name)
-
-
-def _loader_consumers(
-    workflow: dict[str, Any], loader_ids: set[str]
-) -> set[tuple[str, str, str]]:
-    consumers = set()
-    for node_id, node in workflow.items():
-        inputs = node.get("inputs", {}) if isinstance(node, dict) else {}
-        for input_name, value in inputs.items():
-            if (
-                isinstance(value, list)
-                and len(value) == 2
-                and value[0] in loader_ids
-            ):
-                consumers.add((node_id, input_name, value[0]))
-    return consumers
-
-
-def _validate_sealed_workflow_contract(
-    profile: LocalImageExecutionProfile,
-    workflow: dict[str, Any],
-    binding: LocalImageBinding,
-) -> None:
-    actual_node_classes = {
-        node_id: node.get("class_type")
-        for node_id, node in workflow.items()
-        if isinstance(node, dict)
-    }
-    if actual_node_classes != _SEALED_NODE_CLASSES[profile.lane_id]:
-        raise _invalid("Local image workflow node topology is not sealed.")
-
-    loader_contract = {
-        "UNETLoader": ("diffusion", "unet_name"),
-        "CLIPLoader": ("text_encoder", "clip_name"),
-        "VAELoader": ("vae", "vae_name"),
-        "LoraLoaderModelOnly": ("lora", "lora_name"),
-    }
-    actual_components = []
-    for node in workflow.values():
-        if not isinstance(node, dict) or node.get("class_type") not in loader_contract:
-            continue
-        role, input_name = loader_contract[node["class_type"]]
-        filename = node.get("inputs", {}).get(input_name)
-        if not isinstance(filename, str):
-            raise _invalid("Local image workflow model loader is malformed.")
-        actual_components.append((role, filename))
-    expected_components = [
-        (component.role, component.filename) for component in profile.components
-    ]
-    if sorted(actual_components) != sorted(expected_components):
-        raise _invalid(
-            "Local image workflow model loaders do not match the sealed components."
-        )
-    if profile.lane_id == "qwen_image_edit_2511_local":
-        expected_binding = {
-            "positive_prompt": ("170:151", "inputs", "prompt"),
-            "negative_prompt": ("170:149", "inputs", "prompt"),
-            "seed": ("170:169", "inputs", "seed"),
-            "width": ("170:160", "inputs", "width"),
-            "height": ("170:160", "inputs", "height"),
-            "reference_images": (
-                ("41", "inputs", "image"),
-                ("83", "inputs", "image"),
-            ),
-        }
-        settings = (
-            workflow.get("170:169", {}).get("inputs", {}).get("sampler_name")
-            == profile.sampler
-            and workflow.get("170:169", {}).get("inputs", {}).get("scheduler")
-            == profile.scheduler
-            and workflow.get("170:169", {}).get("inputs", {}).get("steps")
-            == profile.steps
-            and workflow.get("170:169", {}).get("inputs", {}).get("cfg")
-            == profile.guidance
-        )
-        model_edges = (
-            _input_edge(workflow, "170:145", "model") == ["170:161", 0]
-            and _input_edge(workflow, "170:152", "model") == ["170:145", 0]
-            and _input_edge(workflow, "170:169", "model") == ["170:152", 0]
-        )
-        loader_consumers = {
-            ("170:145", "model", "170:161"),
-            ("170:149", "clip", "170:162"),
-            ("170:149", "vae", "170:146"),
-            ("170:151", "clip", "170:162"),
-            ("170:151", "vae", "170:146"),
-            ("170:156", "vae", "170:146"),
-            ("170:158", "vae", "170:146"),
-        }
-        loader_ids = {"170:161", "170:162", "170:146"}
-    else:
-        expected_binding = {
-            "positive_prompt": ("92:109", "inputs", "text"),
-            "negative_prompt": ("92:86", "inputs", "text"),
-            "seed": ("92:106", "inputs", "noise_seed"),
-            "width": ("92:111", "inputs", "width"),
-            "height": ("92:111", "inputs", "height"),
-            "reference_images": (
-                ("76", "inputs", "image"),
-                ("81", "inputs", "image"),
-            ),
-        }
-        settings = (
-            profile.scheduler == "flux2_distilled"
-            and workflow.get("92:101", {}).get("inputs", {}).get("sampler_name")
-            == profile.sampler
-            and workflow.get("92:102", {}).get("inputs", {}).get("steps")
-            == profile.steps
-            and workflow.get("92:103", {}).get("inputs", {}).get("cfg")
-            == profile.guidance
-        )
-        model_edges = _input_edge(workflow, "92:103", "model") == ["92:107", 0]
-        loader_consumers = {
-            ("92:103", "model", "92:107"),
-            ("92:105", "vae", "92:110"),
-            ("92:109", "clip", "92:108"),
-            ("92:112:116", "vae", "92:110"),
-            ("92:84:119", "vae", "92:110"),
-            ("92:86", "clip", "92:108"),
-        }
-        loader_ids = {"92:107", "92:108", "92:110"}
-    actual_binding = {
-        key: getattr(binding, key) for key in expected_binding
-    }
-    if (
-        actual_binding != expected_binding
-        or not settings
-        or not model_edges
-        or _loader_consumers(workflow, loader_ids) != loader_consumers
-    ):
-        raise _invalid(
-            "Local image workflow does not implement the sealed request semantics."
-        )
-
-
 def render_image_workflow(
     *,
     template: dict[str, Any],
@@ -517,6 +355,11 @@ def validate_profile_request_match(
         raise _invalid("Image request does not match the sealed local execution profile.")
     count = len(request.references)
     roles = tuple(reference.role for reference in request.references)
+    masked_lane = profile.lane_id == "qwen_image_edit_2511_masked_local"
+    if (masked_lane and roles != ("character", "scene", "edit_mask")) or (
+        not masked_lane and "edit_mask" in roles
+    ):
+        raise _invalid("Image request references do not match the selected local lane.")
     if (
         not profile.min_references <= count <= profile.max_references
         or any(role not in profile.supported_reference_roles for role in roles)
@@ -646,10 +489,55 @@ class ComfyLocalImageProvider:
         self._timeout_seconds = timeout_seconds
         self._preflighted_requests: set[str] = set()
 
+    def _read_reference_bytes(
+        self, request: ImageGenerationRequest
+    ) -> tuple[tuple[Path, bytes], ...]:
+        resolved: list[tuple[Path, bytes]] = []
+        for reference in request.references:
+            try:
+                path = self._reference_resolver(reference).resolve(strict=True)
+                path.relative_to(self._reference_root)
+                payload = path.read_bytes()
+            except (OSError, RuntimeError, ValueError) as exc:
+                raise _invalid(
+                    "Image reference could not be reopened safely.", str(exc)
+                ) from exc
+            if hashlib.sha256(payload).hexdigest() != reference.asset_sha256:
+                raise _invalid(
+                    "Image reference bytes do not match the request.", reference.asset_id
+                )
+            resolved.append((path, payload))
+        return tuple(resolved)
+
+    @staticmethod
+    def _validate_mask_inputs(
+        request: ImageGenerationRequest,
+        references: tuple[tuple[Path, bytes], ...],
+    ) -> None:
+        if not any(reference.role == "edit_mask" for reference in request.references):
+            return
+        references_by_role = {
+            reference.role: payload
+            for reference, (_path, payload) in zip(
+                request.references, references, strict=True
+            )
+        }
+        try:
+            validate_edit_mask_inputs(
+                request,
+                references_by_role["scene"],
+                references_by_role["edit_mask"],
+            )
+        except ValueError as exc:
+            raise _invalid("Image edit mask references are invalid.", str(exc)) from exc
+
     def preflight(self, request: ImageGenerationRequest) -> None:
         """Prove the sealed local runtime before any durable submit evidence exists."""
 
         validate_profile_request_match(self.profile, request)
+        if self.profile.lane_id == "qwen_image_edit_2511_masked_local":
+            references = self._read_reference_bytes(request)
+            self._validate_mask_inputs(request, references)
         commit = self._commit_resolver()
         if commit != self.profile.comfyui_commit:
             raise _invalid(
@@ -714,19 +602,11 @@ class ComfyLocalImageProvider:
             or not authorization.provider_enabled
         ):
             raise _invalid("Image authorization does not match the local request.")
-        reference_names: list[str] = []
-        for reference in request.references:
-            try:
-                path = self._reference_resolver(reference).resolve(strict=True)
-                path.relative_to(self._reference_root)
-                payload = path.read_bytes()
-            except (OSError, RuntimeError, ValueError) as exc:
-                raise _invalid(
-                    "Image reference could not be reopened safely.", str(exc)
-                ) from exc
-            if hashlib.sha256(payload).hexdigest() != reference.asset_sha256:
-                raise _invalid("Image reference bytes do not match the request.", reference.asset_id)
-            reference_names.append(self._transport.upload_image(path))
+        references = self._read_reference_bytes(request)
+        self._validate_mask_inputs(request, references)
+        reference_names = [
+            self._transport.upload_image(path) for path, _payload in references
+        ]
         workflow = render_image_workflow(
             template=self._workflow,
             binding=self._binding,
@@ -760,6 +640,22 @@ class ComfyLocalImageProvider:
         )
         if not image_bytes.startswith(b"\x89PNG\r\n\x1a\n"):
             raise _invalid("Local ComfyUI returned non-PNG bytes.")
+        if any(reference.role == "edit_mask" for reference in request.references):
+            references_by_role = {
+                reference.role: payload
+                for reference, (_path, payload) in zip(
+                    request.references, references, strict=True
+                )
+            }
+            try:
+                validate_edit_mask_output(
+                    request,
+                    references_by_role["scene"],
+                    references_by_role["edit_mask"],
+                    image_bytes,
+                )
+            except ValueError as exc:
+                raise _invalid("Local ComfyUI output violates the edit mask.", str(exc)) from exc
         elapsed_ms = max(0, int((time.monotonic() - started) * 1_000))
         return ImageProviderResult.create(
             request=request,

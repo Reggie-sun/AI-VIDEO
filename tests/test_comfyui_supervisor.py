@@ -6,6 +6,8 @@ import threading
 import time
 from types import SimpleNamespace
 
+import pytest
+
 
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "comfyui_supervisor.py"
 TEST_UNIT = f"ai-video-comfyui-{'a' * 32}.service"
@@ -28,7 +30,8 @@ def _comfy_root(tmp_path: Path) -> Path:
     return root
 
 
-def test_start_uses_detached_user_systemd_service(monkeypatch, tmp_path):
+@pytest.mark.parametrize("core_only", [False, True])
+def test_start_uses_detached_user_systemd_service(monkeypatch, tmp_path, core_only):
     supervisor = _load_supervisor()
     root = _comfy_root(tmp_path)
     commands = []
@@ -66,7 +69,10 @@ def test_start_uses_detached_user_systemd_service(monkeypatch, tmp_path):
 
     monkeypatch.setattr(supervisor, "_run", run)
 
-    assert supervisor.main(["start", "--comfy-root", str(root)]) == 0
+    argv = ["start", "--comfy-root", str(root)]
+    if core_only:
+        argv.append("--core-only")
+    assert supervisor.main(argv) == 0
     assert len(commands) == 1
     command = commands[0]
     assert command[:3] == ["systemd-run", "--user", "--collect"]
@@ -76,7 +82,7 @@ def test_start_uses_detached_user_systemd_service(monkeypatch, tmp_path):
     assert "--property=Restart=no" in command
     assert "--property=KillMode=mixed" in command
     assert "--property=TimeoutStopSec=30s" in command
-    assert command[-8:] == [
+    runtime_command = [
         str(root / ".venv" / "bin" / "python"),
         str(root / "main.py"),
         "--listen",
@@ -86,6 +92,16 @@ def test_start_uses_detached_user_systemd_service(monkeypatch, tmp_path):
         "--disable-auto-launch",
         "--use-sage-attention",
     ]
+    if core_only:
+        runtime_command.extend(["--disable-all-custom-nodes", "--disable-api-nodes"])
+        assert "--setenv=HF_HUB_OFFLINE=1" in command
+        assert "--setenv=TRANSFORMERS_OFFLINE=1" in command
+    else:
+        assert "--setenv=HF_HUB_OFFLINE=1" not in command
+        assert "--setenv=TRANSFORMERS_OFFLINE=1" not in command
+        assert "--disable-all-custom-nodes" not in command
+        assert "--disable-api-nodes" not in command
+    assert command[command.index(str(root / ".venv" / "bin" / "python")):] == runtime_command
     assert not {"--lowvram", "--novram", "--gpu-only", "--cpu"}.intersection(command)
 
 

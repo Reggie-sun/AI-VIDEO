@@ -45,6 +45,25 @@ canonical Registry binding 返回原 bytes，adapter不读任意路径/URL、不
 preview封存图片SHA/bytes/MIME，permit前重验同一preview，原PNG output及其 paid/provenance不变。
 坐标编辑接口支持不证明clean plate几何/七倒影保护，也不授权POST；raw MP4逐镜Gate独立保留。
 
+## Canvas Masked Image Workflow
+
+`image_edit_mask` 独占binary PNG mask/geometry/SHA与保护区RGB像素验证；白编辑黑保护，拒绝soft/alpha/全黑/全白或重采样。
+新`ImageReferenceBinding.role=edit_mask`绑定Scene的Registry image与creative revision/hash；仅local request `/6`
+允许严格`character,scene,edit_mask`三引用，Scene/mask同owner不同asset。原request `/1–5`字节/hash保持。
+mask沿既有preview accounting、provenance references和P5 input_artifact_ids进入依赖，不建第二state/ledger。
+image intent/activation和标准reader重开相同Registry bytes，保护区像素变化不得activate。
+
+`comfy_image_workflow_contract`独占旧Qwen/FLUX与新增`qwen_image_edit_2511_masked_local`的sealed拓扑；
+`comfy_image`仍独占loopback profile/runtime、transport与一用permit。新路线Scene作latent/Qwen image1，
+Character作image2，mask经ImageToMask/SetLatentNoiseMask与最终ImageCompositeMasked；禁止交换身份/场景、
+旁路noise mask或最终保护合成。旧profiles/templates/bindings不改；没有Pose/Depth ControlNet或云mask扩展。
+
+`canvas_image_workflow`仅从current Character/Scene/Registry准备exact request/preview/profile；
+`CanvasProductionService.prepare_image_workflow`和既有CLI同名action无Provider或state副作用，不加载operator runtime。
+真实生成仍经已配置candidate preparer的`ProductionStateCommitter.generate_image_asset`，不新建workflow生命周期。
+输入/工程PASS不证明mask内剧情质量、clean plate、视频连续性或human acceptance。
+checks归现有`production_image_tests`、`canvas_production_workflow_tests`和reader/state/dependency/Architecture gates。
+
 ## Current Shot Close Expression
 
 `video_requirement.py::GenerationIntent.close_causal_facts` 是existing intent内的optional authored

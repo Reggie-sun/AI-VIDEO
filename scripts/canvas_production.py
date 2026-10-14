@@ -29,7 +29,7 @@ def run(*, data_path, project_root, action, runtime_factory=None, arguments=None
     inspection = inspect_canvas_source(source, definition["selection"])
     if action == "inspect":
         return inspection
-    if runtime_factory is not None and action != "preflight":
+    if runtime_factory is not None and action not in {"preflight", "prepare_image_workflow"}:
         module, name = runtime_factory.split(":", 1)
         runtime = getattr(importlib.import_module(module), name)(project_root=Path(project_root))
     else:
@@ -60,6 +60,8 @@ def run(*, data_path, project_root, action, runtime_factory=None, arguments=None
         return service.revise_authoring(registry=registry, asset_artifacts=artifacts, **arguments)
     if action == "status":
         return service.position()
+    if action == "prepare_image_workflow":
+        return service.prepare_image_workflow(**arguments)
     arguments = operator_arguments(action, service, arguments)
     if action == "compose":
         spec, timeline = service.compose(**arguments)
@@ -76,7 +78,7 @@ def run(*, data_path, project_root, action, runtime_factory=None, arguments=None
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("inspect", "preflight", "author", "approve", "revise", "status", "prepare", "start",
-        "prepare_repair", "start_repair", "generate_voice",
+        "prepare_repair", "start_repair", "generate_voice", "prepare_image_workflow",
         "execute", "evaluate", "handoff_reference", "register_native_audio", "compose", "render", "cut_packet",
         "review_delivery", "deliver"))
     parser.add_argument("--data", type=Path, required=True)

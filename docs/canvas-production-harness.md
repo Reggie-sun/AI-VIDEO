@@ -97,6 +97,31 @@ native payload 使用同一原图的 inline PNG。默认纯文字 profile 不接
 原图、准备后的 clean plate 和影片须分别核验；首帧编辑不能代签 raw MP4 或下一镜质量。
 该 shared capability 不授权新的图片/视频调用，也不启用图层拆分或新的 renderer。
 
+## Masked Image Workflow
+
+本地局部作图使用新profile `workflows/profiles/p7_1_qwen_masked_edit.json`，对应API图为
+`workflows/templates/p7_1_qwen_masked_edit_api.json`。复用现有Qwen模型，不接入新的云Provider。
+先通过现有Registry/authoring revision选择人物PNG、场景构图PNG和同尺寸黑白mask；mask归同一Scene，
+白色为允许编辑区、黑色为保护区。mask不是新的角色图，也不伪造为原剧本中的canvas节点。
+
+API `CanvasProductionService.prepare_image_workflow` 或共用CLI同名action接收普通参数：
+`attempt_id/shot_id/target_asset_role/character_id/character_asset_id/source_asset_id/mask_asset_id/seed/prompt_text`
+与`profile_path/artifact_root`，可选`negative_prompt_text`。它沿标准loader重开当前项目，输出sealed
+request/preview/profile及输入校验；忽略CLI `--runtime`，不提交Provider、不写state。
+source/mask必须已被current approved Character/Scene选择，不能直接传任意文件路径或自动猜mask。
+
+真实生成用注入的 `ComfyLocalImageProvider` 与 authorization，经已配置
+`canvas_image_candidate_preparer()` 的 `ProductionStateCommitter.generate_image_asset` 执行；
+现有local profile preflight、durable intent、一用permit和unknown停止规则保持。
+新图以Scene为编辑底图，Character为身份参考，mask控制latent噪声及最终合成；输出、activation和
+标准reader均核验保护区RGB像素不变。Mask内模型质量、clean plate几何和剧情要求仍须实际逐项QA。
+Input PASS不证明runtime readiness；runtime readiness也不证明成功生成。原S01逐镜MP4、原生声音、
+实际handoff、后镜QA、canonical字幕/trim与human1.0x不由作图工作流代签。
+
+本地核心图的runtime核验沿既有 `scripts/comfyui_supervisor.py start --core-only`：
+仅在新启动unit中禁用custom/API nodes并启用HF/Transformers offline；不下载模型。
+旧默认启动参数保持，现有unit/占用端口不接管，失败/停止仍由同一supervisor管理。
+
 ## Production Flow
 
 | Stage | Operation | Required evidence |

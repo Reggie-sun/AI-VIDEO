@@ -1,5 +1,13 @@
 # Jimeng and ComfyUI Workflows for Cinematic Stills and Short Drama
 
+## Supersession Notice — 2026-10-14
+
+下方Current Project Capability Mapping是研究时的snapshot。本轮原生subagent实现已补
+[local masked image workflow](../superpowers/specs/2026-10-14-canvas-masked-image-workflow.md)：
+typed edit_mask、latent mask、最终保护合成及canonical读回复验。Seedream云adapter仍为单场景参考；
+Pose/Depth ControlNet未接通。新工程不改变两张旧图FAIL或证明原S01/S02媒体质量，实际状态以
+[原单元record](../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md)和exact receipt为准。
+
 ## Finding
 
 对《界蚀》S01→S02 来说，需要的是带参考资产、空间布局、局部编辑和逐镜验收的生成工作流。前两张纯文本静帧的实际问题包括缺人、重复倒影、机位偏离及额外标题；增加形容词不会增加结构输入。下述创作者案例使用角色/场景参考、构图示意、分段生成与局部修复，不能据少数案例断言社区普遍采用或已经稳定有效。ComfyUI 是否必要取决于它能补什么实际条件，而非是否有节点界面。

@@ -216,6 +216,7 @@ def _start_serialized(args: argparse.Namespace) -> int:
     unit_name = f"{UNIT_PREFIX}{uuid.uuid4().hex}"
     unit_service = f"{unit_name}.service"
     memory_args = ["--novram"] if args.novram else []
+    core_only = bool(getattr(args, "core_only", False))
     command = [
         "systemd-run",
         "--user",
@@ -230,6 +231,14 @@ def _start_serialized(args: argparse.Namespace) -> int:
         "--property=StandardOutput=journal",
         "--property=StandardError=journal",
         "--setenv=PYTHONUNBUFFERED=1",
+        *(
+            [
+                "--setenv=HF_HUB_OFFLINE=1",
+                "--setenv=TRANSFORMERS_OFFLINE=1",
+            ]
+            if core_only
+            else []
+        ),
         str(python_path),
         str(main_path),
         "--listen",
@@ -239,6 +248,11 @@ def _start_serialized(args: argparse.Namespace) -> int:
         "--disable-auto-launch",
         *memory_args,
         "--use-sage-attention",
+        *(
+            ["--disable-all-custom-nodes", "--disable-api-nodes"]
+            if core_only
+            else []
+        ),
     ]
     result = _run(command)
     if result.returncode != 0:
@@ -379,6 +393,11 @@ def _parser() -> argparse.ArgumentParser:
         "--novram",
         action="store_true",
         help="use ComfyUI --novram instead of its default GPU memory management",
+    )
+    start.add_argument(
+        "--core-only",
+        action="store_true",
+        help="disable custom/API nodes and require offline model caches",
     )
     start.set_defaults(handler=_start)
 

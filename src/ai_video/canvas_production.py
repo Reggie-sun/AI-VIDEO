@@ -140,6 +140,11 @@ class CanvasProductionService:
             raise _blocked("Selected canvas occurrences no longer match the approved Storyboard.")
         return loaded
 
+    @_input_errors
+    def prepare_image_workflow(self, **arguments):
+        from ai_video.canvas_image_workflow import prepare_canvas_masked_image
+        return prepare_canvas_masked_image(loaded=self._load(), **arguments)
+
     def _attempts(self, loaded, shot_id):
         found = []
         for attempt in loaded.manifest.attempts:
