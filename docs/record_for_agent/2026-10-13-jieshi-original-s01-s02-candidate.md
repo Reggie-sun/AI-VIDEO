@@ -11,7 +11,7 @@ Date: 2026-10-13
 
 ## Supersession Notice — 2026-10-14
 
-当前最新checkpoint为下文 **Bounded Image Repair And Stop**：共享修复已发布 `0234fc55e3be9bb188db1ab8ca7a5ec12acd0066`，旧本地unknown在保留全部paid/原图后封存FAILED，随后修正图真实POST一次。累计图片2、原单元视频0，Manifest19，修正图canonical技术准入成功但实际QA仍FAIL；无edit、原S01 MP4、handoff或成片。此前“Manifest12/图片1/共享code未改”为保留的历史checkpoint，不是当前状态。
+当前最新checkpoint为下文 **Generation Workflow Research And Input Gap**：两张原准备图片实际QA均FAIL，累计图片2、原单元视频0，Manifest19；研究期间没有新增图片/视频POST、edit、handoff或成片。共享修复 `0234fc55e3be9bb188db1ab8ca7a5ec12acd0066` 已解除旧本地materialization阻断，技术准入与素材QA仍分开。此前“Manifest12/图片1/共享code未改”为保留的历史checkpoint，不是当前状态。
 
 用户已明确授权最多2 Seedream PNG+2原S01/S02 Fast4s、480p/native audio、零重抽的200 CNY内部上限单元。下文此前“新单元未授权/新增POST=0/Manifest revision3”为历史checkpoint，已被文末真实执行取代：新增1图片POST、0视频POST，exact底图视觉QA FAIL，未进入第二张或视频。paid receipt ACCEPTED与本地materialize `outcome_unknown`分开保留；不是Provider结果未知，也不是原S01成功。
 
@@ -19,7 +19,7 @@ Date: 2026-10-13
 
 用户明确纠正：旧抬手机/起身两镜为 Agent 简化测试，不是原开场。本次从已发布 shared inspect/author/preflight 继续，准备原 S01→S02 候选及逐项忠实度矩阵，不重建执行链。原开场两镜采用0–3/3–7秒；S03/S04才补足7–15秒，当前只保留映射、不扩4次生成。
 
-当前真实停止点为已授权底图的 `QUALITY_FAILURE`，并有本地candidate materialization阻断；声音语义仍缺合格听音/登记路线的 `EVIDENCE_REPAIR_FIRST`。对原文“clean plate必须最终视频overlay”的过早解读已撤回：原文只要求几何一致且只删除林砚映像，可以先准备首帧。已补同一Seedream adapter的单PNG参考；本轮底图失败不能签实际plate或raw video成功。没有激活QA或qualified视频runtime。未生成新的原剧本MP4、没有前镜accepted source、没有state handoff/后镜submit、没有HyperFrames成片；human1.0x及故事AC-7 `NOT_EVALUATED`。
+当前真实停止点为素材 `QUALITY_FAILURE`；旧本地candidate materialization阻断已解除。声音语义仍缺合格听音/登记路线的 `EVIDENCE_REPAIR_FIRST`。对原文“clean plate必须最终视频overlay”的过早解读已撤回：原文只要求几何一致且只删除林砚映像，可以先准备首帧。已补同一Seedream adapter的单PNG参考，但前两次实际使用T2I；底图失败不能签实际plate或raw video成功。没有激活QA或qualified视频runtime。未生成新的原剧本MP4、没有前镜accepted source、没有state handoff/后镜submit、没有HyperFrames成片；human1.0x及故事AC-7 `NOT_EVALUATED`。
 
 ## Owned Work
 
@@ -213,6 +213,44 @@ Parent通过 `view_image(detail=original)` 实际看图，沿submit前sealed七�
 本轮 **QUALITY_FAILURE / STOP**，不edit、不生成video，不把剩余edit次数挪作重抽。累计原准备图片POST2，当前修复用1/2，余1只能全PASS后的edit；原单元video0、历史video11全部保留。没有原S01/S02 exact MP4、accepted前镜、actual state、后镜QA、原生音轨/caption/trim/HyperFrames成片；human1.0x和完整故事AC-7 NOT_EVALUATED。两镜7秒与原前15秒S01–S04映射始终分开，声音路线仍有独立EVIDENCE_REPAIR_FIRST，未伪称听过。
 
 最小恢复条件是能保全完整cast/映像/摄影、无标题污染的可审阅新输入与有界attempt决定，然后实际base全部required PASS；本次失败不能直接晋级edit或video，不能删人物/倒影/原对白来通过。共享materialization确定性阻断已解除，当前剩余是实际素材质量，不再以缺Skill或engineer PASS解释为媒体成功。
+
+## Generation Workflow Research And Input Gap — 2026-10-14
+
+用户要求核查社区是否用类似 ComfyUI 的生成工作流，重点为即梦。新增
+[研究报告](../research/2026-10-14-jimeng-community-workflows.md)，区分创作者自述、对别人作品的复盘、教程目录、官方 UI/API/工作流文档和本项目当前代码；没有因研究提交任何图片/视频或改变 Production 状态。
+
+### Verified Findings
+
+- 创作者案例先做角色/场景参考和构图示意，再逐镜生成、检查、局部修正；也承认多人、空间镜像和精确手部动作失败。少数案例不证明普遍做法，更不证明该地铁七倒影关系可解。
+- 即梦/Dreamina UI、Ark API、ComfyUI 本地模型与 ComfyUI 云 API 节点为不同执行面。ComfyUI 官方 Seedream Pro 节点需要账号/网络，把同一远端请求搬入节点不会添加本地 ControlNet 条件。
+- `seedream.py` 实际只发送 prompt 与可选一张 scene PNG；当前未暴露多角色参考、mask/区域保护或分层输出。前两次原准备生成使用纯文本，已有单参考能力未用起来，不能用 Skill 数量或工程 PASS 解释素材成功。
+- `comfy_image.py` 的两条 sealed edit lane 各有两个参考槽，但拓扑没有 mask/inpaint、pose/depth ControlNet。代码存在不证明当前 host 模型/service live-ready；本次未安装或运行。
+- Ark 官方文档列出多图、坐标交互与图层拆分，不能推导二值保护 mask 或 clean plate 质量。动态正文抓取受限；Chrome MCP 因已有 profile 占用未能打开，没有接管/关闭用户浏览器。实际界面及新增 API exact wire 仍未验证。
+
+### Parent Adjudication And Recovery Direction
+
+受管只读 Kimi invocation `fd9a2ab6-88ed-423f-9d94-f55f5c880fa8`，sealed contract
+`63534dc0c3a1a3467ea6a3ff9c4defff130e4a779253731a6031d23056b5543a`；Parent 核验
+route qualification、k3 model identity、containment、四个 artifacts 与全部 observed-read SHA，均匹配。
+receipt/reduced adjudication 见
+`runs/canvas-jieshi-original-s01-s02-20261013-001/jimeng-workflow-research-20261014/`。
+它是能力映射，不是 implementation review 或 media acceptance；`PARSED` 不代签质量。
+
+Parent 不采纳“必须再生成八个实体全部可见、八个正常倒影的底图”的推导。原镜构图含八名角色，七个倒影可承担其中角色的可见职责；原首帧始终是林砚映像缺席。两次旧技术base仍按各自sealed contract保持FAIL，不倒改历史。
+
+本窗口实际查看历史 `historical-opening-review` PNG
+`4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb`，其侧窗与本人构图接近原目标；只可用于布局审阅/准备参考，尚非 accepted S01，也未在 Scene 注册为新的视觉职责或发送 Provider。
+
+下一输入应把地铁布局、镜头构图、角色/道具、窗面与七倒影对应关系及 clean plate 准备成可审阅资产，再经现有 inspect/author/preflight。必须实际确认只处理林砚映像并保护其余七个；不能把坐标prompt当保护遮罩、把未准入旧底图当 accepted 前镜。若确需多参考、mask或分层，先做目标必要的共享 contract 适配及验证；不新增故事执行脚本/第二timeline/renderer，不直接复制社区无限重抽流程。
+
+### Verification And Learning Boundary
+
+本次为 research/record 文档修改，无 Provider/committer/schema/Gate 变更；Parent 风险判断为无需 implementation Kimi review，不叠加 reviewer。最初 `make harness-inspect` 使用系统Python因缺PyYAML失败；按现有 `.venv` 与 `PYTHONPATH=src:.` 重跑inspect成功，未新增依赖。文档最终exact staged验证由
+`.agent/harness/runs/jieshi-jimeng-workflow-research-20261014-r1/receipt.json`
+记录，不能据此宣称生成效果。
+
+`record-ai-video-session` 在研究稳定checkpoint更新当前record；`distill-ai-video-learning`
+评估为 `no_candidate`：没有新增媒体对照或候选工作流实测，外部案例与代码能力映射不构成本项目的新独立实验。没有采用/修改 Skill、Policy 或 Gate。原本声音缺口、逐镜QA、human1.0x、0–7秒与原0–15秒边界及完整故事AC-7保持。
 
 ## Evidence Index
 
