@@ -11,7 +11,7 @@ Date: 2026-10-13
 
 ## Supersession Notice — 2026-10-14
 
-当前最新checkpoint为下文 **Generation Workflow Research And Input Gap**：两张原准备图片实际QA均FAIL，累计图片2、原单元视频0，Manifest19；研究期间没有新增图片/视频POST、edit、handoff或成片。共享修复 `0234fc55e3be9bb188db1ab8ca7a5ec12acd0066` 已解除旧本地materialization阻断，技术准入与素材QA仍分开。此前“Manifest12/图片1/共享code未改”为保留的历史checkpoint，不是当前状态。
+当前最新checkpoint为下文 **Native Masked Image Workflow Implementation**：本地三引用蒙版作图已接回共享 Canvas/image/committer/reader，工程提交 `d37d0482e4a0d6205b2c546ba010e24433dccd8c` 已push并核验remote main。exact staged Harness通过，实际本机read-only profile preflight通过；未运行模型推理或新增图片/视频。两张原准备图片实际QA均FAIL，累计图片2、原单元视频0，Manifest19，未edit、handoff或输出成片。共享修复 `0234fc55e3be9bb188db1ab8ca7a5ec12acd0066` 已解除旧本地materialization阻断；技术准入、工作流工程与素材QA仍分开。此前“Manifest12/图片1/共享code未改”及“本地无mask路线”为保留的历史checkpoint，不是当前实现。
 
 用户已明确授权最多2 Seedream PNG+2原S01/S02 Fast4s、480p/native audio、零重抽的200 CNY内部上限单元。下文此前“新单元未授权/新增POST=0/Manifest revision3”为历史checkpoint，已被文末真实执行取代：新增1图片POST、0视频POST，exact底图视觉QA FAIL，未进入第二张或视频。paid receipt ACCEPTED与本地materialize `outcome_unknown`分开保留；不是Provider结果未知，也不是原S01成功。
 
@@ -19,7 +19,7 @@ Date: 2026-10-13
 
 用户明确纠正：旧抬手机/起身两镜为 Agent 简化测试，不是原开场。本次从已发布 shared inspect/author/preflight 继续，准备原 S01→S02 候选及逐项忠实度矩阵，不重建执行链。原开场两镜采用0–3/3–7秒；S03/S04才补足7–15秒，当前只保留映射、不扩4次生成。
 
-当前真实停止点为素材 `QUALITY_FAILURE`；旧本地candidate materialization阻断已解除。声音语义仍缺合格听音/登记路线的 `EVIDENCE_REPAIR_FIRST`。对原文“clean plate必须最终视频overlay”的过早解读已撤回：原文只要求几何一致且只删除林砚映像，可以先准备首帧。已补同一Seedream adapter的单PNG参考，但前两次实际使用T2I；底图失败不能签实际plate或raw video成功。没有激活QA或qualified视频runtime。未生成新的原剧本MP4、没有前镜accepted source、没有state handoff/后镜submit、没有HyperFrames成片；human1.0x及故事AC-7 `NOT_EVALUATED`。
+当前媒体停止点为素材 `QUALITY_FAILURE`；旧本地candidate materialization阻断已解除。本地masked lane已实现并做实际只读runtime预检，原单元尚缺按当前Scene/Character职责准入的source与binary mask，也未运行GPU推理。声音语义仍缺合格听音/登记路线的 `EVIDENCE_REPAIR_FIRST`。对原文“clean plate必须最终视频overlay”的过早解读已撤回：原文只要求几何一致且只删除林砚映像，可以先准备首帧。已补同一Seedream adapter的单PNG参考，但前两次实际使用T2I；底图失败不能签实际plate或raw video成功。没有激活QA或qualified视频runtime。未生成新的原剧本MP4、没有前镜accepted source、没有state handoff/后镜submit、没有HyperFrames成片；human1.0x及故事AC-7 `NOT_EVALUATED`。
 
 ## Owned Work
 
@@ -251,6 +251,40 @@ Parent 不采纳“必须再生成八个实体全部可见、八个正常倒影�
 
 `record-ai-video-session` 在研究稳定checkpoint更新当前record；`distill-ai-video-learning`
 评估为 `no_candidate`：没有新增媒体对照或候选工作流实测，外部案例与代码能力映射不构成本项目的新独立实验。没有采用/修改 Skill、Policy 或 Gate。原本声音缺口、逐镜QA、human1.0x、0–7秒与原0–15秒边界及完整故事AC-7保持。
+
+## Native Masked Image Workflow Implementation — 2026-10-14
+
+用户明确要求直接用原生subagent实现作图工作流。Native Codex继续拥有集成、最终裁决与publication；三个原生任务职责不重叠，`image_workflow_seam`只读核对消费者，`image_mask_contract`实现输入/输出保护校验并追加core-only supervisor切片，`comfy_masked_workflow`实现sealed Comfy图与adapter。worker均完成并归还ownership后Parent接回修改；无第二timeline/state库、故事执行脚本或新依赖。spec/plan完成Parent self-review，按 `superpowers:writing-plans` 持久化既有授权范围。
+
+### Shared Contract And Workflow
+
+- 新 `edit_mask` reference仍归当前Scene/Registry，只有local mask请求采用 `ai-video-image-request/6`；旧request/profile/workflow字节及hash兼容。input职责固定为Character身份参考、Scene待编辑原图、同Scene binary mask；mask白编辑、黑保护，不自动推断bbox或生成mask。
+- 新profile `workflows/profiles/p7_1_qwen_masked_edit.json`，lane `qwen_image_edit_2511_masked_local`，sealed profile hash `d9179d4f83a5572d09a14778587f9cb836eb603dc0ade6aacfe27650bfbf35b7`。Scene进入Qwen image1与latent，Character进入image2；mask进入latent noise mask和最终 `ImageCompositeMasked`，目标仍是原Scene。请求尺寸须为8的倍数，source/mask尺寸一致、PNG不透明且mask仅0/255。
+- `image_edit_mask.py`在input、candidate activation及standard reader复验registered bytes/identity/geometry；output所有mask=0的RGB像素必须逐像素相同。保护承诺是像素，不是整PNG文件hash相同；mask内正确性仍靠真实QA，不能由composite签七倒影或原剧情PASS。
+- 共享 `CanvasProductionService.prepare_image_workflow` 与既有CLI同名action仅做无副作用准备，输出exact request/preview/profile。该action不加载operator runtime。真实生成仍通过现有注入provider、authorization与 `ProductionStateCommitter.generate_image_asset`，candidate沿 `canvas_image_candidate_preparer`，P5/Registry/provenance/replay保留唯一owner。
+- Supervisor新增显式 `--core-only`，禁用custom/API nodes并设置HF/Transformers offline；默认启动行为不改。没有增加ControlNet权重、pose/depth路线、多层renderer或Seedream云mask能力。
+
+实现与接口见 [共享Harness文档](../canvas-production-harness.md)、[spec](../superpowers/specs/2026-10-14-canvas-masked-image-workflow.md)、[plan](../superpowers/plans/2026-10-14-canvas-masked-image-workflow.md)。研究报告顶部同步当前supersession；旧“无本地mask”事实保留为历史，不改两次base的sealed QA。
+
+### Actual Verification And Runtime Boundary
+
+工程证据 `.agent/harness/runs/canvas-masked-image-workflow-20261014-r1/receipt.json` 绑定非空23 owned paths、base `0765a404a046cd59c3adcb03112e7304e360e439`、index tree `a60c3027934ba7c62013027320a21900b3438cf4`。18 selected checks中16实际执行PASS，2由同轮reader/state覆盖跳过；无unmapped fallback。包括Production reader569、state962、Canvas218、image172、Seedream38、supervisor18项测试；不同suite的重叠测试不计为独立质量证据。新增测试覆盖selected mask拒绝、三引用lineage/readback、fake provider坏保护像素不激活、exact replay、CLI禁止加载runtime、核心拓扑篡改及旧profile字节。
+
+Architecture PASS保留两个已有大文件增长WARN（image有效行+10、reader+4），没有刷新baseline或增加例外；拓扑独占新module，Comfy adapter缩减。提交前canonical `verify-receipt` 实际 `fresh=true/closure_eligible=true`；提交tree与该index tree完全相同。共享工程 `d37d0482e4a0d6205b2c546ba010e24433dccd8c` 已push，`git ls-remote origin refs/heads/main` 实际返回相同SHA。提交后不把旧staged receipt冒充当前fresh，而是保留已验证snapshot→commit tree对应关系。
+
+`runs/canvas-masked-image-workflow-20261014-001/runtime-readiness.json` 为本机**只读**profile preflight实际PASS，耗时36.312秒；完整测三模型bytes/SHA、ComfyUI commit `7cee3ceb1a35503172e0dfb8dbdbdedee2aba8aa` 和所需14个node/input。已有Qwen diffusion40,861,031,560 bytes、text encoder9,384,670,680 bytes、VAE253,806,246 bytes均匹配sealed profile；未安装/下载模型。预检使用明确标记technical fixture，非原S01 source，不新增媒体样本；`generation_calls=0/model_inference=NOT_EVALUATED`。
+
+Supervisor实际启动任务自有unit `ai-video-comfyui-6970131d868d4c7faec099f4894ee27c.service`、invocation `2638eaeb66c94102bb7a113174d8bf15`，strict loopback/core-only；完成只读核验后先验证同unit/invocation再停止，实际inactive/not-found。`runtime-supervisor-binding.json`、`runtime-stop.json`保存实际所有权和停止结果，没有接管foreign service。本预检只证明该次readiness，不是持续在线或GPU推理成功。
+
+最终Risk Gate为 `KIMI_REVIEW_NOT_REQUIRED`，exact snapshot、owned hashes、spec/plan与fresh receipt以及三个trigger逐项判断写入 `implementation-review-risk.json`。未改credentials、paid ledger、egress或unknown恢复规则；existing intent/permit/committer仍独占，protected-pixel failure在激活前拒绝。剩余实测画质缺口需真实模型/媒体QA，不能以code reviewer代签。原生delegation结果不是独立implementation review或acceptance。
+
+### Original Story And Learning Boundary
+
+本实现新增真实图片/视频调用均0，原Production/paid budget未变，两次旧FAIL不重判。原场景尚未按新route注册source/mask；历史review PNG宽941不满足新lane尺寸契约，任何准备必须显式保留原bytes并形成新asset/revision，不能偷偷改图或把review图改为accepted S01。原首帧七完整倒影、林砚缺席及左手/右手机职责均保留；不重引入“必须八实体全可见/正常八倒影底图”的额外要求。
+
+后续仍须实际准入可审阅输入、local generation及原S01专属QA；S01/S02逐镜MP4、actual handoff、声音语义/时序/口型、canonical字幕/trim与HyperFrames、human1.0x均未完成。两镜7秒不代表原15秒S01–S04或完整故事AC-7；声音路线仍有独立 `EVIDENCE_REPAIR_FIRST`。
+
+本稳定checkpoint按 `record-ai-video-session` 更新同一主record，自动按 `distill-ai-video-learning` 评估为 **no_candidate**。技术fixture、scripted tests、runtime预检及多个proof层不是新独立画质实验；没有实测本地workflow与Seedream的可控对照，也没有更新既有Vidu claim的exact媒体证据。原Evidence Index不添加假媒体attempt，不修改Skill/Policy/Gate、不刷新RAG或全局memory；record没有触发新的媒体、Provider、research或额外全套测试。foreign dirty/staged均保留，只提交当前owned路径。
 
 ## Evidence Index
 
