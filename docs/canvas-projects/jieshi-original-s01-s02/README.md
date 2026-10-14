@@ -2,6 +2,8 @@
 
 ## Status And Entry
 
+2026-10-15最新checkpoint：共享Registry历史链修复已发布 `a45fa113b2ffb10bbd071bfa51753849aa82c911`，原生审查的两处时序缺口经standard-loader RED→GREEN及fresh Harness关闭。标准metadata authoring恢复历史前缀后，真实Z单人修复已生成PNG `102c1ec74f873a0de8297d2cf9de1477a9ae1cf0b0fc654836e6e8dc7e127557`；保护区1,536,514像素变化0，但老人仍站立扶杆，target QA **FAIL/STOP**。H未提交，原视频0；当前Manifest33，累计原paid准备图2/local模型图2，新增paid0，无accepted S01/actual handoff/HyperFrames声画交付。自有ComfyUI服务已停止。实际声义仍EVIDENCE_REPAIR_FIRST、human1.0x/完整故事AC-7未验。详见[最新真实证据与恢复条件](../../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#registry-retention-repair-and-actual-targeted-z)。以下2026-10-14准备/授权段为保留历史，不能据旧剩余额度重抽或提交。
+
 2026-10-14最新续执行：共享本地masked工作流工程已发布 `d37d0482e4a0d6205b2c546ba010e24433dccd8c`，实际只读runtime预检PASS，尚未进行GPU推理。用户要求继续，现准备一个最多1次的strict-loopback local单元，保留前两次paid图的FAIL与计数，不转用旧edit/B。历史审阅图仅作为布局/身份准备source，经显式3px补边、人物crop与玻璃内部binary mask及canonical revision绑定后才可进模型；不是accepted S01。新静态模型文字见 [S01-local-masked-preparation-input.txt](S01-local-masked-preparation-input.txt)。本路线直接准备原首帧七倒影/林砚缺席，不再额外要求八实体全可见或正常八倒影底图；下方旧technical-base文本与单元留作历史，不作为新路线输入。
 
 本目录承接《界蚀》原 S01→S02；共享 `inspect/author/preflight` 已实际运行。2026-10-14 用户先授权2 PNG+2视频单元，第一张QA FAIL；随后“继续做图啊”对应最多新增2图片的有界修复：一次修正base，只有全项PASS才一次同源edit，金额总上限仍200 CNY内部operator bound，非价格/账单。现累计真实图片POST **2**、原单元视频POST **0**，两张底图均QA **FAIL**，没有合格原S01首帧或成片。
@@ -22,12 +24,12 @@ PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production preflight --data 
 
 ## Fidelity Matrix
 
-出处均为 `docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.md` 相应 Shot card 或 Character/Scene Bible；当前用户明确纠正优先。`shots[n]` 下指 `project.json.direction.shots[n]`。输入表达和媒体证据分别判断；表中实际媒体 QA 全部 `NOT_EVALUATED`。
+出处均为 `docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.md` 相应 Shot card 或 Character/Scene Bible；当前用户明确纠正优先。`shots[n]` 下指 `project.json.direction.shots[n]`。输入表达和媒体证据分别判断；表中raw S01/S02声画QA仍未执行，实际静态准备QA为FAIL，不能代签raw QA。resume按canonical stored authoring重开当前Lin/Zhou crop与Scene source/mask refs，不把本目录bootstrap字段当作当前runtime指针。
 
 | Original requirement / Source | Project field / reference duty | Exact source-native input or canonical composition duty | Required actual evidence |
 | --- | --- | --- | --- |
 | S01 Open：林砚坐 A区末位；本人右脸肩在下，玻璃在上 | shots[0].shot.intent / source S01 text | `起始状态：林砚坐A区末位，镜头内本人右侧脸和肩占下方；玻璃占上方。` | exact 首帧/运动片段，座位、左右、本人和窗同时可读 |
-| S01 Action：首帧六乘客及苏遥完整倒影；唯独林砚为空 | 同一 source 原句；eight character_ids；first-frame asset | 原 Action 与 Prompt 全句进入 S01 input；追加明确不得删除其他倒影 | 首帧和采用段全程逐人对应，实体8人、其他完整倒影7人、只缺林砚；不是逐渐消失 |
+| S01 Action：首帧六乘客及苏遥完整倒影；唯独林砚为空 | 同一 source 原句；eight character_ids；first-frame asset | 原 Action 与 Prompt 全句进入 S01 input；追加明确不得删除其他倒影 | 首帧和采用段全程逐人对应，其他完整倒影7人、只缺林砚；本人及其空位同时可读，不额外要求八实体全可见；不是逐渐消失 |
 | S01：看空位、抬解剖左手 | subject_action.progression 原文，无抬手机替代 | `林砚看向空位并抬左手靠玻璃，玻璃里没有手。` | 动作全过程、视线对象、左右手身份；不能靠静帧代签 |
 | S01 Close：距窗约2cm停住并保持到切出 | 原 Close/Prompt；S02 state_reference frame_index=71 | 两句原文保留；计划 frame71 为采用3秒内最后帧，不是4秒素材末帧 | 帧71及切点前动作，实际间隙/悬停；若 frame71 没到正确状态，本单元停而不猜 |
 | S01：玻璃也没有他的手 | source Action/Prompt；首帧 clean plate 准备责任 | 模型输入明确没有手；**选择首帧准备路线，实际几何一致 plate / 只删除林砚映像仍未绑定，BLOCKED** | source/plate exact identities、实测编辑区与保护七倒影区域、窗几何和边缘无污染；原图/plate对比及 raw MP4 全程无手倒影 |

@@ -9,7 +9,11 @@ evidence_index_version: "1"
 
 Date: 2026-10-13
 
-## Supersession Notice — 2026-10-14
+## Supersession Notice — 2026-10-15
+
+最新checkpoint见 **Registry Retention Repair And Actual Targeted Z**。共享历史链修复已发布 `a45fa113b2ffb10bbd071bfa51753849aa82c911` 并核验remote main；原生审查两条blocker均由标准loader RED复现、修复后41项focused PASS和fresh exact Harness验证，原reviewer复审finding set为空，Parent关闭两条问题。标准metadata authoring恢复Registry原P7前缀，所有旧records/媒体/history保留。随后真实新增1次本地Z局部修复，exact PNG `102c1ec74f873a0de8297d2cf9de1477a9ae1cf0b0fc654836e6e8dc7e127557` 技术SUCCEEDED但老人仍站立扶杆，target QA 3 PASS/1 FAIL。遮罩外1,536,514 RGB像素变化0，不能替代坐姿成功。Z单元按FAIL STOP，H未提交；当前Manifest33，累计原准备paid图片2、本地模型图片2、原视频0、历史视频11。本窗口新增paid0，无accepted S01、实际handoff或HyperFrames声画交付；声音仍EVIDENCE_REPAIR_FIRST，human1.0x/完整故事AC-7均NOT_EVALUATED。自有ComfyUI unit已停止。
+
+## Historical Supersession Notice — 2026-10-14
 
 当前最新checkpoint为下文 **Actual Local Masked Generation And Targeted Repair**：本地三引用蒙版作图已真实执行1次，exact PNG技术准入成功但静态QA为2 PASS/4 FAIL/1 NOT_EVALUATED。蒙版外1,096,780像素RGB完全相同，窗内人物/道具/空间没有通过。累计原准备paid图片2、本地模型图片1、原视频0，Manifest25；没有accepted S01、handoff或成片。已封存最多再2次针对具体人物的本地修复，未提交；不挪旧edit/B、不重抽旧单元。共享工程 `d37d0482e4a0d6205b2c546ba010e24433dccd8c` 及输入准备 `49485ee5bfff539e4ebb9a5902a37c0dd501e0e3` 已push/remote核验。此前“只读runtime/无模型推理/Manifest19”是保留的历史checkpoint；技术准入、工程与素材QA仍分开。
 
@@ -308,6 +312,42 @@ Parent实际 `view_image(detail=original)` 看exact输出，复验1,096,780 blac
 
 `record-ai-video-session`在首个真实local FAIL checkpoint更新此主record；`distill-ai-video-learning`评估仍为 **no_candidate**。现在有一个新的Qwen实测，source/ref/mask/model/目标合同与旧Seedream技术base同时不同，不能当isolated对照、推断所有工作流无效或外推既有Vidu声音claim。工程保护属性有真实证据，mask内剧情质量仍FAIL；不修改/采用Skill/Policy/Gate、不刷新RAG或全局memory。后续修复状态另经真实新receipt取代本planned段。
 
+## Registry Retention Repair And Actual Targeted Z
+
+### Shared Regression And Native Review
+
+Z输入已经经唯一committer成功authoring到Manifest27，但随后标准loader报 `selected image candidate history is not retained`，未发Z POST。根因是新像素准备合并全Registry时按asset ID排序，移动了此前P7生成图，破坏其精确历史前缀。当前source/PNG/receipt没有损坏；原生 `image_workflow_seam` 只读确认现有recover只处理未完attempt，没有成功commit回滚API。Parent没有改Manifest或绕过loader手工拼状态。
+
+工程先以standard generation→prepare→author→reopen测试复现两个RED，再把准备合并改为保留旧tuple并追加新records。已提交旧排序仅由标准reader的最窄只读successor证明重开：连续hash-bound成功authoring边、所有旧AssetRecord全字段保留、新增限candidate明确引用的IMPORTED/DERIVED IMAGE；原P7 base→candidate append-one、receipt/placement/activation/bytes仍独立验证。普通membership、删改旧record、未引用新增、missing/non-authoring边仍拒绝。matrix/spec/plan同步该边界，没有第二writer、timeline或renderer。
+
+首个候选 `725f2fa81d2dc4d7e514826e4637dcbed367d672` 的exact7路径Harness通过；Risk Gate基于新历史准入可能影响后续canonical effects的后果、branch/chronology剩余语义缺口及对抗审查增益，选择一名read-only native `reviewer_xhigh`（实际 `/root/registry_retention_review`，profile TOML选定，不override、不Kimi）。round1发现REG-001缺原P7 activation下界、REG-002先过滤时间隐藏匹配分支。Parent源码确认并新增完整standard-loader RED，两个非法历史均被旧代码接受。修复后每边base≥原activation且base+2≤后继revision；先检全部匹配成功边唯一再检时间。activation计算保持reader单owner。
+
+最终候选 `a45fa113b2ffb10bbd071bfa51753849aa82c911` focused41 PASS；exact chronology-fix range Harness通过并fresh，reader569、Canvas251、Seedream38项及所有mapped controls通过；Architecture PASS，reader有效LOC +3 WARN保留。原7路径候选的image172、image-state118与其他proof保留为历史，不虚称其receipt对新HEAD fresh。同一native reviewer round2完整有界复审finding set为空；Parent用RED→GREEN和source hashes关闭REG-001/002，不以空findings代签媒体。两owned commits已push，remote main exact SHA已核验；foreign staged AGENTS/playbook和旧dirty docs未夹带。
+
+当前证据根 `runs/canvas-jieshi-original-s01-s02-20261013-001/local-targeted-repair-20261014-001/`：`registry-retention-review-package.json`、`registry-retention-review-r1-adjudication.json`、`registry-retention-review-r2-package.json`、`registry-retention-review-r2-adjudication.json`。工程receipt：`.agent/harness/runs/canvas-image-registry-retention-20261015-r1/receipt.json` 与 `.agent/harness/runs/canvas-image-registry-chronology-20261015-r2/receipt.json`，snapshot范围各自独立。
+
+### Canonical Metadata Restoration
+
+先完整只读重开真实Manifest27，其文件SHA `d342ebd4004631c64676dc31c0800b18f79d138584c2dc83cfba2ccf89d4816c` 未变；不重放Z输入authoring。随后用既有 `revise_authoring` 独立metadata repair attempt `original-s01-registry-order-repair-20261015-001` 提交原最后P7候选tuple前缀＋现有额外records，Manifest27→29、Project5→6。九个AssetRecord、Shot/Character/Scene、旧attempts及paid budget pointer全部相同，只有新Registry顺序/快照与project pointer改变；原坏排序成功历史完整保留。标准reopen PASS，模型调用0。`registry-order-repair.preview.json` / `registry-order-repair.execution.json`提供exact指针及证明；后续生成沿原严格append路径，不扩大只读例外跨非authoring效果。
+
+### Exact Local Generation And Quality Stop
+
+原Z单元上限最多2新submit（Z通过才H）、每次1200秒、本地累计cap3；恢复后新请求 `a6175b8930d3e7bd84ae3bff8bdc6beacc9c73be3973fd6bc1110e5dd6149455`，attempt `original-s01-targeted-Z-generation-20261015-001`，seed2026101501。Character为Zhou本人128×144 crop `4669a45199bacf80ad99ffc4409f8986fe95dee845010695aa92fb2f017a403e`，Scene为原944×1672 padded布局 `1c36a9ea7600c0d5cbc73848f6ffd1731307478027f53937cb8731502fa7e6d8`，binary mask为已注册r2 `06af95640e884cce000773daffc43f2e8024e778d83800e972b7af2f90b930bb`。r1候选遮罩未经注册/submit；本次不以旧广域FAIL图作source，不改原S01/S02动作、广播、对白、字幕或机位要求。
+
+fresh supervisor核对exact unit/invocation、sealed模型full hashes/checkout/core nodes、当前source/registry bytes与三引用；exact request/preview/profile/authorization和实际workflow已落盘 `Z-*.exact.json`。既有committer创建durable intent/one-use permit；实际local上传3次、prompt submit1次，job `cb5464e5-3f42-44b3-b8d0-6931d784d98a`，无paid/remote/retry。端到端202.188秒含fresh preflight，Comfy prompt执行154.22秒。exact PNG `102c1ec74f873a0de8297d2cf9de1477a9ae1cf0b0fc654836e6e8dc7e127557`，944×1672、2,099,914 bytes，creation receipt `a0e7eb163b43e31f02973453bff1a8b5b1be982a5ea12e71eedf65cbfc8cb943`；技术SUCCEEDED/Registry准入，Manifest29→33，paid budget pointer不变。这不是原S01素材质量acceptance。
+
+Parent实际original-resolution `view_image`：Zhou身份/衣物与原图对应、空间保持，但仍在原高度站立并扶杆，没有坐姿、膝上双手。target findings为identity PASS、seated-complete FAIL、geography PASS、preservation PASS。独立像素复验：1,536,514黑mask保护像素变化0；41,854白mask像素中40,439 RGB发生变化，不能解释为“没有运行模型”，也不能解释为动作执行成功。完整static要求仍为4 PASS/1 FAIL/2 NOT_EVALUATED：Z站姿与He右边截断导致七完整倒影FAIL，Lin对应空位几何及全部道具未取得完整证明。
+
+`Z-execution-receipt.json`、`Z-static-rubric.sealed.json`、`Z-static-image-review.json`与`unit-stop-receipt.json`封存已知输出及FAIL STOP。新单元用1/2，剩余H slot没有挪给再次Z；累计local模型2、原paid准备图2、原视频0、历史视频11。无unknown、重抽、remint或重分类旧失败。自有 `ai-video-comfyui-9d02303789fd4e1f99c54cb545464a2a.service` / invocation `8e76c619228a4deca7fd3cfc027da36a` 经supervisor停止，其他进程未动。
+
+### Minimum Recovery And Proof Boundaries
+
+下一有效输入路线须能明确约束Zhou坐姿/几何，同时保持其身份和非目标像素；不能继续依靠相同输入重抽。当前workflow已证明区域保护，不证明pose遵循或原S01 clean plate成功。完整七倒影、对应空位、道具和摄影的静态证据仍全部需要，之后才有资格开始原MP4→project-local video-analysis全PASS→actual state→S02自身QA。普通两镜约7秒、原前15秒S01–S04覆盖、完整故事AC-7与离线工程proof继续分开。
+
+原生声音语义仍EVIDENCE_REPAIR_FIRST；本次没有音视频，未声称听过或正常速度验收。native audio/caption/ResolvedTimeline trim/接点/HyperFrames exact声画和用户完整1.0x听看均未交付。required target FAIL是本单元真实停止条件，不能删坐姿要求或用保护区PASS推进。
+
+`record-ai-video-session`在此真实Gate失败的stable checkpoint更新同一主record。`distill-ai-video-learning`自动评估仍为 **no_candidate**：两个local attempt共用未accepted synthetic底图但编辑目标/角色参考/mask/prompt/seed不同，不是隔离变量对照；技术硬合成保护已由当前contract拥有，不能由两次不同质量失败推导通用Qwen能力结论或修改Skill/Policy/Gate。未找到需material update的相关existing claim，旧Vidu对白claim不在本scope；工程测试/派生crop/mask/多proof层不另计独立媒体。RAG prior failure不重试、不刷新，全局memory未写。
+
 ## Evidence Index
 
 此表只为本次原开场准备单元建立identity；历史其他实验不并入。remote boundary为Seedream/`doubao-seedream-5-0-pro-260628`、Ark shared image owner、1152×2048 PNG；新增local boundary为Qwen-Image-Edit-2511/三引用masked profile、944×1672 PNG，不与remote合同或计数合并。同一图片的receipt、bytes、materialization和visual proof使用同一request fingerprint independence_key，只贡献一个图片样本；预transport失败不是第二个视觉样本。
@@ -326,8 +366,12 @@ Parent实际 `view_image(detail=original)` 看exact输出，复验1,096,780 blac
 | repair-base-visual | native-image:c5e32912fd1bd00b8bf0afc26d40133305cc95a5bfea9d1c3a0523d633c03011 | jieshi-original-preparation-20261014 | original-preparation-base-repair-20261014-001 | N/A | ba9eb952c5606333727198800fa593abce806b3c239188425ebb7b27087cab4f | VISUAL_INSPECTION | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | repair-base-submit | runs/canvas-jieshi-original-s01-s02-20261013-001/image-repair-20261014/base-001/image-review.json |
 | local-masked-execution | native-image:2d5994083367b056436bd7bb98b2cccd33216de31cb9d4caa5a6054ea07c85ec | jieshi-original-local-masked-20261014 | original-s01-local-masked-20261014-001 | N/A | 62a4414bdc72f1409c88a2fd145ad4bd06d7c85156f6051d7fb0bc2955d982e9 | LOCAL_MODEL_EXECUTION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/local-masked-20261014-001/execution-receipt.json |
 | local-masked-visual | native-image:2d5994083367b056436bd7bb98b2cccd33216de31cb9d4caa5a6054ea07c85ec | jieshi-original-local-masked-20261014 | original-s01-local-masked-20261014-001 | N/A | 62a4414bdc72f1409c88a2fd145ad4bd06d7c85156f6051d7fb0bc2955d982e9 | VISUAL_INSPECTION | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | local-masked-execution | runs/canvas-jieshi-original-s01-s02-20261013-001/local-masked-20261014-001/static-image-review.json |
+| local-Z-execution | native-image:a6175b8930d3e7bd84ae3bff8bdc6beacc9c73be3973fd6bc1110e5dd6149455 | jieshi-original-local-targeted-repair-20261014 | original-s01-targeted-Z-generation-20261015-001 | N/A | 102c1ec74f873a0de8297d2cf9de1477a9ae1cf0b0fc654836e6e8dc7e127557 | LOCAL_MODEL_EXECUTION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/local-targeted-repair-20261014-001/Z-execution-receipt.json |
+| local-Z-visual | native-image:a6175b8930d3e7bd84ae3bff8bdc6beacc9c73be3973fd6bc1110e5dd6149455 | jieshi-original-local-targeted-repair-20261014 | original-s01-targeted-Z-generation-20261015-001 | N/A | 102c1ec74f873a0de8297d2cf9de1477a9ae1cf0b0fc654836e6e8dc7e127557 | VISUAL_INSPECTION | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | local-Z-execution | runs/canvas-jieshi-original-s01-s02-20261013-001/local-targeted-repair-20261014-001/Z-static-image-review.json |
 
-## Record And Learning Update
+## Historical Record And Learning Update
+
+本节为此前第二张paid PNG checkpoint；最新local/engineering评估见上文，历史计数不改写。
 
 前一次checkpoint的no_candidate基于一个视觉样本，为历史结论。本次按 `record-ai-video-session` 更新同一主记录和README，原文/媒体/receipt及foreign dirty保留。按 `distill-ai-video-learning` 自动重新评估仍为 **no_candidate**，但不再声称只有一个视觉样本：已有两个独立实际图片attempt，proof层和旧closure不另计样本。旧图错误为倒置车顶映像/双手持机，新图侧窗/手改善却少人物/重复反射/新增标题；多项输入同时变化，不是isolated-variable comparison。不能由这些输出断言模型不具该能力、添加禁用人物/倒影规则或证明改Skill会解决。现有完整image QA/FAIL STOP已覆盖观察，未形成需要新adoption target的有界机制结论；既有Vidu对白/burned-caption claim明确排除人物/倒影与其他Provider，不构成material update。没有制造重复claim、修改Skill/Policy/Gate、刷新RAG或全局memory。
 
