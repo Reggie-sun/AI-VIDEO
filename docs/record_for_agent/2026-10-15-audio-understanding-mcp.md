@@ -30,7 +30,9 @@ Adapter在取key前从inline WAV重编canonical请求以拒绝tampered dataclass
 - `tests/test_mcp_audio_understanding.py tests/test_mcp_audio_understand.py tests/test_generation_feedback_review.py tests/test_mcp_analyze.py`一次focused97项PASS；`tests/test_canvas_production.py tests/test_generation_feedback_review.py tests/test_generation_evaluation.py tests/test_generation_evaluation_binding.py`93项PASS。schema修正后的final snapshot与完整policy coverage以Harness receipt为准，不能合并不同run当最终PASS。
 - 真实isolated MCP进程list_tools能发现工具并调用现有历史WAV：`runs/canvas-jieshi-original-s01-s02-20261013-001/audio-tool-integration-20261015-001/mcp-preview-current.json`。Source SHA `daa154cb46f2a89ce3e95f5dcab6edb019c14a18ea67aef5de4031e0ffeec2d4`，preview网络调用0；执行未配置runtime时实际返回`runtime_required/KNOWN_NO_EFFECT`，没有取key/POST。此文件是能力预检，不是声音理解结果，不改历史原S01质量。
 
-完整exact快照Harness、Risk Gate、native review与Parent裁决归同一proof目录的`receipt.json`/`review-risk.json`/`review-*`实际记录。新远端credential处理存在关键泄露/授权失败后果；本实现在native verification后触发一个`reviewer_xhigh`，只读验证绑定/错误与权限边界，不让reviewer补听音。后续文档publication与receipt freshness按actual sidecar/remote SHA核验，不把临时shared worktree或future配置当完成证据。
+第一次exact Harness `.agent/harness/runs/audio-understanding-mcp-20261015-r1/receipt.json`保留FAILED：11个check先PASS，Provider组941项PASS/1项FAIL；失败为既有hard-cut回归断言只接受P7 message，而Registry内容先被prepared-image校验拒绝。隔离重开predecessor `4fd9fa8d2e5131e76a27066b3e85bea543cdfed0`同一用例仍FAIL，见proof目录`predecessor-regression-check.txt`，不归因音频接入。只改该test增加exact successor明确为False、校验实际typed `PRODUCTION_PROJECT_INVALID`且non-retryable；未改Product guard，后续receipt篡改/zero-call replay断言保留。Focused真实用例1项PASS，再跑全部policy checks；不得把第一次failure重分类或拼接成PASS。
+
+完整exact快照Harness归`.agent/harness/runs/audio-understanding-mcp-20261015-r2/receipt.json`；Risk Gate、native review与Parent裁决归`runs/canvas-jieshi-original-s01-s02-20261013-001/audio-tool-integration-20261015-001/review-risk.json`/`review-*`实际记录。新远端credential处理存在关键泄露/授权失败后果；本实现在native verification后触发一个`reviewer_xhigh`，只读验证绑定/错误与权限边界，不让reviewer补听音。后续文档publication与receipt freshness按actual sidecar/remote SHA核验，不把临时shared worktree或future配置当完成证据。
 
 ## Agent Discovery And Ownership
 

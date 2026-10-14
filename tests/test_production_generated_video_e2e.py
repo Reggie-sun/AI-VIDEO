@@ -1406,8 +1406,13 @@ def test_hard_cut_keyframe_activation_reopens_exact_terminal_and_replays_zero_ca
     replaced_output = output_asset.model_copy(update={"usage_license": "different-output-record"})
     replaced_registry = later.registry.model_copy(update={"assets": tuple(
         replaced_output if item.asset_id == output_asset.asset_id else item for item in later.registry.assets)})
-    with pytest.raises(AiVideoError, match="P7 image candidate history"):
-        verify_active_image_evidence(later.model_copy(update={"registry": replaced_registry}))
+    replaced_bundle = later.model_copy(update={"registry": replaced_registry})
+    assert not has_exact_video_successor(replaced_bundle, final_shot, retained_image)
+    # The altered record first invalidates the active Registry hash, before P7.
+    with pytest.raises(AiVideoError, match="Prepared image evidence is invalid") as rejected:
+        verify_active_image_evidence(replaced_bundle)
+    assert rejected.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+    assert rejected.value.retryable is False
     for path in (canonical_video_probe_receipt_path(output_asset.video_metadata.probe_receipt_id),
                  canonical_video_provenance_receipt_path(output_asset.video_metadata.provenance_receipt_id)):
         exact_bytes = (tmp_path / path).read_bytes()
