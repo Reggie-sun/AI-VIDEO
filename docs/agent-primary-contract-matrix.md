@@ -34,6 +34,9 @@ request/result/Registry 身份；原 PNG 不转换，unknown 不重试。Canvas 
 resource ID 必须是当前严格重开的 output asset ID；该映射不证明 Provider admission 或人类验收。
 检查归 `seedream_image_tests` 与既有 image/Registry/Canvas suites。
 
+`image_candidate_frontier` 仅经同一P5 baseline projection辨别未变的既有asset/nonfresh节点；desired已变的无关节点仍拒绝。
+`close_remote_image_materialization_failure` 只由显式operator通过唯一committer关闭paid已ACCEPTED且完整retained PNG/result/provenance的local materialize失败；typed `image_materialization_failure` pointer由标准reader/恢复owner重验并保留原图。真正paid unknown、mixed candidate、缺证或stale拒绝；不POST、不激活、不释放原paid reservation，不代表Shot QA。
+
 单参考必须 opt-in `allow_single_png_reference=true` 的新 immutable profile；旧 profile 的
 序列化/hash 与纯文字 request `/4`、result `seedream-original-png/1` 保持。新 request `/5`
 只允许一个 `scene` binding，`seedream_reference` 独占 exact PNG/bytes/geometry measurement、

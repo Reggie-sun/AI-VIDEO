@@ -17,6 +17,7 @@ from pydantic import (
 )
 
 from ai_video.production._dependency_types import DependencyNodeKind
+from ai_video.production.state_commit_attempt_contracts import StateCommitAttemptContracts
 from ai_video.production.final_output_contracts import RepairAction as RepairAction, RepairBaselineMixin, RepairOutcomeMixin
 
 from ai_video.production.artifact_contracts import (
@@ -86,7 +87,6 @@ from ai_video.production._lifecycle_schema import (
     VideoRequestReceiptPointer as VideoRequestReceiptPointer, GenerationExecutionBindingPointer as GenerationExecutionBindingPointer, GenerationExperienceReceiptPointer as GenerationExperienceReceiptPointer, GenerationQualityRejectionReceiptPointer as GenerationQualityRejectionReceiptPointer, QualificationExecutionBindingPointer as QualificationExecutionBindingPointer, TerminalFrameEvidencePointer as TerminalFrameEvidencePointer, ContinuityEvaluationState as ContinuityEvaluationState, VideoProbeReceiptPointer as VideoProbeReceiptPointer, VideoProvenanceReceiptPointer as VideoProvenanceReceiptPointer,
     VideoStatusReceiptPointer as VideoStatusReceiptPointer, TerminalFrameExtractionReceiptPointer as TerminalFrameExtractionReceiptPointer, ContinuityEvaluationIntentPointer as ContinuityEvaluationIntentPointer, CommercialShotEvaluationIntentPointer as CommercialShotEvaluationIntentPointer, CommercialShotEvaluationPhase as CommercialShotEvaluationPhase, CommercialShotEvaluationState as CommercialShotEvaluationState, GeneratedCommercialShotEvidencePointer as GeneratedCommercialShotEvidencePointer, SourceBoundaryEvaluationPhase as SourceBoundaryEvaluationPhase, SourceBoundaryEvaluationState as SourceBoundaryEvaluationState, SourceBoundaryReviewEvidencePointer as SourceBoundaryReviewEvidencePointer, SourceBoundaryReviewIntentPointer as SourceBoundaryReviewIntentPointer, SourceBoundaryReviewReceiptPointer as SourceBoundaryReviewReceiptPointer, SourceBoundaryReviewVerdict as SourceBoundaryReviewVerdict,
     has_p6_state,
-    prune_attempt_fields,
     reject_explicit_p7_fields,
     reject_explicit_p8_video_fields,
     validate_paid_provider_manifest,
@@ -1316,7 +1316,7 @@ class VoiceRequestReceipt(StrictModel):
         return _require_canonical_https_origin(value, "voice destination")
 
 
-class StateCommitAttempt(StrictModel):
+class StateCommitAttempt(StateCommitAttemptContracts):
     attempt_id: str = Field(min_length=1)
     operation: str = Field(min_length=1)
     status: StateCommitStatus
@@ -1480,41 +1480,6 @@ class StateCommitAttempt(StrictModel):
         elif self.review_request is not None or self.review_phase is not None:
             raise ValueError("non-review attempt cannot contain review fields")
         return self
-
-    @model_serializer(mode="wrap")
-    def _serialize_without_unused_render_fields(
-        self, handler: SerializerFunctionWrapHandler
-    ) -> dict[str, object]:
-        data = handler(self)
-        if self.operation != "render_state":
-            for field in (
-                "base_render_state",
-                "candidate_render_state",
-                "renderer_selection",
-                "render_phase",
-            ):
-                data.pop(field, None)
-        prune_attempt_fields(data, self.operation)
-        for field in (
-            "base_dependency_graph",
-            "candidate_dependency_graph",
-            "candidate_dependency_states_hash",
-        ):
-            if data.get(field) is None:
-                data.pop(field, None)
-        if self.operation != "repair":
-            data.pop("approved_repair_receipt", None)
-        if self.operation != "review":
-            data.pop("review_request", None)
-            data.pop("review_phase", None)
-        if self.paid_provider_state is None:
-            data.pop("paid_provider_state", None)
-        if self.video_generation_state is None:
-            data.pop("video_generation_state", None)
-        if self.ad_generation_state is None:
-            data.pop("ad_generation_state", None)
-        return data
-
 
 class RecoveryDisposition(str, Enum):
     ACTIVE = "active"

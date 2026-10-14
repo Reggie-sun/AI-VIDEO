@@ -886,6 +886,13 @@ def verify_hard_cut_keyframe_evidence(
 def verify_active_image_evidence(bundle: LoadedProductionProject) -> None:
     if not manifest_supports(bundle.manifest.schema_version, ManifestCapability.IMAGE_STATE):
         return
+    from ai_video.production.image_materialization_failure import verify_image_materialization_failure
+    for attempt in bundle.manifest.attempts:
+        if attempt.image_materialization_failure is not None:
+            try:
+                verify_image_materialization_failure(bundle, attempt)
+            except Exception:
+                raise _invalid("Remote image materialization failure evidence is invalid.") from None
     attempts = tuple(
         item
         for item in bundle.manifest.attempts

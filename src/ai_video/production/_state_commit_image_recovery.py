@@ -28,6 +28,9 @@ class _StateCommitImageRecoveryMixin:
         bundle = self._load_production_project(self._project_root / "project.yaml")
         pairs: dict[Path, str] = {}
         for attempt in manifest.attempts:
+            if attempt.image_materialization_failure is not None:
+                from ai_video.production.image_materialization_failure import verify_image_materialization_failure
+                pairs.update(verify_image_materialization_failure(bundle, attempt))
             if (
                 attempt.operation == "image_generation"
                 and attempt.status is StateCommitStatus.SUCCEEDED

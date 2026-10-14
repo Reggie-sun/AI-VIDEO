@@ -1187,18 +1187,10 @@ def validate_image_activation_candidate(
         raise _image_scope_invalid(
             "Image candidate resolution omits the target visual generation frontier."
         )
-    uses_continuity_terminal = any(
-        isinstance(reference, ContinuityTerminalImageReferenceBinding)
-        for reference in request.references
-    )
-    previously_nonfresh = (
-        {
-            state.node_id
-            for state in base_dependency_states
-            if state.lifecycle is not DependencyLifecycle.FRESH
-        }
-        if uses_continuity_terminal
-        else set()
+    from ai_video.production.image_candidate_frontier import unchanged_nonfresh_image_nodes
+    previously_nonfresh = unchanged_nonfresh_image_nodes(
+        base_inputs=base_inputs, base_dependency_states=base_dependency_states,
+        resolution=resolution, request=request, prior_asset_ids=target_roles[0].asset_ids,
     )
     newly_affected = affected - previously_nonfresh
     allowed_affected = {target_visual_id, *target_asset_node_ids} | {

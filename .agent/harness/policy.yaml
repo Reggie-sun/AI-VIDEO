@@ -95,7 +95,7 @@ fallback_check_ids:
 
 checks:
   seedream_image_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_seedream_remote_image.py, tests/test_grok_remote_image_lifecycle.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_seedream_remote_image.py, tests/test_grok_remote_image_lifecycle.py, tests/test_image_candidate_frontier.py, tests/test_remote_image_materialization.py, -q]
     cwd: .
     description: Verify original Seedream PNG, exact paid image lifecycle, no retry, strict reopening and shared Canvas preparation.
   grok_media_provider_tests:
@@ -784,6 +784,7 @@ categories:
       - src/ai_video/production/artifact_contracts.py
       - src/ai_video/production/models.py
       - src/ai_video/production/project.py
+      - src/ai_video/production/state_commit_attempt_contracts.py
       - src/ai_video/production/state_commit.py
       - src/ai_video/production/_immutable_models.py
       - src/ai_video/production/_lifecycle_schema.py
@@ -1071,6 +1072,8 @@ categories:
       - src/ai_video/production/seedream_reference.py
       - src/ai_video/production/image.py
       - src/ai_video/production/image_candidate.py
+      - src/ai_video/production/image_candidate_frontier.py
+      - src/ai_video/production/image_materialization_failure.py
       - src/ai_video/production/_asset_registry_validation.py
       - src/ai_video/production/_image_project_reader.py
       - src/ai_video/production/_state_commit_image_*.py
@@ -1079,6 +1082,8 @@ categories:
       - src/ai_video/canvas_image.py
       - src/ai_video/canvas_image_provenance.py
       - tests/test_seedream_remote_image.py
+      - tests/test_image_candidate_frontier.py
+      - tests/test_remote_image_materialization.py
     check_ids:
       - seedream_image_tests
       - task_architecture_gate
