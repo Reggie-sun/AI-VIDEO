@@ -3,7 +3,7 @@
 from ai_video.production.models import AssetSourceKind, AssetType, StateCommitStatus, VideoAttemptPhase
 
 
-def has_exact_registry_authoring_successor(bundle, original_registry) -> bool:
+def has_exact_registry_authoring_successor(bundle, original_registry, *, minimum_manifest_revision) -> bool:
     """Prove a reordered Registry through complete, retained authoring edges.
 
     Membership alone cannot admit a reorder. Every edge must connect the exact
@@ -38,12 +38,14 @@ def has_exact_registry_authoring_successor(bundle, original_registry) -> bool:
         edges = [a for a in bundle.manifest.attempts
             if a.operation == "commit_project_registry"
             and a.status is StateCommitStatus.SUCCEEDED
-            and a.base_manifest_revision + 2 <= before_revision
-            and a.candidate_project == project and a.candidate_registry == registry
-            and a.base_project is not None and a.base_registry is not None]
+            and a.candidate_project == project and a.candidate_registry == registry]
         if len(edges) != 1:
             return False
         edge = edges[0]
+        if (edge.base_project is None or edge.base_registry is None
+                or edge.base_manifest_revision < minimum_manifest_revision
+                or edge.base_manifest_revision + 2 > before_revision):
+            return False
         candidate = reopen(project, registry)
         base = reopen(edge.base_project, edge.base_registry)
         old = {a.asset_id: a for a in base.registry.assets}

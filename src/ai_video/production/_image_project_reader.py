@@ -715,14 +715,18 @@ def _verify_candidate_artifacts_hash(
         raise ValueError("image candidate artifact hash mismatch")
 
 
+def _image_activation_manifest_revision(attempt: StateCommitAttempt) -> int:
+    return attempt.base_manifest_revision + (
+        6 if attempt.image_request.provider_kind in {"grok", "seedream"} else 4)
+
+
 def _verify_image_activation_chronology(
     manifest: ProductionManifest,
     attempt: StateCommitAttempt,
 ) -> None:
     """Bind activation-time state evidence without freezing later P5 results."""
 
-    activation_revision = attempt.base_manifest_revision + (
-        6 if attempt.image_request.provider_kind in {"grok", "seedream"} else 4)
+    activation_revision = _image_activation_manifest_revision(attempt)
     if manifest.manifest_revision < activation_revision:
         raise ValueError("active image Manifest revision predates activation")
     if manifest.manifest_revision == activation_revision:
@@ -776,7 +780,8 @@ def verify_image_attempt_evidence(
                            == candidate_registry.assets)
         if not retained_prefix:
             from ai_video.production._image_video_lineage import has_exact_registry_authoring_successor
-            retained_prefix = has_exact_registry_authoring_successor(bundle, candidate_registry)
+            retained_prefix = has_exact_registry_authoring_successor(bundle, candidate_registry,
+                minimum_manifest_revision=_image_activation_manifest_revision(attempt))
         if (
             attempt.candidate_image_asset_ids != (asset_id,)
             or len(candidate_registry.assets) != len(base_registry.assets) + 1

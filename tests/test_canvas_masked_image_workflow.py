@@ -307,6 +307,24 @@ def test_registry_reorder_requires_exact_succeeded_authoring_chain(tmp_path, cha
         load_production_project(tmp_path / "project.yaml")
 
 
+@pytest.mark.parametrize("change", ["pre-activation-edge", "future-conflicting-edge"])
+def test_registry_reorder_rejects_impossible_or_ambiguous_chronology(tmp_path, change):
+    service, _ = generated_runtime(tmp_path)
+    prepared_authoring(service, legacy_sort=True)
+    path = tmp_path / "state/manifest.json"
+    from ai_video.production.models import ProductionManifest
+    manifest = ProductionManifest.model_validate_json(path.read_bytes())
+    edge = manifest.attempts[-1]
+    if change == "pre-activation-edge":
+        attempts = (*manifest.attempts[:-1], edge.model_copy(update={"base_manifest_revision": 1}))
+    else:
+        attempts = (*manifest.attempts, edge.model_copy(update={
+            "attempt_id": "future-conflicting-authoring", "base_manifest_revision": manifest.manifest_revision}))
+    path.write_text(manifest.model_copy(update={"attempts": attempts}).model_dump_json())
+    with pytest.raises(AiVideoError, match="candidate history"):
+        load_production_project(tmp_path / "project.yaml")
+
+
 def test_canonical_generation_reopens_mask_lineage_and_replays_without_provider(tmp_path):
     service, _, source = runtime(tmp_path)
     prepared = prepare(service)

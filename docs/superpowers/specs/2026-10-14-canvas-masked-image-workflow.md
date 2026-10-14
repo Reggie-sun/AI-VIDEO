@@ -51,6 +51,8 @@ Parent self-review：Registry顺序影响immutable identity，但不拥有剪辑
 
 恢复标准reopen后、任何新生成前，沿既有 `revise_authoring`发布仅顺序修复的新Registry：保留最后P7候选完整tuple为前缀，其他现有records原顺序追加，所有AssetRecord与媒体bytes不变。保留坏排序的成功历史边。该read-only例外不跨越非authoring生成事务；恢复前缀使后续普通append生成继续沿旧严格路径，不扩大例外为通用状态恢复。
 
+原生审查REG-001/002已确认：降序上界不足以证明successor；每边base必须不早于原P7 activation，+2 commit结束不越过当前后继revision。先对相同candidate pointers的全部成功边检查唯一性，再检查时间，非法future分支不能被过滤掉。activation revision由reader唯一helper同时供原chronology和successor校验使用。标准loader RED case必须拒绝pre-activation edge与合法＋future冲突边；真实Manifest27原样合法重开。
+
 ## Acceptance Criteria
 
 1. 共享请求、Canvas preparation、committer intent/activation与标准reader均可识别同一mask lineage；未选中/stale/错误SHA的mask在副作用前拒绝。

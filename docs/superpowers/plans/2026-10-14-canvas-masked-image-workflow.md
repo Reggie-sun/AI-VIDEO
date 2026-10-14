@@ -63,4 +63,6 @@ RED先覆盖真实generate后prepare产生prefix破坏，以及旧排序authorin
 
 在Z POST前，使用标准service把Registry顺序以新authoring commit恢复为原最后P7候选前缀＋现有额外records，不改record/图/剧情/Character参考。此为独立metadata repair attempt而非重放Z输入attempt。标准reopen通过并测试下一次generation后全部旧P7仍有效；例外不跨非authoring效果链。
 
+Native审查round1发现REG-001/002：Parent确认并用完整标准loader复现两个RED。修复原P7 activation下界及先唯一后时间校验，保持activation计算单owner；重跑focused、exact新版Harness及同一native reviewer的完整有界re-review。旧725 snapshot/receipt及两条findings不删除，不在关闭blocker前push或提交新模型。
+
 Self-review：原P7 append-one、receipt/placement及unknown规则不变；例外以完整成功事务链替换特定active-prefix证据，没有凭空membership放行。真实MP4/音频/人验收仍未完成。

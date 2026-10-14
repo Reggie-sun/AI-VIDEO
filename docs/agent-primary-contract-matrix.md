@@ -525,7 +525,9 @@ placement 并追溯到原 P7 或已核验 video successor。单个新 Shot recei
 缺边、错 bytes、错身份及未经证明的 Registry 历史前缀改变仍拒绝。
 原P7 base→candidate严格append-one不变。active前缀改变仅可由同一只读owner
 `has_exact_registry_authoring_successor`从exact active Project/Registry沿连续、递减chronology的
-SUCCEEDED `commit_project_registry`边证明；每边重开pointer file hash/identity，全部旧
+SUCCEEDED `commit_project_registry`边证明；先检查exact candidate匹配边唯一，不能先过滤非法时间分支；
+每边base revision不得早于原P7 activation，且完整commit的+2 revision不越过后继下界。
+每边重开pointer file hash/identity，全部旧
 AssetRecord逐字段保留，新增限被candidate Character/Scene/Shot引用的IMPORTED/DERIVED IMAGE，
 直到仍有原P7精确前缀的base。普通集合membership、非authoring变更、未引用新增、删改旧record
 不构成此证明。原receipt、placement、activation与全部bytes检查仍独立执行；无writer/回滚。
