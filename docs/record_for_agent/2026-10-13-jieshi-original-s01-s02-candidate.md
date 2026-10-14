@@ -430,7 +430,7 @@ Native Codex Parent串行完成这一有界文档变更；没有源码/parser/li
 
 恢复条件：修复并取得原首帧完整道具/镜像几何证据；在现有QA/presentation owner接入真实exact-media听音证据并选定完整原镜policy；再核验current video runtime/profile/window与逐次paid gates。原S01采用3s、S02采用4s及原文/广播/对白/字幕全部保留，S03/S04仍是原前15s的后续映射，不能把两镜7s或这张静图宣称完整前15s。没有accepted S01、handoff、S02或HyperFrames交付；human1.0x/完整故事AC-7仍NOT_EVALUATED。
 
-使用`record-ai-video-session`更新同一主record及候选README状态锚点；`distill-ai-video-learning`评估no_candidate：同一递进图片链的不同修复目标与提示并非两次独立支持或受控多臂对照；H局部成功也不能支持通用镜面/生图能力claim。没有Skill/Policy/Gate或全局memory/RAG变更。本轮除上述3次内置修图外paid/视频/Comfy调用均0，记录期间不额外调用媒体/Provider。原foreign staged/dirty保留。
+使用`record-ai-video-session`更新同一主record及候选README状态锚点；`distill-ai-video-learning`评估no_candidate：同一递进图片链的不同修复目标与提示并非两次独立支持或受控多臂对照；H局部成功也不能支持通用镜面/生图能力claim。没有Skill/Policy/Gate或全局memory/RAG变更。本轮新增Seedream/视频Provider POST及Comfy调用均0，内置修图新增3次；内置工具计费及底层model未暴露，不猜价格/账单。记录期间不额外调用媒体/Provider。原foreign staged/dirty保留。文档checkpoint `c0d16b2137ef86d85955fda86c40f2d260cb29a2` 已push且remote main SHA核对一致；`.agent/harness/runs/jieshi-original-frame-stop-20261015-r1/receipt.json`五项PASS、fresh=true，仅证明该exact文档快照；此处计费边界澄清后的提交另验，不把前receipt伪称验证新bytes。
 
 ## Evidence Index
 
