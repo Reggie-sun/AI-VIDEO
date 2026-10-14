@@ -18,6 +18,8 @@
 
 上例路径/hash须替换为已实测的exact media，不是可提交fixture。`execute=false`默认只做无网络preview：封存source SHA/bytes、分析WAV SHA/bytes/duration/source audio clock offset、exact模型/endpoint/request fingerprint，不导入runtime、不取credential、不上传。只接受配置的项目媒体目录内regular no-follow `.mp4`/`.wav`，source<=128MiB、完整音轨<=120秒、inline wire body<=20MB。视频仅临时提取原完整音轨为PCM derivative，不改原MP4、原生音轨或最终composition。
 
+MP4的probe和decode均显式固定MOV/MP4 demuxer、file-only protocol并关闭external track与absolute alias，不能按扩展名自动识别HLS/concat后读取目录外音轨；相关选项见[FFmpeg官方说明](https://ffmpeg.org/ffmpeg-formats.html#mov_002fmp4_002f3gp)。组合`video_analyze`先完成本地处理，拒绝无效参数后才可能调用远端，避免已知无效请求消费授权。
+
 `execute=true`才请求真实分析；缺qualified runtime立即EVIDENCE_REPAIR_FIRST/KNOWN_NO_EFFECT且无POST。工具/模型只输出`segments`、`voice_description`、`delivery_description`、`background_sounds`、`uncertainties`，没有自签PASS、人类听过或activation。盲观察prompt不含剧本预期台词，后续selected evaluator再对照原句/时窗/声线/嘴部证据。
 
 ## Trusted Operator Binding

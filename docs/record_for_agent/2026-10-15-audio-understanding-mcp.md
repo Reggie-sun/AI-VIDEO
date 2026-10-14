@@ -34,13 +34,21 @@ Adapter在取key前从inline WAV重编canonical请求以拒绝tampered dataclass
 
 完整exact快照Harness归`.agent/harness/runs/audio-understanding-mcp-20261015-r2/receipt.json`；Risk Gate、native review与Parent裁决归`runs/canvas-jieshi-original-s01-s02-20261013-001/audio-tool-integration-20261015-001/review-risk.json`/`review-*`实际记录。新远端credential处理存在关键泄露/授权失败后果；本实现在native verification后触发一个`reviewer_xhigh`，只读验证绑定/错误与权限边界，不让reviewer补听音。后续文档publication与receipt freshness按actual sidecar/remote SHA核验，不把临时shared worktree或future配置当完成证据。
 
+## Verification And Native Review Repair
+
+完整candidate `16fb739a90b7539c89ec3ab1825f92c871ea3070`的r2 receipt总体PASS：18项实际执行PASS，`seedance_local_video_tests`由同run已通过`production_video_provider_tests`覆盖，非独立执行。既有Harness隔离verification checkout核验exact commit `fresh=true`；shared worktree因保留foreign同文件staged changes而fresh=false，两者分别保存，不冒充shared clean。
+
+原生`reviewer_xhigh` `/root/audio_security_review`初审两项：AUDIO-001（blocking_candidate）自动探测伪装MP4的HLS可读root外音轨；AUDIO-002（non_blocking）本地参数无效却先消费远端分析。Parent均CONFIRMED并修复，review output/裁决归同一proof目录。旧S2 source+新增tests的隔离对照，HLS fixture将目录外synthetic MP4 remux为TS并将audio clock延后0.2s，可复现preview接受及mocked POST；默认AAC offset为负的初始fixture会先被旧clock guard拒绝，不当作攻击成功。早期absolute test path也曾让pytest重新导入current src，保存为无效source-control尝试，后改为temporary verification checkout内仅复制新test并核验旧source hash。有效RED为`review-repair-hls-audio-offset-red.txt`的4项FAIL；真实网络调用0。
+
+修复只改音频MP4 probe/decode为forced MOV/file-only、external drefs与absolute alias禁用，并让组合分析先完成本地处理再消费远端。新增用例覆盖preview/execute在runtime/credential/permit/POST前拒绝伪装输入，以及无效max_frames/frame_interval时零音频调用。修复后focused MCP+generation review共101项PASS；最终增强runtime观察与文档后的精确增量验证归`.agent/harness/runs/audio-understanding-mcp-20261015-r3/receipt.json`，其base为已完整验证S2；r2与r3证明边界分别保留，不声称r2曾检查后续新bytes。安全语义变更仍须同一reviewer full re-review，见`review-round-2`实际结果。
+
 ## Agent Discovery And Ownership
 
 MCP自身instructions/tool description说明音频语义工具与Whisper边界；原AGENTS的Per-Shot routing继续指向playbook，新增同段`audio_understand`锚点只归`docs/audio-understanding.md`详细用法。用户选择A允许该新增入口独立提交、保留原暂存reviewer修改。Guide已达210行/18000 bytes，因此只压缩同一句保留显式project-local analysis与逐项PASS语义并增加锚点，不扩大budget或删除Gate。Matrix声明surface owners，Canvas workflow指向同一tool doc，没有第二操作手册。
 
 ## Live And Story Boundary
 
-当前没有qualified Gemini audio operator、exact supplier及其授权/预算/egress/durable-intent/one-use接线。现有Production Paid owner也没有audio-analysis operation，本次不硬套旧image/video permit、不伪造新ledger。因此实际Gemini音义、姓名/声线/对白时窗仍LIVE_NOT_EVALUATED/EVIDENCE_REPAIR_FIRST；本窗口没有云端音频请求、模型下载、依赖安装、图片/视频generation或Production mutation。工具真实stdio可发现不等于当前host已运行的旧MCP catalog自动热加载；后续fresh project-local进程读取新源码即可使用已实现入口。
+当前没有qualified Gemini audio operator、exact supplier及其授权/预算/egress/durable-intent/one-use接线。现有Production Paid owner也没有audio-analysis operation，本次不硬套旧image/video permit、不伪造新ledger。因此实际Gemini音义、姓名/声线/对白时窗仍LIVE_NOT_EVALUATED/EVIDENCE_REPAIR_FIRST；本窗口没有云端音频请求、模型下载、依赖安装、Production图片/视频generation或Production mutation，仅tests使用局部synthetic fixture。工具真实stdio可发现不等于当前host已运行的旧MCP catalog自动热加载；后续fresh project-local进程读取新源码即可使用已实现入口。
 
 《界蚀》最新图片FAIL/NE、Manifest33/Project7/QA未激活、原视频0、历史视频11与旧web UNKNOWN均保留，工具工程不替代原S01 accepted source、真实handoff、S02自身QA或成片；用户完整1.0x/故事AC-7仍未验。恢复声音实测须由实际operator绑定上面真实外部条件，之后最少一次在已有exact媒体补证，而不是重生视频。
 

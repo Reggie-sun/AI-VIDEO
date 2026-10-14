@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import importlib
+import json
 import math
 import re
 import stat
@@ -16,7 +17,6 @@ from ai_video_mcp.audio_understanding import (
     AudioUnderstandingError, GeminiAudioAnalyzer, prepare_audio_request,
 )
 from ai_video_mcp.config import ServerConfig
-from ai_video_mcp.tools.probe import _run_ffprobe
 
 
 @dataclass(frozen=True)
@@ -74,7 +74,14 @@ def _audio_bytes(source, suffix):
         audio = Path(temporary) / "analysis.wav"
         original.write_bytes(source.data)
         try:
-            metadata = _run_ffprobe(original)
+            # Restrict both subprocesses before opening input: a .mp4 suffix
+            # must not enable HLS/concat or MOV external track references.
+            input_options = ["-protocol_whitelist", "file", "-f", "mov",
+                "-enable_drefs", "0", "-use_absolute_path", "0"]
+            probe = subprocess.run(["ffprobe", "-v", "error", *input_options,
+                "-show_streams", "-show_format", "-of", "json", str(original)],
+                check=True, capture_output=True, timeout=45)
+            metadata = json.loads(probe.stdout)
             streams = metadata.get("streams", [])
             audio_stream = next(s for s in streams if s.get("codec_type") == "audio")
             video_stream = next(s for s in streams if s.get("codec_type") == "video")
@@ -84,7 +91,7 @@ def _audio_bytes(source, suffix):
             offset = float(audio_stream.get("start_time", 0)) - float(video_stream.get("start_time", 0))
             if not math.isfinite(offset) or offset < 0:
                 raise ValueError
-            subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-i", str(original),
+            subprocess.run(["ffmpeg", "-nostdin", "-v", "error", *input_options, "-i", str(original),
                 "-map", "0:a:0", "-vn", "-c:a", "pcm_s16le", str(audio)],
                 check=True, capture_output=True, timeout=45)
             data = audio.read_bytes()

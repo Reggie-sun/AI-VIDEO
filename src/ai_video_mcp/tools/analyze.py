@@ -27,12 +27,6 @@ def video_analyze(
 
     probe_result = video_probe(video_path, config, cache)
 
-    audio_result = None
-    if understand_audio:
-        from ai_video_mcp.tools.audio_understand import audio_understand
-        audio_result = audio_understand(video_path, config,
-            expected_sha256=expected_sha256, execute=True)
-
     frames_result = None
     transcription_result = None
     scenes_result = None
@@ -55,6 +49,12 @@ def video_analyze(
             video_path, config, cache,
             model=whisper_model,
         )
+
+    audio_result = None
+    if understand_audio:
+        from ai_video_mcp.tools.audio_understand import audio_understand
+        audio_result = audio_understand(video_path, config,
+            expected_sha256=expected_sha256, execute=True)
 
     duration = probe_result["file"]["duration_seconds"]
     resolution = f"{probe_result['video_stream']['width']}x{probe_result['video_stream']['height']}"

@@ -5,6 +5,7 @@ import ast
 import hashlib
 import io
 import json
+import subprocess
 import sys
 import wave
 from pathlib import Path
@@ -104,7 +105,7 @@ def test_runtime_failure_is_secret_safe(audio_source, monkeypatch):
     assert error.value.code == "runtime_unavailable"
 
 
-def _runtime_with_transport(monkeypatch, config, handler):
+def _runtime_with_transport(monkeypatch, config, handler, events=None):
     from types import ModuleType
     from ai_video_mcp.audio_understanding import GeminiAudioAnalyzer
     from ai_video_mcp.tools.audio_understand import AudioUnderstandingRuntime
@@ -113,15 +114,26 @@ def _runtime_with_transport(monkeypatch, config, handler):
         def __init__(self, preview):
             self.preview, self.used = preview, False
         def validate(self, preview):
+            if events is not None:
+                events.append("permit_validate")
             return self.preview == preview and not self.used
         def consume(self, preview):
+            if events is not None:
+                events.append("permit_consume")
             if not self.validate(preview):
                 return False
             self.used = True
             return True
     module = ModuleType("audio_test_operator")
-    module.build = lambda: AudioUnderstandingRuntime(
-        GeminiAudioAnalyzer(lambda: "test-only-key", transport=client), Permit)
+    def credential():
+        if events is not None:
+            events.append("credential")
+        return "test-only-key"
+    def build():
+        if events is not None:
+            events.append("runtime")
+        return AudioUnderstandingRuntime(GeminiAudioAnalyzer(credential, transport=client), Permit)
+    module.build = build
     monkeypatch.setitem(sys.modules, module.__name__, module)
     return config.model_copy(update={"audio_runtime_factory": "audio_test_operator:build"}), client
 
@@ -187,3 +199,42 @@ def test_video_analyze_audio_opt_in_requires_full_audio_evidence(tiny_video, mcp
         video_analyze(str(tiny_video), config, mcp_cache, extract_frames=False,
             transcribe_audio=False, detect_scenes=False, understand_audio=True,
             expected_sha256=hashlib.sha256(tiny_video.read_bytes()).hexdigest())
+
+
+@pytest.mark.parametrize("execute", [False, True])
+def test_disguised_hls_cannot_read_external_audio(tiny_video, tmp_path, monkeypatch, execute):
+    from ai_video_mcp.audio_understanding import AudioUnderstandingError
+    allowed = tmp_path / "allowed"
+    allowed.mkdir()
+    private_segment = tmp_path / "private.ts"
+    subprocess.run(["ffmpeg", "-nostdin", "-v", "error", "-i", str(tiny_video),
+        "-itsoffset", "0.2", "-i", str(tiny_video), "-map", "0:v:0", "-map", "1:a:0",
+        "-c", "copy", "-f", "mpegts", str(private_segment)], check=True, capture_output=True)
+    manifest = allowed / "source.mp4"
+    manifest.write_text("#EXTM3U\n#EXT-X-VERSION:3\n#EXT-X-TARGETDURATION:3\n"
+        "#EXT-X-MEDIA-SEQUENCE:0\n#EXTINF:3.0,\n" + str(private_segment) + "\n#EXT-X-ENDLIST\n")
+    config = ServerConfig(audio_media_root=str(allowed))
+    events = []
+    config, client = _runtime_with_transport(monkeypatch, config,
+        lambda request: (events.append("POST"), httpx.Response(200, json=_response()))[1], events=events)
+    try:
+        with pytest.raises(AudioUnderstandingError, match="decoded"):
+            _call((manifest, hashlib.sha256(manifest.read_bytes()).hexdigest(), config), execute=execute)
+    finally:
+        client.close()
+    assert events == []
+
+
+@pytest.mark.parametrize("invalid", [{"max_frames": 0}, {"frame_interval": 0}])
+def test_invalid_local_analysis_options_never_consume_audio(tiny_video, tmp_path, mcp_cache, monkeypatch, invalid):
+    import importlib
+    from ai_video_mcp.tools.analyze import video_analyze
+    from ai_video_mcp.errors import McpError
+    module = importlib.import_module("ai_video_mcp.tools.audio_understand")
+    calls = []
+    monkeypatch.setattr(module, "audio_understand", lambda *args, **kwargs: calls.append(kwargs) or {})
+    with pytest.raises(McpError):
+        video_analyze(str(tiny_video), ServerConfig(audio_media_root=str(tmp_path)), mcp_cache,
+            transcribe_audio=False, detect_scenes=False, understand_audio=True,
+            expected_sha256=hashlib.sha256(tiny_video.read_bytes()).hexdigest(), **invalid)
+    assert calls == []
