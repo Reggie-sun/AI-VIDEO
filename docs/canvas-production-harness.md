@@ -78,6 +78,18 @@ CLI：`--runtime trusted_operator_module:function` 返回 `committer` 和 servic
 未配置 runtime 时 inspect/author/preflight 可用；prepare/execute 必须补齐当前 canonical runtime。
 凭据不得进入项目 JSON、`--arguments` 或 CLI argv，只沿现有 injected supplier。
 
+## Agent Image Authoring Workflow
+
+用户要求原图、首帧或局部修图时，默认由 Codex 直接使用自带 Generated Image（`image_gen.imagegen`）；先做最小有界尝试，验实际图片后再接入现有项目。Qwen/ComfyUI 是可选的已封存执行路线，不是这套制作流程的前提。此处是 Agent authoring 指导，不是新的 Product Provider adapter、CLI 生图入口或 runtime Skill invocation。
+
+1. **Bind intent and references.** 保留原文及已满足项，明确唯一编辑对象和目标状态；分别指定原图为编辑底图、人物图为身份参考、姿态/布局图为几何参考。编辑前实际看图，核对 bytes/SHA、输入顺序、机位与邻座空间；不要用头像代替完整身体姿态，也不把参考图的背景或示意线要求生成进照片。
+2. **Adapt supported inputs.** 内置工具接收 `prompt`、`referenced_image_paths` 或 `num_last_images_to_include`、`transparent_background`；两种参考机制不能同时传。prompt表达动作/坐姿、身份、构图、保留区域与禁止改动。它不接收 ComfyUI workflow JSON、`seed`、`steps`、`CFG`、sampler、latent mask 或 ControlNet 参数；骨架/区域示意只能作为可见参考，不能冒充对应节点或硬约束已执行。未暴露的模型身份/采样设置不猜测。
+3. **Generate a bounded candidate.** 核验当前任务授权、明确新单元次数与时间边界、封存 exact 输入/引用和一次调用意图；不借默认路线自动扩大 paid/remote scope。以最少次数取证，保留每次原始输出与失败；timeout/UNKNOWN停止当前单元，不自动重抽、切工具或remint。用户以后明确变更路线也不关闭旧UNKNOWN、退回旧消费或授权盲目重试。
+4. **Review actual media before integration.** 输出以 exact copy 保存进工作目录，实测 SHA、尺寸、通道；逐项检查目标姿态/手脚、身份、道具、空间、机位、非目标人物和额外文字。正常坐姿等语义成功与蒙版外像素零变化分开报告；尺寸变化不能经隐式resize/crop伪装匹配。所选合同需要精确保护区或mask时，必须另有匹配的已验证合成/执行证据，内置生图成功不能代签；缺项/FAIL仍阻断相应使用。
+5. **Import through existing owners.** 仅在实际结果满足相应用途后，沿上文 [Entry And Data](#entry-and-data) 的 `generated_source` exact record/copy入口与 `revise_authoring`，保留完整旧Registry记录和原始 provenance。不能把内置生成图标成human/web import、Qwen输出或已qualified Provider；登记不等于素材验收/activation。原Shot视频、project-local逐镜MCP、声音/字幕、`ResolvedTimeline`和HyperFrames及human1.0x验收继续由原owner执行。
+
+只有用户明确选择其他工具，或内置工具在submit前已确认不可用并且另一入口已获授权，才评估既有 `chatgpt-web`、本地ComfyUI或已选择Provider；失败后不能自动fallback。明确选择 `chatgpt-web` 时先核对 `backend_status` ready，保持exact backend，不切 `api/auto`。需要严格局部像素保护时，可选择下文已实现的 [Masked Image Workflow](#masked-image-workflow)，并完整保留其mask/permit/保护复验合同。
+
 ## Original Asset Preparation
 
 已明确选择 Ark 原图路线时，`SeedreamImageProvider` 通过现有

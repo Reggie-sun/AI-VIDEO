@@ -11,7 +11,9 @@ Date: 2026-10-13
 
 ## Supersession Notice — 2026-10-15
 
-最新尝试见 **Pose Reference Trial And MCP Execution Stop — 2026-10-15**：用户要求先实测后接工作流，已准备明确坐姿参考并调用一次 `chatgpt-web`，MCP 300秒超时、后续页面空白/入口未就绪，未取回 exact 图片。保守保留 remote outcome UNKNOWN；无重发/fallback/工作流接入，Production 标准重开及前后 hash 一致，Manifest33不变。该调用不是新增视觉失败样本；下段为仍有效的上一媒体/工程 checkpoint。
+最新checkpoint见 **Codex Direct Image And Authoring Workflow Rule — 2026-10-15**：用户明确改用Codex内置工具，独立1次实际生成并exact copy落盘；老人坐下/放开扶杆，target static 5 PASS/1 NOT_EVALUATED。原图944×1672、输出943×1668，精确像素保护及完整原S01仍未通过，未导入/激活、Manifest33不变。用户随后明确要求把默认生图规则写入现有工作流，并批准只改playbook生图小节、独立提交且保留原暂存修改；无新增Provider调用或产品adapter。
+
+上一尝试见 **Pose Reference Trial And MCP Execution Stop — 2026-10-15**：先前1次 `chatgpt-web` MCP 300秒超时，页面空白/入口未就绪，未取回 exact 图片；原remote outcome UNKNOWN继续保留，没有重发、退款消费或伪称outcome已关闭。后来的内置调用来自用户新的明确路线指示，不是自动fallback。下段为仍有效的上一媒体/工程 checkpoint。
 
 最新checkpoint见 **Registry Retention Repair And Actual Targeted Z**。共享历史链修复已发布 `a45fa113b2ffb10bbd071bfa51753849aa82c911` 并核验remote main；原生审查两条blocker均由标准loader RED复现、修复后41项focused PASS和fresh exact Harness验证，原reviewer复审finding set为空，Parent关闭两条问题。标准metadata authoring恢复Registry原P7前缀，所有旧records/媒体/history保留。随后真实新增1次本地Z局部修复，exact PNG `102c1ec74f873a0de8297d2cf9de1477a9ae1cf0b0fc654836e6e8dc7e127557` 技术SUCCEEDED但老人仍站立扶杆，target QA 3 PASS/1 FAIL。遮罩外1,536,514 RGB像素变化0，不能替代坐姿成功。Z单元按FAIL STOP，H未提交；当前Manifest33，累计原准备paid图片2、本地模型图片2、原视频0、历史视频11。本窗口新增paid0，无accepted S01、实际handoff或HyperFrames声画交付；声音仍EVIDENCE_REPAIR_FIRST，human1.0x/完整故事AC-7均NOT_EVALUATED。自有ComfyUI unit已停止。
 
@@ -376,6 +378,24 @@ Parent实际original-resolution `view_image`：Zhou身份/衣物与原图对应�
 
 在真实blocker处按 `record-ai-video-session`更新同一主record和研究状态。`distill-ai-video-learning`评估 **no_candidate**：没有新可验媒体，不能验证姿态假设或自动采用社区方案；该工具超时与历史其他MCP问题边界不同，未建立可采用的重复机制。无Skill/Policy/Gate、global memory或RAG index更新。没有源码实现，implementation Risk Gate不触发；Parent完成artifact/状态核对，未新增reviewer。foreign staged/dirty保持，文档checkpoint的exact Harness/commit/push另由实际receipt与Git报告证明。
 
+## Codex Direct Image And Authoring Workflow Rule — 2026-10-15
+
+用户连续明确要求Codex直接接入、自带Generated Image参数和实际效果，随后要求将规则写入工作流。新的独立单元使用 `image_gen.imagegen`，不调用Qwen、ComfyUI、浏览器MCP或CLI/API fallback；原UNKNOWN单元没有重放/重分类。exact request `9cdd1fdf7ea2a660361cd3a5b145ccf9557924d74b31bcb9df1ba70c969610d2`，attempt `original-s01-codex-direct-image-20261015-001`，最多1调用、实际1、retry0。沿用原布局、老人身份crop与明确坐姿图三个角色分工；原图没有被直接编辑或覆盖。`image_gen`返回真实图片，底层模型/采样参数未暴露，不伪称具体model/profile qualification。
+
+图片为 `runs/canvas-jieshi-original-s01-s02-20261013-001/codex-direct-image-trial-20261015-001/s01-zhou-seated-codex-candidate.png`，SHA `f9128ccfde3868ed8aaea420f953e306b37c003e139fd0d85943774eea057e93`，RGB PNG、943×1668、2,027,887 bytes。从工具原始文件exact copy入项目工作目录，原始文件保留，不resize/crop/重编码；`generation-record.json`实测绑定request/output事实，不保存私有session或假model设置。
+
+Parent实际original-resolution看图，并在写规则时重新核对bytes/尺寸/标准项目状态。`static-image-review.json`：同一老人身份衣物、完整坐姿/屈膝/可见鞋、双手自然合放膝前且不握杆、可见邻座/机位关系、非目标人物及无新增文字五项有界PASS；身份不代human attestation，机位不代镜面/镜头标定。原图944×1672与输出943×1668不同，精确保护区等价为NOT_EVALUATED。原最右何静截断仍在，七完整倒影没有通过；林砚缺席对应几何和全部道具仍NOT_EVALUATED，音视频及human1.0x未验。局部效果成立不授权原S01 accepted source、后镜submit或完整故事AC-7。
+
+`production-before.json` / `production-after-generation.json`和规则记录时标准loader复验：project bytes、Manifest bytes/Registry规范模型hash均一致，Manifest33；实际素材导入/activation NOT_STARTED。已确认历史原准备paid图片2、本地模型图片2、原视频0、历史视频11不改；新增内置图片1单独列出，旧web调用UNKNOWN不算作0或完成图片。写规则这一阶段新增媒体/模型/Provider调用为0。
+
+默认规则由用户直接指定，写入 `.agent/context/control-plane-playbook.md` 的 **Agent-Side Image Generation Provider Preference**，详细流程只归 `docs/canvas-production-harness.md` 的 **Agent Image Authoring Workflow**：身份/场景/姿态职责→实际支持的prompt/参考/透明背景字段→有界尝试→图片及完整要求QA→现有generated_source/canonical committer导入。明确不接受ComfyUI JSON/seed/steps/CFG/sampler/latent mask/ControlNet参数，不把语义参考当硬节点、尺寸或像素保护；Qwen仅为已选择的可选路线，不新增Product backend/脚本/状态owner。已有mask路线、paid/unknown/逐镜视频/声音/剪辑验收合同保持。
+
+写前发现playbook已有foreign暂存的native reviewer迁移，与当前生图小节同file；用户明确选择A，授权只改生图小节、独立提交，原暂存保留。原 `AGENTS.md` 及其他foreign paths不编辑/夹带；独立Git index仅用于本次owned patch的隔离提交，不是development worktree或Product状态库。提交后核对原foreign暂存路径、其他blob和playbook原暂存增删内容，不能把另一任务迁移声称为本次工作。
+
+Native Codex Parent串行完成这一有界文档变更；没有源码/parser/lifecycle/credentials/budget/Gate改动，用户未要求independent review，未触发重大后果与验证缺口，Risk Gate为NATIVE_REVIEW_NOT_REQUIRED。前置规则budget检查曾暴露正文超限，仅精简本次生图summary、详细指导留唯一workflow owner后重新PASS，不增registry限额。exact最终commit range Harness必须另核验fresh receipt，工程/文档PASS不代媒体验收。
+
+按 `record-ai-video-session`稳定checkpoint更新同一记录。`distill-ai-video-learning`为 **no_candidate**：单次内置图片能证明该次坐姿效果，不能由模型/姿态输入同时改变推导通用胜率；旧web超时无图片，不算视觉反例。规则属于用户明确的新偏好，不是自动采用Learning Claim；没有制造第二确认、改Skill/Policy/Gate、刷新RAG或写global memory。
+
 ## Evidence Index
 
 此表只为本次原开场准备单元建立identity；历史其他实验不并入。remote boundary为Seedream/`doubao-seedream-5-0-pro-260628`、Ark shared image owner、1152×2048 PNG；新增local boundary为Qwen-Image-Edit-2511/三引用masked profile、944×1672 PNG，不与remote合同或计数合并。同一图片的receipt、bytes、materialization和visual proof使用同一request fingerprint independence_key，只贡献一个图片样本；预transport失败不是第二个视觉样本。
@@ -397,6 +417,8 @@ Parent实际original-resolution `view_image`：Zhou身份/衣物与原图对应�
 | local-Z-execution | native-image:a6175b8930d3e7bd84ae3bff8bdc6beacc9c73be3973fd6bc1110e5dd6149455 | jieshi-original-local-targeted-repair-20261014 | original-s01-targeted-Z-generation-20261015-001 | N/A | 102c1ec74f873a0de8297d2cf9de1477a9ae1cf0b0fc654836e6e8dc7e127557 | LOCAL_MODEL_EXECUTION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/local-targeted-repair-20261014-001/Z-execution-receipt.json |
 | local-Z-visual | native-image:a6175b8930d3e7bd84ae3bff8bdc6beacc9c73be3973fd6bc1110e5dd6149455 | jieshi-original-local-targeted-repair-20261014 | original-s01-targeted-Z-generation-20261015-001 | N/A | 102c1ec74f873a0de8297d2cf9de1477a9ae1cf0b0fc654836e6e8dc7e127557 | VISUAL_INSPECTION | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | local-Z-execution | runs/canvas-jieshi-original-s01-s02-20261013-001/local-targeted-repair-20261014-001/Z-static-image-review.json |
 | pose-web-invocation | external-authoring:8811e001d70794f03f8d34edfcdf9d5ea26f20bd53fa907e41d09e84d537fc2b | jieshi-original-pose-reference-trial-20261015 | original-s01-pose-reference-web-20261015-001 | N/A | NO_ARTIFACT:OUTCOME_UNKNOWN | LOCAL_TOOL_EXECUTION | OUTCOME_UNKNOWN | EXECUTION_EVIDENCE_GAP | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/pose-reference-trial-20261015-001/mcp-call-timeout.json |
+| codex-direct-generation | native-image:9cdd1fdf7ea2a660361cd3a5b145ccf9557924d74b31bcb9df1ba70c969610d2 | jieshi-original-codex-direct-image-20261015 | original-s01-codex-direct-image-20261015-001 | N/A | f9128ccfde3868ed8aaea420f953e306b37c003e139fd0d85943774eea057e93 | TOOL_GENERATION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-direct-image-trial-20261015-001/generation-record.json |
+| codex-direct-static | native-image:9cdd1fdf7ea2a660361cd3a5b145ccf9557924d74b31bcb9df1ba70c969610d2 | jieshi-original-codex-direct-image-20261015 | original-s01-codex-direct-image-20261015-001 | N/A | f9128ccfde3868ed8aaea420f953e306b37c003e139fd0d85943774eea057e93 | VISUAL_INSPECTION | NOT_EVALUATED | EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | codex-direct-generation | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-direct-image-trial-20261015-001/static-image-review.json |
 
 ## Historical Record And Learning Update
 

@@ -26,10 +26,10 @@ Runtime seam 见 [matrix](../../docs/agent-primary-contract-matrix.md#final-outp
 
 ### Agent-Side Image Generation Provider Preference
 
-用户明确要求实际生图时，优先 project-local `gpt-image-2` MCP 的 exact `chatgpt-web` backend，先核对
-`backend_status` ready，不切到 `api/auto`。仅 remote submit 前确认不可用或用户选本地，才用 loopback ComfyUI。
-已调用/timeout/unknown 后停止，不自动 fallback/retry。MCP output 只是 raw candidate，经 truthful import
-与唯一 committer 进入 Production；不保存 session/browser/signed URL/private diagnostics，不把 output dir 当 artifact root。
+作图/修图默认优先 Codex Generated Image（`image_gen.imagegen`），读取 `imagegen`。
+参考/QA/import见[工作流](../../docs/canvas-production-harness.md#agent-image-authoring-workflow)；先有界试图，验后由唯一 committer接入。
+其他已授权入口须显式选择；timeout/unknown停止，不自动fallback/retry，不假称节点执行或完整剧情PASS。
+保留原图/evidence；不保存session/browser/signed URL/private diagnostics，不把工具output dir当artifact root。
 
 ### Creative Skill Preflight Gate
 
