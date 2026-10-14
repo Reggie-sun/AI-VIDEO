@@ -20,10 +20,18 @@ def video_analyze(
     whisper_model: str | None = None,
     detect_scenes: bool = True,
     scene_threshold: float | None = None,
+    understand_audio: bool = False,
+    expected_sha256: str | None = None,
 ) -> dict:
     p = _validate_video(video_path, config)
 
     probe_result = video_probe(video_path, config, cache)
+
+    audio_result = None
+    if understand_audio:
+        from ai_video_mcp.tools.audio_understand import audio_understand
+        audio_result = audio_understand(video_path, config,
+            expected_sha256=expected_sha256, execute=True)
 
     frames_result = None
     transcription_result = None
@@ -67,7 +75,7 @@ def video_analyze(
         "frames_extracted": frames_result["total_frames_extracted"] if frames_result else 0,
     }
 
-    return {
+    result = {
         "video_path": str(p),
         "probe": probe_result,
         "frames": frames_result,
@@ -75,3 +83,6 @@ def video_analyze(
         "scenes": scenes_result,
         "analysis_summary": summary,
     }
+    if understand_audio:
+        result["audio_understanding"] = audio_result
+    return result

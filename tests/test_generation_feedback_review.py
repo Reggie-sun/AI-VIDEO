@@ -42,6 +42,77 @@ def test_analysis_session_rejects_missing_interpreter(tmp_path):
         ProjectAnalysisSession(tmp_path / "missing-python")
 
 
+def test_analysis_session_forwards_explicit_audio_identity_without_secret_arguments(tmp_path, monkeypatch):
+    import json
+    import sys
+    from ai_video_mcp.generation_feedback import ProjectAnalysisSession
+    observed = []
+    class Process:
+        returncode = 0
+        async def communicate(self):
+            return b'{"content": [], "isError": false}', b""
+    async def spawn(*argv, **kwargs):
+        observed.append(argv)
+        return Process()
+    monkeypatch.setattr(asyncio, "create_subprocess_exec", spawn)
+    session = ProjectAnalysisSession(sys.executable)
+    asyncio.run(session.call_tool("video_analyze", {"video_path": "exact.mp4",
+        "understand_audio": True, "expected_sha256": "a" * 64}))
+    assert len(observed[0]) == 5
+    assert json.loads(observed[0][-1]) == {"understand_audio": True, "expected_sha256": "a" * 64}
+
+
+def test_audio_analysis_opt_in_cannot_succeed_with_missing_audio_evidence(tmp_path):
+    _, committer = fetched(tmp_path)
+    with pytest.raises(ValueError, match="audio"):
+        asyncio.run(review_generation_attempt(committer=committer, attempt_id="review",
+            session=Session(), adjudicate=adjudicate, understand_audio=True))
+    assert committer.read_generation_experiences() == ()
+
+
+def test_generation_analysis_rejects_audio_bound_to_different_source():
+    from ai_video.production.generation_evaluation import GenerationAnalysisEvidence
+    import json
+    payload = {"video_path": "exact.mp4", "analysis_summary": {},
+        "probe": {"file": {"size_bytes": 4}}, "audio_understanding": {
+            "schema_version": "audio-understanding-evidence/1", "source_sha256": "b" * 64,
+            "source_size_bytes": 4, "observations": {}}}
+    with pytest.raises(ValueError, match="audio"):
+        GenerationAnalysisEvidence(artifact_sha256="a" * 64, size_bytes=4,
+            response_json=json.dumps({"structuredContent": payload, "isError": False}))
+
+
+def test_audio_observations_are_retained_in_original_generation_evidence(tmp_path):
+    import hashlib
+    from pathlib import Path
+    from types import SimpleNamespace
+    from ai_video.production.state_commit import ProductionStateCommitter
+    _, committer = fetched(tmp_path)
+    calls = []
+    class AudioSession(Session):
+        async def call_tool(self, name, arguments):
+            calls.append(arguments)
+            original = await super().call_tool(name, arguments)
+            response = original.model_dump()
+            payload = response["structuredContent"]
+            data = Path(arguments["video_path"]).read_bytes()
+            payload["audio_understanding"] = {"schema_version": "audio-understanding-evidence/1",
+                "source_sha256": hashlib.sha256(data).hexdigest(), "source_size_bytes": len(data),
+                "audio_sha256": "a" * 64, "request_fingerprint": "b" * 64, "response_sha256": "c" * 64,
+                "requested_model_id": "gemini-fixture", "response_model_id": "gemini-fixture-version",
+                "observations": {"uncertainties": ["offline mocked analyzer, not real hearing"]}}
+            return SimpleNamespace(model_dump=lambda **_: response)
+    diagnosis = asyncio.run(review_generation_attempt(committer=committer, attempt_id="review",
+        session=AudioSession(), adjudicate=adjudicate, understand_audio=True))
+    assert diagnosis.failure_classes == ("QUALITY_FAILURE",)
+    reopened = ProductionStateCommitter(tmp_path).read_generation_experiences()[0]
+    evidence = reopened.evaluation_sources[0].analysis_evidence
+    audio = evidence.payload["audio_understanding"]
+    assert audio["source_sha256"] == evidence.artifact_sha256 == calls[0]["expected_sha256"]
+    assert calls[0]["understand_audio"] is True
+    assert audio["observations"]["uncertainties"] == ["offline mocked analyzer, not real hearing"]
+
+
 class Session:
     def __init__(self, *, fail=False, alter=None):
         self.calls = 0

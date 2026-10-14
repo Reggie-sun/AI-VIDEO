@@ -1,5 +1,12 @@
 # AI-VIDEO Contract Routing Matrix
 
+## Audio Understanding Evidence
+
+`ai_video_mcp/audio_understanding.py`独占Gemini官方inline WAV request/response、exact source/audio/model/wire fingerprint和secret-safe单次transport；不读ambient credential、不retry/redirect/upload/fallback、不创建Production state或paid operation。
+`tools/audio_understand.py`独占configured media root内no-follow exact bytes、临时完整PCM分析derivative、无网络preview与trusted operator injection。真实runtime负责实际qualification/authorization/budget/egress/durable intent/one-use消费；未绑定时无POST，不以JSON/测试permit替代。新工具不自动产生qualified profile或QA authority。
+`server.py`仍独占serialized MCP注册；`video_analyze`显式opt-in把audio观察放入原response，默认旧调用/输出不变。`generation_feedback`/`analysis_client`只投影exact source与non-secret operator接线，`GenerationAnalysisEvidence`重开同一fetched SHA/size及audio request/result身份；selected evaluator/presentation/committer仍独占finding和Production记录。
+用法只归[工具文档](audio-understanding.md)。模型时间戳不代canonical trim/sample，Whisper不代音义，工具与工程PASS不代真实听音或human1.0x；现有Paid owner不支持audio operation的缺口保持，不冒充generation permit。Checks归`mcp_tests`及原generation feedback、reader、state、Architecture验证。
+
 ## Grok Subscription Media
 
 `grok_auth` 独占 device OAuth、exact Secret Service、account/expiry 和显式 refresh；未知 rotation

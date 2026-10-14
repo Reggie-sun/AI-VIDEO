@@ -101,19 +101,35 @@ class ControlledPresentationVerifier:
 class ProjectAnalysisSession:
     """Use the installed isolated MCP runtime without adding a production SDK."""
 
-    def __init__(self, python):
+    def __init__(self, python, *, audio_runtime_factory=None, audio_media_root=None, audio_model_id=None):
         interpreter = Path(python)
         interpreter.resolve(strict=True)
         # Python detects a virtualenv from the invoked path, not its target.
         self.python = str(interpreter.absolute())
+        self.audio_settings = {key: value for key, value in {
+            "VIDEO_MCP_AUDIO_RUNTIME_FACTORY": audio_runtime_factory,
+            "VIDEO_MCP_AUDIO_MEDIA_ROOT": audio_media_root,
+            "VIDEO_MCP_AUDIO_MODEL_ID": audio_model_id,
+        }.items() if value is not None}
 
     async def call_tool(self, name, arguments):
         if name != "video_analyze":
             raise ValueError("generation review only calls video_analyze")
         env = os.environ.copy()
         env["PYTHONPATH"] = str(Path(__file__).resolve().parents[1])
+        options = {}
+        if arguments.get("understand_audio", False):
+            import re
+            digest = arguments.get("expected_sha256")
+            if (arguments["understand_audio"] is not True or not isinstance(digest, str)
+                    or re.fullmatch(r"[0-9a-f]{64}", digest) is None):
+                raise ValueError("audio analysis requires an explicit exact source SHA")
+            options = {"understand_audio": True, "expected_sha256": digest}
+            env.update(self.audio_settings)
+        suffix = (json.dumps(options, separators=(",", ":")),) if options else ()
         process = await asyncio.create_subprocess_exec(
             self.python, "-m", "ai_video_mcp.analysis_client", arguments["video_path"],
+            *suffix,
             env=env, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
         try:
             stdout, _ = await asyncio.wait_for(process.communicate(), timeout=300)
@@ -138,7 +154,8 @@ def _diagnosis(committer, experience):
 
 
 async def review_generation_attempt(*, committer, attempt_id, session, adjudicate,
-                                    repair_evidence=False, analysis_only=False, presentation_verifier=None):
+                                    repair_evidence=False, analysis_only=False, presentation_verifier=None,
+                                    understand_audio=False):
     """Review one exact fetched result; exact completed replay has zero effects.
 
     Missing analysis/evaluator results raise before feedback persistence. The
@@ -186,18 +203,29 @@ async def review_generation_attempt(*, committer, attempt_id, session, adjudicat
         if (all(s.qa_policy_content_hash == loaded.qa_policy.content_hash
                 for s in current.evaluation_sources)
                 and any(s.analysis_evidence is not None for s in current.evaluation_sources)):
+            if understand_audio and not any(s.analysis_evidence is not None
+                    and s.analysis_evidence.payload.get("audio_understanding") is not None
+                    for s in current.evaluation_sources):
+                raise ValueError("EVIDENCE_REPAIR_FIRST: explicit audio evidence repair is required")
             return _diagnosis(committer, current)
     if session is None or (adjudicate is None and presentation_verifier is None and not analysis_only):
         raise ValueError("EVIDENCE_REPAIR_FIRST: project-local MCP and selected evaluator are required")
-    result = await session.call_tool("video_analyze", {
+    arguments = {
         "video_path": str(path), "extract_frames": True,
         "transcribe_audio": False, "detect_scenes": True,
-    })
+    }
+    if type(understand_audio) is not bool:
+        raise ValueError("audio analysis must be an explicit boolean")
+    if understand_audio:
+        arguments.update(understand_audio=True, expected_sha256=receipt.artifact_sha256)
+    result = await session.call_tool("video_analyze", arguments)
     response = result.model_dump(mode="json")
     analysis = GenerationAnalysisEvidence(artifact_sha256=receipt.artifact_sha256,
         size_bytes=receipt.size_bytes, response_json=json.dumps(response, sort_keys=True, separators=(",", ":")))
     if analysis.payload["video_path"] != str(path):
         raise ValueError("EVIDENCE_REPAIR_FIRST: analysis identifies different media")
+    if understand_audio and analysis.payload.get("audio_understanding") is None:
+        raise ValueError("EVIDENCE_REPAIR_FIRST: requested audio understanding evidence is missing")
     measure()
     candidate = next(c for c in binding.inputs.candidates
                      if c.candidate_id == binding.decision.selected_candidate_id)

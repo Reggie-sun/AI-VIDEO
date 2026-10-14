@@ -78,6 +78,8 @@ CLI：`--runtime trusted_operator_module:function` 返回 `committer` 和 servic
 未配置 runtime 时 inspect/author/preflight 可用；prepare/execute 必须补齐当前 canonical runtime。
 凭据不得进入项目 JSON、`--arguments` 或 CLI argv，只沿现有 injected supplier。
 
+原声音证据不齐时使用[project-local音频理解工具](audio-understanding.md)补证，默认无网络preview；qualified operator就绪后可在原`evaluate`显式传`understand_audio=true`，观察进入原exact MP4分析证据。它不代selected QA/presentation、精确时序或human听看，缺证不重生成。
+
 ## Agent Image Authoring Workflow
 
 用户要求原图、首帧或局部修图时，默认由 Codex 直接使用自带 Generated Image（`image_gen.imagegen`）；先做最小有界尝试，验实际图片后再接入现有项目。Qwen/ComfyUI 是可选的已封存执行路线，不是这套制作流程的前提。此处是 Agent authoring 指导，不是新的 Product Provider adapter、CLI 生图入口或 runtime Skill invocation。

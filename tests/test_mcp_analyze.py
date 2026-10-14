@@ -240,6 +240,7 @@ def test_every_public_mcp_tool_uses_the_shared_serialized_entrypoint() -> None:
     server_path = ROOT / "src" / "ai_video_mcp" / "server.py"
     tree = ast.parse(server_path.read_text(encoding="utf-8"))
     public_tool_names = {
+        "audio_understand",
         "video_probe",
         "video_extract_frames",
         "video_transcribe",

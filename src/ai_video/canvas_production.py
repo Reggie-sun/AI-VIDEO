@@ -392,7 +392,8 @@ class CanvasProductionService:
                     raise _blocked("Exact media Gate is FAIL or NOT_EVALUATED; stop this attempt.")
         raise _blocked("Exact media Gate evidence is missing or stale.")
 
-    async def evaluate(self, *, session, adjudicate=None, repair_evidence=False, presentation_verifier=None):
+    async def evaluate(self, *, session, adjudicate=None, repair_evidence=False, presentation_verifier=None,
+                       understand_audio=False):
         """Explicit project-local video-analysis path; replay stays in its owner."""
         from ai_video_mcp.generation_feedback import review_generation_attempt
         position = self.position()
@@ -400,7 +401,7 @@ class CanvasProductionService:
             raise _blocked("No known fetched attempt is eligible for media evaluation.")
         return await review_generation_attempt(committer=self.committer, attempt_id=position.attempt_id,
             session=session, adjudicate=adjudicate, repair_evidence=repair_evidence,
-            presentation_verifier=presentation_verifier)
+            presentation_verifier=presentation_verifier, understand_audio=understand_audio)
 
     def execute(self, *, action, **arguments):
         """Perform one exact next action using current existing gates/permits."""

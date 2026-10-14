@@ -89,6 +89,22 @@ class GenerationAnalysisEvidence(StrictModel):
                 or not isinstance(payload["probe"].get("file"), dict)
                 or payload["probe"]["file"].get("size_bytes") != self.size_bytes):
             raise ValueError("analysis response has no exact successful video analysis")
+        audio = payload.get("audio_understanding")
+        if audio is not None:
+            if (not isinstance(audio, dict) or audio.get("error")
+                    or audio.get("schema_version") != "audio-understanding-evidence/1"
+                    or audio.get("source_sha256") != self.artifact_sha256
+                    or type(audio.get("source_size_bytes")) is not int
+                    or audio.get("source_size_bytes") != self.size_bytes
+                    or not isinstance(audio.get("observations"), dict)):
+                raise ValueError("audio analysis must bind the exact fetched video")
+            import re
+            for field in ("audio_sha256", "request_fingerprint", "response_sha256"):
+                if not isinstance(audio.get(field), str) or re.fullmatch(SHA256, audio[field]) is None:
+                    raise ValueError("audio analysis lacks exact request/result identity")
+            if (not isinstance(audio.get("requested_model_id"), str) or not audio["requested_model_id"]
+                    or not isinstance(audio.get("response_model_id"), str) or not audio["response_model_id"]):
+                raise ValueError("audio analysis lacks its actual model identity")
         return self
 
     @property

@@ -11,6 +11,8 @@ Date: 2026-10-13
 
 ## Supersession Notice — 2026-10-15
 
+声音工具工程更新见[Audio Understanding MCP record](2026-10-15-audio-understanding-mcp.md)：用户要求网上找工具、接入项目并让后续Agent知道，已新增原MCP音频preview/authorized analyzer/逐镜证据接点，真实隔离stdio可发现并预检已有WAV。qualified Gemini runtime未绑定、实际音义仍EVIDENCE_REPAIR_FIRST；没有上传声音或提交原视频，不把工程/preview当作前述首帧FAIL与声音Gate解除。
+
 最新媒体checkpoint见 **Original Frame Completion Attempt And Video Stop — 2026-10-15**：按“继续图做完了就生成视频啊”新增3次Codex内置修图，七名他人完整倒影与老人坐姿保住，陈立手机补出；镜像持机/耳机仍有FAIL或NOT_EVALUATED，首帧未完成。实际声音输入再次被平台拒绝，当前Manifest33没有active QA policy或原视频attempt。未导入/激活新图、未提交视频；累计内置图片4（本轮3）、paid准备图2、local模型图2、原视频0、历史视频11，旧web UNKNOWN保留。
 
 此前治理续执行见 **Community Validation Principle And Checkpoint — 2026-10-15**：用户要求把“遇到问题参考社区、实际验证、写回工作流”写入AGENTS，仅新增薄原则/已有owner锚点；原暂存的native reviewer迁移不夹带。该治理轮不生成媒体、不修改Production或LearningClaim，原S01/声音/UNKNOWN边界保持。

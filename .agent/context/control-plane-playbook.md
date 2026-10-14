@@ -141,7 +141,7 @@ Host install `/home/reggie/vscode_folder/MCP/VideoMCP`，executable `/home/reggi
 ### Per-Shot Post-Media Gate
 
 顺序：resolve SourceAudioPolicy + selected capability → exact request → generate once → fixed MP4 SHA-256 →
-显式 video-analysis probe/sample（按要求 audio/scene/lip-sync/continuity）→逐项 verdict →仅全 PASS 才下一 Shot。
+显式video-analysis验scene/lip-sync/continuity及声音（[audio_understand](../../docs/audio-understanding.md)）；逐项PASS才下一Shot。
 Gate input：shot_id/path/hash/intent/rubric/required IDs/Shot2+前序 accepted end-state；output 每 requirement 的
 PASS/FAIL/NOT_EVALUATED + evidence ref + reason，不用 score 或 advisory hook 代替。FAIL / NOT_EVALUATED 时 STOP。
 

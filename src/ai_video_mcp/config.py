@@ -27,6 +27,11 @@ class ServerConfig(BaseSettings):
     max_video_duration_seconds: int = 7200
     max_video_file_size_mb: int = 4096
 
+    # Remote audio analysis is opt-in; these are non-secret operator bindings.
+    audio_media_root: str | None = None
+    audio_model_id: str = "gemini-3.8-flash"
+    audio_runtime_factory: str | None = None
+
     model_config = {"env_prefix": "VIDEO_MCP_"}
 
 

@@ -10,6 +10,8 @@ from ai_video_mcp.config import get_config, ServerConfig
 from ai_video_mcp.errors import McpError
 from ai_video_mcp.serialization import run_serialized
 from ai_video_mcp.tools.analyze import video_analyze as _video_analyze
+from ai_video_mcp.tools.audio_understand import audio_understand as _audio_understand
+from ai_video_mcp.audio_understanding import AudioUnderstandingError
 from ai_video_mcp.tools.apply_optimization import apply_video_optimization as _apply_video_optimization
 from ai_video_mcp.tools.frames import video_extract_frames as _video_extract_frames
 from ai_video_mcp.tools.optimize_plan import video_optimize_plan as _video_optimize_plan
@@ -28,12 +30,17 @@ mcp = FastMCP(
         "transcribe audio via Whisper, detect scene changes, and review videos for optimization guidance. "
         "Use video_analyze for comprehensive analysis, video_review for actionable optimization hints, "
         "video_optimize_plan for repo-file optimization targets, video_apply_optimization for safe auto-edits, "
-        "or individual tools for targeted queries."
+        "or individual tools for targeted queries. Audio meaning, voice and delivery require audio_understand "
+        "with exact media SHA; it previews offline by default and only executes through a qualified injected operator. "
+        "Whisper transcription alone does not establish audio semantics or human listening."
     ),
 )
 
 
 def _handle_error(e: Exception) -> dict:
+    if isinstance(e, AudioUnderstandingError):
+        return {"error": e.code, "outcome": e.outcome, "message": str(e),
+                "retryable": False, "production_acceptance": "NOT_EVALUATED"}
     if isinstance(e, McpError):
         return e.to_dict()
     return {"error": "internal", "message": str(e)}
@@ -43,6 +50,23 @@ async def _run_serialized(
     operation: Callable[..., dict], *args: Any, **kwargs: Any
 ) -> dict:
     return await run_serialized(operation, *args, **kwargs)
+
+
+@mcp.tool()
+async def audio_understand(media_path: str, expected_sha256: str, execute: bool = False,
+                           ctx: Context = None) -> dict:
+    """Understand exact project MP4/WAV speech, voice, delivery and background sounds.
+
+    Preview is offline by default. Execution requires configured qualified operator,
+    exact injected credential supplier, durable authorization/budget/egress and one-use permit.
+    Observations and estimated timestamps never sign QA, human hearing or canonical timing.
+    Missing runtime or UNKNOWN stops; do not retry or regenerate media to repair evidence.
+    """
+    try:
+        return await _run_serialized(_audio_understand, media_path, config,
+            expected_sha256=expected_sha256, execute=execute)
+    except Exception as e:
+        return _handle_error(e)
 
 
 @mcp.tool()
@@ -155,6 +179,8 @@ async def video_analyze(
     whisper_model: Optional[str] = None,
     detect_scenes: bool = True,
     scene_threshold: Optional[float] = None,
+    understand_audio: bool = False,
+    expected_sha256: Optional[str] = None,
     ctx: Context = None,
 ) -> dict:
     """Comprehensive video analysis: metadata + keyframes + transcription + scene detection.
@@ -168,6 +194,8 @@ async def video_analyze(
         whisper_model: Whisper model name (default: base)
         detect_scenes: Whether to detect scene changes (default: true)
         scene_threshold: Scene change threshold (default: 0.4)
+        understand_audio: Explicit remote audio observations via a qualified operator (default: false)
+        expected_sha256: Required exact source identity when understand_audio is true
     """
     try:
         return await _run_serialized(
@@ -180,6 +208,8 @@ async def video_analyze(
             whisper_model=whisper_model,
             detect_scenes=detect_scenes,
             scene_threshold=scene_threshold,
+            understand_audio=understand_audio,
+            expected_sha256=expected_sha256,
         )
     except Exception as e:
         return _handle_error(e)
