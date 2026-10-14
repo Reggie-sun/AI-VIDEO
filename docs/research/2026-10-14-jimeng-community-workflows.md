@@ -126,6 +126,8 @@ Ark 文档的字段内容本次经官方页面搜索索引核验；普通抓取�
 
 ## Pose Repair Follow-up — 2026-10-15
 
+后续用户要求先实测再接入，已准备坐姿参考并调用一次优先的 `chatgpt-web` 入口；300秒MCP超时，页面空白且入口变为未就绪，没有取回图片，remote outcome保守UNKNOWN。参见 [试验与STOP](../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#pose-reference-trial-and-mcp-execution-stop--2026-10-15)。没有重发、接入工作流或Production mutation，以下研究结论仍是待验证方向；本轮执行阻塞不能归因于模型不遵循坐姿。
+
 本节针对实际 Z 输出“蒙版内像素改变，但老人仍站立扶杆”。前文未实现 masked lane 的能力映射是 2026-10-14 初查时的历史状态；当前共享 masked lane 已实现并真实运行，区域保护通过，目标坐姿失败。公开案例支持补足姿态输入的方向，不构成本项目修复成功或新 submit 许可。本轮只查资料、读取已有 evidence，不生成、不下载模型、不启动 ComfyUI、不修改 Production state。
 
 ### Community Failure And Counter Evidence

@@ -11,6 +11,8 @@ Date: 2026-10-13
 
 ## Supersession Notice — 2026-10-15
 
+最新尝试见 **Pose Reference Trial And MCP Execution Stop — 2026-10-15**：用户要求先实测后接工作流，已准备明确坐姿参考并调用一次 `chatgpt-web`，MCP 300秒超时、后续页面空白/入口未就绪，未取回 exact 图片。保守保留 remote outcome UNKNOWN；无重发/fallback/工作流接入，Production 标准重开及前后 hash 一致，Manifest33不变。该调用不是新增视觉失败样本；下段为仍有效的上一媒体/工程 checkpoint。
+
 最新checkpoint见 **Registry Retention Repair And Actual Targeted Z**。共享历史链修复已发布 `a45fa113b2ffb10bbd071bfa51753849aa82c911` 并核验remote main；原生审查两条blocker均由标准loader RED复现、修复后41项focused PASS和fresh exact Harness验证，原reviewer复审finding set为空，Parent关闭两条问题。标准metadata authoring恢复Registry原P7前缀，所有旧records/媒体/history保留。随后真实新增1次本地Z局部修复，exact PNG `102c1ec74f873a0de8297d2cf9de1477a9ae1cf0b0fc654836e6e8dc7e127557` 技术SUCCEEDED但老人仍站立扶杆，target QA 3 PASS/1 FAIL。遮罩外1,536,514 RGB像素变化0，不能替代坐姿成功。Z单元按FAIL STOP，H未提交；当前Manifest33，累计原准备paid图片2、本地模型图片2、原视频0、历史视频11。本窗口新增paid0，无accepted S01、实际handoff或HyperFrames声画交付；声音仍EVIDENCE_REPAIR_FIRST，human1.0x/完整故事AC-7均NOT_EVALUATED。自有ComfyUI unit已停止。
 
 ## Historical Supersession Notice — 2026-10-14
@@ -356,6 +358,24 @@ Parent实际original-resolution `view_image`：Zhou身份/衣物与原图对应�
 
 本轮是资料研究与已有 evidence 核对，新增模型/图片/视频 submit、模型下载、ComfyUI 启动和 Production mutation 均为 0；旧 FAIL、剩余 H slot、原剧情及视频/声音验收边界不变。`record-ai-video-session` 更新同一主 record；`distill-ai-video-learning` 评估 **no_candidate**：公开案例未在本项目受控复现，现有不同目标 local attempts 不隔离变量，未形成可采用的新 bounded claim。无 Skill/Policy/Gate 或 global memory/RAG index 更新。文档研究不触发 implementation Risk Gate，不新增 reviewer；foreign staged/dirty 保留。
 
+## Pose Reference Trial And MCP Execution Stop — 2026-10-15
+
+用户要求先尝试修图、成功后再接工作流。Parent 按当前 playbook 的 Agent-side preference 选择 project-local `gpt-image-2` MCP、显式 `backend=chatgpt-web`，不是 Kimi/外部工程 subagent 或 API fallback。使用 `imagegen` 的身份/编辑底图/姿态参考职责指导，以及 `open-video` 的 known-failure repair 边界；没有改变原剧情或把先试后接变成先建新 adapter。此前 RAG layout mismatch 沿同一任务不重试/刷新，当前标准 loader、源码、原角色/Shot 与 exact receipts重新核对。
+
+试验目录 `runs/canvas-jieshi-original-s01-s02-20261013-001/pose-reference-trial-20261015-001/`。原场景 `1c36a9ea7600c0d5cbc73848f6ffd1731307478027f53937cb8731502fa7e6d8` 和身份脸 crop `4669a45199bacf80ad99ffc4409f8986fe95dee845010695aa92fb2f017a403e` 保持原 bytes；新增944×1672技术坐姿图 `zhou-seated-pose-guide.png`，SHA `61a696b7001f2e778ef8411b2d681e176b79295e3a5dc81946a4b3c127a4363d`、11,440 bytes。它从空白画布按显式 joints/seat anchors绘制，不是模型输出、人物身份或镜面几何成功证据，未改写照片；`pose-guide.geometry.json`保留坐标。初稿膝部弯曲不够清楚，在任何模型调用前修正并实际看图。原图/脸图/姿态图三引用顺序及 SHA 经 `reference-bindings.json`重验。
+
+`request.exact.json` SHA `8811e001d70794f03f8d34edfcdf9d5ea26f20bd53fa907e41d09e84d537fc2b`；新身份 `original-s01-pose-reference-web-20261015-001`，new conversation、n=1、请求timeout600秒；先封存 `rubric.sealed.json` 与 `one-use-call-intent.json`，最多1次 generate invocation、禁止retry。prompt只改老人坐姿、保留身份/邻座/摄影/窗面/道具；原广播、动作、对白和字幕继续由原视频/composition执行。Provider路径与姿态输入均改变，因此即使产图也不是隔离变量的 Qwen 对照。本试验不挪旧 H slot、不改变旧 paid/local计数或假造 Product reservation/qualification。
+
+`browser_visibility`从未启动状态开启专用浏览器；提交前 `backend_status`为ready=true，actual MCP `generate_image` 调用1次。客户端返回 `timed out awaiting tools/call after 300s`，**不证明未发生生成或可重试**。`mcp-call-timeout.json`保持原工具超时类别。仅通过既有 browserConnection owner/loopback校验连接现有页，对同一次完整请求只读取证，没有 Send/新请求/新tab/修改工具。请求在现有页不存在，user/assistant消息数0，因此匹配门拒绝继续collectImages/export；独立复验 document complete但body空白，无main/composer/file input，后续backend为ready=false、starting=true。没有取回图片或视觉裁决；`page-discovery.json`和`readiness-diagnosis.json`保存只含非敏感分类事实，未保存 session/browser URL/private diagnostics。
+
+为阻止已超时的startup以后迟发，核验仅有本次从browser_open=false启动的专用空白ChatGPT tab，且仍无main/composer/messages后只关闭该tab；`startup-stop.json`保存动作/URL hash，不关闭其他浏览器或进程。这个动作不反证历史零POST，remote submit count/outcome仍 **NOT_EVALUATED / UNKNOWN**。`unit-stop-receipt.json`封存EXECUTION_EVIDENCE_GAP和STOP：observed output0、后续调用0、API0、Comfy0、workflow integration NOT_STARTED、全部visual findings NOT_EVALUATED。它是执行入口阻塞，不是坐姿方案或模型质量FAIL。
+
+标准 `load_production_project`在试验前后均成功；`production-before.json` / `production-after.json` 的project bytes、Manifest/Registry规范模型hash及Manifest33完全相同。无Production writes、输入准入或activation，无新视频/音频/HyperFrames；原full S01、真实接续、human1.0x、完整故事AC-7均未通过。本单元1/1 invocation已用且不释放；原准备paid图片2、本地模型图片2、原视频0、历史视频11是已确认历史，不把未知web调用算成0或已完成图片。
+
+最低恢复条件：先由同一次调用的可靠证据完成outcome reconciliation，再恢复并核验实际composer/upload readiness；unknown未关闭前不补发、不改用本地、不remint该intent。取得新bounded候选后，须完整验坐姿/身份/邻座/保护/尺寸，再决定共享工作流接入。
+
+在真实blocker处按 `record-ai-video-session`更新同一主record和研究状态。`distill-ai-video-learning`评估 **no_candidate**：没有新可验媒体，不能验证姿态假设或自动采用社区方案；该工具超时与历史其他MCP问题边界不同，未建立可采用的重复机制。无Skill/Policy/Gate、global memory或RAG index更新。没有源码实现，implementation Risk Gate不触发；Parent完成artifact/状态核对，未新增reviewer。foreign staged/dirty保持，文档checkpoint的exact Harness/commit/push另由实际receipt与Git报告证明。
+
 ## Evidence Index
 
 此表只为本次原开场准备单元建立identity；历史其他实验不并入。remote boundary为Seedream/`doubao-seedream-5-0-pro-260628`、Ark shared image owner、1152×2048 PNG；新增local boundary为Qwen-Image-Edit-2511/三引用masked profile、944×1672 PNG，不与remote合同或计数合并。同一图片的receipt、bytes、materialization和visual proof使用同一request fingerprint independence_key，只贡献一个图片样本；预transport失败不是第二个视觉样本。
@@ -376,6 +396,7 @@ Parent实际original-resolution `view_image`：Zhou身份/衣物与原图对应�
 | local-masked-visual | native-image:2d5994083367b056436bd7bb98b2cccd33216de31cb9d4caa5a6054ea07c85ec | jieshi-original-local-masked-20261014 | original-s01-local-masked-20261014-001 | N/A | 62a4414bdc72f1409c88a2fd145ad4bd06d7c85156f6051d7fb0bc2955d982e9 | VISUAL_INSPECTION | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | local-masked-execution | runs/canvas-jieshi-original-s01-s02-20261013-001/local-masked-20261014-001/static-image-review.json |
 | local-Z-execution | native-image:a6175b8930d3e7bd84ae3bff8bdc6beacc9c73be3973fd6bc1110e5dd6149455 | jieshi-original-local-targeted-repair-20261014 | original-s01-targeted-Z-generation-20261015-001 | N/A | 102c1ec74f873a0de8297d2cf9de1477a9ae1cf0b0fc654836e6e8dc7e127557 | LOCAL_MODEL_EXECUTION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/local-targeted-repair-20261014-001/Z-execution-receipt.json |
 | local-Z-visual | native-image:a6175b8930d3e7bd84ae3bff8bdc6beacc9c73be3973fd6bc1110e5dd6149455 | jieshi-original-local-targeted-repair-20261014 | original-s01-targeted-Z-generation-20261015-001 | N/A | 102c1ec74f873a0de8297d2cf9de1477a9ae1cf0b0fc654836e6e8dc7e127557 | VISUAL_INSPECTION | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | local-Z-execution | runs/canvas-jieshi-original-s01-s02-20261013-001/local-targeted-repair-20261014-001/Z-static-image-review.json |
+| pose-web-invocation | external-authoring:8811e001d70794f03f8d34edfcdf9d5ea26f20bd53fa907e41d09e84d537fc2b | jieshi-original-pose-reference-trial-20261015 | original-s01-pose-reference-web-20261015-001 | N/A | NO_ARTIFACT:OUTCOME_UNKNOWN | LOCAL_TOOL_EXECUTION | OUTCOME_UNKNOWN | EXECUTION_EVIDENCE_GAP | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/pose-reference-trial-20261015-001/mcp-call-timeout.json |
 
 ## Historical Record And Learning Update
 
