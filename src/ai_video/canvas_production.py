@@ -141,6 +141,11 @@ class CanvasProductionService:
         return loaded
 
     @_input_errors
+    def prepare_image_assets(self, *, operations):
+        from ai_video.production.image_preparation import prepare_canvas_image_assets
+        return prepare_canvas_image_assets(self._load(), operations)
+
+    @_input_errors
     def prepare_image_workflow(self, **arguments):
         from ai_video.canvas_image_workflow import prepare_canvas_masked_image
         return prepare_canvas_masked_image(loaded=self._load(), **arguments)

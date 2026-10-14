@@ -40,3 +40,11 @@ Verification：标准Production loader/committer集成测试，三引用lineage�
 ## Completion Boundary
 
 交付可运行的共享作图工作流、接口和实际工程验证。候选画面/七倒影质量、S01/S02 MP4、声音语义和human1.0x未实际验证时仍为NOT_EVALUATED；不以工程checkpoint标记原连续单元完成。记录沿既有原S01–S02主record更新，learning默认不从未实测workflow推导普遍结论。
+
+## Continuation — Input Preparation And One Local Attempt
+
+已发布工程与只读runtime checkpoint后用户要求继续。Native `image_workflow_seam`核对现有Manifest19 resume/revise路径，确认原node selection与human/web import不能真实表示新mask/crop/padding。Native `image_mask_contract`仅拥有新 `production/image_preparation.py` 与对应tests；Parent拥有service薄API、reader消费者、集成tests、policy/docs与原候选数据，workers不写原Production/执行媒体。准备receipt复验留在Production leaf，reader不反向依赖Canvas模块。
+
+先实现无副作用、当前Registry来源的显式像素准备，标准reader重开同一receipt；通过relevant tests/Harness和Risk Gate后owned commit/push。随后固定原bytes和七反射/左右手/机位的完整准备要求，明确padding/crop/mask与模型文字的适配；经已有canonical authoring revision、exact prepare/preflight/intent/one-use permit提交一个strict-loopback本地candidate。有限单元最多1次、20分钟模型执行观察、无cloud/重抽；unknown停止，超时不重铸permit或另发请求。
+
+输出保护像素验证与原S01完整静态QA分开。局部图FAIL/缺证停止镜头推进；素材通过也不能解除声音 `EVIDENCE_REPAIR_FIRST` 或代签视频Gate。下一真实视频仍沿原授权单元逐次核验，绝不消费旧B或改历史计数。

@@ -60,6 +60,9 @@ Character作image2，mask经ImageToMask/SetLatentNoiseMask与最终ImageComposit
 
 `canvas_image_workflow`仅从current Character/Scene/Registry准备exact request/preview/profile；
 `CanvasProductionService.prepare_image_workflow`和既有CLI同名action无Provider或state副作用，不加载operator runtime。
+`production/image_preparation`独占显式pad/crop/binary mask像素准备与content-addressed source/operation receipt；
+`CanvasProductionService.prepare_image_assets`返回保留旧assets的Registry候选/PreparedArtifacts，既有
+`revise_authoring`和committer才可持久化。标准reader复验同一leaf，不反向依赖Canvas或伪称human/web import。
 真实生成仍经已配置candidate preparer的`ProductionStateCommitter.generate_image_asset`，不新建workflow生命周期。
 输入/工程PASS不证明mask内剧情质量、clean plate、视频连续性或human acceptance。
 checks归现有`production_image_tests`、`canvas_production_workflow_tests`和reader/state/dependency/Architecture gates。

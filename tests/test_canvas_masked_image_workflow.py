@@ -119,6 +119,34 @@ def test_unselected_mask_rejected_before_any_intent(tmp_path):
     assert service._load().manifest == before
 
 
+def test_pixel_preparation_revises_current_registry_and_reopens_exact_lineage(tmp_path):
+    from ai_video.production.image_preparation import CanvasImagePreparationOperation
+    service, _, _ = runtime(tmp_path)
+    before = service._load()
+    source = next(a for a in before.registry.assets if a.asset_id == "scene")
+    operation = CanvasImagePreparationOperation(kind="crop", source_asset_id="scene",
+        source_sha256=source.sha256, new_asset_id="identity-crop",
+        usage_license="fixture explicit local crop", crop_box=(32, 32, 128, 160))
+    prepared = service.prepare_image_assets(operations=[operation])
+    assert service._load().manifest == before.manifest
+    assert all(a in prepared.registry.assets for a in before.registry.assets)
+    data = deepcopy(service.direction)
+    data["characters"][0]["reference_asset_ids"].append("identity-crop")
+    service.direction = data
+    service.revise_authoring(attempt_id="prepared-crop-revision", registry=prepared.registry,
+        asset_artifacts=prepared.artifacts)
+    after = service._load()
+    assert all(a in after.registry.assets for a in before.registry.assets)
+    assert after.characters[0].revision == before.characters[0].revision + 1
+    assert after.characters[0].reference_asset_ids[-1] == "identity-crop"
+    assert after.manifest.attempts[:len(before.manifest.attempts)] == before.manifest.attempts
+    assert after.asset_paths[source.asset_id].read_bytes() == before.asset_paths[source.asset_id].read_bytes()
+    receipt = next(a for a in prepared.artifacts if a.relative_path.suffix == ".json")
+    (tmp_path / receipt.relative_path).write_bytes(b"{}")
+    with pytest.raises(AiVideoError, match="Prepared image evidence"):
+        load_production_project(tmp_path / "project.yaml")
+
+
 class ScriptedProvider:
     def __init__(self, profile, image_bytes):
         self.profile, self.image_bytes = profile, image_bytes

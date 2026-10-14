@@ -104,6 +104,13 @@ native payload 使用同一原图的 inline PNG。默认纯文字 profile 不接
 先通过现有Registry/authoring revision选择人物PNG、场景构图PNG和同尺寸黑白mask；mask归同一Scene，
 白色为允许编辑区、黑色为保护区。mask不是新的角色图，也不伪造为原剧本中的canvas节点。
 
+新mask/crop/padding由 `CanvasProductionService.prepare_image_assets(operations=...)` 无副作用准备。
+每项操作显式给current Registry的source ID/SHA、新asset ID、license和像素参数；仅支持不缩放的
+最小8倍数补边、identity crop与binary region mask。返回merged Registry、PreparedArtifacts和
+content-addressed preparation receipts，保留旧assets；通过既有 `revise_authoring` 提交并绑定
+Character/Scene后再prepare request。Production reader重放操作并复验source/output，不能假称原
+canvas resource、human/web import或accepted Shot。源图不合剧情时，补边和crop不会解除质量失败。
+
 API `CanvasProductionService.prepare_image_workflow` 或共用CLI同名action接收普通参数：
 `attempt_id/shot_id/target_asset_role/character_id/character_asset_id/source_asset_id/mask_asset_id/seed/prompt_text`
 与`profile_path/artifact_root`，可选`negative_prompt_text`。它沿标准loader重开当前项目，输出sealed

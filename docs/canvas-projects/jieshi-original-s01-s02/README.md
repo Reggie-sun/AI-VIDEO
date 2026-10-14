@@ -2,6 +2,8 @@
 
 ## Status And Entry
 
+2026-10-14最新续执行：共享本地masked工作流工程已发布 `d37d0482e4a0d6205b2c546ba010e24433dccd8c`，实际只读runtime预检PASS，尚未进行GPU推理。用户要求继续，现准备一个最多1次的strict-loopback local单元，保留前两次paid图的FAIL与计数，不转用旧edit/B。历史审阅图仅作为布局/身份准备source，经显式3px补边、人物crop与玻璃内部binary mask及canonical revision绑定后才可进模型；不是accepted S01。新静态模型文字见 [S01-local-masked-preparation-input.txt](S01-local-masked-preparation-input.txt)。本路线直接准备原首帧七倒影/林砚缺席，不再额外要求八实体全可见或正常八倒影底图；下方旧technical-base文本与单元留作历史，不作为新路线输入。
+
 本目录承接《界蚀》原 S01→S02；共享 `inspect/author/preflight` 已实际运行。2026-10-14 用户先授权2 PNG+2视频单元，第一张QA FAIL；随后“继续做图啊”对应最多新增2图片的有界修复：一次修正base，只有全项PASS才一次同源edit，金额总上限仍200 CNY内部operator bound，非价格/账单。现累计真实图片POST **2**、原单元视频POST **0**，两张底图均QA **FAIL**，没有合格原S01首帧或成片。
 
 共享修复 `0234fc55e3be9bb188db1ab8ca7a5ec12acd0066` 已push/remote SHA核验；旧local materialize失败经唯一owner显式封存，Manifest12→13，原图/paid ACCEPTED/reservation与active tuple均保留。新修正图SHA `ba9eb952c5606333727198800fa593abce806b3c239188425ebb7b27087cab4f`，1152×2048，4,671,205 bytes；真实POST一次、HTTP200、canonical materialization/Registry activation成功，Manifest19。但实际图只见七名实体、窗中映像重复且不完整，还生成“界蚀”标题；视觉QA为1 PASS/5 FAIL/1 NOT_EVALUATED。**STOP：未edit、未提交视频、未签QA或human acceptance**。工程/Registry activation不证明原S01。详见[当前修复与验收记录](../../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#bounded-image-repair-and-stop--2026-10-14)。

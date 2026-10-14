@@ -33,6 +33,14 @@ Canonical Registry/Manifest/committer/P5/ResolvedTimeline/HyperFrames owners不�
 
 原两个失败base不重分类，不挪用旧edit或B额度。工程验证不发 paid POST；严格local/unmetered runtime核验按既有豁免进行。真实图片生成前另核对task有限单元、exact输入、qualified runtime及一用permit。
 
+## Explicit Input Preparation — Continuation
+
+用户继续要求真实作图后，标准reopen发现当前Character无reference、Scene无source/mask；旧941×1672审阅图不满足8倍数geometry。现有PNG selection只接受原canvas node/resource，human/web import也不适用于Agent制作的mask/crop/padding。不得为运行工作流伪称源节点或真人审批。
+
+补充唯一共享无副作用准备入口，复用已有Pillow、Registry semantic hash、content-addressed PNG/receipt与PreparedArtifact。只允许显式padding（不resize）、identity crop、binary region mask；核对当前source asset ID/SHA/contained bytes和操作边界。返回保留全部旧assets的Registry候选与artifacts，交既有 `revise_authoring`/committer提交；标准reader按同一leaf复验准备receipt与source/output bytes。来源为已注册synthetic image的明确派生，不伪装human/GPTweb生成或accepted Shot；不新增状态库/自动蒙版/原图覆盖。
+
+Parent self-review：该补充是接通真实输入的必要缺项，操作是可重放的像素准备；source职责与原accepted state、mask内模型质量分开。padding保持原区域所有像素及尺度，cropped identity不代表已确认原手部或服装，mask区域须作者实际审阅。原剧情requirement、paid计数和QA阈值不变。
+
 ## Acceptance Criteria
 
 1. 共享请求、Canvas preparation、committer intent/activation与标准reader均可识别同一mask lineage；未选中/stale/错误SHA的mask在副作用前拒绝。
@@ -40,6 +48,7 @@ Canonical Registry/Manifest/committer/P5/ResolvedTimeline/HyperFrames owners不�
 3. binary mask/geometry/channel/identity校验有执行证据；保护像素任一改变均被拒绝。
 4. exact replay不重复调用；标准loader读回result/provenance/Registry边，fake工程证明明确区分真实媒体。
 5. 旧profiles和旧request hashes不变；相关tests及exact Harness通过后按Risk Gate裁决、owned commit/push并核验远端。
+6. 新准备资产有真实source/operation lineage，旧Registry/history不丢失；标准reader拒绝stale、receipt/bytes篡改与越界操作，preparation不代签素材质量。
 
 ## Parent Self-Review
 
