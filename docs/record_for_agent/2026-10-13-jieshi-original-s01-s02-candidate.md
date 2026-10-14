@@ -11,7 +11,7 @@ Date: 2026-10-13
 
 ## Supersession Notice — 2026-10-14
 
-当前最新checkpoint为下文 **Native Masked Image Workflow Implementation**：本地三引用蒙版作图已接回共享 Canvas/image/committer/reader，工程提交 `d37d0482e4a0d6205b2c546ba010e24433dccd8c` 已push并核验remote main。exact staged Harness通过，实际本机read-only profile preflight通过；未运行模型推理或新增图片/视频。两张原准备图片实际QA均FAIL，累计图片2、原单元视频0，Manifest19，未edit、handoff或输出成片。共享修复 `0234fc55e3be9bb188db1ab8ca7a5ec12acd0066` 已解除旧本地materialization阻断；技术准入、工作流工程与素材QA仍分开。此前“Manifest12/图片1/共享code未改”及“本地无mask路线”为保留的历史checkpoint，不是当前实现。
+当前最新checkpoint为下文 **Actual Local Masked Generation And Targeted Repair**：本地三引用蒙版作图已真实执行1次，exact PNG技术准入成功但静态QA为2 PASS/4 FAIL/1 NOT_EVALUATED。蒙版外1,096,780像素RGB完全相同，窗内人物/道具/空间没有通过。累计原准备paid图片2、本地模型图片1、原视频0，Manifest25；没有accepted S01、handoff或成片。已封存最多再2次针对具体人物的本地修复，未提交；不挪旧edit/B、不重抽旧单元。共享工程 `d37d0482e4a0d6205b2c546ba010e24433dccd8c` 及输入准备 `49485ee5bfff539e4ebb9a5902a37c0dd501e0e3` 已push/remote核验。此前“只读runtime/无模型推理/Manifest19”是保留的历史checkpoint；技术准入、工程与素材QA仍分开。
 
 用户已明确授权最多2 Seedream PNG+2原S01/S02 Fast4s、480p/native audio、零重抽的200 CNY内部上限单元。下文此前“新单元未授权/新增POST=0/Manifest revision3”为历史checkpoint，已被文末真实执行取代：新增1图片POST、0视频POST，exact底图视觉QA FAIL，未进入第二张或视频。paid receipt ACCEPTED与本地materialize `outcome_unknown`分开保留；不是Provider结果未知，也不是原S01成功。
 
@@ -19,7 +19,7 @@ Date: 2026-10-13
 
 用户明确纠正：旧抬手机/起身两镜为 Agent 简化测试，不是原开场。本次从已发布 shared inspect/author/preflight 继续，准备原 S01→S02 候选及逐项忠实度矩阵，不重建执行链。原开场两镜采用0–3/3–7秒；S03/S04才补足7–15秒，当前只保留映射、不扩4次生成。
 
-当前媒体停止点为素材 `QUALITY_FAILURE`；旧本地candidate materialization阻断已解除。本地masked lane已实现并做实际只读runtime预检，原单元尚缺按当前Scene/Character职责准入的source与binary mask，也未运行GPU推理。声音语义仍缺合格听音/登记路线的 `EVIDENCE_REPAIR_FIRST`。对原文“clean plate必须最终视频overlay”的过早解读已撤回：原文只要求几何一致且只删除林砚映像，可以先准备首帧。已补同一Seedream adapter的单PNG参考，但前两次实际使用T2I；底图失败不能签实际plate或raw video成功。没有激活QA或qualified视频runtime。未生成新的原剧本MP4、没有前镜accepted source、没有state handoff/后镜submit、没有HyperFrames成片；human1.0x及故事AC-7 `NOT_EVALUATED`。
+当前广域masked候选为素材 `QUALITY_FAILURE`，本地unit1已用1/1并停止该attempt；已诊断后封存targeted repair有限unit，不推进视频。旧本地candidate materialization阻断已解除。source/identity crop/binary mask已按当前Scene/Character职责经canonical revision准入并真实推理，缺的仍是合格剧情画面。声音语义仍缺合格听音/登记路线的 `EVIDENCE_REPAIR_FIRST`。对原文“clean plate必须最终视频overlay”的过早解读已撤回：原文只要求几何一致且只删除林砚映像，可以先准备首帧。已补同一Seedream adapter的单PNG参考，但前两次实际使用T2I；准备图失败不能签实际plate或raw video成功。没有激活QA或qualified视频runtime。未生成新的原剧本MP4、没有前镜accepted source、没有state handoff/后镜submit、没有HyperFrames成片；human1.0x及故事AC-7 `NOT_EVALUATED`。
 
 ## Owned Work
 
@@ -286,9 +286,31 @@ Supervisor实际启动任务自有unit `ai-video-comfyui-6970131d868d4c7faec099f
 
 本稳定checkpoint按 `record-ai-video-session` 更新同一主record，自动按 `distill-ai-video-learning` 评估为 **no_candidate**。技术fixture、scripted tests、runtime预检及多个proof层不是新独立画质实验；没有实测本地workflow与Seedream的可控对照，也没有更新既有Vidu claim的exact媒体证据。原Evidence Index不添加假媒体attempt，不修改Skill/Policy/Gate、不刷新RAG或全局memory；record没有触发新的媒体、Provider、research或额外全套测试。foreign dirty/staged均保留，只提交当前owned路径。
 
+## Actual Local Masked Generation And Targeted Repair — 2026-10-14
+
+用户继续后，原生mapping确认新mask/crop/padding没有合法原node/human-web import接点。共享 `production/image_preparation.py` 复用Registry/PreparedArtifact，独占显式最小8倍数padding、crop、binary region mask与source/operation receipt；标准reader重放同一leaf验证。Native worker18项unit测试，Parent补APNG拒绝、如实 `local_pixel_preparation` origin与typed loader错误；真实标准loader/revise的tamper测试先RED后GREEN。focused suite61 PASS，工程 `49485ee5bfff539e4ebb9a5902a37c0dd501e0e3` 已push并核验remote main。
+
+`.agent/harness/runs/canvas-image-preparation-20261014-r1/receipt.json` 绑定exact12 owned-path commit range：16 selected checks中15实际PASS、1同轮reader覆盖skip，提交后fresh=true；Canvas238、reader569、image172、image-state118、Seedream38项通过。Architecture PASS，reader薄delegation有效行+5 WARN保留。另一个writer已暂存AGENTS/playbook，采用path-limited commit保留其index，未夹带。final Risk Gate按最新native-only规则为 `NATIVE_REVIEW_NOT_REQUIRED`，source hashes/snapshot及三个trigger见 `local-masked-20261014-001/input-preparation-review-risk.json`；不调用或探测Kimi，原历史route保留。
+
+### Exact Input And One Actual Submit
+
+证据根 `runs/canvas-jieshi-original-s01-s02-20261013-001/local-masked-20261014-001/`。历史布局PNG仅作未accepted准备source，右补3px到944×1672，不缩放；Lin头肩crop352×480；binary mask覆盖三个玻璃内部区域。三资产原始来源、操作、RGB、SHA及content-addressed receipts已实际检查，`canonical-input-binding.json`记Manifest19→21；旧Registry/assets/attempts全部保留，Shot原intent字节不变。Lin Character revision2、opening Scene revision2按唯一committer准入；不是原S01 accepted state。
+
+Actual request `2d5994083367b056436bd7bb98b2cccd33216de31cb9d4caa5a6054ea07c85ec`，seed2026101401、profile d9179d4f…，exact `request/preview/execution-profile/authorization/workflow` 和静态rubric均在submit前封存。operator误用不存在的budget字段在进入Provider前失败，Canonical attempt/permit未创建、transport0；核对Manifest21和空event目录后重开同一request/authorization，改用已存在 `active_paid_provider_budget`。`operator-setup-known-no-effect.json`保留错误，不视为一次图片生成、不复用permit或重抽。
+
+Supervisor actual core-only unit `ai-video-comfyui-9d02303789fd4e1f99c54cb545464a2a.service` / invocation `8e76c619228a4deca7fd3cfc027da36a`，loopback-only/offline。fresh profile/model/refs预检、durable intent与one-use permit沿原owner通过；Observer只记录exact transport事件，不替代Production state。实际3次local上传与1次prompt submit，job `96d42b33-96dc-49fd-b359-d727da96d727`，无remote/paid/重试；执行214.693秒含fresh preflight。exact PNG `62a4414bdc72f1409c88a2fd145ad4bd06d7c85156f6051d7fb0bc2955d982e9`，944×1672、2,101,450 bytes，技术SUCCEEDED/Registry准入，Manifest25，paid budget pointer不变。
+
+### Actual Image Review And Bounded Next Unit
+
+Parent实际 `view_image(detail=original)` 看exact输出，复验1,096,780 black-mask像素，RGB变化0。`static-image-review.json`：2 PASS（保护像素、无文字单PNG）、4 FAIL（他人身份、七完整坐姿/站姿倒影、道具、车厢几何）、1 NOT_EVALUATED（窗内新增未能归属的深外套浅灰衣男子，不能签Lin映像缺席）。广域编辑换了脸/服装，把暗门换成白墙，保护条旁残留旧人物片段；不称“保护PASS=原剧本PASS”。首个local unit1/1用完且STOP，视频0，没有原native音轨、字幕/trim、handoff或HyperFrames。
+
+新有限修复证据 `local-targeted-repair-20261014-001/bounded-local-repair-unit.json` 保留该predecessor与精确FAIL图。最多再2次local submit、每次1200秒、blind retry0，本地累计cap3、paid0：恢复历史布局source，先只处理Zhou站姿并用Zhou自己的身份crop；该target/preservation证据PASS后才只处理He截断并用He身份crop。所有完整首帧要求保持，中间修复图仍不是accepted S01，不推进后镜。unknown或target FAIL/NE、缺新可归因变量或预算耗尽停止；不会由原paid剩余额度、旧B或新agent名字重置消费。
+
+`record-ai-video-session`在首个真实local FAIL checkpoint更新此主record；`distill-ai-video-learning`评估仍为 **no_candidate**。现在有一个新的Qwen实测，source/ref/mask/model/目标合同与旧Seedream技术base同时不同，不能当isolated对照、推断所有工作流无效或外推既有Vidu声音claim。工程保护属性有真实证据，mask内剧情质量仍FAIL；不修改/采用Skill/Policy/Gate、不刷新RAG或全局memory。后续修复状态另经真实新receipt取代本planned段。
+
 ## Evidence Index
 
-此表只为本次原开场准备单元建立identity；历史其他实验不并入。本次remote boundary为Seedream/`doubao-seedream-5-0-pro-260628`、Ark shared image owner、1152×2048 PNG。同一图片的receipt、bytes、materialization和visual proof使用同一request fingerprint independence_key，只贡献一个图片样本；预transport失败不是第二个视觉样本。
+此表只为本次原开场准备单元建立identity；历史其他实验不并入。remote boundary为Seedream/`doubao-seedream-5-0-pro-260628`、Ark shared image owner、1152×2048 PNG；新增local boundary为Qwen-Image-Edit-2511/三引用masked profile、944×1672 PNG，不与remote合同或计数合并。同一图片的receipt、bytes、materialization和visual proof使用同一request fingerprint independence_key，只贡献一个图片样本；预transport失败不是第二个视觉样本。
 
 | evidence_id | independence_key | experiment_id | attempt_id | arm_id | artifact_sha256 | proof_layer | verdict | failure_class | relation_kind | related_evidence_id | source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -302,6 +324,8 @@ Supervisor实际启动任务自有unit `ai-video-comfyui-6970131d868d4c7faec099f
 | repair-base-bytes | native-image:c5e32912fd1bd00b8bf0afc26d40133305cc95a5bfea9d1c3a0523d633c03011 | jieshi-original-preparation-20261014 | original-preparation-base-repair-20261014-001 | N/A | ba9eb952c5606333727198800fa593abce806b3c239188425ebb7b27087cab4f | TECHNICAL_BYTES | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | repair-base-submit | runs/canvas-jieshi-original-s01-s02-20261013-001/image-repair-20261014/base-001/image-review.json |
 | repair-base-materialization | native-image:c5e32912fd1bd00b8bf0afc26d40133305cc95a5bfea9d1c3a0523d633c03011 | jieshi-original-preparation-20261014 | original-preparation-base-repair-20261014-001 | N/A | ba9eb952c5606333727198800fa593abce806b3c239188425ebb7b27087cab4f | LOCAL_MATERIALIZATION | SUCCEEDED | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | repair-base-submit | runs/canvas-jieshi-original-s01-s02-20261013-001/image-repair-20261014/base-001/stop-state.json |
 | repair-base-visual | native-image:c5e32912fd1bd00b8bf0afc26d40133305cc95a5bfea9d1c3a0523d633c03011 | jieshi-original-preparation-20261014 | original-preparation-base-repair-20261014-001 | N/A | ba9eb952c5606333727198800fa593abce806b3c239188425ebb7b27087cab4f | VISUAL_INSPECTION | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | repair-base-submit | runs/canvas-jieshi-original-s01-s02-20261013-001/image-repair-20261014/base-001/image-review.json |
+| local-masked-execution | native-image:2d5994083367b056436bd7bb98b2cccd33216de31cb9d4caa5a6054ea07c85ec | jieshi-original-local-masked-20261014 | original-s01-local-masked-20261014-001 | N/A | 62a4414bdc72f1409c88a2fd145ad4bd06d7c85156f6051d7fb0bc2955d982e9 | LOCAL_MODEL_EXECUTION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/local-masked-20261014-001/execution-receipt.json |
+| local-masked-visual | native-image:2d5994083367b056436bd7bb98b2cccd33216de31cb9d4caa5a6054ea07c85ec | jieshi-original-local-masked-20261014 | original-s01-local-masked-20261014-001 | N/A | 62a4414bdc72f1409c88a2fd145ad4bd06d7c85156f6051d7fb0bc2955d982e9 | VISUAL_INSPECTION | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | local-masked-execution | runs/canvas-jieshi-original-s01-s02-20261013-001/local-masked-20261014-001/static-image-review.json |
 
 ## Record And Learning Update
 

@@ -48,3 +48,9 @@ Verification：标准Production loader/committer集成测试，三引用lineage�
 先实现无副作用、当前Registry来源的显式像素准备，标准reader重开同一receipt；通过relevant tests/Harness和Risk Gate后owned commit/push。随后固定原bytes和七反射/左右手/机位的完整准备要求，明确padding/crop/mask与模型文字的适配；经已有canonical authoring revision、exact prepare/preflight/intent/one-use permit提交一个strict-loopback本地candidate。有限单元最多1次、20分钟模型执行观察、无cloud/重抽；unknown停止，超时不重铸permit或另发请求。
 
 输出保护像素验证与原S01完整静态QA分开。局部图FAIL/缺证停止镜头推进；素材通过也不能解除声音 `EVIDENCE_REPAIR_FIRST` 或代签视频Gate。下一真实视频仍沿原授权单元逐次核验，绝不消费旧B或改历史计数。
+
+## Known Failure Extension
+
+首个local unit已用1/1，exact PNG落盘/技术准入但广域窗面编辑破坏他人身份与空间；保护区1,096,780像素变化0。该attempt STOP/QA FAIL保留。新local unit有明确输入差异：恢复原始布局，选择实际被编辑角色自己的identity crop，仅改Zhou站姿；target-specific检查与非目标保护通过后，仅改He右缘完整性。最多2新submit、每次1200秒、本地累计cap3、paid0、blind retry0；不是重抽旧单元或无条件追加预算。
+
+完整七倒影/身份/道具/摄影/缺席要求持续追踪，单个人物修复的中间图不冒充合格S01。Z target FAIL/NOT_EVALUATED不提交H，unknown立即停止；新unit预算或可归因变量耗尽时报告原剧情缺项，不再扩量。原Scene/Shot/Gate不简化，没有第二timeline、renderer或故事执行脚本。
