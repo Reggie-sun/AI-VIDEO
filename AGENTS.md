@@ -37,6 +37,12 @@
 
 Model-quality uncertainty 主导且有安全、有界、已授权或 local exemption、可负担、可归因的最小实验时，先取证再扩建验证工程；用户要求先 contract 时遵从。实验不产生 Production qualification/activation/P6/Final Acceptance/release/replay truth。
 
+### Community Reference And Workflow Improvement
+
+遇到模型质量、工作流能力或反复失败问题，先核对exact输入、结果和当前失败状态，再参考可追溯社区实践、官方/模型作者资料及反例；结合当前工具/模型/版本、授权与约束判断适用性。优先适配有证据的成熟方案，不只反复改prompt或先扩建执行工程。
+在已授权且outcome已知的边界内做可归因的最小真实验证，逐项核验原目标及已满足项，保留输入/输出identity与verdict；社区推荐、技术PASS或局部效果不能代替完整验收，UNKNOWN不盲重试。
+验证有效且适用范围明确后，将可复用步骤、参考职责、能力限制和验收要求写回现有workflow owner并验证；单例只记录有界经验，不自动升级普遍规则或削弱Gate。具体生图流程见[工作流](docs/canvas-production-harness.md#agent-image-authoring-workflow)，证据与学习沿Completion Standard的record/learning owner；不把素材、实验日志或第二执行链放进本constitution。
+
 ### Per-Shot Post-Media Gate
 
 每 Shot exact MP4 落盘后、下一 Shot submit 前，显式调用 project-local `video-analysis` MCP，按 sealed intent/required findings/前序 accepted state 逐项裁决；仅全 `PASS` 推进。禁止 batch 后补、hook/score 替代；缺失/陈旧/identity mismatch/MCP 不可用为 `NOT_EVALUATED`。

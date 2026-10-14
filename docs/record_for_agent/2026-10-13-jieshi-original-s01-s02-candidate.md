@@ -11,6 +11,8 @@ Date: 2026-10-13
 
 ## Supersession Notice — 2026-10-15
 
+最新治理续执行见 **Community Validation Principle And Checkpoint — 2026-10-15**：用户要求把“遇到问题参考社区、实际验证、写回工作流”写入AGENTS，仅新增薄原则/已有owner锚点；原暂存的native reviewer迁移不夹带。本轮不生成媒体、不修改Production或LearningClaim，原S01/声音/UNKNOWN边界保持。
+
 最新checkpoint见 **Codex Direct Image And Authoring Workflow Rule — 2026-10-15**：用户明确改用Codex内置工具，独立1次实际生成并exact copy落盘；老人坐下/放开扶杆，target static 5 PASS/1 NOT_EVALUATED。原图944×1672、输出943×1668，精确像素保护及完整原S01仍未通过，未导入/激活、Manifest33不变。用户随后明确要求把默认生图规则写入现有工作流，并批准只改playbook生图小节、独立提交且保留原暂存修改；无新增Provider调用或产品adapter。
 
 上一尝试见 **Pose Reference Trial And MCP Execution Stop — 2026-10-15**：先前1次 `chatgpt-web` MCP 300秒超时，页面空白/入口未就绪，未取回 exact 图片；原remote outcome UNKNOWN继续保留，没有重发、退款消费或伪称outcome已关闭。后来的内置调用来自用户新的明确路线指示，不是自动fallback。下段为仍有效的上一媒体/工程 checkpoint。
@@ -395,6 +397,18 @@ Parent实际original-resolution看图，并在写规则时重新核对bytes/尺�
 Native Codex Parent串行完成这一有界文档变更；没有源码/parser/lifecycle/credentials/budget/Gate改动，用户未要求independent review，未触发重大后果与验证缺口，Risk Gate为NATIVE_REVIEW_NOT_REQUIRED。前置规则budget检查曾暴露正文超限，仅精简本次生图summary、详细指导留唯一workflow owner后重新PASS，不增registry限额。exact最终commit range Harness必须另核验fresh receipt，工程/文档PASS不代媒体验收。
 
 按 `record-ai-video-session`稳定checkpoint更新同一记录。`distill-ai-video-learning`为 **no_candidate**：单次内置图片能证明该次坐姿效果，不能由模型/姿态输入同时改变推导通用胜率；旧web超时无图片，不算视觉反例。规则属于用户明确的新偏好，不是自动采用Learning Claim；没有制造第二确认、改Skill/Policy/Gate、刷新RAG或写global memory。
+
+## Community Validation Principle And Checkpoint — 2026-10-15
+
+上一工作流规则已独立发布 `96c5ba346b3d27c07438d3e0437be91f37fead60`，远端main已核验。`.agent/harness/runs/codex-generated-image-workflow-rule-20261015-r1/receipt.json`有10项checks PASS；共享工作区保留同file foreign暂存，因此默认receipt freshness=false，不宣称当前dirty状态fresh。通过现有 `isolated_verification_workspace` 核验同一exact commit后fresh=true，证据为同目录 `exact-commit-verification.json`；临时验证checkout已清理，原receipt bytes不改。上一阶段在默认freshness失败后先发起push，顺序不妥，已明确说明并补exact提交核验；后续publication须在适用快照核验完成后执行，不削弱freshness规则、不清空foreign index或重写旧结果。
+
+当前用户要求将“遇到问题参考社区→实际验证→写进工作流”写入 `AGENTS.md`。Parent只新增 **Community Reference And Workflow Improvement**：先诊断exact失败和输入，参考可追溯作者/官方/社区及反例、核对模型工具版本/授权/约束；在known outcome与已授权边界内做最小可归因实测，保全原剧情与已满足项；验证有效且适用范围明确后，沉淀可复用步骤/输入职责/能力限制/验收要求到已有workflow owner。社区推荐/局部PASS不代完整验收，单例不升级通用规则，UNKNOWN不盲重试，具体素材/日志不扩进constitution或第二执行链。
+
+写前精确核对 `AGENTS.md` 原暂存的native reviewer迁移，用户明确选择A：只提交新增原则，原有暂存保留；与上一轮仅针对playbook的授权分开核验。沿已使用的独立Git index只提交本次AGENTS hunk与本primary record，提交后比较原暂存路径、playbook blob及AGENTS原暂存增删内容。其他foreign staged/dirty不编辑，不创建development worktree；Harness标准隔离checkout仅用于exact提交验证。
+
+这是用户明确指定的可逆Agent工作原则，不是Product Provider/Gate/预算/恢复实现变更；Native Codex Parent串行处理，未产生需要CodeGraph/delegation的结构问题。相关documentation/rules/Harness checks按exact scope运行；无用户要求的independent implementation review、重大后果或实质运行时验证缺口，Risk Gate为NATIVE_REVIEW_NOT_REQUIRED。原图/新图/全部receipt保留，媒体/Provider/模型下载/Production writes/RAG刷新/global memory更新均0，不为record/hook追加取证调用或额外测试。
+
+`record-ai-video-session`核对已有稳定checkpoint并更新同一主record；`ai-video-record-2331904e3bd70b88`已以recorded/no_candidate ACK，acknowledged=true。`distill-ai-video-learning`仍为 **no_candidate**：没有新媒体或受控对照，只有用户明确的新工作原则和前次bounded效果，不制造通用模型结论、LearningClaim或第二确认；后续capture按实际新ID另核验，不重ACK旧request。
 
 ## Evidence Index
 
