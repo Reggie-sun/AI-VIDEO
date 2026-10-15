@@ -2,7 +2,9 @@
 
 ## Status And Entry
 
-2026-10-15最新媒体checkpoint：用户要求图完成后生成原视频，实际新增3次Codex内置修图，七名完整他人倒影/最右何静裁边与老人坐姿保留，但最新图仍有苏遥镜像持机FAIL、陈立耳机及完整镜面几何NOT_EVALUATED；不能当原S01 accepted source。当前声音输入实际再次被拒绝，raw可信听音host未接入，Manifest33/Project7仍无active QA policy与原视频attempt。图片未导入/激活，原视频0、历史视频11；内置图片累计4（本轮3），paid准备图2/local模型图2及旧web UNKNOWN保留。现有单元STOP，需首帧完整证据与qualified声音/QA路线后才重走视频fresh gates。详见[实际修图与视频停止证据](../../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#original-frame-completion-attempt-and-video-stop--2026-10-15)。以下latest/historical段为此前checkpoint，非新调用许可。
+2026-10-15最新媒体checkpoint：继续推进时以exact旧图作唯一底图，新增1次Codex内置单物体修图，输出`a1db0247764947b315110ffe166105dcd5927ebc2f5283d142b20fa91b14ed6f`，943×1667。苏遥白手机仍在镜像画面右侧，目标FAIL；条件陈立调用未提交，首帧未导入/激活、原视频0、历史视频11。内置图片累计5，paid准备图2/local模型图2及旧web UNKNOWN保持。标准loader重开Manifest33/Project7、`qa_policy=None`，entrypoint/Manifest/Registry与旧快照相同。现有单元STOP，不能继续同方式抽图或越过首帧Gate。详见[单物体修复及停止证据](../../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#single-object-repair-and-known-quality-stop--2026-10-15)。
+
+声音状态已更新：[Gemini音频观察路线](../../record_for_agent/2026-10-15-audio-understanding-mcp.md#operator-verification-and-live-evidence)在已有4.032s历史WAV完成1次真实MCP调用并返回可用观察。当前Codex原生audio输入仍不支持；这两个事实不能混同，也不能继续声称“没有实际音义工具”。该历史WAV及已消费development permit不代新原镜声音/精确时序/selected QA或human验收。以下latest/historical段为此前checkpoint，非新调用许可。
 
 2026-10-15最新checkpoint：共享Registry历史链修复已发布 `a45fa113b2ffb10bbd071bfa51753849aa82c911`，原生审查的两处时序缺口经standard-loader RED→GREEN及fresh Harness关闭。标准metadata authoring恢复历史前缀后，真实Z单人修复已生成PNG `102c1ec74f873a0de8297d2cf9de1477a9ae1cf0b0fc654836e6e8dc7e127557`；保护区1,536,514像素变化0，但老人仍站立扶杆，target QA **FAIL/STOP**。H未提交，原视频0；当前Manifest33，累计原paid准备图2/local模型图2，新增paid0，无accepted S01/actual handoff/HyperFrames声画交付。自有ComfyUI服务已停止。实际声义仍EVIDENCE_REPAIR_FIRST、human1.0x/完整故事AC-7未验。详见[最新真实证据与恢复条件](../../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#registry-retention-repair-and-actual-targeted-z)。以下2026-10-14准备/授权段为保留历史，不能据旧剩余额度重抽或提交。
 
@@ -73,10 +75,10 @@ PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production preflight --data 
 | First-frame/original image/identity | 历史PNG SHA `4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb` 941×1672，仅 REGISTERED_BYTES。原base `14ce8688…` 和修正base `ba9eb952…` 均实际QA FAIL；后者只是canonical技术素材准入 | 七名实体、重复/不完整反射、机位与标题污染阻断edit/video。没有合格original S01 first-frame；旧图不自动变approved视觉源 |
 | Reflection / clean plate | 原 Next/Risk 要求几何一致窗内plate，但未规定最终视频overlay。现选择首帧准备：同一Seedream模型、单 PNG reference + 作者审查的 bbox编辑；shared adapter已补，见single-reference spec。现有video+局部PNG仍不宣称支持 | **BLOCKED于实际素材**。先正常几何/人物base，再用同源exact图只处理林砚反射区域并验七倒影保护，所得plate作为S01首帧。真实坐标/plate bytes未产生，不能编造；raw MP4仍须全PASS。无需为本单元扩建视频compositor |
 | Hand / camera switch | source prose及state/cut七维可以表达；视频参考可换摄影而carry空间 | actual S01全PASS后source_video+帧71 observation；S02自身验收。边界character_presence为partial，不代表动态事实全通过 |
-| Audio analysis / trusted evidence | 实际audio输入再次返回unsupported；本次MCP medium转写旧原片为 `林燕請在終點站下車`、0–2.24s，虽要求word_timestamps却未返回逐字时间。ControlledPresentationVerifier只接受technical/analyzer、明确拒绝human；Console七项continuity不含声音 | **EVIDENCE_REPAIR_FIRST**。需能实际听音的合格分析环境及selected authority，或接入exact-bound可信human presentation host后由真实人听判；不能把播放网页/文本答复直接当registered verifier、AAC/ASR当音义PASS。当前未接human host，不重生成补证 |
+| Audio analysis / trusted evidence | 当前Codex native audio仍unsupported；project-local `audio_understand`已通过Gemini在exact历史WAV返回真实对白/声线/表演观察。ControlledPresentationVerifier仍只接受technical/analyzer、拒绝human；当前项目未选QA policy | **EVIDENCE_REPAIR_FIRST**针对新原镜与selected QA/精确时序，不能把工具未实现当当前阻塞。后续须为exact新原MP4绑定当前授权/runtime/一次permit并经原evaluator裁决；旧permit已消费，模型估计时间不签精确窗口，不伪造human或重生成补证 |
 | Native audio composition | existing exact source audio registration / auto matching native WAV tracks / canonical sample trim | S01/S02真实accepted source落地后逐镜注册，保留dialogue audio_kind；必须实际验证输出声音，不能静音/重配音 |
 | Captions | existing CaptionTrack、style、source audio clock、CompositionSpec.caption_tracks、HyperFrames | hook是非口述字幕；不能伪造ASR alignment说广播读了hook。需明确authored caption provenance+原生音轨时钟，实际绑定style和sample/frame；目前只有职责，未登记或render |
-| Planner/Router/runtime | shared entry存在；首张图片已有fresh exact preview、profile、budget/egress、durable intent和consumed one-use permit，Provider receipt ACCEPTED。本地candidate validation拒绝 unrelated dependency node | 图片未Registry activate，不能重放POST恢复；视频qualified prepare及完整paid preview仍 `NOT_EVALUATED`，听音路线仍阻断 |
+| Planner/Router/runtime | shared entry存在；首张图片已有fresh exact preview、profile、budget/egress、durable intent和consumed one-use permit，Provider receipt ACCEPTED。本地candidate validation拒绝 unrelated dependency node | 新候选首帧仍未导入；旧failed素材不能据Registry登记当accepted source。视频qualified prepare及完整paid preview仍 `NOT_EVALUATED`；音义工具已实测，selected QA及新原镜声音证据仍须完成 |
 
 ## Explicit Adaptations
 

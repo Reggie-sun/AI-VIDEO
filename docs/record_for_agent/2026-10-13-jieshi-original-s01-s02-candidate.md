@@ -11,7 +11,9 @@ Date: 2026-10-13
 
 ## Supersession Notice — 2026-10-15
 
-声音工具工程更新见[Audio Understanding MCP record](2026-10-15-audio-understanding-mcp.md)：用户要求网上找工具、接入项目并让后续Agent知道，已新增原MCP音频preview/authorized analyzer/逐镜证据接点，真实隔离stdio可发现并预检已有WAV。qualified Gemini runtime未绑定、实际音义仍EVIDENCE_REPAIR_FIRST；没有上传声音或提交原视频，不把工程/preview当作前述首帧FAIL与声音Gate解除。
+声音当前实测更新见[Audio Understanding MCP record](2026-10-15-audio-understanding-mcp.md#operator-verification-and-live-evidence)：Gemini development operator经exact supplier/一次intent/permit，在已有4.032s历史WAV完成1次真实MCP调用，HTTP200，取得对白/声线/表演观察。先前“runtime未绑定、没有上传或实际音义”的描述已被该结果取代；当前Codex native audio仍unsupported，新原镜声音/selected QA/精确时序/human仍未验，旧permit已消费，不把工具成功当首帧FAIL或原镜Gate解除。
+
+最新媒体checkpoint见 **Single Object Repair And Known Quality Stop — 2026-10-15**：用户要求继续，新增1次内置修图，唯一目标为苏遥白手机换至正确镜像侧，但实际输出仍未换边，target FAIL。条件陈立调用未执行，原视频0、内置图片累计5，未导入/激活，Manifest33/Project7及`qa_policy=None`保持。旧计数/UNKNOWN与原剧情不改；下文前一次“最新”均为历史checkpoint。
 
 最新媒体checkpoint见 **Original Frame Completion Attempt And Video Stop — 2026-10-15**：按“继续图做完了就生成视频啊”新增3次Codex内置修图，七名他人完整倒影与老人坐姿保住，陈立手机补出；镜像持机/耳机仍有FAIL或NOT_EVALUATED，首帧未完成。实际声音输入再次被平台拒绝，当前Manifest33没有active QA policy或原视频attempt。未导入/激活新图、未提交视频；累计内置图片4（本轮3）、paid准备图2、local模型图2、原视频0、历史视频11，旧web UNKNOWN保留。
 
@@ -434,6 +436,22 @@ Native Codex Parent串行完成这一有界文档变更；没有源码/parser/li
 
 使用`record-ai-video-session`更新同一主record及候选README状态锚点；`distill-ai-video-learning`评估no_candidate：同一递进图片链的不同修复目标与提示并非两次独立支持或受控多臂对照；H局部成功也不能支持通用镜面/生图能力claim。没有Skill/Policy/Gate或全局memory/RAG变更。本轮新增Seedream/视频Provider POST及Comfy调用均0，内置修图新增3次；内置工具计费及底层model未暴露，不猜价格/账单。记录期间不额外调用媒体/Provider。原foreign staged/dirty保留。文档checkpoint `c0d16b2137ef86d85955fda86c40f2d260cb29a2` 已push且remote main SHA核对一致；`.agent/harness/runs/jieshi-original-frame-stop-20261015-r1/receipt.json`五项PASS、fresh=true，仅证明该exact文档快照；此处计费边界澄清后的提交另验，不把前receipt伪称验证新bytes。
 
+## Single Object Repair And Known Quality Stop — 2026-10-15
+
+用户继续推进后，Parent重新读取当前原文、latest exact图及共享`inspect`，使用`retrieve-ai-video-memory`取得stale但可定位本record的advisory fragments，不为fresh重试或foreground rebuild。按现有`imagegen`/Agent Image Authoring Workflow封存最多2调用、45分钟单元：先只改苏遥白手机，成功才另封存陈立原道具的exact输入；不把剩余slot挪作同一失败项重抽。前序内置4图、paid准备2图、local模型2图及web UNKNOWN逐项保留。这是任务内已知失败的有界修复，不是扩展Seedream/视频付费额度或重放UNKNOWN。
+
+证据目录`runs/canvas-jieshi-original-s01-s02-20261013-001/codex-s01-single-object-repair-20261015-004/`。单一底图为旧`64359f61…`、943×1667；request SHA `4db7ce4accb006c62e162fe299199e943bf1234d35e7fa8d87470b08aa44a8a1`，只要求苏遥已有乳白手机由画面右侧移至左侧，并给出当前/目标坐标；原身份、七完整倒影、老人坐姿/何静灰袋、林砚右手黑手机/空左手/衣物、空间摄影及原动作/广播/字幕均保留。坐标是文字条件，不冒充硬mask或ComfyUI节点。没有新写故事执行脚本、Provider adapter或timeline。
+
+实际`image_gen.imagegen`1次、无retry，原始输出exact copy为`s01-su-single-object-candidate.png`：SHA `a1db0247764947b315110ffe166105dcd5927ebc2f5283d142b20fa91b14ed6f`、2,076,608 bytes、943×1667 RGB PNG。Parent在原始分辨率重看：苏遥白手机仍在靠杆/老人的画面右侧，目标 **FAIL**；七个完整他人倒影、老人坐姿、何静包、林砚原道具及无新增文字维持静态语义PASS。陈立手侧/耳机与具体对应空座仍`NOT_EVALUATED`，不以局部PASS签原首帧。尺寸恰与前图相同不等于区域外像素保护；无resize/crop/reencode、无导入/activation。`Su-static-review.json`及`unit-stop-receipt.json`封存STOP，Chen条件不满足、0次调用；未消费slot不能转作Su重抽。
+
+只读原生`reviewer_high` `/root/s01_static_geometry_audit`独立看旧exact图，目的仅是降低镜像空间/手臂归属的不确定性，不是工程final review、第二生成实验或QA authority。Parent确认其Su镜像侧finding；对“陈立手机的screen x即可证明错手”保留`NEEDS_MORE_EVIDENCE`，必须追踪屈肘/跨身手臂，不能照搬坐标推解剖归属。其指出空近座可见但对应关系有歧义，也没有证明确定的车厢几何破坏；Parent仍保留原required geometry `NOT_EVALUATED`，不因advisory severity为non_blocking就降低Gate。结论及裁决在`native-static-critic.json`。
+
+标准`load_production_project`重开当前Manifest33/Project7、`qa_policy=None`；`production-after-canonical.json`重验entrypoint/Manifest/Registry与前次快照一致。早期`production-after.json`误把selected active snapshot hash同历史entrypoint hash比较，得出false；它保留并由新文件解释为方法不一致，不重分类成Production mutation。当前核验同时命名两种hash。之前的local检查因错误Python缺PIL、以及两次误用revision属性名在写receipt前失败，无Provider或Production副作用；后续使用项目`.venv`及实际schema完成核验。
+
+新增内置图1、累计5；新增视频/Seedream/Comfy/音频请求均0，原视频0、历史视频11保持。当前已知质量FAIL是自然停止点；最低恢复条件为能验证执行的局部物体编辑输入/路径，再补陈立手臂/耳机与对应空座layout证据。不能继续仅重写全图prompt、删除手侧要求或先生成原视频。音频工具已打通不能掩盖图像缺陷；S01→S02、canonical音轨/字幕/trim、HyperFrames及human1.0x/AC-7均未交付。
+
+按`record-ai-video-session`更新本primary record及候选README，`distill-ai-video-learning=no_candidate`：同一递进图片链与一次新失败不能证明通用模型限制，也没有验证替代修法有效；不把失败假设写成已验证workflow规则/新LearningClaim。没有global memory写入或前台RAG刷新。纯文档/真实媒体取证不改变代码或权限，implementation Risk Gate为`NATIVE_REVIEW_NOT_REQUIRED`，上述只读视觉critic独立于该gate。Foreign staged/dirty保留；本checkpoint exact Harness、commit/push以实际receipt/Git另验，记录阶段不新增媒体或Provider调用。
+
 ## Evidence Index
 
 此表只为本次原开场准备单元建立identity；历史其他实验不并入。remote boundary为Seedream/`doubao-seedream-5-0-pro-260628`、Ark shared image owner、1152×2048 PNG；新增local boundary为Qwen-Image-Edit-2511/三引用masked profile、944×1672 PNG，不与remote合同或计数合并。同一图片的receipt、bytes、materialization和visual proof使用同一request fingerprint independence_key，只贡献一个图片样本；预transport失败不是第二个视觉样本。
@@ -463,6 +481,8 @@ Native Codex Parent串行完成这一有界文档变更；没有源码/parser/li
 | codex-C-static | native-image:dc249193b5d938df088f4426dece4982c43a7a62c91f96baf372920764178462 | jieshi-original-codex-frame-repair-20261015 | original-s01-codex-C-20261015-002 | N/A | 5c4fe971f222bacda47cc39ae9cb9b5503b0d59e3968e207808a740d5829b099 | VISUAL_INSPECTION | NOT_EVALUATED | EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | codex-C-generation | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-original-frame-repair-20261015-002/C-static-review.json |
 | codex-mirror-generation | native-image:78091e512ad2621c17d9bf9000efce732401c5246f62d0b6af00fcdd22c4ef57 | jieshi-original-codex-mirrored-props-20261015 | original-s01-codex-mirrored-props-20261015-003 | N/A | 64359f615d10e112ff7aaa68181c3b815cf8178382c199dc4073d17519f810dc | TOOL_GENERATION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-original-frame-repair-20261015-002/mirror-generation-record.json |
 | codex-mirror-static | native-image:78091e512ad2621c17d9bf9000efce732401c5246f62d0b6af00fcdd22c4ef57 | jieshi-original-codex-mirrored-props-20261015 | original-s01-codex-mirrored-props-20261015-003 | N/A | 64359f615d10e112ff7aaa68181c3b815cf8178382c199dc4073d17519f810dc | VISUAL_INSPECTION | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | codex-mirror-generation | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-original-frame-repair-20261015-002/mirror-static-review.json |
+| codex-Su-object-generation | native-image:4db7ce4accb006c62e162fe299199e943bf1234d35e7fa8d87470b08aa44a8a1 | jieshi-original-codex-single-object-20261015 | original-s01-codex-Su-single-object-20261015-004 | N/A | a1db0247764947b315110ffe166105dcd5927ebc2f5283d142b20fa91b14ed6f | TOOL_GENERATION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-s01-single-object-repair-20261015-004/Su-generation-record.json |
+| codex-Su-object-static | native-image:4db7ce4accb006c62e162fe299199e943bf1234d35e7fa8d87470b08aa44a8a1 | jieshi-original-codex-single-object-20261015 | original-s01-codex-Su-single-object-20261015-004 | N/A | a1db0247764947b315110ffe166105dcd5927ebc2f5283d142b20fa91b14ed6f | VISUAL_INSPECTION | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | codex-Su-object-generation | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-s01-single-object-repair-20261015-004/Su-static-review.json |
 
 ## Historical Record And Learning Update
 
