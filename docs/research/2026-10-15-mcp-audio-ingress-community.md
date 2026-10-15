@@ -30,8 +30,20 @@ Research snapshot: 2026-10-15。用户要求MCP将原音频交给当前Agent理�
 
 后续用户明确要求开subagent打通，原生子会话一次read与一次同payload转交也被省略。Parent检查内置catalog和[`gpt-6.1-sol`官方Modalities](https://developers.openai.com/api/docs/models/gpt-6.1-sol)，后者明确Audio `Not supported`；这为该profile的音频限制补上了官方能力依据。当前可见TUI建任务/发消息接口仅有text `prompt`，无audio附件字段；未发现已暴露的另一条可用原生入口。该追加实验及host/backend identity剩余边界归[同一primary record](../record_for_agent/2026-10-15-audio-understanding-mcp.md#native-subagent-ingress-attempt)；仍未恢复听音，没有新识音模型或Provider调用。
 
+## Case Applicability And Active Host
+
+“社区有透传修复案例”不能扩大为“当前Codex已存在可直接照搬的听音修复”。Parent追加核对真实复现、mock及Codex正/负测试后，收敛如下：
+
+| Case | Proven condition | Applicability here |
+| --- | --- | --- |
+| `mcpproxy-go #369` | 真实复现用`get-tiny-image`；mock验证text/image/audio blocks透传，没有模型理解音频的断言。 | 本次outer返回exact omission，而非整个result的JSON文本；未发现可归因的同类扁平化缺陷。 |
+| Codex unsupported-media test | `InputModality::Text`时断言audio替换为本次exact omission。 | 与本次现象匹配，不能用proxy透传补丁补齐模型能力。 |
+| Codex supported-media test | 明确给出`Text,Image,Audio`才断言原结果保持不变。 | 正向测试是传输条件验证，没有证明当前模型/会话支持Audio。 |
+
+测试锚点归[合并提交的实际965–1045行](https://github.com/openai/codex/blob/643de86a190a38a5f4afa5e3a15edf48153f9c64/codex-rs/core/src/mcp_tool_call_tests.rs#L965-L1045)，案例实证归[PR #369](https://github.com/smart-mcp-proxy/mcpproxy-go/pull/369)。Parent经工具子进程的`/proc` executable ancestry找到正在运行的app-server binary，版本`0.162.1`，SHA `628e35487d888a28f0427fc37501da529dd3d81fcbad7a2c3421c1e8670d92e1`；直接读取该binary的bundled catalog，11条均只声明`text,image`。Binary包含exact omission字串、`input_audio`及`input_modalities`，但字串存在不等于取得特定函数执行trace。当前恢复任务因此不能只凭社区案例宣称可由项目MCP补丁完成；实际host绑定与剩余backend identity边界归[primary record](../record_for_agent/2026-10-15-audio-understanding-mcp.md#active-host-and-case-applicability)。
+
 ## Evidence Gaps
 
 - MCP历史[discussion #88](https://github.com/modelcontextprotocol/modelcontextprotocol/discussions/88)曾提出音频/客户端支持问题；未重测当前Claude，不以历史request判断今天能力。
 - `mcpproxy-go`合并与Codex上游实现均不证明本项目实际运行对应代码，也不证明当前托管backend接受音频。
-- 当前host/backend exact identity仍未绑定；父子会话均收到omission，blind audio理解结果仍缺失。不得通过降低逐镜声音验收标准来推进。
+- 当前host executable已绑定，实时selected model metadata/backend response identity仍未绑定；父子会话均收到omission，blind audio理解结果仍缺失。不得通过降低逐镜声音验收标准来推进。

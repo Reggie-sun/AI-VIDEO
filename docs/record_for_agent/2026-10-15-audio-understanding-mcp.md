@@ -80,6 +80,16 @@ Parent裁决`BLOCKED_UNSUPPORTED_NATIVE_AUDIO`：现有证据不支持通过项�
 
 仅文档/诊断证据更新，Parent评估`NATIVE_REVIEW_NOT_REQUIRED`，没有运行行为/权限或Production变更。Exact增量Harness归`.agent/harness/runs/native-audio-subagent-20261015-r1/receipt.json`；foreign staged/dirty及旧receipt保留，commit/push以实际Git和远端SHA验证。
 
+## Active Host And Case Applicability
+
+用户要求继续并质疑“不是说有案例吗”。Parent纠正对外说明：已找到的社区案例只证明透传，不是当前模型原生理解音频的成功案例；不能据此承诺本次能直接打通。原生`universal_executor` `/root/mcp_audio_community`以read-only、`allowed_paths=[]`重开一个收敛核对回合，只查案例/上游正负测试，未重复媒体实验。Parent独立检查active host与source，发现子代理初次给出的测试行范围未覆盖positive test，已以exact pinned source的965–1045行纠正，未照搬错误锚点。
+
+新host证据更新上节仅shell CLI的边界：从`exec_command`子进程向上读取`/proc/<pid>/exe`/PPid，两个Codex祖先进程均指向`/home/reggie/.codex/packages/app-server-daemon/releases/0.162.1-x86_64-unknown-linux-musl/bin/codex`，实测SHA `628e35487d888a28f0427fc37501da529dd3d81fcbad7a2c3421c1e8670d92e1`。直接运行该binary `--version`及`debug models --bundled`，仍为`0.162.1`、11条全部`text,image`，不refresh/network。只读检查binary包含exact omission字串、`input_audio`和`input_modalities`；这是静态存在证据，不是特定过滤函数的动态trace。CLI wrapper `codex_proxy.py`为resume/fork安全路由，未发现audio/catalog处理；未读取config/.env/credential、process argv/env或raw会话日志。实时selected model metadata及backend response identity仍未绑定。
+
+Parent直接重开[PR #369](https://github.com/smart-mcp-proxy/mcpproxy-go/pull/369)及[Codex pinned tests](https://github.com/openai/codex/blob/643de86a190a38a5f4afa5e3a15edf48153f9c64/codex-rs/core/src/mcp_tool_call_tests.rs#L965-L1045)：前者真实复现为图片、audio只有mock透传断言；后者negative test在缺Audio时断言本次omission，positive test显式注入Audio能力才保留原结果。这没有提供“不支持Audio的同一模型通过MCP补丁即可听音”的正例。最新诊断归`runs/canvas-jieshi-original-s01-s02-20261013-001/audio-tool-integration-20261015-001/active-host-case-applicability-20261015-001.json`，旧native probe和未知状态均保留。
+
+当前仍`BLOCKED_UNSUPPORTED_NATIVE_AUDIO`，没有project/runtime修复、听音成功或故事推进。Parent用一个约束澄清询问：用户只排除Whisper等纯转写，还是也排除直接理解原音频的完整多模态模型；回答前不启动依赖该选择的新模型/配置/付费路线。无回答不构成授权。`retrieve-ai-video-memory`沿同一任务既有stale检索边界使用当前files，不为相同结论重试RAG。更新本primary record及research note，`distill-ai-video-learning=no_candidate`；这是既有能力排查的静态证据补充，不是新独立media experiment。仅docs诊断，`NATIVE_REVIEW_NOT_REQUIRED`；exact增量验证归`.agent/harness/runs/native-audio-case-applicability-20261015-r1/receipt.json`，foreign staged/dirty保持。
+
 ## Agent Discovery And Ownership
 
 MCP自身instructions/tool description说明音频语义工具与Whisper边界；原AGENTS的Per-Shot routing继续指向playbook，新增同段`audio_understand`锚点只归`docs/audio-understanding.md`详细用法。用户选择A允许该新增入口独立提交、保留原暂存reviewer修改。Guide已达210行/18000 bytes，因此只压缩同一句保留显式project-local analysis与逐项PASS语义并增加锚点，不扩大budget或删除Gate。Matrix声明surface owners，Canvas workflow指向同一tool doc，没有第二操作手册。
