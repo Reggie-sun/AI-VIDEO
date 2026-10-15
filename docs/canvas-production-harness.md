@@ -48,6 +48,16 @@ asset及image事实；不只比较新的receipt标签。后续修订保留原imm
 
 ## Preservation And Orders
 
+显式新增本地视频参考使用 `canvas_video_assets.prepare_canvas_video_assets`，传入已 inspection 的
+packet、`asset_id/node_id/resource_id/path/usage_license/tool`、allowed local root 和 exact absolute
+`ffprobe_executable`；可声明 `input_artifact_ids` 绑定作者源文件。helper 只准备 exact MP4 与
+local-selection/measurement receipt，限制 2–15 秒、整数 FPS、50 MiB、file-only MP4 probe；
+不调用 Provider 或写 Production。与当前 Registry 合并时显式保留全部旧记录并使用 Registry 2.2，
+经既有 `author` / `revise_authoring` 导入；后续 source-expression 重开 sealed evidence。
+原文中新增的 reference slot 必须进入新的 inspected source snapshot，并标明新增职责，不能冒充
+原剧本已有素材。普通视频参考使用 `video_reference` / `existing_video`；它不等于 accepted source
+或状态交接，不复用后者的资格。Planner/adapter 是否支持、exact native inputs 和全部原 QA 另验。
+
 复刻保留原文 text part、chip slot、主体主图及全部辅图顺序和职责。只按 common compiler 的素材顺序
 将 chip 换成 `图片N`。`Shot.intent` 与 `subject_action.progression` 自动生成，已有不同文本直接拒绝；
 对白/旁白必须引用原文。`source_grounding` 仍经 source owner 验证，不制造原文未表达的动态事实。

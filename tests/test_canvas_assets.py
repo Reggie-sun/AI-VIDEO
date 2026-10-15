@@ -192,3 +192,150 @@ def test_generated_source_registry_is_eligible_for_existing_synthetic_resolver(t
         evidence_source=_synthetic_evidence_source(module, (receipt,), aggregate,
             source_records={asset.creation_receipt_id: source}))
     assert resolver(binding).startswith("data:image/png;base64,")
+
+
+def local_video_packet():
+    from scripts.canvas_sequence_packet import build_sequence_packet
+
+    graph = {"nodes": [
+        {"id": "target", "type": "video", "data": {"resourceId": "target-output",
+            "generationDraft": {"parts": [
+                {"type": "text", "text": "固定机位，演员举手停在玻璃前。"},
+                {"type": "extension", "extension_type": "node", "object_id": "guide-slot"}],
+                "contentSettings": {"resolution": "720p", "durationSeconds": 4},
+                "references": [{"slotId": "guide-slot", "nodeId": "guide",
+                    "role": "reference", "type": "extension", "extensionType": "node"}]}}},
+        {"id": "guide", "type": "video", "data": {"resourceId": "guide-resource",
+            "title": "S01 white model"}},
+    ], "edges": [{"id": "guide-target", "source": "guide", "target": "target",
+        "type": "reference"}]}
+    return build_sequence_packet(graph, {"node_ids": ["target"]})
+
+
+def local_video_selection(tmp_path):
+    source = tmp_path / "guide.mp4"
+    source.write_bytes(b"test-only-mp4-bytes")
+    return {"asset_id": "guide-video", "node_id": "guide", "resource_id": "guide-resource",
+        "path": source, "usage_license": "project-owned-white-model-reference",
+        "tool": {"name": "blender", "version": "4.5.3"},
+        "input_artifact_ids": ("blend-sha256:" + "a" * 64,)}
+
+
+def fake_local_video_probe(monkeypatch):
+    import ai_video.canvas_video_assets as video_assets
+
+    def measured(payload, ffprobe_executable):
+        from ai_video.production.hashing import canonical_sha256
+        import hashlib
+        values = {
+        "container_name": "mp4", "codec_name": "h264", "width": 960, "height": 540,
+        "fps_numerator": 24, "fps_denominator": 1, "duration_milliseconds": 4000,
+        "frame_count": 96, "ffprobe_sha256": "b" * 64,
+        "probe_config_sha256": "c" * 64, "measurement_sha256": "d" * 64,
+        }
+        fields = {key: values[key] for key in ("container_name", "codec_name", "width", "height",
+            "fps_numerator", "fps_denominator", "duration_milliseconds", "frame_count")}
+        values["measurement_sha256"] = canonical_sha256({"kind": "canvas-local-video-measurement/1",
+            "input_sha256": hashlib.sha256(payload).hexdigest(), "input_size_bytes": len(payload),
+            "ffprobe_sha256": values["ffprobe_sha256"], "probe_config_sha256": values["probe_config_sha256"],
+            "measured": fields})
+        return values
+    monkeypatch.setattr(video_assets, "_probe_canvas_mp4", measured)
+    return video_assets.prepare_canvas_video_assets
+
+
+def test_video_selection_measures_exact_local_bytes_and_emits_import_provenance(tmp_path, monkeypatch):
+    prepare = fake_local_video_probe(monkeypatch)
+    selection = local_video_selection(tmp_path)
+    registry, artifacts = prepare(packet=local_video_packet(), selections=[selection],
+        allowed_asset_root=tmp_path, ffprobe_executable="/usr/bin/ffprobe")
+
+    asset = registry.assets[0]
+    assert asset.asset_type.value == "video"
+    assert asset.mime_type == "video/mp4"
+    assert asset.video_metadata.width == 960 and asset.video_metadata.height == 540
+    assert asset.video_metadata.frame_count == 96
+    assert asset.video_metadata.fps_numerator == 24 and asset.video_metadata.fps_denominator == 1
+    assert asset.tool.name == "blender" and asset.tool.version == "4.5.3"
+    assert asset.creation_receipt_id.startswith("canvas-local-video-selection:")
+    assert type(registry).model_validate_json(registry.model_dump_json()) == registry
+    assert len(artifacts) == 2
+    media = next(a for a in artifacts if a.relative_path.suffix == ".mp4")
+    receipt = next(a for a in artifacts if a.relative_path.suffix == ".json")
+    assert media.payload == selection["path"].read_bytes()
+    assert receipt.relative_path.as_posix().startswith("evidence/authoring-input/")
+    assert b"canvas-local-video-selection/1" in receipt.payload
+    assert b'"provider_generation":"NOT_CLAIMED"' in receipt.payload
+
+
+@pytest.mark.parametrize("damage", ["node", "resource", "symlink", "outside", "duplicate", "duration", "fps"])
+def test_video_selection_rejects_wrong_identity_or_unbounded_mp4(tmp_path, monkeypatch, damage):
+    prepare = fake_local_video_probe(monkeypatch)
+    packet_value = local_video_packet()
+    selection = local_video_selection(tmp_path)
+    root = tmp_path
+    if damage == "node":
+        selection["node_id"] = "target"
+    elif damage == "resource":
+        selection["resource_id"] = "other-resource"
+    elif damage == "symlink":
+        link = tmp_path / "link.mp4"
+        link.symlink_to(selection["path"])
+        selection["path"] = link
+    elif damage == "outside":
+        root = tmp_path / "allowed"
+        root.mkdir()
+    elif damage == "duration":
+        import ai_video.canvas_video_assets as video_assets
+        monkeypatch.setattr(video_assets, "_probe_canvas_mp4", lambda *_: {
+            "container_name": "mp4", "codec_name": "h264", "width": 960, "height": 540,
+            "fps_numerator": 24, "fps_denominator": 1, "duration_milliseconds": 16000,
+            "frame_count": 384, "ffprobe_sha256": "b" * 64, "probe_config_sha256": "c" * 64,
+            "measurement_sha256": "d" * 64})
+    elif damage == "fps":
+        import ai_video.canvas_video_assets as video_assets
+        monkeypatch.setattr(video_assets, "_probe_canvas_mp4", lambda *_: {
+            "container_name": "mp4", "codec_name": "h264", "width": 960, "height": 540,
+            "fps_numerator": 24000, "fps_denominator": 1001, "duration_milliseconds": 4000,
+            "frame_count": 96, "ffprobe_sha256": "b" * 64, "probe_config_sha256": "c" * 64,
+            "measurement_sha256": "d" * 64})
+    selections = [selection, selection] if damage == "duplicate" else [selection]
+    with pytest.raises((ValueError, OSError)):
+        prepare(packet=packet_value, selections=selections, allowed_asset_root=root,
+            ffprobe_executable="/usr/bin/ffprobe")
+
+
+@pytest.mark.parametrize("damage", [None, "network_container", "multiple_video", "fractional_fps", "duration"])
+def test_local_video_probe_is_file_only_and_requires_measured_mp4(tmp_path, monkeypatch, damage):
+    import json
+    import os
+    from types import SimpleNamespace
+    import ai_video.canvas_video_assets as module
+
+    executable = tmp_path / "ffprobe"
+    executable.write_bytes(b"test-only-probe-identity")
+    stream = {"codec_type": "video", "codec_name": "h264", "width": 768, "height": 1344,
+        "avg_frame_rate": "48/2", "nb_frames": "96"}
+    document = {"format": {"format_name": "mov,mp4,m4a,3gp,3g2,mj2", "duration": "4.000"},
+        "streams": [stream]}
+    if damage == "network_container": document["format"]["format_name"] = "hls"
+    elif damage == "multiple_video": document["streams"].append(dict(stream))
+    elif damage == "fractional_fps": stream["avg_frame_rate"] = "24000/1001"
+    elif damage == "duration": document["format"]["duration"] = "16.000"
+
+    def run(arguments, **kwargs):
+        assert arguments[1:11] == ("-v", "error", "-protocol_whitelist", "file",
+            "-f", "mov", "-enable_drefs", "0", "-use_absolute_path", "0")
+        assert kwargs == {"check": True, "capture_output": True, "timeout": 45,
+            "pass_fds": (int(arguments[0].rsplit("/", 1)[1]),)}
+        assert os.pread(kwargs["pass_fds"][0], 100, 0) == executable.read_bytes()
+        assert module.Path(arguments[-1]).read_bytes() == b"exact-selected-video"
+        return SimpleNamespace(stdout=json.dumps(document).encode())
+
+    monkeypatch.setattr(module.subprocess, "run", run)
+    if damage:
+        with pytest.raises(ValueError): module._probe_canvas_mp4(b"exact-selected-video", executable)
+    else:
+        measured = module._probe_canvas_mp4(b"exact-selected-video", executable)
+        assert (measured["fps_numerator"], measured["fps_denominator"]) == (24, 1)
+        assert measured["duration_milliseconds"] == 4000

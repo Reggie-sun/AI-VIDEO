@@ -380,3 +380,75 @@ def test_execution_rejects_source_semantics_with_unchanged_prose_and_images(tmp_
     with pytest.raises((AiVideoError, ValueError)):
         service.committer._require_submit_execution_binding(loaded.manifest, state, changed)
     assert {p.relative_to(loaded.root): p.read_bytes() for p in (loaded.root / "state").rglob("*.json")} == before
+
+
+def local_video_source_fixture(tmp_path, monkeypatch):
+    from test_canvas_assets import local_video_packet, local_video_selection, fake_local_video_probe
+    from ai_video.production.seedance_source_expression import source_parts_sha256
+
+    packet = local_video_packet()
+    selection = local_video_selection(tmp_path)
+    registry, artifacts = fake_local_video_probe(monkeypatch)(packet=packet,
+        selections=[selection], allowed_asset_root=tmp_path, ffprobe_executable="/usr/bin/ffprobe")
+    asset = registry.assets[0]
+    unit = packet["units"][0]
+    parts = []
+    for raw in unit["prompt_source"]["parts"]:
+        if raw["type"] == "text":
+            parts.append({"type": "text", "text": raw["text"]})
+        else:
+            parts.append({"type": "reference", "slot_id": raw["object_id"], "materials": [
+                {"asset_id": asset.asset_id, "asset_sha256": asset.sha256, "role": "video_reference"}]})
+    expression = {"source_sha256": source_parts_sha256(parts), "parts": parts}
+    row = {"shot": {"preserved_source_expression": expression}}
+    return packet, unit, row, registry, artifacts
+
+
+def test_preserved_source_accepts_only_exact_local_video_reference(tmp_path, monkeypatch):
+    from ai_video.canvas_source_expression import require_canvas_source_expression
+
+    packet, unit, row, registry, artifacts = local_video_source_fixture(tmp_path, monkeypatch)
+    require_canvas_source_expression(packet=packet, unit=unit, row=row, registry=registry,
+        asset_artifacts=artifacts)
+
+
+@pytest.mark.parametrize("damage", ["missing_receipt", "forged_receipt", "stale_snapshot",
+    "wrong_role", "wrong_slot", "wrong_type", "wrong_mime", "wrong_metadata"])
+def test_preserved_source_rejects_unproven_or_mismatched_local_video(tmp_path, monkeypatch, damage):
+    from ai_video.canvas_source_expression import require_canvas_source_expression
+    from ai_video.production.registry import registry_semantic_sha256
+    from ai_video.production.seedance_source_expression import source_parts_sha256
+    from ai_video.production.state_commit import PreparedArtifact
+
+    packet, unit, row, registry, artifacts = local_video_source_fixture(tmp_path, monkeypatch)
+    expression = row["shot"]["preserved_source_expression"]
+    if damage == "missing_receipt":
+        artifacts = tuple(a for a in artifacts if a.relative_path.suffix != ".json")
+    elif damage == "forged_receipt":
+        receipt = next(a for a in artifacts if a.relative_path.suffix == ".json")
+        artifacts = tuple(a for a in artifacts if a != receipt) + (PreparedArtifact(
+            receipt.relative_path, receipt.payload + b" ", receipt.file_sha256),)
+    elif damage == "stale_snapshot":
+        packet["source_snapshot_sha256"] = "d" * 64
+    elif damage in {"wrong_role", "wrong_slot"}:
+        part = expression["parts"][1]
+        if damage == "wrong_role":
+            part["materials"][0]["role"] = "scene"
+        else:
+            part["slot_id"] = "other-slot"
+        expression["source_sha256"] = source_parts_sha256(expression["parts"])
+    else:
+        asset = registry.assets[0]
+        if damage == "wrong_type":
+            changed_asset = asset.model_copy(update={"asset_type": type(asset.asset_type).IMAGE})
+        elif damage == "wrong_mime":
+            changed_asset = asset.model_copy(update={"mime_type": "video/quicktime"})
+        else:
+            changed_asset = asset.model_copy(update={"width": asset.width + 1,
+                "video_metadata": asset.video_metadata.model_copy(update={"width": asset.width + 1})})
+        assets = (changed_asset,)
+        identity = registry_semantic_sha256(registry.model_copy(update={"assets": assets}))
+        registry = registry.model_copy(update={"assets": assets, "revision_id": identity, "content_hash": identity})
+    with pytest.raises((ValueError, KeyError)):
+        require_canvas_source_expression(packet=packet, unit=unit, row=row, registry=registry,
+            asset_artifacts=artifacts)

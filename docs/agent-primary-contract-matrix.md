@@ -119,6 +119,10 @@ partial close QA 从同一 authored preimage派生，原文/字节映射不证�
 `canvas_production.CanvasProductionService` 是 application caller：消费 source adapter 的完整 inspection
 及显式导演数据，生成既有 creative artifacts 的 identity/hash，经唯一 committer 批准/bootstrap/revise。
 `canvas_assets` 仅测量显式本地 PNG 并准备 Registry；source pointer 是导演声明，不证明平台 bytes 或采用。
+`canvas_video_assets.prepare_canvas_video_assets` 对显式本地 MP4 做 contained/no-follow exact copy 和
+固定 file-only ffprobe 测量，准备既有 Registry 2.2 与 immutable local-selection receipt；
+`canvas_source_expression` 重验 snapshot/node/resource、video role、bytes、metadata 和 receipt。
+这些不是 Provider probe/provenance 或 accepted predecessor，不替代逐镜 QA 与 accepted-state lineage。
 optional generated-source copy由 `canvas_image_provenance` 重验contained外部生成record的原bytes及
 实测image身份并准备immutable provenance artifacts；不推断fictional identity或替代Seedance human/egress gate。
 `canvas_planning` 派生 current Planner/Router 输入，实际 accepted source/末态/C2 materialization 仍归下列 owners；
