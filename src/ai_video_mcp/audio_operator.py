@@ -332,7 +332,8 @@ def _outcome(unit, intent_hash, clock, *, status, code, result=None, permit=None
         receipt = {
             "schema_version": "audio-development-outcome/1", "intent_sha256": intent_hash,
             "recorded_at": _time(_current(clock)), "status": status, "code": code,
-            "outcome": "OBSERVATION_AVAILABLE" if status == "SUCCEEDED" else ("UNKNOWN" if status == "UNKNOWN" else "REJECTED"),
+            "outcome": ("OBSERVATION_AVAILABLE" if status == "SUCCEEDED" else
+                        status if status in {"EVIDENCE_GAP", "UNKNOWN", "REJECTED"} else "REJECTED"),
             "consumed": consumed, "evidence": result or {},
             "qa_acceptance": "NOT_EVALUATED", "human_acceptance": "NOT_EVALUATED",
         }
@@ -400,8 +401,13 @@ class _Permit:
             _load_unit(self.fd, self.intent_hash, self.clock)
             if type(preview) is not dict or _json(preview) != _json(self.intent["request"]["preview"]):
                 raise _error("operator_preview_mismatch", "REJECTED", "The request preview differs from the sealed intent.")
+            consumed_at = _current(self.clock)
+            issued_at = datetime.fromisoformat(self.intent["issued_at"]).astimezone(timezone.utc)
+            expires_at = datetime.fromisoformat(self.intent["expires_at"]).astimezone(timezone.utc)
+            if not issued_at <= consumed_at < expires_at:
+                raise _error("operator_seal_invalid", "REJECTED", "The audio authorization window has expired.")
             marker = {"schema_version": "audio-development-consumption/1", "intent_sha256": self.intent_hash,
-                      "request_fingerprint": preview["request_fingerprint"], "consumed_at": _time(_current(self.clock)),
+                      "request_fingerprint": preview["request_fingerprint"], "consumed_at": _time(consumed_at),
                       "submit_count": 1}
             try:
                 _write(self.fd, _CONSUME, _json(marker))
@@ -436,7 +442,7 @@ class _Analyzer(GeminiAudioAnalyzer):
         except AudioUnderstandingError as error:
             try:
                 _outcome(self.unit, self.intent_hash, self.clock,
-                         status="UNKNOWN" if error.outcome == "UNKNOWN" else "REJECTED",
+                         status=error.outcome,
                          code=error.code, permit=selected)
             except AudioUnderstandingError:
                 raise _error("operator_receipt_unknown", "UNKNOWN", "The audio outcome receipt could not be sealed.") from None

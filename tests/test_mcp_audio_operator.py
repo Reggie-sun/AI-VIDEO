@@ -267,6 +267,69 @@ def test_consumed_unit_cannot_be_reopened_or_replayed_after_restart(operator_cas
     assert (unit / "consume.json").is_file()
 
 
+def test_expiry_between_source_validation_and_consume_prevents_post(operator_case):
+    unit, _source, prepared, returned, issued = operator_case
+    from ai_video_mcp.audio_operator import runtime_for_unit
+
+    boundary = issued + timedelta(minutes=10)
+    instants = iter((
+        issued + timedelta(seconds=1),
+        issued + timedelta(seconds=2),
+        issued + timedelta(seconds=3),
+        boundary - timedelta(microseconds=1),
+        boundary,
+        boundary + timedelta(seconds=1),
+    ))
+    transport = FakeTransport()
+    runtime = runtime_for_unit(
+        unit,
+        returned["intent_sha256"],
+        credential_supplier=lambda: "test-only-key",
+        transport=transport,
+        clock=lambda: next(instants),
+    )
+    permit = runtime.permit_supplier(prepared.preview())
+
+    with pytest.raises(AudioUnderstandingError):
+        runtime.analyzer.analyze(prepared, permit=permit)
+
+    assert transport.calls == []
+    assert not (unit / "consume.json").exists()
+    outcome = json.loads((unit / "outcome.json").read_bytes())
+    assert outcome["status"] == "REJECTED"
+    assert outcome["consumed"] is False
+
+
+def test_consumed_http_200_evidence_gap_is_preserved_across_restart(operator_case):
+    unit, _source, prepared, _returned, _now = operator_case
+    invalid_observations = {"segments": "not-an-array"}
+    invalid_response = httpx.Response(200, json={
+        "modelVersion": "gemini-3.8-flash-test",
+        "candidates": [{"finishReason": "STOP", "content": {
+            "parts": [{"text": json.dumps(invalid_observations)}],
+        }}],
+    })
+    transport = FakeTransport(lambda *_: invalid_response)
+    runtime = _runtime(operator_case, transport=transport)
+
+    with pytest.raises(AudioUnderstandingError) as error:
+        _execute(runtime, prepared)
+
+    assert error.value.code == "invalid_observations"
+    assert error.value.outcome == "EVIDENCE_GAP"
+    assert len(transport.calls) == 1
+    assert (unit / "consume.json").is_file()
+    outcome = json.loads((unit / "outcome.json").read_bytes())
+    assert outcome["status"] == "EVIDENCE_GAP"
+    assert outcome["outcome"] == "EVIDENCE_GAP"
+    assert outcome["consumed"] is True
+
+    retry_transport = FakeTransport()
+    with pytest.raises(AudioUnderstandingError):
+        _runtime(operator_case, transport=retry_transport)
+    assert retry_transport.calls == []
+
+
 def test_credential_failure_records_unconsumed_outcome_without_post(operator_case):
     unit, _source, prepared, _returned, _now = operator_case
     secret = "never-in-outcome-credential-detail"
