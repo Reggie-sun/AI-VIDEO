@@ -8,6 +8,14 @@
 
 WAV/MP3/base64转码、波形、频谱、响度或静音统计不能补出对白及表演语义；这类输出只能支撑其实际测得的声学事实。原生输入受阻时保留`EVIDENCE_REPAIR_FIRST`，恢复条件是host/model路径真正交付音频并取得可核验听音证据。用户禁止额外模型时，不自动改走下文Gemini或另装ASR/本地识音模型；原有Per-Shot Gate、exact identity和human1.0x要求保留。
 
+### Client And Model Capability Diagnosis
+
+Codex上游已于2026-07-18合并[原生audio input转发](https://github.com/openai/codex/pull/33932)及[MCP/tool audio支持](https://github.com/openai/codex/pull/34080)。后者包含`audio()`，同时按`model_info.input_modalities`过滤不支持的输入；不含`Audio`时，`sanitize_mcp_tool_result_for_model`产生与本会话相同的omission提示。该代码匹配缩小了故障范围，但未证明当前host运行的exact版本或后端实际能力。
+
+2026-10-15本机`codex-cli 0.162.1`及`models_cache.json`中四个`gpt-6`条目的安全元数据检查只见`text`、`image`；缓存不是当前服务端的权威能力声明，也不能据此断言模型永久不支持音频。排查顺序是server实际返回`AudioContent` → client/proxy保留音频类型 → 当前会话声明及实际backend支持audio → 同一exact媒体的盲听证据。只在已有支持版本/路线被证实适用后修复对应接点，不盲目升级、不手改cache添加`audio`或以base64文本绕过过滤。
+
+社区的透传修复与转写fallback须分开：修复client/proxy丢失content类型可以恢复真实音频传输；Whisper/ASR返回文字仍是另一个模型的识别结果，不满足本次原音频直达当前Codex的约束。来源、实现状态和适用边界见[社区调查](research/2026-10-15-mcp-audio-ingress-community.md)。
+
 ## Entry And Evidence Boundary
 
 项目本地`video-analysis` MCP注册`audio_understand`，用Gemini官方音频理解接口补充语音内容、声线/语气和环境声观察。它接收原MP4或PCM WAV；不要求Codex主模型能接收audio content，也不强制Qwen/ComfyUI。`video_transcribe`仍是Whisper转写入口，不能据转写文字推断音色、求证表演或完整聆听。[官方能力](https://ai.google.dev/gemini-api/docs/generate-content/audio)

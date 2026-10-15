@@ -54,6 +54,18 @@ Adapter在取key前从inline WAV重编canonical请求以拒绝tampered dataclass
 
 详细工具说明新增原生路线及能力边界；playbook/AGENTS继续沿原指针发现，不改foreign staged reviewer hunks，不扩写第二入口。此checkpoint只有文档/实测记录，Parent判定`NATIVE_REVIEW_NOT_REQUIRED`：不更改Product行为、secret/paid authority、持久状态或验收标准，不触发新的critical consequence/gap。按docs-only exact delta运行Harness；不因记录重复跑媒体、Provider或完整工程测试。`record-ai-video-session`为recorded，`distill-ai-video-learning`为no_candidate：单会话能力限制，非跨实验可推广结论。
 
+## Community Audio Ingress Diagnosis
+
+用户继续问社区如何解决Agent识别问题。`research`由原生`universal_executor` `/root/mcp_audio_community`只写`docs/research/2026-10-15-mcp-audio-ingress-community.md`；Parent独立核对Codex上游、公开源码和本机非敏感能力元数据。两者分工不重叠，没有external subagent、安装或配置变更。
+
+上游[PR #33932](https://github.com/openai/codex/pull/33932)于2026-07-18合并`23899f7cb63a1510e53fddd68740dfc325853e3b`，把原音频序列化为`input_audio`；[PR #34080](https://github.com/openai/codex/pull/34080)同日合并`643de86a190a38a5f4afa5e3a15edf48153f9c64`，加入dynamic tool/MCP audio及`audio()`支持。公开`mcp_tool_call.rs`的`sanitize_mcp_tool_result_for_model`依据`model_info.input_modalities`，当不含`Audio`时返回与本会话实测完全相同的omission字符串。
+
+这更新了上一节“具体过滤组件未定位”的解释边界：已找到匹配的上游过滤路径；当前host exact build、实时model metadata与backend audio能力仍未绑定，不能声称已修好或已证明模型本体不支持。安全本地检查得到`codex-cli 0.162.1`，`/home/reggie/.codex/models_cache.json`中`gpt-6.1-sol`、`gpt-6-astra`、`gpt-6-sol`、`gpt-6-luna`均只列`text`、`image`；这是缓存发现信息，不是当前托管会话能力的权威证据。没有读取credential/config/.env或修改cache。
+
+恢复条件收敛为核验当前client/proxy、会话能力声明及真实backend三者的原生audio支持，再在同一exact媒体取盲听证据；更换MCP、把音频编码为文字或强加cache标记都不构成能力修复。社区转写工具作为另一条架构存在，但用户已排除，不能默认安装或调用。当前仍为`UNSUPPORTED_THIS_SESSION`/`EVIDENCE_REPAIR_FIRST`，原故事QA/human acceptance不变；此次没有重复音频提交、远端模型调用、生成、Production写入或新独立实验。
+
+本次只更新工具guide、社区research note和本record，保留foreign staged/dirty。Parent评估`NATIVE_REVIEW_NOT_REQUIRED`：未改变运行行为、授权或验收标准；exact docs范围验证归`.agent/harness/runs/mcp-audio-community-20261015-r1/receipt.json`。按`record-ai-video-session`复用本primary record；`distill-ai-video-learning=no_candidate`，公开代码/issue调查不是第二次独立本项目实验，不制造adoption claim或刷新RAG。
+
 ## Agent Discovery And Ownership
 
 MCP自身instructions/tool description说明音频语义工具与Whisper边界；原AGENTS的Per-Shot routing继续指向playbook，新增同段`audio_understand`锚点只归`docs/audio-understanding.md`详细用法。用户选择A允许该新增入口独立提交、保留原暂存reviewer修改。Guide已达210行/18000 bytes，因此只压缩同一句保留显式project-local analysis与逐项PASS语义并增加锚点，不扩大budget或删除Gate。Matrix声明surface owners，Canvas workflow指向同一tool doc，没有第二操作手册。

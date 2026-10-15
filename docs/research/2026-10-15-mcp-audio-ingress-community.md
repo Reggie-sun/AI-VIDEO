@@ -1,0 +1,33 @@
+# MCP Audio Ingress: Community Findings
+
+Research snapshot: 2026-10-15。用户要求MCP将原音频交给当前Agent理解，不增加另一个识音模型。调查区分协议、server、client/proxy、当前会话及backend；某一层支持音频不证明全链路已交付或听懂。
+
+## Findings
+
+1. **原生server路径已存在。** MCP schema允许tool result返回包含base64 `data`、`mimeType`的`AudioContent`；官方filesystem的`read_media_file`说明也支持原生image/audio返回。无需为传输再安装识音模型，但README未固定package release，不能据协议断言任意host接受音频。[MCP schema `2026-07-28`](https://github.com/modelcontextprotocol/modelcontextprotocol/blob/main/schema/2026-07-28/schema.json)、[filesystem README](https://github.com/modelcontextprotocol/servers/blob/main/src/filesystem/README.md#tools)
+
+2. **社区真实修复：保留content类型。** `mcpproxy-go` [issue #368](https://github.com/smart-mcp-proxy/mcpproxy-go/issues/368)报告上游返回的image/audio被整体序列化为普通`TextContent`，使下游失去原生内容类型。[PR #369](https://github.com/smart-mcp-proxy/mcpproxy-go/pull/369)于2026-04-09合并，改为保留非text blocks，仅截断text，并报告mock text/image/audio透传验证。它证明该proxy修复了传输问题，不证明音频模型听懂；上游页面未给出对应发布版本，且本项目未证实使用该proxy，不直接照搬补丁。
+
+3. **Codex已实现透传，但按会话能力过滤。** [PR #33932](https://github.com/openai/codex/pull/33932)于2026-07-18合并，将原音频转为Responses API `input_audio`；[PR #34080](https://github.com/openai/codex/pull/34080)同日合并，加入MCP/dynamic tool audio及`audio()`。后者的[`sanitize_mcp_tool_result_for_model`](https://github.com/openai/codex/blob/643de86a190a38a5f4afa5e3a15edf48153f9c64/codex-rs/core/src/mcp_tool_call.rs)读取`input_modalities`，不含`Audio`时以omission文本替换音频。当前公开main仍有此检查；源码与本次placeholder匹配，但本机CLI、托管host和实际backend的exact版本/能力不能互相代签。
+
+4. **转写fallback需要另一个模型。** [mcp-server-whisper](https://github.com/arcaputo3/mcp-server-whisper)的`transcribe_audio`调用`whisper-1`/`gpt-4o-transcribe`并要求API key；README还说明已停止维护并迁往其他项目。它能返回识别文字，但不满足用户不增加识音模型的约束，不在本次推荐安装范围。
+
+## Bounded Comparison
+
+| Route | Evidence | Fit |
+| --- | --- | --- |
+| Native `AudioContent` | 全链路保留音频且当前模型实际接受后，才可能取得原音频语义观察。 | 符合目标；缺host/model能力时MCP本身无法补足。 |
+| Transcription adapter | 独立识音模型提供词句/估计时间戳。 | 不符合本次约束；转写文字不等于听过音色或表演。 |
+| Waveform / spectrogram | 可测能量、停顿及频谱结构，参见[librosa RMS](https://librosa.org/doc/0.11.0/generated/librosa.feature.rms.html)和[STFT](https://librosa.org/doc/main/api/generated/librosa.stft.html)。 | 可辅助声学QA，不能证明词义、情绪或原句正确。 |
+
+## Practical Implication
+
+先核验server返回typed audio，再检查client/proxy有没有将它变成text或删除，最后绑定当前会话声明及真实backend的audio支持。只有发现可修复的具体接点才适配；不手改缓存伪造`audio`能力，不把base64当文字发送，也不据播放器或工具成功声称Agent听过。
+
+本项目MCP/audio helper的实际omission、local cache的有限证据及下一恢复条件见[primary record](../record_for_agent/2026-10-15-audio-understanding-mcp.md#community-audio-ingress-diagnosis)。本次调查没有新模型调用、依赖安装、客户端升级或音频重提；当前语义QA仍未恢复。
+
+## Evidence Gaps
+
+- MCP历史[discussion #88](https://github.com/modelcontextprotocol/modelcontextprotocol/discussions/88)曾提出音频/客户端支持问题；未重测当前Claude，不以历史request判断今天能力。
+- `mcpproxy-go`合并与Codex上游实现均不证明本项目实际运行对应代码，也不证明当前托管backend接受音频。
+- 当前会话实时能力及blind audio理解结果仍缺证据；不得通过降低逐镜声音验收标准来推进。
