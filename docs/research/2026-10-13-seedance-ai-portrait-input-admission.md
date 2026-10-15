@@ -7,6 +7,8 @@ Status: `advisory_research`
 
 ## Latest Correction — Free Entry And Account Eligibility — 2026-10-16
 
+**Free-entry follow-up:** 用户选择继续找免费Seedance入口后，当前即梦免费版账号实际检查Mini、2.5样片与2.5，均出现各自“升级以使用”提示。官方新用户任务提供3次Mini限免是有条件活动，未证实属于本账号；40赠送积分不作为这些新模型可用次数。字节官方列豆包App的Seedance2.0入口，但当前豆包网页未登录且未显示视频功能，App免费次数/图片输入待用户核对。详见[当前免费候选矩阵](../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#free-seedance-alternatives-and-account-specific-readiness--2026-10-16)。没有新生成或上传，未购买/充值，原图和Fast网页草稿保持；没有证明免费路线已可执行，也不由本账号阻断推出所有平台都必须付费。
+
 **Current account update:** 用户保留个人账号并选择核对即梦个人网页，随后已完成登录。当前`积分详情`实测40赠送积分（订阅0/充值0，本次“每日免费积分 +40”）；同一原PNG已正常选入首帧，local blob的SHA/size/dimensions与canonical完全相同。但`Seedance 2.0 Fast VIP`生成按钮悬停明确“此功能为VIP专属”；网页可选4s，分辨率菜单仅720P，未观察到原生音频的独立证明。未点击生成、购买或充值，素材服务端审核仍`NOT_EVALUATED`。见[登录后实测](../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#authenticated-jimeng-credits-exact-frame-selection-and-vip-boundary--2026-10-16)；此前[未登录观察](../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#jimeng-personal-web-readiness-and-login-boundary--2026-10-16)、免费Entry企业条件及Ark单次输入拒绝保留，网页免费积分不推用于Ark或VIP资格。此选择仅核验路线，不授权新生成或付费。
 
 上一轮将“本账号尚无已证明可用的免费准入”归纳成当前仅能咨询，遗漏了应具体核对的免费Entry。

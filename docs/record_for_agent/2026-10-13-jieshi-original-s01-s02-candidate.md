@@ -11,6 +11,8 @@ Date: 2026-10-13
 
 ## Supersession Notice — 2026-10-15
 
+2026-10-16用户选择A继续找免费Seedance入口。即梦当前账号的Mini、2.5样片及2.5均实际显示“升级以使用”；公开新用户活动的3次Mini限免尚未证实属于本账号。字节官方另列豆包App入口，当前豆包网页未登录且未显示视频功能；App实际免费次数待用户核对。见 **Free Seedance Alternatives And Account-Specific Readiness — 2026-10-16**。已恢复FastVIP网页草稿，原图SHA及40积分保持；本轮生成/充值/新上传均0，未把任一候选宣布为免费准入成功。
+
 2026-10-16用户已完成即梦登录。当前实测40赠送积分（订阅0/充值0），本次“每日免费积分 +40”；原PNG已通过正常的系统文件选择框进入网页首帧预览，local blob与canonical SHA完全一致。`Seedance 2.0 Fast VIP`生成按钮悬停明确“此功能为VIP专属”；可选4s，但分辨率菜单仅720P，未点击生成或购买。见 **Authenticated Jimeng Credits, Exact Frame Selection And VIP Boundary — 2026-10-16**。这取代下段未登录阻断；没有生成审核、原S01 MP4或新的Harness视频成功。
 
 2026-10-16用户已选择“保留当前图，先核对即梦个人网页的正常上传、审核和已有额度”。即梦网页已由独立Chrome MCP会话实际打开，`Seedance 2.0 Fast VIP`与`首尾帧`入口可见；点击`首帧`弹出“请先登录”，尚未选择或上传文件。见 **Jimeng Personal Web Readiness And Login Boundary — 2026-10-16**。当前会话未登录，实际会员/额度及原图审核均`NOT_EVALUATED`；仅核验路线，不生成、购买或充值。
@@ -632,6 +634,27 @@ Parent使用`research`与`retrieve-ai-video-memory`，后者不作为current事�
 按用户不新增付费且只核验路线的范围停在这里。恢复需本入口确有合法可用资格，或另有明确的新Seedance型号/入口候选及相应授权；后者必须重新核对能力、原剧情、exact输入、有限计数/预算及canonical接入，不直接用当前网页720P草稿、已有40积分或旧S02次数提交S01。先前API拒绝及声音/逐镜验收要求均保留。
 
 按`record-ai-video-session`更新同一主记录与研究的current-facing状态；`distill-ai-video-learning=no_candidate`，这是一条网页输入/权益观察，没有独立媒体或免费生成成功，不升级通用规则。无Product实现/Gate变更，Risk Gate不触发独立implementation review；Parent核对最终diff和当前UI证据。文档exact范围receipt为`.agent/harness/runs/jimeng-authenticated-input-readiness-20261016-r1/receipt.json`，实际结果以完成后的receipt为准；foreign staged/dirty保持。
+
+## Free Seedance Alternatives And Account-Specific Readiness — 2026-10-16
+
+用户对“继续找能免费生成原S01的Seedance入口，保留当前图”选择A。本轮只做该范围的实际UI核验与官方来源研究，没有将选择A扩为新生成/付费授权。Mini与2.5仅在网页预览切换，canonical项目/Provider请求、原S01及S02计数、完整剧情和逐镜QA要求未更改。
+
+| Candidate | Current Evidence | Boundary |
+| --- | --- | --- |
+| 即梦Seedance 2.0 mini | 登录账号实际选择后，原首帧保留、4s/720P可见，提示“升级以使用「即梦 Seedance 2.0 mini」” | 名称不带VIP不证明免费；没有点击生成 |
+| 即梦Seedance 2.5样片 | 原首帧保留，实际提示“升级以使用「即梦 Seedance 2.5 (样片模式)」” | 菜单宣传480P样片不解除账号资格，也不证明该网页模式原生声音或审核通过 |
+| 即梦Seedance 2.5 | 实际提示“升级以使用「即梦 Seedance 2.5 」” | 未当作原Fast请求的等价替换 |
+| 即梦新用户Mini限免 | [官方公开页面](https://jimeng.jianying.com/ai-tool/generate?ai_feature_name=omniReference&enter_from=ai_feature&from_page=explore)写明完成任务可得3次Mini限免；当前账号积分商城显示免费版/40积分，未找到可证明已到账的该项次数 | 新用户/任务条件及本账号剩余次数均未核验；未执行任务、兑换、邀请、发布或消费 |
+| 豆包App | [字节Seed官方发布页](https://seed.bytedance.com/zh/blog/seedance-2-0-%E6%AD%A3%E5%BC%8F%E5%8F%91%E5%B8%83)明确列App对话框→Seedance2.0→2.0模型 | 官方入口存在不证明当前账号免费次数、图生视频准入、4s与原生声画契约 |
+| 豆包网页 | 正常打开`https://www.doubao.com/chat/`，未登录，能看到图像生成，未看到视频/Seedance入口 | 没有上传本图或发生成消息；不能用App文档代签网页能力 |
+
+当前源码`seedance_capabilities.py`与官方[2.0系列教程](https://docs.volcengine.com/docs/ark/seedance-2-0?lang=zh&sessionid=)确认API Mini具备首帧、有声视频、4–15秒、480p/720p能力；这不绑定即梦网页的exact后台模型或赋予免费使用资格。当前Registry为Mini声明`nominal_seconds`，不能冒充原Fast的`exact_seconds`契约；新候选仍须核对实际时长和canonical采用范围。当前Registry的1.0模型`native_audio_options=(False,)`，因此没有将未证明原生广播/对白能力的旧1.0当本次免费替代，也不删原文声音要求。第三方自称“官方”或SEO文章声称的每日免费次数没有作为账号证据。
+
+检查结束已恢复原FastVIP网页草稿：4s、720P、数量1、首尾帧中的原首帧；local blob与canonical PNG再次实际计算相同SHA `13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923`、2,113,859 bytes，余额仍40。新图片/视频/声音生成0，新上传0，充值/购买/建账号/Production mutation均0。脱敏观察为`runs/canvas-jieshi-original-s01-s02-20261013-001/jimeng-web-readiness-20261016-001/free-entry-followup.json`，前述观察不覆盖。
+
+已向用户异步询问其已有豆包App中Seedance2.0是否有免费次数并支持图片、要求开通，或没有入口/未安装；只请其查看，不生成/付费，不索取凭据或截图。当前`NO_QUALIFIED_FREE_ROUTE_YET`，这不是所有Seedance均不免费的结论。最小恢复条件是取得具体可用免费入口/剩余次数/输入与声音能力，随后封存exact原S01候选和新有限调用单元；不得以广告额度、当前40积分、网页登录或旧S02预算代替授权与Provider Gate。
+
+按`record-ai-video-session`记录同一目标的有界恢复检查；`distill-ai-video-learning=no_candidate`，同一账号的多种预览不是独立媒体实验，没有成功准入/成片可供泛化。无实现/Gate变更，不触发独立implementation review。文档exact范围receipt为`.agent/harness/runs/seedance-free-web-alternatives-20261016-r1/receipt.json`，实际结果以完成后的receipt为准；保留foreign staged/dirty与旧失败历史。
 
 ## Evidence Index
 
