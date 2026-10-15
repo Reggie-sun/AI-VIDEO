@@ -11,6 +11,8 @@ Date: 2026-10-13
 
 ## Supersession Notice — 2026-10-15
 
+2026-10-16当前续执行已到一次真实原S01视频提交，详见 **Original S01 Exact Submit And Input Admission Stop — 2026-10-16**。图片静态PASS保持；已配置S01 15项raw QA、实际Planner/Router编译、fresh runtime/供应凭据/预算/egress/intent/一次permit，并在用户对exact图片确认A后提交。Seedance HTTP400 `InputImageSensitiveContentDetected.PrivacyInformation`，无task/MP4，canonical known_no_effect/runtime_failure/STOP。当前Manifest45/Project10/schema2.15，原视频POST1、历史11、累计12，零retry；下方“qa_policy=None/未提交”是此前保留checkpoint。新作图实践已按用户明确要求写入共享workflow，不把平台审核拒绝当静态图FAIL，也不继续无效修图或重发。
+
 2026-10-16当前图片状态已取代此前完整首帧FAIL/未导入的当前结论：见 **Original First Frame Static Admission And Canonical Import — 2026-10-16**。新增13次内置图片，累计22；最终exact PNG `13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923`逐项静态复核为PASS_FOR_FIRST_FRAME_AUTHORING，随后沿既有generated-source copy/唯一committer导入并绑定S01，标准loader重开Manifest37/Project9。旧10条P7 Registry前缀/媒体/attempt与web UNKNOWN保留。原视频0、历史视频11；静态成功不代视频动作、广播、声音/字幕/trim、后镜handoff或human1.0x。当前qa_policy仍None、Provider admission和qualified视频/新原镜声音仍未验；下方旧“最新”段均为历史checkpoint。
 
 声音当前实测更新见[Audio Understanding MCP record](2026-10-15-audio-understanding-mcp.md#operator-verification-and-live-evidence)：Gemini development operator经exact supplier/一次intent/permit，在已有4.032s历史WAV完成1次真实MCP调用，HTTP200，取得对白/声线/表演观察。先前“runtime未绑定、没有上传或实际音义”的描述已被该结果取代；当前Codex native audio仍unsupported，新原镜声音/selected QA/精确时序/human仍未验，旧permit已消费，不把工具成功当首帧FAIL或原镜Gate解除。
@@ -518,6 +520,34 @@ fresh共享CLI `preflight-final.json`实际重开当前immutable authoring，gen
 
 使用`record-ai-video-session`更新本primary record及README，`distill-ai-video-learning`评估**no_candidate**：这是一条多变量、依赖前产物的渐进修复链，局部姿态参考改变和后续整图转移没有隔离为受控比较，不能推出通用模型胜率、镜面能力或自动采用新的Skill/Gate规则。社区/官方image prompt角色分工只作advisory，失败全景及失败持机尝试作为反证保留。无Skill/Policy/Gate、global memory或RAG重建；记录本身不触发额外媒体/Provider/网络调用。无源码实现，implementation Risk Gate不触发；同一视觉critic的像素核对不冒充工程review或human。foreign staged/dirty保持，publication与exact Harness另按实际receipt/Git核验。
 
+## Original S01 Exact Submit And Input Admission Stop — 2026-10-16
+
+图片checkpoint已发布`0f12d3e4146b474070ce57c41e99757b34f45214`并核对远端main；对应`.agent/harness/runs/jieshi-original-firstframe-ready-20261016-r1/receipt.json`五项checks PASS、fresh/complete。没有在该commit停下。用户随后要求确认作图是否沉淀为Agent能力，Parent把本轮已实际使用的局部放大→整图转移、姿态主参考/身份辅参考、原文与附加限制分离、最终整图复核和实际consumer绑定写入既有`docs/canvas-production-harness.md#bounded-repair-practices`。现有AGENTS/playbook入口已指向该owner，不新增Skill、故事脚本、Provider、第二timeline或状态库。使用边界是本次渐进链中的有界经验，不声称通用成功率或硬节点执行。
+
+### Raw QA And Actual Shared Preparation
+
+原生只读`code_mapper` `/root/original_video_runtime_readiness`确认此处缺的是caller配置，而非不存在的API：正常`activate_qa_policy`可选真实raw rubric；没有production_lineage的S01/S02逐镜切换全局policy即可，`accepted_sequence_source`重验来源随附的QA snapshot，不把新policy自动当旧片失效。Parent重开相关函数裁决，未启动组件物化旁路或借fixture helper签QA。实际建立S01 15项raw required IDs、S02 17项候选required IDs（含七维actual state）、同一36项final-output要求；只经唯一committer选中S01 policy。S02候选尚未激活、没有findings，final contract中的全部原要求及human whole-playback保留。
+
+第一次实际Planner prepare发现`Shot.required_asset_roles.first_frame`仍指旧local布局，而generation/source refs已指新图，得到missing_references及派生human_review_unresolved。没有为此再问用户或放宽human Gate，而是经canonical authoring仅对齐实际首帧槽，Registry及QA保持不变；Project9→10/Manifest38→40。随后按原schema owner升级2.6→2.15，以启用video/source-boundary/caption能力；旧未开始的start被schema guard拒绝为known-no-effect。真实再prepare得到GENERATE_ONCE、CompiledProviderVideoRequest、无unsupported paths，并经正常start建立唯一S01 REQUEST。物化remote stack引用本次profile/compiler/output identity，S01 seal-terminal与后续actual frame71/source-video路线保留，未冒充本地weights或P0 Production资格。
+
+用户对当前exact图片回复“A：确认原创虚构、无受保护身份，允许用这张图生成 S01”，仅把该真实声明绑定既有synthetic receipt，不代签human媒体验收。沿已有原2次Fast视频授权执行首镜1次；本次不新增视频额度，不转用旧B/Vidu修复permit。新profile窗口16:16:22.910395–17:16:22.910395 UTC（2026-10-15），model=`doubao-seedance-2-0-fast-260128`，4秒nominal请求/480p496×864/24fps/native audio，canonical采用前三秒；不是旧15秒nominal测试。50 CNY/call与200 CNY既有总bound仅为sealed内部上限，不查价/账单。
+
+### Exact Request And Actual Rejection
+
+真实证据根`original-S01-live-20261016-001/`。Attempt=`canvas-32dd80cf21a3147888977db32b3dc86c57e1297b`；resolved request SHA `32196e44f2d2d217fcb03cb5d54c59066a42a585bf576f7c020a3d9918fd1525`，Paid preview `16edce15f53803d9f7ed7d96179767419b0106b77ef7c3ee6c68a4f18756967e`。Exact native prompt SHA `2a54252ee51ac0d9c1a193ff0b3060aa80ae94ab3570986c588b49b162f50f59`与已审S01 authored text完全相同，保留原全部source parts，只添加原工牌正常态；没有删广播、手部、倒影、摄影或字幕composition职责。Wire body SHA `21f67a1c46bba1f7e7fecf60c8bbe18e355f752808f00f66f8300e358d3e490e`，只有text与一个first_frame，inline PNG回解SHA仍`13c83ce4…76923`。`native-body.exact.json`/`native-prompt.exact.txt`、profile/stack/limits、synthetic来源/egress、授权和preflight分别保留，不保存key/header或raw signed-response。
+
+Exact injected supplier在本窗口实际查Secret Service `application=ai-video/provider=seedance/credential=ARK_API_KEY`；标准同UID bus核验，禁止.env/ambient/fallback，无value/hash回显。Current adapter/profile/window、原文/refs、实际MCP音频factory/source、预算reservation、egress、durable intent与one-use permit均核验，真实transport仅允许exact body的一次POST。Server返回HTTP400 `InputImageSensitiveContentDetected.PrivacyInformation`，没有task ID/MP4；未poll/fetch/重试，S02零提交。`submit-wire-observation.json`保存实际body identity/status/response hash，不拿离线payload重建冒充wire观察。
+
+Canonical paid submit receipt=`state/paid-provider/submits/6a58fabd1108dfcb3b7556359e14deb167641747bc37b2b9d112f3a18d54ac42.json`，file SHA `8bcdf793b9209bf20e68ad9dde466ed3bd00e75b9623d42f9a46e6a24f50ddc2`，paid phase known_no_effect，attempt failed。再沿正常`record_attempt_evaluation`记录runtime_failure，无媒体findings；当前Manifest45/Project10/schema2.15，position=STOP。原视频POST1+历史11=累计12，原S02次数不挪给新S01重抽；没有“拒绝就把POST计数归零”。实际成本/账单未查，不声称免费。旧web UNKNOWN不受本次known_no_effect影响。
+
+### Provider Boundary And Minimum Recovery
+
+当前首帧静态PASS保持；失败发生在输入审核，不能把它重分类为倒影/手部/服装质量失败或继续盲修照片。Parent在当前窗口重开[方舟官方肖像指南](https://docs.volcengine.com/docs/ark/seedance-portrait-asset-guide?lang=zh)：受信模型产物路线要求同账号、30天内、指定模型原始产物，明确不含跨平台产物或二次编辑；这张Codex图不能因Registry来源声明而变成该路径的原产物。社区[ArcReel #2249](https://github.com/ArcReel/ArcReel/issues/2249)也有AI人物图片同错误的报告，但其issue建议不是本账号的已验证修复。当前请求400是本图的实际反例，不推导所有跨平台AI图永久拒绝，不采纳遮脸/叠图案等规避审核建议。
+
+最小恢复条件是取得当前图可用的合法Provider素材准入证明，或用户明确授权一个支持保留此图/原生声音的其他视频输入单元；随后仍走原shared preparation/paid/逐镜Gate。此前用户拒绝购买/开通私域库仍有效，不自动入库、购买、换Provider，亦不把旧剩余次数当新路线许可。旧Seedream技术图均FAIL，不能换回去求平台通过。没有可用MP4，所以project-local逐镜视频QA、新音义/时序、frame71提取/后镜绑定、S02、字幕/trim/HyperFrames和human1.0x均NOT_EVALUATED；没有为补证多生视频或调用Gemini空转。
+
+按`record-ai-video-session`在真实blocker更新同一主record/README，并将用户要求的可复用步骤补入既有workflow。`distill-ai-video-learning=no_candidate`：本链不构成隔离变量的重复效果结论；工作流更新来自用户明确指令，非自动采用Learning Claim。后续Agent可沿已有入口发现实际方法和Provider限制；文档不假装新自动图引擎。没有源码行为/Gate修订，implementation Risk Gate不触发；Parent保留最终判断。当前文档publication与exact Harness按新receipt核验，foreign staged/dirty保留。
+
 ## Evidence Index
 
 此表只为本次原开场准备单元建立identity；历史其他实验不并入。remote boundary为Seedream/`doubao-seedream-5-0-pro-260628`、Ark shared image owner、1152×2048 PNG；新增local boundary为Qwen-Image-Edit-2511/三引用masked profile、944×1672 PNG，不与remote合同或计数合并。同一图片的receipt、bytes、materialization和visual proof使用同一request fingerprint independence_key，只贡献一个图片样本；预transport失败不是第二个视觉样本。
@@ -571,6 +601,8 @@ fresh共享CLI `preflight-final.json`实际重开当前immutable authoring，gen
 | codex-current-21-generation | native-image:8cc74a4f96c843fcfe95b6a76355aa9c0c17b70c88949f21b34b3588e9129995 | jieshi-original-progressive-repair-20261015 | original-s01-badge-crop-20261015-011-02 | N/A | 93f2f12af558e10b6c8f7f54ba61c2e113fe0485158379dceba775eb24d4549d | TOOL_GENERATION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-s01-final-original-detail-repair-20261015-011/02-generation-record.json |
 | codex-current-22-generation | native-image:dca9ef37a3f22b43e19ccb28dfb707717cf9fa49190795dace34998b714796aa | jieshi-original-progressive-repair-20261015 | original-s01-full-badge-transfer-20261015-011-03 | N/A | 13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923 | TOOL_GENERATION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-s01-final-original-detail-repair-20261015-011/03-generation-record.json |
 | codex-current-22-static | native-image:dca9ef37a3f22b43e19ccb28dfb707717cf9fa49190795dace34998b714796aa | jieshi-original-progressive-repair-20261015 | original-s01-full-badge-transfer-20261015-011-03 | N/A | 13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923 | VISUAL_INSPECTION_FIRST_FRAME_ROLE | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | codex-current-22-generation | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-s01-final-original-detail-repair-20261015-011/03-static-parent-adjudication.json |
+| original-S01-submit-rejection | seedance-post:21f67a1c46bba1f7e7fecf60c8bbe18e355f752808f00f66f8300e358d3e490e | jieshi-original-S01-live-20261016 | canvas-32dd80cf21a3147888977db32b3dc86c57e1297b | N/A | NO_ARTIFACT:INPUT_ADMISSION_REJECTED | PROVIDER_RECEIPT | KNOWN_NO_EFFECT | INPUT_ADMISSION | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/original-S01-live-20261016-001/actual-rejection-audit.json |
+| original-S01-runtime-evaluation | seedance-post:21f67a1c46bba1f7e7fecf60c8bbe18e355f752808f00f66f8300e358d3e490e | jieshi-original-S01-live-20261016 | canvas-32dd80cf21a3147888977db32b3dc86c57e1297b | N/A | NO_ARTIFACT:INPUT_ADMISSION_REJECTED | CANONICAL_RUNTIME_EVALUATION | RUNTIME_FAILURE | INPUT_ADMISSION | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-submit-rejection | runs/canvas-jieshi-original-s01-s02-20261013-001/original-S01-live-20261016-001/canonical-generation-experience.json |
 
 ## Historical Record And Learning Update
 

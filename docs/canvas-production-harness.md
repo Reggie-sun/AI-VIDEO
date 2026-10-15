@@ -84,11 +84,21 @@ CLI：`--runtime trusted_operator_module:function` 返回 `committer` 和 servic
 
 用户要求原图、首帧或局部修图时，默认由 Codex 直接使用自带 Generated Image（`image_gen.imagegen`）；先做最小有界尝试，验实际图片后再接入现有项目。Qwen/ComfyUI 是可选的已封存执行路线，不是这套制作流程的前提。此处是 Agent authoring 指导，不是新的 Product Provider adapter、CLI 生图入口或 runtime Skill invocation。
 
-1. **Bind intent and references.** 保留原文及已满足项，明确唯一编辑对象和目标状态；分别指定原图为编辑底图、人物图为身份参考、姿态/布局图为几何参考。编辑前实际看图，核对 bytes/SHA、输入顺序、机位与邻座空间；不要用头像代替完整身体姿态，也不把参考图的背景或示意线要求生成进照片。
+1. **Bind intent and references.** 保留原文及已满足项，明确唯一编辑对象和目标状态；分别指定原图为编辑底图、人物图为身份参考、姿态/布局图为几何参考。先核对所选下游Provider的实际输入准入、原始产物/编辑产物要求，再投入长修图链；编辑前实际看图，核对 bytes/SHA、输入顺序、机位与邻座空间。不要用头像代替完整身体姿态，也不把参考图的背景或示意线要求生成进照片。
 2. **Adapt supported inputs.** 内置工具接收 `prompt`、`referenced_image_paths` 或 `num_last_images_to_include`、`transparent_background`；两种参考机制不能同时传。prompt表达动作/坐姿、身份、构图、保留区域与禁止改动。它不接收 ComfyUI workflow JSON、`seed`、`steps`、`CFG`、sampler、latent mask 或 ControlNet 参数；骨架/区域示意只能作为可见参考，不能冒充对应节点或硬约束已执行。未暴露的模型身份/采样设置不猜测。
 3. **Generate a bounded candidate.** 核验当前任务授权、明确新单元次数与时间边界、封存 exact 输入/引用和一次调用意图；不借默认路线自动扩大 paid/remote scope。以最少次数取证，保留每次原始输出与失败；timeout/UNKNOWN停止当前单元，不自动重抽、切工具或remint。用户以后明确变更路线也不关闭旧UNKNOWN、退回旧消费或授权盲目重试。
 4. **Review actual media before integration.** 输出以 exact copy 保存进工作目录，实测 SHA、尺寸、通道；逐项检查目标姿态/手脚、身份、道具、空间、机位、非目标人物和额外文字。正常坐姿等语义成功与蒙版外像素零变化分开报告；尺寸变化不能经隐式resize/crop伪装匹配。所选合同需要精确保护区或mask时，必须另有匹配的已验证合成/执行证据，内置生图成功不能代签；缺项/FAIL仍阻断相应使用。
 5. **Import through existing owners.** 仅在实际结果满足相应用途后，沿上文 [Entry And Data](#entry-and-data) 的 `generated_source` exact record/copy入口与 `revise_authoring`，保留完整旧Registry记录和原始 provenance。不能把内置生成图标成human/web import、Qwen输出或已qualified Provider；登记不等于素材验收/activation。原Shot视频、project-local逐镜MCP、声音/字幕、`ResolvedTimeline`和HyperFrames及human1.0x验收继续由原owner执行。
+
+### Bounded Repair Practices
+
+这些是已有入口内的Agent作图步骤，不是新的Provider或节点执行链。当前实证范围见[原S01修复记录](record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#original-first-frame-static-admission-and-canonical-import--2026-10-16)；单条渐进链不能证明通用成功率。
+
+- **Local detail → full frame.** 多人整图中的小对象持续不服从时，可显式裁出并放大目标作参考，记录原图SHA/crop/scale及新图身份；先验局部，再以原整图为唯一编辑对象、局部成功图只负责对应细节，调用原生生图转移。不能把局部PASS或放大的视图当最终构图，不能手工粘贴绕过合成/来源owner；每次转移都重验整图已满足项。
+- **Pose before identity detail.** 镜面/背面左右臂难以用文字稳定表达时，先用实际姿态或几何参考明确肩→肘→腕→道具连接，再以单独照片只负责身份。几何参考可作为主输入，成功后再转移回场景。画面左/右不能代替解剖左/右；示意、Blender局部镜面与最终全景分别验，不把失败全景或参考输入声称为硬几何执行。
+- **Original requirements before extra restrictions.** 修复前重开原文及后续相关状态，不自行要求空白证件、全部人物同排或零正常遮挡。撤回Agent附加条件要留原文证据和旧失败历史；原人数、身体范围、身份、动作、空间、声音、文字与叙事要求仍完整保留。
+- **Prove the consumer binding.** 静态全项通过后，核对实际Scene/reference、`generation.references`、Shot的`required_asset_roles`及preserved-source的引用都指向该exact图；保留原Registry顺序和旧记录。沿共享preflight及无副作用Planner/Router prepare验证，旧mask/旧首帧槽未替换仍须修正，不能因登记成功就宣称视频可提交。Provider人像准入、人类来源声明、声音路线与逐次paid gates继续独立核验。
+- **Keep Provider admission separate.** 2026-10-16原S01图静态PASS后，实际一次Seedance提交仍被`InputImageSensitiveContentDetected.PrivacyInformation`拒绝；人类虚构来源声明和本地Registry不会替平台放行。[方舟肖像指南](https://docs.volcengine.com/docs/ark/seedance-portrait-asset-guide?lang=zh)列出的信任路线要求同账号、有效期内的指定模型原始产物，不能把Codex跨平台图或编辑图冒充该来源。规则须重新核对；失败后不靠降画质/遮脸/改标签/反复修prompt重发，先明确合法素材准入或已授权Provider路线，保留已通过图片和全部失败历史。该次拒绝不证明所有外部AI图永久不可用，也不自动授权入库、购买、换Provider或重抽。
 
 只有用户明确选择其他工具，或内置工具在submit前已确认不可用并且另一入口已获授权，才评估既有 `chatgpt-web`、本地ComfyUI或已选择Provider；失败后不能自动fallback。明确选择 `chatgpt-web` 时先核对 `backend_status` ready，保持exact backend，不切 `api/auto`。需要严格局部像素保护时，可选择下文已实现的 [Masked Image Workflow](#masked-image-workflow)，并完整保留其mask/permit/保护复验合同。
 
