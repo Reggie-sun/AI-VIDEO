@@ -26,8 +26,12 @@ Research snapshot: 2026-10-15。用户要求MCP将原音频交给当前Agent理�
 
 本项目MCP/audio helper的实际omission、local cache的有限证据及下一恢复条件见[primary record](../record_for_agent/2026-10-15-audio-understanding-mcp.md#community-audio-ingress-diagnosis)。本次调查没有新模型调用、依赖安装、客户端升级或音频重提；当前语义QA仍未恢复。
 
+## Native Subagent Follow-up
+
+后续用户明确要求开subagent打通，原生子会话一次read与一次同payload转交也被省略。Parent检查内置catalog和[`gpt-6.1-sol`官方Modalities](https://developers.openai.com/api/docs/models/gpt-6.1-sol)，后者明确Audio `Not supported`；这为该profile的音频限制补上了官方能力依据。当前可见TUI建任务/发消息接口仅有text `prompt`，无audio附件字段；未发现已暴露的另一条可用原生入口。该追加实验及host/backend identity剩余边界归[同一primary record](../record_for_agent/2026-10-15-audio-understanding-mcp.md#native-subagent-ingress-attempt)；仍未恢复听音，没有新识音模型或Provider调用。
+
 ## Evidence Gaps
 
 - MCP历史[discussion #88](https://github.com/modelcontextprotocol/modelcontextprotocol/discussions/88)曾提出音频/客户端支持问题；未重测当前Claude，不以历史request判断今天能力。
 - `mcpproxy-go`合并与Codex上游实现均不证明本项目实际运行对应代码，也不证明当前托管backend接受音频。
-- 当前会话实时能力及blind audio理解结果仍缺证据；不得通过降低逐镜声音验收标准来推进。
+- 当前host/backend exact identity仍未绑定；父子会话均收到omission，blind audio理解结果仍缺失。不得通过降低逐镜声音验收标准来推进。

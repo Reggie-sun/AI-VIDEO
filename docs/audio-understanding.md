@@ -14,6 +14,8 @@ Codex上游已于2026-07-18合并[原生audio input转发](https://github.com/op
 
 2026-10-15本机`codex-cli 0.162.1`及`models_cache.json`中四个`gpt-6`条目的安全元数据检查只见`text`、`image`；缓存不是当前服务端的权威能力声明，也不能据此断言模型永久不支持音频。排查顺序是server实际返回`AudioContent` → client/proxy保留音频类型 → 当前会话声明及实际backend支持audio → 同一exact媒体的盲听证据。只在已有支持版本/路线被证实适用后修复对应接点，不盲目升级、不手改cache添加`audio`或以base64文本绕过过滤。
 
+同日用户要求开subagent打通后，原生`debug_explore_agent`独立会话对同一WAV做一次MCP read及一次同payload转交，仍收到omission，未取得声音语义。Parent另查`codex debug models --bundled`：11个内置条目没有audio输入；该profile配置的[`gpt-6.1-sol`官方页面](https://developers.openai.com/api/docs/models/gpt-6.1-sol)也明确标注Audio `Not supported`。现有证据不支持“项目MCP补丁即可恢复直听”；需要实际支持audio的原生会话/model路线，再取同一媒体的盲听证据。具体边界见[追加记录](record_for_agent/2026-10-15-audio-understanding-mcp.md#native-subagent-ingress-attempt)，不自动换模型、改cache或用子代理文字报告代替父会话听音。
+
 社区的透传修复与转写fallback须分开：修复client/proxy丢失content类型可以恢复真实音频传输；Whisper/ASR返回文字仍是另一个模型的识别结果，不满足本次原音频直达当前Codex的约束。来源、实现状态和适用边界见[社区调查](research/2026-10-15-mcp-audio-ingress-community.md)。
 
 ## Entry And Evidence Boundary

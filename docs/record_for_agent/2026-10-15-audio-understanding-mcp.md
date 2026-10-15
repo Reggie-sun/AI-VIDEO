@@ -11,7 +11,7 @@ Date: 2026-10-15
 
 ## Current Direction
 
-用户随后明确只要MCP把音频交给当前Codex直接理解，不接受额外识音模型。下文Gemini工程仍是历史已实现的可选接口，不满足该新约束，不据旧接入授权自动调用或安装其他模型。当前原生音频输入实测阻断见[Native Audio Input Probe](#native-audio-input-probe)，它没有替代原镜声音验收。
+用户随后明确只要MCP把音频交给当前Codex直接理解，不接受额外识音模型。下文Gemini工程仍是历史已实现的可选接口，不满足该新约束，不据旧接入授权自动调用或安装其他模型。当前原生音频输入实测阻断见[Native Audio Input Probe](#native-audio-input-probe)；用户要求开subagent打通后的独立会话复现及官方模型能力依据见[追加尝试](#native-subagent-ingress-attempt)，均没有替代原镜声音验收。
 
 ## User Intent And Decision
 
@@ -66,6 +66,20 @@ Adapter在取key前从inline WAV重编canonical请求以拒绝tampered dataclass
 
 本次只更新工具guide、社区research note和本record，保留foreign staged/dirty。Parent评估`NATIVE_REVIEW_NOT_REQUIRED`：未改变运行行为、授权或验收标准；exact docs范围验证归`.agent/harness/runs/mcp-audio-community-20261015-r1/receipt.json`。按`record-ai-video-session`复用本primary record；`distill-ai-video-learning=no_candidate`，公开代码/issue调查不是第二次独立本项目实验，不制造adoption claim或刷新RAG。
 
+## Native Subagent Ingress Attempt
+
+用户明确要求“开subagent打通”。Parent重读AGENTS/SUBAGENTS，核验native profile后派`debug_explore_agent` `/root/native_audio_ingress_debug`，职责限定为read-only盲音频能力诊断，`allowed_paths=[]`、不nested delegation、不调用profile残留的Gemini/Qwen/CCW。Parent负责客户端元数据及最终决策；子代理不读剧本/预期对白。这里的native subagent是实际执行actor，不把旧external route资格或模型自述当身份凭据。
+
+独立子会话对同一历史WAV一次`filesystem.read_media_file`得到outer `type=text`及原omission，而`structuredContent.content[0]`仍为`audio/wav`、base64长度172136；一次`audio(a)`转交同一payload仍被省略，未得到词句或声音表演观察。Parent重核source SHA/bytes仍为`daa154cb46f2a89ce3e95f5dcab6edb019c14a18ea67aef5de4031e0ffeec2d4`/129102；decoded MCP payload SHA仍未独立核验。子代理工具结果由其可观察报告提供，Parent没有重复同一路线或把子代理报告声称为父会话实际听音。追加证据归`runs/canvas-jieshi-original-s01-s02-20261013-001/audio-tool-integration-20261015-001/native-subagent-ingress-20261015-001.json`；原probe不覆盖、不重分类。
+
+Parent实际运行`codex debug models --bundled`，不refresh/请求模型，结果11条，四个gpt-6条目均`text,image`，没有audio条目；本机CLI仍`0.162.1`，help未暴露音频附件flag。当前可见`codex_tui.create_thread`/`send_message_to_thread`工具schema只接受text `prompt`而无audio附件。另直接打开[`gpt-6.1-sol`官方模型页面](https://developers.openai.com/api/docs/models/gpt-6.1-sol)，Modalities明确Audio `Not supported`，与该native profile的配置及实测相符。这新增了官方模型能力依据，但没有把local CLI的catalog冒充当前托管host/backend的exact attestation；上游支持`UserInput::Audio`也不证明本窗口有可调用接点。
+
+Parent裁决`BLOCKED_UNSUPPORTED_NATIVE_AUDIO`：现有证据不支持通过项目MCP实现补丁打通当前原生model/session，不创建fake bridge、不改cache/catalog标记、不绕过滤、不重试已知省略路线。最小恢复条件是实际支持audio的原生Codex会话/model与输入路径同时可用，然后同一exact媒体做盲听验证；用户不接受另加识音模型的约束保持。尚未实现“Agent能听音频”，原故事、逐镜声音QA和human acceptance仍`NOT_EVALUATED`，不推进下一镜或重生媒体。
+
+本次无新识音模型、API key使用、安装/升级、配置写入或Provider generation，只有原生子代理两步输入能力实验。`retrieve-ai-video-memory`本次返回stale advisory fragments并自行排队derived refresh，Parent不重试、不以无关命中支撑结论；没有foreground rebuild或global memory更新。本checkpoint用`record-ai-video-session`更新本record，`distill-ai-video-learning=no_candidate`：这是同一host/同一payload的会话能力排查，没有独立隔离模型能力变量，不能推成所有Agent/模型的普遍限制。不增加Learning Claim或改Gate。
+
+仅文档/诊断证据更新，Parent评估`NATIVE_REVIEW_NOT_REQUIRED`，没有运行行为/权限或Production变更。Exact增量Harness归`.agent/harness/runs/native-audio-subagent-20261015-r1/receipt.json`；foreign staged/dirty及旧receipt保留，commit/push以实际Git和远端SHA验证。
+
 ## Agent Discovery And Ownership
 
 MCP自身instructions/tool description说明音频语义工具与Whisper边界；原AGENTS的Per-Shot routing继续指向playbook，新增同段`audio_understand`锚点只归`docs/audio-understanding.md`详细用法。用户选择A允许该新增入口独立提交、保留原暂存reviewer修改。Guide已达210行/18000 bytes，因此只压缩同一句保留显式project-local analysis与逐项PASS语义并增加锚点，不扩大budget或删除Gate。Matrix声明surface owners，Canvas workflow指向同一tool doc，没有第二操作手册。
@@ -76,4 +90,4 @@ MCP自身instructions/tool description说明音频语义工具与Whisper边界�
 
 《界蚀》最新图片FAIL/NE、Manifest33/Project7/QA未激活、原视频0、历史视频11与旧web UNKNOWN均保留，工具工程不替代原S01 accepted source、真实handoff、S02自身QA或成片；用户完整1.0x/故事AC-7仍未验。恢复声音实测须由实际operator绑定上面真实外部条件，之后最少一次在已有exact媒体补证，而不是重生视频。
 
-使用`record-ai-video-session`评估为recorded；`distill-ai-video-learning`为no_candidate：这是用户直接要求的工程接口，不是两次独立声音质量实验或受控模型对照，不能据mocked/offline proof生成能力adoption claim。RAG没有refresh/global memory更新；原foreign staged/dirty保留，记录本身不新增媒体/Provider调用。
+接口接入checkpoint使用`record-ai-video-session`评估为recorded；`distill-ai-video-learning`为no_candidate：这是用户直接要求的工程接口，不是两次独立声音质量实验或受控模型对照，不能据mocked/offline proof生成能力adoption claim。该checkpoint没有RAG refresh/global memory更新；后续检索排队状态见追加尝试。原foreign staged/dirty保留，记录本身不新增媒体/Provider调用。
