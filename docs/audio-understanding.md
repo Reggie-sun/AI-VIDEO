@@ -50,6 +50,14 @@ Factory返回`ai_video_mcp.tools.audio_understand.AudioUnderstandingRuntime`：
 - `permit_supplier(exact_preview)`须重验真实selected model/profile/window、authorization、预算reservation、egress和durable intent，返回有`validate(preview)`/`consume(preview)`的实际一次性capability，两方法成功返回literal `True`。不能用固定True、caller JSON或测试Permit代替真实门。
 - 现有Production Paid owner没有audio-analysis operation；此接入没有擅自把它标作image/video_generation或创建第二Product ledger。真实audio runtime未绑定时保留阻断，不把接口的permit Protocol当作已经实现/qualified的外部授权owner。
 
+### Development Operator Binding
+
+`ai_video_mcp.audio_operator`提供独立于Production状态的development-only单次能力实验接线。`prepare_operator_unit`先保存并重开immutable intent/reservation，绑定exact源文件/preview/wire、`gemini-3.8-flash`及固定Google origin、明确授权来源、最长30分钟窗口、count=1和内部USD upper bound；数值不代表报价、账单或账户余额。原子exclusive consumption marker在POST前持久化，重启/并发或UNKNOWN后均不能再消费。结果及typed失败归同一unit的immutable outcome receipt；没有Production activation/QA/human acceptance。
+
+trusted factory为`ai_video_mcp.audio_operator:build_runtime`，只从operator注入的非secret `VIDEO_MCP_AUDIO_OPERATOR_UNIT`和`VIDEO_MCP_AUDIO_OPERATOR_INTENT_SHA256`定位已封存unit；这些值不是MCP调用参数。实际credential只查Secret Service `application=ai-video,provider=gemini-audio,credential=GEMINI_API_KEY`。当前UID标准D-Bus socket须核对owner后显式接线，失败不搜ambient key、其他provider或`.env`。
+
+用户明确指定私密文件时，一次bootstrap可以在本地私密进程中仅解析对应Gemini字段并转存上述exact引用：no-follow、私密权限、无shell source/变量展开、不输出value、不覆盖不同的既有引用，并回读核验。它不授予runtime自动dotenv加载，不删除用户文件；当前bootstrap及model GET的实际结果见[operator preflight record](record_for_agent/2026-10-15-audio-understanding-mcp.md)。后续音频POST仍须独立核验intent/预算/egress/窗口/permit；key存在或metadata GET 200不代音频理解。
+
 一旦真实runtime齐备，adapter重编当前request核验完整source/audio/model/wire preimage，先验证permit，再取exact supplier、消费一次capability，最后固定Google origin只POST一次。不redirect/retry/Files API/fallback。UNKNOWN立即停止，调查原调用；credential failure、wrong SHA/permit、source drift均不发送新的调用。响应不留raw HTTP/key，保存actual modelVersion及response SHA，所有错误保持secret-safe。
 
 ## Per-Shot Review Integration

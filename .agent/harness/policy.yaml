@@ -264,7 +264,7 @@ checks:
     cwd: .
     description: Verify Legacy transport, orchestration, resume, manifest, and ffmpeg behavior.
   mcp_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_mcp_probe.py, tests/test_mcp_frames.py, tests/test_mcp_transcribe.py, tests/test_mcp_scene_detect.py, tests/test_mcp_analyze.py, tests/test_mcp_audio_understanding.py, tests/test_mcp_audio_understand.py, tests/test_mcp_review.py, tests/test_mcp_optimize_plan.py, tests/test_mcp_apply_optimization.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_mcp_probe.py, tests/test_mcp_frames.py, tests/test_mcp_transcribe.py, tests/test_mcp_scene_detect.py, tests/test_mcp_analyze.py, tests/test_mcp_audio_understanding.py, tests/test_mcp_audio_understand.py, tests/test_mcp_audio_operator.py, tests/test_mcp_review.py, tests/test_mcp_optimize_plan.py, tests/test_mcp_apply_optimization.py, -q]
     cwd: .
     description: Verify project-local video-analysis MCP tools.
   production_contract_tests:

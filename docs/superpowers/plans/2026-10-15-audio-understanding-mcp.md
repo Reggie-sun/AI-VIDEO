@@ -33,3 +33,15 @@ Research native worker：仅`docs/research/2026-10-15-audio-understanding-tools.
 Focused commands：`PYTHONPATH=src:. .venv/bin/python -m pytest -p no:cacheprovider tests/test_mcp_audio_understanding.py tests/test_mcp_audio_understand.py tests/test_mcp_analyze.py tests/test_generation_feedback_review.py -q`，随后Harness按owned paths完整覆盖。
 
 Live音义必须使用已存在exact WAV/MP4，在可信runtime、supplier、qualification、预算和one-use授权齐备后最少1次取证；当前未注入Gemini runtime，不搜别的secret，不因接入授权自动上传音频。离线adapter/stdio接线PASS只能证明工程；没有实际云端音频结果就保留LIVE_NOT_EVALUATED/原镜EVIDENCE_REPAIR_FIRST。原首帧FAIL、旧UNKNOWN、原视频0与用户1.0x验收不因工具接入被关闭。
+
+## Authorized Live Operator Follow-up
+
+2026-10-15用户在明确询问远端API及预算后，将key填入指定`.env`供接入，恢复远端完整多模态路线。Parent将该指定文件仅作为一次私密导入源，经0600/no-follow/allowlisted字段核验后转入exact Secret Service `application=ai-video,provider=gemini-audio,credential=GEMINI_API_KEY`；不输出key，不把dotenv/ambient fallback加入runtime，不删除用户文件。最初import因工具进程无desktop session bus失败，核验同UID标准bus后导入及exact回读成功；未发Provider请求。
+
+本单元只授权development音频能力实验：已有4.032s历史WAV、`gemini-3.8-flash`、固定Google origin、一次POST、30分钟窗口、USD 0.05内部operator upper bound及同额reservation。该数值不是报价、实际账单或对$5账户余额的验证；失败/UNKNOWN不重抽、不remint。Provider拒绝与能力观察分别记录，不提升Production qualification/QA/human acceptance。
+
+新增`src/ai_video_mcp/audio_operator.py`是现有trusted injection seam的唯一development permit实现：固定exact preview/profile/源文件及egress，先持久化并重开immutable intent和reservation，再在validate/consume核验actual clock及源identity；lock+exclusive durable consumption marker阻止并发/重启重复POST。结果/typed failure作为同一operator unit的immutable receipt保存。它不写Production Manifest、另建Product ledger、修改timeline/QA/renderer或伪装generation operation。Secret Service supplier仅查上述exact属性，当前UID标准D-Bus只作为显式非secret host接线；无fallback source。
+
+Native bounded worker只拥有新operator module及`tests/test_mcp_audio_operator.py`；Parent拥有本plan、工具guide/研究/primary record、live unit准备与existing MCP invocation。先RED→GREEN验证seal/expiry/source/model/endpoint/重复与并发consume/重启/credential failure/UNKNOWN/receipt边界，再通过fresh隔离MCP调用现有`audio_understand`。Operator中的outcome wrapper复用原`GeminiAudioAnalyzer`，不改wire/transport/schema/工具参数或现有默认行为。
+
+Parent self-review：scope为已声明trusted audio runtime缺项，数据仅同一已存在exact媒体；必要凭据、有限预算/egress/授权的任务内接线在用户当前意图内。Runtime secret/远端授权失败后果触发一次native `reviewer_xhigh`，先相关tests及exact Harness再review；确认修复后的required review未完成前不发POST。最终仍需实际观察字段及身份判断，而非据tests宣布听音成功。

@@ -11,7 +11,7 @@ Date: 2026-10-15
 
 ## Current Direction
 
-用户随后明确只要MCP把音频交给当前Codex直接理解，不接受额外识音模型。下文Gemini工程仍是历史已实现的可选接口，不满足该新约束，不据旧接入授权自动调用或安装其他模型。当前原生音频输入实测阻断见[Native Audio Input Probe](#native-audio-input-probe)；用户要求开subagent打通后的独立会话复现及官方模型能力依据见[追加尝试](#native-subagent-ingress-attempt)，均没有替代原镜声音验收。
+用户先要求原音频直达当前Codex；该路线的实际阻断及独立复现见[Native Audio Input Probe](#native-audio-input-probe)和[追加尝试](#native-subagent-ingress-attempt)，历史结论保留。用户随后接受通过MCP调用完整多模态模型的远端路线，询问API购买及预算，并明确告知key已填入指定`.env`。当前工作已转为真实接通Gemini，不能继续把“等待路线选择/尚未提供凭据”当作现状；凭据、模型GET和无网络exact preview已实测，development单次operator仍须完成verification/review后才可提交。详情见[Authorized Gemini Operator](#authorized-gemini-operator)。这不表示当前Codex原生获得audio输入，亦不替代原镜声音或human验收。
 
 ## User Intent And Decision
 
@@ -94,10 +94,18 @@ Parent直接重开[PR #369](https://github.com/smart-mcp-proxy/mcpproxy-go/pull/
 
 MCP自身instructions/tool description说明音频语义工具与Whisper边界；原AGENTS的Per-Shot routing继续指向playbook，新增同段`audio_understand`锚点只归`docs/audio-understanding.md`详细用法。用户选择A允许该新增入口独立提交、保留原暂存reviewer修改。Guide已达210行/18000 bytes，因此只压缩同一句保留显式project-local analysis与逐项PASS语义并增加锚点，不扩大budget或删除Gate。Matrix声明surface owners，Canvas workflow指向同一tool doc，没有第二操作手册。
 
-## Live And Story Boundary
+## Historical Live And Story Boundary
 
 当前没有qualified Gemini audio operator、exact supplier及其授权/预算/egress/durable-intent/one-use接线。现有Production Paid owner也没有audio-analysis operation，本次不硬套旧image/video permit、不伪造新ledger。因此实际Gemini音义、姓名/声线/对白时窗仍LIVE_NOT_EVALUATED/EVIDENCE_REPAIR_FIRST；本窗口没有云端音频请求、模型下载、依赖安装、Production图片/视频generation或Production mutation，仅tests使用局部synthetic fixture。工具真实stdio可发现不等于当前host已运行的旧MCP catalog自动热加载；后续fresh project-local进程读取新源码即可使用已实现入口。
 
 《界蚀》最新图片FAIL/NE、Manifest33/Project7/QA未激活、原视频0、历史视频11与旧web UNKNOWN均保留，工具工程不替代原S01 accepted source、真实handoff、S02自身QA或成片；用户完整1.0x/故事AC-7仍未验。恢复声音实测须由实际operator绑定上面真实外部条件，之后最少一次在已有exact媒体补证，而不是重生视频。
 
 接口接入checkpoint使用`record-ai-video-session`评估为recorded；`distill-ai-video-learning`为no_candidate：这是用户直接要求的工程接口，不是两次独立声音质量实验或受控模型对照，不能据mocked/offline proof生成能力adoption claim。该checkpoint没有RAG refresh/global memory更新；后续检索排队状态见追加尝试。原foreign staged/dirty保留，记录本身不新增媒体/Provider调用。
+
+## Authorized Gemini Operator
+
+本节更新此前等待选择、未注入凭据和无真实operator的当前状态，不覆盖旧native失败或旧receipt。用户指定的`.env`仅在本地私密进程中一次bootstrap：regular no-follow、0600、Git ignored，只解析allowlisted `GOOGLE_API_KEY`，不打印value、不shell source、不删除原文件。首次Secret Service写入因工具进程无session D-Bus失败；核验同UID标准bus后，导入exact `application=ai-video,provider=gemini-audio,credential=GEMINI_API_KEY`并回读相等验证成功。Runtime只查该引用，无dotenv/ambient fallback。
+
+固定origin的真实authenticated metadata GET返回HTTP 200，`models/gemini-3.8-flash`支持`generateContent`。原project-local MCP的无网络preview绑定历史WAV：SHA `daa154cb46f2a89ce3e95f5dcab6edb019c14a18ea67aef5de4031e0ffeec2d4`、129102 bytes、4.032s，request fingerprint `82c88e0394d8a1a469b291a8a0b54218851146d39a2d9a0e89a37c37e38f34a8`。这一checkpoint的audio上传及POST仍为0；GET/model存在不代声音理解。证据归`runs/canvas-jieshi-original-s01-s02-20261013-001/audio-tool-integration-20261015-001/credential-and-model-preflight-20261015-001.json`。
+
+`audio_operator.py`沿既有trusted factory实现development-only intent/reservation/one-use消费和safe outcome；用户授权reference与credential reference分开。单元固定该existing WAV、`gemini-3.8-flash`、Google origin、一次POST、最多30分钟，USD 0.05为内部operator upper bound，不是价格、账单或账户余额。未消费前先核验exact bytes/model/wire/window，持久消费后UNKNOWN禁止retry/remint。它不修改Production Manifest、paid ledger、QA、timeline或renderer。实际live结果将在同一节追加；未取得前仍`LIVE_NOT_EVALUATED`。
