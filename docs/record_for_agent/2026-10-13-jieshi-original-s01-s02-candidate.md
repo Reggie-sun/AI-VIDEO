@@ -9,7 +9,27 @@ evidence_index_version: "1"
 
 Date: 2026-10-13
 
-## Current METASO Route Correction — 2026-10-16
+## Current METASO Media And Gate — 2026-10-16
+
+原 S01 已经真实通过 METASO `MiniMax-H3` 生成并经 canonical fetch 落盘，取代下节历史候选的“POST0/无MP4/等待工程验证”状态。工程 commit `c3706e3bbcc648ab2f21a15c57a022df7befa95a` 已 push 并核对 remote main；exact Harness `.agent/harness/runs/metaso-original-recovery-20261016-r1/receipt.json` 的完整证明已核验，一名原生 `reviewer_xhigh` 审查 finding set 为空。工程证据不代表媒体通过。
+
+本次视频 POST1，HTTP200/task `2110842438415237120`，canonical attempt `canvas-785e429d6d7241b741dd75d8f4d5981cef08f876`；S02 POST0，零重抽。旧历史12次保留，当前累计13。输入 prompt SHA仍为 `2a54252ee51ac0d9c1a193ff0b3060aa80ae94ab3570986c588b49b162f50f59`，首帧 SHA仍为 `13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923`。原文15项规则及对白/倒影/手部/摄影均未删除；技术适配仅沿已审查 contract。
+
+Exact MP4：`runs/canvas-jieshi-original-s01-s02-20261013-001/production/state/video-generation/fetch/files/b72a5f426beddf08fb3c9f51fbb0773588ac92a767e595835b60ca601c8c7dd3.mp4`；SHA同文件名，2,676,583 bytes，768×1344，24fps，107帧，4.458秒，原生32kHz双声道AAC。实际请求 nominal4s，不把实际4.458秒写成精确4秒；原采用窗口仍0–3秒，未以延长采用来修广播。
+
+显式调用 project-local `video-analysis` MCP 后，使用 exact MP4、全部15项 actual presentation 与原生音轨观察登记 canonical Gate：**4 PASS / 4 FAIL / 7 NOT_EVALUATED**。FAIL为 `s01-identity/s01-native-track/s01-reflections/s01-space`：0/0.5秒保留七名他人，约1秒后灰衣邻座和老人消失、相应座区变出车门/显示屏；不能用“林砚无倒影”替删除其他人辩护。真实frame71单独解码，左手已抬起，但2cm/不接触的完整证据不足，未用raw尾帧代签。
+
+声音本窗口实际打通新 exact MP4 的 MCP→qualified Gemini operator：一次HTTP200，模型 `gemini-3.8-flash`，完整PCM derivative SHA `7987b8cdd84d9976e4d6214de923d9218ce4b69913369c0bfe7004f4e8f614a9`。盲观察报告孤立点名后再次点名并说完整句，支持重复词FAIL；转写“李燕”不能证明原名“林砚”错误，估计时戳也不代0.1–2.7秒精确边界，因此完整广播/时序仍NOT_EVALUATED。没有伪称Codex原生听过或human验收。首次PTY回答超过4096字节导致JSON framing失败；重开已保存的真实MCP response与相同items，经新controlled presentation完成证据登记，未重发音频/视频。
+
+运行恢复没有改产品代码或旁路写state：第一次submit前被task ceiling guard拦住，实际无POST/intent，随后经既有 `extend_paid_provider_submit_quota` 封存同task 2→3有限扩展，再执行一次真正submit。第一次下载因系统DNS返回 `files.metaso.cn → 198.18.2.227` 被公网pinning拒绝；显式选择HTTPS DNS的真实公网答案，仅在fetch进程中对该host供给解析，保留原公共地址校验、numeric pin、TLS/SNI、无重定向/无下载凭据，成功下载同一task，未改全局代理、未新生成。
+
+当前Manifest57/Project11，paid phase ACCEPTED、video phase VALIDATE；`_require_evaluation` 实际拒绝推进，attempt在持久化层仍RUNNING，不能误写为已关闭/已激活。Budget revision12，内部reserved upper bound150 CNY、available50 CNY，保留两个旧图片reservation及本次50 CNY视频reservation；未结算真实账单。S02、实际accepted state绑定、字幕、canonical trim接点、HyperFrames声画片、原前15秒交付与完整故事AC-7均未完成；human1.0x为NOT_EVALUATED。
+
+Operator证据根：`runs/canvas-jieshi-original-s01-s02-20261013-001/metaso-S01-live-20261016-001/`；关键文件为 `wire-observations.json`、`submit-quota-extension.json`、`fetch-after-dns-repair.json`、`download-dns-runtime-selection.json`、`exact-mcp-analysis.json`、`actual-qa-presentation-r2.json`、`canonical-qa-diagnosis.json`、`stable-media-checkpoint.json`。当前按FAIL/NOT_EVALUATED停止，不挪后镜额度重抽；最小恢复条件是针对缺陷封存新的明确修复单元及其输入/证据方案，而非删剧情或改判PASS。
+
+本checkpoint执行 `record-ai-video-session` 与 `distill-ai-video-learning` 评估：`no_candidate`。一次新H3尝试和同bytes多层证据不构成两个独立实验；旧Seedance输入拒绝亦非控制变量相同的模型质量比较。经验检索本轮返回stale last-good空结果并异步排队；未为记录重建RAG或新增Provider调用，foreign index/dirty保持。
+
+## Prior METASO Route Correction — 2026-10-16
 
 用户最新明确纠正“不是让你用metaso的minimax吗”，当前目标 Provider 改为已有 `MetasoH3VideoProvider` / `MiniMax-H3`，不是秘塔搜索、Seedance 或本地模型。此前 Seedance-only、个人账号 Entry/VIP 阻断保留为历史；没有以账号讨论代替视频制作。
 
@@ -729,6 +749,9 @@ Parent使用`research`与`retrieve-ai-video-memory`，后者不作为current事�
 | codex-current-22-static | native-image:dca9ef37a3f22b43e19ccb28dfb707717cf9fa49190795dace34998b714796aa | jieshi-original-progressive-repair-20261015 | original-s01-full-badge-transfer-20261015-011-03 | N/A | 13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923 | VISUAL_INSPECTION_FIRST_FRAME_ROLE | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | codex-current-22-generation | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-s01-final-original-detail-repair-20261015-011/03-static-parent-adjudication.json |
 | original-S01-submit-rejection | seedance-post:21f67a1c46bba1f7e7fecf60c8bbe18e355f752808f00f66f8300e358d3e490e | jieshi-original-S01-live-20261016 | canvas-32dd80cf21a3147888977db32b3dc86c57e1297b | N/A | NO_ARTIFACT:INPUT_ADMISSION_REJECTED | PROVIDER_RECEIPT | KNOWN_NO_EFFECT | INPUT_ADMISSION | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/original-S01-live-20261016-001/actual-rejection-audit.json |
 | original-S01-runtime-evaluation | seedance-post:21f67a1c46bba1f7e7fecf60c8bbe18e355f752808f00f66f8300e358d3e490e | jieshi-original-S01-live-20261016 | canvas-32dd80cf21a3147888977db32b3dc86c57e1297b | N/A | NO_ARTIFACT:INPUT_ADMISSION_REJECTED | CANONICAL_RUNTIME_EVALUATION | RUNTIME_FAILURE | INPUT_ADMISSION | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-submit-rejection | runs/canvas-jieshi-original-s01-s02-20261013-001/original-S01-live-20261016-001/canonical-generation-experience.json |
+| original-S01-metaso-fetch | metaso-post:48782f5c2aab0e6e5a64757746122fd4799441ee710fa7d36585fa1b1a979d0e | jieshi-original-S01-metaso-20261016 | canvas-785e429d6d7241b741dd75d8f4d5981cef08f876 | N/A | b72a5f426beddf08fb3c9f51fbb0773588ac92a767e595835b60ca601c8c7dd3 | PROVIDER_RECEIPT | FETCHED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/metaso-S01-live-20261016-001/fetch-after-dns-repair.json |
+| original-S01-metaso-qa | metaso-post:48782f5c2aab0e6e5a64757746122fd4799441ee710fa7d36585fa1b1a979d0e | jieshi-original-S01-metaso-20261016 | canvas-785e429d6d7241b741dd75d8f4d5981cef08f876 | N/A | b72a5f426beddf08fb3c9f51fbb0773588ac92a767e595835b60ca601c8c7dd3 | ANALYZER | FAIL | QUALITY_FAILURE_AND_EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-metaso-fetch | runs/canvas-jieshi-original-s01-s02-20261013-001/metaso-S01-live-20261016-001/canonical-qa-diagnosis.json |
+| original-S01-metaso-audio | metaso-post:48782f5c2aab0e6e5a64757746122fd4799441ee710fa7d36585fa1b1a979d0e | jieshi-original-S01-metaso-20261016 | canvas-785e429d6d7241b741dd75d8f4d5981cef08f876 | N/A | b72a5f426beddf08fb3c9f51fbb0773588ac92a767e595835b60ca601c8c7dd3 | AUDIO_ANALYZER_OBSERVATION | OBSERVED_NOT_HUMAN_ACCEPTED | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-metaso-fetch | runs/canvas-jieshi-original-s01-s02-20261013-001/metaso-S01-live-20261016-001/exact-mcp-analysis.json |
 
 ## Historical Record And Learning Update
 
