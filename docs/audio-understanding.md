@@ -22,7 +22,7 @@ Codex上游已于2026-07-18合并[原生audio input转发](https://github.com/op
 
 项目本地`video-analysis` MCP注册`audio_understand`，用Gemini官方音频理解接口补充语音内容、声线/语气和环境声观察。它接收原MP4或PCM WAV；不要求Codex主模型能接收audio content，也不强制Qwen/ComfyUI。`video_transcribe`仍是Whisper转写入口，不能据转写文字推断音色、求证表演或完整聆听。[官方能力](https://ai.google.dev/gemini-api/docs/generate-content/audio)
 
-当前实现是可测试的MCP/adapter/逐镜证据接点；没有已绑定的qualified Gemini operator或本项目实际模型听音结果。官方文档的模型能力、mocked tests、正常decode和preview均不证明原片声音PASS。模型生成时间戳是估计，不是sample/frame测量；精确对白时窗须另有实际证据，原`ResolvedTimeline`独占剪辑/混音时序。用户完整1.0x听看与raw逐镜Gate独立。[研究及限制](research/2026-10-15-audio-understanding-tools.md)
+2026-10-15已通过fresh project-local MCP和下述development operator，在既有4.032s历史WAV完成一次真实`gemini-3.8-flash`请求，HTTP 200，取得对白、声线和广播式语气观察；输入/结果identity与实际边界见[session record](record_for_agent/2026-10-15-audio-understanding-mcp.md#operator-verification-and-live-evidence)。这是该单次路线的真实观察，不是Production声音资格或原镜QA通过。官方能力、mocked tests、正常decode和preview均不能代替该实测。模型时间戳仍是估计；精确对白时窗须另有证据，`ResolvedTimeline`独占剪辑/混音时序。用户完整1.0x听看与raw逐镜Gate独立。[研究及限制](research/2026-10-15-audio-understanding-tools.md)
 
 ## MCP Parameters
 
@@ -57,6 +57,8 @@ Factory返回`ai_video_mcp.tools.audio_understand.AudioUnderstandingRuntime`：
 trusted factory为`ai_video_mcp.audio_operator:build_runtime`，只从operator注入的非secret `VIDEO_MCP_AUDIO_OPERATOR_UNIT`和`VIDEO_MCP_AUDIO_OPERATOR_INTENT_SHA256`定位已封存unit；这些值不是MCP调用参数。实际credential只查Secret Service `application=ai-video,provider=gemini-audio,credential=GEMINI_API_KEY`。当前UID标准D-Bus socket须核对owner后显式接线，失败不搜ambient key、其他provider或`.env`。
 
 用户明确指定私密文件时，一次bootstrap可以在本地私密进程中仅解析对应Gemini字段并转存上述exact引用：no-follow、私密权限、无shell source/变量展开、不输出value、不覆盖不同的既有引用，并回读核验。它不授予runtime自动dotenv加载，不删除用户文件；当前bootstrap及model GET的实际结果见[operator preflight record](record_for_agent/2026-10-15-audio-understanding-mcp.md)。后续音频POST仍须独立核验intent/预算/egress/窗口/permit；key存在或metadata GET 200不代音频理解。
+
+本机已实测使用`/home/reggie/.local/share/video-mcp/venv/bin/python`（Python 3.11.16、MCP 1.30.0）；先核验当前环境的server/operator import及actual版本。只检查另一个Python装有MCP/httpx不够：本次误选`ai-video-p2`因缺numpy在import时停止，未取凭据或POST，后复用现有正确环境，没有安装依赖。Fresh stdio server经现有`-m ai_video_mcp`启动并显式注入上述factory/unit/hash及media root/model；已运行的旧server不会自动取得这些设置。一次成功后unit保留为只读历史证据，禁止复制、改写或再消费；新调用仍须当前授权及新exact unit，不能据已存key或本次成功自动扩大。
 
 一旦真实runtime齐备，adapter重编当前request核验完整source/audio/model/wire preimage，先验证permit，再取exact supplier、消费一次capability，最后固定Google origin只POST一次。不redirect/retry/Files API/fallback。UNKNOWN立即停止，调查原调用；credential failure、wrong SHA/permit、source drift均不发送新的调用。响应不留raw HTTP/key，保存actual modelVersion及response SHA，所有错误保持secret-safe。
 

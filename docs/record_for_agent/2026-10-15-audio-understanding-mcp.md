@@ -11,7 +11,7 @@ Date: 2026-10-15
 
 ## Current Direction
 
-用户先要求原音频直达当前Codex；该路线的实际阻断及独立复现见[Native Audio Input Probe](#native-audio-input-probe)和[追加尝试](#native-subagent-ingress-attempt)，历史结论保留。用户随后接受通过MCP调用完整多模态模型的远端路线，询问API购买及预算，并明确告知key已填入指定`.env`。当前工作已转为真实接通Gemini，不能继续把“等待路线选择/尚未提供凭据”当作现状；凭据、模型GET和无网络exact preview已实测，development单次operator仍须完成verification/review后才可提交。详情见[Authorized Gemini Operator](#authorized-gemini-operator)。这不表示当前Codex原生获得audio输入，亦不替代原镜声音或human验收。
+用户先要求原音频直达当前Codex；该路线的实际阻断及独立复现见[Native Audio Input Probe](#native-audio-input-probe)和[追加尝试](#native-subagent-ingress-attempt)，历史结论保留。用户随后接受通过MCP调用完整多模态模型的远端路线，询问API购买及预算，并明确告知key已填入指定`.env`。现已完成安全bootstrap、development operator、verification/native review和一次真实MCP音频请求，HTTP 200，取得可用观察；不能再把“等待路线选择/尚未提供凭据/无实际结果”当作现状。详情见[Authorized Gemini Operator](#authorized-gemini-operator)和[实际证据](#operator-verification-and-live-evidence)。这不表示当前Codex原生获得audio输入，亦不替代原镜声音或human验收。
 
 ## User Intent And Decision
 
@@ -108,4 +108,20 @@ MCP自身instructions/tool description说明音频语义工具与Whisper边界�
 
 固定origin的真实authenticated metadata GET返回HTTP 200，`models/gemini-3.8-flash`支持`generateContent`。原project-local MCP的无网络preview绑定历史WAV：SHA `daa154cb46f2a89ce3e95f5dcab6edb019c14a18ea67aef5de4031e0ffeec2d4`、129102 bytes、4.032s，request fingerprint `82c88e0394d8a1a469b291a8a0b54218851146d39a2d9a0e89a37c37e38f34a8`。这一checkpoint的audio上传及POST仍为0；GET/model存在不代声音理解。证据归`runs/canvas-jieshi-original-s01-s02-20261013-001/audio-tool-integration-20261015-001/credential-and-model-preflight-20261015-001.json`。
 
-`audio_operator.py`沿既有trusted factory实现development-only intent/reservation/one-use消费和safe outcome；用户授权reference与credential reference分开。单元固定该existing WAV、`gemini-3.8-flash`、Google origin、一次POST、最多30分钟，USD 0.05为内部operator upper bound，不是价格、账单或账户余额。未消费前先核验exact bytes/model/wire/window，持久消费后UNKNOWN禁止retry/remint。它不修改Production Manifest、paid ledger、QA、timeline或renderer。实际live结果将在同一节追加；未取得前仍`LIVE_NOT_EVALUATED`。
+`audio_operator.py`沿既有trusted factory实现development-only intent/reservation/one-use消费和safe outcome；用户授权reference与credential reference分开。单元固定该existing WAV、`gemini-3.8-flash`、Google origin、一次POST、最多30分钟，USD 0.05为内部operator upper bound，不是价格、账单或账户余额。未消费前先核验exact bytes/model/wire/window，持久消费后UNKNOWN禁止retry/remint。它不修改Production Manifest、paid ledger、QA、timeline或renderer。下节真实结果只取代该路线的`LIVE_NOT_EVALUATED`，不改变原native omission或Production资格。
+
+## Operator Verification And Live Evidence
+
+原生`bounded_worker` `/root/audio_live_operator`仅拥有`audio_operator.py`及`test_mcp_audio_operator.py`，Parent拥有接线docs/policy及live invocation。初始focused61项PASS、snapshot `20b9ef83373750e1dd625fdda60bc722b3d75947`的exact Harness r1共9项checks PASS且receipt fresh/complete。Parent Risk Gate因凭据泄漏及重复远端effect的关键后果选择一个read-only `reviewer_xhigh` `/root/audio_operator_review`，不是用worker结果代review。首次发现AO-001：源重读跨过expiry仍可消费；AO-002：HTTP200无效观察的typed `EVIDENCE_GAP`在receipt被改为`REJECTED`。Parent均CONFIRMED。
+
+两个新regressions先`2 failed, 22 deselected`，再修复为消费前同一actual instant裁决窗口并写marker、完整保留typed evidence outcome。Parent独立重跑focused63项PASS；修复commit `df425c87ea1d20bd0ac7c70a2622d2e5aeb70c67`按完整任务range运行`.agent/harness/runs/audio-live-operator-20261015-r2/receipt.json`：9/9 checks PASS，MCP124 PASS/1 skip、Harness306 PASS、Architecture零findings，receipt fresh/complete/integrity为true。该snapshot经同一reviewer第二轮full re-review，finding set为空，Parent核对source diff/回归证据关闭两项；review未通过前音频POST=0。`operator-review-risk.json`、两轮request/findings保留在同一audio-tool proof目录，不重置此前adapter review阶段的历史。
+
+Parent曾误选`/home/reggie/micromamba/envs/ai-video-p2/bin/python`：MCP/httpx存在仍不足，实际import因缺numpy在封存intent、取凭据和出网前失败，KNOWN_NO_EFFECT，不能称qualified。随后读取现有host入口，验证`/home/reggie/.local/share/video-mcp/venv/bin/python`可import当前server/operator（Python3.11.16、MCP1.30.0、httpx0.28.1、numpy2.4.6）；复用已有环境，没有安装依赖或模型。证据`operator-runtime-preflight-20261015-001.json`明确取代先前仅核对p2包版本的资格推断。
+
+真实单元为`runs/canvas-jieshi-original-s01-s02-20261013-001/audio-tool-integration-20261015-001/live-audio-understand-20261015-001/`。Fresh stdio `-m ai_video_mcp`明确调用`audio_understand`，先preview逐字段匹配，再执行一次；输入为同一完整PCM WAV，没有把剧本/预期台词放入盲观察请求。Intent SHA `e1a2b310740095468504e88f4114d508243ad657e50dc0310f767626931329bb`，有效窗口13:24:06.442166–13:54:06.442166 UTC，消费13:24:07.328421 UTC。一次POST返回HTTP 200，requested及response model均`gemini-3.8-flash`，response SHA `7aa46a017cc0e8b6151c2bfcab68cbf5a94656384ddbe285522f70aab783e619`。没有重试/重抽，unit已消费，不得复用。Reservation只表内部上限占用；没有实际费用、结算或账户余额证据。
+
+返回的声音观察含短句“林彦，请在终点站下车”，估计0.0–2.5s，声线为清晰平静女声，表演为均匀、礼貌广播式语气。模型`background_sounds`和`uncertainties`均为空，不据此推断背景绝对静音或观察绝无误差。“林彦”与原文“林砚”同音，音频本身不能裁决姓名用字；模型时间戳也不能签原文0.1–2.7s的精确时窗。该历史WAV不升级为原S01 accepted source，音义模型观察与原镜QA/human1.0x仍分层。
+
+Parent重开`intent.json`、`consume.json`、`outcome.json`和`mcp-execution.json`，核验source当前SHA/129102 bytes、request fingerprint、model及response SHA一致，MCP与durable observations完全相同。Outcome为`SUCCEEDED/OBSERVATION_AVAILABLE`、`consumed=true`，QA及human均`NOT_EVALUATED`；outcome文件SHA `c1fe1b22c4423c5bd2ed4e29e1146a2ae60798a8b00318176cb94f179dfbf095`。真实音频远端effect为1次POST，另有先前metadata GET；本单元无Production generation/mutation，未推进S01/S02或剪辑。
+
+本stable checkpoint使用`record-ai-video-session`更新本primary record和工具guide，`distill-ai-video-learning=no_candidate`：一次Gemini输入/输出链，不构成两次独立支持或隔离变量的受控对照，native omission与Gemini成功也不是单变量对照。新owner/signature的focused experience检索仍返回stale advisory并排队derived refresh，Parent依当前files/receipts，不重试或foreground rebuild；无global memory写入。Foreign index/dirty保持，工具guide仍由既有playbook锚点发现，不改foreign reviewer hunks。后续原故事首帧FAIL/NE与逐镜/handoff/composition/human验收的恢复条件保留。
