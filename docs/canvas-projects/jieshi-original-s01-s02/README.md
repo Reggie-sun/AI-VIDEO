@@ -2,7 +2,7 @@
 
 ## Status And Entry
 
-2026-10-15最新媒体checkpoint：继续推进时以exact旧图作唯一底图，新增1次Codex内置单物体修图，输出`a1db0247764947b315110ffe166105dcd5927ebc2f5283d142b20fa91b14ed6f`，943×1667。苏遥白手机仍在镜像画面右侧，目标FAIL；条件陈立调用未提交，首帧未导入/激活、原视频0、历史视频11。内置图片累计5，paid准备图2/local模型图2及旧web UNKNOWN保持。标准loader重开Manifest33/Project7、`qa_policy=None`，entrypoint/Manifest/Registry与旧快照相同。现有单元STOP，不能继续同方式抽图或越过首帧Gate。详见[单物体修复及停止证据](../../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#single-object-repair-and-known-quality-stop--2026-10-15)。
+2026-10-15最新媒体checkpoint：新增4次Codex内置图片调用。局部放大参考→整图转移已修好苏遥解剖左手持唯一白手机，另由实际袖口/腕部证明旧陈立正面倒影持机手，不能继续以手机横坐标判错。随后用Blender同排/对面座位参考修正陈立位置；新构图虽把陈立鞋纳入窗内，却重复一名海军蓝衣女性、遮住苏遥/周伯祥下肢，苏遥绿翻领仍错，林砚对应空座仍不可读。最新exact PNG为`7540565b88ecee230d41aeda1348461ef4854b191b8663c6ec34b0941bf6d26a`，941×1672，完整首帧 **FAIL/STOP**。单元005用2/2、006用1/2且条件次调用未执行、007用1/1；内置图片累计9，未消费slot不挪用。原视频0、历史视频11、paid准备图2/local模型图2及旧web UNKNOWN保留。未导入/激活，标准loader重开Manifest33/Project7、`qa_policy=None`，entrypoint/Manifest/Registry不变。详见[局部成功、空间修复及整图失败证据](../../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#crop-assisted-hand-repair-and-spatial-composition-stop--2026-10-15)；此前单物体FAIL是保留历史，不能当当前手部结论。
 
 声音状态已更新：[Gemini音频观察路线](../../record_for_agent/2026-10-15-audio-understanding-mcp.md#operator-verification-and-live-evidence)在已有4.032s历史WAV完成1次真实MCP调用并返回可用观察。当前Codex原生audio输入仍不支持；这两个事实不能混同，也不能继续声称“没有实际音义工具”。该历史WAV及已消费development permit不代新原镜声音/精确时序/selected QA或human验收。以下latest/historical段为此前checkpoint，非新调用许可。
 

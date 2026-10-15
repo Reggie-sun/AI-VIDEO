@@ -13,7 +13,7 @@ Date: 2026-10-13
 
 声音当前实测更新见[Audio Understanding MCP record](2026-10-15-audio-understanding-mcp.md#operator-verification-and-live-evidence)：Gemini development operator经exact supplier/一次intent/permit，在已有4.032s历史WAV完成1次真实MCP调用，HTTP200，取得对白/声线/表演观察。先前“runtime未绑定、没有上传或实际音义”的描述已被该结果取代；当前Codex native audio仍unsupported，新原镜声音/selected QA/精确时序/human仍未验，旧permit已消费，不把工具成功当首帧FAIL或原镜Gate解除。
 
-最新媒体checkpoint见 **Single Object Repair And Known Quality Stop — 2026-10-15**：用户要求继续，新增1次内置修图，唯一目标为苏遥白手机换至正确镜像侧，但实际输出仍未换边，target FAIL。条件陈立调用未执行，原视频0、内置图片累计5，未导入/激活，Manifest33/Project7及`qa_policy=None`保持。旧计数/UNKNOWN与原剧情不改；下文前一次“最新”均为历史checkpoint。
+最新媒体checkpoint见 **Crop Assisted Hand Repair And Spatial Composition Stop — 2026-10-15**：新增4次内置图片调用，局部放大参考→整图转移修好苏遥解剖左手白手机；同一原生只读critic与Parent通过实际袖口/肘/腕推翻旧手机横坐标判手。后续同排座位参考修正陈立所在排，新取景让其鞋进窗，但最新图重复一名女性、遮住其他倒影、苏遥领型仍错且林砚对应空座不可读，完整首帧FAIL/STOP。内置累计9、原视频0、历史视频11；未导入/激活，标准loader核验Manifest33/Project7、`qa_policy=None`及entrypoint/Manifest/Registry不变。旧计数/UNKNOWN保留；以下“最新”段均为历史checkpoint。
 
 最新媒体checkpoint见 **Original Frame Completion Attempt And Video Stop — 2026-10-15**：按“继续图做完了就生成视频啊”新增3次Codex内置修图，七名他人完整倒影与老人坐姿保住，陈立手机补出；镜像持机/耳机仍有FAIL或NOT_EVALUATED，首帧未完成。实际声音输入再次被平台拒绝，当前Manifest33没有active QA policy或原视频attempt。未导入/激活新图、未提交视频；累计内置图片4（本轮3）、paid准备图2、local模型图2、原视频0、历史视频11，旧web UNKNOWN保留。
 
@@ -452,6 +452,36 @@ Native Codex Parent串行完成这一有界文档变更；没有源码/parser/li
 
 按`record-ai-video-session`更新本primary record及候选README，`distill-ai-video-learning=no_candidate`：同一递进图片链与一次新失败不能证明通用模型限制，也没有验证替代修法有效；不把失败假设写成已验证workflow规则/新LearningClaim。没有global memory写入或前台RAG刷新。纯文档/真实媒体取证不改变代码或权限，implementation Risk Gate为`NATIVE_REVIEW_NOT_REQUIRED`，上述只读视觉critic独立于该gate。Foreign staged/dirty保留；本checkpoint exact Harness、commit/push以实际receipt/Git另验，记录阶段不新增媒体或Provider调用。
 
+## Crop Assisted Hand Repair And Spatial Composition Stop — 2026-10-15
+
+用户要求继续实际做图；本轮使用现有`imagegen`入口，没有新增故事执行脚本、Product adapter、timeline或renderer。`retrieve-ai-video-memory`仅取得stale advisory fragments，继续以原Character/Scene/Shot、exact图及当前runtime为准，不重试检索、前台重建或下载模型。原native5、paid准备2/local模型2及旧web UNKNOWN保持，封存新有限单元时保留前序消费/停止原因，不重放UNKNOWN、不转移旧B或修复额度。
+
+### Hand Repair And Corrected Evidence
+
+目录`runs/canvas-jieshi-original-s01-s02-20261013-001/codex-s01-crop-assisted-repair-20261015-005/`，最多2次内置调用。实际放大旧图后发现，先前Agent增加的“白手机必须在画面左大腿坐标”被物理林砚头部遮住，与保护前景相冲突；原文只要求解剖左手，不要求该像素位置。调用前以`unit-authorization-v2.json`保留旧版本/0次消费及合计2次上限，明确允许左前臂弯到身前，不删持机手要求。
+
+qualified FFmpeg从原图裁出`[194,300,350,744]`、156×444并显式nearest-neighbor放大4倍至624×1776，`crop-preparation.json`核验逆采样等于原像素；只作模型参考预处理，不是最终修图/Registry准入。实际局部生成`eec68abd39f7bbcddf875c066ff5b375f5c3db3e55edc2b20b775e3f9b45f940`，743×2115；局部手臂归属PASS后，第二次以旧整图为edit target、该局部为动作/道具参考，输出`s01-su-left-hand-full-candidate.png`：`8b2e95271d911c774e9eb97552d89aba282bd08a664dfc0e71b56e39a8739703`，944×1667、2,067,700 bytes。两图均exact copy，无最终resize/crop/reencode，native累计7。
+
+Parent与同一只读原生`reviewer_high` `/root/s01_static_geometry_audit`重看实际像素：苏遥镜像画面左侧袖口经肘连接胸前白手机，另一只手空，**手部局部PASS**；陈立放大图的画面右袖跨膝连接深蓝手机及可见黑耳塞，为其实际右手提供证据，不能只凭手机横坐标判错。这纠正的是观察方法，不抹掉旧FAIL输出。完整图仍FAIL：陈立在过道对面，与林砚近侧空座不相邻；苏遥绿上衣是翻领开襟，而原文要求圆领。`full-static-review.json`保留这两个阻断项及动作/声音/human未验；native工具不支持二进制硬mask，尺寸变化也未归一化，未声明保护区像素完全相同。
+
+### Spatial Reference And Two Failed Full Frames
+
+已按`docs/blender-routing.md`加载`scenario-blender-expert`/`scenario-blender-previs-storyboard`。Blender MCP只读probe返回无法连接，已知无副作用；现有本地Blender5.2.1 LTS以`--background --factory-startup --python-exit-code 1`制作独立静态参考，未启动GUI/联网/下载/修改foreign场景。单元006保存可编辑`seating-layout-reference.blend`、Workbench俯视PNG `ab32d089f80d15db356632828362f71ae7ddbd82170304f732cc872b71cdeb6b`与`layout-receipt.json`：林砚/陈立同排相邻0.7m，其他五人在对面，苏遥门边。它只约束预定座位职责，不证明实际图片镜面、相机、完整倒影或接受；未生成animatic或第二Production执行链。
+
+单元006最多2次，先1次空间修图，只有全项通过才允许条件领型修图。`codex-s01-spatial-repair-20261015-006/s01-adjacent-seat-candidate.png`为`e70dd60e382146a66ea72d5e4ef3e15e7c0dcf0725ecd6a6e2eb6719a5a6222e`，944×1666、2,146,016 bytes。陈立从对面移至近侧背面、对面剩五人，但他的腿鞋被窗框切掉，身体遮住周伯祥与苏遥下肢，原空座被占/遮，背面倒影持机袖口仍对应实际左臂。**FAIL/STOP**，条件第2次未调用，也不挪用为重抽。
+
+单元007另封存1次，保留006停止及消费。原S01只要求物理林砚右脸/肩在下，不要求他的整个人/鞋入画；因此允许下半身出画、增加玻璃占比，保留28mm自然广角/坐姿眼高及全部原剧情。exact request `677bff52fef55bab774a2b842d430e37c930d120a4f2c21da894a12177476176`仍以005整图身份/手部及006座位图为不同职责参考，明确七完整他人、相邻空座、背面镜像实际右手、苏遥圆领，不把参考图当实际结果。
+
+实际输出`codex-s01-composition-repair-20261015-007/s01-window-composition-candidate.png`：`7540565b88ecee230d41aeda1348461ef4854b191b8663c6ec34b0941bf6d26a`，941×1672、2,105,490 bytes。Parent与同一critic核验：林砚下半身出画、陈立黑鞋进玻璃，苏遥左手/林砚右手机空左手及挂绳工牌保留；但窗内为**8名他人**（两名海军蓝短发女性）、周伯祥/苏遥下肢仍被遮、具体相邻空座不可读、苏遥翻领仍错、陈立背面持机袖口仍不符合实际右臂。手机白色UI屏幕不证明深蓝机身换色，不添加无依据FAIL。`static-review.json`逐项绑定像素，`unit-stop-receipt.json`封存**完整首帧FAIL/STOP、1/1消费、零retry**。无accepted S01，不提交视频，不以人数可辨认替代完整倒影。
+
+### State, Recovery And Learning Boundary
+
+新增native调用4，累计9；Seedream/视频/音频Provider POST及Comfy推理本轮均0，Blender静态参考不计AI图片调用。内置底层model/价格/账单未暴露，不能把无外部API POST说成全部免费。原视频仍0、历史视频11，旧paid2/local2/web UNKNOWN保留。标准`load_production_project`重开Manifest33/Project7、`qa_policy=None`，entrypoint/Manifest/Registry hash与004 exact前序一致，见007`production-after-canonical.json`；未导入、激活、签QA、取状态或渲染。最初只读诊断误用root manifest路径失败，随后用canonical`state/manifest.json`核验，期间无写入。
+
+实际能力缺口仍是把镜面人物、空间、道具和保护项同时落实到exact图片：native多参考可以传条件，却不提供硬mask/几何锁定保证，俯视图也未使本例整图通过。最小恢复条件是先得到可审阅的几何/分层参考及结果，实证七完整他人、可读相邻空座、正确镜像持机臂与圆领；当前有限单元停止，不能据未用slot或历史预算盲抽/越过Gate。原广播/对白、动作、字幕、raw逐镜声音、实际handoff、HyperFrames两镜7秒及human1.0x均未验，原前15秒S03/S04和完整故事AC-7未交付。
+
+按`record-ai-video-session`更新本primary record及候选README；`distill-ai-video-learning=no_candidate`：这是一条递进且多变量改变的修图链，局部成功不能支持通用生图/镜面能力或workflow有效claim，不创建LearningClaim、修改Skill/Policy/Gate或写全局memory。只读视觉critic不是新增实验或Product QA authority。纯文档/媒体取证未改变代码或权限，implementation Risk Gate为`NATIVE_REVIEW_NOT_REQUIRED`；现有foreign staged/dirty均保留，exact文档Harness与publication另据实际Git/receipt核验，记录阶段不追加媒体/Provider调用。
+
 ## Evidence Index
 
 此表只为本次原开场准备单元建立identity；历史其他实验不并入。remote boundary为Seedream/`doubao-seedream-5-0-pro-260628`、Ark shared image owner、1152×2048 PNG；新增local boundary为Qwen-Image-Edit-2511/三引用masked profile、944×1672 PNG，不与remote合同或计数合并。同一图片的receipt、bytes、materialization和visual proof使用同一request fingerprint independence_key，只贡献一个图片样本；预transport失败不是第二个视觉样本。
@@ -483,6 +513,14 @@ Native Codex Parent串行完成这一有界文档变更；没有源码/parser/li
 | codex-mirror-static | native-image:78091e512ad2621c17d9bf9000efce732401c5246f62d0b6af00fcdd22c4ef57 | jieshi-original-codex-mirrored-props-20261015 | original-s01-codex-mirrored-props-20261015-003 | N/A | 64359f615d10e112ff7aaa68181c3b815cf8178382c199dc4073d17519f810dc | VISUAL_INSPECTION | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | codex-mirror-generation | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-original-frame-repair-20261015-002/mirror-static-review.json |
 | codex-Su-object-generation | native-image:4db7ce4accb006c62e162fe299199e943bf1234d35e7fa8d87470b08aa44a8a1 | jieshi-original-codex-single-object-20261015 | original-s01-codex-Su-single-object-20261015-004 | N/A | a1db0247764947b315110ffe166105dcd5927ebc2f5283d142b20fa91b14ed6f | TOOL_GENERATION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-s01-single-object-repair-20261015-004/Su-generation-record.json |
 | codex-Su-object-static | native-image:4db7ce4accb006c62e162fe299199e943bf1234d35e7fa8d87470b08aa44a8a1 | jieshi-original-codex-single-object-20261015 | original-s01-codex-Su-single-object-20261015-004 | N/A | a1db0247764947b315110ffe166105dcd5927ebc2f5283d142b20fa91b14ed6f | VISUAL_INSPECTION | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | codex-Su-object-generation | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-s01-single-object-repair-20261015-004/Su-static-review.json |
+| codex-Su-crop-generation | native-image:df6a5a7e0d03a4b5eafbdafc7d347a9833447b065f39c22e1ceb4415cd1a5087 | jieshi-original-crop-assisted-20261015 | original-s01-codex-crop-Su-20261015-005 | N/A | eec68abd39f7bbcddf875c066ff5b375f5c3db3e55edc2b20b775e3f9b45f940 | TOOL_GENERATION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-s01-crop-assisted-repair-20261015-005/crop-generation-record.json |
+| codex-Su-crop-local-static | native-image:df6a5a7e0d03a4b5eafbdafc7d347a9833447b065f39c22e1ceb4415cd1a5087 | jieshi-original-crop-assisted-20261015 | original-s01-codex-crop-Su-20261015-005 | N/A | eec68abd39f7bbcddf875c066ff5b375f5c3db3e55edc2b20b775e3f9b45f940 | VISUAL_INSPECTION_LOCAL_ROLE | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | codex-Su-crop-generation | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-s01-crop-assisted-repair-20261015-005/crop-static-review.json |
+| codex-Su-full-generation | native-image:8d4633673aa0b23fde9d502abf8e0e3375e3b7c658f93dde62511cfc8894f665 | jieshi-original-crop-assisted-20261015 | original-s01-codex-full-Su-transfer-20261015-005 | N/A | 8b2e95271d911c774e9eb97552d89aba282bd08a664dfc0e71b56e39a8739703 | TOOL_GENERATION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-s01-crop-assisted-repair-20261015-005/full-generation-record.json |
+| codex-Su-full-static | native-image:8d4633673aa0b23fde9d502abf8e0e3375e3b7c658f93dde62511cfc8894f665 | jieshi-original-crop-assisted-20261015 | original-s01-codex-full-Su-transfer-20261015-005 | N/A | 8b2e95271d911c774e9eb97552d89aba282bd08a664dfc0e71b56e39a8739703 | VISUAL_INSPECTION | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | codex-Su-full-generation | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-s01-crop-assisted-repair-20261015-005/full-static-review.json |
+| codex-spatial-generation | native-image:3a0249c11a211af64d234e9c4d396c8ae8c22a1a8ab2bf6e6ad2a9ae418b3090 | jieshi-original-spatial-20261015 | original-s01-spatial-20261015-006 | N/A | e70dd60e382146a66ea72d5e4ef3e15e7c0dcf0725ecd6a6e2eb6719a5a6222e | TOOL_GENERATION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-s01-spatial-repair-20261015-006/geometry-generation-record.json |
+| codex-spatial-static | native-image:3a0249c11a211af64d234e9c4d396c8ae8c22a1a8ab2bf6e6ad2a9ae418b3090 | jieshi-original-spatial-20261015 | original-s01-spatial-20261015-006 | N/A | e70dd60e382146a66ea72d5e4ef3e15e7c0dcf0725ecd6a6e2eb6719a5a6222e | VISUAL_INSPECTION | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | codex-spatial-generation | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-s01-spatial-repair-20261015-006/geometry-static-review.json |
+| codex-composition-generation | native-image:677bff52fef55bab774a2b842d430e37c930d120a4f2c21da894a12177476176 | jieshi-original-composition-20261015 | original-s01-composition-20261015-007 | N/A | 7540565b88ecee230d41aeda1348461ef4854b191b8663c6ec34b0941bf6d26a | TOOL_GENERATION | SUCCEEDED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-s01-composition-repair-20261015-007/generation-record.json |
+| codex-composition-static | native-image:677bff52fef55bab774a2b842d430e37c930d120a4f2c21da894a12177476176 | jieshi-original-composition-20261015 | original-s01-composition-20261015-007 | N/A | 7540565b88ecee230d41aeda1348461ef4854b191b8663c6ec34b0941bf6d26a | VISUAL_INSPECTION | FAIL | QUALITY_FAILURE | SAME_EVIDENCE_NEW_PROOF_LAYER | codex-composition-generation | runs/canvas-jieshi-original-s01-s02-20261013-001/codex-s01-composition-repair-20261015-007/static-review.json |
 
 ## Historical Record And Learning Update
 
