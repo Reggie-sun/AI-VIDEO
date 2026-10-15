@@ -146,31 +146,58 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
         return VideoProviderCapabilities.create(provider_name=_NAME, variants=variants)
 
     def compile_request(self, provider_bound, requirement, *, continuity_expression=None):
-        from ai_video.production._remote_video_native_prompt import (
-            RemoteVideoPromptCompilation, compile_remote_video_prompt,
-        )
         from ai_video.production.video_compiler import (
-            ProviderNativePrompt, ProviderRequirementUnsupported,
-            ProviderRequirementUnsupportedReason, compile_provider_video_request,
+            ProviderNativePrompt,
+            ProviderRequirementUnsupported,
+            ProviderRequirementUnsupportedReason,
+            compile_provider_video_request,
         )
-        compiled = compile_remote_video_prompt(requirement,
-            provider_bound=provider_bound, continuity_expression=continuity_expression)
-        if not isinstance(compiled, RemoteVideoPromptCompilation):
-            return ProviderRequirementUnsupported(
-                requirement_hash=requirement.requirement_hash,
-                provider_bound_request_hash=provider_bound.provider_bound_request_hash,
-                selected_capability_id=provider_bound.capability_id,
-                reason=ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
-                unsupported_field_paths=compiled.unsupported_field_paths,
+
+        source_preservation = requirement.target_shot.preserved_source_expression is not None
+        if source_preservation:
+            from ai_video.production.seedance_source_expression import compile_preserved_source
+
+            try:
+                native_prompt = compile_preserved_source(
+                    provider_bound, requirement, provider_name=_NAME,
+                    compiler_id="metaso-h3-video-compiler", compiler_version="1",
+                    continuity_expression=continuity_expression,
+                )
+            except (TypeError, ValueError):
+                return ProviderRequirementUnsupported(
+                    requirement_hash=requirement.requirement_hash,
+                    provider_bound_request_hash=provider_bound.provider_bound_request_hash,
+                    selected_capability_id=provider_bound.capability_id,
+                    reason=ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+                    unsupported_field_paths=("target_shot.preserved_source_expression",),
+                )
+        else:
+            from ai_video.production._remote_video_native_prompt import (
+                RemoteVideoPromptCompilation, compile_remote_video_prompt,
             )
+            compiled = compile_remote_video_prompt(requirement,
+                provider_bound=provider_bound, continuity_expression=continuity_expression)
+            if not isinstance(compiled, RemoteVideoPromptCompilation):
+                from ai_video.production.video_compiler import (
+                    ProviderRequirementUnsupported,
+                    ProviderRequirementUnsupportedReason,
+                )
+                return ProviderRequirementUnsupported(
+                    requirement_hash=requirement.requirement_hash,
+                    provider_bound_request_hash=provider_bound.provider_bound_request_hash,
+                    selected_capability_id=provider_bound.capability_id,
+                    reason=ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+                    unsupported_field_paths=compiled.unsupported_field_paths,
+                )
+            native_prompt = ProviderNativePrompt(grammar_contract="remote-video-prose-v1",
+                prompt_text=compiled.prompt_text, prompt_sha256=compiled.prompt_sha256,
+                expressed_control_paths=compiled.expressed_control_paths)
         return compile_provider_video_request(
             provider_bound=provider_bound, requirement=requirement,
             compiler_id="metaso-h3-video-compiler", compiler_version="1",
             capabilities=self.capabilities(),
             continuity_expression=continuity_expression,
-            native_prompt=ProviderNativePrompt(grammar_contract="remote-video-prose-v1",
-                prompt_text=compiled.prompt_text, prompt_sha256=compiled.prompt_sha256,
-                expressed_control_paths=compiled.expressed_control_paths),
+            native_prompt=native_prompt,
         )
 
     def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:

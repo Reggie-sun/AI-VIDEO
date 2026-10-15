@@ -234,6 +234,10 @@ FAILED observation、runtime-failure evidence 和新 candidate scope，one-use�
 Provider/model、完整 final-output goal 及质量要求。T2V 到 I2V 的输入变更不等于 known_no_effect，
 不释放旧 reservation、不重置消费，unknown/已有输出/错身份拒绝。新 POST 仍经全部 paid gates。
 
+原文保留可由同一 source owner 为 Seedance/3 或 METASO H3/1 生成各自 grammar，重编校验原文、exact 引用及状态 grounding；不删除 preserved source 来换模型。
+已知 paid no-effect 后显式换 Provider 使用 `runtime-repair/5` 的 exact 跨 Provider scope；旧同 Provider `/3`、已接受后 FAILED 的 `/4` 不因此扩权。
+scope 冻结同 task/Shot、原文/首帧/剧情/声音与完整验收，只允许已声明的原生480p→768P输出 token 和几何适配，保留新旧 QA/goal、失败及消费历史；fresh preview/budget/egress/intent/permit 和逐镜 MCP Gate 仍不可省略。
+
 ## Audio And Verification
 
 原生 WAV 只登记当前真正接受且有真实 cost coverage 的 request，旧 failed attempt 不阻碍正确版本。

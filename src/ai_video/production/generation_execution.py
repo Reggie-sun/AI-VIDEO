@@ -117,9 +117,9 @@ class GenerationDecisionExecutionBinding(StrictModel):
         if sealed is None:
             raise ValueError("production execution binding requires an activation scope")
         if self.projection.requirement.target_shot.preserved_source_expression is not None:
-            from ai_video.production.seedance_source_expression import validate_preserved_seedance_request
+            from ai_video.production.seedance_source_expression import validate_preserved_source_request
 
-            validate_preserved_seedance_request(bound, self.projection.requirement, request)
+            validate_preserved_source_request(bound, self.projection.requirement, request)
         if request.subject_bindings or (request.adapter_compiler_id == "vidu-video-compiler"
                                        and request.adapter_compiler_version == "4"):
             from ai_video.production._vidu_subjects import validate_vidu_subject_prompt
@@ -235,12 +235,16 @@ class GenerationDecisionExecutionBinding(StrictModel):
             raise ValueError("source-grounded Router seed cannot execute without its materialized sequence edge")
         if shot.preserved_source_expression is not None and self.continuity_routing is not None:
             from ai_video.production._sequence_source import build_verified_causal_opening_expression
-            from ai_video.production.seedance_source_expression import compile_preserved_seedance_source
+            from ai_video.production.seedance_source_expression import compile_preserved_source
 
             bound = self.decision.routing.provider_bound_request
             expression = build_verified_causal_opening_expression(loaded=project,
                 routing=self.continuity_routing, requirement=self.projection.requirement, provider_bound=bound)
-            compile_preserved_seedance_source(bound, self.projection.requirement, continuity_expression=expression)
+            compile_preserved_source(bound, self.projection.requirement,
+                provider_name=bound.provider_name,
+                compiler_id=bound.compiler_contract.compiler_id,
+                compiler_version=bound.compiler_contract.compiler_version,
+                continuity_expression=expression)
         if request.subject_bindings or shot.preserved_source_expression is not None:
             requirement = self.projection.requirement
             current_characters = {c.character_id: c for c in project.characters}

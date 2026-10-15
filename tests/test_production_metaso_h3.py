@@ -625,3 +625,224 @@ def test_typed_hash_sequence_prompt_remains_explicitly_unsupported(monkeypatch):
     assert isinstance(result, ProviderRequirementUnsupported)
     assert result.reason is ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED
     assert set(result.unsupported_field_paths) == {"generation_intent.open_state", "generation_intent.close_state"}
+
+
+def _metaso_preserved_source_case():
+    from ai_video.production._video_capability_fingerprint import capability_variant_fingerprint
+    from ai_video.production._shot_router_contracts import AdapterCompilerContract, ProviderBoundVideoRequest
+    from ai_video.production.metaso_h3 import MetasoH3Profile, MetasoH3VideoProvider
+    from ai_video.production.seedance_source_expression import (
+        PreservedSourceExpression, SourceReferenceMaterial, SourceTextPart, source_parts_sha256,
+    )
+    from ai_video.production.video_requirement import OutputGeometryPolicy, OutputNeed, ProviderNeutralVideoRequirement
+    from test_seedance_source_expression import _rebind_source_expression
+    from test_seedance_source_prompt import _case
+
+    _, seedance_bound, requirement, source = _case(first_frame=True)
+    profile = MetasoH3Profile(duration=seedance_bound.output_requirement.duration_seconds,
+        resolution="768P", aspect_ratio="adaptive", context_ir=True,
+        cost_upper_bound_microunits=1)
+    requirement = ProviderNeutralVideoRequirement.create(**{
+        **requirement.model_dump(mode="python", exclude={"requirement_id", "requirement_hash"}),
+        "output_need": OutputNeed(timing_mode="content_driven",
+            duration_seconds=profile.duration, geometry_policy=OutputGeometryPolicy.ADAPTIVE,
+            aspect_ratio="adaptive", fps=24, container_mime="video/mp4"),
+    })
+    frame = requirement.asset_evidence[0]
+    expression = PreservedSourceExpression(
+        contract_version="seedance-preserved-source/2",
+        source_sha256=source_parts_sha256(
+            (SourceTextPart(text=source),),
+            (SourceReferenceMaterial(asset_id=frame.asset_id,
+                asset_sha256=frame.asset_sha256, role="first_frame"),),
+        ),
+        parts=(SourceTextPart(text=source),),
+        implicit_references=(SourceReferenceMaterial(asset_id=frame.asset_id,
+            asset_sha256=frame.asset_sha256, role="first_frame"),),
+    )
+    seedance_bound, requirement = _rebind_source_expression(
+        seedance_bound, requirement, expression, source
+    )
+
+    provider = MetasoH3VideoProvider(profile=profile, transport=object(),
+        credential=lambda: pytest.fail("pure source compilation must not read credentials"),
+        reference_resolver=lambda _: pytest.fail("compile must not read reference bytes"))
+    capability = next(v for v in provider.capabilities().variants
+        if v.mode is VideoGenerationMode.IMAGE_TO_VIDEO)
+    compiler = AdapterCompilerContract.create(
+        compiler_id="metaso-h3-video-compiler", compiler_version="1")
+    values = {name: getattr(seedance_bound, name)
+        for name in ProviderBoundVideoRequest.model_fields
+        if name != "provider_bound_request_hash"}
+    recipe = seedance_bound.generation_recipe.model_copy(update={
+        "profile_sha256": profile.pointer().profile_sha256,
+        "compiler_hash": compiler.compiler_hash,
+    })
+    values.update(provider_name="metaso_h3", provider_kind="metaso_h3",
+        model_id="MiniMax-H3", provider_profile=profile.pointer(),
+        capability_id=capability.capability_id,
+        capability_fingerprint=capability_variant_fingerprint(capability),
+        execution_kind=capability.execution_kind, billing_kind=capability.billing_kind,
+        output_requirement=profile.output(), compiler_contract=compiler,
+        generation_recipe=recipe)
+    bound = ProviderBoundVideoRequest.create(**values)
+    return provider, bound, requirement, source
+
+
+def _seedance_preserved_source_case():
+    from ai_video.production._shot_router_contracts import AdapterCompilerContract, ProviderBoundVideoRequest
+    from ai_video.production.seedance import SeedanceVideoProvider
+    from ai_video.production.seedance_source_expression import (
+        PreservedSourceExpression, SourceReferenceMaterial, SourceTextPart, source_parts_sha256,
+    )
+    from test_seedance_source_expression import _rebind_source_expression
+    from test_seedance_source_prompt import _case
+
+    profile, bound, requirement, source = _case(first_frame=True)
+    frame = requirement.asset_evidence[0]
+    expression = PreservedSourceExpression(
+        contract_version="seedance-preserved-source/2",
+        source_sha256=source_parts_sha256(
+            (SourceTextPart(text=source),),
+            (SourceReferenceMaterial(asset_id=frame.asset_id,
+                asset_sha256=frame.asset_sha256, role="first_frame"),),
+        ),
+        parts=(SourceTextPart(text=source),),
+        implicit_references=(SourceReferenceMaterial(asset_id=frame.asset_id,
+            asset_sha256=frame.asset_sha256, role="first_frame"),),
+    )
+    bound, requirement = _rebind_source_expression(bound, requirement, expression, source)
+    compiler = AdapterCompilerContract.create(
+        compiler_id="seedance-video-compiler", compiler_version="3")
+    values = {name: getattr(bound, name) for name in ProviderBoundVideoRequest.model_fields
+        if name != "provider_bound_request_hash"}
+    values["compiler_contract"] = compiler
+    values["generation_recipe"] = bound.generation_recipe.model_copy(update={
+        "compiler_hash": compiler.compiler_hash,
+    })
+    bound = ProviderBoundVideoRequest.create(**values)
+    provider = SeedanceVideoProvider(profile=profile, transport=object(),
+        credential=lambda: pytest.fail("pure source compilation must not read credentials"),
+        input_reference=object())
+    return provider, bound, requirement, source
+
+
+def test_metaso_compiles_original_source_and_exact_first_frame_under_metaso_grammar():
+    from ai_video.production.video_compiler import CompiledProviderVideoRequest
+
+    provider, bound, requirement, source = _metaso_preserved_source_case()
+    result = provider.compile_request(bound, requirement)
+
+    assert isinstance(result, CompiledProviderVideoRequest)
+    assert result.adapter_compiler_id == "metaso-h3-video-compiler"
+    assert result.adapter_compiler_version == "1"
+    assert result.provider_native_prompt == source
+    assert result.request.prompt_text == source
+    assert result.request.image_bindings[0].role == "first_frame"
+    assert result.request.image_bindings[0].asset_sha256 == requirement.asset_evidence[0].asset_sha256
+    assert result.request.adapter_compiler_id == "metaso-h3-video-compiler"
+
+
+def test_metaso_returns_typed_unsupported_for_source_compiler_identity_mismatch():
+    from ai_video.production._shot_router_contracts import AdapterCompilerContract, ProviderBoundVideoRequest
+    from ai_video.production.video_compiler import (
+        ProviderRequirementUnsupported, ProviderRequirementUnsupportedReason,
+    )
+
+    provider, bound, requirement, _ = _metaso_preserved_source_case()
+    wrong_compiler = AdapterCompilerContract.create(
+        compiler_id="metaso-h3-video-compiler", compiler_version="2")
+    values = {name: getattr(bound, name) for name in ProviderBoundVideoRequest.model_fields
+        if name != "provider_bound_request_hash"}
+    values["compiler_contract"] = wrong_compiler
+    values["generation_recipe"] = bound.generation_recipe.model_copy(update={
+        "compiler_hash": wrong_compiler.compiler_hash,
+    })
+    mismatched = ProviderBoundVideoRequest.create(**values)
+
+    result = provider.compile_request(mismatched, requirement)
+
+    assert isinstance(result, ProviderRequirementUnsupported)
+    assert result.reason is ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED
+    assert result.unsupported_field_paths == ("target_shot.preserved_source_expression",)
+
+
+def test_metaso_source_compiler_does_not_swallow_unexpected_errors(monkeypatch):
+    import ai_video.production.seedance_source_expression as source_expression
+
+    provider, bound, requirement, _ = _metaso_preserved_source_case()
+
+    def fail_unexpectedly(*args, **kwargs):
+        raise RuntimeError("unexpected source compiler failure")
+
+    monkeypatch.setattr(source_expression, "compile_preserved_source", fail_unexpectedly)
+    with pytest.raises(RuntimeError, match="unexpected source compiler failure"):
+        provider.compile_request(bound, requirement)
+
+
+@pytest.mark.parametrize("case_factory", [_seedance_preserved_source_case, _metaso_preserved_source_case])
+def test_preserved_source_validator_accepts_resolved_request_for_standard_loading(case_factory):
+    from ai_video.production.seedance_source_expression import validate_preserved_source_request
+    from ai_video.production.video import ResolvedVideoGenerationRequest
+    from ai_video.production.video_compiler import CompiledProviderVideoRequest
+
+    provider, bound, requirement, source = case_factory()
+    compiled = provider.compile_request(bound, requirement)
+
+    assert isinstance(compiled, CompiledProviderVideoRequest)
+    resolved = provider.resolve(compiled.request)
+    assert isinstance(resolved, ResolvedVideoGenerationRequest)
+    assert resolved.prompt_text == source
+    validate_preserved_source_request(bound, requirement, resolved)
+    changed_request = resolved.model_copy(update={"prompt_text": source + " 新增动作。"})
+    with pytest.raises(ValueError, match="compiled request differs"):
+        validate_preserved_source_request(bound, requirement, changed_request)
+
+
+@pytest.mark.parametrize("damage", ["source_text", "compiler", "reference"])
+def test_metaso_source_recompile_rejects_changed_source_compiler_or_reference(damage):
+    from ai_video.production._shot_router_contracts import AdapterCompilerContract, ProviderBoundVideoRequest
+    from ai_video.production.video_compiler import (
+        CompiledProviderVideoRequest, ProviderNativePrompt, ProviderRequirementUnsupported,
+        compile_provider_video_request,
+    )
+
+    provider, bound, requirement, source = _metaso_preserved_source_case()
+    native = provider.compile_request(bound, requirement)
+    assert isinstance(native, CompiledProviderVideoRequest)
+    compiler_id = "metaso-h3-video-compiler"
+    compiler_version = "1"
+    altered_bound = bound
+    altered_requirement = requirement
+    altered_text = source + " 新增动作。" if damage == "source_text" else source
+    altered_native = ProviderNativePrompt(
+        grammar_contract="metaso-h3-preserved-source-v1",
+        prompt_text=altered_text,
+        prompt_sha256=hashlib.sha256(altered_text.encode()).hexdigest(),
+        expressed_control_paths=("generation_intent.subject_action.progression",
+            "generation_intent.pacing.shot_duration_seconds"),
+    )
+    if damage == "compiler":
+        wrong = AdapterCompilerContract.create(compiler_id="seedance-video-compiler", compiler_version="3")
+        values = {name: getattr(bound, name) for name in ProviderBoundVideoRequest.model_fields
+            if name != "provider_bound_request_hash"}
+        values["compiler_contract"] = wrong
+        values["generation_recipe"] = bound.generation_recipe.model_copy(update={"compiler_hash": wrong.compiler_hash})
+        altered_bound = ProviderBoundVideoRequest.create(**values)
+        compiler_id, compiler_version = wrong.compiler_id, wrong.compiler_version
+    elif damage == "reference":
+        values = {name: getattr(bound, name) for name in ProviderBoundVideoRequest.model_fields
+            if name != "provider_bound_request_hash"}
+        values["input_assets"] = (bound.input_assets[0].model_copy(update={"asset_sha256": "f" * 64}),)
+        altered_bound = ProviderBoundVideoRequest.create(**values)
+
+    result = compile_provider_video_request(
+        provider_bound=altered_bound,
+        requirement=altered_requirement,
+        compiler_id=compiler_id,
+        compiler_version=compiler_version,
+        capabilities=provider.capabilities(),
+        native_prompt=altered_native,
+    )
+
+    assert isinstance(result, ProviderRequirementUnsupported)

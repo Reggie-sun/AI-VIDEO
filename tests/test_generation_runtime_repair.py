@@ -219,6 +219,645 @@ def test_paid_known_failure_retarget_allows_profile_hash_drift_with_same_require
     assert result.runtime_repair == auth
 
 
+def _cross_provider_no_effect_case():
+    from pathlib import Path
+    import hashlib
+
+    from ai_video.production.generation_decision import GenerationCandidate
+    from ai_video.production.generation_runtime_repair import (
+        PaidCrossProviderNoEffectRetarget,
+    )
+    from ai_video.production.video import VideoOutputCapability, VideoProviderCapabilities
+    from ai_video.production._shot_router_contracts import AdapterCompilerContract
+    from ai_video.production.video_contracts import VideoFlexibleOutputRequirement
+    from ai_video.production.video_requirement import (
+        AudioNeed, OutputGeometryPolicy, OutputNeed, ProviderNeutralVideoRequirement,
+        VerifiedGenerationRequirementProjection,
+    )
+    from ai_video.production.final_output_contracts import (
+        FinalOutputContract, FinalOutputRequirement,
+    )
+    from ai_video.production.generation_recipe import RequirementExpression
+    from ai_video.production.hashing import seal_artifact
+    from ai_video.production.artifact_contracts import SourceReference
+    from test_production_generation_decision import acceptance_policy
+    from ai_video.planning.video_planner import VideoPlanner
+
+    setup = setup_decision(remote=True, seed_supported=False, reference_hash="f" * 64)
+    old = setup["inputs"].candidates[0]
+    source_need = OutputNeed(
+        timing_mode="content_driven", duration_seconds=4,
+        geometry_policy=OutputGeometryPolicy.EXACT, width=496, height=864,
+        aspect_ratio=None, fps=24, container_mime="video/mp4",
+    )
+    source_requirement = ProviderNeutralVideoRequirement.create(**{
+        **setup["projection"].requirement.model_dump(
+            mode="python", exclude={"requirement_id", "requirement_hash"}),
+        "output_need": source_need,
+        "audio_need": AudioNeed.REQUIRED,
+    })
+    target_shot = seal_artifact(source_requirement.target_shot.model_copy(update={
+        "revision": source_requirement.target_shot.revision + 1,
+        "content_hash": "0" * 64,
+        "creation_receipt_id": "fixture-authoring-revision",
+        "source_provenance": (*source_requirement.target_shot.source_provenance,
+            SourceReference(kind="derived", reference="authoring-revision",
+                            content_hash="a" * 64)),
+    }))
+    target_need = source_need.model_copy(update={
+        "geometry_policy": OutputGeometryPolicy.ADAPTIVE,
+        "width": None, "height": None,
+    })
+    target_requirement = ProviderNeutralVideoRequirement.create(**{
+        **source_requirement.model_dump(
+            mode="python", exclude={"requirement_id", "requirement_hash"}),
+        "target_shot": target_shot,
+        "output_need": target_need,
+    })
+    source_projection = VerifiedGenerationRequirementProjection.create(**{
+        **setup["projection"].model_dump(mode="python", exclude={"projection_hash"}),
+        "requirement": source_requirement,
+    })
+    target_projection = VerifiedGenerationRequirementProjection.create(**{
+        **setup["projection"].model_dump(mode="python", exclude={"projection_hash"}),
+        "requirement": target_requirement,
+        "target_shot_revision": target_shot.revision,
+        "target_shot_content_hash": target_shot.content_hash,
+    })
+
+    source_expression = RequirementExpression(
+        requirement_id="s01-source-output", level="acceptance", stage="raw_generation",
+        dimension="source_fidelity", observable="4秒/480p/24fps且含原生音轨",
+        tolerance="exact", measurement="request and native media inspection",
+        proof="technical", intent_paths=("output_need",),
+        production_owner="shot_authoring",
+    )
+    target_expression = source_expression.model_copy(update={
+        "observable": source_expression.observable.replace("480p", "768P"),
+    })
+    source_expressions = tuple(sorted((*old.recipe.expressions, source_expression),
+                                      key=lambda item: item.requirement_id))
+    target_expressions = tuple(sorted((
+        *(expression for expression in old.recipe.expressions), target_expression,
+    ), key=lambda item: item.requirement_id))
+    source_policy = acceptance_policy(source_expressions)
+    target_policy = acceptance_policy(target_expressions)
+    source_goal = FinalOutputContract(
+        goal_id="jieshi-s01-output", goal_version="seedance-native-480p-S01-20261016-001",
+        user_goal="Preserve the original S01 scene and its accepted raw output.",
+        requirements=(
+            FinalOutputRequirement(requirement_id="s01-source-output",
+                observable="4秒/480p/24fps且含原生音轨", proof="evaluator"),
+            FinalOutputRequirement(requirement_id="s02-source-output",
+                observable="S02仍为4秒/480p/24fps并保留原对白", proof="evaluator"),
+            FinalOutputRequirement(requirement_id="story-preservation",
+                observable="保留林砚左手悬窗、广播和异常倒影", proof="human"),
+        ),
+    )
+    target_goal = source_goal.model_copy(update={
+        "goal_version": "metaso-h3-native-768p-S01-20261016-001",
+        "requirements": (
+            source_goal.requirements[0].model_copy(update={
+                "observable": source_goal.requirements[0].observable.replace("480p", "768P"),
+            }),
+            *source_goal.requirements[1:],
+        ),
+    })
+    source_compiler = old.compiler_contract
+    source_profile_sha = old.provider_profile.profile_sha256
+    old_output = VideoFlexibleOutputRequirement(
+        timing_mode="nominal_seconds", duration_seconds=4,
+        dimension_mode="exact", width=496, height=864,
+        resolution_label="480p", ratio="9:16", fps=24,
+        container="mp4", mime_type="video/mp4", native_audio=True,
+    )
+    old_variant = old.capabilities.variants[0].model_copy(update={
+        "capability_id": "seedance-i2v-480p-v1",
+        "provider_kind": "volcengine_ark_seedance",
+        "model_id": "Seedance-2.5",
+        "output": None,
+        "output_capability": VideoOutputCapability(
+            min_duration_seconds=4, max_duration_seconds=4,
+            provider_selected_duration=False, timing_modes=("nominal_seconds",),
+            dimension_modes=("exact",), resolution_labels=("480p",), ratios=("9:16",),
+            fps_values=(24,), containers=("mp4",), native_audio_options=(True,),
+        ),
+    })
+    old_capabilities = VideoProviderCapabilities.create(
+        provider_name="seedance", variants=(old_variant,))
+    old_profile = old.provider_profile.model_copy(update={
+        "profile_id": "seedance", "profile_version": "seedance-2.5-v1",
+    })
+    old = old.model_copy(update={
+        "capabilities": old_capabilities, "capability_id": old_variant.capability_id,
+        "output_requirement": old_output,
+        "provider_profile": old_profile, "final_output_goal": source_goal,
+        "recipe": old.recipe.model_copy(update={
+            "profile_sha256": old_profile.profile_sha256,
+            "compiler_hash": source_compiler.compiler_hash,
+            "requirement_hash": source_requirement.requirement_hash,
+            "acceptance_policy": source_policy,
+            "expressions": source_expressions,
+            "rubric_hash": source_policy.profile_content_hash,
+        }),
+    })
+    profile_sha = hashlib.sha256(b"metaso-profile").hexdigest()
+    profile = old.provider_profile.model_copy(update={
+        "profile_id": "metaso_h3", "profile_version": "metaso-h3-ref2va-v1",
+        "profile_path": Path(f"provider-profiles/{profile_sha}.json"),
+        "profile_sha256": profile_sha,
+    })
+    variant = old.capabilities.variants[0].model_copy(update={
+        "capability_id": "metaso-h3-fl2va-v1", "provider_kind": "metaso_h3",
+        "model_id": "MiniMax-H3", "profile_version": "metaso-h3-ref2va-v1",
+        "seed_supported": False,
+        "negative_prompt_supported": False,
+        "output": None,
+        "output_capability": VideoOutputCapability(
+            min_duration_seconds=4, max_duration_seconds=4,
+            provider_selected_duration=False, timing_modes=("nominal_seconds",),
+            dimension_modes=("adaptive",), resolution_labels=("768P",), ratios=("adaptive",),
+            fps_values=(24,), containers=("mp4",), native_audio_options=(True,),
+        ),
+    })
+    capabilities = VideoProviderCapabilities.create(
+        provider_name="metaso_h3", variants=(variant,))
+    compiler = AdapterCompilerContract.create(
+        compiler_id="metaso-h3-compiler", compiler_version="1")
+    recipe = old.recipe.model_copy(update={
+        "profile_sha256": profile_sha, "compiler_hash": compiler.compiler_hash,
+        "requirement_hash": target_requirement.requirement_hash,
+        "acceptance_policy": target_policy,
+        "expressions": target_expressions,
+        "rubric_hash": target_policy.profile_content_hash,
+    })
+    h3_output = VideoFlexibleOutputRequirement(
+        timing_mode="nominal_seconds", duration_seconds=4,
+        dimension_mode="adaptive", resolution_label="768P", ratio="adaptive",
+        fps=24, container="mp4", mime_type="video/mp4", native_audio=True,
+    )
+    target = GenerationCandidate(
+        candidate_id="metaso-h3", provider_profile=profile, capabilities=capabilities,
+        capability_id=variant.capability_id, compiler_contract=compiler,
+        output_requirement=h3_output, recipe=recipe,
+        final_output_goal=target_goal, voice_route=old.voice_route,
+    )
+    setup["projection"] = source_projection
+    setup["inputs"] = setup["inputs"].model_copy(update={
+        "projection_hash": source_projection.projection_hash,
+        "facts_hash": VideoPlanner.generation_difficulty(source_projection)["facts_hash"],
+        "rubric_hash": old.recipe.rubric_hash,
+        "candidates": (old,),
+    })
+    entry = evidence(setup, candidate=old, outcome="runtime_failure", task_id="task")
+    setup["projection"] = target_projection
+    setup["context"] = setup["context"].model_copy(update={
+        "activated_shot": target_shot,
+        "target_shot_revision": target_shot.revision,
+        "target_shot_content_hash": target_shot.content_hash,
+    })
+    adaptation = PaidCrossProviderNoEffectRetarget(
+        submit_receipt_fingerprint="d" * 64,
+        source_scope_hash=old.scope_hash,
+        source_provider_name=old.capabilities.provider_name,
+        target_scope_hash=target.scope_hash,
+        target_provider_name=target.capabilities.provider_name,
+        source_requirement_hash=source_requirement.requirement_hash,
+        target_requirement_hash=target_requirement.requirement_hash,
+        output_requirement_id="s01-source-output",
+        source_resolution_label="480p",
+        target_resolution_label="768P",
+    )
+    grant = RuntimeRepairGrant(authorization=RuntimeRepairAuthorization.create(
+        schema_version="runtime-repair/5", attempt_id=entry.attempt_id,
+        evidence_hash=entry.evidence_hash, repair_basis="explicit cross-provider no-effect recovery",
+        actor=ACTOR, expected_manifest_revision=1,
+        paid_cross_provider_no_effect_retarget=adaptation,
+    ), consumed=False)
+    inputs = setup["inputs"].model_copy(update={
+        "projection_hash": target_projection.projection_hash,
+        "facts_hash": VideoPlanner.generation_difficulty(target_projection)["facts_hash"],
+        "rubric_hash": target.recipe.rubric_hash,
+        "candidates": (target,), "historical_recipes": (old,),
+        "evidence": (entry,), "latest_attempt_hash": entry.evidence_hash,
+        "experiences": (), "runtime_repairs": (grant,),
+        "limits": setup["inputs"].limits.model_copy(update={
+            "allowed_remote_candidates": (target.candidate_id,), "paid_submits_used": 1,
+        }),
+    })
+    setup["inputs"] = inputs
+    return setup, old, target, source_requirement, target_requirement, entry, grant, inputs
+
+
+def test_cross_provider_known_no_effect_grant_is_exact_and_preserves_semantics():
+    from ai_video.production.generation_runtime_repair import (
+        PaidCrossProviderNoEffectRetarget,
+        cross_provider_no_effect_retarget_preserves_strategy,
+    )
+    from ai_video.production.hashing import seal_artifact
+    from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
+
+    setup, old, target, source_requirement, target_requirement, entry, grant, inputs = _cross_provider_no_effect_case()
+    scope = grant.authorization.paid_cross_provider_no_effect_retarget
+    assert scope.source_scope_hash == old.scope_hash
+    assert scope.target_scope_hash == target.scope_hash
+    assert old.final_output_goal.goal_version != target.final_output_goal.goal_version
+    assert old.final_output_goal.requirements[1] == target.final_output_goal.requirements[1]
+    assert scope.output_requirement_id == "s01-source-output"
+    assert scope.source_resolution_label == "480p"
+    assert scope.target_resolution_label == "768P"
+    assert cross_provider_no_effect_retarget_preserves_strategy(
+        old, target, source_requirement, target_requirement, scope)
+
+    decision = decide(setup, candidates=(target,), historical_recipes=(old,),
+        limits=inputs.limits, evidence=(entry,), latest_attempt_hash=entry.evidence_hash,
+        runtime_repairs=(grant,))
+    assert decision.disposition == "GENERATE_ONCE"
+    assert decision.runtime_repair == grant.authorization
+    assert decision.selected_candidate_id == target.candidate_id
+
+    altered_output = target.model_copy(update={
+        "output_requirement": target.output_requirement.model_copy(update={"fps": 30}),
+    })
+    assert not cross_provider_no_effect_retarget_preserves_strategy(
+        old, altered_output, source_requirement, target_requirement, scope)
+    assert not cross_provider_no_effect_retarget_preserves_strategy(
+        old, target, source_requirement,
+        target_requirement.model_copy(update={"intent_evidence_hash": "e" * 64}), scope)
+
+    changed_dialogue_shot = target_requirement.target_shot.model_copy(update={
+        "dialogue": "A changed line must not pass as a geometry adaptation.",
+    })
+    changed_dialogue_shot = seal_artifact(changed_dialogue_shot)
+    changed_dialogue = ProviderNeutralVideoRequirement.create(**{
+        **target_requirement.model_dump(
+            mode="python", exclude={"requirement_id", "requirement_hash", "target_shot"}),
+        "target_shot": changed_dialogue_shot,
+    })
+    assert not cross_provider_no_effect_retarget_preserves_strategy(
+        old, target, source_requirement, changed_dialogue, scope)
+
+    changed_reference = ProviderNeutralVideoRequirement.create(**{
+        **target_requirement.model_dump(
+            mode="python", exclude={"requirement_id", "requirement_hash", "asset_evidence"}),
+        "asset_evidence": tuple(asset.model_copy(update={
+            "canonical_owner_content_hash": "e" * 64,
+        }) for asset in target_requirement.asset_evidence),
+    })
+    assert not cross_provider_no_effect_retarget_preserves_strategy(
+        old, target, source_requirement, changed_reference, scope)
+
+    changed_s02 = target.final_output_goal.model_copy(update={
+        "requirements": (
+            target.final_output_goal.requirements[0],
+            target.final_output_goal.requirements[1].model_copy(update={
+                "observable": "S02 must change to 720p and omit its original dialogue.",
+            }),
+            *target.final_output_goal.requirements[2:],
+        ),
+    })
+    assert not cross_provider_no_effect_retarget_preserves_strategy(
+        old, target.model_copy(update={"final_output_goal": changed_s02}),
+        source_requirement, target_requirement, scope)
+
+    changed_other_recipe_rule = target.recipe.expressions[0].model_copy(update={
+        "observable": "The duration may change.",
+    })
+    assert not cross_provider_no_effect_retarget_preserves_strategy(
+        old, target.model_copy(update={"recipe": target.recipe.model_copy(update={
+            "expressions": (changed_other_recipe_rule, *target.recipe.expressions[1:]),
+        })}), source_requirement, target_requirement, scope)
+
+    wrong_rule_scope = scope.model_copy(update={"output_requirement_id": "s02-source-output"})
+    assert not cross_provider_no_effect_retarget_preserves_strategy(
+        old, target, source_requirement, target_requirement, wrong_rule_scope)
+
+    changed_aspect = target_requirement.model_copy(update={
+        "output_need": target_requirement.output_need.model_copy(update={
+            "aspect_ratio": "9:16",
+        }),
+    })
+    assert not cross_provider_no_effect_retarget_preserves_strategy(
+        old, target, source_requirement, changed_aspect, scope)
+
+
+def test_cross_provider_retarget_consumed_grant_cannot_reauthorize_generation():
+    setup, old, target, _source, _target_req, entry, grant, inputs = _cross_provider_no_effect_case()
+    consumed = RuntimeRepairGrant(authorization=grant.authorization, consumed=True)
+    result = decide(
+        setup, candidates=(target,), historical_recipes=(old,), limits=inputs.limits,
+        evidence=(entry,), latest_attempt_hash=entry.evidence_hash,
+        runtime_repairs=(consumed,),
+    )
+    assert result.disposition == "RUNTIME_FAILURE"
+    assert result.runtime_repair is None
+
+
+def test_cross_provider_canvas_reopen_after_paid_intent_uses_consumed_lineage(tmp_path):
+    from dataclasses import replace
+    from types import MethodType
+
+    from ai_video.canvas_dependencies import canvas_video_candidate_preparer
+    from ai_video.canvas_planning import canvas_feedback_context
+    from ai_video.canvas_production import CanvasProductionService
+    from ai_video.production._shot_router_contracts import AdapterCompilerContract
+    from ai_video.production._state_commit_video_runtime_repair import (
+        closed_paid_no_effect_receipt,
+    )
+    from ai_video.production.generation_feedback import (
+        RegisteredGenerationTarget,
+        create_generation_candidates,
+        record_attempt_evaluation,
+    )
+    from ai_video.production.generation_recipe import RequirementExpression
+    from ai_video.production.generation_runtime_repair import (
+        PaidCrossProviderNoEffectRetarget,
+        cross_provider_no_effect_retarget_preserves_strategy,
+    )
+    from ai_video.production.hashing import seal_artifact
+    from ai_video.production.models import ActorIdentity
+    from ai_video.production.state_commit import ProductionStateCommitter
+    from ai_video.production.video import (
+        BillingKind,
+        ResolvedVideoGenerationRequest,
+        VideoExecutionKind,
+        VideoGenerationMode,
+        VideoProviderCapabilities,
+    )
+    from ai_video.production.video_contracts import (
+        VideoFlexibleOutputRequirement,
+        VideoOutputCapability,
+    )
+    from test_canvas_production import runtime
+    from test_production_generation_decision import acceptance_policy
+    from test_production_video import _paid_authorization, _paid_preview
+
+    service, provider, limits, authorizations = runtime(tmp_path)
+    source_expression = RequirementExpression(
+        requirement_id="s01-source-output", level="acceptance", stage="raw_generation",
+        dimension="source_fidelity", observable="4秒/480p/24fps且含原生音轨",
+        tolerance="exact", measurement="request and native media inspection",
+        proof="technical", intent_paths=("output_need.duration_seconds",), production_owner="shot_authoring",
+    )
+    target_expression = source_expression.model_copy(update={
+        "observable": source_expression.observable.replace("480p", "768P"),
+    })
+
+    def install_policy(expression, *, attempt_id):
+        loaded = service._load()
+        policy = seal_artifact(loaded.qa_policy.model_copy(update={
+            "revision": loaded.qa_policy.revision + 1,
+            "content_hash": "0" * 64,
+            "generation_acceptance": acceptance_policy((expression,)),
+        }))
+        service.committer.activate_qa_policy(
+            policy,
+            attempt_id=attempt_id,
+            expected_manifest_revision=loaded.manifest.manifest_revision,
+        )
+
+    def flexible_resolve(self, request):
+        matching = tuple(v for v in self._capabilities.variants if (
+            v.provider_kind == request.provider_kind
+            and v.model_id == request.model_id
+            and v.profile_version == request.provider_profile.profile_version
+            and v.mode is request.mode
+        ))
+        if len(matching) != 1:
+            raise ValueError("fixture Provider capability did not match the prepared request")
+        return ResolvedVideoGenerationRequest.create(
+            request=request, capability=matching[0],
+            effective_output=request.output_requirement,
+            effective_seed=request.seed,
+            effective_negative_prompt_text=request.negative_prompt_text,
+        )
+
+    provider.resolve = MethodType(flexible_resolve, provider)
+    source_variant = provider.capabilities().variants[0].model_copy(update={
+        "capability_id": "seedance-i2v-480p-v1",
+        "provider_kind": "volcengine_ark_seedance",
+        "model_id": "Seedance-2.5",
+        "profile_version": "seedance-2.5-v1",
+        "execution_kind": VideoExecutionKind.REMOTE,
+        "billing_kind": BillingKind.METERED,
+        "mode": VideoGenerationMode.IMAGE_TO_VIDEO,
+        "output": None,
+        "output_capability": VideoOutputCapability(
+            min_duration_seconds=4, max_duration_seconds=4,
+            provider_selected_duration=False, timing_modes=("nominal_seconds",),
+            dimension_modes=("exact",), resolution_labels=("480p",), ratios=("9:16",),
+            fps_values=(24,), containers=("mp4",), native_audio_options=(True,),
+        ),
+        "allowed_image_roles": ("first_frame",),
+        "required_first_frame": True,
+        "max_reference_count": 0,
+        "seed_supported": False,
+    })
+    provider._capabilities = VideoProviderCapabilities.create(
+        provider_name="seedance", variants=(source_variant,)
+    )
+    source_profile = service.targets[0].profile.model_copy(update={
+        "profile_id": "seedance", "profile_version": "seedance-2.5-v1",
+    })
+    source_output = VideoFlexibleOutputRequirement(
+        timing_mode="nominal_seconds", duration_seconds=4,
+        dimension_mode="exact", width=496, height=864,
+        resolution_label="480p", ratio="9:16", fps=24,
+        container="mp4", mime_type="video/mp4", native_audio=True,
+    )
+    source_compiler = service.targets[0].compiler_contract
+    service.targets = (RegisteredGenerationTarget(
+        provider, source_profile, source_compiler, source_output,
+    ),)
+    source_row = service.direction["shots"][0]
+    source_row["generation"]["output_need"] = {
+        "duration_seconds": 4, "geometry_policy": "exact", "width": 496, "height": 864,
+        "aspect_ratio": None, "fps": 24, "container_mime": "video/mp4",
+        "timing_mode": "content_driven",
+    }
+    source_row["generation"]["audio_need"] = "required"
+    service.revise_authoring(attempt_id="fixture-seedance-authoring")
+    install_policy(source_expression, attempt_id="fixture-seedance-policy")
+    loaded = service._load()
+    source_context = canvas_feedback_context(
+        loaded=loaded, row=source_row, policy=service.routing_policy,
+    )
+    source_candidates, _ = create_generation_candidates(
+        projection=source_context["projection"], targets=service.targets,
+        acceptance=loaded.qa_policy.selected_generation_acceptance(),
+    )
+    source_limits = limits.model_copy(update={
+        "allowed_remote_candidates": tuple(c.candidate_id for c in source_candidates),
+    })
+
+    provider._scenario = replace(provider._scenario, submit_outcome="rejected")
+    failed_position = service.start(limits=source_limits)
+    assert hasattr(failed_position, "next_action"), (
+        f"source preparation did not produce an attempt: {failed_position!r}; "
+        f"decision={getattr(failed_position, 'decision', None)!r}; "
+        f"compilation={getattr(failed_position, 'compilation', None)!r}"
+    )
+    assert failed_position.next_action == "submit"
+    _, failed_state = service._service(failed_position.attempt_id)._state(failed_position.attempt_id)
+    failed_request = service.committer._reopen_video_request(failed_state.request)
+    failed_preview = _paid_preview(
+        failed_request, attempt_id=failed_position.attempt_id,
+        video_preview=provider.preview(failed_request),
+    )
+    authorizations[failed_preview.preview_fingerprint] = _paid_authorization(failed_preview)
+    with pytest.raises(AiVideoError):
+        service.execute(
+            action="submit", paid_preview=failed_preview,
+            reservation_id="fixture-seedance-no-effect",
+        )
+    experience = record_attempt_evaluation(
+        committer=service.committer, attempt_id=failed_position.attempt_id,
+    )
+    failed_attempt = next(a for a in service._load().manifest.attempts
+        if a.attempt_id == failed_position.attempt_id)
+    old_binding = service.committer._reopen_generation_execution_binding(
+        failed_attempt.video_generation_state.execution_binding,
+    )
+    old_candidate = next(c for c in old_binding.inputs.candidates
+        if c.candidate_id == old_binding.decision.selected_candidate_id)
+
+    h3_variant = source_variant.model_copy(update={
+        "capability_id": "metaso-h3-fl2va-v1",
+        "provider_kind": "metaso_h3",
+        "model_id": "MiniMax-H3",
+        "profile_version": "metaso-h3-ref2va-v1",
+        "output_capability": VideoOutputCapability(
+            min_duration_seconds=4, max_duration_seconds=4,
+            provider_selected_duration=False, timing_modes=("nominal_seconds",),
+            dimension_modes=("adaptive",), resolution_labels=("768P",), ratios=("adaptive",),
+            fps_values=(24,), containers=("mp4",), native_audio_options=(True,),
+        ),
+        "negative_prompt_supported": False,
+    })
+    provider._capabilities = VideoProviderCapabilities.create(
+        provider_name="metaso_h3", variants=(h3_variant,),
+    )
+    import hashlib
+    profile_sha = hashlib.sha256(b"fixture-metaso-h3-profile").hexdigest()
+    h3_profile = source_profile.model_copy(update={
+        "profile_id": "metaso_h3", "profile_version": "metaso-h3-ref2va-v1",
+        "profile_path": Path(f"provider-profiles/{profile_sha}.json"),
+        "profile_sha256": profile_sha,
+    })
+    h3_compiler = AdapterCompilerContract.create(
+        compiler_id="generated-video-e2e-fixture", compiler_version="1",
+    )
+    h3_output = VideoFlexibleOutputRequirement(
+        timing_mode="nominal_seconds", duration_seconds=4,
+        dimension_mode="adaptive", resolution_label="768P", ratio="adaptive",
+        fps=24, container="mp4", mime_type="video/mp4", native_audio=True,
+    )
+    service.targets = (RegisteredGenerationTarget(
+        provider, h3_profile, h3_compiler, h3_output,
+    ),)
+    source_row["generation"]["output_need"] = {
+        "duration_seconds": 4, "geometry_policy": "adaptive", "width": None, "height": None,
+        "aspect_ratio": None, "fps": 24, "container_mime": "video/mp4",
+        "timing_mode": "content_driven",
+    }
+    service.revise_authoring(attempt_id="fixture-h3-authoring")
+    install_policy(target_expression, attempt_id="fixture-h3-policy")
+    loaded = service._load()
+    target_context = canvas_feedback_context(
+        loaded=loaded, row=source_row, policy=service.routing_policy,
+    )
+    target_candidates, _ = create_generation_candidates(
+        projection=target_context["projection"], targets=service.targets,
+        acceptance=loaded.qa_policy.selected_generation_acceptance(),
+    )
+    target_candidate = target_candidates[0]
+    target_requirement = target_context["projection"].requirement
+    source_requirement = old_binding.projection.requirement
+    assert source_requirement.source_request_content_hash != target_requirement.source_request_content_hash
+    assert source_requirement.intent_evidence_hash != target_requirement.intent_evidence_hash
+    assert source_requirement.generation_intent_hash != target_requirement.generation_intent_hash
+    assert cross_provider_no_effect_retarget_preserves_strategy(
+        old_candidate, target_candidate, source_requirement, target_requirement,
+        PaidCrossProviderNoEffectRetarget(
+            submit_receipt_fingerprint="0" * 64,
+            source_scope_hash=old_candidate.scope_hash,
+            source_provider_name="seedance",
+            source_requirement_hash=source_requirement.requirement_hash,
+            target_scope_hash=target_candidate.scope_hash,
+            target_provider_name="metaso_h3",
+            target_requirement_hash=target_requirement.requirement_hash,
+            output_requirement_id="s01-source-output",
+            source_resolution_label="480p", target_resolution_label="768P",
+        ),
+    )
+    target_limits = source_limits.model_copy(update={
+        "allowed_remote_candidates": (target_candidate.candidate_id,),
+    })
+
+    receipt = closed_paid_no_effect_receipt(service.committer, failed_attempt)
+    adaptation = PaidCrossProviderNoEffectRetarget(
+        submit_receipt_fingerprint=receipt.submit_receipt_fingerprint,
+        source_scope_hash=old_candidate.scope_hash,
+        source_provider_name="seedance",
+        source_requirement_hash=source_requirement.requirement_hash,
+        target_scope_hash=target_candidate.scope_hash,
+        target_provider_name="metaso_h3",
+        target_requirement_hash=target_requirement.requirement_hash,
+        output_requirement_id="s01-source-output",
+        source_resolution_label="480p", target_resolution_label="768P",
+    )
+    pointer = service.committer.record_runtime_repair_authorization(
+        attempt_id=failed_position.attempt_id,
+        evidence_hash=experience.evidence[-1].evidence_hash,
+        repair_basis="explicit one-use METASO H3 recovery after known no-effect",
+        actor=ActorIdentity(actor_id="canvas-test", actor_kind="codex"),
+        paid_cross_provider_no_effect_retarget=adaptation,
+        target_candidate=target_candidate,
+        target_requirement=target_requirement,
+    )
+    assert service.committer._reopen_runtime_repair_authorization(pointer).schema_version == "runtime-repair/5"
+    successor = service.start_repair(limits=target_limits)
+    assert hasattr(successor, "attempt_id"), (
+        f"registered cross-provider recovery did not prepare a successor: {successor!r}; "
+        f"decision={getattr(successor, 'decision', None)!r}; "
+        f"compilation={getattr(successor, 'compilation', None)!r}"
+    )
+    assert successor.attempt_id != failed_position.attempt_id
+    assert successor.next_action == "submit"
+    assert service.position() == successor
+
+    provider._scenario = replace(provider._scenario, submit_outcome="accepted")
+    _, successor_state = service._service(successor.attempt_id)._state(successor.attempt_id)
+    successor_request = service.committer._reopen_video_request(successor_state.request)
+    successor_preview = _paid_preview(
+        successor_request, attempt_id=successor.attempt_id,
+        video_preview=provider.preview(successor_request),
+    )
+    authorizations[successor_preview.preview_fingerprint] = _paid_authorization(successor_preview)
+    service.execute(
+        action="submit", paid_preview=successor_preview,
+        reservation_id="fixture-metaso-h3-successor",
+    )
+    failed_after_submit = next(a for a in service._load().manifest.attempts
+        if a.attempt_id == failed_position.attempt_id)
+    assert failed_after_submit.video_generation_state.runtime_repairs[0].consumed
+    assert provider.call_counts.submit == 2
+
+    reopened_committer = ProductionStateCommitter(
+        service.committer.project_root,
+        video_candidate_preparer=canvas_video_candidate_preparer(),
+    )
+    reopened = CanvasProductionService(
+        committer=reopened_committer, packet=service.packet, direction=service.direction,
+        targets=service.targets, routing_policy=service.routing_policy,
+        decision_policy=service.decision_policy,
+    )
+    assert reopened.position().attempt_id == successor.attempt_id
+    assert reopened.position().next_action == "poll"
+    assert reopened.start_repair(limits=target_limits) == reopened.position()
+    assert provider.call_counts.submit == 2
+
+
 def test_paid_retarget_cannot_replace_frozen_generation_requirement():
     setup, old, target, entry, grant, limits = _retarget_case(required_hash="e" * 64)
     with pytest.raises(ValueError, match="stale candidate requirement"):

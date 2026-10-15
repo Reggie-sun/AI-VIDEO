@@ -434,6 +434,11 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
             if not g.consumed and g.authorization.paid_known_failure_retarget is not None
             and g.authorization.evidence_hash == latest.evidence_hash
             and g.authorization.attempt_id == latest.attempt_id), None)
+        cross_provider_no_effect_grant = next((g for g in inputs.runtime_repairs
+            if not g.consumed
+            and g.authorization.paid_cross_provider_no_effect_retarget is not None
+            and g.authorization.evidence_hash == latest.evidence_hash
+            and g.authorization.attempt_id == latest.attempt_id), None)
         if inputs.policy.version == "3" and latest.rubric_hash != inputs.rubric_hash:
             known_failure_scope_preserved = False
             if (known_failure_grant is not None and latest.outcome == "runtime_failure"
@@ -448,6 +453,30 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
                 known_failure_scope_preserved = bool(
                     previous is not None and target is not None
                     and paid_failure_retarget_preserves_strategy(previous, target)
+                )
+            elif (cross_provider_no_effect_grant is not None
+                    and latest.outcome == "runtime_failure"
+                    and diagnosis.failure_classes == ("RUNTIME_FAILURE",)):
+                from ai_video.production.generation_runtime_repair import (
+                    cross_provider_no_effect_retarget_preserves_strategy,
+                )
+                adaptation = cross_provider_no_effect_grant.authorization.paid_cross_provider_no_effect_retarget
+                previous = next((c for c in (*candidates, *inputs.historical_recipes)
+                                 if c.scope_hash == latest.recipe_scope_hash), None)
+                target = next((c for c in candidates if c.scope_hash == adaptation.target_scope_hash), None)
+                source_requirement = next((x.projection.requirement for x in inputs.experiences
+                    if x.candidate.scope_hash == latest.recipe_scope_hash), None)
+                known_failure_scope_preserved = bool(
+                    previous is not None and target is not None and source_requirement is not None
+                    and previous.scope_hash == adaptation.source_scope_hash
+                    and previous.capabilities.provider_name == adaptation.source_provider_name
+                    and previous.recipe.requirement_hash == adaptation.source_requirement_hash
+                    and target.capabilities.provider_name == adaptation.target_provider_name
+                    and target.recipe.requirement_hash == adaptation.target_requirement_hash
+                    and projection.requirement.requirement_hash == adaptation.target_requirement_hash
+                    and cross_provider_no_effect_retarget_preserves_strategy(
+                        previous, target, source_requirement, projection.requirement, adaptation
+                    )
                 )
             if not known_failure_scope_preserved:
                 old_goal = next(c.final_output_goal for c in (*candidates, *inputs.historical_recipes)
@@ -476,8 +505,12 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
             if grant is not None:
                 retarget = grant.authorization.paid_no_effect_retarget
                 known_failure_retarget = grant.authorization.paid_known_failure_retarget
+                cross_provider_retarget = (
+                    grant.authorization.paid_cross_provider_no_effect_retarget
+                )
                 requested_scope = (retarget.target_scope_hash if retarget else
                     known_failure_retarget.target_scope_hash if known_failure_retarget else
+                    cross_provider_retarget.target_scope_hash if cross_provider_retarget else
                     latest.recipe_scope_hash)
                 repair_candidate = next(
                     (c for c in candidates if c.scope_hash == requested_scope), None)
@@ -501,6 +534,31 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
                             previous, repair_candidate)):
                         return GenerationDecision(**base, disposition="EVIDENCE_GAP",
                             rationale=("accepted FAILED recovery must preserve the exact final-output requirements",))
+                if cross_provider_retarget is not None:
+                    from ai_video.production.generation_runtime_repair import (
+                        cross_provider_candidate_preserves_strategy,
+                    )
+                    previous = next((c for c in (*candidates, *inputs.historical_recipes)
+                                     if c.scope_hash == latest.recipe_scope_hash), None)
+                    if (
+                        previous is None
+                        or previous.scope_hash != cross_provider_retarget.source_scope_hash
+                        or previous.capabilities.provider_name
+                            != cross_provider_retarget.source_provider_name
+                        or previous.recipe.requirement_hash
+                            != cross_provider_retarget.source_requirement_hash
+                        or repair_candidate.capabilities.provider_name
+                            != cross_provider_retarget.target_provider_name
+                        or repair_candidate.recipe.requirement_hash
+                            != cross_provider_retarget.target_requirement_hash
+                        or projection.requirement.requirement_hash
+                            != cross_provider_retarget.target_requirement_hash
+                        or not cross_provider_candidate_preserves_strategy(
+                            previous, repair_candidate, cross_provider_retarget
+                        )
+                    ):
+                        return GenerationDecision(**base, disposition="EVIDENCE_GAP",
+                            rationale=("cross-provider no-effect recovery must preserve its exact prepared H3 target and frozen generation strategy",))
                 runtime_repair = grant.authorization
         for reason in ("UNKNOWN_OUTCOME", "RUNTIME_FAILURE", "RUBRIC_OR_STAGE_ERROR", "EVIDENCE_GAP"):
             if goal_changed and reason == "EVIDENCE_GAP":

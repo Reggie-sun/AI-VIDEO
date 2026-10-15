@@ -102,7 +102,8 @@ opening 仍由现有 sequence owner 在重开 accepted predecessor 后签发，�
 跨 stack 的 prior Router seed 可由该 owner 签发静态身份 selection expression；它重开
 current snapshot/adjacent accepted media，不能执行。Production execution binding 没有物化
 sequence edge 时拒绝 start/submit；selection-only validation 仅归 destination selection owner。
-Seedance compiler/3 与 common compiler 重编唯一 `seedance-preserved-source-v1` grammar；
+同一 source owner 为 Seedance compiler/3 与 METASO H3 compiler/1 分别重编
+`seedance-preserved-source-v1` / `metaso-h3-preserved-source-v1`；精确 compiler allowlist 不开放旧 Seedance/2 执行，旧 prompt-only helper 兼容保持。
 原文 text 逐字保留，只有 chips 转图片序号；不代替 v4、voice、conditioned 或 FULL 路径。
 `generation_execution` 在 binding 创建与执行前重开封存数据，并由同一 source owner
 重验最终 prose、完整 image bindings 及 measured metadata；重新计算 hash 不授权扩写或遗漏引用。
@@ -431,6 +432,9 @@ unknown outcome、旧 evidence 或耗尽的 per-Shot ceiling 不获得 retry 权
 `runtime-repair/3` 绑定失败 receipt 与唯一目标 candidate scope，与 local extension 互斥。
 允许同 Provider model/profile/compiler/raster 适配，但冻结 intent、rubric、duration/fps/audio、seed、
 voice route 和 FinalOutput goal；新 submit 仍独立经过 preview/budget/egress/permit，不改历史消费。
+显式跨 Provider 的 `runtime-repair/5` / `PaidCrossProviderNoEffectRetarget` 另封存旧 paid no-effect receipt、
+两端 provider/candidate scope/requirement identity及原生分辨率适配；仅允许既有输出规则的480p→768P token 与受控几何差异，其他剧情、QA和声音不变。
+decision、committer 登记及一次消费、Canvas lineage 都重验同一 scope；不释放历史消费或授权未知结果重试。
 候选 owner 对最新 runtime_failure 保留已封存 baseline seed，quality resample 才推进 seed。
 `seedance_source_expression.py` 的 preserved-source `/2` 保留重复 chip 和 tray-only ordinary image
 参考；重复表达必须绑定一致的 slot/material role/bytes，native input 由同一 compiler owner 去重。

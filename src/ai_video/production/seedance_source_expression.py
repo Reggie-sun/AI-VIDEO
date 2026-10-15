@@ -29,6 +29,14 @@ _DIMENSION = Literal[
 ]
 _ASSET_ROLE = Literal["identity", "scene", "first_frame", "last_frame", "video_reference"]
 _GROUNDABLE_REFERENCE_DIMENSIONS = {"character_presence", "prop_identity"}
+_SOURCE_COMPILER_IDENTITIES = {
+    ("seedance", "seedance-video-compiler", "3"): "seedance-preserved-source-v1",
+    ("metaso_h3", "metaso-h3-video-compiler", "1"): "metaso-h3-preserved-source-v1",
+}
+
+
+def is_preserved_source_grammar_contract(value: str) -> bool:
+    return value in _SOURCE_COMPILER_IDENTITIES.values()
 
 
 class SourceTextPart(StrictModel):
@@ -358,7 +366,7 @@ def _adapt_source_text(
     return "".join(chunks)
 
 
-def _require_source_identity(bound, requirement, shot):
+def _require_source_identity(bound, requirement, shot, *, provider_name):
     from ai_video.production.models import Shot
     from ai_video.production.shot_router import ProviderBoundVideoRequest
     from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
@@ -377,15 +385,15 @@ def _require_source_identity(bound, requirement, shot):
     )
     if (
         reopened_bound.requirement_hash != reopened_requirement.requirement_hash
-        or reopened_bound.provider_name != "seedance"
+        or reopened_bound.provider_name != provider_name
         or reopened_bound.target_shot_id != shot.shot_id
         or reopened_bound.target_shot_revision != shot.revision
         or reopened_bound.target_shot_content_hash != shot.content_hash
         or reopened_requirement.target_shot != shot
     ):
-        raise ValueError("preserved source is not bound to the exact approved Shot")
+        raise ValueError("preserved source is not bound to the exact approved Shot and Provider")
     if reopened_bound.generation_recipe is None:
-        raise ValueError("preserved source requires a sealed Seedance generation recipe")
+        raise ValueError("preserved source requires a sealed generation recipe")
     return reopened_bound, reopened_requirement, reopened_requirement.target_shot
 
 
@@ -451,12 +459,14 @@ def _require_endpoint_groundings(requirement, expression, continuity_expression,
     return controls
 
 
-def _source_projection(bound, requirement):
+def _source_projection(bound, requirement, *, provider_name):
     """Reopen source identity, prose and images without minting opening authority."""
     from ai_video.production.video_requirement import GenerationMode
 
     shot = getattr(requirement, "target_shot", None)
-    bound, requirement, shot = _require_source_identity(bound, requirement, shot)
+    bound, requirement, shot = _require_source_identity(
+        bound, requirement, shot, provider_name=provider_name
+    )
     expression = _validated_source_expression(shot)
     if expression.contract_version not in {"seedance-preserved-source/1", "seedance-preserved-source/2"}:
         raise ValueError("unsupported preserved source expression contract")
@@ -522,16 +532,27 @@ def _source_projection(bound, requirement):
     return bound, requirement, expression, prompt
 
 
-def validate_preserved_seedance_request(bound, requirement, request):
-    """Recheck final source payload when a sealed binding crosses execution."""
+def validate_preserved_source_request(bound, requirement, request):
+    """Recheck the final source payload under its exact selected Provider compiler."""
     from ai_video.production.video_compiler import (
         _MEDIA_ROLE_ORDER, _compile_image_bindings, _native_recipe_expression_errors,
         _required_measurement,
     )
     from ai_video.production.video_contracts import VideoMediaReferenceBinding
 
-    bound, requirement, expression, prompt = _source_projection(bound, requirement)
-    native = _source_native_prompt(bound, requirement, prompt, _source_endpoint_controls(requirement, expression))
+    compiler = bound.compiler_contract
+    grammar = _SOURCE_COMPILER_IDENTITIES.get((
+        bound.provider_name, compiler.compiler_id, compiler.compiler_version
+    ))
+    if grammar is None:
+        raise ValueError("preserved source has no exact Provider compiler identity")
+    bound, requirement, expression, prompt = _source_projection(
+        bound, requirement, provider_name=bound.provider_name
+    )
+    native = _source_native_prompt(
+        bound, requirement, prompt,
+        _source_endpoint_controls(requirement, expression), grammar_contract=grammar,
+    )
     media_bindings = tuple(sorted((VideoMediaReferenceBinding(
         kind="video", role=role, asset_id=asset.asset_id, asset_sha256=asset.asset_sha256,
         mime_type=asset.mime_type, duration_millis=_required_measurement(asset.duration_millis, "duration_millis"),
@@ -541,8 +562,9 @@ def validate_preserved_seedance_request(bound, requirement, request):
         if role == "reference_video"), key=lambda item: (_MEDIA_ROLE_ORDER[item.role], item.asset_id)))
     if _native_recipe_expression_errors(bound, requirement, native):
         raise ValueError("preserved source has unexpressed authored intent")
-    if (bound.compiler_contract.compiler_id != "seedance-video-compiler"
-            or bound.compiler_contract.compiler_version != "3"
+    if (request.provider_name != bound.provider_name
+            or request.adapter_compiler_id != compiler.compiler_id
+            or request.adapter_compiler_version != compiler.compiler_version
             or request.prompt_text != prompt
             or request.image_bindings != _compile_image_bindings(bound)
             or request.media_bindings != media_bindings or request.subject_bindings
@@ -550,16 +572,54 @@ def validate_preserved_seedance_request(bound, requirement, request):
         raise ValueError("compiled request differs from preserved source prose or exact image bindings")
 
 
-def compile_preserved_seedance_source(bound, requirement, continuity_expression=None):
-    """Compile source parts without rewriting prose or inventing state facts."""
-    bound, requirement, expression, prompt = _source_projection(bound, requirement)
+def compile_preserved_source(
+    bound, requirement, *, provider_name, compiler_id, compiler_version,
+    continuity_expression=None,
+):
+    """Compile source parts under a fixed, Provider-specific prompt grammar."""
+    grammar = _SOURCE_COMPILER_IDENTITIES.get((provider_name, compiler_id, compiler_version))
+    if grammar is None:
+        raise ValueError("preserved source has no exact Provider compiler identity")
+    if (bound.provider_name != provider_name
+            or bound.compiler_contract.compiler_id != compiler_id
+            or bound.compiler_contract.compiler_version != compiler_version):
+        raise ValueError("preserved source Provider/compiler identity changed")
+    bound, requirement, expression, prompt = _source_projection(
+        bound, requirement, provider_name=provider_name
+    )
     endpoint_controls = _require_endpoint_groundings(
         requirement, expression, continuity_expression, bound
     )
-    return _source_native_prompt(bound, requirement, prompt, endpoint_controls)
+    return _source_native_prompt(
+        bound, requirement, prompt, endpoint_controls, grammar_contract=grammar
+    )
 
 
-def _source_native_prompt(bound, requirement, prompt, endpoint_controls):
+def compile_preserved_seedance_source(bound, requirement, continuity_expression=None):
+    """Build the legacy pure source prompt; /3 remains enforced by request compilation."""
+    bound, requirement, expression, prompt = _source_projection(
+        bound, requirement, provider_name="seedance"
+    )
+    endpoint_controls = _require_endpoint_groundings(
+        requirement, expression, continuity_expression, bound
+    )
+    return _source_native_prompt(
+        bound, requirement, prompt, endpoint_controls,
+        grammar_contract="seedance-preserved-source-v1",
+    )
+
+
+def validate_preserved_seedance_request(bound, requirement, request):
+    """Compatibility wrapper for existing Seedance execution callers."""
+    if bound.provider_name != "seedance":
+        raise ValueError("Seedance source validator received another Provider")
+    return validate_preserved_source_request(bound, requirement, request)
+
+
+def _source_native_prompt(
+    bound, requirement, prompt, endpoint_controls,
+    *, grammar_contract="seedance-preserved-source-v1",
+):
     from ai_video.production.video_compiler import ProviderNativePrompt
     from ai_video.production.seedance_source_dialogue import source_dialogue_controls
 
@@ -580,7 +640,7 @@ def _source_native_prompt(bound, requirement, prompt, endpoint_controls):
     controls += source_dialogue_controls(dialogue, prompt, bound.output_requirement)
 
     return ProviderNativePrompt(
-        grammar_contract="seedance-preserved-source-v1",
+        grammar_contract=grammar_contract,
         prompt_text=prompt,
         prompt_sha256=hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
         expressed_control_paths=controls,

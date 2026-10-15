@@ -52,6 +52,9 @@ def current_canvas_attempt(committer, attempts):
         else:
             repair = binding.decision.runtime_repair
             known_failure = repair.paid_known_failure_retarget if repair is not None else None
+            cross_provider = (
+                repair.paid_cross_provider_no_effect_retarget if repair is not None else None
+            )
             if known_failure is not None:
                 from ai_video.production._state_commit_video_runtime_repair import (
                     closed_paid_known_failure_proof,
@@ -87,6 +90,61 @@ def current_canvas_attempt(committer, attempts):
                 ):
                     raise ValueError(message)
                 receipt = observation
+            elif cross_provider is not None:
+                from ai_video.production._state_commit_video_runtime_repair import (
+                    closed_paid_no_effect_receipt,
+                )
+                from ai_video.production.generation_runtime_repair import (
+                    cross_provider_no_effect_retarget_preserves_strategy,
+                )
+
+                receipt = closed_paid_no_effect_receipt(committer, parent)
+                old_binding = committer._reopen_generation_execution_binding(
+                    parent.video_generation_state.execution_binding
+                )
+                old_candidate = next((c for c in old_binding.inputs.candidates
+                    if c.candidate_id == old_binding.decision.selected_candidate_id), None)
+                target_candidate = next((c for c in binding.inputs.candidates
+                    if c.candidate_id == binding.decision.selected_candidate_id), None)
+                if (
+                    receipt.submit_receipt_fingerprint
+                        != cross_provider.submit_receipt_fingerprint
+                    or old_candidate is None
+                    or old_candidate.scope_hash != cross_provider.source_scope_hash
+                    or old_candidate.capabilities.provider_name
+                        != cross_provider.source_provider_name
+                    or target_candidate is None
+                    or target_candidate.scope_hash != cross_provider.target_scope_hash
+                    or target_candidate.capabilities.provider_name
+                        != cross_provider.target_provider_name
+                    or old_binding.projection.requirement.requirement_hash
+                        != cross_provider.source_requirement_hash
+                    or binding.projection.requirement.requirement_hash
+                        != cross_provider.target_requirement_hash
+                    or old_binding.inputs.limits.task_id != binding.inputs.limits.task_id
+                    or old_binding.context.target_shot_id != binding.context.target_shot_id
+                    or evidence.outcome != "runtime_failure"
+                    or evidence.artifact_sha256 is not None
+                    or evidence.request_hash
+                        != committer._reopen_video_request(
+                            parent.video_generation_state.request
+                        ).request_input_hash
+                    or evidence.task_id != old_binding.inputs.limits.task_id
+                    or evidence.shot_id != old_binding.context.target_shot_id
+                    or binding.inputs.latest_attempt_hash != evidence.evidence_hash
+                    or old_binding.compiled_request.image_bindings
+                        != binding.compiled_request.image_bindings
+                    or old_binding.compiled_request.media_bindings
+                        != binding.compiled_request.media_bindings
+                    or binding.inputs.abandoned_result is not None
+                    or not cross_provider_no_effect_retarget_preserves_strategy(
+                        old_candidate, target_candidate,
+                        old_binding.projection.requirement,
+                        binding.projection.requirement,
+                        cross_provider,
+                    )
+                ):
+                    raise ValueError(message) from None
             else:
                 from ai_video.production._state_commit_video_runtime_repair import closed_paid_no_effect_receipt
                 receipt = closed_paid_no_effect_receipt(committer, parent)
@@ -100,6 +158,12 @@ def current_canvas_attempt(committer, attempts):
                     or committer._reopen_runtime_repair_authorization(pointer) != repair
                     or binding.inputs.abandoned_result is not None):
                 raise ValueError(message)
+            if cross_provider is not None:
+                # The grant is consumed atomically with the paid submit intent.
+                # Reopening this successor validates that durable lineage; it
+                # must not call the unconsumed-grant consumer a second time.
+                if pointer.consumed != (attempt.paid_provider_state is not None):
+                    raise ValueError(message)
         predecessors[attempt.attempt_id] = parent.attempt_id
         successors[parent.attempt_id] = attempt.attempt_id
     leaves = set(by_id) - set(successors)

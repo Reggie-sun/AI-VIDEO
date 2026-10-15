@@ -9,6 +9,24 @@ evidence_index_version: "1"
 
 Date: 2026-10-13
 
+## Current METASO Route Correction — 2026-10-16
+
+用户最新明确纠正“不是让你用metaso的minimax吗”，当前目标 Provider 改为已有 `MetasoH3VideoProvider` / `MiniMax-H3`，不是秘塔搜索、Seedance 或本地模型。此前 Seedance-only、个人账号 Entry/VIP 阻断保留为历史；没有以账号讨论代替视频制作。
+
+本轮先误将用户所指 METASO 用作搜索，随后已纠正。该搜索 API 一次 HTTP200，不是视频调用或人物入库成功；没有回显密钥。用户明确指定 `.env` 后只提取对应 `METASO_API_KEY`，不授权其他 credential 搜索或公开。
+
+当前无付费副作用的真实 S01 编译候选已通过：提示词与原封存请求逐字节相同，SHA `2a54252ee51ac0d9c1a193ff0b3060aa80ae94ab3570986c588b49b162f50f59`；first-frame仍为 `13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923`。H3 声明4s/768P/adaptive/24fps/native audio，canonical S01仍只采用0–3秒。候选在 `metaso-S01-live-20261016-001/`，不冒充 final request、已提交或 accepted。
+
+实际发现两处共享缺口：preserved-source 校验此前硬编码 Seedance；已知 no-effect 恢复此前只能同 Provider。原文编译适配的305项 focused tests通过，并实际只读重开当前 Manifest45/Project10。首次扩大真实重开暴露 `ResolvedVideoGenerationRequest` 字段回归，已修复并加两 Provider resolve 测试，不以最初107项局部PASS掩盖该问题。跨 Provider `runtime-repair/5`、完整 Harness/独立审查及真实提交仍在本轮执行中，未声明完成。
+
+候选技术适配逐项可审阅：只有 generation OutputNeed 的 exact geometry 改为 adaptive/null dimensions；Shot 原文、对白、source expression及首帧 bytes不变。H3最低768P，旧 `s01-source-output` 原生480p token候选改为768P；15项 required IDs、proof/tolerance和全部剧情/声音要求保留，旧policy/goal不覆盖。`qa-policy.S01-candidate.json` hash `cd4c11590bab838404bf9f51d426cf2b0f56dd44be31b33c8e253041c81ec949`，尚未激活。S02技术规则留到其独立准备时适配，不先签后镜 QA。
+
+Parent 在真实原项目上执行无副作用 author bundle → Planner → candidate，而非把 fixture 当剧情证据。实际中立输入另有 canonical Shot metadata、三个 Planner identity hash及首帧 Shot owner hash随动；其余完整语义逐项相同。首次 actual comparator 为False：恢复候选误写旧 `exact_seconds` / `seedance` provider_kind，实际旧值为 `nominal_seconds` / `volcengine_ark_seedance`；修正后 `actual-strategy-equivalence-r2.json` 为True，r1保留。恢复模块65项测试为这些收尾修复前的基线，最终 Harness/审查证据另行补充，不能用该基线代签新 bytes。
+
+冻结前新增跨 Provider focused integration为3 PASS：经 Canvas/Planner 创建候选、canonical no-effect、v5 注册、后继 paid intent 消费授权，再用新 committer 重开 Canvas得到 `poll`；再次start不重复submit。该测试使用离线 Provider double，只证明工程生命周期，不代表原 S01生成或媒体验收。
+
+当前新 H3 POST0、原 Seedance POST1、历史11、累计12；无新 MP4、S02未提交。新 H3单元限定S01一次、S02一次且以前镜全PASS/实际状态绑定为条件；内部单次50 CNY/新单元100 CNY只作既有operator upper bound，不是报价或账单，现有project ledger ceiling200 CNY及旧reservation/消费均保留。UNKNOWN不retry/remint，旧失败不重分类。现有音频MCP解释器/工厂本轮import已重新核验；新 exact MP4对应音频unit必须等落盘后准备，未复用历史消费单元。
+
 ## Supersession Notice — 2026-10-15
 
 2026-10-16用户选择A继续找免费Seedance入口。即梦当前账号的Mini、2.5样片及2.5均实际显示“升级以使用”；公开新用户活动的3次Mini限免尚未证实属于本账号。字节官方另列豆包App入口，当前豆包网页未登录且未显示视频功能；App实际免费次数待用户核对。见 **Free Seedance Alternatives And Account-Specific Readiness — 2026-10-16**。已恢复FastVIP网页草稿，原图SHA及40积分保持；本轮生成/充值/新上传均0，未把任一候选宣布为免费准入成功。

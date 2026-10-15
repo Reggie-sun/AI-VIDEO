@@ -10,6 +10,7 @@ from ai_video.production._state_commit_common import (
 from ai_video.production._state_commit_contracts import PreparedArtifact
 from ai_video.production.generation_runtime_repair import (
     LocalRuntimeRepairExtension,
+    PaidCrossProviderNoEffectRetarget,
     PaidKnownFailureRetarget,
     PaidNoEffectRetarget,
 )
@@ -32,6 +33,9 @@ def register_runtime_repair_authorization(
     local_extension: LocalRuntimeRepairExtension | None = None,
     paid_no_effect_retarget: PaidNoEffectRetarget | None = None,
     paid_known_failure_retarget: PaidKnownFailureRetarget | None = None,
+    paid_cross_provider_no_effect_retarget: PaidCrossProviderNoEffectRetarget | None = None,
+    target_candidate=None,
+    target_requirement=None,
 ) -> RuntimeRepairAuthorizationPointer:
     """Authorize one bounded re-execution after a repaired local runtime failure.
 
@@ -51,13 +55,15 @@ def register_runtime_repair_authorization(
         raise _state_invalid("Runtime repair requires an explicit repair basis.")
     if paid_no_effect_retarget is not None:
         if (not isinstance(paid_no_effect_retarget, PaidNoEffectRetarget)
-                or local_extension is not None or paid_known_failure_retarget is not None):
+                or local_extension is not None or paid_known_failure_retarget is not None
+                or paid_cross_provider_no_effect_retarget is not None):
             raise _state_invalid("Paid retarget requires its exact typed scope and no local extension.")
         paid_no_effect_retarget = PaidNoEffectRetarget.model_validate_json(
             paid_no_effect_retarget.model_dump_json())
     if paid_known_failure_retarget is not None:
         if (not isinstance(paid_known_failure_retarget, PaidKnownFailureRetarget)
-                or local_extension is not None or paid_no_effect_retarget is not None):
+                or local_extension is not None or paid_no_effect_retarget is not None
+                or paid_cross_provider_no_effect_retarget is not None):
             raise _state_invalid(
                 "Paid known-failure retarget requires its exact typed scope and no other repair mode."
             )
@@ -66,6 +72,24 @@ def register_runtime_repair_authorization(
                 paid_known_failure_retarget.model_dump_json())
         except ValueError:
             raise _state_invalid("Paid known-failure retarget must be typed and exact.") from None
+    if paid_cross_provider_no_effect_retarget is not None:
+        if (not isinstance(paid_cross_provider_no_effect_retarget,
+                           PaidCrossProviderNoEffectRetarget)
+                or local_extension is not None
+                or paid_no_effect_retarget is not None
+                or paid_known_failure_retarget is not None):
+            raise _state_invalid(
+                "Cross-provider paid recovery requires its exact typed scope and no other repair mode."
+            )
+        try:
+            paid_cross_provider_no_effect_retarget = (
+                PaidCrossProviderNoEffectRetarget.model_validate_json(
+                    paid_cross_provider_no_effect_retarget.model_dump_json())
+            )
+        except ValueError:
+            raise _state_invalid("Cross-provider paid recovery scope must be typed and exact.") from None
+    elif target_candidate is not None or target_requirement is not None:
+        raise _state_invalid("Prepared target inputs require a cross-provider recovery grant.")
     if local_extension is not None:
         if not isinstance(local_extension, LocalRuntimeRepairExtension):
             raise _state_invalid("Runtime repair extension must be typed and exact.")
@@ -128,6 +152,49 @@ def register_runtime_repair_authorization(
             _require_latest_same_shot_attempt(
                 self, manifest, attempt_id, binding.context.target_shot_id
             )
+        if paid_cross_provider_no_effect_retarget is not None:
+            from ai_video.production.generation_decision import GenerationCandidate
+            from ai_video.production.generation_runtime_repair import (
+                cross_provider_no_effect_retarget_preserves_strategy,
+            )
+            from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
+
+            if (not isinstance(target_candidate, GenerationCandidate)
+                    or not isinstance(target_requirement, ProviderNeutralVideoRequirement)):
+                raise _state_invalid(
+                    "Cross-provider recovery requires the exact prepared target candidate and requirement."
+                )
+            receipt = closed_paid_no_effect_receipt(self, attempt)
+            request = self._reopen_video_request(state.request)
+            binding = self._reopen_generation_execution_binding(state.execution_binding)
+            binding.validate_request(request)
+            old_candidate = next((c for c in binding.inputs.candidates
+                if c.candidate_id == binding.decision.selected_candidate_id), None)
+            old_requirement = binding.projection.requirement
+            scope = paid_cross_provider_no_effect_retarget
+            if (
+                receipt.submit_receipt_fingerprint != scope.submit_receipt_fingerprint
+                or old_candidate is None
+                or old_candidate.scope_hash != scope.source_scope_hash
+                or old_candidate.capabilities.provider_name != scope.source_provider_name
+                or old_requirement.requirement_hash != scope.source_requirement_hash
+                or target_candidate.scope_hash != scope.target_scope_hash
+                or target_candidate.capabilities.provider_name != scope.target_provider_name
+                or target_candidate.recipe.requirement_hash != target_requirement.requirement_hash
+                or target_requirement.requirement_hash != scope.target_requirement_hash
+                or failure.attempt_id != attempt_id
+                or failure.request_hash != request.request_input_hash
+                or failure.task_id != binding.inputs.limits.task_id
+                or failure.shot_id != binding.context.target_shot_id
+                or not cross_provider_no_effect_retarget_preserves_strategy(
+                    old_candidate, target_candidate, old_requirement, target_requirement,
+                    scope,
+                )
+            ):
+                raise _state_invalid(
+                    "Cross-provider recovery does not match the exact failed receipt, semantics and prepared target."
+                )
+            _require_latest_local_failure(self, manifest, attempt_id, binding.context.target_shot_id)
         if evidence_hash is not None and evidence_hash != failure.evidence_hash:
             raise _state_invalid(
                 "Runtime repair evidence hash does not match the durable runtime failure."
@@ -138,11 +205,14 @@ def register_runtime_repair_authorization(
                 continue
             for pointer in prior.runtime_repairs:
                 if pointer.evidence_hash == failure.evidence_hash:
-                    if local_extension is not None or paid_no_effect_retarget is not None:
+                    if (local_extension is not None or paid_no_effect_retarget is not None
+                            or paid_cross_provider_no_effect_retarget is not None):
                         existing = self._reopen_runtime_repair_authorization(pointer)
                         if (existing.local_extension != local_extension
                                 or existing.paid_no_effect_retarget != paid_no_effect_retarget
                                 or existing.paid_known_failure_retarget != paid_known_failure_retarget
+                                or existing.paid_cross_provider_no_effect_retarget
+                                    != paid_cross_provider_no_effect_retarget
                                 or existing.actor != actor or existing.repair_basis != repair_basis):
                             raise _state_invalid("Runtime repair extension replay identity mismatch.")
                     if paid_known_failure_retarget is not None:
@@ -150,6 +220,12 @@ def register_runtime_repair_authorization(
                         if (existing.paid_known_failure_retarget != paid_known_failure_retarget
                                 or existing.actor != actor or existing.repair_basis != repair_basis):
                             raise _state_invalid("Paid known-failure retarget replay identity mismatch.")
+                    if paid_cross_provider_no_effect_retarget is not None:
+                        existing = self._reopen_runtime_repair_authorization(pointer)
+                        if (existing.paid_cross_provider_no_effect_retarget
+                                != paid_cross_provider_no_effect_retarget
+                                or existing.actor != actor or existing.repair_basis != repair_basis):
+                            raise _state_invalid("Cross-provider no-effect retarget replay identity mismatch.")
                     return pointer
         request = self._reopen_video_request(state.request)
         scope = request.activation_scope
@@ -198,12 +274,14 @@ def register_runtime_repair_authorization(
         if granted >= ceiling:
             raise _state_invalid("Runtime repair budget is exhausted for this Shot.")
         authorization = RuntimeRepairAuthorization.create(
-            schema_version=("runtime-repair/4" if paid_known_failure_retarget is not None else
+            schema_version=("runtime-repair/5" if paid_cross_provider_no_effect_retarget is not None else
+                "runtime-repair/4" if paid_known_failure_retarget is not None else
                 "runtime-repair/3" if paid_no_effect_retarget is not None else
                 "runtime-repair/2" if local_extension is not None else "runtime-repair/1"),
             local_extension=local_extension,
             paid_no_effect_retarget=paid_no_effect_retarget,
             paid_known_failure_retarget=paid_known_failure_retarget,
+            paid_cross_provider_no_effect_retarget=paid_cross_provider_no_effect_retarget,
             attempt_id=attempt_id,
             evidence_hash=failure.evidence_hash,
             repair_basis=repair_basis,
@@ -312,6 +390,44 @@ def require_runtime_repair_grant(self, manifest, binding):
             self, manifest, prior.attempt_id, binding.context.target_shot_id,
             successor_binding=binding,
         )
+    if repair.paid_cross_provider_no_effect_retarget is not None:
+        from ai_video.production.generation_runtime_repair import (
+            cross_provider_no_effect_retarget_preserves_strategy,
+        )
+
+        scope = repair.paid_cross_provider_no_effect_retarget
+        receipt = closed_paid_no_effect_receipt(self, prior)
+        old_binding = self._reopen_generation_execution_binding(prior_state.execution_binding)
+        old = next((c for c in old_binding.inputs.candidates
+                    if c.candidate_id == old_binding.decision.selected_candidate_id), None)
+        target = next((c for c in binding.inputs.candidates
+                       if c.candidate_id == binding.decision.selected_candidate_id), None)
+        old_requirement = old_binding.projection.requirement
+        target_requirement = binding.projection.requirement
+        old_request = old_binding.compiled_request
+        target_request = binding.compiled_request
+        if (
+            receipt.submit_receipt_fingerprint != scope.submit_receipt_fingerprint
+            or old is None or old.scope_hash != scope.source_scope_hash
+            or old.capabilities.provider_name != scope.source_provider_name
+            or old_requirement.requirement_hash != scope.source_requirement_hash
+            or target is None or target.scope_hash != scope.target_scope_hash
+            or target.capabilities.provider_name != scope.target_provider_name
+            or target_requirement.requirement_hash != scope.target_requirement_hash
+            or target.recipe.requirement_hash != scope.target_requirement_hash
+            or old_binding.inputs.limits.task_id != binding.inputs.limits.task_id
+            or old_binding.context.target_shot_id != binding.context.target_shot_id
+            or binding.inputs.latest_attempt_hash != repair.evidence_hash
+            or old_request.image_bindings != target_request.image_bindings
+            or old_request.media_bindings != target_request.media_bindings
+            or not cross_provider_no_effect_retarget_preserves_strategy(
+                old, target, old_requirement, target_requirement, scope
+            )
+        ):
+            raise _state_invalid(
+                "Cross-provider recovery does not match the exact authorized target and preserved sources."
+            )
+        _require_latest_local_failure(self, manifest, prior.attempt_id, binding.context.target_shot_id)
     if repair.local_extension is not None:
         require_local_extension_scope(repair.local_extension, binding)
         if (prior.status is not StateCommitStatus.FAILED

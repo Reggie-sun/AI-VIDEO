@@ -404,13 +404,22 @@ def compile_provider_video_request(
     from ai_video.production.voice_routing import validate_voice_compilation
 
     preserved_source = requirement.target_shot.preserved_source_expression is not None
-    if preserved_source or native_prompt is not None and native_prompt.grammar_contract == "seedance-preserved-source-v1":
-        from ai_video.production.seedance_source_expression import compile_preserved_seedance_source
+    source_prompt_claimed = False
+    if native_prompt is not None:
+        from ai_video.production.seedance_source_expression import is_preserved_source_grammar_contract
+
+        source_prompt_claimed = is_preserved_source_grammar_contract(native_prompt.grammar_contract)
+    if preserved_source or source_prompt_claimed:
+        from ai_video.production.seedance_source_expression import compile_preserved_source
 
         try:
-            if (not preserved_source or compiler_id != "seedance-video-compiler" or compiler_version != "3"):
-                raise ValueError("preserved source needs its exact selected compiler")
-            expected = compile_preserved_seedance_source(provider_bound, requirement,
+            if not preserved_source:
+                raise ValueError("preserved source needs its exact approved Shot expression")
+            expected = compile_preserved_source(
+                provider_bound, requirement,
+                provider_name=provider_bound.provider_name,
+                compiler_id=compiler_id,
+                compiler_version=compiler_version,
                 continuity_expression=continuity_expression)
             if native_prompt != expected:
                 raise ValueError("native source differs from exact approved recompile")
