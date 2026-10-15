@@ -9,6 +9,30 @@ evidence_index_version: "1"
 
 Date: 2026-10-13
 
+## Current Whitebox Reference Result — 2026-10-16
+
+用户明确要求“做个白膜再用这个api生成一次，模糊先不处理”，本轮完成白模和 **一次** METASO `MiniMax-H3` 视频生成；没有再生图/锐化/重抽/S02 POST。下节“Current METASO Media And Gate”保留的是前一次无白模结果，不能当本轮当前状态或 accepted S01。
+
+白模目录为 `runs/canvas-jieshi-original-s01-s02-20261013-001/whitebox-S01-20261016-001/`。Blender 5.2.1LTS/build `9e2066aef7ef` 制作并保留 `.blend` 与 asset-authoring Python；`S01-whitebox-v006.mp4` SHA `68d175efa490de91ee30634fe790f4b487ea81c150e7b863cc05b47a3c363709`，768×1344、24fps、96帧、4秒、无音轨。28mm锁机位，七名他人的镜面替身及空的林砚位置；空左手抬起后在2.25秒前到位并保持，右手黑手机在膝。`geometry-audit.json` 的掌窗距离约0.0200000015m；这是作者几何与明确的镜面空间替身，未声称真实光学仿真或最终视频已满足2cm。已实际查看白模及显式 MCP 帧；v001–v005 迭代保留。
+
+沿现有共享 inspect/author/Planner/Router/committer 增加普通本地 MP4 reference 准入，未增加故事执行脚本、第二 timeline/state/renderer。实现 `54cefd068022450ee17bf1d9363cadbed5fd131a` 与依赖说明修正 `57dc0951eb317ea2527533ca456b15ea296f1c56` 已 push/main SHA核验。Exact Harness `.agent/harness/runs/canvas-local-video-reference-20261016-r1/receipt.json`：全部checks PASS，含264项Canvas、81项preserved-source及Architecture Gate；receipt完整性/closure已核验。说明修正另有 `.agent/harness/runs/canvas-local-video-reference-doc-20261016-r1/receipt.json`。Risk Gate为 `NATIVE_REVIEW_NOT_REQUIRED`：只准备受限local bytes/测量receipt，不改凭据、付费权限或唯一writer，相关boundary/reopen/tamper和真实导入/编译已有验证；不以旧review或工程PASS代媒体结果。
+
+新 inspected source snapshot `900ce8fe5f971a679e730ba45df0da84f109da7167ebe64c4e1315bc99576e51` 保留原两个text parts逐字不变，新增用户授权白模职责；原PNG仍 `13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923`。R2V沿现有严格逐人物owner绑定，同一PNG用8个Character alias和1个Scene alias形成 **9个相同字节的inline image inputs**，另加1个video input；不是9张新图，也不把它描述成仅发了1个image字段。额外重复是当前输入owner限制，未声称最佳通用多人物方案。原文、15项QA、广播及字幕职责保持；native prompt SHA `96898eef289374fbad5e715e3ea25a7405538c8e39b3e31ad2c9d5993db91243`，body SHA `2e0b00216aca0de95d61cfe999956260cd10012f4d84a167c50b8e4fb4289678`，25,810,477 bytes。相较前片同时改变mode、prompt、image/media bindings与execution stack；seed不受控，不是isolated A/B。
+
+前次b72a…片按canonical abandonment封存4FAIL/7NE，不作为accepted source。本轮两次无Provider副作用的authoring候选被原committer拒绝：外部blend/script hash误填Registry input artifact ID、R2V引用误填pending Shot input roles；原active Project始终保留。随后外部来源hash独立存authoring evidence，输入绑定归Character/Scene/generation.references，Shot只保留pending primary_visual，正常导入Project12。失败事务和旧receipt均保留，未改guard或手写state修复。
+
+Canonical attempt `canvas-62d4ee6132573d671a0191ad976dab8f4c97b527`，task `2110860569473404928`；POST1 HTTP200、正常GET观察succeeded，零retry。实际resolved hash `fed043e294419266b45780101739785e1b293f45f726941cdb8fdd950a9b6bd9`。Fresh preview/30分钟授权、同task ceiling3/used2、内部剩余50,000,000 microCNY上界经原Budget Guard/reservation/egress/intent/一次permit执行；旧计数不退回，累计视频14。内部上界不代表价格/账单。凭据只经exact user-designated private supplier；未输出值或hash。下载沿同task重查与既有public pin/TLS/SNI/noauth/noredirect；当前系统DNS仍返回fake-IP，显式process-local exact-host HTTPS DNS选择有证据，未改全局DNS或绕校验。
+
+Exact输出 `production/state/video-generation/fetch/files/74da665b5f2751f902c1660b6fc9346b4a46e5865357b95db644ae0cc4b07084.mp4`（相对上述run根），SHA同文件名，2,277,666 bytes、H264、**1344×768横屏**、24fps、107帧、4.458333秒、32kHz stereo AAC。Profile为4s/768P/adaptive/context_ir=false/native audio；这次R2V没有首帧硬锁，不能隐去由先前竖屏变横屏的输出差异，也没有裁切/补边伪装交付。原采用仍0–3秒，未执行最终canonical trim。
+
+显式project-local `video-analysis` MCP实际分析exact输出：18帧/0.25秒采样、1 scene；另实际解码frame71。Controlled presentation接收原15个问题后登记 **4 PASS / 2 FAIL / 9 NOT_EVALUATED**，canonical experience `e9b0f1d379c4f5431ab75b9f20c27aa5f6fad0058b42e354928fb165929955aa`、evidence `cc2a5633894fb9add4f2c7e2f23884295d8205d2965b4223b9993927ebcf3fe1`。PASS为camera/close-anchor/source-output/space：采样未再出现乘客消失或座区变门，宽景锁定、七人位置保持。FAIL为reflections/other-props：横屏上缘裁掉苏遥头顶，完整倒影不保；陈立约2.25秒转头并出现眼镜。手机与工牌区域出画、完整身份/从膝起手/悬窗约2cm/目光口型仍缺完整证据，不能用白模或局部改善代签。技术source-output PASS只指raw请求/产物与声明的采用窗口，不代表composition/字幕/交付已完成。
+
+声音实际使用同MP4的一次MCP→Gemini `gemini-3.8-flash` HTTP200；PCM SHA `c02743e63cba370331614fef6d14cf1ba1f4cf7b2c6a37612b746e0735e0ba06`。观察为平直礼貌女声、一个“林艳，请在终点站下车”片段、估计0.3–3.8秒、background_sounds=[]。同音转写不证明名字错误，也不代exact原句、D门扬声器声场、环境声和0.1–2.7秒可验证边界；可能被3秒trim截断仍须补证。未声称Codex原生听过或human接受。原始MCP/音频operator intent/consume/outcome、actual presentation/answers和诊断均保留在该unit。
+
+本轮按FAIL/NE停止且未activate；原committer以明确理由abandon已知失败候选，保留全部findings与媒体，标准loader重开 **Manifest71/Project12、attempt=failed、canonical next_action=stop**，见 `stable-media-checkpoint.json`。完整两镜、前15秒S01–S04、状态交接、HyperFrames声画/字幕/canonical trim、完整故事AC-7及用户1.0x完整听看均未完成；不把这条4.458秒候选称为7秒或15秒交付。已知裁切/额外动作不能靠同bytes补证消除；后续恢复须先明确这些实际缺陷和新有限单元，不能复用本次已消费许可。图片模糊按用户要求未处理。
+
+`record-ai-video-session`更新同一主记录。`distill-ai-video-learning`重新检索并核对同族证据后为 **no_candidate**：本轮只有一个白模条件下的真实attempt，与前片同时改变多项输入和模式；不能将“这一片人数/几何较稳定”升级为白模必然有效或已修复原S01。未修改Skill/Policy/Gate、未刷新RAG或全局memory；foreign staged/dirty保持。
+
 ## Current METASO Media And Gate — 2026-10-16
 
 原 S01 已经真实通过 METASO `MiniMax-H3` 生成并经 canonical fetch 落盘，取代下节历史候选的“POST0/无MP4/等待工程验证”状态。工程 commit `c3706e3bbcc648ab2f21a15c57a022df7befa95a` 已 push 并核对 remote main；exact Harness `.agent/harness/runs/metaso-original-recovery-20261016-r1/receipt.json` 的完整证明已核验，一名原生 `reviewer_xhigh` 审查 finding set 为空。工程证据不代表媒体通过。
@@ -752,6 +776,9 @@ Parent使用`research`与`retrieve-ai-video-memory`，后者不作为current事�
 | original-S01-metaso-fetch | metaso-post:48782f5c2aab0e6e5a64757746122fd4799441ee710fa7d36585fa1b1a979d0e | jieshi-original-S01-metaso-20261016 | canvas-785e429d6d7241b741dd75d8f4d5981cef08f876 | N/A | b72a5f426beddf08fb3c9f51fbb0773588ac92a767e595835b60ca601c8c7dd3 | PROVIDER_RECEIPT | FETCHED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/metaso-S01-live-20261016-001/fetch-after-dns-repair.json |
 | original-S01-metaso-qa | metaso-post:48782f5c2aab0e6e5a64757746122fd4799441ee710fa7d36585fa1b1a979d0e | jieshi-original-S01-metaso-20261016 | canvas-785e429d6d7241b741dd75d8f4d5981cef08f876 | N/A | b72a5f426beddf08fb3c9f51fbb0773588ac92a767e595835b60ca601c8c7dd3 | ANALYZER | FAIL | QUALITY_FAILURE_AND_EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-metaso-fetch | runs/canvas-jieshi-original-s01-s02-20261013-001/metaso-S01-live-20261016-001/canonical-qa-diagnosis.json |
 | original-S01-metaso-audio | metaso-post:48782f5c2aab0e6e5a64757746122fd4799441ee710fa7d36585fa1b1a979d0e | jieshi-original-S01-metaso-20261016 | canvas-785e429d6d7241b741dd75d8f4d5981cef08f876 | N/A | b72a5f426beddf08fb3c9f51fbb0773588ac92a767e595835b60ca601c8c7dd3 | AUDIO_ANALYZER_OBSERVATION | OBSERVED_NOT_HUMAN_ACCEPTED | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-metaso-fetch | runs/canvas-jieshi-original-s01-s02-20261013-001/metaso-S01-live-20261016-001/exact-mcp-analysis.json |
+| original-S01-whitebox-fetch | metaso-post:42910670f97138c0d83cdf9bb7acdc11ee07c8ce2bba427c73aa47c3ce7d1b57 | jieshi-original-S01-whitebox-20261016 | canvas-62d4ee6132573d671a0191ad976dab8f4c97b527 | N/A | 74da665b5f2751f902c1660b6fc9346b4a46e5865357b95db644ae0cc4b07084 | PROVIDER_RECEIPT | FETCHED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/whitebox-S01-20261016-001/runtime-fetch.json |
+| original-S01-whitebox-qa | metaso-post:42910670f97138c0d83cdf9bb7acdc11ee07c8ce2bba427c73aa47c3ce7d1b57 | jieshi-original-S01-whitebox-20261016 | canvas-62d4ee6132573d671a0191ad976dab8f4c97b527 | N/A | 74da665b5f2751f902c1660b6fc9346b4a46e5865357b95db644ae0cc4b07084 | ANALYZER | FAIL | QUALITY_FAILURE_AND_EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-whitebox-fetch | runs/canvas-jieshi-original-s01-s02-20261013-001/whitebox-S01-20261016-001/qa-diagnosis.actual.json |
+| original-S01-whitebox-audio | metaso-post:42910670f97138c0d83cdf9bb7acdc11ee07c8ce2bba427c73aa47c3ce7d1b57 | jieshi-original-S01-whitebox-20261016 | canvas-62d4ee6132573d671a0191ad976dab8f4c97b527 | N/A | 74da665b5f2751f902c1660b6fc9346b4a46e5865357b95db644ae0cc4b07084 | AUDIO_ANALYZER_OBSERVATION | OBSERVED_NOT_HUMAN_ACCEPTED | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-whitebox-fetch | runs/canvas-jieshi-original-s01-s02-20261013-001/whitebox-S01-20261016-001/mcp-analysis.actual.json |
 
 ## Historical Record And Learning Update
 
