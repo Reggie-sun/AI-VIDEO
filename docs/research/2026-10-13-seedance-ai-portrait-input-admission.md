@@ -1,43 +1,56 @@
 # Seedance AI Portrait Input Admission Audit
 
 Date: 2026-10-13
+Last updated: 2026-10-16 (official-source check)
 
 Status: `advisory_research`
 
 ## Current Scope
 
-下文原 PNG 的 `InputImageSensitiveContentDetected.PrivacyInformation` 是历史输入失败。
-最新已授权 T2V attempt 已被接受后以 `OutputVideoSensitiveContentDetected.PolicyViolation`
-终止，没有 MP4；实际状态见[当前实测记录](../record_for_agent/2026-10-13-canvas-two-shot-continuity-preflight.md)。
-用户已经拒绝私域库开通；后文较早的入库建议保留为历史，不是当前必要步骤。
-本轮补查社区 AI drama 制作法及官方素材契约，结论在末尾；没有授权或执行新一轮生成。
+2026-10-16 当前原图 S01 attempt 使用 `doubao-seedance-2-0-fast-260128`，4 秒请求以 HTTP 400
+`InputImageSensitiveContentDetected.PrivacyInformation` 在 submit 阶段被拒。精确输入 SHA-256 为
+`13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923`；记录显示 1 次 POST、无任务/MP4、S02 未提交、无 retry。
+本次累计 POST 计数为 12（历史 11 + 本次 1），没有查询或推断账单。见[实际拒绝审计](../../runs/canvas-jieshi-original-s01-s02-20261013-001/original-S01-live-20261016-001/actual-rejection-audit.json)
+与[停止状态](../../runs/canvas-jieshi-original-s01-s02-20261013-001/original-S01-live-20261016-001/final-stop-state.json)。
+项目记录将该 exact frame 保持为原始整张首帧；静态首帧 authoring 检查为 `PASS`，人类成片验收为 `NOT_EVALUATED`。
+当前 SHA 的来源已由 native Codex generation record 确认；它不是官方列明的 Seedream 5.0 文生图或 Seedance 原始视频/尾帧产物。
+方舟[错误码目录](https://docs.volcengine.com/docs/ark/error-codes?lang=en) 将该 code 解释为输入图像可能含真人。
+这表示平台作出了“可能含真人”的判断，不证明图中实际有真人；也没有指出具体哪张脸、倒影、文字或其他局部触发。
+“没有命中受信人像来源路径”仍是结合素材政策和同类报告得出的可能解释，不是分类器根因证明。
+
+较早的原 PNG 拒绝、T2V 输出侧 `OutputVideoSensitiveContentDetected.PolicyViolation` 与私域库建议都保留为历史，不覆盖本次当前状态。
+用户于 2026-10-16 明确要求“别找那种付费的途径”并保留当前原图；这使下文较早的“开通私域库”及“新生成 Seedream 原图”建议不再是当前恢复方案。
+本轮研究没有新图生成、素材上传、新增视频 submit/重试、购买/开通或对外工单；上文记录的单次 S01 POST 保持为当前既有 attempt。
 
 ## Finding
 
-本次《界蚀》HTTP400的公开错误码是`InputImageSensitiveContentDetected.PrivacyInformation`。
-没有发现当前请求的endpoint/model/role/JSON/Base64构造错误；存在明确的接入准备缺口：
-本地fictional identity/egress声明被用于inline提交，未取得Provider认可的受信素材身份。
-此前只解释“AI图也可能被拦截”，没有查全自有虚拟人像入库路径，结论不完整。
-应优先保留原人物、原图与写实风格，核验私域AIGC素材路线，不因拒绝而改画风或降低逐镜验收。
-准入错误不证明PNG是真人，也不证明Harness或模型连续性已通过。
+本次《界蚀》HTTP400的公开错误码是`InputImageSensitiveContentDetected.PrivacyInformation`；官方释义为平台判输入图像可能含真人。
+当前 original S01 有实际 submit-wire observation，并将 wire body 与解码图像 SHA 绑定到这次拒绝；此分类不证明 PNG 是真人，也没有定位某张脸、倒影、工牌/OCR 或其他局部。
+“当前写实人像没有命中受信输入来源”与官方信任规则和同类社区报告相符，但仍只是解释该失败的工作假设。
+没有证据表明改 prompt、裁切、重绘或换渠道会解决问题。
+首帧静态质量与 Provider 准入是两个独立 verdict；拒绝不使静态 authoring `PASS` 自动变成失败，也不证明视频连续性或成片验收。
 
 ## Official And Community Sources
 
 | Source | Verified Claim | Limit |
 | --- | --- | --- |
-| [方舟私域虚拟人像库指南](https://docs.volcengine.com/docs/ark/private-virtual-avatar-library-guide-preview?lang=zh) | 自有虚拟人像可创建AIGC素材组、上传并审核；只有`Active`资产可用于推理，以`asset://<asset_ID>`引用。需高级创作权益；Assets API用AK/SK及IAM；素材与推理key的`ProjectName`须一致。 | 未核验当前账号权益、AK/SK或实际入库。没有查询价格、购买权益或调用Assets API。 |
+| [方舟私域虚拟人像素材指南](https://docs.volcengine.com/docs/ark/private-virtual-avatar-library-guide-preview?lang=zh) | 单个 Asset 是一个图像/视频/音频文件；AIGC 组可管理自有虚拟形象。图像须为虚拟人像，合法拥有且不得与自然人形象雷同；审核后仅 `Active` 可推理。文档要求开通“高级创作权益包”，Assets API 用 AK/SK / IAM，素材与推理项目须一致。 | API 层面可上传一个图像文件，不代表当前含林砚与七个倒影的完整场景会被归类或审核为合格虚拟人像。AIGC 指南没有在已核验内容中明确禁止多人脸；真人库的多人脸规则不能移植到 AIGC 库。账号是否已有该权益、或可否无新增付费使用，均未知；按最新约束不购买、不申请开通、不调用。 |
 | [方舟肖像素材指南](https://docs.volcengine.com/docs/ark/seedance-portrait-asset-guide?lang=zh) | 同账号30天内指定Seedream 5.0文生图原始产物、Seedance原始视频及其返回尾帧可走信任产物路径；跨平台产物不在这条路径。另有预置虚拟人像、授权真人素材。 | 不是“所有AI图都可以直传”；也不是“自有跨平台AI图永远无法使用”，私域AIGC入库是另一条路线。 |
-| [方舟Create Video API](https://docs.volcengine.com/docs/ark/create-video-generation-task-api?lang=zh) | 图片可用标准Base64或素材URI；2.0参考图1–9张、`reference_image`；Fast支持480p，2.0 duration4–15秒；显式原生声音字段。 | 格式支持不等于人像准入，不等于账号可调用或输出质量。 |
-| [ArcReel Issue #2249](https://github.com/ArcReel/ArcReel/issues/2249) | 2026-08-31 reporter提供同错误码：AI生成的人像作为图片输入被拒，提出asset库接入需求。 | issue仍为enhancement/needs-info；triage回复注明AI生成。只使用reporter的拒绝事实，不能将建议或bot回复视为已验证修复。 |
+| [方舟错误码目录](https://docs.volcengine.com/docs/ark/error-codes?lang=en) | `InputImageSensitiveContentDetected.PrivacyInformation` 的官方解释为 “The request failed because the input image may contain real person.” | “may”是平台判定，不证明真人身份或具体触发局部；本次 request 的 error body 没有额外标签定位原因。 |
+| [方舟创建视频任务 API](https://docs.volcengine.com/docs/ark/create-video-generation-task-api?lang=zh) | `content.image_url.url` 接受 `asset://<ASSET_ID>`；同一 image object 对 `role` 定义了 `first_frame`、`last_frame`、`reference_image`，故 asset-backed image + `first_frame` 的字段组合有 API schema 依据。 | 私域 AIGC 专属示例只演示 `reference_image`；schema 不证明当前图像内容能入库、能通过输入审核，亦不证明当前账号可用。格式支持不等于人像准入或账号授权。 |
+| [ArcReel Issue #2249](https://github.com/ArcReel/ArcReel/issues/2249) | 2026-08-31 reporter 自述 AI 生成的人像作为首帧/参考图片被同一错误码拒绝，并请求素材库支持。 | issue 为 `enhancement` / `needs-info`；后续详细根因与替代方案标记为 AI triage 内容，不是官方答复或成功修复。仅作为相似失败报告。 |
+| [Brut 的 Seedream/Seedance 实测说明](https://getbrut.app/docs/providers/seedream.html) | 该工具作者自述真实请求中，Seedream 文生图原图（含多视图角色表）及 Seedance 片段帧被接受；Seedream 编辑图、裁图和其他来源的肖像被拒。 | 商业工具的一手自报，没有随附可独立核对的请求/receipt；多视图角色表不等于当前多人场景。其“resize/re-export 保持信任”与方舟官方对压缩/转发可能丢失信任的警告不同，不据此指导重编码当前原图。 |
 | [ComfyUI官方Seedance节点源码](https://github.com/Comfy-Org/ComfyUI/blob/14c553159994b626738c392eb99d295ea3d683c1/comfy_api_nodes/nodes_bytedance.py) | image helper上传虚拟库、等待`Active`、返回`asset://`；first/last-frame及reference-image调用点实际使用该helper。 | 经ComfyAPI proxy，是其平台/账号的素材处理链；不能把proxy权限移植到我们的ARK_API_KEY，也没有执行该外部源码。 |
 | [社区Seedream使用反馈](https://www.reddit.com/r/generativeAI/comments/1se1e69/anyone_else_getting_reference_images_rejected_in/) | 有用户报告AI写实参考被拦，也有用户报告在平台内先用Seedream生图再做视频。 | anecdotal、自报参数不完整且渠道不同；不外推为本账号、所有图或所有平台的成功保证。 |
 
 别人能制作写实AI人物视频，可能使用已入库人物、受信模型原始产物、预置虚拟人像或不同平台包装的
 素材处理链。仅看到成片无法判断其模型版本、时间、账号权益或实际传输，不能据展示片判定我们的准入条件。
 
-## Exact Local Request Audit
+## Historical Exact Local Request Reconstruction
 
-当前源码snapshot为`cb79ef2a95052f614e63931075a4f090b886367c`。通过共享reader重开failed新attempt
+本节记录较早的 two-shot 简化 attempt，不是 2026-10-16 当前 original S01 attempt。下述 deterministic reconstruction / no-wire-capture 限制仅适用于这个历史请求；当前 original S01 有独立的实际 submit-wire observation。
+
+该历史源码snapshot为`cb79ef2a95052f614e63931075a4f090b886367c`。通过共享reader重开failed attempt
 `canvas-293bebb27dd2322c484e104df678ac97ff5bbd4f`及exact sealed request，重新核对execution binding。
 纯重建请求并构造HTTPX request，未send、未lookup credential，Manifest仍revision29。
 
@@ -53,8 +66,8 @@ Status: `advisory_research`
 
 同PNG被两个职责引用有冗余，但没有找到官方SHA唯一性规则或重复图片导致PrivacyInformation的证据。
 不得仅为“修复”在adapter去重、删除scene/identity职责或重写已批准prompt。
-这份audit是当前exact request的deterministic reconstruction，不是当时network wire capture；
-历史raw server body未保留，所以不能声称排除了所有可能的代码问题。
+这份历史 audit 是该 attempt 的 deterministic reconstruction，不是当时 network wire capture；
+其 raw server body 未保留，因而不能用来判断当前 original S01 的请求绑定或失败原因。
 
 本机证据位于`runs/canvas-jieshi-two-shot-20261013-001/input-admission-audit/`：
 `exact-request-audit.json`、`comfyui-reference-identity.json`、`kimi-receipt.json`、`kimi-report.json`、
@@ -147,12 +160,26 @@ exact source PNG/confirmation/Active identity绑定与`asset://`输出，不需�
 Seedance原始视频及模型返回尾帧。编辑、压缩或转发可能破坏受信资格，输出仍经过审核。
 用户拒绝私域库开通并不排除这些公开路径；但模型可用性、素材实际来源和适配器支持仍须逐项核验。
 
+**2026-10-16 无付费 supersession。** AIGC 私域库官方指南明确要求高级创作权益包；当前没有证据证明本账号已具备可零新增付费使用的权益。
+因此既有的私域入库候选现仅作历史记录，当前不得购买、开通、上传或以“免费 Entry”名义推定可用；本轮未查询购买页或价格。
+官方可信原始产物路线仅能复用已经存在、仍在 30 天有效期内、且字节确认为同一 Ark 账号指定模型原始产物的输入；不建议新跑 Seedream 文生图，也不把 Seedance 视频 submit 说成免费。
+当前 SHA 已知来自 native Codex generation，不符合官方指定 Seedream / Seedance 受信原始产物来源，因此当前图不能走这条已公开路径。保留当前图的免费放行方式未证实；可整理已知错误码、模型、wire observation 与 decoded SHA 供用户自行向官方询问原因，但不承诺免费白名单或豁免，也不代发。
+
+对于当前整张首帧，资产 API 允许单文件 Image、视频 API 字段允许 `asset://` 与 `first_frame` 的 schema 组合；但素材内容必须属于合格虚拟人像并通过审核。
+该图有一名主体及七个倒影，私域虚拟人像文档未证明此场景可作为一个 AIGC portrait Asset 通过审核；能否入库及之后是否免于人像输入拦截均为 `UNKNOWN`。
+真人素材库明确的多人脸限制绑定真人认证/真人组，不足以推出 AIGC 库也必拒；不得反向宣称它一定可入库。
+
 关键缺口：**任意本地提取的中间PNG没有被列入官方受信集合**。
 “新A成功 → 中间帧自动能提交B”没有充分依据。历史Mini接受H3首帧仅是旧个案。
 身份参考解决外貌；实际中间状态还必须表达持物、动作相位、人物与门的相对位置、运动方向、摄影及声音。
 二者职责不能互相替代。首镜普通中间帧、Provider尾帧与原始视频是三种不同输入契约。
 
-## Recommended Next Candidate
+## Former Recommendation — Superseded 2026-10-16
+
+以下是此前允许付费权益研究时提出的候选方向，现为历史，不是本次执行建议。用户已要求不找付费途径并保留当前原图，因此不再推荐开通私域库、生成新的 Seedream 人像、裁切/重绘当前图或换用可能收费的 Provider。
+尚未证实有保留当前图的免费放行路径；可整理已知证据供用户自行向官方核验解释，不承诺免费白名单或豁免，也不代发。AIGC 入库审核与账号是否有可无新增付费使用的权益仍为 `UNKNOWN`。
+
+### Historical Candidate Text
 
 优先准备资产先行、逐镜验收的项目数据方案，复用既有Harness与renderer。
 若继续Seedance且不开私域库，先核对同账号指定Seedream原始角色/场景图的可用路径，

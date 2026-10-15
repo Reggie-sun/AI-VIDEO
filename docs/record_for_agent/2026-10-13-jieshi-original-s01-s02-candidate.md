@@ -11,6 +11,8 @@ Date: 2026-10-13
 
 ## Supersession Notice — 2026-10-15
 
+2026-10-16用户补充要求“别找那种付费的途径”，当前恢复建议据此收敛：不购买权益、充值、收费中转或新付费Provider；不把免费入库误称为免费视频。见 **Community Admission Research And No-New-Paid-Route Constraint — 2026-10-16** 与共享workflow的`Portrait Input Admission`。此前“换Provider/开通素材库”只保留为历史候选，不是当前待执行建议。S01仍为已知输入拒绝，原图静态PASS、POST计数及S02未提交保持。
+
 2026-10-16当前续执行已到一次真实原S01视频提交，详见 **Original S01 Exact Submit And Input Admission Stop — 2026-10-16**。图片静态PASS保持；已配置S01 15项raw QA、实际Planner/Router编译、fresh runtime/供应凭据/预算/egress/intent/一次permit，并在用户对exact图片确认A后提交。Seedance HTTP400 `InputImageSensitiveContentDetected.PrivacyInformation`，无task/MP4，canonical known_no_effect/runtime_failure/STOP。当前Manifest45/Project10/schema2.15，原视频POST1、历史11、累计12，零retry；下方“qa_policy=None/未提交”是此前保留checkpoint。新作图实践已按用户明确要求写入共享workflow，不把平台审核拒绝当静态图FAIL，也不继续无效修图或重发。
 
 2026-10-16当前图片状态已取代此前完整首帧FAIL/未导入的当前结论：见 **Original First Frame Static Admission And Canonical Import — 2026-10-16**。新增13次内置图片，累计22；最终exact PNG `13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923`逐项静态复核为PASS_FOR_FIRST_FRAME_AUTHORING，随后沿既有generated-source copy/唯一committer导入并绑定S01，标准loader重开Manifest37/Project9。旧10条P7 Registry前缀/媒体/attempt与web UNKNOWN保留。原视频0、历史视频11；静态成功不代视频动作、广播、声音/字幕/trim、后镜handoff或human1.0x。当前qa_policy仍None、Provider admission和qualified视频/新原镜声音仍未验；下方旧“最新”段均为历史checkpoint。
@@ -547,6 +549,21 @@ Canonical paid submit receipt=`state/paid-provider/submits/6a58fabd1108dfcb3b755
 最小恢复条件是取得当前图可用的合法Provider素材准入证明，或用户明确授权一个支持保留此图/原生声音的其他视频输入单元；随后仍走原shared preparation/paid/逐镜Gate。此前用户拒绝购买/开通私域库仍有效，不自动入库、购买、换Provider，亦不把旧剩余次数当新路线许可。旧Seedream技术图均FAIL，不能换回去求平台通过。没有可用MP4，所以project-local逐镜视频QA、新音义/时序、frame71提取/后镜绑定、S02、字幕/trim/HyperFrames和human1.0x均NOT_EVALUATED；没有为补证多生视频或调用Gemini空转。
 
 按`record-ai-video-session`在真实blocker更新同一主record/README，并将用户要求的可复用步骤补入既有workflow。`distill-ai-video-learning=no_candidate`：本链不构成隔离变量的重复效果结论；工作流更新来自用户明确指令，非自动采用Learning Claim。后续Agent可沿已有入口发现实际方法和Provider限制；文档不假装新自动图引擎。没有源码行为/Gate修订，implementation Risk Gate不触发；Parent保留最终判断。当前文档publication与exact Harness按新receipt核验，foreign staged/dirty保留。
+
+## Community Admission Research And No-New-Paid-Route Constraint — 2026-10-16
+
+用户追问“这是我AI生成的图片，社区都是怎么做的”，并要求沉淀给后续Agent，随后明确不找付费途径。
+本轮仅重开实际`actual-rejection-audit.json`、`submit-stop.json`和`final-stop-state.json`，并检索公开官方资料与社区原始报告；没有新图片、视频、音频POST、重试或Production mutation。当前exact图仍`13c83ce4…76923`，S01原视频POST1、历史11、累计12，S02 POST0，无MP4。`PrivacyInformation`本身不证明图片来自真人，也没有定位具体脸部、工牌或像素；写实人像输入准入是结合官方规则及同类报告的解释，不伪称逆向确定了分类器。
+
+Parent使用`research`与`retrieve-ai-video-memory`，后者不作为current事实来源；委派检索报告缺`langchain_core`，未重建、下载模型或启用网络fallback，当前结论以重开的exact本机证据与公开primary source为准。按`SUBAGENTS.md`选择一个原生`universal_executor` `/root/seedance_portrait_evidence`核验官方准入与免费条件、仅更新既有肖像研究文件；Parent持有workflow与本记录，target paths不相交，无external agent、nested delegation或第二reviewer。现有AGENTS/playbook已指向共享workflow，foreign同文件暂存不修改。
+
+研究复用并更新[原肖像准入审计](../research/2026-10-13-seedance-ai-portrait-input-admission.md)，区分官方受信原产物条件、社区reporter同错误、作者自报实测与AI triage建议。只看到他人成片、其他账号或中转平台成功，不证明当前图/role可用；对裁切/转码是否保留信任的社区结论，遇到官方警示和缺少本账号实测时保持不确定。Parent重新核对官方Create Video API，`image_url.url`可传`asset://`且图片role有`first_frame`，属于语法支持；多人整张首帧审核放行不能从单人`reference_image`例子推导。
+
+当前允许的恢复调查不新增付费：整理不含凭据的官方支持核验材料，或核对官方明确且当前账号已可用的免费准入。没有代用户发工单/上传图片/开通权益，未把免费quota说成已有权限；重生Seedream原图不能冒充保留当前图。仅重开现有local H3 profile确认其为loopback、1344×768、124帧/24fps、原生音轨配置；未运行模型/核验当前weights及nodes，也未验证原S01倒影、手部、广播和竖幅要求，所以不是已就绪的免费替代路线，更没有自动下载模型或切换。
+
+按用户明确指令将可复用诊断步骤写入`docs/canvas-production-harness.md#portrait-input-admission`：先绑定被拒exact输入和失败阶段，再核对整条准入路线、费用限制、原图/原文保留及恢复条件。此为advisory执行指导，不改Provider/QA/付费Gate，不声称已打通免费出片。`record-ai-video-session`复用本主记录，不新增重复记录或媒体证据行；自动`distill-ai-video-learning=no_candidate`，本轮没有新增独立受控attempt来证明免费修复有效，社区研究不当本地实验验收。
+
+文档变更按exact owned commit range验证并push；最终receipt见`.agent/harness/runs/seedance-portrait-community-free-route-20261016-r1/receipt.json`，实际结果以完成后的receipt为准。没有源码行为或高风险执行变更，implementation Risk Gate为`NATIVE_REVIEW_NOT_REQUIRED`；没有用户对implementation独立review要求、重大durable-state/credential失败路径或剩余重大语义验证缺口，Parent负责核对来源与最终diff。媒体目标仍因输入准入阻断，非文档完成即Production完成。
 
 ## Evidence Index
 

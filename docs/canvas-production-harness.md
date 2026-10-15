@@ -100,6 +100,18 @@ CLI：`--runtime trusted_operator_module:function` 返回 `committer` 和 servic
 - **Prove the consumer binding.** 静态全项通过后，核对实际Scene/reference、`generation.references`、Shot的`required_asset_roles`及preserved-source的引用都指向该exact图；保留原Registry顺序和旧记录。沿共享preflight及无副作用Planner/Router prepare验证，旧mask/旧首帧槽未替换仍须修正，不能因登记成功就宣称视频可提交。Provider人像准入、人类来源声明、声音路线与逐次paid gates继续独立核验。
 - **Keep Provider admission separate.** 2026-10-16原S01图静态PASS后，实际一次Seedance提交仍被`InputImageSensitiveContentDetected.PrivacyInformation`拒绝；人类虚构来源声明和本地Registry不会替平台放行。[方舟肖像指南](https://docs.volcengine.com/docs/ark/seedance-portrait-asset-guide?lang=zh)列出的信任路线要求同账号、有效期内的指定模型原始产物，不能把Codex跨平台图或编辑图冒充该来源。规则须重新核对；失败后不靠降画质/遮脸/改标签/反复修prompt重发，先明确合法素材准入或已授权Provider路线，保留已通过图片和全部失败历史。该次拒绝不证明所有外部AI图永久不可用，也不自动授权入库、购买、换Provider或重抽。
 
+### Portrait Input Admission
+
+写实AI人物图被`InputImageSensitiveContentDetected.PrivacyInformation`拒绝时，先按输入准入问题调查。
+该错误不证明人物是真人，也不定位到某张脸、工牌或具体像素；本地原创声明、静态QA、平台素材准入分别取证。
+官方来源、社区原始失败报告、作者自报实测与本项目exact请求须分开，详见
+[肖像准入研究](research/2026-10-13-seedance-ai-portrait-input-admission.md)。
+
+1. **Identify the rejected input.** 重开实际model/endpoint/region、首帧或参考图role、native payload及解码后的SHA，保存error code、task有无及known/unknown outcome。格式错误、输入审核、输出审核分别诊断；没有MP4不伪造逐镜QA，也不因相同错误反复重发。
+2. **Check the complete route before image repair.** 官方受信产物路线须核对账号、指定model、有效期、文生图/编辑来源及原始bytes；私域AIGC路线须核对实际权益、审核后`Active`、asset身份及所选role支持。官方API支持image URL字段的`asset://`和首帧role，但语法支持、单人`reference_image`示例均不能证明多人整张首帧审核放行。生图后再裁切、局部重绘或跨平台转移，仍要重验下游准入。
+3. **Respect the current cost constraint.** 用户要求不找付费途径时，不推荐购买权益、充值、收费中转或新增付费Provider。仅整理无需付费的官方支持核验材料，或核对官方明确且当前账号实际可用的免费准入；免费入库不等于免费视频生成，重新生成受信原图也不是免费复用当前图。未经核验的免费额度/开通条件标`NOT_EVALUATED`；本地profile存在不证明当前runtime就绪或原剧本质量通过。不自动开通、下载模型、上传、提交工单或恢复调用。
+4. **Preserve the accepted picture and story.** 保留已通过图片、source/generation lineage与旧计数；不靠换人物、改画风、隐藏人脸或删原文要求解决准入。社区换渠道成功、裁图/转码成功、同模型旧成功都只在其原条件下成立；不能给当前bytes或后镜状态代签。无符合当前授权、费用约束和完整声画要求的路线时，报告具体缺项并停止当前单元。
+
 只有用户明确选择其他工具，或内置工具在submit前已确认不可用并且另一入口已获授权，才评估既有 `chatgpt-web`、本地ComfyUI或已选择Provider；失败后不能自动fallback。明确选择 `chatgpt-web` 时先核对 `backend_status` ready，保持exact backend，不切 `api/auto`。需要严格局部像素保护时，可选择下文已实现的 [Masked Image Workflow](#masked-image-workflow)，并完整保留其mask/permit/保护复验合同。
 
 ## Original Asset Preparation
