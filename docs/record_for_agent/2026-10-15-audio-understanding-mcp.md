@@ -9,6 +9,10 @@ evidence_index_version: "1"
 
 Date: 2026-10-15
 
+## Current Direction
+
+用户随后明确只要MCP把音频交给当前Codex直接理解，不接受额外识音模型。下文Gemini工程仍是历史已实现的可选接口，不满足该新约束，不据旧接入授权自动调用或安装其他模型。当前原生音频输入实测阻断见[Native Audio Input Probe](#native-audio-input-probe)，它没有替代原镜声音验收。
+
 ## User Intent And Decision
 
 用户纠正“没有工具吗?去网上找个工具”，随后明确要求“接进项目”“并且让以后的agent也知道这个工具”。Parent用`research`核查官方Gemini音频理解/专用转写及社区MCP实际handler；原生`universal_executor`只写`docs/research/2026-10-15-audio-understanding-tools.md`。公开工具存在，当前Codex不接受audio content不等于其他模型不能听音。选择官方GenerateContent WAV接口、复用已有httpx接入项目MCP；不安装宽泛社区封装、不强制Qwen或开启external engineering subagent。
@@ -41,6 +45,14 @@ Adapter在取key前从inline WAV重编canonical请求以拒绝tampered dataclass
 原生`reviewer_xhigh` `/root/audio_security_review`初审两项：AUDIO-001（blocking_candidate）自动探测伪装MP4的HLS可读root外音轨；AUDIO-002（non_blocking）本地参数无效却先消费远端分析。Parent均CONFIRMED并修复，review output/裁决归同一proof目录。旧S2 source+新增tests的隔离对照，HLS fixture将目录外synthetic MP4 remux为TS并将audio clock延后0.2s，可复现preview接受及mocked POST；默认AAC offset为负的初始fixture会先被旧clock guard拒绝，不当作攻击成功。早期absolute test path也曾让pytest重新导入current src，保存为无效source-control尝试，后改为temporary verification checkout内仅复制新test并核验旧source hash。有效RED为`review-repair-hls-audio-offset-red.txt`的4项FAIL；真实网络调用0。
 
 修复只改音频MP4 probe/decode为forced MOV/file-only、external drefs与absolute alias禁用，并让组合分析先完成本地处理再消费远端。新增用例覆盖preview/execute在runtime/credential/permit/POST前拒绝伪装输入，以及无效max_frames/frame_interval时零音频调用。修复后focused MCP+generation review共101项PASS；最终增强runtime观察与文档后的精确增量验证归`.agent/harness/runs/audio-understanding-mcp-20261015-r3/receipt.json`，其base为已完整验证S2；r2与r3证明边界分别保留，不声称r2曾检查后续新bytes。安全语义变更仍须同一reviewer full re-review，见`review-round-2`实际结果。
+
+## Native Audio Input Probe
+
+按`openai-docs`核对官方MCP文档并直接查MCP AudioContent schema；真正能力判定来自本会话实际工具返回。调用现有`mcp__filesystem__read_media_file`读取`runs/canvas-jieshi-original-s01-s02-20261013-001/historical-s01-audio-capability.wav`：本地SHA仍为`daa154cb46f2a89ce3e95f5dcab6edb019c14a18ea67aef5de4031e0ffeec2d4`、129102 bytes、4.032s。structured content确有`type=audio`、`mimeType=audio/wav`和172136字符base64；model-facing content却为`<audio content omitted because you do not support audio input>`。用audio helper转交同一structured payload后仍被省略，不能声称听见或转写出任何词。一次read与一次转交属于同一来源的一次能力探测链，不是两次独立声音实验；未单独重测decoded MCP payload SHA，不把它写成已验证逐镜证据。
+
+结果为`UNSUPPORTED_THIS_SESSION`/`EVIDENCE_REPAIR_FIRST`；具体host/model内部过滤组件未定位，不能推论所有Codex版本永远不支持audio。证据归`runs/canvas-jieshi-original-s01-s02-20261013-001/audio-tool-integration-20261015-001/native-audio-delivery-20261015-001.json`。旧历史WAV只用作能力探测，不作为原S01 accepted source。没有下载/调用新识音模型、Gemini请求、Provider generation或Production写入，原镜QA和human1.0x仍`NOT_EVALUATED`。
+
+详细工具说明新增原生路线及能力边界；playbook/AGENTS继续沿原指针发现，不改foreign staged reviewer hunks，不扩写第二入口。此checkpoint只有文档/实测记录，Parent判定`NATIVE_REVIEW_NOT_REQUIRED`：不更改Product行为、secret/paid authority、持久状态或验收标准，不触发新的critical consequence/gap。按docs-only exact delta运行Harness；不因记录重复跑媒体、Provider或完整工程测试。`record-ai-video-session`为recorded，`distill-ai-video-learning`为no_candidate：单会话能力限制，非跨实验可推广结论。
 
 ## Agent Discovery And Ownership
 

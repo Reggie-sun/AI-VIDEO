@@ -1,5 +1,13 @@
 # Project Audio Understanding Tool
 
+## Native Audio Delivery
+
+用户只要求MCP把原音频直接送给当前Codex、且不接受额外识音模型时，先核验原生输入路线：现有`filesystem.read_media_file`可返回`AudioContent`（`type=audio`、`mimeType=audio/wav`、base64 data），见[MCP协议](https://modelcontextprotocol.io/specification/2025-06-18/server/tools#audio-content)。协议可表达音频，不证明当前host/model会交付或理解音频；不能仅凭工具成功、JSON里有data或能播放就声称听过。
+
+2026-10-15本会话用现有4.032秒历史WAV实测：MCP structured content含audio/wav，但模型可见content被替换为`audio content omitted because you do not support audio input`；再用原生audio helper转交同一payload，仍被省略。本会话直听路线为`UNSUPPORTED_THIS_SESSION`，声音语义/human acceptance仍`NOT_EVALUATED`。这只约束该会话及实际路线，不推论所有Codex客户端或未来窗口。证据见[session record](record_for_agent/2026-10-15-audio-understanding-mcp.md#native-audio-input-probe)。
+
+WAV/MP3/base64转码、波形、频谱、响度或静音统计不能补出对白及表演语义；这类输出只能支撑其实际测得的声学事实。原生输入受阻时保留`EVIDENCE_REPAIR_FIRST`，恢复条件是host/model路径真正交付音频并取得可核验听音证据。用户禁止额外模型时，不自动改走下文Gemini或另装ASR/本地识音模型；原有Per-Shot Gate、exact identity和human1.0x要求保留。
+
 ## Entry And Evidence Boundary
 
 项目本地`video-analysis` MCP注册`audio_understand`，用Gemini官方音频理解接口补充语音内容、声线/语气和环境声观察。它接收原MP4或PCM WAV；不要求Codex主模型能接收audio content，也不强制Qwen/ComfyUI。`video_transcribe`仍是Whisper转写入口，不能据转写文字推断音色、求证表演或完整聆听。[官方能力](https://ai.google.dev/gemini-api/docs/generate-content/audio)
