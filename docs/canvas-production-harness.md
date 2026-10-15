@@ -109,7 +109,7 @@ CLI：`--runtime trusted_operator_module:function` 返回 `committer` 和 servic
 
 1. **Identify the rejected input.** 重开实际model/endpoint/region、首帧或参考图role、native payload及解码后的SHA，保存error code、task有无及known/unknown outcome。格式错误、输入审核、输出审核分别诊断；没有MP4不伪造逐镜QA，也不因相同错误反复重发。
 2. **Check the complete route before image repair.** 官方受信产物路线须核对账号、指定model、有效期、文生图/编辑来源及原始bytes；私域AIGC路线须核对实际权益、审核后`Active`、asset身份及所选role支持。官方API支持image URL字段的`asset://`和首帧role，但语法支持、单人`reference_image`示例均不能证明多人整张首帧审核放行。生图后再裁切、局部重绘或跨平台转移，仍要重验下游准入。
-3. **Respect the current cost constraint.** 用户要求不找付费途径时，不推荐购买权益、充值、收费中转或新增付费Provider。仅整理无需付费的官方支持核验材料，或核对官方明确且当前账号实际可用的免费准入；免费入库不等于免费视频生成，重新生成受信原图也不是免费复用当前图。未经核验的免费额度/开通条件标`NOT_EVALUATED`；本地profile存在不证明当前runtime就绪或原剧本质量通过。不自动开通、下载模型、上传、提交工单或恢复调用。
+3. **Respect the current cost constraint.** 用户要求不找付费途径时，不推荐购买权益、充值、收费中转或新增付费Provider。不能由“高级创作权益”推断必须付费；[免费Entry及企业资格](research/2026-10-13-seedance-ai-portrait-input-admission.md#latest-correction--free-entry-and-account-eligibility--2026-10-16)须分别核对。文档存在、旧账号quota和当前已开通是三个不同事实，不把真人入口用于虚构图。Agent不代签人类声明或认证；用户拒绝开通时不自动开通。免费入库不等于免费视频生成，重新生成受信原图也不是免费复用当前图。未核验的当前权限、素材审核及免费额度标`NOT_EVALUATED`；本地profile存在不证明当前runtime就绪或原剧本质量通过。不自动下载模型、上传、提交工单或恢复调用。
 4. **Preserve the accepted picture and story.** 保留已通过图片、source/generation lineage与旧计数；不靠换人物、改画风、隐藏人脸或删原文要求解决准入。社区换渠道成功、裁图/转码成功、同模型旧成功都只在其原条件下成立；不能给当前bytes或后镜状态代签。无符合当前授权、费用约束和完整声画要求的路线时，报告具体缺项并停止当前单元。
 
 只有用户明确选择其他工具，或内置工具在submit前已确认不可用并且另一入口已获授权，才评估既有 `chatgpt-web`、本地ComfyUI或已选择Provider；失败后不能自动fallback。明确选择 `chatgpt-web` 时先核对 `backend_status` ready，保持exact backend，不切 `api/auto`。需要严格局部像素保护时，可选择下文已实现的 [Masked Image Workflow](#masked-image-workflow)，并完整保留其mask/permit/保护复验合同。

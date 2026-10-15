@@ -11,6 +11,8 @@ Date: 2026-10-13
 
 ## Supersession Notice — 2026-10-15
 
+2026-10-16 Seedance-only续查纠正前次归纳遗漏：官方免费`高级创作权益（Entry）`支持AIGC入库；不是必须付费人物订阅。旧账号实测已记录免费Entry因企业认证而disabled，本轮未刷新账号资格。见 **Free Entry Recovery Candidate And Enterprise Eligibility — 2026-10-16**。当前exact图、Manifest45/Project10与原POST计数保持；未切METASO/H3、未读`.env`、未开通/上传/重新生成。免费档存在不等于当前账号或多人首帧已准入。
+
 2026-10-16用户补充要求“别找那种付费的途径”，当前恢复建议据此收敛：不购买权益、充值、收费中转或新付费Provider；不把免费入库误称为免费视频。见 **Community Admission Research And No-New-Paid-Route Constraint — 2026-10-16** 与共享workflow的`Portrait Input Admission`。此前“换Provider/开通素材库”只保留为历史候选，不是当前待执行建议。S01仍为已知输入拒绝，原图静态PASS、POST计数及S02未提交保持。
 
 2026-10-16当前续执行已到一次真实原S01视频提交，详见 **Original S01 Exact Submit And Input Admission Stop — 2026-10-16**。图片静态PASS保持；已配置S01 15项raw QA、实际Planner/Router编译、fresh runtime/供应凭据/预算/egress/intent/一次permit，并在用户对exact图片确认A后提交。Seedance HTTP400 `InputImageSensitiveContentDetected.PrivacyInformation`，无task/MP4，canonical known_no_effect/runtime_failure/STOP。当前Manifest45/Project10/schema2.15，原视频POST1、历史11、累计12，零retry；下方“qa_policy=None/未提交”是此前保留checkpoint。新作图实践已按用户明确要求写入共享workflow，不把平台审核拒绝当静态图FAIL，也不继续无效修图或重发。
@@ -564,6 +566,22 @@ Parent使用`research`与`retrieve-ai-video-memory`，后者不作为current事�
 按用户明确指令将可复用诊断步骤写入`docs/canvas-production-harness.md#portrait-input-admission`：先绑定被拒exact输入和失败阶段，再核对整条准入路线、费用限制、原图/原文保留及恢复条件。此为advisory执行指导，不改Provider/QA/付费Gate，不声称已打通免费出片。`record-ai-video-session`复用本主记录，不新增重复记录或媒体证据行；自动`distill-ai-video-learning=no_candidate`，本轮没有新增独立受控attempt来证明免费修复有效，社区研究不当本地实验验收。
 
 文档变更按exact owned commit range验证并push；最终receipt见`.agent/harness/runs/seedance-portrait-community-free-route-20261016-r1/receipt.json`，实际结果以完成后的receipt为准。没有源码行为或高风险执行变更，implementation Risk Gate为`NATIVE_REVIEW_NOT_REQUIRED`；没有用户对implementation独立review要求、重大durable-state/credential失败路径或剩余重大语义验证缺口，Parent负责核对来源与最终diff。媒体目标仍因输入准入阻断，非文档完成即Production完成。
+
+## Free Entry Recovery Candidate And Enterprise Eligibility — 2026-10-16
+
+用户指出云端METASO后又明确“先停止，我就是要用seedance”，随后“继续”；因此仅继续Seedance正规准入调查，不把key/path presence作为换Provider或调用授权。没有读取所指`.env`、查新credential、启动本地H3、生成媒体或购买服务。
+
+本轮Parent经公开HTML table与web原文交叉核对官方免费Entry确有AIGC入库权限，细节归[原研究的最新纠正](../research/2026-10-13-seedance-ai-portrait-input-admission.md#latest-correction--free-entry-and-account-eligibility--2026-10-16)。旧10月13日账号记录已知道免费Entry，本次不是新功能或新成功实验。前次研究只强调尚未证实当前免费准入，未具体核对Entry，容易被理解成必须付费；现研究/共享workflow已纠正，不能把高级权益名称当付费必要性。
+
+正规候选仍须满足该资格及开通条件。重开`runs/canvas-jieshi-two-shot-20261013-001/asset-entitlement-check-20261013.json`，其2026-10-12T20:21:11.115298+00:00观察为`aigc_writable=false/aigc_readable=true`、Entry未开通、按钮因仅限企业账号disabled；旧实测保持历史，未冒充本窗口账号状态。Chrome MCP `new_page`被既有profile占用拒绝，未杀浏览器、换profile或读cookie；公开文档改用公开SSR原文读取，没有登录账号查询。当前企业/Entry状态`NOT_EVALUATED`，已向用户提出这个必要信息问题；不能代签身份/风险/协议，也不把旧拒绝开通解释为已批准新开通。
+
+标准`load_production_project`重开Manifest45/Project10，当前canonical PNG实测SHA仍`13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923`、2,113,859 bytes；共享`inspect`仅生成advisory报告。恢复candidate只描述同图→免费Entry AIGC审核→真实Active→既有asset resolver，尚无asset ID/人类Active receipt或新video request。CodeGraph关系与当前源码/tests核对`SeedanceAssetMaterializationReceipt`要求human、exact source与confirmation SHA，`SeedanceAssetReferenceResolver`绑定同一first_frame回传`asset://`；不新增执行链或伪造receipt。第一次本地证据整理误读Manifest字段`revision`，在任何Provider/Production写入前失败；按源码改用`manifest_revision`后成功，不涉及submit重试。
+
+证据目录为`runs/canvas-jieshi-original-s01-s02-20261013-001/seedance-free-entry-20261016-001/`：`official-free-entry-observation.json`、`recovery-candidate.json`、`shared-inspect.json`。免费权益资格不证明这张多人/倒影图会入库，不证明新视频免费或已获新S01次数；原视频POST1/历史11/累计12、S02 POST0、web UNKNOWN、完整故事/声音与逐镜Gate保持。
+
+原生`universal_executor` `/root/seedance_portrait_evidence`本轮仅只读社区原帖、无文件写入；Parent独立重开原帖裁决：Dreamina/CapCut动画式多格Omni Reference成功自报不等于本Ark写实first_frame；另一第三方Seedance2.5参考自报5次1成功不构成稳定解法。没有证据表明创作者都付费订阅人像库，也不把其生成费用当素材库费用。不采用遮脸/网格/改角色、第三方收费中转或模型fallback。
+
+按`record-ai-video-session`更新同一主记录及原研究的prominent correction；`distill-ai-video-learning=no_candidate`，只有官方/历史资格重新核对，没有新的独立媒体尝试或免费入库成功。仅文档和advisory证据，未改产品行为/安全Gate；Parent在相关verification后按Risk Gate判断`NATIVE_REVIEW_NOT_REQUIRED`。本checkpoint exact commit range的receipt为`.agent/harness/runs/seedance-free-entry-recovery-20261016-r1/receipt.json`，不以工程PASS代当前账户、人像审核或视频交付。
 
 ## Evidence Index
 

@@ -5,6 +5,21 @@ Last updated: 2026-10-16 (official-source check)
 
 Status: `advisory_research`
 
+## Latest Correction — Free Entry And Account Eligibility — 2026-10-16
+
+上一轮将“本账号尚无已证明可用的免费准入”归纳成当前仅能咨询，遗漏了应具体核对的免费Entry。
+这不是新上线能力：[官方权益表](https://docs.volcengine.com/docs/ark/seedance-2-0-purchase-guide?lang=zh)（页面更新2026-08-13，本轮重新打开）明确列出免费`高级创作权益（Entry）`，支持虚拟人像素材入库、控制台及Assets API，50素材/50组、CreateAsset最大3QPM。基础免费档与Entry不同，前者的虚拟人像入库列为不支持。高级权益不等于必须购买付费套餐。
+
+该页同时要求企业实名认证、合规风险评测、协议及手机号安全校验。沿[免费权益入口](https://console.volcengine.com/ark/region:cn-beijing/openManagement?LLM=%7B%7D&advancedActiveKey=mediaAsset)核对；不以网页存在、API key存在或50个quota推定本账号已具备AIGC写权限，不代签协议/身份、购买、充值或擅自开通。
+
+此前已有[本账号实测记录](../record_for_agent/2026-10-13-canvas-two-shot-continuity-preflight.md#current-account-entitlement-blocker--2026-10-13)及`runs/canvas-jieshi-two-shot-20261013-001/asset-entitlement-check-20261013.json`：观察时间为2026-10-12T20:21:11.115298+00:00，AIGC readable=true/writable=false、免费Entry未开通，按钮因仅限企业账号而disabled。该历史证据已知道免费档，不能解释成欠费或需要付费订阅；本轮重新读到不等于当前权限刷新。当前Chrome MCP因既有profile占用未取得新页面，没有停止其他浏览器、读取cookie或代做认证；当前账号是否改变仍`NOT_EVALUATED`，已向用户请求该必要信息。
+
+正规候选为：保留当前`13c83ce4…76923`整张PNG → 企业资格与免费Entry就绪 → 虚拟人像入库并实际审核 → human-observed `Active`与exact来源确认 → 既有`SeedanceAssetMaterializationReceipt / SeedanceAssetReferenceResolver` → 原Canvas生成链。共享loader重开Manifest45/Project10及exact PNG成功；尚无Provider asset ID、Active receipt或新生成请求。是否接受“本人加七个倒影”的整张图仍未证，不能把免费权益代签素材审核。
+
+社区确有外部AI图经其他Seedance入口生成的自报案例：[GPT Image 2分镜→Dreamina/CapCut Omni Reference](https://www.reddit.com/r/Seedance_AI/comments/1stq5q7/gpts_images2_seedance20_is_the_best_workflow/)是动画式多格分镜，不能代当前写实首帧；[Seedance2.5写实参考测试](https://www.reddit.com/r/Seedance_AI/comments/1wg61g5/seedance_25_accepts_a_photoreal_reference_face/)自报5次仅1次接受，非稳定准入或本账号证明。没有证据支持“创作者都购买人物库”，也不把生成用量订阅等同人物库订阅。不采用遮脸、叠网格或更换角色的审核规避建议，不自动换平台或扩大次数。
+
+用户最新限定只用Seedance，已停止METASO/H3方向；没有读取所指`.env`或新credential lookup。免费入库与后续视频生成授权/计费分开，旧原S01 POST1与S02剩余次数不重置/互挪。当前恢复候选与官方观察保存在`runs/canvas-jieshi-original-s01-s02-20261013-001/seedance-free-entry-20261016-001/`，仅advisory准备，无上传、模型调用或Production写入。下文“免费路径未证实”仍描述当前exact图未实际准入的边界，但不能再省略已明确存在的免费Entry及具体账号条件。
+
 ## Current Scope
 
 2026-10-16 当前原图 S01 attempt 使用 `doubao-seedance-2-0-fast-260128`，4 秒请求以 HTTP 400
