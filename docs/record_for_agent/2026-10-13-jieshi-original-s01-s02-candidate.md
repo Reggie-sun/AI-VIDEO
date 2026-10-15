@@ -11,6 +11,8 @@ Date: 2026-10-13
 
 ## Supersession Notice — 2026-10-15
 
+2026-10-16用户已完成即梦登录。当前实测40赠送积分（订阅0/充值0），本次“每日免费积分 +40”；原PNG已通过正常的系统文件选择框进入网页首帧预览，local blob与canonical SHA完全一致。`Seedance 2.0 Fast VIP`生成按钮悬停明确“此功能为VIP专属”；可选4s，但分辨率菜单仅720P，未点击生成或购买。见 **Authenticated Jimeng Credits, Exact Frame Selection And VIP Boundary — 2026-10-16**。这取代下段未登录阻断；没有生成审核、原S01 MP4或新的Harness视频成功。
+
 2026-10-16用户已选择“保留当前图，先核对即梦个人网页的正常上传、审核和已有额度”。即梦网页已由独立Chrome MCP会话实际打开，`Seedance 2.0 Fast VIP`与`首尾帧`入口可见；点击`首帧`弹出“请先登录”，尚未选择或上传文件。见 **Jimeng Personal Web Readiness And Login Boundary — 2026-10-16**。当前会话未登录，实际会员/额度及原图审核均`NOT_EVALUATED`；仅核验路线，不生成、购买或充值。
 
 2026-10-16用户已确认“仍是个人账号”：免费Entry恢复候选的企业资格未满足。见 **Personal Account Reply And Remaining Seedance Routes — 2026-10-16**；这里是用户账号状态声明，不冒充当前quota/API实测。仍只用Seedance、不买人物库、保留原图及失败历史；此前等待输入面选择已被上段用户选择取代，无新生成。
@@ -612,6 +614,24 @@ Parent使用`research`与`retrieve-ai-video-memory`，后者不作为current事�
 最小恢复条件是用户完成正常登录，随后只核对真实会员/额度并将相同PNG按首帧职责正常上传；不得把UI缩略图或上传成功代签生成审核，不通过生成按钮探测审核，不购买、不充值、不自动改用mini/2.5/Omni Reference。若真实审核只发生在submit时，应保留`NOT_EVALUATED`并报告这个边界。
 
 按`record-ai-video-session`更新同一主记录，并用`distill-ai-video-learning`评估为`no_candidate`：这只是一次网页准入/登录观察，没有新的免费入库或媒体成功，不能升级成通用解法。无产品实现或Gate变更，implementation Risk Gate不触发独立review；Parent负责final diff和证据裁决。文档exact范围receipt为`.agent/harness/runs/jimeng-personal-web-readiness-20261016-r1/receipt.json`，实际结果以完成后的receipt为准；foreign dirty/index保留。
+
+## Authenticated Jimeng Credits, Exact Frame Selection And VIP Boundary — 2026-10-16
+
+用户回复“登陆了”后，沿同一个本任务Chrome MCP独立浏览器会话核对：登录提示/按钮已消失，Fast VIP与首尾帧设置保留。正常`积分详情`显示总40、订阅积分0、充值积分0、赠送积分40，本次可见“每日免费积分 / 2026-10-16 02:04 / +40”。不保存账号标识、过去积分明细、二维码、cookie、headers或完整页面诊断；这是即梦网页当前额度，不推定为Ark API额度或Fast资格。
+
+第一次`upload_file`在选文件前因SDK客户端未声明项目workspace root而拒绝访问。重新核对当前已安装MCP：默认显式允许OS temp；将已授权的同一PNG按bytes准备到0700目录/0600文件，SHA、size不变，没有修改root规则或MCP配置。随后自动选择文件返回`DOM.resolveNode`缺nodeId/backendNodeId与file chooser注入失败；检查两处首尾帧槽均空，未以工具错误冒充Provider审核。参考[Puppeteer上游文件选择问题](https://github.com/puppeteer/puppeteer/issues/7941)及[另一个MCP实现的同类报告](https://github.com/browseros-ai/BrowserOS/issues/2156)，只确认其与无持久input的现代选择框问题相符，不声称已定位即梦内部实现或安装第三方补丁。
+
+在同一登录会话新标签页重开正常首尾帧入口，不复制登录或改网页上传逻辑。通过现有`xdotool`核对本任务Chrome PID及`WM_TRANSIENT_FOR`，只操作其标题为`Select a file this site can read`的原生文件对话框；先填入已核验路径，再以可见`Open`动作确认同一个文件。窗口激活等待曾因modal已在前台而超时；没有停止浏览器，按实际modal归属继续。诊断截图在本地查看后已删除，不进入记录。没有图片/视频生成调用，也未修改页面上传逻辑或安装工具。
+
+等待页面处理后，首帧槽出现941×1672预览，尾帧仍空，输入提示变为“结合图片”，比例为自动匹配。对页面所用local blob实际读取/计算：PNG 2,113,859 bytes，SHA `13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923`，与canonical原图完全一致。该检查只绑定浏览器预览；upload相关resource timing虽出现4条200和2条未暴露status，仍未绑定服务端exact素材/审核receipt，不能代签素材Active或视频准入。没有可见审核拒绝也不等于审核PASS，当前`moderation_result=NOT_EVALUATED`。
+
+网页预览仅保留`即梦 Seedance 2.0 Fast VIP / 首尾帧 / 首帧`；正常时长滑块从5减至4，按钮实际显示4s。分辨率菜单只列720P、数量保持1，与原sealed Ark 480p请求不同；未自动换mini/2.5/全能参考。没有观察到可独立核验原生音频的UI开关，也没有声音产物。生成按钮的submit-button parent出现`lv-tooltip-open`，悬停提示为“此功能为VIP专属”。此为本账号/当前入口的具体资格阻断；40免费积分不解除这项UI限制，不解释为所有Seedance或所有AI图都必须购买人物库。
+
+本轮未填原S01生成prompt、未封存网页新请求/permit、未点击生成、购买或充值，选择后余额仍40。原S01 POST1/历史11/累计12、S02 POST0及canonical项目不变，没有新视频/音频，human acceptance保持`NOT_EVALUATED`。脱敏观察追加到`runs/canvas-jieshi-original-s01-s02-20261013-001/jimeng-web-readiness-20261016-001/authenticated-observation.json`，保留前一份未登录观察。当前结论为`BLOCKED_CURRENT_WEB_FAST_VIP_ENTITLEMENT`，不是原图静态FAIL或新Provider输入拒绝。
+
+按用户不新增付费且只核验路线的范围停在这里。恢复需本入口确有合法可用资格，或另有明确的新Seedance型号/入口候选及相应授权；后者必须重新核对能力、原剧情、exact输入、有限计数/预算及canonical接入，不直接用当前网页720P草稿、已有40积分或旧S02次数提交S01。先前API拒绝及声音/逐镜验收要求均保留。
+
+按`record-ai-video-session`更新同一主记录与研究的current-facing状态；`distill-ai-video-learning=no_candidate`，这是一条网页输入/权益观察，没有独立媒体或免费生成成功，不升级通用规则。无Product实现/Gate变更，Risk Gate不触发独立implementation review；Parent核对最终diff和当前UI证据。文档exact范围receipt为`.agent/harness/runs/jimeng-authenticated-input-readiness-20261016-r1/receipt.json`，实际结果以完成后的receipt为准；foreign staged/dirty保持。
 
 ## Evidence Index
 

@@ -1,13 +1,13 @@
 # Seedance AI Portrait Input Admission Audit
 
 Date: 2026-10-13
-Last updated: 2026-10-16 (official-source check)
+Last updated: 2026-10-16 (official sources and authenticated web observation)
 
 Status: `advisory_research`
 
 ## Latest Correction — Free Entry And Account Eligibility — 2026-10-16
 
-**Current account update:** 用户已回复“仍是个人账号”，随后选择“保留当前图，先核对即梦个人网页的正常上传、审核和已有额度”。免费Entry的企业资格仍缺；新选择只授权网页核验，不触发生成或付费。实际即梦独立浏览器会话未登录，Fast VIP与首尾帧入口可见，点击首帧弹出“请先登录”；未选文件或上传，会员/已有额度/原图审核均`NOT_EVALUATED`。见[网页核验记录](../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#jimeng-personal-web-readiness-and-login-boundary--2026-10-16)；此前账号声明/候选及旧观察保留，不冒充新authenticated quota查询。
+**Current account update:** 用户保留个人账号并选择核对即梦个人网页，随后已完成登录。当前`积分详情`实测40赠送积分（订阅0/充值0，本次“每日免费积分 +40”）；同一原PNG已正常选入首帧，local blob的SHA/size/dimensions与canonical完全相同。但`Seedance 2.0 Fast VIP`生成按钮悬停明确“此功能为VIP专属”；网页可选4s，分辨率菜单仅720P，未观察到原生音频的独立证明。未点击生成、购买或充值，素材服务端审核仍`NOT_EVALUATED`。见[登录后实测](../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#authenticated-jimeng-credits-exact-frame-selection-and-vip-boundary--2026-10-16)；此前[未登录观察](../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#jimeng-personal-web-readiness-and-login-boundary--2026-10-16)、免费Entry企业条件及Ark单次输入拒绝保留，网页免费积分不推用于Ark或VIP资格。此选择仅核验路线，不授权新生成或付费。
 
 上一轮将“本账号尚无已证明可用的免费准入”归纳成当前仅能咨询，遗漏了应具体核对的免费Entry。
 这不是新上线能力：[官方权益表](https://docs.volcengine.com/docs/ark/seedance-2-0-purchase-guide?lang=zh)（页面更新2026-08-13，本轮重新打开）明确列出免费`高级创作权益（Entry）`，支持虚拟人像素材入库、控制台及Assets API，50素材/50组、CreateAsset最大3QPM。基础免费档与Entry不同，前者的虚拟人像入库列为不支持。高级权益不等于必须购买付费套餐。
