@@ -91,6 +91,34 @@ CLI：`--runtime trusted_operator_module:function` 返回 `committer` 和 servic
 
 原声音证据不齐时使用[project-local音频理解工具](audio-understanding.md)补证，默认无网络preview；qualified operator就绪后可在原`evaluate`显式传`understand_audio=true`，观察进入原exact MP4分析证据。它不代selected QA/presentation、精确时序或human听看，缺证不重生成。
 
+## Per-Shot Whitebox Reference
+
+这是用户明确指定的默认制作要求，适用于所有项目、Provider与每一个Shot：**先做白模参考，验后实际作为模型输入，再生成该镜头**。沿[Blender routing](blender-routing.md)使用现有Skills与共享资产入口；不新建故事执行链。此前单个白模实验不构成效果保证，新增规则也不追认历史失败为成功。
+
+### Coverage And Exceptions
+
+在既有Director适配说明/preflight证据中逐镜写明结论，不能整段或整个项目默认豁免：
+
+| 结论 | 必须具备的依据 |
+| --- | --- |
+| 制作或复用白模参考 | 动作、人物/道具接触、走位、人数、空间、反射、运镜或接点等需保留的原要求；复用仍核对本镜全部适用条件。 |
+| 模型不支持 | 所选exact model/profile/mode/role及当前adapter/capability证据，说明不支持所需视频/静态白模输入。上传、素材准入、配额或runtime暂缺属于待补能力，不能谎报模型不支持。未知先查明，不默默退回纯prompt。 |
+| 确无必要 | 具体说明本镜没有需要几何/动作/摄影预演控制的信息，例如单纯静态风景/环境、纯图形，或直接复用已验收素材。环境镜有复杂运镜、关键空间关系或事件变化时仍做白模；制作麻烦、赶时间、已有文字/美术图都不是跳过理由。 |
+
+只有上述两类有依据的例外允许不使用白模。未完成且无有效例外时，在付费preview/permit/POST前停止并补齐。例外不豁免原剧情、引用准入、预算或逐镜QA，也不授权换模型、额外调用或上传。
+
+### Author, Bind And Verify
+
+1. **Preserve the Shot.** 从原文/approved Shot列出开场、完整动作、结束状态、人物/道具/空间、镜头与采用接点。白模只负责明确指定的动作、几何、节奏和摄影；人物身份、服装、写实质感继续由原图/Character/Scene参考负责，声音/对白/字幕继续归原合同。不得为了方便白模删剧情、加动作、改镜头或拆镜。
+2. **Match format and timing first.** 锁定原Shot画幅/比例、镜头焦段/机位/高度/轴线、fps、原采用窗口及所选Provider的nominal生成时长。生成时长与reference可接受时长不同则显式说明hold/padding及动作落点；最终frame/sample/trim仍只归`ResolvedTimeline`。不要继承Skill的通用1080p/35mm/时长默认值；已有竖屏不能在reference模式中无说明变横屏。封存actual native ratio设置，`adaptive`不保证保留原图比例。
+3. **Build the smallest faithful guide.** 复用同场景的可编辑`.blend`、相机及角色/道具proxy；每镜分别核对人数、解剖左右、持物手、肩肘腕链、行进方向、接触/间距、遮挡和全动作极值。需要完整倒影或异常几何时显式建模并说明替身/光学模拟的实际范围。只做足以判断目标的白模，不扩成精模工程；动态镜头输出连续动作MP4，静态布局可在模型/role支持时使用白模静帧，不以静帧代动态控制。
+4. **Review the exact reference.** 先实际看渲染，核对首帧、动作起点/极值/接触、采用接点及末态；有动作时完整正常速度查看白模，并显式用project-local `video-analysis`核对exact MP4、帧与时间。画面裁切、人体/道具穿插、错误手或错镜位先修。保存clean参考、`.blend`、作者来源/几何审计及实际观察；burn-in/注释只放独立review版本，不进入默认模型参考。白模QA与模型输出QA分别记录。
+5. **Import and bind through existing owners.** 视频用`prepare_canvas_video_assets`及Registry 2.2；静帧沿既有PNG/generated-source入口。经`author`/`revise_authoring`保留旧记录与来源，再由Planner/Router/selected adapter编译。新参考须在新的inspected source中显式增加职责，原text parts逐字保留并展示适配diff。普通白模不能冒充前镜accepted state；连续后镜仍只从actual accepted source提取并绑定真实状态，白模按该状态适配。
+6. **Prove actual consumption before submit.** 每镜展示白模path/SHA、实测规格、参考职责、原图identity、actual camera/aspect设置、生成/采用时序及实际编译后的image/media bindings与native请求预览。检查所选输入路线确实送入白模，不能只在prompt提到它或只把文件放进Registry。输入数量、role、人物/场景owner或素材准入不匹配时指出具体缺项，做必要共享适配；不要无依据复制参考、猜参数、绕过guard或悄悄省略白模。
+7. **Recheck the generated Shot.** exact输出后仍显式调用project-local `video-analysis`，按全部原要求逐项验身份、动作、道具、人数、空间、摄影、画幅/裁切、声音和接点。白模/绑定/工程PASS不代模型服从或成片PASS；原图里的手机/工牌等不能因新画幅出画而直接继承通过。仅全PASS才推进下一镜；FAIL/NOT_EVALUATED/UNKNOWN沿原Gate停止与恢复，human 1.0x听看仍另验。
+
+白模制作、核验、导入和绑定是Agent的执行责任；以上逐镜说明复用已有Director/preflight/evidence owner，不增加Product schema、状态库或第二timeline。本规则本身不证明程序已自动拦截所有工具调用，亦不提供新付费或重抽许可。
+
 ## Agent Image Authoring Workflow
 
 用户要求原图、首帧或局部修图时，默认由 Codex 直接使用自带 Generated Image（`image_gen.imagegen`）；先做最小有界尝试，验实际图片后再接入现有项目。Qwen/ComfyUI 是可选的已封存执行路线，不是这套制作流程的前提。此处是 Agent authoring 指导，不是新的 Product Provider adapter、CLI 生图入口或 runtime Skill invocation。
