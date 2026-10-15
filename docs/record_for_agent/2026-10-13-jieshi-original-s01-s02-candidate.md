@@ -11,6 +11,8 @@ Date: 2026-10-13
 
 ## Supersession Notice — 2026-10-15
 
+2026-10-16用户已确认“仍是个人账号”：免费Entry恢复候选的企业资格未满足。见 **Personal Account Reply And Remaining Seedance Routes — 2026-10-16**；这里是用户账号状态声明，不冒充当前quota/API实测。仍只用Seedance、不买人物库、保留原图及失败历史；下一输入面选择待用户答复，无新生成。
+
 2026-10-16 Seedance-only续查纠正前次归纳遗漏：官方免费`高级创作权益（Entry）`支持AIGC入库；不是必须付费人物订阅。旧账号实测已记录免费Entry因企业认证而disabled，本轮未刷新账号资格。见 **Free Entry Recovery Candidate And Enterprise Eligibility — 2026-10-16**。当前exact图、Manifest45/Project10与原POST计数保持；未切METASO/H3、未读`.env`、未开通/上传/重新生成。免费档存在不等于当前账号或多人首帧已准入。
 
 2026-10-16用户补充要求“别找那种付费的途径”，当前恢复建议据此收敛：不购买权益、充值、收费中转或新付费Provider；不把免费入库误称为免费视频。见 **Community Admission Research And No-New-Paid-Route Constraint — 2026-10-16** 与共享workflow的`Portrait Input Admission`。此前“换Provider/开通素材库”只保留为历史候选，不是当前待执行建议。S01仍为已知输入拒绝，原图静态PASS、POST计数及S02未提交保持。
@@ -582,6 +584,16 @@ Parent使用`research`与`retrieve-ai-video-memory`，后者不作为current事�
 原生`universal_executor` `/root/seedance_portrait_evidence`本轮仅只读社区原帖、无文件写入；Parent独立重开原帖裁决：Dreamina/CapCut动画式多格Omni Reference成功自报不等于本Ark写实first_frame；另一第三方Seedance2.5参考自报5次1成功不构成稳定解法。没有证据表明创作者都付费订阅人像库，也不把其生成费用当素材库费用。不采用遮脸/网格/改角色、第三方收费中转或模型fallback。
 
 按`record-ai-video-session`更新同一主记录及原研究的prominent correction；`distill-ai-video-learning=no_candidate`，只有官方/历史资格重新核对，没有新的独立媒体尝试或免费入库成功。仅文档和advisory证据，未改产品行为/安全Gate；Parent在相关verification后按Risk Gate判断`NATIVE_REVIEW_NOT_REQUIRED`。本checkpoint exact commit range的receipt为`.agent/harness/runs/seedance-free-entry-recovery-20261016-r1/receipt.json`，不以工程PASS代当前账户、人像审核或视频交付。
+
+## Personal Account Reply And Remaining Seedance Routes — 2026-10-16
+
+用户对`call_0dc7efb1bb514f9a947a7ea9899ca058`的账号问题回复“仍是个人账号”。据此前已核对的官方企业条件，免费Entry不是本账号当前可直接使用的AIGC路线；不是所有Seedance能力都不可用，也不是需要购买高价人物包。未把这条用户声明写成新authenticated console观察；当前live quota仍未查询。
+
+在`seedance-free-entry-20261016-001/`追加`user-personal-account-confirmation.json`、`recovery-candidate-after-user-reply.json`，保留原候选及历史quota，状态仅为advisory `BLOCKED_ENTERPRISE_IDENTITY_REQUIRED`。原Manifest45/Project10、exact图、原S01 POST1/历史11/累计12、S02 POST0均未变。
+
+继续只读核对Dreamina官方静帧→Seedance制作说明及方舟受信产物条件，区分能力宣传、普通个人网页、当前Ark API与本图准入；没有用“Try free”证明本账号额度或审核通过。用户需要选择保留现图先核对即梦个人网页、保持API另准备合格Seedream原始首帧方案，或现图/API不变仅向官方核实。新制作图会改变identity且生成调用需另封存；网页不是已绑定的当前Ark执行请求，不自动换面。已提出一次路线偏好问题，等待外部决定，不擅自把未回复当许可；没有读key、上传、换Provider或重发。
+
+按`record-ai-video-session`追加同一record，`distill-ai-video-learning=no_candidate`；只是账号信息与恢复范围明确，没有免费准入/新媒体成功。文档验证及exact范围receipt为`.agent/harness/runs/seedance-personal-account-recovery-20261016-r1/receipt.json`；源码/Gate不变，Risk Gate不要求独立review，Parent负责最终核对。foreign dirty/index保留。
 
 ## Evidence Index
 

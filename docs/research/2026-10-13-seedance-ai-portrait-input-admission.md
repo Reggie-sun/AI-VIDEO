@@ -7,6 +7,8 @@ Status: `advisory_research`
 
 ## Latest Correction — Free Entry And Account Eligibility — 2026-10-16
 
+**Current account update:** 用户已回复“仍是个人账号”。该声明确认本轮免费Entry候选缺企业资格；不是新控制台quota查询，也不代表个人账号不能调用Seedance。保留此前候选及旧账号观察，`user-personal-account-confirmation.json`与`recovery-candidate-after-user-reply.json`在同一证据目录追加，不覆盖旧文件。已请用户选择下一输入路线；尚未上传、开通或生成。
+
 上一轮将“本账号尚无已证明可用的免费准入”归纳成当前仅能咨询，遗漏了应具体核对的免费Entry。
 这不是新上线能力：[官方权益表](https://docs.volcengine.com/docs/ark/seedance-2-0-purchase-guide?lang=zh)（页面更新2026-08-13，本轮重新打开）明确列出免费`高级创作权益（Entry）`，支持虚拟人像素材入库、控制台及Assets API，50素材/50组、CreateAsset最大3QPM。基础免费档与Entry不同，前者的虚拟人像入库列为不支持。高级权益不等于必须购买付费套餐。
 
@@ -19,6 +21,8 @@ Status: `advisory_research`
 社区确有外部AI图经其他Seedance入口生成的自报案例：[GPT Image 2分镜→Dreamina/CapCut Omni Reference](https://www.reddit.com/r/Seedance_AI/comments/1stq5q7/gpts_images2_seedance20_is_the_best_workflow/)是动画式多格分镜，不能代当前写实首帧；[Seedance2.5写实参考测试](https://www.reddit.com/r/Seedance_AI/comments/1wg61g5/seedance_25_accepts_a_photoreal_reference_face/)自报5次仅1次接受，非稳定准入或本账号证明。没有证据支持“创作者都购买人物库”，也不把生成用量订阅等同人物库订阅。不采用遮脸、叠网格或更换角色的审核规避建议，不自动换平台或扩大次数。
 
 用户最新限定只用Seedance，已停止METASO/H3方向；没有读取所指`.env`或新credential lookup。免费入库与后续视频生成授权/计费分开，旧原S01 POST1与S02剩余次数不重置/互挪。当前恢复候选与官方观察保存在`runs/canvas-jieshi-original-s01-s02-20261013-001/seedance-free-entry-20261016-001/`，仅advisory准备，无上传、模型调用或Production写入。下文“免费路径未证实”仍描述当前exact图未实际准入的边界，但不能再省略已明确存在的免费Entry及具体账号条件。
+
+个人账号下的候选仍须明确改变哪个输入面：保留当前图，可先核对即梦/Dreamina个人网页的正常参考上传、实际审核与已有额度；其[官方制作说明](https://dreamina.capcut.com/resource/about-dreamina-terms-of-service)展示静帧到Seedance的制作能力，不证明当前账号/这张跨平台多人图可用。保持现有方舟API，则官方受信原产物路线要求另有合格Seedream原始首帧，不能把当前Codex图改标签；重新制作会改变图片身份，不自动授权，也不是免费复用。若现图和API都不变，只能保留现有证据向官方核实，不能以换输入格式或模型版本保证放行。以上均不是新Provider默认选路；不降版、删除动作/声音或新增调用来碰运气。
 
 ## Current Scope
 
