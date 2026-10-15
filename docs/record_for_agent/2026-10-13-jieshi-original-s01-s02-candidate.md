@@ -11,7 +11,9 @@ Date: 2026-10-13
 
 ## Supersession Notice — 2026-10-15
 
-2026-10-16用户已确认“仍是个人账号”：免费Entry恢复候选的企业资格未满足。见 **Personal Account Reply And Remaining Seedance Routes — 2026-10-16**；这里是用户账号状态声明，不冒充当前quota/API实测。仍只用Seedance、不买人物库、保留原图及失败历史；下一输入面选择待用户答复，无新生成。
+2026-10-16用户已选择“保留当前图，先核对即梦个人网页的正常上传、审核和已有额度”。即梦网页已由独立Chrome MCP会话实际打开，`Seedance 2.0 Fast VIP`与`首尾帧`入口可见；点击`首帧`弹出“请先登录”，尚未选择或上传文件。见 **Jimeng Personal Web Readiness And Login Boundary — 2026-10-16**。当前会话未登录，实际会员/额度及原图审核均`NOT_EVALUATED`；仅核验路线，不生成、购买或充值。
+
+2026-10-16用户已确认“仍是个人账号”：免费Entry恢复候选的企业资格未满足。见 **Personal Account Reply And Remaining Seedance Routes — 2026-10-16**；这里是用户账号状态声明，不冒充当前quota/API实测。仍只用Seedance、不买人物库、保留原图及失败历史；此前等待输入面选择已被上段用户选择取代，无新生成。
 
 2026-10-16 Seedance-only续查纠正前次归纳遗漏：官方免费`高级创作权益（Entry）`支持AIGC入库；不是必须付费人物订阅。旧账号实测已记录免费Entry因企业认证而disabled，本轮未刷新账号资格。见 **Free Entry Recovery Candidate And Enterprise Eligibility — 2026-10-16**。当前exact图、Manifest45/Project10与原POST计数保持；未切METASO/H3、未读`.env`、未开通/上传/重新生成。免费档存在不等于当前账号或多人首帧已准入。
 
@@ -594,6 +596,22 @@ Parent使用`research`与`retrieve-ai-video-memory`，后者不作为current事�
 继续只读核对Dreamina官方静帧→Seedance制作说明及方舟受信产物条件，区分能力宣传、普通个人网页、当前Ark API与本图准入；没有用“Try free”证明本账号额度或审核通过。用户需要选择保留现图先核对即梦个人网页、保持API另准备合格Seedream原始首帧方案，或现图/API不变仅向官方核实。新制作图会改变identity且生成调用需另封存；网页不是已绑定的当前Ark执行请求，不自动换面。已提出一次路线偏好问题，等待外部决定，不擅自把未回复当许可；没有读key、上传、换Provider或重发。
 
 按`record-ai-video-session`追加同一record，`distill-ai-video-learning=no_candidate`；只是账号信息与恢复范围明确，没有免费准入/新媒体成功。文档验证及exact范围receipt为`.agent/harness/runs/seedance-personal-account-recovery-20261016-r1/receipt.json`；源码/Gate不变，Risk Gate不要求独立review，Parent负责最终核对。foreign dirty/index保留。
+
+## Jimeng Personal Web Readiness And Login Boundary — 2026-10-16
+
+用户对`call_86d8f829988c48948e7fa2d11781c14c`回复“保留当前图，先核对即梦个人网页的正常上传、审核和已有额度”；问题已明确本选择不触发生成或付费。因此只检查普通个人网页，不把该回复当新S01 submit、会员购买、充值或新Provider许可。
+
+共享Chrome MCP profile仍被既有浏览器以debugging pipe占用，没有可复用的HTTP debugging endpoint。保留原进程/profile、其他业务浏览器及登录状态，不删除锁或复制cookie；以当前已安装`chrome-devtools-mcp` 1.11.0的`--isolated --no-usage-statistics`启动本任务独立有界浏览器，通过标准MCP SDK调用同一browser工具。没有安装包、修改MCP配置或新增故事执行器。最初直接运行包`index.js`不是CLI入口，连接关闭且未开启页面；核对已安装package的`bin`后使用`build/src/bin/chrome-devtools-mcp.js`成功打开官方网页。这是本地工具入口纠正，不是生成重试。
+
+实际访问`https://jimeng.jianying.com/ai-tool/generate/?type=video`后进入`/ai-tool/home`，页面显示未登录。通过普通UI切到`视频生成`，默认为`即梦 Seedance 2.0 mini`；模型列表存在`即梦 Seedance 2.0 Fast VIP`，说明为“极速推理，会员专属通道，音视文图均可参考（暂不支持真人人脸）”。只在网页预览选择Fast VIP，未改canonical项目、模型或sealed request；公开选项不证明本账号已有会员，也不证明与Ark `doubao-seedance-2-0-fast-260128`完全等价。
+
+参考职责菜单实际列出`全能参考 / 首尾帧 / 智能多帧 / 智能编辑 / 超长视频`。选择`首尾帧`后有`首帧 / 尾帧`位置；点击`首帧`上传入口，页面提示“请先登录”并弹出“欢迎登录即梦”。未选择文件，没有上传请求、图片审核或生成。广告/注册赠送文字不作为当前账号额度；实际会员、已有积分/免费次数与这张图的审核均`NOT_EVALUATED`。已请求用户在打开的官方窗口自行登录，未索取/读取密码、OTP、扫码内容或代勾协议；窗口保留供登录。
+
+已复核canonical PNG仍为2,113,859 bytes，SHA `13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923`。脱敏浏览器观察保存于`runs/canvas-jieshi-original-s01-s02-20261013-001/jimeng-web-readiness-20261016-001/observation.json`；只记录公开控件、未登录状态与零副作用，不保存cookie、登录二维码、私有账号内容或MCP session。原S01 POST1/历史11/累计12、S02 POST0保持；仍无原S01 MP4，静态首帧PASS不代准入、逐镜QA或human acceptance。
+
+最小恢复条件是用户完成正常登录，随后只核对真实会员/额度并将相同PNG按首帧职责正常上传；不得把UI缩略图或上传成功代签生成审核，不通过生成按钮探测审核，不购买、不充值、不自动改用mini/2.5/Omni Reference。若真实审核只发生在submit时，应保留`NOT_EVALUATED`并报告这个边界。
+
+按`record-ai-video-session`更新同一主记录，并用`distill-ai-video-learning`评估为`no_candidate`：这只是一次网页准入/登录观察，没有新的免费入库或媒体成功，不能升级成通用解法。无产品实现或Gate变更，implementation Risk Gate不触发独立review；Parent负责final diff和证据裁决。文档exact范围receipt为`.agent/harness/runs/jimeng-personal-web-readiness-20261016-r1/receipt.json`，实际结果以完成后的receipt为准；foreign dirty/index保留。
 
 ## Evidence Index
 
