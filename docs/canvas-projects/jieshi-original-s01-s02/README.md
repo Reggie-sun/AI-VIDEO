@@ -2,6 +2,10 @@
 
 ## Status And Entry
 
+2026-10-16当前图片checkpoint：原S01首帧已完成静态逐项复核并经现有`generated_source`/`revise_authoring`接入，exact PNG SHA `13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923`，941×1672、2,113,859 bytes。七名其他倒影、近侧对应空蓝座、林砚右黑手机/空左手、苏遥左白手机/绿圆领、陈立镜中背面实际右臂持深蓝手机、原服装道具及正常工牌头像/林砚/产品部均获本次静态证据。结论仅为 **PASS_FOR_FIRST_FRAME_AUTHORING**，不是原S01动作/广播或视频验收。新增内置图片13次、累计22；原视频仍0、历史视频11，旧web UNKNOWN保留。
+
+当前普通数据入口为`runs/canvas-jieshi-original-s01-s02-20261013-001/original-firstframe-ready-20261015-001/project.json`，本目录`project.json/source.json`保留此前bootstrap历史。新入口仍调用同一共享API/CLI，没有故事执行脚本或第二状态库。标准loader实际重开Manifest37/Project9；原10条P7 Registry前缀及旧attempt保留，S01已绑定新图，S02仍是等待实际accepted S01的占位。fresh共享`preflight-final.json`确认生成/剪辑顺序S01→S02，原动作/对白/摄影继续进入authored text；新增工牌正常态来自原S08/S37，没有删除原要求。`qa_policy=None`、新图Provider admission、qualified视频运行时及新原镜声音仍须实际补齐，未提交视频。详情见[完整首帧与canonical接入证据](../../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#original-first-frame-static-admission-and-canonical-import--2026-10-16)。下方2026-10-15“最新”段为保留历史。
+
 2026-10-15最新媒体checkpoint：新增4次Codex内置图片调用。局部放大参考→整图转移已修好苏遥解剖左手持唯一白手机，另由实际袖口/腕部证明旧陈立正面倒影持机手，不能继续以手机横坐标判错。随后用Blender同排/对面座位参考修正陈立位置；新构图虽把陈立鞋纳入窗内，却重复一名海军蓝衣女性、遮住苏遥/周伯祥下肢，苏遥绿翻领仍错，林砚对应空座仍不可读。最新exact PNG为`7540565b88ecee230d41aeda1348461ef4854b191b8663c6ec34b0941bf6d26a`，941×1672，完整首帧 **FAIL/STOP**。单元005用2/2、006用1/2且条件次调用未执行、007用1/1；内置图片累计9，未消费slot不挪用。原视频0、历史视频11、paid准备图2/local模型图2及旧web UNKNOWN保留。未导入/激活，标准loader重开Manifest33/Project7、`qa_policy=None`，entrypoint/Manifest/Registry不变。详见[局部成功、空间修复及整图失败证据](../../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#crop-assisted-hand-repair-and-spatial-composition-stop--2026-10-15)；此前单物体FAIL是保留历史，不能当当前手部结论。
 
 声音状态已更新：[Gemini音频观察路线](../../record_for_agent/2026-10-15-audio-understanding-mcp.md#operator-verification-and-live-evidence)在已有4.032s历史WAV完成1次真实MCP调用并返回可用观察。当前Codex原生audio输入仍不支持；这两个事实不能混同，也不能继续声称“没有实际音义工具”。该历史WAV及已消费development permit不代新原镜声音/精确时序/selected QA或human验收。以下latest/historical段为此前checkpoint，非新调用许可。
@@ -18,7 +22,13 @@
 
 普通数据入口为 [project.json](project.json)，原 Canvas parts 为 [source.json](source.json)。[source-mapping.json](source-mapping.json) 保存原 Open/Action/Close/Camera/Dialogue/Prompt/Screen Text/Next-Risk；原 episode SHA-256 为 `a8c3aaaa77e9c5c7904d7dee83265ae14e6100c168e5d5a520387a070c3d53df`。不存在故事执行脚本或第二 timeline。
 
-运行命令沿已发布入口，使用 repository `.venv`；`project-root` 必须为已存在绝对目录：
+当前重开命令沿已发布入口，使用 repository `.venv`；`project-root` 必须为已存在绝对目录：
+
+```bash
+PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production preflight --data runs/canvas-jieshi-original-s01-s02-20261013-001/original-firstframe-ready-20261015-001/project.json --project-root "$PWD/runs/canvas-jieshi-original-s01-s02-20261013-001/production"
+```
+
+以下为旧bootstrap数据的三个入口示例，不用于覆盖当前canonical authoring；当前author/revise通过同一API合并并保留完整历史Registry：
 
 ```bash
 PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production inspect --data docs/canvas-projects/jieshi-original-s01-s02/project.json --project-root "$PWD/runs/canvas-jieshi-original-s01-s02-20261013-001/production"
@@ -36,8 +46,9 @@ PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production preflight --data 
 | S01 Action：首帧六乘客及苏遥完整倒影；唯独林砚为空 | 同一 source 原句；eight character_ids；first-frame asset | 原 Action 与 Prompt 全句进入 S01 input；追加明确不得删除其他倒影 | 首帧和采用段全程逐人对应，其他完整倒影7人、只缺林砚；本人及其空位同时可读，不额外要求八实体全可见；不是逐渐消失 |
 | S01：看空位、抬解剖左手 | subject_action.progression 原文，无抬手机替代 | `林砚看向空位并抬左手靠玻璃，玻璃里没有手。` | 动作全过程、视线对象、左右手身份；不能靠静帧代签 |
 | S01 Close：距窗约2cm停住并保持到切出 | 原 Close/Prompt；S02 state_reference frame_index=71 | 两句原文保留；计划 frame71 为采用3秒内最后帧，不是4秒素材末帧 | 帧71及切点前动作，实际间隙/悬停；若 frame71 没到正确状态，本单元停而不猜 |
-| S01：玻璃也没有他的手 | source Action/Prompt；首帧 clean plate 准备责任 | 模型输入明确没有手；**选择首帧准备路线，实际几何一致 plate / 只删除林砚映像仍未绑定，BLOCKED** | source/plate exact identities、实测编辑区与保护七倒影区域、窗几何和边缘无污染；原图/plate对比及 raw MP4 全程无手倒影 |
+| S01：玻璃也没有他的手 | source Action/Prompt；首帧 clean plate 准备责任 | 模型输入明确没有手；当前单一首帧已绑定新图，七倒影/对应空座/无林砚映像静态PASS；不声称视频已完成该异常 | exact首帧/实际窗几何与七倒影保护复核；raw MP4全程无手倒影仍须实证，静态图不签动态或硬mask像素相等 |
 | 原右手手机职责、蓝挂绳白工牌 | 林砚 Character Bible；两镜 source 当前道具描述 | `林砚右手保持唯一黑壳手机原职责，蓝色挂绳白工牌保持。` | 唯一手机、右手稳定持机，左手空；无抬手机/换手/新增手机 |
+| 原工牌的早期正常态；S08“林砚／产品部”，S37才消失头像姓名 | 当前run数据的S01/S02 source text与同一first-frame资产；旧native文本保留历史 | 两镜追加原文正常态说明：小头像、林砚、产品部保持，本镜不提前空白；不增加特写或身份揭露镜头 | 当前整图小工牌已实见头像/两行字；视频仍须核验保留，不能用局部参考PASS代整图 |
 | 八人身份/服装/道具 | characters appearance_bible；原图 review-only，尚無独立 identity sheets | 两镜原外观/服装已显式复制进 source input，不依赖 Bible 自动进入模型；S01另含苏遥左手乳白手机、陈立耳机/深蓝手机、何静膝上灰布袋 | first-frame admission + 两镜 exact video 身份/服装/道具逐人核验；文字不是视觉identity证明 |
 | SC01 A/B区、D/C门与蓝椅/银杆固定空间 | 两个 scene ownership IDs，同一原 SC01 location | `固定空间：A区座位在D侧门左后…深灰地胶、蓝色长椅、银色立杆…` | 空间、门、窗和邻座位置一致，镜位切换不得重造车厢 |
 | S01 Camera：28mm自然广角、坐姿眼高斜侧中广景、锁机位 | 原 Camera 完整进入 source；不伪填camera hash | 摄影原句完整保留 | 实际构图与视角；全程锁定，无pan/zoom漂移；本人和空座映像同清楚 |
@@ -72,13 +83,13 @@ PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production preflight --data 
 | --- | --- | --- |
 | Original source → shared author | source parts和typed dialogue可核对；原外观Bible不会自动成为source model prose | 本目录显式复制当前外观/道具/空间，列明所有追加；没有删除原动作、声音、字幕/Next-Risk |
 | Typed source dialogue | 原 compiler缺6个mapping paths，实际复现 | 新 `seedance_source_dialogue.py` 仅精确 same-line 约束表达；其余 fields仍 fail closed。不是声音验收 |
-| First-frame/original image/identity | 历史PNG SHA `4134d69125a7b00c322bf987e2c9feef7d73ddd8968f764cc5310282d68d30fb` 941×1672，仅 REGISTERED_BYTES。原base `14ce8688…` 和修正base `ba9eb952…` 均实际QA FAIL；后者只是canonical技术素材准入 | 七名实体、重复/不完整反射、机位与标题污染阻断edit/video。没有合格original S01 first-frame；旧图不自动变approved视觉源 |
-| Reflection / clean plate | 原 Next/Risk 要求几何一致窗内plate，但未规定最终视频overlay。现选择首帧准备：同一Seedream模型、单 PNG reference + 作者审查的 bbox编辑；shared adapter已补，见single-reference spec。现有video+局部PNG仍不宣称支持 | **BLOCKED于实际素材**。先正常几何/人物base，再用同源exact图只处理林砚反射区域并验七倒影保护，所得plate作为S01首帧。真实坐标/plate bytes未产生，不能编造；raw MP4仍须全PASS。无需为本单元扩建视频compositor |
+| First-frame/original image/identity | 当前新图SHA `13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923`，941×1672；静态first-frame角色PASS并canonical绑定。旧历史图及两次paid base FAIL全部保留 | 图片已满足本次静态用途；generated-source来源、Registry登记与Provider admission仍分开。后者及视频动作/声音须实际验证 |
+| Reflection / clean plate | 原Next/Risk没有强制最终视频overlay；当前Codex静态首帧路线实际保留七名他人倒影、对应空蓝座及无林砚映像，原动作/无手倒影要求继续进入视频输入。旧Seedream/Comfy失败路线保留 | 原图/局部参考/最终整图各自留exact identity，当前单一首帧同时作为scene/clean-window视觉基准；不声称硬mask零变化、旧3D全景成功或视频动态已通过。raw MP4逐镜全项Gate仍必须完成 |
 | Hand / camera switch | source prose及state/cut七维可以表达；视频参考可换摄影而carry空间 | actual S01全PASS后source_video+帧71 observation；S02自身验收。边界character_presence为partial，不代表动态事实全通过 |
 | Audio analysis / trusted evidence | 当前Codex native audio仍unsupported；project-local `audio_understand`已通过Gemini在exact历史WAV返回真实对白/声线/表演观察。ControlledPresentationVerifier仍只接受technical/analyzer、拒绝human；当前项目未选QA policy | **EVIDENCE_REPAIR_FIRST**针对新原镜与selected QA/精确时序，不能把工具未实现当当前阻塞。后续须为exact新原MP4绑定当前授权/runtime/一次permit并经原evaluator裁决；旧permit已消费，模型估计时间不签精确窗口，不伪造human或重生成补证 |
 | Native audio composition | existing exact source audio registration / auto matching native WAV tracks / canonical sample trim | S01/S02真实accepted source落地后逐镜注册，保留dialogue audio_kind；必须实际验证输出声音，不能静音/重配音 |
 | Captions | existing CaptionTrack、style、source audio clock、CompositionSpec.caption_tracks、HyperFrames | hook是非口述字幕；不能伪造ASR alignment说广播读了hook。需明确authored caption provenance+原生音轨时钟，实际绑定style和sample/frame；目前只有职责，未登记或render |
-| Planner/Router/runtime | shared entry存在；首张图片已有fresh exact preview、profile、budget/egress、durable intent和consumed one-use permit，Provider receipt ACCEPTED。本地candidate validation拒绝 unrelated dependency node | 新候选首帧仍未导入；旧failed素材不能据Registry登记当accepted source。视频qualified prepare及完整paid preview仍 `NOT_EVALUATED`；音义工具已实测，selected QA及新原镜声音证据仍须完成 |
+| Planner/Router/runtime | shared entry实际重开Manifest37/Project9，新图已导入且S01选择正确；S02仍PENDING_ACCEPTED_SOURCE。旧图片Provider receipt不授权新视频，当前qa_policy=None | 当前qualified视频prepare/完整paid preview及新图Provider admission仍NOT_EVALUATED；音义工具对历史WAV已实测，selected QA及新原镜声音证据仍须完成，不凭静态PASS先submit |
 
 ## Explicit Adaptations
 
