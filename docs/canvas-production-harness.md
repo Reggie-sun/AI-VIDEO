@@ -50,7 +50,8 @@ asset及image事实；不只比较新的receipt标签。后续修订保留原imm
 
 显式新增本地视频参考使用 `canvas_video_assets.prepare_canvas_video_assets`，传入已 inspection 的
 packet、`asset_id/node_id/resource_id/path/usage_license/tool`、allowed local root 和 exact absolute
-`ffprobe_executable`；可声明 `input_artifact_ids` 绑定作者源文件。helper 只准备 exact MP4 与
+`ffprobe_executable`；`input_artifact_ids` 只填写项目中真实存在的 artifact ID，外部作者源文件的
+hash 另存 authoring evidence，不能伪装成 Registry dependency。helper 只准备 exact MP4 与
 local-selection/measurement receipt，限制 2–15 秒、整数 FPS、50 MiB、file-only MP4 probe；
 不调用 Provider 或写 Production。与当前 Registry 合并时显式保留全部旧记录并使用 Registry 2.2，
 经既有 `author` / `revise_authoring` 导入；后续 source-expression 重开 sealed evidence。
