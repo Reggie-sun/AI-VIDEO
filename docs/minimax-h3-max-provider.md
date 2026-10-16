@@ -31,6 +31,9 @@ reference route 的请求比例应核对 sealed profile 与 `reference_control.n
 `extra.prompt_expansion_mode` 属于所选 immutable profile；不发送 METASO 专用的
 `context_ir_enabled`。生成时长与原镜头采用时窗分开；trim/frame/sample/timing
 继续由 `ResolvedTimeline` 独占，不延长剧情窗口来容纳模型输出。
+原 prose 的动作终态、QA observable 和采用切点并不自动表达 native 动作 deadline；需要作者明确写入并核对
+exact compiler text。提前落定的生成余量不改变原 QA。H3 Base 官方提示指南与社区案例仅作有界参考，
+不证明 H3 Max 的精确时序或选择性反射能力，见[研究记录](research/2026-10-17-h3-action-timing-reflection-repair.md)。
 
 从 4 秒模型切换时，提交前必须逐项比较 selected QA 的原文、技术 observable 和
 final-output goal：用新版本将“请求4秒”适配为 H3 Max 的5秒标称生成，保留原采用时窗、

@@ -43,6 +43,62 @@ A这次保留陈立而旧B缺失，只是有界观察。两次同时改变模式
 
 按 `record-ai-video-session` 更新同一主记录并自动评估 `distill-ai-video-learning=no_candidate`：新增一次独立媒体，不把proof层或历史B另算新调用；现有资料只支持上述有界差异，未形成超出现有完整Gate/模式限制的新可采纳工作流机制，不制造通用质量规则或修改Skill/Policy/Gate。既有本地H3 first-frame/open-state claim排除paid/其他profile，Vidu对白claim排除其他模型及人物/倒影质量，本次不是其scope内的material update。此次无源码行为变更，Parent Risk Gate为 `NATIVE_REVIEW_NOT_REQUIRED`；现有首帧/原文保留 focused checks 8 PASS，先前通用工程 exact Harness保留其原publication边界。本文档checkpoint receipt为 `.agent/harness/runs/h3-max-first-frame-record-20261017-r1/receipt.json`；publication以该exact receipt及Git/remote SHA为准。
 
+## Offline Authoring Repair Preview — 2026-10-17
+
+用户要求“参考官方和社区修改”后，先核对 A 的 actual native text：原文已有约2cm悬停终态和“保持到切出”，
+但没有在3秒前落定的明确动作时限。QA observable 和 composition 的72帧采用配置没有自动进入 prose；
+这是 authoring 表达缺项，不是 compiler 丢弃了原已表达的时限，也不能据此证明模型失败的单一根因。
+[研究记录](../research/2026-10-17-h3-action-timing-reflection-repair.md)分别核对官方 H3 Max API、H3 Base
+I2VA 指南、社区时序故障及倒影漂移/局部成功反例；本地 H3 的经验不外推为 H3 Max CN 质量保证。
+
+新的离线输入保留历史两段1202字符原文，另追加一个归属 Agent 的技术 text part：原左手动作在前2.5秒内
+完成靠近、减速并悬停，随后保持至5秒；在正常保留其他七人倒影的同时，明确林砚对应玻璃区域持续显示
+原空位/车厢纹理，局部排除身体和随动手影。2.5秒是生成余量，未改成新的验收门槛；原15项、0–3秒采用、
+广播及摄影/人物/道具/空间要求保持。没有使用后续镜头切点语法虚构剪切，没有新增画面事件或参考媒体。
+两项相连修订均属 prose 表达，尚未有媒体验证，不能分别归因或宣称已解决动作/反射。
+
+证据根：`runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-repair-preview-20261017-001/`。
+`candidate-source.json` 经共享 inspect 得到新 snapshot
+`7a87575a3e382b2887dd60edffb5aeb2877a76f2d7ee7c736bccc7f70da6edc3`；旧 snapshot/hash 保留。
+`candidate-authoring.json`、`candidate-author-preview.json`、`candidate-prompt.txt`、`prompt-change.diff`
+及 `verification.json` 给出完整新输入、原文/新增段和只读 author/preflight 证据。
+候选 prompt SHA `2c491b55c9ccb2b69692966da86f1bafe4b308f8cbef9575c3282b31498e4417`。
+
+第一次复用旧 selection 时，既有 validator 真实拒绝 `generated copy differs from the original canvas resource`：
+generated-image selection 绑定整个 source snapshot，新文字使该 identity 改变。随后由原 import owner 重开
+同一 PNG 和原生成记录，为新 snapshot 准备新 selection asset IDs，合并并保留全部旧 Registry records；
+原图 SHA/bytes、first-frame 职责和预定 native 输入数量仍相同，没有重新生图或直接改 receipt/hash。
+S02 未采用占位图也仅重封 selection identity，原文、采用窗口和 pending accepted-source 语义没有改变；
+它不成为已验收交接图，也不是新增独立人物参考。
+
+标准 loader 重开 Manifest116/Project16 与同一 active QA 后，原 `author_canvas_project` 和
+`canvas_reference_preflight` 验证新候选；Production project/Manifest 文件 SHA 前后相同。
+候选 bundle 的 Project17 只是未提交的 authoring 产物，**不是已持久化 revision 或可执行请求**。
+新候选 Provider 编译、resolved hash、decision/execution binding 均 `NOT_EVALUATED`；未用旧候选报告冒充
+新候选 native preview，也未编造 quota。完整 prepare 仍须 canonical authoring revision、当前 limits/QA/history
+及原 gates；当前新增 attempt/permit、图片/视频/音频 POST 都为0。
+
+共享 workflow 补入[动作时限与局部异常核对](../canvas-production-harness.md#action-timing-and-selective-effects)，
+说明已验证的输入步骤、生成余量与 QA 的区别、snapshot selection 重绑及纯 author preview 的证明边界。
+现有 compiler 已支持新增源 text part，故未修改 runtime、Provider 选择、预算/许可、Gate 或 timeline；
+没有为《界蚀》新增条件分支、执行链或经验采纳规则。正常/边界/失败路径验证与 exact-range Harness 见
+`.agent/harness/runs/h3-action-repair-preview-20261017-r1/receipt.json`，结果以该机器证据为准。
+Focused `tests/test_canvas_source_expression.py` 为40 PASS：新增 H3 Max/Seedance 两类 actual compiler ×
+三组人物/动作/空间的6个用例，以及旧 generated selection 对新 snapshot 的拒绝用例。它们验证原 parts/
+references 顺序、2.5秒补充 prose、5秒 generation、3秒 Shot/72帧采用配置及 QA 不自动增添余量 predicate；
+旧 direction-only 篡改拒绝用例继续保留。fixture 使用禁止 credential/transport 的 Provider，不能证明媒体质量。
+
+按 `record-ai-video-session` 更新本主记录；`distill-ai-video-learning=no_candidate`：本轮只有工程/离线输入证据，
+没有新增独立媒体结果、受控因果证据或已验证质量机制，不创建 Learning placeholder，不修改 Skill/Policy/Gate。
+Parent Risk Gate 为 `NATIVE_REVIEW_NOT_REQUIRED`：仅既有 authoring seam 的回归与输入/操作说明，未更改 runtime
+或持久化/付费控制，主要失败路径可由 focused tests 和只读真实候选核验；代码 mapper/研究 writer 不冒充独立 reviewer。
+
+当前媒体仍为 A 的 **6 PASS / 2 FAIL / 7 NOT_EVALUATED**，S01 STOP、S02 POST0；单镜、连续镜、完整故事、
+通用模型质量及 human 1.0x 验收均未通过。若继续实证，最小新单元为同一 H3 Max CN / 768P / nominal5秒 /
+原 PNG first_frame 的1次新视频提交、零重抽，按新 exact preview 重走全部付费前置条件；需要声音语义证据时
+另封1次 qualified Gemini `gemini-3.8-flash` audio-understand 单元，不能复用旧消费。两类新外部效果均尚未授权；
+全部15项及 exact采用frame71须重验，human完整1.0x听看另验。不沿用未执行B槽位，不用新工程PASS解除旧STOP。
+
 ## Shared Control Engineering — 2026-10-17
 
 通用参考控制审计、模式取舍预览、semantic reference到native index映射与多场景工程验证已记录在

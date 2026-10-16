@@ -130,6 +130,30 @@ Seedance 官方允许在 reference 模式的原文中指定某图片为首/尾�
 实测参考长度、标称生成长度与采用窗口分别说明 hold/padding/动作落点，最终 trim/frame/sample/timing
 仍归 `ResolvedTimeline`。参数/绑定正确只证明输入，不证明模型服从或验收。
 
+### Action Timing And Selective Effects
+
+修复动作不到位时，先并排核对 actual native text、标称生成时长、原采用窗口和 QA observable。
+`duration`、Shot 时长或 QA 中的切点不会自动成为 native prompt 的动作时限；已有“保持到切出”也可能
+没有说明何时到位。作者应在既有 prose 内明确起始状态、连续动作、减速/落定及保持阶段，再逐字核对
+compiler 输出。为切点预留的提前落定时间属于生成余量，必须与原验收条件分别记录，不自动加入或收紧 QA。
+不得用长片末态代替较早的采用状态，也不把模型指南中的后续镜头切点语法当作单镜动作定时器。
+
+保留源路径追加技术说明时，先保留旧 snapshot/hash 和原 parts，在新的 source draft 追加明确归属 Agent
+的 text part，再重新 `inspect` → `author` → `preflight`；记录旧原文与新增段的 diff、来源和保持项。
+它是新的 inspected authoring input，不能冒充历史用户逐字原文。仅修改 direction 的 expression/intent
+会被原 preservation validator 拒绝；不得 patch compiled/resolved request 绕过。纯 author bundle/preflight
+所需的本地/生成图 selection 证据也绑定 snapshot；新快照须沿原 import owner 重开同一 bytes/原生成记录，
+准备新的 selection identity，保留旧 Registry 记录并明确重绑 asset roles，不能只改 receipt 的 hash。
+这不需要重新生成图片，也不产生新的独立身份参考。纯 author bundle/preflight
+不包含新候选的 Provider 编译或执行许可；完整 `prepare` 仍重开 canonical project、QA、history 和当前 limits，
+没有新有限授权时不伪造 quota、decision binding 或执行就绪结论。
+
+修复反射等局部异常时，分别说明正常保留区域与发生异常的区域、主体、可见背景和持续时段；避免全局
+“无倒影”覆盖其他角色必须保留的映像。当前 H3 Max frame API 的首帧输入不提供逐帧区域遮罩或动作时刻
+参数；这些 prose 仍是模型引导，不能声称执行了 mask、物理光学或中间帧硬约束。官方 H3 Base 指南与
+社区原始实例的适用范围、失败反例及本次未验证假设见[研究记录](research/2026-10-17-h3-action-timing-reflection-repair.md)。
+上述步骤用于核验输入表达；选择性反射、动作落点及其余已满足项仍须在 exact 新输出上重验。
+
 ## Per-Shot Whitebox Reference
 
 这是用户明确指定的默认制作要求，适用于所有项目、Provider与每一个Shot：**先做白模参考，验后实际作为模型输入，再生成该镜头**。沿[Blender routing](blender-routing.md)使用现有Skills与共享资产入口；不新建故事执行链。此前单个白模实验不构成效果保证，新增规则也不追认历史失败为成功。

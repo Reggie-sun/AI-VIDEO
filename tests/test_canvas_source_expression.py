@@ -41,7 +41,9 @@ def test_original_canvas_parts_are_reopened_at_authoring(damage):
 
 
 def subject_source(tmp_path, *, scene_auxiliary=False, generated=False,
-                   duplicate_room_png=False, scenario=None):
+                   duplicate_room_png=False, scenario=None, authored_deadline_text=None,
+                   adopted_duration_seconds=5, generation_output_duration_seconds=None,
+                   generation_output_geometry_policy="exact", adopted_composition=None):
     """Inspect/import real fixture bytes before canonical authoring and planning."""
     from ai_video.canvas_assets import prepare_canvas_png_assets
     from tests.production_project_factory import _p7_png
@@ -61,6 +63,8 @@ def subject_source(tmp_path, *, scene_auxiliary=False, generated=False,
             {"type": "text", "text": f" {action} in {space + ' ' if scenario else ''}"},
             {"type": "extension", "extension_type": "node", "object_id": "room-slot"},
             {"type": "text", "text": "."}]
+        if authored_deadline_text is not None:
+            draft["parts"].append({"type": "text", "text": " " + authored_deadline_text})
         draft["references"] = [{"slotId": "robot-slot", "nodeId": "robot", "role": "reference",
             "type": "extension", "extensionType": "subject", "sourceInstanceId": "robot"},
             {"slotId": "room-slot", "nodeId": "room", "role": "reference"}]
@@ -101,6 +105,8 @@ def subject_source(tmp_path, *, scene_auxiliary=False, generated=False,
         {"type": "reference", "slot_id": "room-slot", "materials": [
             {"asset_id": "room", "asset_sha256": next(a.sha256 for a in registry.assets if a.asset_id == "room"),
              "role": "scene"}]}, {"type": "text", "text": "."}]
+    if authored_deadline_text is not None:
+        parts.append({"type": "text", "text": " " + authored_deadline_text})
     data = direction()
     data["delivery_profile"] = {"width": 1280, "height": 720, "fps": 24}
     if scenario:
@@ -111,17 +117,33 @@ def subject_source(tmp_path, *, scene_auxiliary=False, generated=False,
     data["scenes"][0]["visual_reference_asset_ids"] = ["room", *[m["asset_id"] for m in materials
                                                       if m["role"] == "scene"]]
     for row in data["shots"]:
-        row["shot"].update(intent=f"{character} 图片2、图片1 {action} in 图片3.", character_ids=["robot"],
-            duration_policy={"mode": "fixed", "seconds": 5}, preserved_source_expression={
+        authored_prompt = f"{character} 图片2、图片1 {action} in 图片3."
+        if scenario:
+            authored_prompt = f"{character} 图片2、图片1 {action} in {space} 图片3."
+        if authored_deadline_text is not None:
+            authored_prompt += " " + authored_deadline_text
+        row["shot"].update(intent=authored_prompt, character_ids=["robot"],
+            duration_policy={"mode": "fixed", "seconds": adopted_duration_seconds}, preserved_source_expression={
                 "source_sha256": canonical_sha256({"parts": parts, "implicit_references": []}),
                 "parts": parts})
+        if adopted_composition is not None:
+            row["composition"] = dict(adopted_composition)
         row["generation"] = {"references": [{"role": "scene_reference" if m["role"] == "scene"
             else "character_reference", "asset_id": m["asset_id"]} for m in materials] + [
                 {"role": "scene_reference", "asset_id": "room"}],
             "intent_evidence": {"character_action_required": True},
             "generation_intent": {"subject_action": {"progression": row["shot"]["intent"]},
-                                  "pacing": {"shot_duration_seconds": 5}},
+                                  "pacing": {"shot_duration_seconds": (
+                                      5 if generation_output_duration_seconds is None
+                                      else generation_output_duration_seconds)}},
             "audio_need": "required", "quality_need": {}}
+        if generation_output_duration_seconds is not None:
+            output_need = {"duration_seconds": generation_output_duration_seconds,
+                "geometry_policy": generation_output_geometry_policy, "fps": 24,
+                "container_mime": "video/mp4"}
+            if generation_output_geometry_policy == "exact":
+                output_need.update(width=1280, height=720)
+            row["generation"]["output_need"] = output_need
     return source, data, registry, artifacts
 
 
@@ -159,32 +181,61 @@ class LoadedFixture:
     project: object
 
 
-def subject_service(tmp_path, *, generated=False):
+def subject_service(tmp_path, *, generated=False, scenario=None, authored_deadline_text=None,
+                    adopted_duration_seconds=5, generation_output_duration_seconds=None,
+                    adopted_composition=None, provider_family="seedance"):
     from ai_video.canvas_dependencies import initialize_canvas_graph
     from ai_video.canvas_production import CanvasProductionService
     from ai_video.production.generation_decision import DecisionPolicy, ExecutionLimits
     from ai_video.production.generation_feedback import RegisteredGenerationTarget
     from ai_video.production.project import load_production_project
-    from ai_video.production.seedance import SeedanceVideoProvider
     from ai_video.production.shot_router import AdapterCompilerContract
     from ai_video.production.state_commit import ProductionStateCommitter
     from tests.production_generation_execution_factory import activate_fixture_generation_qa_policy
     from test_production_seedance import _profile, _profile_pointer, _request
     from test_production_shot_router import _policy
 
-    source, data, registry, artifacts = subject_source(tmp_path, generated=generated)
+    source, data, registry, artifacts = subject_source(tmp_path, generated=generated,
+        scenario=scenario, authored_deadline_text=authored_deadline_text,
+        adopted_duration_seconds=adopted_duration_seconds,
+        generation_output_duration_seconds=generation_output_duration_seconds,
+        generation_output_geometry_policy=("adaptive" if provider_family == "h3-max" else "exact"),
+        adopted_composition=adopted_composition)
     root = tmp_path / "project"
     root.mkdir()
-    profile = _profile()
-    model = "doubao-seedance-2-0-fast-260128"
-    output = _request(profile, model_id=model).output_requirement.model_copy(update={"timing_mode": "nominal_seconds"})
     def forbidden(*args, **kwargs):
         pytest.fail("source-boundary tests must not use Provider effects or credentials")
-    provider = SeedanceVideoProvider(profile=profile, transport=forbidden,
-                                    credential=forbidden, input_reference=forbidden)
+    if provider_family == "seedance":
+        from ai_video.production.seedance import SeedanceVideoProvider
+
+        profile = _profile()
+        model = "doubao-seedance-2-0-fast-260128"
+        output = _request(profile, model_id=model).output_requirement.model_copy(
+            update={"timing_mode": "nominal_seconds"})
+        provider = SeedanceVideoProvider(profile=profile, transport=forbidden,
+            credential=forbidden, input_reference=forbidden)
+        provider_name = "seedance"
+        profile_pointer = _profile_pointer(profile)
+        compiler_id, compiler_version = "seedance-video-compiler", "3"
+    elif provider_family == "h3-max":
+        from ai_video.production.minimax_h3_max import (
+            MINIMAX_H3_MAX_MODEL_ID, MiniMaxH3MaxProfile, MiniMaxH3MaxVideoProvider,
+        )
+
+        profile = MiniMaxH3MaxProfile(duration=5, resolution="768P", aspect_ratio="adaptive",
+            currency="CNY", cost_upper_bound_microunits=1)
+        model = MINIMAX_H3_MAX_MODEL_ID
+        output = profile.output()
+        provider = MiniMaxH3MaxVideoProvider(profile=profile, transport=forbidden,
+            credential=forbidden, reference_resolver=forbidden)
+        provider_name = "minimax_h3_max"
+        profile_pointer = profile.pointer()
+        compiler_id, compiler_version = "minimax-h3-max-video-compiler", "1"
+    else:
+        raise ValueError(f"unsupported source fixture provider family: {provider_family}")
     service = CanvasProductionService(committer=ProductionStateCommitter(root), packet=source,
-        direction=data, targets=(RegisteredGenerationTarget(provider, _profile_pointer(profile),
-            AdapterCompilerContract.create(compiler_id="seedance-video-compiler", compiler_version="3"),
+        direction=data, targets=(RegisteredGenerationTarget(provider, profile_pointer,
+            AdapterCompilerContract.create(compiler_id=compiler_id, compiler_version=compiler_version),
             output),), routing_policy=_policy(remote_authorized=True, budget_authorized=True),
         decision_policy=DecisionPolicy(allow_bounded_exploration=True))
     service.author(registry=registry, asset_artifacts=artifacts).bootstrap(
@@ -196,7 +247,8 @@ def subject_service(tmp_path, *, generated=False):
     activate_fixture_generation_qa_policy(root=root,
         inputs=LoadedFixture(load_production_project(root / "project.yaml")), output=output)
     limits = ExecutionLimits(task_id="preserved-source-test", generation_forbidden=False,
-        allowed_remote_candidates=tuple(f"seedance/{v.capability_id}" for v in provider.capabilities().variants
+        allowed_remote_candidates=tuple(f"{provider_name}/{v.capability_id}"
+                                        for v in provider.capabilities().variants
                                         if v.model_id == model), paid_submit_ceiling=1, paid_submits_used=0,
         local_batch_limit=1, local_batch_used=0, local_total_used=0, local_resource_available=True)
     return service, limits
@@ -278,6 +330,87 @@ def test_subject_materials_have_character_owners_through_real_common_compiler(tm
         execution_binding=prepared.execution_binding)
     assert service._load().manifest.attempts[-1].video_generation_state.execution_binding.binding_hash == (
         prepared.execution_binding.binding_hash)
+
+
+@pytest.mark.parametrize("scenario", [
+    ("Robot", "raises both arms", "an atrium"),
+    ("Courier", "sets a parcel down", "a station platform"),
+    ("Scientist", "turns toward the window", "a narrow cabin"),
+])
+@pytest.mark.parametrize(("provider_family", "expected_provider", "expected_compiler", "expected_version"), [
+    ("seedance", "seedance", "seedance-video-compiler", "3"),
+    ("h3-max", "minimax_h3_max", "minimax-h3-max-video-compiler", "1"),
+])
+def test_authored_deadline_reaches_compiler_without_changing_generation_or_adopted_trim(
+    tmp_path, scenario, provider_family, expected_provider, expected_compiler, expected_version
+):
+    deadline = "Technical action deadline: finish by 2.5 seconds and hold the completed pose through the cut."
+    composition = {"trim_start_frame": 0, "trim_duration_frames": 72}
+    service, limits = subject_service(tmp_path, generated=True, scenario=scenario,
+        authored_deadline_text=deadline, adopted_duration_seconds=3,
+        generation_output_duration_seconds=5, adopted_composition=composition,
+        provider_family=provider_family)
+    baseline_root = tmp_path / "baseline"
+    baseline_root.mkdir()
+    baseline_packet, baseline_data, _, _ = subject_source(baseline_root, generated=True,
+        scenario=scenario, adopted_duration_seconds=3, generation_output_duration_seconds=5,
+        generation_output_geometry_policy=("adaptive" if provider_family == "h3-max" else "exact"),
+        adopted_composition=composition)
+    source_parts = service.packet["units"][0]["prompt_source"]["parts"]
+    baseline_parts = baseline_packet["units"][0]["prompt_source"]["parts"]
+    assert source_parts[:-1] == baseline_parts
+    assert service.packet["units"][0]["references"] == baseline_packet["units"][0]["references"]
+    assert [part["type"] for part in source_parts] == [
+        "text", "extension", "text", "extension", "text", "text"]
+    assert [part["text"] for part in source_parts if part["type"] == "text"][-1] == " " + deadline
+    preserved_parts = service.direction["shots"][0]["shot"]["preserved_source_expression"]["parts"]
+    baseline_preserved_parts = baseline_data["shots"][0]["shot"]["preserved_source_expression"]["parts"]
+    assert preserved_parts[:-1] == baseline_preserved_parts
+    assert [part["slot_id"] for part in preserved_parts if part["type"] == "reference"] == [
+        "robot-slot", "room-slot"]
+    assert [material["asset_id"] for material in preserved_parts[1]["materials"]] == [
+        "robot-main", "robot-aux"]
+    assert [material["asset_id"] for material in preserved_parts[3]["materials"]] == ["room"]
+
+    prepared = service.prepare(limits=limits)
+
+    expected_prompt = f"{scenario[0]} 图片2、图片1 {scenario[1]} in {scenario[2]} 图片3. {deadline}"
+    assert prepared.execution_binding is not None
+    assert prepared.resolved_request.provider_name == expected_provider
+    assert prepared.resolved_request.prompt_text == expected_prompt
+    assert prepared.resolved_request.adapter_compiler_id == expected_compiler
+    assert prepared.resolved_request.adapter_compiler_version == expected_version
+    assert [binding.asset_id for binding in prepared.resolved_request.image_bindings] == [
+        "robot-aux", "robot-main", "room"]
+    assert prepared.resolved_request.effective_output.duration_seconds == 5
+    requirement = prepared.execution_binding.projection.requirement
+    assert requirement.output_need.duration_seconds == 5
+    assert requirement.output_need.fps == 24
+    assert composition["trim_duration_frames"] / requirement.output_need.fps == 3
+    assert requirement.generation_intent.pacing.shot_duration_seconds == 5
+    loaded_shot = next(shot for shot in service._load().shots if shot.shot_id == "one")
+    assert loaded_shot.duration_policy.seconds == 3
+    assert service.direction["shots"][0]["composition"] == composition
+
+    recipe = prepared.execution_binding.decision.routing.provider_bound_request.generation_recipe
+    inventory = recipe.acceptance_policy.profile_payload["generation_requirements"]
+    assert len(inventory) == 1
+    assert inventory[0]["requirement_id"] == "duration"
+    assert inventory[0]["observable"] == "5 seconds"
+    assert inventory[0]["intent_paths"] == ("output_need.duration_seconds",)
+
+
+def test_generated_selection_receipt_cannot_be_reused_after_raw_deadline_edit(tmp_path):
+    from ai_video.canvas_authoring import author_canvas_project
+
+    old_packet, _, old_registry, old_artifacts = subject_source(tmp_path, generated=True)
+    new_packet, new_direction, _, _ = subject_source(tmp_path,
+        authored_deadline_text="Technical action deadline: finish by 2.5 seconds.")
+    assert old_packet["source_snapshot_sha256"] != new_packet["source_snapshot_sha256"]
+
+    with pytest.raises(ValueError, match="generated copy differs from the original canvas resource"):
+        author_canvas_project(packet=new_packet, direction=new_direction,
+            registry=old_registry, asset_artifacts=old_artifacts)
 
 
 def test_subject_auxiliary_cannot_be_reclassified_as_scene(tmp_path):
