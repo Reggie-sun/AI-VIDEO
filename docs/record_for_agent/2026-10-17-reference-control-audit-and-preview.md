@@ -8,7 +8,52 @@ learning_eligibility: ineligible
 
 Date: 2026-10-17
 
-## Authorized Media Follow-Up
+## Current Generic Control Capability
+
+用户明确纠正目标为跨项目、跨镜头通用能力。此前 `473ed99` 的模式/参考预览和 `c8fefdd` 的单镜离线表达修订不足以证明逐目标控制契约；本轮在原共享 owners 内补齐输入声明、编译拒绝和逐目标投影，没有新增故事分支、控制目标清单、选路器、timeline、状态库或 renderer。旧付费单元与失败镜不延续，本轮视频/图片/音频 Provider POST 均0，没有读取凭据或改变真实 Production。
+
+源码发布 `0fc8c05e7fd7c521047c11f162dcd221b6f5f8cf`，base `c8fefddec979f83ef5dd6b9e7056ae273021b4d8`。本节为当前工程工作；下方原审计、发布证据、媒体比较方案及计数保留为先前 checkpoint 历史，不构成本轮新许可或媒体质量证明。
+
+### Confirmed Gaps And Shared Repair
+
+- 原 `_expressions` 无条件从 `intent_paths` 派生 native text，同一整段 progression 会覆盖各目标独立片段，无法保留作者要求的具体动作时限。新 `RequirementExpression.input_control` 保留原 QA profile 的 authored fragments，`GenerationRecipe` 重开完整 inventory 并拒绝改写后重新封存的片段；legacy 字节/hash/派生行为保持。
+- 原报告用固定六类控制描述代替逐项目标，还使用不存在的 `motion_intent` / `subject_endpoint` 路径。现按完整 recipe 输出 `objectives`，真实路径为 `motion_envelope`、`pacing`、`subject_action.endpoint`；固定部分明确为模式概览，不计目标覆盖。
+- 新 `generation-input-control/1` 区分 prompt/reference guidance、first/last frame、native output。参考 duty 保留角色、id、SHA、显式 owner、用途及 exact scope；同一 common compiler 的纯 helper 校验声明，复用原 `PROMPT_EXPRESSION_UNSUPPORTED` 和目标 ID，不添加第二执行检查链。只要一项目标启用映射，全部 raw 非 diagnostic 目标须映射；缺片段、缺 scope、错 role/SHA/owner、端点不符或冒充独立人物输入均拒绝，不自动换模式或补原文。
+- 新字段无需伪造 semantic marker；QA 封存 owner 对 opted-in inventory 解析 typed shape 与完整 unique IDs，未知机制/缺 scope 在持久化前拒绝。语义必要性、QA verdict、event measurement 与最终 timing 继续归原 owners；输入声明不自动产生语义或质量 PASS。
+- `independent_identity=true` 必须有 identity owner；不同 binding/owner 复用同 SHA 不能宣称独立身份证据，同一参考供多个目标复用合法。不去重或改索引。白模只认明确 duty 与实际图像/视频绑定；静态布局图不替代动态视频，普通 video 不推断为白模，声明不代逐镜制作/观察/验收。
+- Reporter 复用上述问题码，完整投影原验收要求、native fragments、参考职责、native path、原 Router assessments 与能力限制。未编译时保留 selected candidate 目标、失败 ID 及 `AUTHORED_NOT_COMPILED`，不编造 route/参数。另一个 RED 复现同 id/SHA 同时用于首尾帧时职责会串绑两个索引，现以 canonical native role 分开关联。
+
+输入覆盖仅 `EXPRESSED_INPUT_ONLY` / `UNSUPPORTED_INPUT` / `NOT_EVALUATED`；所有模型质量与 human 验收均仍 `NOT_EVALUATED`。这些是可复现工程缺口，不是旧媒体人物缺失、手部幽影或动作落点失败的受控根因结论。没有新增自动理解目标、精确事件定时、区域 mask、模型服从保证或白模合格认证。Planner/Router 仍只按原候选/能力选择，未把词法校验说成自动选出质量最优模型。
+
+### Transferable Offline Evidence
+
+新 core 测试22项、report 测试25项通过。覆盖合法/非法 schema、unmarked QA seal、完整目标 inventory、missing fragment、错角色/id/SHA/owner、相同字节冒充独立人物、同 binding 复用、端点职责、静态/动态白模职责、旧 hash、改写片段、未编译报告和 JSON-safe preview。
+
+六个临时项目沿正常 loader → Planner → Router → actual Provider compiler → execution binding prepare：Robot抬臂/atrium、Courier放包裹/station platform、Scientist转向窗/narrow cabin，各走 H3 Max 与 Seedance。每例独立保留 action-deadline、main-identity、aux-identity、space-layout、native-duration 五项目标。Seedance 实际选择 `doubao-seedance-2-0-fast-260128`，H3 为 `MiniMax-H3-Max`，六例均 `reference_to_video`；缺原生动作句时只返回 `action-deadline` unsupported，不生成 binding。临时 QA 激活归 canonical committer，没有真实项目或 video_generation attempt。
+
+这些是占位 PNG 的工程 fixture，main/aux 是同一 Character 的两份身份参考，不能称为两个人物质量或独立模型尝试；六例没有真实白模制作或媒体质量证据。H3 Max / Seedance 2.0 / 2.5 的 first、first+last、reference_video 三路线另由既有 actual adapter resolver/native-parameter 9格矩阵验证，不能把该矩阵冒充每格都走过完整 Planner 或真实模型。
+
+可审阅预览：`runs/reference-input-contract-preview-20261017-001/preview.md`；六份 JSON 及各 SHA 见同目录 `summary.json`。只存只读报告，不产生第二 Production state。完整共享使用方法归 [Per-Objective Input Contract](../canvas-production-harness.md#per-objective-input-contract)，官方互斥约束和社区正反例范围见本记录原审计及 [research](../research/2026-10-17-h3-action-timing-reflection-repair.md)。没有把本地 H3 社区经验升级为 H3 Max CN 或 Seedance 保证。
+
+### Current Verification And Publication
+
+源码 exact-range Harness：`.agent/harness/runs/generation-input-control-20261017-r1/receipt.json`，17项全部 PASS；源码发布点重验 integrity、fresh、complete_completion_proof、scope_worktree_clean 及隔离 workspace cleanup/stability 全 true。Architecture Gate 为0 error / 0 warning；Provider-neutral、原文保留、声音选路、QA review、输出回归及历史/恢复边界均实际执行。
+
+feedback suite 523 PASS / 1 skip：隔离 checkout 不含历史 run archive，skip 明示该原因，self-contained fixture 仍执行；不将它计作当前真实媒体历史重验。Provider suite 975 PASS / 23 serializer warnings，warnings 来自预算/配额等负测构造的未类型化 dict，未屏蔽或改变其拒绝断言。其他 suite 结果保留在同一 receipt/JUnit，不把重复执行或测试数量当独立媒体证据。
+
+Risk Gate：对上述 exact source candidate 为 `NATIVE_REVIEW_NOT_REQUIRED`。新增的是封存输入声明、纯校验及只读投影，失败在 submit 前关闭；许可、凭据、预算、lifecycle 和 QA acceptance 不变。normal/boundary/failure、完整 loader/Planner/compiler 路径和 legacy replay 已覆盖，没有剩余关键越权/难恢复状态损坏路径或重大未验证运行语义。模型理解/质量未知被明确保留为 NOT_EVALUATED，不是额外代码审查能够代签的缺证。Parent 自审裁决；前期只读调查和 Product review tests 都不冒充独立最终审查或真实验收。
+
+源码已 push 到 origin/main，`ls-remote` 核验 exact SHA 为 `0fc8c05e7fd7c521047c11f162dcd221b6f5f8cf`。文档 checkpoint receipt：`.agent/harness/runs/generation-input-control-record-20261017-r1/receipt.json`；文档 publication 以该 receipt 和 Git remote SHA 为准。foreign files 的 bytes 及原 staged binary diff SHA 均与任务前基线一致；只提交本任务 owned paths，没有前台 RAG rebuild 或全局 memory 更新。
+
+### Remaining Empirical Decision
+
+工程验证、真实模型质量、单镜/连续镜、完整故事与 human 1.0x 验收分别计。旧失败 S01 的 STOP 与无 accepted state 不因本次代码变化解除；本轮不继续其离线修订、不挪用旧消费或未用臂。
+
+下一最小质量单元建议从两个不同项目的合格镜头各比较首帧与全模态参考，共最多4条、零重抽，先固定一个已有 Provider 以减少混杂；它仍不能证明跨 Provider 普遍质量。新单元须先选定真实素材、逐镜白模或 exact-mode 有据例外、原目标和采用窗，准备完整 native preview，再集中取得当前有限 submit/upper-bound/egress 决定。当前六份 fixture 不可直接转为真实质检素材；没有为该建议创建预算、intent、permit、上传或 paid preview，也不自动授予4次调用。若要比较 Seedance，素材准入须另行满足其当前 exact route，不能默认已通过。
+
+`record-ai-video-session` 本轮更新已有 primary record；`distill-ai-video-learning` 自动评估为 `no_candidate`：没有新增独立、受控真实媒体比较，不把工程 fixture、社区推荐或一份历史失败当通用质量规律。不建立 Learning placeholder，不修改 Skill/Policy/Gate 的经验采纳；本次 workflow 更新只描述已实现且已验证的输入契约。experience 检索返回 stale last-good advisory；本轮没有前台刷新 RAG 或全局 memory 写入。
+
+## Historical Authorized Media Follow-Up
 
 工程发布后，用户批准下述最多2次、零重抽单元。已执行一个此前尚无实证的 H3 Max CN first-frame 条件；15项为6 PASS / 2 FAIL / 7 NOT_EVALUATED，整镜仍STOP、无accepted state或S02提交。第二臂原样重做会重复旧 native `ratio=9:16` 请求，故未消耗；`effective_output.ratio=adaptive` 不能反推native比例。当前媒体、计数、canonical关闭与有界比较以 [Jieshi First-Frame Record](2026-10-13-jieshi-original-s01-s02-candidate.md#current-official-h3-max-first-frame-result--2026-10-17) 为准；下文的Manifest103/Project14、POST0和待授权状态保留为先前工程checkpoint历史。
 
