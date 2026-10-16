@@ -86,10 +86,13 @@ class MetasoH3Profile(StrictModel):
 class HttpxMetasoH3Transport(HttpxMiniMaxH3Transport):
     """API transport plus credential-free, public-address-pinned result GET."""
 
+    error_label = "METASO"
+
     @contextmanager
     def stream(self, request):
         if request.method != "GET" or request.body or dict(request.headers) != {"accept": "video/mp4"}:
-            raise _error(ErrorCode.VIDEO_ARTIFACT_INVALID, "Invalid METASO download request.")
+            raise _error(ErrorCode.VIDEO_ARTIFACT_INVALID,
+                         f"Invalid {self.error_label} download request.")
         with stream_public_video(request.url, timeout_seconds=120) as response:
             # http.client preserves wire casing; the inherited consumer expects
             # httpx-style lowercase lookup for these case-insensitive headers.
@@ -98,6 +101,21 @@ class HttpxMetasoH3Transport(HttpxMiniMaxH3Transport):
 
 
 class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
+    # Class metadata lets the official H3 Max adapter reuse reference binding
+    # and lifecycle behavior while retaining the established METASO defaults.
+    provider_name = _NAME
+    provider_kind = _NAME
+    model_id = METASO_MODEL_ID
+    origin = METASO_ORIGIN
+    base_url = METASO_BASE_URL
+    profile_version = _VERSION
+    frame_capability_id = _FRAME_CAPABILITY
+    compiler_id = "metaso-h3-video-compiler"
+    compiler_version = "1"
+    secret_reference_id = "METASO_API_KEY"
+    min_reference_video_fps = 24
+    error_label = "METASO"
+
     def __init__(self, *, profile: MetasoH3Profile, transport,
                  reference_resolver: Callable, credential=metaso_environment_credential,
                  now: Callable[[], datetime] | None = None):
@@ -107,8 +125,8 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
 
     def capabilities(self) -> VideoProviderCapabilities:
         variant = VideoCapabilityVariant(
-            capability_id=_VERSION, provider_kind=_NAME, model_id=METASO_MODEL_ID,
-            profile_version=_VERSION, execution_kind=VideoExecutionKind.REMOTE,
+            capability_id=self.profile_version, provider_kind=self.provider_kind, model_id=self.model_id,
+            profile_version=self.profile_version, execution_kind=VideoExecutionKind.REMOTE,
             billing_kind=BillingKind.METERED, mode=VideoGenerationMode.REFERENCE_TO_VIDEO,
             output_capability=VideoOutputCapability(
                 min_duration_seconds=self._profile.duration, max_duration_seconds=self._profile.duration,
@@ -136,14 +154,14 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
         # silently dropped when the upstream frame API omits the ratio field.
         if self._profile.aspect_ratio == "adaptive":
             variants += (variant.model_copy(update={
-                "capability_id": _FRAME_CAPABILITY,
+                "capability_id": self.frame_capability_id,
                 "mode": VideoGenerationMode.IMAGE_TO_VIDEO,
                 "allowed_image_roles": ("first_frame", "last_frame"),
                 "required_first_frame": True,
                 "max_reference_count": 0,
                 "media_capabilities": (),
             }),)
-        return VideoProviderCapabilities.create(provider_name=_NAME, variants=variants)
+        return VideoProviderCapabilities.create(provider_name=self.provider_name, variants=variants)
 
     def compile_request(self, provider_bound, requirement, *, continuity_expression=None):
         from ai_video.production.video_compiler import (
@@ -159,8 +177,8 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
 
             try:
                 native_prompt = compile_preserved_source(
-                    provider_bound, requirement, provider_name=_NAME,
-                    compiler_id="metaso-h3-video-compiler", compiler_version="1",
+                    provider_bound, requirement, provider_name=self.provider_name,
+                    compiler_id=self.compiler_id, compiler_version=self.compiler_version,
                     continuity_expression=continuity_expression,
                 )
             except (TypeError, ValueError):
@@ -194,7 +212,7 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
                 expressed_control_paths=compiled.expressed_control_paths)
         return compile_provider_video_request(
             provider_bound=provider_bound, requirement=requirement,
-            compiler_id="metaso-h3-video-compiler", compiler_version="1",
+            compiler_id=self.compiler_id, compiler_version=self.compiler_version,
             capabilities=self.capabilities(),
             continuity_expression=continuity_expression,
             native_prompt=native_prompt,
@@ -202,8 +220,8 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
 
     def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:
         capability = next((v for v in self.capabilities().variants if v.mode is request.mode), None)
-        if (request.provider_name != _NAME or request.provider_kind != _NAME
-                or request.model_id != METASO_MODEL_ID
+        if (request.provider_name != self.provider_name or request.provider_kind != self.provider_kind
+                or request.model_id != self.model_id
                 or request.provider_profile != self._profile.pointer()
                 or capability is None
                 or request.output_requirement != self._profile.output()
@@ -211,24 +229,26 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
                 or len(request.prompt_text) > 7000
                 or not (request.image_bindings or any(b.kind == "video" for b in request.media_bindings))):
             raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
-                         "METASO request does not match its sealed profile.")
+                         f"{self.error_label} request does not match its sealed profile.")
         if request.mode is VideoGenerationMode.IMAGE_TO_VIDEO and any(
                 not b.size_bytes for b in request.image_bindings):
-            raise _error(ErrorCode.VIDEO_REQUEST_INVALID, "METASO frame size is missing.")
+            raise _error(ErrorCode.VIDEO_REQUEST_INVALID,
+                         f"{self.error_label} frame size is missing.")
         for kind in ("audio", "video"):
             refs = tuple(b for b in request.media_bindings if b.kind == kind)
             if sum(b.duration_millis for b in refs) > 15000:
                 raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
-                             "METASO reference duration exceeds 15 seconds per media kind.")
+                             f"{self.error_label} reference duration exceeds 15 seconds per media kind.")
         if any(not (256 <= b.width <= 5760 and 256 <= b.height <= 5760
                     and 0.4 <= b.width / b.height <= 2.5)
                for b in (*request.image_bindings,
                          *(b for b in request.media_bindings if b.kind == "video"))):
             raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
-                         "METASO reference aspect ratio is unsupported.")
-        if any(b.kind == "video" and not 24 <= b.fps <= 60 for b in request.media_bindings):
+                         f"{self.error_label} reference aspect ratio is unsupported.")
+        if any(b.kind == "video" and not self.min_reference_video_fps <= b.fps <= 60
+               for b in request.media_bindings):
             raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
-                         "METASO reference video FPS is unsupported.")
+                         f"{self.error_label} reference video FPS is unsupported.")
         return ResolvedVideoGenerationRequest.create(
             request=request, capability=capability,
             effective_output=self._profile.output(), effective_seed=None,
@@ -237,7 +257,8 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
 
     def _validate_resolved(self, request):
         if self.resolve(request.activation_scope.request) != request:
-            raise _error(ErrorCode.VIDEO_REQUEST_INVALID, "METASO resolved request changed.")
+            raise _error(ErrorCode.VIDEO_REQUEST_INVALID,
+                         f"{self.error_label} resolved request changed.")
 
     def egress_items(self, request) -> tuple[PaidProviderEgressItem, ...]:
         self._validate_resolved(request)
@@ -246,7 +267,8 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
                     size_bytes=len(raw), mime_type="text/plain", purpose="prompt")]
         for binding in (*request.image_bindings, *request.media_bindings):
             if not binding.size_bytes:
-                raise _error(ErrorCode.VIDEO_REQUEST_INVALID, "METASO reference size is missing.")
+                raise _error(ErrorCode.VIDEO_REQUEST_INVALID,
+                             f"{self.error_label} reference size is missing.")
             items.append(PaidProviderEgressItem(item_id=binding.asset_id,
                 sha256=binding.asset_sha256, size_bytes=binding.size_bytes,
                 mime_type=binding.mime_type, purpose="reference"))
@@ -255,9 +277,15 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
     def preview(self, request) -> VideoGenerationPreview:
         return VideoGenerationPreview.create(
             resolved=request, estimated_cost_upper_bound_microunits=self._profile.cost_upper_bound_microunits,
-            currency="CNY", destination=METASO_ORIGIN,
+            currency=getattr(self._profile, "currency", "CNY"), destination=self.origin,
             egress_item_ids=tuple(i.item_id for i in self.egress_items(request)),
         )
+
+    def _native_profile_options(self, *, frame_mode: bool) -> dict[str, object]:
+        return {"context_ir_enabled": self._profile.context_ir}
+
+    def _validate_query_output_echoes(self, task: dict[str, object]) -> None:
+        """Provider-specific optional query echoes are checked by adapters."""
 
     def native_payload(self, request) -> bytes:
         self._validate_resolved(request)
@@ -268,10 +296,12 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
             try:
                 raw = self._reference_resolver(binding)
             except Exception:
-                raise _error(ErrorCode.VIDEO_REQUEST_INVALID, "METASO reference lookup failed.") from None
+                raise _error(ErrorCode.VIDEO_REQUEST_INVALID,
+                             f"{self.error_label} reference lookup failed.") from None
             if (not isinstance(raw, bytes) or len(raw) != binding.size_bytes
                     or hashlib.sha256(raw).hexdigest() != binding.asset_sha256):
-                raise _error(ErrorCode.VIDEO_REQUEST_INVALID, "METASO reference bytes changed.")
+                raise _error(ErrorCode.VIDEO_REQUEST_INVALID,
+                             f"{self.error_label} reference bytes changed.")
             kind = "image" if binding in request.image_bindings else binding.kind
             if frame_mode:
                 try:
@@ -282,18 +312,20 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
                         image.verify()
                 except Exception:
                     raise _error(ErrorCode.VIDEO_REQUEST_INVALID,
-                                 "METASO frame bytes do not match their image metadata.") from None
+                                 f"{self.error_label} frame bytes do not match their image metadata.") from None
             content.append({"type": f"{kind}_url", f"{kind}_url": {
                 "url": f"data:{binding.mime_type};base64," + base64.b64encode(raw).decode("ascii")},
                 "role": binding.role if frame_mode else f"reference_{kind}"})
-        payload = {"model": METASO_MODEL_ID, "content": content,
+        payload = {"model": self.model_id, "content": content,
                    "duration": self._profile.duration, "resolution": self._profile.resolution,
-                   "ratio": self._profile.aspect_ratio, "context_ir_enabled": self._profile.context_ir}
+                   "ratio": self._profile.aspect_ratio}
+        payload.update(self._native_profile_options(frame_mode=frame_mode))
         if frame_mode:
             del payload["ratio"]
         body = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()
         if len(body) > _MAX_BODY_BYTES:
-            raise _error(ErrorCode.VIDEO_REQUEST_INVALID, "METASO request is too large.")
+            raise _error(ErrorCode.VIDEO_REQUEST_INVALID,
+                         f"{self.error_label} request is too large.")
         return body
 
     def _credential_headers(self, *, json_body):
@@ -301,11 +333,11 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
             secret = self._credential()
         except Exception:
             raise _error(ErrorCode.PAID_PROVIDER_EGRESS_NOT_AUTHORIZED,
-                         "METASO_API_KEY is unavailable.") from None
+                         f"{self.secret_reference_id} is unavailable.") from None
         if (not isinstance(secret, str) or not secret or not secret.isascii()
                 or any(ord(c) < 33 or ord(c) > 126 for c in secret)):
             raise _error(ErrorCode.PAID_PROVIDER_EGRESS_NOT_AUTHORIZED,
-                         "METASO_API_KEY is unavailable.")
+                         f"{self.secret_reference_id} is unavailable.")
         headers = {"accept": "application/json", "authorization": f"Bearer {secret}"}
         if json_body:
             headers["content-type"] = "application/json"
@@ -313,26 +345,36 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
 
     def submit(self, request, video_preview, paid_preview, authorization, permit):
         if video_preview != self.preview(request):
-            raise _error(ErrorCode.VIDEO_REQUEST_INVALID, "METASO preview mismatch.")
+            raise _error(ErrorCode.VIDEO_REQUEST_INVALID, f"{self.error_label} preview mismatch.")
         if paid_preview is None or authorization is None or permit is None:
             raise _error(ErrorCode.PAID_PROVIDER_AUTHORIZATION_REQUIRED,
-                         "METASO requires durable paid authorization.")
+                         f"{self.error_label} requires durable paid authorization.")
         validate_paid_provider_authorization(paid_preview, authorization, now=self._now())
         binding = build_video_paid_permit_binding(request, video_preview, paid_preview, authorization)
-        if (paid_preview.egress_items != self.egress_items(request)
+        if (paid_preview.operation != "video_generation"
+                or paid_preview.billing_mode != "remote_metered"
+                or paid_preview.egress_items != self.egress_items(request)
                 or paid_preview.secret_reference.kind != "secret_store"
-                or paid_preview.secret_reference.reference_id != "METASO_API_KEY"):
-            raise _error(ErrorCode.VIDEO_REQUEST_INVALID, "METASO egress or credential reference changed.")
+                or paid_preview.secret_reference.reference_id != self.secret_reference_id
+                or paid_preview.provider_kind != self.provider_kind
+                or paid_preview.model_id != self.model_id
+                or paid_preview.destination != self.origin
+                or paid_preview.currency != getattr(self._profile, "currency", "CNY")
+                or paid_preview.method != "POST"):
+            raise _error(ErrorCode.VIDEO_REQUEST_INVALID,
+                         f"{self.error_label} paid preview identity changed.")
         if not _permit_is_valid(permit, binding):
-            raise _error(ErrorCode.PAID_PROVIDER_AUTHORIZATION_REQUIRED, "METASO permit is invalid.")
+            raise _error(ErrorCode.PAID_PROVIDER_AUTHORIZATION_REQUIRED,
+                         f"{self.error_label} permit is invalid.")
         body = self.native_payload(request)
         transport_request = MiniMaxH3TransportRequest(method="POST",
-            url=METASO_BASE_URL + "/v2/video_generation",
+            url=self.base_url + "/v2/video_generation",
             headers=self._credential_headers(json_body=True), body=body)
         # Recheck after potentially expensive reference reads and serialization.
         validate_paid_provider_authorization(paid_preview, authorization, now=self._now())
         if not _consume_permit(permit, binding):
-            raise _error(ErrorCode.PAID_PROVIDER_AUTHORIZATION_REQUIRED, "METASO permit was consumed.")
+            raise _error(ErrorCode.PAID_PROVIDER_AUTHORIZATION_REQUIRED,
+                         f"{self.error_label} permit was consumed.")
         validate_paid_provider_authorization(paid_preview, authorization, now=self._now())
         try:
             response = self._transport.request(transport_request)
@@ -341,13 +383,13 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
         if not 200 <= response.status_code < 300:
             if 400 <= response.status_code < 500 and response.status_code != 429:
                 raise _error(ErrorCode.VIDEO_PROVIDER_FAILED,
-                             f"METASO rejected submit (HTTP {response.status_code}).")
+                             f"{self.error_label} rejected submit (HTTP {response.status_code}).")
             raise _unknown_submit()
         try:
-            data = _json_object(response.body, surface="METASO submit")
+            data = _json_object(response.body, surface=f"{self.error_label} submit")
             if (data.get("base_resp") or {}).get("status_code", 0) != 0:
-                raise _error(ErrorCode.VIDEO_PROVIDER_FAILED, "METASO rejected submit.")
-            task_id = _task_id(data.get("task_id"), surface="METASO submit")
+                raise _error(ErrorCode.VIDEO_PROVIDER_FAILED, f"{self.error_label} rejected submit.")
+            task_id = _task_id(data.get("task_id"), surface=f"{self.error_label} submit")
         except (AiVideoError, AttributeError):
             # A malformed acknowledgement cannot establish absence of effects.
             raise _unknown_submit() from None
@@ -355,21 +397,25 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
                                         submitted_at=self._now())
 
     def _query(self, task_id):
-        task_id = _task_id(task_id, surface="METASO query")
+        task_id = _task_id(task_id, surface=f"{self.error_label} query")
         request = MiniMaxH3TransportRequest(method="GET",
-            url=METASO_BASE_URL + "/v2/query/video_generation/" + quote(task_id, safe=""),
+            url=self.base_url + "/v2/query/video_generation/" + quote(task_id, safe=""),
             headers=self._credential_headers(json_body=False))
         try:
             response = self._transport.request(request)
         except Exception:
-            raise _error(ErrorCode.VIDEO_PROVIDER_FAILED, "METASO query transport failed.") from None
+            raise _error(ErrorCode.VIDEO_PROVIDER_FAILED,
+                         f"{self.error_label} query transport failed.") from None
         if not 200 <= response.status_code < 300:
-            raise _error(ErrorCode.VIDEO_PROVIDER_FAILED, f"METASO query HTTP {response.status_code}.")
-        data = _json_object(response.body, surface="METASO query")
+            raise _error(ErrorCode.VIDEO_PROVIDER_FAILED,
+                         f"{self.error_label} query HTTP {response.status_code}.")
+        data = _json_object(response.body, surface=f"{self.error_label} query")
         task = data.get("task")
         if (not isinstance(task, dict) or task.get("id") != task_id
-                or task.get("model", METASO_MODEL_ID) != METASO_MODEL_ID):
-            raise _error(ErrorCode.VIDEO_PROVIDER_FAILED, "METASO query identity mismatch.")
+                or task.get("model", self.model_id) != self.model_id):
+            raise _error(ErrorCode.VIDEO_PROVIDER_FAILED,
+                         f"{self.error_label} query identity mismatch.")
+        self._validate_query_output_echoes(task)
         state = str(task.get("status", "")).lower()
         if state in {"failed", "fail", "cancelled", "canceled", "expired", "error"}:
             return VideoTaskState.FAILED, None
@@ -378,7 +424,8 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
         if state in {"running", "processing"}:
             return VideoTaskState.RUNNING, None
         if state not in {"success", "succeeded", "completed", "done"}:
-            raise _error(ErrorCode.VIDEO_PROVIDER_FAILED, "METASO query status is unknown.")
+            raise _error(ErrorCode.VIDEO_PROVIDER_FAILED,
+                         f"{self.error_label} query status is unknown.")
         content = task.get("content")
         url = content.get("url") if isinstance(content, dict) else None
         parse_result_url(url)

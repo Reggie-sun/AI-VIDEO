@@ -32,6 +32,7 @@ _GROUNDABLE_REFERENCE_DIMENSIONS = {"character_presence", "prop_identity"}
 _SOURCE_COMPILER_IDENTITIES = {
     ("seedance", "seedance-video-compiler", "3"): "seedance-preserved-source-v1",
     ("metaso_h3", "metaso-h3-video-compiler", "1"): "metaso-h3-preserved-source-v1",
+    ("minimax_h3_max", "minimax-h3-max-video-compiler", "1"): "minimax-h3-max-preserved-source-v1",
 }
 
 
