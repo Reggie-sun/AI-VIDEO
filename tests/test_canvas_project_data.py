@@ -308,6 +308,168 @@ def test_standard_reader_rejects_changed_sealed_project_input(tmp_path):
         load_production_project(tmp_path / "project.yaml")
 
 
+def _video_project_data(tmp_path, *, video_asset_id="motion-guide", video_role="existing_video"):
+    from test_canvas_assets import local_video_selection
+
+    source = document()
+    source["nodes"] = [node for node in source["nodes"] if node["id"] != "voice"]
+    source["edges"] = [edge for edge in source["edges"] if edge["source"] != "voice"]
+    source["nodes"].append({"id": "guide", "type": "video", "data": {
+        "resourceId": "guide-resource",
+        "resourceBatches": [{"id": "guide-import", "resourceIds": ["guide-resource"]}]}})
+    for node in source["nodes"]:
+        if node["id"] == "room":
+            node["data"]["resourceBatches"] = [{"id": "room-import", "resourceIds": ["room-resource"]}]
+        if node["id"] not in {"a", "b"}:
+            continue
+        draft = node["data"]["generationDraft"]
+        node["data"]["resourceBatches"] = [{"id": node["id"] + "-import",
+            "resourceIds": [node["data"]["resourceId"]]}]
+        draft["references"] = [ref for ref in draft["references"] if ref["nodeId"] != "voice"]
+        draft["parts"].append({"type": "extension", "extension_type": "node",
+            "object_id": "guide-slot"})
+        draft["references"].append({"slotId": "guide-slot", "nodeId": "guide", "role": "reference"})
+        source["edges"].append({"id": "guide-" + node["id"], "source": "guide",
+            "target": node["id"], "type": "reference"})
+
+    data = direction()
+    for row in data["shots"]:
+        row["shot"].pop("intent")
+        row["generation"] = {"references": [
+            {"asset_id": "room", "role": "scene_reference"},
+            {"asset_id": video_asset_id, "role": video_role},
+        ]}
+    png = tmp_path / "room.png"
+    from tests.production_project_factory import _p7_png
+    png.write_bytes(_p7_png(width=320, height=320, rgba=bytes((1, 2, 3, 255))))
+    image_selection = [{"asset_id": "room", "node_id": "room", "resource_id": "room-resource",
+        "path": png, "usage_license": "fixture-only"}]
+    video = local_video_selection(tmp_path)
+    video["asset_id"] = video_asset_id
+    video["input_artifact_ids"] = []
+    definition = {"schema_version": "canvas-project-data/1", "source": "source.json",
+        "selection": {"node_ids": ["a", "b"]}, "direction": data,
+        "images": [{**image_selection[0], "path": "room.png"}],
+        "videos": [{**video, "path": video["path"].name}]}
+    return source, definition, video["path"]
+
+
+def test_local_video_reference_is_imported_authored_and_immutably_reopened(tmp_path, monkeypatch):
+    from ai_video.production.project import load_production_project
+    from ai_video.production.models import AssetType
+    from test_canvas_assets import fake_local_video_probe
+
+    fake_local_video_probe(monkeypatch)
+    source, definition, video_path = _video_project_data(tmp_path)
+    (tmp_path / "source.json").write_text(json.dumps(source))
+    inspection = inspect_canvas_source(source, definition["selection"])
+    original_source = deepcopy(source)
+    project_root = tmp_path / "project"
+    project_root.mkdir()
+    committer = ProductionStateCommitter(project_root)
+
+    service, registry, artifacts = open_canvas_project(inspection=inspection, definition=definition,
+        data_root=tmp_path, committer=committer, resume=False, ffprobe_executable="/usr/bin/ffprobe")
+    bundle = service.author(registry=registry, asset_artifacts=artifacts)
+    bundle.bootstrap(committer=committer, attempt_id="video-reference-author")
+    loaded = load_production_project(project_root / "project.yaml")
+
+    assert source == original_source
+    assert loaded.registry.schema_version == "2.2"
+    assert {asset.asset_type for asset in loaded.registry.assets} == {AssetType.IMAGE, AssetType.VIDEO}
+    expression = service.direction["shots"][0]["shot"]["preserved_source_expression"]
+    video_materials = [material for part in expression["parts"] if part["type"] == "reference"
+        for material in part["materials"] if material["role"] == "video_reference"]
+    assert [(item["asset_id"], item["asset_sha256"]) for item in video_materials] == [
+        ("motion-guide", next(asset.sha256 for asset in loaded.registry.assets
+                               if asset.asset_id == "motion-guide"))]
+    assert service.direction["shots"][0]["shot"]["intent"].endswith("图片1视频1")
+    assert service.packet["source_snapshot_sha256"] == inspection["source_snapshot_sha256"]
+    assert [reference["slot_id"] for reference in service.packet["units"][0]["references"]] == [
+        "room-slot", "guide-slot"]
+    assert [part["text"] for part in expression["parts"] if part["type"] == "text"] == [
+        "前段：生物遮满镜头。"]
+    assert video_path.exists()
+
+    video_path.unlink()
+    import ai_video.canvas_video_assets as video_assets
+    monkeypatch.setattr(video_assets, "_probe_canvas_mp4",
+        lambda *_: pytest.fail("immutable reopen must not probe the original source file"))
+    reopened, reopened_registry, reopened_artifacts = open_canvas_project(inspection=inspection,
+        definition=definition, data_root=tmp_path, committer=committer)
+    assert reopened.direction == service.direction
+    assert reopened_registry == loaded.registry
+    assert reopened_artifacts == ()
+
+
+@pytest.mark.parametrize("damage", ["wrong_role", "ambiguous_role"])
+def test_video_import_requires_explicit_probe_and_rejects_generation_role_mismatch(
+    tmp_path, monkeypatch, damage
+):
+    from test_canvas_assets import fake_local_video_probe
+
+    fake_local_video_probe(monkeypatch)
+    source, definition, _ = _video_project_data(tmp_path)
+    inspection = inspect_canvas_source(source, definition["selection"])
+    project_root = tmp_path / "project"
+    project_root.mkdir()
+    committer = ProductionStateCommitter(project_root)
+    with pytest.raises(ValueError, match="explicit absolute ffprobe"):
+        open_canvas_project(inspection=inspection, definition=definition, data_root=tmp_path,
+            committer=committer, resume=False)
+    assert list(project_root.iterdir()) == []
+
+    references = definition["direction"]["shots"][0]["generation"]["references"]
+    if damage == "wrong_role":
+        references[1]["role"] = "scene_reference"
+    else:
+        references.append(dict(references[1]))
+    with pytest.raises(AiVideoError, match="existing_video role"):
+        open_canvas_project(inspection=inspection, definition=definition,
+            data_root=tmp_path, committer=committer, resume=False, ffprobe_executable="/usr/bin/ffprobe")
+    assert list(project_root.iterdir()) == []
+
+
+def test_video_and_image_registry_asset_id_collision_is_rejected(tmp_path, monkeypatch):
+    from test_canvas_assets import fake_local_video_probe
+
+    fake_local_video_probe(monkeypatch)
+    source, definition, _ = _video_project_data(tmp_path, video_asset_id="room")
+    project_root = tmp_path / "project"
+    project_root.mkdir()
+    with pytest.raises(ValueError, match="asset label collision"):
+        open_canvas_project(inspection=inspect_canvas_source(source, definition["selection"]),
+            definition=definition, data_root=tmp_path,
+            committer=ProductionStateCommitter(project_root), resume=False,
+            ffprobe_executable="/usr/bin/ffprobe")
+
+
+def test_video_preflight_cli_passes_explicit_probe_without_loading_runtime(tmp_path, monkeypatch, capsys):
+    from scripts.canvas_production import main
+    from test_canvas_assets import fake_local_video_probe
+
+    fake_local_video_probe(monkeypatch)
+    source, definition, _ = _video_project_data(tmp_path)
+    (tmp_path / "source.json").write_text(json.dumps(source))
+    data_path = tmp_path / "project.json"
+    data_path.write_text(json.dumps(definition))
+    project_root = tmp_path / "production"
+    project_root.mkdir()
+    import scripts.canvas_production as canvas_cli
+    monkeypatch.setattr(canvas_cli.importlib, "import_module",
+        lambda *_: pytest.fail("video preflight must not instantiate a runtime factory"))
+
+    result = main(["preflight", "--data", str(data_path), "--project-root", str(project_root),
+        "--runtime", "forbidden:factory", "--ffprobe", "/usr/bin/ffprobe"])
+    report = json.loads(capsys.readouterr().out)
+    assert result == 0
+    assert report["production_acceptance"] == "NOT_EVALUATED"
+    assert any(reference["asset_id"] == "motion-guide" and
+        reference["identity"]["mime_type"] == "video/mp4"
+        for shot in report["shots"] for reference in shot["references"])
+    assert list(project_root.iterdir()) == []
+
+
 @pytest.mark.parametrize("source_shape", ["original", "repeated_and_tray_only"])
 def test_nominal_15_second_example_uses_real_seedance_compiler_without_effects(tmp_path, source_shape):
     from pathlib import Path

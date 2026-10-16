@@ -137,6 +137,9 @@ native WAV 提取仍归 `generated_video_audio`，其 Manifest 能力判断复�
 render replay 重开原始 begin identity，deliver 只读 exact final target，不签 human acceptance。
 `canvas_project_data` / `scripts.canvas_production` 是共用数据入口；sealed input 由
 `production.authoring_input` 验证，经 bootstrap/committer 存入 immutable evidence，reader 重开。
+可选 `videos` 沿既有 `prepare_canvas_video_assets` 导入，ffprobe 由 API/CLI operator 显式注入；
+PNG/MP4 合并保留全部 Registry 记录并拒绝重名，普通视频仅接受 `existing_video` / `video_reference` 职责。
+首次本地测量不接触 Provider；resume 使用 immutable 项目输入，不重测或重新批准源文件。
 `canvas_preflight` 只投影已校验 source/Director/Registry 的全序列参考职责、来源与待提取状态；
 共享 CLI 在 author validation 后输出，resume 沿上述 immutable reader，不实例化 operator runtime。
 它保留语义 owner、实测媒体规格、同字节组及生成/采用时序，不自动去重、选路或判断白模合格。

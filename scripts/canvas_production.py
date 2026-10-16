@@ -21,7 +21,8 @@ def _json(path, root):
     return json.loads(_read_regular_file_nofollow(path, contained_by=root).data)
 
 
-def run(*, data_path, project_root, action, runtime_factory=None, arguments=None):
+def run(*, data_path, project_root, action, runtime_factory=None, arguments=None,
+       ffprobe_executable=None):
     data_path = Path(data_path).absolute()
     root = data_path.parent.resolve(strict=True)
     definition = _json(data_path, root)
@@ -37,7 +38,8 @@ def run(*, data_path, project_root, action, runtime_factory=None, arguments=None
     committer = runtime.pop("committer")
     operator_arguments = runtime.pop("action_arguments", lambda action, service, arguments: arguments)
     service, registry, artifacts = open_canvas_project(inspection=inspection, definition=definition,
-        data_root=root, committer=committer, resume=action not in {"author", "approve", "revise"}, **runtime)
+        data_root=root, committer=committer, resume=action not in {"author", "approve", "revise"},
+        ffprobe_executable=ffprobe_executable, **runtime)
     arguments = {} if arguments is None else arguments
     if action in {"author", "approve", "preflight"}:
         bundle = service.author(registry=registry, asset_artifacts=artifacts)
@@ -85,11 +87,12 @@ def main(argv=None):
     parser.add_argument("--project-root", type=Path, required=True)
     parser.add_argument("--runtime", help="Trusted shared operator module:function; never a story executor")
     parser.add_argument("--arguments", type=Path, help="Ordinary action arguments JSON; credentials are forbidden")
+    parser.add_argument("--ffprobe", type=Path, help="Absolute ffprobe executable for first-time local MP4 imports")
     args = parser.parse_args(argv)
     try:
         arguments = _json(args.arguments.absolute(), args.arguments.absolute().parent) if args.arguments else {}
         result = run(data_path=args.data, project_root=args.project_root, action=args.action,
-            runtime_factory=args.runtime, arguments=arguments)
+            runtime_factory=args.runtime, arguments=arguments, ffprobe_executable=args.ffprobe)
         import inspect
         if inspect.isawaitable(result):
             import asyncio

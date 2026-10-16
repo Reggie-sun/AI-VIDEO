@@ -8,6 +8,8 @@ from ai_video.canvas_authoring import input_hash
 from ai_video.canvas_production import CanvasProductionService
 from ai_video.canvas_source_expression import adapted_canvas_prompt
 from ai_video.canvas_subject import subject_material_references
+from ai_video.production.models import AssetRegistrySnapshot
+from ai_video.production.registry import registry_semantic_sha256
 from ai_video.production.seedance_source_expression import source_parts_sha256
 
 
@@ -16,9 +18,10 @@ def _source_error(unit, field, message):
         user_message=f"Canvas occurrence {unit['occurrence_id']} ({field}): {message}")
 
 
-def prepare_canvas_project_data(*, inspection, definition, data_root):
+def prepare_canvas_project_data(*, inspection, definition, data_root, ffprobe_executable=None):
     """Preserve source text/chips and compute all internal byte identities locally."""
-    if set(definition) - {"schema_version", "source", "selection", "direction", "images", "source_grounding", "reference_aliases"}:
+    if set(definition) - {"schema_version", "source", "selection", "direction", "images", "videos",
+            "source_grounding", "reference_aliases"}:
         raise ValueError("unknown canvas project data fields")
     if definition.get("schema_version") != "canvas-project-data/1":
         raise ValueError("unsupported canvas project data schema")
@@ -35,6 +38,33 @@ def prepare_canvas_project_data(*, inspection, definition, data_root):
     imported = {(s["node_id"], s["resource_id"]): s["asset_id"] for s in selections}
     if len(imported) != len(selections):
         raise ValueError("duplicate canvas image resource selection")
+    video_selections = deepcopy(definition.get("videos", []))
+    if not isinstance(video_selections, list):
+        raise ValueError("canvas videos must be an explicit selection list")
+    if video_selections:
+        if ffprobe_executable is None:
+            raise ValueError("local video import requires an explicit absolute ffprobe executable")
+        for selection in video_selections:
+            if isinstance(selection, dict) and "path" in selection:
+                selection["path"] = root / selection["path"]
+        from ai_video.canvas_video_assets import prepare_canvas_video_assets
+
+        video_registry, video_artifacts = prepare_canvas_video_assets(packet=packet,
+            selections=video_selections, allowed_asset_root=root,
+            ffprobe_executable=ffprobe_executable)
+        image_ids = {asset.asset_id for asset in registry.assets}
+        video_ids = {asset.asset_id for asset in video_registry.assets}
+        if image_ids & video_ids:
+            raise ValueError("canvas image/video asset label collision")
+        combined = AssetRegistrySnapshot(schema_version="2.2", revision_id="0" * 64,
+            content_hash="0" * 64,
+            assets=tuple(sorted((*registry.assets, *video_registry.assets), key=lambda asset: asset.asset_id)))
+        identity = registry_semantic_sha256(combined)
+        registry = combined.model_copy(update={"revision_id": identity, "content_hash": identity})
+        artifacts = (*artifacts, *video_artifacts)
+    imported_videos = {(s["node_id"], s["resource_id"]): s["asset_id"] for s in video_selections}
+    if len(imported_videos) != len(video_selections):
+        raise ValueError("duplicate canvas video resource selection")
     assets = {a.asset_id: a for a in registry.assets}
     nodes = {a["id"]: a for a in packet["assets"]}
     direction = deepcopy(definition["direction"])
@@ -55,15 +85,25 @@ def prepare_canvas_project_data(*, inspection, definition, data_root):
                 ids = [members["main"]["resource_id"], *[a["resource_id"] for a in members["auxiliaries"]]]
             elif node["type"] == "image":
                 ids = [node["data"]["resourceId"]]
+            elif node["type"] == "video":
+                ids = [node["data"].get("resourceId")]
             else:
                 raise _source_error(unit, "source.references", "Audio/video references need an explicit supported route")
             values = []
             for resource in ids:
-                aid = imported.get((node["id"], resource))
+                is_video = node["type"] == "video"
+                aid = (imported_videos if is_video else imported).get((node["id"], resource))
                 if aid is None:
                     raise _source_error(unit, "images", "Missing local bytes for an original reference material")
-                role = {"character_reference": "identity", "scene_reference": "scene",
-                        "approved_keyframe": "first_frame", "terminal_frame": "last_frame"}.get(roles.get(aid))
+                if is_video:
+                    selected = [r for r in generation.get("references", []) if r.get("asset_id") == aid]
+                    if len(selected) != 1 or selected[0].get("role") != "existing_video":
+                        raise _source_error(unit, "generation.references",
+                            "A source video must be selected exactly once with the existing_video role")
+                    role = "video_reference"
+                else:
+                    role = {"character_reference": "identity", "scene_reference": "scene",
+                            "approved_keyframe": "first_frame", "terminal_frame": "last_frame"}.get(roles.get(aid))
                 if role is None or (node["type"] == "subject" and role != "identity"):
                     raise _source_error(unit, "generation.references", "Reference responsibility must be explicit and retain subject identity")
                 values.append({"asset_id": aid, "asset_sha256": assets[aid].sha256, "role": role})
@@ -125,7 +165,8 @@ def prepare_canvas_project_data(*, inspection, definition, data_root):
     return packet, direction, registry, artifacts
 
 
-def open_canvas_project(*, inspection, definition, data_root, committer, resume=True, **runtime):
+def open_canvas_project(*, inspection, definition, data_root, committer, resume=True,
+                        ffprobe_executable=None, **runtime):
     project_path = committer.project_root / "project.yaml"
     if resume and project_path.exists():
         from ai_video.production.project import load_production_project
@@ -144,6 +185,7 @@ def open_canvas_project(*, inspection, definition, data_root, committer, resume=
         registry, artifacts = loaded.registry, ()
     else:
         packet, direction, registry, artifacts = prepare_canvas_project_data(
-            inspection=inspection, definition=definition, data_root=data_root)
+            inspection=inspection, definition=definition, data_root=data_root,
+            ffprobe_executable=ffprobe_executable)
     service = CanvasProductionService(committer=committer, packet=packet, direction=direction, **runtime)
     return service, registry, artifacts

@@ -17,7 +17,7 @@ PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production preflight \
 
 `inspect` 保留完整原始快照、版本指针、引用职责、主体主/辅图、timeline 与重复 occurrence，定位缺项。
 `author` 无 Production 写入，展示原文、适配文本与 unified diff，并附带全序列 `preflight`。
-`preflight` 忽略 `--runtime`，不实例化 Provider、不调用凭据或媒体工具；已存在项目时重开 immutable
+`preflight` 忽略 `--runtime`，不实例化 Provider、不调用凭据或媒体生成工具；已存在项目时重开 immutable
 Director input。它同时列出全部镜头的角色/场景/道具参考职责、exact bytes 与来源、普通状态提取依赖、
 generation/composition order、声音表达及 cut requirements，供首镜付费前审核后镜路线。
 待替换图片明确标为 authoring placeholder，不能作为 accepted 状态。`REGISTERED_BYTES` 只说明
@@ -48,7 +48,26 @@ asset及image事实；不只比较新的receipt标签。后续修订保留原imm
 
 ## Preservation And Orders
 
-显式新增本地视频参考使用 `canvas_video_assets.prepare_canvas_video_assets`，传入已 inspection 的
+项目数据可用可选 `videos` 声明本地白模 MP4，字段复用下述 helper 的 selection：
+`asset_id/node_id/resource_id/path/usage_license/tool`，可选 `input_artifact_ids`。
+源快照必须有对应 video node/resource，Shot 的 `generation.references` 明确填
+`{"role":"existing_video","asset_id":"..."}`；preserved-source 对应 `video_reference`。
+视频与 PNG 一起导入现有 Registry 2.2，asset ID 不得跨类型重名。视频 path 必须在项目数据目录内，
+不接受外链或 symlink。首次导入显式提供 qualified absolute ffprobe，例如：
+
+```bash
+PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_production preflight \
+  --data /absolute/case/project.json --project-root /absolute/case/production \
+  --ffprobe /absolute/qualified/ffprobe
+```
+
+API 使用 `open_canvas_project(..., ffprobe_executable=...)`；工具路径由 operator 注入，
+不放进项目 JSON。该步骤只运行既有 file-only 本地测量，不调用 Provider、上传、凭据或付费 preview。
+已批准项目重开 immutable Registry/authoring evidence，不重新读取或测量原导入目录的 MP4；
+新增或替换素材仍显式 `author` / `revise`，不借 resume 批准改变的 bytes。
+未声明 `videos` 的历史数据保留原有导入和 hash 行为。
+
+显式新增本地视频参考的既有 helper 为 `canvas_video_assets.prepare_canvas_video_assets`，传入已 inspection 的
 packet、`asset_id/node_id/resource_id/path/usage_license/tool`、allowed local root 和 exact absolute
 `ffprobe_executable`；`input_artifact_ids` 只填写项目中真实存在的 artifact ID，外部作者源文件的
 hash 另存 authoring evidence，不能伪装成 Registry dependency。helper 只准备 exact MP4 与
