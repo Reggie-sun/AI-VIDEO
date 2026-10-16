@@ -8,6 +8,100 @@ learning_eligibility: ineligible
 
 Date: 2026-10-17
 
+## Current Real-Input Preparation Checkpoint
+
+用户最新要求“继续生成”，目标仍是通用制作控制能力。已准备两个不同来源的真实本地素材案例，
+各有 H3 Max CN 首帧和多模态参考路线；没有继续《界蚀》失败镜、使用旧未用臂或重铸已消费额度。
+本节取代下方“尚未选定真实素材”的准备状态；下方输入契约源码、旧审计和历史计数继续保留。
+截至本 checkpoint，新视频/图片/音频 Provider POST、上传、paid preview、permit、凭据读取均为0。
+
+### Shared Data Entry Repair
+
+实际准备暴露了入口缺口：已有 `prepare_canvas_video_assets` 与 preserved video 准入，
+但 `canvas-project-data/1` 不接受 `videos`，换项目仍需在数据入口外接线。
+源码 `b0e5f992aaba9e5ce6ee78da405af47b89c4a371` 在既有 `canvas_project_data` /
+`scripts.canvas_production` 内补齐可选视频 selection，复用原 helper 的 contained/no-follow copy、
+file-only ffprobe、Registry 2.2 与不可变来源 receipt；不新增 resolver、Provider、执行链或状态库。
+ffprobe 由 API 的 `ffprobe_executable` 或 CLI `--ffprobe` 显式注入，不允许项目 JSON 指定执行命令。
+PNG/MP4 合并拒绝 asset ID 冲突，源 video 必须恰好一次声明 `existing_video`，
+preserved source 使用 `video_reference`；原文、slot、source snapshot 和旧无视频行为保留。
+immutable resume 沿标准 loader，不重新 probe 或依赖原导入目录的 MP4。
+
+TDD 先复现新数据被拒，再验证 author/bootstrap/标准 loader、CLI preflight 不加载 runtime、
+缺 probe、错/重复角色、跨类型 ID 冲突及原文件移走后的 reopen，聚焦101项通过。
+fake probe/视频只证明工程行为；下述真实 MP4 又经过该入口和 actual compiler。
+当前精确源码范围 Harness 为 `.agent/harness/runs/canvas-video-data-entry-20261017-r2/receipt.json`，
+9项全部 PASS；Canvas workflow suite272项通过，Harness306项、规则不变量44项、runtime Skill边界2项，
+Architecture Gate为0 error/0 warning。源码发布前复核 artifact integrity、freshness、
+complete_completion_proof、scope_worktree_clean、workspace cleanup/stability 全 true。
+源码已 push origin/main，远端核验 SHA `b0e5f992aaba9e5ce6ee78da405af47b89c4a371`。
+`r1` 错误读取了原真实 index 的两份 foreign staged 文件，不覆盖本任务五个 owned paths，
+因此排除在本任务证明外；已改用 exact commit range，未提交或改写 foreign 内容。
+
+Parent Risk Gate 为 `NATIVE_REVIEW_NOT_REQUIRED`：复用已测的本地测量/来源准入和唯一 committer，
+无新授权、凭据、预算或生命周期规则；错误角色、identity/path、冲突和 reopen 失败由既有边界及回归覆盖。
+不存在审查能补足的关键越权/难恢复状态缺口。前期只读盘点、概念适配核对不冒充独立代码最终审查。
+
+### Real Reference Assets And Bounded Duties
+
+证据根 `runs/generic-control-real-media-20261017-001/`。两个案例由 Agent 为有界验证选择，
+不是用户逐字批准的新故事，也不取代《界蚀》原文/required findings。
+新四份 development 项目均用 canonical author/QA/Registry 保存，不含测试占位 PNG，
+未创建 `video_generation` attempt 或 accepted/active 生成素材。
+
+| Case | Exact reference | Duties and limits |
+| --- | --- | --- |
+| 几何人物，5s | PNG `dea3ad07b19df83ab99779f6f061a0bff76b4e85f0d460a6f8e0db5aad05dd05`；MP4 `6d4fcd90b3069b799b351907efdf56810c28d3939986365e7d7865247403fe19`，1280×720/24fps/120帧/5.000s，无音轨 | 单个几何人物：先保持、抬左臂、保留抬臂向右转头/躯干；只改旧 `.blend` 的正交取景11→13.2，所有120帧最差边距7.9%。不测写真人物/多人身份。 |
+| 废墟菱形，15s | 原 PNG `57226872ee1082812accc41bdb6e777c2d59ddb518714876f5366d99a18912f5`；v002 MP4 `077f5d491aee22143b4d8c7a70124352f50b24de97c64363c3703844a3532535`，1280×720/24fps/360帧/15.000s，无音轨 | 原图负责外观/构图/质感；最小白模只负责街道布局、悬浮与低角度小幅前推。原文烟雾和“没有生机”保留为独立 QA，白模不宣称控制烟雾。 |
+
+实际图像与几何核对纠正了两项 authoring 问题。旧人物首帧贴顶，新渲染留边；
+源名 `RightShoulderPivot` 位于角色+X，鼻标记和相机均在-Y，实际抬的是解剖左臂，
+头/躯干则向解剖右侧转。新文本按实际几何标注，不改源动作，也不把旧对象命名或历史 PASS 当解剖证据。
+机甲 v001 的烟 proxy 在实际 MCP 抽帧中像横向固体实体，因此排除；完整 v001 资产与 hash 在
+`references/mecha/diagnostic-v001/` 保留。v002 移除该 proxy，缩小参考职责，原镜烟雾要求未删除。
+
+Parent 显式 project-local `video_analyze`：人物0–4.5s每0.5s抽帧，机甲v002为0/3/6/9/12s，
+另看关键/末帧；probe 分别确认120/360帧与单 scene。原回应在 `robot-source-mcp.json` /
+`mecha-source-mcp.json`，观察边界在 `reference-review.json`；几何全帧检查归 Blender report。
+这证明限定的本地参考结构/采样观察，不是模型质量或 human 完整1.0x验收。
+Chrome MCP 因共享 profile 已运行而无法建立页面，未关闭用户浏览器；播放器功能仍 NOT_EVALUATED。
+
+### Exact Conditional Input Preview And External Decision
+
+四个案例沿新共用数据入口 → canonical author/QA/loader → Planner/Router → actual H3 Max compiler →
+execution binding，均 compiled；共享 CLI 的 immutable preflight 也逐个重开成功。
+`conditional-prepare.json` 明确为假设未来已获有限授权时的纯编译投影，remote/budget flags 不是实际 grant，
+supplier/transport/materialization 均为拒绝副作用的占位注入；未创建 paid preview、预算 reservation、intent 或 permit。
+每个 action/camera/reference 目标由同一 QA inventory 映射实际素材；没有另设目标清单或把绑定当质量 PASS。
+
+- 首帧路线：`content[1].role=first_frame`，`duration=5/15`、`resolution=768P`、balanced，native 不发 ratio。
+  exact mode 互斥白模视频，逐镜记录例外，动作、烟雾、摄影及全部 QA 保留。
+- 参考路线：`content[1].role=reference_image` + `content[2].role=reference_video`，各一份，`ratio=16:9`。
+  人物的 hold/arm/turn/camera 与机甲 hover/camera 逐目标实际绑定白模；首帧仍是 prompt 引导。
+  机甲 smoke 继续明确 prompt guidance，`lifeless` 保留 human proof；不自动通过其含义判断。
+- 白模、nominal生成与采用窗分别为5/5/0–5及15/15/0–15，具体 frame/trim 仍归 ResolvedTimeline。
+  adaptive 输出尺寸需实测，不把请求画幅说成像素/裁切保证。Seed 不受控，参考路线另有职责文本，
+  两路线不是隔离单一变量的因果 A/B，也不证明跨 Provider、多角色/反射、连续镜、完整故事或声音。
+
+可审阅入口 `review.html`，完整源文、QA、native参数、参考绑定和文件 hash 在 `proposal.json`，
+当前 SHA `3713c0346bff23b3df52e653876bf7658e32f508e1938ec6bcc267c4da607a8e`。
+最终 packet 审计还对齐了 QA JSON 与标准 loader 当前选中 policy 的 exact revision/hash；
+未改原生参数、参考或目标 inventory。修正前 packet 留在 `proposal-pre-pointer-reconciliation.json`，
+不作为当前封套。四个当前 development Manifest 分别为人物首帧10/Project3、人物参考6/Project1、
+机甲首帧5/Project1、机甲参考8/Project2；全部 `video_generation` attempt为0。
+已向用户集中提出一个外部决定：先做人物5s R2V最多1次，或两场景各两模式最多4次；均零重抽、
+仅官方H3 Max CN，无新增图片/音频请求。内部单次上界50,000,000 CNY microunits，
+对应新单元总上界50,000,000或200,000,000，仅为 operator 上限，不是报价、账单或余额，
+不挪用历史消费。许可未回复前不执行。取得 exact MP4 后仍显式 MCP 全原要求裁决，
+FAIL/NOT_EVALUATED 停 attempt、UNKNOWN不重试，旧《界蚀》STOP不变。
+
+`record-ai-video-session` 扩展同一 primary record；自动 `distill-ai-video-learning` 为 `no_candidate`。
+两份本地参考、v001/v002修订及工程 fixture 不是独立真实模型实验，不形成通用质量或因果经验，
+没有 pending claim 或 Skill/Policy/Gate 经验采纳。
+foreign 八份文件的 bytes 与原 staged binary diff hash 仍完全一致，仅发布五份源码/契约 owned paths；
+本记录另走 documentation-only exact-range Harness，receipt 为
+`.agent/harness/runs/canvas-video-data-entry-record-20261017-r1/receipt.json`，publication 以其实际结果为准。
+
 ## Current Generic Control Capability
 
 用户明确纠正目标为跨项目、跨镜头通用能力。此前 `473ed99` 的模式/参考预览和 `c8fefdd` 的单镜离线表达修订不足以证明逐目标控制契约；本轮在原共享 owners 内补齐输入声明、编译拒绝和逐目标投影，没有新增故事分支、控制目标清单、选路器、timeline、状态库或 renderer。旧付费单元与失败镜不延续，本轮视频/图片/音频 Provider POST 均0，没有读取凭据或改变真实 Production。
