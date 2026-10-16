@@ -15,17 +15,62 @@ def closed_unsubmitted_evidence(committer, attempt):
     return experience.evidence[-1]
 
 
+def validate_abandoned_baseline(committer, by_id, receipt, shot_id):
+    """Verify a historical abandonment against its own durable attempt evidence."""
+    from ai_video.production.generation_rejection import validate_abandoned_result
+
+    attempt = by_id.get(receipt.attempt_id)
+    state = attempt.video_generation_state if attempt is not None else None
+    if (attempt is None or attempt.status is not StateCommitStatus.FAILED
+            or state is None or state.quality_rejection is None
+            or not state.generation_experiences):
+        raise ValueError("Abandoned baseline has no matching failed attempt.")
+    stored_receipt = committer._reopen_generation_quality_rejection(state.quality_rejection)
+    experience_pointer = state.generation_experiences[-1]
+    experience = committer._reopen_generation_experience(experience_pointer)
+    evidence = next((item for item in experience.evidence
+                     if item.evidence_hash == receipt.evidence_hash), None)
+    request = committer._reopen_video_request(state.request)
+    fetch_pointer = state.local_fetch_receipt or state.fetch_receipt
+    if fetch_pointer is None:
+        raise ValueError("Abandoned baseline has no exact fetched media.")
+    fetch = (committer._reopen_local_video_fetch(fetch_pointer)
+             if state.local_fetch_receipt is not None
+             else committer._reopen_video_fetch(fetch_pointer))
+    histories = committer.read_generation_experiences()
+    history = tuple(item for stored in histories for item in stored.evidence)
+    sources = tuple(source for stored in histories for source in stored.evaluation_sources)
+    if (stored_receipt != receipt
+            or receipt.experience_content_hash != experience_pointer.content_hash
+            or receipt.request_fingerprint != request.request_input_hash
+            or receipt.artifact_sha256 != fetch.artifact_sha256
+            or receipt.artifact_size_bytes != fetch.size_bytes
+            or evidence is None or evidence.attempt_id != attempt.attempt_id
+            or evidence.shot_id != shot_id or evidence.request_hash != request.request_input_hash
+            or evidence.outcome != "media" or evidence.artifact_sha256 != fetch.artifact_sha256):
+        raise ValueError("Abandoned baseline differs from its canonical stored evidence.")
+    validate_abandoned_result(
+        receipt, experience=experience, evidence=evidence,
+        history=history, evaluation_sources=sources,
+    )
+
+
 def current_canvas_attempt(committer, attempts):
     if len(attempts) == 1:
         return attempts[0]
     message = "Multiple attempts require explicit adopted-version/recovery decisions."
     by_id = {attempt.attempt_id: attempt for attempt in attempts}
     predecessors, successors = {}, {}
+    validated_runtime_repairs = {}
     for attempt in attempts:
         state = attempt.video_generation_state
         if state.execution_binding is None:
             raise ValueError(message)
         binding = committer._reopen_generation_execution_binding(state.execution_binding)
+        if binding.inputs.abandoned_result is not None:
+            validate_abandoned_baseline(
+                committer, by_id, binding.inputs.abandoned_result, binding.context.target_shot_id,
+            )
         predecessor_hash = (
             binding.unsubmitted_predecessor_evidence_hash
             or binding.inputs.latest_attempt_hash
@@ -50,9 +95,12 @@ def current_canvas_attempt(committer, attempts):
                         and binding.inputs.abandoned_result != receipt):
                 raise ValueError(message)
         elif (unsubmitted := closed_unsubmitted_evidence(committer, parent)) is not None:
+            repair = binding.decision.runtime_repair
             if (unsubmitted != evidence or evidence.outcome != "not_submitted"
-                    or binding.decision.runtime_repair is not None
-                    or binding.inputs.abandoned_result is not None):
+                    or (repair is not None and (
+                        validated_runtime_repairs.get(repair.content_hash) != repair
+                        or binding.inputs.latest_attempt_hash != repair.evidence_hash
+                    ))):
                 raise ValueError(message)
         else:
             repair = binding.decision.runtime_repair
@@ -141,7 +189,6 @@ def current_canvas_attempt(committer, attempts):
                         != binding.compiled_request.image_bindings
                     or old_binding.compiled_request.media_bindings
                         != binding.compiled_request.media_bindings
-                    or binding.inputs.abandoned_result is not None
                     or not cross_provider_no_effect_retarget_preserves_strategy(
                         old_candidate, target_candidate,
                         old_binding.projection.requirement,
@@ -160,15 +207,20 @@ def current_canvas_attempt(committer, attempts):
                     or evidence.artifact_sha256 is not None
                     or committer._reopen_video_request(parent.video_generation_state.request).request_input_hash
                         != evidence.request_hash
-                    or committer._reopen_runtime_repair_authorization(pointer) != repair
-                    or binding.inputs.abandoned_result is not None):
+                    or committer._reopen_runtime_repair_authorization(pointer) != repair):
                 raise ValueError(message)
-            if cross_provider is not None:
-                # The grant is consumed atomically with the paid submit intent.
-                # Reopening this successor validates that durable lineage; it
-                # must not call the unconsumed-grant consumer a second time.
-                if pointer.consumed != (attempt.paid_provider_state is not None):
-                    raise ValueError(message)
+            consumers = [
+                candidate for candidate in attempts
+                if candidate.paid_provider_state is not None
+                and candidate.video_generation_state.execution_binding is not None
+                and committer._reopen_generation_execution_binding(
+                    candidate.video_generation_state.execution_binding
+                ).decision.runtime_repair == repair
+            ]
+            if (len(consumers) > 1 or pointer.consumed != bool(consumers)
+                    or (attempt.paid_provider_state is not None and attempt not in consumers)):
+                raise ValueError(message)
+            validated_runtime_repairs[repair.content_hash] = repair
         predecessors[attempt.attempt_id] = parent.attempt_id
         successors[parent.attempt_id] = attempt.attempt_id
     leaves = set(by_id) - set(successors)

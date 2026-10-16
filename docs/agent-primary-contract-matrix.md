@@ -628,7 +628,7 @@ Registry/provenance/candidate artifacts、strict reader、recovery与activation/
 
 `metaso_h3.py` 显式提供 METASO `MiniMax-H3` Ref2VA，复用既有 request/receipt、paid guard、Service/committer 和 public-IP pinned download；唯一默认 credential source 为环境 `METASO_API_KEY`。Exact reference bytes、profile/context flag、egress 与 one-use permit 绑定；禁止自动选路、POST retry、activation 或持久化 key/signed URL。公开 contract 与 focused tests 见 [METASO H3 Provider](metaso-h3-provider.md)，changed paths 路由 `production_video_provider`。
 
-`minimax_h3_max.py` 显式提供官方 `api.minimax.io` 的 `MiniMax-H3-Max` 多参考路径，复用上述 reference/paid/committer/download owner；独立封存 model、origin、5–15秒、480P/768P、prompt expansion 和 operator bound，不发送 METASO context flag、不复用其凭据或 permit。原文编译必须使用 allowlisted `minimax-h3-max-preserved-source-v1`，不将不同模型的旧输出当 accepted source。供应凭据仅显式注入；入口、限制和测试见 [Official MiniMax H3 Max Provider](minimax-h3-max-provider.md)。
+`minimax_h3_max.py` 显式提供官方 `MiniMax-H3-Max` 多参考路径：默认国际站 `api.minimax.io`，sealed `api_region="cn"` 选择国内站 `api.minimax.cn` 及独立 credential reference，禁止自动跨站 fallback，旧 profile hash 保持。复用上述 reference/paid/committer/download owner；独立封存 model、origin、5–15秒、480P/768P、prompt expansion 和 operator bound，不发送 METASO context flag、不复用其凭据或 permit。原文编译必须使用 allowlisted `minimax-h3-max-preserved-source-v1`，不将不同模型的旧输出当 accepted source。供应凭据仅显式注入；入口、限制和测试见 [Official MiniMax H3 Max Provider](minimax-h3-max-provider.md)。
 
 本文件是修改代码前使用的契约路由索引。它回答四个问题：谁拥有该行为、哪些不变量必须保持、哪些替代路径禁止出现，以及最小相关验证是什么。
 

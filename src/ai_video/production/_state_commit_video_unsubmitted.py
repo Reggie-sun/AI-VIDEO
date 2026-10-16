@@ -84,6 +84,52 @@ def is_verified_closed_unsubmitted_video_attempt(committer, *, manifest, attempt
     return True
 
 
+def require_verified_unsubmitted_repair_chain(
+    committer, *, manifest, baseline_attempt, intermediates, successor_binding,
+) -> None:
+    """Allow only a sealed zero-effect chain after the exact repair baseline."""
+    repair = successor_binding.decision.runtime_repair
+    shot_id = successor_binding.context.target_shot_id
+    task_id = successor_binding.inputs.limits.task_id
+    if (repair is None or repair.attempt_id != baseline_attempt.attempt_id
+            or successor_binding.inputs.latest_attempt_hash != repair.evidence_hash):
+        raise _state_invalid("Closed unsubmitted chain differs from the exact repair baseline.")
+
+    baseline_state = baseline_attempt.video_generation_state
+    baseline_binding = (committer._reopen_generation_execution_binding(baseline_state.execution_binding)
+                        if baseline_state is not None and baseline_state.execution_binding is not None else None)
+    if (baseline_binding is None or baseline_binding.context.target_shot_id != shot_id
+            or baseline_binding.inputs.limits.task_id != task_id):
+        raise _state_invalid("Runtime repair baseline differs from the successor Shot or task.")
+
+    previous_evidence_hash = repair.evidence_hash
+    for index, attempt in enumerate(intermediates):
+        if not is_verified_closed_unsubmitted_video_attempt(
+                committer, manifest=manifest, attempt=attempt):
+            raise _state_invalid("Runtime repair chain contains an unverified or open attempt.")
+        state = attempt.video_generation_state
+        binding = committer._reopen_generation_execution_binding(state.execution_binding)
+        experience = committer._reopen_generation_experience(state.generation_experiences[-1])
+        evidence = experience.evidence[-1]
+        expected_parent = None if index == 0 else previous_evidence_hash
+        if (
+            binding.context.target_shot_id != shot_id
+            or binding.inputs.limits.task_id != task_id
+            or binding.inputs.latest_attempt_hash != repair.evidence_hash
+            or binding.decision.runtime_repair != repair
+            or binding.unsubmitted_predecessor_evidence_hash != expected_parent
+            or evidence.outcome != "not_submitted"
+            or evidence.artifact_sha256 is not None
+            or evidence.shot_id != shot_id
+            or evidence.task_id != task_id
+        ):
+            raise _state_invalid("Runtime repair chain skips or changes its exact closed predecessor.")
+        previous_evidence_hash = evidence.evidence_hash
+
+    if successor_binding.unsubmitted_predecessor_evidence_hash != previous_evidence_hash:
+        raise _state_invalid("Paid recovery successor omits its immediate closed predecessor.")
+
+
 def require_unsubmitted_predecessor_lineage(
     committer, *, manifest, binding, current_generation_id: str | None = None,
 ) -> None:

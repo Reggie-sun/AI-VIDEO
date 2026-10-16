@@ -7,7 +7,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Literal
 
-from pydantic import ConfigDict, Field
+from pydantic import ConfigDict, Field, model_serializer
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
@@ -19,6 +19,7 @@ from ai_video.production.models import StrictModel
 from ai_video.production.video import ProviderProfilePointer, VideoFlexibleOutputRequirement
 
 MINIMAX_H3_MAX_ORIGIN = "https://api.minimax.io"
+MINIMAX_H3_MAX_CN_ORIGIN = "https://api.minimax.cn"
 MINIMAX_H3_MAX_MODEL_ID = "MiniMax-H3-Max"
 MINIMAX_H3_MAX_PROVIDER_NAME = "minimax_h3_max"
 _PROFILE_VERSION = "h3-max-reference-v1"
@@ -39,6 +40,14 @@ class MiniMaxH3MaxProfile(StrictModel):
     prompt_expansion_mode: Literal["balanced"] = "balanced"
     currency: Literal["CNY", "USD"]
     cost_upper_bound_microunits: int = Field(strict=True, gt=0)
+    api_region: Literal["international", "cn"] = "international"
+
+    @model_serializer(mode="wrap")
+    def _legacy_international_profile(self, handler):
+        data = handler(self)
+        if self.api_region == "international":
+            data.pop("api_region", None)
+        return data
 
     def pointer(self) -> ProviderProfilePointer:
         digest = canonical_sha256(self.model_dump(mode="json"))
@@ -96,6 +105,11 @@ class MiniMaxH3MaxVideoProvider(MetasoH3VideoProvider):
             raise TypeError("MiniMax H3 Max requires an injected credential supplier.")
         if not callable(reference_resolver):
             raise TypeError("MiniMax H3 Max requires a verified reference resolver.")
+        self.origin, self.secret_reference_id = {
+            "international": (MINIMAX_H3_MAX_ORIGIN, _SECRET_REFERENCE_ID),
+            "cn": (MINIMAX_H3_MAX_CN_ORIGIN, "MINIMAX_H3_CN_API_KEY"),
+        }[validated_profile.api_region]
+        self.base_url = self.origin
         super().__init__(profile=validated_profile, transport=transport,
                          reference_resolver=reference_resolver, credential=credential, now=now)
 
@@ -120,6 +134,7 @@ __all__ = [
     "HttpxMiniMaxH3MaxTransport",
     "MINIMAX_H3_MAX_MODEL_ID",
     "MINIMAX_H3_MAX_ORIGIN",
+    "MINIMAX_H3_MAX_CN_ORIGIN",
     "MINIMAX_H3_MAX_PROVIDER_NAME",
     "MiniMaxH3MaxProfile",
     "MiniMaxH3MaxVideoProvider",

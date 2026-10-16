@@ -618,6 +618,7 @@ def _require_latest_same_shot_attempt(
 ):
     history = []
     successors = []
+    same_shot = []
     for attempt in manifest.attempts:
         state = attempt.video_generation_state
         if state is None:
@@ -626,6 +627,7 @@ def _require_latest_same_shot_attempt(
         scope = request.activation_scope
         if scope is None or scope.request.target_shot_id != shot_id:
             continue
+        same_shot.append(attempt)
         if (successor_binding is not None
                 and state.execution_binding is not None
                 and state.execution_binding.binding_hash == successor_binding.binding_hash):
@@ -635,8 +637,30 @@ def _require_latest_same_shot_attempt(
                     or state.latest_observation is not None
                     or state.fetch_receipt is not None):
                 raise _state_invalid("Paid recovery successor is no longer an unsubmitted task.")
-            successors.append(attempt.attempt_id)
+            successors.append(attempt)
         else:
-            history.append(attempt.attempt_id)
-    if len(successors) > 1 or not history or history[-1] != attempt_id:
+            history.append(attempt)
+    if len(successors) > 1 or not history:
         raise _state_invalid("Paid recovery requires the latest attempt for the same Shot.")
+    if successor_binding is None:
+        if history[-1].attempt_id != attempt_id:
+            raise _state_invalid("Paid recovery requires the latest attempt for the same Shot.")
+        return
+    if (len(successors) != 1 or not same_shot
+            or same_shot[-1].attempt_id != successors[0].attempt_id
+            or attempt_id not in {item.attempt_id for item in history}):
+        raise _state_invalid("Paid recovery requires the latest attempt for the same Shot.")
+    baseline_index = next(index for index, item in enumerate(history)
+                          if item.attempt_id == attempt_id)
+    intermediates = history[baseline_index + 1:]
+    if not intermediates:
+        if history[-1].attempt_id != attempt_id:
+            raise _state_invalid("Paid recovery requires the latest attempt for the same Shot.")
+        return
+    from ai_video.production._state_commit_video_unsubmitted import (
+        require_verified_unsubmitted_repair_chain,
+    )
+    require_verified_unsubmitted_repair_chain(
+        self, manifest=manifest, baseline_attempt=history[baseline_index],
+        intermediates=intermediates, successor_binding=successor_binding,
+    )

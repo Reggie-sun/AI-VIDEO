@@ -37,7 +37,7 @@ from test_production_minimax_h3 import (
 
 
 def _setup(*, currency="CNY", resolution="768P", aspect_ratio="16:9",
-           duration=5, transport=None):
+           duration=5, transport=None, api_region=None):
     raw = {"s01-whitebox": b"exact verified reference image bytes"}
     image = VideoImageReferenceBinding(
         role="reference",
@@ -54,6 +54,7 @@ def _setup(*, currency="CNY", resolution="768P", aspect_ratio="16:9",
         aspect_ratio=aspect_ratio,
         currency=currency,
         cost_upper_bound_microunits=2_000_000,
+        **({"api_region": api_region} if api_region is not None else {}),
     )
     transport = transport or _FakeTransport(submit_response=_submit_response())
     provider = MiniMaxH3MaxVideoProvider(
@@ -93,7 +94,7 @@ def _paid(provider, resolved):
         egress_items=provider.egress_items(resolved),
         retention_mode="provider_standard",
         provider_policy_snapshot_id="minimax-h3-max-test",
-        secret_reference=SecretReference(kind="secret_store", reference_id="MINIMAX_H3_API_KEY"),
+        secret_reference=SecretReference(kind="secret_store", reference_id=provider.secret_reference_id),
     )
     authorization = _paid_authorization(paid_preview)
     permit = _real_permit(build_video_paid_permit_binding(
@@ -135,6 +136,39 @@ def test_official_h3_max_exact_reference_payload_and_paid_submit():
     with pytest.raises(AiVideoError):
         provider.submit(resolved, video_preview, paid_preview, authorization, permit)
     assert len(transport.calls) == 1
+
+
+def test_cn_region_is_explicit_sealed_and_uses_its_own_credential_reference():
+    global_provider, global_request, global_profile, _, _ = _setup()
+    provider, request, profile, transport, _ = _setup(api_region="cn")
+    legacy = global_profile.model_dump(mode="json")
+    assert "api_region" not in legacy
+    from ai_video.production.hashing import canonical_sha256
+    assert global_profile.pointer().profile_sha256 == canonical_sha256(legacy)
+    published = MiniMaxH3MaxProfile(duration=5, resolution="768P", aspect_ratio="9:16",
+        currency="CNY", cost_upper_bound_microunits=50_000_000)
+    assert published.pointer().profile_sha256 == "f2975240788894b02b1e58bba222d09a95e57f91806b15378b82a1dde79443a8"
+    assert profile.pointer().profile_sha256 != global_profile.pointer().profile_sha256
+    assert profile.model_dump(mode="json")["api_region"] == "cn"
+    assert provider.native_payload(request) == global_provider.native_payload(global_request)
+    assert global_provider.origin == "https://api.minimax.io"
+    assert provider.origin == provider.base_url == "https://api.minimax.cn"
+    assert provider.secret_reference_id == "MINIMAX_H3_CN_API_KEY"
+    preview, paid, authorization, permit = _paid(provider, request)
+    wrong = paid.model_dump(mode="python", exclude={"preview_fingerprint"})
+    wrong["secret_reference"] = SecretReference(kind="secret_store", reference_id="MINIMAX_H3_API_KEY")
+    wrong = PaidProviderCallPreview.create(**wrong)
+    wrong_authorization = _paid_authorization(wrong)
+    wrong_permit = _real_permit(build_video_paid_permit_binding(
+        request, preview, wrong, wrong_authorization))
+    with pytest.raises(AiVideoError):
+        provider.submit(request, preview, wrong, wrong_authorization, wrong_permit)
+    assert len(transport.calls) == 0
+    provider.submit(request, preview, paid, authorization, permit)
+    assert transport.calls[0].url == "https://api.minimax.cn/v2/video_generation"
+    assert len(transport.calls) == 1
+    with pytest.raises(ValueError):
+        MiniMaxH3MaxProfile.model_validate({**legacy, "api_region": "https://untrusted.invalid"})
 
 
 @pytest.mark.parametrize(
@@ -329,7 +363,8 @@ def test_reference_video_and_audio_are_bound_as_exact_official_content_items():
         assert base64.b64decode(uri.split(",", 1)[1]) == raw[binding.asset_id]
 
 
-def test_status_checks_optional_h3_max_model_and_output_echoes():
+@pytest.mark.parametrize("api_region", ["international", "cn"])
+def test_status_checks_optional_h3_max_model_and_output_echoes(api_region):
     transport = _FakeTransport(
         submit_response=_submit_response(),
         query_response=MiniMaxH3TransportResponse(
@@ -338,7 +373,7 @@ def test_status_checks_optional_h3_max_model_and_output_echoes():
             }}).encode(),
         ),
     )
-    provider, resolved, _, _, _ = _setup(transport=transport)
+    provider, resolved, _, _, _ = _setup(transport=transport, api_region=api_region)
     video_preview, paid_preview, authorization, permit = _paid(provider, resolved)
     provider.submit(resolved, video_preview, paid_preview, authorization, permit)
     receipt = _paid_submit_receipt(resolved, paid_preview)
@@ -347,7 +382,7 @@ def test_status_checks_optional_h3_max_model_and_output_echoes():
     with pytest.raises(AiVideoError):
         provider.get_status(submission, receipt)
     assert transport.calls[-1].url == (
-        "https://api.minimax.io/v2/query/video_generation/task-h3-1"
+        provider.origin + "/v2/query/video_generation/task-h3-1"
     )
     transport.query_response = MiniMaxH3TransportResponse(
         200, {}, json.dumps({"task": {
@@ -375,7 +410,8 @@ def test_status_checks_optional_h3_max_model_and_output_echoes():
     assert provider.get_status(submission, receipt).state.value == "running"
 
 
-def test_fetch_requeries_h3_max_identity_and_never_sends_bearer_to_result_host():
+@pytest.mark.parametrize("api_region", ["international", "cn"])
+def test_fetch_requeries_h3_max_identity_and_never_sends_bearer_to_result_host(api_region):
     from io import BytesIO
 
     signed_url = "https://cdn.example.org/out.mp4?token=short-lived"
@@ -390,7 +426,7 @@ def test_fetch_requeries_h3_max_identity_and_never_sends_bearer_to_result_host()
         query_response=query,
         download_response=_download_response(body=b"\x00\x00\x00\x18ftypisom" + b"\x00" * 32),
     )
-    provider, resolved, _, _, _ = _setup(transport=transport)
+    provider, resolved, _, _, _ = _setup(transport=transport, api_region=api_region)
     video_preview, paid_preview, authorization, permit = _paid(provider, resolved)
     provider.submit(resolved, video_preview, paid_preview, authorization, permit)
     receipt = _paid_submit_receipt(resolved, paid_preview)
@@ -400,7 +436,7 @@ def test_fetch_requeries_h3_max_identity_and_never_sends_bearer_to_result_host()
     fetched = provider.fetch(submission, receipt, observation, sink)
 
     assert len(transport.calls) == 3
-    assert all(call.url.startswith(MINIMAX_H3_MAX_ORIGIN) for call in transport.calls)
+    assert all(call.url.startswith(provider.origin) for call in transport.calls)
     assert transport.stream_calls[0].url == signed_url
     assert dict(transport.stream_calls[0].headers) == {"accept": "video/mp4"}
     assert signed_url not in repr(fetched) + repr(transport.stream_calls[0])
@@ -471,7 +507,11 @@ def test_first_last_frame_mode_serializes_frame_roles_and_omits_ratio():
     assert payload["extra"] == {"prompt_expansion_mode": "balanced"}
 
 
-def test_canonical_video_generation_service_uses_paid_committer_path(tmp_path, monkeypatch):
+@pytest.mark.parametrize("api_region,origin", [
+    ("international", "https://api.minimax.io"),
+    ("cn", "https://api.minimax.cn"),
+])
+def test_canonical_video_generation_service_uses_paid_committer_path(tmp_path, monkeypatch, api_region, origin):
     from production_remote_generation_factory import prepare_remote_generation
     from ai_video.production.project import load_production_project
     from ai_video.production.state_commit import ProductionStateCommitter
@@ -481,7 +521,7 @@ def test_canonical_video_generation_service_uses_paid_committer_path(tmp_path, m
     output_need = factory.OutputNeed
     monkeypatch.setattr(factory, "OutputNeed", lambda **kwargs: output_need(
         **{**kwargs, "timing_mode": "content_driven"}))
-    provider, resolved, _, transport, raw = _setup()
+    provider, resolved, _, transport, raw = _setup(api_region=api_region)
     source_request = resolved.activation_scope.request
     prepared = prepare_remote_generation(
         root=tmp_path,
@@ -493,7 +533,7 @@ def test_canonical_video_generation_service_uses_paid_committer_path(tmp_path, m
     )
     resolved = prepared.resolved_request
     video_preview, paid_preview, authorization, _ = _paid(provider, resolved)
-    assert video_preview.destination == MINIMAX_H3_MAX_ORIGIN
+    assert video_preview.destination == origin
     committer = ProductionStateCommitter(
         tmp_path,
         paid_provider_authorizer=lambda _: authorization,
@@ -513,7 +553,7 @@ def test_canonical_video_generation_service_uses_paid_committer_path(tmp_path, m
 
     assert submission.resolved_generation_hash == resolved.resolved_generation_hash
     assert len(transport.calls) == 1
-    assert transport.calls[0].url == "https://api.minimax.io/v2/video_generation"
+    assert transport.calls[0].url == origin + "/v2/video_generation"
     loaded = load_production_project(tmp_path / "project.yaml")
     assert loaded.manifest.attempts[-1].video_generation_state is not None
 

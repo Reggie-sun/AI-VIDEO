@@ -55,8 +55,8 @@ def test_unsubmitted_intermediate_preserves_submitted_baseline_and_direct_lineag
     )
     from test_production_video import _paid_preview, _paid_authorization
 
-    service, provider, limits, old, submitted, intervention = failed_canvas(tmp_path)
-    close_failure(service, old)
+    service, provider, limits, old, submitted, intervention = failed_canvas(tmp_path, mixed=True)
+    close_failure(service, old, mixed=True)
 
     middle = service.start_repair(limits=limits, interventions=(intervention,))
     middle_experience = record_attempt_evaluation(
@@ -80,6 +80,7 @@ def test_unsubmitted_intermediate_preserves_submitted_baseline_and_direct_lineag
     assert prepared.execution_binding is not None
     assert prepared.inputs.experiences == history
     assert prepared.inputs.latest_attempt_hash == submitted.evidence[-1].evidence_hash
+    assert prepared.inputs.abandoned_result.attempt_id == old.attempt_id
     binding = prepared.execution_binding
     assert binding.unsubmitted_predecessor_evidence_hash == middle_evidence.evidence_hash
 
@@ -617,16 +618,80 @@ def test_accepted_failed_t2v_retarget_consumes_exact_grant_on_i2v_submit(tmp_pat
             failed_observation_fingerprint=observation.observation_fingerprint, target_scope_hash=replacement.scope_hash))
     pointer = service.committer.record_runtime_repair_authorization(**args)
     assert service.committer.record_runtime_repair_authorization(**args) == pointer
+    intermediate = service.start_repair(limits=limits)
+    assert intermediate.next_action == "submit"
+    from ai_video.production._state_commit_video_runtime_repair import (
+        _require_latest_same_shot_attempt,
+    )
+    intermediate_state = service._service(intermediate.attempt_id)._state(intermediate.attempt_id)[1]
+    _require_latest_same_shot_attempt(
+        service.committer, service._load().manifest, old.attempt_id, "one",
+        successor_binding=service.committer._reopen_generation_execution_binding(
+            intermediate_state.execution_binding
+        ),
+    )
+    record_attempt_evaluation(committer=service.committer, attempt_id=intermediate.attempt_id)
+    service.committer.close_unsubmitted_video_generation(
+        attempt_id=intermediate.attempt_id,
+        expected_manifest_revision=service._load().manifest.manifest_revision,
+        actor=ActorIdentity(actor_id="canvas-test", actor_kind="codex"),
+        reason="superseded_before_submit",
+    )
+    closed = next(a for a in service._load().manifest.attempts
+                  if a.attempt_id == intermediate.attempt_id)
+    assert closed.paid_provider_state is None
+    assert provider.call_counts.submit == 1
     current = service.start_repair(limits=limits)
     assert hasattr(current, "next_action"), current.decision.rationale
-    assert current.next_action == "submit" and current.attempt_id != old.attempt_id
+    assert current.next_action == "submit" and current.attempt_id not in {old.attempt_id, intermediate.attempt_id}
     assert service.start_repair(limits=limits) == current
     history = service.committer.read_generation_experiences()
+    from ai_video.production._state_commit_video_unsubmitted import (
+        require_verified_unsubmitted_repair_chain,
+    )
+    from ai_video.errors import AiVideoError
+    from ai_video.production.generation_execution import GenerationDecisionExecutionBinding
+    from ai_video.production.models import StateCommitStatus
+    manifest = service._load().manifest
+    baseline = next(a for a in manifest.attempts if a.attempt_id == old.attempt_id)
+    current_attempt = next(a for a in manifest.attempts if a.attempt_id == current.attempt_id)
+    successor_binding = service.committer._reopen_generation_execution_binding(
+        current_attempt.video_generation_state.execution_binding
+    )
+    closed = next(a for a in manifest.attempts if a.attempt_id == intermediate.attempt_id)
+    with pytest.raises(AiVideoError):
+        _require_latest_same_shot_attempt(service.committer, manifest, old.attempt_id, "one")
+
+    def reject_chain(*, intermediates=(closed,), binding=successor_binding):
+        with pytest.raises(AiVideoError):
+            require_verified_unsubmitted_repair_chain(
+                service.committer, manifest=manifest, baseline_attempt=baseline,
+                intermediates=intermediates, successor_binding=binding,
+            )
+
+    reject_chain(intermediates=(closed.model_copy(update={"error_message": "unknown closure"}),))
+    reject_chain(intermediates=(closed.model_copy(update={
+        "status": StateCommitStatus.RUNNING, "finished_at": None,
+        "error_code": None, "error_message": None,
+    }),))
+    reject_chain(intermediates=(closed, closed.model_copy(update={"attempt_id": "forked-unsubmitted"})))
+    reject_chain(binding=GenerationDecisionExecutionBinding.create(
+        projection=successor_binding.projection, context=successor_binding.context,
+        policy=successor_binding.policy, lifecycle=successor_binding.lifecycle,
+        inputs=successor_binding.inputs, decision=successor_binding.decision,
+        compiled_request=successor_binding.compiled_request,
+        continuity_routing=successor_binding.continuity_routing,
+        unsubmitted_predecessor_evidence_hash=None,
+    ))
     provider._scenario = replace(provider._scenario, external_effect_id="fixture-image-successor-effect")
     submit(current, "fixture-new-reservation")
     failed = next(a for a in service._load().manifest.attempts if a.attempt_id == old.attempt_id)
     assert failed.video_generation_state.runtime_repairs[0].consumed
     assert provider.call_counts.submit == 2
-    assert service.start_repair(limits=limits).next_action == "poll"
+    reopened = CanvasProductionService(committer=service.committer, packet=service.packet,
+        direction=service.direction, targets=service.targets,
+        routing_policy=service.routing_policy, decision_policy=service.decision_policy)
+    assert reopened.position().next_action == "poll"
+    reopened.execute(action="poll")
     assert provider.call_counts.submit == 2
     assert service.committer.read_generation_experiences() == history

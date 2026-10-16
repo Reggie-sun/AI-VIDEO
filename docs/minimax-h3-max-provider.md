@@ -11,7 +11,11 @@
 
 依据 [MiniMax 官方创建接口](https://platform.minimax.io/docs/api-reference/video-generation-v2-create)
 与 [查询接口](https://platform.minimax.io/docs/api-reference/video-generation-v2-query)：
-直连 `https://api.minimax.io`，创建 `POST /v2/video_generation`，查询
+国际站直连 `https://api.minimax.io`；国内站按
+[国内官方文档](https://platform.minimax.cn/docs/api-reference/video-generation-v2-create)
+显式选择 sealed profile 的 `api_region="cn"`，只访问 `https://api.minimax.cn`。
+未指定 region 的旧 profile 保持国际站及原 hash，不因 401 自动切换站点。
+两站均创建 `POST /v2/video_generation`，查询
 `GET /v2/query/video_generation/{task_id}`。模型字段必须为 `MiniMax-H3-Max`。
 支持 5–15 秒、480P/768P；不发送 4 秒或 2K。参考模式允许图片、视频及音频，
 首尾帧模式与参考模式互斥；白模必须实际作为视频参考绑定，不能只写在 prompt 中。
@@ -29,12 +33,17 @@ unsubmitted，保留其历史与计数，不能重分类已提交或未知的任
 
 适配器必须由 operator 注入 exact credential supplier；公共封存引用为
 `MINIMAX_H3_API_KEY`，它是引用标识，不要求用户私有存储使用同名变量。
+国内站引用为 `MINIMAX_H3_CN_API_KEY`；operator 先核对用户实际创建 Key 的站点，
+再明确绑定对应 supplier/profile/origin，禁止自动跨站尝试同一凭据。
 供应器只读取用户明确指定的私有来源，不自行搜索 `.env`、其他变量、Secret Service 或旧 key，
 不把 key 内容、hash、header、签名结果 URL 写入输出、argv、日志或 receipt。
 项目级 `.env` 读取只在用户明确指定该文件时由 task operator 完成，不是适配器默认能力。
 
 每次提交绑定 exact native preview、完整图片/视频/音频 bytes identity、origin、model、
 profile、预算 reservation、egress、durable intent 与 one-use permit。
+付费 preview 的 `request_fingerprint` 使用 resolved request 的
+`resolved_generation_hash`；先以 `build_video_paid_permit_binding` 核验一致性，不能填入
+原始 `request_input_hash` 后才靠真实提交入口发现错误。
 currency 与 monetary fields 只表示 operator 预配置的内部 upper bound，不是官方价格、
 汇率换算、真实消费或账户余额。沿既有 ledger 保留历史消费，不新建账本避开计数。
 无自动重抽、fallback 或 redirect；unknown 停止。查询与下载必须继续绑定原 task；
