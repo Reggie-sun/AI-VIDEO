@@ -144,6 +144,11 @@ render replay 重开原始 begin identity，deliver 只读 exact final target，
 semantic evidence/native index、控制限制及原 QA 要求；参数复用 selected adapter 的实际 payload builder，
 不物化 URL、lookup credential、调用 transport 或 mint permit。CLI 不序列化运行时 Provider。
 它不拥有 Provider admission、paid permission 或 QA acceptance；未产生状态不伪装为真实输入。
+逐目标输入声明由原 `RequirementExpression.input_control` 独占，引用角色/id/SHA/owner 与职责、
+原生片段和 scope 沿原 recipe/compiler 校验；启用后须覆盖全部 raw 非 diagnostic 目标。
+`generation_input_control` 是同一 compiler 的纯校验 helper，preview 复用问题码，不另建目标、选路或验收 owner。
+`generation_feedback._expressions` 保留新映射的 authored native fragments；legacy bytes/hash/投影保持。
+Compiler unsupported 仍保留候选目标与输入失败证据，不能冒充 actual route；普通视频不自动取得白模职责。
 `canvas_handoff` 只准备 accepted source 的实测普通中间帧及 selected-state MCP Gate；
 中间交接必须有 approved `state_reference`，缺计划/缺证均阻断后镜，不能制造 terminal/semantic acceptance。
 `canvas_target_gate` 只投影/核验同一后镜的 selected generation QA rows 与原 generation findings，

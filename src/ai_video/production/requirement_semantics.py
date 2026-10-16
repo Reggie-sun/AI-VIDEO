@@ -6,6 +6,7 @@ from typing import Literal
 from pydantic import Field, model_serializer, model_validator
 
 from ai_video.production.artifact_contracts import StrictModel
+from ai_video.production.generation_input_control import GenerationInputControl
 
 SEMANTICS_VERSION = "requirement-semantics/1"
 SHA256 = r"^[0-9a-f]{64}$"
@@ -120,6 +121,7 @@ class RequirementExpressionFields(StrictModel):
     production_owner: str = Field(min_length=1)
     semantics: RequirementSemantics | None = None
     measurement_spec: EventTimeWindow | None = None
+    input_control: GenerationInputControl | None = None
 
     @model_validator(mode="after")
     def _semantic_shape(self):
@@ -131,12 +133,25 @@ class RequirementExpressionFields(StrictModel):
             if (self.tolerance != self.measurement_spec.tolerance_text
                     or self.measurement != self.measurement_spec.measurement_text):
                 raise ValueError("time predicate prose must match its canonical structured representation")
+        if self.input_control is not None:
+            if self.stage != "raw_generation" or self.level == "diagnostic":
+                raise ValueError("input control mapping requires a raw generation objective")
+            mechanism = self.input_control.mechanism
+            if mechanism in {"prompt_guidance", "reference_guidance"}:
+                if not self.native_text or any(not text.strip() for text in self.native_text):
+                    raise ValueError("guidance input control requires explicit native fragments")
+                if not any(path.startswith("generation_intent.") for path in self.intent_paths):
+                    raise ValueError("guidance input control requires authored generation intent")
+            if mechanism == "native_output" and (not self.intent_paths or any(
+                not path.startswith("output_need.") and path != "audio_need" for path in self.intent_paths
+            )):
+                raise ValueError("native output control requires output/audio paths")
         return self
 
     @model_serializer(mode="wrap")
     def _preserve_legacy_fields(self, handler):
         data = handler(self)
-        for name in ("semantics", "measurement_spec"):
+        for name in ("semantics", "measurement_spec", "input_control"):
             if getattr(self, name) is None:
                 data.pop(name, None)
         return data
@@ -151,6 +166,13 @@ def validate_semantic_inventory(payload, required_ids):
             for item in inventory
         ):
             raise ValueError("semantic metadata requires the selected QA marker")
+        if any(isinstance(item, Mapping) and item.get("input_control") is not None for item in inventory):
+            rules = tuple(RequirementExpressionFields.model_validate(item) for item in inventory)
+            ids = tuple(rule.requirement_id for rule in rules)
+            if len(set(ids)) != len(ids) or {
+                rule.requirement_id for rule in rules if rule.level == "acceptance"
+            } != set(required_ids):
+                raise ValueError("input-control QA must preserve complete unique requirement coverage")
         return ()
     if marker != SEMANTICS_VERSION:
         raise ValueError("unknown requirement semantics version")

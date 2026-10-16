@@ -130,6 +130,47 @@ Seedance 官方允许在 reference 模式的原文中指定某图片为首/尾�
 实测参考长度、标称生成长度与采用窗口分别说明 hold/padding/动作落点，最终 trim/frame/sample/timing
 仍归 `ResolvedTimeline`。参数/绑定正确只证明输入，不证明模型服从或验收。
 
+### Per-Objective Input Contract
+
+逐目标的输入映射归已有 selected QA profile 的 `generation_requirements`，不另建目标清单。
+每条 `RequirementExpression` 可选 `input_control`（`generation-input-control/1`），沿原
+`_expressions` → `GenerationRecipe` → common compiler → execution binding 使用同一份封存数据。
+`observable`、`proof`、`measurement`、`tolerance` 及 required IDs 仍由原 QA owner 决定；
+`EventTimeWindow` 是输出测量条件，不会自动变成提示词或剪辑时间。
+
+例：动作时限条目沿 `generation_intent.subject_action.progression`，保留作者已经写入 intent/源文的
+确切 `native_text`，另声明 `input_control: {"mechanism":"prompt_guidance"}`。
+它不会再被整段 progression 覆盖，也不会自动把验收时限追加到原文。参考条目则声明
+`mechanism=reference_guidance` 及 `references`：每份 duty 包含 `asset_id`、`asset_sha256`、
+现有 semantic `role`、`purpose` 和确切 `scope_text`；必要时包含 `canonical_owner_id`。
+先由原 Planner/Router 选择 registered variant，再核对 actual native index 与 scope 原句中的素材指代；
+字面匹配只证明表达存在，不证明自然语言语义、人物或事件一定正确。
+
+| Mechanism | Input Obligation | Meaning And Limit |
+| --- | --- | --- |
+| `prompt_guidance` | 独立 `native_text` 与 generation intent 路径 | 原生文本引导，无精确动作定时保证 |
+| `reference_guidance` | 上述文本与 exact duty、scope、role/id/SHA/owner | 实际参考输入；不等于模型服从 |
+| `first_frame` / `last_frame` | 一个 opening/closing duty，原 binder 对应端点 role | API 端点输入；不保证中段或较早采用切点 |
+| `native_output` | 仅既有 `output_need.*` / `audio_need` 路径 | 原 compiler 校验输出参数，不代表动作时间 |
+
+任一条目启用映射时，全部 raw、非 diagnostic 目标必须逐项映射。缺映射、缺原生片段、
+scope 未表达、参考身份或端点角色不符，经原 `PROMPT_EXPRESSION_UNSUPPORTED` 返回目标 ID；
+不会自动改模式、补 prompt、删目标或重抽。完整 recipe 投影与新 authored fragments 均须匹配原 QA profile。
+legacy profile 无此字段时保留旧 bytes/hash 与投影行为，逐目标输入覆盖明确 `NOT_EVALUATED`，
+不能将旧报告整体“绑定成功”升级成逐目标覆盖。
+
+`purpose` 区分 identity、appearance、layout、motion、camera、whitebox、audio、opening、closing。
+人物参考声明 `independent_identity=true` 时必须有显式身份 owner；同一 SHA 的不同 binding/owner
+不能冒充多份独立身份输入，同一 binding 被多个目标复用合法。只拒绝错误声明，不自动合并 alias 或改编号。
+白模 duty 仅核对实际图像/视频绑定；静帧只适用于已说明的静态布局，动态控制仍须视频及逐镜 QA。
+普通视频没有 whitebox duty 时不得推断其用途；declared duty 也不证明白模制作、时序或质量已核验。
+frame/reference 互斥及逐镜白模例外继续沿现有模型能力和上文/下文 authoring 规则处理。
+
+`reference_control.objectives` 从同一完整 recipe 投影要求、输入片段、机制、duty、native path 与验收要求，
+区分输入已表达、输入不支持及未评估；`decision.assessments` 只解释原候选选择。
+compiler 失败时仍保留 selected candidate 的目标和失败 ID，片段标为 authored、未编译，不虚构实际 request。
+模式概览不计作目标覆盖；所有输入检查和离线 fixture 的模型质量、human 验收仍 `NOT_EVALUATED`。
+
 ### Action Timing And Selective Effects
 
 修复动作不到位时，先并排核对 actual native text、标称生成时长、原采用窗口和 QA observable。

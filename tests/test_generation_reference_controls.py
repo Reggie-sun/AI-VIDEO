@@ -146,7 +146,7 @@ def test_reusable_mode_matrix_is_exact_and_zero_effect(family, scenario, mode):
         "MODEL_GUIDANCE" if videos else "API_ENDPOINT_INPUT")
     assert controls["closing_frame"]["mechanism"] == (
         "API_ENDPOINT_INPUT" if mode == "first_last" else "MODEL_GUIDANCE")
-    assert controls["whitebox_motion"]["mechanism"] == ("MODEL_REFERENCE" if videos else "UNBOUND")
+    assert controls["whitebox_motion"]["mechanism"] == "UNBOUND"
     assert report["prompt"]["text"] == scenario
     assert report["selected_route"]["mode"] == selected_mode.value
     if family == "seedance-2.5" and videos:
@@ -196,3 +196,276 @@ def test_reference_report_rejects_mismatched_requirement():
     wrong = prepared.execution_binding.projection.requirement.model_copy(update={"requirement_hash": "f" * 64})
     with pytest.raises(ValueError, match="exact compiled requirement"):
         video_reference_control_report(request=prepared.resolved_request, requirement=wrong)
+
+
+def test_reference_preview_is_per_requirement_and_legacy_input_coverage_stays_unknown():
+    from ai_video.production.video_reference_controls import prepared_generation_report
+    from test_generation_feedback import feedback_setup
+
+    setup, _, _, _, orchestrator = feedback_setup()
+    prepared = orchestrator.prepare(limits=setup["inputs"].limits)
+    selected = next(c for c in prepared.inputs.candidates
+                    if c.candidate_id == prepared.decision.selected_candidate_id)
+    report = prepared_generation_report(prepared)["reference_control"]
+
+    objectives = report["objectives"]
+    assert [row["requirement_id"] for row in objectives] == [
+        rule.requirement_id for rule in selected.recipe.expressions]
+    for row, rule in zip(objectives, selected.recipe.expressions, strict=True):
+        assert row["observable"] == rule.observable
+        assert row["level"] == rule.level
+        assert row["stage"] == rule.stage
+        assert row["proof"] == rule.proof
+        assert row["measurement"] == rule.measurement
+        assert row["tolerance"] == rule.tolerance
+        assert row["intent_paths"] == list(rule.intent_paths)
+        assert row["native_text"] == list(rule.native_text)
+        assert row["native_text_present"] is all(text in prepared.resolved_request.prompt_text
+                                                   for text in rule.native_text)
+        assert row["input_coverage"] == "NOT_EVALUATED"
+        assert row["actual_quality"] == "NOT_EVALUATED"
+
+    assert report["controls_scope"] == "MODE_OVERVIEW_ONLY"
+    assert len(report["controls"]) == 6
+    assert all(row["actual_quality"] == "NOT_EVALUATED" for row in report["controls"])
+
+
+def test_reference_preview_reads_nested_action_and_motion_intent_paths():
+    from ai_video.production.video_reference_controls import video_reference_control_report
+    from test_generation_feedback import feedback_setup
+
+    setup, _, _, _, orchestrator = feedback_setup()
+    prepared = orchestrator.prepare(limits=setup["inputs"].limits)
+    requirement = prepared.execution_binding.projection.requirement
+    intent = requirement.generation_intent
+    source = prepared.inputs.candidates[0].recipe.expressions[0]
+    rule = source.model_copy(update={"intent_paths": (
+        "generation_intent.subject_action.endpoint", "generation_intent.motion_envelope",
+        "generation_intent.pacing"), "native_text": ("Generate 4 seconds.",)})
+    report = video_reference_control_report(request=prepared.resolved_request,
+        requirement=requirement, expressions=(rule,))
+
+    row = report["objectives"][0]
+    assert row["intent_values"]["generation_intent.subject_action.endpoint"] == \
+        intent.subject_action.endpoint.model_dump(mode="json")
+    assert row["intent_values"]["generation_intent.motion_envelope"] == \
+        intent.motion_envelope.model_dump(mode="json")
+    assert row["intent_values"]["generation_intent.pacing"] == intent.pacing.model_dump(mode="json")
+
+
+def test_reference_preview_resolves_numeric_intent_path_segments():
+    from types import SimpleNamespace
+
+    from ai_video.production.video_reference_controls import video_reference_control_report
+    from test_generation_feedback import feedback_setup
+
+    setup, _, _, _, orchestrator = feedback_setup()
+    prepared = orchestrator.prepare(limits=setup["inputs"].limits)
+    requirement = SimpleNamespace(requirement_hash=prepared.resolved_request.requirement_hash,
+        asset_evidence=(), generation_intent={"subjects": [{"name": "Courier"}]})
+    source = prepared.inputs.candidates[0].recipe.expressions[0]
+    rule = source.model_copy(update={"intent_paths": ("generation_intent.subjects.0.name",)})
+
+    row = video_reference_control_report(request=prepared.resolved_request,
+        requirement=requirement, expressions=(rule,))["objectives"][0]
+    assert row["intent_values"] == {"generation_intent.subjects.0.name": "Courier"}
+
+
+def test_declared_input_mapping_uses_shared_issues_without_claiming_quality():
+    from ai_video.production.generation_input_control import GenerationInputControl
+    from ai_video.production.video_reference_controls import video_reference_control_report
+    from test_generation_feedback import feedback_setup
+
+    setup, _, _, _, orchestrator = feedback_setup()
+    prepared = orchestrator.prepare(limits=setup["inputs"].limits)
+    requirement = prepared.execution_binding.projection.requirement
+    source = prepared.inputs.candidates[0].recipe.expressions[0]
+    exact_text = prepared.resolved_request.prompt_text
+    control = GenerationInputControl(mechanism="prompt_guidance")
+    rule = source.model_copy(update={"intent_paths": ("generation_intent.pacing",),
+        "native_text": (exact_text,), "input_control": control})
+
+    report = video_reference_control_report(request=prepared.resolved_request,
+        requirement=requirement, expressions=(rule,))
+    row = report["objectives"][0]
+    assert row["input_coverage"] == "EXPRESSED_INPUT_ONLY"
+    assert row["input_issues"] == []
+    assert row["mechanism"] == "MODEL_GUIDANCE"
+    assert row["native_text_present"] is True
+    assert row["actual_quality"] == "NOT_EVALUATED"
+
+    missing = rule.model_copy(update={"native_text": ("uncompiled invented clause",)})
+    rejected = video_reference_control_report(request=prepared.resolved_request,
+        requirement=requirement, expressions=(missing,))["objectives"][0]
+    assert rejected["input_coverage"] == "UNSUPPORTED_INPUT"
+    assert rejected["input_issues"] == ["MISSING_NATIVE_FRAGMENT"]
+    assert rejected["actual_quality"] == "NOT_EVALUATED"
+
+
+def test_reference_duty_joins_exact_asset_hash_binding_and_semantic_owner(tmp_path):
+    from ai_video.production.generation_input_control import GenerationInputControl, ReferenceDuty
+    from ai_video.production.video_reference_controls import prepared_generation_report
+    from test_canvas_source_expression import subject_service
+
+    service, limits = subject_service(tmp_path)
+    prepared = service.prepare(limits=limits)
+    requirement = prepared.execution_binding.projection.requirement
+    reference = next(e for e in requirement.asset_evidence
+        if e.role.value == "scene" and any(
+            b.asset_id == e.asset_id and b.asset_sha256 == e.asset_sha256
+            for b in prepared.resolved_request.image_bindings))
+    prompt = prepared.resolved_request.prompt_text
+    duty = ReferenceDuty(asset_id=reference.asset_id, asset_sha256=reference.asset_sha256,
+        role=reference.role.value, purpose="whitebox", scope_text=prompt,
+        canonical_owner_id=reference.canonical_owner_id)
+    selected = next(c for c in prepared.inputs.candidates
+        if c.candidate_id == prepared.decision.selected_candidate_id)
+    source = selected.recipe.expressions[0]
+    rule = source.model_copy(update={"intent_paths": ("generation_intent.subject_action.progression",),
+        "native_text": (prompt,), "input_control": GenerationInputControl(
+            mechanism="reference_guidance", references=(duty,))})
+    selected = selected.model_copy(update={"recipe": selected.recipe.model_copy(
+        update={"expressions": (rule,)})})
+    inputs = prepared.inputs.model_copy(update={"candidates": (selected,)})
+    decision = prepared.decision.model_copy(update={"selected_candidate_id": selected.candidate_id})
+    prepared = replace(prepared, inputs=inputs, decision=decision)
+
+    report = prepared_generation_report(prepared)["reference_control"]
+    row = report["objectives"][0]
+    reference_row = row["reference_duties"][0]
+    assert row["input_coverage"] == "EXPRESSED_INPUT_ONLY"
+    assert row["mechanism"] == "MODEL_REFERENCE"
+    assert reference_row["asset_id"] == reference.asset_id
+    assert reference_row["asset_sha256"] == reference.asset_sha256
+    assert len(reference_row["native_bindings"]) == 1
+    assert reference_row["native_bindings"][0]["native_path"].startswith("content[")
+    assert reference_row["native_bindings"][0]["mime_type"] == "image/png"
+    assert reference_row["scope_text"] == prompt
+    assert reference_row["whitebox_disposition"] == "MODEL_REFERENCE"
+    assert reference_row["mime_types"] == ["image/png"]
+    assert reference_row["whitebox_intent"] == "STATIC_LAYOUT"
+    assert reference_row["whitebox_quality"] == "NOT_EVALUATED"
+    assert reference_row["semantic_evidence"][0]["canonical_owner_id"] == reference.canonical_owner_id
+    assert next(row for row in report["controls"] if row["target"] == "whitebox_motion")[
+        "mechanism"] == "UNBOUND"
+
+
+def test_video_binding_is_whitebox_only_with_explicit_whitebox_duty():
+    from types import SimpleNamespace
+
+    from ai_video.production.generation_input_control import GenerationInputControl, ReferenceDuty
+    from ai_video.production.video import VideoGenerationMode, VideoGenerationRequest, VideoMediaReferenceBinding
+    from ai_video.production.video_reference_controls import video_reference_control_report
+    from ai_video.production.video_requirement import AssetEvidence
+    from ai_video.production.generation_recipe import RequirementExpression
+    from test_production_minimax_h3_max import _setup
+
+    provider, resolved, _, _, _ = _setup(aspect_ratio="adaptive")
+    original = resolved.activation_scope.request
+    binding = VideoMediaReferenceBinding(kind="video", role="reference_video",
+        asset_id="layout-motion", asset_sha256="d" * 64, mime_type="video/mp4",
+        size_bytes=128, duration_millis=4000, width=1280, height=720, fps=24)
+    request = VideoGenerationRequest.create(**original.model_dump(mode="python",
+        exclude={"request_input_hash", "image_bindings", "media_bindings", "mode", "prompt_text"}),
+        mode=VideoGenerationMode.REFERENCE_TO_VIDEO, image_bindings=original.image_bindings,
+        media_bindings=(binding,), prompt_text="A camera glides past the empty room.")
+    request = provider.resolve(request)
+    evidence = AssetEvidence(role="video_reference", asset_id=binding.asset_id,
+        asset_sha256=binding.asset_sha256, mime_type=binding.mime_type, size_bytes=binding.size_bytes,
+        width=binding.width, height=binding.height, duration_millis=binding.duration_millis,
+        fps=binding.fps)
+    requirement = SimpleNamespace(requirement_hash=request.requirement_hash,
+        asset_evidence=(evidence,), generation_intent=SimpleNamespace(model_dump=lambda mode: {}))
+    prompt = request.prompt_text
+
+    def report(purpose, role="video_reference"):
+        duty = ReferenceDuty(asset_id=binding.asset_id, asset_sha256=binding.asset_sha256,
+            role=role, purpose=purpose, scope_text=prompt)
+        rule = RequirementExpression(requirement_id="camera-motion", level="acceptance",
+            stage="raw_generation", dimension="camera", observable="camera motion follows the reference",
+            tolerance="same direction", measurement="frame review", proof="human",
+            intent_paths=("generation_intent.subject_action.progression",), native_text=(prompt,),
+            production_owner="shot_authoring", input_control=GenerationInputControl(
+                mechanism="reference_guidance", references=(duty,)))
+        return video_reference_control_report(request=request, requirement=requirement,
+            expressions=(rule,))
+
+    ordinary_video = report("motion")
+    assert ordinary_video["controls"][5]["mechanism"] == "UNBOUND"
+    assert ordinary_video["objectives"][0]["input_coverage"] == "EXPRESSED_INPUT_ONLY"
+
+    explicit_whitebox = report("whitebox")
+    assert explicit_whitebox["controls"][5]["mechanism"] == "MODEL_REFERENCE"
+    assert explicit_whitebox["objectives"][0]["reference_duties"][0]["native_bindings"][0][
+        "native_role"] == "reference_video"
+
+    wrong_semantic_role = report("whitebox", role="scene")["objectives"][0]
+    assert wrong_semantic_role["input_coverage"] == "UNSUPPORTED_INPUT"
+    assert wrong_semantic_role["reference_duties"][0]["native_bindings"] == []
+
+
+def test_uncompiled_selected_candidate_keeps_qa_targets_without_inventing_request():
+    from ai_video.production.generation_feedback import PreparedGeneration
+    from ai_video.production.video_compiler import ProviderRequirementUnsupported, ProviderRequirementUnsupportedReason
+    from ai_video.production.video_reference_controls import prepared_generation_report
+    from test_generation_feedback import feedback_setup
+
+    setup, _, _, _, orchestrator = feedback_setup()
+    prepared = orchestrator.prepare(limits=setup["inputs"].limits)
+    selected = next(c for c in prepared.inputs.candidates
+        if c.candidate_id == prepared.decision.selected_candidate_id)
+    rule = selected.recipe.expressions[0]
+    unsupported_path = rule.requirement_id
+    unsupported = ProviderRequirementUnsupported(requirement_hash=selected.recipe.requirement_hash,
+        provider_bound_request_hash="c" * 64, selected_capability_id=selected.capability_id,
+        reason=ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+        unsupported_field_paths=(unsupported_path,))
+    stopped = PreparedGeneration(prepared.inputs, prepared.decision, compilation=unsupported)
+
+    result = prepared_generation_report(stopped)
+    report = result["reference_control"]
+    assert report["selected_route"] == "NOT_EVALUATED"
+    assert report["native_parameters"] == "NOT_EVALUATED"
+    assert len(report["objectives"]) == len(selected.recipe.expressions)
+    affected = next(row for row in report["objectives"] if row["requirement_id"] == rule.requirement_id)
+    assert affected["input_coverage"] == "UNSUPPORTED_INPUT"
+    assert affected["native_text_present"] == "AUTHORED_NOT_COMPILED"
+    assert result["router_assessments"] == [a.model_dump(mode="json") for a in prepared.decision.assessments]
+
+
+def test_same_asset_opening_and_closing_duties_join_only_their_native_role():
+    from types import SimpleNamespace
+
+    from ai_video.production.generation_input_control import GenerationInputControl, ReferenceDuty
+    from ai_video.production.generation_recipe import RequirementExpression
+    from ai_video.production.video import VideoGenerationMode, VideoGenerationRequest
+    from ai_video.production.video_reference_controls import video_reference_control_report
+    from ai_video.production.video_requirement import AssetEvidence
+    from test_production_minimax_h3_max import _setup
+
+    provider, resolved, _, transport, _ = _setup(aspect_ratio="adaptive")
+    original = resolved.activation_scope.request
+    first = original.image_bindings[0].model_copy(update={"role": "first_frame"})
+    last = first.model_copy(update={"role": "last_frame"})
+    request = VideoGenerationRequest.create(**original.model_dump(mode="python",
+        exclude={"request_input_hash", "image_bindings", "mode"}),
+        image_bindings=(first, last), mode=VideoGenerationMode.IMAGE_TO_VIDEO)
+    resolved = provider.resolve(request)
+    evidence = tuple(AssetEvidence(**binding.model_dump(mode="python")) for binding in (first, last))
+    requirement = SimpleNamespace(requirement_hash=resolved.requirement_hash, asset_evidence=evidence,
+        semantic_reference_roles=tuple(item.role for item in evidence))
+    rules = tuple(RequirementExpression(requirement_id=role, level="acceptance", stage="raw_generation",
+        dimension="composition", observable="The authored endpoint image is supplied.",
+        tolerance="exact input", measurement="observe output separately", proof="technical",
+        intent_paths=("semantic_reference_roles",), native_text=(), production_owner="qa_acceptance",
+        input_control=GenerationInputControl(mechanism=role, references=(ReferenceDuty(
+            asset_id=first.asset_id, asset_sha256=first.asset_sha256, role=role, purpose=purpose),)))
+        for role, purpose in (("first_frame", "opening"), ("last_frame", "closing")))
+
+    report = video_reference_control_report(request=resolved, requirement=requirement, expressions=rules)
+
+    for position, row in enumerate(report["objectives"], 1):
+        bindings = row["reference_duties"][0]["native_bindings"]
+        assert [(binding["native_path"], binding["native_role"]) for binding in bindings] == [
+            (f"content[{position}]", row["requirement_id"])]
+    assert transport.calls == []

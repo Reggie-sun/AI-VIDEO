@@ -90,6 +90,11 @@ def _expressions(acceptance, requirement):
     result = []
     for raw in inventory:
         rule = RequirementExpression.model_validate(raw)
+        if rule.input_control is not None:
+            # The QA/authoring owner supplied a per-objective native expression.
+            # Replacing it with the whole intent would hide a missing control.
+            result.append(rule)
+            continue
         expressions = []
         paths = () if rule.semantics is not None and rule.level == "diagnostic" else rule.intent_paths
         for path in paths:

@@ -97,9 +97,23 @@ class GenerationRecipe(StrictModel):
             # Compare the QA owner's typed projection, including optional-field
             # defaults, while retaining the original sealed profile/hash verbatim.
             inventory = tuple(r.model_dump(mode="json", exclude={"native_text"}) for r in marked_rules)
+        elif inventory and any(raw.get("input_control") is not None for raw in inventory):
+            inventory = tuple(RequirementExpression.model_validate(raw).model_dump(
+                mode="json", exclude={"native_text"}) for raw in inventory)
         actual = tuple(r.model_dump(mode="json", exclude={"native_text"}) for r in self.expressions)
         if inventory is None or canonical_sha256({"rules": inventory}) != canonical_sha256({"rules": actual}):
             raise ValueError("recipe needs the complete versioned acceptance-owner projection")
+        # Native fragments used to be a derived projection. Opted-in authored
+        # mappings are sealed input obligations and must not be replaced even
+        # with another phrase that happens to occur in the prompt.
+        authored = {raw["requirement_id"]: RequirementExpression.model_validate(raw)
+                    for raw in self.acceptance_policy.profile_payload["generation_requirements"]
+                    if raw.get("input_control") is not None}
+        if any(item.input_control is not None and (
+            item.requirement_id not in authored
+            or item.native_text != authored[item.requirement_id].native_text
+        ) for item in self.expressions):
+            raise ValueError("recipe changed an authored input control fragment")
         for item in self.expressions:
             if item.stage == "shot_editorial" and not self.editorial_operations:
                 raise ValueError("editorial requirements need accepted editorial operations")
@@ -121,7 +135,9 @@ class GenerationRecipe(StrictModel):
 def expression_errors(recipe, requirement, prompt: str, control_paths=()) -> tuple[str, ...]:
     """Conservative lexical coverage, never a claim of model understanding."""
     payload = requirement.model_dump(mode="json")
-    errors = []
+    from ai_video.production.generation_input_control import input_control_issues, reference_intent_path
+
+    errors = list(input_control_issues(recipe.expressions, requirement, prompt))
     for item in recipe.expressions:
         if item.stage != "raw_generation":
             continue
@@ -137,12 +153,16 @@ def expression_errors(recipe, requirement, prompt: str, control_paths=()) -> tup
             node = payload
             try:
                 for key in path.split("."):
-                    node = node[key]
-            except (KeyError, TypeError):
+                    node = node[int(key)] if isinstance(node, (list, tuple)) else node[key]
+            except (KeyError, TypeError, ValueError, IndexError):
                 errors.append(item.requirement_id)
                 break
             if node is None or node == "unspecified":
                 errors.append(item.requirement_id)
+            if item.input_control is not None and reference_intent_path(path):
+                # The same exact binder/compiler validates role + bytes for
+                # these structural paths; never paste IDs or hashes into prose.
+                continue
             if not path.startswith("output_need.") and path != "audio_need":
                 prompt_paths.append((path, node))
         # Output/audio controls are validated against the exact request by the
