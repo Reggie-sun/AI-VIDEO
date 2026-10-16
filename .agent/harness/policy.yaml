@@ -342,7 +342,7 @@ checks:
   generation_feedback_tests:
     execution_priority: 80
     covers_check_ids: [typed_causal_native_expression_tests]
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_generation_feedback.py, tests/test_generation_evaluation.py, tests/test_requirement_semantics.py, tests/test_generation_evaluation_binding.py, tests/test_requirement_semantics_replay.py, tests/test_s02_prospective_review.py, tests/test_generation_execution.py, tests/test_generation_execution_guards.py, tests/test_generation_runtime_repair.py, tests/test_generation_historical_replay.py, tests/test_generation_provider_wiring.py, tests/test_generation_local_wiring.py, tests/test_generation_feedback_driver.py, tests/test_generation_feedback_review.py, tests/test_generation_history_import.py, tests/test_generation_history_import_receipt.py, tests/test_generation_quality_rejection.py, tests/test_production_generation_decision.py, tests/test_typed_causal_native_expression.py, tests/test_current_shot_close_expression.py, -q, --durations=20, --durations-min=0.1]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_generation_reference_controls.py, tests/test_generation_feedback.py, tests/test_generation_evaluation.py, tests/test_requirement_semantics.py, tests/test_generation_evaluation_binding.py, tests/test_requirement_semantics_replay.py, tests/test_s02_prospective_review.py, tests/test_generation_execution.py, tests/test_generation_execution_guards.py, tests/test_generation_runtime_repair.py, tests/test_generation_historical_replay.py, tests/test_generation_provider_wiring.py, tests/test_generation_local_wiring.py, tests/test_generation_feedback_driver.py, tests/test_generation_feedback_review.py, tests/test_generation_history_import.py, tests/test_generation_history_import_receipt.py, tests/test_generation_quality_rejection.py, tests/test_production_generation_decision.py, tests/test_typed_causal_native_expression.py, tests/test_current_shot_close_expression.py, -q, --durations=20, --durations-min=0.1]
     cwd: .
     description: Verify evidence-derived decisions, transferable cohorts, execution binding and frozen historical replay without Provider effects.
   typed_causal_native_expression_tests:
@@ -654,6 +654,8 @@ categories:
       - tests/test_generation_feedback_driver.py
       - tests/test_generation_feedback_review.py
       - tests/test_generation_no_regression.py
+      - src/ai_video/production/video_reference_controls.py
+      - tests/test_generation_reference_controls.py
       - src/ai_video/production/generation_feedback.py
       - src/ai_video/production/generation_experience.py
       - src/ai_video/production/generation_evaluation.py

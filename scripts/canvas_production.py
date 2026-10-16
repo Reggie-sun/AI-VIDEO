@@ -97,6 +97,10 @@ def main(argv=None):
         def encode(value):
             if hasattr(value, "model_dump"):
                 return value.model_dump(mode="json")
+            from ai_video.production.generation_feedback import PreparedGeneration
+            if isinstance(value, PreparedGeneration):
+                from ai_video.production.video_reference_controls import prepared_generation_report
+                return prepared_generation_report(value)
             if is_dataclass(value):
                 return asdict(value)
             if isinstance(value, Path):

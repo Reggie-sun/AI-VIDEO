@@ -265,12 +265,35 @@ def _source_materials(expression: PreservedSourceExpression):
     return materials
 
 
+def _source_media_indices(media):
+    """Number selected source media using the compiler's native role order."""
+    from ai_video.production.video_compiler import _MEDIA_ROLE_ORDER, _ROLE_ORDER
+
+    image_media = tuple(item for item in media if item[0] != "reference_video")
+    video_media = tuple(item for item in media if item[0] == "reference_video")
+    indices = {
+        (source_role, asset_id, asset_sha256): index
+        for index, (_, asset_id, asset_sha256, source_role) in enumerate(
+            sorted(image_media, key=lambda item: (_ROLE_ORDER[item[0]], item[1])),
+            start=1,
+        )
+    }
+    indices.update({
+        (source_role, asset_id, asset_sha256): index
+        for index, (_, asset_id, asset_sha256, source_role) in enumerate(
+            sorted(video_media, key=lambda item: (_MEDIA_ROLE_ORDER[item[0]], item[1])),
+            start=1,
+        )
+    })
+    return indices
+
+
 def _image_indices(bound, requirement, expression: PreservedSourceExpression):
     from ai_video.production._video_requirement_routing import (
         context_asset_role,
         native_binding_role,
     )
-    from ai_video.production.video_compiler import _MEDIA_ROLE_ORDER, _ROLE_ORDER
+    from ai_video.production.video_compiler import _ROLE_ORDER
 
     evidence = tuple(requirement.asset_evidence)
     expected = tuple(
@@ -322,21 +345,7 @@ def _image_indices(bound, requirement, expression: PreservedSourceExpression):
     )
     if len(set(bound_keys)) != len(bound_keys) or set(bound_keys) != set(expected_bound_keys):
         raise ValueError("bound source media references must exactly match selected role and byte identities")
-    indices = {
-        (role, asset_id, asset_sha256): index
-        for index, (_, asset_id, asset_sha256, role) in enumerate(
-            sorted(image_pairs, key=lambda item: (_ROLE_ORDER[item[0]], item[1])),
-            start=1,
-        )
-    }
-    indices.update({
-        (role, asset_id, asset_sha256): index
-        for index, (_, asset_id, asset_sha256, role) in enumerate(
-            sorted(video_pairs, key=lambda item: (_MEDIA_ROLE_ORDER[item[0]], item[1])),
-            start=1,
-        )
-    })
-    return indices
+    return _source_media_indices((*image_pairs, *video_pairs))
 
 
 def _adapt_source_text(

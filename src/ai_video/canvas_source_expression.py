@@ -6,22 +6,17 @@ from ai_video.production.seedance_source_expression import PreservedSourceExpres
 
 def adapted_canvas_prompt(expression):
     """Use the compiler's per-media order and source grammar, without creative prose."""
-    from ai_video.production.seedance_source_expression import _adapt_source_text, _source_materials
-    from ai_video.production.video_compiler import _MEDIA_ROLE_ORDER, _ROLE_ORDER
+    from ai_video.production.seedance_source_expression import (
+        _adapt_source_text, _source_materials, _source_media_indices,
+    )
+    from ai_video.production._video_requirement_routing import native_binding_role
+    from ai_video.production.video_requirement import SemanticReferenceRole
     expression = PreservedSourceExpression.model_validate(expression)
     materials = _source_materials(expression)
-    def order(material):
-        if material.role == "video_reference":
-            return (1, _MEDIA_ROLE_ORDER["reference_video"], material.asset_id)
-        role = material.role if material.role in {"first_frame", "last_frame"} else "reference"
-        return (0, _ROLE_ORDER[role], material.asset_id)
-    image_materials = sorted((m for m in materials if m.role != "video_reference"),
-        key=lambda m: order(m)[1:])
-    video_materials = sorted((m for m in materials if m.role == "video_reference"),
-        key=lambda m: order(m)[1:])
-    indices = {(m.role, m.asset_id, m.asset_sha256): i
-        for group in (image_materials, video_materials)
-        for i, m in enumerate(group, 1)}
+    media = tuple((native_binding_role(SemanticReferenceRole(material.role)),
+                   material.asset_id, material.asset_sha256, material.role)
+                  for material in materials)
+    indices = _source_media_indices(media)
     return _adapt_source_text(expression, indices)
 
 

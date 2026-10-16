@@ -287,6 +287,17 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
     def _validate_query_output_echoes(self, task: dict[str, object]) -> None:
         """Provider-specific optional query echoes are checked by adapters."""
 
+    def native_control_parameters(self, request) -> dict[str, object]:
+        """Exact payload scalars, without reference/credential/transport effects."""
+        self._validate_resolved(request)
+        frame_mode = request.mode is VideoGenerationMode.IMAGE_TO_VIDEO
+        payload = {"model": self.model_id, "duration": self._profile.duration,
+                   "resolution": self._profile.resolution}
+        if not frame_mode:
+            payload["ratio"] = self._profile.aspect_ratio
+        payload.update(self._native_profile_options(frame_mode=frame_mode))
+        return payload
+
     def native_payload(self, request) -> bytes:
         self._validate_resolved(request)
         content = [{"type": "text", "text": request.prompt_text}]
@@ -317,11 +328,7 @@ class MetasoH3VideoProvider(MiniMaxH3VideoProvider):
                 "url": f"data:{binding.mime_type};base64," + base64.b64encode(raw).decode("ascii")},
                 "role": binding.role if frame_mode else f"reference_{kind}"})
         payload = {"model": self.model_id, "content": content,
-                   "duration": self._profile.duration, "resolution": self._profile.resolution,
-                   "ratio": self._profile.aspect_ratio}
-        payload.update(self._native_profile_options(frame_mode=frame_mode))
-        if frame_mode:
-            del payload["ratio"]
+                   **self.native_control_parameters(request)}
         body = json.dumps(payload, ensure_ascii=False, separators=(",", ":")).encode()
         if len(body) > _MAX_BODY_BYTES:
             raise _error(ErrorCode.VIDEO_REQUEST_INVALID,

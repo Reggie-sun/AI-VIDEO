@@ -139,6 +139,10 @@ render replay 重开原始 begin identity，deliver 只读 exact final target，
 `production.authoring_input` 验证，经 bootstrap/committer 存入 immutable evidence，reader 重开。
 `canvas_preflight` 只投影已校验 source/Director/Registry 的全序列参考职责、来源与待提取状态；
 共享 CLI 在 author validation 后输出，resume 沿上述 immutable reader，不实例化 operator runtime。
+它保留语义 owner、实测媒体规格、同字节组及生成/采用时序，不自动去重、选路或判断白模合格。
+`production.video_reference_controls` 只解释既有 `PreparedGeneration` 的选中 request：
+semantic evidence/native index、控制限制及原 QA 要求；参数复用 selected adapter 的实际 payload builder，
+不物化 URL、lookup credential、调用 transport 或 mint permit。CLI 不序列化运行时 Provider。
 它不拥有 Provider admission、paid permission 或 QA acceptance；未产生状态不伪装为真实输入。
 `canvas_handoff` 只准备 accepted source 的实测普通中间帧及 selected-state MCP Gate；
 中间交接必须有 approved `state_reference`，缺计划/缺证均阻断后镜，不能制造 terminal/semantic acceptance。

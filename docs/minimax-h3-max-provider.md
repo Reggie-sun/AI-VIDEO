@@ -19,6 +19,13 @@
 `GET /v2/query/video_generation/{task_id}`。模型字段必须为 `MiniMax-H3-Max`。
 支持 5–15 秒、480P/768P；不发送 4 秒或 2K。参考模式允许图片、视频及音频，
 首尾帧模式与参考模式互斥；白模必须实际作为视频参考绑定，不能只写在 prompt 中。
+当前共享 adapter 已有两条能力：`h3-max-reference-v1` 的 reference route，以及仅在
+`aspect_ratio="adaptive"` 时开放的 `minimax-h3-max-fl2va-v1` frame route。
+后者必须有一张 `first_frame`、可选一张 `last_frame`，不允许 reference image/video/audio，native
+省略 `ratio`；前者按原顺序发送 `reference_image/reference_video/reference_audio`，可显式指定 ratio。
+这些是输入模式约束，不保证全部动作、人数或反射正确；生成尾端也不是原采用切点。
+共享 prepare 的 `reference_control` 复用 `native_control_parameters()` 与实际 payload 的同一标量逻辑，
+披露 exact profile/绑定及控制限制，不生成 bytes、读取凭据、授权调用或签 QA。
 `extra.prompt_expansion_mode` 属于所选 immutable profile；不发送 METASO 专用的
 `context_ir_enabled`。生成时长与原镜头采用时窗分开；trim/frame/sample/timing
 继续由 `ResolvedTimeline` 独占，不延长剧情窗口来容纳模型输出。

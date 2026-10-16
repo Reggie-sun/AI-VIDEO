@@ -87,6 +87,27 @@ def test_source_video_reference_uses_its_own_video_number_and_preserved_literal(
     assert _adapt_source_text(expression, indices) == "视频1继续动作。图片1、视频1"
 
 
+def test_shared_source_media_indexing_preserves_native_order_and_separate_media_ordinals():
+    from ai_video.production import seedance_source_expression as source_expression
+
+    media = (
+        ("reference", "scene-a", "a" * 64, "scene"),
+        ("reference", "character-b", "b" * 64, "identity"),
+        ("first_frame", "opening", "c" * 64, "first_frame"),
+        ("reference_video", "video-z", "d" * 64, "video_reference"),
+        ("reference_video", "video-a", "e" * 64, "video_reference"),
+    )
+
+    index_media = getattr(source_expression, "_source_media_indices", lambda _: {})
+    assert index_media(media) == {
+        ("first_frame", "opening", "c" * 64): 1,
+        ("identity", "character-b", "b" * 64): 2,
+        ("scene", "scene-a", "a" * 64): 3,
+        ("video_reference", "video-a", "e" * 64): 1,
+        ("video_reference", "video-z", "d" * 64): 2,
+    }
+
+
 def _rebind_source_expression(bound, requirement, expression, prompt):
     from ai_video.production.shot_router import ProviderBoundVideoRequest
     from ai_video.production.video_requirement import ProviderNeutralVideoRequirement

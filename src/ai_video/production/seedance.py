@@ -743,10 +743,6 @@ class SeedanceVideoProvider:
             )
 
     def _payload(self, request: ResolvedVideoGenerationRequest) -> dict[str, object]:
-        profile = self._profiles_by_capability[request.capability_id]
-        output = request.effective_output
-        if not isinstance(output, VideoFlexibleOutputRequirement):
-            raise _error(ErrorCode.VIDEO_REQUEST_INVALID, "Seedance output contract is invalid.")
         content: list[dict[str, object]] = [{"type": "text", "text": request.prompt_text}]
         for binding in request.image_bindings:
             content.append(
@@ -764,9 +760,20 @@ class SeedanceVideoProvider:
                     "role": binding.role,
                 }
             )
+        return {"model": self._profiles_by_capability[request.capability_id].api_model_id,
+                "content": content, **self.native_control_parameters(request)}
+
+    def native_control_parameters(self, request: ResolvedVideoGenerationRequest) -> dict[str, object]:
+        """Exact payload scalars; never resolve assets, credentials or transport."""
+        profile = self._profiles_by_capability.get(request.capability_id)
+        if (profile is None or request.provider_profile != self._profile.pointer()
+                or request.model_id != profile.variant.model_id or request.mode is not profile.variant.mode):
+            raise _error(ErrorCode.VIDEO_REQUEST_INVALID, "Seedance selected profile is invalid.")
+        output = request.effective_output
+        if not isinstance(output, VideoFlexibleOutputRequirement):
+            raise _error(ErrorCode.VIDEO_REQUEST_INVALID, "Seedance output contract is invalid.")
         payload: dict[str, object] = {
             "model": profile.api_model_id,
-            "content": content,
             "resolution": output.resolution_label,
             "ratio": output.ratio,
             "generate_audio": output.native_audio,

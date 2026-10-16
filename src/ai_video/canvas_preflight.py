@@ -8,6 +8,47 @@ from copy import deepcopy
 from ai_video.canvas_authoring import direction_reference
 
 
+def _reference_measurements(asset):
+    measurements = {"width": asset.width, "height": asset.height}
+    metadata = asset.video_metadata
+    if metadata is not None:
+        measurements.update({
+            "duration_seconds": asset.duration_seconds,
+            "duration_milliseconds": metadata.duration_milliseconds,
+            "fps": {"numerator": metadata.fps_numerator,
+                    "denominator": metadata.fps_denominator},
+            "frame_count": metadata.frame_count,
+            "container_name": metadata.container_name,
+            "codec_name": metadata.codec_name,
+        })
+    elif asset.duration_seconds is not None:
+        measurements["duration_seconds"] = asset.duration_seconds
+    return measurements
+
+
+def _reference_inventory(references, assets):
+    groups = {}
+    for reference in references:
+        asset = assets.get(reference["asset_id"])
+        if asset is None:
+            continue
+        key = (asset.sha256, asset.size_bytes, asset.mime_type)
+        binding = {"asset_id": reference["asset_id"], "role": reference["role"]}
+        if "owner_id" in reference:
+            binding["owner_id"] = reference["owner_id"]
+        groups.setdefault(key, []).append(binding)
+    exact_groups = [
+        {"sha256": sha256, "size_bytes": size_bytes, "mime_type": mime_type,
+         "bindings": bindings}
+        for (sha256, size_bytes, mime_type), bindings in groups.items()
+    ]
+    return {
+        "semantic_binding_count": len(references),
+        "unique_exact_byte_count": len(exact_groups),
+        "duplicate_byte_groups": [group for group in exact_groups if len(group["bindings"]) > 1],
+    }
+
+
 def canvas_reference_preflight(*, packet, direction, registry):
     """Project inputs already validated by author_canvas_project; no verdicts."""
     assets = {asset.asset_id: asset for asset in registry.assets}
@@ -20,12 +61,16 @@ def canvas_reference_preflight(*, packet, direction, registry):
         plan = row.get("state_reference")
         replacements = row.get("reference_replacements", {})
         references = []
-        for reference in row.get("generation", {}).get("references", []):
+        generation = row.get("generation", {})
+        generation_references = generation.get("references", [])
+        for reference in generation_references:
             aid = reference["asset_id"]
             asset = assets.get(aid)
             value = {"asset_id": aid, "role": reference["role"],
                 "provider_admission": "NOT_EVALUATED",
                 "source_status": "MISSING" if asset is None else "REGISTERED_BYTES"}
+            if "owner_id" in reference:
+                value["owner_id"] = reference["owner_id"]
             if asset is not None:
                 value["identity"] = {"sha256": asset.sha256, "size_bytes": asset.size_bytes,
                     "mime_type": asset.mime_type, "source_kind": asset.source_kind.value,
@@ -33,6 +78,7 @@ def canvas_reference_preflight(*, packet, direction, registry):
                     "creation_receipt_id": asset.creation_receipt_id,
                     "input_artifact_ids": list(asset.input_artifact_ids),
                     "usage_license": asset.usage_license}
+                value["measurements"] = _reference_measurements(asset)
             if plan and aid == plan["replace_asset_id"]:
                 value["source_status"] = "AUTHORING_PLACEHOLDER_NOT_ACCEPTED_STATE"
             references.append(value)
@@ -64,15 +110,25 @@ def canvas_reference_preflight(*, packet, direction, registry):
                     *( ["same_accepted_original_video_reference_binding"] if conditioning == "source_video" else []),
                     "selected_provider_input_admission", "successor_own_per_shot_pass"]}
         shot = row["shot"]
+        output_need = generation.get("output_need", {})
+        candidate_video_asset_ids = [reference["asset_id"] for reference in generation_references
+            if reference.get("role") == "existing_video"]
         shots.append({"occurrence_id": row["occurrence_id"], "shot_id": shot["shot_id"],
             "source_text": unit["source_text"], "authored_text": shot["intent"],
             "dialogue": shot.get("dialogue", ""), "narration": shot.get("narration", ""),
             "source_settings": deepcopy(unit.get("observed_parameters", {})),
-            "generation_intent": deepcopy(row.get("generation", {}).get("generation_intent")),
-            "generation_requirements": {name: deepcopy(row.get("generation", {}).get(name)) for name in
+            "generation_intent": deepcopy(generation.get("generation_intent")),
+            "generation_requirements": {name: deepcopy(generation.get(name)) for name in
                 ("generation_operation", "audio_need", "quality_need", "output_need")},
             "references": references, "boundary": deepcopy(row.get("boundary")),
+            "reference_inventory": _reference_inventory(generation_references, assets),
+            "independent_character_evidence": "NOT_EVALUATED",
+            "selected_route": "NOT_EVALUATED",
+            "whitebox_reference": {"candidate_video_asset_ids": candidate_video_asset_ids,
+                "purpose_validation": "NOT_EVALUATED",
+                "timing_validation": "NOT_EVALUATED"},
             "state_reference": state, "composition": deepcopy(row.get("composition")),
+            "requested_duration_seconds": deepcopy(output_need.get("duration_seconds")),
             "provider_admission": "NOT_EVALUATED", "per_shot_acceptance": "NOT_EVALUATED"})
     return {"schema_version": "canvas-production-preflight/1", "project_id": direction["project_id"],
         "source_snapshot_sha256": packet["source_snapshot_sha256"],

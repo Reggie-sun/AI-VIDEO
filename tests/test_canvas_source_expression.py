@@ -40,11 +40,13 @@ def test_original_canvas_parts_are_reopened_at_authoring(damage):
             author_canvas_project(packet=source, direction=data)
 
 
-def subject_source(tmp_path, *, scene_auxiliary=False, generated=False):
+def subject_source(tmp_path, *, scene_auxiliary=False, generated=False,
+                   duplicate_room_png=False, scenario=None):
     """Inspect/import real fixture bytes before canonical authoring and planning."""
     from ai_video.canvas_assets import prepare_canvas_png_assets
     from tests.production_project_factory import _p7_png
 
+    character, action, space = scenario or ("Robot", "lifts its hands", "")
     raw = document()
     raw["edges"] = []
     raw["nodes"].append({"id": "robot", "type": "subject", "data": {
@@ -54,9 +56,9 @@ def subject_source(tmp_path, *, scene_auxiliary=False, generated=False):
         draft = node["data"].get("generationDraft")
         if draft is None:
             continue
-        draft["parts"] = [{"type": "text", "text": "Robot "},
+        draft["parts"] = [{"type": "text", "text": character + " "},
             {"type": "extension", "extension_type": "subject", "object_id": "robot-slot"},
-            {"type": "text", "text": " lifts its hands in "},
+            {"type": "text", "text": f" {action} in {space + ' ' if scenario else ''}"},
             {"type": "extension", "extension_type": "node", "object_id": "room-slot"},
             {"type": "text", "text": "."}]
         draft["references"] = [{"slotId": "robot-slot", "nodeId": "robot", "role": "reference",
@@ -70,7 +72,10 @@ def subject_source(tmp_path, *, scene_auxiliary=False, generated=False):
     selections = []
     for index, asset_id in enumerate(("robot-main", "robot-aux", "room")):
         path = tmp_path / f"{asset_id}.png"
-        path.write_bytes(_p7_png(width=320, height=320, rgba=bytes((index, 32, 48, 255))))
+        if duplicate_room_png and asset_id == "room":
+            path.write_bytes((tmp_path / "robot-main.png").read_bytes())
+        else:
+            path.write_bytes(_p7_png(width=320, height=320, rgba=bytes((index, 32, 48, 255))))
         selections.append({"asset_id": asset_id, "node_id": "room" if asset_id == "room" else "robot",
                            "resource_id": "room-resource" if asset_id == "room" else asset_id,
                            "path": path, "usage_license": "fixture-only"})
@@ -90,21 +95,23 @@ def subject_source(tmp_path, *, scene_auxiliary=False, generated=False):
                   "role": "scene" if scene_auxiliary and a.asset_id == "robot-aux" else "identity"}
                  for asset_id in ("robot-main", "robot-aux")
                  for a in registry.assets if a.asset_id == asset_id]
-    parts = [{"type": "text", "text": "Robot "},
+    parts = [{"type": "text", "text": character + " "},
         {"type": "reference", "slot_id": "robot-slot", "materials": materials},
-        {"type": "text", "text": " lifts its hands in "},
+        {"type": "text", "text": f" {action} in {space + ' ' if scenario else ''}"},
         {"type": "reference", "slot_id": "room-slot", "materials": [
             {"asset_id": "room", "asset_sha256": next(a.sha256 for a in registry.assets if a.asset_id == "room"),
              "role": "scene"}]}, {"type": "text", "text": "."}]
     data = direction()
     data["delivery_profile"] = {"width": 1280, "height": 720, "fps": 24}
-    data["characters"] = [{"character_id": "robot", "name": "Robot", "identity": "Robot",
+    if scenario:
+        data["scenes"][0]["location"] = space
+    data["characters"] = [{"character_id": "robot", "name": character, "identity": character,
         "appearance_bible": "Metal body", "reference_asset_ids": [m["asset_id"] for m in materials
                                                                   if m["role"] == "identity"]}]
     data["scenes"][0]["visual_reference_asset_ids"] = ["room", *[m["asset_id"] for m in materials
                                                       if m["role"] == "scene"]]
     for row in data["shots"]:
-        row["shot"].update(intent="Robot 图片2、图片1 lifts its hands in 图片3.", character_ids=["robot"],
+        row["shot"].update(intent=f"{character} 图片2、图片1 {action} in 图片3.", character_ids=["robot"],
             duration_policy={"mode": "fixed", "seconds": 5}, preserved_source_expression={
                 "source_sha256": canonical_sha256({"parts": parts, "implicit_references": []}),
                 "parts": parts})
@@ -116,6 +123,35 @@ def subject_source(tmp_path, *, scene_auxiliary=False, generated=False):
                                   "pacing": {"shot_duration_seconds": 5}},
             "audio_need": "required", "quality_need": {}}
     return source, data, registry, artifacts
+
+
+@pytest.mark.parametrize("scenario", [
+    ("Robot", "raises both arms", "an atrium"),
+    ("Courier", "sets a parcel down", "a station platform"),
+    ("Scientist", "turns toward the window", "a narrow cabin"),
+])
+def test_canvas_prompt_keeps_character_action_space_and_distinct_duplicate_byte_roles(
+    tmp_path, scenario
+):
+    from ai_video.canvas_source_expression import adapted_canvas_prompt
+
+    source, data, registry, _ = subject_source(
+        tmp_path, duplicate_room_png=True, scenario=scenario
+    )
+    source_text_parts = [part["text"] for part in source["units"][0]["prompt_source"]["parts"]
+                         if part["type"] == "text"]
+    assert source_text_parts == [scenario[0] + " ",
+        f" {scenario[1]} in {scenario[2]} ", "."]
+    expression = data["shots"][0]["shot"]["preserved_source_expression"]
+    prompt = adapted_canvas_prompt(expression)
+    robot = next(asset for asset in registry.assets if asset.asset_id == "robot-main")
+    room = next(asset for asset in registry.assets if asset.asset_id == "room")
+    assert (robot.sha256, robot.size_bytes) == (room.sha256, room.size_bytes)
+    assert prompt == f"{scenario[0]} 图片2、图片1 {scenario[1]} in {scenario[2]} 图片3."
+    referenced = [material for part in expression["parts"] if part["type"] == "reference"
+                  for material in part["materials"]]
+    assert [(item["asset_id"], item["role"]) for item in referenced] == [
+        ("robot-main", "identity"), ("robot-aux", "identity"), ("room", "scene")]
 
 
 @dataclass(frozen=True)

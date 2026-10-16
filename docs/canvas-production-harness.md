@@ -64,7 +64,8 @@ local-selection/measurement receipt，限制 2–15 秒、整数 FPS、50 MiB、
 对白/旁白必须引用原文。`source_grounding` 仍经 source owner 验证，不制造原文未表达的动态事实。
 不支持的音频引用或未知素材须明确补齐 supported route，不能删除后继续。
 新数据入口封存 `seedance-preserved-source/2`，保留同一 chip 的每次文本出现与 tray-only 普通参考；
-同一实际素材只形成一次 native input。重复 slot 的材料或同 asset 的 role/bytes 冲突直接拒绝。
+同一 selected asset 只形成一次 native input；不同 asset alias 的相同字节不自动合并，见下方控制预览。
+重复 slot 的材料或同 asset 的 role/bytes 冲突直接拒绝。
 历史 `/1` 的唯一 slot/asset 与 implicit first-frame 限制、hash/serialization 保持。
 历史图片的 `type=image/uri/history-material` 参考保留原 descriptor；inspection 提供稳定素材 handle，
 不虚构 canvas node 或 reference edge。`images.node_id` 使用该 inventory handle，`resource_id` 保留 URI；
@@ -90,6 +91,44 @@ CLI：`--runtime trusted_operator_module:function` 返回 `committer` 和 servic
 凭据不得进入项目 JSON、`--arguments` 或 CLI argv，只沿现有 injected supplier。
 
 原声音证据不齐时使用[project-local音频理解工具](audio-understanding.md)补证，默认无网络preview；qualified operator就绪后可在原`evaluate`显式传`understand_audio=true`，观察进入原exact MP4分析证据。它不代selected QA/presentation、精确时序或human听看，缺证不重生成。
+
+## Reference Control Preview
+
+制作前先把控制目标分到已有职责：人物外观归 Character/identity，场景与道具外观归 Scene/原图，
+开场/生成末态归显式 first/last frame，动作/空间/摄影预演归经核验的白模；声音沿原音频合同。
+一份素材可以承担多项声明职责，但多个 alias 不产生多份独立人物证据。
+`preflight.reference_inventory` 保留每份 asset/role/显式 owner，并按 SHA/bytes/MIME 披露相同字节组；
+`measurements` 展示参考规格，`requested_duration_seconds` 与原 `composition` 并列。
+普通视频仅列为白模候选，职责、逐镜核验、时序对齐及例外仍需作者证据，报告保持 `NOT_EVALUATED`。
+不自动去重、重编号、推断白模合格或运行 Router；最终选择以既有 `prepare` 结果为准。
+
+共享 CLI 的 `prepare` / `prepare_repair` 现在输出 JSON-safe 的 `reference_control`；API 调用者可用
+`production.video_reference_controls.prepared_generation_report(prepared)` 读取同一投影。
+它列出实际 provider/model/profile/capability/mode、原 compiler 结果、semantic evidence 到
+`content[N]` / 每种媒体序号的映射、同字节组、exact prompt、参考时长、所选 QA 全部要求及控制限制。
+MiniMax H3 Max/METASO 与 Seedance 的 `native_parameters` 复用实际 payload 的标量 builder；
+不物化 reference URL、不调用 credential/transport/paid preview、不创建 intent/permit 或 Production state。
+其他 adapter 的 native 参数明确 `NOT_EVALUATED`，没有选中 request 时不推测路线。
+CLI 只序列化 immutable inputs/decision/compilation/binding，不复制或输出运行时 Provider。
+当前失败镜的 STOP 仍生效，不能为查看报告绕过 `prepare` 或自动发起修复。
+
+| Control | Frame Route | Multimodal Reference Route | Required Evidence |
+| --- | --- | --- | --- |
+| 开场一致 | `content.role=first_frame` 是显式端点输入 | `reference_image` 与提示词是模型引导 | exact 输出开场、人数/身份/道具/构图逐项观察 |
+| 生成末态 | 可选 `last_frame` 绑定生成末端 | 末态文字/参考仍为引导 | 生成末端与原采用切点分别核验，不用长片尾帧冒充切出帧 |
+| 人物身份 | 由端点图及原文表达，不能同时追加人物 reference | 原图/人物参考保留语义 owner 和 native index | 多人同图不计作独立人像；完整逐镜身份 QA |
+| 动作时序 | 原文引导，端点不约束全部中间动作 | 原文 + 实际绑定视频引导 | 起点/极值/接触/结束及采用切点；duration 不证明动作落点 |
+| 空间/摄影 | 端点提供布局，摄影仍需实测 | 场景图/白模视频提供引导 | 轴线、人数、遮挡、反射、镜头和画幅分别检查 |
+
+官方 MiniMax H3 Max、Seedance 2.0/2.5 API 的 frame 与 reference roles 互斥。
+H3 Max 当前 frame capability 只在 sealed `aspect_ratio=adaptive` profile 中开放，native 不发 ratio；
+Seedance 2.5 frame route 发 `ratio=adaptive`，R2V 发 `omni_reference_task_type=reference`。
+Seedance 官方允许在 reference 模式的原文中指定某图片为首/尾帧，但这不获得端点模式的约束；
+使用已有 `reference_aliases` 绑定原 slot 并展示适配 diff，不凭中文数字猜素材、自动插入新创作要求。
+若首帧路线不能同时消费动态白模，必须逐镜记录 exact mode 的能力证据及例外，保留全部原要求；
+或经明确选择改用视频参考并接受首帧控制减弱，不能静默删除其中一项。
+实测参考长度、标称生成长度与采用窗口分别说明 hold/padding/动作落点，最终 trim/frame/sample/timing
+仍归 `ResolvedTimeline`。参数/绑定正确只证明输入，不证明模型服从或验收。
 
 ## Per-Shot Whitebox Reference
 

@@ -161,6 +161,94 @@ def test_author_preflight_separates_asset_provenance_from_provider_admission(tmp
     assert list(tmp_path.iterdir()) == []
 
 
+def test_preflight_reports_reference_bytes_measurements_and_unresolved_control_evidence(
+    tmp_path, monkeypatch
+):
+    from ai_video.canvas_preflight import canvas_reference_preflight
+    from ai_video.production.registry import registry_semantic_sha256
+    from test_canvas_source_expression import local_video_source_fixture, subject_source
+
+    packet, data, image_registry, _ = subject_source(
+        tmp_path, duplicate_room_png=True,
+        scenario=("Courier", "sets a parcel down", "a station platform"),
+    )
+    _, _, _, video_registry, _ = local_video_source_fixture(tmp_path, monkeypatch)
+    combined = image_registry.model_copy(update={
+        "assets": (*image_registry.assets, *video_registry.assets)
+    })
+    registry_hash = registry_semantic_sha256(combined)
+    combined = combined.model_copy(update={"revision_id": registry_hash, "content_hash": registry_hash})
+
+    row = data["shots"][0]
+    for reference in row["generation"]["references"]:
+        reference["owner_id"] = "robot" if reference["role"] == "character_reference" else "road"
+    row["generation"]["references"].append({
+        "role": "existing_video", "asset_id": "guide-video", "owner_id": "road"
+    })
+    row["composition"] = {"trim_start_frame": 4, "trim_end_frame": 60}
+    row["generation"]["output_need"] = {
+        "duration_seconds": 7, "width": 1280, "height": 720, "fps": 24
+    }
+
+    report = canvas_reference_preflight(packet=packet, direction=data, registry=combined)
+    shot = report["shots"][0]
+    inventory = shot.get("reference_inventory", {})
+    assert inventory.get("semantic_binding_count") == 4
+    assert inventory["unique_exact_byte_count"] == 3
+    duplicate = inventory["duplicate_byte_groups"]
+    assert len(duplicate) == 1
+    assert {(item["asset_id"], item["role"], item["owner_id"])
+            for item in duplicate[0]["bindings"]} == {
+                ("robot-main", "character_reference", "robot"),
+                ("room", "scene_reference", "road"),
+            }
+    image_references = [item for item in shot["references"]
+                        if item.get("identity", {}).get("mime_type") == "image/png"]
+    assert len({(item["identity"]["sha256"], item["identity"]["size_bytes"])
+                for item in image_references}) == 2
+    assert "character_count" not in duplicate[0]
+    assert duplicate[0]["mime_type"] == "image/png"
+
+    image = next(item for item in shot["references"] if item["asset_id"] == "robot-main")
+    video = next(item for item in shot["references"] if item["asset_id"] == "guide-video")
+    assert image["owner_id"] == "robot"
+    assert image["measurements"]["width"] == 320
+    assert image["measurements"]["height"] == 320
+    assert video["measurements"]["width"] == 960
+    assert video["measurements"]["height"] == 540
+    assert video["measurements"]["duration_seconds"] == 4
+    assert video["measurements"]["duration_milliseconds"] == 4000
+    assert video["measurements"]["fps"] == {"numerator": 24, "denominator": 1}
+    assert video["measurements"]["frame_count"] == 96
+    assert shot["composition"] == {"trim_start_frame": 4, "trim_end_frame": 60}
+    assert shot["requested_duration_seconds"] == 7
+    assert shot["selected_route"] == "NOT_EVALUATED"
+    assert shot["independent_character_evidence"] == "NOT_EVALUATED"
+    assert shot["whitebox_reference"]["purpose_validation"] == "NOT_EVALUATED"
+    assert shot["whitebox_reference"]["timing_validation"] == "NOT_EVALUATED"
+    assert shot["whitebox_reference"]["candidate_video_asset_ids"] == ["guide-video"]
+
+
+def test_preflight_does_not_instantiate_runtime_factory_or_write_state(tmp_path, monkeypatch):
+    from scripts.canvas_production import run
+
+    source, definition = text_data()
+    (tmp_path / "source.json").write_text(json.dumps(source))
+    path = tmp_path / "data.json"
+    path.write_text(json.dumps(definition))
+    project_root = tmp_path / "production"
+    project_root.mkdir()
+    import scripts.canvas_production as canvas_cli
+    monkeypatch.setattr(canvas_cli.importlib, "import_module",
+        lambda *_: pytest.fail("preflight must not instantiate a runtime factory"))
+
+    result = run(data_path=path, project_root=project_root, action="preflight",
+        runtime_factory="forbidden:factory")
+
+    assert result["production_acceptance"] == "NOT_EVALUATED"
+    assert list(project_root.iterdir()) == []
+
+
 def test_preflight_rejects_invalid_authoring_instead_of_projecting_it(tmp_path):
     from scripts.canvas_production import main
     source, definition = text_data()
