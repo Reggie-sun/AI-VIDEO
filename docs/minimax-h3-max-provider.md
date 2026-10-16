@@ -19,6 +19,12 @@
 `context_ir_enabled`。生成时长与原镜头采用时窗分开；trim/frame/sample/timing
 继续由 `ResolvedTimeline` 独占，不延长剧情窗口来容纳模型输出。
 
+从 4 秒模型切换时，提交前必须逐项比较 selected QA 的原文、技术 observable 和
+final-output goal：用新版本将“请求4秒”适配为 H3 Max 的5秒标称生成，保留原采用时窗、
+对白窗口、全部剧情要求、proof/tolerance 和旧 source quotes；不能只改请求然后把旧4秒规则
+判成 PASS。尚无 paid intent/permit/transport 的旧准备只能由 committer 显式封存为
+unsubmitted，保留其历史与计数，不能重分类已提交或未知的任务。
+
 ## Credentials And Paid Effects
 
 适配器必须由 operator 注入 exact credential supplier；公共封存引用为

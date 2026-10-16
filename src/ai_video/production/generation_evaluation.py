@@ -225,10 +225,13 @@ class GenerationEvaluationSource(StrictModel):
         return canonical_sha256(self.model_dump(mode="json"))
 
     def project_findings(self) -> tuple[Finding, ...]:
+        if not self.observations:
+            return ()
+        source_sha256 = self.source_sha256
         return tuple(Finding(
             **item.model_dump(mode="python", include={"requirement_id", "verdict", "observation", "span_millis"}), rubric_hash=self.rubric_hash,
             stage="raw_generation", proof=self.proof,
-            source_sha256=self.source_sha256,
+            source_sha256=source_sha256,
         ) for item in self.observations)
 
     def answer_payload(self):
@@ -236,7 +239,10 @@ class GenerationEvaluationSource(StrictModel):
             "observations", "advisory_observations", "unresolved_quality_observations")}
 
     def unresolved_refs(self):
-        return tuple(canonical_sha256({"source_hash": self.source_sha256, "entry": item.model_dump(mode="json")})
+        if not self.unresolved_quality_observations:
+            return ()
+        source_sha256 = self.source_sha256
+        return tuple(canonical_sha256({"source_hash": source_sha256, "entry": item.model_dump(mode="json")})
                      for item in self.unresolved_quality_observations)
 
 
