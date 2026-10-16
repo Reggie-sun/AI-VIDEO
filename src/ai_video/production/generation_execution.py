@@ -11,7 +11,7 @@ from dataclasses import asdict, is_dataclass
 import hashlib
 from typing import Literal
 
-from pydantic import Field, PrivateAttr, model_validator
+from pydantic import Field, PrivateAttr, SerializerFunctionWrapHandler, model_serializer, model_validator
 
 from ai_video.production._shot_router_contracts import (
     ContinuityProviderRouteBinding,
@@ -54,6 +54,7 @@ class GenerationDecisionExecutionBinding(StrictModel):
     inputs: DecisionInputs
     decision: GenerationDecision
     continuity_routing: ContinuityProviderRouteBinding | None = None
+    unsubmitted_predecessor_evidence_hash: str | None = Field(default=None, pattern=_SHA256)
     compiled_request: ResolvedVideoGenerationRequest
     binding_hash: str = Field(pattern=_SHA256)
 
@@ -64,6 +65,15 @@ class GenerationDecisionExecutionBinding(StrictModel):
             **{name: value for name, value in values.items() if name != "binding_hash"},
         }
 
+    @model_serializer(mode="wrap")
+    def _serialize_unsubmitted_predecessor(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.unsubmitted_predecessor_evidence_hash is None:
+            data.pop("unsubmitted_predecessor_evidence_hash", None)
+        return data
+
     @model_validator(mode="after")
     def _validate_binding(self) -> "GenerationDecisionExecutionBinding":
         expected_hash = canonical_sha256(
@@ -71,6 +81,29 @@ class GenerationDecisionExecutionBinding(StrictModel):
         )
         if self.binding_hash != expected_hash:
             raise ValueError("generation execution binding hash is invalid")
+        predecessor_hash = self.unsubmitted_predecessor_evidence_hash
+        if predecessor_hash is not None:
+            matches = [
+                evidence for evidence in self.inputs.evidence
+                if evidence.evidence_hash == predecessor_hash
+            ]
+            experience_matches = [
+                evidence for experience in self.inputs.experiences
+                for evidence in experience.evidence
+                if evidence.evidence_hash == predecessor_hash
+            ]
+            if (
+                len(matches) != 1
+                or len(experience_matches) != 1
+                or matches[0] != experience_matches[0]
+                or matches[0].outcome != "not_submitted"
+                or matches[0].artifact_sha256 is not None
+                or matches[0].findings
+                or matches[0].unresolved_quality_refs
+                or matches[0].task_id != self.inputs.limits.task_id
+                or matches[0].shot_id != self.context.target_shot_id
+            ):
+                raise ValueError("unsubmitted predecessor evidence does not match this Shot and task")
         from ai_video.production.generation_decision import resolve_generation_decision
         expected = resolve_generation_decision(VideoGenerationResolver(),
             projection=self.projection,
@@ -150,6 +183,7 @@ class GenerationDecisionExecutionBinding(StrictModel):
         decision: GenerationDecision,
         compiled_request: ResolvedVideoGenerationRequest,
         continuity_routing: ContinuityProviderRouteBinding | None = None,
+        unsubmitted_predecessor_evidence_hash: str | None = None,
     ) -> "GenerationDecisionExecutionBinding":
         values: dict[str, object] = {
             "schema_version": "1",
@@ -160,6 +194,7 @@ class GenerationDecisionExecutionBinding(StrictModel):
             "inputs": inputs,
             "decision": decision,
             "continuity_routing": continuity_routing,
+            "unsubmitted_predecessor_evidence_hash": unsubmitted_predecessor_evidence_hash,
             "compiled_request": compiled_request,
         }
         provisional = cls.model_construct(**values, binding_hash="0" * 64)

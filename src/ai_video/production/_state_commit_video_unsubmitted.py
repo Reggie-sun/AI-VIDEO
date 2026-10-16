@@ -84,6 +84,80 @@ def is_verified_closed_unsubmitted_video_attempt(committer, *, manifest, attempt
     return True
 
 
+def require_unsubmitted_predecessor_lineage(
+    committer, *, manifest, binding, current_generation_id: str | None = None,
+) -> None:
+    """Bind a successor to the immediate same-Shot zero-effect preparation."""
+
+    shot_id = binding.context.target_shot_id
+    task_id = binding.inputs.limits.task_id
+    current_indices = [
+        index for index, attempt in enumerate(manifest.attempts)
+        if current_generation_id is not None
+        and attempt.video_generation_state is not None
+        and attempt.video_generation_state.generation_id == current_generation_id
+    ]
+    if current_generation_id is not None and len(current_indices) != 1:
+        raise _state_invalid("Current video attempt is not unique in Manifest lineage.")
+    boundary = current_indices[0] if current_indices else len(manifest.attempts)
+    same_shot = []
+    for attempt in manifest.attempts[:boundary]:
+        state = attempt.video_generation_state
+        if state is None:
+            continue
+        request = committer._reopen_video_request(state.request)
+        request_shot_id = (
+            request.activation_scope.request.target_shot_id
+            if request.activation_scope is not None else None
+        )
+        if request_shot_id == shot_id:
+            same_shot.append(attempt)
+
+    predecessor_hash = binding.unsubmitted_predecessor_evidence_hash
+    if not same_shot:
+        if predecessor_hash is not None:
+            raise _state_invalid("Unsubmitted predecessor is absent from this Shot's Manifest history.")
+        return
+
+    parent = same_shot[-1]
+    if not is_verified_closed_unsubmitted_video_attempt(
+        committer, manifest=manifest, attempt=parent,
+    ):
+        if predecessor_hash is not None:
+            raise _state_invalid("Unsubmitted predecessor is not the immediate closed Shot attempt.")
+        return
+
+    parent_state = parent.video_generation_state
+    parent_binding = committer._reopen_generation_execution_binding(
+        parent_state.execution_binding
+    )
+    parent_experiences = tuple(
+        committer._reopen_generation_experience(pointer)
+        for pointer in parent_state.generation_experiences
+    )
+    parent_evidence = (
+        parent_experiences[-1].evidence[-1]
+        if parent_experiences and parent_experiences[-1].evidence else None
+    )
+    if (
+        parent_evidence is None
+        or parent_binding.context.target_shot_id != shot_id
+        or parent_binding.inputs.limits.task_id != task_id
+        or parent_evidence.shot_id != shot_id
+        or parent_evidence.task_id != task_id
+    ):
+        raise _state_invalid("Closed unsubmitted predecessor differs from this Shot or task.")
+
+    if predecessor_hash is None:
+        # Older bindings can name this exact immediate predecessor in their
+        # ordinary latest-evidence field; retain that frozen representation.
+        if binding.inputs.latest_attempt_hash != parent_evidence.evidence_hash:
+            raise _state_invalid("Generation binding omits its direct unsubmitted predecessor.")
+        return
+    if predecessor_hash != parent_evidence.evidence_hash:
+        raise _state_invalid("Generation binding selects a stale unsubmitted predecessor.")
+
+
 def close_unsubmitted_video_generation(committer, *, attempt_id: str,
                                       expected_manifest_revision: int,
                                       actor: ActorIdentity, reason: CloseReason):

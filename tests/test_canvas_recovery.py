@@ -48,6 +48,113 @@ def test_closed_unsubmitted_preparation_preserves_history_and_zero_consumption(t
     assert reopened.position() == current
 
 
+def test_unsubmitted_intermediate_preserves_submitted_baseline_and_direct_lineage(tmp_path):
+    from ai_video.production.generation_feedback import record_attempt_evaluation
+    from ai_video.production._state_commit_video_unsubmitted import (
+        is_verified_closed_unsubmitted_video_attempt,
+    )
+    from test_production_video import _paid_preview, _paid_authorization
+
+    service, provider, limits, old, submitted, intervention = failed_canvas(tmp_path)
+    close_failure(service, old)
+
+    middle = service.start_repair(limits=limits, interventions=(intervention,))
+    middle_experience = record_attempt_evaluation(
+        committer=service.committer, attempt_id=middle.attempt_id,
+    )
+    middle_evidence = middle_experience.evidence[-1]
+    service.committer.close_unsubmitted_video_generation(
+        attempt_id=middle.attempt_id,
+        expected_manifest_revision=service._load().manifest.manifest_revision,
+        actor=ActorIdentity(actor_id="canvas-test", actor_kind="codex"),
+        reason="superseded_before_submit",
+    )
+    manifest = service._load().manifest
+    closed_middle = next(a for a in manifest.attempts if a.attempt_id == middle.attempt_id)
+    assert is_verified_closed_unsubmitted_video_attempt(
+        service.committer, manifest=manifest, attempt=closed_middle,
+    )
+
+    history = service.committer.read_generation_experiences()
+    prepared = service.prepare_repair(limits=limits, interventions=(intervention,))
+    assert prepared.execution_binding is not None
+    assert prepared.inputs.experiences == history
+    assert prepared.inputs.latest_attempt_hash == submitted.evidence[-1].evidence_hash
+    binding = prepared.execution_binding
+    assert binding.unsubmitted_predecessor_evidence_hash == middle_evidence.evidence_hash
+
+    from ai_video.production.generation_execution import GenerationDecisionExecutionBinding
+    bound_arguments = dict(
+        projection=binding.projection, context=binding.context, policy=binding.policy,
+        lifecycle=binding.lifecycle, inputs=binding.inputs, decision=binding.decision,
+        compiled_request=binding.compiled_request, continuity_routing=binding.continuity_routing,
+    )
+    for invalid_parent in (
+        submitted.evidence[-1].evidence_hash,
+        "f" * 64,
+        middle_evidence.model_copy(update={"shot_id": "two"}).evidence_hash,
+        middle_evidence.model_copy(update={"task_id": "foreign-task"}).evidence_hash,
+    ):
+        invalid_inputs = binding.inputs
+        if invalid_parent not in {submitted.evidence[-1].evidence_hash, "f" * 64}:
+            changed = next(
+                evidence for evidence in (middle_evidence.model_copy(update={"shot_id": "two"}),
+                    middle_evidence.model_copy(update={"task_id": "foreign-task"}))
+                if evidence.evidence_hash == invalid_parent
+            )
+            invalid_inputs = binding.inputs.model_copy(update={
+                "evidence": (*binding.inputs.evidence, changed),
+            })
+        with pytest.raises(ValueError, match="unsubmitted predecessor"):
+            GenerationDecisionExecutionBinding.create(
+                **{**bound_arguments, "inputs": invalid_inputs},
+                unsubmitted_predecessor_evidence_hash=invalid_parent,
+            )
+
+    legacy_binding = GenerationDecisionExecutionBinding.create(
+        **bound_arguments, unsubmitted_predecessor_evidence_hash=None,
+    )
+    assert "unsubmitted_predecessor_evidence_hash" not in legacy_binding.model_dump(mode="json")
+    assert GenerationDecisionExecutionBinding.model_validate_json(
+        legacy_binding.model_dump_json()
+    ).binding_hash == legacy_binding.binding_hash
+    before_missing_parent = service._load().manifest
+    with pytest.raises(Exception, match="omits its direct unsubmitted predecessor"):
+        service._start_prepared(
+            service.position(), replace(prepared, execution_binding=legacy_binding), limits,
+        )
+    assert service._load().manifest == before_missing_parent
+    assert provider.call_counts.submit == 1
+
+    current = service.start_repair(limits=limits, interventions=(intervention,))
+    assert current.next_action == "submit"
+    assert service.position() == current
+    assert service.committer.read_generation_experiences() == history
+    assert provider.call_counts.submit == 1
+
+    authorizations = {}
+    service.committer._paid_provider_authorizer = lambda preview: authorizations.get(
+        preview.preview_fingerprint
+    )
+    state = service._service(current.attempt_id)._state(current.attempt_id)[1]
+    request = service.committer._reopen_video_request(state.request)
+    preview = _paid_preview(request, attempt_id=current.attempt_id,
+        video_preview=provider.preview(request))
+    authorizations[preview.preview_fingerprint] = _paid_authorization(preview)
+    provider._scenario = replace(provider._scenario,
+        external_effect_id="canvas-direct-lineage-effect")
+    service.execute(action="submit", paid_preview=preview,
+        reservation_id="canvas-direct-lineage-reservation")
+    assert provider.call_counts.submit == 2
+
+    reopened = CanvasProductionService(committer=service.committer, packet=service.packet,
+        direction=service.direction, targets=service.targets,
+        routing_policy=service.routing_policy, decision_policy=service.decision_policy)
+    assert reopened.position().next_action == "poll"
+    reopened.execute(action="poll")
+    assert provider.call_counts.submit == 2
+
+
 def test_closed_unsubmitted_revision_cannot_rename_task(tmp_path):
     service, provider, limits, _, _ = closed_unsubmitted_canvas(tmp_path)
     before = service._load().manifest

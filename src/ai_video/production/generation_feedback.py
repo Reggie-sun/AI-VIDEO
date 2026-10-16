@@ -275,12 +275,14 @@ class GenerationFeedbackOrchestrator:
 
     def __init__(self, *, targets, context_loader: Callable, history_loader: Callable,
                  policy: DecisionPolicy,
-                 profile_reaffirmation: ViduProfileReaffirmation | None = None):
+                 profile_reaffirmation: ViduProfileReaffirmation | None = None,
+                 unsubmitted_predecessor_evidence_hash: str | None = None):
         self.targets = tuple(targets)
         self.context_loader = context_loader
         self.history_loader = history_loader
         self.policy = policy
         self.profile_reaffirmation = profile_reaffirmation
+        self.unsubmitted_predecessor_evidence_hash = unsubmitted_predecessor_evidence_hash
 
     def prepare(self, *, limits: ExecutionLimits,
                 interventions: tuple[Intervention, ...] = ()) -> PreparedGeneration:
@@ -360,7 +362,8 @@ class GenerationFeedbackOrchestrator:
         from ai_video.production.generation_execution import GenerationDecisionExecutionBinding
 
         binding = GenerationDecisionExecutionBinding.create(
-            **arguments, inputs=inputs, decision=decision, compiled_request=resolved)
+            **arguments, inputs=inputs, decision=decision, compiled_request=resolved,
+            unsubmitted_predecessor_evidence_hash=self.unsubmitted_predecessor_evidence_hash)
         return PreparedGeneration(inputs, decision, compilation, resolved, provider, binding,
                                   current["context"].target_shot_id)
 
@@ -393,7 +396,8 @@ class GenerationFeedbackOrchestrator:
 
     @classmethod
     def for_project(cls, *, committer, targets, context_loader, policy,
-                    profile_reaffirmation: ViduProfileReaffirmation | None = None):
+                    profile_reaffirmation: ViduProfileReaffirmation | None = None,
+                    unsubmitted_predecessor_evidence_hash: str | None = None):
         """Use the standard project loader and committer's durable feedback store.
 
         The authoring adapter receives the freshly loaded canonical project and
@@ -470,7 +474,8 @@ class GenerationFeedbackOrchestrator:
         from ai_video.production.video_generation import VideoGenerationService
 
         return cls(targets=targets, context_loader=current, history_loader=history, policy=policy,
-                   profile_reaffirmation=profile_reaffirmation)
+                   profile_reaffirmation=profile_reaffirmation,
+                   unsubmitted_predecessor_evidence_hash=unsubmitted_predecessor_evidence_hash)
 
     @staticmethod
     def record_evaluation(*, committer, prepared, attempt_id, outcome, artifact_sha256=None,

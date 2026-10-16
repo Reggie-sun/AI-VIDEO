@@ -26,10 +26,14 @@ def current_canvas_attempt(committer, attempts):
         if state.execution_binding is None:
             raise ValueError(message)
         binding = committer._reopen_generation_execution_binding(state.execution_binding)
-        latest = binding.inputs.latest_attempt_hash
-        if latest is None:
+        predecessor_hash = (
+            binding.unsubmitted_predecessor_evidence_hash
+            or binding.inputs.latest_attempt_hash
+        )
+        if predecessor_hash is None:
             continue
-        evidence = next((e for e in binding.inputs.evidence if e.evidence_hash == latest), None)
+        evidence = next((e for e in binding.inputs.evidence
+                         if e.evidence_hash == predecessor_hash), None)
         parent = by_id.get(evidence.attempt_id) if evidence is not None else None
         if (parent is None or parent.attempt_id == attempt.attempt_id
                 or parent.status is not StateCommitStatus.FAILED):
@@ -39,7 +43,8 @@ def current_canvas_attempt(committer, attempts):
         if parent.video_generation_state.quality_rejection is not None:
             receipt = committer._reopen_generation_quality_rejection(
                 parent.video_generation_state.quality_rejection)
-            if (receipt.evidence_hash != latest or receipt.request_fingerprint != evidence.request_hash
+            if (receipt.evidence_hash != predecessor_hash
+                    or receipt.request_fingerprint != evidence.request_hash
                     or receipt.artifact_sha256 != evidence.artifact_sha256
                     or binding.inputs.abandoned_result is not None
                         and binding.inputs.abandoned_result != receipt):
@@ -151,7 +156,7 @@ def current_canvas_attempt(committer, attempts):
             pointer = next((p for p in parent.video_generation_state.runtime_repairs
                             if repair is not None and p.content_hash == repair.content_hash), None)
             if (pointer is None or repair.attempt_id != parent.attempt_id
-                    or repair.evidence_hash != latest or evidence.outcome != "runtime_failure"
+                    or repair.evidence_hash != predecessor_hash or evidence.outcome != "runtime_failure"
                     or evidence.artifact_sha256 is not None
                     or committer._reopen_video_request(parent.video_generation_state.request).request_input_hash
                         != evidence.request_hash

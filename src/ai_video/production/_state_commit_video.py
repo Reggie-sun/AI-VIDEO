@@ -284,6 +284,13 @@ class _StateCommitVideoMixin:
             latest_hash = effective_history[-1].evidence_hash if effective_history else None
             if binding.inputs.latest_attempt_hash != latest_hash:
                 raise _state_invalid("Generation latest attempt differs from ordered durable history.")
+            from ai_video.production._state_commit_video_unsubmitted import (
+                require_unsubmitted_predecessor_lineage,
+            )
+            require_unsubmitted_predecessor_lineage(
+                self, manifest=manifest, binding=binding,
+                current_generation_id=state.generation_id,
+            )
             self._require_production_predecessors(loaded, binding, tuple(ordered_experiences))
             self._require_persisted_generation_limits(manifest, state, binding)
             return binding, self._require_runtime_repair_grant(manifest, binding)
@@ -813,6 +820,13 @@ class _StateCommitVideoMixin:
                 for item in manifest.attempts
             ):
                 raise _state_invalid("Video generation identity is already owned.")
+            if execution_binding is not None:
+                from ai_video.production._state_commit_video_unsubmitted import (
+                    require_unsubmitted_predecessor_lineage,
+                )
+                require_unsubmitted_predecessor_lineage(
+                    self, manifest=manifest, binding=execution_binding,
+                )
             self._write_immutable_artifact(artifact, attempt_id=attempt_id)
             if binding_artifact is not None:
                 self._write_immutable_artifact(binding_artifact, attempt_id=attempt_id)

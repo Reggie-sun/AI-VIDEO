@@ -231,6 +231,28 @@ class CanvasProductionService:
         if self.routing_policy is None or self.decision_policy is None:
             raise _blocked("Configure the existing routing/decision policies before generation.")
 
+        unsubmitted_predecessor_evidence_hash = None
+        if getattr(repair_receipt, "outcome", None) == "not_submitted":
+            from ai_video.canvas_recovery import closed_unsubmitted_evidence
+
+            shot_id = row["shot"]["shot_id"]
+            loaded = self._load()
+            matching = [
+                attempt for attempt in self._attempts(loaded, shot_id)
+                if closed_unsubmitted_evidence(self.committer, attempt) == repair_receipt
+            ]
+            if len(matching) != 1:
+                raise _blocked("Closed unsubmitted predecessor is not unique and canonical.")
+            predecessor = matching[0]
+            binding = self.committer._reopen_generation_execution_binding(
+                predecessor.video_generation_state.execution_binding
+            )
+            if (binding.context.target_shot_id != shot_id
+                    or binding.inputs.limits.task_id != repair_receipt.task_id
+                    or repair_receipt.shot_id != shot_id):
+                raise _blocked("Closed unsubmitted predecessor differs from the current Shot or task.")
+            unsubmitted_predecessor_evidence_hash = repair_receipt.evidence_hash
+
         def context(loaded):
             # Every prepare reopens source bytes, approved director binding and actual predecessor.
             self._load()
@@ -250,7 +272,8 @@ class CanvasProductionService:
             return current
 
         return GenerationFeedbackOrchestrator.for_project(committer=self.committer,
-            targets=self.targets, context_loader=context, policy=self.decision_policy)
+            targets=self.targets, context_loader=context, policy=self.decision_policy,
+            unsubmitted_predecessor_evidence_hash=unsubmitted_predecessor_evidence_hash)
 
     @_input_errors
     def prepare(self, *, limits):
