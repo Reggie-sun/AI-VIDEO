@@ -9,6 +9,13 @@ evidence_index_version: "1"
 
 Date: 2026-10-13
 
+## Shared Control Engineering — 2026-10-17
+
+通用参考控制审计、模式取舍预览、semantic reference到native index映射与多场景工程验证已记录在
+[Reference Control Audit And Preview](2026-10-17-reference-control-audit-and-preview.md)。源码 `473ed99`
+已发布并通过 exact Harness；本轮新增图片/视频/音频 POST均0。下方官方 H3 Max 原片的15项要求、
+4 PASS/5 FAIL/6 NOT_EVALUATED及STOP不变；工程完成不证明本片、连续镜、完整故事或通用模型质量通过。
+
 ## Current Official H3 Max Result — 2026-10-16
 
 用户明确改用官方 H3 Max，并确认 Key 来自国内站 `platform.minimax.cn/console/access`。当前最新原片来自官方 `MiniMax-H3-Max`，已实际落盘并登记逐镜 QA；下方 METASO/白模结果全部保留为历史，不是 accepted S01。证据根为 `runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-cn-S01-20261016-001/`，以下简称 CN unit；国际站前序证据在同 run 的 `official-h3-max-S01-20261016-001/`，简称 IO unit。
