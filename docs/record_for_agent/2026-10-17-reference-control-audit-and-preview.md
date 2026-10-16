@@ -8,6 +8,10 @@ learning_eligibility: ineligible
 
 Date: 2026-10-17
 
+## Authorized Media Follow-Up
+
+工程发布后，用户批准下述最多2次、零重抽单元。已执行一个此前尚无实证的 H3 Max CN first-frame 条件；15项为6 PASS / 2 FAIL / 7 NOT_EVALUATED，整镜仍STOP、无accepted state或S02提交。第二臂原样重做会重复旧 native `ratio=9:16` 请求，故未消耗；`effective_output.ratio=adaptive` 不能反推native比例。当前媒体、计数、canonical关闭与有界比较以 [Jieshi First-Frame Record](2026-10-13-jieshi-original-s01-s02-candidate.md#current-official-h3-max-first-frame-result--2026-10-17) 为准；下文的Manifest103/Project14、POST0和待授权状态保留为先前工程checkpoint历史。
+
 ## Goal And Scope
 
 建设跨项目、跨镜头的控制目标→参考职责→所选路线→exact输入→验收证据说明，沿既有 Canvas、Planner、Router、compiler 与唯一 committer；《界蚀》是现有失败案例，不是特殊分支。前序 10-13 reference preflight 与 10-16 preserved-video spec/plan 只作历史依据，本轮没有把它们当新通用 spec 或付费许可。未新增 Provider、执行链、timeline、renderer、状态库、依赖或 QA 放宽。
@@ -37,6 +41,8 @@ MiniMax 当前[官方 V2 API](https://platform.minimax.io/docs/api-reference/vid
 
 ## Current Jieshi Evidence
 
+本节为源码发布前的只读工程基线；后续新授权媒体已由顶部notice取代其“当前”状态。
+
 通过标准 `load_production_project`、`reopen_authoring_input` 及 author validation 重开 current sealed input，再运行只读 preflight：Manifest103 / Project14，source SHA `302772dd855b9ae60dd9b15b5c4319cae63c0b781f20b528c4cdad2adc908980`；10 个 semantic bindings、2 组 unique bytes。9 个 image aliases 均为原 PNG `13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923`；另一个是 v015 视频 `8b8d1e43d5295109fceda1755bc41e005f6e927ef2b8e657d0328f288aa50e33`，720×1280、24fps、96帧、4000ms。作者职责和每个 owner 保留。原 docs 初版定义直接 resume 当前修订项目被 source-selection guard 正确拒绝；不能把新项目的 position=None 当当前运行状态。
 
 独立重开 CN unit 的 sealed execution-binding 文件 SHA `8b86179a31b94e04b0d9d241816d9dbdee3f5b520b2fa765cac8c4d101410c3b`，新报告给出 native `content[1]`–`content[9]` 为9份同PNG reference_image，`content[10]` 为白模 reference_video；保留 identity/scene/video_reference 各语义证据。resolved hash `821b422b878fa4a105eb4ba55dd417236f7f4c9d7bec1d7adb45d04a51fd662a`。这是历史 exact 请求的解释，不是新选路、调用或 accepted state。
@@ -56,6 +62,8 @@ Risk Gate 对上述 exact source candidate 为 `NATIVE_REVIEW_NOT_REQUIRED`：�
 文档 checkpoint receipt：`.agent/harness/runs/reference-control-record-20261017-r1/receipt.json`。publication 以对应 Git 与 remote main SHA 核对为准；原 AGENTS/playbook 及旧记录/spec/plan/baseline 的 staged/dirty/untracked 工作全部保留。
 
 ## Empirical Boundary And Next Unit
+
+以下为获批前的方案与授权边界；后续实际只执行A一次，B的重复性和最新Gate见顶部notice。原先“未执行/需新授权”的时态只适用于该工程checkpoint，不覆盖随后用户“可以”的新有限授权。
 
 本轮完成通用工程表达与多场景离线行为验证，未证明任何模型的通用质量改善、单镜通过、连续镜通过、完整故事交付或 human 1.0x 验收。9份同图、4秒reference/5秒generation/3秒采用分别造成多大影响仍无受控因果结论。
 

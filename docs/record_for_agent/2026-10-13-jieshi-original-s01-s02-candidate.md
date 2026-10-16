@@ -9,16 +9,52 @@ evidence_index_version: "1"
 
 Date: 2026-10-13
 
+## Current Official H3 Max First-Frame Result — 2026-10-17
+
+用户对已展示的 H3 Max CN 最多2次、零重抽单元回复“可以”，包括首帧模式不能并用动态白模的逐镜例外。实际只执行 A 一次：`canvas-1693d62e38fffba5c59869059653049cece057cb`；新证据根为 `runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-mode-pair-20261017-001/`，下称 A unit。新增视频 POST1、图片/音频生成 POST0、音频理解调用0，历史视频累计18，S02仍0。没有把未用的第二次改配其他模型、素材或实验。
+
+### Exact Mode And Preserved Requirements
+
+共享 Canvas authoring、Planner/Router、compiler 与 `VideoGenerationService` 完成此次输入和执行，没有新增源码或故事执行脚本。原 PNG SHA `13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923` 仅作为一张 `first_frame`；不是将九个身份 alias 自动去重。native 为 `MiniMax-H3-Max`、`duration=5`、`resolution=768P`、balanced，`content=[text, first_frame]`，不发送 `ratio`，无 `reference_video`。逐镜记录官方互斥约束下的动态白模例外；v015及旧绑定/结果保留在历史，不能宣称本臂继承了其动作轨迹。
+
+重开历史原始首帧 snapshot `b1e834a4e215f9a7b7104ddf2fec71f3cf687efdad704a64d921f4b4b6aabaaa`，原两段文字逐字保留；prompt SHA `2a54252ee51ac0d9c1a193ff0b3060aa80ae94ab3570986c588b49b162f50f59`。只移除 R2V 专属的参考职责附录、alias与视频 chip，并同步真实 first-frame 职责；S02改回与该 snapshot 匹配的历史未采用占位资产，没有媒体或 accepted state。原15项 QA/hash `dafe8462ce182ac1e44a755f91eef68b8c65dc135063f210a263a278900f639d`、广播0.1–2.7秒及采用 frames0–71/0–3秒不变。`A-source-preservation.json`、`A-authoring.candidate.json`、`A-prepare.json`、`A-native-preview.json` 可重开 exact映射与限制。
+
+两个准备错误均在 POST前被原 guard 拒绝：R2V原稿不能直接改标签冒充 I2V；选择 `approved_keyframe` 后仍须 Shot 的 `required_asset_roles.first_frame` 精确绑定同一图。通过既有 owner 修正数据后正常编译，没有放宽 guard。内部 ledger 总上界300,000,000→350,000,000 CNY microunits、单次50,000,000；task ceiling6→7、历史已用6保留且本次后为7。它们只表示新授权下有限 operator上界，不是报价、余额、账单或重铸旧额度。
+
+### Actual Media And Gate
+
+一次 CN POST于 `2026-10-16T16:41:45Z` 发出，HTTP200；body SHA `3ab700490614a2ad7c93483fb0bdf405659cc33d6c2f63b226eed18b65800bac`、2,822,118 bytes，与封存 preview一致。只查询和下载同一 task。下载仍按 exact结果host的本次公网DNS答案、public IP pin、TLS/SNI、无凭据/无redirect GET，未改全局DNS或重新生成。
+
+Exact MP4：`production/state/video-generation/fetch/files/e3407abea389e9098f74bdaf25281d741030bbb09830e32cdc6faf793c25df3c.mp4`（相对于本 run root），5,148,741 bytes；H264、768×1344、24fps、124帧、container5.184秒，AAC32kHz stereo。实际4:7，不能写成精确9:16或原图像素级复现。显式 project-local `video-analysis.video_analyze` 取得21个0.25秒样本；关闭 transcription与audio understanding。另用既有 FFmpeg 解码原生 frame71（SHA `a7764381c5e55eb8de0a8c20243713be4fb26e1b2db081bb109d14b6f952fc34`），没有用5秒尾帧代3秒切出。
+
+`A-MCP-response.actual.json` 是本次真实工具响应；canonical bridge重开该响应，经受控 presentation实际展示并回答全部15项，登记 `generation-evaluation/2`。QA为 **6 PASS / 2 FAIL / 7 NOT_EVALUATED**：
+
+- PASS：camera、close-anchor、identity、phone、source-output、space。此次观察保留了原八人，包括此前缺失的灰帽衫陈立；可见外观/衣着和空间关系稳定，右手唯一手机保留。close-anchor只证明Lin存在，source-output只证明原片技术合同与采用配置；均不代其他验收。
+- FAIL：close-gap、reflections。约1.5秒起可见抬起手的玻璃幽影；原生frame71仍在完成抬手/伸指，3.0–3.5秒继续变化，没有在原3秒切出前完成并保持所需悬停。物理2cm距离未被伪造测量。
+- NOT_EVALUATED：badge、broadcast、broadcast-window、gaze-lips、left-hand、native-track、other-props。工牌细字、完整音义/精确广播边界、全程目光嘴唇/手部解剖及非接触、陈立被遮挡的手机/耳机细节均未齐证。未复用旧MP4的已消费Gemini音频单元，未把AAC存在或工具成功当听音；human完整1.0x验收仍NOT_EVALUATED。
+
+canonical诊断为 `EVIDENCE_GAP/QUALITY_FAILURE`，evidence `0bc14ce939c3709e2b4b862f9b0ad3592498ca71e360ab9ae8b2ca857f79bc95`，all-required-pass=false。原 committer 已明确 abandon；Manifest116、Project16，attempt failed / phase validate，无activate、accepted state或S02提交。缺声音/细节的补证不能修好两个已知视觉失败，故不为此重生。actual presentation、逐项理由、诊断和标准重开分别见 `A-qa-presentation.actual.json`、`A-operator-qa-answers.json`、`A-qa-diagnosis.actual.json`、`A-stable-media-checkpoint.json`。
+
+### Comparison And Learning Boundary
+
+旧 CN R2V 的 profile/native本来就已发送 `ratio=9:16`；`effective_output.ratio=adaptive` 是输出能力投影，不能反推请求比例。按原样重做 B 只是随机重抽，不增加模式或比例条件，故未执行第二次。具体官方核对与反例见 [Mode Pair Research](../research/2026-10-17-official-h3-max-mode-pair.md)。
+
+A这次保留陈立而旧B缺失，只是有界观察。两次同时改变模式、native references、profile/stack、R2V附录且seed不受控，不能断言首帧模式单独造成改善，也不能证明跨项目质量；两者均未通过整镜。现有控制映射/模式预览工程已完成，单镜、连续镜、完整故事与human验收均未完成。后续应先明确可解决手部反射与3秒动作落点的具体输入或制作策略，再另封有限验证；当前未用槽位不自动授权其他实验。
+
+按 `record-ai-video-session` 更新同一主记录并自动评估 `distill-ai-video-learning=no_candidate`：新增一次独立媒体，不把proof层或历史B另算新调用；现有资料只支持上述有界差异，未形成超出现有完整Gate/模式限制的新可采纳工作流机制，不制造通用质量规则或修改Skill/Policy/Gate。既有本地H3 first-frame/open-state claim排除paid/其他profile，Vidu对白claim排除其他模型及人物/倒影质量，本次不是其scope内的material update。此次无源码行为变更，Parent Risk Gate为 `NATIVE_REVIEW_NOT_REQUIRED`；现有首帧/原文保留 focused checks 8 PASS，先前通用工程 exact Harness保留其原publication边界。本文档checkpoint receipt为 `.agent/harness/runs/h3-max-first-frame-record-20261017-r1/receipt.json`；publication以该exact receipt及Git/remote SHA为准。
+
 ## Shared Control Engineering — 2026-10-17
 
 通用参考控制审计、模式取舍预览、semantic reference到native index映射与多场景工程验证已记录在
 [Reference Control Audit And Preview](2026-10-17-reference-control-audit-and-preview.md)。源码 `473ed99`
-已发布并通过 exact Harness；本轮新增图片/视频/音频 POST均0。下方官方 H3 Max 原片的15项要求、
-4 PASS/5 FAIL/6 NOT_EVALUATED及STOP不变；工程完成不证明本片、连续镜、完整故事或通用模型质量通过。
+已发布并通过 exact Harness；该工程checkpoint新增图片/视频/音频 POST均0。随后新授权的一次首帧实证见上节；
+下方旧R2V原片4 PASS/5 FAIL/6 NOT_EVALUATED及历史STOP保留。工程完成不证明本片、连续镜、完整故事或通用模型质量通过。
 
 ## Current Official H3 Max Result — 2026-10-16
 
-用户明确改用官方 H3 Max，并确认 Key 来自国内站 `platform.minimax.cn/console/access`。当前最新原片来自官方 `MiniMax-H3-Max`，已实际落盘并登记逐镜 QA；下方 METASO/白模结果全部保留为历史，不是 accepted S01。证据根为 `runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-cn-S01-20261016-001/`，以下简称 CN unit；国际站前序证据在同 run 的 `official-h3-max-S01-20261016-001/`，简称 IO unit。
+本节是历史R2V结果；最新首帧结果及当前STOP见顶部2026-10-17节，旧结论和证据不覆盖。
+
+用户明确改用官方 H3 Max，并确认 Key 来自国内站 `platform.minimax.cn/console/access`。当时最新原片来自官方 `MiniMax-H3-Max`，已实际落盘并登记逐镜 QA；下方 METASO/白模结果全部保留为历史，不是 accepted S01。证据根为 `runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-cn-S01-20261016-001/`，以下简称 CN unit；国际站前序证据在同 run 的 `official-h3-max-S01-20261016-001/`，简称 IO unit。
 
 ### Exact Input And Region
 
@@ -881,6 +917,8 @@ Parent使用`research`与`retrieve-ai-video-memory`，后者不作为current事�
 | original-S01-max-cn-fetch | official-max-post:aa4fea276e0220266fc81f47c6c66c32f9bbdbb773c631f6160b8d86101e4092 | jieshi-original-S01-official-max-20261016 | canvas-c5f04a3750cb384d4bf55ae00424511ede0f818c | N/A | f0685279ab5d0b2256951ed99bde45afc721a7135d654533296c11c038f86725 | PROVIDER_RECEIPT | FETCHED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-cn-S01-20261016-001/fetch.actual.json |
 | original-S01-max-cn-qa | official-max-post:aa4fea276e0220266fc81f47c6c66c32f9bbdbb773c631f6160b8d86101e4092 | jieshi-original-S01-official-max-20261016 | canvas-c5f04a3750cb384d4bf55ae00424511ede0f818c | N/A | f0685279ab5d0b2256951ed99bde45afc721a7135d654533296c11c038f86725 | ANALYZER | FAIL | QUALITY_FAILURE_AND_EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-max-cn-fetch | runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-cn-S01-20261016-001/qa-diagnosis.actual.json |
 | original-S01-max-cn-audio | official-max-post:aa4fea276e0220266fc81f47c6c66c32f9bbdbb773c631f6160b8d86101e4092 | jieshi-original-S01-official-max-20261016 | canvas-c5f04a3750cb384d4bf55ae00424511ede0f818c | N/A | f0685279ab5d0b2256951ed99bde45afc721a7135d654533296c11c038f86725 | AUDIO_ANALYZER_OBSERVATION | OBSERVED_NOT_HUMAN_ACCEPTED | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-max-cn-fetch | runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-cn-S01-20261016-001/exact-mcp-analysis.json |
+| original-S01-max-frame-fetch | official-max-attempt:canvas-1693d62e38fffba5c59869059653049cece057cb | official-h3-max-mode-control-20261017 | canvas-1693d62e38fffba5c59869059653049cece057cb | A | e3407abea389e9098f74bdaf25281d741030bbb09830e32cdc6faf793c25df3c | PROVIDER_RECEIPT | FETCHED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-mode-pair-20261017-001/A-fetch.actual.json |
+| original-S01-max-frame-qa | official-max-attempt:canvas-1693d62e38fffba5c59869059653049cece057cb | official-h3-max-mode-control-20261017 | canvas-1693d62e38fffba5c59869059653049cece057cb | A | e3407abea389e9098f74bdaf25281d741030bbb09830e32cdc6faf793c25df3c | ANALYZER | FAIL | QUALITY_FAILURE_AND_EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-max-frame-fetch | runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-mode-pair-20261017-001/A-qa-diagnosis.actual.json |
 
 ## Historical Record And Learning Update
 

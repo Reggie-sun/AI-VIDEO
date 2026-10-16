@@ -26,6 +26,8 @@
 这些是输入模式约束，不保证全部动作、人数或反射正确；生成尾端也不是原采用切点。
 共享 prepare 的 `reference_control` 复用 `native_control_parameters()` 与实际 payload 的同一标量逻辑，
 披露 exact profile/绑定及控制限制，不生成 bytes、读取凭据、授权调用或签 QA。
+`effective_output.ratio=adaptive` 表示接受 Provider 实测输出几何，不能据此推断 native 请求比例；
+reference route 的请求比例应核对 sealed profile 与 `reference_control.native_parameters.ratio`，再另验实际 MP4。
 `extra.prompt_expansion_mode` 属于所选 immutable profile；不发送 METASO 专用的
 `context_ir_enabled`。生成时长与原镜头采用时窗分开；trim/frame/sample/timing
 继续由 `ResolvedTimeline` 独占，不延长剧情窗口来容纳模型输出。
