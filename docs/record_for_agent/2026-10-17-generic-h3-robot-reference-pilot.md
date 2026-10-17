@@ -128,6 +128,16 @@ Risk Gate为`NATIVE_REVIEW_NOT_REQUIRED`：显式trusted resolver没有授予新
 | robot-r2v-technical | canvas:generic-robot-reference:canvas-50d9e7ad76b42064d3c5a34647c05feacd271dda | generic-reference-control-20261017 | canvas-50d9e7ad76b42064d3c5a34647c05feacd271dda | robot-reference-r2v | 0a7e9072f5bbce23f78ead55dc6ebefb477ded1d6e9518cb6a42ce19f5049bc9 | TECHNICAL | NOT_EVALUATED | EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | robot-r2v-fetch | runs/generic-control-real-media-20261017-001/live-robot-r2v-001/canonical-technical-diagnosis.json |
 | robot-r2v-human | canvas:generic-robot-reference:canvas-50d9e7ad76b42064d3c5a34647c05feacd271dda | generic-reference-control-20261017 | canvas-50d9e7ad76b42064d3c5a34647c05feacd271dda | robot-reference-r2v | 0a7e9072f5bbce23f78ead55dc6ebefb477ded1d6e9518cb6a42ce19f5049bc9 | HUMAN | NOT_EVALUATED | EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | robot-r2v-fetch | runs/generic-control-real-media-20261017-001/live-robot-r2v-001/canonical-closure.json |
 
+## Research Clarification
+
+用户追问官方/社区是否已有答案后，补核官方full-reference rewrite指南、CN API扩写选项与第一手社区报告，
+结论和链接写入原[研究owner](../research/2026-10-17-h3-action-timing-reflection-repair.md#generic-reference-timing-follow-up)。
+已有职责组织、时长/FPS对齐及保留关系表达方法；同类动作延迟也已有本地H3用户报告。
+本次白模已满足5秒/24fps，不能把重复该配置或机械切换video editing/扩写模式当成经验证修复。
+官方rewrite格式不等同原始API强制格式，意图保留标记不等同硬控制；尚未找到当前H3 Max CN
+精确动作deadline的可复核稳定修复证据。先应用适用资料并离线核对，真实验证只回答剩余具体问题。
+本次只有文档资料GET，无新增Provider/media/凭据操作或Production状态变更；原独立尝试仍只计一个。
+
 ## Automatic Learning Evaluation
 
 `record-ai-video-session`完成当前真实尝试与旧准备状态对账后，实际评估`distill-ai-video-learning`：

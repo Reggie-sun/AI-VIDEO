@@ -2,6 +2,40 @@
 
 Date: 2026-10-17
 
+## Generic Reference Timing Follow-up
+
+后续[几何人物R2V单元](../record_for_agent/2026-10-17-generic-h3-robot-reference-pilot.md)已观察到：
+白模3.5秒平举，H3 Max CN输出约4秒才平举。这个有界反例不要求从零探索全部工作流；
+应先复用可追溯做法并核对适用性，真实调用只验证尚未解决的目标，不重复验证已知接口边界。
+本节为资料核对，无新媒体调用，不改变该attempt的FAIL/NE、输入或STOP。
+
+- **Official reference semantics.** 官方[full-reference指南](https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/docs/VIDEO_PROMPT_WRITING_GUIDE_ref_en.md)
+  区分主体特征、具体帧锚点与视频整体时序来源，并要求说明各自保留、部分保留、转移或弱参考的关系。
+  `reference generation`与直接编辑原视频的`video editing`不是同一意图；仅借用动作/摄影不自动成为原视频编辑。
+  指南说明的是rewrite output格式；不能据此断言CN API原始prompt必须有六个英文段，
+  也不能把`fully_preserved`这种意图声明当作原生逐帧控制或执行保证。
+- **Exact API boundary.** [当前CN API](https://platform.minimax.cn/docs/api-reference/video-generation-v2-create)
+  的H3 Max扩写选项为`disabled`、`balanced`、`quality`，当前单元已用默认`balanced`。
+  没有取得该次服务端重写文本，不能声称其内部一定保留或改变了动作时间；
+  官方H3 Base的Context-IR指南也不证明H3 Max服务内部实现。
+  不凭“质量优先”名称断言切换`quality`会解决时序，不把关闭扩写当已经验证的修法。
+- **Community delay counterexample.** [第一手视频输入讨论](https://www.reddit.com/r/StableDiffusion/comments/1vg20lv/some_tips_for_feeding_videos_in_to_minimax_h3/)
+  建议输入/输出时长一致、强制24fps；同帖仍有人报告动作相同但输出变慢、延后，
+  自述需要约1.2倍retime才能匹配。这是本地H3用户观察，没有H3 Max CN的受控修复证明；
+  不能将1.2倍直接套用到其他镜头、声音或原采用切点。本次来源已为5秒/24fps，不能把再统一帧率当新修复。
+- **Reusable positive practice and limits.** [Blender参考案例](https://www.reddit.com/r/StableDiffusion/comments/1wqydpg/blender_camera_motion_minimax_h3_ref2vid_in/)
+  用白模负责摄影运动、人物图负责身份、背景图负责环境；作者仍要求检查构图与衔接。
+  它提供制作方法，没有3.5秒动作deadline的误差测量，且为本地采样，不能代签CN API质量。
+  [人物替换原帖](https://www.reddit.com/r/StableDiffusion/comments/1vojyye/minimax_h3_ref2v_character_replacement_prompting/)
+  还报告整个人物替换时`reference generation`比`video editing`好，后者过度保留原人物；
+  因此不能把“全部改成video editing”升级成通用答案。
+
+对当前案例，图/视频职责、同5秒长度和24fps已经核对；接下来可在既有authoring owner内离线检查
+保留/转移关系、主体与视频时序是否被明确表达，以及所选模式能提供的控制强度。
+现有`input_control`与prose可表达这些关系，资料没有证明必须新增schema、Provider或另一执行链。
+这类输入核对不证明改写有效。只有要承诺某个model/mode在目标场景中稳定达到精确动作时点时，
+才还需要有明确问题、通过标准和停止条件的有限真实验证；未取得新授权不执行。
+
 ## Scope and Current Evidence
 
 本记录只评估离线提示表达，不修改 Production、不调用媒体服务，也不为下一次付费调用背书。当前 A 是官方 MiniMax H3 Max CN，标称 5 秒、768P，以原 PNG 作为唯一 `first_frame`，没有 `reference_video`；原采用合同仍为 S01 的 0–3 秒，最终 timing 归 ResolvedTimeline。最新 QA 为 6 PASS / 2 FAIL / 7 NOT_EVALUATED，`s01-reflections` 和 `s01-close-gap` 失败：约 1.5 秒起出现林砚抬手的玻璃幽影，解码的 frame 71（约 2.958 秒）仍在抬手，未在采用切点前落定。15 项原 QA 与 STOP 保留，详见[当前 S01 记录](../record_for_agent/2026-10-13-jieshi-original-s01-s02-candidate.md#current-official-h3-max-first-frame-result--2026-10-17)。
