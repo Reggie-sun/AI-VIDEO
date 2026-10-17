@@ -13,7 +13,16 @@ Date: 2026-10-17
 
 后续[edit-first记录](2026-10-17-edit-first-temporal-control.md)已用本次 exact H3 源生成一个静音本地 `development_preview`：2.0s 手臂垂下与 3.5s 左臂水平只在编辑后样帧获得局部 PASS。它补上了“可否通过确定性时间映射制作开发预览”的证据；原源仍为 **0 PASS / 2 FAIL / 5 NOT_EVALUATED** 且已 abandon，既有 robot pilot 的 1 次消费、rejection 与 STOP 全部保留，此次编辑新增 Provider POST 为 0。整段自然度、精确转向、音频、人工完整 1x 与 Production qualification 仍未评估。
 
+同日原声follow-up沿共享`video-time-map/2`和Composition/ResolvedTimeline2.4输出有声候选
+`173cd95b4629c4d758ccf40d7725870cc8f3cca18685695fe4e0d2ef8f2ca5c9`：
+120帧与前静音版全部解码一致，原生音轨解码后按同一map进入P4。此后“尚无原声保留工程路径”已被实际导出证明取代；
+用户随后对该exact新片完整1×听看，明确回复“完整听看后可以接受”（动作、最后转向和声音）。
+人工观感证据见run内`robot-audiovisual-followup-001/human-review-001.json`；取代此前剪辑版human未取得的状态。
+具体证据与发布进度只由上述edit-first记录维护；原生成源的失败、消费及Production未激活状态不变。
+
 ## Current Result
+
+本节保留未经剪辑的原始生成源结果；带原声剪辑版的后续人工接受见顶部follow-up，二者bytes与裁决范围不同。
 
 用户对[实际输入准备](2026-10-17-reference-control-audit-and-preview.md)推荐的最小单元回复“确认”：
 仅执行几何人物 `robot-reference`，官方 MiniMax H3 Max CN，5秒、768P、16:9、balanced，
@@ -124,6 +133,8 @@ Risk Gate为`NATIVE_REVIEW_NOT_REQUIRED`：显式trusted resolver没有授予新
 本记录与上一准备记录的supersession notice只按owned paths独立验证/提交；保留全部foreign staged/dirty内容。
 
 ## Evidence Index
+
+以下索引只描述原始生成源；剪辑版的human确认见上述follow-up和主记录，不增加独立生成attempt。
 
 | evidence_id | independence_key | experiment_id | attempt_id | arm_id | artifact_sha256 | proof_layer | verdict | failure_class | relation_kind | related_evidence_id | source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
