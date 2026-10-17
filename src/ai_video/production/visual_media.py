@@ -101,10 +101,23 @@ def resolved_video_trim_duration(
         raise VisualMediaValidationError(
             f"Video asset {asset.asset_id} duration and frame count disagree."
         )
-    trim_duration = layer.trim_duration_frames or duration_frames
-    if trim_duration != duration_frames:
+    mapped_source_duration = (
+        layer.source_time_map.source_duration_frames
+        if layer.source_time_map is not None
+        else None
+    )
+    trim_duration = mapped_source_duration or layer.trim_duration_frames or duration_frames
+    if mapped_source_duration is None and trim_duration != duration_frames:
         raise VisualMediaValidationError(
             "Video trim duration must equal its resolved Shot duration."
+        )
+    if (
+        mapped_source_duration is not None
+        and layer.trim_duration_frames is not None
+        and layer.trim_duration_frames != mapped_source_duration
+    ):
+        raise VisualMediaValidationError(
+            "Video time map source duration must match the selected trim."
         )
     if layer.trim_start_frame + trim_duration > metadata.frame_count:
         raise VisualMediaValidationError(
@@ -121,12 +134,16 @@ def render_visual_element(
     duration_seconds: str,
     media_start_seconds: str,
     track_index: int,
+    timed_media: bool = False,
 ) -> str:
     source_path = span.materialized_path.as_posix()
     style = f"transform:{escape(_css_transform(span.transform))};transform-origin:0 0"
     if span.asset_mime_type == "video/mp4":
+        if span.trim_duration_frames != span.duration_frames:
+            raise VisualMediaValidationError("Pinned HyperFrames export requires resolved source-frame sampling")
         return (
-            f'  <video id="{video_id}" src="{source_path}" muted playsinline '
+            f'  <video id="{video_id}"' + (' class="clip"' if timed_media else '') +
+            f' src="{source_path}" muted playsinline '
             f'preload="auto" data-start="{start_seconds}" '
             f'data-duration="{duration_seconds}" '
             f'data-media-start="{media_start_seconds}" '

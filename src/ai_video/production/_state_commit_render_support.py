@@ -437,6 +437,13 @@ class _StateCommitRenderSupportMixin:
         timeline = self._parse_render_model(
             timeline_artifact.payload, ResolvedTimeline, "resolved timeline"
         )
+        if timeline.usage_scope != "production":
+            raise _state_invalid("Development preview timelines cannot be activated.")
+        from ai_video.production.repair_input_admission import require_production_render_sources
+        try:
+            require_production_render_sources(self._project_root, request.current_registry, timeline)
+        except (OSError, ValueError) as exc:
+            raise _state_invalid("Render source eligibility is invalid.", str(exc)) from exc
         source_artifact = self._require_render_artifact(
             artifacts, state.source_receipt.path, state.source_receipt.file_sha256
         )

@@ -13,6 +13,7 @@ from ai_video.production.composition_contracts import (
 )
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.seedance_source_expression import PreservedSourceExpression
+from ai_video.production.video_retime import VideoTimeMap
 
 SHA256 = r"^[0-9a-f]{64}$"
 
@@ -49,11 +50,28 @@ class ProductionSourceOption(StrictModel):
     timebase: Literal["frames", "samples", "still"]
     start: int = Field(default=0, strict=True, ge=0)
     duration: int = Field(strict=True, gt=0)
+    source_time_map: VideoTimeMap | None = None
     evidence_ids: tuple[str, ...] = ()
     requirement_ids: tuple[str, ...] = ()
     transform: FixedTransform = Field(default_factory=FixedTransform)
     z_index: int = 0
     opacity_milli: int = Field(default=1000, ge=0, le=1000)
+
+    @model_validator(mode="after")
+    def _source_map_window(self):
+        if self.source_time_map is not None:
+            if self.timebase != "frames":
+                raise ValueError("video time maps require a frame-based source window")
+            if self.source_time_map.source_duration_frames != self.duration:
+                raise ValueError("video time map must end at the exact source duration")
+        return self
+
+    @model_serializer(mode="wrap")
+    def _preserve_legacy_source_shape(self, handler):
+        data = handler(self)
+        if self.source_time_map is None:
+            data.pop("source_time_map", None)
+        return data
 
 
 class ProductionUnit(StrictModel):
@@ -77,8 +95,11 @@ class ProductionUnit(StrictModel):
         for source in (*self.source_options, *self.additional_sources):
             if source.timebase == "samples":
                 raise ValueError("visual component cannot use a sample window")
-            if source.duration != self.duration_frames:
+            if source.source_time_map is None and source.duration != self.duration_frames:
                 raise ValueError("visual source duration must match the presentation unit")
+            if (source.source_time_map is not None
+                    and source.source_time_map.output_duration_frames != self.duration_frames):
+                raise ValueError("video time map must end at the exact presentation duration")
             if not set(source.requirement_ids) <= set(self.requirement_ids):
                 raise ValueError("source requirements must belong to the component")
         return self

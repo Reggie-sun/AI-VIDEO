@@ -1463,7 +1463,9 @@ def test_maps_path_layer_failures_to_composition_invalid(tmp_path, monkeypatch, 
     def fail(*args, **kwargs):
         raise exception
 
-    monkeypatch.setattr("ai_video.production.composition._read_regular_file_nofollow", fail)
+    monkeypatch.setattr(
+        "ai_video.production._composition_visual._read_regular_file_nofollow", fail
+    )
     _assert_invalid(loaded, spec)
 
 

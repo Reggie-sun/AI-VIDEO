@@ -26,13 +26,16 @@ def validate_strategy_composition_uses(bundle, spec):
             role = next((r for r in child.required_asset_roles if r.role == "primary_visual"), None)
             if role is None or len(role.asset_ids) != 1:
                 raise _invalid("Production component has no completed generated visual.")
-            expected = ((role.role, role.asset_ids[0], 0, unit.duration_frames, FixedTransform(), 1000, 0),)
+            expected = ((role.role, role.asset_ids[0], 0, unit.duration_frames,
+                FixedTransform(), 1000, 0, None),)
         else:
             expected = tuple((s.role, s.asset_id, s.start,
-                s.duration if s.timebase == "frames" else None, s.transform, s.opacity_milli, s.z_index)
+                s.duration if s.timebase == "frames" else None, s.transform, s.opacity_milli,
+                s.z_index, s.source_time_map)
                 for s in (source, *unit.additional_sources))
         uses = tuple((layer.asset_role, layer.asset_id, layer.trim_start_frame,
-            layer.trim_duration_frames, layer.transform, layer.opacity_milli, layer.z_index) for layer in actual)
+            layer.trim_duration_frames, layer.transform, layer.opacity_milli, layer.z_index,
+            layer.source_time_map) for layer in actual)
         if len(uses) != len(expected) or any(use not in uses for use in expected):
             raise _invalid("Actual composition source use differs from approved production lineage.")
         key = (parent.content_hash, coverage.coverage_id)

@@ -540,6 +540,7 @@ def render_source(
             duration_seconds=seconds(span.duration_frames, fps),
             media_start_seconds=_clip_start_seconds(span.trim_start_frame, fps),
             track_index=track_index,
+            **({"timed_media": True} if timeline.schema_version == "2.3" else {}),
         )
         motion_attributes = (
             f' data-layer-entrance="{span.graphic_animation.entrance.value}"'

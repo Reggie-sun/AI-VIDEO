@@ -94,7 +94,8 @@ def validate_shot_strategy(
 ) -> None:
     roles, bound = _bound_assets(shot, assets_by_id)
     from ai_video.production.repair_input_admission import REPAIR_INPUT_TOOL
-    if any(a.tool == REPAIR_INPUT_TOOL for a in bound.values()):
+    captured = {a.sha256 for a in assets_by_id.values() if a.tool.name == REPAIR_INPUT_TOOL.name}
+    if any(a.sha256 in captured for a in bound.values()):
         raise _invalid("Development repair input cannot be bound for Production execution.")
     if shot.visual_strategy is VisualStrategy.STATIC_IMAGE:
         if not _has_type(bound, AssetType.IMAGE):
@@ -232,9 +233,9 @@ def _unique(values: Iterable[str], label: str) -> set[str]:
 
 
 def validate_project_references(bundle: LoadedProductionProject) -> None:
-    from ai_video.production.repair_input_admission import REPAIR_INPUT_TOOL, verify_repair_input
+    from ai_video.production.repair_input_admission import is_repair_input_record, verify_repair_input
     for asset in bundle.registry.assets:
-        if asset.tool == REPAIR_INPUT_TOOL:
+        if is_repair_input_record(asset, bundle.root):
             receipt = verify_repair_input(asset, bundle.root)
             if (receipt.target_project_id != bundle.project.project_id
                     or receipt.target_project_hash != bundle.project.content_hash):

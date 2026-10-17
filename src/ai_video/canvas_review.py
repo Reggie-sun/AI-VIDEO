@@ -51,22 +51,33 @@ def canvas_cut_packet(*, loaded, timeline, direction):
     contract = canvas_cut_contract(direction)
     rows = {r["occurrence_id"]: r for r in direction["shots"]}
     assets = {a.asset_id: a for a in loaded.registry.assets}
-    spans = {s.shot_id: s for s in timeline.visual_spans}
+    spans = {}
+    for span in timeline.visual_spans:
+        spans.setdefault((span.shot_id, span.asset_role), []).append(span)
     cuts = []
     for authored in direction.get("cut_requirements", []):
         evidence = {}
         for side, key in (("from", "from_occurrence_id"), ("to", "to_occurrence_id")):
             row = rows[authored[key]]
-            span = spans[row["shot"]["shot_id"]]
-            asset = assets[span.asset_id]
-            evidence[side] = {"shot_id": span.shot_id, "asset_id": asset.asset_id, "asset_sha256": asset.sha256,
-                "start_frame": span.start_frame, "duration_frames": span.duration_frames,
-                "source_start_frame": span.trim_start_frame,
-                "source_last_frame": span.trim_start_frame + span.duration_frames - 1,
+            role = row.get("composition", {}).get("asset_role", "primary_visual")
+            pieces = sorted(spans[(row["shot"]["shot_id"], role)], key=lambda s: s.start_frame)
+            first, last = pieces[0], pieces[-1]
+            if (len({s.asset_id for s in pieces}) != 1 or any(
+                    a.start_frame + a.duration_frames != b.start_frame for a, b in zip(pieces, pieces[1:]))):
+                raise ValueError("cut evidence needs one contiguous resolved primary visual")
+            asset = assets[first.asset_id]
+            source_duration = last.trim_duration_frames or last.duration_frames
+            evidence[side] = {"shot_id": first.shot_id, "asset_id": asset.asset_id, "asset_sha256": asset.sha256,
+                "start_frame": first.start_frame, "duration_frames": last.start_frame + last.duration_frames - first.start_frame,
+                "source_start_frame": first.trim_start_frame,
+                "source_last_frame": last.trim_start_frame + (last.duration_frames - 1) * source_duration // last.duration_frames,
+                "resolved_segments": [{"start_frame": s.start_frame, "duration_frames": s.duration_frames,
+                    "source_start_frame": s.trim_start_frame,
+                    "source_duration_frames": s.trim_duration_frames or s.duration_frames} for s in pieces],
                 "references": row.get("reference_replacements", {}),
                 "audio_spans": [s.model_dump(mode="json") for s in timeline.audio_spans
-                    if s.start_sample < span.start_sample + span.duration_samples
-                    and s.start_sample + s.duration_samples > span.start_sample]}
+                    if s.start_sample < last.start_sample + last.duration_samples
+                    and s.start_sample + s.duration_samples > first.start_sample]}
         if evidence["from"]["start_frame"] + evidence["from"]["duration_frames"] != evidence["to"]["start_frame"]:
             raise ValueError("cut requirements differ from actual adjacent resolved spans")
         cuts.append({**authored, "evidence": evidence})

@@ -49,6 +49,7 @@ from ai_video.production.models import (
     QaVerdict,
     VisualStrategy,
 )
+from ai_video.production.video_retime import VideoTimeMap, VideoTimePoint
 from ai_video.production.ad_creative_types import (
     AdBeatRole,
     AdBeatPlan,
@@ -494,6 +495,8 @@ __all__ = [
     "CompiledAdCreativeHandoff",
     "ContinuityMode",
     "CompositionSpec",
+    "VideoTimeMap",
+    "VideoTimePoint",
     "compile_ad_creative_plan",
     "compile_ad_creative_handoff",
     "create_ad_creative_plan",

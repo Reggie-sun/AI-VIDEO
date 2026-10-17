@@ -229,6 +229,19 @@ def _materialize_child(
     unit = selected.component
     if selected.operation not in parent.production_intent.allowed_operations:  # type: ignore[union-attr]
         raise _project_invalid("Production strategy operation is not authorized by the parent intent.")
+    authored_sources = ((selected.source,) if selected.source is not None else ()) + unit.additional_sources
+    mapped_uses = tuple(
+        source for source in authored_sources
+        if source.source_time_map is not None
+    )
+    if (selected.operation is ProductionOperation.EDIT_EXISTING_VIDEO) != bool(mapped_uses):
+        raise _project_invalid("EDIT_EXISTING_VIDEO requires an exact authored source time map.")
+    if any(
+        source.source_time_map.source_duration_frames != source.duration
+        or source.source_time_map.output_duration_frames != unit.duration_frames
+        for source in mapped_uses
+    ):
+        raise _project_invalid("Production strategy source time map does not match selected frame windows.")
     if selected.source is not None and selected.source not in unit.source_options:
         raise _project_invalid("Production strategy selected source is not an authored source option.")
     if selected.source is None and selected.operation is not ProductionOperation.GENERATE_FULL_SHOT:
@@ -491,6 +504,8 @@ def build_strategy_composition(
                 asset_role=use.role, asset_id=use.asset_id, trim_start_frame=use.start,
                 trim_duration_frames=use.duration if use.timebase == "frames" else None,
                 transform=use.transform, opacity_milli=use.opacity_milli, z_index=use.z_index,
+                **({"source_time_map": use.source_time_map}
+                   if use.source_time_map is not None else {}),
             ))
     shot_ids = tuple(item.component.shot_id for item in selected_units)
     transitions = tuple(
@@ -505,7 +520,7 @@ def build_strategy_composition(
         source_provenance=(
             SourceReference(kind="derived", reference="production-strategy", content_hash=decision.decision_hash),
         ),
-        schema_version="2.1",
+        schema_version=("2.3" if any(layer.source_time_map is not None for layer in layers) else "2.1"),
         composition_id=composition_id,
         shot_ids=shot_ids,
         layers=tuple(layers),

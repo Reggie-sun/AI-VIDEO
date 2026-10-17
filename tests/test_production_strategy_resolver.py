@@ -38,6 +38,33 @@ def resolve(loaded, **kwargs):
     return ProductionStrategyResolver().resolve(loaded=loaded, parent_shot_id="shot-1", **kwargs)
 
 
+def _with_generation_acceptance(loaded, *, source_observation: str | None):
+    from test_production_generation_decision import acceptance_policy
+    from ai_video.production.generation_recipe import RequirementExpression
+
+    rule = RequirementExpression(requirement_id="visual", level="acceptance",
+        stage="raw_generation", dimension="visual", observable="intended visual",
+        tolerance="exact", measurement="fixture", proof="technical", production_owner="generation")
+    acceptance = acceptance_policy((rule,))
+    qa = loaded.qa_policy
+    allocation = qa.production_allocations[0]
+    component = allocation.components[0].model_copy(update={"generation_acceptance": acceptance})
+    allocation = allocation.model_copy(update={"components": (component,)})
+    evidence = ()
+    if source_observation is not None:
+        record = qa.production_source_evidence[0]
+        response = json.loads(record.response_json)
+        response["observations"][0]["verdict"] = source_observation
+        evidence = (SourceUseEvidence.model_validate({
+            **record.model_dump(mode="json"), "response_json": json.dumps(response),
+        }),)
+    qa = seal_artifact(qa.model_copy(update={
+        "production_allocations": (allocation,),
+        "production_source_evidence": evidence,
+    }))
+    return loaded.model_copy(update={"qa_policy": qa})
+
+
 def test_real_candidate_producer_selects_qualified_source_without_generation_capability(tmp_path):
     loaded = qualified_context(tmp_path)
     decision = resolve(loaded)
@@ -52,6 +79,21 @@ def test_registered_bytes_without_use_evidence_cannot_be_selected(tmp_path):
     decision = resolve(loaded)
     assert decision.disposition == "evidence_required"
     assert decision.selected is None
+
+
+def test_required_edit_operation_without_executable_map_is_a_capability_gap(tmp_path):
+    from ai_video.production.production_strategy_contracts import ProductionOperation as Op
+    loaded = qualified_context(tmp_path)
+    parent = loaded.shots[0]
+    intent = parent.production_intent
+    coverage = intent.coverage_options[0]
+    unit = coverage.units[0].model_copy(update={"required_operations": (Op.EDIT_EXISTING_VIDEO,)})
+    parent = parent.model_copy(update={"production_intent": intent.model_copy(update={
+        "allowed_operations": (*intent.allowed_operations, Op.EDIT_EXISTING_VIDEO),
+        "coverage_options": (coverage.model_copy(update={"units": (unit,)}),)})})
+    decision = resolve(loaded.model_copy(update={"shots": (parent, *loaded.shots[1:])}))
+    assert decision.selected is None
+    assert "capability_gap:video_time_map_required" in decision.reasons
 
 
 def test_failed_source_is_not_overridden_by_technical_registration(tmp_path):
@@ -76,24 +118,42 @@ def test_policy_and_qa_change_decision_identity(tmp_path):
 
 
 def test_generation_is_selected_only_with_component_acceptance_and_explicit_policy(tmp_path):
-    from test_production_generation_decision import acceptance_policy
-    from ai_video.production.generation_recipe import RequirementExpression
-
     loaded = qualified_context(tmp_path)
-    rule = RequirementExpression(requirement_id="visual", level="acceptance",
-        stage="raw_generation", dimension="visual", observable="intended visual",
-        tolerance="exact", measurement="fixture", proof="technical", production_owner="generation")
-    acceptance = acceptance_policy((rule,))
-    allocation = loaded.qa_policy.production_allocations[0]
-    component = allocation.components[0].model_copy(update={"generation_acceptance": acceptance})
-    allocation = allocation.model_copy(update={"components": (component,)})
-    qa = seal_artifact(loaded.qa_policy.model_copy(update={"production_allocations": (allocation,)}))
-    loaded = loaded.model_copy(update={"qa_policy": qa})
+    loaded = _with_generation_acceptance(loaded, source_observation="PASS")
     decision = resolve(loaded, capabilities=ProductionCapabilities(generation_available=True),
         policy=ProductionStrategyPolicy(preference="generation", allow_generation_exploration=True))
     assert decision.disposition == "selected"
     assert decision.selected.new_generation_count == 1
     assert resolve(loaded).selected.new_generation_count == 0
+
+
+def test_v2_waits_for_unassessed_lower_generation_count_source_before_generation(tmp_path):
+    loaded = _with_generation_acceptance(qualified_context(tmp_path), source_observation=None)
+    decision = resolve(loaded, capabilities=ProductionCapabilities(generation_available=True),
+        policy=ProductionStrategyPolicy(allow_generation_exploration=True))
+
+    assert decision.disposition == "evidence_required"
+    assert decision.selected is None
+    assert "evidence_required:source_not_evaluated" in decision.reasons
+
+
+def test_known_source_fail_can_be_excluded_and_generation_chosen(tmp_path):
+    loaded = _with_generation_acceptance(qualified_context(tmp_path), source_observation="FAIL")
+    decision = resolve(loaded, capabilities=ProductionCapabilities(generation_available=True),
+        policy=ProductionStrategyPolicy(allow_generation_exploration=True))
+
+    assert decision.disposition == "selected"
+    assert decision.selected.new_generation_count == 1
+
+
+def test_explicit_policy_v1_keeps_legacy_generation_fallback(tmp_path):
+    loaded = _with_generation_acceptance(qualified_context(tmp_path), source_observation=None)
+    decision = resolve(loaded, capabilities=ProductionCapabilities(generation_available=True),
+        policy=ProductionStrategyPolicy(version="production-strategy/1",
+            allow_generation_exploration=True))
+
+    assert decision.disposition == "selected"
+    assert decision.selected.new_generation_count == 1
 
 
 def test_enumeration_overflow_does_not_pick_first_candidate(tmp_path):

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -25,6 +26,7 @@ from ai_video.production.models import (
     Storyboard,
     ToolIdentity,
     VideoAssetMetadata,
+    GenerationEvaluationAuthority,
 )
 from ai_video.production.production_strategy_contracts import (
     ProductionCandidate,
@@ -40,6 +42,11 @@ from ai_video.production.production_strategy_materialization import (
     build_strategy_composition,
     prepare_strategy_commit,
 )
+from ai_video.production.production_strategy_reader import validate_production_lineage
+from ai_video.production.production_strategy_composition import validate_strategy_composition_uses
+from ai_video.production.source_use_evidence import SourceUseEvidence
+from ai_video.planning.production_strategy import ProductionStrategyResolver
+from ai_video.production.video_retime import VideoTimeMap, VideoTimePoint
 from ai_video.production.project import load_production_project
 from ai_video.production.registry import registry_semantic_sha256
 from production_project_factory import write_production_project
@@ -198,6 +205,88 @@ def _materialized_loaded(loaded, request):
     return loaded.model_copy(update={"project": project, "storyboard": storyboard, "shots": shots})
 
 
+def _loaded_with_mapped_video(tmp_path: Path, *, evidence_map: VideoTimeMap | None = None):
+    loaded, _ = _loaded_with_intent(tmp_path, video_source_kind=AssetSourceKind.IMPORTED)
+    parent = loaded.shots[0]
+    old_unit = parent.production_intent.coverage_options[0].units[0]
+    asset = loaded.registry.assets[0]
+    time_map = VideoTimeMap(points=(
+        VideoTimePoint(source_frame=0, output_frame=0),
+        VideoTimePoint(source_frame=48, output_frame=72),
+    ), audio_policy="mute")
+    source = old_unit.source_options[0].model_copy(update={
+        "duration": 48,
+        "source_time_map": time_map,
+    })
+    unit = old_unit.model_copy(update={"source_options": (source,)})
+    coverage = parent.production_intent.coverage_options[0].model_copy(update={"units": (unit,)})
+    intent = parent.production_intent.model_copy(update={
+        "allowed_operations": parent.production_intent.allowed_operations + (ProductionOperation.EDIT_EXISTING_VIDEO,),
+        "coverage_options": (coverage,),
+    })
+    parent = seal_artifact(parent.model_copy(update={
+        "content_hash": "0" * 64,
+        "production_intent": intent,
+    }))
+    parent_reference = loaded.project.artifacts.shots[0].model_copy(update={
+        "revision": parent.revision,
+        "content_hash": parent.content_hash,
+    })
+    project = seal_artifact(loaded.project.model_copy(update={
+        "revision": loaded.project.revision + 1,
+        "content_hash": "0" * 64,
+        "artifacts": loaded.project.artifacts.model_copy(update={"shots": (parent_reference,)}),
+    }))
+    acceptance = loaded.qa_policy.domain_acceptance
+    allocation = loaded.qa_policy.production_allocations[0].model_copy(update={
+        "parent_shot_content_hash": parent.content_hash,
+    })
+    qa = loaded.qa_policy
+    evaluator = qa.semantic_authorities[0]
+    evidence_map = time_map if evidence_map is None else evidence_map
+    identity = {
+        "parent_shot_content_hash": parent.content_hash,
+        "task_id": intent.task_id,
+        "acceptance_profile_hash": acceptance.profile_content_hash,
+        "component_id": unit.component_id,
+        "asset_id": asset.asset_id,
+        "asset_sha256": asset.sha256,
+        "size_bytes": asset.size_bytes,
+        "role": source.role,
+        "timebase": source.timebase,
+        "start": source.start,
+        "duration": source.duration,
+        "evaluator": evaluator.model_dump(mode="json"),
+        "proof": "technical",
+    }
+    evidence = SourceUseEvidence(
+        **identity,
+        evidence_id="mapped-source-pass",
+        source_time_map=evidence_map,
+        response_json=json.dumps({
+            **identity,
+            "source_time_map": evidence_map.model_dump(mode="json"),
+            "observations": [{
+                "requirement_id": "visual", "verdict": "PASS",
+                "observation": "the retimed mapped source meets the allocated visual requirement",
+            }],
+        }),
+    )
+    qa = seal_artifact(qa.model_copy(update={
+        "content_hash": "0" * 64,
+        "production_allocations": (allocation,),
+        "generation_evaluation_authorities": (
+            GenerationEvaluationAuthority(evaluator=evaluator, proof="technical"),
+        ),
+        "production_source_evidence": (evidence,),
+    }))
+    return loaded.model_copy(update={
+        "project": project,
+        "shots": (parent,),
+        "qa_policy": qa,
+    }), time_map
+
+
 def test_materializes_exact_selected_coverage_with_content_addressed_children(tmp_path):
     loaded, decision = _loaded_with_intent(tmp_path)
     request = prepare_strategy_commit(loaded=loaded, decision=decision, attempt_id="strategy-1")
@@ -218,6 +307,70 @@ def test_materializes_exact_selected_coverage_with_content_addressed_children(tm
     assert spec.shot_ids == ("shot-1-reuse-1",)
     assert spec.layers[0].asset_id == loaded.registry.assets[0].asset_id
     assert spec.transitions == ()
+
+
+def test_mapped_edit_materializes_exact_map_and_reopens_through_composition(tmp_path):
+    loaded, time_map = _loaded_with_mapped_video(tmp_path)
+    decision = ProductionStrategyResolver().resolve(loaded=loaded, parent_shot_id="shot-1")
+    assert decision.disposition == "selected"
+    assert decision.selected.units[0].operation is ProductionOperation.EDIT_EXISTING_VIDEO
+
+    request = prepare_strategy_commit(loaded=loaded, decision=decision, attempt_id="mapped-edit")
+    materialized = _materialized_loaded(loaded, request).model_copy(
+        update={"production_parents": (loaded.shots[0],)}
+    )
+    validate_production_lineage(materialized)
+    spec = build_strategy_composition(loaded=materialized, decision=decision)
+
+    assert spec.schema_version == "2.3"
+    assert spec.layers[0].trim_duration_frames == 48
+    assert spec.layers[0].source_time_map == time_map
+
+    altered_layer = spec.layers[0].model_copy(update={"source_time_map": VideoTimeMap(
+        points=(VideoTimePoint(source_frame=0, output_frame=0),
+            VideoTimePoint(source_frame=48, output_frame=71)),
+        audio_policy="mute",
+    )})
+    altered_spec = spec.model_copy(update={"layers": (altered_layer,)})
+    with pytest.raises(AiVideoError, match="differs from approved production lineage"):
+        validate_strategy_composition_uses(materialized, altered_spec)
+
+    child = materialized.shots[0]
+    changed_lineage = child.production_lineage.model_copy(update={
+        "operation": ProductionOperation.EXISTING_ASSET_REUSE,
+    })
+    with pytest.raises(AiVideoError, match="exact authored time map"):
+        validate_production_lineage(materialized.model_copy(update={
+            "shots": (child.model_copy(update={"production_lineage": changed_lineage}),),
+        }))
+
+
+def test_mapped_edit_requires_evidence_for_the_exact_map(tmp_path):
+    loaded, time_map = _loaded_with_mapped_video(tmp_path)
+    stale_map = VideoTimeMap(points=(
+        VideoTimePoint(source_frame=0, output_frame=0),
+        VideoTimePoint(source_frame=48, output_frame=71),
+    ), audio_policy="mute")
+    qa = loaded.qa_policy
+    old = qa.production_source_evidence[0]
+    stale = SourceUseEvidence.model_validate({
+        **old.model_dump(mode="json"),
+        "source_time_map": stale_map.model_dump(mode="json"),
+        "response_json": old.response_json.replace(
+            json.dumps(time_map.model_dump(mode="json")),
+            json.dumps(stale_map.model_dump(mode="json")),
+        ),
+    })
+    qa = seal_artifact(qa.model_copy(update={
+        "content_hash": "0" * 64,
+        "production_source_evidence": (stale,),
+    }))
+    decision = ProductionStrategyResolver().resolve(
+        loaded=loaded.model_copy(update={"qa_policy": qa}), parent_shot_id="shot-1"
+    )
+
+    assert decision.disposition == "evidence_required"
+    assert decision.selected is None
 
 
 def test_non_integral_second_split_roundtrips_exact_canonical_frames(tmp_path):

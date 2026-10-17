@@ -34,9 +34,12 @@ def content_driven_video_frames(
         raise VisualMediaValidationError(
             f"Content-driven Shot {shot.shot_id} has no bound video metadata."
         )
-    frames = layer.trim_duration_frames
-    if frames is None:
-        frames = asset.video_metadata.frame_count - layer.trim_start_frame
+    if layer.source_time_map is not None:
+        frames = layer.source_time_map.output_duration_frames
+    else:
+        frames = layer.trim_duration_frames
+        if frames is None:
+            frames = asset.video_metadata.frame_count - layer.trim_start_frame
     if frames <= 0:
         raise VisualMediaValidationError("Content-driven video interval is empty.")
     resolved_video_trim_duration(

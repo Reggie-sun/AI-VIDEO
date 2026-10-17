@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import tempfile
 from pathlib import Path
+import yaml
 
 from ai_video.production.hashing import verify_artifact_hash
 from ai_video.production.manifest_schema import MANIFEST_SCHEMA_ORDER
@@ -30,17 +31,48 @@ from ._state_commit_common import (
 from ._state_commit_contracts import PreparedArtifact
 
 
+def _validate_repair_preview_shot(project, artifacts, preview_use) -> None:
+    from ai_video.production.models import Shot
+
+    by_path = {item.relative_path: item for item in artifacts}
+    matches = []
+    for pointer in project.artifacts.shots:
+        artifact = by_path.get(pointer.path)
+        if artifact is None or hashlib.sha256(artifact.payload).hexdigest() != artifact.file_sha256:
+            raise _state_invalid("Repair preview bootstrap is missing an exact target Shot artifact.")
+        try:
+            shot = Shot.model_validate(yaml.safe_load(artifact.payload))
+        except (TypeError, ValueError, yaml.YAMLError) as exc:
+            raise _state_invalid("Repair preview target Shot is invalid.", str(exc)) from exc
+        if (not verify_artifact_hash(shot) or shot.artifact_id != pointer.artifact_id
+                or shot.revision != pointer.revision or shot.content_hash != pointer.content_hash):
+            raise _state_invalid("Repair preview target Shot identity differs from the selected Project.")
+        if shot.shot_id == preview_use.shot_id:
+            matches.append(shot)
+    if len(matches) != 1:
+        raise _state_invalid("Repair preview must target one Shot in the exact Project.")
+
+
 class _StateCommitBootstrapMixin:
     def bootstrap_repair_input(self, *, attempt_id, project, registry, artifacts,
                                source_root, source_attempt_id, source_sha256,
-                               asset_id, usage_license):
+                               asset_id, usage_license, preview_use=None,
+                               preview_probe=None):
         """New development bundle only; no source write, qualification or activation."""
-        from ai_video.production.repair_input_admission import prepare_repair_input
+        from ai_video.production.repair_input_admission import (
+            RepairPreviewUse,
+            prepare_repair_input,
+        )
+
+        if preview_use is not None:
+            preview_use = RepairPreviewUse.model_validate(preview_use)
+            _validate_repair_preview_shot(project, artifacts, preview_use)
 
         updated, captured = prepare_repair_input(target_root=self._project_root,
             project=project, registry=registry, source_root=source_root,
             source_attempt_id=source_attempt_id, source_sha256=source_sha256,
-            asset_id=asset_id, usage_license=usage_license)
+            asset_id=asset_id, usage_license=usage_license,
+            preview_use=preview_use, preview_probe=preview_probe)
         return self.bootstrap_initial_state(attempt_id=attempt_id, project=project,
             registry=updated, artifacts=(*artifacts, *captured))
 
@@ -177,7 +209,7 @@ class _StateCommitBootstrapMixin:
                 required_paths.add(path)
         from ai_video.production.repair_input_admission import REPAIR_INPUT_TOOL, repair_input_receipt_path
         required_paths.update(repair_input_receipt_path(item.creation_receipt_id)
-                              for item in registry.assets if item.tool == REPAIR_INPUT_TOOL)
+                              for item in registry.assets if item.tool.name == REPAIR_INPUT_TOOL.name)
         for item in registry.assets:
             if (
                 item.source_kind is not AssetSourceKind.IMPORTED

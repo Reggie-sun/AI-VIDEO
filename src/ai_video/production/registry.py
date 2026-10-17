@@ -41,10 +41,12 @@ def registry_semantic_sha256(registry: AssetRegistrySnapshot) -> str:
 
 
 def _verify_asset(record: AssetRecord, root: Path, asset_root: Path) -> Path:
-    from ai_video.production.repair_input_admission import REPAIR_INPUT_TOOL, verify_repair_input
+    from ai_video.production.repair_input_admission import (
+        is_repair_input_record,
+        verify_repair_input,
+    )
 
-    repair_input = (record.tool.name == REPAIR_INPUT_TOOL.name
-                    or record.artifact_path.is_relative_to(Path("assets/repair-inputs")))
+    repair_input = is_repair_input_record(record, root)
     if repair_input:
         try:
             verify_repair_input(record, root)

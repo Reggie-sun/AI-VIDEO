@@ -272,6 +272,19 @@ def _validate_source(
         raise _invalid("Production lineage image source has an invalid timebase.")
     if (source.timebase == "frames") != (asset.asset_type is AssetType.VIDEO):
         raise _invalid("Production lineage video source has an invalid timebase.")
+    mapped_uses = tuple(
+        item for item in (source, *unit.additional_sources)
+        if item.source_time_map is not None
+    )
+    if (lineage.operation is ProductionOperation.EDIT_EXISTING_VIDEO) != bool(mapped_uses):
+        raise _invalid("EDIT_EXISTING_VIDEO lineage requires an exact authored time map.")
+    for mapped in mapped_uses:
+        if (
+            mapped.timebase != "frames"
+            or mapped.source_time_map.source_duration_frames != mapped.duration
+            or mapped.source_time_map.output_duration_frames != unit.duration_frames
+        ):
+            raise _invalid("Production lineage time map does not bind exact source and output frames.")
     role = _required_role(child, source)
     if source.asset_id not in role.asset_ids or asset.asset_type not in role.allowed_asset_types:
         raise _invalid("Production lineage source is not bound to the child role.")
@@ -540,7 +553,8 @@ def require_production_source_eligibility(
                     size_bytes=asset.size_bytes, role=source.role, timebase=source.timebase,
                     start=source.start, duration=source.duration, requirement_ids=requirements,
                     evidence_ids=source.evidence_ids, transform=source.transform,
-                    opacity_milli=source.opacity_milli, z_index=source.z_index)
+                    opacity_milli=source.opacity_milli, z_index=source.z_index,
+                    source_time_map=source.source_time_map)
             except ValueError as exc:
                 raise _invalid("Production source-use evidence is invalid.", str(exc)) from exc
             if verdict != "PASS":

@@ -190,6 +190,35 @@ frame/reference 互斥及逐镜白模例外继续沿现有模型能力和上文/
 compiler 失败时仍保留 selected candidate 的目标和失败 ID，片段标为 authored、未编译，不虚构实际 request。
 模式概览不计作目标覆盖；所有输入检查和离线 fixture 的模型质量、human 验收仍 `NOT_EVALUATED`。
 
+### Edit-First Temporal Control
+
+最终采用时点偏差首先是制作手段选择问题。先确认源素材是否已经包含要求的状态、动作顺序与可用画面，
+再比较裁切、分段变速或现有coverage剪辑与新生成。缺人物、错误动作方向或不存在的末态不能靠变速补造；
+变速也必须重验动作自然度、摄影、原有满足项及声音。原生成FAIL和编辑后用途评估分别保留。
+
+上层选择沿 `ProductionPlanningService`，Canvas提供 `prepare_production` → `materialize_production`
+→ `compose_production` 薄入口。作者在Shot既有 `production_intent.coverage_options` 中声明素材选项，
+保留所有protected requirements。默认policy `production-strategy/2` 在qualified_reuse下先要求评估
+更少生成次数、且仅缺用途证据的候选；明确FAIL可排除，但不会授权生成。显式旧policy `/1` 仅供兼容。
+闭合质量失败的 `prepare_repair/start_repair` 返回上层重评；缺ProductionIntent会明确要求补authoring，
+不会直接再生成。未提交关闭、known-no-effect、runtime retarget及unknown恢复仍归原owner。
+
+`ProductionSourceOption.source_time_map`、`SourceUseEvidence.source_time_map` 和
+`CompositionLayerSpec.source_time_map` 共用 `video-time-map/1`：相对所选trim的整数锚点
+`points: [{source_frame:0, output_frame:0}, ...]`，`audio_policy: mute`。两轴严格递增，末点分别等于
+源帧数和输出帧数；每段源/输出比为0.1–5。不反转、冻结、跳过区间或补造动作；加速会减少输出采样帧。
+`CompositionSpec/ResolvedTimeline 2.3` 解析为同Shot连续spans，由唯一时间线拥有source trim及输出
+frame/sample。固定版本0.7.103导出忽略 `data-playback-rate`，因此非一比一段按每个输出帧取
+源坐标floor展开为一帧span；HyperFrames消费这些既有一比一窗口，不新增timeline或renderer。旧2.0–2.2字节/hash保持且拒绝time map。
+Canvas composition填 `source_time_map` 时必须显式 `muted:true`；同镜/全局音轨、字幕或voice来源尚无
+相应sample mapping时明确拒绝，不能静默丢掉所需声音。独立其他Shot的声音不受影响。
+
+每次用途评估必须绑定exact map、bytes、role/window/transform及原要求；未编辑PASS不资格化编辑用途。
+已失败媒体仅经原 `bootstrap_repair_input` 的sealed `/2` exact用途进入静音本地预览，资产保持UNBOUND、
+qualification为NOT_EVALUATED，timeline标记 `development_preview` 并禁止render activation。
+这一路线保留原request/fetch/rejection/QA及消费，不是普通import或Production许可。
+先观察编辑实际效果，仍有无法达成的缺口时才提交明确、有限的新生成方案。
+
 ### Action Timing And Selective Effects
 
 修复动作不到位时，先并排核对 actual native text、标称生成时长、原采用窗口和 QA observable。
@@ -334,6 +363,7 @@ Input PASS不证明runtime readiness；runtime readiness也不证明成功生成
 | Inspect | `inspect` | exact snapshot、明确 selection、无 selected closure blocker |
 | Author | `author` → `approve` / `revise` | diff、显式 approved 数据与 selected QaPolicy |
 | Preflight | `preflight` | 全镜头参考职责/来源、后镜输入准入路线、占位与实际状态分离；不代替 paid preview |
+| Means | `prepare_production` → `materialize_production` | 已有素材/剪辑与生成比较、exact用途证据、原目标覆盖；无新POST |
 | Prepare | `prepare` → `start` | current Planner/Router、exact inputs、真实累计 limits |
 | Execute | `execute(submit/poll/fetch)` → `evaluate` → `execute(validate/activate)` | paid/local gates、显式 project-local `video_analyze`、逐项 PASS |
 | Handoff | `handoff_reference` 或既有 terminal/C2/C4 | accepted source、实测提取与所选实际状态检查 |

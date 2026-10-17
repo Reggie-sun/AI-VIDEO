@@ -14,6 +14,26 @@ from test_canvas_production import runtime, submit_and_fetch, pass_evaluation
 from test_generation_feedback_review import Session
 
 
+def prepare_generation_successor(service, *, limits, interventions=()):
+    """Exercise the lower generation lineage owner after means selection.
+
+    These historical fixtures have no ProductionIntent. Public Canvas repair now
+    refuses them; lineage/recovery regression tests still cover the canonical
+    generation owner independently of the new upper authoring gate.
+    """
+    _, row, receipt = service._repair_context(limits, interventions)
+    return service._orchestrator(row, repair_receipt=receipt).prepare(
+        limits=limits, interventions=interventions)
+
+
+def start_generation_successor(service, *, limits, interventions=()):
+    position = service.position()
+    if position.next_action != "stop":
+        return service.start_repair(limits=limits, interventions=interventions)
+    prepared = prepare_generation_successor(service, limits=limits, interventions=interventions)
+    return service._start_prepared(position, prepared, limits)
+
+
 def closed_unsubmitted_canvas(tmp_path):
     from ai_video.production.generation_feedback import record_attempt_evaluation
     service, provider, limits, _ = runtime(tmp_path)
@@ -58,7 +78,7 @@ def test_unsubmitted_intermediate_preserves_submitted_baseline_and_direct_lineag
     service, provider, limits, old, submitted, intervention = failed_canvas(tmp_path, mixed=True)
     close_failure(service, old, mixed=True)
 
-    middle = service.start_repair(limits=limits, interventions=(intervention,))
+    middle = start_generation_successor(service, limits=limits, interventions=(intervention,))
     middle_experience = record_attempt_evaluation(
         committer=service.committer, attempt_id=middle.attempt_id,
     )
@@ -76,7 +96,7 @@ def test_unsubmitted_intermediate_preserves_submitted_baseline_and_direct_lineag
     )
 
     history = service.committer.read_generation_experiences()
-    prepared = service.prepare_repair(limits=limits, interventions=(intervention,))
+    prepared = prepare_generation_successor(service, limits=limits, interventions=(intervention,))
     assert prepared.execution_binding is not None
     assert prepared.inputs.experiences == history
     assert prepared.inputs.latest_attempt_hash == submitted.evidence[-1].evidence_hash
@@ -127,7 +147,7 @@ def test_unsubmitted_intermediate_preserves_submitted_baseline_and_direct_lineag
     assert service._load().manifest == before_missing_parent
     assert provider.call_counts.submit == 1
 
-    current = service.start_repair(limits=limits, interventions=(intervention,))
+    current = start_generation_successor(service, limits=limits, interventions=(intervention,))
     assert current.next_action == "submit"
     assert service.position() == current
     assert service.committer.read_generation_experiences() == history
@@ -258,12 +278,12 @@ def test_explicit_repair_preserves_history_and_reopens_unique_successor(tmp_path
     service, provider, limits, old, experience, intervention = failed_canvas(tmp_path)
     close_failure(service, old)
     history = service.committer.read_generation_experiences()
-    prepared = service.prepare_repair(limits=limits, interventions=(intervention,))
+    prepared = prepare_generation_successor(service, limits=limits, interventions=(intervention,))
     assert prepared.execution_binding is not None, (prepared.decision, prepared.compilation)
     assert prepared.inputs.limits.paid_submits_used == 1
     assert prepared.inputs.experiences == history
     assert prepared.inputs.latest_attempt_hash == experience.evidence[-1].evidence_hash
-    current = service.start_repair(limits=limits, interventions=(intervention,))
+    current = start_generation_successor(service, limits=limits, interventions=(intervention,))
     assert current.attempt_id != old.attempt_id
     assert current.next_action == "submit"
     assert service.committer.read_generation_experiences() == history
@@ -271,7 +291,7 @@ def test_explicit_repair_preserves_history_and_reopens_unique_successor(tmp_path
         direction=service.direction, targets=service.targets,
         routing_policy=service.routing_policy, decision_policy=service.decision_policy)
     assert reopened.position() == current
-    assert reopened.start_repair(limits=limits, interventions=(intervention,)) == current
+    assert start_generation_successor(reopened, limits=limits, interventions=(intervention,)) == current
     assert provider.call_counts.submit == 1
     attempts = reopened._attempts(reopened._load(), "one")
     assert len(attempts) == 2
@@ -322,7 +342,7 @@ def test_repair_budget_exhaustion_retains_closed_result(tmp_path):
     close_failure(service, old)
     before = service._load().manifest
     limited = limits.model_copy(update={"paid_submit_ceiling": 1})
-    result = service.start_repair(limits=limited, interventions=(intervention,))
+    result = start_generation_successor(service, limits=limited, interventions=(intervention,))
     assert result.execution_binding is None
     assert result.decision.disposition == "BLOCKED_EXECUTION"
     assert service._load().manifest == before
@@ -345,14 +365,14 @@ def test_abandoned_mixed_result_remains_in_repair_binding(tmp_path):
     service, provider, limits, old, experience, intervention = failed_canvas(tmp_path, mixed=True)
     close_failure(service, old, mixed=True)
     history = service.committer.read_generation_experiences()
-    prepared = service.prepare_repair(limits=limits, interventions=(intervention,))
+    prepared = prepare_generation_successor(service, limits=limits, interventions=(intervention,))
     assert prepared.execution_binding is not None, (prepared.decision, prepared.compilation)
     assert prepared.inputs.abandoned_result.attempt_id == old.attempt_id
     assert prepared.inputs.abandoned_result.diagnosis.failure_classes == ("EVIDENCE_GAP", "QUALITY_FAILURE")
     assert prepared.inputs.experiences == history
     assert prepared.inputs.latest_attempt_hash == experience.evidence[-1].evidence_hash
     assert prepared.inputs.limits.paid_submits_used == 1
-    current = service.start_repair(limits=limits, interventions=(intervention,))
+    current = start_generation_successor(service, limits=limits, interventions=(intervention,))
     assert current.next_action == "submit"
     assert service.position() == current
     assert service.committer.read_generation_experiences() == history
@@ -382,7 +402,7 @@ def test_forked_successors_remain_ambiguous(tmp_path):
     from ai_video.canvas_recovery import current_canvas_attempt
     service, _, limits, old, _, intervention = failed_canvas(tmp_path)
     close_failure(service, old)
-    service.start_repair(limits=limits, interventions=(intervention,))
+    start_generation_successor(service, limits=limits, interventions=(intervention,))
     attempts = service._attempts(service._load(), "one")
     # Exercise the read-only selector on a fork view; do not persist invented state.
     sibling = attempts[1].model_copy(update={"attempt_id": "other-successor"})

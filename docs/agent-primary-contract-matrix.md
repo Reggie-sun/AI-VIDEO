@@ -283,6 +283,10 @@ Registry 独立重开 immutable receipt，不依赖外部 root。保留路径与
 该输入固定 `NOT_EVALUATED`，绑定 target Project hash，禁止作为 Production Shot 素材绑定；
 不导入 history、不迁移预算、不建立 source-use PASS、不生成媒体或 activation。
 旧 Manifest schema、普通 imported assets 和 bootstrap replay/recovery owner 不变。
+旧 `development-repair-input/1` 无编辑用途；`/2` 额外封存exact target Shot/role/trim/time map/transform
+及原request/fetch绑定的VideoProbeReceipt，只允许muted本地composition preview。资产仍UNBOUND，
+`composition`按receipt派生 `ResolvedTimeline.usage_scope=development_preview`，原render activation
+owner拒绝该scope；不建立第二renderer、timeline、许可或quality state。
 Focused verification：`tests/test_repair_input_admission.py`；reader/state/feedback 检查组合
 由 Harness policy `repair_input_admission` category 独占。这不是通用视频导入或修复执行器。
 
@@ -351,6 +355,9 @@ owner；从 selected Shot 的 `ProductionIntent`、QA allocation、Registry 与 
 枚举 coverage/source/generation 候选。候选持平、证据不足、范围禁止和 capability gap 均显式返回。
 Application caller `production_planning.py::ProductionPlanningService` 使用 standard loader，在 materialize 前
 重新解析并比较完整 decision；只将缺失的动态组件交给原 generation owner。
+默认policy `production-strategy/2` 在qualified_reuse下对更少生成次数、仅缺用途评估的候选先返回
+evidence_required；明确FAIL与NOT_EVALUATED区分。显式 `/1` 保持旧fallback，任一版本均不授权POST。
+Canvas仅薄接prepare/materialize/composition；闭合质量修复先回此owner，缺intent明确停止并补authoring。
 
 `production_strategy_contracts.py` 只保存 immutable authoring/handoff；`domain_acceptance.py` 的
 `ProductionRequirementAllocation` 与 QA-owned `source_use_evidence.py` 分别拥有组件验收分配和
@@ -365,6 +372,10 @@ window、transform、图层、音轨、字幕与有序 coverage，禁止仅凭�
 MP4 的不同实测画幅只有显式 `FixedTransform.video_fit=cover` 才允许固定居中填满裁切；
 默认 `exact` 保持同画幅校验与历史序列化。用途证据绑定该 transform，旧全幅证据不资格化新裁切；
 此选择不修改 raw generation 历史或证明其 activation。
+`video_retime.py`拥有严格整数 `VideoTimeMap`；source option、用途证据与CompositionLayer共用exact
+map。EDIT_EXISTING_VIDEO仅当存在可执行map；CompositionSpec/ResolvedTimeline2.3把它解析为同Shot
+顺序source/output spans；非一比一段按每输出帧floor源坐标解析为一帧窗口，HyperFrames消费一比一帧窗口。旧schema/hash不变；mute范围、source边界及耦合
+audio/caption/voice拒绝由现有composition/visual_media owner核验，旧raw PASS不资格化新map。
 `production_strategy_dependency.py` 通过既有 P5 resolver/transition 将 authoring revision 交回唯一
 committer；保留未受影响的 authoring→asset edges、fingerprint 和 lifecycle。受影响的旧 render
 domain 退出当前图，新 render graph 仍需由原 dependency builder 消费新的 CompositionSpec 构建。

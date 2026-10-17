@@ -52,11 +52,12 @@ class CanvasProductionService:
     """
 
     def __init__(self, *, committer, packet, direction, targets=(), routing_policy=None,
-                 decision_policy=None, execution_stack=None, handoff_preparer=None):
+                 decision_policy=None, production_policy=None, execution_stack=None, handoff_preparer=None):
         self.committer = committer
         self.packet, self.direction = deepcopy(packet), deepcopy(direction)
         self.targets = tuple(targets)
         self.routing_policy, self.decision_policy = routing_policy, decision_policy
+        self.production_policy = production_policy
         self.execution_stack, self.handoff_preparer = execution_stack, handoff_preparer
 
     @classmethod
@@ -135,10 +136,41 @@ class CanvasProductionService:
         loaded = load_production_project(self.committer.project_root / "project.yaml")
         if direction_reference(self.packet, self.direction) not in loaded.project.source_provenance:
             raise _blocked("Canvas source or director data changed; approve a canonical authoring revision.")
-        expected = [row["shot"]["shot_id"] for row in self.direction["shots"]]
+        expected = []
+        active = {s.shot_id for s in loaded.shots}
+        for row in self.direction["shots"]:
+            shot_id = row["shot"]["shot_id"]
+            if shot_id in active:
+                expected.append(shot_id)
+            else:
+                from ai_video.production.production_strategy_reader import production_parent_context
+                _, family, _, _ = production_parent_context(loaded, shot_id)
+                expected.extend(family)
         if expected != [s for b in loaded.storyboard.beats for s in b.shot_ids]:
             raise _blocked("Selected canvas occurrences no longer match the approved Storyboard.")
         return loaded
+
+    def _production_planning(self):
+        from ai_video.production_planning import ProductionPlanningService
+        self._load()
+        return ProductionPlanningService(committer=self.committer, targets=self.targets, policy=self.production_policy)
+
+    @_input_errors
+    def prepare_production(self, *, parent_shot_id):
+        """Assess existing-source/edit means before any generation, without writes."""
+        return self._production_planning().prepare(parent_shot_id=parent_shot_id)
+
+    @_input_errors
+    def materialize_production(self, *, decision, attempt_id):
+        from ai_video.production.production_strategy_contracts import ProductionStrategyDecision
+        decision = ProductionStrategyDecision.model_validate(decision)
+        return self._production_planning().materialize(decision=decision, attempt_id=attempt_id)
+
+    @_input_errors
+    def compose_production(self, *, decision, renderer_version="0.7.103"):
+        from ai_video.production.production_strategy_contracts import ProductionStrategyDecision
+        decision = ProductionStrategyDecision.model_validate(decision)
+        return self._production_planning().composition(decision=decision, renderer_version=renderer_version)
 
     @_input_errors
     def prepare_image_assets(self, *, operations):
@@ -205,7 +237,9 @@ class CanvasProductionService:
         loaded = self._load()
         for row in self.direction["shots"]:
             shot_id = row["shot"]["shot_id"]
-            shot = next(s for s in loaded.shots if s.shot_id == shot_id)
+            shot = next((s for s in loaded.shots if s.shot_id == shot_id), None)
+            if shot is None or shot.production_intent is not None:
+                return CanvasWorkflowPosition(row["occurrence_id"], shot_id, None, "prepare_production")
             # Existing static/graphics composition remains available without Video Provider.
             if shot.visual_strategy.value != "generated_video":
                 continue
@@ -294,8 +328,6 @@ class CanvasProductionService:
             raise _blocked("Explicit repair requires a closed quality or known-no-effect failure; unknown stops remain closed.")
         pointer = attempt.video_generation_state.quality_rejection
         if pointer is not None:
-            if not interventions:
-                raise _blocked("Closed quality repair requires an explicit intervention.")
             receipt = self.committer._reopen_generation_quality_rejection(pointer)
         else:
             from ai_video.canvas_recovery import closed_unsubmitted_evidence
@@ -323,10 +355,27 @@ class CanvasProductionService:
         row = next(r for r in self.direction["shots"] if r["occurrence_id"] == position.occurrence_id)
         return position, row, receipt
 
+    def _quality_repair_strategy(self, position):
+        """Return to the sole production-means owner before another quality attempt."""
+        loaded = self._load()
+        attempt = next(a for a in loaded.manifest.attempts if a.attempt_id == position.attempt_id)
+        if attempt.video_generation_state.quality_rejection is None:
+            return None
+        from ai_video.production.production_strategy_reader import production_parent_context
+        try:
+            production_parent_context(loaded, position.shot_id)
+        except AiVideoError as error:
+            raise _blocked("Closed quality repair requires an authored ProductionIntent with existing-source/edit "
+                           "options and protected requirements; run prepare_production before more generation.") from error
+        return self.prepare_production(parent_shot_id=position.shot_id)
+
     @_input_errors
     def prepare_repair(self, *, limits, interventions=()):
         """Explicitly hand a closed exact result to the existing decision owner."""
-        _, row, receipt = self._repair_context(limits, interventions)
+        position, row, receipt = self._repair_context(limits, interventions)
+        strategy = self._quality_repair_strategy(position)
+        if strategy is not None:
+            return strategy
         return self._orchestrator(row, repair_receipt=receipt).prepare(
             limits=limits, interventions=interventions)
 
@@ -338,6 +387,9 @@ class CanvasProductionService:
             if len(self._attempts(self._load(), position.shot_id)) > 1:
                 return position
         position, row, receipt = self._repair_context(limits, interventions)
+        strategy = self._quality_repair_strategy(position)
+        if strategy is not None:
+            return strategy
         prepared = self._orchestrator(row, repair_receipt=receipt).prepare(
             limits=limits, interventions=interventions)
         return self._start_prepared(position, prepared, limits)

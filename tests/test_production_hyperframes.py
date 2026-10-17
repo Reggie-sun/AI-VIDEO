@@ -3594,11 +3594,15 @@ def test_live_committed_fixture_render_state_lifecycle(tmp_path):
 
 
 def _prepared_activation_request(
-    tmp_path: Path, attempt_id: str, *, versioned_pair: bool = False
+    tmp_path: Path, attempt_id: str, *, versioned_pair: bool = False, timeline_override=None
 ):
     before, timeline, begin_request, browser, ip_path = _replay_inputs(
         tmp_path, attempt_id
     )
+    if timeline_override is not None:
+        timeline = timeline_override
+        begin_request = replace(begin_request, renderer_selection=begin_request.renderer_selection.model_copy(
+            update={"timeline_fingerprint": timeline.composition_fingerprint}))
     committer = ProductionStateCommitter(tmp_path)
     if versioned_pair:
         project, registry = project_factory.load_revision_two_models(tmp_path)
@@ -3653,6 +3657,18 @@ def _prepared_activation_request(
         next_render_state=durable.next_render_state,
     )
     return before, committer, request
+
+
+def test_development_preview_render_cannot_activate_even_with_complete_artifacts(tmp_path):
+    preview = make_resolved_timeline().model_copy(update={
+        "schema_version": "2.3", "usage_scope": "development_preview", "content_hash": "0" * 64})
+    preview = seal_artifact(preview.model_copy(update={"composition_fingerprint": timeline_fingerprint(preview)}))
+    _, committer, request = _prepared_activation_request(tmp_path, "preview-no-activation", timeline_override=preview)
+    with pytest.raises(AiVideoError, match="preview timelines cannot be activated"):
+        committer.activate_render_state(request)
+    reopened = load_production_project(tmp_path / "project.yaml")
+    assert reopened.manifest.active_render_state is None
+    assert reopened.manifest.attempts[-1].status is StateCommitStatus.FAILED
 
 
 def test_manifest_23_render_activation_atomically_applies_complete_render_unit(

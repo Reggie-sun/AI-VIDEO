@@ -16,6 +16,7 @@ from ai_video.production.commercial_graphics import (
     GraphicTreatment,
     ResolvedCommercialGraphic,
 )
+from ai_video.production.video_retime import VideoTimeMap
 
 
 class DeliveryProfile(StrictModel):
@@ -135,9 +136,19 @@ class CompositionLayerSpec(StrictModel):
     asset_id: str = Field(min_length=1)
     trim_start_frame: int = Field(default=0, ge=0)
     trim_duration_frames: int | None = Field(default=None, gt=0)
+    source_time_map: VideoTimeMap | None = None
     transform: FixedTransform = Field(default_factory=FixedTransform)
     opacity_milli: int = Field(default=1000, ge=0, le=1000)
     z_index: int = 0
+
+    @model_serializer(mode="wrap")
+    def _serialize_optional_time_map(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.source_time_map is None:
+            data.pop("source_time_map", None)
+        return data
 
 
 class TransitionSpec(StrictModel):
@@ -162,7 +173,7 @@ class VoiceCompositionSource(StrictModel):
 
 
 class CompositionSpec(VersionedArtifact):
-    schema_version: Literal["2.0", "2.1", "2.2"] = "2.0"
+    schema_version: Literal["2.0", "2.1", "2.2", "2.3"] = "2.0"
     composition_id: str
     shot_ids: tuple[str, ...] = Field(min_length=1)
     layers: tuple[CompositionLayerSpec, ...] = Field(min_length=1)
@@ -213,6 +224,28 @@ class CompositionSpec(VersionedArtifact):
 
     @model_validator(mode="after")
     def _validate_versioned_tracks(self) -> "CompositionSpec":
+        mapped_shot_ids = {
+            layer.shot_id for layer in self.layers if layer.source_time_map is not None
+        }
+        if mapped_shot_ids and self.schema_version != "2.3":
+            raise ValueError("Video time maps require CompositionSpec 2.3")
+        if mapped_shot_ids:
+            mapped_audio_ids = {
+                track.track_id
+                for track in self.audio_tracks
+                if track.shot_id in mapped_shot_ids
+            }
+            if mapped_audio_ids or any(
+                source.shot_id in mapped_shot_ids for source in self.voice_sources
+            ) or any(
+                binding.shot_id in mapped_shot_ids
+                or binding.source_audio_track_id in mapped_audio_ids
+                for binding in self.caption_tracks
+            ):
+                raise ValueError(
+                    "Video time maps require an explicitly muted visual-only Shot; "
+                    "same-Shot audio, captions, and voice sources are unsupported"
+                )
         voice_ids = tuple(item.shot_id for item in self.voice_sources)
         if len(voice_ids) != len(set(voice_ids)) or not set(voice_ids) <= set(self.shot_ids):
             raise ValueError("voice sources must uniquely bind composition Shots")
@@ -228,7 +261,7 @@ class CompositionSpec(VersionedArtifact):
             raise ValueError("caption binding IDs must be unique")
         if any(item.style_reference is None for item in self.caption_tracks):
             raise ValueError("bound caption tracks require a style reference")
-        if self.schema_version != "2.2" and (
+        if self.schema_version not in {"2.2", "2.3"} and (
             self.graphic_layer_ids
             or self.graphic_layer_animations
             or self.commercial_graphics
@@ -263,7 +296,7 @@ class CompositionSpec(VersionedArtifact):
         if (self.ad_creative_plan_id is None) != (self.ad_creative_plan_hash is None):
             raise ValueError("ad creative plan identity must be all-or-none")
         if (
-            self.schema_version == "2.2"
+            self.schema_version in {"2.2", "2.3"}
             and (
                 self.graphic_layer_ids
                 or self.commercial_graphics
@@ -284,7 +317,7 @@ class CompositionSpec(VersionedArtifact):
         if self.schema_version == "2.0":
             data.pop("audio_tracks", None)
             data.pop("caption_tracks", None)
-        if self.schema_version != "2.2":
+        if self.schema_version not in {"2.2", "2.3"}:
             data.pop("graphic_layer_ids", None)
             data.pop("graphic_layer_animations", None)
             data.pop("commercial_graphics", None)
@@ -397,7 +430,8 @@ class ResolvedCaptionCue(StrictModel):
 
 
 class ResolvedTimeline(VersionedArtifact):
-    schema_version: Literal["2.0", "2.1", "2.2"] = "2.0"
+    schema_version: Literal["2.0", "2.1", "2.2", "2.3"] = "2.0"
+    usage_scope: Literal["production", "development_preview"] = "production"
     timeline_id: str
     composition_spec_id: str
     composition_spec_revision: int = Field(ge=1)
@@ -435,16 +469,31 @@ class ResolvedTimeline(VersionedArtifact):
             raise ValueError("ResolvedTimeline before 2.2 cannot contain ad graphics")
         return value
 
+    @model_validator(mode="before")
+    @classmethod
+    def _reject_preview_scope_before_23(cls, value: object) -> object:
+        if (
+            isinstance(value, Mapping)
+            and value.get("schema_version", "2.0") != "2.3"
+            and value.get("usage_scope", "production") != "production"
+        ):
+            raise ValueError("development preview scope requires ResolvedTimeline 2.3")
+        return value
+
     @model_validator(mode="after")
     def _validate_versioned_resolved_tracks(self) -> "ResolvedTimeline":
         if self.schema_version == "2.0" and (self.audio_spans or self.caption_cues):
             raise ValueError("ResolvedTimeline 2.0 cannot contain P4 timing fields")
-        if self.schema_version != "2.2" and self.commercial_graphics:
+        if self.schema_version not in {"2.2", "2.3"} and self.commercial_graphics:
             raise ValueError("ResolvedTimeline before 2.2 cannot contain ad graphics")
-        if self.schema_version != "2.2" and any(
+        if self.schema_version not in {"2.2", "2.3"} and any(
             item.graphic_animation is not None for item in self.visual_spans
         ):
             raise ValueError("ResolvedTimeline before 2.2 cannot contain graphic animation")
+        if self.usage_scope == "development_preview" and (
+            self.audio_spans or self.caption_cues
+        ):
+            raise ValueError("development preview timelines cannot contain audio or captions")
         if any(
             item.start_sample + item.duration_samples > self.total_samples
             for item in self.audio_spans
@@ -537,6 +586,8 @@ class ResolvedTimeline(VersionedArtifact):
         if self.schema_version == "2.0":
             data.pop("audio_spans", None)
             data.pop("caption_cues", None)
-        if self.schema_version != "2.2":
+        if self.schema_version not in {"2.2", "2.3"}:
             data.pop("commercial_graphics", None)
+        if self.schema_version != "2.3":
+            data.pop("usage_scope", None)
         return data

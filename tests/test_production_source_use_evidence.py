@@ -16,6 +16,7 @@ from ai_video.production.models import (
     ToolIdentity,
 )
 from ai_video.production.source_use_evidence import SourceUseEvidence, assess_source_use
+from ai_video.production.video_retime import VideoTimeMap, VideoTimePoint
 
 
 HASH = "a" * 64
@@ -45,7 +46,8 @@ def _acceptance(*, ids: tuple[str, ...] = ("action", "timing"), proof="technical
 def _evidence(*, acceptance: DomainAcceptancePolicy, evidence_id: str = "evidence-1",
               evaluator: ToolIdentity = TECHNICAL, proof: str = "technical",
               observations: tuple[tuple[str, str], ...] = (("action", "PASS"), ("timing", "PASS")),
-              start: int = 0, role: str = "reuse", human_actor_id: str | None = None,
+              start: int = 0, duration: int = 24, role: str = "reuse",
+              source_time_map: VideoTimeMap | None = None, human_actor_id: str | None = None,
               evidence_ref: str | None = None) -> SourceUseEvidence:
     response = {
         "parent_shot_content_hash": SHOT_HASH,
@@ -58,7 +60,7 @@ def _evidence(*, acceptance: DomainAcceptancePolicy, evidence_id: str = "evidenc
         "role": role,
         "timebase": "frames",
         "start": start,
-        "duration": 24,
+        "duration": duration,
         "evaluator": evaluator.model_dump(mode="json"),
         "proof": proof,
         "observations": [
@@ -66,6 +68,8 @@ def _evidence(*, acceptance: DomainAcceptancePolicy, evidence_id: str = "evidenc
             for requirement_id, verdict in observations
         ],
     }
+    if source_time_map is not None:
+        response["source_time_map"] = source_time_map.model_dump(mode="json")
     if human_actor_id is not None:
         response["human_actor_id"] = human_actor_id
     if evidence_ref is not None:
@@ -82,10 +86,11 @@ def _evidence(*, acceptance: DomainAcceptancePolicy, evidence_id: str = "evidenc
         role=role,
         timebase="frames",
         start=start,
-        duration=24,
+        duration=duration,
         evaluator=evaluator,
         proof=proof,
         response_json=json.dumps(response),
+        source_time_map=source_time_map,
     )
 
 
@@ -112,7 +117,8 @@ def _policy(*, acceptance: DomainAcceptancePolicy, evidence: tuple[SourceUseEvid
     ))
 
 
-def _assess(policy: QaPolicy, *, start: int = 0, role: str = "reuse", ids: tuple[str, ...] = ("evidence-1",)):
+def _assess(policy: QaPolicy, *, start: int = 0, duration: int = 24, role: str = "reuse",
+            source_time_map: VideoTimeMap | None = None, ids: tuple[str, ...] = ("evidence-1",)):
     return assess_source_use(
         qa_policy=policy,
         parent_shot_content_hash=SHOT_HASH,
@@ -124,9 +130,10 @@ def _assess(policy: QaPolicy, *, start: int = 0, role: str = "reuse", ids: tuple
         role=role,
         timebase="frames",
         start=start,
-        duration=24,
+        duration=duration,
         requirement_ids=("action", "timing"),
         evidence_ids=ids,
+        source_time_map=source_time_map,
     )
 
 
@@ -237,6 +244,7 @@ def test_later_human_fail_cannot_be_hidden_by_old_selected_pass():
 def test_response_identity_is_not_synthesized_and_legacy_policy_bytes_are_unchanged():
     acceptance = _acceptance()
     evidence = _evidence(acceptance=acceptance)
+    assert "source_time_map" not in evidence.model_dump(mode="json")
     response = json.loads(evidence.response_json)
     response["role"] = "insert"
     with pytest.raises(ValueError, match="response"):
@@ -248,3 +256,21 @@ def test_response_identity_is_not_synthesized_and_legacy_policy_bytes_are_unchan
     payload = policy.model_dump(mode="json")
     assert "production_source_evidence" not in payload
     assert QaPolicy.model_validate(payload).model_dump(mode="json") == payload
+
+
+def test_unretimed_pass_cannot_qualify_retimed_source_use():
+    acceptance = _acceptance()
+    unchanged = _evidence(acceptance=acceptance)
+    mapped_use = VideoTimeMap(points=(
+        VideoTimePoint(source_frame=0, output_frame=0),
+        VideoTimePoint(source_frame=48, output_frame=24),
+    ), audio_policy="mute")
+    policy = _policy(acceptance=acceptance, evidence=(unchanged,))
+
+    assert _assess(policy, duration=48, source_time_map=mapped_use) == "NOT_EVALUATED"
+
+    retimed = _evidence(acceptance=acceptance, evidence_id="retimed-pass",
+        duration=48, source_time_map=mapped_use)
+    policy = _policy(acceptance=acceptance, evidence=(retimed,))
+    assert _assess(policy, duration=48, source_time_map=mapped_use,
+        ids=("retimed-pass",)) == "PASS"

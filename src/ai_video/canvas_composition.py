@@ -44,13 +44,15 @@ def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), capt
         shot = next(s for s in loaded.shots if s.shot_id == row["shot"]["shot_id"])
         settings = dict(row.get("composition", {}))
         if set(settings) - {"asset_role", "asset_id", "trim_start_frame", "trim_duration_frames",
-                            "transform", "speed", "muted", "volume"}:
+                            "transform", "speed", "muted", "volume", "source_time_map"}:
             raise ValueError("unsupported source composition settings")
         if settings.pop("speed", 1) != 1 or settings.pop("volume", 1) != 1:
             raise ValueError("source speed/gain requires explicit existing composition authoring")
         muted = settings.pop("muted", False)
         if type(muted) is not bool:
             raise ValueError("muted must be an explicit boolean")
+        if settings.get("source_time_map") is not None and not muted:
+            raise ValueError("retimed video requires explicit muted=true; source audio has no sample time map")
         role = settings.pop("asset_role", "primary_visual")
         candidates = [i for r in shot.required_asset_roles if r.role == role for i in r.asset_ids]
         asset_id = settings.pop("asset_id", None)
@@ -74,6 +76,7 @@ def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), capt
             asset_role=role, asset_id=asset_id, **settings))
     order = tuple(row["shot"]["shot_id"] for row in rows)
     spec = CompositionSpec(artifact_id="canvas-composition", composition_id="canvas-composition",
+        schema_version="2.3" if any(layer.source_time_map is not None for layer in layers) else "2.0",
         revision=1, content_hash="0" * 64, creation_receipt_id="canvas-composition-authoring",
         source_provenance=(SourceReference(kind="derived", reference=loaded.project.artifact_id,
                                          content_hash=loaded.project.content_hash),),
@@ -98,7 +101,7 @@ def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), capt
                 t.audio_kind.value in {"dialogue", "narration"} for t in tracks):
             raise ValueError("authored dialogue/narration must remain present in the final audio tracks")
     if tracks or caption_tracks or voice_sources:
-        spec = spec.model_copy(update={"schema_version": "2.1", "audio_tracks": tuple(tracks),
+        spec = spec.model_copy(update={"schema_version": "2.3" if spec.schema_version == "2.3" else "2.1", "audio_tracks": tuple(tracks),
             "caption_tracks": tuple(caption_tracks), "voice_sources": tuple(voice_sources)})
     spec = seal_artifact(spec)
     return spec, resolve_composition(loaded, spec, renderer_version)

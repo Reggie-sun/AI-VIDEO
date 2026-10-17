@@ -23,7 +23,7 @@ from ai_video.production.visual_media import resolved_video_trim_duration
 
 
 class ProductionStrategyPolicy(StrictModel):
-    version: Literal["production-strategy/1"] = "production-strategy/1"
+    version: Literal["production-strategy/1", "production-strategy/2"] = "production-strategy/2"
     preference: Literal["qualified_reuse", "generation", "unresolved"] = "qualified_reuse"
     allow_generation_exploration: bool = False
     max_candidates: int = Field(default=128, strict=True, gt=0, le=1024)
@@ -41,10 +41,12 @@ class ProductionCapabilities(StrictModel):
 _SUPPORTED = frozenset({Op.GENERATE_FULL_SHOT, Op.EXISTING_ASSET_REUSE,
     Op.SPLIT_SHOT, Op.CUTAWAY, Op.REACTION_SHOT, Op.INSERT_SHOT,
     Op.REFRAME, Op.TRIM_EXISTING, Op.REPLACE_AUDIO,
-    Op.COMPOSITE_MULTIPLE_ASSETS, Op.SIMPLIFY_ACTION})
+    Op.COMPOSITE_MULTIPLE_ASSETS, Op.SIMPLIFY_ACTION, Op.EDIT_EXISTING_VIDEO})
 
 
-def _source_blockers(loaded, parent, component_id, source, requirement_ids):
+def _source_blockers(
+    loaded, parent, component_id, source, requirement_ids, *, output_duration_frames: int | None = None,
+):
     asset = next((a for a in loaded.registry.assets if a.asset_id == source.asset_id), None)
     if asset is None or asset.sha256 != source.asset_sha256:
         return ("evidence_required:source_identity",)
@@ -53,12 +55,20 @@ def _source_blockers(loaded, parent, component_id, source, requirement_ids):
         if asset.asset_type != AssetType.VIDEO:
             blockers.append("capability_gap:video_type")
         else:
+            resolved_output_frames = output_duration_frames or source.duration
+            if (source.source_time_map is not None
+                    and source.source_time_map.output_duration_frames != resolved_output_frames):
+                blockers.append("capability_gap:video_time_map")
             try:
                 resolved_video_trim_duration(asset, CompositionLayerSpec(
                     layer_id="source-use",
                     shot_id="qualification", asset_id=asset.asset_id, asset_role=source.role,
                     trim_start_frame=source.start, trim_duration_frames=source.duration,
-                ), duration_frames=source.duration, delivery_profile=loaded.project.delivery_profile)
+                    transform=source.transform,
+                    **({"source_time_map": source.source_time_map}
+                       if source.source_time_map is not None else {}),
+                ), duration_frames=resolved_output_frames,
+                    delivery_profile=loaded.project.delivery_profile)
             except ValueError:
                 blockers.append("capability_gap:video_window")
     elif source.timebase == "still":
@@ -76,7 +86,8 @@ def _source_blockers(loaded, parent, component_id, source, requirement_ids):
             size_bytes=asset.size_bytes, role=source.role, timebase=source.timebase,
             start=source.start, duration=source.duration, requirement_ids=requirement_ids,
             evidence_ids=source.evidence_ids, transform=source.transform,
-            opacity_milli=source.opacity_milli, z_index=source.z_index)
+            opacity_milli=source.opacity_milli, z_index=source.z_index,
+            source_time_map=source.source_time_map)
     except ValueError:
         verdict = "NOT_EVALUATED"
     if verdict != "PASS":
@@ -86,8 +97,13 @@ def _source_blockers(loaded, parent, component_id, source, requirement_ids):
 
 def _unit_options(unit):
     options = []
+    maps_additional_source = any(
+        source.source_time_map is not None
+        for source in unit.additional_sources
+    )
     for source in unit.source_options:
-        operation = Op.TRIM_EXISTING if source.start else Op.EXISTING_ASSET_REUSE
+        operation = (Op.EDIT_EXISTING_VIDEO if source.source_time_map is not None or maps_additional_source else
+                     Op.TRIM_EXISTING if source.start else Op.EXISTING_ASSET_REUSE)
         options.append(ProductionSelectedUnit(component=unit, operation=operation, source=source))
     options.append(ProductionSelectedUnit(component=unit, operation=Op.GENERATE_FULL_SHOT))
     return tuple(options)
@@ -143,13 +159,21 @@ def _candidate(loaded, parent, coverage, selected_units, policy, capabilities):
             if unit.motion_required and source.timebase == "still":
                 blockers.append("capability_gap:still_cannot_supply_motion")
             primary_ids = source.requirement_ids or unit.requirement_ids
-            blockers.extend(_source_blockers(loaded, parent, unit.component_id, source, primary_ids))
+            blockers.extend(_source_blockers(loaded, parent, unit.component_id, source, primary_ids,
+                output_duration_frames=unit.duration_frames))
             supplied = set(primary_ids)
             for extra in unit.additional_sources:
                 supplied.update(extra.requirement_ids)
             if supplied != set(unit.requirement_ids):
                 blockers.append("needs_authoring_revision:source_requirement_coverage")
         sources = ((*unit.additional_sources, source) if source else unit.additional_sources)
+        mapped = any(item.source_time_map is not None for item in sources)
+        if Op.EDIT_EXISTING_VIDEO in unit.required_operations and not mapped:
+            blockers.append("capability_gap:video_time_map_required")
+        if mapped and (unit.dialogue or unit.narration or any(
+                item.track.shot_id in {None, unit.shot_id} for item in coverage.audio
+        ) or any(item.shot_id in {None, unit.shot_id} for item in coverage.captions)):
+            blockers.append("capability_gap:retimed_audio_or_captions")
         if unit.additional_sources:
             operations.add(Op.COMPOSITE_MULTIPLE_ASSETS)
             types = {a.asset_type for a in loaded.registry.assets
@@ -159,11 +183,14 @@ def _candidate(loaded, parent, coverage, selected_units, policy, capabilities):
             if len({s.z_index for s in sources}) != len(sources):
                 blockers.append("needs_authoring_revision:duplicate_layer_depth")
         for extra in unit.additional_sources:
-            blockers.extend(_source_blockers(loaded, parent, unit.component_id, extra, extra.requirement_ids))
+            if extra.source_time_map is not None and selected.operation is not Op.EDIT_EXISTING_VIDEO:
+                blockers.append("capability_gap:video_time_map_operation")
+            blockers.extend(_source_blockers(loaded, parent, unit.component_id, extra,
+                extra.requirement_ids, output_duration_frames=unit.duration_frames))
         for item in sources:
             if item.transform != FixedTransform():
                 operations.add(Op.REFRAME)
-            if item.start:
+            if item.start and item.source_time_map is None:
                 operations.add(Op.TRIM_EXISTING)
     if coverage.audio:
         operations.add(Op.REPLACE_AUDIO)
@@ -213,6 +240,20 @@ class ProductionStrategyResolver:
         if feasible:
             if policy.preference == "qualified_reuse":
                 score = min(c.new_generation_count for c in feasible)
+                if policy.version == "production-strategy/2":
+                    evidence_pending = tuple(
+                        c for c in candidates
+                        if c.new_generation_count < score
+                        and c.blockers
+                        and all(b == "evidence_required:source_not_evaluated" for b in c.blockers)
+                    )
+                    if evidence_pending:
+                        pending_reasons = tuple(dict.fromkeys(
+                            blocker for candidate in evidence_pending for blocker in candidate.blockers
+                        ))
+                        return ProductionStrategyDecision(**common, candidates=candidates,
+                            disposition="evidence_required",
+                            reasons=pending_reasons)
                 preferred = tuple(c for c in feasible if c.new_generation_count == score)
             elif policy.preference == "generation":
                 score = max(c.new_generation_count for c in feasible)

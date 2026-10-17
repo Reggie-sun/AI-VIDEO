@@ -6,11 +6,12 @@ import json
 from collections.abc import Mapping, Sequence
 from typing import Literal, Protocol
 
-from pydantic import Field, model_validator
+from pydantic import Field, model_serializer, model_validator
 
 from ai_video.production.artifact_contracts import StrictModel, ToolIdentity
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.composition_contracts import FixedTransform
+from ai_video.production.video_retime import VideoTimeMap
 
 
 class _QaPolicyLike(Protocol):
@@ -37,12 +38,20 @@ class SourceUseEvidence(StrictModel):
     timebase: Literal["frames", "samples", "still"]
     start: int = Field(ge=0)
     duration: int = Field(gt=0)
+    source_time_map: VideoTimeMap | None = None
     evaluator: ToolIdentity
     proof: Literal["technical", "analyzer", "human"]
     response_json: str = Field(min_length=1)
     transform: FixedTransform = Field(default_factory=FixedTransform)
     opacity_milli: int = Field(default=1000, ge=0, le=1000)
     z_index: int = 0
+
+    @model_serializer(mode="wrap")
+    def _preserve_legacy_evidence_shape(self, handler):
+        data = handler(self)
+        if self.source_time_map is None:
+            data.pop("source_time_map", None)
+        return data
 
     @model_validator(mode="after")
     def _validate_original_response(self) -> "SourceUseEvidence":
@@ -52,6 +61,11 @@ class SourceUseEvidence(StrictModel):
             raise ValueError("Source-use response JSON is invalid") from exc
         if not isinstance(response, Mapping):
             raise ValueError("Source-use response JSON must be an object")
+        if self.source_time_map is not None and (
+            self.timebase != "frames"
+            or self.source_time_map.source_duration_frames != self.duration
+        ):
+            raise ValueError("Source-use time map must bind the exact frame-based source window")
         expected = {
             "parent_shot_content_hash": self.parent_shot_content_hash,
             "task_id": self.task_id,
@@ -74,6 +88,12 @@ class SourceUseEvidence(StrictModel):
             if value != default or key in response:
                 expected[key] = value
         if any(response.get(key) != value for key, value in expected.items()):
+            raise ValueError("Source-use response identity does not match evidence")
+        if self.source_time_map is not None:
+            expected["source_time_map"] = self.source_time_map.model_dump(mode="json")
+        elif "source_time_map" in response:
+            expected["source_time_map"] = None
+        if "source_time_map" in expected and response.get("source_time_map") != expected["source_time_map"]:
             raise ValueError("Source-use response identity does not match evidence")
         observations = response.get("observations")
         if not isinstance(observations, list) or not observations:
@@ -150,6 +170,7 @@ def _matches_use(
     transform: FixedTransform,
     opacity_milli: int,
     z_index: int,
+    source_time_map: VideoTimeMap | None,
 ) -> bool:
     return (
         evidence.parent_shot_content_hash == parent_shot_content_hash
@@ -166,6 +187,7 @@ def _matches_use(
         and evidence.transform == transform
         and evidence.opacity_milli == opacity_milli
         and evidence.z_index == z_index
+        and evidence.source_time_map == source_time_map
     )
 
 
@@ -187,6 +209,7 @@ def assess_source_use(
     transform: FixedTransform | None = None,
     opacity_milli: int = 1000,
     z_index: int = 0,
+    source_time_map: VideoTimeMap | None = None,
 ) -> Literal["PASS", "FAIL", "NOT_EVALUATED"]:
     """Assess an exact use from all current evidence, never a caller-picked subset."""
     acceptance = _current_acceptance(qa_policy)
@@ -225,6 +248,7 @@ def assess_source_use(
         start=start,
         duration=duration,
         transform=transform or FixedTransform(), opacity_milli=opacity_milli, z_index=z_index,
+        source_time_map=source_time_map,
     )
     if any(not _matches_use(item, **expected) for item in (evidence_by_id[item_id] for item_id in selected_ids)):
         return "NOT_EVALUATED"
