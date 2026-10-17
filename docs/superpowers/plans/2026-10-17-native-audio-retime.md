@@ -26,7 +26,11 @@ RendererAudioBinding归`renderer_audio_contracts.py`并由models兼容re-export�
 
 **Owner:** Parent；`canvas_composition.py`、`production_strategy_materialization.py`、policy及workflow/matrix、公开测试与记录。
 **Contract:** Canvas/策略只在显式V2选2.4，跳过重复native WAV注册；实际robot从原failed source新封存v3并经原HyperFrames导出。画面采用窗和anchors保持，无direct mux、无Provider/凭据调用、无activation；所有要求和声音缺证保留。
-**Verification:** focused公开用例→稳定exact-range适用Harness→Risk Gate及同一native reviewer复审（保留此前两轮历史）→owned commit/push main和remote SHA核验。真实导出显式project-local video-analysis、全部frame/PCM/时钟证据及独立可访问媒体复核；无法真实听看不代签human。
+**Verification:** focused公开用例→稳定exact-range适用Harness→Risk Gate及一名native reviewer审查（保留此前两轮历史）→owned commit/push main和remote SHA核验。真实导出显式project-local video-analysis、全部frame/PCM/时钟证据及独立可访问媒体复核；无法真实听看不代签human。
+
+公开导入用例确认普通VIDEO使用local measurement而非generation probe；resolver按真实Registry来源
+解析预期映射，materializer才对held bytes核验唯一音轨。测试覆盖同素材不同map复用、缺轨/双轨失败及
+repair v2/v3先于普通IMPORTED分支的准入边界；不增加另一种导入凭证或修改失败素材资格。
 
 ## Completion
 

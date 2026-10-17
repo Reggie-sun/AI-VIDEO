@@ -379,7 +379,8 @@ map。EDIT_EXISTING_VIDEO仅当存在可执行map；CompositionSpec/ResolvedTime
 顺序source/output spans；非一比一段按每输出帧floor源坐标解析为一帧窗口，HyperFrames消费一比一帧窗口。旧schema/hash不变；mute范围、source边界及耦合
 audio/caption/voice拒绝由现有composition/visual_media owner核验，旧raw PASS不资格化新map。
 保留同源原声使用显式`video-time-map/2`和CompositionSpec/ResolvedTimeline2.4；
-`_composition_native_audio.py`只从同一VIDEO probe/map派生内部P4 native spans，
+`_composition_native_audio.py`从同一VIDEO身份/map派生内部P4 native spans；generated/captured源
+重开exact probe，普通imported源沿Registry实测metadata并在materializer核验held bytes的唯一音轨，
 `_hyperframes_native_audio.py`处理explicit FFmpeg/ffprobe、音频正偏移、分段变速和有界尾部修正；
 `audio_retime_contracts.py`固定sample mapping/proof，原mixer/HyperFrames消费且reader核验exact proofs。
 原P4 mixer/WAV校验归`_hyperframes_audio.py`，audio binding类型归`renderer_audio_contracts.py`，

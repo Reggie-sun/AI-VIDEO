@@ -218,12 +218,15 @@ frame/sample。固定版本0.7.103导出忽略 `data-playback-rate`，因此非�
 源坐标floor展开为一帧span；HyperFrames消费这些既有一比一窗口，不新增timeline或renderer。旧2.0–2.2字节/hash保持且拒绝time map。
 Canvas composition使用上述V1时必须显式 `muted:true`。保留原声采用显式
 `video-time-map/2` + `audio_policy:retime_preserve_pitch` + `muted:false`，并进入
-`CompositionSpec/ResolvedTimeline 2.4`：resolver从同一VIDEO的exact probe和同一帧映射派生
+`CompositionSpec/ResolvedTimeline 2.4`：resolver从同一VIDEO身份和同一帧映射派生
 sample segments及内部 `native_video` P4 span；不另注册WAV、不把原生整轨冒充单独对白或环境声。
+generated/captured源重开exact probe；普通imported源使用Registry实测metadata，不伪造generation probe。
+普通导入的音轨存在性/唯一性到materializer读取held MP4时才核验，compose成功不证明已取得可用声音。
 源必须只有一条音轨、视频时间原点为零；正向音频起始偏移保留为空白，前置音频或不能可靠对齐时拒绝。
 原声经显式注入的FFmpeg/ffprobe处理，逐段保音高变速；每段尾部补齐/裁切最多一个输出帧的samples，
 proof记录输入/输出PCM、source/map/tool hashes及修正量，超界拒绝。画面仍沿原帧窗口解析，
-原P4 mixer和HyperFrames消费同一时间线。保音高不保证音色、接缝或口型质量，必须检查实际A/V。
+原P4 mixer和HyperFrames消费同一时间线。原声节奏与时点随画面映射改变；保音高不保留原绝对时刻，
+也不保证音色、接缝或口型质量，必须检查实际A/V。
 同镜/全局额外音轨、字幕或voice来源尚无对应sample mapping时明确拒绝，不能静默丢掉所需声音。
 独立其他Shot的声音不受影响，旧2.0–2.3及V1序列化保持兼容。
 

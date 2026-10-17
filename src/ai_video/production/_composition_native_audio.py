@@ -13,7 +13,7 @@ from ai_video.production.composition_contracts import (
     ResolvedAudioSpan,
 )
 from ai_video.production.hashing import canonical_sha256
-from ai_video.production.models import AssetRecord, LoadedProductionProject
+from ai_video.production.models import AssetRecord, AssetSourceKind, LoadedProductionProject
 from ai_video.production.paths import (
     _read_regular_file_nofollow,
     canonical_video_probe_receipt_path,
@@ -26,7 +26,7 @@ def _native_audio_probe(
     asset: AssetRecord,
     *,
     invalid: Callable[..., AiVideoError],
-) -> VideoProbeReceipt:
+) -> VideoProbeReceipt | None:
     metadata = asset.video_metadata
     if metadata is None:
         raise invalid(f"Mapped video asset {asset.asset_id} has no exact probe identity.")
@@ -44,6 +44,11 @@ def _native_audio_probe(
         if admission.contract_version != "development-repair-input/3":
             raise invalid("Native audio preview requires development-repair-input/3.")
         probe = admission.preview_probe
+    elif asset.source_kind is AssetSourceKind.IMPORTED:
+        # Ordinary imports carry Registry measurements, not generation receipts.
+        # The materializer verifies the held MP4's unique audio stream before P4.
+        # Repair provenance must take the strict branch above even when imported.
+        return None
     else:
         path = project.root / canonical_video_probe_receipt_path(metadata.probe_receipt_id)
         try:
