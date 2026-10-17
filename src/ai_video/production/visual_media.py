@@ -139,7 +139,10 @@ def render_visual_element(
     source_path = span.materialized_path.as_posix()
     style = f"transform:{escape(_css_transform(span.transform))};transform-origin:0 0"
     if span.asset_mime_type == "video/mp4":
-        if span.trim_duration_frames != span.duration_frames:
+        if (
+            span.trim_duration_frames is not None
+            and span.trim_duration_frames != span.duration_frames
+        ):
             raise VisualMediaValidationError("Pinned HyperFrames export requires resolved source-frame sampling")
         return (
             f'  <video id="{video_id}"' + (' class="clip"' if timed_media else '') +

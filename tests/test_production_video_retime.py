@@ -29,6 +29,10 @@ from ai_video.production.models import (
     VideoAssetMetadata,
 )
 from ai_video.production.video_retime import VideoTimeMap, VideoTimePoint
+from ai_video.production.visual_media import (
+    VisualMediaValidationError,
+    render_visual_element,
+)
 from production_project_factory import (
     make_loaded_project_and_spec,
     make_p4_composition_fixture,
@@ -227,6 +231,46 @@ def test_unit_rate_time_map_resolves_as_one_continuous_span(tmp_path):
         span.trim_start_frame,
         span.trim_duration_frames,
     ) == ("layer-shot-2", 48, 48, 0, 48)
+
+
+@pytest.mark.parametrize("trim_duration", [None, 48])
+def test_legacy_unit_rate_video_span_renders_with_optional_trim_duration(
+    tmp_path, trim_duration,
+):
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    loaded, spec = _with_video_layer(
+        tmp_path, loaded, spec, shot_index=1, trim_start_frame=0,
+        trim_duration_frames=48, frame_count=48,
+    )
+    timeline = resolve_composition(loaded, spec, renderer_version="0.7.103")
+    span = next(item for item in timeline.visual_spans if item.shot_id == "shot-2")
+    span = span.model_copy(update={"trim_duration_frames": trim_duration})
+
+    element = render_visual_element(
+        span, video_id="legacy-video", start_seconds="2", duration_seconds="2",
+        media_start_seconds="0", track_index=0,
+    )
+
+    assert '<video id="legacy-video"' in element
+    assert 'data-duration="2"' in element
+    assert "data-playback-rate" not in element
+
+
+def test_renderer_rejects_nonunit_video_span_without_resolved_sampling(tmp_path):
+    loaded, spec = make_loaded_project_and_spec(tmp_path)
+    loaded, spec = _with_video_layer(
+        tmp_path, loaded, spec, shot_index=1, trim_start_frame=0,
+        trim_duration_frames=48, frame_count=48,
+    )
+    timeline = resolve_composition(loaded, spec, renderer_version="0.7.103")
+    span = next(item for item in timeline.visual_spans if item.shot_id == "shot-2")
+    span = span.model_copy(update={"trim_duration_frames": 24})
+
+    with pytest.raises(VisualMediaValidationError, match="source-frame sampling"):
+        render_visual_element(
+            span, video_id="unsampled-video", start_seconds="2", duration_seconds="2",
+            media_start_seconds="0", track_index=0,
+        )
 
 
 def test_content_driven_duration_uses_time_map_output_endpoint(tmp_path):
