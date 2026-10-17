@@ -658,3 +658,50 @@ def test_native_audio_rejects_tail_correction_over_one_frame(delta):
         )
 
     assert caught.value.code is ErrorCode.RENDERER_SOURCE_INVALID
+
+
+@pytest.mark.parametrize(
+    ("source_samples", "output_samples"),
+    [
+        (90_037, 900_375),
+        (450_187, 90_037),
+    ],
+    ids=["lower-frame-ratio-after-floor", "upper-frame-ratio-after-floor"],
+)
+def test_native_audio_atempo_accepts_sample_floor_envelope(
+    source_samples, output_samples
+):
+    factors = native_audio._atempo_factors(source_samples, output_samples)
+
+    assert factors
+    assert all(0.5 <= float(value) <= 2 for value in factors)
+
+
+@pytest.mark.parametrize(
+    ("source_samples", "output_samples"),
+    [
+        (90_036, 900_375),
+        (450_191, 90_037),
+    ],
+    ids=["below-floor-envelope", "above-floor-envelope"],
+)
+def test_native_audio_atempo_rejects_true_sample_ratio_outside_frame_envelope(
+    source_samples, output_samples
+):
+    with pytest.raises(AiVideoError) as caught:
+        native_audio._atempo_factors(source_samples, output_samples)
+
+    assert caught.value.code is ErrorCode.RENDERER_SOURCE_INVALID
+
+
+@pytest.mark.parametrize(
+    ("source_samples", "output_samples"),
+    [(0, 1), (1, 0), (-1, -1), (True, 1), (1, 1.0)],
+)
+def test_native_audio_atempo_requires_positive_integer_sample_counts(
+    source_samples, output_samples
+):
+    with pytest.raises(AiVideoError) as caught:
+        native_audio._atempo_factors(source_samples, output_samples)
+
+    assert caught.value.code is ErrorCode.RENDERER_SOURCE_INVALID

@@ -12,6 +12,7 @@
 - 普通imported VIDEO的Registry本地测量不是generation probe；按其真实来源解析预期sample map。新native render在begin前对held bytes检查音轨存在性/唯一性，缺轨/多轨不改Manifest、不调用renderer；materializer仍重读并验证exact bytes，已有attempt沿原replay且不重复预检。generated/captured源继续重开exact probe；repair provenance必须先于普通import分支核验，旧capture不得借IMPORTED标记进入A/V。
 - HyperFrames source materializer使用已注入、hash绑定的FFmpeg/ffprobe从exact MP4 held snapshot解码。首版要求video起始时钟为0且唯一原生音轨；正向音轨起始偏移按PTS保留，负向或不可可靠解析的起始时钟拒绝，再按sample map运行`atempo`。倍率拆为0.5–2的乘积，避免大倍率直接跳采样。
 - `atempo`输出可能与目标sample数略异；仅允许逐段不超过一个输出frame的尾部trim/pad并逐项记录，超限失败，不静默补长段静音。处理结果仍须音质/同步验收，不能把结构对齐当音义或自然度保证。
+- Frame map独占精确`0.1–5`倍率验证；两轴sample窗口各有不到一个sample的floor差误差，sample层仅用该有限整数包络拒绝真实越界，不重拒合法端点。合法frame map仍须实际DSP输出通过尾部修正上限，不能把domain验证当作音频可处理/质量资格；超限保留明确失败，不回退静音或生成。
 - 同源原声的节奏与时点跟随画面映射，保音高不保留原绝对时刻；额外音轨、字幕或voice时序尚无对应映射时仍拒绝，不能宣称原节奏或口型已通过。
 - 既有RendererAudioBinding/bundle receipt绑定source VIDEO、stream、input/mapped PCM、map、每段实际sample修正及工具hash。旧无此字段的binding字节不变；reader拒绝proof缺失或映射/来源不一致。
 - `development-repair-input/3`封存显式A/V用途及有音轨的exact probe；`/1`、`/2`含义不变。失败素材与新原声仍UNBOUND/NE、development_preview，activation的scope及alias保护保留，不制造accepted state。

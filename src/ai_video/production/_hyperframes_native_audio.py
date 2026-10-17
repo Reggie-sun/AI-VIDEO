@@ -415,11 +415,27 @@ def _decode_source_pcm(
 
 
 def _atempo_factors(source_samples: int, output_samples: int) -> tuple[str, ...]:
-    factor = Decimal(source_samples) / Decimal(output_samples)
-    if factor < Decimal("0.1") or factor > Decimal("5"):
+    if (
+        type(source_samples) is not int
+        or source_samples <= 0
+        or type(output_samples) is not int
+        or output_samples <= 0
+    ):
+        raise _source_invalid(
+            "Native audio segment sample counts must be positive integers."
+        )
+    # The frame time map owns the exact 0.1..5 ratio. Each window subtracts two
+    # floored endpoints, so its sample length differs from the exact length by
+    # less than one sample in either direction. These integer bounds admit that
+    # finite rounding envelope and reject ratios outside it.
+    if (
+        10 * source_samples + 10 < output_samples
+        or source_samples > 5 * output_samples + 5
+    ):
         raise _source_invalid(
             "Native audio segment tempo is outside the supported range."
         )
+    factor = Decimal(source_samples) / Decimal(output_samples)
     remaining = factor
     values: list[Decimal] = []
     while remaining > Decimal("2"):

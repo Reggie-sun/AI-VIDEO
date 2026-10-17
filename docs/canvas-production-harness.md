@@ -227,6 +227,8 @@ materializer仍重读并验证exact bytes。已有attempt沿canonical replay且�
 源必须只有一条音轨、视频时间原点为零；正向音频起始偏移保留为空白，前置音频或不能可靠对齐时拒绝。
 原声经显式注入的FFmpeg/ffprobe处理，逐段保音高变速；每段尾部补齐/裁切最多一个输出帧的samples，
 proof记录输入/输出PCM、source/map/tool hashes及修正量，超界拒绝。画面仍沿原帧窗口解析，
+`0.1–5`是帧映射倍率边界；两轴sample窗口各有不到一个sample的取整误差，不能据此重拒合法帧映射。
+原声还须通过实际DSP样本修正检查；合法map不保证每份原声都能安全处理，超限明确失败，不自动静音或转生成。
 原P4 mixer和HyperFrames消费同一时间线。原声节奏与时点随画面映射改变；保音高不保留原绝对时刻，
 也不保证音色、接缝或口型质量，必须检查实际A/V。
 同镜/全局额外音轨、字幕或voice来源尚无对应sample mapping时明确拒绝，不能静默丢掉所需声音。
