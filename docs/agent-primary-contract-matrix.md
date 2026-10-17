@@ -378,6 +378,14 @@ MP4 的不同实测画幅只有显式 `FixedTransform.video_fit=cover` 才允许
 map。EDIT_EXISTING_VIDEO仅当存在可执行map；CompositionSpec/ResolvedTimeline2.3把它解析为同Shot
 顺序source/output spans；非一比一段按每输出帧floor源坐标解析为一帧窗口，HyperFrames消费一比一帧窗口。旧schema/hash不变；mute范围、source边界及耦合
 audio/caption/voice拒绝由现有composition/visual_media owner核验，旧raw PASS不资格化新map。
+保留同源原声使用显式`video-time-map/2`和CompositionSpec/ResolvedTimeline2.4；
+`_composition_native_audio.py`只从同一VIDEO probe/map派生内部P4 native spans，
+`_hyperframes_native_audio.py`处理explicit FFmpeg/ffprobe、音频正偏移、分段变速和有界尾部修正；
+`audio_retime_contracts.py`固定sample mapping/proof，原mixer/HyperFrames消费且reader核验exact proofs。
+原P4 mixer/WAV校验归`_hyperframes_audio.py`，audio binding类型归`renderer_audio_contracts.py`，
+source/timeline track校验归`_render_source_validation.py`；原public imports兼容，不保留双实现。
+旧静音capture不授权A/V，failed-source需`development-repair-input/3`且仍禁止activation；
+任意额外同镜/全局audio/caption/voice无sample映射仍拒绝，不增加timeline或直接mux路径。
 `production_strategy_dependency.py` 通过既有 P5 resolver/transition 将 authoring revision 交回唯一
 committer；保留未受影响的 authoring→asset edges、fingerprint 和 lifecycle。受影响的旧 render
 domain 退出当前图，新 render graph 仍需由原 dependency builder 消费新的 CompositionSpec 构建。

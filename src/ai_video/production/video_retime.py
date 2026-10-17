@@ -16,9 +16,21 @@ class VideoTimePoint(StrictModel):
 
 
 class VideoTimeMap(StrictModel):
-    contract_version: Literal["video-time-map/1"] = "video-time-map/1"
+    contract_version: Literal["video-time-map/1", "video-time-map/2"] = "video-time-map/1"
     points: tuple[VideoTimePoint, ...] = Field(min_length=2, max_length=64)
-    audio_policy: Literal["mute"]
+    audio_policy: Literal["mute", "retime_preserve_pitch"]
+
+    @model_validator(mode="after")
+    def _versioned_audio_policy(self):
+        expected = {
+            "video-time-map/1": "mute",
+            "video-time-map/2": "retime_preserve_pitch",
+        }[self.contract_version]
+        if self.audio_policy != expected:
+            raise ValueError(
+                f"{self.contract_version} requires audio_policy={expected!r}"
+            )
+        return self
 
     @model_validator(mode="after")
     def _ordered_coordinates(self):

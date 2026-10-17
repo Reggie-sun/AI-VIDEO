@@ -34,6 +34,7 @@ from ai_video.production.composition_contracts import FixedTransform
 
 REPAIR_INPUT_TOOL = ToolIdentity(name="ai-video-development-repair-input", version="1")
 REPAIR_PREVIEW_INPUT_TOOL = ToolIdentity(name=REPAIR_INPUT_TOOL.name, version="2")
+REPAIR_AV_PREVIEW_INPUT_TOOL = ToolIdentity(name=REPAIR_INPUT_TOOL.name, version="3")
 _SHA = r"^[0-9a-f]{64}$"
 
 
@@ -198,7 +199,10 @@ class RepairInputAdmissionReceipt(StrictModel):
                 history=history,
                 evaluation_sources=prior_sources,
             )
-        if self.contract_version == "development-repair-input/2":
+        if self.contract_version in {
+            "development-repair-input/2",
+            "development-repair-input/3",
+        }:
             _validate_preview_probe(
                 self.preview_probe,
                 request=request,
@@ -209,11 +213,19 @@ class RepairInputAdmissionReceipt(StrictModel):
             if (self.preview_use.trim_start_frame + self.preview_use.trim_duration_frames
                     > self.preview_probe.measured.frame_count):
                 raise ValueError("Development repair preview trim exceeds measured source frames")
+            if self.contract_version == "development-repair-input/2":
+                if (self.preview_use.scope != "muted_visual_preview"
+                        or self.preview_use.source_time_map.contract_version != "video-time-map/1"):
+                    raise ValueError("Development repair input/2 cannot carry native A/V retiming")
+            elif (self.preview_use.scope != "retimed_av_preview"
+                  or self.preview_use.source_time_map.contract_version != "video-time-map/2"
+                  or self.preview_probe.measured.audio_stream_count != 1):
+                raise ValueError("Development repair input/3 requires one exact native audio stream")
         return self
 
 
 class RepairPreviewUse(StrictModel):
-    """One exact, explicitly muted visual use for a development preview."""
+    """One exact muted visual or native A/V use for a development preview."""
 
     shot_id: str = Field(min_length=1)
     asset_role: str = Field(min_length=1)
@@ -221,12 +233,16 @@ class RepairPreviewUse(StrictModel):
     trim_duration_frames: int = Field(strict=True, gt=0)
     source_time_map: VideoTimeMap
     transform: FixedTransform
-    scope: Literal["muted_visual_preview"] = "muted_visual_preview"
+    scope: Literal["muted_visual_preview", "retimed_av_preview"] = "muted_visual_preview"
 
     @model_validator(mode="after")
     def _exact_source_window_and_mute(self):
-        if self.source_time_map.audio_policy != "mute":
-            raise ValueError("Development repair preview must be explicitly muted")
+        expected = {
+            "muted_visual_preview": ("video-time-map/1", "mute"),
+            "retimed_av_preview": ("video-time-map/2", "retime_preserve_pitch"),
+        }[self.scope]
+        if (self.source_time_map.contract_version, self.source_time_map.audio_policy) != expected:
+            raise ValueError("Development repair preview scope differs from its exact time-map version")
         if self.source_time_map.source_duration_frames != self.trim_duration_frames:
             raise ValueError("Development repair preview time map must cover its exact trim")
         return self
@@ -236,6 +252,10 @@ class RepairPreviewInputAdmissionReceipt(RepairInputAdmissionReceipt):
     contract_version: Literal["development-repair-input/2"] = "development-repair-input/2"
     preview_use: RepairPreviewUse
     preview_probe: VideoProbeReceipt
+
+
+class RepairAudioPreviewInputAdmissionReceipt(RepairPreviewInputAdmissionReceipt):
+    contract_version: Literal["development-repair-input/3"] = "development-repair-input/3"
 
 
 def _validate_preview_probe(probe, *, request, fetch, artifact_sha256, size_bytes):
@@ -316,8 +336,12 @@ def prepare_repair_input(*, target_root, project, registry, source_root, source_
             asset_id=asset_id, artifact_sha256=source_sha256, size_bytes=len(media), usage_license=usage_license,
             source_attempt_id=source_attempt_id, source_manifest_json=raw.decode("utf-8"),
             source_manifest_sha256=hashlib.sha256(raw).hexdigest(), documents=docs)
-        receipt_type = (RepairPreviewInputAdmissionReceipt if preview_use is not None
-                        else RepairInputAdmissionReceipt)
+        if preview_use is None:
+            receipt_type = RepairInputAdmissionReceipt
+        elif preview_use.scope == "retimed_av_preview":
+            receipt_type = RepairAudioPreviewInputAdmissionReceipt
+        else:
+            receipt_type = RepairPreviewInputAdmissionReceipt
         receipt_values = dict(values)
         if preview_use is not None:
             receipt_values.update(preview_use=preview_use, preview_probe=preview_probe)
@@ -328,13 +352,18 @@ def prepare_repair_input(*, target_root, project, registry, source_root, source_
         measured = receipt.preview_probe.measured if preview else None
         asset_path = (canonical_video_asset_path(source_sha256) if preview else
                       Path("assets/repair-inputs") / (source_sha256 + ".mp4"))
+        preview_tool = (
+            REPAIR_AV_PREVIEW_INPUT_TOOL
+            if receipt.contract_version == "development-repair-input/3"
+            else REPAIR_PREVIEW_INPUT_TOOL
+        )
         asset = AssetRecord(asset_id=asset_id, asset_type=AssetType.VIDEO,
             artifact_path=asset_path,
             sha256=source_sha256, size_bytes=len(media), mime_type="video/mp4",
             duration_seconds=(measured.duration_milliseconds / 1000 if measured else None),
             width=(measured.width if measured else None), height=(measured.height if measured else None),
             source_kind=AssetSourceKind.IMPORTED,
-            tool=REPAIR_PREVIEW_INPUT_TOOL if preview else REPAIR_INPUT_TOOL,
+            tool=preview_tool if preview else REPAIR_INPUT_TOOL,
             input_fingerprint=receipt.content_hash, creation_receipt_id=receipt.content_hash,
             usage_license=usage_license,
             video_metadata=_preview_video_metadata(receipt) if preview else None)
@@ -372,6 +401,7 @@ def verify_repair_input(record, root):
     receipt_type = {
         "development-repair-input/1": RepairInputAdmissionReceipt,
         "development-repair-input/2": RepairPreviewInputAdmissionReceipt,
+        "development-repair-input/3": RepairAudioPreviewInputAdmissionReceipt,
     }.get(version)
     if receipt_type is None:
         raise ValueError("Development repair input version is unsupported")
@@ -386,7 +416,12 @@ def verify_repair_input(record, root):
     )
     if isinstance(receipt, RepairPreviewInputAdmissionReceipt):
         expected_metadata = _preview_video_metadata(receipt)
-        if (record.tool != REPAIR_PREVIEW_INPUT_TOOL
+        expected_tool = (
+            REPAIR_AV_PREVIEW_INPUT_TOOL
+            if receipt.contract_version == "development-repair-input/3"
+            else REPAIR_PREVIEW_INPUT_TOOL
+        )
+        if (record.tool != expected_tool
                 or record.video_metadata != expected_metadata
                 or record.width != expected_metadata.width or record.height != expected_metadata.height
                 or record.duration_seconds != expected_metadata.duration_milliseconds / 1000

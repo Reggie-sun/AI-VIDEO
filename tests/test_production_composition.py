@@ -560,7 +560,7 @@ def test_p4_resolves_all_audio_kinds_and_captions_in_one_timeline(tmp_path):
     timeline = resolve_composition(loaded, spec, "0.7.103")
 
     assert timeline.schema_version == "2.1"
-    assert {span.audio_kind for span in timeline.audio_spans} == set(AudioKind)
+    assert {span.audio_kind for span in timeline.audio_spans} == set(AudioKind) - {AudioKind.NATIVE_VIDEO}
     assert [(span.track_id, span.start_sample) for span in timeline.audio_spans] == [
         ("dialogue", 0),
         ("narration", 96_000),

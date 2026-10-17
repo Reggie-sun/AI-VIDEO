@@ -50,6 +50,7 @@ from ai_video.production.dependency import (
     voice_semantic_projection_fingerprint,
 )
 from ai_video.production.hashing import verify_artifact_hash
+from ai_video.production._render_source_validation import _validate_source_timeline_bindings
 from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
     ArtifactReference,
@@ -698,61 +699,6 @@ def _render_source_binding_map(
                 binding,
             )
     return bindings
-
-
-def _validate_source_timeline_bindings(
-    source: RendererSourceReceipt, timeline: ResolvedTimeline
-) -> None:
-    expected_track_ids = tuple(item.track_id for item in timeline.audio_spans)
-    if expected_track_ids:
-        if len(source.audio_bindings) != 1:
-            raise ValueError(
-                "P4 render source requires exactly one mixed audio binding"
-            )
-        audio = source.audio_bindings[0]
-        if (
-            audio.asset_mime_type != "audio/wav"
-            or audio.sample_rate_hz != timeline.sample_rate
-            or audio.channels != 2
-            or audio.duration_samples != timeline.total_samples
-            or audio.resolved_track_ids != expected_track_ids
-        ):
-            raise ValueError(
-                "P4 mixed audio binding does not match the resolved timeline"
-            )
-    elif source.audio_bindings:
-        raise ValueError("silent timeline cannot declare a renderer audio binding")
-
-    expected_caption_tracks = {item.caption_track_id for item in timeline.caption_cues}
-    actual_caption_tracks = tuple(
-        item.caption_track_id for item in source.caption_bindings
-    )
-    if len(actual_caption_tracks) != len(set(actual_caption_tracks)):
-        raise ValueError("renderer caption track bindings must be unique")
-    if set(actual_caption_tracks) != expected_caption_tracks:
-        raise ValueError("renderer caption bindings do not match the resolved timeline")
-    for binding in source.caption_bindings:
-        cues = tuple(
-            item
-            for item in timeline.caption_cues
-            if item.caption_track_id == binding.caption_track_id
-        )
-        style_identities = {
-            (item.style_reference_id, item.style_content_hash) for item in cues
-        }
-        if (
-            not cues
-            or {item.caption_asset_sha256 for item in cues}
-            != {binding.caption_asset_sha256}
-            or binding.resolved_cue_ids != tuple(item.segment_id for item in cues)
-            or style_identities
-            != {(binding.style_reference_id, binding.style_content_hash)}
-        ):
-            raise ValueError("renderer caption binding does not match resolved cues")
-    if (
-        timeline.audio_spans or timeline.caption_cues
-    ) and source.schema_version != "2.1":
-        raise ValueError("P4 timeline requires RendererSourceReceipt 2.1")
 
 
 def _render_source_payload_matches(

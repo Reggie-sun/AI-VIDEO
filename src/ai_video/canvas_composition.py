@@ -5,6 +5,7 @@ from ai_video.production.composition_contracts import (
 )
 from ai_video.production.hashing import seal_artifact
 from ai_video.production.models import SourceReference
+from ai_video.production.video_retime import VideoTimeMap
 
 
 def _native_audio_matches(loaded, audio, video, shot):
@@ -79,8 +80,15 @@ def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), capt
         muted = settings.pop("muted", False)
         if type(muted) is not bool:
             raise ValueError("muted must be an explicit boolean")
-        if settings.get("source_time_map") is not None and not muted:
-            raise ValueError("retimed video requires explicit muted=true; source audio has no sample time map")
+        native_retime = False
+        if settings.get("source_time_map") is not None:
+            mapping = VideoTimeMap.model_validate(settings["source_time_map"])
+            settings["source_time_map"] = mapping
+            native_retime = mapping.audio_policy == "retime_preserve_pitch"
+            if native_retime and muted:
+                raise ValueError("muted=true conflicts with explicit native audio retime policy")
+            if not native_retime and not muted:
+                raise ValueError("retimed video requires explicit muted=true; source audio has no sample time map")
         role = settings.pop("asset_role", "primary_visual")
         candidates = [i for r in shot.required_asset_roles if r.role == role for i in r.asset_ids]
         asset_id = settings.pop("asset_id", None)
@@ -91,7 +99,7 @@ def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), capt
         if asset_id not in candidates:
             raise ValueError("composition selects a version not adopted by this Shot")
         asset = assets[asset_id]
-        if asset.asset_type.value == "video" and not muted:
+        if asset.asset_type.value == "video" and not muted and not native_retime:
             # Registered audio carries a canonical derivation identity. Do not
             # count arbitrary per-Shot BGM as preserved source dialogue/sound.
             bound_tracks = [t for t in tracks if t.shot_id == shot.shot_id]
@@ -111,6 +119,10 @@ def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), capt
     if (any(spec.schema_version == "2.3" for spec in strategy_specs)
             or any(layer.source_time_map is not None for layer in layers)):
         schema_version = "2.3"
+    if (any(spec.schema_version == "2.4" for spec in strategy_specs)
+            or any(layer.source_time_map is not None
+                   and layer.source_time_map.audio_policy == "retime_preserve_pitch" for layer in layers)):
+        schema_version = "2.4"
     spec = CompositionSpec(artifact_id="canvas-composition", composition_id="canvas-composition",
         schema_version=schema_version,
         revision=1, content_hash="0" * 64, creation_receipt_id="canvas-composition-authoring",
@@ -143,11 +155,16 @@ def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), capt
         else:
             shots = [shot]
         for shot in shots:
-            if (shot.dialogue or shot.narration) and not any(t.shot_id == shot.shot_id and
+            has_mapped_native_audio = any(
+                layer.shot_id == shot.shot_id and layer.source_time_map is not None
+                and layer.source_time_map.audio_policy == "retime_preserve_pitch"
+                for layer in layers
+            )
+            if (shot.dialogue or shot.narration) and not has_mapped_native_audio and not any(t.shot_id == shot.shot_id and
                     t.audio_kind.value in {"dialogue", "narration"} for t in tracks):
                 raise ValueError("authored dialogue/narration must remain present in the final audio tracks")
     if tracks or captions or voice_sources:
-        spec = spec.model_copy(update={"schema_version": "2.3" if spec.schema_version == "2.3" else "2.1", "audio_tracks": tuple(tracks),
+        spec = spec.model_copy(update={"schema_version": spec.schema_version if spec.schema_version in {"2.3", "2.4"} else "2.1", "audio_tracks": tuple(tracks),
             "caption_tracks": tuple(captions), "voice_sources": tuple(voice_sources)})
     spec = CompositionSpec.model_validate(seal_artifact(spec).model_dump(mode="python"))
     if strategy_specs:

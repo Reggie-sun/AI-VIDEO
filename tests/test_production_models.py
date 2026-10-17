@@ -537,6 +537,7 @@ def test_p4_audio_kinds_have_exact_registry_mapping():
         "ambience",
         "sfx",
         "bgm",
+        "native_video",
     }
     assert AUDIO_KIND_TO_ASSET_TYPE == {
         AudioKind.DIALOGUE: AssetType.VOICE,
@@ -544,6 +545,7 @@ def test_p4_audio_kinds_have_exact_registry_mapping():
         AudioKind.AMBIENCE: AssetType.SFX,
         AudioKind.SFX: AssetType.SFX,
         AudioKind.BGM: AssetType.MUSIC,
+        AudioKind.NATIVE_VIDEO: AssetType.VIDEO,
     }
     assert "audio" not in {item.value for item in AssetType}
 

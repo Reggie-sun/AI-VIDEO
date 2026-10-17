@@ -53,6 +53,7 @@ from ai_video.production.composition_contracts import (
     TransitionKind,
     TransitionSpec,
 )
+from ai_video.production.renderer_audio_contracts import RendererAudioBinding as RendererAudioBinding
 from ai_video.production.domain_acceptance import DomainAcceptanceQaPolicyMixin, QaLayer as QaLayer, GenerationEvaluationAuthority as GenerationEvaluationAuthority
 from ai_video.production.artifact_contracts import ToolIdentity as ToolIdentity
 from ai_video.production.manifest_schema import ManifestCapability, ManifestVersion, manifest_supports
@@ -475,6 +476,7 @@ AUDIO_KIND_TO_ASSET_TYPE: Mapping[AudioKind, AssetType] = MappingProxyType(
         AudioKind.AMBIENCE: AssetType.SFX,
         AudioKind.SFX: AssetType.SFX,
         AudioKind.BGM: AssetType.MUSIC,
+        AudioKind.NATIVE_VIDEO: AssetType.VIDEO,
     }
 )
 
@@ -907,41 +909,6 @@ class RendererAssetBinding(StrictModel):
     asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     asset_mime_type: Literal["image/png", "image/jpeg", "image/webp", "video/mp4"]
     materialized_path: Path
-
-
-class RendererAudioBinding(StrictModel):
-    asset_id: str = Field(min_length=1)
-    asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    asset_mime_type: Literal[
-        "audio/wav",
-        "audio/mpeg",
-        "audio/mp4",
-        "audio/aac",
-        "audio/flac",
-    ]
-    materialized_path: Path
-    sample_rate_hz: int = Field(strict=True, gt=0)
-    channels: int = Field(strict=True, ge=1, le=2)
-    duration_samples: int = Field(strict=True, gt=0)
-    resolved_track_ids: tuple[str, ...] = Field(min_length=1)
-
-    @model_validator(mode="after")
-    def _validate_materialized_identity(self) -> "RendererAudioBinding":
-        suffix_by_mime = {
-            "audio/wav": ".wav",
-            "audio/mpeg": ".mp3",
-            "audio/mp4": ".m4a",
-            "audio/aac": ".aac",
-            "audio/flac": ".flac",
-        }
-        if (
-            self.materialized_path.stem != self.asset_sha256
-            or self.materialized_path.suffix != suffix_by_mime[self.asset_mime_type]
-        ):
-            raise ValueError("renderer audio MIME requires exact hash suffix mapping")
-        if len(self.resolved_track_ids) != len(set(self.resolved_track_ids)):
-            raise ValueError("renderer audio resolved track IDs must be unique")
-        return self
 
 
 class RendererCaptionBinding(StrictModel):

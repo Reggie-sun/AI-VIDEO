@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from decimal import Decimal, ROUND_CEILING
+from fractions import Fraction
 from pathlib import Path
 
 from pydantic import ValidationError
@@ -11,6 +12,7 @@ from ai_video.production._composition_visual import (
     resolve_shot_visual_spans,
 )
 from ai_video.production._composition_source_duration import content_driven_video_frames
+from ai_video.production._composition_native_audio import resolve_native_audio_spans
 from ai_video.production.ad_composition import (
     resolve_commercial_graphics,
 )
@@ -106,8 +108,9 @@ def _frames_for_fixed_seconds(seconds: float, fps: int) -> int:
     return int(value)
 
 
-def _sample_at_frame(frame: int, *, fps: int, sample_rate: int) -> int:
-    return frame * sample_rate // fps
+def _sample_at_frame(frame: int, *, fps: int | Fraction, sample_rate: int) -> int:
+    rate = Fraction(fps)
+    return frame * sample_rate * rate.denominator // rate.numerator
 
 
 def _floor_frame_at_sample(sample: int, *, fps: int, sample_rate: int) -> int:
@@ -120,7 +123,7 @@ def _ceil_frame_at_sample(sample: int, *, fps: int, sample_rate: int) -> int:
 
 def timeline_fingerprint(timeline: ResolvedTimeline) -> str:
     excluded = {"content_hash", "composition_fingerprint", "source_provenance"}
-    if timeline.schema_version in {"2.1", "2.2", "2.3"}:
+    if timeline.schema_version in {"2.1", "2.2", "2.3", "2.4"}:
         # P4 fingerprints resolved behavior, not authoring tuple order. The exact
         # input artifact hash remains durable on the timeline itself.
         excluded.update({"composition_spec_hash", "creation_receipt_id"})
@@ -739,6 +742,24 @@ def _resolve_composition(
         shot_start_samples=shot_start_samples,
         total_samples=total_samples,
     )
+    native_audio_spans = resolve_native_audio_spans(
+        project,
+        spec,
+        shot_start_samples=shot_start_samples,
+        sample_at_frame=_sample_at_frame,
+        invalid=_audio_invalid,
+    )
+    audio_spans = tuple(
+        sorted(
+            (*audio_spans, *native_audio_spans),
+            key=lambda item: (
+                AUDIO_KIND_PRIORITY[item.audio_kind],
+                item.track_id,
+                item.start_sample,
+                item.asset_id,
+            ),
+        )
+    )
     caption_cues = _resolve_caption_cues(
         project,
         spec,
@@ -775,13 +796,13 @@ def _resolve_composition(
         total_samples=total_samples,
         composition_fingerprint="0" * 64,
     )
-    if spec.schema_version == "2.3":
+    if spec.schema_version in {"2.3", "2.4"}:
         timeline_fields["usage_scope"] = (
             "development_preview" if preview_layer_ids else "production"
         )
-    if spec.schema_version in {"2.1", "2.2", "2.3"}:
+    if spec.schema_version in {"2.1", "2.2", "2.3", "2.4"}:
         timeline_fields.update(audio_spans=audio_spans, caption_cues=caption_cues)
-    if spec.schema_version in {"2.2", "2.3"}:
+    if spec.schema_version in {"2.2", "2.3", "2.4"}:
         timeline_fields.update(commercial_graphics=commercial_graphics)
     provisional = ResolvedTimeline(**timeline_fields)
     fingerprint = timeline_fingerprint(provisional)

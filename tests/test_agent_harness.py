@@ -460,7 +460,7 @@ def test_shared_production_contract_routes_to_cross_surface_suite() -> None:
     ):
         report = agent_harness.inspect_paths([path], policy)
         voice_route = path == "src/ai_video/production/models.py"
-        assert report["categories"] == (["voice_source_routing"] if voice_route else []) + ["production_shared_contracts"]
+        assert report["categories"] == (["voice_source_routing"] if voice_route else []) + ["production_shared_contracts"] + (["native_audio_retime"] if voice_route else [])
         assert ("voice_source_routing_tests" in report["check_ids"]) == voice_route
         assert report["fallback_paths"] == []
         assert report["check_ids"] == [
@@ -473,6 +473,7 @@ def test_shared_production_contract_routes_to_cross_surface_suite() -> None:
             *(["voice_source_routing_tests"] if voice_route else []),
             "production_contract_tests",
             "cli_config_tests",
+            *(["native_audio_retime_tests"] if voice_route else []),
         ]
 
 
@@ -939,7 +940,7 @@ def test_ad_creative_runtime_routes_to_composition_audio_suite() -> None:
     ):
         report = agent_harness.inspect_paths([path], policy)
         voice_route = path == "src/ai_video/production/composition_contracts.py"
-        assert report["categories"] == (["voice_source_routing"] if voice_route else []) + ["production_composition_audio"]
+        assert report["categories"] == (["voice_source_routing"] if voice_route else []) + ["production_composition_audio"] + (["native_audio_retime"] if voice_route else [])
         assert ("voice_source_routing_tests" in report["check_ids"]) == voice_route
         assert report["fallback_paths"] == []
         assert "production_composition_audio_tests" in report["check_ids"]

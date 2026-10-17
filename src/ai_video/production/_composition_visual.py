@@ -66,8 +66,8 @@ def resolve_preview_layer_ids(
         if allows_repair_preview_layer(project, layer, shot):
             preview_layer_ids.add(layer.layer_id)
     if preview_layer_ids:
-        if spec.schema_version != "2.3":
-            raise invalid("Development repair previews require CompositionSpec 2.3.")
+        if spec.schema_version not in {"2.3", "2.4"}:
+            raise invalid("Development repair previews require CompositionSpec 2.3 or 2.4.")
         if spec.audio_tracks or spec.caption_tracks or spec.voice_sources:
             raise invalid(
                 "Development repair previews cannot contain audio, captions, or voice sources."
@@ -192,8 +192,8 @@ def resolve_shot_visual_spans(
                 f"Layer {layer.layer_id} time mapping requires a primary video asset."
             )
         if layer.source_time_map is not None:
-            if spec.schema_version != "2.3":
-                raise invalid("Video time mapping requires CompositionSpec 2.3.")
+            if spec.schema_version not in {"2.3", "2.4"}:
+                raise invalid("Video time mapping requires CompositionSpec 2.3 or 2.4.")
             if layer.source_time_map.output_duration_frames != duration_frames:
                 raise invalid(
                     f"Layer {layer.layer_id} time map output endpoint must equal its Shot duration."

@@ -525,7 +525,9 @@ def _build_strategy_composition(
         source_provenance=(
             SourceReference(kind="derived", reference="production-strategy", content_hash=decision_hash),
         ),
-        schema_version=("2.3" if any(layer.source_time_map is not None for layer in layers) else "2.1"),
+        schema_version=("2.4" if any(layer.source_time_map is not None
+            and layer.source_time_map.audio_policy == "retime_preserve_pitch" for layer in layers)
+            else "2.3" if any(layer.source_time_map is not None for layer in layers) else "2.1"),
         composition_id=composition_id,
         shot_ids=shot_ids,
         layers=tuple(layers),

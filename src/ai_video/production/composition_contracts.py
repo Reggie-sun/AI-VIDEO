@@ -9,6 +9,7 @@ from pydantic import Field, SerializerFunctionWrapHandler, model_serializer, mod
 
 from ai_video.production.artifact_contracts import StrictModel, VersionedArtifact
 from ai_video.production._lifecycle_schema import GenerationExecutionBindingPointer
+from ai_video.production.audio_retime_contracts import NativeAudioRetime
 from ai_video.production.commercial_graphics import (
     AdvertisingSoundCueProjection,
     GraphicLayerAnimation,
@@ -32,6 +33,7 @@ class AudioKind(str, Enum):
     AMBIENCE = "ambience"
     SFX = "sfx"
     BGM = "bgm"
+    NATIVE_VIDEO = "native_video"
 
 
 AUDIO_KIND_PRIORITY: Mapping[AudioKind, int] = MappingProxyType(
@@ -87,6 +89,8 @@ class AudioTrackSpec(StrictModel):
 
     @model_validator(mode="after")
     def _validate_placement_and_ducking(self) -> "AudioTrackSpec":
+        if self.audio_kind is AudioKind.NATIVE_VIDEO:
+            raise ValueError("native video audio is derived from a mapped visual layer")
         if self.audio_kind in {AudioKind.DIALOGUE, AudioKind.NARRATION} and (
             self.shot_id is None
         ):
@@ -173,7 +177,7 @@ class VoiceCompositionSource(StrictModel):
 
 
 class CompositionSpec(VersionedArtifact):
-    schema_version: Literal["2.0", "2.1", "2.2", "2.3"] = "2.0"
+    schema_version: Literal["2.0", "2.1", "2.2", "2.3", "2.4"] = "2.0"
     composition_id: str
     shot_ids: tuple[str, ...] = Field(min_length=1)
     layers: tuple[CompositionLayerSpec, ...] = Field(min_length=1)
@@ -227,8 +231,14 @@ class CompositionSpec(VersionedArtifact):
         mapped_shot_ids = {
             layer.shot_id for layer in self.layers if layer.source_time_map is not None
         }
-        if mapped_shot_ids and self.schema_version != "2.3":
-            raise ValueError("Video time maps require CompositionSpec 2.3")
+        if mapped_shot_ids and self.schema_version not in {"2.3", "2.4"}:
+            raise ValueError("Video time maps require CompositionSpec 2.3 or 2.4")
+        if self.schema_version == "2.3" and any(
+            layer.source_time_map is not None
+            and layer.source_time_map.contract_version == "video-time-map/2"
+            for layer in self.layers
+        ):
+            raise ValueError("Audio-preserving video time maps require CompositionSpec 2.4")
         if mapped_shot_ids:
             mapped_audio_ids = {
                 track.track_id
@@ -261,7 +271,7 @@ class CompositionSpec(VersionedArtifact):
             raise ValueError("caption binding IDs must be unique")
         if any(item.style_reference is None for item in self.caption_tracks):
             raise ValueError("bound caption tracks require a style reference")
-        if self.schema_version not in {"2.2", "2.3"} and (
+        if self.schema_version not in {"2.2", "2.3", "2.4"} and (
             self.graphic_layer_ids
             or self.graphic_layer_animations
             or self.commercial_graphics
@@ -296,7 +306,7 @@ class CompositionSpec(VersionedArtifact):
         if (self.ad_creative_plan_id is None) != (self.ad_creative_plan_hash is None):
             raise ValueError("ad creative plan identity must be all-or-none")
         if (
-            self.schema_version in {"2.2", "2.3"}
+            self.schema_version in {"2.2", "2.3", "2.4"}
             and (
                 self.graphic_layer_ids
                 or self.commercial_graphics
@@ -317,7 +327,7 @@ class CompositionSpec(VersionedArtifact):
         if self.schema_version == "2.0":
             data.pop("audio_tracks", None)
             data.pop("caption_tracks", None)
-        if self.schema_version not in {"2.2", "2.3"}:
+        if self.schema_version not in {"2.2", "2.3", "2.4"}:
             data.pop("graphic_layer_ids", None)
             data.pop("graphic_layer_animations", None)
             data.pop("commercial_graphics", None)
@@ -391,9 +401,21 @@ class ResolvedAudioSpan(StrictModel):
     fade_in_samples: int = Field(strict=True, ge=0)
     fade_out_samples: int = Field(strict=True, ge=0)
     ducking: ResolvedDuckingSpec | None = None
+    native_audio_retime: NativeAudioRetime | None = None
+
+    @model_serializer(mode="wrap")
+    def _serialize_optional_native_audio_retime(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if self.native_audio_retime is None:
+            data.pop("native_audio_retime", None)
+        return data
 
     @model_validator(mode="after")
     def _validate_fades(self) -> "ResolvedAudioSpan":
+        if (self.audio_kind is AudioKind.NATIVE_VIDEO) != (self.native_audio_retime is not None):
+            raise ValueError("native video audio spans require their exact retime mapping")
         if self.fade_in_samples + self.fade_out_samples > self.duration_samples:
             raise ValueError("resolved audio fades cannot exceed duration")
         if self.ducking is not None and self.track_id in self.ducking.sidechain_track_ids:
@@ -430,7 +452,7 @@ class ResolvedCaptionCue(StrictModel):
 
 
 class ResolvedTimeline(VersionedArtifact):
-    schema_version: Literal["2.0", "2.1", "2.2", "2.3"] = "2.0"
+    schema_version: Literal["2.0", "2.1", "2.2", "2.3", "2.4"] = "2.0"
     usage_scope: Literal["production", "development_preview"] = "production"
     timeline_id: str
     composition_spec_id: str
@@ -474,7 +496,7 @@ class ResolvedTimeline(VersionedArtifact):
     def _reject_preview_scope_before_23(cls, value: object) -> object:
         if (
             isinstance(value, Mapping)
-            and value.get("schema_version", "2.0") != "2.3"
+            and value.get("schema_version", "2.0") not in {"2.3", "2.4"}
             and value.get("usage_scope", "production") != "production"
         ):
             raise ValueError("development preview scope requires ResolvedTimeline 2.3")
@@ -484,22 +506,38 @@ class ResolvedTimeline(VersionedArtifact):
     def _validate_versioned_resolved_tracks(self) -> "ResolvedTimeline":
         if self.schema_version == "2.0" and (self.audio_spans or self.caption_cues):
             raise ValueError("ResolvedTimeline 2.0 cannot contain P4 timing fields")
-        if self.schema_version not in {"2.2", "2.3"} and self.commercial_graphics:
+        if self.schema_version not in {"2.2", "2.3", "2.4"} and self.commercial_graphics:
             raise ValueError("ResolvedTimeline before 2.2 cannot contain ad graphics")
-        if self.schema_version not in {"2.2", "2.3"} and any(
+        if self.schema_version not in {"2.2", "2.3", "2.4"} and any(
             item.graphic_animation is not None for item in self.visual_spans
         ):
             raise ValueError("ResolvedTimeline before 2.2 cannot contain graphic animation")
-        if self.usage_scope == "development_preview" and (
-            self.audio_spans or self.caption_cues
+        if self.usage_scope == "development_preview":
+            if self.caption_cues:
+                raise ValueError("development preview timelines cannot contain captions")
+            if self.schema_version == "2.3" and self.audio_spans:
+                raise ValueError("ResolvedTimeline 2.3 development previews cannot contain audio")
+            if self.schema_version == "2.4" and any(
+                item.native_audio_retime is None for item in self.audio_spans
+            ):
+                raise ValueError("ResolvedTimeline 2.4 previews may contain only linked native audio")
+        if self.schema_version != "2.4" and any(
+            item.native_audio_retime is not None for item in self.audio_spans
         ):
-            raise ValueError("development preview timelines cannot contain audio or captions")
+            raise ValueError("native video audio requires ResolvedTimeline 2.4")
         if any(
             item.start_sample + item.duration_samples > self.total_samples
             for item in self.audio_spans
         ):
             raise ValueError("resolved audio span exceeds timeline")
         track_ids = tuple(item.track_id for item in self.audio_spans)
+        native_layer_ids = tuple(
+            item.native_audio_retime.visual_layer_id
+            for item in self.audio_spans
+            if item.native_audio_retime is not None
+        )
+        if len(native_layer_ids) != len(set(native_layer_ids)):
+            raise ValueError("each visual layer may contribute one native audio track")
         span_identities = tuple(
             (
                 item.asset_id,
@@ -507,6 +545,9 @@ class ResolvedTimeline(VersionedArtifact):
                 item.duration_samples,
                 item.source_start_sample,
                 item.source_duration_samples,
+                item.native_audio_retime.visual_layer_id
+                if item.native_audio_retime is not None
+                else None,
             )
             for item in self.audio_spans
         )
@@ -527,6 +568,44 @@ class ResolvedTimeline(VersionedArtifact):
         )
         if self.audio_spans != canonical_audio_order:
             raise ValueError("resolved audio spans must use canonical mix order")
+        for item in self.audio_spans:
+            mapping = item.native_audio_retime
+            if mapping is None:
+                continue
+            visual = tuple(
+                span
+                for span in self.visual_spans
+                if span.layer_id == mapping.visual_layer_id
+                or (
+                    span.layer_id.startswith(mapping.visual_layer_id + "--retime-")
+                    and span.layer_id[len(mapping.visual_layer_id + "--retime-"):].isdigit()
+                )
+            )
+            if not visual:
+                raise ValueError("native audio mapping references an unknown visual layer")
+            if any(
+                span.asset_id != item.asset_id or span.asset_sha256 != item.asset_sha256
+                or span.asset_mime_type != "video/mp4"
+                for span in visual
+            ):
+                raise ValueError("native audio must use the exact mapped VIDEO asset")
+            visual_start = min(span.start_sample for span in visual)
+            visual_end = max(span.start_sample + span.duration_samples for span in visual)
+            source_start = mapping.segments[0].source_start_sample
+            source_end = (
+                mapping.segments[-1].source_start_sample
+                + mapping.segments[-1].source_duration_samples
+            )
+            if (
+                item.track_id != f"native-video-audio::{mapping.visual_layer_id}"
+                or item.start_sample != visual_start
+                or item.duration_samples != visual_end - visual_start
+                or item.source_start_sample != source_start
+                or item.source_duration_samples != source_end - source_start
+                or sum(segment.output_duration_samples for segment in mapping.segments)
+                != item.duration_samples
+            ):
+                raise ValueError("native audio timing differs from its mapped visual layer")
         cue_identities = tuple(
             (
                 cue.caption_asset_id,
@@ -586,8 +665,8 @@ class ResolvedTimeline(VersionedArtifact):
         if self.schema_version == "2.0":
             data.pop("audio_spans", None)
             data.pop("caption_cues", None)
-        if self.schema_version not in {"2.2", "2.3"}:
+        if self.schema_version not in {"2.2", "2.3", "2.4"}:
             data.pop("commercial_graphics", None)
-        if self.schema_version != "2.3":
+        if self.schema_version not in {"2.3", "2.4"}:
             data.pop("usage_scope", None)
         return data

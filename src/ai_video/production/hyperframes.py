@@ -5,19 +5,10 @@ import json
 import os
 import re
 import stat
-import struct
 import subprocess
-import wave
-from io import BytesIO
 from collections.abc import Mapping
 from contextlib import contextmanager
 from dataclasses import dataclass
-from decimal import (
-    Decimal,
-    DecimalException,
-    ROUND_HALF_EVEN,
-    localcontext,
-)
 from html.parser import HTMLParser
 from pathlib import Path
 from typing import Callable, Iterator, Literal, Protocol, cast
@@ -31,6 +22,21 @@ from ai_video.production._hyperframes_source import (
     render_source as _source_render_source,
     seconds as _seconds,
 )
+from ai_video.production._hyperframes_native_audio import derive_native_audio_pcm
+from ai_video.production._hyperframes_audio import (
+    _MAX_GAIN_MILLIDB as _MAX_GAIN_MILLIDB,
+    _MIN_GAIN_MILLIDB as _MIN_GAIN_MILLIDB,
+    _MIX_SCALE as _MIX_SCALE,
+    _PCM16_STEREO_FRAME_BYTES as _PCM16_STEREO_FRAME_BYTES,
+    decoded_pcm16 as _decode_pcm16,
+    ducking_scale as _ducking_scale,  # noqa: F401 - preserve HyperFrames import surface
+    fixed_gain as _convert_fixed_gain,
+    linear_scale as _linear_scale,  # noqa: F401 - preserve HyperFrames import surface
+    mix_resolved_audio as _mix_pcm,
+    multiply_fixed as _multiply_fixed,  # noqa: F401 - preserve HyperFrames import surface
+    scale_pcm as _scale_pcm,  # noqa: F401 - preserve HyperFrames import surface
+    validated_wav as _validate_wav,
+)
 from ai_video.production.captions import (
     _canonical_track_bytes,
     validate_caption_track_timeline_binding,
@@ -39,6 +45,7 @@ from ai_video.production.composition import (
     _validated_visual_suffix,
     timeline_fingerprint,
 )
+from ai_video.production.audio_retime_contracts import NativeAudioDerivationProof
 from ai_video.production.hashing import seal_artifact, verify_artifact_hash
 from ai_video.production.manifest_schema import ManifestCapability, manifest_supports
 from ai_video.production.models import (
@@ -407,168 +414,28 @@ def _parse_source_document(source: str) -> _ParsedSourceDocument:
     )
 
 
-_MIX_SCALE = 1_000_000
-_MIN_GAIN_MILLIDB = -96_000
-_MAX_GAIN_MILLIDB = 24_000
-
-
 def _fixed_gain(gain_millidb: int) -> int:
-    """Convert the adapter-supported -96..+24 dB range to fixed-point gain."""
-
-    if not _MIN_GAIN_MILLIDB <= gain_millidb <= _MAX_GAIN_MILLIDB:
-        raise _source_invalid(
-            "Audio gain is outside the P4 renderer adapter range.",
-            f"supported gain_millidb range is {_MIN_GAIN_MILLIDB}..{_MAX_GAIN_MILLIDB}",
-        )
-    try:
-        with localcontext() as context:
-            context.prec = 50
-            context.rounding = ROUND_HALF_EVEN
-            exponent = Decimal(gain_millidb) / Decimal(20_000)
-            scaled = (Decimal(10) ** exponent) * Decimal(_MIX_SCALE)
-            return int(scaled.to_integral_value(rounding=ROUND_HALF_EVEN))
-    except (DecimalException, OverflowError, ValueError) as exc:
-        raise _source_invalid(
-            "Audio gain could not be converted deterministically.",
-            f"supported gain_millidb range is {_MIN_GAIN_MILLIDB}..{_MAX_GAIN_MILLIDB}",
-        ) from exc
+    return _convert_fixed_gain(gain_millidb, source_invalid=_source_invalid)
 
 
-def _multiply_fixed(left: int, right: int) -> int:
-    product = left * right
-    return (product + _MIX_SCALE // 2) // _MIX_SCALE
-
-
-def _scale_pcm(sample: int, scale: int) -> int:
-    product = sample * scale
-    if product >= 0:
-        return (product + _MIX_SCALE // 2) // _MIX_SCALE
-    return -((-product + _MIX_SCALE // 2) // _MIX_SCALE)
-
-
-def _linear_scale(start: int, end: int, ordinal: int, length: int) -> int:
-    if length <= 0:
-        return end
-    return start + ((end - start) * ordinal + length // 2) // length
-
-
-def _ducking_scale(
-    sample: int,
-    *,
-    intervals: tuple[tuple[int, int], ...],
-    attenuation: int,
-    attack: int,
-    release: int,
-) -> int:
-    result = _MIX_SCALE
-    for start, end in intervals:
-        if start <= sample < end:
-            if attack and sample - start < attack:
-                candidate = _linear_scale(
-                    _MIX_SCALE, attenuation, sample - start + 1, attack
-                )
-            else:
-                candidate = attenuation
-            result = min(result, candidate)
-        elif release and end <= sample < end + release:
-            candidate = _linear_scale(
-                attenuation, _MIX_SCALE, sample - end + 1, release
-            )
-            result = min(result, candidate)
-    return result
-
-
-def _decoded_pcm16(snapshot: NoFollowFile) -> tuple[int, int, tuple[tuple[int, int], ...]]:
-    sample_rate, channels, frames = _validated_wav(snapshot)
-    with wave.open(BytesIO(snapshot.data), "rb") as source:
-        payload = source.readframes(frames)
-    values = struct.unpack(f"<{frames * channels}h", payload)
-    if channels == 1:
-        stereo = tuple((value, value) for value in values)
-    else:
-        stereo = tuple(zip(values[0::2], values[1::2], strict=True))
-    return sample_rate, frames, stereo
+def _decoded_pcm16(
+    snapshot: NoFollowFile,
+) -> tuple[int, int, tuple[tuple[int, int], ...]]:
+    return _decode_pcm16(snapshot, source_invalid=_source_invalid)
 
 
 def _mix_resolved_audio(
     timeline: ResolvedTimeline,
     *,
     audio_snapshots: Mapping[str, NoFollowFile],
+    native_audio_pcm_by_track: Mapping[str, bytes] | None = None,
 ) -> bytes:
-    decoded: dict[str, tuple[tuple[int, int], ...]] = {}
-    for asset_id, snapshot in audio_snapshots.items():
-        sample_rate, _, samples = _decoded_pcm16(snapshot)
-        if sample_rate != timeline.sample_rate:
-            raise _source_invalid("Audio source sample rate does not match timeline.")
-        decoded[asset_id] = samples
-    by_track = {item.track_id: item for item in timeline.audio_spans}
-    output = [[0, 0] for _ in range(timeline.total_samples)]
-    for span in timeline.audio_spans:
-        source = decoded[span.asset_id]
-        source_end = span.source_start_sample + span.source_duration_samples
-        if source_end > len(source) or span.duration_samples != span.source_duration_samples:
-            raise _source_invalid("P4 pre-mix requires exact source-duration placement.")
-        gain = _fixed_gain(span.gain_millidb)
-        duck_intervals: tuple[tuple[int, int], ...] = ()
-        attenuation = _MIX_SCALE
-        attack = release = 0
-        if span.ducking is not None:
-            duck_intervals = tuple(
-                (
-                    by_track[track_id].start_sample,
-                    by_track[track_id].start_sample
-                    + by_track[track_id].duration_samples,
-                )
-                for track_id in span.ducking.sidechain_track_ids
-            )
-            attenuation = _fixed_gain(span.ducking.attenuation_millidb)
-            attack = span.ducking.attack_samples
-            release = span.ducking.release_samples
-        for offset in range(span.duration_samples):
-            envelope = _MIX_SCALE
-            if span.fade_in_samples and offset < span.fade_in_samples:
-                envelope = min(
-                    envelope,
-                    _linear_scale(0, _MIX_SCALE, offset + 1, span.fade_in_samples),
-                )
-            remaining = span.duration_samples - offset
-            if span.fade_out_samples and remaining <= span.fade_out_samples:
-                envelope = min(
-                    envelope,
-                    _linear_scale(0, _MIX_SCALE, remaining, span.fade_out_samples),
-                )
-            if span.ducking is not None:
-                envelope = _multiply_fixed(
-                    envelope,
-                    _ducking_scale(
-                        span.start_sample + offset,
-                        intervals=duck_intervals,
-                        attenuation=attenuation,
-                        attack=attack,
-                        release=release,
-                    ),
-                )
-            scale = _multiply_fixed(gain, envelope)
-            left, right = source[span.source_start_sample + offset]
-            target = output[span.start_sample + offset]
-            target[0] += _scale_pcm(left, scale)
-            target[1] += _scale_pcm(right, scale)
-    pcm = bytearray()
-    for left, right in output:
-        pcm.extend(
-            struct.pack(
-                "<hh",
-                max(-32768, min(32767, left)),
-                max(-32768, min(32767, right)),
-            )
-        )
-    buffer = BytesIO()
-    with wave.open(buffer, "wb") as mixed:
-        mixed.setnchannels(2)
-        mixed.setsampwidth(2)
-        mixed.setframerate(timeline.sample_rate)
-        mixed.writeframes(bytes(pcm))
-    return buffer.getvalue()
+    return _mix_pcm(
+        timeline,
+        audio_snapshots=audio_snapshots,
+        native_audio_pcm_by_track=native_audio_pcm_by_track,
+        source_invalid=_source_invalid,
+    )
 
 
 def _validate_local_relative_url(url: str) -> None:
@@ -590,16 +457,7 @@ def _validate_local_relative_url(url: str) -> None:
 
 
 def _validated_wav(snapshot: NoFollowFile) -> tuple[int, int, int]:
-    try:
-        with wave.open(BytesIO(snapshot.data), "rb") as source:
-            if source.getsampwidth() != 2 or source.getcomptype() != "NONE":
-                raise ValueError("only PCM16 WAV is accepted by the P4 renderer")
-            channels = source.getnchannels()
-            if channels not in {1, 2}:
-                raise ValueError("P4 audio must be mono or stereo")
-            return source.getframerate(), channels, source.getnframes()
-    except (EOFError, wave.Error, ValueError) as exc:
-        raise _source_invalid("Renderer audio source is not canonical PCM16 WAV.", str(exc)) from exc
+    return _validate_wav(snapshot, source_invalid=_source_invalid)
 
 
 def _all_materialized_bindings(
@@ -882,8 +740,19 @@ def _materialize_hyperframes_source(
     allowed_asset_root: Path,
     staging_root: Path,
     allowed_staging_parent: Path,
+    native_audio_ffmpeg_path: Path | None = None,
+    native_audio_ffprobe_path: Path | None = None,
 ) -> MaterializedHyperFramesSource:
     _validate_timeline(timeline)
+    native_audio_spans = tuple(
+        item for item in timeline.audio_spans if item.native_audio_retime is not None
+    )
+    if native_audio_spans and (
+        native_audio_ffmpeg_path is None or native_audio_ffprobe_path is None
+    ):
+        raise _renderer_unavailable(
+            "Native video audio requires explicit ffmpeg and ffprobe paths."
+        )
     visual_ids = {item.asset_id for item in timeline.visual_spans}
     audio_ids = {item.asset_id for item in timeline.audio_spans}
     caption_ids = {item.caption_asset_id for item in timeline.caption_cues}
@@ -919,9 +788,54 @@ def _materialize_hyperframes_source(
         )
     bindings = tuple(bindings_by_id[key] for key in sorted(bindings_by_id))
 
+    native_video_snapshots: dict[str, NoFollowFile] = {}
+    for span in native_audio_spans:
+        mapping = span.native_audio_retime
+        assert mapping is not None
+        visual_matches = tuple(
+            item for item in timeline.visual_spans if item.layer_id == mapping.visual_layer_id
+        )
+        if (
+            len(visual_matches) != 1
+            or visual_matches[0].asset_id != span.asset_id
+            or visual_matches[0].asset_sha256 != span.asset_sha256
+            or visual_matches[0].asset_mime_type != "video/mp4"
+            or span.audio_kind.value != "native_video"
+            or sum(item.output_duration_samples for item in mapping.segments)
+            != span.duration_samples
+        ):
+            raise _source_invalid(
+                "Native audio retime does not match its exact visual source and duration."
+            )
+        if span.asset_id in native_video_snapshots:
+            continue
+        source_path = Path(asset_sources[span.asset_id])
+        snapshot = _read_regular_file_nofollow(
+            source_path, contained_by=allowed_asset_root
+        )
+        suffix = _validated_visual_suffix(
+            snapshot,
+            suffix=source_path.suffix,
+            mime_type="video/mp4",
+        )
+        if (
+            suffix != ".mp4"
+            or snapshot.file_sha256 != span.asset_sha256
+            or Path("assets") / f"{span.asset_sha256}{suffix}"
+            != visual_matches[0].materialized_path
+        ):
+            raise _source_invalid("Native audio video snapshot identity is invalid.")
+        native_video_snapshots[span.asset_id] = snapshot
+
     audio_snapshots: dict[str, NoFollowFile] = {}
     for asset_id in sorted(audio_ids):
         spans = tuple(item for item in timeline.audio_spans if item.asset_id == asset_id)
+        if any(item.native_audio_retime is not None for item in spans):
+            if not all(item.native_audio_retime is not None for item in spans):
+                raise _source_invalid(
+                    "One audio asset cannot mix native video and imported audio tracks."
+                )
+            continue
         digest = spans[0].asset_sha256
         if any(item.asset_sha256 != digest for item in spans):
             raise _source_invalid("Timeline contains conflicting audio asset hashes.")
@@ -936,12 +850,36 @@ def _materialize_hyperframes_source(
         ):
             raise _source_invalid("Audio source measurements do not match timeline.")
         audio_snapshots[asset_id] = snapshot
+    native_audio_pcm_by_track: dict[str, bytes] = {}
+    native_audio_derivations: list[NativeAudioDerivationProof] = []
+    for span in native_audio_spans:
+        snapshot = native_video_snapshots[span.asset_id]
+        assert span.native_audio_retime is not None
+        mapped_pcm, proof = derive_native_audio_pcm(
+            snapshot,
+            source_video_asset_id=span.asset_id,
+            source_video_sha256=span.asset_sha256,
+            track_id=span.track_id,
+            mapping=span.native_audio_retime,
+            sample_rate_hz=timeline.sample_rate,
+            max_correction_samples=(
+                timeline.sample_rate + timeline.delivery_profile.fps - 1
+            )
+            // timeline.delivery_profile.fps,
+            ffmpeg_path=native_audio_ffmpeg_path,
+            ffprobe_path=native_audio_ffprobe_path,
+        )
+        native_audio_pcm_by_track[span.track_id] = mapped_pcm
+        native_audio_derivations.append(proof)
+
     audio_bindings: tuple[RendererAudioBinding, ...] = ()
     mixed_audio_bytes: bytes | None = None
     mixed_audio_target: Path | None = None
     if timeline.audio_spans:
         mixed_audio_bytes = _mix_resolved_audio(
-            timeline, audio_snapshots=audio_snapshots
+            timeline,
+            audio_snapshots=audio_snapshots,
+            native_audio_pcm_by_track=native_audio_pcm_by_track,
         )
         mixed_audio_hash = hashlib.sha256(mixed_audio_bytes).hexdigest()
         mixed_relative = Path("assets") / f"{mixed_audio_hash}.wav"
@@ -958,6 +896,7 @@ def _materialize_hyperframes_source(
                 channels=2,
                 duration_samples=timeline.total_samples,
                 resolved_track_ids=tuple(item.track_id for item in timeline.audio_spans),
+                native_audio_derivations=tuple(native_audio_derivations),
             ),
         )
 
@@ -1059,9 +998,11 @@ def _materialize_hyperframes_source(
         if span.asset_id in snapshots_by_id:
             continue
         source = Path(asset_sources[span.asset_id])
-        source_snapshot = _read_regular_file_nofollow(
-            source, contained_by=allowed_asset_root
-        )
+        source_snapshot = native_video_snapshots.get(span.asset_id)
+        if source_snapshot is None:
+            source_snapshot = _read_regular_file_nofollow(
+                source, contained_by=allowed_asset_root
+            )
         suffix = _validated_visual_suffix(
             source_snapshot,
             suffix=source.suffix,
@@ -1138,6 +1079,8 @@ def materialize_hyperframes_source(
     allowed_asset_root: Path,
     staging_root: Path,
     allowed_staging_parent: Path,
+    native_audio_ffmpeg_path: Path | None = None,
+    native_audio_ffprobe_path: Path | None = None,
 ) -> MaterializedHyperFramesSource:
     try:
         return _materialize_hyperframes_source(
@@ -1146,9 +1089,14 @@ def materialize_hyperframes_source(
             allowed_asset_root=allowed_asset_root,
             staging_root=staging_root,
             allowed_staging_parent=allowed_staging_parent,
+            native_audio_ffmpeg_path=native_audio_ffmpeg_path,
+            native_audio_ffprobe_path=native_audio_ffprobe_path,
         )
     except AiVideoError as exc:
-        if exc.code is ErrorCode.RENDERER_SOURCE_INVALID:
+        if exc.code in {
+            ErrorCode.RENDERER_SOURCE_INVALID,
+            ErrorCode.RENDERER_UNAVAILABLE,
+        }:
             raise
         raise _source_invalid("HyperFrames source inputs are invalid.", str(exc)) from exc
     except (OSError, UnicodeError, ValueError) as exc:
@@ -1258,7 +1206,16 @@ def _render_with_hyperframes(
     decoded_frames: Callable[[int], str] | None = None,
     decoded_audio: Callable[[int, int, int], tuple[int, str]] | None = None,
     audio_measurement_method: str = "held-fd ffprobe packets plus pcm_s16le decode",
+    native_audio_ffmpeg_path: Path | None = None,
+    native_audio_ffprobe_path: Path | None = None,
 ) -> ProductionManifest:
+    if any(
+        item.native_audio_retime is not None
+        for item in timeline.audio_spans
+    ) and (native_audio_ffmpeg_path is None or native_audio_ffprobe_path is None):
+        raise _renderer_unavailable(
+            "Native video audio requires explicit ffmpeg and ffprobe paths."
+        )
     manifest, fresh = committer._begin_render_attempt_with_status(begin_request)
     if not fresh:
         return committer._replay_render_attempt(begin_request, manifest)
@@ -1292,6 +1249,8 @@ def _render_with_hyperframes(
             decoded_frames=decoded_frames or decoded_frame_sha256_fd,
             decoded_audio=decoded_audio or decoded_audio_sha256_fd,
             audio_measurement_method=audio_measurement_method,
+            native_audio_ffmpeg_path=native_audio_ffmpeg_path,
+            native_audio_ffprobe_path=native_audio_ffprobe_path,
         )
         result = adapter.render(
             HyperFramesRenderAttempt(
@@ -1430,6 +1389,8 @@ def render_with_hyperframes(
     """Run the sole production HyperFrames path and durably activate its result."""
     probe = None
     decoded_audio = None
+    native_audio_ffmpeg = None
+    native_audio_ffprobe = None
     measurement_method = "held-fd ffprobe packets plus pcm_s16le decode"
     if getattr(timeline, "audio_spans", ()):
         if ffmpeg_path is None or ffprobe_path is None:
@@ -1438,6 +1399,8 @@ def render_with_hyperframes(
             )
         ffmpeg = _validated_executable(ffmpeg_path, "ffmpeg")
         ffprobe = _validated_executable(ffprobe_path, "ffprobe")
+        native_audio_ffmpeg = ffmpeg
+        native_audio_ffprobe = ffprobe
         probe = lambda fd: probe_clip_fd_with_executable(fd, ffprobe)
         decoded_audio = lambda fd, rate, channels: decoded_audio_sha256_fd_with_executable(
             fd, rate, channels, ffmpeg
@@ -1468,6 +1431,8 @@ def render_with_hyperframes(
         probe=probe,
         decoded_audio=decoded_audio,
         audio_measurement_method=measurement_method,
+        native_audio_ffmpeg_path=native_audio_ffmpeg,
+        native_audio_ffprobe_path=native_audio_ffprobe,
     )
 
 
@@ -2384,6 +2349,8 @@ class HyperFramesAdapter:
             [int, int, int], tuple[int, str]
         ] = decoded_audio_sha256_fd,
         audio_measurement_method: str = "held-fd ffprobe packets plus pcm_s16le decode",
+        native_audio_ffmpeg_path: Path | None = None,
+        native_audio_ffprobe_path: Path | None = None,
         browser_path: Path,
         ip_path: Path,
     ) -> None:
@@ -2397,6 +2364,8 @@ class HyperFramesAdapter:
         self._decoded_frames = decoded_frames
         self._decoded_audio = decoded_audio
         self._audio_measurement_method = audio_measurement_method
+        self._native_audio_ffmpeg_path = native_audio_ffmpeg_path
+        self._native_audio_ffprobe_path = native_audio_ffprobe_path
         self._env = _controlled_env(browser_path, ip_path)
 
     def _check(
@@ -2527,6 +2496,8 @@ class HyperFramesAdapter:
             allowed_asset_root=attempt.allowed_asset_root,
             staging_root=attempt.staging_root,
             allowed_staging_parent=attempt.allowed_staging_parent,
+            native_audio_ffmpeg_path=self._native_audio_ffmpeg_path,
+            native_audio_ffprobe_path=self._native_audio_ffprobe_path,
         )
         lint = self._check("lint", materialized.root)
         _verify_materialized_unchanged(materialized)

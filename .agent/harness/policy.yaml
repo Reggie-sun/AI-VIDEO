@@ -288,6 +288,10 @@ checks:
     cwd: .
     covered_by_check_ids: [production_contract_tests]
     description: Verify timeline, renderer, audio, voice, and caption contracts.
+  native_audio_retime_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_native_audio_retime_contracts.py, tests/test_hyperframes_native_audio_retime.py, tests/test_canvas_native_audio_retime.py, -q]
+    cwd: .
+    description: Verify exact source-coupled A/V mapping, bounded local PCM processing and public Canvas preservation; no Provider calls or media acceptance.
   production_dependency_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_dependency.py, tests/test_production_video_pre_generation.py, tests/test_production_selective_rebuild.py, tests/test_production_models.py, tests/test_production_project.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
@@ -454,6 +458,7 @@ checks:
       - s01_strategy_regression_tests
       - production_state_tests
       - production_composition_audio_tests
+      - native_audio_retime_tests
       - production_dependency_tests
       - production_review_tests
       - production_image_tests
@@ -791,6 +796,7 @@ categories:
       - src/ai_video/production/artifact_contracts.py
       - src/ai_video/production/models.py
       - src/ai_video/production/project.py
+      - src/ai_video/production/renderer_audio_contracts.py
       - src/ai_video/production/state_commit_attempt_contracts.py
       - src/ai_video/production/state_commit.py
       - src/ai_video/production/_immutable_models.py
@@ -819,6 +825,7 @@ categories:
       - task_architecture_gate
   production_reader:
     patterns:
+      - src/ai_video/production/_render_source_validation.py
       - src/ai_video/production/_asset_registry_*.py
       - src/ai_video/production/hashing.py
       - src/ai_video/production/paths.py
@@ -843,6 +850,7 @@ categories:
       - task_architecture_gate
   production_composition_audio:
     patterns:
+      - src/ai_video/production/_composition_native_audio.py
       - src/ai_video/production/_composition_source_duration.py
       - src/ai_video/production/_composition_visual.py
       - src/ai_video/production/ad_composition.py
@@ -882,6 +890,29 @@ categories:
       - tests/fixtures/voice_captions/**
     check_ids:
       - production_composition_audio_tests
+      - task_architecture_gate
+  native_audio_retime:
+    patterns:
+      - src/ai_video/production/renderer_audio_contracts.py
+      - src/ai_video/production/_render_source_validation.py
+      - src/ai_video/production/_hyperframes_audio.py
+      - src/ai_video/production/audio_retime_contracts.py
+      - src/ai_video/production/_composition_native_audio.py
+      - src/ai_video/production/_hyperframes_native_audio.py
+      - src/ai_video/production/video_retime.py
+      - src/ai_video/production/composition_contracts.py
+      - src/ai_video/production/composition.py
+      - src/ai_video/production/hyperframes.py
+      - src/ai_video/production/models.py
+      - src/ai_video/production/project.py
+      - src/ai_video/production/repair_input_admission.py
+      - src/ai_video/production/production_strategy_materialization.py
+      - src/ai_video/canvas_composition.py
+      - tests/test_native_audio_retime_contracts.py
+      - tests/test_hyperframes_native_audio_retime.py
+      - tests/test_canvas_native_audio_retime.py
+    check_ids:
+      - native_audio_retime_tests
       - task_architecture_gate
   production_dependency:
     patterns:

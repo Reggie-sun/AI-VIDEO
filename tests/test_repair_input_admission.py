@@ -363,6 +363,129 @@ def test_preview_capture_requires_closed_known_failure_and_exact_probe(tmp_path)
         )
 
 
+def test_native_av_preview_v3_reopens_exact_audio_and_stays_unbound(tmp_path):
+    from types import SimpleNamespace
+
+    from ai_video.production.composition_contracts import CompositionLayerSpec
+    from ai_video.production.repair_input_admission import (
+        RepairAudioPreviewInputAdmissionReceipt,
+        allows_repair_preview_layer,
+        require_production_render_sources,
+        verify_repair_input,
+    )
+    from ai_video.production.video_retime import VideoTimeMap, VideoTimePoint
+
+    source, target, writer, args = _inputs(tmp_path, close=True, abandon=True)
+    source_before = _files(source)
+    preview_use, preview_probe, shot = _preview_arguments(source, args)
+    preview_use.update(
+        scope="retimed_av_preview",
+        source_time_map=VideoTimeMap(
+            contract_version="video-time-map/2",
+            points=(
+                VideoTimePoint(source_frame=0, output_frame=0),
+                VideoTimePoint(source_frame=24, output_frame=18),
+                VideoTimePoint(source_frame=48, output_frame=40),
+            ),
+            audio_policy="retime_preserve_pitch",
+        ),
+    )
+    manifest = writer.bootstrap_repair_input(
+        **args, preview_use=preview_use, preview_probe=preview_probe
+    )
+
+    loaded = load_production_project(target / "project.yaml")
+    asset = next(item for item in loaded.registry.assets if item.asset_id == "failed-source")
+    receipt = verify_repair_input(asset, target)
+    assert isinstance(receipt, RepairAudioPreviewInputAdmissionReceipt)
+    assert receipt.contract_version == "development-repair-input/3"
+    assert receipt.qualification == "NOT_EVALUATED"
+    assert receipt.preview_use.scope == "retimed_av_preview"
+    assert receipt.preview_probe.measured.audio_stream_count == 1
+    assert asset.tool.version == "3"
+    assert loaded.manifest == manifest
+    assert manifest.attempts == ()
+    assert not any(
+        asset.asset_id in role.asset_ids
+        for shot_item in loaded.shots
+        for role in shot_item.required_asset_roles
+    )
+
+    layer = CompositionLayerSpec(
+        layer_id="preview-layer",
+        shot_id=shot.shot_id,
+        asset_role=preview_use["asset_role"],
+        asset_id=asset.asset_id,
+        trim_start_frame=preview_use["trim_start_frame"],
+        trim_duration_frames=preview_use["trim_duration_frames"],
+        source_time_map=preview_use["source_time_map"],
+        transform=preview_use["transform"],
+    )
+    assert allows_repair_preview_layer(loaded, layer, shot) is True
+    with pytest.raises(ValueError, match="preview bytes cannot be activated"):
+        require_production_render_sources(
+            target,
+            loaded.manifest.active_registry,
+            SimpleNamespace(
+                visual_spans=(SimpleNamespace(asset_sha256=asset.sha256),)
+            ),
+        )
+    from ai_video.production.registry import _verify_asset
+    from ai_video.production.models import ToolIdentity
+
+    with pytest.raises(AiVideoError, match="provenance"):
+        _verify_asset(
+            asset.model_copy(update={"tool": ToolIdentity(name="ordinary-import", version="1")}),
+            target,
+            target / "assets/files",
+        )
+    assert _files(source) == source_before
+
+
+def test_native_av_preview_v3_rejects_missing_stream_and_v2_cannot_carry_map2(tmp_path):
+    from pydantic import ValidationError
+
+    from ai_video.production.repair_input_admission import RepairPreviewUse
+    from ai_video.production.video_artifact import VideoProbeReceipt
+    from ai_video.production.video_retime import VideoTimeMap, VideoTimePoint
+    from ai_video.production.hashing import canonical_sha256
+
+    source, target, writer, args = _inputs(tmp_path, close=True, abandon=True)
+    preview_use, preview_probe, _ = _preview_arguments(source, args)
+    preview_use.update(
+        scope="retimed_av_preview",
+        source_time_map=VideoTimeMap(
+            contract_version="video-time-map/2",
+            points=(
+                VideoTimePoint(source_frame=0, output_frame=0),
+                VideoTimePoint(source_frame=48, output_frame=40),
+            ),
+            audio_policy="retime_preserve_pitch",
+        ),
+    )
+    candidate = preview_probe.model_copy(update={
+        "measured": preview_probe.measured.model_copy(update={"audio_stream_count": 0}),
+        "content_hash": "0" * 64,
+    })
+    no_audio_probe = VideoProbeReceipt.model_validate({
+        **candidate.model_dump(mode="json"),
+        "content_hash": canonical_sha256(
+            candidate.model_dump(mode="json", exclude={"content_hash"})
+        ),
+    })
+    with pytest.raises(AiVideoError):
+        writer.bootstrap_repair_input(
+            **args, preview_use=preview_use, preview_probe=no_audio_probe
+        )
+    assert _files(target) == {}
+
+    with pytest.raises(ValidationError):
+        RepairPreviewUse.model_validate({
+            **preview_use,
+            "scope": "muted_visual_preview",
+        })
+
+
 def test_legacy_repair_input_remains_unusable_for_retimed_preview(tmp_path):
     from ai_video.production.composition_contracts import CompositionLayerSpec
     from ai_video.production.repair_input_admission import allows_repair_preview_layer
