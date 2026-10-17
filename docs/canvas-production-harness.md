@@ -204,13 +204,15 @@ compiler 失败时仍保留 selected candidate 的目标和失败 ID，片段标
 不会直接再生成。未提交关闭、known-no-effect、runtime retarget及unknown恢复仍归原owner。
 材料化后，已取得当前用途资格的source-backed组件由原materialization builder重开lineage，接回标准
 `position` → `compose/render`，并保留普通镜头及approved composition order；不重造原Decision/hash。
-未完成的动态组件仍回原ProductionPlanningService，unknown优先STOP。最终完整P4重新校验，
+该自动续接首版仅处理source-backed组件；`source=None`的动态生成组件仍归原ProductionPlanningService/
+generation owner，本入口尚不自动续接。unknown优先STOP。最终完整P4重新校验，
 `cut_packet`按实际首/末子镜的resolved spans描述原occurrence外部切点，不复制帧或样本推导。
 
 `ProductionSourceOption.source_time_map`、`SourceUseEvidence.source_time_map` 和
 `CompositionLayerSpec.source_time_map` 共用 `video-time-map/1`：相对所选trim的整数锚点
 `points: [{source_frame:0, output_frame:0}, ...]`，`audio_policy: mute`。两轴严格递增，末点分别等于
-源帧数和输出帧数；每段源/输出比为0.1–5。不反转、冻结、跳过区间或补造动作；加速会减少输出采样帧。
+源帧数和输出帧数；每段源/输出比为0.1–5。不反转、冻结、跳过区间或补造动作；加速会减少输出采样帧，
+减速会重复采样源帧，不做光流补帧，动作自然度必须另验。
 `CompositionSpec/ResolvedTimeline 2.3` 解析为同Shot连续spans，由唯一时间线拥有source trim及输出
 frame/sample。固定版本0.7.103导出忽略 `data-playback-rate`，因此非一比一段按每个输出帧取
 源坐标floor展开为一帧span；HyperFrames消费这些既有一比一窗口，不新增timeline或renderer。旧2.0–2.2字节/hash保持且拒绝time map。

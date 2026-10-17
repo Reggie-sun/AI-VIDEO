@@ -32,4 +32,5 @@
 
 分段源帧映射、exact用途证据、上层编辑优先及静音开发预览已实现；实际pinned导出11/11抽样帧匹配，机器人原4秒姿势映射到3.5秒样帧，新增Provider POST0，完整质量与human仍NE。
 基线Harness r2为21 PASS/1 covered SKIP；旧格式None trim兼容增量r3为7 PASS，分别在其exact源码点核验fresh完整证明。
-首次native reviewer_xhigh在8470611发现EF-001完整P4校验遗漏与EF-002材料化后Canvas续接缺口；Parent确认并修复，补公开compose/render、正反切点及未知结果STOP用例。当前等待修复快照适用Harness及同一reviewer复审；尚未发布，不把离线证明当Production验收。
+首次native reviewer_xhigh在8470611发现EF-001完整P4校验遗漏与EF-002材料化后Canvas续接缺口；Parent确认并修复，补公开compose/render、正反切点及未知结果STOP用例。修复快照43b58d6的r4为14/14 PASS，fresh/integrity/complete证明已核验；同一reviewer第二轮full re-review finding set为空，Parent结合公开回归关闭两项问题。
+源码已push main并核验remote43b58d62e55fbcba8021002667f3042be584a6c2。收尾文档只明确既有source-backed自动续接范围、减速重复采样限制及上述实证，不增加运行语义。文档checkpoint的receipt归`edit-first-temporal-control-record-20261017-r1`；工程证明、静音单源局部观察、原Shot STOP与human未验分别保留，记录及learning评估见`docs/record_for_agent/2026-10-17-edit-first-temporal-control.md`。

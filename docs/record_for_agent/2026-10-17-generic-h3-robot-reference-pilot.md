@@ -9,6 +9,10 @@ evidence_index_version: "1"
 
 Date: 2026-10-17
 
+## Follow-up — Edit-First Temporal Control (2026-10-17)
+
+后续[edit-first记录](2026-10-17-edit-first-temporal-control.md)已用本次 exact H3 源生成一个静音本地 `development_preview`：2.0s 手臂垂下与 3.5s 左臂水平只在编辑后样帧获得局部 PASS。它补上了“可否通过确定性时间映射制作开发预览”的证据；原源仍为 **0 PASS / 2 FAIL / 5 NOT_EVALUATED** 且已 abandon，既有 robot pilot 的 1 次消费、rejection 与 STOP 全部保留，此次编辑新增 Provider POST 为 0。整段自然度、精确转向、音频、人工完整 1x 与 Production qualification 仍未评估。
+
 ## Current Result
 
 用户对[实际输入准备](2026-10-17-reference-control-audit-and-preview.md)推荐的最小单元回复“确认”：

@@ -2,6 +2,12 @@
 
 Date: 2026-10-17
 
+## Follow-up — Edit-First Temporal Control (2026-10-17)
+
+后续[edit-first实现记录](../record_for_agent/2026-10-17-edit-first-temporal-control.md)显示，同一失败 robot 视频可经 `ResolvedTimeline` 整数帧映射制作静音本地预览；2.0s 手臂垂下和 3.5s 左臂水平只获得编辑后样帧级 PASS。这把“可否通过剪辑验证既有画面”从待探索问题推进为单源实现证明。它不改变原 H3 Max CN 在约 4s 才达到水平、原 QA 的 FAIL/NOT_EVALUATED 或已停止的 Provider attempt，也不证明精确时序可由模型稳定生成、整段动作自然、声音保留、人工完整 1x 或 Production 质量。
+
+下文关于下一步输入表达检查的建议保留为历史方向；现行 [workflow](../canvas-production-harness.md#edit-first-temporal-control) 先评估既有素材与剪辑/变速，再决定是否生成。
+
 ## Generic Reference Timing Follow-up
 
 后续[几何人物R2V单元](../record_for_agent/2026-10-17-generic-h3-robot-reference-pilot.md)已观察到：
