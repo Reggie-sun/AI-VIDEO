@@ -8,6 +8,15 @@ learning_eligibility: ineligible
 
 Date: 2026-10-17
 
+## Supersession Notice — Robot R2V Pilot
+
+用户随后“确认”了下方推荐的最小单元；实际仅人物reference路线POST1次、零重抽，
+其余三臂仍POST0。最新结果、exact MP4和共享DNS下载恢复见
+[真实Pilot记录](2026-10-17-generic-h3-robot-reference-pilot.md)。
+当前为0 PASS / 2 FAIL / 5 NOT_EVALUATED，已canonical abandon；没有activation或通用质量证明。
+下方“当前新POST/凭据读取为0”“未执行”的表述均为该准备checkpoint历史，不能作为最新状态或新授权。
+原proposal、输入hash、历史实验、工程证明和《界蚀》STOP保持；没有以新Project复用或清零旧消费。
+
 ## Current Real-Input Preparation Checkpoint
 
 用户最新要求“继续生成”，目标仍是通用制作控制能力。已准备两个不同来源的真实本地素材案例，
