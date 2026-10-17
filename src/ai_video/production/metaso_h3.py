@@ -88,12 +88,22 @@ class HttpxMetasoH3Transport(HttpxMiniMaxH3Transport):
 
     error_label = "METASO"
 
+    def __init__(self, *, client=None, timeout_seconds: float = 60.0,
+                 download_resolver: Callable | None = None):
+        super().__init__(client=client, timeout_seconds=timeout_seconds)
+        self._download_resolver = download_resolver
+
     @contextmanager
     def stream(self, request):
         if request.method != "GET" or request.body or dict(request.headers) != {"accept": "video/mp4"}:
             raise _error(ErrorCode.VIDEO_ARTIFACT_INVALID,
                          f"Invalid {self.error_label} download request.")
-        with stream_public_video(request.url, timeout_seconds=120) as response:
+        if self._download_resolver is None:
+            download = stream_public_video(request.url, timeout_seconds=120)
+        else:
+            download = stream_public_video(request.url, timeout_seconds=120,
+                                           download_resolver=self._download_resolver)
+        with download as response:
             # http.client preserves wire casing; the inherited consumer expects
             # httpx-style lowercase lookup for these case-insensitive headers.
             response.headers = {key.lower(): value for key, value in response.headers.items()}

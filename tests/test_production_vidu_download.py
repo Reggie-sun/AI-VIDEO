@@ -175,6 +175,69 @@ def test_native_ipv6_address_is_pinned_with_original_sni(monkeypatch):
     assert state["sni"] == ["media.vidu.example"]
 
 
+def test_explicit_resolver_pins_public_answer_without_ambient_dns_fallback(monkeypatch):
+    state = _wire(monkeypatch, addresses=("198.18.0.24",))
+    resolver_calls = []
+
+    def resolver(host, port, **kwargs):
+        resolver_calls.append((host, port, kwargs))
+        return [(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP, "",
+                 ("140.206.110.62", port))]
+
+    with vidu_download.stream_public_video(URL, timeout_seconds=1,
+                                           download_resolver=resolver) as response:
+        assert b"".join(response.iter_bytes()) == MP4
+
+    assert resolver_calls == [("media.vidu.example", 443,
+                               {"type": socket.SOCK_STREAM, "proto": socket.IPPROTO_TCP})]
+    assert not state["dns"]
+    assert state["sockets"][0].address == ("140.206.110.62", 443)
+    assert state["sni"] == ["media.vidu.example"]
+    assert b"Authorization" not in b"".join(state["sockets"][0].writes)
+
+
+@pytest.mark.parametrize("answer", [
+    (),
+    ((socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP, "", ("8.8.8.8", 80)),),
+    ((socket.AF_INET6, socket.SOCK_STREAM, socket.IPPROTO_TCP, "", ("8.8.8.8", 443)),),
+    ((socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP, "", ("8.8.8.8", 443)),),
+    ((socket.AF_INET, socket.SOCK_STREAM),),
+    (None,),
+    ((socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP, "", ("8.8.8.8", 443)),
+     (socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP, "", ("198.18.0.24", 443))),
+    ((socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP, "", ("8.8.8.8", 443)),
+     (socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP, "", ("10.0.0.1", 443))),
+])
+def test_explicit_resolver_unsafe_answers_fail_closed_without_ambient_fallback(monkeypatch, answer):
+    state = _wire(monkeypatch, addresses=("8.8.8.8",))
+    resolver_calls = []
+
+    def resolver(host, port, **kwargs):
+        resolver_calls.append((host, port, kwargs))
+        return answer
+
+    with pytest.raises(AiVideoError):
+        with vidu_download.stream_public_video(URL, timeout_seconds=1,
+                                               download_resolver=resolver):
+            pytest.fail("unsafe resolver answer accepted")
+    assert len(resolver_calls) == 1
+    assert not state["dns"] and not state["sockets"]
+
+
+def test_explicit_resolver_error_fails_closed_without_ambient_fallback(monkeypatch):
+    state = _wire(monkeypatch, addresses=("8.8.8.8",))
+
+    def resolver(host, port, **kwargs):
+        raise socket.gaierror("private signed locator must not leak")
+
+    with pytest.raises(AiVideoError) as error:
+        with vidu_download.stream_public_video(URL, timeout_seconds=1,
+                                               download_resolver=resolver):
+            pytest.fail("resolver failure accepted")
+    assert "private signed locator" not in str(error.value)
+    assert not state["dns"] and not state["sockets"]
+
+
 @pytest.mark.parametrize("status,headers", [(302, b"Location: https://127.0.0.1/private\r\n"),
                                             (200, b"Content-Encoding: gzip\r\n")])
 def test_redirects_and_encoded_bodies_are_not_followed_or_consumed(monkeypatch, status, headers):

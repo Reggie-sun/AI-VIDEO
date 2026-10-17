@@ -10,7 +10,7 @@ from ai_video.production.metaso_h3 import (
     METASO_BASE_URL, MetasoH3Profile, MetasoH3VideoProvider,
     metaso_environment_credential,
 )
-from ai_video.production.minimax_h3 import MiniMaxH3TransportResponse
+from ai_video.production.minimax_h3 import MiniMaxH3TransportRequest, MiniMaxH3TransportResponse
 from ai_video.production.paid_provider import PaidProviderCallPreview, SecretReference
 from ai_video.production.video import (
     VideoGenerationMode, VideoImageReferenceBinding, VideoMediaReferenceBinding,
@@ -270,6 +270,43 @@ def test_real_transport_handles_case_insensitive_http_download_headers(monkeypat
         result = provider.fetch(submission,receipt,observed,sink)
     assert sink.getvalue()==body
     assert result.size_bytes==len(body)
+
+
+def test_metaso_transport_forwards_explicit_download_resolver_without_api_credentials(monkeypatch):
+    from contextlib import contextmanager
+    from types import SimpleNamespace
+    import httpx
+    import ai_video.production.metaso_h3 as module
+
+    download_resolver = lambda host, port, **kwargs: ()
+    observed = {}
+
+    @contextmanager
+    def public_stream(url, *, timeout_seconds, download_resolver=None):
+        observed.update(url=url, timeout_seconds=timeout_seconds, resolver=download_resolver)
+        yield SimpleNamespace(status_code=200, headers={}, iter_bytes=lambda: iter(()))
+
+    monkeypatch.setattr(module, "stream_public_video", public_stream)
+    api_requests = []
+    client = httpx.Client(
+        transport=httpx.MockTransport(lambda request: api_requests.append(request)),
+        headers={"Authorization": "API-CLIENT-SECRET"}, auth=("user", "password"),
+    )
+    transport = module.HttpxMetasoH3Transport(client=client, download_resolver=download_resolver)
+    request = MiniMaxH3TransportRequest("GET", "https://cdn.example.org/out.mp4", {"accept": "video/mp4"})
+    try:
+        with transport.stream(request) as response:
+            assert response.status_code == 200
+    finally:
+        client.close()
+
+    assert observed == {
+        "url": "https://cdn.example.org/out.mp4",
+        "timeout_seconds": 120,
+        "resolver": download_resolver,
+    }
+    assert api_requests == []
+    assert request.headers == {"accept": "video/mp4"}
 
 
 def _frame_setup(*, last=False, aspect_ratio="adaptive"):

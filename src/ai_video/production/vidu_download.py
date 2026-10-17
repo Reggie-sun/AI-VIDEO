@@ -8,7 +8,7 @@ import math
 import re
 import socket
 import ssl
-from collections.abc import Iterator
+from collections.abc import Callable, Iterator
 from contextlib import contextmanager
 from dataclasses import dataclass, field
 from urllib.parse import urlsplit
@@ -74,10 +74,11 @@ def parse_result_url(url: str) -> ViduResultLocator:
         raise _error() from None
 
 
-def _resolve(locator: ViduResultLocator):
+def _resolve(locator: ViduResultLocator, *, download_resolver: Callable | None = None):
     try:
-        records = socket.getaddrinfo(locator.hostname, 443, type=socket.SOCK_STREAM,
-                                     proto=socket.IPPROTO_TCP)
+        resolver = socket.getaddrinfo if download_resolver is None else download_resolver
+        records = resolver(locator.hostname, 443, type=socket.SOCK_STREAM,
+                           proto=socket.IPPROTO_TCP)
         if not records:
             raise ValueError()
         for family, kind, protocol, _, sockaddr in records:
@@ -88,7 +89,7 @@ def _resolve(locator: ViduResultLocator):
                 raise ValueError()
         family, _, _, _, sockaddr = records[0]
         return family, sockaddr
-    except (OSError, ValueError):
+    except (OSError, ValueError, TypeError, IndexError):
         raise _error() from None
 
 
@@ -104,11 +105,13 @@ class _VideoResponse:
 
 
 @contextmanager
-def stream_public_video(url: str, *, timeout_seconds: float) -> Iterator[_VideoResponse]:
+def stream_public_video(
+    url: str, *, timeout_seconds: float, download_resolver: Callable | None = None
+) -> Iterator[_VideoResponse]:
     if not isinstance(timeout_seconds, (int, float)) or not math.isfinite(timeout_seconds) or timeout_seconds <= 0:
         raise _error()
     locator = parse_result_url(url)
-    family, sockaddr = _resolve(locator)
+    family, sockaddr = _resolve(locator, download_resolver=download_resolver)
     # Explicit context avoids create_default_context's SSLKEYLOGFILE side effect.
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
     context.load_default_certs()
