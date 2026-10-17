@@ -238,7 +238,40 @@ class CanvasProductionService:
         for row in self.direction["shots"]:
             shot_id = row["shot"]["shot_id"]
             shot = next((s for s in loaded.shots if s.shot_id == shot_id), None)
-            if shot is None or shot.production_intent is not None:
+            if shot is None:
+                from ai_video.production.production_strategy_reader import (
+                    production_parent_context,
+                    require_production_source_eligibility,
+                )
+
+                _, family_ids, _, _ = production_parent_context(loaded, shot_id)
+                family_children = tuple(
+                    child for child in loaded.shots
+                    if child.shot_id in set(family_ids) and child.production_lineage is not None
+                )
+                family_attempts = [
+                    attempt
+                    for family_shot_id in (shot_id, *family_ids)
+                    for attempt in self._attempts(loaded, family_shot_id)
+                ]
+                unresolved = next((attempt for attempt in family_attempts
+                                   if attempt.status.value in {"outcome_unknown", "interrupted"}), None)
+                if unresolved is not None:
+                    return CanvasWorkflowPosition(row["occurrence_id"], shot_id,
+                                                  unresolved.attempt_id, "stop")
+                if not family_children or any(child.production_lineage.source is None
+                                              for child in family_children):
+                    return CanvasWorkflowPosition(row["occurrence_id"], shot_id, None,
+                                                  "prepare_production")
+                try:
+                    require_production_source_eligibility(
+                        loaded, family_shot_id=family_children[0].shot_id
+                    )
+                except AiVideoError:
+                    return CanvasWorkflowPosition(row["occurrence_id"], shot_id, None,
+                                                  "prepare_production")
+                continue
+            if shot.production_intent is not None:
                 return CanvasWorkflowPosition(row["occurrence_id"], shot_id, None, "prepare_production")
             # Existing static/graphics composition remains available without Video Provider.
             if shot.visual_strategy.value != "generated_video":

@@ -29,10 +29,25 @@ def _native_audio_matches(loaded, audio, video, shot):
             and receipt.source_fetch.artifact_sha256 == video.sha256)
 
 
+def _materialized_strategy_spec(loaded, parent_shot_id):
+    from ai_video.production.production_strategy_materialization import (
+        build_materialized_strategy_composition,
+    )
+
+    return build_materialized_strategy_composition(
+        loaded=loaded,
+        family_shot_id=parent_shot_id,
+        composition_id=f"canvas-family-{parent_shot_id}",
+    )
+
+
 def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), caption_tracks=(), voice_sources=()):
     layers = []
     tracks = [AudioTrackSpec.model_validate(t) if isinstance(t, dict) else t for t in audio_tracks]
+    captions = list(caption_tracks)
     native = []
+    strategy_specs = []
+    strategy_specs_by_parent = {}
     assets = {a.asset_id: a for a in loaded.registry.assets}
     by_occurrence = {row["occurrence_id"]: row for row in direction["shots"]}
     selected_order = direction.get("composition_order", list(by_occurrence))
@@ -40,8 +55,21 @@ def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), capt
             or set(selected_order) != set(by_occurrence)):
         raise ValueError("composition_order must contain every selected occurrence exactly once")
     rows = [by_occurrence[identity] for identity in selected_order]
+    order = []
     for row in rows:
-        shot = next(s for s in loaded.shots if s.shot_id == row["shot"]["shot_id"])
+        shot_id = row["shot"]["shot_id"]
+        shot = next((s for s in loaded.shots if s.shot_id == shot_id), None)
+        if shot is None:
+            family_spec = _materialized_strategy_spec(loaded, shot_id)
+            strategy_specs.append(family_spec)
+            strategy_specs_by_parent[shot_id] = family_spec
+            layers.extend(family_spec.layers)
+            tracks.extend(family_spec.audio_tracks)
+            captions.extend(family_spec.caption_tracks)
+            order.extend(family_spec.shot_ids)
+            continue
+        if shot.production_intent is not None:
+            raise ValueError("unmaterialized production parent cannot be composed")
         settings = dict(row.get("composition", {}))
         if set(settings) - {"asset_role", "asset_id", "trim_start_frame", "trim_duration_frames",
                             "transform", "speed", "muted", "volume", "source_time_map"}:
@@ -74,13 +102,23 @@ def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), capt
                 raise ValueError("native video audio needs its exact registered WAV track or explicit mute")
         layers.append(CompositionLayerSpec(layer_id=f"canvas-{shot.shot_id}", shot_id=shot.shot_id,
             asset_role=role, asset_id=asset_id, **settings))
-    order = tuple(row["shot"]["shot_id"] for row in rows)
+        order.append(shot.shot_id)
+    order = tuple(order)
+    schema_version = "2.0"
+    if (any(spec.schema_version == "2.1" for spec in strategy_specs)
+            or tracks or captions or voice_sources):
+        schema_version = "2.1"
+    if (any(spec.schema_version == "2.3" for spec in strategy_specs)
+            or any(layer.source_time_map is not None for layer in layers)):
+        schema_version = "2.3"
     spec = CompositionSpec(artifact_id="canvas-composition", composition_id="canvas-composition",
-        schema_version="2.3" if any(layer.source_time_map is not None for layer in layers) else "2.0",
+        schema_version=schema_version,
         revision=1, content_hash="0" * 64, creation_receipt_id="canvas-composition-authoring",
         source_provenance=(SourceReference(kind="derived", reference=loaded.project.artifact_id,
                                          content_hash=loaded.project.content_hash),),
         shot_ids=order, layers=tuple(layers), delivery_profile=loaded.project.delivery_profile,
+        **({"audio_tracks": tuple(tracks), "caption_tracks": tuple(captions), "voice_sources": tuple(voice_sources)}
+           if tracks or captions or voice_sources else {}),
         transitions=tuple(TransitionSpec(from_shot_id=a, to_shot_id=b, kind="cut", duration_frames=0)
                           for a, b in zip(order, order[1:])),
         )
@@ -96,12 +134,24 @@ def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), capt
                 asset_id=audio.asset_id, audio_kind=audio.audio_metadata.audio_kind,
                 trim_start_sample=start, trim_duration_samples=stop - start))
     for row in rows:
-        shot = next(s for s in loaded.shots if s.shot_id == row["shot"]["shot_id"])
-        if (shot.dialogue or shot.narration) and not any(t.shot_id == shot.shot_id and
-                t.audio_kind.value in {"dialogue", "narration"} for t in tracks):
-            raise ValueError("authored dialogue/narration must remain present in the final audio tracks")
-    if tracks or caption_tracks or voice_sources:
+        shot_id = row["shot"]["shot_id"]
+        shot = next((s for s in loaded.shots if s.shot_id == shot_id), None)
+        if shot is None:
+            family_spec = strategy_specs_by_parent[shot_id]
+            family_shots = family_spec.shot_ids
+            shots = [s for s in loaded.shots if s.shot_id in family_shots]
+        else:
+            shots = [shot]
+        for shot in shots:
+            if (shot.dialogue or shot.narration) and not any(t.shot_id == shot.shot_id and
+                    t.audio_kind.value in {"dialogue", "narration"} for t in tracks):
+                raise ValueError("authored dialogue/narration must remain present in the final audio tracks")
+    if tracks or captions or voice_sources:
         spec = spec.model_copy(update={"schema_version": "2.3" if spec.schema_version == "2.3" else "2.1", "audio_tracks": tuple(tracks),
-            "caption_tracks": tuple(caption_tracks), "voice_sources": tuple(voice_sources)})
-    spec = seal_artifact(spec)
+            "caption_tracks": tuple(captions), "voice_sources": tuple(voice_sources)})
+    spec = CompositionSpec.model_validate(seal_artifact(spec).model_dump(mode="python"))
+    if strategy_specs:
+        from ai_video.production.production_strategy_reader import require_production_source_eligibility
+
+        require_production_source_eligibility(loaded, spec)
     return spec, resolve_composition(loaded, spec, renderer_version)

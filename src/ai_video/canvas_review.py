@@ -51,6 +51,7 @@ def canvas_cut_packet(*, loaded, timeline, direction):
     contract = canvas_cut_contract(direction)
     rows = {r["occurrence_id"]: r for r in direction["shots"]}
     assets = {a.asset_id: a for a in loaded.registry.assets}
+    shots = {shot.shot_id: shot for shot in loaded.shots}
     spans = {}
     for span in timeline.visual_spans:
         spans.setdefault((span.shot_id, span.asset_role), []).append(span)
@@ -59,8 +60,20 @@ def canvas_cut_packet(*, loaded, timeline, direction):
         evidence = {}
         for side, key in (("from", "from_occurrence_id"), ("to", "to_occurrence_id")):
             row = rows[authored[key]]
+            shot_id = row["shot"]["shot_id"]
             role = row.get("composition", {}).get("asset_role", "primary_visual")
-            pieces = sorted(spans[(row["shot"]["shot_id"], role)], key=lambda s: s.start_frame)
+            family = ()
+            source = None
+            if shot_id not in shots:
+                from ai_video.production.production_strategy_reader import production_parent_context
+                _, family, _, _ = production_parent_context(loaded, shot_id)
+                shot_id = family[-1] if side == "from" else family[0]
+                source = shots[shot_id].production_lineage.source
+                role = source.role if source is not None else "primary_visual"
+            pieces = sorted((span for span in spans.get((shot_id, role), ())
+                             if source is None or span.asset_id == source.asset_id), key=lambda s: s.start_frame)
+            if not pieces:
+                raise ValueError("cut evidence has no resolved visual for the selected occurrence boundary")
             first, last = pieces[0], pieces[-1]
             if (len({s.asset_id for s in pieces}) != 1 or any(
                     a.start_frame + a.duration_frames != b.start_frame for a, b in zip(pieces, pieces[1:]))):
@@ -78,6 +91,8 @@ def canvas_cut_packet(*, loaded, timeline, direction):
                 "audio_spans": [s.model_dump(mode="json") for s in timeline.audio_spans
                     if s.start_sample < last.start_sample + last.duration_samples
                     and s.start_sample + s.duration_samples > first.start_sample]}
+            if family:
+                evidence[side]["production_family_shot_ids"] = list(family)
         if evidence["from"]["start_frame"] + evidence["from"]["duration_frames"] != evidence["to"]["start_frame"]:
             raise ValueError("cut requirements differ from actual adjacent resolved spans")
         cuts.append({**authored, "evidence": evidence})

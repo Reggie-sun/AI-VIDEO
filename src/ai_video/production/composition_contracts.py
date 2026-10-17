@@ -233,18 +233,18 @@ class CompositionSpec(VersionedArtifact):
             mapped_audio_ids = {
                 track.track_id
                 for track in self.audio_tracks
-                if track.shot_id in mapped_shot_ids
+                if track.shot_id is None or track.shot_id in mapped_shot_ids
             }
             if mapped_audio_ids or any(
                 source.shot_id in mapped_shot_ids for source in self.voice_sources
             ) or any(
-                binding.shot_id in mapped_shot_ids
+                binding.shot_id is None or binding.shot_id in mapped_shot_ids
                 or binding.source_audio_track_id in mapped_audio_ids
                 for binding in self.caption_tracks
             ):
                 raise ValueError(
                     "Video time maps require an explicitly muted visual-only Shot; "
-                    "same-Shot audio, captions, and voice sources are unsupported"
+                    "same-Shot/global audio or captions, and same-Shot voice sources are unsupported"
                 )
         voice_ids = tuple(item.shot_id for item in self.voice_sources)
         if len(voice_ids) != len(set(voice_ids)) or not set(voice_ids) <= set(self.shot_ids):

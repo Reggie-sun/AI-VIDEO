@@ -390,8 +390,11 @@ def test_time_map_rejects_raster_layers_and_source_overrun(tmp_path):
         resolve_composition(loaded, mapped_overrun, renderer_version="0.7.103")
 
 
-@pytest.mark.parametrize("binding_kind", ["audio", "caption", "voice"])
-def test_retimed_shot_rejects_same_shot_audio_coupling(tmp_path, binding_kind):
+@pytest.mark.parametrize("binding_kind,shot_id", [
+    ("audio", "shot-2"), ("audio", None),
+    ("caption", "shot-2"), ("caption", None), ("voice", "shot-2"),
+])
+def test_retimed_shot_rejects_coupled_audio(tmp_path, binding_kind, shot_id):
     _loaded, spec = make_loaded_project_and_spec(tmp_path)
     layer = spec.layers[1].model_copy(
         update={"source_time_map": _time_map((0, 0), (60, 48))}
@@ -406,7 +409,8 @@ def test_retimed_shot_rejects_same_shot_audio_coupling(tmp_path, binding_kind):
                 track_id="shot-2-ambience",
                 audio_kind=AudioKind.AMBIENCE,
                 asset_id="missing-audio",
-                shot_id="shot-2",
+                shot_id=shot_id,
+                **({"start_sample": 0} if shot_id is None else {}),
             ),
         )
     elif binding_kind == "caption":
@@ -416,7 +420,7 @@ def test_retimed_shot_rejects_same_shot_audio_coupling(tmp_path, binding_kind):
                 binding_id="shot-2-captions",
                 caption_asset_id="missing-captions",
                 source_audio_track_id="missing-audio",
-                shot_id="shot-2",
+                shot_id=shot_id,
                 style_reference=CaptionStyleReference(
                     artifact_id="caption-style",
                     revision=1,

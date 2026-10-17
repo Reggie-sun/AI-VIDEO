@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 from pathlib import Path
 
@@ -27,6 +28,7 @@ from ai_video.production.models import (
     ToolIdentity,
     VideoAssetMetadata,
     GenerationEvaluationAuthority,
+    QaPolicyPointer,
 )
 from ai_video.production.production_strategy_contracts import (
     ProductionCandidate,
@@ -39,6 +41,7 @@ from ai_video.production.production_strategy_contracts import (
     ProductionUnit,
 )
 from ai_video.production.production_strategy_materialization import (
+    build_materialized_strategy_composition,
     build_strategy_composition,
     prepare_strategy_commit,
 )
@@ -205,6 +208,25 @@ def _materialized_loaded(loaded, request):
     return loaded.model_copy(update={"project": project, "storyboard": storyboard, "shots": shots})
 
 
+def _with_selected_policy(loaded):
+    policy = loaded.qa_policy
+    payload = policy.model_dump_json().encode()
+    relative_path = Path(f"state/reviews/policy.{policy.content_hash}.json")
+    path = loaded.root / relative_path
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_bytes(payload)
+    pointer = QaPolicyPointer(
+        path=relative_path,
+        policy_id=policy.policy_id,
+        policy_version=policy.policy_version,
+        content_hash=policy.content_hash,
+        file_sha256=hashlib.sha256(payload).hexdigest(),
+    )
+    return loaded.model_copy(update={
+        "manifest": loaded.manifest.model_copy(update={"active_qa_policy": pointer})
+    })
+
+
 def _loaded_with_mapped_video(tmp_path: Path, *, evidence_map: VideoTimeMap | None = None):
     loaded, _ = _loaded_with_intent(tmp_path, video_source_kind=AssetSourceKind.IMPORTED)
     parent = loaded.shots[0]
@@ -311,20 +333,27 @@ def test_materializes_exact_selected_coverage_with_content_addressed_children(tm
 
 def test_mapped_edit_materializes_exact_map_and_reopens_through_composition(tmp_path):
     loaded, time_map = _loaded_with_mapped_video(tmp_path)
+    loaded = _with_selected_policy(loaded)
     decision = ProductionStrategyResolver().resolve(loaded=loaded, parent_shot_id="shot-1")
     assert decision.disposition == "selected"
     assert decision.selected.units[0].operation is ProductionOperation.EDIT_EXISTING_VIDEO
 
     request = prepare_strategy_commit(loaded=loaded, decision=decision, attempt_id="mapped-edit")
     materialized = _materialized_loaded(loaded, request).model_copy(
-        update={"production_parents": (loaded.shots[0],)}
+        update={"production_parents": (loaded.shots[0],),
+                "production_allocation_policies": (loaded.qa_policy,)}
     )
     validate_production_lineage(materialized)
     spec = build_strategy_composition(loaded=materialized, decision=decision)
+    reopened_spec = build_materialized_strategy_composition(
+        loaded=materialized, family_shot_id="shot-1-reuse-1"
+    )
 
     assert spec.schema_version == "2.3"
     assert spec.layers[0].trim_duration_frames == 48
     assert spec.layers[0].source_time_map == time_map
+    assert reopened_spec.shot_ids == spec.shot_ids
+    assert reopened_spec.layers == spec.layers
 
     altered_layer = spec.layers[0].model_copy(update={"source_time_map": VideoTimeMap(
         points=(VideoTimePoint(source_frame=0, output_frame=0),
@@ -404,11 +433,19 @@ def test_rejects_old_or_tampered_selected_coverage(tmp_path):
 def test_pending_generation_cannot_be_composed_as_an_illegal_bound_role(tmp_path):
     loaded, decision = _loaded_with_intent(tmp_path, pending=True)
     request = prepare_strategy_commit(loaded=loaded, decision=decision, attempt_id="strategy-1")
-    materialized = _materialized_loaded(loaded, request)
+    materialized = _materialized_loaded(loaded, request).model_copy(
+        update={"production_parents": (loaded.shots[0],)}
+    )
 
     with pytest.raises(AiVideoError) as error:
         build_strategy_composition(loaded=materialized, decision=decision)
     assert error.value.code is ErrorCode.COMPOSITION_INVALID
+
+    with pytest.raises(AiVideoError, match="existing-source components") as reopened_error:
+        build_materialized_strategy_composition(
+            loaded=materialized, family_shot_id="shot-1-reuse-1"
+        )
+    assert reopened_error.value.code is ErrorCode.COMPOSITION_INVALID
 
 
 def test_allowed_split_preserves_ordered_duration_and_exact_parent_references(tmp_path):

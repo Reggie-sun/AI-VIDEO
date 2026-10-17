@@ -446,14 +446,19 @@ def _materialized_coverage(
     return coverage, selected_units
 
 
-def build_strategy_composition(
+def _build_strategy_composition(
     *,
     loaded: LoadedProductionProject,
-    decision: ProductionStrategyDecision,
+    parent_shot_id: str,
+    parent_shot_content_hash: str,
+    task_id: str,
+    allocation_hash: str,
+    decision_hash: str,
+    coverage: ProductionCoverage,
+    selected_units: tuple[ProductionSelectedUnit, ...],
     composition_id: str = "production-strategy",
 ) -> CompositionSpec:
-    """Build P3 inputs for already materialized, completed visual components."""
-    coverage, selected_units = _materialized_coverage(loaded=loaded, decision=decision)
+    """Build P3 layers from one validated selected family."""
     shots_by_id = {item.shot_id: item for item in loaded.shots}
     layers: list[CompositionLayerSpec] = []
     for selected in selected_units:
@@ -463,13 +468,13 @@ def build_strategy_composition(
             raise _composition_invalid("Materialized production strategy child Shot is missing.")
         lineage = child.production_lineage
         if (
-            lineage.parent_shot_id != decision.parent_shot_id
-            or lineage.parent.content_hash != decision.parent_shot_content_hash
-            or lineage.task_id != decision.task_id
+            lineage.parent_shot_id != parent_shot_id
+            or lineage.parent.content_hash != parent_shot_content_hash
+            or lineage.task_id != task_id
             or lineage.coverage_id != coverage.coverage_id
             or lineage.component_id != unit.component_id
-            or lineage.allocation_hash != decision.selected.allocation_hash  # type: ignore[union-attr]
-            or lineage.decision_hash != decision.decision_hash
+            or lineage.allocation_hash != allocation_hash
+            or lineage.decision_hash != decision_hash
             or lineage.operation != selected.operation
             or lineage.source != selected.source
         ):
@@ -516,9 +521,9 @@ def build_strategy_composition(
         artifact_id=f"composition-{composition_id}",
         revision=1,
         content_hash="0" * 64,
-        creation_receipt_id=decision.decision_hash,
+        creation_receipt_id=decision_hash,
         source_provenance=(
-            SourceReference(kind="derived", reference="production-strategy", content_hash=decision.decision_hash),
+            SourceReference(kind="derived", reference="production-strategy", content_hash=decision_hash),
         ),
         schema_version=("2.3" if any(layer.source_time_map is not None for layer in layers) else "2.1"),
         composition_id=composition_id,
@@ -529,3 +534,99 @@ def build_strategy_composition(
         audio_tracks=coverage.audio and tuple(item.track for item in coverage.audio) or (),
         caption_tracks=coverage.captions,
     ))
+
+
+def build_strategy_composition(
+    *,
+    loaded: LoadedProductionProject,
+    decision: ProductionStrategyDecision,
+    composition_id: str = "production-strategy",
+) -> CompositionSpec:
+    """Build P3 inputs for a previously selected and materialized decision."""
+    coverage, selected_units = _materialized_coverage(loaded=loaded, decision=decision)
+    return _build_strategy_composition(
+        loaded=loaded,
+        parent_shot_id=decision.parent_shot_id,
+        parent_shot_content_hash=decision.parent_shot_content_hash,
+        task_id=decision.task_id,
+        allocation_hash=decision.selected.allocation_hash,  # type: ignore[union-attr]
+        decision_hash=decision.decision_hash,
+        coverage=coverage,
+        selected_units=selected_units,
+        composition_id=composition_id,
+    )
+
+
+def build_materialized_strategy_composition(
+    *,
+    loaded: LoadedProductionProject,
+    family_shot_id: str,
+    composition_id: str = "production-strategy",
+) -> CompositionSpec:
+    """Reopen and compose a qualified existing-source family without its transient decision."""
+    from ai_video.production.production_strategy_reader import (
+        production_parent_context,
+        require_production_source_eligibility,
+    )
+
+    parent, family_ids, _, _ = production_parent_context(loaded, family_shot_id)
+    if parent.production_intent is None:
+        raise _composition_invalid("Materialized production family does not reopen its authored parent.")
+    family_id_set = set(family_ids)
+    children = tuple(
+        shot for shot in loaded.shots
+        if shot.shot_id in family_id_set and shot.production_lineage is not None
+    )
+    if not children:
+        raise _composition_invalid("Materialized production family has no current children.")
+    lineages = tuple(shot.production_lineage for shot in children)
+    identity = {
+        (
+            item.parent.artifact_id,
+            item.parent.revision,
+            item.parent.content_hash,
+            item.origin_project_hash,
+            item.parent_shot_id,
+            item.task_id,
+            item.coverage_id,
+            item.allocation_hash,
+            item.decision_hash,
+        )
+        for item in lineages
+    }
+    if len(identity) != 1:
+        raise _composition_invalid("Materialized production family mixes selected decisions or coverages.")
+    lineage = lineages[0]
+    coverage_matches = tuple(
+        coverage for coverage in parent.production_intent.coverage_options
+        if coverage.coverage_id == lineage.coverage_id
+    )
+    if len(coverage_matches) != 1:
+        raise _composition_invalid("Materialized production family coverage is not current authoring.")
+    coverage = coverage_matches[0]
+    by_component = {item.component_id: item for item in lineages}
+    if len(by_component) != len(lineages) or set(by_component) != {unit.component_id for unit in coverage.units}:
+        raise _composition_invalid("Materialized production family is incomplete or duplicates a component.")
+    selected_units = []
+    for unit in coverage.units:
+        selected_lineage = by_component[unit.component_id]
+        if selected_lineage.source is None:
+            raise _composition_invalid("Canvas continuation requires completed existing-source components.")
+        selected_units.append(ProductionSelectedUnit(
+            component=unit,
+            operation=selected_lineage.operation,
+            source=selected_lineage.source,
+        ))
+    spec = _build_strategy_composition(
+        loaded=loaded,
+        parent_shot_id=parent.shot_id,
+        parent_shot_content_hash=parent.content_hash,
+        task_id=lineage.task_id,
+        allocation_hash=lineage.allocation_hash,
+        decision_hash=lineage.decision_hash,
+        coverage=coverage,
+        selected_units=tuple(selected_units),
+        composition_id=composition_id,
+    )
+    require_production_source_eligibility(loaded, spec, family_shot_id=children[0].shot_id)
+    return spec

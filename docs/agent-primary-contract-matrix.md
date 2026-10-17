@@ -358,6 +358,8 @@ Application caller `production_planning.py::ProductionPlanningService` 使用 st
 默认policy `production-strategy/2` 在qualified_reuse下对更少生成次数、仅缺用途评估的候选先返回
 evidence_required；明确FAIL与NOT_EVALUATED区分。显式 `/1` 保持旧fallback，任一版本均不授权POST。
 Canvas仅薄接prepare/materialize/composition；闭合质量修复先回此owner，缺intent明确停止并补authoring。
+材料化source-backed族由原materialization builder按validated lineage及当前source-use资格重开P3，
+Canvas标准compose/render与cut evidence消费此结果；不伪造原Decision、不拼接第二timeline，动态组件仍归原generation owner。
 
 `production_strategy_contracts.py` 只保存 immutable authoring/handoff；`domain_acceptance.py` 的
 `ProductionRequirementAllocation` 与 QA-owned `source_use_evidence.py` 分别拥有组件验收分配和

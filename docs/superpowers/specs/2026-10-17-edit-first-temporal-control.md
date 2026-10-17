@@ -19,6 +19,7 @@ Canvas质量修复直接进入generation-only feedback。P3契约仅trim、强�
 - 首个范围只支持显式muted视觉变速。源声音保留/口型同步、同Shot音轨/字幕/voice source不能静默沿用，缺样本级映射时明确拒绝。独立声音及所有最终要求继续由原P4/QA拥有。
 - 用途证据绑定exact time map、bytes/window/role/transform及原要求；未变速PASS不能资格化变速用途。原始生成失败不被改写为PASS，编辑成片仍须新证据及最终验收。
 - Canvas暴露现有ProductionPlanningService的薄prepare/materialize入口；闭合quality失败的再次生成先过上层重评，缺ProductionIntent返回明确authoring缺口。known-no-effect、unsubmitted、runtime recovery和unknown边界保留。
+- 材料化后的source-backed族从已验证lineage和当前用途资格重开CompositionSpec，续接标准Canvas position/compose/render；不反造未持久化的原Decision或hash。与普通镜头合并后核验完整P4，外部occurrence剪辑边界从实际首/末子镜的ResolvedTimeline取证。首版不自动推进仍需原generation owner处理的动态组件；unknown优先STOP。
 - 已失败MP4进入编辑候选须保留可重开的原request/fetch/rejection与qualification状态，不通过普通导入隐藏已知失败；开发preview与Production qualification分开。
 
 ## Acceptance And Limits

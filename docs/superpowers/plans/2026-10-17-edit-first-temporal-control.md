@@ -27,3 +27,9 @@
 
 源码稳定后运行owned exact snapshot适用Harness；按SUBAGENTS Risk Gate处理用途证据/准入的独立审查需求，修复确认finding。
 记录工程证明、编辑预览与未验质量，评估record/learning；仅owned paths commit/push main并核验remote SHA，foreign index/dirty保持。
+
+## Verified Progress
+
+分段源帧映射、exact用途证据、上层编辑优先及静音开发预览已实现；实际pinned导出11/11抽样帧匹配，机器人原4秒姿势映射到3.5秒样帧，新增Provider POST0，完整质量与human仍NE。
+基线Harness r2为21 PASS/1 covered SKIP；旧格式None trim兼容增量r3为7 PASS，分别在其exact源码点核验fresh完整证明。
+首次native reviewer_xhigh在8470611发现EF-001完整P4校验遗漏与EF-002材料化后Canvas续接缺口；Parent确认并修复，补公开compose/render、正反切点及未知结果STOP用例。当前等待修复快照适用Harness及同一reviewer复审；尚未发布，不把离线证明当Production验收。

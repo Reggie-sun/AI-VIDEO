@@ -105,6 +105,49 @@ def submit_and_fetch(service, provider, limits, authorizations):
     return position
 
 
+def _strategy_canvas_with_explicit_ordinary_layers(
+    root, *, generation_only=False, reverse_composition_order=False,
+):
+    from ai_video.canvas_authoring import direction_reference
+    from ai_video.production.hashing import seal_artifact
+    from ai_video.production.project import load_production_project
+    from ai_video.production.state_commit import prepare_project_registry_commit
+    from production_strategy_factory import make_persisted_strategy_fixture
+
+    fixture = make_persisted_strategy_fixture(root, generation_only=generation_only)
+    loaded = load_production_project(root / "project.yaml")
+    packet_data = {"fixture": "canvas-strategy"}
+    direction_data = {"project_id": loaded.project.project_id, "shots": []}
+    for beat in loaded.storyboard.beats:
+        for shot_id in beat.shot_ids:
+            row = {"occurrence_id": shot_id, "shot": {"shot_id": shot_id}}
+            shot = next(item for item in loaded.shots if item.shot_id == shot_id)
+            if shot_id != fixture.parent_shot_id:
+                role = next(item for item in shot.required_asset_roles if item.asset_ids)
+                row["composition"] = {"asset_role": role.role, "asset_id": role.asset_ids[0]}
+            direction_data["shots"].append(row)
+    if reverse_composition_order:
+        direction_data["composition_order"] = [
+            row["occurrence_id"] for row in reversed(direction_data["shots"])
+        ]
+    project = seal_artifact(loaded.project.model_copy(update={
+        "revision": loaded.project.revision + 1,
+        "content_hash": "0" * 64,
+        "source_provenance": (*loaded.project.source_provenance,
+            direction_reference(packet_data, direction_data)),
+    }))
+    request = prepare_project_registry_commit(manifest=loaded.manifest, project=project,
+        registry=loaded.registry, attempt_id="canvas-binding")
+    from ai_video.production.production_strategy_dependency import prepare_strategy_dependency_transition
+
+    request = prepare_strategy_dependency_transition(base_loaded=loaded,
+        candidate_loaded=loaded.model_copy(update={"project": project}), request=request)
+    fixture.committer.commit(request)
+    service = CanvasProductionService(committer=fixture.committer, packet=packet_data,
+        direction=direction_data, targets=())
+    return fixture, service
+
+
 def test_shared_flow_requires_explicit_gate_and_resumes_without_resubmit(tmp_path):
     service, provider, limits, auth = runtime(tmp_path)
     assert service.position().next_action == "prepare"
@@ -290,3 +333,125 @@ def test_native_audio_registration_uses_exact_accepted_video_and_replays(tmp_pat
     assert service.register_native_audio(**args) == registered
     assert service._load().manifest.manifest_revision == before
     assert provider.call_counts.submit == 1
+
+
+def test_materialized_existing_source_continues_through_canvas_compose_and_render(tmp_path, monkeypatch):
+    fixture, service = _strategy_canvas_with_explicit_ordinary_layers(tmp_path)
+    decision = service.prepare_production(parent_shot_id=fixture.parent_shot_id)
+    assert decision.selected is not None and decision.selected.new_generation_count == 0
+    service.materialize_production(decision=decision, attempt_id="canvas-existing-source")
+
+    position = service.position()
+    assert position.next_action == "compose"
+
+    spec, timeline = service.compose()
+    selected = decision.selected.units[0].source
+    loaded = service._load()
+    ordinary = next(item for item in loaded.shots if item.shot_id == "shot-2")
+    ordinary_asset_id = ordinary.required_asset_roles[0].asset_ids[0]
+    assert spec.shot_ids == (fixture.child_shot_id, "shot-2")
+    assert [(layer.asset_id, layer.trim_start_frame, layer.trim_duration_frames, layer.source_time_map)
+            for layer in spec.layers] == [
+                (selected.asset_id, selected.start, selected.duration, None),
+                (ordinary_asset_id, 0, None, None),
+            ]
+    assert [span.asset_id for span in timeline.visual_spans] == [selected.asset_id, ordinary_asset_id]
+    assert [(track.track_id, track.shot_id) for track in spec.audio_tracks] == [
+        ("strategy-dialogue", fixture.child_shot_id)]
+    assert [(caption.binding_id, caption.shot_id) for caption in spec.caption_tracks] == [
+        ("strategy-caption", fixture.child_shot_id)]
+
+    import ai_video.production.hyperframes as hyperframes
+
+    observed = {}
+    result = object()
+
+    def render_owner(**kwargs):
+        observed.update(kwargs)
+        return result
+
+    monkeypatch.setattr(hyperframes, "render_with_hyperframes", render_owner)
+    from ai_video.production.captions import caption_style_fingerprint
+
+    style = spec.caption_tracks[0].style_reference
+    style_payload = (loaded.root / style.path).read_bytes()
+    style_fingerprints = ((style.artifact_id, caption_style_fingerprint(style, style_payload)),)
+    assert service.render(attempt_id="canvas-existing-render", toolchain={},
+                          caption_style_fingerprints=style_fingerprints) is result
+    assert observed["timeline"] == timeline
+    assert set(observed["asset_sources"]) == {
+        selected.asset_id, ordinary_asset_id, "voice-dialogue", "caption-asset-1", "caption-style-1"
+    }
+    assert not any(attempt.video_generation_state for attempt in service._load().manifest.attempts)
+
+
+def test_materialized_family_keeps_authored_custom_order_with_ordinary_rows(tmp_path):
+    fixture, service = _strategy_canvas_with_explicit_ordinary_layers(
+        tmp_path, reverse_composition_order=True
+    )
+    decision = service.prepare_production(parent_shot_id=fixture.parent_shot_id)
+    service.materialize_production(decision=decision, attempt_id="canvas-custom-order")
+
+    spec, timeline = service.compose()
+
+    assert spec.shot_ids == ("shot-2", fixture.child_shot_id)
+    assert tuple(span.shot_id for span in timeline.visual_spans) == spec.shot_ids
+    assert [(track.track_id, track.shot_id) for track in spec.audio_tracks] == [
+        ("strategy-dialogue", fixture.child_shot_id)
+    ]
+    assert [(caption.binding_id, caption.shot_id) for caption in spec.caption_tracks] == [
+        ("strategy-caption", fixture.child_shot_id)
+    ]
+
+
+def test_materialized_pending_generation_does_not_advance_to_canvas_generation(tmp_path, monkeypatch):
+    from ai_video.planning.production_strategy import ProductionCapabilities, ProductionStrategyPolicy
+    from ai_video.production_planning import ProductionPlanningService
+
+    fixture, service = _strategy_canvas_with_explicit_ordinary_layers(tmp_path, generation_only=True)
+    service.production_policy = ProductionStrategyPolicy(allow_generation_exploration=True)
+    monkeypatch.setattr(ProductionPlanningService, "_capabilities",
+                        lambda self: ProductionCapabilities(generation_available=True))
+    decision = service.prepare_production(parent_shot_id=fixture.parent_shot_id)
+    assert decision.selected is not None and decision.selected.new_generation_count == 1
+    service.materialize_production(decision=decision, attempt_id="canvas-pending-generation")
+
+    position = service.position()
+
+    assert position.next_action == "prepare_production"
+    assert not any(attempt.video_generation_state for attempt in service._load().manifest.attempts)
+
+    from types import SimpleNamespace
+    unknown = SimpleNamespace(status=SimpleNamespace(value="outcome_unknown"), attempt_id="pending-unknown")
+    monkeypatch.setattr(service, "_attempts", lambda loaded, shot_id:
+                        [unknown] if shot_id == fixture.child_shot_id else [])
+    assert service.position().next_action == "stop"
+
+
+def test_materialized_existing_source_position_stops_on_unknown_and_blocks_unqualified(tmp_path, monkeypatch):
+    fixture, service = _strategy_canvas_with_explicit_ordinary_layers(tmp_path)
+    decision = service.prepare_production(parent_shot_id=fixture.parent_shot_id)
+    service.materialize_production(decision=decision, attempt_id="canvas-qualified-source")
+
+    from types import SimpleNamespace
+
+    unknown = SimpleNamespace(status=SimpleNamespace(value="outcome_unknown"),
+                              attempt_id="unknown-attempt")
+    monkeypatch.setattr(service, "_attempts", lambda loaded, shot_id:
+                        [unknown] if shot_id == fixture.child_shot_id else [])
+    position = service.position()
+    assert position.next_action == "stop"
+    assert position.attempt_id == "unknown-attempt"
+
+    monkeypatch.undo()
+    actual_load = service._load
+
+    def without_current_policy():
+        loaded = actual_load()
+        return loaded.model_copy(update={
+            "manifest": loaded.manifest.model_copy(update={"active_qa_policy": None})
+        })
+
+    monkeypatch.setattr(service, "_load", without_current_policy)
+    position = service.position()
+    assert position.next_action == "prepare_production"

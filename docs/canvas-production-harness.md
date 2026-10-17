@@ -202,6 +202,10 @@ compiler 失败时仍保留 selected candidate 的目标和失败 ID，片段标
 更少生成次数、且仅缺用途证据的候选；明确FAIL可排除，但不会授权生成。显式旧policy `/1` 仅供兼容。
 闭合质量失败的 `prepare_repair/start_repair` 返回上层重评；缺ProductionIntent会明确要求补authoring，
 不会直接再生成。未提交关闭、known-no-effect、runtime retarget及unknown恢复仍归原owner。
+材料化后，已取得当前用途资格的source-backed组件由原materialization builder重开lineage，接回标准
+`position` → `compose/render`，并保留普通镜头及approved composition order；不重造原Decision/hash。
+未完成的动态组件仍回原ProductionPlanningService，unknown优先STOP。最终完整P4重新校验，
+`cut_packet`按实际首/末子镜的resolved spans描述原occurrence外部切点，不复制帧或样本推导。
 
 `ProductionSourceOption.source_time_map`、`SourceUseEvidence.source_time_map` 和
 `CompositionLayerSpec.source_time_map` 共用 `video-time-map/1`：相对所选trim的整数锚点
