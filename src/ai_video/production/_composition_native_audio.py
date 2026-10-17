@@ -82,6 +82,7 @@ def resolve_native_audio_spans(
     project: LoadedProductionProject,
     spec: CompositionSpec,
     *,
+    shot_start_frames: dict[str, int],
     shot_start_samples: dict[str, int],
     sample_at_frame: Callable[..., int],
     invalid: Callable[..., AiVideoError],
@@ -115,6 +116,8 @@ def resolve_native_audio_spans(
             asset.video_metadata.fps_numerator,
             asset.video_metadata.fps_denominator,
         )
+        shot_frame_start = shot_start_frames[layer.shot_id]
+        shot_sample_start = shot_start_samples[layer.shot_id]
         segments: list[AudioTimeSegment] = []
         for left, right in zip(mapping.points, mapping.points[1:]):
             source_start = sample_at_frame(
@@ -128,15 +131,15 @@ def resolve_native_audio_spans(
                 sample_rate=spec.sample_rate,
             )
             output_start = sample_at_frame(
-                left.output_frame,
+                shot_frame_start + left.output_frame,
                 fps=spec.delivery_profile.fps,
                 sample_rate=spec.sample_rate,
-            )
+            ) - shot_sample_start
             output_end = sample_at_frame(
-                right.output_frame,
+                shot_frame_start + right.output_frame,
                 fps=spec.delivery_profile.fps,
                 sample_rate=spec.sample_rate,
-            )
+            ) - shot_sample_start
             if source_end <= source_start or output_end <= output_start:
                 raise invalid(f"Mapped layer {layer.layer_id} resolves an empty audio segment.")
             segments.append(

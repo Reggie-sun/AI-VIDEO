@@ -745,6 +745,7 @@ def _resolve_composition(
     native_audio_spans = resolve_native_audio_spans(
         project,
         spec,
+        shot_start_frames=shot_start_frames,
         shot_start_samples=shot_start_samples,
         sample_at_frame=_sample_at_frame,
         invalid=_audio_invalid,

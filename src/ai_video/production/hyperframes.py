@@ -22,7 +22,11 @@ from ai_video.production._hyperframes_source import (
     render_source as _source_render_source,
     seconds as _seconds,
 )
-from ai_video.production._hyperframes_native_audio import derive_native_audio_pcm
+from ai_video.production._hyperframes_native_audio import (
+    derive_native_audio_pcm,
+    native_audio_video_snapshots,
+    validate_native_audio_video_streams,
+)
 from ai_video.production._hyperframes_audio import (
     _MAX_GAIN_MILLIDB as _MAX_GAIN_MILLIDB,
     _MIN_GAIN_MILLIDB as _MIN_GAIN_MILLIDB,
@@ -788,44 +792,11 @@ def _materialize_hyperframes_source(
         )
     bindings = tuple(bindings_by_id[key] for key in sorted(bindings_by_id))
 
-    native_video_snapshots: dict[str, NoFollowFile] = {}
-    for span in native_audio_spans:
-        mapping = span.native_audio_retime
-        assert mapping is not None
-        visual_matches = tuple(
-            item for item in timeline.visual_spans if item.layer_id == mapping.visual_layer_id
-        )
-        if (
-            len(visual_matches) != 1
-            or visual_matches[0].asset_id != span.asset_id
-            or visual_matches[0].asset_sha256 != span.asset_sha256
-            or visual_matches[0].asset_mime_type != "video/mp4"
-            or span.audio_kind.value != "native_video"
-            or sum(item.output_duration_samples for item in mapping.segments)
-            != span.duration_samples
-        ):
-            raise _source_invalid(
-                "Native audio retime does not match its exact visual source and duration."
-            )
-        if span.asset_id in native_video_snapshots:
-            continue
-        source_path = Path(asset_sources[span.asset_id])
-        snapshot = _read_regular_file_nofollow(
-            source_path, contained_by=allowed_asset_root
-        )
-        suffix = _validated_visual_suffix(
-            snapshot,
-            suffix=source_path.suffix,
-            mime_type="video/mp4",
-        )
-        if (
-            suffix != ".mp4"
-            or snapshot.file_sha256 != span.asset_sha256
-            or Path("assets") / f"{span.asset_sha256}{suffix}"
-            != visual_matches[0].materialized_path
-        ):
-            raise _source_invalid("Native audio video snapshot identity is invalid.")
-        native_video_snapshots[span.asset_id] = snapshot
+    native_video_snapshots = native_audio_video_snapshots(
+        timeline,
+        asset_sources=asset_sources,
+        allowed_asset_root=allowed_asset_root,
+    )
 
     audio_snapshots: dict[str, NoFollowFile] = {}
     for asset_id in sorted(audio_ids):
@@ -1216,6 +1187,26 @@ def _render_with_hyperframes(
         raise _renderer_unavailable(
             "Native video audio requires explicit ffmpeg and ffprobe paths."
         )
+    native_audio_spans = tuple(
+        item for item in timeline.audio_spans if item.native_audio_retime is not None
+    )
+    if native_audio_spans:
+        manifest = committer._read_manifest()
+        existing_attempt = any(
+            item.attempt_id == begin_request.renderer_selection.attempt_id
+            for item in manifest.attempts
+        )
+        if not existing_attempt:
+            native_video_snapshots = native_audio_video_snapshots(
+                timeline,
+                asset_sources=asset_sources,
+                allowed_asset_root=allowed_asset_root,
+            )
+            validate_native_audio_video_streams(
+                native_video_snapshots,
+                sample_rate_hz=timeline.sample_rate,
+                ffprobe_path=native_audio_ffprobe_path,
+            )
     manifest, fresh = committer._begin_render_attempt_with_status(begin_request)
     if not fresh:
         return committer._replay_render_attempt(begin_request, manifest)

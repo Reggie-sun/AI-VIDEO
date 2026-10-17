@@ -34,4 +34,8 @@ repair v2/v3先于普通IMPORTED分支的准入边界；不增加另一种导入
 
 ## Completion
 
+round3独立审查确认NA-001公开render缺轨/双轨在begin后才失败、NA-002非整除采样率下相对取整偏差。
+必要修复沿共享held-source预检与既有global shot_start_frames；先RED再GREEN，适用Harness后只增加
+一次同profile round4完整复审，保留已执行三轮及finding历史，不自动增加第五轮。
+
 更新原edit-first/robot进度与必要supersession，record/learning评估；工程能力、单源A/V preview、完整QA、Production/human分别报告。实现困难不构成结束理由；真实授权、unknown或不可取得的验收证据缺口才报告最小恢复条件。

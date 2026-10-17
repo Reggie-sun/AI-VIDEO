@@ -5,6 +5,7 @@ import json
 import os
 import stat
 import subprocess
+from collections.abc import Mapping
 from contextlib import ExitStack
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from fractions import Fraction
@@ -18,7 +19,13 @@ from ai_video.production.audio_retime_contracts import (
     NativeAudioRetime,
     native_audio_mapping_sha256 as native_audio_mapping_sha256,
 )
-from ai_video.production.paths import NoFollowFile, _open_regular_file_nofollow
+from ai_video.production.composition import _validated_visual_suffix
+from ai_video.production.models import ResolvedTimeline
+from ai_video.production.paths import (
+    NoFollowFile,
+    _open_regular_file_nofollow,
+    _read_regular_file_nofollow,
+)
 
 
 _PCM16_STEREO_FRAME_BYTES = 4
@@ -223,6 +230,86 @@ def _probe_source(
             "Native video source stream identity is invalid.", str(exc)
         ) from exc
     return audio_start_sample
+
+
+def native_audio_video_snapshots(
+    timeline: ResolvedTimeline,
+    *,
+    asset_sources: Mapping[str, Path],
+    allowed_asset_root: Path,
+) -> dict[str, NoFollowFile]:
+    """Read and validate the exact visual sources used by native audio spans."""
+
+    native_spans = tuple(
+        item for item in timeline.audio_spans if item.native_audio_retime is not None
+    )
+    snapshots: dict[str, NoFollowFile] = {}
+    for span in native_spans:
+        mapping = span.native_audio_retime
+        assert mapping is not None
+        visual_matches = tuple(
+            item
+            for item in timeline.visual_spans
+            if item.layer_id == mapping.visual_layer_id
+        )
+        if (
+            len(visual_matches) != 1
+            or visual_matches[0].asset_id != span.asset_id
+            or visual_matches[0].asset_sha256 != span.asset_sha256
+            or visual_matches[0].asset_mime_type != "video/mp4"
+            or span.audio_kind.value != "native_video"
+            or sum(item.output_duration_samples for item in mapping.segments)
+            != span.duration_samples
+        ):
+            raise _source_invalid(
+                "Native audio retime does not match its exact visual source and duration."
+            )
+        if span.asset_id in snapshots:
+            continue
+        try:
+            source_path = Path(asset_sources[span.asset_id])
+            snapshot = _read_regular_file_nofollow(
+                source_path, contained_by=allowed_asset_root
+            )
+            suffix = _validated_visual_suffix(
+                snapshot,
+                suffix=source_path.suffix,
+                mime_type="video/mp4",
+            )
+        except (AiVideoError, KeyError, OSError, ValueError) as exc:
+            raise _source_invalid(
+                "Native audio video snapshot identity is invalid.", str(exc)
+            ) from exc
+        if (
+            suffix != ".mp4"
+            or snapshot.file_sha256 != span.asset_sha256
+            or Path("assets") / f"{span.asset_sha256}{suffix}"
+            != visual_matches[0].materialized_path
+        ):
+            raise _source_invalid("Native audio video snapshot identity is invalid.")
+        snapshots[span.asset_id] = snapshot
+    return snapshots
+
+
+def validate_native_audio_video_streams(
+    snapshots: Mapping[str, NoFollowFile],
+    *,
+    sample_rate_hz: int,
+    ffprobe_path: Path | None,
+) -> None:
+    """Validate unique audio-stream identity without decoding or rendering media."""
+
+    if not snapshots:
+        return
+    with ExitStack() as stack:
+        ffprobe_descriptor, _ = _open_tool(stack, ffprobe_path, "ffprobe")
+        for snapshot in snapshots.values():
+            source_descriptor = _held_source_snapshot(snapshot, stack)
+            _probe_source(
+                ffprobe_descriptor,
+                source_descriptor,
+                sample_rate_hz=sample_rate_hz,
+            )
 
 
 def _decimal_timestamp(value: object) -> Decimal:

@@ -100,6 +100,21 @@ def _materialize(service, loaded, project_root, *, ffmpeg, ffprobe):
     return timeline, materialized
 
 
+def _renderer_toolchain(tmp_path, *, ffmpeg, ffprobe):
+    from test_canvas_render import _executable
+
+    tool_root = tmp_path / "renderer-tools"
+    return {
+        "binary_path": tool_root / "node_modules/.bin/hyperframes",
+        "browser_path": _executable(tool_root / "chrome"),
+        "unshare_path": _executable(tool_root / "unshare"),
+        "ip_path": _executable(tool_root / "ip"),
+        "bash_path": _executable(tool_root / "bash"),
+        "ffmpeg_path": ffmpeg,
+        "ffprobe_path": ffprobe,
+    }
+
+
 def test_canvas_imported_video_reuses_distinct_native_audio_maps(tmp_path):
     service, loaded, video, project_root, ffmpeg, ffprobe = _author_imported_video(
         tmp_path, with_audio=True
@@ -182,6 +197,96 @@ def test_canvas_imported_video_without_unique_audio_fails_without_state_change(
 
     assert caught.value.code is ErrorCode.RENDERER_SOURCE_INVALID
     assert manifest_path.read_bytes() == before
+
+
+@pytest.mark.parametrize(
+    ("with_audio", "extra_audio"),
+    [(False, False), (True, True)],
+    ids=["missing-audio", "multiple-audio"],
+)
+def test_canvas_render_rejects_nonunique_native_audio_before_begin(
+    tmp_path,
+    monkeypatch,
+    with_audio,
+    extra_audio,
+):
+    from ai_video.production import hyperframes
+    from test_production_hyperframes import FakeRunner
+
+    service, _loaded, _video, project_root, ffmpeg, ffprobe = _author_imported_video(
+        tmp_path, with_audio=with_audio, extra_audio=extra_audio
+    )
+    manifest_path = project_root / "state" / "manifest.json"
+    before = manifest_path.read_bytes()
+    runner_factory_calls = []
+    runner = FakeRunner()
+
+    def runner_factory(**_kwargs):
+        runner_factory_calls.append(True)
+        return runner
+
+    monkeypatch.setattr(
+        hyperframes, "_NetworkIsolatedHyperFramesRunner", runner_factory
+    )
+    toolchain = _renderer_toolchain(tmp_path, ffmpeg=ffmpeg, ffprobe=ffprobe)
+
+    with pytest.raises(AiVideoError) as caught:
+        service.render(
+            attempt_id="invalid-imported-native-audio-render",
+            toolchain=toolchain,
+        )
+
+    assert caught.value.code is ErrorCode.RENDERER_SOURCE_INVALID
+    assert manifest_path.read_bytes() == before
+    assert runner_factory_calls == []
+
+
+def test_canvas_native_audio_failed_render_replay_skips_stream_probe(
+    tmp_path,
+    monkeypatch,
+):
+    from ai_video.production import hyperframes
+    from ai_video.production import _hyperframes_native_audio as native_audio
+    from test_production_hyperframes import FakeRunner
+
+    service, _loaded, _video, project_root, ffmpeg, ffprobe = _author_imported_video(
+        tmp_path, with_audio=True
+    )
+    runner = FakeRunner(fail_at="doctor")
+    runner_factory_calls = []
+
+    def runner_factory(**_kwargs):
+        runner_factory_calls.append(True)
+        return runner
+
+    monkeypatch.setattr(
+        hyperframes, "_NetworkIsolatedHyperFramesRunner", runner_factory
+    )
+    original_probe = native_audio._probe_source
+    probe_calls = []
+
+    def count_probe(*args, **kwargs):
+        probe_calls.append(True)
+        return original_probe(*args, **kwargs)
+
+    monkeypatch.setattr(native_audio, "_probe_source", count_probe)
+    toolchain = _renderer_toolchain(tmp_path, ffmpeg=ffmpeg, ffprobe=ffprobe)
+    attempt_id = "native-audio-failed-render-replay"
+    with pytest.raises(AiVideoError):
+        service.render(attempt_id=attempt_id, toolchain=toolchain)
+
+    failed = service._load().manifest
+    manifest_path = project_root / "state" / "manifest.json"
+    before_replay = manifest_path.read_bytes()
+    assert len(probe_calls) == 1
+    assert runner_factory_calls == [True]
+
+    replayed = service.render(attempt_id=attempt_id, toolchain=toolchain)
+
+    assert replayed == failed
+    assert manifest_path.read_bytes() == before_replay
+    assert len(probe_calls) == 1
+    assert runner_factory_calls == [True]
 
 
 @pytest.mark.parametrize("capture_version", [2, 3])

@@ -221,7 +221,9 @@ Canvas composition使用上述V1时必须显式 `muted:true`。保留原声采�
 `CompositionSpec/ResolvedTimeline 2.4`：resolver从同一VIDEO身份和同一帧映射派生
 sample segments及内部 `native_video` P4 span；不另注册WAV、不把原生整轨冒充单独对白或环境声。
 generated/captured源重开exact probe；普通imported源使用Registry实测metadata，不伪造generation probe。
-普通导入的音轨存在性/唯一性到materializer读取held MP4时才核验，compose成功不证明已取得可用声音。
+compose只解析预期音轨；新native render在begin前对held MP4预检音轨存在性/唯一性，缺轨/多轨不写attempt，
+materializer仍重读并验证exact bytes。已有attempt沿canonical replay且不重复预检，compose成功不证明已取得可用声音。
+输出sample区间使用全局帧锚点减Shot起始sample，与画面共用取整边界。
 源必须只有一条音轨、视频时间原点为零；正向音频起始偏移保留为空白，前置音频或不能可靠对齐时拒绝。
 原声经显式注入的FFmpeg/ffprobe处理，逐段保音高变速；每段尾部补齐/裁切最多一个输出帧的samples，
 proof记录输入/输出PCM、source/map/tool hashes及修正量，超界拒绝。画面仍沿原帧窗口解析，

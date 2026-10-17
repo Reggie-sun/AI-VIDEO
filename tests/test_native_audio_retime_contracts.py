@@ -215,6 +215,48 @@ def test_native_audio_retime_uses_absolute_trimmed_source_samples_and_shot_offse
         )
 
 
+@pytest.mark.parametrize("shot_frames", [1, 3])
+def test_native_audio_uses_global_sample_boundaries_after_fractional_frame(
+    tmp_path, shot_frames,
+):
+    from ai_video.production.composition import resolve_composition
+    from ai_video.production.composition_contracts import AudioKind
+    from production_project_factory import make_composition_spec, write_and_load_two_shot_project
+    from test_production_video_retime import _reseal, _with_map, _with_video_layer
+
+    loaded = write_and_load_two_shot_project(
+        tmp_path, seconds=(shot_frames / 24, shot_frames / 24), fps=24,
+    )
+    spec = _reseal(make_composition_spec(sample_rate=44_100),
+                   delivery_profile=loaded.project.delivery_profile)
+    loaded, spec = _with_video_layer(
+        tmp_path, loaded, spec, shot_index=1, trim_start_frame=0,
+        trim_duration_frames=shot_frames, frame_count=shot_frames,
+    )
+    loaded = attach_exact_audio_probe(loaded)
+    anchors = ((0, 0), (1, 1), (3, 3)) if shot_frames == 3 else ((0, 0), (1, 1))
+    mapping = VideoTimeMap(
+        contract_version="video-time-map/2", audio_policy="retime_preserve_pitch",
+        points=tuple(VideoTimePoint(source_frame=s, output_frame=o) for s, o in anchors),
+    )
+    spec = _with_map(spec, layer_index=1, time_map=mapping, schema="2.4")
+
+    timeline = resolve_composition(loaded, spec, renderer_version="0.7.103")
+
+    native, = (span for span in timeline.audio_spans if span.audio_kind is AudioKind.NATIVE_VIDEO)
+    expected_start = shot_frames * 44_100 // 24
+    expected_end = 2 * shot_frames * 44_100 // 24
+    assert (native.start_sample, native.duration_samples) == (
+        expected_start, expected_end - expected_start,
+    )
+    assert native.start_sample + native.duration_samples == timeline.total_samples == expected_end
+    assert native.source_duration_samples == shot_frames * 44_100 // 24
+    segments = native.native_audio_retime.segments
+    assert segments[0].output_offset_sample == 0
+    assert segments[0].output_duration_samples == 1_838
+    assert sum(segment.output_duration_samples for segment in segments) == native.duration_samples
+
+
 def test_native_audio_requires_one_exact_probe_stream_and_schema_24(tmp_path):
     from ai_video.errors import AiVideoError
     from ai_video.production.composition import resolve_composition
