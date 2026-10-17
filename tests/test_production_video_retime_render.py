@@ -611,4 +611,3 @@ def test_pinned_hyperframes_selects_source_frames_from_piecewise_time_map(
         },
     )
     assert all(item["match"] for item in observed), observed
-
