@@ -220,13 +220,14 @@ def require_qa_semantic_admission(policy):
             require_semantic_admission(component.generation_acceptance)
 
 
-def final_requirement_matches(*, requirement_id, observable, proof, final_output):
-    """Compare result and proof using the existing final-output contract."""
+def final_requirement_matches(*, requirement_id, observable, proof, final_output, match_proof=True):
+    """Compare the result; additional final proof may coexist with retained raw proof."""
     if final_output is None:
         return False
     expected = next((r for r in final_output.requirements if r.requirement_id == requirement_id), None)
     final_proof = {"human": "human", "analyzer": "evaluator"}.get(proof)
-    return expected is not None and expected.observable == observable and expected.proof == final_proof
+    return (expected is not None and expected.observable == observable
+            and (not match_proof or expected.proof == final_proof))
 
 
 def require_final_contract(rules, final_output):

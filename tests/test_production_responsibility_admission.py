@@ -208,9 +208,10 @@ def test_matching_editorial_analyzer_result_binds_to_final_evaluator():
 
 
 def _raw_overlap_policy(*, include_raw=True, allocate_raw=True, final_observable=None,
-                        component_mutation=None, generation_parent=False):
+                        component_mutation=None, generation_parent=False,
+                        raw_proof="analyzer", final_proof="evaluator"):
     observable = "The handover completes by 3 seconds."
-    deadline = {**_row("deadline"), "observable": observable, "proof": "analyzer"}
+    deadline = {**_row("deadline"), "observable": observable, "proof": raw_proof}
     parent = _acceptance("raw-parent", ("action", "deadline"), rows=(_row("action"), deadline))
     component_deadline = {**deadline, **(component_mutation or {})}
     raw = _acceptance("raw-component", ("action", "deadline") if include_raw else ("action",),
@@ -220,7 +221,7 @@ def _raw_overlap_policy(*, include_raw=True, allocate_raw=True, final_observable
         generation_acceptance=raw),), assembly=("deadline",))
     final = FinalOutputContract(goal_id="handover", goal_version="1", user_goal=observable,
         requirements=(FinalOutputRequirement(requirement_id="deadline",
-            observable=final_observable or observable, proof="evaluator"),))
+            observable=final_observable or observable, proof=final_proof),))
     policy = _qa_policy(parent, allocation, final_output=final)
     if generation_parent:
         policy = seal_artifact(policy.model_copy(update={"content_hash": "0" * 64,
@@ -245,6 +246,14 @@ def test_declared_raw_and_final_overlap_preserves_both_result_owners():
     from ai_video.production.domain_acceptance import require_production_responsibilities
 
     require_production_responsibilities(_raw_overlap_policy())
+
+
+@pytest.mark.parametrize("raw_proof,final_proof", [("technical", "human"),
+    ("analyzer", "human"), ("human", "evaluator")])
+def test_additional_final_proof_does_not_replace_or_have_to_duplicate_raw_proof(raw_proof, final_proof):
+    from ai_video.production.domain_acceptance import require_production_responsibilities
+
+    require_production_responsibilities(_raw_overlap_policy(raw_proof=raw_proof, final_proof=final_proof))
 
 
 def test_declared_raw_source_only_owner_still_uses_existing_source_evidence_path():

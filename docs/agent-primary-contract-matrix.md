@@ -368,8 +368,9 @@ acceptance inventory 的 proof 与 source/raw stage；Registry 技术有效不�
 `domain_acceptance.py::production_allocation_issues/require_production_responsibilities` 独占新发布/当前使用的
 分工完整性：声明 raw 的 hard IDs 始终有 component 承担；组件 raw rubric 覆盖其 raw 目标及未交给
 assembly 的 hard IDs，并保持已声明 raw 的 observable/proof/tolerance/measurement；required 条目必须为 raw acceptance。
-assembly 不豁免 raw，绑定既有 FinalOutputContract；已声明 hard goal 的 observable/proof 共用
-`requirement_semantics.py::final_requirement_matches` 校验，不以同 ID 冒充同一结果；source-only
+assembly 不豁免 raw，绑定既有 FinalOutputContract；已声明 hard goal 的 observable 与 post proof 共用
+`requirement_semantics.py::final_requirement_matches` 校验。raw 原证明保留，额外 final proof 可不同；
+不以同 ID 冒充同一结果；source-only
 与历史反序列化不强加生成 rubric。
 `production_responsibility.py` 仅投影上述合同和原 Planner 选择，供 Canvas preflight、制作准备和
 exact input preview 解释职责/自由度/缺口；不得推断放宽、重分 stage、资格化素材、复制策略状态或 timeline。

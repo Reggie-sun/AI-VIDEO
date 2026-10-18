@@ -232,6 +232,7 @@ def production_allocation_issues(policy, allocation: ProductionRequirementAlloca
                 if requirement_id in assembly_ids and requirement_id in final_ids and not final_requirement_matches(
                     requirement_id=requirement_id, observable=item.get("observable"),
                     proof=item.get("proof"), final_output=final_output,
+                    match_proof=item.get("stage") != "raw_generation",
                 ):
                     issues.add(f"assembly_final_output_mismatch:{requirement_id}")
 
