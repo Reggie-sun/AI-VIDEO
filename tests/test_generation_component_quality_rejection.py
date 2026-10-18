@@ -24,6 +24,7 @@ from ai_video.production.generation_feedback import record_attempt_evaluation
 from ai_video.production.generation_experience import GenerationExperience
 from ai_video.production.generation_rejection import validate_quality_rejection_experience
 from ai_video.production.generation_recipe import RequirementExpression
+from ai_video.production.final_output_contracts import FinalOutputContract, FinalOutputRequirement
 from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.dependency import (
     build_production_dependency_graph,
@@ -335,7 +336,7 @@ def _parent_visual_acceptance():
     )
 
 
-def _persist_video_component_authoring(tmp_path):
+def _persist_video_component_authoring(tmp_path, *, legacy_shared_rubric=False):
     inputs = make_p8_video_generation_base(tmp_path, schema_version="2.7")
     loaded = inputs.project
     parent = loaded.shots[0]
@@ -362,6 +363,7 @@ def _persist_video_component_authoring(tmp_path):
         allowed_operations=(ProductionOperation.GENERATE_FULL_SHOT,),
         protected_requirement_ids=("visual",),
         coverage_options=(coverage,),
+        assembly_requirement_ids=("visual",) if legacy_shared_rubric else (),
     )
     parent = seal_artifact(parent.model_copy(update={
         "revision": parent.revision + 1,
@@ -428,8 +430,10 @@ def _persist_video_component_authoring(tmp_path):
     committer.commit(project_commit)
     loaded = load_production_project(tmp_path / "project.yaml")
 
-    parent_acceptance = _parent_visual_acceptance()
     component_acceptance = _component_generation_acceptance()
+    parent_acceptance = (
+        component_acceptance if legacy_shared_rubric else _parent_visual_acceptance()
+    )
     allocation = ProductionRequirementAllocation(
         allocation_id=coverage.allocation_id,
         parent_shot_id=parent.shot_id,
@@ -442,6 +446,7 @@ def _persist_video_component_authoring(tmp_path):
             requirement_ids=("visual",),
             generation_acceptance=component_acceptance,
         ),),
+        assembly_requirement_ids=("visual",) if legacy_shared_rubric else (),
     )
     evaluator = ToolIdentity(name="component-quality-close-evaluator", version="1")
     policy = seal_artifact(QaPolicy(
@@ -467,6 +472,7 @@ def _persist_video_component_authoring(tmp_path):
         strategy_rules_version="1",
         semantic_requirement="required",
         semantic_authorities=(evaluator,),
+        generation_acceptance=component_acceptance if legacy_shared_rubric else None,
         generation_evaluation_authorities=(
             GenerationEvaluationAuthority(evaluator=evaluator, proof="technical"),
             GenerationEvaluationAuthority(evaluator=evaluator, proof="human"),
@@ -482,9 +488,11 @@ def _persist_video_component_authoring(tmp_path):
     return committer, task_id, parent.shot_id, child_shot_id, component_acceptance
 
 
-def _component_close_runtime(tmp_path, *, abandon):
+def _component_close_runtime(tmp_path, *, abandon, legacy_shared_rubric=False):
     committer, task_id, parent_shot_id, child_shot_id, acceptance = (
-        _persist_video_component_authoring(tmp_path)
+        _persist_video_component_authoring(
+            tmp_path, legacy_shared_rubric=legacy_shared_rubric,
+        )
     )
 
     planning = ProductionPlanningService(
@@ -495,7 +503,7 @@ def _component_close_runtime(tmp_path, *, abandon):
         ),
     )
     decision = planning.prepare(parent_shot_id=parent_shot_id)
-    assert decision.disposition == "selected"
+    assert decision.disposition == "selected", decision.reasons
     planning.materialize(decision=decision, attempt_id="component-quality-close-materialize")
 
     loaded = load_production_project(tmp_path / "project.yaml")
@@ -734,6 +742,143 @@ def test_materialized_component_quality_close_reopens_and_replays(tmp_path, aban
     assert record_attempt_evaluation(
         committer=committer, attempt_id=attempt_id,
     ) == experience
+
+
+def test_legacy_shared_rubric_quality_rejection_reopens_without_new_admission(tmp_path, monkeypatch):
+    with monkeypatch.context() as historical_admission:
+        historical_admission.setattr(
+            "ai_video.production.domain_acceptance.production_allocation_issues",
+            lambda policy, allocation: (),
+        )
+        historical_admission.setattr(
+            "ai_video.planning.production_strategy.production_allocation_issues",
+            lambda policy, allocation: (),
+        )
+        committer, attempt_id, attempt, manifest, experience = _component_close_runtime(
+            tmp_path, abandon=False, legacy_shared_rubric=True,
+        )
+        state = attempt.video_generation_state
+        arguments = {
+            "attempt_id": attempt_id,
+            "expected_manifest_revision": manifest.manifest_revision,
+            "experience_content_hash": state.generation_experiences[-1].content_hash,
+            "actor": ACTOR,
+        }
+        closed = committer.reject_video_generation(**arguments)
+
+    closed_attempt = next(item for item in closed.attempts if item.attempt_id == attempt_id)
+    receipt_pointer = closed_attempt.video_generation_state.quality_rejection
+    assert receipt_pointer is not None
+    receipt_path = tmp_path / receipt_pointer.path
+    receipt_bytes = receipt_path.read_bytes()
+    assert hashlib.sha256(receipt_bytes).hexdigest() == receipt_pointer.file_sha256
+    qa_pointer = closed.active_qa_policy
+    assert qa_pointer is not None
+    qa_path = tmp_path / qa_pointer.path
+    qa_bytes = qa_path.read_bytes()
+    assert hashlib.sha256(qa_bytes).hexdigest() == qa_pointer.file_sha256
+    files_before_read = {
+        path.relative_to(tmp_path): path.read_bytes()
+        for path in tmp_path.rglob("*")
+        if path.is_file() and path != tmp_path / "state/commit.lock"
+    }
+
+    reopened = load_production_project(tmp_path / "project.yaml")
+    assert reopened.manifest == closed
+    assert reopened.qa_policy.content_hash == qa_pointer.content_hash
+    receipt = committer._reopen_generation_quality_rejection(receipt_pointer)
+    assert receipt.content_hash == receipt_pointer.content_hash
+    assert hashlib.sha256(receipt_path.read_bytes()).hexdigest() == receipt_pointer.file_sha256
+    assert receipt.evidence_hash == experience.evidence[-1].evidence_hash
+    assert receipt.diagnosis.failure_classes == ("QUALITY_FAILURE",)
+    allocation = reopened.qa_policy.production_allocations[0]
+    lineage = next(
+        shot for shot in reopened.shots
+        if shot.shot_id == experience.evidence[-1].shot_id
+    ).production_lineage
+    assert lineage is not None
+    assert allocation.assembly_requirement_ids == ("visual",)
+    assert reopened.qa_policy.final_output is None
+    component_acceptance = reopened.qa_policy.selected_component_generation_acceptance(
+        allocation_hash=lineage.allocation_hash,
+        component_id=lineage.component_id,
+        parent_shot_id=lineage.parent_shot_id,
+        parent_shot_content_hash=lineage.parent.content_hash,
+        task_id=lineage.task_id,
+    )
+    assert reopened.qa_policy.selected_generation_acceptance() == component_acceptance
+    assert component_acceptance == experience.candidate.recipe.acceptance_policy
+    from ai_video.production.production_strategy_reader import selected_shot_generation_acceptance
+
+    with pytest.raises(AiVideoError, match="Production component generation acceptance is not current"):
+        selected_shot_generation_acceptance(reopened, experience.evidence[-1].shot_id)
+
+    replay = committer.reject_video_generation(**arguments)
+    assert replay == closed
+    assert (tmp_path / receipt_pointer.path).read_bytes() == receipt_bytes
+    assert (tmp_path / qa_pointer.path).read_bytes() == qa_bytes
+    files_after_read = {
+        path.relative_to(tmp_path): path.read_bytes()
+        for path in tmp_path.rglob("*")
+        if path.is_file() and path != tmp_path / "state/commit.lock"
+    }
+    assert files_after_read == files_before_read
+
+    completed_final_output = FinalOutputContract(
+        goal_id="legacy-component-visual",
+        goal_version="1",
+        user_goal="The authored component visual is present in the assembled output.",
+        requirements=(FinalOutputRequirement(
+            requirement_id="visual",
+            observable="authored component visual",
+            proof="human",
+        ),),
+    )
+    valid_new_policy = seal_artifact(reopened.qa_policy.model_copy(update={
+        "revision": reopened.qa_policy.revision + 1,
+        "final_output": completed_final_output,
+        "content_hash": "0" * 64,
+    }))
+    activated = committer.activate_qa_policy(
+        valid_new_policy,
+        expected_manifest_revision=reopened.manifest.manifest_revision,
+        attempt_id="legacy-component-quality-complete-final-owner",
+    )
+    new_policy_pointer = activated.active_qa_policy
+    assert new_policy_pointer is not None
+    new_policy_path = tmp_path / new_policy_pointer.path
+    new_policy_bytes = new_policy_path.read_bytes()
+    assert hashlib.sha256(new_policy_bytes).hexdigest() == new_policy_pointer.file_sha256
+    files_before_new_read = {
+        path.relative_to(tmp_path): path.read_bytes()
+        for path in tmp_path.rglob("*")
+        if path.is_file() and path != tmp_path / "state/commit.lock"
+    }
+
+    after_qa_switch = load_production_project(tmp_path / "project.yaml")
+    assert after_qa_switch.manifest == activated
+    assert after_qa_switch.qa_policy.content_hash == new_policy_pointer.content_hash
+    assert selected_shot_generation_acceptance(
+        after_qa_switch, experience.evidence[-1].shot_id,
+    ) == component_acceptance
+    archived_receipt = committer._reopen_generation_quality_rejection(receipt_pointer)
+    assert archived_receipt.qa_policy == qa_pointer
+    assert archived_receipt.content_hash == receipt_pointer.content_hash
+    assert receipt_path.read_bytes() == receipt_bytes
+    assert qa_path.read_bytes() == qa_bytes
+    assert (tmp_path / new_policy_pointer.path).read_bytes() == new_policy_bytes
+
+    replay_after_qa_switch = committer.reject_video_generation(**arguments)
+    assert replay_after_qa_switch == activated
+    assert receipt_path.read_bytes() == receipt_bytes
+    assert qa_path.read_bytes() == qa_bytes
+    assert (tmp_path / new_policy_pointer.path).read_bytes() == new_policy_bytes
+    files_after_new_read = {
+        path.relative_to(tmp_path): path.read_bytes()
+        for path in tmp_path.rglob("*")
+        if path.is_file() and path != tmp_path / "state/commit.lock"
+    }
+    assert files_after_new_read == files_before_new_read
 
 
 def test_component_quality_close_refuses_stale_selected_rubric_without_writes(tmp_path):

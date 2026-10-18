@@ -130,15 +130,6 @@ def validate_quality_rejection_experience(
     if lineage is None:
         acceptance = qa_policy.selected_generation_acceptance()
     else:
-        from ai_video.production.domain_acceptance import require_production_responsibilities
-
-        allocation = qa_policy.require_production_allocation(
-            allocation_hash=lineage.allocation_hash,
-            parent_shot_id=lineage.parent_shot_id,
-            parent_shot_content_hash=lineage.parent.content_hash,
-            task_id=lineage.task_id,
-        )
-        require_production_responsibilities(qa_policy, allocation)
         acceptance = qa_policy.selected_component_generation_acceptance(
             allocation_hash=lineage.allocation_hash,
             component_id=lineage.component_id,
