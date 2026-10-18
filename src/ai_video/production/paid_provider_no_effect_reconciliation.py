@@ -215,25 +215,25 @@ def release_unsettled_paid_provider_reservation(
     )
 
 
-def is_verified_reconciled_no_effect_video_attempt(
-    committer, *, attempt_id: str
+def _is_verified_reconciled_no_effect_video_attempt_from_snapshot(
+    committer, *, loaded, manifest, attempt
 ) -> bool:
-    """Read-only exact check for the one recovered outcome that consumed no submit."""
-
+    """Check one failed attempt against an already validated current snapshot."""
     from ai_video.production.models import (
         PaidProviderAttemptPhase,
         StateCommitStatus,
         VideoAttemptPhase,
     )
     from ai_video.production.paid_provider import PaidProviderSubmitOutcome
-    from ai_video.production.project import load_production_project
 
-    loaded = load_production_project(committer.project_root / "project.yaml")
+    if loaded.manifest != manifest:
+        return False
     loaded_attempt = next(
-        (item for item in loaded.manifest.attempts if item.attempt_id == attempt_id),
+        (item for item in loaded.manifest.attempts
+         if item.attempt_id == attempt.attempt_id),
         None,
     )
-    if loaded_attempt is None:
+    if loaded_attempt is None or loaded_attempt != attempt:
         return False
     loaded_state = loaded_attempt.video_generation_state
     paid = loaded_attempt.paid_provider_state
@@ -271,9 +271,31 @@ def is_verified_reconciled_no_effect_video_attempt(
     )
     return (
         reconciliation.reason == "verified_pre_transport_failure"
-        and reconciliation.attempt_id == attempt_id
-        and reconciliation.project_id == loaded.manifest.project_id
+        and reconciliation.attempt_id == attempt.attempt_id
+        and reconciliation.project_id == manifest.project_id
         and reconciliation.prior_submit_receipt != paid.submit_receipt
+    )
+
+
+def is_verified_reconciled_no_effect_video_attempt(
+    committer, *, attempt_id: str
+) -> bool:
+    """Read-only exact check for the one recovered outcome that consumed no submit."""
+
+    from ai_video.production.project import load_production_project
+
+    loaded = load_production_project(committer.project_root / "project.yaml")
+    loaded_attempt = next(
+        (item for item in loaded.manifest.attempts if item.attempt_id == attempt_id),
+        None,
+    )
+    if loaded_attempt is None:
+        return False
+    return _is_verified_reconciled_no_effect_video_attempt_from_snapshot(
+        committer,
+        loaded=loaded,
+        manifest=loaded.manifest,
+        attempt=loaded_attempt,
     )
 
 

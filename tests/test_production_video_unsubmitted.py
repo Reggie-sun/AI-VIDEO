@@ -182,3 +182,55 @@ def test_closed_request_rejects_changed_experience_and_corrupt_evidence(tmp_path
     before=_bytes(tmp_path)
     with pytest.raises(AiVideoError):_close(writer)
     assert _bytes(tmp_path)==before
+
+
+def test_ordinary_known_no_effect_failure_remains_runtime_failure(tmp_path):
+    from ai_video.production._state_commit_video_unsubmitted import (
+        failed_generation_history_outcome,
+    )
+    from test_paid_provider_no_effect_reconciliation import _ordinary_failed_runtime
+
+    writer, _, _ = _ordinary_failed_runtime(tmp_path)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    attempt = loaded.manifest.attempts[-1]
+
+    assert failed_generation_history_outcome(
+        writer, loaded=loaded, manifest=loaded.manifest, attempt=attempt
+    ) == "runtime_failure"
+
+
+@pytest.mark.parametrize("tampered", ["submit_receipt", "reconciliation_evidence"])
+def test_reconciled_history_classifier_reopens_exact_bytes(tmp_path, tampered):
+    from ai_video.production._state_commit_video_unsubmitted import (
+        failed_generation_history_outcome,
+    )
+    from test_paid_provider_no_effect_reconciliation import (
+        _entry as reconciliation_entry,
+        _unknown_runtime,
+    )
+
+    writer, unknown, _, _ = _unknown_runtime(tmp_path)
+    entry, evidence, actor = reconciliation_entry(writer, unknown)
+    writer.reconcile_paid_provider_no_effect(
+        entry,
+        evidence_artifacts=(evidence,),
+        authorizer=lambda exact, artifacts: actor,
+    )
+    loaded = load_production_project(tmp_path / "project.yaml")
+    attempt = next(
+        item for item in loaded.manifest.attempts
+        if item.attempt_id == unknown.attempts[-1].attempt_id
+    )
+    paid = attempt.paid_provider_state
+    assert paid is not None and paid.submit_receipt is not None
+    target = (
+        paid.submit_receipt.path
+        if tampered == "submit_receipt"
+        else evidence.relative_path
+    )
+    (tmp_path / target).write_bytes(b"tampered evidence\n")
+
+    with pytest.raises(AiVideoError):
+        failed_generation_history_outcome(
+            writer, loaded=loaded, manifest=loaded.manifest, attempt=attempt
+        )

@@ -243,16 +243,16 @@ def close_unsubmitted_video_generation(committer, *, attempt_id: str,
         return committer._read_manifest()
 
 
-def failed_generation_history_outcome(committer, *, manifest, attempt):
+def failed_generation_history_outcome(committer, *, loaded, manifest, attempt):
     """Retain paid reconciliation and explicit zero-effect preparation separately."""
     from ai_video.production.paid_provider_no_effect_reconciliation import (
-        is_verified_reconciled_no_effect_video_attempt,
+        _is_verified_reconciled_no_effect_video_attempt_from_snapshot,
     )
 
     closed = is_verified_closed_unsubmitted_video_attempt(
         committer, manifest=manifest, attempt=attempt,
     )
-    reconciled = is_verified_reconciled_no_effect_video_attempt(
-        committer, attempt_id=attempt.attempt_id,
+    reconciled = _is_verified_reconciled_no_effect_video_attempt_from_snapshot(
+        committer, loaded=loaded, manifest=manifest, attempt=attempt,
     )
     return "not_submitted" if closed or reconciled else "runtime_failure"

@@ -537,6 +537,125 @@ def test_paid_submit_intent_reuses_locked_project_snapshot_for_family_limits(tmp
     assert budget.reservations[-1].reservation_id == "quota-snapshot-once"
 
 
+def test_paid_submit_reuses_locked_snapshot_for_reconciled_failed_history(tmp_path, monkeypatch):
+    from ai_video.production.generation_feedback import record_attempt_evaluation
+    from test_paid_provider_no_effect_reconciliation import (
+        _entry as reconciliation_entry,
+        _unknown_runtime,
+    )
+
+    committer, unknown, provider, prior_binding = _unknown_runtime(tmp_path)
+    entry, evidence, actor = reconciliation_entry(committer, unknown)
+    committer.reconcile_paid_provider_no_effect(
+        entry,
+        evidence_artifacts=(evidence,),
+        authorizer=lambda exact, artifacts: actor,
+    )
+    prior_experience = record_attempt_evaluation(
+        committer=committer, attempt_id=unknown.attempts[-1].attempt_id
+    )
+
+    selected = load_production_project(tmp_path / "project.yaml")
+    prior = next(
+        item for item in selected.manifest.attempts
+        if item.attempt_id == unknown.attempts[-1].attempt_id
+    )
+    prior_state = prior.video_generation_state
+    prior_request = committer._reopen_video_request(prior_state.request)
+    values = prior_request.activation_scope.request.model_dump(
+        mode="python", exclude={"request_input_hash"}
+    )
+    values.update(
+        generation_id=NEXT,
+        output_asset_id=f"{NEXT}-reconciled-video",
+        base_project=selected.manifest.active_project,
+        base_registry=selected.manifest.active_registry,
+        base_dependency_graph=selected.manifest.active_dependency_graph,
+    )
+    prepared = e2e.prepare_generation_execution(
+        project=selected,
+        provider=provider,
+        request=provider.resolve(VideoGenerationRequest.create(**values)),
+        task_id=prior_binding.inputs.limits.task_id,
+        compiler_id="recovery-native-fixture",
+        compiler_version="1",
+    )
+    old = prepared.binding
+    inputs = old.inputs.model_copy(update={
+        "limits": old.inputs.limits.model_copy(update={
+            "paid_submit_ceiling": 2,
+            "paid_submits_used": 1,
+        }),
+        "evidence": prior_experience.evidence,
+        "experiences": (prior_experience,),
+        "latest_attempt_hash": prior_experience.evidence[-1].evidence_hash,
+        "historical_recipes": (prior_experience.candidate,),
+    })
+    decision = VideoGenerationResolver().resolve_requirement(
+        projection=old.projection,
+        context=old.context,
+        policy=old.policy,
+        lifecycle=old.lifecycle,
+        inputs=inputs,
+    )
+    compiled = provider.compile_request(
+        decision.routing.provider_bound_request,
+        old.projection.requirement,
+    )
+    request = provider.resolve(compiled.request)
+    binding = GenerationDecisionExecutionBinding.create(
+        projection=old.projection,
+        context=old.context,
+        policy=old.policy,
+        lifecycle=old.lifecycle,
+        inputs=inputs,
+        decision=decision,
+        compiled_request=request,
+    )
+    preview = e2e._paid_preview(
+        request, attempt_id=NEXT, video_preview=provider.preview(request)
+    )
+    authorization = e2e._paid_authorization(preview)
+    writer = ProductionStateCommitter(
+        tmp_path,
+        paid_provider_authorizer=lambda exact: authorization if exact == preview else None,
+        paid_provider_clock=lambda: authorization.issued_at,
+        video_candidate_preparer=committer._video_candidate_preparer,
+    )
+    service = VideoGenerationService(committer=writer, provider=provider)
+    service.start(attempt_id=NEXT, request=request, execution_binding=binding)
+    prior = next(
+        item for item in writer._read_manifest().attempts
+        if item.attempt_id == unknown.attempts[-1].attempt_id
+    )
+    writer.extend_paid_provider_submit_quota(_entry(writer, prior))
+
+    import ai_video.production.project as project_module
+    import ai_video.production.state_commit as state_commit_module
+
+    project_loads = 0
+    original_load = project_module.load_production_project
+
+    def counted_load(path):
+        nonlocal project_loads
+        project_loads += 1
+        return original_load(path)
+
+    monkeypatch.setattr(project_module, "load_production_project", counted_load)
+    monkeypatch.setattr(state_commit_module, "load_production_project", counted_load)
+
+    writer.record_paid_provider_submit_intent(
+        preview, reservation_id="reconciled-history-reservation"
+    )
+
+    assert project_loads == 1
+    manifest = writer._read_manifest()
+    target = next(item for item in manifest.attempts if item.attempt_id == NEXT)
+    assert target.paid_provider_state is not None
+    assert target.paid_provider_state.phase.value == "submit_intent"
+    assert provider.call_counts.submit == 0
+
+
 def test_paid_submit_stale_current_qa_refuses_before_intent_or_reservation(tmp_path):
     writer, _, preview, prior = _pending(tmp_path)
     writer.extend_paid_provider_submit_quota(_entry(writer, prior))

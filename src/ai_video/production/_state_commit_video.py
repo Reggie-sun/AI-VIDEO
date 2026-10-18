@@ -265,7 +265,7 @@ class _StateCommitVideoMixin:
                         failed_generation_history_outcome,
                     )
                     required_outcome = failed_generation_history_outcome(
-                        self, manifest=manifest, attempt=item,
+                        self, loaded=loaded, manifest=manifest, attempt=item,
                     )
                     if not any(e.outcome == required_outcome for e in prior_evidence):
                         raise _state_invalid("Prior failed generation lacks runtime evidence.")
