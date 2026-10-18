@@ -10,6 +10,8 @@ Date: 2026-10-19
 
 ## Current Integration Follow-up
 
+2026-10-19 后续的验证职责分层和单次 submit snapshot复用见[架构续改记录](2026-10-19-staged-verification-boundaries.md)。本节 `df13f21` 的源码/审查快照作为历史保留；媒体状态未因架构改动而通过。
+
 2026-10-19 在真实制作入口确认并修复四个共享缺口，源码依次发布 `984e372`、`510c440`、`df13f21`；最后一项修复后的 native review round 2 无 findings。未新增故事条件分支、执行链、timeline、renderer 或依赖。实际 S01 运行结果归[媒体主记录](2026-10-13-jieshi-original-s01-s02-candidate.md)，下文初次发布的 POST0、Manifest116 与 readiness 只描述当时快照。
 
 - 生成组件通过 `ProductionUnit.preserved_source_expression` 显式保留来源表达，不隐式继承；source-backed unit 仍拒绝该字段。两个不同人物/动作/空间的持久化 fixture 走标准材料化及 loader，旧 JSON/hash 保持兼容。
