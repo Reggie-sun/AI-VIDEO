@@ -55,6 +55,7 @@ from ai_video.production.review import (
     validate_technical_review_context,
 )
 from ai_video.production.requirement_semantics import require_qa_semantic_admission
+from ai_video.production.domain_acceptance import require_production_responsibilities
 
 from ._state_commit_common import (
     _candidate_artifacts_hash,
@@ -117,6 +118,10 @@ class _StateCommitReviewMixin:
                 require_qa_semantic_admission(policy)
             except ValueError as exc:
                 raise _state_invalid("QA semantic admission failed.", str(exc)) from exc
+            try:
+                require_production_responsibilities(policy)
+            except ValueError as exc:
+                raise _state_invalid("QA production responsibility admission failed.", str(exc)) from exc
             if manifest.active_qa_policy is not None:
                 prior = load_qa_policy(self._project_root, manifest.active_qa_policy).final_output
                 current = policy.final_output

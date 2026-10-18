@@ -96,7 +96,7 @@ def _expressions(acceptance, requirement):
             result.append(rule)
             continue
         expressions = []
-        paths = () if rule.semantics is not None and rule.level == "diagnostic" else rule.intent_paths
+        paths = rule.intent_paths if rule.stage == "raw_generation" and rule.level != "diagnostic" else ()
         for path in paths:
             if path.startswith("output_need.") or path == "audio_need":
                 continue

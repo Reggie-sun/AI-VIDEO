@@ -49,8 +49,12 @@ def _reference_inventory(references, assets):
     }
 
 
-def canvas_reference_preflight(*, packet, direction, registry):
+def canvas_reference_preflight(*, packet, direction, registry, qa_policy=None,
+                               qa_authority="NOT_EVALUATED", authored_shots=()):
     """Project inputs already validated by author_canvas_project; no verdicts."""
+    from ai_video.production.production_responsibility import production_responsibility_report
+
+    authored = {shot.shot_id: shot for shot in authored_shots}
     assets = {asset.asset_id: asset for asset in registry.assets}
     rows = direction["shots"]
     units = {unit["occurrence_id"]: unit for unit in packet["units"]}
@@ -114,6 +118,9 @@ def canvas_reference_preflight(*, packet, direction, registry):
         candidate_video_asset_ids = [reference["asset_id"] for reference in generation_references
             if reference.get("role") == "existing_video"]
         shots.append({"occurrence_id": row["occurrence_id"], "shot_id": shot["shot_id"],
+            "production_control": production_responsibility_report(qa_policy=qa_policy,
+                shot=authored.get(shot["shot_id"]), target_shot_id=shot["shot_id"],
+                qa_authority=qa_authority),
             "source_text": unit["source_text"], "authored_text": shot["intent"],
             "dialogue": shot.get("dialogue", ""), "narration": shot.get("narration", ""),
             "source_settings": deepcopy(unit.get("observed_parameters", {})),
@@ -131,6 +138,8 @@ def canvas_reference_preflight(*, packet, direction, registry):
             "requested_duration_seconds": deepcopy(output_need.get("duration_seconds")),
             "provider_admission": "NOT_EVALUATED", "per_shot_acceptance": "NOT_EVALUATED"})
     return {"schema_version": "canvas-production-preflight/1", "project_id": direction["project_id"],
+        "production_control": production_responsibility_report(qa_policy=qa_policy,
+            qa_authority=qa_authority),
         "source_snapshot_sha256": packet["source_snapshot_sha256"],
         "director_content_hash": direction_reference(packet, direction).content_hash,
         "generation_order": [row["shot"]["shot_id"] for row in rows],

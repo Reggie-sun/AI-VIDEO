@@ -43,9 +43,19 @@ class ProductionPlanningService:
         return ProductionStrategyResolver().resolve(loaded=loaded,
             parent_shot_id=parent_shot_id, policy=self.policy, capabilities=self._capabilities())
 
-    def prepare(self, *, parent_shot_id):
+    def prepare(self, *, parent_shot_id, include_control_report=False):
         """Standard read, bounded candidate production, no state/media effects."""
-        return self._resolve(self._load(), parent_shot_id)
+        loaded = self._load()
+        decision = self._resolve(loaded, parent_shot_id)
+        if not include_control_report:
+            return decision
+        from ai_video.production.production_responsibility import production_responsibility_report
+        from ai_video.production.production_strategy_reader import production_parent_context
+
+        parent, _, _, _ = production_parent_context(loaded, parent_shot_id)
+        return {"decision": decision.model_dump(mode="json"),
+            "production_control": production_responsibility_report(qa_policy=loaded.qa_policy,
+                shot=parent, decision=decision, qa_authority="selected_policy")}
 
     def reassess_generation(self, *, component_shot_id, prepared_generation):
         """Route generation's authoring exit back to the same approved intent."""

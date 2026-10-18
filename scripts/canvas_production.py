@@ -44,8 +44,21 @@ def run(*, data_path, project_root, action, runtime_factory=None, arguments=None
     if action in {"author", "approve", "preflight"}:
         bundle = service.author(registry=registry, asset_artifacts=artifacts)
         if action in {"author", "preflight"}:
+            from ai_video.production.models import QaPolicy, Shot
+
+            selected = arguments.get("qa_policy")
+            qa_policy, qa_authority = None, "NOT_EVALUATED"
+            if selected is not None:
+                qa_policy = selected if isinstance(selected, QaPolicy) else QaPolicy.model_validate(
+                    _json(root / selected, root))
+                qa_authority = "candidate_not_approved"
+            elif action == "preflight" and (Path(project_root) / "project.yaml").exists():
+                qa_policy = service._load().qa_policy
+                qa_authority = "selected_policy"
             preflight = canvas_reference_preflight(packet=service.packet,
-                direction=service.direction, registry=bundle.registry)
+                direction=service.direction, registry=bundle.registry, qa_policy=qa_policy,
+                qa_authority=qa_authority,
+                authored_shots=tuple(m for m in bundle.creative_artifacts if isinstance(m, Shot)))
             if action == "preflight":
                 preflight["position"] = asdict(service.position()) if (
                     Path(project_root) / "project.yaml").exists() else None
@@ -65,6 +78,8 @@ def run(*, data_path, project_root, action, runtime_factory=None, arguments=None
     if action == "prepare_image_workflow":
         return service.prepare_image_workflow(**arguments)
     arguments = operator_arguments(action, service, arguments)
+    if action == "prepare_production":
+        arguments.setdefault("include_control_report", True)
     if action in {"compose", "compose_production"}:
         spec, timeline = getattr(service, action)(**arguments)
         return {"spec": spec.model_dump(mode="json"), "timeline": timeline.model_dump(mode="json")}

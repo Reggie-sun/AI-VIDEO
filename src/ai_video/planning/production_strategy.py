@@ -12,6 +12,7 @@ from typing import Literal
 from pydantic import Field
 
 from ai_video.production.artifact_contracts import StrictModel
+from ai_video.production.domain_acceptance import production_allocation_issues
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import AssetType, CompositionLayerSpec, FixedTransform
 from ai_video.production.production_strategy_contracts import (
@@ -129,6 +130,11 @@ def _candidate(loaded, parent, coverage, selected_units, policy, capabilities):
         expected = {c.component_id: set(c.requirement_ids) for c in (*coverage.units, *coverage.audio)}
         if actual != expected:
             blockers.append("needs_authoring_revision:requirement_coverage")
+        if loaded.qa_policy is not None:
+            blockers.extend(
+                "needs_authoring_revision:allocation_responsibility:" + issue
+                for issue in production_allocation_issues(loaded.qa_policy, allocation)
+            )
     if (parent.duration_policy.mode != "fixed" or parent.duration_policy.seconds is None
             or sum(u.duration_frames for u in coverage.units) !=
             Decimal(str(parent.duration_policy.seconds)) * loaded.project.delivery_profile.fps):

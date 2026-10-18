@@ -156,9 +156,10 @@ class CanvasProductionService:
         return ProductionPlanningService(committer=self.committer, targets=self.targets, policy=self.production_policy)
 
     @_input_errors
-    def prepare_production(self, *, parent_shot_id):
+    def prepare_production(self, *, parent_shot_id, include_control_report=False):
         """Assess existing-source/edit means before any generation, without writes."""
-        return self._production_planning().prepare(parent_shot_id=parent_shot_id)
+        return self._production_planning().prepare(parent_shot_id=parent_shot_id,
+            include_control_report=include_control_report)
 
     @_input_errors
     def materialize_production(self, *, decision, attempt_id):

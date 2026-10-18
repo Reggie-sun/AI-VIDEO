@@ -190,6 +190,36 @@ frame/reference 互斥及逐镜白模例外继续沿现有模型能力和上文/
 compiler 失败时仍保留 selected candidate 的目标和失败 ID，片段标为 authored、未编译，不虚构实际 request。
 模式概览不计作目标覆盖；所有输入检查和离线 fixture 的模型质量、human 验收仍 `NOT_EVALUATED`。
 
+### Production Responsibility Allocation
+
+分工沿既有 QA inventory 的 `level/stage/semantics`、`ProductionRequirementAllocation` 与 Shot 的
+`production_intent` 声明，不另建可编辑控制表。固定原文、人物和叙事结果保持 acceptance；
+`directional_preference/acceptable_variation` 只能表达其明确范围内的自由度，不计 required finding。
+未提供语义的旧目标标为未评估，不自动解释成可放宽。
+
+| Existing owner | Responsibility | Evidence boundary |
+| --- | --- | --- |
+| Component `generation_acceptance` | 原片必须存在的人物、动作、状态及其他 raw 结果 | 输入/参考仅作引导，需原片逐项验收 |
+| `assembly_requirement_ids` + `FinalOutputContract` | 剪辑或合成后才成立的硬结果 | 必须有同 ID 的最终验收目标，不能仅写“后期处理” |
+| `ProductionIntent` + Planner | 选择实际复用、变速、声音、生成等操作 | exact source-use 证据、能力与范围均满足才可选 |
+| `ResolvedTimeline` + HyperFrames | 采用窗口、帧/样本、实际成片 | 分工报告不另算时间线，也不证明成片通过 |
+
+新 QA publication 和当前策略使用共用 `production_allocation_issues`：有 generation rubric 的组件，
+其未分给 assembly 的 hard IDs 必须全部由该 rubric 的 `acceptance/raw_generation` 覆盖；
+rubric required IDs 不能用 hint 或后期条目冒充。多组件或原片/成片重叠验收合法；source-only
+组件继续走 exact source-use，不强造生成 rubric。历史 bytes/hash、反序列化和 lineage 重开保持兼容，
+不完整旧合同的新发布/使用仍会阻断。未实现的遮罩、跟踪、口型等操作仍为 capability blocker。
+
+`author/preflight.production_control` 展示 QA inventory、固定来源、允许变化与已声明分工。
+新项目可在 `--arguments` 提供普通 `qa_policy` 文件（限 data 目录内）预览，标为
+`candidate_not_approved`；已批准项目的 preflight 默认读取 selected policy。全局 rubric 只展示一次，
+没有匹配 Shot intent/allocation 时不把它自动套给每镜。`prepare_production` CLI 返回
+`{decision, production_control}`；materialize 仍消费其中原始 `decision`。Python API 默认仍返回
+immutable decision，需要报告时显式 `include_control_report=True`。
+原生输入预览的每项目标同步展示上述语义；后期/诊断条目不再从 intent paths 派生出模型文本。
+用户原 prompt 不被自动删改，已有 explicit input-control fragments 保持原合同。
+这些入口无 POST、permit 或验收效果；旧失败不会因分工预览而通过，编辑用途与最终 A/V 仍需新 exact 证据。
+
 ### Edit-First Temporal Control
 
 最终采用时点偏差首先是制作手段选择问题。先确认源素材是否已经包含要求的状态、动作顺序与可用画面，

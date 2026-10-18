@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.artifact_contracts import ArtifactReference
+from ai_video.production.domain_acceptance import require_production_responsibilities
 from ai_video.production.models import (
     AssetSourceKind,
     AssetType,
@@ -460,6 +461,13 @@ def selected_shot_generation_acceptance(
         raise _invalid("Production component generation acceptance requires a QA policy.")
     lineage = shot.production_lineage
     try:
+        allocation = policy.require_production_allocation(
+            allocation_hash=lineage.allocation_hash,
+            parent_shot_id=lineage.parent_shot_id,
+            parent_shot_content_hash=lineage.parent.content_hash,
+            task_id=lineage.task_id,
+        )
+        require_production_responsibilities(policy, allocation)
         return policy.selected_component_generation_acceptance(
             allocation_hash=lineage.allocation_hash,
             component_id=lineage.component_id,
@@ -532,9 +540,10 @@ def require_production_source_eligibility(
         parent = _parent_for_lineage(bundle, lineage)
         coverage, unit = _coverage_unit(parent, lineage)
         try:
-            bundle.qa_policy.require_production_allocation(allocation_hash=lineage.allocation_hash,
+            allocation = bundle.qa_policy.require_production_allocation(allocation_hash=lineage.allocation_hash,
                 parent_shot_id=parent.shot_id, parent_shot_content_hash=parent.content_hash,
                 task_id=lineage.task_id)
+            require_production_responsibilities(bundle.qa_policy, allocation)
         except ValueError as exc:
             raise _invalid("Current allocation requires production reassessment.", str(exc)) from exc
         uses = [(unit.component_id, s, s.requirement_ids or unit.requirement_ids)

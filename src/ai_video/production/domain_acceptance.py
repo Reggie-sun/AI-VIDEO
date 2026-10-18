@@ -183,6 +183,83 @@ class ProductionRequirementAllocation(StrictModel):
         return canonical_sha256(self.model_dump(mode="json"))
 
 
+def production_allocation_issues(policy, allocation: ProductionRequirementAllocation) -> tuple[str, ...]:
+    """Report incomplete responsibility mappings without changing authored state.
+
+    This is intentionally an admission check rather than a model validator so
+    previously sealed policies remain readable with their original bytes and
+    hashes. New publication and current use call the same pure rule.
+    """
+    parent_acceptance = getattr(policy, "domain_acceptance", None)
+    if parent_acceptance is None:
+        parent_acceptance = policy.selected_generation_acceptance()
+
+    issues: set[str] = set()
+    assembly_ids = set(allocation.assembly_requirement_ids)
+    final_output = getattr(policy, "final_output", None)
+    final_ids = (
+        {item.requirement_id for item in final_output.requirements}
+        if final_output is not None
+        else set()
+    )
+    for requirement_id in assembly_ids - final_ids:
+        issues.add(f"assembly_final_output_missing:{requirement_id}")
+
+    if parent_acceptance is not None:
+        parent_inventory = parent_acceptance.profile_payload.get("generation_requirements") or ()
+        for item in parent_inventory:
+            if not isinstance(item, Mapping):
+                continue
+            requirement_id = item.get("requirement_id")
+            if (
+                isinstance(requirement_id, str)
+                and requirement_id in parent_acceptance.required_requirement_ids
+                and item.get("level") == "acceptance"
+                and item.get("stage") in {"shot_editorial", "final_composition"}
+                and requirement_id not in assembly_ids
+            ):
+                issues.add(f"post_goal_not_in_assembly:{requirement_id}")
+
+    for component in allocation.components:
+        rubric = component.generation_acceptance
+        if rubric is None:
+            continue
+        rubric_required = set(rubric.required_requirement_ids)
+        for requirement_id in set(component.requirement_ids) - assembly_ids - rubric_required:
+            issues.add(
+                f"component_raw_required_missing:{component.component_id}:{requirement_id}"
+            )
+
+        inventory = rubric.profile_payload.get("generation_requirements", ())
+        by_id: dict[str, list[Mapping]] = {}
+        for item in inventory:
+            if not isinstance(item, Mapping):
+                continue
+            requirement_id = item.get("requirement_id")
+            if isinstance(requirement_id, str):
+                by_id.setdefault(requirement_id, []).append(item)
+        for requirement_id in rubric_required:
+            rows = by_id.get(requirement_id, ())
+            if len(rows) != 1 or rows[0].get("level") != "acceptance" or rows[0].get("stage") != "raw_generation":
+                issues.add(
+                    f"component_rubric_not_raw:{component.component_id}:{requirement_id}"
+                )
+
+    return tuple(sorted(issues))
+
+
+def require_production_responsibilities(policy, allocation: ProductionRequirementAllocation | None = None) -> None:
+    """Reject new publication/use when an allocation has no complete owner."""
+    allocations = (allocation,) if allocation is not None else getattr(policy, "production_allocations", ())
+    issues = tuple(
+        issue
+        for item in allocations
+        for issue in production_allocation_issues(policy, item)
+    )
+    if issues:
+        raise ValueError("Production responsibility allocation is incomplete: " + "; ".join(issues))
+
+
 class DomainAcceptanceQaPolicyMixin:
     """Pydantic mixin that keeps the generic QA model domain-neutral."""
 

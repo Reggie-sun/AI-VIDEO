@@ -160,6 +160,7 @@ def _reference_duties(expressions, references):
 
 def _objectives(*, expressions, requirement, request, compilation, references):
     from ai_video.production.generation_input_control import input_control_issues
+    from ai_video.production.production_responsibility import requirement_responsibility
 
     declared = any(_control_for(rule) is not None for rule in expressions)
     issue_map = {}
@@ -173,7 +174,10 @@ def _objectives(*, expressions, requirement, request, compilation, references):
     for rule in expressions:
         control = _control_for(rule)
         exact_native = tuple(rule.native_text)
-        if request is None:
+        if rule.stage != "raw_generation" or rule.level == "diagnostic":
+            native_text_present = "NOT_APPLICABLE"
+            native_text_status = "NOT_APPLICABLE"
+        elif request is None:
             native_text_present = "AUTHORED_NOT_COMPILED"
             native_text_status = "AUTHORED_NOT_COMPILED"
         else:
@@ -204,6 +208,7 @@ def _objectives(*, expressions, requirement, request, compilation, references):
             else:
                 unresolved.append(path)
         rows.append({
+            **requirement_responsibility(rule),
             "requirement_id": rule.requirement_id,
             "observable": rule.observable,
             "level": rule.level,

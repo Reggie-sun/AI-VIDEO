@@ -15,6 +15,7 @@ from ai_video.production._state_commit_common import (
 )
 from ai_video.production._state_commit_contracts import PreparedArtifact, StateCommitRequest
 from ai_video.production.artifact_contracts import ArtifactReference, SourceReference
+from ai_video.production.domain_acceptance import require_production_responsibilities
 from ai_video.production.composition_contracts import (
     CompositionLayerSpec,
     CompositionSpec,
@@ -122,6 +123,10 @@ def _require_current_allocation(
         raise _project_invalid("Production strategy allocation is not current.", str(exc)) from exc
     if allocation.allocation_id != coverage.allocation_id:
         raise _project_invalid("Production strategy coverage does not use its selected allocation.")
+    try:
+        require_production_responsibilities(policy, allocation)
+    except ValueError as exc:
+        raise _project_invalid("Production strategy allocation has incomplete responsibilities.", str(exc)) from exc
     return allocation
 
 
