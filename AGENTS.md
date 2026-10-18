@@ -23,6 +23,8 @@
 
 ## Product Invariants
 
+制作控制能力必须面向跨项目、跨镜头复用，具体作品只作验证案例，不以作品或单镜特例替代共享能力，也不以单例通过证明通用能力成立。
+
 - Legacy `0.1.x` local-first / CLI-first，默认 loopback ComfyUI，remote opt-in，无隐式 fallback。`validate` 无副作用，`run` 创建 run 并 atomic 持久化 Manifest，`resume` 只恢复既有 Manifest；保留 CLI/Manifest/layout/workflow compatibility。
 - v0.2 reader/Registry strict、read-only、no-network；核验 selected revision/identity/containment/bytes。Evidence content-addressed，immutable graph/Registry/receipt 不携带 mutable lifecycle。
 - HyperFrames 默认 Production renderer，Providers optional；禁止隐式换 renderer、第二 timeline，或缺 Video Provider 就放弃 image/graphics/voice/captions composition。
