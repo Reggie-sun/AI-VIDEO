@@ -19,6 +19,7 @@ from ai_video.production.models import (
     ArtifactReference, AssetRegistrySnapshot, Character, DeliveryProfile,
     ProductionBrief, ProductionProject, ProjectArtifactRefs, RendererPolicy,
     Scene, Shot, SourceReference, Story, Storyboard,
+    StoryboardBeat,
 )
 from ai_video.production.registry import registry_semantic_sha256
 from ai_video.production.state_commit import PreparedArtifact, _canonical_yaml_bytes
@@ -126,6 +127,15 @@ def author_canvas_project(*, packet, direction, registry=None, asset_artifacts=(
         previous.project.artifacts.brief, previous.project.artifacts.story,
         *previous.project.artifacts.characters, *previous.project.artifacts.scenes,
         previous.project.artifacts.storyboard, *previous.project.artifacts.shots)}
+    if previous is not None and previous.production_parents:
+        from ai_video.production.production_strategy_reader import production_parent_context
+
+        retained_parent_ids = {shot.production_lineage.parent_shot_id for shot in previous.shots
+            if shot.production_lineage is not None}
+        for parent_shot_id in retained_parent_ids:
+            parent, _, reference, _ = production_parent_context(previous, parent_shot_id)
+            previous_models.setdefault(parent.artifact_id, parent)
+            previous_refs.setdefault(parent.artifact_id, reference)
 
     def creative(model, data, name, source_unit=None):
         if set(data) & {"artifact_id", "revision", "content_hash", "creation_receipt_id",
@@ -138,10 +148,18 @@ def author_canvas_project(*, packet, direction, registry=None, asset_artifacts=(
             content_hash=local_hash),)
         prior = previous_models.get(f"{pid}-{name}")
         if prior is not None and local_provenance[0] in prior.source_provenance:
-            # Canonical adoption may add roles/provenance after authoring. An
-            # unrelated director edit must not erase those accepted outputs.
-            models.append(prior)
-            return prior, previous_refs[prior.artifact_id]
+            # P5 rewrites Storyboard beat membership while preserving its
+            # authoring provenance. Reuse only if its author-owned beats still
+            # match this direction; ordinary Shot adoption remains reusable.
+            authored_storyboard_matches = (
+                not isinstance(prior, Storyboard)
+                or prior.beats == tuple(StoryboardBeat.model_validate(beat) for beat in data["beats"])
+            )
+            if authored_storyboard_matches:
+                # Canonical adoption may add roles/provenance after authoring. An
+                # unrelated director edit must not erase those accepted outputs.
+                models.append(prior)
+                return prior, previous_refs[prior.artifact_id]
         value = seal_artifact(model(artifact_id=f"{pid}-{name}", revision=prior.revision if prior else 1,
             content_hash="0" * 64, creation_receipt_id=f"canvas-author-{local_hash}",
             source_provenance=local_provenance, **data))

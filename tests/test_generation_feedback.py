@@ -9,7 +9,7 @@ from ai_video.production.generation_decision import DecisionInputs, DecisionPoli
 from ai_video.production.generation_experience import GenerationExperience, empirical_assessment, extract_generation_features
 from ai_video.production.generation_feedback import (
     GenerationFeedbackOrchestrator, GenerationHistory, RegisteredGenerationTarget,
-    project_attempt_evidence,
+    create_generation_candidates, project_attempt_evidence,
 )
 from ai_video.production.video_compiler import ProviderNativePrompt, compile_provider_video_request
 from ai_video.production.video_fake import ScriptedFakeVideoProvider
@@ -44,6 +44,145 @@ def feedback_setup():
         context_loader=lambda: current, history_loader=lambda: history[0],
         policy=DecisionPolicy(allow_bounded_exploration=True))
     return setup, provider, current, history, orchestrator
+
+
+def _acceptance_with_reordered_inventory(setup, kind):
+    from ai_video.production.domain_acceptance import DomainAcceptancePolicy
+    from ai_video.production.generation_input_control import GenerationInputControl
+    from ai_video.production.generation_recipe import RequirementExpression
+    from ai_video.production.hashing import canonical_sha256
+
+    if kind == "marked":
+        from test_requirement_semantics import marked_policy, semantic_rule
+
+        return marked_policy([semantic_rule("zeta"), semantic_rule("alpha")])
+
+    base = setup["inputs"].candidates[0].recipe
+    if kind == "input_control":
+        rules = tuple(RequirementExpression(
+            requirement_id=identity, level="acceptance", stage="raw_generation",
+            dimension="action_and_time", observable="The authored action is preserved.",
+            tolerance="as authored", measurement="inspect the exact compiler input", proof="technical",
+            intent_paths=("generation_intent.subject_action.progression",),
+            native_text=("raises both arms",), production_owner="qa_acceptance",
+            input_control=GenerationInputControl(mechanism="prompt_guidance"),
+        ) for identity in ("zeta", "alpha"))
+    else:
+        original = base.expressions[0]
+        rules = tuple(original.model_copy(update={"requirement_id": identity})
+                      for identity in ("zeta", "alpha"))
+
+    payload = dict(base.acceptance_policy.profile_payload)
+    payload["required_requirement_ids"] = tuple(rule.requirement_id for rule in rules)
+    payload["generation_requirements"] = tuple(
+        rule.model_dump(mode="json") if kind == "input_control"
+        else rule.model_dump(mode="json", exclude={"native_text"})
+        for rule in rules
+    )
+    digest = canonical_sha256(payload)
+    payload["content_hash"] = digest
+    return DomainAcceptancePolicy(
+        domain_id=base.acceptance_policy.domain_id,
+        profile_id=base.acceptance_policy.profile_id,
+        profile_version=base.acceptance_policy.profile_version,
+        profile_content_hash=digest,
+        measurement_contract_version=base.acceptance_policy.measurement_contract_version,
+        required_requirement_ids=payload["required_requirement_ids"],
+        profile_payload=payload,
+    )
+
+
+@pytest.mark.parametrize("kind", ["legacy", "marked", "input_control"])
+def test_candidate_projection_accepts_unique_qa_inventory_in_authored_order(kind):
+    setup = setup_decision()
+    base = setup["inputs"].candidates[0]
+    acceptance = _acceptance_with_reordered_inventory(setup, kind)
+    original_payload = acceptance.model_dump_json()
+    provider = NativeFixtureProvider(capabilities=base.capabilities, artifact_bytes=b"unused-offline")
+
+    candidates, _ = create_generation_candidates(
+        projection=setup["projection"],
+        targets=(RegisteredGenerationTarget(provider, base.provider_profile,
+            base.compiler_contract, base.output_requirement),),
+        acceptance=acceptance,
+    )
+
+    assert len(candidates) == 1
+    assert tuple(item.requirement_id for item in candidates[0].recipe.expressions) == ("alpha", "zeta")
+    assert acceptance.model_dump_json() == original_payload
+    assert candidates[0].recipe.acceptance_policy.profile_content_hash == acceptance.profile_content_hash
+
+
+@pytest.mark.parametrize("mutation, message", [
+    ("duplicate", "unique sorted requirement IDs"),
+    ("missing", "omits or adds an accepted requirement"),
+    ("changed_semantics", "complete versioned acceptance-owner projection"),
+])
+def test_recipe_projection_still_rejects_nonmatching_owner_inventory(mutation, message):
+    from ai_video.production.generation_recipe import GenerationRecipe
+
+    setup = setup_decision()
+    base = setup["inputs"].candidates[0]
+    acceptance = _acceptance_with_reordered_inventory(setup, "legacy")
+    provider = NativeFixtureProvider(capabilities=base.capabilities, artifact_bytes=b"unused-offline")
+    candidates, _ = create_generation_candidates(
+        projection=setup["projection"],
+        targets=(RegisteredGenerationTarget(provider, base.provider_profile,
+            base.compiler_contract, base.output_requirement),),
+        acceptance=acceptance,
+    )
+    recipe = candidates[0].recipe
+    expressions = recipe.expressions
+    if mutation == "duplicate":
+        expressions = (expressions[0], expressions[0], expressions[1])
+    elif mutation == "missing":
+        expressions = expressions[:1]
+    else:
+        expressions = (expressions[0].model_copy(update={"observable": "A changed predicate."}), *expressions[1:])
+
+    with pytest.raises(ValueError, match=message):
+        GenerationRecipe.model_validate({**recipe.model_dump(mode="python"), "expressions": expressions})
+
+
+@pytest.mark.parametrize("malformation", ["missing_requirement_id", "non_mapping"])
+def test_legacy_recipe_projection_rejects_malformed_inventory_with_contract_error(malformation):
+    from ai_video.production.domain_acceptance import DomainAcceptancePolicy
+    from ai_video.production.generation_recipe import GenerationRecipe
+    from ai_video.production.hashing import canonical_sha256
+
+    setup = setup_decision()
+    base = setup["inputs"].candidates[0]
+    acceptance = _acceptance_with_reordered_inventory(setup, "legacy")
+    provider = NativeFixtureProvider(capabilities=base.capabilities, artifact_bytes=b"unused-offline")
+    candidates, _ = create_generation_candidates(
+        projection=setup["projection"],
+        targets=(RegisteredGenerationTarget(provider, base.provider_profile,
+            base.compiler_contract, base.output_requirement),),
+        acceptance=acceptance,
+    )
+    payload = dict(acceptance.profile_payload)
+    inventory = list(payload["generation_requirements"])
+    if malformation == "missing_requirement_id":
+        inventory[0] = {key: value for key, value in inventory[0].items() if key != "requirement_id"}
+    else:
+        inventory[0] = "not-a-requirement-mapping"
+    payload["generation_requirements"] = tuple(inventory)
+    digest = canonical_sha256(payload)
+    payload["content_hash"] = digest
+    malformed_acceptance = DomainAcceptancePolicy(
+        domain_id=acceptance.domain_id,
+        profile_id=acceptance.profile_id,
+        profile_version=acceptance.profile_version,
+        profile_content_hash=digest,
+        measurement_contract_version=acceptance.measurement_contract_version,
+        required_requirement_ids=acceptance.required_requirement_ids,
+        profile_payload=payload,
+    )
+    recipe = candidates[0].recipe
+
+    with pytest.raises(ValueError, match="complete versioned acceptance-owner projection"):
+        GenerationRecipe.model_validate({**recipe.model_dump(mode="python"),
+            "acceptance_policy": malformed_acceptance, "rubric_hash": digest})
 
 
 def test_common_caller_produces_failure_intervention_without_handwritten_proposal():

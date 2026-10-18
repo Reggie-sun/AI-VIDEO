@@ -383,6 +383,8 @@ window、transform、图层、音轨、字幕与有序 coverage，禁止仅凭�
 `ProductionUnit.preserved_source_expression` 是显式的生成输入 handoff：只把 unit 声明原样物化到
 generation child Shot，不推断继承 parent 整镜；source-backed use 拒绝此字段，未声明时旧 hash 不变。
 其 exact materials、原文和 Provider 准入继续由现有 compiler/Registry 核验，不新增输入或授权 owner。
+Canvas 修订沿 retained parent 的 exact ref 保留 revision ancestry；物化后 Storyboard 的旧 authoring provenance 不能豁免当前 beats 校验。
+Recipe 对照 QA inventory 时按唯一 requirement ID 比较完整字段，保留原 QA payload/hash；排序不免除缺项、改义或重复项拒绝。
 MP4 的不同实测画幅只有显式 `FixedTransform.video_fit=cover` 才允许固定居中填满裁切；
 默认 `exact` 保持同画幅校验与历史序列化。用途证据绑定该 transform，旧全幅证据不资格化新裁切；
 此选择不修改 raw generation 历史或证明其 activation。

@@ -1,5 +1,6 @@
 """Immutable recipe semantics, independent of attempt and audit identities."""
 
+from collections.abc import Mapping
 from typing import Literal
 
 from pydantic import Field, model_serializer, model_validator
@@ -91,15 +92,24 @@ class GenerationRecipe(StrictModel):
         if required_ids != set(self.acceptance_policy.required_requirement_ids):
             raise ValueError("recipe omits or adds an accepted requirement")
         inventory = self.acceptance_policy.profile_payload.get("generation_requirements")
+        if inventory is not None and not isinstance(inventory, (tuple, list)):
+            raise ValueError("recipe needs the complete versioned acceptance-owner projection")
         marked_rules = validate_semantic_inventory(self.acceptance_policy.profile_payload,
                                                   self.acceptance_policy.required_requirement_ids)
         if marked_rules:
             # Compare the QA owner's typed projection, including optional-field
             # defaults, while retaining the original sealed profile/hash verbatim.
             inventory = tuple(r.model_dump(mode="json", exclude={"native_text"}) for r in marked_rules)
-        elif inventory and any(raw.get("input_control") is not None for raw in inventory):
-            inventory = tuple(RequirementExpression.model_validate(raw).model_dump(
-                mode="json", exclude={"native_text"}) for raw in inventory)
+        elif inventory:
+            if any(not isinstance(raw, Mapping)
+                   or not isinstance(raw.get("requirement_id"), str)
+                   or not raw["requirement_id"].strip() for raw in inventory):
+                raise ValueError("recipe needs the complete versioned acceptance-owner projection")
+            if any(raw.get("input_control") is not None for raw in inventory):
+                inventory = tuple(RequirementExpression.model_validate(raw).model_dump(
+                    mode="json", exclude={"native_text"}) for raw in inventory)
+        if inventory is not None:
+            inventory = tuple(sorted(inventory, key=lambda item: item["requirement_id"]))
         actual = tuple(r.model_dump(mode="json", exclude={"native_text"}) for r in self.expressions)
         if inventory is None or canonical_sha256({"rules": inventory}) != canonical_sha256({"rules": actual}):
             raise ValueError("recipe needs the complete versioned acceptance-owner projection")

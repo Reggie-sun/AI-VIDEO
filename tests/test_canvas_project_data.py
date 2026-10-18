@@ -208,6 +208,182 @@ def test_existing_preflight_uses_retained_parent_after_materialization(tmp_path,
     assert not any(attempt.video_generation_state for attempt in materialized.manifest.attempts)
 
 
+@pytest.mark.parametrize("next_unit_intent", [
+    "Generate the arrival with a held opening pose.",
+    "Generate the arrival with a measured camera push.",
+])
+def test_revising_materialized_parent_reconciles_storyboard_and_retained_revision(
+    tmp_path, next_unit_intent
+):
+    from ai_video.canvas_authoring import author_canvas_project
+    from ai_video.canvas_production import CanvasProductionService
+    from ai_video.production.hashing import seal_artifact
+    from ai_video.production.models import Story
+    from ai_video.production.production_strategy_reader import production_parent_context
+    from ai_video.production.project import load_production_project
+    from ai_video.production.registry import registry_semantic_sha256
+    from ai_video.production.seedance_source_expression import (
+        PreservedSourceExpression, SourceTextPart, source_parts_sha256,
+    )
+    from ai_video.planning.production_strategy import ProductionCapabilities, ProductionStrategyPolicy
+    from ai_video.production_planning import ProductionPlanningService
+    from production_strategy_factory import make_persisted_strategy_fixture
+
+    source, definition = text_data()
+    fixture = make_persisted_strategy_fixture(tmp_path / "production", generation_only=True)
+    initial = load_production_project(fixture.root / "project.yaml")
+    direction_data = deepcopy(definition["direction"])
+    direction_data["project_id"] = initial.project.project_id
+    shot_ids = [fixture.parent_shot_id, initial.shots[1].shot_id]
+    for row, shot_id in zip(direction_data["shots"], shot_ids, strict=True):
+        row["shot"]["shot_id"] = shot_id
+    direction_data["storyboard"]["beats"][0]["shot_ids"] = shot_ids
+    definition["direction"] = direction_data
+    inspection = inspect_canvas_source(source, definition["selection"])
+    packet, direction_data, _, _ = prepare_canvas_project_data(
+        inspection=inspection, definition=definition, data_root=tmp_path,
+    )
+    direction_data["characters"] = [{
+        "character_id": "character-hero", "name": "Hero", "identity": "Lead detective",
+        "appearance_bible": "Blue jacket and silver badge",
+        "reference_asset_ids": ["image-shot-1"],
+    }]
+    direction_data["shots"][0]["shot"]["duration_policy"] = {
+        "mode": "fixed", "seconds": 3.0,
+    }
+    direction_data["shots"][0]["shot"]["production_intent"] = (
+        initial.shots[0].production_intent.model_dump(mode="json")
+    )
+
+    initial_bundle = author_canvas_project(
+        packet=packet, direction=direction_data, previous=initial,
+    )
+    authored_story = next(item for item in initial_bundle.creative_artifacts if isinstance(item, Story))
+    assets = tuple(asset.model_copy(update={
+        "input_artifact_ids": tuple(
+            authored_story.artifact_id if item == "story-main" else item
+            for item in asset.input_artifact_ids
+        ),
+        "input_fingerprint": authored_story.content_hash,
+    }) if "story-main" in asset.input_artifact_ids else asset
+        for asset in initial.registry.assets)
+    registry = initial.registry.model_copy(update={
+        "revision_id": "0" * 64, "content_hash": "0" * 64, "assets": assets,
+    })
+    registry_hash = registry_semantic_sha256(registry)
+    registry = registry.model_copy(update={"revision_id": registry_hash, "content_hash": registry_hash})
+
+    committer = fixture.committer
+    initial_service = CanvasProductionService(
+        committer=committer, packet=packet, direction=direction_data,
+    )
+    initial_service.revise_authoring(attempt_id="canvas-initial-canonical-authoring", registry=registry)
+
+    def align_policy_to_parent(parent, attempt_id):
+        loaded = load_production_project(fixture.root / "project.yaml")
+        policy = loaded.qa_policy
+        allocations = tuple(item.model_copy(update={
+            "parent_shot_content_hash": parent.content_hash,
+        }) if item.parent_shot_id == parent.shot_id else item
+            for item in policy.production_allocations)
+        policy = seal_artifact(policy.model_copy(update={
+            "revision": policy.revision + 1,
+            "content_hash": "0" * 64,
+            "production_allocations": allocations,
+        }))
+        committer.activate_qa_policy(
+            policy, expected_manifest_revision=loaded.manifest.manifest_revision,
+            attempt_id=attempt_id,
+        )
+        return load_production_project(fixture.root / "project.yaml")
+
+    authored = load_production_project(fixture.root / "project.yaml")
+    authored_parent = next(shot for shot in authored.shots if shot.shot_id == fixture.parent_shot_id)
+    authored = align_policy_to_parent(authored_parent, "canvas-policy-initial-parent")
+    service = CanvasProductionService(committer=committer, packet=packet, direction=direction_data)
+    planning = ProductionPlanningService(
+        committer=committer,
+        policy=ProductionStrategyPolicy(preference="generation", allow_generation_exploration=True),
+    )
+    planning._capabilities = lambda: ProductionCapabilities(generation_available=True)
+    service._production_planning = lambda: planning
+    first_decision = service.prepare_production(parent_shot_id=fixture.parent_shot_id)
+    service.materialize_production(
+        decision=first_decision.model_dump(mode="json"), attempt_id="canvas-first-materialization",
+    )
+    materialized = load_production_project(fixture.root / "project.yaml")
+    retained_parent, _, _, _ = production_parent_context(materialized, fixture.parent_shot_id)
+    second_before = next(shot for shot in materialized.shots if shot.shot_id == shot_ids[1])
+    assert any(item.reference == "canvas-authoring:storyboard"
+        for item in materialized.storyboard.source_provenance)
+    assert [shot for beat in materialized.storyboard.beats for shot in beat.shot_ids] == [
+        fixture.child_shot_id, shot_ids[1],
+    ]
+    previous_child = next(shot for shot in materialized.shots
+        if shot.production_lineage is not None and shot.production_lineage.parent_shot_id == fixture.parent_shot_id)
+    child_ref = next(ref for ref in materialized.project.artifacts.shots
+        if ref.artifact_id == previous_child.artifact_id)
+    previous_child_bytes = (fixture.root / child_ref.path).read_bytes()
+
+    original_text = direction_data["shots"][0]["shot"]["intent"]
+    parts = (SourceTextPart(text=original_text),)
+    expression = PreservedSourceExpression(
+        source_sha256=source_parts_sha256(parts), parts=parts,
+    )
+    old_intent = retained_parent.production_intent
+    old_coverage = old_intent.coverage_options[0]
+    changed_unit = old_coverage.units[0].model_copy(update={
+        "intent": next_unit_intent,
+        "preserved_source_expression": expression,
+    })
+    revised_intent = old_intent.model_copy(update={
+        "coverage_options": (old_coverage.model_copy(update={"units": (changed_unit,)}),),
+    })
+    revised_direction = deepcopy(direction_data)
+    revised_direction["shots"][0]["shot"]["production_intent"] = revised_intent.model_dump(mode="json")
+    revised_service = CanvasProductionService(
+        committer=committer, packet=packet, direction=revised_direction,
+    )
+    revised_service.revise_authoring(
+        attempt_id="canvas-revise-materialized-parent", registry=materialized.registry,
+    )
+
+    revised_loaded = load_production_project(fixture.root / "project.yaml")
+    assert [shot for beat in revised_loaded.storyboard.beats for shot in beat.shot_ids] == shot_ids
+    revised_parent = next(shot for shot in revised_loaded.shots if shot.shot_id == fixture.parent_shot_id)
+    assert revised_parent.revision == retained_parent.revision + 1
+    revised_unit = revised_parent.production_intent.coverage_options[0].units[0]
+    assert revised_unit.intent == next_unit_intent
+    assert revised_unit.preserved_source_expression == expression
+    assert revised_unit.preserved_source_expression.parts[0].text == original_text
+    second_after = next(shot for shot in revised_loaded.shots if shot.shot_id == shot_ids[1])
+    assert second_after.content_hash == second_before.content_hash
+    assert second_after.required_asset_roles == second_before.required_asset_roles
+    assert (fixture.root / child_ref.path).read_bytes() == previous_child_bytes
+
+    revised_loaded = align_policy_to_parent(revised_parent, "canvas-policy-revised-parent")
+    revised_service = CanvasProductionService(
+        committer=committer, packet=packet, direction=revised_direction,
+    )
+    planning = ProductionPlanningService(
+        committer=committer,
+        policy=ProductionStrategyPolicy(preference="generation", allow_generation_exploration=True),
+    )
+    planning._capabilities = lambda: ProductionCapabilities(generation_available=True)
+    revised_service._production_planning = lambda: planning
+    second_decision = revised_service.prepare_production(parent_shot_id=fixture.parent_shot_id)
+    revised_service.materialize_production(
+        decision=second_decision.model_dump(mode="json"), attempt_id="canvas-second-materialization",
+    )
+    final = load_production_project(fixture.root / "project.yaml")
+    final_parent, _, _, _ = production_parent_context(final, fixture.parent_shot_id)
+    final_child = next(shot for shot in final.shots
+        if shot.production_lineage is not None and shot.production_lineage.parent_shot_id == fixture.parent_shot_id)
+    assert final_parent.content_hash == revised_parent.content_hash
+    assert final_child.preserved_source_expression == expression
+    assert (fixture.root / child_ref.path).read_bytes() == previous_child_bytes
+
+
 def test_sequence_preflight_exposes_future_state_before_first_generation(tmp_path):
     from scripts.canvas_production import run
     source, definition = text_data()
