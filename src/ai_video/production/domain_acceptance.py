@@ -18,7 +18,9 @@ from ai_video.production._immutable_models import ImmutableDict
 from ai_video.production.artifact_contracts import StrictModel, ToolIdentity
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.final_output_contracts import FinalOutputContract
-from ai_video.production.requirement_semantics import validate_semantic_inventory, require_final_contract
+from ai_video.production.requirement_semantics import (
+    final_requirement_matches, validate_semantic_inventory, require_final_contract,
+)
 from ai_video.production.source_use_evidence import (
     SourceUseEvidence,
     require_source_use_evidence_authority,
@@ -216,9 +218,14 @@ def production_allocation_issues(policy, allocation: ProductionRequirementAlloca
                 and requirement_id in parent_acceptance.required_requirement_ids
                 and item.get("level") == "acceptance"
                 and item.get("stage") in {"shot_editorial", "final_composition"}
-                and requirement_id not in assembly_ids
             ):
-                issues.add(f"post_goal_not_in_assembly:{requirement_id}")
+                if requirement_id not in assembly_ids:
+                    issues.add(f"post_goal_not_in_assembly:{requirement_id}")
+                elif requirement_id in final_ids and not final_requirement_matches(
+                    requirement_id=requirement_id, observable=item.get("observable"),
+                    proof=item.get("proof"), final_output=final_output,
+                ):
+                    issues.add(f"assembly_final_output_mismatch:{requirement_id}")
 
     for component in allocation.components:
         rubric = component.generation_acceptance

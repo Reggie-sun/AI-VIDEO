@@ -144,7 +144,7 @@ def test_complete_raw_and_assembly_responsibilities_are_accepted():
     parent = _acceptance(
         "parent",
         ("action", "editorial"),
-        rows=(_row("action"), _row("editorial", stage="shot_editorial")),
+        rows=(_row("action"), {**_row("editorial", stage="shot_editorial"), "proof": "human"}),
     )
     raw = _acceptance("raw", ("action",), rows=(_row("action"),))
     allocation = _allocation(
@@ -159,6 +159,69 @@ def test_complete_raw_and_assembly_responsibilities_are_accepted():
     policy = _qa_policy(parent, allocation, final_output=_final_output("editorial"))
 
     assert production_allocation_issues(policy, allocation) == ()
+
+
+def _post_policy(*, marked=True, final_observable=None, parent_proof="human", final_proof="human"):
+    from test_requirement_semantics import marked_policy, semantic_rule
+
+    observable = "The handover completes by 3 seconds."
+    rule = semantic_rule("deadline")
+    rule.update(stage="shot_editorial", observable=observable, proof=parent_proof)
+    rule["semantics"]["source_refs"][0].update(origin="explicit_user", fixed=True, quote=observable)
+    rule["semantics"]["hard_basis"].update(kind="explicit_user",
+        necessity="This fixed deadline is required for the match cut.")
+    if marked:
+        parent = marked_policy([rule])
+    else:
+        rule.pop("semantics")
+        parent = _acceptance("legacy-editorial", ("deadline",), rows=(rule,))
+    allocation = _allocation(parent, (), assembly=("deadline",))
+    final = FinalOutputContract(goal_id="fixed-deadline", goal_version="1",
+        user_goal="Preserve the fixed handover deadline.", requirements=(FinalOutputRequirement(
+            requirement_id="deadline", observable=final_observable or observable, proof=final_proof),))
+    return _qa_policy(parent, allocation, final_output=final)
+
+
+@pytest.mark.parametrize("marked", [False, True])
+@pytest.mark.parametrize("mutation", ["observable", "proof", "technical_proof"])
+def test_assembly_cannot_replace_a_declared_post_result_or_its_proof(marked, mutation):
+    from ai_video.production.domain_acceptance import (
+        production_allocation_issues, require_production_responsibilities,
+    )
+
+    changes = {"observable": {"final_observable": "The handover completes by 5 seconds."},
+        "proof": {"final_proof": "evaluator"}, "technical_proof": {"parent_proof": "technical"}}
+    historical = _post_policy(marked=marked, **changes[mutation])
+    original = historical.model_dump_json()
+    reopened = QaPolicy.model_validate_json(original)
+    assert reopened.model_dump_json() == original
+    assert production_allocation_issues(reopened, reopened.production_allocations[0]) == (
+        "assembly_final_output_mismatch:deadline",)
+    with pytest.raises(ValueError, match="assembly_final_output_mismatch:deadline"):
+        require_production_responsibilities(reopened)
+
+
+def test_matching_editorial_analyzer_result_binds_to_final_evaluator():
+    from ai_video.production.domain_acceptance import require_production_responsibilities
+
+    require_production_responsibilities(_post_policy(parent_proof="analyzer", final_proof="evaluator"))
+
+
+def test_qa_publication_rejects_substituted_editorial_goal_before_writing(tmp_path):
+    from ai_video.errors import AiVideoError
+    from ai_video.production.paths import canonical_qa_policy_path
+    from ai_video.production.project import load_production_project
+    from production_strategy_factory import make_persisted_strategy_fixture
+
+    fixture = make_persisted_strategy_fixture(tmp_path)
+    loaded = load_production_project(tmp_path / "project.yaml")
+    policy = _post_policy(final_observable="No black frames are visible.")
+    before = (tmp_path / "state/manifest.json").read_bytes()
+    with pytest.raises(AiVideoError, match="responsibility admission"):
+        fixture.committer.activate_qa_policy(policy, attempt_id="reject-substituted-goal",
+            expected_manifest_revision=loaded.manifest.manifest_revision)
+    assert (tmp_path / "state/manifest.json").read_bytes() == before
+    assert not (tmp_path / canonical_qa_policy_path(policy.content_hash)).exists()
 
 
 def test_component_raw_rubric_must_cover_every_nonassembly_id():

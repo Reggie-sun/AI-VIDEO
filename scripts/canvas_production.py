@@ -21,6 +21,27 @@ def _json(path, root):
     return json.loads(_read_regular_file_nofollow(path, contained_by=root).data)
 
 
+def _approved_preflight_shots(loaded, authored_shots):
+    """Use retained production owners for approved Shots replaced by components."""
+    from ai_video.production.production_strategy_reader import production_parent_context
+
+    active = {shot.shot_id: shot for shot in loaded.shots}
+    family_parents = {shot.production_lineage.parent_shot_id for shot in loaded.shots
+        if shot.production_lineage is not None}
+    resolved = []
+    for authored in authored_shots:
+        current = active.get(authored.shot_id)
+        if current is not None and current.production_intent is not None:
+            resolved.append(current)
+        elif ((current is not None and current.production_lineage is not None)
+                or authored.shot_id in family_parents):
+            parent, _, _, _ = production_parent_context(loaded, authored.shot_id)
+            resolved.append(parent)
+        else:
+            resolved.append(authored)
+    return tuple(resolved)
+
+
 def run(*, data_path, project_root, action, runtime_factory=None, arguments=None,
        ffprobe_executable=None):
     data_path = Path(data_path).absolute()
@@ -48,17 +69,22 @@ def run(*, data_path, project_root, action, runtime_factory=None, arguments=None
 
             selected = arguments.get("qa_policy")
             qa_policy, qa_authority = None, "NOT_EVALUATED"
+            selected_project = None
             if selected is not None:
                 qa_policy = selected if isinstance(selected, QaPolicy) else QaPolicy.model_validate(
                     _json(root / selected, root))
                 qa_authority = "candidate_not_approved"
             elif action == "preflight" and (Path(project_root) / "project.yaml").exists():
-                qa_policy = service._load().qa_policy
+                selected_project = service._load()
+                qa_policy = selected_project.qa_policy
                 qa_authority = "selected_policy"
+            authored_shots = tuple(m for m in bundle.creative_artifacts if isinstance(m, Shot))
+            if selected_project is not None and qa_policy is not None:
+                authored_shots = _approved_preflight_shots(selected_project, authored_shots)
             preflight = canvas_reference_preflight(packet=service.packet,
                 direction=service.direction, registry=bundle.registry, qa_policy=qa_policy,
                 qa_authority=qa_authority,
-                authored_shots=tuple(m for m in bundle.creative_artifacts if isinstance(m, Shot)))
+                authored_shots=authored_shots)
             if action == "preflight":
                 preflight["position"] = asdict(service.position()) if (
                     Path(project_root) / "project.yaml").exists() else None

@@ -113,6 +113,111 @@ def _with_final_preference(acceptance):
     return DomainAcceptancePolicy.model_validate(fields)
 
 
+def _with_unmarked_raw_diagnostic(acceptance):
+    from ai_video.production.domain_acceptance import DomainAcceptancePolicy
+    from ai_video.production.hashing import canonical_sha256
+
+    payload = dict(acceptance.profile_payload)
+    payload.pop("content_hash", None)
+    assert "requirement_semantics_version" not in payload
+    diagnostic = {
+        "requirement_id": "diagnostic-action-observation",
+        "level": "diagnostic",
+        "stage": "raw_generation",
+        "dimension": "action_observation",
+        "observable": "Observe how the camera moves in the generated result.",
+        "tolerance": "observation only",
+        "measurement": "inspect the submitted source frames",
+        "proof": "analyzer",
+        "intent_paths": ["generation_intent.camera_intent.movement"],
+        "native_text": [],
+        "production_owner": "diagnostic_observation",
+    }
+    payload["generation_requirements"] = tuple(sorted(
+        (*payload["generation_requirements"], diagnostic), key=lambda item: item["requirement_id"]
+    ))
+    digest = canonical_sha256(payload)
+    fields = acceptance.model_dump(mode="python")
+    fields.update(profile_content_hash=digest, profile_payload={**payload, "content_hash": digest})
+    return DomainAcceptancePolicy.model_validate(fields)
+
+
+def _prepared_with_acceptance(service, limits, acceptance):
+    orchestrator = service._orchestrator(service.direction["shots"][0])
+    current = orchestrator.context_loader()
+    orchestrator.context_loader = lambda: {**current, "acceptance": acceptance}
+    return orchestrator.prepare(limits=limits)
+
+
+@pytest.mark.parametrize("provider_family", ["h3-max", "seedance"])
+def test_unmarked_raw_diagnostic_does_not_block_or_become_native_input_or_required(
+    tmp_path, provider_family
+):
+    from test_generation_input_control import _canvas_control_service
+    from ai_video.production.generation_recipe import expression_errors
+    from ai_video.production.video_reference_controls import prepared_generation_report
+
+    service, limits, _, _, _ = _canvas_control_service(
+        tmp_path,
+        scenario=("Courier", "sets a parcel down", "a station platform"),
+        provider_family=provider_family,
+    )
+    current = service._orchestrator(service.direction["shots"][0]).context_loader()
+    acceptance = _with_unmarked_raw_diagnostic(current["acceptance"])
+    before_attempts = tuple(item.attempt_id for item in service._load().manifest.attempts)
+
+    prepared = _prepared_with_acceptance(service, limits, acceptance)
+
+    assert prepared.compilation.outcome == "compiled"
+    recipe = prepared.execution_binding.decision.routing.provider_bound_request.generation_recipe
+    diagnostic = next(item for item in recipe.expressions
+                      if item.requirement_id == "diagnostic-action-observation")
+    assert diagnostic.level == "diagnostic"
+    assert diagnostic.native_text == ()
+    assert diagnostic.requirement_id not in acceptance.required_requirement_ids
+    assert expression_errors(
+        SimpleNamespace(expressions=(diagnostic,)),
+        prepared.execution_binding.projection.requirement,
+        prepared.resolved_request.prompt_text,
+        control_paths=("generation_intent.pacing.shot_duration_seconds",),
+    ) == ()
+    assert prepared.resolved_request.prompt_text == service.direction["shots"][0]["shot"]["intent"]
+    row = next(item for item in prepared_generation_report(prepared)["reference_control"]["objectives"]
+               if item["requirement_id"] == diagnostic.requirement_id)
+    assert row["raw_acceptance_required"] is False
+    assert row["raw_input_expected"] is False
+    assert not any(item.operation == "video_generation" for item in service._load().manifest.attempts)
+    assert tuple(item.attempt_id for item in service._load().manifest.attempts) == before_attempts
+
+
+@pytest.mark.parametrize("provider_family", ["h3-max", "seedance"])
+def test_unmarked_diagnostic_does_not_hide_missing_raw_fragment(
+    tmp_path, provider_family
+):
+    from test_generation_input_control import _canvas_control_service
+    from ai_video.production.video_compiler import (
+        ProviderRequirementUnsupported,
+        ProviderRequirementUnsupportedReason,
+    )
+
+    service, limits, _, _, _ = _canvas_control_service(
+        tmp_path,
+        scenario=("Courier", "sets a parcel down", "a station platform"),
+        provider_family=provider_family,
+        missing_fragment=True,
+    )
+    current = service._orchestrator(service.direction["shots"][0]).context_loader()
+    acceptance = _with_unmarked_raw_diagnostic(current["acceptance"])
+
+    prepared = _prepared_with_acceptance(service, limits, acceptance)
+
+    assert isinstance(prepared.compilation, ProviderRequirementUnsupported)
+    assert prepared.compilation.reason is ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED
+    assert prepared.compilation.unsupported_field_paths == ("action-deadline",)
+    assert prepared.execution_binding is None
+    assert not any(item.operation == "video_generation" for item in service._load().manifest.attempts)
+
+
 @pytest.mark.parametrize("scenario", [
     ("Courier", "sets a parcel down", "a station platform"),
     ("Mechanic", "tightens a valve and checks it", "an engine room"),

@@ -120,6 +120,94 @@ def test_generic_prepare_keeps_decision_compatibility_and_opts_into_control_repo
     assert not any(a.video_generation_state for a in service._load().manifest.attempts)
 
 
+def test_existing_preflight_uses_retained_parent_after_materialization(tmp_path, monkeypatch):
+    from ai_video.canvas_authoring import direction_reference
+    from ai_video.canvas_production import CanvasProductionService
+    from ai_video.production.hashing import seal_artifact
+    from ai_video.production.production_strategy_reader import production_parent_context
+    from ai_video.production.project import load_production_project
+    from ai_video.production.state_commit import prepare_project_registry_commit
+    from ai_video.planning.production_strategy import ProductionCapabilities, ProductionStrategyPolicy
+    from ai_video.production_planning import ProductionPlanningService
+    from production_strategy_factory import make_persisted_strategy_fixture
+
+    source, definition = text_data()
+    fixture = make_persisted_strategy_fixture(tmp_path / "production", generation_only=True)
+    loaded = load_production_project(fixture.root / "project.yaml")
+    authoring_direction = deepcopy(definition["direction"])
+    authoring_direction["project_id"] = loaded.project.project_id
+    shot_ids = [fixture.parent_shot_id, loaded.shots[1].shot_id]
+    for row, shot_id in zip(authoring_direction["shots"], shot_ids, strict=True):
+        row["shot"]["shot_id"] = shot_id
+    authoring_direction["storyboard"]["beats"][0]["shot_ids"] = shot_ids
+    definition["direction"] = authoring_direction
+    inspection = inspect_canvas_source(source, definition["selection"])
+    packet, authoring_direction, _, _ = prepare_canvas_project_data(
+        inspection=inspection, definition=definition, data_root=tmp_path)
+
+    project = seal_artifact(loaded.project.model_copy(update={
+        "revision": loaded.project.revision + 1,
+        "content_hash": "0" * 64,
+        "source_provenance": (*loaded.project.source_provenance,
+            direction_reference(packet, authoring_direction)),
+    }))
+    binding = prepare_project_registry_commit(manifest=loaded.manifest, project=project,
+        registry=loaded.registry, attempt_id="canvas-director-binding")
+    from ai_video.production.production_strategy_dependency import prepare_strategy_dependency_transition
+    binding = prepare_strategy_dependency_transition(base_loaded=loaded,
+        candidate_loaded=loaded.model_copy(update={"project": project}), request=binding)
+    fixture.committer.commit(binding)
+    service = CanvasProductionService(committer=fixture.committer, packet=packet,
+        direction=authoring_direction)
+    planning = ProductionPlanningService(committer=fixture.committer,
+        policy=ProductionStrategyPolicy(preference="generation", allow_generation_exploration=True))
+    planning._capabilities = lambda: ProductionCapabilities(generation_available=True)
+    service._production_planning = lambda: planning
+
+    approved = service._load()
+    parent, _, _, _ = production_parent_context(approved, fixture.parent_shot_id)
+    assert parent.revision == 2
+    assert approved.qa_policy.production_allocations[0].parent_shot_content_hash == parent.content_hash
+    decision = service.prepare_production(parent_shot_id=fixture.parent_shot_id)
+    service.materialize_production(decision=decision.model_dump(mode="json"),
+        attempt_id="preflight-parent-materialization")
+    materialized = service._load()
+    retained_parent, _, _, _ = production_parent_context(materialized, fixture.parent_shot_id)
+    assert retained_parent.content_hash == parent.content_hash
+
+    # The approved parent is no longer an active Shot, so ordinary authoring
+    # produces a candidate with a different identity and no approved intent.
+    candidate = service.author(registry=materialized.registry)
+    candidate_parent = next(shot for shot in candidate.creative_artifacts
+        if getattr(shot, "shot_id", None) == fixture.parent_shot_id)
+    assert candidate_parent.content_hash != retained_parent.content_hash
+    assert candidate_parent.production_intent is None
+
+    (tmp_path / "source.json").write_text(json.dumps(source))
+    data_path = tmp_path / "project.json"
+    data_path.write_text(json.dumps(definition))
+    manifest_path = fixture.root / "state/manifest.json"
+    before = manifest_path.read_bytes()
+    monkeypatch.setattr("scripts.canvas_production.open_canvas_project",
+        lambda **_: (service, materialized.registry, ()))
+
+    from scripts.canvas_production import run
+    result = run(data_path=data_path, project_root=fixture.root, action="preflight",
+        runtime_factory="must_not_import:provider")
+
+    control = result["shots"][0]["production_control"]
+    assert control["qa_authority"] == "selected_policy"
+    assert control["qa_policy_hash"] == approved.qa_policy.content_hash
+    assert control["shot_id"] == fixture.parent_shot_id
+    assert control["binding"] == "DECLARED_PRODUCTION_INTENT"
+    assert [row["requirement_id"] for row in control["requirements"]] == ["visual"]
+    assert control["allocations"][0]["allocation_id"] == "strategy-allocation-1"
+    assert result["shots"][1]["production_control"]["binding"] == "REQUIRES_PRODUCTION_INTENT"
+    assert result["shots"][1]["production_control"]["requirements"] == []
+    assert manifest_path.read_bytes() == before
+    assert not any(attempt.video_generation_state for attempt in materialized.manifest.attempts)
+
+
 def test_sequence_preflight_exposes_future_state_before_first_generation(tmp_path):
     from scripts.canvas_production import run
     source, definition = text_data()

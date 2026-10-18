@@ -141,8 +141,8 @@ def expression_errors(recipe, requirement, prompt: str, control_paths=()) -> tup
     for item in recipe.expressions:
         if item.stage != "raw_generation":
             continue
-        if item.semantics is not None and (
-            item.level == "diagnostic" or item.level == "recipe_hint" and not item.intent_paths
+        if item.level == "diagnostic" or (
+            item.semantics is not None and item.level == "recipe_hint" and not item.intent_paths
         ):
             continue
         if not item.intent_paths:
