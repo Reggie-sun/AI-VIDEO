@@ -213,9 +213,10 @@ rubric required IDs 不能用 hint 或后期条目冒充。多组件或原片/�
 `author/preflight.production_control` 展示 QA inventory、固定来源、允许变化与已声明分工。
 新项目可在 `--arguments` 提供普通 `qa_policy` 文件（限 data 目录内）预览，标为
 `candidate_not_approved`；已批准项目的 preflight 默认读取 selected policy。全局 rubric 只展示一次，
-没有匹配 Shot intent/allocation 时不把它自动套给每镜。`prepare_production` CLI 返回
-`{decision, production_control}`；materialize 仍消费其中原始 `decision`。Python API 默认仍返回
-immutable decision，需要报告时显式 `include_control_report=True`。
+没有匹配 Shot intent/allocation 时不把它自动套给每镜。`prepare_production` 的 CLI 和 Python API
+默认仍返回原 immutable decision；需要报告时在普通 `--arguments` 中显式指定
+`"include_control_report": true`（Python 为 `include_control_report=True`），返回
+`{decision, production_control}`，materialize 仍消费其中原始 `decision`。
 原生输入预览的每项目标同步展示上述语义；后期/诊断条目不再从 intent paths 派生出模型文本。
 用户原 prompt 不被自动删改，已有 explicit input-control fragments 保持原合同。
 这些入口无 POST、permit 或验收效果；旧失败不会因分工预览而通过，编辑用途与最终 A/V 仍需新 exact 证据。

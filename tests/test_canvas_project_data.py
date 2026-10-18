@@ -92,6 +92,34 @@ def test_generic_cli_requires_only_data_for_authoring(tmp_path):
     assert list((tmp_path / "project").iterdir()) == []
 
 
+def test_generic_prepare_keeps_decision_compatibility_and_opts_into_control_report(tmp_path, monkeypatch):
+    from scripts.canvas_production import run
+    from ai_video.production.production_strategy_contracts import ProductionStrategyDecision
+    from test_canvas_edit_first import strategy_canvas
+
+    fixture, service = strategy_canvas(tmp_path / "production")
+    source, definition = text_data()
+    (tmp_path / "source.json").write_text(json.dumps(source))
+    data = tmp_path / "project.json"
+    data.write_text(json.dumps(definition))
+    # Substitute only the data-entry binding. Planning, normal loading, the
+    # returned decision and its canonical materialization are exercised intact.
+    monkeypatch.setattr("scripts.canvas_production.open_canvas_project", lambda **_: (service, None, ()))
+    arguments = {"parent_shot_id": fixture.parent_shot_id}
+    before = (fixture.root / "state/manifest.json").read_bytes()
+    decision = run(data_path=data, project_root=fixture.root, action="prepare_production",
+        arguments=arguments)
+    assert isinstance(decision, ProductionStrategyDecision)
+    assert arguments == {"parent_shot_id": fixture.parent_shot_id}
+    envelope = run(data_path=data, project_root=fixture.root, action="prepare_production",
+        arguments={**arguments, "include_control_report": True})
+    assert envelope["decision"] == decision.model_dump(mode="json")
+    assert envelope["production_control"]["strategy"]["selected_candidate_hash"] == decision.selected.candidate_hash
+    assert (fixture.root / "state/manifest.json").read_bytes() == before
+    service.materialize_production(decision=decision.model_dump(mode="json"), attempt_id="compatible-prepare")
+    assert not any(a.video_generation_state for a in service._load().manifest.attempts)
+
+
 def test_sequence_preflight_exposes_future_state_before_first_generation(tmp_path):
     from scripts.canvas_production import run
     source, definition = text_data()

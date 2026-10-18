@@ -78,8 +78,6 @@ def run(*, data_path, project_root, action, runtime_factory=None, arguments=None
     if action == "prepare_image_workflow":
         return service.prepare_image_workflow(**arguments)
     arguments = operator_arguments(action, service, arguments)
-    if action == "prepare_production":
-        arguments.setdefault("include_control_report", True)
     if action in {"compose", "compose_production"}:
         spec, timeline = getattr(service, action)(**arguments)
         return {"spec": spec.model_dump(mode="json"), "timeline": timeline.model_dump(mode="json")}

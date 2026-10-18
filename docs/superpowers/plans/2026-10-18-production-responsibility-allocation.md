@@ -20,7 +20,7 @@ Owner：Parent，与 Milestone 1 文件互不交叉。
 
 文件：新增只读 `production/production_responsibility.py` 投影既有 inventory/allocation；`canvas_preflight.py`、`scripts/canvas_production.py` 与 `production_planning.py`/`canvas_production.py` 接回既有 preflight/prepare；`video_reference_controls.py` 展示语义/自由度，`generation_feedback.py` 保持 raw/input fragments 与后期职责分离。新增 `tests/test_production_responsibility_preview.py`，复用现有 Canvas/Provider compiler fixtures。
 
-不改变旧 API 默认 immutable decision 返回；CLI 的制作准备报告附带只读分工信息，原 Decision/hash 不改。现有项目重开 selected QA，新项目可显式预览 candidate QA 并标明尚未批准；不实例化 Provider/runtime 或制造预算/permit。报告只呈现当前声明、证据与实际选择，不自动推断偏好、不改 prompt、不复制 timeline。
+不改变旧 API/CLI 默认 immutable decision 返回；显式 `include_control_report=True` 的制作准备报告附带只读分工信息，原 Decision/hash 不改。现有项目重开 selected QA，新项目可显式预览 candidate QA 并标明尚未批准；不实例化 Provider/runtime 或制造预算/permit。报告只呈现当前声明、证据与实际选择，不自动推断偏好、不改 prompt、不复制 timeline。
 
 验收：三个不同场景与两个编译器显示相同通用分工；允许变化不计 required PASS；raw 内容、参考职责、editorial/final 目标和未支持修复分别可见。所有原目标保持且纯预览不写 Manifest，不调用凭据或 transport。
 
