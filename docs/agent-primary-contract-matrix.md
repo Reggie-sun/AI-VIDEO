@@ -380,6 +380,9 @@ exact input preview 解释职责/自由度/缺口；不得推断放宽、重分 
 window、transform、图层、音轨、字幕与有序 coverage，禁止仅凭旧 lineage 证明新用途。
 `production_strategy_materialization.py` 仅构造原 committer 的
 `StateCommitRequest` 或原 CompositionSpec。不得写入第二个 strategy lifecycle、timeline 或 quota。
+`ProductionUnit.preserved_source_expression` 是显式的生成输入 handoff：只把 unit 声明原样物化到
+generation child Shot，不推断继承 parent 整镜；source-backed use 拒绝此字段，未声明时旧 hash 不变。
+其 exact materials、原文和 Provider 准入继续由现有 compiler/Registry 核验，不新增输入或授权 owner。
 MP4 的不同实测画幅只有显式 `FixedTransform.video_fit=cover` 才允许固定居中填满裁切；
 默认 `exact` 保持同画幅校验与历史序列化。用途证据绑定该 transform，旧全幅证据不资格化新裁切；
 此选择不修改 raw generation 历史或证明其 activation。
@@ -508,6 +511,7 @@ permit 从 Manifest 顺序推导同 Shot 的最新有效结果，优先实际提
 requirement 必须已有对应 proof 的观察，未知项仍为 `NOT_EVALUATED`。原 `/1` 收据与
 `reject_video_generation()` 的完整质量失败条件不变；`/2` 绑定放弃理由和重算的未知项，
 不改变 Manifest schema、原评价、付费预留、activation 或 recovery。标准 reader 重验全部 joins。
+组件拒绝/放弃按目标 lineage 选择 exact allocation/component rubric，并与绑定 recipe 核对；历史重开使用 receipt 封存的 QA，不以父镜 rubric 或当前新 QA 替代。
 Feedback 只将绑定当前 selected QA 的 exact latest `/2` 投影到 `DecisionInputs.abandoned_result`；
 切换 QA 后仍保留原 experience、latest evidence、baseline 与 terminal receipt，旧 QA 的
 abandonment 不成为新 QA 的执行例外。Router

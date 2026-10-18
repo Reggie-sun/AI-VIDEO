@@ -87,6 +87,7 @@ class ProductionUnit(StrictModel):
     additional_sources: tuple[ProductionSourceOption, ...] = ()
     required_operations: tuple[ProductionOperation, ...] = ()
     first_frame_asset_id: str | None = None
+    preserved_source_expression: PreservedSourceExpression | None = None
 
     @model_validator(mode="after")
     def _unique_requirements(self):
@@ -103,6 +104,13 @@ class ProductionUnit(StrictModel):
             if not set(source.requirement_ids) <= set(self.requirement_ids):
                 raise ValueError("source requirements must belong to the component")
         return self
+
+    @model_serializer(mode="wrap")
+    def _preserve_legacy_shape(self, handler):
+        data = handler(self)
+        if self.preserved_source_expression is None:
+            data.pop("preserved_source_expression", None)
+        return data
 
 
 class ProductionAudioUse(StrictModel):

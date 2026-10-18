@@ -130,12 +130,18 @@ class _StateCommitGenerationRejectionMixin:
                 selected_shot_generation_acceptance,
             )
 
+            selected_acceptance = selected_shot_generation_acceptance(
+                loaded, evidence.shot_id
+            )
             if (
-                selected_shot_generation_acceptance(loaded, evidence.shot_id)
-                != loaded.qa_policy.selected_generation_acceptance()
+                selected_acceptance is None
+                or selected_acceptance
+                != experience.candidate.recipe.acceptance_policy
+                or selected_acceptance.profile_content_hash
+                != experience.candidate.recipe.rubric_hash
             ):
                 raise _state_invalid(
-                    "Quality rejection does not support component QA authority."
+                    "Quality rejection component QA authority differs from its bound recipe."
                 )
             try:
                 diagnosis = validate_quality_rejection_experience(

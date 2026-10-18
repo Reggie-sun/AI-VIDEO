@@ -3,6 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -14,6 +15,8 @@ from ai_video.production.domain_acceptance import (
     ProductionRequirementAllocation,
 )
 from ai_video.production.hashing import canonical_sha256, seal_artifact
+from ai_video.production.generation_feedback import RegisteredGenerationTarget
+from ai_video.planning.production_strategy import ProductionStrategyPolicy
 from ai_video.production.models import (
     ArtifactReference,
     AssetSourceKind,
@@ -30,6 +33,7 @@ from ai_video.production.models import (
     GenerationEvaluationAuthority,
     QaPolicyPointer,
 )
+from ai_video.production_planning import ProductionPlanningService
 from ai_video.production.production_strategy_contracts import (
     ProductionCandidate,
     ProductionCoverage,
@@ -39,6 +43,10 @@ from ai_video.production.production_strategy_contracts import (
     ProductionSourceOption,
     ProductionStrategyDecision,
     ProductionUnit,
+)
+from ai_video.production.seedance_source_expression import (
+    PreservedSourceExpression, SourceReferenceMaterial, SourceReferencePart,
+    SourceTextPart, source_parts_sha256,
 )
 from ai_video.production.production_strategy_materialization import (
     build_materialized_strategy_composition,
@@ -53,9 +61,25 @@ from ai_video.production.video_retime import VideoTimeMap, VideoTimePoint
 from ai_video.production.project import load_production_project
 from ai_video.production.registry import registry_semantic_sha256
 from production_project_factory import write_production_project
+from production_strategy_factory import make_persisted_strategy_fixture
 
 
 HASH = "a" * 64
+
+
+def _generation_target() -> RegisteredGenerationTarget:
+    class _Projection:
+        def __init__(self, payload):
+            self.payload = payload
+
+        def model_dump(self, *, mode):
+            return self.payload
+
+    capabilities = _Projection({"variants": ({"capability_id": "fixture-generation"},)})
+    provider = SimpleNamespace(capabilities=lambda: capabilities)
+    return RegisteredGenerationTarget(
+        provider, _Projection({}), _Projection({}), _Projection({}),
+    )
 
 
 def _acceptance() -> DomainAcceptancePolicy:
@@ -73,6 +97,29 @@ def _acceptance() -> DomainAcceptancePolicy:
         domain_id="test", profile_id="strategy-final", profile_version="1",
         profile_content_hash=digest, profile_payload={**payload, "content_hash": digest},
         measurement_contract_version="test/1", required_requirement_ids=required,
+    )
+
+
+def _preserved_expression(source_text: str) -> PreservedSourceExpression:
+    materials = (
+        SourceReferenceMaterial(
+            asset_id="image-shot-1",
+            asset_sha256="96a15fd15c5e013722daa2ad32490aa3cb89ea7b6d31c738577f56da55305a45",
+            role="identity",
+        ),
+        SourceReferenceMaterial(
+            asset_id="image-shot-2",
+            asset_sha256="2814f96281d4a1f6c1837ae77161c30e514e53bb6b34ecb72b902f24709c3efa",
+            role="scene",
+        ),
+    )
+    parts = (
+        SourceTextPart(text=source_text),
+        SourceReferencePart(slot_id="ordered-reference", materials=materials),
+        SourceTextPart(text="按原文结束并保留镜头限制。"),
+    )
+    return PreservedSourceExpression(
+        source_sha256=source_parts_sha256(parts), parts=parts,
     )
 
 
@@ -102,6 +149,8 @@ def _loaded_with_intent(
     video_source_kind: AssetSourceKind | None = None,
     split: bool = False,
     split_frames: tuple[int, ...] = (24, 48),
+    parent_preserved_source_expression: PreservedSourceExpression | None = None,
+    unit_preserved_source_expression: PreservedSourceExpression | None = None,
 ):
     loaded = load_production_project(write_production_project(tmp_path))
     parent = loaded.shots[0]
@@ -140,6 +189,7 @@ def _loaded_with_intent(
             intent="Hold on the hero.", duration_frames=duration,
             requirement_ids=("visual",),
             source_options=() if source is None else (source.model_copy(update={"duration": duration}),),
+            preserved_source_expression=unit_preserved_source_expression,
         )
         for index, duration in enumerate(durations, start=1)
     )
@@ -151,6 +201,7 @@ def _loaded_with_intent(
     )
     parent = seal_artifact(parent.model_copy(update={
         "revision": 2, "content_hash": "0" * 64, "production_intent": intent,
+        "preserved_source_expression": parent_preserved_source_expression,
     }))
     parent_ref = ArtifactReference(
         artifact_id=parent.artifact_id, revision=parent.revision, content_hash=parent.content_hash,
@@ -329,6 +380,80 @@ def test_materializes_exact_selected_coverage_with_content_addressed_children(tm
     assert spec.shot_ids == ("shot-1-reuse-1",)
     assert spec.layers[0].asset_id == loaded.registry.assets[0].asset_id
     assert spec.transitions == ()
+
+
+def test_materialization_hands_explicit_preserved_source_to_generated_child(tmp_path):
+    expression = _preserved_expression("At a glass partition, a courier pauses and lowers one hand.")
+    loaded, decision = _loaded_with_intent(
+        tmp_path, pending=True, unit_preserved_source_expression=expression,
+    )
+
+    request = prepare_strategy_commit(loaded=loaded, decision=decision, attempt_id="source-handoff")
+    child = _materialized_loaded(loaded, request).shots[0]
+
+    assert child.preserved_source_expression == expression
+    assert child.preserved_source_expression.model_dump(mode="json") == expression.model_dump(mode="json")
+    assert child.preserved_source_expression.parts[1].materials == expression.parts[1].materials
+
+
+def test_materialization_does_not_inherit_parent_source_expression_without_unit_declaration(tmp_path):
+    parent_expression = _preserved_expression("A rover crosses a workshop, stops, and turns toward a doorway.")
+    loaded, decision = _loaded_with_intent(
+        tmp_path, pending=True, parent_preserved_source_expression=parent_expression,
+    )
+
+    request = prepare_strategy_commit(loaded=loaded, decision=decision, attempt_id="no-source-inference")
+    child = _materialized_loaded(loaded, request).shots[0]
+
+    assert loaded.shots[0].preserved_source_expression == parent_expression
+    assert decision.selected.units[0].component.preserved_source_expression is None
+    assert child.preserved_source_expression is None
+
+
+def test_source_backed_component_rejects_generation_only_preserved_source_expression(tmp_path):
+    expression = _preserved_expression("At a glass partition, a courier pauses and lowers one hand.")
+    loaded, decision = _loaded_with_intent(
+        tmp_path, unit_preserved_source_expression=expression,
+    )
+
+    with pytest.raises(AiVideoError, match="only bind to generated production components"):
+        prepare_strategy_commit(loaded=loaded, decision=decision, attempt_id="source-backed-expression")
+
+
+@pytest.mark.parametrize(
+    "source_text",
+    (
+        "At a glass partition, a courier pauses and lowers one hand.",
+        "A rover crosses a workshop, stops, and turns toward a doorway.",
+    ),
+)
+def test_explicit_preserved_source_survives_planning_committer_and_standard_reload(
+    tmp_path, source_text,
+):
+    expression = _preserved_expression(source_text)
+    fixture = make_persisted_strategy_fixture(
+        tmp_path, generation_only=True,
+        unit_preserved_source_expression=expression,
+    )
+    service = ProductionPlanningService(
+        committer=fixture.committer,
+        targets=(_generation_target(),),
+        policy=ProductionStrategyPolicy(
+            preference="generation", allow_generation_exploration=True,
+        ),
+    )
+
+    decision = service.prepare(parent_shot_id=fixture.parent_shot_id)
+    assert decision.disposition == "selected"
+    assert decision.selected.units[0].component.preserved_source_expression == expression
+
+    service.materialize(decision=decision, attempt_id="preserved-source-roundtrip")
+    reopened = load_production_project(tmp_path / "project.yaml")
+    child = next(shot for shot in reopened.shots if shot.shot_id == fixture.child_shot_id)
+
+    assert child.preserved_source_expression == expression
+    assert child.preserved_source_expression.parts[0].text == source_text
+    assert child.preserved_source_expression.parts[1].materials == expression.parts[1].materials
 
 
 def test_mapped_edit_materializes_exact_map_and_reopens_through_composition(tmp_path):

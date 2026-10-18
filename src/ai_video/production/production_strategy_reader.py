@@ -332,6 +332,7 @@ def _validate_child(
     assert intent is not None
     if (
         child.production_intent is not None
+        or child.preserved_source_expression != unit.preserved_source_expression
         or lineage.operation not in intent.allowed_operations
         or child.shot_id != unit.shot_id
         or child.intent != unit.intent

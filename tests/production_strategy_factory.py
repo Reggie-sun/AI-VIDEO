@@ -49,6 +49,7 @@ from ai_video.production.production_strategy_contracts import (
     ProductionSourceOption,
     ProductionUnit,
 )
+from ai_video.production.seedance_source_expression import PreservedSourceExpression
 from ai_video.production.project import load_production_project
 from ai_video.production.registry import registry_semantic_sha256
 from ai_video.production.source_use_evidence import SourceUseEvidence
@@ -204,6 +205,7 @@ def make_persisted_strategy_fixture(
     root: Path, *, source_verdict: str = "PASS", generation_only: bool = False,
     global_caption: bool = False,
     generation_audio: bool = False,
+    unit_preserved_source_expression: PreservedSourceExpression | None = None,
 ) -> PersistedStrategyFixture:
     """Create P2 authoring through the canonical committer, then activate QA normally."""
     base_inputs = make_p5_dependency_inputs(root, decodable_pngs=True)
@@ -266,6 +268,7 @@ def make_persisted_strategy_fixture(
                 else "Use the qualified trimmed plate."),
         duration_frames=72, requirement_ids=("visual",),
         source_options=() if generation_only else (video_source,),
+        preserved_source_expression=unit_preserved_source_expression,
     )
     audio_track = AudioTrackSpec(
         track_id="strategy-dialogue", audio_kind=AudioKind.DIALOGUE,

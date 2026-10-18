@@ -251,6 +251,12 @@ def _materialize_child(
         raise _project_invalid("Production strategy selected source is not an authored source option.")
     if selected.source is None and selected.operation is not ProductionOperation.GENERATE_FULL_SHOT:
         raise _project_invalid("Only full-shot generation may materialize a pending primary visual role.")
+    if (unit.preserved_source_expression is not None
+            and (selected.source is not None
+                 or selected.operation is not ProductionOperation.GENERATE_FULL_SHOT)):
+        raise _project_invalid(
+            "Preserved source expressions may only bind to generated production components."
+        )
 
     visual_strategy, hybrid_layers, rationale = _visual_strategy(loaded, selected)
     roles = _required_roles(
@@ -298,6 +304,7 @@ def _materialize_child(
         hybrid_layers=hybrid_layers,
         review_policy=parent.review_policy,
         production_lineage=lineage,
+        preserved_source_expression=unit.preserved_source_expression,
     ))
 
 

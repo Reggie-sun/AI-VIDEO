@@ -126,10 +126,38 @@ def validate_quality_rejection_experience(
         validate_generation_evaluation_sources,
     )
 
+    lineage = binding.projection.requirement.target_shot.production_lineage
+    if lineage is None:
+        acceptance = qa_policy.selected_generation_acceptance()
+    else:
+        from ai_video.production.domain_acceptance import require_production_responsibilities
+
+        allocation = qa_policy.require_production_allocation(
+            allocation_hash=lineage.allocation_hash,
+            parent_shot_id=lineage.parent_shot_id,
+            parent_shot_content_hash=lineage.parent.content_hash,
+            task_id=lineage.task_id,
+        )
+        require_production_responsibilities(qa_policy, allocation)
+        acceptance = qa_policy.selected_component_generation_acceptance(
+            allocation_hash=lineage.allocation_hash,
+            component_id=lineage.component_id,
+            parent_shot_id=lineage.parent_shot_id,
+            parent_shot_content_hash=lineage.parent.content_hash,
+            task_id=lineage.task_id,
+        )
+    if (
+        acceptance is None
+        or selected.recipe.acceptance_policy != acceptance
+        or selected.recipe.rubric_hash != acceptance.profile_content_hash
+    ):
+        raise ValueError("quality rejection rubric differs from its exact selected QA authority")
+
     validate_generation_evaluation_sources(
         sources=experience.evaluation_sources,
         evidence=evidence,
         qa_policy=qa_policy,
+        acceptance=acceptance,
         requirement=experience.projection.requirement,
     )
     return diagnose_exact_result(evidence, history, experience.candidate.recipe,

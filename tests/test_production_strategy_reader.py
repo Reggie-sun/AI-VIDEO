@@ -10,6 +10,9 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.artifact_contracts import ArtifactReference
 from ai_video.production.hashing import seal_artifact
 from ai_video.production.production_strategy_materialization import prepare_strategy_commit
+from ai_video.production.seedance_source_expression import (
+    PreservedSourceExpression, SourceTextPart, source_parts_sha256,
+)
 from ai_video.production.production_strategy_reader import (
     production_family_shot_ids,
     selected_shot_generation_acceptance,
@@ -87,6 +90,33 @@ def test_rejects_child_authoring_drift_after_parent_reopen(tmp_path):
         "dialogue": "A replacement line that was not allocated.",
     }))
     drifted = materialized.model_copy(update={"shots": (changed,)})
+
+    with pytest.raises(AiVideoError) as error:
+        validate_production_lineage(drifted)
+    assert error.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_rejects_preserved_source_expression_drift_from_authorized_unit(tmp_path):
+    parts = (SourceTextPart(text="A rover crosses the workshop and turns toward a doorway."),)
+    expression = PreservedSourceExpression(
+        source_sha256=source_parts_sha256(parts), parts=parts,
+    )
+    loaded, decision = _loaded_with_intent(
+        tmp_path, pending=True, unit_preserved_source_expression=expression,
+    )
+    request = prepare_strategy_commit(
+        loaded=loaded, decision=decision, attempt_id="strategy-reader-source-expression"
+    )
+    materialized = _materialized_loaded(loaded, request).model_copy(
+        update={"production_parents": (loaded.shots[0],)}
+    )
+    child = materialized.shots[0]
+    assert child.preserved_source_expression == expression
+    drifted_child = seal_artifact(child.model_copy(update={
+        "content_hash": "0" * 64,
+        "preserved_source_expression": None,
+    }))
+    drifted = materialized.model_copy(update={"shots": (drifted_child,)})
 
     with pytest.raises(AiVideoError) as error:
         validate_production_lineage(drifted)

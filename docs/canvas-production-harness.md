@@ -214,6 +214,11 @@ raw 原证明继续由 component/source-use 承担，额外 final proof 可不�
 组件继续走 exact source-use，不强造生成 rubric。历史 bytes/hash、反序列化和 lineage 重开保持兼容，
 不完整旧合同的新发布/使用仍会阻断。未实现的遮罩、跟踪、口型等操作仍为 capability blocker。
 
+生成组件需要逐字保留已选输入时，由 `ProductionUnit.preserved_source_expression` 显式声明，
+materialization 原样交给 child Shot，再由既有 compiler 核对 actual reference 绑定；不自动继承父镜整段表达。
+该字段省略时保留旧序列化/hash，source-backed 组件不得携带生成表达，声明本身不代表 Provider 准入或质量通过。
+生成组件失败后，原 quality-rejection owner 使用 lineage 对应的 component rubric 核对 recipe 并关闭；历史 receipt 保留其当时 QA，不能借父镜或新 QA 改写旧裁决。
+
 `author/preflight.production_control` 展示 QA inventory、固定来源、允许变化与已声明分工。
 新项目可在 `--arguments` 提供普通 `qa_policy` 文件（限 data 目录内）预览，标为
 `candidate_not_approved`；已批准项目的 preflight 默认读取 selected policy。全局 rubric 只展示一次，
