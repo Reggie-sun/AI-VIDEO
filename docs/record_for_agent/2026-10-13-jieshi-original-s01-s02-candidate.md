@@ -9,6 +9,14 @@ evidence_index_version: "1"
 
 Date: 2026-10-13
 
+## Current Billing Blocker — 2026-10-19
+
+用户重新要求“做视频”，随后问“你的意思是没钱了api是吗”。本轮复核[官方国内站创建接口](https://platform.minimax.cn/docs/api-reference/video-generation-v2-create)：该 endpoint 将 HTTP402 定义为 `insufficient_balance_error` / `insufficient balance (1008)`，因此按官方语义应先处理 API 可用余额不足。上次实测仅保留 HTTP402和response SHA，未保留业务错误体；不能冒称实测读到1008、账户余额为零或已查过账户。此前“具体原因未确认”是尚未核对该官方说明时的历史解释，不再作为当前接口语义结论。
+
+本轮未再次 submit、读取凭据、查询私密账户、扩预算/次数、登记新 grant/permit或生成媒体；实际 Manifest133、task used8/ceiling8、历史视频POST19及S02 POST0保持。当前“做视频”指令尚未消费，范围沿已接受输入限定为S01一次、零重抽；账户余额问题处理后可沿此指令继续，不要求重复批准同一 scope，但须重新核验当时 exact inputs、真实计数和canonical paid gates。未知 outcome仍停止，旧已消费permit不复用。
+
+本次 `record-ai-video-session` 更新同一记录，`distill-ai-video-learning=no_candidate`：官方错误语义核实不是新的模型质量实验，不新增 Evidence Index attempt或经验采纳规则。文档 checkpoint receipt为 `.agent/harness/runs/h3-max-billing-clarification-20261019-r1/receipt.json`，只证明文档范围。
+
 ## Current Finite S01 Submit — 2026-10-19
 
 用户对顶部显式分工候选回复“可以”，授权 official MiniMax H3 Max CN / 5秒 / 768P / balanced / first-frame 一次、零重抽，明确本次动态白模例外；S02 POST0、图片/音频生成0、音频理解新调用0。随后用户要求在没有可用视频前减轻验证，已停止重复的大范围增量 Harness，保留必要提交边界和针对性回归；共享修复、完整旧快照证据及中止边界见[工程主记录](2026-10-19-production-responsibility-allocation.md#current-integration-follow-up)。

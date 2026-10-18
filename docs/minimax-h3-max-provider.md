@@ -43,6 +43,12 @@ unsubmitted，保留其历史与计数，不能重分类已提交或未知的任
 
 ## Credentials And Paid Effects
 
+国内站当前 [V2 创建接口](https://platform.minimax.cn/docs/api-reference/video-generation-v2-create)
+将 HTTP402 定义为 `insufficient_balance_error` / `insufficient balance (1008)`。
+遇到该拒绝，先核对并处理该 Key 所属账户的可用余额，再继续有效的有限制作指令；
+不靠重复生成探测余额，也不将内部 ledger/cost upper bound 当作真实账户余额。
+HTTP 状态的官方含义不证明具体余额数额；未保留业务 response 时，不伪称实际已收到1008或查询过账户。
+
 适配器必须由 operator 注入 exact credential supplier；公共封存引用为
 `MINIMAX_H3_API_KEY`，它是引用标识，不要求用户私有存储使用同名变量。
 国内站引用为 `MINIMAX_H3_CN_API_KEY`；operator 先核对用户实际创建 Key 的站点，
