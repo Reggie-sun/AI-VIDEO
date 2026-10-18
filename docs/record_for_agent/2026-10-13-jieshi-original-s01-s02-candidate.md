@@ -9,6 +9,83 @@ evidence_index_version: "1"
 
 Date: 2026-10-13
 
+## Offline Production Responsibility Candidate — 2026-10-19
+
+用户要求继续 S01 后，沿已发布的[共享分工能力](2026-10-19-production-responsibility-allocation.md)
+制作候选，而非继续旧失败片。标准 loader 重开 Manifest116 / Project16 / selected QA
+`dafe8462ce182ac1e44a755f91eef68b8c65dc135063f210a263a278900f639d`；已有 S01 STOP、S02 POST0保持。
+
+已发布的[候选证据包](../superpowers/artifacts/drama/jieshi-episode-01/s01-responsibility-candidate-20261019.json)
+保存 source、普通 project data、canonical authoring bundle、QA、Planner 与职责预览的 immutable snapshot。
+工作输入与完整 preflight 位于
+`runs/canvas-jieshi-original-s01-s02-20261013-001/s01-responsibility-preview-20261019-001/`；
+PNG/原始生成来源继续复用本地原 run 的 exact bytes，未重新生成图片，证据包不是另一状态库或执行器。
+
+### Preserved Goal And Assigned Work
+
+原15项 ID、observable、proof、tolerance、measurement、原来源引用逐项保留；只有
+`s01-close-gap` 和 `s01-broadcast-window` 的 stage/owner 显式改为 `shot_editorial`，
+分别检查最终3秒切出前悬窗终态、最终0.1–2.7秒完整广播。此为候选 QA revision，
+不反写旧 raw Gate，也不把旧片改判通过。原 `FinalOutputContract` 全36项逐字不变，
+包含 S02、字幕、接点、完整声画和 human1.0x要求；没有删成容易通过的15项子集。
+
+| Responsibility | Candidate scope | Evidence still required |
+| --- | --- | --- |
+| Raw component | 原13项 raw，包括身份/人数、其他七人倒影、林砚无倒影、左手动作、道具、摄影/空间和原声音义 | 新 exact MP4 的逐项原片证据；参考绑定与 prompt 不代签 |
+| Raw prerequisite | 新 ID `s01-source-hover-prerequisite`，由原 close-gap 派生，要求原片真实完整抬手并悬停，存在可连续剪辑的终态 | 实际源窗及后续 exact time map；不预设已存在合格源窗，不冻结/跳切/倒放/补帧造动作 |
+| Assembly / final review | 原15项都绑定原 FinalOutput 要求；两项时序结果由成片裁切/必要时变速及验收承担 | 实际 `ResolvedTimeline` 的 frame/sample/source use，以及 exact 最终声画；本候选没有 time map 或合格 source claim |
+| Unavailable repair | 当前未声明可执行的局部遮罩/跟踪/口型修补 | 不能拿 trim/retime 修好玻璃手影或补造缺失人物；没有把 unsupported 操作写成已支持 |
+
+原片组件共14项 raw requirement，parent 共16项（原15加一个内部制作前置条件）；
+新增前置不修改用户最终目标，也没有用同一个 close-gap ID 表示两个不同谓词。
+2.5秒提前到位仍只是已有 Agent 附录的生成余量，不是新增 raw deadline 或最终验收门槛。
+若将来变速，必须实际验证同源原声音轨的映射、广播边界、拟音和音质，不能仅看视觉终态；
+当前候选没有选择具体变速率，也没有把普通 dialogue 组件自动声明成可变速的声音组合。
+
+### Input Proposal And Authorization Boundary
+
+采用此前尚未提交的 repair source snapshot `7a87575a3e382b2887dd60edffb5aeb2877a76f2d7ee7c736bccc7f70da6edc3`，
+prompt SHA `2c491b55c9ccb2b69692966da86f1bafe4b308f8cbef9575c3282b31498e4417`；
+保留原两段文字和当时独立标明归属的动作/反射附录。本轮没有再改 prompt。
+输入提案为 official H3 Max CN / 5秒 / 768P / balanced、单张原 PNG
+`13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923` 作 `first_frame`，
+native 省略 ratio；不宣称精确9:16、独立八人人物参考、整段动作锁定或动态白模约束。
+此 frame mode 与 reference video 互斥，下一真实单元须明确确认本次逐镜白模例外，
+旧 v015、旧绑定及失败证据继续保留，不静默继承或删除。
+
+这只是输入提案，**尚非当前批准的 Project/QA，也没有 provider compilation、resolved request、
+execution binding、预算 reservation 或 permit**。新候选须沿同一 canonical authoring/QA、
+Planner/compiler 与 paid gates 重开，核验 exact native preview 后才能提交。
+最小外部提案限上述 S01 新视频 POST1、零重抽、S02 POST0、图片/音频生成0；
+音频理解的新调用亦未获授权。沿原 `jieshi-original-unit-20261014-001` 保留 task used7/ceiling7、
+历史视频 POST18及原账本，不能以新组件身份清零，旧未用槽位不移作许可。
+
+### Verification And Remaining Stop
+
+`author_canvas_project`、`canvas_reference_preflight`、`production_allocation_issues` 与
+`ProductionStrategyResolver` 实际完成只读候选计算：S01 为 `DECLARED_PRODUCTION_INTENT`、
+allocation issues为空，单组件生成提案 `selected`；S02仍 `REQUIRES_PRODUCTION_INTENT`，
+没有套用 S01 的全局 QA。Planner 的 selected 只表示已声明制作手段可表达，不是生成授权或媒体通过。
+候选 QA hash `993eea80b4fc1812c8a008f5f897f8f5ec344d442455a66b9325e468f809e02a`；
+parent Shot hash `42c28d70b47977d709aff0a1c80bf1248c0c5d49b243c48d4a1731bb242ea526`。
+候选模型/hash与本地 exact snapshot 重开相符；删除 final close-gap 或移除 raw 悬停前置均被
+同一共享 allocation 校验拒绝，结果封存在证据包 `candidate_data_checks`，不是模型质量测试。
+标准 loader 后以其 snapshot 和 canonical authoring bundle 做纯候选投影，未持久化第二 Manifest。
+原 Manifest 前后 SHA
+`1ece69263041eb06d345e5673f010a2b209e67a1e2fea82c2002e12a2b982e60` 不变；
+新 attempt/permit/Provider transport/credential/reference-byte supplier 调用及媒体 POST均0。
+本轮不重复普通单镜准备无关的全仓工程测试；精确文档/证据包 publication receipt 为
+`.agent/harness/runs/jieshi-s01-responsibility-candidate-20261019-r1/receipt.json`。
+
+独立只读内容核对识别出“仅移动 close-gap 会遗漏原片真实终态前置”的问题，Parent 已用单独
+raw ID 修正；最后一次候选内容核对无阻断 finding，仍明确5秒原片与72帧采用尚无实际源窗/map证据。
+没有把代码能接受的同 ID 改义当成合法分工。此为普通 authoring/记录工作，无源码变更；
+Parent Risk Gate 为 `NATIVE_REVIEW_NOT_REQUIRED`，不重开已关闭的共享源码审查。
+旧 A 的6 PASS / 2 FAIL / 7 NOT_EVALUATED、无 accepted state、S01 STOP不变；
+新模型质量、单镜成片、连续镜、完整故事与human验收均未证明。
+本主记录由 `record-ai-video-session` 更新，自动 `distill-ai-video-learning=no_candidate`：
+本轮仅输入/工程证据，没有新增独立媒体验证或可采纳的经验规则，不修改 Skill/Policy/Gate。
+
 ## Current Official H3 Max First-Frame Result — 2026-10-17
 
 用户对已展示的 H3 Max CN 最多2次、零重抽单元回复“可以”，包括首帧模式不能并用动态白模的逐镜例外。实际只执行 A 一次：`canvas-1693d62e38fffba5c59869059653049cece057cb`；新证据根为 `runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-mode-pair-20261017-001/`，下称 A unit。新增视频 POST1、图片/音频生成 POST0、音频理解调用0，历史视频累计18，S02仍0。没有把未用的第二次改配其他模型、素材或实验。
@@ -45,7 +122,7 @@ A这次保留陈立而旧B缺失，只是有界观察。两次同时改变模式
 
 ## Prompt-Control Audit — 2026-10-18
 
-2026-10-19 更新：该审计提出的通用分工已由[共享实现记录](2026-10-19-production-responsibility-allocation.md)所述源码 `d082009` 实现并发布；下文“本轮仅研究”是当时阶段的历史范围。当前工程预览保留全部15项，S01/S02均明确缺 ProductionIntent，没有自动重分 stage 或放宽要求；本片媒体结果、S01 STOP、S02 POST0不变，工程 PASS不代媒体通过。
+2026-10-19 更新：该审计提出的通用分工已由[共享实现记录](2026-10-19-production-responsibility-allocation.md)所述源码 `d082009` 实现并发布；下文“本轮仅研究”是当时阶段的历史范围。已批准 Project 的工程预览保留全部15项，S01/S02均明确缺 ProductionIntent；本页顶部现已给出 S01 的显式分工候选，尚未批准或提交。没有自动重分 stage 或放宽要求；本片媒体结果、S01 STOP、S02 POST0不变，工程 PASS不代媒体通过。
 
 用户追问画布是否采用更宽松的提示词后，对照剧本卡、本地 authoring source、A 实际 native preview 和逐项 QA。
 本记录所称两段“原文”是本地封存的 authoring 文本，不证明外部网页画布的真实提交或服务端扩写。
