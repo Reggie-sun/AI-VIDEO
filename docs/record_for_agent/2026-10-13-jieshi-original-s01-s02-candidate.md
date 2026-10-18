@@ -9,7 +9,27 @@ evidence_index_version: "1"
 
 Date: 2026-10-13
 
-## Offline Production Responsibility Candidate — 2026-10-19
+## Current Finite S01 Submit — 2026-10-19
+
+用户对顶部显式分工候选回复“可以”，授权 official MiniMax H3 Max CN / 5秒 / 768P / balanced / first-frame 一次、零重抽，明确本次动态白模例外；S02 POST0、图片/音频生成0、音频理解新调用0。随后用户要求在没有可用视频前减轻验证，已停止重复的大范围增量 Harness，保留必要提交边界和针对性回归；共享修复、完整旧快照证据及中止边界见[工程主记录](2026-10-19-production-responsibility-allocation.md#current-integration-follow-up)。
+
+新 attempt `canvas-0e0af8ebe3cdf1f0f49a01ce584ba094a9033df2` 已真实提交一次，`2026-10-18T21:11:31.587321Z` 发出 CN POST，约1秒后 **HTTP402 拒绝**。原有 owner 已记录 `video_provider_failed` / `known_no_effect`，不是 UNKNOWN，也不是媒体质量 FAIL；没有 task、MP4、fetch、MCP 媒体裁决、剪辑或人工听看。不能仅凭 HTTP402 确认具体账户原因或模型能力。未重试、换站、换 Provider 或沿用旧 permit。新增视频 POST1、历史累计19，task used7→8、ceiling7→8均保留；S02仍0。
+
+实际普通 authoring→材料化→compiler 已完成，Manifest128 / Project20 / QA revision5；selected QA `61ba5056f03f7614be7de4c3c3ed5ce1904ae96bcc5b8aacf7546cc4893f53cf`，parent `5fdc0a9ba0407a8a361eb4bd45b218de8167c9b1aca6c0ca6de9385f8fb4b95e`，组件 `S01-production-source`。原15项及36项 FinalOutput 保留；两项时序职责移至成片，原片14项已含真实可剪终态前置，不把2.5秒余量升级为硬门槛。下节的“尚未批准/未编译/POST0”仅属此前离线候选历史。
+
+| Exact submitted input | Value |
+| --- | --- |
+| Resolved request | `f9e69997ad8f8e6bb93835064855c40b08d0ec526d7e25d010f95f00cc0e0169` |
+| Execution binding | `5b9a618b7202c1b20781a4d008fa15f5d17288b3493d0b291c9ee0245b2ac67e` |
+| Native body | SHA `b652e9ede0be30198407089c7cec5041ffdd80185fd48b8cca545fbbf8c3eced`，2,822,925 bytes；wire 与封存 preview 一致 |
+| Prompt | SHA `2c491b55c9ccb2b69692966da86f1bafe4b308f8cbef9575c3282b31498e4417`，1478字符；原两段及已有独立附录未再修改 |
+| Reference duty | 原 PNG SHA `13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923`，一份 `first_frame`；无 last-frame/video/audio reference，无 ratio 字段 |
+
+证据根：`runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-responsibility-S01-20261019-001/`。`user-authorization.json`、`creative-preflight.json`、`pre-submit-input-checks.json`、`native-preview.json`、`wire-observations.json` 与 `operator-error-submit.json` 保存当前依据；拒绝 receipt 为 `production/state/paid-provider/submits/44f2aebec3bbc1e75b8215562f8bfe37c59776db2ed6a3a6ccf1ae527d76b9b1.json`。内部 ledger 总上界350,000,000→400,000,000 CNY microunits、单次50,000,000只代表有限 operator bound，不是报价或账单。`known-no-effect-reopen.json` 已通过标准 `load_production_project` 重开 Manifest133 / Project20：attempt failed、paid phase known_no_effect、video phase submit_intent；budget revision33 未 blocked，本次 reservation 已 released、内部 actual cost0，不是 Provider 账单证明。
+
+旧 A 仍是最新可用 MP4，原6 PASS / 2 FAIL / 7 NOT_EVALUATED、S01 STOP保持；此次没有新模型质量样本，也没有 accepted end-state 或 S02 交接。最小恢复条件是先解决当前接口402拒绝，再为下一次有限提交取得有效授权；此次一次调用已计数，不自动重用。本次两份记录的文档 publication receipt 为 `.agent/harness/runs/component-generation-followup-record-20261019-r1/receipt.json`。记录及学习评估为 `no_candidate`：工程 fixture 与一次无产物拒绝都不能证明分工改善模型质量，不改 Skill/Policy/Gate，不刷新 RAG index。
+
+## Historical Offline Production Responsibility Candidate — 2026-10-19
 
 用户要求继续 S01 后，沿已发布的[共享分工能力](2026-10-19-production-responsibility-allocation.md)
 制作候选，而非继续旧失败片。标准 loader 重开 Manifest116 / Project16 / selected QA
@@ -86,7 +106,7 @@ Parent Risk Gate 为 `NATIVE_REVIEW_NOT_REQUIRED`，不重开已关闭的共享�
 本主记录由 `record-ai-video-session` 更新，自动 `distill-ai-video-learning=no_candidate`：
 本轮仅输入/工程证据，没有新增独立媒体验证或可采纳的经验规则，不修改 Skill/Policy/Gate。
 
-## Current Official H3 Max First-Frame Result — 2026-10-17
+## Latest Available H3 Max First-Frame Media — 2026-10-17
 
 用户对已展示的 H3 Max CN 最多2次、零重抽单元回复“可以”，包括首帧模式不能并用动态白模的逐镜例外。实际只执行 A 一次：`canvas-1693d62e38fffba5c59869059653049cece057cb`；新证据根为 `runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-mode-pair-20261017-001/`，下称 A unit。新增视频 POST1、图片/音频生成 POST0、音频理解调用0，历史视频累计18，S02仍0。没有把未用的第二次改配其他模型、素材或实验。
 
@@ -122,7 +142,7 @@ A这次保留陈立而旧B缺失，只是有界观察。两次同时改变模式
 
 ## Prompt-Control Audit — 2026-10-18
 
-2026-10-19 更新：该审计提出的通用分工已由[共享实现记录](2026-10-19-production-responsibility-allocation.md)所述源码 `d082009` 实现并发布；下文“本轮仅研究”是当时阶段的历史范围。已批准 Project 的工程预览保留全部15项，S01/S02均明确缺 ProductionIntent；本页顶部现已给出 S01 的显式分工候选，尚未批准或提交。没有自动重分 stage 或放宽要求；本片媒体结果、S01 STOP、S02 POST0不变，工程 PASS不代媒体通过。
+2026-10-19 更新：该审计提出的通用分工已由[共享实现记录](2026-10-19-production-responsibility-allocation.md)所述源码 `d082009` 实现并发布；下文“本轮仅研究”是当时阶段的历史范围。已批准 Project 的工程预览保留全部15项，S01/S02均明确缺 ProductionIntent；上述离线分工候选是历史检查点；本页顶部记录随后批准的一次真实提交及 HTTP402 拒绝。没有自动重分 stage 或放宽要求；本片媒体结果、S01 STOP、S02 POST0不变，工程 PASS不代媒体通过。
 
 用户追问画布是否采用更宽松的提示词后，对照剧本卡、本地 authoring source、A 实际 native preview 和逐项 QA。
 本记录所称两段“原文”是本地封存的 authoring 文本，不证明外部网页画布的真实提交或服务端扩写。
@@ -1070,6 +1090,7 @@ Parent使用`research`与`retrieve-ai-video-memory`，后者不作为current事�
 | original-S01-optical-qa | metaso-post:905ba4c0ba5a73e2438686862d182b1968fc3f891a3231ff92e40821d4d5d932 | jieshi-original-S01-optical-20261016 | canvas-65bcbc798a2b1935c7fbd18fc54eeafc803c5b72 | N/A | 32853406063cf3f57adf1ae83ae59599316a930893d0c6f1ccf8bcd76203d5c1 | ANALYZER | FAIL | QUALITY_FAILURE_AND_EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-optical-fetch | runs/canvas-jieshi-original-s01-s02-20261013-001/whitebox-repair-S01-20261016-002/qa-diagnosis.actual.json |
 | original-S01-optical-audio | metaso-post:905ba4c0ba5a73e2438686862d182b1968fc3f891a3231ff92e40821d4d5d932 | jieshi-original-S01-optical-20261016 | canvas-65bcbc798a2b1935c7fbd18fc54eeafc803c5b72 | N/A | 32853406063cf3f57adf1ae83ae59599316a930893d0c6f1ccf8bcd76203d5c1 | AUDIO_ANALYZER_OBSERVATION | OBSERVED_NOT_HUMAN_ACCEPTED | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-optical-fetch | runs/canvas-jieshi-original-s01-s02-20261013-001/whitebox-repair-S01-20261016-002/qa-mcp-payload.actual.json |
 | original-S01-max-io-401 | official-max-post:canvas-ced3bd552a905aa189c2e3b5ed23f2c64273d43f | jieshi-original-S01-official-max-20261016 | canvas-ced3bd552a905aa189c2e3b5ed23f2c64273d43f | N/A | NO_ARTIFACT:HTTP401_KNOWN_NO_EFFECT | PROVIDER_RECEIPT | KNOWN_NO_EFFECT | AUTHENTICATION_REGION | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-S01-20261016-001/successor-001/wire-observations.json |
+| original-S01-responsibility-402 | official-max-post:canvas-0e0af8ebe3cdf1f0f49a01ce584ba094a9033df2 | jieshi-original-S01-responsibility-20261019 | canvas-0e0af8ebe3cdf1f0f49a01ce584ba094a9033df2 | N/A | NO_ARTIFACT:HTTP402_KNOWN_NO_EFFECT | PROVIDER_RECEIPT | KNOWN_NO_EFFECT | PROVIDER_SUBMIT_REJECTED | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/production/state/paid-provider/submits/44f2aebec3bbc1e75b8215562f8bfe37c59776db2ed6a3a6ccf1ae527d76b9b1.json |
 | original-S01-max-cn-fetch | official-max-post:aa4fea276e0220266fc81f47c6c66c32f9bbdbb773c631f6160b8d86101e4092 | jieshi-original-S01-official-max-20261016 | canvas-c5f04a3750cb384d4bf55ae00424511ede0f818c | N/A | f0685279ab5d0b2256951ed99bde45afc721a7135d654533296c11c038f86725 | PROVIDER_RECEIPT | FETCHED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-cn-S01-20261016-001/fetch.actual.json |
 | original-S01-max-cn-qa | official-max-post:aa4fea276e0220266fc81f47c6c66c32f9bbdbb773c631f6160b8d86101e4092 | jieshi-original-S01-official-max-20261016 | canvas-c5f04a3750cb384d4bf55ae00424511ede0f818c | N/A | f0685279ab5d0b2256951ed99bde45afc721a7135d654533296c11c038f86725 | ANALYZER | FAIL | QUALITY_FAILURE_AND_EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-max-cn-fetch | runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-cn-S01-20261016-001/qa-diagnosis.actual.json |
 | original-S01-max-cn-audio | official-max-post:aa4fea276e0220266fc81f47c6c66c32f9bbdbb773c631f6160b8d86101e4092 | jieshi-original-S01-official-max-20261016 | canvas-c5f04a3750cb384d4bf55ae00424511ede0f818c | N/A | f0685279ab5d0b2256951ed99bde45afc721a7135d654533296c11c038f86725 | AUDIO_ANALYZER_OBSERVATION | OBSERVED_NOT_HUMAN_ACCEPTED | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-max-cn-fetch | runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-cn-S01-20261016-001/exact-mcp-analysis.json |

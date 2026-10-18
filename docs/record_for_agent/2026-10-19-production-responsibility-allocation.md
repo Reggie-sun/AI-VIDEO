@@ -8,7 +8,25 @@ learning_eligibility: ineligible
 
 Date: 2026-10-19
 
-## Current Result
+## Current Integration Follow-up
+
+2026-10-19 在真实制作入口确认并修复四个共享缺口，源码依次发布 `984e372`、`510c440`、`df13f21`；最后一项修复后的 native review round 2 无 findings。未新增故事条件分支、执行链、timeline、renderer 或依赖。实际 S01 运行结果归[媒体主记录](2026-10-13-jieshi-original-s01-s02-candidate.md)，下文初次发布的 POST0、Manifest116 与 readiness 只描述当时快照。
+
+- 生成组件通过 `ProductionUnit.preserved_source_expression` 显式保留来源表达，不隐式继承；source-backed unit 仍拒绝该字段。两个不同人物/动作/空间的持久化 fixture 走标准材料化及 loader，旧 JSON/hash 保持兼容。
+- 材料化后修订 retained parent 时，只在当前 typed beats 一致时复用 Storyboard；保留 revision ancestry、旧 child bytes 及未改 Shot。QA inventory 按 ID 比较完整语义，保留原 author 顺序、payload/hash 和 native text；不排序重封 QA 来规避契约。
+- 当前组件质量失败按 exact component recipe/rubric 关闭；历史 rejection 按 archived QA 和 frozen lineage 读取重放。当前新使用准入不能反向应用于旧记录，旧记录可读也不授予新的不完整 allocation 使用权。`CGB-001` 已修复，四项针对性回归通过，含切换有效新 QA 后旧 bytes 不变重放。
+
+完整工程 Harness 为 `.agent/harness/runs/component-generation-boundaries-20261019-r2/receipt.json`：18/18 checks PASS，证明只绑定 `510c440`。同源码显式 qualified FFmpeg/FFprobe 的原生音频变速专项 48 PASS、0 SKIP，补充原 Harness 因环境未配置而跳过的媒体 DSP fixture；不证明真实模型或人工听看。`df13f21` 的重复增量 Harness 按用户“先有好视频、避免过重验证”的最新要求中止，receipt 保留 failed/SIGTERM、cleanup PASS 与 `parent-abort.json`，不是源码测试失败或完整完成证明。修复后的四项回归及同一 read-only `reviewer_xhigh` 的第二轮针对性复审仍有效；旧完整 receipt 不冒称对新 HEAD fresh。
+
+此次改正执行顺序：已授权、有界且 outcome 已知的最小媒体验证先回答原片能否用；当前输入、计数、预算、凭据、一次 permit、unknown 停止及实际媒体判定保留。重复的大范围工程发布验证后移到媒体路线成立之后，不在没有可用原片时继续扩建验证工程。可由现有剪辑修复的节奏不直接成为重新生成理由。此项是当前任务执行决定，不伪造 Harness PASS 或削弱原成片要求。
+
+本次两份主记录的文档 checkpoint 使用 `.agent/harness/runs/component-generation-followup-record-20261019-r1/receipt.json`，不替代已中止的源码增量 Harness。
+
+证据根：`runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-responsibility-S01-20261019-001/`；review round 1/2、exact 输入检查、preflight、原片复用评估均保留。工程 fixtures、重复检查和不同 proof 层不能计为独立模型实验。
+
+本次唯一真实 S01 POST 返回 HTTP402，canonical `known_no_effect`，无 task/MP4，未重试；因此没有新模型质量或剪辑证据。已到外部阻断点，重复大范围工程发布验证继续后移，未凭 HTTP 状态推断具体账户原因。共享源码已发布仍不等于已证明通用媒体质量。
+
+## Initial Publication Result
 
 通用制作分工工程已实现并发布，源码 `d08200901d242de634c4ab82487726c75b87f747`，tree `725d90a14379b23ae5f0825cd523c646f7fe023f`；push 后核验远端 `main` 为同一 SHA。实现沿既有 QA、ProductionIntent、Planner、compiler 和最终验收 owner，不新增 timeline、renderer、状态库、依赖或故事执行脚本。
 
@@ -53,6 +71,8 @@ Risk Gate 为 NATIVE_REVIEW_REQUIRED：验收职责遗漏可丢失原硬目标�
 
 ## Existing Project Previews
 
+以下只描述初次发布时的快照；当前 S01 实际提交及状态见顶部链接的媒体主记录。
+
 《界蚀》实际共享 preflight 在源码 `7720246` 执行，证据为 `runs/production-responsibility-20261018-001/jieshi-preflight.json`、`operation-proof.json`、`readiness-summary.json`。全部 15 项仍在 selected QA，S01/S02 均为 REQUIRES_PRODUCTION_INTENT；S02 的 future accepted source 仍未绑定。Manifest SHA `1ece69263041eb06d345e5673f010a2b209e67a1e2fea82c2002e12a2b982e60` 前后相同，并在最终源码点再次只读核对一致。A 的 6 PASS / 2 FAIL / 7 NOT_EVALUATED、S01 STOP、S02 POST0 未变。
 
 机器人既有 A/V 开发预览在最终源码 `d082009` 经标准 loader 只读投影，见同证据根 `robot-current-responsibility-preview.json`。该项目的 source-shot 也尚无 ProductionIntent，报告 allocation_count=0、selected candidate 为空，Manifest 前后相同、POST0。不能从已渲染画面反推一份获批分工；也不能将报告的 actual_quality=NOT_EVALUATED 解释为撤销旧人工接受。[原人工和工程证据](2026-10-17-edit-first-temporal-control.md#current-result) 保留其自身边界。
@@ -60,6 +80,8 @@ Risk Gate 为 NATIVE_REVIEW_REQUIRED：验收职责遗漏可丢失原硬目标�
 两次重开只是当前工程/authoring readiness 证据，不是新模型样本。现有字段和执行能力不等于具体项目已经正确声明、绑定并验收它们。
 
 ## Publication And Remaining Boundary
+
+此节保留初次发布 checkpoint 的范围；顶部 follow-up 的实际 S01 提交已取代这里当时的下一实验建议。
 
 源码已按 owned paths commit/push main 并核验 SHA。八份 foreign staged/dirty/untracked 文件的 bytes 及原 staged diff hash 保持不变，没有纳入本任务提交。本文及《界蚀》直接关联 notice 的文档 checkpoint 使用 `.agent/harness/runs/production-responsibility-record-20261019-r1/receipt.json`，publication 以其绑定提交与 Git 远端核验为准。
 
