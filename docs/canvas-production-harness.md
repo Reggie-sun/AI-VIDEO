@@ -422,6 +422,21 @@ Input PASS不证明runtime readiness；runtime readiness也不证明成功生成
 
 ## Production Flow
 
+### Verification Responsibilities
+
+制作顺序由本 workflow 编排，工程验证、提交准入和媒体验收分别沿原 owner 执行；以下不是新增的 Product phase、状态库或许可。
+
+| Point | Required work | Evidence boundary |
+| --- | --- | --- |
+| Before a bounded media trial | 先判断已有素材/剪辑是否可用；只补齐当前输入或运行证据确认的确定性缺口，运行相关 focused regression 并关闭阻断；核验 exact 输入、当前授权、真实计数、预算、egress 和一次性 permit | 完整 Harness receipt 不是模型取材前置条件；关键正确性/安全阻断不能因“试拍”略过 |
+| After the exact source exists | 显式 project-local MCP 核验所选 raw rubric；原片可用但节奏偏差时，先用现有剪辑及原声映射形成 exact 成片 | raw 时序余量不替代成片切点；FAIL/NOT_EVALUATED 不推进下一 Shot，也不授予 activation/accepted state |
+| Before engineering completion or final delivery | 共享源码稳定后完成 exact scope 的全部适用 Harness checks 和必要 Risk Gate；成片按原 P6/final-output/human 要求独立验收 | 工程 proof、媒体质量与人工接受分别报告；模型路线未成立时可以继续有界取证，不能宣称工程或交付完整完成 |
+
+`harness-inspect` 的 `verification_purpose=engineering_completion` 只列工程完成检查；
+`media_submit_authority=false`、`media_acceptance_authority=false` 不产生运行时例外。
+纯数据准备、普通查询或每镜生成不重复全仓工程验证。源码变化后的相关回归不能用旧 receipt 代替；
+完整工程发布验证在稳定候选执行，后续仅因新变化、失败或未解决问题补做适用检查。
+
 | Stage | Operation | Required evidence |
 | --- | --- | --- |
 | Inspect | `inspect` | exact snapshot、明确 selection、无 selected closure blocker |
@@ -508,4 +523,4 @@ scope 冻结同 task/Shot、原文/首帧/剧情/声音与完整验收，只允�
 离线 scripted Provider/evaluator/renderer 只证明控制流。冻结后以未参与设计的独立画布仅换数据验证复用；
 来源表达、引用职责与对白改写错误通过 typed error 标明 occurrence 和数据字段；CLI 不回显原始输入或 traceback。
 若修改共享代码，应将失败画布转为 development。真实完整声画与用户听看单独记录。
-本轮 Seedance 新提交为零，历史7/7不重置。后续最小实测单元、授权和预算缺口见 completion record。
+当前调用次数、outcome 与剩余有限授权只从 canonical attempt/paid state 和当前授权核对，历史消费不重置；具体实验状态保留在对应 record，不在通用 workflow 固定某一项目或 Provider 的当轮计数。

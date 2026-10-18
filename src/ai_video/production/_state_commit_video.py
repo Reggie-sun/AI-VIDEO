@@ -292,7 +292,9 @@ class _StateCommitVideoMixin:
                 current_generation_id=state.generation_id,
             )
             self._require_production_predecessors(loaded, binding, tuple(ordered_experiences))
-            self._require_persisted_generation_limits(manifest, state, binding)
+            self._require_persisted_generation_limits(
+                manifest, state, binding, family_ids=family_ids
+            )
             return binding, self._require_runtime_repair_grant(manifest, binding)
         if state.qualification_binding is not None:
             self._reopen_qualification_execution_binding(
@@ -371,8 +373,10 @@ class _StateCommitVideoMixin:
             if not diagnosis.all_required_observed_pass:
                 raise _state_invalid("Previous production component required findings are not all PASS.")
 
-    def _require_persisted_generation_limits(self, manifest, state, binding) -> None:
-        """Retain durable counts; unmetered local batches are not paid quotas."""
+    def _require_persisted_generation_limits(
+        self, manifest, state, binding, *, family_ids: tuple[str, ...]
+    ) -> None:
+        """Retain durable counts using the family from the locked current project."""
 
         current_limits = binding.inputs.limits
         current_policy = binding.inputs.policy
@@ -384,10 +388,6 @@ class _StateCommitVideoMixin:
             if item.capability_id == candidate.capability_id
         )
         local_unmetered = variant.execution_kind.value == "local" and variant.billing_kind.value == "local_unmetered"
-        from ai_video.production.production_strategy_reader import production_family_shot_ids
-
-        loaded = self._load_production_project(self._project_root / "project.yaml")
-        family_ids = production_family_shot_ids(loaded, binding.context.target_shot_id)
         def quota_raise_is_retained(prior_limits) -> bool:
             from ai_video.production.paid_provider_submit_quota import retained_submit_quota_allows
 

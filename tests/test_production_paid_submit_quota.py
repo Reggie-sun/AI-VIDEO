@@ -497,6 +497,77 @@ def test_same_task_extension_resumes_pending_request_and_preserves_durable_used_
     assert _bytes(tmp_path) == before
 
 
+def test_paid_submit_intent_reuses_locked_project_snapshot_for_family_limits(tmp_path, monkeypatch):
+    writer, _, preview, prior = _pending(tmp_path)
+    writer.extend_paid_provider_submit_quota(_entry(writer, prior))
+
+    project_loads = 0
+    original_load = writer._load_production_project
+
+    def counted_load(path):
+        nonlocal project_loads
+        project_loads += 1
+        return original_load(path)
+
+    import ai_video.production.production_strategy_reader as strategy_reader
+
+    family_derivations = 0
+    original_family_ids = strategy_reader.production_family_shot_ids
+
+    def counted_family_ids(loaded, shot_id):
+        nonlocal family_derivations
+        family_derivations += 1
+        return original_family_ids(loaded, shot_id)
+
+    monkeypatch.setattr(writer, "_load_production_project", counted_load)
+    monkeypatch.setattr(strategy_reader, "production_family_shot_ids", counted_family_ids)
+
+    writer.record_paid_provider_submit_intent(
+        preview, reservation_id="quota-snapshot-once"
+    )
+
+    assert project_loads == 1
+    assert family_derivations == 1
+    manifest = writer._read_manifest()
+    target = next(item for item in manifest.attempts if item.attempt_id == NEXT)
+    assert target.paid_provider_state is not None
+    assert target.paid_provider_state.phase.value == "submit_intent"
+    assert target.paid_provider_state.reservation_id == "quota-snapshot-once"
+    budget = writer._reopen_paid_budget(manifest.active_paid_provider_budget)
+    assert budget.reservations[-1].reservation_id == "quota-snapshot-once"
+
+
+def test_paid_submit_stale_current_qa_refuses_before_intent_or_reservation(tmp_path):
+    writer, _, preview, prior = _pending(tmp_path)
+    writer.extend_paid_provider_submit_quota(_entry(writer, prior))
+    selected = load_production_project(tmp_path / "project.yaml")
+    acceptance = selected.qa_policy.selected_generation_acceptance()
+    assert acceptance is not None
+    revised_acceptance = acceptance.model_copy(
+        update={"profile_version": "stale-current-qa-check"}
+    )
+    _activate_goal(
+        writer,
+        goal=_goal("stale-current-qa-check"),
+        acceptance=revised_acceptance,
+        attempt_id=NEXT,
+    )
+    before = _bytes(tmp_path)
+
+    with pytest.raises(
+        ValueError, match="generation final-output goal differs from the current QA owner"
+    ):
+        writer.record_paid_provider_submit_intent(
+            preview, reservation_id="quota-stale-current-qa"
+        )
+
+    assert _bytes(tmp_path) == before
+    manifest = writer._read_manifest()
+    target = next(item for item in manifest.attempts if item.attempt_id == NEXT)
+    assert target.paid_provider_state is None
+    assert target.video_generation_state.phase.value == "request"
+
+
 def _successor_guard_inputs(writer, *, used=2, ceiling=2, task_id=None):
     manifest = load_production_project(writer.project_root / "project.yaml").manifest
     ancestor = next(item for item in manifest.attempts if item.attempt_id == NEXT)
@@ -511,6 +582,13 @@ def _successor_guard_inputs(writer, *, used=2, ceiling=2, task_id=None):
     return manifest.model_copy(update={"attempts": (*manifest.attempts, successor)}), state, binding
 
 
+def _current_family_ids(writer, binding):
+    from ai_video.production.production_strategy_reader import production_family_shot_ids
+
+    loaded = load_production_project(writer.project_root / "project.yaml")
+    return production_family_shot_ids(loaded, binding.context.target_shot_id)
+
+
 def test_applied_quota_is_inherited_and_original_durable_ceiling_still_stops_successor(tmp_path):
     writer, service, preview, prior = _pending(tmp_path)
     writer.extend_paid_provider_submit_quota(_entry(writer, prior))
@@ -521,14 +599,20 @@ def test_applied_quota_is_inherited_and_original_durable_ceiling_still_stops_suc
     before = _bytes(tmp_path)
     manifest, state, binding = _successor_guard_inputs(writer)
     with pytest.raises(AiVideoError, match="Durable paid submit ceiling is exhausted"):
-        writer._require_persisted_generation_limits(manifest, state, binding)
+        writer._require_persisted_generation_limits(
+            manifest, state, binding, family_ids=_current_family_ids(writer, binding)
+        )
     assert _bytes(tmp_path) == before
     manifest, state, binding = _successor_guard_inputs(writer, used=1)
     with pytest.raises(AiVideoError, match="counters are below durable"):
-        writer._require_persisted_generation_limits(manifest, state, binding)
+        writer._require_persisted_generation_limits(
+            manifest, state, binding, family_ids=_current_family_ids(writer, binding)
+        )
     manifest, state, binding = _successor_guard_inputs(writer, ceiling=3)
     with pytest.raises(AiVideoError, match="ceilings cannot expand"):
-        writer._require_persisted_generation_limits(manifest, state, binding)
+        writer._require_persisted_generation_limits(
+            manifest, state, binding, family_ids=_current_family_ids(writer, binding)
+        )
     from ai_video.production.paid_provider_submit_quota import retained_submit_quota_allows
     ancestor = next(item for item in manifest.attempts if item.attempt_id == NEXT)
     for invalid in (
@@ -558,7 +642,9 @@ def test_unsubmitted_quota_target_does_not_establish_inherited_cap(tmp_path):
     before = _bytes(tmp_path)
     manifest, state, binding = _successor_guard_inputs(writer, used=1)
     with pytest.raises(AiVideoError, match="ceilings cannot expand"):
-        writer._require_persisted_generation_limits(manifest, state, binding)
+        writer._require_persisted_generation_limits(
+            manifest, state, binding, family_ids=_current_family_ids(writer, binding)
+        )
     assert _bytes(tmp_path) == before
 
 

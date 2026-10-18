@@ -20,6 +20,13 @@ def _close(writer, **changes):
     return writer.close_unsubmitted_video_generation(**values)
 
 
+def _current_family_ids(writer, binding):
+    from ai_video.production.production_strategy_reader import production_family_shot_ids
+
+    loaded = load_production_project(writer.project_root / "project.yaml")
+    return production_family_shot_ids(loaded, binding.context.target_shot_id)
+
+
 def test_close_retains_exact_request_history_budget_and_replays_without_writes(tmp_path):
     writer, _, _, prior = _pending(tmp_path)
     writer.extend_paid_provider_submit_quota(_entry(writer, prior))
@@ -42,10 +49,14 @@ def test_close_retains_exact_request_history_budget_and_replays_without_writes(t
         _close(writer, reason="superseded_before_submit")
     assert _bytes(tmp_path) == frozen
     manifest, state, binding = _successor_guard_inputs(writer, used=1)
-    writer._require_persisted_generation_limits(manifest, state, binding)
+    writer._require_persisted_generation_limits(
+        manifest, state, binding, family_ids=_current_family_ids(writer, binding)
+    )
     with pytest.raises(AiVideoError, match="ceilings cannot expand"):
         manifest, state, binding = _successor_guard_inputs(writer, used=1, ceiling=3)
-        writer._require_persisted_generation_limits(manifest, state, binding)
+        writer._require_persisted_generation_limits(
+            manifest, state, binding, family_ids=_current_family_ids(writer, binding)
+        )
 
 
 def test_close_requires_current_revision_and_durable_not_submitted_evidence(tmp_path):

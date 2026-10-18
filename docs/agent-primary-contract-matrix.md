@@ -478,6 +478,9 @@ QA owner 的 `generation_evaluation_authorities` 显式绑定 evaluator 与 proo
 空新增字段不进入旧序列化；新选择会改变 QA content hash，使旧 policy-bound evidence 失效。
 `generation_execution.py` 将可重算 decision 绑定实际 native compiled request；普通新 v2 start
 必须提供该 binding，旧 request shape、空 lineage 或 run script 不能成为 submit 例外。
+`_state_commit_video.py` 在一次锁内 submit admission 严格重开当前 project、核对 Manifest/QA 后，
+将同一次派生的 family IDs 传给额度/历史校验；不为同一集合再次完整重开项目。
+该复用只在当前 guard 内有效，新动作仍重新核验；无跨调用缓存、caller 自证快照或跳过 history/unknown/permit 的入口。
 `generation_runtime_repair.py` 的 one-use grant 只对最新已知 `RUNTIME_FAILURE` 的同 Shot
 re-execution 生效；committer 在 replacement submit intent 的同一原子写入中消耗 grant，
 unknown outcome、旧 evidence 或耗尽的 per-Shot ceiling 不获得 retry 权限。
@@ -739,7 +742,7 @@ Focused verification：`tests/test_planning_video_planner.py`、`tests/test_shot
 | Local-First and Provider Safety | Legacy 默认只连接 local ComfyUI；v2 local adapter 必须 loopback-only。严格loopback、完全local/unmetered且无cloud egress的ComfyUI lifecycle、generation、retry、variant与benchmark按`AGENTS.md`无需user authorization；该豁免不放宽exact identity、canonical seam、permit、provenance、unknown-outcome、recovery或media gates。任何remote/paid Provider、secret或cloud egress继续受decision gates约束，且不得成为fallback。 |
 | Evidence Truth | Immutable evidence 必须 content-addressed 并绑定 exact selected inputs。Plan、console text、Agent memory 或 heuristic 不得升级成 runtime、semantic acceptance 或 quality acceptance。 |
 | Error Model | 跨模块失败使用 `AiVideoError` 与 `ErrorCode`；retryability 由 typed metadata 决定，常规 CLI 输出不得泄露 raw traceback。 |
-| Development Governance Isolation | Codex、`AGENTS.md`、`.agent/`、`.agents/`、`.codex/`、`.workflow/`、Development Verification Harness、Documentation Contract Gate、Architecture Gate 与 developer-only Agent Memory 只拥有开发治理。`src/ai_video/**` Product Runtime 不得 import、执行或依赖这些 artifacts，也不得把 `.workflow/` session 当作 production session。 |
+| Development Governance Isolation | Codex、`AGENTS.md`、`.agent/`、`.agents/`、`.codex/`、`.workflow/`、Development Verification Harness、Documentation Contract Gate、Architecture Gate 与 developer-only Agent Memory 只拥有开发治理。`src/ai_video/**` Product Runtime 不得 import、执行或依赖这些 artifacts，也不得把 `.workflow/` session 当作 production session。Harness CLI 的 engineering-completion 检查范围不提供媒体 submit/acceptance 权限；取材、剪辑与交付的执行顺序归现有 Canvas workflow，工程 receipt 不成为每次生成的运行时前置条件。 |
 | Agent Session Fact Domain | 当前没有通用 Product Agent Loop、Tool Registry 或 event-sourced Product Session。未来若引入 Product Agent Session，其 append-only events 只能拥有 model-visible conversation、decision context 与 non-authoritative telemetry；Project、Registry、Manifest、Provider effect、activation、review、repair 与 delivery truth 继续由既有 domain owners 独占。 |
 
 ## Provider Console Browsing Surface

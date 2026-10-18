@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Route an exact Git task scope to mandatory checks and write proof receipts."""
+"""Verify engineering completion for an exact Git scope, without media authority."""
 
 from __future__ import annotations
 
@@ -793,8 +793,12 @@ def _add_scope_arguments(parser: argparse.ArgumentParser) -> None:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     subparsers = parser.add_subparsers(dest="command", required=True)
-    inspect_parser = subparsers.add_parser("inspect", help="Show required checks.")
-    verify_parser = subparsers.add_parser("verify", help="Run checks and write a receipt.")
+    inspect_parser = subparsers.add_parser(
+        "inspect", help="Show engineering-completion checks, not media-submit readiness."
+    )
+    verify_parser = subparsers.add_parser(
+        "verify", help="Run engineering-completion checks and write a receipt."
+    )
     receipt_parser = subparsers.add_parser(
         "verify-receipt", help="Verify receipt integrity and freshness."
     )
@@ -841,6 +845,9 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.command == "inspect":
         inspection = inspect_paths(scope["changed_paths"], policy)
         inspection["scope"] = scope
+        inspection["verification_purpose"] = "engineering_completion"
+        inspection["media_submit_authority"] = False
+        inspection["media_acceptance_authority"] = False
         print(json.dumps(inspection, ensure_ascii=False, sort_keys=True, indent=2))
         return 0
 

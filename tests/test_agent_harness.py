@@ -2144,6 +2144,28 @@ def test_staged_scope_discovers_both_sides_of_real_git_rename(tmp_path: Path) ->
     assert scope["changed_paths"] == ["tracked.txt", "renamed file.txt"]
 
 
+def test_inspect_reports_engineering_boundary_without_running_checks(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    def forbid_verification(*args, **kwargs):
+        raise AssertionError("Inspection must not execute engineering checks.")
+
+    monkeypatch.setattr(agent_harness, "verify_inspection", forbid_verification)
+
+    assert agent_harness.main(["inspect", "--path", "README.md"]) == 0
+    report = json.loads(capsys.readouterr().out)
+
+    assert report["verification_purpose"] == "engineering_completion"
+    assert report["media_submit_authority"] is False
+    assert report["media_acceptance_authority"] is False
+    assert report["check_ids"] == agent_harness.inspect_paths(
+        ["README.md"], agent_harness.load_policy()
+    )["check_ids"]
+    assert report["scope"]["closure_eligible"] is False
+    with pytest.raises(ValueError, match="completion scope"):
+        agent_harness.validate_completion_scope(report["scope"])
+
+
 def test_completion_verification_rejects_explicit_or_empty_scope() -> None:
     with pytest.raises(ValueError, match="completion scope"):
         agent_harness.validate_completion_scope(

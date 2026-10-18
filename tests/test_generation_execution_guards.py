@@ -74,6 +74,13 @@ def _request(*, shot_id="guard-shot", request_hash="a" * 64):
     )
 
 
+def _family_ids(committer, binding):
+    from ai_video.production.production_strategy_reader import production_family_shot_ids
+
+    loaded = committer._load_production_project(committer._project_root / "project.yaml")
+    return production_family_shot_ids(loaded, binding.context.target_shot_id)
+
+
 class _Committer(_StateCommitVideoMixin):
     def __init__(self, bindings, requests) -> None:
         self._bindings = bindings
@@ -180,7 +187,7 @@ def test_durable_local_submit_count_cannot_be_reset_by_input_projection() -> Non
 
     with pytest.raises(AiVideoError, match="submit counters"):
         committer._require_persisted_generation_limits(
-            manifest, current_state, current
+            manifest, current_state, current, family_ids=_family_ids(committer, current)
         )
 
 
@@ -192,7 +199,8 @@ def test_local_unmetered_can_continue_with_a_new_finite_batch(total_limit):
     prior = _attempt(attempt_id="old", binding="previous", request="old-request", local_submit=True)
     committer = _Committer({"previous": previous}, {"old-request": _request()})
     committer._require_persisted_generation_limits(
-        SimpleNamespace(attempts=(prior,)), SimpleNamespace(generation_id="new"), current)
+        SimpleNamespace(attempts=(prior,)), SimpleNamespace(generation_id="new"), current,
+        family_ids=_family_ids(committer, current))
 
 
 @pytest.mark.parametrize("execution_kind,billing_kind", [("remote", "metered"), ("local", "metered")])
@@ -204,7 +212,8 @@ def test_metered_or_remote_cannot_expand_persisted_local_limits(execution_kind, 
     committer = _Committer({"previous": previous}, {"old-request": _request()})
     with pytest.raises(AiVideoError, match="ceilings cannot expand"):
         committer._require_persisted_generation_limits(
-            SimpleNamespace(attempts=(prior,)), SimpleNamespace(generation_id="new"), current)
+            SimpleNamespace(attempts=(prior,)), SimpleNamespace(generation_id="new"), current,
+            family_ids=_family_ids(committer, current))
 
 
 def test_local_unmetered_continuation_does_not_expand_paid_quota():
@@ -214,7 +223,8 @@ def test_local_unmetered_continuation_does_not_expand_paid_quota():
     committer = _Committer({"previous": previous}, {"old-request": _request()})
     with pytest.raises(AiVideoError, match="ceilings cannot expand"):
         committer._require_persisted_generation_limits(
-            SimpleNamespace(attempts=(prior,)), SimpleNamespace(generation_id="new"), current)
+            SimpleNamespace(attempts=(prior,)), SimpleNamespace(generation_id="new"), current,
+            family_ids=_family_ids(committer, current))
 
 
 @pytest.mark.parametrize("limit", ["batch", "total"])
@@ -227,7 +237,8 @@ def test_local_unmetered_still_respects_current_finite_limit(limit):
     committer = _Committer({"previous": previous}, {"old-request": _request()})
     with pytest.raises(AiVideoError, match="local submit limit is exhausted"):
         committer._require_persisted_generation_limits(
-            SimpleNamespace(attempts=(prior,)), SimpleNamespace(generation_id="new"), current)
+            SimpleNamespace(attempts=(prior,)), SimpleNamespace(generation_id="new"), current,
+            family_ids=_family_ids(committer, current))
 
 
 @pytest.mark.parametrize("task_id", ["guard-task", "new-task-name"])
@@ -250,7 +261,7 @@ def test_same_shot_cannot_expand_persisted_resample_policy(task_id) -> None:
 
     with pytest.raises(AiVideoError, match="repair policy"):
         committer._require_persisted_generation_limits(
-            manifest, current_state, current
+            manifest, current_state, current, family_ids=_family_ids(committer, current)
         )
 
 
@@ -303,7 +314,8 @@ def test_pending_submit_intent_on_another_shot_reserves_task_count(kind):
     committer = _Committer({"previous": previous}, {"old-request": _request(shot_id="other-shot")})
     with pytest.raises(AiVideoError, match="submit counters"):
         committer._require_persisted_generation_limits(
-            SimpleNamespace(attempts=(prior,)), SimpleNamespace(generation_id="new"), current)
+            SimpleNamespace(attempts=(prior,)), SimpleNamespace(generation_id="new"), current,
+            family_ids=_family_ids(committer, current))
 
 
 @pytest.mark.parametrize("later_state", ["unknown", "fetched"])
