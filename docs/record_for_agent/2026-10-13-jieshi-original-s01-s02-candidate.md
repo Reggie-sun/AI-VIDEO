@@ -43,6 +43,27 @@ A这次保留陈立而旧B缺失，只是有界观察。两次同时改变模式
 
 按 `record-ai-video-session` 更新同一主记录并自动评估 `distill-ai-video-learning=no_candidate`：新增一次独立媒体，不把proof层或历史B另算新调用；现有资料只支持上述有界差异，未形成超出现有完整Gate/模式限制的新可采纳工作流机制，不制造通用质量规则或修改Skill/Policy/Gate。既有本地H3 first-frame/open-state claim排除paid/其他profile，Vidu对白claim排除其他模型及人物/倒影质量，本次不是其scope内的material update。此次无源码行为变更，Parent Risk Gate为 `NATIVE_REVIEW_NOT_REQUIRED`；现有首帧/原文保留 focused checks 8 PASS，先前通用工程 exact Harness保留其原publication边界。本文档checkpoint receipt为 `.agent/harness/runs/h3-max-first-frame-record-20261017-r1/receipt.json`；publication以该exact receipt及Git/remote SHA为准。
 
+## Prompt-Control Audit — 2026-10-18
+
+用户追问画布是否采用更宽松的提示词后，对照剧本卡、本地 authoring source、A 实际 native preview 和逐项 QA。
+本记录所称两段“原文”是本地封存的 authoring 文本，不证明外部网页画布的真实提交或服务端扩写。
+`source-mapping.json` 明确为 `candidate_preparation_only`；剧本 S01 卡已包含抬左手、约2cm悬停、
+七人倒影保留、点名广播与3秒采用。1151字符的本地文本加51字符工牌正常态说明，精确组成 A 的1202字符
+prompt（3386 UTF-8 bytes），SHA `2a54252ee51ac0d9c1a193ff0b3060aa80ae94ab3570986c588b49b162f50f59`。
+因此不能把它称为外部画布的宽松原始请求，也不能把3386 bytes误报为字符数。
+
+A 的 nominal5秒请求仅写“保持到切出”，没有明示3秒动作截止；`s01-close-gap` QA 却检查 frame71已到位。
+这是真实的表达/采用窗口差异，不证明其为时序失败唯一原因；15项 QA 不是 API 硬控制字段。
+官方 H3 指南允许与意图一致的细节补充，也要求清楚描述动作和参考职责；详细程度本身不证明控制有效。
+当前 CN 请求的 `balanced`、本地 H3 社区经验及外部画布后台改写必须分开，不能据此宣称放宽提示必然改善。
+完整来源、通用职责判断及边界见[调研](../research/2026-10-18-canvas-prompt-control-and-acceptance.md)。
+
+本轮仅研究/输入核对，未改 prompt、QA、workflow 或 Product state，图片/视频/音频 POST均0；
+A 的6 PASS / 2 FAIL / 7 NOT_EVALUATED、S01 STOP、S02 POST0保持。
+`record-ai-video-session` 更新本主记录，自动 `distill-ai-video-learning=no_candidate`：
+同一输入/结果链的复核不是新增独立实验，缺少提示复杂度的受控比较，不创建 Learning Claim 或采纳规则。
+Parent Risk Gate 为 `NATIVE_REVIEW_NOT_REQUIRED`：只有有界研究与记录澄清，无 Runtime/授权/验收行为变更。
+
 ## Offline Authoring Repair Preview — 2026-10-17
 
 用户要求“参考官方和社区修改”后，先核对 A 的 actual native text：原文已有约2cm悬停终态和“保持到切出”，
