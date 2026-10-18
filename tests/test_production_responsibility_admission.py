@@ -207,6 +207,143 @@ def test_matching_editorial_analyzer_result_binds_to_final_evaluator():
     require_production_responsibilities(_post_policy(parent_proof="analyzer", final_proof="evaluator"))
 
 
+def _raw_overlap_policy(*, include_raw=True, allocate_raw=True, final_observable=None,
+                        component_mutation=None, generation_parent=False):
+    observable = "The handover completes by 3 seconds."
+    deadline = {**_row("deadline"), "observable": observable, "proof": "analyzer"}
+    parent = _acceptance("raw-parent", ("action", "deadline"), rows=(_row("action"), deadline))
+    component_deadline = {**deadline, **(component_mutation or {})}
+    raw = _acceptance("raw-component", ("action", "deadline") if include_raw else ("action",),
+        rows=(_row("action"), component_deadline) if include_raw else (_row("action"),))
+    allocation = _allocation(parent, (ComponentRequirementAllocation(component_id="plate-A",
+        requirement_ids=("action", "deadline") if allocate_raw else ("action",),
+        generation_acceptance=raw),), assembly=("deadline",))
+    final = FinalOutputContract(goal_id="handover", goal_version="1", user_goal=observable,
+        requirements=(FinalOutputRequirement(requirement_id="deadline",
+            observable=final_observable or observable, proof="evaluator"),))
+    policy = _qa_policy(parent, allocation, final_output=final)
+    if generation_parent:
+        policy = seal_artifact(policy.model_copy(update={"content_hash": "0" * 64,
+            "domain_acceptance": None, "generation_acceptance": parent}))
+    return policy
+
+
+@pytest.mark.parametrize("generation_parent", [False, True])
+@pytest.mark.parametrize("allocate_raw", [False, True])
+def test_assembly_never_exempts_declared_raw_goal(generation_parent, allocate_raw):
+    from ai_video.production.domain_acceptance import production_allocation_issues
+
+    policy = _raw_overlap_policy(include_raw=False, allocate_raw=allocate_raw,
+        generation_parent=generation_parent)
+    issues = production_allocation_issues(policy, policy.production_allocations[0])
+    expected = ("component_raw_required_missing:plate-A:deadline" if allocate_raw else
+        "raw_goal_not_in_component:deadline")
+    assert expected in issues
+
+
+def test_declared_raw_and_final_overlap_preserves_both_result_owners():
+    from ai_video.production.domain_acceptance import require_production_responsibilities
+
+    require_production_responsibilities(_raw_overlap_policy())
+
+
+def test_declared_raw_source_only_owner_still_uses_existing_source_evidence_path():
+    from ai_video.production.domain_acceptance import require_production_responsibilities
+
+    policy = _raw_overlap_policy()
+    allocation = policy.production_allocations[0]
+    source = allocation.components[0].model_copy(update={"generation_acceptance": None})
+    allocation = allocation.model_copy(update={"components": (source,)})
+    policy = seal_artifact(policy.model_copy(update={"content_hash": "0" * 64,
+        "production_allocations": (allocation,)}))
+    require_production_responsibilities(policy)
+
+
+def test_declared_raw_overlap_cannot_replace_the_final_result():
+    from ai_video.production.domain_acceptance import production_allocation_issues
+
+    policy = _raw_overlap_policy(final_observable="No black frames are visible.")
+    assert "assembly_final_output_mismatch:deadline" in production_allocation_issues(
+        policy, policy.production_allocations[0])
+
+
+@pytest.mark.parametrize("field,value", [("observable", "The handover completes by 5 seconds."),
+    ("proof", "human"), ("tolerance", "any timing"), ("measurement", "always passes")])
+def test_component_cannot_substitute_a_declared_raw_predicate(field, value):
+    from ai_video.production.domain_acceptance import production_allocation_issues
+
+    policy = _raw_overlap_policy(component_mutation={field: value})
+    assert "component_raw_result_mismatch:plate-A:deadline" in production_allocation_issues(
+        policy, policy.production_allocations[0])
+
+
+def test_raw_assembly_bypass_is_rejected_before_publication_and_current_use(tmp_path):
+    from ai_video.errors import AiVideoError
+    from ai_video.production.domain_acceptance import require_production_responsibilities
+    from ai_video.production.paths import canonical_qa_policy_path
+    from ai_video.production.project import load_production_project
+    from production_strategy_factory import make_persisted_strategy_fixture
+
+    fixture = make_persisted_strategy_fixture(tmp_path)
+    loaded = load_production_project(fixture.root / "project.yaml")
+    policy = _raw_overlap_policy(include_raw=False, generation_parent=True,
+        final_observable="No black frames are visible.")
+    original = policy.model_dump_json()
+    assert QaPolicy.model_validate_json(original).model_dump_json() == original
+    before = (fixture.root / "state/manifest.json").read_bytes()
+    with pytest.raises(ValueError, match="component_raw_required_missing:plate-A:deadline"):
+        require_production_responsibilities(policy)
+    with pytest.raises(AiVideoError, match="responsibility admission"):
+        fixture.committer.activate_qa_policy(policy, attempt_id="reject-raw-assembly-bypass",
+            expected_manifest_revision=loaded.manifest.manifest_revision)
+    assert (fixture.root / "state/manifest.json").read_bytes() == before
+    assert not (fixture.root / canonical_qa_policy_path(policy.content_hash)).exists()
+
+
+def test_current_planner_rejects_raw_assembly_bypass_without_attempt(tmp_path):
+    from ai_video.planning.production_strategy import (
+        ProductionCapabilities, ProductionStrategyPolicy, ProductionStrategyResolver,
+    )
+    from ai_video.production.project import load_production_project
+    from production_strategy_factory import make_persisted_strategy_fixture
+
+    fixture = make_persisted_strategy_fixture(tmp_path, generation_only=True)
+    loaded = load_production_project(fixture.root / "project.yaml")
+    parent = loaded.shots[0]
+    intent = parent.production_intent
+    coverage = intent.coverage_options[0]
+    unit = coverage.units[0].model_copy(update={"component_id": "plate-A",
+        "requirement_ids": ("action", "deadline")})
+    coverage = coverage.model_copy(update={"units": (unit,)})
+    parent = seal_artifact(parent.model_copy(update={"content_hash": "0" * 64,
+        "production_intent": intent.model_copy(update={"protected_requirement_ids": ("action", "deadline"),
+            "assembly_requirement_ids": ("deadline",), "coverage_options": (coverage,)})}))
+    policy = _raw_overlap_policy(include_raw=False, generation_parent=True)
+    allocation = policy.production_allocations[0].model_copy(update={
+        "allocation_id": coverage.allocation_id, "parent_shot_id": parent.shot_id,
+        "parent_shot_content_hash": parent.content_hash, "task_id": intent.task_id})
+    policy = seal_artifact(policy.model_copy(update={"content_hash": "0" * 64,
+        "production_allocations": (allocation,)}))
+    references = tuple(reference.model_copy(update={"content_hash": parent.content_hash})
+        if reference.artifact_id == parent.artifact_id else reference
+        for reference in loaded.project.artifacts.shots)
+    project = seal_artifact(loaded.project.model_copy(update={"content_hash": "0" * 64,
+        "revision": loaded.project.revision + 1,
+        "artifacts": loaded.project.artifacts.model_copy(update={"shots": references})}))
+    candidate = loaded.model_copy(update={"project": project, "qa_policy": policy,
+        "shots": (parent, *loaded.shots[1:])})
+    before = (fixture.root / "state/manifest.json").read_bytes()
+
+    result = ProductionStrategyResolver().resolve(loaded=candidate, parent_shot_id=parent.shot_id,
+        policy=ProductionStrategyPolicy(allow_generation_exploration=True),
+        capabilities=ProductionCapabilities(generation_available=True))
+
+    assert result.selected is None
+    assert any("allocation_responsibility:component_raw_required_missing:plate-A:deadline" in reason
+        for reason in result.reasons)
+    assert (fixture.root / "state/manifest.json").read_bytes() == before
+
+
 def test_qa_publication_rejects_substituted_editorial_goal_before_writing(tmp_path):
     from ai_video.errors import AiVideoError
     from ai_video.production.paths import canonical_qa_policy_path

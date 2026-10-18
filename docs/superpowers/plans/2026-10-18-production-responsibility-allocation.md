@@ -12,7 +12,7 @@ Owner：一名 native bounded worker；Parent 负责最终裁决。
 
 文件：`production/domain_acceptance.py` 中统一纯校验，原 `_state_commit_review.py` publication、`planning/production_strategy.py`、`production_strategy_reader.py` 与 `production_strategy_materialization.py` 的 current-use seams 调用同一规则。测试 `tests/test_production_responsibility_admission.py` 及现有 allocation/planning/source-use 用例。
 
-验收：组件未分给 assembly 的 hard IDs 全部有 raw rubric；rubric required IDs 不能是 hint 或后期阶段；assembly 必须有既有 final-output 目标，已声明的 post-stage observable/proof 保持匹配。source-only 合法、重叠职责合法；旧 policy bytes/hash 和只读 lineage 继续可重开，不完整旧 policy 的新执行明确停止。新 publication 拒绝发生在 durable write 前，策略拒绝不开 attempt。
+验收：声明 raw 的 hard IDs 始终有 component 承担；组件自身 raw 目标不因 assembly 重叠而免验，observable/proof/tolerance/measurement 保持。其他未分给 assembly 的 hard IDs 也须有 raw rubric；rubric required IDs 不能是 hint 或后期阶段；assembly 必须有既有 final-output 目标，所有已声明 hard goal 的 observable/proof 保持匹配。source-only 合法、重叠职责合法；旧 policy bytes/hash 和只读 lineage 继续可重开，不完整旧 policy 的新执行明确停止。新 publication 拒绝发生在 durable write 前，策略拒绝不开 attempt。
 
 ## Milestone 2: Expose The Same Division In Existing Previews
 

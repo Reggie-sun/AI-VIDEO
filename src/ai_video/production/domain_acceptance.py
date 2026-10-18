@@ -207,6 +207,10 @@ def production_allocation_issues(policy, allocation: ProductionRequirementAlloca
     for requirement_id in assembly_ids - final_ids:
         issues.add(f"assembly_final_output_missing:{requirement_id}")
 
+    parent_raw: dict[str, Mapping] = {}
+    component_requirement_ids = {
+        rid for component in allocation.components for rid in component.requirement_ids
+    }
     if parent_acceptance is not None:
         parent_inventory = parent_acceptance.profile_payload.get("generation_requirements") or ()
         for item in parent_inventory:
@@ -217,22 +221,27 @@ def production_allocation_issues(policy, allocation: ProductionRequirementAlloca
                 isinstance(requirement_id, str)
                 and requirement_id in parent_acceptance.required_requirement_ids
                 and item.get("level") == "acceptance"
-                and item.get("stage") in {"shot_editorial", "final_composition"}
             ):
-                if requirement_id not in assembly_ids:
+                if item.get("stage") == "raw_generation":
+                    parent_raw[requirement_id] = item
+                    if requirement_id not in component_requirement_ids:
+                        issues.add(f"raw_goal_not_in_component:{requirement_id}")
+                elif (item.get("stage") in {"shot_editorial", "final_composition"}
+                        and requirement_id not in assembly_ids):
                     issues.add(f"post_goal_not_in_assembly:{requirement_id}")
-                elif requirement_id in final_ids and not final_requirement_matches(
+                if requirement_id in assembly_ids and requirement_id in final_ids and not final_requirement_matches(
                     requirement_id=requirement_id, observable=item.get("observable"),
                     proof=item.get("proof"), final_output=final_output,
                 ):
                     issues.add(f"assembly_final_output_mismatch:{requirement_id}")
 
+    post_only = assembly_ids - parent_raw.keys()
     for component in allocation.components:
         rubric = component.generation_acceptance
         if rubric is None:
             continue
         rubric_required = set(rubric.required_requirement_ids)
-        for requirement_id in set(component.requirement_ids) - assembly_ids - rubric_required:
+        for requirement_id in set(component.requirement_ids) - post_only - rubric_required:
             issues.add(
                 f"component_raw_required_missing:{component.component_id}:{requirement_id}"
             )
@@ -251,6 +260,11 @@ def production_allocation_issues(policy, allocation: ProductionRequirementAlloca
                 issues.add(
                     f"component_rubric_not_raw:{component.component_id}:{requirement_id}"
                 )
+            elif requirement_id in parent_raw and any(
+                rows[0].get(field) != parent_raw[requirement_id].get(field)
+                for field in ("observable", "proof", "tolerance", "measurement")
+            ):
+                issues.add(f"component_raw_result_mismatch:{component.component_id}:{requirement_id}")
 
     return tuple(sorted(issues))
 

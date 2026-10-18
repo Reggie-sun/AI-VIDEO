@@ -13,8 +13,8 @@
 ## Contract
 
 - 分工仍只来自 QA 的既有 inventory 与 component/assembly IDs。模型必须结果与参考职责保持其 raw acceptance；偏好/允许变化仅按既有非固定 `recipe_hint` 表达，不升级为 required finding，也不自动删除或重写原生文本。
-- 新 QA publication 和当前策略使用时，有 generation rubric 的每个组件必须覆盖自身所有未交给 assembly 的 required IDs。rubric 的全部 required IDs 必须是真正的 `acceptance/raw_generation`，不能把 hint 或 final-stage 条目伪装成原片覆盖。多个组件重复承担同一目标、原片与成片同时检查同一目标均合法。
-- assembly 的目标必须绑定既有 `FinalOutputContract` 中相同 ID 的结果；已声明的 post-stage hard goal 还须保持相同 observable 与原 final owner 的 proof 映射。`shot_editorial` 不得借同名 ID 替换目标或弱化证明；technical 无既有 final proof 映射时要求 authoring revision，不自动改为 human/evaluator。已声明的 final-stage source reference 继续由原 semantics/final-contract owner 核验，不把“后期负责”当作已有修复能力。
+- 新 QA publication 和当前策略使用时，已声明的 raw hard goal 必须仍有 component 承担，加入 assembly 不豁免原片验收。有 generation rubric 的组件须覆盖自身全部 raw 目标及未交给 assembly 的 required IDs；已声明 raw 目标的 observable/proof/tolerance/measurement 须保持。rubric 的全部 required IDs 必须是真正的 `acceptance/raw_generation`，不能把 hint 或 final-stage 条目伪装成原片覆盖。多个组件重复承担同一目标、原片与成片同时检查同一目标均合法。
+- assembly 的目标必须绑定既有 `FinalOutputContract` 中相同 ID 的结果；已声明 hard goal 还须保持相同 observable 与原 final owner 的 proof 映射，不因 raw/post 阶段不同而豁免。不得借同名 ID 替换目标或弱化证明；technical 无既有 final proof 映射时要求 authoring revision，不自动改为 human/evaluator。已声明的 final-stage source reference 继续由原 semantics/final-contract owner 核验，不把“后期负责”当作已有修复能力。
 - source-only 组件不强造 generation rubric；原 source-use owner 仍检查完整 exact bytes/window/map/transform 和内容证据。未知、失败、过期和新用途缺证均保持原行为。历史模型反序列化、hash、lookup 和已持久化结果不被重写；新 publication/use 的不完整分工返回明确 authoring blocker。
 - 预览由同一校验和现有事实投影：逐项目标的 level/stage、语义/固定来源、model guidance/允许变化、原生成 owner、component/assembly 分配、实际操作、原 map 和最终验收要求。缺 QA/语义/选择时明确未评估，不猜意图或自动改 stage。
 - 参考预览保留 exact native text/绑定及机制，补足“必须结果/允许变化/交由后期”的视图。非 raw 的派生 native fragments 不再冒充模型输入；原用户文本不变。

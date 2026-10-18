@@ -200,13 +200,14 @@ compiler 失败时仍保留 selected candidate 的目标和失败 ID，片段标
 | Existing owner | Responsibility | Evidence boundary |
 | --- | --- | --- |
 | Component `generation_acceptance` | 原片必须存在的人物、动作、状态及其他 raw 结果 | 输入/参考仅作引导，需原片逐项验收 |
-| `assembly_requirement_ids` + `FinalOutputContract` | 剪辑或合成后才成立的硬结果 | 已声明的 post 目标须保持 ID、observable 与既有 proof 映射，不能仅写“后期处理” |
+| `assembly_requirement_ids` + `FinalOutputContract` | 剪辑或合成后才成立的硬结果 | 已声明 hard goal 须保持 ID、observable 与既有 proof 映射，不能仅写“后期处理” |
 | `ProductionIntent` + Planner | 选择实际复用、变速、声音、生成等操作 | exact source-use 证据、能力与范围均满足才可选 |
 | `ResolvedTimeline` + HyperFrames | 采用窗口、帧/样本、实际成片 | 分工报告不另算时间线，也不证明成片通过 |
 
 新 QA publication 和当前策略使用共用 `production_allocation_issues`：有 generation rubric 的组件，
-其未分给 assembly 的 hard IDs 必须全部由该 rubric 的 `acceptance/raw_generation` 覆盖；
-rubric required IDs 不能用 hint 或后期条目冒充。相同 ID 不能换成另一结果；post 硬目标的 observable
+其 raw 目标及未分给 assembly 的 hard IDs 必须全部由该 rubric 的 `acceptance/raw_generation` 覆盖；
+声明 raw 的目标必须有 component 承担，assembly 重叠不会豁免；raw 的 observable/proof/tolerance/measurement
+也不能被组件改写。rubric required IDs 不能用 hint 或后期条目冒充。相同 ID 不能换成另一结果；assembly 硬目标的 observable
 和 final owner proof 映射须一致，technical 无映射时要求显式修订，不静默降为 human/evaluator。
 多组件或原片/成片重叠验收合法；source-only
 组件继续走 exact source-use，不强造生成 rubric。历史 bytes/hash、反序列化和 lineage 重开保持兼容，

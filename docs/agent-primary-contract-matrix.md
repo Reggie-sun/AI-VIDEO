@@ -366,8 +366,9 @@ Canvas标准compose/render与cut evidence消费此结果；不伪造原Decision�
 精确 bytes/window/role/transform/requirement/evaluator 的用途证据。正向证据必须符合当前
 acceptance inventory 的 proof 与 source/raw stage；Registry 技术有效不等于用途 PASS。
 `domain_acceptance.py::production_allocation_issues/require_production_responsibilities` 独占新发布/当前使用的
-分工完整性：组件 raw rubric 覆盖未交给 assembly 的 hard IDs，required 条目必须为 raw acceptance，
-assembly 绑定既有 FinalOutputContract；已声明的 post-stage observable/proof 共用
+分工完整性：声明 raw 的 hard IDs 始终有 component 承担；组件 raw rubric 覆盖其 raw 目标及未交给
+assembly 的 hard IDs，并保持已声明 raw 的 observable/proof/tolerance/measurement；required 条目必须为 raw acceptance。
+assembly 不豁免 raw，绑定既有 FinalOutputContract；已声明 hard goal 的 observable/proof 共用
 `requirement_semantics.py::final_requirement_matches` 校验，不以同 ID 冒充同一结果；source-only
 与历史反序列化不强加生成 rubric。
 `production_responsibility.py` 仅投影上述合同和原 Planner 选择，供 Canvas preflight、制作准备和
