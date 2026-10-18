@@ -45,6 +45,8 @@ A这次保留陈立而旧B缺失，只是有界观察。两次同时改变模式
 
 ## Prompt-Control Audit — 2026-10-18
 
+2026-10-19 更新：该审计提出的通用分工已由[共享实现记录](2026-10-19-production-responsibility-allocation.md)所述源码 `d082009` 实现并发布；下文“本轮仅研究”是当时阶段的历史范围。当前工程预览保留全部15项，S01/S02均明确缺 ProductionIntent，没有自动重分 stage 或放宽要求；本片媒体结果、S01 STOP、S02 POST0不变，工程 PASS不代媒体通过。
+
 用户追问画布是否采用更宽松的提示词后，对照剧本卡、本地 authoring source、A 实际 native preview 和逐项 QA。
 本记录所称两段“原文”是本地封存的 authoring 文本，不证明外部网页画布的真实提交或服务端扩写。
 `source-mapping.json` 明确为 `candidate_preparation_only`；剧本 S01 卡已包含抬左手、约2cm悬停、
