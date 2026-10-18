@@ -528,4 +528,3 @@ def test_current_generation_and_source_use_reject_historically_readable_incomple
     assert source_error.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
     assert "component_rubric_not_raw:component-1:visual" in source_error.value.technical_detail
     assert loaded.manifest.attempts == attempts_before
-
