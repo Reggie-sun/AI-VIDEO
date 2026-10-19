@@ -297,6 +297,9 @@ qualification为NOT_EVALUATED，timeline标记 `development_preview` 并禁止re
 扩大保护矩形也可能把待去除残影一起保留下来。先核对真实前景轮廓与残影的空间关系，再调整作者的逐帧保护多边形/补片，
 不以保护像素零变化证明遮罩内容正确。对贴近前景边缘的修补，检查实际最后一帧及动作边界附近的连续帧，
 并以正常速度完整观看衔接；稀疏抽帧可能遗漏不足一个采样间隔的缺陷。
+用户反馈先对齐exact观看文件、实际手势/画面区域及既有source/use/time-map；口语“最后”不能直接映射为文件末帧，
+采用切点与源片尾段分别核对，时间映射仍归`ResolvedTimeline`。覆盖检查要包含整块待去除物与真实前景，
+不能仅检查局部接缝，或让固定保护baseline盖过已写出的动态轮廓。
 
 `prepare_video_cleanup(source_bytes=..., plan=..., tools=VideoCleanupTools(...))`只做有界本地素材准备：
 支持8-bit、零视频起点的CFR MP4、0或1条原声音轨；默认最多600帧/60秒、source200MiB、解码RGB1GiB及PCM64MiB。

@@ -11,7 +11,9 @@ Date: 2026-10-13
 
 ## Current Non-generative Cleanup Follow-up — 2026-10-19
 
-用户后续指出“最后那个瞬间还是明显的有痕迹”，并定位“手放在玻璃上”：旧58dee观看版的局部修补观感验收已重新打开，颜色接受与旧反馈保留。现有入口只修作者逐帧前景保护轮廓，新候选位于`runs/non-generative-cleanup-tail-20261019-001/production/assets/files/39da73d103ab0c6c2b46976d6b31cc2b3417c6f1b3ba08e4a820b5b79d4e2a1b.mp4`。完整124帧PTS、原声PCM及前56帧母版像素保持；新尾段静态复核未再见旧明显拖影，实际Chrome完整1×自动播放与末帧正常，人工新观感仍待确认。当前修复及证据以[共享修补主记录](2026-10-19-non-generative-video-cleanup.md#reopened-tail-repair)为准，原S01 STOP、其余缺证与S02 POST0保持。
+用户再次以截图反馈“还是有最后”，39da局部修补候选仍失败；该手势匹配source约2.5秒，残影主体在上一轮保护区内的扶杆左侧，不能用文件末帧检查代替用户所指位置。新作者遮罩补齐整块残影覆盖，新观看版为`runs/non-generative-cleanup-hand-20261019-001/production/assets/files/75a328d76ae349cf48aa048eeea8d5216f239a4a0b058e89e5c56de74cb7d620.mp4`；124帧PTS、原声PCM保持，frame0–39母版RGB与前版相同。新2.5秒及相邻帧的静态复核和实际Chrome局部画面未再见旧宽手影，完整1×自动播放成功，人工观感仍待确认。当前修复以[截图定位主记录](2026-10-19-non-generative-video-cleanup.md#current-screenshot-bound-hand-repair)为准；下方39da的有限改善与旧人工反馈保留为历史，原S01 STOP和S02 POST0不变。
+
+此前用户指出“最后那个瞬间还是明显的有痕迹”，并定位“手放在玻璃上”：旧58dee观看版的局部修补观感验收重新打开，颜色接受与旧反馈保留。现有入口当时只修作者逐帧前景保护轮廓，得到`runs/non-generative-cleanup-tail-20261019-001/production/assets/files/39da73d103ab0c6c2b46976d6b31cc2b3417c6f1b3ba08e4a820b5b79d4e2a1b.mp4`。124帧PTS、原声PCM及前56帧母版像素保持；文件尾段的有限静态改善及自动播放证据保留，但约2.5秒仍有宽手影，不能继续将39da整体作为仅待确认。阶段证据见[主记录历史部分](2026-10-19-non-generative-video-cleanup.md#reopened-tail-repair)，当前状态由顶部新截图修复取代，原S01 STOP、其余缺证与S02 POST0保持。
 
 用户明确授权的[共享局部修补能力](2026-10-19-non-generative-video-cleanup.md)已在现有开发素材准备/准入 owner 实现；下方静帧可修性中的“本次未实现”仅属历史。旧第二版 RGB 母版 `86eb56c7e2dab3f8aae27cd1c8073d0d6dabd8fcfad3f0d4dadbdf995ecdd9ff` 被用户实际播放证实严重绿紫偏色，不能再作为正常观看交付；其无损像素证明仍有效，失败截图与原 bytes 保留。
 

@@ -8,7 +8,25 @@ learning_eligibility: ineligible
 
 Date: 2026-10-19
 
+## Current Screenshot-bound Hand Repair
+
+用户再次反馈“还是有最后”并提供截图，SHA `594c7acee17ba558980b1587944fd167a152f6d6b692fcd3b038fa6825734d8b`。39da候选的修补观感明确失败，不再仅为等待确认。Parent与独立位置调查将相近手势定位在source约2.5秒、frame59–61，不能把用户口语“最后”直接等同文件5.125秒末帧。截图本身不能区分58dee和39da，但当前39da相同位置仍有可见缺陷。
+
+残影主体位于扶杆左侧、真实手与扶杆之间约x500–550/y575–710；上一轮固定x<=554保护区仍将此处保留，新增手轮廓在frame56–66被该baseline完全盖过，原补片左界x535也覆盖不全。此前只清理扶杆右侧/竖边的有限改善不等于去除整块手影，旧第四轮“无静态blocker”不能再作为该候选整体结论。当前使用原raw和既有clean-plate入口补齐显式作者遮罩覆盖，不重新调用生成模型、不改手部动作或原S01要求；证据根`runs/non-generative-cleanup-hand-20261019-001/`。
+
+本次只在普通run计划中修改frame40–123：保留原补片，增加扶杆左侧的plate0小补片与局部前景保护轮廓；frame60新增区域为x476..558/y524..712，保护轮廓在该局部跟随真手，靠下边界保守保护袖口，区域外保留旧保护。轮廓辅助及作者坐标不进入共享源码，不声称自动识别/跟踪。13张局部静帧对照后仅输出一条完整候选；6个已见残影背景采样点恢复plate0、12个独立指定手/袖口采样点与原像素一致，只证明这些点和作者覆盖，不代替视觉质量。见`authoring-delta.json`、`still-proofs.json`、`authored-coverage-check.json`。独立`code_mapper`位置/目标核对确认新范围针对整块残影，动作与原目标没有被替换，同时保留相邻帧/背景/完整体验的不确定性。
+
+新观看版为同根`production/assets/files/75a328d76ae349cf48aa048eeea8d5216f239a4a0b058e89e5c56de74cb7d620.mp4`，2,151,720 bytes；RGB母版`6c10b45577144672904573146f9fd4dca70bcf3bfe224b22857489a5687f1fbc`，52,590,162 bytes。公共CLI成功，经标准`load_production_project`与`verify_repair_input`重开`development-repair-input/5`，准入hash `7d1fa9f796697aa56e2d71280e2a1f12255b022e65863f0b7ae921e65a1570c2`。768×1344、24fps、124帧、5.184秒，实际4:7；代理yuv420p/BT709 limited。frame0–39母版RGB hash与39da阶段完全一致，全部124帧source/master/viewing PTS一致，保护像素变化0；四份PCM hash均为原`c9d52680fb853d64b89b3b1350e050811c36af2ff8095fc68901580a5eaefa85`，声音时序一致。见`cleanup.actual.json`、`reopen-proof.json`。开发Manifest1、attempts空、qualification仍`NOT_EVALUATED`，原Manifest hash未变，S01 STOP与S02 POST0保持。
+
+显式project-local `video-analysis` MCP对新exact MP4取42张图，间隔0.125秒，包含2.5秒及5.125秒；未转写、未调用audio_understand。新代理全部124帧另由qualified FFmpeg解码。`actual-before-after-2.5s.jpg`对照旧39da与新75a的同一源时刻，`actual-onset-dense.jpg`覆盖32–47、`actual-screenshot-dense.jpg`覆盖52–75、`actual-late-dense.jpg`覆盖76–122隔帧，并查看native123。实际Chrome选中新workspace/SHA，经HTTP取bytes复算确认75a，完整1×/unmuted/volume1自动播放5.184秒无错误，再定位2.5秒；`browser-hand-2.5s.png`为该actual video画面的局部canvas诊断截图，不冒充Registry帧证据。自动播放与PCM保持不等于人听过。
+
+既有`reviewer_high`按新截图定位与Parent已完成的独立调查，完成一次有明确范围的第五轮；四轮旧历史、一次新候选和停止条件在`bounded-repair-unit.json`保留，不重置或自动续第六轮。`MEDIA-05`确认39da约2.5秒的宽棕色手影；新75a的2.458/2.500/2.542秒与已检查起影/后段/末帧未再辨识旧重复手形，未见新增明确指尖/拇指/袖口缺失、接缝、鞋靴断裂或严重偏色。Parent在native同帧对照及actual浏览器局部画面确认该范围，判为`OBSOLETE_AFTER_CHANGE_IN_INSPECTED_SCOPE`；`MEDIA-02`的连续动态/听音/人工体验限制保留，详见`media-review-r5.json`。已向用户提供新MP4与放大对照，当前75a人工观感仍`PENDING`，不把旧颜色接受、旧观感或工具成功转成新片接受。
+
+共享kernel/codec/committer源码未改；workflow同步反馈定位、采用切点与文件尾段分别检查、整块残影覆盖及固定baseline不能盖过轮廓的操作说明。文档scope验证归`.agent/harness/runs/cleanup-hand-coverage-20261019-r1/receipt.json`，不重复全仓工程；Parent `NATIVE_REVIEW_NOT_REQUIRED`，有限媒体复核另列。`record-ai-video-session`更新本记录和直接S01 notice；自动`distill-ai-video-learning=no_candidate`：同一raw的多次作者修正与proof层不是独立模型质量证据，不创建claim、不改Skill/Policy/Gate。检索为带stale标签的advisory，未等待或重建索引。新生成/付费理解POST均0，原15项/36项及消费/失败历史保留。
+
 ## Reopened Tail Repair
+
+本节为39da阶段的历史测量；当前质量状态已由顶部截图重新打开，不能据下方有限观察推断整段通过。
 
 用户在先前接受后补充“最后那个瞬间还是明显的有痕迹”，定位为“手放在玻璃上”。旧`58dee01c...`观看版的修补观感验收重新打开；颜色正常的反馈与此前接受的历史保留，不再将该版局部修补写为当前已完成。
 
@@ -83,7 +101,7 @@ Date: 2026-10-19
 
 此前同一只读原生 `/root/cleanup_media_review`、实际 profile `reviewer_high` 完成三轮内容复核。第二轮母版采样与第三轮观看代理21张图中，1.0/1.25秒未再辨识旧手影，0.75–1.75秒未发现新增明确前景截断、鞋靴损坏或接缝；Parent将`MEDIA-01`在此采样范围内判为`OBSOLETE_AFTER_CHANGE`。`MEDIA-03`确认旧RGB母版用户偏色失败，该代理采样及Chrome截图未复现，范围仅限此exact文件/路径；当时未机械开启第四轮，后续新反馈引发的有限扩展见顶部。`MEDIA-02`限制仍`CONFIRMED`：静态图和自动播放不证明完整人工观看/听音。见旧根`media-review-r1.json`、`repair-v2/media-review-r2.json`与旧观看根`media-review-r3.json`。这是媒体样本复核，不冒充源码implementation review或人工验收。
 
-已发布可复用修补入口；旧58dee观看版的颜色接受保留，局部修补观感因顶部尾段反馈重新打开，新39da候选人工观感待确认。`MEDIA-02`中的人工观看反馈保留其原范围，不抵消最新缺陷；原S01声音语义、badge/道具/座位与可采用终态等仍为`NOT_EVALUATED`。原raw的5 PASS /1 FAIL /8 NOT_EVALUATED与abandon历史保留，不因派生物改善改写旧verdict。没有accepted end-state、S02 handoff、连续镜、15秒或完整故事交付。
+已发布可复用修补入口；旧58dee观看版的颜色接受保留，39da被后续截图与同帧观察确认仍有宽手影，当前75a候选人工观感待确认。`MEDIA-02`中的人工观看反馈保留其原范围，不抵消最新缺陷；原S01声音语义、badge/道具/座位与可采用终态等仍为`NOT_EVALUATED`。原raw的5 PASS /1 FAIL /8 NOT_EVALUATED与abandon历史保留，不因派生物改善改写旧verdict。没有accepted end-state、S02 handoff、连续镜、15秒或完整故事交付。
 
 ## Engineering Verification And Publication
 
