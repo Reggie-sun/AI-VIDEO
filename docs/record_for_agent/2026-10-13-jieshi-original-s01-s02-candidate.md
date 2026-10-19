@@ -9,6 +9,14 @@ evidence_index_version: "1"
 
 Date: 2026-10-13
 
+## Current Performance Feedback And Input Audit — 2026-10-19
+
+用户反馈主角与路人“跟僵尸一样”，质疑是否控制人物表情。复核当前funded raw对应`official-h3-max-responsibility-S01-20261019-002/native-preview.json`：实际1478字符prompt SHA `2c491b55c9ccb2b69692966da86f1bafe4b308f8cbef9575c3282b31498e4417`，包含固定目光、嘴唇不动、抬手与悬停；没有逐镜的眉眼情绪变化、呼吸、肩颈反应或背景自然微动作。另有“六名普通乘客固定坐位，无新增人物或独立动作”。本次是一张PNG的first-frame请求，没有另行绑定表演视频/音频参考。
+
+原`docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.md`人物Bible有“困惑→自我怀疑→克制恐惧”的全剧情绪弧，但当前S01 Shot及selected QA revision5只落实了目光、嘴唇和手部动作，没有对应的面部表演/自然程度要求。路人Bible的静态背景/无表达约束较强；B01的0–3秒规定倒影异常与广播，“人群毫无反应”明确在B02的3–15秒，不能据此要求S01所有人完全冻结。Parent核对实际native输入，read-only native `code_mapper`独立核对原文、Shot和QA；没有新增媒体分析、生成或付费理解。
+
+已确认的是这次输入和表演编排不足，不是已隔离的模型能力根因，也未据此证明共享compiler丢字段。通用改进方向应将人物目标/情绪落实为逐镜可见表演，并区分主角反应、背景人物日常状态及验收；这是待实施方向，不冒充已批准的新spec或已实现能力。本地手影修补没有增加人物表演，当前反馈不构成75a局部修补接受，整镜仍未通过；原要求、Manifest及S02 POST0保持。`record-ai-video-session`更新本记录及直接cleanup notice，自动`distill-ai-video-learning=no_candidate`：同一raw的输入核对与定性反馈不是独立受控对照，不新增Evidence Index attempt或采纳规则。
+
 ## Current Non-generative Cleanup Follow-up — 2026-10-19
 
 用户再次以截图反馈“还是有最后”，39da局部修补候选仍失败；该手势匹配source约2.5秒，残影主体在上一轮保护区内的扶杆左侧，不能用文件末帧检查代替用户所指位置。新作者遮罩补齐整块残影覆盖，新观看版为`runs/non-generative-cleanup-hand-20261019-001/production/assets/files/75a328d76ae349cf48aa048eeea8d5216f239a4a0b058e89e5c56de74cb7d620.mp4`；124帧PTS、原声PCM保持，frame0–39母版RGB与前版相同。新2.5秒及相邻帧的静态复核和实际Chrome局部画面未再见旧宽手影，完整1×自动播放成功，人工观感仍待确认。当前修复以[截图定位主记录](2026-10-19-non-generative-video-cleanup.md#current-screenshot-bound-hand-repair)为准；下方39da的有限改善与旧人工反馈保留为历史，原S01 STOP和S02 POST0不变。

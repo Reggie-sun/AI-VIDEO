@@ -8,6 +8,10 @@ learning_eligibility: ineligible
 
 Date: 2026-10-19
 
+## Current Performance Feedback
+
+用户随后质疑主角与路人表演“跟僵尸一样”。[S01实际输入核对](2026-10-13-jieshi-original-s01-s02-candidate.md#current-performance-feedback-and-input-audit--2026-10-19)确认固定目光/闭口/手部动作之外，没有逐镜情绪变化、呼吸或背景自然微动作指令；原人物情绪弧未落实到该镜的表演与QA。局部手影清理没有解决人物表演，不能据清理结果宣称整镜可接受，也不能将此反馈当作75a手影修补已获人工接受；局部确认仍待完成，原S01 STOP保持。本次未生成新片、修改Product state或建立新表演spec；此处是同一raw链的质量反馈，不增加独立实验数量。
+
 ## Current Screenshot-bound Hand Repair
 
 用户再次反馈“还是有最后”并提供截图，SHA `594c7acee17ba558980b1587944fd167a152f6d6b692fcd3b038fa6825734d8b`。39da候选的修补观感明确失败，不再仅为等待确认。Parent与独立位置调查将相近手势定位在source约2.5秒、frame59–61，不能把用户口语“最后”直接等同文件5.125秒末帧。截图本身不能区分58dee和39da，但当前39da相同位置仍有可见缺陷。
