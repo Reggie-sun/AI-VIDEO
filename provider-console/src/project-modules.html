@@ -67,15 +67,70 @@
     .section-head { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin: 0 0 16px; }
     .section-head h2 { margin: 0; color: #f1f3f8; font-size: 23px; letter-spacing: -.02em; }
     .section-head p { max-width: 560px; margin: 4px 0 0; color: var(--muted); font-size: 14px; }
-    .flow-section { margin-bottom: 43px; }
-    .flow { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 9px; counter-reset: flow; }
-    .flow-step { position: relative; min-height: 112px; padding: 13px 13px 14px; border: 1px solid var(--border); border-radius: 9px; background: #0d1721; color: var(--text); text-align: left; cursor: pointer; transition: transform .16s ease, border-color .16s ease, background .16s ease; }
-    .flow-step:hover { transform: translateY(-2px); border-color: #665bac; background: #121b2a; }
-    .flow-step::after { position: absolute; z-index: 1; top: 50%; right: -10px; width: 9px; border-top: 1px solid #596477; content: ""; }
-    .flow-step:last-child::after { display: none; }
-    .flow-number { display: block; margin-bottom: 11px; color: #a99aff; font-size: 11px; font-weight: 760; letter-spacing: .1em; }
-    .flow-step strong { display: block; font-size: 14px; line-height: 1.35; }
-    .flow-step span:last-child { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.4; }
+    [hidden] { display: none !important; }
+    .architecture { margin-bottom: 38px; }
+    .view-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+    .view-tab { min-height: 43px; padding: 9px 15px; border: 1px solid var(--border); border-radius: 8px; background: #101b26; color: #bcc8d7; cursor: pointer; }
+    .view-tab[aria-selected="true"] { color: #eee9ff; background: #292343; border-color: #8a76d0; }
+    .diagram-panel { padding: 22px; border: 1px solid var(--border); border-radius: 12px; background: #0b151f; }
+    .diagram-panel h3 { margin: 0 0 8px; font-size: 21px; }
+    .view-copy { margin: 0 0 17px; color: #bac6d4; font-size: 15px; }
+    .legend { display: flex; flex-wrap: wrap; gap: 18px; margin-bottom: 15px; color: #bac6d4; font-size: 12px; }
+    .legend span { display: flex; align-items: center; gap: 7px; }
+    .legend i { width: 25px; border-top: 2px solid var(--violet); }
+    .legend .data { border-top-style: dotted; border-color: var(--teal); }
+    .legend .agent { border-top-style: dashed; border-color: var(--amber); }
+    .diagram-scroll, .maturity-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; border: 1px solid var(--border-soft); border-radius: 9px; }
+    .diagram-canvas { position: relative; width: 1120px; height: 600px; margin: auto; background: #08121b; }
+    .diagram-canvas svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+    .diagram-canvas path { fill: none; stroke-width: 2; }
+    .diagram-canvas .edge-label { font: 12px system-ui, sans-serif; fill: #d7deea; paint-order: stroke; stroke: #08121b; stroke-width: 7px; stroke-linejoin: round; }
+    .graph-node { position: absolute; z-index: 1; width: 220px; min-height: 92px; padding: 13px 14px; border: 1px solid #4e426f; border-radius: 9px; background: #171c2d; color: #e8e4ff; text-align: left; cursor: pointer; }
+    .graph-node:hover { border-color: #b3a3ff; background: #25233d; }
+    .graph-node strong, .graph-node span { display: block; }
+    .graph-node strong { font-size: 15px; line-height: 1.4; overflow-wrap: anywhere; }
+    .graph-node span { margin-top: 5px; color: #b9c5d3; font-size: 12px; line-height: 1.5; }
+    .graph-node[data-tone="stop"] { border-color: #a15e63; background: #2a1924; }
+    .graph-node[data-tone="edit"] { border-color: #3c8d7c; background: #102c2b; }
+    .graph-node[data-tone="owner"] { border-color: #9b7d40; background: #27241b; }
+    .branch-note { margin: 15px 0 0; padding: 13px 15px; border-left: 3px solid var(--amber); background: #211f21; color: #e2d4bf; font-size: 14px; }
+    .edge-evidence { margin-top: 15px; color: #b9c5d4; font-size: 13px; }
+    .edge-evidence summary { cursor: pointer; color: #d5cafb; }
+    .edge-evidence li { margin: 9px 0; overflow-wrap: anywhere; }
+    .edge-evidence code, .relation-list code { color: #a7d8cf; font-size: 11px; overflow-wrap: anywhere; }
+    .owner-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; margin-top: 17px; }
+    .owner-card { min-width: 0; padding: 16px; border: 1px solid #3b4148; border-radius: 9px; background: #111c25; }
+    .owner-card h4 { margin: 0 0 7px; color: #e9d59f; font-size: 16px; }
+    .owner-card p { margin: 5px 0; color: #bfcbd8; font-size: 14px; }
+    .owner-card code { display: block; color: #99acbf; font-size: 11px; overflow-wrap: anywhere; }
+    .failure-row { display: grid; grid-template-columns: 1fr 22px 1.1fr 22px 1.4fr; gap: 9px; align-items: stretch; margin-top: 13px; }
+    .failure-step { min-width: 0; padding: 15px; border: 1px solid #3b4451; border-radius: 8px; background: #121c28; }
+    .failure-step strong { display: block; margin-bottom: 6px; color: #ffd2a5; font-size: 15px; }
+    .failure-step p { margin: 0; color: #bec9d5; font-size: 14px; }
+    .failure-step code { color: #91a6ba; font-size: 11px; overflow-wrap: anywhere; }
+    .failure-arrow { align-self: center; color: #a898d0; font-size: 23px; }
+    .failure-row[data-kind="unknown"] .failure-step { border-color: #73424f; }
+    .failure-row[data-kind="unknown"] strong { color: #ffb7bd; }
+    .maturity-intro { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; margin: 18px 0; }
+    .maturity-intro article { padding: 14px; border: 1px solid var(--border); border-radius: 8px; }
+    .maturity-intro h4 { margin: 0 0 6px; font-size: 15px; color: #ddd3ff; }
+    .maturity-intro p { margin: 0; font-size: 13px; color: #b4c1d0; }
+    .maturity-scroll { max-height: 610px; }
+    .maturity-table { width: 100%; min-width: 1040px; border-collapse: collapse; font-size: 13px; }
+    .maturity-table th { position: sticky; top: 0; z-index: 2; background: #192332; color: #e3def3; text-align: left; padding: 13px; }
+    .maturity-table td { padding: 13px; border-top: 1px solid #263341; vertical-align: top; width: 21%; }
+    .maturity-table td:first-child { width: 16%; }
+    .maturity-table button { padding: 0; border: 0; background: transparent; color: #e3dcff; text-align: left; cursor: pointer; }
+    .maturity-table td p { margin: 7px 0 0; color: #a9bacb; font-size: 12px; overflow-wrap: anywhere; }
+    .evidence-tag { display: inline-block; padding: 3px 7px; border: 1px solid #465261; border-radius: 5px; color: #c0cbd7; font-size: 11px; }
+    .evidence-tag[data-state="source"], .evidence-tag[data-state="historical"] { border-color: #5c4c8c; color: #d0c2ff; }
+    .evidence-tag[data-state="bounded"] { border-color: #8b754b; color: #f0d69e; }
+    .evidence-tag[data-state="unproven"], .evidence-tag[data-state="failed"] { border-color: #8d5364; color: #ffb7c9; }
+    .evidence-tag[data-state="human"] { border-color: #408577; color: #a0e6d4; }
+    .maturity-detail { grid-column: 1/-1; }
+    .maturity-detail code { display: block; color: #9fc6c4; font-size: 11px; overflow-wrap: anywhere; }
+    .maturity-detail ul, .relation-list { margin: 8px 0 0; padding-left: 18px; color: #b9c8d7; font-size: 13px; }
+    .maturity-detail li, .relation-list li { margin: 9px 0; }
     .catalog { padding: 25px; border: 1px solid var(--border); border-radius: 13px; background: linear-gradient(180deg, rgba(13, 23, 33, .96), rgba(9, 17, 25, .98)); }
     .catalog-tools { display: grid; grid-template-columns: minmax(220px, 1fr) auto; gap: 14px; align-items: center; margin: 20px 0 17px; }
     .search-wrap { position: relative; display: flex; align-items: center; min-width: 0; }
@@ -140,8 +195,7 @@
     .note-line { margin: 18px 0 0; padding-top: 13px; border-top: 1px solid var(--border-soft); color: #8996a5; font-size: 12px; }
     @media (max-width: 1080px) {
       .page { padding-right: 24px; padding-left: 24px; }
-      .flow { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-      .flow-step:nth-child(4)::after { display: none; }
+      .owner-grid, .maturity-intro { grid-template-columns: repeat(2,minmax(0,1fr)); }
       .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .truth-panel { grid-template-columns: 1fr; }
     }
@@ -152,9 +206,11 @@
       .snapshot { max-width: none; }
       .responsibility { grid-template-columns: 1fr; gap: 9px; margin-bottom: 34px; }
       .lane { min-height: 0; padding: 15px 17px; }
-      .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-      .flow-step { min-height: 105px; }
-      .flow-step::after, .flow-step:nth-child(4)::after { display: none; }
+      .diagram-panel { padding: 14px 11px; }
+      .view-tab { padding: 8px 11px; font-size: 13px; }
+      .owner-grid, .maturity-intro { grid-template-columns: 1fr; }
+      .failure-row { grid-template-columns: 1fr; }
+      .failure-arrow { text-align: center; transform: rotate(90deg); }
       .catalog { padding: 17px 12px; }
       .catalog-tools { grid-template-columns: 1fr; }
       .cards { grid-template-columns: 1fr; }
@@ -169,11 +225,6 @@
       .detail-grid { grid-template-columns: 1fr; }
       .detail-block--wide { grid-column: auto; }
     }
-    @media (max-width: 380px) {
-      .flow { grid-template-columns: 1fr; }
-      .flow-step { min-height: 0; }
-      .flow-number { display: inline-block; width: 30px; margin: 0 5px 0 0; }
-    }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
     }
@@ -181,7 +232,17 @@
       :root { color-scheme: light; color: #17202b; background: #fff; }
       body { min-width: 0; background: #fff; color: #17202b; font-size: 12px; }
       .page { width: 100%; padding: 0; }
-      .topbar, .stats, .responsibility, .flow-section, .catalog-tools, .truth-panel, .footer, .card-hint, .mechanism, dialog { display: none !important; }
+      .topbar, .stats, .responsibility, .view-tabs, .catalog-tools, .truth-panel, .footer, .card-hint, .mechanism, dialog { display: none !important; }
+      .diagram-panel, .diagram-panel[hidden] { display: block !important; margin: 15px 0; background: #fff; color: #17202b; }
+      .diagram-scroll { display: none; }
+      .edge-evidence, .view-copy, .owner-card p, .failure-step p, .maturity-table td p { color: #394553; }
+      .diagram-panel h3, .owner-card h4, .failure-step strong, .maturity-intro h4 { color: #30225f; }
+      .owner-card, .failure-step, .maturity-intro article, .maturity-table th { background: #f5f7fa; }
+      .maturity-scroll { max-height: none; overflow: visible; }
+      .maturity-table { min-width: 0; font-size: 9px; }
+      .maturity-table th { position: static; color: #17202b; }
+      .maturity-table td { padding: 5px; }
+      .evidence-tag { color: #30225f !important; }
       .hero { display: block; padding: 0 0 14px; }
       h1, .section-head h2 { color: #101820; }
       .hero-lede, .snapshot p { color: #394553; }
@@ -228,7 +289,8 @@
     <div class="stats" aria-label="模块地图概览">
       <div class="stat"><strong id="statModules">26</strong><span>个功能模块</span></div>
       <div class="stat"><strong>3</strong><span>条职责泳道</span></div>
-      <div class="stat"><strong>7</strong><span>步制作主链</span></div>
+      <div class="stat"><strong>5</strong><span>种架构视图</span></div>
+      <div class="stat"><strong>4</strong><span>层独立能力证据</span></div>
     </div>
 
     <section class="responsibility" aria-label="三条职责泳道">
@@ -237,9 +299,54 @@
       <article class="lane"><span class="lane-index">03 / EXECUTION</span><h2>程序执行</h2><p>检查输入与授权，管理状态，完成剪辑、声音和渲染，并把结果与验收证据关联起来。</p></article>
     </section>
 
-    <section class="flow-section" aria-labelledby="flowTitle">
-      <div class="section-head"><div><h2 id="flowTitle">一条制作主链</h2><p>点任一步骤，查看负责模块、输入输出和能力边界。</p></div></div>
-      <div class="flow" id="flowSteps" aria-label="制作流程步骤"></div>
+    <section class="architecture" aria-labelledby="architectureTitle">
+      <div class="section-head"><div><h2 id="architectureTitle">从反馈闭环看系统如何协作</h2><p>分别查看制作工作流、运行时关系、状态所有权、失败传播与能力证据。图中的节点可打开模块详情。</p></div></div>
+      <div class="view-tabs" role="tablist" aria-label="架构视图">
+        <button class="view-tab" id="tab-feedback" role="tab" aria-selected="true" aria-controls="view-feedback" tabindex="0" type="button">反馈闭环</button>
+        <button class="view-tab" id="tab-calls" role="tab" aria-selected="false" aria-controls="view-calls" tabindex="-1" type="button">调用与依赖</button>
+        <button class="view-tab" id="tab-ownership" role="tab" aria-selected="false" aria-controls="view-ownership" tabindex="-1" type="button">状态所有权</button>
+        <button class="view-tab" id="tab-failures" role="tab" aria-selected="false" aria-controls="view-failures" tabindex="-1" type="button">失败传播</button>
+        <button class="view-tab" id="tab-maturity" role="tab" aria-selected="false" aria-controls="view-maturity" tabindex="-1" type="button">能力成熟度</button>
+      </div>
+      <section class="diagram-panel" id="view-feedback" role="tabpanel" aria-labelledby="tab-feedback" tabindex="0">
+        <h3>生成是有边界的反馈闭环</h3>
+        <p class="view-copy">检查结果回到失败分析与制作策略；可复用或可编辑的素材可以绕过重新生成。虚线表示需要 Agent 明确发起的工作流动作。</p>
+        <div id="feedbackGraph"></div>
+        <p class="branch-note">回环不表示自动重试：新生成仍需当前授权、有限额度与一次性许可。UNKNOWN 先停止并查明结果；缺证据先补证。开发修补预览保留原片失败历史。</p>
+      </section>
+      <section class="diagram-panel" id="view-calls" role="tabpanel" aria-labelledby="tab-calls" tabindex="0" hidden>
+        <h3>实际调用链与数据流</h3>
+        <p class="view-copy">这是当前主路径的摘要图，部分箭头折叠了中间函数。它区分程序调用、数据读取和 Agent 编排，不代表完整 Python import graph。</p>
+        <div class="legend"><span><i></i>调用链</span><span><i class="data"></i>数据依赖</span><span><i class="agent"></i>Agent / 显式操作</span></div>
+        <div id="callsGraph"></div>
+        <details class="edge-evidence"><summary>展开调用关系与源码依据</summary><ol id="callEvidence"></ol></details>
+      </section>
+      <section class="diagram-panel" id="view-ownership" role="tabpanel" aria-labelledby="tab-ownership" tabindex="0" hidden>
+        <h3>语义由各自 owner 决定，持久状态由唯一 committer 写入</h3>
+        <p class="view-copy">计算结果、素材身份、当前选择与验收结论分别有所有者。读取不推进状态，生成或渲染成功也不直接代表采用或接受。</p>
+        <div id="ownershipGraph"></div>
+        <div class="owner-grid" id="ownerCards"></div>
+      </section>
+      <section class="diagram-panel" id="view-failures" role="tabpanel" aria-labelledby="tab-failures" tabindex="0" hidden>
+        <h3>失败会传播到哪里，怎样恢复</h3>
+        <p class="view-copy">按失败类型分流，先保留 exact attempt 和消费历史。修复入口由对应 owner 控制，不把所有问题都送回模型。</p>
+        <div id="failureRoutes"></div>
+        <p class="branch-note">证据不足 = NOT_EVALUATED；已观察到不满足要求 = FAIL。两者都不能直接推进下一镜，但补证、局部编辑和新生成的恢复条件不同。</p>
+      </section>
+      <section class="diagram-panel" id="view-maturity" role="tabpanel" aria-labelledby="tab-maturity" tabindex="0" hidden>
+        <h3>四层证据，分别判断</h3>
+        <p class="view-copy">这里展示本页已核对的证据范围，不是全仓资格认证。历史 receipt 只对其提交和用例有效；“未核验”不表示没有测试，“不适用”不表示通过。</p>
+        <div class="maturity-intro">
+          <article><h4>01 · 已实现</h4><p>源码中存在对应职责与调用入口，或已有 advisory Skill。</p></article>
+          <article><h4>02 · 已测试</h4><p>需要绑定实际运行结果；仅定位测试文件不算 PASS。</p></article>
+          <article><h4>03 · 真实生成验证</h4><p>限定 exact 模型、输入和输出；成功产出与内容质量分开。</p></article>
+          <article><h4>04 · 人工验收</h4><p>需要对 exact 版本完整听看；单片接受不推广为通用能力。</p></article>
+        </div>
+        <div class="maturity-scroll" tabindex="0" aria-label="26个模块的四层能力证据，可横向滚动">
+          <table class="maturity-table"><thead><tr><th scope="col">模块</th><th scope="col">源码实现</th><th scope="col">工程测试</th><th scope="col">真实生成 / 媒体</th><th scope="col">人工验收</th></tr></thead><tbody id="maturityRows"></tbody></table>
+        </div>
+        <p class="branch-note">例：表演参数工程已受测，但 S01 的自然表演效果未证实；机器人剪辑版获一次完整听看接受，但仍是开发预览。页面自身的测试不证明这 26 个模块全部可交付。</p>
+      </section>
     </section>
 
     <section class="catalog" aria-labelledby="catalogTitle">
@@ -304,15 +411,85 @@
       { id: "special", title: "Legacy CLI 与电商专项流程", category: "infra", mechanism: "兼容入口 + 领域协调", summary: "保留旧版 ComfyUI 配置驱动 CLI，并为电商广告提供商品、审核与交付步骤。", input: "Legacy workflow/config，或电商项目的商品与广告制作定义。", output: "兼容的本地执行结果，或经共享制作 owner 协调的广告 job。", boundary: "旧 CLI 与 v0.2 Production/Canvas 是不同表面；电商专项 Gate 不自动成为所有剧情项目的验收规则。", files: ["src/ai_video/cli.py", "src/ai_video/pipeline.py", "src/ai_video/production/ecommerce_job.py", "src/ai_video/production/ecommerce_job_review.py"], terms: "legacy CLI ComfyUI ecommerce ad job product specialized workflow", lane: "基础设施" }
     ];
 
-    const flow = [
-      ["creative", "创作与分镜", "剧本 → 人物/Shot"],
-      ["canvas", "项目组织", "创作 → 结构化数据"],
-      ["planner", "制定制作策略", "目标 → 制作计划"],
-      ["routing", "选择并编译请求", "能力 → exact 输入"],
-      ["adapters", "生成原始媒体", "模型 → 图片/视频"],
-      ["timeline", "剪辑与统一渲染", "媒体 → 成片"],
-      ["qa", "检查与验收", "要求 → 证据/判断"]
+    const feedbackNodes = [
+      ["plan","planner",20,30,"制作策略","先评估复用、剪辑与生成"], ["compile","routing",300,30,"选择与编译","exact model / mode / bindings"],
+      ["generate","adapters",580,30,"有界生成","每轮重新检查许可与额度"], ["check","qa",860,30,"检查实际媒体","逐项对照封存要求"],
+      ["revise","authoring",300,260,"修改制作方案","Agent 修改表达、参考或路径"], ["diagnose","feedback",860,260,"失败分析","内容、证据、运行或能力问题"],
+      ["stop","safety",20,480,"停止副作用","UNKNOWN / 上限 / 授权不足","stop"], ["edit","retime",580,480,"编辑已有素材","裁切、变速、修补、声画合成","edit"],
+      ["final","qa",860,480,"成片验收","正常速度完整听看；通过再交付","edit"]
     ];
+    const feedbackEdges = [
+      ["plan","compile","制作方案","agent","M240 76 H300",270,19], ["compile","generate","需新媒体","agent","M520 76 H580",550,19],
+      ["generate","check","exact 输出","agent","M800 76 H860",830,19], ["check","diagnose","FAIL / 需补证","agent","M970 122 V260",970,200],
+      ["diagnose","revise","有依据的内容 / 策略调整","agent","M860 306 H520",690,293], ["revise","plan","↺ 重选方案","agent","M300 306 H270 V155 H130 V122",180,154],
+      ["plan","edit","已有素材可用 · 绕过生成","agent","M130 122 V428 H690 V480",400,416], ["diagnose","edit","可局部编辑 → 修补预览","agent","M970 352 V394 H740 V480",855,382],
+      ["check","edit","原片可用","data","M1080 76 H1100 V450 H800 V480",1010,438], ["edit","final","重新验收","agent","M800 526 H860",830,513],
+      ["final","diagnose","成片仍不满足 → 回到分析","agent","M1080 526 H1110 V364 H1000 V352",962,364],
+      ["generate","stop","UNKNOWN / 硬限制 → STOP","stop","M690 122 V184 H70 V480",415,173],
+      ["diagnose","check","证据缺口 → 补证后再判","data","M1080 306 H1090 V155 H1000 V122",920,146]
+    ];
+    const callNodes = [
+      ["canvas","canvas",20,30,"CanvasProductionService","prepare / start / execute / evaluate"], ["planner","planner",300,30,"VideoPlanner","plan → require_current_video_plan"],
+      ["evaluate","qa",860,30,"评估入口 / MCP","显式调用；证据回写后进入历史"], ["agent","creative",20,250,"Agent / Operator","创作判断与显式动作"],
+      ["feedback","feedback",300,250,"FeedbackOrchestrator","重读 context / history → decision"], ["router","routing",580,250,"Router / Decision","兼容性、失败历史、配额"],
+      ["compiler","routing",860,250,"Selected Compiler","只编译胜出候选；不提交"], ["reader","state",20,480,"Project Reader","strict read；不推进状态"],
+      ["committer","committer",300,480,"StateCommitter","intent / permit / result / lifecycle","owner"], ["service","adapters",580,480,"VideoGenerationService","start 与 submit 分开"],
+      ["adapter","adapters",860,480,"Selected Adapter","submit / refresh / fetch"]
+    ];
+    const callEdges = [
+      ["canvas","planner","context loader → plan","call","M240 76 H300",270,19,"canvas_planning.py:195–243"],
+      ["canvas","feedback","prepare()","call","M240 92 H265 V296 H300",265,200,"canvas_production.py:325–379"],
+      ["planner","feedback","verified requirement","data","M410 122 V250",410,186,"canvas_planning.py:219–243"],
+      ["feedback","router","resolve_requirement()","call","M520 296 H580",550,238,"generation_feedback.py:351–357 → shot_router.py:424–444"],
+      ["router","compiler","provider-bound request","data","M800 296 H860",830,238,"generation_decision.py:713–779"],
+      ["feedback","compiler","GENERATE_ONCE 才编译","call","M440 250 V214 H970 V250",705,202,"generation_feedback.py:356–375 → _sequence_source.py:255–274"],
+      ["feedback","service","start：只建 attempt","call","M520 322 H555 V526 H580",680,400,"generation_feedback.py:378–393; video_generation.py:74–82"],
+      ["service","adapter","submit / refresh / fetch","call","M800 526 H860",830,467,"video_generation.py:258–324,511–582"],
+      ["service","committer","提交持久状态变化","call","M580 554 H520",550,580,"video_generation.py:74–82,258–324"],
+      ["committer","feedback","已记录 attempt / history","data","M410 480 V342",410,427,"generation_feedback.py:441–480"],
+      ["reader","planner","当前 Project / Registry","data","M130 480 H12 V182 H380 V122",220,170,"canvas_production.py:351–371; canvas_planning.py:83–152"],
+      ["agent","canvas","发起明确动作","agent","M130 250 V122",130,222,"scripts/canvas_production.py:45–63,115–125"],
+      ["adapter","evaluate","显式检查实际媒体","agent","M1080 526 H1100 V76 H1080",994,450,"canvas_production.py:531–540; AGENTS.md Per-Shot Gate"],
+      ["evaluate","feedback","记录后的评价证据","data","M970 122 V160 H460 V250",705,149,"generation_feedback.py:534–615；非自动调用回环"]
+    ];
+    const ownerNodes = [["meaning","planner",20,40,"各语义 owner","创作定义 / timeline / 依赖 / QA"],["writer","committer",300,40,"唯一持久状态 writer","ProductionStateCommitter","owner"],["manifest","state",580,40,"Manifest","当前采用指针 / lifecycle","owner"],["registry","state",860,40,"Registry","素材身份 / 来源 / bytes 校验","owner"],["reader","state",580,300,"Standard Reader","重开 Manifest → 验证各 snapshot"],["consumer","console",20,300,"只读消费者","前端 / 检查 / 规划读取当前证据"]];
+    const ownerEdges = [["meaning","writer","校验后的候选与操作","data","M240 86 H300",270,24],["writer","manifest","原子提交","call","M520 86 H580",550,24],["writer","registry","提交 Registry snapshot","call","M410 132 V215 H970 V132",690,202],["manifest","reader","指针 + lifecycle","data","M690 132 V300",690,266],["registry","reader","身份 + 实际 bytes","data","M970 132 V346 H800",970,281],["reader","consumer","verified view · 无写回","data","M580 346 H240",410,285]];
+    const owners = [
+      ["ProductionProject","项目及 Character / Scene / Shot 的 schema、revision 与定义。","提交变更仍经 committer；不是任务状态库。","production/models.py:1925; canvas_authoring.py:78"],
+      ["Registry / Manifest","Registry 管素材身份；Manifest 管可变选择、attempt 和生命周期。","Registry 不是验收状态；只读打开不修复或推进状态。","production/registry.py:198; models.py:1636"],
+      ["ProductionStateCommitter","独占 v2 持久写入、采用、放弃、激活、恢复与 receipt 提交。","语义计算由对应 owner 完成；根类由职责 mixins 组成。","production/state_commit.py:271; _state_commit_transaction.py:65"],
+      ["ResolvedTimeline / Composition","唯一决定最终 order、frame、sample、source trim 与声画时间。","变速映射是其输入；不能另建平行 timeline。","production/composition.py:620; composition_contracts.py:454"],
+      ["Dependency Resolver","独占 desired fingerprint、失效传播与 rebuild frontier 的计算。","计算是纯选择；不会自动提交、生成或重试 FAILED。","production/dependency.py:474,681,914"],
+      ["QA / Final Acceptance","required findings、证据覆盖、verdict 和成片接受条件。","分析只提供证据；人工完整 1× 听看需要单独证明。","production/review.py:682; _state_commit_review.py:541"]
+    ];
+    const failures = [
+      ["guard","准备或兼容性缺口","缺参数、错绑、unsupported mode、无额度/授权。","编译 / submit 前阻断","不创建新的 Provider 副作用，也不能静默换模型。","修改输入或恢复必要条件","重做当前计划与 exact preview；新 submit 再验许可。","generation_decision.py:713–739"],
+      ["unknown","UNKNOWN_OUTCOME","无法确定 exact attempt 是否已产生外部效果。","锁住重发与推进","Canvas position=stop；普通 quality repair 不能接管 unknown。","先查证并显式恢复","保留 intent、消费与历史；取得已知 outcome 后经 canonical recovery 判断。","canvas_production.py:285–289; generation_decision.py:387–409"],
+      ["evidence","证据缺失 / 陈旧 / 身份不符","缺 latest attempt、旧 recipe、覆盖或权威证据。","EVIDENCE_GAP / NOT_EVALUATED","不能把缺证据推成质量失败，也不能签署接受。","EVIDENCE_REPAIR_FIRST","补齐 exact 输入/输出与观察；重新裁决，不为补证重新生成。","generation_decision.py:396–409; review.py:682–704"],
+      ["quality","已观察到 QUALITY_FAILURE","原片或成片不满足封存要求，outcome 已知。","停当前失败候选与下一镜","原片 FAIL、消费及历史保留；评价进入后续决策。","重新评估制作策略","可编辑的走有界修补预览；其余由 Agent 修改方案，获当前有限授权后才可新生成。","canvas_production.py:381–456; generation_feedback.py:163–275"],
+      ["runtime","已知运行失败","API/transport 错误或 known-no-effect receipt。","RUNTIME_FAILURE / EVIDENCE_GAP","不能把接口错误当作模型质量观察。","有据的有限恢复","exact evidence、未消费 repair grant 与历史策略匹配后，才可能单次恢复；不保证可重试。","generation_decision.py:433–561"],
+      ["stale","上游定义或证据变化","角色、素材、图、时间线或 QA policy 指纹改变。","下游 STALE / BLOCKED","非 fresh 前置阻断采用、review 或 Final Acceptance；同指纹 FAILED 不自动 retry。","从 ready frontier 重建","重新解析依赖与 exact 输出；必需层全 fresh PASS、修复关闭后再接受。","dependency.py:681–765; _state_commit_review.py:541–689"]
+    ];
+    const proofRefs = {
+      performance:".agent/harness/runs/character-performance-control-20261020-r4/receipt.json · 51cff9..0f2d09d",
+      references:".agent/harness/runs/reference-control-preview-20261016-r1/receipt.json · 9917a28..473ed99",
+      acting:"docs/record_for_agent/2026-10-20-character-performance-control.md · Current Media Follow-up",
+      robot:"docs/record_for_agent/2026-10-17-edit-first-temporal-control.md · Current Result / Native Audio Follow-Up",
+      retime:".agent/harness/runs/native-audio-retime-20261018-r4/receipt.json · 69ae168..c19fa31",
+      ui:".agent/harness/runs/module-map-relations-browser-20261020/browser-proof.json · 本说明页交互范围"
+    };
+    const proof = (state,label,scope,source) => ({state,label,scope,source});
+    function maturityFor(module) {
+      const result = [proof("source",module.id==="creative"?"Skill 入口已存在":"源码职责已核对","2026-10-20 源码说明；不等于功能全范围资格认证。",module.files[0]),proof("unknown","运行证据未逐项核验","本页不因测试文件存在就标 PASS；本轮页面检查不覆盖全部制作模块。","未绑定模块级 exact 运行结果"),proof("unknown","未评估","没有在此页建立该模块的独立真实媒体效果证明。","NOT_EVALUATED"),proof("unknown","未建立模块级证明","需要 exact 成片及明确完整听看判断；不从浏览器播放或工具成功推断。","NOT_EVALUATED")];
+      if(module.id==="performance") { result[1]=proof("historical","历史工程 PASS","离线 author/reader/compiler/QA 映射；不是当前全部模型效果。",proofRefs.performance); result[2]=proof("unproven","真实输入已接通 · 效果未证实","H3 Max CN S01 八人参数进入 native prompt；原片 5 PASS / 1 FAIL / 9 未评估。",proofRefs.acting); result[3]=proof("unproven","完整表演验收未证实","用户未看出清晰改善；不能认定表演模块已解决自然度问题。",proofRefs.acting); }
+      if(module.id==="references"||module.id==="routing") result[1]=proof("historical","历史离线 PASS","限定 reference duties / native 绑定 / 模式边界；fixture 不证明模型遵从。",proofRefs.references);
+      if(module.id==="adapters") result[2]=proof("bounded","H3 Max CN 有真实产出","仅证明限定请求成功产出；该 S01 仍 FAIL/未评估，不覆盖 Seedance 或全部 adapter。",proofRefs.acting);
+      if(module.id==="retime") { result[1]=proof("historical","历史原声映射 PASS","限定 source-frame/sample 映射、边界与回归；不代表任意素材变速后都自然。",proofRefs.retime); result[2]=proof("bounded","真实源的剪辑预览已验证","同一机器人源，经原声 retime 得到 exact 开发预览；不改变 raw FAIL。",proofRefs.robot); result[3]=proof("human","单版完整 1× 听看接受","仅 SHA 173cd95b… 的动作、最后转向和声音；未 Production qualification/activation，不代表跨场景通用有效。",proofRefs.robot); }
+      if(module.id==="cleanup") result[2]=proof("bounded","真实片段局部观察","S01 第二版清理预览有抽帧及 exact 前端播放证据；整段表演和完整人审仍未证。",proofRefs.acting);
+      if(module.id==="console") { result[1]=proof("bounded","本说明页交互已核验","限定5个视图、图节点、分层证据、搜索和窄屏；不证明整个Console或26个制作模块全部行为。",proofRefs.ui); result[2]=proof("na","不直接生成媒体","此模块是只读展示；播放成功不证明内容质量。","provider-console/AGENTS.md"); }
+      if(["creative","harness","memory"].includes(module.id)) result[2]=proof("na","不直接生成媒体","方法、工程检查或检索模块；不能替代生成与内容验收。",module.files[0]);
+      return result;
+    }
     const categoryLabels = { control: "创作与控制", media: "媒体制作", infra: "基础设施" };
     const mechanismLabels = { "创作判断 · advisory": "Agent 判断", "共享流程编排": "程序编排", "项目数据表达": "结构化表达", "MODEL_PROMPT_GUIDANCE": "模型提示引导", "素材职责 + 实际绑定": "素材表达与绑定", "生成前检查": "生成前约束", "目标到制作方案": "计划决策", "能力选择 + 精确请求": "请求编译", "证据驱动决策": "执行决策", "外部/本地媒体生成": "模型生成", "前序已接受状态": "连续性约束", "统一时间语义": "时间线编排", "显式帧映射": "确定性剪辑", "显式遮罩 + 干净底图": "人工定义修补", "媒体导入 / 合成 / 对齐": "媒体处理", "统一合成渲染": "程序渲染", "定义 / 素材身份 / 生命周期": "状态与素材", "唯一状态写入 owner": "状态提交", "指纹与重建范围": "依赖管理", "预算 Guard + 单次许可": "调用安全", "观察与提取证据": "自动化观察", "要求 × 证据 × Verdict": "技术与人工验收", "只读浏览与证据关联": "只读界面", "检索与独立学习数据集": "经验辅助", "源码/契约/回归检查": "工程验证", "兼容入口 + 领域协调": "专用制作入口" };
     const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
@@ -324,6 +501,29 @@
     const emptyState = document.getElementById("emptyState");
     let activeFilter = "all";
     let returnFocus = null;
+
+    function sourceLabel(value) {
+      return String(value).replace(/(?<![\w/])production\//g,"src/ai_video/production/").replace(/(?<![\w/])([A-Za-z_]\w*\.py)(?=:)/g,(_,file)=>`src/ai_video/${file.startsWith("canvas_")?"":"production/"}${file}`);
+    }
+
+    function renderGraph(targetId, nodes, edges, label) {
+      const colors = {call:"#aa95fa",data:"#67d9c2",agent:"#e5bd76",stop:"#ff9fae"};
+      const defs = Object.entries(colors).map(([kind,color]) => `<marker id="${targetId}-${kind}" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" style="fill:${color}"/></marker>`).join("");
+      const paths = edges.map((edge) => `<g><path d="${edge[4]}" stroke="${colors[edge[3]]}" ${edge[3]==="data"?'stroke-dasharray="3 5"':edge[3]==="agent"?'stroke-dasharray="8 5"':""} marker-end="url(#${targetId}-${edge[3]})"/><text class="edge-label" x="${edge[5]}" y="${edge[6]}" text-anchor="middle">${escapeHtml(edge[2])}</text></g>`).join("");
+      const buttons = nodes.map(([id,module,x,y,title,subtitle,tone]) => `<button type="button" class="graph-node" data-node="${escapeHtml(id)}" data-module="${escapeHtml(module)}" data-tone="${tone||"normal"}" style="left:${x}px;top:${y}px" aria-label="${escapeHtml(title)}，查看模块详情"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(subtitle)}</span></button>`).join("");
+      document.getElementById(targetId).innerHTML = `<div class="diagram-scroll" tabindex="0" role="region" aria-label="${escapeHtml(label)}，窄屏可横向滚动"><div class="diagram-canvas"><svg viewBox="0 0 1120 600" aria-hidden="true"><defs>${defs}</defs>${paths}</svg>${buttons}</div></div><ol class="sr-only">${edges.map(e=>`<li>${escapeHtml(nodes.find(n=>n[0]===e[0])[4])} → ${escapeHtml(nodes.find(n=>n[0]===e[1])[4])}：${escapeHtml(e[2])}</li>`).join("")}</ol>`;
+    }
+
+    const proofNames = ["源码实现","工程测试","真实生成 / 媒体","人工验收"];
+    function evidenceMarkup(module) {
+      return `<div class="detail-block maturity-detail"><h3>四层能力证据（各自独立）</h3><ul>${maturityFor(module).map((p,i)=>`<li><strong>${proofNames[i]}</strong> · <span class="evidence-tag" data-state="${p.state}">${escapeHtml(p.label)}</span><p>${escapeHtml(p.scope)}</p><code>${escapeHtml(p.source)}</code></li>`).join("")}</ul></div>`;
+    }
+
+    function relationMarkup(module) {
+      const rows = callEdges.filter(e=>callNodes.some(n=>(n[0]===e[0]||n[0]===e[1])&&n[1]===module.id));
+      const names = {call:"调用链",data:"数据依赖",agent:"显式操作"};
+      return `<div class="detail-block maturity-detail"><h3>主路径中的调用 / 数据关系</h3>${rows.length?`<ul class="relation-list">${rows.map(e=>`<li>${escapeHtml(callNodes.find(n=>n[0]===e[0])[4])} → ${escapeHtml(callNodes.find(n=>n[0]===e[1])[4])}<br>${names[e[3]]} · ${escapeHtml(e[2])}<br><code>${escapeHtml(sourceLabel(e[7]))}</code></li>`).join("")}</ul>`:"<p>本页主路径摘要未展开此模块的调用边；不能据此判定它没有依赖。其输入输出职责仍见上方。</p>"}</div>`;
+    }
 
     function detailMarkup(module) {
       return `<div class="detail-block"><h3>负责什么</h3><p>${escapeHtml(module.summary)}</p></div><div class="detail-block"><h3>输入</h3><p>${escapeHtml(module.input)}</p></div><div class="detail-block"><h3>输出</h3><p>${escapeHtml(module.output)}</p></div><div class="detail-block detail-block--wide"><h3>能力边界</h3><p>${escapeHtml(module.boundary)}</p></div><div class="detail-block detail-block--wide"><h3>主要源码位置（相对仓库）</h3><ul class="source-list">${module.files.map((path) => `<li>${escapeHtml(path)}</li>`).join("")}</ul></div>`;
@@ -343,7 +543,7 @@
       document.getElementById("dialogKicker").textContent = `MODULE / ${String(index).padStart(2, "0")} · ${categoryLabels[module.category]} · ${mechanismLabels[module.mechanism] || module.mechanism}`;
       document.getElementById("dialogTitle").textContent = module.title;
       document.getElementById("dialogSummary").textContent = module.summary;
-      document.getElementById("dialogDetails").innerHTML = detailMarkup(module);
+      document.getElementById("dialogDetails").innerHTML = detailMarkup(module) + evidenceMarkup(module) + relationMarkup(module);
       dialog.showModal();
       document.getElementById("closeDialog").focus();
     }
@@ -369,8 +569,20 @@
       applyFilters();
     }
 
-    document.getElementById("flowSteps").innerHTML = flow.map(([id, title, subtitle], index) => `<button class="flow-step" type="button" data-module="${id}" aria-label="第 ${index + 1} 步：${title}，查看负责模块"><span class="flow-number">0${index + 1}</span><strong>${title}</strong><span>${subtitle}</span></button>`).join("");
-    document.querySelectorAll(".flow-step").forEach((button) => button.addEventListener("click", () => openModule(button.dataset.module, button)));
+    renderGraph("feedbackGraph",feedbackNodes,feedbackEdges,"制作反馈闭环");
+    renderGraph("callsGraph",callNodes,callEdges,"程序调用与数据依赖图");
+    renderGraph("ownershipGraph",ownerNodes,ownerEdges,"状态所有权与写入读取图");
+    document.querySelectorAll(".graph-node").forEach(button=>button.addEventListener("click",()=>openModule(button.dataset.module,button)));
+    document.getElementById("callEvidence").innerHTML = callEdges.map(e=>`<li><strong>${escapeHtml(callNodes.find(n=>n[0]===e[0])[4])} → ${escapeHtml(callNodes.find(n=>n[0]===e[1])[4])}</strong> · ${escapeHtml(e[2])}<br><code>${escapeHtml(sourceLabel(e[7]))}</code></li>`).join("");
+    document.getElementById("ownerCards").innerHTML = owners.map(o=>`<article class="owner-card"><h4>${escapeHtml(o[0])}</h4><p>${escapeHtml(o[1])}</p><p>${escapeHtml(o[2])}</p><code>${escapeHtml(sourceLabel(o[3]))}</code></article>`).join("");
+    document.getElementById("failureRoutes").innerHTML = failures.map(f=>`<div class="failure-row" data-kind="${f[0]}"><div class="failure-step"><strong>${escapeHtml(f[1])}</strong><p>${escapeHtml(f[2])}</p></div><span class="failure-arrow" aria-hidden="true">→</span><div class="failure-step"><strong>${escapeHtml(f[3])}</strong><p>${escapeHtml(f[4])}</p></div><span class="failure-arrow" aria-hidden="true">→</span><div class="failure-step"><strong>${escapeHtml(f[5])}</strong><p>${escapeHtml(f[6])}</p><code>${escapeHtml(sourceLabel(f[7]))}</code></div></div>`).join("");
+    document.getElementById("maturityRows").innerHTML = modules.map(m=>`<tr data-module="${m.id}"><td><button type="button" data-module="${m.id}" aria-label="查看${escapeHtml(m.title)}的证据详情">${escapeHtml(m.title)}</button></td>${maturityFor(m).map(p=>`<td><span class="evidence-tag" data-state="${p.state}">${escapeHtml(p.label)}</span><p>${escapeHtml(p.scope)}</p></td>`).join("")}</tr>`).join("");
+    document.querySelectorAll("#maturityRows button").forEach(button=>button.addEventListener("click",()=>openModule(button.dataset.module,button)));
+    function selectView(tab) {
+      document.querySelectorAll(".view-tab").forEach(t=>{const selected=t===tab;t.setAttribute("aria-selected",String(selected));t.tabIndex=selected?0:-1;document.getElementById(t.getAttribute("aria-controls")).hidden=!selected;});
+    }
+    const viewTabs = [...document.querySelectorAll(".view-tab")];
+    viewTabs.forEach((tab,index)=>{tab.addEventListener("click",()=>selectView(tab));tab.addEventListener("keydown",event=>{let next=index;if(event.key==="ArrowRight")next=(index+1)%viewTabs.length;else if(event.key==="ArrowLeft")next=(index+viewTabs.length-1)%viewTabs.length;else if(event.key==="Home")next=0;else if(event.key==="End")next=viewTabs.length-1;else return;event.preventDefault();selectView(viewTabs[next]);viewTabs[next].focus();});});
     document.querySelectorAll(".filter").forEach((button) => button.addEventListener("click", () => {
       activeFilter = button.dataset.filter;
       document.querySelectorAll(".filter").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
