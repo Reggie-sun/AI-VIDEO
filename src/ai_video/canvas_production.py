@@ -180,7 +180,7 @@ class CanvasProductionService:
 
     @_input_errors
     def bootstrap_video_cleanup(self, *, bundle, cleanup_plan, ffmpeg_executable,
-                                ffprobe_executable, **arguments):
+                                ffprobe_executable, viewing_proxy=True, **arguments):
         """One explicit local cleanup capture; never adopts or activates a Shot."""
         from pathlib import Path
         from ai_video.production.video_cleanup_media import VideoCleanupTools
@@ -189,12 +189,17 @@ class CanvasProductionService:
         manifest = self.committer.bootstrap_repair_input(project=bundle.project,
             registry=bundle.registry, artifacts=bundle.artifacts, cleanup_plan=cleanup_plan,
             cleanup_tools=VideoCleanupTools(ffmpeg=Path(ffmpeg_executable), ffprobe=Path(ffprobe_executable)),
+            cleanup_viewing_proxy=viewing_proxy,
             **arguments)
         loaded = load_production_project(self.committer.project_root / "project.yaml")
-        asset = next(item for item in loaded.registry.assets if item.asset_id == arguments["asset_id"])
+        master = next(item for item in loaded.registry.assets if item.asset_id == arguments["asset_id"])
+        output_id = master.asset_id + "-viewing" if viewing_proxy else master.asset_id
+        asset = next(item for item in loaded.registry.assets if item.asset_id == output_id)
         receipt = verify_repair_input(asset, loaded.root)
         return {"manifest_revision": manifest.manifest_revision,
             "output_path": str(loaded.asset_paths[asset.asset_id]), "output_sha256": asset.sha256,
+            "master_path": str(loaded.asset_paths[master.asset_id]), "master_sha256": master.sha256,
+            "viewing_proxy": viewing_proxy,
             "source_sha256": receipt.artifact_sha256, "receipt_hash": receipt.content_hash,
             "qualification": receipt.qualification, "generation_calls": 0,
             "tracking": "explicit_affine_per_frame", "audio": "original_samples_preserved",

@@ -31,3 +31,12 @@
 ## Limits
 
 首版支持显式逐帧对齐数据，不承诺自动光流/平面跟踪、任意遮挡重建或缺失背景恢复。无干净底片或无法保护真实前景时，保留失败而不是模糊/冻结全画面。真实修补是否自然与工程零变化证明分别验收。
+
+## Human Playback And Frontend Follow-up
+
+用户实际播放第二版后报告严重绿紫偏色，并指出前端没有视频。FFmpeg重解码与静态MCP图均正常，不能代替实际播放器显示；第二版因此不构成合格观看交付。先停止旧候选的最终Harness，保留失败/中止证明，再修复实际观看结果，最后验证稳定源码。
+
+- 保留`video-cleanup/1`与`development-repair-input/4`的RGB制作母版及历史bytes。新增独立`video-cleanup-viewing-proxy/1`，用显式本地工具生成H264/yuv420p、BT.709 limited-range、faststart观看版；实际核验色彩tag、源帧/PTS、原声PCM和时间。不把lossy观看版的像素与母版逐像素保护证明混用。
+- Additive`development-repair-input/5`保留原捕获、`/4`母版和观看版三个身份；viewing.source必须等于master的exact local measurement，Registry同时保留完整父链。仍由同一bootstrap持久化、标准reader重开、UNBOUND/NOT_EVALUATED，Production activation fence不变。旧committer调用默认不加proxy以保留replay；Canvas面向观看的新入口默认提供观看版，同时返回master路径和SHA。
+- 既有Provider Console catalog改进有界发现顺序，保留depth/entry/no-symlink上限；现有detail投影严格重开的`/5`观看角色与`/4`母版角色。媒体库默认展示观看版，母版在高级入口保留；支持受限relative workspace与exact媒体SHA的直接链接，截断catalog时仍能经既有strict detail读取显式目标。不新增index、状态库、Provider或renderer。
+- 验证增加正常肤色/灰色/原色的真实转码测试，v5来源/篡改/失败不写入与前端投影测试，以及深证据/未注册frame dump的扫描回归、URL路径拒绝和观看角色筛选。实际新视频先经MCP与真实Chrome DOM/video/canvas/截图验证，再请求完整1×听看；人工与工程结论保持分开。

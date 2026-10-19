@@ -288,6 +288,38 @@ def test_catalog_enforces_workspace_and_entry_scan_budgets(tmp_path: Path):
     assert entry_limited["truncated"] is True
 
 
+def test_catalog_discovers_nested_workspaces_before_deep_evidence_exhausts_budget(tmp_path: Path):
+    runs = tmp_path / "runs"
+    old = _production_workspace(runs, "aaa-old/production")
+    evidence = old.parent / "state" / "evidence"
+    evidence.mkdir()
+    for index in range(100):
+        (evidence / f"proof-{index}.json").write_text("{}")
+    target = _production_workspace(runs, "zzz-new/repair-v2/production")
+
+    catalog = provider_console.catalog_runs(runs, max_entries=60)
+
+    assert target.relative_to(runs).as_posix() in {
+        entry["workspace"] for entry in catalog["workspaces"]
+    }
+    assert catalog["scan"]["entries"] <= 60
+
+
+def test_catalog_primary_workspace_is_discovered_before_unregistered_frame_dump(tmp_path: Path):
+    runs = tmp_path / "runs"
+    frames = runs / "aaa-diagnostic" / "frames"
+    frames.mkdir(parents=True)
+    for index in range(100):
+        (frames / f"frame-{index}.png").write_bytes(b"not-media")
+    target = _production_workspace(runs, "zzz-new/production")
+
+    result = provider_console.catalog_runs(runs, max_entries=50)
+
+    assert target.relative_to(runs).as_posix() in {item["workspace"] for item in result["workspaces"]}
+    assert result["truncated"] is True
+    assert result["scan"]["entries"] <= 50
+
+
 def test_catalog_entry_budget_limits_scandir_consumption(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ):

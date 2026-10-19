@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { buildLibraryEntries, filterLibraryEntries, libraryLifecycle, selectLibraryEntry, versionGroups } from "./library-contract.js";
 import { useLibraryData } from "./library-data.js";
+import { libraryTargetFromSearch } from "./library-load-contract.js";
 import { classifyPlaybackFailure, keepOneAudio, playbackFailureLabel } from "./library-preview.js";
 import { durationLabel, entryTitle, VideoLibraryRail } from "./video-library-rail.jsx";
 import { attemptId } from "./run-detail-contract.js";
@@ -79,12 +80,14 @@ function Comparison({ entries, measurements, onMeasured, onUnavailable, onClose 
 
 export function LibraryBrowser({ sidebar, renderContext, renderRecord }) {
   const data = useLibraryData();
+  const target = useRef(libraryTargetFromSearch(typeof window === "undefined" ? "" : window.location.search));
   const [view, setView] = useState("library");
   const [query, setQuery] = useState("");
   const [source, setSource] = useState("all");
   const [model, setModel] = useState("all");
   const [availability, setAvailability] = useState("all");
   const [evidence, setEvidence] = useState("all");
+  const [includeMasters, setIncludeMasters] = useState(false);
   const [selectedId, setSelectedId] = useState("");
   const [followLatest, setFollowLatest] = useState(false);
   const [compareIds, setCompareIds] = useState([]);
@@ -98,8 +101,10 @@ export function LibraryBrowser({ sidebar, renderContext, renderRecord }) {
   const listScroll = useRef(null);
   const savedScroll = useRef(0);
   const entries = useMemo(() => buildLibraryEntries(data.loaded, data.external).map((entry) => unavailable.has(entry.id) ? { ...entry, available: false, url: null } : entry), [data.loaded, data.external, unavailable]);
-  const filtered = useMemo(() => filterLibraryEntries(entries, { query, source, model, availability, evidence }), [entries, query, source, model, availability, evidence]);
-  useEffect(() => { setSelectedId((current) => selectLibraryEntry(filtered, current, followLatest)); }, [filtered, followLatest]);
+  const filtered = useMemo(() => filterLibraryEntries(entries, { query, source, model, availability, evidence, includeMasters }), [entries, query, source, model, availability, evidence, includeMasters]);
+  useEffect(() => { setSelectedId((current) => !followLatest && !current && target.current.sha256
+    ? filtered.find((entry) => entry.sha256 === target.current.sha256)?.id || current
+    : selectLibraryEntry(filtered, current, followLatest)); }, [filtered, followLatest]);
   const current = entries.find((item) => item.id === selectedId);
   if (current) lastSelected.current = current;
   const selected = current || (lastSelected.current?.id === selectedId ? { ...lastSelected.current, available: false, url: null } : null);
@@ -142,7 +147,7 @@ export function LibraryBrowser({ sidebar, renderContext, renderRecord }) {
       {(data.external?.sources || []).filter((item) => item.status !== "available" || item.truncated).map((item) => <p key={item.id}>{item.label || item.id} · {item.status}{item.truncated ? " · 扫描截断" : ""}</p>)}
     </div>
     {view === "library" && <>
-      <div className="library-filters"><label>搜索已加载视频<input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="作品 / Run / Shot / 模型 / 文件名" /></label><label>来源<select id="video-source-select" value={source} onChange={(event) => setSource(event.target.value)}><option value="all">全部视频来源</option><option value="runs">Runs</option>{(data.external?.sources || []).map((item) => <option key={item.id} value={item.id}>{item.label || item.id}</option>)}</select></label><label>模型<select value={model} onChange={(event) => setModel(event.target.value)}><option value="all">全部模型</option>{[...new Set(entries.flatMap((entry) => entry.contexts.map((item) => item.model)).filter(Boolean))].sort().map((value) => <option key={value}>{value}</option>)}</select></label><label>媒体状态<select value={availability} onChange={(event) => setAvailability(event.target.value)}><option value="all">全部状态</option><option value="available">可预览</option><option value="unavailable">文件不可用</option></select></label><details className="library-advanced"><summary>高级证据筛选</summary><select aria-label="证据筛选" value={evidence} onChange={(event) => setEvidence(event.target.value)}><option value="all">全部证据状态</option><option value="linked">已关联</option><option value="unbound">无绑定证据</option><option value="unparsed">旁证待解析</option><option value="incomplete">Runs 待恢复</option></select></details></div>
+      <div className="library-filters"><label>搜索已加载视频<input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="作品 / Run / Shot / 模型 / 文件名" /></label><label>来源<select id="video-source-select" value={source} onChange={(event) => setSource(event.target.value)}><option value="all">全部视频来源</option><option value="runs">Runs</option>{(data.external?.sources || []).map((item) => <option key={item.id} value={item.id}>{item.label || item.id}</option>)}</select></label><label>模型<select value={model} onChange={(event) => setModel(event.target.value)}><option value="all">全部模型</option>{[...new Set(entries.flatMap((entry) => entry.contexts.map((item) => item.model)).filter(Boolean))].sort().map((value) => <option key={value}>{value}</option>)}</select></label><label>媒体状态<select value={availability} onChange={(event) => setAvailability(event.target.value)}><option value="all">全部状态</option><option value="available">可预览</option><option value="unavailable">文件不可用</option></select></label><details className="library-advanced"><summary>高级证据筛选</summary><select aria-label="证据筛选" value={evidence} onChange={(event) => setEvidence(event.target.value)}><option value="all">全部证据状态</option><option value="linked">已关联</option><option value="unbound">无绑定证据</option><option value="unparsed">旁证待解析</option><option value="incomplete">Runs 待恢复</option></select><label><input type="checkbox" checked={includeMasters} onChange={(event) => setIncludeMasters(event.target.checked)} />显示修补母版</label></details></div>
       <div className="library-selection-bar"><label><input type="checkbox" checked={followLatest} onChange={(event) => setFollowLatest(event.target.checked)} />跟随最新</label><span>已选择 {compareIds.length} / 2 段比较</span>{compareIds.length > 0 && <button type="button" onClick={() => { setCompareIds([]); setComparing(false); }}>清空比较选择</button>}<button type="button" disabled={!canCompare} onClick={() => { savedScroll.current = listScroll.current?.scrollTop || 0; setComparing(true); }}>比较所选视频</button>{notice && <span role="status">{notice}</span>}</div>
       {comparing && <Comparison entries={compareIds.map((id) => entries.find((item) => item.id === id) || { id, title: "所选视频已不可用", contexts: [], available: false })} measurements={measurements} onMeasured={onMeasured} onUnavailable={onUnavailable} onClose={closeComparison} />}<div className="library-body" style={comparing ? { display: "none" } : undefined}><section ref={listScroll} className="library-list-scroll" aria-label="浏览视频"><VideoLibraryRail entries={filtered} selectedId={selectedId} compareIds={compareIds} onSelect={onSelect} onCompare={onCompare} measurements={measurements} onMeasured={onMeasured} /></section><div className="library-preview-scroll">{!comparing && selected ? <Preview key={selected.id} entry={selected} entries={entries} measurements={measurements} onMeasured={onMeasured} onUnavailable={onUnavailable} renderContext={renderContext} onSelect={onSelect} /> : <p className="library-empty">选择视频开始预览。扫描结果将逐步显示。</p>}</div></div>
     </>}

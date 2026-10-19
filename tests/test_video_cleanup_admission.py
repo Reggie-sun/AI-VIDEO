@@ -334,3 +334,95 @@ def test_cleanup_failure_and_invalid_target_binding_write_nothing_and_skip_adapt
     assert processor.call_count == 0
     assert _files(target) == {}
     assert _files(source_root) == source_files
+
+
+def _viewing_case(tmp_path, monkeypatch):
+    from ai_video.production import video_cleanup_viewing_admission
+    from ai_video.production.video_cleanup_viewing import CleanupViewingProxyReceipt, PreparedCleanupViewingProxy
+
+    case = _case(tmp_path, monkeypatch)
+    cleaned = case[6].receipt
+    raw = b"browser-compatible-viewing-fixture"
+    values = dict(source=cleaned.output, output=cleaned.output.model_copy(update={
+        "artifact_sha256": hashlib.sha256(raw).hexdigest(), "size_bytes": len(raw)}),
+        source_pixel_format="gbrp", ffmpeg_sha256="c" * 64, ffprobe_sha256="d" * 64,
+        source_frame_times=cleaned.output_frame_times, output_frame_times=cleaned.output_frame_times,
+        input_audio_sha256=cleaned.output_audio_sha256, output_audio_sha256=cleaned.output_audio_sha256,
+        input_audio_signature=cleaned.output_audio_signature, output_audio_signature=cleaned.output_audio_signature)
+    provisional = CleanupViewingProxyReceipt.model_construct(**values, content_hash="0" * 64)
+    receipt = CleanupViewingProxyReceipt.model_validate({**provisional.model_dump(mode="python"),
+        "content_hash": canonical_sha256(provisional)})
+    processor = Mock(return_value=PreparedCleanupViewingProxy(raw, receipt))
+    monkeypatch.setattr(video_cleanup_viewing_admission, "prepare_cleanup_viewing_proxy", processor)
+    arguments = {**case[-1], "cleanup_viewing_proxy": True}
+    return case, processor, arguments
+
+
+def test_viewing_admission_keeps_raw_master_proxy_unbound_and_projects_the_actual_viewing_asset(tmp_path, monkeypatch):
+    from ai_video import provider_console
+    from ai_video.production.repair_input_admission import require_production_render_sources
+
+    case, processor, arguments = _viewing_case(tmp_path, monkeypatch)
+    source_root, target, writer = case[:3]
+    before_source = _files(source_root)
+    writer.bootstrap_repair_input(**arguments)
+    loaded = load_production_project(target / "project.yaml")
+    assets = {item.asset_id: item for item in loaded.registry.assets}
+    master, view = assets["failed-source"], assets["failed-source-viewing"]
+    admission = verify_repair_input(view, target)
+    assert admission.contract_version == "development-repair-input/5"
+    assert admission.master_asset == master
+    assert admission.source_asset == assets["failed-source-source"]
+    assert admission.viewing.source == verify_repair_input(master, target).cleanup.output
+    assert view.input_artifact_ids == (master.asset_id,)
+    assert view.tool.version == "5"
+    assert admission.qualification == "NOT_EVALUATED"
+    assert loaded.manifest.attempts == () and loaded.qa_policy is None
+    assert _files(source_root) == before_source
+    snapshot = _files(target)
+    writer.bootstrap_repair_input(**arguments)
+    assert _files(target) == snapshot and processor.call_count == 2
+
+    projected = provider_console.project_workspace_detail(target.parent, target.name + "/project.yaml")
+    viewing_media = next(item for item in projected["workspace_media"] if item["sha256"] == view.sha256)
+    assert projected["status"] == "valid"
+    assert viewing_media["source_kind"] == "viewing_proxy"
+    assert viewing_media["source_master_sha256"] == master.sha256
+    assert any(item.get("source_kind") == "cleanup_master" for item in projected["workspace_media"])
+    assert str(tmp_path) not in json.dumps({key: value for key, value in projected.items() if key != "_media"})
+    with pytest.raises(ValueError, match="cannot be activated for Production"):
+        require_production_render_sources(target, loaded.manifest.active_registry,
+            SimpleNamespace(visual_spans=(SimpleNamespace(asset_sha256=view.sha256),)))
+    registry = loaded.registry.model_copy(update={"assets": tuple(item for item in loaded.registry.assets if item != master)})
+    with pytest.raises(AiVideoError, match="cleanup master in Registry"):
+        validate_project_references(loaded.model_copy(update={"registry": registry}))
+
+
+@pytest.mark.parametrize("changed", ["master", "viewing", "viewing_receipt"])
+def test_viewing_reader_rejects_changed_master_proxy_and_color_evidence(tmp_path, monkeypatch, changed):
+    case, _, arguments = _viewing_case(tmp_path, monkeypatch)
+    target, writer = case[1:3]
+    writer.bootstrap_repair_input(**arguments)
+    loaded = load_production_project(target / "project.yaml")
+    assets = {item.asset_id: item for item in loaded.registry.assets}
+    view = assets["failed-source-viewing"]
+    if changed == "viewing_receipt":
+        path = target / repair_input_receipt_path(view.creation_receipt_id)
+        values = json.loads(path.read_text());values["viewing"]["output_color_space"] = "unknown"
+        path.write_text(json.dumps(values))
+    else:
+        asset = assets["failed-source"] if changed == "master" else view
+        (target / asset.artifact_path).write_bytes(b"corrupt")
+    with pytest.raises(AiVideoError):
+        load_production_project(target / "project.yaml")
+
+
+def test_viewing_preparation_failure_writes_nothing(tmp_path, monkeypatch):
+    case, processor, arguments = _viewing_case(tmp_path, monkeypatch)
+    source_root, target, writer = case[:3]
+    before = _files(source_root)
+    processor.side_effect = ValueError("synthetic viewing failure")
+    with pytest.raises(AiVideoError):
+        writer.bootstrap_repair_input(**arguments)
+    assert _files(target) == {} and _files(source_root) == before
+    assert processor.call_count == 1

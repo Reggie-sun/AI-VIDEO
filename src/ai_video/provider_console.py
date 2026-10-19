@@ -11,7 +11,7 @@ import hashlib
 import json
 import os
 import stat
-from collections import Counter
+from collections import Counter, deque
 from datetime import datetime, timezone
 from pathlib import Path, PurePosixPath
 from typing import Any
@@ -91,11 +91,11 @@ def _walk_files(
     max_entries: int,
     scan: dict[str, int | bool],
 ):
-    """Yield regular files without following symlinks, in deterministic order."""
+    """Find workspace locators before descending into bounded evidence trees."""
 
-    pending: list[tuple[Path, int]] = [(root, 0)]
+    pending = deque([(root, 0)])
     while pending:
-        directory, depth = pending.pop()
+        directory, depth = pending.popleft()
         remaining = max_entries - int(scan["entries"])
         if remaining <= 0:
             scan["truncated"] = True
@@ -112,7 +112,11 @@ def _walk_files(
         except OSError:
             continue
         scan["entries"] = int(scan["entries"]) + len(entries)
-        entries.sort(key=lambda item: item.name, reverse=True)
+        entries.sort(key=lambda item: item.name)
+        workspace_storage = (
+            _is_regular_nofollow(directory / "project.yaml")
+            and _is_regular_nofollow(directory / "state" / "manifest.json")
+        )
         for entry in entries:
             try:
                 if entry.is_symlink():
@@ -123,6 +127,21 @@ def _walk_files(
                     if relative_depth <= max_depth:
                         yield path
                 elif entry.is_dir(follow_symlinks=False) and depth + 1 < max_depth:
+                    if workspace_storage and entry.name in {"assets", "state"}:
+                        continue
+                    if depth == 0:
+                        for primary in (path / "project.yaml", path / "production" / "project.yaml"):
+                            if len(primary.relative_to(root).parts) > max_depth:
+                                continue
+                            if int(scan["entries"]) >= max_entries:
+                                scan["truncated"] = True
+                                return
+                            scan["entries"] = int(scan["entries"]) + 1
+                            if (not primary.parent.is_symlink()
+                                    and not (primary.parent / "state").is_symlink()
+                                    and _is_regular_nofollow(primary)
+                                    and _is_regular_nofollow(primary.parent / "state" / "manifest.json")):
+                                yield primary
                     pending.append((path, depth + 1))
             except OSError:
                 continue
@@ -520,6 +539,13 @@ def _workspace_media_projection(
             media_map=media_map,
         )
         if media is not None:
+            tool = getattr(asset, "tool", None)
+            if getattr(tool, "name", "") == "ai-video-development-repair-input":
+                if getattr(tool, "version", "") == "4":
+                    media["source_kind"] = "cleanup_master"
+                elif getattr(tool, "version", "") == "5":
+                    master = assets[asset.input_artifact_ids[0]]
+                    media.update(source_kind="viewing_proxy", source_master_sha256=master.sha256)
             projected.append(media)
     return projected, truncated
 

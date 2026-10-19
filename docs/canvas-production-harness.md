@@ -298,6 +298,19 @@ qualification为NOT_EVALUATED，timeline标记 `development_preview` 并禁止re
 保持每个源帧及其PTS，用`libx264rgb` lossless保存并重解码比对，未选帧和保护像素不得变化；原声音频不重编码，
 另比较PCM及stream start/duration/time base。不能可靠保持的输入显式失败。编码结果是派生源，不是新的timeline或最终成片renderer。
 
+面向正常浏览器播放时，`CanvasProductionService.bootstrap_video_cleanup`默认同时生成独立的观看代理（`viewing_proxy=True`）；
+可显式关闭。低层`ProductionStateCommitter.bootstrap_repair_input(cleanup_viewing_proxy=False)`默认仍不生成代理。
+此扩展沿用原捕获资产及`development-repair-input/4`无损RGB母版，再以`development-repair-input/5`
+登记母版派生的独立H.264 `yuv420p`、BT.709 limited-range有损代理；原`video-clean-plate/1`计划、`video-cleanup/1`母版及`/4`准入契约不变。
+代理保留测得的画面尺寸、帧率、逐帧PTS、时长、原音轨和PCM，但不拥有母版的逐像素保护证明；母版仍是像素证明对象，代理只用于观看。
+输出像素格式与实际色彩标签经ffprobe复核，不能由编码参数声明代替实测。两份派生物都保持UNBOUND/`NOT_EVALUATED`，
+播放或技术证明不自动成为模型质量、人工验收或Production通过。
+
+本地视频库明确标记`source_kind=viewing_proxy`并关联`source_master_sha256`；`cleanup_master`默认隐藏，
+可在“高级证据筛选”中显式显示。使用观看代理做实际画面判断前，仍须以正常速度检查肤色、灰阶、主色、局部修补、声音和整体效果；
+用户看到的代理是有损编码，不能代替母版核验。工作区目录保留扫描上限；受限relative workspace与exact SHA深链
+可通过既有strict detail读取目录遗漏的目标，文件权限边界不变，能定位一个准确素材不等于索引完整。
+
 对已关闭remote质量失败，使用现有独立开发bundle的`bootstrap_repair_input`及`/4`准入。
 Canvas普通`--data`指定该开发bundle；`bootstrap_video_cleanup --arguments ... --ffmpeg ABS --ffprobe ABS`
 要求原`source_root/source_attempt_id/source_sha256`、新`asset_id`、`usage_license`、sealed `preview_use`、

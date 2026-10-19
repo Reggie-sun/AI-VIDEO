@@ -74,5 +74,6 @@ def video_cleanup_capability_report() -> dict:
         "tracking": "EXPLICIT_AFFINE_DATA_ONLY", "automatic_tracking": False,
         "timing": "SOURCE_FRAMES_AND_TIMESTAMPS_PRESERVED",
         "audio": "ORIGINAL_PCM_AND_TIMING_PRESERVED", "generation_calls": 0,
+        "outputs": {"master": "LOSSLESS_RGB", "viewing_proxy": "H264_YUV420P_BT709_LIMITED"},
         "production_selection": "REQUIRES_SEPARATE_SOURCE_QUALIFICATION",
         "quality": "NOT_EVALUATED"}

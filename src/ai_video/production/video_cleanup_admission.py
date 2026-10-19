@@ -59,7 +59,7 @@ def cleaned_repair_asset(receipt: CleanedRepairInputAdmissionReceipt) -> AssetRe
         video_metadata=metadata)
 
 
-def prepare_cleaned_repair_input(*, cleanup_plan, cleanup_tools, **arguments):
+def prepare_cleaned_repair_input(*, cleanup_plan, cleanup_tools, viewing_proxy=False, **arguments):
     """Capture original then derive; canonical bootstrap remains the only writer."""
     from ai_video.production.repair_input_admission import prepare_repair_input
     from ai_video.production.registry import registry_semantic_sha256
@@ -69,6 +69,8 @@ def prepare_cleaned_repair_input(*, cleanup_plan, cleanup_tools, **arguments):
     output_id = arguments["asset_id"]
     if any(record.asset_id == output_id for record in arguments["registry"].assets):
         raise ValueError("Cleanup output asset id already exists")
+    if viewing_proxy and any(record.asset_id == output_id + "-viewing" for record in arguments["registry"].assets):
+        raise ValueError("Cleanup viewing asset id already exists")
     original_args = {**arguments, "asset_id": output_id + "-source"}
     if arguments.get("preview_use") is None or arguments.get("preview_probe") is None:
         raise ValueError("Cleanup requires an exact sealed preview use and original probe")
@@ -85,7 +87,13 @@ def prepare_cleaned_repair_input(*, cleanup_plan, cleanup_tools, **arguments):
     values["content_hash"] = canonical_sha256(values)
     receipt = CleanedRepairInputAdmissionReceipt.model_validate(values)
     asset = cleaned_repair_asset(receipt)
-    merged = registry.model_copy(update={"assets": (*registry.assets, asset)})
+    extra_assets, extra_artifacts = (), ()
+    if viewing_proxy:
+        from ai_video.production.video_cleanup_viewing_admission import prepare_viewing_repair_input
+        viewing, extra_artifacts = prepare_viewing_repair_input(master_asset=asset,
+            master_receipt=receipt, source_bytes=result.media_bytes, tools=cleanup_tools)
+        extra_assets = (viewing,)
+    merged = registry.model_copy(update={"assets": (*registry.assets, asset, *extra_assets)})
     digest = registry_semantic_sha256(merged)
     merged = AssetRegistrySnapshot.model_validate({**merged.model_dump(mode="python"),
         "revision_id": digest, "content_hash": digest})
@@ -96,7 +104,8 @@ def prepare_cleaned_repair_input(*, cleanup_plan, cleanup_tools, **arguments):
         raise ValueError("Original source changed during cleanup preparation")
     return merged, (*captured,
         PreparedArtifact(asset.artifact_path, result.media_bytes, asset.sha256),
-        PreparedArtifact(repair_input_receipt_path(receipt.content_hash), payload, sha256(payload).hexdigest()))
+        PreparedArtifact(repair_input_receipt_path(receipt.content_hash), payload, sha256(payload).hexdigest()),
+        *extra_artifacts)
 
 
 def verify_cleaned_repair_input(record, root, payload):

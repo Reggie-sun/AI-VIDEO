@@ -1,6 +1,23 @@
 // Keep browsing and playback independent of the size of the Runs catalog.
 export const LIBRARY_WORKSPACE_PAGE_SIZE = 6;
 
+export function libraryTargetFromSearch(search = "") {
+  const params = new URLSearchParams(search);
+  const workspace = params.get("workspace");
+  const safe = typeof workspace === "string" && workspace.length <= 1024
+    && /^[A-Za-z0-9_.\/-]+$/.test(workspace)
+    && workspace.split("/").every((part) => part && part !== "." && part !== "..")
+    && /\/(project\.yaml|manifest\.json)$/.test(workspace);
+  const sha256 = params.get("media");
+  return { workspace: safe ? workspace : null, sha256: safe && /^[a-f0-9]{64}$/.test(sha256 || "") ? sha256 : null };
+}
+
+export function includeLibraryTarget(workspaces, target) {
+  if (!target) return workspaces;
+  const existing = workspaces.find((item) => item.workspace === target);
+  return [existing || { workspace: target, requested: true }, ...workspaces.filter((item) => item.workspace !== target)];
+}
+
 export function libraryWorkspaceBatch(workspaces, limit, requested) {
   return workspaces.filter((item, index) => index < limit || requested.has(item.workspace));
 }

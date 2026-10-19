@@ -57,7 +57,8 @@ class _StateCommitBootstrapMixin:
     def bootstrap_repair_input(self, *, attempt_id, project, registry, artifacts,
                                source_root, source_attempt_id, source_sha256,
                                asset_id, usage_license, preview_use=None,
-                               preview_probe=None, cleanup_plan=None, cleanup_tools=None):
+                               preview_probe=None, cleanup_plan=None, cleanup_tools=None,
+                               cleanup_viewing_proxy=False):
         """New development bundle only; no source write, qualification or activation."""
         from ai_video.production.repair_input_admission import (
             RepairPreviewUse,
@@ -76,6 +77,8 @@ class _StateCommitBootstrapMixin:
 
         if (cleanup_plan is None) != (cleanup_tools is None):
             raise _state_invalid("Cleanup requires an explicit plan and local tools together.")
+        if type(cleanup_viewing_proxy) is not bool or (cleanup_viewing_proxy and cleanup_plan is None):
+            raise _state_invalid("Viewing proxy requires explicit cleanup preparation.")
         arguments = dict(target_root=self._project_root, project=project, registry=registry,
             source_root=source_root, source_attempt_id=source_attempt_id,
             source_sha256=source_sha256, asset_id=asset_id, usage_license=usage_license,
@@ -86,7 +89,8 @@ class _StateCommitBootstrapMixin:
             from ai_video.production.video_cleanup_admission import prepare_cleaned_repair_input
             try:
                 updated, captured = prepare_cleaned_repair_input(**arguments,
-                    cleanup_plan=cleanup_plan, cleanup_tools=cleanup_tools)
+                    cleanup_plan=cleanup_plan, cleanup_tools=cleanup_tools,
+                    viewing_proxy=cleanup_viewing_proxy)
             except (OSError, ValueError) as exc:
                 raise _state_invalid("Development video cleanup preparation failed.", str(exc)) from exc
         return self.bootstrap_initial_state(attempt_id=attempt_id, project=project,

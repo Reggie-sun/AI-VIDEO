@@ -159,8 +159,8 @@ function runContexts(details) {
         workspace: valueOrNull(detail?.workspace),
         ownerKey: JSON.stringify([detail?.workspace, detail?.project?.project_id]),
         attemptId: null,
-        role: isRender ? "active_render" : "workspace_media",
-        title: [projectTitle, isRender ? "合成成片" : fileName].filter(Boolean).join(" · ") || null,
+        role: isRender ? "active_render" : ["viewing_proxy", "cleanup_master"].includes(media.source_kind) ? media.source_kind : "workspace_media",
+        title: [projectTitle, isRender ? "合成成片" : media.source_kind === "viewing_proxy" ? "修补观看版" : media.source_kind === "cleanup_master" ? "修补母版" : fileName].filter(Boolean).join(" · ") || null,
         semanticTitle: null,
         semanticBinding: null,
         model: null,
@@ -331,8 +331,11 @@ export function filterLibraryEntries(entries, {
   model = "all",
   availability = "all",
   evidence = "all",
+  includeMasters = false,
 } = {}) {
   return (Array.isArray(entries) ? entries : []).filter((entry) => (
+    (includeMasters || !entry.contexts.length || !entry.contexts.every((context) => context.role === "cleanup_master"))
+    &&
     matchesQuery(entry, query)
     && (source === "all" || entry.contexts.some((context) => context.sourceId === source))
     && (model === "all" || entry.contexts.some((context) => context.model === model))

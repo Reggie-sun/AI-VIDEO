@@ -240,11 +240,16 @@ def validate_project_references(bundle: LoadedProductionProject) -> None:
             if (receipt.target_project_id != bundle.project.project_id
                     or receipt.target_project_hash != bundle.project.content_hash):
                 raise _invalid("Development repair input belongs to another project snapshot.")
-            if receipt.contract_version == "development-repair-input/4":
+            if receipt.contract_version in {"development-repair-input/4", "development-repair-input/5"}:
                 source = next((item for item in bundle.registry.assets
                                if item.asset_id == receipt.source_asset.asset_id), None)
                 if source != receipt.source_asset:
                     raise _invalid("Cleaned repair input lost its original Registry source.")
+                if receipt.contract_version == "development-repair-input/5":
+                    master = next((item for item in bundle.registry.assets
+                                   if item.asset_id == receipt.master_asset.asset_id), None)
+                    if master != receipt.master_asset:
+                        raise _invalid("Viewing repair input lost its cleanup master in Registry.")
     character_ids = _unique(
         [item.character_id for item in bundle.characters], "character_id"
     )

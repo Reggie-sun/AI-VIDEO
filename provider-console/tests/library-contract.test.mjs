@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { libraryWorkspaceBatch, loadLibraryWorkspaces } from "../src/library-load-contract.js";
+import { includeLibraryTarget, libraryTargetFromSearch, libraryWorkspaceBatch, loadLibraryWorkspaces } from "../src/library-load-contract.js";
 
 import {
   buildLibraryEntries,
@@ -17,6 +17,23 @@ test("initial library reads only recent workspaces and retains explicit older se
   const batch = libraryWorkspaceBatch(workspaces, 12, requested);
   assert.equal(batch.length, 13);
   assert.equal(batch.at(-1).workspace, workspaces[100].workspace);
+});
+
+test("explicit exact-media links load a safe workspace even when bounded discovery omitted it", () => {
+  const target = libraryTargetFromSearch(`?workspace=deep-run%2Frepair%2Fproduction%2Fproject.yaml&media=${"a".repeat(64)}`);
+  assert.equal(target.workspace, "deep-run/repair/production/project.yaml");
+  assert.equal(target.sha256, "a".repeat(64));
+  const catalog = [{ workspace: "other/project.yaml" }];
+  const linked = includeLibraryTarget(catalog, target.workspace);
+  assert.equal(linked[0].requested, true);
+  assert.equal(linked[0].workspace, target.workspace);
+  assert.equal(libraryWorkspaceBatch(linked, 6, new Set())[0].workspace, target.workspace);
+  assert.deepEqual(catalog, [{ workspace: "other/project.yaml" }]);
+  assert.equal(includeLibraryTarget(linked, target.workspace).filter((item) => item.workspace === target.workspace).length, 1);
+  for (const workspace of ["../foreign/project.yaml", "/tmp/project.yaml", "a/../project.yaml", "a//project.yaml", "https://bad/project.yaml", "a\\project.yaml"]) {
+    assert.equal(libraryTargetFromSearch(`?workspace=${encodeURIComponent(workspace)}&media=${"a".repeat(64)}`).workspace, null);
+  }
+  assert.equal(libraryTargetFromSearch("?workspace=run/project.yaml&media=wrong").sha256, null);
 });
 
 test("workspace reads reserve browser connections, publish progressively and cancel queued work", async () => {
@@ -198,6 +215,25 @@ test("includes strict workspace registry videos without inventing attempt metada
   assert.deepEqual(entry.versionKeys, []);
   assert.equal(entry.contexts[0].role, "workspace_media");
   assert.equal(entry.contexts[0].title, "Greenhouse Mini · greenhouse-final");
+});
+
+test("viewing proxies stay visible while cleanup masters require explicit advanced browsing", () => {
+  const d = detail("cleanup", attempt());
+  d.attempts = [];
+  d.workspace_media = [
+    { ...media("b", "master-token"), asset_id: "master", source_kind: "cleanup_master" },
+    { ...media("c", "view-token"), asset_id: "view", source_kind: "viewing_proxy", source_master_sha256: sha("b") },
+  ];
+  const entries = buildLibraryEntries([d], null);
+  assert.equal(entries.length, 2);
+  const visible = filterLibraryEntries(entries);
+  assert.equal(visible.length, 1);
+  assert.equal(visible[0].sha256, sha("c"));
+  assert.match(visible[0].title, /修补观看版/);
+  assert.equal(visible[0].contexts[0].role, "viewing_proxy");
+  assert.equal(filterLibraryEntries(entries, { includeMasters: true }).length, 2);
+  assert.equal(visible[0].model, null);
+  assert.equal(visible[0].contexts[0].attempt, null);
 });
 
 test("only exact verified project snapshots create version groups", () => {

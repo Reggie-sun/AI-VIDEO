@@ -293,8 +293,17 @@ owner拒绝该scope；不建立第二renderer、timeline、许可或quality stat
 `video_cleanup_admission.py`经同一`bootstrap_repair_input(cleanup_plan=..., cleanup_tools=...)`准备`/4`：
 保留原`/2,/3`捕获资产和Provider probe，另封存派生bytes、local measurement、recipe和tool/protection/audio proof。
 Registry/validation重开原资产关联；派生保持UNBOUND/NOT_EVALUATED，原Production绑定与render fence覆盖它。
-`CanvasProductionService.bootstrap_video_cleanup`及同名CLI action只编排这一入口；纯职责预览展示可用的开发侧素材准备，
-不将MASK_COMPOSITE/TRACKING自动升级为已资格化Production operation。
+`video_cleanup_viewing.py`仅接受H.264 `gbrp`/`rgb24`母版输入，生成独立H.264 `yuv420p` BT.709 limited-range有损观看代理，
+以`video-cleanup-viewing-proxy/1`封存两份媒体测量、逐帧PTS、原音频PCM及stream签名、工具hash和实测色彩标签；
+代理不继承母版的逐像素证明。`video_cleanup_viewing_admission.py`只追加`development-repair-input/5`，
+严格保留原捕获与`/4`母版并验证代理到母版的bytes/receipt lineage；既有`video-clean-plate/1`、`video-cleanup/1`和`/4`不改写。
+`CanvasProductionService.bootstrap_video_cleanup`默认`viewing_proxy=True`；低层`bootstrap_repair_input(cleanup_viewing_proxy=False)`默认不生成代理。
+`CanvasProductionService`及同名CLI action只编排canonical committer入口；所有资产和receipt仍由唯一committer写入。
+`provider_console.py`显式投影`source_kind=viewing_proxy`及`source_master_sha256`，`provider-console/src/library-contract.js`
+将观看代理作为默认可见角色并把`cleanup_master`留给高级筛选。目录发现保留扫描上限；受限relative workspace加exact SHA深链
+可经既有strict detail读取被目录遗漏的目标，但不扩大文件权限或宣称索引完整。
+正常浏览器播放及人工色彩/画面检查仍是独立验收；播放成功、颜色标签、`/4`像素证明或`/5`回执均不自动产生质量通过。
+纯职责预览展示开发侧素材准备，不将MASK_COMPOSITE/TRACKING自动升级为已资格化Production operation。
 Focused verification：`tests/test_repair_input_admission.py`、`tests/test_video_cleanup_*.py`；reader/state/feedback检查组合
 由Harness policy独占。旧版本不变，派生源不改写原失败或带来新的生成许可。
 

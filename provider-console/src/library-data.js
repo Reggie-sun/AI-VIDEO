@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { attachRunsMediaIndex, readExternalCatalogResponse, runsMediaContextNotice } from "./external-media-contract.js";
-import { LIBRARY_WORKSPACE_PAGE_SIZE, libraryWorkspaceBatch, loadLibraryWorkspaces } from "./library-load-contract.js";
+import { LIBRARY_WORKSPACE_PAGE_SIZE, includeLibraryTarget, libraryTargetFromSearch, libraryWorkspaceBatch, loadLibraryWorkspaces } from "./library-load-contract.js";
 import { useLibraryLiveUpdates } from "./library-live-updates.js";
 
 async function readJson(url, signal) {
@@ -24,6 +24,7 @@ export function useLibraryData() {
   const [indexLoading, setIndexLoading] = useState(false);
   const [indexNotice, setIndexNotice] = useState("尚未执行全量关联；未确认的 Runs 绑定保持未评估。");
   const indexEnabled = useRef(false);
+  const target = useRef(libraryTargetFromSearch(typeof window === "undefined" ? "" : window.location.search));
   const workspaceLimit = useRef(LIBRARY_WORKSPACE_PAGE_SIZE);
   const requestedWorkspaces = useRef(new Set());
   const loadedWorkspaces = useRef(new Set());
@@ -67,8 +68,8 @@ export function useLibraryData() {
         runsReloadQueued.current = false;
         const body = await readJson("/api/runs", controller.signal);
         if (controller.signal.aborted) return;
-        setCatalog(body);
-        const workspaces = body.workspaces || [];
+        const workspaces = includeLibraryTarget(body.workspaces || [], target.current.workspace);
+        setCatalog({ ...body, workspaces });
         const keys = new Set(workspaces.map((item) => item.workspace));
         loadedWorkspaces.current = new Set([...loadedWorkspaces.current].filter((key) => keys.has(key)));
         const batch = libraryWorkspaceBatch(workspaces, workspaceLimit.current, new Set([...requestedWorkspaces.current, ...loadedWorkspaces.current]));
