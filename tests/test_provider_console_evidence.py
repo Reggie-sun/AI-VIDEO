@@ -322,4 +322,3 @@ def test_empty_case_projection_cannot_claim_delivery_not_established(tmp_path: P
         "scope": "selected_case_audit",
         "autonomy": "not_measured",
     }
-
