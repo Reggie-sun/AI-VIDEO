@@ -146,9 +146,11 @@ def test_prepares_and_reopens_a_strict_legacy_remote_snapshot(tmp_path):
     loaded, experience, policy, source = _legacy_source(tmp_path)
     source_payload = source.model_dump(mode="json")
     assert source.schema_version == "generation-evaluation/1"
-    assert source.source_sha256 == "19899e8635031be80b9bae82f5e3f69b28a07bc6b7a1cacc8113dc711fe83a31"
-    assert experience.evidence[0].evidence_hash == "fcb33d9b3f154c5162f50bc84f9c3a9a700186b5e4f151235e1c4b302dfe565e"
-    assert canonical_sha256(experience.model_dump(mode="json")) == "3eed2e3fb476f8a8652e72af33d6233738d83c9c1ea50539ce6a5b7479c7a402"
+    # This fixture is freshly authored, then projected into legacy receipt
+    # shape; its fingerprints include the new explicit acting input/rubric.
+    assert source.source_sha256 == "784df05b74c3a56661bc60591fa23cc8f0b96346a21cc0ef4ce7aaa9fd6c2375"
+    assert experience.evidence[0].evidence_hash == "a3dba4af5e3ab4edaf0c1a31d79a6a8ee9980272b1e40ee0c62436a402b9605e"
+    assert canonical_sha256(experience.model_dump(mode="json")) == "5332aa5109fa5fcdaabe18d57fab7c8d72c90bba927c5e5206be34e1cf84f668"
     assert "analysis_evidence" not in source_payload
     assert GenerationEvaluationSource.model_validate(source_payload).model_dump(mode="json") == source_payload
     expected = hashlib.sha256((tmp_path / "state/manifest.json").read_bytes()).hexdigest()

@@ -25,6 +25,7 @@ def canonical_expression_fixture(tmp_path, *, exact_terminal=False, source=None,
     from test_production_video_intent_validation import _complete_intent, _compatible_fl2va
     from ai_video.production.project import load_production_project
     from ai_video.production.video_requirement import ConditioningLane
+    from performance_fixture import fixture_performance_intent
 
     source = source or s._activated_source(tmp_path)
     inputs = s._edge_inputs(source, **({"boundary": s.BoundaryKind.WITHIN_CONTINUOUS_TAKE}
@@ -32,12 +33,26 @@ def canonical_expression_fixture(tmp_path, *, exact_terminal=False, source=None,
     seed = inputs["current_request"]
     # New authored target fixture: opening is sealed causal truth; closing is
     # separately authored text. Existing source and historical fixtures stay intact.
+    cast = tuple(
+        character
+        for character in seed.character_context
+        if character.character_id in seed.target_shot.character_ids
+    )
     intent = _complete_intent().model_copy(update={
         "open_state": seed.generation_intent.generation_intent.open_state,
         "close_state": TypedStateReference(kind="typed_hash", state_hash=s.causal_state_column_hash(
             s.causal_changes(), endpoint="source_close")) if close_hash else TypedStateReference(
             kind="typed_text", state_text="actors continue along the right path"),
         "pacing": Pacing(shot_duration_seconds=duration),
+        "performance_intent": fixture_performance_intent(
+            cast,
+            trigger="the authored action moves toward its terminal state",
+            emotion="quiet concentration",
+            facial_expression="attentive eyes and an unforced neutral mouth",
+            gaze_target="the authored path toward screen right",
+            breathing="gentle breathing consistent with the walking posture",
+            body_behavior="balanced posture during the authored action and settle",
+        ),
         "ambience_intent": AmbienceIntent(environment_bed="none", explicitly_silent=True),
     })
     if equal_close:
@@ -261,8 +276,9 @@ def test_text_bytes_unchanged_with_no_hash_path(causal_fixture):
     assert result.outcome == "compiled"
     assert result.prompt_sha256 == hashlib.sha256(result.prompt_text.encode()).hexdigest()
     assert result == compile_remote_video_prompt(text, provider_bound=causal_fixture["provider_bound"])
-    # Baseline golden was measured before adding the hash expression path.
-    assert result.prompt_sha256 == "79551dcfe71dd0e72005c4c65cc38dea3bed5daf73cfcdd3dbe3cc05f4fba209"
+    # This authored fixture now includes an explicit performance direction;
+    # the open-state hash expression remains absent from the compiled prose.
+    assert result.prompt_sha256 == "b6e02f1ac3f995c0c373cf5ac80e56d0f0db67392cf6762433c7c36490c4d983"
 
 
 def test_normal_metaso_ref2va_native_body_hash_is_unchanged():
@@ -397,6 +413,7 @@ def metaso_canonical_fixture(tmp_path, monkeypatch, *, target_acceptance=False):
         from ai_video.production.state_commit import ProductionStateCommitter
         from ai_video.production.generation_recipe import RequirementExpression
         from test_production_generation_decision import acceptance_policy
+        from performance_fixture import acceptance_with_fixture_performance
 
         # A new target rubric is authored in this temporary fixture. The
         # accepted source's old close-hash rubric and evidence stay immutable.
@@ -411,11 +428,31 @@ def metaso_canonical_fixture(tmp_path, monkeypatch, *, target_acceptance=False):
         from ai_video.production.models import GenerationEvaluationAuthority
 
         updated = seal_artifact(current.model_copy(update={"revision": current.revision + 1,
-            "content_hash": "0" * 64, "generation_acceptance": acceptance_policy((duration, opening)),
+            "content_hash": "0" * 64, "generation_acceptance": acceptance_with_fixture_performance(
+                acceptance_policy((duration, opening))),
             "generation_evaluation_authorities": (*current.generation_evaluation_authorities,
                 GenerationEvaluationAuthority(evaluator=current.semantic_authorities[0], proof="human"))}))
         ProductionStateCommitter(tmp_path).activate_qa_policy(updated,
             expected_manifest_revision=loaded.manifest.manifest_revision, attempt_id="authored-target-qa")
+    else:
+        from ai_video.production.hashing import seal_artifact
+        from ai_video.production.state_commit import ProductionStateCommitter
+        from performance_fixture import acceptance_with_fixture_performance
+
+        loaded = load_production_project(tmp_path / "project.yaml")
+        current = loaded.qa_policy
+        acceptance = acceptance_with_fixture_performance(current.generation_acceptance)
+        if acceptance != current.generation_acceptance:
+            updated = seal_artifact(current.model_copy(update={
+                "revision": current.revision + 1,
+                "content_hash": "0" * 64,
+                "generation_acceptance": acceptance,
+            }))
+            ProductionStateCommitter(tmp_path).activate_qa_policy(
+                updated,
+                expected_manifest_revision=loaded.manifest.manifest_revision,
+                attempt_id="fixture-performance-qa",
+            )
     return provider, canonical_expression_fixture(tmp_path, source=source, duration=6)
 
 

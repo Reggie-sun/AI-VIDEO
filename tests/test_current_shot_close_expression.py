@@ -77,6 +77,7 @@ def fresh_fixture(tmp_path, monkeypatch):
     from ai_video.production.state_commit import ProductionStateCommitter
     from ai_video.production.hashing import seal_artifact
     from ai_video.production.models import GenerationEvaluationAuthority
+    from performance_fixture import acceptance_with_fixture_performance
 
     provider, fixture = metaso_canonical_fixture(tmp_path, monkeypatch)
     request, bound = fixture["request"], fixture["provider_bound"]
@@ -106,7 +107,8 @@ def fresh_fixture(tmp_path, monkeypatch):
     committer = ProductionStateCommitter(tmp_path)
     loaded = load_production_project(tmp_path / "project.yaml")
     qa = seal_artifact(loaded.qa_policy.model_copy(update={"revision": loaded.qa_policy.revision + 1,
-        "content_hash": "0" * 64, "generation_acceptance": marked_policy([rule]),
+        "content_hash": "0" * 64,
+        "generation_acceptance": acceptance_with_fixture_performance(marked_policy([rule])),
         "generation_evaluation_authorities": (GenerationEvaluationAuthority(
             evaluator=loaded.qa_policy.semantic_authorities[0], proof="analyzer"),)}))
     committer.activate_qa_policy(qa, expected_manifest_revision=loaded.manifest.manifest_revision,
@@ -234,10 +236,11 @@ def test_close_qa_item_contains_exact_preimage_and_rejects_missing_input(tmp_pat
         qa_policy_content_hash=f["loaded"].qa_policy.content_hash,
         request_hash=f["prepared"].resolved_request.request_input_hash,
         artifact_sha256="c" * 64, size_bytes=32)
-    rule = candidate.recipe.expressions[0]
+    rule = next(item for item in candidate.recipe.expressions if item.requirement_id == "causal-close")
     assert rule.intent_paths == ("generation_intent.close_state.state_hash",)
     assert rule.observable == f["requirement"].generation_intent.close_state.state_hash
-    item, = evaluation_items(**values, requirement=f["requirement"])
+    item = next(item for item in evaluation_items(**values, requirement=f["requirement"])
+        if item.requirement_id == "causal-close")
     assert item.observable == rule.observable
     assert all(fact in item.question_text for fact in close_facts().values())
     with pytest.raises(ValueError, match="preimage"):
@@ -255,25 +258,33 @@ def test_evaluator_reopen_rejects_hash_only_stale_or_other_shot_truth(tmp_path, 
     acceptance, qa = candidate.recipe.acceptance_policy, f["loaded"].qa_policy
     values = dict(acceptance=acceptance, qa_policy_content_hash=qa.content_hash,
         request_hash=f["prepared"].resolved_request.request_input_hash, artifact_sha256="c" * 64, size_bytes=32)
-    item, = evaluation_items(**values, requirement=f["requirement"])
-    def source_for(question):
+    items = evaluation_items(**values, requirement=f["requirement"])
+    close_item = next(item for item in items if item.requirement_id == "causal-close")
+    authored_close_rule = next(item for item in acceptance.profile_payload["generation_requirements"]
+        if item["requirement_id"] == "causal-close")
+    def source_for(questions):
+        observations = tuple(GenerationObservation(
+            requirement_id=question.requirement_id, verdict="PASS", observation="scripted offline answer",
+            evaluation_item_hash=question.evaluation_item_hash, question_text=question.question_text,
+            presentation_ref="fixture/question", answer_ref="fixture/answer")
+            for question in questions)
         source = GenerationEvaluationSource(schema_version="generation-evaluation/2",
             request_hash=values["request_hash"], artifact_sha256="c" * 64, size_bytes=32,
             rubric_hash=acceptance.profile_content_hash, qa_policy_content_hash=qa.content_hash, qa_policy_snapshot=qa,
-            evaluator=qa.semantic_authorities[0], proof="analyzer", observations=(GenerationObservation(
-                requirement_id=question.requirement_id, verdict="PASS", observation="scripted offline answer",
-                evaluation_item_hash=question.evaluation_item_hash, question_text=question.question_text,
-                presentation_ref="fixture/question", answer_ref="fixture/answer"),))
+            evaluator=qa.semantic_authorities[0], proof="analyzer", observations=observations)
         return source.model_copy(update={"presentation_evidence": PresentationEvidence(namespace="controlled-evaluator/1",
             interaction_ref="fixture", presentation_ref="fixture/question", answer_ref="fixture/answer",
             event_order=("presentation", "answer"), actor_name=source.evaluator.name, actor_version=source.evaluator.version,
-            items=(question,), answers_json=json.dumps(source.answer_payload()))})
-    source = source_for(item)
-    assert project_generation_evaluation_sources(sources=(source,), acceptance=acceptance,
-        requirement=f["requirement"])[0][0].verdict == "PASS"
-    for measurement in (candidate.recipe.expressions[0].measurement, item.measurement + " stale fact"):
+            items=tuple(questions), answers_json=json.dumps(source.answer_payload()))})
+    source = source_for(items)
+    findings, _ = project_generation_evaluation_sources(sources=(source,), acceptance=acceptance,
+        requirement=f["requirement"])
+    assert next(item for item in findings if item.requirement_id == "causal-close").verdict == "PASS"
+    for measurement in (authored_close_rule["measurement"], close_item.measurement + " stale fact"):
+        changed = tuple(question.model_copy(update={"measurement": measurement})
+            if question.requirement_id == "causal-close" else question for question in items)
         with pytest.raises(ValueError, match="canonical evaluation items"):
-            project_generation_evaluation_sources(sources=(source_for(item.model_copy(update={"measurement": measurement})),),
+            project_generation_evaluation_sources(sources=(source_for(changed),),
                 acceptance=acceptance, requirement=f["requirement"])
     with pytest.raises(ValueError, match="preimage"):
         project_generation_evaluation_sources(sources=(source,), acceptance=acceptance)
@@ -384,15 +395,23 @@ def test_offline_fresh_source_raw_pass_activation_terminal_and_reopen(tmp_path, 
         requirement=f["requirement"])
     def scripted_evaluation(presented):
         assert presented.request is None and presented.projection is None and presented.recipe is None
-        item, = presented.evaluation_items
-        assert all(fact in item.question_text for fact in close_facts().values())
+        close_item = next(item for item in presented.evaluation_items if item.requirement_id == "causal-close")
+        assert all(fact in close_item.question_text for fact in close_facts().values())
+        observations = []
+        for item in presented.evaluation_items:
+            observation = {
+                "causal-close": "Scripted complete close-state PASS; no live quality claim",
+                "duration": "Scripted fixture duration observation; no media qualification",
+                "performance": "Scripted explicit actor-performance observation; no live quality claim",
+            }[item.requirement_id]
+            observations.append(GenerationObservation(
+                requirement_id=item.requirement_id, verdict="PASS", observation=observation,
+                question_text=item.question_text, evaluation_item_hash=item.evaluation_item_hash,
+                presentation_ref=presented.presentation_ref, answer_ref=presented.answer_ref))
         return (GenerationEvaluationSource(schema_version="generation-evaluation/2",
             request_hash=resolved.request_input_hash, artifact_sha256=digest, size_bytes=len(e.FIXTURE.read_bytes()),
             rubric_hash=candidate.recipe.rubric_hash, qa_policy_content_hash=qa.content_hash, qa_policy_snapshot=qa,
-            evaluator=qa.semantic_authorities[0], proof="analyzer", observations=(GenerationObservation(
-                requirement_id="causal-close", verdict="PASS", observation="Scripted complete close-state PASS; no live quality claim",
-                question_text=item.question_text, evaluation_item_hash=item.evaluation_item_hash,
-                presentation_ref=presented.presentation_ref, answer_ref=presented.answer_ref),)),)
+            evaluator=qa.semantic_authorities[0], proof="analyzer", observations=tuple(observations)),)
     verified = asyncio.run(ControlledPresentationVerifier(evaluator=qa.semantic_authorities[0], proof="analyzer",
         adjudicate=scripted_evaluation).present_and_verify(review_input=GenerationReviewInput(
             resolved, prepared.execution_binding.projection, candidate.recipe, qa, None, items),

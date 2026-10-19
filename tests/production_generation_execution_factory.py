@@ -126,9 +126,12 @@ class NativeFixtureVideoProvider(ScriptedFakeVideoProvider):
                 f"Hand behavior: {performance_intent.hand_behavior}.",
                 f"Terminal performance state: {performance_intent.terminal_performance_state}.",
             ))
-            prompt_text = "\n\n".join(part for part in (
-                prompt_text, coarse_performance, performance_block
-            ) if part)
+            # Some repair fixtures start from an already compiled baseline.
+            # Recompilation must preserve those exact input bytes rather than
+            # introduce an unrelated prompt delta by duplicating acting text.
+            for part in (coarse_performance, performance_block):
+                if part and part not in prompt_text:
+                    prompt_text = "\n\n".join(filter(None, (prompt_text, part)))
         controls = (("generation_intent.close_state.state_hash", "generation_intent.close_causal_facts")
             if requirement.generation_intent.close_causal_facts is not None else ())
         if performance_block:

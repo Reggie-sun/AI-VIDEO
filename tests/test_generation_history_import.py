@@ -19,6 +19,21 @@ def _setup(tmp_path):
     source_root.mkdir()
     target_root.mkdir()
     source, experience, policy, evaluation = _legacy_source(source_root)
+    # This repair scenario needs a complete known verdict for the modern
+    # fixture rubric; the duration failure remains the historical baseline.
+    from ai_video.production.generation_evaluation import GenerationEvaluationSource, GenerationObservation
+    semantic = GenerationEvaluationSource(
+        request_hash=evaluation.request_hash, artifact_sha256=evaluation.artifact_sha256,
+        rubric_hash=evaluation.rubric_hash, qa_policy_content_hash=policy.content_hash,
+        evaluator=policy.semantic_authorities[0], proof="analyzer",
+        observations=(GenerationObservation(requirement_id="performance", verdict="PASS",
+            observation="Synthetic imported fixture cast followed its authored acting."),),
+    )
+    evidence = experience.evidence[0].model_copy(update={
+        "findings": (*evaluation.project_findings(), *semantic.project_findings()),
+    })
+    experience = type(experience).model_validate({**experience.model_dump(mode="python"),
+        "evidence": (evidence,), "evaluation_sources": (evaluation, semantic)})
     _, provider, request, template, preview, writer = _runtime(target_root)
     loaded = load_production_project(target_root / "project.yaml")
     if loaded.qa_policy != policy:
@@ -33,8 +48,9 @@ def _setup(tmp_path):
         expected_source_manifest_sha256=hashlib.sha256((source_root / "state/manifest.json").read_bytes()).hexdigest(),
         import_id="import-legacy", source_attempt_id=ATTEMPT_ID,
         experience=experience, source_documents=(document,), evidence_root=source_root,
-        evaluation_source_attributions=(ImportedGenerationEvaluationSourceAttribution(
-            evaluation_source_sha256=evaluation.source_sha256, document_sha256s=(document.sha256,)),),
+        evaluation_source_attributions=tuple(ImportedGenerationEvaluationSourceAttribution(
+            evaluation_source_sha256=item.source_sha256, document_sha256s=(document.sha256,))
+            for item in experience.evaluation_sources),
         actor=ActorIdentity(actor_id="test-importer", actor_kind="automation"),
     )
     return source_root, target_root, source, provider, request, template, preview, writer, kwargs

@@ -516,7 +516,7 @@ def _activate_canvas_control_acceptance(service, *, control=None, native_text=()
             observable=spec["observable"],
             tolerance="preserve the authored target and its mapped inputs",
             measurement="inspect the exact compiler input and native bindings",
-            proof="technical",
+            proof=spec.get("proof", "technical"),
             intent_paths=list(spec["intent_paths"]),
             native_text=list(spec["native_text"]),
             production_owner="qa_acceptance",
@@ -593,7 +593,16 @@ def _canvas_control_service(tmp_path, *, scenario, provider_family, missing_frag
         "space-layout": (scopes["room"],),
         "native-duration": (),
     }
+    from ai_video.production.performance_direction import render_performance_direction
+    expected_text["character-performance"] = (
+        render_performance_direction(requirement.generation_intent.performance_intent),
+    )
     rules = (
+        {"requirement_id": "character-performance", "dimension": "character_performance",
+         "observable": "The cast performs the authored expression, gaze and physical response.",
+         "proof": "analyzer", "intent_paths": ["generation_intent.performance_intent"],
+         "native_text": expected_text["character-performance"],
+         "input_control": GenerationInputControl(mechanism="prompt_guidance").model_dump(mode="json")},
         {"requirement_id": "action-deadline", "dimension": "action_timing",
          "observable": "The character completes the authored action by its deadline.",
          "intent_paths": ["generation_intent.subject_action.progression"],
@@ -660,6 +669,7 @@ def test_reference_guidance_and_authored_deadline_reach_each_shared_native_compi
         "aux-identity": "reference_guidance",
         "space-layout": "reference_guidance",
         "native-duration": "native_output",
+        "character-performance": "prompt_guidance",
     }
     assert {requirement_id: rule.native_text for requirement_id, rule in rules.items()} == fragments
     assert {requirement_id: rule.input_control.references[0].asset_id

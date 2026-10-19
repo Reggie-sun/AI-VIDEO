@@ -262,7 +262,7 @@ def test_reference_preview_resolves_numeric_intent_path_segments():
     setup, _, _, _, orchestrator = feedback_setup()
     prepared = orchestrator.prepare(limits=setup["inputs"].limits)
     requirement = SimpleNamespace(requirement_hash=prepared.resolved_request.requirement_hash,
-        asset_evidence=(), generation_intent={"subjects": [{"name": "Courier"}]})
+        asset_evidence=(), characters=(), generation_intent={"subjects": [{"name": "Courier"}]})
     source = prepared.inputs.candidates[0].recipe.expressions[0]
     rule = source.model_copy(update={"intent_paths": ("generation_intent.subjects.0.name",)})
 
@@ -375,7 +375,8 @@ def test_video_binding_is_whitebox_only_with_explicit_whitebox_duty():
         width=binding.width, height=binding.height, duration_millis=binding.duration_millis,
         fps=binding.fps)
     requirement = SimpleNamespace(requirement_hash=request.requirement_hash,
-        asset_evidence=(evidence,), generation_intent=SimpleNamespace(model_dump=lambda mode: {}))
+        asset_evidence=(evidence,), characters=(), generation_intent=SimpleNamespace(
+            performance_intent=None, model_dump=lambda mode: {}))
     prompt = request.prompt_text
 
     def report(purpose, role="video_reference"):
@@ -453,6 +454,7 @@ def test_same_asset_opening_and_closing_duties_join_only_their_native_role():
     resolved = provider.resolve(request)
     evidence = tuple(AssetEvidence(**binding.model_dump(mode="python")) for binding in (first, last))
     requirement = SimpleNamespace(requirement_hash=resolved.requirement_hash, asset_evidence=evidence,
+        characters=(), generation_intent=None,
         semantic_reference_roles=tuple(item.role for item in evidence))
     rules = tuple(RequirementExpression(requirement_id=role, level="acceptance", stage="raw_generation",
         dimension="composition", observable="The authored endpoint image is supplied.",

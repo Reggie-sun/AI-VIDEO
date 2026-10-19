@@ -215,6 +215,7 @@ Agent 制作有人物的镜头时，必须在 `generation.generation_intent.perf
 对应 selected QA 的 required `acceptance/raw_generation` 条目，使用 `analyzer` 或 `human` 观察原片表演，
 `intent_paths` 绑定整个 `generation_intent.performance_intent.character_directions`，或覆盖相关人物的全部阶段字段。
 technical probe、recipe hint、diagnostic 或只覆盖视线的条目不能代替完整表演验收。
+按组件生成时，表演映射必须进入所选组件的 generation acceptance；顶层 QA 清单不能替代该组件的验收。
 
 rich remote/local H3 编译器将同一表演方向机械转为原生文字。preserved-source 路线必须先在新作者版本中
 显式写入完整确定性表演段落，并保留 coarse 六字段的原句；pure

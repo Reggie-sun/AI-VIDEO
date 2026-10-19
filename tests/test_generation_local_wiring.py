@@ -104,6 +104,21 @@ def _projection(setup, output, *, image_to_video=False):
 
 
 def _prepare(*, provider, profile, compiler, output, setup, projection):
+    from performance_fixture import acceptance_with_fixture_performance, fixture_performance_intent
+    if projection.requirement.characters:
+        requirement = projection.requirement
+        intent = requirement.generation_intent.model_copy(update={
+            "performance_intent": fixture_performance_intent(requirement.characters,
+                trigger="the authored hand action begins", emotion="concentration",
+                facial_expression="brows soften while the lips stay relaxed",
+                gaze_target="the authored hand action", breathing="steady quiet breathing",
+                body_behavior="a small weight shift follows the hand action"),
+        })
+        projection = _replace_requirement(projection,
+            generation_intent=intent, generation_intent_hash=canonical_sha256({
+                "schema": "provider-neutral-generation-intent/2",
+                "generation_intent": intent.model_dump(mode="json"),
+            }))
     lifecycle = setup["lifecycle"]
     if projection.requirement.generation_mode is GenerationMode.IMAGE_TO_VIDEO:
         first = setup["context"].shot_keyframe
@@ -112,7 +127,8 @@ def _prepare(*, provider, profile, compiler, output, setup, projection):
                             setup["context"].target_shot_id, first.asset_id)),)})
     current = {**{key: value for key, value in setup.items() if key != "inputs"},
                "projection": projection, "lifecycle": lifecycle,
-               "acceptance": _acceptance()}
+               "acceptance": acceptance_with_fixture_performance(_acceptance())
+                   if projection.requirement.characters else _acceptance()}
     limits = setup["inputs"].limits.model_copy(update={
         "allowed_remote_candidates": (),
     })

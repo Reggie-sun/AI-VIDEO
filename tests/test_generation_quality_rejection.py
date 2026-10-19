@@ -53,6 +53,19 @@ def _fetched_experience(tmp_path, *, verdict="FAIL"):
     """Use the standard remote/metered fixture through fetched VALIDATE."""
     _, original, _, source = _legacy_source(tmp_path, strip_binding=False)
     candidate = original.candidate
+    timing_rule = next(
+        rule for rule in candidate.recipe.expressions
+        if rule.dimension == "timing" and rule.level == "acceptance"
+    )
+    performance_rule = next(
+        rule for rule in candidate.recipe.expressions
+        if rule.dimension == "character_performance" and rule.level == "acceptance"
+    )
+    performance = original.projection.requirement.generation_intent.performance_intent
+    assert performance is not None and performance.character_directions
+    assert performance_rule.stage == "raw_generation"
+    assert performance_rule.proof == "analyzer"
+    assert "generation_intent.performance_intent" in performance_rule.intent_paths
     source = GenerationEvaluationSource(
         request_hash=source.request_hash,
         artifact_sha256=source.artifact_sha256,
@@ -61,19 +74,32 @@ def _fetched_experience(tmp_path, *, verdict="FAIL"):
         evaluator=source.evaluator,
         proof=source.proof,
         observations=(GenerationObservation(
-            requirement_id=candidate.recipe.expressions[0].requirement_id,
+            requirement_id=timing_rule.requirement_id,
             verdict=verdict,
             observation="Exact retained evaluator records the visibly malformed hand.",
         ),),
     )
+    performance_source = GenerationEvaluationSource(
+        request_hash=source.request_hash,
+        artifact_sha256=source.artifact_sha256,
+        rubric_hash=source.rubric_hash,
+        qa_policy_content_hash=source.qa_policy_content_hash,
+        evaluator=source.evaluator,
+        proof="analyzer",
+        observations=(GenerationObservation(
+            requirement_id=performance_rule.requirement_id,
+            verdict="PASS",
+            observation="Explicit offline fixture analyzer covers the authored actor directions.",
+        ),),
+    )
     evidence = original.evidence[0].model_copy(
-        update={"findings": source.project_findings()}
+        update={"findings": (*source.project_findings(), *performance_source.project_findings())}
     )
     experience = GenerationExperience(
         projection=original.projection,
         candidate=candidate,
         evidence=(evidence,),
-        evaluation_sources=(source,),
+        evaluation_sources=(source, performance_source),
     )
     committer = ProductionStateCommitter(tmp_path)
     committer.record_generation_experience(
@@ -102,16 +128,24 @@ def _fetched_mixed_failure(tmp_path):
     }))
     committer.activate_qa_policy(policy, expected_manifest_revision=loaded.manifest.manifest_revision,
                                  attempt_id="mixed-failure-authority")
-    technical = original.evaluation_sources[0].model_copy(update={"qa_policy_content_hash": policy.content_hash})
-    human = technical.model_copy(update={
+    timing = next(
+        source for source in original.evaluation_sources
+        if source.proof == "technical"
+    ).model_copy(update={"qa_policy_content_hash": policy.content_hash})
+    performance = next(
+        source for source in original.evaluation_sources
+        if source.proof == "analyzer"
+    ).model_copy(update={"qa_policy_content_hash": policy.content_hash})
+    human = timing.model_copy(update={
         "proof": "human",
-        "observations": (GenerationObservation(requirement_id="duration", verdict="FAIL",
+        "observations": (GenerationObservation(requirement_id=timing.observations[0].requirement_id, verdict="FAIL",
             observation="Viewer rejects the usable duration; technical measurement is irrecoverable."),),
     })
     experience = original.model_copy(update={
-        "evaluation_sources": (technical, human),
+        "evaluation_sources": (timing, human, performance),
         "evidence": (original.evidence[0].model_copy(update={
-            "findings": (*technical.project_findings(), *human.project_findings()),
+            "findings": (*timing.project_findings(), *human.project_findings(),
+                         *performance.project_findings()),
         }),),
     })
     committer.record_generation_experience(attempt_id=ATTEMPT_ID, experience=experience)
@@ -124,14 +158,15 @@ def test_abandon_preserves_mixed_diagnosis_paid_state_and_exact_replay(tmp_path)
     committer, experience, manifest, before = _fetched_mixed_failure(tmp_path)
     state = before.video_generation_state
     assert tuple(source.schema_version for source in experience.evaluation_sources) == (
-        "generation-evaluation/1", "generation-evaluation/1",
+        "generation-evaluation/1", "generation-evaluation/1", "generation-evaluation/1",
     )
     assert tuple(source.source_sha256 for source in experience.evaluation_sources) == (
-        "774cf3ccb881ff2ce8b78012ea073372c94ac90e22f2e6c70156059eb3165a16",
-        "70c1618d31429fc61c8f3e805270a7118af3600df8fbddd5e1a85ecee309a34a",
+        "0709007fb737c6d5178c07c034a97b74fe0cd332fb8be426942751efeeb078e1",
+        "16597ee4ebe53f56e8f11854c73ef44fc768d7f1505619285da4922ab2086676",
+        "53332622ceb3527a363137c3418e47a7693f003fecb0b76c757c721d359648ee",
     )
-    assert experience.evidence[0].evidence_hash == "4e0a16eecf34667db896c204d7ad10b489994580772cedf8c70c66bed19c64ca"
-    assert canonical_sha256(experience.model_dump(mode="json")) == "3f312234a508cd1375495729688aab51011937a1e5b31959fa3a22e78f66687b"
+    assert experience.evidence[0].evidence_hash == "eddaf22e2c042f5fbf18362929c0d2b86392561212a89e1979e256570dff77f7"
+    assert canonical_sha256(experience.model_dump(mode="json")) == "746400440e280d44e87ca425d84b59a41eca76de82c6ca9362e7ef01369106a9"
     assert diagnose_exact_result(
         experience.evidence[0], experience.evidence, experience.candidate.recipe
     ).failure_classes == ("EVIDENCE_GAP", "QUALITY_FAILURE")
@@ -202,8 +237,10 @@ def test_abandoned_result_reaches_router_without_erasing_gap_or_authorizing_subm
     result = router.resolve_requirement(**args, inputs=inputs)
     assert result.disposition == "REASSESS_FEASIBILITY"
     assert result.diagnosis.failure_classes == ("EVIDENCE_GAP", "QUALITY_FAILURE")
+    assert result.diagnosis.preserved_requirements == ("performance",)
     proposal = Intervention(intervention_id="repair-after-abandonment", candidate_id="selected",
         purpose="resample", disposition="GENERATE_ONCE", closes=("duration",),
+        protected_requirements=("performance",),
         support=(evidence.evidence_hash,), changed_variables=("seed",), held_constants=(),
         uncontrolled_variables=(), regression_risks=("all source requirements need new proof",),
         hypothesis="One bounded new sample may repair the rejected duration.", confidence_basis="observed failure",
@@ -436,16 +473,18 @@ def test_closed_quality_attempt_refuses_direct_new_feedback_without_writes(tmp_p
     )
     source = experience.evaluation_sources[0].model_copy(update={
         "observations": (GenerationObservation(
-            requirement_id=experience.candidate.recipe.expressions[0].requirement_id,
+            requirement_id=experience.evaluation_sources[0].observations[0].requirement_id,
             verdict="FAIL",
             observation="A later evaluator cannot alter a closed quality decision.",
         ),),
     })
+    sources = (source, *experience.evaluation_sources[1:])
     changed = experience.model_copy(update={
         "evidence": (experience.evidence[0].model_copy(
-            update={"findings": source.project_findings()}
+            update={"findings": tuple(finding for item in sources
+                                       for finding in item.project_findings())}
         ),),
-        "evaluation_sources": (source,),
+        "evaluation_sources": sources,
     })
     before = {
         path.relative_to(tmp_path): path.read_bytes()
@@ -572,11 +611,13 @@ def test_standard_reader_rejects_resealed_unauthorized_evaluator(tmp_path):
     source = experience.evaluation_sources[0].model_copy(update={
         "evaluator": ToolIdentity(name="not-selected-by-qa", version="1"),
     })
+    sources = (source, *experience.evaluation_sources[1:])
     forged_experience = experience.model_copy(update={
         "evidence": (experience.evidence[0].model_copy(
-            update={"findings": source.project_findings()}
+            update={"findings": tuple(finding for item in sources
+                                       for finding in item.project_findings())}
         ),),
-        "evaluation_sources": (source,),
+        "evaluation_sources": sources,
     })
     experience_hash = canonical_sha256(forged_experience.model_dump(mode="json"))
     experience_payload = _canonical_json_bytes(forged_experience)

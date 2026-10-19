@@ -87,6 +87,7 @@ from test_generation_quality_rejection import ACTOR
 from test_generation_quality_rejection import _fetched_experience
 from test_production_planning_generation import _generation_target
 from test_production_video import _paid_authorization, _paid_preview
+from performance_fixture import fixture_performance_expression
 
 
 def _component_acceptance(global_acceptance, *, profile_id="component-specific-generation"):
@@ -122,7 +123,7 @@ def _component_experience(
         _component_acceptance(global_acceptance, profile_id=qa_profile_id)
         if qa_profile_id else component_acceptance
     )
-    requirement_id = global_acceptance.required_requirement_ids[0]
+    requirement_ids = global_acceptance.required_requirement_ids
     task_id = binding.inputs.limits.task_id
     parent = loaded.shots[1]
     parent_ref = loaded.project.artifacts.shots[1]
@@ -132,10 +133,10 @@ def _component_experience(
         parent_shot_content_hash=parent.content_hash,
         task_id=task_id,
         parent_acceptance_hash=global_acceptance.profile_content_hash,
-        parent_requirement_ids=(requirement_id,),
+        parent_requirement_ids=requirement_ids,
         components=(ComponentRequirementAllocation(
             component_id="component-visual",
-            requirement_ids=(requirement_id,),
+            requirement_ids=requirement_ids,
             generation_acceptance=selected_component_acceptance,
         ),),
     )
@@ -188,29 +189,30 @@ def _component_experience(
         "rubric_hash": component_acceptance.profile_content_hash,
     })
     binding = binding.model_copy(update={"projection": projection, "inputs": inputs})
-    source = original.evaluation_sources[0].model_copy(update={
+    sources = tuple(source.model_copy(update={
         "rubric_hash": component_acceptance.profile_content_hash,
         "qa_policy_content_hash": qa_policy.content_hash,
-    })
+    }) for source in original.evaluation_sources)
     evidence = original.evidence[0].model_copy(update={
         "recipe_scope_hash": candidate.scope_hash,
         "facts_hash": canonical_sha256(requirement.model_dump(
             mode="json", exclude={"requirement_id", "requirement_hash"}
         )),
         "rubric_hash": component_acceptance.profile_content_hash,
-        "findings": source.project_findings(),
+        "findings": tuple(finding for source in sources
+                           for finding in source.project_findings()),
     })
     experience = GenerationExperience(
         projection=projection,
         candidate=candidate,
         evidence=(evidence,),
-        evaluation_sources=(source,),
+        evaluation_sources=sources,
     )
-    return binding, experience, evidence, source, qa_policy
+    return binding, experience, evidence, sources, qa_policy
 
 
 def test_component_rubric_is_used_for_quality_rejection_validation(tmp_path):
-    binding, experience, evidence, source, qa_policy = _component_experience(tmp_path)
+    binding, experience, evidence, sources, qa_policy = _component_experience(tmp_path)
 
     diagnosis = validate_quality_rejection_experience(
         binding=binding,
@@ -221,7 +223,7 @@ def test_component_rubric_is_used_for_quality_rejection_validation(tmp_path):
         artifact_sha256=evidence.artifact_sha256,
         qa_policy=qa_policy,
         history=(evidence,),
-        evaluation_sources=(source,),
+        evaluation_sources=sources,
     )
 
     assert diagnosis.failure_classes == ("QUALITY_FAILURE",)
@@ -239,15 +241,18 @@ def test_component_quality_rejection_mismatches_fail_without_writes(tmp_path, mi
         kwargs["lineage_allocation_hash"] = "0" * 64
     elif mismatch == "selected-authority":
         kwargs["qa_profile_id"] = "different-selected-component-rubric"
-    binding, experience, evidence, source, qa_policy = _component_experience(
+    binding, experience, evidence, sources, qa_policy = _component_experience(
         tmp_path, **kwargs,
     )
     if mismatch == "rubric":
-        source = source.model_copy(update={"rubric_hash": "0" * 64})
-        evidence = evidence.model_copy(update={"findings": source.project_findings()})
+        sources = (sources[0].model_copy(update={"rubric_hash": "0" * 64}), *sources[1:])
+        evidence = evidence.model_copy(update={
+            "findings": tuple(finding for source in sources
+                               for finding in source.project_findings()),
+        })
         experience = experience.model_copy(update={
             "evidence": (evidence,),
-            "evaluation_sources": (source,),
+            "evaluation_sources": sources,
         })
     before = {
         path.relative_to(tmp_path): path.read_bytes()
@@ -264,7 +269,7 @@ def test_component_quality_rejection_mismatches_fail_without_writes(tmp_path, mi
             artifact_sha256=evidence.artifact_sha256,
             qa_policy=qa_policy,
             history=(evidence,),
-            evaluation_sources=(source,),
+            evaluation_sources=sources,
         )
 
     after = {
@@ -277,7 +282,7 @@ def test_component_quality_rejection_mismatches_fail_without_writes(tmp_path, mi
 def _component_generation_acceptance(
     *, profile_id="strategy-component-generation-quality-close",
 ):
-    rule = RequirementExpression(
+    visual_rule = RequirementExpression(
         requirement_id="visual",
         level="acceptance",
         stage="raw_generation",
@@ -289,14 +294,19 @@ def _component_generation_acceptance(
         production_owner="generation",
         intent_paths=("target_shot.shot_id",),
     )
+    performance_rule = fixture_performance_expression()
+    requirements = tuple(sorted((performance_rule, visual_rule),
+                                key=lambda item: item.requirement_id))
+    requirement_ids = tuple(rule.requirement_id for rule in requirements)
     payload = {
         "domain_id": "strategy-test",
         "profile_id": profile_id,
         "profile_version": "1",
         "measurement_contract_version": "strategy-test/1",
-        "required_requirement_ids": ("visual",),
-        "generation_requirements": (
-            rule.model_dump(mode="json", exclude={"native_text"}),
+        "required_requirement_ids": requirement_ids,
+        "generation_requirements": tuple(
+            rule.model_dump(mode="json", exclude={"native_text"})
+            for rule in requirements
         ),
     }
     digest = canonical_sha256(payload)
@@ -307,17 +317,22 @@ def _component_generation_acceptance(
         profile_content_hash=digest,
         profile_payload={**payload, "content_hash": digest},
         measurement_contract_version="strategy-test/1",
-        required_requirement_ids=("visual",),
+        required_requirement_ids=requirement_ids,
     )
 
 
 def _parent_visual_acceptance():
+    performance_rule = fixture_performance_expression()
+    requirement_ids = ("performance", "visual")
     payload = {
         "domain_id": "component-quality-close",
         "profile_id": "component-quality-close-final",
         "profile_version": "1",
         "measurement_contract_version": "component-quality-close/1",
-        "required_requirement_ids": ("visual",),
+        "required_requirement_ids": requirement_ids,
+        "generation_requirements": (
+            performance_rule.model_dump(mode="json", exclude={"native_text"}),
+        ),
         "source_use_requirements": ({
             "requirement_id": "visual",
             "proof": "technical",
@@ -332,7 +347,7 @@ def _parent_visual_acceptance():
         profile_content_hash=digest,
         profile_payload={**payload, "content_hash": digest},
         measurement_contract_version=payload["measurement_contract_version"],
-        required_requirement_ids=("visual",),
+        required_requirement_ids=requirement_ids,
     )
 
 
@@ -350,7 +365,7 @@ def _persist_video_component_authoring(tmp_path, *, legacy_shared_rubric=False):
         shot_id=child_shot_id,
         intent="Generate the authored component visual.",
         duration_frames=duration_frames,
-        requirement_ids=("visual",),
+        requirement_ids=("performance", "visual"),
         source_options=(),
     )
     coverage = ProductionCoverage(
@@ -361,7 +376,7 @@ def _persist_video_component_authoring(tmp_path, *, legacy_shared_rubric=False):
     intent = ProductionIntent(
         task_id=task_id,
         allowed_operations=(ProductionOperation.GENERATE_FULL_SHOT,),
-        protected_requirement_ids=("visual",),
+        protected_requirement_ids=("performance", "visual"),
         coverage_options=(coverage,),
         assembly_requirement_ids=("visual",) if legacy_shared_rubric else (),
     )
@@ -440,10 +455,10 @@ def _persist_video_component_authoring(tmp_path, *, legacy_shared_rubric=False):
         parent_shot_content_hash=parent.content_hash,
         task_id=task_id,
         parent_acceptance_hash=parent_acceptance.profile_content_hash,
-        parent_requirement_ids=("visual",),
+        parent_requirement_ids=parent_acceptance.required_requirement_ids,
         components=(ComponentRequirementAllocation(
             component_id=unit.component_id,
-            requirement_ids=("visual",),
+            requirement_ids=unit.requirement_ids,
             generation_acceptance=component_acceptance,
         ),),
         assembly_requirement_ids=("visual",) if legacy_shared_rubric else (),
@@ -475,6 +490,7 @@ def _persist_video_component_authoring(tmp_path, *, legacy_shared_rubric=False):
         generation_acceptance=component_acceptance if legacy_shared_rubric else None,
         generation_evaluation_authorities=(
             GenerationEvaluationAuthority(evaluator=evaluator, proof="technical"),
+            GenerationEvaluationAuthority(evaluator=evaluator, proof="analyzer"),
             GenerationEvaluationAuthority(evaluator=evaluator, proof="human"),
         ),
         domain_acceptance=parent_acceptance,
@@ -605,6 +621,12 @@ def _component_close_runtime(tmp_path, *, abandon, legacy_shared_rubric=False):
         if item.candidate_id == prepared.binding.decision.selected_candidate_id
     )
     assert candidate.recipe.acceptance_policy == acceptance
+    performance = prepared.binding.projection.requirement.generation_intent.performance_intent
+    assert performance is not None
+    assert {item.character_id for item in performance.character_directions} == {
+        item.character_id for item in loaded.characters
+        if item.character_id in child.character_ids
+    }
 
     attempt_id = "component-quality-close-abandon" if abandon else "component-quality-close-reject"
     preview = _paid_preview(
@@ -657,6 +679,22 @@ def _component_close_runtime(tmp_path, *, abandon, legacy_shared_rubric=False):
             ),),
         ),
     ]
+    sources.append(GenerationEvaluationSource(
+        request_hash=prepared.resolved.activation_scope.request.request_input_hash,
+        artifact_sha256=fetch.artifact_sha256,
+        rubric_hash=candidate.recipe.rubric_hash,
+        qa_policy_content_hash=policy.content_hash,
+        evaluator=next(
+            item.evaluator for item in policy.generation_evaluation_authorities
+            if item.proof == "analyzer"
+        ),
+        proof="analyzer",
+        observations=(GenerationObservation(
+            requirement_id="performance",
+            verdict="PASS",
+            observation="The offline fixture analyzer covers the explicitly authored cast directions.",
+        ),),
+    ))
     if abandon:
         sources.append(GenerationEvaluationSource(
             request_hash=prepared.resolved.activation_scope.request.request_input_hash,

@@ -124,7 +124,9 @@ def acceptance_with_fixture_performance(acceptance):
         and rule.level == "acceptance"
         and rule.stage == "raw_generation"
         and rule.proof in {"analyzer", "human"}
-        and any(path.startswith("generation_intent.performance_intent") for path in rule.intent_paths)
+        and any(path in {"generation_intent.performance_intent",
+                         "generation_intent.performance_intent.character_directions"}
+                for path in rule.intent_paths)
         for rule in rules
     ):
         return acceptance
