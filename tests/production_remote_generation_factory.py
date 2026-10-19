@@ -113,7 +113,7 @@ def _register_remote_inputs(*, root, inputs, project, bindings, input_bytes):
 
 
 def prepare_remote_generation(*, root, provider, request, compiler_id, compiler_version="2", input_bytes=None,
-        requirement_timing_mode="fixed"):
+        requirement_timing_mode="fixed", performance_details=None):
     """Author/activate the fixture Shot, then use the common production caller."""
     inputs = activate_generated_video_shot(
         root=root, inputs=make_p8_video_generation_base(root, schema_version="2.7"))
@@ -147,12 +147,14 @@ def prepare_remote_generation(*, root, provider, request, compiler_id, compiler_
         "pacing": Pacing(shot_duration_seconds=output.duration_seconds),
         "performance_intent": fixture_performance_intent(
             characters,
-            trigger="The hero enters and notices the room",
-            emotion="quiet curiosity",
-            facial_expression="brows gently lifted, eyes alert, lips relaxed",
-            gaze_target="the room ahead",
-            breathing="steady, natural breathing",
-            body_behavior="keeps a balanced walking posture and settles at the endpoint",
+            **(performance_details if performance_details is not None else {
+                "trigger": "The hero enters and notices the room",
+                "emotion": "quiet curiosity",
+                "facial_expression": "brows gently lifted, eyes alert, lips relaxed",
+                "gaze_target": "the room ahead",
+                "breathing": "steady, natural breathing",
+                "body_behavior": "keeps a balanced walking posture and settles at the endpoint",
+            }),
         ),
         **({"ambience_intent": AmbienceIntent(environment_bed="none", explicitly_silent=True)}
            if not output.native_audio else {}),

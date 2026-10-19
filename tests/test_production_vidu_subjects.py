@@ -8,10 +8,13 @@ from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import seal_artifact
+from ai_video.production.performance_direction import CharacterPerformanceDirection, PerformanceBeat
 from ai_video.production.shot_router import AdapterCompilerContract, MotionRequirement, VideoGenerationResolver
 from ai_video.production.video import VideoGenerationRequest, ResolvedVideoGenerationRequest
 from ai_video.production.video_compiler import CompiledProviderVideoRequest
-from ai_video.production.video_requirement import AssetEvidence, AudioNeed, GenerationMode, OutputNeed, SemanticReferenceRole
+from ai_video.production.video_requirement import (
+    AssetEvidence, AudioNeed, GenerationMode, OutputNeed, PerformanceIntent, SemanticReferenceRole,
+)
 from tests.fixtures.planning_factory import make_character, make_scene
 from test_production_provider_neutral_adapters import _replace_requirement
 from test_production_shot_router import _asset, _context, _lifecycle, _policy, _verified_requirement
@@ -48,8 +51,51 @@ def _named_route(*, compiler_version="4", capability_id="viduq3-r2v-subjects-v1"
     if complete:
         from tests.test_production_video_intent_validation import _complete_intent
         from ai_video.production.video_requirement import Pacing
+        performance = PerformanceIntent(
+            trigger="COCO receives the product offer",
+            visible_response="COCO acknowledges with one small nod",
+            gaze_target="the elder and product",
+            body_behavior="upright and attentive",
+            hand_behavior="reaches once and secures the product",
+            terminal_performance_state="settled holding the product",
+            character_directions=(
+                CharacterPerformanceDirection(
+                    character_id="COCO",
+                    screen_identity="COCO",
+                    role="principal",
+                    visibility="visible",
+                    beats=(PerformanceBeat(
+                        phase="response",
+                        trigger="receives the product offer",
+                        emotion="attentive curiosity",
+                        intensity="subtle",
+                        facial_expression="eyes brighten slightly; mouth stays relaxed",
+                        gaze_target="the elder and offered product",
+                        breathing="steady, with a small anticipatory inhale",
+                        body_behavior="reaches once, secures the product, nods once, then settles holding it",
+                    ),),
+                ),
+                CharacterPerformanceDirection(
+                    character_id="Nosha",
+                    screen_identity="Nosha",
+                    role="supporting",
+                    visibility="visible",
+                    beats=(PerformanceBeat(
+                        phase="response",
+                        trigger="COCO reaches for the offer",
+                        emotion="patient attentiveness",
+                        intensity="subtle",
+                        facial_expression="eyes follow COCO's hands; mouth stays closed without speaking motion",
+                        gaze_target="COCO's receiving hands and the product",
+                        breathing="calm and even",
+                        body_behavior="holds the offer steady until COCO secures it, then lowers the offering hand",
+                    ),),
+                ),
+            ),
+        )
         intent = _complete_intent().model_copy(update={
             "pacing": Pacing(shot_duration_seconds=5),
+            "performance_intent": performance,
             "camera_subject_relation": _complete_intent().camera_subject_relation.model_copy(update={"subject_id": "COCO"}),
         })
     projection = _replace_requirement(_verified_requirement(context), scene=scene, characters=characters,
@@ -201,10 +247,21 @@ def test_complete_intent_reopens_execution_binding_and_rejects_resealed_subject_
     compiler = AdapterCompilerContract.create(compiler_id="vidu-video-compiler", compiler_version="4")
     output = _request().output_requirement
     expression = fixture_generation_expression(output)
-    acceptance = acceptance_policy((expression,))
+    from tests.performance_fixture import fixture_performance_expression
+    performance_expression = fixture_performance_expression()
+    acceptance = acceptance_policy((expression, performance_expression))
+    selected_performance_rule = next(
+        rule for rule in acceptance.profile_payload["generation_requirements"]
+        if rule["requirement_id"] == performance_expression.requirement_id
+    )
+    assert performance_expression.requirement_id in acceptance.required_requirement_ids
+    assert selected_performance_rule["stage"] == "raw_generation"
+    assert selected_performance_rule["proof"] == "analyzer"
+    assert "generation_intent.performance_intent" in selected_performance_rule["intent_paths"]
     recipe = GenerationRecipe(seed=SeedPolicy(kind="fixed", value=42), profile_sha256=_profile().pointer().profile_sha256,
         compiler_hash=compiler.compiler_hash, requirement_hash=projection.requirement.requirement_hash,
-        rubric_hash=acceptance.profile_content_hash, acceptance_policy=acceptance, expressions=(expression,))
+        rubric_hash=acceptance.profile_content_hash, acceptance_policy=acceptance,
+        expressions=(expression, performance_expression))
     candidate = GenerationCandidate(candidate_id="one", provider_profile=_profile().pointer(),
         capabilities=provider.capabilities(), capability_id="viduq3-r2v-subjects-v1",
         compiler_contract=compiler, output_requirement=output, recipe=recipe)

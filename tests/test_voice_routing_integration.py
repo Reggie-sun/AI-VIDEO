@@ -333,8 +333,21 @@ def _voice_setup(shot=None, *, mode: VoiceMode = VoiceMode.AUTO):
 def _voice_projection(setup, output):
     voice = setup["context"].activated_shot.voice_routing
     assert voice is not None
+    character = make_character(character_id="hero")
+    from performance_fixture import fixture_performance_intent
+
+    performance = fixture_performance_intent(
+        (character,),
+        trigger="the hero attends to the gate before speaking",
+        emotion="quiet attentiveness",
+        facial_expression="focused eyes and a slight, natural brow lift",
+        gaze_target="the gate ahead",
+        breathing="quiet, steady breathing",
+        body_behavior="relaxed shoulders with small natural weight shifts",
+    )
     intent = _complete_intent().model_copy(update={
         "pacing": Pacing(shot_duration_seconds=output.duration_seconds or 4),
+        "performance_intent": performance,
         "ambience_intent": AmbienceIntent(environment_bed="none", explicitly_silent=True),
         "dialogue_intent": DialogueIntent(
             mode="dialogue",
@@ -371,7 +384,7 @@ def _voice_projection(setup, output):
     )
     request = make_request(
         target_shot=setup["context"].activated_shot,
-        character_context=(make_character(character_id="hero"),),
+        character_context=(character,),
         scene_context=make_scene(scene_id=setup["context"].activated_shot.scene_id),
         available_assets=(),
         review_decision=None,
@@ -414,6 +427,9 @@ def _orchestrator(*, setup, source_project=None, voice_context=None):
         intent_paths=("generation_intent.performance_intent.hand_behavior",),
         production_owner="shot_authoring",
     ),))
+    from performance_fixture import acceptance_with_fixture_performance
+
+    acceptance = acceptance_with_fixture_performance(acceptance)
     if source_project is not None and source_project.qa_policy is not None:
         from ai_video.production.production_strategy_reader import (
             selected_shot_generation_acceptance,

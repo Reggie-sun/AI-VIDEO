@@ -70,6 +70,9 @@ def _activate_goal(writer, *, goal, acceptance=None, attempt_id):
             GenerationEvaluationAuthority(
                 evaluator=policy.semantic_authorities[0], proof="technical"
             ),
+            GenerationEvaluationAuthority(
+                evaluator=policy.semantic_authorities[0], proof="analyzer"
+            ),
         )} if acceptance is not None else {}),
     })
     writer.activate_qa_policy(
@@ -101,6 +104,7 @@ def _new_goal_pending(
     from ai_video.production.paid_provider import PaidProviderAuthorizationDecision
 
     from test_requirement_semantics import marked_policy, semantic_rule
+    from performance_fixture import acceptance_with_fixture_performance
 
     _, provider, resolved, _, _, bootstrap = e2e._runtime(tmp_path)
     rule = semantic_rule("duration")
@@ -112,7 +116,7 @@ def _new_goal_pending(
         intent_paths=["output_need.duration_seconds"],
         native_text=[],
     )
-    old_acceptance = marked_policy([rule])
+    old_acceptance = acceptance_with_fixture_performance(marked_policy([rule]))
     selected = _activate_goal(
         bootstrap,
         goal=_goal("1"),
@@ -137,6 +141,12 @@ def _new_goal_pending(
         compiler_id="generated-video-e2e-fixture",
         compiler_version="1",
     )
+    requirement = prior_prepared.binding.projection.requirement
+    performance = requirement.generation_intent.performance_intent
+    assert performance is not None
+    assert {item.character_id for item in performance.character_directions} == {
+        item.character_id for item in requirement.characters
+    }
     prior_recipe = GenerationRecipe.model_validate({
         **prior_prepared.binding.inputs.candidates[0].recipe.model_dump(mode="python"),
         "rubric_hash": old_acceptance.profile_content_hash,
@@ -226,16 +236,24 @@ def _new_goal_pending(
         artifact_sha256=fetched.artifact_sha256,
         size_bytes=fetched.size_bytes,
     )
-    assert len(items) == 1
-    item = items[0]
+    assert {item.proof for item in items} == {"technical", "analyzer"}
+    duration_item = next(item for item in items if item.requirement_id == "duration")
+    performance_item = next(item for item in items if item.requirement_id == "performance")
     observation = GenerationObservation(
-        requirement_id=item.requirement_id,
+        requirement_id=duration_item.requirement_id,
         verdict=evaluation_verdict,
         observation="Exact fixture evaluator has no conclusive quality verdict.",
-        evaluation_item_hash=item.evaluation_item_hash,
-        question_text=item.question_text,
+        evaluation_item_hash=duration_item.evaluation_item_hash,
+        question_text=duration_item.question_text,
         presentation_ref="fixture/goal-v1/presentation",
         answer_ref="fixture/goal-v1/answer",
+    )
+    performance_observation = GenerationObservation(
+        requirement_id=performance_item.requirement_id,
+        verdict="NOT_EVALUATED",
+        observation="No conclusive actor-performance observation is available in this offline fixture.",
+        evaluation_item_hash=performance_item.evaluation_item_hash,
+        question_text=performance_item.question_text,
     )
     import json
     source = GenerationEvaluationSource(
@@ -257,7 +275,7 @@ def _new_goal_pending(
             event_order=("presentation", "answer"),
             actor_name=selected.qa_policy.semantic_authorities[0].name,
             actor_version=selected.qa_policy.semantic_authorities[0].version,
-            items=items,
+            items=(duration_item,),
             answers_json=json.dumps({
                 "observations": [observation.model_dump(mode="json")],
                 "advisory_observations": [],
@@ -265,14 +283,32 @@ def _new_goal_pending(
             }),
         ),
     )
+    performance_source = GenerationEvaluationSource(
+        schema_version="generation-evaluation/2",
+        request_hash=prior_request.request_input_hash,
+        artifact_sha256=fetched.artifact_sha256,
+        size_bytes=fetched.size_bytes,
+        rubric_hash=candidate.recipe.rubric_hash,
+        qa_policy_content_hash=selected.qa_policy.content_hash,
+        qa_policy_snapshot=selected.qa_policy,
+        evaluator=selected.qa_policy.semantic_authorities[0],
+        proof="analyzer",
+        observations=(performance_observation,),
+    )
+    sources = (source, performance_source)
     experience = record_attempt_evaluation(
         committer=writer,
         attempt_id="quota-goal-prior",
-        evaluation_sources=(source,),
+        evaluation_sources=sources,
         presentation_proof=_seal_presentation_recording(
-            attempt_id="quota-goal-prior", sources=(source,)
+            attempt_id="quota-goal-prior", sources=sources
         ),
     )
+    assert {(item.requirement_id, item.verdict)
+            for item in experience.evidence[0].findings} == {
+        ("duration", evaluation_verdict),
+        ("performance", "NOT_EVALUATED"),
+    }
     selected = load_production_project(tmp_path / "project.yaml")
     prior = next(
         item for item in selected.manifest.attempts

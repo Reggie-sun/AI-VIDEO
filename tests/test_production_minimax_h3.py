@@ -747,8 +747,14 @@ def test_real_committer_permit_drives_exactly_one_submit(tmp_path: Path):
         now=_fixed_now,
     )
     prepared = prepare_remote_generation(root=tmp_path, provider=provider, request=_request(),
-        compiler_id="minimax-h3-video-compiler")
+        compiler_id="minimax-h3-video-compiler", performance_details={
+            "trigger": "entry", "emotion": "curiosity",
+            "facial_expression": "alert eyes, relaxed lips", "gaze_target": "the room",
+            "breathing": "steady", "body_behavior": "walks, then settles",
+        })
     resolved = prepared.resolved_request
+    assert len(resolved.prompt_text) <= 2000
+    assert "alert eyes, relaxed lips" in resolved.prompt_text
     video_preview = provider.preview(resolved)
     paid_preview = _paid_preview(resolved, video_preview=video_preview)
     authorization = _paid_authorization(paid_preview)

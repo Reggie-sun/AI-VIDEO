@@ -926,6 +926,14 @@ def test_extension_and_r2v_use_real_service_durable_permit(tmp_path):
             root=root, provider=compiler_provider, request=request,
             compiler_id="vidu-video-compiler", compiler_version="3",
             input_bytes=input_bytes,
+            performance_details={
+                "trigger": "notices the room",
+                "emotion": "curiosity",
+                "facial_expression": "alert eyes, relaxed lips",
+                "gaze_target": "ahead",
+                "breathing": "steady",
+                "body_behavior": "walks, then settles",
+            },
         )
         provider, transport, (resolved, _, paid, auth, _) = _setup(
             prepared.compilation.request, extension_source=lambda _: source,

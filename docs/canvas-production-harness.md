@@ -222,6 +222,7 @@ rich remote/local H3 编译器将同一表演方向机械转为原生文字。pr
 `performance_direction.render_performance_direction(performance)` 和 preflight 的 `native_text_required`
 提供待核对段落。编译器只核对原文已有内容，不自动追加或重写保留原文；缺表达返回输入不支持。
 原始用户要求与新增导演表演指令的来源分别保留，输入修订不沿用已消费的旧调用授权。
+表演文本计入所选 model/mode 的提示词长度上限；作者须核对 exact 预览并精炼表达，不能为适配长度静默删除人物或控制目标。
 
 `preflight.performance_control` 与 `prepare.reference_control.performance_control` 展示逐人物参数、缺项、
 所需原生段落、输入字面表达和原片验收映射。`LEXICALLY_EXPRESSED` / `DECLARED` 只说明输入/映射存在，
