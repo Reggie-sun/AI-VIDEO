@@ -70,8 +70,20 @@ Parent与同一独立reviewer检查中段frame46/48/50/54及尾frame69/70/71，�
 1×、unmuted、volume1播放到3秒结束且无error；actual播放器截图颜色正常。
 这条展示是`external_output`，不是把development输入洗成普通Asset或激活Production render。
 前端deep link使用第二版workspace及exact新SHA；首页列表也实际出现该文件。`browser-playback.actual.json`、`browser-screenshot.jpg`保存证明。
-已向用户发送明确“1×完整听看、人物自然度/手影/镜尾/声音、字幕尚未叠加”的exact候选问题，当前 **human PENDING**。
+已向用户发送明确“1×完整听看、人物自然度/手影/镜尾/声音、字幕尚未叠加”的exact候选问题，当前 **human完整验收PENDING**。
 完整验收、正式source-use资格和S02交接不由浏览器播放成功或reviewer意见代签。
+
+随后用户反馈“我没看出来区别和刚才”。当前Chrome确实选中 `f98e2c0a…` 新文件；但“刚才”的比较对象未明确，
+不将该句推定为完整1×听看、全项拒绝或接受。核对最后两版修补均来自同一 `4c9589f4…` 原片、同一time map，
+两份lossless母版的林砚脸部ROI `(x0,y400,w300,h450)` 在124帧中 **124帧相同、0帧变化**；最后两版没有新增表演，差异只在局部手影。
+另对照加参数前 `c49403ca…` 与新 `4c9589f4…` 原片的source0/2/4秒面部抽帧，仅见细小姿态/下颌/眼睑变化，
+未建立正常观看可读的情绪改善，不把该非受控抽帧比较作为根因实验。
+实际作者方向偏subtle，且保留固定视线、闭嘴与背景微动限制；这些输入事实不证明模型能力根因。
+当前只能确认“参数必填、表达与QA映射已接通”，**不能称人物表演控制效果已验证成功**。
+`human-feedback-001.json`、`prior-new-face-diagnostic.jpg`保存此次核对；本次新生成POST0、原S01 STOP及S02 POST0保持。
+按 `record-ai-video-session` 更新本主记录与模块notice，自动 `distill-ai-video-learning=no_candidate`：
+反馈与ROI比较同属既有媒体链，未形成新的独立模型实验或受控表演强度对照，不新增Evidence Index unit或采纳规则。
+本次反馈记录的文档范围receipt为 `.agent/harness/runs/acting-s01-viewer-feedback-record-20261020-r1/receipt.json`。
 
 以下首版步骤与失败保留为history，其3秒候选不能继续当作当前干净版。
 
