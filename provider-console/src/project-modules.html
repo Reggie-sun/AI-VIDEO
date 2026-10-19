@@ -557,7 +557,7 @@
     const edgeTypeLabels = { call:"程序调用", data:"数据依赖", agent:"显式 Agent / 操作", stop:"安全停止" };
 
     function sourceLabel(value) {
-      return String(value).split(" · ").map(token => token.startsWith("production/") ? `src/ai_video/${token}` : /^[a-z_]+\.py$/.test(token) ? `src/ai_video/${token.startsWith("canvas_") ? "" : ["video_planner.py", "production_strategy.py"].includes(token) ? "planning/" : "production/"}${token}` : token).join(" · ");
+      return String(value).split(" · ").map(token => token.startsWith("production/") ? `src/ai_video/${token}` : /^[a-z_]+\.py$/.test(token) ? `src/ai_video/${token.startsWith("canvas_") || token === "provider_console.py" ? "" : ["video_planner.py", "production_strategy.py"].includes(token) ? "planning/" : "production/"}${token}` : token).join(" · ");
     }
 
     function displayState(state) { return apiStateLabels[state] || (state ? String(state) : "未返回状态"); }
