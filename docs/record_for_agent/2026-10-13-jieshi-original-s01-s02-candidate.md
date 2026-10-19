@@ -37,6 +37,20 @@ Date: 2026-10-13
 
 `record-ai-video-session`及自动`distill-ai-video-learning`评估为 `no_candidate`：新片与旧A存在同类手影表现，但不是隔离mode、prompt或参考职责的受控因果对照；已有“绑定不保证整段质量”边界不需重复采纳。本地H3首帧头部claim明确排除paid/remote，不借此扩张其scope。Evidence Index的fetch与analyzer层只计同一新attempt；未修改Skill/Policy/Gate或全局memory。当前一次授权已消费，不同输入的新有限单元尚未封存或获批，不继续同输入重抽。
 
+## Non-generative Cleanup Feasibility — 2026-10-19
+
+用户问“手影子这个能不能换一个不再生成的别的方式去掉影子”。此前“变速不能删除手影”的判断只覆盖时间编辑，不能据此排除传统局部合成；这是本次补查的制作手段缺口，不是新的生成授权。
+
+采用同一新原片 SHA `c49403ca2a9491647fbe12ab4c277c42611cd866f85bb826697cf1dc1bf6fbc9`，用本地 FFmpeg 解码 frame0/36/48 为 lossless PNG。以 frame0 的同位置背景为 clean plate，Pillow 做显式多边形遮罩与4px羽化合成，未用模型填补或生成像素。两帧只保留原时刻；未制作 MP4、变速、重配音或修改 Production state。
+
+证据根为 `runs/non-generative-cleanup-feasibility-20261019-001/`。Parent 实际查看 `comparison-frame-36.png` 和 `comparison-frame-48-v2.png`，关键手影在局部静帧中已可去除，鞋子和格栅重新可见；`still-probe.json` / `still-probe-v2.json` 记录零alpha保护区像素变化为0。frame48首版遗漏立杆左侧一小段手影，v2扩展遮罩后再看；首版与源帧均保留。修补静帧SHA分别为 `4051ba020e95f741b221cceb622255c8460d9b1dd2c3e8d1612172090a20f8e0` 与 `3a019113c2b67b137165f03972fb508bf736c0683cee13df1330d12f5666cd98`。静帧operator也留在同一证据根，只是此次可复现诊断，不是故事专属Product执行链或已发布视频修复器。
+
+方法有成熟来源：[Natron Roto文档](https://natron.readthedocs.io/en/v2.4.2/guide/thenodes-draw-roto.html)说明用遮罩与clean plate覆盖瑕疵，[Natron tracking文档](https://natron.readthedocs.io/en/rb-2.5/guide/compositing-tracking.html)描述将纹理或Roto随跟踪经CornerPin合成；这些资料支持方法选择，不证明当前整段已经修好。本次未运行Natron/Blender或跟踪算法。镜头轻微几何变化、被覆盖的鞋子/座椅运动、真实前景手与补片的遮挡、亮度和接缝仍需逐帧处理并以实际整段复核，不能把固定背景两帧成功外推成通用自动擦除能力。
+
+当前源码审计确认：`composition_contracts.py` 只有固定变换、整体透明度与time-map，没有视频mask/tracking；`image_edit_mask.py` 的静态生成图遮罩及 `ContinuitySubjectTracker` 的QA测量不等于视频修补。`repair_input_admission.py` 的 `/2,/3` 只接纳原失败MP4的exact bytes，改过像素的图也不能冒充原 `video_frame` 证据。完整共享修复需要补齐局部合成执行与派生provenance/诊断接入，而非绕过这些owner导入“已通过”源片；本次未实现该能力。
+
+本次视频/图片/音频生成POST与付费理解均0；原视频、音轨、Manifest143 /Project20、失败attempt及S01 STOP不变，S02仍0。两张改图是同一已有attempt的派生诊断，不增加独立模型实验数量，不改变Evidence Index中的原MP4 verdict。`record-ai-video-session` 更新本记录，`distill-ai-video-learning=no_candidate`：静帧局部可修性不证明整段质量或通用能力，不修改Skill/Policy/Gate。文档验证receipt为 `.agent/harness/runs/non-generative-cleanup-record-20261019-r1/receipt.json`。
+
 ## Historical Billing Blocker — 2026-10-19
 
 用户重新要求“做视频”，随后问“你的意思是没钱了api是吗”。本轮复核[官方国内站创建接口](https://platform.minimax.cn/docs/api-reference/video-generation-v2-create)：该 endpoint 将 HTTP402 定义为 `insufficient_balance_error` / `insufficient balance (1008)`，因此按官方语义应先处理 API 可用余额不足。上次实测仅保留 HTTP402和response SHA，未保留业务错误体；不能冒称实测读到1008、账户余额为零或已查过账户。此前“具体原因未确认”是尚未核对该官方说明时的历史解释，不再作为当前接口语义结论。
