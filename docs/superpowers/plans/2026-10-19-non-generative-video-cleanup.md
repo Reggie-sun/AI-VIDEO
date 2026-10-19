@@ -40,3 +40,9 @@
 - Additive`development-repair-input/5`保留原捕获、`/4`母版和观看版三个身份；viewing.source必须等于master的exact local measurement，Registry同时保留完整父链。仍由同一bootstrap持久化、标准reader重开、UNBOUND/NOT_EVALUATED，Production activation fence不变。旧committer调用默认不加proxy以保留replay；Canvas面向观看的新入口默认提供观看版，同时返回master路径和SHA。
 - 既有Provider Console catalog改进有界发现顺序，保留depth/entry/no-symlink上限；现有detail投影严格重开的`/5`观看角色与`/4`母版角色。媒体库默认展示观看版，母版在高级入口保留；支持受限relative workspace与exact媒体SHA的直接链接，截断catalog时仍能经既有strict detail读取显式目标。不新增index、状态库、Provider或renderer。
 - 验证增加正常肤色/灰色/原色的真实转码测试，v5来源/篡改/失败不写入与前端投影测试，以及深证据/未注册frame dump的扫描回归、URL路径拒绝和观看角色筛选。实际新视频先经MCP与真实Chrome DOM/video/canvas/截图验证，再请求完整1×听看；人工与工程结论保持分开。
+
+## Reopened Foreground-edge Repair
+
+用户指出最后手到玻璃前仍有痕迹，重新打开此前局部观感接受，颜色接受保留。先用exact raw/master/viewing尾段逐帧定位，区分作者遮罩内容与kernel语义；保护矩形留下残影不等于合成算法缺陷。
+
+本次限定一条本地完整候选：仅调整普通run计划中frame56–123的前景保护轮廓，plate0、补片、仿射与羽化参数保持，frame0–55计划不变；经同一公共bootstrap制作无损母版和正常观看版，不截尾、冻结、变速或生成。核验全部124帧PTS、原声PCM和保护像素，检查实际尾帧、动作边界及完整1×播放。此前三轮媒体复核的历史保留；因新反馈和已定位原因，允许一轮仅针对新候选的内容复核，出现blocking缺陷则由Parent继续调查能力边界，不机械开启下一轮。源码无已证实缺口时不改kernel、不重跑全仓工程；稳定文档scope按Harness验证并发布。

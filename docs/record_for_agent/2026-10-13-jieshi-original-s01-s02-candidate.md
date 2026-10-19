@@ -11,11 +11,13 @@ Date: 2026-10-13
 
 ## Current Non-generative Cleanup Follow-up — 2026-10-19
 
+用户后续指出“最后那个瞬间还是明显的有痕迹”，并定位“手放在玻璃上”：旧58dee观看版的局部修补观感验收已重新打开，颜色接受与旧反馈保留。现有入口只修作者逐帧前景保护轮廓，新候选位于`runs/non-generative-cleanup-tail-20261019-001/production/assets/files/39da73d103ab0c6c2b46976d6b31cc2b3417c6f1b3ba08e4a820b5b79d4e2a1b.mp4`。完整124帧PTS、原声PCM及前56帧母版像素保持；新尾段静态复核未再见旧明显拖影，实际Chrome完整1×自动播放与末帧正常，人工新观感仍待确认。当前修复及证据以[共享修补主记录](2026-10-19-non-generative-video-cleanup.md#reopened-tail-repair)为准，原S01 STOP、其余缺证与S02 POST0保持。
+
 用户明确授权的[共享局部修补能力](2026-10-19-non-generative-video-cleanup.md)已在现有开发素材准备/准入 owner 实现；下方静帧可修性中的“本次未实现”仅属历史。旧第二版 RGB 母版 `86eb56c7e2dab3f8aae27cd1c8073d0d6dabd8fcfad3f0d4dadbdf995ecdd9ff` 被用户实际播放证实严重绿紫偏色，不能再作为正常观看交付；其无损像素证明仍有效，失败截图与原 bytes 保留。
 
-当前观看版为 `runs/non-generative-cleanup-viewing-20261019-001/production/assets/files/58dee01c3fb9ad82b2b43e39f80c3ae85d6a1988c1f7e8b687f66b0d6dfd838f.mp4`，SHA同文件名：独立H264/yuv420p、BT.709 limited-range代理，768×1344、24fps、124帧、5.184秒，全部PTS及原声PCM/声音时序保留。它经`development-repair-input/5`保留原raw和`/4`母版，代理有损，不继承母版逐像素证明。前端无query首页已实测首屏展示“修补观看版”并可普通点击选择，修复了有deep link才能定位及新Registry素材排序靠后的缺口；真实Chrome截图颜色正常，1×自动播放至结束无错误。公共能力接收作者遮罩/逐帧仿射，不声称自动跟踪；本轮新生成/付费理解POST0。
+上一观看版为 `runs/non-generative-cleanup-viewing-20261019-001/production/assets/files/58dee01c3fb9ad82b2b43e39f80c3ae85d6a1988c1f7e8b687f66b0d6dfd838f.mp4`，SHA同文件名：独立H264/yuv420p、BT.709 limited-range代理，768×1344、24fps、124帧、5.184秒，全部PTS及原声PCM/声音时序保留。它经`development-repair-input/5`保留原raw和`/4`母版，代理有损，不继承母版逐像素证明。前端无query首页已实测首屏展示“修补观看版”并可普通点击选择，修复了有deep link才能定位及新Registry素材排序靠后的缺口；真实Chrome截图颜色正常，1×自动播放至结束无错误。公共能力接收作者遮罩/逐帧仿射，不声称自动跟踪；本轮新生成/付费理解POST0。
 
-首版局部漏影被拒绝；第二版扩大早段遮罩，同一reviewer在第三轮的新代理21张采样及Chrome截图中未再辨识旧手影、明确截断、接缝或偏色。用户随后对该exact前端链接的完整1×听看问题回复“颜色正常，修补效果可以接受”，颜色和局部修补观感已获人工接受；下方原8项缺证未因此逐项通过。派生为独立development repair input，qualification `NOT_EVALUATED`，不是原Provider产物或已采用S01。原Manifest143 /Project20、raw失败/abandon、15项与36项要求及S02 POST0不变，无accepted state或交接。工程验证、三轮媒体复核、限制和发布状态以新记录为准。
+首版局部漏影被拒绝；第二版扩大早段遮罩，同一reviewer在第三轮的新代理21张采样及Chrome截图中未再辨识旧手影、明确截断、接缝或偏色。用户随后对该exact前端链接的完整1×听看问题回复“颜色正常，修补效果可以接受”；其中局部修补观感现被顶部新反馈重新打开，颜色接受保留。下方原8项缺证未因此逐项通过。派生为独立development repair input，qualification `NOT_EVALUATED`，不是原Provider产物或已采用S01。原Manifest143 /Project20、raw失败/abandon、15项与36项要求及S02 POST0不变，无accepted state或交接。工程验证、三轮媒体复核、限制和发布状态以新记录为准。
 
 ## Current Funded S01 — 2026-10-19
 

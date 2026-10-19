@@ -8,11 +8,29 @@ learning_eligibility: ineligible
 
 Date: 2026-10-19
 
-## Current Human-viewing Follow-up
+## Reopened Tail Repair
+
+用户在先前接受后补充“最后那个瞬间还是明显的有痕迹”，定位为“手放在玻璃上”。旧`58dee01c...`观看版的修补观感验收重新打开；颜色正常的反馈与此前接受的历史保留，不再将该版局部修补写为当前已完成。
+
+证据根为`runs/non-generative-cleanup-tail-20261019-001/`。原raw、旧无损母版和旧观看版的frame96–123逐帧对照，确认旧保护矩形将扶杆旁、真实手缘右侧的一条暗褐残影保留下来。只读原生`code_mapper`核对当前kernel：先计算补片羽化，后将保护区alpha置零；旧x<=570保护线切入x535..680补片内部，在570/571间可从0跃至255。保护像素零变化符合实现，但不能证明作者的保护区包含了正确内容。它解释了本次几何缺口，不推出全部痕迹都由此造成或模型/编码具有同一根因。
+
+本次仅修改普通run计划的frame56–123保护多边形，使其随真实手轮廓变化；plate0、补片、identity affine、feather8与frame0–55计划保持。run-local轮廓作者辅助不进入共享代码，不声称自动识别/跟踪能力；简化共线点前后68份栅格保护mask逐字节一致，最多35个顶点。`bounded-repair-unit.json`封存一条本地候选、生成POST0及一次有限tail review扩展；独立intent check认为目标对齐，同时保留动态边缘和编码后保全的不确定性。原15项、36项、原Manifest与S01 STOP未放宽。
+
+同一公共`bootstrap_video_cleanup`完成并经标准`load_production_project`及`verify_repair_input`重开`/5`：新观看版为`production/assets/files/39da73d103ab0c6c2b46976d6b31cc2b3417c6f1b3ba08e4a820b5b79d4e2a1b.mp4`，2,154,794 bytes；RGB母版为`0e6740df07b704580b51de7f6ae98d3d6914de7ade950c6b9e674851f5e84bd0`，52,734,783 bytes。768×1344、24fps、124帧、5.184秒，实际4:7；观看版为yuv420p/BT709 limited。准入hash为`545e7b74ea0f79383d6c6c8d245081804d13af1f13bba54041a7a30301421092`。新旧母版frame0–55的RGB hash全部相同；每帧源/母版/代理PTS相同，显式保护区像素变化0。四份PCM hash均为原`c9d52680fb853d64b89b3b1350e050811c36af2ff8095fc68901580a5eaefa85`，声音时序相同。见`cleanup.actual.json`、`reopen-proof.json`；代理有损，不继承母版逐像素证明。
+
+显式project-local `video-analysis` MCP提取42帧，0.125秒间隔覆盖到实际末帧5.125秒；未转写、未调用audio_understand。`mcp-call.json`、`mcp-response-metadata.json`及`mcp-tail-39..41.jpg`保留调用/元数据/末三张采样，原工具返回42份JPEG；另以qualified FFmpeg解码新代理全部124帧，`new-tail-dense.jpg`覆盖末28帧、`new-transition-dense.jpg`覆盖52–95，解决旧0.25秒采样停在5.0秒而漏掉末三帧的证据缺口。
+
+既有`reviewer_high`在已消耗三轮后完成一次有据的有限第四轮（不重置历史）：旧`MEDIA-04`尾段拖影在新候选末28帧和native末帧未复现，过渡及原片2.625/3.292/5.125秒对照未见新增指尖缺失、明确轮廓跳变、鞋靴断裂或偏色；新静态blocker finding set为空。Parent在相同图及MCP末帧中确认此有限结果，判为`OBSOLETE_AFTER_CHANGE_IN_INSPECTED_STATIC_SCOPE`。`MEDIA-02`保持：reviewer未播放或听音，不据静帧代签动态体验。见`media-review-r4.json`；没有机械第五轮。
+
+实际Chrome DevTools MCP打开新relative workspace/exact SHA链接，通过HTTP读取bytes重算SHA确认选中39da新片；完整1×、unmuted/volume1自动播放至5.184秒，无错误，再seek5.125秒查看正常颜色与手缘。见`browser-full-playback.json`、`browser-final-frame.png`。MCP写截图文件被其workspace根限制拒绝，返回image由Parent保存；resize失败后保留实际viewport，这些失败不冒充产品通过证据。自动播放不是human听看；已向用户提供新absolute MP4并请求完整1×判断，当前新候选人工观感仍`PENDING`。新开发project/Manifest1、attempts空、qualification `NOT_EVALUATED`，原Manifest hash仍`06b50a94afcbc6d130b24db609dde4513172db8b83447dd0d6392ee04c3bd80a`，S02 POST0。
+
+本次无已证实共享源码缺口，kernel/committer/codec均未改变；只同步既有workflow的保护区/羽化语义和实际尾帧检查说明。源码旧Harness证明保留，不为普通作者计划重跑全仓工程。文档scope完成证明归`.agent/harness/runs/cleanup-tail-followup-20261019-r1/receipt.json`；Parent `NATIVE_REVIEW_NOT_REQUIRED`，独立媒体有限复核另列。`record-ai-video-session`更新本记录和直接S01 notice；自动`distill-ai-video-learning=no_candidate`：同一raw派生链、局部作者修正与实现合同说明不构成新的独立模型质量结论，不创建claim或改Skill/Policy/Gate。检索仍返回stale last-good advisory并排队refresh，未主动重建或宣称fresh index。
+
+## Historical Human-viewing Follow-up
 
 用户实际播放下方第二版RGB母版后报告严重绿紫偏色，并指出前端没有视频。失败截图保存在`runs/non-generative-video-cleanup-20261019-001/user-color-failure.png`；FFmpeg重解码正常和MCP静帧正常均未证明实际播放器显示正确。旧母版不再作为正常观看交付，其原bytes和像素证明保留。已停止旧候选的最终Harness r3，保留`parent-abort.json`；该轮不是完成证明。
 
-当前供人观看的文件为`runs/non-generative-cleanup-viewing-20261019-001/production/assets/files/58dee01c3fb9ad82b2b43e39f80c3ae85d6a1988c1f7e8b687f66b0d6dfd838f.mp4`，2,159,577 bytes；H264 High/yuv420p、BT.709 limited-range、768×1344、24fps、124帧、5.184秒、原AAC stereo/32000Hz。它是独立有损代理，不是修改或替换旧母版。标准loader及严格`/5`验证重开，确认raw→master→viewing三份身份、全部PTS与原声PCM/声音时序一致；见同根`cleanup.actual.json`、`reopen-proof.json`。
+当时供人观看的文件为`runs/non-generative-cleanup-viewing-20261019-001/production/assets/files/58dee01c3fb9ad82b2b43e39f80c3ae85d6a1988c1f7e8b687f66b0d6dfd838f.mp4`，2,159,577 bytes；H264 High/yuv420p、BT.709 limited-range、768×1344、24fps、124帧、5.184秒、原AAC stereo/32000Hz。它是独立有损代理，不是修改或替换旧母版。标准loader及严格`/5`验证重开，确认raw→master→viewing三份身份、全部PTS与原声PCM/声音时序一致；见同根`cleanup.actual.json`、`reopen-proof.json`。
 
 原前端catalog实际扫描16,384 entries并截断，遗漏目标；strict detail本身可以读取旧`/4`。共享修复保留原扫描上限，先发现常规primary locator并浅层优先遍历；显式relative workspace/exact SHA深链经既有strict detail读取遗漏目标，无新索引或文件权限扩张。视频库明确显示“修补观看版”，RGB母版默认隐藏于高级筛选。
 
@@ -22,7 +40,7 @@ Date: 2026-10-19
 
 实际Chrome已显示正常肤色、灰色和蓝色，1×自动播放完整5.184秒，无解码错误；HEAD200、Range206及advanced母版开关/观看版固定选择均验证。证据为同根`browser-color.png`、`browser-full-playback.json`、`browser-seek-and-media.json`、`browser-controls.json`。Chrome MCP因其共享profile被占用不可用，本次使用任务独立headless Chrome的CDP，未终止或改变用户浏览器、代理或账户。
 
-随后用户对该exact前端链接的完整1×听看问题明确回复“颜色正常，修补效果可以接受”；见`human-viewing-feedback.json`，question item `call_94c03f1c359b410ca39debd491c03990`。当前观看版的颜色与局部修补观感已获人工接受，取代该范围内的pending；不推断用户已逐项确认原台词、道具、具名人物关系或交接终态，不代写canonical QA/activation。
+随后用户对该exact前端链接的完整1×听看问题明确回复“颜色正常，修补效果可以接受”；见`human-viewing-feedback.json`，question item `call_94c03f1c359b410ca39debd491c03990`。这是当时的人工接受，局部修补部分现被顶部尾段反馈重新打开，颜色接受仍保留；不推断用户已逐项确认原台词、道具、具名人物关系或交接终态，不代写canonical QA/activation。
 
 ## Current Capability And Limits
 
@@ -63,9 +81,9 @@ Date: 2026-10-19
 
 显式 project-local `video-analysis` MCP 对第二版 exact MP4 提取0–5秒、间隔0.25秒的21张图，未转写或调用 `audio_understand`；见 `repair-v2/mcp-call.json`、`mcp-response.json`、`mcp-contact-sheet.jpg`。MCP 的 metadata/scene success 不是内容 PASS。
 
-同一只读原生 `/root/cleanup_media_review`、实际 profile `reviewer_high` 完成三轮内容复核。第二轮母版采样与第三轮新观看代理21张图中，1.0/1.25秒未再辨识旧手影，0.75–1.75秒未发现新增明确前景截断、鞋靴损坏或接缝；Parent将`MEDIA-01`在此采样范围内判为`OBSOLETE_AFTER_CHANGE`。`MEDIA-03`确认旧RGB母版用户偏色失败，新代理采样及Chrome截图未复现，范围仅限此exact文件/路径；没有机械开启第四轮。`MEDIA-02`限制仍`CONFIRMED`：静态图和自动播放不证明完整人工观看/听音。见旧根`media-review-r1.json`、`repair-v2/media-review-r2.json`与新观看根`media-review-r3.json`。这是媒体样本复核，不冒充源码implementation review或人工验收。
+此前同一只读原生 `/root/cleanup_media_review`、实际 profile `reviewer_high` 完成三轮内容复核。第二轮母版采样与第三轮观看代理21张图中，1.0/1.25秒未再辨识旧手影，0.75–1.75秒未发现新增明确前景截断、鞋靴损坏或接缝；Parent将`MEDIA-01`在此采样范围内判为`OBSOLETE_AFTER_CHANGE`。`MEDIA-03`确认旧RGB母版用户偏色失败，该代理采样及Chrome截图未复现，范围仅限此exact文件/路径；当时未机械开启第四轮，后续新反馈引发的有限扩展见顶部。`MEDIA-02`限制仍`CONFIRMED`：静态图和自动播放不证明完整人工观看/听音。见旧根`media-review-r1.json`、`repair-v2/media-review-r2.json`与旧观看根`media-review-r3.json`。这是媒体样本复核，不冒充源码implementation review或人工验收。
 
-当前可交付的是可复用修补入口及获用户接受颜色/修补观感的实际观看版。`MEDIA-02`中的完整人工观看缺口仅在本次用户接受的颜色与修补范围被补证；原S01声音语义、badge/道具/座位与可采用终态等仍为`NOT_EVALUATED`。原raw的5 PASS /1 FAIL /8 NOT_EVALUATED与abandon历史保留，不因派生物改善改写旧verdict。没有accepted end-state、S02 handoff、连续镜、15秒或完整故事交付。
+已发布可复用修补入口；旧58dee观看版的颜色接受保留，局部修补观感因顶部尾段反馈重新打开，新39da候选人工观感待确认。`MEDIA-02`中的人工观看反馈保留其原范围，不抵消最新缺陷；原S01声音语义、badge/道具/座位与可采用终态等仍为`NOT_EVALUATED`。原raw的5 PASS /1 FAIL /8 NOT_EVALUATED与abandon历史保留，不因派生物改善改写旧verdict。没有accepted end-state、S02 handoff、连续镜、15秒或完整故事交付。
 
 ## Engineering Verification And Publication
 
