@@ -9,7 +9,35 @@ evidence_index_version: "1"
 
 Date: 2026-10-13
 
-## Current Billing Blocker — 2026-10-19
+## Current Funded S01 — 2026-10-19
+
+用户回复“现在有钱了”后，继续此前尚未消费的“做视频”指令：official MiniMax H3 Max CN、5秒标称、768P、balanced、同一 PNG first-frame，一次、零重抽。实际 POST 于 `2026-10-18T23:43:14Z` 发出，约0.92秒后 HTTP200，canonical paid receipt 为 `accepted`；旧402没有重现，但没有查询或证明具体账户余额。此次不是沿用旧已消费 permit，S02、图片/音频生成及新音频理解均为0。
+
+新原片为 `runs/canvas-jieshi-original-s01-s02-20261013-001/production/state/video-generation/fetch/files/c49403ca2a9491647fbe12ab4c277c42611cd866f85bb826697cf1dc1bf6fbc9.mp4`；5,248,370 bytes，768×1344、24fps、124帧、container 5.184秒、AAC stereo /32000Hz。实际4:7，不是精确9:16。它取代旧A作为最新生成原片，**仍未通过 S01**，不是3秒采用版、连续镜或成片交付。
+
+| Exact input | Verified value |
+| --- | --- |
+| Attempt | `canvas-ab20b88226f1308d4695a5a6589fd7c3c092b2b5` |
+| Resolved request / binding | `23a1a1e4c18c23a6ef90cfb1379bfb943b4b00fe2b92f92115fb2cfb3c7f68b5` / `5bc971f59d1bbc008b83bbf623a2f5c55c86d7a20ce00cec2df5a23e5ef9d392` |
+| Native body | SHA `b652e9ede0be30198407089c7cec5041ffdd80185fd48b8cca545fbbf8c3eced`，2,822,925 bytes；与上次批准输入及本次 wire 逐字节一致 |
+| Prompt / first-frame PNG | `2c491b55c9ccb2b69692966da86f1bafe4b308f8cbef9575c3282b31498e4417` / `13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923` |
+| Mode and duties | 一份原 PNG负责人物/场景/开场构图；无 last-frame/video/audio reference及ratio参数。沿用本单元明确批准的动态白模不兼容例外，未把绑定首帧当作整段倒影或动作保证 |
+
+显式调用 project-local `video-analysis` MCP，并通过本次 exact bytes 的 canonical controlled presentation 裁决14项：**5 PASS /1 FAIL /8 NOT_EVALUATED**。源帧36（1.500秒）和48（2.000秒）在玻璃内清楚出现随林砚抬手移动的暗褐手掌幽影，`s01-reflections=FAIL`；这段属于0–3秒要求区间。新片约2.5秒后已有近窗保持的可见迹象，但约2cm、合格连续源窗及 exact time map仍未证明。变速不会删除动作源帧里的手影，不以冻结、跳切、倒放或补帧伪造终态，因此没有制作一条冒称合格的剪辑版。
+
+八项缺证保留：badge逐字细节、broadcast音义、gaze/lips的完整声画对应、native-track完整声音、other-props、source-output中的canonical采用、具名座位关系、source-hover-prerequisite。AAC存在不证明广播台词或环境声，本次没有转写、audio_understand或human完整1×听看；不复用旧音频unit，也不将技术部分PASS代签整条要求。原15项目标与36项FinalOutput、selected QA revision5/hash `61ba5056f03f7614be7de4c3c3ed5ce1904ae96bcc5b8aacf7546cc4893f53cf`保持。
+
+已由 canonical committer abandon该 exact候选，标准 `load_production_project` 重开 **Manifest143 /Project20**：attempt `failed`、phase `validate`，rejection `98395d4df172f9829a796df69dea0aff9bd82ef0d0504f8c2e382ef083714b49`。S01仍STOP，无 activation、accepted state或S02 handoff。paid phase仍为 `accepted`，budget revision36未blocked，本次reservation保留 `reserved`、actual cost为null；质量失败不等于无消费或退款，也不释放或挪用这次额度。
+
+本次网络视频POST1、历史累计20，task used8→9、ceiling8→9，S02仍0。内部金额总上界400,000,000 CNY microunits及单次50,000,000均未提高，不是报价、账单或余额。提交前多次本地进程中断均停在Manifest137的REQUEST、无paid intent及wire事件；只恢复同一attempt，未重复POST、重建grant或重铸已消费permit。保留初始授权后，仅续了尚未消费授权的45分钟时间窗，次数、金额、preview、inputs不变。中断的全部原因尚未确认，不归咎账户、模型或内存。
+
+实际栈确认的一处逐条历史失败重复全量读取已通过共享owner修复，源码 `e5bf7fc86d42c1ec8adc5f1e4ed6a57e65d2f6a4` 已push并核验remote main；20项针对性回归及Parent审阅通过，详见[验证边界记录](2026-10-19-staged-verification-boundaries.md#current-funded-follow-up--2026-10-19)。成功提交入口仍耗时10分17秒，不宣称全部延迟已解决。源码完整工程Harness继续按用户优先取可用视频的要求标为DEFERRED。
+
+证据根：`runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-responsibility-S01-20261019-002/`。`native-preview.json`、`wire-observations.json`、`fetch.actual.json`、`probe.actual.json`、`mcp-call.json`、`controlled-presentation.json`、`controlled-answers.json`、`diagnosis.json`、`quality-rejection.actual.json`、`final-reopen.json`分别保留输入、实际调用、媒体、观察与关闭证明。下载只对同一已知结果使用既有公开DNS/公网IP固定/TLS-SNI/无重定向GET seam，未重新生成。文档checkpoint receipt为 `.agent/harness/runs/funded-s01-recovery-record-20261019-r1/receipt.json`，不补签源码或媒体通过。
+
+`record-ai-video-session`及自动`distill-ai-video-learning`评估为 `no_candidate`：新片与旧A存在同类手影表现，但不是隔离mode、prompt或参考职责的受控因果对照；已有“绑定不保证整段质量”边界不需重复采纳。本地H3首帧头部claim明确排除paid/remote，不借此扩张其scope。Evidence Index的fetch与analyzer层只计同一新attempt；未修改Skill/Policy/Gate或全局memory。当前一次授权已消费，不同输入的新有限单元尚未封存或获批，不继续同输入重抽。
+
+## Historical Billing Blocker — 2026-10-19
 
 用户重新要求“做视频”，随后问“你的意思是没钱了api是吗”。本轮复核[官方国内站创建接口](https://platform.minimax.cn/docs/api-reference/video-generation-v2-create)：该 endpoint 将 HTTP402 定义为 `insufficient_balance_error` / `insufficient balance (1008)`，因此按官方语义应先处理 API 可用余额不足。上次实测仅保留 HTTP402和response SHA，未保留业务错误体；不能冒称实测读到1008、账户余额为零或已查过账户。此前“具体原因未确认”是尚未核对该官方说明时的历史解释，不再作为当前接口语义结论。
 
@@ -17,7 +45,7 @@ Date: 2026-10-13
 
 本次 `record-ai-video-session` 更新同一记录，`distill-ai-video-learning=no_candidate`：官方错误语义核实不是新的模型质量实验，不新增 Evidence Index attempt或经验采纳规则。文档 checkpoint receipt为 `.agent/harness/runs/h3-max-billing-clarification-20261019-r1/receipt.json`，只证明文档范围。
 
-## Current Finite S01 Submit — 2026-10-19
+## Historical Finite S01 Submit — 2026-10-19
 
 用户对顶部显式分工候选回复“可以”，授权 official MiniMax H3 Max CN / 5秒 / 768P / balanced / first-frame 一次、零重抽，明确本次动态白模例外；S02 POST0、图片/音频生成0、音频理解新调用0。随后用户要求在没有可用视频前减轻验证，已停止重复的大范围增量 Harness，保留必要提交边界和针对性回归；共享修复、完整旧快照证据及中止边界见[工程主记录](2026-10-19-production-responsibility-allocation.md#current-integration-follow-up)。
 
@@ -1035,10 +1063,12 @@ Parent使用`research`与`retrieve-ai-video-memory`，后者不作为current事�
 
 ## Evidence Index
 
-此表只为本次原开场准备单元建立identity；历史其他实验不并入。remote boundary为Seedream/`doubao-seedream-5-0-pro-260628`、Ark shared image owner、1152×2048 PNG；新增local boundary为Qwen-Image-Edit-2511/三引用masked profile、944×1672 PNG，不与remote合同或计数合并。同一图片的receipt、bytes、materialization和visual proof使用同一request fingerprint independence_key，只贡献一个图片样本；预transport失败不是第二个视觉样本。
+此表为本记录原开场相关准备、有限调用与观察建立identity，不收纳无关实验。早期remote boundary为Seedream/`doubao-seedream-5-0-pro-260628`、Ark shared image owner、1152×2048 PNG；local boundary为Qwen-Image-Edit-2511/三引用masked profile、944×1672 PNG，不与remote合同或计数合并。同一图片的receipt、bytes、materialization和visual proof使用同一request fingerprint independence_key；预transport失败不是第二个视觉样本。新增官方H3 Max CN /5秒/768P/first-frame调用以exact attempt为一个单位，fetch及analyzer层复用同一key；复用旧PNG、工程fixture和本地未提交进程恢复均不增加模型实验数。
 
 | evidence_id | independence_key | experiment_id | attempt_id | arm_id | artifact_sha256 | proof_layer | verdict | failure_class | relation_kind | related_evidence_id | source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| original-S01-funded-fetch | official-max-attempt:canvas-ab20b88226f1308d4695a5a6589fd7c3c092b2b5 | jieshi-original-S01-responsibility-20261019 | canvas-ab20b88226f1308d4695a5a6589fd7c3c092b2b5 | N/A | c49403ca2a9491647fbe12ab4c277c42611cd866f85bb826697cf1dc1bf6fbc9 | PROVIDER_RECEIPT | FETCHED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-responsibility-S01-20261019-002/fetch.actual.json |
+| original-S01-funded-qa | official-max-attempt:canvas-ab20b88226f1308d4695a5a6589fd7c3c092b2b5 | jieshi-original-S01-responsibility-20261019 | canvas-ab20b88226f1308d4695a5a6589fd7c3c092b2b5 | N/A | c49403ca2a9491647fbe12ab4c277c42611cd866f85bb826697cf1dc1bf6fbc9 | ANALYZER | FAIL | QUALITY_FAILURE_AND_EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-funded-fetch | runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-responsibility-S01-20261019-002/diagnosis.json |
 | credential-before-post | native-image:463e47e5d7b07c89d5db8f82db5d06f06867b08d7eac9d2066acb860adf74ac3 | jieshi-original-preparation-20261014 | original-preparation-base-20261014-candidate | N/A | NO_ARTIFACT:PRE_TRANSPORT_CREDENTIAL_FAILURE | PROVIDER_RECEIPT | KNOWN_NO_EFFECT | CREDENTIAL_READINESS | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/authorized-unit-20261014-001/base-known-no-effect-current.json |
 | base-submit | native-image:4225a10af7b88649f33bbfa08f8df705363780f78b07abae1847dcd230845801 | jieshi-original-preparation-20261014 | original-preparation-base-20261014-qualified-001 | N/A | 14ce8688fd567c1d2ff7518a1de112cd505e5dec395bf22299219a00fed3ec73 | PROVIDER_RECEIPT | ACCEPTED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/production/state/paid-provider/submits/aa2c38927dace8d98eddd50dc005e9748a56b70764b9ca755827caf369ff1469.json |
 | base-bytes | native-image:4225a10af7b88649f33bbfa08f8df705363780f78b07abae1847dcd230845801 | jieshi-original-preparation-20261014 | original-preparation-base-20261014-qualified-001 | N/A | 14ce8688fd567c1d2ff7518a1de112cd505e5dec395bf22299219a00fed3ec73 | TECHNICAL_BYTES | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | base-submit | runs/canvas-jieshi-original-s01-s02-20261013-001/authorized-unit-20261014-001/runtime-repair-001/materialization-diagnosis.json |

@@ -10,6 +10,8 @@ Date: 2026-10-19
 
 ## Current Integration Follow-up
 
+2026-10-19充值后续已完成新的同输入S01单次POST：HTTP200、原片落盘，实际5 PASS /1 FAIL /8 NOT_EVALUATED；玻璃手影仍违反原目标，已canonical abandon并重开Manifest143 /Project20，S01 STOP、S02 POST0。下文402阻断属于前一次历史，不再表示最新接口状态；新媒体、已消费9/9次数与音频/剪辑/人工缺证归[当前媒体记录](2026-10-13-jieshi-original-s01-s02-candidate.md#current-funded-s01--2026-10-19)。运行中确认的逐条失败历史重复全量读取已由共享源码`e5bf7fc`修复并发布，20项focused回归及Parent审阅通过，详见[验证边界follow-up](2026-10-19-staged-verification-boundaries.md#current-funded-follow-up--2026-10-19)；完整源码Harness仍DEFERRED，不因拿到MP4而宣称通用媒体控制质量成立。
+
 2026-10-19 后续的验证职责分层和单次 submit snapshot复用见[架构续改记录](2026-10-19-staged-verification-boundaries.md)。本节 `df13f21` 的源码/审查快照作为历史保留；媒体状态未因架构改动而通过。
 
 2026-10-19 在真实制作入口确认并修复四个共享缺口，源码依次发布 `984e372`、`510c440`、`df13f21`；最后一项修复后的 native review round 2 无 findings。未新增故事条件分支、执行链、timeline、renderer 或依赖。实际 S01 运行结果归[媒体主记录](2026-10-13-jieshi-original-s01-s02-candidate.md)，下文初次发布的 POST0、Manifest116 与 readiness 只描述当时快照。

@@ -8,7 +8,19 @@ learning_eligibility: ineligible
 
 Date: 2026-10-19
 
-## Current Result
+## Current Funded Follow-up — 2026-10-19
+
+真实充值后续沿同一已登记S01请求取证，最新媒体与关闭状态归[媒体主记录](2026-10-13-jieshi-original-s01-s02-candidate.md#current-funded-s01--2026-10-19)：一次POST已HTTP200并下载原片，但玻璃手影导致5 PASS /1 FAIL /8 NOT_EVALUATED，canonical abandon后标准loader重开Manifest143 /Project20。S01仍STOP、S02 POST0。下文a07b1ed、Manifest133及当时POST0均保留为初次checkpoint历史，不再表示最新媒体状态。
+
+实际运行栈暴露另一处共享重复读取：`_require_submit_execution_binding`逐条分类旧失败时，经`failed_generation_history_outcome`调用公开对账helper，再次完整`load_production_project`。源码 `e5bf7fc86d42c1ec8adc5f1e4ed6a57e65d2f6a4` 已push并核验remote main：分类现在消费本锁内已标准验证、Manifest/attempt匹配的同一`loaded`，公开独立对账入口仍重新加载；两者复用同一predicate，并继续重开收据与全部reconciliation evidence、检查containment/hash/size。没有cache、第二执行链、故事分支或放宽history/current QA/unknown/quota/grant规则。
+
+新canonical paid-intent回归在真实reconciled FAILED历史上由2次完整加载RED到1次GREEN。最新20项focused测试通过，覆盖stale QA、普通KNOWN_NO_EFFECT仍为runtime_failure、真实对账not_submitted、伪造not_submitted及receipt/evidence字节篡改拒绝。Parent审阅五份owned diff，Risk Gate为`NATIVE_REVIEW_NOT_REQUIRED`：复用的是现有锁内已核验快照、predicate和独立公共读取语义保留，相关负向路径已有可执行证明，未发现新的authority或实质未覆盖高后果路径。证据为该媒体run的`snapshot-reuse-focused-checks.json`；这不是完整Harness receipt。
+
+首次提交进程exit143的来源及一次后台进程无正常退出记录的原因仍未确证；另一次为Parent在REQUEST、wire0时主动暂停以修复上述重复读取。每次继续前核对Manifest137仍REQUEST且paid state为null，恢复同一attempt；首次durable submit intent及one-use permit仅在实际提交时生成，不重建旧grant或重铸已消费permit。最终受监督执行10分17秒、峰值RSS399,924KB，wire POST约0.92秒；不能将全部延迟或中断归因这一个缺口，也不宣称真实吞吐已普遍改善。
+
+本次无大范围源码Harness；按用户先取得可用原片的要求，完整工程completion proof继续DEFERRED。仅文档checkpoint运行`.agent/harness/runs/funded-s01-recovery-record-20261019-r1/receipt.json`，不能补签源码全检查、媒体通过或human验收。foreign index SHA仍为`c727828e0ef6aebc8033b71b3842d44668105948aafd9dd6363db47254b90b82`。记录后的自动learning评估为no_candidate，未改Skill/Policy/Gate。
+
+## Initial Result
 
 用户要求在没有可用视频前减轻验证，随后明确“修改架构”。本轮在既有 owners 内落实取材、剪辑、交付与工程证明的边界，并合并一次确定的重复项目加载。源码 `a07b1ed030ad5942d44da91b7404ce87aac681df` 已 push main，远端 SHA 相同。新增外部 Provider/媒体/音频理解调用0，没有新 schema、状态库、timeline、renderer、依赖、试拍许可或跨调用缓存。
 
@@ -40,7 +52,7 @@ Parent 自审确认本改动只传递同锁内既有纯投影，未增加 author
 
 ## Existing Media And Publication Boundary
 
-本轮未启动 Provider、读取凭据或修改实际 Production state。原项目仍 Manifest133；Manifest SHA `914aa7b92d14ea7c9d192535b9c1548e6be9722dfca6ce61f9f3f42ab852b726`。S01最后一次提交的 HTTP402/known_no_effect 和无新MP4状态见[媒体主记录](2026-10-13-jieshi-original-s01-s02-candidate.md#current-finite-s01-submit--2026-10-19)；无 accepted-state/activation，S02 POST0。恢复真实生成仍需解决当前接口拒绝及下一次有效有限授权。
+初次checkpoint未启动 Provider、读取凭据或修改实际 Production state。原项目当时为 Manifest133；Manifest SHA `914aa7b92d14ea7c9d192535b9c1548e6be9722dfca6ce61f9f3f42ab852b726`。当时S01提交的 HTTP402/known_no_effect 和无新MP4状态见[历史媒体记录](2026-10-13-jieshi-original-s01-s02-candidate.md#historical-finite-s01-submit--2026-10-19)；无 accepted-state/activation，S02 POST0。当时的接口拒绝与有限授权阻断已由顶部funded follow-up部分取代，不能据此重复要求批准同一尚未消费指令。
 
 八份源码/合同按 owned paths提交，foreign staged diff SHA `c727828e0ef6aebc8033b71b3842d44668105948aafd9dd6363db47254b90b82` 保留；AGENTS/playbook及其余未知修改未纳入。本文和旧工程记录的直接关联 notice另作文档 checkpoint，publication以Git及文档 receipt为准。
 
