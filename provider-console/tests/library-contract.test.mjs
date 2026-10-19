@@ -236,6 +236,27 @@ test("viewing proxies stay visible while cleanup masters require explicit advanc
   assert.equal(visible[0].contexts[0].attempt, null);
 });
 
+test("recent strict workspace media is discoverable before older external videos using file time only", () => {
+  const d = detail("local-repair", attempt());
+  d.attempts = [];
+  const modifiedAt = "2026-10-19T12:46:14Z";
+  d.workspace_media = [{ ...media("c", "view-token"), source_kind: "viewing_proxy", modified_at: modifiedAt }];
+  const external = { groups: [{ ...media("b", "older-token"), locations: [{ source_id: "external", token: "older-token", modified_at: "2026-10-10T00:00:00Z" }] }] };
+  const entries = buildLibraryEntries([d], external);
+  assert.equal(entries[0].sha256, sha("c"));
+  assert.equal(entries[0].startedAt, modifiedAt);
+  assert.equal(entries[0].timeKind, "file");
+  assert.equal(entries[0].contexts[0].attempt, null);
+  assert.equal(entries[0].model, null);
+  const generated = detail("local-repair", attempt({ fetched_media: media("c", "view-token"), started_at: "2026-09-01T00:00:00Z" }));
+  generated.workspace_media = d.workspace_media;
+  const [bound] = buildLibraryEntries([generated], null);
+  assert.equal(bound.timeKind, "attempt");
+  assert.equal(bound.startedAt, "2026-09-01T00:00:00Z", "copying bytes cannot replace a known generation time");
+  d.workspace_media[0].modified_at = "invalid";
+  assert.equal(buildLibraryEntries([d], null)[0].startedAt, null);
+});
+
 test("only exact verified project snapshots create version groups", () => {
   const valid = detail("run-a", attempt({ candidate_media: media("f", "valid-token") }));
   const mismatched = detail("run-a", attempt({

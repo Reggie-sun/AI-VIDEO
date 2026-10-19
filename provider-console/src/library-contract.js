@@ -153,6 +153,8 @@ function runContexts(details) {
       const isRender = media === detail.active_render_media;
       const projectTitle = valueOrNull(detail?.project?.title);
       const fileName = valueOrNull(media?.asset_id || media?.relative_path);
+      const attemptTime = isRender && timestamp(media.started_at) !== null ? media.started_at : null;
+      const fileTime = timestamp(media.modified_at) !== null ? media.modified_at : null;
       contexts.push({
         id: `runs:${detail?.workspace || ""}:${isRender ? "active_render" : "workspace_media"}:${fileName || mediaIndex}`,
         sourceId: "runs",
@@ -165,8 +167,8 @@ function runContexts(details) {
         semanticBinding: null,
         model: null,
         prompt: null,
-        startedAt: isRender ? valueOrNull(media.started_at) : null,
-        timeKind: isRender && timestamp(media.started_at) !== null ? "attempt" : null,
+        startedAt: attemptTime || fileTime,
+        timeKind: attemptTime ? "attempt" : fileTime ? "file" : null,
         media,
         url: mediaUrl(media, "/api/runs/media/"),
         detail,

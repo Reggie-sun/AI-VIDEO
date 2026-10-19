@@ -1271,6 +1271,9 @@ def test_production_workspace_media_projection_is_bounded_and_sanitized(
     assert [item["asset_id"] for item in result["workspace_media"]] == [
         f"image-{index:02d}" for index in range(32)
     ]
+    assert result["workspace_media"][0]["modified_at"] == (
+        provider_console._iso_mtime(asset_paths["image-00"])
+    )
     assert result["workspace_media_truncated"] is True
     serialized_public = json.dumps(
         {key: value for key, value in result.items() if key != "_media"}

@@ -310,6 +310,7 @@ def _media_projection(
         "mime_type": mime_type,
         "bytes": size,
         "sha256": getattr(asset, "sha256", None),
+        "modified_at": datetime.fromtimestamp(metadata.st_mtime, timezone.utc).isoformat(),
         "width": getattr(asset, "width", None),
         "height": getattr(asset, "height", None),
         "duration_seconds": getattr(asset, "duration_seconds", None),
