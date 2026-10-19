@@ -77,7 +77,7 @@ checks归现有`production_image_tests`、`canvas_production_workflow_tests`和r
 
 ## Character Performance Direction
 
-`production/video_requirement.py::PerformanceIntent.character_directions` 沿既有 intent 独占逐人物表演输入；
+`production/video_requirement.py::PerformanceIntent.character_directions`（兼容导出）沿既有 intent 独占逐人物表演输入；
 `production/performance_direction.py` 拥有 pure 类型、exact cast coverage、相对阶段顺序与确定性文字表达。
 `production/performance_authoring.py` 只检查新生成的显式填写和既有 selected QA acceptance/raw_generation
 analyzer/human 覆盖，提供 read-only preview；不默认生成表情、不创建 finding 或质量状态。

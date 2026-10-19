@@ -22,6 +22,9 @@ Owner：native `bounded_worker` `/root/performance_core_impl`。唯一写入 `pr
 
 验收：结构及人物绑定、阶段顺序和 offscreen 失败路径；old bytes/hash；rich 编译包含作者表演；preserved-source 缺原文表达拒绝。无外部效果。
 
+最终 owner 收敛：完整 `PerformanceIntent` 类型与新增逐人物类型同归 `performance_direction.py`，
+`video_requirement.py` 保留原 public import。避免扩张已有大模型文件；历史 JSON、hash 与旧 prompt 的兼容通过固定 golden 验证。
+
 ### 2. Mandatory Authoring And Acceptance Integration
 
 Owner：Parent。新增小型 preparation guard，接入现有 `GenerationFeedbackOrchestrator.prepare` 与 `GenerationDecisionExecutionBinding.create` 的 fresh creation 边界；不修改 historical validation。现有 Canvas preflight 和 reference-control 展示同一 sealed 数据与缺项。测试覆盖公共 author→standard reader→prepare seam、多场景、缺少人物/参数/验收、未表达与成功编译；只迁移受影响的共享 fixtures，不能放宽新规则来保持旧 fixture。
