@@ -11,6 +11,10 @@ Date: 2026-10-13
 
 ## Current Performance Feedback And Input Audit — 2026-10-19
 
+2026-10-20 更新：[通用人物表演模块](2026-10-20-character-performance-control.md)已在共享 owners 实现并发布，
+Agent 新生成时必须明确填写逐人物方向、进入 exact 提示词并关联所选 raw QA。下文“待实施方向”属于本次输入审计时点；
+共享工程现已完成，但未补写旧 S01 输入、未生成新片、未改变旧 QA/消费/失败状态，S01 STOP 和 S02 POST0 保持。
+
 用户反馈主角与路人“跟僵尸一样”，质疑是否控制人物表情。复核当前funded raw对应`official-h3-max-responsibility-S01-20261019-002/native-preview.json`：实际1478字符prompt SHA `2c491b55c9ccb2b69692966da86f1bafe4b308f8cbef9575c3282b31498e4417`，包含固定目光、嘴唇不动、抬手与悬停；没有逐镜的眉眼情绪变化、呼吸、肩颈反应或背景自然微动作。另有“六名普通乘客固定坐位，无新增人物或独立动作”。本次是一张PNG的first-frame请求，没有另行绑定表演视频/音频参考。
 
 原`docs/superpowers/artifacts/drama/jieshi-episode-01/episode-01.md`人物Bible有“困惑→自我怀疑→克制恐惧”的全剧情绪弧，但当前S01 Shot及selected QA revision5只落实了目光、嘴唇和手部动作，没有对应的面部表演/自然程度要求。路人Bible的静态背景/无表达约束较强；B01的0–3秒规定倒影异常与广播，“人群毫无反应”明确在B02的3–15秒，不能据此要求S01所有人完全冻结。Parent核对实际native输入，read-only native `code_mapper`独立核对原文、Shot和QA；没有新增媒体分析、生成或付费理解。

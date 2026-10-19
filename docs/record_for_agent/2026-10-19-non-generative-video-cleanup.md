@@ -10,6 +10,10 @@ Date: 2026-10-19
 
 ## Current Performance Feedback
 
+2026-10-20 更新：[通用人物表演模块](2026-10-20-character-performance-control.md)的参数必填、实际输入表达和 raw QA
+接入已实现并发布，适用于后续新作者版本；没有改动本片或为 cleanup 增加表演，不改变当前局部修补 PENDING 或 S01 STOP。
+工程验证与实际模型表演质量分开，后者尚未新增验证。
+
 用户随后质疑主角与路人表演“跟僵尸一样”。[S01实际输入核对](2026-10-13-jieshi-original-s01-s02-candidate.md#current-performance-feedback-and-input-audit--2026-10-19)确认固定目光/闭口/手部动作之外，没有逐镜情绪变化、呼吸或背景自然微动作指令；原人物情绪弧未落实到该镜的表演与QA。局部手影清理没有解决人物表演，不能据清理结果宣称整镜可接受，也不能将此反馈当作75a手影修补已获人工接受；局部确认仍待完成，原S01 STOP保持。本次未生成新片、修改Product state或建立新表演spec；此处是同一raw链的质量反馈，不增加独立实验数量。
 
 ## Current Screenshot-bound Hand Repair
