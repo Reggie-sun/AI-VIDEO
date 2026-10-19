@@ -12,6 +12,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { createServer } from "vite";
 
 import { createCatalogChangeFeed, createRunsApiHandler, RunsApiError } from "../scripts/runs-api.mjs";
+import { createPythonModuleEvidenceProjector, moduleEvidenceProjection } from "../scripts/module-evidence.mjs";
 import { configuredExternalMediaSources } from "../vite.config.mjs";
 import {
   attemptOutcome,
@@ -821,6 +822,89 @@ async function invoke(handler, req) {
   await handler(req, res, () => { nextCalled = true; });
   return { res, nextCalled };
 }
+
+function moduleEvidenceFixture() {
+  return {
+    schema: "ai-video-module-evidence/1", observed_at: "2026-10-20T00:00:00Z", source_kind: "local_readonly",
+    repository: { head: "a".repeat(40), dirty: false },
+    modules: [{
+      id: "committer", kind: "engineering",
+      source: { state: "present", files: [{ path: "src/ai_video/production_state_committer.py", sha256: "b".repeat(64), bytes: 1 }] },
+      engineering: { state: "historical_pass", evidence: [{
+        receipt_path: ".agent/harness/runs/example/receipt.json", receipt_sha256: "c".repeat(64),
+        base_commit: "d".repeat(40), head_commit: "e".repeat(40), finished_at: "2026-10-19T00:00:00Z",
+        check_id: "state_tests", status: "passed", anchor_match: "changed",
+        artifacts: [{ path: ".agent/harness/runs/example/state.stdout.log", sha256: "f".repeat(64), bytes: 0, kind: "stdout" }],
+      }] },
+      media: { applicable: false, state: "not_applicable" }, human: { applicable: false, state: "not_applicable" },
+    }],
+    cases: [], delivery: { state: "unavailable", scope: "selected_case_audit", autonomy: "not_measured" },
+  };
+}
+
+test("module evidence endpoint rereads fixed local sources, preserves historical drift and engineering applicability", async () => {
+  let reads = 0;
+  const handler = createRunsApiHandler({ repoRoot: "/repo", moduleEvidenceProjector: async () => {
+    reads += 1;
+    return { ...moduleEvidenceFixture(), _private: "/private/source", raw_log: "do not publish" };
+  } });
+  const first = await invoke(handler, request("GET", "/api/runs/module-evidence"));
+  assert.equal(first.res.statusCode, 200);
+  assert.equal(first.res.headers.get("cache-control"), "no-store");
+  const value = JSON.parse(first.res.body);
+  assert.equal(value.modules[0].engineering.evidence[0].anchor_match, "changed");
+  assert.equal(value.modules[0].media.state, "not_applicable");
+  assert.equal(value.delivery.state, "unavailable");
+  assert.doesNotMatch(first.res.body.toString(), /private|raw_log|do not publish/);
+  await invoke(handler, request("GET", "/api/runs/module-evidence"));
+  assert.equal(reads, 2);
+  for (const method of ["POST", "HEAD", "PUT"]) {
+    assert.equal((await invoke(handler, request(method, "/api/runs/module-evidence"))).res.statusCode, 405);
+  }
+  assert.equal((await invoke(handler, request("GET", "/api/runs/module-evidence?root=.."))).res.statusCode, 400);
+  const remote = request("GET", "/api/runs/module-evidence");
+  remote.socket.remoteAddress = "192.0.2.1";
+  assert.equal((await invoke(handler, remote)).res.statusCode, 403);
+  assert.equal(reads, 2);
+});
+
+test("module evidence fails closed on unavailable, malformed, escaped and unsupported evidence without leaking errors", async () => {
+  const badValues = [null, {}, { ...moduleEvidenceFixture(), schema: "future" }];
+  for (const badPath of ["/private/secret", "../secret", "src/link/../secret", "src\\secret"]) {
+    const value = moduleEvidenceFixture();
+    value.modules[0].source.files[0].path = badPath;
+    badValues.push(value);
+  }
+  for (const value of badValues) {
+    const handler = createRunsApiHandler({ repoRoot: "/repo", moduleEvidenceProjector: async () => value });
+    const result = await invoke(handler, request("GET", "/api/runs/module-evidence"));
+    assert.equal(result.res.statusCode, 503);
+    assert.equal(JSON.parse(result.res.body).error.code, "MODULE_EVIDENCE_UNAVAILABLE");
+    assert.doesNotMatch(result.res.body.toString(), /secret|Traceback|private/);
+  }
+  const handler = createRunsApiHandler({ repoRoot: "/repo", moduleEvidenceProjector: async () => { throw new Error("private credential"); } });
+  const result = await invoke(handler, request("GET", "/api/runs/module-evidence"));
+  assert.equal(result.res.statusCode, 503);
+  assert.doesNotMatch(result.res.body.toString(), /private|credential/);
+  const duplicate = moduleEvidenceFixture();
+  duplicate.modules.push(duplicate.modules[0]);
+  assert.throws(() => moduleEvidenceProjection(duplicate), /MODULE_EVIDENCE_UNAVAILABLE/);
+});
+
+test("module evidence Python bridge has fixed argv, bounded reads and a minimal non-credential environment", async () => {
+  const run = async (program, args, options) => {
+    assert.ok(program);
+    assert.deepEqual(args, ["-m", "scripts.provider_console_evidence", "--repo-root", "/repo with spaces"]);
+    assert.equal(options.cwd, "/repo with spaces");
+    assert.equal(options.timeout, 30000);
+    assert.deepEqual(Object.keys(options.env).sort(), ["LANG", "LC_ALL", "PATH", "PYTHONPATH"]);
+    return { stdout: JSON.stringify(moduleEvidenceFixture()) };
+  };
+  assert.equal((await createPythonModuleEvidenceProjector("/repo with spaces", run)()).schema, "ai-video-module-evidence/1");
+  for (const stdout of ["not json", JSON.stringify({ schema: "future" })]) {
+    await assert.rejects(createPythonModuleEvidenceProjector("/repo", async () => ({ stdout })), /MODULE_EVIDENCE_UNAVAILABLE/);
+  }
+});
 
 test("catalog change feed batches recursive source events and closes every watcher", async () => {
   const callbacks = new Map();

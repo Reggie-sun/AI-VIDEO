@@ -42,6 +42,21 @@
     .return-link { padding: 7px 12px; border: 1px solid var(--border); border-radius: 7px; color: #d8ddea; font-size: 13px; text-decoration: none; transition: border-color .16s, background .16s; }
     .return-link:hover { border-color: #6558a8; background: #17182c; }
     .return-link[aria-disabled="true"] { cursor: not-allowed; color: #8792a0; border-style: dashed; }
+    .audit-status { margin: 21px 0 8px; padding: 20px 22px; border: 1px solid #514777; border-radius: 12px; background: linear-gradient(115deg, rgba(41, 34, 70, .74), rgba(10, 20, 30, .98)); }
+    .audit-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
+    .audit-kicker { display: block; color: #b2a4ff; font-size: 11px; font-weight: 760; letter-spacing: .14em; }
+    .audit-status h2 { margin: 3px 0 4px; color: #f4f0ff; font-size: 20px; line-height: 1.4; }
+    .audit-summary { max-width: 920px; margin: 0; color: #c6c2d2; font-size: 14px; line-height: 1.6; }
+    .audit-refresh { flex: none; min-height: 39px; padding: 7px 12px; border: 1px solid #665a91; border-radius: 7px; background: #211e36; color: #e6e0ff; font-size: 13px; cursor: pointer; }
+    .audit-refresh:hover { border-color: #a294e2; background: #2c2748; }
+    .audit-refresh:disabled { opacity: .6; cursor: progress; }
+    .audit-meta { display: flex; flex-wrap: wrap; gap: 8px 18px; margin-top: 13px; color: #aab2c0; font-size: 12px; }
+    .audit-meta strong { color: #e4dcff; font-weight: 650; }
+    .audit-cases { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 9px; margin-top: 14px; }
+    .audit-case { min-width: 0; padding: 12px 14px; border: 1px solid #353249; border-radius: 8px; background: rgba(8, 15, 24, .6); }
+    .audit-case h3 { margin: 0 0 5px; color: #e9e3ff; font-size: 14px; }
+    .audit-case p { margin: 3px 0; color: #b7bdca; font-size: 12px; line-height: 1.5; overflow-wrap: anywhere; }
+    .audit-case code { color: #9dd9cf; font-size: 11px; overflow-wrap: anywhere; }
     .eyebrow { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; color: #a99aff; font-size: 12px; font-weight: 750; letter-spacing: .16em; text-transform: uppercase; }
     .eyebrow::before { width: 20px; height: 1px; background: var(--violet); content: ""; }
     .hero { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(250px, .6fr); gap: 34px; align-items: end; padding: 46px 0 28px; }
@@ -80,19 +95,58 @@
     .legend i { width: 25px; border-top: 2px solid var(--violet); }
     .legend .data { border-top-style: dotted; border-color: var(--teal); }
     .legend .agent { border-top-style: dashed; border-color: var(--amber); }
-    .diagram-scroll, .maturity-scroll { max-width: 100%; overflow-x: auto; overscroll-behavior-x: contain; border: 1px solid var(--border-soft); border-radius: 9px; }
-    .diagram-canvas { position: relative; width: 1120px; height: 600px; margin: auto; background: #08121b; }
-    .diagram-canvas svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-    .diagram-canvas path { fill: none; stroke-width: 2; }
-    .diagram-canvas .edge-label { font: 12px system-ui, sans-serif; fill: #d7deea; paint-order: stroke; stroke: #08121b; stroke-width: 7px; stroke-linejoin: round; }
-    .graph-node { position: absolute; z-index: 1; width: 220px; min-height: 92px; padding: 13px 14px; border: 1px solid #4e426f; border-radius: 9px; background: #171c2d; color: #e8e4ff; text-align: left; cursor: pointer; }
-    .graph-node:hover { border-color: #b3a3ff; background: #25233d; }
-    .graph-node strong, .graph-node span { display: block; }
-    .graph-node strong { font-size: 15px; line-height: 1.4; overflow-wrap: anywhere; }
-    .graph-node span { margin-top: 5px; color: #b9c5d3; font-size: 12px; line-height: 1.5; }
+    .relation-map { display: grid; gap: 17px; }
+    .graph-node-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 210px), 1fr)); gap: 10px; }
+    .graph-node { min-width: 0; padding: 12px 13px; border: 1px solid #4e426f; border-radius: 9px; background: #171c2d; color: #e8e4ff; transition: opacity .15s, border-color .15s, background .15s; }
     .graph-node[data-tone="stop"] { border-color: #a15e63; background: #2a1924; }
     .graph-node[data-tone="edit"] { border-color: #3c8d7c; background: #102c2b; }
     .graph-node[data-tone="owner"] { border-color: #9b7d40; background: #27241b; }
+    .graph-node.is-dimmed { opacity: .33; }
+    .graph-node.is-related { border-color: #b4a5ff; box-shadow: 0 0 0 1px rgba(180, 165, 255, .2); }
+    .graph-node-title { display: block; color: #f0edfa; font-size: 15px; font-weight: 680; line-height: 1.35; overflow-wrap: anywhere; }
+    .graph-node-code { display: block; margin-top: 3px; color: #a2b3c4; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 10px; line-height: 1.5; overflow-wrap: anywhere; }
+    .graph-node-copy { display: block; margin-top: 7px; color: #b9c5d3; font-size: 12px; line-height: 1.5; }
+    .graph-node-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .graph-node-actions button, .graph-reset { min-height: 30px; padding: 4px 8px; border: 1px solid #45465b; border-radius: 6px; background: #111a28; color: #d8d2f0; font-size: 11px; cursor: pointer; }
+    .graph-node-actions button:hover, .graph-reset:hover { border-color: #9d8beb; background: #211e37; }
+    .graph-node-actions .node-detail { color: #b9c5d3; }
+    .edge-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .graph-edge { min-width: 0; padding: 10px 12px; border: 1px solid #263643; border-radius: 8px; background: #0b151e; transition: opacity .15s, border-color .15s; }
+    .graph-edge.is-dimmed { opacity: .25; }
+    .graph-edge.is-related { border-color: #8272bd; background: #13182a; }
+    .edge-ends { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 7px; align-items: center; color: #e2def0; font-size: 12px; line-height: 1.4; }
+    .edge-ends span:first-child, .edge-ends span:last-child { overflow-wrap: anywhere; }
+    .edge-arrow { color: #a697d9; font-size: 17px; }
+    .edge-label { margin-top: 4px; color: #aebac8; font-size: 12px; line-height: 1.45; }
+    .edge-meta { display: flex; flex-wrap: wrap; gap: 7px; align-items: baseline; margin-top: 5px; color: #8e9cab; font-size: 10px; }
+    .edge-type { padding: 2px 6px; border: 1px solid #4e426f; border-radius: 99px; color: #c9beff; }
+    .graph-edge[data-type="data"] .edge-type { border-color: #285a55; color: #9ce7d8; }
+    .graph-edge[data-type="agent"] .edge-type { border-color: #594b33; color: #f0d39c; }
+    .graph-edge[data-type="stop"] .edge-type { border-color: #783e4a; color: #ffb6c0; }
+    .edge-source { display: block; margin-top: 5px; color: #93bcb9; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 10px; overflow-wrap: anywhere; }
+    .relation-inspector { padding: 14px; border: 1px solid #655a8d; border-radius: 9px; background: #17182a; }
+    .relation-inspector h4 { margin: 0 0 5px; color: #e8e2ff; font-size: 14px; }
+    .relation-inspector p { margin: 0 0 9px; color: #b7bdca; font-size: 12px; }
+    .relation-inspector ul { margin: 0; padding-left: 18px; color: #d0d5e0; font-size: 12px; }
+    .relation-inspector li { margin: 5px 0; }
+    .relation-inspector code { color: #9dd9cf; font-size: 10px; overflow-wrap: anywhere; }
+    .loop-note { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; padding: 11px 13px; border: 1px solid #6a5b3e; border-radius: 8px; background: #211f21; color: #e2d4bf; font-size: 13px; }
+    .loop-note strong { color: #f0d39c; }
+    .loop-note span { padding: 3px 7px; border: 1px solid #5d5139; border-radius: 5px; background: #17191b; }
+    .loop-note b { color: #c3b285; font-weight: 500; }
+    .evidence-table-scroll { max-width: 100%; max-height: 610px; overflow: auto; overscroll-behavior: contain; border: 1px solid var(--border-soft); border-radius: 9px; }
+    .evidence-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .evidence-table th { position: sticky; top: 0; z-index: 2; padding: 11px; background: #192332; color: #e3def3; text-align: left; }
+    .evidence-table td { padding: 10px 11px; border-top: 1px solid #263341; vertical-align: top; color: #bdc8d4; }
+    .evidence-table td:first-child { color: #e3dcff; font-weight: 650; }
+    .evidence-state { display: inline-block; padding: 2px 6px; border: 1px solid #465261; border-radius: 5px; color: #c0cbd7; font-size: 10px; }
+    .evidence-state[data-state="historical_pass"], .evidence-state[data-state="bounded"], .evidence-state[data-state="bounded_acceptance"] { border-color: #8b754b; color: #f0d69e; }
+    .evidence-state[data-state="failed"] { border-color: #8d5364; color: #ffb7c9; }
+    .evidence-state[data-state="unavailable"], .evidence-state[data-state="no_result"], .evidence-state[data-state="not_evaluated"] { border-color: #465261; color: #aebac8; }
+    .evidence-table p { margin: 5px 0 0; color: #9eacbb; font-size: 11px; overflow-wrap: anywhere; }
+    .evidence-table button { padding: 0; border: 0; background: transparent; color: #e3dcff; text-align: left; cursor: pointer; }
+    .source-proof { display: block; margin-top: 5px; color: #96c9c1; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 10px; overflow-wrap: anywhere; }
+    .evidence-unavailable { padding: 17px; border: 1px dashed #665a5d; border-radius: 9px; color: #d5c1c4; background: #1b161d; font-size: 13px; }
     .branch-note { margin: 15px 0 0; padding: 13px 15px; border-left: 3px solid var(--amber); background: #211f21; color: #e2d4bf; font-size: 14px; }
     .edge-evidence { margin-top: 15px; color: #b9c5d4; font-size: 13px; }
     .edge-evidence summary { cursor: pointer; color: #d5cafb; }
@@ -111,26 +165,8 @@
     .failure-arrow { align-self: center; color: #a898d0; font-size: 23px; }
     .failure-row[data-kind="unknown"] .failure-step { border-color: #73424f; }
     .failure-row[data-kind="unknown"] strong { color: #ffb7bd; }
-    .maturity-intro { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 10px; margin: 18px 0; }
-    .maturity-intro article { padding: 14px; border: 1px solid var(--border); border-radius: 8px; }
-    .maturity-intro h4 { margin: 0 0 6px; font-size: 15px; color: #ddd3ff; }
-    .maturity-intro p { margin: 0; font-size: 13px; color: #b4c1d0; }
-    .maturity-scroll { max-height: 610px; }
-    .maturity-table { width: 100%; min-width: 1040px; border-collapse: collapse; font-size: 13px; }
-    .maturity-table th { position: sticky; top: 0; z-index: 2; background: #192332; color: #e3def3; text-align: left; padding: 13px; }
-    .maturity-table td { padding: 13px; border-top: 1px solid #263341; vertical-align: top; width: 21%; }
-    .maturity-table td:first-child { width: 16%; }
-    .maturity-table button { padding: 0; border: 0; background: transparent; color: #e3dcff; text-align: left; cursor: pointer; }
-    .maturity-table td p { margin: 7px 0 0; color: #a9bacb; font-size: 12px; overflow-wrap: anywhere; }
-    .evidence-tag { display: inline-block; padding: 3px 7px; border: 1px solid #465261; border-radius: 5px; color: #c0cbd7; font-size: 11px; }
-    .evidence-tag[data-state="source"], .evidence-tag[data-state="historical"] { border-color: #5c4c8c; color: #d0c2ff; }
-    .evidence-tag[data-state="bounded"] { border-color: #8b754b; color: #f0d69e; }
-    .evidence-tag[data-state="unproven"], .evidence-tag[data-state="failed"] { border-color: #8d5364; color: #ffb7c9; }
-    .evidence-tag[data-state="human"] { border-color: #408577; color: #a0e6d4; }
-    .maturity-detail { grid-column: 1/-1; }
-    .maturity-detail code { display: block; color: #9fc6c4; font-size: 11px; overflow-wrap: anywhere; }
-    .maturity-detail ul, .relation-list { margin: 8px 0 0; padding-left: 18px; color: #b9c8d7; font-size: 13px; }
-    .maturity-detail li, .relation-list li { margin: 9px 0; }
+    .relation-list { margin: 8px 0 0; padding-left: 18px; color: #b9c8d7; font-size: 13px; }
+    .relation-list li { margin: 9px 0; }
     .catalog { padding: 25px; border: 1px solid var(--border); border-radius: 13px; background: linear-gradient(180deg, rgba(13, 23, 33, .96), rgba(9, 17, 25, .98)); }
     .catalog-tools { display: grid; grid-template-columns: minmax(220px, 1fr) auto; gap: 14px; align-items: center; margin: 20px 0 17px; }
     .search-wrap { position: relative; display: flex; align-items: center; min-width: 0; }
@@ -195,12 +231,16 @@
     .note-line { margin: 18px 0 0; padding-top: 13px; border-top: 1px solid var(--border-soft); color: #8996a5; font-size: 12px; }
     @media (max-width: 1080px) {
       .page { padding-right: 24px; padding-left: 24px; }
-      .owner-grid, .maturity-intro { grid-template-columns: repeat(2,minmax(0,1fr)); }
+      .owner-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
       .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .audit-cases { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .truth-panel { grid-template-columns: 1fr; }
     }
     @media (max-width: 720px) {
       .page { padding-right: 17px; padding-left: 17px; }
+      .audit-head { flex-direction: column; }
+      .audit-refresh { align-self: flex-start; }
+      .audit-cases { grid-template-columns: 1fr; }
       .hero { grid-template-columns: 1fr; gap: 19px; padding-top: 35px; }
       .hero-lede { font-size: 16px; }
       .snapshot { max-width: none; }
@@ -208,7 +248,8 @@
       .lane { min-height: 0; padding: 15px 17px; }
       .diagram-panel { padding: 14px 11px; }
       .view-tab { padding: 8px 11px; font-size: 13px; }
-      .owner-grid, .maturity-intro { grid-template-columns: 1fr; }
+      .owner-grid { grid-template-columns: 1fr; }
+      .edge-grid { grid-template-columns: 1fr; }
       .failure-row { grid-template-columns: 1fr; }
       .failure-arrow { text-align: center; transform: rotate(90deg); }
       .catalog { padding: 17px 12px; }
@@ -232,17 +273,19 @@
       :root { color-scheme: light; color: #17202b; background: #fff; }
       body { min-width: 0; background: #fff; color: #17202b; font-size: 12px; }
       .page { width: 100%; padding: 0; }
-      .topbar, .stats, .responsibility, .view-tabs, .catalog-tools, .truth-panel, .footer, .card-hint, .mechanism, dialog { display: none !important; }
+      .topbar, .stats, .responsibility, .view-tabs, .catalog-tools, .truth-panel, .footer, .card-hint, .mechanism, .graph-node-actions, .graph-reset, dialog { display: none !important; }
       .diagram-panel, .diagram-panel[hidden] { display: block !important; margin: 15px 0; background: #fff; color: #17202b; }
-      .diagram-scroll { display: none; }
-      .edge-evidence, .view-copy, .owner-card p, .failure-step p, .maturity-table td p { color: #394553; }
-      .diagram-panel h3, .owner-card h4, .failure-step strong, .maturity-intro h4 { color: #30225f; }
-      .owner-card, .failure-step, .maturity-intro article, .maturity-table th { background: #f5f7fa; }
-      .maturity-scroll { max-height: none; overflow: visible; }
-      .maturity-table { min-width: 0; font-size: 9px; }
-      .maturity-table th { position: static; color: #17202b; }
-      .maturity-table td { padding: 5px; }
-      .evidence-tag { color: #30225f !important; }
+      .edge-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .graph-node, .graph-edge, .owner-card, .failure-step { border-color: #cbd3dc; background: #f5f7fa; color: #17202b; break-inside: avoid; }
+      .graph-node-title, .graph-node-code, .graph-node-copy, .edge-ends, .edge-label, .edge-meta, .edge-source, .owner-card p, .failure-step p, .evidence-table td, .evidence-table p { color: #394553; }
+      .diagram-panel h3, .owner-card h4, .failure-step strong, .audit-status h2, .audit-case h3 { color: #30225f; }
+      .audit-status, .audit-case { border-color: #cbd3dc; background: #f5f7fa; color: #17202b; }
+      .audit-summary, .audit-meta, .audit-case p { color: #394553; }
+      .audit-refresh { display: none; }
+      .evidence-table th { position: static; background: #e8ecf2; color: #17202b; }
+      .evidence-table td { padding: 5px; }
+      .evidence-state { color: #30225f !important; }
+      .evidence-table-scroll { max-height: none; overflow: visible; }
       .hero { display: block; padding: 0 0 14px; }
       h1, .section-head h2 { color: #101820; }
       .hero-lede, .snapshot p { color: #394553; }
@@ -274,6 +317,12 @@
       <a id="returnLink" class="return-link" href="/">返回前端</a>
     </nav>
 
+    <section id="auditStatus" class="audit-status" data-state="loading" aria-labelledby="auditTitle" aria-live="polite">
+      <div class="audit-head"><div><span class="audit-kicker">LOCAL READ-ONLY EVIDENCE</span><h2 id="auditTitle">正在读取本机审阅证据…</h2><p id="auditSummary" class="audit-summary">此页面只展示由本机只读接口核验并返回的案例与模块证据。</p></div><button id="refreshEvidence" class="audit-refresh" type="button">刷新证据</button></div>
+      <div id="auditMeta" class="audit-meta"></div>
+      <div id="auditCases" class="audit-cases"></div>
+    </section>
+
     <header class="hero">
       <div>
         <p class="eyebrow">Project architecture · 2026.10.20</p>
@@ -282,14 +331,13 @@
       </div>
       <aside class="snapshot" aria-label="页面内容说明">
         <span class="snapshot-label">SOURCE-BASED EXPLANATION</span>
-        <p>这是基于当前代码职责整理的架构说明，日期为 2026-10-20。它不读取或显示某个项目、Shot 或任务的实时状态。</p>
+        <p>这是基于当前代码职责整理的架构快照，日期为 2026-10-20；顶部审阅状态只按本机接口返回的有限案例展示。</p>
       </aside>
     </header>
 
     <div class="stats" aria-label="模块地图概览">
       <div class="stat"><strong id="statModules">26</strong><span>个功能模块</span></div>
       <div class="stat"><strong>3</strong><span>条职责泳道</span></div>
-      <div class="stat"><strong>5</strong><span>种架构视图</span></div>
       <div class="stat"><strong>4</strong><span>层独立能力证据</span></div>
     </div>
 
@@ -310,13 +358,14 @@
       </div>
       <section class="diagram-panel" id="view-feedback" role="tabpanel" aria-labelledby="tab-feedback" tabindex="0">
         <h3>生成是有边界的反馈闭环</h3>
-        <p class="view-copy">检查结果回到失败分析与制作策略；可复用或可编辑的素材可以绕过重新生成。虚线表示需要 Agent 明确发起的工作流动作。</p>
+        <p class="view-copy">节点按职责自动换行；关系以语义边列出。聚焦节点后只保留相邻关系，详细模块信息另行打开。</p>
         <div id="feedbackGraph"></div>
+        <p class="loop-note"><strong>内容反馈短回路：</strong><span>检查媒体</span><b>→</b><span>定位问题</span><b>→</b><span>调整方案</span><b>→</b><span>重新规划</span></p>
         <p class="branch-note">回环不表示自动重试：新生成仍需当前授权、有限额度与一次性许可。UNKNOWN 先停止并查明结果；缺证据先补证。开发修补预览保留原片失败历史。</p>
       </section>
       <section class="diagram-panel" id="view-calls" role="tabpanel" aria-labelledby="tab-calls" tabindex="0" hidden>
         <h3>实际调用链与数据流</h3>
-        <p class="view-copy">这是当前主路径的摘要图，部分箭头折叠了中间函数。它区分程序调用、数据读取和 Agent 编排，不代表完整 Python import graph。</p>
+        <p class="view-copy">这是当前主路径的调用摘要，部分箭头折叠中间函数。它区分程序调用、数据读取和显式 Agent 操作，不代表完整 Python import graph。</p>
         <div class="legend"><span><i></i>调用链</span><span><i class="data"></i>数据依赖</span><span><i class="agent"></i>Agent / 显式操作</span></div>
         <div id="callsGraph"></div>
         <details class="edge-evidence"><summary>展开调用关系与源码依据</summary><ol id="callEvidence"></ol></details>
@@ -334,18 +383,11 @@
         <p class="branch-note">证据不足 = NOT_EVALUATED；已观察到不满足要求 = FAIL。两者都不能直接推进下一镜，但补证、局部编辑和新生成的恢复条件不同。</p>
       </section>
       <section class="diagram-panel" id="view-maturity" role="tabpanel" aria-labelledby="tab-maturity" tabindex="0" hidden>
-        <h3>四层证据，分别判断</h3>
-        <p class="view-copy">这里展示本页已核对的证据范围，不是全仓资格认证。历史 receipt 只对其提交和用例有效；“未核验”不表示没有测试，“不适用”不表示通过。</p>
-        <div class="maturity-intro">
-          <article><h4>01 · 已实现</h4><p>源码中存在对应职责与调用入口，或已有 advisory Skill。</p></article>
-          <article><h4>02 · 已测试</h4><p>需要绑定实际运行结果；仅定位测试文件不算 PASS。</p></article>
-          <article><h4>03 · 真实生成验证</h4><p>限定 exact 模型、输入和输出；成功产出与内容质量分开。</p></article>
-          <article><h4>04 · 人工验收</h4><p>需要对 exact 版本完整听看；单片接受不推广为通用能力。</p></article>
-        </div>
-        <div class="maturity-scroll" tabindex="0" aria-label="26个模块的四层能力证据，可横向滚动">
-          <table class="maturity-table"><thead><tr><th scope="col">模块</th><th scope="col">源码实现</th><th scope="col">工程测试</th><th scope="col">真实生成 / 媒体</th><th scope="col">人工验收</th></tr></thead><tbody id="maturityRows"></tbody></table>
-        </div>
-        <p class="branch-note">例：表演参数工程已受测，但 S01 的自然表演效果未证实；机器人剪辑版获一次完整听看接受，但仍是开发预览。页面自身的测试不证明这 26 个模块全部可交付。</p>
+        <h3>当前模块证据（来自本机只读接口）</h3>
+        <p class="view-copy">工程、真实媒体和人工验收分别展示。媒体效果相关模块包括人物表演、参考和连续性，媒体状态只按接口适用性显示，不从模块类型推断 N/A；历史工程 PASS 仅对 receipt 中的提交和检查范围有效。</p>
+        <div id="evidenceRows" class="evidence-table-scroll"></div>
+        <div id="evidenceUnavailable" class="evidence-unavailable" hidden>本地审阅证据源不可用；当前页面不显示静态或缓存的模块 PASS、生成结论或人工验收。</div>
+        <p class="branch-note">NOT_EVALUATED 与 NOT_APPLICABLE 含义不同；任何来源缺失、证据陈旧或身份不匹配都不会由相邻证据补成 PASS。</p>
       </section>
     </section>
 
@@ -412,48 +454,75 @@
     ];
 
     const feedbackNodes = [
-      ["plan","planner",20,30,"制作策略","先评估复用、剪辑与生成"], ["compile","routing",300,30,"选择与编译","exact model / mode / bindings"],
-      ["generate","adapters",580,30,"有界生成","每轮重新检查许可与额度"], ["check","qa",860,30,"检查实际媒体","逐项对照封存要求"],
-      ["revise","authoring",300,260,"修改制作方案","Agent 修改表达、参考或路径"], ["diagnose","feedback",860,260,"失败分析","内容、证据、运行或能力问题"],
-      ["stop","safety",20,480,"停止副作用","UNKNOWN / 上限 / 授权不足","stop"], ["edit","retime",580,480,"编辑已有素材","裁切、变速、修补、声画合成","edit"],
-      ["final","qa",860,480,"成片验收","正常速度完整听看；通过再交付","edit"]
+      { id:"plan", module:"planner", title:"制定制作策略", code:"VideoPlanner", summary:"先评估复用、剪辑与生成路径。" },
+      { id:"compile", module:"routing", title:"选择并编译请求", code:"ShotRouter → VideoCompiler", summary:"确定 exact model、mode 与素材绑定。" },
+      { id:"generate", module:"adapters", title:"生成原始媒体", code:"VideoGenerationService", summary:"每次提交重新检查额度与许可。" },
+      { id:"check", module:"qa", title:"检查实际媒体", code:"Per-Shot Gate / Review", summary:"逐项比对 sealed requirements。" },
+      { id:"revise", module:"authoring", title:"调整表达或路径", code:"Agent / Authoring", summary:"根据明确证据调整创作方案。" },
+      { id:"diagnose", module:"feedback", title:"判断失败类型", code:"GenerationFeedbackOrchestrator", summary:"区分内容、证据、运行与能力问题。" },
+      { id:"stop", module:"safety", title:"停止进一步副作用", code:"unknown / quota / authorization", summary:"结果未知、额度耗尽或缺少授权时停下。", tone:"stop" },
+      { id:"edit", module:"retime", title:"处理已有素材", code:"trim / retime / repair / mix", summary:"复用、裁切、变速、局部修补与合成。", tone:"edit" },
+      { id:"final", module:"qa", title:"判断成片交付", code:"Final Acceptance", summary:"针对 exact 输出检查并完整听看。", tone:"edit" }
     ];
     const feedbackEdges = [
-      ["plan","compile","制作方案","agent","M240 76 H300",270,19], ["compile","generate","需新媒体","agent","M520 76 H580",550,19],
-      ["generate","check","exact 输出","agent","M800 76 H860",830,19], ["check","diagnose","FAIL / 需补证","agent","M970 122 V260",970,200],
-      ["diagnose","revise","有依据的内容 / 策略调整","agent","M860 306 H520",690,293], ["revise","plan","↺ 重选方案","agent","M300 306 H270 V155 H130 V122",180,154],
-      ["plan","edit","已有素材可用 · 绕过生成","agent","M130 122 V428 H690 V480",400,416], ["diagnose","edit","可局部编辑 → 修补预览","agent","M970 352 V394 H740 V480",855,382],
-      ["check","edit","原片可用","data","M1080 76 H1100 V450 H800 V480",1010,438], ["edit","final","重新验收","agent","M800 526 H860",830,513],
-      ["final","diagnose","成片仍不满足 → 回到分析","agent","M1080 526 H1110 V364 H1000 V352",962,364],
-      ["generate","stop","UNKNOWN / 硬限制 → STOP","stop","M690 122 V184 H70 V480",415,173],
-      ["diagnose","check","证据缺口 → 补证后再判","data","M1080 306 H1090 V155 H1000 V122",920,146]
+      {from:"plan",to:"compile",label:"按制作计划选择 Provider/mode",type:"agent",source:"canvas_planning.py · shot_router.py"},
+      {from:"compile",to:"generate",label:"只把胜出的 exact 请求交给 adapter",type:"data",source:"video_compiler.py · video_generation.py"},
+      {from:"generate",to:"check",label:"把 exact 输出交给逐镜核验",type:"agent",source:"video_generation.py · Per-Shot Gate"},
+      {from:"check",to:"diagnose",label:"失败或缺证据进入分类",type:"agent",source:"canvas_review.py · generation_feedback.py"},
+      {from:"diagnose",to:"revise",label:"有依据的内容或策略调整",type:"agent",source:"generation_feedback.py · Agent decision"},
+      {from:"revise",to:"plan",label:"回到计划，重新比较制作路径",type:"agent",source:"video_planner.py · production_strategy.py",loop:true},
+      {from:"plan",to:"edit",label:"源素材可用时绕过生成",type:"agent",source:"production_strategy.py · ResolvedTimeline"},
+      {from:"diagnose",to:"edit",label:"可修复的问题进入局部编辑预览",type:"agent",source:"video_cleanup_admission.py · video_retime.py"},
+      {from:"generate",to:"stop",label:"unknown outcome 或硬限制立即停止",type:"stop",source:"generation_feedback.py · paid_provider.py"},
+      {from:"diagnose",to:"check",label:"证据缺口先补证，再重新裁决",type:"data",source:"review.py · evidence repair"},
+      {from:"edit",to:"final",label:"按原要求重新检查编辑结果",type:"agent",source:"ResolvedTimeline · final_output_review.py"},
+      {from:"final",to:"diagnose",label:"仍有问题时返回失败分析",type:"agent",source:"final_output_review.py · generation_feedback.py",loop:true}
     ];
     const callNodes = [
-      ["canvas","canvas",20,30,"CanvasProductionService","prepare / start / execute / evaluate"], ["planner","planner",300,30,"VideoPlanner","plan → require_current_video_plan"],
-      ["evaluate","qa",860,30,"评估入口 / MCP","显式调用；证据回写后进入历史"], ["agent","creative",20,250,"Agent / Operator","创作判断与显式动作"],
-      ["feedback","feedback",300,250,"FeedbackOrchestrator","重读 context / history → decision"], ["router","routing",580,250,"Router / Decision","兼容性、失败历史、配额"],
-      ["compiler","routing",860,250,"Selected Compiler","只编译胜出候选；不提交"], ["reader","state",20,480,"Project Reader","strict read；不推进状态"],
-      ["committer","committer",300,480,"StateCommitter","intent / permit / result / lifecycle","owner"], ["service","adapters",580,480,"VideoGenerationService","start 与 submit 分开"],
-      ["adapter","adapters",860,480,"Selected Adapter","submit / refresh / fetch"]
+      {id:"canvas",module:"canvas",title:"Canvas 制作入口",code:"CanvasProductionService",summary:"装配 inspect、plan、attempt、review 与 composition。"},
+      {id:"planner",module:"planner",title:"制作计划",code:"VideoPlanner",summary:"形成计划并投影为当前可用视频要求。"},
+      {id:"evaluate",module:"qa",title:"显式媒体评估",code:"video-analysis MCP / Review",summary:"读取 exact 输出，证据回写后进入后续判断。"},
+      {id:"agent",module:"creative",title:"创作与操作者",code:"Agent / Operator",summary:"作出创作判断并显式发起操作。"},
+      {id:"feedback",module:"feedback",title:"生成反馈决策",code:"GenerationFeedbackOrchestrator",summary:"重读 context/history，决定下一动作。"},
+      {id:"router",module:"routing",title:"路由与决策",code:"ShotRouter / GenerationDecision",summary:"核对兼容性、失败历史与配额。"},
+      {id:"compiler",module:"routing",title:"请求编译",code:"Selected Video Compiler",summary:"编译胜出的候选请求，不负责提交。"},
+      {id:"reader",module:"state",title:"Strict 项目读取",code:"Production Reader / Registry",summary:"读取并验证当前状态，不推进 lifecycle。"},
+      {id:"committer",module:"committer",title:"唯一持久写入",code:"ProductionStateCommitter",summary:"提交 intent、permit、结果与状态。",tone:"owner"},
+      {id:"service",module:"adapters",title:"生成生命周期",code:"VideoGenerationService",summary:"创建 attempt 与真实 submit 分开处理。"},
+      {id:"adapter",module:"adapters",title:"所选 Provider",code:"Selected Adapter",summary:"按精确请求 submit、refresh 与 fetch。"}
     ];
     const callEdges = [
-      ["canvas","planner","context loader → plan","call","M240 76 H300",270,19,"canvas_planning.py:195–243"],
-      ["canvas","feedback","prepare()","call","M240 92 H265 V296 H300",265,200,"canvas_production.py:325–379"],
-      ["planner","feedback","verified requirement","data","M410 122 V250",410,186,"canvas_planning.py:219–243"],
-      ["feedback","router","resolve_requirement()","call","M520 296 H580",550,238,"generation_feedback.py:351–357 → shot_router.py:424–444"],
-      ["router","compiler","provider-bound request","data","M800 296 H860",830,238,"generation_decision.py:713–779"],
-      ["feedback","compiler","GENERATE_ONCE 才编译","call","M440 250 V214 H970 V250",705,202,"generation_feedback.py:356–375 → _sequence_source.py:255–274"],
-      ["feedback","service","start：只建 attempt","call","M520 322 H555 V526 H580",680,400,"generation_feedback.py:378–393; video_generation.py:74–82"],
-      ["service","adapter","submit / refresh / fetch","call","M800 526 H860",830,467,"video_generation.py:258–324,511–582"],
-      ["service","committer","提交持久状态变化","call","M580 554 H520",550,580,"video_generation.py:74–82,258–324"],
-      ["committer","feedback","已记录 attempt / history","data","M410 480 V342",410,427,"generation_feedback.py:441–480"],
-      ["reader","planner","当前 Project / Registry","data","M130 480 H12 V182 H380 V122",220,170,"canvas_production.py:351–371; canvas_planning.py:83–152"],
-      ["agent","canvas","发起明确动作","agent","M130 250 V122",130,222,"scripts/canvas_production.py:45–63,115–125"],
-      ["adapter","evaluate","显式检查实际媒体","agent","M1080 526 H1100 V76 H1080",994,450,"canvas_production.py:531–540; AGENTS.md Per-Shot Gate"],
-      ["evaluate","feedback","记录后的评价证据","data","M970 122 V160 H460 V250",705,149,"generation_feedback.py:534–615；非自动调用回环"]
+      {from:"canvas",to:"planner",label:"加载上下文并形成计划",type:"call",source:"canvas_planning.py"},
+      {from:"canvas",to:"feedback",label:"准备阶段读取已知历史并作决策",type:"call",source:"canvas_production.py · generation_feedback.py"},
+      {from:"planner",to:"feedback",label:"传入已验证的当前要求",type:"data",source:"video_planner.py · current plan projection"},
+      {from:"feedback",to:"router",label:"resolve_requirement()",type:"call",source:"generation_feedback.py · shot_router.py"},
+      {from:"router",to:"compiler",label:"为选定的 provider-bound request 编译",type:"data",source:"shot_router.py · video_compiler.py"},
+      {from:"feedback",to:"compiler",label:"只有 GENERATE_ONCE 才编译",type:"call",source:"generation_feedback.py · sequence source"},
+      {from:"feedback",to:"service",label:"start() 创建 attempt",type:"call",source:"generation_feedback.py · video_generation.py"},
+      {from:"service",to:"adapter",label:"submit / refresh / fetch exact task",type:"call",source:"video_generation.py · selected adapter"},
+      {from:"service",to:"committer",label:"提交持久生命周期变更",type:"call",source:"video_generation.py · state committer"},
+      {from:"committer",to:"feedback",label:"回读已记录 attempt 与 history",type:"data",source:"generation feedback reader"},
+      {from:"reader",to:"planner",label:"读取当前 Project / Registry",type:"data",source:"canvas_production.py · canvas_planning.py"},
+      {from:"agent",to:"canvas",label:"Agent / Operator 显式发起动作",type:"agent",source:"scripts/canvas_production.py"},
+      {from:"adapter",to:"evaluate",label:"显式检查生成媒体",type:"agent",source:"canvas_production.py · AGENTS.md Per-Shot Gate"},
+      {from:"evaluate",to:"feedback",label:"评价证据被记录后供下一轮读取；不是自动回调",type:"data",source:"review.py · generation_feedback.py"}
     ];
-    const ownerNodes = [["meaning","planner",20,40,"各语义 owner","创作定义 / timeline / 依赖 / QA"],["writer","committer",300,40,"唯一持久状态 writer","ProductionStateCommitter","owner"],["manifest","state",580,40,"Manifest","当前采用指针 / lifecycle","owner"],["registry","state",860,40,"Registry","素材身份 / 来源 / bytes 校验","owner"],["reader","state",580,300,"Standard Reader","重开 Manifest → 验证各 snapshot"],["consumer","console",20,300,"只读消费者","前端 / 检查 / 规划读取当前证据"]];
-    const ownerEdges = [["meaning","writer","校验后的候选与操作","data","M240 86 H300",270,24],["writer","manifest","原子提交","call","M520 86 H580",550,24],["writer","registry","提交 Registry snapshot","call","M410 132 V215 H970 V132",690,202],["manifest","reader","指针 + lifecycle","data","M690 132 V300",690,266],["registry","reader","身份 + 实际 bytes","data","M970 132 V346 H800",970,281],["reader","consumer","verified view · 无写回","data","M580 346 H240",410,285]];
+    const ownerNodes = [
+      {id:"meaning",module:"planner",title:"语义 owner",code:"Character / Shot / Timeline / QA",summary:"分别拥有创作定义、时间、依赖与验收语义。"},
+      {id:"writer",module:"committer",title:"唯一状态 writer",code:"ProductionStateCommitter",summary:"负责通过验证后提交 lifecycle。",tone:"owner"},
+      {id:"manifest",module:"state",title:"运行状态",code:"Manifest",summary:"记录 attempt、采用指针和生命周期。",tone:"owner"},
+      {id:"registry",module:"state",title:"媒体身份与来源",code:"Registry",summary:"记录素材身份、provenance 与 bytes。",tone:"owner"},
+      {id:"reader",module:"state",title:"Strict Reader",code:"Project / Manifest / Registry",summary:"重开并验证 snapshot，不做写回。"},
+      {id:"consumer",module:"console",title:"只读消费者",code:"Console / planning / review",summary:"读取当前证据和投影视图，不提交状态。"}
+    ];
+    const ownerEdges = [
+      {from:"meaning",to:"writer",label:"校验后的候选与状态操作",type:"data",source:"project / action contracts"},
+      {from:"writer",to:"manifest",label:"原子提交 lifecycle 与采用状态",type:"call",source:"state_commit.py"},
+      {from:"writer",to:"registry",label:"提交内容寻址的 Registry snapshot",type:"call",source:"_state_commit_*.py"},
+      {from:"manifest",to:"reader",label:"读取采用指针和 lifecycle",type:"data",source:"production reader"},
+      {from:"registry",to:"reader",label:"验证素材身份与实际 bytes",type:"data",source:"registry.py · hashing.py"},
+      {from:"reader",to:"consumer",label:"只读 verified view，不反向写状态",type:"data",source:"provider_console.py · planner"}
+    ];
     const owners = [
       ["ProductionProject","项目及 Character / Scene / Shot 的 schema、revision 与定义。","提交变更仍经 committer；不是任务状态库。","production/models.py:1925; canvas_authoring.py:78"],
       ["Registry / Manifest","Registry 管素材身份；Manifest 管可变选择、attempt 和生命周期。","Registry 不是验收状态；只读打开不修复或推进状态。","production/registry.py:198; models.py:1636"],
@@ -470,26 +539,6 @@
       ["runtime","已知运行失败","API/transport 错误或 known-no-effect receipt。","RUNTIME_FAILURE / EVIDENCE_GAP","不能把接口错误当作模型质量观察。","有据的有限恢复","exact evidence、未消费 repair grant 与历史策略匹配后，才可能单次恢复；不保证可重试。","generation_decision.py:433–561"],
       ["stale","上游定义或证据变化","角色、素材、图、时间线或 QA policy 指纹改变。","下游 STALE / BLOCKED","非 fresh 前置阻断采用、review 或 Final Acceptance；同指纹 FAILED 不自动 retry。","从 ready frontier 重建","重新解析依赖与 exact 输出；必需层全 fresh PASS、修复关闭后再接受。","dependency.py:681–765; _state_commit_review.py:541–689"]
     ];
-    const proofRefs = {
-      performance:".agent/harness/runs/character-performance-control-20261020-r4/receipt.json · 51cff9..0f2d09d",
-      references:".agent/harness/runs/reference-control-preview-20261016-r1/receipt.json · 9917a28..473ed99",
-      acting:"docs/record_for_agent/2026-10-20-character-performance-control.md · Current Media Follow-up",
-      robot:"docs/record_for_agent/2026-10-17-edit-first-temporal-control.md · Current Result / Native Audio Follow-Up",
-      retime:".agent/harness/runs/native-audio-retime-20261018-r4/receipt.json · 69ae168..c19fa31",
-      ui:".agent/harness/runs/module-map-relations-browser-20261020/browser-proof.json · 本说明页交互范围"
-    };
-    const proof = (state,label,scope,source) => ({state,label,scope,source});
-    function maturityFor(module) {
-      const result = [proof("source",module.id==="creative"?"Skill 入口已存在":"源码职责已核对","2026-10-20 源码说明；不等于功能全范围资格认证。",module.files[0]),proof("unknown","运行证据未逐项核验","本页不因测试文件存在就标 PASS；本轮页面检查不覆盖全部制作模块。","未绑定模块级 exact 运行结果"),proof("unknown","未评估","没有在此页建立该模块的独立真实媒体效果证明。","NOT_EVALUATED"),proof("unknown","未建立模块级证明","需要 exact 成片及明确完整听看判断；不从浏览器播放或工具成功推断。","NOT_EVALUATED")];
-      if(module.id==="performance") { result[1]=proof("historical","历史工程 PASS","离线 author/reader/compiler/QA 映射；不是当前全部模型效果。",proofRefs.performance); result[2]=proof("unproven","真实输入已接通 · 效果未证实","H3 Max CN S01 八人参数进入 native prompt；原片 5 PASS / 1 FAIL / 9 未评估。",proofRefs.acting); result[3]=proof("unproven","完整表演验收未证实","用户未看出清晰改善；不能认定表演模块已解决自然度问题。",proofRefs.acting); }
-      if(module.id==="references"||module.id==="routing") result[1]=proof("historical","历史离线 PASS","限定 reference duties / native 绑定 / 模式边界；fixture 不证明模型遵从。",proofRefs.references);
-      if(module.id==="adapters") result[2]=proof("bounded","H3 Max CN 有真实产出","仅证明限定请求成功产出；该 S01 仍 FAIL/未评估，不覆盖 Seedance 或全部 adapter。",proofRefs.acting);
-      if(module.id==="retime") { result[1]=proof("historical","历史原声映射 PASS","限定 source-frame/sample 映射、边界与回归；不代表任意素材变速后都自然。",proofRefs.retime); result[2]=proof("bounded","真实源的剪辑预览已验证","同一机器人源，经原声 retime 得到 exact 开发预览；不改变 raw FAIL。",proofRefs.robot); result[3]=proof("human","单版完整 1× 听看接受","仅 SHA 173cd95b… 的动作、最后转向和声音；未 Production qualification/activation，不代表跨场景通用有效。",proofRefs.robot); }
-      if(module.id==="cleanup") result[2]=proof("bounded","真实片段局部观察","S01 第二版清理预览有抽帧及 exact 前端播放证据；整段表演和完整人审仍未证。",proofRefs.acting);
-      if(module.id==="console") { result[1]=proof("bounded","本说明页交互已核验","限定5个视图、图节点、分层证据、搜索和窄屏；不证明整个Console或26个制作模块全部行为。",proofRefs.ui); result[2]=proof("na","不直接生成媒体","此模块是只读展示；播放成功不证明内容质量。","provider-console/AGENTS.md"); }
-      if(["creative","harness","memory"].includes(module.id)) result[2]=proof("na","不直接生成媒体","方法、工程检查或检索模块；不能替代生成与内容验收。",module.files[0]);
-      return result;
-    }
     const categoryLabels = { control: "创作与控制", media: "媒体制作", infra: "基础设施" };
     const mechanismLabels = { "创作判断 · advisory": "Agent 判断", "共享流程编排": "程序编排", "项目数据表达": "结构化表达", "MODEL_PROMPT_GUIDANCE": "模型提示引导", "素材职责 + 实际绑定": "素材表达与绑定", "生成前检查": "生成前约束", "目标到制作方案": "计划决策", "能力选择 + 精确请求": "请求编译", "证据驱动决策": "执行决策", "外部/本地媒体生成": "模型生成", "前序已接受状态": "连续性约束", "统一时间语义": "时间线编排", "显式帧映射": "确定性剪辑", "显式遮罩 + 干净底图": "人工定义修补", "媒体导入 / 合成 / 对齐": "媒体处理", "统一合成渲染": "程序渲染", "定义 / 素材身份 / 生命周期": "状态与素材", "唯一状态写入 owner": "状态提交", "指纹与重建范围": "依赖管理", "预算 Guard + 单次许可": "调用安全", "观察与提取证据": "自动化观察", "要求 × 证据 × Verdict": "技术与人工验收", "只读浏览与证据关联": "只读界面", "检索与独立学习数据集": "经验辅助", "源码/契约/回归检查": "工程验证", "兼容入口 + 领域协调": "专用制作入口" };
     const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
@@ -501,32 +550,209 @@
     const emptyState = document.getElementById("emptyState");
     let activeFilter = "all";
     let returnFocus = null;
+    let moduleEvidenceById = new Map();
+    let evidenceSnapshot = null;
+    const apiStateLabels = { present:"源码存在", missing:"源码缺失", unavailable:"证据源不可用", historical_pass:"历史工程 PASS（限定范围）", failed:"工程检查失败", no_result:"无工程结果", not_applicable:"不适用", not_evaluated:"未评估", bounded:"有界媒体证据", bounded_acceptance:"有界人工接受", recorded_only:"仅有记录", verified:"已核验", recorded:"已记录 activation（非资格）", not_established:"尚未建立", not_established_in_reviewed_cases:"审阅案例未建立完整交付证明", local_readonly:"本机只读来源", selected_case_audit:"精选案例审计", not_measured:"未测量" };
+    const kindLabels = { engineering:"工程机制", media:"媒体效果相关", creative:"创作方法" };
+    const edgeTypeLabels = { call:"程序调用", data:"数据依赖", agent:"显式 Agent / 操作", stop:"安全停止" };
 
     function sourceLabel(value) {
-      return String(value).replace(/(?<![\w/])production\//g,"src/ai_video/production/").replace(/(?<![\w/])([A-Za-z_]\w*\.py)(?=:)/g,(_,file)=>`src/ai_video/${file.startsWith("canvas_")?"":"production/"}${file}`);
+      return String(value).split(" · ").map(token => token.startsWith("production/") ? `src/ai_video/${token}` : /^[a-z_]+\.py$/.test(token) ? `src/ai_video/${token.startsWith("canvas_") ? "" : ["video_planner.py", "production_strategy.py"].includes(token) ? "planning/" : "production/"}${token}` : token).join(" · ");
+    }
+
+    function displayState(state) { return apiStateLabels[state] || (state ? String(state) : "未返回状态"); }
+    function proofBadge(state, text) { return `<span class="evidence-state" data-state="${escapeHtml(state || "unavailable")}">${escapeHtml(text || displayState(state))}</span>`; }
+    function safePath(path) { return typeof path === "string" && path.length > 0 && !/[\u0000-\u001f]/.test(path) && !path.includes("\\") && !/^[A-Za-z][\w+.-]*:/.test(path) && !path.startsWith("/") && !path.split("/").includes(".."); }
+    function validDigest(value) { return typeof value === "string" && /^[a-f0-9]{64}$/i.test(value); }
+    function validBytes(value) { return Number.isSafeInteger(value) && value >= 0; }
+    function validEvidenceFile(file) { return file && safePath(file.path) && validDigest(file.sha256) && validBytes(file.bytes); }
+    function verifiedProofForCase(testCase, kind) {
+      const exactHash = testCase.artifact && testCase.artifact.state === "verified" && testCase.artifact.sha256;
+      return Boolean(exactHash && Array.isArray(testCase.proofs) && testCase.proofs.some((proof) => proof.kind === kind && proof.state === "verified" && proof.artifact_sha256 === exactHash));
+    }
+
+    function validateEvidencePayload(payload) {
+      if (!payload || payload.schema !== "ai-video-module-evidence/1" || payload.source_kind !== "local_readonly") return false;
+      if (!payload.repository || typeof payload.repository.head !== "string" || typeof payload.repository.dirty !== "boolean" || typeof payload.observed_at !== "string") return false;
+      if (!Array.isArray(payload.modules) || !Array.isArray(payload.cases) || !payload.delivery || !["not_established_in_reviewed_cases", "unavailable"].includes(payload.delivery.state) || payload.delivery.scope !== "selected_case_audit" || payload.delivery.autonomy !== "not_measured") return false;
+      const ids = new Set();
+      for (const item of payload.modules) {
+        if (!item || typeof item.id !== "string" || ids.has(item.id) || !["engineering", "media", "creative"].includes(item.kind)) return false;
+        ids.add(item.id);
+        if (!item.source || !["present", "missing", "unavailable"].includes(item.source.state) || !Array.isArray(item.source.files)) return false;
+        if (item.source.files.some((file) => !validEvidenceFile(file))) return false;
+        if (!item.engineering || !["historical_pass", "failed", "no_result", "unavailable"].includes(item.engineering.state) || !Array.isArray(item.engineering.evidence)) return false;
+        if (item.engineering.evidence.some((entry) => !entry || !safePath(entry.receipt_path) || !validDigest(entry.receipt_sha256) || !safePath(entry.base_commit) || !safePath(entry.head_commit) || typeof entry.check_id !== "string" || typeof entry.status !== "string" || !["match", "changed", "unknown"].includes(entry.anchor_match) || !Array.isArray(entry.artifacts) || entry.artifacts.some((file) => !validEvidenceFile(file)))) return false;
+        if (!["media", "human"].every((key) => item[key] && typeof item[key].applicable === "boolean" && (key === "media" ? ["not_applicable", "not_evaluated", "bounded", "failed", "unavailable"] : ["not_applicable", "not_evaluated", "bounded_acceptance", "recorded_only", "unavailable"]).includes(item[key].state))) return false;
+      }
+      for (const testCase of payload.cases) {
+        if (!testCase || typeof testCase.id !== "string" || typeof testCase.title !== "string" || typeof testCase.description !== "string" || !["raw_generation", "edited_preview", "production_example"].includes(testCase.category) || !testCase.artifact || !["verified", "unavailable"].includes(testCase.artifact.state) || !Array.isArray(testCase.proofs)) return false;
+        if ((testCase.artifact.state === "verified" && (!safePath(testCase.artifact.path) || !validDigest(testCase.artifact.sha256) || !validBytes(testCase.artifact.bytes))) || (testCase.artifact.path && !safePath(testCase.artifact.path))) return false;
+        if (!testCase.quality || !["failed", "bounded", "not_evaluated", "unavailable"].includes(testCase.quality.state) || ![testCase.quality.pass, testCase.quality.fail, testCase.quality.not_evaluated].every(validBytes)) return false;
+        if (!testCase.human || !["bounded_acceptance", "recorded_only", "not_evaluated", "unavailable"].includes(testCase.human.state) || typeof testCase.human.scope !== "string" || !testCase.qualification || !["not_established", "not_evaluated", "unavailable"].includes(testCase.qualification.state) || typeof testCase.qualification.scope !== "string") return false;
+        if (testCase.proofs.some((proof) => !proof || !["verified", "unavailable"].includes(proof.state) || !["qa", "human", "record", "artifact"].includes(proof.kind) || (proof.path && !safePath(proof.path)) || (proof.sha256 && !validDigest(proof.sha256)) || (proof.bytes !== undefined && !validBytes(proof.bytes)) || (proof.state === "verified" && (!safePath(proof.path) || !validDigest(proof.sha256) || !validBytes(proof.bytes))) || (proof.artifact_sha256 && !validDigest(proof.artifact_sha256)))) return false;
+        if (testCase.activation && (!["recorded", "not_evaluated", "unavailable"].includes(testCase.activation.state) || typeof testCase.activation.scope !== "string")) return false;
+      }
+      return true;
     }
 
     function renderGraph(targetId, nodes, edges, label) {
-      const colors = {call:"#aa95fa",data:"#67d9c2",agent:"#e5bd76",stop:"#ff9fae"};
-      const defs = Object.entries(colors).map(([kind,color]) => `<marker id="${targetId}-${kind}" markerWidth="9" markerHeight="9" refX="8" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 Z" style="fill:${color}"/></marker>`).join("");
-      const paths = edges.map((edge) => `<g><path d="${edge[4]}" stroke="${colors[edge[3]]}" ${edge[3]==="data"?'stroke-dasharray="3 5"':edge[3]==="agent"?'stroke-dasharray="8 5"':""} marker-end="url(#${targetId}-${edge[3]})"/><text class="edge-label" x="${edge[5]}" y="${edge[6]}" text-anchor="middle">${escapeHtml(edge[2])}</text></g>`).join("");
-      const buttons = nodes.map(([id,module,x,y,title,subtitle,tone]) => `<button type="button" class="graph-node" data-node="${escapeHtml(id)}" data-module="${escapeHtml(module)}" data-tone="${tone||"normal"}" style="left:${x}px;top:${y}px" aria-label="${escapeHtml(title)}，查看模块详情"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(subtitle)}</span></button>`).join("");
-      document.getElementById(targetId).innerHTML = `<div class="diagram-scroll" tabindex="0" role="region" aria-label="${escapeHtml(label)}，窄屏可横向滚动"><div class="diagram-canvas"><svg viewBox="0 0 1120 600" aria-hidden="true"><defs>${defs}</defs>${paths}</svg>${buttons}</div></div><ol class="sr-only">${edges.map(e=>`<li>${escapeHtml(nodes.find(n=>n[0]===e[0])[4])} → ${escapeHtml(nodes.find(n=>n[0]===e[1])[4])}：${escapeHtml(e[2])}</li>`).join("")}</ol>`;
+      const target = document.getElementById(targetId);
+      const nodeMap = new Map(nodes.map((node) => [node.id, node]));
+      target.innerHTML = `<div class="relation-map" data-graph="${targetId}"><div class="relation-inspector" hidden aria-live="polite"></div><div class="graph-node-list" role="list" aria-label="${escapeHtml(label)} 的职责节点">${nodes.map((node) => `<article class="graph-node" role="listitem" data-node="${escapeHtml(node.id)}" data-module="${escapeHtml(node.module)}" data-tone="${node.tone || "normal"}"><span class="graph-node-title">${escapeHtml(node.title)}</span><code class="graph-node-code">${escapeHtml(node.code)}</code><span class="graph-node-copy">${escapeHtml(node.summary)}</span><div class="graph-node-actions"><button type="button" class="focus-node" data-node-id="${escapeHtml(node.id)}" aria-label="聚焦 ${escapeHtml(node.title)} 的相邻关系">聚焦关系</button><button type="button" class="node-detail" data-module-id="${escapeHtml(node.module)}">打开模块详情</button></div></article>`).join("")}</div><div><div class="section-head"><h4>关系边 <span class="edge-count">${edges.length}</span></h4><button type="button" class="graph-reset" hidden>显示全部关系</button></div><div class="edge-grid">${edges.map((edge, index) => `<article class="graph-edge" data-edge="${index}" data-from="${escapeHtml(edge.from)}" data-to="${escapeHtml(edge.to)}" data-type="${escapeHtml(edge.type)}"><div class="edge-ends"><span>${escapeHtml(nodeMap.get(edge.from)?.title || edge.from)}</span><span class="edge-arrow" aria-hidden="true">→</span><span>${escapeHtml(nodeMap.get(edge.to)?.title || edge.to)}</span></div><div class="edge-label">${escapeHtml(edge.label)}</div><div class="edge-meta"><span class="edge-type">${edgeTypeLabels[edge.type] || escapeHtml(edge.type)}</span>${edge.loop ? "<span>反馈回路</span>" : ""}</div><code class="edge-source">${escapeHtml(sourceLabel(edge.source))}</code></article>`).join("")}</div></div></div>`;
+      const graph = target.querySelector(".relation-map");
+      const inspector = graph.querySelector(".relation-inspector");
+      const reset = graph.querySelector(".graph-reset");
+      function focusNode(id) {
+        const node = nodeMap.get(id);
+        if (!node) return;
+        const incident = edges.filter((edge) => edge.from === id || edge.to === id);
+        const neighbors = new Set([id, ...incident.map((edge) => edge.from === id ? edge.to : edge.from)]);
+        graph.querySelectorAll(".graph-node").forEach((card) => {
+          card.classList.toggle("is-dimmed", !neighbors.has(card.dataset.node));
+          card.classList.toggle("is-related", card.dataset.node !== id && neighbors.has(card.dataset.node));
+        });
+        graph.querySelectorAll(".graph-edge").forEach((card) => {
+          const isIncident = card.dataset.from === id || card.dataset.to === id;
+          card.hidden = !isIncident;
+          card.classList.toggle("is-related", isIncident);
+        });
+        graph.querySelector(".edge-count").textContent = String(incident.length);
+        reset.hidden = false;
+        inspector.hidden = false;
+        inspector.innerHTML = `<h4>${escapeHtml(node.title)} · 相邻关系</h4><p>只显示一跳上游 / 下游边；长路径请查看完整关系列表。</p><ul>${incident.map((edge) => `<li><strong>${edge.to === id ? "上游" : "下游"}</strong> · ${escapeHtml(nodeMap.get(edge.from)?.title || edge.from)} → ${escapeHtml(nodeMap.get(edge.to)?.title || edge.to)} · ${escapeHtml(edge.label)}<br><code>${escapeHtml(sourceLabel(edge.source))}</code></li>`).join("") || "<li>此节点在当前摘要图中没有直接边。</li>"}</ul>`;
+      }
+      function resetFocus() {
+        graph.querySelectorAll(".graph-node, .graph-edge").forEach((card) => { card.classList.remove("is-dimmed", "is-related"); card.hidden = false; });
+        graph.querySelector(".edge-count").textContent = String(edges.length);
+        reset.hidden = true;
+        inspector.hidden = true;
+        inspector.replaceChildren();
+      }
+      graph.querySelectorAll(".focus-node").forEach((button) => button.addEventListener("click", () => focusNode(button.dataset.nodeId)));
+      graph.querySelectorAll(".node-detail").forEach((button) => button.addEventListener("click", () => openModule(button.dataset.moduleId, button)));
+      reset.addEventListener("click", resetFocus);
     }
 
-    const proofNames = ["源码实现","工程测试","真实生成 / 媒体","人工验收"];
-    function evidenceMarkup(module) {
-      return `<div class="detail-block maturity-detail"><h3>四层能力证据（各自独立）</h3><ul>${maturityFor(module).map((p,i)=>`<li><strong>${proofNames[i]}</strong> · <span class="evidence-tag" data-state="${p.state}">${escapeHtml(p.label)}</span><p>${escapeHtml(p.scope)}</p><code>${escapeHtml(p.source)}</code></li>`).join("")}</ul></div>`;
+    function evidenceCell(record, sectionName) {
+      const section = record && record[sectionName];
+      if (!section) return `${proofBadge("unavailable", "未返回")}`;
+      if (section.applicable === false) return section.state === "not_applicable" ? proofBadge("not_applicable", "N/A · 不适用") : proofBadge("unavailable", "接口状态不一致");
+      if (section.applicable === true && section.state === "not_applicable") return proofBadge("unavailable", "接口状态不一致");
+      if (sectionName === "human" && section.state === "bounded_acceptance") return proofBadge("not_evaluated", "未显示：缺少模块级 case 绑定");
+      return proofBadge(section.state);
+    }
+
+    function moduleEvidenceRows() {
+      if (!evidenceSnapshot) return;
+      const byId = new Map(evidenceSnapshot.modules.map((item) => [item.id, item]));
+      moduleEvidenceById = byId;
+      const rows = modules.map((module) => {
+        const item = byId.get(module.id);
+        if (!item) return `<tr><td><button type="button" data-module="${escapeHtml(module.id)}">${escapeHtml(module.title)}</button></td><td>${proofBadge("unavailable", "接口未返回此模块")}</td><td colspan="3">${proofBadge("unavailable", "无模块级证据记录")}</td></tr>`;
+        return `<tr><td><button type="button" data-module="${escapeHtml(module.id)}">${escapeHtml(module.title)}</button><p>${kindLabels[item.kind]}</p></td><td>${proofBadge(item.source.state)}<p>${item.source.files.length} 个源码摘要</p></td><td>${evidenceCell(item, "engineering")}</td><td>${evidenceCell(item, "media")}</td><td>${evidenceCell(item, "human")}</td></tr>`;
+      }).join("");
+      document.getElementById("evidenceRows").innerHTML = `<table class="evidence-table"><thead><tr><th scope="col">模块</th><th scope="col">源码快照</th><th scope="col">工程</th><th scope="col">真实媒体</th><th scope="col">人工</th></tr></thead><tbody>${rows}</tbody></table>`;
+      document.querySelectorAll("#evidenceRows button[data-module]").forEach((button) => button.addEventListener("click", () => openModule(button.dataset.module, button)));
+    }
+
+    function moduleProofMarkup(module) {
+      const item = moduleEvidenceById.get(module.id);
+      if (!item) return `<div class="detail-block detail-block--wide"><h3>本机模块证据</h3><p>接口未返回此模块的证据记录；不使用静态或相邻模块信息补齐。</p></div>`;
+      const sourceFiles = item.source.files.map((file) => `<li><code>${escapeHtml(file.path)}</code><br><span class="source-proof">SHA-256 ${escapeHtml(file.sha256)} · ${Number(file.bytes).toLocaleString()} bytes</span></li>`).join("") || "<li>没有返回源码文件摘要。</li>";
+      const engineeringEvidence = item.engineering && Array.isArray(item.engineering.evidence) ? item.engineering.evidence : [];
+      const engDetails = engineeringEvidence.map((evidence) => `<li><strong>${proofBadge(evidence.status)}</strong> · ${escapeHtml(evidence.check_id)} · 源码锚点 ${escapeHtml(evidence.anchor_match)}<p>Receipt: <code>${escapeHtml(evidence.receipt_path)}</code><br>Receipt SHA-256: <code>${escapeHtml(evidence.receipt_sha256)}</code></p><p>Exact range: <code>${escapeHtml(evidence.base_commit)}</code> → <code>${escapeHtml(evidence.head_commit)}</code>${evidence.head_commit === evidenceSnapshot.repository.head ? " · 与当前快照 HEAD 一致" : " · 与当前快照 HEAD 不同"}<br>Finished: ${escapeHtml(evidence.finished_at)}</p>${evidence.artifacts.map((artifact) => `<p>Artifact (${escapeHtml(artifact.kind)}): <code>${escapeHtml(artifact.path)}</code><br>SHA-256: <code>${escapeHtml(artifact.sha256)}</code> · ${Number(artifact.bytes).toLocaleString()} bytes</p>`).join("")}</li>`).join("") || "<li>没有返回工程 receipt 明细。</li>";
+      const humanContent = item.human.state === "bounded_acceptance" ? "模块级人工接受没有 exact case artifact binding，因此本页不显示为接受结论。" : `${escapeHtml(displayState(item.human.state))}${item.human.applicable === false && item.human.state === "not_applicable" ? " · 不适用于此模块" : ""}`;
+      return `<div class="detail-block detail-block--wide"><h3>本机源码快照 · ${proofBadge(item.source.state)}</h3><p>模块类型：${kindLabels[item.kind]}。以下身份来自只读接口当前返回的精确文件。</p><ul class="source-list">${sourceFiles}</ul></div><div class="detail-block"><h3>工程验证 · ${evidenceCell(item,"engineering")}</h3><p>历史 PASS 只适用于 receipt 中绑定的检查范围、提交和源码 anchor；anchor 一致不等于当前完整依赖与行为已验证。</p><ul class="relation-list">${engDetails}</ul></div><div class="detail-block"><h3>真实媒体 · ${evidenceCell(item,"media")}</h3><p>真实媒体质量只按此模块的接口状态与关联证据报告；案例结果不会自动批量提升到模块。</p></div><div class="detail-block"><h3>人工验收 · ${evidenceCell(item,"human")}</h3><p>${humanContent}</p></div>`;
     }
 
     function relationMarkup(module) {
-      const rows = callEdges.filter(e=>callNodes.some(n=>(n[0]===e[0]||n[0]===e[1])&&n[1]===module.id));
-      const names = {call:"调用链",data:"数据依赖",agent:"显式操作"};
-      return `<div class="detail-block maturity-detail"><h3>主路径中的调用 / 数据关系</h3>${rows.length?`<ul class="relation-list">${rows.map(e=>`<li>${escapeHtml(callNodes.find(n=>n[0]===e[0])[4])} → ${escapeHtml(callNodes.find(n=>n[0]===e[1])[4])}<br>${names[e[3]]} · ${escapeHtml(e[2])}<br><code>${escapeHtml(sourceLabel(e[7]))}</code></li>`).join("")}</ul>`:"<p>本页主路径摘要未展开此模块的调用边；不能据此判定它没有依赖。其输入输出职责仍见上方。</p>"}</div>`;
+      const rows = callEdges.filter((edge) => callNodes.some((node) => (node.id === edge.from || node.id === edge.to) && node.module === module.id));
+      return `<div class="detail-block detail-block--wide"><h3>主路径中的调用 / 数据关系</h3>${rows.length ? `<ul class="relation-list">${rows.map((edge) => `<li>${escapeHtml(callNodes.find((node) => node.id === edge.from).title)} → ${escapeHtml(callNodes.find((node) => node.id === edge.to).title)}<br>${escapeHtml(edgeTypeLabels[edge.type])} · ${escapeHtml(edge.label)}<br><code>${escapeHtml(sourceLabel(edge.source))}</code></li>`).join("")}</ul>` : "<p>本页主路径摘要未展开此模块的调用边；不能据此判定它没有依赖。</p>"}</div>`;
+    }
+
+    function renderCaseCard(testCase) {
+      const artifact = testCase.artifact || {};
+      const categoryLabels = {raw_generation:"原始生成", edited_preview:"编辑预览", production_example:"制作案例"};
+      const humanBound = verifiedProofForCase(testCase, "human");
+      const qaBound = verifiedProofForCase(testCase, "qa");
+      const humanText = testCase.human?.state === "bounded_acceptance"
+        ? humanBound ? `有界接受 · ${escapeHtml(testCase.human.scope || "范围见记录")}` : "未评估：人工记录未绑定本片"
+        : `${escapeHtml(displayState(testCase.human?.state))}${testCase.human?.scope ? ` · ${escapeHtml(testCase.human.scope)}` : ""}`;
+      const qualityText = qaBound ? `${testCase.quality.state === "failed" ? "质量要求失败" : escapeHtml(displayState(testCase.quality.state))}${testCase.quality.pass + testCase.quality.fail + testCase.quality.not_evaluated ? ` · PASS ${testCase.quality.pass} / FAIL ${testCase.quality.fail} / 未评估 ${testCase.quality.not_evaluated}` : " · 仅范围复核，无逐项验收计数"}` : "未建立逐项质量验收证据";
+      const proofRows = testCase.proofs.map((proof) => {
+        const exactBound = ["human", "qa", "artifact"].includes(proof.kind) ? verifiedProofForCase(testCase, proof.kind) : proof.state === "verified";
+        return exactBound
+          ? `<li>${proofBadge(proof.state)} · ${escapeHtml(proof.kind)} · <code>${escapeHtml(proof.path)}</code> · SHA-256 <code>${escapeHtml(proof.sha256)}</code>${proof.artifact_sha256 ? ` · Artifact SHA-256 <code>${escapeHtml(proof.artifact_sha256)}</code>` : ""}</li>`
+          : `<li>${proofBadge("not_evaluated", `${proof.kind} proof 未显示：未绑定 exact artifact` )}</li>`;
+      }).join("");
+      const activation = testCase.activation?.state === "recorded" ? `<p>逐镜激活：已有绑定记录；不代表最终交付验收。</p>` : "";
+      const artifactBytes = validBytes(artifact.bytes) ? `${artifact.bytes.toLocaleString()} bytes` : "bytes 未核验";
+      return `<article class="audit-case"><h3>${escapeHtml(categoryLabels[testCase.category] || testCase.category || "审阅案例")} · ${escapeHtml(testCase.title || testCase.id)}</h3><p>${escapeHtml(testCase.description || "")}</p><p>质量：${qualityText}</p><p>人工：${humanText}</p><p>生产资格：${escapeHtml(displayState(testCase.qualification?.state))}</p>${activation}<details><summary>查看视频身份与核验材料</summary><p>媒体：${proofBadge(artifact.state)} · <code>${escapeHtml(artifact.path || "路径未返回")}</code></p><p>SHA-256：<code>${escapeHtml(artifact.sha256 || "未核验")}</code> · ${artifactBytes}</p><p>${escapeHtml(testCase.qualification?.scope || "")}</p><p>${escapeHtml(testCase.activation?.scope || "")}</p><ul class="relation-list">${proofRows || "<li>无可显示的核验材料。</li>"}</ul></details></article>`;
+    }
+
+    function renderAudit(payload) {
+      evidenceSnapshot = payload;
+      moduleEvidenceById = new Map(payload.modules.map((item) => [item.id, item]));
+      const delivery = payload.delivery;
+      const title = delivery.state === "not_established_in_reviewed_cases"
+        ? "从剧本到合格最终交付，所审案例尚无完整证明"
+        : delivery.state === "unavailable" ? "当前审阅范围不可用" : `端到端审阅状态：${displayState(delivery.state)}`;
+      document.getElementById("auditTitle").textContent = title;
+      document.getElementById("auditStatus").dataset.state = "available";
+      document.getElementById("auditSummary").textContent = `${displayState(delivery.scope)}：下方只列本次接口核验的 exact 案例，不推断全项目或全历史。自主度：${displayState(delivery.autonomy)}。原始生成、编辑预览和制作案例分开显示；案例媒体结果不会自动提升为模块质量结论。`;
+      document.getElementById("auditMeta").innerHTML = `<span>来源：<strong>${escapeHtml(displayState(payload.source_kind))}</strong></span><span>观测时间：<strong>${escapeHtml(payload.observed_at)}</strong></span><span>Repository HEAD：<strong><code>${escapeHtml(payload.repository.head)}</code></strong></span><span>工作区：<strong>${payload.repository.dirty ? "dirty" : "clean"}</strong></span><span>范围：<strong>${escapeHtml(delivery.scope)} · ${payload.cases.length} cases</strong></span>`;
+      document.getElementById("auditCases").innerHTML = payload.cases.map(renderCaseCard).join("") || `<article class="audit-case"><h3>没有返回审阅案例</h3><p>本次读取没有可展示的案例级输入和输出证据。</p></article>`;
+      document.getElementById("evidenceUnavailable").hidden = true;
+      moduleEvidenceRows();
+    }
+
+    function setEvidenceUnavailable(message) {
+      evidenceSnapshot = null;
+      moduleEvidenceById = new Map();
+      const state = document.getElementById("auditStatus");
+      state.dataset.state = "unavailable";
+      document.getElementById("auditTitle").textContent = "本机审阅证据不可用";
+      document.getElementById("auditSummary").textContent = `${message} 页面仍可浏览静态架构说明，但不会显示历史 PASS、生成结果或人工验收作为当前证据。`;
+      document.getElementById("auditMeta").textContent = "状态：NOT_EVALUATED · 未读取到可核验的本机审阅证据";
+      document.getElementById("auditCases").replaceChildren();
+      document.getElementById("evidenceRows").replaceChildren();
+      document.getElementById("evidenceUnavailable").hidden = false;
+    }
+
+    async function loadModuleEvidence() {
+      const button = document.getElementById("refreshEvidence");
+      if (window.location.protocol === "file:") {
+        button.disabled = true;
+        button.textContent = "需要本机前端";
+        setEvidenceUnavailable("file:// 离线打开时没有本机 API 连接；需通过正在运行的本地前端读取只读接口。");
+        return;
+      }
+      button.disabled = true; evidenceSnapshot = null; moduleEvidenceById = new Map(); if (dialog.open) dialog.close();
+      button.textContent = "读取中…";
+      document.getElementById("auditStatus").dataset.state = "loading";
+      document.getElementById("auditTitle").textContent = "正在读取本机审阅证据…";
+      document.getElementById("auditSummary").textContent = "刷新期间暂不显示上一轮结果。";
+      document.getElementById("auditMeta").replaceChildren();
+      document.getElementById("auditCases").replaceChildren();
+      document.getElementById("evidenceRows").replaceChildren();
+      document.getElementById("evidenceUnavailable").hidden = true;
+      try {
+        const response = await fetch("/api/runs/module-evidence", { method: "GET", headers: { Accept: "application/json" }, cache: "no-store", credentials: "same-origin" });
+        if (!response.ok) throw new Error(`只读接口返回 HTTP ${response.status}`);
+        const payload = await response.json();
+        if (!validateEvidencePayload(payload)) throw new Error("只读接口返回的数据未通过 ai-video-module-evidence/1 契约核验");
+        renderAudit(payload);
+      } catch (error) {
+        setEvidenceUnavailable(error instanceof Error ? error.message : "只读接口读取失败");
+      } finally {
+        button.disabled = false;
+        button.textContent = "刷新证据";
+      }
     }
 
     function detailMarkup(module) {
-      return `<div class="detail-block"><h3>负责什么</h3><p>${escapeHtml(module.summary)}</p></div><div class="detail-block"><h3>输入</h3><p>${escapeHtml(module.input)}</p></div><div class="detail-block"><h3>输出</h3><p>${escapeHtml(module.output)}</p></div><div class="detail-block detail-block--wide"><h3>能力边界</h3><p>${escapeHtml(module.boundary)}</p></div><div class="detail-block detail-block--wide"><h3>主要源码位置（相对仓库）</h3><ul class="source-list">${module.files.map((path) => `<li>${escapeHtml(path)}</li>`).join("")}</ul></div>`;
+      return `<div class="detail-block"><h3>负责什么</h3><p>${escapeHtml(module.summary)}</p></div><div class="detail-block"><h3>输入</h3><p>${escapeHtml(module.input)}</p></div><div class="detail-block"><h3>输出</h3><p>${escapeHtml(module.output)}</p></div><div class="detail-block detail-block--wide"><h3>能力边界</h3><p>${escapeHtml(module.boundary)}</p></div><div class="detail-block detail-block--wide"><h3>源码导航（相对仓库）</h3><ul class="source-list">${module.files.map((path) => `<li>${escapeHtml(path)}</li>`).join("")}</ul></div>${moduleProofMarkup(module)}`;
     }
 
     function renderModules() {
@@ -543,7 +769,7 @@
       document.getElementById("dialogKicker").textContent = `MODULE / ${String(index).padStart(2, "0")} · ${categoryLabels[module.category]} · ${mechanismLabels[module.mechanism] || module.mechanism}`;
       document.getElementById("dialogTitle").textContent = module.title;
       document.getElementById("dialogSummary").textContent = module.summary;
-      document.getElementById("dialogDetails").innerHTML = detailMarkup(module) + evidenceMarkup(module) + relationMarkup(module);
+      document.getElementById("dialogDetails").innerHTML = detailMarkup(module) + relationMarkup(module);
       dialog.showModal();
       document.getElementById("closeDialog").focus();
     }
@@ -569,15 +795,10 @@
       applyFilters();
     }
 
-    renderGraph("feedbackGraph",feedbackNodes,feedbackEdges,"制作反馈闭环");
-    renderGraph("callsGraph",callNodes,callEdges,"程序调用与数据依赖图");
-    renderGraph("ownershipGraph",ownerNodes,ownerEdges,"状态所有权与写入读取图");
-    document.querySelectorAll(".graph-node").forEach(button=>button.addEventListener("click",()=>openModule(button.dataset.module,button)));
-    document.getElementById("callEvidence").innerHTML = callEdges.map(e=>`<li><strong>${escapeHtml(callNodes.find(n=>n[0]===e[0])[4])} → ${escapeHtml(callNodes.find(n=>n[0]===e[1])[4])}</strong> · ${escapeHtml(e[2])}<br><code>${escapeHtml(sourceLabel(e[7]))}</code></li>`).join("");
+    renderGraph("feedbackGraph",feedbackNodes,feedbackEdges,"制作反馈闭环"); renderGraph("callsGraph",callNodes,callEdges,"程序调用与数据依赖图"); renderGraph("ownershipGraph",ownerNodes,ownerEdges,"状态所有权与写入读取图");
+    document.getElementById("callEvidence").innerHTML = callEdges.map((edge) => `<li><strong>${escapeHtml(callNodes.find((node) => node.id === edge.from).title)} → ${escapeHtml(callNodes.find((node) => node.id === edge.to).title)}</strong> · ${escapeHtml(edge.label)}<br><code>${escapeHtml(sourceLabel(edge.source))}</code></li>`).join("");
     document.getElementById("ownerCards").innerHTML = owners.map(o=>`<article class="owner-card"><h4>${escapeHtml(o[0])}</h4><p>${escapeHtml(o[1])}</p><p>${escapeHtml(o[2])}</p><code>${escapeHtml(sourceLabel(o[3]))}</code></article>`).join("");
     document.getElementById("failureRoutes").innerHTML = failures.map(f=>`<div class="failure-row" data-kind="${f[0]}"><div class="failure-step"><strong>${escapeHtml(f[1])}</strong><p>${escapeHtml(f[2])}</p></div><span class="failure-arrow" aria-hidden="true">→</span><div class="failure-step"><strong>${escapeHtml(f[3])}</strong><p>${escapeHtml(f[4])}</p></div><span class="failure-arrow" aria-hidden="true">→</span><div class="failure-step"><strong>${escapeHtml(f[5])}</strong><p>${escapeHtml(f[6])}</p><code>${escapeHtml(sourceLabel(f[7]))}</code></div></div>`).join("");
-    document.getElementById("maturityRows").innerHTML = modules.map(m=>`<tr data-module="${m.id}"><td><button type="button" data-module="${m.id}" aria-label="查看${escapeHtml(m.title)}的证据详情">${escapeHtml(m.title)}</button></td>${maturityFor(m).map(p=>`<td><span class="evidence-tag" data-state="${p.state}">${escapeHtml(p.label)}</span><p>${escapeHtml(p.scope)}</p></td>`).join("")}</tr>`).join("");
-    document.querySelectorAll("#maturityRows button").forEach(button=>button.addEventListener("click",()=>openModule(button.dataset.module,button)));
     function selectView(tab) {
       document.querySelectorAll(".view-tab").forEach(t=>{const selected=t===tab;t.setAttribute("aria-selected",String(selected));t.tabIndex=selected?0:-1;document.getElementById(t.getAttribute("aria-controls")).hidden=!selected;});
     }
@@ -588,11 +809,9 @@
       document.querySelectorAll(".filter").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
       applyFilters();
     }));
-    search.addEventListener("input", applyFilters);
-    clearSearch.addEventListener("click", () => { search.value = ""; applyFilters(); search.focus(); });
+    search.addEventListener("input", applyFilters); clearSearch.addEventListener("click", () => { search.value = ""; applyFilters(); search.focus(); });
     document.getElementById("resetFilters").addEventListener("click", () => { resetFilters(); search.focus(); });
-    document.getElementById("closeDialog").addEventListener("click", () => dialog.close());
-    dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
+    document.getElementById("closeDialog").addEventListener("click", () => dialog.close()); dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
     dialog.addEventListener("close", () => { if (returnFocus && typeof returnFocus.focus === "function") returnFocus.focus(); });
     const returnLink = document.getElementById("returnLink");
     if (window.location.protocol === "file:") {
@@ -602,8 +821,8 @@
       returnLink.textContent = "离线查看 · 无前端返回";
       returnLink.title = "通过 file:// 打开时没有站内页面可返回";
     }
-    renderModules();
-    applyFilters();
+    document.getElementById("refreshEvidence").addEventListener("click", loadModuleEvidence);
+    renderModules(); applyFilters(); loadModuleEvidence();
   </script>
 </body>
 </html>

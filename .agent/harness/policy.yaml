@@ -388,7 +388,7 @@ checks:
     cwd: .
     description: Verify passive Quality Experience schemas, immutable closure, exact lookup, sanitized projection, and Agent Memory isolation without live Provider or index rebuild.
   provider_console_python_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_provider_console.py, tests/test_provider_console_media_index.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_provider_console.py, tests/test_provider_console_media_index.py, tests/test_provider_console_evidence.py, tests/test_provider_console_cases.py, -q]
     cwd: .
     description: Verify bounded local-only runs discovery, canonical read projection, exact media indexing, sanitization, and no-write contracts.
   provider_console_node_tests:
@@ -1465,6 +1465,12 @@ categories:
       - src/ai_video/provider_console_video_evidence.py
       - tests/test_provider_console.py
       - tests/test_provider_console_media_index.py
+      - scripts/provider_console_evidence.py
+      - scripts/provider_console_cases.py
+      - tests/test_provider_console_evidence.py
+      - tests/test_provider_console_cases.py
+      - provider-console/scripts/module-evidence-catalog.json
+      - provider-console/scripts/module-evidence.mjs
       - provider-console/scripts/experiment-evidence.mjs
       - provider-console/scripts/external-media.mjs
       - provider-console/scripts/runs-api.mjs

@@ -1,0 +1,170 @@
+{
+  "schema": "ai-video-module-evidence-catalog/1",
+  "modules": [
+    {
+      "id": "creative",
+      "kind": "creative",
+      "source_files": [".agents/skills/open-video/SKILL.md", ".agents/skills/seedance-authoring/SKILL.md", "AGENTS.md"],
+      "engineering_receipts": []
+    },
+    {
+      "id": "canvas",
+      "kind": "engineering",
+      "source_files": ["src/ai_video/canvas_production.py", "src/ai_video/canvas_authoring.py", "src/ai_video/canvas_preflight.py"],
+      "engineering_receipts": [{"path": ".agent/harness/runs/character-performance-control-20261020-r4/receipt.json", "check_ids": ["canvas_production_workflow_tests", "canvas_project_data_check"]}]
+    },
+    {
+      "id": "authoring",
+      "kind": "engineering",
+      "source_files": ["src/ai_video/canvas_authoring.py", "src/ai_video/canvas_project_data.py", "src/ai_video/canvas_source_expression.py"],
+      "engineering_receipts": [{"path": ".agent/harness/runs/character-performance-control-20261020-r4/receipt.json", "check_ids": ["canvas_production_workflow_tests", "canvas_project_data_check"]}]
+    },
+    {
+      "id": "performance",
+      "kind": "media",
+      "source_files": ["src/ai_video/production/performance_direction.py", "src/ai_video/production/performance_authoring.py"],
+      "engineering_receipts": [{"path": ".agent/harness/runs/character-performance-control-20261020-r4/receipt.json", "check_ids": ["generation_feedback_tests", "shot_readiness_gate_tests"]}]
+    },
+    {
+      "id": "references",
+      "kind": "media",
+      "source_files": ["src/ai_video/production/video_reference_controls.py", "src/ai_video/canvas_assets.py"],
+      "engineering_receipts": [{"path": ".agent/harness/runs/reference-control-preview-20261016-r1/receipt.json", "check_ids": ["generation_feedback_tests", "provider_neutral_video_requirement_tests"]}]
+    },
+    {
+      "id": "readiness",
+      "kind": "engineering",
+      "source_files": ["src/ai_video/canvas_preflight.py", "src/ai_video/quality_gates/shot_readiness_gate.py"],
+      "engineering_receipts": [{"path": ".agent/harness/runs/character-performance-control-20261020-r4/receipt.json", "check_ids": ["shot_readiness_gate_tests"]}]
+    },
+    {
+      "id": "planner",
+      "kind": "engineering",
+      "source_files": ["src/ai_video/planning/production_strategy.py", "src/ai_video/planning/video_planner.py", "src/ai_video/planning/sequence_continuity.py"],
+      "engineering_receipts": [
+        {"path": ".agent/harness/runs/character-performance-control-20261020-r4/receipt.json", "check_ids": ["video_planner_tests"]},
+        {"path": ".agent/harness/runs/edit-first-temporal-control-20261017-r4/receipt.json", "check_ids": ["production_strategy_tests"]}
+      ]
+    },
+    {
+      "id": "routing",
+      "kind": "engineering",
+      "source_files": ["src/ai_video/production/shot_router.py", "src/ai_video/production/video_compiler.py", "src/ai_video/production/video_contracts.py", "src/ai_video/production/seedance_capabilities.py"],
+      "engineering_receipts": [
+        {"path": ".agent/harness/runs/character-performance-control-20261020-r4/receipt.json", "check_ids": ["production_shot_router_tests", "provider_neutral_video_requirement_tests"]},
+        {"path": ".agent/harness/runs/reference-control-preview-20261016-r1/receipt.json", "check_ids": ["production_shot_router_tests", "provider_neutral_video_requirement_tests"]}
+      ]
+    },
+    {
+      "id": "feedback",
+      "kind": "engineering",
+      "source_files": ["src/ai_video/production/generation_feedback.py", "src/ai_video/planning/generation_feedback_context.py"],
+      "engineering_receipts": [{"path": ".agent/harness/runs/character-performance-control-20261020-r4/receipt.json", "check_ids": ["generation_feedback_tests"]}]
+    },
+    {
+      "id": "adapters",
+      "kind": "media",
+      "source_files": ["src/ai_video/production/video.py", "src/ai_video/production/minimax_h3_max.py", "src/ai_video/production/seedance.py", "src/ai_video/production/image.py"],
+      "engineering_receipts": [{"path": ".agent/harness/runs/character-performance-control-20261020-r4/receipt.json", "check_ids": ["production_video_provider_tests", "production_vidu_tests"]}]
+    },
+    {
+      "id": "continuity",
+      "kind": "media",
+      "source_files": ["src/ai_video/canvas_handoff.py", "src/ai_video/planning/sequence_continuity.py", "src/ai_video/production/shot_continuity_source_runtime.py"],
+      "engineering_receipts": [{"path": ".agent/harness/runs/character-performance-control-20261020-r4/receipt.json", "check_ids": ["video_planner_tests", "canvas_production_workflow_tests"]}]
+    },
+    {
+      "id": "timeline",
+      "kind": "media",
+      "source_files": ["src/ai_video/production/composition.py", "src/ai_video/canvas_composition.py", "src/ai_video/production/video_candidate_composition.py"],
+      "engineering_receipts": [{"path": ".agent/harness/runs/native-audio-retime-20261018-r4/receipt.json", "check_ids": ["production_composition_audio_tests"]}]
+    },
+    {
+      "id": "retime",
+      "kind": "media",
+      "source_files": ["src/ai_video/production/video_retime.py", "src/ai_video/production/composition.py"],
+      "engineering_receipts": [{"path": ".agent/harness/runs/native-audio-retime-20261018-r4/receipt.json", "check_ids": ["native_audio_retime_tests", "production_composition_audio_tests"]}]
+    },
+    {
+      "id": "cleanup",
+      "kind": "media",
+      "source_files": ["src/ai_video/production/video_cleanup_contracts.py", "src/ai_video/production/video_cleanup_pixels.py", "src/ai_video/production/video_cleanup_media.py", "src/ai_video/production/video_cleanup_admission.py"],
+      "engineering_receipts": []
+    },
+    {
+      "id": "audio",
+      "kind": "media",
+      "source_files": ["src/ai_video/production/audio.py", "src/ai_video/production/captions.py", "src/ai_video/production/generated_video_audio.py"],
+      "engineering_receipts": [{"path": ".agent/harness/runs/native-audio-retime-20261018-r4/receipt.json", "check_ids": ["production_composition_audio_tests", "native_audio_retime_tests"]}]
+    },
+    {
+      "id": "renderer",
+      "kind": "media",
+      "source_files": ["src/ai_video/production/hyperframes.py", "src/ai_video/production/_hyperframes_source.py", "src/ai_video/production/visual_media.py"],
+      "engineering_receipts": [{"path": ".agent/harness/runs/native-audio-retime-20261018-r4/receipt.json", "check_ids": ["production_composition_audio_tests"]}]
+    },
+    {
+      "id": "state",
+      "kind": "engineering",
+      "source_files": ["src/ai_video/production/project.py", "src/ai_video/production/registry.py", "src/ai_video/production/models.py", "src/ai_video/production/state_commit.py"],
+      "engineering_receipts": [{"path": ".agent/harness/runs/native-audio-retime-20261018-r4/receipt.json", "check_ids": ["production_composition_audio_tests"]}]
+    },
+    {
+      "id": "committer",
+      "kind": "engineering",
+      "source_files": ["src/ai_video/production/state_commit.py", "src/ai_video/production/_state_commit_video.py", "src/ai_video/production/_state_commit_review.py"],
+      "engineering_receipts": [{"path": ".agent/harness/runs/native-audio-retime-20261018-r4/receipt.json", "check_ids": ["production_composition_audio_tests"]}]
+    },
+    {
+      "id": "dependency",
+      "kind": "engineering",
+      "source_files": ["src/ai_video/production/dependency.py", "src/ai_video/production/video_dependency.py", "src/ai_video/production/production_strategy_dependency.py"],
+      "engineering_receipts": [
+        {"path": ".agent/harness/runs/edit-first-temporal-control-20261017-r4/receipt.json", "check_ids": ["production_strategy_tests", "production_shot_router_tests"]},
+        {"path": ".agent/harness/runs/reference-control-preview-20261016-r1/receipt.json", "check_ids": ["production_shot_router_tests"]}
+      ]
+    },
+    {
+      "id": "safety",
+      "kind": "engineering",
+      "source_files": ["src/ai_video/production/paid_provider.py", "src/ai_video/production/paid_provider_budget_extension.py", "src/ai_video/production/paid_provider_submit_quota.py"],
+      "engineering_receipts": [{"path": ".agent/harness/runs/character-performance-control-20261020-r4/receipt.json", "check_ids": ["production_video_provider_tests"]}]
+    },
+    {
+      "id": "analysis",
+      "kind": "engineering",
+      "source_files": ["src/ai_video_mcp/server.py", "src/ai_video/canvas_review.py"],
+      "engineering_receipts": []
+    },
+    {
+      "id": "qa",
+      "kind": "media",
+      "source_files": ["src/ai_video/production/review.py", "src/ai_video/production/final_output_review.py"],
+      "engineering_receipts": [{"path": ".agent/harness/runs/character-performance-control-20261020-r4/receipt.json", "check_ids": ["final_output_no_regression_tests", "generation_feedback_tests"]}]
+    },
+    {
+      "id": "console",
+      "kind": "engineering",
+      "source_files": ["provider-console/src/App.jsx", "provider-console/src/library-browser.jsx", "provider-console/src/project-modules.html", "src/ai_video/provider_console.py"],
+      "engineering_receipts": [{"path": ".agent/harness/runs/module-map-relations-20261020-r1/receipt.json", "check_ids": ["provider_console_node_tests", "provider_console_web_build"]}]
+    },
+    {
+      "id": "memory",
+      "kind": "engineering",
+      "source_files": ["src/ai_video/agent_memory/retrieval.py", "src/ai_video/quality_intelligence/capture.py", ".agents/skills/retrieve-ai-video-memory/SKILL.md"],
+      "engineering_receipts": []
+    },
+    {
+      "id": "harness",
+      "kind": "engineering",
+      "source_files": ["scripts/agent_harness.py", "scripts/architecture_gate/__main__.py", ".agent/harness/policy.yaml", ".agent/harness/agent-rules.yaml"],
+      "engineering_receipts": [{"path": ".agent/harness/runs/character-performance-control-20261020-r4/receipt.json", "check_ids": ["harness_tests"]}]
+    },
+    {
+      "id": "special",
+      "kind": "engineering",
+      "source_files": ["src/ai_video/cli.py", "src/ai_video/pipeline.py", "src/ai_video/production/ecommerce_job.py", "src/ai_video/production/ecommerce_job_review.py"],
+      "engineering_receipts": []
+    }
+  ]
+}

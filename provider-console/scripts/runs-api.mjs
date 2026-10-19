@@ -7,6 +7,7 @@ import { promisify } from "node:util";
 
 import { catalogExternalMedia, publicExternalMediaProjection } from "./external-media.mjs";
 import { handleMediaFolderRequest, openMediaFolder } from "./media-folder.mjs";
+import { createPythonModuleEvidenceProjector, moduleEvidenceProjection } from "./module-evidence.mjs";
 
 const execFileAsync = promisify(execFile);
 const JSON_HEADERS = { "Content-Type": "application/json; charset=utf-8" };
@@ -472,6 +473,7 @@ export function createRunsApiHandler({
   repoRoot,
   runProjector = createPythonProjector(repoRoot),
   runsMediaIndexProjector = createPythonRunsMediaIndex(repoRoot),
+  moduleEvidenceProjector = createPythonModuleEvidenceProjector(repoRoot),
   externalSources = [],
   externalCatalog = catalogExternalMedia,
   changeFeed = null,
@@ -642,6 +644,14 @@ export function createRunsApiHandler({
 
       if (isExternalRequest) {
         send(res, 404, { error: { code: "NOT_FOUND", message: "接口不存在。" } });
+        return;
+      }
+
+      if (parsed.pathname === "/api/runs/module-evidence") {
+        if (req.method !== "GET") return methodNotAllowed(res, "GET");
+        if (parsed.search) return send(res, 400, { error: { code: "INVALID_MODULE_EVIDENCE_QUERY" } });
+        try { send(res, 200, moduleEvidenceProjection(await moduleEvidenceProjector())); }
+        catch { send(res, 503, { error: { code: "MODULE_EVIDENCE_UNAVAILABLE", message: "本机模块证据不可用。" } }); }
         return;
       }
 
