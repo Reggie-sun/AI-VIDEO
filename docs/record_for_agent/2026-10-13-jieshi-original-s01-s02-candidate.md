@@ -9,6 +9,14 @@ evidence_index_version: "1"
 
 Date: 2026-10-13
 
+## Current Non-generative Cleanup Follow-up — 2026-10-19
+
+用户明确授权的[共享局部修补能力](2026-10-19-non-generative-video-cleanup.md)已在现有开发素材准备/准入 owner 实现；下方静帧可修性中的“本次未实现”仅属历史。旧第二版 RGB 母版 `86eb56c7e2dab3f8aae27cd1c8073d0d6dabd8fcfad3f0d4dadbdf995ecdd9ff` 被用户实际播放证实严重绿紫偏色，不能再作为正常观看交付；其无损像素证明仍有效，失败截图与原 bytes 保留。
+
+当前观看版为 `runs/non-generative-cleanup-viewing-20261019-001/production/assets/files/58dee01c3fb9ad82b2b43e39f80c3ae85d6a1988c1f7e8b687f66b0d6dfd838f.mp4`，SHA同文件名：独立H264/yuv420p、BT.709 limited-range代理，768×1344、24fps、124帧、5.184秒，全部PTS及原声PCM/声音时序保留。它经`development-repair-input/5`保留原raw和`/4`母版，代理有损，不继承母版逐像素证明。前端无query首页已实测首屏展示“修补观看版”并可普通点击选择，修复了有deep link才能定位及新Registry素材排序靠后的缺口；真实Chrome截图颜色正常，1×自动播放至结束无错误。公共能力接收作者遮罩/逐帧仿射，不声称自动跟踪；本轮新生成/付费理解POST0。
+
+首版局部漏影被拒绝；第二版扩大早段遮罩，同一reviewer在第三轮的新代理21张采样及Chrome截图中未再辨识旧手影、明确截断、接缝或偏色。用户随后对该exact前端链接的完整1×听看问题回复“颜色正常，修补效果可以接受”，颜色和局部修补观感已获人工接受；下方原8项缺证未因此逐项通过。派生为独立development repair input，qualification `NOT_EVALUATED`，不是原Provider产物或已采用S01。原Manifest143 /Project20、raw失败/abandon、15项与36项要求及S02 POST0不变，无accepted state或交接。工程验证、三轮媒体复核、限制和发布状态以新记录为准。
+
 ## Current Funded S01 — 2026-10-19
 
 用户回复“现在有钱了”后，继续此前尚未消费的“做视频”指令：official MiniMax H3 Max CN、5秒标称、768P、balanced、同一 PNG first-frame，一次、零重抽。实际 POST 于 `2026-10-18T23:43:14Z` 发出，约0.92秒后 HTTP200，canonical paid receipt 为 `accepted`；旧402没有重现，但没有查询或证明具体账户余额。此次不是沿用旧已消费 permit，S02、图片/音频生成及新音频理解均为0。
@@ -37,7 +45,9 @@ Date: 2026-10-13
 
 `record-ai-video-session`及自动`distill-ai-video-learning`评估为 `no_candidate`：新片与旧A存在同类手影表现，但不是隔离mode、prompt或参考职责的受控因果对照；已有“绑定不保证整段质量”边界不需重复采纳。本地H3首帧头部claim明确排除paid/remote，不借此扩张其scope。Evidence Index的fetch与analyzer层只计同一新attempt；未修改Skill/Policy/Gate或全局memory。当前一次授权已消费，不同输入的新有限单元尚未封存或获批，不继续同输入重抽。
 
-## Non-generative Cleanup Feasibility — 2026-10-19
+## Historical Non-generative Cleanup Feasibility — 2026-10-19
+
+本节的静帧阶段及未实现结论由顶部 `Current Non-generative Cleanup Follow-up` 部分取代；保留原测量与当时范围，不把两张静帧改写为视频通过。
 
 用户问“手影子这个能不能换一个不再生成的别的方式去掉影子”。此前“变速不能删除手影”的判断只覆盖时间编辑，不能据此排除传统局部合成；这是本次补查的制作手段缺口，不是新的生成授权。
 
