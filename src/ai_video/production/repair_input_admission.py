@@ -202,6 +202,7 @@ class RepairInputAdmissionReceipt(StrictModel):
         if self.contract_version in {
             "development-repair-input/2",
             "development-repair-input/3",
+            "development-repair-input/4",
         }:
             _validate_preview_probe(
                 self.preview_probe,
@@ -213,7 +214,9 @@ class RepairInputAdmissionReceipt(StrictModel):
             if (self.preview_use.trim_start_frame + self.preview_use.trim_duration_frames
                     > self.preview_probe.measured.frame_count):
                 raise ValueError("Development repair preview trim exceeds measured source frames")
-            if self.contract_version == "development-repair-input/2":
+            if (self.contract_version == "development-repair-input/2"
+                    or (self.contract_version == "development-repair-input/4"
+                        and self.preview_use.scope == "muted_visual_preview")):
                 if (self.preview_use.scope != "muted_visual_preview"
                         or self.preview_use.source_time_map.contract_version != "video-time-map/1"):
                     raise ValueError("Development repair input/2 cannot carry native A/V retiming")
@@ -398,6 +401,9 @@ def verify_repair_input(record, root):
         version = json.loads(payload).get("contract_version")
     except (AttributeError, TypeError, ValueError) as exc:
         raise ValueError("Development repair input receipt is invalid") from exc
+    if version == "development-repair-input/4":
+        from ai_video.production.video_cleanup_admission import verify_cleaned_repair_input
+        return verify_cleaned_repair_input(record, root, payload)
     receipt_type = {
         "development-repair-input/1": RepairInputAdmissionReceipt,
         "development-repair-input/2": RepairPreviewInputAdmissionReceipt,

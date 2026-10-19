@@ -29,6 +29,30 @@ def text_data():
     return source, definition
 
 
+def test_cleanup_cli_uses_local_tools_and_never_instantiates_generation_runtime(tmp_path, monkeypatch):
+    from scripts.canvas_production import run
+    from types import SimpleNamespace
+
+    source, definition = text_data()
+    (tmp_path / "production").mkdir()
+    (tmp_path / "source.json").write_text(json.dumps(source))
+    data = tmp_path / "data.json"
+    data.write_text(json.dumps(definition))
+    calls = []
+    service = SimpleNamespace(author=lambda **kwargs: "authored",
+        bootstrap_video_cleanup=lambda **kwargs: calls.append(kwargs) or {"generation_calls": 0})
+    monkeypatch.setattr("scripts.canvas_production.open_canvas_project",
+        lambda **kwargs: (service, "registry", ()))
+    result = run(data_path=data, project_root=tmp_path / "production", action="bootstrap_video_cleanup",
+        runtime_factory="must_not_import:paid_provider", arguments={"cleanup_plan": {"explicit": "plan"}},
+        ffmpeg_executable=tmp_path / "ffmpeg", ffprobe_executable=tmp_path / "ffprobe")
+    assert result == {"generation_calls": 0}
+    assert calls[0]["bundle"] == "authored"
+    assert calls[0]["cleanup_plan"] == {"explicit": "plan"}
+    with pytest.raises(ValueError, match="explicit local"):
+        run(data_path=data, project_root=tmp_path / "production", action="bootstrap_video_cleanup")
+
+
 def test_data_entry_preserves_original_text_and_resumes_immutable_director_inputs(tmp_path):
     source, definition = text_data()
     inspection = inspect_canvas_source(source, definition["selection"])

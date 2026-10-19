@@ -166,6 +166,10 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_repair_input_admission.py, -q]
     cwd: .
     description: Verify development-only failed-video provenance admission, no qualification, and exact bootstrap replay without Provider effects.
+  video_cleanup_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_video_cleanup_pixels.py, tests/test_video_cleanup_media.py, tests/test_video_cleanup_admission.py, -q]
+    cwd: .
+    description: Verify explicit non-generative clean-plate pixels, bounded local media preservation, strict failed-source derivation and quarantine; local FFmpeg proof requires explicit test tools.
   final_output_no_regression_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_final_output.py, tests/test_generation_no_regression.py, -q]
     cwd: .
@@ -582,6 +586,16 @@ categories:
       - production_reader_tests
       - production_state_tests
       - generation_feedback_tests
+      - task_architecture_gate
+  video_cleanup:
+    patterns:
+      - src/ai_video/production/video_cleanup_*.py
+      - tests/test_video_cleanup_*.py
+    check_ids:
+      - video_cleanup_tests
+      - repair_input_admission_tests
+      - production_reader_tests
+      - production_state_tests
       - task_architecture_gate
   s01_strategy_regression:
     patterns:

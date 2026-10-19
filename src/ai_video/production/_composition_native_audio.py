@@ -41,6 +41,10 @@ def _native_audio_probe(
             admission = verify_repair_input(asset, project.root)
         except (OSError, ValueError) as exc:
             raise invalid("Mapped development video admission is invalid.", str(exc)) from exc
+        if admission.contract_version == "development-repair-input/4":
+            # The strict v4 reader verifies a local measured derivative and its
+            # preserved source probe; it must not forge a new Provider probe.
+            return None
         if admission.contract_version != "development-repair-input/3":
             raise invalid("Native audio preview requires development-repair-input/3.")
         probe = admission.preview_probe

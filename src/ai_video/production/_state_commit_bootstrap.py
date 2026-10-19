@@ -57,22 +57,38 @@ class _StateCommitBootstrapMixin:
     def bootstrap_repair_input(self, *, attempt_id, project, registry, artifacts,
                                source_root, source_attempt_id, source_sha256,
                                asset_id, usage_license, preview_use=None,
-                               preview_probe=None):
+                               preview_probe=None, cleanup_plan=None, cleanup_tools=None):
         """New development bundle only; no source write, qualification or activation."""
         from ai_video.production.repair_input_admission import (
             RepairPreviewUse,
             prepare_repair_input,
         )
 
-        if preview_use is not None:
-            preview_use = RepairPreviewUse.model_validate(preview_use)
-            _validate_repair_preview_shot(project, artifacts, preview_use)
+        try:
+            if preview_use is not None:
+                preview_use = RepairPreviewUse.model_validate(preview_use)
+                _validate_repair_preview_shot(project, artifacts, preview_use)
+            if preview_probe is not None:
+                from ai_video.production.video_artifact import VideoProbeReceipt
+                preview_probe = VideoProbeReceipt.model_validate(preview_probe)
+        except ValueError as exc:
+            raise _state_invalid("Development repair preview input is invalid.", str(exc)) from exc
 
-        updated, captured = prepare_repair_input(target_root=self._project_root,
-            project=project, registry=registry, source_root=source_root,
-            source_attempt_id=source_attempt_id, source_sha256=source_sha256,
-            asset_id=asset_id, usage_license=usage_license,
+        if (cleanup_plan is None) != (cleanup_tools is None):
+            raise _state_invalid("Cleanup requires an explicit plan and local tools together.")
+        arguments = dict(target_root=self._project_root, project=project, registry=registry,
+            source_root=source_root, source_attempt_id=source_attempt_id,
+            source_sha256=source_sha256, asset_id=asset_id, usage_license=usage_license,
             preview_use=preview_use, preview_probe=preview_probe)
+        if cleanup_plan is None:
+            updated, captured = prepare_repair_input(**arguments)
+        else:
+            from ai_video.production.video_cleanup_admission import prepare_cleaned_repair_input
+            try:
+                updated, captured = prepare_cleaned_repair_input(**arguments,
+                    cleanup_plan=cleanup_plan, cleanup_tools=cleanup_tools)
+            except (OSError, ValueError) as exc:
+                raise _state_invalid("Development video cleanup preparation failed.", str(exc)) from exc
         return self.bootstrap_initial_state(attempt_id=attempt_id, project=project,
             registry=updated, artifacts=(*artifacts, *captured))
 

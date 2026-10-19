@@ -179,6 +179,28 @@ class CanvasProductionService:
         return prepare_canvas_image_assets(self._load(), operations)
 
     @_input_errors
+    def bootstrap_video_cleanup(self, *, bundle, cleanup_plan, ffmpeg_executable,
+                                ffprobe_executable, **arguments):
+        """One explicit local cleanup capture; never adopts or activates a Shot."""
+        from pathlib import Path
+        from ai_video.production.video_cleanup_media import VideoCleanupTools
+        from ai_video.production.repair_input_admission import verify_repair_input
+
+        manifest = self.committer.bootstrap_repair_input(project=bundle.project,
+            registry=bundle.registry, artifacts=bundle.artifacts, cleanup_plan=cleanup_plan,
+            cleanup_tools=VideoCleanupTools(ffmpeg=Path(ffmpeg_executable), ffprobe=Path(ffprobe_executable)),
+            **arguments)
+        loaded = load_production_project(self.committer.project_root / "project.yaml")
+        asset = next(item for item in loaded.registry.assets if item.asset_id == arguments["asset_id"])
+        receipt = verify_repair_input(asset, loaded.root)
+        return {"manifest_revision": manifest.manifest_revision,
+            "output_path": str(loaded.asset_paths[asset.asset_id]), "output_sha256": asset.sha256,
+            "source_sha256": receipt.artifact_sha256, "receipt_hash": receipt.content_hash,
+            "qualification": receipt.qualification, "generation_calls": 0,
+            "tracking": "explicit_affine_per_frame", "audio": "original_samples_preserved",
+            "production_acceptance": "NOT_EVALUATED"}
+
+    @_input_errors
     def prepare_image_workflow(self, **arguments):
         from ai_video.canvas_image_workflow import prepare_canvas_masked_image
         return prepare_canvas_masked_image(loaded=self._load(), **arguments)

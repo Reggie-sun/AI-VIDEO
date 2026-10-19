@@ -6,6 +6,7 @@ grants execution. Missing authoring remains explicit rather than inferred.
 
 from ai_video.production.domain_acceptance import production_allocation_issues
 from ai_video.production.requirement_semantics import RequirementExpressionFields
+from ai_video.production.video_cleanup_contracts import video_cleanup_capability_report
 
 
 def requirement_responsibility(rule):
@@ -115,6 +116,7 @@ def production_responsibility_report(*, qa_policy=None, shot=None, target_shot_i
             if qa_policy is not None and show_inventory else [],
         "production_intent": intent.model_dump(mode="json") if intent else None,
         "strategy": strategy,
+        "source_preparation": [video_cleanup_capability_report()],
         "final_output_contract": final.model_dump(mode="json") if final else None,
         "actual_quality": "NOT_EVALUATED",
         "proof_boundary": "Authored responsibility and available operations are input facts; "

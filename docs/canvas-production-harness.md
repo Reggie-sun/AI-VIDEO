@@ -283,6 +283,32 @@ qualification为NOT_EVALUATED，timeline标记 `development_preview` 并禁止re
 这一路线保留原request/fetch/rejection/QA及消费，不是普通import或Production许可。
 先观察编辑实际效果，仍有无法达成的缺口时才提交明确、有限的新生成方案。
 
+### Non-generative Local Cleanup
+
+局部影子、穿帮或脏点先评估clean plate与遮罩合成，不因trim/retime修不了就直接重生成。
+`production_control.source_preparation`显示本地修补入口、前置条件和边界，不选择新Provider或自动放宽QA。
+公共像素核使用同一视频的干净帧，`video-clean-plate/1`包含exact `source_sha256`及严格排序的`frames`：
+每项声明`frame_index`、`patches`（`plate_frame`、plate坐标多边形、`feather_px`、正向`plate_to_output_affine`）
+与output坐标的`protected_polygons`。仿射数组表示`x'=a*x+b*y+c, y'=d*x+e*y+f`。
+这是显式逐帧对齐数据，不是自动平面/光流跟踪；空背景、前景遮挡与素材变化仍由作者核对。
+非法/越界/自交几何、非有限或奇异变换、越界采样拒绝，不静默裁掉失败区域。
+
+`prepare_video_cleanup(source_bytes=..., plan=..., tools=VideoCleanupTools(...))`只做有界本地素材准备：
+支持8-bit、零视频起点的CFR MP4、0或1条原声音轨；默认最多600帧/60秒、source200MiB、解码RGB1GiB及PCM64MiB。
+保持每个源帧及其PTS，用`libx264rgb` lossless保存并重解码比对，未选帧和保护像素不得变化；原声音频不重编码，
+另比较PCM及stream start/duration/time base。不能可靠保持的输入显式失败。编码结果是派生源，不是新的timeline或最终成片renderer。
+
+对已关闭remote质量失败，使用现有独立开发bundle的`bootstrap_repair_input`及`/4`准入。
+Canvas普通`--data`指定该开发bundle；`bootstrap_video_cleanup --arguments ... --ffmpeg ABS --ffprobe ABS`
+要求原`source_root/source_attempt_id/source_sha256`、新`asset_id`、`usage_license`、sealed `preview_use`、
+原实际`preview_probe`及`cleanup_plan`（内联或同data root内JSON路径）。工具显式注入，不加载generation runtime或凭据。
+公共service也支持同样参数；所有持久化仍由唯一committer完成，CLI返回已落盘派生路径和exact SHA供观看。
+原捕获`asset_id-source`与新派生资产同时保留；Registry reader复验recipe/proof、原失败链和关联，不把local measurement伪装成Provider probe。
+
+派生仍UNBOUND、qualification NOT_EVALUATED，禁止Production Shot绑定或render activation；不自动修复原raw Gate，
+也不推进下一镜。正常速度观看要检查补片漂移、接缝、被覆盖背景运动及真实前景；局部像素/声音证明不代替整段质量。
+最终剪辑、变速和声音混合继续归`ResolvedTimeline`/HyperFrames。原片及其质量失败、消费和其余全部要求保留。
+
 ### Action Timing And Selective Effects
 
 修复动作不到位时，先并排核对 actual native text、标称生成时长、原采用窗口和 QA observable。

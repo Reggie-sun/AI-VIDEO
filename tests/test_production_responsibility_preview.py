@@ -186,3 +186,19 @@ def test_preflight_does_not_allow_candidate_qa_path_to_escape_data_root(tmp_path
         run(data_path=data / "project.json", project_root=root, action="preflight",
             arguments={"qa_policy": "../qa.json"})
     assert list(root.iterdir()) == []
+
+
+def test_responsibility_preview_exposes_cleanup_without_running_tools_or_qualifying_source(monkeypatch):
+    import subprocess
+    from ai_video.production.production_responsibility import production_responsibility_report
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("read-only preview must not run a local tool")
+    monkeypatch.setattr(subprocess, "run", forbidden)
+    report = production_responsibility_report()
+    cleanup = report["source_preparation"][0]
+    assert cleanup["entrypoint"] == "bootstrap_video_cleanup"
+    assert cleanup["automatic_tracking"] is False
+    assert cleanup["production_selection"] == "REQUIRES_SEPARATE_SOURCE_QUALIFICATION"
+    assert cleanup["quality"] == report["actual_quality"] == "NOT_EVALUATED"
+    assert cleanup["generation_calls"] == 0

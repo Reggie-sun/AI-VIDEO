@@ -38,7 +38,9 @@ class ProductionCapabilities(StrictModel):
 
 
 # These are operations actually expressible by current Shot/P3/P4 contracts.
-# Masking, tracking, arbitrary motion, dubbing and extension have no executor.
+# These are Production operations. Development clean-plate source preparation
+# does not qualify masking/tracking for automatic Production materialization.
+# Arbitrary motion, dubbing and extension still have no executor here.
 _SUPPORTED = frozenset({Op.GENERATE_FULL_SHOT, Op.EXISTING_ASSET_REUSE,
     Op.SPLIT_SHOT, Op.CUTAWAY, Op.REACTION_SHOT, Op.INSERT_SHOT,
     Op.REFRAME, Op.TRIM_EXISTING, Op.REPLACE_AUDIO,

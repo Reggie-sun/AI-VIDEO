@@ -287,8 +287,16 @@ Registry 独立重开 immutable receipt，不依赖外部 root。保留路径与
 及原request/fetch绑定的VideoProbeReceipt，只允许muted本地composition preview。资产仍UNBOUND，
 `composition`按receipt派生 `ResolvedTimeline.usage_scope=development_preview`，原render activation
 owner拒绝该scope；不建立第二renderer、timeline、许可或quality state。
-Focused verification：`tests/test_repair_input_admission.py`；reader/state/feedback 检查组合
-由 Harness policy `repair_input_admission` category 独占。这不是通用视频导入或修复执行器。
+`video_cleanup_contracts.py` / `video_cleanup_pixels.py` 独占显式逐帧clean-plate recipe、仿射采样、羽化与foreground保护；
+`video_cleanup_media.py`只用注入的本地工具准备同帧数/PTS的lossless RGB派生源，重解码验证像素并比较原声PCM/时间。
+它不拥有剪辑顺序、trim/speed或最终renderer；无自动tracking/生成填补。
+`video_cleanup_admission.py`经同一`bootstrap_repair_input(cleanup_plan=..., cleanup_tools=...)`准备`/4`：
+保留原`/2,/3`捕获资产和Provider probe，另封存派生bytes、local measurement、recipe和tool/protection/audio proof。
+Registry/validation重开原资产关联；派生保持UNBOUND/NOT_EVALUATED，原Production绑定与render fence覆盖它。
+`CanvasProductionService.bootstrap_video_cleanup`及同名CLI action只编排这一入口；纯职责预览展示可用的开发侧素材准备，
+不将MASK_COMPOSITE/TRACKING自动升级为已资格化Production operation。
+Focused verification：`tests/test_repair_input_admission.py`、`tests/test_video_cleanup_*.py`；reader/state/feedback检查组合
+由Harness policy独占。旧版本不变，派生源不改写原失败或带来新的生成许可。
 
 ## S01 Read-only Recovery Observation
 

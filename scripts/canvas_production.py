@@ -43,7 +43,7 @@ def _approved_preflight_shots(loaded, authored_shots):
 
 
 def run(*, data_path, project_root, action, runtime_factory=None, arguments=None,
-       ffprobe_executable=None):
+       ffprobe_executable=None, ffmpeg_executable=None):
     data_path = Path(data_path).absolute()
     root = data_path.parent.resolve(strict=True)
     definition = _json(data_path, root)
@@ -51,7 +51,7 @@ def run(*, data_path, project_root, action, runtime_factory=None, arguments=None
     inspection = inspect_canvas_source(source, definition["selection"])
     if action == "inspect":
         return inspection
-    if runtime_factory is not None and action not in {"preflight", "prepare_image_workflow"}:
+    if runtime_factory is not None and action not in {"preflight", "prepare_image_workflow", "bootstrap_video_cleanup"}:
         module, name = runtime_factory.split(":", 1)
         runtime = getattr(importlib.import_module(module), name)(project_root=Path(project_root))
     else:
@@ -59,9 +59,18 @@ def run(*, data_path, project_root, action, runtime_factory=None, arguments=None
     committer = runtime.pop("committer")
     operator_arguments = runtime.pop("action_arguments", lambda action, service, arguments: arguments)
     service, registry, artifacts = open_canvas_project(inspection=inspection, definition=definition,
-        data_root=root, committer=committer, resume=action not in {"author", "approve", "revise"},
+        data_root=root, committer=committer, resume=action not in {"author", "approve", "revise", "bootstrap_video_cleanup"},
         ffprobe_executable=ffprobe_executable, **runtime)
     arguments = {} if arguments is None else arguments
+    if action == "bootstrap_video_cleanup":
+        if ffmpeg_executable is None or ffprobe_executable is None:
+            raise ValueError("Video cleanup requires explicit local FFmpeg and ffprobe executables")
+        bundle = service.author(registry=registry, asset_artifacts=artifacts)
+        arguments = dict(arguments)
+        if isinstance(arguments.get("cleanup_plan"), str):
+            arguments["cleanup_plan"] = _json(root / arguments["cleanup_plan"], root)
+        return service.bootstrap_video_cleanup(bundle=bundle, ffmpeg_executable=ffmpeg_executable,
+            ffprobe_executable=ffprobe_executable, **arguments)
     if action in {"author", "approve", "preflight"}:
         bundle = service.author(registry=registry, asset_artifacts=artifacts)
         if action in {"author", "preflight"}:
@@ -120,7 +129,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("action", choices=("inspect", "preflight", "author", "approve", "revise", "status", "prepare", "start",
         "prepare_repair", "start_repair", "prepare_production", "materialize_production", "compose_production",
-        "generate_voice", "prepare_image_workflow",
+        "generate_voice", "prepare_image_workflow", "bootstrap_video_cleanup",
         "execute", "evaluate", "handoff_reference", "register_native_audio", "compose", "render", "cut_packet",
         "review_delivery", "deliver"))
     parser.add_argument("--data", type=Path, required=True)
@@ -128,11 +137,13 @@ def main(argv=None):
     parser.add_argument("--runtime", help="Trusted shared operator module:function; never a story executor")
     parser.add_argument("--arguments", type=Path, help="Ordinary action arguments JSON; credentials are forbidden")
     parser.add_argument("--ffprobe", type=Path, help="Absolute ffprobe executable for first-time local MP4 imports")
+    parser.add_argument("--ffmpeg", type=Path, help="Absolute local FFmpeg executable for non-generative cleanup")
     args = parser.parse_args(argv)
     try:
         arguments = _json(args.arguments.absolute(), args.arguments.absolute().parent) if args.arguments else {}
         result = run(data_path=args.data, project_root=args.project_root, action=args.action,
-            runtime_factory=args.runtime, arguments=arguments, ffprobe_executable=args.ffprobe)
+            runtime_factory=args.runtime, arguments=arguments, ffprobe_executable=args.ffprobe,
+            ffmpeg_executable=args.ffmpeg)
         import inspect
         if inspect.isawaitable(result):
             import asyncio
