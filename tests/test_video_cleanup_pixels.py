@@ -302,4 +302,3 @@ def test_positive_alpha_with_out_of_plate_sampling_is_rejected():
 
     with pytest.raises(ValueError, match="outside plate geometry"):
         apply_clean_plate_frame(source, {0: plate}, _frame(patch))
-
