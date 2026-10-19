@@ -431,6 +431,7 @@ checks:
       - vidu_ad_tests
       - voice_source_routing_tests
       - repair_input_admission_tests
+      - video_cleanup_tests
       - generation_feedback_tests
       - grok_media_provider_tests
       - seedream_image_tests
