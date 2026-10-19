@@ -43,6 +43,7 @@ const NAV_ITEMS = [
   ["assets", "素材", ImageSquare],
   ["ark", "Ark", SlidersHorizontal],
   ["providers", "提供商控制台", Monitor],
+  ["modules", "项目模块", Info],
   ["runs", "执行记录", ArrowsClockwise],
   ["evidence", "证据", FileText],
   ["settings", "设置", Gear],
@@ -97,7 +98,9 @@ function Sidebar() {
       <div className="brand"><Play size={22} weight="fill" /><span>AI-VIDEO</span></div>
       <ul className="nav-list">
         {NAV_ITEMS.map(([id, label, Icon]) => (
-          <li key={id}><button type="button" className={`nav-item${id === "providers" ? " is-active" : ""}`} aria-current={id === "providers" ? "page" : undefined}><Icon size={17} /><span>{label}</span></button></li>
+          <li key={id}>{id === "modules"
+            ? <a className="nav-item" href="/src/project-modules.html" style={{ textDecoration: "none" }}><Icon size={17} /><span>{label}</span></a>
+            : <button type="button" className={`nav-item${id === "providers" ? " is-active" : ""}`} aria-current={id === "providers" ? "page" : undefined}><Icon size={17} /><span>{label}</span></button>}</li>
         ))}
       </ul>
       <div className="sidebar-bottom">

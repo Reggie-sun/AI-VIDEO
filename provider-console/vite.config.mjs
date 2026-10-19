@@ -23,6 +23,12 @@ const externalMediaSources = configuredExternalMediaSources({ repoRoot, homeRoot
 export default defineConfig({
   build: {
     outDir: "dist/client",
+    rollupOptions: {
+      input: {
+        console: path.join(providerConsoleRoot, "index.html"),
+        modules: path.join(providerConsoleRoot, "src/project-modules.html"),
+      },
+    },
   },
   optimizeDeps: {
     include: ["react", "react-dom/client"],

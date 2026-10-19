@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <link rel="icon" href="data:,">
+  <title>AI-VIDEO · Module Map</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif;
+      color: #e9edf5;
+      background: #071019;
+      font-size: 16px;
+      --bg: #071019;
+      --panel: #0b151f;
+      --panel-raised: #111d29;
+      --border: #263442;
+      --border-soft: #1c2a37;
+      --text: #e9edf5;
+      --muted: #a5b0bd;
+      --faint: #7f8b99;
+      --violet: #9b88ff;
+      --violet-soft: #272344;
+      --teal: #67d9c2;
+      --amber: #f0c579;
+      --red: #ffaaa1;
+    }
+    * { box-sizing: border-box; }
+    html { min-width: 320px; scroll-behavior: smooth; }
+    body { min-width: 320px; margin: 0; background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    button, input, a { font: inherit; }
+    button:focus-visible, a:focus-visible, input:focus-visible { outline: 2px solid var(--violet); outline-offset: 3px; }
+    a { color: inherit; }
+    .page { width: min(1440px, 100%); margin: 0 auto; padding: 0 36px 64px; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+    .topbar { display: flex; align-items: center; justify-content: space-between; min-height: 64px; border-bottom: 1px solid var(--border-soft); }
+    .brand { display: flex; align-items: center; gap: 11px; color: #f4f5f8; font-size: 14px; font-weight: 760; letter-spacing: .12em; }
+    .brand-mark { display: grid; width: 27px; height: 27px; place-items: center; border: 1px solid #594a9a; border-radius: 8px; background: linear-gradient(145deg, #312764, #142c37); color: #c5baff; font-size: 13px; letter-spacing: 0; }
+    .brand small { color: var(--faint); font-size: 10px; font-weight: 650; letter-spacing: .16em; }
+    .return-link { padding: 7px 12px; border: 1px solid var(--border); border-radius: 7px; color: #d8ddea; font-size: 13px; text-decoration: none; transition: border-color .16s, background .16s; }
+    .return-link:hover { border-color: #6558a8; background: #17182c; }
+    .return-link[aria-disabled="true"] { cursor: not-allowed; color: #8792a0; border-style: dashed; }
+    .eyebrow { display: flex; align-items: center; gap: 10px; margin: 0 0 12px; color: #a99aff; font-size: 12px; font-weight: 750; letter-spacing: .16em; text-transform: uppercase; }
+    .eyebrow::before { width: 20px; height: 1px; background: var(--violet); content: ""; }
+    .hero { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(250px, .6fr); gap: 34px; align-items: end; padding: 46px 0 28px; }
+    h1 { max-width: 780px; margin: 0; color: #f5f6fa; font-size: clamp(34px, 5vw, 58px); font-weight: 720; letter-spacing: -.045em; line-height: 1.14; }
+    .hero-lede { max-width: 780px; margin: 18px 0 0; color: #c4ccd7; font-size: 18px; line-height: 1.7; }
+    .snapshot { padding: 15px 17px; border: 1px solid #39404f; border-radius: 10px; background: linear-gradient(145deg, rgba(43, 36, 78, .46), rgba(11, 21, 31, .92)); }
+    .snapshot-label { display: block; margin-bottom: 7px; color: #b1a5ff; font-size: 11px; font-weight: 750; letter-spacing: .13em; }
+    .snapshot p { margin: 0; color: #c7ced9; font-size: 13px; line-height: 1.65; }
+    .stats { display: flex; flex-wrap: wrap; gap: 10px; padding: 0 0 25px; }
+    .stat { display: flex; align-items: baseline; gap: 9px; padding: 8px 12px; border: 1px solid var(--border-soft); border-radius: 7px; background: #0b141d; }
+    .stat strong { color: #f4f1ff; font-size: 17px; }
+    .stat span { color: var(--muted); font-size: 12px; }
+    .responsibility { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 42px; }
+    .lane { position: relative; min-height: 148px; padding: 19px 20px 17px; overflow: hidden; border: 1px solid var(--border); border-radius: 10px; background: linear-gradient(130deg, #111925, #0b151e 80%); }
+    .lane::after { position: absolute; top: -30px; right: -20px; width: 100px; height: 100px; border: 1px solid rgba(155, 136, 255, .18); border-radius: 50%; content: ""; }
+    .lane:nth-child(2)::after { border-color: rgba(103, 217, 194, .2); }
+    .lane:nth-child(3)::after { border-color: rgba(240, 197, 121, .2); }
+    .lane-index { color: var(--violet); font-size: 11px; font-weight: 750; letter-spacing: .12em; }
+    .lane h2 { margin: 5px 0 5px; font-size: 18px; }
+    .lane p { max-width: 370px; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.58; }
+    .lane:nth-child(2) .lane-index { color: var(--teal); }
+    .lane:nth-child(3) .lane-index { color: var(--amber); }
+    .section-head { display: flex; align-items: end; justify-content: space-between; gap: 18px; margin: 0 0 16px; }
+    .section-head h2 { margin: 0; color: #f1f3f8; font-size: 23px; letter-spacing: -.02em; }
+    .section-head p { max-width: 560px; margin: 4px 0 0; color: var(--muted); font-size: 14px; }
+    .flow-section { margin-bottom: 43px; }
+    .flow { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 9px; counter-reset: flow; }
+    .flow-step { position: relative; min-height: 112px; padding: 13px 13px 14px; border: 1px solid var(--border); border-radius: 9px; background: #0d1721; color: var(--text); text-align: left; cursor: pointer; transition: transform .16s ease, border-color .16s ease, background .16s ease; }
+    .flow-step:hover { transform: translateY(-2px); border-color: #665bac; background: #121b2a; }
+    .flow-step::after { position: absolute; z-index: 1; top: 50%; right: -10px; width: 9px; border-top: 1px solid #596477; content: ""; }
+    .flow-step:last-child::after { display: none; }
+    .flow-number { display: block; margin-bottom: 11px; color: #a99aff; font-size: 11px; font-weight: 760; letter-spacing: .1em; }
+    .flow-step strong { display: block; font-size: 14px; line-height: 1.35; }
+    .flow-step span:last-child { display: block; margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.4; }
+    .catalog { padding: 25px; border: 1px solid var(--border); border-radius: 13px; background: linear-gradient(180deg, rgba(13, 23, 33, .96), rgba(9, 17, 25, .98)); }
+    .catalog-tools { display: grid; grid-template-columns: minmax(220px, 1fr) auto; gap: 14px; align-items: center; margin: 20px 0 17px; }
+    .search-wrap { position: relative; display: flex; align-items: center; min-width: 0; }
+    .search-icon { position: absolute; left: 13px; color: var(--faint); font-size: 18px; pointer-events: none; }
+    #moduleSearch { width: 100%; min-height: 46px; padding: 10px 45px 10px 40px; border: 1px solid #354352; border-radius: 8px; background: #08111a; color: var(--text); font-size: 15px; }
+    #moduleSearch::placeholder { color: #8290a0; }
+    .clear-search { position: absolute; right: 6px; width: 34px; height: 34px; border: 0; border-radius: 6px; background: transparent; color: #c5ccd7; cursor: pointer; }
+    .clear-search:hover { background: #1c2733; }
+    .clear-search:disabled { visibility: hidden; }
+    .filters { display: flex; flex-wrap: wrap; gap: 7px; }
+    .filter { min-height: 38px; padding: 6px 11px; border: 1px solid var(--border); border-radius: 7px; background: #0c1620; color: #c5cdd7; font-size: 13px; cursor: pointer; }
+    .filter:hover { border-color: #665bac; }
+    .filter[aria-pressed="true"] { border-color: #7664c2; background: var(--violet-soft); color: #e4dfff; }
+    .catalog-meta { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 0 1px 14px; color: var(--muted); font-size: 13px; }
+    .catalog-meta strong { color: #e8e2ff; font-variant-numeric: tabular-nums; }
+    .cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .module-card { min-width: 0; border: 1px solid #263543; border-radius: 9px; background: #101a25; transition: border-color .16s ease, transform .16s ease, background .16s ease; }
+    .module-card:hover { transform: translateY(-2px); border-color: #5b548e; background: #121d29; }
+    .module-card[hidden] { display: none; }
+    .module-open { display: block; width: 100%; min-height: 178px; padding: 16px; border: 0; border-radius: inherit; background: transparent; color: inherit; text-align: left; cursor: pointer; }
+    .module-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 9px; }
+    .module-number { color: #8d9aaa; font-size: 11px; font-weight: 760; letter-spacing: .11em; }
+    .module-group { padding: 3px 8px; border: 1px solid #403968; border-radius: 99px; color: #c8beff; font-size: 10px; font-weight: 700; white-space: nowrap; }
+    .module-card[data-category="media"] .module-group { border-color: #285a55; color: #9ce7d8; }
+    .module-card[data-category="infra"] .module-group { border-color: #594b33; color: #f0d39c; }
+    .module-title { display: block; margin-bottom: 6px; color: #f2f4f8; font-size: 17px; font-weight: 690; line-height: 1.34; }
+    .module-summary { display: block; min-height: 48px; color: #b5bfcb; font-size: 14px; line-height: 1.58; }
+    .mechanism { display: inline-flex; align-items: center; gap: 6px; margin-top: 12px; color: #aeb8c7; font-size: 11px; font-weight: 650; }
+    .mechanism::before { width: 6px; height: 6px; border-radius: 50%; background: var(--violet); content: ""; }
+    .module-card[data-category="media"] .mechanism::before { background: var(--teal); }
+    .module-card[data-category="infra"] .mechanism::before { background: var(--amber); }
+    .card-hint { display: block; margin-top: 8px; color: #8591a0; font-size: 11px; }
+    .print-detail { display: none; }
+    .empty-state { display: none; padding: 34px 18px; border: 1px dashed #3a4654; border-radius: 8px; color: #bdc6d2; text-align: center; }
+    .empty-state.is-visible { display: block; }
+    .empty-state p { margin: 0 0 13px; }
+    .reset-button { padding: 7px 12px; border: 1px solid #514778; border-radius: 7px; background: #211d38; color: #e3ddff; cursor: pointer; }
+    .truth-panel { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: center; margin-top: 25px; padding: 19px 21px; border: 1px solid #52466b; border-radius: 10px; background: linear-gradient(115deg, rgba(40, 33, 65, .62), rgba(11, 21, 31, .88)); }
+    .truth-panel h2 { margin: 0 0 5px; color: #f0eaff; font-size: 16px; }
+    .truth-panel p { max-width: 830px; margin: 0; color: #c4bdcf; font-size: 14px; line-height: 1.6; }
+    .truth-stages { display: flex; align-items: center; gap: 7px; color: #e9e2ff; font-size: 11px; font-weight: 700; white-space: nowrap; }
+    .truth-stages span { padding: 6px 8px; border: 1px solid #514778; border-radius: 6px; background: rgba(15, 19, 33, .65); }
+    .truth-stages b { color: #988bba; font-weight: 500; }
+    .footer { display: flex; justify-content: space-between; gap: 18px; margin-top: 24px; padding-top: 15px; border-top: 1px solid var(--border-soft); color: #8491a0; font-size: 12px; }
+    .footer p { margin: 0; }
+    dialog { width: min(720px, calc(100% - 28px)); max-height: min(86vh, 850px); padding: 0; overflow: auto; border: 1px solid #475365; border-radius: 14px; background: #0c1621; color: var(--text); box-shadow: 0 24px 90px rgba(0, 0, 0, .62); }
+    dialog::backdrop { background: rgba(1, 5, 10, .76); backdrop-filter: blur(5px); }
+    .dialog-head { position: sticky; z-index: 2; top: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; padding: 22px 25px 17px; border-bottom: 1px solid var(--border); background: rgba(12, 22, 33, .96); }
+    .dialog-kicker { color: #ad9fff; font-size: 11px; font-weight: 760; letter-spacing: .14em; }
+    .dialog-head h2 { margin: 4px 0 0; color: #f5f6fa; font-size: 25px; line-height: 1.25; }
+    .close-dialog { flex: none; width: 38px; height: 38px; border: 1px solid var(--border); border-radius: 8px; background: #111e2a; color: #d6dce5; font-size: 20px; cursor: pointer; }
+    .close-dialog:hover { border-color: #7664c2; background: #201d35; }
+    .dialog-body { padding: 21px 25px 27px; }
+    .dialog-lede { margin: 0 0 20px; color: #c9d0da; font-size: 16px; line-height: 1.68; }
+    .detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .detail-block { min-width: 0; padding: 14px 15px; border: 1px solid var(--border-soft); border-radius: 8px; background: #101b26; }
+    .detail-block--wide { grid-column: 1 / -1; }
+    .detail-block h3 { margin: 0 0 6px; color: #b6aaff; font-size: 12px; letter-spacing: .04em; }
+    .detail-block p { margin: 0; color: #c3ccd7; font-size: 14px; line-height: 1.62; overflow-wrap: anywhere; }
+    .source-list { display: flex; flex-wrap: wrap; gap: 7px; margin: 0; padding: 0; list-style: none; }
+    .source-list li { max-width: 100%; padding: 5px 8px; border: 1px solid #2d3b4a; border-radius: 5px; background: #09131c; color: #c8d8e4; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 11px; overflow-wrap: anywhere; }
+    .note-line { margin: 18px 0 0; padding-top: 13px; border-top: 1px solid var(--border-soft); color: #8996a5; font-size: 12px; }
+    @media (max-width: 1080px) {
+      .page { padding-right: 24px; padding-left: 24px; }
+      .flow { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .flow-step:nth-child(4)::after { display: none; }
+      .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .truth-panel { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 720px) {
+      .page { padding-right: 17px; padding-left: 17px; }
+      .hero { grid-template-columns: 1fr; gap: 19px; padding-top: 35px; }
+      .hero-lede { font-size: 16px; }
+      .snapshot { max-width: none; }
+      .responsibility { grid-template-columns: 1fr; gap: 9px; margin-bottom: 34px; }
+      .lane { min-height: 0; padding: 15px 17px; }
+      .flow { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .flow-step { min-height: 105px; }
+      .flow-step::after, .flow-step:nth-child(4)::after { display: none; }
+      .catalog { padding: 17px 12px; }
+      .catalog-tools { grid-template-columns: 1fr; }
+      .cards { grid-template-columns: 1fr; }
+      .module-open { min-height: 0; }
+      .module-summary { min-height: 0; }
+      .catalog-meta { align-items: flex-start; }
+      .catalog-meta span:last-child { text-align: right; }
+      .truth-stages { flex-wrap: wrap; white-space: normal; }
+      .footer { flex-direction: column; }
+      .dialog-head { padding: 18px 17px 14px; }
+      .dialog-body { padding: 17px; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .detail-block--wide { grid-column: auto; }
+    }
+    @media (max-width: 380px) {
+      .flow { grid-template-columns: 1fr; }
+      .flow-step { min-height: 0; }
+      .flow-number { display: inline-block; width: 30px; margin: 0 5px 0 0; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; }
+    }
+    @media print {
+      :root { color-scheme: light; color: #17202b; background: #fff; }
+      body { min-width: 0; background: #fff; color: #17202b; font-size: 12px; }
+      .page { width: 100%; padding: 0; }
+      .topbar, .stats, .responsibility, .flow-section, .catalog-tools, .truth-panel, .footer, .card-hint, .mechanism, dialog { display: none !important; }
+      .hero { display: block; padding: 0 0 14px; }
+      h1, .section-head h2 { color: #101820; }
+      .hero-lede, .snapshot p { color: #394553; }
+      .snapshot { margin-top: 10px; border-color: #ccd3dc; background: #f5f7fa; }
+      .snapshot-label { color: #4b3c91; }
+      .catalog { padding: 0; border: 0; background: #fff; }
+      .section-head { margin-bottom: 10px; }
+      .section-head p { color: #45515e; }
+      .catalog-meta { color: #394553; }
+      .catalog-meta strong { color: #30225f; }
+      .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+      .module-card, .module-card[hidden] { display: block !important; break-inside: avoid; border-color: #cbd3dc; background: #fff; }
+      .module-open { min-height: 0; padding: 10px 12px 4px; }
+      .module-title { color: #17202b; font-size: 14px; }
+      .module-summary { min-height: 0; color: #394553; font-size: 11px; }
+      .module-number { color: #576575; }
+      .module-group { color: #44377f !important; border-color: #bcb4db !important; }
+      .print-detail { display: block; padding: 0 12px 11px; color: #394553; font-size: 10px; line-height: 1.45; }
+      .print-detail p { margin: 3px 0; }
+      .print-detail code { color: #394d6b; }
+      .empty-state { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <nav class="topbar" aria-label="页面工具栏">
+      <div class="brand"><span class="brand-mark" aria-hidden="true">A</span><span>AI-VIDEO</span><small>MODULE MAP</small></div>
+      <a id="returnLink" class="return-link" href="/">返回前端</a>
+    </nav>
+
+    <header class="hero">
+      <div>
+        <p class="eyebrow">Project architecture · 2026.10.20</p>
+        <h1>项目模块全景</h1>
+        <p class="hero-lede">AI-VIDEO 把创作意图转成可执行的制作计划，再连接模型生成、剪辑、声音、渲染与验收。Agent 决定创作方向，模型生成原始媒体，程序负责约束、加工和记录证据。</p>
+      </div>
+      <aside class="snapshot" aria-label="页面内容说明">
+        <span class="snapshot-label">SOURCE-BASED EXPLANATION</span>
+        <p>这是基于当前代码职责整理的架构说明，日期为 2026-10-20。它不读取或显示某个项目、Shot 或任务的实时状态。</p>
+      </aside>
+    </header>
+
+    <div class="stats" aria-label="模块地图概览">
+      <div class="stat"><strong id="statModules">26</strong><span>个功能模块</span></div>
+      <div class="stat"><strong>3</strong><span>条职责泳道</span></div>
+      <div class="stat"><strong>7</strong><span>步制作主链</span></div>
+    </div>
+
+    <section class="responsibility" aria-label="三条职责泳道">
+      <article class="lane"><span class="lane-index">01 / INTENT</span><h2>Agent 创作</h2><p>理解剧本与目标，设计人物、动作、摄影、表演和镜头方案；Skills 提供创作方法与参考。</p></article>
+      <article class="lane"><span class="lane-index">02 / MEDIA</span><h2>模型生成</h2><p>所选 Provider/model 根据 Prompt 与绑定的素材产出原始图像或视频；参考与文字提供引导。</p></article>
+      <article class="lane"><span class="lane-index">03 / EXECUTION</span><h2>程序执行</h2><p>检查输入与授权，管理状态，完成剪辑、声音和渲染，并把结果与验收证据关联起来。</p></article>
+    </section>
+
+    <section class="flow-section" aria-labelledby="flowTitle">
+      <div class="section-head"><div><h2 id="flowTitle">一条制作主链</h2><p>点任一步骤，查看负责模块、输入输出和能力边界。</p></div></div>
+      <div class="flow" id="flowSteps" aria-label="制作流程步骤"></div>
+    </section>
+
+    <section class="catalog" aria-labelledby="catalogTitle">
+      <div class="section-head">
+        <div><h2 id="catalogTitle">按职责浏览模块</h2><p>模块说明指向当前源码的职责；标注的“机制”说明它如何工作，不代表某次生成或验收已通过。</p></div>
+      </div>
+      <div class="catalog-tools">
+        <div class="search-wrap"><span class="search-icon" aria-hidden="true">⌕</span><label for="moduleSearch" class="sr-only">搜索模块名称、职责或源码路径</label><input id="moduleSearch" type="search" placeholder="搜索模块、能力或源码路径…" autocomplete="off"><button id="clearSearch" class="clear-search" type="button" aria-label="清除搜索" title="清除搜索" disabled>×</button></div>
+        <div class="filters" role="group" aria-label="按职责筛选模块">
+          <button class="filter" type="button" data-filter="all" aria-pressed="true">全部</button>
+          <button class="filter" type="button" data-filter="control" aria-pressed="false">创作与控制</button>
+          <button class="filter" type="button" data-filter="media" aria-pressed="false">媒体制作</button>
+          <button class="filter" type="button" data-filter="infra" aria-pressed="false">基础设施</button>
+        </div>
+      </div>
+      <div class="catalog-meta"><span id="resultCount" aria-live="polite"><strong>26</strong> 个模块</span><span>选择卡片可展开职责细节与代码位置</span></div>
+      <div class="cards" id="moduleCards"></div>
+      <div class="empty-state" id="emptyState" role="status"><p>没有找到匹配模块。试试其他关键词或清除筛选。</p><button class="reset-button" id="resetFilters" type="button">显示全部模块</button></div>
+    </section>
+
+    <aside class="truth-panel" aria-label="证据边界">
+      <div><h2>三个不同的问题，需要三类证据</h2><p>代码里写入参数，说明制作链把要求表达并传递了；模型生成的媒体是否符合要求，要检查实际输出；成片是否自然、可看、可听，仍要人工按正常速度完整验收。前一层的结果不能替代后一层。</p></div>
+      <div class="truth-stages" aria-label="代码行为、媒体效果、人工验收"><span>代码行为</span><b>→</b><span>媒体效果</span><b>→</b><span>人工验收</span></div>
+    </aside>
+
+    <footer class="footer"><p>AI-VIDEO · 项目模块职责说明</p><p>模块地图是架构快照；运行状态、模型质量与人工接受度须查看各自的当前证据。</p></footer>
+  </main>
+
+  <dialog id="moduleDialog" aria-labelledby="dialogTitle" aria-describedby="dialogSummary">
+    <div class="dialog-head"><div><span id="dialogKicker" class="dialog-kicker"></span><h2 id="dialogTitle"></h2></div><button id="closeDialog" class="close-dialog" type="button" aria-label="关闭模块详情">×</button></div>
+    <div class="dialog-body"><p id="dialogSummary" class="dialog-lede"></p><div class="detail-grid" id="dialogDetails"></div><p class="note-line">源码位置用于定位职责入口；实现细节以对应模块、测试和当前运行证据为准。</p></div>
+  </dialog>
+
+  <script>
+    "use strict";
+    const modules = [
+      { id: "creative", title: "Agent 创作与 Skills", category: "control", mechanism: "创作判断 · advisory", summary: "把剧本转为人物、场景、镜头、动作、摄影与表演意图。", input: "用户目标、剧本、人物与场景资料、项目规则。", output: "供结构化创作和制作计划使用的创作意图、分镜与 Prompt。", boundary: "创意判断主要由 Agent 完成。Skill 提供流程建议，不是 Product runtime，也不能保证模型执行或成片质量。", files: [".agents/skills/open-video/", ".agents/skills/seedance-authoring/", "AGENTS.md"], terms: "creative director authoring prompt script screenplay acting direction", lane: "创作控制" },
+      { id: "canvas", title: "Canvas 制作入口", category: "control", mechanism: "共享流程编排", summary: "连接检查、创作、预检、计划、生成生命周期、逐镜检查与合成。", input: "Production Project、素材与明确的操作者动作。", output: "经既有 canonical owners 执行的项目制作步骤与观察结果。", boundary: "Canvas 是共享服务入口，不会把各阶段的完成自动升级为成片通过或最终交付。", files: ["src/ai_video/canvas_production.py", "src/ai_video/canvas_authoring.py", "src/ai_video/canvas_preflight.py"], terms: "canvas inspect author preflight planning generation composition service", lane: "创作控制" },
+      { id: "authoring", title: "结构化创作数据", category: "control", mechanism: "项目数据表达", summary: "把 Brief、Story、Character、Scene 与 Shot 写成可检查的制作意图。", input: "创作描述、原文来源与用户确认的制作决定。", output: "带身份和结构的项目、人物、场景与镜头数据。", boundary: "结构化数据表达创作意图，不代表模型已生成或接受该内容。", files: ["src/ai_video/canvas_authoring.py", "src/ai_video/canvas_project_data.py", "src/ai_video/canvas_source_expression.py"], terms: "story character scene shot brief source structured authoring", lane: "创作控制" },
+      { id: "performance", title: "人物表演参数", category: "control", mechanism: "MODEL_PROMPT_GUIDANCE", summary: "要求为出镜人物填写情绪、表情、视线、呼吸、身体行为和反应阶段。", input: "Shot 中的人物、角色可见性、表演方向和时序阶段。", output: "可核对的表演表达、生成前覆盖检查与关联的验收要求。", boundary: "当前是参数覆盖约束与模型提示引导，没有直接驱动脸部/身体的动画控制器；字段完整也不证明表演自然。", files: ["src/ai_video/production/performance_direction.py", "src/ai_video/production/performance_authoring.py"], terms: "facial expression acting emotion gaze breathing phase performance module", lane: "创作控制" },
+      { id: "references", title: "参考素材与白模职责", category: "control", mechanism: "素材职责 + 实际绑定", summary: "分别表达人物身份、空间、动作、摄影、首尾帧和白模参考的用途。", input: "经核验的参考图片/视频、素材身份、职责及所选模型模式。", output: "随请求传入的 reference bindings 与可追溯的素材职责。", boundary: "重复同一张图不构成多个独立人物参考；绑定不等于模型必然遵从。模型模式冲突需显式说明控制取舍。", files: ["src/ai_video/production/video_reference_controls.py", "src/ai_video/canvas_assets.py", "docs/canvas-production-harness.md"], terms: "reference whitebox image video binding identity first frame responsibility", lane: "创作控制" },
+      { id: "readiness", title: "Preflight 与镜头准备度", category: "control", mechanism: "生成前检查", summary: "检查生成所需的镜头定义、素材、身份、参考和连续性条件。", input: "当前 Project、Shot、素材和计划状态。", output: "准备情况、缺项和可解释的阻断原因。", boundary: "准备度检查判断输入是否具备，不评价尚未生成的媒体是否好看。", files: ["src/ai_video/canvas_preflight.py", "src/ai_video/quality_gates/shot_readiness_gate.py", "src/ai_video/quality_gates/"], terms: "preflight readiness gate validate missing input shot", lane: "创作控制" },
+      { id: "planner", title: "制作策略与 Planner", category: "control", mechanism: "目标到制作方案", summary: "结合控制目标、源素材、模型能力与剪辑约束，形成 Shot 制作计划。", input: "Shot 目标、已有媒体、参考与质量要求。", output: "可供 Router 和执行环节消费的制作策略与计划。", boundary: "编辑优先的判断依赖输入与显式计划；Planner 的选择本身不证明方案效果。最终 trim、frame 与 timing 归 ResolvedTimeline。", files: ["src/ai_video/planning/production_strategy.py", "src/ai_video/planning/video_planner.py", "src/ai_video/planning/sequence_continuity.py"], terms: "planner strategy edit first reuse cut retime split generate plan", lane: "创作控制" },
+      { id: "routing", title: "Shot Router 与请求 Compiler", category: "control", mechanism: "能力选择 + 精确请求", summary: "选择兼容的 Provider/model/mode，并把意图编译为具体原生参数和素材绑定。", input: "当前计划、Provider capability、prompt 与 exact source/reference bindings。", output: "selected adapter 可执行的精确请求及模式说明。", boundary: "官方接口允许什么、项目实现支持什么、模型实际遵从什么是三类事实；首尾帧和全模态参考可能互斥，需按具体模式表达取舍。", files: ["src/ai_video/production/shot_router.py", "src/ai_video/production/video_compiler.py", "src/ai_video/production/video_contracts.py", "src/ai_video/production/seedance_capabilities.py"], terms: "router compiler model provider mode exact native parameters capability", lane: "创作控制" },
+      { id: "feedback", title: "生成反馈与下一步决策", category: "media", mechanism: "证据驱动决策", summary: "结合当前与前序 attempt、失败原因和额度，决定生成、修复、停止或恢复。", input: "已记录的 attempt、失败证据、source identity 与可用配额。", output: "准备动作、继续条件或有据的停止决定。", boundary: "未知 outcome 必须停止并先查证；已消费的调用额度不能靠重试或换名恢复。", files: ["src/ai_video/production/generation_feedback.py", "src/ai_video/planning/generation_feedback_context.py", "src/ai_video/production/_generation_feedback_reader.py"], terms: "feedback retry unknown failure recovery consumption decision", lane: "媒体制作" },
+      { id: "adapters", title: "Provider 生成适配器", category: "media", mechanism: "外部/本地媒体生成", summary: "按已选服务提交图片或视频任务、读取结果并保存输入输出证据。", input: "精确编译请求、明确授权、选定 adapter 与一次性提交许可。", output: "关联 attempt 的生成任务、原始媒体和 Provider 证据。", boundary: "适配器只完成请求与媒体交接，不自动激活、验收或证明模型质量；每次外部调用仍受当前授权约束。", files: ["src/ai_video/production/video.py", "src/ai_video/production/minimax_h3_max.py", "src/ai_video/production/seedance.py", "src/ai_video/production/image.py"], terms: "provider adapter minimax seedance image video task media generation", lane: "媒体制作" },
+      { id: "continuity", title: "镜头连续性与交接", category: "media", mechanism: "前序已接受状态", summary: "把上一镜的人物、动作、空间和交接素材纳入下一镜准备。", input: "已接受的前序 Shot 状态、明确交接与当前 Shot 目标。", output: "连续性约束、handoff 资料和镜头关系证据。", boundary: "只有前序真实证据可支持交接；计划顺序或文字描述不能伪造已发生的成片状态。", files: ["src/ai_video/canvas_handoff.py", "src/ai_video/planning/sequence_continuity.py", "src/ai_video/production/shot_continuity_source_runtime.py"], terms: "continuity handoff sequence previous next shot state", lane: "媒体制作" },
+      { id: "timeline", title: "ResolvedTimeline 与画面合成", category: "media", mechanism: "统一时间语义", summary: "决定镜头顺序、源素材采用区间、画面层和声音位置。", input: "已选 Shot/media、区间、帧率、声音与图层定义。", output: "唯一的 resolved composition timeline 与可渲染层。", boundary: "ResolvedTimeline 独占 order、frame、sample、timing 和 source trim；不能在其他模块另建平行时间线。", files: ["src/ai_video/production/composition.py", "src/ai_video/canvas_composition.py", "src/ai_video/production/video_candidate_composition.py"], terms: "resolved timeline composition trim order frame sample timing", lane: "媒体制作" },
+      { id: "retime", title: "变速与帧映射", category: "media", mechanism: "显式帧映射", summary: "将源视频帧映射到输出时长，帮助按剪辑目标调整动作节奏。", input: "源帧时间、输出帧范围、采用切点与音频策略。", output: "受控的 source-frame 到 output-frame 映射。", boundary: "变速可以改变动作时长，不能凭空补出源视频没有的动作阶段；最终采用时长由 ResolvedTimeline 决定。", files: ["src/ai_video/production/video_retime.py", "src/ai_video/production/composition.py"], terms: "retime speed adjust duration source frame output frame timing cut", lane: "媒体制作" },
+      { id: "cleanup", title: "非生成式局部修补", category: "media", mechanism: "显式遮罩 + 干净底图", summary: "按逐帧遮罩、clean plate 和前景保护修复源视频局部区域。", input: "精确源媒体、作者提供的遮罩/底图、逐帧变换和保护区域。", output: "修补后媒体及可供观看的派生版本。", boundary: "需显式提供修补控制；这一路径不等于自动目标追踪或自动推断掩盖内容，预览修补也不自动成为生产验收素材。", files: ["src/ai_video/production/video_cleanup_contracts.py", "src/ai_video/production/video_cleanup_pixels.py", "src/ai_video/production/video_cleanup_media.py", "src/ai_video/production/video_cleanup_admission.py"], terms: "non generative cleanup mask clean plate inpaint repair shadow remove", lane: "媒体制作" },
+      { id: "audio", title: "声音与字幕", category: "media", mechanism: "媒体导入 / 合成 / 对齐", summary: "管理原声、生成声音、旁白、混音、字幕内容和对齐关系。", input: "音频源、台词/字幕意图、时间映射与混音参数。", output: "按项目时间线对齐的声音和字幕素材。", boundary: "语音转录不等于完整听懂声音；模型时间戳也不等于精确边界或人工听过。", files: ["src/ai_video/production/audio.py", "src/ai_video/production/captions.py", "src/ai_video/production/generated_video_audio.py", "docs/audio-understanding.md"], terms: "audio voice music subtitle captions transcript listening", lane: "媒体制作" },
+      { id: "renderer", title: "HyperFrames 渲染", category: "media", mechanism: "统一合成渲染", summary: "将 timeline 中的素材、图层、声音和字幕合成为预览或最终视频。", input: "ResolvedTimeline、已选媒体、画面层、声音和导出配置。", output: "具体身份的渲染视频文件和技术信息。", boundary: "渲染成功只证明文件生成；不能替代逐镜 Gate、Final Acceptance 或人工观看。", files: ["src/ai_video/production/hyperframes.py", "src/ai_video/production/_hyperframes_source.py", "src/ai_video/production/visual_media.py"], terms: "hyperframes render preview export final output", lane: "媒体制作" },
+      { id: "state", title: "Project、Registry 与 Manifest", category: "infra", mechanism: "定义 / 素材身份 / 生命周期", summary: "分别保存项目定义、素材身份与来源，以及运行中的 attempt 和采用状态。", input: "项目 revision、素材 bytes/provenance、操作与生成结果。", output: "严格可读的项目对象、内容身份与当前 lifecycle projection。", boundary: "Registry 负责素材身份与来源；Manifest 负责可变状态；reader 不自动修复、不猜测状态。", files: ["src/ai_video/production/project.py", "src/ai_video/production/registry.py", "src/ai_video/production/models.py", "src/ai_video/production/state_commit.py"], terms: "production project registry manifest immutable identity lifecycle", lane: "基础设施" },
+      { id: "committer", title: "ProductionStateCommitter", category: "infra", mechanism: "唯一状态写入 owner", summary: "集中提交 attempt、采用/放弃、恢复、审核和激活等持久状态变化。", input: "已验证的明确操作、前置状态和对应证据。", output: "原子、可追溯的状态变更与 lifecycle 结果。", boundary: "其他模块不能旁路写 Manifest 或自行推进生命周期；生成、fetch、render、analysis 成功都不等于激活。", files: ["src/ai_video/production/state_commit.py", "src/ai_video/production/_state_commit_video.py", "src/ai_video/production/_state_commit_review.py"], terms: "committer state mutation commit activate abandon recovery", lane: "基础设施" },
+      { id: "dependency", title: "依赖与失效管理", category: "infra", mechanism: "指纹与重建范围", summary: "追踪素材、Shot、计划和结果之间的依赖，定位变更后需要重做的部分。", input: "当前依赖图、目标指纹、素材与已完成节点。", output: "精确失效结果和最小 rebuild frontier。", boundary: "依赖解析是判断依据，不直接创建媒体，也不持有第二份可变 lifecycle 状态。", files: ["src/ai_video/production/dependency.py", "src/ai_video/production/video_dependency.py", "src/ai_video/production/production_strategy_dependency.py"], terms: "dependency fingerprint invalidation rebuild frontier cache", lane: "基础设施" },
+      { id: "safety", title: "授权、预算与提交安全", category: "infra", mechanism: "预算 Guard + 单次许可", summary: "控制远端 Provider 的额度、精确输入、提交意图和消费记录。", input: "当前批准的 Provider/model/输入、配额上限、egress 和一次性许可。", output: "可执行或 fail-closed 的提交决定与耐久消费记录。", boundary: "历史额度、Key 存在、计划或文档都不授权新调用；unknown outcome 不能盲重试或重铸许可。", files: ["src/ai_video/production/paid_provider.py", "src/ai_video/production/paid_provider_budget_extension.py", "src/ai_video/production/paid_provider_submit_quota.py"], terms: "authorization paid budget quota one use permit provider", lane: "基础设施" },
+      { id: "analysis", title: "媒体分析工具", category: "infra", mechanism: "观察与提取证据", summary: "对视频做探测、抽帧、场景切分、转录或声音观察。", input: "被明确选择的 exact media 与分析配置。", output: "带媒体身份的观察结果，供审核者比对要求。", boundary: "分析工具只提供观察证据；工具返回或模型总结不是接受结论，也不证明人类完整观看。", files: ["src/ai_video_mcp/server.py", "src/ai_video_mcp/", "src/ai_video/canvas_review.py"], terms: "MCP media analysis video probe frames audio understand observation", lane: "基础设施" },
+      { id: "qa", title: "逐镜 QA 与人工验收", category: "infra", mechanism: "要求 × 证据 × Verdict", summary: "逐项核对 exact Shot 输出与 required findings，并记录 PASS、FAIL 或未评估。", input: "封存的 Shot 要求、exact MP4、前序已接受状态与观察证据。", output: "与 attempt 绑定的 QA receipt、失败项或人工判断。", boundary: "FAIL / NOT_EVALUATED 停止后续镜头；工程 Harness、自动评分和单项 PASS 都不能替代完整成片验收。", files: ["src/ai_video/production/review.py", "src/ai_video/production/final_output_review.py", ".agent/context/control-plane-playbook.md"], terms: "per shot gate QA acceptance PASS FAIL human review final", lane: "基础设施" },
+      { id: "console", title: "Provider Console 前端", category: "infra", mechanism: "只读浏览与证据关联", summary: "查看项目、Shot、attempt、注册媒体、输入绑定、时间语义与验收证据。", input: "本机 runs 的只读 canonical projection 与受支持的外部媒体 evidence。", output: "可浏览的状态、媒体与证据展示。", boundary: "前端只观察已有数据；不写 Manifest、不创建提交意图、不调用 Provider，也不把外部状态提升为生产验收。", files: ["provider-console/src/App.jsx", "provider-console/src/library-browser.jsx", "src/ai_video/provider_console.py"], terms: "frontend console browser read only UI display media", lane: "基础设施" },
+      { id: "memory", title: "Agent Memory 与质量经验", category: "infra", mechanism: "检索与独立学习数据集", summary: "检索既有项目文档/经验，并收集与媒体证据绑定的质量观察。", input: "搜索问题、明确范围和带来源的经验或质量记录。", output: "可引用上下文与待审核的经验记录。", boundary: "记忆用于辅助判断，不是当前运行真相；Q0/passive quality experience 不直接改变生产状态或验收结论。", files: ["src/ai_video/agent_memory/retrieval.py", "src/ai_video/quality_intelligence/capture.py", ".agents/skills/retrieve-ai-video-memory/"], terms: "agent memory retrieval quality intelligence Q0 learning records", lane: "基础设施" },
+      { id: "harness", title: "工程 Harness 与 Architecture Gate", category: "infra", mechanism: "源码/契约/回归检查", summary: "检查改动路径、策略规则、文档契约和适用工程回归。", input: "明确变更快照、policy 与已注册的验证命令。", output: "只针对受测代码与契约行为的结构/测试 receipt。", boundary: "Harness 不执行 live generation、不审核视频、不读取 Secret，也不签署 P6 或 Final Acceptance。", files: ["scripts/agent_harness.py", "scripts/architecture_gate/", ".agent/harness/policy.yaml", ".agent/harness/agent-rules.yaml"], terms: "harness engineering tests architecture gate policy receipt", lane: "基础设施" },
+      { id: "special", title: "Legacy CLI 与电商专项流程", category: "infra", mechanism: "兼容入口 + 领域协调", summary: "保留旧版 ComfyUI 配置驱动 CLI，并为电商广告提供商品、审核与交付步骤。", input: "Legacy workflow/config，或电商项目的商品与广告制作定义。", output: "兼容的本地执行结果，或经共享制作 owner 协调的广告 job。", boundary: "旧 CLI 与 v0.2 Production/Canvas 是不同表面；电商专项 Gate 不自动成为所有剧情项目的验收规则。", files: ["src/ai_video/cli.py", "src/ai_video/pipeline.py", "src/ai_video/production/ecommerce_job.py", "src/ai_video/production/ecommerce_job_review.py"], terms: "legacy CLI ComfyUI ecommerce ad job product specialized workflow", lane: "基础设施" }
+    ];
+
+    const flow = [
+      ["creative", "创作与分镜", "剧本 → 人物/Shot"],
+      ["canvas", "项目组织", "创作 → 结构化数据"],
+      ["planner", "制定制作策略", "目标 → 制作计划"],
+      ["routing", "选择并编译请求", "能力 → exact 输入"],
+      ["adapters", "生成原始媒体", "模型 → 图片/视频"],
+      ["timeline", "剪辑与统一渲染", "媒体 → 成片"],
+      ["qa", "检查与验收", "要求 → 证据/判断"]
+    ];
+    const categoryLabels = { control: "创作与控制", media: "媒体制作", infra: "基础设施" };
+    const mechanismLabels = { "创作判断 · advisory": "Agent 判断", "共享流程编排": "程序编排", "项目数据表达": "结构化表达", "MODEL_PROMPT_GUIDANCE": "模型提示引导", "素材职责 + 实际绑定": "素材表达与绑定", "生成前检查": "生成前约束", "目标到制作方案": "计划决策", "能力选择 + 精确请求": "请求编译", "证据驱动决策": "执行决策", "外部/本地媒体生成": "模型生成", "前序已接受状态": "连续性约束", "统一时间语义": "时间线编排", "显式帧映射": "确定性剪辑", "显式遮罩 + 干净底图": "人工定义修补", "媒体导入 / 合成 / 对齐": "媒体处理", "统一合成渲染": "程序渲染", "定义 / 素材身份 / 生命周期": "状态与素材", "唯一状态写入 owner": "状态提交", "指纹与重建范围": "依赖管理", "预算 Guard + 单次许可": "调用安全", "观察与提取证据": "自动化观察", "要求 × 证据 × Verdict": "技术与人工验收", "只读浏览与证据关联": "只读界面", "检索与独立学习数据集": "经验辅助", "源码/契约/回归检查": "工程验证", "兼容入口 + 领域协调": "专用制作入口" };
+    const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
+    const cards = document.getElementById("moduleCards");
+    const dialog = document.getElementById("moduleDialog");
+    const search = document.getElementById("moduleSearch");
+    const clearSearch = document.getElementById("clearSearch");
+    const resultCount = document.getElementById("resultCount");
+    const emptyState = document.getElementById("emptyState");
+    let activeFilter = "all";
+    let returnFocus = null;
+
+    function detailMarkup(module) {
+      return `<div class="detail-block"><h3>负责什么</h3><p>${escapeHtml(module.summary)}</p></div><div class="detail-block"><h3>输入</h3><p>${escapeHtml(module.input)}</p></div><div class="detail-block"><h3>输出</h3><p>${escapeHtml(module.output)}</p></div><div class="detail-block detail-block--wide"><h3>能力边界</h3><p>${escapeHtml(module.boundary)}</p></div><div class="detail-block detail-block--wide"><h3>主要源码位置（相对仓库）</h3><ul class="source-list">${module.files.map((path) => `<li>${escapeHtml(path)}</li>`).join("")}</ul></div>`;
+    }
+
+    function renderModules() {
+      cards.innerHTML = modules.map((module, index) => `<article class="module-card" data-id="${escapeHtml(module.id)}" data-category="${escapeHtml(module.category)}"><button class="module-open" type="button" aria-haspopup="dialog" aria-label="查看模块 ${escapeHtml(module.title)} 的职责详情"><span class="module-top"><span class="module-number">MODULE / ${String(index + 1).padStart(2, "0")}</span><span class="module-group">${categoryLabels[module.category]}</span></span><span class="module-title">${escapeHtml(module.title)}</span><span class="module-summary">${escapeHtml(module.summary)}</span><span class="mechanism">${mechanismLabels[module.mechanism] || escapeHtml(module.mechanism)}</span><span class="card-hint">打开职责详情 ↗</span></button><div class="print-detail"><p><strong>输入：</strong>${escapeHtml(module.input)}</p><p><strong>输出：</strong>${escapeHtml(module.output)}</p><p><strong>边界：</strong>${escapeHtml(module.boundary)}</p><p><strong>源码：</strong>${module.files.map((path) => `<code>${escapeHtml(path)}</code>`).join(" · ")}</p></div></article>`).join("");
+      document.getElementById("statModules").textContent = String(modules.length);
+      document.querySelectorAll(".module-open").forEach((button) => button.addEventListener("click", () => openModule(button.closest(".module-card").dataset.id, button)));
+    }
+
+    function openModule(id, opener) {
+      const module = modules.find((item) => item.id === id);
+      if (!module) return;
+      returnFocus = opener || document.activeElement;
+      const index = modules.indexOf(module) + 1;
+      document.getElementById("dialogKicker").textContent = `MODULE / ${String(index).padStart(2, "0")} · ${categoryLabels[module.category]} · ${mechanismLabels[module.mechanism] || module.mechanism}`;
+      document.getElementById("dialogTitle").textContent = module.title;
+      document.getElementById("dialogSummary").textContent = module.summary;
+      document.getElementById("dialogDetails").innerHTML = detailMarkup(module);
+      dialog.showModal();
+      document.getElementById("closeDialog").focus();
+    }
+
+    function applyFilters() {
+      const query = search.value.trim().toLocaleLowerCase();
+      const filtered = modules.filter((module) => {
+        const categoryMatches = activeFilter === "all" || module.category === activeFilter;
+        const haystack = [module.title, module.summary, module.input, module.output, module.boundary, module.mechanism, module.lane, ...module.files, module.terms].join(" ").toLocaleLowerCase();
+        return categoryMatches && (!query || haystack.includes(query));
+      });
+      const matched = new Set(filtered.map((module) => module.id));
+      document.querySelectorAll(".module-card").forEach((card) => { card.hidden = !matched.has(card.dataset.id); });
+      resultCount.innerHTML = `<strong>${filtered.length}</strong> / ${modules.length} 个模块`;
+      emptyState.classList.toggle("is-visible", filtered.length === 0);
+      clearSearch.disabled = search.value.length === 0;
+    }
+
+    function resetFilters() {
+      search.value = "";
+      activeFilter = "all";
+      document.querySelectorAll(".filter").forEach((button) => button.setAttribute("aria-pressed", String(button.dataset.filter === "all")));
+      applyFilters();
+    }
+
+    document.getElementById("flowSteps").innerHTML = flow.map(([id, title, subtitle], index) => `<button class="flow-step" type="button" data-module="${id}" aria-label="第 ${index + 1} 步：${title}，查看负责模块"><span class="flow-number">0${index + 1}</span><strong>${title}</strong><span>${subtitle}</span></button>`).join("");
+    document.querySelectorAll(".flow-step").forEach((button) => button.addEventListener("click", () => openModule(button.dataset.module, button)));
+    document.querySelectorAll(".filter").forEach((button) => button.addEventListener("click", () => {
+      activeFilter = button.dataset.filter;
+      document.querySelectorAll(".filter").forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
+      applyFilters();
+    }));
+    search.addEventListener("input", applyFilters);
+    clearSearch.addEventListener("click", () => { search.value = ""; applyFilters(); search.focus(); });
+    document.getElementById("resetFilters").addEventListener("click", () => { resetFilters(); search.focus(); });
+    document.getElementById("closeDialog").addEventListener("click", () => dialog.close());
+    dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
+    dialog.addEventListener("close", () => { if (returnFocus && typeof returnFocus.focus === "function") returnFocus.focus(); });
+    const returnLink = document.getElementById("returnLink");
+    if (window.location.protocol === "file:") {
+      returnLink.setAttribute("aria-disabled", "true");
+      returnLink.setAttribute("tabindex", "-1");
+      returnLink.removeAttribute("href");
+      returnLink.textContent = "离线查看 · 无前端返回";
+      returnLink.title = "通过 file:// 打开时没有站内页面可返回";
+    }
+    renderModules();
+    applyFilters();
+  </script>
+</body>
+</html>
