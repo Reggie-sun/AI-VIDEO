@@ -104,7 +104,23 @@ class LocalVideoProviderDouble:
         return self._delegate.resolve(request)
 
     def compile_request(self, provider_bound, requirement):
+        from ai_video.production.performance_direction import render_performance_direction
+
         prompt_text = self._native_prompt_text
+        performance_intent = requirement.generation_intent.performance_intent
+        expressed_control_paths = ()
+        if performance_intent is not None and performance_intent.character_directions:
+            performance_block = render_performance_direction(performance_intent)
+            coarse_performance = " ".join((
+                f"Performance trigger: {performance_intent.trigger}.",
+                f"Visible response: {performance_intent.visible_response}.",
+                f"Gaze target: {performance_intent.gaze_target}.",
+                f"Body behavior: {performance_intent.body_behavior}.",
+                f"Hand behavior: {performance_intent.hand_behavior}.",
+                f"Terminal performance state: {performance_intent.terminal_performance_state}.",
+            ))
+            prompt_text = "\n\n".join((prompt_text, coarse_performance, performance_block))
+            expressed_control_paths = ("generation_intent.performance_intent",)
         return compile_provider_video_request(
             provider_bound=provider_bound,
             requirement=requirement,
@@ -115,6 +131,7 @@ class LocalVideoProviderDouble:
                 grammar_contract="local-video-state-fixture-v1",
                 prompt_text=prompt_text,
                 prompt_sha256=hashlib.sha256(prompt_text.encode("utf-8")).hexdigest(),
+                expressed_control_paths=expressed_control_paths,
             ),
         )
 

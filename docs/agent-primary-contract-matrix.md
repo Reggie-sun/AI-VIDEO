@@ -75,6 +75,21 @@ Character作image2，mask经ImageToMask/SetLatentNoiseMask与最终ImageComposit
 输入/工程PASS不证明mask内剧情质量、clean plate、视频连续性或human acceptance。
 checks归现有`production_image_tests`、`canvas_production_workflow_tests`和reader/state/dependency/Architecture gates。
 
+## Character Performance Direction
+
+`production/video_requirement.py::PerformanceIntent.character_directions` 沿既有 intent 独占逐人物表演输入；
+`production/performance_direction.py` 拥有 pure 类型、exact cast coverage、相对阶段顺序与确定性文字表达。
+`production/performance_authoring.py` 只检查新生成的显式填写和既有 selected QA acceptance/raw_generation
+analyzer/human 覆盖，提供 read-only preview；不默认生成表情、不创建 finding 或质量状态。
+`GenerationFeedbackOrchestrator.prepare` 在 GENERATE_ONCE 编译前、`GenerationDecisionExecutionBinding.create`
+在 fresh creation 时要求完整参数；旧 reader/replay/缺省序列化保持，不据此豁免新生成。
+rich remote/local H3 沿原 grammar 表达；preserved source 只承认作者已写入的完整表演段落及 coarse 原句，
+原文缺表达拒绝，不自动补写。Canvas preflight/reference-control 读取同一 intent 与验收条目，仍为 model guidance。
+角色身份归 Character/Shot，最终时序归 ResolvedTimeline，required finding/裁决归现有 QA；不得另建表演timeline、
+人物状态库、renderer、自动 FACS 控制或 Provider fallback，也不得把字面覆盖当作真实表演自然。
+Agent 必填操作归[workflow](canvas-production-harness.md#character-performance-authoring)，checks 归现有 generation
+feedback/requirement/Canvas suites 与 task Architecture Gate。
+
 ## Current Shot Close Expression
 
 `video_requirement.py::GenerationIntent.close_causal_facts` 是existing intent内的optional authored

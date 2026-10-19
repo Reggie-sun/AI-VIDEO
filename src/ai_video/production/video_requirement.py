@@ -20,6 +20,7 @@ from ai_video.production.models import Character, Scene, Shot, StrictModel
 from ai_video.production._video_continuity import C4MultiAnchorBinding
 from ai_video.production.voice_routing_contracts import VoiceRoutingRequirement
 from ai_video.production.video_transition import CausalDimension
+from ai_video.production.performance_direction import CharacterPerformanceDirection
 
 
 _REQUIREMENT_CONTRACT_VERSION = "provider-neutral-video-requirement/1"
@@ -407,6 +408,27 @@ class PerformanceIntent(StrictModel):
     body_behavior: str = Field(min_length=1)
     hand_behavior: str = Field(min_length=1)
     terminal_performance_state: str = Field(min_length=1)
+    character_directions: tuple[CharacterPerformanceDirection, ...] = Field(
+        default=(), max_length=16
+    )
+
+    @model_validator(mode="after")
+    def _validate_unique_character_directions(self) -> "PerformanceIntent":
+        character_ids = tuple(
+            direction.character_id for direction in self.character_directions
+        )
+        if len(character_ids) != len(set(character_ids)):
+            raise ValueError("character performance directions require unique character IDs")
+        return self
+
+    @model_serializer(mode="wrap")
+    def _serialize_legacy_performance_shape(
+        self, handler: SerializerFunctionWrapHandler
+    ) -> dict[str, object]:
+        data = handler(self)
+        if not self.character_directions:
+            data.pop("character_directions", None)
+        return data
 
 
 class VisualTreatment(StrictModel):

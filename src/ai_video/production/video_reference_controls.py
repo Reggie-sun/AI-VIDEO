@@ -237,6 +237,7 @@ def video_reference_control_report(*, request=None, native_parameters=None, requ
                                    expressions=(), compilation=None):
     """Join authored controls to one exact request, without materialization or QA claims."""
     from ai_video.production._video_requirement_routing import native_binding_role
+    from ai_video.production.performance_authoring import performance_authoring_report
 
     if request is not None:
         request = ResolvedVideoGenerationRequest.model_validate(request.model_dump(mode="python"))
@@ -325,6 +326,11 @@ def video_reference_control_report(*, request=None, native_parameters=None, requ
     })
     return {
         "schema_version": "video-reference-control-preview/2",
+        "performance_control": (performance_authoring_report(
+            intent=requirement.generation_intent, characters=requirement.characters,
+            rules=expressions, required_ids=tuple(item.requirement_id for item in expressions
+                if item.level == "acceptance"), prompt_text=request.prompt_text if request is not None else None)
+            if requirement is not None else _NOT_EVALUATED),
         "selected_route": ({"provider_name": request.provider_name, "model_id": request.model_id,
             "mode": request.mode.value, "capability_id": request.capability_id,
             "provider_profile": request.provider_profile.model_dump(mode="json"),

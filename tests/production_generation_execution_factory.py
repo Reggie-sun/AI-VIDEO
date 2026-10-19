@@ -50,6 +50,7 @@ from ai_video.production.video_requirement import (
     SemanticReferenceRole,
     VerifiedGenerationRequirementProjection,
 )
+from ai_video.production.performance_direction import render_performance_direction
 from ai_video.production.models import (
     AssetRoleRequirement,
     AssetType,
@@ -83,6 +84,11 @@ from test_production_shot_router import (
     _lifecycle as _router_lifecycle,
     _policy as _router_policy,
 )
+from tests.performance_fixture import (
+    acceptance_with_fixture_performance,
+    fixture_performance_expression,
+    fixture_performance_intent,
+)
 
 
 @dataclass(frozen=True)
@@ -109,8 +115,24 @@ class NativeFixtureVideoProvider(ScriptedFakeVideoProvider):
 
     def compile_request(self, provider_bound, requirement):
         prompt_text = self._native_prompt_text
+        performance_intent = requirement.generation_intent.performance_intent
+        performance_block = render_performance_direction(performance_intent)
+        if performance_intent is not None:
+            coarse_performance = " ".join((
+                f"Performance trigger: {performance_intent.trigger}.",
+                f"Visible response: {performance_intent.visible_response}.",
+                f"Gaze target: {performance_intent.gaze_target}.",
+                f"Body behavior: {performance_intent.body_behavior}.",
+                f"Hand behavior: {performance_intent.hand_behavior}.",
+                f"Terminal performance state: {performance_intent.terminal_performance_state}.",
+            ))
+            prompt_text = "\n\n".join(part for part in (
+                prompt_text, coarse_performance, performance_block
+            ) if part)
         controls = (("generation_intent.close_state.state_hash", "generation_intent.close_causal_facts")
             if requirement.generation_intent.close_causal_facts is not None else ())
+        if performance_block:
+            controls = (*controls, "generation_intent.performance_intent")
         return compile_provider_video_request(
             provider_bound=provider_bound,
             requirement=requirement,
@@ -148,11 +170,51 @@ def activate_fixture_generation_qa_policy(*, root: Path, inputs, output):
     """Install a raw-generation fixture rubric, preserving final-domain QA."""
 
     loaded = inputs.project
-    if loaded.qa_policy is not None and loaded.qa_policy.selected_generation_acceptance() is not None:
+    has_cast = any(shot.character_ids for shot in loaded.shots)
+    current_policy = loaded.qa_policy
+    current_acceptance = (
+        current_policy.selected_generation_acceptance() if current_policy is not None else None
+    )
+    if current_acceptance is not None and not has_cast:
         return inputs
 
-    acceptance = acceptance_policy((fixture_generation_expression(output),))
-    current_policy = loaded.qa_policy
+    if current_acceptance is not None:
+        acceptance = acceptance_with_fixture_performance(current_acceptance)
+        evaluator = (current_policy.semantic_authorities[0]
+                     if current_policy.semantic_authorities
+                     else ToolIdentity(name="fixture-generation-evaluator", version="1"))
+        authorities = list(current_policy.generation_evaluation_authorities)
+        if not any(item.evaluator == evaluator and item.proof == "analyzer" for item in authorities):
+            authorities.append(GenerationEvaluationAuthority(evaluator=evaluator, proof="analyzer"))
+        if acceptance == current_acceptance and tuple(authorities) == current_policy.generation_evaluation_authorities:
+            return inputs
+        policy = current_policy.model_copy(update={
+            "artifact_id": "fixture-generation-qa-policy",
+            "revision": current_policy.revision + 1,
+            "content_hash": "0" * 64,
+            "creation_receipt_id": "fixture-generation-qa-policy",
+            "source_provenance": (
+                SourceReference(kind="derived", reference="generation-fixture"),
+            ),
+            "semantic_authorities": current_policy.semantic_authorities or (evaluator,),
+            "generation_acceptance": acceptance,
+            "generation_evaluation_authorities": tuple(authorities),
+        })
+        policy = seal_artifact(policy)
+        committer = ProductionStateCommitter(root)
+        manifest = committer._read_manifest()
+        committer.activate_qa_policy(
+            policy,
+            expected_manifest_revision=manifest.manifest_revision,
+            attempt_id="activate-fixture-generation-qa-policy",
+        )
+        return replace(inputs, project=load_production_project(root / "project.yaml"))
+
+    duration_expression = fixture_generation_expression(output)
+    expressions = [duration_expression]
+    if has_cast:
+        expressions.append(fixture_performance_expression(semantics=duration_expression.semantics is not None))
+    acceptance = acceptance_policy(tuple(sorted(expressions, key=lambda item: item.requirement_id)))
     if current_policy is None:
         policy = QaPolicy(
             artifact_id="fixture-generation-qa-policy",
@@ -207,6 +269,8 @@ def activate_fixture_generation_qa_policy(*, root: Path, inputs, output):
 
     policy = policy.model_copy(update={"generation_evaluation_authorities": (
         GenerationEvaluationAuthority(evaluator=policy.semantic_authorities[0], proof="technical"),
+        *((GenerationEvaluationAuthority(evaluator=policy.semantic_authorities[0], proof="analyzer"),)
+          if has_cast else ()),
     )})
     sealed = seal_artifact(policy)
     committer = ProductionStateCommitter(root)
@@ -460,7 +524,17 @@ def prepare_generation_execution(
         ),
         continuity_mode="none",
         motion_requirement=MotionRequirement.FREE_COMPLEX,
-        generation_intent=GenerationIntent(),
+        generation_intent=GenerationIntent(
+            performance_intent=fixture_performance_intent(
+                tuple(item for item in project.characters if item.character_id in shot.character_ids),
+                trigger="The shot opens on the hero in the room",
+                emotion="focused curiosity",
+                facial_expression="brows slightly lifted, eyes attentive, mouth relaxed",
+                gaze_target="the room ahead",
+                breathing="quiet, even breathing",
+                body_behavior="stands at ease and settles weight subtly",
+            ) if shot.character_ids else None,
+        ),
         semantic_reference_roles=(
             (SemanticReferenceRole.FIRST_FRAME,) if source is not None else ()
         ),
@@ -537,9 +611,14 @@ def prepare_generation_execution(
             raise ValueError("fixture has no selected generation acceptance")
         expressions = _expressions(acceptance, requirement)
     else:
-        expression = fixture_generation_expression(output)
-        acceptance = acceptance_policy((expression,))
-        expressions = (expression,)
+        duration_expression = fixture_generation_expression(output)
+        expression_list = [duration_expression]
+        if requirement.characters:
+            expression_list.append(fixture_performance_expression(
+                semantics=duration_expression.semantics is not None
+            ))
+        expressions = tuple(sorted(expression_list, key=lambda item: item.requirement_id))
+        acceptance = acceptance_policy(expressions)
     seed = (
         SeedPolicy(kind="fixed", value=request.effective_seed or 0)
         if capability.seed_supported

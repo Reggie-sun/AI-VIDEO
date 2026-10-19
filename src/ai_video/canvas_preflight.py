@@ -53,6 +53,7 @@ def canvas_reference_preflight(*, packet, direction, registry, qa_policy=None,
                                qa_authority="NOT_EVALUATED", authored_shots=()):
     """Project inputs already validated by author_canvas_project; no verdicts."""
     from ai_video.production.production_responsibility import production_responsibility_report
+    from ai_video.production.performance_authoring import performance_authoring_report
 
     authored = {shot.shot_id: shot for shot in authored_shots}
     assets = {asset.asset_id: asset for asset in registry.assets}
@@ -118,6 +119,10 @@ def canvas_reference_preflight(*, packet, direction, registry, qa_policy=None,
         candidate_video_asset_ids = [reference["asset_id"] for reference in generation_references
             if reference.get("role") == "existing_video"]
         shots.append({"occurrence_id": row["occurrence_id"], "shot_id": shot["shot_id"],
+            "performance_control": performance_authoring_report(
+                intent=generation.get("generation_intent"),
+                characters=tuple(shot.get("character_ids", ())),
+                prompt_text=shot["intent"]),
             "production_control": production_responsibility_report(qa_policy=qa_policy,
                 shot=authored.get(shot["shot_id"]), target_shot_id=shot["shot_id"],
                 qa_authority=qa_authority),

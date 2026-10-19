@@ -20,6 +20,7 @@ from ai_video.production._video_intent_validation import (
 )
 from ai_video.production.models import StrictModel
 from ai_video.production._remote_video_product_prompt import product_fidelity_sentences
+from ai_video.production.performance_direction import render_performance_direction
 from ai_video.production.video_requirement import (
     AudioNeed,
     ContinuityStateKind,
@@ -255,6 +256,15 @@ def compile_remote_video_prompt(
             f"Lighting continuity: {lighting.continuity_state}.",
         )
     )
+    performance_direction = render_performance_direction(performance)
+    if performance_direction:
+        sentences.append(performance_direction)
+        controls.extend(
+            (
+                "generation_intent.performance_intent",
+                "generation_intent.performance_intent.character_directions",
+            )
+        )
     if ambience.explicitly_silent:
         sentences.append("Use no ambience or foley.")
         controls.append("generation_intent.ambience_intent.explicitly_silent")

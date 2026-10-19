@@ -43,12 +43,29 @@ def test_original_canvas_parts_are_reopened_at_authoring(damage):
 def subject_source(tmp_path, *, scene_auxiliary=False, generated=False,
                    duplicate_room_png=False, scenario=None, authored_deadline_text=None,
                    adopted_duration_seconds=5, generation_output_duration_seconds=None,
-                   generation_output_geometry_policy="exact", adopted_composition=None):
+                   generation_output_geometry_policy="exact", adopted_composition=None, author_performance=False):
     """Inspect/import real fixture bytes before canonical authoring and planning."""
     from ai_video.canvas_assets import prepare_canvas_png_assets
     from tests.production_project_factory import _p7_png
 
     character, action, space = scenario or ("Robot", "lifts its hands", "")
+    performance = None
+    performance_text = ""
+    if author_performance:
+        from types import SimpleNamespace
+        from performance_fixture import fixture_performance_intent
+        from ai_video.production.performance_direction import render_performance_direction
+
+        performance = fixture_performance_intent((SimpleNamespace(character_id="robot", name=character),),
+            trigger="the authored action begins", emotion="quiet attention",
+            facial_expression=("rigid face remains unchanged; eye lights stay steady" if character == "Robot"
+                               else "eyes remain attentive with an unforced neutral mouth"),
+            gaze_target="the authored action target", breathing=("no biological breathing on the metal body"
+                if character == "Robot" else "gentle breathing consistent with the posture"),
+            body_behavior="natural balance during the authored action")
+        performance_text = " " + " ".join(dict.fromkeys(getattr(performance, name) for name in (
+            "trigger", "visible_response", "gaze_target", "body_behavior", "hand_behavior",
+            "terminal_performance_state"))) + ". " + render_performance_direction(performance)
     raw = document()
     raw["edges"] = []
     raw["nodes"].append({"id": "robot", "type": "subject", "data": {
@@ -63,6 +80,8 @@ def subject_source(tmp_path, *, scene_auxiliary=False, generated=False,
             {"type": "text", "text": f" {action} in {space + ' ' if scenario else ''}"},
             {"type": "extension", "extension_type": "node", "object_id": "room-slot"},
             {"type": "text", "text": "."}]
+        if performance_text:
+            draft["parts"].append({"type": "text", "text": performance_text})
         if authored_deadline_text is not None:
             draft["parts"].append({"type": "text", "text": " " + authored_deadline_text})
         draft["references"] = [{"slotId": "robot-slot", "nodeId": "robot", "role": "reference",
@@ -105,6 +124,8 @@ def subject_source(tmp_path, *, scene_auxiliary=False, generated=False,
         {"type": "reference", "slot_id": "room-slot", "materials": [
             {"asset_id": "room", "asset_sha256": next(a.sha256 for a in registry.assets if a.asset_id == "room"),
              "role": "scene"}]}, {"type": "text", "text": "."}]
+    if performance_text:
+        parts.append({"type": "text", "text": performance_text})
     if authored_deadline_text is not None:
         parts.append({"type": "text", "text": " " + authored_deadline_text})
     data = direction()
@@ -120,6 +141,7 @@ def subject_source(tmp_path, *, scene_auxiliary=False, generated=False,
         authored_prompt = f"{character} 图片2、图片1 {action} in 图片3."
         if scenario:
             authored_prompt = f"{character} 图片2、图片1 {action} in {space} 图片3."
+        authored_prompt += performance_text
         if authored_deadline_text is not None:
             authored_prompt += " " + authored_deadline_text
         row["shot"].update(intent=authored_prompt, character_ids=["robot"],
@@ -137,6 +159,8 @@ def subject_source(tmp_path, *, scene_auxiliary=False, generated=False,
                                       5 if generation_output_duration_seconds is None
                                       else generation_output_duration_seconds)}},
             "audio_need": "required", "quality_need": {}}
+        if performance is not None:
+            row["generation"]["generation_intent"]["performance_intent"] = performance.model_dump(mode="json")
         if generation_output_duration_seconds is not None:
             output_need = {"duration_seconds": generation_output_duration_seconds,
                 "geometry_policy": generation_output_geometry_policy, "fps": 24,
@@ -200,7 +224,7 @@ def subject_service(tmp_path, *, generated=False, scenario=None, authored_deadli
         adopted_duration_seconds=adopted_duration_seconds,
         generation_output_duration_seconds=generation_output_duration_seconds,
         generation_output_geometry_policy=("adaptive" if provider_family == "h3-max" else "exact"),
-        adopted_composition=adopted_composition)
+        adopted_composition=adopted_composition, author_performance=True)
     root = tmp_path / "project"
     root.mkdir()
     def forbidden(*args, **kwargs):
@@ -355,13 +379,13 @@ def test_authored_deadline_reaches_compiler_without_changing_generation_or_adopt
     baseline_packet, baseline_data, _, _ = subject_source(baseline_root, generated=True,
         scenario=scenario, adopted_duration_seconds=3, generation_output_duration_seconds=5,
         generation_output_geometry_policy=("adaptive" if provider_family == "h3-max" else "exact"),
-        adopted_composition=composition)
+        adopted_composition=composition, author_performance=True)
     source_parts = service.packet["units"][0]["prompt_source"]["parts"]
     baseline_parts = baseline_packet["units"][0]["prompt_source"]["parts"]
     assert source_parts[:-1] == baseline_parts
     assert service.packet["units"][0]["references"] == baseline_packet["units"][0]["references"]
     assert [part["type"] for part in source_parts] == [
-        "text", "extension", "text", "extension", "text", "text"]
+        "text", "extension", "text", "extension", "text", "text", "text"]
     assert [part["text"] for part in source_parts if part["type"] == "text"][-1] == " " + deadline
     preserved_parts = service.direction["shots"][0]["shot"]["preserved_source_expression"]["parts"]
     baseline_preserved_parts = baseline_data["shots"][0]["shot"]["preserved_source_expression"]["parts"]
@@ -374,7 +398,8 @@ def test_authored_deadline_reaches_compiler_without_changing_generation_or_adopt
 
     prepared = service.prepare(limits=limits)
 
-    expected_prompt = f"{scenario[0]} 图片2、图片1 {scenario[1]} in {scenario[2]} 图片3. {deadline}"
+    expected_prompt = baseline_data["shots"][0]["shot"]["intent"] + " " + deadline
+    assert expected_prompt.startswith(f"{scenario[0]} 图片2、图片1 {scenario[1]} in {scenario[2]} 图片3.")
     assert prepared.execution_binding is not None
     assert prepared.resolved_request.provider_name == expected_provider
     assert prepared.resolved_request.prompt_text == expected_prompt
@@ -394,7 +419,7 @@ def test_authored_deadline_reaches_compiler_without_changing_generation_or_adopt
 
     recipe = prepared.execution_binding.decision.routing.provider_bound_request.generation_recipe
     inventory = recipe.acceptance_policy.profile_payload["generation_requirements"]
-    assert len(inventory) == 1
+    assert {item["requirement_id"] for item in inventory} == {"duration", "performance"}
     assert inventory[0]["requirement_id"] == "duration"
     assert inventory[0]["observable"] == "5 seconds"
     assert inventory[0]["intent_paths"] == ("output_need.duration_seconds",)

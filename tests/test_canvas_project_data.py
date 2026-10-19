@@ -606,7 +606,14 @@ def test_subject_example_is_measured_and_grouped_without_internal_hash_input(tmp
     materials = data["shots"][0]["shot"]["preserved_source_expression"]["parts"][1]["materials"]
     assert [m["asset_id"] for m in materials] == ["robot-main", "robot-aux"]
     assert {m["role"] for m in materials} == {"identity"}
-    assert data["shots"][0]["shot"]["intent"] == "Robot 图片2、图片1 lifts its hands in 图片3."
+    from ai_video.production.performance_direction import render_performance_direction
+    from ai_video.production.video_requirement import GenerationIntent
+
+    row = data["shots"][0]
+    assert row["shot"]["intent"].startswith("Robot 图片2、图片1 lifts its hands in 图片3.\n")
+    performance = GenerationIntent.model_validate(row["generation"]["generation_intent"]).performance_intent
+    assert performance.character_directions[0].character_id == "robot"
+    assert render_performance_direction(performance) in row["shot"]["intent"]
     assert len(registry.assets) == 3 and len(artifacts) == 3
     assert "preserved_source_expression" not in definition["direction"]["shots"][0]["shot"]
 

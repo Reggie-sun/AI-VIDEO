@@ -126,6 +126,34 @@
           "generation_intent": {
             "pacing": {
               "shot_duration_seconds": 15
+            },
+            "performance_intent": {
+              "trigger": "the robot begins the authored action",
+              "visible_response": "steady eye lights",
+              "gaze_target": "the authored action target",
+              "body_behavior": "balanced mechanical movement",
+              "hand_behavior": "only the authored hand action",
+              "terminal_performance_state": "stable posture",
+              "character_directions": [
+                {
+                  "character_id": "robot",
+                  "screen_identity": "the metal robot",
+                  "role": "principal",
+                  "visibility": "visible",
+                  "beats": [
+                    {
+                      "phase": "throughout",
+                      "trigger": "the robot begins the authored action",
+                      "emotion": "quiet attention",
+                      "intensity": "subtle",
+                      "facial_expression": "rigid face with steady eye lights",
+                      "gaze_target": "the authored action target",
+                      "breathing": "no biological breathing on a metal body",
+                      "body_behavior": "balanced mechanical movement"
+                    }
+                  ]
+                }
+              ]
             }
           },
           "audio_need": "required",
@@ -194,6 +222,34 @@
           "generation_intent": {
             "pacing": {
               "shot_duration_seconds": 15
+            },
+            "performance_intent": {
+              "trigger": "the robot begins the authored action",
+              "visible_response": "steady eye lights",
+              "gaze_target": "the authored action target",
+              "body_behavior": "balanced mechanical movement",
+              "hand_behavior": "only the authored hand action",
+              "terminal_performance_state": "stable posture",
+              "character_directions": [
+                {
+                  "character_id": "robot",
+                  "screen_identity": "the metal robot",
+                  "role": "principal",
+                  "visibility": "visible",
+                  "beats": [
+                    {
+                      "phase": "throughout",
+                      "trigger": "the robot begins the authored action",
+                      "emotion": "quiet attention",
+                      "intensity": "subtle",
+                      "facial_expression": "rigid face with steady eye lights",
+                      "gaze_target": "the authored action target",
+                      "breathing": "no biological breathing on a metal body",
+                      "body_behavior": "balanced mechanical movement"
+                    }
+                  ]
+                }
+              ]
             }
           },
           "audio_need": "required",

@@ -12,6 +12,7 @@ from ai_video.production._video_intent_validation import (
     validate_generation_intent_for_continuity,
 )
 from ai_video.production.models import StrictModel
+from ai_video.production.performance_direction import render_performance_direction
 from ai_video.production.video_requirement import (
     ContinuityMode,
     GenerationMode,
@@ -311,6 +312,9 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement, *, provider_
         f"terminal motion state {motion.end_motion_state.value}; "
         f"duration {intent.pacing.shot_duration_seconds:g} seconds"
     )
+    performance_direction = render_performance_direction(performance)
+    if performance_direction:
+        visual += "; " + performance_direction
     soundscape = (
         f"ambience {ambience.environment_bed}; foley {foley}; "
         f"explicitly silent {str(ambience.explicitly_silent).lower()}"
@@ -342,6 +346,14 @@ def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement, *, provider_
         prompt_sha256=hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
         expressed_control_paths=(
             *state_controls,
+            *(
+                (
+                    "generation_intent.performance_intent",
+                    "generation_intent.performance_intent.character_directions",
+                )
+                if performance.character_directions
+                else ()
+            ),
             "generation_intent.primary_camera_motion.movement_kind",
             "generation_intent.primary_camera_motion.amplitude_class",
             "generation_intent.primary_camera_motion.speed_class",
@@ -515,6 +527,9 @@ def _compile_h3_t2va_prompt(
         f"duration {intent.pacing.shot_duration_seconds:.3f}s; "
         f"prohibit {prohibited}; no visible text, captions, or subtitles"
     )
+    performance_direction = render_performance_direction(performance)
+    if performance_direction:
+        visual += "; " + performance_direction
     foley = ", ".join(ambience.foley_cues) if ambience.foley_cues else "none"
     if dialogue.mode == "dialogue":
         assert dialogue.verbatim_text is not None
@@ -559,6 +574,14 @@ def _compile_h3_t2va_prompt(
         prompt_text=prompt,
         prompt_sha256=hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
         expressed_control_paths=(
+            *(
+                (
+                    "generation_intent.performance_intent",
+                    "generation_intent.performance_intent.character_directions",
+                )
+                if performance.character_directions
+                else ()
+            ),
             "generation_intent.subject_action.endpoint.required_change",
             "generation_intent.camera_endpoint.position_lock",
             "generation_intent.camera_endpoint.orientation_lock",

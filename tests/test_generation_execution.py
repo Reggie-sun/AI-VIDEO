@@ -97,6 +97,9 @@ def test_real_feedback_roundtrip_generates_one_controlled_repair_then_stops(tmp_
             evaluator=qa_policy.semantic_authorities[0], proof="technical",
             observations=(GenerationObservation(requirement_id="duration", verdict="FAIL",
                 observation="Injected evaluator failure for offline orchestration regression"),))
+        performance_source = source.model_copy(update={"proof": "analyzer", "observations": (
+            GenerationObservation(requirement_id="performance", verdict="PASS",
+                observation="Explicit synthetic acting observation; no real-media quality claim"),)})
         if number == 0:
             with pytest.raises(AiVideoError, match="evaluation source"):
                 caller.record_evaluation(committer=committer, prepared=prepared, attempt_id=attempt_id,
@@ -104,7 +107,8 @@ def test_real_feedback_roundtrip_generates_one_controlled_repair_then_stops(tmp_
                     evaluation_sources=(source.model_copy(update={"artifact_sha256": "f" * 64}),))
             assert committer.read_generation_experiences() == ()
         caller.record_evaluation(committer=committer, prepared=prepared, attempt_id=attempt_id,
-            outcome="media", artifact_sha256=artifact_sha256, evaluation_sources=(source,))
+            outcome="media", artifact_sha256=artifact_sha256,
+            evaluation_sources=(source, performance_source))
         previous_seed = prepared.resolved_request.effective_seed
     sequence[0] = 2
     next_decision = caller.prepare(limits=limits)

@@ -190,6 +190,50 @@ frame/reference 互斥及逐镜白模例外继续沿现有模型能力和上文/
 compiler 失败时仍保留 selected candidate 的目标和失败 ID，片段标为 authored、未编译，不虚构实际 request。
 模式概览不计作目标覆盖；所有输入检查和离线 fixture 的模型质量、human 验收仍 `NOT_EVALUATED`。
 
+### Character Performance Authoring
+
+Agent 制作有人物的镜头时，必须在 `generation.generation_intent.performance_intent.character_directions`
+明确填写当前 Shot 每个 `character_id` 的表演方向，再准备新生成；不能仅写“自然”“害怕”等情绪词、
+复制角色外观或依赖旧六字段。该字段沿现有 intent、Planner、recipe、compiler 和 execution binding
+封存，不建立另一份人物状态库。`prepare` 与新 binding creation 会阻断缺失的角色、阶段或原片验收映射；
+历史 reader/replay 不要求补写，不修改旧 bytes/hash、消费或验收状态。
+
+每个人物填写 `screen_identity`（画面可辨认的外观/位置身份）、`role=principal/supporting/background`
+以及 `visibility=visible/offscreen`。可见人物的 `beats` 按 `opening/response/settle` 顺序填写需要的阶段，
+或只用 `throughout` 表达持续状态；逐阶段填写 `trigger`、`emotion`、
+`intensity=none/subtle/moderate/strong`、`facial_expression`、`gaze_target`、`breathing`、`body_behavior`。
+不可见人物必须写 `offscreen_reason` 且不填写可见表演；不得用此项隐藏应当入镜的人物。
+没有可见人脸、机械角色或遮挡时，应按真实可观察部位说明限制，不编造眉眼或呼吸。
+
+主角的情绪应落到可观察的面部/视线/身体变化，路人保持符合场景的日常状态；对异常不反应不等于整段冻结。
+`throughout` 不等于 freeze，`none` 强度不等于无生命。眨眼、呼吸和小动作按景别、角色与叙事需要编排，
+不自动为所有人添加相同动作，不强制每镜出现情绪转折。相对阶段是作者表演次序，不是硬定时参数，
+实际采用 trim/frame/sample/timing 仍由 `ResolvedTimeline` 独占。
+
+既有 coarse `PerformanceIntent` 六字段继续明确镜头整体反应；逐人物字段补足各人的职责，不从人物Bible
+自动填值。新参数必须由 Agent 在 author/revise 输入中显式编写并查看适配 diff；不允许执行器根据空值猜表演。
+对应 selected QA 的 required `acceptance/raw_generation` 条目，使用 `analyzer` 或 `human` 观察原片表演，
+`intent_paths` 绑定整个 `generation_intent.performance_intent.character_directions`，或覆盖相关人物的全部阶段字段。
+technical probe、recipe hint、diagnostic 或只覆盖视线的条目不能代替完整表演验收。
+
+rich remote/local H3 编译器将同一表演方向机械转为原生文字。preserved-source 路线必须先在新作者版本中
+显式写入完整确定性表演段落，并保留 coarse 六字段的原句；pure
+`performance_direction.render_performance_direction(performance)` 和 preflight 的 `native_text_required`
+提供待核对段落。编译器只核对原文已有内容，不自动追加或重写保留原文；缺表达返回输入不支持。
+原始用户要求与新增导演表演指令的来源分别保留，输入修订不沿用已消费的旧调用授权。
+
+`preflight.performance_control` 与 `prepare.reference_control.performance_control` 展示逐人物参数、缺项、
+所需原生段落、输入字面表达和原片验收映射。`LEXICALLY_EXPRESSED` / `DECLARED` 只说明输入/映射存在，
+机制始终是 model prompt guidance；所有表情、强度、阶段与背景自然度都需看实际输出，不能当作 API 硬控制。
+未进行新的真实媒体验证时，actual quality 与 human acceptance 保持 `NOT_EVALUATED`。
+
+方法参考：[Seedance官方提示指南](https://docs.byteplus.com/en/docs/modelark/seedance-2-0-prompt-guide)
+强调将抽象情绪落实到可见动作/表情；[MiniMax H3模型作者指南](https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/docs/VIDEO_PROMPT_WRITING_GUIDE_ref_en.md)
+区分主体身份与动作/表情等参考职责。后者是开放模型 full-reference 指南，不证明 H3 Max CN API 的同等能力。
+[社区旧MiniMax表情演示](https://www.reddit.com/r/aivideo/comments/1g6shqk/)只作有界实践线索，
+不作为当前 model/mode 的质量证据或必成功规则。普通作者输入示例见
+[`subject-reference/project.json`](canvas-projects/subject-reference/project.json)，对应 source 保留显式表演段落。
+
 ### Production Responsibility Allocation
 
 分工沿既有 QA inventory 的 `level/stage/semantics`、`ProductionRequirementAllocation` 与 Shot 的

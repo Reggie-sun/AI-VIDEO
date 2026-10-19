@@ -37,6 +37,7 @@ from production_generation_execution_factory import (
 )
 from test_production_generation_decision import setup_decision
 from tests.test_production_video_intent_validation import _complete_intent
+from tests.performance_fixture import fixture_performance_intent
 
 
 def _register_remote_inputs(*, root, inputs, project, bindings, input_bytes):
@@ -141,8 +142,18 @@ def prepare_remote_generation(*, root, provider, request, compiler_id, compiler_
         "scene_content_hash": scene.content_hash,
     }
     output = request.output_requirement
+    characters = tuple(c for c in project.characters if c.character_id in shot.character_ids)
     intent = _complete_intent().model_copy(update={
         "pacing": Pacing(shot_duration_seconds=output.duration_seconds),
+        "performance_intent": fixture_performance_intent(
+            characters,
+            trigger="The hero enters and notices the room",
+            emotion="quiet curiosity",
+            facial_expression="brows gently lifted, eyes alert, lips relaxed",
+            gaze_target="the room ahead",
+            breathing="steady, natural breathing",
+            body_behavior="keeps a balanced walking posture and settles at the endpoint",
+        ),
         **({"ambience_intent": AmbienceIntent(environment_bed="none", explicitly_silent=True)}
            if not output.native_audio else {}),
     })
@@ -192,7 +203,7 @@ def prepare_remote_generation(*, root, provider, request, compiler_id, compiler_
         intent_evidence_hash=canonical_sha256({"shot": shot.content_hash}),
         generation_intent_hash=canonical_sha256(intent.model_dump(mode="json")),
         target_shot=shot, scene=scene,
-        characters=tuple(c for c in project.characters if c.character_id in shot.character_ids),
+        characters=characters,
         generation_mode=GenerationMode(request.mode.value), continuity_mode="none",
         motion_requirement="free_complex", generation_intent=intent,
         semantic_reference_roles=semantic_roles, asset_evidence=evidence, capability_need=capability_need,

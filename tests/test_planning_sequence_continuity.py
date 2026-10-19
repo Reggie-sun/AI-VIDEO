@@ -89,6 +89,16 @@ def _planning(loaded, shot, changes, *, roles=(SemanticReferenceRole.FIRST_FRAME
             asset_id=a.asset_id, asset_sha256=a.sha256, mime_type=a.mime_type, width=a.width,
             height=a.height, size_bytes=a.size_bytes, canonical_owner_id=scene.scene_id,
             canonical_owner_content_hash=scene.content_hash))
+    from performance_fixture import fixture_performance_intent
+
+    cast = tuple(c for c in loaded.characters if c.character_id in shot.character_ids)
+    intent = _intent(changes)
+    if cast:
+        intent = intent.model_copy(update={"performance_intent": fixture_performance_intent(cast,
+            trigger="the prop release finishes", emotion="quiet concentration",
+            facial_expression="attentive eyes and an unforced neutral mouth",
+            gaze_target="the authored walking direction", breathing="gentle breathing while walking",
+            body_behavior="balanced posture through the authored release and walk")})
     return VideoPlanningRequest.create(request_id=f"sequence-input-{shot.shot_id}",
         target_shot=shot, character_context=tuple(c for c in loaded.characters if c.character_id in shot.character_ids),
         scene_context=next(s for s in loaded.scenes if s.scene_id == shot.scene_id),
@@ -96,7 +106,7 @@ def _planning(loaded, shot, changes, *, roles=(SemanticReferenceRole.FIRST_FRAME
         shot_intent_evidence=ShotIntentEvidence(target_shot_id=shot.shot_id,
             target_shot_content_hash=shot.content_hash, character_action_required=True),
         review_decision=None, production_policy=ProductionPolicyInput(remote_authorized=True, budget_authorized=True),
-        generation_intent=ProviderNeutralGenerationIntentProjection.create(generation_intent=_intent(changes),
+        generation_intent=ProviderNeutralGenerationIntentProjection.create(generation_intent=intent,
             output_need=OutputNeed(duration_seconds=1, width=64, height=64, fps=24, container_mime="video/mp4"),
             audio_need=AudioNeed.FORBIDDEN, quality_need=QualityNeed(), semantic_reference_roles=roles),
         planning_contract_version="video-planner/3")
@@ -138,7 +148,18 @@ def _activated_source(tmp_path, *, seal_terminal=True, close_evaluation=True, cl
     close_rule.update(dimension="causal_state", observable=close_hash, tolerance="exact",
         measurement="Inspect the explicitly authored fixture terminal column",
         intent_paths=["generation_intent.close_state.state_hash"])
-    acceptance = marked_policy([close_rule, duration_rule] if close_evaluation else [duration_rule])
+    performance_rule = semantic_rule("performance")
+    performance_rule.update(dimension="character_performance",
+        observable="Actors remain naturally attentive through the authored release and walk",
+        tolerance="No unrequested emotional change or frozen acting",
+        measurement="Explicit synthetic analyzer observation; no real-media acceptance",
+        intent_paths=["generation_intent.performance_intent"])
+    performance_rule["semantics"]["source_refs"][0].update(locator="fixture/sequence/performance",
+        intent_item_id="performance", quote="Keep actors naturally attentive during the release and walk")
+    performance_rule["semantics"]["hard_basis"].update(locator="fixture/sequence/performance",
+        necessity="Readable performer behavior supports the depicted physical event")
+    acceptance = marked_policy([close_rule, duration_rule, performance_rule] if close_evaluation
+        else [duration_rule, performance_rule])
     updated = seal_artifact(current.model_copy(update={"revision": current.revision + 1,
         "content_hash": "0" * 64, "generation_acceptance": acceptance,
         "generation_evaluation_authorities": (*current.generation_evaluation_authorities,
@@ -191,7 +212,7 @@ def _activated_source(tmp_path, *, seal_terminal=True, close_evaluation=True, cl
             qa_policy_content_hash=loaded.qa_policy.content_hash, qa_policy_snapshot=loaded.qa_policy,
             evaluator=loaded.qa_policy.semantic_authorities[0], proof="analyzer",
             observations=tuple(GenerationObservation(requirement_id=item.requirement_id,
-                verdict="PASS" if item.requirement_id == "duration" else close_verdict,
+                verdict=close_verdict if item.requirement_id == "causal-close" else "PASS",
                 observation="scripted fixture observation; no real media qualification",
                 evaluation_item_hash=item.evaluation_item_hash, question_text=item.question_text,
                 presentation_ref=presented.presentation_ref, answer_ref=presented.answer_ref)

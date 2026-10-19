@@ -185,6 +185,12 @@ class GenerationDecisionExecutionBinding(StrictModel):
         continuity_routing: ContinuityProviderRouteBinding | None = None,
         unsubmitted_predecessor_evidence_hash: str | None = None,
     ) -> "GenerationDecisionExecutionBinding":
+        from ai_video.production.performance_authoring import require_performance_authoring
+
+        bound = decision.routing.provider_bound_request if decision.routing is not None else None
+        recipe = bound.generation_recipe if bound is not None else None
+        require_performance_authoring(projection.requirement,
+            recipe.acceptance_policy if recipe is not None else None)
         values: dict[str, object] = {
             "schema_version": "1",
             "projection": projection,

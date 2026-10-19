@@ -134,13 +134,22 @@ class Session:
 
 
 def adjudicate(review):
-    return (GenerationEvaluationSource(request_hash=review.request.request_input_hash,
+    acceptance = review.qa_policy.selected_generation_acceptance()
+    assert acceptance is not None
+    rules = {rule.requirement_id: rule for rule in review.recipe.expressions}
+    requirements_by_proof = {}
+    for requirement_id in acceptance.required_requirement_ids:
+        requirements_by_proof.setdefault(rules[requirement_id].proof, []).append(requirement_id)
+    return tuple(GenerationEvaluationSource(request_hash=review.request.request_input_hash,
         artifact_sha256=review.analysis.artifact_sha256, rubric_hash=review.recipe.rubric_hash,
         qa_policy_content_hash=review.qa_policy.content_hash,
         analysis_evidence=review.analysis,
-        evaluator=review.qa_policy.semantic_authorities[0], proof="technical",
-        observations=(GenerationObservation(requirement_id="duration", verdict="FAIL",
-            observation="Explicit offline evaluator FAIL, not inferred from MCP success"),)),)
+        evaluator=review.qa_policy.semantic_authorities[0], proof=proof,
+        observations=tuple(GenerationObservation(requirement_id=requirement_id, verdict="FAIL",
+            observation=(f"Explicit offline fixture {proof} evaluator FAIL for {requirement_id}; "
+                         "not inferred from MCP success"))
+            for requirement_id in requirement_ids))
+        for proof, requirement_ids in sorted(requirements_by_proof.items()))
 
 
 def fetched(tmp_path):
@@ -266,6 +275,70 @@ def marked_fetched(tmp_path, monkeypatch, *, measurement_spec=None):
     return fetched(tmp_path)
 
 
+def fixture_marked_verifier(*, evaluator, technical_adjudicate):
+    """Compose distinct scripted proof layers for marked synthetic fixture QA."""
+    from ai_video.production.generation_evaluation import (
+        GenerationEvaluationSource,
+        GenerationObservation,
+        _seal_presentation_recording,
+    )
+    from ai_video_mcp.generation_feedback import (
+        ControlledPresentationVerifier,
+        VerifiedEvaluationBinding,
+    )
+
+    async def analyzer_adjudicate(review):
+        items = review.evaluation_items
+        assert items and all(item.proof == "analyzer" for item in items)
+        first = items[0]
+        return (GenerationEvaluationSource(
+            schema_version="generation-evaluation/2",
+            request_hash=first.request_hash,
+            artifact_sha256=first.artifact_sha256,
+            size_bytes=first.size_bytes,
+            rubric_hash=first.rubric_hash,
+            qa_policy_content_hash=first.qa_policy_content_hash,
+            qa_policy_snapshot=review.qa_policy,
+            analysis_evidence=review.analysis,
+            evaluator=evaluator,
+            proof="analyzer",
+            observations=tuple(GenerationObservation(
+                requirement_id=item.requirement_id,
+                verdict="PASS",
+                observation="Explicit synthetic fixture analyzer answer; no media quality claim",
+                evaluation_item_hash=item.evaluation_item_hash,
+                question_text=item.question_text,
+                presentation_ref=review.presentation_ref,
+                answer_ref=review.answer_ref,
+            ) for item in items),
+        ),)
+
+    technical = ControlledPresentationVerifier(
+        evaluator=evaluator, proof="technical", adjudicate=technical_adjudicate
+    )
+    analyzer = ControlledPresentationVerifier(
+        evaluator=evaluator, proof="analyzer", adjudicate=analyzer_adjudicate
+    )
+
+    class Composite:
+        async def present_and_verify(self, *, review_input, attempt_id):
+            technical_result = await technical.present_and_verify(
+                review_input=review_input, attempt_id=attempt_id
+            )
+            analyzer_result = await analyzer.present_and_verify(
+                review_input=review_input, attempt_id=attempt_id
+            )
+            sources = (*technical_result.sources, *analyzer_result.sources)
+            return VerifiedEvaluationBinding(
+                sources=sources,
+                recording_proof=_seal_presentation_recording(
+                    attempt_id=attempt_id, sources=sources
+                ),
+            )
+
+    return Composite()
+
+
 def marked_adjudicate(review, *, verdict="PASS", unresolved=True):
     item = review.evaluation_items[0]
     assert review.request is None and review.projection is None and review.recipe is None
@@ -284,14 +357,13 @@ def marked_adjudicate(review, *, verdict="PASS", unresolved=True):
 
 @pytest.mark.parametrize("verdict", ["PASS", "FAIL"])
 def test_marked_review_reopens_unresolved_and_preserves_mixed_hard_failure(tmp_path, monkeypatch, verdict):
-    from ai_video_mcp.generation_feedback import ControlledPresentationVerifier
     from ai_video.production.state_commit import ProductionStateCommitter
     from ai_video.production.project import load_production_project
 
     provider, committer = marked_fetched(tmp_path, monkeypatch)
     qa = load_production_project(tmp_path / "project.yaml").qa_policy
-    verifier = ControlledPresentationVerifier(evaluator=qa.semantic_authorities[0], proof="technical",
-        adjudicate=lambda review: marked_adjudicate(review, verdict=verdict))
+    verifier = fixture_marked_verifier(evaluator=qa.semantic_authorities[0],
+        technical_adjudicate=lambda review: marked_adjudicate(review, verdict=verdict))
     session = Session()
     result = asyncio.run(review_generation_attempt(committer=committer, attempt_id="review", session=session,
         adjudicate=None, presentation_verifier=verifier))
@@ -308,8 +380,8 @@ def test_marked_review_reopens_unresolved_and_preserves_mixed_hard_failure(tmp_p
     assert replay == result
     assert reopened._read_manifest().manifest_revision == revision
     assert provider.submit_calls == provider.fetch_calls == session.calls == 1
-    later_verifier = ControlledPresentationVerifier(evaluator=qa.semantic_authorities[0], proof="technical",
-        adjudicate=lambda review: marked_adjudicate(review, verdict="PASS", unresolved=False))
+    later_verifier = fixture_marked_verifier(evaluator=qa.semantic_authorities[0],
+        technical_adjudicate=lambda review: marked_adjudicate(review, verdict="PASS", unresolved=False))
     later = asyncio.run(review_generation_attempt(committer=reopened, attempt_id="review", session=session,
         adjudicate=None, presentation_verifier=later_verifier, repair_evidence=True))
     assert "RUBRIC_OR_STAGE_ERROR" in later.failure_classes
@@ -322,7 +394,6 @@ def test_marked_review_reopens_unresolved_and_preserves_mixed_hard_failure(tmp_p
 
 @pytest.mark.parametrize("failure", ["missing_verifier", "wrong_question", "prior_presentation", "human"])
 def test_marked_review_rejects_untrusted_or_mismatched_presentation(tmp_path, monkeypatch, failure):
-    from ai_video_mcp.generation_feedback import ControlledPresentationVerifier
     from ai_video.production.project import load_production_project
 
     _, committer = marked_fetched(tmp_path, monkeypatch)
@@ -337,8 +408,17 @@ def test_marked_review_rejects_untrusted_or_mismatched_presentation(tmp_path, mo
                 update={"presentation_ref": "previous/request"}),)})
         return (source,)
     with pytest.raises(ValueError):
-        verifier = None if failure == "missing_verifier" else ControlledPresentationVerifier(
-            evaluator=qa.semantic_authorities[0], proof="human" if failure == "human" else "technical", adjudicate=answer)
+        if failure == "missing_verifier":
+            verifier = None
+        elif failure == "human":
+            from ai_video_mcp.generation_feedback import ControlledPresentationVerifier
+            verifier = ControlledPresentationVerifier(
+                evaluator=qa.semantic_authorities[0], proof="human", adjudicate=answer
+            )
+        else:
+            verifier = fixture_marked_verifier(
+                evaluator=qa.semantic_authorities[0], technical_adjudicate=answer
+            )
         asyncio.run(review_generation_attempt(committer=committer, attempt_id="review", session=Session(),
             adjudicate=answer, presentation_verifier=verifier))
     assert committer.read_generation_experiences() == ()
@@ -349,13 +429,12 @@ def test_direct_committer_cannot_drop_unresolved_refs_or_reuse_presentation_proo
     from ai_video.errors import AiVideoError
     from ai_video.production.generation_feedback import record_attempt_evaluation
     from ai_video.production.generation_evaluation import _seal_analysis_recording
-    from ai_video_mcp.generation_feedback import ControlledPresentationVerifier
 
     _, committer = marked_fetched(tmp_path, monkeypatch)
     review = asyncio.run(review_generation_attempt(committer=committer, attempt_id="review", session=Session(),
                                                   adjudicate=None, analysis_only=True))
-    verifier = ControlledPresentationVerifier(evaluator=review.qa_policy.semantic_authorities[0], proof="technical",
-                                             adjudicate=marked_adjudicate)
+    verifier = fixture_marked_verifier(evaluator=review.qa_policy.semantic_authorities[0],
+                                       technical_adjudicate=marked_adjudicate)
     verified = asyncio.run(verifier.present_and_verify(review_input=review, attempt_id="review"))
     with pytest.raises(AiVideoError, match="presentation verifier proof"):
         record_attempt_evaluation(committer=committer, attempt_id="review", evaluation_sources=verified.sources,
@@ -377,13 +456,12 @@ def test_orchestrator_record_entry_uses_identical_refs_projection(tmp_path, monk
     from types import SimpleNamespace
     from ai_video.production.generation_feedback import GenerationFeedbackOrchestrator
     from ai_video.production.generation_evaluation import _seal_analysis_recording
-    from ai_video_mcp.generation_feedback import ControlledPresentationVerifier
 
     _, committer = marked_fetched(tmp_path, monkeypatch)
     review = asyncio.run(review_generation_attempt(committer=committer, attempt_id="review", session=Session(),
                                                   adjudicate=None, analysis_only=True))
-    verifier = ControlledPresentationVerifier(evaluator=review.qa_policy.semantic_authorities[0], proof="technical",
-                                             adjudicate=marked_adjudicate)
+    verifier = fixture_marked_verifier(evaluator=review.qa_policy.semantic_authorities[0],
+                                       technical_adjudicate=marked_adjudicate)
     verified = asyncio.run(verifier.present_and_verify(review_input=review, attempt_id="review"))
     _, state = VideoGenerationService(committer=committer, provider=None)._state("review")
     binding = committer._reopen_generation_execution_binding(state.execution_binding)
@@ -408,7 +486,6 @@ def test_typed_time_result_recording_and_strict_reopen(tmp_path, monkeypatch, ca
     from ai_video.production.generation_evaluation_criteria import TemporalMeasurement
     from ai_video.production.project import load_production_project
     from ai_video.production.state_commit import ProductionStateCommitter
-    from ai_video_mcp.generation_feedback import ControlledPresentationVerifier
     from test_generation_evaluation_binding import time_window
 
     spec = time_window(upper_millis=700, required_coverage=(0, 1000))
@@ -426,7 +503,7 @@ def test_typed_time_result_recording_and_strict_reopen(tmp_path, monkeypatch, ca
             coverage_millis=(200, 700) if case == "insufficient_coverage" else (0, 1000),
             evidence_refs=("offline-fixture-measurement",))
         return (source.model_copy(update={"observations": (obs.model_copy(update={"measurement_result": result}),)}),)
-    verifier = ControlledPresentationVerifier(evaluator=qa.semantic_authorities[0], proof="technical", adjudicate=answer)
+    verifier = fixture_marked_verifier(evaluator=qa.semantic_authorities[0], technical_adjudicate=answer)
     def run():
         return asyncio.run(review_generation_attempt(committer=committer, attempt_id="review", session=Session(),
                                                      adjudicate=None, presentation_verifier=verifier))

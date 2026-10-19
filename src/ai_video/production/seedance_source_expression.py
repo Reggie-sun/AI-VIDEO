@@ -631,14 +631,39 @@ def _source_native_prompt(
     *, grammar_contract="seedance-preserved-source-v1",
 ):
     from ai_video.production.video_compiler import ProviderNativePrompt
+    from ai_video.production.performance_direction import render_performance_direction
     from ai_video.production.seedance_source_dialogue import source_dialogue_controls
 
     intent = requirement.generation_intent
+    performance = intent.performance_intent
+    if performance is not None and performance.character_directions:
+        performance_direction = render_performance_direction(performance)
+        if performance_direction not in prompt:
+            raise ValueError(
+                "preserved source must contain the authored performance direction block verbatim"
+            )
+        for field in (
+            "trigger",
+            "visible_response",
+            "gaze_target",
+            "body_behavior",
+            "hand_behavior",
+            "terminal_performance_state",
+        ):
+            if getattr(performance, field) not in prompt:
+                raise ValueError(
+                    "preserved source does not contain every authored legacy performance value"
+                )
     controls = (
         "generation_intent.subject_action.progression",
         "generation_intent.pacing.shot_duration_seconds",
         *endpoint_controls,
     )
+    if performance is not None and performance.character_directions:
+        controls += (
+            "generation_intent.performance_intent",
+            "generation_intent.performance_intent.character_directions",
+        )
     ambience = intent.ambience_intent
     if ambience is not None and not ambience.explicitly_silent:
         if not bound.output_requirement.native_audio:
