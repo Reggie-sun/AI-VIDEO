@@ -9,7 +9,114 @@ evidence_index_version: "1"
 
 Date: 2026-10-13
 
-## Current Performance Feedback And Input Audit — 2026-10-19
+## Current Acting S01 — 2026-10-20
+
+用户在通用人物表演模块发布后要求“再次完成shot1”。本次沿既有 Canvas author/Planner/compiler/paid owners，
+执行 official MiniMax H3 Max CN、标称5秒、768P、balanced、first-frame **一次，零重抽**；S02、图片/音频生成及付费音频理解均0。
+实际 POST 于 `2026-10-19T18:48:17.104655Z` 发出，约0.79秒后 HTTP200。当前新授权单元已消费，不能复用旧 permit或继续重抽。
+下方2026-10-19输入审计、funded raw与旧手影修补均保留为历史；它们没有被新表演参数补写。
+
+| Exact input and output | Verified value |
+| --- | --- |
+| Attempt | `canvas-81d3a07583cc6684a370e6dc9b729cda828be208` |
+| Resolved generation / execution binding | `de1e55b00de4cea374700bdba9c60e2f7ee87586e5240d8558bc6f9545877d44` / `8f3d756d3505bfb5c5ef9627bf257d2c51c0bb1daae8ad0c493e1ef0b6c29289` |
+| Native body | SHA `1900c5b198a878d8bead63926c376c6d1ea035fa70ec663b3295c4c2a819aa0b`，2,827,190 bytes，实际 wire 与封存输入一致 |
+| Prompt | 3904字符，SHA `712f12072f64425474c007e905af0791037960b3053740b8d85b2adbafbc3442`；原三段保留，追加八人的确定性表演方向及 coarse 六字段 |
+| Reference | 原 PNG SHA `13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923`，只绑定一份 `first_frame`；无 last-frame/video/audio reference及ratio参数，本单元显式白模互斥例外 |
+| Actual raw MP4 | `production/state/video-generation/fetch/files/4c9589f49dd92104ed6c6a2f5f7ed2f47306535f11a10784d5585ce9652c957f.mp4`（相对本项目run根），7,036,305 bytes，SHA同文件名 |
+| Measured media | 768×1344（实际4:7）、24fps、124帧、container5.184秒、AAC stereo/32000Hz；不是精确9:16或已采用3秒成片 |
+
+prepare的 `performance_control` 为 AUTHORED、issues空、LEXICALLY_EXPRESSED、acceptance mapping DECLARED，八人均关联
+`s01-character-performance`。这证明实际输入已补表演，不证明模型执行效果。原15项目标保留，新增表演验收后raw15项、parent17项、FinalOutput37项。
+新goal version、QA revision6/hash `6a583d8b764ec19d5cb6bd96634fb56b19d96b8d12c956fb0abf4cfdb87e6213` 单独保留，不改旧失败goal。
+
+对 exact新原片显式调用 project-local `video-analysis` MCP，再经 canonical controlled presentation 裁决：**5 PASS /1 FAIL /9 NOT_EVALUATED**。
+约2.0–4.5秒玻璃中仍出现随手移动的幽影，`s01-reflections=FAIL`；抬手约3.5秒后才接近稳定，直接取前3秒不满足最终切出状态。
+2.5秒是生成动作余量，不能把它升级为强制raw截止；原最终3秒与合格连续源窗要求保留。
+林砚眉眼/下颌和个别背景有细小变化，但全部八人的自然表演、完整1×声画与手的约2cm空间仍缺证。
+本地缓存Whisper实际得到“林燕，请在终点站下车”及0–2.64秒估计；同音字、估计时戳不证明人名错误、精确时窗、女声音义/听感或完整环境声，不代替真实听音。
+
+原片由 canonical committer abandon：标准reader重开 **Manifest157 /Project22**，attempt `failed`、phase `validate`，
+experience `6372d53e0e222481cac68989353c9fd80c516cccf23b026930d46b9eb764dcb0`，
+rejection `b435b7ef1f260bc396375a4981ced74e05a8ce2a5949719c59f2cee0e5567bc2`。
+paid accepted、ledger revision40和reservation保留，actual cost为null；质量失败不释放消费。
+task used9→10、ceiling9→10，历史视频POST累计21、S02 POST0。内部总上界400,000,000→450,000,000 CNY microunits、单次50,000,000，均非报价/账单/余额。
+S01仍STOP，没有accepted state、activation或S02交接。
+
+证据根：`runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-acting-S01-20261020-001/`。
+`native-preview.json`、`wire-observations.json`、`fetch.actual.json`、`probe.actual.json`、`mcp-call.json`、
+`controlled-presentation.json`、`controlled-answers.json`、`diagnosis.json`、`quality-rejection.actual.json`保存输入、调用、媒体、逐项判定及关闭身份。
+同一 native `reviewer_high` 的媒体初审确认手影、直取前3秒时序不足及表演缺证；Parent明确驳回“2.5秒raw硬截止”的解释，见`media-review-r1.json`。
+
+## Acting Repair Preview And Remaining Boundary — 2026-10-20
+
+当前供完整听看的第二版为 [3秒带原声预览](../../runs/jieshi-s01-acting-edit-20261020-002/outputs/Jieshi-S01-acting-cleaned-v2-3s-preview.mp4)，
+SHA `f98e2c0ab5198962450a8dca2b7b3a53c133559ebb36c2b6f511700e976f4a47`，2,165,551 bytes，768×1344 /24fps /72帧，AAC stereo /48000Hz。
+原始verified输出在同一run的 `render-001/verified.mp4`，`outputs/`仅存exact同bytes的前端展示副本，不是第二Production源。
+第二版仅扩大已定位区域的两块作者遮罩边界，原前景保护、frame0 clean plate、全124帧时序/PCM及4秒→3秒map保持。
+新lossless母版SHA `f421c557e95c120d5da28ba48e6a2f4ca01ed8b0c4f8a276891122b7b3914a03`，
+观看代理SHA `c25242d9ac408842645479dfb4b2eb2942c2e8124a8a2d747d1e4dbb2f264520`，admission `73a80d6439713be9c0121baa6617d4b6cc1c549586e4659e64d627aad24538c4`。
+13张静帧保护像素变化仍0；最终有损MP4不继承该逐像素保证。两个cleanup候选的本地有限上限已使用完毕，未新增生成POST。
+
+第二版HyperFrames lint/check均0 error/0 warning，显式project-local `video-analysis` MCP核验该exact新文件。
+Parent与同一独立reviewer检查中段frame46/48/50/54及尾frame69/70/71，旧棕色掌影未再出现，所看画面未见明显新接缝、
+真实手截断或灰袋、乘客手腿、立杆受损；只覆盖所看帧，不代签整段或八人表演。
+初次post-fix复审round3被Native服务HTTP403拒绝、无实际检查证据；Parent调查后保留历史并将同一有限review上限3→4，
+仅补一次同profile/同exact候选的原生只读复审，round4已完成。可见blocking finding为空，镜尾可读性、全部表演和human完整听看仍NE。
+同一reviewer明确撤回无依据的raw2.5秒硬截止。证据为第二版run内 `media-review-r3-admission.json`、`media-review-r4.json`。
+
+两版的mapped PCM与最终decoded-audio fingerprint分别相同，第二轮局部像素修补未改变剪辑版声音；不据此判定声音自然度。
+实际Chrome前端通过既有External Media Library选择此3秒展示副本，HTTP200下载哈希/2,165,551 bytes与verified输出一致，
+1×、unmuted、volume1播放到3秒结束且无error；actual播放器截图颜色正常。
+这条展示是`external_output`，不是把development输入洗成普通Asset或激活Production render。
+前端deep link使用第二版workspace及exact新SHA；首页列表也实际出现该文件。`browser-playback.actual.json`、`browser-screenshot.jpg`保存证明。
+已向用户发送明确“1×完整听看、人物自然度/手影/镜尾/声音、字幕尚未叠加”的exact候选问题，当前 **human PENDING**。
+完整验收、正式source-use资格和S02交接不由浏览器播放成功或reviewer意见代签。
+
+以下首版步骤与失败保留为history，其3秒候选不能继续当作当前干净版。
+
+沿既有 `bootstrap_video_cleanup` / `development-repair-input/5`，以新原片frame0为clean plate、逐帧显式遮罩/identity affine、
+原手与袖口前景保护，制作非生成修补。不是自动跟踪，不新增renderer或状态owner；原124帧、PTS和PCM在cleanup阶段保持。
+第一个lossless RGB母版SHA `8c462fcafd8d1b073fe2f9795be867bdaefd8912ccfcadf193a7c9e25ca481ca`，
+独立H264/yuv420p观看代理SHA `8b80fcaaf6eb8b07cd21e9aad28daa6f5f4e8720ff7df30460ee3d7757e236dc`。
+仅代理用于观看，不把RGB母版再次当成人类兼容成片。13张作者抽帧的protected pixel changes为0，不把该证明延伸到有损观看代理全部像素。
+
+标准reader读取独立development bundle后，由 `CompositionSpec2.4 → resolve_composition → ResolvedTimeline →` 既有网络隔离、
+pinned `HyperFramesAdapter` 输出：源frame0–96连续映射到最终frame0–72，`audio_policy=retime_preserve_pitch`。
+实际timeline为72帧/144000 samples，末帧71采用source94；不是把5秒文件尾帧冒称3秒，未冻结/跳切/倒放/补帧。
+同源原声经P4原生音轨派生与atempo进入3秒输出；这证明处理与身份，不证明完整听感。
+两边Manifest不变，preview资产保持UNBOUND / qualification NOT_EVALUATED，timeline为 `development_preview`，没有Production render activation。
+
+第一条实际3秒候选位于 `runs/jieshi-s01-acting-edit-20261020-001/render-002/verified.mp4`，
+SHA `2308c9923907516c4afcba4addb2e3784b2c456e0c9e4a0e77146ba41a1911f1`，2,175,870 bytes。
+HyperFrames lint/check均0 error/0 warning，另显式project-local MCP检查新exact文件；Parent与同一reviewer的round2均发现
+约1.917–2.250秒、何静灰袋下方黑裤膝部仍有棕色掌影，**该候选FAIL**，不能因末帧较干净而通过。
+`media-review-r2.json`保留Parent逐项裁决：约最后0.25秒停留的可读性仍需正常速度观看，八人自然表演仍缺证；
+再次出现的“原片2.5秒硬截止”说法已据实际sealed QA明确驳回。
+
+本次完整S01尚不能宣称完成：原要求的剧情hook“可这条地铁，没有终点站。”未叠加，9:16最终构图、完整37项验收与human完整1×听看仍未完成。
+只读mapper确认现有P4Caption绑定显式语音对齐；当前native-audio time-map Shot不能把独立剧情文字伪装为对白字幕。
+现有graphic-layer公共路线要求exact AdCreativePlan，Canvas不接受自由多层；本次不冒用commercial字段或另建renderer来绕过。
+先供判断的素材预览保持实际4:7，未删除原文字或放宽正式Gate。
+
+准备过程的本地失败均无新POST：新development项目最初引用未带入的旧Scene素材，strict bootstrap拒绝且未落Manifest；
+随后把该预览的Character/Scene引用明确指向同一实际context PNG、保留原人物描述，并让pending video role保持空，
+从exact unbound preview seam使用修补素材，未将其绑定为Production已采用源。原Production Character/Scene/ref history未改。
+一次HyperFrames调用在实际render前因staging输出父目录配置错误被拒，失败namespace保留，修正子目录后导出；不将这些operator错误称为模型失败。
+另实际观察到submit入口至wire约15分钟本地验证耗时，栈含retained quota/budget closure重读；这是尚存性能问题，未为此在取得可用素材前再次扩建验证工程。
+
+本轮只有媒体操作/作者数据/开发预览与记录更新，没有共享源码改动，不重复已完成的表演模块工程Harness。
+文档checkpoint范围receipt为 `.agent/harness/runs/acting-s01-preview-record-20261020-r1/receipt.json`；其适用检查只证明该记录范围，
+不构成原片、37项完整S01或通用模型质量PASS。文档implementation Risk Gate为 `NATIVE_REVIEW_NOT_REQUIRED`：
+未改执行、授权、持久状态owner或Gate，媒体独立复核另按上述实际轮次记录。
+
+本稳定checkpoint按 `record-ai-video-session` 更新同一主记录及表演模块直接notice，自动 `distill-ai-video-learning=no_candidate`。
+新表演输入只有一次真实attempt，两版本地修补是同一原片的派生证据链，不增独立模型样本；历史同类手影没有隔离mode、prompt或参考职责的因果变量。
+检索并核对现有两个本地H3 claim，均不覆盖本次official H3 Max CN/paid first-frame scope；不借其扩权。
+本次未取得足以提出新表演效果规则或可迁移质量保证的证据，不创建placeholder/采纳规则，不修改Skill/Policy/Gate、不主动重建RAG或更新全局memory。
+下一步先取得该exact预览的真实听看反馈；字幕/最终构图/资格与完整要求仍是后续工作，不将候选预览改称完整S01交付。
+
+## Historical Performance Feedback And Input Audit — 2026-10-19
 
 2026-10-20 更新：[通用人物表演模块](2026-10-20-character-performance-control.md)已在共享 owners 实现并发布，
 Agent 新生成时必须明确填写逐人物方向、进入 exact 提示词并关联所选 raw QA。下文“待实施方向”属于本次输入审计时点；
@@ -21,7 +128,7 @@ Agent 新生成时必须明确填写逐人物方向、进入 exact 提示词并�
 
 已确认的是这次输入和表演编排不足，不是已隔离的模型能力根因，也未据此证明共享compiler丢字段。通用改进方向应将人物目标/情绪落实为逐镜可见表演，并区分主角反应、背景人物日常状态及验收；这是待实施方向，不冒充已批准的新spec或已实现能力。本地手影修补没有增加人物表演，当前反馈不构成75a局部修补接受，整镜仍未通过；原要求、Manifest及S02 POST0保持。`record-ai-video-session`更新本记录及直接cleanup notice，自动`distill-ai-video-learning=no_candidate`：同一raw的输入核对与定性反馈不是独立受控对照，不新增Evidence Index attempt或采纳规则。
 
-## Current Non-generative Cleanup Follow-up — 2026-10-19
+## Historical Non-generative Cleanup Follow-up — 2026-10-19
 
 用户再次以截图反馈“还是有最后”，39da局部修补候选仍失败；该手势匹配source约2.5秒，残影主体在上一轮保护区内的扶杆左侧，不能用文件末帧检查代替用户所指位置。新作者遮罩补齐整块残影覆盖，新观看版为`runs/non-generative-cleanup-hand-20261019-001/production/assets/files/75a328d76ae349cf48aa048eeea8d5216f239a4a0b058e89e5c56de74cb7d620.mp4`；124帧PTS、原声PCM保持，frame0–39母版RGB与前版相同。新2.5秒及相邻帧的静态复核和实际Chrome局部画面未再见旧宽手影，完整1×自动播放成功，人工观感仍待确认。当前修复以[截图定位主记录](2026-10-19-non-generative-video-cleanup.md#current-screenshot-bound-hand-repair)为准；下方39da的有限改善与旧人工反馈保留为历史，原S01 STOP和S02 POST0不变。
 
@@ -33,7 +140,7 @@ Agent 新生成时必须明确填写逐人物方向、进入 exact 提示词并�
 
 首版局部漏影被拒绝；第二版扩大早段遮罩，同一reviewer在第三轮的新代理21张采样及Chrome截图中未再辨识旧手影、明确截断、接缝或偏色。用户随后对该exact前端链接的完整1×听看问题回复“颜色正常，修补效果可以接受”；其中局部修补观感现被顶部新反馈重新打开，颜色接受保留。下方原8项缺证未因此逐项通过。派生为独立development repair input，qualification `NOT_EVALUATED`，不是原Provider产物或已采用S01。原Manifest143 /Project20、raw失败/abandon、15项与36项要求及S02 POST0不变，无accepted state或交接。工程验证、三轮媒体复核、限制和发布状态以新记录为准。
 
-## Current Funded S01 — 2026-10-19
+## Historical Funded S01 — 2026-10-19
 
 用户回复“现在有钱了”后，继续此前尚未消费的“做视频”指令：official MiniMax H3 Max CN、5秒标称、768P、balanced、同一 PNG first-frame，一次、零重抽。实际 POST 于 `2026-10-18T23:43:14Z` 发出，约0.92秒后 HTTP200，canonical paid receipt 为 `accepted`；旧402没有重现，但没有查询或证明具体账户余额。此次不是沿用旧已消费 permit，S02、图片/音频生成及新音频理解均为0。
 
@@ -1107,6 +1214,10 @@ Parent使用`research`与`retrieve-ai-video-memory`，后者不作为current事�
 
 | evidence_id | independence_key | experiment_id | attempt_id | arm_id | artifact_sha256 | proof_layer | verdict | failure_class | relation_kind | related_evidence_id | source |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| original-S01-acting-fetch | official-max-attempt:canvas-81d3a07583cc6684a370e6dc9b729cda828be208 | jieshi-original-S01-acting-20261020 | canvas-81d3a07583cc6684a370e6dc9b729cda828be208 | N/A | 4c9589f49dd92104ed6c6a2f5f7ed2f47306535f11a10784d5585ce9652c957f | PROVIDER_RECEIPT | FETCHED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-acting-S01-20261020-001/fetch.actual.json |
+| original-S01-acting-qa | official-max-attempt:canvas-81d3a07583cc6684a370e6dc9b729cda828be208 | jieshi-original-S01-acting-20261020 | canvas-81d3a07583cc6684a370e6dc9b729cda828be208 | N/A | 4c9589f49dd92104ed6c6a2f5f7ed2f47306535f11a10784d5585ce9652c957f | ANALYZER | FAIL | QUALITY_FAILURE_AND_EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-acting-fetch | runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-acting-S01-20261020-001/diagnosis.json |
+| original-S01-acting-edited-v2 | official-max-attempt:canvas-81d3a07583cc6684a370e6dc9b729cda828be208 | jieshi-original-S01-acting-20261020 | canvas-81d3a07583cc6684a370e6dc9b729cda828be208 | N/A | f98e2c0ab5198962450a8dca2b7b3a53c133559ebb36c2b6f511700e976f4a47 | LOCAL_MATERIALIZATION | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-acting-fetch | runs/jieshi-s01-acting-edit-20261020-002/render-evidence.json |
+| original-S01-acting-edited-observation | official-max-attempt:canvas-81d3a07583cc6684a370e6dc9b729cda828be208 | jieshi-original-S01-acting-20261020 | canvas-81d3a07583cc6684a370e6dc9b729cda828be208 | N/A | f98e2c0ab5198962450a8dca2b7b3a53c133559ebb36c2b6f511700e976f4a47 | ANALYZER | NOT_EVALUATED | FULL_FINAL_ACCEPTANCE_PENDING | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-acting-edited-v2 | runs/jieshi-s01-acting-edit-20261020-002/observations.json |
 | original-S01-funded-fetch | official-max-attempt:canvas-ab20b88226f1308d4695a5a6589fd7c3c092b2b5 | jieshi-original-S01-responsibility-20261019 | canvas-ab20b88226f1308d4695a5a6589fd7c3c092b2b5 | N/A | c49403ca2a9491647fbe12ab4c277c42611cd866f85bb826697cf1dc1bf6fbc9 | PROVIDER_RECEIPT | FETCHED | NONE | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-responsibility-S01-20261019-002/fetch.actual.json |
 | original-S01-funded-qa | official-max-attempt:canvas-ab20b88226f1308d4695a5a6589fd7c3c092b2b5 | jieshi-original-S01-responsibility-20261019 | canvas-ab20b88226f1308d4695a5a6589fd7c3c092b2b5 | N/A | c49403ca2a9491647fbe12ab4c277c42611cd866f85bb826697cf1dc1bf6fbc9 | ANALYZER | FAIL | QUALITY_FAILURE_AND_EVIDENCE_GAP | SAME_EVIDENCE_NEW_PROOF_LAYER | original-S01-funded-fetch | runs/canvas-jieshi-original-s01-s02-20261013-001/official-h3-max-responsibility-S01-20261019-002/diagnosis.json |
 | credential-before-post | native-image:463e47e5d7b07c89d5db8f82db5d06f06867b08d7eac9d2066acb860adf74ac3 | jieshi-original-preparation-20261014 | original-preparation-base-20261014-candidate | N/A | NO_ARTIFACT:PRE_TRANSPORT_CREDENTIAL_FAILURE | PROVIDER_RECEIPT | KNOWN_NO_EFFECT | CREDENTIAL_READINESS | NEW_ATTEMPT | NONE | runs/canvas-jieshi-original-s01-s02-20261013-001/authorized-unit-20261014-001/base-known-no-effect-current.json |

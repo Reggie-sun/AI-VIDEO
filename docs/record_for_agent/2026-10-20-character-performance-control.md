@@ -8,6 +8,22 @@ learning_eligibility: ineligible
 
 Date: 2026-10-20
 
+## Current Media Follow-up
+
+模块发布后用户要求“再次完成shot1”，已实际执行一次 official MiniMax H3 Max CN S01，
+attempt `canvas-81d3a07583cc6684a370e6dc9b729cda828be208`，raw SHA `4c9589f49dd92104ed6c6a2f5f7ed2f47306535f11a10784d5585ce9652c957f`。
+八人的 rich 方向与 coarse 六字段均进入 actual native prompt，prepare显示 AUTHORED / LEXICALLY_EXPRESSED / DECLARED，
+新增表演raw验收映射已被选中。实际观察仍有手影，canonical原片裁决5 PASS /1 FAIL /9 NOT_EVALUATED并关闭failed；
+八人完整自然表演和human完整1×听看仍未证实。
+详见[S01主记录](2026-10-13-jieshi-original-s01-s02-candidate.md#current-acting-s01--2026-10-20)。
+下文“没有新媒体POST/尚缺新的有限单元”等仅属模块发布时点，不能作为当前调用计数或阻断状态；原工程Harness证明继续有效，
+这次单例也不证明共享模块能保证模型去掉“僵尸感”。
+
+其后已通过既有非生成clean-plate与原声retime制作3秒开发预览，当前第二版SHA
+`f98e2c0ab5198962450a8dca2b7b3a53c133559ebb36c2b6f511700e976f4a47`，已在真实前端播放并核验exact bytes。
+所检查的旧残影样帧已修正，完整八人自然表演与human听看仍PENDING；字幕、正式完整验收及S01 accepted state未完成。
+这些是同一媒体链的后处理观察，不回填原片QA，不替代上述共享模块工程证明；当前状态继续由S01主记录持有。
+
 ## Purpose And Current Status
 
 用户要求由原生 subagent 完善通用人物表演模块，并明确要求 Agent 在制作时写入参数。
