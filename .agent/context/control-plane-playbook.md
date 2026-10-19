@@ -191,20 +191,20 @@ Native Codex 默认 primary；settled bounded task 直接实施与 focused verif
 ### Constructing An Immutable Review Target
 
 先完成实际 verification；使用 exact commit/tree 或 staged tree hash，绑定 diff、source byte hashes、spec/plan 和 receipt。
-仅 staged 清单+时间不能证明 immutable bytes；Kimi 绑定 exact target，read-only，不 nested delegation。
+仅 staged 清单+时间不能证明 immutable bytes；原生 reviewer 绑定 exact target，read-only，不 nested delegation。
 
 ### Implementation Review
 先完成 project-native tests/Harness，再按 `/home/reggie/.codex/SUBAGENTS.md` 的低频 Risk Gate 判断。
-T3、Spec/Plan 存在、diff 大小或 Kimi 可用都不自动触发；未触发由 Codex Parent 正常完成。
-触发时只增加一名 Kimi adversarial read-only reviewer，Codex Parent 是 orchestrator/fixer/adjudicator；
-不叠加 Codex native reviewer。最低充分 package 绑定 exact snapshot、适用 Spec/Plan、AC 与 verification。
-封存、执行、模型/route proof、receipt 由 `external-subagent` Skill 独占；不把 PARSED/exit0/LGTM 当 acceptance。
+T3、Spec/Plan 存在、diff 大小或 agent 可用都不自动触发；未触发由 Codex Parent 正常完成。
+触发时只增加一名 native adversarial read-only reviewer，Parent 是 orchestrator/fixer/adjudicator；
+不叠加 Kimi 或第二 reviewer。最低充分 package 绑定 exact snapshot、适用 Spec/Plan、AC 与 verification。
+Native agent/profile/权限/执行证据按 SUBAGENTS.md 核验，不伪造 external route/Docker 资格；PARSED/exit0/LGTM 不构成 acceptance。直接走 native，不探测/重试 Kimi 或先消费两次失败。
 
 ### Adjudication
 
-Kimi review → Codex Parent 调查/裁决 → confirmed blocker 修复 → verification → 必要 Kimi re-review。
+Native review → Codex Parent 调查/裁决 → confirmed blocker 修复 → verification → 必要 native re-review。
 Parent 用 source、contracts、tests/Harness 和 runtime evidence 关闭 findings，不投票或为争取共识反复调用。
 Semantic fix 绑定新 target；isolated boundary 用 targeted re-review，广域语义变更用 full re-review。
-有限轮次、升级和连续故障的单 native 替换由 SUBAGENTS.md 独占；不得自动第四轮或叠加 reviewer。
+有限轮次、升级与接手由 SUBAGENTS.md 独占；旧 findings/失败与轮次保留，不得自动第四轮或叠加 reviewer。
 没有 unresolved blocker 才具 completion eligibility，Parent 拥有最终决定；不得降低 AC 以消除 findings。
 本次用户同步取代旧 Spec/Plan 从 T3 推导的双审默认，不重写旧 findings/receipts 或冒充新 snapshot 已审。

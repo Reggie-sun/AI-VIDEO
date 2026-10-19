@@ -70,7 +70,7 @@ Blender 资产/参考制作先读 [routing](docs/blender-routing.md)；媒体实
 ## Agent Workflow Routing
 
 Native Codex 默认 primary，Skill 不自动拥有 lifecycle。流程选择前读 [Workflow Operations](.agent/context/control-plane-playbook.md#agent-workflow-operations)；authorized written spec 自动触发 `superpowers:writing-plans`，Spec/Plan 默认 Parent self-review。
-Implementation 先 tests/Harness，再按 `/home/reggie/.codex/SUBAGENTS.md` 的 Risk Gate 判断；未触发由 Parent 完成，触发仅一名受管 read-only Kimi reviewer，不叠加 native reviewer。Parent 裁决/修复，exact snapshot、有限轮次、re-review 和连续故障 fallback 由该 owner 独占；required review/unresolved blocker 不得绕过。额外 reviewer 仅按用户新的明确要求。
+Engineering delegation/review 全部使用 Codex 原生子代理，不调用/探测 Kimi 或先等两次失败；用户以后明确重新启用 external subagent 前不自动换其他 provider。Implementation 先 tests/Harness，再按 `/home/reggie/.codex/SUBAGENTS.md` 的低频 Risk Gate 判断；未触发由 Parent 完成，触发仅一名 read-only native reviewer。Parent 裁决/修复，exact snapshot、有限轮次与 re-review 由该 owner 独占；required review/unresolved blocker 不得绕过，旧历史不重置。额外 reviewer 仅按用户新的明确要求。
 
 ## Change Rules
 

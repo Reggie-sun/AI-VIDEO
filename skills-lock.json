@@ -19,6 +19,12 @@
       "skillPath": "skills/dcc/blender/scenario-blender-animation/SKILL.md",
       "computedHash": "c0e5d5a9485f0ca5dc1e7f1c29d0d2ac00f5b5d036c74246c633069ec722b7c6"
     },
+    "scenario-blender-blockout": {
+      "source": "scenario-labs/skills",
+      "sourceType": "github",
+      "skillPath": "skills/dcc/blender/scenario-blender-blockout/SKILL.md",
+      "computedHash": "a40d2b97f8793f66959b2968a01f3283228d2028e6fe35500d771e60f1c61314"
+    },
     "scenario-blender-expert": {
       "source": "scenario-labs/skills",
       "sourceType": "github",
