@@ -40,8 +40,8 @@ actual reference/terminal handoff、axis/action/camera endpoint、prompt适配/l
 #### Raw Creative Input Director Strategy Gate
 
 请求分来源保留、新创作/已授权优化（design）、已知失败 repair；边界归 [`open-video` Step 1](../../.agents/skills/open-video/SKILL.md)。
-已选来源核对原文/reference，转为语义不变 approved Shot；缺 artifact 不授权优化，缺证据不编造。
-来源保持 actual prompt/reference；技术适配展示 diff；repair 保全目标与已满足项，实质改写沿 human gate。
+原文/reference保语义，适配附diff；缺artifact不优化、不编造证据；repair保全目标/已满足项，实质改写沿human gate。
+画风/参考用[当前稿](../../docs/canvas-production-harness.md#current-inputs)，禁历史追加。
 仅 design 的未批准 raw input 作为 `DIRECTOR_PREFLIGHT_REQUEST` 入 `open-video`。
 prompt presence、时长阈值、`VIDEO_EXTEND` 不代替 design 判断；封存 verbatim inventory。
 核对 raw→inventory→coverage，执行 [validator](../../.agents/skills/open-video/scripts/validate_director_coverage.py)，FAIL 停止；选 single_take/multi_shot，保留 rationale/user evidence。

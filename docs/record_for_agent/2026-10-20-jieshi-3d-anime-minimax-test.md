@@ -8,6 +8,8 @@ learning_eligibility: ineligible
 
 Date: 2026-10-20
 
+后续共享控制层修复见[当前输入控制](2026-10-20-canvas-current-input-control.md)；下方原试片的失败、未验证项和消费历史保留，工程修复不改变媒体判定。
+
 ## Uploaded Style S01 Actual Result
 
 当前用户上传图方向已完成一次真实MiniMax S01，actual attempt为`canvas-f537c7549329d0c5b4cc8254756e0a2054d2e75f`。父单元暂停后未发视频POST；camera-corrected子单元是本新目标的唯一POST。真实body与下方native preview的SHA/26,771,514 bytes完全一致，实际9张不同reference image加唯一5秒新白模，不是旧单首帧路线。原16项raw/38项FinalOutput及0–3秒采用窗口保留；本次没有渲染3秒composition。

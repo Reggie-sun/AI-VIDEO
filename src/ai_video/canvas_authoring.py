@@ -194,8 +194,14 @@ def author_canvas_project(*, packet, direction, registry=None, asset_artifacts=(
     shots = []
     for index, (unit, row) in enumerate(zip(units, rows, strict=True)):
         if set(row) - {"occurrence_id", "shot", "adaptation_reason", "source_dialogue",
-                       "generation", "composition", "boundary", "reference_replacements", "state_reference"}:
+                       "generation", "composition", "boundary", "reference_replacements", "state_reference",
+                       "source_revision", "visual_style"}:
             raise ValueError("unknown Shot director fields")
+        from ai_video.canvas_source_revision import require_canvas_source_revision
+        from ai_video.canvas_visual_style import require_canvas_visual_style
+
+        require_canvas_source_revision(packet=packet, unit=unit, row=row, previous=previous)
+        require_canvas_visual_style(row, registry)
         state_plan = row.get("state_reference")
         if state_plan is not None:
             from ai_video.canvas_review import DIMENSIONS

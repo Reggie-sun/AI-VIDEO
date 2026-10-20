@@ -136,6 +136,142 @@ def test_intermediate_reference_consumes_accepted_bytes_and_replays_without_effe
     assert provider.call_counts.submit == 1
 
 
+def test_rich_source_state_handoff_revisions_canonical_source_and_replays_exactly(tmp_path):
+    from ai_video.canvas_assets import prepare_canvas_png_assets
+    from ai_video.canvas_source_expression import adapted_canvas_prompt
+    from ai_video.canvas_source_revision import (
+        _previous_director, effective_prompt_sha256, retained_source_revision,
+    )
+    from ai_video.production.hashing import canonical_sha256
+    from ai_video.production.registry import registry_semantic_sha256
+    from ai_video.production.seedance_source_expression import (
+        PreservedSourceExpression, SourceReferenceMaterial, SourceReferencePart,
+        SourceTextPart, source_parts_sha256,
+    )
+    from scripts.canvas_sequence_packet import build_sequence_packet
+    from test_canvas_sequence_packet import document
+    from production_project_factory import _p7_png
+
+    service, provider, limits, auth, _placeholder_id = state_target(tmp_path)
+    previous = service._load()
+
+    raw_document = document()
+    target_node = next(node for node in raw_document["nodes"] if node["id"] == "b")
+    target_draft = target_node["data"]["generationDraft"]
+    target_draft["references"] = [ref for ref in target_draft["references"]
+        if ref["slotId"] != "voice-slot"]
+    raw_document["edges"] = [edge for edge in raw_document["edges"]
+        if not (edge["source"] == "voice" and edge["target"] == "b")]
+    packet = build_sequence_packet(raw_document, {"node_ids": ["a", "b"]})
+    target_unit = next(unit for unit in packet["units"] if unit["occurrence_id"] == "b")
+    baseline = _previous_director(previous)
+    baseline_unit = next(unit for unit in baseline["packet"]["units"]
+        if unit["occurrence_id"] == "b")
+    assert target_unit["prompt_source"]["parts"] == baseline_unit["prompt_source"]["parts"]
+
+    local_path = tmp_path / "retained-room.png"
+    local_path.write_bytes(_p7_png(rgba=b"\x11\x22\x33\xff"))
+    scene_id = "canvas-local-room-for-state-handoff"
+    local_registry, local_artifacts = prepare_canvas_png_assets(packet=packet,
+        selections=[{"asset_id": scene_id, "node_id": "room", "resource_id": "room-resource",
+            "path": local_path, "usage_license": "fixture-only"}], allowed_asset_root=tmp_path)
+    local_scene_asset = local_registry.assets[0]
+    registry = previous.registry.model_copy(update={"assets": tuple(sorted(
+        (*previous.registry.assets, local_scene_asset), key=lambda asset: asset.asset_id))})
+    registry_hash = registry_semantic_sha256(registry)
+    registry = registry.model_copy(update={"revision_id": registry_hash, "content_hash": registry_hash})
+
+    direction = deepcopy(service.direction)
+    target = next(row for row in direction["shots"] if row["occurrence_id"] == "b")
+    next(scene for scene in direction["scenes"] if scene["scene_id"] == "after")[
+        "visual_reference_asset_ids"] = [scene_id]
+    target["generation"]["references"] = [{"role": "scene_reference", "asset_id": scene_id}]
+    target["state_reference"]["replace_asset_id"] = scene_id
+    raw_parts = target_unit["prompt_source"]["parts"]
+    text_part = next(part for part in raw_parts if part["type"] == "text")
+    room_part = next(part for part in raw_parts if part["type"] == "extension")
+    expression_parts = (
+        SourceTextPart(text=text_part["text"]),
+        SourceReferencePart(slot_id=room_part["object_id"], materials=(
+            SourceReferenceMaterial(asset_id=scene_id, asset_sha256=local_scene_asset.sha256, role="scene"),
+        )),
+    )
+    expression = PreservedSourceExpression(contract_version="seedance-preserved-source/2",
+        source_sha256=source_parts_sha256(expression_parts), parts=expression_parts)
+    target["shot"]["preserved_source_expression"] = expression.model_dump(mode="json")
+    prompt = adapted_canvas_prompt(target["shot"]["preserved_source_expression"])
+    target["shot"]["intent"] = prompt
+    target["generation"]["generation_intent"]["subject_action"]["progression"] = prompt
+    target["source_revision"] = retained_source_revision(previous=previous,
+        packet=packet, row=target,
+        reason="Retain the inspected source parts while binding the selected accepted-state reference.")
+
+    baseline_row = next(row for row in baseline["direction"]["shots"]
+        if row["occurrence_id"] == "b")
+    setup_revision = target["source_revision"]
+    assert setup_revision["baseline_source_snapshot_sha256"] == baseline["packet"]["source_snapshot_sha256"]
+    assert setup_revision["baseline_prompt_parts_sha256"] == canonical_sha256({
+        "parts": baseline_unit["prompt_source"]["parts"]})
+    assert setup_revision["baseline_effective_prompt_sha256"] == effective_prompt_sha256(baseline_row)
+
+    service.packet = packet
+    service.direction = direction
+    service.revise_authoring(attempt_id="rich-source-state-reference",
+        registry=registry, asset_artifacts=local_artifacts)
+    assert service.direction["shots"][0]["shot"].get("preserved_source_expression") is None
+    assert service.direction["shots"][1]["shot"]["preserved_source_expression"]["parts"][0][
+        "text"] == text_part["text"]
+
+    accept_current(service, provider, limits, auth)
+    pre_handoff = service._load()
+    pre_handoff_baseline = _previous_director(pre_handoff)
+    pre_handoff_baseline_row = next(row for row in pre_handoff_baseline["direction"]["shots"]
+        if row["occurrence_id"] == "b")
+    pre_handoff_baseline_unit = next(unit for unit in pre_handoff_baseline["packet"]["units"]
+        if unit["occurrence_id"] == "b")
+    gate = reference_gate(service)
+    evaluations = 0
+    original_adjudicate = gate["adjudicate"]
+
+    def count_evaluation(*args):
+        nonlocal evaluations
+        evaluations += 1
+        return original_adjudicate(*args)
+
+    gate["adjudicate"] = count_evaluation
+    args = {"source_shot_id": "one", "target_occurrence_id": "b", "frame_index": 7,
+        "replace_asset_id": scene_id, "usage_license": "fixture-only", **gate}
+    accepted_frame = service.handoff_reference(**args)
+    loaded = service._load()
+    revised_target = next(row for row in service.direction["shots"] if row["occurrence_id"] == "b")
+    revised_expression = revised_target["shot"]["preserved_source_expression"]
+    revised_parts = revised_expression["parts"]
+    validated_expression = PreservedSourceExpression.model_validate(revised_expression)
+    assert revised_parts[0]["text"] == text_part["text"]
+    assert revised_parts[1]["materials"] == [{
+        "asset_id": accepted_frame.asset_id, "asset_sha256": accepted_frame.sha256, "role": "scene",
+    }]
+    assert validated_expression.source_sha256 == source_parts_sha256(validated_expression.parts)
+    assert revised_target["reference_replacements"][accepted_frame.asset_id] == {
+        "original_asset_id": scene_id, "source_shot_id": "one", "frame_index": 7,
+    }
+    handoff_revision = revised_target["source_revision"]
+    assert handoff_revision["baseline_source_snapshot_sha256"] == packet["source_snapshot_sha256"]
+    assert handoff_revision["baseline_prompt_parts_sha256"] == canonical_sha256({
+        "parts": pre_handoff_baseline_unit["prompt_source"]["parts"]})
+    assert handoff_revision["baseline_effective_prompt_sha256"] == effective_prompt_sha256(
+        pre_handoff_baseline_row)
+    assert require_canvas_state_reference(loaded=loaded, asset=accepted_frame)[
+        "reference"]["frame_index"] == 7
+
+    manifest_revision = loaded.manifest.manifest_revision
+    assert service.handoff_reference(**args) == accepted_frame
+    assert service._load().manifest.manifest_revision == manifest_revision
+    assert evaluations == 1
+    assert args["session"].calls == 1
+    assert provider.call_counts.submit == 1
+
+
 def test_source_video_handoff_binds_accepted_mp4_and_replays_before_successor_prepare(tmp_path):
     service, provider, limits, auth, aid = state_target(tmp_path)
     service.direction["shots"][1]["state_reference"]["conditioning"] = "source_video"

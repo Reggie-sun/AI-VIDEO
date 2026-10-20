@@ -136,6 +136,12 @@ class CanvasProductionService:
         loaded = load_production_project(self.committer.project_root / "project.yaml")
         if direction_reference(self.packet, self.direction) not in loaded.project.source_provenance:
             raise _blocked("Canvas source or director data changed; approve a canonical authoring revision.")
+        from ai_video.canvas_visual_style import require_canvas_visual_style
+        for row in self.direction["shots"]:
+            try:
+                require_canvas_visual_style(row, loaded.registry)
+            except ValueError as error:
+                raise _blocked("Canvas visual-style inputs no longer match the approved references.") from error
         expected = []
         active = {s.shot_id for s in loaded.shots}
         for row in self.direction["shots"]:
@@ -376,7 +382,10 @@ class CanvasProductionService:
         if position.next_action != "prepare":
             raise _blocked(f"Current canvas action is {position.next_action}; do not create another attempt.")
         row = next(r for r in self.direction["shots"] if r["occurrence_id"] == position.occurrence_id)
-        return self._orchestrator(row).prepare(limits=limits)
+        prepared = self._orchestrator(row).prepare(limits=limits)
+        from ai_video.canvas_visual_style import require_prepared_visual_style
+        require_prepared_visual_style(row, prepared)
+        return prepared
 
     def _repair_context(self, limits, interventions):
         position = self.position()
@@ -437,8 +446,11 @@ class CanvasProductionService:
         strategy = self._quality_repair_strategy(position)
         if strategy is not None:
             return strategy
-        return self._orchestrator(row, repair_receipt=receipt).prepare(
+        prepared = self._orchestrator(row, repair_receipt=receipt).prepare(
             limits=limits, interventions=interventions)
+        from ai_video.canvas_visual_style import require_prepared_visual_style
+        require_prepared_visual_style(row, prepared)
+        return prepared
 
     @_input_errors
     def start_repair(self, *, limits, interventions=()):
@@ -476,6 +488,9 @@ class CanvasProductionService:
     def _start_prepared(self, position, prepared, limits):
         if prepared.execution_binding is None:
             return prepared  # Router's typed capability/authoring exit, no Provider effect.
+        from ai_video.canvas_visual_style import require_prepared_visual_style
+        row = next(r for r in self.direction["shots"] if r["occurrence_id"] == position.occurrence_id)
+        require_prepared_visual_style(row, prepared)
         from ai_video.canvas_authoring import input_hash
         attempt_id = "canvas-" + input_hash({"project": self.direction["project_id"],
             "task": limits.task_id, "shot": position.shot_id,
@@ -630,12 +645,18 @@ class CanvasProductionService:
         revised = replace_state_reference(direction=self.direction, loaded=loaded,
             target_occurrence_id=target_occurrence_id, replace_asset_id=replace_asset_id,
             asset=selected.asset, source_shot_id=source_shot_id, frame_index=frame_index)
+        from ai_video.canvas_source_revision import retained_source_revision
+        revised_row = next(r for r in revised["shots"] if r["occurrence_id"] == target_occurrence_id)
+        revised_row["source_revision"] = retained_source_revision(previous=loaded, packet=self.packet,
+            row=revised_row, reason="Canonical accepted-state handoff; inspected source retained verbatim.")
+        from ai_video.canvas_visual_style import require_canvas_visual_style
         existing = next((a for a in loaded.registry.assets if a.asset_id == selected.asset.asset_id), None)
         if existing is None:
             registry = loaded.registry.model_copy(update={"assets": tuple(sorted(
                 (*loaded.registry.assets, selected.asset), key=lambda a: a.asset_id))})
             digest = registry_semantic_sha256(registry)
             registry = registry.model_copy(update={"revision_id": digest, "content_hash": digest})
+            require_canvas_visual_style(revised_row, registry)
             request = prepare_project_registry_commit(manifest=loaded.manifest, project=loaded.project,
                 registry=registry, attempt_id=f"canvas-state-register-{selected.asset.input_fingerprint}")
             request = replace(request, artifacts=tuple(sorted((*request.artifacts, *selected.artifacts),
@@ -647,6 +668,8 @@ class CanvasProductionService:
             loaded = self._load()
         elif existing != selected.asset:
             raise _blocked("State reference identity was reused with different inputs.")
+        else:
+            require_canvas_visual_style(revised_row, loaded.registry)
         self.direction = revised
         self.revise_authoring(attempt_id=f"canvas-state-bind-{selected.asset.input_fingerprint}")
         return selected.asset

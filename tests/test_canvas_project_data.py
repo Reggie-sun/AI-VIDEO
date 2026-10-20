@@ -811,6 +811,29 @@ def test_nominal_15_second_example_uses_real_seedance_compiler_without_effects(t
             if p.get("object_id") != draft["references"][1]["slotId"]]
     packet, data, registry, artifacts = prepare_canvas_project_data(
         inspection=inspect_canvas_source(original, definition["selection"]), definition=definition, data_root=root)
+    from ai_video.production.hashing import canonical_sha256
+    baseline = {row["shot"]["shot_id"]: unit for unit, row in
+        zip(service.packet["units"], service.direction["shots"], strict=True)}
+    baseline_rows = {row["shot"]["shot_id"]: row for row in service.direction["shots"]}
+    for unit, row in zip(packet["units"], data["shots"], strict=True):
+        old_parts = baseline[row["shot"]["shot_id"]]["prompt_source"]["parts"]
+        current_parts = unit["prompt_source"]["parts"]
+        if old_parts != current_parts:
+            row["source_revision"] = {
+                "contract_version": "canvas-source-revision/1",
+                "baseline_source_snapshot_sha256": service.packet["source_snapshot_sha256"],
+                "baseline_prompt_parts_sha256": canonical_sha256({"parts": old_parts}),
+                "baseline_effective_prompt_sha256": canonical_sha256({
+                    "intent": baseline_rows[row["shot"]["shot_id"]]["shot"]["intent"],
+                    "preserved_source_expression": baseline_rows[row["shot"]["shot_id"]]["shot"].get(
+                        "preserved_source_expression")}),
+                "reason": "Adopt the explicit example source, including repeated chips and tray-only references.",
+                "sections": [{"section_id": "current-example", "parts": current_parts}],
+                "dispositions": [{"part_index": index, "part_sha256": canonical_sha256(part),
+                    "disposition": "retained" if part in current_parts else "superseded",
+                    "reason": "Retain the exact part or supersede its explicit chip with the selected tray binding."}
+                    for index, part in enumerate(old_parts)],
+            }
     # Existing fixture's original raw source is identical except observed batch
     # history: approve the exact new source through the canonical revision seam.
     service.packet, service.direction = packet, data

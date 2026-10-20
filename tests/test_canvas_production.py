@@ -208,6 +208,15 @@ def test_changed_director_data_is_blocked_before_provider_effect(tmp_path):
     assert provider.call_counts.submit == 0
 
 
+def declare_intent_revision(previous, changed, shot_id):
+    from ai_video.canvas_source_revision import _previous_director, retained_source_revision
+
+    packet = _previous_director(previous)["packet"]
+    row = next(r for r in changed["shots"] if r["shot"]["shot_id"] == shot_id)
+    row["source_revision"] = retained_source_revision(previous=previous, packet=packet, row=row,
+        reason="Explicit director viewpoint revision; inspected source retained.")
+
+
 def test_authoring_revision_rebases_canonical_graph_without_rewriting_history(tmp_path):
     from ai_video.production.dependency import desired_fingerprints
     service, provider, _, _ = runtime(tmp_path)
@@ -215,6 +224,7 @@ def test_authoring_revision_rebases_canonical_graph_without_rewriting_history(tm
     old_bytes = {p: p.read_bytes() for p in service.committer.project_root.rglob("*") if p.is_file()}
     changed = deepcopy(service.direction)
     changed["shots"][0]["shot"]["intent"] = "Observe an arrival from the side"
+    declare_intent_revision(before, changed, "one")
     revised = CanvasProductionService(committer=service.committer, packet=service.packet, direction=changed)
     revised.revise_authoring(attempt_id="canvas-director-revision")
     after = revised._load()
@@ -240,6 +250,7 @@ def test_revision_preserves_an_unrelated_already_adopted_shot(tmp_path):
     before = service._load()
     changed = deepcopy(service.direction)
     changed["shots"][1]["shot"]["intent"] = "Watch the road from a new viewpoint"
+    declare_intent_revision(before, changed, "two")
     revised = CanvasProductionService(committer=service.committer, packet=service.packet, direction=changed)
     revised.revise_authoring(attempt_id="second-director-revision")
     after = revised._load()

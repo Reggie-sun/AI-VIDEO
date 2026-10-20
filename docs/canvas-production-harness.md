@@ -98,6 +98,46 @@ local-selection/measurement receipt，限制 2–15 秒、整数 FPS、50 MiB、
 frame/sample/trim 仍只由 `ResolvedTimeline` 派生。重复节点使用独立 occurrence 和 Shot ID。
 未知源 tick timebase 或 speed 不会被猜成执行时间。
 
+## Current Inputs
+
+用户更换画风、参考或修复已知输入问题时，Agent先整理**完整当前稿**，重新inspection；历史提示与修订说明留在既有immutable authoring input和主记录，不追加进新的模型提示词。旧source/compiler仍逐字保留当前批准稿，不负责理解“后文覆盖前文”、删重复或自动改写原剧情。先对照原目标和已满足项审核差异，再走既有`author`/`revise`；不写作品专用执行脚本。
+
+已有Canvas Shot修改原始prompt、实际`Shot.intent`或`preserved_source_expression`时，`direction.shots[]`必须使用`source_revision`，包括移除已有原文保留表达；不因未声明画风字段或observed packet没有parts而豁免。新Shot初稿和未改稿的legacy重开保持兼容。baseline按canonical Shot ID关联，改Canvas节点名不重置控制历史：
+
+- `contract_version: canvas-source-revision/1`、非空`reason`。
+- `baseline_source_snapshot_sha256`绑定重开的上一版Canvas packet；`baseline_prompt_parts_sha256`是`canonical_sha256({"parts": baseline_parts})`。
+- `baseline_effective_prompt_sha256`由`canvas_source_revision.effective_prompt_sha256(baseline_row)`计算：绑定上一版`Shot.intent`、`preserved_source_expression`；没有保留表达式的legacy编译路线另纳入typed、规范序列化的`generation.generation_intent`，覆盖动作、表演等实际编入native prompt的指导。output/reference等执行配置不混入该payload；不是本版intent的hash。
+- `sections: [{section_id, parts}]`只列当前有效段落；section ID唯一，其`parts`依序展开必须等于本版inspection的`prompt_source.parts`。替换同一职责时更新当前section，不保留另一份历史指令。
+- `dispositions: [{part_index, part_sha256, disposition, reason}]`逐项覆盖上一版parts；part hash用`canonical_sha256(part)`，`disposition`为`retained`或`superseded`。保留项不能消失，被替代的完整旧文字不能继续混在新提示中。
+
+没有结构化parts的observed prompt按一个`{"type":"text","text": source_text}`part进入同一inventory，observed prompt须与source_text一致；保留逐字原文，不自动拆段。只改导演intent而保留原始source时，仍列出全部原始parts为retained，并填写明确改稿理由。
+
+既有accepted-state handoff由原owner调用`retained_source_revision`，在Registry注册前为机械材料替换生成canonical baseline及逐项retained声明；该helper拒绝原始parts/source_text变化，不自动审核画风或其他创意改稿。完整参考仍须沿既有accepted-source与exact replay校验，不借新声明绕过媒体Gate。换图使画风review失效时在Registry注册前停止，需Agent重新查看并显式建稿，不能自动继承审美结论。
+
+`canvas_source_revision`从标准loader取得的上一版Project重开canonical director input，拒绝stale baseline、漏项、重复section、当前parts漂移或历史回流。声明随现有director provenance封存；已批准修订可重开和exact replay，有效intent或原文表达变更不能冒用旧声明的replay快捷路径，也不能在后续改稿中静默丢弃。检查只验证显式处置与字节，语义等价、原剧情/动作/声音保全仍需Agent按完整目标审核；把旧词换成近义词不构成已验证修复。
+
+全镜换画风的每个Shot必须声明`visual_style`，不因legacy字段可选而省略：
+
+```json
+{
+  "contract_version": "canvas-visual-style/1",
+  "scope": "whole_shot",
+  "source": {"asset_id": "current-style-character", "asset_sha256": "<exact-selected-PNG-SHA256>"},
+  "reviews": [{
+    "asset_id": "current-style-character", "asset_sha256": "<exact-selected-PNG-SHA256>",
+    "role": "character_reference", "owner_id": "character-id",
+    "current_style_sha256": "<same-style-anchor-SHA256>",
+    "disposition": "current_style", "observation": "实际查看该exact图后记录的画风检查"
+  }]
+}
+```
+
+示例仅展示一条review的结构，实际须覆盖全部选中的图片，包括辅助图、场景和端点图；人物/场景引用的`owner_id`须匹配对应Character/Scene。完整端点图由当前Shot拥有，review可用`covered_owner_ids`明确列出已实际看图检查的可见角色和Scene；前镜terminal仍沿canonical前镜owner。这样允许已审核完整首帧覆盖多人构图，不强制改成九图参考路线，也不从图片自动推断人物是否齐全。style anchor本身必须是实际选择的Registry图片，不用任意字符串冒充已传给模型的原上传图。每条review绑定本图SHA与当前anchor SHA；漏图、换图未重审、旧画风review、漏角色或场景均阻断authoring。显式offscreen角色沿既有表演契约说明，不伪造可见参考。
+
+`whole_shot`为默认范围，不能用仍为旧风格的`identity_layout_only`参考冒充全量换风格。确实采用混合参考时显式选`scope: mixed_reference_guidance`并填写`mixed_reference_reason`，每个例外另填`reason`及最终native prompt逐字包含的`scope_text`；预检报告`PARTIAL_REFERENCE_STYLE`，不声称全镜风格统一。图片实际是否同风格由观察者判断，确定性校验器不能从SHA推断审美。
+
+`canvas_visual_style`在authoring、当前service重开、prepare及start前使用同一契约；prepare/start还对照实际requirement evidence、resolved image bindings和native scope，阻止声明中的图被漏传、替换或新增未审图。`preflight.shots[].visual_style_control`区分覆盖、例外与`aesthetic_acceptance/source_consumption: NOT_EVALUATED`；编译绑定检查不代表Provider已经执行或画风已通过。legacy未声明的输入保持原序列化/编译行为，报告`NOT_DECLARED`；旧失败片与付费历史不因工程修复而改变。
+
 ## Operator Runtime
 
 Provider、private credential supplier、paid authorizer、routing/decision policy、limits、MCP evaluator 和

@@ -143,6 +143,8 @@ optional generated-source copy由 `canvas_image_provenance` 重验contained外�
 `canvas_planning` 派生 current Planner/Router 输入，实际 accepted source/末态/C2 materialization 仍归下列 owners；
 缺 boundary 不默认为独立，declared continuity 不允许降级。`canvas_dependencies` 只调用既有 graph/resolver 和
 strategy transition；`canvas_composition` 只构建 CompositionSpec，不解释源 ticks 或建立第二 timeline。
+
+`canvas_source_revision`独占上层当前section/旧part处置声明的校验，从canonical authoring input重开baseline；历史不拼入新prompt，不自动改写自然语言或替代原文compiler。`canvas_visual_style`独占显式画风anchor、逐图/owner/current-style SHA覆盖及最终native引用/scope一致性；whole-shot与显式mixed-reference区分，legacy未声明不冒称覆盖。声明随原director provenance保存，仍由`canvas_authoring`准备、唯一committer修订；`CanvasProductionService`在重开/prepare/start复验。两者不拥有Production schema、Provider选择/调用或审美/媒体验收；用法与边界归[当前输入修订](canvas-production-harness.md#current-inputs)，checks归原Canvas workflow suite。
 逐镜显式 MCP evaluation 后才 validate/activate/下一镜；resume、unknown、permit、paid 和恢复仍由既有 owners 裁决。
 `prepare_repair` / `start_repair` 只把同task的显式 intervention 交给原 GenerationFeedbackOrchestrator，
 前序须有 exact terminal quality-rejection；不自动关闭失败或POST。`canvas_recovery` 仅从 canonical binding
