@@ -56,7 +56,7 @@ Date: 2026-10-21
 
 当前会话的 `filesystem.read_media_file` 实际返回 `audio content omitted because you do not support audio input`。未绕过输入限制、调用付费识音或把声学统计当成听音。
 
-保留原 MP4，另制作同一原声的 **audio-only +20dB 试听**：`review/native-audio-plus20dB-listen.wav`，实测平均 `−29.1 dBFS`、峰值 `−8.7 dBFS`。这是判断原声内容是否可用的诊断文件，没有新增音效，也没有完成视频混音。试听请求已交用户；截至本次记录，尚无该 WAV 的内容反馈。原 MP4 的声音问题没有被修复。
+保留原 MP4，另制作同一原声的 **audio-only +20dB 试听**：`review/native-audio-plus20dB-listen.wav`，SHA `bdae0ce64d750b1f15f8c49b1f27c481a67f79588f6fb763a75dcddd21756af0`，实测平均 `−29.1 dBFS`、峰值 `−8.7 dBFS`。用户试听后明确反馈 **“噪声更多”**，见 `review/user-feedback-audio-diagnostic.json`。因此这条原声不适合作为当前片段的声音，继续放大不能补出可用的环境/动作内容。这只评价本次输出，不外推所有 H3 原声。诊断没有新增音效或完成视频混音，原 MP4 的声音问题没有被修复。
 
 现有 `register_generated_video_audio` 的来源检查要求 remote/metered 的 fetched evidence；当前 development repair-input 也明确不接收 local fetch。不得把本地原声伪装成远端生成、普通独立录音或已验收素材，也不得为嵌回声音 direct mux 或手造 timeline。本轮没有为此修改代码、Policy 或 Gate；若继续做完整声音修复，先由现有 P4 owner 确定有据可用的路径，保留这项实际接入限制。
 
@@ -66,7 +66,7 @@ Date: 2026-10-21
 
 **存在明确执行偏差。** 原生 Prompt 确实保留了“转向出口、开始离开、看见新座位、再决定返回”，输出缺少这条链。不能归因为 Compiler 把动作删掉；也不能用一次结果断言所有 H3、I2V 或单镜头都做不到。
 
-**目前不需要再次生成画面来处理声音。** 用户认为自然度还好，先判断放大后的原声是否有可保留的环境/动作内容；无可用内容时做单独声音设计。不得把仅提高响度说成声音语义、同步或完整成片通过。
+**目前不需要再次生成画面来处理声音。** 用户认为自然度还好，但已否定放大后原声的可用性。保留画面，下一步应单独制作房间环境、脚步以及挪位/坐下时的布料和坐垫声，再经相称的 P4 路径合成、原速复核。没有把提高响度当成修复，也没有用配乐覆盖噪声后声称声音完成。
 
 若继续验证原导演命题，先取一段正常速度、真正包含“察觉邀请才改变行动”的表演参考，验证关系本身能否独立读懂，再选择能保留其表演时机的制作路线。若只修改首帧朝向或再次抽样，仍不能假定情绪层次会随动作补齐。本轮不再无限微调同一 Prompt。
 
@@ -74,7 +74,7 @@ Date: 2026-10-21
 
 真实 ComfyUI 调用共两次图像生成、一次视频生成。视频 prompt ID `12ea2097-fab2-4e7e-bfdd-fa06b7db1f65`，执行约11分32秒。此前 `stay-video-01` 因任务脚本图像 resolver 的参数绑定错误，在上传/permit消费/prompt effect之前失败；经明确调用路径证明、唯一 committer 和一次性 runtime-repair grant 恢复。`stay-video-02` 因计数投影不一致在 submit intent 前被拒并正式关闭；未用 advisory hash 重置消费。`stay-video-03` 保留旧计数、原 Prompt/seed/profile/QA 后完成唯一实际视频生成。诊断与恢复证据均在 run，未手改 Manifest 或重复消费旧 permit。
 
-`runtime-repair2-video-fetched.json`、`runtime-repair2-video-fetch-receipt.json`、`review/video-analysis-response.json`、`review/decode-and-acoustic-facts.json`、`review/user-feedback.json`、`review/audio-diagnostic.json`、`media-gate.json` 保存当前证据。`media-gate.json` 为 Agent-side STOP，不冒充 Production QA receipt；本 run 的视频仍停在 fetched/VALIDATE，未激活、未提交后镜、未签 P6/Final Acceptance 或发布。
+`runtime-repair2-video-fetched.json`、`runtime-repair2-video-fetch-receipt.json`、`review/video-analysis-response.json`、`review/decode-and-acoustic-facts.json`、`review/user-feedback.json`、`review/audio-diagnostic.json`、`review/user-feedback-audio-diagnostic.json`、`media-gate.json` 保存当前证据。`media-gate.json` 为 Agent-side STOP，不冒充 Production QA receipt；本 run 的视频仍停在 fetched/VALIDATE，未激活、未提交后镜、未签 P6/Final Acceptance 或发布。
 
 本轮启动的 supervisor unit `ai-video-comfyui-4b5b4f74841d4621ac343791bbe6fb1d.service` 已在确认 ownership 与空队列后停止，未终止其他 FFmpeg 工作。工作区存在其他窗口的源码、文档和 index 变化；本轮没有将其纳入提交，也不能以本实验声称 clean main 的完整可复现性。
 
@@ -93,6 +93,6 @@ Date: 2026-10-21
 
 实际验证包括本地生成、标准 Production loader 重开、Director coverage/goal binding 校验、显式 MCP 抽帧、完整解码、声学电平测量、独立采样审片和用户反馈。没有用代码测试、reviewer 意见或工程 receipt 证明作品成功。
 
-自动评估 `distill-ai-video-learning`：**no_candidate**。只有一个实际视频实验，图片变体有混杂变量；没有多臂受控比较或足够独立重复支撑新通用导演规则。没有创建学习占位文档或修改 Skill。Agent Memory 后续检索报告 shard incompatible 并排队刷新，未等待/重建索引，也未将 RAG 当证据。
+自动评估 `distill-ai-video-learning`：**no_candidate**。只有一个实际视频实验，图片变体有混杂变量；没有隔离导演变量的受控比较或足够独立重复支撑新通用导演规则，原声增益试听也是同一声源的诊断。没有创建学习占位文档或修改 Skill。Agent Memory 后续检索报告 shard incompatible 并排队刷新，未等待/重建索引，也未将 RAG 当证据。
 
 唯一跟踪改动是本记录；媒体和任务脚本保留在 ignored run，未作为 Production release 发布。最终文档验证与提交身份由对应 exact-range Harness receipt、Git 及交付说明给出。
