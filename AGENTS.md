@@ -70,7 +70,7 @@ Blender 资产/参考制作先读 [routing](docs/blender-routing.md)；媒体实
 ## Agent Workflow Routing
 
 Native Codex 默认 primary，Skill 不自动拥有 lifecycle。流程选择前读 [Workflow Operations](.agent/context/control-plane-playbook.md#agent-workflow-operations)；authorized written spec 自动触发 `superpowers:writing-plans`，Spec/Plan 默认 Parent self-review。
-Engineering delegation/review 全部使用 Codex 原生子代理，不调用/探测 Kimi 或先等两次失败；用户以后明确重新启用 external subagent 前不自动换其他 provider。Implementation 先 tests/Harness，再按 `/home/reggie/.codex/SUBAGENTS.md` 的低频 Risk Gate 判断；未触发由 Parent 完成，触发仅一名 read-only native reviewer。Parent 裁决/修复，exact snapshot、有限轮次与 re-review 由该 owner 独占；required review/unresolved blocker 不得绕过，旧历史不重置。额外 reviewer 仅按用户新的明确要求。
+Engineering delegation/review 全部使用 Codex 原生子代理，不调用/探测 Kimi 或先等两次失败；用户以后明确重新启用 external subagent 前不自动换其他 provider。完成与改动影响相称的局部验证后，按 `/home/reggie/.codex/SUBAGENTS.md` 的低频 Risk Gate 判断独立审查；未触发由 Parent 完成，触发仅一名 read-only native reviewer。Parent 裁决/修复，exact snapshot、有限轮次与 re-review 由该 owner 独占；required review/unresolved blocker 不得绕过，旧历史不重置。额外 reviewer 仅按用户新的明确要求。
 
 ## Change Rules
 
@@ -101,6 +101,7 @@ Strict loopback、完全 local/unmetered、无 cloud egress 的任务内 ComfyUI
 
 ## Verification Contract
 
+迭代与复审按改动影响做局部验证，必要复审完成且候选稳定后再运行最终完整 policy checks；仅新改动、失败或未决风险使既有证据失效时补跑相应检查，不因流程轮次或记录要求机械全量重跑。
 执行 `make harness-inspect`，完成前按 [Verification Details](.agent/context/control-plane-playbook.md#4-verification-pilot-and-delivery-details) 验 nonempty exact staged snapshot 或 exact commit range 的全部 policy checks 与 fresh receipt。Unmapped path fail safe 到 full tests + task Architecture Gate，不刷新 baseline 隐藏 regression；Harness 隔离验证 checkout 不授权开发 worktree。
 Harness 不拦截任意 tool/shell、不调度 Agent、不读 secret、不运行 live media、不 mutation Production、不代签 P6/Final Acceptance；CI 自产 evidence，workflow 文件不证明 server enforcement。离线 PASS 只证明所测行为，exit 0 / `PARSED` / tests 不代替 required review 或真实验收。
 区分 execution、structure、function、criteria 与 final review 五层证据；`PASS/DONE/ACCEPTED` 须有对应证据，无法验证标 `NOT_EVALUATED`。

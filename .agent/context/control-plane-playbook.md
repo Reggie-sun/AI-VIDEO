@@ -100,8 +100,8 @@ reservation、egress、durable intent、one-use permit。Local video 仍经 `Vid
 
 `make harness-inspect` → exact staged snapshot 或 commit range 的 `make harness-verify` / `make harness-verify-range`
 → `make harness-receipt`。核验 scope/policy/artifact hashes/freshness；isolation/fallback 由 Harness tests 验证。
-`agent_rules_check` 每轮检查 rules/check references、links/anchors、guide/context budgets；`agent_rule_invariants` 与原 changed-path suites 验证迁移 invariant。
-迭代跑 focused tests，修复完成且 owned bytes 稳定后再跑最终 exact Harness；运行中不修改 snapshot，drift/读取失败停余项。数据/工程、image/shared-boundary 的 routing 与覆盖只归 policy，失效 receipt 不复用。
+Harness 中 `agent_rules_check` 核验 rules/check references、links/anchors、guide/context budgets；`agent_rule_invariants` 与原 changed-path suites 验证迁移 invariant。
+迭代/复审跑受影响 focused tests，必要复审完成且 owned bytes 稳定后运行最终 exact Harness；仅新改动/失败/未决风险使证据失效时补相应检查，不因轮次/记录机械全量重跑。运行中不改 snapshot，drift/读取失败停余项；routing/覆盖只归 policy，失效 receipt 不复用。
 Harness 不生成媒体或读 secret；CI 自产证据；remote enforcement 必须当前 server evidence。
 真实批量媒体前先完成约 30–60 秒、4–8 连续 Shots 的代表性 Pilot，包含任务主要 media/audio/captions/composition，
 人实际观看给 GO/NO-GO；NO-GO 不扩量。Reference asset 不自动成为 Final Shot Visual，跨非连续 Shot 复用须导演理由和人工 review。
@@ -190,21 +190,21 @@ Native Codex 默认 primary；settled bounded task 直接实施与 focused verif
 
 ### Constructing An Immutable Review Target
 
-先完成实际 verification；使用 exact commit/tree 或 staged tree hash，绑定 diff、source byte hashes、spec/plan 和 receipt。
+使用 exact commit/tree 或 staged tree hash，绑定 diff、source byte hashes、spec/plan 和验证结果。
 仅 staged 清单+时间不能证明 immutable bytes；原生 reviewer 绑定 exact target，read-only，不 nested delegation。
 
 ### Implementation Review
-先完成 project-native tests/Harness，再按 `/home/reggie/.codex/SUBAGENTS.md` 的低频 Risk Gate 判断。
+以相关局部验证为前提，按 `/home/reggie/.codex/SUBAGENTS.md` 的低频 Risk Gate 判断；最终 Harness 留到候选稳定后。
 T3、Spec/Plan 存在、diff 大小或 agent 可用都不自动触发；未触发由 Codex Parent 正常完成。
 触发时只增加一名 native adversarial read-only reviewer，Parent 是 orchestrator/fixer/adjudicator；
 不叠加 Kimi 或第二 reviewer。最低充分 package 绑定 exact snapshot、适用 Spec/Plan、AC 与 verification。
-Native agent/profile/权限/执行证据按 SUBAGENTS.md 核验，不伪造 external route/Docker 资格；PARSED/exit0/LGTM 不构成 acceptance。直接走 native，不探测/重试 Kimi 或先消费两次失败。
+Native profile/权限/执行证据按 SUBAGENTS.md 核验，不伪造 external/Docker 资格；PARSED/exit0/LGTM 不代替验收，不探测/重试 Kimi。
 
 ### Adjudication
 
-Native review → Codex Parent 调查/裁决 → confirmed blocker 修复 → verification → 必要 native re-review。
+Native review → Parent 调查/裁决 → confirmed blocker 修复 → 受影响局部验证 → 必要 native re-review。
 Parent 用 source、contracts、tests/Harness 和 runtime evidence 关闭 findings，不投票或为争取共识反复调用。
 Semantic fix 绑定新 target；isolated boundary 用 targeted re-review，广域语义变更用 full re-review。
 有限轮次、升级与接手由 SUBAGENTS.md 独占；旧 findings/失败与轮次保留，不得自动第四轮或叠加 reviewer。
 没有 unresolved blocker 才具 completion eligibility，Parent 拥有最终决定；不得降低 AC 以消除 findings。
-本次用户同步取代旧 Spec/Plan 从 T3 推导的双审默认，不重写旧 findings/receipts 或冒充新 snapshot 已审。
+旧 Spec/Plan 的双审默认已失效；保留历史，不冒称新 snapshot 已审。
