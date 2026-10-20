@@ -1,0 +1,24 @@
+{
+  "dialogue": {
+    "before": {
+      "sha256": "a1a02780dc79dd29d4d54920c37067003657f05c5122ef48da6695e6527b60d8",
+      "decoded_samples": 336896
+    },
+    "after": {
+      "sha256": "a1a02780dc79dd29d4d54920c37067003657f05c5122ef48da6695e6527b60d8",
+      "decoded_samples": 336896
+    },
+    "identical_decoded_audio": true
+  },
+  "word": {
+    "before": {
+      "sha256": "a1a02780dc79dd29d4d54920c37067003657f05c5122ef48da6695e6527b60d8",
+      "decoded_samples": 336896
+    },
+    "after": {
+      "sha256": "a1a02780dc79dd29d4d54920c37067003657f05c5122ef48da6695e6527b60d8",
+      "decoded_samples": 336896
+    },
+    "identical_decoded_audio": true
+  }
+}

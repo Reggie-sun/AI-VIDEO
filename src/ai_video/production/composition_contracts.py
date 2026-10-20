@@ -191,6 +191,7 @@ class CompositionSpec(VersionedArtifact):
     graphic_layer_ids: tuple[str, ...] = ()
     graphic_layer_animations: tuple[GraphicLayerAnimation, ...] = ()
     commercial_graphics: tuple[GraphicTreatment, ...] = ()
+    text_layers: tuple[GraphicTreatment, ...] = ()
     advertising_sound_cues: tuple[AdvertisingSoundCueProjection, ...] = ()
     ad_creative_plan_id: str | None = None
     ad_creative_plan_hash: str | None = Field(
@@ -218,6 +219,7 @@ class CompositionSpec(VersionedArtifact):
                 "graphic_layer_ids",
                 "graphic_layer_animations",
                 "commercial_graphics",
+                "text_layers",
                 "advertising_sound_cues",
                 "ad_creative_plan_id",
                 "ad_creative_plan_hash",
@@ -228,6 +230,16 @@ class CompositionSpec(VersionedArtifact):
 
     @model_validator(mode="after")
     def _validate_versioned_tracks(self) -> "CompositionSpec":
+        if self.text_layers and self.schema_version not in {"2.2", "2.3", "2.4"}:
+            raise ValueError("Authored text layers require CompositionSpec 2.2 or later")
+        for layer in self.text_layers:
+            if (layer.role is GraphicRole.DIALOGUE_SUBTITLE or layer.claim_reference_ids
+                    or layer.brand_token_ids or layer.keyword_emphasis or layer.sound_cue_ids
+                    or layer.synchronized_event_id):
+                raise ValueError("Generic text layers cannot bypass caption or AdCreativePlan bindings")
+        all_graphic_ids = [g.graphic_id for g in (*self.commercial_graphics, *self.text_layers)]
+        if len(set(all_graphic_ids)) != len(all_graphic_ids):
+            raise ValueError("Graphic IDs must be unique across commercial and generic text layers")
         mapped_shot_ids = {
             layer.shot_id for layer in self.layers if layer.source_time_map is not None
         }
@@ -322,6 +334,8 @@ class CompositionSpec(VersionedArtifact):
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, object]:
         data = handler(self)
+        if not self.text_layers:
+            data.pop("text_layers", None)
         if not self.voice_sources:
             data.pop("voice_sources", None)
         if self.schema_version == "2.0":
@@ -423,6 +437,20 @@ class ResolvedAudioSpan(StrictModel):
         return self
 
 
+class ResolvedCaptionWord(StrictModel):
+    text: str = Field(min_length=1)
+    start_sample: int = Field(ge=0)
+    end_sample: int = Field(gt=0)
+    start_frame: int = Field(ge=0)
+    end_frame_exclusive: int = Field(ge=0)
+
+    @model_validator(mode="after")
+    def _window(self) -> "ResolvedCaptionWord":
+        if self.end_sample <= self.start_sample or self.end_frame_exclusive < self.start_frame:
+            raise ValueError("Resolved word has an invalid window")
+        return self
+
+
 class ResolvedCaptionCue(StrictModel):
     caption_asset_id: str = Field(min_length=1)
     caption_asset_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -439,9 +467,24 @@ class ResolvedCaptionCue(StrictModel):
     style_content_hash: str | None = Field(
         default=None, pattern=r"^[0-9a-f]{64}$"
     )
+    words: tuple[ResolvedCaptionWord, ...] | None = None
+
+    @model_serializer(mode="wrap")
+    def _serialize_optional_words(self, handler: SerializerFunctionWrapHandler) -> dict[str, object]:
+        data = handler(self)
+        if self.words is None:
+            data.pop("words", None)
+        return data
 
     @model_validator(mode="after")
     def _validate_cue_bounds_and_style(self) -> "ResolvedCaptionCue":
+        previous_end = self.start_sample
+        for word in self.words or ():
+            if word.start_sample < previous_end or word.end_sample > self.end_sample:
+                raise ValueError("Resolved words must be monotonic and contained in cue")
+            if word.start_frame < self.start_frame or word.end_frame_exclusive > self.end_frame_exclusive:
+                raise ValueError("Resolved word frames must remain in cue")
+            previous_end = word.end_sample
         if self.end_sample <= self.start_sample:
             raise ValueError("resolved caption sample end must follow start")
         if self.end_frame_exclusive <= self.start_frame:
@@ -465,6 +508,7 @@ class ResolvedTimeline(VersionedArtifact):
     audio_spans: tuple[ResolvedAudioSpan, ...] = ()
     caption_cues: tuple[ResolvedCaptionCue, ...] = ()
     commercial_graphics: tuple[ResolvedCommercialGraphic, ...] = ()
+    text_layers: tuple[ResolvedCommercialGraphic, ...] = ()
     total_frames: int = Field(gt=0)
     total_samples: int = Field(ge=0)
     composition_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -486,7 +530,7 @@ class ResolvedTimeline(VersionedArtifact):
         if (
             isinstance(value, Mapping)
             and value.get("schema_version", "2.0") in {"2.0", "2.1"}
-            and "commercial_graphics" in value
+            and {"commercial_graphics", "text_layers"}.intersection(value)
         ):
             raise ValueError("ResolvedTimeline before 2.2 cannot contain ad graphics")
         return value
@@ -643,15 +687,15 @@ class ResolvedTimeline(VersionedArtifact):
         )
         if self.caption_cues != canonical_caption_order:
             raise ValueError("resolved caption cues must use canonical order")
-        graphic_ids = tuple(item.graphic_id for item in self.commercial_graphics)
+        graphic_ids = tuple(item.graphic_id for item in (*self.commercial_graphics, *self.text_layers))
         if len(graphic_ids) != len(set(graphic_ids)):
-            raise ValueError("resolved commercial graphic IDs must be unique")
+            raise ValueError("resolved graphic IDs must be unique")
         if any(
             item.end_frame_exclusive > self.total_frames
             or item.end_sample > self.total_samples
-            for item in self.commercial_graphics
+            for item in (*self.commercial_graphics, *self.text_layers)
         ):
-            raise ValueError("resolved commercial graphic exceeds timeline")
+            raise ValueError("resolved graphic exceeds timeline")
         canonical_graphics = tuple(
             sorted(
                 self.commercial_graphics,
@@ -660,6 +704,10 @@ class ResolvedTimeline(VersionedArtifact):
         )
         if self.commercial_graphics != canonical_graphics:
             raise ValueError("resolved commercial graphics must use canonical order")
+        if self.text_layers and self.schema_version not in {"2.2", "2.3", "2.4"}:
+            raise ValueError("Resolved text layers require timeline 2.2 or later")
+        if self.text_layers != tuple(sorted(self.text_layers, key=lambda item:(item.start_frame,item.z_index,item.graphic_id))):
+            raise ValueError("resolved text layers must use canonical order")
         return self
 
     @model_serializer(mode="wrap")
@@ -667,6 +715,8 @@ class ResolvedTimeline(VersionedArtifact):
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, object]:
         data = handler(self)
+        if not self.text_layers:
+            data.pop("text_layers", None)
         if self.schema_version == "2.0":
             data.pop("audio_spans", None)
             data.pop("caption_cues", None)

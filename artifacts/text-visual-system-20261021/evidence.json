@@ -1,0 +1,98 @@
+{
+  "dialogue": {
+    "before": {
+      "source": "/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/02_elder_dialogue_repair.mp4",
+      "source_sha256": "4d28cd1f9ea588802d8028e5581fa421e33f3cd5154159971b7179e1226ba2aa",
+      "output": "/tmp/ai-video-text-visual-20261021/final-r1/dialogue/before/state/render/outputs/6919b1c57e15cdca05f1c6e07522e61dcf3d3c661163a62e3a180897289446e1.mp4",
+      "output_sha256": "6919b1c57e15cdca05f1c6e07522e61dcf3d3c661163a62e3a180897289446e1",
+      "seconds": 13.873889999988023,
+      "timeline_fingerprint": "3cb19220673d37dc918c7c91b5c018d917eaffe9741ff46d01caebd6c1a97403",
+      "production_render_active": true,
+      "p6_final_acceptance": "NOT_EVALUATED",
+      "viewing_copy": "/home/reggie/vscode_folder/AI-VIDEO/artifacts/text-visual-system-20261021/dialogue-before.mp4"
+    },
+    "after": {
+      "source": "/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/02_elder_dialogue_repair.mp4",
+      "source_sha256": "4d28cd1f9ea588802d8028e5581fa421e33f3cd5154159971b7179e1226ba2aa",
+      "output": "/tmp/ai-video-text-visual-20261021/final-r1/dialogue/after/state/render/outputs/440661d3c81c5386cdfcbc6f5b7815aa38b627ce6265e8266f233094fc11a439.mp4",
+      "output_sha256": "440661d3c81c5386cdfcbc6f5b7815aa38b627ce6265e8266f233094fc11a439",
+      "seconds": 13.91862039800617,
+      "timeline_fingerprint": "7c2b7593c03b42f9e9b5af9dc691ac2d35db138b33ec429a8865664b82f0dc29",
+      "production_render_active": true,
+      "p6_final_acceptance": "NOT_EVALUATED",
+      "viewing_copy": "/home/reggie/vscode_folder/AI-VIDEO/artifacts/text-visual-system-20261021/dialogue-after.mp4"
+    }
+  },
+  "advert": {
+    "before": {
+      "source": "/tmp/ai-video-text-visual-20261021/final-r1/advert/shared-source.mp4",
+      "source_sha256": "7e117b2481348c6bfce3b8d1216c30ba00be9b6867e7e366c145518e00061366",
+      "output": "/tmp/ai-video-text-visual-20261021/final-r1/advert/before/state/render/outputs/1dce2a44efd702fab83349f6691f4c76e62b1d0c2456f561bdefe48d6c78a964.mp4",
+      "output_sha256": "1dce2a44efd702fab83349f6691f4c76e62b1d0c2456f561bdefe48d6c78a964",
+      "seconds": 12.053381428006105,
+      "timeline_fingerprint": "3b8fc40b1b019f2370a4f48e3a32c7b2e752f45e3a1ef140f4ffac7dee96185e",
+      "production_render_active": true,
+      "p6_final_acceptance": "NOT_EVALUATED",
+      "viewing_copy": "/home/reggie/vscode_folder/AI-VIDEO/artifacts/text-visual-system-20261021/advert-before.mp4"
+    },
+    "after": {
+      "source": "/tmp/ai-video-text-visual-20261021/final-r1/advert/shared-source.mp4",
+      "source_sha256": "7e117b2481348c6bfce3b8d1216c30ba00be9b6867e7e366c145518e00061366",
+      "output": "/tmp/ai-video-text-visual-20261021/final-r1/advert/after/state/render/outputs/d78cd2c66eb23e5b17d1b763d1aca892caa6b110800855c20102ea0b8478f465.mp4",
+      "output_sha256": "d78cd2c66eb23e5b17d1b763d1aca892caa6b110800855c20102ea0b8478f465",
+      "seconds": 12.497010922001209,
+      "timeline_fingerprint": "f94dea259daa07c7d0649e1e4a4b74072ac0ba1edede151ee6c7d3985fc546c4",
+      "production_render_active": true,
+      "p6_final_acceptance": "NOT_EVALUATED",
+      "viewing_copy": "/home/reggie/vscode_folder/AI-VIDEO/artifacts/text-visual-system-20261021/advert-after.mp4"
+    }
+  },
+  "title": {
+    "before": {
+      "source": "/home/reggie/vscode_folder/AI-VIDEO/runs/director-stay-a-moment-20261021-001/stay-a-moment-8s.mp4",
+      "source_sha256": "d57c6ef7b06d42876e743a84264e11283c863a076fbb13e02012e41c9ede75eb",
+      "output": "/tmp/ai-video-text-visual-20261021/final-r1/title/before/state/render/outputs/fa2ccef2ee7ffdfa03b3e823d690778b734ffda9e4bf41ad953b17f7890d9161.mp4",
+      "output_sha256": "fa2ccef2ee7ffdfa03b3e823d690778b734ffda9e4bf41ad953b17f7890d9161",
+      "seconds": 13.07724128200789,
+      "timeline_fingerprint": "d1137dc6c89c811b9b7d9cf0eb731742c85bbeac3db64d286d00e7ac81f6f66c",
+      "production_render_active": true,
+      "p6_final_acceptance": "NOT_EVALUATED",
+      "viewing_copy": "/home/reggie/vscode_folder/AI-VIDEO/artifacts/text-visual-system-20261021/title-before.mp4"
+    },
+    "after": {
+      "source": "/home/reggie/vscode_folder/AI-VIDEO/runs/director-stay-a-moment-20261021-001/stay-a-moment-8s.mp4",
+      "source_sha256": "d57c6ef7b06d42876e743a84264e11283c863a076fbb13e02012e41c9ede75eb",
+      "output": "/tmp/ai-video-text-visual-20261021/final-r1/title/after/state/render/outputs/4634b5549aab819c3ee666837260af8d8a7d0eaf611b34474260dcbc8bbf36e6.mp4",
+      "output_sha256": "4634b5549aab819c3ee666837260af8d8a7d0eaf611b34474260dcbc8bbf36e6",
+      "seconds": 13.537958191009238,
+      "timeline_fingerprint": "2d8de3361951f0abfb0fc258181b63efc34cb3cb80de91685865a359c5184020",
+      "production_render_active": true,
+      "p6_final_acceptance": "NOT_EVALUATED",
+      "viewing_copy": "/home/reggie/vscode_folder/AI-VIDEO/artifacts/text-visual-system-20261021/title-after.mp4"
+    }
+  },
+  "word": {
+    "before": {
+      "source": "/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/02_elder_dialogue_repair.mp4",
+      "source_sha256": "4d28cd1f9ea588802d8028e5581fa421e33f3cd5154159971b7179e1226ba2aa",
+      "output": "/tmp/ai-video-text-visual-20261021/final-r1/word/before/state/render/outputs/96c0e78a1ad5ae8b053d61d58417b4de616eb260c8e05093086f8d44aa872bc7.mp4",
+      "output_sha256": "96c0e78a1ad5ae8b053d61d58417b4de616eb260c8e05093086f8d44aa872bc7",
+      "seconds": 13.627574974991148,
+      "timeline_fingerprint": "c9d0c5b01c3136d5724dda7a34c0813c8d4f08979b04b5b986d993698ed329e2",
+      "production_render_active": true,
+      "p6_final_acceptance": "NOT_EVALUATED",
+      "viewing_copy": "/home/reggie/vscode_folder/AI-VIDEO/artifacts/text-visual-system-20261021/word-before.mp4"
+    },
+    "after": {
+      "source": "/home/reggie/vscode_folder/AI-VIDEO/artifacts/qingyan-miao-ad-20260826-v8/runtime/t8_portrait_ad/02_elder_dialogue_repair.mp4",
+      "source_sha256": "4d28cd1f9ea588802d8028e5581fa421e33f3cd5154159971b7179e1226ba2aa",
+      "output": "/tmp/ai-video-text-visual-20261021/final-r1/word/after/state/render/outputs/85ef2454b55cf0c376769ede24e727a6aae861404aa8a6fd67b145506be6f0b7.mp4",
+      "output_sha256": "85ef2454b55cf0c376769ede24e727a6aae861404aa8a6fd67b145506be6f0b7",
+      "seconds": 14.607038596004713,
+      "timeline_fingerprint": "867aabb8e40f01c3f115ec02b432a2320fc1e9ef3b070a0adc32ee3f2f36f9c0",
+      "production_render_active": true,
+      "p6_final_acceptance": "NOT_EVALUATED",
+      "viewing_copy": "/home/reggie/vscode_folder/AI-VIDEO/artifacts/text-visual-system-20261021/word-after.mp4"
+    }
+  }
+}

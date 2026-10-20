@@ -16,6 +16,10 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+text = [
+  "pysubs2==1.8.0",
+  "fonttools==4.67.0",
+]
 dev = [
   "pytest>=8.0",
 ]

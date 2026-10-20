@@ -579,13 +579,14 @@ class CanvasProductionService:
         return service.activate_once(attempt_id=position.attempt_id, **arguments)
 
     @_input_errors
-    def compose(self, *, renderer_version="0.7.103", audio_tracks=(), caption_tracks=(), voice_sources=()):
+    def compose(self, *, renderer_version="0.7.103", audio_tracks=(), caption_tracks=(), voice_sources=(), text_layers=()):
         from ai_video.canvas_composition import compose_canvas
         loaded = self._load()
         if self.position().next_action != "compose":
             raise _blocked("Every selected generated Shot must pass and be adopted before composition.")
         return compose_canvas(loaded=loaded, direction=self.direction, renderer_version=renderer_version,
-            audio_tracks=audio_tracks, caption_tracks=caption_tracks, voice_sources=voice_sources)
+            audio_tracks=audio_tracks, caption_tracks=caption_tracks, voice_sources=voice_sources,
+            text_layers=text_layers)
 
     def deliver(self):
         """Exact canonical final media; this read never signs human acceptance."""
@@ -705,14 +706,14 @@ class CanvasProductionService:
                 shot_id=shot_id, asset_id=asset_id, audio_kind=kind))
 
     def render(self, *, attempt_id, toolchain, renderer_version="0.7.103", audio_tracks=(),
-               caption_tracks=(), voice_sources=(), voice_requests=(), caption_style_fingerprints=()):
+               caption_tracks=(), voice_sources=(), voice_requests=(), caption_style_fingerprints=(), text_layers=()):
         """One configured HyperFrames invocation; durable replay stays in its owner."""
         from ai_video.canvas_dependencies import canvas_dependency_inputs, canvas_render_transition_preparer
         from ai_video.production.hyperframes import render_with_hyperframes
         from ai_video.production.models import RendererSelectionReceipt
         from ai_video.production.state_commit import BeginRenderAttemptRequest
         spec, timeline = self.compose(renderer_version=renderer_version, audio_tracks=audio_tracks,
-            caption_tracks=caption_tracks, voice_sources=voice_sources)
+            caption_tracks=caption_tracks, voice_sources=voice_sources, text_layers=text_layers)
         loaded = self._load()
         selection = RendererSelectionReceipt(receipt_id=f"canvas-render-{attempt_id}", attempt_id=attempt_id,
             requested_kind="hyperframes", selected_kinds=("hyperframes",), renderer_version=renderer_version,

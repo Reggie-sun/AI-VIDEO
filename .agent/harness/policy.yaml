@@ -288,7 +288,7 @@ checks:
     covered_by_check_ids: [production_contract_tests]
     description: Verify the single Production writer, activation, and explicit recovery.
   production_composition_audio_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_ad_creative.py, tests/test_production_composition.py, tests/test_production_video_retime.py, tests/test_production_video_retime_render.py, tests/test_production_hyperframes.py, tests/test_production_audio.py, tests/test_production_generated_video_audio.py, tests/test_production_captions.py, tests/test_production_elevenlabs.py, tests/test_production_minimax_speech.py, tests/test_production_voice_captions_e2e.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_ad_creative.py, tests/test_production_composition.py, tests/test_production_video_retime.py, tests/test_production_video_retime_render.py, tests/test_production_hyperframes.py, tests/test_production_audio.py, tests/test_production_generated_video_audio.py, tests/test_production_captions.py, tests/test_production_text_design.py, tests/test_production_subtitle_ass.py, tests/test_production_text_visual_render.py, tests/test_production_elevenlabs.py, tests/test_production_minimax_speech.py, tests/test_production_voice_captions_e2e.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
     covered_by_check_ids: [production_contract_tests]
     description: Verify timeline, renderer, audio, voice, and caption contracts.
@@ -877,6 +877,11 @@ categories:
       - src/ai_video/production/_composition_native_audio.py
       - src/ai_video/production/_composition_source_duration.py
       - src/ai_video/production/_composition_visual.py
+      - src/ai_video/production/_composition_text.py
+      - src/ai_video/production/text_design.py
+      - src/ai_video/production/text_design_html.py
+      - src/ai_video/production/text_fonts.py
+      - src/ai_video/production/subtitle_ass.py
       - src/ai_video/production/ad_composition.py
       - src/ai_video/production/ad_creative.py
       - src/ai_video/production/ad_creative_review.py
@@ -906,6 +911,10 @@ categories:
       - tests/test_production_audio.py
       - tests/test_production_generated_video_audio.py
       - tests/test_production_captions.py
+      - tests/test_production_text_design.py
+      - tests/test_production_subtitle_ass.py
+      - tests/test_production_text_visual_render.py
+      - tests/text_visual_pilot_support.py
       - tests/test_production_elevenlabs.py
       - tests/test_production_minimax_speech.py
       - tests/test_production_voice_captions_e2e.py

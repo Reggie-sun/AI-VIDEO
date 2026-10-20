@@ -15,6 +15,7 @@ from typing import Callable, Iterator, Literal, Protocol, cast
 from urllib.parse import urlsplit
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production._hyperframes_css import parse_css_model as _source_css_model
 from ai_video.production._hyperframes_source import (
     HyperFramesSourceError,
     capture_safe_boundary_percent as _source_capture_safe_boundary_percent,
@@ -45,6 +46,7 @@ from ai_video.production.captions import (
     _canonical_track_bytes,
     validate_caption_track_timeline_binding,
 )
+from ai_video.production.text_design_html import embedded_render_url
 from ai_video.production.composition import (
     _validated_visual_suffix,
     timeline_fingerprint,
@@ -313,67 +315,11 @@ class _SourceParser(HTMLParser):
             self.document.append(("data", data.strip()))
 
 
-def _split_css_rules(css: str) -> tuple[tuple[str, str], ...]:
-    rules: list[tuple[str, str]] = []
-    cursor = 0
-    length = len(css)
-    while cursor < length:
-        while cursor < length and css[cursor].isspace():
-            cursor += 1
-        if cursor == length:
-            break
-        opening = css.find("{", cursor)
-        if opening < 0:
-            raise _source_invalid("CSS contains an unterminated rule.")
-        header = css[cursor:opening].strip()
-        if not header:
-            raise _source_invalid("CSS contains an empty rule header.")
-        depth = 1
-        end = opening + 1
-        while end < length and depth:
-            if css[end] == "{":
-                depth += 1
-            elif css[end] == "}":
-                depth -= 1
-            end += 1
-        if depth:
-            raise _source_invalid("CSS contains an unterminated rule body.")
-        rules.append((header, css[opening + 1 : end - 1]))
-        cursor = end
-    return tuple(rules)
-
-
-def _parse_declarations(body: str) -> tuple[tuple[str, str], ...]:
-    declarations: list[tuple[str, str]] = []
-    for item in body.split(";"):
-        item = item.strip()
-        if not item:
-            continue
-        if ":" not in item:
-            raise _source_invalid("CSS contains an invalid declaration.")
-        name, value = item.split(":", 1)
-        declarations.append((name.strip().lower(), value.strip()))
-    if len({name for name, _ in declarations}) != len(declarations):
-        raise _source_invalid("CSS contains a duplicate declaration.")
-    return tuple(declarations)
-
-
 def _parse_css_model(styles: list[str]) -> tuple[object, ...]:
-    model: list[object] = []
-    for css in styles:
-        if re.search(r"(?i)(?<![-\w])@import\b", css):
-            raise _source_invalid("CSS imports are not allowed in HyperFrames source.")
-        for header, body in _split_css_rules(css):
-            if header.lower().startswith("@keyframes "):
-                name = header.split(maxsplit=1)[1]
-                stops = tuple(
-                    (stop_header.replace(" ", ""), _parse_declarations(stop_body))
-                    for stop_header, stop_body in _split_css_rules(body)
-                )
-                model.append(("keyframes", name, stops))
-            else:
-                model.append(("rule", header.replace(" ", ""), _parse_declarations(body)))
-    return tuple(model)
+    try:
+        return _source_css_model(styles)
+    except ValueError as exc:
+        raise _source_invalid(str(exc)) from exc
 
 
 def _parse_source_document(source: str) -> _ParsedSourceDocument:
@@ -391,9 +337,8 @@ def _parse_source_document(source: str) -> _ParsedSourceDocument:
     for style in parser.styles:
         imports.extend(match[1] for match in _IMPORT_PATTERN.findall(style))
         parser.all_urls.update(match[1] for match in _URL_PATTERN.findall(style))
-    lowered = source.lower()
     forbidden_runtime_context = any(
-        bool(urlsplit(value.strip()).scheme)
+        (bool(urlsplit(value.strip()).scheme) and not embedded_render_url(value))
         or bool(urlsplit(value.strip()).netloc)
         or value.strip().startswith("//")
         for value in parser.all_urls
@@ -408,7 +353,7 @@ def _parse_source_document(source: str) -> _ParsedSourceDocument:
         document_model=tuple(parser.document),
         has_script=parser.has_script,
         external_styles_or_fonts=(
-            parser.external_styles_or_fonts or "@font-face" in lowered
+            parser.external_styles_or_fonts
         ),
         has_event_handler=parser.has_event_handler,
         # Caption/data text is inert and remains part of the exact document model.
@@ -602,6 +547,7 @@ def _audit_hyperframes_source(
             (caption_styles, False, False),
             (None, True, True),
         )
+        if not (legacy_caption_style and any(style.get("schema_version") == "2" for style in caption_styles.values()))
     ]
 
     def structure_matches(expected: _ParsedSourceDocument) -> bool:
@@ -612,7 +558,8 @@ def _audit_hyperframes_source(
             and parsed.clip_attributes == expected.clip_attributes
         )
 
-    if not any(structure_matches(expected) for expected in expected_variants):
+    matching = next((expected for expected in expected_variants if structure_matches(expected)), None)
+    if matching is None:
         raise _source_invalid("HyperFrames source structure does not match the timeline.")
     if parsed.stage_attributes.get("data-no-timeline", "missing") is not None:
         raise _source_invalid("HyperFrames source requires boolean data-no-timeline.")
@@ -626,10 +573,13 @@ def _audit_hyperframes_source(
         raise _source_invalid("HyperFrames source contains a runtime or external input.")
     expected_urls = {item.materialized_path.as_posix() for item in expected_assets}
     expected_urls.update(item.materialized_path.as_posix() for item in expected_audio)
-    if parsed.media_urls != expected_urls or parsed.all_urls != expected_urls:
+    embedded_media = {url for url in matching.media_urls if embedded_render_url(url)}
+    embedded_all = {url for url in matching.all_urls if embedded_render_url(url)}
+    if parsed.media_urls != expected_urls | embedded_media or parsed.all_urls != expected_urls | embedded_all:
         raise _source_invalid("Source URLs do not exactly match declared media bindings.")
     for url in parsed.all_urls:
-        _validate_local_relative_url(url)
+        if url not in embedded_all:
+            _validate_local_relative_url(url)
     for binding in expected_assets:
         relative = binding.materialized_path
         target = _validate_contained_target(source_root, relative, before_creation=False)
@@ -961,7 +911,8 @@ def _materialize_hyperframes_source(
     )
     parsed_source = _parse_source_document(source_text)
     for url in parsed_source.all_urls:
-        _validate_local_relative_url(url)
+        if not embedded_render_url(url):
+            _validate_local_relative_url(url)
 
     snapshots_by_id: dict[str, NoFollowFile] = {}
     unique_targets: dict[Path, bytes] = {}

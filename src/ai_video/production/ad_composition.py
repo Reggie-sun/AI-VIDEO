@@ -37,9 +37,21 @@ def resolve_commercial_graphics(
     *,
     shot_start_frames: dict[str, int],
     duration_frames_by_shot: dict[str, int],
+    text_layers: bool = False,
 ) -> tuple[ResolvedCommercialGraphic, ...]:
     resolved: list[ResolvedCommercialGraphic] = []
-    for graphic in spec.commercial_graphics:
+    for graphic in spec.text_layers if text_layers else spec.commercial_graphics:
+        if graphic.text_design is not None:
+            design = graphic.text_design
+            height_milli = (
+                graphic.width_milli * spec.delivery_profile.width * design.reference_height_px
+                / (spec.delivery_profile.height * design.reference_width_px)
+            )
+            if graphic.y_milli + height_milli > 1000 - graphic.safe_area.bottom_milli:
+                raise _invalid("Text design exceeds the bottom safe area.")
+            declared_targets = {region.target_id for region in design.avoidance_regions}
+            if not set(graphic.avoidance_target_ids) <= declared_targets:
+                raise _invalid("Text design avoidance targets require explicit geometry.")
         shot_start = shot_start_frames.get(graphic.shot_id)
         shot_duration = duration_frames_by_shot.get(graphic.shot_id)
         if shot_start is None or shot_duration is None:
@@ -77,6 +89,7 @@ def resolve_commercial_graphics(
                 entrance=graphic.entrance,
                 exit=graphic.exit,
                 z_index=graphic.z_index,
+                text_design=graphic.text_design,
             )
         )
     return tuple(

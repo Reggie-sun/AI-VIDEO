@@ -222,10 +222,12 @@ def build_caption_review_context(
                     "y_milli": item.y_milli,
                     "width_milli": item.width_milli,
                     "font_size_px": item.font_size_px,
+                    **({"text_design_hash":canonical_sha256(item.text_design.model_dump(mode="json"))}
+                       if item.text_design is not None else {}),
                 }
             ),
         )
-        for item in timeline.commercial_graphics
+        for item in (*timeline.commercial_graphics, *timeline.text_layers)
     )
     return CaptionReviewContext(
         caption_policy_hash=caption_policy.content_hash,

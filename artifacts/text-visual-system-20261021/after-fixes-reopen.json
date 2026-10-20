@@ -1,0 +1,50 @@
+[
+  {
+    "case": "dialogue",
+    "arm": "before",
+    "strict_reopen": "PASS",
+    "sha256": "6919b1c57e15cdca05f1c6e07522e61dcf3d3c661163a62e3a180897289446e1"
+  },
+  {
+    "case": "dialogue",
+    "arm": "after",
+    "strict_reopen": "PASS",
+    "sha256": "440661d3c81c5386cdfcbc6f5b7815aa38b627ce6265e8266f233094fc11a439"
+  },
+  {
+    "case": "advert",
+    "arm": "before",
+    "strict_reopen": "PASS",
+    "sha256": "1dce2a44efd702fab83349f6691f4c76e62b1d0c2456f561bdefe48d6c78a964"
+  },
+  {
+    "case": "advert",
+    "arm": "after",
+    "strict_reopen": "PASS",
+    "sha256": "d78cd2c66eb23e5b17d1b763d1aca892caa6b110800855c20102ea0b8478f465"
+  },
+  {
+    "case": "title",
+    "arm": "before",
+    "strict_reopen": "PASS",
+    "sha256": "fa2ccef2ee7ffdfa03b3e823d690778b734ffda9e4bf41ad953b17f7890d9161"
+  },
+  {
+    "case": "title",
+    "arm": "after",
+    "strict_reopen": "PASS",
+    "sha256": "4634b5549aab819c3ee666837260af8d8a7d0eaf611b34474260dcbc8bbf36e6"
+  },
+  {
+    "case": "word",
+    "arm": "before",
+    "strict_reopen": "PASS",
+    "sha256": "96c0e78a1ad5ae8b053d61d58417b4de616eb260c8e05093086f8d44aa872bc7"
+  },
+  {
+    "case": "word",
+    "arm": "after",
+    "strict_reopen": "PASS",
+    "sha256": "85ef2454b55cf0c376769ede24e727a6aae861404aa8a6fd67b145506be6f0b7"
+  }
+]

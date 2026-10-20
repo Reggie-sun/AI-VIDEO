@@ -1,0 +1,83 @@
+{
+  "case": "advert",
+  "probe": {
+    "file": {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/artifacts/text-visual-system-20261021/advert-after.mp4",
+      "size_bytes": 1940718,
+      "size_mb": 1.85,
+      "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "duration_seconds": 6,
+      "duration_hms": "00:00:06.000",
+      "bit_rate_kbps": 2588
+    },
+    "video_stream": {
+      "codec": "h264",
+      "profile": "High",
+      "width": 768,
+      "height": 1344,
+      "aspect_ratio": "4:7",
+      "fps": 24,
+      "pixel_format": "yuv420p",
+      "bit_rate_kbps": 2586,
+      "frame_count": 144
+    },
+    "audio_stream": null
+  },
+  "scenes": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/artifacts/text-visual-system-20261021/advert-after.mp4",
+    "threshold": 0.4,
+    "total_scenes": 1,
+    "scenes": [
+      {
+        "scene_number": 1,
+        "start_time": 0,
+        "start_hms": "00:00:00.000",
+        "end_time": 6,
+        "end_hms": "00:00:06.000",
+        "duration_seconds": 6,
+        "confidence": null
+      }
+    ]
+  },
+  "analysis_summary": {
+    "duration_hms": "00:00:06.000",
+    "resolution": "768x1344",
+    "has_audio": false,
+    "estimated_speaking_duration_seconds": 0,
+    "scene_count": 1,
+    "frames_extracted": 6
+  },
+  "frames": [
+    {
+      "timestamp_seconds": 0,
+      "width": 640,
+      "format": "jpeg"
+    },
+    {
+      "timestamp_seconds": 1,
+      "width": 640,
+      "format": "jpeg"
+    },
+    {
+      "timestamp_seconds": 2,
+      "width": 640,
+      "format": "jpeg"
+    },
+    {
+      "timestamp_seconds": 3,
+      "width": 640,
+      "format": "jpeg"
+    },
+    {
+      "timestamp_seconds": 4,
+      "width": 640,
+      "format": "jpeg"
+    },
+    {
+      "timestamp_seconds": 5,
+      "width": 640,
+      "format": "jpeg"
+    }
+  ]
+}

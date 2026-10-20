@@ -14,6 +14,7 @@ from ai_video.production.commercial_graphics import (
     ResolvedCommercialGraphic,
 )
 from ai_video.production.visual_media import render_visual_element, visual_media_css
+from ai_video.production.text_design_html import render_text_design, render_ass_caption
 
 
 class HyperFramesSourceError(ValueError):
@@ -334,6 +335,14 @@ def _commercial_graphic_css(
     legacy_percent_format: bool = False,
 ) -> str:
     name = _graphic_animation_name(graphic.graphic_id)
+    if graphic.text_design is not None:
+        return (
+            f".{name}{{left:{_decimal_milli(graphic.x_milli * 100)}%;"
+            f"top:{_decimal_milli(graphic.y_milli * 100)}%;"
+            f"width:{_decimal_milli(graphic.width_milli * 100)}%;"
+            f"padding:0;overflow:visible;z-index:{graphic.z_index};"
+            f"animation:{name} {duration}s step-end both paused}}"
+        )
     background = graphic.background_color or "transparent"
     percent = _legacy_decimal_milli if legacy_percent_format else _decimal_milli
     font_weight = f"font-weight:{graphic.font_weight};" if graphic.font_weight != 700 else ""
@@ -390,6 +399,8 @@ def _stable_dom_id(prefix: str, identity: str) -> str:
 
 
 def _caption_style_css(style_hash: str, style: Mapping[str, object]) -> str:
+    if style.get("schema_version") == "2":
+        return "    .caption.caption-raster{inset:0;padding:0;background:transparent}"
     if style.get("schema_version") != "1":
         raise HyperFramesSourceError(
             "Caption style schema version is unsupported."
@@ -484,12 +495,18 @@ def render_source(
         )
     if legacy_commercial_percent_format and any(
         graphic.font_weight != 700 or graphic.letter_spacing_px != 0
-        for graphic in timeline.commercial_graphics
+        for graphic in (*timeline.commercial_graphics, *timeline.text_layers)
     ):
         raise HyperFramesSourceError(
             "Legacy commercial source cannot consume custom typography."
         )
     fps = timeline.delivery_profile.fps
+    font_identities: dict[str, str] = {}
+    for graphic in (*timeline.commercial_graphics, *timeline.text_layers):
+        for font in graphic.text_design.fonts if graphic.text_design is not None else ():
+            if font.family in font_identities and font_identities[font.family] != font.sha256:
+                raise HyperFramesSourceError("Text designs cannot bind conflicting bytes for one font family.")
+            font_identities[font.family] = font.sha256
     duration = seconds(timeline.total_frames, fps)
     clips: list[str] = []
     audio_elements: list[str] = []
@@ -589,6 +606,18 @@ def render_source(
                 "Resolved caption cue is missing its style identity."
             )
         caption_class = "clip caption"
+        caption_content = escape(cue.text)
+        raster_style = caption_styles.get(cue.style_content_hash, {})
+        if not legacy_caption_style and raster_style.get("schema_version") == "2":
+            caption_class += " caption-raster"
+            try:
+                caption_content, raster_css = render_ass_caption(
+                    cue, raster_style, timeline=timeline, duration=duration,
+                    boundary=capture_safe_boundary_percent, visibility=css_visibility_keyframes,
+                )
+            except (ValueError, ImportError) as exc:
+                raise HyperFramesSourceError(f"Subtitle rasterization failed: {exc}") from exc
+            keyframes.extend(raster_css)
         if not legacy_caption_style:
             caption_class += f" caption-style-{cue.style_content_hash}"
         caption_elements.append(
@@ -605,11 +634,18 @@ def render_source(
                 f' data-start-frame="{cue.start_frame}" data-end-frame-exclusive="{cue.end_frame_exclusive}"'
                 f' data-start="{_clip_start_seconds(cue.start_frame, fps)}"'
                 f' data-duration="{seconds(cue.end_frame_exclusive - cue.start_frame, fps)}"'
-                f' data-track-index="{track_index}">{escape(cue.text)}</div>'
+                f' data-track-index="{track_index}">{caption_content}</div>'
             )
         )
-    for graphic in timeline.commercial_graphics:
+    for graphic in (*timeline.commercial_graphics, *timeline.text_layers):
         name = _graphic_animation_name(graphic.graphic_id)
+        graphic_content = _commercial_graphic_text(graphic)
+        if graphic.text_design is not None:
+            graphic_content, design_css = render_text_design(
+                graphic, timeline=timeline, duration=duration,
+                boundary=capture_safe_boundary_percent,
+            )
+            keyframes.extend(design_css)
         animations.append(
             _commercial_graphic_css(
                 graphic,
@@ -643,7 +679,7 @@ def render_source(
                 f' data-sound-cue-ids="{escape(",".join(graphic.sound_cue_ids))}"'
                 f' data-safe-area="{graphic.safe_area.top_milli},{graphic.safe_area.right_milli},{graphic.safe_area.bottom_milli},{graphic.safe_area.left_milli}"'
                 f' data-entrance="{graphic.entrance.value}"'
-                f' data-exit="{graphic.exit.value}">{_commercial_graphic_text(graphic)}</div>'
+                f' data-exit="{graphic.exit.value}">{graphic_content}</div>'
             )
         )
     return "\n".join(
@@ -661,7 +697,7 @@ def render_source(
                     "    .commercial-graphic{inset:auto;box-sizing:border-box;padding:.2em .3em;font-family:sans-serif;font-weight:700;line-height:1.15;white-space:pre-wrap;overflow:hidden}",
                     "    .commercial-keyword-emphasis{font-weight:900;text-decoration:underline;text-decoration-thickness:.08em}",
                 )
-                if timeline.commercial_graphics
+                if timeline.commercial_graphics or timeline.text_layers
                 else ()
             ),
             visual_media_css(timeline.visual_spans),

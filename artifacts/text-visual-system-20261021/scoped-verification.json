@@ -1,0 +1,179 @@
+{
+  "proof": "scoped development verification; not complete Harness PASS or Product acceptance",
+  "snapshot": {
+    "mode": "staged",
+    "git_head": "fef0b3935402f724aa3b73ebaab15032bba08443",
+    "changed_paths": [
+      ".agent/harness/policy.yaml",
+      "artifacts/text-visual-system-20261021/advert-video-analysis.json",
+      "artifacts/text-visual-system-20261021/after-fixes-reopen.json",
+      "artifacts/text-visual-system-20261021/audio-preservation.json",
+      "artifacts/text-visual-system-20261021/dialogue-video-analysis.json",
+      "artifacts/text-visual-system-20261021/evidence.json",
+      "artifacts/text-visual-system-20261021/independent-review.json",
+      "artifacts/text-visual-system-20261021/index.html",
+      "artifacts/text-visual-system-20261021/title-video-analysis.json",
+      "artifacts/text-visual-system-20261021/word-video-analysis.json",
+      "docs/record_for_agent/2026-10-21-text-visual-system.md",
+      "docs/research/2026-10-21-text-visual-engines.md",
+      "docs/superpowers/plans/2026-10-21-text-visual-system.md",
+      "docs/text-visual-system.md",
+      "pyproject.toml",
+      "src/ai_video/canvas_composition.py",
+      "src/ai_video/canvas_production.py",
+      "src/ai_video/production/_composition_text.py",
+      "src/ai_video/production/_hyperframes_css.py",
+      "src/ai_video/production/_hyperframes_source.py",
+      "src/ai_video/production/ad_composition.py",
+      "src/ai_video/production/caption_quality.py",
+      "src/ai_video/production/captions.py",
+      "src/ai_video/production/commercial_graphics.py",
+      "src/ai_video/production/composition.py",
+      "src/ai_video/production/composition_contracts.py",
+      "src/ai_video/production/hyperframes.py",
+      "src/ai_video/production/subtitle_ass.py",
+      "src/ai_video/production/text_design.py",
+      "src/ai_video/production/text_design_html.py",
+      "src/ai_video/production/text_fonts.py",
+      "tests/test_production_subtitle_ass.py",
+      "tests/test_production_text_design.py",
+      "tests/test_production_text_visual_render.py",
+      "tests/text_visual_pilot_support.py"
+    ],
+    "index_tree": "b73a8083d87f342183d6e1593bb036214fe79929",
+    "cached_patch_sha256": "5ce1d47102372b2abf78f07d2cad9e12ba074a9fa4c59829cb078a3169c58929",
+    "scope_sha256": "a9137464b93fa4850d631ca000e8195076f7b27c47983b43b13946a74a650f77"
+  },
+  "source_files": {
+    ".agent/harness/policy.yaml": "37248fd86da9e82f52efed1da7bc707340b3c6847ad429798c007b84d106292d",
+    "artifacts/text-visual-system-20261021/advert-video-analysis.json": "313a6e298fb2d3ad16809ba6aef954cdbe4606b21b3ad1147d46dc67e2867cb3",
+    "artifacts/text-visual-system-20261021/after-fixes-reopen.json": "37ab28c8391b0a2cab0c2c9ff1001fb3a2d1fe63b67b432b93d8417c87e8721a",
+    "artifacts/text-visual-system-20261021/audio-preservation.json": "6c5a506625ef7ce5a8122814cc5634a750903bb86ffabb6488c285a85eb7a4cb",
+    "artifacts/text-visual-system-20261021/dialogue-video-analysis.json": "5c7157bf98d4860a9d480609036f9d998d3e8d8b90dcf3a77c27c5fcb6bf38e2",
+    "artifacts/text-visual-system-20261021/evidence.json": "e462f0879a59453fbf0196edad63f55de90a3a6a3bdd016dd9052bee3502af4c",
+    "artifacts/text-visual-system-20261021/independent-review.json": "c6bd46cb921efb6290a358d5a1a929d026d3f645cf6b6b8f8cfe37d696c849c1",
+    "artifacts/text-visual-system-20261021/index.html": "a9b7cb74c1d3a38385b640997fb87052c2c8f1517f57dcbcc0709eb72c57a2da",
+    "artifacts/text-visual-system-20261021/title-video-analysis.json": "3de0c54300b6974f67149a6396322ae2b4f2d5c6c96ec48aa276c45c2a664cc9",
+    "artifacts/text-visual-system-20261021/word-video-analysis.json": "5b97c4aab570aad6c5eb860859feff080f550a12ec125b9a06276e93837ece8d",
+    "docs/record_for_agent/2026-10-21-text-visual-system.md": "c2e1a5c2599a54eb3617a9aa8db4024bf26f64e369852a1948264c0573cb43a8",
+    "docs/research/2026-10-21-text-visual-engines.md": "c68d6c1bc405a58484aa6014bc7bfeae7b519376196d9ec5376e3c2c8041dad9",
+    "docs/superpowers/plans/2026-10-21-text-visual-system.md": "602aa77d4e7b253a0c50d60bfaea773256b0d56fab495ffa5850241a7e51dcdf",
+    "docs/text-visual-system.md": "efb16f3e4dfbd3a42e398cc37f46d6a5625ecfc706053bc08b73f3b821905da1",
+    "pyproject.toml": "f2f603da45f7a59166086896e12429c2e9c5c80e106fa8180b3ff754ac20b2ea",
+    "src/ai_video/canvas_composition.py": "ee5e39e116480b577f943f34c32e0f7e0414d8f62ce5d8956ece7357face1830",
+    "src/ai_video/canvas_production.py": "a8835d0e2876306d59108ec5b60c77b4c30d139f073c9f2f0de981a9394ad636",
+    "src/ai_video/production/_composition_text.py": "4ae3a5c3a65dc9de6ff3fc5301e8e99d9c771b9e7b61bd60362235bf39c5e2eb",
+    "src/ai_video/production/_hyperframes_css.py": "b12e4fdddc7b84355c27af25702b7ea5df20966249e570881f20efbb572a9a09",
+    "src/ai_video/production/_hyperframes_source.py": "21ecdcf62e0c5af7d0e76c116d08ed34cd3e5da17c6b10663dcbd5992c09ed2b",
+    "src/ai_video/production/ad_composition.py": "2f21242946bc57ecdc95c73443800779be98686c4219913a0ea6ba01bd6811d7",
+    "src/ai_video/production/caption_quality.py": "18ae7fbf806af994889e5effab3bd94cb18bd1b402f2dcc07b0be65d68eac442",
+    "src/ai_video/production/captions.py": "c282c59c27c199dc9f90f2e14adb94ea36e02e5596175946b3b7b25941c6d721",
+    "src/ai_video/production/commercial_graphics.py": "8319d5bf8a292d43a890b3f2ad87d23b1de030306c694028ffdb7f8794f1dd78",
+    "src/ai_video/production/composition.py": "e47214c3263163bb5af6a01b19be3b4eedc24d2b797d65d7b2bd9d9753e215a9",
+    "src/ai_video/production/composition_contracts.py": "c673ea66f099f25b304497a6b16053be61d70bb1422ad506b9f38b486750484b",
+    "src/ai_video/production/hyperframes.py": "b7565cf9fd58a6d37ce53f341e7094fba5f549dd89c4e832a60ac2352b2d7f7f",
+    "src/ai_video/production/subtitle_ass.py": "48324ae8ddf381e2e4fdce5c5e1a6e65b960c36dfdd330ade958cfc0300ae17d",
+    "src/ai_video/production/text_design.py": "23e14ab0c7428d4ba069e90b4e128ff7e175f6e85daa8a57a4af073d62d86020",
+    "src/ai_video/production/text_design_html.py": "a94e038fcc4261ea4b4240ea5ea80b749b575bdb54ddfda452ab7ef1eb7b518c",
+    "src/ai_video/production/text_fonts.py": "d0ae84327c905ed9145320f4bcab088fadaf8f382e239928c05f44ab8a68b56f",
+    "tests/test_production_subtitle_ass.py": "d9d6139163812e3f61dee7063a1ddd0b9e6ba4a69712949129d10a74336ba426",
+    "tests/test_production_text_design.py": "4841b1c228dec03904fc5cba6cb3605732c54c62ec231e2f032d4fd95f6ac44a",
+    "tests/test_production_text_visual_render.py": "3a3ef4f1e2569223928ae4e1c3980325d2c11f02b801ceb7315937c37f6d6314",
+    "tests/text_visual_pilot_support.py": "c074ef92a5082aca2df55316fe27cbc39c85259762c03854503b34448017d582"
+  },
+  "checks": [
+    {
+      "check": "scope_diff",
+      "argv": [
+        "git",
+        "diff",
+        "--cached",
+        "--check"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 0.007227786001749337
+    },
+    {
+      "check": "docs",
+      "argv": [
+        "/home/reggie/vscode_folder/AI-VIDEO/.venv/bin/python",
+        "-m",
+        "scripts.docs_contract_gate",
+        "check"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 0.15664971200749278
+    },
+    {
+      "check": "rules",
+      "argv": [
+        "/home/reggie/vscode_folder/AI-VIDEO/.venv/bin/python",
+        "-m",
+        "scripts.agent_rules_gate"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 0.08676440999261104
+    },
+    {
+      "check": "policy",
+      "argv": [
+        "/home/reggie/vscode_folder/AI-VIDEO/.venv/bin/python",
+        "-m",
+        "scripts.agent_harness",
+        "policy-audit"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 0.46579110602033325
+    },
+    {
+      "check": "architecture",
+      "argv": [
+        "/home/reggie/vscode_folder/AI-VIDEO/.venv/bin/python",
+        "-m",
+        "scripts.architecture_gate",
+        "check",
+        "--base-ref",
+        "fef0b3935402f724aa3b73ebaab15032bba08443"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 2.9458400690054987
+    },
+    {
+      "check": "related_tests",
+      "argv": [
+        "/home/reggie/vscode_folder/AI-VIDEO/.venv/bin/python",
+        "-m",
+        "pytest",
+        "-p",
+        "no:cacheprovider",
+        "tests/test_production_text_design.py",
+        "tests/test_production_subtitle_ass.py",
+        "tests/test_production_composition.py",
+        "tests/test_production_hyperframes.py",
+        "tests/test_production_captions.py",
+        "tests/test_production_ad_creative.py",
+        "tests/test_production_caption_quality.py",
+        "tests/test_production_review.py",
+        "tests/test_production_repair.py",
+        "tests/test_canvas_authoring.py",
+        "tests/test_canvas_assets.py",
+        "tests/test_canvas_render.py",
+        "tests/test_canvas_production.py",
+        "tests/test_canvas_recovery.py",
+        "-q"
+      ],
+      "status": "passed",
+      "exit_code": 0,
+      "seconds": 224.2620672629855
+    }
+  ],
+  "status": "passed",
+  "related_test_summary": "520 passed, 3 skipped in 223.64s; native text runtime exercised with explicit host LD_PRELOAD",
+  "full_harness_status": "INTERRUPTED_NOT_PASSED; final-r4 receipt retained",
+  "permitted_post_verification_delta": "Documentation and evidence closure only; production source files must still match source_files hashes."
+}

@@ -11,6 +11,7 @@ from typing import Literal
 from pydantic import Field, model_validator
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production._composition_text import resolve_caption_words
 from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.models import (
     CaptionSegment,
@@ -644,6 +645,11 @@ def validate_caption_track_timeline_binding(
         )
         if actual != expected:
             raise ValueError("caption cue does not exactly match the canonical track")
+        if cue.words is not None and cue.words != resolve_caption_words(
+            segment, audio_start=audio.start_sample, source_start=audio.source_start_sample,
+            sample_rate=sample_rate_hz, fps=fps,
+        ):
+            raise ValueError("caption word projection does not match the canonical track")
 
 
 def segment_caption_track(

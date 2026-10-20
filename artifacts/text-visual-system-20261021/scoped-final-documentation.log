@@ -1,0 +1,17 @@
+git diff --cached --check
+
+/home/reggie/vscode_folder/AI-VIDEO/.venv/bin/python -m scripts.docs_contract_gate check
+Documentation contract gate passed.
+
+/home/reggie/vscode_folder/AI-VIDEO/.venv/bin/python -m scripts.agent_rules_gate
+{"ok": true, "proof": "development_governance_only", "errors": []}
+
+/home/reggie/vscode_folder/AI-VIDEO/.venv/bin/python -m scripts.agent_harness policy-audit
+{
+  "candidate_count": 1092,
+  "docs_contract_diagnostics": [],
+  "missing_check_test_paths": [],
+  "unmapped_paths": [],
+  "unreferenced_test_paths": [],
+  "unverified_paths": []
+}

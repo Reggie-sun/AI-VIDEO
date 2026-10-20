@@ -6,6 +6,7 @@ from pydantic import (
     BaseModel, ConfigDict, Field, SerializerFunctionWrapHandler, ValidationInfo,
     field_validator, model_serializer, model_validator,
 )
+from ai_video.production.text_design import TextDesign
 
 
 class _StrictModel(BaseModel):
@@ -111,9 +112,18 @@ class GraphicTreatment(_StrictModel):
     exit: GraphicAnimation = GraphicAnimation.NONE
     z_index: int = Field(strict=True)
     caption_binding_id: str | None = None
+    text_design: TextDesign | None = None
 
     @model_validator(mode="after")
     def _separate_subtitles_from_commercial_graphics(self) -> "GraphicTreatment":
+        if self.text_design is not None:
+            if self.text_design.text != self.text:
+                raise ValueError("Text design must preserve the exact graphic copy")
+            if self.entrance is not GraphicAnimation.NONE or self.exit is not GraphicAnimation.NONE:
+                raise ValueError("Text design owns its motion; legacy motion must be none")
+            if self.role is GraphicRole.DIALOGUE_SUBTITLE:
+                raise ValueError("Dialogue design belongs to the bound caption style")
+            self.text_design.validate_window(self.duration_frames)
         if self.role is GraphicRole.DIALOGUE_SUBTITLE:
             if self.caption_binding_id is None:
                 raise ValueError("dialogue subtitle requires a CaptionTrack binding")
@@ -146,6 +156,8 @@ class GraphicTreatment(_StrictModel):
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, object]:
         data = handler(self)
+        if self.text_design is None:
+            data.pop("text_design", None)
         if self.font_weight == 700:
             data.pop("font_weight", None)
         if self.letter_spacing_px == 0:
@@ -182,9 +194,16 @@ class ResolvedCommercialGraphic(_StrictModel):
     entrance: GraphicAnimation
     exit: GraphicAnimation
     z_index: int = Field(strict=True)
+    text_design: TextDesign | None = None
 
     @model_validator(mode="after")
     def _validate_resolved_window(self) -> "ResolvedCommercialGraphic":
+        if self.text_design is not None:
+            if self.text_design.text != self.text:
+                raise ValueError("Resolved text design must preserve graphic copy")
+            if self.entrance is not GraphicAnimation.NONE or self.exit is not GraphicAnimation.NONE:
+                raise ValueError("Resolved text design cannot combine legacy motion")
+            self.text_design.validate_window(self.end_frame_exclusive - self.start_frame)
         if self.role is GraphicRole.DIALOGUE_SUBTITLE:
             raise ValueError("dialogue subtitle cannot enter commercial graphics")
         if self.end_frame_exclusive <= self.start_frame:
@@ -198,6 +217,8 @@ class ResolvedCommercialGraphic(_StrictModel):
         self, handler: SerializerFunctionWrapHandler
     ) -> dict[str, object]:
         data = handler(self)
+        if self.text_design is None:
+            data.pop("text_design", None)
         if self.font_weight == 700:
             data.pop("font_weight", None)
         if self.letter_spacing_px == 0:

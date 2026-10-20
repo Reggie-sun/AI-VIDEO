@@ -6,6 +6,8 @@ from ai_video.production.composition_contracts import (
 from ai_video.production.hashing import seal_artifact
 from ai_video.production.models import SourceReference
 from ai_video.production.video_retime import VideoTimeMap
+from ai_video.production.commercial_graphics import GraphicTreatment
+import json
 
 
 def _native_audio_matches(loaded, audio, video, shot):
@@ -42,10 +44,11 @@ def _materialized_strategy_spec(loaded, parent_shot_id):
     )
 
 
-def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), caption_tracks=(), voice_sources=()):
+def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), caption_tracks=(), voice_sources=(), text_layers=()):
     layers = []
     tracks = [AudioTrackSpec.model_validate(t) if isinstance(t, dict) else t for t in audio_tracks]
     captions = list(caption_tracks)
+    graphics = tuple(GraphicTreatment.model_validate_json(json.dumps(g)) if isinstance(g, dict) else g for g in text_layers)
     native = []
     strategy_specs = []
     strategy_specs_by_parent = {}
@@ -116,6 +119,8 @@ def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), capt
     if (any(spec.schema_version == "2.1" for spec in strategy_specs)
             or tracks or captions or voice_sources):
         schema_version = "2.1"
+    if graphics:
+        schema_version = "2.2"
     if (any(spec.schema_version == "2.3" for spec in strategy_specs)
             or any(layer.source_time_map is not None for layer in layers)):
         schema_version = "2.3"
@@ -129,6 +134,7 @@ def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), capt
         source_provenance=(SourceReference(kind="derived", reference=loaded.project.artifact_id,
                                          content_hash=loaded.project.content_hash),),
         shot_ids=order, layers=tuple(layers), delivery_profile=loaded.project.delivery_profile,
+        **({"text_layers": graphics} if graphics else {}),
         **({"audio_tracks": tuple(tracks), "caption_tracks": tuple(captions), "voice_sources": tuple(voice_sources)}
            if tracks or captions or voice_sources else {}),
         transitions=tuple(TransitionSpec(from_shot_id=a, to_shot_id=b, kind="cut", duration_frames=0)
@@ -164,7 +170,7 @@ def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), capt
                     t.audio_kind.value in {"dialogue", "narration"} for t in tracks):
                 raise ValueError("authored dialogue/narration must remain present in the final audio tracks")
     if tracks or captions or voice_sources:
-        spec = spec.model_copy(update={"schema_version": spec.schema_version if spec.schema_version in {"2.3", "2.4"} else "2.1", "audio_tracks": tuple(tracks),
+        spec = spec.model_copy(update={"schema_version": spec.schema_version if spec.schema_version in {"2.2", "2.3", "2.4"} else "2.1", "audio_tracks": tuple(tracks),
             "caption_tracks": tuple(captions), "voice_sources": tuple(voice_sources)})
     spec = CompositionSpec.model_validate(seal_artifact(spec).model_dump(mode="python"))
     if strategy_specs:

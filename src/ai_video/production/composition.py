@@ -21,6 +21,7 @@ from ai_video.production.captions import (
     caption_style_fingerprint,
     caption_timing_fingerprint,
 )
+from ai_video.production._composition_text import resolve_caption_words
 from ai_video.production.hashing import canonical_sha256, seal_artifact
 from ai_video.production.models import (
     AUDIO_KIND_PRIORITY,
@@ -603,6 +604,11 @@ def _resolve_caption_cues(
                     end_frame_exclusive=end_frame,
                     style_reference_id=style.artifact_id,
                     style_content_hash=style.content_hash,
+                    words=resolve_caption_words(
+                        segment, audio_start=span.start_sample,
+                        source_start=span.source_start_sample,
+                        sample_rate=spec.sample_rate, fps=spec.delivery_profile.fps,
+                    ),
                 )
             )
     cues.sort(
@@ -806,6 +812,11 @@ def _resolve_composition(
         timeline_fields.update(audio_spans=audio_spans, caption_cues=caption_cues)
     if spec.schema_version in {"2.2", "2.3", "2.4"}:
         timeline_fields.update(commercial_graphics=commercial_graphics)
+        if spec.text_layers:
+            timeline_fields["text_layers"] = resolve_commercial_graphics(
+                spec, shot_start_frames=shot_start_frames,
+                duration_frames_by_shot=duration_frames_by_shot, text_layers=True,
+            )
     provisional = ResolvedTimeline(**timeline_fields)
     fingerprint = timeline_fingerprint(provisional)
     return seal_artifact(
@@ -821,6 +832,10 @@ def resolve_composition(
     try:
         from ai_video.production.production_strategy_reader import require_production_source_eligibility
 
+        # model_copy deliberately skips Pydantic validation. Reopen authored
+        # text recursively before any projection, including generic/ad bounds.
+        if spec.text_layers or any(g.text_design is not None for g in spec.commercial_graphics):
+            spec = CompositionSpec.model_validate(spec.model_dump(mode="python"))
         require_production_source_eligibility(project, spec)
         timeline = _resolve_composition(project, spec, renderer_version)
         from ai_video.production.voice_routing_handoff import require_voice_composition

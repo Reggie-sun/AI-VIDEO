@@ -1,0 +1,93 @@
+{
+  "case": "title",
+  "probe": {
+    "file": {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/artifacts/text-visual-system-20261021/title-after.mp4",
+      "size_bytes": 3330392,
+      "size_mb": 3.18,
+      "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "duration_seconds": 8,
+      "duration_hms": "00:00:08.000",
+      "bit_rate_kbps": 3330
+    },
+    "video_stream": {
+      "codec": "h264",
+      "profile": "High",
+      "width": 1344,
+      "height": 768,
+      "aspect_ratio": "7:4",
+      "fps": 24,
+      "pixel_format": "yuv420p",
+      "bit_rate_kbps": 3329,
+      "frame_count": 192
+    },
+    "audio_stream": null
+  },
+  "scenes": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/artifacts/text-visual-system-20261021/title-after.mp4",
+    "threshold": 0.4,
+    "total_scenes": 1,
+    "scenes": [
+      {
+        "scene_number": 1,
+        "start_time": 0,
+        "start_hms": "00:00:00.000",
+        "end_time": 8,
+        "end_hms": "00:00:08.000",
+        "duration_seconds": 8,
+        "confidence": null
+      }
+    ]
+  },
+  "analysis_summary": {
+    "duration_hms": "00:00:08.000",
+    "resolution": "1344x768",
+    "has_audio": false,
+    "estimated_speaking_duration_seconds": 0,
+    "scene_count": 1,
+    "frames_extracted": 8
+  },
+  "frames": [
+    {
+      "timestamp_seconds": 0,
+      "width": 640,
+      "format": "jpeg"
+    },
+    {
+      "timestamp_seconds": 1,
+      "width": 640,
+      "format": "jpeg"
+    },
+    {
+      "timestamp_seconds": 2,
+      "width": 640,
+      "format": "jpeg"
+    },
+    {
+      "timestamp_seconds": 3,
+      "width": 640,
+      "format": "jpeg"
+    },
+    {
+      "timestamp_seconds": 4,
+      "width": 640,
+      "format": "jpeg"
+    },
+    {
+      "timestamp_seconds": 5,
+      "width": 640,
+      "format": "jpeg"
+    },
+    {
+      "timestamp_seconds": 6,
+      "width": 640,
+      "format": "jpeg"
+    },
+    {
+      "timestamp_seconds": 7,
+      "width": 640,
+      "format": "jpeg"
+    }
+  ]
+}
