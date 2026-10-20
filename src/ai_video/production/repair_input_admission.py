@@ -35,6 +35,7 @@ from ai_video.production.composition_contracts import FixedTransform
 REPAIR_INPUT_TOOL = ToolIdentity(name="ai-video-development-repair-input", version="1")
 REPAIR_PREVIEW_INPUT_TOOL = ToolIdentity(name=REPAIR_INPUT_TOOL.name, version="2")
 REPAIR_AV_PREVIEW_INPUT_TOOL = ToolIdentity(name=REPAIR_INPUT_TOOL.name, version="3")
+REPAIR_REPLACEMENT_PREVIEW_INPUT_TOOL = ToolIdentity(name=REPAIR_INPUT_TOOL.name, version="6")
 _SHA = r"^[0-9a-f]{64}$"
 
 
@@ -204,6 +205,7 @@ class RepairInputAdmissionReceipt(StrictModel):
             "development-repair-input/3",
             "development-repair-input/4",
             "development-repair-input/5",
+            "development-repair-input/6",
         }:
             _validate_preview_probe(
                 self.preview_probe,
@@ -215,7 +217,11 @@ class RepairInputAdmissionReceipt(StrictModel):
             if (self.preview_use.trim_start_frame + self.preview_use.trim_duration_frames
                     > self.preview_probe.measured.frame_count):
                 raise ValueError("Development repair preview trim exceeds measured source frames")
-            if (self.contract_version == "development-repair-input/2"
+            if self.contract_version == "development-repair-input/6":
+                if (self.preview_use.scope != "replacement_audio_preview"
+                        or self.preview_use.source_time_map.contract_version != "video-time-map/1"):
+                    raise ValueError("Development repair input/6 requires explicitly replaced source audio")
+            elif (self.contract_version == "development-repair-input/2"
                     or (self.contract_version in {"development-repair-input/4", "development-repair-input/5"}
                         and self.preview_use.scope == "muted_visual_preview")):
                 if (self.preview_use.scope != "muted_visual_preview"
@@ -229,7 +235,7 @@ class RepairInputAdmissionReceipt(StrictModel):
 
 
 class RepairPreviewUse(StrictModel):
-    """One exact muted visual or native A/V use for a development preview."""
+    """One sealed visual, native A/V, or normal-speed replacement-audio use."""
 
     shot_id: str = Field(min_length=1)
     asset_role: str = Field(min_length=1)
@@ -237,18 +243,23 @@ class RepairPreviewUse(StrictModel):
     trim_duration_frames: int = Field(strict=True, gt=0)
     source_time_map: VideoTimeMap
     transform: FixedTransform
-    scope: Literal["muted_visual_preview", "retimed_av_preview"] = "muted_visual_preview"
+    scope: Literal["muted_visual_preview", "retimed_av_preview", "replacement_audio_preview"] = "muted_visual_preview"
 
     @model_validator(mode="after")
     def _exact_source_window_and_mute(self):
         expected = {
             "muted_visual_preview": ("video-time-map/1", "mute"),
             "retimed_av_preview": ("video-time-map/2", "retime_preserve_pitch"),
+            "replacement_audio_preview": ("video-time-map/1", "mute"),
         }[self.scope]
         if (self.source_time_map.contract_version, self.source_time_map.audio_policy) != expected:
             raise ValueError("Development repair preview scope differs from its exact time-map version")
         if self.source_time_map.source_duration_frames != self.trim_duration_frames:
             raise ValueError("Development repair preview time map must cover its exact trim")
+        if self.scope == "replacement_audio_preview" and any(
+            point.source_frame != point.output_frame for point in self.source_time_map.points
+        ):
+            raise ValueError("Replacement audio preview requires normal-speed video")
         return self
 
 
@@ -260,6 +271,18 @@ class RepairPreviewInputAdmissionReceipt(RepairInputAdmissionReceipt):
 
 class RepairAudioPreviewInputAdmissionReceipt(RepairPreviewInputAdmissionReceipt):
     contract_version: Literal["development-repair-input/3"] = "development-repair-input/3"
+
+
+class RepairReplacementPreviewInputAdmissionReceipt(RepairPreviewInputAdmissionReceipt):
+    contract_version: Literal["development-repair-input/6"] = "development-repair-input/6"
+
+
+def _preview_input_tool(receipt):
+    if receipt.contract_version == "development-repair-input/6":
+        return REPAIR_REPLACEMENT_PREVIEW_INPUT_TOOL
+    if receipt.contract_version == "development-repair-input/3":
+        return REPAIR_AV_PREVIEW_INPUT_TOOL
+    return REPAIR_PREVIEW_INPUT_TOOL
 
 
 def _validate_preview_probe(probe, *, request, fetch, artifact_sha256, size_bytes):
@@ -344,6 +367,8 @@ def prepare_repair_input(*, target_root, project, registry, source_root, source_
             receipt_type = RepairInputAdmissionReceipt
         elif preview_use.scope == "retimed_av_preview":
             receipt_type = RepairAudioPreviewInputAdmissionReceipt
+        elif preview_use.scope == "replacement_audio_preview":
+            receipt_type = RepairReplacementPreviewInputAdmissionReceipt
         else:
             receipt_type = RepairPreviewInputAdmissionReceipt
         receipt_values = dict(values)
@@ -356,11 +381,7 @@ def prepare_repair_input(*, target_root, project, registry, source_root, source_
         measured = receipt.preview_probe.measured if preview else None
         asset_path = (canonical_video_asset_path(source_sha256) if preview else
                       Path("assets/repair-inputs") / (source_sha256 + ".mp4"))
-        preview_tool = (
-            REPAIR_AV_PREVIEW_INPUT_TOOL
-            if receipt.contract_version == "development-repair-input/3"
-            else REPAIR_PREVIEW_INPUT_TOOL
-        )
+        preview_tool = _preview_input_tool(receipt)
         asset = AssetRecord(asset_id=asset_id, asset_type=AssetType.VIDEO,
             artifact_path=asset_path,
             sha256=source_sha256, size_bytes=len(media), mime_type="video/mp4",
@@ -412,6 +433,7 @@ def verify_repair_input(record, root):
         "development-repair-input/1": RepairInputAdmissionReceipt,
         "development-repair-input/2": RepairPreviewInputAdmissionReceipt,
         "development-repair-input/3": RepairAudioPreviewInputAdmissionReceipt,
+        "development-repair-input/6": RepairReplacementPreviewInputAdmissionReceipt,
     }.get(version)
     if receipt_type is None:
         raise ValueError("Development repair input version is unsupported")
@@ -426,11 +448,7 @@ def verify_repair_input(record, root):
     )
     if isinstance(receipt, RepairPreviewInputAdmissionReceipt):
         expected_metadata = _preview_video_metadata(receipt)
-        expected_tool = (
-            REPAIR_AV_PREVIEW_INPUT_TOOL
-            if receipt.contract_version == "development-repair-input/3"
-            else REPAIR_PREVIEW_INPUT_TOOL
-        )
+        expected_tool = _preview_input_tool(receipt)
         if (record.tool != expected_tool
                 or record.video_metadata != expected_metadata
                 or record.width != expected_metadata.width or record.height != expected_metadata.height
@@ -470,7 +488,7 @@ def is_repair_input_record(record, root: Path | None = None) -> bool:
 
 
 def allows_repair_preview_layer(loaded, layer, shot) -> bool:
-    """Permit only the exact v2 capture use sealed for this unbound preview."""
+    """Permit only the exact versioned capture use sealed for this unbound preview."""
     asset = next((item for item in loaded.registry.assets if item.asset_id == layer.asset_id), None)
     if asset is None or not is_repair_input_record(asset, loaded.root):
         return False
@@ -478,6 +496,7 @@ def allows_repair_preview_layer(loaded, layer, shot) -> bool:
     if not isinstance(receipt, RepairPreviewInputAdmissionReceipt):
         raise ValueError("Legacy development repair input cannot be used as a retimed preview")
     use = receipt.preview_use
+    layer_time_map = None if use.scope == "replacement_audio_preview" else use.source_time_map
     if (loaded.project.project_id != receipt.target_project_id
             or loaded.project.content_hash != receipt.target_project_hash):
         raise ValueError("Development preview target project differs from its admission")
@@ -492,7 +511,7 @@ def allows_repair_preview_layer(loaded, layer, shot) -> bool:
         or layer.asset_role != use.asset_role
         or layer.trim_start_frame != use.trim_start_frame
         or layer.trim_duration_frames != use.trim_duration_frames
-        or layer.source_time_map != use.source_time_map
+        or layer.source_time_map != layer_time_map
         or layer.transform != use.transform
         or layer.trim_start_frame + layer.trim_duration_frames > receipt.preview_probe.measured.frame_count
     ):

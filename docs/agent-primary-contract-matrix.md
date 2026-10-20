@@ -304,6 +304,11 @@ Registry 独立重开 immutable receipt，不依赖外部 root。保留路径与
 及原request/fetch绑定的VideoProbeReceipt，只允许muted本地composition preview。资产仍UNBOUND，
 `composition`按receipt派生 `ResolvedTimeline.usage_scope=development_preview`，原render activation
 owner拒绝该scope；不建立第二renderer、timeline、许可或quality state。
+`/6`的`replacement_audio_preview`单独允许正常速度source window配独立P4 BGM/SFX/ambience，
+原音轨明确排除，receipt中的V1 map必须为identity，layer不得携带retime map；禁止speech/captions/voice source。
+`_composition_visual`按exact admission限制音轨，resolver产生`development_audio_preview`，
+HyperFrames消费同一时间线混音；所有非Production scope与captured bytes仍由原activation fence拒绝。
+此扩展不改变旧`/2,/3`行为，不资格化失败素材，不推进原Shot barrier或Final Acceptance。
 `video_cleanup_contracts.py` / `video_cleanup_pixels.py` 独占显式逐帧clean-plate recipe、仿射采样、羽化与foreground保护；
 `video_cleanup_media.py`只用注入的本地工具准备同帧数/PTS的lossless RGB派生源，重解码验证像素并比较原声PCM/时间。
 它不拥有剪辑顺序、trim/speed或最终renderer；无自动tracking/生成填补。

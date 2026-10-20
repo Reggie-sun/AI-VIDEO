@@ -367,6 +367,14 @@ proof记录输入/输出PCM、source/map/tool hashes及修正量，超界拒绝�
 同源A/V用途需独立 `/3` capture及 `retimed_av_preview` scope，不能复用旧静音capture。资产保持UNBOUND、
 qualification为NOT_EVALUATED，timeline标记 `development_preview` 并禁止render activation。
 这一路线保留原request/fetch/rejection/QA及消费，不是普通import或Production许可。
+需要检查独立替换声音时，显式使用`development-repair-input/6`的`replacement_audio_preview`：
+sealed source window仅支持正常速度，receipt内V1 map的source/output锚点必须逐点相等；
+Composition layer不携带retime map，仍严格匹配receipt的Shot/role/trim/transform。
+P4必须显式提供已登记的BGM/SFX/ambience，不允许对白、旁白、caption或voice source；
+原MP4音轨不会进入混音。resolver沿同一帧/样本时间线产生`development_audio_preview`，
+HyperFrames实际导出AAC；旧`/2`静音与`/3`原生保音高预览的行为保持。
+新scope仍保持UNBOUND/NOT_EVALUATED，原activation owner拒绝所有非Production scope，
+且即使改写scope，captured bytes检查仍拒绝Production激活；有声预览不修复原raw Gate。
 先观察编辑实际效果，仍有无法达成的缺口时才提交明确、有限的新生成方案。
 
 ### Non-generative Local Cleanup

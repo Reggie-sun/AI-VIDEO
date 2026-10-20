@@ -52,3 +52,9 @@
 预览路径为 `runs/hotpatch-dayoff-20261020-001/opening-render-checked/output/opening-3s.mp4`，SHA-256 `99fe8efd53d345174fc0938ce0d0e320ac9249c56834653003dad9ca76e6e115`。HyperFrames lint/check 为零错误，实测 72 帧、768×1366、24fps、无音轨；已显式 MCP 抽取 12 帧检查可见动作。它使用 `bootstrap_repair_input` 的 sealed `/2` admission，保持 `UNBOUND`、`NOT_EVALUATED`、`development_preview`，未 Production activation、P6、Final Acceptance 或发布。它不是完整成片，替换声音、商品互动、后续镜头及全片真实听看仍未完成。
 
 当前恢复条件是已有 Production owner 能对这份失败源的非生成修复输出执行完整新用途验收并保留旧失败，或获得适用的新有限生成修复授权；不得把失败源普通 import 后伪装成已通过素材，也不得在首镜 barrier 失败时提交下一镜。详见 [checkpoint record](../../record_for_agent/2026-10-20-hotpatch-dayoff-edit-preview.md)。
+
+## User Feedback Revision — 2026-10-21
+
+用户拒绝旧 3 秒预览的怪异观感及静音。当前另有正常速度的 2.25 秒局部动作/声音检查文件 `runs/hotpatch-dayoff-20261020-001/natural-sound-render-v2/output/opening-natural-with-sound.mp4`，SHA `9fc167e0d6adb0ff61c96ccec35c2d3b7cad1f7fa96e91575c9ef47b97bbcd17`。已实际渲染含 AAC 的 MP4，完整音轨模型观察识别纸张窸窣和翻页声；未取得人工听看或商业审美接受。
+
+这段截取没有整镜末尾对视，不能替代完整 S01 或证明自然度问题已修复。新增 `/6` 正常速度 replacement-audio preview 能力仅支持独立 P4 非语音声音，仍是 UNBOUND/NOT_EVALUATED 与 `development_audio_preview`，不能 Production activation。视频提交仍为一次；Gemini 实际分析三次。自制声音版本被模型识别为吱响/擦拭后拒绝，现使用已核验 CC0 的实录纸声与低音量钢琴；来源和失败证据见同一 checkpoint record。完整片制作与旧 raw barrier 仍未完成。

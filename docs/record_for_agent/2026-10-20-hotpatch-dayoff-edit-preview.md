@@ -2,6 +2,26 @@
 
 Date: 2026-10-20
 
+## Supersession Notice — 2026-10-21
+
+用户明确指出旧 3 秒预览“很奇怪”且没有声音，旧版本不能作为已满足节奏或审美的候选。后续仅制作正常速度的 2.25 秒局部动作/声音检查片段，未恢复整镜末尾对视，也未将它用作原完整 Shot 的替代。原完整目标与 sound FAIL 保留；完整成片、自然度与商业完成度仍未通过。
+
+当前局部文件为 `runs/hotpatch-dayoff-20261020-001/natural-sound-render-v2/output/opening-natural-with-sound.mp4`，SHA `9fc167e0d6adb0ff61c96ccec35c2d3b7cad1f7fa96e91575c9ef47b97bbcd17`。实测 54 帧、24fps、768×1366、2.25 秒、AAC stereo 48kHz，HyperFrames lint/check 零错误。显式 MCP 视频检查取得五帧；完整音轨 Gemini 观察识别 paper rustling / pages turning，无可辨认语音。音乐轨已进入 P4 混音，但此次模型观察没有单独辨认音乐，不声称配乐听感通过或人工完整听看。
+
+视频仍只提交一次；Gemini 已实际分析三次，剩余一次。第二次针对自制正弦拨弦/噪声混音，识别为高频吱响与擦拭声，被拒绝；第三次改用实际纸张录音及低音量钢琴，识别到纸张声。每次输入与结果保留，不重试旧 unit、不删除失败历史。
+
+当前声音来源为 keweldog 的 [rustling paper.wav](https://freesound.org/people/keweldog/sounds/181774/) 与 Jadis0x 的 [Piano + Crystal Keys](https://freesound.org/people/Jadis0x/sounds/677275/)，两页当前均声明 CC0。下载公开 HQ MP3 preview，保留原文件及 SHA，以注入的 Jianji FFmpeg 转为完整 PCM WAV，再经 `AudioImportRequest`、committer、P4 tracks、同一 ResolvedTimeline 与 HyperFrames 混音；未绕过登录获取原下载、未 direct mux。声明、公开 URL、原/派生 SHA 见 task `input/licensed-audio/*.provenance.json`，完整录音不会作为本片原创录制署名。
+
+## Replacement Audio Preview Capability
+
+实际运行证实旧 `/2` admission、composition guard 与 resolved timeline 都禁止预览加入独立 P4 声音。为完成已授权的声音检查，增加有限、可复用的 `development-repair-input/6` / `replacement_audio_preview`，而非修改旧 `/2,/3` 或放宽 Production 资格。
+
+新用途只支持正常速度：receipt 的 V1 map 必须逐点 identity，composition layer 不携带 retime map，仍精确绑定 Shot/role/window/transform/bytes；必须有登记的 BGM/SFX/ambience，拒绝对白、旁白、caption 和 voice source。resolver 输出单一 `development_audio_preview` 时间线，旧 activation owner 对所有非Production scope拒绝，captured-bytes fence 也拒绝把 scope 改成 Production 后的激活。原失败素材保持 UNBOUND/NOT_EVALUATED，不推进后镜 barrier。
+
+TDD 先观察新 scope 被旧 admission 拒绝，再完成 bootstrap/strict reader/P4 registry import/resolve/relabel fence 的集成验证；旧 scopes 仍拒绝独立音轨，新 scope 拒绝 retime/native audio、缺轨与 speech。局部完整检查曾 42 passed；最终候选的实际 policy checks 以本次 fresh Harness receipt 为准。Parent Risk Gate 为 `NATIVE_REVIEW_NOT_REQUIRED`：本次无新 Provider/凭据入口，无 Production activation 扩权；现有 mutation owner、原失败链与 activation/captured-bytes fence 保持，相关失败路径有 executable coverage。CodeGraph 查询报告 source changed during indexing，未将它当作当前结构证据；以源码和实际运行核对调用关系。
+
+开发过程中一次音轨 import 将 recipe hash 误放入 `input_artifact_ids`，writer 已提交而 strict reader 随后拒绝未知引用。保留该开发 bundle 与失败证据，另建正常预览 bundle，使用空 dependency IDs、exact source fingerprint/provenance；未直接改 Manifest、未重置原 Production 消费。后续 audio import 成功、旧 preview 禁止音轨的已知失败均保留；新 scope 使用独立 capture，没有重解释旧 receipt。
+
 ## Purpose
 
 记录《今天，腰先下班》首镜真实生成、声音失败及用户节奏反馈后的非生成剪辑预览。完整原创商业成片目标保留；未交付完整成片，也未把预览标为 Production 接受。

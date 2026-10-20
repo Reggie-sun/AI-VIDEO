@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from ai_video.errors import AiVideoError
+from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.project import load_production_project
 from ai_video.production.hashing import seal_artifact
 from ai_video.production.state_commit import ProductionStateCommitter
@@ -142,6 +142,49 @@ def test_admit_exact_failure_is_unbound_and_replay_adds_no_writes(tmp_path):
     assert writer.bootstrap_repair_input(**args) == manifest
     assert _files(target) == admitted
     assert _files(source) == before
+
+
+@pytest.mark.parametrize("scope", ["muted_visual_preview", "retimed_av_preview"])
+def test_legacy_preview_scopes_still_reject_independent_p4_tracks(tmp_path, scope):
+    from ai_video.production._composition_visual import resolve_preview_layer_ids
+    from ai_video.production.composition_contracts import AudioTrackSpec, CompositionLayerSpec, CompositionSpec
+
+    source, target, writer, args = _inputs(tmp_path)
+    use, probe, shot = _preview_arguments(source, args)
+    use.update(scope=scope, asset_role=shot.required_asset_roles[0].role)
+    if scope == "retimed_av_preview":
+        use["source_time_map"] = use["source_time_map"].model_copy(update={
+            "contract_version": "video-time-map/2", "audio_policy": "retime_preserve_pitch"})
+    writer.bootstrap_repair_input(**args, preview_use=use, preview_probe=probe)
+    loaded = load_production_project(target / "project.yaml")
+    spec = seal_artifact(CompositionSpec(artifact_id="legacy-scope", revision=1, content_hash="0"*64,
+        creation_receipt_id="legacy-scope", source_provenance=loaded.project.source_provenance,
+        schema_version="2.4" if scope == "retimed_av_preview" else "2.3",
+        composition_id="legacy-scope", shot_ids=(shot.shot_id,), delivery_profile=loaded.project.delivery_profile,
+        layers=(CompositionLayerSpec(layer_id="visual", shot_id=shot.shot_id, asset_id=args["asset_id"],
+            asset_role=use["asset_role"], trim_start_frame=0, trim_duration_frames=48,
+            source_time_map=use["source_time_map"], transform=use["transform"]),)))
+    # The scope guard is exercised before asset lookup; registered P4 audio is
+    # covered by the replacement-preview integration test below.
+    spec = spec.model_copy(update={"audio_tracks": (AudioTrackSpec(
+        track_id="music", asset_id="independent-music", audio_kind="bgm", start_sample=0),)})
+    with pytest.raises(AiVideoError, match="cannot contain audio"):
+        resolve_preview_layer_ids(loaded, spec, {shot.shot_id: shot}, invalid=lambda msg: AiVideoError(
+            code=ErrorCode.COMPOSITION_INVALID,
+            user_message=msg))
+
+
+def test_replacement_preview_rejects_retiming_and_native_audio():
+    from ai_video.production.repair_input_admission import RepairPreviewUse
+    for mapping in (
+        {"audio_policy": "mute", "points": [{"source_frame": 0, "output_frame": 0},
+            {"source_frame": 48, "output_frame": 24}]},
+        {"contract_version": "video-time-map/2", "audio_policy": "retime_preserve_pitch",
+            "points": [{"source_frame": 0, "output_frame": 0}, {"source_frame": 48, "output_frame": 48}]},
+    ):
+        with pytest.raises(ValueError):
+            RepairPreviewUse(shot_id="shot-1", asset_role="visual", trim_start_frame=0,
+                trim_duration_frames=48, source_time_map=mapping, transform={}, scope="replacement_audio_preview")
 
 
 @pytest.mark.parametrize("invalid", ["running", "sha", "overlap"])
@@ -347,6 +390,89 @@ def test_preview_capture_requires_closed_known_failure_and_exact_probe(tmp_path)
         writer.bootstrap_repair_input(
             **args, preview_use=preview_use, preview_probe=preview_probe
         )
+
+
+def test_replacement_audio_preview_resolves_p4_without_qualifying_failed_media(tmp_path):
+    from ai_video.production.audio import AudioKind
+    from ai_video.production.composition import resolve_composition
+    from ai_video.production.composition_contracts import AudioTrackSpec, CompositionLayerSpec, CompositionSpec
+    from ai_video.production.registry import registry_semantic_sha256
+    from ai_video.production.repair_input_admission import verify_repair_input, require_production_render_sources
+    from ai_video.production.state_commit import PreparedArtifact, prepare_audio_registry_commit
+    from ai_video.production.models import DurationPolicy, VisualStrategy, AssetRoleRequirement, AssetType, ResolvedTimeline
+    from production_project_factory import _make_audio_asset
+
+    source, target, writer, args = _inputs(tmp_path)
+    before = _files(source)
+    use, probe, shot = _preview_arguments(source, args)
+    shot = seal_artifact(shot.model_copy(update={
+        "duration_policy": DurationPolicy(mode="fixed", seconds=2), "content_hash": "0"*64,
+        "visual_strategy": VisualStrategy.GENERATED_VIDEO, "generated_video_rationale": "Preview fixture source",
+        "required_asset_roles": (AssetRoleRequirement(role="primary_visual", asset_ids=(),
+                                                     allowed_asset_types=(AssetType.VIDEO,)),)}))
+    ref = next(r for r in args["project"].artifacts.shots if r.artifact_id == shot.artifact_id)
+    payload = yaml.safe_dump(shot.model_dump(mode="json"), sort_keys=False).encode()
+    args["artifacts"] = tuple(PreparedArtifact(ref.path, payload, hashlib.sha256(payload).hexdigest())
+        if a.relative_path == ref.path else a for a in args["artifacts"])
+    args["project"] = seal_artifact(args["project"].model_copy(update={"content_hash": "0"*64,
+        "artifacts": args["project"].artifacts.model_copy(update={"shots": tuple(
+            r.model_copy(update={"content_hash": shot.content_hash}) if r == ref else r
+            for r in args["project"].artifacts.shots)})}))
+    use.update(scope="replacement_audio_preview", asset_role=shot.required_asset_roles[0].role,
+               transform={"video_fit": "cover"})
+    use["source_time_map"] = {"audio_policy": "mute", "points": [
+        {"source_frame": 0, "output_frame": 0}, {"source_frame": 48, "output_frame": 48}]}
+    writer.bootstrap_repair_input(**args, preview_use=use, preview_probe=probe)
+    loaded = load_production_project(target / "project.yaml")
+    captured = next(a for a in loaded.registry.assets if a.asset_id == args["asset_id"])
+    receipt = verify_repair_input(captured, target)
+    assert receipt.contract_version == "development-repair-input/6"
+    assert receipt.qualification == "NOT_EVALUATED"
+    assert not any(captured.asset_id in role.asset_ids for s in loaded.shots for role in s.required_asset_roles)
+
+    audio_root = tmp_path / "sound"
+    (audio_root / "assets/files").mkdir(parents=True)
+    audio, path = _make_audio_asset(audio_root, asset_id="original-music", audio_kind=AudioKind.BGM,
+                                  duration_samples=96_000)
+    registry = loaded.registry.model_copy(update={"assets": (*loaded.registry.assets, audio)})
+    digest = registry_semantic_sha256(registry)
+    registry = registry.model_copy(update={"revision_id": digest, "content_hash": digest})
+    def artifact(relative, payload):
+        return PreparedArtifact(relative, payload, hashlib.sha256(payload).hexdigest())
+    ref = loaded.manifest.active_project
+    writer.commit(prepare_audio_registry_commit(manifest=loaded.manifest, project=loaded.project,
+        base_registry=loaded.registry, registry=registry, attempt_id="replacement-preview-music",
+        artifacts=(artifact(audio.artifact_path, path.read_bytes()),),
+        active_project_artifact=artifact(ref.path, (target / ref.path).read_bytes())))
+    loaded = load_production_project(target / "project.yaml")
+    spec = seal_artifact(CompositionSpec(artifact_id="sound-preview", revision=1, content_hash="0"*64,
+        creation_receipt_id="sound-preview", source_provenance=loaded.project.source_provenance,
+        schema_version="2.3", composition_id="sound-preview", shot_ids=(shot.shot_id,),
+        delivery_profile=loaded.project.delivery_profile,
+        layers=(CompositionLayerSpec(layer_id="visual", shot_id=shot.shot_id, asset_id=captured.asset_id,
+            asset_role=use["asset_role"], trim_start_frame=0, trim_duration_frames=48,
+            transform=use["transform"]),),
+        audio_tracks=(AudioTrackSpec(track_id="music", asset_id=audio.asset_id, audio_kind="bgm",
+            start_sample=0, trim_duration_samples=96_000),)))
+    timeline = resolve_composition(loaded, spec, renderer_version="0.7.103")
+    assert timeline.usage_scope == "development_audio_preview"
+    assert timeline.total_frames == 48
+    assert len(timeline.audio_spans) == 1
+    assert timeline.audio_spans[0].asset_id == audio.asset_id
+    assert ResolvedTimeline.model_validate_json(timeline.model_dump_json()) == timeline
+    for scope in (timeline.usage_scope, "production"):
+        with pytest.raises(ValueError, match="Development.*preview"):
+            require_production_render_sources(target, loaded.manifest.active_registry,
+                timeline.model_copy(update={"usage_scope": scope}))
+    raw_timeline = timeline.model_dump(mode="python")
+    raw_timeline["audio_spans"] = ()
+    with pytest.raises(ValueError, match="Replacement audio previews"):
+        ResolvedTimeline.model_validate(raw_timeline)
+    for tracks in ((), (spec.audio_tracks[0].model_copy(update={"audio_kind": AudioKind.DIALOGUE}),)):
+        invalid = seal_artifact(spec.model_copy(update={"audio_tracks": tracks, "content_hash": "0"*64}))
+        with pytest.raises(AiVideoError, match="replacement|Replacement"):
+            resolve_composition(loaded, invalid, renderer_version="0.7.103")
+    assert _files(source) == before
 
     source, _, writer, args = _inputs(tmp_path / "rejected", close=True)
     preview_use, preview_probe, _ = _preview_arguments(source, args)

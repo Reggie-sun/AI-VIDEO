@@ -453,7 +453,7 @@ class ResolvedCaptionCue(StrictModel):
 
 class ResolvedTimeline(VersionedArtifact):
     schema_version: Literal["2.0", "2.1", "2.2", "2.3", "2.4"] = "2.0"
-    usage_scope: Literal["production", "development_preview"] = "production"
+    usage_scope: Literal["production", "development_preview", "development_audio_preview"] = "production"
     timeline_id: str
     composition_spec_id: str
     composition_spec_revision: int = Field(ge=1)
@@ -521,6 +521,11 @@ class ResolvedTimeline(VersionedArtifact):
                 item.native_audio_retime is None for item in self.audio_spans
             ):
                 raise ValueError("ResolvedTimeline 2.4 previews may contain only linked native audio")
+        if self.usage_scope == "development_audio_preview":
+            if (self.schema_version != "2.3" or not self.audio_spans or self.caption_cues
+                    or any(span.audio_kind not in {AudioKind.BGM, AudioKind.SFX, AudioKind.AMBIENCE}
+                           or span.native_audio_retime is not None for span in self.audio_spans)):
+                raise ValueError("Replacement audio previews require explicit non-speech P4 audio in 2.3")
         if self.schema_version != "2.4" and any(
             item.native_audio_retime is not None for item in self.audio_spans
         ):

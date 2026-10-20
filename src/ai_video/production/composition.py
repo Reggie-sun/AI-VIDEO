@@ -799,7 +799,8 @@ def _resolve_composition(
     )
     if spec.schema_version in {"2.3", "2.4"}:
         timeline_fields["usage_scope"] = (
-            "development_preview" if preview_layer_ids else "production"
+            "development_audio_preview" if preview_layer_ids and spec.audio_tracks
+            else "development_preview" if preview_layer_ids else "production"
         )
     if spec.schema_version in {"2.1", "2.2", "2.3", "2.4"}:
         timeline_fields.update(audio_spans=audio_spans, caption_cues=caption_cues)

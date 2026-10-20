@@ -47,6 +47,7 @@ def resolve_preview_layer_ids(
     invalid: Callable[..., AiVideoError],
 ) -> set[str]:
     preview_layer_ids: set[str] = set()
+    preview_scopes: set[str] = set()
     roles_by_shot = {
         shot_id: {role.role: role for role in shots_by_id[shot_id].required_asset_roles}
         for shot_id in spec.shot_ids
@@ -61,14 +62,22 @@ def resolve_preview_layer_ids(
             continue
         from ai_video.production.repair_input_admission import (
             allows_repair_preview_layer,
+            verify_repair_input,
         )
 
         if allows_repair_preview_layer(project, layer, shot):
             preview_layer_ids.add(layer.layer_id)
+            asset = next(a for a in project.registry.assets if a.asset_id == layer.asset_id)
+            preview_scopes.add(verify_repair_input(asset, project.root).preview_use.scope)
     if preview_layer_ids:
         if spec.schema_version not in {"2.3", "2.4"}:
             raise invalid("Development repair previews require CompositionSpec 2.3 or 2.4.")
-        if spec.audio_tracks or spec.caption_tracks or spec.voice_sources:
+        if "replacement_audio_preview" in preview_scopes:
+            if (spec.schema_version != "2.3" or preview_scopes != {"replacement_audio_preview"} or not spec.audio_tracks
+                    or any(t.audio_kind.value not in {"bgm", "sfx", "ambience"} for t in spec.audio_tracks)
+                    or spec.caption_tracks or spec.voice_sources):
+                raise invalid("Replacement audio preview requires explicit P4 music/SFX/ambience only.")
+        elif spec.audio_tracks or spec.caption_tracks or spec.voice_sources:
             raise invalid(
                 "Development repair previews cannot contain audio, captions, or voice sources."
             )
