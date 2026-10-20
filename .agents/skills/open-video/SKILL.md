@@ -21,28 +21,24 @@ description: Use for AI-VIDEO Director review of selected source plans, or Direc
 
 ## 1. What open-video does
 
-open-video is the **autonomous director** layer on top of open video models. It turns a concept
-into a finished film by running the loop no open engine ships natively:
+In AI-VIDEO, Codex uses this advisory Skill to make creative decisions: translate the brief into
+audience experience, design action and visual expression, direct performance, choose coverage,
+and judge whether the result serves the work. Use the
+[directorial choices and diagnosis practice](references/creative-completion.md#directorial-choices)
+to reason about these decisions before filling the existing coverage fields.
 
-**plan → craft → validate → generate → judge → refine → stitch → deliver**
+The project-local Skill contains guidance and a coverage validator. The upstream `core/`,
+`backends/`, `engines/`, judge and stitcher described later are upstream references, not an installed
+AI-VIDEO Director runtime. H3 mode, grammar, settings and commands below apply only as advisory
+upstream examples after selecting an approved H3 Shot; verify the current adapter/profile through
+[`h3-video`](../h3-video/SKILL.md). They do not choose another Provider or override its authoring.
+Creative reasoning may describe emotion and motivation; translate those choices into observable
+performance through the selected adapter rather than applying H3 wording rules to all directing.
 
-- **Model-agnostic core** (`core/`): planner (coherence bible), crafter, validator, judge-loop,
-  stitcher, selector, ref-pack builder.
-- **Pluggable backends** (`backends/<model>/`): baseline = **MiniMax H3** (#1 open model, Arena
-  parity with closed, native stereo audio). Future: Wan2.2 (physics), LTX-2.3 (speed).
-- **Engine adapter** (`engines/comfyui/`): drives ComfyUI via its HTTP API. open-video is the brain;
-  ComfyUI is the hands.
-
-It is NOT a video engine (ComfyUI is the engine) and NOT a model (H3/Wan/LTX are backends). It is
-the agent brain ComfyUI lacks: judge→refine + multi-shot stitch + coherence planning **as they
-land**.
-
-**v0.0.1 honesty:** prefer [`skill/h3-video`](../h3-video/SKILL.md) for reliable high-quality
-single clips. Multi-minute film is the flagship *design*. The judge is REAL when env-wired:
-set `OPEN_VIDEO_VLM_URL` + `OPEN_VIDEO_VLM_MODEL` (+ `OPEN_VIDEO_VLM_KEY`) to any
-OpenAI-compatible vision endpoint and every shot is scored + diagnosed automatically;
-with the env unset it is an honest PASS stub — then manual frame review is mandatory.
-Single open models still cap ~15s/shot; longer output needs multi-shot orchestration (partial).
+Return authoring to the existing Canvas/Shot owners, generation to the selected adapter, timing to
+`ResolvedTimeline`, composition to HyperFrames, and acceptance to the existing media/QA owners.
+No upstream command, automatic score or PASS stub substitutes for those owners or for watching
+and hearing the exact film.
 
 ## 2. Agentic procedure — run these steps in order
 
@@ -180,6 +176,20 @@ completeness; it does not prove exhaustive constraint extraction or natural-lang
 Before Shot approval, the Agent must first compare raw evidence against the declared inventory for
 unextracted explicit constraints, then compare the declared inventory against planned coverage for
 omissions, reversals, or unauthorized reinterpretation.
+
+**Carry the meaning through authoring.** Before submission, trace the decisive action, relation or
+reveal from coverage into Canvas direction / `Shot.intent`, then the selected `generation_intent`
+or preserved source and the actual native preview. Prose in `Shot.intent` alone does not guarantee
+that it reaches the model. Identify where the meaning is expressed; matching IDs or retaining a
+quote elsewhere is insufficient. If “tries to sit but is blocked” becomes “leans forward and stands
+still”, fix the authoring handoff. Do not ask the Compiler to invent the missing action. Check that
+the existing QA owner has not reduced the necessary result to an easier incidental gesture;
+preferences and generation margins still require the classification above.
+
+For known-quality failures, use
+[failure attribution](references/creative-completion.md#failure-attribution) before selecting a fix,
+including during source-preserving review. Diagnosis does not authorize redesigning approved
+content or another generation attempt.
 
 **Step 2 — Pick the mode.** Mode is auto-derived from inputs (see `backends/h3/backend.py` and
 `scripts/validate_prompt.py` `detect_mode`):
