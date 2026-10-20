@@ -39,9 +39,10 @@ Seedance adapter 单独关闭它。`SeedanceNativePromptBinding` 去掉原65536�
 这些是离线工程证据，不证明Provider live接受长文本或视频观感改善。
 
 Parent自审：局部文本长度处理与advisory指导调整，无授权、凭据、持久化或验收路径变更，
-按当前Risk Gate不额外派独立reviewer。最终完整changed-path policy验证由
-`.agent/harness/runs/seedance-prompt-length-20261021/receipt.json`及其exact commit-range身份给出；
-本段不预先声明该receipt通过。
+按当前Risk Gate不额外派独立reviewer。额外启动的大范围changed-path policy验证耗时过长，
+用户明确要求收回到Prompt限制修改后已停止，不重跑；
+`.agent/harness/runs/seedance-prompt-length-20261021/receipt.json`为未完成记录，
+不声称完整Harness通过。上述121项相关测试已完成并通过。
 
 ## Boundaries
 
