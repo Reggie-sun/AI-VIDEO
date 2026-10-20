@@ -8,6 +8,20 @@ learning_eligibility: ineligible
 
 Date: 2026-10-20
 
+## Uploaded Style Camera Correction
+
+后续对照原首帧发现v015的远景机位不适合当前原图近前景要求；其probe/旧MCP成功不证明构图满足。Parent在materialize的pre-write standard reader中停止准备进程，实际Manifest178/Project26、budget revision45的550,000,000内部上界保留，未创建新视频attempt/permit或发出视频POST。唯一调用转到同单元`uploaded-style-S01-20261020-001/camera-corrected/`，父子合计仍最多一次POST，不重复预算扩展。
+
+本地headless Blender 5.2.1 LTS复用原真实镜面、林砚glossy-ray缺席、右手黑手机和左手连续动作，按原首帧校准近处林砚与上方七名他人倒影。8个camera starts共1,624个数值候选，移动苏遥proxy X -0.50米及陈立整组X +0.42米以分开头部，未改变最终人物身份/座位职责；保留原.blend及全部候选。静态round8发现WB-001：立杆遮郭向东头脸。Parent CONFIRMED，仅将reflected pole X从0.87改到1.189396米，使其投影在郭/沈之间；一版本地投影solver符号错误候选被拒绝并留档，正确版开场/hover实际静帧均由Parent查看。有限本地边界有据扩为8张review still、60分钟、最多2次video export，均无额外paid调用；首export局部帧保留。
+
+新白模为`whitebox-camera-repair/S01-whitebox-camera-corrected-v2.mp4`，SHA `88969efcc00dec396f7e1b97c5a072b79b2072b76969d056b7cd8b5e25e21f6a`、191,919 bytes、720×1280、24fps、120帧/5秒、无音轨。实际逐帧数值检查七名他人头部及手机/左掌不出画，55帧后左掌最近玻璃距离约0.02米，林砚mesh glossy visibility全关闭。Parent再次显式调用project-local `video_analyze`，查看0/1/2/3/4秒五帧，`mcp-v2.json`保存实际返回；只证明本地参考的camera/action/mirror/props职责，不证明生成片的身份、材质、2厘米距离或完整1×视听验收。
+
+新source保留此前七个text parts，追加当前相机/参考职责；新白模5秒参数显式取代历史v015四秒参数。九图identity/bytes不变，新asset ID与provenance避免覆写旧Registry记录。纯输入预检PASS；后续实际canonical/native/POST/媒体状态须以本节后补的当前证据为准，不把以上参考检查当作已生成新shot。
+
+唯一committer完成新authoring/QA登记至Manifest181，parent Shot hash `e753c8f9bcc9a2368b0d16f4cbb316b881a247dc11f0f5ca58003432a83955aa`、QA hash `a36ad13906b4ae42ed8391a59ac1cc0c57d731d65618d7432bdcbde8756f1cbc`；随后materialize至Project28/Manifest183。实际prepared attempt `canvas-f537c7549329d0c5b4cc8254756e0a2054d2e75f`，binding hash `e9b27d8e3f818782ddb3c5a2399c23f3c949d154bd07ef92a147d109c86b2fba`。Native preview确为9个不同`reference_image`和1个`reference_video`，body 26,771,514 bytes、SHA `645c1e25466c356d3f7fb81b5c1881721e6181c63babc69348affb56d0a252d4`；sealed source适配prompt和实际prompt同为`86575a5077f6fd315e2fff31e878e169920c2bd41f37abe07546092998dddacf`。`creative-preflight-current.json`逐项记录semantic open/close、首镜continuity、handoff/原0–3秒采用窗口、axis/action/camera、alias适配和lint证据；native参数为MiniMax-H3-Max/5秒/768P/9:16/balanced，resolved output要求native_audio=true。
+
+本次camera/native-input稳定checkpoint按`record-ai-video-session`评估为record；自动learning评估为`no_candidate`：局部参考与预检不能代替新生成片或受控比较，不修改Skill/Policy/Gate/global memory。文档exact staged receipt为`.agent/harness/runs/jieshi-uploaded-style-camera-inputs-record-20261020-r1/receipt.json`，其验证范围只为当前owned文档，视频POST及媒体裁决仍待当前单元后续实际证据。
+
 ## Uploaded Style Inputs Checkpoint
 
 用户先要求“用剑来那种风格尝试下”，随后上传Image #1并明确“换这个画风[Image #1]”。当前美术权威改为该上传图，SHA `1e60b7c241ee17823cd2b4aa33fd33f9717a0dc18442dee657756160c50b557d`，已exact copy至`runs/canvas-jieshi-original-s01-s02-20261013-001/uploaded-style-S01-20261020-001/style-input/user-style.png`。只迁移高精度3D CG五官/发丝/材质、冷蓝暗调、暖色点光与边缘光，保留《界蚀》现代地铁、人物服装、动作、原声和剧情；不引入古装、白发、雨景或截图UI。
