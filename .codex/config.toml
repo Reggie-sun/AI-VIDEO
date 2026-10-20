@@ -53,3 +53,22 @@ CODEGRAPH_INDEX_PATH = "/home/reggie/vscode_folder/AI-VIDEO/.codegraph-cache/ind
 [mcp_servers.aoci]
 command = "/home/reggie/.local/share/aoci-code/v0.1.0-rc14/aoci"
 args = ["--repo", "/home/reggie/vscode_folder/AI-VIDEO", "mcp"]
+
+# Project-scoped browser automation; local package pinned to @playwright/mcp 0.0.83.
+[mcp_servers.playwright]
+command = "/home/reggie/.local/bin/node"
+args = [
+    "/home/reggie/.local/share/ai-video/playwright-mcp/node_modules/@playwright/mcp/cli.js",
+    "--browser", "chrome",
+    "--executable-path", "/usr/bin/google-chrome",
+    "--user-data-dir", "/home/reggie/.local/share/ai-video/playwright-mcp/profile",
+    "--output-dir", "/home/reggie/.local/share/ai-video/playwright-mcp/output",
+]
+cwd = "/home/reggie/vscode_folder/AI-VIDEO"
+startup_timeout_sec = 30
+tool_timeout_sec = 120
+
+[mcp_servers.playwright.env]
+DISPLAY = ":1"
+XAUTHORITY = "/run/user/1000/gdm/Xauthority"
+XDG_RUNTIME_DIR = "/run/user/1000"
