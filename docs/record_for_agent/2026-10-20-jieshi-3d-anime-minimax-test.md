@@ -8,6 +8,37 @@ learning_eligibility: ineligible
 
 Date: 2026-10-20
 
+## Uploaded Style S01 Actual Result
+
+当前用户上传图方向已完成一次真实MiniMax S01，actual attempt为`canvas-f537c7549329d0c5b4cc8254756e0a2054d2e75f`。父单元暂停后未发视频POST；camera-corrected子单元是本新目标的唯一POST。真实body与下方native preview的SHA/26,771,514 bytes完全一致，实际9张不同reference image加唯一5秒新白模，不是旧单首帧路线。原16项raw/38项FinalOutput及0–3秒采用窗口保留；本次没有渲染3秒composition。
+
+Task ceiling11→12与此前used11保留，已应用的内部550,000,000 microCNY上界不重复扩展，单次50,000,000内部上界不变；不是市场价、账单或余额。`paid-preview.json`、`paid-authorization.json`及`quota-extension.json`封存当前一次调用。2026-10-20 05:28:21–05:28:23 UTC唯一POST到official CN返回HTTP200，随后canonical登记accepted；05:33:45同task状态GET观察succeeded，05:34:03文件查询GET后只下载同一已知结果。提交writer退出后才查询，没有在持锁期间额外GET或盲重发。
+
+本地历史次数/预算重复回读使submit从04:56:11开始至05:28:21才发出POST，约32分钟属于本地核验，不是MiniMax生成耗时。另用现有default Python3.13对Manifest185/Project28完成standard reader验证（193.6秒）及exact native body复核后执行；MCP桥接仍用既有pinned分析Python3.11，不改共享源码或Guard，也不从不同快照的耗时推出受控性能结论。
+
+| Artifact | Exact evidence |
+| --- | --- |
+| 原始MP4可播放副本 | `uploaded-style-S01-20261020-001/camera-corrected/outputs/Jieshi-S01-uploaded-style-MiniMax-test.mp4`，与canonical fetched bytes完全一致，未转码、剪辑或重定时 |
+| SHA-256 / bytes | `b3fea442735a2ad0a41c795c548c05e1a27c11a804b50e740775e417e918203b` / 5,849,266 |
+| 实测流 | H.264，768×1344，24fps，124帧；container5.184秒；AAC stereo32kHz |
+| Exact provenance | 本子目录`submit.actual.json`、`poll.actual.json`、`fetch.actual.json`、`wire-observations.json`、`probe.actual.json`、`output-identity.actual.json` |
+
+Parent经实际project-local stdio MCP显式调用`video_analyze`，对canonical MP4按0.25秒取得0–5秒21个样帧，另看原生首帧与最后decoded frame123；`mcp-call.json`、`mcp-response.json`、`controlled-presentation.json`和`analysis-frames/`保存当前identity与展示。相同native `reviewer_high`完成round9/9，独立核验同SHA并显式调用`video_extract_frames`看21个实际样帧。`review-round9.json`保存3项blocking candidates，Parent均CONFIRMED：2.0/2.25/2.5秒窗内随动手影；0–1.5秒额外手掌/米白矩形物，1.75秒残留、2秒消失；苏遥坐在远排、老人站立并新增手机，缺少卡其夹克/细黑框眼镜沈嘉程的对应身份。新片不是旧片“两名苏遥”的同一观察，不复用旧结论。
+
+本次`controlled-answers.json`按当前全部16个sealed问题给出1 PASS /9 FAIL /6 NOT_EVALUATED。唯一PASS仅为close-anchor的林砚在场。FAIL为camera、identity、left-hand、phone、reflections、space、source-hover-prerequisite、character-performance、3d-anime-style：camera失败指对应空座被背影占据的信息关系，未冒称测出28mm焦距错误；performance失败依据已写的站坐/手部/道具职责，不编造细微呼吸或表情证据；style完整谓词含身份/道具/原构图保持，失败不否认可见的前景3D CG，也不代表用户已拒绝该审美。hover失败依据额外手/物体消失的连续动作缺陷，不套用原片3秒或2.5秒硬deadline。
+
+其余badge、broadcast、gaze-lips、native-track、other-props、source-output保留未验证，不以部分满足代签完整谓词。补充现有缓存Whisper base得到“林炎 請在終點站下車”；默认Python缺torch在本地停止后改用既有分析环境，无安装、下载或远程audio-understand。ASR同音字、AAC/PCM存在及数值音量不证明精确人名/声线/扬声器位置/0.1–2.7秒时间窗或完整听审。原速完整声画、精确生成2cm及最终3秒采用均未取得验收。
+
+实际canonical review由唯一committer登记至Manifest190，experience hash `b613c43d7e35a4e858875113eed3c33d1cbd10b61581aa0b3056cdbfe18f4a5f`，diagnosis evidence hash `0d4bc801c8495a107fc753e1872d770684321f461bcc4317571fc7d10286180c`。`diagnosis.json`明确`all_required_observed_pass=false`，failure classes为`EVIDENCE_GAP`与`QUALITY_FAILURE`，并非把Agent答案文件冒充已登记评审。已知手部、倒影和人物职责错误无法由同bytes补证消除；本单元唯一POST已消费，不重抽、不提交S02，不激活/P6/Final Acceptance，不用裁切、配音或重定时掩盖缺陷。
+
+唯一committer随后执行有明确质量理由的`abandon_video_generation`，Manifest191中本attempt为`failed / video_quality_rejected`。quality rejection hash为`1687b7e2cc1a74e426b3dec23fb5bed3acc15e37c94984f536353890101dbbb2`，canonical文件为`production/state/video-generation/rejections/1687b7e2cc1a74e426b3dec23fb5bed3acc15e37c94984f536353890101dbbb2.json`，绑定上述exact MP4与experience。子目录`quality-rejection.actual.json`、`closure-status.actual.json`、`closure-proof.actual.json`保存关闭证据；budget revision48、550,000,000内部上界、当前reservation为`reserved`、真实累计remote次数12均保留。失败关闭没有退回额度，不宣称Provider实际费用已结算。
+
+## Uploaded Style S01 Verification And Publication
+
+本次只更新本主记录；媒体、参考及运行证据留本地run，不上传Git。`record-ai-video-session`评估record；自动`distill-ai-video-learning`评估`no_candidate`：风格、参考与机位同时变化的单次实验不构成受控比较，也没有经过验证的独立修复，不修改Skill/Policy/Gate或全局memory。
+
+本次文档exact staged Harness receipt为`.agent/harness/runs/jieshi-uploaded-style-S01-live-record-20261020-r1/receipt.json`，仅验证owned文档快照，不代签媒体质量。无共享实现变更，Parent完成文档自审；实际媒体独立复核另见round9。publication只包含本任务owned记录的commit、push及remote SHA核验；原速完整视听、最终composition及用户风格认可仍未取得，所有foreign dirty路径保留。
+
 ## Uploaded Style Camera Correction
 
 后续对照原首帧发现v015的远景机位不适合当前原图近前景要求；其probe/旧MCP成功不证明构图满足。Parent在materialize的pre-write standard reader中停止准备进程，实际Manifest178/Project26、budget revision45的550,000,000内部上界保留，未创建新视频attempt/permit或发出视频POST。唯一调用转到同单元`uploaded-style-S01-20261020-001/camera-corrected/`，父子合计仍最多一次POST，不重复预算扩展。
