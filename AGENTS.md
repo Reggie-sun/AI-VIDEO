@@ -65,7 +65,7 @@ real media/quality、Provider/model、continuity、regression/recovery、prior a
 首次 creative prompt/contract/script 前读取 [Creative Routing And Preflight](.agent/context/control-plane-playbook.md#1-creative-skill-routing-and-preflight)，再实际读取匹配 Skill、声明选择及影响。Live/paid preview/permit/POST 前报告 continuity、handoff、axis/action/camera、prompt adaptation、lint evidence，缺失停止；schema/操作由各 Skill 和 validators 独占。
 Blender 资产/参考制作先读 [routing](docs/blender-routing.md)；媒体实验/Pilot/成片交付先读 [Verification/Pilot](.agent/context/control-plane-playbook.md#4-verification-pilot-and-delivery-details)；credential/paid/ceiling 续期先读 [Provider Details](.agent/context/control-plane-playbook.md#3-provider-credential-and-paid-execution-details)，授权边界仍由下文决定。
 
-所有 Shot 默认先制作、核验并实际绑定[白模参考](docs/canvas-production-harness.md#per-shot-whitebox-reference)，仅在所选模型不支持或本镜确无必要且逐镜记录依据时例外。
+每 Shot 按题材、表演/动作/空间/摄影目标、所选模型能力与已有成片证据选择必要的参考条件，不因具备白模制作能力而默认使用白模；选用[白模参考](docs/canvas-production-harness.md#per-shot-whitebox-reference)时核验并实际绑定，白模、参考图或长 Prompt 均不保证导演意图被执行，效果须由 exact 成片验证。
 
 ## Agent Workflow Routing
 

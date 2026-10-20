@@ -184,7 +184,7 @@ H3 Max 当前 frame capability 只在 sealed `aspect_ratio=adaptive` profile 中
 Seedance 2.5 frame route 发 `ratio=adaptive`，R2V 发 `omni_reference_task_type=reference`。
 Seedance 官方允许在 reference 模式的原文中指定某图片为首/尾帧，但这不获得端点模式的约束；
 使用已有 `reference_aliases` 绑定原 slot 并展示适配 diff，不凭中文数字猜素材、自动插入新创作要求。
-若首帧路线不能同时消费动态白模，必须逐镜记录 exact mode 的能力证据及例外，保留全部原要求；
+若本镜选用动态白模但首帧路线不能同时消费，必须逐镜记录 exact mode 的能力证据及输入取舍，保留全部原要求；
 或经明确选择改用视频参考并接受首帧控制减弱，不能静默删除其中一项。
 实测参考长度、标称生成长度与采用窗口分别说明 hold/padding/动作落点，最终 trim/frame/sample/timing
 仍归 `ResolvedTimeline`。参数/绑定正确只证明输入，不证明模型服从或验收。
@@ -223,7 +223,7 @@ legacy profile 无此字段时保留旧 bytes/hash 与投影行为，逐目标�
 不能冒充多份独立身份输入，同一 binding 被多个目标复用合法。只拒绝错误声明，不自动合并 alias 或改编号。
 白模 duty 仅核对实际图像/视频绑定；静帧只适用于已说明的静态布局，动态控制仍须视频及逐镜 QA。
 普通视频没有 whitebox duty 时不得推断其用途；declared duty 也不证明白模制作、时序或质量已核验。
-frame/reference 互斥及逐镜白模例外继续沿现有模型能力和上文/下文 authoring 规则处理。
+frame/reference 互斥及逐镜参考选择继续沿现有模型能力和上文/下文 authoring 规则处理。
 
 `reference_control.objectives` 从同一完整 recipe 投影要求、输入片段、机制、duty、native path 与验收要求，
 区分输入已表达、输入不支持及未评估；`decision.assessments` 只解释原候选选择。
@@ -450,19 +450,19 @@ compiler 输出。为切点预留的提前落定时间属于生成余量，必�
 
 ## Per-Shot Whitebox Reference
 
-这是用户明确指定的默认制作要求，适用于所有项目、Provider与每一个Shot：**先做白模参考，验后实际作为模型输入，再生成该镜头**。沿[Blender routing](blender-routing.md)使用现有Skills与共享资产入口；不新建故事执行链。此前单个白模实验不构成效果保证，新增规则也不追认历史失败为成功。
+白模是可选的空间、动作与摄影预演手段，不是所有题材或Shot的默认生成路线；按`AGENTS.md`逐镜选择参考条件。选用白模时，沿[Blender routing](blender-routing.md)使用现有Skills与共享资产入口，核验后实际绑定；不新建故事执行链。白模、参考图及长Prompt均不保证模型服从；输入组织修复与工程PASS也不证明画面质量改善，仍须exact新成片证据。
 
-### Coverage And Exceptions
+### Reference Selection
 
-在既有Director适配说明/preflight证据中逐镜写明结论，不能整段或整个项目默认豁免：
+在既有Director适配说明/preflight证据中逐镜说明参考职责与选择依据，结合题材、表演/动作/空间/摄影目标、所选exact model/profile/mode/role及已有成片证据，不以题材标签或工具可用性代替判断：
 
 | 结论 | 必须具备的依据 |
 | --- | --- |
-| 制作或复用白模参考 | 动作、人物/道具接触、走位、人数、空间、反射、运镜或接点等需保留的原要求；复用仍核对本镜全部适用条件。 |
-| 模型不支持 | 所选exact model/profile/mode/role及当前adapter/capability证据，说明不支持所需视频/静态白模输入。上传、素材准入、配额或runtime暂缺属于待补能力，不能谎报模型不支持。未知先查明，不默默退回纯prompt。 |
-| 确无必要 | 具体说明本镜没有需要几何/动作/摄影预演控制的信息，例如单纯静态风景/环境、纯图形，或直接复用已验收素材。环境镜有复杂运镜、关键空间关系或事件变化时仍做白模；制作麻烦、赶时间、已有文字/美术图都不是跳过理由。 |
+| 制作或复用白模参考 | 说明需要引导的具体空间关系、动作或摄影目标，以及当前输入模式能消费哪些参考；复用仍核对本镜全部适用条件，不假定模型原样继承动作时序。 |
+| 使用其他参考条件或文字 | 说明所选原图、人物/表演/动作参考、首尾帧或文字分别承担什么职责及其局限；有空间或动作要求也不自动强制白模，不使用白模无需申请例外。 |
+| 所需输入能力不支持或未知 | 核对当前adapter/capability证据；上传、素材准入、配额或runtime暂缺不能谎报模型不支持。未知先查明，再明确选择可行路线，不默默删掉原要求或退回纯prompt。 |
 
-只有上述两类有依据的例外允许不使用白模。未完成且无有效例外时，在付费preview/permit/POST前停止并补齐。例外不豁免原剧情、引用准入、预算或逐镜QA，也不授权换模型、额外调用或上传。
+选定的必要参考未核验或未实际绑定时，在付费preview/permit/POST前停止并补齐。参考选择不豁免原剧情、引用准入、预算或逐镜QA，也不授权换模型、额外调用或上传；以下制作步骤仅适用于选用白模的Shot。
 
 ### Author, Bind And Verify
 
@@ -474,7 +474,7 @@ compiler 输出。为切点预留的提前落定时间属于生成余量，必�
 6. **Prove actual consumption before submit.** 每镜展示白模path/SHA、实测规格、参考职责、原图identity、actual camera/aspect设置、生成/采用时序及实际编译后的image/media bindings与native请求预览。检查所选输入路线确实送入白模，不能只在prompt提到它或只把文件放进Registry。输入数量、role、人物/场景owner或素材准入不匹配时指出具体缺项，做必要共享适配；不要无依据复制参考、猜参数、绕过guard或悄悄省略白模。
 7. **Recheck the generated Shot.** exact输出后仍显式调用project-local `video-analysis`，按全部原要求逐项验身份、动作、道具、人数、空间、摄影、画幅/裁切、声音和接点。白模/绑定/工程PASS不代模型服从或成片PASS；原图里的手机/工牌等不能因新画幅出画而直接继承通过。仅全PASS才推进下一镜；FAIL/NOT_EVALUATED/UNKNOWN沿原Gate停止与恢复，human 1.0x听看仍另验。
 
-白模制作、核验、导入和绑定是Agent的执行责任；以上逐镜说明复用已有Director/preflight/evidence owner，不增加Product schema、状态库或第二timeline。本规则本身不证明程序已自动拦截所有工具调用，亦不提供新付费或重抽许可。
+选用白模后的制作、核验、导入和绑定是Agent的执行责任；以上逐镜说明复用已有Director/preflight/evidence owner，不增加Product schema、状态库或第二timeline。本规则本身不证明程序已自动拦截所有工具调用，亦不提供新付费或重抽许可。
 
 ## Agent Image Authoring Workflow
 
