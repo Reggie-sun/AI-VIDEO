@@ -8,7 +8,21 @@ learning_eligibility: ineligible
 
 Date: 2026-10-20
 
-## Current S01 Generation Request
+## Uploaded Style Inputs Checkpoint
+
+用户先要求“用剑来那种风格尝试下”，随后上传Image #1并明确“换这个画风[Image #1]”。当前美术权威改为该上传图，SHA `1e60b7c241ee17823cd2b4aa33fd33f9717a0dc18442dee657756160c50b557d`，已exact copy至`runs/canvas-jieshi-original-s01-s02-20261013-001/uploaded-style-S01-20261020-001/style-input/user-style.png`。只迁移高精度3D CG五官/发丝/材质、冷蓝暗调、暖色点光与边缘光，保留《界蚀》现代地铁、人物服装、动作、原声和剧情；不引入古装、白发、雨景或截图UI。
+
+此前《剑来》方向实际完成林砚、苏遥两次内置imagegen，均known-success并保存在`jianlai-style-S01-20261020-001/references/`；被用户新目标替代，不作为当前模型输入，也没有该方向的视频POST。当前上传图方向另完成两次内置`image_gen.imagegen`，不是重发unknown：`references/linyan-v1.png` SHA `941e1654a06e006da012ea9852a76792ab42b30daeb48e7767e6c883ffe6c7b3`，`references/suyao-v1.png` SHA `7795fa5dc0280497a7d93c4baf4c600d89e4d6dffd72371704a8da741a673e67`。均为1536×1024，模型身份未暴露，不猜型号；exact prompt在同目录`linyan-prompt.txt`与`suyao-prompt.txt`，原图不覆盖。
+
+本单元只重做两位核心角色参考，其余六人及车厢共七张保留原bytes；旧人物图只提供身份/年龄/服装/道具，统一画风由两张新参考负责。`references/asset-index.json`实际共9图，frozen `references/review-target-index.json` SHA `26e9e61e20ae0ccf0374284c267a9d08b7b453550148223acb4e43f75b3b6d0e`。同一native `reviewer_high`完成round7静态输入/概念复核，finding set为空，未代签新视频或用户风格认可。用户新画风单元有据扩展review上限6→9，历史round1–6保留；`finite-unit.json`保留次数、旧/新预算计划及stop条件。
+
+v015白模在当前SHA下再次显式调用project-local `video_analyze`，实测720×1280/24fps/96帧/4秒，查看0/1/2/3秒，保存`whitebox-mcp-current.json`；仍只负责几何/动作/机位。原六段source text逐字保留，仅追加一个素材职责/美术段，纯输入检查通过。准备中发生的旧Project版本assert及immutable QA复制错误均在本地停止、无Production写入或视频POST；核对当前Project25并沿model serialization修正，实际QA构建及其余15项raw/37项FinalOutput逐值保持检查通过。
+
+随后由唯一committer登记Project26/Manifest177的新authoring与QA：parent hash `3d43a1c4185d4d05cdcefee8d5fb02366136d71ff1b096153dd7c1be97591772`，QA hash `6cf4c11be492d2642d384cbeb73a2aa4c6fbeba6fcfe46f6291dcaf867e7763d`。只随用户新目标更新`s01-3d-anime-style`谓词，仍为16项raw/38项FinalOutput。该输入checkpoint没有新视频POST，尚不能声明新shot已生成；当前授权继续沿同一official MiniMax-H3-Max CN、5秒/768P/9:16/balanced/R2V/原生音轨做唯一一次S01，零重抽、S02 POST0，真实native binding及结果须另取证。
+
+`record-ai-video-session`在“两张参考完成＋authoring已登记”的稳定输入边界评估record；自动`distill-ai-video-learning`为`no_candidate`，当前不从美术输入或旧失败推导新视频效果或通用规律。该checkpoint文档receipt为`.agent/harness/runs/jieshi-uploaded-style-inputs-record-20261020-r1/receipt.json`；不代签媒体质量。后续paid/媒体状态以本单元实际receipt为准，前次下文失败片保持原判。
+
+## Previous S01 Generation Request
 
 用户质疑“你确定这个是3d动漫风”。Parent承认该批更接近写实CG，尤其老人和中年乘客偏拟真；先前静态finding为空只覆盖已查的造型/道具问题，不证明鲜明且统一的动漫风或用户认可。随后用户明确“别管,反正先做了再说用minimax”“生成shot”：继续一次原S01实测，不再生图；不把这两句话当作风格验收或撤回原3D目标。
 
