@@ -18,13 +18,17 @@ def forbidden(*args, **kwargs):
     raise AssertionError("compiler-only wiring must not use transport or credentials")
 
 
-def prepare(provider, profile, output, compiler_id, compiler_version="2", authorized_model=None, setup=None):
+def prepare(provider, profile, output, compiler_id, compiler_version="2", authorized_model=None, setup=None,
+            action_progression=None):
     setup = setup or setup_decision()
     intent = _complete_intent().model_copy(update={
         "pacing": Pacing(shot_duration_seconds=output.duration_seconds or 4),
         **({"ambience_intent": AmbienceIntent(environment_bed="none", explicitly_silent=True)}
            if not output.native_audio else {}),
     })
+    if action_progression is not None:
+        intent = intent.model_copy(update={"subject_action": intent.subject_action.model_copy(
+            update={"progression": action_progression})})
     conditioning = setup["projection"].requirement.conditioning_compatibility
     if conditioning is not None:
         conditioning = conditioning.model_copy(update={"available_duration_seconds": output.duration_seconds})
@@ -80,6 +84,46 @@ def test_seedance_registered_models_through_common_caller(model):
     assert result.execution_binding is not None
     assert result.resolved_request.model_id == model
     assert "reaches once and secures the product" in result.resolved_request.prompt_text
+
+
+@pytest.mark.parametrize("model", [
+    "doubao-seedance-2-0-260128", "doubao-seedance-2-0-fast-260128",
+    "doubao-seedance-2-5-260628",
+])
+@pytest.mark.parametrize("action", [
+    "他看见她让出的座位，停下离开的脚步。" * 350 + "她等他坐下后才松开紧绷的肩膀。",
+    "He notices the offered seat and stops leaving. " * 150 + "Only after he sits, her shoulders relax.",
+], ids=["zh", "en"])
+def test_seedance_long_prompt_keeps_complete_action_in_native_payload(model, action):
+    from ai_video.production.seedance import SeedanceVideoProvider
+    from test_production_seedance import _active_profile, _profile_pointer, _request
+
+    profile = _active_profile(model)
+    output = _request(profile, model_id=model).output_requirement
+    provider = SeedanceVideoProvider(profile=profile, transport=forbidden, credential=forbidden,
+                                    input_reference=forbidden)
+    result = prepare(provider, _profile_pointer(profile), output, "seedance-video-compiler",
+                     action_progression=action)
+
+    assert result.compilation.outcome == "compiled"
+    assert result.execution_binding is not None
+    prompt = result.resolved_request.prompt_text
+    assert len(prompt) > 5000
+    assert action in prompt
+    assert provider._payload(result.resolved_request)["content"][0] == {"type": "text", "text": prompt}
+
+
+def test_other_remote_providers_keep_existing_compiled_prompt_limit():
+    from ai_video.production.minimax_h3 import MiniMaxH3VideoProvider
+    from test_production_minimax_h3 import _profile, _output
+
+    provider = MiniMaxH3VideoProvider(transport=forbidden, credential=forbidden)
+    result = prepare(provider, _profile(), _output(), "minimax-h3-video-compiler",
+                     action_progression="The actor looks at the offered seat. " * 200)
+
+    assert result.compilation.outcome == "unsupported"
+    assert result.resolved_request is None
+    assert result.execution_binding is None
 
 
 @pytest.mark.parametrize("provider_name", ["h3", "hailuo"])

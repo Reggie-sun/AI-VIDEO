@@ -46,7 +46,8 @@ def compile_seedance_request(provider_bound, requirement, *, capabilities, bindi
             native_prompt = binding.compile_source(provider_bound, requirement)
         else:
             compiled = compile_remote_video_prompt(requirement, voice_route=provider_bound.voice_route,
-                provider_bound=provider_bound, continuity_expression=continuity_expression)
+                provider_bound=provider_bound, continuity_expression=continuity_expression,
+                max_prompt_characters=None)
             if not isinstance(compiled, RemoteVideoPromptCompilation):
                 return ProviderRequirementUnsupported(requirement_hash=requirement.requirement_hash,
                     provider_bound_request_hash=provider_bound.provider_bound_request_hash,
@@ -66,8 +67,8 @@ def compile_seedance_request(provider_bound, requirement, *, capabilities, bindi
 
 class SeedanceNativePromptBinding(StrictModel):
     provider_bound_request_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
-    # Local bounded authoring guard, not a claim about the Provider text limit.
-    prompt_text: str = Field(min_length=1, max_length=65536)
+    # Official length guidance is advisory; preserve exact text and its seal.
+    prompt_text: str = Field(min_length=1)
     prompt_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     source_evidence_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     source_preservation: bool = Field(default=False, strict=True)

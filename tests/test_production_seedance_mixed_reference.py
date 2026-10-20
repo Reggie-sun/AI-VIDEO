@@ -205,7 +205,8 @@ def test_reference_jpeg_measured_without_reencoding():
         measure_reference_image(fixtures._rgba_png(), "image/jpeg")
 
 
-def test_pinned_native_prompt_keeps_recipe_coverage_and_exact_text(monkeypatch):
+@pytest.mark.parametrize("repeat_count", [900, 11000])
+def test_pinned_native_prompt_keeps_recipe_coverage_and_exact_text(monkeypatch, repeat_count):
     from ai_video.production.seedance_native_prompt import SeedanceNativePromptBinding
     from ai_video.production.video_compiler import CompiledProviderVideoRequest
 
@@ -218,7 +219,7 @@ def test_pinned_native_prompt_keeps_recipe_coverage_and_exact_text(monkeypatch):
     monkeypatch.setattr(fixtures.SeedanceVideoProvider, "compile_request", capture)
     fixtures.test_recipe_compiles_complete_t2v_intent_with_native_remote_grammar()
     monkeypatch.setattr(fixtures.SeedanceVideoProvider, "compile_request", original)
-    text = captured["result"].provider_native_prompt + "\nExact authored punctuation: …。" + "原始画布全文。" * 900
+    text = captured["result"].provider_native_prompt + "\nExact authored punctuation: …。" + "原始画布全文。" * repeat_count
     assert len(text) > 6306
     binding = SeedanceNativePromptBinding(
         provider_bound_request_hash=captured["bound"].provider_bound_request_hash,

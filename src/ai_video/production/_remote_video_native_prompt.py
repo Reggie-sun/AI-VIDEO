@@ -92,11 +92,14 @@ def _optional(label: str, value: str | None) -> str | None:
 def compile_remote_video_prompt(
     requirement: ProviderNeutralVideoRequirement,
     *, voice_route=None, provider_bound=None, continuity_expression=None,
+    max_prompt_characters: int | None = 5_000,
 ) -> RemoteVideoPromptResult:
     """Compile the current complete intent into remote-provider prose.
 
     The grammar treats provider-specific request payload controls separately;
     this function owns only the native textual expression used by a recipe.
+    Callers may disable the legacy local length guard when it does not represent
+    their Provider's documented limits. This never truncates authored controls.
     """
 
     intent = requirement.generation_intent
@@ -352,7 +355,7 @@ def compile_remote_video_prompt(
     )
     sentences.extend(product_fidelity_sentences(requirement))
     prompt = unicodedata.normalize("NFC", " ".join(sentences))
-    if not prompt or len(prompt) > 5_000:
+    if not prompt or (max_prompt_characters is not None and len(prompt) > max_prompt_characters):
         return RemoteVideoPromptUnsupported(
             unsupported_field_paths=("generation_intent",)
         )

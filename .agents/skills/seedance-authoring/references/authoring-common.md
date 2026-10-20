@@ -52,6 +52,17 @@ subject 与 stable identity
 - Audio 仅作为 authoring intent。Exact native-audio support 与 final mix ownership 仍属于 current
   AI-VIDEO runtime facts。
 
+### Prompt Length Guidance
+
+Seedance 2.0、2.0 Fast 和 2.5 的[官方 API 文档](https://docs.volcengine.com/docs/ark/create-video-generation-task-api?lang=zh)
+建议中文提示词不超过 500 字、英文提示词不超过 1000 词；文字过长可能使信息分散，模型遗漏细节、仅关注重点，
+导致视频缺少部分元素。这是创作建议，不是已核实的 API 硬上限，也不意味着长 Prompt 必然失败。
+
+优先精简重复场景描述、泛化形容词和互相竞争的指令，保留决定含义的动机、动作因果、人物反应、表情变化、
+关键声音及参考职责。不能为凑字数自动截断或删除批准内容；来源保留任务仍按 Generation Input Boundary
+保留原文，创作性改写需有当前任务授权。实际本地编译边界见[运行说明](../../../../docs/seedance-prompt-length.md)，
+不得将中文“字”、英文“词”、字符、UTF-8 字节和 token 当作同一单位。
+
 ## Reference Role Map
 
 每个输入 asset 在进入 prompt 前都必须有一个 primary semantic job：
