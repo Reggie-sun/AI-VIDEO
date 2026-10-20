@@ -98,10 +98,10 @@ reservation、egress、durable intent、one-use permit。Local video 仍经 `Vid
 
 ## 4. Verification, Pilot And Delivery Details
 
-`make harness-inspect` → exact staged snapshot 或 commit range 的 `make harness-verify` / `make harness-verify-range`
-→ `make harness-receipt`。核验 scope/policy/artifact hashes/freshness；isolation/fallback 由 Harness tests 验证。
-Harness 中 `agent_rules_check` 核验 rules/check references、links/anchors、guide/context budgets；`agent_rule_invariants` 与原 changed-path suites 验证迁移 invariant。
-迭代/复审跑受影响 focused tests，必要复审完成且 owned bytes 稳定后运行最终 exact Harness；仅新改动/失败/未决风险使证据失效时补相应检查，不因轮次/记录机械全量重跑。运行中不改 snapshot，drift/读取失败停余项；routing/覆盖只归 policy，失效 receipt 不复用。
+按 `AGENTS.md` 选择最小充分验证，记录对象、命令、结果与限制；不为 receipt 扩跑整组。
+完整验证：`make harness-inspect` → exact staged snapshot 或 commit range 的 `make harness-verify` / `make harness-verify-range` → `make harness-receipt`，核验 scope/policy/artifact hashes/freshness。
+耗时不相称时重评、停止冗余检查，保留中断/未验证项；仅新改动/失败/未决风险使证据失效时补验，不因提交/记录重跑。Harness routing、coverage、unknown-path fallback及receipt验真保持；局部通过不得冒充完整PASS，运行中snapshot drift/读取失败停余项。
+`agent_rules_check` 验 references/links/budgets；`agent_rule_invariants` 与原 suites 验迁移 invariant。
 Harness 不生成媒体或读 secret；CI 自产证据；remote enforcement 必须当前 server evidence。
 真实批量媒体前先完成约 30–60 秒、4–8 连续 Shots 的代表性 Pilot，包含任务主要 media/audio/captions/composition，
 人实际观看给 GO/NO-GO；NO-GO 不扩量。Reference asset 不自动成为 Final Shot Visual，跨非连续 Shot 复用须导演理由和人工 review。
@@ -194,7 +194,7 @@ Native Codex 默认 primary；settled bounded task 直接实施与 focused verif
 仅 staged 清单+时间不能证明 immutable bytes；原生 reviewer 绑定 exact target，read-only，不 nested delegation。
 
 ### Implementation Review
-以相关局部验证为前提，按 `/home/reggie/.codex/SUBAGENTS.md` 的低频 Risk Gate 判断；最终 Harness 留到候选稳定后。
+以相关局部验证为前提，按 `/home/reggie/.codex/SUBAGENTS.md` 的低频 Risk Gate 判断；需要的最终 Harness 留到候选稳定后。
 T3、Spec/Plan 存在、diff 大小或 agent 可用都不自动触发；未触发由 Codex Parent 正常完成。
 触发时只增加一名 native adversarial read-only reviewer，Parent 是 orchestrator/fixer/adjudicator；
 不叠加 Kimi 或第二 reviewer。最低充分 package 绑定 exact snapshot、适用 Spec/Plan、AC 与 verification。

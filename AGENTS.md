@@ -101,8 +101,8 @@ Strict loopback、完全 local/unmetered、无 cloud egress 的任务内 ComfyUI
 
 ## Verification Contract
 
-迭代与复审按改动影响做局部验证，必要复审完成且候选稳定后再运行最终完整 policy checks；仅新改动、失败或未决风险使既有证据失效时补跑相应检查，不因流程轮次或记录要求机械全量重跑。
-执行 `make harness-inspect`，完成前按 [Verification Details](.agent/context/control-plane-playbook.md#4-verification-pilot-and-delivery-details) 验 nonempty exact staged snapshot 或 exact commit range 的全部 policy checks 与 fresh receipt。Unmapped path fail safe 到 full tests + task Architecture Gate，不刷新 baseline 隐藏 regression；Harness 隔离验证 checkout 不授权开发 worktree。
+验证范围按实际行为影响与失败风险选择：局部改动以相关成功、边界及失败路径的验证完成交付，不因触及共享文件、提交、记录或取得 receipt 而自动扩成整组回归；仅新改动、失败或未决风险使证据失效时补验。
+按 [Verification Details](.agent/context/control-plane-playbook.md#4-verification-pilot-and-delivery-details) 判断是否需要扩大验证；跨模块行为、授权/凭据/持久化/恢复语义、影响无法界定或用户要求完整验证时，运行适用的 exact staged snapshot 或 commit range Harness 并保留 fresh receipt。路径选测只提供保守影响提示，局部验证不冒充完整 Harness PASS；不刷新 baseline 隐藏 regression。
 Harness 不拦截任意 tool/shell、不调度 Agent、不读 secret、不运行 live media、不 mutation Production、不代签 P6/Final Acceptance；CI 自产 evidence，workflow 文件不证明 server enforcement。离线 PASS 只证明所测行为，exit 0 / `PARSED` / tests 不代替 required review 或真实验收。
 区分 execution、structure、function、criteria 与 final review 五层证据；`PASS/DONE/ACCEPTED` 须有对应证据，无法验证标 `NOT_EVALUATED`。
 

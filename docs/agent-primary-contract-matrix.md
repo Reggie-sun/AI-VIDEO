@@ -738,7 +738,7 @@ Registry/provenance/candidate artifacts、strict reader、recovery与activation/
 | 单个 slice 的 accepted scope、tradeoff 与 implementation detail | active spec / plan |
 | Executable behavior | source code、tests 与本轮实际 runtime evidence |
 
-使用方法：先用 `make harness-inspect` 根据 task-owned changed paths 查看 mandatory checks，再定位受影响的 surface，确认唯一 owner，保持 `Invariants`，不得引入 `Forbidden Alternate Path`。完成前运行 `make harness-verify` 并保留 passing receipt。下表的 `Focused Verification` 是 human-readable contract；`.agent/harness/policy.yaml` 是对应 executable routing，二者变更时必须同步。
+使用方法：根据 task-owned diff 定位受影响的 surface、实际行为与失败风险，确认唯一 owner，保持 `Invariants`，不得引入 `Forbidden Alternate Path`。局部改动按 `AGENTS.md` 选择最小充分验证；需要完整 Harness 时用 `make harness-inspect` 查看保守路径选测，再运行 exact snapshot 验证并保留 passing receipt。下表的 `Focused Verification` 是验证入口；`.agent/harness/policy.yaml` 独占正式 Harness 的 executable routing，不能把路径类别自动等同于本次全部行为影响。
 
 ## Cross-Cutting Contracts
 
@@ -1025,4 +1025,4 @@ Canvas 的显式 `source_video` handoff 仍由 `CanvasProductionService.handoff_
 只授权 exact accepted-terminal-FAILED/no-media 的新 scope；旧 paid receipts、reservation 和消费保留，
 不是 `known_no_effect`，不授权 unknown retry，且后继 start/submit 重新核验并消费 one-use grant。
 
-本矩阵只定义 surface-level focused gate。最终交付仍必须遵守 `AGENTS.md`：检查实际 diff ownership，通过 Development Harness 运行全部受影响 surface 的 mandatory checks，报告 fresh receipt path，区分本轮执行证据与历史记录，并明确 remaining risk、未验证区域和 publication 状态。
+本矩阵只定义 surface-level focused gate。最终交付遵守 `AGENTS.md`：检查实际 diff ownership，报告与改动影响相称的实际验证、剩余风险、未验证区域及 publication 状态；仅在完成正式 Harness 时报告其 fresh passing receipt，局部验证不冒充完整 Harness。
