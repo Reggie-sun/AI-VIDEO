@@ -33,6 +33,21 @@ Date: 2026-10-21
 
 本机 continuation receipt：[`.codex/tmp/jimeng-single-trial/receipt.json`](../../.codex/tmp/jimeng-single-trial/receipt.json)，绑定 `native-account-read.json`、`native-quote.json`、`action-entitlement.json`、`preflight.json`、预览和实际参考图片的 hash。它独立于下方初次研究 receipt，保留两个 checkpoint 的历史。
 
+## Promotion Scope And VIP Label — 2026-10-21
+
+用户随后指出 Seedance 2.5 活动横幅，并询问 2.0 的 VIP 标签。重新读取同一账号的原生 metadata、benefit strategy 与 fresh quote 后，**884 仅适用于本次当前画布 action，不能概括所有即梦入口的优惠情况**。之前向用户说明余额不足时缺少这个范围限定。
+
+| Native benefit triple (`resource_type=aigc`) | Current unit credits / original | Read-only quote for amount 34 |
+| --- | --- | --- |
+| `generate_video` / `seedance_25_720p_output`，本次 `video.generate` action 的实际解析结果 | 26 / 26 | 884 |
+| `dreamina_video_novel_video_generate_seedance2_5` / `dreamina_video_novel_video_generate_seedance2_5_720p_with_ref`，另一个视频生成计费项 | 12 / 26 | 408 |
+
+两个单价均来自账号原生成功响应的 `credit_pricing_info`；`quoteBatch` 对两个 exact benefit triple 的只读核算分别返回上述积分。第二行证明另一个计费项存在优惠，不证明原 `/octo_api/v1/node_generate` 请求能选择该项或按 408 结算，也未定位它的实际生成提交入口。没有替换 `commerce_selection`、修改策略、切换生成入口、追加提交或购买。第一行在 reload 后仍由 `computeStrategyBenefit({scene,sceneOptions})` 解析，原生 action state 仍为 `credit_insufficient`。源码的报价函数会使用 exact strategy 的现价字段，不能用另一 resource 的现价覆盖本 action。
+
+官方[活动页](https://jimeng.jianying.com/tools/jimeng-seedance-price)明确将横幅的 ¥0.19/秒“低至”条件写为超级会员连续包年，并另列活动对象和适用套餐；未将该人民币宣传价折算为本账号积分。官方[会员权益表](https://jimeng.jianying.com/)将 `Seedance 2.0 VIP专属通道` 列为基础会员包含的权益，VIP 标签表示会员通道资格，本身不证明积分免费。当前 `generation_specs` 另有 `seedance_2.0_vip` / `dreamina_seedance_40_pro_vision` 与 `seedance_2.0_fast_vip` / `dreamina_seedance_40_vision`。一次独立的 2.0 VIP 五秒只读示例 action 在当前 commerce wrapper 返回 `unsupported`，因此没有以该示例宣称具体 2.0 报价或成功准入，也没有把这次已确认的 2.5 试验换成 2.0。
+
+本次补核生成 POST / 上传 / 充值 / 购买均为 0；本机回执为 [`.codex/tmp/jimeng-discount-check/receipt.json`](../../.codex/tmp/jimeng-discount-check/receipt.json)。本 checkpoint 仍为研究记录，自动 learning 结果 `no_candidate`，不改变 Skill、Policy、Gate 或 Production 状态。
+
 ## Pinned Sources
 
 用户最终指定的三个项目如下；更早讨论中的其他即梦 MCP 不属于本次比较结论。以下是源码事实，不能单独证明账号可用。
