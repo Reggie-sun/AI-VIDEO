@@ -13,9 +13,25 @@ Date: 2026-10-21
 
 当前登录账号下，已经通过直接 HTTP 请求完成图片、音频、视频各一次存储上传，并在两个独立客户端进程重连后读回同一已有结果，下载的 MP4 与历史 source provenance 的 SHA-256 一致。账号会话由原项目浏览器 profile 持有，操作没有依赖视觉点击，也没有导出登录 Cookie。
 
-**这证明当前会话中的三类上传和已完成结果找回可行；尚未证明新生成闭环、三模态同次生成、运行中断线恢复、提交结果未知时的恢复或长期稳定性。** 新生成、充值、购买均为 0。下一次会消耗积分的提交必须先取得用户对具体请求及有限积分上限的确认。
+**这证明当前会话中的三类上传和已完成结果找回可行；尚未证明新生成闭环、三模态同次生成、运行中断线恢复、提交结果未知时的恢复或长期稳定性。** 新生成、充值、购买均为 0。用户随后确认一次三模态试验；当前在提交前因余额不足及尚缺数值积分上限而停止，详见下节。
 
 没有安装或启动三个第三方服务，也没有接入新的 Production Provider、写入 Manifest / Registry、激活素材或签署 Shot QA。上传只到存储层，未调用 `resource/upload` 将新对象登记到画布，原画布仍为 296 nodes / 162 edges。新上传的三个对象保留，不以自动清理删除证据。
+
+## Single Trial Preflight — 2026-10-21
+
+用户确认了此前预览的最多一次试验：同一 `视频 10 (17)` 的 Seedance 2.5、720p、17 秒、单输出，保留三张图片与 COCO 声线，加入已经上传的同镜视频作为运镜参考。这次确认没有给出数值积分上限。新增视频材料在 `materials[4]`，使用上传后的 `vid=v02870g10004dbbu7dfog65m808fqmv0`；原四个材料的 index 和引用绑定保持。该视频仍是存储对象，没有画布 node/resource 映射；其服务端准入未验证。
+
+实际下载并查看了三张 exact 参考图片：图片 0 为宠物店场景，图片 1 为 COCO 多视图设定，图片 2 为 Nosha 多视图设定。参数预览 v2 只追加视频用途说明：参考连续摄影机路径与动作节奏，人物和场景身份仍由图片约束，声线由音频约束，不从视频取对白或字幕。原叙事、动作因果与镜头文本均保留；原文本写 15 秒而已有控件/请求为 17 秒的差异显式记录，没有静默改写。预览 SHA-256 为 `05ff5ed428d22a594dde561f8409d343875f3d06309591692d206238a0831d43`，性质仍是 `LOCAL_PARAMETER_PREVIEW_NOT_A_PERMIT`，`execute_allowed=false`。
+
+同一账号的原生余额请求成功返回 `vip_credit=725`、`gift_credit=40`、`purchase_credit=0`，合计 **765 积分**。只读调用当前客户端原生 commerce `quoteActions` 对上述 exact 选项核算，结果为 **884 积分**；随后 `getActionState` 返回 `status=blocked, reason=credit_insufficient, isFree=false`。会员 entitlement 为 `access=available`，没有免除本次费用。差额为 **119 积分**。这些是当前账号的客户端核算和准入状态，不是已扣费回执或官方市场价格。
+
+核算输入与公开客户端的 action builder 一致：输出 17 秒，输入视频实际 17.056009 秒经 `Math.round(ms/1000)` 取 17 秒，`hasInputVideo=true`、`chargeInputVideoDuration=true`，`benefitAmount=34`。34 是该核算的用量参数，不能当作积分；884 来自原生 quote 返回，没有用历史扣分或自行估价代替。
+
+该 quote 是从正常 React context 中取得已有 commerce client 的只读方法，依赖当前 UI 内部结构，不能视为稳定公开 SDK 或独立费用接口；未调用权限拒绝的 observability diagnostics，也未执行 commerce action、引导充值、领取或购买。独立 browser fetch 请求余额接口即使带原生公开 query 参数仍返回业务 `ret=1014`，因此也未证明 standalone 余额读取可用。可选 `commerce_selection.quote_precondition` 的源码字段不证明服务端承诺积分硬上限，不能充作 Budget Guard。
+
+本次 continuation 新上传 0、生成 POST 0、购买/充值 0、Production mutation 0；没有消费 permit，没有提交后 outcome，也没有 `UNKNOWN` 重试。原画布仍为 296 nodes / 162 edges。素材 index、枚举、配置时长和原文保留的局部检查通过，服务端素材准入、三模态生成、运行中轮询、断线恢复及新 MP4 的逐 Shot Gate 均为 `NOT_EVALUATED`。
+
+本机 continuation receipt：[`.codex/tmp/jimeng-single-trial/receipt.json`](../../.codex/tmp/jimeng-single-trial/receipt.json)，绑定 `native-account-read.json`、`native-quote.json`、`action-entitlement.json`、`preflight.json`、预览和实际参考图片的 hash。它独立于下方初次研究 receipt，保留两个 checkpoint 的历史。
 
 ## Pinned Sources
 
@@ -118,8 +134,10 @@ REA 实际捕获 `resource/batch_get` 的请求/响应字段结构，Evidence ID
 
 局部文档契约、owned-path whitespace 和 receipt artifact hash 验证按实际执行结果记入总 receipt；本次没有运行完整工程 Harness。没有 Product behavior 改动，Parent Risk Gate 为 `NATIVE_REVIEW_NOT_REQUIRED`：交付是有边界的研究记录和局部真实读写证据，不改变授权判断、凭据 owner、Production writer 或恢复语义。
 
-使用 `record-ai-video-session` 保存本 checkpoint；`distill-ai-video-learning` 自动评估为 `no_candidate`。这是协议/单会话研究，没有满足独立媒体实验门槛，也没有修改 Skill、Policy 或 Gate。Agent Memory 检索返回 incompatible shard / exit 3，按 retrieval owner 继续使用当前源码与运行证据，没有前台重建或重试索引。
+使用 `record-ai-video-session` 保存本 checkpoint；`distill-ai-video-learning` 自动评估为 `no_candidate`。这是协议/单会话研究及一次提交前检查，没有满足独立媒体实验门槛，也没有修改 Skill、Policy 或 Gate。初次 Agent Memory 检索返回 incompatible shard / exit 3；continuation 的 experience 检索返回标记为 stale 的 last-good 片段并提示后台 refresh。两次均按 retrieval owner 使用当前源码与运行证据，没有前台重建或重试索引，也没有用检索片段作为授权。
 
 ## Paid Continuation Boundary
 
-尚未发出任何新生成请求。后续试验应先封存一个具体 Shot 的图片、视频、音频用途和完整参数 preview，核对当前账号适用的消耗与用户给定积分上限，取得最多一次提交的明确确认，再经适用 budget / intent / permit 边界执行；保留同一任务 ID，验证排队、断开客户端、重连、下载及 exact 媒体 Gate。不以旧任务历史消耗、会员身份或已有余额授权新生成，也不把这份研究报告当作付费 permit。
+尚未发出任何新生成请求。最多一次 exact 试验已获确认；当前停止条件是原生 `credit_insufficient` 和尚缺用户数值积分上限。恢复时应核验同一账号最新余额及 exact 选项的 fresh quote，确认额度足以覆盖且不超过用户上限，再完成适用 budget / durable intent / one-use permit 边界。一次试验授权不包含充值、购买、缩短时长、删参考、换模型或自动改用另一权益。
+
+提交后保留同一任务 identity，验证排队、断开客户端、重连、下载及 exact 媒体 Gate；unknown 停止，不重交。原生 quote 和这份研究报告均不构成付费 permit，已完成旧结果的恢复证据也不构成新生成或长期稳定性证明。
