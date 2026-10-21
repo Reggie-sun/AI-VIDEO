@@ -92,7 +92,7 @@ nontrivial frontend 用 integrated browser testing。结构关系按需 CodeGrap
 ## Provider Credential and Paid Execution Rules
 
 Credential 仅经 injected supplier 的 exact private reference，不进 repo/.env/prompt/argv/log/error/receipt；lookup 失败 fail closed，不搜其他 secret source。
-明确要求必含 paid/remote 的执行仅授权 accepted Provider/model/inputs 及最少有限 submit count；plan/docs/history/credential presence 不授权新调用，不查官方价格或估算账单。
+执行请求默认授权任务内必要的付费/remote 调用，自主控制有限次数与预算，不另行索要付费授权，完成时据实汇报金额或积分，未结算标待确认；用户明确禁令与硬上限优先，文档/凭据不授权执行，不为授权查价或估账。
 每 submit 验 remaining count、exact preview、Budget Guard/reservation、egress、durable intent、one-use permit；monetary fields 仅消费预配置 sealed operator upper bound，续期按 Provider Details，不代表市场价。
 
 ## Local ComfyUI Authorization Exemption
