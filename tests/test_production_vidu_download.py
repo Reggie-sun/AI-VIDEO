@@ -144,8 +144,19 @@ def _wire(monkeypatch, *, addresses=("8.8.8.8",), status=200, headers=b"", body=
         if tls_error:
             raise ssl.SSLCertVerificationError("private URL should never leak")
         return sock
+    def create_connection(address, timeout=None, source_address=None, **kwargs):
+        # Mock the connector as well as its sockets: Harness intentionally rejects
+        # external hostnames before invoking the mocked low-level DNS/socket calls.
+        family, kind, protocol, _, sockaddr = vidu_download.socket.getaddrinfo(
+            address[0], address[1], 0, socket.SOCK_STREAM,
+        )[0]
+        sock = vidu_download.socket.socket(family, kind, protocol)
+        sock.settimeout(timeout)
+        sock.connect(sockaddr)
+        return sock
     monkeypatch.setattr(vidu_download.socket, "getaddrinfo", resolve)
     monkeypatch.setattr(vidu_download.socket, "socket", make_socket)
+    monkeypatch.setattr(vidu_download.socket, "create_connection", create_connection)
     monkeypatch.setattr(vidu_download.ssl.SSLContext, "wrap_socket", wrap)
     return state
 

@@ -53,7 +53,7 @@ lifecycle、Seedance readback 与旧版 ComfyClient。额外真实 loopback 测�
 文档契约、owned diff whitespace、全局规则唯一性与相关源码 lint 检查通过。
 
 Parent 判定 `NATIVE_REVIEW_REQUIRED`：新增 CDN redirect 路径涉及凭据隔离和持久化
-origin/协议真相，独立审查可核对测试之外的泄露及兼容性路径。exact staged snapshot
+origin/协议真相，独立审查可核对测试之外的泄露及兼容性路径。exact commit-range snapshot
 Harness、独立审查候选 hash/结论和发布 SHA 由本机汇总
 [`.codex/tmp/download-default/receipt.json`](../../.codex/tmp/download-default/receipt.json)
 绑定，不用 Markdown 的叙述替代 fresh receipt。
