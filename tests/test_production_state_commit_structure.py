@@ -225,6 +225,7 @@ def test_committer_mro_preserves_approved_domain_order() -> None:
         "_StateCommitVideoCandidateMixin",
         "_StateCommitVideoActivationMixin",
         "_StateCommitPaidProviderMixin",
+        "_StateCommitJimengMixin",
         "_StateCommitReviewMixin",
         "_StateCommitRepairMixin",
         "_StateCommitImageIntentMixin",
