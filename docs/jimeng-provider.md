@@ -1,0 +1,27 @@
+# Jimeng Seedance 2.5 Production Provider
+
+## Scope and Owners
+
+`JimengVideoProvider` 接入现有 `VideoGenerationService`。`ProductionStateCommitter` 独占 Manifest 状态、Paid Provider 意图、预算预留与回执；Registry 和现有视频获取、验证流程负责输入及输出资产。Provider 只映射素材、调用即梦画布原生运行时、查询任务并下载结果，不选择 Shot、不判断创作质量、不激活媒体、不决定修复或再次付费。
+
+浏览器 transport 必须显式注入正在运行的 Chrome/CDP profile 目录，每次操作检查账号 hash 和画布 project。提交依赖内部 `generationRuntime.actions.submitVideo`，属于可能随网页版本变化的 UI 依赖，并非独立 HTTP 提交 API。profile 的 `node_id` 必须指向空闲且无既有引用来源的画布节点；如请求带入旧节点引用，提交前拒绝，避免素材关系混淆。凭据只留在网页上下文；桥接层返回技术 ID、参数和临时下载地址，后者不写 Product 状态。
+
+## Exact Input and Paid Contract
+
+`JimengProfile` 封存账号、project/node、输出规格、原生 benefit 类型与金额，以及操作人设置的积分上限。adapter 仅接受匹配的 `VideoGenerationRequest`，要求每项素材在提示词中以 `{{image:N}}`、`{{audio:N}}` 或 `{{video:N}}` 精确绑定。原生 index 按 canonical 图片、音频、视频绑定顺序排列；缺失、类型错误或越界在上传前失败。原生参数 validator 还须接受精确映射后的请求。
+
+P0 的 `compile_request` 支持普通 Shot requirement 的显式素材绑定。带 `preserved_source_expression` 的 Shot 会明确返回 unsupported；该源文法尚未建立与即梦 index marker 一致的精确保真映射，不把原文静默改写后提交。
+
+上传前核验 Registry 绑定素材的大小与 SHA-256。生成 POST 发出前，`JimengDispatchIntent` 已持久封存存储 ID、素材顺序与 hash、原生参数 hash、submit/resource ID；浏览器和 host 各守一道单次请求 fence。提交使用 `VideoGenerationService.submit_once` 的一次性 permit、Paid Gate 回执、预算预留和持久意图。原生 quote、action 权限及余额在启动和发送前核对上限。`CRD` 中 1 积分按 1,000,000 内部微单位表示；这是操作人封存的上限，不是市场价或已证实的服务端硬限额。代码不将 `quote_precondition` 当作硬上限证明。
+
+每次提交后，Provider 只读轮询服务端已保存的画布草稿，要求本次节点精确绑定封存的 `resource_id`，再将完整草稿、版本和 SHA-256 按内容寻址保存为项目内 `artifacts/provider-canvas/jimeng/` 的不可变快照。标准项目 reader 重开 accepted task 时同时核验 dispatch 与画布快照；缺失或不一致即拒绝加载。服务端草稿保存未获确认时，付费结果保持 `OUTCOME_UNKNOWN`，只允许读回恢复，不能再次付费提交。此机制以草稿读取证明保存，不另行调用未经验证的画布写入接口。
+
+提交响应丢失时，Paid attempt 保持 `OUTCOME_UNKNOWN`，预算保持未结算。`VideoGenerationService.recover_jimeng_unknown_once` 只查询已封存的 resource ID，核对账号/project、submit/task 和参数身份，再由 committer 将原预算预留协调为 accepted；不重新提交或签发 permit。无法证明资源时继续保持 UNKNOWN。恢复回执嵌入带内容 hash 的读回证据。正常轮询和获取使用 accepted 的 `resource_id:task_id`；完成后从新鲜 resource 响应取下载地址，允许正常重定向，落盘时计算 hash。接受前仍须经过现有视频 artifact probe 与 QA。
+
+## Integration
+
+创建 `JimengProfile`，将 `JimengBrowserTransport(profile_dir=<私有配置的登录 CDP 目录>)`、Registry 精确字节 resolver 和当前项目的 `ProductionStateCommitter` 注入 `JimengVideoProvider`，在现有 Generation target 中注册选定 profile/Provider。沿用 `VideoGenerationService.start`、`submit_once`、`refresh_once`、`fetch_once` 和标准验证/验收；仅已有 Jimeng unknown attempt 可调用 `recover_jimeng_unknown_once`，不得再次调用 `submit_once`。Paid preview 使用 `billing_mode=remote_metered`、`currency=CRD`、profile 上限及 `SecretReference(kind="secret_store", reference_id="JIMENG_BROWSER_SESSION")` 作为浏览器会话元数据。账号/profile 由私有配置注入；Cookie、Token 不写入仓库、prompt、argv、日志或 receipt。
+
+## Verification Boundary
+
+只读复查已通过本 transport 找回 2026-10-21 的三模态历史任务，resource、submit、task 身份、完成状态和新鲜下载地址均匹配；服务端保存的生成参数与原请求逐字段一致。用本 Provider 的下载路径再次取得同一历史 MP4，29,222,147 字节及 SHA-256 与先前保留的原片一致。服务端历史画布草稿只读获取成功，目标节点精确包含历史 `resource_id`；本次未通过新提交验证实时自动保存时序。离线测试覆盖参数映射、身份漂移、一次性 permit、响应丢失、读回不可用、画布快照缺失、进程重开、预算协调、轮询和获取。本次未新增付费生成，也未实测浏览器整体重启、登录过期恢复或真实提交响应丢失。网页内部对象、quote 结构、上传签名与节点行为可能变化；完整 Production qualification 和最终成片验收需要相应真实证据，不能由离线测试推出。

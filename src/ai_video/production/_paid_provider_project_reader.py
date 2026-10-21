@@ -6,6 +6,7 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
+from ai_video.production._jimeng_project_reader import verify_jimeng_task_lineage
 from ai_video.production.models import (
     PaidProviderAttemptPhase,
     PaidProviderBudgetSnapshotPointer,
@@ -601,5 +602,14 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
                     or budget.revision < expected_budget.revision
                 ):
                     raise _invalid("Paid Provider no-effect reconciliation budget lineage is invalid.")
+            if (gate.preview.provider_kind == "jimeng"
+                    and submit.outcome is PaidProviderSubmitOutcome.ACCEPTED):
+                verify_jimeng_task_lineage(
+                    root=root, attempt_id=attempt.attempt_id, submit=submit,
+                    active_budget=budget,
+                    load_budget_by_hash=lambda content_hash: _load_paid_provider_budget_by_content_hash(
+                        root, content_hash, frozenset(), traversal,
+                    ),
+                )
     if len(external_effect_ids) != len(set(external_effect_ids)):
         raise _invalid("Paid Provider external effect ownership is ambiguous.")

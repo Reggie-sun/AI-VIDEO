@@ -538,6 +538,44 @@ class PaidProviderSubmitOutcome(str, Enum):
     OUTCOME_UNKNOWN = "outcome_unknown"
 
 
+class JimengAcceptedEffectProof(_PaidStrictModel):
+    """Exact readback that repairs one UNKNOWN without another paid submit."""
+
+    provider_kind: Literal["jimeng"] = "jimeng"
+    request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    preview_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    dispatch_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    prior_unknown_receipt_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    base_budget_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    account_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    project_id: str = Field(pattern=r"^[0-9a-f-]{36}$")
+    node_id: str = Field(pattern=r"^node_[A-Za-z0-9]{1,64}$")
+    submit_id: str = Field(pattern=r"^[0-9a-f-]{36}$")
+    resource_id: str = Field(pattern=r"^[0-9a-f-]{36}$")
+    task_id: str = Field(pattern=r"^[0-9]{1,32}$")
+    params_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    observed_status: Literal[200, 1000]
+    observed_at: datetime
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_seal(self) -> "JimengAcceptedEffectProof":
+        if self.observed_at.tzinfo is None:
+            raise ValueError("Jimeng accepted readback requires an aware time")
+        if canonical_sha256(self.model_dump(mode="json", exclude={"content_hash"})) != self.content_hash:
+            raise ValueError("Jimeng accepted readback hash mismatch")
+        return self
+
+    @classmethod
+    def create(cls, **values):
+        data = dict(values)
+        trial = cls.model_construct(**data, content_hash="0" * 64)
+        data["content_hash"] = canonical_sha256(
+            trial.model_dump(mode="json", exclude={"content_hash"})
+        )
+        return cls.model_validate(data)
+
+
 class PaidProviderSubmitReceipt(_PaidStrictModel):
     attempt_id: str = Field(pattern=_SAFE_SHORT_ID.pattern)
     request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -547,6 +585,7 @@ class PaidProviderSubmitReceipt(_PaidStrictModel):
     outcome: PaidProviderSubmitOutcome
     external_effect_id: str | None = None
     no_effect_reconciliation: PaidProviderNoEffectReconciliationPointer | None = None
+    jimeng_accepted_effect: JimengAcceptedEffectProof | None = None
     recorded_at: datetime
     submit_receipt_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
 
@@ -555,6 +594,8 @@ class PaidProviderSubmitReceipt(_PaidStrictModel):
         data = handler(self)
         if self.no_effect_reconciliation is None:
             data.pop("no_effect_reconciliation", None)
+        if self.jimeng_accepted_effect is None:
+            data.pop("jimeng_accepted_effect", None)
         return data
 
     @field_validator("external_effect_id")
@@ -578,6 +619,14 @@ class PaidProviderSubmitReceipt(_PaidStrictModel):
             and self.outcome is not PaidProviderSubmitOutcome.KNOWN_NO_EFFECT
         ):
             raise ValueError("only known-no-effect submits may link a reconciliation")
+        proof = self.jimeng_accepted_effect
+        if proof is not None and (
+            self.outcome is not PaidProviderSubmitOutcome.ACCEPTED
+            or self.external_effect_id != f"{proof.resource_id}:{proof.task_id}"
+            or self.request_fingerprint != proof.request_fingerprint
+            or self.preview_fingerprint != proof.preview_fingerprint
+        ):
+            raise ValueError("Jimeng accepted readback does not match submit receipt")
         data = self.model_dump(mode="json", exclude={"submit_receipt_fingerprint"})
         if canonical_sha256(data) != self.submit_receipt_fingerprint:
             raise ValueError("paid Provider submit receipt fingerprint does not match")
@@ -664,6 +713,37 @@ def apply_paid_provider_submit_receipt(
             "submit_receipt_fingerprint": receipt.submit_receipt_fingerprint,
         }
     )
+    return _replace_reservation(snapshot, updated)
+
+
+def reconcile_jimeng_unknown_as_accepted(
+    snapshot: PaidProviderBudgetSnapshot,
+    *,
+    prior: PaidProviderSubmitReceipt,
+    accepted: PaidProviderSubmitReceipt,
+) -> PaidProviderBudgetSnapshot:
+    """Keep the original reservation held after exact server readback."""
+
+    proof = accepted.jimeng_accepted_effect
+    reservation = next((item for item in snapshot.reservations
+        if item.reservation_id == prior.reservation_id), None)
+    if (prior.outcome is not PaidProviderSubmitOutcome.OUTCOME_UNKNOWN
+            or accepted.outcome is not PaidProviderSubmitOutcome.ACCEPTED
+            or proof is None
+            or proof.prior_unknown_receipt_fingerprint != prior.submit_receipt_fingerprint
+            or reservation is None
+            or reservation.status is not BudgetReservationStatus.UNSETTLED
+            or reservation.submit_receipt_fingerprint != prior.submit_receipt_fingerprint
+            or any(getattr(prior, field) != getattr(accepted, field) for field in (
+                "attempt_id", "request_fingerprint", "preview_fingerprint",
+                "gate_receipt_fingerprint", "reservation_id"))):
+        raise _paid_error(ErrorCode.PAID_PROVIDER_OUTCOME_UNKNOWN,
+                          "Jimeng accepted readback cannot reconcile this unknown reservation.")
+    updated = PaidProviderBudgetReservation.model_validate({
+        **reservation.model_dump(mode="python"),
+        "status": BudgetReservationStatus.RESERVED,
+        "submit_receipt_fingerprint": accepted.submit_receipt_fingerprint,
+    })
     return _replace_reservation(snapshot, updated)
 
 

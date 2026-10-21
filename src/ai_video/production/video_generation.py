@@ -539,6 +539,19 @@ class VideoGenerationService:
         )
         return observation
 
+    def recover_jimeng_unknown_once(self, *, attempt_id: str) -> VideoSubmission:
+        """Read back one sealed Jimeng resource through its canonical paid owner."""
+
+        from ai_video.production.jimeng import JimengVideoProvider
+
+        if not isinstance(self._provider, JimengVideoProvider):
+            raise AiVideoError(
+                code=ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
+                user_message="This recovery is available only for the Jimeng Provider.",
+                retryable=False,
+            )
+        return self._provider.recover_unknown(attempt_id=attempt_id)
+
     def fetch_once(self, *, attempt_id: str) -> FetchedVideoCandidate:
         attempt, state = self._state(attempt_id)
         paid_state = attempt.paid_provider_state
