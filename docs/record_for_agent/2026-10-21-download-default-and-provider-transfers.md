@@ -19,7 +19,7 @@ Date: 2026-10-21
 ## Download Contract
 
 常规 HTTP(S) 下载不增加域名/IP/端口白名单、固定字节上限或响应 MIME 准入，允许正常 CDN redirect。
-Provider 结果下载每跳重建无 API 凭据和 Cookie 的 GET；HTTPS 保留证书/SNI 核验，网络协议错误、HTTP 失败与
+本次更改的 Provider 结果下载每跳重建无 API 凭据和 Cookie 的 GET；HTTPS 保留证书/SNI 核验，网络协议错误、HTTP 失败与
 重定向环仍按传输错误处理。签名 URL 不进入日志或持久 receipt。
 
 完整响应先传输，再核验长度、实际媒体格式、SHA-256 与任务/引用的精确 identity。
@@ -29,10 +29,11 @@ Provider 结果下载每跳重建无 API 凭据和 Cookie 的 GET；HTTPS 保留
 
 ## Owners And Compatibility
 
-- `vidu_download.py` 是共享无凭据下载 owner；Vidu、Grok、MiniMax H3/Hailuo、METASO H3、
+- `src/ai_video/download.py` 是共享无凭据下载 owner（`vidu_download.py` 保留旧导出）；Vidu、Grok、MiniMax H3/Hailuo、METASO H3、
   官方 H3 Max、Seedance 结果 GET 与本地视频上传后的 readback 复用该入口。
 - 旧版 `ComfyClient` 的两种 artifact GET 也支持 CDN redirect；首次读取仍可使用已选
-  ComfyUI API 的原有授权，后续跳转请求重新构造，清除 client auth/cookie/header 和 URL userinfo。
+  ComfyUI API 的原有授权，后续跳转使用共享原生下载器，清除 client auth/cookie/header 和初始 redirect URL userinfo，
+  避免 HTTPX INFO 日志输出签名 URL。
 - 各 adapter 删除结果来源白名单、MIME header 与体积提前阻断，仍复核同一 task/file/creation。
   广告素材 reader 也不再按旧下载体积上限拒绝真实 bytes。
 - `result_origins`、`result_trust`、`max_download_bytes` 保留旧 profile 序列化身份，
@@ -40,7 +41,12 @@ Provider 结果下载每跳重建无 API 凭据和 Cookie 的 GET；HTTPS 保留
 - remote materialization 如实记录起始 locator 的 HTTP(S) 协议/origin/hash 与实际 bytes；
   不把起始 URL 的 hash 冒充最终 redirect 地址的 hash。
 - 已提供的上传授权、预期源文件的精确 size/hash 与媒体合同仍可在下载后拒绝不匹配内容，
-  不将取消固定体积上限理解为可以接受不同的素材。
+  不将取消固定体积上限理解为可以接受不同的素材。混合引用也在完整 readback 后比对，
+  不依赖响应 MIME header；Vidu/Grok 保留旧 `Accept: video/mp4` 调用兼容。
+
+当前源码补查未发现其他媒体 GET 的固定来源/MIME/体积准入：Jimeng 的独立结果 GET 已允许正常
+redirect，未作上述拦截，本次未修改其并行开发文件；图像与语音 Provider 的 POST/base64/hex
+解码预算属于生成响应与模型合同，不是本次取消的 GET 下载准入。
 
 ## Verification And Remaining Boundaries
 
@@ -51,6 +57,10 @@ lifecycle、Seedance readback 与旧版 ComfyClient。额外真实 loopback 测�
 服务，完成不同主机名/端口间的 302 跳转并下载 262170 bytes，SHA-256 为
 `513ca76f4f5e61f94dfd8ea7933bcabb9cd03602a9981db7cda047a78234d9f2`，没有转发 Cookie 或凭据。
 文档契约、owned diff whitespace、全局规则唯一性与相关源码 lint 检查通过。
+
+首轮独立审查指出 ComfyUI HTTPX INFO 日志可能暴露签名下载地址、混合视频 readback
+残留 MIME 提前拦截，以及旧 Accept header 的兼容问题；修复后追加实际 loopback、
+日志 canary、混合引用 wire 与兼容调用验证，修复后的 11 文件 guard 聚焦测试 **571 passed**（32.21 秒）；详细结果绑定下述 receipt。
 
 Parent 判定 `NATIVE_REVIEW_REQUIRED`：新增 CDN redirect 路径涉及凭据隔离和持久化
 origin/协议真相，独立审查可核对测试之外的泄露及兼容性路径。exact commit-range snapshot

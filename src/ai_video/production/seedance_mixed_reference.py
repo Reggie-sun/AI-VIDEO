@@ -135,13 +135,10 @@ def verify_reference_video(*, binding: VideoMediaReferenceBinding, url: str,
         request = SeedanceLocalVideoTransportRequest(method="GET", url=url,
                                                      headers={"accept": "video/mp4"})
         with transport.stream(request) as response:
-            if (response.status_code != 200
-                    or response.headers.get("content-type", "").split(";", 1)[0] != "video/mp4"):
+            if response.status_code != 200:
                 raise ValueError("reference readback failed")
             for chunk in response.iter_bytes():
                 size += len(chunk)
-                if size > binding.size_bytes:
-                    raise ValueError("reference readback exceeds exact source")
                 digest.update(chunk)
     except Exception:
         raise _invalid("Seedance reference video exact readback failed.") from None

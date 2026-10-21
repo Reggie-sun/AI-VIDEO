@@ -1,3 +1,7 @@
+from contextlib import contextmanager
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from threading import Thread
+
 import httpx
 import pytest
 
@@ -202,46 +206,83 @@ def test_fetch_artifact_bytes_does_not_write_a_target():
     assert seen == [("/view", "frame.png")]
 
 
+@contextmanager
+def _artifact_server(*, loop=False, truncated=False, status=200):
+    seen = []
+    payload = b"arbitrary-downloaded-bytes"
+
+    class Handler(BaseHTTPRequestHandler):
+        def do_GET(self):
+            seen.append((self.path, dict(self.headers)))
+            self.send_response(302 if loop else status)
+            if loop:
+                self.send_header("Location", "/loop?signature=SIGNED_DOWNLOAD_CANARY")
+            self.send_header("Content-Type", "application/octet-stream")
+            self.send_header("Content-Length", str(len(payload) + (10 if truncated else 0)))
+            self.end_headers()
+            self.wfile.write(payload)
+
+        def log_message(self, *_args):
+            pass
+
+    server = ThreadingHTTPServer(("127.0.0.1", 0), Handler)
+    thread = Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        yield server.server_port, seen, payload
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join(timeout=2)
+
+
 @pytest.mark.parametrize("write_file", [False, True])
-def test_artifact_download_follows_cdn_redirect_without_client_credentials(tmp_path, write_file):
+def test_artifact_download_follows_cdn_redirect_without_client_credentials(tmp_path, write_file, caplog):
+    caplog.set_level("INFO")
     seen = []
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        seen.append(request)
-        if request.url.path == "/view":
+    with _artifact_server() as (port, downloaded, payload):
+        def handler(request: httpx.Request) -> httpx.Response:
+            seen.append(request)
             return httpx.Response(302, headers={
-                "location": "https://redirect-user:redirect-secret@cdn.example/file?signature=private",
+                "location": f"http://redirect-user:redirect-secret@127.0.0.1:{port}/file?signature=SIGNED_DOWNLOAD_CANARY",
             })
-        return httpx.Response(200, content=b"arbitrary-downloaded-bytes")
 
-    http = httpx.Client(transport=httpx.MockTransport(handler),
-                        auth=("api-user", "api-secret"), headers={"x-api-key": "private-key"})
-    http.cookies.set("session", "private-cookie", domain="cdn.example")
-    client = ComfyClient("http://127.0.0.1:8188", http_client=http)
-    if write_file:
-        target = tmp_path / "download.bin"
-        client.download_artifact(filename="result.bin", subfolder="", type_="output", target=target)
-        assert target.read_bytes() == b"arbitrary-downloaded-bytes"
-    else:
-        assert client.fetch_artifact_bytes(filename="result.bin", subfolder="", type_="output") == b"arbitrary-downloaded-bytes"
-    assert len(seen) == 2
-    assert "authorization" in seen[0].headers
-    assert not {"authorization", "cookie", "x-api-key"}.intersection(seen[1].headers)
-    assert not seen[1].url.userinfo
+        with httpx.Client(transport=httpx.MockTransport(handler),
+                          auth=("api-user", "api-secret"), headers={"x-api-key": "private-key"}) as http:
+            http.cookies.set("session", "private-cookie", domain="127.0.0.1")
+            client = ComfyClient("http://127.0.0.1:8188", http_client=http)
+            if write_file:
+                target = tmp_path / "download.bin"
+                client.download_artifact(filename="result.bin", subfolder="", type_="output", target=target)
+                assert target.read_bytes() == payload
+            else:
+                assert client.fetch_artifact_bytes(filename="result.bin", subfolder="", type_="output") == payload
+        assert len(seen) == len(downloaded) == 1
+        assert "authorization" in seen[0].headers
+        assert "x-api-key" in seen[0].headers
+        assert "SIGNED_DOWNLOAD_CANARY" in downloaded[0][0]
+        assert not {"authorization", "cookie", "x-api-key"}.intersection(
+            key.lower() for key in downloaded[0][1]
+        )
+    assert "SIGNED_DOWNLOAD_CANARY" not in caplog.text
+    assert "redirect-secret" not in caplog.text
 
 
-def test_artifact_redirect_loop_stops_without_leaking_signed_url():
-    seen = []
-
-    def handler(request: httpx.Request) -> httpx.Response:
-        seen.append(request)
-        return httpx.Response(302, headers={"location": "/again?signature=private"})
-
-    client = ComfyClient("http://127.0.0.1:8188", http_client=httpx.Client(
-        transport=httpx.MockTransport(handler), max_redirects=2,
-    ))
-    with pytest.raises(AiVideoError) as exc_info:
-        client.fetch_artifact_bytes(filename="result.bin", subfolder="", type_="output")
-    assert len(seen) == 3
-    assert "private" not in str(exc_info.value)
-    assert "private" not in exc_info.value.technical_detail
+@pytest.mark.parametrize("failure", ["loop", "truncated", "http"])
+def test_artifact_download_failure_is_typed_without_leaking_signed_url(failure, caplog):
+    caplog.set_level("INFO")
+    with _artifact_server(loop=failure == "loop", truncated=failure == "truncated",
+                          status=404 if failure == "http" else 200) as (port, downloaded, _):
+        def handler(request):
+            return httpx.Response(302, headers={
+                "location": f"http://127.0.0.1:{port}/file?signature=SIGNED_DOWNLOAD_CANARY",
+            })
+        with httpx.Client(transport=httpx.MockTransport(handler)) as http:
+            client = ComfyClient("http://127.0.0.1:8188", http_client=http)
+            with pytest.raises(AiVideoError) as exc_info:
+                client.fetch_artifact_bytes(filename="result.bin", subfolder="", type_="output")
+        assert exc_info.value.code is ErrorCode.COMFY_OUTPUT_MISSING
+        assert len(downloaded) == (11 if failure == "loop" else 1)
+        assert "SIGNED_DOWNLOAD_CANARY" not in str(exc_info.value)
+        assert "SIGNED_DOWNLOAD_CANARY" not in exc_info.value.technical_detail
+    assert "SIGNED_DOWNLOAD_CANARY" not in caplog.text

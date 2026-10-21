@@ -687,7 +687,7 @@ exact subject 与 prompt。`shot_router.py` 检查 named capability 与 compiler
 `video_request_models.py` 保存 request fingerprint 投影，`video.py` 保持 public constructor 与 validator，
 请求 hash 的新主体字段接入不能继续增长 oversized module。
 `vidu_profile.py` 独占 dated profile、能力与 per-call monetary ceiling；旧下载策略字段只作兼容 metadata。
-`vidu_download.py` 独占 credential-free HTTP(S) 下载与正常 CDN redirect（HTTPS 保留原域名 TLS）；`vidu_source.py`
+`src/ai_video/download.py` 独占 credential-free HTTP(S) 下载（`vidu_download.py` 保留兼容导出）与正常 CDN redirect（HTTPS 保留原域名 TLS）；`vidu_source.py`
 只验证延长输入的 canonical submit/fetch/probe receipts，不拥有 lifecycle。显式 registry 注入，
 沿既有 `VideoGenerationService` / `ProductionStateCommitter` lifecycle；不得自动选路、
 fallback、重试 POST 或 activation。Profile hash、task/model、creation ID、exact egress、

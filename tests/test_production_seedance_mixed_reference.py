@@ -327,3 +327,89 @@ def test_exact_chinese_counterclockwise_arc_preserves_camera_direction():
     assert compile().expressed_control_paths == ("generation_intent.primary_camera_motion.direction",)
     motion.direction = "right"
     assert not compile().expressed_control_paths
+
+
+@pytest.mark.parametrize(
+    ("content_type", "remove_content_type"),
+    [("video/mp4", False), ("text/plain", False), ("video/mp4", True)],
+)
+def test_video_reference_readback_uses_exact_bytes_not_content_type(
+    monkeypatch, content_type, remove_content_type
+):
+    from ai_video.production.seedance_local_video import (
+        HttpxSeedanceLocalVideoMaterializationTransport,
+    )
+    from test_production_vidu_download import WireSocket, _wire
+
+    _, options = _fixture(monkeypatch)
+    state = _wire(
+        monkeypatch,
+        responses=[{"content_type": content_type, "body": options["source_bytes"]}],
+    )
+    if remove_content_type:
+        original_makefile = WireSocket.makefile
+
+        def without_content_type(sock, *args):
+            headers, separator, body = sock.response.partition(b"\r\n\r\n")
+            headers = b"\r\n".join(
+                line
+                for line in headers.split(b"\r\n")
+                if not line.lower().startswith(b"content-type:")
+            )
+            sock.response = headers + separator + body
+            return original_makefile(sock, *args)
+
+        monkeypatch.setattr(WireSocket, "makefile", without_content_type)
+
+    options["transport"] = HttpxSeedanceLocalVideoMaterializationTransport(
+        timeout_seconds=1
+    )
+    verified = verify_reference_video(**options)
+
+    assert verified.binding == options["binding"]
+    assert verified.locator_sha256 == hashlib.sha256(URL.encode()).hexdigest()
+    assert state["sockets"][0].closed
+    response_headers = state["sockets"][0].response.split(b"\r\n\r\n", 1)[0]
+    wire = b"".join(state["sockets"][0].writes)
+    assert b"Accept: */*\r\n" in wire
+    assert b"Authorization:" not in wire and b"Cookie:" not in wire
+    if remove_content_type:
+        assert not any(
+            line.lower().startswith(b"content-type:")
+            for line in response_headers.split(b"\r\n")
+        )
+    else:
+        assert f"Content-Type: {content_type}".encode() in response_headers
+
+
+def test_video_reference_oversize_is_rejected_after_complete_readback(monkeypatch):
+    from ai_video.production.seedance_local_video import (
+        HttpxSeedanceLocalVideoMaterializationTransport,
+    )
+    from test_production_vidu_download import WireSocket, _wire
+
+    _, options = _fixture(monkeypatch)
+    oversized = options["source_bytes"] + b"x" * 70_000
+    state = _wire(monkeypatch, responses=[{"body": oversized}])
+
+    class ReadTrackingBytesIO(BytesIO):
+        def close(self):
+            self.bytes_consumed = self.tell()
+            super().close()
+
+    def tracked_makefile(sock, *_args):
+        stream = ReadTrackingBytesIO(sock.response)
+        sock.response_stream = stream
+        return stream
+
+    monkeypatch.setattr(WireSocket, "makefile", tracked_makefile)
+    options["transport"] = HttpxSeedanceLocalVideoMaterializationTransport(
+        timeout_seconds=1
+    )
+
+    with pytest.raises(AiVideoError):
+        verify_reference_video(**options)
+
+    sock = state["sockets"][0]
+    assert sock.closed
+    assert sock.response_stream.bytes_consumed == len(sock.response)

@@ -8,6 +8,7 @@ from typing import Any
 
 import httpx
 
+from ai_video.download import stream_public_video
 from ai_video.errors import AiVideoError, ErrorCode, retryable_error
 
 
@@ -210,26 +211,26 @@ class ComfyClient:
                     return True
         return False
 
-    def _get_artifact(self, *, filename: str, subfolder: str, type_: str) -> httpx.Response:
-        response = self.http.get(
-            self._url("/view"),
+    def _get_artifact(self, *, filename: str, subfolder: str, type_: str) -> bytes:
+        # Only the selected ComfyUI endpoint receives API authentication. Artifact
+        # redirects use the shared non-logging downloader without ambient secrets.
+        with self.http.stream(
+            "GET", self._url("/view"),
             params={"filename": filename, "subfolder": subfolder, "type": type_},
             follow_redirects=False,
-        )
-        # The selected ComfyUI endpoint may require its own API authentication.
-        # Redirected artifact GETs use fresh requests without ambient client secrets.
-        for redirects in range(self.http.max_redirects + 1):
+        ) as response:
             if not response.has_redirect_location:
-                return response
-            if redirects == self.http.max_redirects:
-                response.close()
-                raise httpx.TooManyRedirects("Artifact redirect loop.")
+                response.raise_for_status()
+                return response.read()
             target = response.request.url.join(response.headers["location"])
             target = target.copy_with(username="", password="")
-            response.close()
-            request = httpx.Request("GET", target, headers={"accept": "*/*"})
-            response = self.http.send(request, auth=None, follow_redirects=False)
-        raise httpx.TooManyRedirects("Artifact redirect loop.")
+        with stream_public_video(str(target), timeout_seconds=30) as downloaded:
+            if not 200 <= downloaded.status_code < 300:
+                raise AiVideoError(
+                    ErrorCode.COMFY_OUTPUT_MISSING,
+                    "ComfyUI artifact download failed.",
+                )
+            return b"".join(downloaded.iter_bytes())
 
     def download_artifact(
         self,
@@ -242,16 +243,15 @@ class ComfyClient:
         target_path = Path(target)
         target_path.parent.mkdir(parents=True, exist_ok=True)
         try:
-            response = self._get_artifact(filename=filename, subfolder=subfolder, type_=type_)
-            response.raise_for_status()
-        except httpx.HTTPError as exc:
+            content = self._get_artifact(filename=filename, subfolder=subfolder, type_=type_)
+        except (httpx.HTTPError, AiVideoError) as exc:
             raise retryable_error(
                 ErrorCode.COMFY_OUTPUT_MISSING,
                 f"Could not download ComfyUI artifact: {filename}",
                 type(exc).__name__,
                 exc,
             ) from exc
-        target_path.write_bytes(response.content)
+        target_path.write_bytes(content)
 
     def fetch_artifact_bytes(
         self,
@@ -267,16 +267,15 @@ class ComfyClient:
         does not mutate the filesystem.
         """
         try:
-            response = self._get_artifact(filename=filename, subfolder=subfolder, type_=type_)
-            response.raise_for_status()
-        except httpx.HTTPError as exc:
+            content = self._get_artifact(filename=filename, subfolder=subfolder, type_=type_)
+        except (httpx.HTTPError, AiVideoError) as exc:
             raise retryable_error(
                 ErrorCode.COMFY_OUTPUT_MISSING,
                 f"Could not fetch ComfyUI artifact bytes: {filename}",
                 type(exc).__name__,
                 exc,
             ) from exc
-        return bytes(response.content)
+        return content
 
     def free_memory(self) -> None:
         try:

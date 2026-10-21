@@ -11,6 +11,7 @@ import httpx
 import pytest
 from pydantic import ValidationError
 
+from ai_video import download as download_transport
 from ai_video.errors import AiVideoError
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.remote_media import RemoteMediaMaterializationReceipt
@@ -147,17 +148,17 @@ def _wire(monkeypatch, *, addresses=("8.8.8.8",), status=200, headers=b"", body=
     def create_connection(address, timeout=None, source_address=None, **kwargs):
         # Mock the connector as well as its sockets: Harness intentionally rejects
         # external hostnames before invoking the mocked low-level DNS/socket calls.
-        family, kind, protocol, _, sockaddr = vidu_download.socket.getaddrinfo(
+        family, kind, protocol, _, sockaddr = download_transport.socket.getaddrinfo(
             address[0], address[1], 0, socket.SOCK_STREAM,
         )[0]
-        sock = vidu_download.socket.socket(family, kind, protocol)
+        sock = download_transport.socket.socket(family, kind, protocol)
         sock.settimeout(timeout)
         sock.connect(sockaddr)
         return sock
-    monkeypatch.setattr(vidu_download.socket, "getaddrinfo", resolve)
-    monkeypatch.setattr(vidu_download.socket, "socket", make_socket)
-    monkeypatch.setattr(vidu_download.socket, "create_connection", create_connection)
-    monkeypatch.setattr(vidu_download.ssl.SSLContext, "wrap_socket", wrap)
+    monkeypatch.setattr(download_transport.socket, "getaddrinfo", resolve)
+    monkeypatch.setattr(download_transport.socket, "socket", make_socket)
+    monkeypatch.setattr(download_transport.socket, "create_connection", create_connection)
+    monkeypatch.setattr(download_transport.ssl.SSLContext, "wrap_socket", wrap)
     return state
 
 
@@ -436,13 +437,13 @@ def test_incomplete_or_sink_failure_never_emits_receipt_and_closes_socket(monkey
     class FailingSink(BytesIO):
         def write(self, chunk):
             raise OSError("disk full")
-    socket_factory = vidu_download.socket.socket
+    socket_factory = download_transport.socket.socket
     def make_socket(*args):
         sock = socket_factory(*args)
         if failure == "truncated":
             sock.response = sock.response[:-1]
         return sock
-    monkeypatch.setattr(vidu_download.socket, "socket", make_socket)
+    monkeypatch.setattr(download_transport.socket, "socket", make_socket)
     sink = FailingSink() if failure == "sink" else BytesIO()
     with httpx.Client(transport=httpx.MockTransport(lambda _: httpx.Response(200, json=fake.query))) as client:
         provider._transport = HttpxViduTransport(client=client)
@@ -479,3 +480,70 @@ def test_bad_or_incomplete_media_is_written_before_post_download_rejection(body)
     with pytest.raises(AiVideoError):
         provider.fetch(submission, receipt, observation, sink)
     assert sink.getvalue() == body
+
+
+@pytest.mark.parametrize("provider_kind", ["vidu", "grok"])
+@pytest.mark.parametrize(
+    ("accept_name", "accept_value"),
+    [("accept", "video/mp4"), ("Accept", "*/*"), ("aCcEpT", "application/octet-stream")],
+)
+def test_result_stream_accepts_accept_only_headers_without_forwarding_them(
+    monkeypatch, provider_kind, accept_name, accept_value
+):
+    from ai_video.production.grok import (
+        GrokTransportRequest,
+        HttpxGrokTransport,
+    )
+
+    state = _wire(monkeypatch)
+    with httpx.Client(
+        transport=httpx.MockTransport(lambda _request: pytest.fail("API client used"))
+    ) as client:
+        if provider_kind == "vidu":
+            transport = HttpxViduTransport(client=client)
+            request = ViduTransportRequest("GET", URL, {accept_name: accept_value})
+        else:
+            transport = HttpxGrokTransport(client=client)
+            request = GrokTransportRequest("GET", URL, {accept_name: accept_value})
+        with transport.stream(request) as response:
+            assert b"".join(response.iter_bytes()) == MP4
+
+    wire = b"".join(state["sockets"][0].writes)
+    assert b"Accept: */*\r\n" in wire
+    if accept_value != "*/*":
+        assert accept_value.encode() not in wire
+    assert b"Authorization:" not in wire and b"Cookie:" not in wire
+
+
+@pytest.mark.parametrize("provider_kind", ["vidu", "grok"])
+@pytest.mark.parametrize("bad_request", ["method", "body", "secret_header"])
+def test_result_stream_still_rejects_method_body_and_secret_headers(
+    monkeypatch, provider_kind, bad_request
+):
+    from ai_video.production.grok import GrokTransportRequest, HttpxGrokTransport
+
+    state = _wire(monkeypatch)
+    headers = {"Accept": "video/mp4"}
+    method = "GET"
+    body = b""
+    if bad_request == "method":
+        method = "POST"
+    elif bad_request == "body":
+        body = b"payload"
+    else:
+        headers["Authorization"] = "SECRET"
+
+    with httpx.Client(
+        transport=httpx.MockTransport(lambda _request: pytest.fail("API client used"))
+    ) as client:
+        if provider_kind == "vidu":
+            transport = HttpxViduTransport(client=client)
+            request = ViduTransportRequest(method, URL, headers, body)
+        else:
+            transport = HttpxGrokTransport(client=client)
+            request = GrokTransportRequest(method, URL, headers, body)
+        with pytest.raises(AiVideoError):
+            with transport.stream(request):
+                pytest.fail("invalid result request reached the wire")
+
+    assert not state["dns"] and not state["sockets"]

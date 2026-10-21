@@ -172,7 +172,23 @@ class HttpxGrokTransport:
     def stream(
         self, request: GrokTransportRequest
     ) -> Iterator[GrokStreamResponse]:
-        if request.method != "GET" or request.body or dict(request.headers) != {"accept": "*/*"}:
+        normalized_headers: dict[str, str] = {}
+        for key, value in request.headers.items():
+            if (
+                not isinstance(key, str)
+                or not isinstance(value, str)
+                or key.lower() in normalized_headers
+            ):
+                raise _error(
+                    "Grok result downloads must be credential-free GETs.",
+                    ErrorCode.VIDEO_ARTIFACT_INVALID,
+                )
+            normalized_headers[key.lower()] = value
+        if (
+            request.method != "GET"
+            or request.body
+            or set(normalized_headers) != {"accept"}
+        ):
             raise _error(
                 "Grok result downloads must be credential-free GETs.",
                 ErrorCode.VIDEO_ARTIFACT_INVALID,

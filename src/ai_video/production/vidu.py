@@ -128,7 +128,20 @@ class HttpxViduTransport:
 
     @contextmanager
     def stream(self, request: ViduTransportRequest) -> Iterator[ViduStreamResponse]:
-        if request.method != "GET" or request.body or dict(request.headers) != {"accept": "*/*"}:
+        normalized_headers: dict[str, str] = {}
+        for key, value in request.headers.items():
+            if (
+                not isinstance(key, str)
+                or not isinstance(value, str)
+                or key.lower() in normalized_headers
+            ):
+                raise _error("Vidu result transport only accepts credential-free GET.")
+            normalized_headers[key.lower()] = value
+        if (
+            request.method != "GET"
+            or request.body
+            or set(normalized_headers) != {"accept"}
+        ):
             raise _error("Vidu result transport only accepts credential-free GET.")
         with stream_public_video(request.url, timeout_seconds=self._download_timeout) as response:
             yield response
