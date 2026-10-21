@@ -16,7 +16,7 @@ P0 的 `compile_request` 支持普通 Shot requirement 的显式素材绑定。�
 
 每次提交后，Provider 只读轮询服务端已保存的画布草稿，要求本次节点精确绑定封存的 `resource_id`，再将完整草稿、版本和 SHA-256 按内容寻址保存为项目内 `artifacts/provider-canvas/jimeng/` 的不可变快照。accepted 的标准付费回执锚定 dispatch 和画布快照 hash；标准项目 reader 重开时还将有序素材 tuple 与原生成请求核对，缺失、替换或不一致即拒绝加载。服务端草稿保存未获确认时，付费结果保持 `OUTCOME_UNKNOWN`，只允许读回恢复，不能再次付费提交。此机制以草稿读取证明保存，不另行调用未经验证的画布写入接口。
 
-提交响应丢失时，Paid attempt 保持 `OUTCOME_UNKNOWN`，预算保持未结算，UNKNOWN 回执锚定已落盘的 dispatch hash。若进程在写提交回执前退出，`recover_jimeng_unknown_once` 先通过原 Paid committer 将遗留 `SUBMIT_INTENT` 锁定为 UNKNOWN，再只查询已封存的 resource ID，核对账号/project、submit/task、素材及参数身份，并将原预算预留协调为 accepted；不重新提交或签发 permit。没有封存 resource ID、读回不可用或无法证明资源时继续保持 UNKNOWN。恢复回执嵌入带内容 hash 的读回证据。正常轮询和获取使用 accepted 的 `resource_id:task_id`；完成后从新鲜 resource 响应取下载地址，允许正常重定向，落盘时计算 hash。接受前仍须经过现有视频 artifact probe 与 QA。
+提交响应丢失时，Paid attempt 保持 `OUTCOME_UNKNOWN`，预算保持未结算，UNKNOWN 回执锚定已落盘的 dispatch 与画布快照 hash。若进程在写提交回执前退出，标准 `ProductionStateCommitter.recover()` 或 `recover_jimeng_unknown_once` 都将遗留 `SUBMIT_INTENT` 锁定为 UNKNOWN，并封存当时已有的 Jimeng 证据；之后只查询已封存的 resource ID，核对账号/project、submit/task、素材及参数身份，并将原预算预留协调为 accepted；不重新提交或签发 permit。没有封存 resource ID、读回不可用或无法证明资源时继续保持 UNKNOWN。恢复回执嵌入带内容 hash 的读回证据。正常轮询和获取使用 accepted 的 `resource_id:task_id`；完成后从新鲜 resource 响应取下载地址，允许正常重定向，落盘时计算 hash。接受前仍须经过现有视频 artifact probe 与 QA。
 
 ## Integration
 

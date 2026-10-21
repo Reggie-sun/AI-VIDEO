@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-from datetime import datetime
 from pathlib import Path
 from typing import Callable
 
@@ -787,6 +786,7 @@ class _StateCommitPaidProviderMixin(_StateCommitJimengMixin):
             ):
                 continue
             gate = self._reopen_paid_gate(state.gate_receipt)
+            dispatch_hash, canvas_hash = self._jimeng_unknown_evidence_hashes(attempt, gate)
             receipt = PaidProviderSubmitReceipt.create(
                 attempt_id=attempt.attempt_id,
                 request_fingerprint=gate.preview.request_fingerprint,
@@ -795,7 +795,9 @@ class _StateCommitPaidProviderMixin(_StateCommitJimengMixin):
                 reservation_id=state.reservation_id,
                 outcome=PaidProviderSubmitOutcome.OUTCOME_UNKNOWN,
                 external_effect_id=None,
-                recorded_at=datetime.fromisoformat(_timestamp()),
+                jimeng_unknown_dispatch_hash=dispatch_hash,
+                jimeng_unknown_canvas_hash=canvas_hash,
+                recorded_at=self._paid_provider_clock(),
             )
             budget = apply_paid_provider_submit_receipt(budget, receipt)
             submit_artifact = _artifact(

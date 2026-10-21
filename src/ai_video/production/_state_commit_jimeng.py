@@ -35,6 +35,38 @@ def _artifact(path: Path, model: object) -> PreparedArtifact:
 
 
 class _StateCommitJimengMixin:
+    def _jimeng_unknown_evidence_hashes(self, attempt, gate) -> tuple[str | None, str | None]:
+        """Seal the existing dispatch and saved canvas on either recovery entry point."""
+
+        from ai_video.production.jimeng_contracts import dispatch_matches_request
+
+        if gate.preview.provider_kind != "jimeng":
+            return None, None
+        video = attempt.video_generation_state
+        if video is None or attempt.operation != "video_generation":
+            raise _state_invalid("Jimeng recovery requires one video paid intent.")
+        dispatch = self.read_jimeng_dispatch(attempt.attempt_id, required=False)
+        canvas = self.read_jimeng_canvas_snapshot(attempt.attempt_id, required=False)
+        if canvas is not None and dispatch is None:
+            raise _state_invalid("Jimeng saved canvas has no durable dispatch.")
+        if dispatch is not None and (
+            dispatch.request_fingerprint != gate.preview.request_fingerprint
+            or dispatch.preview_fingerprint != gate.preview.preview_fingerprint
+            or not dispatch_matches_request(dispatch, self._reopen_video_request(video.request))
+        ):
+            raise _state_invalid("Jimeng dispatch differs from the paid video intent.")
+        if canvas is not None and (
+            canvas.dispatch_hash != dispatch.content_hash
+            or canvas.project_id != dispatch.project_id
+            or canvas.node_id != dispatch.node_id
+            or canvas.resource_id != dispatch.resource_id
+        ):
+            raise _state_invalid("Jimeng saved canvas differs from its dispatch.")
+        return (
+            dispatch.content_hash if dispatch is not None else None,
+            canvas.content_hash if canvas is not None else None,
+        )
+
     def latch_jimeng_abandoned_intent(self, attempt_id: str) -> ProductionManifest:
         """Turn a crashed in-flight Jimeng submit into a query-only UNKNOWN."""
 
@@ -58,9 +90,7 @@ class _StateCommitJimengMixin:
         gate = self._reopen_paid_gate(state.gate_receipt)
         if gate.preview.provider_kind != "jimeng":
             raise _state_invalid("Jimeng recovery selected another Provider.")
-        dispatch = self.read_jimeng_dispatch(attempt_id, required=False)
-        canvas = (self.read_jimeng_canvas_snapshot(attempt_id, required=False)
-                  if dispatch is not None else None)
+        dispatch_hash, canvas_hash = self._jimeng_unknown_evidence_hashes(attempt, gate)
         receipt = PaidProviderSubmitReceipt.create(
             attempt_id=attempt_id,
             request_fingerprint=gate.preview.request_fingerprint,
@@ -69,8 +99,8 @@ class _StateCommitJimengMixin:
             reservation_id=state.reservation_id,
             outcome=PaidProviderSubmitOutcome.OUTCOME_UNKNOWN,
             external_effect_id=None,
-            jimeng_unknown_dispatch_hash=(dispatch.content_hash if dispatch else None),
-            jimeng_unknown_canvas_hash=(canvas.content_hash if canvas else None),
+            jimeng_unknown_dispatch_hash=dispatch_hash,
+            jimeng_unknown_canvas_hash=canvas_hash,
             recorded_at=self._paid_provider_clock(),
         )
         return self.record_paid_provider_submit_receipt(receipt)

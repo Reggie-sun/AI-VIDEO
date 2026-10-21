@@ -303,7 +303,9 @@ def test_dispatch_materials_remain_bound_to_resolved_request():
     (True, "dispatch"), (True, "prior_receipt"), (True, "base_budget"),
     (True, "tampered_unknown_dispatch"),
     (False, "abandoned_intent"),
+    (False, "standard_recover_abandoned"),
     (False, "abandoned_no_dispatch"),
+    (False, "standard_recover_no_dispatch"),
     (False, "tampered_unknown_canvas"),
 ])
 def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, lose_response, missing):
@@ -353,10 +355,12 @@ def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, lose_
     service = VideoGenerationService(committer=committer, provider=provider)
     service.start(attempt_id=paid.attempt_id, request=resolved,
                   execution_binding=prepared.execution_binding)
-    if missing == "abandoned_no_dispatch":
+    if missing in {"abandoned_no_dispatch", "standard_recover_no_dispatch"}:
         committer.record_paid_provider_submit_intent(
             paid, reservation_id="jimeng-reservation-1")
         committer = ProductionStateCommitter(tmp_path, paid_provider_clock=lambda: NOW)
+        if missing == "standard_recover_no_dispatch":
+            committer.recover()
         provider._committer = committer
         service = VideoGenerationService(committer=committer, provider=provider)
         with pytest.raises(AiVideoError) as absent:
@@ -365,7 +369,8 @@ def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, lose_
         assert committer._read_manifest().attempts[-1].status.value == "outcome_unknown"
         assert browser.calls == 0
         return
-    if missing in {"abandoned_intent", "tampered_unknown_canvas"}:
+    if missing in {"abandoned_intent", "standard_recover_abandoned",
+                   "tampered_unknown_canvas"}:
         permit = committer.record_paid_provider_submit_intent(
             paid, reservation_id="jimeng-reservation-1")
         provider.submit(resolved, video_preview, paid, auth, permit)
@@ -391,6 +396,14 @@ def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, lose_
             assert browser.calls == 1
             return
         committer = ProductionStateCommitter(tmp_path, paid_provider_clock=lambda: NOW)
+        if missing == "standard_recover_abandoned":
+            committer.recover()
+            unknown = committer._read_manifest().attempts[-1].paid_provider_state
+            receipt = committer._reopen_paid_submit(unknown.submit_receipt)
+            assert receipt.jimeng_unknown_dispatch_hash == committer.read_jimeng_dispatch(
+                paid.attempt_id).content_hash
+            assert receipt.jimeng_unknown_canvas_hash == committer.read_jimeng_canvas_snapshot(
+                paid.attempt_id).content_hash
         provider._committer = committer
         service = VideoGenerationService(committer=committer, provider=provider)
         submission = service.recover_jimeng_unknown_once(attempt_id=paid.attempt_id)
