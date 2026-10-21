@@ -9,6 +9,10 @@ evidence_index_version: "1"
 
 Date: 2026-10-21
 
+## Supersession Notice — 2026-10-21
+
+下文“没有接入新的 Production Provider”描述的是当时的一次性研究 probe。后续已提交 [Jimeng Provider P0 Engineering Record](2026-10-21-jimeng-provider-p0.md) 所述正式 Provider 与 Paid/State/reader 接线；历史真实提交、442 积分结算和媒体 Gate 边界保持原样。新 Provider 的真实付费提交仍未实证。
+
 ## Assessment
 
 当前登录账号下，已经通过直接 HTTP 请求完成图片、音频、视频各一次存储上传，并在两个独立客户端进程重连后读回同一已有结果，下载的 MP4 与历史 source provenance 的 SHA-256 一致。账号会话由原项目浏览器 profile 持有，操作没有依赖视觉点击，也没有导出登录 Cookie。
