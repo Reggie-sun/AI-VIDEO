@@ -8,7 +8,9 @@ from datetime import datetime
 from pathlib import Path
 from typing import Literal
 
-from pydantic import ConfigDict, Field, model_validator
+from pydantic import ConfigDict, Field, model_serializer, model_validator
+
+from ai_video.errors import AiVideoError, ErrorCode
 
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import StrictModel
@@ -24,6 +26,15 @@ JIMENG_PROVIDER = "jimeng"
 JIMENG_CAPABILITY = "jimeng-seedance-2.5-multimodal-v1"
 JIMENG_COMPILER = "jimeng-seedance-2.5-video-compiler"
 JIMENG_PROFILE_VERSION = "canvas-seedance-2.5-v1"
+JIMENG_MODELS = (JIMENG_MODEL, "seedance_2.0_mini")
+
+
+class JimengSubmitNotDispatched(AiVideoError):
+    """Transport proved the native submit action never started, not a retry grant."""
+
+    def __init__(self):
+        super().__init__(code=ErrorCode.VIDEO_PROVIDER_FAILED,
+            user_message="Jimeng native submission did not start.", retryable=False)
 
 
 class JimengProfile(StrictModel):
@@ -31,6 +42,7 @@ class JimengProfile(StrictModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True)
 
+    model_id: Literal["seedance_2.5", "seedance_2.0_mini"] = JIMENG_MODEL
     account_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     project_id: str = Field(pattern=r"^[0-9a-f-]{36}$")
     node_id: str = Field(pattern=r"^node_[A-Za-z0-9]{1,64}$")
@@ -43,11 +55,38 @@ class JimengProfile(StrictModel):
     # The quote is checked against this operator bound immediately before dispatch.
     # It is not a server-enforced hard spending cap.
 
+    @model_serializer(mode="wrap")
+    def _preserve_existing_profile_bytes(self, handler):
+        data = handler(self)
+        if self.model_id == JIMENG_MODEL:
+            data.pop("model_id", None)
+        return data
+
+    @model_validator(mode="after")
+    def _selected_model_specs(self):
+        if self.model_id == "seedance_2.0_mini" and (
+            self.duration_seconds > 15 or self.resolution != "720p"
+        ):
+            raise ValueError("Jimeng Seedance 2.0 Mini requires 4–15 seconds at 720p")
+        return self
+
+    @property
+    def capability_id(self) -> str:
+        return f"jimeng-{self.model_id.replace('_', '-')}-multimodal-v1"
+
+    @property
+    def compiler_id(self) -> str:
+        return f"jimeng-{self.model_id.replace('_', '-')}-video-compiler"
+
+    @property
+    def profile_version(self) -> str:
+        return f"canvas-{self.model_id.replace('_', '-')}-v1"
+
     def pointer(self) -> ProviderProfilePointer:
         digest = canonical_sha256(self.model_dump(mode="json"))
         return ProviderProfilePointer(
             profile_id=JIMENG_PROVIDER,
-            profile_version=JIMENG_PROFILE_VERSION,
+            profile_version=self.profile_version,
             profile_path=Path(f"provider-profiles/{digest}.json"),
             profile_sha256=digest,
         )

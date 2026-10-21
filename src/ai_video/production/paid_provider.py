@@ -554,7 +554,7 @@ class JimengAcceptedEffectProof(_PaidStrictModel):
     resource_id: str = Field(pattern=r"^[0-9a-f-]{36}$")
     task_id: str = Field(pattern=r"^[0-9]{1,32}$")
     params_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    observed_status: Literal[200, 1000]
+    observed_status: Literal[200, 1000, 1001]
     observed_at: datetime
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
 

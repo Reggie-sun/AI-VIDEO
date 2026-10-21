@@ -15,27 +15,43 @@ from typing import BinaryIO
 import httpx
 
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.production.jimeng_contracts import JimengMaterial, JimengProfile
+from ai_video.production.jimeng_contracts import (
+    JimengMaterial, JimengProfile, JimengSubmitNotDispatched,
+)
 
 
 _WORKER = Path(__file__).with_name("jimeng_browser.cjs")
-_DEFAULT_PLAYWRIGHT = Path(
-    "/home/reggie/.local/share/ai-video/playwright-mcp/node_modules/playwright"
-)
+_DEFAULT_PLAYWRIGHT = "playwright"
 
 
 def _failure(code: ErrorCode, message: str) -> AiVideoError:
     return AiVideoError(code=code, user_message=message, retryable=False)
 
 
+def _reap_worker(child) -> None:
+    """Also run on cancellation; never leave an approved child detached."""
+
+    if child is None:
+        return
+    if child.poll() is None:
+        child.kill()
+    child.wait()
+    for stream in (child.stdin, child.stdout, child.stderr):
+        if stream is not None:
+            try:
+                stream.close()
+            except OSError:
+                pass
+
+
 class JimengBrowserTransport:
     """One operation per child. Browser credentials remain inside page context."""
 
     def __init__(self, *, profile_dir: Path,
-                 playwright_module: Path = _DEFAULT_PLAYWRIGHT,
+                 playwright_module: Path | str = _DEFAULT_PLAYWRIGHT,
                  node_binary: str = "node", timeout_seconds: int = 300):
         self._profile_dir = Path(profile_dir)
-        self._playwright_module = Path(playwright_module)
+        self._playwright_module = str(playwright_module)
         self._node_binary = node_binary
         self._timeout_seconds = timeout_seconds
 
@@ -47,13 +63,14 @@ class JimengBrowserTransport:
         )
 
     def _base(self, profile: JimengProfile) -> dict[str, object]:
-        return {"profile": profile.model_dump(mode="json"),
+        return {"profile": {**profile.model_dump(mode="json"), "model_id": profile.model_id},
                 "profile_dir": str(self._profile_dir),
                 "playwright_module": str(self._playwright_module)}
 
     def _single(self, operation: str, profile: JimengProfile, extra: dict) -> dict:
-        child = self._process()
+        child = None
         try:
+            child = self._process()
             payload = {"operation": operation, **self._base(profile), **extra}
             output, _ = child.communicate(json.dumps(payload, ensure_ascii=False) + "\n",
                                           timeout=self._timeout_seconds)
@@ -65,10 +82,10 @@ class JimengBrowserTransport:
                 raise ValueError("browser operation failed")
             return result
         except (OSError, ValueError, subprocess.TimeoutExpired):
-            child.kill()
-            child.communicate()
             raise _failure(ErrorCode.VIDEO_PROVIDER_FAILED,
                            "Jimeng browser operation failed; account state was not exported.") from None
+        finally:
+            _reap_worker(child)
 
     def upload(self, *, profile: JimengProfile, kind: str, payload: bytes,
                mime_type: str) -> str:
@@ -93,8 +110,12 @@ class JimengBrowserTransport:
 
     def submit_native(self, *, profile: JimengProfile, video_params: dict,
                       materials: tuple[JimengMaterial, ...], admit):
-        child = self._process()
+        try:
+            child = self._process()
+        except OSError:
+            raise JimengSubmitNotDispatched() from None
         selector = selectors.DefaultSelector()
+        admitted = False
         try:
             assert child.stdin is not None and child.stdout is not None
             selector.register(child.stdout, selectors.EVENT_READ)
@@ -104,14 +125,25 @@ class JimengBrowserTransport:
                 "materials": [x.model_dump(mode="json") for x in materials]}
             child.stdin.write(json.dumps(command, ensure_ascii=False) + "\n")
             child.stdin.flush()
-            admitted = False
+            buffered = b""
             while True:
-                if not selector.select(max(0, deadline - time.monotonic())):
+                remaining = deadline - time.monotonic()
+                if remaining <= 0:
                     raise TimeoutError("Jimeng browser submit timed out")
-                line = child.stdout.readline()
-                if not line:
-                    raise ValueError("browser worker ended without result")
+                if b"\n" not in buffered:
+                    if not selector.select(remaining):
+                        raise TimeoutError("Jimeng browser submit timed out")
+                    chunk = os.read(child.stdout.fileno(), 65536)
+                    if not chunk:
+                        raise ValueError("browser worker ended without result")
+                    buffered += chunk
+                    if len(buffered) > 65536:
+                        raise ValueError("browser submit protocol frame is too large")
+                    continue
+                line, buffered = buffered.split(b"\n", 1)
                 message = json.loads(line)
+                if not isinstance(message, dict):
+                    raise ValueError("browser protocol frame is invalid")
                 if message.get("event") == "dispatch":
                     if admitted:
                         raise ValueError("second dispatch")
@@ -126,18 +158,28 @@ class JimengBrowserTransport:
                     child.stdin.flush()
                     continue
                 if message.get("ok") is True and admitted:
-                    child.wait(timeout=max(0, deadline - time.monotonic()))
-                    if child.returncode != 0:
+                    # The worker's readline interface stays alive until EOF.
+                    child.stdin.close()
+                    child.stdin = None
+                    tail, _ = child.communicate(timeout=max(0, deadline - time.monotonic()))
+                    if child.returncode != 0 or buffered.strip() or tail.strip():
                         raise ValueError("browser worker did not exit cleanly")
                     return message
+                if message.get("ok") is False and message.get("no_effect") is True and not admitted:
+                    child.stdin.close()
+                    child.stdin = None
+                    tail, _ = child.communicate(timeout=max(0, deadline - time.monotonic()))
+                    if child.returncode == 1 and not buffered.strip() and not tail.strip():
+                        raise JimengSubmitNotDispatched()
                 raise ValueError("browser worker returned no accepted dispatch")
+        except JimengSubmitNotDispatched:
+            raise
         except Exception:
-            child.kill()
-            child.communicate()
             raise _failure(ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN,
                            "Jimeng native submit outcome is unknown; do not submit again.") from None
         finally:
             selector.close()
+            _reap_worker(child)
 
     def read_resource(self, *, profile: JimengProfile, resource_id: str):
         result = self._single("read", profile, {"resource_id": resource_id})

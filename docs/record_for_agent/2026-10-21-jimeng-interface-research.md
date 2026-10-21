@@ -11,7 +11,7 @@ Date: 2026-10-21
 
 ## Supersession Notice — 2026-10-21
 
-下文“没有接入新的 Production Provider”描述的是当时的一次性研究 probe。后续已提交 [Jimeng Provider P0 Engineering Record](2026-10-21-jimeng-provider-p0.md) 所述正式 Provider 与 Paid/State/reader 接线；历史真实提交、442 积分结算和媒体 Gate 边界保持原样。新 Provider 的真实付费提交仍未实证。
+下文“没有接入新的 Production Provider”描述的是当时的一次性研究 probe。后续已提交 [Jimeng Provider P0 Engineering Record](2026-10-21-jimeng-provider-p0.md) 所述正式 Provider 与 Paid/State/reader 接线；历史真实提交、442 积分结算和媒体 Gate 边界保持原样。另已完成一次 [Mini 正式 Provider 提交与失败恢复](2026-10-21-jimeng-mini-provider-validation.md)，没有取得该 Mini 任务的新 MP4。
 
 ## Assessment
 

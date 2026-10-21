@@ -9,6 +9,10 @@ evidence_index_version: "1"
 
 Date: 2026-10-21
 
+## Follow-up Runtime Boundary — 2026-10-21
+
+下文“新 Provider 真实提交未实证”已由 [Mini 正式 Provider 验证](2026-10-21-jimeng-mini-provider-validation.md)部分取代：独立新画布中真实提交一次 Mini 任务，服务端生成失败；任务已由独立进程恢复并记为 FAILED，完整画布快照已保存。新增修复覆盖纯图片 commercial context、worker EOF 与失败任务恢复。没有新 MP4 或 Mini 成功出片证明，原全仓 Harness 与质量边界继续保留。
+
 ## Current Runtime Truth
 
 即梦 Seedance 2.5 已作为可选 `JimengVideoProvider` 接入既有 `VideoGenerationService`、Paid Provider Gate、`ProductionStateCommitter`、Manifest 与标准项目 reader。`jimeng.py` 负责生成服务技术执行，`jimeng_browser.py` / `jimeng_browser.cjs` 隔离已登录浏览器内的原生提交，未建立第二套任务状态、付费授权、Registry 或 Shot QA。部署时仍须显式注入账号 profile、浏览器 transport、Registry 字节 resolver 和当前项目 committer；不存在隐式 Provider 切换。

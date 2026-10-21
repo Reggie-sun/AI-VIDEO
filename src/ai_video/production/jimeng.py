@@ -15,9 +15,8 @@ from typing import BinaryIO, Protocol
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.jimeng_contracts import (
-    JIMENG_CAPABILITY, JIMENG_COMPILER, JIMENG_MODEL, JIMENG_ORIGIN,
-    JIMENG_PROFILE_VERSION, JIMENG_PROVIDER, JimengDispatchIntent,
-    JimengCanvasSnapshot, JimengMaterial, JimengProfile,
+    JIMENG_ORIGIN, JIMENG_PROVIDER, JimengDispatchIntent,
+    JimengCanvasSnapshot, JimengMaterial, JimengProfile, JimengSubmitNotDispatched,
 )
 from ai_video.production.minimax_h3 import _consume_permit, _permit_is_valid
 from ai_video.production.paid_provider import (
@@ -131,35 +130,38 @@ class JimengVideoProvider:
         self._now = now or (lambda: datetime.now(timezone.utc))
 
     def capabilities(self) -> VideoProviderCapabilities:
+        mini = self._profile.model_id == "seedance_2.0_mini"
         variant = VideoCapabilityVariant(
-            capability_id=JIMENG_CAPABILITY, provider_kind=JIMENG_PROVIDER,
-            model_id=JIMENG_MODEL, profile_version=JIMENG_PROFILE_VERSION,
+            capability_id=self._profile.capability_id, provider_kind=JIMENG_PROVIDER,
+            model_id=self._profile.model_id, profile_version=self._profile.profile_version,
             execution_kind=VideoExecutionKind.REMOTE, billing_kind=BillingKind.METERED,
             mode=VideoGenerationMode.REFERENCE_TO_VIDEO,
             output_capability=VideoOutputCapability(
-                min_duration_seconds=4, max_duration_seconds=30,
+                min_duration_seconds=4, max_duration_seconds=15 if mini else 30,
                 provider_selected_duration=False, timing_modes=("nominal_seconds",),
                 dimension_modes=("adaptive",),
-                resolution_labels=("480p", "720p", "1080p"),
+                resolution_labels=("720p",) if mini else ("480p", "720p", "1080p"),
                 ratios=("16:9", "9:16", "1:1", "4:3", "3:4"),
                 fps_values=(None,), containers=("mp4",), native_audio_options=(True,),
             ),
             allowed_image_roles=("reference",), required_first_frame=False,
-            max_reference_count=30,
+            max_reference_count=9 if mini else 30,
             allowed_image_mime_types=("image/png", "image/jpeg", "image/webp"),
-            max_image_bytes=40 * 1024 * 1024,
+            max_image_bytes=(50 if mini else 40) * 1024 * 1024,
             min_image_width=1, min_image_height=1,
             media_capabilities=(
                 VideoMediaCapability(kind="audio", roles=("reference_audio",),
-                    min_count=0, max_count=10,
+                    min_count=0, max_count=3 if mini else 10,
                     allowed_mime_types=("audio/wav", "audio/mpeg", "audio/mp4"),
-                    max_size_bytes=40 * 1024 * 1024,
-                    min_duration_millis=1, max_duration_millis=30_200),
+                    max_size_bytes=(15 if mini else 40) * 1024 * 1024,
+                    min_duration_millis=2000 if mini else 1,
+                    max_duration_millis=15_000 if mini else 30_200),
                 VideoMediaCapability(kind="video", roles=("reference_video",),
-                    min_count=0, max_count=10,
+                    min_count=0, max_count=3 if mini else 10,
                     allowed_mime_types=("video/mp4", "video/quicktime"),
-                    max_size_bytes=100 * 1024 * 1024,
-                    min_duration_millis=1, max_duration_millis=30_200),
+                    max_size_bytes=(50 if mini else 100) * 1024 * 1024,
+                    min_duration_millis=2000 if mini else 1,
+                    max_duration_millis=15_400 if mini else 30_200),
             ),
             negative_prompt_supported=False, seed_supported=False, fps_supported=False,
             idempotent_submit=False, lookup_supported=True,
@@ -213,7 +215,7 @@ class JimengVideoProvider:
             expressed_control_paths=prose.expressed_control_paths)
         return compile_provider_video_request(
             provider_bound=provider_bound, requirement=requirement,
-            compiler_id=JIMENG_COMPILER, compiler_version="1",
+            compiler_id=self._profile.compiler_id, compiler_version="1",
             capabilities=self.capabilities(), continuity_expression=continuity_expression,
             native_prompt=native,
         )
@@ -221,7 +223,7 @@ class JimengVideoProvider:
     def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:
         if (request.provider_name != JIMENG_PROVIDER
                 or request.provider_kind != JIMENG_PROVIDER
-                or request.model_id != JIMENG_MODEL
+                or request.model_id != self._profile.model_id
                 or request.provider_profile != self._profile.pointer()
                 or request.mode is not VideoGenerationMode.REFERENCE_TO_VIDEO
                 or request.output_requirement != self._profile.output()
@@ -230,13 +232,22 @@ class JimengVideoProvider:
             raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                          "Jimeng request differs from its selected profile.")
         bindings = _ordered_bindings(request)
-        if not bindings or len(bindings) > 50:
+        mini = self._profile.model_id == "seedance_2.0_mini"
+        if not bindings or len(bindings) > (12 if mini else 50):
             raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
-                         "Jimeng requires 1–50 explicit reference materials.")
-        if sum(x.duration_millis for x in request.media_bindings if x.kind == "audio") > 30_200:
+                         "Jimeng reference material count exceeds the selected model bound.")
+        if mini and (len(request.prompt_text) > 4000
+                or not (request.image_bindings or any(x.kind == "video" for x in request.media_bindings))
+                or any(max(x.width, x.height) > 8192 for x in request.image_bindings)
+                or any(x.width is None or x.height is None
+                       or not (200 <= x.width <= 2160 and 200 <= x.height <= 2160)
+                       for x in request.media_bindings if x.kind == "video")):
+            raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
+                         "Jimeng Mini prompt or reference geometry is unsupported.")
+        if sum(x.duration_millis for x in request.media_bindings if x.kind == "audio") > (15_000 if mini else 30_200):
             raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                          "Jimeng audio reference duration exceeds the selected model bound.")
-        if sum(x.duration_millis for x in request.media_bindings if x.kind == "video") > 30_200:
+        if sum(x.duration_millis for x in request.media_bindings if x.kind == "video") > (15_400 if mini else 30_200):
             raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                          "Jimeng video reference duration exceeds the selected model bound.")
         video_millis = sum(x.duration_millis for x in request.media_bindings if x.kind == "video")
@@ -348,7 +359,7 @@ class JimengVideoProvider:
             else:
                 material_params.append({"type": 3, "role": 3, "vid": entry.storage_id})
         params = {"mode": 4, "prompt": request.prompt_text,
-            "model_name": JIMENG_MODEL, "aspect_ratio": self._profile.aspect_ratio,
+            "model_name": self._profile.model_id, "aspect_ratio": self._profile.aspect_ratio,
             "resolution": self._profile.resolution,
             "duration_ms": self._profile.duration_seconds * 1000,
             "materials": material_params,
@@ -391,6 +402,11 @@ class JimengVideoProvider:
         try:
             ack = self._transport.submit_native(profile=self._profile,
                 video_params=params, materials=materials, admit=admit)
+        except JimengSubmitNotDispatched:
+            if not admitted:
+                raise
+            raise _error(ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN,
+                         "Jimeng dispatch is sealed; keep UNKNOWN and query only.") from None
         except Exception:
             raise _error(ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN,
                          "Jimeng submit outcome is unknown; query the sealed resource and never retry.") from None
@@ -464,7 +480,7 @@ class JimengVideoProvider:
             raise _error(ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN,
                          "Jimeng resource read is unavailable; keep UNKNOWN.") from None
         _, task_id = _validated_resource(resource, dispatch)
-        if resource.get("status") not in {200, 1000}:
+        if resource.get("status") not in {200, 1000, 1001}:
             raise _error(ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN,
                          "Jimeng resource has no proven accepted task; keep UNKNOWN.")
         self._save_canvas(dispatch)
@@ -492,6 +508,8 @@ class JimengVideoProvider:
         status = resource.get("status")
         if status == 200:
             state, progress, file_id = VideoTaskState.RUNNING, 500, None
+        elif status == 1001:
+            state, progress, file_id = VideoTaskState.FAILED, None, None
         elif status == 1000 and isinstance(video.get("vid"), str) and video["vid"]:
             state, progress, file_id = VideoTaskState.SUCCEEDED, 1000, video["vid"]
         else:

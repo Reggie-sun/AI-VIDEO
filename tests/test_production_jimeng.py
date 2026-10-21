@@ -307,8 +307,12 @@ def test_dispatch_materials_remain_bound_to_resolved_request():
     (False, "abandoned_no_dispatch"),
     (False, "standard_recover_no_dispatch"),
     (False, "tampered_unknown_canvas"),
+    (False, "failed_task"), (True, "failed_task"),
+    (False, "pre_native_failure"), (False, "unknown_status"),
+    (False, "missing_vid"), (True, "concurrent_recovery"),
 ])
-def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, lose_response, missing):
+@pytest.mark.parametrize("model_id", ["seedance_2.5", "seedance_2.0_mini"])
+def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, lose_response, missing, model_id):
     from production_remote_generation_factory import prepare_remote_generation
     from ai_video.production.project import load_production_project
     from ai_video.production.state_commit import ProductionStateCommitter
@@ -316,23 +320,30 @@ def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, lose_
 
     provider, request, _, _, _, _, browser, _, raw = setup()
     original = request.activation_scope.request
-    provider._profile = provider._profile.model_copy(update={"benefit_amount": 17})
+    profile_data = provider._profile.model_dump(mode="python")
+    profile_data["benefit_amount"] = 17
+    if model_id == "seedance_2.0_mini":
+        profile_data.update(model_id=model_id, duration_seconds=5,
+                            benefit_amount=5, credit_upper_bound=30)
+    provider._profile = JimengProfile.model_validate(profile_data)
     image_only = _request(**{**original.model_dump(exclude={"request_input_hash"}),
                             "provider_profile": provider._profile.pointer(),
+                            "model_id": model_id,
+                            "output_requirement": provider._profile.output(),
                             "image_bindings": original.image_bindings,
                             "media_bindings": (),
                             "prompt_text": "The room reference {{image:0}}"})
     prepared = prepare_remote_generation(root=tmp_path, provider=provider,
-        request=image_only, compiler_id="jimeng-seedance-2.5-video-compiler",
+        request=image_only, compiler_id=provider._profile.compiler_id,
         compiler_version="1", input_bytes={"image-a": raw["image-a"]},
         requirement_timing_mode="content_driven")
     resolved = prepared.resolved_request
     video_preview = provider.preview(resolved)
     paid = PaidProviderCallPreview.create(attempt_id="attempt-jimeng-1",
-        operation="video_generation", provider_kind="jimeng", model_id="seedance_2.5",
+        operation="video_generation", provider_kind="jimeng", model_id=model_id,
         request_fingerprint=resolved.resolved_generation_hash,
         billing_mode="remote_metered", currency="CRD",
-        estimated_cost_upper_bound_microunits=884_000_000,
+        estimated_cost_upper_bound_microunits=provider._profile.credit_upper_bound * 1_000_000,
         destination="https://jimeng.jianying.com", method="POST",
         egress_items=provider.egress_items(resolved),
         retention_mode="provider_standard", provider_policy_snapshot_id="jimeng-test",
@@ -342,8 +353,8 @@ def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, lose_
         attempt_id=paid.attempt_id, preview_fingerprint=paid.preview_fingerprint,
         explicit_opt_in=True, actor=ActorIdentity(actor_id="test-owner", actor_kind="human"),
         opt_in_policy_receipt_id="opt-in-jimeng", budget_policy_id="budget-jimeng",
-        budget_currency="CRD", project_budget_ceiling_microunits=884_000_000,
-        per_call_ceiling_microunits=884_000_000,
+        budget_currency="CRD", project_budget_ceiling_microunits=provider._profile.credit_upper_bound * 1_000_000,
+        per_call_ceiling_microunits=provider._profile.credit_upper_bound * 1_000_000,
         egress_authorized=True, egress_policy_receipt_id="egress-jimeng",
         live_test_authorized=True, live_authorization_receipt_id="live-jimeng",
         issued_at=NOW - timedelta(minutes=1), expires_at=NOW + timedelta(minutes=10),
@@ -352,9 +363,26 @@ def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, lose_
                                          paid_provider_clock=lambda: NOW)
     provider._committer = committer
     browser.fail_after_admit = lose_response
+    if missing == "failed_task":
+        browser.status = 1001
     service = VideoGenerationService(committer=committer, provider=provider)
     service.start(attempt_id=paid.attempt_id, request=resolved,
                   execution_binding=prepared.execution_binding)
+    if missing == "pre_native_failure":
+        from ai_video.production.jimeng_contracts import JimengSubmitNotDispatched
+        def fail(**kwargs):
+            raise JimengSubmitNotDispatched()
+        browser.submit_native = fail
+        with pytest.raises(JimengSubmitNotDispatched):
+            service.submit_once(attempt_id=paid.attempt_id, paid_preview=paid,
+                                reservation_id="jimeng-reservation-1")
+        loaded = load_production_project(tmp_path / "project.yaml")
+        current = loaded.manifest.attempts[-1]
+        receipt = committer._reopen_paid_submit(current.paid_provider_state.submit_receipt)
+        assert receipt.outcome is PaidProviderSubmitOutcome.KNOWN_NO_EFFECT
+        assert committer.read_jimeng_dispatch(paid.attempt_id, required=False) is None
+        assert browser.calls == 0
+        return
     if missing in {"abandoned_no_dispatch", "standard_recover_no_dispatch"}:
         committer.record_paid_provider_submit_intent(
             paid, reservation_id="jimeng-reservation-1")
@@ -437,6 +465,31 @@ def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, lose_
             assert committer._read_manifest().attempts[-1].status.value == "outcome_unknown"
             assert browser.calls == 1
             return
+        if missing == "concurrent_recovery":
+            from concurrent.futures import ThreadPoolExecutor
+            from threading import Barrier
+            barrier = Barrier(2)
+            read = browser.read_resource
+            def concurrent_read(**kwargs):
+                resource = read(**kwargs)
+                barrier.wait(timeout=5)
+                return resource
+            browser.read_resource = concurrent_read
+            def recover():
+                try:
+                    return service.recover_jimeng_unknown_once(attempt_id=paid.attempt_id)
+                except AiVideoError as error:
+                    return error
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                results = list(pool.map(lambda _: recover(), range(2)))
+            assert sum(isinstance(result, VideoSubmission) for result in results) == 1
+            browser.read_resource = read
+            before = load_production_project(tmp_path / "project.yaml").manifest
+            with pytest.raises(AiVideoError):
+                service.recover_jimeng_unknown_once(attempt_id=paid.attempt_id)
+            assert load_production_project(tmp_path / "project.yaml").manifest == before
+            assert browser.calls == 1
+            return
         submission = service.recover_jimeng_unknown_once(attempt_id=paid.attempt_id)
     else:
         submission = service.submit_once(attempt_id=paid.attempt_id, paid_preview=paid,
@@ -449,10 +502,35 @@ def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, lose_
     assert json.loads(canvas.draft_json)["nodes"][0]["data"]["resourceId"] == RESOURCE_ID
     loaded = load_production_project(tmp_path / "project.yaml")
     assert loaded.manifest.attempts[-1].paid_provider_state.phase.value == "accepted"
-    assert service.refresh_once(attempt_id=paid.attempt_id).state is VideoTaskState.RUNNING
+    if missing in {"unknown_status", "missing_vid"}:
+        browser.status = 98765 if missing == "unknown_status" else 1000
+        read = browser.read_resource
+        if missing == "missing_vid":
+            def without_vid(**kwargs):
+                resource = read(**kwargs)
+                resource["video"]["vid"] = None
+                return resource
+            browser.read_resource = without_vid
+        before = loaded.manifest
+        with pytest.raises(AiVideoError):
+            service.refresh_once(attempt_id=paid.attempt_id)
+        assert load_production_project(tmp_path / "project.yaml").manifest == before
+        assert browser.calls == 1
+        return
+    observation = service.refresh_once(attempt_id=paid.attempt_id)
+    assert observation.state is (VideoTaskState.FAILED if missing == "failed_task" else VideoTaskState.RUNNING)
+    if missing == "failed_task":
+        closed = load_production_project(tmp_path / "project.yaml")
+        assert closed.manifest.attempts[-1].status.value == "failed"
+        assert closed.manifest.attempts[-1].paid_provider_state.phase.value == "accepted"
+        assert observation.provider_file_id is None
+        with pytest.raises(AiVideoError):
+            service.fetch_once(attempt_id=paid.attempt_id)
+        assert browser.calls == 1
     if missing == "settled":
         committer.settle_paid_provider_reservation(
-            attempt_id=paid.attempt_id, actual_cost_microunits=442_000_000)
+            attempt_id=paid.attempt_id,
+            actual_cost_microunits=min(442_000_000, provider._profile.credit_upper_bound * 1_000_000))
         settled = load_production_project(tmp_path / "project.yaml")
         assert settled.manifest.attempts[-1].paid_provider_state.phase.value == "settled"
     if missing in {"tampered_dispatch", "tampered_canvas"}:
@@ -505,3 +583,252 @@ def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, lose_
         with pytest.raises(AiVideoError) as reopen_error:
             load_production_project(tmp_path / "project.yaml")
         assert reopen_error.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+
+
+def test_mini_profile_has_distinct_identity_and_rejects_unsupported_specs():
+    from pydantic import ValidationError
+    from ai_video.production.hashing import canonical_sha256
+
+    provider, *_ = setup()
+    old = provider._profile
+    legacy_data = old.model_dump(mode="json")
+    assert "model_id" not in legacy_data
+    assert old.pointer().profile_sha256 == canonical_sha256(legacy_data)
+    data = {**legacy_data, "model_id": "seedance_2.0_mini",
+            "duration_seconds": 5, "benefit_amount": 5, "credit_upper_bound": 30}
+    mini = JimengProfile.model_validate(data)
+    assert mini.pointer() != old.pointer()
+    assert JimengProfile.model_validate_json(mini.model_dump_json()) == mini
+    assert mini.model_id == "seedance_2.0_mini"
+    for update in ({"duration_seconds": 16}, {"resolution": "480p"}):
+        with pytest.raises(ValidationError):
+            JimengProfile.model_validate({**data, **update})
+
+
+def test_native_action_uses_base_shape_without_video_and_exact_mini_model():
+    import subprocess
+    from pathlib import Path
+
+    worker = Path(__file__).parents[1] / "src/ai_video/production/jimeng_browser.cjs"
+    result = subprocess.run(["node", "-e", """
+        const {buildVideoAction,buildVideoCommerceContext}=require(process.argv[1]);
+        const profile={model_id:'seedance_2.0_mini',resolution:'720p',
+            duration_seconds:5,benefit_amount:5};
+        const image=buildVideoAction(profile,[{kind:'image'}]);
+        const mixed=buildVideoAction({...profile,benefit_amount:8},
+            [{kind:'image'},{kind:'video',duration_millis:3000}]);
+        console.log(JSON.stringify({image,mixed,
+            imageContext:buildVideoCommerceContext(image,0),
+            mixedContext:buildVideoCommerceContext(mixed,3000)}));
+    """, str(worker)], capture_output=True, text=True, check=True)
+    actions = json.loads(result.stdout)
+    assert actions["image"]["options"]["model"] == "seedance_2.0_mini"
+    assert set(actions["image"]["options"]) == {
+        "model", "resolution", "durationSeconds", "outputCount", "videoMode",
+        "hasInputVideo", "isLongVideo", "materialTypes"}
+    assert actions["mixed"]["options"]["chargeInputVideoDuration"] is True
+    assert actions["mixed"]["options"]["benefitAmount"] == 8
+    assert actions["imageContext"] == {"hasInputVideo": False}
+    assert actions["mixedContext"] == {"hasInputVideo": True, "inputVideoDurationMs": 3000}
+
+
+@pytest.mark.parametrize("exit_code", [0, 7])
+def test_browser_submit_protocol_closes_stdin_after_ack(tmp_path, monkeypatch, exit_code):
+    """An acknowledged Node worker must get EOF before the host waits for exit."""
+    import subprocess
+    import sys
+    from ai_video.production.jimeng_browser import JimengBrowserTransport
+
+    provider, *_ = setup()
+    transport = JimengBrowserTransport(profile_dir=tmp_path, timeout_seconds=2)
+    script = f'''
+import json, sys
+json.loads(sys.stdin.readline())
+print(json.dumps({{"event":"dispatch","submit_id":"{SUBMIT_ID}","resource_id":"{RESOURCE_ID}"}}),flush=True)
+assert json.loads(sys.stdin.readline())["approved"] is True
+print(json.dumps({{"ok":True,"submit_id":"{SUBMIT_ID}","resource_id":"{RESOURCE_ID}","task_id":"{TASK_ID}"}}),flush=True)
+sys.stdin.read()
+sys.exit({exit_code})
+'''
+    monkeypatch.setattr(transport, "_process", lambda: subprocess.Popen(
+        [sys.executable, "-u", "-c", script], stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, bufsize=1))
+    admitted = []
+    def submit():
+        return transport.submit_native(profile=provider._profile, video_params={}, materials=(),
+            admit=lambda submit_id, resource_id: admitted.append((submit_id, resource_id)))
+    if exit_code:
+        with pytest.raises(AiVideoError) as error:
+            submit()
+        assert error.value.code is ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN
+    else:
+        assert submit()["task_id"] == TASK_ID
+    assert admitted == [(SUBMIT_ID, RESOURCE_ID)]
+
+
+def test_native_editor_selection_matches_request_without_reordering_draft_inputs():
+    import subprocess
+    from pathlib import Path
+
+    worker = Path(__file__).parents[1] / "src/ai_video/production/jimeng_browser.cjs"
+    result = subprocess.run(["node", "-e", """
+        const assert=require('node:assert/strict');
+        const {buildVideoEditorDraft}=require(process.argv[1]);
+        const previous={kind:'video',parts:[{type:'text',text:'existing input'}],
+          references:[{id:'image-b'},{id:'image-a'}],outputCount:1,
+          contentSettings:{modelName:'seedance_2.0_vip',durationSeconds:4,
+            mode:'multiModal',aspectRatio:'1:1',resolution:'720p',isLongVideo:false}};
+        const frozen=JSON.stringify(previous);
+        const params={model_name:'seedance_2.0_mini',duration_ms:5000,
+          aspect_ratio:'16:9',resolution:'720p'};
+        const next=buildVideoEditorDraft(previous,params);
+        assert.equal(JSON.stringify(previous),frozen);
+        assert.deepEqual(next.parts,previous.parts);
+        assert.deepEqual(next.references,previous.references);
+        assert.deepEqual(next.contentSettings,{modelName:'seedance_2.0_mini',
+          durationSeconds:5,mode:'multiModal',aspectRatio:'16:9',resolution:'720p',isLongVideo:false});
+        assert.equal(buildVideoEditorDraft(null,params).kind,'video');
+        assert.throws(()=>buildVideoEditorDraft({kind:'image'},params));
+    """, str(worker)], capture_output=True, text=True)
+    assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.parametrize("scenario", ["timeout_late_send", "timeout_late_fetch", "timeout_late_replaced_http", "identity_drift", "ambiguous_page", "concurrent",
+    "success", "duplicate_post", "host_reject", "after_approval_identity_drift",
+    "quote_change", "mutated_request", "preflight_cleanup", "quote_precondition_changed", "duplicate_wire", "replaced_http", "binding_unavailable"])
+def test_shipped_worker_fault_boundaries(scenario):
+    import subprocess
+    from pathlib import Path
+
+    root = Path(__file__).parents[1]
+    result = subprocess.run(["node", str(root / "tests/fixtures/generated_video/jimeng_worker_faults.cjs"),
+        str(root / "src/ai_video/production/jimeng_browser.cjs"), scenario],
+        capture_output=True, text=True, timeout=10)
+    assert result.returncode == 0, result.stderr
+
+
+@pytest.mark.parametrize('frame', ['partial', 'no_effect', 'abrupt', 'duplicate', 'response_lost'])
+def test_browser_protocol_faults_preserve_outcome_and_bound_deadline(tmp_path, monkeypatch, frame):
+    import subprocess
+    import sys
+    import time
+    from ai_video.production.jimeng_browser import JimengBrowserTransport
+    from ai_video.production.jimeng_contracts import JimengSubmitNotDispatched
+
+    provider, *_ = setup()
+    transport = JimengBrowserTransport(profile_dir=tmp_path, timeout_seconds=0.25)
+    dispatch = json.dumps({'event': 'dispatch', 'submit_id': SUBMIT_ID, 'resource_id': RESOURCE_ID})
+    script = 'import json,sys,time\njson.loads(sys.stdin.readline())\n'
+    if frame == 'partial':
+        script += "sys.stdout.write('{');sys.stdout.flush();time.sleep(5)\n"
+    elif frame == 'no_effect':
+        script += "print(json.dumps({'ok':False,'no_effect':True}),flush=True)\nsys.stdin.read()\nsys.exit(1)\n"
+    elif frame == 'abrupt':
+        script += 'sys.exit(7)\n'
+    else:
+        script += f'print({dispatch!r},flush=True)\nassert json.loads(sys.stdin.readline())["approved"]\n'
+        script += f'print({dispatch!r},flush=True)\n' if frame == 'duplicate' else 'time.sleep(5)\n'
+    children = []
+    def process():
+        child = subprocess.Popen([sys.executable, '-u', '-c', script], stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, bufsize=1)
+        children.append(child)
+        return child
+    monkeypatch.setattr(transport, '_process', process)
+    admitted = []
+    started = time.monotonic()
+    with pytest.raises(AiVideoError) as error:
+        transport.submit_native(profile=provider._profile, video_params={}, materials=(),
+            admit=lambda *ids: admitted.append(ids))
+    assert time.monotonic() - started < 2
+    assert children[0].poll() is not None
+    if frame == 'no_effect':
+        assert isinstance(error.value, JimengSubmitNotDispatched)
+        assert not admitted
+    else:
+        assert error.value.code is ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN
+    assert len(admitted) == (1 if frame in {'duplicate', 'response_lost'} else 0)
+
+
+@pytest.mark.parametrize('after_dispatch', [False, True])
+def test_only_proven_pre_native_failure_is_known_no_effect(after_dispatch):
+    from ai_video.production.jimeng_contracts import JimengSubmitNotDispatched
+    provider, request, preview, paid, auth, permit, browser, committer, _ = setup()
+    def fail(**kwargs):
+        if after_dispatch:
+            kwargs['admit'](SUBMIT_ID, RESOURCE_ID)
+        raise JimengSubmitNotDispatched()
+    browser.submit_native = fail
+    with pytest.raises(AiVideoError) as error:
+        provider.submit(request, preview, paid, auth, permit)
+    assert error.value.code is (ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN
+        if after_dispatch else ErrorCode.VIDEO_PROVIDER_FAILED)
+    assert (committer.dispatch is not None) == after_dispatch
+
+
+def test_actual_worker_preflight_failure_exits_and_is_not_dispatched(tmp_path):
+    from ai_video.production.jimeng_browser import JimengBrowserTransport
+    from ai_video.production.jimeng_contracts import JimengSubmitNotDispatched
+    provider, *_ = setup()
+    transport = JimengBrowserTransport(profile_dir=tmp_path,
+        playwright_module=str(tmp_path / 'missing-playwright'), timeout_seconds=2)
+    with pytest.raises(JimengSubmitNotDispatched):
+        transport.submit_native(profile=provider._profile, video_params={}, materials=(),
+            admit=lambda *_: pytest.fail('preflight must not dispatch'))
+
+
+def test_browser_executable_failure_uses_typed_sanitized_errors(tmp_path):
+    from ai_video.production.jimeng_browser import JimengBrowserTransport
+    from ai_video.production.jimeng_contracts import JimengSubmitNotDispatched
+    provider, *_ = setup()
+    transport = JimengBrowserTransport(profile_dir=tmp_path, node_binary=str(tmp_path / 'missing-node'))
+    with pytest.raises(JimengSubmitNotDispatched):
+        transport.submit_native(profile=provider._profile, video_params={}, materials=(), admit=lambda *_: None)
+    with pytest.raises(AiVideoError) as error:
+        transport.read_resource(profile=provider._profile, resource_id=RESOURCE_ID)
+    assert error.value.code is ErrorCode.VIDEO_PROVIDER_FAILED
+    assert str(tmp_path) not in str(error.value)
+
+
+@pytest.mark.parametrize('phase', ['admission', 'after_approval', 'single'])
+@pytest.mark.parametrize('cancel', [KeyboardInterrupt, SystemExit])
+def test_cancellation_reaps_worker_and_preserves_exception(tmp_path, monkeypatch, phase, cancel):
+    import subprocess
+    import sys
+    from ai_video.production import jimeng_browser as module
+    provider, *_ = setup()
+    transport = module.JimengBrowserTransport(profile_dir=tmp_path, timeout_seconds=2)
+    dispatch = json.dumps({'event': 'dispatch', 'submit_id': SUBMIT_ID, 'resource_id': RESOURCE_ID})
+    marker = tmp_path / 'simulated-post-after-cancel'
+    script = ('import sys,time,json\nfrom pathlib import Path\njson.loads(sys.stdin.readline())\n'
+        f'print({dispatch!r},flush=True)\njson.loads(sys.stdin.readline())\ntime.sleep(0.2)\n'
+        f'Path({str(marker)!r}).touch()\ntime.sleep(5)\n')
+    child = subprocess.Popen([sys.executable, '-u', '-c', script], stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, text=True, bufsize=1)
+    monkeypatch.setattr(transport, '_process', lambda: child)
+    def interrupt(*args, **kwargs):
+        raise cancel('cancelled')
+    def admit(*_):
+        if phase == 'admission':
+            interrupt()
+    selector_factory = module.selectors.DefaultSelector
+    if phase == 'after_approval':
+        selector = selector_factory()
+        select = selector.select
+        count = 0
+        def select_once(timeout):
+            nonlocal count
+            count += 1
+            return select(timeout) if count == 1 else interrupt()
+        monkeypatch.setattr(selector, 'select', select_once)
+        monkeypatch.setattr(module.selectors, 'DefaultSelector', lambda: selector)
+    if phase == 'single':
+        monkeypatch.setattr(child, 'communicate', interrupt)
+    with pytest.raises(cancel, match='cancelled'):
+        if phase == 'single':
+            transport.read_resource(profile=provider._profile, resource_id=RESOURCE_ID)
+        else:
+            transport.submit_native(profile=provider._profile, video_params={}, materials=(), admit=admit)
+    assert child.poll() is not None
+    assert child.stdin.closed and child.stdout.closed
+    assert not marker.exists()

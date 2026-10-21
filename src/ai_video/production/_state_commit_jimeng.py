@@ -206,9 +206,9 @@ class _StateCommitJimengMixin:
             gate = self._reopen_paid_gate(state.gate_receipt)
             dispatch = self.read_jimeng_dispatch(attempt.attempt_id)
             canvas = self.read_jimeng_canvas_snapshot(attempt.attempt_id)
-            from ai_video.production.jimeng_contracts import dispatch_matches_request
+            from ai_video.production.jimeng_contracts import JIMENG_MODELS, dispatch_matches_request
             if (gate.preview.provider_kind != "jimeng"
-                    or gate.preview.model_id != "seedance_2.5"
+                    or gate.preview.model_id not in JIMENG_MODELS
                     or prior.outcome is not PaidProviderSubmitOutcome.OUTCOME_UNKNOWN
                     or prior.external_effect_id is not None
                     or proof.request_fingerprint != prior.request_fingerprint
