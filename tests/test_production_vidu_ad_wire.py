@@ -104,15 +104,20 @@ def test_parse_submission_rejects_malformed_or_ambiguous_responses(body):
     assert exc_info.value.code is ErrorCode.VIDEO_PROVIDER_FAILED
 
 
-def test_parse_status_returns_terminal_creation_and_validated_public_url():
+@pytest.mark.parametrize("url", [
+    "https://media.vidu.example/output.mp4?token=signed",
+    "http://private.example:8080/a",
+    "https://127.0.0.1/private?signature=secret",
+])
+def test_parse_status_returns_terminal_creation_and_download_locator(url):
     body = json.dumps({
         "id": "ad.task:1",
         "state": "success",
-        "creations": [{"id": "creation.1", "url": "https://media.vidu.example/output.mp4?token=signed"}],
+        "creations": [{"id": "creation.1", "url": url}],
     }).encode()
 
     assert parse_status(body, task_id="ad.task:1") == (
-        "success", "creation.1", "https://media.vidu.example/output.mp4?token=signed",
+        "success", "creation.1", url,
     )
 
 
@@ -125,7 +130,7 @@ def test_parse_status_returns_terminal_creation_and_validated_public_url():
         b'{"id":"ad.task:1","id":"other","state":"processing"}',
         b'{"id":"ad.task:1","state":"success","creations":[]}',
         b'{"id":"ad.task:1","state":"success","creations":[{"id":"c"},{"id":"d"}]}',
-        b'{"id":"ad.task:1","state":"success","creations":[{"id":"c","url":"http://private.example/a"}]}',
+        b'{"id":"ad.task:1","state":"success","creations":[{"id":"c","url":"ftp://private.example/a"}]}',
     ],
 )
 def test_parse_status_rejects_wrong_identity_or_invalid_success_payload_without_leaking_url(body):
@@ -142,12 +147,12 @@ def test_parse_status_non_success_returns_no_creation_or_url(state):
     assert parse_status(body, task_id="ad.task:1") == (state, None, None)
 
 
-def test_response_limits_and_private_url_are_sanitized():
+def test_response_limits_and_credential_url_errors_are_sanitized():
     with pytest.raises(AiVideoError) as oversized:
         parse_submission(b"{" + b"x" * 1_000_000)
     assert oversized.value.code is ErrorCode.VIDEO_PROVIDER_FAILED
 
-    private_url = "https://127.0.0.1/private?signature=secret"
+    private_url = "https://api-user:api-secret@127.0.0.1/private?signature=secret"
     body = json.dumps({
         "id": "ad.task:1", "state": "success",
         "creations": [{"id": "creation.1", "url": private_url}],
