@@ -8,7 +8,20 @@
 
 ## Selected Models
 
-`JimengProfile.model_id` 显式选择 `seedance_2.5` 或 `seedance_2.0_mini`，不自动切换。旧 2.5 profile 的序列化和 identity 保持原样；Mini 使用独立 capability、compiler 与 profile identity。Mini 当前支持 720p、4–15 秒、最多 12 项素材，其中图片最多 9、视频和音频各最多 3；至少包含图片或视频。图片与视频各最多 50 MiB，音频最多 15 MiB；单段视频 2–15.4 秒、音频 2–15 秒，同时核验总时长和当前原生参数 validator。这里声明的是当前有界映射，不证明所有组合都已真实生成。
+四个型号复用同一个 `JimengVideoProvider` 类及 `JimengBrowserTransport` / Worker，`JimengProfile.model_id` 精确选择原生 ID，不自动切换。每个 profile 封存一个输出规格；上层按 Shot 要求检查其 capability，Provider 不代选模型。旧 2.5 profile 的序列化和 identity 保持原样；各型号具有独立 capability、compiler 与 profile identity。
+
+| Model | Native ID | Output duration | Resolutions | Production qualification |
+| --- | --- | --- | --- | --- |
+| Seedance 2.5 | `seedance_2.5` | 4–30 秒 | 480p / 720p / 1080p | `UNQUALIFIED` |
+| Seedance 2.0 Mini | `seedance_2.0_mini` | 4–15 秒 | 720p | `UNQUALIFIED` |
+| Seedance 2.0 | `seedance_2.0_vip` | 4–15 秒 | 720p / 1080p / 4k | `UNQUALIFIED` |
+| Seedance 2.0 Fast | `seedance_2.0_fast_vip` | 4–15 秒 | 720p | `UNQUALIFIED` |
+
+所有型号当前仅声明 reference-to-video / mode 4、单输出、原生音轨、整数秒及既有五种宽高比；不代表网页全部功能。2.0 / Fast / Mini 各自声明最多 12 项素材（图片 9、视频 3、音频 3），至少包含图片或视频；图片与视频各最多 50 MiB，音频 15 MiB，图片每边最多 8192，视频每边 200–2160。视频单段及总长 2–15.4 秒 / 最多 15.4 秒，音频 2–15 秒 / 总长最多 15 秒。2.5 最多 50 项（图片 30、视频 10、音频 10），支持纯音频参考；图片每边 300–8192、比例 0.4–2.5，视频每边 300–6000；视频和音频最短 1.8 秒、单段及各自总长最多 30.2 秒，音频 15 MiB。2.5 图片 40 MiB / 视频 100 MiB 继续使用已有较窄上限。Prompt 按 native JavaScript UTF-16 长度限制：2.5 为 15000，其余 4000；所有限制在上传前核验，不截断或丢弃素材。
+
+`jimeng_models.py` 是各型号有界映射声明；2026-10-22 原生已加载 config、reference constraints 和只读 validator / commerce 查询的脱敏投影见 `tests/fixtures/generated_video/jimeng-native-models-20261022.json`。直接 `generation_specs` 读取当时不可用，实际证据来自网页初始化的 native stores；只读准入仅代表该时点账号状态，报价不代替下一次提交时的 fresh quote 或 operator bound。
+
+`VideoCapabilityVariant.production_qualification` 为 hash-bound 静态准入声明；四型号均 `UNQUALIFIED`，正式 `VideoGenerationResolver` 返回 `BLOCKED_CAPABILITY / MODEL_UNQUALIFIED`，不会尝试其他型号。没有 profile 开关、自动晋级或新的资格生命周期。未声明该字段的既有其他 Provider 及旧 snapshot 保持兼容。技术 resolve / 只读历史恢复仍可用；测试中模拟 `QUALIFIED` 只验证原有 Paid / State 链，不赋予真实资格。本轮没有真实生成，2.0 / Fast 及四型号的正式成功出片链仍未获生产资格证明。
 
 纯图片输入使用不含参考视频计时字段的原生 commercial action/context；只有存在视频素材才传入其时长。即使 `inputVideoDurationMs=0`，原生 owner 也会拒绝“无视频却带视频时长”的 context，不能将其等同于省略该字段。
 

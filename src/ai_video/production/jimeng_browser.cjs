@@ -282,7 +282,8 @@ async function upload(page, command, session) {
 }
 
 function buildVideoAction(profile, materials) {
-  if (!['seedance_2.5', 'seedance_2.0_mini'].includes(profile.model_id)) {
+  if (!['seedance_2.5', 'seedance_2.0_mini', 'seedance_2.0_vip',
+        'seedance_2.0_fast_vip'].includes(profile.model_id)) {
     throw Error('unsupported Jimeng model');
   }
   const inputVideoMillis = materials.filter(x => x.kind === 'video')

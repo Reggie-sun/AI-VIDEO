@@ -14,6 +14,9 @@ from ai_video.errors import AiVideoError, ErrorCode
 
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import StrictModel
+from ai_video.production.jimeng_models import (
+    JIMENG_MODELS as JIMENG_MODELS, JIMENG_MODEL_SPECS, JimengModelId,
+)
 from ai_video.production.video import (
     ProviderProfilePointer, ResolvedVideoGenerationRequest,
     VideoFlexibleOutputRequirement,
@@ -26,7 +29,6 @@ JIMENG_PROVIDER = "jimeng"
 JIMENG_CAPABILITY = "jimeng-seedance-2.5-multimodal-v1"
 JIMENG_COMPILER = "jimeng-seedance-2.5-video-compiler"
 JIMENG_PROFILE_VERSION = "canvas-seedance-2.5-v1"
-JIMENG_MODELS = (JIMENG_MODEL, "seedance_2.0_mini")
 
 
 class JimengSubmitNotDispatched(AiVideoError):
@@ -42,12 +44,12 @@ class JimengProfile(StrictModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True)
 
-    model_id: Literal["seedance_2.5", "seedance_2.0_mini"] = JIMENG_MODEL
+    model_id: JimengModelId = JIMENG_MODEL
     account_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     project_id: str = Field(pattern=r"^[0-9a-f-]{36}$")
     node_id: str = Field(pattern=r"^node_[A-Za-z0-9]{1,64}$")
     duration_seconds: int = Field(strict=True, ge=4, le=30)
-    resolution: Literal["480p", "720p", "1080p"]
+    resolution: Literal["480p", "720p", "1080p", "4k"]
     aspect_ratio: Literal["16:9", "9:16", "1:1", "4:3", "3:4"]
     benefit_amount: int = Field(strict=True, gt=0)
     benefit_type: str = Field(pattern=r"^[A-Za-z0-9_]{1,128}$")
@@ -64,10 +66,9 @@ class JimengProfile(StrictModel):
 
     @model_validator(mode="after")
     def _selected_model_specs(self):
-        if self.model_id == "seedance_2.0_mini" and (
-            self.duration_seconds > 15 or self.resolution != "720p"
-        ):
-            raise ValueError("Jimeng Seedance 2.0 Mini requires 4–15 seconds at 720p")
+        spec = JIMENG_MODEL_SPECS[self.model_id]
+        if self.duration_seconds > spec.max_seconds or self.resolution not in spec.resolutions:
+            raise ValueError("Jimeng output specification is unsupported by the exact selected model")
         return self
 
     @property

@@ -109,36 +109,36 @@ class FakeBrowser:
         return len(self.video_bytes), hashlib.sha256(self.video_bytes).hexdigest()
 
 
-def setup(prompt="Scene {{image:0}} voice {{audio:1}} motion {{video:2}}"):
+def setup(prompt="Scene {{image:0}} voice {{audio:1}} motion {{video:2}}", *, model_id="seedance_2.5"):
     raw = {"image-a": b"image bytes", "audio-a": b"audio bytes", "video-a": b"video bytes"}
     image = VideoImageReferenceBinding(role="reference", asset_id="image-a",
         asset_sha256=hashlib.sha256(raw["image-a"]).hexdigest(), mime_type="image/png",
         width=1280, height=720, size_bytes=len(raw["image-a"]))
     video = VideoMediaReferenceBinding(kind="video", role="reference_video",
         asset_id="video-a", asset_sha256=hashlib.sha256(raw["video-a"]).hexdigest(),
-        mime_type="video/mp4", duration_millis=17_056, size_bytes=len(raw["video-a"]),
+        mime_type="video/mp4", duration_millis=17_056 if model_id == "seedance_2.5" else 2500, size_bytes=len(raw["video-a"]),
         width=1280, height=720, fps=24)
     audio = VideoMediaReferenceBinding(kind="audio", role="reference_audio",
         asset_id="audio-a", asset_sha256=hashlib.sha256(raw["audio-a"]).hexdigest(),
         mime_type="audio/wav", duration_millis=6_504, size_bytes=len(raw["audio-a"]))
-    profile = JimengProfile(account_sha256="a" * 64,
+    profile = JimengProfile(model_id=model_id, account_sha256="a" * 64,
         project_id="f0ed223b-090e-4ed6-b394-283f8b7dbd07",
-        node_id="node_bq6wajb5xe", duration_seconds=17, resolution="720p",
-        aspect_ratio="16:9", benefit_amount=34,
+        node_id="node_bq6wajb5xe", duration_seconds=17 if model_id == "seedance_2.5" else 5, resolution="720p",
+        aspect_ratio="16:9", benefit_amount=34 if model_id == "seedance_2.5" else 8,
         benefit_type="seedance_25_720p_output", credit_upper_bound=884)
     browser, committer = FakeBrowser(), FakeCommitter()
     provider = JimengVideoProvider(profile=profile, transport=browser,
         reference_resolver=lambda binding: raw[binding.asset_id], committer=committer,
         now=lambda: NOW)
     request = _request(provider_name="jimeng", provider_kind="jimeng",
-        model_id="seedance_2.5", provider_profile=profile.pointer(),
+        model_id=model_id, provider_profile=profile.pointer(),
         mode=VideoGenerationMode.REFERENCE_TO_VIDEO, prompt_text=prompt,
         image_bindings=(image,), media_bindings=(video, audio),
         output_requirement=profile.output())
     resolved = provider.resolve(request)
     video_preview = provider.preview(resolved)
     paid = PaidProviderCallPreview.create(attempt_id="attempt-jimeng-1",
-        operation="video_generation", provider_kind="jimeng", model_id="seedance_2.5",
+        operation="video_generation", provider_kind="jimeng", model_id=model_id,
         request_fingerprint=resolved.resolved_generation_hash,
         billing_mode="remote_metered", currency="CRD",
         estimated_cost_upper_bound_microunits=884_000_000,
@@ -171,10 +171,172 @@ def accepted_receipt(request, paid):
         external_effect_id=f"{RESOURCE_ID}:{TASK_ID}", recorded_at=NOW)
 
 
-def test_multimodal_mapping_paid_permit_poll_and_fetch():
-    provider, request, preview, paid, auth, permit, browser, committer, raw = setup()
+MODEL_CASES = (
+    ("seedance_2.5", 30, ("480p", "720p", "1080p"), 30, 10),
+    ("seedance_2.0_mini", 15, ("720p",), 9, 3),
+    ("seedance_2.0_vip", 15, ("720p", "1080p", "4k"), 9, 3),
+    ("seedance_2.0_fast_vip", 15, ("720p",), 9, 3),
+)
+
+
+@pytest.mark.parametrize("model_id,duration,resolutions,images,media", MODEL_CASES)
+def test_model_family_has_independent_unqualified_contract(model_id, duration, resolutions, images, media):
+    provider, *_ = setup()
+    data = provider._profile.model_dump(mode="python")
+    pointers = []
+    for resolution in resolutions:
+        provider._profile = JimengProfile.model_validate({**data, "model_id": model_id,
+            "duration_seconds": duration, "resolution": resolution})
+        profile = provider._profile
+        cap = provider.capabilities().variants[0]
+        assert cap.model_id == model_id
+        assert cap.production_qualification == "UNQUALIFIED"
+        assert cap.output_capability.max_duration_seconds == duration
+        assert cap.output_capability.resolution_labels == resolutions
+        assert cap.max_reference_count == images
+        assert {x.max_count for x in cap.media_capabilities} == {media}
+        assert JimengProfile.model_validate_json(profile.model_dump_json()) == profile
+        pointers.append(profile.pointer().profile_sha256)
+    assert len(set(pointers)) == len(resolutions)
+
+
+@pytest.mark.parametrize("model_id", [row[0] for row in MODEL_CASES])
+def test_unqualified_model_is_blocked_by_standard_router(model_id):
+    from test_production_shot_router import _context, _policy
+    from ai_video.production.shot_router import VideoGenerationResolver, RoutingOutcome, RouterReasonCode
+    provider, *_, browser, _, _ = setup()
+    provider._profile = JimengProfile.model_validate({**provider._profile.model_dump(),
+        "model_id": model_id, "duration_seconds": 5, "benefit_amount": 5})
+    result = VideoGenerationResolver().inspect_capability(context=_context(), policy=_policy(),
+        provider_profile=provider._profile.pointer(), capabilities=provider.capabilities(),
+        selected_capability_id=provider._profile.capability_id,
+        output_requirement=provider._profile.output())
+    assert result.outcome is RoutingOutcome.BLOCKED_CAPABILITY
+    assert result.reason_codes == (RouterReasonCode.MODEL_UNQUALIFIED,)
+    assert result.selected_mode is None
+    assert browser.calls == 0 and browser.uploads == []
+
+
+@pytest.mark.parametrize("model_id,duration,resolutions,images,media", MODEL_CASES)
+def test_model_limits_match_sanitized_native_read_only_evidence(model_id, duration, resolutions, images, media):
+    from pathlib import Path
+    from ai_video.production.jimeng_models import JIMENG_MODEL_SPECS
+    observed = json.loads((Path(__file__).parent / "fixtures/generated_video/jimeng-native-models-20261022.json").read_text())["models"][model_id]
+    spec = JIMENG_MODEL_SPECS[model_id]
+    native, refs = observed["mode4"], observed["references"]
+    assert max(native["duration"]["valuesMs"]) == duration * 1000
+    assert tuple(native["resolutions"]) == resolutions
+    assert set(spec.ratios).issubset(native["aspectRatios"])
+    assert native["promptMaxCharacters"] == spec.prompt_max_characters
+    assert native["materials"]["maxCount"] == spec.max_materials == refs["maxTotalCount"]
+    assert refs["perType"]["2"]["maxCount"] == images
+    assert refs["perType"]["3"]["maxCount"] == refs["perType"]["4"]["maxCount"] == media
+    assert spec.image_bytes <= refs["perType"]["2"]["maxFileSizeBytes"]
+    assert spec.video_bytes <= refs["perType"]["3"]["maxFileSizeBytes"]
+    assert spec.audio_bytes == refs["perType"]["4"]["maxFileSizeBytes"]
+    assert spec.min_media_millis == refs["perType"]["3"]["minDurationSeconds"] * 1000
+    assert spec.max_audio_millis == refs["maxTotalAudioDurationSeconds"] * 1000
+    assert spec.max_video_millis == refs["maxTotalVideoDurationSeconds"] * 1000
+    assert observed["validation_status"] == "valid"
+    assert observed["trimodal_validation"] == [
+        {"resolution": resolution, "status": "valid"} for resolution in resolutions]
+    # This observed admission is neither a paid permit nor generation evidence.
+    assert observed["read_only_checks"]["state_status"] == "allowed"
+
+
+@pytest.mark.parametrize("model_id", [row[0] for row in MODEL_CASES])
+@pytest.mark.parametrize("fault", ["prompt", "image_geometry", "video_geometry", "audio_total", "wrong_model"])
+def test_exact_model_bounds_fail_before_upload(model_id, fault):
+    from ai_video.production.jimeng_models import JIMENG_MODEL_SPECS
+    provider, original, *_, browser, _, _ = setup()
+    spec = JIMENG_MODEL_SPECS[model_id]
+    provider._profile = JimengProfile.model_validate({**provider._profile.model_dump(),
+        "model_id": model_id, "duration_seconds": 5, "benefit_amount": 8})
+    image = original.image_bindings[0]
+    audio = next(x for x in original.media_bindings if x.kind == "audio").model_copy(update={"duration_millis": 2500})
+    video = next(x for x in original.media_bindings if x.kind == "video").model_copy(update={"duration_millis": 2500})
+    values = {**original.activation_scope.request.model_dump(exclude={"request_input_hash"}),
+        "model_id": model_id, "provider_profile": provider._profile.pointer(),
+        "output_requirement": provider._profile.output(), "image_bindings": (image,),
+        "media_bindings": (video, audio)}
+    if fault == "prompt":
+        values["prompt_text"] = "😀" * (spec.prompt_max_characters // 2) + "{{image:0}}{{audio:1}}{{video:2}}"
+    elif fault == "image_geometry":
+        values["image_bindings"] = (image.model_copy(update={"width": spec.max_image_dimension + 1}),)
+    elif fault == "video_geometry":
+        values["media_bindings"] = (video.model_copy(update={"width": spec.min_video_dimension - 1}), audio)
+    elif fault == "audio_total":
+        values["media_bindings"] = (video, audio.model_copy(update={"duration_millis": spec.max_audio_millis + 1}))
+    else:
+        values["model_id"] = "seedance_2.0_mini" if model_id != "seedance_2.0_mini" else "seedance_2.5"
+    with pytest.raises(AiVideoError) as failure:
+        provider.resolve(_request(**values))
+    assert failure.value.code is ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED
+    assert browser.calls == 0 and not browser.uploads
+
+
+def test_qualification_is_sealed_and_legacy_capability_bytes_are_preserved():
+    from test_production_shot_router import _variant, _capabilities
+    from ai_video.production.video import VideoCapabilityVariant, VideoProviderCapabilities
+    from ai_video.production._video_capability_fingerprint import capability_variant_fingerprint
+    cap = _variant(VideoGenerationMode.TEXT_TO_VIDEO)
+    assert "production_qualification" not in cap.model_dump()
+    assert "subject_reference_capability" not in cap.model_dump()
+    assert "output_recovery_strategy" not in cap.model_dump()
+    assert VideoCapabilityVariant.model_validate(cap.model_dump()) == cap
+    qualified = cap.model_copy(update={"production_qualification": "QUALIFIED"})
+    unqualified = cap.model_copy(update={"production_qualification": "UNQUALIFIED"})
+    assert len({capability_variant_fingerprint(x) for x in (cap, qualified, unqualified)}) == 3
+    data = _capabilities(unqualified).model_dump(mode="json")
+    data["variants"][0]["production_qualification"] = "QUALIFIED"
+    with pytest.raises(ValueError):
+        VideoProviderCapabilities.model_validate(data)
+
+
+@pytest.mark.parametrize("model_id,resolution,seconds", [
+    ("seedance_2.5", "4k", 5), ("seedance_2.0_mini", "1080p", 5),
+    ("seedance_2.0_fast_vip", "1080p", 5), ("seedance_2.0_vip", "480p", 5),
+    ("seedance_2.0_mini", "720p", 16), ("seedance_2.0_vip", "720p", 16),
+    ("seedance_2.0_fast_vip", "720p", 16), ("seedance_2.0", "720p", 5),
+])
+def test_invalid_model_or_output_is_rejected_without_replacement(model_id, resolution, seconds):
+    provider, *_ = setup()
+    with pytest.raises(ValueError):
+        JimengProfile.model_validate({**provider._profile.model_dump(),
+            "model_id": model_id, "resolution": resolution, "duration_seconds": seconds})
+
+
+@pytest.mark.parametrize("model_id", [row[0] for row in MODEL_CASES])
+def test_worker_native_action_preserves_exact_model_and_video_billing(model_id):
+    import subprocess
+    from pathlib import Path
+    script = """
+      const {buildVideoAction,buildVideoCommerceContext,buildVideoEditorDraft}=require(process.argv[1]);
+      const profile={model_id:process.argv[2],resolution:'720p',duration_seconds:5,benefit_amount:8};
+      const action=buildVideoAction(profile,[{kind:'image'},{kind:'audio'},{kind:'video',duration_millis:2500}]);
+      const context=buildVideoCommerceContext(action,2500);
+      const draft=buildVideoEditorDraft(null,{model_name:profile.model_id,duration_ms:5000,resolution:'720p',aspect_ratio:'16:9'});
+      let rejected=false;try{buildVideoAction({...profile,model_id:'seedance_2.0'},[])}catch{rejected=true}
+      console.log(JSON.stringify({action,context,draft,rejected}));
+    """
+    worker = Path(__file__).parents[1] / "src/ai_video/production/jimeng_browser.cjs"
+    result = json.loads(subprocess.run(["node", "-e", script, str(worker), model_id],
+        capture_output=True, check=True, text=True).stdout)
+    assert result["action"]["options"]["model"] == model_id
+    assert result["action"]["options"]["benefitAmount"] == 8
+    assert result["action"]["options"]["inputVideoDuration"] == 3
+    assert result["context"]["inputVideoDurationMs"] == 2500
+    assert result["draft"]["contentSettings"]["modelName"] == model_id
+    assert result["rejected"] is True
+
+
+@pytest.mark.parametrize("model_id", [row[0] for row in MODEL_CASES])
+def test_multimodal_mapping_paid_permit_poll_and_fetch(model_id):
+    provider, request, preview, paid, auth, permit, browser, committer, raw = setup(model_id=model_id)
+    assert provider.capabilities().variants[0].production_qualification == "UNQUALIFIED"
     result = provider.submit(request, preview, paid, auth, permit)
     assert result.external_effect_id == f"{RESOURCE_ID}:{TASK_ID}"
+    assert browser.params["model_name"] == model_id
     assert [kind for kind, _, _ in browser.uploads] == ["image", "audio", "video"]
     assert [x["type"] for x in browser.params["materials"]] == [2, 4, 3]
     assert browser.params["materials"][2]["role"] == 3
@@ -311,8 +473,8 @@ def test_dispatch_materials_remain_bound_to_resolved_request():
     (False, "pre_native_failure"), (False, "unknown_status"),
     (False, "missing_vid"), (True, "concurrent_recovery"),
 ])
-@pytest.mark.parametrize("model_id", ["seedance_2.5", "seedance_2.0_mini"])
-def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, lose_response, missing, model_id):
+@pytest.mark.parametrize("model_id", [row[0] for row in MODEL_CASES])
+def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, monkeypatch, lose_response, missing, model_id):
     from production_remote_generation_factory import prepare_remote_generation
     from ai_video.production.project import load_production_project
     from ai_video.production.state_commit import ProductionStateCommitter
@@ -322,10 +484,17 @@ def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, lose_
     original = request.activation_scope.request
     profile_data = provider._profile.model_dump(mode="python")
     profile_data["benefit_amount"] = 17
-    if model_id == "seedance_2.0_mini":
+    if model_id != "seedance_2.5":
         profile_data.update(model_id=model_id, duration_seconds=5,
                             benefit_amount=5, credit_upper_bound=30)
     provider._profile = JimengProfile.model_validate(profile_data)
+    # Simulated eligibility ONLY for offline state/paid tests. Actual providers
+    # always declare UNQUALIFIED; the independent route-denial test uses them.
+    from ai_video.production.video import VideoProviderCapabilities
+    declared = provider.capabilities()
+    synthetic = VideoProviderCapabilities.create(provider_name="jimeng", variants=tuple(
+        cap.model_copy(update={"production_qualification": "QUALIFIED"}) for cap in declared.variants))
+    monkeypatch.setattr(provider, "capabilities", lambda: synthetic)
     image_only = _request(**{**original.model_dump(exclude={"request_input_hash"}),
                             "provider_profile": provider._profile.pointer(),
                             "model_id": model_id,

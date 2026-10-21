@@ -210,6 +210,13 @@ class VideoGenerationResolver:
                 "execution_kind": selected.execution_kind,
             }
         )
+        if selected.production_qualification == "UNQUALIFIED":
+            return self._blocked(
+                base,
+                RoutingOutcome.BLOCKED_CAPABILITY,
+                RouterReasonCode.MODEL_UNQUALIFIED,
+                "The exact selected model has not completed production qualification.",
+            )
         if context.activated_shot.visual_strategy not in {
             VisualStrategy.GENERATED_VIDEO,
             VisualStrategy.HYBRID,

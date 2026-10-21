@@ -1,0 +1,519 @@
+{
+  "observed_at": "2026-10-22",
+  "evidence_level": "LIVE_READ_ONLY_CLIENT_CONFIG",
+  "source": "generationRuntime.videoGenerationConfigStore / referenceConstraints; native client quoteActions/getActionState",
+  "mutations": 0,
+  "models": {
+    "seedance_2.5": {
+      "mode4": {
+        "aspectRatioDefault": "16:9",
+        "aspectRatios": [
+          "21:9",
+          "16:9",
+          "4:3",
+          "1:1",
+          "3:4",
+          "9:16"
+        ],
+        "count": {
+          "defaultValue": 1,
+          "maxValue": 4
+        },
+        "duration": {
+          "defaultMs": 4000,
+          "valuesMs": [
+            4000,
+            5000,
+            6000,
+            7000,
+            8000,
+            9000,
+            10000,
+            11000,
+            12000,
+            13000,
+            14000,
+            15000,
+            16000,
+            17000,
+            18000,
+            19000,
+            20000,
+            21000,
+            22000,
+            23000,
+            24000,
+            25000,
+            26000,
+            27000,
+            28000,
+            29000,
+            30000
+          ]
+        },
+        "editSource": {
+          "minMs": 4000,
+          "maxMs": 30000
+        },
+        "extendSource": {
+          "minSourceMs": 1800,
+          "maxSourceMs": 30200,
+          "extendDurationValuesMs": [
+            4000,
+            5000,
+            6000,
+            7000,
+            8000,
+            9000,
+            10000,
+            11000,
+            12000,
+            13000,
+            14000,
+            15000,
+            16000,
+            17000,
+            18000,
+            19000,
+            20000,
+            21000,
+            22000,
+            23000,
+            24000,
+            25000,
+            26000,
+            27000,
+            28000,
+            29000,
+            30000
+          ],
+          "defaultExtendDurationMs": 5000,
+          "billableInputDurationCapMs": 30000
+        },
+        "longVideo": {
+          "defaultValue": false,
+          "supported": false
+        },
+        "materials": {
+          "acceptedTypes": [
+            2,
+            3,
+            4
+          ],
+          "maxCount": 50,
+          "minCount": 1,
+          "promptRequired": false,
+          "requiresRole": false,
+          "roles": []
+        },
+        "mode": 4,
+        "promptMaxCharacters": 15000,
+        "resolutionDefault": "720p",
+        "resolutions": [
+          "480p",
+          "720p",
+          "1080p"
+        ],
+        "supportsPromptEnhancement": true
+      },
+      "references": {
+        "acceptedTypes": [
+          2,
+          3,
+          4
+        ],
+        "maxTotalCount": 50,
+        "mutuallyExclusiveTypes": [],
+        "perType": {
+          "2": {
+            "maxCount": 30,
+            "minAspectRatio": 0.4,
+            "maxAspectRatio": 2.5,
+            "maxFileSizeBytes": 52428800,
+            "maxHeight": 8192,
+            "maxWidth": 8192,
+            "minHeight": 300,
+            "minWidth": 300
+          },
+          "3": {
+            "maxCount": 10,
+            "maxDurationSeconds": 30.2,
+            "maxFileSizeBytes": 209715200,
+            "maxHeight": 6000,
+            "maxWidth": 6000,
+            "minDurationSeconds": 1.8,
+            "minHeight": 300,
+            "minWidth": 300
+          },
+          "4": {
+            "maxCount": 10,
+            "maxDurationSeconds": 30.2,
+            "maxFileSizeBytes": 15728640,
+            "minDurationSeconds": 1.8
+          }
+        },
+        "requiredAnyOf": [
+          2,
+          3,
+          4
+        ],
+        "maxTotalAudioDurationSeconds": 30.2,
+        "maxTotalVideoDurationSeconds": 30.2
+      },
+      "read_only_checks": {
+        "quote_status": "available",
+        "state_status": "allowed",
+        "credits": 100
+      },
+      "validation_status": "valid",
+      "trimodal_validation": [
+        {
+          "resolution": "480p",
+          "status": "valid"
+        },
+        {
+          "resolution": "720p",
+          "status": "valid"
+        },
+        {
+          "resolution": "1080p",
+          "status": "valid"
+        }
+      ]
+    },
+    "seedance_2.0_mini": {
+      "mode4": {
+        "aspectRatioDefault": "16:9",
+        "aspectRatios": [
+          "21:9",
+          "16:9",
+          "4:3",
+          "1:1",
+          "3:4",
+          "9:16"
+        ],
+        "count": {
+          "defaultValue": 1,
+          "maxValue": 4
+        },
+        "duration": {
+          "defaultMs": 4000,
+          "valuesMs": [
+            4000,
+            5000,
+            6000,
+            7000,
+            8000,
+            9000,
+            10000,
+            11000,
+            12000,
+            13000,
+            14000,
+            15000
+          ]
+        },
+        "longVideo": {
+          "defaultValue": false,
+          "supported": false
+        },
+        "materials": {
+          "acceptedTypes": [
+            2,
+            3,
+            4
+          ],
+          "maxCount": 12,
+          "minCount": 1,
+          "promptRequired": false,
+          "requiresRole": false,
+          "roles": []
+        },
+        "mode": 4,
+        "promptMaxCharacters": 4000,
+        "resolutionDefault": "720p",
+        "resolutions": [
+          "720p"
+        ],
+        "supportsPromptEnhancement": true
+      },
+      "references": {
+        "acceptedTypes": [
+          2,
+          3,
+          4
+        ],
+        "maxTotalCount": 12,
+        "mutuallyExclusiveTypes": [],
+        "perType": {
+          "2": {
+            "maxCount": 9,
+            "maxFileSizeBytes": 52428800,
+            "maxHeight": 8192,
+            "maxWidth": 8192
+          },
+          "3": {
+            "maxCount": 3,
+            "maxDurationSeconds": 15.4,
+            "maxFileSizeBytes": 52428800,
+            "maxHeight": 2160,
+            "maxWidth": 2160,
+            "minDurationSeconds": 2,
+            "minHeight": 200,
+            "minWidth": 200
+          },
+          "4": {
+            "maxCount": 3,
+            "maxDurationSeconds": 15,
+            "maxFileSizeBytes": 15728640,
+            "minDurationSeconds": 2
+          }
+        },
+        "requiredAnyOf": [
+          2,
+          3
+        ],
+        "maxTotalAudioDurationSeconds": 15,
+        "maxTotalVideoDurationSeconds": 15.4
+      },
+      "read_only_checks": {
+        "quote_status": "available",
+        "state_status": "allowed",
+        "credits": 30
+      },
+      "validation_status": "valid",
+      "trimodal_validation": [
+        {
+          "resolution": "720p",
+          "status": "valid"
+        }
+      ]
+    },
+    "seedance_2.0_vip": {
+      "mode4": {
+        "aspectRatioDefault": "16:9",
+        "aspectRatios": [
+          "21:9",
+          "16:9",
+          "4:3",
+          "1:1",
+          "3:4",
+          "9:16"
+        ],
+        "count": {
+          "defaultValue": 1,
+          "maxValue": 4
+        },
+        "duration": {
+          "defaultMs": 4000,
+          "valuesMs": [
+            4000,
+            5000,
+            6000,
+            7000,
+            8000,
+            9000,
+            10000,
+            11000,
+            12000,
+            13000,
+            14000,
+            15000
+          ]
+        },
+        "longVideo": {
+          "defaultValue": false,
+          "supported": false
+        },
+        "materials": {
+          "acceptedTypes": [
+            2,
+            3,
+            4
+          ],
+          "maxCount": 12,
+          "minCount": 1,
+          "promptRequired": false,
+          "requiresRole": false,
+          "roles": []
+        },
+        "mode": 4,
+        "promptMaxCharacters": 4000,
+        "resolutionDefault": "720p",
+        "resolutions": [
+          "720p",
+          "1080p",
+          "4k"
+        ],
+        "supportsPromptEnhancement": true
+      },
+      "references": {
+        "acceptedTypes": [
+          2,
+          3,
+          4
+        ],
+        "maxTotalCount": 12,
+        "mutuallyExclusiveTypes": [],
+        "perType": {
+          "2": {
+            "maxCount": 9,
+            "maxFileSizeBytes": 52428800,
+            "maxHeight": 8192,
+            "maxWidth": 8192
+          },
+          "3": {
+            "maxCount": 3,
+            "maxDurationSeconds": 15.4,
+            "maxFileSizeBytes": 52428800,
+            "maxHeight": 2160,
+            "maxWidth": 2160,
+            "minDurationSeconds": 2,
+            "minHeight": 200,
+            "minWidth": 200
+          },
+          "4": {
+            "maxCount": 3,
+            "maxDurationSeconds": 15,
+            "maxFileSizeBytes": 15728640,
+            "minDurationSeconds": 2
+          }
+        },
+        "requiredAnyOf": [
+          2,
+          3
+        ],
+        "maxTotalAudioDurationSeconds": 15,
+        "maxTotalVideoDurationSeconds": 15.4
+      },
+      "read_only_checks": {
+        "quote_status": "available",
+        "state_status": "allowed",
+        "credits": 70
+      },
+      "validation_status": "valid",
+      "trimodal_validation": [
+        {
+          "resolution": "720p",
+          "status": "valid"
+        },
+        {
+          "resolution": "1080p",
+          "status": "valid"
+        },
+        {
+          "resolution": "4k",
+          "status": "valid"
+        }
+      ]
+    },
+    "seedance_2.0_fast_vip": {
+      "mode4": {
+        "aspectRatioDefault": "16:9",
+        "aspectRatios": [
+          "21:9",
+          "16:9",
+          "4:3",
+          "1:1",
+          "3:4",
+          "9:16"
+        ],
+        "count": {
+          "defaultValue": 1,
+          "maxValue": 4
+        },
+        "duration": {
+          "defaultMs": 4000,
+          "valuesMs": [
+            4000,
+            5000,
+            6000,
+            7000,
+            8000,
+            9000,
+            10000,
+            11000,
+            12000,
+            13000,
+            14000,
+            15000
+          ]
+        },
+        "longVideo": {
+          "defaultValue": false,
+          "supported": false
+        },
+        "materials": {
+          "acceptedTypes": [
+            2,
+            3,
+            4
+          ],
+          "maxCount": 12,
+          "minCount": 1,
+          "promptRequired": false,
+          "requiresRole": false,
+          "roles": []
+        },
+        "mode": 4,
+        "promptMaxCharacters": 4000,
+        "resolutionDefault": "720p",
+        "resolutions": [
+          "720p"
+        ],
+        "supportsPromptEnhancement": true
+      },
+      "references": {
+        "acceptedTypes": [
+          2,
+          3,
+          4
+        ],
+        "maxTotalCount": 12,
+        "mutuallyExclusiveTypes": [],
+        "perType": {
+          "2": {
+            "maxCount": 9,
+            "maxFileSizeBytes": 52428800,
+            "maxHeight": 8192,
+            "maxWidth": 8192
+          },
+          "3": {
+            "maxCount": 3,
+            "maxDurationSeconds": 15.4,
+            "maxFileSizeBytes": 52428800,
+            "maxHeight": 2160,
+            "maxWidth": 2160,
+            "minDurationSeconds": 2,
+            "minHeight": 200,
+            "minWidth": 200
+          },
+          "4": {
+            "maxCount": 3,
+            "maxDurationSeconds": 15,
+            "maxFileSizeBytes": 15728640,
+            "minDurationSeconds": 2
+          }
+        },
+        "requiredAnyOf": [
+          2,
+          3
+        ],
+        "maxTotalAudioDurationSeconds": 15,
+        "maxTotalVideoDurationSeconds": 15.4
+      },
+      "read_only_checks": {
+        "quote_status": "available",
+        "state_status": "allowed",
+        "credits": 30
+      },
+      "validation_status": "valid",
+      "trimodal_validation": [
+        {
+          "resolution": "720p",
+          "status": "valid"
+        }
+      ]
+    }
+  }
+}

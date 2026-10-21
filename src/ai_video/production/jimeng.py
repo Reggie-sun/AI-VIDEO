@@ -1,4 +1,4 @@
-"""Jimeng Seedance 2.5 video adapter for the existing P8/paid lifecycle.
+"""Jimeng Seedance video adapter for the existing P8/paid lifecycle.
 
 The browser transport owns only technical I/O. Product task state, budget,
 Registry and acceptance continue through VideoGenerationService and committer.
@@ -18,6 +18,7 @@ from ai_video.production.jimeng_contracts import (
     JIMENG_ORIGIN, JIMENG_PROVIDER, JimengDispatchIntent,
     JimengCanvasSnapshot, JimengMaterial, JimengProfile, JimengSubmitNotDispatched,
 )
+from ai_video.production.jimeng_models import JIMENG_MODEL_SPECS
 from ai_video.production.minimax_h3 import _consume_permit, _permit_is_valid
 from ai_video.production.paid_provider import (
     JimengAcceptedEffectProof, PaidProviderCallPreview, PaidProviderEgressItem,
@@ -130,39 +131,40 @@ class JimengVideoProvider:
         self._now = now or (lambda: datetime.now(timezone.utc))
 
     def capabilities(self) -> VideoProviderCapabilities:
-        mini = self._profile.model_id == "seedance_2.0_mini"
+        spec = JIMENG_MODEL_SPECS[self._profile.model_id]
         variant = VideoCapabilityVariant(
             capability_id=self._profile.capability_id, provider_kind=JIMENG_PROVIDER,
             model_id=self._profile.model_id, profile_version=self._profile.profile_version,
             execution_kind=VideoExecutionKind.REMOTE, billing_kind=BillingKind.METERED,
             mode=VideoGenerationMode.REFERENCE_TO_VIDEO,
             output_capability=VideoOutputCapability(
-                min_duration_seconds=4, max_duration_seconds=15 if mini else 30,
+                min_duration_seconds=4, max_duration_seconds=spec.max_seconds,
                 provider_selected_duration=False, timing_modes=("nominal_seconds",),
                 dimension_modes=("adaptive",),
-                resolution_labels=("720p",) if mini else ("480p", "720p", "1080p"),
-                ratios=("16:9", "9:16", "1:1", "4:3", "3:4"),
+                resolution_labels=spec.resolutions,
+                ratios=spec.ratios,
                 fps_values=(None,), containers=("mp4",), native_audio_options=(True,),
             ),
             allowed_image_roles=("reference",), required_first_frame=False,
-            max_reference_count=9 if mini else 30,
+            max_reference_count=spec.max_images,
             allowed_image_mime_types=("image/png", "image/jpeg", "image/webp"),
-            max_image_bytes=(50 if mini else 40) * 1024 * 1024,
-            min_image_width=1, min_image_height=1,
+            max_image_bytes=spec.image_bytes,
+            min_image_width=spec.min_image_dimension, min_image_height=spec.min_image_dimension,
             media_capabilities=(
                 VideoMediaCapability(kind="audio", roles=("reference_audio",),
-                    min_count=0, max_count=3 if mini else 10,
+                    min_count=0, max_count=spec.max_audios,
                     allowed_mime_types=("audio/wav", "audio/mpeg", "audio/mp4"),
-                    max_size_bytes=(15 if mini else 40) * 1024 * 1024,
-                    min_duration_millis=2000 if mini else 1,
-                    max_duration_millis=15_000 if mini else 30_200),
+                    max_size_bytes=spec.audio_bytes,
+                    min_duration_millis=spec.min_media_millis,
+                    max_duration_millis=spec.max_audio_millis),
                 VideoMediaCapability(kind="video", roles=("reference_video",),
-                    min_count=0, max_count=3 if mini else 10,
+                    min_count=0, max_count=spec.max_videos,
                     allowed_mime_types=("video/mp4", "video/quicktime"),
-                    max_size_bytes=(50 if mini else 100) * 1024 * 1024,
-                    min_duration_millis=2000 if mini else 1,
-                    max_duration_millis=15_400 if mini else 30_200),
+                    max_size_bytes=spec.video_bytes,
+                    min_duration_millis=spec.min_media_millis,
+                    max_duration_millis=spec.max_video_millis),
             ),
+            production_qualification=spec.production_qualification,
             negative_prompt_supported=False, seed_supported=False, fps_supported=False,
             idempotent_submit=False, lookup_supported=True,
             output_recovery_strategy=VideoOutputRecoveryStrategy.REQUERY_BY_EFFECT_ID,
@@ -232,22 +234,28 @@ class JimengVideoProvider:
             raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                          "Jimeng request differs from its selected profile.")
         bindings = _ordered_bindings(request)
-        mini = self._profile.model_id == "seedance_2.0_mini"
-        if not bindings or len(bindings) > (12 if mini else 50):
+        spec = JIMENG_MODEL_SPECS[self._profile.model_id]
+        if not bindings or len(bindings) > spec.max_materials:
             raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                          "Jimeng reference material count exceeds the selected model bound.")
-        if mini and (len(request.prompt_text) > 4000
-                or not (request.image_bindings or any(x.kind == "video" for x in request.media_bindings))
-                or any(max(x.width, x.height) > 8192 for x in request.image_bindings)
+        if (len(request.prompt_text.encode("utf-16-le")) // 2 > spec.prompt_max_characters
+                or (spec.requires_visual and not (request.image_bindings
+                    or any(x.kind == "video" for x in request.media_bindings)))
+                or any(not (spec.min_image_dimension <= x.width <= spec.max_image_dimension
+                            and spec.min_image_dimension <= x.height <= spec.max_image_dimension)
+                    or (spec.image_aspect_bounds is not None and not (
+                        spec.image_aspect_bounds[0] <= x.width / x.height <= spec.image_aspect_bounds[1]))
+                    for x in request.image_bindings)
                 or any(x.width is None or x.height is None
-                       or not (200 <= x.width <= 2160 and 200 <= x.height <= 2160)
+                       or not (spec.min_video_dimension <= x.width <= spec.max_video_dimension
+                               and spec.min_video_dimension <= x.height <= spec.max_video_dimension)
                        for x in request.media_bindings if x.kind == "video")):
             raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
-                         "Jimeng Mini prompt or reference geometry is unsupported.")
-        if sum(x.duration_millis for x in request.media_bindings if x.kind == "audio") > (15_000 if mini else 30_200):
+                         "Jimeng prompt or reference geometry exceeds the selected model bound.")
+        if sum(x.duration_millis for x in request.media_bindings if x.kind == "audio") > spec.max_audio_millis:
             raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                          "Jimeng audio reference duration exceeds the selected model bound.")
-        if sum(x.duration_millis for x in request.media_bindings if x.kind == "video") > (15_400 if mini else 30_200):
+        if sum(x.duration_millis for x in request.media_bindings if x.kind == "video") > spec.max_video_millis:
             raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                          "Jimeng video reference duration exceeds the selected model bound.")
         video_millis = sum(x.duration_millis for x in request.media_bindings if x.kind == "video")

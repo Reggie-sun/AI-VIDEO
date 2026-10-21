@@ -506,6 +506,16 @@ class VideoCapabilityVariant(VideoCapabilityContractMixin, _VideoStrictModel):
     lookup_supported: bool
     output_recovery_strategy: VideoOutputRecoveryStrategy | None = None
     binding_cardinality_constraints: tuple[VideoBindingCardinalityConstraint, ...] = ()
+    # Static routing eligibility, not task state or a grant of paid authority.
+    # None preserves pre-existing Provider contracts and immutable snapshots.
+    production_qualification: Literal["UNQUALIFIED", "QUALIFIED"] | None = None
+
+    @model_serializer(mode="wrap")
+    def _qualification_projection(self, handler):
+        data = self._serialize_additive_output_recovery_strategy(handler)
+        if self.production_qualification is None:
+            data.pop("production_qualification", None)
+        return data
 
 
 class VideoProviderCapabilities(_VideoStrictModel):
