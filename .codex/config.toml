@@ -4,6 +4,29 @@ enable_fanout = true
 multi_agent = true
 multi_agent_v2 = true
 
+# Project-local authoring channel; asset evaluation stays in the existing
+# blender-agent-studio plugin. See docs/blender-routing.md.
+[mcp_servers.blender]
+command = "/home/reggie/.local/bin/uvx"
+args = ["--python", "3.11", "blender-mcp==1.8.7"]
+enabled = true
+startup_timeout_sec = 120.0
+tool_timeout_sec = 120.0
+enabled_tools = [
+    "get_addon_status",
+    "get_scene_info",
+    "get_object_info",
+    "get_viewport_screenshot",
+    "execute_blender_code",
+    "disable_telemetry",
+]
+
+[mcp_servers.blender.env]
+BLENDER_HOST = "127.0.0.1"
+BLENDER_PORT = "9876"
+DISABLE_TELEMETRY = "true"
+UV_PYTHON_PREFERENCE = "only-managed"
+
 [mcp_servers.video-mcp]
 command = "/home/reggie/.local/share/video-mcp/venv/bin/video-mcp"
 cwd = "/home/reggie/vscode_folder/MCP/VideoMCP"
