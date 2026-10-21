@@ -8,6 +8,10 @@ learning_eligibility: ineligible
 
 Date: 2026-10-21
 
+## Later Evidence — 2026-10-21
+
+[可靠性加固](2026-10-21-jimeng-reliability-qualification.md)已修复 Worker 的生命周期、单次发送及清理，并验证 97 项专项、2,740 项 exact scoped Harness。另只读核对了本地已有的成功 Mini 资源 `cc23913c-b829-4cdc-8577-02154e945220`：虽然 submit ID 和参数相同，resource/task 与下文原失败 attempt 不同，不能据此替换原任务、结算原预留或宣称正式 Provider 成功。下文“没有新 MP4”描述的是原已封存 attempt 的当时结果；其 Manifest16 和 Paid 账本未被改写。
+
 ## Outcome
 
 用户批准 Seedance 2.0 Mini、720p、16:9、5 秒、复用现有参考图，最多一次真实生成、30 积分上限。正式 Provider 实际发出一次生成请求；即梦创建任务后返回 `status=1001`、`error_code=20010`，提示“生成失败，本次不消耗积分”。没有新 MP4，不能宣称 Mini 成功出片或 Shot QA 通过，不再次生成。

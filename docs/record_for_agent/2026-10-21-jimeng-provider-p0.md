@@ -9,6 +9,10 @@ evidence_index_version: "1"
 
 Date: 2026-10-21
 
+## Reliability Follow-up — 2026-10-21
+
+后续[可靠性与资格记录](2026-10-21-jimeng-reliability-qualification.md)补充 Worker 生命周期、底层单次发送 fence、取消清理、真实 Playwright API、97 项专项及 2,740 项 exact scoped Harness；源码 `9615517` 已 push。受控资格实验 readiness 有条件 GO，正式生产仍 NO-GO；不将旧历史成功、额外 Mini 资源或离线 PASS 接管为原 attempt 的成功。下文的旧快照测试数字和全仓基线失败保留为历史。
+
 ## Follow-up Runtime Boundary — 2026-10-21
 
 下文“新 Provider 真实提交未实证”已由 [Mini 正式 Provider 验证](2026-10-21-jimeng-mini-provider-validation.md)部分取代：独立新画布中真实提交一次 Mini 任务，服务端生成失败；任务已由独立进程恢复并记为 FAILED，完整画布快照已保存。新增修复覆盖纯图片 commercial context、worker EOF 与失败任务恢复。没有新 MP4 或 Mini 成功出片证明，原全仓 Harness 与质量边界继续保留。

@@ -42,6 +42,8 @@ P0 的 `compile_request` 支持普通 Shot requirement 的显式素材绑定。�
 
 ## Verification Boundary
 
+当前可靠性候选源码为 `9615517d1092bef3febb7dd44f16f651bcbeced8`：97 项 Jimeng 专项、2,740 项 exact scoped Harness 和最终 native 独立审查通过；真实 Chromium 的合成提交流程验证了发送及清理，真实平台验证仅使用历史资源只读回读。结论为“可在新授权及已验证环境内开展受控资格实验”，正式生产仍 NO-GO。后续历史 Mini 成功资源与原失败 attempt 的 resource/task 不同，不能仅凭相同 submit ID 接管。完整证据分级、receipt、部署限制与剩余条件见 [reliability qualification record](record_for_agent/2026-10-21-jimeng-reliability-qualification.md)；下文保留前序验证的历史边界。
+
 2026-10-21 的 Mini 验证使用独立画布，不继续往历史作品画布添加试验。原生报价 30 积分，实际生成请求最多一次。正式 Provider 已提交 Mini / 720p / 16:9 / 5 秒图片参考任务；服务端返回 `status=1001`、`error_code=20010` 和“生成失败，本次不消耗积分”。这不是成功出片证明，未取得新 MP4，失败原因不能从错误码自行推断。任务身份、画布保存、账本恢复与最终验证边界见 [Mini validation record](record_for_agent/2026-10-21-jimeng-mini-provider-validation.md)。
 
 此前 P0 工程化的只读复查已通过本 transport 找回 2026-10-21 的三模态历史任务，resource、submit、task 身份、完成状态和新鲜下载地址均匹配；服务端保存的生成参数与原请求逐字段一致。用本 Provider 的下载路径再次取得同一历史 MP4，29,222,147 字节及 SHA-256 与先前保留的原片一致。服务端历史画布草稿只读获取成功，目标节点精确包含历史 `resource_id`；该阶段未通过新提交验证实时自动保存时序。离线测试覆盖参数映射、身份漂移、一次性 permit、响应丢失、读回不可用、画布快照缺失及替换、进程重开及遗留提交意图、预算协调、轮询和获取。构建验证确认浏览器 worker 存在于 sdist、wheel 及安装目标。该历史阶段未新增付费生成，也未实测浏览器整体重启、登录过期恢复或真实提交响应丢失。网页内部对象、quote 结构、上传签名与节点行为可能变化；完整 Production qualification 和最终成片验收需要相应真实证据，不能由离线测试推出。
