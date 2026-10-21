@@ -5,7 +5,7 @@ learning_eligibility: ineligible
 evidence_index_version: "1"
 ---
 
-# Jimeng Interface Research And Existing Result Recovery
+# Jimeng Interface Research, Direct Generation And Task Recovery
 
 Date: 2026-10-21
 
@@ -13,11 +13,46 @@ Date: 2026-10-21
 
 当前登录账号下，已经通过直接 HTTP 请求完成图片、音频、视频各一次存储上传，并在两个独立客户端进程重连后读回同一已有结果，下载的 MP4 与历史 source provenance 的 SHA-256 一致。账号会话由原项目浏览器 profile 持有，操作没有依赖视觉点击，也没有导出登录 Cookie。
 
-**这证明当前会话中的三类上传和已完成结果找回可行；尚未证明新生成闭环、三模态同次生成、运行中断线恢复、提交结果未知时的恢复或长期稳定性。** 新生成、充值、购买均为 0。用户随后确认一次三模态试验；当前在提交前因余额不足及尚缺数值积分上限而停止，详见下节。
+**最新进展：三模态新生成已经完成并下载，运行中任务也通过独立客户端重连及页面刷新找回。** 本轮唯一生成实际扣除 442 积分，服务端已同步结算；新 MP4 完整解码通过。project-local `video-analysis` 已显式执行，但对白、声线、完整动作与运镜连续性缺少足够验收证据，媒体 Gate 为 `NOT_EVALUATED`。下方 765 积分 / 884 报价与提交前阻断保留为初次检查历史，不再代表最新账号状态。提交无响应的恢复、浏览器整体重启、登录失效和长期稳定性仍未验证。
 
-没有安装或启动三个第三方服务，也没有接入新的 Production Provider、写入 Manifest / Registry、激活素材或签署 Shot QA。上传只到存储层，未调用 `resource/upload` 将新对象登记到画布，原画布仍为 296 nodes / 162 edges。新上传的三个对象保留，不以自动清理删除证据。
+没有安装或启动三个第三方服务，也没有接入新的 Production Provider、写入 Manifest / Registry、激活 Production 素材或签署 Shot QA。上传只到存储层，未调用 `resource/upload` 登记新上传对象；本轮通过原生生成 owner 更新了该画布节点的输出资源，仍为 296 nodes / 162 edges。新上传的三个对象保留，不以自动清理删除证据。
+
+## Authorized Live Trial — 2026-10-21
+
+用户在已知 884 积分报价、已确认最多一次 exact 试验后要求“现在有积分了你继续”；Parent 将这次知情续行限定为原模型、参数和输入、最多一次、884 积分上限，没有把整笔余额当预算。最新同账号状态为 `vipLevel=ultra`，可用积分 96825；原生 quote 返回 `credits=442, originalCredits=884, discountLabel=积分5折`，action 为 `allowed`。前述基础会员快照不能代表升级后的折扣。
+
+提交仍为 Seedance 2.5 / `multi_modal` / 720p / 16:9 / 17000 ms / 单输出，材料类型顺序 `2,2,2,4,3`，`meta_list` 引用顺序 `1,2,3,0,4`。图片、声线、视频用途与预览 v2 完全一致，原提示词只保留既有视频参考用途适配。当前原生参数 validator 为 `valid`。
+
+实际通过正常 React canvas context 的 `generationRuntime.actions.submitVideo` 调用原生 creation authority → commercial execute → generator owner，没有视觉点击，没有绕过其权限判断或导出登录凭据。该入口是当前 UI 内部方法，不是稳定公开 SDK，也不证明无浏览器会话的独立客户端生成可用。native owner 分配新的 submit/resource identity；本地 probe 在放行网络前 fsync 保存 exact request、任务 identity 和单次消费记录。预览中先前占位的 ID 没有用于另一次提交。
+
+一次性研究 probe 不是 Production adapter 或 Production permit，不写 Product 状态。它对 exact 提示词/材料/绑定、账号、442 报价、884 上限和单次请求做限制，并在正常 HTTP 方法外增加只收紧权限的页面内检查；保留原生 HTTP 的请求策略、凭据、project scope 与商业流程。请求附加源码允许的 `quote_precondition={expected_benefit_amount:34,expected_credits_amount:442}`，服务端接受了该 body，但这不是已证明的服务端硬上限保证。
+
+独立审查采用一名 native `reviewer_xhigh`，共两轮。第一轮确认延迟操作可能在调用端退出后继续提交，以及响应未绑定 exact Request 的问题；修正为页面内单次检查必须等本地持久化放行，断连不能取得新的放行，退出前关闭检查，响应绑定 admitted Request / resource ID。第二轮审查 exact probe SHA-256 `730581edeedeecf7ed296c7cdac287049f156b897a6304a57286f3b949c2d72e` 无剩余 finding。12 项离线边界检查、Node syntax 与真实原生只读 preflight 通过；没有运行完整工程 Harness。
+
+唯一 POST 时间为 `2026-10-21T09:41:43Z`，HTTP 200 / `ret=0`，结果 `state=1,error_code=0`。服务器任务身份：
+
+| Identity | Value |
+| --- | --- |
+| submit_id | `cedcb4bc-5bb5-4c8e-9c10-278f4f388518` |
+| resource_id | `71949d15-dac1-4642-b83c-24f238650876` |
+| task_id | `23681081680140` |
+| canonical request SHA-256 | `64ec20d6e0fd9131dafc66f50a99d853a9f4c867bfdf8ef163276fd68344d447` |
+
+独立进程通过资源接口读回新任务 `status=200`（生成中），队列返回 `stage=3`、无前序排队。实际服务端资源的提示词 hash、五个 materials 与四个既有 `reference_sources` 均匹配请求，`meta_list` 类型/index 顺序一致；本地脱敏记录省略 type-1 条目的明文，不能称整份参数逐字节一致。保存后刷新画布，再以持久 ID 查询，仍为同一任务；没有额外生成或购买尝试。刷新触发的原生余额响应为 `vip_credit=55325,gift_credit=41058,purchase_credit=0`，合计 96383，比提交前减少 442。
+
+`2026-10-21T09:51:21Z` 首次读到 `status=1000`，距唯一 POST 约 9 分 38 秒；最终资源为 `vid=v02870g10004dbc8lta7dld3p49ej2i0`，并返回 `consumption_synced=true, consumed_credits=442`。随后直接 GET 新返回的媒体地址并落盘，29222147 bytes，SHA-256 `4cf66fe02005279b987f7d06fcc66f11adba7a63efc5785833adcfcf83720e5c`。没有重用旧 MP4 冒充本次输出。
+
+本地文件为 [`.codex/tmp/jimeng-single-trial/resume/generated.mp4`](../../.codex/tmp/jimeng-single-trial/resume/generated.mp4)，H.264、1280×720、409 帧，容器/音轨时长 17.056009 秒，AAC stereo / 44100 Hz。完整解码 exit 0，音轨 mean/max 为 -26.5/-5.2 dB；这只证明可解码且非全静音，不证明对白正确或听感。FFprobe `r_frame_rate=60/1`、`avg_frame_rate=24540/1021`，与资源声明 24 fps 有显示口径差异，因此不把 MCP 的 60 fps 摘要当作恒定帧率证明。
+
+project-local `video_probe` / `video_analyze` 对 exact MP4 执行成功，提取 0–16 秒九帧，场景阈值检测返回一个 scene。抽帧可见场景、COCO/Nosha、掉落宠物、推车/果物和结尾宠物，但不足以核验全速连续动作及完整摄影机路径。`audio_understand(execute=false)` 仅产生离线预览，network calls 为 0；没有为修补证据追加远程付费分析。因此媒体 Gate 为 `NOT_EVALUATED`，没有签署 Shot QA、人工观看/听觉验收或提交下一镜。
+
+下载最初被研究脚本的静态域名白名单拦住，核对为 fresh 资源响应返回的第一方 CDN 后完成下载。用户随后明确要求去掉下载检查；本地只读下载 probe 已移除域名/端口、大小和 MP4 magic 准入限制，并允许跟随 CDN redirect。仍从 exact 已完成资源取地址、检查 HTTP 结果、避免覆盖已有文件，并在下载后做 hash/解码验证；没有把该局部调整改成 Product/Provider policy，也没有为此再次下载或提交生成。
+
+本机证据目录为 `.codex/tmp/jimeng-single-trial/resume/`，含单次 intent / exact request / admission / network dispatch / acceptance、查询、页面刷新、费用回读、下载、媒体检查和审查历史。最终回执为 [`receipt.json`](../../.codex/tmp/jimeng-single-trial/resume/receipt.json)；媒体 Gate 明细为 [`media-gate.json`](../../.codex/tmp/jimeng-single-trial/resume/media-gate.json)。历史 admission 的 `ADMITTED_OUTCOME_UNKNOWN` 保持不改，由 acceptance / terminal 回读确定最新结果；单次额度已消费，不因质量未验收或等待异常重交。
 
 ## Single Trial Preflight — 2026-10-21
+
+本节为首次余额不足时的历史 checkpoint；其未提交/未准入结论已由上方唯一真实试验补证，保留原检查范围与当时数值。
 
 用户确认了此前预览的最多一次试验：同一 `视频 10 (17)` 的 Seedance 2.5、720p、17 秒、单输出，保留三张图片与 COCO 声线，加入已经上传的同镜视频作为运镜参考。这次确认没有给出数值积分上限。新增视频材料在 `materials[4]`，使用上传后的 `vid=v02870g10004dbbu7dfog65m808fqmv0`；原四个材料的 index 和引用绑定保持。该视频仍是存储对象，没有画布 node/resource 映射；其服务端准入未验证。
 
@@ -34,6 +69,8 @@ Date: 2026-10-21
 本机 continuation receipt：[`.codex/tmp/jimeng-single-trial/receipt.json`](../../.codex/tmp/jimeng-single-trial/receipt.json)，绑定 `native-account-read.json`、`native-quote.json`、`action-entitlement.json`、`preflight.json`、预览和实际参考图片的 hash。它独立于下方初次研究 receipt，保留两个 checkpoint 的历史。
 
 ## Promotion Scope And VIP Label — 2026-10-21
+
+本节为账号升级前的优惠范围核对；最新 `ultra` 账号的本 action 原生五折报价与实际 442 积分结算见上方真实试验。
 
 用户随后指出 Seedance 2.5 活动横幅，并询问 2.0 的 VIP 标签。重新读取同一账号的原生 metadata、benefit strategy 与 fresh quote 后，**884 仅适用于本次当前画布 action，不能概括所有即梦入口的优惠情况**。之前向用户说明余额不足时缺少这个范围限定。
 
@@ -75,9 +112,9 @@ Date: 2026-10-21
 | Upload ticket | `POST /mweb/v1/get_upload_token`，image `scene=2`，video/audio `scene=1` | 当前公开客户端与真实请求一致；只记录字段名及非秘密配置。 |
 | Image storage upload | ImageX `ApplyImageUpload` → binary POST → `CommitImageUpload` | 三个阶段实际成功；最终 `UriStatus=2000`。 |
 | Video/audio storage upload | VOD `ApplyUploadInner` → binary POST → `CommitUploadInner` | 两类素材均完成三阶段并取得 `Vid`。 |
-| Canvas generation | `POST /octo_api/v1/node_generate` | 当前公开客户端源码确认；本轮未调用。 |
+| Canvas generation | `POST /octo_api/v1/node_generate` | exact 三模态试验唯一 POST 接受并完成；使用正常原生 owner，没有视觉点击。 |
 | Read output/reference resources | `POST /octo_api/v1/resource/batch_get`，body `{project_id, resource_ids}` | 实际返回素材参数、`resource_id` / `submit_id` / `task_id`、状态和媒体地址。 |
-| Queue lookup | `POST /octo_api/v1/resource/generation/queue_status`，body `{project_id, resource_ids}` | 对已有完成资源实际返回 `ret=0, results=[]`；没有排队中样本。 |
+| Queue lookup | `POST /octo_api/v1/resource/generation/queue_status`，body `{project_id, resource_ids}` | 旧完成资源与新任务完成后 `results=[]`；新任务生成中实际返回 `stage=3`，不是等待队列阶段的证明。 |
 | Download | 对本次资源响应提供的媒体地址直接 GET | HTTP 200，落盘并核对 SHA-256；不持久化签名 URL。 |
 
 公开客户端 `canvas-core.15e0f05e55.js` 的 module `73375` 构造 initial video body：`project_id`、`op=1`、`initial.{node_id,submit_id,items}`，每 item 包含 `resource_id`、`type=2`、`params.video_params` 以及适用的 `reference_sources`。`3717.4cfa44b033.js` module `85481` 负责 `nodeGenerate`；它支持 initial / retry / post-edit / detached，并检查返回资源的顺序及结果状态。这个方法会执行 POST，没有观察到可安全调用的 validate-only 模式。
@@ -107,7 +144,7 @@ Date: 2026-10-21
 
 当前资源的 `meta_list` 中引用出现顺序为 `1,2,3,0`，与素材数组顺序不同；必须按 index 关联，不能按提示词出现顺序重新编号。资源类型枚举和 material 类型枚举也不同：resource 的 image/video/audio 为 `1/2/3`，此处 material 的 image/video/audio 为 `2/3/4`。
 
-本画布 66 个当前视频资源的实际回读中没有发现 `materials.type=3`；本轮没有伪称已有 Shot 同时使用三类参考。视频分支的真实证据是下方独立存储上传；三模态同次生成仍为 `NOT_EVALUATED`。
+初次扫描本画布 66 个视频资源时没有发现 `materials.type=3`；没有将原有 Shot 伪称为三模态。后续唯一试验已回读三张图片、音频和视频材料，完成生成并下载新 MP4。这证明三模态参数被接受并保存，不证明每类参考都按导演意图影响结果。
 
 此外实际读取 `GET /octo_api/v1/generation_specs`：本账号返回 `seedance_2.5`、`model_req_key=dreamina_seedance_45_pro`，`multi_modal` 支持 image/video/audio，数量上限分别 30/10/10，总量上限 50，视频/音频总时长各 30200 ms。返回的分辨率枚举包含 480p/720p/1080p，普通生成时长范围 4000–30000 ms。它说明当前 schema 宣告的边界，不替代实际素材准入、同次生成或费用核验；不能把旧仓库的 2.0/15 秒约束套到当前 2.5 上。
 
@@ -139,7 +176,7 @@ Date: 2026-10-21
 
 如实施后续接入，应沿项目现有 Generation / paid / state owner，在发出唯一提交前持久封存账号范围、project/node/resource/submit identity、素材 bytes/hash 与 index 映射，并核实平台是否提供幂等和可查找的 durable receipt。提交后断线时先按已知资源身份读队列和资源；空查询不等于已证明未提交。缺少可归因结果时保留 `UNKNOWN`，不因复用 submit ID 或源码有 retry 就再次生成。签名下载地址应从 fresh 资源读响应重新取得，不作为持久任务标识。
 
-这只是接入条件和风险判断，本轮没有实现 Production adapter 或证明服务端幂等。已完成结果恢复为本次有界 `PASS`；运行中恢复、无响应提交恢复、三模态生成闭环和长期稳定性为 `NOT_EVALUATED`。
+本轮没有实现 Production adapter 或证明服务端幂等。已有完成结果恢复、当前登录会话中已接受新任务的客户端重连 / 页面刷新恢复、三模态新结果生成到下载闭环为本次有界 `PASS`。上传/查询/下载使用直接 HTTP；生成通过网页原生内部 owner 发出真实请求，因此“无需视觉点击”已验证，“完全脱离浏览器会话的独立 HTTP 生成客户端”仍未验证。无响应提交恢复、浏览器整体重启、登录失效和长期稳定性仍为 `NOT_EVALUATED`。
 
 ## Verification And Evidence
 
@@ -147,12 +184,12 @@ Date: 2026-10-21
 
 REA 实际捕获 `resource/batch_get` 的请求/响应字段结构，Evidence ID 为 `ev_ddd646a5a2635861a4b296a45a8a3c718a4598b1198ac7d052cd6e3f88de80d2`。保留文件是删除 URL query values 的 derivative，明确标记不能当作原始 Evidence 的字节等同副本；原始 stdout hash 单独保存。其 coverage 是 `policy_filtered` / attach-limited，没有 prior network；没有将其他 Chrome/Playwright 输出称为 REA Evidence。
 
-局部文档契约、owned-path whitespace 和 receipt artifact hash 验证按实际执行结果记入总 receipt；本次没有运行完整工程 Harness。没有 Product behavior 改动，Parent Risk Gate 为 `NATIVE_REVIEW_NOT_REQUIRED`：交付是有边界的研究记录和局部真实读写证据，不改变授权判断、凭据 owner、Production writer 或恢复语义。
+局部文档契约、owned-path whitespace 和 receipt artifact hash 验证按实际执行结果记入相应 receipt；本次没有运行完整工程 Harness。初始 docs/recovery checkpoint 没有 Product behavior 改动，Parent 判定 `NATIVE_REVIEW_NOT_REQUIRED`。后续单次付费 probe 存在调用端退出后仍可能提交的具体风险，判定 `NATIVE_REVIEW_REQUIRED` 并完成上述两轮独立审查。下载限制的后续移除和事实记录由 Parent 验证；不能称为 reviewer 审过的新内容。
 
-使用 `record-ai-video-session` 保存本 checkpoint；`distill-ai-video-learning` 自动评估为 `no_candidate`。这是协议/单会话研究及一次提交前检查，没有满足独立媒体实验门槛，也没有修改 Skill、Policy 或 Gate。初次 Agent Memory 检索返回 incompatible shard / exit 3；continuation 的 experience 检索返回标记为 stale 的 last-good 片段并提示后台 refresh。两次均按 retrieval owner 使用当前源码与运行证据，没有前台重建或重试索引，也没有用检索片段作为授权。
+使用 `record-ai-video-session` 保存本 checkpoint；`distill-ai-video-learning` 自动评估为 `no_candidate`。这是协议/单会话研究及一次真实三模态生成；同一次任务的多次轮询、刷新和检查不算多个独立实验，也没有足够已验收媒体支持新规则。没有修改 Skill、Policy 或 Gate。初次 Agent Memory 检索返回 incompatible shard / exit 3；continuation 的 experience 检索返回标记为 stale 的 last-good 片段并提示后台 refresh。均按 retrieval owner 使用当前源码与运行证据，没有前台重建或重试索引，也没有用检索片段作为授权。
 
 ## Paid Continuation Boundary
 
-尚未发出任何新生成请求。最多一次 exact 试验已获确认；当前停止条件是原生 `credit_insufficient` 和尚缺用户数值积分上限。恢复时应核验同一账号最新余额及 exact 选项的 fresh quote，确认额度足以覆盖且不超过用户上限，再完成适用 budget / durable intent / one-use permit 边界。一次试验授权不包含充值、购买、缩短时长、删参考、换模型或自动改用另一权益。
+初次提交前阻断已被上方知情续行和 fresh 442 积分报价取代。最多一次 exact 试验已接受并完成，剩余新增提交数为 0；只查询、下载同一 task/resource 并检查 exact 媒体，不因超时、失败或质量问题自动重交。一次试验授权不包含本 Agent 充值、购买、缩短时长、删参考、换模型或自动改用另一权益。
 
 提交后保留同一任务 identity，验证排队、断开客户端、重连、下载及 exact 媒体 Gate；unknown 停止，不重交。原生 quote 和这份研究报告均不构成付费 permit，已完成旧结果的恢复证据也不构成新生成或长期稳定性证明。
