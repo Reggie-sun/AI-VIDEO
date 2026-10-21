@@ -1,6 +1,9 @@
 from __future__ import annotations
 
+import logging
 import time
+from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -10,6 +13,34 @@ import httpx
 
 from ai_video.download import stream_public_video
 from ai_video.errors import AiVideoError, ErrorCode, retryable_error
+
+
+_ARTIFACT_HTTP_EXCHANGE: ContextVar[bool] = ContextVar("comfy_artifact_http_exchange", default=False)
+
+
+class _ArtifactHttpLogFilter(logging.Filter):
+    def filter(self, record: logging.LogRecord) -> bool:
+        # HTTPcore DEBUG includes response headers, including signed Location and
+        # Set-Cookie. Suppress only this request context, without changing logger
+        # levels, handlers, or diagnostics emitted by concurrent requests.
+        return not _ARTIFACT_HTTP_EXCHANGE.get()
+
+
+_artifact_http_log_filter = _ArtifactHttpLogFilter()
+for _logger_name in (
+    "httpx", "httpcore.connection", "httpcore.http11", "httpcore.http2",
+    "httpcore.proxy", "httpcore.socks",
+):
+    logging.getLogger(_logger_name).addFilter(_artifact_http_log_filter)
+
+
+@contextmanager
+def _artifact_http_logging_scope():
+    token = _ARTIFACT_HTTP_EXCHANGE.set(True)
+    try:
+        yield
+    finally:
+        _ARTIFACT_HTTP_EXCHANGE.reset(token)
 
 
 class JobStatus(str, Enum):
@@ -214,7 +245,7 @@ class ComfyClient:
     def _get_artifact(self, *, filename: str, subfolder: str, type_: str) -> bytes:
         # Only the selected ComfyUI endpoint receives API authentication. Artifact
         # redirects use the shared non-logging downloader without ambient secrets.
-        with self.http.stream(
+        with _artifact_http_logging_scope(), self.http.stream(
             "GET", self._url("/view"),
             params={"filename": filename, "subfolder": subfolder, "type": type_},
             follow_redirects=False,

@@ -286,3 +286,58 @@ def test_artifact_download_failure_is_typed_without_leaking_signed_url(failure, 
         assert "SIGNED_DOWNLOAD_CANARY" not in str(exc_info.value)
         assert "SIGNED_DOWNLOAD_CANARY" not in exc_info.value.technical_detail
     assert "SIGNED_DOWNLOAD_CANARY" not in caplog.text
+
+
+@pytest.mark.parametrize("status", [200, 302, 503])
+def test_artifact_real_http_transport_debug_logs_are_private_and_scope_isolated(
+    monkeypatch, caplog, status
+):
+    import logging
+    from httpcore import MockBackend
+    from ai_video import comfy_client
+
+    caplog.set_level("DEBUG")
+    # Use the real HTTPX/httpcore stack so response-header DEBUG records are emitted.
+    wire = (
+        f"HTTP/1.1 {status} Test\r\n"
+        "Location: https://cdn.example/file?signature=SIGNED_DEBUG_CANARY\r\n"
+        "Set-Cookie: private=SERVER_COOKIE_CANARY\r\n"
+        "Content-Length: 5\r\n\r\nbytes"
+    ).encode()
+    transport = httpx.HTTPTransport()
+    transport._pool._network_backend = MockBackend([wire])
+    seen = []
+
+    @contextmanager
+    def native_download(url, **_kwargs):
+        seen.append(url)
+        yield type("Downloaded", (), {
+            "status_code": 200,
+            "iter_bytes": lambda self: iter([b"bytes"]),
+        })()
+
+    monkeypatch.setattr(comfy_client, "stream_public_video", native_download)
+
+    def concurrent_diagnostic(_response):
+        # A different request/thread must retain its diagnostics while the
+        # artifact request's sensitive response headers are being processed.
+        thread = Thread(target=lambda: logging.getLogger("httpcore.http11").debug(
+            "UNRELATED_CONCURRENT_CANARY"
+        ))
+        thread.start()
+        thread.join(timeout=2)
+        assert not thread.is_alive()
+
+    with httpx.Client(transport=transport, event_hooks={"response": [concurrent_diagnostic]}) as http:
+        client = ComfyClient("http://127.0.0.1:8188", http_client=http)
+        if status == 503:
+            with pytest.raises(AiVideoError):
+                client.fetch_artifact_bytes(filename="result.bin", subfolder="", type_="output")
+        else:
+            assert client.fetch_artifact_bytes(filename="result.bin", subfolder="", type_="output") == b"bytes"
+    logging.getLogger("httpcore.http11").debug("AFTER_ARTIFACT_SCOPE_CANARY")
+    assert len(seen) == (1 if status == 302 else 0)
+    assert "SIGNED_DEBUG_CANARY" not in caplog.text
+    assert "SERVER_COOKIE_CANARY" not in caplog.text
+    assert "UNRELATED_CONCURRENT_CANARY" in caplog.text
+    assert "AFTER_ARTIFACT_SCOPE_CANARY" in caplog.text

@@ -33,7 +33,8 @@ Date: 2026-10-21
   官方 H3 Max、Seedance 结果 GET 与本地视频上传后的 readback 复用该入口。
 - 旧版 `ComfyClient` 的两种 artifact GET 也支持 CDN redirect；首次读取仍可使用已选
   ComfyUI API 的原有授权，后续跳转使用共享原生下载器，清除 client auth/cookie/header 和初始 redirect URL userinfo，
-  避免 HTTPX INFO 日志输出签名 URL。
+  避免 HTTPX INFO 日志输出签名 URL。首跳 API HTTP 交换用 ContextVar 隔离底层
+  HTTPX/httpcore 日志，避免 DEBUG 的 Location/Set-Cookie 泄露；并发其他请求日志与请求结束后的诊断照常保留。
 - 各 adapter 删除结果来源白名单、MIME header 与体积提前阻断，仍复核同一 task/file/creation。
   广告素材 reader 也不再按旧下载体积上限拒绝真实 bytes。
 - `result_origins`、`result_trust`、`max_download_bytes` 保留旧 profile 序列化身份，
@@ -60,7 +61,11 @@ lifecycle、Seedance readback 与旧版 ComfyClient。额外真实 loopback 测�
 
 首轮独立审查指出 ComfyUI HTTPX INFO 日志可能暴露签名下载地址、混合视频 readback
 残留 MIME 提前拦截，以及旧 Accept header 的兼容问题；修复后追加实际 loopback、
-日志 canary、混合引用 wire 与兼容调用验证，修复后的 11 文件 guard 聚焦测试 **571 passed**（32.21 秒）；详细结果绑定下述 receipt。
+日志 canary、混合引用 wire 与兼容调用验证，修复后的 11 文件 guard 聚焦测试 **571 passed**（32.21 秒）。第二轮指出首跳 HTTPcore DEBUG
+仍会记录响应 Location；增加按请求上下文隔离及真实 HTTPTransport + MockBackend 测试后，
+ComfyUI 聚焦测试 **18 passed**，覆盖并发与成功/跳转/失败后的上下文恢复；图片/视频适配器另有
+**62 passed**。全范围提交验证 `download-default-20261021-004` 通过，后续日志修复按独立提交范围
+补验；两段证据、原候选与最终候选关系绑定下述 receipt，不重复未变化的整组测试。
 
 Parent 判定 `NATIVE_REVIEW_REQUIRED`：新增 CDN redirect 路径涉及凭据隔离和持久化
 origin/协议真相，独立审查可核对测试之外的泄露及兼容性路径。exact commit-range snapshot
