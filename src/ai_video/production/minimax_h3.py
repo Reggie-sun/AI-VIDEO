@@ -15,7 +15,7 @@ from contextlib import AbstractContextManager
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import BinaryIO, Literal, Protocol
-from urllib.parse import quote, urlsplit
+from urllib.parse import quote
 
 import httpx
 
@@ -59,6 +59,7 @@ from ai_video.production.video_compiler import (
     compile_provider_video_request,
 )
 from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
+from ai_video.production.vidu_download import parse_result_url, stream_public_video
 
 _ORIGIN = "https://api.minimaxi.com"
 _SUBMIT_URL = f"{_ORIGIN}/v2/video_generation"
@@ -71,7 +72,6 @@ _CAPABILITY_ID = "minimax-h3-v2-t2v-768p-4s-16x9"
 _FILE_ID_PREFIX = "h3-content-"
 _MAX_JSON_BYTES = 1_000_000
 _MAX_PROMPT_CHARACTERS = 2_000
-_MAX_VIDEO_BYTES = 256 * 1024 * 1024
 _SECRET_REFERENCE_KIND = "secret_store"
 _SECRET_REFERENCE_ID = "MINIMAX_H3_API_KEY"
 _SAFE_ERROR_TYPE = re.compile(r"^[a-z][a-z0-9_]{0,63}$")
@@ -145,6 +145,7 @@ class HttpxMiniMaxH3Transport:
             follow_redirects=False,
         )
         self._owns_client = client is None
+        self._download_timeout = timeout_seconds
 
     def request(self, request: MiniMaxH3TransportRequest) -> MiniMaxH3TransportResponse:
         response = self._client.request(
@@ -163,6 +164,10 @@ class HttpxMiniMaxH3Transport:
     def stream(
         self, request: MiniMaxH3TransportRequest
     ) -> AbstractContextManager[MiniMaxH3StreamResponse]:
+        if request.method == "GET":
+            return stream_public_video(
+                request.url, timeout_seconds=self._download_timeout
+            )
         return self._client.stream(
             request.method,
             request.url,
@@ -248,23 +253,26 @@ def _signed_https_url(value: object) -> str:
     if not isinstance(value, str) or not value:
         raise _error(ErrorCode.VIDEO_PROVIDER_FAILED, "MiniMax H3 result URL is missing.")
     try:
-        parsed = urlsplit(value)
-        _ = parsed.port
-    except ValueError:
+        parse_result_url(value)
+    except AiVideoError:
         raise _error(ErrorCode.VIDEO_PROVIDER_FAILED, "MiniMax H3 result URL is invalid.") from None
-    if (
-        parsed.scheme != "https"
-        or parsed.hostname is None
-        or parsed.username is not None
-        or parsed.password is not None
-        or not parsed.path
-        or parsed.fragment
-    ):
-        raise _error(
-            ErrorCode.VIDEO_PROVIDER_FAILED,
-            "MiniMax H3 result URL must be HTTPS without credentials or fragments.",
-        )
     return value
+
+
+def _observed_mp4(prefix: bytes, size_bytes: int) -> bool:
+    if len(prefix) < 16 or prefix[4:8] != b"ftyp":
+        return False
+    box_size = int.from_bytes(prefix[:4], "big")
+    return 16 <= box_size <= size_bytes and prefix[8:12] in {
+        b"M4V ",
+        b"avc1",
+        b"iso2",
+        b"iso5",
+        b"iso6",
+        b"isom",
+        b"mp41",
+        b"mp42",
+    }
 
 
 def _provider_file_id(task_id: str) -> str:
@@ -622,6 +630,7 @@ class MiniMaxH3VideoProvider:
         )
         digest = hashlib.sha256()
         size = 0
+        prefix = bytearray()
         try:
             with self._transport.stream(request) as response:
                 if not 200 <= response.status_code < 300:
@@ -630,37 +639,22 @@ class MiniMaxH3VideoProvider:
                         f"MiniMax H3 download returned HTTP {response.status_code}.",
                         retryable=response.status_code >= 500 or response.status_code == 429,
                     )
-                content_type = response.headers.get("content-type", "")
-                if not content_type.lower().startswith("video/mp4"):
-                    raise _error(
-                        ErrorCode.VIDEO_ARTIFACT_INVALID,
-                        "MiniMax H3 download is not video/mp4.",
-                    )
-                content_length = response.headers.get("content-length")
-                if content_length is not None:
-                    try:
-                        declared_size = int(content_length)
-                    except ValueError:
-                        raise _error(
-                            ErrorCode.VIDEO_ARTIFACT_INVALID,
-                            "MiniMax H3 download Content-Length is invalid.",
-                        ) from None
-                    if declared_size < 0 or declared_size > _MAX_VIDEO_BYTES:
-                        raise _error(
-                            ErrorCode.VIDEO_ARTIFACT_INVALID,
-                            "MiniMax H3 download exceeds the size limit.",
-                        )
+                content_length = next(
+                    (
+                        value
+                        for key, value in response.headers.items()
+                        if key.lower() == "content-length"
+                    ),
+                    None,
+                )
                 for chunk in response.iter_bytes():
                     if not chunk:
                         continue
-                    if size + len(chunk) > _MAX_VIDEO_BYTES:
-                        raise _error(
-                            ErrorCode.VIDEO_ARTIFACT_INVALID,
-                            "MiniMax H3 download exceeds the size limit.",
-                        )
+                    prefix.extend(chunk[: max(0, 32 - len(prefix))])
                     sink.write(chunk)
                     digest.update(chunk)
                     size += len(chunk)
+                sink.flush()
         except AiVideoError:
             raise
         except Exception:
@@ -671,12 +665,24 @@ class MiniMaxH3VideoProvider:
             ) from None
         if size == 0:
             raise _error(ErrorCode.VIDEO_ARTIFACT_INVALID, "MiniMax H3 download is empty.")
-        if content_length is not None and size != declared_size:
+        if content_length is not None:
+            try:
+                declared_size = int(content_length)
+            except ValueError:
+                raise _error(
+                    ErrorCode.VIDEO_ARTIFACT_INVALID,
+                    "MiniMax H3 download Content-Length is invalid.",
+                ) from None
+            if declared_size < 0 or size != declared_size:
+                raise _error(
+                    ErrorCode.VIDEO_ARTIFACT_INVALID,
+                    "MiniMax H3 download size does not match Content-Length.",
+                )
+        if not _observed_mp4(bytes(prefix), size):
             raise _error(
                 ErrorCode.VIDEO_ARTIFACT_INVALID,
-                "MiniMax H3 download size does not match Content-Length.",
+                "MiniMax H3 download is not a measured MP4 artifact.",
             )
-        sink.flush()
         return VideoFetchReceipt.create(
             submission=submission,
             observation=observation,

@@ -1,16 +1,19 @@
-"""Vidu authenticated result trust and pinned public HTTPS boundary."""
+"""Credential-free result transfers and exact post-download media evidence."""
 
 from io import BytesIO
 import hashlib
 import http.client
 import socket
 import ssl
+from datetime import UTC, datetime
 
 import httpx
 import pytest
+from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.remote_media import RemoteMediaMaterializationReceipt
 from ai_video.production.vidu import HttpxViduTransport, ViduTransportRequest, ViduVideoProvider
 from ai_video.production.vidu_profile import ViduProviderProfile
 from ai_video.production import vidu_download
@@ -37,10 +40,47 @@ def test_legacy_profile_serialization_and_hash_are_preserved():
     assert profile.pointer().profile_sha256 == canonical_sha256(original)
 
 
-@pytest.mark.parametrize("mode,origins", [("fixed_origins", ()), ("authenticated_task", ("https://cdn.example",)), ("anything", ())])
+@pytest.mark.parametrize("mode,origins", [("anything", ())])
 def test_profile_rejects_ambiguous_or_implicit_trust(mode, origins):
     with pytest.raises(ValueError):
         _profile(result_trust=mode, result_origins=origins)
+
+
+def test_fixed_origin_list_is_legacy_metadata_and_may_be_empty():
+    profile = _profile(result_trust="fixed_origins", result_origins=())
+    assert profile.result_origins == ()
+
+
+def _materialization(origin, transport_kind):
+    return RemoteMediaMaterializationReceipt.create(
+        transport_kind=transport_kind,
+        provider_kind="vidu",
+        model_id="viduq3-pro",
+        submission_fingerprint="a" * 64,
+        paid_submit_receipt_fingerprint="b" * 64,
+        provider_file_id="creation-1",
+        remote_origin=origin,
+        remote_locator_sha256="c" * 64,
+        artifact_sha256="d" * 64,
+        artifact_size_bytes=128,
+        artifact_mime_type="video/mp4",
+        accessibility_verification="exact_get",
+        verified_at=datetime(2026, 10, 21, tzinfo=UTC),
+    )
+
+
+def test_materialization_receipt_accepts_canonical_http_and_preserves_https_shape():
+    https_receipt = _materialization("https://cdn.example", "provider_output_https")
+    assert RemoteMediaMaterializationReceipt.model_validate_json(https_receipt.model_dump_json()) == https_receipt
+    assert https_receipt.model_dump(mode="json")["transport_kind"] == "provider_output_https"
+    http_receipt = _materialization("http://127.0.0.1:8080", "provider_output_http")
+    assert http_receipt.remote_origin == "http://127.0.0.1:8080"
+    with pytest.raises(ValidationError):
+        _materialization("http://cdn.example", "provider_output_https")
+    with pytest.raises(ValidationError):
+        _materialization("https://cdn.example", "provider_output_http")
+    with pytest.raises(ValidationError):
+        _materialization("http://cdn.example:80", "provider_output_http")
 
 
 @pytest.mark.parametrize("mode", ["fixed_origins", "authenticated_task"])
@@ -61,6 +101,9 @@ class WireSocket:
     def settimeout(self, timeout):
         self.timeout = timeout
 
+    def setsockopt(self, *args):
+        pass
+
     def connect(self, address):
         self.address = address
 
@@ -74,15 +117,24 @@ class WireSocket:
         self.closed = True
 
 
-def _wire(monkeypatch, *, addresses=("8.8.8.8",), status=200, headers=b"", body=MP4, tls_error=False):
+def _wire(monkeypatch, *, addresses=("8.8.8.8",), status=200, headers=b"", body=MP4,
+          tls_error=False, responses=None):
     state = {"dns": [], "sockets": [], "sni": [], "contexts": []}
-    def resolve(host, port, **kwargs):
-        state["dns"].append((host, port, kwargs))
+    def resolve(host, port, *args, **kwargs):
+        state["dns"].append((host, port, args, kwargs))
         return [(socket.AF_INET6 if ":" in ip else socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP, "",
                  (ip, port, 0, 0) if ":" in ip else (ip, port)) for ip in addresses]
-    def make_socket(family, kind):
-        response = (f"HTTP/1.1 {status} Result\r\nContent-Type: video/mp4\r\nContent-Length: {len(body)}\r\n".encode()
-                    + headers + b"\r\n" + body)
+    def make_socket(family, kind, protocol=0):
+        if responses:
+            spec = responses.pop(0)
+            response_status = spec.get("status", 200)
+            response_headers = spec.get("headers", b"")
+            response_body = spec.get("body", MP4)
+            content_type = spec.get("content_type", "video/mp4")
+        else:
+            response_status, response_headers, response_body, content_type = status, headers, body, "video/mp4"
+        response = (f"HTTP/1.1 {response_status} Result\r\nContent-Type: {content_type}\r\nContent-Length: {len(response_body)}\r\n".encode()
+                    + response_headers + b"\r\n" + response_body)
         sock = WireSocket(response)
         state["sockets"].append(sock)
         return sock
@@ -98,7 +150,7 @@ def _wire(monkeypatch, *, addresses=("8.8.8.8",), status=200, headers=b"", body=
     return state
 
 
-def test_media_wire_pins_dns_and_isolates_api_credentials_and_proxy(monkeypatch, caplog):
+def test_media_wire_isolates_api_credentials_and_proxy(monkeypatch, caplog):
     state = _wire(monkeypatch)
     monkeypatch.setenv("HTTPS_PROXY", "http://127.0.0.1:9")
     seen = []
@@ -106,7 +158,7 @@ def test_media_wire_pins_dns_and_isolates_api_credentials_and_proxy(monkeypatch,
                       auth=("user", "password"), headers={"Authorization": "CLIENT-SECRET"},
                       cookies={"private": "cookie"}) as client:
         transport = HttpxViduTransport(client=client)
-        with transport.stream(ViduTransportRequest("GET", URL, {"accept": "video/mp4"})) as response:
+        with transport.stream(ViduTransportRequest("GET", URL, {"accept": "*/*"})) as response:
             assert b"".join(response.iter_bytes()) == MP4
     assert not seen
     assert len(state["dns"]) == len(state["sockets"]) == 1
@@ -117,25 +169,25 @@ def test_media_wire_pins_dns_and_isolates_api_credentials_and_proxy(monkeypatch,
     assert state["contexts"][0].check_hostname
     assert state["contexts"][0].verify_mode == ssl.CERT_REQUIRED
     wire = b"".join(sock.writes)
-    assert wire == (b"GET /output.mp4?private=token HTTP/1.1\r\nHost: media.vidu.example\r\n"
-                    b"Accept: video/mp4\r\nAccept-Encoding: identity\r\nConnection: close\r\n\r\n")
+    assert wire.startswith(b"GET /output.mp4?private=token HTTP/1.1\r\n")
+    assert b"Host: media.vidu.example\r\n" in wire
+    assert b"Accept: */*\r\n" in wire
+    assert b"Accept-Encoding: identity\r\n" in wire
+    assert b"Connection: close\r\n" in wire
+    assert b"Authorization:" not in wire and b"Cookie:" not in wire
     assert URL not in caplog.text
 
 
 @pytest.mark.parametrize("url", [
-    "http://cdn.example/v", "https://user:secret@cdn.example/v", "https://cdn.example:444/v",
-    "https://cdn.example/v#", "https://cdn.example/v#fragment", "https://cdn.example/v\r\n",
-    "https://cdn.example\\@evil.example/v", "https://cdn.example./v", "https://local/v",
-    "https://127.0.0.1/v", "https://10.0.0.1/v", "https://169.254.169.254/v",
-    "https://[::1]/v", "https://[::ffff:8.8.8.8]/v", "https://[2002:0808:0808::1]/v",
-    "https://cdn%2eexample/v", "https://cdn.example:/v", "https://cdn.example:0443/v",
-    "https://cdn.example//video.mp4",
+    "ftp://cdn.example/v", "https://user:secret@cdn.example/v",
+    "https://cdn.example/v\r\n", "https://cdn.example\\@evil.example/v",
+    "https://cdn.example:/v", "https://cdn.example:70000/v", "https:///v",
 ])
-def test_bad_locator_rejected_before_dns(monkeypatch, url):
+def test_invalid_locator_rejected_before_dns(monkeypatch, url):
     state = _wire(monkeypatch)
     with pytest.raises(AiVideoError):
         with vidu_download.stream_public_video(url, timeout_seconds=1):
-            pytest.fail("unsafe locator accepted")
+            pytest.fail("invalid locator accepted")
     assert not state["dns"] and not state["sockets"]
 
 
@@ -144,6 +196,25 @@ def test_empty_query_delimiter_is_preserved_on_wire(monkeypatch):
     with vidu_download.stream_public_video("https://cdn.example/v?", timeout_seconds=1) as response:
         assert b"".join(response.iter_bytes()) == MP4
     assert state["sockets"][0].writes[0].startswith(b"GET /v? HTTP/1.1\r\n")
+
+
+@pytest.mark.parametrize(
+    ("url", "expected_host", "expected_target"),
+    [
+        ("https://café.example/片段?q=值#client-fragment", "xn--caf-dma.example", "/%E7%89%87%E6%AE%B5?q=%E5%80%BC"),
+        ("https://cdn_stage.example/video.mp4", "cdn_stage.example", "/video.mp4"),
+    ],
+)
+def test_unicode_and_reg_name_locators_are_normalized_for_http(monkeypatch, url, expected_host, expected_target):
+    state = _wire(monkeypatch)
+    locator = vidu_download.parse_result_url(url)
+    assert locator.hostname == expected_host
+    assert locator.origin == f"https://{expected_host}"
+    with vidu_download.stream_public_video(url, timeout_seconds=1) as response:
+        assert b"".join(response.iter_bytes()) == MP4
+    wire = b"".join(state["sockets"][0].writes)
+    assert wire.startswith(f"GET {expected_target} HTTP/1.1\r\n".encode())
+    assert f"Host: {expected_host}\r\n".encode() in wire
 
 
 def test_global_http_debug_does_not_print_signed_locator(monkeypatch, capsys):
@@ -155,27 +226,27 @@ def test_global_http_debug_does_not_print_signed_locator(monkeypatch, capsys):
     assert captured.out == captured.err == ""
 
 
-@pytest.mark.parametrize("addresses", [(), ("127.0.0.1",), ("10.0.0.1",), ("169.254.169.254",),
-    ("100.64.0.1",), ("198.18.0.1",), ("192.0.2.1",), ("224.0.0.1",), ("::1",), ("fc00::1",),
-    ("fe80::1",), ("::ffff:8.8.8.8",), ("64:ff9b::a00:1",), ("8.8.8.8", "10.0.0.1"),
-])
-def test_all_dns_answers_must_be_public_before_any_connection(monkeypatch, addresses):
-    state = _wire(monkeypatch, addresses=addresses)
-    with pytest.raises(AiVideoError):
-        with vidu_download.stream_public_video(URL, timeout_seconds=1):
-            pytest.fail("unsafe address accepted")
-    assert len(state["dns"]) == 1 and not state["sockets"]
-
-
-def test_native_ipv6_address_is_pinned_with_original_sni(monkeypatch):
-    state = _wire(monkeypatch, addresses=("2606:4700:4700::1111",))
-    with vidu_download.stream_public_video(URL, timeout_seconds=1) as response:
+def test_private_ip_http_destination_and_alternate_port_are_allowed(monkeypatch):
+    state = _wire(monkeypatch, addresses=("127.0.0.1",))
+    url = "http://127.0.0.1:8080/video.mp4?token=private"
+    locator = vidu_download.parse_result_url(url)
+    assert locator.origin == "http://127.0.0.1:8080"
+    with vidu_download.stream_public_video(url, timeout_seconds=1) as response:
         assert b"".join(response.iter_bytes()) == MP4
-    assert state["sockets"][0].address == ("2606:4700:4700::1111", 443, 0, 0)
-    assert state["sni"] == ["media.vidu.example"]
+    assert state["dns"] == [("127.0.0.1", 8080, (0, socket.SOCK_STREAM), {})]
+    assert state["sockets"][0].address == ("127.0.0.1", 8080)
+    assert state["sni"] == []
 
 
-def test_explicit_resolver_pins_public_answer_without_ambient_dns_fallback(monkeypatch):
+def test_https_ipv6_keeps_original_sni_and_uses_alternate_port(monkeypatch):
+    state = _wire(monkeypatch, addresses=("2606:4700:4700::1111",))
+    with vidu_download.stream_public_video("https://[2606:4700:4700::1111]:8443/v", timeout_seconds=1) as response:
+        assert b"".join(response.iter_bytes()) == MP4
+    assert state["sockets"][0].address == ("2606:4700:4700::1111", 8443, 0, 0)
+    assert state["sni"] == ["2606:4700:4700::1111"]
+
+
+def test_explicit_resolver_is_used_without_ambient_dns_fallback(monkeypatch):
     state = _wire(monkeypatch, addresses=("198.18.0.24",))
     resolver_calls = []
 
@@ -203,12 +274,8 @@ def test_explicit_resolver_pins_public_answer_without_ambient_dns_fallback(monke
     ((socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP, "", ("8.8.8.8", 443)),),
     ((socket.AF_INET, socket.SOCK_STREAM),),
     (None,),
-    ((socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP, "", ("8.8.8.8", 443)),
-     (socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP, "", ("198.18.0.24", 443))),
-    ((socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP, "", ("8.8.8.8", 443)),
-     (socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP, "", ("10.0.0.1", 443))),
 ])
-def test_explicit_resolver_unsafe_answers_fail_closed_without_ambient_fallback(monkeypatch, answer):
+def test_explicit_resolver_invalid_answers_fail_without_ambient_fallback(monkeypatch, answer):
     state = _wire(monkeypatch, addresses=("8.8.8.8",))
     resolver_calls = []
 
@@ -219,7 +286,7 @@ def test_explicit_resolver_unsafe_answers_fail_closed_without_ambient_fallback(m
     with pytest.raises(AiVideoError):
         with vidu_download.stream_public_video(URL, timeout_seconds=1,
                                                download_resolver=resolver):
-            pytest.fail("unsafe resolver answer accepted")
+            pytest.fail("invalid resolver answer accepted")
     assert len(resolver_calls) == 1
     assert not state["dns"] and not state["sockets"]
 
@@ -238,15 +305,32 @@ def test_explicit_resolver_error_fails_closed_without_ambient_fallback(monkeypat
     assert not state["dns"] and not state["sockets"]
 
 
-@pytest.mark.parametrize("status,headers", [(302, b"Location: https://127.0.0.1/private\r\n"),
-                                            (200, b"Content-Encoding: gzip\r\n")])
-def test_redirects_and_encoded_bodies_are_not_followed_or_consumed(monkeypatch, status, headers):
-    state = _wire(monkeypatch, status=status, headers=headers)
+def test_cross_host_redirect_is_followed_without_forwarding_credentials(monkeypatch):
+    state = _wire(monkeypatch, addresses=("10.0.0.7",), responses=[
+        {"status": 302, "headers": b"Location: https://other.example:8443/final.mp4?signature=second\r\n", "body": b""},
+        {"status": 200, "headers": b"Set-Cookie: session=server-cookie\r\n", "body": MP4, "content_type": "text/plain"},
+    ])
+    with vidu_download.stream_public_video("http://first.example/start?signature=first", timeout_seconds=1) as response:
+        assert b"".join(response.iter_bytes()) == MP4
+        assert response.headers["Content-Type"] == "text/plain"
+    assert [entry[:2] for entry in state["dns"]] == [("first.example", 80), ("other.example", 8443)]
+    assert len(state["sockets"]) == 2
+    first_wire, second_wire = [b"".join(sock.writes) for sock in state["sockets"]]
+    for wire in (first_wire, second_wire):
+        assert b"Authorization:" not in wire and b"Cookie:" not in wire
+    assert b"Host: first.example\r\n" in first_wire
+    assert b"Host: other.example:8443\r\n" in second_wire
+    assert b"GET /final.mp4?signature=second HTTP/1.1" in second_wire
+    assert state["sni"] == ["other.example"]
+
+
+def test_redirect_loop_is_bounded(monkeypatch):
+    redirect = {"status": 302, "headers": b"Location: /again\r\n", "body": b""}
+    state = _wire(monkeypatch, responses=[dict(redirect) for _ in range(12)])
     with pytest.raises(AiVideoError):
         with vidu_download.stream_public_video(URL, timeout_seconds=1):
-            pytest.fail("bad response exposed")
-    assert len(state["sockets"]) == len(state["dns"]) == 1
-    assert state["sockets"][0].closed
+            pytest.fail("redirect loop accepted")
+    assert len(state["sockets"]) <= 11
 
 
 def test_tls_failure_sends_no_http_and_closes_socket(monkeypatch):
@@ -331,11 +415,10 @@ def test_dynamic_fetch_rejects_changed_identity_before_download(change):
         assert len(fake.calls) == before
 
 
-@pytest.mark.parametrize("failure", ["limit", "truncated", "sink"])
-def test_pinned_fetch_failure_never_emits_receipt_and_closes_socket(monkeypatch, failure):
+@pytest.mark.parametrize("failure", ["truncated", "sink"])
+def test_incomplete_or_sink_failure_never_emits_receipt_and_closes_socket(monkeypatch, failure):
     state = _wire(monkeypatch)
-    profile = _profile(result_trust="authenticated_task", result_origins=(),
-                       max_download_bytes=12 if failure == "limit" else 1024)
+    profile = _profile(result_trust="authenticated_task", result_origins=(), max_download_bytes=12)
     provider, fake, args = _setup(profile=profile)
     submission, receipt = _submitted(provider, args)
     observation = provider.get_status(submission, receipt)
@@ -349,8 +432,39 @@ def test_pinned_fetch_failure_never_emits_receipt_and_closes_socket(monkeypatch,
             sock.response = sock.response[:-1]
         return sock
     monkeypatch.setattr(vidu_download.socket, "socket", make_socket)
+    sink = FailingSink() if failure == "sink" else BytesIO()
     with httpx.Client(transport=httpx.MockTransport(lambda _: httpx.Response(200, json=fake.query))) as client:
         provider._transport = HttpxViduTransport(client=client)
         with pytest.raises(AiVideoError):
-            provider.fetch(submission, receipt, observation, FailingSink() if failure == "sink" else BytesIO())
+            provider.fetch(submission, receipt, observation, sink)
     assert len(state["sockets"]) == 1 and state["sockets"][0].closed
+    if failure == "truncated":
+        assert sink.getvalue() == MP4[:-1]
+
+
+def test_authenticated_fetch_ignores_origin_size_and_mime_metadata_after_exact_task_query():
+    profile = _profile(result_trust="authenticated_task", result_origins=(), max_download_bytes=12)
+    provider, fake, args = _setup(profile=profile)
+    submission, receipt = _submitted(provider, args)
+    observation = provider.get_status(submission, receipt)
+    url = "http://127.0.0.1:8080/result.mp4?sig=private"
+    fake.query["creations"][0]["url"] = url
+    fake.headers = {"content-type": "text/plain", "content-length": str(len(MP4))}
+    sink = BytesIO()
+    fetched = provider.fetch(submission, receipt, observation, sink)
+    assert sink.getvalue() == MP4
+    assert fetched.remote_materialization.remote_origin == "http://127.0.0.1:8080"
+    assert fetched.remote_materialization.transport_kind == "provider_output_http"
+
+
+@pytest.mark.parametrize("body", [b"not an mp4", MP4[:-1]])
+def test_bad_or_incomplete_media_is_written_before_post_download_rejection(body):
+    provider, fake, args = _setup(profile=_profile(max_download_bytes=12))
+    submission, receipt = _submitted(provider, args)
+    observation = provider.get_status(submission, receipt)
+    fake.body = body
+    fake.headers = {"content-type": "application/octet-stream", "content-length": str(len(body) + 1)}
+    sink = BytesIO()
+    with pytest.raises(AiVideoError):
+        provider.fetch(submission, receipt, observation, sink)
+    assert sink.getvalue() == body

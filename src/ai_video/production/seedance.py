@@ -17,7 +17,7 @@ from contextlib import AbstractContextManager
 from dataclasses import dataclass, field
 from datetime import UTC, datetime, timedelta
 from typing import BinaryIO, Literal, Protocol
-from urllib.parse import quote, urlsplit
+from urllib.parse import quote
 
 import httpx
 
@@ -83,6 +83,7 @@ from ai_video.production.video_compiler import (
     ProviderRequestCompilationResult,
 )
 from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
+from ai_video.production.vidu_download import parse_result_url, stream_public_video
 
 
 ARK_API_KEY_REFERENCE = "ARK_API_KEY"
@@ -122,9 +123,9 @@ def _matches_iso_bmff_container(
     if box_size < 16 or box_size > size_bytes:
         return False
     major_brand = prefix[8:12]
-    if content_type == "video/quicktime":
-        return major_brand == b"qt  "
-    return major_brand in _MP4_MAJOR_BRANDS
+    if major_brand == b"qt  ":
+        return content_type == "video/quicktime"
+    return content_type == "video/mp4" and major_brand in _MP4_MAJOR_BRANDS
 
 
 def _unknown_submit() -> AiVideoError:
@@ -184,6 +185,7 @@ class HttpxSeedanceTransport:
             timeout=httpx.Timeout(timeout_seconds), follow_redirects=False
         )
         self._owns_client = client is None
+        self._download_timeout = timeout_seconds
 
     def request(self, request: SeedanceTransportRequest) -> SeedanceTransportResponse:
         response = self._client.request(
@@ -202,6 +204,10 @@ class HttpxSeedanceTransport:
     def stream(
         self, request: SeedanceTransportRequest
     ) -> AbstractContextManager[SeedanceStreamResponse]:
+        if request.method == "GET":
+            return stream_public_video(
+                request.url, timeout_seconds=self._download_timeout
+            )
         return self._client.stream(
             request.method,
             request.url,
@@ -637,7 +643,6 @@ class SeedanceVideoProvider:
             or materialization.provider_kind != _PROVIDER_KIND
             or materialization.model_id
             != submission.provider_task_binding.response_model_id
-            or materialization.remote_origin not in self._profile.result_origins
         ):
             raise _error(
                 ErrorCode.VIDEO_REQUEST_INVALID,
@@ -702,21 +707,10 @@ class SeedanceVideoProvider:
                         ErrorCode.VIDEO_PROVIDER_FAILED,
                         "Seedance remote reference is not accessible.",
                     )
-                content_type = response.headers.get("content-type", "").split(";", 1)[0].lower()
-                if content_type != materialization.artifact_mime_type:
-                    raise _error(
-                        ErrorCode.VIDEO_ARTIFACT_INVALID,
-                        "Seedance remote reference content type changed.",
-                    )
                 for chunk in response.iter_bytes():
                     if not isinstance(chunk, bytes) or not chunk:
                         continue
                     size += len(chunk)
-                    if size > self._profile.max_download_bytes:
-                        raise _error(
-                            ErrorCode.VIDEO_ARTIFACT_INVALID,
-                            "Seedance remote reference exceeds the byte ceiling.",
-                        )
                     if len(prefix) < 64:
                         prefix.extend(chunk[: 64 - len(prefix)])
                     digest.update(chunk)
@@ -951,28 +945,12 @@ class SeedanceVideoProvider:
 
     def _result_url(self, value: str) -> str:
         try:
-            parsed = urlsplit(value)
-            port = parsed.port
-        except ValueError:
+            parse_result_url(value)
+        except (AiVideoError, ValueError, TypeError):
             raise _error(
                 ErrorCode.VIDEO_PROVIDER_FAILED,
                 "Seedance result URL is invalid.",
             ) from None
-        if (
-            parsed.scheme != "https"
-            or parsed.hostname is None
-            or parsed.username is not None
-            or parsed.password is not None
-            or not parsed.path
-            or parsed.fragment
-        ):
-            raise _error(ErrorCode.VIDEO_PROVIDER_FAILED, "Seedance result URL is invalid.")
-        host = parsed.hostname.lower()
-        origin = f"https://{host}"
-        if port is not None and port != 443:
-            origin = f"{origin}:{port}"
-        if origin not in self._profile.result_origins:
-            raise _error(ErrorCode.VIDEO_PROVIDER_FAILED, "Seedance result origin is not allowed.")
         return value
 
     def fetch(
@@ -1006,6 +984,7 @@ class SeedanceVideoProvider:
         if state is not VideoTaskState.SUCCEEDED or result_url is None:
             raise _error(ErrorCode.VIDEO_PROVIDER_FAILED, "Seedance task is not fetchable.")
         verified_result_url = self._result_url(result_url)
+        locator = parse_result_url(verified_result_url)
         request = SeedanceTransportRequest(
             method="GET",
             url=verified_result_url,
@@ -1014,6 +993,7 @@ class SeedanceVideoProvider:
         digest = hashlib.sha256()
         size = 0
         prefix = bytearray()
+        content_length: str | None = None
         try:
             with self._transport.stream(request) as response:
                 if not 200 <= response.status_code < 300:
@@ -1021,29 +1001,18 @@ class SeedanceVideoProvider:
                         ErrorCode.VIDEO_PROVIDER_FAILED,
                         f"Seedance download returned HTTP {response.status_code}.",
                     )
-                raw_type = response.headers.get("content-type", "").split(";", 1)[0].lower()
-                if raw_type not in {"video/mp4", "video/quicktime"}:
-                    raise _error(
-                        ErrorCode.VIDEO_ARTIFACT_INVALID,
-                        "Seedance download content type is not an accepted video container.",
-                    )
-                if (
-                    submission.expected_content_type is not None
-                    and raw_type != submission.expected_content_type
-                ):
-                    raise _error(
-                        ErrorCode.VIDEO_ARTIFACT_INVALID,
-                        "Seedance download container does not match the durable submit intent.",
-                    )
+                content_length = next(
+                    (
+                        value
+                        for key, value in response.headers.items()
+                        if key.lower() == "content-length"
+                    ),
+                    None,
+                )
                 for chunk in response.iter_bytes():
                     if not isinstance(chunk, bytes) or not chunk:
                         continue
                     size += len(chunk)
-                    if size > self._profile.max_download_bytes:
-                        raise _error(
-                            ErrorCode.VIDEO_ARTIFACT_INVALID,
-                            "Seedance download exceeds the configured byte ceiling.",
-                        )
                     if len(prefix) < 64:
                         prefix.extend(chunk[: 64 - len(prefix)])
                     digest.update(chunk)
@@ -1056,22 +1025,53 @@ class SeedanceVideoProvider:
                 "Seedance download transport failed.",
                 retryable=True,
             ) from None
-        if not _matches_iso_bmff_container(
-            content_type=raw_type,
-            prefix=bytes(prefix),
-            size_bytes=size,
-        ):
+        raw_type = next(
+            (
+                candidate
+                for candidate in ("video/mp4", "video/quicktime")
+                if _matches_iso_bmff_container(
+                    content_type=candidate,
+                    prefix=bytes(prefix),
+                    size_bytes=size,
+                )
+            ),
+            None,
+        )
+        if content_length is not None:
+            try:
+                declared_size = int(content_length)
+            except ValueError:
+                raise _error(
+                    ErrorCode.VIDEO_ARTIFACT_INVALID,
+                    "Seedance download Content-Length is invalid.",
+                ) from None
+            if declared_size < 0 or declared_size != size:
+                raise _error(
+                    ErrorCode.VIDEO_ARTIFACT_INVALID,
+                    "Seedance download size does not match Content-Length.",
+                )
+        if raw_type is None:
             raise _error(
                 ErrorCode.VIDEO_ARTIFACT_INVALID,
                 "Seedance download is not a measured MP4/MOV artifact.",
             )
+        if (
+            submission.expected_content_type is not None
+            and raw_type != submission.expected_content_type
+        ):
+            raise _error(
+                ErrorCode.VIDEO_ARTIFACT_INVALID,
+                "Seedance download container does not match the durable submit intent.",
+            )
         fetched_at = self._now()
-        parsed_result = urlsplit(verified_result_url)
-        remote_origin = f"https://{parsed_result.hostname.lower()}"
-        if parsed_result.port is not None and parsed_result.port != 443:
-            remote_origin = f"{remote_origin}:{parsed_result.port}"
+        remote_origin = locator.origin
+        transport_kind = (
+            "provider_output_https"
+            if remote_origin.startswith("https:")
+            else "provider_output_http"
+        )
         remote_materialization = RemoteMediaMaterializationReceipt.create(
-            transport_kind="provider_output_https",
+            transport_kind=transport_kind,
             provider_kind=_PROVIDER_KIND,
             model_id=submission.provider_task_binding.response_model_id,
             submission_fingerprint=submission.submission_fingerprint,

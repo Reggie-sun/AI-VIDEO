@@ -18,14 +18,14 @@ _SAFE_ID = re.compile(r"^[A-Za-z0-9._:/-]{1,256}$")
 _SHA256 = r"^[0-9a-f]{64}$"
 
 
-def _canonical_https_origin(value: str) -> str:
+def _canonical_http_origin(value: str) -> str:
     try:
         parsed = urlsplit(value)
         port = parsed.port
     except ValueError as exc:
-        raise ValueError("remote media origin must be a canonical HTTPS origin") from exc
+        raise ValueError("remote media origin must be a canonical HTTP(S) origin") from exc
     if (
-        parsed.scheme != "https"
+        parsed.scheme not in {"http", "https"}
         or parsed.hostname is None
         or parsed.username is not None
         or parsed.password is not None
@@ -33,15 +33,17 @@ def _canonical_https_origin(value: str) -> str:
         or parsed.query
         or parsed.fragment
     ):
-        raise ValueError("remote media origin must be a canonical HTTPS origin")
+        raise ValueError("remote media origin must be a canonical HTTP(S) origin")
     host = parsed.hostname.lower()
     if ":" in host:
         host = f"[{host}]"
-    canonical = f"https://{host}"
-    if port is not None and port != 443:
+    scheme = parsed.scheme
+    default_port = 443 if scheme == "https" else 80
+    canonical = f"{scheme}://{host}"
+    if port is not None and port != default_port:
         canonical = f"{canonical}:{port}"
     if value != canonical:
-        raise ValueError("remote media origin must be a canonical HTTPS origin")
+        raise ValueError("remote media origin must be a canonical HTTP(S) origin")
     return value
 
 
@@ -53,7 +55,7 @@ class RemoteMediaMaterializationReceipt(_RemoteMediaStrictModel):
     """Exact remote locator-to-byte binding without persisting the locator."""
 
     schema_version: Literal["1"] = "1"
-    transport_kind: Literal["provider_output_https"]
+    transport_kind: Literal["provider_output_https", "provider_output_http"]
     provider_kind: str = Field(pattern=_SAFE_ID.pattern)
     model_id: str = Field(pattern=_SAFE_ID.pattern)
     submission_fingerprint: str = Field(pattern=_SHA256)
@@ -71,7 +73,7 @@ class RemoteMediaMaterializationReceipt(_RemoteMediaStrictModel):
     @field_validator("remote_origin")
     @classmethod
     def _canonical_origin(cls, value: str) -> str:
-        return _canonical_https_origin(value)
+        return _canonical_http_origin(value)
 
     @field_validator("verified_at")
     @classmethod
@@ -84,6 +86,9 @@ class RemoteMediaMaterializationReceipt(_RemoteMediaStrictModel):
 
     @model_validator(mode="after")
     def _validate_seal(self) -> "RemoteMediaMaterializationReceipt":
+        scheme = urlsplit(self.remote_origin).scheme
+        if (self.transport_kind == "provider_output_https") != (scheme == "https"):
+            raise ValueError("remote media transport kind does not match its origin")
         if self.content_hash != canonical_sha256(
             self.model_dump(mode="json", exclude={"content_hash"})
         ):

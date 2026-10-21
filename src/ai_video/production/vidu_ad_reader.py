@@ -105,8 +105,7 @@ def verify_ad_evidence(root, manifest):
                         or receipt.submit_receipt_fingerprint != candidate.submit_receipt_hash):
                     raise ValueError("ad candidate task or receipt changed")
                 raw = _read(root, candidate.path)
-                if (len(raw.data) != candidate.size_bytes or raw.file_sha256 != candidate.sha256
-                        or candidate.size_bytes > profile.max_download_bytes):
+                if len(raw.data) != candidate.size_bytes or raw.file_sha256 != candidate.sha256:
                     raise ValueError("ad candidate bytes changed")
         for task_id, (limit, _) in scopes.items():
             if sum(a.ad_generation_state is not None and a.ad_generation_state.request.task_id == task_id

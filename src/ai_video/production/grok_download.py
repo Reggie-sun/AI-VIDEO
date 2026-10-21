@@ -1,4 +1,4 @@
-"""Pinned, credential-free Grok video result downloads."""
+"""Credential-free Grok video result downloads."""
 
 from __future__ import annotations
 
@@ -19,25 +19,22 @@ GROK_VIDEO_RESULT_ORIGIN = "https://vidgen.x.ai"
 def _invalid_locator() -> AiVideoError:
     return AiVideoError(
         code=ErrorCode.VIDEO_ARTIFACT_INVALID,
-        user_message="Grok video result must use the documented public HTTPS origin.",
+        user_message="Grok video result requires a valid credential-free HTTP(S) locator.",
     )
 
 
 def parse_grok_result_url(url: str) -> ViduResultLocator:
-    """Require the documented host before using the shared pinned-IP downloader."""
+    """Validate a result locator without constraining its origin."""
 
     try:
-        locator = parse_result_url(url)
+        return parse_result_url(url)
     except AiVideoError:
         raise _invalid_locator() from None
-    if locator.origin != GROK_VIDEO_RESULT_ORIGIN:
-        raise _invalid_locator()
-    return locator
 
 
 @contextmanager
 def stream_public_grok_video(url: str, *, timeout_seconds: float) -> Iterator[object]:
-    """Stream a Grok result without credentials, redirects, or unpinned DNS."""
+    """Stream a Grok result without credentials or cookies on any redirect hop."""
 
     parse_grok_result_url(url)
     try:

@@ -84,7 +84,7 @@ class MetasoH3Profile(StrictModel):
 
 
 class HttpxMetasoH3Transport(HttpxMiniMaxH3Transport):
-    """API transport plus credential-free, public-address-pinned result GET."""
+    """API transport plus the shared credential-free result downloader."""
 
     error_label = "METASO"
 

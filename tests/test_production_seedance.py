@@ -11,6 +11,7 @@ from contextlib import contextmanager
 from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
+import httpx
 import pytest
 from pydantic import ValidationError
 
@@ -156,6 +157,43 @@ class _FakeTransport:
     def stream(self, request: SeedanceTransportRequest):
         self.requests.append(request)
         yield self.stream_response
+
+
+def test_httpx_result_download_uses_credential_free_stream(monkeypatch):
+    client_calls: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        client_calls.append(request)
+        return httpx.Response(500)
+
+    public_calls: list[tuple[str, float]] = []
+
+    @contextmanager
+    def public_stream(url: str, *, timeout_seconds: float, download_resolver=None):
+        public_calls.append((url, timeout_seconds))
+        yield _StreamResponse(
+            status=200,
+            content_type="video/mp4",
+            chunks=(b"\x00\x00\x00\x10ftypisom\x00\x00\x00\x00",),
+        )
+
+    monkeypatch.setattr(seedance_adapter, "stream_public_video", public_stream)
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        transport = seedance_adapter.HttpxSeedanceTransport(
+            client=client, timeout_seconds=7.0
+        )
+        request = SeedanceTransportRequest(
+            method="GET",
+            url="https://signed.example/result.mp4?token=short-lived",
+            headers={"authorization": "must-not-forward", "cookie": "ambient"},
+        )
+        with transport.stream(request) as response:
+            assert b"".join(response.iter_bytes()).startswith(
+                b"\x00\x00\x00\x10ftyp"
+            )
+
+    assert public_calls == [(request.url, 7.0)]
+    assert client_calls == []
 
 
 def _json_response(payload: dict[str, object], *, status: int = 200) -> SeedanceTransportResponse:
@@ -3669,7 +3707,7 @@ def test_seedance_2_5_edit_payload_maps_explicit_reference_and_provider_fields()
     }
 
 
-def test_poll_and_fetch_bind_same_task_and_accept_only_allowed_origin_mp4():
+def test_poll_and_fetch_bind_same_task_without_restricting_result_origin_or_header():
     profile = _profile()
     transport = _FakeTransport()
     transport.responses.extend(
@@ -3679,7 +3717,7 @@ def test_poll_and_fetch_bind_same_task_and_accept_only_allowed_origin_mp4():
                     "id": "task-seedance-1",
                     "model": "doubao-seedance-2-5-260628",
                     "status": "succeeded",
-                    "content": {"video_url": "https://media.example/result.mp4"},
+                    "content": {"video_url": "http://other.example:8080/result.mp4"},
                 }
             ),
             _json_response(
@@ -3687,7 +3725,7 @@ def test_poll_and_fetch_bind_same_task_and_accept_only_allowed_origin_mp4():
                     "id": "task-seedance-1",
                     "model": "doubao-seedance-2-5-260628",
                     "status": "succeeded",
-                    "content": {"video_url": "https://media.example/result.mp4"},
+                    "content": {"video_url": "http://other.example:8080/result.mp4"},
                 }
             ),
         )
@@ -3707,6 +3745,11 @@ def test_poll_and_fetch_bind_same_task_and_accept_only_allowed_origin_mp4():
         resolved=resolved, receipt=paid_receipt
     )
     observation = provider.get_status(submission, paid_receipt)
+    transport.stream_response = _StreamResponse(
+        status=200,
+        content_type="text/html",
+        chunks=(b"\x00\x00\x00\x10ftypisom\x00\x00\x00\x00", b"video-bytes"),
+    )
     sink = bytearray()
 
     class _Sink:
@@ -3718,22 +3761,33 @@ def test_poll_and_fetch_bind_same_task_and_accept_only_allowed_origin_mp4():
     assert receipt.content_type == "video/mp4"
     assert receipt.size_bytes == len(sink)
     assert receipt.remote_materialization is not None
-    assert receipt.remote_materialization.transport_kind == "provider_output_https"
-    assert receipt.remote_materialization.remote_origin == "https://media.example"
+    assert receipt.remote_materialization.transport_kind == "provider_output_http"
+    assert receipt.remote_materialization.remote_origin == "http://other.example:8080"
     assert receipt.remote_materialization.remote_locator_sha256 == hashlib.sha256(
-        b"https://media.example/result.mp4"
+        b"http://other.example:8080/result.mp4"
     ).hexdigest()
     assert receipt.remote_materialization.artifact_sha256 == receipt.artifact_sha256
     assert receipt.remote_materialization.artifact_size_bytes == receipt.size_bytes
-    assert "https://media.example/result.mp4" not in receipt.model_dump_json()
-    assert all("https://media.example/result.mp4" not in repr(req) for req in transport.requests)
+    assert "http://other.example:8080/result.mp4" not in receipt.model_dump_json()
+    assert all("http://other.example:8080/result.mp4" not in repr(req) for req in transport.requests)
 
 
 def test_seedance_provider_output_lease_drives_exact_video_extend_without_ark_asset():
     asset_module = importlib.import_module("ai_video.production.seedance_asset")
     result_url = "https://media.example/result.mp4?token=short-lived"
-    profile = _profile()
+    base_profile = _profile()
+    profile = SeedanceProviderProfile.create(
+        pricing=base_profile.pricing,
+        result_origins=base_profile.result_origins,
+        capabilities=base_profile.capabilities,
+        max_download_bytes=12,
+    )
     transport = _FakeTransport()
+    transport.stream_response = _StreamResponse(
+        status=200,
+        content_type="text/html",
+        chunks=(b"\x00\x00\x00\x10ftypisom\x00\x00\x00\x00", b"video-bytes"),
+    )
     transport.responses.extend(
         (
             _json_response(
@@ -4342,7 +4396,7 @@ def test_fetch_accepts_only_measured_supported_video_containers(
     transport.responses.extend((_json_response(query), _json_response(query)))
     transport.stream_response = _StreamResponse(
         status=200,
-        content_type=content_type,
+        content_type="video/quicktime" if content_type == "video/mp4" else "text/plain",
         chunks=(
             b"\x00\x00\x00\x10ftyp"
             + (b"qt  " if suffix == "mov" else b"isom")
@@ -4479,7 +4533,7 @@ def test_fetch_rejects_container_that_differs_from_durable_submit_intent():
     assert exc_info.value.code is ErrorCode.VIDEO_ARTIFACT_INVALID
 
 
-def test_fetch_rejects_download_over_profile_byte_ceiling():
+def test_fetch_does_not_apply_profile_download_byte_ceiling():
     base = _profile()
     profile = SeedanceProviderProfile.create(
         pricing=base.pricing,
@@ -4497,8 +4551,8 @@ def test_fetch_rejects_download_over_profile_byte_ceiling():
     transport.responses.extend((_json_response(query), _json_response(query)))
     transport.stream_response = _StreamResponse(
         status=200,
-        content_type="video/mp4",
-        chunks=(b"\x00\x00\x00\x10ftypisom\x00\x00\x00\x00", b"too-large"),
+        content_type="text/html",
+        chunks=(b"\x00\x00\x00\x18ftypisom\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",),
     )
     provider = SeedanceVideoProvider(
         profile=profile,
@@ -4516,20 +4570,19 @@ def test_fetch_rejects_download_over_profile_byte_ceiling():
     )
     observation = provider.get_status(submission, paid_receipt)
 
-    with pytest.raises(AiVideoError) as exc_info:
-        provider.fetch(submission, paid_receipt, observation, _FakeWriteSink())
-    assert exc_info.value.code is ErrorCode.VIDEO_ARTIFACT_INVALID
+    receipt = provider.fetch(submission, paid_receipt, observation, _FakeWriteSink())
+    assert receipt.size_bytes > profile.max_download_bytes
+    assert receipt.content_type == "video/mp4"
 
 
 @pytest.mark.parametrize(
     ("result_url", "status", "content_type", "expected_code"),
     [
-        ("https://other.example/result.mp4", 200, "video/mp4", ErrorCode.VIDEO_PROVIDER_FAILED),
         ("https://media.example/result.mp4", 302, "video/mp4", ErrorCode.VIDEO_PROVIDER_FAILED),
-        ("https://media.example/result.mp4", 200, "text/html", ErrorCode.VIDEO_ARTIFACT_INVALID),
+        ("https://media.example/result.mp4", 200, "video/mp4", ErrorCode.VIDEO_ARTIFACT_INVALID),
     ],
 )
-def test_fetch_fails_closed_for_origin_redirect_and_non_video(
+def test_fetch_rejects_non_success_status_and_unmeasured_container(
     result_url: str,
     status: int,
     content_type: str,
@@ -4547,7 +4600,11 @@ def test_fetch_fails_closed_for_origin_redirect_and_non_video(
     transport.stream_response = _StreamResponse(
         status=status,
         content_type=content_type,
-        chunks=(b"\x00\x00\x00\x10ftypisom\x00\x00\x00\x00",),
+        chunks=(
+            b"\x00\x00\x00\x10ftypisom\x00\x00\x00\x00"
+            if status == 302
+            else b"not-a-container",
+        ),
     )
     provider = SeedanceVideoProvider(
         profile=profile,

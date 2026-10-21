@@ -17,7 +17,6 @@ from pydantic_core import PydanticSerializationError
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.grok_download import (
-    GROK_VIDEO_RESULT_ORIGIN,
     parse_grok_result_url,
     stream_public_grok_video,
 )
@@ -173,13 +172,9 @@ class HttpxGrokTransport:
     def stream(
         self, request: GrokTransportRequest
     ) -> Iterator[GrokStreamResponse]:
-        if (
-            request.method != "GET"
-            or request.body
-            or dict(request.headers) != {"accept": "video/mp4"}
-        ):
+        if request.method != "GET" or request.body or dict(request.headers) != {"accept": "*/*"}:
             raise _error(
-                "Grok result downloads must be credential-free video GETs.",
+                "Grok result downloads must be credential-free GETs.",
                 ErrorCode.VIDEO_ARTIFACT_INVALID,
             )
         parse_grok_result_url(request.url)
@@ -735,48 +730,41 @@ class GrokVideoProvider:
 
     def _stream_mp4(self, url: str, sink: BinaryIO) -> tuple[str, int]:
         parse_grok_result_url(url)
-        request = GrokTransportRequest("GET", url, {"accept": "video/mp4"})
+        request = GrokTransportRequest("GET", url, {"accept": "*/*"})
         size = 0
         prefix = bytearray()
         digest = hashlib.sha256()
-        declared: int | None = None
+        declared: str | None = None
         try:
             with self._transport.stream(request) as response:
                 headers = {key.lower(): value for key, value in response.headers.items()}
-                if (
-                    response.status_code != 200
-                    or headers.get("content-type", "").split(";", 1)[0].strip().lower()
-                    != "video/mp4"
-                ):
+                if response.status_code != 200:
                     raise _error(
-                        "Grok video download must be an HTTP 200 MP4.",
+                        "Grok video download must return HTTP 200.",
                         ErrorCode.VIDEO_ARTIFACT_INVALID,
                     )
-                if "content-length" in headers:
-                    raw_length = headers["content-length"]
-                    if not raw_length.isascii() or not raw_length.isdecimal():
-                        raise _error("Grok video download length is invalid.", ErrorCode.VIDEO_ARTIFACT_INVALID)
-                    declared = int(raw_length)
-                    if not 0 < declared <= self._profile.max_download_bytes:
-                        raise _error("Grok video download exceeds the profile limit.", ErrorCode.VIDEO_ARTIFACT_INVALID)
+                declared = headers.get("content-length")
                 for chunk in response.iter_bytes():
-                    if size + len(chunk) > self._profile.max_download_bytes:
-                        raise _error("Grok video download exceeds the profile limit.", ErrorCode.VIDEO_ARTIFACT_INVALID)
                     prefix.extend(chunk[:max(0, 32 - len(prefix))])
                     sink.write(chunk)
                     digest.update(chunk)
                     size += len(chunk)
+                sink.flush()
         except AiVideoError:
             raise
         except Exception:
             raise _error("Grok video download failed.", retryable=True) from None
+        declared_size: int | None = None
+        if declared is not None:
+            if not declared.isascii() or not declared.isdecimal():
+                raise _error("Grok video download length is invalid.", ErrorCode.VIDEO_ARTIFACT_INVALID)
+            declared_size = int(declared)
         if (
             size < 12
             or prefix[4:8] != b"ftyp"
-            or (declared is not None and declared != size)
+            or (declared_size is not None and declared_size != size)
         ):
             raise _error("Grok video download is not a complete MP4.", ErrorCode.VIDEO_ARTIFACT_INVALID)
-        sink.flush()
         return digest.hexdigest(), size
 
     def fetch(
@@ -804,14 +792,16 @@ class GrokVideoProvider:
             raise _error("Grok result identity changed before download.")
         artifact_sha256, size = self._stream_mp4(url, sink)
         fetched_at = self._now()
+        result_locator = parse_grok_result_url(url)
         materialization = RemoteMediaMaterializationReceipt.create(
-            transport_kind="provider_output_https",
+            transport_kind=("provider_output_https" if result_locator.scheme == "https"
+                            else "provider_output_http"),
             provider_kind="grok",
             model_id=model_id,
             submission_fingerprint=submission.submission_fingerprint,
             paid_submit_receipt_fingerprint=submission.paid_submit_receipt_fingerprint,
             provider_file_id=observation.provider_file_id,
-            remote_origin=GROK_VIDEO_RESULT_ORIGIN,
+            remote_origin=result_locator.origin,
             remote_locator_sha256=hashlib.sha256(url.encode("utf-8")).hexdigest(),
             artifact_sha256=artifact_sha256,
             artifact_size_bytes=size,

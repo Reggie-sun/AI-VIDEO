@@ -557,7 +557,7 @@ def test_fetch_requeries_exact_task_and_seals_locator_to_mp4_bytes():
         VIDEO_URL.encode()
     ).hexdigest()
     assert len([call for call in transport.calls if call.method == "GET"]) == 2
-    assert transport.downloads[0].headers == {"accept": "video/mp4"}
+    assert transport.downloads[0].headers == {"accept": "*/*"}
 
 
 def test_fetch_accepts_mp4_ftyp_with_a_different_major_brand():
@@ -570,21 +570,32 @@ def test_fetch_accepts_mp4_ftyp_with_a_different_major_brand():
     assert fetched.size_bytes == len(transport.download_body)
 
 
-def test_fetch_rejects_untrusted_origin_and_download_over_profile_limit():
+def test_fetch_accepts_arbitrary_http_origin_small_legacy_limit_and_misleading_mime():
     profile = _profile(max_download_bytes=12)
     provider, transport, args, _, _, _ = _setup(profile=profile)
+    transport.query_payload["video"]["url"] = "http://127.0.0.1:8080/output.mp4?token=short-lived"
     submission, receipt = _submission(provider, transport, args)
     observation = provider.get_status(submission, receipt)
     sink = BytesIO()
+    transport.download_headers["content-type"] = "text/plain"
+    fetched = provider.fetch(submission, receipt, observation, sink)
+    assert sink.getvalue() == MP4
+    assert fetched.remote_materialization.remote_origin == "http://127.0.0.1:8080"
+    assert fetched.remote_materialization.transport_kind == "provider_output_http"
+    assert transport.downloads[0].headers == {"accept": "*/*"}
+
+
+def test_fetch_writes_complete_bad_media_before_rejecting_it():
+    provider, transport, args, _, _, _ = _setup()
+    submission, receipt = _submission(provider, transport, args)
+    observation = provider.get_status(submission, receipt)
+    transport.download_body = b"not an mp4"
+    transport.download_headers["content-type"] = "application/octet-stream"
+    transport.download_headers["content-length"] = str(len(transport.download_body))
+    sink = BytesIO()
     with pytest.raises(AiVideoError):
         provider.fetch(submission, receipt, observation, sink)
-    assert len(transport.downloads) == 1
-    assert sink.getvalue() == b""
-
-    transport.query_payload["video"]["url"] = "https://attacker.example/video.mp4"
-    with pytest.raises(AiVideoError):
-        provider.fetch(submission, receipt, observation, BytesIO())
-    assert len(transport.downloads) == 1
+    assert sink.getvalue() == transport.download_body
 
 
 def test_http_transport_does_not_merge_injected_client_auth_or_cookies():

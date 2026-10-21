@@ -210,6 +210,27 @@ class ComfyClient:
                     return True
         return False
 
+    def _get_artifact(self, *, filename: str, subfolder: str, type_: str) -> httpx.Response:
+        response = self.http.get(
+            self._url("/view"),
+            params={"filename": filename, "subfolder": subfolder, "type": type_},
+            follow_redirects=False,
+        )
+        # The selected ComfyUI endpoint may require its own API authentication.
+        # Redirected artifact GETs use fresh requests without ambient client secrets.
+        for redirects in range(self.http.max_redirects + 1):
+            if not response.has_redirect_location:
+                return response
+            if redirects == self.http.max_redirects:
+                response.close()
+                raise httpx.TooManyRedirects("Artifact redirect loop.")
+            target = response.request.url.join(response.headers["location"])
+            target = target.copy_with(username="", password="")
+            response.close()
+            request = httpx.Request("GET", target, headers={"accept": "*/*"})
+            response = self.http.send(request, auth=None, follow_redirects=False)
+        raise httpx.TooManyRedirects("Artifact redirect loop.")
+
     def download_artifact(
         self,
         *,
@@ -221,16 +242,13 @@ class ComfyClient:
         target_path = Path(target)
         target_path.parent.mkdir(parents=True, exist_ok=True)
         try:
-            response = self.http.get(
-                self._url("/view"),
-                params={"filename": filename, "subfolder": subfolder, "type": type_},
-            )
+            response = self._get_artifact(filename=filename, subfolder=subfolder, type_=type_)
             response.raise_for_status()
         except httpx.HTTPError as exc:
             raise retryable_error(
                 ErrorCode.COMFY_OUTPUT_MISSING,
                 f"Could not download ComfyUI artifact: {filename}",
-                str(exc),
+                type(exc).__name__,
                 exc,
             ) from exc
         target_path.write_bytes(response.content)
@@ -249,16 +267,13 @@ class ComfyClient:
         does not mutate the filesystem.
         """
         try:
-            response = self.http.get(
-                self._url("/view"),
-                params={"filename": filename, "subfolder": subfolder, "type": type_},
-            )
+            response = self._get_artifact(filename=filename, subfolder=subfolder, type_=type_)
             response.raise_for_status()
         except httpx.HTTPError as exc:
             raise retryable_error(
                 ErrorCode.COMFY_OUTPUT_MISSING,
                 f"Could not fetch ComfyUI artifact bytes: {filename}",
-                str(exc),
+                type(exc).__name__,
                 exc,
             ) from exc
         return bytes(response.content)

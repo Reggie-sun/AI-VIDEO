@@ -136,9 +136,12 @@ def _committer(root: Path) -> ProductionStateCommitter:
 
 
 def _prepared(root: Path, *, attempt: str = "ad-attempt-1", task_id: str = "ad-task-1",
-              submit_limit: int = 1, prompt: str = "Show the product."):
+              submit_limit: int = 1, prompt: str = "Show the product.",
+              max_download_bytes: int | None = None):
     transport = AdTransport()
     profile = _profile()
+    if max_download_bytes is not None:
+        profile = profile.model_copy(update={"max_download_bytes": max_download_bytes})
     provider = _provider(root, transport, profile)
     request = _request(root, profile, attempt=attempt, task_id=task_id,
                        submit_limit=submit_limit, prompt=prompt)
@@ -165,6 +168,23 @@ def test_public_lifecycle_persists_unaccepted_mp4_source_candidate(tmp_path):
     assert attempt.ad_generation_state.candidate == candidate
     assert attempt.candidate_project is attempt.candidate_registry is None
     assert sum(call.method == "POST" for call in transport.calls) == 1
+
+
+def test_download_above_legacy_ceiling_reopens_with_exact_bytes(tmp_path):
+    write_production_project(tmp_path)
+    committer, provider, transport, _, _ = _prepared(tmp_path, max_download_bytes=1)
+    transport.headers["content-type"] = "application/octet-stream"
+    committer.submit_ad_generation(attempt_id="ad-attempt-1", provider=provider)
+    committer.query_ad_generation(attempt_id="ad-attempt-1", provider=provider)
+
+    candidate = committer.fetch_ad_generation(attempt_id="ad-attempt-1", provider=provider)
+
+    assert (tmp_path / candidate.path).read_bytes() == MP4
+    assert candidate.size_bytes > 1
+    loaded = load_production_project(tmp_path / "project.yaml")
+    attempt = next(a for a in loaded.manifest.attempts if a.attempt_id == "ad-attempt-1")
+    assert attempt.ad_generation_state.candidate == candidate
+    assert candidate.acceptance == "not_evaluated"
 
 
 def test_restart_submit_replay_reuses_accepted_task_without_network_or_write(tmp_path):

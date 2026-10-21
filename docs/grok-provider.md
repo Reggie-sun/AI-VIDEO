@@ -92,7 +92,7 @@ approved intent/prompt 需按实际顺序表达 `<IMAGE_n>` / `<AUDIO_n>`：firs
 exact byte supplier 验 size/hash/MP4 envelope 后发 data URI，无额外上传；128MiB source / 400MiB
 aggregate body 是本地保守上限。artifact 与 reader 同时重验继承尺寸/时长及 declared resolution。
 POST 返回真实 `request_id`，GET 同一 ID 的 pending/done/failed；done 必须匹配 model 与 moderation。
-fetch 重开同一 task，无凭据 public-IP pinned 下载 trusted temporary MP4。
+fetch 重开同一 task，经无凭据 HTTP(S) 下载器获取结果，支持正常 CDN redirect 并在下载后核验媒体。
 来源：[video generation](https://docs.x.ai/developers/model-capabilities/video/generation)、
 [image-to-video](https://docs.x.ai/developers/model-capabilities/video/image-to-video)、
 [reference-to-video](https://docs.x.ai/developers/model-capabilities/video/reference-to-video)、
@@ -124,7 +124,11 @@ paid preview 使用 `remote_subscription`、每次现金 upper bound 零和 seal
 known failure 仍消耗一次；unknown 不释放、不结算、不自动重试。没有第二账本或 writer。
 Video credential 注入 `GrokOAuthManager.credential_supplier(profile.account_fingerprint)`；
 image 注入 `GrokOAuthManager.credential` 并重验返回 credential 的 account/reference/expiry。
-transport 使用 `HttpxGrokTransport` / `HttpxGrokImageTransport`，禁止 redirect、client auth/cookies 注入。
+API transport 使用 `HttpxGrokTransport` / `HttpxGrokImageTransport`，禁止认证 API
+redirect 和 client auth/cookies 注入。视频结果 GET 使用独立无凭据 HTTP(S) 下载器，
+允许正常 CDN redirect，不再限定 `vidgen.x.ai`、公网 IP、端口、MIME 或文件大小。
+完整传输后核验实际媒体、长度和 SHA-256，receipt 的 origin 与起始 locator hash 绑定；
+下载不构成模型质量或 Production acceptance。
 
 ## Verification Boundary
 

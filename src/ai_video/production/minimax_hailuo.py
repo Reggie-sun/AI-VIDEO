@@ -25,7 +25,7 @@ from contextlib import AbstractContextManager
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import BinaryIO, Literal, Protocol
-from urllib.parse import quote, urlsplit
+from urllib.parse import quote
 
 import httpx
 
@@ -74,6 +74,7 @@ from ai_video.production.video_compiler import (
     compile_provider_video_request,
 )
 from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
+from ai_video.production.vidu_download import parse_result_url, stream_public_video
 
 _ORIGIN = "https://api.minimaxi.com"
 _SUBMIT_URL = f"{_ORIGIN}/v1/video_generation"
@@ -88,7 +89,6 @@ _I2V_CAPABILITY_ID = "minimax-hailuo-2.3-v1-i2v-768p-6s-first_frame"
 _FILE_ID_PREFIX = "hailuo-content-"
 _MAX_JSON_BYTES = 1_000_000
 _MAX_PROMPT_CHARACTERS = 2_000
-_MAX_VIDEO_BYTES = 256 * 1024 * 1024
 _SECRET_REFERENCE_KIND = "secret_store"
 _SECRET_REFERENCE_ID = "MINIMAX_API_KEY"
 _SAFE_TASK_ID = re.compile(r"^[A-Za-z0-9._:-]{1,256}$")
@@ -174,6 +174,7 @@ class HttpxMiniMaxHailuoTransport:
             follow_redirects=False,
         )
         self._owns_client = client is None
+        self._download_timeout = timeout_seconds
 
     def request(
         self, request: MiniMaxHailuoTransportRequest
@@ -194,6 +195,10 @@ class HttpxMiniMaxHailuoTransport:
     def stream(
         self, request: MiniMaxHailuoTransportRequest
     ) -> AbstractContextManager[MiniMaxHailuoStreamResponse]:
+        if request.method == "GET":
+            return stream_public_video(
+                request.url, timeout_seconds=self._download_timeout
+            )
         return self._client.stream(
             request.method,
             request.url,
@@ -382,25 +387,28 @@ def _signed_https_url(value: object) -> str:
             ErrorCode.VIDEO_PROVIDER_FAILED, "MiniMax Hailuo result URL is missing."
         )
     try:
-        parsed = urlsplit(value)
-        _ = parsed.port
-    except ValueError:
+        parse_result_url(value)
+    except AiVideoError:
         raise _error(
             ErrorCode.VIDEO_PROVIDER_FAILED, "MiniMax Hailuo result URL is invalid."
         ) from None
-    if (
-        parsed.scheme != "https"
-        or parsed.hostname is None
-        or parsed.username is not None
-        or parsed.password is not None
-        or not parsed.path
-        or parsed.fragment
-    ):
-        raise _error(
-            ErrorCode.VIDEO_PROVIDER_FAILED,
-            "MiniMax Hailuo result URL must be HTTPS without credentials or fragments.",
-        )
     return value
+
+
+def _observed_mp4(prefix: bytes, size_bytes: int) -> bool:
+    if len(prefix) < 16 or prefix[4:8] != b"ftyp":
+        return False
+    box_size = int.from_bytes(prefix[:4], "big")
+    return 16 <= box_size <= size_bytes and prefix[8:12] in {
+        b"M4V ",
+        b"avc1",
+        b"iso2",
+        b"iso5",
+        b"iso6",
+        b"isom",
+        b"mp41",
+        b"mp42",
+    }
 
 
 def _provider_file_id(file_id: str) -> str:
@@ -977,6 +985,7 @@ class MiniMaxHailuoVideoProvider:
         )
         digest = hashlib.sha256()
         size = 0
+        prefix = bytearray()
         try:
             with self._transport.stream(request) as response:
                 if not 200 <= response.status_code < 300:
@@ -985,37 +994,22 @@ class MiniMaxHailuoVideoProvider:
                         f"MiniMax Hailuo download returned HTTP {response.status_code}.",
                         retryable=response.status_code >= 500 or response.status_code == 429,
                     )
-                content_type = response.headers.get("content-type", "")
-                if not content_type.lower().startswith("video/mp4"):
-                    raise _error(
-                        ErrorCode.VIDEO_ARTIFACT_INVALID,
-                        "MiniMax Hailuo download is not video/mp4.",
-                    )
-                content_length = response.headers.get("content-length")
-                if content_length is not None:
-                    try:
-                        declared_size = int(content_length)
-                    except ValueError:
-                        raise _error(
-                            ErrorCode.VIDEO_ARTIFACT_INVALID,
-                            "MiniMax Hailuo download Content-Length is invalid.",
-                        ) from None
-                    if declared_size < 0 or declared_size > _MAX_VIDEO_BYTES:
-                        raise _error(
-                            ErrorCode.VIDEO_ARTIFACT_INVALID,
-                            "MiniMax Hailuo download exceeds the size limit.",
-                        )
+                content_length = next(
+                    (
+                        value
+                        for key, value in response.headers.items()
+                        if key.lower() == "content-length"
+                    ),
+                    None,
+                )
                 for chunk in response.iter_bytes():
                     if not chunk:
                         continue
-                    if size + len(chunk) > _MAX_VIDEO_BYTES:
-                        raise _error(
-                            ErrorCode.VIDEO_ARTIFACT_INVALID,
-                            "MiniMax Hailuo download exceeds the size limit.",
-                        )
+                    prefix.extend(chunk[: max(0, 32 - len(prefix))])
                     sink.write(chunk)
                     digest.update(chunk)
                     size += len(chunk)
+                sink.flush()
         except AiVideoError:
             raise
         except Exception:
@@ -1028,12 +1022,24 @@ class MiniMaxHailuoVideoProvider:
             raise _error(
                 ErrorCode.VIDEO_ARTIFACT_INVALID, "MiniMax Hailuo download is empty."
             )
-        if content_length is not None and size != declared_size:
+        if content_length is not None:
+            try:
+                declared_size = int(content_length)
+            except ValueError:
+                raise _error(
+                    ErrorCode.VIDEO_ARTIFACT_INVALID,
+                    "MiniMax Hailuo download Content-Length is invalid.",
+                ) from None
+            if declared_size < 0 or size != declared_size:
+                raise _error(
+                    ErrorCode.VIDEO_ARTIFACT_INVALID,
+                    "MiniMax Hailuo download size does not match Content-Length.",
+                )
+        if not _observed_mp4(bytes(prefix), size):
             raise _error(
                 ErrorCode.VIDEO_ARTIFACT_INVALID,
-                "MiniMax Hailuo download size does not match Content-Length.",
+                "MiniMax Hailuo download is not a measured MP4 artifact.",
             )
-        sink.flush()
         return VideoFetchReceipt.create(
             submission=submission,
             observation=observation,

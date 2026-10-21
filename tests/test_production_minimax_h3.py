@@ -396,7 +396,7 @@ def _query_response(
 def _download_response(
     *,
     status: int = 200,
-    body: bytes = b"\x00\x00\x00\x18ftypisom",
+    body: bytes = b"\x00\x00\x00\x18ftypisom\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00",
     content_type: str = "video/mp4",
 ) -> MiniMaxH3TransportResponse:
     return MiniMaxH3TransportResponse(
@@ -898,6 +898,34 @@ def test_httpx_transport_never_follows_submit_redirect():
     assert len(calls) == 1
 
 
+def test_httpx_result_download_uses_credential_free_stream(monkeypatch):
+    client_calls: list[httpx.Request] = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        client_calls.append(request)
+        return httpx.Response(500)
+
+    public_calls: list[tuple[str, float]] = []
+
+    def public_stream(url: str, *, timeout_seconds: float, download_resolver=None):
+        public_calls.append((url, timeout_seconds))
+        return _StreamResponse(_download_response())
+
+    monkeypatch.setattr(h3_module, "stream_public_video", public_stream)
+    with httpx.Client(transport=httpx.MockTransport(handler)) as client:
+        transport = HttpxMiniMaxH3Transport(client=client, timeout_seconds=7.0)
+        request = MiniMaxH3TransportRequest(
+            method="GET",
+            url=SIGNED_URL,
+            headers={"authorization": "must-not-forward", "cookie": "ambient"},
+        )
+        with transport.stream(request) as response:
+            assert b"".join(response.iter_bytes()) == _download_response().body
+
+    assert public_calls == [(SIGNED_URL, 7.0)]
+    assert client_calls == []
+
+
 @pytest.mark.parametrize("permit_kind", ["none", "mismatched", "consumed"])
 def test_invalid_permits_are_rejected_before_transport(
     monkeypatch: pytest.MonkeyPatch, permit_kind: str
@@ -1188,7 +1216,7 @@ def test_minimal_status_response_reaches_fetch_without_native_output_echo(
     }
     transport = _FakeTransport(
         query_response=_query_response(status="succeeded", body=minimal_body),
-        download_response=_download_response(body=b"minimal-mp4-bytes"),
+        download_response=_download_response(),
     )
     provider = MiniMaxH3VideoProvider(
         transport=transport,
@@ -1387,7 +1415,7 @@ def test_fetch_signed_url_is_never_persisted_in_repr_or_receipt(monkeypatch):
     provider_file_id = "h3-content-" + hashlib.sha256(b"task-h3-1").hexdigest()
     transport = _FakeTransport(
         query_response=_query_response(status="succeeded"),
-        download_response=_download_response(body=b"some-mp4-bytes"),
+        download_response=_download_response(),
     )
     provider = MiniMaxH3VideoProvider(
         transport=transport, credential=_SecretResolver(),
@@ -1432,7 +1460,7 @@ def test_fetch_signed_url_is_never_persisted_in_repr_or_receipt(monkeypatch):
 
 def test_fetch_accepts_rotated_signed_url_for_same_durable_task(monkeypatch):
     _block_socket(monkeypatch)
-    new_url = "https://signed.cdn.minimax.io/asset/rotated.mp4"
+    new_url = "http://other.example:8080/asset/rotated.mp4"
     transport = _FakeTransport(
         query_response=MiniMaxH3TransportResponse(
             status_code=200,
@@ -1451,7 +1479,7 @@ def test_fetch_accepts_rotated_signed_url_for_same_durable_task(monkeypatch):
                 }
             ).encode(),
         ),
-        download_response=_download_response(body=b"any"),
+        download_response=_download_response(),
     )
     provider = MiniMaxH3VideoProvider(
         transport=transport, credential=_SecretResolver(),
@@ -1478,14 +1506,12 @@ def test_fetch_accepts_rotated_signed_url_for_same_durable_task(monkeypatch):
     assert [call.url for call in transport.stream_calls] == [new_url]
 
 
-def test_fetch_rejects_wrong_content_type_without_streaming(monkeypatch):
+def test_fetch_uses_downloaded_container_when_content_type_is_wrong(monkeypatch):
     _block_socket(monkeypatch)
     provider_file_id = "h3-content-" + hashlib.sha256(b"task-h3-1").hexdigest()
     transport = _FakeTransport(
         query_response=_query_response(status="succeeded"),
-        download_response=_download_response(
-            body=b"definitely-not-mp4", content_type="text/html"
-        ),
+        download_response=_download_response(content_type="text/html"),
     )
     provider = MiniMaxH3VideoProvider(
         transport=transport, credential=_SecretResolver(),
@@ -1506,24 +1532,44 @@ def test_fetch_rejects_wrong_content_type_without_streaming(monkeypatch):
         provider_file_id=provider_file_id,
     )
     sink = BytesIO()
+    receipt = provider.fetch(submission, submit_receipt, observation, sink)
+    assert receipt.content_type == "video/mp4"
+    assert sink.getvalue() == transport.download_response.body
+
+    transport.download_response = _download_response(body=b"not-a-container")
+    invalid_sink = BytesIO()
     with pytest.raises(AiVideoError) as exc_info:
-        provider.fetch(submission, submit_receipt, observation, sink)
+        provider.fetch(submission, submit_receipt, observation, invalid_sink)
     assert exc_info.value.code is ErrorCode.VIDEO_ARTIFACT_INVALID
-    assert sink.getvalue() == b""
+    assert invalid_sink.getvalue() == b"not-a-container"
+
+    body = _download_response().body
+    transport.download_response = MiniMaxH3TransportResponse(
+        status_code=200,
+        headers={"Content-Length": str(len(body) - 1)},
+        body=body,
+    )
+    incomplete_sink = BytesIO()
+    with pytest.raises(AiVideoError) as length_error:
+        provider.fetch(submission, submit_receipt, observation, incomplete_sink)
+    assert length_error.value.code is ErrorCode.VIDEO_ARTIFACT_INVALID
+    assert incomplete_sink.getvalue() == body
 
 
-def test_fetch_rejects_declared_oversize_before_writing(monkeypatch):
+def test_fetch_does_not_apply_a_download_byte_ceiling(monkeypatch):
     _block_socket(monkeypatch)
+    monkeypatch.setattr(h3_module, "_MAX_VIDEO_BYTES", 16, raising=False)
     provider_file_id = "h3-content-" + hashlib.sha256(b"task-h3-1").hexdigest()
+    body = b"\x00\x00\x00\x18ftypisom" + b"\x00" * 12
     transport = _FakeTransport(
         query_response=_query_response(status="succeeded"),
         download_response=MiniMaxH3TransportResponse(
             status_code=200,
             headers={
                 "content-type": "video/mp4",
-                "content-length": str(256 * 1024 * 1024 + 1),
+                "content-length": str(len(body)),
             },
-            body=b"small",
+            body=body,
         ),
     )
     provider = MiniMaxH3VideoProvider(
@@ -1545,11 +1591,9 @@ def test_fetch_rejects_declared_oversize_before_writing(monkeypatch):
     )
     sink = BytesIO()
 
-    with pytest.raises(AiVideoError) as exc_info:
-        provider.fetch(submission, submit_receipt, observation, sink)
-
-    assert exc_info.value.code is ErrorCode.VIDEO_ARTIFACT_INVALID
-    assert sink.getvalue() == b""
+    receipt = provider.fetch(submission, submit_receipt, observation, sink)
+    assert receipt.size_bytes == len(body)
+    assert sink.getvalue() == body
 
 
 def test_fetch_transport_failure_is_typed_and_sanitized(monkeypatch):

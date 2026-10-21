@@ -50,6 +50,7 @@ class ViduProviderProfile(StrictModel):
     model_config = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True)
 
     origin: str
+    # Legacy metadata retained for sealed profile compatibility, not GET admission.
     result_origins: tuple[str, ...] = ()
     result_trust: Literal["fixed_origins", "authenticated_task"] = "fixed_origins"
     cost_upper_bound_microunits: int = Field(strict=True, gt=0)
@@ -61,8 +62,6 @@ class ViduProviderProfile(StrictModel):
     def _validate_profile(self) -> "ViduProviderProfile":
         if self.origin not in {"https://api.vidu.cn", "https://api.vidu.com"}:
             raise ValueError("Vidu API origin must be an official explicit endpoint")
-        if (self.result_trust == "fixed_origins") != bool(self.result_origins):
-            raise ValueError("Vidu fixed trust requires origins; authenticated task trust requires none")
         for origin in self.result_origins:
             canonical_result_origin(origin)
         if len(set(self.result_origins)) != len(self.result_origins):

@@ -15,7 +15,7 @@
 
 ## Ownership And Safety
 
-`metaso_h3.py` 显式实现 Ref2VA 和 frame payload/query mapping；复用现有 video request/receipt、remote prose compiler、paid budget/egress/one-use permit、`VideoGenerationService` 与唯一 `ProductionStateCommitter`。下载复用 public-IP pinned HTTPS，禁 redirect。raw key 唯一默认来源是进程环境 `METASO_API_KEY`，不回退其他 secret；request repr 与错误不包含 credential。不注册 default、不 retry POST、不激活 candidate。
+`metaso_h3.py` 显式实现 Ref2VA 和 frame payload/query mapping；复用现有 video request/receipt、remote prose compiler、paid budget/egress/one-use permit、`VideoGenerationService` 与唯一 `ProductionStateCommitter`。下载复用无凭据 HTTP(S) transport，允许 CDN redirect，不设来源、MIME 或大小准入；完整性在传输后核验。raw key 唯一默认来源是进程环境 `METASO_API_KEY`，不回退其他 secret；request repr 与错误不包含 credential。不注册 default、不 retry POST、不激活 candidate。
 
 Profile 封存 requested ratio 和 Context IR。输出 pixel geometry 与物理 FPS 由 Provider 决定；现有 flexible requirement 使用 adaptive geometry / 24 FPS nominal 声明，实际 MP4 必须独立 probe。内部 `cost_upper_bound_microunits` 是 operator 上限，真实 credits/cost 只从可确认的 Provider response 取证。
 

@@ -128,8 +128,8 @@ class HttpxViduTransport:
 
     @contextmanager
     def stream(self, request: ViduTransportRequest) -> Iterator[ViduStreamResponse]:
-        if request.method != "GET" or request.body or dict(request.headers) != {"accept": "video/mp4"}:
-            raise _error("Vidu result transport only accepts credential-free video GET.")
+        if request.method != "GET" or request.body or dict(request.headers) != {"accept": "*/*"}:
+            raise _error("Vidu result transport only accepts credential-free GET.")
         with stream_public_video(request.url, timeout_seconds=self._download_timeout) as response:
             yield response
 
@@ -504,12 +504,6 @@ class ViduVideoProvider(_ViduAdMethods):
             provider_file_id=self._file_id(task_id, creation_id) if creation_id is not None else None,
         )
 
-    def _result_url(self, url: str) -> str:
-        locator = parse_result_url(url)
-        if self._profile.result_trust == "fixed_origins" and locator.origin not in self._profile.result_origins:
-            raise _error("Vidu result URL is outside the sealed origins.")
-        return url
-
     def fetch(self, submission: VideoSubmission, submit_receipt: PaidProviderSubmitReceipt,
               observation: VideoTaskObservation, sink: BinaryIO) -> VideoFetchReceipt:
         task_id = self._submission(submission, submit_receipt)
@@ -526,7 +520,8 @@ class ViduVideoProvider(_ViduAdMethods):
         materialization = None
         if self._profile.result_trust == "authenticated_task":
             materialization = RemoteMediaMaterializationReceipt.create(
-                transport_kind="provider_output_https", provider_kind="vidu",
+                transport_kind=("provider_output_https" if parse_result_url(url).scheme == "https"
+                                else "provider_output_http"), provider_kind="vidu",
                 model_id=submission.provider_task_binding.response_model_id,
                 submission_fingerprint=submission.submission_fingerprint,
                 paid_submit_receipt_fingerprint=submission.paid_submit_receipt_fingerprint,
@@ -544,34 +539,31 @@ class ViduVideoProvider(_ViduAdMethods):
         )
 
     def _stream_mp4(self, url: str, sink: BinaryIO) -> tuple[str, int]:
-        request = ViduTransportRequest("GET", self._result_url(url), {"accept": "video/mp4"})
+        request = ViduTransportRequest("GET", url, {"accept": "*/*"})
         size, prefix, digest = 0, bytearray(), hashlib.sha256()
-        declared = None
+        declared: str | None = None
         try:
             with self._transport.stream(request) as response:
                 headers = {k.lower(): v for k, v in response.headers.items()}
-                if response.status_code != 200 or headers.get("content-type", "").split(";", 1)[0].strip().lower() != "video/mp4":
-                    raise _error("Vidu download must be an HTTP 200 MP4.", ErrorCode.VIDEO_ARTIFACT_INVALID)
-                if "content-length" in headers:
-                    value = headers["content-length"]
-                    if not value.isascii() or not value.isdecimal():
-                        raise _error("Vidu download length is invalid.", ErrorCode.VIDEO_ARTIFACT_INVALID)
-                    declared = int(value)
-                    if not 0 < declared <= self._profile.max_download_bytes:
-                        raise _error("Vidu download length exceeds limit.", ErrorCode.VIDEO_ARTIFACT_INVALID)
+                if response.status_code != 200:
+                    raise _error("Vidu download must return HTTP 200.", ErrorCode.VIDEO_ARTIFACT_INVALID)
+                declared = headers.get("content-length")
                 for chunk in response.iter_bytes():
-                    if size + len(chunk) > self._profile.max_download_bytes:
-                        raise _error("Vidu download exceeds limit.", ErrorCode.VIDEO_ARTIFACT_INVALID)
                     prefix.extend(chunk[:max(0, 32 - len(prefix))])
                     sink.write(chunk)
                     digest.update(chunk)
                     size += len(chunk)
+                sink.flush()
         except AiVideoError:
             raise
         except Exception:
             raise _error("Vidu download transport failed.", retryable=True) from None
+        declared_size: int | None = None
+        if declared is not None:
+            if not declared.isascii() or not declared.isdecimal():
+                raise _error("Vidu download length is invalid.", ErrorCode.VIDEO_ARTIFACT_INVALID)
+            declared_size = int(declared)
         if (size < 12 or prefix[4:8] != b"ftyp" or bytes(prefix[8:12]) not in {b"isom", b"iso2", b"mp41", b"mp42", b"avc1"}
-                or (declared is not None and declared != size)):
+                or (declared_size is not None and declared_size != size)):
             raise _error("Vidu download is not a complete MP4.", ErrorCode.VIDEO_ARTIFACT_INVALID)
-        sink.flush()
         return digest.hexdigest(), size

@@ -255,7 +255,7 @@ def test_submit_poll_fetch_and_rotating_url_keep_exact_creation():
     fetched = provider.fetch(submission, receipt, observation, sink)
     assert sink.getvalue() == MP4
     assert fetched.artifact_sha256 == hashlib.sha256(MP4).hexdigest()
-    assert transport.downloads[0].headers == {"accept": "video/mp4"}
+    assert transport.downloads[0].headers == {"accept": "*/*"}
     assert "PRIVATE-KEY" not in repr(post)
     assert URL not in repr(transport.downloads[0]) + fetched.model_dump_json() + observation.model_dump_json()
     with pytest.raises(AiVideoError):
@@ -292,14 +292,12 @@ def test_task_states(state, expected):
     assert provider.get_status(submission, receipt).state is expected
 
 
-@pytest.mark.parametrize("mutation", ["creation", "origin", "mime", "redirect", "length", "bytes"])
+@pytest.mark.parametrize("mutation", ["creation", "redirect", "length", "bytes"])
 def test_fetch_rejects_changed_or_invalid_result(mutation):
     provider, transport, args = _setup()
     submission, receipt = _submitted(provider, args)
     observation = provider.get_status(submission, receipt)
     if mutation == "creation": transport.query["creations"][0]["id"] = "other"
-    if mutation == "origin": transport.query["creations"][0]["url"] = "https://evil.example/a.mp4"
-    if mutation == "mime": transport.headers["content-type"] = "text/html"
     if mutation == "redirect": transport.download_status = 302
     if mutation == "length": transport.headers["content-length"] = "9999"
     if mutation == "bytes": transport.body = b"not a video at all"
@@ -757,7 +755,7 @@ def test_extension_requeries_exact_source_and_posts_added_duration(model, added,
     transport.submit["model"] = model
     submission, receipt = _submitted(provider, args)
     assert [c.method for c in transport.calls] == ["GET", "GET", "POST"]
-    assert transport.downloads[0].headers == {"accept": "video/mp4"}
+    assert transport.downloads[0].headers == {"accept": "*/*"}
     payload = json.loads(transport.calls[-1].body)
     assert transport.calls[-1].url.endswith("/extend")
     assert payload["video_creation_id"] == "creation-1"

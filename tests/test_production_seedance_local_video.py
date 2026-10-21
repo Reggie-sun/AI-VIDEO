@@ -29,9 +29,9 @@ READ_URL = "https://media.storage.example/white-model.mp4?signature=get-secret"
 
 
 class _Readback:
-    def __init__(self, chunks: tuple[bytes, ...]) -> None:
+    def __init__(self, chunks: tuple[bytes, ...], content_type: str = "video/mp4") -> None:
         self.status_code = 200
-        self.headers = {"content-type": "video/mp4"}
+        self.headers = {"content-type": content_type}
         self._chunks = chunks
 
     def iter_bytes(self):
@@ -39,9 +39,11 @@ class _Readback:
 
 
 class _MaterializationTransport:
-    def __init__(self, *, readback: bytes = SOURCE_BYTES) -> None:
+    def __init__(self, *, readback: bytes = SOURCE_BYTES,
+                 content_type: str = "video/mp4") -> None:
         self.requests = []
         self.readback = readback
+        self.content_type = content_type
 
     def upload(self, request, source_bytes: bytes):
         self.requests.append((request, source_bytes))
@@ -57,7 +59,7 @@ class _MaterializationTransport:
     @contextmanager
     def stream(self, request):
         self.requests.append((request, None))
-        yield _Readback((self.readback[:17], self.readback[17:]))
+        yield _Readback((self.readback[:17], self.readback[17:]), self.content_type)
 
 
 class _PathSwapTransport(_MaterializationTransport):
@@ -288,6 +290,49 @@ def test_materializer_holds_exact_source_bytes_across_permit_and_upload(tmp_path
     )
 
     assert transport.requests[0][1] == SOURCE_BYTES
+
+
+@pytest.mark.parametrize("content_type", ["application/octet-stream", ""])
+def test_exact_readback_ignores_misleading_content_type(tmp_path, content_type):
+    from ai_video.production import seedance_local_video as module
+
+    source_path = tmp_path / "white-model-motion.mp4"
+    source_path.write_bytes(SOURCE_BYTES)
+    binding = _binding()
+    preview, authorization, grant, permit = _contracts(module, binding)
+    transport = _MaterializationTransport(content_type=content_type)
+    materialized = module.SeedanceLocalVideoMaterializer(
+        transport=transport, now=lambda: FIXED_NOW,
+    ).materialize(
+        binding=binding, source_path=source_path, preview=preview,
+        authorization=authorization, permit=permit, grant=grant,
+    )
+
+    assert materialized.receipt.readback_sha256 == SOURCE_SHA256
+    assert [r.method for r, _ in transport.requests] == ["PUT", "GET"]
+
+
+def test_readback_transport_uses_shared_credential_free_downloader(monkeypatch):
+    from ai_video.production import seedance_local_video as module
+
+    observed = []
+
+    @contextmanager
+    def shared_download(url, **options):
+        observed.append((url, options))
+        yield _Readback((SOURCE_BYTES,))
+
+    monkeypatch.setattr(module, "stream_public_video", shared_download)
+    transport = module.HttpxSeedanceLocalVideoMaterializationTransport()
+    transport._client.cookies.set("api-session", "PRIVATE-COOKIE")
+    try:
+        with transport.stream(module.SeedanceLocalVideoTransportRequest(
+            method="GET", url=READ_URL, headers={"accept": "video/mp4"},
+        )) as response:
+            assert b"".join(response.iter_bytes()) == SOURCE_BYTES
+    finally:
+        transport.close()
+    assert observed == [(READ_URL, {"timeout_seconds": 120.0})]
 
 
 def test_readback_mismatch_consumes_one_use_permit_and_blocks_retry(tmp_path):

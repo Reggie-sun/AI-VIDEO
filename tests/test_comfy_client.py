@@ -200,3 +200,48 @@ def test_fetch_artifact_bytes_does_not_write_a_target():
         filename="frame.png", subfolder="", type_="output"
     ) == b"image-bytes"
     assert seen == [("/view", "frame.png")]
+
+
+@pytest.mark.parametrize("write_file", [False, True])
+def test_artifact_download_follows_cdn_redirect_without_client_credentials(tmp_path, write_file):
+    seen = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        if request.url.path == "/view":
+            return httpx.Response(302, headers={
+                "location": "https://redirect-user:redirect-secret@cdn.example/file?signature=private",
+            })
+        return httpx.Response(200, content=b"arbitrary-downloaded-bytes")
+
+    http = httpx.Client(transport=httpx.MockTransport(handler),
+                        auth=("api-user", "api-secret"), headers={"x-api-key": "private-key"})
+    http.cookies.set("session", "private-cookie", domain="cdn.example")
+    client = ComfyClient("http://127.0.0.1:8188", http_client=http)
+    if write_file:
+        target = tmp_path / "download.bin"
+        client.download_artifact(filename="result.bin", subfolder="", type_="output", target=target)
+        assert target.read_bytes() == b"arbitrary-downloaded-bytes"
+    else:
+        assert client.fetch_artifact_bytes(filename="result.bin", subfolder="", type_="output") == b"arbitrary-downloaded-bytes"
+    assert len(seen) == 2
+    assert "authorization" in seen[0].headers
+    assert not {"authorization", "cookie", "x-api-key"}.intersection(seen[1].headers)
+    assert not seen[1].url.userinfo
+
+
+def test_artifact_redirect_loop_stops_without_leaking_signed_url():
+    seen = []
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        seen.append(request)
+        return httpx.Response(302, headers={"location": "/again?signature=private"})
+
+    client = ComfyClient("http://127.0.0.1:8188", http_client=httpx.Client(
+        transport=httpx.MockTransport(handler), max_redirects=2,
+    ))
+    with pytest.raises(AiVideoError) as exc_info:
+        client.fetch_artifact_bytes(filename="result.bin", subfolder="", type_="output")
+    assert len(seen) == 3
+    assert "private" not in str(exc_info.value)
+    assert "private" not in exc_info.value.technical_detail

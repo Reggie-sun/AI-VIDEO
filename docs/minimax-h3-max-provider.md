@@ -64,12 +64,11 @@ profile、预算 reservation、egress、durable intent 与 one-use permit。
 原始 `request_input_hash` 后才靠真实提交入口发现错误。
 currency 与 monetary fields 只表示 operator 预配置的内部 upper bound，不是官方价格、
 汇率换算、真实消费或账户余额。沿既有 ledger 保留历史消费，不新建账本避开计数。
-无自动重抽、fallback 或 redirect；unknown 停止。查询与下载必须继续绑定原 task；
-下载通过既有 public-IP pinning、TLS/SNI、无凭据 GET，签名 URL 仅暂存内存。
-若本机代理 DNS 返回 fake-IP，保持下载阻断；trusted operator 可显式向
-`HttpxMiniMaxH3MaxTransport(download_resolver=...)` 注入已核实的解析器，沿共享
-`vidu_download` 重验全部地址并固定数值地址连接，证书及 SNI 仍使用原 hostname。
-默认只使用系统解析器，不自动 fallback、不接受私网地址、不修改系统 DNS/代理配置。
+无自动重抽或 fallback；unknown 停止。查询与下载必须继续绑定原 task；下载沿共享
+`vidu_download` 允许正常 CDN redirect，不再按域名/IP/端口、MIME 或文件大小拦截。
+GET 每跳均无 API 凭据或 Cookie，HTTPS 证书和 SNI 核验保留，签名 URL 仅暂存内存。
+`HttpxMiniMaxH3MaxTransport(download_resolver=...)` 的显式解析器注入继续可用；
+默认使用系统解析器，不偷偷 fallback 或修改系统 DNS/代理配置。
 解析失败只恢复同一已知成功 task 的 fetch，不新增生成、额度或 permit；下载恢复也不证明媒体质量。
 
 ## Verification

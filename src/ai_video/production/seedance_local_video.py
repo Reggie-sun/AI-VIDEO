@@ -26,6 +26,7 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.artifact_contracts import StrictModel
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import ActorIdentity
+from ai_video.production.vidu_download import stream_public_video
 from ai_video.production.video import (
     ResolvedVideoGenerationRequest,
     VideoGenerationRequest,
@@ -301,20 +302,11 @@ class _HttpxUploadResponse:
     headers: Mapping[str, str]
 
 
-class _HttpxStreamResponse:
-    def __init__(self, response: httpx.Response) -> None:
-        self.status_code = response.status_code
-        self.headers = response.headers
-        self._response = response
-
-    def iter_bytes(self) -> Iterator[bytes]:
-        yield from self._response.iter_bytes()
-
-
 class HttpxSeedanceLocalVideoMaterializationTransport:
-    """No-redirect HTTP transport for presigned object PUT and exact GET."""
+    """Presigned PUT and credential-free exact GET with CDN redirects."""
 
     def __init__(self, *, timeout_seconds: float = 120.0) -> None:
+        self._download_timeout = timeout_seconds
         self._client = httpx.Client(
             timeout=httpx.Timeout(timeout_seconds),
             follow_redirects=False,
@@ -341,12 +333,10 @@ class HttpxSeedanceLocalVideoMaterializationTransport:
     ) -> Iterator[SeedanceLocalVideoStreamResponse]:
         if request.method != "GET":
             raise ValueError("local video readback transport requires GET")
-        with self._client.stream(
-            request.method,
-            request.url,
-            headers=dict(request.headers),
+        with stream_public_video(
+            request.url, timeout_seconds=self._download_timeout,
         ) as response:
-            yield _HttpxStreamResponse(response)
+            yield response
 
     def close(self) -> None:
         self._client.close()
@@ -705,17 +695,10 @@ class SeedanceLocalVideoMaterializer:
             with self._transport.stream(read_request) as response:
                 if not 200 <= response.status_code < 300:
                     raise ValueError("readback failed")
-                response_mime_type = (
-                    response.headers.get("content-type", "").split(";", 1)[0].strip()
-                )
-                if response_mime_type != binding.mime_type:
-                    raise ValueError("readback content type changed")
                 for chunk in response.iter_bytes():
                     if not isinstance(chunk, bytes) or not chunk:
                         continue
                     size += len(chunk)
-                    if size > binding.size_bytes:
-                        raise ValueError("readback size changed")
                     digest.update(chunk)
                     if len(prefix) < 32:
                         prefix.extend(chunk[: 32 - len(prefix)])

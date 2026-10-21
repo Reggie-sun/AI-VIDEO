@@ -137,9 +137,10 @@ class SeedanceProviderProfile(_SeedanceProfileModel):
     profile_version: str = Field(pattern=_SAFE_ID)
     origin: str
     pricing: SeedancePricingSnapshot
-    result_origins: tuple[str, ...] = Field(min_length=1)
+    # Legacy download policy fields remain in old seals but do not gate GETs.
+    result_origins: tuple[str, ...] = ()
     capabilities: tuple[SeedanceCapabilityProfile, ...] = Field(min_length=1)
-    max_download_bytes: int = Field(strict=True, gt=0)
+    max_download_bytes: int = Field(default=_MAX_DOWNLOAD_BYTES, strict=True, gt=0)
     profile_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
 
     @field_validator("origin")
@@ -192,7 +193,7 @@ class SeedanceProviderProfile(_SeedanceProfileModel):
         cls,
         *,
         pricing: SeedancePricingSnapshot,
-        result_origins: tuple[str, ...],
+        result_origins: tuple[str, ...] = (),
         capabilities: tuple[SeedanceCapabilityProfile, ...],
         max_download_bytes: int = _MAX_DOWNLOAD_BYTES,
     ) -> "SeedanceProviderProfile":
@@ -218,7 +219,7 @@ class SeedanceProviderProfile(_SeedanceProfileModel):
         cls,
         *,
         pricing: SeedancePricingSnapshot,
-        result_origins: tuple[str, ...],
+        result_origins: tuple[str, ...] = (),
     ) -> "SeedanceProviderProfile":
         return cls.create(
             pricing=pricing,
@@ -231,7 +232,7 @@ class SeedanceProviderProfile(_SeedanceProfileModel):
         cls,
         *,
         pricing: SeedancePricingSnapshot,
-        result_origins: tuple[str, ...],
+        result_origins: tuple[str, ...] = (),
     ) -> "SeedanceProviderProfile":
         """Build the current entitled Production inventory for base Seedance 2.0."""
 

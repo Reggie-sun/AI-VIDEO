@@ -66,6 +66,7 @@ class GrokProviderProfile(StrictModel):
 
     origin: Literal["https://cli-chat-proxy.grok.com"] = _API_ORIGIN
     account_fingerprint: str = Field(pattern=_SHA256)
+    # Retained in historical profile seals; downloads have no byte ceiling.
     max_download_bytes: int = Field(default=512 * 1024 * 1024, strict=True, gt=0)
     image_resolution: Literal["1k", "2k"] = "1k"
     keyframes: tuple[GrokTimedKeyframe, ...] = Field(default=(), max_length=4)

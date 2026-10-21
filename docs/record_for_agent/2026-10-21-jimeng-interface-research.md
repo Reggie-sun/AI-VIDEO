@@ -48,6 +48,10 @@ project-local `video_probe` / `video_analyze` 对 exact MP4 执行成功，提�
 
 下载最初被研究脚本的静态域名白名单拦住，核对为 fresh 资源响应返回的第一方 CDN 后完成下载。用户随后明确要求去掉下载检查；本地只读下载 probe 已移除域名/端口、大小和 MP4 magic 准入限制，并允许跟随 CDN redirect。仍从 exact 已完成资源取地址、检查 HTTP 结果、避免覆盖已有文件，并在下载后做 hash/解码验证；没有把该局部调整改成 Product/Provider policy，也没有为此再次下载或提交生成。
 
+后续用户又明确扩展到 Codex 全局默认及代码中的下载拦截；该独立变更见
+[Global Download Default And Provider Transfers](2026-10-21-download-default-and-provider-transfers.md)。
+上段仅保留原即梦试验 checkpoint 的实施范围，不代表这次后续全局变更未发生。
+
 本机证据目录为 `.codex/tmp/jimeng-single-trial/resume/`，含单次 intent / exact request / admission / network dispatch / acceptance、查询、页面刷新、费用回读、下载、媒体检查和审查历史。最终回执为 [`receipt.json`](../../.codex/tmp/jimeng-single-trial/resume/receipt.json)；媒体 Gate 明细为 [`media-gate.json`](../../.codex/tmp/jimeng-single-trial/resume/media-gate.json)。历史 admission 的 `ADMITTED_OUTCOME_UNKNOWN` 保持不改，由 acceptance / terminal 回读确定最新结果；单次额度已消费，不因质量未验收或等待异常重交。
 
 ## Single Trial Preflight — 2026-10-21

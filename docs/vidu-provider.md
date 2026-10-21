@@ -33,12 +33,10 @@ Vidu submit 保留 consume 前检查，并在 one-use permit 的 durable 校验�
 Task quota 首次扩展在历史/binding 校验后、首次 write 前核验 extension clock；已合法
 发布的 ceiling 继续保留，后续新 profile 仍须 fresh preview/authorization/intent/permit。
 
-首次接入可显式设置 `result_trust="authenticated_task"`，此时 `result_origins` 必须为空
-（可以省略）。下载 URL 只来自 official API 对 exact task 的认证查询，并在 fetch 时
-重新验证同一 creation；无需先生成历史任务来发现 CDN。该模式进入 profile hash。
-默认 `result_trust="fixed_origins"` 继续要求非空 exact `result_origins`；旧 profile 的
-序列化 bytes/hash 保持兼容。两种模式不可混用，切换模式需新的 profile/request，不能
-替换历史 submission 的 profile 来恢复下载。
+下载 URL 来自 official API 对 exact task 的认证查询，并在 fetch 时重新验证同一
+creation；无需预知 CDN。2026-10-21 起，`result_trust`、`result_origins` 和
+`max_download_bytes` 保留为旧 profile 的序列化 metadata，不再限制下载；新配置可省略
+`result_origins`。既有 profile/请求/receipt 的 bytes/hash 不重写，paid 边界保持原 owner。
 
 ```python
 from ai_video.production.vidu import HttpxViduTransport, ViduVideoProvider
@@ -168,19 +166,15 @@ Source 查询与素材/secret supplier 返回后、permit 消费前，重新核�
 `submit` 只在 durable paid permit 消费后执行一次 POST。超时、无法解释的响应和
 非明确拒绝均为 unknown outcome，必须沿既有 explicit recovery 处理。
 查询通过 exact task URL，若响应带 task/model 字段则复核；下载时重新查询同一 task，
-要求同一 creation ID。`fixed_origins` 额外验证 sealed origin；`authenticated_task`
-信任此次 official task response 的 locator，不接受外部传入的任意下载链接。
+要求同一 creation ID；结果来源仍由此次 official task response 绑定。
 
-`vidu_download.py` 独占结果 HTTPS transport：解析后的所有 DNS 地址必须是 public
-unicast，拒绝内网、loopback、link-local、CGNAT、保留地址与 IPv6 transition 地址。
-直接连接已验证的数值 IP，TLS SNI 与证书核验使用原域名，不再次解析域名，不走环境
-proxy、不继承 API client 的 auth/cookie/header，不跟随重定向、不自动解压或重试。
-固定白名单模式也使用同一安全下载路径。部署网络须支持直接访问真实 public 地址；
-返回 Fake-IP 的 DNS 会被拒绝，不能通过关闭地址校验处理。
-字节上限、HTTP/MIME/MP4 header、完整长度与 SHA-256 检查仍由 adapter 负责，媒体
-测量和 acceptance 仍由既有 downstream owners 负责。
-URL 仅在内存中使用；新模式的 fetch receipt 嵌入既有 `RemoteMediaMaterializationReceipt`，
-绑定 origin、locator SHA-256、task/file identity 与实际下载 SHA/size，不保存完整 signed URL。
+`vidu_download.py` 独占无凭据 HTTP(S) 下载；域名、IP、端口、MIME 和文件大小不作
+额外准入，正常 CDN redirect 可跟随，每跳重新构造不带 API auth/cookie 的 GET。
+HTTPS 保留证书及原域名 SNI 核验，解析/连接失败不偷偷替换 resolver 或重新提交。
+完整响应体写入 sink 后再检查传输长度、实际容器及 SHA-256；媒体测量和 acceptance
+仍由既有 downstream owners 负责。下载成功不等于有效视频或质量通过。
+URL 仅在内存中使用；fetch receipt 绑定起始 locator 的 origin/协议/hash、task/file
+identity 和实际下载 SHA/size，不把起始地址冒充最终 redirect hop，也不保存 signed URL。
 
 离线测试：`python -m pytest -p no:cacheprovider tests/test_production_vidu.py tests/test_production_vidu_download.py -q`。
 本次实现不表示 credential/access、live submit、真实媒体质量或 P6 / Final Acceptance
