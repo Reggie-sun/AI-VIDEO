@@ -447,7 +447,10 @@ class JimengVideoProvider:
         if manifest.active_paid_provider_budget is None:
             raise _error(ErrorCode.PRODUCTION_STATE_INVALID,
                          "Jimeng recovery has no retained budget reservation.")
-        dispatch = self._committer.read_jimeng_dispatch(attempt_id)
+        dispatch = self._committer.read_jimeng_dispatch(attempt_id, required=False)
+        if dispatch is None:
+            raise _error(ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN,
+                         "Jimeng has no sealed resource to query; keep UNKNOWN.")
         if (dispatch.account_sha256 != self._profile.account_sha256
                 or dispatch.project_id != self._profile.project_id
                 or dispatch.node_id != self._profile.node_id

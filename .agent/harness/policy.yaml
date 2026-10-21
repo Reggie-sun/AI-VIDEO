@@ -1259,6 +1259,7 @@ categories:
       - workflows/templates/minimax_h3_t8_ref2va_turbo_native_17s_v3*
       - src/ai_video/production/jimeng*.py
       - src/ai_video/production/_jimeng_project_reader.py
+      - src/ai_video/production/_state_commit_jimeng.py
       - src/ai_video/production/jimeng_browser.cjs
       - src/ai_video/production/minimax_h3.py
       - src/ai_video/production/metaso_h3.py

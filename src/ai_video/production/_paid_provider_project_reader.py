@@ -6,7 +6,9 @@ from pathlib import Path
 from pydantic import ValidationError
 
 from ai_video.errors import AiVideoError, ErrorCode
-from ai_video.production._jimeng_project_reader import verify_jimeng_task_lineage
+from ai_video.production._jimeng_project_reader import (
+    verify_jimeng_task_lineage, verify_jimeng_unknown_lineage,
+)
 from ai_video.production.models import (
     PaidProviderAttemptPhase,
     PaidProviderBudgetSnapshotPointer,
@@ -603,10 +605,21 @@ def verify_paid_provider_evidence(root: Path, manifest: ProductionManifest) -> N
                 ):
                     raise _invalid("Paid Provider no-effect reconciliation budget lineage is invalid.")
             if (gate.preview.provider_kind == "jimeng"
+                    and submit.outcome is PaidProviderSubmitOutcome.OUTCOME_UNKNOWN):
+                if attempt.video_generation_state is None:
+                    raise _invalid("Jimeng unknown task has no video request.")
+                verify_jimeng_unknown_lineage(
+                    root=root, attempt_id=attempt.attempt_id, submit=submit,
+                    request_pointer=attempt.video_generation_state.request,
+                )
+            if (gate.preview.provider_kind == "jimeng"
                     and submit.outcome is PaidProviderSubmitOutcome.ACCEPTED):
+                if attempt.video_generation_state is None:
+                    raise _invalid("Jimeng accepted task has no video request.")
                 verify_jimeng_task_lineage(
                     root=root, attempt_id=attempt.attempt_id, submit=submit,
                     active_budget=budget,
+                    request_pointer=attempt.video_generation_state.request,
                     load_budget_by_hash=lambda content_hash: _load_paid_provider_budget_by_content_hash(
                         root, content_hash, frozenset(), traversal,
                     ),

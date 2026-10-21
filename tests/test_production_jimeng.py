@@ -11,7 +11,9 @@ import pytest
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.jimeng import JimengVideoProvider, jimeng_meta_list
-from ai_video.production.jimeng_contracts import JimengProfile
+from ai_video.production.jimeng_contracts import (
+    JimengProfile, dispatch_matches_request,
+)
 from ai_video.production.models import ActorIdentity
 from ai_video.production.paid_provider import (
     PaidProviderAuthorizationDecision, PaidProviderCallPreview,
@@ -281,10 +283,28 @@ def test_resource_identity_or_parameters_drift_blocks_poll():
     assert exc.value.code is ErrorCode.VIDEO_PROVIDER_FAILED
 
 
+def test_dispatch_materials_remain_bound_to_resolved_request():
+    provider, request, preview, paid, auth, permit, _, committer, _ = setup()
+    provider.submit(request, preview, paid, auth, permit)
+    dispatch = committer.dispatch
+    assert dispatch_matches_request(dispatch, request)
+    altered = dispatch.model_copy(update={
+        "materials": (dispatch.materials[0].model_copy(
+            update={"asset_id": "unregistered-asset"}), *dispatch.materials[1:]),
+    })
+    assert not dispatch_matches_request(altered, request)
+
+
 @pytest.mark.parametrize("lose_response,missing", [
     (False, None), (False, "dispatch"), (False, "canvas"),
+    (False, "tampered_dispatch"), (False, "tampered_canvas"),
     (True, None), (True, "settled"), (True, "canvas"),
+    (True, "tampered_canvas"),
     (True, "dispatch"), (True, "prior_receipt"), (True, "base_budget"),
+    (True, "tampered_unknown_dispatch"),
+    (False, "abandoned_intent"),
+    (False, "abandoned_no_dispatch"),
+    (False, "tampered_unknown_canvas"),
 ])
 def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, lose_response, missing):
     from production_remote_generation_factory import prepare_remote_generation
@@ -333,7 +353,48 @@ def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, lose_
     service = VideoGenerationService(committer=committer, provider=provider)
     service.start(attempt_id=paid.attempt_id, request=resolved,
                   execution_binding=prepared.execution_binding)
-    if lose_response:
+    if missing == "abandoned_no_dispatch":
+        committer.record_paid_provider_submit_intent(
+            paid, reservation_id="jimeng-reservation-1")
+        committer = ProductionStateCommitter(tmp_path, paid_provider_clock=lambda: NOW)
+        provider._committer = committer
+        service = VideoGenerationService(committer=committer, provider=provider)
+        with pytest.raises(AiVideoError) as absent:
+            service.recover_jimeng_unknown_once(attempt_id=paid.attempt_id)
+        assert absent.value.code is ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN
+        assert committer._read_manifest().attempts[-1].status.value == "outcome_unknown"
+        assert browser.calls == 0
+        return
+    if missing in {"abandoned_intent", "tampered_unknown_canvas"}:
+        permit = committer.record_paid_provider_submit_intent(
+            paid, reservation_id="jimeng-reservation-1")
+        provider.submit(resolved, video_preview, paid, auth, permit)
+        assert committer._read_manifest().attempts[-1].paid_provider_state.phase.value == "submit_intent"
+        if missing == "tampered_unknown_canvas":
+            from ai_video.production.jimeng_contracts import (
+                JimengCanvasSnapshot, canvas_snapshot_path,
+            )
+            committer.latch_jimeng_abandoned_intent(paid.attempt_id)
+            old = committer.read_jimeng_canvas_snapshot(paid.attempt_id)
+            draft = json.loads(old.draft_json)
+            draft["tampered"] = True
+            altered = JimengCanvasSnapshot.create(**old.model_dump(
+                mode="python", exclude={"content_hash", "draft_sha256", "draft_json"}),
+                draft_json=json.dumps(draft))
+            (tmp_path / canvas_snapshot_path(old.content_hash)).unlink()
+            (tmp_path / canvas_snapshot_path(altered.content_hash)).write_text(
+                altered.model_dump_json())
+            with pytest.raises(AiVideoError) as tampered:
+                load_production_project(tmp_path / "project.yaml")
+            assert tampered.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+            assert committer._read_manifest().attempts[-1].status.value == "outcome_unknown"
+            assert browser.calls == 1
+            return
+        committer = ProductionStateCommitter(tmp_path, paid_provider_clock=lambda: NOW)
+        provider._committer = committer
+        service = VideoGenerationService(committer=committer, provider=provider)
+        submission = service.recover_jimeng_unknown_once(attempt_id=paid.attempt_id)
+    elif lose_response:
         with pytest.raises(AiVideoError) as exc:
             service.submit_once(attempt_id=paid.attempt_id, paid_preview=paid,
                                 reservation_id="jimeng-reservation-1")
@@ -348,6 +409,21 @@ def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, lose_
         assert read_exc.value.code is ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN
         assert committer._read_manifest().attempts[-1].status.value == "outcome_unknown"
         browser.fail_read = False
+        if missing == "tampered_unknown_dispatch":
+            from ai_video.production.jimeng_contracts import JimengDispatchIntent, dispatch_path
+            old = committer.read_jimeng_dispatch(paid.attempt_id)
+            altered = JimengDispatchIntent.create(**old.model_dump(
+                mode="python", exclude={"content_hash", "materials"}),
+                materials=(old.materials[0].model_copy(
+                    update={"asset_id": "unregistered-asset"}), *old.materials[1:]))
+            (tmp_path / dispatch_path(old.content_hash)).unlink()
+            (tmp_path / dispatch_path(altered.content_hash)).write_text(altered.model_dump_json())
+            with pytest.raises(AiVideoError) as tampered:
+                service.recover_jimeng_unknown_once(attempt_id=paid.attempt_id)
+            assert tampered.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
+            assert committer._read_manifest().attempts[-1].status.value == "outcome_unknown"
+            assert browser.calls == 1
+            return
         submission = service.recover_jimeng_unknown_once(attempt_id=paid.attempt_id)
     else:
         submission = service.submit_once(attempt_id=paid.attempt_id, paid_preview=paid,
@@ -366,6 +442,37 @@ def test_standard_production_service_owns_paid_submit_and_reopen(tmp_path, lose_
             attempt_id=paid.attempt_id, actual_cost_microunits=442_000_000)
         settled = load_production_project(tmp_path / "project.yaml")
         assert settled.manifest.attempts[-1].paid_provider_state.phase.value == "settled"
+    if missing in {"tampered_dispatch", "tampered_canvas"}:
+        from ai_video.production.jimeng_contracts import (
+            JimengCanvasSnapshot, JimengDispatchIntent, canvas_snapshot_path,
+            dispatch_path,
+        )
+        old_canvas = committer.read_jimeng_canvas_snapshot(paid.attempt_id)
+        if missing == "tampered_dispatch":
+            old_dispatch = committer.read_jimeng_dispatch(paid.attempt_id)
+            altered_materials = (old_dispatch.materials[0].model_copy(
+                update={"asset_id": "unregistered-asset"}), *old_dispatch.materials[1:])
+            changed_dispatch = JimengDispatchIntent.create(**old_dispatch.model_dump(
+                mode="python", exclude={"content_hash", "materials"}),
+                materials=altered_materials)
+            (tmp_path / dispatch_path(old_dispatch.content_hash)).unlink()
+            (tmp_path / dispatch_path(changed_dispatch.content_hash)).write_text(
+                changed_dispatch.model_dump_json())
+            changed_canvas = JimengCanvasSnapshot.create(**old_canvas.model_dump(
+                mode="python", exclude={"content_hash", "draft_sha256", "dispatch_hash"}),
+                dispatch_hash=changed_dispatch.content_hash)
+        else:
+            draft = json.loads(old_canvas.draft_json)
+            draft["tampered"] = True
+            changed_canvas = JimengCanvasSnapshot.create(**old_canvas.model_dump(
+                mode="python", exclude={"content_hash", "draft_sha256", "draft_json"}),
+                draft_json=json.dumps(draft))
+        (tmp_path / canvas_snapshot_path(old_canvas.content_hash)).unlink()
+        (tmp_path / canvas_snapshot_path(changed_canvas.content_hash)).write_text(
+            changed_canvas.model_dump_json())
+        with pytest.raises(AiVideoError) as reopen_error:
+            load_production_project(tmp_path / "project.yaml")
+        assert reopen_error.value.code is ErrorCode.PRODUCTION_PROJECT_INVALID
     if missing in {"dispatch", "canvas", "prior_receipt", "base_budget"}:
         from ai_video.production.jimeng_contracts import canvas_snapshot_path, dispatch_path
         from ai_video.production.paths import (

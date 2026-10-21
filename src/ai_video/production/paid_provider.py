@@ -576,6 +576,14 @@ class JimengAcceptedEffectProof(_PaidStrictModel):
         return cls.model_validate(data)
 
 
+class JimengAcceptedArtifacts(_PaidStrictModel):
+    """Hashes owned by one accepted Jimeng receipt, including its saved canvas."""
+
+    provider_kind: Literal["jimeng"] = "jimeng"
+    dispatch_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    canvas_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+
 class PaidProviderSubmitReceipt(_PaidStrictModel):
     attempt_id: str = Field(pattern=_SAFE_SHORT_ID.pattern)
     request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -586,6 +594,9 @@ class PaidProviderSubmitReceipt(_PaidStrictModel):
     external_effect_id: str | None = None
     no_effect_reconciliation: PaidProviderNoEffectReconciliationPointer | None = None
     jimeng_accepted_effect: JimengAcceptedEffectProof | None = None
+    jimeng_accepted_artifacts: JimengAcceptedArtifacts | None = None
+    jimeng_unknown_dispatch_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
+    jimeng_unknown_canvas_hash: str | None = Field(default=None, pattern=r"^[0-9a-f]{64}$")
     recorded_at: datetime
     submit_receipt_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
 
@@ -596,6 +607,12 @@ class PaidProviderSubmitReceipt(_PaidStrictModel):
             data.pop("no_effect_reconciliation", None)
         if self.jimeng_accepted_effect is None:
             data.pop("jimeng_accepted_effect", None)
+        if self.jimeng_accepted_artifacts is None:
+            data.pop("jimeng_accepted_artifacts", None)
+        if self.jimeng_unknown_dispatch_hash is None:
+            data.pop("jimeng_unknown_dispatch_hash", None)
+        if self.jimeng_unknown_canvas_hash is None:
+            data.pop("jimeng_unknown_canvas_hash", None)
         return data
 
     @field_validator("external_effect_id")
@@ -620,11 +637,23 @@ class PaidProviderSubmitReceipt(_PaidStrictModel):
         ):
             raise ValueError("only known-no-effect submits may link a reconciliation")
         proof = self.jimeng_accepted_effect
+        artifacts = self.jimeng_accepted_artifacts
+        if artifacts is not None and self.outcome is not PaidProviderSubmitOutcome.ACCEPTED:
+            raise ValueError("Jimeng artifacts require an accepted submit")
+        if (self.jimeng_unknown_dispatch_hash is not None
+                and self.outcome is not PaidProviderSubmitOutcome.OUTCOME_UNKNOWN):
+            raise ValueError("Jimeng dispatch anchor requires an unknown submit")
+        if (self.jimeng_unknown_canvas_hash is not None
+                and (self.outcome is not PaidProviderSubmitOutcome.OUTCOME_UNKNOWN
+                     or self.jimeng_unknown_dispatch_hash is None)):
+            raise ValueError("Jimeng canvas anchor requires a dispatched unknown submit")
         if proof is not None and (
             self.outcome is not PaidProviderSubmitOutcome.ACCEPTED
             or self.external_effect_id != f"{proof.resource_id}:{proof.task_id}"
             or self.request_fingerprint != proof.request_fingerprint
             or self.preview_fingerprint != proof.preview_fingerprint
+            or artifacts is None
+            or artifacts.dispatch_hash != proof.dispatch_hash
         ):
             raise ValueError("Jimeng accepted readback does not match submit receipt")
         data = self.model_dump(mode="json", exclude={"submit_receipt_fingerprint"})
@@ -731,6 +760,11 @@ def reconcile_jimeng_unknown_as_accepted(
             or accepted.outcome is not PaidProviderSubmitOutcome.ACCEPTED
             or proof is None
             or proof.prior_unknown_receipt_fingerprint != prior.submit_receipt_fingerprint
+            or prior.jimeng_unknown_dispatch_hash != proof.dispatch_hash
+            or (prior.jimeng_unknown_canvas_hash is not None
+                and (accepted.jimeng_accepted_artifacts is None
+                     or prior.jimeng_unknown_canvas_hash
+                        != accepted.jimeng_accepted_artifacts.canvas_hash))
             or reservation is None
             or reservation.status is not BudgetReservationStatus.UNSETTLED
             or reservation.submit_receipt_fingerprint != prior.submit_receipt_fingerprint

@@ -20,6 +20,7 @@ from ai_video.production.local_video import (
     LocalVideoTaskObservation,
 )
 from ai_video.production.paid_provider import (
+    JimengAcceptedArtifacts,
     PaidProviderCallPreview,
     PaidProviderSubmitOutcome,
     PaidProviderSubmitReceipt,
@@ -300,6 +301,24 @@ class VideoGenerationService:
                 gate.authorization,
                 permit,
             )
+            jimeng_artifacts = None
+            if gate.preview.provider_kind == "jimeng":
+                try:
+                    dispatch = self._committer.read_jimeng_dispatch(attempt_id)
+                    canvas = self._committer.read_jimeng_canvas_snapshot(attempt_id)
+                    if (result.external_effect_id.split(":", 1)[0] != dispatch.resource_id
+                            or dispatch.content_hash != canvas.dispatch_hash):
+                        raise ValueError("Jimeng accepted evidence identity changed")
+                    jimeng_artifacts = JimengAcceptedArtifacts(
+                        dispatch_hash=dispatch.content_hash,
+                        canvas_hash=canvas.content_hash,
+                    )
+                except (AiVideoError, ValueError, AttributeError):
+                    raise AiVideoError(
+                        code=ErrorCode.VIDEO_PROVIDER_OUTCOME_UNKNOWN,
+                        user_message="Jimeng accepted evidence cannot be sealed; keep UNKNOWN.",
+                        retryable=False,
+                    ) from None
         except AiVideoError as exc:
             if exc.code in {
                 ErrorCode.VIDEO_PROVIDER_FAILED,
@@ -310,6 +329,20 @@ class VideoGenerationService:
                     if exc.code is ErrorCode.VIDEO_PROVIDER_FAILED
                     else PaidProviderSubmitOutcome.OUTCOME_UNKNOWN
                 )
+                dispatch_hash = None
+                canvas_hash = None
+                if (gate.preview.provider_kind == "jimeng"
+                        and outcome is PaidProviderSubmitOutcome.OUTCOME_UNKNOWN):
+                    try:
+                        dispatch = self._committer.read_jimeng_dispatch(
+                            attempt_id, required=False)
+                        dispatch_hash = dispatch.content_hash if dispatch is not None else None
+                        if dispatch is not None:
+                            canvas = self._committer.read_jimeng_canvas_snapshot(
+                                attempt_id, required=False)
+                            canvas_hash = canvas.content_hash if canvas is not None else None
+                    except AiVideoError:
+                        pass
                 receipt = PaidProviderSubmitReceipt.create(
                     attempt_id=attempt_id,
                     request_fingerprint=request.resolved_generation_hash,
@@ -318,6 +351,8 @@ class VideoGenerationService:
                     reservation_id=paid_state.reservation_id,
                     outcome=outcome,
                     external_effect_id=None,
+                    jimeng_unknown_dispatch_hash=dispatch_hash,
+                    jimeng_unknown_canvas_hash=canvas_hash,
                     recorded_at=self._committer._paid_provider_clock(),
                 )
                 self._committer.record_paid_provider_submit_receipt(receipt)
@@ -330,6 +365,7 @@ class VideoGenerationService:
             reservation_id=paid_state.reservation_id,
             outcome=PaidProviderSubmitOutcome.ACCEPTED,
             external_effect_id=result.external_effect_id,
+            jimeng_accepted_artifacts=jimeng_artifacts,
             recorded_at=result.submitted_at,
         )
         self._committer.record_paid_provider_submit_receipt(receipt)
@@ -550,6 +586,7 @@ class VideoGenerationService:
                 user_message="This recovery is available only for the Jimeng Provider.",
                 retryable=False,
             )
+        self._committer.latch_jimeng_abandoned_intent(attempt_id)
         return self._provider.recover_unknown(attempt_id=attempt_id)
 
     def fetch_once(self, *, attempt_id: str) -> FetchedVideoCandidate:

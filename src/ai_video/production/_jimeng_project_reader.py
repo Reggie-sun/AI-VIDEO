@@ -8,8 +8,10 @@ from typing import Callable
 
 from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.jimeng_contracts import (
-    JimengCanvasSnapshot, JimengDispatchIntent, canvas_snapshot_path, dispatch_path,
+    JimengCanvasSnapshot, JimengDispatchIntent, canvas_snapshot_path,
+    dispatch_matches_request, dispatch_path,
 )
+from ai_video.production.models import VideoRequestReceiptPointer
 from ai_video.production.paid_provider import (
     BudgetReservationStatus, PaidProviderBudgetSnapshot, PaidProviderSubmitOutcome,
     PaidProviderSubmitReceipt, reconcile_jimeng_unknown_as_accepted,
@@ -69,9 +71,34 @@ def _canvas_for_attempt(root: Path, attempt_id: str) -> JimengCanvasSnapshot:
     return matches[0]
 
 
+def verify_jimeng_unknown_lineage(
+    *, root: Path, attempt_id: str, submit: PaidProviderSubmitReceipt,
+    request_pointer: VideoRequestReceiptPointer,
+) -> None:
+    """A dispatched UNKNOWN remains tied to its original sealed materials."""
+
+    if submit.jimeng_unknown_dispatch_hash is None:
+        return
+    dispatch = _dispatch_for_attempt(Path(root).resolve(strict=True), attempt_id)
+    canvas = (_canvas_for_attempt(Path(root).resolve(strict=True), attempt_id)
+              if submit.jimeng_unknown_canvas_hash is not None else None)
+    from ai_video.production._video_project_reader import load_video_request_receipt
+    request = load_video_request_receipt(root, request_pointer)
+    if (submit.outcome is not PaidProviderSubmitOutcome.OUTCOME_UNKNOWN
+            or dispatch.content_hash != submit.jimeng_unknown_dispatch_hash
+            or dispatch.request_fingerprint != submit.request_fingerprint
+            or dispatch.preview_fingerprint != submit.preview_fingerprint
+            or (canvas is not None and (
+                canvas.content_hash != submit.jimeng_unknown_canvas_hash
+                or canvas.dispatch_hash != dispatch.content_hash))
+            or not dispatch_matches_request(dispatch, request)):
+        raise _invalid("Jimeng unknown dispatch differs from the paid request.")
+
+
 def verify_jimeng_task_lineage(
     *, root: Path, attempt_id: str,
     submit: PaidProviderSubmitReceipt, active_budget: PaidProviderBudgetSnapshot,
+    request_pointer: VideoRequestReceiptPointer,
     load_budget_by_hash: Callable[[str], PaidProviderBudgetSnapshot],
 ) -> None:
     """Reopen dispatch for every accepted task; recoveries also reopen prior state."""
@@ -80,6 +107,9 @@ def verify_jimeng_task_lineage(
     resolved_root = Path(root).resolve(strict=True)
     dispatch = _dispatch_for_attempt(resolved_root, attempt_id)
     canvas = _canvas_for_attempt(resolved_root, attempt_id)
+    from ai_video.production._video_project_reader import load_video_request_receipt
+    request = load_video_request_receipt(resolved_root, request_pointer)
+    binding = submit.jimeng_accepted_artifacts
     effect = submit.external_effect_id
     if (submit.outcome is not PaidProviderSubmitOutcome.ACCEPTED
             or not isinstance(effect, str)
@@ -87,6 +117,10 @@ def verify_jimeng_task_lineage(
             or effect.split(":", 1)[0] != dispatch.resource_id
             or submit.request_fingerprint != dispatch.request_fingerprint
             or submit.preview_fingerprint != dispatch.preview_fingerprint
+            or binding is None
+            or binding.dispatch_hash != dispatch.content_hash
+            or binding.canvas_hash != canvas.content_hash
+            or not dispatch_matches_request(dispatch, request)
             or canvas.dispatch_hash != dispatch.content_hash
             or canvas.project_id != dispatch.project_id
             or canvas.node_id != dispatch.node_id
@@ -135,8 +169,12 @@ def verify_jimeng_task_lineage(
             or prior.outcome is not PaidProviderSubmitOutcome.OUTCOME_UNKNOWN
             or prior.external_effect_id is not None
             or prior.jimeng_accepted_effect is not None
+            or prior.jimeng_unknown_dispatch_hash != dispatch.content_hash
+            or (prior.jimeng_unknown_canvas_hash is not None
+                and prior.jimeng_unknown_canvas_hash != canvas.content_hash)
             or prior.recorded_at > proof.observed_at
             or dispatch.recorded_at > proof.observed_at
+            or canvas.recorded_at > proof.observed_at
             or submit.recorded_at != proof.observed_at
             or base_budget.content_hash != proof.base_budget_hash
             or retained_budget != expected_budget

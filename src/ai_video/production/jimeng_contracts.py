@@ -12,7 +12,10 @@ from pydantic import ConfigDict, Field, model_validator
 
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import StrictModel
-from ai_video.production.video import ProviderProfilePointer, VideoFlexibleOutputRequirement
+from ai_video.production.video import (
+    ProviderProfilePointer, ResolvedVideoGenerationRequest,
+    VideoFlexibleOutputRequirement,
+)
 
 
 JIMENG_ORIGIN = "https://jimeng.jianying.com"
@@ -175,3 +178,24 @@ class JimengCanvasSnapshot(StrictModel):
 
 def canvas_snapshot_path(content_hash: str) -> Path:
     return Path("artifacts/provider-canvas/jimeng") / f"{content_hash}.json"
+
+
+def dispatch_matches_request(
+    dispatch: JimengDispatchIntent, request: ResolvedVideoGenerationRequest,
+) -> bool:
+    """Check the sealed native material order against the canonical request."""
+
+    bindings = (*request.image_bindings,
+                *(item for item in request.media_bindings if item.kind == "audio"),
+                *(item for item in request.media_bindings if item.kind == "video"))
+    if len(bindings) != len(dispatch.materials):
+        return False
+    return all(
+        material.index == index
+        and material.kind == getattr(binding, "kind", "image")
+        and material.asset_id == binding.asset_id
+        and material.asset_sha256 == binding.asset_sha256
+        and material.size_bytes == binding.size_bytes
+        and material.duration_millis == getattr(binding, "duration_millis", None)
+        for index, (material, binding) in enumerate(zip(dispatch.materials, bindings, strict=True))
+    )

@@ -44,3 +44,6 @@ video-analysis-mcp = "ai_video_mcp.server:mcp"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+
+[tool.setuptools.package-data]
+"ai_video.production" = ["jimeng_browser.cjs"]
