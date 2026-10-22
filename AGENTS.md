@@ -2,6 +2,8 @@
 
 本文件是 repository constitution，常驻 authority、安全、唯一 owner 与 completion；可执行约束归 Harness，细节按需加载。默认中文，path、command、API、schema、Skill 名保持原文。
 
+即梦（Jimeng）与 Seedance 的生成 Prompt 默认使用中文，技术标识和素材引用语法保持原样；用户明确指定其他语言时遵从。
+
 ## Runtime Truth Sources
 
 | Concern | Canonical Source |
