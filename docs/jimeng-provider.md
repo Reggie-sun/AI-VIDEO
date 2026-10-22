@@ -39,6 +39,14 @@ P0 的 `compile_request` 支持普通 Shot requirement 的显式素材绑定。�
 
 ## Integration
 
+### One Complete Video Per Canvas
+
+按完整视频项目分配即梦画布：开始另一条独立视频时在已登录即梦 UI 新建画布，确认新 `project_id` 后再封存相应 profile / 请求。同一条视频的不同镜头、素材、变体和重做版本集中保存在这张画布，新增生成使用对应的新节点和独立 attempt，不覆盖、清空或删除旧结果。不得把不同完整视频长期混在同一张历史画布；“每条视频一张画布”不等于“每次 Provider 操作或每个镜头一张画布”。
+
+每次生成的 `node_id`、资源、参数、dispatch 和服务端 saved-snapshot 仍逐 attempt 核验及保留，沿既有 canonical owner 保存。正常轮询、下载、exact replay 和 UNKNOWN recovery 继续读取原 project/node/dispatch；同画布组织不扩大预算、重试或恢复授权。Worker不创建画布，也不能在 `submit()` 内临时替换已封存身份；由 Agent 在新视频准备阶段创建，并在同视频后续 Shot profile 中沿用该 project、选择相应节点。
+
+交付时提供每条完整视频的可点击画布链接及镜头/版本索引，说明画布中原始生成与本地后期成片的区别；服务端画布及节点完整保留供用户观看。本地 MP4 或索引不能代替在线画布，失败/无结果版本也应如实标明。
+
 创建 `JimengProfile`，将 `JimengBrowserTransport(profile_dir=<私有配置的登录 CDP 目录>)`、Registry 精确字节 resolver 和当前项目的 `ProductionStateCommitter` 注入 `JimengVideoProvider`，在现有 Generation target 中注册选定 profile/Provider。`playwright_module` 默认通过 Node 的 `playwright` 模块解析，也可显式注入安装目录；`node_binary`、`timeout_seconds` 同样可注入，不依赖某个用户的安装路径。Playwright 的 `exposeFunction` 必须返回可 `dispose()` 的 binding；不支持该公共 API 的版本在原生提交前拒绝，不调用其他浏览器库的清理 API。本机已验证 Node 22.21.0 和 Playwright 1.64.0-alpha-1790635538000，其他版本不自动视为合格。浏览器须预先登录、开启本机 CDP，并且目标画布 URL 在所有 context 中恰有一个页面；Worker 不创建登录会话或选择重复页面。
 
 沿用 `VideoGenerationService.start`、`submit_once`、`refresh_once`、`fetch_once` 和标准验证/验收；仅已有 Jimeng unknown attempt 可调用 `recover_jimeng_unknown_once`，不得再次调用 `submit_once`。Paid preview 使用 `billing_mode=remote_metered`、`currency=CRD`、profile 上限及 `SecretReference(kind="secret_store", reference_id="JIMENG_BROWSER_SESSION")` 作为浏览器会话元数据。账号/profile 由私有配置注入；Cookie、Token 不写入仓库、prompt、argv、日志或 receipt。
