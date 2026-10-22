@@ -76,7 +76,8 @@ def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), capt
             raise ValueError("unmaterialized production parent cannot be composed")
         settings = dict(row.get("composition", {}))
         if set(settings) - {"asset_role", "asset_id", "trim_start_frame", "trim_duration_frames",
-                            "transform", "speed", "muted", "volume", "source_time_map"}:
+                            "transform", "speed", "muted", "volume", "source_time_map",
+                            "source_audio_policy", "source_audio_reason"}:
             raise ValueError("unsupported source composition settings")
         if settings.pop("speed", 1) != 1 or settings.pop("volume", 1) != 1:
             raise ValueError("source speed/gain requires explicit existing composition authoring")
@@ -102,7 +103,16 @@ def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), capt
         if asset_id not in candidates:
             raise ValueError("composition selects a version not adopted by this Shot")
         asset = assets[asset_id]
-        if asset.asset_type.value == "video" and not muted and not native_retime:
+        if asset.asset_type.value == "video":
+            policy = settings.setdefault("source_audio_policy", "MUTE" if muted else "KEEP")
+            if muted and policy != "MUTE":
+                raise ValueError("muted=true conflicts with the source audio policy")
+            if policy == "MUTE":
+                if not muted:
+                    raise ValueError("source_audio_policy=MUTE requires explicit muted=true")
+                settings.setdefault("source_audio_reason", "Canvas direction explicitly sets muted=true.")
+        if (asset.asset_type.value == "video" and not muted and not native_retime
+                and settings.get("source_audio_policy") != "REPLACE"):
             # Registered audio carries a canonical derivation identity. Do not
             # count arbitrary per-Shot BGM as preserved source dialogue/sound.
             bound_tracks = [t for t in tracks if t.shot_id == shot.shot_id]
@@ -142,7 +152,15 @@ def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), capt
         )
     if native:
         from ai_video.production.composition import _sample_at_frame
-        visual = resolve_composition(loaded, seal_artifact(spec), renderer_version)
+        # This existing first pass resolves placement only. Its temporary
+        # visual-only intent is never returned/rendered; the final spec below
+        # keeps KEEP and must pass the common source-audio coverage check.
+        pending = {shot.shot_id for shot, _ in native}
+        layout_layers = tuple(layer.model_copy(update={
+            "source_audio_policy": "MUTE",
+            "source_audio_reason": "Placement-only resolution before binding the exact native WAV.",
+        }) if layer.shot_id in pending else layer for layer in spec.layers)
+        visual = resolve_composition(loaded, seal_artifact(spec.model_copy(update={"layers": layout_layers})), renderer_version)
         for shot, audio in native:
             span = next(s for s in visual.visual_spans if s.shot_id == shot.shot_id)
             start = _sample_at_frame(span.trim_start_frame, fps=visual.delivery_profile.fps, sample_rate=spec.sample_rate)

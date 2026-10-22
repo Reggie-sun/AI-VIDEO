@@ -56,3 +56,33 @@ def test_canvas_keeps_authored_speech_in_the_complete_native_track(tmp_path, fie
 
     native, = timeline.audio_spans
     assert native.native_audio_retime.visual_layer_id == f"canvas-{shot.shot_id}"
+
+
+def test_canvas_seals_keep_policy_in_the_composition_layer(tmp_path):
+    loaded, direction = _canvas(tmp_path, muted=False)
+    spec, _ = compose_canvas(loaded=loaded, direction=direction, renderer_version="0.7.103")
+    assert spec.layers[0].source_audio_policy == "KEEP"
+
+
+def test_canvas_seals_explicit_mute_instead_of_discarding_the_decision(tmp_path):
+    loaded, direction = _canvas(tmp_path, muted=True)
+    settings = direction["shots"][0]["composition"]
+    settings.pop("source_time_map")
+    settings["trim_duration_frames"] = 48
+    spec, timeline = compose_canvas(loaded=loaded, direction=direction, renderer_version="0.7.103")
+    assert spec.layers[0].source_audio_policy == "MUTE"
+    assert spec.layers[0].source_audio_reason
+    assert not timeline.audio_spans
+
+
+def test_canvas_explicit_replace_does_not_allow_missing_replacement_audio(tmp_path):
+    from ai_video.errors import AiVideoError, ErrorCode
+
+    loaded, direction = _canvas(tmp_path, muted=False)
+    settings = direction["shots"][0]["composition"]
+    settings.pop("source_time_map")
+    settings.update(trim_duration_frames=48, source_audio_policy="REPLACE",
+                    source_audio_reason="Use the authored replacement soundtrack.")
+    with pytest.raises(AiVideoError) as error:
+        compose_canvas(loaded=loaded, direction=direction, renderer_version="0.7.103")
+    assert error.value.code is ErrorCode.AUDIO_TIMELINE_INVALID

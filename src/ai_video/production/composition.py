@@ -834,13 +834,18 @@ def resolve_composition(
 
         # model_copy deliberately skips Pydantic validation. Reopen authored
         # text recursively before any projection, including generic/ad bounds.
-        if spec.text_layers or any(g.text_design is not None for g in spec.commercial_graphics):
+        if (spec.text_layers or any(g.text_design is not None for g in spec.commercial_graphics)
+                or any(layer.source_audio_policy is not None or layer.source_audio_reason is not None
+                       for layer in spec.layers)):
             spec = CompositionSpec.model_validate(spec.model_dump(mode="python"))
         require_production_source_eligibility(project, spec)
         timeline = _resolve_composition(project, spec, renderer_version)
         from ai_video.production.voice_routing_handoff import require_voice_composition
 
         require_voice_composition(project, spec, timeline)
+        from ai_video.production.composition_source_audio import require_source_audio
+
+        require_source_audio(project, spec, timeline)
         return timeline
     except AiVideoError:
         raise

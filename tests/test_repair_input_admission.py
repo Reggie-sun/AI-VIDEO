@@ -451,7 +451,8 @@ def test_replacement_audio_preview_resolves_p4_without_qualifying_failed_media(t
         delivery_profile=loaded.project.delivery_profile,
         layers=(CompositionLayerSpec(layer_id="visual", shot_id=shot.shot_id, asset_id=captured.asset_id,
             asset_role=use["asset_role"], trim_start_frame=0, trim_duration_frames=48,
-            transform=use["transform"]),),
+            transform=use["transform"], source_audio_policy="REPLACE",
+            source_audio_reason="This test intentionally replaces the failed source audio with music."),),
         audio_tracks=(AudioTrackSpec(track_id="music", asset_id=audio.asset_id, audio_kind="bgm",
             start_sample=0, trim_duration_samples=96_000),)))
     timeline = resolve_composition(loaded, spec, renderer_version="0.7.103")
@@ -470,8 +471,9 @@ def test_replacement_audio_preview_resolves_p4_without_qualifying_failed_media(t
         ResolvedTimeline.model_validate(raw_timeline)
     for tracks in ((), (spec.audio_tracks[0].model_copy(update={"audio_kind": AudioKind.DIALOGUE}),)):
         invalid = seal_artifact(spec.model_copy(update={"audio_tracks": tracks, "content_hash": "0"*64}))
-        with pytest.raises(AiVideoError, match="replacement|Replacement"):
+        with pytest.raises(AiVideoError) as invalid_audio:
             resolve_composition(loaded, invalid, renderer_version="0.7.103")
+        assert invalid_audio.value.code.value == "composition_invalid"
     assert _files(source) == before
 
     source, _, writer, args = _inputs(tmp_path / "rejected", close=True)

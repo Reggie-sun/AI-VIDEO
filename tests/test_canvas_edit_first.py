@@ -198,7 +198,7 @@ def test_materialized_canvas_render_keeps_canonical_external_cut_evidence(tmp_pa
 def test_family_audio_is_present_during_other_shot_native_audio_projection(tmp_path, monkeypatch):
     """Pure adapter boundary: the native-audio owner is scripted, never qualified here."""
     from ai_video.canvas_composition import compose_canvas
-    from ai_video.production.models import AssetRoleRequirement, VisualStrategy
+    from ai_video.production.models import AssetRoleRequirement, AssetSourceKind, VisualStrategy
     fixture, service = strategy_canvas(tmp_path)
     decision = service.prepare_production(parent_shot_id=fixture.parent_shot_id)
     service.materialize_production(decision=decision.model_dump(mode="json"), attempt_id="mixed-means")
@@ -206,9 +206,27 @@ def test_family_audio_is_present_during_other_shot_native_audio_projection(tmp_p
     video = next(a for a in loaded.registry.assets if a.asset_id == "strategy-imported-video")
     ordinary = loaded.shots[1].model_copy(update={"visual_strategy": VisualStrategy.EXISTING_VIDEO, "required_asset_roles": (
         AssetRoleRequirement(role="primary_visual", asset_ids=(video.asset_id,), allowed_asset_types=("video",)),)})
-    loaded = loaded.model_copy(update={"shots": (loaded.shots[0], ordinary)})
+    # Script the native owner with its own source-coupled WAV identity. The
+    # family's unrelated dialogue must not impersonate the video's source audio.
+    voice = next(a for a in loaded.registry.assets if a.asset_id == "voice-dialogue")
+    native = voice.model_copy(update={
+        "asset_id": "scripted-native-audio", "source_kind": AssetSourceKind.GENERATED,
+        "creation_receipt_id": "generated-video-audio-scripted",
+        "input_artifact_ids": (), "input_fingerprint": video.sha256,
+        "audio_metadata": voice.audio_metadata.model_copy(update={
+            "source": voice.audio_metadata.source.model_copy(update={
+                "kind": AssetSourceKind.GENERATED, "input_artifact_ids": (),
+                "input_fingerprint": video.sha256,
+            }),
+        }),
+    })
+    loaded = loaded.model_copy(update={
+        "shots": (loaded.shots[0], ordinary),
+        "registry": loaded.registry.model_copy(update={"assets": (*loaded.registry.assets, native)}),
+        "asset_paths": {**loaded.asset_paths, native.asset_id: loaded.asset_paths[voice.asset_id]},
+    })
     monkeypatch.setattr("ai_video.canvas_composition._native_audio_matches",
-                        lambda _loaded, audio, _video, _shot: audio.asset_id == "voice-dialogue")
+                        lambda _loaded, audio, _video, _shot: audio.asset_id == native.asset_id)
     spec, timeline = compose_canvas(loaded=loaded, direction=service.direction, renderer_version="0.7.103")
     assert {track.track_id for track in spec.audio_tracks} == {"strategy-dialogue", "canvas-native-shot-2"}
     assert timeline.total_frames == 120

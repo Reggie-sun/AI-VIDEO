@@ -293,7 +293,7 @@ checks:
     covered_by_check_ids: [production_contract_tests]
     description: Verify timeline, renderer, audio, voice, and caption contracts.
   native_audio_retime_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_native_audio_retime_contracts.py, tests/test_hyperframes_native_audio_retime.py, tests/test_canvas_native_audio_retime.py, tests/test_canvas_imported_audio_retime.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_composition_source_audio.py, tests/test_native_audio_retime_contracts.py, tests/test_hyperframes_native_audio_retime.py, tests/test_canvas_native_audio_retime.py, tests/test_canvas_imported_audio_retime.py, -q]
     cwd: .
     description: Verify exact source-coupled A/V mapping, bounded local PCM processing and public Canvas preservation; no Provider calls or media acceptance.
   production_dependency_tests:
@@ -942,6 +942,8 @@ categories:
       - src/ai_video/production/repair_input_admission.py
       - src/ai_video/production/production_strategy_materialization.py
       - src/ai_video/canvas_composition.py
+      - src/ai_video/production/composition_source_audio.py
+      - tests/test_production_composition_source_audio.py
       - tests/test_native_audio_retime_contracts.py
       - tests/test_hyperframes_native_audio_retime.py
       - tests/test_canvas_native_audio_retime.py

@@ -437,6 +437,7 @@ audio/caption/voice拒绝由现有composition/visual_media owner核验，旧raw 
 核验held bytes的唯一音轨，materializer重读验证，已有attempt保留原replay；输出samples沿全局frame边界，
 `_hyperframes_native_audio.py`处理explicit FFmpeg/ffprobe、音频正偏移、分段变速和有界尾部修正；
 `audio_retime_contracts.py`固定sample mapping/proof，原mixer/HyperFrames消费且reader核验exact proofs。
+CompositionLayer封存source_audio_policy与reason；`composition_source_audio.py`在唯一resolver出口核验已验证原声的同源、trim和覆盖，默认KEEP；MUTE/REPLACE须显式原因，无关配乐不能替代原声。缺字段旧bytes/hash保持，缺少原生stream证据不伪造来源；详见[源音频组合契约](source-audio-composition.md)。
 原P4 mixer/WAV校验归`_hyperframes_audio.py`，audio binding类型归`renderer_audio_contracts.py`，
 source/timeline track校验归`_render_source_validation.py`；原public imports兼容，不保留双实现。
 旧静音capture不授权A/V，failed-source需`development-repair-input/3`且仍禁止activation；

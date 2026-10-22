@@ -141,9 +141,25 @@ class CompositionLayerSpec(StrictModel):
     trim_start_frame: int = Field(default=0, ge=0)
     trim_duration_frames: int | None = Field(default=None, gt=0)
     source_time_map: VideoTimeMap | None = None
+    source_audio_policy: Literal["KEEP", "MUTE", "REPLACE"] | None = None
+    source_audio_reason: str | None = None
     transform: FixedTransform = Field(default_factory=FixedTransform)
     opacity_milli: int = Field(default=1000, ge=0, le=1000)
     z_index: int = 0
+
+    @model_validator(mode="after")
+    def _source_audio_intent(self) -> "CompositionLayerSpec":
+        if self.source_audio_policy in {"MUTE", "REPLACE"} and not (
+            self.source_audio_reason and self.source_audio_reason.strip()
+        ):
+            raise ValueError("Muting or replacing source audio requires an explicit reason")
+        if self.source_audio_policy is None and self.source_audio_reason is not None:
+            raise ValueError("Source audio reason requires an explicit source audio policy")
+        if (self.source_time_map is not None
+                and self.source_time_map.audio_policy == "retime_preserve_pitch"
+                and self.source_audio_policy in {"MUTE", "REPLACE"}):
+            raise ValueError("Source audio policy conflicts with the preserving time map")
+        return self
 
     @model_serializer(mode="wrap")
     def _serialize_optional_time_map(
@@ -152,6 +168,10 @@ class CompositionLayerSpec(StrictModel):
         data = handler(self)
         if self.source_time_map is None:
             data.pop("source_time_map", None)
+        if self.source_audio_policy is None:
+            data.pop("source_audio_policy", None)
+        if self.source_audio_reason is None:
+            data.pop("source_audio_reason", None)
         return data
 
 
