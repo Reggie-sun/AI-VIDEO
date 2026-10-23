@@ -117,10 +117,12 @@ def compose_canvas(*, loaded, direction, renderer_version, audio_tracks=(), capt
             # count arbitrary per-Shot BGM as preserved source dialogue/sound.
             bound_tracks = [t for t in tracks if t.shot_id == shot.shot_id]
             matches = [a for a in assets.values() if _native_audio_matches(loaded, a, asset, shot)]
-            if not bound_tracks and len(matches) == 1:
+            matched_asset_ids = {audio.asset_id for audio in matches}
+            bound_native_audio = any(t.asset_id in matched_asset_ids for t in bound_tracks)
+            if not bound_native_audio:
+                if len(matches) != 1:
+                    raise ValueError("native video audio needs its exact registered WAV track or explicit mute")
                 native.append((shot, matches[0]))
-            elif not any(_native_audio_matches(loaded, assets[t.asset_id], asset, shot) for t in bound_tracks):
-                raise ValueError("native video audio needs its exact registered WAV track or explicit mute")
         layers.append(CompositionLayerSpec(layer_id=f"canvas-{shot.shot_id}", shot_id=shot.shot_id,
             asset_role=role, asset_id=asset_id, **settings))
         order.append(shot.shot_id)

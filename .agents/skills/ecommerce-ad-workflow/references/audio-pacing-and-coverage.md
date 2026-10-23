@@ -8,6 +8,8 @@
 
 每个 beat 声明 dialogue/VO expectation、music presence/energy/transition、SFX 或 reveal hit、ducking、source/generation need，以及与 product/copy event 的同步。`audio_plan.coverage` 必须覆盖 `[0, duration_seconds]`；无 event 的窗口仅在 `intentional_silence=true` 且附 narrative/commercial rationale 时有效。
 
+结合画面与实际原声判断配音是否补足剧情、商品信息或行动指引；在现有声音方案说明需要的内容与时点，省略时给出具体表达理由。生成视频带原声不代表已满足旁白需求；必要的后期配音与原声、音乐、拟音共同进入既有P4混音，避免重复说同一文案或遮住人声。修复原声时逐轨保留仍有用的后期声音，仅调整有明确重复或冲突的部分；不新增必配旁白规则或第二声音编排状态。
+
 每条 on-camera line 必须绑定 exact speaker、verbatim line、Shot 和 `lip_sync_required`。每个 native/generated source audio 声明 `keep`、`mute`、`replace` 或 `trim_then_mix` policy；Shot 开头噪声风险要写 trim/fade 意图和 P6 measurement requirement。
 
 ## Provider capability branch

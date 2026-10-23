@@ -8,6 +8,12 @@
 
 显式 `REPLACE` 仍须有覆盖该层时段的替换音轨；显式 `MUTE` 不要求原声音轨。v2原生音频继续通过原VIDEO/sample映射、原stream预检与HyperFrames mixer；注册WAV仍遵循原来源和登记资格，不能用此检查绕过结算、原片验收或Registry owner。开发预览的来源不得升级为Production acceptance。
 
+## Native And Post Audio Together
+
+原声保留与后期配音不是二选一。普通Canvas视频层在同Shot已有旁白、对白或音乐轨时，仍应自动接入唯一精确匹配的已登记原声WAV；已显式绑定该原声时不重复建轨。缺少或存在多个未选定原声候选时，不能以任意后期音轨代替来源检查。显式MUTE/REPLACE仍遵守原意图与覆盖约束，后期轨的trim、gain、fade和ducking保持。
+
+所有选定音轨由同一个`ResolvedTimeline`与HyperFrames mixer组合；是否需要旁白由现有导演/广告声音方案判断，省略须有内容理由，不由stream存在与否推断。听感、对白可懂度及是否重复仍需exact成片审听，配置与测试不代签。
+
 ## Compatibility And Proof Boundary
 
 新增字段缺席时不进入旧序列化，历史Spec及hash不被补写。旧素材没有可重开的源音轨证据时，缺省policy不能作为“存在音轨”或“没有音轨”的证明；显式KEEP必须提供可验证的同源音轨路线。实际已验证原声不再因字段缺省而静默丢弃。

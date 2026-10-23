@@ -1148,16 +1148,17 @@ def test_native_audio_gate_documents_provider_capability_branch() -> None:
     playbook_gate = playbook.split("### Per-Shot Post-Media Gate\n", 1)[1].split(
         "\n## ", 1
     )[0]
-    assert "outcome known" in agents_gate
-    assert "Unknown outcome 必须停止" in agents_gate
-    assert "只有全部 required findings 为 `PASS` 才可推进" in agents_gate
+    assert "每 Shot exact MP4 落盘后、下一 Shot submit 前" in agents_gate
+    assert "显式调用 project-local `video-analysis` MCP" in agents_gate
+    assert "local exemption + known outcome" in agents_gate
+    assert "unknown 停止" in agents_gate
+    assert "仅全 `PASS` 推进" in agents_gate
+    assert "`FAIL` / `NOT_EVALUATED` 停止 attempt" in agents_gate
     assert (
-        "[Per-Shot Post-Media Gate]"
-        "(.agent/context/control-plane-playbook.md#per-shot-post-media-gate)"
+        "[Per-Shot Gate](.agent/context/control-plane-playbook.md#per-shot-post-media-gate)"
     ) in agents_gate
     for policy_text in (playbook_gate, h3_skill):
         assert "outcome-known" in policy_text
-    assert "阻断下一 Shot" in agents_gate
     assert "new exact identity / intent / one-use permit" in playbook_gate
     assert "封存有限的 task-scoped attempt count、elapsed-time" in playbook_gate
     assert "与 GPU budget" in playbook_gate
