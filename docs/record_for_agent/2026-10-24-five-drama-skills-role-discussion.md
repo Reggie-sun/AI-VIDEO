@@ -8,6 +8,12 @@ learning_eligibility: ineligible
 
 Date: 2026-10-24
 
+## Supersession Notice — 2026-10-24
+
+后续用户已授权执行，并补充广告 `ad-creative`。本地专责Skills/方法接入与冲突清理由
+`4118931` / `a168f8d` 实施，详见[实施记录](2026-10-24-director-skill-integration.md)。下文
+“尚未安装/修改Skills”“后续未实施”是原讨论检查点的历史状态；没有新媒体生成/验收。
+
 ## Purpose And Scope
 
 用户提供 Shuohao、Zenstory、Liyue Seedance 2.5、DirectorSKILL、Kangarooking 五个仓库，要求原生团队讨论如何各司其职，允许修改或优化。随后收窄为 Drama / 剧情短剧层，广告层暂不动；允许识别共用能力，并希望增加子代理。

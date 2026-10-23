@@ -1,5 +1,12 @@
 # Five Drama Skills Role Design
 
+## Implementation Update — 2026-10-24
+
+用户随后授权执行并补充广告 `ad-creative`，本方案的advisory方法和路由已在
+`4118931` / `a168f8d` 实施；已同步删除冲突、过时状态和重复说明。具体实现、验证与未验证
+边界见[实施记录](../record_for_agent/2026-10-24-director-skill-integration.md)。下方保留原讨论方案，
+其中“尚未安装/实施”属于此前讨论检查点；不表示整套上游安装、Drama Runtime或媒体质量已验证。
+
 ## Status And Scope
 
 本轮是用户要求的原生团队讨论和接入设计，不是安装或 Runtime 实现。用户随后明确：五个仓库先用于 **Drama / 剧情与短剧层**，广告层暂不动；可识别共用能力。本文是 advisory proposal，不变更 accepted contract、Skill 路由、Production state 或验收状态。
