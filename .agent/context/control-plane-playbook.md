@@ -53,7 +53,10 @@ Provider capability 归 current profile；结构 PASS 不证明语义/质量。�
 → deterministic composition。只用 matching concerns，实际读取各 Skill；schema/操作/限制不在此复制。连续画布先读[制作方法](../../docs/canvas-continuous-production.md)，默认480p。
 
 - `ecommerce-ad-workflow`：仅 ecommerce/SKU/product advertising；不接管 AI comic/drama。
+- `ad-creative`：广告创意策略、Hook、形式、文案与受控变体的 advisory 专项；先消费已核实商品事实，建议回到现有 ecommerce authoring owner，不处理投放账号或执行。剧情广告仍归广告语义，可按需借用下方 craft。
+- `drama-authoring`：剧情/分集/剧本与人物场景道具制作设定；遵 accepted Drama contract，输出同一 Story/Scene/Character/Shot 语义与 Director 交接，不签媒体验收。
 - `open-video`：concept/script/raw input/ordered coverage；不安装运行外部 engine 或生成/judge/stitch。
+  需要细化调度、表演或动作时按需读其 `references/professional-specialists.md`，不为五库齐用而重复编剧/分镜；2.5 专项仍只由 selected Seedance 2.5 overlay 加载。
 - `hell-grind-aigc-skill`：semantic Shot/state/continuity、prompt、diagnosis；不建立第二 schema/ledger。
 - `h3-video`：approved Shot + requirement + selected MiniMax H3；不选择 Provider/改 intent/运行上游 runtime。
 - `seedance-authoring` MUST use：approved Shot + requirement + selected Seedance，先 shared knowledge 再一个 exact

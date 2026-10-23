@@ -36,6 +36,17 @@ Return authoring to the existing Canvas/Shot owners, generation to the selected 
 No upstream command, automatic score or PASS stub substitutes for those owners or for watching
 and hearing the exact film.
 
+### Specialist Authoring
+
+For story development or production design, read the local [Drama authoring specialist](../drama-authoring/SKILL.md).
+For product advertising, use [ad creative](../ad-creative/SKILL.md) with the existing
+`ecommerce-ad-workflow` Product Truth and authoring contract. A narrative ad retains its advertising
+objective and may borrow Drama craft; it does not become an episodic-fiction request.
+For staging, performance or physical action, load only the relevant section of
+[Professional Specialists](references/professional-specialists.md). These specialists return advice
+to the same approved story and coverage; they do not dispatch one another or execute production.
+Skip upstream development for an already approved source or a bounded local repair.
+
 ## 2. Director Task And Coverage
 
 **Step 1 — Understand the request.** Classify the user's task purpose before checking whether

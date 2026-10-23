@@ -11,17 +11,23 @@ description: Use when an ecommerce, SKU, product advertising, direct-response pr
 
 ## Boundaries
 
-- 只服务 ecommerce / product advertising；AI comic、episode、serial、cliffhanger 输入立即停止。
+- 只服务 ecommerce / product advertising；独立 AI comic、episode 或 serial 创作归 Drama owner。人物情节或悬念用于商品广告时仍按广告目标处理，不按关键词误拒绝，也不在广告 package 中加入 fiction runtime 字段。
 - 不抓取未授权页面，不读取 credential，不联网，不调用 Provider，不生成媒体，不写 Project、Registry、Manifest 或 activation。
 - 不选择 renderer/timeline/Provider，也不把 `DIALOGUE_SUBTITLE` 当作 commercial graphics fallback。
 - Valid package 不证明 compositing、typography、audio stream、watchability、P6、Final Acceptance、live-ready 或 advertising performance。
-- `AdQCReport.ready`只表示 Ecommerce authoring readiness；它不能创建`ReviewReceipt`、`FinalAcceptanceReceipt`、Production verdict或Manifest mutation。`AdCreativeReviewReport.is_ready`只表示deterministic handoff integrity，且`production_verdict`必须保持`None`。Whole-ad post-media Ecommerce acceptance尚未实现。
+- `AdQCReport.ready`只表示 Ecommerce authoring readiness；它不能创建`ReviewReceipt`、`FinalAcceptanceReceipt`、Production verdict或Manifest mutation。`AdCreativeReviewReport.is_ready`只表示deterministic handoff integrity，且`production_verdict`必须保持`None`。Whole-ad post-media Ecommerce acceptance归现有 `EcommerceQualityGateCoordinator` / Gate 2 与 P6 lifecycle，见 [owner matrix](../../../docs/agent-primary-contract-matrix.md#quality-gate-architecture-boundary)。
 - Runtime handoff export 只有在 exact `DeliveryProfile`、reviewed `EcommerceVisualSystemProfile`、per-ad `EcommerceLayoutPlan` 与只绑定这些 identity 的 `EcommerceProductionCompileProfile` 同时存在时才允许。Exporter 不生成通用布局默认值，也不以 schema-valid 代替 preview / visual review。
 - CTR、CVR、CPA、ROAS、hold rate、retention与其他market outcome属于future empirical feedback，不得由package validity、Ad QC或Production Final Acceptance预测。
 
 ## Decision Sequence
 
-按 G0→G7 顺序执行。每个阶段只读取列出的 reference；blocking finding 立即返回 exact gate、diagnostic code、evidence gap 与所需决定，不继续伪造 ready package。
+需要发展广告角度、Hook、创意形式或文案变体时，在 G0 已核实资料范围内按需读取
+[Ad Creative 专项](../ad-creative/SKILL.md)，将其建议带回下表对应阶段；它不代替 Product Truth、
+本 package 或 G7。剧情广告可借用 [Director 入口](../open-video/SKILL.md) 中按需路由的专业方法
+设计人物互动和连续性，仍保留商业目标与广告验收，不因有故事而误分为独立 episode。
+此处是 Native Codex 的按需知识读取，不是本 Skill 调用其他执行工作流或 fallback。
+
+按 G0→G7 顺序执行，先读取当前阶段列出的 reference，再按具体创意疑点读取上方专项；blocking finding 立即返回 exact gate、diagnostic code、evidence gap 与所需决定，不继续伪造 ready package。
 
 | Gate | Required result | Read |
 | --- | --- | --- |
@@ -73,4 +79,4 @@ description: Use when an ecommerce, SKU, product advertising, direct-response pr
 
 ## Stop Conditions
 
-rights/claim/source 缺失、医疗 claim、第一秒 Hook 缺失、商品名缺失、`ad_format` profile不闭合、fake physical interaction、commercial copy 全部降级为 subtitle、非 intentional audio gap、dialogue binding不全、source-audio policy矛盾、CTA/end card缺失、multi-variable variant、或 Runtime execution/acceptance字段出现时停止。Authoring不得把required Provider native audio静默改写为P4 replacement；exact Provider分流由后续Agent Gate执行。返回 blocker，不调用 `open-video`、AI comic workflow、外部 ad system或任何执行 fallback。
+rights/claim/source 缺失、医疗 claim、第一秒 Hook 缺失、商品名缺失、`ad_format` profile不闭合、fake physical interaction、commercial copy 全部降级为 subtitle、非 intentional audio gap、dialogue binding不全、source-audio policy矛盾、CTA/end card缺失、multi-variable variant、或 Runtime execution/acceptance字段出现时停止。Authoring不得把required Provider native audio静默改写为P4 replacement；exact Provider分流由后续Agent Gate执行。返回 blocker，不启动 `open-video`、AI comic workflow、外部 ad system或其他执行路径绕过该 blocker；正常的专项知识读取不构成执行 fallback。

@@ -22,7 +22,7 @@ G7 是 authoring preflight：检查 package 的真相、广告逻辑和 handoff 
 
 任一缺证据、缺 trace、未覆盖 audio window、缺 CTA/end card、缺 product presentation，或未分类 capability gap 即为 blocking finding，回到对应 G0-G6。只有无 blocking finding 才能让`AdQCReport.ready=true`并标记`PACKAGE_READY`；该verdict只关闭Ecommerce authoring preflight。
 
-`AdQCReport.ready`不得创建或冒充`ReviewReceipt`、`FinalAcceptanceReceipt`、Production verdict、Manifest mutation、candidate activation或whole-ad post-media acceptance。它也不预测CTR、CVR、CPA、ROAS、hold rate、retention或其他market outcome；future media acceptance必须由另行批准的typed Runtime seam把exact domain/rubric/requirement/media evidence重新绑定到existing P6 lifecycle。
+`AdQCReport.ready`不得创建或冒充`ReviewReceipt`、`FinalAcceptanceReceipt`、Production verdict、Manifest mutation、candidate activation或whole-ad post-media acceptance。它也不预测CTR、CVR、CPA、ROAS、hold rate、retention或其他market outcome。Post-media acceptance 已由现有 `EcommerceQualityGateCoordinator` / Gate 2 把 exact domain/rubric/requirement/media evidence 绑定到 existing P6 lifecycle；当前 owner 见 [Quality Gate boundary](../../../../docs/agent-primary-contract-matrix.md#quality-gate-architecture-boundary)，本 authoring checklist 不重复执行或签发该裁决。
 
 ## Quick Reference
 
