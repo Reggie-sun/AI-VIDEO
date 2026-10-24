@@ -7,6 +7,10 @@
 官方请求没有 `model`；内部 `model_id=ad-one-click` 仅用于绑定服务与付费证据。
 参考：[官方接口文档](https://platform.vidu.cn/docs/one-click-ad-film)。
 
+该整片服务包含自动营销编排与多语言 TTS；当前请求没有独立逐镜 speaker、对白窗口或无口播
+区段字段。需要保持人物对白/停顿的原稿不能仅因 Provider 相同就视为能力等价，Agent 作者指导
+见 [Vidu Authoring](../.agents/skills/vidu-authoring/SKILL.md)，不改变下面的 Runtime/验收合同。
+
 输入为 1–7 张已注册图片、最多 2000 字提示词、8–60 秒、`1:1/16:9/9:16`、
 `zh/en` 和显式 `creative`。输入图片顺序保持不变，首图应为商品图；无图片 URL
 抓取旁路，只发送验证后的原始 bytes 的 data URI。完整请求不超过 20 MiB。

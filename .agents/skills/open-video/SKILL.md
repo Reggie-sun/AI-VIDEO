@@ -213,7 +213,9 @@ for executable allocation and route selection; Director proposals do not select 
 qualify assets or bypass readiness. Once the Shot and selected route are established:
 
 - H3 authoring uses [h3-video](../h3-video/SKILL.md); selected Seedance authoring uses
-  [seedance-authoring](../seedance-authoring/SKILL.md). Other selected models use their matching owner.
+  [seedance-authoring](../seedance-authoring/SKILL.md); selected Vidu models/services use
+  [vidu-authoring](../vidu-authoring/SKILL.md), including dialogue versus automated TTS service matching.
+  Other selected models use their matching owner.
 - Generation uses the selected adapter and existing authorization, budget, egress and permit gates.
   Rendering uses HyperFrames and timing uses the single `ResolvedTimeline`.
 - After each exact MP4, explicitly use project-local `video-analysis` MCP and the

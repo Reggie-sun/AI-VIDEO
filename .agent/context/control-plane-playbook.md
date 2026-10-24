@@ -58,7 +58,7 @@ Provider capability 归 current profile；结构 PASS 不证明语义/质量。�
 - `h3-video`：approved Shot + selected MiniMax H3 的表达指导。
 - `seedance-authoring` MUST use：approved Shot + requirement + selected Seedance，先 shared knowledge 再一个 exact
   version overlay；unknown/mixed selection 停止。semantic intent -> seedance-authoring: prompt/reference expression。
-- Non-Seedance guidance 用 `higgsfield`；deterministic motion/graphics/pacing 用 `video-shotcraft`。
+- 已选 Vidu model/service 的表达先读 `vidu-authoring`，核对角色对白/无口播段与服务 TTS 控制是否匹配；其他 Non-Seedance guidance 用 `higgsfield`；deterministic motion/graphics/pacing 用 `video-shotcraft`。
 - `higgsfield-seedance`、`higgsfield-seedance-2-5`、`higgsfield-seedance-vfx` 与 `higgsfield-troubleshoot` 的
   Seedance branch 已 retired，MUST NOT direct-dispatch；仅 selected seedance-authoring 后可读取 advisory excerpt。
 
