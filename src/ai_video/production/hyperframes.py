@@ -528,7 +528,7 @@ def _audit_hyperframes_source(
     )
     allow_legacy_percent = bool(expected_timeline.commercial_graphics) and all(
         graphic.font_weight == 700 and graphic.letter_spacing_px == 0
-        for graphic in expected_timeline.commercial_graphics
+        for graphic in (*expected_timeline.commercial_graphics, *expected_timeline.text_layers)
     )
     expected_variants = [
         _parse_source_document(

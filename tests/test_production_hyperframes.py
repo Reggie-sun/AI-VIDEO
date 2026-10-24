@@ -909,6 +909,24 @@ def test_commercial_graphic_zero_suffix_width_keeps_60_percent(tmp_path):
     assert "width:6%" not in html
 
 
+@pytest.mark.parametrize("typography", [{"font_weight": 500}, {"letter_spacing_px": 1}])
+def test_audit_accepts_custom_text_layer_beside_default_commercial_graphic(tmp_path, typography):
+    timeline = _with_commercial_graphic(make_resolved_timeline())
+    default = timeline.commercial_graphics[0].model_copy(
+        update={"font_weight": 700, "letter_spacing_px": 0}
+    )
+    text_layer = default.model_copy(update={"graphic_id": "merchant-watermark", **typography})
+    timeline = _reseal_timeline(timeline, commercial_graphics=(default,), text_layers=(text_layer,))
+
+    result = _materialize(tmp_path, timeline)
+
+    audit_hyperframes_source(
+        result.index_path,
+        expected_timeline=timeline,
+        expected_assets=result.asset_bindings,
+    )
+
+
 @pytest.mark.parametrize("width_milli, historical_width", [(840, "84"), (600, "6")])
 def test_audit_keeps_historical_default_commercial_graphic_source(
     tmp_path, width_milli, historical_width
