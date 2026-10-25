@@ -52,10 +52,12 @@ For music spotting, thematic development, score prompts or music repair, read
 choose music from the narrative and actual performance before using a selected music tool.
 This does not install another Skill, select a Provider, or authorize generation.
 
-When dialogue rhythm, action timing or shot length is undecided, read
-[Event-Led Timing](references/event-led-timing.md). Direct the causal performance and the reason
-to hold or cut before choosing a feasible generation duration; an allocated clip duration does not
-assign a timestamp to every gesture or line. Preserve fixed user timing and approved source facts.
+When choosing or revising generation grouping or duration, including reusing coverage with existing
+short durations, read [Event-Led Timing](references/event-led-timing.md). Decide photographic cuts
+and generation groups separately: preserve a complete action-and-response sequence before choosing
+a feasible clip duration. Existing coverage-unit lengths are not automatic Provider request lengths;
+an allocated clip duration does not assign a timestamp to every gesture or line. Preserve fixed user
+timing and approved source facts.
 
 ## 2. Director Task And Coverage
 

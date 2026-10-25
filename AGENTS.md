@@ -71,7 +71,7 @@ Blender 资产/参考制作先读 [routing](docs/blender-routing.md)；媒体实
 
 每 Shot 按题材、表演/动作/空间/摄影目标、所选模型能力与已有成片证据选择必要的参考条件，不因具备白模制作能力而默认使用白模；选用[白模参考](docs/canvas-production-harness.md#per-shot-whitebox-reference)时核验并实际绑定，白模、参考图或长 Prompt 均不保证导演意图被执行，效果须由 exact 成片验证。
 
-镜头数量、景别和切点先服从叙事与表演，剧情段落和生成片段不默认等同摄影镜头，修复保留已满足的效果而非自动冻结原机位与剪辑。
+摄影服从叙事与表演，生成按完整行动反应及模型能力分组定长，不默认短段或一镜一段、不强凑上限；修复保留已满足效果，不冻结机位剪辑。
 
 ## Agent Workflow Routing
 
