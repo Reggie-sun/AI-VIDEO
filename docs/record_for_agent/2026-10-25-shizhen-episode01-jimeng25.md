@@ -8,7 +8,21 @@ evidence_index_version: "1"
 
 Date: 2026-10-25
 
-## Current Checkpoint — S02 Raw Approved And Bilingual Captions Delivered
+## Current Checkpoint — S01–S02 Cumulative Bilingual Review
+
+2026-10-26，用户要求“两个shot拼接在一起我看看,然后把规则改一下,每次新shot合格之后,都要拼接出来给我看”。已交付 `outputs/shizhen-episode01/失帧-第一集-S01-S02连续版-1080p中英双语-24秒.mp4`，SHA `a7c9782275cb2eaab861cce7413f5bbbe87a73c07282a42422ade7550eccd568`，23,615,087 bytes，1920×1080、24fps CFR、576帧、24秒、AAC48kHz双声道。完整S01 16秒后在frame384直接切入完整S02 8秒，无添加转场、停顿、重复、变速、配音或配乐；四组S01与一组S02双语字幕沿各自原轨进入同一timeline，S02字幕实际移至17.000–18.208秒。各独立原片、字幕版及旧审核记录保留，未产生新generation/paid调用、未公开发布、未Production activation或生成S03；24秒整段用户审看仍PENDING。
+
+沿既有 `qualification_preview_input` 精确捕获两个真实已获raw认可的来源，原source Project/Manifest/MP4字节不改；新的独立 `cumulative-S01-S02-v1/project` 明确保留development scope，不把用户认可改写为模型资格、八项合成HUMAN证明或清除S02历史analyzer FAIL/NE。最初bootstrap带入未引用的旧style/bundle被标准owner拒绝，未初始化；改为声明所需source provenance，初始注册真实媒体/音轨，再由唯一committer追加两份CaptionTrack及样式，strict reopen通过。首次resolve暴露现有 `_composition_visual` 硬编码整条字幕审看仅一Shot/一对白轨，实际还未启动renderer；不是模型生成失败或未知付费重试。
+
+为实现可复用的逐镜连续审看，仅适配既有 `_composition_visual`：每Shot仍仅一个admitted video、一个同SHA派生的原DIALOGUE与绑定本Shot音轨的字幕；逐Shot保留exact source window、0gain/no fade/duck、identity map、development scope和activation fence。全段visual samples须连续覆盖0到total_samples，拒绝跨镜字幕、错源、短音轨、重复Shot分配及间隙/重叠，不生成第二timeline或直接mux旁路。新增测试先得到多Shot正例FAIL、五类负例PASS，再实现得到该模块10 PASS；随后composition/captions/generated-audio/admission相关5文件182项全部PASS（94.27秒）。这不等于完整工程suite。canonical matrix同步该多Shot边界，未改Provider、账本、权限或Production qualification。Parent Risk Gate为NATIVE_REVIEW_NOT_REQUIRED：边界限development preview，可逆且无凭据/付费/激活改动，逐源负例与实际双镜render覆盖所需风险，未以文件数自动开额外审查。
+
+实际HyperFrames0.7.103 lint/check均0 errors/0 warnings，唯一ResolvedTimeline为576frames/1152000samples，visual起点0/384。Explicit project-local `video_analyze`取得exact交付24帧，Parent查看整个样本及frame382/383/384/385接点、407/408字幕进入和436/437/438退出，确认接点无新增空白/黑帧，字幕位移、两行和无句尾符号保持。按同一timeline audio_spans重建仅用于比较的原声样本，AAC对齐1024samples（21.33ms）后相关0.999282，原对白与环境内容未换；该比较是技术证明，不虚称主模型亲耳聆听或用户已经认可连续版。当前仍是原renderer审看片编码，不冒称正式发布码率全部达标。
+
+新持久规则位于AGENTS的Final-output-first：“每个新 Shot 合格后，自动拼接截至该镜的全部合格镜头交用户连续审看”。原有两段成片验收/先出片后工程验证细则原文迁至既有 `docs/canvas-continuous-production.md#formal-narrative-output-defaults`，constitution保留原则并显式委托该owner；不是删除不降质或人审要求。新增规则的同时将AGENTS从原先已超限14235bytes收敛为13988bytes，未放宽14000预算或迁移其他无关规则；agent_rules_gate与docs_contract_gate均PASS。工作流owner同时规定累计版本保留、按当前验收/用户明确意见判合格、各轨字幕与接点验证，不从单镜PASS推出完整故事质量。
+
+本轮证据集中在 `runs/shizhen-episode01-jimeng25-20261025-001/cumulative-S01-S02-v1/`：`input-receipt.json`、`resolved-timeline.json`、`render-receipt.json`、`exact-MCP-analysis.json`、`join-frames/`、`audio-preservation.json`、`delivery-verification-receipt.json`、`owned-snapshot.json`、`related-regression.xml`。未stage/改写其他窗口音乐或广告文件；并行Suno窗口要求Git snapshot稳定时，尝试经native thread工具协调但本地MCP transport不可达，主index/HEAD写入先等待。临时GIT_INDEX_FILE准备了独立index，但Harness清理环境后识别为空scope，未执行，不能称隔离Harness通过；之后实际读回共享index为空、无运行中的Harness验证进程，选择仅owned paths的短commit窗口，并用明确commit-range验证，不夹带音乐/广告改动。record-ai-video-session更新同一primary record；distill-ai-video-learning为no_candidate：工程能力与一次连续审看不构成独立重复的模型质量结论，不自动新增Skill/Policy/Gate学习规则。
+
+## Previous Checkpoint — S02 Raw Approved And Bilingual Captions Delivered
 
 2026-10-26，用户对刚交付的exact S02原片明确回复“这个可以通过,直接上字幕”，绑定raw SHA `4617cb5674d67591bd89b7a32d6018be21c4c7b636c6ae7ac518fad7d7cc36ce`。用户接受这版实际构图并要求直接上字幕；本轮按该明确指令保留原片，不继续裁脸问题的重生成。旧analyzer 2 FAIL/3 NE如实保留，用户认可单独记在 `caption-review-S02-001/S02001-user-approval.json`，不伪造成用户逐条回答八项、Runtime HUMAN证明、模型资格、Production activation或S03准入。
 

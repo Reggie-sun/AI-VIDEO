@@ -308,6 +308,7 @@ Registry 独立重开 immutable receipt，不依赖外部 root。保留路径与
 owner拒绝该scope；不建立第二renderer、timeline、许可或quality state。
 `/6`的`replacement_audio_preview`允许正常速度source window配独立P4 BGM/SFX/ambience及有据的静态Shot旁白；
 同源原声对白可作为显式derived DIALOGUE音轨配CaptionTrack，必须精确绑定captured MP4身份和样本窗口、保持0增益且无fade/ducking。
+连续审看允许多个已捕获Shot，每Shot仅一条原片视觉和一条同源对白，字幕逐Shot绑定各自音轨；逐一核验来源与完整样本窗口，画面区间连续覆盖全片，拒绝跨Shot字幕绑定、错源、缺口、重叠或额外音轨。
 receipt中的V1 map必须为identity，layer不得携带retime map，voice_sources仍禁止；字幕沿既有音轨绑定与样本校验，不能以字幕接入取得Production资格。
 `_composition_visual`按exact admission限制音轨，resolver产生`development_audio_preview`，
 HyperFrames消费同一时间线混音；所有非Production scope与captured bytes仍由原activation fence拒绝。

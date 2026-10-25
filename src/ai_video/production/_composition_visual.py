@@ -92,11 +92,8 @@ def resolve_preview_layer_ids(
                     or spec.voice_sources):
                 raise invalid("Replacement audio preview requires supported P4 audio tracks and no voice sources.")
             if dialogue_tracks:
-                if (len(dialogue_tracks) != 1 or len(spec.audio_tracks) != 1
-                        or not spec.caption_tracks
-                        or any(binding.source_audio_track_id != dialogue_tracks[0].track_id
-                               for binding in spec.caption_tracks)):
-                    raise invalid("Captured dialogue preview requires one exact-source dialogue track with captions bound to it.")
+                if not _captured_dialogue_layout_valid(spec, dialogue_tracks):
+                    raise invalid("Captured dialogue preview requires one exact-source dialogue track per Shot with its captions bound to it.")
             elif spec.caption_tracks:
                 raise invalid("Development preview captions require the exact captured dialogue track.")
         elif spec.audio_tracks or spec.caption_tracks or spec.voice_sources:
@@ -208,6 +205,30 @@ def validate_replacement_preview_narration(
             )
 
 
+def _captured_dialogue_layout_valid(spec, dialogue_tracks) -> bool:
+    """One video and original dialogue per Shot; caption bindings never cross Shots."""
+    count = len(spec.shot_ids)
+    if (not count or len(set(spec.shot_ids)) != count
+            or len(spec.layers) != count or len(dialogue_tracks) != count
+            or len(spec.audio_tracks) != count or not spec.caption_tracks):
+        return False
+    tracks = {track.track_id: track for track in dialogue_tracks}
+    if (len(tracks) != count
+            or {track.shot_id for track in dialogue_tracks} != set(spec.shot_ids)
+            or {layer.shot_id for layer in spec.layers} != set(spec.shot_ids)):
+        return False
+    covered = set()
+    for binding in spec.caption_tracks:
+        track = tracks.get(binding.source_audio_track_id)
+        if track is None:
+            return False
+        bound_shot = getattr(binding, "shot_id", None)
+        if bound_shot != track.shot_id and not (count == 1 and bound_shot is None):
+            return False
+        covered.add(track.shot_id)
+    return covered == set(spec.shot_ids)
+
+
 def _validate_captured_dialogue_preview(
     project: LoadedProductionProject,
     spec: CompositionSpec,
@@ -218,33 +239,36 @@ def _validate_captured_dialogue_preview(
     invalid: Callable[..., AiVideoError],
 ) -> None:
     """Bind review dialogue to the exact captured video and its full source window."""
-    from ai_video.production.composition_source_audio import (
-        _expected_source_trim,
-        _source_audio_asset_matches,
-    )
-    from ai_video.production.repair_input_admission import (
-        allows_repair_preview_layer,
-        verify_repair_input,
-    )
-
     if (timeline.usage_scope != "development_audio_preview"
             or spec.schema_version != "2.3"
-            or len(dialogue_tracks) != 1
-            or len(spec.shot_ids) != 1
-            or len(spec.layers) != 1
-            or len(spec.audio_tracks) != 1
-            or not spec.caption_tracks):
-        raise invalid("Captured dialogue requires one captioned, single-source development audio preview.")
+            or not _captured_dialogue_layout_valid(spec, dialogue_tracks)):
+        raise invalid("Captured dialogue requires one captioned exact source per Shot in a development audio preview.")
+    intervals = sorted((span.start_sample, span.start_sample + span.duration_samples)
+                       for span in timeline.visual_spans)
+    if (len(intervals) != len(spec.shot_ids) or intervals[0][0] != 0
+            or intervals[-1][1] != timeline.total_samples
+            or any(left[1] != right[0] for left, right in zip(intervals, intervals[1:]))):
+        raise invalid("Captured dialogue visuals must cover the complete contiguous preview interval.")
+    layers = {layer.shot_id: layer for layer in spec.layers}
+    for track in dialogue_tracks:
+        _validate_captured_dialogue_source(project, spec, timeline, shots_by_id,
+            layer=layers[track.shot_id], track=track, invalid=invalid)
 
-    track = dialogue_tracks[0]
-    if (track.shot_id != spec.shot_ids[0]
-            or track.gain_millidb != 0
+
+def _validate_captured_dialogue_source(project, spec, timeline, shots_by_id, *, layer, track, invalid):
+    """Preserve the original exact-byte provenance and source-window checks for each Shot."""
+    from ai_video.production.composition_source_audio import (
+        _expected_source_trim, _source_audio_asset_matches,
+    )
+    from ai_video.production.repair_input_admission import (
+        allows_repair_preview_layer, verify_repair_input,
+    )
+    if (track.gain_millidb != 0
             or track.fade_in_samples != 0
             or track.fade_out_samples != 0
             or track.ducking is not None):
         raise invalid("Captured dialogue preview must preserve source audio without gain, fades, or ducking.")
 
-    layer = spec.layers[0]
     shot = shots_by_id.get(layer.shot_id)
     if shot is None or layer.source_audio_policy not in {"KEEP", "REPLACE"}:
         raise invalid("Captured dialogue preview needs an explicit source-audio policy.")
@@ -284,8 +308,7 @@ def _validate_captured_dialogue_preview(
         layer, video, timeline, spec.sample_rate, visual_spans
     )
     if (expected_source_trim is None
-            or visual.start_sample != 0
-            or visual.start_sample + visual.duration_samples != timeline.total_samples
+            or visual.duration_samples <= 0
             or audio_span.start_sample != visual.start_sample
             or audio_span.duration_samples != visual.duration_samples
             or audio_span.source_start_sample != expected_source_trim[0]

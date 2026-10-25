@@ -298,3 +298,69 @@ def test_resolved_development_audio_preview_can_carry_captions():
     assert timeline.caption_cues == (caption,)
     assert timeline.audio_spans[0].audio_kind is AudioKind.DIALOGUE
 
+
+
+def _two_captured_dialogue_previews():
+    from copy import deepcopy
+    p, spec, timeline, shots = _resolved_preview_fixture()
+    q, second, latter, more_shots = deepcopy(_resolved_preview_fixture())
+    for asset in q.registry.assets:
+        asset.asset_id += '-2'
+    q.registry.assets[0].sha256 = 'e' * 64
+    audio = q.registry.assets[1]
+    audio.input_artifact_ids = ('captured-video-2',)
+    audio.input_fingerprint = 'e' * 64
+    audio.audio_metadata.source.input_artifact_ids = ('captured-video-2',)
+    audio.audio_metadata.source.input_fingerprint = 'e' * 64
+    second.layers[0].layer_id += '-2'
+    second.layers[0].asset_id += '-2'
+    second.layers[0].shot_id = 'shot-s02'
+    second.audio_tracks[0].track_id += '-2'
+    second.audio_tracks[0].asset_id += '-2'
+    second.audio_tracks[0].shot_id = 'shot-s02'
+    spec.caption_tracks[0].shot_id = 'shot-s01'
+    second.caption_tracks[0].shot_id = 'shot-s02'
+    second.caption_tracks[0].source_audio_track_id += '-2'
+    latter.visual_spans[0].layer_id += '-2'
+    latter.visual_spans[0].start_sample = 768_000
+    latter.audio_spans[0].track_id += '-2'
+    latter.audio_spans[0].start_sample = 768_000
+    p.registry.assets += q.registry.assets
+    spec.shot_ids += ('shot-s02',)
+    spec.layers += second.layers
+    spec.audio_tracks += second.audio_tracks
+    spec.caption_tracks += second.caption_tracks
+    timeline.visual_spans += latter.visual_spans
+    timeline.audio_spans += latter.audio_spans
+    timeline.total_samples *= 2
+    shots['shot-s02'] = SimpleNamespace(shot_id='shot-s02')
+    return p, spec, timeline, shots
+
+
+@pytest.mark.parametrize('failure', [None, 'second_source', 'short_second_audio', 'crossed_caption', 'duplicate_shot', 'gap'])
+def test_cumulative_preview_validates_every_shots_exact_source(monkeypatch, failure):
+    import ai_video.production.repair_input_admission as admission
+    monkeypatch.setattr(admission, 'allows_repair_preview_layer', lambda *_: True)
+    monkeypatch.setattr(admission, 'verify_repair_input', lambda *_: SimpleNamespace(
+        preview_use=SimpleNamespace(scope='replacement_audio_preview')))
+    p, spec, timeline, shots = _two_captured_dialogue_previews()
+    if failure == 'second_source':
+        p.registry.assets[-1].input_fingerprint = 'f' * 64
+        p.registry.assets[-1].audio_metadata.source.input_fingerprint = 'f' * 64
+    elif failure == 'short_second_audio':
+        timeline.audio_spans[-1].duration_samples -= 1
+    elif failure == 'crossed_caption':
+        spec.caption_tracks[-1].source_audio_track_id = spec.audio_tracks[0].track_id
+    elif failure == 'duplicate_shot':
+        spec.audio_tracks[-1].shot_id = 'shot-s01'
+    elif failure == 'gap':
+        timeline.visual_spans[-1].start_sample += 1
+        timeline.audio_spans[-1].start_sample += 1
+    def check():
+        _validate_captured_dialogue_preview(p, spec, timeline, shots,
+            dialogue_tracks=spec.audio_tracks, invalid=lambda message, *_: ValueError(message))
+    if failure is None:
+        check()
+    else:
+        with pytest.raises(ValueError):
+            check()

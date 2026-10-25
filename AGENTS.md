@@ -35,11 +35,9 @@
 
 ### Final-output-first / No-regression
 
-验收对象是正常速度观看、聆听的 exact 成片；修复不得破坏已满足的视觉/动作/连续性/节奏/音频/叙事，拒绝已知降质方案。技术 PASS、preview、成本不代替验收；Gate 阻断须说明具体要求和失败证据，授权内修复/补证，无解报告最小恢复条件。
+以原速声画成片验收，保留已满足的效果；先交片，用户认可后完整验证，通过再 commit/push；详见[成片优先](docs/canvas-continuous-production.md#formal-narrative-output-defaults)。
 
-视频制作先完成出片必需的最小改动与检查并交用户审片，用户明确认可效果后才运行完整工程验证套件，验证通过后再 commit/push，不得提前扩展通用工程或让工程验证阻塞交片。
-
-原片认可后自动制作并验收字幕，句尾不加符号。
+原片认可后自动制作并验收字幕，句尾不加符号；每个新 Shot 合格后，自动拼接截至该镜的全部合格镜头交用户连续审看。
 
 ### Empirical Validation Priority
 
