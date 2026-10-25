@@ -44,7 +44,7 @@ fetch 后显式 `await evaluate(session=project_local_video_analysis_session, ad
 绑定 Shot，native sound 没有 exact WAV 时必须显式 mute 或停止；BGM 不充当原对白。
 `compose(audio_tracks=..., caption_tracks=..., voice_sources=...)` → `render(attempt_id=..., toolchain=...)` → `deliver()`
 均沿现有 owners。trim 以 Production frame/sample 表达；source tick timebase 不猜测，speed/gain 非支持值停止。
-默认新项目以480像素短边、24fps保持来源显式 aspectRatio（16:9为854×480，竖版9:16为480×854）；
+既有接口的兼容默认仍为480像素短边、24fps，保持来源显式 aspectRatio（16:9为854×480，竖版9:16为480×854）；正式制作须显式选择下文规格，不能直接沿用兼容默认。
 来源未声明比例时使用640×480。混合或未支持比例要求明确 delivery_profile；capability 不支持时停止。
 已成功 render 的同 attempt replay 不再次执行 renderer。相同 bytes 的不同 visual asset IDs 遇现有 renderer bundle duplicate-path
 检查时停止，不自动改 identity；可由导演选择同一已准入 asset 的正常复用策略。
@@ -53,6 +53,20 @@ fetch 后显式 `await evaluate(session=project_local_video_analysis_session, ad
 既有 P5 owner 计算局部失效并保留历史。它不授权重生成，也不自动替换失败/unknown attempts 的恢复决定。
 `deliver()` 只展示 exact final target；完整听看和 final acceptance 继续由既有 review/committer owner 与用户决定。
 scripted Provider/renderer 测试证明控制流，不能签作品质量或原平台采用。
+
+## Formal Narrative Output Defaults
+
+用户未另行指定时，正式横版叙事/短剧采用下表；其他题材、比例和来源保留任务尊重各自明确合同，不强改竖版或已封存请求。这是 Agent 制作规则，不表示接口默认、已生成媒体或当前 selected profile 已被自动修改。
+
+| Stage | Required choice |
+| --- | --- |
+| 正式生成 | 在 selected Provider/profile 中显式选择 `1080p`，横版 `16:9`；提交前核对实际编译请求、支持能力和预算。模型不支持时报告缺口，不静默降档或换模型。 |
+| 最终画幅 | `1920×1080`；`480p`/`720p` 仅用于明确标记的试片，直接放大或修改尺寸标签不计作1080p正式生成。 |
+| 帧率 | 生成遵循模型原生输出，不强加 surface 不支持的 fps 参数；最终统一 `24fps` 恒定帧率。核对解码帧数及时间戳，不把 `r_frame_rate=60` 当作实际60fps；不默认AI补帧，保留原速、完整动作及声画同步。 |
+| 视频导出 | `MP4` / `H.264`，目标视频码率 `15–20 Mbps`，以 exact 成片暗部、雨夜、发丝及运动细节验收，码率数字不代替画质。 |
+| 音频导出 | `AAC` / `48kHz` / `256–320kbps`；生成音轨遵原生输出，后期规范化不得改变已认可的音色、对白、节奏和同步，上采样不宣称补回细节。 |
+
+上述 profile 与导出参数分别归既有生成、CompositionSpec / ResolvedTimeline 和 HyperFrames owners；不建立第二时间线、旁路合成或伪造规格。沿用先审原片、用户认可后自动制作并验收字幕的顺序；分辨率与帧率不代替人物造型、材质、灯光和表演验收。新规格作用于后续正式制作，旧480p试片和全部历史证据保留；本规则不触发重生成、付费提交或旧request改写。
 
 ## Shared Method
 
@@ -98,7 +112,7 @@ scripted Provider/renderer 测试证明控制流，不能签作品质量或原�
 原始parts中的引用slot保留，不用字符串替换猜引用，不省略未在正文出现的video/audio参考。
 
 选择文件使用`{"node_ids": ["node-a", "node-b"]}`，或者`{"timeline_id": "timeline-node"}`。
-默认480p；旧画布的720p/1080p仍留在observed_parameters，不自动覆盖用户默认。
+接口兼容默认480p；正式横版叙事按上文显式选择1080p，旧画布参数仍留在observed_parameters，不冒充新的执行选择。
 
 ```bash
 PYTHONPATH=src:. .venv/bin/python -m scripts.canvas_sequence_packet \
@@ -115,7 +129,7 @@ full_continuity必须提供完整十维及所有carry项。source_analysis保留
 文件含expected_source_snapshot_sha256，可直接作为selection重开对应源快照；源漂移拒绝。白带子后五边只继承遮挡/前冲，
 明确释放世界身份；运动矢量、透光和音轨实际匹配属于media_checks，不把不同物种误当剧情冲突。
 没有boundary时导出BLOCKED_MISSING_AUTHORING；完整时也只是AUTHORED_NOT_MEDIA_VERIFIED，不是READY或PASS。
-`--resolution 720p`或`1080p`只在用户明确要求时使用；模型不支持480p时返回能力问题，不静默升级。
+正式横版叙事显式传入 `--resolution 1080p`；明确试片或其他已选规格按其合同。能力不支持时报告，不静默升级或降档。
 
 ## Production Handoff And Cost Boundary
 
@@ -131,7 +145,7 @@ full_continuity必须提供完整十维及所有carry项。source_analysis保留
 execution_evidence（source_shot采用时identity、source_generation_intent_hash、stack、anchors、lifecycle等）。
 它重建准备包、拒绝有冲突/缺证的边界，核对已有Storyboard连续顺序与当前Shot修订，再调用canonical sequence adapter。
 同canvas节点在timeline重复出现时仍需不同Shot身份；首单元走既有single-Shot入口。source adopted revision和当前revision分开核验。
-原输出resourceId只作为快照指针保存，未读取MP4时不伪造SHA或验收。输出尺寸必须符合新准备默认480p（显式override除外）；
+原输出resourceId只作为快照指针保存，未读取MP4时不伪造SHA或验收。输出尺寸必须符合当前显式选择的规格；接口兼容默认480p不代替正式制作选择。
 不会改写已批准request。这个入口不自动创建/批准Storyboard或Shot、不提交、不签媒体PASS。
 
 下一次同链修改只重新读取受影响节点、相邻边界和引用身份；输入未变时复用封存资料，

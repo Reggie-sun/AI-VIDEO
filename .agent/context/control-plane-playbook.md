@@ -49,7 +49,7 @@ Provider capability 归 current profile；结构 PASS 不证明语义/质量。�
 
 ### Skill Selection
 
-依赖顺序：memory（按 trigger）→ ecommerce/Director → continuity → selected Provider authoring → composition。按需读 owner，连续画布先读[制作方法](../../docs/canvas-continuous-production.md)，默认480p。
+按需加载 memory→ecommerce/Director→continuity→selected Provider→composition；连续画布先读[制作方法及输出规格](../../docs/canvas-continuous-production.md#formal-narrative-output-defaults)。
 
 - `ecommerce-ad-workflow`：广告事实与package；`ad-creative`按需补角度/Hook/文案，剧情广告仍归广告。
 - `drama-authoring`：剧情/剧本与制作设定，遵 accepted Drama contract；镜头交 Director。
