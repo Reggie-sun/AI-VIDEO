@@ -103,8 +103,8 @@ Strict loopback、完全 local/unmetered、无 cloud egress 的任务内 ComfyUI
 
 ## Verification Contract
 
-验证范围按实际行为影响与失败风险选择：局部改动以相关成功、边界及失败路径的验证完成交付，不因触及共享文件、提交、记录或取得 receipt 而自动扩成整组回归；仅新改动、失败或未决风险使证据失效时补验。
-按 [Verification Details](.agent/context/control-plane-playbook.md#4-verification-pilot-and-delivery-details) 判断是否需要扩大验证；跨模块行为、授权/凭据/持久化/恢复语义、影响无法界定或用户要求完整验证时，运行适用的 exact staged snapshot 或 commit range Harness 并保留 fresh receipt。路径选测只提供保守影响提示，局部验证不冒充完整 Harness PASS；不刷新 baseline 隐藏 regression。
+Harness 按阶段验证：修改后仅运行受影响模块的精准测试，功能完成后运行关联模块和接口契约回归，合并或发布前运行完整测试套件；receipt 必须标明级别，局部或相关回归通过不得冒充完整回归通过。
+执行入口见 [Verification Details](.agent/context/control-plane-playbook.md#4-verification-pilot-and-delivery-details)；使用 exact staged snapshot 或 commit range 并保留对应级别 receipt。精准映射缺失时明确报告或升级，不静默扩跑；不刷新 baseline 隐藏 regression。
 Harness 不拦截任意 tool/shell、不调度 Agent、不读 secret、不运行 live media、不 mutation Production、不代签 P6/Final Acceptance；CI 自产 evidence，workflow 文件不证明 server enforcement。离线 PASS 只证明所测行为，exit 0 / `PARSED` / tests 不代替 required review 或真实验收。
 区分 execution、structure、function、criteria 与 final review 五层证据；`PASS/DONE/ACCEPTED` 须有对应证据，无法验证标 `NOT_EVALUATED`。
 

@@ -3,7 +3,6 @@
 
 from __future__ import annotations
 
-import argparse
 import json
 import re
 import subprocess
@@ -417,6 +416,10 @@ def verify_inspection(
     runner: Runner = run_command,
 ) -> tuple[Path, bool]:
     validate_completion_scope(scope)
+    if inspection.get("unfocused_paths"):
+        raise ValueError(
+            f"focused verification requires a module mapping: {inspection['unfocused_paths']}"
+        )
     if inspection.get("sensitive_paths"):
         raise ValueError(
             f"completion scope contains sensitive paths: {inspection['sensitive_paths']}"
@@ -438,7 +441,9 @@ def verify_inspection(
         "schema": "ai-video-agent-harness-run/2",
         "run_id": run_id,
         "status": "running",
-        "closure_eligible": bool(scope["closure_eligible"]),
+        "verification_level": inspection.get("verification_level", "related"),
+        "closure_eligible": bool(scope["closure_eligible"])
+        and inspection.get("verification_level", "related") != "focused",
         "started_at": datetime.now(UTC).isoformat(),
         "finished_at": None,
         "scope": dict(scope),
@@ -672,7 +677,10 @@ def receipt_freshness(
         scope_paths_match = sorted(scope.get("changed_paths", [])) == sorted(
             recomputed_scope_paths
         )
-        expected_inspection = inspect_paths(recomputed_scope_paths, policy)
+        expected_inspection = inspect_paths(
+            recomputed_scope_paths, policy,
+            level=receipt.get("verification_level", "related"),
+        )
         inspection_matches = (
             scope_paths_match
             and inspection_matches_receipt(receipt, expected_inspection)
@@ -780,129 +788,18 @@ def receipt_freshness(
         "fresh_for_snapshot": fresh_for_snapshot,
         "complete_completion_proof": complete_completion_proof,
         "fresh": fresh,
+        "verification_level": receipt.get("verification_level", "related"),
+        "full_regression_passed": fresh
+        and receipt.get("verification_level") == "full",
     }
 
 
-def _add_scope_arguments(parser: argparse.ArgumentParser) -> None:
-    parser.add_argument("--path", action="append", help="Advisory inspect path; repeatable.")
-    parser.add_argument("--staged", action="store_true", help="Use the exact staged index delta.")
-    parser.add_argument("--base-ref", help="Use merge-base(base-ref, head-ref)..head-ref.")
-    parser.add_argument("--head-ref", default="HEAD", help="Commit-range head (default: HEAD).")
-
-
 def main(argv: Sequence[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description=__doc__)
-    subparsers = parser.add_subparsers(dest="command", required=True)
-    inspect_parser = subparsers.add_parser(
-        "inspect", help="Show engineering-completion checks, not media-submit readiness."
-    )
-    verify_parser = subparsers.add_parser(
-        "verify", help="Run engineering-completion checks and write a receipt."
-    )
-    receipt_parser = subparsers.add_parser(
-        "verify-receipt", help="Verify receipt integrity and freshness."
-    )
-    subparsers.add_parser("policy-audit", help="Fail on unmapped owned repository files.")
-    _add_scope_arguments(inspect_parser)
-    _add_scope_arguments(verify_parser)
-    verify_parser.add_argument("--run-id")
-    receipt_parser.add_argument("receipt", type=Path)
-    args = parser.parse_args(argv)
-
-    if args.command == "verify-receipt":
-        receipt = json.loads(args.receipt.read_text(encoding="utf-8"))
-        report = receipt_freshness(receipt, receipt_dir=args.receipt.resolve().parent)
-        print(json.dumps(report, sort_keys=True))
-        return 0 if report["fresh"] else 1
-
-    policy = load_policy()
-    if args.command == "policy-audit":
-        report = audit_policy_coverage(policy)
-        print(json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2))
-        return 0 if not any(
-            report[key]
-            for key in (
-                "unmapped_paths",
-                "unverified_paths",
-                "missing_check_test_paths",
-                "unreferenced_test_paths",
-                "docs_contract_diagnostics",
-            )
-        ) else 1
-
-    receipt_path: Path | None = None
     try:
-        scope = discover_scope(
-            PROJECT_ROOT,
-            paths=args.path,
-            staged=args.staged,
-            base_ref=args.base_ref,
-            head_ref=args.head_ref,
-        )
-    except (ValueError, subprocess.CalledProcessError) as exc:
-        parser.error(str(exc))
-
-    if args.command == "inspect":
-        inspection = inspect_paths(scope["changed_paths"], policy)
-        inspection["scope"] = scope
-        inspection["verification_purpose"] = "engineering_completion"
-        inspection["media_submit_authority"] = False
-        inspection["media_acceptance_authority"] = False
-        print(json.dumps(inspection, ensure_ascii=False, sort_keys=True, indent=2))
-        return 0
-
-    try:
-        validate_completion_scope(scope)
-        source_snapshot = _scope_snapshot(PROJECT_ROOT, scope)
-        validate_scope_snapshot(scope, source_snapshot)
-        with isolated_verification_workspace(
-            PROJECT_ROOT, scope, source_snapshot=source_snapshot
-        ) as execution_root:
-            execution_policy_path = execution_root / ".agent/harness/policy.yaml"
-            execution_policy = load_policy(execution_policy_path)
-            inspection = inspect_paths(scope["changed_paths"], execution_policy)
-            materialize_npm_workspace_dependencies(
-                PROJECT_ROOT,
-                execution_root,
-                execution_policy,
-                inspection["check_ids"],
-            )
-            receipt_path, passed = verify_inspection(
-                inspection,
-                execution_policy,
-                scope=scope,
-                source_snapshot=source_snapshot,
-                project_root=PROJECT_ROOT,
-                execution_root=execution_root,
-                run_id=args.run_id,
-                policy_sha256=_sha256(execution_policy_path.read_bytes()),
-                workspace_cleanup_required=True,
-                snapshot_after=lambda: _scope_snapshot(PROJECT_ROOT, scope),
-            )
-        receipt_io.record_workspace_cleanup(receipt_path, status="passed")
-    except (OSError, ValueError, subprocess.CalledProcessError) as exc:
-        if receipt_path is not None and receipt_path.is_file():
-            try:
-                receipt_io.record_workspace_cleanup(
-                    receipt_path,
-                    status="failed",
-                    error=f"isolated workspace cleanup failed: {exc}",
-                )
-            except (OSError, ValueError, json.JSONDecodeError):
-                pass
-        print(json.dumps({"status": "failed", "error": str(exc)}, sort_keys=True))
-        return 2
-    print(
-        json.dumps(
-            {
-                "status": "passed" if passed else "failed",
-                "receipt": receipt_path.relative_to(PROJECT_ROOT).as_posix(),
-            },
-            sort_keys=True,
-        )
-    )
-    return 0 if passed else 1
-
+        from scripts.agent_harness_cli import main as cli_main
+    except ModuleNotFoundError:  # Direct script execution.
+        from agent_harness_cli import main as cli_main
+    return cli_main(argv, harness=sys.modules[__name__])
 
 if __name__ == "__main__":
     raise SystemExit(main())

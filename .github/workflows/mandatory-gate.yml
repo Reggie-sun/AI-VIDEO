@@ -40,6 +40,7 @@ jobs:
         run: |
           set -o pipefail
           python scripts/agent_harness.py inspect \
+            --level full \
             --base-ref "${BASE_SHA}" \
             --head-ref "${HEAD_SHA}" \
             | tee "${RUNNER_TEMP}/harness-inspection.json"
@@ -79,6 +80,7 @@ jobs:
         run: |
           set -o pipefail
           make harness-verify-range \
+            LEVEL="full" \
             BASE_REF="${BASE_SHA}" \
             HEAD_REF="${HEAD_SHA}" \
             RUN_ID="${HARNESS_RUN_ID}" \
@@ -86,8 +88,8 @@ jobs:
 
       - name: Verify CI receipt integrity
         run: >-
-          make harness-receipt
-          RECEIPT=".agent/harness/runs/${HARNESS_RUN_ID}/receipt.json"
+          python scripts/agent_harness.py verify-receipt
+          ".agent/harness/runs/${HARNESS_RUN_ID}/receipt.json" --require-level full
 
       - name: Upload Harness receipt, JUnit, and logs
         if: always()

@@ -98,9 +98,9 @@ reservation、egress、durable intent、one-use permit。Local video 仍经 `Vid
 
 ## 4. Verification, Pilot And Delivery Details
 
-按 `AGENTS.md` 选择最小充分验证，记录对象、命令、结果与限制；不为 receipt 扩跑整组。
-完整验证：`make harness-inspect` → exact staged snapshot 或 commit range 的 `make harness-verify` / `make harness-verify-range` → `make harness-receipt`，核验 scope/policy/artifact hashes/freshness。
-耗时不相称时重评、停止冗余检查，保留中断/未验证项；仅新改动/失败/未决风险使证据失效时补验，不因提交/记录重跑。Harness routing、coverage、unknown-path fallback及receipt验真保持；局部通过不得冒充完整PASS，运行中snapshot drift/读取失败停余项。
+修改后 `make harness-focused` 测受影响模块；功能完成 `make harness-related` 测关联模块/接口契约；合并/发布前 `make harness-full` 跑全套测试/前端构建。
+使用 exact staged snapshot；range 用 `make harness-verify-range BASE_REF=... LEVEL=focused|related|full`。`make harness-inspect LEVEL=...` 预览，默认 related；focused 缺映射停止。
+receipt 绑定级别、scope/policy/artifact hashes及freshness；focused 不关闭功能验收，related 不证明完整回归；合并/发布用 `verify-receipt ... --require-level full`。coverage、fallback保留；snapshot drift/读取失败停余项。
 `agent_rules_check` 验 references/links/budgets；`agent_rule_invariants` 与原 suites 验迁移 invariant。
 Harness 不生成媒体或读 secret；CI 自产证据；remote enforcement 必须当前 server evidence。
 真实批量媒体前先完成约 30–60 秒、4–8 连续 Shots 的代表性 Pilot，包含任务主要 media/audio/captions/composition，

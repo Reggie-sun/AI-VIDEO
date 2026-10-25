@@ -14,6 +14,7 @@ import yaml
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 CHECK_ID_PATTERN = re.compile(r"[A-Za-z0-9._-]+")
 DEFAULT_EXECUTION_PRIORITY = 100
+VERIFICATION_LEVELS = ("focused", "related", "full")
 
 
 def unique(values: Iterable[str]) -> list[str]:
@@ -162,6 +163,10 @@ def validate_policy(policy: object, *, source: str | Path) -> dict[str, Any]:
             raise ValueError(f"category {category_name!r} patterns must be list[str]")
         string_list(category, "exclude_patterns")
         referenced.extend(string_list(category, "check_ids"))
+        focused = string_list(category, "focused_check_ids")
+        if "full_tests" in focused:
+            raise ValueError("focused_check_ids cannot include full_tests")
+        referenced.extend(focused)
     unknown = sorted(set(referenced) - known_check_ids)
     if unknown:
         raise ValueError(f"policy references unknown checks: {unknown}")
@@ -235,7 +240,13 @@ def ordered_check_ids(
     )
 
 
-def inspect_paths(paths: Iterable[str | Path], policy: Mapping[str, Any]) -> dict[str, Any]:
+def inspect_paths(
+    paths: Iterable[str | Path], policy: Mapping[str, Any], *, level: str = "related"
+) -> dict[str, Any]:
+    if level not in VERIFICATION_LEVELS:
+        raise ValueError(f"unknown verification level: {level!r}")
+    if level == "full" and "full_tests" not in policy["checks"]:
+        raise ValueError("full verification requires a full_tests check")
     normalized_paths = sorted(unique(relative_repository_path(path) for path in paths))
     sensitive_patterns = [
         pattern.casefold() for pattern in policy["sensitive_patterns"]
@@ -259,18 +270,27 @@ def inspect_paths(paths: Iterable[str | Path], policy: Mapping[str, Any]) -> dic
     categories: list[str] = []
     category_checks: list[str] = []
     matched_paths: set[str] = set()
+    focused_paths: set[str] = set()
     for category_name, category in policy["categories"].items():
         category_matches = [
             path for path in active_paths if matches_category(path, category)
         ]
         if category_matches:
             categories.append(category_name)
-            category_checks.extend(category.get("check_ids", []))
+            key = "focused_check_ids" if level == "focused" else "check_ids"
+            category_checks.extend(category.get(key, []))
+            if category.get("focused_check_ids"):
+                focused_paths.update(category_matches)
             matched_paths.update(category_matches)
 
     fallback_paths = [path for path in active_paths if path not in matched_paths]
-    selected = [*policy.get("always_check_ids", []), *category_checks]
-    if fallback_paths or sensitive_paths:
+    unfocused_paths = [path for path in active_paths if path not in focused_paths]
+    selected = category_checks if level == "focused" else [
+        *policy.get("always_check_ids", []), *category_checks
+    ]
+    if level == "full":
+        selected = list(policy["checks"])
+    elif level == "related" and (fallback_paths or sensitive_paths):
         selected.extend(policy.get("fallback_check_ids", []))
     check_ids = ordered_check_ids(selected, policy)
     npm_workspace_dependency_paths = unique(
@@ -281,6 +301,8 @@ def inspect_paths(paths: Iterable[str | Path], policy: Mapping[str, Any]) -> dic
         )
     )
     return {
+        "verification_level": level,
+        "unfocused_paths": unfocused_paths if level == "focused" else [],
         "changed_paths": active_paths,
         "ignored_paths": ignored_paths,
         "sensitive_paths": sensitive_paths,
