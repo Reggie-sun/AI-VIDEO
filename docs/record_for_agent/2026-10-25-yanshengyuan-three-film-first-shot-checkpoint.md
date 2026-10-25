@@ -9,6 +9,14 @@ evidence_index_version: "1"
 
 Date: 2026-10-25 (Asia/Hong_Kong)
 
+## Current User Motion And Hook Rejection — 2026-10-26
+
+用户否定当前15秒合片（SHA `0a5047f3f5446957deb30d87f09f7774c29ca4a5d240a05b083e9b5e503eb08b`），
+补充指出8秒后两只动物像固定在屏幕上、不随人物移动，前三秒钩子弱，要求“浮夸”。此前对应
+S02 raw的静帧space-camera PASS不覆盖该动态附着要求，不能据此放行后镜；旧技术测量与7秒
+开场的人审各保留其原范围，不扩展为当前合片认可。设计要求及Skill修订见
+[Ad Creative User Requirements](2026-10-26-ad-creative-user-design-requirements.md)。没有重生或重试媒体。
+
 ## Narrative Rejection — 2026-10-26
 
 用户对前20秒exact副本 `3590a61eaf225efef05efae4366d60f751171984d893f6f8e4fc4fc44b42749c` 明确反馈：“这个故事不对,因果没有,灵盖之后就是一个警报?然后就介绍产品太牵强了”。当前叙事人审为 **FAIL**；下方空间/技术检查及旧Gate保留其原证明范围，不能代替剧情认可。反馈封存在 `single-a-rework-001/creative/user-review-story-rejection-001.json`。后续生成暂停，先讨论人物目标、产品介入动机和结尾兑现，新剧情方向未获确认；本轮没有新增Provider/媒体/音义调用，不推断声音通过，也不重试旧UNKNOWN。学习评估仍为 `no_candidate`：单次整体叙事反馈不能作为跨实验因果规律或自动修改Skill/Policy/Gate的证据。
