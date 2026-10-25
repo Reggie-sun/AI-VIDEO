@@ -2,6 +2,20 @@
 
 Date: 2026-10-26
 
+## Current Revision — Rhythm 02
+
+用户保留核心创意、人物关系、规则、音乐及S01衔接，要求更快建立兴趣，并明确本轮不付费生成。当前创作入口改为`cold-open-preparation/rhythm-revision-02/director-revision.md`及同目录coverage；下方37秒方案／旧回执属于Revision 01历史，相关实测事实不回写。
+
+推荐22秒预算、20–28秒弹性。一个固定构图并入“两位”、同伴关心与遮挡后空位；约第7–9秒揭示是待实片检验的导演偏好，不是QA硬deadline。第二构图听见“就我一个”，再用片名交接翌夜S01。取消重复转告司机、擦镜片／举手机等入口动作及为消失重新建立机位，保留辨认空位和日常回答的时间；不靠改速、截对白或快切增密。
+
+实际重读：原coverage与31条shot cards均276秒，S02准备版coverage为278秒（S02从6到8秒）；加22秒分别298／300秒，仅是规划账，S01实际16.065秒与最终timeline readback不能四舍五入冒充已成片。未削减或重生成正片，未改已认可S02及字幕。
+
+失踪路线由“优先单次生成”改为“优先准备前后动态状态＋完整车身遮挡硬切”，原生连续生成保留为有界备选。依据是决定性事件控制风险与当前Composition仅接受零时长CUT的真实边界；不声称已测试胜率、成本或自然度，也不假设已有动态mask能力。不新建组件执行器，不把摄影镜头与生成组件强行一一对应。
+
+沿用既有Music Director的“缺席的应答”音乐输入与生成identity，只调整事件锚点和短版可用余量；不重新提交、dry-run、读取认证或签发permit。原Suno UNKNOWN历史不变，其他音乐窗口后续执行状态由其owner独占，不将其候选自动认作片头cue。
+
+本轮验证以revision-02的`verification.json`及最终消息所列exact staged Harness为准，区分文本／结构验证与未执行的媒体验收。源哈希、原创角色关系和S01保护重验；旧37秒文件保持不变，父README仅追加当前revision入口。Risk Gate为Parent自审、无高后果运行行为变更，无需额外reviewer。record更新，learning评估`no_candidate`：没有新的真实媒体实验可用于学习claim。
+
 ## Scope And Current Truth
 
 用户要求先审查《失帧》第一集，再完成冷开场完整导演方案、音乐、镜头编排、S01衔接及可执行素材准备；后续明确音乐偏高级冷峻的影视悬疑质感，并指定即梦`seedance_2.5`。本次是设计及离线准备checkpoint，不是已生成的新开场。

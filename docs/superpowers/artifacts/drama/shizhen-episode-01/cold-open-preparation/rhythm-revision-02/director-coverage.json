@@ -1,0 +1,1245 @@
+{
+  "schema_version": "4",
+  "request": {
+    "creative_input_kind": "direction",
+    "creative_input_evidence": "请基于当前 AI-VIDEO 中《失帧》第一集已经完成的剧本、S01 原片、角色美术、声音设计及导演规划，为第一集设计并制作一个专业的电影级冷开场。\n\n我已经确定开场方向：\n\n**雨夜城市氛围 + 另一名普通人的灵异失踪事件 + Suno v6 原创电影配乐 + 《失帧》片名，随后自然衔接现有 S01。**\n\n创作目标是让观众迅速被故事吸引，同时建立整部作品的视觉、声音和悬疑气质。\n\n请调用现有相关导演、剧情、摄影、美术、音乐及后期能力，自主完成专业设计。\n\n重点要求：\n\n- 冷开场必须有真正的悬疑事件，不是城市空镜、Logo 和背景音乐的简单拼接。\n- 建议从雨夜城市中的普通人物开始，表现一次令人不安的失踪事件。可以采用公交站场景，但允许导演优化事件、人物关系和摄影表现。\n- 遵循《失帧》已有的时间缺失、人物被遗忘及现实记录改写规则，不擅自发明互相矛盾的灵异机制。\n- 保留电影级原创 3D 国漫写实风格，与已经认可的 S01 美术语言一致。\n- 利用镜头组织、声音异常、人物反应和观众信息差建立恐惧，不依赖廉价惊吓。\n- 由现有 Music Director 设计整段音乐，优先使用已接入的 Suno v6 创作原创器乐配乐，并考虑将音乐主题延续至第一集结尾。\n- 配乐服务画面，允许静默，不强制音乐铺满全段。\n- 片名文字、准确时间信息和最终声音剪辑交由现有后期系统负责。\n- 不固定逐句对白时间和镜头长度；根据自然表演、叙事节奏及视频模型能力自主安排。\n- 可以设定整体目标时长，但不要为了时长填充无意义画面。\n- 新增开场必须合理衔接已完成的 S01。优先保护现有认可的原片、字幕、人物、动作与音频，不进行不必要的重生成。\n- 优先复用当前 Music Director、Suno Provider、Composition、声音及 QA 基础设施，不重复建设。\n- 真实付费生成遵守项目现有授权与额度限制，未取得所需授权时先完成可执行设计和生成准备。\n\n请先审查整集故事，确保新开场不会提前泄露结尾反转，也不会与便利店事件形成无意义的重复。\n\n如果存在更优秀的电影化表达方式，可以自主优化，不必机械照搬我的画面设想。\n\n先完成完整开场导演方案、音乐设计、镜头编排与 S01 衔接方案，并准备相应可执行素材。保护既有制作记录和版本。\n\n**最终目标是让观众从第一眼就感到这座城市不正常，同时在进入便利店 S01 后仍然保持好奇心，而不是只观看一段漂亮但没有叙事价值的片头。**\n\n---\n还有一个关键判断：我建议整个开场的音乐风格更偏《爱，死亡和机器人》那种高级、冷峻、带悬疑质感的影视配乐，而不是传统国产恐怖短剧的突发惊吓音乐。\n\n---\n用即梦 seedance 2.5\n\n--- Rhythm Revision 02 / latest user request ---\n请继续完善《失帧》第一集冷开场《两位》。\n\n现有导演方案的核心创意、人物关系、灵异规则、音乐主题和 S01 衔接方向予以保留，但我认为目前约37秒的开场可能存在铺垫偏慢、吸引力不足的问题。\n\n请从真正的影视导演与短剧观众体验出发，重新审视开场的戏剧节奏。\n\n重点解决：\n\n1. 如何让观众在最初几个画面就产生兴趣，而不是先观看较长的普通生活铺垫。\n2. 是否可以更早呈现“两位→一位”的核心异常，同时保留足够的人物关系和情感反差。\n3. 冷开场是否能够自然压缩到约20–28秒，并与原第一集276秒的预算协调。时长仅作为目标，不锁死对白、动作和镜头时间。\n4. 是否存在比现有摄影与剪辑方案更高级、更自然的表达方式。\n5. 对关键失踪镜头，比较模型连续生成与前后状态素材加遮挡剪辑的可行性和实际制作风险。\n6. 保留 Suno 的“缺席的应答”音乐主题，确保音乐真正服务剧情，不为片头强行加入配乐。\n7. 片名之后必须自然进入已经认可的 S01，不能重新生成或破坏既有原片。\n\n不要因为我提出缩短时长就机械删减镜头。请根据实际戏剧功能判断哪些内容值得保留、合并、提前或重新设计。\n\n保留已有世界观、时间逻辑、最终反转和观众信息差。不要增加新的灵异规则。\n\n先完成导演方案和开场节奏修订，提供推荐版本及其取舍依据；尚不执行新的付费视频或音乐生成。\n\n最终目标是一个**既有电影质感，又能在开场迅速吸引观众的原创灵异短剧片头**，而不是快节奏的恐怖混剪。\n",
+    "creative_constraints": [
+      {
+        "constraint_id": "event",
+        "scope": "global",
+        "source_text": "冷开场必须有真正的悬疑事件，不是城市空镜、Logo 和背景音乐的简单拼接。"
+      },
+      {
+        "constraint_id": "ordinary",
+        "scope": "global",
+        "source_text": "建议从雨夜城市中的普通人物开始，表现一次令人不安的失踪事件。"
+      },
+      {
+        "constraint_id": "rules",
+        "scope": "global",
+        "source_text": "遵循《失帧》已有的时间缺失、人物被遗忘及现实记录改写规则，不擅自发明互相矛盾的灵异机制。"
+      },
+      {
+        "constraint_id": "art",
+        "scope": "global",
+        "source_text": "保留电影级原创 3D 国漫写实风格，与已经认可的 S01 美术语言一致。"
+      },
+      {
+        "constraint_id": "fear",
+        "scope": "global",
+        "source_text": "利用镜头组织、声音异常、人物反应和观众信息差建立恐惧，不依赖廉价惊吓。"
+      },
+      {
+        "constraint_id": "music-director",
+        "scope": "global",
+        "source_text": "由现有 Music Director 设计整段音乐"
+      },
+      {
+        "constraint_id": "suno",
+        "scope": "global",
+        "source_text": "优先使用已接入的 Suno v6 创作原创器乐配乐"
+      },
+      {
+        "constraint_id": "ending-theme",
+        "scope": "global",
+        "source_text": "并考虑将音乐主题延续至第一集结尾。"
+      },
+      {
+        "constraint_id": "silence",
+        "scope": "global",
+        "source_text": "配乐服务画面，允许静默，不强制音乐铺满全段。"
+      },
+      {
+        "constraint_id": "post",
+        "scope": "global",
+        "source_text": "片名文字、准确时间信息和最终声音剪辑交由现有后期系统负责。"
+      },
+      {
+        "constraint_id": "timing",
+        "scope": "global",
+        "source_text": "不固定逐句对白时间和镜头长度；根据自然表演、叙事节奏及视频模型能力自主安排。"
+      },
+      {
+        "constraint_id": "no-padding",
+        "scope": "global",
+        "source_text": "可以设定整体目标时长，但不要为了时长填充无意义画面。"
+      },
+      {
+        "constraint_id": "handoff",
+        "scope": "global",
+        "source_text": "新增开场必须合理衔接已完成的 S01。"
+      },
+      {
+        "constraint_id": "protect",
+        "scope": "global",
+        "source_text": "优先保护现有认可的原片、字幕、人物、动作与音频，不进行不必要的重生成。"
+      },
+      {
+        "constraint_id": "reuse",
+        "scope": "global",
+        "source_text": "优先复用当前 Music Director、Suno Provider、Composition、声音及 QA 基础设施，不重复建设。"
+      },
+      {
+        "constraint_id": "paid",
+        "scope": "global",
+        "source_text": "真实付费生成遵守项目现有授权与额度限制，未取得所需授权时先完成可执行设计和生成准备。"
+      },
+      {
+        "constraint_id": "audit",
+        "scope": "global",
+        "source_text": "请先审查整集故事"
+      },
+      {
+        "constraint_id": "no-spoiler",
+        "scope": "global",
+        "source_text": "确保新开场不会提前泄露结尾反转"
+      },
+      {
+        "constraint_id": "no-repeat",
+        "scope": "global",
+        "source_text": "也不会与便利店事件形成无意义的重复。"
+      },
+      {
+        "constraint_id": "delivery",
+        "scope": "global",
+        "source_text": "先完成完整开场导演方案、音乐设计、镜头编排与 S01 衔接方案，并准备相应可执行素材。"
+      },
+      {
+        "constraint_id": "versions",
+        "scope": "global",
+        "source_text": "保护既有制作记录和版本。"
+      },
+      {
+        "constraint_id": "hook",
+        "scope": "global",
+        "source_text": "最终目标是让观众从第一眼就感到这座城市不正常，同时在进入便利店 S01 后仍然保持好奇心，而不是只观看一段漂亮但没有叙事价值的片头。"
+      },
+      {
+        "constraint_id": "cold-score",
+        "scope": "global",
+        "source_text": "高级、冷峻、带悬疑质感的影视配乐，而不是传统国产恐怖短剧的突发惊吓音乐。"
+      },
+      {
+        "constraint_id": "route",
+        "scope": "global",
+        "source_text": "用即梦 seedance 2.5"
+      },
+      {
+        "constraint_id": "title",
+        "scope": "global",
+        "source_text": "《失帧》片名，随后自然衔接现有 S01。"
+      },
+      {
+        "constraint_id": "r2-preserve",
+        "scope": "global",
+        "source_text": "现有导演方案的核心创意、人物关系、灵异规则、音乐主题和 S01 衔接方向予以保留"
+      },
+      {
+        "constraint_id": "r2-interest",
+        "scope": "global",
+        "source_text": "如何让观众在最初几个画面就产生兴趣，而不是先观看较长的普通生活铺垫。"
+      },
+      {
+        "constraint_id": "r2-earlier",
+        "scope": "global",
+        "source_text": "是否可以更早呈现“两位→一位”的核心异常，同时保留足够的人物关系和情感反差。"
+      },
+      {
+        "constraint_id": "r2-duration",
+        "scope": "global",
+        "source_text": "冷开场是否能够自然压缩到约20–28秒"
+      },
+      {
+        "constraint_id": "r2-budget",
+        "scope": "global",
+        "source_text": "并与原第一集276秒的预算协调。"
+      },
+      {
+        "constraint_id": "r2-flex",
+        "scope": "global",
+        "source_text": "时长仅作为目标，不锁死对白、动作和镜头时间。"
+      },
+      {
+        "constraint_id": "r2-routes",
+        "scope": "global",
+        "source_text": "对关键失踪镜头，比较模型连续生成与前后状态素材加遮挡剪辑的可行性和实际制作风险。"
+      },
+      {
+        "constraint_id": "r2-music",
+        "scope": "global",
+        "source_text": "保留 Suno 的“缺席的应答”音乐主题，确保音乐真正服务剧情，不为片头强行加入配乐。"
+      },
+      {
+        "constraint_id": "r2-s01",
+        "scope": "global",
+        "source_text": "片名之后必须自然进入已经认可的 S01，不能重新生成或破坏既有原片。"
+      },
+      {
+        "constraint_id": "r2-functional",
+        "scope": "global",
+        "source_text": "不要因为我提出缩短时长就机械删减镜头。"
+      },
+      {
+        "constraint_id": "r2-world",
+        "scope": "global",
+        "source_text": "保留已有世界观、时间逻辑、最终反转和观众信息差。不要增加新的灵异规则。"
+      },
+      {
+        "constraint_id": "r2-no-paid",
+        "scope": "global",
+        "source_text": "尚不执行新的付费视频或音乐生成。"
+      },
+      {
+        "constraint_id": "r2-no-montage",
+        "scope": "global",
+        "source_text": "而不是快节奏的恐怖混剪。"
+      }
+    ],
+    "target_duration_seconds": 22,
+    "coverage_strategy": "multi_shot",
+    "strategy_source": "agent_directed",
+    "director_decision_rationale": "同一固定观察构图同时建立两位普通同事、关心及遮挡后缺席，省去重复转述和第二次空间建立；观众确认空位之后才切留下的人听平常回答，最后用同一片名段交接翌夜S01。12/6/4秒是方案预算，不给台词动作排秒，7至9秒揭示只是偏好。",
+    "strategy_request_evidence": null,
+    "director_skill": "open-video"
+  },
+  "coverage_units": [
+    {
+      "unit_id": "CO-R2-A",
+      "duration_seconds": 12,
+      "beat_function": "reversal",
+      "objective": "同一构图里先使两人可信，再让空位清楚成立",
+      "open_state": "两人已在雨站；罗敏右手手机贴耳，高峥左侧已戴眼镜；两侧出口可见",
+      "close_state": "货车离开后只剩罗敏及她自身物品，先留辨认空位的空间",
+      "shot_scale": "wide",
+      "camera_treatment": "static",
+      "camera_intent": "static：同一构图里先使两人可信，再让空位清楚成立",
+      "visible_change": "两位与路滑两句建立普通关心，货车遮挡后同构图少一人、无走开上车或烟化",
+      "transition_out": "motivated_cut",
+      "constraint_ids": [
+        "event",
+        "ordinary",
+        "rules",
+        "art",
+        "fear",
+        "music-director",
+        "suno",
+        "ending-theme",
+        "silence",
+        "post",
+        "timing",
+        "no-padding",
+        "handoff",
+        "protect",
+        "reuse",
+        "paid",
+        "audit",
+        "no-spoiler",
+        "no-repeat",
+        "delivery",
+        "versions",
+        "hook",
+        "cold-score",
+        "route",
+        "title",
+        "r2-preserve",
+        "r2-interest",
+        "r2-earlier",
+        "r2-duration",
+        "r2-budget",
+        "r2-flex",
+        "r2-routes",
+        "r2-music",
+        "r2-s01",
+        "r2-functional",
+        "r2-world",
+        "r2-no-paid",
+        "r2-no-montage"
+      ]
+    },
+    {
+      "unit_id": "CO-R2-B",
+      "duration_seconds": 6,
+      "beat_function": "reaction",
+      "objective": "观众记得同伴，留下的人自然回答并继续等车",
+      "open_state": "观众已看清空位，罗敏右手持机，司机的询问引导注意",
+      "close_state": "她自然说就我一个并看车灯，回答后才允许短动机进入",
+      "shot_scale": "medium",
+      "camera_treatment": "static",
+      "camera_intent": "static：观众记得同伴，留下的人自然回答并继续等车",
+      "visible_change": "司机确认一位，罗敏回答无寻找或恐惧行为，原关系被遗忘",
+      "transition_out": "cut",
+      "constraint_ids": [
+        "event",
+        "ordinary",
+        "rules",
+        "art",
+        "fear",
+        "music-director",
+        "suno",
+        "ending-theme",
+        "silence",
+        "post",
+        "timing",
+        "no-padding",
+        "handoff",
+        "protect",
+        "reuse",
+        "paid",
+        "audit",
+        "no-spoiler",
+        "no-repeat",
+        "delivery",
+        "versions",
+        "hook",
+        "cold-score",
+        "route",
+        "title",
+        "r2-preserve",
+        "r2-interest",
+        "r2-earlier",
+        "r2-duration",
+        "r2-budget",
+        "r2-flex",
+        "r2-routes",
+        "r2-music",
+        "r2-s01",
+        "r2-functional",
+        "r2-world",
+        "r2-no-paid",
+        "r2-no-montage"
+      ]
+    },
+    {
+      "unit_id": "CO-R2-TITLE",
+      "duration_seconds": 4,
+      "beat_function": "transition",
+      "objective": "以原主题余韵和正确片名交接翌夜S01",
+      "open_state": "回答及日常余波已成立，可有未完成乐句",
+      "close_state": "片名翌夜文字退场、音乐退尽，下一画面为完整S01首帧与原音",
+      "shot_scale": "full",
+      "camera_treatment": "static",
+      "camera_intent": "static：以原主题余韵和正确片名交接翌夜S01",
+      "visible_change": "失帧与翌夜在同一后期段落出现，保持原片不重生",
+      "transition_out": "end",
+      "constraint_ids": [
+        "event",
+        "ordinary",
+        "rules",
+        "art",
+        "fear",
+        "music-director",
+        "suno",
+        "ending-theme",
+        "silence",
+        "post",
+        "timing",
+        "no-padding",
+        "handoff",
+        "protect",
+        "reuse",
+        "paid",
+        "audit",
+        "no-spoiler",
+        "no-repeat",
+        "delivery",
+        "versions",
+        "hook",
+        "cold-score",
+        "route",
+        "title",
+        "r2-preserve",
+        "r2-interest",
+        "r2-earlier",
+        "r2-duration",
+        "r2-budget",
+        "r2-flex",
+        "r2-routes",
+        "r2-music",
+        "r2-s01",
+        "r2-functional",
+        "r2-world",
+        "r2-no-paid",
+        "r2-no-montage"
+      ]
+    }
+  ],
+  "intent_items": [
+    {
+      "intent_item_id": "event",
+      "statement": "冷开场必须有真正的悬疑事件，不是城市空镜、Logo 和背景音乐的简单拼接。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "event",
+          "quote": "冷开场必须有真正的悬疑事件，不是城市空镜、Logo 和背景音乐的简单拼接。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "ordinary",
+      "statement": "建议从雨夜城市中的普通人物开始，表现一次令人不安的失踪事件。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "ordinary",
+          "quote": "建议从雨夜城市中的普通人物开始，表现一次令人不安的失踪事件。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "rules",
+      "statement": "遵循《失帧》已有的时间缺失、人物被遗忘及现实记录改写规则，不擅自发明互相矛盾的灵异机制。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "rules",
+          "quote": "遵循《失帧》已有的时间缺失、人物被遗忘及现实记录改写规则，不擅自发明互相矛盾的灵异机制。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "art",
+      "statement": "保留电影级原创 3D 国漫写实风格，与已经认可的 S01 美术语言一致。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "art",
+          "quote": "保留电影级原创 3D 国漫写实风格，与已经认可的 S01 美术语言一致。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "fear",
+      "statement": "利用镜头组织、声音异常、人物反应和观众信息差建立恐惧，不依赖廉价惊吓。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "fear",
+          "quote": "利用镜头组织、声音异常、人物反应和观众信息差建立恐惧，不依赖廉价惊吓。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "music-director",
+      "statement": "由现有 Music Director 设计整段音乐",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "music-director",
+          "quote": "由现有 Music Director 设计整段音乐",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "suno",
+      "statement": "优先使用已接入的 Suno v6 创作原创器乐配乐",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "suno",
+          "quote": "优先使用已接入的 Suno v6 创作原创器乐配乐",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "ending-theme",
+      "statement": "并考虑将音乐主题延续至第一集结尾。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "ending-theme",
+          "quote": "并考虑将音乐主题延续至第一集结尾。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "silence",
+      "statement": "配乐服务画面，允许静默，不强制音乐铺满全段。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "silence",
+          "quote": "配乐服务画面，允许静默，不强制音乐铺满全段。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "post",
+      "statement": "片名文字、准确时间信息和最终声音剪辑交由现有后期系统负责。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "post",
+          "quote": "片名文字、准确时间信息和最终声音剪辑交由现有后期系统负责。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "timing",
+      "statement": "不得给逐句对白硬排秒点；镜头时长服从自然表演与模型能力",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "timing",
+          "quote": "不固定逐句对白时间和镜头长度；根据自然表演、叙事节奏及视频模型能力自主安排。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "no-padding",
+      "statement": "不得为了目标时长填充无叙事职责的画面",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "no-padding",
+          "quote": "可以设定整体目标时长，但不要为了时长填充无意义画面。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "handoff",
+      "statement": "新增开场必须合理衔接已完成的 S01。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "handoff",
+          "quote": "新增开场必须合理衔接已完成的 S01。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "protect",
+      "statement": "优先保护现有认可的原片、字幕、人物、动作与音频，不进行不必要的重生成。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "protect",
+          "quote": "优先保护现有认可的原片、字幕、人物、动作与音频，不进行不必要的重生成。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "reuse",
+      "statement": "优先复用当前 Music Director、Suno Provider、Composition、声音及 QA 基础设施，不重复建设。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "reuse",
+          "quote": "优先复用当前 Music Director、Suno Provider、Composition、声音及 QA 基础设施，不重复建设。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "paid",
+      "statement": "真实付费生成遵守项目现有授权与额度限制，未取得所需授权时先完成可执行设计和生成准备。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "paid",
+          "quote": "真实付费生成遵守项目现有授权与额度限制，未取得所需授权时先完成可执行设计和生成准备。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "audit",
+      "statement": "请先审查整集故事",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "audit",
+          "quote": "请先审查整集故事",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "no-spoiler",
+      "statement": "不得提前泄露结尾反转",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "no-spoiler",
+          "quote": "确保新开场不会提前泄露结尾反转",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "no-repeat",
+      "statement": "不得重复便利店的求证流程而无新叙事价值",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "no-repeat",
+          "quote": "也不会与便利店事件形成无意义的重复。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "delivery",
+      "statement": "先完成完整开场导演方案、音乐设计、镜头编排与 S01 衔接方案，并准备相应可执行素材。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "delivery",
+          "quote": "先完成完整开场导演方案、音乐设计、镜头编排与 S01 衔接方案，并准备相应可执行素材。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "versions",
+      "statement": "保护既有制作记录和版本。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "versions",
+          "quote": "保护既有制作记录和版本。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "hook",
+      "statement": "最终目标是让观众从第一眼就感到这座城市不正常，同时在进入便利店 S01 后仍然保持好奇心，而不是只观看一段漂亮但没有叙事价值的片头。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "hook",
+          "quote": "最终目标是让观众从第一眼就感到这座城市不正常，同时在进入便利店 S01 后仍然保持好奇心，而不是只观看一段漂亮但没有叙事价值的片头。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "cold-score",
+      "statement": "高级、冷峻、带悬疑质感的影视配乐，而不是传统国产恐怖短剧的突发惊吓音乐。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "cold-score",
+          "quote": "高级、冷峻、带悬疑质感的影视配乐，而不是传统国产恐怖短剧的突发惊吓音乐。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "route",
+      "statement": "用即梦 seedance 2.5",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "route",
+          "quote": "用即梦 seedance 2.5",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "title",
+      "statement": "《失帧》片名，随后自然衔接现有 S01。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "title",
+          "quote": "《失帧》片名，随后自然衔接现有 S01。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "prior-night",
+      "statement": "冷开场事件位于前一夜，片名后进入翌夜S01，保留每天03:17的既有规则",
+      "origin": "director_choice",
+      "source_refs": [
+        {
+          "source_hash": "fdd92cb5737cf04410925c9a0d24e95119a0b903b87b9a0fa56443fa46a42f4c",
+          "locator": "../director-treatment.md",
+          "intent_item_id": "prior-night",
+          "quote": "新事件位于**前一夜**",
+          "origin": "director_choice"
+        }
+      ],
+      "related_intent_ids": [
+        "rules"
+      ]
+    },
+    {
+      "intent_item_id": "two-one",
+      "statement": "先听见两位，再在失踪后听见同一人的就我一个，且没有寻找同伴行为",
+      "origin": "director_choice",
+      "source_refs": [
+        {
+          "source_hash": "fdd92cb5737cf04410925c9a0d24e95119a0b903b87b9a0fa56443fa46a42f4c",
+          "locator": "../director-treatment.md",
+          "intent_item_id": "two-one",
+          "quote": "罗敏：**“嗯，就我一个。”**",
+          "origin": "director_choice"
+        }
+      ],
+      "related_intent_ids": [
+        "event"
+      ]
+    },
+    {
+      "intent_item_id": "no-trace",
+      "statement": "不使用残影、渐隐或不可改写遗物替代缺席事件",
+      "origin": "director_choice",
+      "source_refs": [
+        {
+          "source_hash": "fdd92cb5737cf04410925c9a0d24e95119a0b903b87b9a0fa56443fa46a42f4c",
+          "locator": "../director-treatment.md",
+          "intent_item_id": "no-trace",
+          "quote": "没有烟雾、残影、衣物、第二只包或“无法被改写”的脚印。",
+          "origin": "director_choice"
+        }
+      ],
+      "related_intent_ids": [
+        "rules"
+      ]
+    },
+    {
+      "intent_item_id": "calm-performance",
+      "statement": "罗敏以日常等车任务自然表演，不以恍惚脸解释遗忘",
+      "origin": "director_choice",
+      "source_refs": [
+        {
+          "source_hash": "fdd92cb5737cf04410925c9a0d24e95119a0b903b87b9a0fa56443fa46a42f4c",
+          "locator": "../director-treatment.md",
+          "intent_item_id": "calm-performance",
+          "quote": "她是在等车，不是在表演失忆。",
+          "origin": "director_choice"
+        }
+      ],
+      "related_intent_ids": [
+        "two-one"
+      ]
+    },
+    {
+      "intent_item_id": "r2-preserve",
+      "statement": "保留已接受的核心创意、普通同事关系、规则、主题与S01衔接",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "r2-preserve",
+          "quote": "现有导演方案的核心创意、人物关系、灵异规则、音乐主题和 S01 衔接方向予以保留",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "r2-interest",
+      "statement": "最初画面直接进入有明确人物目标的信息，不先等待较长生活铺垫",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "r2-interest",
+          "quote": "如何让观众在最初几个画面就产生兴趣，而不是先观看较长的普通生活铺垫。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "r2-earlier",
+      "statement": "将核心异常提前并保留人物关系与情感反差",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "r2-earlier",
+          "quote": "是否可以更早呈现“两位→一位”的核心异常，同时保留足够的人物关系和情感反差。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "r2-duration",
+      "statement": "以约20–28秒为软目标，最终服从自然表演和完整事件",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "r2-duration",
+          "quote": "冷开场是否能够自然压缩到约20–28秒",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "r2-budget",
+      "statement": "明确新增开场与原276秒预算及当前准备稿变动的关系",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "r2-budget",
+          "quote": "并与原第一集276秒的预算协调。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "r2-flex",
+      "statement": "不得把目标总时长变成逐句对白、动作或镜头的硬时间锁",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "r2-flex",
+          "quote": "时长仅作为目标，不锁死对白、动作和镜头时间。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "r2-routes",
+      "statement": "比较两条制作路线，说明当前代码证据、推断及尚未实测的边界",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "r2-routes",
+          "quote": "对关键失踪镜头，比较模型连续生成与前后状态素材加遮挡剪辑的可行性和实际制作风险。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "r2-music",
+      "statement": "保留缺席的应答主题，以剧情事件而非片头长度决定配乐进入",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "r2-music",
+          "quote": "保留 Suno 的“缺席的应答”音乐主题，确保音乐真正服务剧情，不为片头强行加入配乐。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "r2-s01",
+      "statement": "不得重生或破坏S01原片，片名之后完整自然接入",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "r2-s01",
+          "quote": "片名之后必须自然进入已经认可的 S01，不能重新生成或破坏既有原片。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "r2-functional",
+      "statement": "不得机械删镜，需按戏剧功能保留、合并、提前或重新设计",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "r2-functional",
+          "quote": "不要因为我提出缩短时长就机械删减镜头。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "r2-world",
+      "statement": "保留世界观、时间逻辑、最终反转和观众信息差，不增加新机制",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "r2-world",
+          "quote": "保留已有世界观、时间逻辑、最终反转和观众信息差。不要增加新的灵异规则。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "r2-no-paid",
+      "statement": "本轮不得执行新的付费视频或音乐生成",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "r2-no-paid",
+          "quote": "尚不执行新的付费视频或音乐生成。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "r2-no-montage",
+      "statement": "不得以恐怖混剪代替有电影质感的清晰事件",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+          "locator": "creative-input.txt",
+          "intent_item_id": "r2-no-montage",
+          "quote": "而不是快节奏的恐怖混剪。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "r2-single-comparison",
+      "statement": "同一固定构图承载关系与缺席比较",
+      "origin": "director_choice",
+      "source_refs": [
+        {
+          "source_hash": "1379bc2f96b37258f43790550ea37a5b0ac1bb06da19ecbc7de79e7c3fdf97b5",
+          "locator": "director-revision.md",
+          "intent_item_id": "r2-single-comparison",
+          "quote": "先建立两个人，再让其中一个位置空掉。",
+          "origin": "director_choice"
+        }
+      ],
+      "related_intent_ids": [
+        "r2-earlier"
+      ]
+    },
+    {
+      "intent_item_id": "r2-gaze",
+      "statement": "以有对象的目光回应保留关系，省去重复转告司机",
+      "origin": "director_choice",
+      "source_refs": [
+        {
+          "source_hash": "1379bc2f96b37258f43790550ea37a5b0ac1bb06da19ecbc7de79e7c3fdf97b5",
+          "locator": "director-revision.md",
+          "intent_item_id": "r2-gaze",
+          "quote": "她看他一眼，表示听见，继续听电话。",
+          "origin": "director_choice"
+        }
+      ],
+      "related_intent_ids": [
+        "r2-preserve"
+      ]
+    },
+    {
+      "intent_item_id": "r2-reveal-preference",
+      "statement": "期望约第7–9秒读到缺席，随表演修订，非硬deadline",
+      "origin": "director_choice",
+      "source_refs": [
+        {
+          "source_hash": "1379bc2f96b37258f43790550ea37a5b0ac1bb06da19ecbc7de79e7c3fdf97b5",
+          "locator": "director-revision.md",
+          "intent_item_id": "r2-reveal-preference",
+          "quote": "约第7–9秒",
+          "origin": "director_choice"
+        }
+      ],
+      "related_intent_ids": [
+        "r2-earlier"
+      ]
+    },
+    {
+      "intent_item_id": "r2-plate-preference",
+      "statement": "优先准备动态两状态遮挡CUT，连续生成保留为备选，尚未发布执行选择",
+      "origin": "director_choice",
+      "source_refs": [
+        {
+          "source_hash": "1379bc2f96b37258f43790550ea37a5b0ac1bb06da19ecbc7de79e7c3fdf97b5",
+          "locator": "director-revision.md",
+          "intent_item_id": "r2-plate-preference",
+          "quote": "优先准备前后状态＋完整遮挡硬切",
+          "origin": "director_choice"
+        }
+      ],
+      "related_intent_ids": [
+        "r2-routes"
+      ]
+    },
+    {
+      "intent_item_id": "r2-title-only-variation",
+      "statement": "实际候选无自然短句时，允许只在片名入乐，保持缺席的应答主题与对白完整",
+      "origin": "director_choice",
+      "source_refs": [
+        {
+          "source_hash": "1379bc2f96b37258f43790550ea37a5b0ac1bb06da19ecbc7de79e7c3fdf97b5",
+          "locator": "director-revision.md",
+          "intent_item_id": "r2-title-only-variation",
+          "quote": "可让音乐只在片名进入",
+          "origin": "director_choice"
+        }
+      ],
+      "related_intent_ids": [
+        "r2-music"
+      ]
+    }
+  ],
+  "intent_groups": {
+    "must_happen": [
+      {
+        "intent_item_id": "event"
+      },
+      {
+        "intent_item_id": "ordinary"
+      },
+      {
+        "intent_item_id": "rules"
+      },
+      {
+        "intent_item_id": "art"
+      },
+      {
+        "intent_item_id": "fear"
+      },
+      {
+        "intent_item_id": "music-director"
+      },
+      {
+        "intent_item_id": "suno"
+      },
+      {
+        "intent_item_id": "ending-theme"
+      },
+      {
+        "intent_item_id": "silence"
+      },
+      {
+        "intent_item_id": "post"
+      },
+      {
+        "intent_item_id": "handoff"
+      },
+      {
+        "intent_item_id": "protect"
+      },
+      {
+        "intent_item_id": "reuse"
+      },
+      {
+        "intent_item_id": "paid"
+      },
+      {
+        "intent_item_id": "audit"
+      },
+      {
+        "intent_item_id": "delivery"
+      },
+      {
+        "intent_item_id": "versions"
+      },
+      {
+        "intent_item_id": "hook"
+      },
+      {
+        "intent_item_id": "cold-score"
+      },
+      {
+        "intent_item_id": "route"
+      },
+      {
+        "intent_item_id": "title"
+      },
+      {
+        "intent_item_id": "prior-night"
+      },
+      {
+        "intent_item_id": "two-one"
+      },
+      {
+        "intent_item_id": "r2-preserve"
+      },
+      {
+        "intent_item_id": "r2-interest"
+      },
+      {
+        "intent_item_id": "r2-earlier"
+      },
+      {
+        "intent_item_id": "r2-budget"
+      },
+      {
+        "intent_item_id": "r2-routes"
+      },
+      {
+        "intent_item_id": "r2-music"
+      },
+      {
+        "intent_item_id": "r2-s01"
+      },
+      {
+        "intent_item_id": "r2-world"
+      },
+      {
+        "intent_item_id": "r2-single-comparison"
+      }
+    ],
+    "must_not_happen": [
+      {
+        "intent_item_id": "timing"
+      },
+      {
+        "intent_item_id": "no-padding"
+      },
+      {
+        "intent_item_id": "no-spoiler"
+      },
+      {
+        "intent_item_id": "no-repeat"
+      },
+      {
+        "intent_item_id": "no-trace"
+      },
+      {
+        "intent_item_id": "r2-flex"
+      },
+      {
+        "intent_item_id": "r2-functional"
+      },
+      {
+        "intent_item_id": "r2-no-paid"
+      },
+      {
+        "intent_item_id": "r2-no-montage"
+      }
+    ],
+    "preferred_performance": [
+      {
+        "intent_item_id": "calm-performance"
+      },
+      {
+        "intent_item_id": "r2-gaze"
+      },
+      {
+        "intent_item_id": "r2-reveal-preference"
+      },
+      {
+        "intent_item_id": "r2-plate-preference"
+      }
+    ],
+    "timing_targets": [
+      {
+        "intent_item_id": "r2-duration",
+        "target_kind": "delivery_constraint"
+      }
+    ],
+    "acceptable_variation": [
+      {
+        "intent_item_id": "r2-title-only-variation"
+      }
+    ]
+  }
+}

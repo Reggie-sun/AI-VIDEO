@@ -1,0 +1,194 @@
+{
+  "recorded_at": "2026-10-25T21:38:47.361777+00:00",
+  "kind": "director_rhythm_revision_only",
+  "production_receipt": false,
+  "revision": 2,
+  "predecessor_commit": "aabb9a33ef1e707aa1b3c597f0c5396445c959a4",
+  "current_coverage": "director-coverage.json",
+  "parent_self_review": {
+    "raw_to_inventory": "REVIEWED",
+    "inventory_to_coverage": "REVIEWED",
+    "meaning_preserved": "REVIEWED; ordinary colleagues, prior night, erasure, original motif, S01 protection",
+    "review_gate": "NATIVE_REVIEW_NOT_REQUIRED; design-only; no runtime or durable Production mutation"
+  },
+  "checks": {
+    "intent_source_hash_and_quote_joins": "PASS",
+    "coverage_duration_sum_seconds": 22,
+    "relative_links": "PASS",
+    "revision01_design_music_and_title_unchanged": "PASS",
+    "episode_planning_arithmetic": "PASS",
+    "director_v4_structure": "PASS",
+    "docs_contract_gate": "PASS; actual command python -m scripts.docs_contract_gate check"
+  },
+  "planning_budgets": {
+    "original_body_seconds": 276,
+    "s02_preparation_body_seconds": 278,
+    "opening_working_seconds": 22,
+    "original_plus_opening_seconds": 298,
+    "s02_preparation_plus_opening_seconds": 300,
+    "soft_opening_target_seconds": [
+      20,
+      28
+    ],
+    "first_reveal_preference_seconds": [
+      7,
+      9
+    ],
+    "measured_media_timing": false,
+    "s01_source_duration_remains_seconds": 16.065
+  },
+  "source_observations": [
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "sha256": "46c2f253c44ea87dd382af48bb28b69c5b0304adba637d03698318de88850464"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/S02-preparation/director-coverage.json",
+      "sha256": "ba483e4c2b40e3f0fdaad5e2c0f589a5763077a5bd857243dd2a406ca76ff2dc"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/shot-prompts.md",
+      "sha256": "14e34cb0368ea4611cc6b8f67e8239e5b7e8f9825580c9eb26973c70a0832c53"
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-1080p高清版-Seedance2.5-16秒.mp4",
+      "sha256": "15c7c21ea8ef526d641d5a1565cbb4ec93ea4ee63b34fc9c7a0d73f2b21efb0b"
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-1080p中英双语字幕版-16秒.mp4",
+      "sha256": "3bbf15995bac0e91033be3689b12f16ad1e09f9eb8a78d53a80cb2724a0d16a1"
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-中英双语字幕.srt",
+      "sha256": "d611d365a8813e46ab2d942d74c77f655057cb4dcb36c4f32e2ffab06c017a55"
+    },
+    {
+      "path": "src/ai_video/production/jimeng_models.py",
+      "sha256": "128b8c3d1767c837046d6c4ac610a83b3638bbbc0d40f444413a92e5e8e97d27"
+    },
+    {
+      "path": "src/ai_video/production/jimeng.py",
+      "sha256": "f66108f219ebb5e337c6143101b693f2aeaae12f87043069127816f7c8c61e22"
+    },
+    {
+      "path": "src/ai_video/production/composition_contracts.py",
+      "sha256": "9ab3344dbae51f7e6c1abc6d774016639609f9c96f3973d48078a6e9c4e65a9c"
+    },
+    {
+      "path": "src/ai_video/production/composition.py",
+      "sha256": "61f2efec9833fb59938d050f0879e264934ea62d1619938cc7359f79a678bb03"
+    }
+  ],
+  "preserved_revision01_files": [
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/director-treatment.md",
+      "sha256": "fdd92cb5737cf04410925c9a0d24e95119a0b903b87b9a0fa56443fa46a42f4c",
+      "matches_revision01_commit": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/director-coverage.json",
+      "sha256": "3aac019401b2cd8e98af36f972794d21c98cdf945472206a9ee0c282783f9f70",
+      "matches_revision01_commit": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/shot-cards.md",
+      "sha256": "c560e36fd489a5fbc8057ea1bb67908ca868c6cc368c1d680a6cd8b9764dde34",
+      "matches_revision01_commit": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/composition-handoff.md",
+      "sha256": "1175f374aeaf4e88f90be304a61403d6f7389ff77d84e1b40b124c080b94d15c",
+      "matches_revision01_commit": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music-and-sound.md",
+      "sha256": "07b7f1a18300867d95533f2e79b00adba7493515fe85f7c5d77c20e8ba2cdabd",
+      "matches_revision01_commit": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/briefs.json",
+      "sha256": "01f27db01361b864258131e74897b8190882846660c4cef07328f65fe28714bb",
+      "matches_revision01_commit": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/directions.json",
+      "sha256": "8a618f9844c212861c0d78c88eacedabd9ab5d1936483c49cb6f0b0ecc25c01d",
+      "matches_revision01_commit": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/co-missing-response/style.txt",
+      "sha256": "6489351a9493eb8ec7711c9206bb6c54f7fa6d058f0a2e4313c7938c333cd46a",
+      "matches_revision01_commit": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/co-missing-response/exclude.txt",
+      "sha256": "a35646b52c3ee69881a6d582be78e1395252483cd32db865328b809c7edab424",
+      "matches_revision01_commit": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/co-missing-response/dry-run.argv.json",
+      "sha256": "4d72c6b6510a3a3396107f26a0384be45aa1cc711041702f79ac56a74bbf1222",
+      "matches_revision01_commit": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/assets/title-shizhen.paths.svg",
+      "sha256": "326e8aa89d199dd0a7da2ce5b154736c6df12360f64c142fcee1f6e374501023",
+      "matches_revision01_commit": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/verification/preparation-receipt.json",
+      "sha256": "91d4b46702be68f3944bd8312b8dc6de13340e49c6d314b190d1823e4ac33cb3",
+      "matches_revision01_commit": true
+    }
+  ],
+  "owned_files": [
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/rhythm-revision-02/creative-input.txt",
+      "sha256": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/rhythm-revision-02/director-revision.md",
+      "sha256": "1379bc2f96b37258f43790550ea37a5b0ac1bb06da19ecbc7de79e7c3fdf97b5"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/rhythm-revision-02/director-coverage.json",
+      "sha256": "8d3f05e827e56b00e2956b1a120a89c220577a60a3f048c9eb7e8d2e8d443806"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/README.md",
+      "sha256": "ef40a02bbead8104e5d0f39ed8363e0d8d5d19dbe6b6c2f37179f8874fe95b00"
+    }
+  ],
+  "new_generation_calls": {
+    "video": 0,
+    "music": 0,
+    "image": 0
+  },
+  "new_paid_cost": 0,
+  "media_verdict": "NOT_EVALUATED",
+  "human_audience_validation": "NOT_EVALUATED",
+  "music_listening": "NOT_EVALUATED",
+  "composition_render": "NOT_EVALUATED",
+  "publication": "NOT_PUBLISHED",
+  "note": "text and code inspection only; model-continuous vs two-state route is a reasoned preference, not an empirical win; older UNKNOWN unchanged",
+  "coverage_validator_result": {
+    "coverage_strategy": "multi_shot",
+    "coverage_unit_count": 3,
+    "creative_input_kind": "direction",
+    "director_intent_is_not_acceptance": true,
+    "director_preflight_request": true,
+    "intent_group_counts": {
+      "acceptable_variation": 1,
+      "must_happen": 32,
+      "must_not_happen": 9,
+      "preferred_performance": 4,
+      "timing_targets": 1
+    },
+    "planned_duration_seconds": 22.0,
+    "qa_admission_required": true,
+    "schema_version": "4",
+    "status": "passed",
+    "strategy_source": "agent_directed"
+  },
+  "coverage_validator_advisory": "Static camera repetition is deliberate: fixed spatial comparison, then same-side daily response. No change made solely to suppress warning."
+}

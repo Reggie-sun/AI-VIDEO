@@ -1,6 +1,12 @@
 # Lost Frames EP01 — Cold Open Preparation
 
-## Director Decision
+## Current Revision — Rhythm 02
+
+当前推荐改为[Rhythm Revision 02](rhythm-revision-02/director-revision.md)：约22秒、20–28秒弹性，同一固定构图提前呈现“两位→一位”，无新付费生成。[当前coverage](rhythm-revision-02/director-coverage.json)取代下方37秒coverage的后续制作指导；人物、世界观、主题与S01保护继续继承。revision-02是创作准备，不激活Production。
+
+以下各文件与37秒说明保留为Revision 01历史，不再作为最新镜头顺序／时长／spotting入口。旧验证回执绑定原commit `aabb9a3`；本README的版本入口更新不回填旧回执。既有音乐设计／静态素材可按revision-02明确列出的继承范围复用，不从旧shot-cards直接submit。
+
+## Previous Director Decision — Revision 01
 
 **《两位》：雨站里有两个人，十一秒过去，连“一起等车”这件事也只剩观众记得。**
 
