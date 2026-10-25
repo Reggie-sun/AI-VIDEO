@@ -25,6 +25,16 @@ Date: 2026-10-26
 
 自动学习评估 `no_candidate`：修复为可复现软件缺陷；CG/真人更换了输入且非受控比较，不能升级通用模型或审核结论。
 
+## Second Photorealistic Reference Test
+
+用户追加要求再用一个非常逼真的人物测试。直接复用 `runs/canvas-jieshi-two-shot-20261013-001/assets/linyan-reference.png`，SHA `1a21ac10047cab19b441bfefd84ab91fef8de4b6787b7a5c558794903ff18b55`，941×1672、1,801,377 bytes；实际查看为单个成年男子地铁写实参考，皮肤、发丝、衣料均为摄影质感。此图与前一八人构图不同，仍属《界蚀》林砚参考，不声称不同真人身份或真实摄影来源。未重新生图。
+
+经相同正式Jimeng Provider，用Mini/720p/4秒/9:16、`reference`全能参考、中文native prompt1692字符；仅要求自然眨眼、轻微转向镜头、固定机位、无对白。新节点 `node_a96d4nxkb5`，attempt `canvas-9723aa2154e56ecd3327940183eb6dc6b759985a`，request SHA `7c3665bb921e30b7c3c38216b85f8e7c065ad462a9370340e5d90383c36f96dd`。输入准备最初遗漏显式none dialogue，已沿canonical source revision补齐，无生成提交；最后仅一次paid intent和一次真实生成。前序2次实际生成及4份intent保留，新累计上限3次实际生成/5份intent、内部积分上界60→90，本单元上界30CRD。
+
+平台最终SUCCEEDED，file id `v02870g10004dbf9bea7dldagl1vh710`，已正式fetch原片，SHA `a77f12c7f3e8873d501d37e75d20a0c8ab47ca06ff9d7ede92ea4215ddbe7817`。交付 `runs/jieshi-jimeng-mini-realperson-second-20261026/Jieshi-Photorealistic-Person-Mini-720p-4s.mp4`。回执根 `U = .codex/tmp/jieshi-jimeng-mini-realperson-second-20261026/`：`input.json`、`compiled-request.json`、`submit-result.json`、`poll-result.json`、`fetch-result.json`、`delivery.json`。本条实际扣费待确认。
+
+此请求未返回真人认证要求或PrivacyInformation拒绝；不证明所有真人图均可通过，也不能确定先前Ark差异来自入口、mode或策略。按用户此前仅测试/不追加检查要求，没有新软件测试或媒体QA，没有生产acceptance/activation。没有修改共享源码。`record-ai-video-session`: update；`distill-ai-video-learning`: `no_candidate`，同一角色的两份参考不隔离审核变量，现阶段只保留有界成功事实。
+
 ## Root Cause Update — 2026-10-26
 
 用户随后要求定位是否与旧 API 失败相同。当前有界上传诊断已复现本地 `upload destination invalid`：ImageX 实际返回的 `tos-lq-x.bytedancevod.com` 不匹配 `jimeng_browser.cjs` 的 `safeUpload` 域名白名单，因此在 binary POST 前被拒；其他返回的 `*.snssdk.com` 节点匹配并可上传，解释了间歇性成功/失败。此更新取代下文 checkpoint 的“根因仍未确证”，原两次 paid receipt、计数和未出片事实保持。
