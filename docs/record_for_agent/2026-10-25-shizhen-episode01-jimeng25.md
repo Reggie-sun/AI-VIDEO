@@ -8,7 +8,19 @@ evidence_index_version: "1"
 
 Date: 2026-10-25
 
-## Current Checkpoint — Bilingual Captions Without Ending Symbols
+## Current Checkpoint — S02 Preparation Only
+
+2026-10-26，用户要求“开始准备第二个shot”。已完成 `docs/superpowers/artifacts/drama/shizhen-episode-01/S02-preparation/` 的导演准备稿、中文模型表达稿及沿existing v4格式的coverage候选；S02约8秒、两个摄影单元，保留唯一一句“这个也算上”，先看林序推咖啡，再看小程接稳、转瓶、从底座取扫码枪，林序用同一右手取出并点亮手机。末尾小程仍完整可见，扫码枪未触发，咖啡瓶底落在台面，纸上饭团保持，为S03同构图缺席提供接点。仅准备，无S02视频提交、无新图/配音生成，无新增费用或公开发布。
+
+本地从已认可HD005 raw逐像素抽取frame60/300/384（PTS2.5/12.5/16秒）三张PNG，并解码5.00–7.35秒的林序原声为2.35秒48kHz单声道WAV，实际查看三图并核验SHA/格式/当前代码规格。原片实际是黑金瓶装咖啡，不是旧文字里的罐；终末frame384只证明林序面部短笑、向下视线，手/台面状态取frame300的最后可见证据，不伪称终帧全景。参考与receipt位于 `runs/shizhen-episode01-jimeng25-20261025-001/S02-preparation/`，未注册为S02资产或上传。
+
+使用open-video与seedance-authoring的2.5 overlay；当前代码支持multimodal、1080p/16:9和8秒候选，但未创建S02 native node/profile、compiled request、budget或permit。源Manifest SHA与此前caption准备记录相同，真实video submit仍5次，旧audio UNKNOWN未重试。S01用户原片认可保留，旧技术NE未伪造为全PASS；不把本轮准备当作下一Shot submit准入。
+
+按open-video实践做一轮read-only独立概念审读，native reviewer_high `/root/s02_concept_check`提出唯一non_blocking `S02-C01`：需交代扫码枪来源。Parent确认并补齐底座初态及可见取枪动作，不称reviewer审过修订字节。Director v4结构检查PASS，整集弹性预算278秒；重复medium/static分类仅advisory warning，不为清warning机械换机位。Docs contract及owned diff检查PASS，准确源身份、参考范围、单句对白和无对白时间戳检查在preparation receipt。
+
+本轮record-ai-video-session更新primary record；distill-ai-video-learning为no_candidate：没有新模型质量实验，不从准备稿、结构PASS或只读意见推广效果结论。下一步实际执行仍须沿原owner绑定exact前序交接、参考/声音职责、S02专用profile与累计账本；本轮不扩工程、不生成S03或宣称可直接submit。
+
+## Previous Checkpoint — Bilingual Captions Without Ending Symbols
 
 2026-10-26，用户要求“把结尾不要有符号写进规则,然后我需要中英双版本的”，并明确选择“一份中英双语字幕视频”。已交付 `outputs/shizhen-episode01/失帧-第一集-S01-1080p中英双语字幕版-16秒.mp4`，SHA `3bbf15995bac0e91033be3689b12f16ad1e09f9eb8a78d53a80cb2724a0d16a1`，16,537,969 bytes，1920×1080、24fps、16秒。中文在上、英文在下，同步四个实际对白窗口，两行均无句尾标点或装饰符号，句内逗号及英文缩写撇号保留。对应SRT同目录 `失帧-第一集-S01-中英双语字幕.srt`。此前单语字幕版保留为历史，未倒写其用户验收。
 
