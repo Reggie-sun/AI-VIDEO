@@ -46,6 +46,14 @@ def canvas_feedback_context(*, loaded, row, policy, execution_stack=None, handof
     inferred from an original prompt or generated here as a PASS receipt.
     """
     shot = next(s for s in loaded.shots if s.shot_id == row["shot"]["shot_id"])
+    order = tuple(s for beat in loaded.storyboard.beats for s in beat.shot_ids)
+    edge = row.get("boundary")
+    if order.index(shot.shot_id) > 0 and edge is None:
+        raise ValueError("a following Shot requires an explicit continuity or independent boundary")
+    if edge is not None and not isinstance(edge, dict):
+        raise ValueError("an explicit Shot boundary must be an object")
+    if edge is not None and edge.get("independent") is True and set(edge) - {"independent", "reason"}:
+        raise ValueError("an independent boundary cannot also declare continuity constraints")
     from ai_video.canvas_target_gate import require_target_state_inventory
     require_target_state_inventory(loaded=loaded, row=row)
     scene = next(s for s in loaded.scenes if s.scene_id == shot.scene_id)
@@ -69,7 +77,6 @@ def canvas_feedback_context(*, loaded, row, policy, execution_stack=None, handof
         if closing:
             authored.setdefault("close_state", {"kind": "typed_hash",
                 "state_hash": canonical_sha256({d.value: fact for d, fact in closing.items()})})
-    edge = row.get("boundary")
     if edge is not None and edge.get("independent") is not True:
         changes = tuple(CausalStateChange.model_validate(c) for c in edge["causal_state_changes"])
         authored.setdefault("open_state", {"kind": "typed_hash",

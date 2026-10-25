@@ -17,7 +17,15 @@
 | Seedance 2.0 | `seedance_2.0_vip` | 4–15 秒 | 720p / 1080p / 4k | `UNQUALIFIED` |
 | Seedance 2.0 Fast | `seedance_2.0_fast_vip` | 4–15 秒 | 720p | `UNQUALIFIED` |
 
-所有型号当前仅声明 reference-to-video / mode 4、单输出、原生音轨、整数秒及既有五种宽高比；不代表网页全部功能。2.0 / Fast / Mini 各自声明最多 12 项素材（图片 9、视频 3、音频 3），至少包含图片或视频；图片与视频各最多 50 MiB，音频 15 MiB，图片每边最多 8192，视频每边 200–2160。视频单段及总长 2–15.4 秒 / 最多 15.4 秒，音频 2–15 秒 / 总长最多 15 秒。2.5 最多 50 项（图片 30、视频 10、音频 10），支持纯音频参考；图片每边 300–8192、比例 0.4–2.5，视频每边 300–6000；视频和音频最短 1.8 秒、单段及各自总长最多 30.2 秒，音频 15 MiB。2.5 图片 40 MiB / 视频 100 MiB 继续使用已有较窄上限。Prompt 按 native JavaScript UTF-16 长度限制：2.5 为 15000，其余 4000；所有限制在上传前核验，不截断或丢弃素材。
+默认 profile 仍声明 reference-to-video / mode 4、单输出、原生音轨、整数秒及既有五种宽高比；不代表网页全部功能。2.0 / Fast / Mini 各自声明最多 12 项素材（图片 9、视频 3、音频 3），至少包含图片或视频；图片与视频各最多 50 MiB，音频 15 MiB，图片每边最多 8192，视频每边 200–2160。视频单段及总长 2–15.4 秒 / 最多 15.4 秒，音频 2–15 秒 / 总长最多 15 秒。2.5 最多 50 项（图片 30、视频 10、音频 10），支持纯音频参考；图片每边 300–8192、比例 0.4–2.5，视频每边 300–6000；视频和音频最短 1.8 秒、单段及各自总长最多 30.2 秒，音频 15 MiB。2.5 图片 40 MiB / 视频 100 MiB 继续使用已有较窄上限。Prompt 按 native JavaScript UTF-16 长度限制：2.5 为 15000，其余 4000；所有限制在上传前核验，不截断或丢弃素材。
+
+### Explicit Frame Conditioning
+
+`seedance_2.0_vip` 可显式选择 `JimengProfile.input_mode=first_frame` 或 `first_last_frame`，分别映射 native mode 2 / 3、image-to-video capability、必须的 `first_frame` 或 `first_frame,last_frame` 图片角色，以及 native material role 1 / 2；不能混入普通参考图、音视频或偷偷降级 mode 4。默认 `multimodal` 序列化省略新字段，既有 profile、capability 与历史 dispatch identity 不变；端点模式拥有不同 profile/compiler/capability identity。当前只为已核对 native config 的 Seedance 2.0 VIP 开放端点模式，其他型号不推定支持，模型 Production qualification 仍为 `UNQUALIFIED`。
+
+端点素材角色进入 exact request、egress、dispatch material 和 native 参数 hash；对应 commercial action 使用 `i2v` / `first_last_frame`，editor draft 使用 `firstLastFrame`。纯文本描述“保持上一镜”不是首帧绑定；必须实际选择与封存端点图片。2026-10-25 当前 native validator 已零生成核对 mode 2、3 与角色 1、2，quote 可读不等于生成或质量验收。
+
+Canvas 对 storyboard 中非首镜的新 planning request 要求明确 `boundary`：连续关系走已有 materialized sequence handoff 与 accepted-source owner；独立切镜显式写 `{"independent": true}`，不能同时声明连续性约束。缺失边界在 planning 前拒绝，不再默认为独立生成；非连续切镜不会被强制改成首尾帧。素材绑定仍不保证手部动作或空间连续，必须比较 exact 前镜末态、当前开场与正常速度剪接结果。
 
 `jimeng_models.py` 是各型号有界映射声明；2026-10-22 原生已加载 config、reference constraints 和只读 validator / commerce 查询的脱敏投影见 `tests/fixtures/generated_video/jimeng-native-models-20261022.json`。直接 `generation_specs` 读取当时不可用，实际证据来自网页初始化的 native stores；只读准入仅代表该时点账号状态，报价不代替下一次提交时的 fresh quote 或 operator bound。
 
@@ -27,7 +35,17 @@
 
 ## Exact Input and Paid Contract
 
-`JimengProfile` 封存账号、project/node、输出规格、原生 benefit 类型与金额，以及操作人设置的积分上限。adapter 仅接受匹配的 `VideoGenerationRequest`，要求每项素材在提示词中以 `{{image:N}}`、`{{audio:N}}` 或 `{{video:N}}` 精确绑定。原生 index 按 canonical 图片、音频、视频绑定顺序排列；缺失、类型错误或越界在上传前失败。原生参数 validator 还须接受精确映射后的请求。
+### Bounded Qualification Trial
+
+普通 `VideoRoutingPolicy` 默认 `execution_purpose="production"`，默认字段不写入旧序列化；`UNQUALIFIED` 仍不能进入生产。显式 `execution_purpose="qualification"` 只允许一个已注册、明确 `UNQUALIFIED` 的 remote/metered 候选，执行绑定封存精确远程 allowlist、`paid_submit_ceiling=1`、`paid_submits_used=0`、`max_resamples=0` 及 remote/budget 授权。首次未知质量的有界探索可显式允许，但不授予重试。该用途仍经同一 `VideoGenerationService`、Paid Gate、预算预留、持久意图、一用 permit、exact replay 和 UNKNOWN 恢复；不使用 local qualification binding，也不改变模型资格声明。
+
+试生成可提交、轮询、下载并保留原始 QA 观察，停在 `VALIDATE`；service 拒绝准备 Production candidate，committer 拒绝激活及重放激活。需要完整审片时，`prepare_qualification_preview_input` 只读捕获 exact request/binding/paid submit/observation/fetch/Manifest 和原 MP4，经原 `bootstrap_initial_state` 写入独立开发项目。`development-qualification-preview/1` receipt 仅允许封存的正常速度、替换声音预览，复用原 development preview composition 与 Production render activation 禁令；不伪造质量失败，不导入付费历史、不升级资格、不产生 P6 或最终验收。当前本地验证证明该边界的运行行为，真实平台成功与成片质量仍需 exact 媒体证据。
+
+已确认 `KNOWN_NO_EFFECT` 的连接失败可显式恢复一次：保留原 attempt/task、付费调用计数及 receipt，沿既有 `runtime-repair/3` 登记 exact 最新 runtime failure 与目标 scope；资格 binding 可额外接受 `paid_submit_ceiling=2 / paid_submits_used=1`，且必须携带未消费的同一 grant。新 REQUEST 登记后，原 `PaidProviderSubmitQuotaExtension` 才能按1→2原子扩一次计数，提交时沿原 Paid owner 消费 grant 和新 permit。
+
+若第二次调用也被证明确实未发送，先通过原 no-effect reconciliation owner 追加纠正回执、保留 UNKNOWN 历史与计数。其 feedback 仍为 `not_submitted`；只有 canonical reconciliation、精确纠正回执及最新同 Shot 证据核验通过，才能为它登记一个新的 `/3` grant。该未消费 grant 使它成为有效最新证据，不重用第一次已消费 grant、不改标 runtime failure。第二次恢复只接受3/2、两份不同 attempt 的无媒体证据和两份 `/3` grant（恰一份已消费），并另经2→3 quota extension。第三次恢复另须显式 `PaidNoEffectRepairExtension`：默认 per-Shot ceiling 仍为2，同 task/Shot/actor 的两份 `/3` grant 已消费、最新 canonical verified no-effect 与 exact failed binding/current Manifest revision 一致，才可封存唯一 `/6` grant、ceiling3，资格绑定仅额外接受4/3。若再遇 canonical known-no-effect 的零媒体上传失败，显式 ceiling4 还须前三份 grant 已消费，其中第三份必须为 `/6` ceiling3；最新证据须为 exact runtime failure 或 verified reconciled not_submitted，资格绑定仅额外接受5/4。两种扩展分别另经3→4或4→5 quota extension，不会自动重复或归零。历史 UNKNOWN 的已核验关闭事实不随 grant 消费失效，一次性恢复权限仍只由未消费 grant 授予。缺 grant、缺扩额、未协调 UNKNOWN、普通未提交记录或 qualification ceiling>5 仍阻断；不提高积分总预算，也不授予模型生产资格。
+
+`JimengProfile` 封存账号、project/node、输出规格、原生 benefit 类型与金额，以及操作人设置的积分上限。adapter 仅接受匹配的 `VideoGenerationRequest`。默认 multimodal 模式要求每项素材在提示词中以 `{{image:N}}`、`{{audio:N}}` 或 `{{video:N}}` 精确绑定。原生 index 按 canonical 图片、音频、视频绑定顺序排列；缺失、类型错误或越界在上传前失败。端点模式使用 native material role 绑定实际图片，纯文本 prompt 不插入 multimodal markers。原生参数 validator 还须接受精确映射后的请求。
 
 P0 的 `compile_request` 支持普通 Shot requirement 的显式素材绑定。带 `preserved_source_expression` 的 Shot 会明确返回 unsupported；该源文法尚未建立与即梦 index marker 一致的精确保真映射，不把原文静默改写后提交。
 
@@ -52,6 +70,8 @@ P0 的 `compile_request` 支持普通 Shot requirement 的显式素材绑定。�
 沿用 `VideoGenerationService.start`、`submit_once`、`refresh_once`、`fetch_once` 和标准验证/验收；仅已有 Jimeng unknown attempt 可调用 `recover_jimeng_unknown_once`，不得再次调用 `submit_once`。Paid preview 使用 `billing_mode=remote_metered`、`currency=CRD`、profile 上限及 `SecretReference(kind="secret_store", reference_id="JIMENG_BROWSER_SESSION")` 作为浏览器会话元数据。账号/profile 由私有配置注入；Cookie、Token 不写入仓库、prompt、argv、日志或 receipt。
 
 ## Worker Reliability Boundary
+
+原生商业执行可能只提供 `benefit_type`，省略可选 `quote_precondition`。Worker 在 admission 前用已核验、有限额的当前 quote 补齐该字段，再由原有 admission、发送前 fresh quote、HTTP/fetch fence 共同核对；generation params、reference identity 与 native selection 保持原样。已提供的 precondition 必须精确匹配，漂移或超上限仍拒绝，不静默覆盖。
 
 每个操作保存独立的页面 JSHandle，并在上传、查询、同步编辑器、提交及发送前重新扫描当前 React context，核验唯一账号/project 和 owner identity；等待 host admission 后再次验证账号、owner、编辑器及原生商业准入。刷新使旧 handle 失效，必须建立新连接，只能按既有 Paid 状态决定后续动作。缺少/歧义/漂移均拒绝，不猜测新对象。
 

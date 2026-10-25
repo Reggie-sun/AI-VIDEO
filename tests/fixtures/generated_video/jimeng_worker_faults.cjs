@@ -89,10 +89,11 @@ async function main(){
   }
   const s=await session();
   if(scenario==='preflight_cleanup') canvas.generationRuntime.videoGenerationConfigStore.validate=()=>({status:'invalid'});
-  if(['success','duplicate_post','host_reject','after_approval_identity_drift','quote_change','mutated_request','quote_precondition_changed','duplicate_wire','replaced_http'].includes(scenario)){
+  if(['native_no_quote','success','duplicate_post','host_reject','after_approval_identity_drift','quote_change','mutated_request','quote_precondition_changed','duplicate_wire','replaced_http'].includes(scenario)){
     canvas.generationRuntime.actions.submitVideo=async()=>{
       const body={project_id:profile.project_id,op:1,initial:{node_id:profile.node_id,...ids,
         items:[{resource_id:ids.resource_id,type:2,params:{video_params:params},commerce_selection:{benefit_type:profile.benefit_type,quote_precondition:{expected_benefit_amount:5,expected_credits_amount:30}}}]}};
+      if(scenario==='native_no_quote') delete body.initial.items[0].commerce_selection.quote_precondition;
       if(scenario==='quote_precondition_changed') body.initial.items[0].commerce_selection.quote_precondition.expected_credits_amount=31;
       if(scenario==='mutated_request') body.initial.items[0].params.video_params={...params,resolution:'480p'};
       if(scenario==='replaced_http') {foreignEnvelope=async()=>browser.window.fetch('/octo_api/v1/node_generate',{method:'POST',body:JSON.stringify(body)});httpProto.postEnvelope=foreignEnvelope;}
@@ -109,7 +110,7 @@ async function main(){
     assert.equal(browser.window.__aiVideoJimengFence,null);
     assert.equal(Object.keys(browser.window).filter(k=>k.startsWith('__aiVideoJimengAdmit_')).length,0);return;
   }
-  if(['success','duplicate_post','duplicate_wire'].includes(scenario)){
+  if(['native_no_quote','success','duplicate_post','duplicate_wire'].includes(scenario)){
     const result=await submitting;assert.equal(result.resource_id,ids.resource_id);
     assert.equal(calls,1);assert.equal(routes.length,0);assert.equal(Object.keys(exposed).length,0);
     assert.equal(browser.window.__aiVideoJimengFence,null);return;

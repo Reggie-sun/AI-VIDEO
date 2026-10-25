@@ -116,3 +116,25 @@ def test_canvas_timing_default_accepts_nominal_without_changing_explicit_exact(
         requirement, nominal.model_copy(update={"duration_seconds": 14}),
     )
     assert row == original
+
+
+def test_following_shot_without_boundary_is_rejected_before_planning(activated_source):
+    inputs = _edge_inputs(activated_source)
+    loaded = load_production_project(activated_source["root"] / "project.yaml")
+    request = inputs["current_request"]
+    generation = request.generation_intent.model_dump(mode="json", exclude={"projection_hash", "contract_version"})
+    generation["references"] = [{"role": a.role.value, "asset_id": a.asset_id}
+        for a in request.available_assets]
+    row = {"shot": {"shot_id": request.target_shot.shot_id}, "generation": generation}
+    with pytest.raises(ValueError, match="explicit.*boundary"):
+        canvas_feedback_context(loaded=loaded, row=row, policy=activated_source["binding"].policy)
+
+
+def test_independent_boundary_cannot_hide_a_continuity_obligation(activated_source):
+    inputs = _edge_inputs(activated_source)
+    row = {"shot": {"shot_id": inputs["current_request"].target_shot.shot_id},
+        "generation": {}, "boundary": {"independent": True,
+            "continuity_obligation": "full_continuity"}}
+    with pytest.raises(ValueError, match="cannot also declare continuity"):
+        canvas_feedback_context(loaded=load_production_project(activated_source["root"] / "project.yaml"),
+            row=row, policy=activated_source["binding"].policy)

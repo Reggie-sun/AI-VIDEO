@@ -1,13 +1,13 @@
 # AI-VIDEO Control-Plane Playbook
 
-按 concern 读取的 advisory reference；不拥有 Product state/Provider/验收。规则检查已迁入
-[agent-rules.yaml](../harness/agent-rules.yaml)，argv 与 changed-path routing 只由 policy 独占。
+Advisory reference，无 Product state/Provider/验收 authority。
+检查归 [agent-rules.yaml](../harness/agent-rules.yaml)，argv/changed-path routing 归 policy。
 
 ## Task Context Loading
 
-源码/tests/runtime 是事实；matrix 确定 surface owner，policy 确定 checks，baseline/roadmap 分别维护当前状态/方向。
-只读匹配 Skill/active spec/plan；T8/LatentSync 主机操作另读 [runtime](t8-latentsync-local-runtime.md)。
-不整目录加载，不把 history/handoff/`.workflow/` 当作当前事实。
+源码/tests/runtime 为事实；matrix 管 owner，policy 管 checks，baseline/roadmap 管当前状态/方向。
+只读匹配 Skill/spec/plan；T8/LatentSync 操作另读 [runtime](t8-latentsync-local-runtime.md)。
+禁整目录预载；history/handoff/`.workflow/` 不证明当前事实。
 
 ## 1. Creative Skill Routing And Preflight
 

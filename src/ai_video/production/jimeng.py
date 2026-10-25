@@ -33,6 +33,7 @@ from ai_video.production.video import (
     VideoProviderCapabilities, VideoSubmission, VideoSubmitResult, VideoTaskObservation,
     VideoTaskState, build_video_paid_permit_binding,
 )
+from ai_video.production.video_contracts import VideoBindingCardinalityConstraint
 
 
 _MARKER = re.compile(r"\{\{(image|audio|video):([0-9]+)\}\}")
@@ -132,11 +133,14 @@ class JimengVideoProvider:
 
     def capabilities(self) -> VideoProviderCapabilities:
         spec = JIMENG_MODEL_SPECS[self._profile.model_id]
+        frames = self._profile.input_mode != "multimodal"
+        roles = (("first_frame", "last_frame") if self._profile.input_mode == "first_last_frame"
+                 else ("first_frame",)) if frames else ("reference",)
         variant = VideoCapabilityVariant(
             capability_id=self._profile.capability_id, provider_kind=JIMENG_PROVIDER,
             model_id=self._profile.model_id, profile_version=self._profile.profile_version,
             execution_kind=VideoExecutionKind.REMOTE, billing_kind=BillingKind.METERED,
-            mode=VideoGenerationMode.REFERENCE_TO_VIDEO,
+            mode=VideoGenerationMode.IMAGE_TO_VIDEO if frames else VideoGenerationMode.REFERENCE_TO_VIDEO,
             output_capability=VideoOutputCapability(
                 min_duration_seconds=4, max_duration_seconds=spec.max_seconds,
                 provider_selected_duration=False, timing_modes=("nominal_seconds",),
@@ -145,12 +149,17 @@ class JimengVideoProvider:
                 ratios=spec.ratios,
                 fps_values=(None,), containers=("mp4",), native_audio_options=(True,),
             ),
-            allowed_image_roles=("reference",), required_first_frame=False,
-            max_reference_count=spec.max_images,
+            allowed_image_roles=roles, required_first_frame=frames,
+            binding_cardinality_constraints=tuple(
+                VideoBindingCardinalityConstraint(roles=(role,), min_count=count, max_count=count)
+                for role, count in (("first_frame", 1), ("last_frame", int(len(roles) == 2)),
+                                    ("reference", 0))
+            ) if frames else (),
+            max_reference_count=0 if frames else spec.max_images,
             allowed_image_mime_types=("image/png", "image/jpeg", "image/webp"),
             max_image_bytes=spec.image_bytes,
             min_image_width=spec.min_image_dimension, min_image_height=spec.min_image_dimension,
-            media_capabilities=(
+            media_capabilities=() if frames else (
                 VideoMediaCapability(kind="audio", roles=("reference_audio",),
                     min_count=0, max_count=spec.max_audios,
                     allowed_mime_types=("audio/wav", "audio/mpeg", "audio/mp4"),
@@ -211,7 +220,9 @@ class JimengVideoProvider:
             for kind in ({"reference": "image", "reference_audio": "audio",
                           "reference_video": "video"}[role],))
         prompt = prose.prompt_text + markers
-        native = ProviderNativePrompt(grammar_contract="jimeng-explicit-reference-v1",
+        grammar = ("jimeng-explicit-reference-v1" if self._profile.input_mode == "multimodal"
+                   else "jimeng-frame-conditioned-v1")
+        native = ProviderNativePrompt(grammar_contract=grammar,
             prompt_text=prompt,
             prompt_sha256=hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
             expressed_control_paths=prose.expressed_control_paths)
@@ -223,17 +234,25 @@ class JimengVideoProvider:
         )
 
     def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:
+        frames = self._profile.input_mode != "multimodal"
+        expected_mode = VideoGenerationMode.IMAGE_TO_VIDEO if frames else VideoGenerationMode.REFERENCE_TO_VIDEO
         if (request.provider_name != JIMENG_PROVIDER
                 or request.provider_kind != JIMENG_PROVIDER
                 or request.model_id != self._profile.model_id
                 or request.provider_profile != self._profile.pointer()
-                or request.mode is not VideoGenerationMode.REFERENCE_TO_VIDEO
+                or request.mode is not expected_mode
                 or request.output_requirement != self._profile.output()
                 or request.seed is not None or request.negative_prompt_text
                 or request.subject_bindings or request.c4_multi_anchor_binding is not None):
             raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                          "Jimeng request differs from its selected profile.")
         bindings = _ordered_bindings(request)
+        if frames:
+            roles = ("first_frame", "last_frame") if self._profile.input_mode == "first_last_frame" else ("first_frame",)
+            if (tuple(item.role for item in request.image_bindings) != roles
+                    or request.media_bindings or _ANY_MARKER.search(request.prompt_text)):
+                raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
+                             "Jimeng frame conditioning requires its exact endpoint roles and plain prompt.")
         spec = JIMENG_MODEL_SPECS[self._profile.model_id]
         if not bindings or len(bindings) > spec.max_materials:
             raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
@@ -265,7 +284,8 @@ class JimengVideoProvider:
                          "Jimeng sealed benefit amount differs from the exact input duration.")
         if any(getattr(x, "size_bytes", None) is None for x in bindings):
             raise _error(ErrorCode.VIDEO_REQUEST_INVALID, "Jimeng references require measured sizes.")
-        jimeng_meta_list(request.prompt_text, bindings)
+        if not frames:
+            jimeng_meta_list(request.prompt_text, bindings)
         capability = self.capabilities().variants[0]
         return ResolvedVideoGenerationRequest.create(
             request=request, capability=capability, effective_output=self._profile.output(),
@@ -356,22 +376,26 @@ class JimengVideoProvider:
                 asset_id=item.asset_id, asset_sha256=item.asset_sha256,
                 size_bytes=item.size_bytes,
                 duration_millis=getattr(item, "duration_millis", None),
-                storage_id=storage_id))
+                storage_id=storage_id,
+                image_role=item.role if item.role in {"first_frame", "last_frame"} else None))
         materials = tuple(refs)
         material_params = []
         for entry in materials:
             if entry.kind == "image":
-                material_params.append({"type": 2, "image_uri": entry.storage_id})
+                material_params.append({"type": 2, "image_uri": entry.storage_id,
+                    **({"role": 1 if entry.image_role == "first_frame" else 2}
+                       if entry.image_role is not None else {})})
             elif entry.kind == "audio":
                 material_params.append({"type": 4, "vid": entry.storage_id})
             else:
                 material_params.append({"type": 3, "role": 3, "vid": entry.storage_id})
-        params = {"mode": 4, "prompt": request.prompt_text,
+        params = {"mode": self._profile.native_mode, "prompt": request.prompt_text,
             "model_name": self._profile.model_id, "aspect_ratio": self._profile.aspect_ratio,
             "resolution": self._profile.resolution,
             "duration_ms": self._profile.duration_seconds * 1000,
-            "materials": material_params,
-            "meta_list": jimeng_meta_list(request.prompt_text, _ordered_bindings(request))}
+            "materials": material_params}
+        if self._profile.input_mode == "multimodal":
+            params["meta_list"] = jimeng_meta_list(request.prompt_text, _ordered_bindings(request))
         params_hash = canonical_sha256(params)
         try:
             validate_paid_provider_authorization(paid_preview, authorization, now=self._now())

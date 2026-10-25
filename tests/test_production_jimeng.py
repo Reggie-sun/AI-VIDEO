@@ -863,7 +863,7 @@ def test_native_editor_selection_matches_request_without_reordering_draft_inputs
 
 
 @pytest.mark.parametrize("scenario", ["timeout_late_send", "timeout_late_fetch", "timeout_late_replaced_http", "identity_drift", "ambiguous_page", "concurrent",
-    "success", "duplicate_post", "host_reject", "after_approval_identity_drift",
+    "success", "native_no_quote", "duplicate_post", "host_reject", "after_approval_identity_drift",
     "quote_change", "mutated_request", "preflight_cleanup", "quote_precondition_changed", "duplicate_wire", "replaced_http", "binding_unavailable"])
 def test_shipped_worker_fault_boundaries(scenario):
     import subprocess
@@ -873,6 +873,36 @@ def test_shipped_worker_fault_boundaries(scenario):
     result = subprocess.run(["node", str(root / "tests/fixtures/generated_video/jimeng_worker_faults.cjs"),
         str(root / "src/ai_video/production/jimeng_browser.cjs"), scenario],
         capture_output=True, text=True, timeout=10)
+    assert result.returncode == 0, result.stderr
+
+
+def test_native_quote_binding_preserves_params_and_rejects_supplied_drift():
+    import subprocess
+    from pathlib import Path
+
+    worker = Path(__file__).parents[1] / "src/ai_video/production/jimeng_browser.cjs"
+    result = subprocess.run(["node", "-e", """
+        const assert=require('node:assert/strict');
+        const bind=require(process.argv[1]).createVideoQuoteBinder();
+        const profile={benefit_type:'selected',benefit_amount:12,credit_upper_bound:500};
+        const params=Object.freeze({mode:4,materials:[{type:2,image_uri:'exact-image'}]});
+        const selection=Object.freeze({benefit_type:'selected'});
+        const row=Object.freeze({type:2,params:{video_params:params},commerce_selection:selection});
+        const body=Object.freeze({initial:Object.freeze({items:Object.freeze([row])})});
+        const sealed=bind(body,profile,240);
+        assert.equal(sealed.initial.items[0].params.video_params,params);
+        assert.equal(selection.quote_precondition,undefined);
+        assert.deepEqual(sealed.initial.items[0].commerce_selection.quote_precondition,
+          {expected_benefit_amount:12,expected_credits_amount:240});
+        assert.deepEqual(bind(sealed,profile,240),sealed);
+        for(const supplied of [null,{}, {expected_benefit_amount:12,expected_credits_amount:241},
+            {expected_benefit_amount:13,expected_credits_amount:240},
+            {expected_benefit_amount:12,expected_credits_amount:240,extra:1}]) {
+          assert.throws(()=>bind({initial:{items:[{...row,commerce_selection:{
+            ...selection,quote_precondition:supplied}}]}},profile,240));
+        }
+        for(const credits of [0,501,240.5,NaN]) assert.throws(()=>bind(body,profile,credits));
+    """, str(worker)], capture_output=True, text=True)
     assert result.returncode == 0, result.stderr
 
 
@@ -1001,3 +1031,176 @@ def test_cancellation_reaps_worker_and_preserves_exception(tmp_path, monkeypatch
     assert child.poll() is not None
     assert child.stdin.closed and child.stdout.closed
     assert not marker.exists()
+
+
+# Frame conditioning regression coverage.
+from pathlib import Path
+import subprocess
+
+def _frame_conditioned(mode):
+    legacy = setup(model_id="seedance_2.0_vip")[0]._profile
+    profile = JimengProfile.model_validate({**legacy.model_dump(mode="json"),
+        "input_mode": mode, "benefit_amount": legacy.duration_seconds})
+    roles = ("first_frame", "last_frame") if mode == "first_last_frame" else ("first_frame",)
+    raw = {role: role.encode() for role in roles}
+    images = tuple(VideoImageReferenceBinding(role=role, asset_id=role,
+        asset_sha256=hashlib.sha256(raw[role]).hexdigest(), size_bytes=len(raw[role]),
+        mime_type="image/png", width=720, height=1280) for role in roles)
+    browser = FakeBrowser()
+    provider = JimengVideoProvider(profile=profile, transport=browser,
+        reference_resolver=lambda binding: raw[binding.asset_id], committer=FakeCommitter(),
+        now=lambda: NOW)
+    request = _request(provider_name="jimeng", provider_kind="jimeng",
+        model_id=profile.model_id, provider_profile=profile.pointer(),
+        mode=VideoGenerationMode.IMAGE_TO_VIDEO, image_bindings=images,
+        media_bindings=(), prompt_text="从真实首帧继续伸手拿起瓶子，最后到达指定尾帧。",
+        output_requirement=profile.output())
+    return profile, provider, request
+
+
+@pytest.mark.parametrize("mode,count,native", [("first_frame", 1, 2), ("first_last_frame", 2, 3)])
+def test_frame_mode_has_exact_profile_and_capability(mode, count, native):
+    profile, provider, request = _frame_conditioned(mode)
+    capability = provider.capabilities().variants[0]
+    assert profile.native_mode == native
+    assert capability.mode is VideoGenerationMode.IMAGE_TO_VIDEO
+    assert capability.required_first_frame
+    bounds = {c.roles: (c.min_count, c.max_count) for c in capability.binding_cardinality_constraints}
+    assert bounds[("first_frame",)] == (1, 1)
+    assert bounds[("last_frame",)] == ((1, 1) if count == 2 else (0, 0))
+    assert capability.allowed_image_roles == (("first_frame", "last_frame") if count == 2 else ("first_frame",))
+    assert provider.resolve(request).image_bindings == request.image_bindings
+
+
+def test_existing_reference_profile_bytes_and_identity_unchanged():
+    profile = setup()[0]._profile
+    payload = profile.model_dump(mode="json")
+    assert "input_mode" not in payload
+    assert "model_id" not in payload
+    assert profile.capability_id == "jimeng-seedance-2.5-multimodal-v1"
+    assert profile.pointer() == JimengProfile.model_validate(payload).pointer()
+
+
+def test_frame_profile_rejects_reference_only_request_without_fallback():
+    _, provider, request = _frame_conditioned("first_frame")
+    reference = request.image_bindings[0].model_copy(update={"role": "reference"})
+    with pytest.raises(AiVideoError):
+        provider.resolve(_request(provider_name="jimeng", provider_kind="jimeng",
+            model_id=provider._profile.model_id, provider_profile=provider._profile.pointer(),
+            mode=VideoGenerationMode.REFERENCE_TO_VIDEO, image_bindings=(reference,),
+            media_bindings=(), output_requirement=provider._profile.output()))
+
+
+def test_last_frame_profile_cannot_silently_drop_endpoint():
+    _, provider, request = _frame_conditioned("first_last_frame")
+    with pytest.raises(AiVideoError):
+        provider.resolve(_request(provider_name="jimeng", provider_kind="jimeng",
+            model_id=provider._profile.model_id, provider_profile=provider._profile.pointer(),
+            mode=VideoGenerationMode.IMAGE_TO_VIDEO, image_bindings=request.image_bindings[:1],
+            media_bindings=(), output_requirement=provider._profile.output()))
+
+
+@pytest.mark.parametrize("mode,native,roles,commerce", [
+    ("first_frame", 2, ["first_frame"], "i2v"),
+    ("first_last_frame", 3, ["first_frame", "last_frame"], "first_last_frame"),
+])
+def test_browser_frame_mode_commercial_action_and_editor_agree(mode, native, roles, commerce):
+    worker = Path(__file__).resolve().parents[1] / "src/ai_video/production/jimeng_browser.cjs"
+    code = """
+      const {buildVideoAction,buildVideoEditorDraft}=require(process.argv[1]);
+      const data=JSON.parse(process.argv[2]);
+      const action=buildVideoAction({model_id:'seedance_2.0_vip',input_mode:data.mode,
+        duration_seconds:8,benefit_amount:8,resolution:'720p'},
+        data.roles.map(image_role=>({kind:'image',image_role})));
+      const draft=buildVideoEditorDraft(null,{mode:data.native,model_name:'seedance_2.0_vip',
+        aspect_ratio:'9:16',resolution:'720p',duration_ms:8000});
+      console.log(JSON.stringify({action,draft}));
+    """
+    result = json.loads(subprocess.check_output(["node", "-e", code, str(worker),
+        json.dumps(dict(mode=mode, native=native, roles=roles))], text=True))
+    assert result["action"]["options"]["videoMode"] == commerce
+    assert result["draft"]["contentSettings"]["mode"] == "firstLastFrame"
+
+
+@pytest.mark.parametrize("mode,native", [("first_frame", 2), ("first_last_frame", 3)])
+def test_paid_dispatch_retains_native_frame_roles_without_prompt_markers(mode, native):
+    from ai_video.production.paid_provider import PaidProviderCallPreview, PaidProviderAuthorizationDecision
+    from ai_video.production.video import build_video_paid_permit_binding
+    from ai_video.production.jimeng_contracts import dispatch_matches_request
+    profile, provider, request = _frame_conditioned(mode)
+    resolved = provider.resolve(request)
+    video_preview = provider.preview(resolved)
+    legacy = setup(model_id="seedance_2.0_vip")
+    values = legacy[3].model_dump(mode="python", exclude={"preview_fingerprint"})
+    values.update(request_fingerprint=resolved.resolved_generation_hash,
+        egress_items=provider.egress_items(resolved))
+    paid = PaidProviderCallPreview.create(**values)
+    values = legacy[4].model_dump(mode="python", exclude={"authorization_fingerprint"})
+    values["preview_fingerprint"] = paid.preview_fingerprint
+    auth = PaidProviderAuthorizationDecision.create(**values)
+    permit = _real_permit(build_video_paid_permit_binding(resolved, video_preview, paid, auth))
+    provider.submit(resolved, video_preview, paid, auth, permit)
+    assert provider._transport.params["mode"] == native
+    assert [item["role"] for item in provider._transport.params["materials"]] == list(range(1, len(request.image_bindings) + 1))
+    assert "meta_list" not in provider._transport.params
+    assert [m.image_role for m in provider._transport.materials] == [b.role for b in request.image_bindings]
+    assert dispatch_matches_request(provider._committer.dispatch, resolved)
+
+
+@pytest.mark.parametrize("mode", ["first_frame", "first_last_frame"])
+def test_frame_conditioning_survives_requirement_router_compiler_and_resolve(mode, monkeypatch):
+    from test_production_shot_router import (
+        _asset, _context, _first_frame_projection, _reseal_projection, _policy, _lifecycle,
+    )
+    from test_production_video_intent_validation import _complete_intent, _compatible_fl2va
+    from ai_video.production.shot_router import VideoGenerationResolver, AdapterCompilerContract
+    from ai_video.production._video_intent_validation import ConditioningLane
+    from ai_video.production.video_requirement import (
+        AssetEvidence, SemanticReferenceRole, CapabilityNeed, AudioNeed, OutputNeed,
+    )
+    profile, provider, expected = _frame_conditioned(mode)
+    assets = tuple(_asset(binding.role, binding.asset_id, binding.asset_sha256,
+        width=binding.width, height=binding.height, size_bytes=binding.size_bytes)
+        for binding in expected.image_bindings)
+    context = _context(keyframe=assets[0], last_frame=assets[-1] if len(assets) == 2 else None)
+    projection = _reseal_projection(_first_frame_projection(context),
+        contract_version="provider-neutral-video-requirement/4",
+        generation_mode="first_last_frame_video" if len(assets) == 2 else "image_to_video",
+        conditioning_compatibility=_compatible_fl2va().model_copy(update={
+            "lane": ConditioningLane.FL2VA if len(assets) == 2 else ConditioningLane.I2VA,
+            "first_anchor_id": assets[0].asset_id,
+            "last_anchor_id": assets[-1].asset_id if len(assets) == 2 else None,
+            "available_duration_seconds": profile.duration_seconds}),
+        generation_intent=_complete_intent().model_copy(update={"pacing":
+            _complete_intent().pacing.model_copy(update={"shot_duration_seconds": profile.duration_seconds})}),
+        audio_need=AudioNeed.REQUIRED,
+        output_need=OutputNeed(timing_mode="content_driven", duration_seconds=profile.duration_seconds,
+            geometry_policy="adaptive", aspect_ratio=profile.aspect_ratio, container_mime="video/mp4"),
+        semantic_reference_roles=tuple(SemanticReferenceRole(a.role) for a in assets),
+        asset_evidence=tuple(AssetEvidence(role=SemanticReferenceRole(a.role),
+            asset_id=a.asset_id, asset_sha256=a.asset_sha256, mime_type=a.mime_type,
+            width=a.width, height=a.height, size_bytes=a.size_bytes) for a in assets),
+        capability_need=CapabilityNeed(needs_first_frame=True, needs_last_frame=len(assets) == 2))
+    policy = _policy(remote_authorized=True, budget_authorized=True)
+    # Qualification is deliberately unchanged. Only this offline fixture is
+    # qualified, matching the existing lifecycle fixtures above.
+    from ai_video.production.video import VideoProviderCapabilities
+    declared = provider.capabilities()
+    assert declared.variants[0].production_qualification == "UNQUALIFIED"
+    qualified = VideoProviderCapabilities.create(provider_name=declared.provider_name,
+        variants=tuple(v.model_copy(update={"production_qualification": "QUALIFIED"})
+                       for v in declared.variants))
+    monkeypatch.setattr(provider, "capabilities", lambda: qualified)
+    result = VideoGenerationResolver()._bind_requirement(projection=projection,
+        context=context, policy=policy, provider_profile=profile.pointer(),
+        capabilities=provider.capabilities(), selected_capability_id=profile.capability_id,
+        output_requirement=profile.output(), lifecycle=_lifecycle(context).model_copy(update={
+            "input_artifact_ids": (context.target_shot_id, *(a.asset_id for a in assets))}),
+        compiler_contract=AdapterCompilerContract.create(compiler_id=profile.compiler_id, compiler_version="1"))
+    assert result.provider_bound_request is not None, json.dumps(result.decision.model_dump(mode="json"))
+    compiled = provider.compile_request(result.provider_bound_request, projection.requirement)
+    resolved = provider.resolve(compiled.request)
+    assert [(b.role, b.asset_id, b.asset_sha256) for b in resolved.image_bindings] == [
+        (a.role, a.asset_id, a.asset_sha256) for a in assets]
+    assert resolved.mode is VideoGenerationMode.IMAGE_TO_VIDEO
+    assert "{{image:" not in resolved.prompt_text

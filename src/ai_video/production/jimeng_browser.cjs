@@ -286,6 +286,18 @@ function buildVideoAction(profile, materials) {
         'seedance_2.0_fast_vip'].includes(profile.model_id)) {
     throw Error('unsupported Jimeng model');
   }
+  const inputMode = profile.input_mode || 'multimodal';
+  const videoMode = {multimodal:'multi_modal',first_frame:'i2v',first_last_frame:'first_last_frame'}[inputMode];
+  if (!videoMode) throw Error('unsupported Jimeng input mode');
+  if (inputMode !== 'multimodal') {
+    const roles = inputMode === 'first_frame' ? ['first_frame'] : ['first_frame','last_frame'];
+    if (profile.model_id !== 'seedance_2.0_vip' || materials.length !== roles.length ||
+        materials.some((item, index) => item.kind !== 'image' || item.image_role !== roles[index])) {
+      throw Error('native frame conditioning differs from the sealed endpoint roles');
+    }
+  } else if (materials.some(item => item.image_role != null)) {
+    throw Error('frame roles cannot use the multimodal commercial action');
+  }
   const inputVideoMillis = materials.filter(x => x.kind === 'video')
     .reduce((sum, item) => sum + item.duration_millis, 0);
   if (profile.benefit_amount !== profile.duration_seconds + Math.round(inputVideoMillis / 1000)) {
@@ -295,7 +307,7 @@ function buildVideoAction(profile, materials) {
   return {scene: 'video.generate', source: 'canvas_generation', options: {
     model: profile.model_id, resolution: profile.resolution,
     durationSeconds: profile.duration_seconds, outputCount: 1,
-    videoMode: 'multi_modal', hasInputVideo: inputVideoMillis > 0,
+    videoMode, hasInputVideo: inputVideoMillis > 0,
     isLongVideo: false, materialTypes: kinds,
     ...(inputVideoMillis > 0 ? {
       benefitAmount: profile.benefit_amount,
@@ -314,10 +326,37 @@ function buildVideoEditorDraft(previous, params) {
   if (previous && previous.kind !== 'video') throw Error('native editor kind changed');
   return {...previous, kind: 'video', parts: previous?.parts || [],
     references: previous?.references || [], outputCount: 1,
-    contentSettings: {...previous?.contentSettings, mode: 'multiModal',
+    contentSettings: {...previous?.contentSettings,
+      mode: params.mode === 2 || params.mode === 3 ? 'firstLastFrame' : 'multiModal',
       modelName: params.model_name, aspectRatio: params.aspect_ratio,
       resolution: params.resolution, durationSeconds: params.duration_ms / 1000,
       isLongVideo: false}};
+}
+
+// Native commercial execution selects a benefit but can omit its optional
+// server quote precondition. Bind our fresh bounded quote before admission;
+// never replace a supplied precondition or change generation parameters.
+function createVideoQuoteBinder() {
+  return (body, profile, credits) => {
+    const row = body.initial?.items?.[0];
+    if (body.initial?.items?.length !== 1 ||
+        row.commerce_selection?.benefit_type !== profile.benefit_type ||
+        !Number.isSafeInteger(credits) || credits <= 0 || credits > profile.credit_upper_bound ||
+        !Number.isSafeInteger(profile.benefit_amount) || profile.benefit_amount <= 0) {
+      throw Error('native quote binding rejected');
+    }
+    const expected = {expected_benefit_amount: profile.benefit_amount,
+      expected_credits_amount: credits};
+    const supplied = row.commerce_selection.quote_precondition;
+    if (supplied !== undefined && (supplied === null ||
+        Object.keys(supplied).length !== 2 ||
+        supplied.expected_benefit_amount !== expected.expected_benefit_amount ||
+        supplied.expected_credits_amount !== expected.expected_credits_amount)) {
+      throw Error('native quote precondition changed');
+    }
+    return {...body, initial: {...body.initial, items: [{...row,
+      commerce_selection: {...row.commerce_selection, quote_precondition: expected}}]}};
+  };
 }
 
 async function syncVideoEditor(page, profile, params, session) {
@@ -372,9 +411,11 @@ async function submit(page, command, session) {
   const resultName = '__aiVideoJimengResult_' + crypto.randomUUID().replaceAll('-', '');
   await session.evaluate(async (value, owner) => {await value.check(); value.claim(owner);}, admissionName);
   let admissionBinding, routed = false, routeHandler;
+  let quoteBinder;
   const routePattern = '**/octo_api/v1/node_generate{,?*}';
   try {
     const editorDraft = await syncVideoEditor(page, profile, params, session);
+    quoteBinder = await page.evaluateHandle(createVideoQuoteBinder);
     admissionBinding = await page.exposeFunction(admissionName, async value => {
       if (admitted) throw Error('duplicate native dispatch');
       admitted = true;
@@ -426,7 +467,7 @@ async function submit(page, command, session) {
     await page.route(routePattern, routeHandler);
     routed = true;
     nativeStarted = true;
-    await page.evaluate(async ({profile, params, action, commerceContext, editorDraft, admissionName, resultName, session}) => {
+    await page.evaluate(async ({profile, params, action, commerceContext, editorDraft, admissionName, resultName, session, quoteBinder}) => {
       const {canvas, client, http} = await session.check();
       if (!client || !http) throw Error('native commercial owner unavailable');
       const fence = window.__aiVideoJimengFence;
@@ -492,6 +533,7 @@ async function submit(page, command, session) {
         fence.used = true;
         await session.check();
         if (!editorMatches()) throw Error('native editor changed before dispatch');
+        body = quoteBinder(body, profile, quote.credits);
         const row = body.initial?.items?.[0];
         if (body.project_id !== profile.project_id || body.op !== 1 ||
             body.initial?.node_id !== profile.node_id ||
@@ -538,7 +580,7 @@ async function submit(page, command, session) {
         fence.close();
       });
       return true;
-    }, {profile, params, action, commerceContext, editorDraft, admissionName, resultName, session});
+    }, {profile, params, action, commerceContext, editorDraft, admissionName, resultName, session, quoteBinder});
     for (let i = 0; i < 120; i++) {
       const result = await page.evaluate(name => window[name], resultName);
       if (result?.state !== 'running') break;
@@ -560,6 +602,7 @@ async function submit(page, command, session) {
     }, {owner: admissionName, resultName}).catch(() => {});
     if (routed) await page.unroute(routePattern, routeHandler);
     if (admissionBinding) await admissionBinding.dispose();
+    if (quoteBinder) await quoteBinder.dispose();
   }
 }
 
@@ -584,7 +627,7 @@ async function main() {
   }
 }
 
-module.exports = {createSession, buildVideoAction, buildVideoCommerceContext, buildVideoEditorDraft, syncVideoEditor};
+module.exports = {createSession, buildVideoAction, buildVideoCommerceContext, buildVideoEditorDraft, createVideoQuoteBinder, syncVideoEditor};
 if (require.main === module) {
   main().catch(() => {
     emit({ok: false, no_effect: !nativeStarted && !dispatchAnnounced});

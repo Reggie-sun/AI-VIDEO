@@ -45,6 +45,7 @@ class JimengProfile(StrictModel):
     model_config = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True)
 
     model_id: JimengModelId = JIMENG_MODEL
+    input_mode: Literal["multimodal", "first_frame", "first_last_frame"] = "multimodal"
     account_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     project_id: str = Field(pattern=r"^[0-9a-f-]{36}$")
     node_id: str = Field(pattern=r"^node_[A-Za-z0-9]{1,64}$")
@@ -62,6 +63,8 @@ class JimengProfile(StrictModel):
         data = handler(self)
         if self.model_id == JIMENG_MODEL:
             data.pop("model_id", None)
+        if self.input_mode == "multimodal":
+            data.pop("input_mode", None)
         return data
 
     @model_validator(mode="after")
@@ -69,19 +72,28 @@ class JimengProfile(StrictModel):
         spec = JIMENG_MODEL_SPECS[self.model_id]
         if self.duration_seconds > spec.max_seconds or self.resolution not in spec.resolutions:
             raise ValueError("Jimeng output specification is unsupported by the exact selected model")
+        if self.input_mode != "multimodal" and self.model_id != "seedance_2.0_vip":
+            raise ValueError("Frame conditioning requires the verified Seedance 2.0 VIP surface")
         return self
 
     @property
+    def native_mode(self) -> int:
+        return {"multimodal": 4, "first_frame": 2, "first_last_frame": 3}[self.input_mode]
+
+    @property
     def capability_id(self) -> str:
-        return f"jimeng-{self.model_id.replace('_', '-')}-multimodal-v1"
+        mode = self.input_mode.replace("_", "-")
+        return f"jimeng-{self.model_id.replace('_', '-')}-{mode}-v1"
 
     @property
     def compiler_id(self) -> str:
-        return f"jimeng-{self.model_id.replace('_', '-')}-video-compiler"
+        suffix = "" if self.input_mode == "multimodal" else f"-{self.input_mode.replace('_', '-')}"
+        return f"jimeng-{self.model_id.replace('_', '-')}{suffix}-video-compiler"
 
     @property
     def profile_version(self) -> str:
-        return f"canvas-{self.model_id.replace('_', '-')}-v1"
+        suffix = "" if self.input_mode == "multimodal" else f"-{self.input_mode.replace('_', '-')}"
+        return f"canvas-{self.model_id.replace('_', '-')}{suffix}-v1"
 
     def pointer(self) -> ProviderProfilePointer:
         digest = canonical_sha256(self.model_dump(mode="json"))
@@ -116,11 +128,21 @@ class JimengMaterial(StrictModel):
     size_bytes: int = Field(strict=True, gt=0)
     duration_millis: int | None = Field(default=None, strict=True, gt=0)
     storage_id: str = Field(min_length=1, max_length=512)
+    image_role: Literal["first_frame", "last_frame"] | None = None
+
+    @model_serializer(mode="wrap")
+    def _preserve_reference_material_bytes(self, handler):
+        data = handler(self)
+        if self.image_role is None:
+            data.pop("image_role", None)
+        return data
 
     @model_validator(mode="after")
     def _duration(self) -> "JimengMaterial":
         if (self.kind == "image") != (self.duration_millis is None):
             raise ValueError("Jimeng material duration does not match its kind")
+        if self.image_role is not None and self.kind != "image":
+            raise ValueError("Jimeng frame roles require image materials")
         return self
 
 
@@ -237,5 +259,6 @@ def dispatch_matches_request(
         and material.asset_sha256 == binding.asset_sha256
         and material.size_bytes == binding.size_bytes
         and material.duration_millis == getattr(binding, "duration_millis", None)
+        and material.image_role == (binding.role if binding.role in {"first_frame", "last_frame"} else None)
         for index, (material, binding) in enumerate(zip(dispatch.materials, bindings, strict=True))
     )
