@@ -9,6 +9,10 @@ evidence_index_version: "1"
 
 Date: 2026-10-21
 
+## Supersession — 2026-10-25
+
+用户后续要求由 [Harness Three-Level Verification](2026-10-25-harness-three-level-verification.md) 落实到 runtime/CI：修改后精准测试、功能完成相关回归、合并/发布前完整回归。下文保留 2026-10-21 的 docs-only 调整与当时证据；当前执行入口和 receipt 级别以新记录及 canonical owners 为准。
+
 ## Decision
 
 用户在Seedance Prompt限制调整后明确要求优化验证策略。旧要求强制完成全部路径选测并取得fresh receipt；共享compiler及相关tests命中宽泛类别，选择18个checks，其中generation_feedback_tests耗时627.372秒。历史记录保留在`.agent/harness/runs/seedance-prompt-length-20261021/receipt.json`，该完整run中断，不能宣称整体通过。
