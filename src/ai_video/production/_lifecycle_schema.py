@@ -379,6 +379,19 @@ class LocalVideoStatusReceiptPointer(_PaidLifecycleModel):
         return self
 
 
+class RuntimeRepairRevocationPointer(_PaidLifecycleModel):
+    path: Path
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _canonical_path(self):
+        _canonical_paid_path(self.path, Path(
+            f"state/video-generation/runtime-repair/revocations/{self.content_hash}.json"
+        ), "runtime repair revocation")
+        return self
+
+
 class RuntimeRepairAuthorizationPointer(_PaidLifecycleModel):
     path: Path
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -386,9 +399,19 @@ class RuntimeRepairAuthorizationPointer(_PaidLifecycleModel):
     evidence_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     consumed: bool = False
     file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    revocation: RuntimeRepairRevocationPointer | None = None
+
+    @model_serializer(mode="wrap")
+    def _legacy_payload(self, handler):
+        data = handler(self)
+        if self.revocation is None:
+            data.pop("revocation", None)
+        return data
 
     @model_validator(mode="after")
     def _validate_canonical_path(self) -> "RuntimeRepairAuthorizationPointer":
+        if self.consumed and self.revocation is not None:
+            raise ValueError("Consumed runtime repair cannot be revoked")
         _canonical_paid_path(
             self.path,
             Path(

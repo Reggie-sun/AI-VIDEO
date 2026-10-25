@@ -227,6 +227,9 @@ def register_runtime_repair_authorization(
                 continue
             for pointer in prior.runtime_repairs:
                 if pointer.evidence_hash == failure.evidence_hash:
+                    if pointer.revocation is not None:
+                        self._reopen_runtime_repair_authorization(pointer)
+                        raise _state_invalid("Runtime repair authorization was revoked; cannot remint it.")
                     if (local_extension is not None or paid_no_effect_retarget is not None
                             or paid_no_effect_extension is not None
                             or paid_cross_provider_no_effect_retarget is not None):
@@ -267,7 +270,11 @@ def register_runtime_repair_authorization(
                 or prior_scope.request.target_shot_id != scope.request.target_shot_id
             ):
                 continue
-            grants.extend(prior.runtime_repairs)
+            for pointer in prior.runtime_repairs:
+                if pointer.revocation is not None:
+                    self._reopen_runtime_repair_authorization(pointer)
+                else:
+                    grants.append(pointer)
         granted = len(grants)
         ceiling = MAX_RUNTIME_REPAIRS_PER_SHOT
         if local_extension is not None:
@@ -371,7 +378,7 @@ def require_runtime_repair_grant(self, manifest, binding):
         ),
         None,
     )
-    if pointer is None or pointer.consumed:
+    if pointer is None or pointer.consumed or pointer.revocation is not None:
         raise _state_invalid("Runtime repair grant is unavailable.")
     if pointer.content_hash != repair.content_hash:
         raise _state_invalid("Runtime repair grant identity mismatch.")
@@ -617,6 +624,9 @@ def _require_paid_no_effect_repair_extension(
         if scope is None or scope.request.target_shot_id != extension.shot_id:
             continue
         for pointer in prior_state.runtime_repairs:
+            if pointer.revocation is not None:
+                committer._reopen_runtime_repair_authorization(pointer)
+                continue
             if (current_repair is not None
                     and prior_attempt.attempt_id == current_repair.attempt_id
                     and pointer.content_hash == current_repair.content_hash):

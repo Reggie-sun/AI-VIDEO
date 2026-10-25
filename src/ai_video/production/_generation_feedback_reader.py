@@ -158,6 +158,12 @@ def load_runtime_repair_authorization(
         or authorization.evidence_hash != pointer.evidence_hash
     ):
         raise _invalid("Runtime repair authorization pointer identity is invalid.")
+    if pointer.revocation is not None:
+        from ai_video.production.generation_runtime_repair_revocation import load_revocation
+
+        receipt = load_revocation(root, pointer)
+        if receipt.actor != authorization.actor:
+            raise _invalid("Runtime repair revocation actor differs from its authorization.")
     return authorization
 
 
@@ -435,6 +441,17 @@ def verify_manifest_generation_evidence(loaded, manifest):
     from ai_video.production._video_project_reader import verify_manifest_video_evidence
 
     verify_manifest_video_evidence(loaded, manifest)
+    for attempt in manifest.attempts:
+        state = attempt.video_generation_state
+        for pointer in (() if state is None else state.runtime_repairs):
+            if pointer.revocation is not None:
+                from ai_video.production.generation_runtime_repair_revocation import load_revocation
+
+                load_runtime_repair_authorization(loaded.root, pointer)
+                receipt = load_revocation(loaded.root, pointer, project_id=manifest.project_id)
+                if (attempt.status.value != "failed" or pointer.attempt_id != attempt.attempt_id
+                        or receipt.expected_manifest_revision >= manifest.manifest_revision):
+                    raise _invalid("Runtime repair revocation has a different attempt or future revision.")
     for receipt in load_imported_history(loaded.root, loaded.manifest):
         request = receipt.source_request.activation_scope.request
         shots = (*loaded.shots, *loaded.production_parents)

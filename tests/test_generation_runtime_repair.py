@@ -1499,3 +1499,96 @@ def test_snapshot_hash_stable_across_runtime_repair_iteration_order():
     other = _grant(runtime, evidence_hash="d" * 64)
     divergent = setup["inputs"].model_copy(update={"runtime_repairs": (other,)})
     assert divergent.snapshot_hash != forward.snapshot_hash
+
+
+def _unused_revocation_case(tmp_path):
+    provider, committer, caller, service, limits, sequence = _orchestrator(
+        tmp_path, status_state=VideoTaskState.FAILED)
+    _fail_attempt(committer=committer, caller=caller, service=service, limits=limits,
+                  sequence=sequence, number=0, attempt_id='revocation-failure')
+    pointer = committer.record_runtime_repair_authorization(
+        attempt_id='revocation-failure', repair_basis=REPAIR_BASIS, actor=ACTOR)
+    return provider, committer, caller, service, limits, sequence, pointer
+
+
+def test_unused_runtime_grant_revocation_preserves_history_and_blocks_stale_binding(tmp_path):
+    import hashlib
+    from ai_video.production.project import load_production_project
+
+    _, c, caller, service, limits, sequence, pointer = _unused_revocation_case(tmp_path)
+    sequence[0] = 1
+    prepared = caller.prepare(limits=limits)
+    before = c._read_manifest()
+    raw = (c.project_root / pointer.path).read_bytes()
+    receipt = c.revoke_runtime_repair_authorization(
+        attempt_id=pointer.attempt_id, authorization_hash=pointer.content_hash,
+        expected_manifest_revision=before.manifest_revision, actor=ACTOR,
+        reason='Unused ordinary grant was superseded by a diagnosed paid recovery path.')
+    after = c._read_manifest()
+    retained = _attempt(c, pointer.attempt_id).video_generation_state.runtime_repairs[0]
+    assert retained.consumed is False and retained.revocation == receipt
+    assert len(before.attempts) == len(after.attempts)
+    assert before.active_paid_provider_budget == after.active_paid_provider_budget
+    assert (c.project_root / pointer.path).read_bytes() == raw
+    assert hashlib.sha256(raw).hexdigest() == pointer.file_sha256
+    load_production_project(c.project_root / 'project.yaml')
+    assert caller.prepare(limits=limits).decision.disposition == 'RUNTIME_FAILURE'
+    assert c.revoke_runtime_repair_authorization(
+        attempt_id=pointer.attempt_id, authorization_hash=pointer.content_hash,
+        expected_manifest_revision=before.manifest_revision, actor=ACTOR,
+        reason='Unused ordinary grant was superseded by a diagnosed paid recovery path.') == receipt
+    assert c._read_manifest() == after
+    with pytest.raises(AiVideoError, match='revoked'):
+        c.record_runtime_repair_authorization(
+            attempt_id=pointer.attempt_id, repair_basis=REPAIR_BASIS, actor=ACTOR)
+    service.start(attempt_id='stale-revoked-successor', request=prepared.resolved_request,
+                  execution_binding=prepared.execution_binding)
+    with pytest.raises(AiVideoError, match='unavailable'):
+        service.submit_local_once(attempt_id='stale-revoked-successor')
+
+
+@pytest.mark.parametrize('fault', ['stale', 'pending', 'consumed'])
+def test_runtime_grant_revocation_rejects_stale_pending_or_consumed(tmp_path, fault):
+    _, c, caller, service, limits, sequence, pointer = _unused_revocation_case(tmp_path)
+    sequence[0] = 1
+    if fault in {'pending', 'consumed'}:
+        caller.start(committer=c, attempt_id='revocation-successor', limits=limits)
+        if fault == 'consumed':
+            service.submit_local_once(attempt_id='revocation-successor')
+    before = c._read_manifest()
+    with pytest.raises(AiVideoError):
+        c.revoke_runtime_repair_authorization(
+            attempt_id=pointer.attempt_id, authorization_hash=pointer.content_hash,
+            expected_manifest_revision=before.manifest_revision - int(fault == 'stale'),
+            actor=ACTOR, reason='Bounded explicit cancellation of an unused grant.')
+    assert c._read_manifest() == before
+
+
+def test_runtime_grant_revocation_receipt_is_required_on_standard_reopen(tmp_path):
+    from ai_video.production.project import load_production_project
+
+    _, c, _, _, _, _, pointer = _unused_revocation_case(tmp_path)
+    receipt = c.revoke_runtime_repair_authorization(
+        attempt_id=pointer.attempt_id, authorization_hash=pointer.content_hash,
+        expected_manifest_revision=c._read_manifest().manifest_revision,
+        actor=ACTOR, reason='Preserve authorization while cancelling it.')
+    (c.project_root / receipt.path).write_text('{}')
+    with pytest.raises(AiVideoError, match='revocation'):
+        load_production_project(c.project_root / 'project.yaml')
+
+
+def test_legacy_runtime_pointer_does_not_gain_serialized_revocation_field(tmp_path):
+    _, _, _, _, _, _, pointer = _unused_revocation_case(tmp_path)
+    assert 'revocation' not in pointer.model_dump(mode='json')
+
+
+def test_runtime_revocation_rejects_other_actor_without_mutation(tmp_path):
+    _, c, _, _, _, _, pointer = _unused_revocation_case(tmp_path)
+    before = c._read_manifest()
+    with pytest.raises(AiVideoError, match='original authorization actor'):
+        c.revoke_runtime_repair_authorization(
+            attempt_id=pointer.attempt_id, authorization_hash=pointer.content_hash,
+            expected_manifest_revision=before.manifest_revision,
+            actor=ActorIdentity(actor_id='another-owner', actor_kind='automation'),
+            reason='A different writer cannot cancel this authorization.')
+    assert c._read_manifest() == before

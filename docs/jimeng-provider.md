@@ -6,6 +6,8 @@
 
 浏览器 transport 必须显式注入正在运行的 Chrome/CDP profile 目录，每次操作检查账号 hash 和画布 project。提交依赖内部 `generationRuntime.actions.submitVideo`，属于可能随网页版本变化的 UI 依赖，并非独立 HTTP 提交 API。profile 的 `node_id` 必须指向空闲且无既有引用来源的画布节点；如请求带入旧节点引用，提交前拒绝，避免素材关系混淆。凭据只留在网页上下文；桥接层返回技术 ID、参数和临时下载地址，后者不写 Product 状态。
 
+图片上传沿 ImageX 分配的地址执行，继续要求 HTTPS 与受限域名；在原有域名集之外，仅增加实测返回的精确主机 `tos-lq-x.bytedancevod.com`，不开放整个新域或任意响应 URL。新主机仍须经过原 ticket、字节校验、上传与 commit 确认，不改变生成许可或费用边界。
+
 ## Selected Models
 
 四个型号复用同一个 `JimengVideoProvider` 类及 `JimengBrowserTransport` / Worker，`JimengProfile.model_id` 精确选择原生 ID，不自动切换。每个 profile 封存一个输出规格；上层按 Shot 要求检查其 capability，Provider 不代选模型。旧 2.5 profile 的序列化和 identity 保持原样；各型号具有独立 capability、compiler 与 profile identity。

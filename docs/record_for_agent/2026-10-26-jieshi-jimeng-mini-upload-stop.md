@@ -9,6 +9,22 @@ evidence_index_version: "1"
 
 Date: 2026-10-26
 
+## Implementation And Live Follow-up — 2026-10-26
+
+此节取代下文历史 checkpoint 的“未修复/真实生成0”当前状态描述，保留历史失败和计数。上传白名单现仅新增 exact `tos-lq-x.bytedancevod.com`，仍要求HTTPS并拒绝其他未知地址。新增 canonical 未消费 runtime repair 授权注销能力：原actor、FAILED attempt、无pending successor方可注销；原grant和append-only receipt保留，paid计数不回退。qualification测试被纳入真实关联测试路由。
+
+已有验证：Provider相关214通过、recovery相关92通过（2个HEAD既有失败单独复现保留）、精准14通过；独立review两轮后blocking findings为0。证据：`R/provider-fixed-tests.xml`、`recovery-related-tests.xml`、`final-targeted-tests.xml`、`baseline-two-failures-verified.xml`、`review-closed.json`。未做完整回归，也不宣称正式Harness receipt或发布验收。
+
+修复后第三intent `jieshi-mini-fixed-upload-one-generation-001`实际出片，旧两次KNOWN_NO_EFFECT均保留。CG原片SHA `4ceae93db54b4ff4839d490b22ed99800186649ea31c551675ca1b86da1d7dae`，交付副本 `runs/jieshi-jimeng-mini-20261026/Jieshi-Mini-720p-4s.mp4`。此前分析发现手的倒影仍出现，音频内容NOT_EVALUATED；且用户明确要真人，因此该CG片不算目标完成。报价24CRD，实际扣费待确认。
+
+用户随后要求复用已记录真人资产、仅测试、不追加检查。直接取原S01图片SHA `13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923`及1202字符旧提示词，未重新生图。新单元 `T = .codex/tmp/jieshi-jimeng-mini-realperson-20261026/`，同画布新节点 `node_1haggzpv8g`，Mini/720p/4秒/9:16，图片绑定为reference而非first_frame；结构化native prompt2999字符。任务累计actual generation上限2、paid intent上限4、内部积分上界60，旧CG账本完整保留；真人单元仅一份permit、上界30CRD，不自动重试。
+
+真人attempt `canvas-4a2232846381459517e6857f3323c53f5ff95e5f`已正式submit，request hash `d1dc603cdadfdc2b00df854fee4e7b752cf1fcf4791e1d7ea2eb8f8ff816792d`，平台返回RUNNING。最终状态另附本节后续行；RUNNING不证明最终审核/出片。用户指令后没有新增软件测试或媒体审片。无activation、Production qualification或Final Acceptance。
+
+真人最终结果：平台SUCCEEDED并已fetch，file id `v02870g10004dbf96ta7dld0bg4daqe0`，MP4 SHA `942ace78310e62cb2060530194e28ada6ce0daebb6b445d920233673eeefca39`、6,233,836 bytes。原片交付 `runs/jieshi-jimeng-mini-realperson-20261026/Jieshi-Realperson-Mini-720p-4s.mp4`；正式回执 `T/submit-result.json`、`poll-result.json`、`fetch-result.json`。此次真人输入经Jimeng reference模式成功出片，没有重现旧Ark PrivacyInformation拒绝；仅限该次输入/模式，不推断平台审核通用规则。按用户要求未审片，质量NOT_EVALUATED，实际积分结算待确认（本条内部上界30CRD）。
+
+自动学习评估 `no_candidate`：修复为可复现软件缺陷；CG/真人更换了输入且非受控比较，不能升级通用模型或审核结论。
+
 ## Root Cause Update — 2026-10-26
 
 用户随后要求定位是否与旧 API 失败相同。当前有界上传诊断已复现本地 `upload destination invalid`：ImageX 实际返回的 `tos-lq-x.bytedancevod.com` 不匹配 `jimeng_browser.cjs` 的 `safeUpload` 域名白名单，因此在 binary POST 前被拒；其他返回的 `*.snssdk.com` 节点匹配并可上传，解释了间歇性成功/失败。此更新取代下文 checkpoint 的“根因仍未确证”，原两次 paid receipt、计数和未出片事实保持。

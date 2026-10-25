@@ -174,6 +174,14 @@ class _StateCommitVideoMixin:
 
         return require_runtime_repair_grant(self, manifest, binding)
 
+    def revoke_runtime_repair_authorization(self, *, attempt_id, authorization_hash,
+                                           expected_manifest_revision, actor, reason):
+        from .generation_runtime_repair_revocation import revoke_runtime_repair_authorization
+
+        return revoke_runtime_repair_authorization(self, attempt_id=attempt_id,
+            authorization_hash=authorization_hash, expected_manifest_revision=expected_manifest_revision,
+            actor=actor, reason=reason)
+
     def _require_submit_execution_binding(self, manifest, state, request):
         """Reject old request records before any new Provider intent or permit."""
 

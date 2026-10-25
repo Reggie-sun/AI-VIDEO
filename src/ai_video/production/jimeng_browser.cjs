@@ -174,7 +174,8 @@ async function upload(page, command, session) {
       const safeUpload = url => {
         const parsed = new URL(url);
         if (parsed.protocol !== 'https:' ||
-            !/(^|\.)(bytedanceapi\.com|byteimg\.com|bytecdn\.cn|bytedance\.com|bytedance\.net|bytecdn\.com|douyinvod\.com|vod\.com|snssdk\.com|volces\.com|bytescm\.com|ibytedtos\.com|bytetos\.com|tos-cn\.com)$/.test(parsed.hostname)) {
+            (parsed.hostname !== 'tos-lq-x.bytedancevod.com' &&
+            !/(^|\.)(bytedanceapi\.com|byteimg\.com|bytecdn\.cn|bytedance\.com|bytedance\.net|bytecdn\.com|douyinvod\.com|vod\.com|snssdk\.com|volces\.com|bytescm\.com|ibytedtos\.com|bytetos\.com|tos-cn\.com)$/.test(parsed.hostname))) {
           throw Error('upload destination invalid');
         }
       };

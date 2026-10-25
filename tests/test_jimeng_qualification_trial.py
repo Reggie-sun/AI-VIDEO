@@ -228,7 +228,7 @@ def _qualification_binding(
     return inputs, provider, decision, binding, request
 
 
-def _failed_paid_qualification(root: Path):
+def _failed_paid_qualification(root: Path, *, stale_ordinary_grant=False):
     inputs, provider, _, base, _, _ = _runtime(
         root,
         status_events=(VideoTaskState.SUCCEEDED,),
@@ -289,6 +289,20 @@ def _failed_paid_qualification(root: Path):
     )
     evidence = experience.evidence[-1]
     assert evidence.outcome == "runtime_failure"
+    if stale_ordinary_grant:
+        from ai_video.production.generation_experience import GenerationExperience
+        from ai_video.production.generation_diagnosis import AttemptEvidence
+
+        committer.record_runtime_repair_authorization(
+            attempt_id=first_attempt_id, evidence_hash=evidence.evidence_hash,
+            repair_basis="Preliminary ordinary grant, not valid for a qualification recovery.",
+            actor=ActorIdentity(actor_id="qualification-test-owner", actor_kind="codex"))
+        evidence = AttemptEvidence.model_validate(evidence.model_copy(update={
+            "runtime_reason": "Exact upload diagnosis establishes the repaired pre-dispatch failure."
+        }).model_dump(mode="python"))
+        experience = GenerationExperience(projection=experience.projection,
+            candidate=experience.candidate, evidence=(evidence,))
+        committer.record_generation_experience(attempt_id=first_attempt_id, experience=experience)
     target = next(
         item for item in binding.inputs.candidates
         if item.candidate_id == binding.decision.selected_candidate_id
@@ -1813,3 +1827,62 @@ def test_production_routing_policy_keeps_legacy_serialization():
     assert "execution_purpose" not in default_policy.model_dump(mode="json")
     assert trial_policy.model_dump(mode="json")["execution_purpose"] == "qualification"
 
+
+
+def test_revoked_unused_grant_preserves_two_no_effect_intents_for_third_trial(tmp_path):
+    from ai_video.production.generation_runtime_repair import PaidNoEffectRetarget, RuntimeRepairGrant
+    from ai_video.production.project import load_production_project
+
+    inputs, provider, base, c, service, first, exp1, grant1 = _failed_paid_qualification(
+        tmp_path, stale_ordinary_grant=True)
+    m = c._read_manifest()
+    old = c._video_attempt(m, first).video_generation_state.runtime_repairs[0]
+    c.revoke_runtime_repair_authorization(
+        attempt_id=first, authorization_hash=old.content_hash,
+        expected_manifest_revision=m.manifest_revision,
+        actor=grant1.authorization.actor, reason='Retire unused preliminary grant; retain intent history.')
+    history1 = c.read_generation_experiences()
+    _, _, _, binding2, request2 = _qualification_binding(
+        inputs, provider, base, paid_submit_ceiling=2, paid_submits_used=1,
+        evidence=tuple(e for x in history1 for e in x.evidence), latest_attempt_hash=exp1.evidence[-1].evidence_hash,
+        experiences=history1, runtime_repairs=(grant1,),
+        lifecycle_updates={'generation_id': 'revoked-grant-recovery-2', 'output_asset_id': 'revoked-video-2'})
+    second = 'revoked-grant-second-no-effect'
+    service.start(attempt_id=second, request=request2, execution_binding=binding2)
+    _extend_paid_submit_quota(c, prior_attempt_id=first, target_attempt_id=second, new_ceiling=2)
+    preview2 = _paid_preview(request2, attempt_id=second, video_preview=provider.preview(request2))
+    with pytest.raises(AiVideoError) as rejected:
+        service.submit_once(attempt_id=second, paid_preview=preview2, reservation_id='revoked-second')
+    assert rejected.value.code is ErrorCode.VIDEO_PROVIDER_FAILED, str(rejected.value)
+    exp2 = record_attempt_evaluation(committer=c, attempt_id=second)
+    a2 = c._video_attempt(c._read_manifest(), second)
+    receipt2 = c._reopen_paid_submit(a2.paid_provider_state.submit_receipt)
+    pointer2 = c.record_runtime_repair_authorization(
+        attempt_id=second, evidence_hash=exp2.evidence[-1].evidence_hash,
+        actor=grant1.authorization.actor, repair_basis='Same repaired upload; preserve both no-effect intents.',
+        paid_no_effect_retarget=PaidNoEffectRetarget(
+            submit_receipt_fingerprint=receipt2.submit_receipt_fingerprint,
+            target_scope_hash=exp2.candidate.scope_hash))
+    grant2 = RuntimeRepairGrant(c._reopen_runtime_repair_authorization(pointer2), consumed=False)
+    history2 = c.read_generation_experiences()
+    _, _, decision3, binding3, request3 = _qualification_binding(
+        inputs, provider, base, paid_submit_ceiling=3, paid_submits_used=2,
+        evidence=tuple(e for x in history2 for e in x.evidence), latest_attempt_hash=exp2.evidence[-1].evidence_hash,
+        experiences=history2, runtime_repairs=(RuntimeRepairGrant(grant1.authorization, True), grant2),
+        lifecycle_updates={'generation_id': 'revoked-grant-recovery-3', 'output_asset_id': 'revoked-video-3'})
+    assert decision3.disposition == 'GENERATE_ONCE'
+    third = 'revoked-grant-third-trial'
+    service.start(attempt_id=third, request=request3, execution_binding=binding3)
+    _extend_paid_submit_quota(c, prior_attempt_id=second, target_attempt_id=third, new_ceiling=3)
+    provider._scenario = replace(provider._scenario, submit_outcome='accepted',
+                                 external_effect_id='revoked-grant-third-effect')
+    service.submit_once(attempt_id=third,
+        paid_preview=_paid_preview(request3, attempt_id=third, video_preview=provider.preview(request3)),
+        reservation_id='revoked-third')
+    loaded = load_production_project(tmp_path / 'project.yaml')
+    assert provider.call_counts.submit == 3
+    retained = c._video_attempt(loaded.manifest, first).video_generation_state.runtime_repairs
+    assert len(retained) == 2 and retained[0].revocation is not None and not retained[0].consumed
+    assert retained[1].consumed
+    assert c._video_attempt(loaded.manifest, second).paid_provider_state.phase.value == 'known_no_effect'
+    assert c._video_attempt(loaded.manifest, third).paid_provider_state.phase.value == 'accepted'

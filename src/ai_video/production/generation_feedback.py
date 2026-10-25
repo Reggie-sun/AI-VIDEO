@@ -463,6 +463,9 @@ class GenerationFeedbackOrchestrator:
                 if video_state is None:
                     continue
                 for pointer in video_state.runtime_repairs:
+                    if pointer.revocation is not None:
+                        committer._reopen_runtime_repair_authorization(pointer)
+                        continue
                     runtime_repairs.append(RuntimeRepairGrant(
                         authorization=committer._reopen_runtime_repair_authorization(pointer),
                         consumed=pointer.consumed))

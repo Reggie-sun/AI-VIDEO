@@ -551,6 +551,8 @@ Canvas source owner 逐份核对 implicit materials 与原始 reference tray；�
 `_state_commit_video_runtime_repair.py`拥有完整registration transaction和submit前scope重验；仍为
 唯一committer的同一lock/atomic writer。Receipt `/2`携带exact extension，`/1`省略新字段，保留旧bytes/hash/read/replay；
 Manifest pointer/layout不变。paid/remote、unknown、scope mismatch、跳过prior grants或第七份grant拒绝；intent写入和grant消耗保持原子。
+
+`generation_runtime_repair_revocation.py` 仅由 `ProductionStateCommitter.revoke_runtime_repair_authorization` 在同一锁内注销原 actor 的未消费、未被 pending successor 保留的授权；immutable revocation receipt 与原 grant 均保留，Manifest pointer 绑定注销事实。旧 pointer 省略新字段保持原 bytes；严格 reader 重验身份和字节，注销后旧 binding 在 submit 前拒绝，同 evidence 不得重签。注销只移除未用恢复权限，不回退 paid intent、消费、quota 或已消费 grant；新的恢复继续走原登记、qualification 和 paid gate。
 新ceiling4/5/6沿用`/2`，不支持对应ceiling的旧runtime不具备forward compatibility并fail closed；旧ceiling3/4/5和`/1`序列化不变。
 strict local/unmetered 的当前 selected capability 可以设置新的有限 batch bound，
 `local_total_limit=None` 表示本地无累计 quota；旧 local ceiling 不永久锁定后续请求。

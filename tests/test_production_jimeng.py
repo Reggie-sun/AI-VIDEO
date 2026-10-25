@@ -1244,3 +1244,30 @@ def test_frame_conditioning_survives_requirement_router_compiler_and_resolve(mod
                 compiler_version="1", capabilities=provider.capabilities(), native_prompt=resealed)
             assert rejected.outcome == "unsupported"
             assert "generation_intent.dialogue_intent.turns" in rejected.unsupported_field_paths
+
+
+@pytest.mark.parametrize('host,allowed', [
+    ('tos-lq-x.bytedancevod.com', True),
+    ('tos-d-x-hl.snssdk.com', True),
+    ('tos-lq-x.bytedancevod.com.attacker.invalid', False),
+    ('attacker-tos-lq-x.bytedancevod.com', False),
+    ('other.bytedancevod.com', False),
+    ('127.0.0.1', False),
+])
+def test_shipped_upload_checks_delegated_host_before_sending_bytes(tmp_path, host, allowed):
+    import subprocess
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    image = tmp_path / 'reference.png'
+    image.write_bytes(b'exact fixture image bytes')
+    result = json.loads(subprocess.check_output([
+        'node', str(root / 'tests/fixtures/generated_video/jimeng_upload_host.cjs'),
+        str(root / 'src/ai_video/production/jimeng_browser.cjs'), host, str(image),
+    ], text=True))
+    assert result['ok'] is allowed
+    assert result['binaryPosts'] == int(allowed)
+    assert result['commits'] == int(allowed)
+    assert result['cleaned'] is True
+    if not allowed:
+        assert result['error'] == 'upload destination invalid'

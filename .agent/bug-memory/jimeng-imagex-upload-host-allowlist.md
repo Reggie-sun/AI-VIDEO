@@ -14,7 +14,7 @@
 
 ## Fix And Verification Status
 
-`DIAGNOSED_NOT_FIXED`。未修改域名规则、Provider、permit、budget 或 recovery lifecycle。修复应在该上传准入 owner 内核对委托 host 并保持受限目的地址验证，再覆盖允许/拒绝域名及真实上传；不在 caller 重试或替换输入来掩盖此缺陷。原有失败及未消费普通 runtime grant 必须保留并由 canonical recovery owner 处理。
+`FIXED_AND_LIVE_UPLOAD_PROVEN`（2026-10-26后续更新）。仅新增exact `tos-lq-x.bytedancevod.com`，HTTPS与其他host限制保持；修复后正式Provider已上传并完成一条Mini CG生成。相关测试214通过、精准14通过，独立review无未解决blocking finding。详细后续见对应session record。以下为修复前历史建议：未修改域名规则、Provider、permit、budget 或 recovery lifecycle。修复应在该上传准入 owner 内核对委托 host 并保持受限目的地址验证，再覆盖允许/拒绝域名及真实上传；不在 caller 重试或替换输入来掩盖此缺陷。原有失败及未消费普通 runtime grant 必须保留并由 canonical recovery owner 处理。
 
 诊断未新增生成请求，canonical Manifest SHA 与原 checkpoint 一致。此证据证明上传准入缺陷，不证明平台内容审核通过、Mini 能成功生成或原作品质量合格。
 
