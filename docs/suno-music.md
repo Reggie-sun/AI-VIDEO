@@ -24,7 +24,9 @@ Suno 没有面向这段生成流程的官方 API。`paperfoot/suno-cli` 是 MIT 
 
 ## Not Activated
 
-没有真实生成、下载、Manifest 指针切换、Registry 激活或成片混音。Captcha、余额、v6 是否对当前订阅开放，都要在用户明确授权并且浏览器会话已经存在之后，先跑 `suno credits` 和 `suno models`，再决定是否允许一次付费提交。
+后续《失帧》实测已通过官方网页生成，并经 CLI 查询/下载；这不证明纯 CLI 生成恢复。
+尚未执行 Manifest 指针切换、Registry 激活或成片混音。新提交仍需任务授权与剩余次数，
+模型资格及认证/人机验证前检必须核实；余额仅按用户要求报告，不额外设置预算 gate。
 
 ## Authored Music Design
 
@@ -82,3 +84,40 @@ permit / committer 执行编排，不能把 `paid_generation_authorized=True` �
 该兼容有离线契约回归，尚未由成功 live generation 验证。具体素材、Prompt、错误/恢复、
 当前音频输入受阻与生产限制见[本轮记录](record_for_agent/2026-10-26-shizhen-suno-live-pilot.md)
 及[配乐方案与评估](superpowers/artifacts/drama/shizhen-episode-01/music-pilot-20261026/spotting-and-evaluation.md)。
+
+
+## Generation Readiness Repair
+
+doctor的success/pass不等于可生成，captcha_preflight.detail仍可能required:true。
+SunoMusicService现在先只读核验jwt、studio_api、captcha_preflight；要求验证或检查不明确时，
+在generate与UNKNOWN写入前停止。不用积分检查设置预算gate；submitted回放及UNKNOWN拒绝先执行。
+官方网页的实际challenge仍由用户处理，适配器不求解/搬运token。当前36项精准回归通过。
+《失帧》第3次通过原登录官方网页生成一对v6，CLI查询/下载MP3、WAV成功，消耗10 credits。
+此证据不证明纯CLI生成认证恢复；候选未登记激活，音乐/声画待审听。最新状态见配乐报告的
+Official UI Recovery节，旧认证受阻ZIP保持历史，当前盘满导致commit/push受阻。
+
+### CLI Skill And Argument Repair
+
+后续修复取代上一段的代码验证数量及磁盘阻塞状态。已同步修订现有
+`~/.agents/skills/suno/SKILL.md` 和 `~/.codex/skills/suno/SKILL.md`，保留更新前备份。
+不新增 Skill、不安装求解器、不改账号凭据或已消费请求。
+
+在上游 [main.rs 的 resolve_captcha](https://github.com/paperfoot/suno-cli/blob/6d28c67a733b32183a80d81306bf0013f46b00b7/src/main.rs)
+中，`--no-captcha` 会直接返回空 token，跳过平台前检，不能当作安全的“禁用求解器”。
+项目现在不生成该参数，并拒绝向 transport 传入它；统一通过 `--json --no-browser` 调用 CLI，
+保留原生检查，同时禁止浏览器求解。doctor 到实际调用之间平台要求若变化，CLI 仍可在 POST
+之前返回 `captcha_required`，项目记录 `known_no_effect`，不把它误当成功。
+
+Skill 还修正了 doctor 的 pass/detail 语义、`list` 命令、已有自定义 Chrome profile 的选择、
+认证错误的歧义、官方网页与 CLI 事务的区别和下载/审听证据边界。不会再让用户重复登录错误窗口，
+也不会因为刷新认证就重提 UNKNOWN。`auth_expired` 不能单独证明 JWT 失效或 captcha 是唯一根因。
+
+当前精准回归37项通过；真实安装 CLI 的新 argv dry-run 已执行，submitted=false；
+live 仅运行只读前检，没有第4次生成。REA 的 browser target 读取返回 invalid_endpoint_response，
+所以本次未获得网页协议捕获；源码给出的是确定参数语义，不冒充完整根因逆向。
+证据及当前平台阻塞见[修复记录](record_for_agent/2026-10-26-suno-cli-skill-preflight-repair.md)。
+
+随后用户新增一次真实生成授权，修复后的 `SunoMusicService → CLI` 已获得两首complete/v6，
+并完成MP3/WAV下载、完整解码、标准音频测量与未提交候选资产记录。真实提交ledger回放0网络调用。
+新增10 credits、累计20，余额2480；不再追加。本次已证明纯CLI实际接入，但没有Scene04声画
+审听或canonical Registry激活，仍不代表专业配乐质量或成片生产验收。详见同一记录的Live CLI Recovery。

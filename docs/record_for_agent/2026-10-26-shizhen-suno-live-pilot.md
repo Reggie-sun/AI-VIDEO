@@ -5,7 +5,13 @@ learning_eligibility: ineligible
 evidence_index_version: "1"
 ---
 
+> **Current status — 2026-10-26:** 下文保留首次失败历史。第2次CLI请求仍认证失败；第3次在既有sunruijie42官方网页自动提交成功，两首v6由CLI下载MP3/WAV，消耗10 credits（2500→2490）。质量/声画验收仍NOT_EVALUATED，候选未激活。最新证据见[配乐报告](../superpowers/artifacts/drama/shizhen-episode-01/music-pilot-20261026/spotting-and-evaluation.md#official-ui-recovery--current-checkpoint)。
+
 # Shizhen Suno Live Pilot — Authentication Stop
+
+> **CLI repair update — 2026-10-26:** 已修复 Skill 与调用参数的 `--no-captcha` 误用，
+> 37项精准测试通过；用户随后新增一次授权，真实CLI生成与下载成功，累计20 credits、余额2480。
+> 见[修复记录](2026-10-26-suno-cli-skill-preflight-repair.md)。下文次数/测试数为各历史检查点。
 
 ## Authorization And Outcome
 

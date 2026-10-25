@@ -45,12 +45,23 @@ class _Transport:
         result: _Result | list[_Result] | None = None,
         *,
         error: BaseException | None = None,
+        readiness: list[dict] | None = None,
     ) -> None:
         self.calls: list[list[str]] = []
+        self.readiness_calls: list[list[str]] = []
+        self.readiness = readiness
         self.results = list(result) if isinstance(result, list) else [result]
         self.error = error
 
     def run(self, argv, *, timeout_seconds: float):
+        if "doctor" in argv:
+            self.readiness_calls.append(list(argv))
+            checks = self.readiness if self.readiness is not None else [
+                {"name": "jwt", "status": "pass", "detail": "present and fresh"},
+                {"name": "studio_api", "status": "pass", "detail": "reachable"},
+                {"name": "captcha_preflight", "status": "pass", "detail": "required: false — solver will be skipped"},
+            ]
+            return _Result(0, json.dumps({"status": "success", "data": {"checks": checks}}))
         self.calls.append(list(argv))
         if self.error is not None:
             raise self.error
@@ -128,7 +139,7 @@ def test_director_uses_scene_and_does_not_freeze_duration():
     argv = build_generation_argv(direction, dry_run=True)
     assert "--instrumental" in argv
     assert "--dry-run" in argv
-    assert "--no-captcha" in argv
+    assert "--no-captcha" not in argv
     assert "--model" in argv and argv[argv.index("--model") + 1] == "v6"
     assert "4.0" not in argv
     assert "11.5" not in argv
@@ -176,6 +187,86 @@ def test_auth_expired_without_no_submit_proof_preserves_unknown_and_blocks_retry
         assert error.value.code is ErrorCode.PAID_PROVIDER_OUTCOME_UNKNOWN
     assert len(transport.calls) == 1
     assert service.recover(blocked_request(direction)).state == "submission_unknown"
+
+
+def test_captcha_pass_with_required_true_blocks_before_generate_or_unknown_ledger(tmp_path):
+    transport = _Transport(readiness=[
+        {"name": "jwt", "status": "pass", "detail": "present and fresh"},
+        {"name": "studio_api", "status": "pass", "detail": "reachable"},
+        {"name": "captcha_preflight", "status": "pass", "detail": "required: true — generation uses the captcha provider selected by Suno"},
+    ])
+    service = SunoMusicService(ledger_dir=tmp_path, transport=transport)
+    readiness = service.preflight()
+    assert readiness.ready is False and readiness.reason == "captcha_required"
+    with pytest.raises(AiVideoError) as error:
+        service.submit(direct_music(_brief()), paid_generation_authorized=True)
+    assert error.value.code is ErrorCode.PAID_PROVIDER_KNOWN_NO_EFFECT
+    assert "人机验证" in str(error.value)
+    assert transport.calls == []
+    assert not list(tmp_path.glob("*.json"))
+
+
+def test_native_captcha_check_is_retained_when_requirement_changes_after_doctor(tmp_path):
+    direction = direct_music(_brief())
+    transport = _Transport(_Result(2, "", json.dumps({
+        "status": "error", "error": {"code": "captcha_required"},
+    })))
+    service = SunoMusicService(ledger_dir=tmp_path, transport=transport)
+    with pytest.raises(AiVideoError) as error:
+        service.submit(direction, paid_generation_authorized=True)
+    assert error.value.code is ErrorCode.PAID_PROVIDER_KNOWN_NO_EFFECT
+    assert len(transport.calls) == 1
+    assert "--no-browser" in transport.calls[0]
+    assert "--no-captcha" not in transport.calls[0]
+    assert service.recover(blocked_request(direction)).state == "known_no_effect"
+
+
+@pytest.mark.parametrize("checks", [
+    [],
+    [{"name": "captcha_preflight", "status": "pass", "detail": "required: false"}],
+    [{"name": "jwt", "status": "pass"}, {"name": "studio_api", "status": "pass"}, {"name": "captcha_preflight", "status": "pass", "detail": "not required"}],
+    [{"name": "jwt", "status": "pass"}, {"name": "studio_api", "status": "pass"}, {"name": "captcha_preflight", "status": "warn", "detail": "required: false"}],
+    [{"name": "jwt", "status": "pass"}, {"name": "studio_api", "status": "pass"}, {"name": "captcha_preflight", "status": "pass", "detail": "required: false"}, {"name": "captcha_preflight", "status": "pass", "detail": "required: true"}],
+    [{"name": "jwt", "status": "pass"}, {"name": "studio_api", "status": "pass"}, "bad check"],
+])
+def test_incomplete_readiness_never_becomes_generation_permission(tmp_path, checks):
+    transport = _Transport(readiness=checks)
+    service = SunoMusicService(ledger_dir=tmp_path, transport=transport)
+    assert service.preflight().reason == "not_evaluated"
+    with pytest.raises(AiVideoError):
+        service.submit(direct_music(_brief()), paid_generation_authorized=True)
+    assert transport.calls == []
+
+
+def test_preflight_has_no_credit_or_budget_gate_and_replay_does_not_recheck(tmp_path):
+    checks = [
+        {"name": "jwt", "status": "pass"}, {"name": "studio_api", "status": "pass"},
+        {"name": "captcha_preflight", "status": "pass", "detail": "required: false — solver will be skipped"},
+        {"name": "credits", "status": "fail", "detail": "unknown balance"},
+    ]
+    transport = _Transport(_Result(0, json.dumps({"status": "success", "data": [{"id": "clip_0001"}]})), readiness=checks)
+    service = SunoMusicService(ledger_dir=tmp_path, transport=transport)
+    d = direct_music(_brief())
+    assert service.submit(d, paid_generation_authorized=True).submitted
+    assert service.submit(d, paid_generation_authorized=True).submitted
+    assert len(transport.readiness_calls) == 1 and len(transport.calls) == 1
+
+
+def test_doctor_credit_failure_envelope_does_not_become_a_budget_gate(tmp_path):
+    class CreditFailure(_Transport):
+        def run(self, argv, *, timeout_seconds):
+            if "doctor" in argv:
+                return _Result(2, "", json.dumps({"status": "error", "error": {
+                    "code": "config_error", "details": {"checks": [
+                        {"name": "jwt", "status": "pass"},
+                        {"name": "studio_api", "status": "pass"},
+                        {"name": "captcha_preflight", "status": "pass", "detail": "required: false"},
+                        {"name": "credits", "status": "fail", "detail": "unavailable"},
+                    ]},
+                }}))
+            return super().run(argv, timeout_seconds=timeout_seconds)
+    service = SunoMusicService(ledger_dir=tmp_path, transport=CreditFailure())
+    assert service.preflight().ready is True
 
 
 def test_character_theme_silence_and_song_choices():
@@ -242,6 +333,7 @@ def test_unauthorized_unknown_and_changed_payload_do_not_spend_again(tmp_path: P
         service.submit(direction)
     assert denied.value.code is ErrorCode.PAID_PROVIDER_LIVE_AUTHORIZATION_REQUIRED
     assert transport.calls == []
+    assert transport.readiness_calls == []
 
     service.dry_run(direction)
     receipt = tmp_path / f"{service.dry_run(direction).request_id}.json"

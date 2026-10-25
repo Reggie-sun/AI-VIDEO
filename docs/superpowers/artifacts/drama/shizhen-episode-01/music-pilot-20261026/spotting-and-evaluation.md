@@ -103,3 +103,49 @@ Manifest 或 active pointers。没有 Production activation、P6、Final Accepta
 
 本地试听/证据入口：`outputs/shizhen-episode01/suno-v6-music-pilot-20261026/index.html`。
 其中明确区分首镜原声、实际失败记录及未执行的音乐 Prompt，不显示不存在的生成音频。
+
+
+## Official UI Recovery — Current Checkpoint
+
+> 后续用户新增一次测试授权，纯CLI已真实生成并下载另一对Scene04候选；累计4次请求、20 credits。
+> 旧3次及UNKNOWN不变。最新链路证据见docs/record_for_agent/2026-10-26-suno-cli-skill-preflight-repair.md
+> 的Live CLI Recovery；本节“3次耗尽/纯CLI未恢复/盘满”仅保留当时历史状态。
+
+2026-10-26：本节替代上文“只有一次请求/没有音乐”的当前状态，原失败历史保留。
+第2次CLI请求经正常auth --refresh后仍auth_expired，无ID。旧ledger保持UNKNOWN，
+CLI jobs为rejected/ids=[]。doctor外层success与captcha_preflight的pass只是查询成功，
+detail仍为required:true，不能当作生成许可。--no-captcha不豁免平台验证。
+
+用户要求自动操作原reggie/sunruijie42窗口。第3次由已登录官方Create界面单击提交成功，
+没有出现需人工处理的challenge，未求解或搬运token。两个clip均complete：
+
+- A：e61e327c-4e53-4e68-9e52-118e3ac0cb64，WAV183.56秒。
+- B：6de433ab-dab5-4ca4-a0f5-7665a0d48c01，WAV174秒。
+
+这是同次空位动机设计的两个候选，非两个独立实验。chirp-hawk(v6)，Lyrics空，Duration Auto，
+Max Mode/Personalize Off；网页默认滑杆未改：Weirdness50%、Style Influence50%、Variety Normal。
+Styles、Exclude、标题经网页复制读回与原意图逐字比对一致。CLI仅查询status并下载MP3/WAV，
+四文件完整解码通过；WAV为48kHz双声道PCM16。请求3/3次耗尽，未追加。
+余额2500→2490，monthly_usage0→10，实际消耗10 credits，未购买积分。
+
+新证据在outputs/shizhen-episode01/suno-v6-music-pilot-20261026/manual-request-03/：
+consume.json、ui-form-readback.json、status-download.json、credits-after.json、audio-validation.json。
+后者含源clip、文件路径、字节数、SHA及解码结果，试听入口为上级index.html。
+旧认证受阻ZIP只代表首次失败，本次因盘满没有新ZIP。
+
+工程修复：SunoMusicService提交前只读doctor，分别核验jwt/studio_api/captcha要求；
+required:true或检查不明时在generate与UNKNOWN写入之前拒绝，不用积分设置预算gate。
+原submitted/UNKNOWN先走幂等分支。36项精准回归通过，JUnit位于
+.agent/harness/runs/suno-captcha-preflight-repair-focused.xml（非完整Harness回执）。此前related因
+其他任务改变HEAD而scope drift，不能报告相关回归整体通过。Parent自审：新前检仅拒绝
+有障碍的新提交，主要失败路径有测试，无新凭据读取、Product写入或重试，不触发新独立审查；
+旧三轮review不冒充审过新前检。
+
+工程与文件有效性PASS；作曲/主题/声画/最终听感NOT_EVALUATED，当前无法实际听音。
+不以元数据评音乐、不盲裁源区间或排名。S01不加新配乐；并行任务新产出S02待审素材，
+本音乐实验未审听或混合；旧“后续无素材”仅为初检时间点。当前为外部生成候选，
+不关联失败CLI事务，不伪造IMPORTED、Registry激活、P6或成片。canonical资产登记/混音尚未验证，
+未证明独立专业影视配乐闭环生产就绪。学习评估no_candidate，无听音质量证据或独立受控对照。
+磁盘普通用户可用空间0，commit/push受阻；未清理其他任务文件。
+
+Returned clip metadata: tags are different English texts for A/B; negative_tags absent. UI readback does not prove model compliance; see manual-request-03/wav-download.json.

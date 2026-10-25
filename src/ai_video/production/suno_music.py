@@ -53,8 +53,8 @@ _FORBIDDEN_FLAGS = {
     "--force",
     "--max-mode",
     "--headless",
+    "--no-captcha",
 }
-_PAID_COMMANDS = {"generate", "describe", "extend", "cover", "remaster", "concat", "stems"}
 
 
 class MusicDirection(BaseMusicDirection):
@@ -155,7 +155,6 @@ def build_generation_argv(direction: BaseMusicDirection, *, dry_run: bool) -> tu
         direction.exclude,
         "--request-id",
         request_id_for(direction),
-        "--no-captcha",
     ]
     if direction.instrumental:
         argv.append("--instrumental")
@@ -197,6 +196,12 @@ class SunoCallResult(StrictModel):
     detail: str
 
 
+class SunoGenerationReadiness(StrictModel):
+    ready: bool
+    reason: Literal["ready", "captcha_required", "not_evaluated"]
+    detail: str
+
+
 class SunoMusicService:
     def __init__(
         self,
@@ -208,6 +213,46 @@ class SunoMusicService:
         self.ledger_dir = ledger_dir
         self.transport = transport
         self.executable = executable
+
+    def preflight(self) -> SunoGenerationReadiness:
+        """Read authentication and captcha requirements; never gate on credits."""
+        unavailable = SunoGenerationReadiness(
+            ready=False, reason="not_evaluated",
+            detail="Suno 生成认证或人机验证要求未能明确核实，本次没有提交。",
+        )
+        try:
+            payload = _envelope(self._invoke(("doctor",), timeout_seconds=45))
+        except AiVideoError:
+            return unavailable
+        data = payload.get("data")
+        if not isinstance(data, dict):
+            error = payload.get("error")
+            data = error.get("details") if isinstance(error, dict) else None
+            if not isinstance(data, dict):
+                return unavailable
+        checks = data.get("checks")
+        if not isinstance(checks, list) or any(not isinstance(row, dict) for row in checks):
+            return unavailable
+        selected = {}
+        for name in ("jwt", "studio_api", "captcha_preflight"):
+            rows = [row for row in checks if row.get("name") == name]
+            if len(rows) != 1 or rows[0].get("status") != "pass":
+                return unavailable
+            selected[name] = rows[0]
+        detail = selected["captcha_preflight"].get("detail")
+        if not isinstance(detail, str):
+            return unavailable
+        if detail == "required: true" or detail.startswith("required: true — "):
+            return SunoGenerationReadiness(
+                ready=False, reason="captcha_required",
+                detail="Suno 要求生成人机验证；请通过官方正常流程处理。本次没有提交，也不会自动求解验证码。",
+            )
+        if detail != "required: false" and not detail.startswith("required: false — "):
+            return unavailable
+        return SunoGenerationReadiness(
+            ready=True, reason="ready",
+            detail="认证读取及当前无验证码要求已核实，不代表生成或音乐质量已通过。",
+        )
 
     def dry_run(self, direction: BaseMusicDirection) -> SunoCallResult:
         argv = build_generation_argv(direction, dry_run=True)
@@ -273,6 +318,9 @@ class SunoMusicService:
             )
         if existing is not None and existing.state == "submission_unknown":
             raise _unknown("上次提交结果未知。先用 status 核对，不能重新提交。")
+        readiness = self.preflight()
+        if not readiness.ready:
+            raise _no_effect(readiness.detail)
         self._write(
             SunoReceipt(
                 request_id=request_id,
@@ -361,12 +409,10 @@ class SunoMusicService:
         )
 
     def _invoke(self, argv: Sequence[str], *, timeout_seconds: float) -> _Completed:
+        # HTTP-only preserves CLI captcha preflight while disabling its solver.
+        # --no-captcha would skip that preflight and send a tokenless request.
         command = ["--json", "--no-browser", *argv]
         _reject_forbidden(command)
-        if argv[0] in _PAID_COMMANDS and "--no-captcha" not in argv and "--dry-run" not in argv:
-            raise _invalid("付费命令必须关闭内置验证码求解。")
-        if argv[0] == "generate" and "--no-captcha" not in argv:
-            raise _invalid("生成命令必须关闭内置验证码求解。")
         try:
             completed = self.transport.run(command, timeout_seconds=timeout_seconds)
         except TimeoutError as exc:

@@ -1,0 +1,233 @@
+{
+  "schema": "suno-cli-skill-repair-evidence/1",
+  "software_verification": {
+    "recorded_at": "2026-10-25T21:27:26.153695+00:00",
+    "upstream_commit": "6d28c67a733b32183a80d81306bf0013f46b00b7",
+    "cli_version": "0.10.1",
+    "dry_run": {
+      "exit_code": 0,
+      "status": "success",
+      "submitted": false,
+      "model_verified_live": false,
+      "model": "chirp-hawk",
+      "native_captcha_preflight_preserved": true,
+      "browser_solver_allowed": false
+    },
+    "live_readonly_preflight": {
+      "ready": true,
+      "reason": "ready",
+      "detail": "认证读取及当前无验证码要求已核实，不代表生成或音乐质量已通过。"
+    },
+    "new_generation_requests": 0,
+    "remaining_pilot_requests": 0,
+    "historical_unknowns_preserved": true,
+    "rea": {
+      "operation": "list_browser_targets",
+      "endpoint": "http://127.0.0.1:34537",
+      "result": "invalid_endpoint_response",
+      "no_cdp_repair_or_configuration_mutation": true,
+      "interpretation": "REA browser evidence unavailable; no captured request or root-cause proof claimed"
+    },
+    "focused_tests": {
+      "passed": 37,
+      "junit": ".agent/harness/runs/suno-cli-skill-repair-focused.xml"
+    },
+    "hashes": {
+      "src/ai_video/production/suno_music.py": "2751fbe373bea3eab125552f30f46d2bec3ba450f2d1e0f93f03db7a834f0a75",
+      "tests/test_suno_music.py": "66ec978871ffd663a6dcea5a71cd1ca62a91bbbbac3001a53b5d02ab060183f5",
+      "/home/reggie/.agents/skills/suno/SKILL.md": "897a171b567fab95f616deeb637fcf959c82fe4402ea245126f795f245ffaa14",
+      "/home/reggie/.codex/skills/suno/SKILL.md": "897a171b567fab95f616deeb637fcf959c82fe4402ea245126f795f245ffaa14"
+    },
+    "native_review": "NOT_REQUIRED: local deny-only preflight and preservation of CLI check; failure paths covered, no credential/store mutation or retry"
+  },
+  "new_live_authorization": "授权我给你,可以继续生成测试",
+  "live_generation": {
+    "logical_request_number": 4,
+    "previous_maximum": 3,
+    "new_maximum": 4,
+    "request_id": "ebd95316-1986-51d9-8c10-d65b6465b7e2",
+    "clip_ids": [
+      "e3599d34-c24a-4750-ad48-69825671da9b",
+      "1c3f82de-fa9e-43e7-abf0-e366de84caa9"
+    ],
+    "complete": true,
+    "generation_route": "SunoMusicService -> CLI --no-browser (no --no-captcha)",
+    "mp3_wav_full_decode": "PASS",
+    "canonical_asset_registration": "NOT_EXECUTED; two uncommitted GENERATED candidate records built using actual probes",
+    "musical_quality": "NOT_EVALUATED",
+    "final_film_listening": "NOT_EVALUATED",
+    "credits": {
+      "recorded_at": "2026-10-25T21:34:12.314551+00:00",
+      "before": {
+        "total_credits_left": 2490,
+        "monthly_usage": 10
+      },
+      "after": {
+        "total_credits_left": 2480,
+        "monthly_usage": 20
+      },
+      "observed_credits_consumed": 10,
+      "topup": false
+    },
+    "cumulative_credits_consumed": 20,
+    "replay": {
+      "transport_calls": 0,
+      "ids_reused": [
+        "e3599d34-c24a-4750-ad48-69825671da9b",
+        "1c3f82de-fa9e-43e7-abf0-e366de84caa9"
+      ],
+      "prior_consumption_hashes_unchanged": true,
+      "new_paid_request": false
+    }
+  },
+  "artifacts": [
+    {
+      "path": "outputs/shizhen-episode01/suno-v6-music-pilot-20261026/cli-repair-live-04/intent.json",
+      "sha256": "74de8b85832172806f64b273d492ad0088833c5089cfd148def425bee55ae337"
+    },
+    {
+      "path": "outputs/shizhen-episode01/suno-v6-music-pilot-20261026/cli-repair-live-04/dry-run.json",
+      "sha256": "29b6dec12f87758d45b0528159a9a21dfcfcf83bf0acabb52ff3b44fa937c42f"
+    },
+    {
+      "path": "outputs/shizhen-episode01/suno-v6-music-pilot-20261026/cli-repair-live-04/consume.json",
+      "sha256": "f884aa2cf2e10c291c844f483ad8d054724e5f2d5f543cf36d520e227a9e8c53"
+    },
+    {
+      "path": "outputs/shizhen-episode01/suno-v6-music-pilot-20261026/cli-repair-live-04/submit-result.json",
+      "sha256": "a625927f62215f40c730ff61126130f297f9ff37a100775955d569fafba0d407"
+    },
+    {
+      "path": "outputs/shizhen-episode01/suno-v6-music-pilot-20261026/cli-repair-live-04/status-download.json",
+      "sha256": "9c1d430744a81b323712547bfd06e647529b04a98e2f77a1cab8e18014729bf4"
+    },
+    {
+      "path": "outputs/shizhen-episode01/suno-v6-music-pilot-20261026/cli-repair-live-04/wav-download.json",
+      "sha256": "962a9e83bc0bb7c6a135084da8a3b6bdaeae96ad8bbc268a44dfc7f0f65255b9"
+    },
+    {
+      "path": "outputs/shizhen-episode01/suno-v6-music-pilot-20261026/cli-repair-live-04/credits-after.json",
+      "sha256": "c8d4899f47cde4d8b125c9839dcc1359d363558ff54753ca6d724bdd0979f52b"
+    },
+    {
+      "path": "outputs/shizhen-episode01/suno-v6-music-pilot-20261026/cli-repair-live-04/audio-validation.json",
+      "sha256": "441ea55276fbef5bfbd02885a3205c2f1d48e1f75e42a2ce35e2ee8f6e0a1c3a"
+    },
+    {
+      "path": "outputs/shizhen-episode01/suno-v6-music-pilot-20261026/cli-repair-live-04/candidate-assets.json",
+      "sha256": "772bdb91be1eece277c61c17be19d0e4b0e9e0713f0335b4dca95b5a293a4254"
+    },
+    {
+      "path": "outputs/shizhen-episode01/suno-v6-music-pilot-20261026/cli-repair-live-04/clip-info.json",
+      "sha256": "ad56dbe00ce37ea2836df049bb04918bc0f5446538d6d65d7f9670635199639d"
+    },
+    {
+      "path": "outputs/shizhen-episode01/suno-v6-music-pilot-20261026/cli-repair-live-04/replay-verification.json",
+      "sha256": "02a0bc633d4e3ca1b70db19969df9516079b2a8a9ae26fcc7cb295260e50df5a"
+    },
+    {
+      "path": "outputs/shizhen-episode01/suno-v6-music-pilot-20261026/cli-repair-live-04/runner-validation.json",
+      "sha256": "8bdf3ac85acf6f148182afa9484c342d9eacfff3642752efefc040ef6ef0ebae"
+    }
+  ],
+  "media_files": [
+    {
+      "path": "audio/scene04-修复台-两个源文件的缺口-instrumental-bed-1c3f82de.mp3",
+      "clip_id": "1c3f82de-fa9e-43e7-abf0-e366de84caa9",
+      "sha256": "27f95a3a39093e37307845703ed95c6776b07ecb1ab736723f2d9c403b8f2873",
+      "bytes": 4781935,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "48000",
+            "channels": 2
+          },
+          {
+            "codec_name": "mjpeg"
+          }
+        ],
+        "format": {
+          "duration": "214.824000",
+          "size": "4781935"
+        }
+      },
+      "full_decode_exit_code": 0
+    },
+    {
+      "path": "audio/scene04-修复台-两个源文件的缺口-instrumental-bed-1c3f82de.wav",
+      "clip_id": "1c3f82de-fa9e-43e7-abf0-e366de84caa9",
+      "sha256": "7cadb2b2bd16e554e92dead6c29c405e7ec4a48e622b4a935a59cb60fda366e7",
+      "bytes": 41255440,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "pcm_s16le",
+            "sample_rate": "48000",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "214.800000",
+          "size": "41255440"
+        }
+      },
+      "full_decode_exit_code": 0
+    },
+    {
+      "path": "audio/scene04-修复台-两个源文件的缺口-instrumental-bed-e3599d34.mp3",
+      "clip_id": "e3599d34-c24a-4750-ad48-69825671da9b",
+      "sha256": "da47cdc332f277c32cc61aac5ed78c4c4bdef2743727b6a3f39e453b2960eaf6",
+      "bytes": 4448092,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "48000",
+            "channels": 2
+          },
+          {
+            "codec_name": "mjpeg"
+          }
+        ],
+        "format": {
+          "duration": "199.224000",
+          "size": "4448092"
+        }
+      },
+      "full_decode_exit_code": 0
+    },
+    {
+      "path": "audio/scene04-修复台-两个源文件的缺口-instrumental-bed-e3599d34.wav",
+      "clip_id": "e3599d34-c24a-4750-ad48-69825671da9b",
+      "sha256": "41b3d40095cd82559d3c37cedcdcff4890d74b6f4298c1e9b2b39226b263ba8c",
+      "bytes": 38260240,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "pcm_s16le",
+            "sample_rate": "48000",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "199.200000",
+          "size": "38260240"
+        }
+      },
+      "full_decode_exit_code": 0
+    }
+  ],
+  "learning": "no_candidate; source/repair/live are one incident, not independent quality experiments",
+  "related_harness": {
+    "level": "related",
+    "status": "BLOCKED_BY_EXISTING_POLICY_AUDIT_FAILURE",
+    "receipt": ".agent/harness/runs/suno-cli-skill-repair-related/receipt.json",
+    "failed_check": "policy_audit_check",
+    "reason": "Unrelated qualification/watermark source and tests have no policy mapping; downstream suites not run. Receipt predates this documentation update; no final-snapshot PASS claimed."
+  }
+}
