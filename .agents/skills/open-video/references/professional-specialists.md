@@ -11,6 +11,7 @@ Native Codex 使用本地专业方法补足当前决策，再由 `open-video` �
 | 可见人物/场景/道具设定、开场空间依据 | [Production design](../../drama-authoring/references/production-design.md)；Shuohao 方法 | 一致性锚点与开场站位候选，不持有独立 active 站位 |
 | 动态调度、观众注意力、摄影覆盖与剪接意图 | 下方 Blocking And Coverage；DirectorSKILL 方法 | 一份整场调度与 ordered coverage |
 | 听说反应、情绪表现、动作接触与后果 | 下方 Performance And Action；Kangarooking 方法 | 既定事件的可观察表演，不改变剧情事实 |
+| 对白/动作如何共享时间、何时停留或切出、镜头是否装得下 | [Event-Led Timing](event-led-timing.md) | 同一 Shot 的相对节奏、可执行时长选择与切点理由 |
 | 广告受众、角度、Hook、商品如何进入表达 | [Ad creative](../../ad-creative/SKILL.md)；Marketing Skills 方法 | 回既有广告 authoring owner 的创意建议 |
 | 已批准 Shot 的 Seedance 表达 | [Seedance authoring](../../seedance-authoring/SKILL.md) | 预选版本/profile/mode 的 prompt/reference advice；Liyue 仅用于已选 2.5 overlay |
 

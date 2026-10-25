@@ -47,6 +47,11 @@ For staging, performance or physical action, load only the relevant section of
 to the same approved story and coverage; they do not dispatch one another or execute production.
 Skip upstream development for an already approved source or a bounded local repair.
 
+When dialogue rhythm, action timing or shot length is undecided, read
+[Event-Led Timing](references/event-led-timing.md). Direct the causal performance and the reason
+to hold or cut before choosing a feasible generation duration; an allocated clip duration does not
+assign a timestamp to every gesture or line. Preserve fixed user timing and approved source facts.
+
 ## 2. Director Task And Coverage
 
 **Step 1 — Understand the request.** Classify the user's task purpose before checking whether
