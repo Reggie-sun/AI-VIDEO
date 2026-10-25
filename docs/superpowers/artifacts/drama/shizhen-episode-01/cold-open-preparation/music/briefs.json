@@ -1,0 +1,46 @@
+[
+  {
+    "cue_id": "co-diegetic-only",
+    "scene_id": "cold-open-rain-shelter",
+    "script_excerpt": "两位夜班同事在雨站候车，货车遮挡后其中一人缺席。",
+    "emotion": "普通生活与观众独自感到的不安",
+    "scene_facts": "日常对白、货车和雨先成立，不用音乐提前告知异常。",
+    "edit_need": "intentional_silence",
+    "dialogue_present": true
+  },
+  {
+    "cue_id": "co-missing-response",
+    "scene_id": "cold-open-title",
+    "script_excerpt": "她平静地说就我一个。观众记得同伴，城市照常继续，切失帧片名。",
+    "emotion": "高级、冷峻、悬疑；不提供恐惧答案",
+    "scene_facts": "回答后才进入，片名沿同一actual录音；S01前退尽，终场反转仍留雨声。",
+    "edit_need": "underscore",
+    "dialogue_present": true,
+    "musical_design": {
+      "role": "suspense_atmosphere",
+      "narrative_function": "让观众独自保留已经被世界忘记的关系，以未完成应答建立城市主题，不解释消失原因",
+      "style": "cold minimalist electronic chamber score, nocturnal urban mystery, precise and spacious",
+      "instrumentation": "dry bass clarinet offers two short descending notes; granular analog synth carries their residue; thin viola harmonics add a cold edge; controlled low register",
+      "pulse": "slow irregular breath-like pulse, elastic rests, no dance groove",
+      "development": "start sparse after the human answer; repeat a small incomplete cell with widening gaps; withhold its expected reply; open decaying tail, no climax",
+      "mix_intent": "deep quiet space, clean transients; leave speech frequencies open; no location sound effects",
+      "continuity": "return to the same audible cell within this recording; select real phrases for opening and later end slate",
+      "exclusions": "humming, whispers, horror stingers, screeching strings, trailer hits, risers, beat drops, pop chorus, thunder",
+      "listening_checks": [
+        "仅在就我一个的回答余波后进入，观众先读懂空位",
+        "两音与缺失应答须从actual source辨认，不能凭Prompt认定实现",
+        "不能出现人声或突发惊吓，片名不成为预告片高潮",
+        "S01前音乐退尽；片尾延续优先同源区间，结尾反转仍留真实雨声"
+      ]
+    }
+  },
+  {
+    "cue_id": "co-s01-protect",
+    "scene_id": "S01",
+    "script_excerpt": "小程服务林序，提醒里面烫并给饭团垫纸。",
+    "emotion": "日常可信",
+    "scene_facts": "完整复用获认可的S01原片与原音，不加冷开场配乐。",
+    "edit_need": "intentional_silence",
+    "dialogue_present": true
+  }
+]

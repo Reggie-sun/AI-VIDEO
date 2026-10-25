@@ -1,0 +1,173 @@
+{
+  "recorded_at": "2026-10-25T21:11:07.547596+00:00",
+  "delivery_kind": "director_and_offline_material_preparation",
+  "production_receipt": false,
+  "selected_video_route": {
+    "provider": "jimeng",
+    "model": "seedance_2.5",
+    "resolution": "1080p",
+    "aspect_ratio": "16:9",
+    "new_exact_profile": null,
+    "native_compiler_verdict": "NOT_EVALUATED"
+  },
+  "checks": {
+    "director_coverage_structure": "passed",
+    "source_quote_and_sha_joins": "PASS",
+    "budget_sum_seconds": 37,
+    "music_brief_current_schema": "PASS",
+    "suno_cli_offline_dry_run": "PASS",
+    "title_paths_static_chrome_screenshot": "PASS",
+    "protected_sources_unchanged_at_check": "PASS",
+    "local_markdown_links": "PASS"
+  },
+  "source_snapshot": "source-identities.json",
+  "files": [
+    {
+      "path": "README.md",
+      "bytes": 2534,
+      "sha256": "33a25fff33c39f46a2f39c5d21331ac6a3c38b6368b86df74e15519f51a9c7f6"
+    },
+    {
+      "path": "assets/S01-frame-provenance.json",
+      "bytes": 752,
+      "sha256": "21b989a6879059d528d5dc3e50331fd14bca070c5efaf7da8320fc25b97f98c5"
+    },
+    {
+      "path": "assets/S01-late-sample.jpg",
+      "bytes": 41546,
+      "sha256": "7ea3ece7b51281b522903c84ef69c76a361158db065f6fe1b534eeb6d5760659"
+    },
+    {
+      "path": "assets/S01-opening.jpg",
+      "bytes": 94439,
+      "sha256": "4bfb31d9f138f8277c5eaa662e4dcaa874ee7a5efa055aef518b764a9d046848"
+    },
+    {
+      "path": "assets/title-provenance.json",
+      "bytes": 780,
+      "sha256": "03099a5acd1eef4cbfc42d0986e592fe4c3e88ca139f7abd07b1ccfe74488ad2"
+    },
+    {
+      "path": "assets/title-shizhen.paths.svg",
+      "bytes": 1204,
+      "sha256": "326e8aa89d199dd0a7da2ce5b154736c6df12360f64c142fcee1f6e374501023"
+    },
+    {
+      "path": "composition-handoff.md",
+      "bytes": 7534,
+      "sha256": "1175f374aeaf4e88f90be304a61403d6f7389ff77d84e1b40b124c080b94d15c"
+    },
+    {
+      "path": "creative-input.txt",
+      "bytes": 2995,
+      "sha256": "2b1c4bc7b3205ecf575a76b25df53de419d2cf08582351189186237bf8fca8d5"
+    },
+    {
+      "path": "director-coverage.json",
+      "bytes": 33911,
+      "sha256": "3aac019401b2cd8e98af36f972794d21c98cdf945472206a9ee0c282783f9f70"
+    },
+    {
+      "path": "director-treatment.md",
+      "bytes": 9562,
+      "sha256": "fdd92cb5737cf04410925c9a0d24e95119a0b903b87b9a0fa56443fa46a42f4c"
+    },
+    {
+      "path": "music/briefs.json",
+      "bytes": 2706,
+      "sha256": "01f27db01361b864258131e74897b8190882846660c4cef07328f65fe28714bb"
+    },
+    {
+      "path": "music/co-missing-response/dry-run.argv.json",
+      "bytes": 1083,
+      "sha256": "4d72c6b6510a3a3396107f26a0384be45aa1cc711041702f79ac56a74bbf1222"
+    },
+    {
+      "path": "music/co-missing-response/dry-run.result.json",
+      "bytes": 410,
+      "sha256": "d87581ee66c8a2957d67b27d6ea2fdcc464ffa6584a4ddc081bbdd45fc2fca38"
+    },
+    {
+      "path": "music/co-missing-response/exclude.txt",
+      "bytes": 146,
+      "sha256": "a35646b52c3ee69881a6d582be78e1395252483cd32db865328b809c7edab424"
+    },
+    {
+      "path": "music/co-missing-response/handoff.json",
+      "bytes": 410,
+      "sha256": "c6ffb5e63db1a085137e16f54cd0200906a055443932d27ccbeae455aac8f671"
+    },
+    {
+      "path": "music/co-missing-response/qa-preparation.json",
+      "bytes": 1492,
+      "sha256": "7324ca5eac56bb87598c238a09157ea803b284f84f6474280f24382b5a2bff4d"
+    },
+    {
+      "path": "music/co-missing-response/style.txt",
+      "bytes": 685,
+      "sha256": "6489351a9493eb8ec7711c9206bb6c54f7fa6d058f0a2e4313c7938c333cd46a"
+    },
+    {
+      "path": "music/directions.json",
+      "bytes": 3905,
+      "sha256": "8a618f9844c212861c0d78c88eacedabd9ab5d1936483c49cb6f0b0ecc25c01d"
+    },
+    {
+      "path": "music-and-sound.md",
+      "bytes": 6492,
+      "sha256": "07b7f1a18300867d95533f2e79b00adba7493515fe85f7c5d77c20e8ba2cdabd"
+    },
+    {
+      "path": "shot-cards.md",
+      "bytes": 10372,
+      "sha256": "c560e36fd489a5fbc8057ea1bb67908ca868c6cc368c1d680a6cd8b9764dde34"
+    },
+    {
+      "path": "verification/S01-mcp-observation.json",
+      "bytes": 479,
+      "sha256": "0c6a19acc4e2fd6e3193f262649e3f422b15c9a87c2e8213b1067326e600ffe5"
+    },
+    {
+      "path": "verification/S01-probe.json",
+      "bytes": 693,
+      "sha256": "fe28821a6d0dad2b05be90af9e3be5f7758e2a0c91cc4422e65e01d9c1452e05"
+    },
+    {
+      "path": "verification/coverage-validation.json",
+      "bytes": 769,
+      "sha256": "e0008adaa9af53d11b2a00a705dc65f4495d5cb21cb4dc917b691b27990f2aa8"
+    },
+    {
+      "path": "verification/existing-engineering-blockers.json",
+      "bytes": 3480,
+      "sha256": "49c8e347a20fecf654f420e1bcc572cfe9563337ba09b84d7df803199d35c7dd"
+    },
+    {
+      "path": "verification/source-identities.json",
+      "bytes": 2882,
+      "sha256": "a45972ca9ac2dd40f07768c0ec018638de775980124a93959ee7bf26c0260c72"
+    },
+    {
+      "path": "verification/title-review.png",
+      "bytes": 19995,
+      "sha256": "9f927f6729e8920043d189dea6183de47e5352093b883278183803aff649b809"
+    }
+  ],
+  "scope_notes": [
+    "raw request vs inventory reviewed by Parent",
+    "inventory vs coverage reviewed by Parent",
+    "adjacent static camera warning deliberately retained",
+    "no new video, character art, Suno audio, Production writes, activation, P6 or publication"
+  ],
+  "new_live_generation_count": 0,
+  "new_paid_generation_count": 0,
+  "incremental_paid_cost": 0,
+  "historical_suno_settlement": "UNKNOWN / owned by other execution window",
+  "media_quality": "NOT_EVALUATED",
+  "human_review": "NOT_EVALUATED",
+  "final_acceptance": "NOT_EVALUATED",
+  "review_gate": "NATIVE_REVIEW_NOT_REQUIRED",
+  "harness_receipt": ".agent/harness/runs/shizhen-cold-open-prep-related-final-20261026/receipt.json (separate exact staged run; consult its actual status)",
+  "engineering_related_gate": "BLOCKED_BY_EXISTING_REPOSITORY_BASELINE",
+  "engineering_blocker_evidence": "existing-engineering-blockers.json"
+}

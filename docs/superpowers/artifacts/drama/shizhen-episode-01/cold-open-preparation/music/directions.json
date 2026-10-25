@@ -1,0 +1,70 @@
+[
+  {
+    "cue_id": "co-diegetic-only",
+    "role": "silence",
+    "instrumental": false,
+    "title": "cold-open-rain-shelter silence",
+    "tags": "",
+    "exclude": "",
+    "lyrics": "",
+    "duration_policy": "phrase_then_timeline_trim",
+    "clock_owner": "resolved_timeline",
+    "editorial_hint_seconds": null,
+    "duck_under_dialogue": false,
+    "rationale": "剪辑要求留白，这一段不生成配乐。",
+    "generation_required": false,
+    "qa_findings": [
+      "确认成片该段没有新加入的配乐。",
+      "不得把留白改成固定时长的空音频。"
+    ]
+  },
+  {
+    "cue_id": "co-missing-response",
+    "role": "suspense_atmosphere",
+    "instrumental": true,
+    "title": "cold-open-title suspense_atmosphere",
+    "tags": "instrumental score. cold minimalist electronic chamber score, nocturnal urban mystery, precise and spacious. dry bass clarinet offers two short descending notes; granular analog synth carries their residue; thin viola harmonics add a cold edge; controlled low register. slow irregular breath-like pulse, elastic rests, no dance groove. start sparse after the human answer; repeat a small incomplete cell with widening gaps; withhold its expected reply; open decaying tail, no climax. deep quiet space, clean transients; leave speech frequencies open; no location sound effects. return to the same audible cell within this recording; select real phrases for opening and later end slate",
+    "exclude": "vocals, lyrics, choir, spoken word, humming, whispers, horror stingers, screeching strings, trailer hits, risers, beat drops, pop chorus, thunder",
+    "lyrics": "",
+    "duration_policy": "phrase_then_timeline_trim",
+    "clock_owner": "resolved_timeline",
+    "editorial_hint_seconds": null,
+    "duck_under_dialogue": true,
+    "rationale": "让观众独自保留已经被世界忘记的关系，以未完成应答建立城市主题，不解释消失原因",
+    "generation_required": true,
+    "qa_findings": [
+      "正常速度审听情绪、乐器和场景是否一致。",
+      "技术检查通过不能代替成片听感验收。",
+      "成品不得出现人声、哼唱或歌词。",
+      "对白出现时配乐要让开，词义仍须听清。",
+      "悬疑气氛应持续服务于场景，不能突然变成歌曲。",
+      "结合画面核验叙事作用：让观众独自保留已经被世界忘记的关系，以未完成应答建立城市主题，不解释消失原因",
+      "审听音乐发展与表演/切点的关系：start sparse after the human answer; repeat a small incomplete cell with widening gaps; withhold its expected reply; open decaying tail, no climax",
+      "在exact成片中核验声音层次：deep quiet space, clean transients; leave speech frequencies open; no location sound effects",
+      "与实际选定前段对听，不凭文字认定主题延续：return to the same audible cell within this recording; select real phrases for opening and later end slate",
+      "仅在就我一个的回答余波后进入，观众先读懂空位",
+      "两音与缺失应答须从actual source辨认，不能凭Prompt认定实现",
+      "不能出现人声或突发惊吓，片名不成为预告片高潮",
+      "S01前音乐退尽；片尾延续优先同源区间，结尾反转仍留真实雨声"
+    ]
+  },
+  {
+    "cue_id": "co-s01-protect",
+    "role": "silence",
+    "instrumental": false,
+    "title": "S01 silence",
+    "tags": "",
+    "exclude": "",
+    "lyrics": "",
+    "duration_policy": "phrase_then_timeline_trim",
+    "clock_owner": "resolved_timeline",
+    "editorial_hint_seconds": null,
+    "duck_under_dialogue": false,
+    "rationale": "剪辑要求留白，这一段不生成配乐。",
+    "generation_required": false,
+    "qa_findings": [
+      "确认成片该段没有新加入的配乐。",
+      "不得把留白改成固定时长的空音频。"
+    ]
+  }
+]

@@ -1,0 +1,14 @@
+{
+  "exit_code": 0,
+  "status": "success",
+  "dry_run": true,
+  "submitted": false,
+  "model_verified_live": false,
+  "external_model_key": "chirp-hawk",
+  "instrumental": true,
+  "max_mode": false,
+  "request_id": "2bb1b69e-5366-5a31-b413-95c938d4767f",
+  "request_text_matches_prepared": true,
+  "lyrics_empty": true,
+  "note": "allowlisted offline result only; no session metadata or live argv persisted"
+}

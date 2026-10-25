@@ -1,0 +1,16 @@
+{
+  "font_file": "/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc",
+  "font_file_sha256": "b76b0433203017ca80401b2ee0dd69350349871c4b19d504c34dbdd80541690a",
+  "family": "Noto Sans CJK SC",
+  "style": "Regular",
+  "title": "失帧",
+  "glyphs": [
+    "cid14090",
+    "cid16737"
+  ],
+  "units_per_em": 1000,
+  "outline_paths": 2,
+  "runtime_font_dependency": false,
+  "role": "static_title_asset_not_rendered_film",
+  "source_license": "This Font Software is licensed under the SIL Open Font License, Version 1.1. This Font Software is distributed on an \"AS IS\" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the SIL Open Font License for the specific language, permissions and limitations governing your use of this Font Software."
+}

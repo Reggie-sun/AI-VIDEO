@@ -1,0 +1,104 @@
+{
+  "proof": "read_only_engineering_baseline_not_media_acceptance",
+  "head_oid": "e9f5f1284eb10dcda29ca24f802c73c1fbb5fba6",
+  "agent_rules_error": "document budget exceeded: AGENTS.md",
+  "agents_max_bytes": 14000,
+  "agents_actual_bytes": 14235,
+  "policy_audit_unmapped_paths": [
+    "src/ai_video/production/_qualification_quality_repair.py",
+    "src/ai_video/production/qualification_preview_input.py",
+    "src/ai_video/production/watermark_preset.py",
+    "tests/test_jimeng_qualification_trial.py",
+    "tests/test_preview_source_clock.py",
+    "tests/test_qualification_preview_input.py",
+    "tests/test_qualification_quality_repair.py",
+    "tests/test_watermark_preset.py"
+  ],
+  "policy_audit_unreferenced_test_paths": [
+    "tests/test_jimeng_qualification_trial.py",
+    "tests/test_preview_source_clock.py",
+    "tests/test_qualification_preview_input.py",
+    "tests/test_watermark_preset.py"
+  ],
+  "independent_runtime_skill_boundary_test": {
+    "argv": [
+      "python",
+      "-m",
+      "pytest",
+      "-p",
+      "no:cacheprovider",
+      "tests/test_runtime_skill_boundary.py",
+      "-q"
+    ],
+    "result": "2 passed"
+  },
+  "baseline_files": [
+    {
+      "path": "AGENTS.md",
+      "bytes": 14235,
+      "sha256": "bb7d712be16f849de85e682cf82c6f2c2644ba6690da4a5e17d1aba9f2798c12",
+      "matches_HEAD": true
+    },
+    {
+      "path": ".agent/harness/policy.yaml",
+      "bytes": 94666,
+      "sha256": "d9ffc1b71a69aaa90129f5b5e4a9d70cb522172ae4164ea4313a3929c202e96d",
+      "matches_HEAD": true
+    },
+    {
+      "path": ".agent/harness/agent-rules.yaml",
+      "bytes": 2604,
+      "sha256": "5616fb5dc671cef8ecb6d8217326e8e46063139414b29afa4873a62203fb4dab",
+      "matches_HEAD": true
+    },
+    {
+      "path": "src/ai_video/production/_qualification_quality_repair.py",
+      "bytes": 6178,
+      "sha256": "cf5d65695b325a65d33dd7167caa0e3c00ff9f263b35d3f15955133ce1599163",
+      "matches_HEAD": true
+    },
+    {
+      "path": "src/ai_video/production/qualification_preview_input.py",
+      "bytes": 11163,
+      "sha256": "af1dcaf2d24bb9a7c29a7289d74a89288302b20be95fb71bef50e9ee97fffd7d",
+      "matches_HEAD": true
+    },
+    {
+      "path": "src/ai_video/production/watermark_preset.py",
+      "bytes": 8039,
+      "sha256": "b4db3a5bd9101cd3e96c2d4fe22e1047525fe3e9c102be5cc55150dbdabb8682",
+      "matches_HEAD": true
+    },
+    {
+      "path": "tests/test_jimeng_qualification_trial.py",
+      "bytes": 69433,
+      "sha256": "8b1b690ba93a2316d30bd12f523dd70ef269910cc9990adf871d7a1db3199b2a",
+      "matches_HEAD": true
+    },
+    {
+      "path": "tests/test_preview_source_clock.py",
+      "bytes": 2593,
+      "sha256": "5d128e7d3348eafb505fe8089d0a5f7bd55cd9744718a5ae9f8a10d530be39a6",
+      "matches_HEAD": true
+    },
+    {
+      "path": "tests/test_qualification_preview_input.py",
+      "bytes": 6660,
+      "sha256": "d69a1582ddf0c650fc4d62e7dccad0beb3a1fe9e552697c649b7608523a63eff",
+      "matches_HEAD": true
+    },
+    {
+      "path": "tests/test_qualification_quality_repair.py",
+      "bytes": 8851,
+      "sha256": "bb844b7121043931b2f4075d1d3171784ffb497a708ca27fa3769d3d5bf18bc1",
+      "matches_HEAD": true
+    },
+    {
+      "path": "tests/test_watermark_preset.py",
+      "bytes": 3487,
+      "sha256": "ad7f80dd927cf242f75b6b73bf8399a55371d1612e60378a34141d8e9bb2aa02",
+      "matches_HEAD": true
+    }
+  ],
+  "resolution": "left unchanged; outside cold-open preparation scope; related gate not passed"
+}

@@ -1,0 +1,23 @@
+{
+  "result": {
+    "coverage_strategy": "multi_shot",
+    "coverage_unit_count": 5,
+    "creative_input_kind": "direction",
+    "director_intent_is_not_acceptance": true,
+    "director_preflight_request": true,
+    "intent_group_counts": {
+      "acceptable_variation": 1,
+      "must_happen": 23,
+      "must_not_happen": 5,
+      "preferred_performance": 1,
+      "timing_targets": 1
+    },
+    "planned_duration_seconds": 37.0,
+    "qa_admission_required": true,
+    "schema_version": "4",
+    "status": "passed",
+    "strategy_source": "agent_directed"
+  },
+  "advisory_warning": "adjacent static cameras retained for absence comparison; not a structure failure",
+  "proof_boundary": "declared inventory only; no natural-language entailment or media acceptance"
+}

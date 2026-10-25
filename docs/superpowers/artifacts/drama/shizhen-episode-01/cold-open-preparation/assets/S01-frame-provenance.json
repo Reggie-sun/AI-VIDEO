@@ -1,0 +1,18 @@
+[
+  {
+    "path": "assets/S01-opening.jpg",
+    "sha256": "4bfb31d9f138f8277c5eaa662e4dcaa874ee7a5efa055aef518b764a9d046848",
+    "source_sha256": "15c7c21ea8ef526d641d5a1565cbb4ec93ea4ee63b34fc9c7a0d73f2b21efb0b",
+    "seek_seconds": 0,
+    "transform": "ffmpeg frame sample, scale=960:-2, JPEG q3",
+    "role": "local_art_and_boundary_reference_not_registered_asset"
+  },
+  {
+    "path": "assets/S01-late-sample.jpg",
+    "sha256": "7ea3ece7b51281b522903c84ef69c76a361158db065f6fe1b534eeb6d5760659",
+    "source_sha256": "15c7c21ea8ef526d641d5a1565cbb4ec93ea4ee63b34fc9c7a0d73f2b21efb0b",
+    "seek_seconds": 15,
+    "transform": "ffmpeg frame sample, scale=960:-2, JPEG q3",
+    "role": "local_art_and_boundary_reference_not_registered_asset"
+  }
+]

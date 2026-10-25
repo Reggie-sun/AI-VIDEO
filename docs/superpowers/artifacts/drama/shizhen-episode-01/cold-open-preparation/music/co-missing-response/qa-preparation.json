@@ -1,0 +1,20 @@
+{
+  "cue_id": "co-missing-response",
+  "payload_sha256": "3b18721b7b19a37467882c390528252bc985c460d75a3994911dd12464cf3483",
+  "required_findings": [
+    "正常速度审听情绪、乐器和场景是否一致。",
+    "技术检查通过不能代替成片听感验收。",
+    "成品不得出现人声、哼唱或歌词。",
+    "对白出现时配乐要让开，词义仍须听清。",
+    "悬疑气氛应持续服务于场景，不能突然变成歌曲。",
+    "结合画面核验叙事作用：让观众独自保留已经被世界忘记的关系，以未完成应答建立城市主题，不解释消失原因",
+    "审听音乐发展与表演/切点的关系：start sparse after the human answer; repeat a small incomplete cell with widening gaps; withhold its expected reply; open decaying tail, no climax",
+    "在exact成片中核验声音层次：deep quiet space, clean transients; leave speech frequencies open; no location sound effects",
+    "与实际选定前段对听，不凭文字认定主题延续：return to the same audible cell within this recording; select real phrases for opening and later end slate",
+    "仅在就我一个的回答余波后进入，观众先读懂空位",
+    "两音与缺失应答须从actual source辨认，不能凭Prompt认定实现",
+    "不能出现人声或突发惊吓，片名不成为预告片高潮",
+    "S01前音乐退尽；片尾延续优先同源区间，结尾反转仍留真实雨声"
+  ],
+  "verdict": "NOT_EVALUATED"
+}

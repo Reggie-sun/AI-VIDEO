@@ -1,0 +1,15 @@
+{
+  "tool": "project-local video-analysis.video_analyze",
+  "source_sha256": "15c7c21ea8ef526d641d5a1565cbb4ec93ea4ee63b34fc9c7a0d73f2b21efb0b",
+  "sample_times_seconds": [
+    0,
+    5,
+    10,
+    15
+  ],
+  "transcription_requested": false,
+  "audio_understanding_requested": false,
+  "observed_scope": "metadata and sampled frames only; first and late sample visually inspected for art and S01 boundary",
+  "quality_verdict": "NOT_EVALUATED",
+  "new_cold_open_media": false
+}

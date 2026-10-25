@@ -1,0 +1,71 @@
+{
+  "recorded_at": "2026-10-25T21:08:37.565011+00:00",
+  "role": "read_only_preparation_inputs_not_production_qualification",
+  "sources": [
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/screenplay.md",
+      "bytes": 13132,
+      "sha256": "3635c7d177cba5dcf2c814ccb6d1e1e46b93e44d51476e067fa1dafca288d46f"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/production-design.md",
+      "bytes": 11937,
+      "sha256": "4e36e38762bfd55ae6a4ae449c2f07dcb2b572f062058f79f3155ac9e33b0d87"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/final-output-contract.json",
+      "bytes": 12287,
+      "sha256": "b235b3e167ab6b9aa2b4fdf63fa2b7c920d6eb88a570b425314bd98866740e98"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "bytes": 59080,
+      "sha256": "46c2f253c44ea87dd382af48bb28b69c5b0304adba637d03698318de88850464"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/shot-prompts.md",
+      "bytes": 45795,
+      "sha256": "14e34cb0368ea4611cc6b8f67e8239e5b7e8f9825580c9eb26973c70a0832c53"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/S02-preparation/README.md",
+      "bytes": 6599,
+      "sha256": "2cded3d08034a2cd179b626bb803fc5af8d95eb194a7fa1c35d691f7d1ebd933"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/music-pilot-20261026/spotting-and-evaluation.md",
+      "bytes": 9075,
+      "sha256": "5bf6d6724d798e9141ed1f763cae62c0492c6b273a5819fb26bbe074948a9278"
+    },
+    {
+      "path": "outputs/shizhen-episode01/首镜版本索引.json",
+      "bytes": 3220,
+      "sha256": "9b2613b3c89d40de539d08dffdf0253c109470585396208a8729cfb57bc5c8fa"
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-1080p高清版-Seedance2.5-16秒.mp4",
+      "bytes": 51142682,
+      "sha256": "15c7c21ea8ef526d641d5a1565cbb4ec93ea4ee63b34fc9c7a0d73f2b21efb0b"
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-1080p中英双语字幕版-16秒.mp4",
+      "bytes": 16537969,
+      "sha256": "3bbf15995bac0e91033be3689b12f16ad1e09f9eb8a78d53a80cb2724a0d16a1"
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-中英双语字幕.srt",
+      "bytes": 334,
+      "sha256": "d611d365a8813e46ab2d942d74c77f655057cb4dcb36c4f32e2ffab06c017a55"
+    },
+    {
+      "path": "outputs/shizhen-episode01/D-selected-20261026/linxu-D-approved-reference.png",
+      "bytes": 2212838,
+      "sha256": "833cd1f92cbfd0e0d92c451d018be308a854536ed6563e723eb9fd65707b7761"
+    },
+    {
+      "path": "outputs/shizhen-episode01/suno-v6-music-pilot-20261026/STOP-request-02.json",
+      "bytes": 201,
+      "sha256": "fcbc7823a1d516ad04e78a00196170e24ea0319eb4ca86fd0702ac53f97b2114"
+    }
+  ]
+}
