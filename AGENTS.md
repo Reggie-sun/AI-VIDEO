@@ -37,6 +37,8 @@
 
 验收对象是正常速度观看、聆听的 exact 成片；修复不得破坏已满足的视觉/动作/连续性/节奏/音频/叙事，拒绝已知降质方案。技术 PASS、preview、成本不代替验收；Gate 阻断须说明具体要求和失败证据，授权内修复/补证，无解报告最小恢复条件。
 
+默认先审原片，用户认可后自动制作并验收字幕。
+
 ### Empirical Validation Priority
 
 Model-quality uncertainty 主导且有安全、有界、已授权或 local exemption、可负担、可归因的最小实验时，先取证再扩建验证工程；用户要求先 contract 时遵从。实验不产生 Production qualification/activation/P6/Final Acceptance/release/replay truth。
