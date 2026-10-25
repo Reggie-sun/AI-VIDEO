@@ -1,6 +1,6 @@
 ---
 name: ad-creative
-description: Develop product-advertising concepts, hooks, video formats, copy and controlled creative variants from verified product facts or supplied performance data. Provides creative advice to ecommerce-ad-workflow and open-video; does not manage campaigns or execute media production.
+description: Develop product-advertising concepts, exaggerated first-three-second video hooks, product-led visual storytelling, copy and controlled creative variants from verified facts. Provides creative advice to ecommerce-ad-workflow and open-video; does not manage campaigns or execute media production.
 ---
 
 # Ad Creative
@@ -9,6 +9,27 @@ description: Develop product-advertising concepts, hooks, video formats, copy an
 这是本地广告创意专项；Product Truth、claim/source 和商业 authoring contract 继续归
 [Ecommerce Ad Workflow](../ecommerce-ad-workflow/SKILL.md)，镜头统筹归
 [open-video](../open-video/SKILL.md)。不建立第二广告 package、项目状态或执行流程。
+
+## Default Product Video Direction
+
+本项目新创作或获准整体重构的商品广告视频，必须落实以下内容方向；用户当次明确另定风格或
+要求忠实复刻时遵从。只改颜色、字幕、单句或指定片段，不据此擅自重做已批准的整片。
+
+- **前3秒是夸张钩子。** 第一秒就让观众看见异常/反差，在0–3秒用夸张动作、戏剧性反差或直观视觉隐喻
+  形成能看懂的事件，并把使用问题与商品本体或使用动作联系起来；不只靠大字、强音效或口播
+  宣布“震撼”。不强制先出包装，夸张仍受 Product Truth 约束，不能编造实际功效。
+- **后续主体要有产品表现力。** 钩子之后尽快进入连贯的商品展示：看得清本体、材质/结构与
+  尺度，读得懂关键使用或展示动作及其反馈，并由具体画面承载可支持的卖点。按品类选择有效
+  信息，可在同镜完成；不机械规定镜头数或商品露出比例。
+- **剧情和笑点回到产品。** 主要夸张事件要回扣真实商品、使用问题或人物使用反馈；产品要参与
+  行动与转折，不能大段演无关剧情，只在最后亮包装。换景与否由表达决定，因果、动作和声音
+  要连续；结尾用真实商品与品牌收束并兑现开头。
+- **按观众看到的内容复核。** 前3秒能否看出异常、问题及商品关系？后段能否看清是什么、怎样
+  使用/展示、哪一处画面支撑卖点？删掉产品或换成无关商品后，剧情是否仍完全一样？缺少这些信息
+  就修改创意或选材，不用持续解说、密集转场、末尾产品卡或技术通过代替商品表达。
+
+这是广告内容的默认作者要求，回填既有 G2/G3/G5 并按实际成片复核；不新增 Runtime Gate，
+不保证留存、转化或模型必然执行。具体 Hook 与视频组织分别见下列参考。
 
 ## Select Only The Needed Work
 
