@@ -9,6 +9,16 @@ evidence_index_version: "1"
 
 Date: 2026-10-26
 
+## Root Cause Update — 2026-10-26
+
+用户随后要求定位是否与旧 API 失败相同。当前有界上传诊断已复现本地 `upload destination invalid`：ImageX 实际返回的 `tos-lq-x.bytedancevod.com` 不匹配 `jimeng_browser.cjs` 的 `safeUpload` 域名白名单，因此在 binary POST 前被拒；其他返回的 `*.snssdk.com` 节点匹配并可上传，解释了间歇性成功/失败。此更新取代下文 checkpoint 的“根因仍未确证”，原两次 paid receipt、计数和未出片事实保持。
+
+旧 API exact body 的 SHA 与 wire audit 一致，包含 `image_url / first_frame` 和 SHA `13c83ce47482f81da436d6b1d43e3b49a09b09f93250c6f10e647eafb8776923` 的完整图片；方舟返回 HTTP400 / `InputImageSensitiveContentDetected.PrivacyInformation`。本次图片为 `93c4…7d9`、`reference / mode 4`，当前复现的故障是本地上传地址准入，不能将它归因为同一隐私审核。
+
+新增证据为 `R/upload-diagnosis-results.json`（两次 upload 成功、一次 local host 拒绝）、`R/upload-host-format-results.json`（前七个 host 允许，第八个 delegated host 被当前规则拒绝；只执行 Apply，不发 binary/commit）和 `R/root-cause-comparison.json`。已从当前源码提取同一 regex 离线重放，确认 `snssdk.com` 为 true、上述 `bytedancevod.com` host 为 false；排除本次观察中的重复协议拼接，失败 host 的 `upload_host_has_scheme=false`。完整诊断 canonical Manifest hash 未变，新增生成请求 0。
+
+原两次 opaque 异常没有保存被拒 host，不能逐次断言当时具体分配了哪个节点；本轮确证的是相同输入/当前实现可重复出现的上传准入缺陷。共享实现尚未修改，真实生成仍为 0，修复后端审核或 Mini 出片能力未得到验证。可复用定位归 [bug memory](../../.agent/bug-memory/jimeng-imagex-upload-host-allowlist.md)，不扩成模型质量 Learning Claim；自动 learning evaluation 仍为 `no_candidate`。
+
 ## Scope And Exact Inputs
 
 用户要求自主复用《界蚀》旧素材，经正式 `JimengVideoProvider` 做最低成本真实图片参考测试，最后指定 720p，并允许新开页面。目标为 `seedance_2.0_mini`、`multimodal`、720p、9:16、4 秒、一个实际生成请求，内部积分上界 30；不使用 Ark API key。
