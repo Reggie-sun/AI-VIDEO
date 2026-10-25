@@ -8,7 +8,25 @@ evidence_index_version: "1"
 
 Date: 2026-10-25
 
-## Current Checkpoint — S02 Preparation Only
+## Current Checkpoint — S02 Generated, Framing Gate Failed
+
+2026-10-26，用户明确“制作”后，已通过 canonical `GenerationFeedbackOrchestrator`、`VideoGenerationService`、budget reservation 与 one-use permit 完成 S02 一次真实即梦 `seedance_2.5` submit/fetch。同原画布新节点 `node_zm58s0yx4d`，8秒、1080p、16:9、multimodal；四张同源原片帧（60/300/384及新增frame0）分别绑定三位人物和场景，另绑定HD005的林序2.35秒声线参考。编译输出3678字符，单句“这个也算上”、四图一声引用顺序、两机位、取枪来源、1080p、native KEEP及无台词时间戳共10项lint全通过；技术预检不等于模型实现。
+
+已交待审原片 `outputs/shizhen-episode01/失帧-第一集-S02-1080p原片-8秒-待审.mp4`，与 canonical fetch 完全相同，SHA `4617cb5674d67591bd89b7a32d6018be21c4c7b636c6ae7ac518fad7d7cc36ce`，21,979,393 bytes，1920×1080、8.065秒、193 decoded frames、avg_frame_rate=11580/481（约24.07fps VFR）。原标签r_frame_rate=60不是真60帧；原AAC44.1kHz立体声保留，未插帧、重编码、加字幕或改声。发布前仍需沿既有合成owner交付24fps及最终音频编码规格；本次是原片审看，不冒充正式成片。
+
+显式project-local `video_analyze`以0.25秒间隔取得33帧；Parent查看切点两侧和0–8秒样本。确实在3.25–3.5秒间同轴硬切，接瓶、从底座取枪、取亮手机可见，人物与CG质感维持。但第二机位过低，直到片尾仅见店员下巴/躯干和双手，上半张脸被裁；不符合封存的脸手同框目标。当前canonical diagnosis及Agent post-media gate是3 PASS（identity/story-scope/D-art）、2 FAIL（space-camera/coverage）、3 NOT_EVALUATED（完整action/performance/sound），不将tool success、metadata scene=1或样本图当作完整声画验收。白纸范围与道具切镜连续性保留待原速复核，不无据判为全PASS。raw尚未经用户审看，字幕、S03及Production activation均STOP；画面质量修正与本镜可靠听音/口型证据是恢复条件。
+
+S01已用fresh project-local MCP与实际exactHD005原片“认可”、同源转写补当前Parent analyzer逐项判断，经 `review_generation_attempt(..., repair_evidence=True)`追加新experience，Manifest69→70、八项PASS；旧5P/3NE历史、001口型FAIL、003纸接触FAIL及旧audio UNKNOWN全部保留。初次调用只返回旧经验（no-effect replay），已检查后明确evidence repair；无重复S01 submit、无Runtime HUMAN/P6或模型资格提升。
+
+S02是新的logical Shot和独立qualification Project `trial-S02-v1`，沿既有逐镜W02/W03模式，ancestor bundle封存完整S01 Project/Manifest、五次attempt/paid pointers、exact source/认可/新gate；不宣称跨Shot Production activation/handoff。初始R2V错误使用FLF/I2V专用conditioning evidence，被strict preflight拒绝；通过原authoring commit去除不适用字段。随后只绑定林序身份不足三角色，被原Planner拒绝；补三人物独立reference owner和新增frame0场景，并用canonical Project/Character/Scene/Shot revision提交。sound/D-art QA父路径不满足lexical coverage，细化为已有原文scalar leaves，不改observable或降低验收。这些均在任何S02付费提交前完成，保留全部旧revision；当前Project revision3/QA revision2。
+
+全run历史五次S01继续计入，S02新增一次，合计六次真实video submit；无新图、配音或音频理解调用，旧audio UNKNOWN未重试。有限operator bound新增最多一次、不自动retry：S02本单元1500 CRD内部上限、旧S01 3500、合计5000，均不是费用；本次local submit receipt未记录native quote，实际扣费/结算UNKNOWN，不能报上限为支出。原来五次报价和1792 CRD仍仅报价。当前没有第七次授权unit、没有自动重生成或新节点；失败结果保留供审看及后续有据repair。
+
+核心证据在 `runs/shizhen-episode01-jimeng25-20261025-001/S02-execution/`：`prepare.json`、`prompt-lint.json`、`operator-bound.json`、`submit-output.json`、`fetch-output.json`、`exact-MCP-analysis.json`、`S02-canonical-diagnosis.json`、`post-media-gate.json`、`delivery-receipt.json`，canonical Root为 `trial-S02-v1`。执行计划为 `docs/superpowers/plans/2026-10-26-shizhen-S02-production.md`。没有改shared runtime或其他窗口Suno文件；Parent Risk Gate为NATIVE_REVIEW_NOT_REQUIRED：任务本地data caller、沿既有owners、一次有界真实submit，未扩权限或更改production控制行为；已有只读mapper定位成熟模式不冒充审片。
+
+record-ai-video-session本轮更新同一primary record；distill-ai-video-learning评估no_candidate：S02仅一个新尝试，没有能隔离变量的独立重复或对照，不把参考/长prompt/lint通过推为构图保证。核对官方2.5资料只作advisory（[官方指南](https://docs.volcengine.com/docs/ark/seedance-2-5-prompt-guide?lang=en)），不以通用能力说明覆盖本次反例，也没有自动改Skill/Policy/Gate。完成前运行docs contract、owned diff及strict reopen/真实媒体核验；用户尚未认可该S02，按film-first未扩跑完整工程suite。并发baseline AGENTS超字节限制仍保留，未削弱规则或回滚其他窗口。
+
+## Previous Checkpoint — S02 Preparation Only
 
 2026-10-26，用户要求“开始准备第二个shot”。已完成 `docs/superpowers/artifacts/drama/shizhen-episode-01/S02-preparation/` 的导演准备稿、中文模型表达稿及沿existing v4格式的coverage候选；S02约8秒、两个摄影单元，保留唯一一句“这个也算上”，先看林序推咖啡，再看小程接稳、转瓶、从底座取扫码枪，林序用同一右手取出并点亮手机。末尾小程仍完整可见，扫码枪未触发，咖啡瓶底落在台面，纸上饭团保持，为S03同构图缺席提供接点。仅准备，无S02视频提交、无新图/配音生成，无新增费用或公开发布。
 
