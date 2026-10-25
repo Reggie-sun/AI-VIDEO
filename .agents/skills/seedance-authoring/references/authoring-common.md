@@ -44,7 +44,7 @@ subject 与 stable identity
 ```
 
 - 描述可见或可听的内容，不要用 mood label 取代 action。
-- 每个 Shot 保留一个 primary camera intent，除非 approved Shot 明确包含 cut。
+- 每个摄影镜头保留清楚的 primary camera intent；一段戏的镜头数与切点先由 Director 按关注点和反应决定，再组织有序 coverage 与生成片段。本条不把一段戏或一次生成限制为单镜，完整表演也不等于不切镜；明确包含 cut 的 approved coverage 保留其切镜意图。
 - 按 start state -> action -> resulting state 排列事件。Selected duration 无法清晰表达所有 beat
   时，降低 event density。
 - 保留 approved names、appearance、wardrobe、objects、screen axis、direction 与 causal anchors，

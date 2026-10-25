@@ -34,7 +34,7 @@ Shot Contract，再进入本 Skill；不因缺少项目格式就将其归成任�
 新创作或已授权优化中，尚未形成 approved Shot / ordered coverage 的空白、模糊方向、concept/script、
 reference-led brief 或完整 draft prompt，先作为 `DIRECTOR_PREFLIGHT_REQUEST` route 到 `open-video`
 做 Director optimization；在该设计范围内 prompt presence 不等于 approval。已知失败 repair 绑定失败项、
-完整目标与已满足部分，只做有界对应调整；实质改写沿 task 的 human decision gate。
+完整目标与已满足部分，只做有界对应调整；保留表演不自动锁定机位与剪辑。覆盖、摄影或切点有问题时回到 `open-video`，在已有授权范围内修订 coverage 并走原 authoring revision 与执行准入，不把局部修复的变量限制当成导演要求；用户明确要求先审批或超出授权时仍遵从。
 所有分支仍须 approved Shot 与 selected profile，且不能绕过 Provider/paid/egress/permit/media gates。
 Director design 分支中，`open-video` 必须保留用户明确的 subject、action、style、product facts、references 与 exclusions，
 不得以“优化”为名覆盖 hard constraints；其 validator 只验证 declared constraint inventory 的结构、

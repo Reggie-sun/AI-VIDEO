@@ -101,6 +101,10 @@ the selected adapter still validates exact capability. Capability limits cannot 
 approved creative facts. An infeasible strategy returns to Director planning or an explicit gap,
 rather than proceeding on the strength of a well-formed prompt.
 
+先按戏剧关注点、信息揭示、动作因果与人物反应决定摄影镜头和切点，再适配模型的生成片段；剧情段落、摄影镜头、一次生成不默认一一对应。选择固定单镜时须说明该机位与人物调度怎样承载整段戏，不能只以保留完整表演、减少身份漂移或生成方便作为理由；也不按每句对白机械切镜。
+
+修复须保留已经满足的叙事、表演与连续性效果，不能据此自动冻结旧景别、机位、镜长或剪辑。若问题涉及镜头覆盖或动作可读性，回到 Director 在已有授权范围内修订 coverage，再走原 authoring revision、依赖失效与执行准入；局部修复入口只准修改哪些变量，不是不可改变的创作要求，也不授权绕过该入口。
+
 Before crafting an approved Shot or Provider-specific prompt for a `DIRECTOR_PREFLIGHT_REQUEST`,
 create Director Coverage Evidence with:
 
