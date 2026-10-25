@@ -8,7 +8,21 @@ evidence_index_version: "1"
 
 Date: 2026-10-25
 
-## Current Checkpoint — S02 Generated, Framing Gate Failed
+## Current Checkpoint — S02 Raw Approved And Bilingual Captions Delivered
+
+2026-10-26，用户对刚交付的exact S02原片明确回复“这个可以通过,直接上字幕”，绑定raw SHA `4617cb5674d67591bd89b7a32d6018be21c4c7b636c6ae7ac518fad7d7cc36ce`。用户接受这版实际构图并要求直接上字幕；本轮按该明确指令保留原片，不继续裁脸问题的重生成。旧analyzer 2 FAIL/3 NE如实保留，用户认可单独记在 `caption-review-S02-001/S02001-user-approval.json`，不伪造成用户逐条回答八项、Runtime HUMAN证明、模型资格、Production activation或S03准入。
+
+已交付 `outputs/shizhen-episode01/失帧-第一集-S02-1080p中英双语字幕版-8秒.mp4`，SHA `0f475578968d21c23ff593b0a79932caf0bb7391d946793de54db3d9c9b361de`，7,039,711 bytes，1920×1080、24fps CFR、192帧、8秒，AAC48kHz立体声。字幕为中文“这个也算上”在上、英文“Add this too”在下，均无句尾符号；独立字幕为同目录 `失帧-第一集-S02-中英双语字幕.srt`。样式hash与S01双语版相同：`c0258ca10836547a872d57b5ae9def7f97ed5c18174d53e8eccaea6268e90e67`。
+
+复用现有资格素材capture → Registry/CaptionTrack → CompositionSpec/ResolvedTimeline → HyperFrames0.7.103入口，没有改共享字幕或renderer源码，没有直接FFmpeg烧字幕/独立mux旁路。使用已缓存本地Whisper medium对同源音轨盲转写，实际识别“这个也算上”，词时间1.02–2.18秒；最终字幕显示窗1.000–2.208秒，以24fps display frame量化，不把单句创作约束改成固定台词时间戳。中文源script_hash与中英display transcript_hash分别封存，避免重犯S01双语准备时将显示hash误作中文音轨hash的问题。原片和source Manifest SHA均未变；8秒timeline仅省去结尾0.065秒idle/AAC padding。
+
+实际HyperFrames lint/check均0 errors/0 warnings；explicit project-local `video_analyze`对exact字幕MP4取得16帧，Parent查看两行字幕、切镜后与末尾画面，并额外查看frame23/24/25/40/52/53/54字幕边界：23无、24有、52有、53和54无，未见溢出、乱码、句尾符号或cue重叠。同源音轨技术比较首次零lag相关仅约0.0605，进一步FFT对齐确认是AAC编码1024samples（21.33ms）延迟；对齐后mono相关0.999252，384000samples/channel、48kHz双声道完整，无更换声音/变速/增益/额外BGM。该延迟小于一个24fps视频帧，不虚称PCM bit-identical或零延迟，不从相关系数签完整听音验收。
+
+交付是沿原renderer的字幕审看片；实测视频约6.84Mbps、音频195kbps，低于之前建议的正式发布15–20Mbps及256–320kbps，不冒称正式发布编码全部满足。字幕版尚待用户审看，未公开发布、未Production activation、未生成S03。新增生成/付费调用均0，本片video submit总计仍6次，旧audio UNKNOWN未动。
+
+完整证据在 `runs/shizhen-episode01-jimeng25-20261025-001/caption-review-S02-001/`：`prepare-receipt.json`、`render-input-receipt.json`、`composition-spec.json`、`resolved-timeline.json`、`render-receipt.json`、`exact-MCP-analysis.json`、`audio-preservation-check.json`、`delivery-verification-receipt.json`及`cue-boundaries/`。本轮只更新同一primary record，保留其他窗口Suno及cold-open工作；Parent风险判断为NATIVE_REVIEW_NOT_REQUIRED：使用既有caption/render owner制作可逆单镜字幕，未改共享行为或权限。验证只证明其标明层级，未宣称完整工程回归。record-ai-video-session记录该稳定交付；distill-ai-video-learning为no_candidate：单次字幕导出和明确用户认可不构成可推广的独立模型质量实验，不新增或自动采纳规则。
+
+## Previous Checkpoint — S02 Generated, Framing Gate Failed
 
 2026-10-26，用户明确“制作”后，已通过 canonical `GenerationFeedbackOrchestrator`、`VideoGenerationService`、budget reservation 与 one-use permit 完成 S02 一次真实即梦 `seedance_2.5` submit/fetch。同原画布新节点 `node_zm58s0yx4d`，8秒、1080p、16:9、multimodal；四张同源原片帧（60/300/384及新增frame0）分别绑定三位人物和场景，另绑定HD005的林序2.35秒声线参考。编译输出3678字符，单句“这个也算上”、四图一声引用顺序、两机位、取枪来源、1080p、native KEEP及无台词时间戳共10项lint全通过；技术预检不等于模型实现。
 
