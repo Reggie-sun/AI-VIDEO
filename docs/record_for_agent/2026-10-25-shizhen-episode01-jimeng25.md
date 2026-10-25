@@ -20,6 +20,8 @@ Date: 2026-10-25
 
 本轮record-ai-video-session更新primary record；distill-ai-video-learning为no_candidate：没有新模型质量实验，不从准备稿、结构PASS或只读意见推广效果结论。下一步实际执行仍须沿原owner绑定exact前序交接、参考/声音职责、S02专用profile与累计账本；本轮不扩工程、不生成S03或宣称可直接submit。
 
+S02文档checkpoint提交为 `54c8e5f`。执行exact commit-range related Harness时，发现另一窗口已在其parent `5473a4c`（`all`）合入既有大批修改，包括此前留在工作区的AGENTS段落；该baseline AGENTS为14,235 bytes，超现有14,000上限。Scope whitespace及Docs contract PASS，`agent_rules_check`因此FAIL，后续检查停止，receipt为 `.agent/harness/runs/shizhen-S02-preparation-20261026/receipt.json`。本轮不增加AGENTS字节、不放宽budget、不回滚该并发commit，不把本次关联验证记作通过；只保留已完成的创作准备与明确的仓库校验限制。
+
 ## Previous Checkpoint — Bilingual Captions Without Ending Symbols
 
 2026-10-26，用户要求“把结尾不要有符号写进规则,然后我需要中英双版本的”，并明确选择“一份中英双语字幕视频”。已交付 `outputs/shizhen-episode01/失帧-第一集-S01-1080p中英双语字幕版-16秒.mp4`，SHA `3bbf15995bac0e91033be3689b12f16ad1e09f9eb8a78d53a80cb2724a0d16a1`，16,537,969 bytes，1920×1080、24fps、16秒。中文在上、英文在下，同步四个实际对白窗口，两行均无句尾标点或装饰符号，句内逗号及英文缩写撇号保留。对应SRT同目录 `失帧-第一集-S01-中英双语字幕.srt`。此前单语字幕版保留为历史，未倒写其用户验收。
