@@ -46,7 +46,9 @@ index，其他改动保留在工作区。未修改脏的 contract matrix；当�
 - Harness 拒绝 partly staged policy 的 staged scope（同文件保留其他任务的 unstaged 改动），
   因此在已通过上述验证的 owned checkpoint commit 上使用 commit range，隔离其他工作区改动。
   精确 commit-range 的 Harness 结果单独归
-  `.agent/harness/runs/suno-music-direction-related/receipt.json`；以 receipt 实际 verdict/level 为准。
+  `.agent/harness/runs/suno-music-direction-related-r2/receipt.json`；以 receipt 实际 verdict/level 为准。
+  首轮 `suno-music-direction-related/receipt.json` 保留失败：新增测试组漏记 `full_tests.covers_check_ids`，
+  harness 自测发现（320 PASS、1 FAIL），已补登记并重新验证；未降低测试或验收要求。
   Direct JUnit 不冒充 Harness receipt 或全量回归。
 
 ## Review And Learning Decision
