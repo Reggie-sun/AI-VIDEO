@@ -1,6 +1,6 @@
 ---
 name: open-video
-description: Use for AI-VIDEO Director review of selected source plans, or Director design when raw creative input for new creation or authorized optimization—missing, vague direction, concept, script, reference-led brief, or draft prompt—needs approved Shots and ordered coverage; guidance is advisory and must return to AI-VIDEO contracts.
+description: "Use for AI-VIDEO Director review of selected source plans, or Director design when raw creative input for new creation or authorized optimization—missing, vague direction, concept, script, reference-led brief, or draft prompt—needs approved Shots and ordered coverage; guidance is advisory and must return to AI-VIDEO contracts. Also trigger for 拼接、剪辑、连续审看, including joining already-approved Shots: judge adjacent cuts and assembled footage for narrative, performance, pacing and audiovisual continuity; single-Shot approval does not replace assembled-film review."
 ---
 
 # open-video — autonomous director skill

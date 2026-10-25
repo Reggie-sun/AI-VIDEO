@@ -8,7 +8,26 @@ evidence_index_version: "1"
 
 Date: 2026-10-25
 
-## Current Checkpoint — S01–S02 Cumulative Bilingual Review
+## Current Checkpoint — Continuity Repair And Skill Discovery
+
+2026-10-26，用户拒绝先前连续版的接点，并要求“那就加入规则避免这种情况,然后拼接好了给我”，随后指定“或者改这两个skill的description”。本轮采用后者：只扩展open-video与hell-grind-aigc-skill的frontmatter description，保留原description全部既有触发语义与Skill正文，不再增加AGENTS规则。open-video明确已认可Shots的拼接、剪辑、连续审看也要判断叙事/表演/节奏/声画接点；hell-grind明确比较actual predecessor close state与successor open state的人物、道具、位置/轴线、动作与声音。两个Skill的原正文其实已经要求相邻镜头及成片审查；此次是纠正discovery漏触发，不能声称description自动拦截一切旁路。全局hell-grind路径不在Git仓库内，仅已更新本机；旧/新描述及SHA保存在 `continuity-repair-002/skill-description-changes*.json` 与 `final-skill-identities.json`，不虚称该全局文件已被Git提交。
+
+明确修正前一checkpoint的质量边界：24秒旧连续版SHA `a7c978…d568`现在是USER_REJECTED，技术render/解码/字幕/source correlation成功不证明衔接合格。actual source frames确认S01末段饭团已放原白纸；S02 A的f0..79纸消失、f80切B又出现；S01笑后又被S02A重演。只读独立reviewer_high `/root/s02_concept_check`确认旧片纸跳变为blocking，不能靠裁画面或音效掩盖。旧片与原逐镜认可、S02旧3P/2FAIL/3NE、全部paid/fetch历史均保留，用户单镜认可不被倒填为整片通过。
+
+新导演剪辑保留完整S01 16秒，只选S02原source f80..191及其同窗口原声；完整删除有问题的A，包括“这个也算上”一句。普通推瓶交接作有意省略，已建立的同一瓶咖啡进入店员手中，随后取扫码枪与取手机让结账因果仍可理解；不挪对白、重演笑、合成声音或新增生成。独立概念审读确认该省略成立。最终新片为 `outputs/shizhen-episode01/失帧-第一集-S01-S02连续版-1080p中英双语-剪辑修正版.mp4`，SHA `ce7e03ebe8569b3054aa6918eb4006fffb5a6f34c12af813ef44ecb0905e1442`，20,435,296 bytes，1920×1080、24fps CFR、496帧、20.667秒、AAC48kHz双声道；四组S01中英上下字幕保留无句尾符号，S02选段无台词所以不绑定字幕。仍为HyperFrames审看片编码，非宣称正式发布全部码率达标。
+
+唯一timeline与实际render位于 `cumulative-S01-S02-v3/`。为了让连续片中的无台词片段不强制挂字幕，仅将既有 `_captured_dialogue_layout_valid` 的“每Shot必须字幕”改为“实际字幕绑定各自同源音轨”；每Shot原声仍逐一验证exact source身份、完整所选样本窗口、0gain/no fade/ducking，连续visual coverage与development activation fence不变。新增四例覆盖无字幕片段、非零source trim，以及无字幕时错源/样本偏移仍拒绝；TDD先见正例FAIL，修后14项PASS，5文件相关回归186 PASS（77.91秒）；Skill/docs/rules相关123 PASS，两个quick_validate PASS，未运行full工程suite。canonical matrix同步可选字幕边界，不为此改Provider、预算或Production准入。
+
+本地v2先捕获素材再试改Shot时长，被exact project-snapshot fence拒绝，未启动付费或renderer；失败与旧Manifest保留。v3在bootstrap/capture之前完整声明新剪辑Shot时长与scope，再经正常唯一committer新捕获。首次materialize因多传未用style来源拒绝（无外部效果）；第二stage只提供实际timeline引用素材，HyperFrames0.7.103 lint/check均0error/0warning并成功导出。没有降低snapshot/asset-source校验，也没有直接mux或第二渲染时间线。
+
+新exact成片显式调用project-local video_analyze，取得21张全片样本，另由独立context检查接点/末帧；未发现16秒处再次丢纸或重复微笑。独立review有两项non_blocking：S02-F01末尾手机为普通应用而非清晰付款码，Parent确认原用户认可的B表现的是准备付款，保留现有动作、不擅改屏幕；S02-E01正常速度人工听看仍NOT_EVALUATED。exact新片Gemini观察三轮S01原对白及正常日常语速，按canonical timeline原声对比AAC延迟1024samples后相关0.999241；接点前后半秒RMS分别-42.35/-31.99dBFS，此为诊断数据、不证明听感自然。最终候选仍待用户正常播放审看，未伪造HUMAN、完整/4人审、Production qualification/activation、P6/Final Acceptance或S03推进。
+
+本轮没有新video/image/voice生成，video累计仍6次。为旧失败连续版与新exact连续版各执行一次新的音频理解请求，均已知HTTP200成功；新分析不是重试历史S01 UNKNOWN（该UNKNOWN未动）。实际音频分析扣费待结算，两个operator各0.05 USD仅内部upper bound、不是报价或支出。未公开发布。完整证据见 `cumulative-S01-S02-v3/delivery-verification-receipt.json`、`audio-preservation.json`、`exact-MCP-analysis.json`、`render-receipt.json` 与 `continuity-repair-002/joined-v*-audio-understanding.json`。record-ai-video-session更新此同一primary record；distill-ai-video-learning为no_candidate：一次旧片重剪及两层观察不构成独立重复模型实验；这两个description修改直接来自本轮用户授权，不冒称自动学习采纳。
+
+本轮staged related Harness在scope/docs/agent-rules通过后，被既有policy audit的四个未登记测试阻断：`test_jimeng_qualification_trial.py`、`test_preview_source_clock.py`、`test_qualification_preview_input.py`、`test_watermark_preset.py`；这些文件及policy不是本轮改动，不修改登记或放宽audit。失败receipt为 `.agent/harness/runs/shizhen-continuity-description-repair-20261026/receipt.json`，后续checks为skipped，不称related Harness通过；独立直接运行的186项相关测试与123项规则测试事实保持。随后对更新后的owned staged snapshot执行focused Harness，receipt入口为 `.agent/harness/runs/shizhen-continuity-description-focused-20261026/receipt.json`；只有该receipt实际通过才可报告focused成功，不能覆盖related阻断。focused实际也被同一既有policy缺项阻断：`harness_tests`中两项policy-audit断言FAIL、319 PASS，production/open-video后续checks skipped。该focused receipt因此为failed，不能报focused通过。此checkpoint不宣称完整工程闭合或release；只提交已完成相关直接验证的任务文件，保留两个Harness失败receipt供后续原policy owner处理。
+
+## Previous Checkpoint — S01–S02 Cumulative Bilingual Review
+
 
 2026-10-26，用户要求“两个shot拼接在一起我看看,然后把规则改一下,每次新shot合格之后,都要拼接出来给我看”。已交付 `outputs/shizhen-episode01/失帧-第一集-S01-S02连续版-1080p中英双语-24秒.mp4`，SHA `a7c9782275cb2eaab861cce7413f5bbbe87a73c07282a42422ade7550eccd568`，23,615,087 bytes，1920×1080、24fps CFR、576帧、24秒、AAC48kHz双声道。完整S01 16秒后在frame384直接切入完整S02 8秒，无添加转场、停顿、重复、变速、配音或配乐；四组S01与一组S02双语字幕沿各自原轨进入同一timeline，S02字幕实际移至17.000–18.208秒。各独立原片、字幕版及旧审核记录保留，未产生新generation/paid调用、未公开发布、未Production activation或生成S03；24秒整段用户审看仍PENDING。
 

@@ -337,13 +337,32 @@ def _two_captured_dialogue_previews():
     return p, spec, timeline, shots
 
 
-@pytest.mark.parametrize('failure', [None, 'second_source', 'short_second_audio', 'crossed_caption', 'duplicate_shot', 'gap'])
+@pytest.mark.parametrize('failure', [None, 'second_source', 'short_second_audio', 'crossed_caption', 'duplicate_shot', 'gap', 'silent_second', 'silent_second_bad_source', 'silent_second_desync', 'silent_second_trimmed'])
 def test_cumulative_preview_validates_every_shots_exact_source(monkeypatch, failure):
     import ai_video.production.repair_input_admission as admission
     monkeypatch.setattr(admission, 'allows_repair_preview_layer', lambda *_: True)
     monkeypatch.setattr(admission, 'verify_repair_input', lambda *_: SimpleNamespace(
         preview_use=SimpleNamespace(scope='replacement_audio_preview')))
     p, spec, timeline, shots = _two_captured_dialogue_previews()
+    if failure in {'silent_second', 'silent_second_bad_source', 'silent_second_desync', 'silent_second_trimmed'}:
+        # A selected interval with no speech needs no subtitle binding, while its
+        # original source audio must still receive the same identity/window checks.
+        spec.caption_tracks = spec.caption_tracks[:1]
+    if failure == 'silent_second_bad_source':
+        p.registry.assets[-1].audio_metadata.source.input_fingerprint = 'f' * 64
+    elif failure == 'silent_second_desync':
+        timeline.audio_spans[-1].source_start_sample = 1
+    elif failure == 'silent_second_trimmed':
+        spec.layers[-1].trim_start_frame = 80
+        spec.layers[-1].trim_duration_frames = 112
+        spec.audio_tracks[-1].trim_start_sample = 160_000
+        spec.audio_tracks[-1].trim_duration_samples = 224_000
+        timeline.visual_spans[-1].duration_frames = 112
+        timeline.visual_spans[-1].duration_samples = 224_000
+        timeline.audio_spans[-1].source_start_sample = 160_000
+        timeline.audio_spans[-1].source_duration_samples = 224_000
+        timeline.audio_spans[-1].duration_samples = 224_000
+        timeline.total_samples = 992_000
     if failure == 'second_source':
         p.registry.assets[-1].input_fingerprint = 'f' * 64
         p.registry.assets[-1].audio_metadata.source.input_fingerprint = 'f' * 64
@@ -359,7 +378,7 @@ def test_cumulative_preview_validates_every_shots_exact_source(monkeypatch, fail
     def check():
         _validate_captured_dialogue_preview(p, spec, timeline, shots,
             dialogue_tracks=spec.audio_tracks, invalid=lambda message, *_: ValueError(message))
-    if failure is None:
+    if failure is None or failure in {'silent_second', 'silent_second_trimmed'}:
         check()
     else:
         with pytest.raises(ValueError):

@@ -206,7 +206,7 @@ def validate_replacement_preview_narration(
 
 
 def _captured_dialogue_layout_valid(spec, dialogue_tracks) -> bool:
-    """One video and original dialogue per Shot; caption bindings never cross Shots."""
+    """One video and original dialogue per Shot; optional captions never cross Shots."""
     count = len(spec.shot_ids)
     if (not count or len(set(spec.shot_ids)) != count
             or len(spec.layers) != count or len(dialogue_tracks) != count
@@ -217,7 +217,6 @@ def _captured_dialogue_layout_valid(spec, dialogue_tracks) -> bool:
             or {track.shot_id for track in dialogue_tracks} != set(spec.shot_ids)
             or {layer.shot_id for layer in spec.layers} != set(spec.shot_ids)):
         return False
-    covered = set()
     for binding in spec.caption_tracks:
         track = tracks.get(binding.source_audio_track_id)
         if track is None:
@@ -225,8 +224,7 @@ def _captured_dialogue_layout_valid(spec, dialogue_tracks) -> bool:
         bound_shot = getattr(binding, "shot_id", None)
         if bound_shot != track.shot_id and not (count == 1 and bound_shot is None):
             return False
-        covered.add(track.shot_id)
-    return covered == set(spec.shot_ids)
+    return True
 
 
 def _validate_captured_dialogue_preview(
@@ -242,7 +240,7 @@ def _validate_captured_dialogue_preview(
     if (timeline.usage_scope != "development_audio_preview"
             or spec.schema_version != "2.3"
             or not _captured_dialogue_layout_valid(spec, dialogue_tracks)):
-        raise invalid("Captured dialogue requires one captioned exact source per Shot in a development audio preview.")
+        raise invalid("Captured dialogue requires one exact source per Shot with captions bound to its own audio in a development audio preview.")
     intervals = sorted((span.start_sample, span.start_sample + span.duration_samples)
                        for span in timeline.visual_spans)
     if (len(intervals) != len(spec.shot_ids) or intervals[0][0] != 0
