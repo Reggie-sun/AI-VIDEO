@@ -226,6 +226,10 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_seedance_authoring_skill.py, -q]
     cwd: .
     description: Verify minimal Seedance authoring dispatch, progressive version loading, and advisory authority boundaries.
+  music_direction_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_music_direction.py, tests/test_suno_music.py, -q]
+    cwd: .
+    description: Verify authored music direction, Suno offline projection, compatibility and fail-closed recovery without paid generation.
   open_video_skill_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_open_video_skill.py, -q]
     cwd: .
@@ -1633,6 +1637,19 @@ categories:
     focused_check_ids: [seedance_authoring_skill_tests]
     check_ids:
       - seedance_authoring_skill_tests
+      - task_architecture_gate
+  music_direction:
+    patterns:
+      - src/ai_video/production/music_direction.py
+      - src/ai_video/production/suno_music.py
+      - tests/test_music_direction.py
+      - tests/test_suno_music.py
+    focused_check_ids: [music_direction_tests]
+    check_ids:
+      - music_direction_tests
+      - production_composition_audio_tests
+      - native_audio_retime_tests
+      - open_video_skill_tests
       - task_architecture_gate
   open_video_skill:
     patterns:

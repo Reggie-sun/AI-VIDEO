@@ -47,6 +47,11 @@ For staging, performance or physical action, load only the relevant section of
 to the same approved story and coverage; they do not dispatch one another or execute production.
 Skip upstream development for an already approved source or a bounded local repair.
 
+For music spotting, thematic development, score prompts or music repair, read
+[Music Direction](references/music-direction.md). Codex acts as the existing Music Director;
+choose music from the narrative and actual performance before using a selected music tool.
+This does not install another Skill, select a Provider, or authorize generation.
+
 When dialogue rhythm, action timing or shot length is undecided, read
 [Event-Led Timing](references/event-led-timing.md). Direct the causal performance and the reason
 to hold or cut before choosing a feasible generation duration; an allocated clip duration does not

@@ -13,6 +13,7 @@ Native Codex 使用本地专业方法补足当前决策，再由 `open-video` �
 | 听说反应、情绪表现、动作接触与后果 | 下方 Performance And Action；Kangarooking 方法 | 既定事件的可观察表演，不改变剧情事实 |
 | 对白/动作如何共享时间、何时停留或切出、镜头是否装得下 | [Event-Led Timing](event-led-timing.md) | 同一 Shot 的相对节奏、可执行时长选择与切点理由 |
 | 广告受众、角度、Hook、商品如何进入表达 | [Ad creative](../../ad-creative/SKILL.md)；Marketing Skills 方法 | 回既有广告 authoring owner 的创意建议 |
+| 音乐叙事、主题/场景配乐、延续、留白与听感修订 | [Music Direction](music-direction.md) | 同一声音方案与 `SceneMusicBrief.musical_design`；不另建导演或时间线 |
 | 已批准 Shot 的 Seedance 表达 | [Seedance authoring](../../seedance-authoring/SKILL.md) | 预选版本/profile/mode 的 prompt/reference advice；Liyue 仅用于已选 2.5 overlay |
 
 ## Blocking And Coverage
