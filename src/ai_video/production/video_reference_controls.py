@@ -324,12 +324,16 @@ def video_reference_control_report(*, request=None, native_parameters=None, requ
         "outcome": getattr(compilation, "outcome", _NOT_EVALUATED),
         "unsupported_field_paths": unsupported_paths,
     })
+    diagnostic = getattr(compilation, "input_expression_report", None)
+    if diagnostic is not None:
+        compilation_projection["input_expression_report"] = diagnostic.model_dump(mode="json")
     return {
         "schema_version": "video-reference-control-preview/2",
         "performance_control": (performance_authoring_report(
             intent=requirement.generation_intent, characters=requirement.characters,
             rules=expressions, required_ids=tuple(item.requirement_id for item in expressions
-                if item.level == "acceptance"), prompt_text=request.prompt_text if request is not None else None)
+                if item.level == "acceptance"), prompt_text=request.prompt_text if request is not None
+                    else diagnostic.prompt_text if diagnostic is not None else None)
             if requirement is not None else _NOT_EVALUATED),
         "selected_route": ({"provider_name": request.provider_name, "model_id": request.model_id,
             "mode": request.mode.value, "capability_id": request.capability_id,
@@ -378,7 +382,7 @@ def prepared_generation_report(prepared):
         if candidate.candidate_id == prepared.decision.selected_candidate_id), None)
     expressions = selected.recipe.expressions if selected is not None else ()
     binding = prepared.execution_binding
-    requirement = binding.projection.requirement if binding is not None else None
+    requirement = binding.projection.requirement if binding is not None else getattr(prepared, "requirement", None)
     if prepared.resolved_request is not None:
         parameters = None
         # These API families expose a pure scalar view of the actual payload builder.

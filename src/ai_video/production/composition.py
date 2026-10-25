@@ -10,6 +10,7 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production._composition_visual import (
     resolve_preview_layer_ids,
     resolve_shot_visual_spans,
+    validate_replacement_preview_narration,
 )
 from ai_video.production._composition_source_duration import content_driven_video_frames
 from ai_video.production._composition_native_audio import resolve_native_audio_spans
@@ -818,6 +819,14 @@ def _resolve_composition(
                 duration_frames_by_shot=duration_frames_by_shot, text_layers=True,
             )
     provisional = ResolvedTimeline(**timeline_fields)
+    if timeline_fields.get("usage_scope") == "development_audio_preview":
+        validate_replacement_preview_narration(
+            project,
+            spec,
+            provisional,
+            shots_by_id,
+            invalid=_invalid,
+        )
     fingerprint = timeline_fingerprint(provisional)
     return seal_artifact(
         provisional.model_copy(update={"composition_fingerprint": fingerprint})

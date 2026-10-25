@@ -119,10 +119,11 @@ oldQA、失败receipt/bytes/全部NE保持，实际planner是explicit goal revis
 
 用户已购500万tokens的Seedance2.5包，正常console只读观察仍生效、剩约384.56万tokens。
 官方规则区分开通资格与具体模型抵扣；该包不能覆盖当前2.0 Fast的POST，不以cash negative断言所有模型不可用。
-Parent提出2.5方向后，用户明确“别用2.5太贵了”。停止该方向；选定model仍
-`doubao-seedance-2-0-fast-260128`、480p，本任务2.5提交0、总物理POST仍3。
+Parent提出2.5方向后，误将费用提醒解释为禁止2.5并固定Fast2.0；用户最新明确“我是要复刻不是说不让用2.5”。
+撤销该错误限制，以原画布剧情、参考职责、动作/视点与声音为准选择model，480p保持。
+2.5可用作候选，原画布model观察与实际选择差异必须公开；本任务2.5提交0、总物理POST仍3。
 没有新的budget/permit/Production写入。解除当前选定API账户/模型的计费拒绝后，再核对known-no-effect
-正常恢复与新的有限单元；不能切模型、改task/Shot/root或借pre-transport reconciliation抹掉实际POST。
+正常恢复与新的有限单元；必要model变化须通过原routing/恢复/预算/permit，不改task/Shot/root或借pre-transport reconciliation抹掉实际POST。
 本修订只保存执行约束与解释纠正，不预先宣称恢复已实现、账号匹配或完整spec验收。
 
 ## Current Evidence

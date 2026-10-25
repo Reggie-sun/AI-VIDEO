@@ -5,11 +5,82 @@ There is no selection, timeline, media lookup, authorization or state here.
 """
 
 from collections import defaultdict
-from typing import Literal
+from typing import Annotated, Literal
 
 from pydantic import Field, field_validator, model_validator
 
 from ai_video.production.artifact_contracts import StrictModel
+from ai_video.production.hashing import canonical_sha256
+
+
+class NativeTextFragmentBinding(StrictModel):
+    intent_path: str = Field(pattern=r"^generation_intent\.[A-Za-z0-9_.]+$")
+    fragment_indices: tuple[Annotated[int, Field(strict=True, ge=0)], ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _unique_indices(self):
+        if len(set(self.fragment_indices)) != len(self.fragment_indices):
+            raise ValueError("native text fragment indices must be unique")
+        return self
+
+
+class NativeTextMapping(StrictModel):
+    """QA-owned references to its existing fragments, never a second intent."""
+    contract_version: Literal["native-text-mapping/1"] = "native-text-mapping/1"
+    intent_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    bindings: tuple[NativeTextFragmentBinding, ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def _unique_paths(self):
+        paths = tuple(item.intent_path for item in self.bindings)
+        if len(set(paths)) != len(paths):
+            raise ValueError("native text mapping paths must be unique")
+        return self
+
+
+class NativeTextExpressionReport(StrictModel):
+    """Read-only diagnostics, never a request or an acceptance receipt."""
+    prompt_text: str
+    prompt_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    missing_requirement_paths: tuple[str, ...]
+    coverage_source: Literal["selected_qa_final_text"] = "selected_qa_final_text"
+    rejected_coverage_source: Literal["inherited_automatic_prose"] = "inherited_automatic_prose"
+    actual_quality: Literal["NOT_EVALUATED"] = "NOT_EVALUATED"
+
+
+def native_text_mapping_evidence(expressions, intent, prompt):
+    """Return only explicit scalar paths whose selected QA fragments are present.
+
+    This checks identities elsewhere sealed by the recipe, path existence and
+    exact text. It does not determine whether the author's phrase is equivalent
+    to the intent, natural, or contradicted by another phrase.
+    """
+    controls, issues = set(), {}
+    intent_payload = intent.model_dump(mode="json")
+    intent_sha256 = canonical_sha256(intent_payload)
+    payload = {"generation_intent": intent_payload}
+    for item in expressions:
+        mapping = item.native_text_mapping
+        if mapping is None or item.stage != "raw_generation" or item.level == "diagnostic":
+            continue
+        for binding in mapping.bindings:
+            path = binding.intent_path
+            node = payload
+            try:
+                for key in path.split("."):
+                    node = node[int(key)] if isinstance(node, (list, tuple)) and key.isdecimal() else node[key]
+                valid = (mapping.intent_sha256 == intent_sha256
+                    and path in item.intent_paths and node is not None
+                    and not isinstance(node, (dict, list, tuple))
+                    and all(index < len(item.native_text) and item.native_text[index].strip()
+                        and item.native_text[index] in prompt for index in binding.fragment_indices))
+            except (KeyError, IndexError, TypeError, ValueError):
+                valid = False
+            if valid:
+                controls.add(path)
+            else:
+                issues.setdefault(item.requirement_id, []).append(path)
+    return tuple(sorted(controls)), {key: tuple(value) for key, value in issues.items()}
 
 
 class ReferenceDuty(StrictModel):

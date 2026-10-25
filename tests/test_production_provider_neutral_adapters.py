@@ -401,7 +401,8 @@ def test_requirement_nominal_output_preserves_timing_intent(
     assert not output.matches_timing_measurement(duration_milliseconds=5042, frame_count=122)
 
 
-def test_minimax_h3_compiles_neutral_t2v_to_exact_offline_capability() -> None:
+@pytest.mark.parametrize("untimed", [False, True])
+def test_minimax_h3_compiles_neutral_t2v_to_exact_offline_capability(untimed) -> None:
     context = _context(motion=MotionRequirement.FREE_COMPLEX, important=False)
     output = _h3_output()
     projection = _replace_requirement(
@@ -414,6 +415,14 @@ def test_minimax_h3_compiles_neutral_t2v_to_exact_offline_capability() -> None:
         ),
         audio_need=AudioNeed.OPTIONAL,
     )
+    if untimed:
+        from ai_video.production.video_requirement import DialogueIntent
+        projection = _replace_requirement(projection, generation_intent=GenerationIntent(
+            dialogue_intent=DialogueIntent.model_validate({
+                "mode": "conversation", "language": "zh", "turns": [
+                    {"speaker_id": "clerk", "verbatim_text": "慢点，里面烫。",
+                     "on_screen": False, "lip_sync_required": False,
+                     "response_obligation": "倾听后再反应。"}]})))
     compiler = AdapterCompilerContract.create(
         compiler_id="minimax-h3-video-compiler",
         compiler_version="1",
@@ -438,6 +447,11 @@ def test_minimax_h3_compiles_neutral_t2v_to_exact_offline_capability() -> None:
         routing.provider_bound_request,
         projection.requirement,
     )
+
+    if untimed:
+        assert isinstance(compiled, ProviderRequirementUnsupported)
+        assert "generation_intent.dialogue_intent.mode" in compiled.unsupported_field_paths
+        return
 
     assert isinstance(compiled, CompiledProviderVideoRequest)
     resolved = provider.resolve(compiled.request)

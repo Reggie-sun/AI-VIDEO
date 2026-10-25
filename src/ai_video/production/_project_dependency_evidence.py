@@ -11,12 +11,15 @@ from ai_video.production.dependency import (
 from ai_video.production.models import (
     DependencyGraphSnapshot,
     DependencyGraphSnapshotPointer,
+    DependencyLifecycle,
     DependencyNode,
+    DependencyNodeKind,
     DependencyNodeState,
     DependencySemanticRole,
     FingerprintContribution,
     LoadedProductionProject,
     ProjectDependencyEvidence,
+    RenderDependencyEvidence,
     Shot,
     StateCommitStatus,
     VersionedArtifact,
@@ -29,6 +32,57 @@ def _invalid(message: str) -> AiVideoError:
         user_message=message,
         retryable=False,
     )
+
+
+def verify_retired_render_unit(bundle, graph, load_graph, load_render_state) -> None:
+    """Bind retained history to its committed origin graph, not a row count."""
+    kinds = {DependencyNodeKind.COMPOSITION_SPEC, DependencyNodeKind.RESOLVED_TIMELINE,
+        DependencyNodeKind.RENDERER_SOURCE, DependencyNodeKind.RENDER}
+    active_ids = {node.node_id for node in graph.nodes}
+    states = tuple(state for state in bundle.manifest.dependency_states
+        if state.node_id not in active_ids
+        and state.lifecycle is DependencyLifecycle.SUPERSEDED
+        and isinstance(state.applied_evidence, RenderDependencyEvidence)
+        and state.applied_evidence.pointer == bundle.manifest.active_render_state)
+    if any(node.kind in kinds for node in graph.nodes) or len(states) != 4:
+        raise _invalid("Active render evidence must match the Manifest-selected render state.")
+    revisions = {state.graph_revision_id for state in states}
+    if len(states) != 4 or len(revisions) != 1:
+        raise _invalid("Retired render history must preserve one complete origin unit.")
+    origin_revision = next(iter(revisions))
+    selected = load_render_state(bundle, bundle.manifest.active_render_state)
+    pointers = {
+        attempt.candidate_dependency_graph for attempt in bundle.manifest.attempts
+        if attempt.status is StateCommitStatus.SUCCEEDED
+        and attempt.operation == "render_state"
+        and attempt.attempt_id == selected.attempt_id
+        and attempt.candidate_render_state == bundle.manifest.active_render_state
+        and attempt.candidate_project == selected.project
+        and attempt.candidate_registry == selected.registry
+        and attempt.renderer_selection is not None
+        and attempt.renderer_selection.timeline_fingerprint == selected.timeline_fingerprint
+        and attempt.candidate_dependency_graph is not None
+        and attempt.candidate_dependency_graph.revision_id == origin_revision
+    }
+    if len(pointers) != 1:
+        raise _invalid("Retired render history has no exact committed origin graph.")
+    origin = load_graph(bundle.root, next(iter(pointers)))
+    nodes = tuple(node for node in origin.nodes if node.kind in kinds)
+    if len(nodes) != 4 or {node.kind for node in nodes} != kinds:
+        raise _invalid("Retired origin graph does not contain one complete render unit.")
+    by_id = {node.node_id: node for node in nodes}
+    if {state.node_id for state in states} != set(by_id):
+        raise _invalid("Retired render history node identities differ from the origin graph.")
+    desired = desired_fingerprints(origin)
+    for state in states:
+        node, evidence = by_id[state.node_id], state.applied_evidence
+        if (not isinstance(evidence, RenderDependencyEvidence)
+                or evidence.pointer != bundle.manifest.active_render_state
+                or evidence.artifact_id != node.artifact_id
+                or evidence.artifact_fingerprint != desired[node.node_id]
+                or state.applied_fingerprint != desired[node.node_id]
+                or state.desired_fingerprint != desired[node.node_id]):
+            raise _invalid("Retired render history does not match its origin evidence.")
 
 
 def matching_evidence_artifacts(

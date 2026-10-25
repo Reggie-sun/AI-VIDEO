@@ -1,0 +1,8 @@
+ M docs/record_for_agent/2026-10-11-mecha-ant-seedance480-canvas.md
+ M docs/record_for_agent/2026-10-11-reusable-canvas-production-harness.md
+ M docs/superpowers/plans/2026-10-11-reusable-canvas-production-harness.md
+ M docs/superpowers/specs/2026-10-11-reusable-canvas-production-harness.md
+ M docs/v0.2-runtime-baseline.md
+?? docs/record_for_agent/2026-10-20-add-scenario-blender-blockout-skill.md
+?? docs/superpowers/plans/2026-10-11-canvas-paid-no-effect-retarget.md
+?? outputs/

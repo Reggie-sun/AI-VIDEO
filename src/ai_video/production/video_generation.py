@@ -142,6 +142,7 @@ class VideoGenerationService:
                 loaded=(load_production_project(self._committer.project_root / "project.yaml")
                     if binding.continuity_routing is not None else None),
                 routing=binding.continuity_routing,
+                expected_request=request.activation_scope.request if request.activation_scope else None,
             )
             if not isinstance(result, CompiledProviderVideoRequest):
                 raise ValueError("current Provider compiler cannot express the bound recipe")
@@ -255,6 +256,20 @@ class VideoGenerationService:
                 retryable=False,
             )
         return attempt, state
+
+    def _require_production_candidate_promotion(self, state) -> None:
+        pointer = getattr(state, "execution_binding", None)
+        if pointer is None:
+            return
+        binding = self._committer._reopen_generation_execution_binding(pointer)
+        if binding.policy.execution_purpose == "qualification":
+            raise AiVideoError(
+                code=ErrorCode.PRODUCTION_STATE_INVALID,
+                user_message=(
+                    "Qualification execution cannot prepare a production candidate."
+                ),
+                retryable=False,
+            )
 
     def submit_once(
         self,
@@ -833,6 +848,7 @@ class VideoGenerationService:
         """Finish only the durable next post-submit phases, replaying no effect."""
 
         attempt, state = self._state(attempt_id)
+        self._require_production_candidate_promotion(state)
         if (
             attempt.status.value == "succeeded"
             and state.phase is VideoAttemptPhase.ACTIVATE
@@ -878,6 +894,7 @@ class VideoGenerationService:
         """Perform exactly one canonical prepare action without any activation."""
 
         attempt, state = self._state(attempt_id)
+        self._require_production_candidate_promotion(state)
         if (
             attempt.status is not StateCommitStatus.RUNNING
             or state.phase is not VideoAttemptPhase.VALIDATE

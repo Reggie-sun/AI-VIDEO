@@ -10,7 +10,11 @@ const profile = {account_sha256: crypto.createHash('sha256').update('account-a')
   project_id:'f0ed223b-090e-4ed6-b394-283f8b7dbd07',node_id:'node_bq6wajb5xe',
   model_id:'seedance_2.5',resolution:'720p',duration_seconds:5,
   credit_upper_bound:30,benefit_amount:5,benefit_type:'seedance_25_720p_output'};
-const params={model_name:profile.model_id,aspect_ratio:'16:9',resolution:'720p',duration_ms:5000};
+const materials=[{index:0,kind:'image',asset_id:'fault-image',asset_sha256:'a'.repeat(64),
+  size_bytes:1,storage_id:'fixture-image'}];
+const params={mode:4,model_name:profile.model_id,aspect_ratio:'16:9',resolution:'720p',
+  duration_ms:5000,prompt:'fixture {{image:0}}',materials:[{type:2,image_uri:'fixture-image'}],
+  meta_list:[{type:1,text:'fixture '},{type:2,material_idx:0}]};
 const ids={submit_id:'cedcb4bc-5bb5-4c8e-9c10-278f4f388518',resource_id:'71949d15-dac1-4642-b83c-24f238650876'};
 const timers=[];
 let resolveNative, foreignEnvelope, calls=0, exposed={}, routes=[];
@@ -103,7 +107,7 @@ async function main(){
       return {status:'success'};
     };
   }
-  const submitting=submit(page,{profile,video_params:params,materials:[]},s);
+  const submitting=submit(page,{profile,video_params:params,materials},s);
   submitting.catch(()=>{});
   if(scenario==='binding_unavailable'){
     await assert.rejects(submitting);assert.equal(calls,0);
@@ -125,7 +129,7 @@ async function main(){
   if(scenario==='concurrent'){
     // Wait for the first native invocation, not a timing-only sleep.
     while(!resolveNative) await new Promise(resolve=>setImmediate(resolve));
-    await assert.rejects(submit(page,{profile,video_params:params,materials:[]},await session()));
+    await assert.rejects(submit(page,{profile,video_params:params,materials},await session()));
     resolveNative({status:'error'});await assert.rejects(submitting);return;
   }
   if(scenario.startsWith('timeout_late_')){

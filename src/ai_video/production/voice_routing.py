@@ -451,7 +451,7 @@ def route_blockers(requirement, candidate):
     # admitted. Other registered adapters remain explicit capability gaps.
     compiler = candidate.compiler_contract
     if (compiler.compiler_id, compiler.compiler_version) not in {
-        ("vidu-video-compiler", "3"), ("seedance-video-compiler", "2")
+        ("vidu-video-compiler", "3"), ("seedance-video-compiler", "2"), ("seedance-video-compiler", "4")
     }:
         return ("VOICE_COMPILER_UNSUPPORTED",)
     return (binding.readiness.native_blockers if binding.route is VoiceRoute.NATIVE

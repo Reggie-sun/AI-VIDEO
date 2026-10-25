@@ -13,6 +13,7 @@ from typing import Literal
 
 from pydantic import Field, PrivateAttr, SerializerFunctionWrapHandler, model_serializer, model_validator
 
+from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production._shot_router_contracts import (
     ContinuityProviderRouteBinding,
     ProviderRouteIdentity,
@@ -128,6 +129,250 @@ class GenerationDecisionExecutionBinding(StrictModel):
             (item for item in self.inputs.candidates if item.candidate_id == self.decision.selected_candidate_id),
             None,
         )
+        if selected is not None and self.policy.execution_purpose == "qualification":
+            selected_variant = next(
+                (
+                    item
+                    for item in selected.capabilities.variants
+                    if item.capability_id == selected.capability_id
+                ),
+                None,
+            )
+            limits = self.inputs.limits
+            runtime_repair = self.decision.runtime_repair
+            from ai_video.production.generation_runtime_repair import (
+                is_paid_no_effect_repair_grant_for_evidence,
+            )
+
+            paid_retarget = (
+                runtime_repair.paid_no_effect_retarget
+                if runtime_repair is not None
+                and runtime_repair.schema_version in {"runtime-repair/3", "runtime-repair/6"}
+                else None
+            )
+            initial_trial = (
+                limits.paid_submit_ceiling == 1
+                and limits.paid_submits_used == 0
+                and runtime_repair is None
+            )
+            recovery_trial = (
+                limits.paid_submit_ceiling == 2
+                and limits.paid_submits_used == 1
+                and paid_retarget is not None
+                and paid_retarget.target_scope_hash == selected.scope_hash
+                and runtime_repair.evidence_hash == self.inputs.latest_attempt_hash
+                and any(
+                    not grant.consumed and grant.authorization == runtime_repair
+                    for grant in self.inputs.runtime_repairs
+                )
+            )
+            recovery_trial_three = False
+            if (
+                limits.paid_submit_ceiling == 3
+                and limits.paid_submits_used == 2
+                and runtime_repair is not None
+                and runtime_repair.schema_version == "runtime-repair/3"
+                and paid_retarget is not None
+                and paid_retarget.target_scope_hash == selected.scope_hash
+                and runtime_repair.evidence_hash == self.inputs.latest_attempt_hash
+                and len(self.inputs.runtime_repairs) == 2
+                and sum(grant.consumed for grant in self.inputs.runtime_repairs) == 1
+                and sum(grant.authorization == runtime_repair
+                        for grant in self.inputs.runtime_repairs) == 1
+                and all(
+                    grant.authorization.schema_version == "runtime-repair/3"
+                    and grant.authorization.paid_no_effect_retarget is not None
+                    for grant in self.inputs.runtime_repairs
+                )
+                and len({grant.authorization.attempt_id for grant in self.inputs.runtime_repairs}) == 2
+            ):
+                repair_evidence = []
+                for grant in self.inputs.runtime_repairs:
+                    matches = [
+                        evidence for evidence in self.inputs.evidence
+                        if evidence.attempt_id == grant.authorization.attempt_id
+                        and evidence.evidence_hash == grant.authorization.evidence_hash
+                    ]
+                    if (
+                        len(matches) != 1
+                        or matches[0].outcome not in {"runtime_failure", "not_submitted"}
+                        or matches[0].artifact_sha256 is not None
+                        or matches[0].findings
+                        or matches[0].unresolved_quality_refs
+                    ):
+                        break
+                    repair_evidence.append(matches[0])
+                recovery_trial_three = (
+                    len(repair_evidence) == 2
+                    and runtime_repair.evidence_hash == repair_evidence[-1].evidence_hash
+                    and not next(
+                        grant for grant in self.inputs.runtime_repairs
+                        if grant.authorization == runtime_repair
+                    ).consumed
+                    and (repair_evidence[-1].outcome != "not_submitted"
+                         or any(is_paid_no_effect_repair_grant_for_evidence(grant, repair_evidence[-1])
+                                for grant in self.inputs.runtime_repairs))
+                )
+            recovery_trial_four = False
+            if (
+                limits.paid_submit_ceiling == 4
+                and limits.paid_submits_used == 3
+                and runtime_repair is not None
+                and runtime_repair.schema_version == "runtime-repair/6"
+                and paid_retarget is not None
+                and paid_retarget.target_scope_hash == selected.scope_hash
+                and runtime_repair.evidence_hash == self.inputs.latest_attempt_hash
+                and len(self.inputs.runtime_repairs) == 3
+                and len({grant.authorization.attempt_id for grant in self.inputs.runtime_repairs}) == 3
+                and sum(grant.consumed for grant in self.inputs.runtime_repairs) == 2
+                and sum(grant.authorization == runtime_repair
+                        for grant in self.inputs.runtime_repairs) == 1
+            ):
+                prior_grants = [
+                    grant for grant in self.inputs.runtime_repairs
+                    if grant.authorization != runtime_repair
+                ]
+                repair_evidence = []
+                for grant in self.inputs.runtime_repairs:
+                    matches = [
+                        evidence for evidence in self.inputs.evidence
+                        if evidence.attempt_id == grant.authorization.attempt_id
+                        and evidence.evidence_hash == grant.authorization.evidence_hash
+                    ]
+                    if (
+                        len(matches) != 1
+                        or matches[0].outcome not in {"runtime_failure", "not_submitted"}
+                        or matches[0].artifact_sha256 is not None
+                        or matches[0].findings
+                        or matches[0].unresolved_quality_refs
+                        or matches[0].task_id != limits.task_id
+                        or matches[0].shot_id != self.context.target_shot_id
+                    ):
+                        break
+                    repair_evidence.append(matches[0])
+                extension = runtime_repair.paid_no_effect_extension
+                current_grants = [
+                    grant for grant in self.inputs.runtime_repairs
+                    if grant.authorization == runtime_repair
+                ]
+                recovery_trial_four = (
+                    len(repair_evidence) == 3
+                    and len(prior_grants) == 2
+                    and all(
+                        grant.consumed
+                        and grant.authorization.schema_version == "runtime-repair/3"
+                        and grant.authorization.paid_no_effect_retarget is not None
+                        for grant in prior_grants
+                    )
+                    and extension is not None
+                    and extension.ceiling == 3
+                    and extension.task_id == limits.task_id
+                    and extension.shot_id == self.context.target_shot_id
+                    and repair_evidence[-1].evidence_hash == runtime_repair.evidence_hash
+                    and repair_evidence[-1].outcome == "not_submitted"
+                    and len(current_grants) == 1
+                    and not current_grants[0].consumed
+                    and is_paid_no_effect_repair_grant_for_evidence(
+                        current_grants[0], repair_evidence[-1]
+                    )
+                )
+            recovery_trial_five = False
+            if (
+                limits.paid_submit_ceiling == 5
+                and limits.paid_submits_used == 4
+                and runtime_repair is not None
+                and runtime_repair.schema_version == "runtime-repair/6"
+                and paid_retarget is not None
+                and paid_retarget.target_scope_hash == selected.scope_hash
+                and runtime_repair.evidence_hash == self.inputs.latest_attempt_hash
+                and len(self.inputs.runtime_repairs) == 4
+                and len({grant.authorization.attempt_id for grant in self.inputs.runtime_repairs}) == 4
+                and sum(grant.consumed for grant in self.inputs.runtime_repairs) == 3
+                and sum(grant.authorization == runtime_repair
+                        for grant in self.inputs.runtime_repairs) == 1
+            ):
+                prior_grants = [
+                    grant for grant in self.inputs.runtime_repairs
+                    if grant.authorization != runtime_repair
+                ]
+                repair_evidence = []
+                for grant in self.inputs.runtime_repairs:
+                    matches = [
+                        evidence for evidence in self.inputs.evidence
+                        if evidence.attempt_id == grant.authorization.attempt_id
+                        and evidence.evidence_hash == grant.authorization.evidence_hash
+                    ]
+                    if (
+                        len(matches) != 1
+                        or matches[0].outcome not in {"runtime_failure", "not_submitted"}
+                        or matches[0].artifact_sha256 is not None
+                        or matches[0].findings
+                        or matches[0].unresolved_quality_refs
+                        or matches[0].task_id != limits.task_id
+                        or matches[0].shot_id != self.context.target_shot_id
+                    ):
+                        break
+                    repair_evidence.append(matches[0])
+                extension = runtime_repair.paid_no_effect_extension
+                current_grants = [
+                    grant for grant in self.inputs.runtime_repairs
+                    if grant.authorization == runtime_repair
+                ]
+                prior_extensions = [
+                    grant.authorization.paid_no_effect_extension
+                    for grant in prior_grants
+                    if grant.authorization.schema_version == "runtime-repair/6"
+                ]
+                recovery_trial_five = (
+                    len(repair_evidence) == 4
+                    and len(prior_grants) == 3
+                    and sum(grant.authorization.schema_version == "runtime-repair/3"
+                            and grant.authorization.paid_no_effect_retarget is not None
+                            for grant in prior_grants) == 2
+                    and len(prior_extensions) == 1
+                    and prior_extensions[0] is not None
+                    and prior_extensions[0].ceiling == 3
+                    and prior_extensions[0].task_id == limits.task_id
+                    and prior_extensions[0].shot_id == self.context.target_shot_id
+                    and extension is not None
+                    and extension.ceiling == 4
+                    and extension.task_id == limits.task_id
+                    and extension.shot_id == self.context.target_shot_id
+                    and repair_evidence[-1].evidence_hash == runtime_repair.evidence_hash
+                    and repair_evidence[-1].outcome == "runtime_failure"
+                    and len(current_grants) == 1
+                    and not current_grants[0].consumed
+                )
+            from ai_video.production._qualification_quality_repair import allows_one_known_quality_repair
+
+            quality_repair_trial = allows_one_known_quality_repair(self, selected)
+            from ai_video.production._qualification_visual_revision import allows_authored_visual_revision
+
+            visual_revision_trial = allows_authored_visual_revision(self, selected)
+            from ai_video.production.generation_coverage_revision import allows_authored_coverage_revision
+
+            coverage_revision_trial = allows_authored_coverage_revision(self, selected)
+            from ai_video.production.generation_resolution_revision import allows_authored_resolution_revision
+
+            resolution_revision_trial = allows_authored_resolution_revision(self, selected)
+            if (
+                len(self.inputs.candidates) != 1
+                or selected_variant is None
+                or selected_variant.production_qualification != "UNQUALIFIED"
+                or selected_variant.execution_kind.value != "remote"
+                or selected_variant.billing_kind.value != "metered"
+                or self.inputs.policy.max_resamples != 0
+                or limits.generation_forbidden
+                or limits.allowed_remote_candidates != (selected.candidate_id,)
+                or not (initial_trial or recovery_trial or recovery_trial_three
+                        or recovery_trial_four or recovery_trial_five or quality_repair_trial
+                        or visual_revision_trial or coverage_revision_trial or resolution_revision_trial)
+                or not self.policy.remote_authorized
+                or not self.policy.budget_authorized
+            ):
+                raise ValueError(
+                    "qualification execution binding exceeds its bounded remote trial scope"
+                )
         if selected is None or (
             request.generation_id != self.lifecycle.generation_id
             or request.output_asset_id != self.lifecycle.output_asset_id
@@ -184,6 +429,7 @@ class GenerationDecisionExecutionBinding(StrictModel):
         compiled_request: ResolvedVideoGenerationRequest,
         continuity_routing: ContinuityProviderRouteBinding | None = None,
         unsubmitted_predecessor_evidence_hash: str | None = None,
+        source_project=None,
     ) -> "GenerationDecisionExecutionBinding":
         from ai_video.production.performance_authoring import require_performance_authoring
 
@@ -191,6 +437,8 @@ class GenerationDecisionExecutionBinding(StrictModel):
         recipe = bound.generation_recipe if bound is not None else None
         require_performance_authoring(projection.requirement,
             recipe.acceptance_policy if recipe is not None else None)
+        cls._require_fresh_seedance_expression(projection=projection, inputs=inputs, decision=decision,
+            compiled_request=compiled_request, continuity_routing=continuity_routing, source_project=source_project)
         values: dict[str, object] = {
             "schema_version": "1",
             "projection": projection,
@@ -227,6 +475,7 @@ class GenerationDecisionExecutionBinding(StrictModel):
                                  voice_attempt_id: str | None = None, selection_only: bool = False) -> None:
         """Bind a self-consistent decision to the currently loaded source bytes."""
 
+        self._validate_seedance_admission(project)
         if self.continuity_routing is not None:
             from ai_video.production._sequence_source import require_sequence_source
             require_sequence_source(loaded=project, routing=self.continuity_routing,
@@ -339,6 +588,74 @@ class GenerationDecisionExecutionBinding(StrictModel):
                 or binding.asset_id not in project.asset_paths
             ):
                 raise ValueError("generation execution media reference is not current")
+
+    @staticmethod
+    def _require_fresh_seedance_expression(*, projection, inputs, decision, compiled_request,
+                                            continuity_routing=None, source_project=None):
+        bound = decision.routing.provider_bound_request if decision.routing is not None else None
+        if bound is None or bound.provider_name != "seedance":
+            return
+        from ai_video.production.performance_authoring import require_performance_authoring
+        from ai_video.production.seedance_native_prompt import require_fresh_seedance_request
+
+        require_performance_authoring(projection.requirement,
+            bound.generation_recipe.acceptance_policy if bound.generation_recipe is not None else None)
+        selected = next(item for item in inputs.candidates if item.candidate_id == decision.selected_candidate_id)
+        expression = None
+        requirement = projection.requirement
+        if requirement.target_shot.preserved_source_expression is not None:
+            from ai_video.production.seedance_source_expression import validate_preserved_source_request
+
+            validate_preserved_source_request(bound, requirement, compiled_request)
+        if (compiled_request.adapter_compiler_version in {"2", "3", "4"}
+                and requirement.generation_intent.open_state.kind.value == "typed_hash"):
+            from ai_video.production._sequence_source import (
+                build_verified_causal_opening_expression, build_verified_source_selection_expression,
+            )
+            if source_project is None:
+                raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                    user_message="Fresh Seedance continuity expression requires the current sequence source.")
+            if (compiled_request.adapter_compiler_version == "3"
+                    and requirement.target_shot.preserved_source_expression is not None
+                    and continuity_routing is None):
+                expression = build_verified_source_selection_expression(loaded=source_project,
+                    requirement=requirement, provider_bound=bound)
+            elif continuity_routing is not None:
+                expression = build_verified_causal_opening_expression(loaded=source_project,
+                    routing=continuity_routing, requirement=requirement, provider_bound=bound)
+            else:
+                raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+                    user_message="Fresh Seedance continuity expression requires the current sequence route.")
+        require_fresh_seedance_request(bound, requirement, compiled_request, selected.capabilities,
+            continuity_expression=expression)
+
+    def _validate_seedance_admission(self, project):
+        """Only an exact Manifest-owned request/binding can use legacy replay.
+
+        A self-consistent hash or model_validate is not durable authority. Read
+        only this generation's request receipt; do not traverse old history.
+        """
+        request = self.compiled_request
+        if request.provider_name != "seedance":
+            return
+        states = [attempt.video_generation_state for attempt in project.manifest.attempts
+            if attempt.video_generation_state is not None
+            and attempt.video_generation_state.generation_id == request.generation_id]
+        if states:
+            from ai_video.production._video_project_reader import load_video_request_receipt
+
+            if len(states) != 1:
+                raise ValueError("Seedance replay requires one exact durable generation")
+            state = states[0]
+            pointer = state.execution_binding
+            if (pointer is None or pointer.binding_hash != self.binding_hash
+                    or pointer.request_fingerprint != request.resolved_generation_hash
+                    or load_video_request_receipt(project.root, state.request) != request):
+                raise ValueError("Seedance replay requires its Manifest-owned request and binding")
+            return
+        self._require_fresh_seedance_expression(projection=self.projection, inputs=self.inputs,
+            decision=self.decision, compiled_request=request, continuity_routing=self.continuity_routing,
+            source_project=project)
 
 
 def require_sequence_destination_selection(

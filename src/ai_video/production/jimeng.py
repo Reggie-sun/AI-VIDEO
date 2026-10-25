@@ -18,7 +18,9 @@ from ai_video.production.jimeng_contracts import (
     JIMENG_ORIGIN, JIMENG_PROVIDER, JimengDispatchIntent,
     JimengCanvasSnapshot, JimengMaterial, JimengProfile, JimengSubmitNotDispatched,
 )
-from ai_video.production.jimeng_models import JIMENG_MODEL_SPECS
+from ai_video.production.jimeng_models import (
+    JIMENG_INPUT_MODE_SPECS, JIMENG_MODEL_SPECS,
+)
 from ai_video.production.minimax_h3 import _consume_permit, _permit_is_valid
 from ai_video.production.paid_provider import (
     JimengAcceptedEffectProof, PaidProviderCallPreview, PaidProviderEgressItem,
@@ -133,14 +135,15 @@ class JimengVideoProvider:
 
     def capabilities(self) -> VideoProviderCapabilities:
         spec = JIMENG_MODEL_SPECS[self._profile.model_id]
-        frames = self._profile.input_mode != "multimodal"
-        roles = (("first_frame", "last_frame") if self._profile.input_mode == "first_last_frame"
-                 else ("first_frame",)) if frames else ("reference",)
+        mode = JIMENG_INPUT_MODE_SPECS[self._profile.input_mode]
+        roles = mode.image_roles
+        frames = self._profile.input_mode in {"first_frame", "first_last_frame"}
+        multimodal = self._profile.input_mode == "multimodal"
         variant = VideoCapabilityVariant(
             capability_id=self._profile.capability_id, provider_kind=JIMENG_PROVIDER,
             model_id=self._profile.model_id, profile_version=self._profile.profile_version,
             execution_kind=VideoExecutionKind.REMOTE, billing_kind=BillingKind.METERED,
-            mode=VideoGenerationMode.IMAGE_TO_VIDEO if frames else VideoGenerationMode.REFERENCE_TO_VIDEO,
+            mode=VideoGenerationMode(mode.generation_mode),
             output_capability=VideoOutputCapability(
                 min_duration_seconds=4, max_duration_seconds=spec.max_seconds,
                 provider_selected_duration=False, timing_modes=("nominal_seconds",),
@@ -155,11 +158,11 @@ class JimengVideoProvider:
                 for role, count in (("first_frame", 1), ("last_frame", int(len(roles) == 2)),
                                     ("reference", 0))
             ) if frames else (),
-            max_reference_count=0 if frames else spec.max_images,
+            max_reference_count=spec.max_images if multimodal else 0,
             allowed_image_mime_types=("image/png", "image/jpeg", "image/webp"),
             max_image_bytes=spec.image_bytes,
             min_image_width=spec.min_image_dimension, min_image_height=spec.min_image_dimension,
-            media_capabilities=() if frames else (
+            media_capabilities=(
                 VideoMediaCapability(kind="audio", roles=("reference_audio",),
                     min_count=0, max_count=spec.max_audios,
                     allowed_mime_types=("audio/wav", "audio/mpeg", "audio/mp4"),
@@ -172,7 +175,7 @@ class JimengVideoProvider:
                     max_size_bytes=spec.video_bytes,
                     min_duration_millis=spec.min_media_millis,
                     max_duration_millis=spec.max_video_millis),
-            ),
+            ) if multimodal else (),
             production_qualification=spec.production_qualification,
             negative_prompt_supported=False, seed_supported=False, fps_supported=False,
             idempotent_submit=False, lookup_supported=True,
@@ -181,12 +184,9 @@ class JimengVideoProvider:
         return VideoProviderCapabilities.create(provider_name=JIMENG_PROVIDER, variants=(variant,))
 
     def compile_request(self, provider_bound, requirement, *, continuity_expression=None):
-        from ai_video.production._remote_video_native_prompt import (
-            RemoteVideoPromptCompilation, compile_remote_video_prompt,
-        )
         from ai_video.production.video_compiler import (
-            ProviderNativePrompt, ProviderRequirementUnsupported,
-            ProviderRequirementUnsupportedReason, compile_provider_video_request,
+            ProviderRequirementUnsupported, ProviderRequirementUnsupportedReason,
+            compile_provider_video_request,
         )
 
         if requirement.target_shot.preserved_source_expression is not None:
@@ -197,45 +197,42 @@ class JimengVideoProvider:
                 reason=ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
                 unsupported_field_paths=("target_shot.preserved_source_expression",),
             )
-        prose = compile_remote_video_prompt(requirement,
-            provider_bound=provider_bound, continuity_expression=continuity_expression)
-        if not isinstance(prose, RemoteVideoPromptCompilation):
-            return ProviderRequirementUnsupported(
-                requirement_hash=requirement.requirement_hash,
-                provider_bound_request_hash=provider_bound.provider_bound_request_hash,
-                selected_capability_id=provider_bound.capability_id,
-                reason=ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
-                unsupported_field_paths=("generation_intent",),
-            )
-        # Generic Shot prose has no Jimeng markers. The selected compiler
-        # makes the reference binding explicit and hash-bound.
-        rows = sorted(((role, asset.asset_id)
-            for role, asset in zip(provider_bound.binding_roles,
-                provider_bound.input_assets, strict=True)
-            if role in {"reference", "reference_audio", "reference_video"}),
-            key=lambda row: ({"reference": 0, "reference_audio": 1,
-                              "reference_video": 2}[row[0]], row[1]))
-        markers = "".join(f"\n参考素材{index + 1} {{{{{kind}:{index}}}}}"
-            for index, (role, _) in enumerate(rows)
-            for kind in ({"reference": "image", "reference_audio": "audio",
-                          "reference_video": "video"}[role],))
-        prompt = prose.prompt_text + markers
-        grammar = ("jimeng-explicit-reference-v1" if self._profile.input_mode == "multimodal"
-                   else "jimeng-frame-conditioned-v1")
-        native = ProviderNativePrompt(grammar_contract=grammar,
-            prompt_text=prompt,
-            prompt_sha256=hashlib.sha256(prompt.encode("utf-8")).hexdigest(),
-            expressed_control_paths=prose.expressed_control_paths)
-        return compile_provider_video_request(
+        from ai_video.production.jimeng_prompt import compile_jimeng_native_prompt
+
+        native = compile_jimeng_native_prompt(
+            compiler_id=self._profile.compiler_id, compiler_version="1",
+            requirement=requirement, provider_bound=provider_bound,
+            continuity_expression=continuity_expression,
+        )
+        if isinstance(native, ProviderRequirementUnsupported):
+            return native
+        compiled = compile_provider_video_request(
             provider_bound=provider_bound, requirement=requirement,
             compiler_id=self._profile.compiler_id, compiler_version="1",
             capabilities=self.capabilities(), continuity_expression=continuity_expression,
             native_prompt=native,
         )
+        if compiled.outcome == "compiled":
+            try:
+                self.resolve(compiled.request)
+            except AiVideoError as error:
+                if error.code not in {ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
+                                      ErrorCode.VIDEO_REQUEST_INVALID}:
+                    raise
+                return ProviderRequirementUnsupported(
+                    requirement_hash=requirement.requirement_hash,
+                    provider_bound_request_hash=provider_bound.provider_bound_request_hash,
+                    selected_capability_id=provider_bound.capability_id,
+                    reason=ProviderRequirementUnsupportedReason.NATIVE_CONTROL_UNSUPPORTED,
+                    unsupported_field_paths=("selected_jimeng_input_limits",),
+                )
+        return compiled
 
     def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:
-        frames = self._profile.input_mode != "multimodal"
-        expected_mode = VideoGenerationMode.IMAGE_TO_VIDEO if frames else VideoGenerationMode.REFERENCE_TO_VIDEO
+        mode_spec = JIMENG_INPUT_MODE_SPECS[self._profile.input_mode]
+        frames = self._profile.input_mode in {"first_frame", "first_last_frame"}
+        multimodal = self._profile.input_mode == "multimodal"
+        expected_mode = VideoGenerationMode(mode_spec.generation_mode)
         if (request.provider_name != JIMENG_PROVIDER
                 or request.provider_kind != JIMENG_PROVIDER
                 or request.model_id != self._profile.model_id
@@ -248,17 +245,27 @@ class JimengVideoProvider:
                          "Jimeng request differs from its selected profile.")
         bindings = _ordered_bindings(request)
         if frames:
-            roles = ("first_frame", "last_frame") if self._profile.input_mode == "first_last_frame" else ("first_frame",)
+            roles = mode_spec.image_roles
             if (tuple(item.role for item in request.image_bindings) != roles
                     or request.media_bindings or _ANY_MARKER.search(request.prompt_text)):
                 raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                              "Jimeng frame conditioning requires its exact endpoint roles and plain prompt.")
+        elif self._profile.input_mode == "text_to_video":
+            if bindings or _ANY_MARKER.search(request.prompt_text):
+                raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
+                             "Jimeng text-to-video does not accept reference materials.")
+        elif (any(item.role != "reference" for item in request.image_bindings)
+                or any(item.role not in {"reference_audio", "reference_video"}
+                       for item in request.media_bindings)):
+            raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
+                         "Jimeng multimodal references cannot contain frame endpoint roles.")
         spec = JIMENG_MODEL_SPECS[self._profile.model_id]
-        if not bindings or len(bindings) > spec.max_materials:
+        if (len(bindings) > spec.max_materials
+                or (multimodal and not bindings)):
             raise _error(ErrorCode.VIDEO_CAPABILITY_UNSUPPORTED,
                          "Jimeng reference material count exceeds the selected model bound.")
         if (len(request.prompt_text.encode("utf-16-le")) // 2 > spec.prompt_max_characters
-                or (spec.requires_visual and not (request.image_bindings
+                or (multimodal and spec.requires_visual and not (request.image_bindings
                     or any(x.kind == "video" for x in request.media_bindings)))
                 or any(not (spec.min_image_dimension <= x.width <= spec.max_image_dimension
                             and spec.min_image_dimension <= x.height <= spec.max_image_dimension)

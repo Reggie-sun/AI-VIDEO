@@ -17,6 +17,7 @@ from ai_video.production._video_requirement_routing import (
 )
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.generation_recipe import expression_errors
+from ai_video.production.generation_input_control import NativeTextExpressionReport
 from ai_video.production.video_subjects import VideoSubjectBinding, VideoSubjectBindingMixin, subject_capability_errors
 from ai_video.production.models import (
     DependencyGraphSnapshotPointer,
@@ -88,6 +89,14 @@ class ProviderRequirementUnsupported(_CompilerModel):
     retryable: Literal[False] = False
     prompt_text: None = None
     payload: None = None
+    input_expression_report: NativeTextExpressionReport | None = None
+
+    @model_serializer(mode="wrap")
+    def _legacy_shape(self, handler):
+        data = handler(self)
+        if self.input_expression_report is None:
+            data.pop("input_expression_report", None)
+        return data
 
 
 class ProviderNativePrompt(_CompilerModel):
@@ -342,16 +351,11 @@ def _compile_image_bindings(provider_bound):
 def _native_recipe_expression_errors(provider_bound, requirement, native_prompt):
     """Reopen the same recipe coverage at compile and execution boundaries."""
     from ai_video.production.voice_routing import voice_expression_recipe
+    from ai_video.production._causal_state_expression import native_recipe_expression_view
 
     expression_recipe = voice_expression_recipe(provider_bound.generation_recipe, requirement, provider_bound.voice_route)
-    for endpoint in ("open_state", "close_state"):
-        if f"generation_intent.{endpoint}.state_hash" not in native_prompt.expressed_control_paths:
-            continue
-        state_hash = getattr(requirement.generation_intent, endpoint).state_hash
-        expression_recipe = expression_recipe.model_copy(update={"expressions": tuple(
-            item.model_copy(update={"native_text": tuple(text for text in item.native_text if text != state_hash)})
-            if f"generation_intent.{endpoint}.state_hash" in item.intent_paths else item
-            for item in expression_recipe.expressions)})
+    expression_recipe = native_recipe_expression_view(
+        expression_recipe, requirement, native_prompt.expressed_control_paths)
     return expression_errors(expression_recipe, requirement, native_prompt.prompt_text, native_prompt.expressed_control_paths)
 
 
@@ -401,6 +405,28 @@ def compile_provider_video_request(
             ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH,
             ("requirement_hash",),
         )
+    dialogue = requirement.generation_intent.dialogue_intent
+    if dialogue is not None and dialogue.mode == "conversation":
+        if (provider_bound.provider_kind != "jimeng"
+                or provider_bound.model_id != "seedance_2.5"
+                or provider_bound.voice_route is not None
+                or requirement.voice_routing is not None
+                or not provider_bound.output_requirement.native_audio
+                or native_prompt is None):
+            return _unsupported(provider_bound, requirement,
+                ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+                ("generation_intent.dialogue_intent.mode",))
+        from ai_video.production.jimeng_prompt import compile_jimeng_native_prompt
+
+        expected_conversation = compile_jimeng_native_prompt(
+            compiler_id=compiler_id, compiler_version=compiler_version,
+            requirement=requirement, provider_bound=provider_bound,
+            continuity_expression=continuity_expression)
+        if (not isinstance(expected_conversation, ProviderNativePrompt)
+                or native_prompt != expected_conversation):
+            return _unsupported(provider_bound, requirement,
+                ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+                ("generation_intent.dialogue_intent.turns",))
     from ai_video.production.voice_routing import validate_voice_compilation
 
     preserved_source = requirement.target_shot.preserved_source_expression is not None
@@ -477,6 +503,21 @@ def compile_provider_video_request(
                 from ai_video.production.comfy_t8_native_turbo_video import _long_reference_prompt
 
                 expected = _long_reference_prompt(expected, provider_bound, requirement)
+        elif native_prompt is not None and native_prompt.grammar_contract.startswith("jimeng-"):
+            from ai_video.production.jimeng_prompt import compile_jimeng_native_prompt
+            from ai_video.production._remote_video_native_prompt import RemoteVideoPromptCompilation
+
+            exact = compile_jimeng_native_prompt(compiler_id=compiler_id,
+                compiler_version=compiler_version, requirement=requirement,
+                provider_bound=provider_bound, continuity_expression=continuity_expression)
+            if (not isinstance(exact, ProviderNativePrompt)
+                    or exact.grammar_contract != native_prompt.grammar_contract):
+                return _unsupported(provider_bound, requirement,
+                    ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+                    ("native_prompt.grammar_contract",))
+            expected = RemoteVideoPromptCompilation(prompt_text=exact.prompt_text,
+                prompt_sha256=exact.prompt_sha256,
+                expressed_control_paths=exact.expressed_control_paths)
         else:
             expected = compile_remote_video_prompt(requirement, voice_route=provider_bound.voice_route,
                 provider_bound=provider_bound, continuity_expression=continuity_expression)

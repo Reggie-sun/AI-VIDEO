@@ -69,3 +69,16 @@ permit / committer 执行编排，不能把 `paid_generation_authorized=True` �
 真实生成、下载恢复、主题旋律延续、混音与听感闭环仍须在各自授权和 canonical owners 下验证。
 
 研究、许可证、已有覆盖和未引入项见[评估报告](research/2026-10-26-suno-music-direction.md)。
+
+## Live Pilot — 2026-10-26
+
+《失帧》第一集的有界实测已尝试一次 `generate`，CLI 返回 `auth_expired`、没有 clip ID。
+账号读取仍显示 Pro / v6 可用；前后余额均 2500 credits、monthly usage 均 0，读取成功不证明
+生成认证有效。CLI jobs 的 `rejected` 与项目 `submission_unknown` 分别保留，不改历史、不重提。
+用户本轮明确关闭金额/积分 budget gate，只据实报告消耗；原最多三次请求、one-use、unknown、
+账号与平台边界保持。实验没有创建音乐资产、激活或改写全局付费策略。
+
+执行前修复了真实 CLI `data: Clip[]` 成功信封的识别；旧对象形式仍兼容，空/坏数组仍 UNKNOWN。
+该兼容有离线契约回归，尚未由成功 live generation 验证。具体素材、Prompt、错误/恢复、
+当前音频输入受阻与生产限制见[本轮记录](record_for_agent/2026-10-26-shizhen-suno-live-pilot.md)
+及[配乐方案与评估](superpowers/artifacts/drama/shizhen-episode-01/music-pilot-20261026/spotting-and-evaluation.md)。

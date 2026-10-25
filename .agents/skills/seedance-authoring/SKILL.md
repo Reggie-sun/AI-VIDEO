@@ -100,6 +100,8 @@ support、role cardinality 与 transport mapping 仍是 deterministic runtime fa
    transfer rule 都不与 Shot 冲突。
 6. 将 advisory result 返回现有 AI-VIDEO workflow，绝不直接执行。
 
+人物表演或画风 repair 还须按 `references/authoring-common.md` 的 Performance And Whole-Shot Review，核对约束来源、逐人物/beat 的最终文字职责、exact 参考的全场局部证据及正常速度声画审查。静止或细微表演不按关键词判错；完整参数、片段存在、人数及参考 SHA 均不能冒充真实自然度或全场风格通过。
+
 ## Output
 
 返回简洁的 advisory package，不创建新的 durable schema：

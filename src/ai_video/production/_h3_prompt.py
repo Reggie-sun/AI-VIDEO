@@ -156,6 +156,10 @@ def _h3_dialogue_language(language: str | None) -> str | None:
 
 def compile_h3_prompt(requirement: ProviderNeutralVideoRequirement, *, provider_bound=None,
                      continuity_expression=None) -> H3PromptResult:
+    dialogue = requirement.generation_intent.dialogue_intent
+    if dialogue is not None and dialogue.mode == "conversation":
+        return H3PromptUnsupported(
+            unsupported_field_paths=("generation_intent.dialogue_intent.mode",))
     from ai_video.production._causal_state_expression import causal_endpoint_text
 
     state_texts, state_controls, state_errors = {}, [], []

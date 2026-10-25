@@ -33,9 +33,10 @@ canonical experience仍为`EVIDENCE_GAP + QUALITY_FAILURE`，
 后续修复入口已验证并发布；第二次机甲物理POST被HTTP403 / `AccountOverdueError`拒绝，
 canonical `KNOWN_NO_EFFECT`、attempt failed、next action stop，没有新task ID或MP4。
 当前任务累计3次物理POST（Beauty1、机甲原片1、修复1），本次追加单元已耗尽，未重复提交。
-当前选定`doubao-seedance-2-0-fast-260128` / 480p仍受该计费拒绝阻断。用户随后明确“别用2.5太贵了”，
-停止切换2.5的准备，本任务2.5提交数为0。用户购买的2.5资源包确实仍有余量，但不能抵扣2.0 Fast；
-不把cash negative扩大解释为所有Seedance模型都不可用。详情与证据边界见下节，未估算市场费用。
+历史选定`doubao-seedance-2-0-fast-260128` / 480p的修复请求受该计费拒绝阻断。Parent曾将费用提醒
+错误解释为“禁止2.5并固定Fast2.0”，用户明确纠正：“没有让你保持用2.0fast我是要复刻不是说不让用2.5”。
+当前目标仍是原画布复刻，480p保持；model按来源/忠实实现需要与可用执行条件选择，2.5未被禁止，也未提交。
+用户的2.5资源包仍有余量，但不能抵扣旧Fast请求；cash negative不证明所有Seedance模型不可用。
 
 ## Source And Creative Decisions
 
@@ -224,8 +225,8 @@ quota extension hash`d6d092d9397c4eb683e430d75355ca98f6e41d15ef6dfa4ea850b0c1e92
 因此先前将negative现金余额当作整个Seedance路线阻断的解释被限缩，保留原403/余额观测作为历史。
 未遍历全部资源包页面，不能声称账户不存在任何2.0包；API key与console账号一致性仍NOT_EVALUATED。
 
-Parent曾提出按已购资源包准备2.5，尚未提交或改变Production。用户最新明确拒绝2.5；当前选择保持
-`doubao-seedance-2-0-fast-260128` / 480p。不为使用这份资源包切换模型，不查询价格、不充值或购买其他包，
+历史停点：Parent曾提出按已购资源包准备2.5，尚未提交或改变Production；随后将用户费用提醒误读为禁止2.5，
+把选择固定为`doubao-seedance-2-0-fast-260128` / 480p。这条限制已被下节用户纠正取代。该历史阶段不查询价格、不充值或购买其他包，
 没有新Video Provider POST、permit或预算扩展。2.0 Fast的known-no-effect失败及耗尽有限单元保持；
 必须先解除所选API账户/模型的计费拒绝，再核对canonical恢复条件和新有限单元，不能盲目重试。
 
@@ -234,6 +235,14 @@ Parent曾提出按已购资源包准备2.5，尚未提交或改变Production。�
 process `cancelled`及classification `OUTCOME_UNKNOWN`，没有terminal report，不采用partial输出或重试。
 这是独立Kimi调查的结果状态，不改写上述Seedance physical POST的`KNOWN_NO_EFFECT`，
 不构成恢复实现、required review、新model选择或媒体验收；封存inputs和历史消费保持。
+
+### User Correction — Recreate Canvas Intent Without A Fixed Model
+
+用户明确说明目标是复刻、未要求固定2.0 Fast、也未禁止2.5。`b178413`记录的固定模型限制是Parent的
+interpretation error，撤销其current authority；原用户表述、三次POST及2.5资源包观测保留为历史。
+选择仍须忠实原画布的剧情、参考职责、动作/视点、声音及480p，不因模型或费用删改要求。
+2.5可作为同一Seedance范围内候选；明确记录原画布Fast2.0观察值与实际model差异，不能冒称逐像素复刻。
+不能把尚未核验的模型可用性、恢复路径或资源包余额当作已签发paid permit；沿canonical owners准备下一有限单元。
 
 ### Published Repair Verification
 
@@ -281,7 +290,7 @@ concept审查不冒充code review，补充protocol失败也不构成已通过的
 
 原片声音/完整运动已获上述human确认；旧formal analyzer gaps保持，已通过明确补证耗尽closure封存。
 保留已知POV失败，缺连续运动证据不靠重复生成补齐。新的视点表达单元已准备并被账号错误拒绝，
-不是POV实测失败或成功。用户禁止2.5，当前Fast2.0计费拒绝解除后先核对closed known-no-effect状态和全部3次物理POST，
+不是POV实测失败或成功。依用户最新澄清重新评估模型与恢复条件，先核对closed known-no-effect状态和全部3次物理POST，
 按原recovery/planning、exact preview/actual clock及下一有限单元执行；当前已消费permit/封套不能复用，
 不另开Production根清零、不改成第三人称求PASS，也不自动重试。
 最终还需真正holdout短剧情单元、canonical原声composition/HyperFrames和用户完整听看认可。

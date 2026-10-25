@@ -1,0 +1,36 @@
+{
+  "schema": "task-local-suno-recovery-observation/1",
+  "request_id": "68ae0257-5b71-5871-8c49-10d03fc658f7",
+  "provider_response": {
+    "exit_code": 2,
+    "status": "error",
+    "error_code": "auth_expired",
+    "clip_ids": []
+  },
+  "CLI_jobs": {
+    "transaction_id": "68ae0257-5b71-5871-8c49-10d03fc658f7",
+    "state": "rejected",
+    "ids": []
+  },
+  "project_service_ledger": {
+    "state": "submission_unknown",
+    "preserved": true,
+    "rewritten": false
+  },
+  "before": {
+    "credits": 2500,
+    "monthly_usage": 0
+  },
+  "after": {
+    "credits": 2500,
+    "monthly_usage": 0
+  },
+  "observed_credit_delta": 0,
+  "settlement_status": "No separate billing settlement receipt obtained; readbacks show no usage increase.",
+  "generation_request_attempts": 1,
+  "successful_generations": 0,
+  "new_requests_after_failure": 0,
+  "new_purchases": 0,
+  "account_auth_refreshed_by_agent": false,
+  "next_condition": "Existing account generation auth must be valid through supported flow; reconcile exact old transaction before any new task attempt."
+}

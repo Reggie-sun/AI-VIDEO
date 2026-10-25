@@ -321,6 +321,10 @@ class SunoMusicService:
         error = payload.get("error") if isinstance(payload.get("error"), dict) else {}
         code = str(error.get("code") or "")
         data = payload.get("data") if isinstance(payload.get("data"), dict) else {}
+        # CLI 0.10.1 emits data as Clip[]; keep legacy object envelopes readable.
+        raw_data = payload.get("data")
+        if isinstance(raw_data, list) and all(isinstance(item, dict) for item in raw_data):
+            data = {"clips": raw_data}
         if code in {"captcha_required", "auth_missing", "config_error"} or data.get("submitted") is False:
             self._write(
                 SunoReceipt(

@@ -249,6 +249,39 @@ def test_compiler_projects_plan_into_composition_22_without_caption_overload() -
     assert compiled.content_hash != "0" * 64
 
 
+@pytest.mark.parametrize(
+    ("base_schema", "expected_schema", "replacement_audio"),
+    (
+        ("2.1", "2.2", None),
+        ("2.2", "2.2", None),
+        ("2.3", "2.3", True),
+        ("2.4", "2.4", None),
+    ),
+)
+def test_compiler_preserves_composition_schema_required_by_timeline_inputs(
+    base_schema: str, expected_schema: str, replacement_audio: bool | None,
+) -> None:
+    base = _make_base_composition()
+    layers = base.layers
+    if replacement_audio:
+        layers = (layers[0].model_copy(update={
+            "trim_duration_frames": 48,
+            "source_audio_policy": "REPLACE",
+            "source_audio_reason": "The captured preview's normal-speed time map is sealed in its input receipt; P4 carries the imported original soundtrack.",
+        }), *layers[1:])
+    base = seal_artifact(base.model_copy(update={
+        "schema_version": base_schema,
+        "content_hash": "0" * 64,
+        "layers": layers,
+    }))
+
+    compiled = production.compile_ad_creative_plan(_make_plan(), base)
+
+    assert compiled.schema_version == expected_schema
+    assert compiled.layers[0] == layers[0]
+    assert compiled.audio_tracks == base.audio_tracks
+
+
 def test_compiler_fails_closed_for_unresolved_physical_product_interaction() -> None:
     presentation = _make_plan().product_presentations[0].model_copy(
         update={

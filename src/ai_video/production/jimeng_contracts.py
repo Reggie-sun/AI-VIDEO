@@ -15,7 +15,9 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production.hashing import canonical_sha256
 from ai_video.production.models import StrictModel
 from ai_video.production.jimeng_models import (
-    JIMENG_MODELS as JIMENG_MODELS, JIMENG_MODEL_SPECS, JimengModelId,
+    JIMENG_MODELS as JIMENG_MODELS, JIMENG_MODEL_SPECS,
+    JIMENG_INPUT_MODE_SPECS, JimengModelId,
+    jimeng_capability_id, jimeng_profile_compiler_id, jimeng_profile_version,
 )
 from ai_video.production.video import (
     ProviderProfilePointer, ResolvedVideoGenerationRequest,
@@ -45,7 +47,7 @@ class JimengProfile(StrictModel):
     model_config = ConfigDict(extra="forbid", frozen=True, hide_input_in_errors=True)
 
     model_id: JimengModelId = JIMENG_MODEL
-    input_mode: Literal["multimodal", "first_frame", "first_last_frame"] = "multimodal"
+    input_mode: Literal["text_to_video", "multimodal", "first_frame", "first_last_frame"] = "multimodal"
     account_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     project_id: str = Field(pattern=r"^[0-9a-f-]{36}$")
     node_id: str = Field(pattern=r"^node_[A-Za-z0-9]{1,64}$")
@@ -72,28 +74,23 @@ class JimengProfile(StrictModel):
         spec = JIMENG_MODEL_SPECS[self.model_id]
         if self.duration_seconds > spec.max_seconds or self.resolution not in spec.resolutions:
             raise ValueError("Jimeng output specification is unsupported by the exact selected model")
-        if self.input_mode != "multimodal" and self.model_id != "seedance_2.0_vip":
-            raise ValueError("Frame conditioning requires the verified Seedance 2.0 VIP surface")
         return self
 
     @property
     def native_mode(self) -> int:
-        return {"multimodal": 4, "first_frame": 2, "first_last_frame": 3}[self.input_mode]
+        return JIMENG_INPUT_MODE_SPECS[self.input_mode].native_mode
 
     @property
     def capability_id(self) -> str:
-        mode = self.input_mode.replace("_", "-")
-        return f"jimeng-{self.model_id.replace('_', '-')}-{mode}-v1"
+        return jimeng_capability_id(self.model_id, self.input_mode)
 
     @property
     def compiler_id(self) -> str:
-        suffix = "" if self.input_mode == "multimodal" else f"-{self.input_mode.replace('_', '-')}"
-        return f"jimeng-{self.model_id.replace('_', '-')}{suffix}-video-compiler"
+        return jimeng_profile_compiler_id(self.model_id, self.input_mode)
 
     @property
     def profile_version(self) -> str:
-        suffix = "" if self.input_mode == "multimodal" else f"-{self.input_mode.replace('_', '-')}"
-        return f"canvas-{self.model_id.replace('_', '-')}{suffix}-v1"
+        return jimeng_profile_version(self.model_id, self.input_mode)
 
     def pointer(self) -> ProviderProfilePointer:
         digest = canonical_sha256(self.model_dump(mode="json"))
@@ -161,7 +158,7 @@ class JimengDispatchIntent(StrictModel):
     submit_id: str = Field(pattern=r"^[0-9a-f-]{36}$")
     resource_id: str = Field(pattern=r"^[0-9a-f-]{36}$")
     params_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
-    materials: tuple[JimengMaterial, ...] = Field(min_length=1)
+    materials: tuple[JimengMaterial, ...]
     recorded_at: datetime
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
 

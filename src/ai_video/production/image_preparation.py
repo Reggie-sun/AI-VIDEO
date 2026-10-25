@@ -41,7 +41,7 @@ class CanvasImagePreparationOperation(StrictModel):
 
     model_config = ConfigDict(extra="forbid", frozen=True, strict=True)
 
-    kind: Literal["pad", "crop", "binary_mask"]
+    kind: Literal["pad", "crop", "binary_mask", "letterbox"]
     source_asset_id: str = Field(min_length=1)
     source_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
     new_asset_id: str = Field(min_length=1)
@@ -61,6 +61,16 @@ class CanvasImagePreparationOperation(StrictModel):
                 raise ValueError("pad does not accept mask geometry")
             if any(value < 0 or value > 255 for value in self.fill_rgb):
                 raise ValueError("pad fill_rgb values must be bytes")
+        elif self.kind == "letterbox":
+            if self.canvas_size is None or self.fill_rgb is None or self.crop_box is not None:
+                raise ValueError("letterbox requires canvas_size and fill_rgb, without crop geometry")
+            if self.rectangles or self.polygons:
+                raise ValueError("letterbox does not accept mask geometry")
+            if any(value < 0 or value > 255 for value in self.fill_rgb):
+                raise ValueError("letterbox fill_rgb values must be bytes")
+            if (any(value <= 0 or value > 8192 for value in self.canvas_size)
+                    or self.canvas_size[0] * self.canvas_size[1] > 16777216):
+                raise ValueError("letterbox canvas exceeds bounded raster dimensions")
         elif self.kind == "crop":
             if self.crop_box is None or self.fill_rgb is not None or self.canvas_size is not None:
                 raise ValueError("crop requires crop_box and accepts no pad or mask geometry")
@@ -214,6 +224,15 @@ def _apply_operation(
     operation: CanvasImagePreparationOperation,
 ) -> Image.Image:
     width, height = source.size
+    if operation.kind == "letterbox":
+        size, fill = operation.canvas_size, operation.fill_rgb
+        assert size is not None and fill is not None
+        if size[0] < width or size[1] < height:
+            raise ValueError("letterbox canvas must contain every source pixel without resizing")
+        color = (*fill, 255) if source.mode == "RGBA" else fill
+        output = Image.new(source.mode, size, color)
+        output.paste(source, ((size[0] - width) // 2, (size[1] - height) // 2))
+        return output
     if operation.kind == "pad":
         output_size = _minimal_padded_size(width, height)
         fill = operation.fill_rgb

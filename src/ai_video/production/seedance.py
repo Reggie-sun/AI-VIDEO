@@ -328,6 +328,17 @@ class SeedanceVideoProvider:
         return compile_seedance_request(provider_bound, requirement, capabilities=self._capabilities,
             binding=self._native_prompt_binding, continuity_expression=continuity_expression)
 
+    def compile_new_request(self, provider_bound, requirement, *, continuity_expression=None):
+        """Require the new contract before fresh authored-text preparation."""
+        binding = self._native_prompt_binding
+        if (binding is not None and not binding.source_preservation
+                and requirement.target_shot.preserved_source_expression is None
+                and provider_bound.compiler_contract.compiler_version != "4"):
+            from ai_video.production.seedance_native_prompt import _expression_unsupported
+            return _expression_unsupported(provider_bound, requirement,
+                ("compiler_contract", "native_prompt_binding.final_text_expression"), binding=binding)
+        return self.compile_request(provider_bound, requirement, continuity_expression=continuity_expression)
+
     def resolve(self, request: VideoGenerationRequest) -> ResolvedVideoGenerationRequest:
         if (
             request.provider_name != _PROVIDER_NAME

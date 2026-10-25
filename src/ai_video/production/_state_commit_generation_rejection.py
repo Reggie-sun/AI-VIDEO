@@ -65,6 +65,29 @@ class _StateCommitGenerationRejectionMixin:
             expected_manifest_revision=expected_manifest_revision,
             experience_content_hash=experience_content_hash, actor=actor, reason=reason)
 
+    def supersede_video_generation(
+        self, *, attempt_id, expected_manifest_revision, experience_content_hash,
+        actor, authorization_receipt_id, reason, target_goal, target_first_frame_sha256,
+        coverage_revision=None,
+        resolution_revision=None,
+    ):
+        """End a fetched version after explicit user authorization to revise its visuals."""
+        from ai_video.production.generation_visual_revision import supersede_video_generation
+
+        return supersede_video_generation(
+            self,
+            attempt_id=attempt_id,
+            expected_manifest_revision=expected_manifest_revision,
+            experience_content_hash=experience_content_hash,
+            actor=actor,
+            authorization_receipt_id=authorization_receipt_id,
+            reason=reason,
+            target_goal=target_goal,
+            target_first_frame_sha256=target_first_frame_sha256,
+            coverage_revision=coverage_revision,
+            resolution_revision=resolution_revision,
+        )
+
     def _close_video_quality_result(
         self, *, attempt_id, expected_manifest_revision, experience_content_hash, actor, reason,
     ):

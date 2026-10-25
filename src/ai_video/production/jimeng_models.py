@@ -61,3 +61,49 @@ JIMENG_MODEL_SPECS = MappingProxyType({
         200, 2160, 2000, 15000, 15400, True),
 })
 JIMENG_MODELS = tuple(JIMENG_MODEL_SPECS)
+
+
+@dataclass(frozen=True)
+class JimengInputModeSpec:
+    """One explicitly mapped native Seedance mode, not model qualification."""
+
+    input_mode: Literal["text_to_video", "first_frame", "first_last_frame", "multimodal"]
+    native_mode: int
+    generation_mode: Literal["text_to_video", "image_to_video", "reference_to_video"]
+    image_roles: tuple[Literal["first_frame", "last_frame", "reference"], ...]
+    editor_mode: Literal["firstLastFrame", "multiModal"]
+
+
+# Current native client configuration was read without mutations for all four
+# exact model IDs. Keep one Python contract for the mode-to-role mapping.
+JIMENG_INPUT_MODE_SPECS = MappingProxyType({
+    "text_to_video": JimengInputModeSpec(
+        "text_to_video", 1, "text_to_video", (), "firstLastFrame"),
+    "first_frame": JimengInputModeSpec(
+        "first_frame", 2, "image_to_video", ("first_frame",), "firstLastFrame"),
+    "first_last_frame": JimengInputModeSpec(
+        "first_last_frame", 3, "image_to_video", ("first_frame", "last_frame"), "firstLastFrame"),
+    "multimodal": JimengInputModeSpec(
+        "multimodal", 4, "reference_to_video", ("reference",), "multiModal"),
+})
+
+
+def jimeng_profile_compiler_id(model_id: str, input_mode: str) -> str:
+    if model_id not in JIMENG_MODEL_SPECS or input_mode not in JIMENG_INPUT_MODE_SPECS:
+        raise ValueError("unsupported Jimeng model or input mode")
+    suffix = "" if input_mode == "multimodal" else f"-{input_mode.replace('_', '-')}"
+    return f"jimeng-{model_id.replace('_', '-')}{suffix}-video-compiler"
+
+
+def jimeng_profile_version(model_id: str, input_mode: str) -> str:
+    if model_id not in JIMENG_MODEL_SPECS or input_mode not in JIMENG_INPUT_MODE_SPECS:
+        raise ValueError("unsupported Jimeng model or input mode")
+    suffix = "" if input_mode == "multimodal" else f"-{input_mode.replace('_', '-')}"
+    return f"canvas-{model_id.replace('_', '-')}{suffix}-v1"
+
+
+def jimeng_capability_id(model_id: str, input_mode: str) -> str:
+    if model_id not in JIMENG_MODEL_SPECS or input_mode not in JIMENG_INPUT_MODE_SPECS:
+        raise ValueError("unsupported Jimeng model or input mode")
+    suffix = input_mode.replace("_", "-")
+    return f"jimeng-{model_id.replace('_', '-')}-{suffix}-v1"

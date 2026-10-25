@@ -53,6 +53,25 @@ def render_causal_facts(facts):
     return "; ".join(f"{dimension.value.replace('_', ' ')}: {fact}" for dimension, fact in facts)
 
 
+def native_recipe_expression_view(recipe, requirement, expressed_control_paths):
+    """Keep verified state seals in the recipe, outside native prose/coverage.
+
+    This is an ephemeral projection shared by native authors and the common
+    compiler. Only an exact endpoint seal already expressed by its native
+    grammar is removed; other fragments and the original recipe stay intact.
+    """
+    for endpoint in ("open_state", "close_state"):
+        path = f"generation_intent.{endpoint}.state_hash"
+        if path not in expressed_control_paths:
+            continue
+        state_hash = getattr(requirement.generation_intent, endpoint).state_hash
+        recipe = recipe.model_copy(update={"expressions": tuple(
+            item.model_copy(update={"native_text": tuple(
+                text for text in item.native_text if text != state_hash)})
+            if path in item.intent_paths else item for item in recipe.expressions)})
+    return recipe
+
+
 def causal_endpoint_text(requirement, provider_bound, *, endpoint, opening_expression=None):
     """Separate opening authority from independently authored current closing."""
     from ai_video.production._shot_router_contracts import ProviderBoundVideoRequest

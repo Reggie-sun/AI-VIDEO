@@ -101,12 +101,20 @@ Parent 对每项问题裁决并说明证据。明确的错字、商品/角色错
 global 可以零专属 unit，beat-specific 覆盖所有引用该 constraint 的既有 units。
 此检查只证明已登记关系自洽，不证明提取完整、scope 分类正确或内容表达充分。
 
-开发侧复核使用现有 `scripts.visual_quality_report prepare --contract PATH --goal-binding PATH`，
-并绑定本片实际视觉方向、`--content-kind`、MP4、output 和 timestamps。新 `/3` packet 在
+开发侧复核使用现有 `scripts.visual_quality_report prepare --contract PATH --goal-binding PATH
+--timeline PATH --render-report PATH`，timeline 必须是本次 canonical `ResolvedTimeline`，
+render report 必须绑定本次 HyperFrames exact MP4；不得以 Provider 首尾帧绑定或原素材全长代替剪辑检查。
+同时绑定本片实际视觉方向、`--content-kind`、MP4、output 和 timestamps。新 `/4` packet 在
 `creative/` 保存预检后的四份原始文件 bytes；reopen/check 只读此封存 snapshot。外部原文件
-移走仍可重开，snapshot 被改则拒绝并清除旧派生 PASS。旧 `/1`、`/2` 与 positional API 保留
-原范围，明确 `goal_chain=not_evaluated`，不能据此声称新目标链已核对。
+移走仍可重开，snapshot 被改则拒绝并清除旧派生 PASS。旧 `/1`、`/2` 保留原范围及 `goal_chain=not_evaluated`；历史 `/3` 已有目标链可重开，但不证明新接缝检查完成。
 Production 则由当前 QA、Review / Repair 和 Final Acceptance 原入口完成，不以开发报告替换。
+
+当前新完整复核使用 `/4` packet，在原 creative snapshot 外封存 timeline、render report 和逐接缝清单，
+包括没有显式 transition 标签的实际切镜。逐接缝核对采用入出点、重复动作/停顿、对白/笑声/音效叠加或截断，
+画面与声音分别记录，必须有正常速度实际听看证据；抽帧、ASR、波形和播放结束不能代签聆听。
+每刀可以保留，但必须说明理由；`edit_decision=trim` 表示尚需剪辑，会阻断通过，修复后对新 exact 成片重新检查。
+缺接缝记录、未听声音或成片/时间线变动均不得通过；旧 `/2`、`/3` 仍可重开，其完整接缝范围保留
+`NOT_EVALUATED`，不能靠改回旧 packet 版本绕过。报告只是 development review，不授予 Production acceptance。
 
 首次完整合同应在执行前按原用户目标建立；不得看完失败结果后重写要求求 PASS。对旧失败做回溯复核时，必须说明这是补建的诊断标准，不虚称早已封存或具有历史验收权威。重新编码或修改成片后旧 hash/报告无效，需要新证据。
 

@@ -136,6 +136,48 @@ def test_director_uses_scene_and_does_not_freeze_duration():
     assert "--download" not in argv
 
 
+def test_cli_clip_array_success_preserves_ids_for_recovery_and_replay(tmp_path):
+    direction = direct_music(_brief())
+    transport = _Transport(_Result(0, json.dumps({
+        "version": "1", "status": "success", "data": [
+            {"id": "clip_0001", "status": "submitted"},
+            {"id": "clip_0002", "status": "submitted"},
+        ],
+    })))
+    service = SunoMusicService(ledger_dir=tmp_path, transport=transport)
+    submitted = service.submit(direction, paid_generation_authorized=True)
+    assert submitted.clip_ids == ("clip_0001", "clip_0002")
+    assert service.recover(submitted.request_id).clip_ids == submitted.clip_ids
+    assert service.submit(direction, paid_generation_authorized=True).clip_ids == submitted.clip_ids
+    assert len(transport.calls) == 1
+
+
+@pytest.mark.parametrize("data", [[], [{"id": "clip_0001"}, "not-a-clip"], [{"status": "submitted"}]])
+def test_malformed_cli_clip_array_stays_unknown_without_resubmission(tmp_path, data):
+    direction = direct_music(_brief())
+    transport = _Transport(_Result(0, json.dumps({"version": "1", "status": "success", "data": data})))
+    service = SunoMusicService(ledger_dir=tmp_path, transport=transport)
+    for _ in range(2):
+        with pytest.raises(AiVideoError) as error:
+            service.submit(direction, paid_generation_authorized=True)
+        assert error.value.code is ErrorCode.PAID_PROVIDER_OUTCOME_UNKNOWN
+    assert len(transport.calls) == 1
+
+
+def test_auth_expired_without_no_submit_proof_preserves_unknown_and_blocks_retry(tmp_path):
+    direction = direct_music(_brief())
+    transport = _Transport(_Result(2, "", json.dumps({
+        "version": "1", "status": "error", "error": {"code": "auth_expired"},
+    })))
+    service = SunoMusicService(ledger_dir=tmp_path, transport=transport)
+    for _ in range(2):
+        with pytest.raises(AiVideoError) as error:
+            service.submit(direction, paid_generation_authorized=True)
+        assert error.value.code is ErrorCode.PAID_PROVIDER_OUTCOME_UNKNOWN
+    assert len(transport.calls) == 1
+    assert service.recover(blocked_request(direction)).state == "submission_unknown"
+
+
 def test_character_theme_silence_and_song_choices():
     theme = direct_music(_brief(edit_need=MusicEditNeed.THEME_STATEMENT, emotion="克制的主题"))
     assert theme.role is MusicRole.CHARACTER_THEME

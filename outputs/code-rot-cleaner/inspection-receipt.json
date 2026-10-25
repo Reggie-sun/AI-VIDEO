@@ -1,0 +1,54 @@
+{
+  "schema_version": "code-rot-inspection/1",
+  "mode": "report-only",
+  "generated_at": "2026-10-20T16:13:50.723680+00:00",
+  "head": "6ff8f4cf2c68154324fd820fd82c4f448377829b",
+  "source_files": 755,
+  "python_ast_files": 720,
+  "python_ast_errors": [],
+  "source_snapshot_drift": [],
+  "concurrent_change_observed": [
+    "tests/test_repair_input_admission.py",
+    "src/ai_video/production/_composition_visual.py",
+    "src/ai_video/production/repair_input_admission.py"
+  ],
+  "whole_workspace_snapshot_consistency": "NOT_EVALUATED",
+  "candidate_source_hashes_match": true,
+  "source_changes_applied": false,
+  "proof_commands_run": [],
+  "harness_receipt": null,
+  "status_counts": {
+    "SAFE TO REMOVE": 0,
+    "REVIEW": 2,
+    "KEEP": 323
+  },
+  "review_loc": 16,
+  "review_bytes": 682,
+  "recommended_proof_candidate_ids": [
+    "CRT-324"
+  ],
+  "proposed_commands": [
+    "make harness-inspect",
+    "env -i PATH=\"$PATH\" LANG=C.UTF-8 AI_VIDEO_HARNESS_NO_NETWORK=1 PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 PYTEST_PLUGINS=scripts.harness_pytest_guard python -m pytest -p no:cacheprovider tests/test_production_dependency.py -q",
+    "env -i PATH=\"$PATH\" LANG=C.UTF-8 python -m scripts.architecture_gate check"
+  ],
+  "record": "no_record",
+  "learning": "not_applicable",
+  "publication": "local-artifacts-only",
+  "artifact_sha256": {
+    "CODE-ROT-REPORT.md": "43ce6b774a2b751f49f0e86e6ddb6727896b5cc6d30711260265bfb0bcbf9858",
+    "SCANNER-DETAILS.md": "f572ef567f542af818ff497e9870cd850a95cb4b92f44c449679b2fb2ddf4d7e",
+    "analysis.json": "b6e1f617a0c0c16607152a156eb9df45d6e6f8875b93b3ce8b66c2aeeefb6798",
+    "cleanup-plan.csv": "0f88b36adeac1f4c7cb4817080912912fff4766ebd4f4c8da593058f2da7555e",
+    "finalize_report.py": "e22e0de912a7de2948cb9467b49dff8cb3565f9c8de6cc6dd0f19277ec2c8743",
+    "inspect_python.py": "620a6d8ce62a1e625a5a5997ac1e7f0ea1660f9a6e517b02de251f9348235842",
+    "prepare_report.py": "41d7392789ece60a8d71651fddfd282bab14e66fc201475b12be4834d047e59c",
+    "proposed-cleanup.patch": "63c233fe5ed8cc4052493b57ad0e5dc6263b9053e3b6289be08ca94114c16ac1",
+    "python-static-initial.json": "57123b542cb78231d80d9e6e8eb8b6d6b95786f4de5edd1939515338ee142005",
+    "python-static.json": "ee66ba9681e6e605b48d039bbe95fb661506eed5a8d5ccb998313d4e136d4076",
+    "review.json": "dd34732039616e37ddf030360a8f3cbf4d16aa4a45413f47e436b44b09dd233f",
+    "run_scan.py": "84eaf96f2fc59d1285c77e3c5d9e70d0f63ded9961894c81106f5882f9cc5387",
+    "scanner-analysis.json": "80f88a416f79073c0cf1d03408646eb0b55e88a6d3ff1878a5a300d0151a35ab",
+    "status-after-scan.txt": "991f023fd9d11516fe3ce5a03c01a9ffe3a1a49f7505500e06dd6a53fd9292cb"
+  }
+}

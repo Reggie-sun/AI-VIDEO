@@ -2,15 +2,19 @@
 
 ## Latest Checkpoint — 2026-10-21
 
-用户明确批准使用原额度内剩余两次做定向重做。实际第二次 METASO / `MiniMax-H3` 提交取得6.583秒新开场，但 exact 媒体检查失败：女子先坐在空位又起身，没有同一座位受阻因果；约3.5秒收纸出现纸带断开。独立复核也未找到不换叙事、不新生成且保持完整动作的可行剪辑修复。该镜未接受，未提交第3次商品镜，完整成片未完成。
+用户否定下述旧11秒版本字幕，并明确要求成片与执行规范一起修。新[字幕重设计审片版](/home/reggie/电商/热敷贴/成片/今天_腰先下班_11秒_字幕重设计版.mp4)已导出，SHA `82ad5125cf65a51a83f89ae6e243aaca48ade737e3aa1f5868bf282bf0306423`，同为11秒/264帧；减少文字，接盒/落座留白，商品段去掉重复底条、区分商品名/主题/详情层级。新旧visual/audio spans一致，实际解码PCM一致；本轮没有新Provider调用。现有G4指导补清本地审片也须设计→真实输入→实际媒体复核。样帧检查不证明正常速度完整观感，用户认可仍待取得；完整工程套件和commit/push继续等待该认可，详见[字幕修复记录](../../record_for_agent/2026-10-20-hotpatch-dayoff-edit-preview.md#subtitle-execution-repair--2026-10-21)。以下旧版信息保留为历史，不能视为本次审美通过。
 
-当前真实消费为视频2/3、Gemini音频3/4；旧段落的消费数和待授权条件仅保留为历史。当前已向用户提出将最后一次改为“放下手机—接盒—伴侣落座”商品互动并退役纸卷的范围调整，不能在实际回复前执行。exact 输出、评估与剩余条件见 [checkpoint record](../../record_for_agent/2026-10-20-hotpatch-dayoff-edit-preview.md#directed-redo-checkpoint--2026-10-21)。
+用户随后以“我接受生成啊”明确接受最后一次改为“放下手机—接盒—伴侣落座”，纸卷剧情退役。第3次 METASO / `MiniMax-H3` 生成取得8秒新素材，六项raw要求实际通过canonical评估、验证与激活；两条旧失败镜及消费均保留。
 
-## Creative Brief
+完整11秒有声审片版已实际导出：前7秒真人保持正常速度，后4秒呈现真实包装、贴片结构示意与主题/详情入口。canonical文件为 `runs/hotpatch-dayoff-20261020-001/production/state/render/outputs/c951788b2c107da8e7666eeb3bd810e9a5c519ccf59fc5b551216a487030e6e3.mp4`，SHA同文件名，768×1366、24fps、H.264/AAC48kHz stereo；同字节审片副本位于 `/home/reggie/电商/热敷贴/成片/今天_腰先下班_11秒_有声审片版.mp4`。
+
+当前总消费视频3/3、Gemini音频4/4，均known outcome；未自动重抽或新增额度。完整音轨模型检查确认钢琴配乐，未单独辨认短促动作音效；独立样帧复核后已修复结构裁切和收尾安全区。正常速度完整人工听看、最终审美及商业效果仍待用户审片，无P6、Final Acceptance、PackageReady或公开发布。exact来源、声音许可、raw评估、local recovery和验证边界见 [current record](../../record_for_agent/2026-10-20-hotpatch-dayoff-edit-preview.md#full-film-review-copy--2026-10-21)。下方旧剧情、旧片段及旧消费描述保留为历史。
+
+## Creative Brief (Original Historical Direction)
 
 中文片名《今天，腰先下班》。目标是原创生活化商业短片：前三秒用“一条长得离谱的待办纸卷占住沙发”制造可理解的视觉问题，随后由伴侣腾出休息位置、真实贴片细节及人物主动休息完成暖意。夸张作用于待办事项，不表示产品治疗、即时消除不适或改变身体功能。
 
-当前用户要求见 [creative-input.txt](../../superpowers/artifacts/ecommerce/hotpatch-dayoff/creative-input.txt)，Director 覆盖见 [director-coverage.json](../../superpowers/artifacts/ecommerce/hotpatch-dayoff/director-coverage.json)。24 秒、9:16、四个剪辑段落是导演选择；三个生成镜头各有职责，真实包装收尾属于独立受控商品画面。首次覆盖文件是对用户创作文字的转录，未把商品图中的广告文案自动当作商品事实。
+完整原始要求见 [creative-input.txt](../../superpowers/artifacts/ecommerce/hotpatch-dayoff/creative-input.txt)，当前11秒覆盖见 [director-coverage.json](../../superpowers/artifacts/ecommerce/hotpatch-dayoff/director-coverage.json)。最初24秒与纸卷方向是导演选择，后因真实失败与用户许可改为手机主动下班的文字反差及真人关心；没有撤回原始趣味、前三秒、商品、声音和实际成片要求。首次覆盖及旧输入仍保存在task历史，不把商品图广告文案自动当事实。
 
 ## Reference Analysis
 
@@ -31,7 +35,7 @@
 
 三条原始图片路径遗漏了 `~tplv` 中的 `~`；本轮按完整基名唯一匹配实际文件，已实际看图、测 SHA，未改名用户文件。用户提供素材用于本次创作，不等于已核实外部发布权。
 
-人物休息由自己的决定和伴侣照顾引发；不使用疼痛到痊愈的前后对比。尚未取得说明书，不能从竞品直接贴肤的画面推断本产品适用方式。商品段先表现贴片形态与离型纸手部细节，实际动作与材质仍须真实视频证据。
+人物休息由自己的决定和伴侣照顾引发；不使用疼痛到痊愈的前后对比。尚未取得说明书，不从竞品直接贴肤画面推断本产品适用方式。当前真人只递交原款橙盒；后段使用确切原图crop和纯色留白，贴片分层明确标为结构示意，不伪装成实拍或新增功效。
 
 ## Creative Review
 
@@ -49,7 +53,7 @@
 
 必须保持完整用户目标：原创、直观、夸张服务内容、无虚构功效、前三秒吸引、真人和产品质感、自然动作反馈、视听节奏与实际 MP4 成片。工程通过、参考图、白模、Provider 返回、抽帧或单镜通过均不能替代全片正常速度听看和用户最终审美认可。未取得的证明保留 `NOT_EVALUATED`，不预测商业传播结果。
 
-## Current Media Checkpoint
+## First Media Checkpoint (Historical)
 
 2026-10-20：METASO / `MiniMax-H3` 已提交一次并取得首镜，未提交第二镜；Gemini 音频分析实际使用一次。首镜五项画面要求通过显式评估，原生声音因持续流水和喷溅声与客厅情境不符而 `FAIL`，已由 canonical committer 关闭失败，保留原 request、fetch、消费及评估链。严格 generated-video probe 也拒绝原输出契约匹配；实测 768×1344、24fps、175 帧，不能把下载成功称为 Production qualification。
 
@@ -59,7 +63,7 @@
 
 当前恢复条件是已有 Production owner 能对这份失败源的非生成修复输出执行完整新用途验收并保留旧失败，或获得适用的新有限生成修复授权；不得把失败源普通 import 后伪装成已通过素材，也不得在首镜 barrier 失败时提交下一镜。详见 [checkpoint record](../../record_for_agent/2026-10-20-hotpatch-dayoff-edit-preview.md)。
 
-## User Feedback Revision — 2026-10-21
+## User Feedback Revision — 2026-10-21 (Historical Partial Edit)
 
 用户拒绝旧 3 秒预览的怪异观感及静音。当前另有正常速度的 2.25 秒局部动作/声音检查文件 `runs/hotpatch-dayoff-20261020-001/natural-sound-render-v2/output/opening-natural-with-sound.mp4`，SHA `9fc167e0d6adb0ff61c96ccec35c2d3b7cad1f7fa96e91575c9ef47b97bbcd17`。已实际渲染含 AAC 的 MP4，完整音轨模型观察识别纸张窸窣和翻页声；未取得人工听看或商业审美接受。
 

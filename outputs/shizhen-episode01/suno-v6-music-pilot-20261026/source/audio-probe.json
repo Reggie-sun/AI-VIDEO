@@ -1,0 +1,19 @@
+{
+  "sha256": "df21b5825cd6262eaa05726ce948b421b045be4491ef447ccf8b0cacc4dfcbfd",
+  "size_bytes": 3085224,
+  "probe": {
+    "programs": [],
+    "streams": [
+      {
+        "codec_name": "pcm_s16le",
+        "sample_rate": "48000",
+        "channels": 2,
+        "duration": "16.068229"
+      }
+    ],
+    "format": {
+      "duration": "16.068229"
+    }
+  },
+  "role": "native_source_audio_not_Suno_music"
+}

@@ -1,0 +1,165 @@
+{
+  "observed_at": "2026-10-25T01:31:23.494Z",
+  "evidence_level": "LIVE_READ_ONLY_NATIVE_VALIDATOR",
+  "generation_POSTs": 0,
+  "uploads": 0,
+  "mutations": 0,
+  "rows": [
+    {
+      "model_id": "seedance_2.5",
+      "native_mode": 1,
+      "material_count": 0,
+      "roles": [],
+      "validation_status": "valid",
+      "reason": null
+    },
+    {
+      "model_id": "seedance_2.5",
+      "native_mode": 2,
+      "material_count": 1,
+      "roles": [
+        1
+      ],
+      "validation_status": "valid",
+      "reason": null
+    },
+    {
+      "model_id": "seedance_2.5",
+      "native_mode": 3,
+      "material_count": 2,
+      "roles": [
+        1,
+        2
+      ],
+      "validation_status": "valid",
+      "reason": null
+    },
+    {
+      "model_id": "seedance_2.5",
+      "native_mode": 4,
+      "material_count": 1,
+      "roles": [
+        "reference"
+      ],
+      "validation_status": "valid",
+      "reason": null
+    },
+    {
+      "model_id": "seedance_2.0_mini",
+      "native_mode": 1,
+      "material_count": 0,
+      "roles": [],
+      "validation_status": "valid",
+      "reason": null
+    },
+    {
+      "model_id": "seedance_2.0_mini",
+      "native_mode": 2,
+      "material_count": 1,
+      "roles": [
+        1
+      ],
+      "validation_status": "valid",
+      "reason": null
+    },
+    {
+      "model_id": "seedance_2.0_mini",
+      "native_mode": 3,
+      "material_count": 2,
+      "roles": [
+        1,
+        2
+      ],
+      "validation_status": "valid",
+      "reason": null
+    },
+    {
+      "model_id": "seedance_2.0_mini",
+      "native_mode": 4,
+      "material_count": 1,
+      "roles": [
+        "reference"
+      ],
+      "validation_status": "valid",
+      "reason": null
+    },
+    {
+      "model_id": "seedance_2.0_vip",
+      "native_mode": 1,
+      "material_count": 0,
+      "roles": [],
+      "validation_status": "valid",
+      "reason": null
+    },
+    {
+      "model_id": "seedance_2.0_vip",
+      "native_mode": 2,
+      "material_count": 1,
+      "roles": [
+        1
+      ],
+      "validation_status": "valid",
+      "reason": null
+    },
+    {
+      "model_id": "seedance_2.0_vip",
+      "native_mode": 3,
+      "material_count": 2,
+      "roles": [
+        1,
+        2
+      ],
+      "validation_status": "valid",
+      "reason": null
+    },
+    {
+      "model_id": "seedance_2.0_vip",
+      "native_mode": 4,
+      "material_count": 1,
+      "roles": [
+        "reference"
+      ],
+      "validation_status": "valid",
+      "reason": null
+    },
+    {
+      "model_id": "seedance_2.0_fast_vip",
+      "native_mode": 1,
+      "material_count": 0,
+      "roles": [],
+      "validation_status": "valid",
+      "reason": null
+    },
+    {
+      "model_id": "seedance_2.0_fast_vip",
+      "native_mode": 2,
+      "material_count": 1,
+      "roles": [
+        1
+      ],
+      "validation_status": "valid",
+      "reason": null
+    },
+    {
+      "model_id": "seedance_2.0_fast_vip",
+      "native_mode": 3,
+      "material_count": 2,
+      "roles": [
+        1,
+        2
+      ],
+      "validation_status": "valid",
+      "reason": null
+    },
+    {
+      "model_id": "seedance_2.0_fast_vip",
+      "native_mode": 4,
+      "material_count": 1,
+      "roles": [
+        "reference"
+      ],
+      "validation_status": "valid",
+      "reason": null
+    }
+  ]
+}

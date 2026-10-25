@@ -84,6 +84,19 @@ def _artifact(path, model):
 
 def retained_submit_quota_allows(*, committer, manifest, state, current_limits, prior_limits):
     """Read an applied task ceiling without replaying its target authorization."""
+    pointer = manifest.active_paid_provider_budget
+    if pointer is None or state.execution_binding is None:
+        return False
+    return _retained_submit_quota_allows(
+        committer=committer, manifest=manifest, state=state,
+        current_limits=current_limits, prior_limits=prior_limits,
+        budget=committer._reopen_paid_budget(pointer),
+    )
+
+
+def _retained_submit_quota_allows(*, committer, manifest, state, current_limits,
+                                prior_limits, budget):
+    """Use the budget already reopened by this locked validation operation."""
     current = next((item for item in manifest.attempts
                     if item.video_generation_state == state), None)
     if current is None:
@@ -91,7 +104,6 @@ def retained_submit_quota_allows(*, committer, manifest, state, current_limits, 
     pointer = manifest.active_paid_provider_budget
     if pointer is None or state.execution_binding is None:
         return False
-    budget = committer._reopen_paid_budget(pointer)
     for entry in budget.submit_quota_extensions:
         if (entry.task_id != current_limits.task_id
                 or entry.old_paid_submit_ceiling < prior_limits.paid_submit_ceiling
@@ -293,9 +305,10 @@ def _extend_paid_provider_submit_quota(committer, entry):
                         is_verified_closed_unsubmitted_video_attempt(
                             committer, manifest=manifest, attempt=item,
                         )
-                        and not retained_submit_quota_allows(
+                        and not _retained_submit_quota_allows(
                             committer=committer, manifest=manifest, state=state,
                             current_limits=limits, prior_limits=prior_limits,
+                            budget=budget,
                         )
                     )
                     if not unapplied_closed_proposal:

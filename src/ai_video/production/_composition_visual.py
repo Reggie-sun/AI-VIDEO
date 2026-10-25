@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
+from hashlib import sha256
 from pathlib import Path
 
 from ai_video.errors import AiVideoError
@@ -14,8 +15,12 @@ from ai_video.production.composition_contracts import (
     TransitionSpec,
 )
 from ai_video.production.models import (
+    AssetType,
+    AudioKind,
     LoadedProductionProject,
+    ResolvedTimeline,
     Shot,
+    VisualStrategy,
 )
 from ai_video.production.paths import _read_regular_file_nofollow
 from ai_video.production.video_retime import (
@@ -73,15 +78,225 @@ def resolve_preview_layer_ids(
         if spec.schema_version not in {"2.3", "2.4"}:
             raise invalid("Development repair previews require CompositionSpec 2.3 or 2.4.")
         if "replacement_audio_preview" in preview_scopes:
-            if (spec.schema_version != "2.3" or preview_scopes != {"replacement_audio_preview"} or not spec.audio_tracks
-                    or any(t.audio_kind.value not in {"bgm", "sfx", "ambience"} for t in spec.audio_tracks)
-                    or spec.caption_tracks or spec.voice_sources):
-                raise invalid("Replacement audio preview requires explicit P4 music/SFX/ambience only.")
+            dialogue_tracks = tuple(
+                track for track in spec.audio_tracks
+                if track.audio_kind is AudioKind.DIALOGUE
+            )
+            if (spec.schema_version != "2.3"
+                    or preview_scopes != {"replacement_audio_preview"}
+                    or not spec.audio_tracks
+                    or any(t.audio_kind not in {
+                        AudioKind.BGM, AudioKind.SFX, AudioKind.AMBIENCE,
+                        AudioKind.NARRATION, AudioKind.DIALOGUE,
+                    } for t in spec.audio_tracks)
+                    or spec.voice_sources):
+                raise invalid("Replacement audio preview requires supported P4 audio tracks and no voice sources.")
+            if dialogue_tracks:
+                if (len(dialogue_tracks) != 1 or len(spec.audio_tracks) != 1
+                        or not spec.caption_tracks
+                        or any(binding.source_audio_track_id != dialogue_tracks[0].track_id
+                               for binding in spec.caption_tracks)):
+                    raise invalid("Captured dialogue preview requires one exact-source dialogue track with captions bound to it.")
+            elif spec.caption_tracks:
+                raise invalid("Development preview captions require the exact captured dialogue track.")
         elif spec.audio_tracks or spec.caption_tracks or spec.voice_sources:
             raise invalid(
                 "Development repair previews cannot contain audio, captions, or voice sources."
             )
     return preview_layer_ids
+
+
+def validate_replacement_preview_narration(
+    project: LoadedProductionProject,
+    spec: CompositionSpec,
+    timeline: ResolvedTimeline,
+    shots_by_id: Mapping[str, Shot],
+    *,
+    invalid: Callable[..., AiVideoError],
+) -> None:
+    dialogue_tracks = tuple(
+        track for track in spec.audio_tracks
+        if track.audio_kind is AudioKind.DIALOGUE
+    )
+    if dialogue_tracks:
+        _validate_captured_dialogue_preview(
+            project,
+            spec,
+            timeline,
+            shots_by_id,
+            dialogue_tracks=dialogue_tracks,
+            invalid=invalid,
+        )
+
+    narration_tracks = tuple(
+        track for track in spec.audio_tracks
+        if track.audio_kind is AudioKind.NARRATION
+    )
+    if not narration_tracks:
+        return
+
+    assets_by_id = {asset.asset_id: asset for asset in project.registry.assets}
+    layers_by_shot: dict[str, list[CompositionLayerSpec]] = {}
+    for layer in spec.layers:
+        layers_by_shot.setdefault(layer.shot_id, []).append(layer)
+    audio_by_track_id = {span.track_id: span for span in timeline.audio_spans}
+
+    for track in narration_tracks:
+        shot = shots_by_id.get(track.shot_id or "")
+        if shot is None or shot.shot_id not in spec.shot_ids:
+            raise invalid(
+                f"Narration track {track.track_id} must target a selected Shot."
+            )
+        if shot.visual_strategy is not VisualStrategy.STATIC_IMAGE or not shot.narration.strip():
+            raise invalid(
+                f"Narration track {track.track_id} requires authored narration on a STATIC_IMAGE Shot."
+            )
+
+        shot_layers = layers_by_shot.get(shot.shot_id, [])
+        if not shot_layers or any(
+            (asset := assets_by_id.get(layer.asset_id)) is None
+            or asset.asset_type is not AssetType.IMAGE
+            for layer in shot_layers
+        ):
+            raise invalid(
+                f"Narration track {track.track_id} requires every Shot visual layer to use an IMAGE asset."
+            )
+        visual_spans = tuple(
+            span for span in timeline.visual_spans if span.shot_id == shot.shot_id
+        )
+        if not visual_spans or any(
+            span.asset_mime_type not in {"image/png", "image/jpeg", "image/webp"}
+            for span in visual_spans
+        ):
+            raise invalid(
+                f"Narration track {track.track_id} requires resolved static image visuals."
+            )
+        visual_intervals = {
+            (span.start_sample, span.start_sample + span.duration_samples)
+            for span in visual_spans
+        }
+        if len(visual_intervals) != 1:
+            raise invalid(
+                f"Narration track {track.track_id} requires one resolved static-Shot visual interval."
+            )
+
+        asset = assets_by_id.get(track.asset_id)
+        metadata = asset.audio_metadata if asset is not None else None
+        expected_script_hash = sha256(shot.narration.encode("utf-8")).hexdigest()
+        if (
+            asset is None
+            or asset.asset_type is not AssetType.VOICE
+            or metadata is None
+            or metadata.audio_kind is not AudioKind.NARRATION
+            or metadata.script_hash != expected_script_hash
+        ):
+            raise invalid(
+                f"Narration track {track.track_id} must bind a VOICE/NARRATION asset for the exact Shot script."
+            )
+
+        audio_span = audio_by_track_id.get(track.track_id)
+        if audio_span is None:
+            raise invalid(
+                f"Narration track {track.track_id} has no resolved audio interval."
+            )
+        audio_start = audio_span.start_sample
+        audio_end = audio_start + audio_span.duration_samples
+        visual_start, visual_end = next(iter(visual_intervals))
+        if audio_start < visual_start or audio_end > visual_end:
+            raise invalid(
+                f"Narration track {track.track_id} must stay inside its resolved STATIC_IMAGE Shot interval."
+            )
+
+
+def _validate_captured_dialogue_preview(
+    project: LoadedProductionProject,
+    spec: CompositionSpec,
+    timeline: ResolvedTimeline,
+    shots_by_id: Mapping[str, Shot],
+    *,
+    dialogue_tracks,
+    invalid: Callable[..., AiVideoError],
+) -> None:
+    """Bind review dialogue to the exact captured video and its full source window."""
+    from ai_video.production.composition_source_audio import (
+        _expected_source_trim,
+        _source_audio_asset_matches,
+    )
+    from ai_video.production.repair_input_admission import (
+        allows_repair_preview_layer,
+        verify_repair_input,
+    )
+
+    if (timeline.usage_scope != "development_audio_preview"
+            or spec.schema_version != "2.3"
+            or len(dialogue_tracks) != 1
+            or len(spec.shot_ids) != 1
+            or len(spec.layers) != 1
+            or len(spec.audio_tracks) != 1
+            or not spec.caption_tracks):
+        raise invalid("Captured dialogue requires one captioned, single-source development audio preview.")
+
+    track = dialogue_tracks[0]
+    if (track.shot_id != spec.shot_ids[0]
+            or track.gain_millidb != 0
+            or track.fade_in_samples != 0
+            or track.fade_out_samples != 0
+            or track.ducking is not None):
+        raise invalid("Captured dialogue preview must preserve source audio without gain, fades, or ducking.")
+
+    layer = spec.layers[0]
+    shot = shots_by_id.get(layer.shot_id)
+    if shot is None or layer.source_audio_policy not in {"KEEP", "REPLACE"}:
+        raise invalid("Captured dialogue preview needs an explicit source-audio policy.")
+    if not allows_repair_preview_layer(project, layer, shot):
+        raise invalid("Captured dialogue must use the admitted development preview video.")
+
+    video = next((asset for asset in project.registry.assets if asset.asset_id == layer.asset_id), None)
+    if video is None:
+        raise invalid("Captured dialogue preview video is missing from the Registry.")
+    receipt = verify_repair_input(video, project.root)
+    if receipt.preview_use.scope != "replacement_audio_preview":
+        raise invalid("Captured dialogue requires the normal-speed replacement-audio preview scope.")
+
+    audio = next((asset for asset in project.registry.assets if asset.asset_id == track.asset_id), None)
+    if (audio is None
+            or audio.asset_type is not AssetType.VOICE
+            or audio.audio_metadata is None
+            or audio.audio_metadata.audio_kind is not AudioKind.DIALOGUE
+            or video.asset_type is not AssetType.VIDEO
+            or not _source_audio_asset_matches(
+                audio, video, usage_scope=timeline.usage_scope
+            )):
+        raise invalid("Dialogue audio must be derived from the exact captured video bytes.")
+
+    visual_spans = tuple(
+        span for span in timeline.visual_spans if span.layer_id == layer.layer_id
+    )
+    audio_spans = tuple(
+        span for span in timeline.audio_spans if span.track_id == track.track_id
+    )
+    if len(visual_spans) != 1 or len(audio_spans) != 1:
+        raise invalid("Captured dialogue preview requires one resolved visual and audio span.")
+
+    visual = visual_spans[0]
+    audio_span = audio_spans[0]
+    expected_source_trim = _expected_source_trim(
+        layer, video, timeline, spec.sample_rate, visual_spans
+    )
+    if (expected_source_trim is None
+            or visual.start_sample != 0
+            or visual.start_sample + visual.duration_samples != timeline.total_samples
+            or audio_span.start_sample != visual.start_sample
+            or audio_span.duration_samples != visual.duration_samples
+            or audio_span.source_start_sample != expected_source_trim[0]
+            or audio_span.source_duration_samples != expected_source_trim[1]
+            or track.trim_start_sample != expected_source_trim[0]
+            or track.trim_duration_samples != expected_source_trim[1]
+            or audio_span.gain_millidb != 0
+            or audio_span.fade_in_samples != 0
+            or audio_span.fade_out_samples != 0
+            or audio_span.ducking is not None):
+        raise invalid("Captured dialogue audio must cover the exact unmodified visual source interval.")
 
 
 def _segments_for_layer(
@@ -166,7 +381,8 @@ def resolve_shot_visual_spans(
     z_values = [item.z_index for item in layers]
     if len(z_values) != len(set(z_values)):
         raise invalid(f"Shot {shot.shot_id} has duplicate z_index values.")
-    if all(item.layer_id in graphic_layer_ids for item in layers):
+    if (shot.visual_strategy is not VisualStrategy.STATIC_IMAGE
+            and all(item.layer_id in graphic_layer_ids for item in layers)):
         raise invalid(f"Shot {shot.shot_id} requires a primary visual layer.")
 
     assets_by_id = {item.asset_id: item for item in project.registry.assets}
@@ -222,6 +438,10 @@ def resolve_shot_visual_spans(
                     layer,
                     duration_frames=duration_frames,
                     delivery_profile=spec.delivery_profile,
+                    normal_speed_preview=(
+                        layer.layer_id in preview_layer_ids
+                        and layer.source_time_map is None
+                    ),
                 )
             except VisualMediaValidationError as exc:
                 raise invalid(str(exc)) from exc

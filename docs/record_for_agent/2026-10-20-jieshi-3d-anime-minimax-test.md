@@ -8,6 +8,59 @@ learning_eligibility: ineligible
 
 Date: 2026-10-20
 
+## Subsequent Seedance Comparison — 2026-10-21
+
+用户随后选择 Seedance 2.0 和 Fast，并按新策略重写 prompt。两臂各一次实际 POST，均已生成原始 MP4；最新状态见[Seedance对照记录](2026-10-21-jieshi-seedance-20-fast-comparison.md)。2.0因窗内手影关闭为质量失败；Fast为已完成生成、待证据审查的 `validate / EVIDENCE_GAP`，未伪造质量失败或验收。下文 MiniMax/METASO产物、402、预算和裁决均保留为各自历史单元，不作为最新 Seedance阻断或交片身份。
+
+## METASO S01 Actual Result — 2026-10-21
+
+用户随后明确“那用METAS/home/reggie/vscode_folder/AI-VIDEO/.env”，授权切换到现有 `metaso_h3 / MiniMax-H3`，仅一次新视频POST。下节官方MiniMax的402是保留历史，不是当前METASO的执行结果。凭据仅从用户指定私有文件的 exact `METASO_API_KEY` supplier 在内存读取，无回退、显示、复制或secret hash。
+
+本单元位于 `runs/canvas-jieshi-original-s01-s02-20261013-001/uploaded-style-S01-metaso-20261021-001/`。同一原项目、production task、已登记完整首帧、3603字符prompt、16项raw/38项FinalOutput保留；不是另建项目重置历史。source和target neutral requirement hash均为 `ac811ebfca1f68f79591ebe4762794842de7587d1bd95f94b62c1205a8defe08`，逐字段差异为空，frozen recipe（除profile/compiler）和完整output contract相同。新的provider/model与Context IR会影响生成，不能声称严格模型A/B或backend等价。
+
+现有 no-effect retarget 原先禁止所有跨Provider切换。本次最小兼容改动仍走 `PaidNoEffectRetarget`、canonical known-no-effect receipt 和一次性 runtime repair grant；跨Provider要求完整output（含几何）相同，原mode/remote-metered/recipe/intent/QA/audio/voice/final-goal检查保留。同Provider旧几何兼容不变，没有修改schema、历史计数或自动fallback。新测试先RED，随后4项focused PASS /0.70秒，整个相关runtime-repair文件67 PASS /201.41秒；单名native `reviewer_xhigh` finding set为空。`minimal-verification.json`、`retarget-source-hashes.json`保存局部工程证据，不是full Harness receipt。
+
+旧HTTP402已通过原committer记录runtime failure；新grant绑定其 exact receipt及当前target scope，随后由新submit intent原子消费。actual attempt为 `canvas-1ec9f68e2137d150c46872d8579cd93d0e6af389`。原task prior used13、ceiling13→14保留；当前600,000,000内部预算上界未再次扩展，本次仍封存50,000,000单次内部上界，不是市场价或账单。没有复用旧permit或重发官方MiniMax。
+
+真实唯一POST发生于2026-10-20 **20:00:06.197–20:00:11.180 UTC**，METASO返回HTTP200并由canonical登记accepted；随后同任务GET observed succeeded并下载。native body SHA `42e2fb229b002bd318bb01acffeb066ffadb770d5f40f9750922dc391a4e4082`、3,076,535 bytes与preview完全一致；model `MiniMax-H3`、5秒、768P、Context IR=true，只有text及一张 `first_frame`，不发送ratio/独立参考视频。prompt SHA与前节相同，首帧SHA仍为 `93c4d6bc6d3467bc444a61ba492293ad9e98a5f8b123589cd7afb3476b0fe7d9`。frame路线的白模互斥例外保留。
+
+| Artifact | Exact evidence |
+| --- | --- |
+| 本次新MP4 | `outputs/Jieshi-S01-uploaded-style-METASO-H3-20261021.mp4`，canonical fetched原字节副本，无转码、剪辑、增益或后配音 |
+| SHA-256 / bytes | `7945325b848f53573d07d59da9039ef0bcc7865462737da666aec29ec366fa7b` /3,769,070 |
+| 实测流 | H.264，768×1344，24fps、124帧；container5.175秒；AAC stereo32kHz |
+| Execution evidence | 本目录 `submit.actual.json`、`poll.actual.json`、`fetch.actual.json`、`wire-observations.jsonl`、`output-identity.actual.json`、`probe.actual.json` |
+
+Parent显式调用project-local stdio `video_analyze`，取得0–5.0秒每0.25秒的21帧；实际查看contact sheet、0/2.5/3/5秒原生样帧及另解码的最后frame123。原片和可播放副本hash一致。`mcp-call.json`、`mcp-response.json`、`controlled-presentation.json`、`analysis-frames/`与`supplemental-final-frame.json`保存identity与展示。另将同bytes原生音轨以正常速度提取呈现，没有取得可确认的完整听音语义观察，不能冒称human听审。
+
+新artifact的一名native `reviewer_high` 独立画面复核round1确认 **2.25–3.00秒**何静靴子前方有随林砚左手同步升高的半透明掌/指，2.50/2.75秒最清楚。Parent对照frame09–12判 `CONFIRMED`，违反0–3秒窗内无左手倒影；蓝色对应空座、七名其他人仍保持，灰卫衣背影正确识别为陈立。抬手约1.25秒开始，3.25–3.50秒仍调整掌向，3.75–5.00秒有较稳定尾段；不把晚于3秒本身当FAIL，但物理2cm与最终采用源窗/time map仍未证明。音轨存在不证明逐字广播/声线/无音乐。`independent-media-review.json`保存三项finding及Parent裁决。
+
+当前sealed16项裁决 **5 PASS /1 FAIL /10 NOT_EVALUATED**。PASS只包括可观察camera关系、close character presence、八人identity保持、林砚右手唯一手机、车厢空间；FAIL为 `s01-reflections`。badge小字、完整听音、广播同步唇部、左手全帧解剖及未接触、被遮挡陈立道具、最终0–3秒composition、物理2cm/采用窗、逐人细微表演、完整风格认可均不由局部证据代签。前景CG脸/发束/材质与现代人物构图有保留，不据此宣称整段已获得用户电影国漫风认可。
+
+canonical `diagnosis.json` 为 `all_required_observed_pass=false`、`EVIDENCE_GAP + QUALITY_FAILURE`；同bytes补证不能消除已确认手影缺陷。只保留原片作为用户可观看试片，不追加生成、不提交S02、不激活/P6/Final Acceptance。最终质量关闭见本目录 `quality-rejection.actual.json`、`closure-status.actual.json`；消费、grant、完整输入/输出和全部历史保留。
+
+唯一committer已实际关闭到 **Manifest219 / failed / video_quality_rejected**。experience hash为 `d00aa170dd1177b2cab200c00c36bf43052b646befe6c639a2aa4b376d1d6ad4`，quality rejection hash为 `98c4fdefcb2266563629451825328e6a85c73597e93a2d2442336b3fc7d46a7e`。`closure-proof.actual.json`确认budget revision55、600,000,000上界、blocked=false、本次reservation仍reserved且actual_cost=null、task最新ceiling14；质量失败没有退款或重置次数，也不证明Provider实际费用结算。原速完整听审、物理距离、最终composition和用户画风认可仍未取得。
+
+`record-ai-video-session` 更新本主记录，自动 `distill-ai-video-learning` 为 `no_candidate`：没有受控模型比较或已验证的媒体修复，不将同类手影观察直接升级为通用制作规则。完整工程policy suite及commit/push按当前先交片审片规则暂缓；局部工程PASS与试片交付均不冒充Production或publication acceptance。
+
+## Regeneration Blocked Before Media — 2026-10-21
+
+本节是当前单元状态；下方 2026-10-20 actual MP4 和质量结论均为历史，不是本次新生成。用户要求再次生成，并明确批准仅本次继续读取先前指定私有 `.env` 的 `MINIMAX_API_KEY`；未显示、复制或持久化密钥，没有自动搜索其他来源。
+
+本次证据目录为 `runs/canvas-jieshi-original-s01-s02-20261013-001/uploaded-style-S01-20261021-regen-001/`。实际内置 imagegen 完成一张完整八人/车厢首帧，以原始构图、上传画风和已做的林砚/苏遥参考为输入：`S01-firstframe-uploaded-style.png`，SHA `93c4d6bc6d3467bc444a61ba492293ad9e98a5f8b123589cd7afb3476b0fe7d9`，2,301,611 bytes，941×1672。Parent 实际查看；当前全场景画风覆盖已登记，背景写实程度和目标冷暖风格仍有不确定性，不宣称用户审美认可或视频质量 PASS。
+
+实际所选 MiniMax-H3-Max/CN 为 5 秒/768P，单个 `first_frame`，balanced prompt expansion，保留 native audio、原八人现代地铁/道具/连续动作/对白及原 0–3 秒采用窗口。首帧路线与 reference image/video/audio 互斥，所以当前白模未绑定，逐镜记录例外；旧白模仍保留，不能将其效果当作当前视频证据。原16项 raw /38项 FinalOutput 未删减。清理后的当前 source prompt 为3603字符、SHA `1bc768432a0c815310ef8fd1e71d640775bb056609747ac7a6604c5c308fc9da`，未向 native prompt 历史追加旧版本；response obligation 元数据对齐已在该 source 中存在的同义完整句，未改变动作或放宽 QA。
+
+第一次本地准备 `canvas-a0ab59b026c0d4780f57a6e236e5551dadbfa03d` 因先 start 后预算扩展而被拒绝，未创建 paid effect。已经 canonical 记录 not_submitted 并关闭，保留原历史；随后预算在 start 前扩展，再准备 same native body 的新请求 `canvas-6af3a215597bc51303c0df8836b84f2008b211df`。新请求预算上界为600,000,000 microCNY，task ceiling12→13，旧 used12和原reservation保留，不是价格、账单或账户余额。
+
+用户随后要求修复长时间本地核验。旧进程在已知零 POST/paid state 的 Manifest206 REQUEST 边界安全中断，修复 repeated budget/binding reads 后以新进程恢复同一请求，未另建 attempt 或新 generation identity。修复、局部测试、真实只读重开和独立审查见 [Paid history read repair](2026-10-21-paid-history-read-reuse.md)。恢复后提交额度扩展已实际登记，未重置消费。
+
+2026-10-20 **19:30:02.510–19:30:03.401 UTC** 实际唯一一次 POST 到 `https://api.minimax.cn`；wire body SHA `565fbff40cc40e9b25687dca26e8366d46ab79851adf37d6db7f7898553ab9c0`、3,076,558 bytes 与 sealed native preview 完全相同。对方返回 **HTTP402**，adapter 报 `video_provider_failed`，没有 accepted task ID 或新 MP4。没有根据 HTTP 状态猜测精确账户余额、账单或具体缺额；需账号端确认支付/额度原因。没有自动重发、poll/fetch、新 S02 或换 Provider。
+
+canonical receipt `production/state/paid-provider/submits/3fbad29eab02cbda790fb23b95d47bf3d6e59d9817c9979f6e47876036b74e2b.json` 为 `known_no_effect`、external_effect_id=null。当前 Manifest209 为 failed / `paid_provider_known_no_effect`，paid phase=known_no_effect；budget revision52、600,000,000上界、blocked=false，当前reservation released、内部 actual_cost=0。这是 canonical 账本事实，不冒充 Provider 结算证明。`wire-observations.jsonl`、`execution-error.successor.json`、`quota-extension.json`、`paid-preview.json`、`paid-authorization.json` 保留真实证据；此前本地失败与关闭不抹除。
+
+本次未生成媒体，因此没有新 exact MP4 MCP Gate 或质量裁决，也没有 activation/P6/Final Acceptance。旧片不得作为本次交片。需要账号端解决402原因及封存下一有界提交单元后才能再次提交；本次唯一 POST 已消费，不盲重试。`record-ai-video-session` 更新本主记录，自动 `distill-ai-video-learning` 为 `no_candidate`；当前 reference/mode/输入变化且没有新视频，不形成可升级的模型质量经验。完整工程 policy suite 与 commit/push 按当前先交片审片规则延后，当前没有 fresh full Harness receipt 或已发布代码声明。
+
 后续共享控制层修复见[当前输入控制](2026-10-20-canvas-current-input-control.md)；下方原试片的失败、未验证项和消费历史保留，工程修复不改变媒体判定。
 
 ## Uploaded Style S01 Actual Result

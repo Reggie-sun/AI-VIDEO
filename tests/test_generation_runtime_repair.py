@@ -74,6 +74,38 @@ def test_paid_no_effect_retarget_selects_only_exact_authorized_strategy():
     assert result.routing.provider_bound_request.provider_profile == target.provider_profile
 
 
+def test_paid_no_effect_provider_switch_requires_exact_output_and_one_use_grant():
+    from ai_video.production.generation_runtime_repair import (
+        PaidNoEffectRetarget, retarget_preserves_strategy,
+    )
+    from ai_video.production.video import VideoProviderCapabilities
+
+    setup, old, target, entry, _, limits = _retarget_case()
+    capabilities = VideoProviderCapabilities.create(
+        provider_name="second-provider", variants=target.capabilities.variants,
+    )
+    target = target.model_copy(update={"capabilities": capabilities})
+    grant = RuntimeRepairGrant(authorization=RuntimeRepairAuthorization.create(
+        schema_version="runtime-repair/3", attempt_id=entry.attempt_id,
+        evidence_hash=entry.evidence_hash, repair_basis="explicit exact-contract provider switch",
+        actor=ACTOR, expected_manifest_revision=0,
+        paid_no_effect_retarget=PaidNoEffectRetarget(
+            submit_receipt_fingerprint="d" * 64, target_scope_hash=target.scope_hash)), consumed=False)
+    assert retarget_preserves_strategy(old, target)
+    arguments = dict(candidates=(target,), historical_recipes=(old,), limits=limits,
+        evidence=(entry,), latest_attempt_hash=entry.evidence_hash)
+    result = decide(setup, **arguments, runtime_repairs=(grant,))
+    assert result.disposition == "GENERATE_ONCE"
+    assert result.runtime_repair == grant.authorization
+    assert decide(setup, **arguments).disposition == "RUNTIME_FAILURE"
+    assert decide(setup, **arguments, runtime_repairs=(
+        RuntimeRepairGrant(authorization=grant.authorization, consumed=True),
+    )).disposition == "RUNTIME_FAILURE"
+    changed = target.model_copy(update={"output_requirement":
+        target.output_requirement.model_copy(update={"width": 960})})
+    assert not retarget_preserves_strategy(old, changed)
+
+
 def _paid_known_failure_reference_case():
     from ai_video.production.final_output_contracts import (
         FinalOutputContract,

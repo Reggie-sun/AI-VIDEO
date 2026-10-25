@@ -38,6 +38,20 @@ def compile_seedance_request(provider_bound, requirement, *, capabilities, bindi
         return compile_provider_video_request(provider_bound=provider_bound, requirement=requirement,
             compiler_id="seedance-video-compiler", compiler_version="3", capabilities=capabilities,
             native_prompt=native_prompt, continuity_expression=continuity_expression)
+    if provider_bound.compiler_contract.compiler_version == "4":
+        if binding is None or binding.source_preservation or provider_bound.generation_recipe is None:
+            return _expression_unsupported(provider_bound, requirement, ("native_prompt_binding",))
+        native_prompt, issues = _authored_final_prompt(binding, provider_bound, requirement,
+            continuity_expression=continuity_expression)
+        if issues:
+            return _expression_unsupported(provider_bound, requirement, issues, binding=binding)
+        result = compile_provider_video_request(provider_bound=provider_bound, requirement=requirement,
+            compiler_id="seedance-video-compiler", compiler_version="4", capabilities=capabilities,
+            native_prompt=native_prompt, continuity_expression=continuity_expression)
+        if isinstance(result, ProviderRequirementUnsupported):
+            return result.model_copy(update={"input_expression_report": _input_expression_report(
+                binding, result.unsupported_field_paths)})
+        return result
     if binding is not None and binding.source_preservation and provider_bound.generation_recipe is None:
         raise ValueError("Seedance source preservation requires a sealed recipe")
     if provider_bound.generation_recipe is not None:
@@ -63,6 +77,142 @@ def compile_seedance_request(provider_bound, requirement, *, capabilities, bindi
     return compile_provider_video_request(provider_bound=provider_bound, requirement=requirement,
         compiler_id="seedance-video-compiler", compiler_version=compiler_version,
         capabilities=capabilities, native_prompt=native_prompt, continuity_expression=continuity_expression)
+
+
+def _input_expression_report(binding, paths):
+    from ai_video.production.generation_input_control import NativeTextExpressionReport
+    if not isinstance(binding.prompt_text, str):
+        return None
+    return NativeTextExpressionReport(prompt_text=binding.prompt_text,
+        prompt_sha256=hashlib.sha256(binding.prompt_text.encode()).hexdigest(),
+        missing_requirement_paths=tuple(sorted(set(paths))))
+
+
+def _expression_unsupported(bound, requirement, paths, *, binding=None):
+    from ai_video.production.video_compiler import (
+        ProviderRequirementUnsupported, ProviderRequirementUnsupportedReason,
+    )
+    return ProviderRequirementUnsupported(requirement_hash=requirement.requirement_hash,
+        provider_bound_request_hash=bound.provider_bound_request_hash,
+        selected_capability_id=bound.capability_id,
+        reason=ProviderRequirementUnsupportedReason.PROMPT_EXPRESSION_UNSUPPORTED,
+        unsupported_field_paths=tuple(sorted(set(paths))),
+        input_expression_report=_input_expression_report(binding, paths) if binding is not None else None)
+
+
+def _authored_final_prompt(binding, bound, requirement, *, continuity_expression=None):
+    """v4 evidence is selected QA plus the final bytes, never replaced prose."""
+    from pydantic import ValidationError
+    from ai_video.production.generation_input_control import native_text_mapping_evidence
+    from ai_video.production.performance_authoring import _actor_paths
+    from ai_video.production.performance_direction import render_performance_direction
+    from ai_video.production.shot_router import ProviderBoundVideoRequest
+    from ai_video.production.video_requirement import ProviderNeutralVideoRequirement
+
+    try:
+        binding = SeedanceNativePromptBinding.model_validate(binding.model_dump(mode="python"))
+    except (TypeError, ValueError):
+        return None, ("native_prompt_binding.prompt_sha256",)
+    if binding.provider_bound_request_hash != bound.provider_bound_request_hash:
+        return None, ("native_prompt_binding.provider_bound_request_hash",)
+    try:
+        bound = ProviderBoundVideoRequest.model_validate(bound.model_dump(mode="python"))
+        requirement = ProviderNeutralVideoRequirement.model_validate(requirement.model_dump(mode="python"))
+    except (ValueError, ValidationError):
+        return None, ("generation_recipe", "requirement_hash")
+    recipe = bound.generation_recipe
+    if recipe.requirement_hash != requirement.requirement_hash or bound.requirement_hash != requirement.requirement_hash:
+        return None, ("generation_recipe.requirement_hash",)
+    prompt, intent = binding.prompt_text, requirement.generation_intent
+    mapped, mapping_issues = native_text_mapping_evidence(recipe.expressions, intent, prompt)
+    controls = set(mapped)
+    mapping_problems = [value for identifier, paths in mapping_issues.items() for value in (identifier, *paths)]
+    issues = list(mapping_problems)
+
+    # Exact canonical literal text can express itself. Direction/beat obligations
+    # need individual QA duties; a repeated adjective is no per-actor evidence.
+    def literal_paths(node, path="generation_intent"):
+        if isinstance(node, dict):
+            for key, value in node.items():
+                if key == "character_directions" or key.endswith(("_id", "_ids", "_hash")):
+                    continue
+                literal_paths(value, path + "." + key)
+        elif isinstance(node, str) and node.strip() and node not in {"none", "unspecified"} and node in prompt:
+            controls.add(path)
+
+    literal_paths(intent.model_dump(mode="json"))
+    duration = intent.pacing.shot_duration_seconds
+    if duration is not None and duration == bound.output_requirement.duration_seconds:
+        controls.add("generation_intent.pacing.shot_duration_seconds")
+    performance = intent.performance_intent
+    if performance is not None and performance.character_directions:
+        block = render_performance_direction(performance)
+        if block and block in prompt:
+            controls.add("generation_intent.performance_intent.character_directions")
+        else:
+            for index, actor in enumerate(performance.character_directions):
+                required = (*_actor_paths(actor, index), *(f"generation_intent.performance_intent."
+                    f"character_directions.{index}.beats.{beat}.phase" for beat in range(len(actor.beats))))
+                # Metadata may also be expressed by an exact actor identity in
+                # final prose; role and visibility stay canonical author choices.
+                base = f"generation_intent.performance_intent.character_directions.{index}"
+                if actor.screen_identity in prompt:
+                    controls.add(base + ".screen_identity")
+                for field in ("role", "visibility"):
+                    if getattr(actor, field) in prompt:
+                        controls.add(base + "." + field)
+                for path in required:
+                    if path in controls:
+                        continue
+                    issues.append(path)
+                    issues.extend(item.requirement_id for item in recipe.expressions
+                        if any(path == target or path.startswith(target + ".") for target in item.intent_paths))
+
+    # Keeping the *entire* deterministic result is an exact check against the
+    # actual final bytes. It preserves existing voice/continuity support without
+    # allowing partially overlapping or shortened text to inherit its claims.
+    from ai_video.production._remote_video_native_prompt import compile_remote_video_prompt
+    compiled = compile_remote_video_prompt(requirement, voice_route=bound.voice_route,
+        provider_bound=bound, continuity_expression=continuity_expression, max_prompt_characters=None)
+    grammar = "seedance-authored-prose-v4"
+    if compiled.outcome == "compiled" and compiled.prompt_text == prompt:
+        return ProviderNativePrompt(grammar_contract="remote-video-prose-v1", prompt_text=prompt,
+            prompt_sha256=binding.prompt_sha256,
+            expressed_control_paths=compiled.expressed_control_paths), tuple(mapping_problems)
+    return ProviderNativePrompt(grammar_contract=grammar, prompt_text=prompt,
+        prompt_sha256=binding.prompt_sha256, expressed_control_paths=tuple(sorted(controls))), tuple(issues)
+
+
+def require_fresh_seedance_request(bound, requirement, request, capabilities, *, continuity_expression=None):
+    """Fresh execution cannot mint a v2 replacement; old readers never call this."""
+    if bound.provider_name != "seedance":
+        return
+    from ai_video.errors import AiVideoError, ErrorCode
+    from ai_video.production.video_compiler import CompiledProviderVideoRequest
+
+    version = request.adapter_compiler_version
+    if version not in {"1", "2", "3", "4"} or (
+            version == "3" and requirement.target_shot.preserved_source_expression is None):
+        raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+            user_message="Fresh Seedance requires a supported compiler contract; compiler/3 requires preserved-source evidence.")
+    text = request.prompt_text
+    digest = hashlib.sha256(text.encode()).hexdigest()
+    binding = None
+    if version == "4" or (version == "2" and text == requirement.target_shot.intent):
+        binding = SeedanceNativePromptBinding(provider_bound_request_hash=bound.provider_bound_request_hash,
+            prompt_text=text, prompt_sha256=digest, source_evidence_sha256=digest,
+            source_preservation=request.adapter_compiler_version == "2")
+    try:
+        result = compile_seedance_request(bound, requirement, capabilities=capabilities, binding=binding,
+            continuity_expression=continuity_expression)
+    except (TypeError, ValueError):
+        result = None
+    sealed = request.activation_scope.request if request.activation_scope else None
+    if not isinstance(result, CompiledProviderVideoRequest) or result.request != sealed:
+        paths = getattr(result, "unsupported_field_paths", ())
+        raise AiVideoError(code=ErrorCode.VIDEO_REQUEST_INVALID,
+            user_message="Fresh Seedance authored text requires compiler/4 and current final-text QA evidence."
+                + (" Missing: " + ", ".join(paths) if paths else ""))
 
 
 class SeedanceNativePromptBinding(StrictModel):

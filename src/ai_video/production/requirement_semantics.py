@@ -6,7 +6,7 @@ from typing import Literal
 from pydantic import Field, model_serializer, model_validator
 
 from ai_video.production.artifact_contracts import StrictModel
-from ai_video.production.generation_input_control import GenerationInputControl
+from ai_video.production.generation_input_control import GenerationInputControl, NativeTextMapping
 
 SEMANTICS_VERSION = "requirement-semantics/1"
 SHA256 = r"^[0-9a-f]{64}$"
@@ -122,9 +122,19 @@ class RequirementExpressionFields(StrictModel):
     semantics: RequirementSemantics | None = None
     measurement_spec: EventTimeWindow | None = None
     input_control: GenerationInputControl | None = None
+    native_text_mapping: NativeTextMapping | None = None
 
     @model_validator(mode="after")
     def _semantic_shape(self):
+        if self.native_text_mapping is not None:
+            if self.stage != "raw_generation" or self.level == "diagnostic":
+                raise ValueError("native text mapping requires a raw generation objective")
+            for binding in self.native_text_mapping.bindings:
+                if binding.intent_path not in self.intent_paths or any(
+                    index >= len(self.native_text) or not self.native_text[index].strip()
+                    for index in binding.fragment_indices
+                ):
+                    raise ValueError("native text mapping requires its selected QA path and nonempty fragment")
         if self.semantics is not None:
             self.semantics.require_level(self.level)
         if self.measurement_spec is not None:
@@ -151,7 +161,7 @@ class RequirementExpressionFields(StrictModel):
     @model_serializer(mode="wrap")
     def _preserve_legacy_fields(self, handler):
         data = handler(self)
-        for name in ("semantics", "measurement_spec", "input_control"):
+        for name in ("semantics", "measurement_spec", "input_control", "native_text_mapping"):
             if getattr(self, name) is None:
                 data.pop(name, None)
         return data
@@ -166,7 +176,8 @@ def validate_semantic_inventory(payload, required_ids):
             for item in inventory
         ):
             raise ValueError("semantic metadata requires the selected QA marker")
-        if any(isinstance(item, Mapping) and item.get("input_control") is not None for item in inventory):
+        if any(isinstance(item, Mapping) and (item.get("input_control") is not None
+                or item.get("native_text_mapping") is not None) for item in inventory):
             rules = tuple(RequirementExpressionFields.model_validate(item) for item in inventory)
             ids = tuple(rule.requirement_id for rule in rules)
             if len(set(ids)) != len(ids) or {

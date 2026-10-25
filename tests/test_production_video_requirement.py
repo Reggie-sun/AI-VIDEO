@@ -718,6 +718,73 @@ def test_dialogue_language_is_sealed_without_rehashing_historical_missing_field(
         DialogueIntent(mode="none", language="en-US")
 
 
+def test_conversation_preserves_ordered_speakers_without_dialogue_timestamps():
+    dialogue = DialogueIntent.model_validate({
+        "mode": "conversation", "language": "zh",
+        "turns": [
+            {"speaker_id": "clerk", "verbatim_text": "慢点，里面烫。",
+             "on_screen": True, "lip_sync_required": True,
+             "response_obligation": "顾客听见后收手。"},
+            {"speaker_id": "linxu", "verbatim_text": "谢了。袋子不用。",
+             "on_screen": True, "lip_sync_required": True,
+             "response_obligation": "店员听完才抽纸。"},
+        ],
+    })
+    payload = GenerationIntent(dialogue_intent=dialogue).model_dump(mode="json")
+    assert payload["dialogue_intent"] == {
+        "mode": "conversation", "language": "zh",
+        "turns": [
+            {"speaker_id": "clerk", "verbatim_text": "慢点，里面烫。",
+             "on_screen": True, "lip_sync_required": True,
+             "response_obligation": "顾客听见后收手。"},
+            {"speaker_id": "linxu", "verbatim_text": "谢了。袋子不用。",
+             "on_screen": True, "lip_sync_required": True,
+             "response_obligation": "店员听完才抽纸。"},
+        ],
+    }
+    assert GenerationIntent.model_validate(payload).dialogue_intent == dialogue
+
+
+@pytest.mark.parametrize("fault", ("timing", "scalar", "empty", "missing-language", "turn-time", "blank-text"))
+def test_conversation_rejects_ambiguous_or_timed_turns(fault):
+    data = {"mode": "conversation", "language": "zh", "turns": [
+        {"speaker_id": "hero", "verbatim_text": "谢了。", "on_screen": True,
+         "lip_sync_required": True, "response_obligation": "对方倾听。"}]}
+    if fault == "timing":
+        data.update(start_seconds=0, end_seconds=8)
+    elif fault == "scalar":
+        data["speaker_id"] = "hero"
+    elif fault == "empty":
+        data["turns"] = []
+    elif fault == "missing-language":
+        data.pop("language")
+    elif fault == "turn-time":
+        data["turns"][0]["start_seconds"] = 1
+    else:
+        data["turns"][0]["verbatim_text"] = "  "
+    with pytest.raises(ValidationError):
+        DialogueIntent.model_validate(data)
+
+
+@pytest.mark.parametrize("fault", ("unknown-speaker", "no-audio", "offscreen-lips"))
+def test_conversation_keeps_speaker_and_audio_boundaries(fault):
+    turn = {"speaker_id": "hero", "verbatim_text": "谢了。", "on_screen": True,
+            "lip_sync_required": True, "response_obligation": "对方倾听。"}
+    if fault == "unknown-speaker":
+        turn["speaker_id"] = "unregistered"
+    elif fault == "offscreen-lips":
+        turn["on_screen"] = False
+    payload = _requirement_kwargs()
+    if fault == "no-audio":
+        payload["audio_need"] = AudioNeed.FORBIDDEN
+    with pytest.raises(ValidationError):
+        intent = GenerationIntent(dialogue_intent=DialogueIntent.model_validate({
+            "mode": "conversation", "language": "zh", "turns": [turn]}))
+        payload["generation_intent"] = intent
+        payload["generation_intent_hash"] = canonical_sha256(intent.model_dump(mode="json"))
+        ProviderNeutralVideoRequirement.create(**payload)
+
+
 @pytest.mark.parametrize("language", ("zh-Hans-CN", "es-419"))
 def test_dialogue_language_accepts_canonical_core_tags(language: str) -> None:
     assert DialogueIntent(

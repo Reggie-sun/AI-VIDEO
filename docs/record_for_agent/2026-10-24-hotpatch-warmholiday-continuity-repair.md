@@ -8,6 +8,10 @@ learning_eligibility: ineligible
 
 Date: 2026-10-24 (Asia/Hong_Kong)
 
+## Supersession — Vidu Comparison And Source-Audit Closure
+
+后续实际结果见[Vidu同稿原片记录](2026-10-24-hotpatch-vidu-same-script-source.md)：用户取消旧片尺寸修复，确认8×7厘米指橙盒，并要求原稿仅换Vidu；已生成一次47秒对照原片、官方返回1363积分，发现贴皮肤及末镜被子变马甲的问题，未当作广告定稿或发布。本文下方工程等待状态也已取代：source-audit修复的适用staged Harness经native依赖环境修正后PASS，三个owned paths已commit/push为`0734ee6be99a235f62a438bd3f87860b39248486`；详细receipt与旧失败历史保留在新记录中。此notice不改变旧47秒MP4或其尺寸缺陷。
+
 ## Human-Held Product And Moving Watermark — 2026-10-24
 
 ### Later User Decision And Engineering Verification

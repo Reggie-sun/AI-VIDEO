@@ -159,3 +159,59 @@ def test_active_ancestry_remains_a_cycle_guard(tmp_path):
     pointer = manifest.active_paid_provider_budget
     with pytest.raises(AiVideoError, match="cyclic"):
         reader.load_paid_provider_budget(tmp_path, pointer, _seen={pointer.content_hash})
+
+
+def test_quota_binding_bytes_are_parsed_once_per_read(tmp_path, monkeypatch):
+    import hashlib
+    from ai_video.production.generation_execution import GenerationDecisionExecutionBinding
+
+    _, manifest, _ = _mixed_ledger(tmp_path, submit=True)
+    original = GenerationDecisionExecutionBinding.model_validate_json
+    calls = Counter()
+
+    def counted(cls, data, *args, **kwargs):
+        calls[hashlib.sha256(data).hexdigest()] += 1
+        return original(data, *args, **kwargs)
+
+    monkeypatch.setattr(GenerationDecisionExecutionBinding, "model_validate_json", classmethod(counted))
+    pointer = manifest.active_paid_provider_budget
+    reader.load_paid_provider_budget(tmp_path, pointer)
+    assert len(calls) == 2
+    assert set(calls.values()) == {1}
+    # Reuse is confined to one read; the next public call validates afresh.
+    reader.load_paid_provider_budget(tmp_path, pointer)
+    assert set(calls.values()) == {2}
+
+
+def test_repeated_quota_binding_visit_rechecks_current_bytes(tmp_path, monkeypatch):
+    from ai_video.production import _generation_feedback_reader as feedback
+
+    _, manifest, extension = _mixed_ledger(tmp_path, submit=True)
+    target = tmp_path / extension.target_binding.path
+    original = feedback._read_regular_file_nofollow
+    reads = 0
+
+    def drift_after_read(path, *args, **kwargs):
+        nonlocal reads
+        raw = original(path, *args, **kwargs)
+        if path == target:
+            reads += 1
+            if reads == 1:
+                target.write_bytes(target.read_bytes() + b" ")
+        return raw
+
+    monkeypatch.setattr(feedback, "_read_regular_file_nofollow", drift_after_read)
+    with pytest.raises(AiVideoError):
+        reader.load_paid_provider_budget(tmp_path, manifest.active_paid_provider_budget)
+    assert reads >= 2
+
+
+@pytest.mark.parametrize("field", ["binding_hash", "request_fingerprint", "file_sha256"])
+def test_binding_pointer_identity_is_checked_after_repeated_read(tmp_path, field):
+    from ai_video.production._generation_feedback_reader import load_generation_execution_binding
+
+    _, _, extension = _mixed_ledger(tmp_path)
+    pointer = extension.target_binding
+    load_generation_execution_binding(tmp_path, pointer)
+    with pytest.raises(AiVideoError):
+        load_generation_execution_binding(tmp_path, pointer.model_copy(update={field: "0" * 64}))

@@ -1,0 +1,1629 @@
+{
+  "decisions": [
+    {
+      "candidate_id": "CRT-001",
+      "status": "KEEP",
+      "reason": "KEEP: continuity-review.js:2-5 multiline-imports this module and re-exports it at lines 8-14; provider-console/tests/continuity-review-contract.test.mjs also imports it. Bundled regex misses multiline imports."
+    },
+    {
+      "candidate_id": "CRT-002",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/agent_memory/index.py, tests/test_agent_memory.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-003",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/agent_memory.py, src/ai_video/agent_memory/__init__.py, src/ai_video/agent_memory/embeddings.py and 5 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-004",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/agent_memory.py, src/ai_video/agent_memory/__init__.py, src/ai_video/agent_memory/index.py and 4 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-005",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/agent_memory.py, src/ai_video/agent_memory/__init__.py, src/ai_video/agent_memory/manifest.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-006",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/agent_memory/retrieval.py, tests/test_agent_memory.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-007",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/agent_memory.py, src/ai_video/agent_memory/__init__.py, src/ai_video/agent_memory/layout.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-008",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/agent_memory.py, src/ai_video/agent_memory/__init__.py, src/ai_video/agent_memory/retrieval.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-009",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/agent_memory.py, tests/test_agent_memory.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-010",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/agent_memory.py, src/ai_video/agent_memory/__init__.py, src/ai_video/agent_memory/index.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-011",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/agent_memory.py, src/ai_video/agent_memory/__init__.py, tests/test_agent_memory.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-012",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_production.py, src/ai_video/canvas_project_data.py, tests/test_canvas_assets.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-013",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_assets.py, src/ai_video/canvas_preflight.py, src/ai_video/canvas_production.py and 11 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-014",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_production.py, tests/test_canvas_edit_first.py, tests/test_canvas_native_audio_retime.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-015",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_image.py, src/ai_video/canvas_production.py, tests/test_canvas_masked_image_workflow.py and 5 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-016",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/canvas_production_source.py, scripts/canvas_sequence_packet.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-017",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_planning.py, src/ai_video/canvas_production.py, src/ai_video/canvas_source_expression.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-018",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from tests/test_canvas_masked_image_workflow.py, tests/test_image_candidate_frontier.py, tests/test_seedream_remote_image.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-019",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_production.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-020",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_production.py, src/ai_video/canvas_visual_style.py, tests/test_canvas_continuity.py and 4 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-021",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/canvas_production.py, tests/test_canvas_continuity.py, tests/test_canvas_project_data.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-022",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_project_data.py, tests/test_canvas_assets.py, tests/test_canvas_continuity.py and 12 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-023",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/canvas_production.py, tests/test_canvas_external_image.py, tests/test_canvas_imported_audio_retime.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-024",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_production.py, tests/test_canvas_recovery.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-025",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_authoring.py, src/ai_video/canvas_handoff.py, src/ai_video/canvas_production.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-026",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_authoring.py, src/ai_video/canvas_handoff.py, src/ai_video/canvas_project_data.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-027",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_authoring.py, src/ai_video/canvas_production.py, tests/test_canvas_continuity.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-028",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/canvas_production_source.py, scripts/canvas_sequence_packet.py, src/ai_video/canvas_assets.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-029",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_planning.py, src/ai_video/canvas_production.py, tests/test_canvas_continuity.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-030",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_authoring.py, src/ai_video/canvas_preflight.py, src/ai_video/canvas_production.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-031",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from tests/test_cli.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-032",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/pipeline.py, src/ai_video/production/comfy_image.py, src/ai_video/production/comfy_t8_native_turbo_video.py and 16 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-033",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/cli.py, src/ai_video/manifest.py, src/ai_video/pipeline.py and 10 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-034",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/agent_harness_canvas_data.py, scripts/canvas_production.py, scripts/execute_shot_continuity_source.py and 314 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-035",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/pipeline.py, src/ai_video/production/video_artifact.py, tests/test_ffmpeg_tools.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-036",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/cli.py, src/ai_video/pipeline.py, src/ai_video/provider_console.py and 7 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-037",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/cli.py, src/ai_video/config.py, src/ai_video/pipeline.py and 6 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-038",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/cli.py, tests/test_pipeline.py, tests/test_resume_e2e.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-039",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/planning/_current_plan_projection.py, src/ai_video/planning/video_planner.py, src/ai_video/quality_gates/shot_readiness_gate.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-040",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/planning/__init__.py, src/ai_video/planning/video_planner.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-041",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/planning/video_planner.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-042",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/composition_playbooks.py, scripts/composition_shadow.py, src/ai_video/planning/__init__.py and 7 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-043",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/planning/video_planner.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-044",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/generation_feedback_driver.py, scripts/s01_strategy_regression.py, src/ai_video/canvas_planning.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-045",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/s01_strategy_regression.py, src/ai_video/production_planning.py, tests/test_canvas_production.py and 6 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-046",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/canvas_sequence_handoff.py, src/ai_video/canvas_planning.py, src/ai_video/planning/__init__.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-047",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/canvas_sequence_handoff.py, src/ai_video/planning/__init__.py, src/ai_video/planning/sequence_continuity.py and 9 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-048",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/models.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-049",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/ecommerce_ad_coordinator.py, src/ai_video/production/ecommerce_job_review.py, tests/production_e2e_support.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-050",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/models.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-051",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_causal_state_expression.py, src/ai_video/production/_sequence_source.py, src/ai_video/production/seedance_source_expression.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-052",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_h3_prompt.py, src/ai_video/production/_remote_video_native_prompt.py, src/ai_video/production/generation_evaluation.py and 5 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-053",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/planning/_commercial_video_planning.py, src/ai_video/production/_state_commit_dependency.py, src/ai_video/production/commercial_video_validation.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-054",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_provider_manifest_fields.py, src/ai_video/production/models.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-055",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/composition.py, tests/test_canvas_imported_audio_retime.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-056",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/composition.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-057",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/composition.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-058",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/project.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-059",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_dependencies.py, src/ai_video/production/dependency.py, src/ai_video/production/minimax_speech_batch.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-060",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_dependency_authoring.py, src/ai_video/production/dependency.py, src/ai_video/production/video_pre_generation.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-061",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/models.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-062",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/ecommerce_ad_coordinator.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-063",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/models.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-064",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/grok_auth.py, tests/test_grok_auth.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-065",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/comfy_t8_native_turbo_video.py, src/ai_video/production/comfy_t8_turbo_video.py, src/ai_video/production/comfy_t8_video.py and 6 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-066",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/hyperframes.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-067",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/hyperframes.py, tests/test_canvas_imported_audio_retime.py, tests/test_hyperframes_native_audio_retime.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-068",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/hyperframes.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-069",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_state_commit_image_activation.py, src/ai_video/production/_state_commit_image_recovery.py, src/ai_video/production/_state_commit_video.py and 8 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-070",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_image_project_reader.py, tests/test_production_generated_video_e2e.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-071",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/domain_acceptance.py, src/ai_video/production/models.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-072",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_production.py, src/ai_video/production/_generation_feedback_reader.py, src/ai_video/production/_generation_history_schema.py and 15 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-073",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, src/ai_video/production/_remote_image_reader.py, src/ai_video/production/_state_commit_paid_provider.py and 10 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-074",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/project.py, tests/test_production_project.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-075",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/models.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-076",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_image_project_reader.py, src/ai_video/production/_state_commit_image_candidate.py, src/ai_video/production/_state_commit_paid_provider.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-077",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_vidu_prompt.py, src/ai_video/production/grok.py, src/ai_video/production/metaso_h3.py and 11 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-078",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_remote_video_native_prompt.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-079",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/project.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-080",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_state_commit_transaction.py, src/ai_video/quality_intelligence/_capture_p6.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-081",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/project.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-082",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_composition.py, src/ai_video/canvas_handoff.py, src/ai_video/canvas_planning.py and 11 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-083",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/generation_feedback_driver.py, src/ai_video/canvas_planning.py, src/ai_video/planning/sequence_continuity.py and 10 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-084",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/shot_router.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-085",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/models.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-086",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_video_requirement_routing.py, src/ai_video/production/shot_router.py, src/ai_video/production/video.py and 9 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-087",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/planning/sequence_continuity.py, src/ai_video/production/shot_continuity_m0_operator.py, src/ai_video/production/shot_continuity_motion_tail.py and 9 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-088",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/shot_router.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-089",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/planning/video_planner.py, src/ai_video/production/_h3_prompt.py, src/ai_video/production/_remote_video_native_prompt.py and 7 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-090",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_commercial_project_reader.py, src/ai_video/production/_generation_feedback_reader.py, src/ai_video/production/_image_project_reader.py and 24 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-091",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_source_expression.py, src/ai_video/canvas_visual_style.py, src/ai_video/production/_shot_router_contracts.py and 8 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-092",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_vidu_subjects.py, src/ai_video/production/vidu.py, tests/test_production_vidu_prompt.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-093",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/generation_execution.py, src/ai_video/production/video_compiler.py, src/ai_video/production/vidu.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-094",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_state_commit_paid_provider.py, src/ai_video/production/_state_commit_voice_intent.py, src/ai_video/production/project.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-095",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_composition_visual.py, src/ai_video/production/composition.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-096",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, tests/test_production_delivery_packager.py, tests/test_production_ecommerce_job.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-097",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-098",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, src/ai_video/production/_ecommerce_quality_gate_p6.py, src/ai_video/production/ad_creative.py and 18 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-099",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/creative_goal_binding.py, scripts/visual_quality_report.py, src/ai_video/canvas_source_revision.py and 68 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-100",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/minimax_speech_batch.py, src/ai_video/production/__init__.py, src/ai_video/production/_generated_video_audio_contracts.py and 32 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-101",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_composition_native_audio.py, src/ai_video/production/_hyperframes_native_audio.py, src/ai_video/production/_render_source_validation.py and 4 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-102",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_authoring.py, src/ai_video/canvas_image_provenance.py, src/ai_video/canvas_project_data.py and 7 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-103",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_caption_quality_p6.py, src/ai_video/production/_review_project_reader.py, src/ai_video/production/_state_commit_repair.py and 5 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-104",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_caption_quality_p6.py, src/ai_video/production/_caption_review_models.py, src/ai_video/production/caption_quality.py and 7 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-105",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_state_commit_contracts.py, src/ai_video/production/_state_commit_voice_candidate.py, src/ai_video/production/caption_quality.py and 18 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-106",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/check_p7_1_comfy_compatibility.py, scripts/smoke_p7_1_local_image.py, src/ai_video/canvas_image_workflow.py and 16 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-107",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/comfy_image.py, tests/test_production_comfy_masked_image.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-108",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, src/ai_video/production/comfy_t8_native_turbo_video.py, tests/test_production_comfy_t8_native_long_video.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-109",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, src/ai_video/production/video_compiler.py, tests/test_generation_local_wiring.py and 4 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-110",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_local_h3_provider_family.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-111",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, src/ai_video/production/comfy_t8_native_turbo_video.py, src/ai_video/production/comfy_t8_turbo_video.py and 5 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-112",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, src/ai_video/production/shot_continuity_source_qualification.py, src/ai_video/production/shot_continuity_source_stack.py and 5 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-113",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, src/ai_video/production/_commercial_project_reader.py, src/ai_video/production/_state_commit_commercial_source.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-114",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, src/ai_video/production/_composition_visual.py, src/ai_video/production/_hyperframes_source.py and 14 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-115",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-116",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/planning/_commercial_video_planning.py, src/ai_video/planning/_planner_models.py, src/ai_video/production/__init__.py and 7 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-117",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/planning/_commercial_video_planning.py, src/ai_video/planning/_planner_models.py, src/ai_video/production/__init__.py and 8 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-118",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_shot_router_contracts.py, src/ai_video/production/commercial_video_validation.py, src/ai_video/production/video.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-119",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, src/ai_video/production/_commercial_project_reader.py, src/ai_video/production/_state_commit_commercial_source.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-120",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_composition.py, src/ai_video/production/__init__.py, src/ai_video/production/_hyperframes_native_audio.py and 28 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-121",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_composition.py, src/ai_video/canvas_dependencies.py, src/ai_video/canvas_image.py and 31 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-122",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/continuity_onnx_backend.py, src/ai_video/production/local_continuity_reviewer.py, src/ai_video/production/shot_continuity_source_operator.py and 4 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-123",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/local_continuity_reviewer.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-124",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/provider_console_continuity.py, tests/test_production_continuity_review_coordinator.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-125",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, src/ai_video/production/ecommerce_job_review.py, tests/test_production_delivery_packager.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-126",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_dependencies.py, src/ai_video/production/_commercial_project_reader.py, src/ai_video/production/_dependency_authoring.py and 58 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-127",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/planning/production_strategy.py, src/ai_video/production/_caption_review_models.py, src/ai_video/production/_state_commit_review.py and 32 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-128",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, src/ai_video/production/ecommerce_job.py, src/ai_video/production/ecommerce_job_execution.py and 8 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-129",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, tests/test_production_delivery_packager.py, tests/test_production_ecommerce_job.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-130",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, src/ai_video/production/delivery_packager.py, src/ai_video/production/ecommerce_job.py and 6 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-131",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, tests/test_production_delivery_packager.py, tests/test_production_ecommerce_job.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-132",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, src/ai_video/production/delivery_packager.py, src/ai_video/production/ecommerce_ad_coordinator.py and 14 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-133",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/ecommerce_job.py, src/ai_video/production/ecommerce_job_projection.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-134",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/ecommerce_job.py, tests/test_production_ecommerce_job_projection.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-135",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/ecommerce_job.py, src/ai_video/production/ecommerce_job_execution.py, src/ai_video/production/ecommerce_job_projection.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-136",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, src/ai_video/production/ecommerce_job.py, src/ai_video/production/ecommerce_job_projection.py and 5 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-137",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_state_commit_video_commercial.py, src/ai_video/production/_video_project_reader.py, src/ai_video/production/commercial_execution.py and 21 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-138",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, src/ai_video/production/_ecommerce_quality_gate_p6.py, src/ai_video/production/delivery_packager.py and 8 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-139",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from tests/test_production_elevenlabs.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-140",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_state_commit_p0_qualification.py, src/ai_video/production/_video_project_reader.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-141",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/creative_goal_binding.py, scripts/visual_quality_report.py, src/ai_video/canvas_review.py and 17 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-142",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/visual_quality_report.py, src/ai_video/canvas_review.py, src/ai_video/production/_ecommerce_quality_gate_p6.py and 12 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-143",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/generation_feedback_driver.py, src/ai_video/production/_generation_feedback_reader.py, src/ai_video/production/_state_commit_generation_feedback.py and 22 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-144",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/s01_strategy_regression.py, src/ai_video/canvas_production.py, src/ai_video/production/_sequence_source.py and 26 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-145",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/generation_feedback_driver.py, src/ai_video/canvas_handoff.py, src/ai_video/canvas_review.py and 28 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-146",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/generation_evaluation.py, src/ai_video_mcp/generation_feedback.py, tests/test_current_shot_close_expression.py and 6 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-147",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/planning/sequence_continuity.py, src/ai_video/production/_generation_feedback_reader.py, src/ai_video/production/_sequence_source.py and 16 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-148",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/planning/generation_difficulty.py, src/ai_video/production/_generation_feedback_reader.py, src/ai_video/production/_state_commit_generation_feedback.py and 15 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-149",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/canvas_production.py, scripts/generation_feedback_driver.py, scripts/s01_strategy_regression.py and 37 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-150",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_generation_feedback_reader.py, src/ai_video/production/_state_commit_generation_history.py, tests/test_generation_history_import.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-151",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/generation_recipe.py, src/ai_video/production/requirement_semantics.py, src/ai_video/production/video_reference_controls.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-152",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_shot_router_contracts.py, src/ai_video/production/generation_decision.py, src/ai_video/production/generation_diagnosis.py and 37 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-153",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_recovery.py, src/ai_video/production/_generation_feedback_reader.py, src/ai_video/production/_state_commit_video_runtime_repair.py and 5 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-154",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from tests/test_generation_provider_wiring.py, tests/test_grok_output_contract.py, tests/test_grok_video_operations.py and 4 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-155",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/grok_auth.py, src/ai_video/production/grok_image.py, tests/test_grok_auth.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-156",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/grok_auth.py, tests/test_grok_billing.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-157",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/grok.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-158",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from tests/test_grok_remote_image_lifecycle.py, tests/test_production_grok_image.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-159",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_remote_image_reader.py, src/ai_video/production/grok_image.py, tests/test_grok_remote_image_lifecycle.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-160",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/grok.py, src/ai_video/production/grok_image.py, src/ai_video/production/grok_video_request.py and 8 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-161",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/grok.py, src/ai_video/production/grok_billing.py, src/ai_video/production/grok_image.py and 5 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-162",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/grok_profile.py, tests/test_grok_video_capabilities.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-163",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_video_project_reader.py, src/ai_video/production/video_artifact.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-164",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/grok.py, tests/test_generation_provider_wiring.py, tests/test_grok_video_operations.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-165",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/composition_shadow.py, scripts/generation_feedback_driver.py, scripts/prepare_shot_continuity_endpoint_repair.py and 298 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-166",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_production.py, src/ai_video/production/__init__.py, src/ai_video/production/ecommerce_job_assembly.py and 17 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-167",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/smoke_p7_1_local_image.py, src/ai_video/canvas_assets.py, src/ai_video/canvas_handoff.py and 34 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-168",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/image.py, src/ai_video/production/image_edit_mask.py, src/ai_video/production/image_preparation.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-169",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_image.py, tests/test_seedream_remote_image.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-170",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/image.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-171",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_image_workflow.py, src/ai_video/production/_image_project_reader.py, src/ai_video/production/_state_commit_image_intent.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-172",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/prepare_shot_continuity_endpoint_repair.py, scripts/prepare_shot_continuity_p0.py, src/ai_video/production/__init__.py and 8 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-173",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_handoff.py, src/ai_video/production/_image_project_reader.py, src/ai_video/production/_state_commit_bootstrap.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-174",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_image_project_reader.py, src/ai_video/production/_state_commit_image_recovery.py, src/ai_video/production/_state_commit_remote_image.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-175",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_production.py, src/ai_video/production/_image_project_reader.py, tests/test_canvas_image_preparation.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-176",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/continuity_review_coordinator.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_local_continuity_reviewer.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-177",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, tests/test_generation_local_wiring.py, tests/test_production_comfy_t8_native_long_video.py and 4 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-178",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, src/ai_video/production/_state_commit_video.py, src/ai_video/production/_video_project_reader.py and 21 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-179",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_caption_review_models.py, src/ai_video/production/_commercial_project_reader.py, src/ai_video/production/_commercial_source_state.py and 38 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-180",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/minimax_h3_max.py, tests/test_production_metaso_h3.py, tests/test_production_minimax_h3_max.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-181",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/metaso_h3.py, tests/test_generation_provider_wiring.py, tests/test_production_metaso_h3.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-182",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from tests/test_canvas_source_expression.py, tests/test_production_minimax_h3_max.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-183",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from tests/test_generation_provider_wiring.py, tests/test_production_minimax_hailuo.py, tests/test_production_provider_neutral_adapters.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-184",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/minimax_speech_batch.py, src/ai_video/production/minimax_speech_batch.py, tests/test_production_minimax_speech_batch.py and 5 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-185",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/minimax_speech_batch.py, tests/test_production_minimax_speech_batch.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-186",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/canvas_production.py, scripts/minimax_speech_batch.py, scripts/prepare_shot_continuity_endpoint_repair.py and 383 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-187",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/generation_feedback_driver.py, src/ai_video/production/__init__.py, src/ai_video/production/_generated_video_audio_contracts.py and 69 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-188",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_state_commit_paid_provider.py, src/ai_video/production/paid_provider.py, tests/test_production_paid_budget_extension.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-189",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_paid_provider_project_reader.py, src/ai_video/production/_state_commit_generation_feedback.py, src/ai_video/production/_state_commit_paid_provider.py and 4 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-190",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_state_commit_paid_provider.py, src/ai_video/production/_state_commit_video.py, src/ai_video/production/paid_provider.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-191",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/canvas_production.py, scripts/creative_goal_binding.py, scripts/materialize_shot_continuity_m0.py and 149 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-192",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_preflight.py, src/ai_video/production/generation_execution.py, src/ai_video/production/generation_feedback.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-193",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_preflight.py, src/ai_video/production/video_reference_controls.py, src/ai_video/production_planning.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-194",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/production_strategy_reader.py, tests/test_production_strategy_materialization.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-195",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_production.py, src/ai_video/planning/production_strategy.py, src/ai_video/production/models.py and 9 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-196",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_production.py, src/ai_video/production/minimax_speech_batch.py, src/ai_video/production/production_strategy_materialization.py and 4 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-197",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_composition.py, src/ai_video/production_planning.py, tests/test_production_planning_service.py and 4 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-198",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/canvas_production.py, src/ai_video/canvas_authoring.py, src/ai_video/canvas_composition.py and 29 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-199",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/canvas_sequence_handoff.py, scripts/materialize_shot_continuity_m0.py, scripts/minimax_speech_batch.py and 174 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-200",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_caption_quality_p6.py, src/ai_video/production/_ecommerce_quality_gate_p6.py, src/ai_video/production/ecommerce_ad_coordinator.py and 7 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-201",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/prepare_shot_continuity_endpoint_repair.py, scripts/prepare_shot_continuity_p0.py, src/ai_video/canvas_assets.py and 62 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-202",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_image_project_reader.py, src/ai_video/production/_state_commit_remote_image.py, src/ai_video/production/grok_image.py and 8 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-203",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, src/ai_video/production/grok.py, src/ai_video/production/seedance.py and 4 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-204",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/models.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-205",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_production.py, src/ai_video/production/_composition_native_audio.py, src/ai_video/production/_composition_visual.py and 8 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-206",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_state_commit_review.py, src/ai_video/production/domain_acceptance.py, src/ai_video/production/generation_evaluation.py and 8 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-207",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_handoff.py, src/ai_video/canvas_review.py, src/ai_video/production/_caption_quality_p6.py and 27 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-208",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/generation_feedback_driver.py, src/ai_video/production/__init__.py, src/ai_video/production/seedance.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-209",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/seedance.py, src/ai_video/production/seedance_profile.py, tests/test_production_provider_neutral_adapters.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-210",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/__init__.py, src/ai_video/production/seedance.py, src/ai_video/production/seedance_mixed_reference.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-211",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/seedance.py, tests/test_production_seedance_mixed_reference.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-212",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/seedance.py, tests/test_production_seedance_mixed_reference.py, tests/test_seedance_source_prompt.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-213",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/generation_feedback_driver.py, src/ai_video/production/seedance.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-214",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/seedance.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-215",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/seedance_asset.py, tests/test_production_seedance_mixed_reference.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-216",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/seedance.py, tests/test_production_seedance_rejection.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-217",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/seedance_source_expression.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-218",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_handoff.py, src/ai_video/canvas_planning.py, src/ai_video/canvas_project_data.py and 23 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-219",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from tests/test_image_candidate_frontier.py, tests/test_remote_image_materialization.py, tests/test_seedream_remote_image.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-220",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/image.py, src/ai_video/production/seedream.py, tests/test_seedream_remote_image.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-221",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/generation_execution.py, src/ai_video/production/shot_continuity_m0_operator.py, tests/test_shot_continuity_m0_caller.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-222",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/materialize_shot_continuity_m0.py, src/ai_video/production/shot_continuity_m0_caller.py, tests/test_shot_continuity_m0_caller.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-223",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/shot_continuity_m0_caller.py, src/ai_video/production/shot_continuity_m0_operator.py, tests/test_shot_continuity_m0_feasibility.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-224",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/shot_continuity_m0_feasibility.py, src/ai_video/production/shot_continuity_m0_operator.py, src/ai_video/production/shot_continuity_m0_reprepare.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-225",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from tests/test_shot_continuity_m0_operator.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-226",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/materialize_shot_continuity_m0.py, scripts/prepare_shot_continuity_endpoint_repair.py, scripts/prepare_shot_continuity_p0.py and 9 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-227",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/materialize_shot_continuity_m0.py, src/ai_video/production/shot_continuity_m0_caller.py, src/ai_video/production/shot_continuity_m0_fast_validation.py and 13 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-228",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from tests/test_shot_continuity_m0_reprepare.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-229",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/shot_continuity_m0_caller.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-230",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/materialize_shot_continuity_m0.py, src/ai_video/production/shot_continuity_m0_qualification.py, tests/test_shot_continuity_m0_seed_reseal.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-231",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/shot_continuity_motion_tail.py, src/ai_video/production/shot_continuity_terminal_motion_tail.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-232",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/shot_continuity_motion_tail_runtime.py, src/ai_video/production/shot_continuity_terminal_motion_tail.py, tests/test_shot_continuity_motion_tail.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-233",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from tests/test_shot_continuity_motion_tail.py, tests/test_shot_continuity_terminal_motion_tail.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-234",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/shot_continuity_source_operator.py, src/ai_video/production/shot_continuity_source_qualification.py, src/ai_video/production/shot_continuity_source_transport.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-235",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/execute_shot_continuity_source.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-236",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/generation_execution.py, src/ai_video/production/shot_continuity_source_operator.py, tests/test_shot_continuity_source_operator.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-237",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_state_commit_video_candidate.py, src/ai_video/production/_state_commit_video_recovery.py, src/ai_video/production/_state_commit_video_source_boundary.py and 4 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-238",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/prepare_shot_continuity_endpoint_repair.py, scripts/prepare_shot_continuity_p0.py, src/ai_video/production/shot_continuity_m0_operator.py and 6 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-239",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/shot_continuity_source_qualification.py, tests/test_shot_continuity_source_qualification.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-240",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/materialize_shot_continuity_m0.py, scripts/prepare_shot_continuity_p0.py, src/ai_video/production/shot_continuity_source_qualification.py and 4 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-241",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/shot_continuity_m0_caller.py, src/ai_video/production/shot_continuity_m0_operator.py, src/ai_video/production/shot_continuity_source_operator.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-242",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/shot_continuity_m0_motion_tail.py, src/ai_video/production/shot_continuity_motion_tail_runtime.py, tests/test_shot_continuity_m0_feasibility.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-243",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/generation_feedback_driver.py, src/ai_video/production/__init__.py, src/ai_video/production/comfy_t8_native_turbo_video.py and 46 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-244",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/planning/production_strategy.py, src/ai_video/production/domain_acceptance.py, src/ai_video/production/production_strategy_reader.py and 6 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-245",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/canvas_production.py, scripts/generation_feedback_driver.py, scripts/materialize_shot_continuity_m0.py and 126 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-246",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/models.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-247",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_creative_project_reader.py, src/ai_video/production/project.py, tests/test_production_validation.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-248",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_state_commit_bootstrap.py, src/ai_video/production/repair_input_admission.py, src/ai_video/production/video_cleanup_viewing_admission.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-249",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/production_responsibility.py, src/ai_video/production/video_cleanup_media.py, src/ai_video/production/video_cleanup_pixels.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-250",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_production.py, src/ai_video/production/video_cleanup_admission.py, src/ai_video/production/video_cleanup_viewing.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-251",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/video_cleanup_media.py, tests/test_video_cleanup_pixels.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-252",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/video_cleanup_viewing_admission.py, tests/test_video_cleanup_admission.py, tests/test_video_cleanup_viewing.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-253",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/repair_input_admission.py, src/ai_video/production/video_cleanup_admission.py, tests/test_video_cleanup_admission.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-254",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/comfy_t8_native_turbo_video.py, src/ai_video/production/comfy_t8_turbo_video.py, src/ai_video/production/comfy_t8_video.py and 46 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-255",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/generation_feedback_driver.py, src/ai_video/production/__init__.py, src/ai_video/production/_shot_router_contracts.py and 35 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-256",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/materialize_shot_continuity_m0.py, scripts/prepare_shot_continuity_p0.py, src/ai_video/planning/sequence_continuity.py and 17 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-257",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_video_project_reader.py, src/ai_video/production/video_artifact.py, tests/test_grok_output_contract.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-258",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/canvas_production.py, tests/test_character_performance_workflow.py, tests/test_generation_reference_controls.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-259",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_planning.py, src/ai_video/canvas_source_expression.py, src/ai_video/canvas_source_revision.py and 85 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-260",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/canvas_composition.py, src/ai_video/production/__init__.py, src/ai_video/production/_composition_visual.py and 13 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-261",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_vidu_subjects.py, src/ai_video/production/video.py, src/ai_video/production/video_compiler.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-262",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/video_artifact.py, tests/test_video_nominal_endpoint_recovery.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-263",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/canvas_sequence_handoff.py, scripts/canvas_sequence_packet.py, scripts/prepare_shot_continuity_p0.py and 32 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-264",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/s01_strategy_regression.py, src/ai_video/production/vidu_ad_provider.py, tests/test_generation_provider_wiring.py and 4 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-265",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_state_commit_ad.py, src/ai_video/production/models.py, src/ai_video/production/vidu_ad_provider.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-266",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_state_commit_paid_provider.py, src/ai_video/production/vidu.py, src/ai_video/production/vidu_ad_reader.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-267",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_paid_provider_project_reader.py, src/ai_video/production/_state_commit_ad.py, src/ai_video/production/_state_commit_paid_provider.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-268",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/vidu_ad_provider.py, tests/test_production_vidu_ad_wire.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-269",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_state_commit_ad.py, src/ai_video/production/grok_download.py, src/ai_video/production/metaso_h3.py and 4 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-270",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/s01_strategy_regression.py, src/ai_video/production/generation_decision.py, src/ai_video/production/generation_feedback.py and 9 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-271",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/vidu.py, tests/test_production_vidu.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-272",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/planning/production_strategy.py, src/ai_video/production/_composition_source_duration.py, src/ai_video/production/_composition_visual.py and 4 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-273",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/visual_quality_report.py, src/ai_video/production/final_output_contracts.py, src/ai_video/production/final_output_review.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-274",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_shot_router_contracts.py, src/ai_video/production/_state_commit_paid_provider.py, src/ai_video/production/_state_commit_voice_candidate.py and 13 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-275",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/generation_decision.py, src/ai_video/production/models.py, src/ai_video/production/video_requirement.py and 10 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-276",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/production/_state_commit_voice_candidate.py, src/ai_video/production/_state_commit_voice_intent.py, src/ai_video/production/_voice_project_reader.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-277",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/s01_strategy_regression.py, src/ai_video/canvas_production.py, tests/test_canvas_production.py and 8 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-278",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/provider_console_media_index.py, src/ai_video/provider_console_video_evidence.py, tests/test_provider_console.py and 1 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-279",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/provider_console.py, src/ai_video/provider_console_render.py, tests/test_provider_console.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-280",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/provider_console.py, src/ai_video/provider_console_video_evidence.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-281",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from tests/test_provider_console_media_index.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-282",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/provider_console.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-283",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/provider_console_media_index.py, tests/test_provider_console.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-284",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/quality_gates/__init__.py, src/ai_video/quality_gates/shot_readiness_gate.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-285",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/quality_gates/__init__.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-286",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/quality_intelligence/_capture_human.py, src/ai_video/quality_intelligence/_capture_p6.py, src/ai_video/quality_intelligence/capture.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-287",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/quality_intelligence/capture.py, tests/test_quality_experience_capture.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-288",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/quality_intelligence/__init__.py, tests/test_quality_experience_capture.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-289",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/quality_intelligence/__init__.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-290",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/quality_intelligence/__init__.py, src/ai_video/quality_intelligence/_capture_contracts.py, src/ai_video/quality_intelligence/_capture_human.py and 10 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-291",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/quality_intelligence/__init__.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-292",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video/quality_intelligence/__init__.py, src/ai_video/quality_intelligence/_capture_contracts.py, src/ai_video/quality_intelligence/capture.py and 6 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-293",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/check_p7_1_comfy_compatibility.py, src/ai_video/cli.py, src/ai_video/production/comfy_image.py and 12 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-294",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/check_p7_1_comfy_compatibility.py, src/ai_video/cli.py, src/ai_video/pipeline.py and 9 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-295",
+      "status": "KEEP",
+      "reason": "KEEP: generation_feedback.py:131 launches this exact module with python -m; tests/test_generation_feedback_review.py:35 asserts the subprocess entry."
+    },
+    {
+      "candidate_id": "CRT-296",
+      "status": "KEEP",
+      "reason": "KEEP: .codex/hooks.json:34 and .claude/settings.json:31 register this hook; tests/test_mcp_analyze.py dynamically imports it."
+    },
+    {
+      "candidate_id": "CRT-297",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from tests/test_mcp_audio_operator.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-298",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video_mcp/audio_operator.py, src/ai_video_mcp/server.py, src/ai_video_mcp/tools/audio_understand.py and 3 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-299",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video_mcp/analysis_hook.py, src/ai_video_mcp/server.py, src/ai_video_mcp/tools/analyze.py and 8 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-300",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video_mcp/analysis_hook.py, src/ai_video_mcp/server.py, src/ai_video_mcp/tools/analyze.py and 10 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-301",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video_mcp/server.py, src/ai_video_mcp/tools/frames.py, src/ai_video_mcp/tools/probe.py and 9 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-302",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from scripts/generation_feedback_driver.py, src/ai_video/canvas_production.py, tests/test_canvas_continuity.py and 5 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-303",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video_mcp/analysis_hook.py, src/ai_video_mcp/server.py, tests/test_mcp_analyze.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-304",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video_mcp/__main__.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-305",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video_mcp/analysis_hook.py, src/ai_video_mcp/server.py, src/ai_video_mcp/tools/review.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-306",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video_mcp/server.py, tests/test_mcp_apply_optimization.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-307",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video_mcp/audio_operator.py, src/ai_video_mcp/server.py, src/ai_video_mcp/tools/analyze.py and 2 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-308",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video_mcp/server.py, src/ai_video_mcp/tools/analyze.py, tests/test_mcp_frames.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-309",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video_mcp/server.py, src/ai_video_mcp/tools/apply_optimization.py, tests/test_mcp_optimize_plan.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-310",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video_mcp/server.py, src/ai_video_mcp/tools/analyze.py, src/ai_video_mcp/tools/frames.py and 5 more. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-311",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video_mcp/server.py, src/ai_video_mcp/tools/optimize_plan.py, tests/test_mcp_review.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-312",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video_mcp/server.py, src/ai_video_mcp/tools/analyze.py, tests/test_mcp_scene_detect.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-313",
+      "status": "KEEP",
+      "reason": "KEEP: src-layout-aware AST resolves actual Python inbound import(s) from src/ai_video_mcp/server.py, src/ai_video_mcp/tools/analyze.py, tests/test_mcp_transcribe.py. See python-static.json; bundled import resolution is a false positive."
+    },
+    {
+      "candidate_id": "CRT-314",
+      "status": "KEEP",
+      "reason": "KEEP: pytest uses tests/ as an import root; real helper module imports occur in tests/test_production_delivery_packager.py, tests/test_production_ecommerce_job.py, tests/test_production_ecommerce_job_assembly.py. The generic resolver uses the repository root."
+    },
+    {
+      "candidate_id": "CRT-315",
+      "status": "KEEP",
+      "reason": "KEEP: tests/test_production_state_recovery.py:443 executes this helper via its string path."
+    },
+    {
+      "candidate_id": "CRT-316",
+      "status": "KEEP",
+      "reason": "KEEP: pytest uses tests/ as an import root; real helper module imports occur in tests/production_project_factory.py, tests/test_canvas_continuity.py, tests/test_canvas_edit_first.py. The generic resolver uses the repository root."
+    },
+    {
+      "candidate_id": "CRT-317",
+      "status": "KEEP",
+      "reason": "KEEP: pytest uses tests/ as an import root; real helper module imports occur in tests/test_agent_harness.py, tests/test_production_ecommerce_job_e2e.py. The generic resolver uses the repository root."
+    },
+    {
+      "candidate_id": "CRT-318",
+      "status": "KEEP",
+      "reason": "KEEP: pytest uses tests/ as an import root; real helper module imports occur in tests/test_agent_harness.py, tests/test_generation_feedback_driver.py, tests/test_production_grok.py. The generic resolver uses the repository root."
+    },
+    {
+      "candidate_id": "CRT-319",
+      "status": "KEEP",
+      "reason": "KEEP: pytest uses tests/ as an import root; real helper module imports occur in tests/test_canvas_edit_first.py, tests/test_canvas_production.py, tests/test_canvas_project_data.py. The generic resolver uses the repository root."
+    },
+    {
+      "candidate_id": "CRT-320",
+      "status": "KEEP",
+      "reason": "KEEP: pytest uses tests/ as an import root; real helper module imports occur in tests/production_e2e_support.py, tests/test_production_voice_captions_e2e.py. The generic resolver uses the repository root."
+    },
+    {
+      "candidate_id": "CRT-321",
+      "status": "KEEP",
+      "reason": "KEEP: pytest uses tests/ as an import root; real helper module imports occur in tests/test_production_video_fake.py. The generic resolver uses the repository root."
+    },
+    {
+      "candidate_id": "CRT-322",
+      "status": "KEEP",
+      "reason": "KEEP: continuity-review.js:79 invokes downloadHumanReviewDecision from the panel submit handler. No external export consumer does not mean the function is dead."
+    },
+    {
+      "candidate_id": "CRT-323",
+      "status": "KEEP",
+      "reason": "KEEP: external-media-contract.js:16 and :194 invoke preferredRunBinding, including externalDisplayMetadata. The implementation is live."
+    },
+    {
+      "candidate_id": "CRT-324",
+      "status": "REVIEW",
+      "reason": "Private function; no in-repository consumer found. Rare dynamic/external use and regression safety are unproven. Proposed function-only patch is syntax-valid but has no execution proof."
+    },
+    {
+      "candidate_id": "CRT-325",
+      "status": "REVIEW",
+      "reason": "Public module function; external imports cannot be ruled out, and passing in-repository tests would not prove external API compatibility. Proposed function-only patch is syntax-valid but has no execution proof."
+    }
+  ]
+}

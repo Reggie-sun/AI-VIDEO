@@ -19,7 +19,9 @@ from ai_video.production.generation_rejection import (
     GenerationQualityRejectionReceipt, validate_abandoned_result,
 )
 from ai_video.production.generation_runtime_repair import (
-    RuntimeRepairAuthorization, RuntimeRepairGrant,
+    RuntimeRepairAuthorization,
+    RuntimeRepairGrant,
+    is_paid_no_effect_repair_grant_for_evidence,
 )
 from ai_video.production.video import (
     ProviderProfilePointer, VideoGenerationRequest, VideoOutputRequirement, VideoProviderCapabilities,
@@ -390,6 +392,16 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
     # a caller-supplied media claim cannot act as recovery authorization.
     known_attempts = {exact_attempt(e) for e in inputs.evidence
                       if e.outcome in {"media", "runtime_failure"}}
+    known_attempts.update(
+        exact_attempt(entry)
+        for entry in inputs.evidence
+        if any(
+            is_paid_no_effect_repair_grant_for_evidence(
+                grant, entry, require_unconsumed=False,
+            )
+            for grant in inputs.runtime_repairs
+        )
+    )
     def unresolved_unknown(entry):
         return entry.outcome == "unknown_outcome" and exact_attempt(entry) not in known_attempts
 
@@ -402,9 +414,13 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
     if any(e.intervention_id is not None and e.intervention_semantic_hash is None for e in current_attempts):
         return GenerationDecision(**base, disposition="EVIDENCE_GAP",
                                   rationale=("repair semantic identity missing from current attempt history",))
-    if latest is not None and latest.outcome == "not_submitted" and any(
-        entry.outcome != "not_submitted" for entry in current_attempts
-    ):
+    pretransport_recovery = latest is not None and any(
+        is_paid_no_effect_repair_grant_for_evidence(grant, latest)
+        for grant in inputs.runtime_repairs
+    )
+    if (latest is not None and latest.outcome == "not_submitted"
+            and any(entry.outcome != "not_submitted" for entry in current_attempts)
+            and not pretransport_recovery):
         return GenerationDecision(**base, disposition="EVIDENCE_GAP",
             rationale=("prepared-only work cannot replace the last submitted outcome and baseline",))
     goal_changed = False
@@ -430,6 +446,28 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
             requirement=next((x.projection.requirement for x in inputs.experiences
                 if x.candidate.recipe.requirement_hash == old_recipe.requirement_hash), None))
         base["diagnosis"] = diagnosis
+        # A requested higher-resolution version can retain its exact raw rubric.
+        # Recognize that prospective goal without claiming the old media passed;
+        # compiled admission and the submit lock still require its sealed /3.
+        prior_candidate = next((c for c in inputs.historical_recipes
+                                if c.scope_hash == latest.recipe_scope_hash), None)
+        if policy.execution_purpose == "qualification" and prior_candidate is not None and len(candidates) == 1:
+            target_candidate = candidates[0]
+            if (prior_candidate.candidate_id == target_candidate.candidate_id
+                    and prior_candidate.capabilities == target_candidate.capabilities
+                    and prior_candidate.recipe.acceptance_policy == target_candidate.recipe.acceptance_policy
+                    and not any(item.verdict == "FAIL" for item in latest.findings)):
+                from ai_video.production.generation_resolution_revision import ResolutionRevisionTarget
+                from ai_video.production.generation_visual_revision import validate_visual_revision_goal
+
+                try:
+                    validate_visual_revision_goal(prior_candidate.final_output_goal, target_candidate.final_output_goal)
+                    ResolutionRevisionTarget.create(old_output=prior_candidate.output_requirement,
+                        target_output=target_candidate.output_requirement,
+                        rationale="Recognize a prospective output-only goal; execution requires exact sealed authorization.")
+                    goal_changed = True
+                except (AttributeError, TypeError, ValueError):
+                    pass
         known_failure_grant = next((g for g in inputs.runtime_repairs
             if not g.consumed and g.authorization.paid_known_failure_retarget is not None
             and g.authorization.evidence_hash == latest.evidence_hash
@@ -497,11 +535,12 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
         # failure.  It never overrides quality findings, unknown outcomes, or
         # mixed failure classes, and the committer consumes the grant inside the
         # replacement submit intent's atomic write.
-        if diagnosis.failure_classes == ("RUNTIME_FAILURE",):
+        if diagnosis.failure_classes == ("RUNTIME_FAILURE",) or pretransport_recovery:
             grant = next((g for g in inputs.runtime_repairs
-                          if not g.consumed
-                          and g.authorization.evidence_hash == latest.evidence_hash
-                          and g.authorization.attempt_id == latest.attempt_id), None)
+                          if g.authorization.evidence_hash == latest.evidence_hash
+                          and g.authorization.attempt_id == latest.attempt_id
+                          and (is_paid_no_effect_repair_grant_for_evidence(g, latest)
+                               if latest.outcome == "not_submitted" else not g.consumed)), None)
             if grant is not None:
                 retarget = grant.authorization.paid_no_effect_retarget
                 known_failure_retarget = grant.authorization.paid_known_failure_retarget
@@ -566,6 +605,9 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
             if inputs.abandoned_result is not None and reason == "EVIDENCE_GAP":
                 continue
             if runtime_repair is not None and reason == "RUNTIME_FAILURE":
+                continue
+            if (runtime_repair is not None and pretransport_recovery
+                    and reason == "EVIDENCE_GAP"):
                 continue
             if reason in diagnosis.failure_classes:
                 return GenerationDecision(**base, disposition=reason,

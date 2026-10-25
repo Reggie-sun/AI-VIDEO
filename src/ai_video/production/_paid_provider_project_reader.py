@@ -61,6 +61,7 @@ def _root_and_path(root: str | Path, stored: Path) -> tuple[Path, Path]:
 class _BudgetReadTraversal:
     # Private to one top-level read; never shared across public calls or locks.
     completed: set[tuple[Path, str, str]] = field(default_factory=set)
+    bindings: dict = field(default_factory=dict)
 
 
 def load_paid_provider_budget(
@@ -174,11 +175,15 @@ def _verify_submit_quota_extensions(
         try:
             base = _load_paid_provider_budget(root, entry.base_budget, seen, traversal)
             from ai_video.production._generation_feedback_reader import (
-                load_generation_execution_binding,
+                _load_generation_execution_binding,
             )
 
-            target_binding = load_generation_execution_binding(root, entry.target_binding)
-            prior_binding = load_generation_execution_binding(root, entry.prior_binding)
+            target_binding = _load_generation_execution_binding(
+                root, entry.target_binding, traversal.bindings
+            )
+            prior_binding = _load_generation_execution_binding(
+                root, entry.prior_binding, traversal.bindings
+            )
         except AiVideoError as exc:
             raise _invalid("Paid Provider submit quota extension base is invalid.", str(exc)) from exc
         except (OSError, ValueError) as exc:

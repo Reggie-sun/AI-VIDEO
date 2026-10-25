@@ -429,8 +429,31 @@ class AmbienceIntent(StrictModel):
         return self
 
 
+class ConversationTurn(StrictModel):
+    """An ordered speech turn whose rhythm is directed without a time window."""
+
+    speaker_id: str = Field(pattern=_SAFE_ID)
+    verbatim_text: str = Field(min_length=1)
+    on_screen: bool
+    response_obligation: str = Field(min_length=1)
+    lip_sync_required: bool
+
+    @field_validator("verbatim_text", "response_obligation")
+    @classmethod
+    def _nonblank_text(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("conversation speech and response must not be blank")
+        return value
+
+    @model_validator(mode="after")
+    def _visible_lips(self) -> "ConversationTurn":
+        if self.lip_sync_required and not self.on_screen:
+            raise ValueError("off-screen conversation cannot require visible lip sync")
+        return self
+
+
 class DialogueIntent(StrictModel):
-    mode: Literal["none", "dialogue"]
+    mode: Literal["none", "dialogue", "conversation"]
     language: str | None = Field(
         default=None,
         pattern=_LANGUAGE_TAG,
@@ -447,6 +470,16 @@ class DialogueIntent(StrictModel):
     on_screen: bool | None = None
     response_obligation: str | None = None
     lip_sync_required: bool = False
+    turns: tuple[ConversationTurn, ...] = ()
+
+    @model_serializer(mode="wrap")
+    def _serialize_dialogue_mode(self, handler):
+        data = handler(self)
+        if self.mode == "conversation":
+            return {key: value for key, value in data.items()
+                    if key in {"mode", "language", "turns"}}
+        data.pop("turns", None)
+        return data
 
     @field_validator("language")
     @classmethod
@@ -479,6 +512,14 @@ class DialogueIntent(StrictModel):
             self.on_screen,
             self.response_obligation,
         )
+        if self.mode == "conversation":
+            if (self.language is None or not self.turns
+                    or any(value is not None for value in payload[1:])
+                    or self.lip_sync_required):
+                raise ValueError("conversation requires language and untimed turns only")
+            return self
+        if self.turns:
+            raise ValueError("only conversation may carry speech turns")
         if self.mode == "none":
             if any(value is not None for value in payload) or self.lip_sync_required:
                 raise ValueError("none dialogue boundary cannot carry dialogue facts")
@@ -1099,6 +1140,14 @@ class ProviderNeutralVideoRequirement(StrictModel):
         if tuple(sorted(self.target_shot.character_ids)) != character_ids:
             raise ValueError("requirement Characters must match the exact target Shot")
         intent = self.generation_intent
+        if intent.dialogue_intent is not None and intent.dialogue_intent.mode == "conversation":
+            if self.voice_routing is not None:
+                raise ValueError("conversation voice routing is not supported")
+            if self.audio_need is AudioNeed.FORBIDDEN:
+                raise ValueError("conversation requires audible speech")
+            if any(turn.on_screen and turn.speaker_id not in character_ids
+                   for turn in intent.dialogue_intent.turns):
+                raise ValueError("on-screen conversation speaker must be a Shot Character")
         if intent.primary_camera_motion is None:
             if self.contract_version == _CAMERA_COMPLETE_REQUIREMENT_CONTRACT_VERSION:
                 raise ValueError("camera-complete v4 requirement requires camera_motion")

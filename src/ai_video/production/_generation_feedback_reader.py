@@ -5,6 +5,7 @@ from ai_video.errors import AiVideoError, ErrorCode
 from ai_video.production._lifecycle_schema import (
     GenerationExecutionBindingPointer, GenerationExperienceReceiptPointer,
     GenerationQualityRejectionReceiptPointer, QualificationExecutionBindingPointer,
+    GenerationVisualSupersessionReceiptPointer,
     RuntimeRepairAuthorizationPointer,
 )
 from ai_video.production.paths import _read_regular_file_nofollow, resolve_contained_path
@@ -33,6 +34,11 @@ def load_generation_execution_binding(
     root: str | Path, pointer: GenerationExecutionBindingPointer
 ):
     """Reopen the exact pure decision that authorized one new submit."""
+    return _load_generation_execution_binding(root, pointer, {})
+
+
+def _load_generation_execution_binding(root, pointer, validated):
+    """Reuse parsed bytes only within the owning reader's current traversal."""
 
     from ai_video.production.generation_execution import (
         GenerationDecisionExecutionBinding,
@@ -43,7 +49,10 @@ def load_generation_execution_binding(
         raw = _read_regular_file_nofollow(
             resolved, contained_by=resolved_root / "state"
         )
-        binding = GenerationDecisionExecutionBinding.model_validate_json(raw.data)
+        key = (resolved, raw.file_sha256)
+        binding = validated.get(key)
+        if binding is None:
+            binding = GenerationDecisionExecutionBinding.model_validate_json(raw.data)
     except (OSError, ValidationError, ValueError, AiVideoError) as exc:
         raise _invalid(
             "Could not reopen generation decision execution binding.", str(exc)
@@ -55,6 +64,9 @@ def load_generation_execution_binding(
         != pointer.request_fingerprint
     ):
         raise _invalid("Generation decision execution binding pointer is invalid.")
+    # Every visit above still reads current bytes and checks all pointer fields.
+    # Never retain a partial or failed validation, or share it across public reads.
+    validated[key] = binding
     return binding
 
 
@@ -112,6 +124,16 @@ def load_generation_quality_rejection(
     ):
         raise _invalid("Generation quality rejection pointer identity is invalid.")
     return receipt
+
+
+def load_generation_visual_supersession(
+    root: str | Path, pointer: GenerationVisualSupersessionReceiptPointer
+):
+    from ai_video.production.generation_visual_revision import (
+        load_generation_visual_supersession as load,
+    )
+
+    return load(root, pointer)
 
 
 def load_runtime_repair_authorization(
@@ -214,6 +236,92 @@ def verify_generation_feedback(root, state, request):
                      else load_video_fetch_receipt(root, fetch_pointer))
             if any(s.artifact_sha256 != fetch.artifact_sha256 or s.size_bytes != fetch.size_bytes for s in marked):
                 raise _invalid("Marked evaluation differs from exact fetched media.")
+    if state.visual_supersession is not None:
+        receipt = load_generation_visual_supersession(root, state.visual_supersession)
+        if state.fetch_receipt is None or state.paid_submit_receipt is None:
+            raise _invalid("Visual supersession has no exact remote paid fetch.")
+        from ai_video.production._video_project_reader import load_video_fetch_receipt
+
+        fetch = load_video_fetch_receipt(root, state.fetch_receipt)
+        experience_pointer = state.generation_experiences[-1] if state.generation_experiences else None
+        if experience_pointer is None:
+            raise _invalid("Visual supersession has no retained generation experience.")
+        experience = load_generation_experience(root, experience_pointer)
+        evidence = next((item for item in experience.evidence
+                         if item.evidence_hash == receipt.evidence_hash), None)
+        binding = (
+            load_generation_execution_binding(root, state.execution_binding)
+            if state.execution_binding is not None else None
+        )
+        if binding is None or request.activation_scope is None:
+            raise _invalid("Visual supersession has no exact decision-bound Shot request.")
+        selected = tuple(item for item in binding.inputs.candidates
+                         if item.candidate_id == binding.decision.selected_candidate_id)
+        request_scope = request.activation_scope.request
+        first_frames = tuple(item for item in request_scope.image_bindings
+                             if item.role == "first_frame")
+        if (
+            len(selected) != 1
+            or experience.projection != binding.projection
+            or experience.candidate != selected[0]
+            or selected[0].final_output_goal != receipt.old_goal
+            or len(first_frames) != 1
+            or first_frames[0].asset_sha256 != receipt.old_first_frame_sha256
+            or (receipt.schema_version == "generation-visual-supersession/1"
+                and receipt.target_first_frame_sha256 == first_frames[0].asset_sha256)
+            or (receipt.schema_version in {"generation-visual-supersession/2", "generation-visual-supersession/3"}
+                and receipt.target_first_frame_sha256 != first_frames[0].asset_sha256)
+            or receipt.attempt_id != state.visual_supersession.attempt_id
+            or receipt.request_fingerprint != request.request_input_hash
+            or receipt.request_fingerprint != request_scope.request_input_hash
+            or receipt.execution_binding != state.execution_binding
+            or receipt.fetch_receipt != state.fetch_receipt
+            or receipt.paid_submit_receipt != state.paid_submit_receipt
+            or receipt.artifact_sha256 != fetch.artifact_sha256
+            or receipt.artifact_size_bytes != fetch.size_bytes
+            or receipt.experience_content_hash != experience_pointer.content_hash
+            or receipt.base_project != request_scope.base_project
+            or receipt.task_id != binding.inputs.limits.task_id
+            or receipt.shot_id != binding.context.target_shot_id
+            or evidence is None
+            or evidence.attempt_id != receipt.attempt_id
+            or evidence.request_hash != receipt.request_fingerprint
+            or evidence.outcome != "media"
+            or evidence.artifact_sha256 != receipt.artifact_sha256
+            or evidence.task_id != receipt.task_id
+            or evidence.shot_id != receipt.shot_id
+            or evidence.facts_hash != binding.inputs.facts_hash
+            or evidence.recipe_scope_hash != selected[0].scope_hash
+            or evidence.rubric_hash != selected[0].recipe.rubric_hash
+        ):
+            raise _invalid("Visual supersession receipt differs from retained request, media, goal, or evaluation evidence.")
+        from ai_video.production.generation_visual_revision import validate_visual_revision_goal
+
+        try:
+            validate_visual_revision_goal(receipt.old_goal, receipt.target_goal)
+            if receipt.coverage_revision is not None:
+                from ai_video.production.generation_coverage_revision import validate_coverage_target
+
+                validate_coverage_target(binding, experience, receipt.coverage_revision)
+            if receipt.resolution_revision is not None:
+                from ai_video.production.generation_resolution_revision import validate_resolution_target
+
+                validate_resolution_target(binding, experience, receipt.resolution_revision)
+            from ai_video.production.generation_evaluation import validate_generation_evaluation_sources
+            from ai_video.production.project import load_qa_policy
+
+            qa_policy = load_qa_policy(root, receipt.qa_policy)
+            validate_generation_evaluation_sources(
+                sources=experience.evaluation_sources,
+                evidence=evidence,
+                qa_policy=qa_policy,
+                size_bytes=fetch.size_bytes,
+                acceptance=selected[0].recipe.acceptance_policy,
+                requirement=experience.projection.requirement,
+            )
+        except ValueError as exc:
+            raise _invalid("Visual supersession goal or original QA evidence is invalid.", str(exc)) from exc
+        return
     if state.quality_rejection is None:
         return
     receipt = load_generation_quality_rejection(root, state.quality_rejection)

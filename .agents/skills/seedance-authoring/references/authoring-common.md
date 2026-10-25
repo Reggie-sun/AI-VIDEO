@@ -27,6 +27,16 @@ Provider grammar / reference-role 技术适配须展示原文与实际输入的�
 不得机械拼入 prompt。已授权创作时，只表达该 Shot 需要的可观察内容与必要 reference jobs；不以
 prompt 更长、lint PASS 或 source quote 仍存在来证明语义保真或模型遵从提高。
 
+## Performance And Whole-Shot Review
+
+表演修订先辨明用户明确约束、已批准叙事事实、导演选择和旧 repair margin；保留构图/坐姿不能自行扩张为头身全锁。让可读的动机连接脸部、目光、呼吸、平衡与主动作，按景别说明可见范围；不强制每镜增加动作，不用全员同步眨眼或摆动代替背景生活状态。有来源的静止、`subtle`、`none`、`throughout` 均可保留，遮挡及微表演不可辨认时明确缺证。
+
+author/revise 后逐项核对 canonical directions → selected QA 的人物/beat 表达职责 → exact 最终 native 正文。普通精简 binding 的片段可共同表达多个明确列出的字段；在现有 QA 表达里绑定具体路径及片段，不继承被替换长文的覆盖声明，不凭父路径或泛泛的“自然一些”豁免全员。当前新普通 Seedance binding 使用已封存 compiler/4；preserved-source 原有逐字契约独立，不把整个渲染表演模板强塞进普通正文。程序核验片段、路径和绑定；作者另审片段是否确实表达意图、有无反向语句矛盾，不将字面检查当作 NLP 等义证明。
+
+实际查看每张 exact 参考，分别检查主要人物、背景人物、头身比例、肤质/发丝/衣物材质和环境光照。只报告有局部证据的风格结论及未确定项，不以主角 CG、人数或覆盖完整证明全场统一；合法混合参考须使用既有 scope 声明。换图沿现有 Registry/authoring/review owner，不默认增加白模、参考或模型调用。
+
+实际结果另沿现有 Per-Shot Gate 以 project-local `video-analysis` 观察 exact MP4；表演须正常速度观看，声音语义和反应时机须可靠的同 bytes 声画证据。分别保留基础连续性、表演/观感、完整剧情/声音结论；FAIL/NOT_EVALUATED 停止，缺证先同 bytes 补证。工程接通、参考覆盖或静态表达通过均不能签发自然度、activation 或最终验收。
+
 ## Prompt Grammar
 
 以下起草 guidance 适用于已授权创作/优化或对应 repair；来源保留沿 Generation Input Boundary，

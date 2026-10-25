@@ -68,7 +68,12 @@ def resolved_video_trim_duration(
     *,
     duration_frames: int,
     delivery_profile: DeliveryProfile,
+    normal_speed_preview: bool = False,
 ) -> int:
+    if type(normal_speed_preview) is not bool or (
+        normal_speed_preview and layer.source_time_map is not None
+    ):
+        raise VisualMediaValidationError("Normal-speed preview cannot carry a retime map.")
     metadata = asset.video_metadata
     if metadata is None:
         raise VisualMediaValidationError(
@@ -87,7 +92,7 @@ def resolved_video_trim_duration(
         raise VisualMediaValidationError(
             f"Video asset {asset.asset_id} dimensions do not match delivery."
         )
-    if metadata.fps_numerator != (
+    if not normal_speed_preview and metadata.fps_numerator != (
         delivery_profile.fps * metadata.fps_denominator
     ):
         raise VisualMediaValidationError(
@@ -119,7 +124,18 @@ def resolved_video_trim_duration(
         raise VisualMediaValidationError(
             "Video time map source duration must match the selected trim."
         )
-    if layer.trim_start_frame + trim_duration > metadata.frame_count:
+    # A sealed replacement-audio development preview is played at 1x. Its
+    # trim grid is the delivery clock, exactly as the renderer's media seek;
+    # retain native VFR metadata and check wall-clock coverage instead of
+    # pretending native samples use the output frame rate. Production and
+    # explicit retiming keep their existing strict frame-rate contract.
+    if normal_speed_preview:
+        if ((layer.trim_start_frame + trim_duration) * 1000
+                > metadata.duration_milliseconds * delivery_profile.fps):
+            raise VisualMediaValidationError(
+                f"Video asset {asset.asset_id} cannot cover its preview clock interval."
+            )
+    elif layer.trim_start_frame + trim_duration > metadata.frame_count:
         raise VisualMediaValidationError(
             f"Video asset {asset.asset_id} cannot cover its resolved Shot interval."
         )

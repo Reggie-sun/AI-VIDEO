@@ -2,7 +2,57 @@
 
 Date: 2026-10-20
 
-## Directed Redo Checkpoint — 2026-10-21
+## Subtitle Execution Repair — 2026-10-21
+
+用户否定旧 `c951…e6e3` 的字幕“太low了”，随后要求修复字幕执行问题，并明确选择“成片与执行规范一起修”。旧样帧检查确认：宽底条反复出现，接盒时叠泛化文案，结尾三根同形长条挤占商品与留白；未发现渲染器把合格设计画坏的证据。旧版仍保留作拒绝基线，原先抽帧finding为空不代表用户认可。
+
+本轮只调整现有 G4 guidance 与本片图文数据，不修改共享 Python renderer/validator 或扩建新模块。现有 `ecommerce-ad-workflow` 入口明确本地审片、字幕修复、手工编排也适用；`references/advertising-copy-graphics.md#authoring-and-media-review` 补充表达/必要性先于样式、落实到真实输入、检查图层与原速阅读、用户拒绝后重审而不能以技术PASS关闭。该指导不具备自动拦截Agent或保证审美的能力，不新增状态或审美评分；这是用户直接要求的规范修复，不是将单次结果自动ADOPT为经验规则。
+
+实际新编排位于 `runs/hotpatch-dayoff-20261020-001/author-subtitle-repair.py`，设计依据为同目录 `subtitle-repair-direction.md`。开场改为“下班了”与手机动作关联的“手机也歇会儿”，仅局部底衬；接盒/落座留白；商品名36px、结构示意34px、片尾主题50px及详情28px，商品段不加底条。安全区、避让对象、cue与既有beat事件绑定实际写入 `GraphicTreatment`。独立概念复核CC-10/11建议标签可读、去掉悬空逗号、时点关联，Parent采纳；不将这些具体字号/文案写成通用规范。
+
+使用既有 `AdCreativePlan → CompositionSpec → ResolvedTimeline → HyperFrames 0.7.103 → ProductionStateCommitter` 完成本地 `hotpatch-subtitle-repair-006`。新MP4 SHA `82ad5125cf65a51a83f89ae6e243aaca48ade737e3aa1f5868bf282bf0306423`，3,971,940 bytes，768×1366、24fps、264帧/11秒、AAC48kHz stereo；canonical路径为 `runs/hotpatch-dayoff-20261020-001/production/state/render/outputs/82ad5125cf65a51a83f89ae6e243aaca48ade737e3aa1f5868bf282bf0306423.mp4`。同字节审片副本 `/home/reggie/电商/热敷贴/成片/今天_腰先下班_11秒_字幕重设计版.mp4`，不覆盖旧版。
+
+局部验证：真实render完成，严格重开项目；对比新旧resolved visual/audio spans与Composition layers/audio tracks完全相同；新旧MP4实际解码PCM SHA均为 `2df9d19771a0f2343a6f9e5880985dfa93f0e0d7673ad077ecfaf28d3b770b6d`。新图文7层，非原8层。结果见同目录 `subtitle-repair-media-check.json`、`subtitle-repair-render-output.json`；canonical render receipt为 `production/state/render/render-receipts/c0aa4d786598023dcdfeede6b5e30dd06bd15f395db250c525a96a756e90b036.json`。实际调用project-local MCP取得22张半秒样帧，保存在 `subtitle-repair-006-visual-mcp.json`；Parent查看开场、放手机、接盒、落座、两商品段与收尾，未见文字压住脸/手/商品或明显裁字，但不能以此证明正常速度完整阅读与节奏。音频不重跑远程分析，复用原音轨且解码一致不新增聆听证据。
+
+独立Native `concept_review`核验exact SHA并查看全22张实帧，未见文字遮住脸、手、橙盒；对两处现有规范变更finding为空，确认本地preview不能豁免设计且没有新增固定模板/自动审美批准。CC-12为non_blocking：7/8秒切入帧标签几乎不可见，7.5/8.5秒才清楚，淡入缩短一秒商品段的清晰停留。Parent确认阅读窗口风险，未宣称修复；保留现有0.25秒fade供用户原速审片，未为消除此切点现象使用历史已知会提前插值露出未来字幕的NONE entrance，避免布局回归或再扩建工程。具体边界见 `subtitle-repair-independent-review.json`；不把本轮实帧复核说成原速阅读通过。
+
+用户审美、正常速度完整人工听看、P6/Final Acceptance仍NOT_EVALUATED。本轮无视频/音频Provider调用，历史计数保持视频3/3、音频4/4。遵从用户先审片后工程套件/commit的要求，未跑完整工程套件、未stage/commit/push；既有失败/中止Harness不被本轮局部证明替代。规范仅做局部diff核对与上述独立定向复核，待用户认可后按实际changed paths完成工程验证。其他dirty/index工作保留。
+
+按 `record-ai-video-session` 稳定候选边界更新本记录；`distill-ai-video-learning`评估为 `no_candidate`：当前是一条受用户否定的基线及尚未获认可的字幕修复链，不能据此提出已证实的通用审美结论。历史检索返回exit3、library-incompatible，已按owner停止重试并依据当前文件处理，不为记录重建索引或新增测试/Provider调用。
+
+## Full Film Review Copy — 2026-10-21
+
+最新用户反馈“你在干什么这合理吗这么慢”后，Parent确认把剪辑扩成工程修改并等待宽泛回归拖延了交付，属于流程选择失当。已直接提供下述完整视频，并停止本任务独占的`production_contract_tests`进程；Harness正常保存中止结果；回传stdout在中止前已有7个F标记，但没有完整failure明细，因此工程验证未通过，不能把它仅解释为中止或声称整组检查通过。稳定receipt为`.agent/harness/runs/hotpatch-final-product-film-stable-20261021/receipt.json`：前9项完成，完整合同套件中止，后续未执行。用户随后明确顺序：先由用户审片并认可效果，才运行完整套件，验证通过后再commit/push；这条流程指令不是对当前视频的认可。后续套件、诊断修复与提交均等待该实际认可。工程修改保留本地、未提交/未推送；媒体文件及所有历史保留。本轮record/learning评价为`recorded/no_candidate`，没有为记录新增Provider、媒体或测试。以下本地focused48 passed、独立代码审查及媒体检查各保留自身证明范围，不代替未完成的最终policy验证。
+
+用户对最后一次改为“放下手机—接盒—伴侣落座”、退役纸卷剧情的具体问题回答“我接受生成啊”。授权封存在 task `final-slot-authorization.json`，沿原 METASO / `MiniMax-H3` 执行第3次且最后一次视频提交；没有再次询问、自动重抽或切回 Seedance。以下2/3视频、3/4音频以及等待此回复的段落均为历史，现由本节取代。
+
+新 source attempt `canvas-d5478cc0e117ff0e92a01a004121235590805518`，exact MP4 SHA `55857f1ae02d2e2be8d00a3c46030cfa2b14d35f029ade93afead44ab6c440ea`，6,146,483 bytes，768×1344、192帧、24fps、8秒、AAC32kHz。输入为实际核验过的原创人物/客厅图、真实中央橙盒及8秒粗动作白模；无竞品上传。exact request body SHA `5cfe93ad47cebbeef248d83a5fc318113f0e933336587be1b561b629610adbec`。HTTP200结果已知；同一输出经原 public-address pinning/TLS SNI/no-redirect downloader取得，没有重复POST。
+
+显式 project-local MCP 每0.5秒观察全8秒：放下一部手机并释放、女子双手承接后男子释放单个橙盒、男子随后坐在右侧，人物身份和物件连续。`SP1-canonical-diagnosis.json` 六项要求全PASS，证据hash `5b4f146ef02d1995d47b6cf2be56a022b0ee3a01d45c15d0f93586489df558f4`；已沿 canonical validate/activate 准入。手机是否反扣未获证明，已披露导演朝向偏差；不将逐项PASS说成prompt逐字服从。sound项仅证明明确MUTE/P4责任，不能替代成片音频。
+
+完整剪辑由 `CompositionSpec → ResolvedTimeline → HyperFrames 0.7.103 → ProductionStateCommitter` 完成：source0.5–7.5秒以1.0x保留7秒，接1秒真实包装、1秒贴片结构示意、2秒真实包装收尾，共264帧/11秒。文字从“再忙一下？”到“手机，下班了。”与放下手机动作关联；只借休息与关心建立关系，不演产品即时疗效。完整原始brief、七项explicit intents及九项原final requirements均保留；开发审片另补五项视觉方向，不回写或伪装成历史raw准入标准。
+
+最终 canonical 文件：`runs/hotpatch-dayoff-20261020-001/production/state/render/outputs/c951788b2c107da8e7666eeb3bd810e9a5c519ccf59fc5b551216a487030e6e3.mp4`，SHA同文件名，4,042,084 bytes，768×1366、H.264、24fps、AAC48kHz stereo。已按相同SHA复制到用户素材目录 `成片/今天_腰先下班_11秒_有声审片版.mp4`，不重新编码、不覆盖异名旧片；这是本地审片副本，不是Production delivery package或公开发布。
+
+P4三个登记音轨为实录手机落桌、低音量纸盒窸窣及钢琴。新手机声来源为 Vladislav_Sazonov 的 [Take the phone and put it on wooden table](https://freesound.org/people/Vladislav_Sazonov/sounds/859962/)，实际页面CC0与公开preview/完整PCM派生保留于 `input/licensed-audio/`；其他两项CC0来源见历史声音节。最终平均音量−21.8dBFS、峰值−5.4dBFS。第4次且最后一次 `gemini-3.8-flash` 分析exact完整11秒音轨，HTTP200，明确观察到 `piano music`、无可辨语音；未单独辨认短促动作声，故不能声称其存在感/同步听感通过。当前总消费为视频3/3、音频4/4，均known outcome，无剩余额度或UNKNOWN。
+
+独立Native Codex审片查看完整半秒样帧，CC-08指出结构局部过紧、CC-09指出收尾字靠边。Parent确认并使用原像素重排留白、展示更多层次、内移文字；新版`c951…`定向复核finding set为空。`film-005-visual-mcp.json`为22帧exact证据。此复核不是正常速度完整播放或人工听音；finish、complete-av、holistic及最终商业审美/传播效果仍NOT_EVALUATED。未取得PackageReady、commercial I2V source handoff、P6或Final Acceptance，不以raw激活或渲染成功代签。
+
+## Local Finishing Recovery
+
+首次静帧接入时，来源AssetRecord元数据更新导致旧crop receipt身份不匹配；通过原candidate/authoring/committer入口创建`packaging-center-hero-v2`并退役仅该无效active派生记录，保留旧不可变证据。未直接编辑Manifest。后续本地render001–003已知check失败：对比度及不同时段图文提前插值重叠；调整为明确淡入淡出、保持独立primary层后render004成功。没有为此关掉lint或放行check错误，失败attempt均保留。
+
+为修复CC-08/09，现有`production/image_preparation.py`新增有界`letterbox`操作，原始像素居中落在显式纯色画布，不缩放、不重绘；旧pad/crop/mask规则及历史receipt字节不变。真实结构图先裁掉上方功效标题和左侧标签，再保留轮廓/分层作示意；包装采用干净crop及暖色留白。两个派生SHA分别为`2db503fac337cad2845ca72c7b1b5a6d18d33ca17ea534f9de6de60ea2d8002e`和`450a8adc56c6135c4b2ba7659db27a94a54cc20852209d9a5ba3e481e70be107`。均经原Registry/committer登记、strict reader逐像素重验。
+
+真实后编辑还暴露reader缺口：authoring已由P5合法退役旧render-domain，但旧last-render pointer仍保留历史，strict reader因此拒绝新修订。两个已知失败事务原样保留。修复仅允许无active render-domain且完整旧四节点SUPERSEDED的情况，并从SUCCEEDED历史attempt取得exact origin graph，核验四类节点、node/artifact/fingerprint和同一render pointer；旧render/source/output继续重验。部分历史、删一补一伪节点、不存在origin、改fingerprint均拒绝，旧输出不算新项目fresh。未删除历史pointer或绕过唯一committer。
+
+工程TDD先复现render→authoring被拒绝，再验证修订、strict重开和新render；图像准备验证RGB/RGBA完整原像素、边界拒绝及receipt重开。最终focused验证48 passed。Risk Gate为`NATIVE_REVIEW_REQUIRED`，原生`reviewer_xhigh`独立审查指出LR-01“数量不足以证明完整unit”、LR-02“origin未与实际render成对绑定”；Parent均确认。修复沿同一成功render attempt绑定exact reopened state的attempt/project/registry/timeline与origin graph，再核验原节点；新增伪节点/伪origin/指纹、两次成功render交换pointer与篡改attempt配对的拒绝回归。关闭和最终policy证据见本轮保存的review材料及 `.agent/harness/runs/hotpatch-final-product-film-stable-20261021/receipt.json`；代码/记录只按owned paths提交，不夹带同时运行窗口的Skill与文档。第三轮固定快照finding set为空；其后首个最终Harness因project.py增长15 effective LOC而拒绝，故把同一退役历史判定移入既有`_project_dependency_evidence` owner，project.py不增长、不改判定条件；Parent对迁移差异自审并重验，不声称reviewer审过迁移后字节，也不为纯迁移启动第4轮。原失败receipt保留于`hotpatch-final-product-film-20261021`。
+
+开发审片封套`film-005-review-packet/`保留exact原始brief、coverage、完整合同与五项视觉方向；`creative_goal_binding`核验成功，报告`goal_chain=verified`、`review_scope=full_contract`，整体`not_evaluated`，没有用partial proof生成最终PASS。当前保留的缺口为完整人工听看、holistic/finish及动作声音可辨/同步，未伪造human authority。
+
+本节是当前稳定制作记录，以下声音失败与纸卷剧情继续作为历史证据保留，不因新片完成而改成PASS。最终完整人类听看仍由用户审片，不回写假human证据。
+
+## Directed Redo Checkpoint — 2026-10-21 (Historical)
 
 用户对“剩余两次分别重做6秒腾座开场、8秒商品互动；总提交仍不超过3次、零自动重抽、原声MUTE/P4、最后一次Gemini留给整片”的具体问题回答“允许按此方案重做”。授权与前序消费封存在 task `redo-authorization-20261021.json`；它不是新增额度。以下旧段落的一次视频消费与待授权描述均为历史状态。
 
@@ -44,7 +94,7 @@ TDD 先观察新 scope 被旧 admission 拒绝，再完成 bootstrap/strict read
 
 ## Purpose
 
-记录《今天，腰先下班》首镜真实生成、声音失败及用户节奏反馈后的非生成剪辑预览。完整原创商业成片目标保留；未交付完整成片，也未把预览标为 Production 接受。
+本记录最初记录首镜真实生成、声音失败及用户节奏反馈后的非生成剪辑预览。该历史阶段未交付完整成片；当前完整有声审片文件与仍缺的人类验收由顶部`Full Film Review Copy`节取代，不把旧预览改称Production接受。
 
 ## Verified Media
 
@@ -68,7 +118,7 @@ TDD 先观察新 scope 被旧 admission 拒绝，再完成 bootstrap/strict read
 
 `S01-edit-render-report.json` 保存实测及 HyperFrames lint/check receipts，均零 error / warning。显式 `video-analysis.video_analyze(frame_interval=0.25)` 获取 12 帧并实际检查，证据 `S01-edit-visual-mcp.json`；纸卷动作、女子转向与对视仍可见。抽帧不代替正常速度完整观看，也不能验证自然节奏或审美接受。没有音轨只证明明确静音，不证明替换音效已完成。
 
-## Remaining Boundary
+## Remaining Boundary (Historical Before Product Revision)
 
 后续镜头未提交，商品互动及包装收尾未制作；最终音乐、音效、完整剪辑、P6、Final Acceptance、独立成片审查及用户最终听看均未完成。当前 canonical contract 允许失败源进入 sealed 本地预览，明确禁止把它直接激活为 Production。不能通过倒改已关闭 raw barrier、伪造 SourceUseEvidence 或删除 sound FAIL 来继续。
 
@@ -79,5 +129,7 @@ TDD 先观察新 scope 被旧 admission 拒绝，再完成 bootstrap/strict read
 `distill-ai-video-learning`: `no_candidate`。这是一条实际生成链及其派生预览，不能把多个文件、检查层或修订当成多个独立实验；无成熟、可推广的节奏或模型质量结论，不修改 Skill/Policy/Gate。
 
 2026-10-21第二次真实生成后重新评估仍为 `no_candidate`：第一镜主要为原声环境失败，第二镜为新调度下的因果/物件连续性失败，输入、动作与音频责任均改变，不能将两种不同失败归为同一已复现模型结论。独立复核、抽帧、canonical诊断属于同一新媒体的不同证明层，不增加实验独立数；不自动提出或采用Skill/Policy/Gate变更。
+
+2026-10-21完整商品审片版后再次执行自动学习评估，仍为`no_candidate`：新source退役纸卷、改变人物起始姿态/动作/参考并替换声音责任，是一个新的有界成功素材，不能把两条不同失败与这次结果拼成受控A/B或普遍H3结论。工程回归和两轮布局媒体属于同一链的新证明层；修复作为任务内普通实现，不自动采纳经验为Skill/Policy/Gate。
 
 Director-only JSON 与用户原文最初放在要求完整 `project.json` 的 `docs/canvas-projects` 数据目录，使首次 Harness 的 `canvas_project_data_check` 拒绝。现移至既有 `docs/superpowers/artifacts/ecommerce/hotpatch-dayoff/`，保持字节不变；README 留在原目录作入口。历史 QA 的原路径字符串与 content hash 保留，不回写旧 receipt。普通 Canvas project data 仍只位于 task run，未把 Director 覆盖冒充可执行 Canvas project。

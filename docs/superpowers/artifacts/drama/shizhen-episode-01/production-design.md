@@ -71,8 +71,14 @@ D版003已实际生成并下载，exact MP4 SHA-256 `ea0dad2e3ea4a4c964d3a7cdf73
 
 用户回看指出约10秒纸张穿透；同一003原片的0.25秒MCP取样确认10.50–10.75秒纸从饭团上方直接进入底部，缺少提起饭团或移开的动作。此前action与space-camera的PASS撤回，当前逐镜Gate为FAIL。画面没有被设计成灵异事件；单镜固定中景为author选择，需要重新评估覆盖与纸/饭团动作调度，尚未自动生成新版。
 
-## Current S01 Coverage Retake 004
+## Previous S01 Coverage Retake 004
 
 按用户要求与新导演原则，同一D首帧绑定的Project/Shot已修订至revision3，QA为同goal_id的3-coverage，保留旧全部要求。一个16秒生成片段执行四个摄影关注点：双人关系、林序回应、店员脸手动作、林序反应；对白不分配时间戳。第004次原片已fetch：`outputs/shizhen-episode01/失帧-第一集-S01-切镜重拍版-Seedance2.5-16秒.mp4`，SHA-256 `06168bd113436e755cfca82c198677544f95cd82c76c216c65a131a6c59170a3`。
 
 Actual MCP半秒与0.1秒样本确认三个硬切和先铺纸、提饭离台、放纸上、连纸推近的可读路径，未见003纸穿透。完整原速表演、对白/口型与D动态美术满意度仍待播放，004整体Gate NOT_EVALUATED；003的纸复核FAIL及此前1秒粗采样误判撤回保留，前文003初始NOT_EVALUATED为当时历史状态。未推进下一剧情Shot、激活Production或发布。
+
+## Current S01 HD Version 005
+
+按用户认可的004方案已实际新生成1080p原片：`outputs/shizhen-episode01/失帧-第一集-S01-1080p高清版-Seedance2.5-16秒.mp4`，SHA-256 `15c7c21ea8ef526d641d5a1565cbb4ec93ea4ee63b34fc9c7a0d73f2b21efb0b`，1920×1080、16.065秒、平均约24fps原生时序和AAC原声保持。Project/Shot为revision4，goal4-HD1080，原raw QA与exact004 prompt不变，旧004以用户要求规格改版封存，历史媒体/观察/消费保持。
+
+Actual MCP半秒与0.1秒取样确认四机位、先铺纸再提饭离台放稳后推近的可见路径。完整原速表演、实际对白/口型、D动态观感仍待用户播放，整体Gate NOT_EVALUATED；HD原片获认可后才生成对齐字幕并通过既有composition owners导出最终规格，未运行字幕合成或擅自进入下一剧情Shot。

@@ -15,6 +15,7 @@ description: Use when an ecommerce, SKU, product advertising, direct-response pr
 - 不抓取未授权页面，不读取 credential，不联网，不调用 Provider，不生成媒体，不写 Project、Registry、Manifest 或 activation。
 - 不选择 renderer/timeline/Provider，也不把 `DIALOGUE_SUBTITLE` 当作 commercial graphics fallback。
 - Valid package 不证明 compositing、typography、audio stream、watchability、P6、Final Acceptance、live-ready 或 advertising performance。
+- G4 的设计与媒体复核要求也适用于本地审片、字幕修复和手工编排；按 [Authoring And Media Review](references/advertising-copy-graphics.md#authoring-and-media-review) 落实到实际输入，不能以未执行正式 handoff export 为由跳过。
 - `AdQCReport.ready`只表示 Ecommerce authoring readiness；它不能创建`ReviewReceipt`、`FinalAcceptanceReceipt`、Production verdict或Manifest mutation。`AdCreativeReviewReport.is_ready`只表示deterministic handoff integrity，且`production_verdict`必须保持`None`。Whole-ad post-media Ecommerce acceptance归现有 `EcommerceQualityGateCoordinator` / Gate 2 与 P6 lifecycle，见 [owner matrix](../../../docs/agent-primary-contract-matrix.md#quality-gate-architecture-boundary)。
 - Runtime handoff export 只有在 exact `DeliveryProfile`、reviewed `EcommerceVisualSystemProfile`、per-ad `EcommerceLayoutPlan` 与只绑定这些 identity 的 `EcommerceProductionCompileProfile` 同时存在时才允许。Exporter 不生成通用布局默认值，也不以 schema-valid 代替 preview / visual review。
 - CTR、CVR、CPA、ROAS、hold rate、retention与其他market outcome属于future empirical feedback，不得由package validity、Ad QC或Production Final Acceptance预测。

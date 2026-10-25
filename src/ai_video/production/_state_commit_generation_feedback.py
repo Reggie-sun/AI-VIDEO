@@ -103,6 +103,14 @@ class _StateCommitGenerationFeedbackMixin:
                 raise _state_invalid(
                     "Closed quality rejection cannot accept new generation evidence."
                 )
+            if state.visual_supersession is not None:
+                from ai_video.production.project import load_production_project
+
+                load_production_project(self._project_root / "project.yaml")
+                if (state.generation_experiences
+                        and _experience_hash(experience) == state.generation_experiences[-1].content_hash):
+                    return manifest
+                raise _state_invalid("Superseded visual version cannot accept changed generation evidence.")
             request = self._reopen_video_request(state.request)
             binding = self._reopen_generation_execution_binding(state.execution_binding)
             selected_id = binding.decision.selected_candidate_id

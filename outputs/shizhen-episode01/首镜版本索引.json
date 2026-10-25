@@ -1,0 +1,79 @@
+{
+  "canvas_url": "https://jimeng.jianying.com/ai-tool/ai-canvas/1d9c7d6f-7a36-43bb-bf6b-b475cfb4031d",
+  "current": {
+    "shot_id": "S01",
+    "version": "HD-005",
+    "node_id": "node_h5ayptnszt",
+    "file": "失帧-第一集-S01-1080p高清版-Seedance2.5-16秒.mp4",
+    "sha256": "15c7c21ea8ef526d641d5a1565cbb4ec93ea4ee63b34fc9c7a0d73f2b21efb0b",
+    "resolution": "1920x1080",
+    "duration_seconds": 16.065,
+    "acceptance": "NOT_ACCEPTED",
+    "media_gate": "NOT_EVALUATED",
+    "note": "用户已认可exact1080p原片；原技术Gate历史保留，不冒充Production qualification。字幕审看副本见caption_review。",
+    "receipt": "runs/shizhen-episode01-jimeng25-20261025-001/HD-execution-005/post-media-gate.json",
+    "user_review": "APPROVED",
+    "user_review_quote": "认可"
+  },
+  "history": [
+    {
+      "version": "001",
+      "node_id": "node_j584v1zdvx",
+      "result": "USER_REJECTED_LIP_SYNC"
+    },
+    {
+      "version": "002",
+      "node_id": "node_fab39vmyq7",
+      "result": "USER_REQUESTED_D_VISUAL_REVISION; performance direction liked; audio not formally accepted"
+    },
+    {
+      "shot_id": "S01",
+      "version": "D-003",
+      "node_id": "node_eka0sd7b89",
+      "file": "失帧-第一集-S01-D版-Seedance2.5-16秒.mp4",
+      "sha256": "ea0dad2e3ea4a4c964d3a7cdf731d1e96c36a64358b3427dda7adf3aed12cbbc",
+      "acceptance": "NOT_ACCEPTED",
+      "note": "用户指出纸穿透；0.25秒MCP复核确认约10.50至10.75秒纸从饭团上方进入底部，无提起动作；此前接触PASS已撤回。",
+      "media_gate": "FAIL"
+    },
+    {
+      "shot_id": "S01",
+      "version": "coverage-004",
+      "node_id": "node_svdkkk4xrp",
+      "file": "失帧-第一集-S01-切镜重拍版-Seedance2.5-16秒.mp4",
+      "sha256": "06168bd113436e755cfca82c198677544f95cd82c76c216c65a131a6c59170a3",
+      "acceptance": "NOT_ACCEPTED",
+      "media_gate": "NOT_EVALUATED",
+      "note": "实际四机位切镜与0.1秒纸/饭团接触核验PASS；完整原速表演、对白口型与D动态美术满意度待播放确认。",
+      "receipt": "runs/shizhen-episode01-jimeng25-20261025-001/coverage-retake-004/post-media-gate.json"
+    }
+  ],
+  "publication": "NOT_PUBLISHED",
+  "caption_review": {
+    "file": "失帧-第一集-S01-1080p中英双语字幕版-16秒.mp4",
+    "sha256": "3bbf15995bac0e91033be3689b12f16ad1e09f9eb8a78d53a80cb2724a0d16a1",
+    "resolution": "1920x1080",
+    "fps": 24,
+    "duration_seconds": 16,
+    "languages": [
+      "zh",
+      "en"
+    ],
+    "line_end_punctuation": false,
+    "user_review": "PENDING",
+    "production_activation": false,
+    "receipt": "runs/shizhen-episode01-jimeng25-20261025-001/caption-review-005/bilingual-v4/delivery-verification-receipt.json"
+  },
+  "caption_history": [
+    {
+      "file": "失帧-第一集-S01-1080p字幕版-16秒.mp4",
+      "sha256": "ea09423b8e4edda2eb66ebbeb4aceccb9c16cbae63e9a331f209a4c051d9c90d",
+      "resolution": "1920x1080",
+      "fps": 24,
+      "duration_seconds": 16,
+      "user_review": "PENDING",
+      "production_activation": false,
+      "receipt": "runs/shizhen-episode01-jimeng25-20261025-001/caption-review-005/delivery-verification-receipt.json"
+    }
+  ]
+}

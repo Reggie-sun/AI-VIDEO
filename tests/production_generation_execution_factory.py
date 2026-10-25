@@ -332,16 +332,11 @@ def activate_generated_video_shot(
                         asset_ids=(),
                         allowed_asset_types=(AssetType.VIDEO,),
                     ),
-                    AssetRoleRequirement(
+                ) + ((AssetRoleRequirement(
                         role="first_frame",
-                        asset_ids=(
-                            (first_frame_asset.asset_id,)
-                            if first_frame_asset is not None
-                            else ()
-                        ),
+                        asset_ids=(first_frame_asset.asset_id,),
                         allowed_asset_types=(AssetType.IMAGE,),
-                    ),
-                ),
+                    ),) if first_frame_asset is not None else ()),
             }
         )
     )

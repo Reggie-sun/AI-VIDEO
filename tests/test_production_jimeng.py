@@ -1037,8 +1037,8 @@ def test_cancellation_reaps_worker_and_preserves_exception(tmp_path, monkeypatch
 from pathlib import Path
 import subprocess
 
-def _frame_conditioned(mode):
-    legacy = setup(model_id="seedance_2.0_vip")[0]._profile
+def _frame_conditioned(mode, *, model_id="seedance_2.0_vip"):
+    legacy = setup(model_id=model_id)[0]._profile
     profile = JimengProfile.model_validate({**legacy.model_dump(mode="json"),
         "input_mode": mode, "benefit_amount": legacy.duration_seconds})
     roles = ("first_frame", "last_frame") if mode == "first_last_frame" else ("first_frame",)
@@ -1148,7 +1148,8 @@ def test_paid_dispatch_retains_native_frame_roles_without_prompt_markers(mode, n
 
 
 @pytest.mark.parametrize("mode", ["first_frame", "first_last_frame"])
-def test_frame_conditioning_survives_requirement_router_compiler_and_resolve(mode, monkeypatch):
+@pytest.mark.parametrize("untimed", [False, True])
+def test_frame_conditioning_survives_requirement_router_compiler_and_resolve(mode, monkeypatch, untimed):
     from test_production_shot_router import (
         _asset, _context, _first_frame_projection, _reseal_projection, _policy, _lifecycle,
     )
@@ -1156,13 +1157,22 @@ def test_frame_conditioning_survives_requirement_router_compiler_and_resolve(mod
     from ai_video.production.shot_router import VideoGenerationResolver, AdapterCompilerContract
     from ai_video.production._video_intent_validation import ConditioningLane
     from ai_video.production.video_requirement import (
-        AssetEvidence, SemanticReferenceRole, CapabilityNeed, AudioNeed, OutputNeed,
+        AssetEvidence, SemanticReferenceRole, CapabilityNeed, AudioNeed, OutputNeed, DialogueIntent,
     )
-    profile, provider, expected = _frame_conditioned(mode)
+    profile, provider, expected = _frame_conditioned(mode, model_id="seedance_2.5" if untimed else "seedance_2.0_vip")
     assets = tuple(_asset(binding.role, binding.asset_id, binding.asset_sha256,
         width=binding.width, height=binding.height, size_bytes=binding.size_bytes)
         for binding in expected.image_bindings)
     context = _context(keyframe=assets[0], last_frame=assets[-1] if len(assets) == 2 else None)
+    intent = _complete_intent()
+    if untimed:
+        intent = intent.model_copy(update={"dialogue_intent": DialogueIntent.model_validate({
+            "mode": "conversation", "language": "zh", "turns": [
+                {"speaker_id": "hero", "verbatim_text": "有人吗？", "on_screen": True,
+                 "lip_sync_required": True, "response_obligation": "等待画外人回答。"},
+                {"speaker_id": "clerk", "verbatim_text": "慢点，里面烫。", "on_screen": False,
+                 "lip_sync_required": False, "response_obligation": "主角听完再收手。"},
+            ]})})
     projection = _reseal_projection(_first_frame_projection(context),
         contract_version="provider-neutral-video-requirement/4",
         generation_mode="first_last_frame_video" if len(assets) == 2 else "image_to_video",
@@ -1171,7 +1181,7 @@ def test_frame_conditioning_survives_requirement_router_compiler_and_resolve(mod
             "first_anchor_id": assets[0].asset_id,
             "last_anchor_id": assets[-1].asset_id if len(assets) == 2 else None,
             "available_duration_seconds": profile.duration_seconds}),
-        generation_intent=_complete_intent().model_copy(update={"pacing":
+        generation_intent=intent.model_copy(update={"pacing":
             _complete_intent().pacing.model_copy(update={"shot_duration_seconds": profile.duration_seconds})}),
         audio_need=AudioNeed.REQUIRED,
         output_need=OutputNeed(timing_mode="content_driven", duration_seconds=profile.duration_seconds,
@@ -1199,8 +1209,38 @@ def test_frame_conditioning_survives_requirement_router_compiler_and_resolve(mod
         compiler_contract=AdapterCompilerContract.create(compiler_id=profile.compiler_id, compiler_version="1"))
     assert result.provider_bound_request is not None, json.dumps(result.decision.model_dump(mode="json"))
     compiled = provider.compile_request(result.provider_bound_request, projection.requirement)
+    assert compiled.outcome == "compiled", compiled
     resolved = provider.resolve(compiled.request)
     assert [(b.role, b.asset_id, b.asset_sha256) for b in resolved.image_bindings] == [
         (a.role, a.asset_id, a.asset_sha256) for a in assets]
     assert resolved.mode is VideoGenerationMode.IMAGE_TO_VIDEO
     assert "{{image:" not in resolved.prompt_text
+    if untimed:
+        assert resolved.prompt_text.index("有人吗？") < resolved.prompt_text.index("慢点，里面烫。")
+        assert "Dialogue timing:" not in resolved.prompt_text
+        from ai_video.production.jimeng_prompt import compile_jimeng_native_prompt
+        native = compile_jimeng_native_prompt(compiler_id=profile.compiler_id, compiler_version="1",
+            requirement=projection.requirement, provider_bound=result.provider_bound_request)
+        assert "generation_intent.dialogue_intent.turns" in native.expressed_control_paths
+        # A caller cannot fall back to the neutral grammar and lose the turns.
+        from ai_video.production.video_compiler import compile_provider_video_request
+        neutral = compile_provider_video_request(provider_bound=result.provider_bound_request,
+            requirement=projection.requirement, compiler_id=profile.compiler_id,
+            compiler_version="1", capabilities=provider.capabilities())
+        assert neutral.outcome == "unsupported"
+        assert "generation_intent.dialogue_intent.mode" in neutral.unsupported_field_paths
+        for corrupted in (
+            native.prompt_text.replace("慢点，里面烫。", "慢点。"),
+            native.prompt_text.replace("（clerk）", "（hero）"),
+            native.prompt_text.replace("有人吗？", "__temporary_turn__")
+                .replace("慢点，里面烫。", "有人吗？")
+                .replace("__temporary_turn__", "慢点，里面烫。"),
+        ):
+            assert corrupted != native.prompt_text
+            resealed = native.model_copy(update={"prompt_text": corrupted,
+                "prompt_sha256": hashlib.sha256(corrupted.encode()).hexdigest()})
+            rejected = compile_provider_video_request(provider_bound=result.provider_bound_request,
+                requirement=projection.requirement, compiler_id=profile.compiler_id,
+                compiler_version="1", capabilities=provider.capabilities(), native_prompt=resealed)
+            assert rejected.outcome == "unsupported"
+            assert "generation_intent.dialogue_intent.turns" in rejected.unsupported_field_paths

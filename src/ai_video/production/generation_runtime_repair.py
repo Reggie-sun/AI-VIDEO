@@ -1,13 +1,10 @@
-"""Immutable authorization for one bounded re-execution after a local runtime failure.
+"""Immutable authorization for one bounded runtime or paid no-effect recovery.
 
-A runtime repair is not a quality intervention: it authorizes the exact same
-provider/prompt/seed-scope strategy once the environmental runtime failure
-(VRAM exhaustion, missing local runtime, interrupted worker, ...) has been
-diagnosed and fixed by the runtime owner.  The decision engine consumes it only
-while the Shot's latest evidence is exactly ``RUNTIME_FAILURE``; the committer
-marks it consumed inside the same atomic write as the replacement submit
-intent, so a repaired outcome can never be re-authorized from the same
-evidence.
+A runtime repair is not a quality intervention. It authorizes one exact
+strategy after a diagnosed runtime failure, or one paid no-effect retarget
+after canonical reconciliation proves a pre-transport failure. The committer
+marks the grant consumed in the same atomic write as the replacement submit
+intent, so the same evidence cannot authorize another attempt.
 """
 
 from __future__ import annotations
@@ -50,6 +47,17 @@ class PaidNoEffectRetarget(StrictModel):
     target_scope_hash: str = Field(pattern=_SHA256)
 
 
+class PaidNoEffectRepairExtension(StrictModel):
+    """Explicit bounded paid no-effect repair ceiling for one exact task and Shot."""
+
+    task_id: str = Field(min_length=1)
+    shot_id: str = Field(min_length=1)
+    failed_binding_hash: str = Field(pattern=_SHA256)
+    expected_manifest_revision: int = Field(strict=True, ge=0)
+    ceiling: Literal[3, 4] = 3
+    authorization_receipt_id: str = Field(min_length=1)
+
+
 class PaidKnownFailureRetarget(StrictModel):
     """Explicit image-input retarget after one accepted task is observed FAILED."""
 
@@ -87,6 +95,7 @@ class RuntimeRepairAuthorization(StrictModel):
         "runtime-repair/3",
         "runtime-repair/4",
         "runtime-repair/5",
+        "runtime-repair/6",
     ] = "runtime-repair/1"
     attempt_id: str = Field(min_length=1)
     evidence_hash: str = Field(pattern=_SHA256)
@@ -98,25 +107,30 @@ class RuntimeRepairAuthorization(StrictModel):
     paid_no_effect_retarget: PaidNoEffectRetarget | None = None
     paid_known_failure_retarget: PaidKnownFailureRetarget | None = None
     paid_cross_provider_no_effect_retarget: PaidCrossProviderNoEffectRetarget | None = None
+    paid_no_effect_extension: PaidNoEffectRepairExtension | None = None
 
     @model_serializer(mode="wrap")
     def _serialize_version(self, handler):
         result = handler(self)
         if self.schema_version == "runtime-repair/1":
             result.pop("local_extension", None)
-        if self.schema_version != "runtime-repair/3":
+        if self.schema_version not in {"runtime-repair/3", "runtime-repair/6"}:
             result.pop("paid_no_effect_retarget", None)
         if self.schema_version != "runtime-repair/4":
             result.pop("paid_known_failure_retarget", None)
         if self.schema_version != "runtime-repair/5":
             result.pop("paid_cross_provider_no_effect_retarget", None)
+        if self.schema_version != "runtime-repair/6":
+            result.pop("paid_no_effect_extension", None)
         return result
 
     @model_validator(mode="after")
     def _exact_runtime_repair(self) -> "RuntimeRepairAuthorization":
         if (self.schema_version == "runtime-repair/2") != (self.local_extension is not None):
             raise ValueError("runtime repair version and local extension do not match")
-        if (self.schema_version == "runtime-repair/3") != (self.paid_no_effect_retarget is not None):
+        if (self.schema_version in {"runtime-repair/3", "runtime-repair/6"}) != (
+            self.paid_no_effect_retarget is not None
+        ):
             raise ValueError("runtime repair version and paid retarget do not match")
         if (self.schema_version == "runtime-repair/4") != (self.paid_known_failure_retarget is not None):
             raise ValueError("runtime repair version and paid known-failure retarget do not match")
@@ -124,9 +138,17 @@ class RuntimeRepairAuthorization(StrictModel):
             self.paid_cross_provider_no_effect_retarget is not None
         ):
             raise ValueError("runtime repair version and cross-provider no-effect retarget do not match")
+        if (self.schema_version == "runtime-repair/6") != (
+            self.paid_no_effect_extension is not None
+        ):
+            raise ValueError("runtime repair version and paid no-effect extension do not match")
         if (self.local_extension is not None and self.expected_manifest_revision
                 != self.local_extension.expected_manifest_revision + 1):
             raise ValueError("runtime repair extension revision is invalid")
+        if (self.paid_no_effect_extension is not None
+                and self.expected_manifest_revision
+                    != self.paid_no_effect_extension.expected_manifest_revision + 1):
+            raise ValueError("paid no-effect repair extension revision is invalid")
         if self.content_hash != canonical_sha256(self.model_dump(mode="json")):
             raise ValueError("runtime repair authorization content hash is invalid")
         return self
@@ -151,18 +173,57 @@ class RuntimeRepairGrant:
     consumed: bool
 
 
+def is_paid_no_effect_repair_grant_for_evidence(
+    grant, evidence, *, require_unconsumed: bool = True,
+) -> bool:
+    """Match an exact paid no-effect grant, requiring it open by default."""
+
+    authorization = grant.authorization
+    extension = authorization.paid_no_effect_extension
+    return (
+        (not require_unconsumed or not grant.consumed)
+        and authorization.schema_version in {"runtime-repair/3", "runtime-repair/6"}
+        and authorization.paid_no_effect_retarget is not None
+        and authorization.attempt_id == evidence.attempt_id
+        and authorization.evidence_hash == evidence.evidence_hash
+        and evidence.outcome == "not_submitted"
+        and (authorization.schema_version != "runtime-repair/6" or (
+            extension is not None
+            and extension.task_id == evidence.task_id
+            and extension.shot_id == evidence.shot_id
+        ))
+    )
+
+
+def effective_latest_generation_evidence(evidence, runtime_repairs=()):
+    """Keep submitted history authoritative unless its exact no-effect repair is open."""
+
+    matching = tuple(evidence)
+    if not matching:
+        return None
+    latest = matching[-1]
+    if latest.outcome == "not_submitted" and any(
+        is_paid_no_effect_repair_grant_for_evidence(grant, latest)
+        for grant in runtime_repairs
+    ):
+        return latest
+    submitted = tuple(item for item in matching if item.outcome != "not_submitted")
+    return submitted[-1] if submitted else latest
+
+
 def retarget_preserves_strategy(old, target):
-    """Model/profile recovery cannot edit frozen intent, acceptance or audio."""
+    """Recovery freezes intent/QA/audio; a provider switch also freezes geometry."""
     previous = next(v for v in old.capabilities.variants if v.capability_id == old.capability_id)
     current = next(v for v in target.capabilities.variants if v.capability_id == target.capability_id)
-    return (old.capabilities.provider_name == target.capabilities.provider_name
-        and previous.mode == current.mode
+    geometry_fields = ({"width", "height"}
+        if old.capabilities.provider_name == target.capabilities.provider_name else set())
+    return (previous.mode == current.mode
         and previous.execution_kind.value == current.execution_kind.value == "remote"
         and previous.billing_kind.value == current.billing_kind.value == "metered"
         and old.recipe.model_dump(mode="json", exclude={"profile_sha256", "compiler_hash", "comparison"})
             == target.recipe.model_dump(mode="json", exclude={"profile_sha256", "compiler_hash", "comparison"})
-        and old.output_requirement.model_dump(mode="json", exclude={"width", "height"})
-            == target.output_requirement.model_dump(mode="json", exclude={"width", "height"})
+        and old.output_requirement.model_dump(mode="json", exclude=geometry_fields)
+            == target.output_requirement.model_dump(mode="json", exclude=geometry_fields)
         and old.final_output_goal == target.final_output_goal
         and old.voice_route == target.voice_route)
 

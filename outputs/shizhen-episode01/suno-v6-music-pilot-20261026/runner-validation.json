@@ -1,0 +1,21 @@
+{
+  "runner_sha256": "0f0840c2f6dafb632c425a09b4124c5dfc9f31ce40c2f748d9b261dfff777609",
+  "cases": [
+    {
+      "case": "title",
+      "verdict": "PASS",
+      "fake_calls": 1
+    },
+    {
+      "case": "error_code",
+      "verdict": "PASS",
+      "fake_calls": 1
+    },
+    {
+      "case": "stopped",
+      "verdict": "PASS",
+      "fake_calls": 0
+    }
+  ],
+  "real_calls_in_this_validation": 0
+}

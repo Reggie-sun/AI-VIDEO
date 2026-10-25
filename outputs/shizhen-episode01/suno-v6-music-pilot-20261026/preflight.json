@@ -1,0 +1,52 @@
+{
+  "schema": "task-local-suno-pilot-preflight/1",
+  "recorded_at": "2026-10-25T20:22:00.586381+00:00",
+  "authorizations": {
+    "user_max_requests": 3,
+    "budget_gate": "USER_DISABLED",
+    "purchases": false,
+    "auto_retry": false,
+    "captcha_bypass": false
+  },
+  "account_readback": {
+    "plan": "Pro Plan",
+    "total_credits_left": 2500,
+    "monthly_usage": 0,
+    "v6_can_use": true,
+    "download_used": 0,
+    "download_limit": 20
+  },
+  "media": {
+    "outputs/shizhen-episode01/失帧-第一集-S01-1080p高清版-Seedance2.5-16秒.mp4": {
+      "sha256": "15c7c21ea8ef526d641d5a1565cbb4ec93ea4ee63b34fc9c7a0d73f2b21efb0b",
+      "size_bytes": 51142682
+    },
+    "outputs/shizhen-episode01/suno-v6-music-pilot-20261026/source/S01-native-48k.wav": {
+      "sha256": "df21b5825cd6262eaa05726ce948b421b045be4491ef447ccf8b0cacc4dfcbfd",
+      "size_bytes": 3085224
+    },
+    "outputs/shizhen-episode01/suno-v6-music-pilot-20261026/source/native-input-probe-4s.wav": {
+      "sha256": "9c313060bf46fc5e53315f676b15b0a7e8e389c20f20eb393fae7817f1e3c7ba",
+      "size_bytes": 768124
+    },
+    "docs/superpowers/artifacts/drama/shizhen-episode-01/screenplay.md": {
+      "sha256": "3635c7d177cba5dcf2c814ccb6d1e1e46b93e44d51476e067fa1dafca288d46f",
+      "size_bytes": 13132
+    }
+  },
+  "availability": {
+    "opening_footage": true,
+    "other_story_scenes_video": false,
+    "other_story_scenes_basis": "screenplay_and_coverage_only"
+  },
+  "native_audio_input": {
+    "source": "source/native-input-probe-4s.wav",
+    "host_result": "audio content omitted because you do not support audio input",
+    "verdict": "UNSUPPORTED_THIS_SESSION",
+    "human_listening": "NOT_EVALUATED"
+  },
+  "known_speech_analysis_unknown": "Do not retry prior protected audio-understand outcome for this raw shot",
+  "generation_requests_consumed": 0,
+  "production_activation": "NOT_COMMITTED",
+  "remaining_money_cost": "not_applicable_no_new_purchases"
+}

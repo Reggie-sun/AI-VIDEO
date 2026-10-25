@@ -21,6 +21,16 @@ from ._state_commit_common import (
 
 
 class _StateCommitVideoActivationMixin:
+    def _require_production_execution_binding(self, state) -> None:
+        pointer = state.execution_binding
+        if pointer is None:
+            return
+        binding = self._reopen_generation_execution_binding(pointer)
+        if binding.policy.execution_purpose == "qualification":
+            raise _state_invalid(
+                "Qualification execution cannot be activated as production."
+            )
+
     def activate_video_candidate(self, *, attempt_id: str):
         """Atomically select one fully persisted P8 candidate tuple."""
 
@@ -28,6 +38,8 @@ class _StateCommitVideoActivationMixin:
             manifest = self._read_manifest()
             attempt = self._video_attempt(manifest, attempt_id)
             state = attempt.video_generation_state
+            if state is not None:
+                self._require_production_execution_binding(state)
             if (
                 attempt.status
                 not in {
@@ -150,6 +162,8 @@ class _StateCommitVideoActivationMixin:
         manifest = self._read_manifest()
         attempt = self._video_attempt(manifest, attempt_id)
         state = attempt.video_generation_state
+        if state is not None:
+            self._require_production_execution_binding(state)
         if (
             attempt.status is not StateCommitStatus.SUCCEEDED
             or state is None

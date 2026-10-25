@@ -152,7 +152,8 @@ class _StateCommitVideoMixin:
     def record_runtime_repair_authorization(
         self, *, attempt_id: str, repair_basis: str, actor,
         evidence_hash: str | None = None, local_extension=None, paid_no_effect_retarget=None,
-        paid_known_failure_retarget=None, paid_cross_provider_no_effect_retarget=None,
+        paid_no_effect_extension=None, paid_known_failure_retarget=None,
+        paid_cross_provider_no_effect_retarget=None,
         target_candidate=None, target_requirement=None,
     ):
         from ._state_commit_video_runtime_repair import register_runtime_repair_authorization
@@ -161,6 +162,7 @@ class _StateCommitVideoMixin:
             self, attempt_id=attempt_id, repair_basis=repair_basis, actor=actor,
             evidence_hash=evidence_hash, local_extension=local_extension,
             paid_no_effect_retarget=paid_no_effect_retarget,
+            paid_no_effect_extension=paid_no_effect_extension,
             paid_known_failure_retarget=paid_known_failure_retarget,
             paid_cross_provider_no_effect_retarget=paid_cross_provider_no_effect_retarget,
             target_candidate=target_candidate,
@@ -185,6 +187,18 @@ class _StateCommitVideoMixin:
                 raise _state_invalid("Active Manifest changed during decision validation.")
             binding.validate_current_project(loaded)
             self._require_current_generation_acceptance(loaded, binding)
+            from ._qualification_quality_repair import require_quality_repair_predecessor
+
+            require_quality_repair_predecessor(self, manifest, binding)
+            from ._qualification_visual_revision import require_authored_visual_revision_predecessor
+
+            require_authored_visual_revision_predecessor(self, manifest, binding)
+            from .generation_coverage_revision import require_authored_coverage_revision_predecessor
+
+            require_authored_coverage_revision_predecessor(self, manifest, binding)
+            from .generation_resolution_revision import require_authored_resolution_revision_predecessor
+
+            require_authored_resolution_revision_predecessor(self, manifest, binding)
             from ai_video.production.production_strategy_reader import production_family_shot_ids
 
             family_ids = production_family_shot_ids(loaded, binding.context.target_shot_id)
@@ -279,9 +293,29 @@ class _StateCommitVideoMixin:
                 raise _state_invalid(
                     "Generation decision differs from complete durable experience history."
                 )
-            submitted_history = [e for e in ordered_shot_evidence if e.outcome != "not_submitted"]
-            effective_history = submitted_history or ordered_shot_evidence
-            latest_hash = effective_history[-1].evidence_hash if effective_history else None
+            from ai_video.production.generation_runtime_repair import (
+                RuntimeRepairGrant,
+                effective_latest_generation_evidence,
+            )
+
+            latest_prepared = ordered_shot_evidence[-1] if ordered_shot_evidence else None
+            latest_recovery_grants = []
+            if latest_prepared is not None and latest_prepared.outcome == "not_submitted":
+                for prior in manifest.attempts:
+                    prior_state = prior.video_generation_state
+                    if prior_state is None or prior.attempt_id != latest_prepared.attempt_id:
+                        continue
+                    for pointer in prior_state.runtime_repairs:
+                        if pointer.evidence_hash != latest_prepared.evidence_hash:
+                            continue
+                        latest_recovery_grants.append(RuntimeRepairGrant(
+                            authorization=self._reopen_runtime_repair_authorization(pointer),
+                            consumed=pointer.consumed,
+                        ))
+            latest = effective_latest_generation_evidence(
+                ordered_shot_evidence, latest_recovery_grants,
+            )
+            latest_hash = latest.evidence_hash if latest is not None else None
             if binding.inputs.latest_attempt_hash != latest_hash:
                 raise _state_invalid("Generation latest attempt differs from ordered durable history.")
             from ai_video.production._state_commit_video_unsubmitted import (
@@ -388,12 +422,20 @@ class _StateCommitVideoMixin:
             if item.capability_id == candidate.capability_id
         )
         local_unmetered = variant.execution_kind.value == "local" and variant.billing_kind.value == "local_unmetered"
+        retained_budget = None
         def quota_raise_is_retained(prior_limits) -> bool:
-            from ai_video.production.paid_provider_submit_quota import retained_submit_quota_allows
+            nonlocal retained_budget
+            from ai_video.production.paid_provider_submit_quota import _retained_submit_quota_allows
 
-            return retained_submit_quota_allows(
+            pointer = manifest.active_paid_provider_budget
+            if pointer is None:
+                return False
+            if retained_budget is None:
+                retained_budget = self._reopen_paid_budget(pointer)
+            return _retained_submit_quota_allows(
                 committer=self, manifest=manifest, state=state,
                 current_limits=current_limits, prior_limits=prior_limits,
+                budget=retained_budget,
             )
 
         submitted = {"local": set(), "remote": set()}

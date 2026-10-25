@@ -1,0 +1,713 @@
+{
+  "schema_version": "creative-goal-binding/1",
+  "authority": "development_only",
+  "creative_input": {
+    "path": "creative-input.txt",
+    "sha256": "c2585d78d376e254e033aef097fc2c4d92178ada9650b36b12a3cd46f669a866"
+  },
+  "coverage": {
+    "path": "director-coverage.json",
+    "sha256": "46c2f253c44ea87dd382af48bb28b69c5b0304adba637d03698318de88850464"
+  },
+  "final_output_contract": {
+    "path": "final-output-contract.json",
+    "sha256": "b235b3e167ab6b9aa2b4fdf63fa2b7c920d6eb88a570b425314bd98866740e98"
+  },
+  "bindings": [
+    {
+      "intent_item_id": "duration",
+      "constraint_ids": [
+        "duration"
+      ],
+      "unit_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14",
+        "S15",
+        "S16",
+        "S17",
+        "S18",
+        "S19",
+        "S20",
+        "S21",
+        "S22",
+        "S23",
+        "S24",
+        "S25",
+        "S26",
+        "S27",
+        "S28",
+        "S29",
+        "S30",
+        "S31"
+      ],
+      "requirement_ids": [
+        "duration"
+      ]
+    },
+    {
+      "intent_item_id": "original",
+      "constraint_ids": [
+        "original"
+      ],
+      "unit_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14",
+        "S15",
+        "S16",
+        "S17",
+        "S18",
+        "S19",
+        "S20",
+        "S21",
+        "S22",
+        "S23",
+        "S24",
+        "S25",
+        "S26",
+        "S27",
+        "S28",
+        "S29",
+        "S30",
+        "S31"
+      ],
+      "requirement_ids": [
+        "original"
+      ]
+    },
+    {
+      "intent_item_id": "drama",
+      "constraint_ids": [
+        "drama"
+      ],
+      "unit_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14",
+        "S15",
+        "S16",
+        "S17",
+        "S18",
+        "S19",
+        "S20",
+        "S21",
+        "S22",
+        "S23",
+        "S24",
+        "S25",
+        "S26",
+        "S27",
+        "S28",
+        "S29",
+        "S30",
+        "S31"
+      ],
+      "requirement_ids": [
+        "drama"
+      ]
+    },
+    {
+      "intent_item_id": "natural",
+      "constraint_ids": [
+        "natural"
+      ],
+      "unit_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14",
+        "S15",
+        "S16",
+        "S17",
+        "S18",
+        "S19",
+        "S20",
+        "S21",
+        "S22",
+        "S23",
+        "S24",
+        "S25",
+        "S26",
+        "S27",
+        "S28",
+        "S29",
+        "S30",
+        "S31"
+      ],
+      "requirement_ids": [
+        "natural"
+      ]
+    },
+    {
+      "intent_item_id": "no-line-times",
+      "constraint_ids": [
+        "no-line-times"
+      ],
+      "unit_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14",
+        "S15",
+        "S16",
+        "S17",
+        "S18",
+        "S19",
+        "S20",
+        "S21",
+        "S22",
+        "S23",
+        "S24",
+        "S25",
+        "S26",
+        "S27",
+        "S28",
+        "S29",
+        "S30",
+        "S31"
+      ],
+      "requirement_ids": [
+        "no-line-times"
+      ]
+    },
+    {
+      "intent_item_id": "cg",
+      "constraint_ids": [
+        "cg"
+      ],
+      "unit_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14",
+        "S15",
+        "S16",
+        "S17",
+        "S18",
+        "S19",
+        "S20",
+        "S21",
+        "S22",
+        "S23",
+        "S24",
+        "S25",
+        "S26",
+        "S27",
+        "S28",
+        "S29",
+        "S30",
+        "S31"
+      ],
+      "requirement_ids": [
+        "cg"
+      ]
+    },
+    {
+      "intent_item_id": "continuity",
+      "constraint_ids": [
+        "continuity"
+      ],
+      "unit_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14",
+        "S15",
+        "S16",
+        "S17",
+        "S18",
+        "S19",
+        "S20",
+        "S21",
+        "S22",
+        "S23",
+        "S24",
+        "S25",
+        "S26",
+        "S27",
+        "S28",
+        "S29",
+        "S30",
+        "S31"
+      ],
+      "requirement_ids": [
+        "continuity"
+      ]
+    },
+    {
+      "intent_item_id": "sound",
+      "constraint_ids": [
+        "sound"
+      ],
+      "unit_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14",
+        "S15",
+        "S16",
+        "S17",
+        "S18",
+        "S19",
+        "S20",
+        "S21",
+        "S22",
+        "S23",
+        "S24",
+        "S25",
+        "S26",
+        "S27",
+        "S28",
+        "S29",
+        "S30",
+        "S31"
+      ],
+      "requirement_ids": [
+        "sound"
+      ]
+    },
+    {
+      "intent_item_id": "no-gore",
+      "constraint_ids": [
+        "no-gore"
+      ],
+      "unit_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14",
+        "S15",
+        "S16",
+        "S17",
+        "S18",
+        "S19",
+        "S20",
+        "S21",
+        "S22",
+        "S23",
+        "S24",
+        "S25",
+        "S26",
+        "S27",
+        "S28",
+        "S29",
+        "S30",
+        "S31"
+      ],
+      "requirement_ids": [
+        "no-gore"
+      ]
+    },
+    {
+      "intent_item_id": "no-lore",
+      "constraint_ids": [
+        "no-lore"
+      ],
+      "unit_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14",
+        "S15",
+        "S16",
+        "S17",
+        "S18",
+        "S19",
+        "S20",
+        "S21",
+        "S22",
+        "S23",
+        "S24",
+        "S25",
+        "S26",
+        "S27",
+        "S28",
+        "S29",
+        "S30",
+        "S31"
+      ],
+      "requirement_ids": [
+        "no-lore"
+      ]
+    },
+    {
+      "intent_item_id": "model",
+      "constraint_ids": [
+        "model"
+      ],
+      "unit_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14",
+        "S15",
+        "S16",
+        "S17",
+        "S18",
+        "S19",
+        "S20",
+        "S21",
+        "S22",
+        "S23",
+        "S24",
+        "S25",
+        "S26",
+        "S27",
+        "S28",
+        "S29",
+        "S30",
+        "S31"
+      ],
+      "requirement_ids": [
+        "model"
+      ]
+    },
+    {
+      "intent_item_id": "priority",
+      "constraint_ids": [
+        "priority"
+      ],
+      "unit_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14",
+        "S15",
+        "S16",
+        "S17",
+        "S18",
+        "S19",
+        "S20",
+        "S21",
+        "S22",
+        "S23",
+        "S24",
+        "S25",
+        "S26",
+        "S27",
+        "S28",
+        "S29",
+        "S30",
+        "S31"
+      ],
+      "requirement_ids": [
+        "priority"
+      ]
+    },
+    {
+      "intent_item_id": "rational",
+      "constraint_ids": [
+        "rational"
+      ],
+      "unit_ids": [
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14",
+        "S15",
+        "S16",
+        "S22",
+        "S24",
+        "S25"
+      ],
+      "requirement_ids": [
+        "rational"
+      ]
+    },
+    {
+      "intent_item_id": "clerk",
+      "constraint_ids": [
+        "clerk"
+      ],
+      "unit_ids": [
+        "S01",
+        "S02",
+        "S03"
+      ],
+      "requirement_ids": [
+        "clerk"
+      ]
+    },
+    {
+      "intent_item_id": "erased",
+      "constraint_ids": [
+        "erased"
+      ],
+      "unit_ids": [
+        "S05",
+        "S06",
+        "S07",
+        "S09",
+        "S10"
+      ],
+      "requirement_ids": [
+        "erased"
+      ]
+    },
+    {
+      "intent_item_id": "remembers",
+      "constraint_ids": [
+        "remembers"
+      ],
+      "unit_ids": [
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S13"
+      ],
+      "requirement_ids": [
+        "remembers"
+      ]
+    },
+    {
+      "intent_item_id": "city",
+      "constraint_ids": [
+        "city"
+      ],
+      "unit_ids": [
+        "S03",
+        "S11",
+        "S15"
+      ],
+      "requirement_ids": [
+        "city"
+      ]
+    },
+    {
+      "intent_item_id": "sister",
+      "constraint_ids": [
+        "sister"
+      ],
+      "unit_ids": [
+        "S17",
+        "S18",
+        "S19",
+        "S20",
+        "S21",
+        "S23"
+      ],
+      "requirement_ids": [
+        "sister"
+      ]
+    },
+    {
+      "intent_item_id": "warning",
+      "constraint_ids": [
+        "warning"
+      ],
+      "unit_ids": [
+        "S19",
+        "S21"
+      ],
+      "requirement_ids": [
+        "warning"
+      ]
+    },
+    {
+      "intent_item_id": "future",
+      "constraint_ids": [
+        "future"
+      ],
+      "unit_ids": [
+        "S22",
+        "S31"
+      ],
+      "requirement_ids": [
+        "future"
+      ]
+    },
+    {
+      "intent_item_id": "face",
+      "constraint_ids": [
+        "face"
+      ],
+      "unit_ids": [
+        "S25",
+        "S26",
+        "S27",
+        "S28",
+        "S29",
+        "S30",
+        "S31"
+      ],
+      "requirement_ids": [
+        "face"
+      ]
+    },
+    {
+      "intent_item_id": "refinement",
+      "constraint_ids": [
+        "refinement"
+      ],
+      "unit_ids": [
+        "S01",
+        "S02",
+        "S03",
+        "S04",
+        "S05",
+        "S06",
+        "S07",
+        "S08",
+        "S09",
+        "S10",
+        "S11",
+        "S12",
+        "S13",
+        "S14",
+        "S15",
+        "S16",
+        "S17",
+        "S18",
+        "S19",
+        "S20",
+        "S21",
+        "S22",
+        "S23",
+        "S24",
+        "S25",
+        "S26",
+        "S27",
+        "S28",
+        "S29",
+        "S30",
+        "S31"
+      ],
+      "requirement_ids": [
+        "refinement"
+      ]
+    }
+  ]
+}

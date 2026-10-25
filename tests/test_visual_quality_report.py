@@ -1,13 +1,51 @@
 """Actual extraction, report rendering, and exact-media tamper regressions."""
 
+import hashlib
 import json
 from pathlib import Path
+import shutil
 import subprocess
 
 import pytest
 
 from scripts.visual_quality_report import check, prepare, write_json
 from test_production_visual_quality import direction
+
+
+TIMELINE_FIXTURE = Path(__file__).parent / "fixtures/hyperframes/silent_image/timeline.json"
+
+
+def full_contract_media(tmp_path):
+    """Use the existing canonical two-image CUT timeline for contract packets."""
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    video = tmp_path / "full-contract-source.mp4"
+    subprocess.run(["ffmpeg", "-v", "error", "-nostdin", "-f", "lavfi", "-i",
+        "color=c=orange:s=320x180:r=24", "-frames:v", "10", "-c:v", "libx264",
+        "-pix_fmt", "yuv420p", str(video)], check=True, capture_output=True)
+    timeline = json.loads(TIMELINE_FIXTURE.read_text(encoding="utf-8"))
+    report_path = tmp_path / "render-report.json"
+    write_json(report_path, {
+        "output": str(video.resolve()),
+        "sha256": hashlib.sha256(video.read_bytes()).hexdigest(),
+        "size_bytes": video.stat().st_size,
+        "measured": {
+            "width": timeline["delivery_profile"]["width"],
+            "height": timeline["delivery_profile"]["height"],
+            "fps_num": timeline["delivery_profile"]["fps"],
+            "fps_den": 1,
+            "duration_frames": timeline["total_frames"],
+            "codec_name": "h264",
+        },
+        "timeline_fingerprint": timeline["composition_fingerprint"],
+        "timeline_frames": timeline["total_frames"],
+        "checks": [
+            {"command": command, "tool_version": timeline["renderer"]["version"],
+             "exit_code": 0, "error_count": 0, "warning_count": 0}
+            for command in ("lint", "check")
+        ],
+        "usage_scope": "development_audio_preview",
+    })
+    return video, TIMELINE_FIXTURE, report_path
 
 
 @pytest.fixture
@@ -32,6 +70,24 @@ def answers(output, verdict="pass"):
     frame = {k: v for k, v in packet["frames"][0].items() if k != "path"}
     for finding in data["observation"]["findings"]:
         finding.update(verdict=verdict, observation="Explicit fixture answer", visual_frames=[frame])
+    if packet["schema_version"] == "visual-review-packet/4":
+        data["junction_findings"] = [
+            {
+                "junction_id": junction["junction_id"],
+                "inventory_sha256": packet["junction_inventory_sha256"],
+                "edit_decision": "retain_with_reason",
+                "edit_reason": "动作在切点前收住，下一镜主体自然接上。",
+                "visual_verdict": "pass",
+                "visual_observation": "正常速度播放时没有重复、停顿或跳帧。",
+                "audio_verdict": "pass",
+                "audio_observation": "实际聆听时没有重复音或突然截断。",
+                "audio_basis": "actual_listening",
+                "audio_reason": None,
+                "viewing_mode": "full_playback",
+                "viewing_speed_milli": 1000,
+            }
+            for junction in packet["junction_inventory"]
+        ]
     path = output / "answers.json"
     write_json(path, data)
     return path
@@ -165,13 +221,14 @@ def test_complete_goal_cannot_be_replaced_by_visual_pass(packet, tmp_path, kind,
     from scripts.visual_quality_report import reopen
 
     authored, goal = complete_goal(kind)
-    source = Path(json.loads((packet / "packet.json").read_text())["video_path"])
+    source, timeline, report = full_contract_media(tmp_path / "complete-inputs")
     output = tmp_path / "complete"
-    result = prepare(source, authored, output, (0, 1000), final_output_contract=goal)
+    result = prepare(source, authored, output, (0, 200), final_output_contract=goal,
+        timeline=timeline, render_report=report)
     assert result["verdict"] == "not_evaluated"
     assert result["review_scope"] == "full_contract"
     saved, reopened = reopen(output)
-    assert saved["schema_version"] == "visual-review-packet/2"
+    assert saved["schema_version"] == "visual-review-packet/4"
     assert reopened == goal
     assert reopened.contract_hash == goal.contract_hash
     path = answers(output)
@@ -217,11 +274,12 @@ def test_complete_contract_cli_and_visual_only_scope(packet, tmp_path):
     config, contract = tmp_path / "direction.json", tmp_path / "goal.json"
     write_json(config, authored.model_dump(mode="json"))
     write_json(contract, goal.model_dump(mode="json"))
-    source = json.loads((packet / "packet.json").read_text())["video_path"]
+    source, timeline, report = full_contract_media(tmp_path / "complete-inputs")
     output = tmp_path / "complete"
-    assert main(["prepare", "--video", source, "--direction", str(config),
+    assert main(["prepare", "--video", str(source), "--direction", str(config),
         "--content-kind", "drama", "--contract", str(contract), "--output", str(output),
-        "--timestamps-ms", "0", "1000"]) == 0
+        "--timeline", str(timeline), "--render-report", str(report),
+        "--timestamps-ms", "0", "200"]) == 0
     result = json.loads((output / "result.json").read_text())
     assert result["review_scope"] == "full_contract"
     assert result["verdict"] == "not_evaluated"
@@ -238,8 +296,9 @@ def bound_packet(packet, tmp_path):
         goal.requirements[-1].model_copy(update={"proof": "human"}))})
     binding, _, _, _ = goal_inputs(tmp_path / "authoring", kind="drama", contract=goal)
     output = tmp_path / "bound-review"
-    source = Path(reopen(packet)[0]["video_path"])
-    prepare(source, authored, output, (0, 1000), final_output_contract=goal, goal_binding=binding)
+    source, timeline, report = full_contract_media(tmp_path / "complete-inputs")
+    prepare(source, authored, output, (0, 200), final_output_contract=goal,
+        goal_binding=binding, timeline=timeline, render_report=report)
     return output, binding, goal
 
 
@@ -247,7 +306,7 @@ def test_goal_binding_python_roundtrip_reopens_only_sealed_inputs(bound_packet):
     from scripts.visual_quality_report import reopen
     output, binding, goal = bound_packet
     packet, reopened = reopen(output)
-    assert packet["schema_version"] == "visual-review-packet/3"
+    assert packet["schema_version"] == "visual-review-packet/4"
     assert reopened == goal
     assert packet["goal_binding"]["path"] == "creative/binding.json"
     for source in binding.parent.iterdir():
@@ -260,6 +319,39 @@ def test_goal_binding_python_roundtrip_reopens_only_sealed_inputs(bound_packet):
     assert checked["completion_summary"]["requirements_to_address"] == []
     assert checked["completion_summary"]["user_feedback"]["assessment"] == "parent_review_required"
     assert checked["production_acceptance"] == "not_evaluated"
+
+
+@pytest.mark.parametrize("version", ["visual-review-packet/2", "visual-review-packet/3"])
+def test_legacy_full_contract_packets_reopen_but_need_new_junction_binding(bound_packet, tmp_path, version):
+    from ai_video.production.hashing import canonical_sha256
+    from scripts.visual_quality_report import reopen
+
+    current, _, _ = bound_packet
+    legacy = tmp_path / version.rsplit("/", 1)[1]
+    shutil.copytree(current, legacy)
+    packet_path = legacy / "packet.json"
+    packet = json.loads(packet_path.read_text(encoding="utf-8"))
+    packet["schema_version"] = version
+    for field in ("timeline_snapshot", "render_report_snapshot", "junction_inventory", "junction_inventory_sha256"):
+        packet.pop(field, None)
+    if version.endswith("/2"):
+        packet.pop("goal_binding", None)
+    packet["subject_hash"] = canonical_sha256({key: value for key, value in packet.items() if key != "subject_hash"})
+    write_json(packet_path, packet)
+
+    assert reopen(legacy)[0]["schema_version"] == version
+    answer_path = answers(legacy)
+    data = json.loads(answer_path.read_text(encoding="utf-8"))
+    data["observation"]["review_request_content_hash"] = packet["subject_hash"]
+    write_json(answer_path, data)
+    checked = check(legacy, answer_path)
+    assert checked["verdict"] == "not_evaluated"
+    assert checked["junction_review"]["verdict"] == "not_evaluated"
+    assert "missing_junction_binding" in checked["evidence_gaps"]
+    assert "junction_binding" in {
+        item["requirement_id"] for item in checked["completion_summary"]["requirements_to_address"]
+    }
+    assert "衔接范围未知" in (legacy / "report.html").read_text(encoding="utf-8")
 
 
 @pytest.mark.parametrize("mutation", ["binding", "source", "coverage", "contract", "missing", "symlink", "path_escape"])
@@ -313,6 +405,7 @@ def test_snapshot_uses_preflight_bytes_even_if_external_inputs_drift_during_prob
     from scripts.visual_quality_report import reopen
     authored, goal = complete_goal("advertising")
     binding, _, _, _ = goal_inputs(tmp_path / "authoring", contract=goal)
+    video, timeline, report = full_contract_media(tmp_path / "complete-inputs")
     original = (binding.parent / "input.txt").read_bytes()
     real_run = subprocess.run
     def drift(*args, **kwargs):
@@ -320,8 +413,8 @@ def test_snapshot_uses_preflight_bytes_even_if_external_inputs_drift_during_prob
         return real_run(*args, **kwargs)
     monkeypatch.setattr(subprocess, "run", drift)
     output = tmp_path / "frozen"
-    prepare(Path(reopen(packet)[0]["video_path"]), authored, output, (0,),
-        final_output_contract=goal, goal_binding=binding)
+    prepare(video, authored, output, (0,), final_output_contract=goal, goal_binding=binding,
+        timeline=timeline, render_report=report)
     assert (output / "creative/input.txt").read_bytes() == original
     assert reopen(output)[1] == goal
 
@@ -353,13 +446,14 @@ def test_goal_binding_cli_consumes_same_preflight_and_reopen(packet, tmp_path):
     config = tmp_path / "direction.json"
     write_json(config, authored.model_dump(mode="json"))
     output = tmp_path / "cli"
-    args = ["prepare", "--video", reopen(packet)[0]["video_path"], "--direction", str(config),
-        "--content-kind", "drama", "--output", str(output), "--timestamps-ms", "0", "1000",
-        "--goal-binding", str(binding)]
+    video, timeline, report = full_contract_media(tmp_path / "complete-inputs")
+    args = ["prepare", "--video", str(video), "--direction", str(config),
+        "--content-kind", "drama", "--output", str(output), "--timestamps-ms", "0", "200",
+        "--goal-binding", str(binding), "--timeline", str(timeline), "--render-report", str(report)]
     assert main(args) == 2
     assert not output.exists()
     assert main(args + ["--contract", str(binding.parent / "contract.json")]) == 0
-    assert reopen(output)[0]["schema_version"] == "visual-review-packet/3"
+    assert reopen(output)[0]["schema_version"] == "visual-review-packet/4"
     assert main(["check", "--packet", str(output), "--answers", str(answers(output))]) == 0
 
 
@@ -386,8 +480,9 @@ def test_feedback_revision_is_sealed_new_input_and_never_rewrites_old_report(bou
     reseal(binding, envelope, "final_output_contract", revision.model_dump(mode="json"))
     new = tmp_path / "new-revision"
     authored, _ = complete_goal("drama")
-    result = prepare(Path(reopen(packet)[0]["video_path"]), authored, new, (0,),
-        final_output_contract=revision, goal_binding=binding)
+    video, timeline, report = full_contract_media(tmp_path / "new-revision-inputs")
+    result = prepare(video, authored, new, (0,), final_output_contract=revision,
+        goal_binding=binding, timeline=timeline, render_report=report)
     assert result["subject_hash"] != old_subject
     assert result["completion_summary"]["user_feedback"]["assessment"] == "parent_review_required"
     assert result["completion_summary"]["user_feedback"]["source"]["sha256"] == envelope["creative_input"]["sha256"]

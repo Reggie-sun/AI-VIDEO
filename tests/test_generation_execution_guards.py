@@ -59,6 +59,7 @@ def _binding(*, limits, policy, shot_id="guard-shot", execution_kind="local", bi
         ),
     )
     return SimpleNamespace(
+        policy=SimpleNamespace(execution_purpose="production"),
         inputs=SimpleNamespace(limits=limits, policy=policy, candidates=(candidate,)),
         decision=SimpleNamespace(selected_candidate_id="local-candidate"),
         context=SimpleNamespace(target_shot_id=shot_id),
@@ -223,7 +224,7 @@ def test_local_unmetered_continuation_does_not_expand_paid_quota():
     committer = _Committer({"previous": previous}, {"old-request": _request()})
     with pytest.raises(AiVideoError, match="ceilings cannot expand"):
         committer._require_persisted_generation_limits(
-            SimpleNamespace(attempts=(prior,)), SimpleNamespace(generation_id="new"), current,
+            SimpleNamespace(attempts=(prior,), active_paid_provider_budget=None), SimpleNamespace(generation_id="new"), current,
             family_ids=_family_ids(committer, current))
 
 

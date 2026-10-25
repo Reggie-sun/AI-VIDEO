@@ -252,25 +252,41 @@ def build_verified_causal_opening_expression(*, loaded, routing, requirement, pr
         routing=routing, source_intent=source_binding.projection.requirement.generation_intent)
 
 
-def compile_with_sequence_expression(provider, provider_bound, requirement, *, loaded=None, routing=None):
-    """Keep legacy calls intact; native grammars share the sequence-issued facts."""
+def compile_with_sequence_expression(provider, provider_bound, requirement, *, loaded=None, routing=None,
+                                     expected_request=None):
+    """Fresh admission or exact sealed replay, sharing sequence-issued facts."""
+    compile_request = (getattr(provider, "compile_new_request", provider.compile_request)
+        if expected_request is None else provider.compile_request)
+
+    def compile_exact(**kwargs):
+        result = compile_request(provider_bound, requirement, **kwargs)
+        if expected_request is not None and getattr(result, "request", None) != expected_request:
+            from ai_video.production.video_compiler import (
+                ProviderRequirementUnsupported, ProviderRequirementUnsupportedReason,
+            )
+            return ProviderRequirementUnsupported(requirement_hash=requirement.requirement_hash,
+                provider_bound_request_hash=provider_bound.provider_bound_request_hash,
+                selected_capability_id=provider_bound.capability_id,
+                reason=ProviderRequirementUnsupportedReason.LINEAGE_MISMATCH,
+                unsupported_field_paths=("expected_request",))
+        return result
     preserved = requirement.target_shot.preserved_source_expression is not None
     if preserved and requirement.generation_intent.open_state.kind is ContinuityStateKind.TYPED_HASH and routing is None:
         if loaded is None:
             raise ValueError("source selection expression requires the current sequence project")
         expression = build_verified_source_selection_expression(loaded=loaded, requirement=requirement,
             provider_bound=provider_bound)
-        return provider.compile_request(provider_bound, requirement, continuity_expression=expression)
+        return compile_exact(continuity_expression=expression)
     if (getattr(provider, "causal_expression_grammar", None) not in {"remote-video-prose-v1", "h3-three-field-v1"}
             or (requirement.contract_version != "provider-neutral-video-requirement/4" and not preserved)
             or requirement.generation_intent.open_state.kind is not ContinuityStateKind.TYPED_HASH
             or routing is None):
-        return provider.compile_request(provider_bound, requirement)
+        return compile_exact()
     if loaded is None:
         raise ValueError("causal expression requires the current sequence project")
     evidence = build_verified_causal_opening_expression(loaded=loaded, routing=routing,
         requirement=requirement, provider_bound=provider_bound)
-    return provider.compile_request(provider_bound, requirement, continuity_expression=evidence)
+    return compile_exact(continuity_expression=evidence)
 
 
 def build_verified_source_selection_expression(*, loaded, requirement, provider_bound):

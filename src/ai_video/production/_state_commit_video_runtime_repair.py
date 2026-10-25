@@ -12,6 +12,7 @@ from ai_video.production.generation_runtime_repair import (
     LocalRuntimeRepairExtension,
     PaidCrossProviderNoEffectRetarget,
     PaidKnownFailureRetarget,
+    PaidNoEffectRepairExtension,
     PaidNoEffectRetarget,
 )
 from ai_video.production.models import StateCommitStatus
@@ -32,17 +33,19 @@ def register_runtime_repair_authorization(
     evidence_hash: str | None = None,
     local_extension: LocalRuntimeRepairExtension | None = None,
     paid_no_effect_retarget: PaidNoEffectRetarget | None = None,
+    paid_no_effect_extension: PaidNoEffectRepairExtension | None = None,
     paid_known_failure_retarget: PaidKnownFailureRetarget | None = None,
     paid_cross_provider_no_effect_retarget: PaidCrossProviderNoEffectRetarget | None = None,
     target_candidate=None,
     target_requirement=None,
 ) -> RuntimeRepairAuthorizationPointer:
-    """Authorize one bounded re-execution after a repaired local runtime failure.
+    """Authorize one bounded re-execution after a verified runtime or paid no-effect failure.
 
-    The attempt must be FAILED with durable ``runtime_failure`` evidence; the
-    grant is per-Shot capped and one-use (consumed by the replacement submit
-    intent inside the same atomic write).  Re-recording the same evidence
-    returns the existing pointer unchanged.
+    A reconciled ``not_submitted`` outcome is eligible only for an exact paid
+    no-effect retarget and verified pre-transport reconciliation. The grant is
+    per-Shot capped and one-use (consumed by the replacement submit intent
+    inside the same atomic write). Re-recording the same evidence returns the
+    existing pointer unchanged.
     """
 
     from ai_video.production.generation_runtime_repair import (
@@ -60,6 +63,20 @@ def register_runtime_repair_authorization(
             raise _state_invalid("Paid retarget requires its exact typed scope and no local extension.")
         paid_no_effect_retarget = PaidNoEffectRetarget.model_validate_json(
             paid_no_effect_retarget.model_dump_json())
+    if paid_no_effect_extension is not None:
+        if (not isinstance(paid_no_effect_extension, PaidNoEffectRepairExtension)
+                or paid_no_effect_retarget is None
+                or local_extension is not None
+                or paid_known_failure_retarget is not None
+                or paid_cross_provider_no_effect_retarget is not None):
+            raise _state_invalid(
+                "Paid no-effect extension requires its exact paid retarget and no other repair mode."
+            )
+        try:
+            paid_no_effect_extension = PaidNoEffectRepairExtension.model_validate_json(
+                paid_no_effect_extension.model_dump_json())
+        except ValueError:
+            raise _state_invalid("Paid no-effect repair extension must be typed and exact.") from None
     if paid_known_failure_retarget is not None:
         if (not isinstance(paid_known_failure_retarget, PaidKnownFailureRetarget)
                 or local_extension is not None or paid_no_effect_retarget is not None
@@ -105,22 +122,24 @@ def register_runtime_repair_authorization(
         if attempt.status is not StateCommitStatus.FAILED or state is None:
             raise _state_invalid("Runtime repair requires a failed video attempt.")
         if not state.generation_experiences:
-            raise _state_invalid(
-                "Runtime repair requires durable runtime failure evidence."
-            )
+            raise _state_invalid("Runtime repair requires durable attempt evidence.")
         experience = self._reopen_generation_experience(
             state.generation_experiences[-1]
         )
-        failures = [
-            e for e in experience.evidence if e.outcome == "runtime_failure"
-        ]
-        if not failures:
+        attempt_evidence = [e for e in experience.evidence if e.attempt_id == attempt_id]
+        if not attempt_evidence:
+            raise _state_invalid("Runtime repair requires exact attempt evidence.")
+        failure = attempt_evidence[-1]
+        if failure.outcome == "not_submitted" and paid_no_effect_retarget is not None:
+            receipt = closed_paid_no_effect_receipt(self, attempt)
+            _require_paid_no_effect_evidence(self, attempt, receipt, failure)
+        elif failure.outcome != "runtime_failure":
             raise _state_invalid(
-                "Runtime repair requires a runtime_failure outcome evidence."
+                "Runtime repair requires runtime_failure or verified reconciled no-effect evidence."
             )
-        failure = failures[-1]
         if paid_no_effect_retarget is not None:
             receipt = closed_paid_no_effect_receipt(self, attempt)
+            _require_paid_no_effect_evidence(self, attempt, receipt, failure)
             request = self._reopen_video_request(state.request)
             binding = self._reopen_generation_execution_binding(state.execution_binding)
             if (receipt.submit_receipt_fingerprint != paid_no_effect_retarget.submit_receipt_fingerprint
@@ -129,7 +148,10 @@ def register_runtime_repair_authorization(
                     or failure.task_id != binding.inputs.limits.task_id
                     or failure.shot_id != binding.context.target_shot_id):
                 raise _state_invalid("Paid retarget does not match the exact failed receipt and evidence.")
-            _require_latest_local_failure(self, manifest, attempt_id, failure.shot_id)
+            if failure.outcome == "not_submitted":
+                _require_latest_same_shot_attempt(self, manifest, attempt_id, failure.shot_id)
+            else:
+                _require_latest_local_failure(self, manifest, attempt_id, failure.shot_id)
         if paid_known_failure_retarget is not None:
             receipt, _submission, observation, request = closed_paid_known_failure_proof(
                 self, attempt
@@ -206,10 +228,12 @@ def register_runtime_repair_authorization(
             for pointer in prior.runtime_repairs:
                 if pointer.evidence_hash == failure.evidence_hash:
                     if (local_extension is not None or paid_no_effect_retarget is not None
+                            or paid_no_effect_extension is not None
                             or paid_cross_provider_no_effect_retarget is not None):
                         existing = self._reopen_runtime_repair_authorization(pointer)
                         if (existing.local_extension != local_extension
                                 or existing.paid_no_effect_retarget != paid_no_effect_retarget
+                                or existing.paid_no_effect_extension != paid_no_effect_extension
                                 or existing.paid_known_failure_retarget != paid_known_failure_retarget
                                 or existing.paid_cross_provider_no_effect_retarget
                                     != paid_cross_provider_no_effect_retarget
@@ -271,15 +295,27 @@ def register_runtime_repair_authorization(
                 require_local_extension_scope(local_extension, prior_binding)
             _require_latest_local_failure(self, manifest, attempt_id, local_extension.shot_id)
             ceiling = local_extension.ceiling
+        if paid_no_effect_extension is not None:
+            if granted != paid_no_effect_extension.ceiling - 1:
+                raise _state_invalid(
+                    "Paid no-effect repair extension is premature or the Shot budget is exhausted."
+                )
+            _require_paid_no_effect_repair_extension(
+                self, manifest, attempt, failure, paid_no_effect_extension,
+                expected_current_revision=True, actor=actor,
+            )
+            ceiling = paid_no_effect_extension.ceiling
         if granted >= ceiling:
             raise _state_invalid("Runtime repair budget is exhausted for this Shot.")
         authorization = RuntimeRepairAuthorization.create(
-            schema_version=("runtime-repair/5" if paid_cross_provider_no_effect_retarget is not None else
+            schema_version=("runtime-repair/6" if paid_no_effect_extension is not None else
+                "runtime-repair/5" if paid_cross_provider_no_effect_retarget is not None else
                 "runtime-repair/4" if paid_known_failure_retarget is not None else
                 "runtime-repair/3" if paid_no_effect_retarget is not None else
                 "runtime-repair/2" if local_extension is not None else "runtime-repair/1"),
             local_extension=local_extension,
             paid_no_effect_retarget=paid_no_effect_retarget,
+            paid_no_effect_extension=paid_no_effect_extension,
             paid_known_failure_retarget=paid_known_failure_retarget,
             paid_cross_provider_no_effect_retarget=paid_cross_provider_no_effect_retarget,
             attempt_id=attempt_id,
@@ -346,6 +382,7 @@ def require_runtime_repair_grant(self, manifest, binding):
     if repair.paid_no_effect_retarget is not None:
         from ai_video.production.generation_runtime_repair import retarget_preserves_strategy
         receipt = closed_paid_no_effect_receipt(self, prior)
+        evidence = _require_paid_no_effect_evidence(self, prior, receipt)
         old_binding = self._reopen_generation_execution_binding(prior_state.execution_binding)
         old = next(c for c in old_binding.inputs.candidates
                    if c.candidate_id == old_binding.decision.selected_candidate_id)
@@ -356,9 +393,22 @@ def require_runtime_repair_grant(self, manifest, binding):
                 or old_binding.inputs.limits.task_id != binding.inputs.limits.task_id
                 or old_binding.context.target_shot_id != binding.context.target_shot_id
                 or binding.inputs.latest_attempt_hash != repair.evidence_hash
+                or evidence.evidence_hash != repair.evidence_hash
                 or not retarget_preserves_strategy(old, target)):
             raise _state_invalid("Paid retarget does not match the exact authorized strategy and failure.")
-        _require_latest_local_failure(self, manifest, prior.attempt_id, binding.context.target_shot_id)
+        if evidence.outcome == "not_submitted":
+            _require_latest_same_shot_attempt(
+                self, manifest, prior.attempt_id, binding.context.target_shot_id,
+                successor_binding=binding,
+            )
+        else:
+            _require_latest_local_failure(self, manifest, prior.attempt_id, binding.context.target_shot_id)
+        if repair.paid_no_effect_extension is not None:
+            _require_paid_no_effect_repair_extension(
+                self, manifest, prior, evidence, repair.paid_no_effect_extension,
+                expected_current_revision=False, actor=repair.actor,
+                current_repair=repair,
+            )
     if repair.paid_known_failure_retarget is not None:
         from ai_video.production.generation_runtime_repair import (
             paid_failure_retarget_preserves_strategy,
@@ -472,11 +522,173 @@ def closed_paid_no_effect_receipt(committer, attempt):
     receipt = committer._reopen_paid_submit(paid.submit_receipt)
     request = committer._reopen_video_request(state.request)
     if (receipt.outcome is not PaidProviderSubmitOutcome.KNOWN_NO_EFFECT
-            or receipt.external_effect_id is not None or receipt.no_effect_reconciliation is not None
+            or receipt.external_effect_id is not None
             or receipt.attempt_id != attempt.attempt_id
             or receipt.request_fingerprint != request.resolved_generation_hash):
         raise _state_invalid("Paid recovery receipt does not match the physical failed request.")
     return receipt
+
+
+def _require_paid_no_effect_evidence(committer, attempt, receipt, supplied=None):
+    state = attempt.video_generation_state
+    if state is None or not state.generation_experiences:
+        raise _state_invalid("Paid recovery requires durable no-effect evidence.")
+    experience = committer._reopen_generation_experience(state.generation_experiences[-1])
+    matching = [item for item in experience.evidence if item.attempt_id == attempt.attempt_id]
+    if not matching:
+        raise _state_invalid("Paid recovery evidence does not identify its exact attempt.")
+    evidence = matching[-1]
+    request = committer._reopen_video_request(state.request)
+    binding = committer._reopen_generation_execution_binding(state.execution_binding)
+    if (
+        supplied is not None and supplied != evidence
+        or evidence.request_hash != request.request_input_hash
+        or evidence.task_id != binding.inputs.limits.task_id
+        or evidence.shot_id != binding.context.target_shot_id
+        or evidence.artifact_sha256 is not None
+        or evidence.findings
+        or evidence.unresolved_quality_refs
+    ):
+        raise _state_invalid("Paid recovery evidence differs from the exact failed request.")
+    if evidence.outcome == "not_submitted":
+        from ai_video.production.paid_provider_no_effect_reconciliation import (
+            is_verified_reconciled_no_effect_video_attempt,
+        )
+
+        if (receipt.no_effect_reconciliation is None
+                or not is_verified_reconciled_no_effect_video_attempt(
+                    committer, attempt_id=attempt.attempt_id)):
+            raise _state_invalid(
+                "Paid recovery not_submitted evidence requires verified no-effect reconciliation."
+            )
+    elif evidence.outcome != "runtime_failure" or receipt.no_effect_reconciliation is not None:
+        raise _state_invalid("Paid recovery requires exact runtime_failure or reconciled no-effect evidence.")
+    return evidence
+
+
+def _require_paid_no_effect_repair_extension(
+    committer,
+    manifest,
+    attempt,
+    evidence,
+    extension,
+    *,
+    expected_current_revision,
+    actor,
+    current_repair=None,
+):
+    state = attempt.video_generation_state
+    if state is None or state.execution_binding is None:
+        raise _state_invalid("Paid no-effect extension requires the exact failed binding.")
+    request = committer._reopen_video_request(state.request)
+    binding = committer._reopen_generation_execution_binding(state.execution_binding)
+    binding.validate_request(request)
+    if (
+        extension.ceiling not in {3, 4}
+        or not extension.authorization_receipt_id.strip()
+        or extension.task_id != binding.inputs.limits.task_id
+        or extension.task_id != evidence.task_id
+        or extension.shot_id != binding.context.target_shot_id
+        or extension.shot_id != evidence.shot_id
+        or extension.failed_binding_hash != binding.binding_hash
+        or evidence.attempt_id != attempt.attempt_id
+        or evidence.outcome != ("not_submitted" if extension.ceiling == 3 else "runtime_failure")
+    ):
+        raise _state_invalid("Paid no-effect extension differs from the exact failed task and Shot.")
+    if expected_current_revision:
+        if extension.expected_manifest_revision != manifest.manifest_revision:
+            raise _state_invalid("Paid no-effect extension Manifest revision is stale.")
+    elif (current_repair is None
+            or current_repair.expected_manifest_revision
+                != extension.expected_manifest_revision + 1
+            or current_repair.paid_no_effect_extension != extension
+            or current_repair.attempt_id != attempt.attempt_id
+            or current_repair.evidence_hash != evidence.evidence_hash
+            or current_repair.actor != actor):
+        raise _state_invalid("Paid no-effect extension differs from its immutable grant.")
+
+    prior_grants = []
+    for prior_attempt in manifest.attempts:
+        prior_state = prior_attempt.video_generation_state
+        if prior_state is None or not prior_state.runtime_repairs:
+            continue
+        prior_request = committer._reopen_video_request(prior_state.request)
+        scope = prior_request.activation_scope
+        if scope is None or scope.request.target_shot_id != extension.shot_id:
+            continue
+        for pointer in prior_state.runtime_repairs:
+            if (current_repair is not None
+                    and prior_attempt.attempt_id == current_repair.attempt_id
+                    and pointer.content_hash == current_repair.content_hash):
+                continue
+            prior_grants.append((prior_attempt, pointer))
+    if (len(prior_grants) != extension.ceiling - 1
+            or len({pointer.attempt_id for _, pointer in prior_grants}) != len(prior_grants)):
+        raise _state_invalid("Paid no-effect extension requires each exact prior repair grant.")
+
+    prior_authorizations = []
+    for prior_attempt, pointer in prior_grants:
+        prior_state = prior_attempt.video_generation_state
+        if (not pointer.consumed
+                or prior_attempt.status is not StateCommitStatus.FAILED
+                or prior_state is None or prior_state.execution_binding is None):
+            raise _state_invalid("Paid no-effect extension requires both prior grants consumed.")
+        authorization = committer._reopen_runtime_repair_authorization(pointer)
+        if (authorization.schema_version not in {"runtime-repair/3", "runtime-repair/6"}
+                or authorization.paid_no_effect_retarget is None
+                or authorization.actor != actor
+                or authorization.attempt_id != prior_attempt.attempt_id
+                or authorization.evidence_hash != pointer.evidence_hash):
+            raise _state_invalid("Paid no-effect extension prior grant identity or actor mismatch.")
+        prior_request = committer._reopen_video_request(prior_state.request)
+        prior_binding = committer._reopen_generation_execution_binding(
+            prior_state.execution_binding
+        )
+        prior_binding.validate_request(prior_request)
+        if (prior_binding.inputs.limits.task_id != extension.task_id
+                or prior_binding.context.target_shot_id != extension.shot_id):
+            raise _state_invalid("Paid no-effect extension prior task or Shot mismatch.")
+        prior_authorizations.append((authorization, prior_binding))
+        prior_receipt = closed_paid_no_effect_receipt(committer, prior_attempt)
+        prior_evidence = _require_paid_no_effect_evidence(
+            committer, prior_attempt, prior_receipt,
+        )
+        if (prior_evidence.evidence_hash != authorization.evidence_hash
+                or authorization.paid_no_effect_retarget.submit_receipt_fingerprint
+                    != prior_receipt.submit_receipt_fingerprint):
+            raise _state_invalid("Paid no-effect extension prior grant lacks its exact no-effect proof.")
+
+    if extension.ceiling == 3:
+        prior_shape_valid = all(
+            authorization.schema_version == "runtime-repair/3"
+            for authorization, _ in prior_authorizations
+        )
+    else:
+        legacy_grants = [
+            (authorization, prior_binding)
+            for authorization, prior_binding in prior_authorizations
+            if authorization.schema_version == "runtime-repair/3"
+        ]
+        extension_grants = [
+            (authorization, prior_binding)
+            for authorization, prior_binding in prior_authorizations
+            if authorization.schema_version == "runtime-repair/6"
+        ]
+        prior_shape_valid = (
+            len(legacy_grants) == 2
+            and len(extension_grants) == 1
+            and extension_grants[0][0].paid_no_effect_extension is not None
+            and extension_grants[0][0].paid_no_effect_extension.ceiling == 3
+            and all(
+                authorization.paid_no_effect_extension.task_id == extension.task_id
+                and authorization.paid_no_effect_extension.shot_id == extension.shot_id
+                and authorization.paid_no_effect_extension.failed_binding_hash
+                    == prior_binding.binding_hash
+                for authorization, prior_binding in extension_grants
+            )
+        )
+    if not prior_shape_valid:
+        raise _state_invalid("Paid no-effect extension prior grant lineage is not the exact bounded chain.")
 
 
 def closed_paid_known_failure_proof(committer, attempt):

@@ -34,6 +34,11 @@ Gate阻断validate/adoption，未生成final composition，不能用开发样本
 canonical `KNOWN_NO_EFFECT`、无新MP4。当前累计3次物理POST，未重试；账号侧计费阻断待解除。
 原片用户声音/动作反馈不转移为新片接受，新的POV效果、holdout完整生产与final render仍未验证。
 
+用户最新澄清以原画布复刻为目标，未要求固定Fast2.0，也未禁止2.5；Parent先前从费用提醒推导的限制撤销。
+480p、原剧情/参考职责/动作/视点/声音不变。必要model变化须明确来源观察与实际选择差异，并经原owner、
+历史计数、有限预算、exact preview/permit与新媒体验收；不得以模型选择清零known-no-effect历史。
+当前恢复缺口按[bounded retarget plan](../plans/2026-10-11-canvas-paid-no-effect-retarget.md)补齐，不自签成功。
+
 ## Current Baseline And Scope Correction
 
 当前可复用入口已经存在：

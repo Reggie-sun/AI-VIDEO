@@ -255,6 +255,14 @@ class VideoRoutingPolicy(_RouterModel):
     local_resources_available: bool = Field(strict=True)
     remote_authorized: bool = Field(strict=True)
     budget_authorized: bool = Field(strict=True)
+    execution_purpose: Literal["production", "qualification"] = "production"
+
+    @model_serializer(mode="wrap")
+    def _serialize_execution_purpose(self, handler):
+        data = handler(self)
+        if self.execution_purpose == "production":
+            data.pop("execution_purpose", None)
+        return data
 
 
 class AdapterCompilerContract(_RouterModel):

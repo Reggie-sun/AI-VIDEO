@@ -43,6 +43,7 @@ from ai_video.production._video_requirement_routing import (
 )
 from ai_video.production.models import VisualStrategy
 from ai_video.production.video import (
+    BillingKind,
     ProviderProfilePointer,
     VideoCapabilityVariant,
     VideoExecutionKind,
@@ -210,12 +211,35 @@ class VideoGenerationResolver:
                 "execution_kind": selected.execution_kind,
             }
         )
-        if selected.production_qualification == "UNQUALIFIED":
+        if (
+            policy.execution_purpose == "qualification"
+            and selected.production_qualification != "UNQUALIFIED"
+        ):
+            return self._blocked(
+                base,
+                RoutingOutcome.BLOCKED_CAPABILITY,
+                RouterReasonCode.PROVIDER_CAPABILITY_DENIED,
+                "A qualification trial requires an explicitly UNQUALIFIED model.",
+            )
+        if (
+            selected.production_qualification == "UNQUALIFIED"
+            and policy.execution_purpose != "qualification"
+        ):
             return self._blocked(
                 base,
                 RoutingOutcome.BLOCKED_CAPABILITY,
                 RouterReasonCode.MODEL_UNQUALIFIED,
                 "The exact selected model has not completed production qualification.",
+            )
+        if policy.execution_purpose == "qualification" and (
+            selected.execution_kind is not VideoExecutionKind.REMOTE
+            or selected.billing_kind is not BillingKind.METERED
+        ):
+            return self._blocked(
+                base,
+                RoutingOutcome.BLOCKED_POLICY,
+                RouterReasonCode.PROVIDER_CAPABILITY_DENIED,
+                "A qualification trial requires one remote metered capability.",
             )
         if context.activated_shot.visual_strategy not in {
             VisualStrategy.GENERATED_VIDEO,

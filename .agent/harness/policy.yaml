@@ -129,11 +129,11 @@ checks:
     cwd: .
     description: Execute migrated guide invariants through existing public CLI, reader, timeline, dependency and recovery tests; offline regression proof only.
   visual_quality_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_visual_quality.py, tests/test_visual_quality_report.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_visual_quality.py, tests/test_visual_quality_report.py, tests/test_junction_review_gate.py, -q]
     cwd: .
     description: Verify visual requirements through existing semantic/final acceptance, exact media report binding and missing-review blocking; no Provider calls.
   creative_goal_binding_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_creative_goal_binding.py, tests/test_open_video_skill.py, tests/test_production_visual_quality.py, tests/test_visual_quality_report.py, tests/test_runtime_skill_boundary.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_creative_goal_binding.py, tests/test_open_video_skill.py, tests/test_production_visual_quality.py, tests/test_visual_quality_report.py, tests/test_junction_review_gate.py, tests/test_runtime_skill_boundary.py, -q]
     cwd: .
     covers_check_ids: [open_video_skill_tests, visual_quality_tests, product_runtime_skill_boundary_tests]
     description: Verify exact development intent joins, sealed review snapshots, Director compatibility and one-way runtime boundaries without Provider calls.
@@ -292,7 +292,7 @@ checks:
     covered_by_check_ids: [production_contract_tests]
     description: Verify the single Production writer, activation, and explicit recovery.
   production_composition_audio_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_ad_creative.py, tests/test_production_composition.py, tests/test_production_video_retime.py, tests/test_production_video_retime_render.py, tests/test_production_hyperframes.py, tests/test_production_audio.py, tests/test_production_generated_video_audio.py, tests/test_production_captions.py, tests/test_production_text_design.py, tests/test_production_subtitle_ass.py, tests/test_production_text_visual_render.py, tests/test_production_elevenlabs.py, tests/test_production_minimax_speech.py, tests/test_production_voice_captions_e2e.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_ad_creative.py, tests/test_caption_development_preview.py, tests/test_production_composition.py, tests/test_production_video_retime.py, tests/test_production_video_retime_render.py, tests/test_production_hyperframes.py, tests/test_production_audio.py, tests/test_production_generated_video_audio.py, tests/test_production_captions.py, tests/test_production_text_design.py, tests/test_production_subtitle_ass.py, tests/test_production_text_visual_render.py, tests/test_production_elevenlabs.py, tests/test_production_minimax_speech.py, tests/test_production_voice_captions_e2e.py, tests/test_production_state_commit.py, tests/test_production_state_recovery.py, -q]
     cwd: .
     covered_by_check_ids: [production_contract_tests]
     description: Verify timeline, renderer, audio, voice, and caption contracts.
@@ -333,12 +333,12 @@ checks:
     covered_by_check_ids: [production_dependency_tests]
     description: Verify image/P7 graph and selective rebuild boundaries; skip only after the full dependency owner passes in this run.
   production_video_provider_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_jimeng.py, tests/test_production_paid_provider.py, tests/test_production_paid_budget_extension.py, tests/test_paid_budget_read_traversal.py, tests/test_production_paid_submit_quota.py, tests/test_production_video_unsubmitted.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_nominal_endpoint_recovery.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_video_pre_generation.py, tests/test_production_ecommerce_shot_candidate_gate.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_comfy_t8_native_long_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_metaso_h3.py, tests/test_production_minimax_h3_max.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_production_seedance_rejection.py, tests/test_seedance_source_prompt.py, tests/test_shot_continuity_source_review.py, tests/test_shot_continuity_source_operator.py, tests/test_shot_continuity_source_transport.py, -q, --durations=20, --durations-min=0.1]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_jimeng.py, tests/test_jimeng_shot_modes.py, tests/test_jimeng_causal_compilation.py, tests/test_production_paid_provider.py, tests/test_production_paid_budget_extension.py, tests/test_paid_budget_read_traversal.py, tests/test_production_paid_submit_quota.py, tests/test_production_video_unsubmitted.py, tests/test_production_paid_provider_state.py, tests/test_production_paid_provider_e2e.py, tests/test_production_video.py, tests/test_video_nominal_endpoint_recovery.py, tests/test_video_candidate.py, tests/test_video_generation.py, tests/test_production_video_pre_generation.py, tests/test_production_ecommerce_shot_candidate_gate.py, tests/test_production_continuity_evaluator.py, tests/test_production_continuity_onnx_backend.py, tests/test_production_local_continuity_reviewer.py, tests/test_production_continuity_review_coordinator.py, tests/test_production_video_fake.py, tests/test_production_video_state_recovery.py, tests/test_production_generated_video_e2e.py, tests/test_production_local_video_state.py, tests/test_production_comfy_video.py, tests/test_production_comfy_t8_video.py, tests/test_production_comfy_t8_turbo_video.py, tests/test_production_comfy_t8_native_turbo_video.py, tests/test_production_comfy_t8_native_long_video.py, tests/test_production_local_h3_provider_family.py, tests/test_production_minimax_h3.py, tests/test_production_metaso_h3.py, tests/test_production_minimax_h3_max.py, tests/test_production_minimax_hailuo.py, tests/test_production_seedance.py, tests/test_production_seedance_rejection.py, tests/test_seedance_source_prompt.py, tests/test_shot_continuity_source_review.py, tests/test_shot_continuity_source_operator.py, tests/test_shot_continuity_source_transport.py, -q, --durations=20, --durations-min=0.1]
     cwd: .
     covered_by_check_ids: [production_contract_tests]
     description: Verify paid-provider safety and generated-video contracts without live submit.
   seedance_local_video_tests:
-    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_seedance.py, tests/test_production_seedance_local_video.py, tests/test_production_seedance_mixed_reference.py, tests/test_seedance_source_prompt.py, -q]
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_seedance.py, tests/test_production_seedance_local_video.py, tests/test_production_seedance_mixed_reference.py, tests/test_seedance_source_prompt.py, tests/test_seedance_prompt_fidelity.py, tests/test_seedance_durable_fidelity.py, -q]
     cwd: .
     covered_by_check_ids: [production_video_provider_tests]
     description: Verify exact non-identity local-video materialization and Seedance request binding without live submit.
@@ -351,6 +351,10 @@ checks:
     cwd: .
     covered_by_check_ids: [production_contract_tests]
     description: Verify pure Shot routing, exact video capabilities, and dependency isolation.
+  authored_visual_revision_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_generation_visual_revision.py, tests/test_qualification_visual_revision.py, tests/test_qualification_quality_repair.py, tests/test_generation_coverage_revision.py, tests/test_generation_coverage_supersession.py, tests/test_generation_resolution_revision.py, tests/test_generation_resolution_supersession.py, -q]
+    cwd: .
+    description: Verify explicit fetched-version supersession, retained observations and paid history, and one exact authored visual qualification unit.
   generation_feedback_tests:
     execution_priority: 80
     covers_check_ids: [typed_causal_native_expression_tests]
@@ -750,6 +754,20 @@ categories:
       - production_video_provider_tests
       - canvas_preserved_source_tests
       - task_architecture_gate
+  authored_visual_revision:
+    patterns:
+      - src/ai_video/production/generation_visual_revision.py
+      - src/ai_video/production/_qualification_visual_revision.py
+      - src/ai_video/production/generation_coverage_revision.py
+      - src/ai_video/production/generation_resolution_revision.py
+      - tests/test_generation_visual_revision.py
+      - tests/test_qualification_visual_revision.py
+      - tests/test_generation_coverage_revision.py
+      - tests/test_generation_coverage_supersession.py
+      - tests/test_generation_resolution_revision.py
+      - tests/test_generation_resolution_supersession.py
+    focused_check_ids: [authored_visual_revision_tests]
+    check_ids: [authored_visual_revision_tests, generation_feedback_tests, production_video_provider_tests, task_architecture_gate]
   documentation:
     patterns:
       - README.md
@@ -937,6 +955,7 @@ categories:
       - src/ai_video/production/_voice_project_reader.py
       - tests/test_production_ad_creative.py
       - tests/test_production_composition.py
+      - tests/test_caption_development_preview.py
       - tests/test_production_video_retime.py
       - tests/test_production_video_retime_render.py
       - tests/test_production_hyperframes.py
@@ -1053,6 +1072,8 @@ categories:
   visual_quality_report:
     patterns:
       - scripts/visual_quality_report.py
+      - src/ai_video/production/junction_review.py
+      - tests/test_junction_review_gate.py
       - tests/test_visual_quality_report.py
       - configs/visual-quality/**
       - docs/visual-quality-gate.md
@@ -1392,6 +1413,8 @@ categories:
       - tests/test_production_paid_provider_state.py
       - tests/test_production_paid_provider_e2e.py
       - tests/test_production_jimeng.py
+      - tests/test_jimeng_shot_modes.py
+      - tests/test_jimeng_causal_compilation.py
       - tests/test_production_minimax_h3.py
       - tests/test_production_metaso_h3.py
       - tests/test_production_minimax_h3_max.py
@@ -1405,6 +1428,8 @@ categories:
       - tests/test_production_seedance_local_video.py
       - tests/test_production_seedance_mixed_reference.py
       - tests/test_seedance_source_prompt.py
+      - tests/test_seedance_prompt_fidelity.py
+      - tests/test_seedance_durable_fidelity.py
       - tests/test_production_video.py
       - tests/test_video_nominal_endpoint_recovery.py
       - tests/test_production_ecommerce_shot_candidate_gate.py

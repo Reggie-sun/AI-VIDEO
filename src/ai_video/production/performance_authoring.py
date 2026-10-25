@@ -83,16 +83,37 @@ def performance_authoring_report(*, intent, characters, rules=None, required_ids
     block = "" if performance is None else render_performance_direction(performance)
     expression = ("NOT_EVALUATED" if prompt_text is None or not block else
                   "LEXICALLY_EXPRESSED" if block in prompt_text else "UNEXPRESSED")
+    mapped, mapping_issues = (), {}
+    if prompt_text is not None and rules is not None:
+        from ai_video.production.generation_input_control import native_text_mapping_evidence
+        from ai_video.production.requirement_semantics import RequirementExpressionFields
+        mapped_rules = tuple(RequirementExpressionFields.model_validate(rule) if isinstance(rule, Mapping) else rule
+            for rule in rules if _value(rule, "native_text_mapping") is not None)
+        mapped, mapping_issues = native_text_mapping_evidence(mapped_rules, intent, prompt_text)
+    required_paths = tuple(path for index, actor in enumerate(actors)
+        for path in (*_actor_paths(actor, index), *(f"{_DIRECTIONS}.{index}.beats.{number}.phase"
+            for number in range(len(actor.beats)))))
+    missing_expression = tuple(path for path in required_paths if path not in mapped)
+    if mapped and not missing_expression and not mapping_issues:
+        expression = "MAPPED_FRAGMENTS_PRESENT"
     entries = []
     for index, actor in enumerate(actors):
         coverage = {} if rules is None else _matching_rules(_actor_paths(actor, index), rules, required_ids)
         entries.append({"intent_path": f"{_DIRECTIONS}.{index}",
             "direction": actor.model_dump(mode="json"),
+            "final_text_paths": [path for path in mapped if path.startswith(f"{_DIRECTIONS}.{index}.")],
             "acceptance_requirement_ids": sorted({identifier for ids in coverage.values() for identifier in ids})})
+    import hashlib
+    final_text = None if prompt_text is None else {"prompt_text": prompt_text,
+        "prompt_sha256": hashlib.sha256(prompt_text.encode()).hexdigest()}
     return {"mandatory_for_new_generation": bool(characters),
         "authoring_status": "INCOMPLETE" if issues else "AUTHORED" if characters else "NO_CAST",
         "issues": issues, "characters": entries, "native_text_required": block,
         "input_expression": expression, "mechanism": "MODEL_PROMPT_GUIDANCE",
+        "final_native_prompt": final_text,
+        "final_text_mapping_issues": mapping_issues,
+        "missing_final_text_paths": list(missing_expression) if expression not in {
+            "LEXICALLY_EXPRESSED", "MAPPED_FRAGMENTS_PRESENT"} else [],
         "acceptance_mapping": "NOT_EVALUATED" if rules is None else "MISSING" if any(
             issue.endswith(".acceptance") for issue in issues) else "DECLARED",
         "actual_quality": "NOT_EVALUATED"}

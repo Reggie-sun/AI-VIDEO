@@ -287,16 +287,19 @@ function buildVideoAction(profile, materials) {
     throw Error('unsupported Jimeng model');
   }
   const inputMode = profile.input_mode || 'multimodal';
-  const videoMode = {multimodal:'multi_modal',first_frame:'i2v',first_last_frame:'first_last_frame'}[inputMode];
+  const videoMode = {text_to_video:'t2v',multimodal:'multi_modal',
+    first_frame:'i2v',first_last_frame:'first_last_frame'}[inputMode];
   if (!videoMode) throw Error('unsupported Jimeng input mode');
-  if (inputMode !== 'multimodal') {
+  if (inputMode === 'text_to_video') {
+    if (materials.length !== 0) throw Error('text-to-video cannot bind materials');
+  } else if (inputMode !== 'multimodal') {
     const roles = inputMode === 'first_frame' ? ['first_frame'] : ['first_frame','last_frame'];
-    if (profile.model_id !== 'seedance_2.0_vip' || materials.length !== roles.length ||
+    if (materials.length !== roles.length ||
         materials.some((item, index) => item.kind !== 'image' || item.image_role !== roles[index])) {
       throw Error('native frame conditioning differs from the sealed endpoint roles');
     }
-  } else if (materials.some(item => item.image_role != null)) {
-    throw Error('frame roles cannot use the multimodal commercial action');
+  } else if (materials.length === 0 || materials.some(item => item.image_role != null)) {
+    throw Error('multimodal action requires reference materials without frame roles');
   }
   const inputVideoMillis = materials.filter(x => x.kind === 'video')
     .reduce((sum, item) => sum + item.duration_millis, 0);
@@ -324,10 +327,14 @@ function buildVideoCommerceContext(action, inputVideoMillis) {
 
 function buildVideoEditorDraft(previous, params) {
   if (previous && previous.kind !== 'video') throw Error('native editor kind changed');
+  const nativeMode = params.mode === undefined ? 4 : params.mode;
+  const editorMode = {1: 'firstLastFrame', 2: 'firstLastFrame',
+    3: 'firstLastFrame', 4: 'multiModal'}[nativeMode];
+  if (!editorMode) throw Error('unsupported Jimeng native mode');
   return {...previous, kind: 'video', parts: previous?.parts || [],
     references: previous?.references || [], outputCount: 1,
     contentSettings: {...previous?.contentSettings,
-      mode: params.mode === 2 || params.mode === 3 ? 'firstLastFrame' : 'multiModal',
+      mode: editorMode,
       modelName: params.model_name, aspectRatio: params.aspect_ratio,
       resolution: params.resolution, durationSeconds: params.duration_ms / 1000,
       isLongVideo: false}};

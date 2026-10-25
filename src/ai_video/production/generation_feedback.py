@@ -64,6 +64,7 @@ class PreparedGeneration:
     provider: object | None = None
     execution_binding: object | None = None
     target_shot_id: str | None = None
+    requirement: object | None = None
 
     @property
     def voice_handoffs(self):
@@ -90,7 +91,7 @@ def _expressions(acceptance, requirement):
     result = []
     for raw in inventory:
         rule = RequirementExpression.model_validate(raw)
-        if rule.input_control is not None:
+        if rule.input_control is not None or rule.native_text_mapping is not None:
             # The QA/authoring owner supplied a per-objective native expression.
             # Replacing it with the whole intent would hide a missing control.
             result.append(rule)
@@ -317,14 +318,24 @@ class GenerationFeedbackOrchestrator:
             "local_batch_used": max(limits.local_batch_used, len(submitted["local"]))
                 if limits.batch_review_evidence_hash is None else limits.local_batch_used,
         })
+        latest_evidence = next((e for x in history.experiences for e in x.evidence
+                                if e.evidence_hash == history.latest_attempt_hash), None)
+        from ai_video.production.generation_runtime_repair import (
+            is_paid_no_effect_repair_grant_for_evidence,
+        )
+
+        preserve_baseline_seed = bool(latest_evidence is not None and (
+            latest_evidence.outcome == "runtime_failure"
+            or any(is_paid_no_effect_repair_grant_for_evidence(grant, latest_evidence)
+                   for grant in history.runtime_repairs)
+        ))
         candidates, providers = create_generation_candidates(
             projection=current["projection"], targets=self.targets,
             acceptance=current["acceptance"], baseline=history.baseline_request,
             final_output_goal=current.get("final_output_goal"), source_project=current.get("source_project"),
             voice_context=current.get("voice_context"), generation_id=current["lifecycle"].generation_id,
             task_id=limits.task_id,
-            preserve_baseline_seed=any(e.evidence_hash == history.latest_attempt_hash
-                and e.outcome == "runtime_failure" for x in history.experiences for e in x.evidence))
+            preserve_baseline_seed=preserve_baseline_seed)
         voice_used = max((c.voice_route.readiness.voice_submits_used for c in candidates
             if c.voice_route is not None and c.voice_route.readiness is not None), default=0)
         limits = limits.model_copy(update={"paid_submits_used": max(limits.paid_submits_used,
@@ -365,13 +376,15 @@ class GenerationFeedbackOrchestrator:
             loaded=current.get("source_project"), routing=arguments.get("continuity_routing"))
         if isinstance(compilation, ProviderRequirementUnsupported):
             return PreparedGeneration(inputs, decision, compilation=compilation,
-                                      target_shot_id=current["context"].target_shot_id)
+                                      target_shot_id=current["context"].target_shot_id,
+                                      requirement=projection.requirement)
         resolved = provider.resolve(compilation.request)
         from ai_video.production.generation_execution import GenerationDecisionExecutionBinding
 
         binding = GenerationDecisionExecutionBinding.create(
             **arguments, inputs=inputs, decision=decision, compiled_request=resolved,
-            unsubmitted_predecessor_evidence_hash=self.unsubmitted_predecessor_evidence_hash)
+            unsubmitted_predecessor_evidence_hash=self.unsubmitted_predecessor_evidence_hash,
+            source_project=current.get("source_project"))
         return PreparedGeneration(inputs, decision, compilation, resolved, provider, binding,
                                   current["context"].target_shot_id)
 
@@ -443,9 +456,21 @@ class GenerationFeedbackOrchestrator:
             current_context = current()
             shot_id = current_context["context"].target_shot_id
             matching = [e for x in experiences for e in x.evidence if e.shot_id == shot_id]
-            submitted = [e for e in matching if e.outcome != "not_submitted"]
-            effective = submitted or matching
-            latest = effective[-1] if effective else None
+            manifest = committer._read_manifest()
+            runtime_repairs = []
+            for item in manifest.attempts:
+                video_state = item.video_generation_state
+                if video_state is None:
+                    continue
+                for pointer in video_state.runtime_repairs:
+                    runtime_repairs.append(RuntimeRepairGrant(
+                        authorization=committer._reopen_runtime_repair_authorization(pointer),
+                        consumed=pointer.consumed))
+            from ai_video.production.generation_runtime_repair import (
+                effective_latest_generation_evidence,
+            )
+
+            latest = effective_latest_generation_evidence(matching, runtime_repairs)
             # The persisted binding is the compiled baseline owner. Never
             # synthesize a baseline from the current prompt or recipe.
             baseline = None
@@ -453,7 +478,7 @@ class GenerationFeedbackOrchestrator:
             if latest is not None:
                 from ai_video.production._generation_feedback_reader import load_imported_history
 
-                imports = load_imported_history(committer.project_root, committer._read_manifest())
+                imports = load_imported_history(committer.project_root, manifest)
                 imported = next((r for r in imports if latest in r.experience.evidence), None)
                 if imported is not None:
                     request = imported.source_request
@@ -467,15 +492,6 @@ class GenerationFeedbackOrchestrator:
                             abandoned_result = receipt
                 if request.activation_scope is not None:
                     baseline = request.activation_scope.request
-            runtime_repairs = []
-            for item in committer._read_manifest().attempts:
-                video_state = item.video_generation_state
-                if video_state is None:
-                    continue
-                for pointer in video_state.runtime_repairs:
-                    runtime_repairs.append(RuntimeRepairGrant(
-                        authorization=committer._reopen_runtime_repair_authorization(pointer),
-                        consumed=pointer.consumed))
             return GenerationHistory(experiences, latest.evidence_hash if latest else None,
                                      baseline, abandoned_result, tuple(runtime_repairs))
 
@@ -544,6 +560,13 @@ def record_attempt_evaluation(*, committer, attempt_id, evaluation_sources=(), a
     attempt, state = VideoGenerationService(committer=committer, provider=None)._state(attempt_id)
     from ai_video.errors import ErrorCode
 
+    if state.visual_supersession is not None:
+        from ai_video.production.project import load_production_project
+
+        load_production_project(committer.project_root / "project.yaml")
+        if evaluation_sources or analysis_proof is not None or presentation_proof is not None:
+            raise ValueError("Superseded visual version cannot accept changed evaluation")
+        return committer._reopen_generation_experience(state.generation_experiences[-1])
     if attempt.error_code == ErrorCode.VIDEO_GENERATION_NOT_SUBMITTED.value:
         from ai_video.production._state_commit_video_unsubmitted import (
             is_verified_closed_unsubmitted_video_attempt,

@@ -105,7 +105,8 @@ class GenerationRecipe(StrictModel):
                    or not isinstance(raw.get("requirement_id"), str)
                    or not raw["requirement_id"].strip() for raw in inventory):
                 raise ValueError("recipe needs the complete versioned acceptance-owner projection")
-            if any(raw.get("input_control") is not None for raw in inventory):
+            if any(raw.get("input_control") is not None or raw.get("native_text_mapping") is not None
+                   for raw in inventory):
                 inventory = tuple(RequirementExpression.model_validate(raw).model_dump(
                     mode="json", exclude={"native_text"}) for raw in inventory)
         if inventory is not None:
@@ -118,8 +119,8 @@ class GenerationRecipe(StrictModel):
         # with another phrase that happens to occur in the prompt.
         authored = {raw["requirement_id"]: RequirementExpression.model_validate(raw)
                     for raw in self.acceptance_policy.profile_payload["generation_requirements"]
-                    if raw.get("input_control") is not None}
-        if any(item.input_control is not None and (
+                    if raw.get("input_control") is not None or raw.get("native_text_mapping") is not None}
+        if any((item.input_control is not None or item.native_text_mapping is not None) and (
             item.requirement_id not in authored
             or item.native_text != authored[item.requirement_id].native_text
         ) for item in self.expressions):
@@ -145,9 +146,17 @@ class GenerationRecipe(StrictModel):
 def expression_errors(recipe, requirement, prompt: str, control_paths=()) -> tuple[str, ...]:
     """Conservative lexical coverage, never a claim of model understanding."""
     payload = requirement.model_dump(mode="json")
-    from ai_video.production.generation_input_control import input_control_issues, reference_intent_path
+    from ai_video.production.generation_input_control import (
+        input_control_issues, native_text_mapping_evidence, reference_intent_path,
+    )
 
     errors = list(input_control_issues(recipe.expressions, requirement, prompt))
+    mapped, mapping_issues = native_text_mapping_evidence(recipe.expressions, requirement.generation_intent, prompt)
+    # Opted-in QA mappings express only their exact leaves. Legacy expressions
+    # and compiler controls retain their versioned behavior when absent.
+    control_paths = (*control_paths, *mapped)
+    for identifier, paths in mapping_issues.items():
+        errors.extend((identifier, *paths))
     for item in recipe.expressions:
         if item.stage != "raw_generation":
             continue

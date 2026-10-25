@@ -83,6 +83,67 @@ def _requirement(*, movement: CameraMovementKind = CameraMovementKind.DOLLY_IN):
     return ProviderNeutralVideoRequirement.create(**payload)
 
 
+def _untimed_conversation_requirement():
+    original = _requirement()
+    dialogue = DialogueIntent.model_validate({
+        "mode": "conversation", "language": "zh", "turns": [
+            {"speaker_id": "hero", "verbatim_text": "有人吗？", "on_screen": True,
+             "lip_sync_required": True, "response_obligation": "等待画外人回应。"},
+            {"speaker_id": "clerk", "verbatim_text": "慢点，里面烫。", "on_screen": False,
+             "lip_sync_required": False, "response_obligation": "主角听见后收手。"},
+        ]})
+    payload = original.model_dump(mode="python", exclude={"requirement_id", "requirement_hash"})
+    payload["generation_intent"] = original.generation_intent.model_copy(update={"dialogue_intent": dialogue})
+    return ProviderNeutralVideoRequirement.create(**payload)
+
+
+def test_h3_rejects_untimed_conversation_instead_of_silently_discarding_speech():
+    result = compile_h3_prompt(_untimed_conversation_requirement())
+    assert isinstance(result, H3PromptUnsupported)
+    assert "generation_intent.dialogue_intent.mode" in result.unsupported_field_paths
+
+
+def test_native_conversation_retains_turn_order_and_has_no_fixed_speech_window():
+    from types import SimpleNamespace
+    from ai_video.production._remote_video_native_prompt import compile_remote_video_prompt
+
+    result = compile_remote_video_prompt(_untimed_conversation_requirement(),
+        provider_bound=SimpleNamespace(provider_kind="jimeng", model_id="seedance_2.5",
+                                       output_requirement=SimpleNamespace(native_audio=True)))
+    assert result.outcome == "compiled"
+    assert result.prompt_text.index("hero") < result.prompt_text.index("有人吗？")
+    assert result.prompt_text.index("有人吗？") < result.prompt_text.index("慢点，里面烫。")
+    assert "clerk" in result.prompt_text and "等待画外人回应。" in result.prompt_text
+    assert "Dialogue timing:" not in result.prompt_text
+    assert "generation_intent.dialogue_intent.turns" in result.expressed_control_paths
+
+
+@pytest.mark.parametrize("kind,model", [("seedance", "seedance_2.5"), ("jimeng", "seedance_2.0_vip"), ("vidu", "q3")])
+def test_native_conversation_refuses_unadapted_provider_or_model(kind, model):
+    from types import SimpleNamespace
+    from ai_video.production._remote_video_native_prompt import compile_remote_video_prompt
+
+    result = compile_remote_video_prompt(_untimed_conversation_requirement(),
+        provider_bound=SimpleNamespace(provider_kind=kind, model_id=model))
+    assert result.outcome == "unsupported"
+    assert "generation_intent.dialogue_intent.mode" in result.unsupported_field_paths
+
+
+@pytest.mark.parametrize("fault", ("muted", "separate-voice", "missing-bound"))
+def test_native_conversation_cannot_discard_or_separate_untimed_speech(fault):
+    from types import SimpleNamespace
+    from ai_video.production._remote_video_native_prompt import compile_remote_video_prompt
+
+    bound = SimpleNamespace(provider_kind="jimeng", model_id="seedance_2.5",
+                            output_requirement=SimpleNamespace(native_audio=fault != "muted"))
+    result = compile_remote_video_prompt(_untimed_conversation_requirement(),
+        provider_bound=None if fault == "missing-bound" else bound,
+        voice_route=SimpleNamespace(route=SimpleNamespace(value="separate"))
+        if fault == "separate-voice" else None)
+    assert result.outcome == "unsupported"
+    assert "generation_intent.dialogue_intent.mode" in result.unsupported_field_paths
+
+
 def test_h3_prompt_is_exact_single_take_three_field_grammar() -> None:
     result = compile_h3_prompt(_requirement())
 

@@ -197,10 +197,13 @@ class _HttpxTransport:
             headers={"accept-encoding": "identity"},
         ) as client:
             with client.stream("POST", url, headers=headers, content=content) as response:
+                response_headers = httpx.Headers(response.headers)
+                response_headers.pop("content-encoding", None)
+                response_headers.pop("content-length", None)
                 if response.status_code != 200:
                     return httpx.Response(
                         response.status_code,
-                        headers=response.headers,
+                        headers=response_headers,
                         content=b"",
                         request=response.request,
                     )
@@ -211,7 +214,7 @@ class _HttpxTransport:
                     collected.append(chunk)
                 return httpx.Response(
                     response.status_code,
-                    headers=response.headers,
+                    headers=response_headers,
                     content=b"".join(collected),
                     request=response.request,
                 )

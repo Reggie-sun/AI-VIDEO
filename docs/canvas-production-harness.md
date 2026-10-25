@@ -138,6 +138,8 @@ frame/sample/trim 仍只由 `ResolvedTimeline` 派生。重复节点使用独立
 
 `canvas_visual_style`在authoring、当前service重开、prepare及start前使用同一契约；prepare/start还对照实际requirement evidence、resolved image bindings和native scope，阻止声明中的图被漏传、替换或新增未审图。`preflight.shots[].visual_style_control`区分覆盖、例外与`aesthetic_acceptance/source_consumption: NOT_EVALUATED`；编译绑定检查不代表Provider已经执行或画风已通过。legacy未声明的输入保持原序列化/编译行为，报告`NOT_DECLARED`；旧失败片与付费历史不因工程修复而改变。
 
+全场风格判断另由 Agent 实际查看本次 exact 参考：分别记录主要人物、背景人物的头身比例、肤质、发丝、衣物材质与环境光照是否协调、是否符合用户方向与时代设定。给出局部观察与未确定项；主角像 CG、人数正确、SHA 相符或 coverage 完整均不能证明全场统一。区分已观察不符、缺证和显式合法例外；换图沿既有 Registry/source revision/review 重新绑定，不改历史裁决，也不默认追加白模、图片或生成调用。
+
 ## Operator Runtime
 
 Provider、private credential supplier、paid authorizer、routing/decision policy、limits、MCP evaluator 和
@@ -250,6 +252,8 @@ Agent 制作有人物的镜头时，必须在 `generation.generation_intent.perf
 不自动为所有人添加相同动作，不强制每镜出现情绪转折。相对阶段是作者表演次序，不是硬定时参数，
 实际采用 trim/frame/sample/timing 仍由 `ResolvedTimeline` 独占。
 
+作者先区分用户硬约束、已批准叙事、导演选择与旧 repair margin，再检查主动作的动机、反应和终态。保留身份、道具、视线、剧情及已满足条件；保留构图或坐姿不能无据扩大成不许移动头身。按景别核对脸部、目光、呼吸、身体平衡与主动作的联系，不强制转头、换重心或新增事件。`subtle`、`none`、`throughout` 及有叙事来源的静止均可成立；遮挡和不可辨认的微表演须说明限制，不能靠统一眨眼/摆动制造全员自然的声明。
+
 既有 coarse `PerformanceIntent` 六字段继续明确镜头整体反应；逐人物字段补足各人的职责，不从人物Bible
 自动填值。新参数必须由 Agent 在 author/revise 输入中显式编写并查看适配 diff；不允许执行器根据空值猜表演。
 对应 selected QA 的 required `acceptance/raw_generation` 条目，使用 `analyzer` 或 `human` 观察原片表演，
@@ -264,10 +268,16 @@ rich remote/local H3 编译器将同一表演方向机械转为原生文字。pr
 原始用户要求与新增导演表演指令的来源分别保留，输入修订不沿用已消费的旧调用授权。
 表演文本计入所选 model/mode 的提示词长度上限；作者须核对 exact 预览并精炼表达，不能为适配长度静默删除人物或控制目标。
 
+普通 Seedance authored binding 与 preserved-source 独立：新普通 binding 预先选择 `seedance-video-compiler/4` 的 target/stack，保留最终正文原字节；v1/v2 自动 prose 与既有 v2/v3 source 路线不被偷偷升级。对每个当前人物及 beat，在 selected QA 的 `RequirementExpression.intent_paths`、`native_text` 中编写精简职责；需要消除多路径/多片段歧义时填写可选 `native_text_mapping={contract_version: "native-text-mapping/1", intent_sha256, bindings: [{intent_path, fragment_indices}]}`。`intent_sha256` 由 QA 作者取当前 `canonical_sha256(generation_intent.model_dump(mode="json"))`；intent 修订后重新审查并封存 QA，runtime 不自动刷新。每条映射只指向同一条 QA 的非空片段和具体 canonical intent 叶子；片段可共同承担明确列出的相关字段。完整 deterministic 表演段落实际存在时仍可使用，但普通精简 binding 不要求整块模板文字。
+
+author/revise 后实际对照 canonical directions → selected QA → 最终 native 正文，检查人物区别、动机、阶段、反应与终态有无丢失。旧 prose 的 `expressed_control_paths`、笼统父路径或“自然一些”不能免除这些职责。映射核验 request/intent/QA identity、叶子和 exact 片段；等义是否成立、有无正反矛盾由作者语义审查，程序不做 NLP 判断。不得以删人物、改 offscreen、移除 required finding 或降为 diagnostic 补覆盖；缺口回到输入层修订，不让编译器补写、截断或塞回长模板。500 字等建议不构成新的硬上限。
+
 `preflight.performance_control` 与 `prepare.reference_control.performance_control` 展示逐人物参数、缺项、
 所需原生段落、输入字面表达和原片验收映射。`LEXICALLY_EXPRESSED` / `DECLARED` 只说明输入/映射存在，
 机制始终是 model prompt guidance；所有表情、强度、阶段与背景自然度都需看实际输出，不能当作 API 硬控制。
 未进行新的真实媒体验证时，actual quality 与 human acceptance 保持 `NOT_EVALUATED`。
+
+`final_native_prompt`、`final_text_mapping_issues`、`missing_final_text_paths` 显示本次最终输入；`MAPPED_FRAGMENTS_PRESENT` 仅说明具体片段存在。原片仍沿 Per-Shot Gate 显式调用 project-local `video-analysis`，自然表演还须正常速度观看，声音语义/反应时机须同 bytes 声画观察。分别汇报基础连续性、表演/观感、完整剧情与声音，说明时间/帧、遮挡与缺证；检查动作动机、身体/手部协调、脸部/目光状态、背景生活状态、全场美术及原叙事目标。抽样截图不能独自证明全部表演，背景安静也不能直接判成冻结。FAIL/NOT_EVALUATED 停止推进，证据不足先同 bytes 补证；用户负反馈记录为审片事实，正式 HUMAN receipt 仍归既有受信 owner。
 
 方法参考：[Seedance官方提示指南](https://docs.byteplus.com/en/docs/modelark/seedance-2-0-prompt-guide)
 强调将抽象情绪落实到可见动作/表情；[MiniMax H3模型作者指南](https://huggingface.co/MiniMaxAI/MiniMax-H3/blob/main/docs/VIDEO_PROMPT_WRITING_GUIDE_ref_en.md)

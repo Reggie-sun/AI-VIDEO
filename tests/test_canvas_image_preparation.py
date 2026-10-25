@@ -165,6 +165,35 @@ def test_crop_is_pixel_exact_and_does_not_resize(tmp_path):
     verify_canvas_prepared_image_assets(loaded)
 
 
+@pytest.mark.parametrize("mode,color", [("RGB", (12, 34, 56)), ("RGBA", (12, 34, 56, 255))])
+def test_letterbox_centers_exact_pixels_and_reopens_lineage(tmp_path, mode, color):
+    loaded, record, original = _loaded(tmp_path, _png((9, 10), color, mode))
+    operation = CanvasImagePreparationOperation(kind="letterbox",
+        source_asset_id=record.asset_id, source_sha256=record.sha256,
+        new_asset_id="presentation-matte", usage_license="fixture",
+        canvas_size=(16, 27), fill_rgb=(231, 213, 172))
+    bundle = prepare_canvas_image_assets(loaded, [operation])
+    image = Image.open(BytesIO(next(a.payload for a in bundle.artifacts
+        if a.relative_path == bundle.assets[0].artifact_path)))
+    assert image.size == (16, 27)
+    assert image.crop((3, 8, 12, 18)).tobytes() == Image.open(BytesIO(original)).tobytes()
+    assert image.getpixel((0, 0)) == ((231, 213, 172, 255) if mode == "RGBA" else (231, 213, 172))
+    assert loaded.asset_paths[record.asset_id].read_bytes() == original
+    _persist_for_loader_verification(tmp_path, loaded, bundle)
+    verify_canvas_prepared_image_assets(loaded)
+
+
+@pytest.mark.parametrize("size", [(8, 27), (16, 9), (0, 10), (100000, 100000)])
+def test_letterbox_rejects_cropping_or_unbounded_canvas_before_writes(tmp_path, size):
+    loaded, record, _ = _loaded(tmp_path)
+    with pytest.raises(ValueError):
+        prepare_canvas_image_assets(loaded, [dict(kind="letterbox",
+            source_asset_id=record.asset_id, source_sha256=record.sha256,
+            new_asset_id="invalid-matte", usage_license="fixture",
+            canvas_size=size, fill_rgb=(0, 0, 0))])
+    assert len(list((tmp_path / "assets/files").iterdir())) == 1
+
+
 def test_accepts_fully_opaque_rgba_source(tmp_path):
     loaded, record, _ = _loaded(tmp_path, _png((9, 10), (12, 34, 56, 255), "RGBA"))
     operation = CanvasImagePreparationOperation(

@@ -586,10 +586,54 @@ class ResolvedTimeline(VersionedArtifact):
             ):
                 raise ValueError("ResolvedTimeline 2.4 previews may contain only linked native audio")
         if self.usage_scope == "development_audio_preview":
-            if (self.schema_version != "2.3" or not self.audio_spans or self.caption_cues
-                    or any(span.audio_kind not in {AudioKind.BGM, AudioKind.SFX, AudioKind.AMBIENCE}
+            if (self.schema_version != "2.3" or not self.audio_spans
+                    or any(span.audio_kind not in {
+                               AudioKind.BGM, AudioKind.SFX, AudioKind.AMBIENCE,
+                               AudioKind.NARRATION, AudioKind.DIALOGUE,
+                           }
                            or span.native_audio_retime is not None for span in self.audio_spans)):
-                raise ValueError("Replacement audio previews require explicit non-speech P4 audio in 2.3")
+                raise ValueError("Replacement audio previews require explicit P4 audio in 2.3")
+            narration_spans = tuple(
+                span for span in self.audio_spans
+                if span.audio_kind is AudioKind.NARRATION
+            )
+            if narration_spans:
+                image_mime_types = {"image/png", "image/jpeg", "image/webp"}
+                visual_spans_by_shot: dict[str, list[ResolvedVisualSpan]] = {}
+                for span in self.visual_spans:
+                    visual_spans_by_shot.setdefault(span.shot_id, []).append(span)
+                static_intervals = tuple(
+                    (spans[0].start_sample, spans[0].start_sample + spans[0].duration_samples)
+                    for spans in visual_spans_by_shot.values()
+                    if spans
+                    and all(span.asset_mime_type in image_mime_types for span in spans)
+                    and len({
+                        (span.start_sample, span.start_sample + span.duration_samples)
+                        for span in spans
+                    }) == 1
+                )
+                video_spans = tuple(
+                    span for span in self.visual_spans
+                    if span.asset_mime_type == "video/mp4"
+                )
+                for audio_span in narration_spans:
+                    audio_start = audio_span.start_sample
+                    audio_end = audio_start + audio_span.duration_samples
+                    if any(
+                        audio_start < span.start_sample + span.duration_samples
+                        and span.start_sample < audio_end
+                        for span in video_spans
+                    ):
+                        raise ValueError(
+                            "Replacement narration cannot overlap a development preview VIDEO interval"
+                        )
+                    if not any(
+                        audio_start >= visual_start and audio_end <= visual_end
+                        for visual_start, visual_end in static_intervals
+                    ):
+                        raise ValueError(
+                            "Replacement narration must stay inside a resolved static IMAGE Shot interval"
+                        )
         if self.schema_version != "2.4" and any(
             item.native_audio_retime is not None for item in self.audio_spans
         ):

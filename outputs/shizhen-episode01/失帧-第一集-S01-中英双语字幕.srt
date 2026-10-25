@@ -1,0 +1,19 @@
+1
+00:00:02,333 --> 00:00:03,708
+慢点，里面烫
+Careful, it's hot inside
+
+2
+00:00:05,125 --> 00:00:07,083
+谢了，袋子不用
+Thanks, I don't need a bag
+
+3
+00:00:10,625 --> 00:00:11,750
+垫着吧
+Here, use this
+
+4
+00:00:11,791 --> 00:00:14,166
+上回有个人，直接给扔地上了
+Someone tossed theirs on the floor last time

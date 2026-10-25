@@ -217,6 +217,25 @@ class GenerationQualityRejectionReceiptPointer(_PaidLifecycleModel):
         return self
 
 
+class GenerationVisualSupersessionReceiptPointer(_PaidLifecycleModel):
+    path: Path
+    content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    attempt_id: str = Field(min_length=1)
+    request_fingerprint: str = Field(pattern=r"^[0-9a-f]{64}$")
+    artifact_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    experience_content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
+    file_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+
+    @model_validator(mode="after")
+    def _validate_canonical_path(self) -> "GenerationVisualSupersessionReceiptPointer":
+        _canonical_paid_path(
+            self.path,
+            Path("state/video-generation/supersessions") / f"{self.content_hash}.json",
+            "video visual supersession receipt",
+        )
+        return self
+
+
 class ImportedGenerationExperienceReceiptPointer(_PaidLifecycleModel):
     path: Path
     content_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
@@ -889,6 +908,7 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
     generation_experiences: tuple[GenerationExperienceReceiptPointer, ...] = ()
     runtime_repairs: tuple[RuntimeRepairAuthorizationPointer, ...] = ()
     quality_rejection: GenerationQualityRejectionReceiptPointer | None = None
+    visual_supersession: GenerationVisualSupersessionReceiptPointer | None = None
     generation_id: str = Field(min_length=1)
     resolved_generation_hash: str = Field(pattern=r"^[0-9a-f]{64}$")
     phase: VideoAttemptPhase
@@ -927,6 +947,8 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
             data.pop("runtime_repairs", None)
         if self.quality_rejection is None:
             data.pop("quality_rejection", None)
+        if self.visual_supersession is None:
+            data.pop("visual_supersession", None)
         if self.continuity_evaluation is None:
             data.pop("continuity_evaluation", None)
         if self.commercial_evaluation is None:
@@ -971,6 +993,22 @@ class VideoGenerationAttemptState(_PaidLifecycleModel):
             or self.candidate_continuity_asset_ids
         ):
             raise ValueError("quality rejection must close the latest validate experience")
+        if self.visual_supersession is not None and (
+            self.phase is not VideoAttemptPhase.VALIDATE
+            or self.visual_supersession.request_fingerprint != self.request.request_input_hash
+            or not self.generation_experiences
+            or self.visual_supersession.experience_content_hash
+            != self.generation_experiences[-1].content_hash
+            or self.fetch_receipt is None
+            or self.visual_supersession.artifact_sha256 != self.fetch_receipt.artifact_sha256
+            or self.execution_binding is None
+            or self.paid_submit_receipt is None
+            or self.local_fetch_receipt is not None
+            or self.candidate_video_asset_ids
+            or self.candidate_continuity_asset_ids
+            or self.quality_rejection is not None
+        ):
+            raise ValueError("visual supersession must close the latest fetched validate experience")
         if self.execution_binding is not None and self.qualification_binding is not None:
             raise ValueError("video attempt cannot mix production and qualification bindings")
         local_fields = (
@@ -1268,6 +1306,18 @@ def _validate_video_attempt(attempt: Any) -> None:
         raise ValueError("quality rejection lifecycle state is inconsistent")
     if quality_rejected and state.quality_rejection is None:
         raise ValueError("quality rejection error requires its receipt pointer")
+    visually_superseded = attempt.error_code == "generation_visual_superseded"
+    if state.visual_supersession is not None and (
+        attempt.status.value != "failed"
+        or state.phase is not VideoAttemptPhase.VALIDATE
+        or not visually_superseded
+        or state.visual_supersession.attempt_id != attempt.attempt_id
+    ):
+        raise ValueError("visual supersession lifecycle state is inconsistent")
+    if visually_superseded and state.visual_supersession is None:
+        raise ValueError("visual supersession error requires its exact receipt")
+    if state.visual_supersession is not None and quality_rejected:
+        raise ValueError("quality rejection and creative supersession are distinct closures")
     if (
         state.paid_submit_receipt is not None
         and paid_state is not None

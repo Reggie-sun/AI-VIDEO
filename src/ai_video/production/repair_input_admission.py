@@ -97,6 +97,10 @@ class RepairInputAdmissionReceipt(StrictModel):
 
     @model_validator(mode="after")
     def _source_chain(self):
+        if self.contract_version == "development-qualification-preview/1":
+            from ai_video.production.qualification_preview_input import validate_qualification_capture
+            validate_qualification_capture(self)
+            return self
         from ai_video.production.video import (
             ResolvedVideoGenerationRequest, VideoFetchReceipt, VideoTaskObservation, VideoSubmission,
         )
@@ -278,6 +282,8 @@ class RepairReplacementPreviewInputAdmissionReceipt(RepairPreviewInputAdmissionR
 
 
 def _preview_input_tool(receipt):
+    if receipt.contract_version == "development-qualification-preview/1":
+        return ToolIdentity(name=REPAIR_INPUT_TOOL.name, version="7")
     if receipt.contract_version == "development-repair-input/6":
         return REPAIR_REPLACEMENT_PREVIEW_INPUT_TOOL
     if receipt.contract_version == "development-repair-input/3":
@@ -435,6 +441,9 @@ def verify_repair_input(record, root):
         "development-repair-input/3": RepairAudioPreviewInputAdmissionReceipt,
         "development-repair-input/6": RepairReplacementPreviewInputAdmissionReceipt,
     }.get(version)
+    if version == "development-qualification-preview/1":
+        from ai_video.production.qualification_preview_input import QualificationPreviewInputReceipt
+        receipt_type = QualificationPreviewInputReceipt
     if receipt_type is None:
         raise ValueError("Development repair input version is unsupported")
     receipt = receipt_type.model_validate_json(payload)

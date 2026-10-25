@@ -491,6 +491,335 @@ def test_replacement_audio_preview_resolves_p4_without_qualifying_failed_media(t
         )
 
 
+def test_replacement_audio_preview_allows_only_static_shot_narration(tmp_path):
+    from ai_video.production.audio import AudioKind
+    from ai_video.production.composition import resolve_composition
+    from ai_video.production.composition_contracts import (
+        AudioTrackSpec,
+        CompositionLayerSpec,
+        CompositionSpec,
+    )
+    from ai_video.production.models import (
+        AssetRoleRequirement,
+        AssetType,
+        ResolvedTimeline,
+        VisualStrategy,
+    )
+    from ai_video.production.registry import registry_semantic_sha256
+    from ai_video.production.repair_input_admission import verify_repair_input
+    from ai_video.production.state_commit import (
+        PreparedArtifact,
+        prepare_audio_registry_commit,
+    )
+    from production_project_factory import (
+        _make_audio_asset,
+        _ref,
+        write_and_load_two_shot_project,
+    )
+
+    source, target, writer, args = _inputs(tmp_path)
+    template = tmp_path / "two-shot-template"
+    template.mkdir()
+    template_project = write_and_load_two_shot_project(template)
+    shots_by_id = {shot.shot_id: shot for shot in template_project.shots}
+    preview_shot = shots_by_id["shot-1"]
+    narration_text = "给自己留点暖意。"
+    narration_shot = shots_by_id["shot-2"].model_copy(
+        update={"narration": narration_text}
+    )
+    preview_shot = preview_shot.model_copy(
+        update={
+            "visual_strategy": VisualStrategy.GENERATED_VIDEO,
+            "generated_video_rationale": "Known-failed repair preview fixture.",
+            "dialogue": "",
+            "narration": "这段视频镜头的语音必须保持禁止。",
+            "required_asset_roles": (
+                AssetRoleRequirement(
+                    role="final_visual",
+                    asset_ids=(),
+                    allowed_asset_types=(AssetType.VIDEO,),
+                ),
+            ),
+        }
+    )
+    preview_shot = seal_artifact(
+        preview_shot.model_copy(update={"content_hash": "0" * 64})
+    )
+    narration_shot = seal_artifact(
+        narration_shot.model_copy(update={"content_hash": "0" * 64})
+    )
+    shots_by_id.update(
+        {preview_shot.shot_id: preview_shot, narration_shot.shot_id: narration_shot}
+    )
+    shots_by_artifact_id = {shot.artifact_id: shot for shot in shots_by_id.values()}
+    shot_refs = tuple(
+        _ref(shots_by_artifact_id[reference.artifact_id], reference.path.as_posix())
+        for reference in template_project.project.artifacts.shots
+    )
+    project = seal_artifact(
+        template_project.project.model_copy(
+            update={
+                "content_hash": "0" * 64,
+                "project_id": "repair-development",
+                "artifacts": template_project.project.artifacts.model_copy(
+                    update={"shots": shot_refs}
+                ),
+            }
+        )
+    )
+    args["project"] = project
+    args["registry"] = template_project.registry
+    referenced_paths = {
+        project.artifacts.brief.path,
+        project.artifacts.story.path,
+        project.artifacts.storyboard.path,
+        *(item.path for item in project.artifacts.characters),
+        *(item.path for item in project.artifacts.scenes),
+        *(item.path for item in project.artifacts.shots),
+        *(item.artifact_path for item in template_project.registry.assets),
+    }
+    prepared_by_path = {
+        item.relative_path: item
+        for item in (
+            writer.prepare_artifact(
+                "repair-input-bootstrap",
+                path,
+                (template / path).read_bytes(),
+            )
+            for path in sorted(referenced_paths, key=lambda value: value.as_posix())
+        )
+    }
+    for shot in (preview_shot, narration_shot):
+        reference = next(
+            item for item in project.artifacts.shots
+            if item.artifact_id == shot.artifact_id
+        )
+        payload = yaml.safe_dump(
+            shot.model_dump(mode="json"), sort_keys=False, allow_unicode=True
+        ).encode("utf-8")
+        prepared_by_path[reference.path] = writer.prepare_artifact(
+            "repair-input-bootstrap", reference.path, payload
+        )
+    args["artifacts"] = tuple(prepared_by_path.values())
+
+    preview_use, preview_probe, _ = _preview_arguments(source, args)
+    preview_use.update(
+        scope="replacement_audio_preview",
+        shot_id=preview_shot.shot_id,
+        asset_role=preview_shot.required_asset_roles[0].role,
+        transform={"video_fit": "cover"},
+    )
+    preview_use["source_time_map"] = {
+        "audio_policy": "mute",
+        "points": [
+            {"source_frame": 0, "output_frame": 0},
+            {"source_frame": 48, "output_frame": 48},
+        ],
+    }
+    writer.bootstrap_repair_input(
+        **args, preview_use=preview_use, preview_probe=preview_probe
+    )
+    loaded = load_production_project(target / "project.yaml")
+    failed_source = next(
+        asset for asset in loaded.registry.assets if asset.asset_id == args["asset_id"]
+    )
+    assert verify_repair_input(failed_source, target).qualification == "NOT_EVALUATED"
+
+    script_hash = hashlib.sha256(narration_text.encode("utf-8")).hexdigest()
+    audio_root = tmp_path / "voice"
+    (audio_root / "assets/files").mkdir(parents=True)
+    good_voice, good_path = _make_audio_asset(
+        audio_root,
+        asset_id="static-narration",
+        audio_kind=AudioKind.NARRATION,
+        duration_samples=48_000,
+    )
+    good_voice = good_voice.model_copy(
+        update={
+            "audio_metadata": good_voice.audio_metadata.model_copy(
+                update={"script_hash": script_hash}
+            )
+        }
+    )
+    preview_bed, preview_bed_path = _make_audio_asset(
+        audio_root,
+        asset_id="preview-bed",
+        audio_kind=AudioKind.BGM,
+        duration_samples=96_000,
+    )
+    wrong_script_voice, wrong_script_path = _make_audio_asset(
+        audio_root,
+        asset_id="wrong-script-narration",
+        audio_kind=AudioKind.NARRATION,
+        duration_samples=48_000,
+    )
+    wrong_script_voice = wrong_script_voice.model_copy(
+        update={
+            "audio_metadata": wrong_script_voice.audio_metadata.model_copy(
+                update={"script_hash": hashlib.sha256(b"different script").hexdigest()}
+            )
+        }
+    )
+    video_script = preview_shot.narration
+    video_voice, video_path = _make_audio_asset(
+        audio_root,
+        asset_id="generated-shot-narration",
+        audio_kind=AudioKind.NARRATION,
+        duration_samples=48_000,
+    )
+    video_voice = video_voice.model_copy(
+        update={
+            "audio_metadata": video_voice.audio_metadata.model_copy(
+                update={
+                    "script_hash": hashlib.sha256(video_script.encode("utf-8")).hexdigest()
+                }
+            )
+        }
+    )
+    registry = loaded.registry.model_copy(
+        update={
+            "assets": (
+                *loaded.registry.assets,
+                *sorted(
+                    (good_voice, preview_bed, wrong_script_voice, video_voice),
+                    key=lambda asset: asset.asset_id,
+                ),
+            )
+        }
+    )
+    registry_digest = registry_semantic_sha256(registry)
+    registry = registry.model_copy(
+        update={"revision_id": registry_digest, "content_hash": registry_digest}
+    )
+    def prepared(relative_path, payload):
+        return PreparedArtifact(
+            relative_path,
+            payload,
+            hashlib.sha256(payload).hexdigest(),
+        )
+
+    active_project = loaded.manifest.active_project
+    writer.commit(
+        prepare_audio_registry_commit(
+            manifest=loaded.manifest,
+            project=loaded.project,
+            base_registry=loaded.registry,
+            registry=registry,
+            attempt_id="replacement-preview-narration",
+            artifacts=tuple(
+                prepared(path.relative_to(audio_root), path.read_bytes())
+                for path in (good_path, preview_bed_path, wrong_script_path, video_path)
+            ),
+            active_project_artifact=prepared(
+                active_project.path,
+                (target / active_project.path).read_bytes(),
+            ),
+        )
+    )
+    loaded = load_production_project(target / "project.yaml")
+    preview_asset = next(
+        item for item in loaded.registry.assets if item.asset_id == args["asset_id"]
+    )
+    still_asset = next(
+        item for item in loaded.registry.assets
+        if item.asset_id == narration_shot.required_asset_roles[0].asset_ids[0]
+    )
+    def make_spec(*, voice_asset_id, target_shot_id, start_sample=None):
+        return seal_artifact(
+            CompositionSpec(
+                artifact_id="replacement-narration-preview",
+                revision=1,
+                content_hash="0" * 64,
+                creation_receipt_id="replacement-narration-preview",
+                source_provenance=loaded.project.source_provenance,
+                schema_version="2.3",
+                composition_id="replacement-narration-preview",
+                shot_ids=(preview_shot.shot_id, narration_shot.shot_id),
+                delivery_profile=loaded.project.delivery_profile,
+                layers=(
+                    CompositionLayerSpec(
+                        layer_id="failed-video-preview",
+                        shot_id=preview_shot.shot_id,
+                        asset_id=preview_asset.asset_id,
+                        asset_role=preview_use["asset_role"],
+                        trim_start_frame=0,
+                        trim_duration_frames=48,
+                        transform=preview_use["transform"],
+                        source_audio_policy="REPLACE",
+                        source_audio_reason="The failed source is muted for this review preview.",
+                    ),
+                    CompositionLayerSpec(
+                        layer_id="narration-still",
+                        shot_id=narration_shot.shot_id,
+                        asset_id=still_asset.asset_id,
+                        asset_role=narration_shot.required_asset_roles[0].role,
+                        trim_start_frame=0,
+                        transform={},
+                    ),
+                ),
+                audio_tracks=(
+                    AudioTrackSpec(
+                        track_id="preview-bed",
+                        asset_id=preview_bed.asset_id,
+                        audio_kind=AudioKind.BGM,
+                        start_sample=0,
+                        trim_duration_samples=96_000,
+                    ),
+                    AudioTrackSpec(
+                        track_id="narration",
+                        asset_id=voice_asset_id,
+                        audio_kind=AudioKind.NARRATION,
+                        shot_id=target_shot_id,
+                        start_sample=start_sample,
+                        trim_duration_samples=48_000,
+                    ),
+                ),
+            )
+        )
+
+    timeline = resolve_composition(
+        loaded,
+        make_spec(voice_asset_id=good_voice.asset_id, target_shot_id=narration_shot.shot_id),
+        renderer_version="0.7.103",
+    )
+    assert timeline.usage_scope == "development_audio_preview"
+    assert timeline.visual_spans[0].asset_id == preview_asset.asset_id
+    narration_span = next(
+        span for span in timeline.audio_spans
+        if span.audio_kind is AudioKind.NARRATION
+    )
+    still_span = next(
+        span for span in timeline.visual_spans
+        if span.shot_id == narration_shot.shot_id
+    )
+    assert narration_span.start_sample == still_span.start_sample
+    assert narration_span.start_sample + narration_span.duration_samples <= (
+        still_span.start_sample + still_span.duration_samples
+    )
+    assert not any(
+        narration_span.start_sample < span.start_sample + span.duration_samples
+        and span.start_sample
+        < narration_span.start_sample + narration_span.duration_samples
+        for span in timeline.visual_spans
+        if span.asset_mime_type == "video/mp4"
+    )
+    assert ResolvedTimeline.model_validate_json(timeline.model_dump_json()) == timeline
+
+    for voice_id, target_shot_id, start_sample in (
+        (wrong_script_voice.asset_id, narration_shot.shot_id, None),
+        (video_voice.asset_id, preview_shot.shot_id, None),
+        (good_voice.asset_id, "not-selected", None),
+        (good_voice.asset_id, narration_shot.shot_id, 0),
+    ):
+        invalid = make_spec(
+            voice_asset_id=voice_id,
+            target_shot_id=target_shot_id,
+            start_sample=start_sample,
+        )
+        with pytest.raises(AiVideoError):
+            resolve_composition(loaded, invalid, renderer_version="0.7.103")
+
+
 def test_native_av_preview_v3_reopens_exact_audio_and_stays_unbound(tmp_path):
     from types import SimpleNamespace
 

@@ -1,0 +1,45 @@
+{
+  "schema": "task-local-music-pilot-review/1",
+  "native_reviewer": "/root/music_pilot_review",
+  "profile": "reviewer_high",
+  "round_1": {
+    "finding": "MUSIC-PILOT-001",
+    "parent_verdict": "CONFIRMED",
+    "fix": "Validate complete CLI response with existing _envelope before writing summary."
+  },
+  "fake_transport_verification": {
+    "cases": [
+      "credential-shaped clip.title",
+      "credential-shaped error.code"
+    ],
+    "sensitive_values_persisted": false,
+    "unknown_blocks_second_invocation": true,
+    "calls_per_case": 1,
+    "verdict": "PASS"
+  },
+  "project_focused_tests": {
+    "passed": 24,
+    "scope": [
+      "tests/test_suno_music.py",
+      "tests/test_music_direction.py"
+    ]
+  },
+  "current_runner_sha256": "3483f63989e1dee856dd5ffeb4cce8b6dac3b02fb4786e533e7cda684e5daa5c",
+  "round_2": {
+    "finding_set": [],
+    "scope": "runner, request-01, adapter/test diff, screenplay/music reference",
+    "heard_audio": false,
+    "production_approval": false
+  },
+  "live_requests_consumed": 1,
+  "human_music_acceptance": "NOT_EVALUATED",
+  "round_3": {
+    "finding_set": [],
+    "runner_sha256": "0f0840c2f6dafb632c425a09b4124c5dfc9f31ce40c2f748d9b261dfff777609",
+    "scope": "STOP before consumption/CLI; actual failure/recovery artifacts",
+    "heard_audio": false
+  },
+  "final_project_focused_tests": {
+    "passed": 25
+  }
+}

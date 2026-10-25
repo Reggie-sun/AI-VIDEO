@@ -103,6 +103,15 @@ def compile_remote_video_prompt(
     """
 
     intent = requirement.generation_intent
+    conversation = intent.dialogue_intent
+    if conversation is not None and conversation.mode == "conversation":
+        if (getattr(provider_bound, "provider_kind", None) != "jimeng"
+                or getattr(provider_bound, "model_id", None) != "seedance_2.5"
+                or voice_route is not None
+                or getattr(getattr(provider_bound, "output_requirement", None),
+                           "native_audio", False) is not True):
+            return RemoteVideoPromptUnsupported(
+                unsupported_field_paths=("generation_intent.dialogue_intent.mode",))
     diagnostics = list(
         validate_generation_intent_for_continuity(
             intent, audio_need=requirement.audio_need if requirement.voice_routing is None else AudioNeed.OPTIONAL
@@ -283,7 +292,26 @@ def compile_remote_video_prompt(
         sentences.append("Dialogue is supplied separately. Do not synthesize speech or a speaker voice.")
         if dialogue.response_obligation:
             sentences.append(f"Dialogue response: {dialogue.response_obligation}.")
-        controls.extend(f"generation_intent.dialogue_intent.{name}" for name in type(dialogue).model_fields)
+        controls.extend(f"generation_intent.dialogue_intent.{name}"
+                        for name in type(dialogue).model_fields if name != "turns")
+    elif dialogue.mode == "conversation":
+        language = _DIALOGUE_LANGUAGE_NAMES.get(dialogue.language.split("-", 1)[0])
+        if language is None:
+            return RemoteVideoPromptUnsupported(
+                unsupported_field_paths=("generation_intent.dialogue_intent.language",))
+        sentences.append(f"对话语言：{language}。以下各轮按顺序自然交谈，每句只说一次；"
+                         "由表演安排停顿、倾听与接话，不指定台词时间点，不抢话或赶词。")
+        names = {character.character_id: character.name for character in requirement.characters}
+        for index, turn in enumerate(dialogue.turns, 1):
+            speaker = names.get(turn.speaker_id, turn.speaker_id)
+            sentences.append(f"第{index}轮，{speaker}（{turn.speaker_id}）"
+                             f"{'在画面内' if turn.on_screen else '在画外'}说：“{turn.verbatim_text}”。"
+                             f"听说反应：{turn.response_obligation}。"
+                             + ("可见口型与此人对白同步。" if turn.lip_sync_required
+                                else "不要求可见口型。"))
+        controls.extend(("generation_intent.dialogue_intent.mode",
+                         "generation_intent.dialogue_intent.language",
+                         "generation_intent.dialogue_intent.turns"))
     elif dialogue.mode == "dialogue":
         assert dialogue.language is not None
         language = _DIALOGUE_LANGUAGE_NAMES.get(dialogue.language.split("-", 1)[0])

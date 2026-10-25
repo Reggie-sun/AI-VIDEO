@@ -68,7 +68,9 @@ Character作image2，mask经ImageToMask/SetLatentNoiseMask与最终ImageComposit
 
 `canvas_image_workflow`仅从current Character/Scene/Registry准备exact request/preview/profile；
 `CanvasProductionService.prepare_image_workflow`和既有CLI同名action无Provider或state副作用，不加载operator runtime。
-`production/image_preparation`独占显式pad/crop/binary mask像素准备与content-addressed source/operation receipt；
+`production/image_preparation`独占显式pad/crop/binary mask/letterbox像素准备与content-addressed source/operation receipt；
+`letterbox`仅把完整原像素居中放入显式纯色画布（每边≤8192、总量≤16Mi像素），禁止缩放或裁掉source；旧pad仍只作右/下最小8像素补齐。
+创作修订退役完整render-domain后，reader沿同一成功render attempt成对绑定last-render pointer与exact origin graph，核对四类节点、artifact/fingerprint及完整SUPERSEDED证据后才允许保留历史output；任何active render-domain仍须匹配Manifest pointer，旧输出不计新项目fresh或Final Acceptance。
 `CanvasProductionService.prepare_image_assets`返回保留旧assets的Registry候选/PreparedArtifacts，既有
 `revise_authoring`和committer才可持久化。标准reader复验同一leaf，不反向依赖Canvas或伪称human/web import。
 真实生成仍经已配置candidate preparer的`ProductionStateCommitter.generate_image_asset`，不新建workflow生命周期。
@@ -304,8 +306,9 @@ Registry 独立重开 immutable receipt，不依赖外部 root。保留路径与
 及原request/fetch绑定的VideoProbeReceipt，只允许muted本地composition preview。资产仍UNBOUND，
 `composition`按receipt派生 `ResolvedTimeline.usage_scope=development_preview`，原render activation
 owner拒绝该scope；不建立第二renderer、timeline、许可或quality state。
-`/6`的`replacement_audio_preview`单独允许正常速度source window配独立P4 BGM/SFX/ambience，
-原音轨明确排除，receipt中的V1 map必须为identity，layer不得携带retime map；禁止speech/captions/voice source。
+`/6`的`replacement_audio_preview`允许正常速度source window配独立P4 BGM/SFX/ambience及有据的静态Shot旁白；
+同源原声对白可作为显式derived DIALOGUE音轨配CaptionTrack，必须精确绑定captured MP4身份和样本窗口、保持0增益且无fade/ducking。
+receipt中的V1 map必须为identity，layer不得携带retime map，voice_sources仍禁止；字幕沿既有音轨绑定与样本校验，不能以字幕接入取得Production资格。
 `_composition_visual`按exact admission限制音轨，resolver产生`development_audio_preview`，
 HyperFrames消费同一时间线混音；所有非Production scope与captured bytes仍由原activation fence拒绝。
 此扩展不改变旧`/2,/3`行为，不资格化失败素材，不推进原Shot barrier或Final Acceptance。
@@ -459,6 +462,12 @@ mandatory changed-path routing 仍由 `.agent/harness/policy.yaml` 独占。
 
 ## Generation Decision Loop
 
+`generation_coverage_revision.py` 是 authored coverage target 与准入predicate的无writer叶模块；`generation_visual_revision.py` 的supersession `/2` 与原committer复用唯一关闭/严格重开路径，`/1` 历史hash不变。`GenerationIntent` 既有语义camera/framing字段承载已批准切镜文字，不新增runtime镜头枚举或第二timeline；具体切镜仍须exact MP4逐项验证。新target只允许有界摄影/物理调度修订，保护对白、声音、身份、原首帧及未失败QA；budget/quota/permit/QA acceptance原owner保持。
+
+`generation_resolution_revision.py` 仅拥有typed输出分辨率升级目标、纯qualification准入与锁内原`/3` lineage核验；不写state或操作Provider。`generation_visual_revision.py`沿既有唯一committer/reader封存旧known fetched result，旧`/1`、`/2`序列化不变；exact prompt、参考、intent、非分辨率output与原raw QA保持，NE不签PASS。新规格仍经selected profile/compiler、累计paid/count与原permit执行，新MP4重新审片，不赋予activation/qualification。
+
+`generation_visual_revision.py` 独占已 fetched 版本的 typed supersession receipt 与 exact lineage 校验；唯一 writer 仍为 `ProductionStateCommitter.supersede_video_generation`。`_lifecycle_schema` 绑定 terminal reason / pointer，原 feedback reader 重开历史 QA / request / selected candidate / projection / media，封存后的观察只允许 exact replay。`_qualification_visual_revision.py` 仅验证同任务的新视觉版本及 submit-lock predecessor，不拥有选择、预算、quota、permit、activation 或质量结论；正常 authoring revision、Router、原 Paid owner 与逐镜 Gate 保持独占。
+
 `VideoGenerationResolver.resolve_requirement()` 是新 generation 任务 selection/fit 的唯一 public owner，
 消费 `generation_decision.DecisionInputs` 的候选、当前 projection、rubric、执行范围和显式
 advisory evidence；不接收外部 `selected_capability_id`。`inspect_capability()` 只提供无
@@ -526,6 +535,7 @@ re-execution 生效；committer 在 replacement submit intent 的同一原子写
 unknown outcome、旧 evidence 或耗尽的 per-Shot ceiling 不获得 retry 权限。
 `PaidNoEffectRetarget` 只在 canonical paid `KNOWN_NO_EFFECT` 的 exact latest failed receipt 上登记；
 `runtime-repair/3` 绑定失败 receipt 与唯一目标 candidate scope，与 local extension 互斥。
+显式 `PaidNoEffectRepairExtension` / `runtime-repair/6` 在同 task/Shot/actor 两份 `/3` grant 已消费后，可将默认 ceiling2 有界扩为3；ceiling4另须前述两份和一份 `/6` ceiling3 均已消费。重验最新 canonical no-effect、failed binding 和 Manifest revision，qualification 第四/五次调用分别另须3→4/4→5 quota extension，不改变历史计数或积分预算；已核验历史关闭独立于 grant 消费，未消费状态仍独占新恢复权限。
 允许同 Provider model/profile/compiler/raster 适配，但冻结 intent、rubric、duration/fps/audio、seed、
 voice route 和 FinalOutput goal；新 submit 仍独立经过 preview/budget/egress/permit，不改历史消费。
 显式跨 Provider 的 `runtime-repair/5` / `PaidCrossProviderNoEffectRetarget` 另封存旧 paid no-effect receipt、
@@ -1022,6 +1032,8 @@ Harness check owner为`drama_authoring_source_binding_tests`；实际当前run�
 只登记满足至少一项的entry：跨canonical owner、产生local/external/paid effect、durable write、replay/recovery-sensitive、normal caller与internal seam易混淆，或bypass会破坏Product invariant。不得登记private helper、ordinary pure utility、data class、receipt/pointer model、trivial loader、Provider内部helper、test-only API、函数签名副本或volatile runtime/provider status。本节不要求新增普通API时登记，也不得升级为独立registry、parser、schema、Harness/Architecture gate或第二ownership matrix。
 
 ## Completion Use
+
+显式 remote qualification trial 仍归 `VideoRoutingPolicy` / `GenerationDecisionExecutionBinding` 与既有 service、Paid owner、唯一 committer：默认 Production 拒绝 `UNQUALIFIED`，资格用途封存单候选、一次 submit、零自动重试，下载不获得 candidate/activation。已核验无效果的恢复须沿原 reconciliation、`runtime-repair/3` 与 quota extension，保留计数及已消费 grant；普通未提交或未协调 UNKNOWN 不获得恢复资格。`qualification_preview_input` 只读准备独立开发捕获，复用 `repair_input_admission` 的 exact preview use、Registry 重开与 Production render 禁令；`bootstrap_initial_state` 仍是唯一写入入口，不创建模型资格或 QA acceptance。操作细节见 [Jimeng Provider](jimeng-provider.md#bounded-qualification-trial)。
 
 Canvas 的显式 `source_video` handoff 仍由 `CanvasProductionService.handoff_reference()` 消费 accepted
 前镜并登记 approved state；Provider reference 是原 MP4，state PNG 是独立核验依据，二者必须同源。

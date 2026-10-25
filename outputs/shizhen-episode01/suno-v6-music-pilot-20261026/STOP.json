@@ -1,0 +1,8 @@
+{
+  "request_id": "68ae0257-5b71-5871-8c49-10d03fc658f7",
+  "code": "PAID_PROVIDER_OUTCOME_UNKNOWN",
+  "provider_error": "auth_expired",
+  "recorded_at": "2026-10-25T20:27:32.124777+00:00",
+  "new_submissions_allowed": false,
+  "reason": "User instruction: stop on permission failure; do not retry unknown outcome."
+}

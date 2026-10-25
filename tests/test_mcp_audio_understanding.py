@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 from dataclasses import replace
+import gzip
 import hashlib
 import io
 import json
@@ -11,11 +12,14 @@ import wave
 import httpx
 import pytest
 
+import ai_video_mcp.audio_understanding as audio_understanding
 from ai_video_mcp.audio_understanding import (
     AudioUnderstandingError,
     GeminiAudioAnalyzer,
     prepare_audio_request,
 )
+
+_REAL_HTTPX_CLIENT = httpx.Client
 
 
 def pcm_wav(seconds: float = 0.5, *, sample_rate: int = 8_000) -> bytes:
@@ -414,3 +418,105 @@ def test_server_failures_are_unknown_and_no_redirects_are_followed():
             )
         assert error.value.outcome == outcome
         assert len(transport.calls) == 1
+
+
+def _mock_default_httpx_client(monkeypatch, *, status_code: int, body: bytes,
+                               response_headers: dict[str, str]):
+    requests = []
+    client_options = []
+
+    def handler(request):
+        requests.append(request)
+        return httpx.Response(status_code, headers=response_headers, content=body, request=request)
+
+    def make_client(**kwargs):
+        client_options.append(kwargs)
+        return _REAL_HTTPX_CLIENT(transport=httpx.MockTransport(handler), **kwargs)
+
+    monkeypatch.setattr(audio_understanding.httpx, "Client", make_client)
+    return requests, client_options
+
+
+def test_default_httpx_transport_decodes_gzip_once_and_discards_stale_body_headers(monkeypatch):
+    expected = gemini_response().content
+    wire_body = gzip.compress(expected)
+    requests, options = _mock_default_httpx_client(monkeypatch, status_code=200, body=wire_body,
+        response_headers={"content-type": "application/json", "content-encoding": "gzip",
+                          "content-length": str(len(wire_body))})
+
+    class CapturingHttpxTransport(audio_understanding._HttpxTransport):
+        response = None
+
+        def post(self, url, *, headers, content):
+            self.response = super().post(url, headers=headers, content=content)
+            return self.response
+
+    transport = CapturingHttpxTransport()
+    analyzer = GeminiAudioAnalyzer(lambda: "test-key", transport)
+    permit = OneShotPermit()
+
+    result = analyzer.analyze(prepared(), permit=permit)
+
+    assert result["observations"]["segments"][0]["text"] == "Test words."
+    assert transport.response.content == expected
+    assert "content-encoding" not in transport.response.headers
+    assert transport.response.headers["content-length"] == str(len(expected))
+    assert len(requests) == len(permit.consumed) == 1
+    assert requests[0].headers["x-goog-api-key"] == "test-key"
+    assert requests[0].headers["accept-encoding"] == "identity"
+    assert options[0]["follow_redirects"] is False
+    assert options[0]["trust_env"] is False
+    assert options[0]["timeout"].read == 45.0
+
+
+def test_default_httpx_transport_preserves_uncompressed_response(monkeypatch):
+    expected = gemini_response().content
+    requests, _ = _mock_default_httpx_client(monkeypatch, status_code=200, body=expected,
+        response_headers={"content-type": "application/json", "content-length": str(len(expected))})
+
+    response = audio_understanding._HttpxTransport().post(
+        "https://generativelanguage.googleapis.com/test", headers={}, content=b"request",
+    )
+
+    assert response.content == expected
+    assert len(requests) == 1
+
+
+def test_default_httpx_transport_preserves_non_200_rejection_without_decoding_empty_body(monkeypatch):
+    body = gzip.compress(b"private provider error")
+    requests, _ = _mock_default_httpx_client(monkeypatch, status_code=401, body=body,
+        response_headers={"content-type": "text/plain", "content-encoding": "gzip",
+                          "content-length": str(len(body))})
+    permit = OneShotPermit()
+
+    with pytest.raises(AudioUnderstandingError) as error:
+        GeminiAudioAnalyzer(lambda: "test-key").analyze(prepared(), permit=permit)
+
+    assert error.value.code == "provider_rejected"
+    assert error.value.outcome == "REJECTED"
+    assert len(requests) == len(permit.consumed) == 1
+    assert "private provider error" not in str(error.value)
+
+
+def test_default_httpx_transport_enforces_decoded_response_size_boundary(monkeypatch):
+    from ai_video_mcp.audio_understanding import _MAX_RESPONSE_BYTES
+
+    boundary_body = gzip.compress(b"x" * _MAX_RESPONSE_BYTES)
+    requests, _ = _mock_default_httpx_client(monkeypatch, status_code=200, body=boundary_body,
+        response_headers={"content-encoding": "gzip", "content-length": str(len(boundary_body))})
+    response = audio_understanding._HttpxTransport().post(
+        "https://generativelanguage.googleapis.com/test", headers={}, content=b"request",
+    )
+    assert len(response.content) == _MAX_RESPONSE_BYTES
+    assert len(requests) == 1
+
+    oversized_body = gzip.compress(b"x" * (_MAX_RESPONSE_BYTES + 1))
+    oversized_requests, _ = _mock_default_httpx_client(monkeypatch, status_code=200, body=oversized_body,
+        response_headers={"content-encoding": "gzip", "content-length": str(len(oversized_body))})
+    permit = OneShotPermit()
+    with pytest.raises(AudioUnderstandingError) as error:
+        GeminiAudioAnalyzer(lambda: "test-key").analyze(prepared(), permit=permit)
+
+    assert error.value.code == "response_too_large"
+    assert error.value.outcome == "EVIDENCE_GAP"
+    assert len(oversized_requests) == len(permit.consumed) == 1

@@ -21,9 +21,20 @@
 
 ### Explicit Frame Conditioning
 
-`seedance_2.0_vip` 可显式选择 `JimengProfile.input_mode=first_frame` 或 `first_last_frame`，分别映射 native mode 2 / 3、image-to-video capability、必须的 `first_frame` 或 `first_frame,last_frame` 图片角色，以及 native material role 1 / 2；不能混入普通参考图、音视频或偷偷降级 mode 4。默认 `multimodal` 序列化省略新字段，既有 profile、capability 与历史 dispatch identity 不变；端点模式拥有不同 profile/compiler/capability identity。当前只为已核对 native config 的 Seedance 2.0 VIP 开放端点模式，其他型号不推定支持，模型 Production qualification 仍为 `UNQUALIFIED`。
+四个明确型号均可通过 `JimengProfile.input_mode` 显式选择以下输入，current native config 的只读核对覆盖每个 exact model 的 mode 1–4；每个模式独立封存 profile/compiler/capability identity，不自动回退或切换模型。
 
-端点素材角色进入 exact request、egress、dispatch material 和 native 参数 hash；对应 commercial action 使用 `i2v` / `first_last_frame`，editor draft 使用 `firstLastFrame`。纯文本描述“保持上一镜”不是首帧绑定；必须实际选择与封存端点图片。2026-10-25 当前 native validator 已零生成核对 mode 2、3 与角色 1、2，quote 可读不等于生成或质量验收。
+| Shot input | Profile mode | Native mode | Actual materials |
+| --- | --- | --- | --- |
+| 纯文本生成 | `text_to_video` | 1 | 无素材，不上传、不伪造参考图 |
+| 首帧引导 | `first_frame` | 2 | 一张 `first_frame`，native role 1 |
+| 首尾帧引导 | `first_last_frame` | 3 | `first_frame,last_frame`，native role 1、2 |
+| 图片、视频、音频参考 | `multimodal` | 4 | 实际 image/audio/video bindings 与逐项 native marker |
+
+白模静帧或动作视频沿同一 Registry 与 reference 输入，保留其已声明的布局、动作、空间或摄影职责；放入文件夹或仅在 Prompt 提到白模不算实际绑定。首尾端点模式不能混入动作视频；mode 4 的软参考不冒充原生端点约束。C4 强多锚点、独立 video edit/extend、typed voice routing 及 preserved-source 文法没有在本适配器获得完整支持，继续明确 unsupported，不能靠删除 guard 宣称“所有控制可同时使用”。静态图、图形运动与 hybrid 的组装仍归现有 Renderer。
+
+默认 `multimodal` 序列化继续省略新字段，旧 profile、capability 与历史 dispatch identity 保持。端点素材角色进入 exact request、egress、dispatch material 和 native 参数 hash；commercial action 使用 `t2v` / `i2v` / `first_last_frame` / `multi_modal`，editor family 对 mode 1–3 使用 `firstLastFrame`，mode 4 使用 `multiModal`。只读配置/validator 验证不构成真实出片、模型 Production qualification 或成片验收，四型号仍为 `UNQUALIFIED`。
+
+原生 Prompt 的唯一模型适配 owner 为 `jimeng_prompt.compile_jimeng_native_prompt`：首次编译与共享 causal-state 重编译复用同一完整文法，不再把含参考 marker 的文本与纯 remote prose 比较。完整文本（包含标记）按 JavaScript UTF-16 长度服从 `JimengModelSpec`，不沿用其他 Provider 的 5000 字符默认值、不截断。
 
 Canvas 对 storyboard 中非首镜的新 planning request 要求明确 `boundary`：连续关系走已有 materialized sequence handoff 与 accepted-source owner；独立切镜显式写 `{"independent": true}`，不能同时声明连续性约束。缺失边界在 planning 前拒绝，不再默认为独立生成；非连续切镜不会被强制改成首尾帧。素材绑定仍不保证手部动作或空间连续，必须比较 exact 前镜末态、当前开场与正常速度剪接结果。
 
@@ -37,7 +48,7 @@ Canvas 对 storyboard 中非首镜的新 planning request 要求明确 `boundary
 
 ### Bounded Qualification Trial
 
-普通 `VideoRoutingPolicy` 默认 `execution_purpose="production"`，默认字段不写入旧序列化；`UNQUALIFIED` 仍不能进入生产。显式 `execution_purpose="qualification"` 只允许一个已注册、明确 `UNQUALIFIED` 的 remote/metered 候选，执行绑定封存精确远程 allowlist、`paid_submit_ceiling=1`、`paid_submits_used=0`、`max_resamples=0` 及 remote/budget 授权。首次未知质量的有界探索可显式允许，但不授予重试。该用途仍经同一 `VideoGenerationService`、Paid Gate、预算预留、持久意图、一用 permit、exact replay 和 UNKNOWN 恢复；不使用 local qualification binding，也不改变模型资格声明。
+普通 `VideoRoutingPolicy` 默认 `execution_purpose="production"`，默认字段不写入旧序列化；`UNQUALIFIED` 仍不能进入生产。显式 `execution_purpose="qualification"` 只允许一个已注册、明确 `UNQUALIFIED` 的 remote/metered 候选，执行绑定封存精确远程 allowlist、`paid_submit_ceiling=1`、`paid_submits_used=0`、`max_resamples=0` 及 remote/budget 授权。首次未知质量的有界探索不授予重试。另有一次已知质量修复：同 task/Shot 的首样须已完整逐项评估并由原 committer 终结为质量拒绝；仅允许一个显式 `production_repair`，累计 ceiling=2、used=1、`max_resamples=0`，保留原 rubric/FinalOutput goal、全部通过项、原参考/输出/模型/编译器/seed，只改变实际 Prompt 及必要的新空节点 profile identity。原生声音不能静音降级；UNKNOWN、证据缺口、第二次质量修复、抽样重试和改变已满足项均不获此入口。新提交仍须独立的 +1 quota extension、有限积分预算、预检、持久意图与一用 permit；不授予 Production qualification 或 activation。该用途仍经同一 `VideoGenerationService`、Paid Gate、预算预留、持久意图、一用 permit、exact replay 和 UNKNOWN 恢复；不使用 local qualification binding，也不改变模型资格声明。
 
 试生成可提交、轮询、下载并保留原始 QA 观察，停在 `VALIDATE`；service 拒绝准备 Production candidate，committer 拒绝激活及重放激活。需要完整审片时，`prepare_qualification_preview_input` 只读捕获 exact request/binding/paid submit/observation/fetch/Manifest 和原 MP4，经原 `bootstrap_initial_state` 写入独立开发项目。`development-qualification-preview/1` receipt 仅允许封存的正常速度、替换声音预览，复用原 development preview composition 与 Production render activation 禁令；不伪造质量失败，不导入付费历史、不升级资格、不产生 P6 或最终验收。当前本地验证证明该边界的运行行为，真实平台成功与成片质量仍需 exact 媒体证据。
 
@@ -54,6 +65,14 @@ P0 的 `compile_request` 支持普通 Shot requirement 的显式素材绑定。�
 每次提交后，Provider 只读轮询服务端已保存的画布草稿，要求本次节点精确绑定封存的 `resource_id`，再将完整草稿、版本和 SHA-256 按内容寻址保存为项目内 `artifacts/provider-canvas/jimeng/` 的不可变快照。accepted 的标准付费回执锚定 dispatch 和画布快照 hash；标准项目 reader 重开时还将有序素材 tuple 与原生成请求核对，缺失、替换或不一致即拒绝加载。服务端草稿保存未获确认时，付费结果保持 `OUTCOME_UNKNOWN`，只允许读回恢复，不能再次付费提交。此机制以草稿读取证明保存，不另行调用未经验证的画布写入接口。
 
 提交响应丢失时，Paid attempt 保持 `OUTCOME_UNKNOWN`，预算保持未结算，UNKNOWN 回执锚定已落盘的 dispatch 与画布快照 hash。若进程在写提交回执前退出，标准 `ProductionStateCommitter.recover()` 或 `recover_jimeng_unknown_once` 都将遗留 `SUBMIT_INTENT` 锁定为 UNKNOWN，并封存当时已有的 Jimeng 证据；之后只查询已封存的 resource ID，核对账号/project、submit/task、素材及参数身份，并将原预算预留协调为 accepted；不重新提交或签发 permit。没有封存 resource ID、读回不可用或无法证明资源时继续保持 UNKNOWN。恢复回执嵌入带内容 hash 的读回证据。正常轮询和获取使用 accepted 的 `resource_id:task_id`；完成后从新鲜 resource 响应取下载地址，允许正常重定向，落盘时计算 hash。接受前仍须经过现有视频 artifact probe 与 QA。
+
+### Authored Visual Revision
+
+`generation-visual-supersession/3` 支持用户认可试片方向后明确要求的分辨率升级：typed `ResolutionRevisionTarget` 封存旧/新adaptive output，只有分辨率档位提高，其余输出、exact native prompt、intent、参考和原raw QA不变。旧结果须已知fetched并有无FAIL的durable评估，NOT_EVALUATED不变成PASS；沿原committer封存旧paid/media/evidence与同ID新goal，旧`/1`、`/2`hash不变。新qualification binding与submit锁须对齐exact `/3`及完整累计历史，原budget/quota各自显式扩展、单次permit执行；1080p新片重新审看，不继承试片验收，不提升模型Production qualification。
+
+`generation-visual-supersession/2` 另支持用户明确要求的coverage/物理调度修订：沿用原首帧，封存完整 `CoverageRevisionTarget` 的intent与QA，旧 `/1` 换图语义和hash不变。只准修改封存的摄影/subject action progression与cadence，保留原对白、表演方向、身份、材质、光照、音频、open/close及输出。旧raw required IDs和非失败rule必须保留；已确证失败项只改作者表达及验收observable等内容，stage/proof/dimension/owner不变。新同ID goal保留全部旧FinalOutput requirements；锁内校验exact `/2` 与当前intent/QA/首帧/历史，不为凑条件更换像素SHA。仍须原预算与累计quota各+1、exact preview和一用permit；不开放任意重抽或升级模型资格。
+
+用户明确要求更换已下载试片的美术版本时，`ProductionStateCommitter.supersede_video_generation` 以独立 immutable receipt 封存旧 request、fetch、paid receipt、原始观察、旧 QA 与新 goal / 首帧 SHA；旧 attempt 终止为 `generation_visual_superseded`，不伪造质量失败，不结算、验收、激活或授予重试。新 goal 须保留全部旧要求，标准 Project / Registry revision 才能采用新素材。Qualification binding 仅允许同 task / Shot / provider / model / output 的新首帧版本，保留对白、动作、摄影、声音与旧 raw criteria，累计 used + 1 ceiling、零 resample；submit lock 重开 exact supersession 并核对新版本目标。预算、+1 quota extension、preview、intent 与 one-use permit 沿原 owner，UNKNOWN 仍停止，模型资格保持 `UNQUALIFIED`。
 
 ## Integration
 

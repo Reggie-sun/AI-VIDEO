@@ -22,7 +22,7 @@ exact identity 校验。选对作品类型由 authoring caller 负责，Gate 不
 owner；电视剧对白准确性和同步仍由原 CAPTION Gate 负责，本次没有替换它。
 
 兼容：已有未分类 `VisualDirection` 在 Python API 中继续可读，缺省字段不序列化，
-旧 requirement ID、已封存 packet 和 `check` 行为不变。新私有 `prepare` CLI 要求
+旧 requirement ID 和已封存 packet 保持可读；旧完整报告缺少接缝证据时，当前 `check` 不再宣称完整通过。新私有 `prepare` CLI 要求
 `--content-kind` 且必须与方向文件一致；旧创建命令需补该参数及显式分类的方向文件，
 不能依靠默认广告类型。此变更不增加或改变公共 `ai-video` CLI 命令。
 
@@ -56,15 +56,17 @@ Production 验证 selected evaluator 的测量声明，不重新解码 MP4/JPEG�
 ## Local Report
 
 完整作品的开发侧审片使用 `prepare --contract /path/to/final-output-contract.json`，
-同时提供该作品的 `--direction` 和 `--content-kind`。`--contract` 读取原
+同时提供该作品的 `--direction`、`--content-kind`、`--timeline` 和 `--render-report`。
+后两者必须是本次 canonical `ResolvedTimeline` 与绑定 exact MP4 的 HyperFrames 输出报告。
+`--contract` 读取原
 `FinalOutputContract`，保留 `goal_id`、`goal_version`、`user_goal` 与所有 requirements；
 其中五项视觉要求必须与 direction 完全一致，差异在 probe/抽帧/建目录前拒绝。
 叙事、表演、商品、声音等普通要求不会被视觉要求替换或过滤，任何有效 FAIL 都阻断
 整体 PASS，缺项为 NOT_EVALUATED，仍使用同一个 `adjudicate_final_output`。
 
-此模式产生 `visual-review-packet/2` 与 `review_scope=full_contract`。不传 contract
-则保持旧 `/1` packet 和 `review_scope=visual_only`；旧 Python positional API、已有
-packet 与旧合同身份继续兼容。HTML 显示原目标和所有要求，非视觉项使用原 requirement ID。
+此模式产生 `visual-review-packet/4` 与 `review_scope=full_contract`。不传 contract
+则保持旧 `/1` packet 和 `review_scope=visual_only`；已有 packet 与旧合同身份继续可读。
+HTML 显示原目标和所有要求，非视觉项使用原 requirement ID。
 `full_contract` 仅描述 caller 输入范围：工具不会自动理解叙事、听音频、验证合同穷尽原意，
 也不拦截 Agent 直接发链接。原始 brief 到合同的覆盖和审片纪律见
 [Creative Completion Practice](../.agents/skills/open-video/references/creative-completion.md)。
@@ -74,11 +76,21 @@ packet 与旧合同身份继续兼容。HTML 显示原目标和所有要求，�
 contained exact file references 与完整 intent bindings；无效输入或合同冲突在 probe/抽帧/
 mkdir 前拒绝。它不改变公共 `ai-video` CLI。封套字段与创作闭环只由上方 reference 维护。
 
-显式传 goal binding 时产生 `visual-review-packet/3`：封套及三个依赖以预检已读的原始 bytes
+显式传 goal binding 时，`/4` 仍保留此前 `/3` 的封套快照机制：封套及三个依赖以预检已读的原始 bytes
 保存于 `creative/`，保留相对引用，identity 纳入 `subject_hash`。即使外部输入后来变化/移动，
 reopen/check 只消费封存 snapshot；缺文件、symlink、改 quote/映射/合同/hash 都拒绝。
 JSON bytes SHA 与 `contract_hash` 分别验证文件和语义，不能互相替代。旧 packet 不静默升级，
-结果明确 `goal_chain=not_evaluated`；`/3` 的 `verified` 也只证明结构完整。
+`/1`、`/2` 的 `goal_chain=not_evaluated` 保留；`/3` 的 `verified` 也只证明结构完整。
+
+`/4` 额外封存 timeline/report bytes 与逐接缝 inventory；每刀的画面采用窗口、源素材 hash、
+附近音轨的 sample 位置、裁切和淡入淡出由同一 `ResolvedTimeline` 投影，不建立第二时间线。
+即使 CompositionSpec 未显式写 transition 标签，实际相邻 Shot 切镜也必须检查；叠加图层不重复计刀。
+每刀必须记录 `junction_findings`：剪辑决定及理由、画面观察、声音观察和实际观看方式。
+`retain_with_reason` 允许保留当前接点；`trim` 表示仍需修剪，会阻断通过，不能用理由替代修复。
+PASS 需要 exact inventory、实际 human 1x 完整听看和分别明确的声画观察；播放器结束、首尾帧绑定、
+抽帧、波形或 ASR 均不能代签听感。已报告的画面或声音 FAIL 保留为修复项，不能因不具备 PASS 证据而抹成未知。
+缺项、未听声音、旧回答或 MP4/timeline/report 改动均不通过；旧 `/2`、`/3` 缺接缝绑定时返回
+`missing_junction_binding`，仍保留已有 FAIL，不可通过降级 packet 版本绕过。
 
 JSON/HTML 保留 evaluator 原始 `findings`，另列原 owner
 `adjudicate_final_output_details` 的 `effective_requirements` 和全局 `evidence_gaps`。
@@ -122,5 +134,6 @@ host，也不具备签发 Production 验收的权限。
 tests/test_visual_quality_report.py -q` 验证逐项阻断、真实 committer/strict reopen、
 旧序列化、实际 ffmpeg 抽帧、替换 MP4/截图、陈旧回答、HTML 转义与缺少全片观看。
 Harness 的 `visual_quality_tests` 路由这些检查，相关 Review / Repair 回归继续执行。
-新封套与 `/3` 实际入口由 `creative_goal_binding_tests` 路由，并验证 Runtime 单向边界。
+`tests/test_junction_review_gate.py` 覆盖逐刀、隐式切镜、单片零接缝、声音失败保留与 stale/downgrade 阻断；
+同样进入 `visual_quality_tests` 与 `creative_goal_binding_tests`。新封套与 `/4` 实际入口继续验证 Runtime 单向边界。
 测试通过不代表某条成片已达到用户的审美要求。

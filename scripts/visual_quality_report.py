@@ -21,6 +21,15 @@ from ai_video.production.artifact_contracts import StrictModel
 from ai_video.production.final_output_contracts import FinalOutputContract
 from ai_video.production.final_output_review import FinalOutputObservation, adjudicate_final_output_details
 from ai_video.production.hashing import canonical_sha256
+from ai_video.production.junction_review import (
+    JunctionFinding,
+    JunctionInventory,
+    derive_junction_inventory,
+    evaluate_junction_review,
+    junction_inventory_sha256,
+    validate_probe_matches_report,
+    validate_timeline_and_report,
+)
 from ai_video.production.models import EvidenceStrength
 from ai_video.production.visual_quality import VisualDirection, VisualFrameReference, visual_requirements
 from scripts.creative_goal_binding import load_goal_binding
@@ -35,6 +44,7 @@ class ReviewAnswer(StrictModel):
     evaluator_name: str = Field(min_length=1)
     strength: EvidenceStrength
     observation: FinalOutputObservation
+    junction_findings: tuple[JunctionFinding, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -56,7 +66,8 @@ def write_json(path, value):
 
 
 def prepare(video: Path, direction: VisualDirection, output: Path, timestamps: tuple[int, ...],
-            *, final_output_contract: FinalOutputContract | None = None, goal_binding: Path | None = None):
+            *, final_output_contract: FinalOutputContract | None = None, goal_binding: Path | None = None,
+            timeline: Path | None = None, render_report: Path | None = None):
     if goal_binding is not None and final_output_contract is None:
         raise ValueError("Goal binding requires a complete final-output contract")
     visual = visual_requirements(direction)
@@ -72,10 +83,30 @@ def prepare(video: Path, direction: VisualDirection, output: Path, timestamps: t
     verified = load_goal_binding(goal_binding) if goal_binding is not None else None
     if verified is not None and verified.contract != contract:
         raise ValueError("Goal binding contract differs from the supplied complete contract")
+    if final_output_contract is not None and (timeline is None or render_report is None):
+        raise ValueError("Full-contract review requires an exact ResolvedTimeline and HyperFrames render report")
+    if final_output_contract is None and (timeline is not None or render_report is not None):
+        raise ValueError("ResolvedTimeline and render report require a complete final-output contract")
     video = video.resolve(strict=True)
     before = file_hash(video)
+    video_size = video.stat().st_size
+    timeline_bytes = timeline.read_bytes() if timeline is not None else None
+    render_report_bytes = render_report.read_bytes() if render_report is not None else None
+    timeline_model = render_model = None
+    if timeline_bytes is not None and render_report_bytes is not None:
+        timeline_model, render_model = validate_timeline_and_report(
+            timeline_bytes,
+            render_report_bytes,
+            video_path=video,
+            video_sha256=before,
+            video_size_bytes=video_size,
+        )
+        inventory = derive_junction_inventory(timeline_model)
+        inventory_hash = junction_inventory_sha256(inventory)
     probe = json.loads(subprocess.run(["ffprobe", "-v", "error", "-show_format",
         "-show_streams", "-of", "json", str(video)], check=True, capture_output=True, text=True).stdout)
+    if timeline_model is not None and render_model is not None:
+        validate_probe_matches_report(probe, timeline_model, render_model)
     duration_ms = int(Decimal(probe["format"]["duration"]) * 1000)
     if not timestamps or len(set(timestamps)) != len(timestamps) or any(t < 0 or t >= duration_ms for t in timestamps):
         raise ValueError("Unique frame timestamps must be inside the video")
@@ -86,6 +117,9 @@ def prepare(video: Path, direction: VisualDirection, output: Path, timestamps: t
             path = output / "creative" / snapshot.path
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(snapshot.data)
+    if timeline_bytes is not None and render_report_bytes is not None:
+        (output / "timeline.json").write_bytes(timeline_bytes)
+        (output / "render-report.json").write_bytes(render_report_bytes)
     frames = []
     for stamp in sorted(timestamps):
         path = output / "frames" / f"{stamp:08d}.jpg"
@@ -96,8 +130,7 @@ def prepare(video: Path, direction: VisualDirection, output: Path, timestamps: t
             "frame_sha256": file_hash(path), "render_output_sha256": before})
     if file_hash(video) != before:
         raise ValueError("Video changed during extraction")
-    version = "visual-review-packet/3" if verified is not None else (
-        "visual-review-packet/2" if final_output_contract is not None else "visual-review-packet/1")
+    version = "visual-review-packet/4" if final_output_contract is not None else "visual-review-packet/1"
     packet = {"schema_version": version, "authority": "development_only",
         "video_path": str(video), "video_sha256": before, "video_size_bytes": video.stat().st_size,
         "duration_ms": duration_ms, "contract": contract.model_dump(mode="json"), "frames": frames}
@@ -105,6 +138,27 @@ def prepare(video: Path, direction: VisualDirection, output: Path, timestamps: t
         packet["content_kind"] = direction.content_kind
     if verified is not None:
         packet["goal_binding"] = {**verified.identity(), "path": f"creative/{verified.files[0].path}"}
+    if timeline_model is not None and render_model is not None:
+        packet["timeline_snapshot"] = {
+            "path": "timeline.json",
+            "sha256": hashlib.sha256(timeline_bytes).hexdigest(),
+            "content_hash": timeline_model.content_hash,
+            "composition_fingerprint": timeline_model.composition_fingerprint,
+            "total_frames": timeline_model.total_frames,
+            "fps": timeline_model.delivery_profile.fps,
+            "sample_rate": timeline_model.sample_rate,
+        }
+        packet["render_report_snapshot"] = {
+            "path": "render-report.json",
+            "sha256": hashlib.sha256(render_report_bytes).hexdigest(),
+            "video_sha256": render_model.sha256,
+            "timeline_fingerprint": render_model.timeline_fingerprint,
+            "duration_frames": render_model.measured.duration_frames,
+            "fps_num": render_model.measured.fps_num,
+            "fps_den": render_model.measured.fps_den,
+        }
+        packet["junction_inventory"] = [item.model_dump(mode="json") for item in inventory]
+        packet["junction_inventory_sha256"] = inventory_hash
     packet["subject_hash"] = canonical_sha256(packet)
     write_json(output / "packet.json", packet)
     observation = {"contract_hash": contract.contract_hash,
@@ -115,8 +169,27 @@ def prepare(video: Path, direction: VisualDirection, output: Path, timestamps: t
         "findings": [{"requirement_id": r.requirement_id, "verdict": "not_evaluated",
             "observation": "尚未评审；不得从抽帧成功推断通过。", "visual_frames": []}
             for r in contract.requirements]}
-    write_json(output / "observations.template.json", {"evaluator_name": "pending",
-        "strength": "explicit_evaluator", "observation": observation})
+    answer_template = {"evaluator_name": "pending", "strength": "explicit_evaluator",
+        "observation": observation}
+    if timeline_model is not None:
+        answer_template["junction_findings"] = [
+            {
+                "junction_id": item.junction_id,
+                "inventory_sha256": inventory_hash,
+                "edit_decision": None,
+                "edit_reason": "尚未评审；需记录剪辑决定和依据。",
+                "visual_verdict": "not_evaluated",
+                "visual_observation": "未评审；1x完整播放该接点，记录动作/画面有无重复、停顿或跳变。",
+                "audio_verdict": "not_evaluated",
+                "audio_observation": "未聆听；实际监听接点前后音频，记录有无叠音、截断或异常空隙。",
+                "audio_basis": "not_listened",
+                "audio_reason": None,
+                "viewing_mode": None,
+                "viewing_speed_milli": None,
+            }
+            for item in inventory
+        ]
+    write_json(output / "observations.template.json", answer_template)
     return check(output, output / "observations.template.json")
 
 
@@ -124,7 +197,7 @@ def reopen(output: Path):
     packet = json.loads((output / "packet.json").read_text(encoding="utf-8"))
     body = {k: v for k, v in packet.items() if k != "subject_hash"}
     version = packet.get("schema_version")
-    if version not in {"visual-review-packet/1", "visual-review-packet/2", "visual-review-packet/3"} or packet.get("authority") != "development_only":
+    if version not in {"visual-review-packet/1", "visual-review-packet/2", "visual-review-packet/3", "visual-review-packet/4"} or packet.get("authority") != "development_only":
         raise ValueError("Unsupported visual review packet")
     if canonical_sha256(body) != packet["subject_hash"]:
         raise ValueError("Packet identity changed; prepare a new packet")
@@ -145,7 +218,7 @@ def reopen(output: Path):
     prefix = "visual" if kind is None else f"visual.{kind}"
     if any(r.requirement_id != f"{prefix}.{r.visual_dimension}" for r in visual):
         raise ValueError("Content kind differs from sealed visual requirements")
-    if version == "visual-review-packet/3":
+    if version in {"visual-review-packet/3", "visual-review-packet/4"} and "goal_binding" in packet:
         identity = packet.get("goal_binding")
         if not isinstance(identity, dict) or not isinstance(identity.get("path"), str):
             raise ValueError("Goal binding snapshot is missing")
@@ -156,8 +229,64 @@ def reopen(output: Path):
         expected = {**verified.identity(), "path": path.as_posix()}
         if identity != expected or verified.contract != contract:
             raise ValueError("Goal binding snapshot or complete contract identity changed")
+    elif version == "visual-review-packet/3":
+        raise ValueError("Goal binding snapshot is missing")
     elif "goal_binding" in packet:
         raise ValueError("Legacy packet cannot claim a verified goal binding")
+    if version == "visual-review-packet/4":
+        try:
+            timeline_ref = packet["timeline_snapshot"]
+            report_ref = packet["render_report_snapshot"]
+            if timeline_ref["path"] != "timeline.json" or report_ref["path"] != "render-report.json":
+                raise ValueError("Timeline or render report snapshot path is not canonical")
+            timeline_path = output / timeline_ref["path"]
+            report_path = output / report_ref["path"]
+            if timeline_path.is_symlink() or report_path.is_symlink():
+                raise ValueError("Timeline and render report snapshots cannot be symlinks")
+            timeline_bytes = timeline_path.read_bytes()
+            report_bytes = report_path.read_bytes()
+            if (hashlib.sha256(timeline_bytes).hexdigest() != timeline_ref["sha256"]
+                    or hashlib.sha256(report_bytes).hexdigest() != report_ref["sha256"]):
+                raise ValueError("Timeline or render report snapshot bytes changed")
+            timeline_model, render_model = validate_timeline_and_report(
+                timeline_bytes,
+                report_bytes,
+                video_path=video,
+                video_sha256=packet["video_sha256"],
+                video_size_bytes=packet["video_size_bytes"],
+            )
+            expected_timeline = {
+                "content_hash": timeline_model.content_hash,
+                "composition_fingerprint": timeline_model.composition_fingerprint,
+                "total_frames": timeline_model.total_frames,
+                "fps": timeline_model.delivery_profile.fps,
+                "sample_rate": timeline_model.sample_rate,
+            }
+            expected_report = {
+                "video_sha256": render_model.sha256,
+                "timeline_fingerprint": render_model.timeline_fingerprint,
+                "duration_frames": render_model.measured.duration_frames,
+                "fps_num": render_model.measured.fps_num,
+                "fps_den": render_model.measured.fps_den,
+            }
+            if any(timeline_ref.get(key) != value for key, value in expected_timeline.items()):
+                raise ValueError("ResolvedTimeline snapshot identity changed")
+            if any(report_ref.get(key) != value for key, value in expected_report.items()):
+                raise ValueError("Render report snapshot identity changed")
+            inventory = derive_junction_inventory(timeline_model)
+            inventory_hash = junction_inventory_sha256(inventory)
+            supplied_inventory = tuple(
+                JunctionInventory.model_validate(item) for item in packet["junction_inventory"]
+            )
+            if (
+                supplied_inventory != inventory
+                or packet.get("junction_inventory_sha256") != inventory_hash
+            ):
+                raise ValueError("Per-cut inventory differs from the exact ResolvedTimeline")
+        except (KeyError, OSError, TypeError) as exc:
+            raise ValueError("Full-contract timeline or render report snapshot is incomplete") from exc
+    elif any(key in packet for key in ("timeline_snapshot", "render_report_snapshot", "junction_inventory", "junction_inventory_sha256")):
+        raise ValueError("Legacy packet cannot claim a new junction binding")
     for frame in packet["frames"]:
         path = output / frame["path"]
         if not path.resolve().is_relative_to((output / "frames").resolve()):
@@ -196,23 +325,72 @@ def check(output: Path, answers: Path):
     details = adjudicate_final_output_details(contract, (item,), review_request_content_hash=packet["subject_hash"])
     effective = [{"requirement_id": row.requirement_id, "verdict": row.verdict.value,
         "evidence_gaps": list(row.evidence_gaps)} for row in details.requirements]
-    result = {"authority": "development_only", "verdict": details.verdict.value,
+    junction_result = None
+    if packet["schema_version"] == "visual-review-packet/4":
+        inventory = tuple(JunctionInventory.model_validate(row) for row in packet["junction_inventory"])
+        junction_result = evaluate_junction_review(
+            inventory,
+            answer.junction_findings,
+            inventory_sha256=packet["junction_inventory_sha256"],
+            strength=answer.strength,
+        )
+    elif packet["schema_version"] in {"visual-review-packet/2", "visual-review-packet/3"}:
+        from ai_video.production.junction_review import JunctionReviewResult
+
+        junction_result = JunctionReviewResult(
+            verdict="not_evaluated",
+            evidence_gaps=("missing_junction_binding",),
+            cuts=(),
+        )
+    if junction_result is None:
+        combined_verdict = details.verdict.value
+        evidence_gaps = list(details.evidence_gaps)
+    else:
+        if details.verdict.value == "fail" or junction_result.verdict == "fail":
+            combined_verdict = "fail"
+        elif details.verdict.value == "pass" and junction_result.verdict == "pass":
+            combined_verdict = "pass"
+        else:
+            combined_verdict = "not_evaluated"
+        evidence_gaps = list(dict.fromkeys((*details.evidence_gaps, *junction_result.evidence_gaps)))
+    result = {"authority": "development_only", "verdict": combined_verdict,
         "review_scope": "visual_only" if packet["schema_version"] == "visual-review-packet/1" else "full_contract",
-        "goal_chain": "verified" if packet["schema_version"] == "visual-review-packet/3" else "not_evaluated",
+        "goal_chain": "verified" if "goal_binding" in packet else "not_evaluated",
         "production_acceptance": "not_evaluated", "subject_hash": packet["subject_hash"],
         "video_sha256": packet["video_sha256"], "answers_sha256": file_hash(answers),
         "evaluator_name": answer.evaluator_name, "strength": answer.strength.value,
         "findings": [f.model_dump(mode="json") for f in source.findings],
-        "effective_requirements": effective, "evidence_gaps": list(details.evidence_gaps)}
+        "effective_requirements": effective, "evidence_gaps": evidence_gaps}
+    if junction_result is not None:
+        result["junction_review"] = junction_result.model_dump(mode="json")
     result["completion_summary"] = {"video_sha256": packet["video_sha256"],
         "review_scope": result["review_scope"], "goal_chain": result["goal_chain"],
         "viewing_mode": source.viewing_mode, "viewing_speed_milli": source.viewing_speed_milli,
         "requirements_to_address": [{**row, "next_action": "repair" if row["verdict"] == "fail" else "evidence_repair"}
             for row in effective if row["verdict"] != "pass"],
-        "evidence_gaps": list(details.evidence_gaps),
+        "evidence_gaps": evidence_gaps,
         "user_feedback": {"assessment": "parent_review_required",
             "source": packet.get("goal_binding", {}).get("creative_input"),
             "note": "Parent 须核对有效用户反馈并披露未解决的拒绝；工具不判断用户是否撤回意见。"}}
+    if junction_result is not None:
+        junctions_to_address = [
+            {
+                "requirement_id": f"junction.{cut.junction_id}",
+                "verdict": cut.verdict,
+                "evidence_gaps": list(cut.evidence_gaps),
+                "next_action": "repair" if cut.verdict == "fail" else "evidence_repair",
+            }
+            for cut in junction_result.cuts if cut.verdict != "pass"
+        ]
+        if "missing_junction_binding" in junction_result.evidence_gaps:
+            junctions_to_address.append({
+                "requirement_id": "junction_binding",
+                "verdict": "not_evaluated",
+                "evidence_gaps": ["missing_junction_binding"],
+                "next_action": "evidence_repair",
+            })
+        result["completion_summary"]["junctions_to_address"] = junctions_to_address
+        result["completion_summary"]["requirements_to_address"].extend(junctions_to_address)
     if "goal_binding" in packet:
         reference = packet["goal_binding"]["creative_input"]
         result["completion_summary"]["user_feedback"]["source"] = {**reference,
@@ -243,6 +421,62 @@ def render_html(packet, contract, result):
     chain_label = "目标引用链结构已核对；不证明语义充分" if result["goal_chain"] == "verified" else "目标引用链未核对"
     todo = ''.join(f'<li>{escape(row["requirement_id"])} · {row["verdict"].upper()} · {"修复" if row["next_action"] == "repair" else "补证"}</li>'
         for row in result["completion_summary"]["requirements_to_address"])
+    junction_section = ""
+    if "junction_review" in result:
+        inventory = {row["junction_id"]: row for row in packet.get("junction_inventory", [])}
+        cuts = []
+        for cut in result["junction_review"]["cuts"]:
+            details = inventory.get(cut["junction_id"], {})
+            visual_sources = "；".join(
+                f'{escape(row["shot_id"])} / {escape(row["layer_id"])} · '
+                f'SHA {escape(row["asset_sha256"][:12])} · trim {row["trim_start_frame"]}+'
+                f'{row["trim_duration_frames"] if row["trim_duration_frames"] is not None else "source-end"}f'
+                for row in details.get("visual_spans", [])
+            ) or "无邻近视觉素材记录"
+            audio_sources = "；".join(
+                f'{escape(row["track_id"])} / {escape(row["audio_kind"])} · '
+                f'SHA {escape(row["asset_sha256"][:12])} · source {row["source_start_sample"]}+'
+                f'{row["source_duration_samples"]} samples · fades {row["fade_in_samples"]}/'
+                f'{row["fade_out_samples"]} samples'
+                for row in details.get("audio_spans", [])
+            ) or "该窗口没有排定音轨；这本身不构成静音评审通过"
+            audio_basis = {"actual_listening": "实际聆听", "deliberately_silent": "明确设计为静音",
+                "not_listened": "未聆听", None: "未声明"}.get(cut.get("audio_basis"), "未知")
+            cut_viewing = {"full_playback": "完整播放", "sampled_frames": "抽样画面", None: "未声明"}.get(
+                cut.get("viewing_mode"), "未知")
+            cut_speed = cut.get("viewing_speed_milli")
+            cut_speed_text = "未声明速度" if cut_speed is None else f'{cut_speed / 1000:g} 倍速'
+            cuts.append(
+                f'<article><div class="row"><h3>{escape(cut["from_shot_id"])} → '
+                f'{escape(cut["to_shot_id"])} · {details.get("time_ms", cut["frame"])}ms '
+                f'(frame {cut["frame"]})</h3><b class="{cut["verdict"]}">有效结果 · '
+                f'{cut["verdict"].upper()}</b></div>'
+                f'<p>剪辑决定 · {escape(cut["edit_decision"] or "未评审")} · '
+                f'{escape(cut["edit_reason"])}</p>'
+                f'<p>画面 · {escape(cut["visual_verdict"].upper())} · '
+                f'{escape(cut["visual_observation"])}</p>'
+                f'<p>声音 · {escape(cut["audio_verdict"].upper())} · '
+                f'{escape(cut["audio_observation"])}</p>'
+                f'<p>声音依据 · {escape(audio_basis)} · {escape(cut.get("audio_reason") or "无额外说明")}<br>'
+                f'观看声明 · {escape(cut_viewing)} / {escape(cut_speed_text)}</p>'
+                f'<p class="muted">转换 · {escape(details.get("transition_kind", "unknown"))} / '
+                f'{details.get("transition_duration_frames", "?")}f<br>视觉素材与源裁切 · '
+                f'{visual_sources}<br>接点附近实际音轨与裁切/淡入淡出 · {audio_sources}</p>'
+                f'<small>证据缺口 · {escape(", ".join(cut["evidence_gaps"]) or "none")}</small></article>'
+            )
+        if cuts:
+            content = f'<div class="grid">{"".join(cuts)}</div>'
+        elif packet["schema_version"] == "visual-review-packet/4":
+            content = '<p>ResolvedTimeline 没有入镜转换；未补造接点。</p>'
+        else:
+            content = '<p>历史 packet 未绑定 ResolvedTimeline 或接点清单；衔接范围未知。</p>'
+        junction_section = (
+            f'<section><h2>镜头接点剪辑检查</h2><p>Gate · '
+            f'{escape(result["junction_review"]["verdict"].upper())} · '
+            f'{len(result["junction_review"]["cuts"])} 个接点</p>'
+            f'<p class="muted">此处需对 exact MP4 做正常速度 1x 完整播放并分别记录画面与实际聆听；'
+            f'帧绑定、波形、ASR 和渲染通过都不会自动通过接点。</p>{content}</section>'
+        )
     summary = result["completion_summary"]
     feedback_source = json.dumps(summary["user_feedback"]["source"], ensure_ascii=False) if summary["user_feedback"]["source"] else "未封存相关用户上下文"
     viewing = {"sampled_frames": "抽样画面", "full_playback": "完整播放"}.get(summary["viewing_mode"], "未声明观看方式")
@@ -271,6 +505,7 @@ main{{max-width:1240px;margin:auto;padding:48px 24px;overflow-wrap:anywhere}}h1{
 <p>{escape(summary["user_feedback"]["note"])}</p><p class="identity">用户反馈来源 · {escape(feedback_source)}</p>
 <p class="muted">结构检查、独立概念判断、实际观看、用户意见须分别取证。报告仅核验结构和证据声明；Production acceptance: NOT_EVALUATED。</p></section>
 <section><h2>要求与逐项评审</h2><div class="grid">{''.join(cards)}</div></section>
+{junction_section}
 <section><h2>成片画面证据</h2><div class="frames">{frames}</div></section>
 <section class="identity">MP4 SHA-256: {packet["video_sha256"]}<br>Review subject: {packet["subject_hash"]}<br>
 Evaluator: {escape(result["evaluator_name"])} / {escape(result["strength"])}</section></main></html>'''
@@ -284,6 +519,8 @@ def main(argv=None):
     prep.add_argument("--direction", type=Path, required=True)
     prep.add_argument("--contract", type=Path, help="Complete authored FinalOutputContract; preserves nonvisual requirements")
     prep.add_argument("--goal-binding", type=Path, help="Exact development intent binding; requires --contract")
+    prep.add_argument("--timeline", type=Path, help="Exact canonical ResolvedTimeline; required with --contract")
+    prep.add_argument("--render-report", type=Path, help="Existing HyperFrames render report; required with --contract")
     prep.add_argument("--content-kind", choices=tuple(CONTENT_LABELS), required=True)
     prep.add_argument("--output", type=Path, required=True)
     prep.add_argument("--timestamps-ms", type=int, nargs="+", required=True)
@@ -298,7 +535,8 @@ def main(argv=None):
                 raise ValueError("Explicit content kind must match the direction file")
             contract = FinalOutputContract.model_validate_json(args.contract.read_text()) if args.contract else None
             result = prepare(args.video, direction, args.output, tuple(args.timestamps_ms),
-                final_output_contract=contract, goal_binding=args.goal_binding)
+                final_output_contract=contract, goal_binding=args.goal_binding,
+                timeline=args.timeline, render_report=args.render_report)
         else:
             result = check(args.packet, args.answers)
     except (ValueError, OSError, KeyError, subprocess.SubprocessError) as exc:

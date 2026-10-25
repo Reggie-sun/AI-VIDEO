@@ -1458,8 +1458,8 @@ def _verify_manifest_dependency_states(
         if active_render_pointers:
             raise _invalid("Active render evidence requires active_render_state.")
     elif active_render_pointers != {bundle.manifest.active_render_state}:
-        raise _invalid(
-            "Active render evidence must match the Manifest-selected render state."
+        _project_evidence.verify_retired_render_unit(
+            bundle, graph, _load_active_dependency_graph, _load_exact_render_state
         )
 
     for node_id in sorted(set(state_by_id) - active_ids):

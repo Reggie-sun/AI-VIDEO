@@ -203,9 +203,14 @@ def compile_ad_creative_plan(
             )
         )
     )
+    compiled_schema_version = (
+        base_composition.schema_version
+        if base_composition.schema_version in {"2.2", "2.3", "2.4"}
+        else "2.2"
+    )
     compiled = base_composition.model_copy(
         update={
-            "schema_version": "2.2",
+            "schema_version": compiled_schema_version,
             "revision": base_composition.revision + 1,
             "content_hash": "0" * 64,
             "creation_receipt_id": f"compile-{plan.content_hash}",

@@ -1,0 +1,31 @@
+--- a/src/ai_video/production/dependency.py
++++ b/src/ai_video/production/dependency.py
+@@ -835,20 +835,6 @@
+ # ---------------------------------------------------------------------------
+ 
+ 
+-def _source_render_pairs(graph: DependencyGraphSnapshot) -> dict[str, str]:
+-    pairs: dict[str, str] = {}
+-    node_by_id = {node.node_id: node for node in graph.nodes}
+-    for edge in graph.edges:
+-        if edge.reason is not DependencyReason.RENDER_EXECUTION:
+-            continue
+-        source = node_by_id[edge.source_node_id]
+-        target = node_by_id[edge.target_node_id]
+-        if (
+-            source.kind is DependencyNodeKind.RENDERER_SOURCE
+-            and target.kind is DependencyNodeKind.RENDER
+-        ):
+-            pairs[target.node_id] = source.node_id
+-    return pairs
+ 
+ 
+ def _render_execution_groups(
+--- a/src/ai_video/production/manifest_schema.py
++++ b/src/ai_video/production/manifest_schema.py
+@@ -107,5 +107,3 @@
+     return _INTRODUCED_IN[capability]
+ 
+ 
+-def is_supported_manifest_version(version: str) -> bool:
+-    return version in _VERSIONS

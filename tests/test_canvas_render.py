@@ -224,3 +224,81 @@ def test_static_canvas_bootstrap_composes_audio_and_delivers_canonical_render(
                               audio_tracks=(audio_track,))
     assert replayed == result
     assert runner.render_calls == 1
+    first_pointer = final_project.manifest.active_render_state
+    audio_track = audio_track.model_copy(update={"gain_millidb": 500})
+    service.render(attempt_id="canvas-static-second-render", toolchain=renderer_toolchain,
+        audio_tracks=(audio_track,))
+    final_project, _ = service.deliver()
+    assert final_project.manifest.active_render_state != first_pointer
+    assert runner.render_calls == 2
+
+    # A new creative version retires the old render domain but retains its
+    # immutable media/history. It must be editable without laundering that
+    # old output into fresh evidence for the new direction.
+    import copy
+    from ai_video.production.project import load_production_project
+    from ai_video.production.models import DependencyLifecycle, RenderDependencyEvidence
+    old_pointer = final_project.manifest.active_render_state
+    old_output = project_root / final_project.render_state.output.path
+    old_bytes = old_output.read_bytes()
+    revised_direction = copy.deepcopy(director)
+    revised_direction["shots"][0]["shot"]["required_asset_roles"][0]["asset_ids"] = [images[1].asset_id]
+    revised_direction["shots"][0]["composition"]["asset_id"] = images[1].asset_id
+    revised = CanvasProductionService(committer=committer, packet=packet(),
+        direction=revised_direction, targets=())
+    revised.revise_authoring(attempt_id="revise-after-render", registry=final_project.registry)
+    reopened = load_production_project(project_root / "project.yaml")
+    assert reopened.manifest.active_render_state == old_pointer
+    retired = [state for state in reopened.manifest.dependency_states
+        if isinstance(state.applied_evidence, RenderDependencyEvidence)]
+    assert len(retired) == 4
+    assert all(state.lifecycle is DependencyLifecycle.SUPERSEDED for state in retired)
+    assert old_output.read_bytes() == old_bytes
+    # Partial history cannot use the all-retired exception.
+    import pytest
+    from ai_video.errors import AiVideoError
+    from ai_video.production.project import _verify_manifest_dependency_states
+    partial = reopened.model_copy(update={"manifest": reopened.manifest.model_copy(update={
+        "dependency_states": tuple(s for s in reopened.manifest.dependency_states
+            if s.node_id != retired[0].node_id)})})
+    with pytest.raises(AiVideoError, match="Active render evidence must match"):
+        _verify_manifest_dependency_states(partial, reopened.dependency_graph)
+    # Keeping the count at four cannot conceal a missing real origin node.
+    forged_states = tuple(sorted((*(s for s in reopened.manifest.dependency_states
+        if s.node_id != retired[0].node_id), retired[1].model_copy(update={"node_id": "forged-history"})),
+        key=lambda s: s.node_id))
+    forged = reopened.model_copy(update={"manifest": reopened.manifest.model_copy(update={
+        "dependency_states": forged_states})})
+    with pytest.raises(AiVideoError):
+        _verify_manifest_dependency_states(forged, reopened.dependency_graph)
+    unknown_origin = reopened.model_copy(update={"manifest": reopened.manifest.model_copy(update={
+        "dependency_states": tuple(s.model_copy(update={"graph_revision_id": "f" * 64})
+            if s in retired else s for s in reopened.manifest.dependency_states)})})
+    with pytest.raises(AiVideoError):
+        _verify_manifest_dependency_states(unknown_origin, reopened.dependency_graph)
+    changed_fingerprint = reopened.model_copy(update={"manifest": reopened.manifest.model_copy(update={
+        "dependency_states": tuple(s.model_copy(update={"desired_fingerprint": "e" * 64,
+            "applied_fingerprint": "e" * 64, "applied_evidence": s.applied_evidence.model_copy(
+                update={"artifact_fingerprint": "e" * 64})}) if s == retired[0] else s
+            for s in reopened.manifest.dependency_states)})})
+    with pytest.raises(AiVideoError):
+        _verify_manifest_dependency_states(changed_fingerprint, reopened.dependency_graph)
+    # Two known successful renders cannot exchange pointer/origin pairs.
+    exchanged = reopened.model_copy(update={"manifest": reopened.manifest.model_copy(update={
+        "active_render_state": first_pointer,
+        "dependency_states": tuple(s.model_copy(update={"applied_evidence":
+            s.applied_evidence.model_copy(update={"pointer": first_pointer})})
+            if s in retired else s for s in reopened.manifest.dependency_states)})})
+    with pytest.raises(AiVideoError):
+        _verify_manifest_dependency_states(exchanged, reopened.dependency_graph)
+    edited_attempt_pair = exchanged.model_copy(update={"manifest": exchanged.manifest.model_copy(update={
+        "attempts": tuple(a.model_copy(update={"candidate_render_state": first_pointer})
+            if a.attempt_id == "canvas-static-second-render" else a
+            for a in exchanged.manifest.attempts)})})
+    with pytest.raises(AiVideoError):
+        _verify_manifest_dependency_states(edited_attempt_pair, reopened.dependency_graph)
+    # The same owner can render the changed scene, with a new output identity.
+    new_result = revised.render(attempt_id="render-after-revision", toolchain=renderer_toolchain,
+        audio_tracks=(audio_track,))
+    assert new_result.active_render_state != old_pointer
+    assert runner.render_calls == 3
