@@ -5,6 +5,8 @@ support、limits、modes 与 surface behavior 的 authority。
 
 ## Use This Dialect
 
+- 单次生成时长上限为**30秒**，不能沿用2.0的15秒上限或默认8–10秒分段；按完整戏剧过程和
+  实际渠道能力选择时长。一次生成可以包含多个摄影镜头，不强制一镜到底，也不强行凑满30秒。
 - Complex multi-reference prompt 仍需要 explicit roles。分别分配 identity、scene、style、motion、
   camera、voice、ambience 与 edit-source jobs；reference 含有不需要的 salient properties 时添加
   `must_not_transfer`。

@@ -5,6 +5,9 @@ support、limits、modes 与 surface behavior 的 authority。
 
 ## Use This Dialect
 
+- 单次生成时长上限为**15秒**，不能继承2.5的30秒容量。先按完整行动与回应组织生成分组；
+  超过15秒且用户允许版本择优时，交现有selection owner评估2.5，不截断对白或把连续戏机械切短。
+  当前渠道的exact variant、mode、分辨率和参考限制仍须执行前核实。
 - 优先使用清晰的 visual sequence，不要使用密集 timestamp choreography。Official 2.0 guidance
   提醒 precise timing 可能无法被可靠遵循；除非 exact selected surface 有更强控制的 current evidence，
   否则使用 relative beats。
@@ -26,5 +29,6 @@ accepted/failed output evidence 比较。
 ## Source Boundary
 
 - Official model overview：<https://seed.bytedance.com/en/seedance2_0>
+- Official launch / 15-second output and reference limits：<https://seed.bytedance.com/en/blog/official-launch-of-seedance-2-0>
 - 执行前必须从 AI-VIDEO code、sealed profiles 与 selected surface 重新打开 current API/runtime facts。
 - Community prompt recipes 可以作为 vocabulary，但不是 capability 或 quality 的证明。

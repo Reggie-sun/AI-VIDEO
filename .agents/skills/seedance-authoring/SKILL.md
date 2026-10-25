@@ -1,6 +1,6 @@
 ---
 name: seedance-authoring
-description: Use when an approved AI-VIDEO Shot and preselected Seedance target need prompt and reference authoring or creative repair; consumes exact version, mode, runtime surface, and semantic reference roles without owning runtime dispatch or production state.
+description: Use when an approved AI-VIDEO Shot needs authorized Seedance 2.0/2.5 version-selection advice, prompt and reference authoring, or creative repair; compare duration and reference needs, then consume an exact selected version, mode and surface without owning runtime dispatch or production state.
 ---
 
 # Seedance Authoring
@@ -10,12 +10,47 @@ prompt/reference 专家，不是 Seedance workflow、router、Provider adapter �
 
 ## Trigger Boundary
 
-仅当以下输入全部存在时使用该 Skill：
+具体 prompt/reference authoring 仅在以下输入全部存在时进行；尚未确定版本时，只提供下节的选择建议，
+由 Codex 经现有 capability/profile owner 完成选择，不混用版本语法或猜测运行能力：
 
 - 已批准的 AI-VIDEO `Shot Contract`，或语义完全等价的创作 contract；
 - exact selected Seedance model/profile identity，以及对应 version family（`2.0` 或 `2.5`）；
 - 已预选的 generation mode 和当前 runtime/provider surface；
 - 每个输入 asset 的 semantic reference role 与 transfer intent。
+
+## Authorized Version Selection
+
+用户授权自主选择时，Codex 应根据完整戏剧过程、表演/连续性目标、参考需求、实际质量证据和当前渠道
+能力，在允许的Seedance版本中自行择优；不逐镜重复请用户选型号。本Skill提供建议，确定exact
+model/profile与mode仍归现有capability/selection owner，进入authoring后只加载一个对应overlay。
+用户明确锁定的版本、来源复刻、预算、渠道与审批边界优先；不把自主选择解释为任意换Provider。
+
+当前核实的模型级差异（2026-10-26；实际可执行范围仍须核对selected surface/profile）：
+
+| Capability | Seedance 2.0 | Seedance 2.5 |
+| --- | --- | --- |
+| 单次生成时长上限 | **15秒** | **30秒** |
+| 图片参考上限 | 9张 | 30张 |
+| 视频参考上限 | 3段 | 10段 |
+| 音频参考上限 | 3段 | 10段 |
+
+- 需要15秒以上连续戏、多轮人物互动、复杂多参考、白模/动作参考、连续叙事或局部编辑时，优先评估2.5，
+  让同一片段承载完整行动与回应及有动机的切镜；30秒容量不等于一镜到底，也不是必须凑满。
+- 15秒以内的简单、独立内容可评估2.0，但不能只因片段短就自动降级；必须保住已认可的人物造型、
+  表演、分辨率、声画和接点。价格或速度优势以当前实际证据为准，不预设2.0一定更便宜或短片一定同质。
+- 官方将2.5的长叙事、转场连续性、白模/动作参考及时间戳编辑列为增强方向；这不是精确动作、
+  时间点或物理效果必定成功的承诺，也不取消本任务“不逐句分配对白时间戳”的要求。
+- 分辨率不按版本一概推断：当前Jimeng注册的2.5为480p/720p/1080p，2.0 VIP有720p/1080p/4k，
+  Mini/Fast为720p；不能把渠道输出档位说成全系列原生分辨率，也不只为更大像素牺牲剧情与表演。
+
+版本改变发生在新请求封存前：同步核对模型、mode、时长、分辨率、参考数量/格式/时长、声音与
+compiler表达，再沿原authoring revision、preview、预算和permit执行。不原地改已提交请求、不重置
+累计消费；UNKNOWN不允许借换模型盲重试。当前渠道不支持目标时，保留原目标，重新选择可行版本或
+返回Director调整，不截断到15秒、不隐式换Provider或把原生能力宣传当作渠道已实现。
+
+依据：[2.0官方发布](https://seed.bytedance.com/en/blog/official-launch-of-seedance-2-0)、
+[2.5官方发布](https://seed.bytedance.com/en/blog/one-take-creation-flexible-referencing-introducing-seedance-2-5)，
+以及当前`src/ai_video/production/jimeng_models.py`。没有实际A/B证据时，不将版本宣传差异当作本项目质量结论。
 
 如果缺失事项属于其他 owner，先按以下规则 route：
 

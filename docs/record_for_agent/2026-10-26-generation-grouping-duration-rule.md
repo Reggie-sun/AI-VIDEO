@@ -21,3 +21,13 @@ Skill quick_validate通过；open-video、Seedance authoring、docs contract与a
 本轮policy-audit实测仍列出既有八个未映射路径、其中四个未登记测试（Jimeng qualification trial、preview source clock、qualification preview input、watermark preset）。相关policy与这些路径未在本轮修改；不为消除baseline失败扩围或放宽Gate。本轮exact staged related Harness receipt入口为`.agent/harness/runs/generation-grouping-duration-rule-20261026/receipt.json`；按其实际结果报告，不能把直接测试通过说成完整Harness通过。
 
 本轮规则修改没有新增Provider/生成/分析付费调用、没有发布。用户指示前已有S03首发结果只保留，不在此规则修改中改判为合格或继续处理。record-ai-video-session评估为recorded；distill-ai-video-learning为no_candidate：本轮是用户直接授权的原则与Skill路由修改，不是独立重复媒体实验或自动学习采纳。Parent Risk Gate为NATIVE_REVIEW_NOT_REQUIRED：仅现有advisory规则与引用更新、可逆且无runtime/权限/预算变更，已执行对应检查。
+
+## Follow-Up — Authorized Seedance Version Selection
+
+用户追加“seedance 2.0只有15s最大时常也要写,2.5才是最多30s.我希望你能自己切换”，并要求将所附比较写入Skill。该新授权允许Codex在本任务的2.0/2.5之间择优，不再沿用此前只选2.5作为不可变偏好；仍保持原Jimeng Provider、质量目标、预算与已封存请求边界，不等于运行时隐式fallback。
+
+已核对[2.0官方发布](https://seed.bytedance.com/en/blog/official-launch-of-seedance-2-0)与[2.5官方发布](https://seed.bytedance.com/en/blog/one-take-creation-flexible-referencing-introducing-seedance-2-5)，当前`jimeng_models.py`亦一致：单次15/30秒，图片9/30、视频3/10、音频3/10。官方将2.5的长叙事、多模态/白模/动作参考与编辑控制列为增强方向；Skill区分这些官方能力说明、当前渠道可执行范围与本项目尚未做的A/B质量结论。分辨率保留variant差异，不把2.0全系说成原生4K，不为短片自动选低分辨率Mini。
+
+修改`seedance-authoring`的description与入口：尚未确定exact版本时可提供授权选择建议，具体authoring仍须先由原capability/profile owner确定版本、mode与surface，再只加载对应overlay。复杂连续戏、多参考或超过15秒优先评估2.5；简单独立且≤15秒可评估2.0，但必须保住造型、表演、分辨率、声画与接点，不预设价格/速度优势。两个overlay分别明确15秒/30秒上限，保留同片多摄影镜头、不强凑上限、禁止逐句卡时与UNKNOWN不换模盲重试。
+
+Skill quick_validate及相同四文件123项直接检查通过；属于Skill建议与Codex执行判断更新，没有新增runtime路由、模型注册或权限，没有真实换模调用或新增费用。exact staged related Harness receipt为`.agent/harness/runs/seedance-version-choice-skill-20261026/receipt.json`，仍按实际结果区分直接检查和既有policy baseline阻断。record/learning评估仍为recorded/no_candidate；这是用户直接授权的修改，不将截图、官方宣传或一次本地结果当作模型质量已验证。
