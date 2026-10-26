@@ -251,11 +251,19 @@ def derive_generation_interventions(*, projection, candidates, history, policy,
         elif failure_streak >= policy.repeated_failure_threshold:
             failed_dimensions = {r.dimension for r in current.recipe.expressions
                                  if r.requirement_id in current_estimate.failed_requirements}
-            disposition = "SPLIT_SHOT" if len(failed_dimensions) > 1 else "CAPABILITY_BOUNDARY"
+            reference_intent = projection.requirement.generation_intent.reference_planning
+            keep_continuous = reference_intent is not None and reference_intent.structure == "continuous"
+            disposition = "SPLIT_SHOT" if len(failed_dimensions) > 1 and not keep_continuous else "CAPABILITY_BOUNDARY"
             purpose, changed = "production_repair", ("generation_strategy",)
             hypothesis = "Repeated comparable failures require authoring/recipe feasibility review before another sample."
         elif history.baseline_request is None:
             return (), conflicts
+        reference_hypothesis = hypothesis
+        if projection.requirement.generation_intent.reference_planning is not None:
+            from ai_video.production.reference_strategy import reference_revision_advice
+
+            reference_hypothesis += " " + " ".join(reference_revision_advice(diagnosis,
+                current.recipe.expressions, projection.requirement.generation_intent))
         proposals.append(Intervention(
             intervention_id="feedback-v1-" + canonical_sha256({"candidate": candidate.candidate_id,
                                 "disposition": disposition, "closes": diagnosis.failed_requirements})[:20],
@@ -267,7 +275,7 @@ def derive_generation_interventions(*, projection, candidates, history, policy,
             uncontrolled_variables=("seed",) if prior.candidate.recipe.seed.kind == "uncontrolled"
                 or candidate.recipe.seed.kind == "uncontrolled" else (),
             regression_risks=diagnosis.preserved_requirements,
-            hypothesis=hypothesis, confidence_basis="generation-feedback-policy/1; exact evaluator observations",
+            hypothesis=reference_hypothesis, confidence_basis="generation-feedback-policy/1; exact evaluator observations",
             improvement_prediction="Target requirements become PASS with required proof; all protected requirements remain PASS.",
             falsification_prediction="Any target remains FAIL or a protected requirement becomes FAIL.",
             insufficient_evidence_condition="Missing/stale/stage-incompatible proof is undetermined, never a successful repair.",
@@ -365,7 +373,8 @@ class GenerationFeedbackOrchestrator:
         decision = VideoGenerationResolver().resolve_requirement(**arguments, inputs=inputs,
             source_project=current.get("source_project"))
         if decision.disposition != "GENERATE_ONCE":
-            return PreparedGeneration(inputs, decision, target_shot_id=current["context"].target_shot_id)
+            return PreparedGeneration(inputs, decision, target_shot_id=current["context"].target_shot_id,
+                requirement=projection.requirement)
         from ai_video.production.performance_authoring import require_performance_authoring
 
         require_performance_authoring(projection.requirement, current["acceptance"])

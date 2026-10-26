@@ -731,6 +731,14 @@ def compile_provider_video_request(
         if native_prompt is not None
         else _compile_neutral_prompt(requirement)
     )
+    from ai_video.production.reference_strategy import reference_execution_gaps, reference_prompt_issues
+
+    reference_gaps = reference_execution_gaps(requirement, capability)
+    reference_paths = reference_prompt_issues(requirement, prompt)
+    if reference_gaps or reference_paths:
+        return _unsupported(provider_bound, requirement,
+            ProviderRequirementUnsupportedReason.NATIVE_CONTROL_UNSUPPORTED,
+            reference_paths or ("generation_intent.reference_planning",))
     recipe = provider_bound.generation_recipe
     if recipe is not None:
         if native_prompt is None:

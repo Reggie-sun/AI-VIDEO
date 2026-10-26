@@ -91,6 +91,8 @@ class MotionRequirement(str, Enum):
 
 
 class ReasonCode(str, Enum):
+    REFERENCE_PLAN_APPLIED = "reference_plan_applied"
+    REFERENCE_PLAN_UNSATISFIED = "reference_plan_unsatisfied"
     IMPORTANT_CHARACTER = "important_character"
     IDENTITY_REQUIRED = "identity_required"
     CONTINUITY_REQUIRED = "continuity_required"
@@ -127,6 +129,7 @@ class ReasonCode(str, Enum):
 
 
 class PlanWarning(str, Enum):
+    REFERENCE_PLAN_REQUIRES_REVISION = "reference_plan_requires_revision"
     MISSING_CHARACTER_REFERENCE = "missing_character_reference"
     MISSING_SCENE_REFERENCE = "missing_scene_reference"
     MISSING_TERMINAL_FRAME = "missing_terminal_frame"
@@ -508,6 +511,15 @@ class VideoGenerationPlan(StrictModel):
             return GenerationMode(self.generation_requirement.generation_mode.value)
         assert self.legacy_generation_mode is not None
         return self.legacy_generation_mode
+
+    @property
+    def reference_plan(self):
+        """Derived advice; never a second sealed planning truth."""
+        if self.generation_requirement is None:
+            return None
+        from ai_video.production.reference_strategy import reference_strategy_report
+
+        return reference_strategy_report(self.generation_requirement)
 
     @property
     def continuity_mode(self) -> ContinuityMode:

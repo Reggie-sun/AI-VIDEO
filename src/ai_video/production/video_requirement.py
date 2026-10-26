@@ -21,6 +21,7 @@ from ai_video.production._video_continuity import C4MultiAnchorBinding
 from ai_video.production.voice_routing_contracts import VoiceRoutingRequirement
 from ai_video.production.video_transition import CausalDimension
 from ai_video.production.performance_direction import PerformanceIntent
+from ai_video.production.reference_planning_contracts import ReferencePlanningIntent
 
 
 _REQUIREMENT_CONTRACT_VERSION = "provider-neutral-video-requirement/1"
@@ -551,6 +552,7 @@ class MusicIntent(StrictModel):
 
 
 class GenerationIntent(StrictModel):
+    reference_planning: ReferencePlanningIntent | None = None
     open_state: TypedStateReference = Field(default_factory=TypedStateReference)
     close_state: TypedStateReference = Field(default_factory=TypedStateReference)
     close_causal_facts: dict[CausalDimension, str] | None = None
@@ -617,6 +619,7 @@ class GenerationIntent(StrictModel):
     ) -> dict[str, object]:
         data = handler(self)
         for field in (
+            "reference_planning",
             "close_causal_facts",
             "performance_intent",
             "visual_treatment",

@@ -1010,6 +1010,14 @@ Harness check owner为`drama_authoring_source_binding_tests`；实际当前run�
 
 ## Canonical API Entry Points
 
+### Shot Reference Planning
+
+`GenerationIntent.reference_planning` 是 Director 的可选组合语义声明；`reference_planning_contracts.py` 定义其事件/职责契约，`reference_planning.py::plan_shot_references()` 派生参考需求、关键状态及风险。`planning/_reference_planning.py` 仅在既有 Planner/asset-readiness seam 精选已验证素材，影响 mode、outcome 和 neutral requirement；`reference_strategy.py` 为既有 Router/compiler 提供语义能力检查及基于 QA diagnosis 的修正建议。Canvas preflight 与 prepared-generation report 消费同一派生报告，详情见 [Shot Reference Planning](shot-reference-planning.md)。
+
+禁止按固定秒数计算图片量、把持久资产计入时间密度、把规划图数或 Provider 上限当上传数量、把普通 reference 当精确时间控制、以静态图替代连续运动约束、自动拆分声明为 continuous 的 Shot，或另建 capability Registry/timeline/committer。未知或未支持的控制、缺少 required reference、素材职责冲突均显式阻断；QA 建议不授权重试或改变已验收项。缺省字段省略保留历史封存语义，旧输入只得到 advisory 规划，不追溯改写历史请求。检查归 `reference_planning_tests` 与现有 Planner/Router/compiler/feedback suites；不证明真实模型服从或媒体质量。
+
+### Existing Canonical Entries
+
 本节只约束容易混淆 normal business entry 与 internal seam 的跨 owner、effectful、durable、replay/recovery-sensitive API。`Allowed Caller` 描述谁可以进入该 seam；它不同于上表描述谁拥有 implementation 或 durable truth。Package export、public method、类型可构造或 test 中直接调用均不自动构成 normal Production caller authorization。
 
 `Effect Class` 只使用 `PURE`、`READ_ONLY`、`LOCAL_EFFECT`、`EXTERNAL_EFFECT`、`PAID_EXTERNAL_EFFECT`、`DURABLE_WRITE`、`RECOVERY` 作为认知标签，不是 authorization、完整 effect accounting 或新 gate。多阶段 entry 可以列出多个 class；durable mutation 仍只归 `ProductionStateCommitter`。

@@ -578,6 +578,15 @@ class VideoGenerationResolver:
         decision = enforce_c4_requirement_gate(
             requirement, context, capabilities, selected_capability_id, decision
         )
+        from ai_video.production.reference_strategy import reference_execution_gaps
+
+        reference_variant = next((v for v in capabilities.variants if v.capability_id == selected_capability_id), None)
+        reference_gaps = reference_execution_gaps(requirement, reference_variant)
+        if reference_gaps and decision.outcome is RoutingOutcome.SELECTED:
+            decision = as_capability_blocked(decision,
+                reason_code=RouterReasonCode.PROVIDER_CAPABILITY_DENIED,
+                outcome=RoutingOutcome.BLOCKED_CAPABILITY,
+                rationale="Reference strategy cannot execute: " + ", ".join(reference_gaps))
         unsupported = requirement_route_is_unsupported(
             requirement, context, expected_mode, decision, output_requirement
         )

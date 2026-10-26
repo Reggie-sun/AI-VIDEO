@@ -55,6 +55,8 @@ def canvas_reference_preflight(*, packet, direction, registry, qa_policy=None,
     from ai_video.production.production_responsibility import production_responsibility_report
     from ai_video.production.performance_authoring import performance_authoring_report
     from ai_video.canvas_visual_style import visual_style_report
+    from ai_video.production.reference_planning import reference_plan_report
+    from ai_video.production.video_requirement import GenerationIntent
 
     authored = {shot.shot_id: shot for shot in authored_shots}
     assets = {asset.asset_id: asset for asset in registry.assets}
@@ -120,6 +122,8 @@ def canvas_reference_preflight(*, packet, direction, registry, qa_policy=None,
         candidate_video_asset_ids = [reference["asset_id"] for reference in generation_references
             if reference.get("role") == "existing_video"]
         shots.append({"occurrence_id": row["occurrence_id"], "shot_id": shot["shot_id"],
+            "reference_planning": (reference_plan_report(GenerationIntent.model_validate(generation["generation_intent"]))
+                if generation.get("generation_intent") is not None else "NOT_EVALUATED"),
             "visual_style_control": visual_style_report(row, registry),
             "performance_control": performance_authoring_report(
                 intent=generation.get("generation_intent"),

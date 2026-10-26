@@ -248,6 +248,11 @@ def _dynamic_decision(
     if motion is MotionRequirement.GRAPHIC:
         return GenerationMode.HYBRID, PlanOutcome.PROPOSED, ()
 
+    if request.generation_intent is not None and request.generation_intent.generation_intent.reference_planning is not None:
+        from ai_video.planning._reference_planning import reference_planning_decision
+
+        return reference_planning_decision(request, continuity, reasons, warnings)
+
     important_character = bool(request.target_shot.character_ids)
     declared_roles = (
         request.generation_intent.semantic_reference_roles
@@ -523,6 +528,13 @@ def _build_generation_requirement(
         )
     )
     required_role_set = set(required_roles)
+    execution_assets = request.available_assets
+    if (projection.generation_intent.reference_planning is not None
+            and request.target_shot.visual_strategy in {VisualStrategy.GENERATED_VIDEO, VisualStrategy.HYBRID}
+            and request.commercial_execution_projection is None):
+        from ai_video.planning._reference_planning import planned_reference_assets
+
+        execution_assets, _ = planned_reference_assets(request, continuity)
     evidence = tuple(
         RequirementAssetEvidence(
             role=_semantic_role(asset.role),
@@ -537,7 +549,7 @@ def _build_generation_requirement(
             duration_millis=asset.duration_millis,
             fps=asset.fps,
         )
-        for asset in request.available_assets
+        for asset in execution_assets
         if _semantic_role(asset.role) in required_role_set
         and any(
             _available_role(request, item.role)
@@ -744,6 +756,13 @@ class VideoPlanner:
             if request.planning_contract_version == self.CONTRACT_VERSION
             else None
         )
+        if requirement is not None:
+            from ai_video.production.reference_strategy import reference_execution_gaps
+
+            if reference_execution_gaps(requirement):
+                outcome = PlanOutcome.BLOCKED
+                _append_unique(reasons, ReasonCode.REFERENCE_PLAN_UNSATISFIED)
+                _append_unique(warnings, PlanWarning.REFERENCE_PLAN_REQUIRES_REVISION)
         plan_values: dict[str, object] = {
             "source_request_content_hash": request.request_content_hash,
             "target_shot_id": request.target_shot.shot_id,

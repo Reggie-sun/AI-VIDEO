@@ -94,6 +94,10 @@ fallback_check_ids:
   - task_architecture_gate
 
 checks:
+  reference_planning_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_reference_planning.py, tests/test_reference_planning_integration.py, -q]
+    cwd: .
+    description: Verify semantic reference planning, canonical Canvas handoff, capability constraints and evidence-scoped feedback without Provider effects.
   assembly_review_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_agent_harness_assembly.py, tests/test_junction_review_gate.py, -q]
     cwd: .
@@ -508,6 +512,23 @@ checks:
     description: Report repository health against the version-controlled architecture baseline.
 
 categories:
+  shot_reference_planning:
+    patterns:
+      - src/ai_video/production/reference_planning.py
+      - src/ai_video/production/reference_planning_contracts.py
+      - src/ai_video/production/reference_strategy.py
+      - src/ai_video/planning/_reference_planning.py
+      - tests/test_reference_planning.py
+      - tests/test_reference_planning_integration.py
+      - docs/shot-reference-planning.md
+    focused_check_ids: [reference_planning_tests]
+    check_ids:
+      - reference_planning_tests
+      - video_planner_tests
+      - provider_neutral_video_requirement_tests
+      - generation_feedback_tests
+      - canvas_reference_packet_tests
+      - task_architecture_gate
   assembly_review:
     patterns:
       - scripts/agent_harness_assembly.py

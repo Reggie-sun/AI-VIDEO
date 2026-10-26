@@ -211,6 +211,11 @@ def _unexpressed_authored_text(requirement, prompt, control_paths):
             return
         if path in control_paths:
             return
+        if path == "generation_intent.reference_planning":
+            from ai_video.production.reference_strategy import reference_prompt_issues
+
+            errors.extend(reference_prompt_issues(requirement, prompt))
+            return
         if isinstance(node, dict):
             for key, value in node.items():
                 if key.endswith(("_id", "_ids")) or key in {"kind", "state_hash"}:
