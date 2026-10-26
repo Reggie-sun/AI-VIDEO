@@ -39,6 +39,8 @@
 
 原片认可后自动制作并验收字幕，句尾不加符号；每个新 Shot 合格后，自动拼接截至该镜的全部合格镜头交用户连续审看。
 
+商品广告生成与最终交付固定使用720p，不得自行升至1080p或4K；具体规格见[广告制作要求](.agents/skills/ecommerce-ad-workflow/SKILL.md#fixed-720p-output)。
+
 ### Empirical Validation Priority
 
 Model-quality uncertainty 主导且有安全、有界、已授权或 local exemption、可负担、可归因的最小实验时，先取证再扩建验证工程；用户要求先 contract 时遵从。实验不产生 Production qualification/activation/P6/Final Acceptance/release/replay truth。

@@ -20,6 +20,10 @@ description: Use when an ecommerce, SKU, product advertising, direct-response pr
 - Runtime handoff export 只有在 exact `DeliveryProfile`、reviewed `EcommerceVisualSystemProfile`、per-ad `EcommerceLayoutPlan` 与只绑定这些 identity 的 `EcommerceProductionCompileProfile` 同时存在时才允许。Exporter 不生成通用布局默认值，也不以 schema-valid 代替 preview / visual review。
 - CTR、CVR、CPA、ROAS、hold rate、retention与其他market outcome属于future empirical feedback，不得由package validity、Ad QC或Production Final Acceptance预测。
 
+## Fixed 720p Output
+
+商品广告生成与最终交付固定使用 `720p`：竖版 `9:16` 为 `720×1280`，横版 `16:9` 为 `1280×720`；提交前核对 selected generation profile、实际请求与最终 `DeliveryProfile` 一致。不得自行升至 `1080p` / `4K`，也不安排720p试片后再升档重生成。模糊须从原生取景、对焦、素材或剪辑修复，不以提高输出分辨率代替；模型不支持720p时报告能力缺口，不静默换规格或模型。历史 sealed requests、媒体与消费账本保持原样，本要求不触发自动重生成。
+
 ## Decision Sequence
 
 需要发展广告角度、Hook、创意形式或文案变体时，在 G0 已核实资料范围内按需读取
