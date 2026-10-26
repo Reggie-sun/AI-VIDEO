@@ -6,6 +6,12 @@ learning_eligibility: ineligible
 
 # Shizhen S04 Preparation And Audio Unknown
 
+## Reference Supplement After User Review
+
+用户指出只有两张取帧不够后，实际补做两张Shot4动作关键帧：`S04/references/03-check-side-passage.png`（保持右手近身持手机，查看既有侧通道）与 `04-phone-lowered-look-to-rider.png`（同一右手手机降低至髋侧，头/视线转向画外骑手）。两次image_gen均已取得明确结果、复制到任务目录并实际查看；瓶直立、枪落台且在瓶左、饭团仍在白纸，店员没有重现。source.json保存实际输入图hash、完整prompt、输出hash/尺寸及工具原始路径；帧间运动、声音、口型或人类接受仍未验证。当前共4张，前2张actual取帧、后2张拟定动作图；`S04-intent.draft.json`与`reference-evidence.json`已同步4个planned参考，不代表视频模型已收到素材。
+
+本次补图新增image调用2、video0、audio0，图像费用未暴露；原声音UNKNOWN/已消费permit保留，未重试、未生成Shot4。下方“两张/无额外图像调用”是补图前检查点，已由本节更新参考准备状态。模型兼容性与S03 Gate阻断不因参考变多而解除。
+
 ## Current Result
 
 用户明确“开始shot 4”。S04真人镜头意图与两张actual source参考已准备，GenerationIntent结构验证通过；未提交S04视频。不是已完成镜头，也不是只凭工具成功签PASS。当前硬阻断为S03-005声音补证的已消费调用UNKNOWN，不能盲重试。

@@ -6,6 +6,8 @@
 
 ## Preparation And Route
 
+用户复核后已实际补做侧通道检查中态和手机降低/转向画外骑手末态两图，现在是2张actual取帧加2张生成动作图，共4张planned参考。具体hash、输入与职责归S04目录的reference-evidence/source记录；静态参考不能证明连续动作，视频仍未提交。
+
 当前草稿为约10秒完整行动/回应，两机位同侧服务查找对象。实际两图为S03-005末尾近景与4.5秒柜台物件/场景，后一图不能迁移更早的受惊表情、站姿或举手机姿态。目录 `runs/shizhen-episode01-jimeng25-20261025-001/live-action-regeneration-01/S04/`。
 
 2.0 VIP渠道当前支持10秒/1080p/多图，原生只读报价330credits；这不等于已扣费或完整可执行。当前common compiler仅接受2.5的无时间戳conversation，原S04不应通过强塞逐句时间戳来适配2.0；exact模型/模式仍未封存，恢复后先在既有能力owner选择兼容路线或完成必要适配，不隐式换Provider。
