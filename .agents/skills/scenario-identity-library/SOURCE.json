@@ -1,0 +1,10 @@
+{
+  "repository": "https://github.com/scenario-labs/skills",
+  "commit": "e0a051cd6e3a7ce3b27b607f4f859611de0c49df",
+  "path": "skills/scenario-identity-library",
+  "license": "MIT",
+  "upstream_files_sha256": {
+    "SKILL.md": "686ca20080a8e4fae1543f1f795662a0a1609692655811c6eca546ca19eeb085"
+  },
+  "local_adaptation": "SKILL.md is the AI-VIDEO scoped entry; original SKILL.md preserved byte-for-byte as UPSTREAM.md. Other upstream files unchanged."
+}

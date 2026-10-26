@@ -47,6 +47,13 @@ For staging, performance or physical action, load only the relevant section of
 to the same approved story and coverage; they do not dispatch one another or execute production.
 Skip upstream development for an already approved source or a bounded local repair.
 
+When reference assets are missing, use the [identity reference specialist](../scenario-identity-library/SKILL.md)
+for character/prop views and the [storyboard reference specialist](../scenario-seedance-storyboard/SKILL.md)
+for action-state images and clean keyframes. Assess and prepare missing references before video authoring;
+one complete opening image does not by itself cover contact, release, landing or reaction states.
+These specialists keep approved coverage and return assets to the existing authoring/Registry owners;
+they do not add a generation workflow or require a fixed image count.
+
 For object handling, placement, transfer, loss of support or collision, apply
 [Physical Action Continuity](references/event-led-timing.md#physical-action-continuity)
 before authoring, even when duration and generation grouping are unchanged.

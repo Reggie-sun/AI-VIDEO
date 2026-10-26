@@ -123,6 +123,11 @@ support、role cardinality 与 transport mapping 仍是 deterministic runtime fa
    输入的 semantic roles。缺少字段时显式标记，不得用 heuristic 补全。
 2. 建立 reference-role map。对每个输入保留现有 identity 与 state：`primary_role`、允许的
    `transfers` 和 `must_not_transfer` constraints。
+   先核对动作/身份所需参考是否缺失；需要制作图片时交
+   [identity preparation](../scenario-identity-library/SKILL.md) 或
+   [action-state/storyboard preparation](../scenario-seedance-storyboard/SKILL.md)，返回实际图片后
+   再绑定。不得只给现有单图分配角色就假定参考充分；制图素材不等于实际视频输入，按当前
+   首帧/首尾帧/全模态模式核验真正的素材列表与顺序，不以画布摆放或文字提及代替绑定。
 3. 来源保留任务输出封存原 prompt，按 `references/authoring-common.md` 的 Generation Input Boundary
    核对实际输入与差异；结构化 Shot 不自动授权扩写。仅已授权创作/优化才从 approved Shot 起草
    subject、visible action、scene、spatial relation、camera、lighting、audio intent、chronology 与

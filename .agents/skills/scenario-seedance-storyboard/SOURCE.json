@@ -1,0 +1,14 @@
+{
+  "repository": "https://github.com/scenario-labs/skills",
+  "commit": "e0a051cd6e3a7ce3b27b607f4f859611de0c49df",
+  "path": "skills/scenario-seedance-storyboard",
+  "license": "MIT",
+  "upstream_files_sha256": {
+    "README.md": "cfcc37b0b61f6626def3c0a264f6090789e1c67b09ef0cbae01e29f101afe82b",
+    "SKILL.md": "cc65205cf158e1a4282994fd439805d4d92b877327b823ef917a582937e5a117",
+    "references/video-prompt.md": "f5f78b9431538cc7989f304311e5ee5c8ee805fd01a704889a8c4687382c16f4",
+    "references/board-craft.md": "08fb8661a945bc1af31c87e7d8118cd607f192dfedab2b6b1c70593bdb323b52",
+    "references/chained-lane.md": "9e4e934ccacb6a4de2b0ea514f39001fec3449d915f5db9802073a4188396bf8"
+  },
+  "local_adaptation": "SKILL.md is the AI-VIDEO scoped entry; original SKILL.md preserved byte-for-byte as UPSTREAM.md. Other upstream files unchanged."
+}
