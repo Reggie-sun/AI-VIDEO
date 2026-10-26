@@ -1,33 +1,29 @@
 {
-  "created_at": "2026-10-26T21:55:17.246751+00:00",
-  "operation": "copy_only",
+  "created_at": "2026-10-26T21:57:15.770590+00:00",
+  "project": "失帧",
+  "operation": "copy_only_shizhen",
   "source_roots": [
-    "runs",
-    "outputs",
-    "artifacts",
-    "docs"
+    "runs/shizhen-*",
+    "outputs/shizhen-episode01"
   ],
-  "selection": "Registry image records, explicit reference/input/image directories, and reference filenames; filename-only QA contact sheets excluded. No external directories scanned.",
-  "source_count": 2608,
-  "unique_image_count": 399,
-  "duplicate_source_count": 2209,
-  "copied_bytes": 620679032,
-  "index_sha256": "22f4380eb8ab19e9528fe31671a18f3ca953132e6b5a9abaf0923988c4818286",
+  "source_count": 338,
+  "unique_image_count": 48,
+  "duplicate_source_count": 290,
+  "copied_bytes": 111377810,
+  "removed_other_project_copies": 351,
+  "index_sha256": "726465f6e511f3318ea05f0c7ff9511ce415967b59945adea8ec6ac2d66b8f4d",
   "verification": {
     "all_destination_sha256_match": true,
     "all_sources_rechecked": true,
-    "original_files_preserved": true
+    "original_files_preserved": true,
+    "only_shizhen_sources": true
   },
   "production_binding_changes": 0,
   "media_publication": "local_only",
   "engineering_harness": {
     "verification_level": "focused",
     "status": "NOT_EVALUATED",
-    "reason": "No focused module mapping for referces/.gitignore, referces/index.csv, referces/verification.json; no test suite expansion.",
+    "reason": "No focused mapping for archive metadata; copy integrity verified directly.",
     "receipt": null
-  },
-  "native_review": {
-    "decision": "NATIVE_REVIEW_NOT_REQUIRED",
-    "basis": "Copy-only local image archive; original Production files and bindings unchanged; destination and source hashes verified."
   }
 }
