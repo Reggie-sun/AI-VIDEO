@@ -1091,6 +1091,33 @@ test("catalog and detail are GET-only, no-store, and sanitize internal media pat
   assert.equal(method.res.headers.get("allow"), "GET");
 });
 
+test("preparation catalog registers exact image previews without a Project and rejects changed bytes", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-preparation-"));
+  const source = path.join(root, "runs/demo/S05/references/frame.png");
+  await mkdir(path.dirname(source), { recursive: true });
+  const bytes = Buffer.from("exact-preparation-image");
+  await writeFile(source, bytes);
+  const token = "preparation-image-token";
+  const media = { token, mime_type: "image/png", sha256: createHash("sha256").update(bytes).digest("hex"), bytes: bytes.length };
+  const handler = createRunsApiHandler({ repoRoot: root, runProjector: async () => ({
+    workspaces: [], preparations: [{ id: "demo/S05", binding_status: "unbound_local_files", references: [{ file_name: "frame.png", media }] }],
+    _media: { [token]: { ...media, source_path: source } },
+  }) });
+  const catalog = await invoke(handler, request("GET", "/api/runs"));
+  assert.equal(catalog.res.statusCode, 200);
+  assert.doesNotMatch(catalog.res.body.toString(), /source_path|_media/);
+  assert.equal(catalog.res.body.toString().includes(root), false);
+  const image = await invoke(handler, request("GET", `/api/runs/media/${token}`));
+  assert.equal(image.res.statusCode, 200);
+  assert.deepEqual(image.res.body, bytes);
+  await writeFile(source, Buffer.alloc(bytes.length, 120));
+  const changed = await invoke(handler, request("GET", `/api/runs/media/${token}`));
+  assert.notEqual(changed.res.statusCode, 200);
+  const refreshed = await invoke(handler, request("GET", "/api/runs"));
+  assert.equal(JSON.parse(refreshed.res.body).preparations[0].references[0].media.token, undefined);
+  handler.close();
+});
+
 test("external media catalog is parallel to runs, source-qualified, and never leaks allowlist roots", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "provider-console-external-api-"));
   const sourceRoot = path.join(root, "artifacts");

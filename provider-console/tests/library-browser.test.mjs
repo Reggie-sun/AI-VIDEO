@@ -34,7 +34,7 @@ test("default browser offers one cross-source search, records and explicit follo
     const { LibraryBrowser, ExactPlayer, StatusSummary } = await server.ssrLoadModule("/src/library-browser.jsx");
     const { VideoLibraryRail } = await server.ssrLoadModule("/src/video-library-rail.jsx");
     const { MediaFolderButton } = await server.ssrLoadModule("/src/media-folder.jsx");
-    const { GenerationActivity, generationActivity } = await server.ssrLoadModule("/src/generation-activity.jsx");
+    const { GenerationActivity, generationActivity, PreparationActivityDetail } = await server.ssrLoadModule("/src/generation-activity.jsx");
     const details = [{ status: "valid", workspace: "current/project.yaml", project: { title: "当前作品" }, attempts: [
       { attempt_id: "live", target_shot_id: "S02", started_at: "2026-10-27T10:00:00Z", status: "running", phase: "polling" },
       { attempt_id: "review", target_shot_id: "S01", started_at: "2026-10-27T09:00:00Z", status: "running", phase: "validate" },
@@ -49,6 +49,18 @@ test("default browser offers one cross-source search, records and explicit follo
     assert.match(waiting, /等待验证/);
     assert.match(renderToStaticMarkup(React.createElement(GenerationActivity, { details, stale: true })), /状态可能已过期/);
     assert.deepEqual(generationActivity([{ ...details[0], status: "recovered_video_evidence" }]), []);
+    const preparation = { id: "demo/S05", kind: "local_preparation", directory_name: "S05", run_id: "demo", source_directory: "demo/S05", updated_at: "2026-10-27T11:00:00Z", binding_status: "unbound_local_files", references: [{ file_name: "terminal.png", relative_path: "demo/S05/references/terminal.png", media: { token: "prepared-image", mime_type: "image/png" } }] };
+    const preparing = renderToStaticMarkup(React.createElement(GenerationActivity, { details: [], preparations: [preparation] }));
+    assert.match(preparing, /S05 · demo/);
+    assert.match(preparing, /本地参考准备 · 未关联生成请求/);
+    assert.doesNotMatch(preparing, /正在生成|Shot 执行中/);
+    const both = renderToStaticMarkup(React.createElement(GenerationActivity, { details, preparations: [preparation] }));
+    assert.match(both, /S02 · 当前作品/);
+    assert.match(both, /S05 · demo/);
+    const preparingDetail = renderToStaticMarkup(React.createElement(PreparationActivityDetail, { preparation }));
+    assert.match(preparingDetail, /src="\/api\/runs\/media\/prepared-image"/);
+    assert.match(preparingDetail, /不代表已登记的 Shot/);
+    assert.match(renderToStaticMarkup(React.createElement(PreparationActivityDetail)), /已不在当前扫描范围/);
     const folder = renderToStaticMarkup(React.createElement(MediaFolderButton, { entry: { available: true, url: "/api/runs/media/exacttoken" } }));
     assert.match(folder, /打开所在文件夹/);
     assert.doesNotMatch(folder, /disabled/);

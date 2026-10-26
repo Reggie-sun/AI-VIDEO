@@ -86,6 +86,83 @@ def _production_workspace(root: Path, relative: str) -> Path:
     return project
 
 
+def test_catalog_exposes_preparation_images_without_a_production_workspace(tmp_path):
+    runs = tmp_path / "runs"
+    image = _write(runs / "demo/S05/references/terminal.png", b"prepared-reference")
+    _write(image.parent.parent / "private-profile.json", b'{"secret":"DO_NOT_PROJECT"}')
+    result = provider_console.catalog_runs(runs)
+    assert result["workspaces"] == []
+    preparation, = result["preparations"]
+    assert preparation["directory_name"] == "S05"
+    assert preparation["binding_status"] == "unbound_local_files"
+    assert "shot_id" not in preparation
+    reference, = preparation["references"]
+    assert reference["relative_path"] == "demo/S05/references/terminal.png"
+    assert reference["media"]["sha256"] == hashlib.sha256(image.read_bytes()).hexdigest()
+    assert "DO_NOT_PROJECT" not in json.dumps(result)
+    assert not (image.parent.parent / "project.yaml").exists()
+    old_token = reference["media"]["token"]
+    image.write_bytes(b"changed-reference")
+    refreshed = provider_console.catalog_runs(runs)["preparations"][0]
+    assert refreshed["references"][0]["media"]["token"] != old_token
+
+
+def test_preparation_projection_rejects_links_oversize_and_non_reference_files(tmp_path, monkeypatch):
+    from ai_video import provider_console_preparation as preparation
+
+    runs = tmp_path / "runs"
+    outside = _write(tmp_path / "outside.png", b"outside")
+    reference_dir = runs / "demo/S05/references"
+    reference_dir.mkdir(parents=True)
+    (reference_dir / "link.png").symlink_to(outside)
+    os.link(outside, reference_dir / "hardlink.png")
+    _write(reference_dir / "large.png", b"x" * 10)
+    _write(runs / "demo/S05/not-a-reference.png", b"ignored")
+    monkeypatch.setattr(preparation, "_MAX_IMAGE_BYTES", 8)
+    result = provider_console.catalog_runs(runs)
+    assert result["preparations"] == []
+    assert result["_media"] == {}
+    assert result["preparations_truncated"] is True
+    with pytest.raises(ValueError):
+        preparation._read_image(reference_dir / "link.png", runs.resolve(), [100])
+
+
+def test_preparation_projection_bounds_groups_images_and_bytes(tmp_path, monkeypatch):
+    from ai_video import provider_console_preparation as preparation
+
+    runs = tmp_path / "runs"
+    for group in range(3):
+        for index in range(3):
+            image = _write(runs / f"demo/S0{group}/references/{index}.png", b"abcd")
+            os.utime(image, (100 + group + index / 10, 100 + group + index / 10))
+    monkeypatch.setattr(preparation, "_MAX_GROUPS", 2)
+    monkeypatch.setattr(preparation, "_MAX_IMAGES", 2)
+    monkeypatch.setattr(preparation, "_MAX_TOTAL_BYTES", 12)
+    result = provider_console.catalog_runs(runs)
+    assert [row["directory_name"] for row in result["preparations"]] == ["S02", "S01"]
+    assert [len(row["references"]) for row in result["preparations"]] == [2, 1]
+    assert result["preparations_truncated"] is True
+    assert sum(row["bytes"] for row in result["_media"].values()) == 12
+
+
+def test_preparation_changed_during_read_is_rejected_and_charges_read_budget(tmp_path, monkeypatch):
+    from ai_video import provider_console_preparation as preparation
+
+    image = _write(tmp_path / "demo/S05/references/frame.png", b"abcd")
+    original_read = os.read
+
+    def change_after_read(fd, count):
+        chunk = original_read(fd, count)
+        image.write_bytes(b"changed")
+        return chunk
+
+    monkeypatch.setattr(preparation.os, "read", change_after_read)
+    budget = [4]
+    with pytest.raises(ValueError, match="changed"):
+        preparation._read_image(image, tmp_path, budget)
+    assert budget == [0]
+
+
 def _ns(**values):
     return SimpleNamespace(**values)
 

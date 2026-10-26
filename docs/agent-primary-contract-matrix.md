@@ -808,6 +808,13 @@ Focused verification：`tests/test_planning_video_planner.py`、`tests/test_shot
 
 ## Provider Console Browsing Surface
 
+`provider_console_preparation.py` 只读观察既有 runs 扫描范围内 `references/` 的 PNG/JPEG/WebP，
+最多 6 组、每组 16 张、单文件 16 MiB／总读取 64 MiB；按文件时间排序，目录名仅作定位。
+它不读取任意 JSON/Prompt/凭据，不创建 Project/Manifest，不推断 Shot 绑定或生成状态。
+`runs-api.mjs` 沿用 exact SHA/bytes、no-follow、containment 和 opaque token 注册与传输，
+`generation-activity.jsx` 明确显示“本地参考准备／未关联生成请求”，与 canonical attempt 分开；
+缺失、变更、链接、超限素材不提供可用预览，扫描截断可见。测试归既有 Provider Console checks。
+
 | Surface | Primary Owner | Invariants | Forbidden Alternate Path | Focused Verification |
 | --- | --- | --- | --- | --- |
 | Module Evidence Map | `provider-console/src/project-modules.html` 说明视图；`scripts/provider_console_evidence.py` / `scripts/provider_console_cases.py` 的只读开发证据投影；`module-evidence-catalog.json` 的有限来源配置；既有 `runs-api.mjs` 经 `module-evidence.mjs` 提供 loopback GET | 工程结果按 receipt seal、artifact bytes、exact commit 与模块 anchor 比较；历史测试不宣称当前完整依赖验证。媒体与 human proof 必须绑定 exact MP4，工程模块显示不适用；首屏结果限于所审案例，数据缺失、错绑、变化或离线显示不可用。仅观察既有开发证据，未建立自主交付比例。 | 写死成熟度 verdict、build-time evidence fallback、把源码存在/测试/播放/用户预览接受提升为 Production qualification、读取凭据或任意客户端路径、Provider/Manifest writes、全历史 Project 递归校验作为页面前置。 | `tests/test_provider_console_evidence.py`、`tests/test_provider_console_cases.py`、`provider-console/tests/runs-api.test.mjs`；desktop/mobile/failure Browser QA 与 exact snapshot Harness。 |

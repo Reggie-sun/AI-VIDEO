@@ -665,7 +665,8 @@ export function createRunsApiHandler({
       if (parsed.pathname === "/api/runs") {
         if (req.method !== "GET") return methodNotAllowed(res, "GET");
         const result = await runProjector("catalog");
-        send(res, 200, publicProjection(result));
+        const unavailableTokens = await registerRunsMedia(result, runsRoot, mediaCache);
+        send(res, 200, publicProjection(unavailableMediaDescriptors(result, unavailableTokens)));
         return;
       }
 

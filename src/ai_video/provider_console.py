@@ -33,6 +33,7 @@ from ai_video.provider_console_manifest import (
     read_production_manifest_nofollow as _read_production_manifest_nofollow,
 )
 from ai_video.provider_console_render import active_render_media
+from ai_video.provider_console_preparation import preparation_directory, project_preparations
 
 
 _BOUNDARY = {"read_only": True, "local_only": True, "network": False}
@@ -173,7 +174,10 @@ def catalog_runs(
     candidates: dict[str, dict[str, object]] = {}
     scan: dict[str, int | bool] = {"entries": 0, "workspaces": 0, "truncated": False}
     workspace_truncated = False
+    preparation_paths: list[Path] = []
     for path in _walk_files(root, max_depth=max_depth, max_entries=max_entries, scan=scan):
+        if preparation_directory(path, root) is not None:
+            preparation_paths.append(path)
         relative = path.relative_to(root)
         workspace = relative.as_posix()
         kind: str | None = None
@@ -211,6 +215,7 @@ def catalog_runs(
     public = [{key: value for key, value in item.items() if key != "_mtime_ns"} for item in ordered[:max_workspaces]]
     return {
         "boundary": dict(_BOUNDARY),
+        **project_preparations(preparation_paths, root),
         "workspaces": public,
         "truncated": bool(scan["truncated"]) or workspace_truncated or len(ordered) > max_workspaces,
         "scan": {
