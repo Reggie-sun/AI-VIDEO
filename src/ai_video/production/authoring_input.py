@@ -30,6 +30,26 @@ def require_authoring_input(reference, payload):
     return value
 
 
+def prepared_authoring_input_references(artifacts):
+    """Collect sealed import receipts for a Project's source provenance.
+
+    Prepared media bytes alone are insufficient: bootstrap also requires each
+    accompanying authoring-input artifact to be referenced by the Project.
+    """
+    references = []
+    for artifact in artifacts:
+        path = artifact.relative_path.as_posix()
+        if not path.startswith(PREFIX):
+            continue
+        reference = authoring_input_reference(json.loads(artifact.payload))
+        require_authoring_input(reference, artifact.payload)
+        if reference.reference != path:
+            raise ValueError("asset source evidence path differs from its sealed input")
+        if reference not in references:
+            references.append(reference)
+    return tuple(references)
+
+
 def reopen_authoring_input(root, reference):
     raw = _read_regular_file_nofollow(Path(root) / reference.reference, contained_by=root)
     return require_authoring_input(reference, raw.data)
