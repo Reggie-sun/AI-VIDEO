@@ -64,6 +64,8 @@ test("default browser offers one cross-source search, records and explicit follo
     assert.match(markup, /跟随最新/);
     assert.match(markup, /关联全部 Runs 证据/);
     assert.match(markup, /尚未执行全量关联/);
+    assert.match(markup, /<details class="library-coverage"><summary>/);
+    assert.match(markup, /扫描详情与加载选项/);
     assert.doesNotMatch(markup, /<video/);
     const entries = Array.from({ length: 40 }, (_, index) => ({ id: String(index), title: `完整作品名 ${index}`, available: true }));
     const cards = renderToStaticMarkup(React.createElement(VideoLibraryRail, { entries }));

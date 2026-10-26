@@ -47,14 +47,29 @@ export function ReferenceMedia({ media, label = "参考素材", onError }) {
 
 const SOURCE_LABELS = { character: "角色参考", scene: "场景参考", shot: "Shot 素材" };
 
+export function groupAuthoredReferences(references) {
+  const groups = new Map();
+  references.forEach((ref, index) => {
+    const identity = ref.media?.sha256 || ref.media?.token || ref.media?.media_token;
+    // Only combine the same asset and verified media; missing identity is not evidence of equality.
+    const key = identity && ref.asset_id ? JSON.stringify([ref.asset_id, identity]) : `unverified:${index}`;
+    if (!groups.has(key)) groups.set(key, { ...ref, usages: [] });
+    const usages = groups.get(key).usages;
+    if (!usages.some((usage) => usage.source_kind === ref.source_kind && usage.source_id === ref.source_id && usage.role === ref.role)) {
+      usages.push({ source_kind: ref.source_kind, source_id: ref.source_id, role: ref.role });
+    }
+  });
+  return [...groups.values()];
+}
+
 export function AuthoredReferences({ shot }) {
-  const references = shot?.authored_references || [];
+  const references = groupAuthoredReferences(shot?.authored_references || []);
   return <section className="shot-reference-section" aria-label="生成前创作参考">
     <h4>生成前创作参考与素材</h4>
     <p>当前创作版本 · revision {shot?.revision || "—"}，不代表已提交给模型</p>
     {references.length ? <div className="shot-reference-grid">{references.map((ref, i) => <article key={`${ref.source_kind}:${ref.source_id}:${ref.role}:${ref.asset_id}:${i}`}>
       <ReferenceMedia media={ref.media} label={ref.asset_id} />
-      <strong>{ref.asset_id}</strong><small>{SOURCE_LABELS[ref.source_kind] || "创作素材"} · {ref.source_id} · {ref.role}</small>
+      <strong>{ref.asset_id}</strong>{ref.usages.map((usage, index) => <small key={index}>{SOURCE_LABELS[usage.source_kind] || "创作素材"} · {usage.source_id} · {usage.role}</small>)}
     </article>)}</div> : <p>尚未登记此 Shot、角色或场景的参考素材</p>}
     {shot?.authored_references_truncated && <p>仅展示前 32 项创作素材</p>}
   </section>;

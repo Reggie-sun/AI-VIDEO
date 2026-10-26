@@ -106,7 +106,25 @@ test("Runs attempt keeps the inline player and Project Shot breakdown in the mai
     assert.match(workspaceMarkup, /放大 prepared-reference/);
     assert.match(workspaceMarkup, /src="\/api\/runs\/media\/prepared-reference-token"/);
     assert.doesNotMatch(workspaceMarkup, /本次生成请求参考/);
-    const { RequestReferences, ReferenceMedia } = await server.ssrLoadModule("/src/reference-media.jsx");
+    const { RequestReferences, ReferenceMedia, AuthoredReferences, groupAuthoredReferences } = await server.ssrLoadModule("/src/reference-media.jsx");
+    const sceneReference = detail.shots[0].authored_references[0];
+    const shotReference = { ...sceneReference, source_kind: "shot", source_id: "shot-1", role: "reference" };
+    const sharedReferences = [sceneReference, shotReference, shotReference];
+    const grouped = groupAuthoredReferences(sharedReferences);
+    assert.equal(grouped.length, 1);
+    assert.equal(grouped[0].usages.length, 2);
+    assert.equal(sharedReferences.length, 3, "presentation grouping preserves source rows");
+    const sharedMarkup = renderToStaticMarkup(React.createElement(AuthoredReferences, { shot: { authored_references: sharedReferences } }));
+    assert.equal((sharedMarkup.match(/<img /g) || []).length, 1);
+    assert.match(sharedMarkup, /场景参考 · scene-1 · scene_reference/);
+    assert.match(sharedMarkup, /Shot 素材 · shot-1 · reference/);
+    assert.equal(groupAuthoredReferences([sceneReference, { ...shotReference, media: { ...shotReference.media, token: "another-media-token" } }]).length, 2, "different media must not merge by label");
+    assert.equal(groupAuthoredReferences([{ ...sceneReference, media: null }, { ...shotReference, media: null }]).length, 2, "unverified media equality is not inferred");
+    assert.equal(groupAuthoredReferences([sceneReference, { ...shotReference, asset_id: "another-asset" }]).length, 2, "distinct asset bindings remain distinct");
+    assert.equal(groupAuthoredReferences([
+      { ...sceneReference, media: { ...sceneReference.media, sha256: "a".repeat(64) } },
+      { ...shotReference, media: { ...shotReference.media, sha256: "a".repeat(64), token: "another-media-token" } },
+    ]).length, 1, "verified same asset bytes may use different preview tokens");
     const requestMarkup = renderToStaticMarkup(React.createElement(RequestReferences, { attempt: {
       mode: "image_to_video", input_bindings: [{ asset_id: "sealed-input", role: "first_frame", media: { asset_id: "sealed-input", token: "sealed-input-token", mime_type: "image/png" } }],
     } }));

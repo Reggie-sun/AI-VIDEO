@@ -47,3 +47,28 @@ Date: 2026-10-27
 identity/containment/transport，关键关联和失效路径有测试。没有 Provider 请求或 Production
 state mutation。保留其他窗口未提交改动；`distill-ai-video-learning=no_candidate`，本次不形成
 独立媒体实验结论，不修改 Skill/Policy/Gate。
+
+## Layout And Duplicate References Follow-up
+
+用户补充截图后复现：扫描状态内容高 228px，却被 110px 上限裁切；S04 的 4 个 asset
+同时绑定角色／场景和 Shot，旧 UI 按 8 条来源逐条画图。扫描区改为默认收起的原生 details，
+展开后按内容撑高；取消动态卡片的垂直裁切，并让矮窗口主区域可滚动、侧栏不撑破 viewport。
+生成记录摘要和操作按钮按容器宽度换行，修复手机端 692px 横向溢出。
+
+创作参考按相同 asset ID 和 media SHA/token 合并卡片，保留所有去重后的来源用途；不同 asset、
+不同媒体 identity、未知 identity 不合并。仅改变展示，不修改 Production references 或请求绑定。
+
+- 边界测试覆盖同图多用途、重复用途、不同 identity、未知 identity，以及来源数组保持不变。
+- `20261027-console-layout-focused`：79 项 Python、112 项 Node tests 通过；offline Vite build 通过。
+- Chrome MCP 实测真实 `trial-S04-v1/project.yaml`：8 条绑定显示为 4 张图，全部加载，
+  每张保留角色／场景及 Shot 用途；放大完整显示，Escape 关闭并恢复按钮焦点。
+- 1440×1000、1280×600、390×844 viewport 检查：展开扫描详情内容不裁切、按钮完整、
+  与 Shot 动态无重叠；矮窗口可滚动，手机无页面横向溢出。期间观察到真实 S04 从
+  `running/polling` 更新为 `running/validate`，没有发起或修改 Provider 任务。
+- 本轮 related/full receipts 位于 `.agent/harness/runs/20261027-console-layout-related/receipt.json`
+  和 `.agent/harness/runs/20261027-console-layout-full/receipt.json`；仍在既有 AGENTS.md
+  14,185/14,000 bytes 检查失败，完整回归未完成。最终包含记录的 focused receipt：
+  `.agent/harness/runs/20261027-console-layout-final-focused/receipt.json`。
+
+Parent 对以上五个前端源码／测试文件自审：`NATIVE_REVIEW_NOT_REQUIRED`，只读展示、局部可逆，
+无新增 durable-state 或授权路径；`distill-ai-video-learning=no_candidate`。
