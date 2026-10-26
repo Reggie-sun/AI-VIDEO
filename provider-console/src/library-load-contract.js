@@ -19,7 +19,13 @@ export function includeLibraryTarget(workspaces, target) {
 }
 
 export function libraryWorkspaceBatch(workspaces, limit, requested) {
-  return workspaces.filter((item, index) => index < limit || requested.has(item.workspace));
+  // Recent renders/authoring edits must not crowd generation out of the first
+  // page. These hints only schedule strict detail reads, never supply UI truth.
+  const recentAttempts = new Set(workspaces
+    .filter((item) => Number.isFinite(Date.parse(item.latest_video_attempt_at)))
+    .sort((a, b) => Date.parse(b.latest_video_attempt_at) - Date.parse(a.latest_video_attempt_at))
+    .slice(0, LIBRARY_WORKSPACE_PAGE_SIZE).map((item) => item.workspace));
+  return workspaces.filter((item, index) => index < limit || requested.has(item.workspace) || recentAttempts.has(item.workspace));
 }
 
 export async function loadLibraryWorkspaces(workspaces, signal, readJson, onResult) {

@@ -53,8 +53,8 @@ export function createCatalogChangeFeed({ roots = [], watchFactory = watch, debo
   const enqueue = (sourceId) => {
     if (closed) return;
     pendingSources.add(sourceId);
-    if (timer) clearTimeout(timer);
-    timer = setTimeout(flush, Math.max(0, debounceMs));
+    // Bound notification latency even when generation writes continuously.
+    if (!timer) timer = setTimeout(flush, Math.max(0, debounceMs));
   };
 
   for (const entry of roots) {

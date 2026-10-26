@@ -965,6 +965,23 @@ test("catalog change feed exposes unavailable watchers and runtime failures", ()
   feed.close();
 });
 
+test("continuous file writes cannot postpone the first catalog notification", (t) => {
+  t.mock.timers.enable({ apis: ["setTimeout"] });
+  let changed;
+  const feed = createCatalogChangeFeed({ roots: [{ id: "runs", root: "/runs" }], debounceMs: 750,
+    watchFactory(_root, _options, callback) { changed = callback; return { close() {} }; },
+  });
+  const events = [];
+  feed.subscribe((event) => events.push(event));
+  try {
+    changed();
+    for (let i = 0; i < 7; i++) { t.mock.timers.tick(100); changed(); }
+    t.mock.timers.tick(50);
+    assert.equal(events.length, 1);
+    assert.deepEqual(events[0].sources, ["runs"]);
+  } finally { feed.close(); }
+});
+
 test("library events endpoint streams local catalog changes and releases its subscription", async () => {
   let listener;
   let unsubscribed = false;

@@ -356,6 +356,30 @@ def test_catalog_entry_budget_limits_scandir_consumption(
     assert consumed <= 3
 
 
+def test_catalog_keeps_discovering_nested_projects_after_large_frame_directory(tmp_path: Path):
+    runs = tmp_path / "runs"
+    frames = runs / "aaa-diagnostic" / "frames"
+    frames.mkdir(parents=True)
+    for index in range(600):
+        (frames / f"frame-{index}.png").write_bytes(b"not-media")
+    target = _production_workspace(runs, "zzz-current/repair/runtime/A/trial-S02")
+    # A recently modified diagnostics directory must not starve sibling projects.
+    os.utime(frames, (2_000_000_000, 2_000_000_000))
+
+    result = provider_console.catalog_runs(runs, max_entries=400)
+
+    assert target.relative_to(runs).as_posix() in {item["workspace"] for item in result["workspaces"]}
+    assert result["truncated"] is True
+    assert result["scan"]["entries"] <= 400
+
+
+def test_catalog_default_depth_includes_nested_repair_workspace(tmp_path: Path):
+    runs = tmp_path / "runs"
+    target = _production_workspace(runs, "film/concept/continuation/runtime/A/trial-S02")
+    result = provider_console.catalog_runs(runs)
+    assert target.relative_to(runs).as_posix() in {item["workspace"] for item in result["workspaces"]}
+
+
 @pytest.mark.parametrize("review_eligible", [False, True])
 def test_production_detail_uses_strict_readers_and_returns_only_whitelisted_data(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch, review_eligible: bool

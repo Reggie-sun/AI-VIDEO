@@ -91,7 +91,7 @@ def _walk_files(
     max_entries: int,
     scan: dict[str, int | bool],
 ):
-    """Find workspace locators before descending into bounded evidence trees."""
+    """Discover recent workspace trees without letting one dump consume the scan."""
 
     pending = deque([(root, 0)])
     while pending:
@@ -102,21 +102,30 @@ def _walk_files(
             return
         try:
             entries = []
+            # Reserve the global budget for sibling workspaces as well as media
+            # dumps. The root is an index of runs and keeps the full allowance.
+            directory_limit = remaining if depth == 0 else min(remaining, 256)
             with os.scandir(directory) as iterator:
                 for entry in iterator:
-                    if len(entries) >= remaining:
-                        scan["entries"] = int(scan["entries"]) + len(entries)
+                    if len(entries) >= directory_limit:
                         scan["truncated"] = True
-                        return
+                        break
                     entries.append(entry)
         except OSError:
             continue
         scan["entries"] = int(scan["entries"]) + len(entries)
-        entries.sort(key=lambda item: item.name)
+        def recent_first(entry):
+            try:
+                return (-entry.stat(follow_symlinks=False).st_mtime_ns, entry.name)
+            except OSError:
+                return (0, entry.name)
+
+        entries.sort(key=recent_first)
         workspace_storage = (
             _is_regular_nofollow(directory / "project.yaml")
             and _is_regular_nofollow(directory / "state" / "manifest.json")
         )
+        children = []
         for entry in entries:
             try:
                 if entry.is_symlink():
@@ -142,17 +151,18 @@ def _walk_files(
                                     and _is_regular_nofollow(primary)
                                     and _is_regular_nofollow(primary.parent / "state" / "manifest.json")):
                                 yield primary
-                    pending.append((path, depth + 1))
+                    children.append((path, depth + 1))
             except OSError:
                 continue
+        pending.extendleft(reversed(children))
 
 
 def catalog_runs(
     runs_root: str | Path,
     *,
     max_workspaces: int = 256,
-    max_depth: int = 6,
-    max_scanned_workspaces: int = 256,
+    max_depth: int = 10,
+    max_scanned_workspaces: int = 1024,
     max_entries: int = 16_384,
 ) -> dict[str, object]:
     """Return a bounded catalog without claiming strict workspace validity."""

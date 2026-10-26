@@ -1,6 +1,39 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { includeLibraryTarget, libraryTargetFromSearch, libraryWorkspaceBatch, loadLibraryWorkspaces } from "../src/library-load-contract.js";
+import { connectLibraryLiveUpdates } from "../src/library-live-updates.js";
+
+test("SSE ready reconciles missed updates on initial connection and reconnection", () => {
+  let events;
+  let runs = 0;
+  let external = 0;
+  let state;
+  class FakeEvents {
+    listeners = new Map();
+    constructor(url) { assert.equal(url, "/api/library-events"); events = this; }
+    addEventListener(type, handler) { this.listeners.set(type, handler); }
+    removeEventListener(type) { this.listeners.delete(type); }
+    close() { this.closed = true; }
+    emit(type, value) { this.listeners.get(type)({ type, data: JSON.stringify(value) }); }
+  }
+  const close = connectLibraryLiveUpdates({ EventSourceClass: FakeEvents,
+    refreshRuns: () => runs++, refreshExternal: () => external++,
+    setConnection: (value) => { state = typeof value === "function" ? value(state) : value; },
+  });
+  events.emit("ready", { sources: ["runs"] });
+  assert.deepEqual([runs, external], [1, 1]);
+  events.onerror();
+  assert.equal(state.state, "reconnecting");
+  events.emit("ready", { sources: ["runs"] });
+  assert.deepEqual([runs, external], [2, 2]);
+  events.emit("catalog-change", { sources: ["runs"] });
+  assert.deepEqual([runs, external], [3, 2]);
+  events.emit("source-status", { sources: [] });
+  assert.deepEqual(state.watchedSources, []);
+  close();
+  assert.equal(events.closed, true);
+  assert.equal(events.listeners.size, 0);
+});
 
 import {
   buildLibraryEntries,
@@ -34,6 +67,17 @@ test("explicit exact-media links load a safe workspace even when bounded discove
     assert.equal(libraryTargetFromSearch(`?workspace=${encodeURIComponent(workspace)}&media=${"a".repeat(64)}`).workspace, null);
   }
   assert.equal(libraryTargetFromSearch("?workspace=run/project.yaml&media=wrong").sha256, null);
+});
+
+test("recent generation is loaded even when newer renders fill the initial page", () => {
+  const workspaces = Array.from({ length: 30 }, (_, i) => ({ workspace: `run-${i}/project.yaml`,
+    ...(i >= 10 ? { latest_video_attempt_at: `2026-10-${String(i).padStart(2, "0")}T00:00:00Z` } : {}),
+  }));
+  const batch = libraryWorkspaceBatch(workspaces, 6, new Set());
+  assert.equal(batch.length, 12);
+  assert.deepEqual(batch.slice(-6), workspaces.slice(-6));
+  assert.equal(libraryLifecycle({ status: "running", phase: "polling" }), "正在生成（running / polling）");
+  assert.equal(libraryLifecycle({ status: "outcome_unknown", phase: "polling" }), "outcome_unknown / polling");
 });
 
 test("workspace reads reserve browser connections, publish progressively and cancel queued work", async () => {

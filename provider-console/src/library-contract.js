@@ -352,6 +352,10 @@ export function libraryLifecycle(attempt) {
   const status = valueOrNull(attempt?.status) || "未标注";
   const phase = valueOrNull(attempt?.phase);
   if (status === "running" && phase === "validate") return "等待验证（running / validate）";
+  if (status === "running") {
+    const label = { request: "准备提交", submit_intent: "正在提交", submitted: "已提交", polling: "正在生成", fetch: "正在获取视频" }[phase];
+    if (label) return `${label}（${status} / ${phase}）`;
+  }
   return phase ? `${status} / ${phase}` : status;
 }
 

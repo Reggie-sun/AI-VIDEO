@@ -34,6 +34,21 @@ test("default browser offers one cross-source search, records and explicit follo
     const { LibraryBrowser, ExactPlayer, StatusSummary } = await server.ssrLoadModule("/src/library-browser.jsx");
     const { VideoLibraryRail } = await server.ssrLoadModule("/src/video-library-rail.jsx");
     const { MediaFolderButton } = await server.ssrLoadModule("/src/media-folder.jsx");
+    const { GenerationActivity, generationActivity } = await server.ssrLoadModule("/src/generation-activity.jsx");
+    const details = [{ status: "valid", workspace: "current/project.yaml", project: { title: "当前作品" }, attempts: [
+      { attempt_id: "live", target_shot_id: "S02", started_at: "2026-10-27T10:00:00Z", status: "running", phase: "polling" },
+      { attempt_id: "review", target_shot_id: "S01", started_at: "2026-10-27T09:00:00Z", status: "running", phase: "validate" },
+    ] }];
+    const activity = renderToStaticMarkup(React.createElement(GenerationActivity, { details }));
+    assert.match(activity, /S02 · 当前作品/);
+    assert.match(activity, /1 个 Shot 执行中/);
+    assert.match(activity, /正在生成/);
+    assert.doesNotMatch(activity, /S01|<video/);
+    const waiting = renderToStaticMarkup(React.createElement(GenerationActivity, { details: [{ ...details[0], attempts: [details[0].attempts[1]] }] }));
+    assert.match(waiting, /没有生成中的 Shot/);
+    assert.match(waiting, /等待验证/);
+    assert.match(renderToStaticMarkup(React.createElement(GenerationActivity, { details, stale: true })), /状态可能已过期/);
+    assert.deepEqual(generationActivity([{ ...details[0], status: "recovered_video_evidence" }]), []);
     const folder = renderToStaticMarkup(React.createElement(MediaFolderButton, { entry: { available: true, url: "/api/runs/media/exacttoken" } }));
     assert.match(folder, /打开所在文件夹/);
     assert.doesNotMatch(folder, /disabled/);
