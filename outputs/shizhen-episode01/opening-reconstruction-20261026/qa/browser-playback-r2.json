@@ -1,0 +1,37 @@
+{
+  "source": "http://127.0.0.1:8874/outputs/shizhen-episode01/opening-reconstruction-20261026/%E5%A4%B1%E5%B8%A7-%E5%BC%80%E5%9C%BA%E9%87%8D%E6%9E%84-%E5%8A%A8%E6%80%81%E9%A2%84%E6%BC%94-002.mp4",
+  "duration": 25.666667,
+  "currentTime": 25.666667,
+  "ended": true,
+  "error": null,
+  "rate": 1,
+  "muted": false,
+  "elapsedMs": 80769,
+  "events": [
+    {
+      "event": "play",
+      "source": "new",
+      "time": 0,
+      "speed": 1,
+      "error": null,
+      "at": 1792976790282
+    },
+    {
+      "event": "pause",
+      "source": "new",
+      "time": 25.666667,
+      "speed": 1,
+      "error": null,
+      "at": 1792976816082
+    },
+    {
+      "event": "ended",
+      "source": "new",
+      "time": 25.666667,
+      "speed": 1,
+      "error": null,
+      "at": 1792976816082
+    }
+  ],
+  "proof": "browser playback mechanics only; no claim of human seeing or hearing"
+}

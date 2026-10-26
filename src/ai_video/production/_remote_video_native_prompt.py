@@ -106,7 +106,7 @@ def compile_remote_video_prompt(
     conversation = intent.dialogue_intent
     if conversation is not None and conversation.mode == "conversation":
         if (getattr(provider_bound, "provider_kind", None) != "jimeng"
-                or getattr(provider_bound, "model_id", None) != "seedance_2.5"
+                or getattr(provider_bound, "model_id", None) not in {"seedance_2.0_vip", "seedance_2.5"}
                 or voice_route is not None
                 or getattr(getattr(provider_bound, "output_requirement", None),
                            "native_audio", False) is not True):

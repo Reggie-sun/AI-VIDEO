@@ -1,0 +1,23 @@
+{
+  "command": "models",
+  "exit_code": 0,
+  "status": "success",
+  "data": [
+    {
+      "name": "v6",
+      "external_key": "chirp-hawk",
+      "can_use": true
+    },
+    {
+      "name": "v6-wild",
+      "external_key": "chirp-hawk-wild",
+      "can_use": true
+    },
+    {
+      "name": "v6-mini",
+      "external_key": "chirp-goose",
+      "can_use": true
+    }
+  ],
+  "error_code": null
+}

@@ -1,0 +1,10 @@
+{
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-composition-v1/render-001/output/\u5931\u5e27-\u4e24\u4f4d\u51b7\u5f00\u573a\u52a0S01-1080p\u5ba1\u770b\u7248.mp4",
+  "extract_frames": true,
+  "frame_interval": 0.25,
+  "max_frames": 40,
+  "transcribe_audio": false,
+  "detect_scenes": true,
+  "understand_audio": true,
+  "expected_sha256": "5ab3a929258db93606196ab537d89c795343899dba8616dbdd8905e55433e48a"
+}

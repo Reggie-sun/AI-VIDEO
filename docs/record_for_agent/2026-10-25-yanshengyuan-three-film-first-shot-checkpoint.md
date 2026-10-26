@@ -17,6 +17,54 @@ S02 raw的静帧space-camera PASS不覆盖该动态附着要求，不能据此�
 开场的人审各保留其原范围，不扩展为当前合片认可。设计要求及Skill修订见
 [Ad Creative User Requirements](2026-10-26-ad-creative-user-design-requirements.md)。没有重生或重试媒体。
 
+## Squatters Opening Human Review — 2026-10-26
+
+本节为当前进度，下面的全城警报稿与20秒合片叙事FAIL保留为历史，不作为新剧情基础。用户批准《斑点钉子户》：卧室镜中斑点租客→超长续住合同→女主主动日常护理→租客逐步收拾→同一合同回扣“不续了”。原计划50秒，当前S01选用7秒剪辑前缀后全片目标47秒，仍在40–60秒范围。
+
+### Exact Media And Human Verdict
+
+`runs/yanshengyuan-three-concepts-seedance20-20261025-001/squatters-001/` 为本阶段根目录。首次S01仅1张首帧输入，request `b7396b4f40eefbd3eee17af14d69a0b3a05d1af7090cfad50b06a0637d7bd12e`；Provider终态1001/20008，原生提示“生成失败，本次不消耗积分”，没有MP4。数字码根因未核实，不解释为审查、尺寸或Prompt原因；费用提示未独立对账。证据 `diagnostics/S01-native-failure-001.json`，no-artifact停止记录为 `diagnostics/S01-attempt-stop-001.json`。
+
+Scene-only R2V准备在canonical planner要求Character+Scene references时阻断，0 generation/paid；未用同一asset ID伪造多owner。改用已实际查看的独立女主、红马甲墨镜boss、灰褐助手和原镜面场景4图，仍同Seedance2.0VIP/720p/9:16/native audio。`repair-S01-r2v-cast-001/runtime/A/S01-prepare-output.json` SHA `b980ded8ed9f4d86321278a59c420e12962bb49d090f9f5a9aaeffdf9310556b`，3914/4000 UTF16，request `3f5b7bb73c7e29324d84bb4505410a7905d3d15ac1eddd42c7802d69af21887f`。唯一实际submit fingerprint `c5677a990426f13e8fb619b521a890904841ce5b70350067677cf1dbc5501195`；fetch UTC19:57:21，raw SHA `0ca177fca02ed96378d256f92bb525b8b2b292140a4ee775d57a96288a6676bd`、14244345bytes。raw容器10.08s、720×1280、241帧；r_frame_rate60不能当播放帧率，实际avg为14460/601、video duration10.016667s。
+
+Parent显式project-local video-analysis，实际查看21帧0–10s/0.5s。卧室、镜中脸颊营地与前三秒产品清楚；女主收指后4–6s嘴部变化、6.5s后闭口等待。约7.5–8s商品贴下边，9–10s仅上部入画，故原10秒space-camera为FAIL，微小玩偶动作/原速表演/声音原先NE。raw Gate `repair-S01-r2v-cast-001/source-acceptance/S01/post-media-gate.json` SHA `127ec4742648037e1b456c95527aab18fbec7cdfb4c2592a935802151935e2ae` 原样保留。
+
+沿CompositionSpec→ResolvedTimeline→HyperFrames只使用前7秒，去掉过推与额外等待，没有重新生成视频。实际候选SHA `7f66b8c8bd8de13bfb9ce09de6cb78f783f471891c4304ecff362ee7abf62906`、9668802bytes，1080×1920/24fps/168帧/7.000s、48k stereo AAC，0–336000音频samples正常1×。慢水印为“栖澜百货商贸”，24px/26%且沿50秒轨迹的前7秒；原单一AI标识保留。报告 `repair-S01-r2v-cast-001/post/review/S01/r3/render-report.json`，lint/check均0错误0警告；源/输出PCM编码priming对齐后双声道相关约0.9993，仅作技术忠实证据。
+
+用户副本 `/home/reggie/电商/颜生源/广告试片/2026-10-26-斑点钉子户/01-卧室镜中钉子户-7秒带水印待审.mp4` 与候选hash一致。Parent对该副本同bytes再次显式video-analysis并查看0/3/6s。用户按正常速度看听后明确答“已看听，这三项都没问题”，所问为环境/营地清楚、人物反应自然、完整问句“你们还打算住多久？”声音和口型合理。人审收据 `repair-S01-r2v-cast-001/source-acceptance/S01/user-review-edited-7s-001.json` SHA `ab45edb217b4df0ec6457e3f17499f00fae3c230a4e6cc58041e502250adfb4d`。这只认可7秒用途，不覆盖原raw10秒FAIL、不代表全片完成或Production activation。
+
+### Continuation Source And Preserved Bounds
+
+当前源用途意图/Gate在 `continuation-001/source-use/S01-7s-intent.json` / `S01-7s-gate.json`，Gate SHA `a6e20b3f3530658d2eede4fe546060415b4260df43504ed5f681a941c5f110ce`。七项只裁决已认可7秒用途，接受女主收指/提问/等待及租客静驻，不宣称未验证的微小手脚动作完成。Production `accepted_sequence_source()` 仍不能把该P4片当raw ACTIVATE；本次沿既有task-local qualification素材使用路径，绑定P4报告/时间线、用户收据、raw fetch和raw FAIL。时间线选raw[0,168)，从底层raw精确提取frame167以免把商户水印烘进下一镜。标准VideoFrameImageImportReferenceBinding verify_derivation通过，PNG SHA `5b631af0a84ec30ec59c43f97fcce5b3bfb166fff0f389716c91f56141a64891`；proof `continuation-001/refs/S02-first-frame-binding.json` SHA `7c39ad0fa3395ce595018f11c3f67aa63e9689cfdb6173aca74a36181b8cdc3b`。不声称raw/P4经缩放及图层后像素相等，不新增共享API或伪报imagegen来源。
+
+本阶段实际video2次（一次终态失败、一次成功），builtin imagegen4次（场景、两玩偶身份、S02尾帧），音义Provider0次，旧5个consumed UNKNOWN不重试。当前整个video task累计12（A6/B3/C3），加task前9次为21；500CRD单次、5000CRD A、9000CRD task均为内部上限，实际金额/积分与生图费用待核账。首次cast submit在authorizer缺配置的锁/permit前拒绝，canonical仍REQUEST/paid None/budget None；Parent补同一authorized字典闭包并实际无副作用readback验证后仅1次真实POST，没有重start或重mint。
+
+新 `continuation-001/operator-window.json` SHA `a09012c419492aec80544464a3bbe97d4fb6e3517705becb5e3dc7d185299b14` 续期至UTC22:18:01，保留累计12/A6、task18/A10上限，只准S02–S05各首次1次、automatic retry0。S02为8秒FLF，首帧真实720×1280，尾帧imagegen941×1672 SHA `c34409a832f970912626ac0d196860f4f2f93e7c668663c2ca1712f15ac0a327`，boss展长合同、女主镜中手持同一瓶、原托盘空。`refs/endpoint-manifest.json` SHA `e798dd5f6500b442ec55452a60dbe1375bc64f5aa2d205598a7b233becb6c92a`，两端分别first_frame/last_frame；不伪填相同尺寸，兼容性由当前compiler验证。此checkpoint S02尚未提交。
+
+所有本轮runtime改动均task-local ignored run；局部py_compile/ruff F821、strict reopen、真实prepare/submit/fetch及P4已执行，source-frame接口focused35测试通过；未将其冒充完整Harness。并行窗口曾暂缺generation_resolution_revision.py，后已落盘解除，不回滚他人改动；TUI接口当时不可达。共享dirty/index保留，当前仅7秒获得人审，全片仍未完成、未发布。后续继续合同/护理/回扣，不回用警报剧情。自动学习评估 `no_candidate`：R2V输入新增了角色图，并非纯mode对照；剪辑与人审是同一媒体的证明层，不增加独立实验数量，不能推断20008根因或升级Skill/Policy/Gate。
+
+## S02 Known-No-Effect And Reference Recovery — 2026-10-26
+
+本节更新上一checkpoint“S02尚未提交”的状态，保留旧端点与首次窗口，不重置历史。FLF compiler实际要求相同像素尺寸；原941×1672尾帧保留，以Lanczos fit/居中pad归一化为720×1280，完整构图不裁切。实际尾帧SHA `4a41d244ac237502bbe74941d2e50ee1029f2a592ea0a3a704c11b62eacf92e3`，派生记录 `continuation-001/refs/S02-last-frame-normalization.json`；新manifest为 `endpoint-manifest-r2.json`。r1因尺寸不符、r2因4604/4000 UTF16分别在提交前停止，均0 paid submit；r3精简至3767/4000，保持原台词、8秒、起止状态和唯一产品。
+
+`continuation-001/runtime-r3/A/trial-S02` 的同一Project/task/Shot执行一次canonical submit；request `2df1dd2287fe5d909089c31f1f49b0d91ec564b246c7f06766900905a82862e9`，attempt `yanshengyuan-squatters-continuation-001-A-S02-qualification-r3-attempt-001`。UTC21:36:23持久化FAILED/paid known_no_effect：参考上传阶段中止，无generation dispatch、无新MP4。paid receipt `4fb19fc85cf110e281a6ebe9f035fcaf9aa08893b4150619352277ad10657982`，budget reservation释放、actual cost0；具体初始上传根因没有封存，不猜DNS/TLS/平台审查。该尝试仍占一个durable paid-submit slot，保守task槽位13/A7/B3/C3；native已接受generation次数仍12/A6/B3/C3，不把两种计数混为一谈。
+
+随后沿原native upload函数做有界诊断，两张exact PNG分别UTC21:51:29与21:53:04确认commit成功，diagnostic仅generation_POSTs0。证据为 `continuation-001/diagnostics/S02-upload-full-diagnostic-001.json` 与 `S02-upload-last-full-diagnostic-001.json`；实际storage identities只留私有task文件，不进入本记录。`S02-confirmed-reference-uploads-001.json` SHA `f67d45521ad5dde8854e493a7a58cac6bb315544056f6528d9faa7fb73824c90` 绑定两个素材的hash/size、exact profile与诊断hash。新增task-local `runtime_helpers/confirmed_s02_transport.py`只复用这两张已确认素材，其他submit/read/download仍交canonical transport；本地验证两个exact输入可复用、改字节/错kind拒绝，network0。后续只允许保留旧attempt的canonical no-effect retarget、一次successor、明确quota1→2；此记录不宣称恢复已执行或媒体已验收。
+
+磁盘满期间仅两份owned脚本被截为0B，已认可7秒影片及原媒体未受损。用户明确只准清pip下载缓存，执行现有base conda pip purge，删除3379个缓存文件/3974.4MB；不删除已安装依赖、模型或项目证据。另有并行外部清理，不能把全部磁盘释放归因本任务。bootstrap脚本已恢复为可读源码并经局部检查/实际prepare；P4合片脚本仍由其唯一writer恢复。无新成片交付、无发布，费用除本次canonical no-effect0外仍待核账。自动学习评估 `no_candidate`：初始上传失败没有可归因根因，后续两张素材成功只证明其当前上传结果，不能推导通用平台修复或升级Gate。
+
+### Exact Successor Result
+
+上述“尚未恢复submit”为恢复准备时快照，已由本段新证据推进。canonical runtime_failure evidence及单次PaidNoEffectRetarget均封存；同Project/task/Shot创建唯一successor，新的generation/output IDs使request变为 `d7339e2d3ca78352463d8d3f77d050f62040a3dade970bbb38fabf05d87b6935`，binding `ba1d14fd131fc5c5904dcbe8acba4ab1ed3f6d0a4f1341143e0ab2f2b835b93b`。逐字段diff只含lifecycle IDs及其派生hash；原Prompt全文/SHA/3767 UTF16、profile/model、两端图hash/size/role/order和8s/720p/9:16/native audio逐项相等。证据 `continuation-001/recovery-001/S02-recovery-prepare-r3.json` SHA `f3c7733f2d28b1db1ad880e227137750ea836da2b964854549a750f9db15afdb`。
+
+Parent实际start后沿committer扩单Shot quota1→2，保留已用1；extension SHA `8c48fa26493ccb65c8558ae42f979254eb1fda8584b3f3d6ab10cfc835d15ca5`、Manifest rev12。quota第一次已持久化，但返回摘要误读pointer.content_hash报错；Parent只修正为binding_hash，再次调用读取同一existing entry/replayed=true，没有第二次扩限。随后唯一恢复submit成功，fingerprint `4b3693b5ac233a9b9ca86cc47c725ee2c72f4c2c70d5478c2f9472c49d8f6e92`。UTC22:15 fresh native预检PASS、原node仍idle，两张已确认参考直接复用，没有再次上传。恢复submit在旧窗口过期前完成；过期后只poll/fetch，未新铸permit或自动提交S03。
+
+UTC22:21:23取得exact新MP4，SHA `936aa6ab66e1492e7adec8eec30823a21ef9509ffeb5dc138c0863af5d8af2b3`、13376463bytes、720×1280、193帧；actual avg11580/481，video8.016667s、audio8.096009s/AAC44.1k stereo，不能用r_frame_rate60当播放fps。fetch fingerprint `8b17224490901bbd431403ea32c4abb2a3d97c922878800604ec4fa665a8e0b5`。这使task保守durable paid槽位14/A8/B3/C3、native accepted generation13/A7/B3/C3；旧known-no-effect0cost保留，新生成实际扣点待核账。
+
+Parent显式project-local video-analysis并实际查看0–8秒/0.5秒共17帧：约1–2秒boss长合同展开，女主看后2.5–5.5秒嘴部变化，6–8秒才伸手拿瓶，原台面空。同人/营地/唯一商品及自然雀斑保持；原片0–约4秒左上AI标识有叠影，须只在S02 P4整理为单一清楚披露。ASR为“还想一直住,那我就天天认真护理”，不是实际听审，0–6秒ASR时间不作canonical timing。新Gate `continuation-001/source-acceptance/S02-recovery-001/post-media-gate.json` SHA `0242422ca68717f331f1cc390689d851d6eda3454807b1092f6c468a84e0e5ce`：视觉五项PASS，performance/sound NOT_EVALUATED，overall NOT_EVALUATED，S03 submit仍禁止。旧Gate不覆写。
+
+已恢复pair P4脚本，允许exact Gate NE生成明确DIAGNOSTIC审片；诊断渲染不等于QA acceptance或下一镜放行。待做原S01 clean raw[0,168)+S02约8秒，保留单一ResolvedTimeline/每段原声一次/原50秒慢水印轨迹前15秒，实际切点检查后交用户看听。第一段用户副本重新SHA核对仍 `7f66b8…af62906`。本轮run-local恢复仅调用成熟canonical owner，无shared contract变更；Parent Risk Gate为NATIVE_REVIEW_NOT_REQUIRED，有限一次、精确source约束及committer的单用授权/预算边界有可执行验证，不存在已知重大凭据或durable-state缺口。最终driver SHA `0a6cbd127f9630b43a6de6f9c88194b0da4f52eabae7e071b8f5ee07b9fe695d`；局部静态/3项恢复测试、真实prepare/start/quota/submit/poll/fetch分别为对应证据，未冒充完整Harness或全片验收。依film-first尚未commit/push，其他窗口dirty/index保留，未发布。
+
 ## Narrative Rejection — 2026-10-26
 
 用户对前20秒exact副本 `3590a61eaf225efef05efae4366d60f751171984d893f6f8e4fc4fc44b42749c` 明确反馈：“这个故事不对,因果没有,灵盖之后就是一个警报?然后就介绍产品太牵强了”。当前叙事人审为 **FAIL**；下方空间/技术检查及旧Gate保留其原证明范围，不能代替剧情认可。反馈封存在 `single-a-rework-001/creative/user-review-story-rejection-001.json`。后续生成暂停，先讨论人物目标、产品介入动机和结尾兑现，新剧情方向未获确认；本轮没有新增Provider/媒体/音义调用，不推断声音通过，也不重试旧UNKNOWN。学习评估仍为 `no_candidate`：单次整体叙事反馈不能作为跨实验因果规律或自动修改Skill/Policy/Gate的证据。
@@ -171,6 +219,11 @@ run-local续镜loader已覆盖Shot02–05：02参考对应repair01；后续按�
 | benefit-C | jimeng:912bf57971fb931dfb5b3462a6ffdc276f5a2ecadbae70c5d77b6a416f6913f9 | ysy-benefit-shot02 | yanshengyuan-benefit-v2-C-C02-qualification-attempt-001 | N/A | 7242c94cbc46fc3f09b82d84f5bf6e3ed2b319d627a00f5d516e010257619cfb | ANALYZER | FAIL | UNREQUESTED_PROP_FLIGHT | NEW_ATTEMPT | NONE | benefit-continuation/source-acceptance/C02/post-media-gate.json |
 | benefit-A-audio | audio:8f0d8d01c7ff555522b6558068288ebdbe71d32043bd0bfb83020ffba7ace63b | ysy-benefit-audio | yanshengyuan-benefit-A02-audio-001 | N/A | NO_ARTIFACT:UNKNOWN | ANALYZER_RECEIPT | UNKNOWN | AUDIO_OBSERVATION_UNAVAILABLE | NEW_ATTEMPT | NONE | benefit-continuation/audio/attempts/A02--5d47d40b63b23c9d121e5b3399b4826966913fd5fbfff73376902452e35abc34/resume-001/resume-summary.json |
 | single-A-opening | jimeng:6caeaa6136dc9c47b8cfa4bb6d0501325b18cdc918c9a342f26d7de34fb21ff2 | ysy-single-a-opening-rework | yanshengyuan-single-a-rework-001-A-A01-qualification-attempt-001 | N/A | ccc6b91626b82ad75e6404ba6745adca049d977a1e519ae9ef8e5056a6035336 | ANALYZER | NOT_EVALUATED | AUDIO_AND_FULL_PERFORMANCE_REVIEW_GAP | NEW_ATTEMPT | NONE | single-a-rework-001/source-acceptance/A01/post-media-gate.json |
+| squatters-S01-i2v-failed | jimeng:e4b7c92df0a30edb8a9738c5da7ecca8b770bd9e82a4131d53a67590c5b5f8c9 | ysy-squatters-opening | yanshengyuan-squatters-001-A-S01-qualification-attempt-001 | N/A | NO_ARTIFACT:PROVIDER_FAILED_20008 | PROVIDER_RECEIPT | FAIL | PROVIDER_FAILED_20008 | NEW_ATTEMPT | NONE | squatters-001/diagnostics/S01-native-failure-001.json |
+| squatters-S01-r2v-raw | jimeng:c5677a990426f13e8fb619b521a890904841ce5b70350067677cf1dbc5501195 | ysy-squatters-opening | yanshengyuan-squatters-S01-r2v-cast-repair-001-A-S01-qualification-attempt-001 | N/A | 0ca177fca02ed96378d256f92bb525b8b2b292140a4ee775d57a96288a6676bd | ANALYZER | FAIL | LATE_PRODUCT_EXITS_FRAME | NEW_ATTEMPT | NONE | squatters-001/repair-S01-r2v-cast-001/source-acceptance/S01/post-media-gate.json |
+| squatters-S01-edited-human | jimeng:c5677a990426f13e8fb619b521a890904841ce5b70350067677cf1dbc5501195 | ysy-squatters-opening | yanshengyuan-squatters-S01-r2v-cast-repair-001-A-S01-qualification-attempt-001 | N/A | 7f66b8c8bd8de13bfb9ce09de6cb78f783f471891c4304ecff362ee7abf62906 | HUMAN | PASS | NONE | SAME_EVIDENCE_NEW_PROOF_LAYER | squatters-S01-r2v-raw | squatters-001/repair-S01-r2v-cast-001/source-acceptance/S01/user-review-edited-7s-001.json |
+| squatters-S02-upload-no-effect | jimeng:4fb19fc85cf110e281a6ebe9f035fcaf9aa08893b4150619352277ad10657982 | ysy-squatters-S02-continuation | yanshengyuan-squatters-continuation-001-A-S02-qualification-r3-attempt-001 | N/A | NO_ARTIFACT:REFERENCE_UPLOAD_KNOWN_NO_EFFECT | PROVIDER_RECEIPT | FAIL | REFERENCE_UPLOAD_KNOWN_NO_EFFECT | NEW_ATTEMPT | NONE | squatters-001/continuation-001/runtime-r3/A/trial-S02/state/paid-provider/submits/4fb19fc85cf110e281a6ebe9f035fcaf9aa08893b4150619352277ad10657982.json |
+| squatters-S02-successor-raw | jimeng:4b3693b5ac233a9b9ca86cc47c725ee2c72f4c2c70d5478c2f9472c49d8f6e92 | ysy-squatters-S02-continuation | yanshengyuan-squatters-continuation-001-A-S02-qualification-r3-recovery-001-attempt-001 | N/A | 936aa6ab66e1492e7adec8eec30823a21ef9509ffeb5dc138c0863af5d8af2b3 | ANALYZER | NOT_EVALUATED | AUDIO_AND_NORMAL_SPEED_REVIEW_MISSING | NEW_ATTEMPT | squatters-S02-upload-no-effect | squatters-001/continuation-001/source-acceptance/S02-recovery-001/post-media-gate.json |
 
 ## Completion And Publication Boundary
 

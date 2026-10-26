@@ -1,0 +1,53 @@
+{
+  "sources": [
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/screenplay.md",
+      "sha256": "3635c7d177cba5dcf2c814ccb6d1e1e46b93e44d51476e067fa1dafca288d46f",
+      "bytes": 13132,
+      "mutation": "NONE"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "sha256": "46c2f253c44ea87dd382af48bb28b69c5b0304adba637d03698318de88850464",
+      "bytes": 59080,
+      "mutation": "NONE"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/production-design.md",
+      "sha256": "4e36e38762bfd55ae6a4ae449c2f07dcb2b572f062058f79f3155ac9e33b0d87",
+      "bytes": 11937,
+      "mutation": "NONE"
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-1080p高清版-Seedance2.5-16秒.mp4",
+      "sha256": "15c7c21ea8ef526d641d5a1565cbb4ec93ea4ee63b34fc9c7a0d73f2b21efb0b",
+      "bytes": 51142682,
+      "mutation": "NONE"
+    },
+    {
+      "path": "outputs/shizhen-episode01/cold-open-execution-20261026/失帧-两位冷开场加S01-1080p审看版.mp4",
+      "sha256": "5ab3a929258db93606196ab537d89c795343899dba8616dbdd8905e55433e48a",
+      "bytes": 34615187,
+      "mutation": "NONE"
+    },
+    {
+      "path": "outputs/shizhen-episode01/cold-open-execution-20261026/两位-CO-A1-双人候车原片.mp4",
+      "sha256": "b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd",
+      "bytes": 29400940,
+      "mutation": "NONE"
+    },
+    {
+      "path": "outputs/shizhen-episode01/cold-open-execution-20261026/music/audio/cold-open-title-suspense-atmosphere-fc0af846.wav",
+      "sha256": "88585bd2a3a9d44680f1a1a2667145839fa5166363c36260d2963ed8bd05a425",
+      "bytes": 17063440,
+      "mutation": "NONE"
+    },
+    {
+      "path": "outputs/shizhen-episode01/cold-open-execution-20261026/music/audio/cold-open-title-suspense-atmosphere-31d31b57.wav",
+      "sha256": "ea2fa22977e30853796ea7dd894178f28c397b5cb71c76d587080ecfa5b20e2f",
+      "bytes": 18284560,
+      "mutation": "NONE"
+    }
+  ],
+  "note": "Current bytes verified; protection is not live-action media acceptance"
+}

@@ -147,14 +147,21 @@ def validate_shot_strategy(
             first_frame = roles.get("first_frame")
             last_frame = roles.get("last_frame")
             for role in roles.values():
-                if role.asset_ids and not (
+                is_boundary_frame = (
                     role.role in {"first_frame", "last_frame"}
                     and len(role.asset_ids) == 1
                     and role.allowed_asset_types == (AssetType.IMAGE,)
-                ):
+                )
+                is_reference_tuple = (
+                    role.role == "reference"
+                    and bool(role.asset_ids)
+                    and role.allowed_asset_types == (AssetType.IMAGE,)
+                )
+                if role.asset_ids and not (is_boundary_frame or is_reference_tuple):
                     raise _invalid(
                         f"Shot {shot.shot_id} generated_video pending target allows only "
-                        "one bound first_frame image input and optional last_frame image input."
+                        "one bound first_frame image input, optional last_frame image input, "
+                        "and a non-empty reference image tuple."
                     )
             if last_frame is not None and last_frame.asset_ids and (
                 first_frame is None or not first_frame.asset_ids

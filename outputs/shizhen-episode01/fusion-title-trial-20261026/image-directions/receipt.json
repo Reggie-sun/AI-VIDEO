@@ -1,0 +1,36 @@
+{
+  "tool": "built-in image_gen",
+  "calls": 2,
+  "images": [
+    {
+      "path": "A-glass.png",
+      "sha256": "f5bd366b6c65e1354221ae28639a4f7f611f1b3a1d47c706a741192cbe6686e6",
+      "bytes": 2744076,
+      "size": [
+        1672,
+        941
+      ],
+      "mode": "RGB"
+    },
+    {
+      "path": "B-negative.png",
+      "sha256": "beed983a552ff9331bdc111f5e4cc2f1668c85c46ebce2809c6aae153b831caa",
+      "bytes": 2830231,
+      "size": [
+        1672,
+        941
+      ],
+      "mode": "RGB"
+    }
+  ],
+  "scope": "static concept review only",
+  "video_paused": true,
+  "source_preservation": "Reference-guided new concepts, not pixel-exact edits; no source video replacement",
+  "visual_review": {
+    "A": "Readable title and stronger glass relation; title resembles physical glass lettering, requires a motivated film reveal. Character and lighting are generated variations.",
+    "B": "Clear contrast and hierarchy, but paperlike edge and large white area risk poster treatment; not a preferred final treatment."
+  },
+  "status": "AWAITING_USER_VISUAL_DIRECTION",
+  "production_acceptance": "NOT_EVALUATED",
+  "cost": "Built-in tool billing not exposed; no video/music generation"
+}

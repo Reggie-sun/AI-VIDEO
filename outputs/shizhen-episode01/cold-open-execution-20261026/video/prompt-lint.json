@@ -1,0 +1,9 @@
+{
+  "first_last_roles": true,
+  "no_multimodal_markers": true,
+  "dialogue_a_once": true,
+  "dialogue_b_once": true,
+  "left_hand": true,
+  "truck_occlusion": true,
+  "1080p": true
+}

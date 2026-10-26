@@ -1,0 +1,13 @@
+{
+  "recorded_at": "2026-10-25T21:34:12.314551+00:00",
+  "before": {
+    "total_credits_left": 2490,
+    "monthly_usage": 10
+  },
+  "after": {
+    "total_credits_left": 2480,
+    "monthly_usage": 20
+  },
+  "observed_credits_consumed": 10,
+  "topup": false
+}

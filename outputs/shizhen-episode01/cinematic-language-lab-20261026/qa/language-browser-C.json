@@ -1,0 +1,80 @@
+{
+  "src": "C-refined/失帧-视觉方向-C-概念片.mp4",
+  "width": 1920,
+  "height": 1080,
+  "duration": 9,
+  "rate": 1,
+  "samples": [
+    {
+      "wallStep": 0,
+      "time": 0.026683,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 1,
+      "time": 1.026658,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 2,
+      "time": 2.02694,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 3,
+      "time": 3.027091,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 4,
+      "time": 4.027265,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 5,
+      "time": 5.02739,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 6,
+      "time": 6.027535,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 7,
+      "time": 7.027653,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 8,
+      "time": 8.027836,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 9,
+      "time": 9,
+      "paused": true,
+      "ended": true,
+      "error": null
+    }
+  ],
+  "scope": "normal-speed browser playback, not human listening"
+}

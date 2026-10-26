@@ -1,0 +1,11 @@
+{
+  "unit_dir": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-reconstruction-20261026/qa/exact-mix-audio-unit",
+  "intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-reconstruction-20261026/qa/exact-mix-audio-unit/intent.json",
+  "intent_sha256": "ecc33d871be495489dea586537dbbcb2df98ddac3459bb70b7e5e35a11ccd5d2",
+  "reservation_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-reconstruction-20261026/qa/exact-mix-audio-unit/reservation.json",
+  "reservation_sha256": "be8caafbf8123c96fdc31dfe6bd7ec01d4d92f10d005dfe4b5f938e67ea038ce",
+  "source_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870",
+  "source_size_bytes": 32158050,
+  "submit_count": 1,
+  "upper_bound_microunits": 50000
+}

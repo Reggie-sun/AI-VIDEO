@@ -1,0 +1,47 @@
+{
+  "selected_provider": "jimeng",
+  "selected_model_family": "seedance_2.5",
+  "surface_intent": "existing Jimeng native workflow",
+  "resolution": "1080p",
+  "aspect_ratio": "16:9",
+  "native_prompt_language": "zh",
+  "max_generation_seconds": 30,
+  "entries": [
+    {
+      "id": "CO-WORLD",
+      "prompt": "CO-WORLD.native.zh.txt",
+      "proposed_duration_seconds": 12,
+      "mode_candidate": "multimodal",
+      "reference_jobs": [
+        "look only: user reference",
+        "new live-action shelter geography",
+        "new Luo Min and Gao Zheng identities"
+      ],
+      "native_asset_bindings": "MISSING",
+      "runtime_profile": "REQUIRES_FRESH_BINDING"
+    },
+    {
+      "id": "CO-TWO",
+      "prompt": "CO-TWO.native.zh.txt",
+      "proposed_duration_seconds": 22,
+      "mode_candidate": "multimodal",
+      "reference_jobs": [
+        "new live-action two-person state",
+        "same-scene one-person state",
+        "same Luo Min close-up"
+      ],
+      "native_asset_bindings": "MISSING",
+      "runtime_profile": "REQUIRES_FRESH_BINDING"
+    }
+  ],
+  "execute_ready": false,
+  "missing": [
+    "live-action identity and scene reference media",
+    "selected exact current profile and input bindings",
+    "actual preview and lint",
+    "task-specific new paid-generation authorization",
+    "new reservation/durable intent/one-use permit"
+  ],
+  "not_a_production_manifest": true,
+  "new_paid_generation_calls": 0
+}

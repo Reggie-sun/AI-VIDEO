@@ -1,0 +1,386 @@
+{
+  "schema_version": "creative-goal-binding/1",
+  "authority": "development_only",
+  "creative_input": {
+    "path": "creative-input.txt",
+    "sha256": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a"
+  },
+  "coverage": {
+    "path": "director-coverage.json",
+    "sha256": "987d570231154fb67db3145d200b6ec623a6b37b0e5e23c854cc34c721ae876a"
+  },
+  "final_output_contract": {
+    "path": "final-output-contract.json",
+    "sha256": "ec9914305918d8ba5e5ad2de581f1cd15333e11ef15a21e0602714078f68b6f2"
+  },
+  "bindings": [
+    {
+      "intent_item_id": "source-review",
+      "constraint_ids": [
+        "source-review"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "source-review"
+      ]
+    },
+    {
+      "intent_item_id": "references",
+      "constraint_ids": [
+        "references"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "references"
+      ]
+    },
+    {
+      "intent_item_id": "originality",
+      "constraint_ids": [
+        "originality"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "originality"
+      ]
+    },
+    {
+      "intent_item_id": "structure",
+      "constraint_ids": [
+        "structure"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "structure"
+      ]
+    },
+    {
+      "intent_item_id": "ordinary-world",
+      "constraint_ids": [
+        "ordinary-world"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "ordinary-world"
+      ]
+    },
+    {
+      "intent_item_id": "scale",
+      "constraint_ids": [
+        "scale"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "scale"
+      ]
+    },
+    {
+      "intent_item_id": "emotion",
+      "constraint_ids": [
+        "emotion"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "emotion"
+      ]
+    },
+    {
+      "intent_item_id": "relations",
+      "constraint_ids": [
+        "relations"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "relations"
+      ]
+    },
+    {
+      "intent_item_id": "reveal-boundary",
+      "constraint_ids": [
+        "reveal-boundary"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "reveal-boundary"
+      ]
+    },
+    {
+      "intent_item_id": "freedom",
+      "constraint_ids": [
+        "freedom"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "freedom"
+      ]
+    },
+    {
+      "intent_item_id": "type",
+      "constraint_ids": [
+        "type"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "type"
+      ]
+    },
+    {
+      "intent_item_id": "type-restraint",
+      "constraint_ids": [
+        "type-restraint"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "type-restraint"
+      ]
+    },
+    {
+      "intent_item_id": "music",
+      "constraint_ids": [
+        "music"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "music"
+      ]
+    },
+    {
+      "intent_item_id": "mix",
+      "constraint_ids": [
+        "mix"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "mix"
+      ]
+    },
+    {
+      "intent_item_id": "reuse",
+      "constraint_ids": [
+        "reuse"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "reuse"
+      ]
+    },
+    {
+      "intent_item_id": "skills",
+      "constraint_ids": [
+        "skills"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "skills"
+      ]
+    },
+    {
+      "intent_item_id": "explore",
+      "constraint_ids": [
+        "explore"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "explore"
+      ]
+    },
+    {
+      "intent_item_id": "timing",
+      "constraint_ids": [
+        "timing"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "timing"
+      ]
+    },
+    {
+      "intent_item_id": "dynamic",
+      "constraint_ids": [
+        "dynamic"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "dynamic"
+      ]
+    },
+    {
+      "intent_item_id": "missing",
+      "constraint_ids": [
+        "missing"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "missing"
+      ]
+    },
+    {
+      "intent_item_id": "no-video-fee",
+      "constraint_ids": [
+        "no-video-fee"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "no-video-fee"
+      ]
+    },
+    {
+      "intent_item_id": "no-template",
+      "constraint_ids": [
+        "no-template"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "no-template"
+      ]
+    },
+    {
+      "intent_item_id": "art-review",
+      "constraint_ids": [
+        "art-review"
+      ],
+      "unit_ids": [
+        "CITY",
+        "ROAD",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3"
+      ],
+      "requirement_ids": [
+        "art-review"
+      ]
+    }
+  ]
+}

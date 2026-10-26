@@ -1,0 +1,52 @@
+{
+  "output": "outputs/shizhen-episode01/opening-narrative-integration-20261026/focus/失帧-两位-关键事件重剪-001.mp4",
+  "sha256": "1189b080130493791ce4cfffd464889f956e9632535429edd24fa74b674c5a09",
+  "bytes": 18223349,
+  "measured": {
+    "width": 1920,
+    "height": 1080,
+    "fps_num": 24,
+    "fps_den": 1,
+    "duration_frames": 424,
+    "codec_name": "h264",
+    "audio": {
+      "stream_count": 1,
+      "codec_name": "aac",
+      "sample_rate_hz": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "decoded_samples": 848896,
+      "encoder_priming_samples": 1024,
+      "encoder_padding_samples": 896,
+      "measurement_method": "held-fd ffprobe packets plus pcm_s16le decode"
+    }
+  },
+  "checks": [
+    {
+      "command": "lint",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "f91a7f9e08658cf8daf815895c72ad59093b2920a6f4b6f0aecc6a36b1ee1e2d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "error_count": 0,
+      "warning_count": 0
+    },
+    {
+      "command": "check",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "2cdc18b879e33fc37cabe6c8b629a3d401069928e6adc1624c2eb05748e4853f",
+      "stderr_sha256": "d307dee2a0b012cf36e66f31da96f0a4304ef70065eeb0ad3e63c1ee997e8a7a",
+      "error_count": 0,
+      "warning_count": 0
+    }
+  ],
+  "source_audio_matches_new_visual_windows": true,
+  "usage_scope": "development_audio_preview",
+  "native_dialogue": "KEEP exact native source sound for each revised window; no speech removed, no gain/fade changes",
+  "title_plate": "Title appears after answer over actual moving rain-glass; no independent static title plate",
+  "s01": "NOT_INCLUDED; protected in separate continuous context study",
+  "paid_generation_calls": 0,
+  "human_review": "PENDING",
+  "publication": "NOT_PUBLISHED"
+}

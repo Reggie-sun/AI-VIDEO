@@ -1,0 +1,752 @@
+{
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A3/state/video-generation/fetch/files/750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf.mp4",
+  "probe": {
+    "file": {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A3/state/video-generation/fetch/files/750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf.mp4",
+      "size_bytes": 56738811,
+      "size_mb": 54.11,
+      "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "duration_seconds": 22.08,
+      "duration_hms": "00:00:22.080",
+      "bit_rate_kbps": 20558
+    },
+    "video_stream": {
+      "codec": "h264",
+      "profile": "High",
+      "width": 1920,
+      "height": 1080,
+      "aspect_ratio": "16:9",
+      "fps": 60.0,
+      "pixel_format": "yuv420p",
+      "bit_rate_kbps": 20479,
+      "frame_count": 529
+    },
+    "audio_stream": {
+      "codec": "aac",
+      "sample_rate": 44100,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "bit_rate_kbps": 128,
+      "language": "und"
+    },
+    "metadata": {
+      "major_brand": "isom",
+      "minor_version": "512",
+      "compatible_brands": "isomiso2avc1mp41",
+      "LvMetaInfo": "{\"data\":{\"os\":\"\",\"product\":\"dreamina\",\"exportType\":\"generation\",\"videoId\":\"0\"}}",
+      "UserComment": "{\"aigc_label_type\":0,\"source_info\":\"dreamina\"}",
+      "com.apple.quicktime.artwork": "{\"data\":{\"os\":\"\",\"product\":\"dreamina\",\"exportType\":\"generation\",\"videoId\":\"0\"}}",
+      "comment": "vid:v02870g10004dbf8f8q7dld16aj55dt0",
+      "encoder": "Lavf58.76.100"
+    }
+  },
+  "frames": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A3/state/video-generation/fetch/files/750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf.mp4",
+    "total_frames_extracted": 89,
+    "interval_used": 0.25,
+    "frames": [
+      {
+        "timestamp_seconds": 0.0,
+        "timestamp_hms": "00:00:00.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 70372
+      },
+      {
+        "timestamp_seconds": 0.25,
+        "timestamp_hms": "00:00:00.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 70747
+      },
+      {
+        "timestamp_seconds": 0.5,
+        "timestamp_hms": "00:00:00.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 71019
+      },
+      {
+        "timestamp_seconds": 0.75,
+        "timestamp_hms": "00:00:00.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 70663
+      },
+      {
+        "timestamp_seconds": 1.0,
+        "timestamp_hms": "00:00:01.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 70220
+      },
+      {
+        "timestamp_seconds": 1.25,
+        "timestamp_hms": "00:00:01.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 69215
+      },
+      {
+        "timestamp_seconds": 1.5,
+        "timestamp_hms": "00:00:01.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 68809
+      },
+      {
+        "timestamp_seconds": 1.75,
+        "timestamp_hms": "00:00:01.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 68479
+      },
+      {
+        "timestamp_seconds": 2.0,
+        "timestamp_hms": "00:00:02.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67826
+      },
+      {
+        "timestamp_seconds": 2.25,
+        "timestamp_hms": "00:00:02.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67214
+      },
+      {
+        "timestamp_seconds": 2.5,
+        "timestamp_hms": "00:00:02.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 66345
+      },
+      {
+        "timestamp_seconds": 2.75,
+        "timestamp_hms": "00:00:02.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 65210
+      },
+      {
+        "timestamp_seconds": 3.0,
+        "timestamp_hms": "00:00:03.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 63806
+      },
+      {
+        "timestamp_seconds": 3.25,
+        "timestamp_hms": "00:00:03.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 62084
+      },
+      {
+        "timestamp_seconds": 3.5,
+        "timestamp_hms": "00:00:03.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 60540
+      },
+      {
+        "timestamp_seconds": 3.75,
+        "timestamp_hms": "00:00:03.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 59424
+      },
+      {
+        "timestamp_seconds": 4.0,
+        "timestamp_hms": "00:00:04.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 57973
+      },
+      {
+        "timestamp_seconds": 4.25,
+        "timestamp_hms": "00:00:04.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 56400
+      },
+      {
+        "timestamp_seconds": 4.5,
+        "timestamp_hms": "00:00:04.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 54257
+      },
+      {
+        "timestamp_seconds": 4.75,
+        "timestamp_hms": "00:00:04.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 51169
+      },
+      {
+        "timestamp_seconds": 5.0,
+        "timestamp_hms": "00:00:05.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 47046
+      },
+      {
+        "timestamp_seconds": 5.25,
+        "timestamp_hms": "00:00:05.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 44446
+      },
+      {
+        "timestamp_seconds": 5.5,
+        "timestamp_hms": "00:00:05.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 41892
+      },
+      {
+        "timestamp_seconds": 5.75,
+        "timestamp_hms": "00:00:05.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 35920
+      },
+      {
+        "timestamp_seconds": 6.0,
+        "timestamp_hms": "00:00:06.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 31418
+      },
+      {
+        "timestamp_seconds": 6.25,
+        "timestamp_hms": "00:00:06.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 27958
+      },
+      {
+        "timestamp_seconds": 6.5,
+        "timestamp_hms": "00:00:06.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 24286
+      },
+      {
+        "timestamp_seconds": 6.75,
+        "timestamp_hms": "00:00:06.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 21405
+      },
+      {
+        "timestamp_seconds": 7.0,
+        "timestamp_hms": "00:00:07.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 19121
+      },
+      {
+        "timestamp_seconds": 7.25,
+        "timestamp_hms": "00:00:07.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 17249
+      },
+      {
+        "timestamp_seconds": 7.5,
+        "timestamp_hms": "00:00:07.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 15211
+      },
+      {
+        "timestamp_seconds": 7.75,
+        "timestamp_hms": "00:00:07.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 13726
+      },
+      {
+        "timestamp_seconds": 8.0,
+        "timestamp_hms": "00:00:08.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 12037
+      },
+      {
+        "timestamp_seconds": 8.25,
+        "timestamp_hms": "00:00:08.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 12289
+      },
+      {
+        "timestamp_seconds": 8.5,
+        "timestamp_hms": "00:00:08.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 14013
+      },
+      {
+        "timestamp_seconds": 8.75,
+        "timestamp_hms": "00:00:08.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 19900
+      },
+      {
+        "timestamp_seconds": 9.0,
+        "timestamp_hms": "00:00:09.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 24990
+      },
+      {
+        "timestamp_seconds": 9.25,
+        "timestamp_hms": "00:00:09.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 31142
+      },
+      {
+        "timestamp_seconds": 9.5,
+        "timestamp_hms": "00:00:09.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 38081
+      },
+      {
+        "timestamp_seconds": 9.75,
+        "timestamp_hms": "00:00:09.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 45924
+      },
+      {
+        "timestamp_seconds": 10.0,
+        "timestamp_hms": "00:00:10.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 51822
+      },
+      {
+        "timestamp_seconds": 10.25,
+        "timestamp_hms": "00:00:10.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 57817
+      },
+      {
+        "timestamp_seconds": 10.5,
+        "timestamp_hms": "00:00:10.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 62774
+      },
+      {
+        "timestamp_seconds": 10.75,
+        "timestamp_hms": "00:00:10.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 69711
+      },
+      {
+        "timestamp_seconds": 11.0,
+        "timestamp_hms": "00:00:11.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 77110
+      },
+      {
+        "timestamp_seconds": 11.25,
+        "timestamp_hms": "00:00:11.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 81357
+      },
+      {
+        "timestamp_seconds": 11.5,
+        "timestamp_hms": "00:00:11.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 85905
+      },
+      {
+        "timestamp_seconds": 11.75,
+        "timestamp_hms": "00:00:11.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 86460
+      },
+      {
+        "timestamp_seconds": 12.0,
+        "timestamp_hms": "00:00:12.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 86573
+      },
+      {
+        "timestamp_seconds": 12.25,
+        "timestamp_hms": "00:00:12.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 86759
+      },
+      {
+        "timestamp_seconds": 12.5,
+        "timestamp_hms": "00:00:12.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 86926
+      },
+      {
+        "timestamp_seconds": 12.75,
+        "timestamp_hms": "00:00:12.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 86926
+      },
+      {
+        "timestamp_seconds": 13.0,
+        "timestamp_hms": "00:00:13.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 86905
+      },
+      {
+        "timestamp_seconds": 13.25,
+        "timestamp_hms": "00:00:13.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 86977
+      },
+      {
+        "timestamp_seconds": 13.5,
+        "timestamp_hms": "00:00:13.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 86830
+      },
+      {
+        "timestamp_seconds": 13.75,
+        "timestamp_hms": "00:00:13.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 86836
+      },
+      {
+        "timestamp_seconds": 14.0,
+        "timestamp_hms": "00:00:14.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 86878
+      },
+      {
+        "timestamp_seconds": 14.25,
+        "timestamp_hms": "00:00:14.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 86964
+      },
+      {
+        "timestamp_seconds": 14.5,
+        "timestamp_hms": "00:00:14.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 86884
+      },
+      {
+        "timestamp_seconds": 14.75,
+        "timestamp_hms": "00:00:14.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 87063
+      },
+      {
+        "timestamp_seconds": 15.0,
+        "timestamp_hms": "00:00:15.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 86983
+      },
+      {
+        "timestamp_seconds": 15.25,
+        "timestamp_hms": "00:00:15.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67475
+      },
+      {
+        "timestamp_seconds": 15.5,
+        "timestamp_hms": "00:00:15.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67363
+      },
+      {
+        "timestamp_seconds": 15.75,
+        "timestamp_hms": "00:00:15.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67659
+      },
+      {
+        "timestamp_seconds": 16.0,
+        "timestamp_hms": "00:00:16.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67779
+      },
+      {
+        "timestamp_seconds": 16.25,
+        "timestamp_hms": "00:00:16.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67896
+      },
+      {
+        "timestamp_seconds": 16.5,
+        "timestamp_hms": "00:00:16.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67926
+      },
+      {
+        "timestamp_seconds": 16.75,
+        "timestamp_hms": "00:00:16.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67503
+      },
+      {
+        "timestamp_seconds": 17.0,
+        "timestamp_hms": "00:00:17.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67673
+      },
+      {
+        "timestamp_seconds": 17.25,
+        "timestamp_hms": "00:00:17.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67970
+      },
+      {
+        "timestamp_seconds": 17.5,
+        "timestamp_hms": "00:00:17.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67968
+      },
+      {
+        "timestamp_seconds": 17.75,
+        "timestamp_hms": "00:00:17.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 68209
+      },
+      {
+        "timestamp_seconds": 18.0,
+        "timestamp_hms": "00:00:18.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67895
+      },
+      {
+        "timestamp_seconds": 18.25,
+        "timestamp_hms": "00:00:18.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67831
+      },
+      {
+        "timestamp_seconds": 18.5,
+        "timestamp_hms": "00:00:18.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67833
+      },
+      {
+        "timestamp_seconds": 18.75,
+        "timestamp_hms": "00:00:18.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67881
+      },
+      {
+        "timestamp_seconds": 19.0,
+        "timestamp_hms": "00:00:19.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67855
+      },
+      {
+        "timestamp_seconds": 19.25,
+        "timestamp_hms": "00:00:19.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67788
+      },
+      {
+        "timestamp_seconds": 19.5,
+        "timestamp_hms": "00:00:19.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67901
+      },
+      {
+        "timestamp_seconds": 19.75,
+        "timestamp_hms": "00:00:19.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67949
+      },
+      {
+        "timestamp_seconds": 20.0,
+        "timestamp_hms": "00:00:20.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67844
+      },
+      {
+        "timestamp_seconds": 20.25,
+        "timestamp_hms": "00:00:20.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67960
+      },
+      {
+        "timestamp_seconds": 20.5,
+        "timestamp_hms": "00:00:20.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67997
+      },
+      {
+        "timestamp_seconds": 20.75,
+        "timestamp_hms": "00:00:20.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 68112
+      },
+      {
+        "timestamp_seconds": 21.0,
+        "timestamp_hms": "00:00:21.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 68090
+      },
+      {
+        "timestamp_seconds": 21.25,
+        "timestamp_hms": "00:00:21.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 68118
+      },
+      {
+        "timestamp_seconds": 21.5,
+        "timestamp_hms": "00:00:21.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 68105
+      },
+      {
+        "timestamp_seconds": 21.75,
+        "timestamp_hms": "00:00:21.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 68167
+      },
+      {
+        "timestamp_seconds": 22.0,
+        "timestamp_hms": "00:00:22.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 68372
+      }
+    ]
+  },
+  "transcription": null,
+  "scenes": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A3/state/video-generation/fetch/files/750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf.mp4",
+    "threshold": 0.4,
+    "total_scenes": 1,
+    "scenes": [
+      {
+        "scene_number": 1,
+        "start_time": 0.0,
+        "start_hms": "00:00:00.000",
+        "end_time": 22.08,
+        "end_hms": "00:00:22.080",
+        "duration_seconds": 22.08,
+        "confidence": null
+      }
+    ]
+  },
+  "analysis_summary": {
+    "duration_hms": "00:00:22.080",
+    "resolution": "1920x1080",
+    "has_audio": true,
+    "estimated_speaking_duration_seconds": 0.0,
+    "scene_count": 1,
+    "frames_extracted": 89
+  },
+  "audio_understanding": {
+    "schema_version": "audio-understanding-evidence/1",
+    "source_sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+    "source_size_bytes": 56738811,
+    "audio_sha256": "fff2d9df79cc03d71e3c8505e2f976c1a1cd029ae96b699146938fd103c81f76",
+    "audio_size_bytes": 3895420,
+    "duration_seconds": 22.0821768707483,
+    "audio_start_seconds": 0.0,
+    "request_fingerprint": "f8a0dfc6be163a7462e34e1b659f4799e7dc890b2ef04169e0d2e6f32d4b2ba8",
+    "requested_model_id": "gemini-3.8-flash",
+    "response_model_id": "gemini-3.8-flash",
+    "response_sha256": "296483d00605653a7b9a6017471655ce4c8425e7ff16a97cfc24f76b05e688cd",
+    "observations": {
+      "segments": [
+        {
+          "start_seconds": 0.0,
+          "end_seconds": 2.6,
+          "text": "师傅，我们在站里，两位",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 2.9,
+          "end_seconds": 5.3,
+          "text": "让他别急，路滑",
+          "speaker": "Speaker 2"
+        },
+        {
+          "start_seconds": 15.3,
+          "end_seconds": 16.8,
+          "text": "就你一位？",
+          "speaker": "Speaker 2"
+        },
+        {
+          "start_seconds": 17.3,
+          "end_seconds": 19.0,
+          "text": "嗯，就我一个",
+          "speaker": "Speaker 1"
+        }
+      ],
+      "voice_description": "Speaker 1 is a female with a clear, natural, medium-pitched voice. Speaker 2 is a male with a deep, slightly raspy, low-pitched voice.",
+      "delivery_description": "Both speakers talk in a calm, casual, conversational manner with standard pacing and pragmatic tone.",
+      "background_sounds": [
+        "vehicle engine hum",
+        "car interior ambient noise",
+        "rustling"
+      ],
+      "uncertainties": []
+    },
+    "proof_boundary": "analyzer observations; not QA/human/timing acceptance",
+    "media_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A3/state/video-generation/fetch/files/750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf.mp4",
+    "analysis_audio_derivation": "full_source_track_pcm_derivative",
+    "human_acceptance": "NOT_EVALUATED"
+  }
+}

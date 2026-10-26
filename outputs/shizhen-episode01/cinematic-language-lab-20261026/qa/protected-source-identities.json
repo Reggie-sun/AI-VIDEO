@@ -1,0 +1,36 @@
+{
+  "sources": [
+    {
+      "asset_id": "CO-A1-review-video",
+      "sha256": "b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd",
+      "bytes": 29400940,
+      "unchanged": true
+    },
+    {
+      "asset_id": "CO-A2-review-video",
+      "sha256": "0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c",
+      "bytes": 14559142,
+      "unchanged": true
+    },
+    {
+      "asset_id": "CO-A3-review-video",
+      "sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+      "bytes": 56738811,
+      "unchanged": true
+    },
+    {
+      "asset_id": "approved-HD005-review-source",
+      "sha256": "15c7c21ea8ef526d641d5a1565cbb4ec93ea4ee63b34fc9c7a0d73f2b21efb0b",
+      "bytes": 51142682,
+      "unchanged": true
+    },
+    {
+      "asset_id": "two-passengers-missing-response-B",
+      "sha256": "88585bd2a3a9d44680f1a1a2667145839fa5166363c36260d2963ed8bd05a425",
+      "bytes": 17063440,
+      "unchanged": true
+    }
+  ],
+  "new_paid_generation_calls": 0,
+  "production_manifest_mutation": false
+}

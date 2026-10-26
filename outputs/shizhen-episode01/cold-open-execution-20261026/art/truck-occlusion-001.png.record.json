@@ -1,0 +1,13 @@
+{
+  "schema_version": "agent-generated-image-observation/1",
+  "sha256": "4fb4538af83a0c52714a268478341b59726cc0c2ba638d79a67943636131d6b7",
+  "size_bytes": 2120476,
+  "width": 1672,
+  "height": 941,
+  "generator": "builtin image_gen.imagegen",
+  "tool_identity_claim": "builtin only; exact internal model not exposed",
+  "fictional_characters": true,
+  "platform_admission": "NOT_EVALUATED",
+  "semantic_review": "Parent viewed actual result; intended identity/state/geometry consistent, not a mask-zero-diff claim",
+  "actual_phone_hand": "LEFT"
+}

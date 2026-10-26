@@ -1,0 +1,64 @@
+{
+  "shot_id": "CO-A3",
+  "attempt_id": "shizhen-CO-A3-qualification-001",
+  "artifact_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A3/state/video-generation/fetch/files/750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf.mp4",
+  "artifact_sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+  "verdict": "FAIL",
+  "proof": "analyzer",
+  "required_findings": [
+    {
+      "requirement_id": "relationship",
+      "verdict": "PASS",
+      "reason": "两名同事先通话与提醒湿路，后态罗敏独自自然候车，未增加角色关系或记忆保留者。",
+      "evidence_ref": "CO-A3-mcp.json"
+    },
+    {
+      "requirement_id": "action",
+      "verdict": "PASS",
+      "reason": "货车从左向右经过，7.5–9s完整遮住两名人物，10–12s揭出原棚左侧空位和右侧罗敏；未见走开、上车或透明消失。车轮/路面仍在画面底部，未字面遮满每一个像素，功能性的角色遮挡成立。",
+      "evidence_ref": "CO-A3-mcp.json"
+    },
+    {
+      "requirement_id": "identity",
+      "verdict": "FAIL",
+      "reason": "FAIL:高峥从0秒起没有参考1的褐色挎包，因而没有满足既定各自包保持；罗敏的脸、雨衣、黑包和左手手机左耳保持。不能以消失后无遗留包倒签消失前包存在。",
+      "evidence_ref": "CO-A3-mcp.json"
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "PASS",
+      "reason": "固定站棚全景完成两位到一位，约15.25s才切同侧罗敏胸上近景；空位先可读。MCP场景阈值报告1不覆盖实际89帧可见剪切。",
+      "evidence_ref": "CO-A3-mcp.json"
+    },
+    {
+      "requirement_id": "performance",
+      "verdict": "PASS",
+      "reason": "女先报两位，男听后回应，女随后看他；后态她无寻找或惊恐，近景平常回答一位，口型归女声。原速human观感待审。",
+      "evidence_ref": "CO-A3-mcp.json"
+    },
+    {
+      "requirement_id": "sound",
+      "verdict": "NOT_EVALUATED",
+      "reason": "真实音频理解四轮语义及顺序齐全，声线平常；它把路滑提醒与电话核对都归同一Speaker2，且背景只列引擎/车内/衣料，不能据此证明电话声处理、近棚雨声或不同男性身份可辨，相关声音目标NOT_EVALUATED。",
+      "evidence_ref": "CO-A3-mcp.json"
+    },
+    {
+      "requirement_id": "story-scope",
+      "verdict": "PASS",
+      "reason": "一次前一夜的失踪，角色未记忆高峥；不解释规则或泄露S01/终场反转，无鬼怪、字幕、准确数字或片名。",
+      "evidence_ref": "CO-A3-mcp.json"
+    },
+    {
+      "requirement_id": "art",
+      "verdict": "PASS",
+      "reason": "89帧内保持成年原创CG与同一雨棚冷暖光，近景罗敏面部发丝及湿衣材质统一，未变真人或蜡像。",
+      "evidence_ref": "CO-A3-mcp.json"
+    }
+  ],
+  "source_frame_count": 529,
+  "observed_terminal_state": "罗敏同侧胸上近景，左手手机贴左耳，平常听电话",
+  "human_acceptance": "NOT_EVALUATED",
+  "production_activation": false,
+  "next_component": "STOP new generation. Known prop failure: repair through existing accepted prefix, preserve full raw and history; no raw acceptance or Production activation",
+  "actual_new_video_submits": 3
+}

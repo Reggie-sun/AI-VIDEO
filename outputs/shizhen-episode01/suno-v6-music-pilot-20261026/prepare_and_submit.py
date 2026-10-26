@@ -79,7 +79,16 @@ class OneUseTransport:
         live = "generate" in argv and "--dry-run" not in argv
         if live:
             if (ROOT / "STOP.json").exists():
-                raise RuntimeError("Experiment is stopped; no new submit before explicit recovery")
+                resume_path = ROOT / "auth-repair-01/resume-request-02.json"
+                if not resume_path.is_file() or list(ROOT.glob("STOP-request-*.json")):
+                    raise RuntimeError("Experiment is stopped; no new submit before explicit recovery")
+                resume = json.loads(resume_path.read_text())
+                actual_hash = hashlib.sha256(json.dumps(list(argv), ensure_ascii=False).encode()).hexdigest()
+                if resume["allowed_argv_sha256"] != actual_hash or resume["stop_sha256"] != hashlib.sha256((ROOT / "STOP.json").read_bytes()).hexdigest():
+                    raise RuntimeError("Recovery authority does not match the exact new request/old stop")
+                for relative, expected in resume["evidence_sha256"].items():
+                    if hashlib.sha256((ROOT / relative).read_bytes()).hexdigest() != expected:
+                        raise RuntimeError("Recovery evidence changed")
             if tuple(argv) != self.allowed:
                 raise RuntimeError("Exact request differs from the sealed permit")
             with (ROOT / ".request-count.lock").open("a+") as lock:
@@ -130,7 +139,10 @@ def main():
             write(unit / "submit-result.json", result.model_dump(mode="json"))
         except AiVideoError as exc:
             write(unit / "submit-error.json", {"code": str(exc.code), "message": str(exc), "stop": True})
-            write(ROOT / "STOP.json", {"request_id": request_id_for(d), "code": str(exc.code), "recorded_at": stamp(), "new_submissions_allowed": False})
+            stop = ROOT / "STOP.json"
+            if stop.exists():
+                stop = ROOT / f"STOP-request-{number:02d}.json"
+            write(stop, {"request_id": request_id_for(d), "code": str(exc.code), "recorded_at": stamp(), "new_submissions_allowed": False})
             print(json.dumps({"state": "STOP", "code": str(exc.code)})); return 2
     else: raise ValueError("Unknown action")
     print(json.dumps(result.model_dump(mode="json"), ensure_ascii=False))

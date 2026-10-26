@@ -1,0 +1,467 @@
+{
+  "schema_version": "4",
+  "request": {
+    "creative_input_kind": "direction",
+    "creative_input_evidence": "Exact user excerpts for this revision (not a complete transcript)\n\n宏观世界 → 社会与环境 → 具体空间 → 微观异常 → 正片叙事\n\n重点不是增加几个城市航拍、故障画面或抽象特效，而是通过有意义的视觉事件，让观众感受到这个世界看似正常，却存在某种深层的不协调。\n\n原则上保留现有 Shot，将其作为新版宏观叙事逐步进入微观异常阶段的候选组成镜头。\n\n原有音乐同样需要保留。\n\n不要将这项工作误判为字幕优化，也不要使用廉价的模板化 Glitch、发光字体或普通 PPT 式文字转场。\n\n确保中文文字准确、清晰、稳定，必要时使用后期字体排版与合成，而不是完全依赖视频生成模型直接生成汉字。\n\n宏观表现不能提前曝光关键人物身份、异常来源、后续反转或原本应当延后揭示的信息。\n\n未经授权不得产生新增付费生成费用，也不得用低质量占位内容冒充正式镜头。\n\n不要只停留在设计文档或文字方案。\n\n等下,别的要求不要变,我要全部变成真人感觉,不要现在的3d写实,就像这种[Image #1]\n\n用即梦 seedance 2.5\n\n保留 Suno 的“缺席的应答”音乐主题，确保音乐真正服务剧情，不为片头强行加入配乐。\n\n保留已有世界观、时间逻辑、最终反转和观众信息差。不要增加新的灵异规则。",
+    "creative_constraints": [
+      {
+        "constraint_id": "world",
+        "scope": "global",
+        "source_text": "宏观世界 → 社会与环境 → 具体空间 → 微观异常 → 正片叙事"
+      },
+      {
+        "constraint_id": "meaning",
+        "scope": "global",
+        "source_text": "重点不是增加几个城市航拍、故障画面或抽象特效，而是通过有意义的视觉事件，让观众感受到这个世界看似正常，却存在某种深层的不协调。"
+      },
+      {
+        "constraint_id": "preserve",
+        "scope": "global",
+        "source_text": "原则上保留现有 Shot，将其作为新版宏观叙事逐步进入微观异常阶段的候选组成镜头。"
+      },
+      {
+        "constraint_id": "music",
+        "scope": "global",
+        "source_text": "原有音乐同样需要保留。"
+      },
+      {
+        "constraint_id": "type",
+        "scope": "global",
+        "source_text": "不要将这项工作误判为字幕优化，也不要使用廉价的模板化 Glitch、发光字体或普通 PPT 式文字转场。"
+      },
+      {
+        "constraint_id": "chinese",
+        "scope": "global",
+        "source_text": "确保中文文字准确、清晰、稳定，必要时使用后期字体排版与合成，而不是完全依赖视频生成模型直接生成汉字。"
+      },
+      {
+        "constraint_id": "reveals",
+        "scope": "global",
+        "source_text": "宏观表现不能提前曝光关键人物身份、异常来源、后续反转或原本应当延后揭示的信息。"
+      },
+      {
+        "constraint_id": "paid",
+        "scope": "global",
+        "source_text": "未经授权不得产生新增付费生成费用，也不得用低质量占位内容冒充正式镜头。"
+      },
+      {
+        "constraint_id": "output",
+        "scope": "global",
+        "source_text": "不要只停留在设计文档或文字方案。"
+      },
+      {
+        "constraint_id": "style",
+        "scope": "global",
+        "source_text": "等下,别的要求不要变,我要全部变成真人感觉,不要现在的3d写实,就像这种[Image #1]"
+      },
+      {
+        "constraint_id": "model",
+        "scope": "global",
+        "source_text": "用即梦 seedance 2.5"
+      },
+      {
+        "constraint_id": "theme",
+        "scope": "global",
+        "source_text": "保留 Suno 的“缺席的应答”音乐主题，确保音乐真正服务剧情，不为片头强行加入配乐。"
+      },
+      {
+        "constraint_id": "rules",
+        "scope": "global",
+        "source_text": "保留已有世界观、时间逻辑、最终反转和观众信息差。不要增加新的灵异规则。"
+      }
+    ],
+    "target_duration_seconds": 53.5,
+    "coverage_strategy": "multi_shot",
+    "strategy_source": "agent_directed",
+    "director_decision_rationale": "城市交通与夜班生活建立观看尺度，动线收束到两个普通人；一次失踪把空间变成缺席。主片名和时间省略职责分开。真人视觉替换旧CG目标，原始素材与音乐作为受保护来源，不将旧CG混作真人合格片。",
+    "strategy_request_evidence": null,
+    "director_skill": "open-video"
+  },
+  "coverage_units": [
+    {
+      "unit_id": "CO-W1",
+      "duration_seconds": 6,
+      "beat_function": "establish",
+      "objective": "把城市变成仍在运转的生活空间",
+      "open_state": "高处雨夜街区",
+      "close_state": "下工人群进入送人回家的交通动线",
+      "shot_scale": "extreme_wide",
+      "camera_treatment": "static",
+      "camera_intent": "长焦观察真实动线，不游览天际线",
+      "visible_change": "人群与车辆以自己的任务改变画面",
+      "transition_out": "motivated_cut",
+      "constraint_ids": [
+        "world",
+        "meaning",
+        "preserve",
+        "music",
+        "type",
+        "chinese",
+        "reveals",
+        "paid",
+        "output",
+        "style",
+        "model",
+        "theme",
+        "rules"
+      ]
+    },
+    {
+      "unit_id": "CO-W2",
+      "duration_seconds": 6,
+      "beat_function": "transition",
+      "objective": "将宏观生活收束到两位同事",
+      "open_state": "同一物流车进入街面",
+      "close_state": "站棚两位同事成为注意中心",
+      "shot_scale": "wide",
+      "camera_treatment": "tracking",
+      "camera_intent": "街道高度的前景遮挡带出候车关系",
+      "visible_change": "视点从交通动线落到两个人的接车任务",
+      "transition_out": "motivated_cut",
+      "constraint_ids": [
+        "world",
+        "meaning",
+        "preserve",
+        "music",
+        "type",
+        "chinese",
+        "reveals",
+        "paid",
+        "output",
+        "style",
+        "model",
+        "theme",
+        "rules"
+      ]
+    },
+    {
+      "unit_id": "CO-TWO",
+      "duration_seconds": 22,
+      "beat_function": "reversal",
+      "objective": "让观众记得一个别人已经忘记的人",
+      "open_state": "两位同事等待司机",
+      "close_state": "只剩罗敏且平常确认一位",
+      "shot_scale": "mixed_progression",
+      "camera_treatment": "compound",
+      "camera_intent": "保护空位及出入口，回答再切近景",
+      "visible_change": "两位经货车遮挡成为一位，关系被平常回答抹去",
+      "transition_out": "cut",
+      "constraint_ids": [
+        "world",
+        "meaning",
+        "preserve",
+        "music",
+        "type",
+        "chinese",
+        "reveals",
+        "paid",
+        "output",
+        "style",
+        "model",
+        "theme",
+        "rules"
+      ]
+    },
+    {
+      "unit_id": "TITLE",
+      "duration_seconds": 3.5,
+      "beat_function": "payoff",
+      "objective": "让缺席进入片名与时间省略",
+      "open_state": "日常回答已落定",
+      "close_state": "片名后准备进入翌夜",
+      "shot_scale": "close_up",
+      "camera_treatment": "static",
+      "camera_intent": "完整稳定中文的间隔承担缺席，不制造故障",
+      "visible_change": "主片名可读后退出，翌夜由独立窗口进入",
+      "transition_out": "cut",
+      "constraint_ids": [
+        "world",
+        "meaning",
+        "preserve",
+        "music",
+        "type",
+        "chinese",
+        "reveals",
+        "paid",
+        "output",
+        "style",
+        "model",
+        "theme",
+        "rules"
+      ]
+    },
+    {
+      "unit_id": "S01",
+      "duration_seconds": 16,
+      "beat_function": "establish",
+      "objective": "自然进入便利店日常服务",
+      "open_state": "翌夜林序买饭",
+      "close_state": "保留原认可的服务动作与人物关系",
+      "shot_scale": "mixed_progression",
+      "camera_treatment": "compound",
+      "camera_intent": "保留原四机位叙事与轴线，真人画面独立新版本",
+      "visible_change": "热饭、垫纸、放稳与接话依因果发生",
+      "transition_out": "end",
+      "constraint_ids": [
+        "world",
+        "meaning",
+        "preserve",
+        "music",
+        "type",
+        "chinese",
+        "reveals",
+        "paid",
+        "output",
+        "style",
+        "model",
+        "theme",
+        "rules"
+      ]
+    }
+  ],
+  "intent_items": [
+    {
+      "intent_item_id": "world",
+      "statement": "宏观世界 → 社会与环境 → 具体空间 → 微观异常 → 正片叙事",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "4809e466b09fb947bfcab9d4ecd1adecb975a575bedc06b8a5014aafec87df9c",
+          "locator": "production-inputs/creative-input-excerpts.txt#world",
+          "intent_item_id": "world",
+          "quote": "宏观世界 → 社会与环境 → 具体空间 → 微观异常 → 正片叙事",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "meaning",
+      "statement": "重点不是增加几个城市航拍、故障画面或抽象特效，而是通过有意义的视觉事件，让观众感受到这个世界看似正常，却存在某种深层的不协调。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "4809e466b09fb947bfcab9d4ecd1adecb975a575bedc06b8a5014aafec87df9c",
+          "locator": "production-inputs/creative-input-excerpts.txt#meaning",
+          "intent_item_id": "meaning",
+          "quote": "重点不是增加几个城市航拍、故障画面或抽象特效，而是通过有意义的视觉事件，让观众感受到这个世界看似正常，却存在某种深层的不协调。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "preserve",
+      "statement": "原则上保留现有 Shot，将其作为新版宏观叙事逐步进入微观异常阶段的候选组成镜头。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "4809e466b09fb947bfcab9d4ecd1adecb975a575bedc06b8a5014aafec87df9c",
+          "locator": "production-inputs/creative-input-excerpts.txt#preserve",
+          "intent_item_id": "preserve",
+          "quote": "原则上保留现有 Shot，将其作为新版宏观叙事逐步进入微观异常阶段的候选组成镜头。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "music",
+      "statement": "原有音乐同样需要保留。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "4809e466b09fb947bfcab9d4ecd1adecb975a575bedc06b8a5014aafec87df9c",
+          "locator": "production-inputs/creative-input-excerpts.txt#music",
+          "intent_item_id": "music",
+          "quote": "原有音乐同样需要保留。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "type",
+      "statement": "不要将这项工作误判为字幕优化，也不要使用廉价的模板化 Glitch、发光字体或普通 PPT 式文字转场。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "4809e466b09fb947bfcab9d4ecd1adecb975a575bedc06b8a5014aafec87df9c",
+          "locator": "production-inputs/creative-input-excerpts.txt#type",
+          "intent_item_id": "type",
+          "quote": "不要将这项工作误判为字幕优化，也不要使用廉价的模板化 Glitch、发光字体或普通 PPT 式文字转场。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "chinese",
+      "statement": "确保中文文字准确、清晰、稳定，必要时使用后期字体排版与合成，而不是完全依赖视频生成模型直接生成汉字。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "4809e466b09fb947bfcab9d4ecd1adecb975a575bedc06b8a5014aafec87df9c",
+          "locator": "production-inputs/creative-input-excerpts.txt#chinese",
+          "intent_item_id": "chinese",
+          "quote": "确保中文文字准确、清晰、稳定，必要时使用后期字体排版与合成，而不是完全依赖视频生成模型直接生成汉字。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "reveals",
+      "statement": "宏观表现不能提前曝光关键人物身份、异常来源、后续反转或原本应当延后揭示的信息。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "4809e466b09fb947bfcab9d4ecd1adecb975a575bedc06b8a5014aafec87df9c",
+          "locator": "production-inputs/creative-input-excerpts.txt#reveals",
+          "intent_item_id": "reveals",
+          "quote": "宏观表现不能提前曝光关键人物身份、异常来源、后续反转或原本应当延后揭示的信息。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "paid",
+      "statement": "未经授权不得产生新增付费生成费用，也不得用低质量占位内容冒充正式镜头。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "4809e466b09fb947bfcab9d4ecd1adecb975a575bedc06b8a5014aafec87df9c",
+          "locator": "production-inputs/creative-input-excerpts.txt#paid",
+          "intent_item_id": "paid",
+          "quote": "未经授权不得产生新增付费生成费用，也不得用低质量占位内容冒充正式镜头。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "output",
+      "statement": "不要只停留在设计文档或文字方案。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "4809e466b09fb947bfcab9d4ecd1adecb975a575bedc06b8a5014aafec87df9c",
+          "locator": "production-inputs/creative-input-excerpts.txt#output",
+          "intent_item_id": "output",
+          "quote": "不要只停留在设计文档或文字方案。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "style",
+      "statement": "等下,别的要求不要变,我要全部变成真人感觉,不要现在的3d写实,就像这种[Image #1]",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "4809e466b09fb947bfcab9d4ecd1adecb975a575bedc06b8a5014aafec87df9c",
+          "locator": "production-inputs/creative-input-excerpts.txt#style",
+          "intent_item_id": "style",
+          "quote": "等下,别的要求不要变,我要全部变成真人感觉,不要现在的3d写实,就像这种[Image #1]",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "model",
+      "statement": "用即梦 seedance 2.5",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "4809e466b09fb947bfcab9d4ecd1adecb975a575bedc06b8a5014aafec87df9c",
+          "locator": "production-inputs/creative-input-excerpts.txt#model",
+          "intent_item_id": "model",
+          "quote": "用即梦 seedance 2.5",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "theme",
+      "statement": "保留 Suno 的“缺席的应答”音乐主题，确保音乐真正服务剧情，不为片头强行加入配乐。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "4809e466b09fb947bfcab9d4ecd1adecb975a575bedc06b8a5014aafec87df9c",
+          "locator": "production-inputs/creative-input-excerpts.txt#theme",
+          "intent_item_id": "theme",
+          "quote": "保留 Suno 的“缺席的应答”音乐主题，确保音乐真正服务剧情，不为片头强行加入配乐。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "rules",
+      "statement": "保留已有世界观、时间逻辑、最终反转和观众信息差。不要增加新的灵异规则。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "4809e466b09fb947bfcab9d4ecd1adecb975a575bedc06b8a5014aafec87df9c",
+          "locator": "production-inputs/creative-input-excerpts.txt#rules",
+          "intent_item_id": "rules",
+          "quote": "保留已有世界观、时间逻辑、最终反转和观众信息差。不要增加新的灵异规则。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    }
+  ],
+  "intent_groups": {
+    "must_happen": [
+      {
+        "intent_item_id": "world"
+      },
+      {
+        "intent_item_id": "meaning"
+      },
+      {
+        "intent_item_id": "preserve"
+      },
+      {
+        "intent_item_id": "music"
+      },
+      {
+        "intent_item_id": "chinese"
+      },
+      {
+        "intent_item_id": "output"
+      },
+      {
+        "intent_item_id": "style"
+      },
+      {
+        "intent_item_id": "model"
+      },
+      {
+        "intent_item_id": "theme"
+      }
+    ],
+    "must_not_happen": [
+      {
+        "intent_item_id": "type"
+      },
+      {
+        "intent_item_id": "reveals"
+      },
+      {
+        "intent_item_id": "paid"
+      },
+      {
+        "intent_item_id": "rules"
+      }
+    ],
+    "preferred_performance": [],
+    "timing_targets": [],
+    "acceptable_variation": []
+  }
+}

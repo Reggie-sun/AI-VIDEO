@@ -1,0 +1,96 @@
+{
+  "recorded_at": "2026-10-25T21:34:44.837041+00:00",
+  "files": [
+    {
+      "path": "audio/scene04-修复台-两个源文件的缺口-instrumental-bed-1c3f82de.mp3",
+      "clip_id": "1c3f82de-fa9e-43e7-abf0-e366de84caa9",
+      "sha256": "27f95a3a39093e37307845703ed95c6776b07ecb1ab736723f2d9c403b8f2873",
+      "bytes": 4781935,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "48000",
+            "channels": 2
+          },
+          {
+            "codec_name": "mjpeg"
+          }
+        ],
+        "format": {
+          "duration": "214.824000",
+          "size": "4781935"
+        }
+      },
+      "full_decode_exit_code": 0
+    },
+    {
+      "path": "audio/scene04-修复台-两个源文件的缺口-instrumental-bed-1c3f82de.wav",
+      "clip_id": "1c3f82de-fa9e-43e7-abf0-e366de84caa9",
+      "sha256": "7cadb2b2bd16e554e92dead6c29c405e7ec4a48e622b4a935a59cb60fda366e7",
+      "bytes": 41255440,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "pcm_s16le",
+            "sample_rate": "48000",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "214.800000",
+          "size": "41255440"
+        }
+      },
+      "full_decode_exit_code": 0
+    },
+    {
+      "path": "audio/scene04-修复台-两个源文件的缺口-instrumental-bed-e3599d34.mp3",
+      "clip_id": "e3599d34-c24a-4750-ad48-69825671da9b",
+      "sha256": "da47cdc332f277c32cc61aac5ed78c4c4bdef2743727b6a3f39e453b2960eaf6",
+      "bytes": 4448092,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "48000",
+            "channels": 2
+          },
+          {
+            "codec_name": "mjpeg"
+          }
+        ],
+        "format": {
+          "duration": "199.224000",
+          "size": "4448092"
+        }
+      },
+      "full_decode_exit_code": 0
+    },
+    {
+      "path": "audio/scene04-修复台-两个源文件的缺口-instrumental-bed-e3599d34.wav",
+      "clip_id": "e3599d34-c24a-4750-ad48-69825671da9b",
+      "sha256": "41b3d40095cd82559d3c37cedcdcff4890d74b6f4298c1e9b2b39226b263ba8c",
+      "bytes": 38260240,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "pcm_s16le",
+            "sample_rate": "48000",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "199.200000",
+          "size": "38260240"
+        }
+      },
+      "full_decode_exit_code": 0
+    }
+  ],
+  "actual_audio_listening": "NOT_EVALUATED"
+}

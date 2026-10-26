@@ -1,0 +1,41 @@
+{
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-A-revision-20261026/variant-R2/失帧-独立开场-接缝修订-R2.mp4",
+  "model": "medium",
+  "language": "zh",
+  "duration_seconds": 17.375,
+  "segments": [
+    {
+      "id": 0,
+      "start": 0,
+      "end": 2.86,
+      "start_hms": "00:00:00.000",
+      "end_hms": "00:00:02.860",
+      "text": "师父 我们在站里 两位"
+    },
+    {
+      "id": 1,
+      "start": 2.86,
+      "end": 4.68,
+      "start_hms": "00:00:02.860",
+      "end_hms": "00:00:04.680",
+      "text": "让他别急 路滑"
+    },
+    {
+      "id": 2,
+      "start": 10.82,
+      "end": 11.68,
+      "start_hms": "00:00:10.820",
+      "end_hms": "00:00:11.680",
+      "text": "就你一位"
+    },
+    {
+      "id": 3,
+      "start": 13.44,
+      "end": 14.4,
+      "start_hms": "00:00:13.440",
+      "end_hms": "00:00:14.400",
+      "text": "就我一个"
+    }
+  ],
+  "full_text": "师父 我们在站里 两位\n让他别急 路滑\n就你一位\n就我一个"
+}

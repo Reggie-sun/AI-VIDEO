@@ -1,0 +1,599 @@
+{
+  "schema_version": "visual-review-packet/4",
+  "authority": "development_only",
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-reconstruction-20261026/失帧-开场重构-动态预演-002.mp4",
+  "video_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870",
+  "video_size_bytes": 32158050,
+  "duration_ms": 25667,
+  "contract": {
+    "goal_id": "shizhen-opening-reconstruction",
+    "goal_version": "1",
+    "user_goal": "https://vimeo.com/84017154?utm_source=chatgpt.com  https://www.youtube.com/watch?v=NmS3m0OG-Ug https://www.youtube.com/watch?v=rLSH-81yT7s\n# 《失帧》视觉开场重构：从静态概念片到电影级视听叙事\n\n请接管《失帧》当前视觉开场制作，先审看最新的 `失帧-视觉方向-C-概念片.mp4`、对应海报、现有 Shot、原音乐、剧本及导演设计。\n目前方向 C 已经具备一定的视觉设计基础，但整体仍缺少真正成熟的电影表现力。\n本次不是简单优化字体、双重曝光或转场，而是重新审视整段开场的视觉叙事。\n\n## 一、参考作品\n重点研究以下三部作品的片头设计：\n- 《真探》第一季：影像层次、人物与环境的关系、双重曝光、剪辑节奏。\n- 《人生切割术》第一季：超现实视觉事件、空间变化、连续运动和世界观的视觉呈现。\n- 《守望尘世》第二季：缺失、记忆、人物消失与日常影像之间的情绪关系。\n请主动研究其片头的镜头组织、构图、节奏、音乐与文字结合方法。\n参考的是创作方法和艺术水准，不是复刻镜头、使用原作素材或照搬视觉风格。\n\n## 二、当前版本存在的问题\n目前 9 秒概念片主要依靠人物剪影、雨夜纹理、双重曝光、中文标题及简单转场构成。\n它具有一定的平面设计感，但缺乏真正的镜头叙事推进。\n人物与环境之间没有发生足够有意义的变化，画面长时间停留在相似构图中，视觉表达停留在漂亮的概念包装层面。\n当前的“失帧”文字虽然进行了大小和位置上的变化，却仍然与画面事件相对独立。\n请不要把本次任务理解为继续增加文字动画、蒙版、噪点、镜头数量或者特效复杂度。\n真正的问题是：观众看到了设计，却没有经历一个正在发生的异常。\n\n## 三、重新建立核心创作方向\n《失帧》的开场应该让观众感觉到：\n世界表面上依然正常运转，但现实正在悄无声息地发生某种不合理的变化。\n希望从更大的世界尺度，逐渐收束到具体空间和极其细微的异常。\n让观众从感受到不协调，逐渐进入怀疑、困惑与不安。\n异常不仅需要被看见，还需要通过镜头前后的关系被感知。\n比如，一个正常场景发生了观众能够察觉、但画面中其他人完全没有意识到的变化，这可能比大量闪屏、噪点和视觉故障更具有力量。\n这只是导演思考方向，不要求机械实现这一示例。\n请根据《失帧》的剧本与信息揭示边界，自主寻找更具有表现力的电影语言。\n\n## 四、突破目前的视觉形式\n不再要求继续沿用白色背景、人物剪影、城市纹理、黑色宋体和水平线转场。\n方向 C 中有价值的素材可以保留，但不能让既有视觉形式限制新方案。\n允许探索真实摄影、空间异常、时间错位、光学表现、环境变化、非对称构图、视觉隐喻和实验性排字。\n重点是让不同镜头之间产生叙事联系，让画面本身推动观众理解这个世界，而不是一系列独立设计作品的展示。\n字体也应具有更强的电影美术品质，并与镜头事件、空间和剪辑节奏形成联系。\n不必追求所有镜头都有文字，也不要为了展现 Typography Skill 而制造无意义的文字动画。\n\n## 五、音乐与既有素材\n保留此前已确认的音乐，将其作为新版开场的核心声音素材。\n根据音乐的结构、情绪和节奏重新组织视觉内容，必要时进行合理延展、混音和环境音设计。\n现有 Shot 与方向 C 概念片中的有效画面也应作为可复用素材，而非全部废弃。\n但保留不意味着必须完整使用原来的 9 秒，可以根据新镜头结构进行拆分、重组与重新剪辑。\n希望新增宏观镜头、已有画面、关键文字和音乐形成统一的视听体验。\n\n## 六、导演与 Skill 协作\n优先调用当前项目和 Codex 已安装的专业 Skills。\n导演体系负责叙事、镜头与视听整体判断；Motion Design、Kinetic Typography、剪辑及合成能力负责对应的专业实现。\n不要重新开发一套重复的 Skill，不要为了调用某个 Skill 而改变作品应该采用的视觉形式。\n本次更重视导演判断、镜头表现和最终观看感受，而非技术模块数量。\n\n## 七、实际制作与审查\n请先分析原片为什么缺乏情绪感染力，找出真正的结构问题。\n随后探索具有明显艺术差异的视觉方案，选出最符合《失帧》的方向，实际推进制作。\n不预设固定镜头数量、精确时长或必须使用的特效。\n允许显著扩展开场，但时长必须由叙事节奏决定，不得单纯填充镜头。\n请在既有素材及已授权工具范围内完成尽可能充分的动态预演、剪辑、字体合成、音乐组织及可观看样片。\n对于尚无素材的镜头，准备可生产的导演设计和生成输入。未经明确授权不要产生新的视频生成费用；预演和最终成片必须清楚区分。\n最终请以真实的视频观看结果进行审查，特别关注：\n- 画面是否真正发生了有意义的事件。\n- 镜头之间是否有视觉、因果或情绪联系。\n- 是否具有宏观到微观的叙事纵深。\n- 是否产生足够强的悬疑感、陌生感和电影感。\n- 字体是否成为影像艺术的一部分。\n- 音乐是否真正参与了情绪和节奏构建。\n- 是否出现静态海报堆叠、廉价特效或过于模板化的 AI 视频设计。\n不得将技术测试通过、字体清晰或者渲染成功等同于艺术审查通过。\n最终目标：让观众不是在看一段关于“失帧”的视觉设计，而是在这段开场中亲眼经历某种无法解释的现实异常。\n请自主完成必要的导演分析、创作探索、可执行实施与验证，不要仅交付概念文档。\n",
+    "requirements": [
+      {
+        "requirement_id": "source-review",
+        "observable": "先审看最新的 `失帧-视觉方向-C-概念片.mp4`、对应海报、现有 Shot、原音乐、剧本及导演设计。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "references",
+        "observable": "请主动研究其片头的镜头组织、构图、节奏、音乐与文字结合方法。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "originality",
+        "observable": "参考的是创作方法和艺术水准，不是复刻镜头、使用原作素材或照搬视觉风格。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "structure",
+        "observable": "真正的问题是：观众看到了设计，却没有经历一个正在发生的异常。",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "ordinary-world",
+        "observable": "世界表面上依然正常运转，但现实正在悄无声息地发生某种不合理的变化。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "scale",
+        "observable": "希望从更大的世界尺度，逐渐收束到具体空间和极其细微的异常。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "emotion",
+        "observable": "让观众从感受到不协调，逐渐进入怀疑、困惑与不安。",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "relations",
+        "observable": "异常不仅需要被看见，还需要通过镜头前后的关系被感知。",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "reveal-boundary",
+        "observable": "请根据《失帧》的剧本与信息揭示边界，自主寻找更具有表现力的电影语言。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "freedom",
+        "observable": "不再要求继续沿用白色背景、人物剪影、城市纹理、黑色宋体和水平线转场。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "type",
+        "observable": "字体也应具有更强的电影美术品质，并与镜头事件、空间和剪辑节奏形成联系。",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "type-restraint",
+        "observable": "不必追求所有镜头都有文字，也不要为了展现 Typography Skill 而制造无意义的文字动画。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "music",
+        "observable": "保留此前已确认的音乐，将其作为新版开场的核心声音素材。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "mix",
+        "observable": "根据音乐的结构、情绪和节奏重新组织视觉内容，必要时进行合理延展、混音和环境音设计。",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "reuse",
+        "observable": "现有 Shot 与方向 C 概念片中的有效画面也应作为可复用素材，而非全部废弃。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "skills",
+        "observable": "不要重新开发一套重复的 Skill，不要为了调用某个 Skill 而改变作品应该采用的视觉形式。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "explore",
+        "observable": "随后探索具有明显艺术差异的视觉方案，选出最符合《失帧》的方向，实际推进制作。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "timing",
+        "observable": "不预设固定镜头数量、精确时长或必须使用的特效。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "dynamic",
+        "observable": "请在既有素材及已授权工具范围内完成尽可能充分的动态预演、剪辑、字体合成、音乐组织及可观看样片。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "missing",
+        "observable": "对于尚无素材的镜头，准备可生产的导演设计和生成输入。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "no-video-fee",
+        "observable": "未经明确授权不要产生新的视频生成费用；预演和最终成片必须清楚区分。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "no-template",
+        "observable": "是否出现静态海报堆叠、廉价特效或过于模板化的 AI 视频设计。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "art-review",
+        "observable": "不得将技术测试通过、字体清晰或者渲染成功等同于艺术审查通过。",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "visual.drama.typography",
+        "observable": "片名只在异常和后态成立之后进入真实玻璃负空间；字形清楚但不能靠读字解释异常，无无意义级联/闪烁或每镜字幕。",
+        "proof": "evaluator",
+        "visual_dimension": "typography"
+      },
+      {
+        "requirement_id": "visual.drama.palette",
+        "observable": "深蓝黑与原片局部钨灯暖光，保留暗部和雨夜层次；stock与旧CG只作清楚披露的预演，正式版须统一摄影。",
+        "proof": "evaluator",
+        "visual_dimension": "palette"
+      },
+      {
+        "requirement_id": "visual.drama.layout",
+        "observable": "先完整看见两人，再同构图看见一人和空位；全景后态有时间比较，最后视线收近人物与玻璃，不以大量独立海报替代。",
+        "proof": "evaluator",
+        "visual_dimension": "layout"
+      },
+      {
+        "requirement_id": "visual.drama.style",
+        "observable": "采用原创日常关系缺席机制，不使用参考片的镜头、素材或字体；无廉价glitch、随机粒子、身体残影或未经剧本建立的循环空间。",
+        "proof": "evaluator",
+        "visual_dimension": "style"
+      },
+      {
+        "requirement_id": "visual.drama.holistic",
+        "observable": "以正常速度完整听看：有意义的变化通过前后镜头成立，宏观到微观递进、悬疑情绪、字体和原音乐形成整体；预演不能代签正式真人成片。",
+        "proof": "human",
+        "visual_dimension": "holistic"
+      }
+    ]
+  },
+  "frames": [
+    {
+      "path": "frames/00000000.jpg",
+      "timestamp_ms": 0,
+      "frame_sha256": "1b9249a38be5657652279c94af4e7850c7ec75a51dc354724ff31e28f3b26fec",
+      "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+    },
+    {
+      "path": "frames/00004000.jpg",
+      "timestamp_ms": 4000,
+      "frame_sha256": "28b12bc47ae5615e36c8786feb89404a4488195182a14efa6bb2b7139c0a3b3d",
+      "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+    },
+    {
+      "path": "frames/00005250.jpg",
+      "timestamp_ms": 5250,
+      "frame_sha256": "7929ced2f8e690f0db707d764c47ffb154f4b19dd8038ad628bc019ab054da3e",
+      "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+    },
+    {
+      "path": "frames/00007000.jpg",
+      "timestamp_ms": 7000,
+      "frame_sha256": "4b9b8718553288ebc065750f2d48f94e9c52923ee0c18c46af2b6c3503b70454",
+      "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+    },
+    {
+      "path": "frames/00008000.jpg",
+      "timestamp_ms": 8000,
+      "frame_sha256": "16f19407a076f0c0d5d97f98ee0e7d8cb1b11b8a8f4c1cc7e173bf52f8ddcbc9",
+      "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+    },
+    {
+      "path": "frames/00012000.jpg",
+      "timestamp_ms": 12000,
+      "frame_sha256": "3330552a49f0582a8828a31bf04ec6b631799b8584abfddd15046b325189fc69",
+      "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+    },
+    {
+      "path": "frames/00015500.jpg",
+      "timestamp_ms": 15500,
+      "frame_sha256": "7507aac6c7bdde3520cb95bde53e76a74553b37a1d4d92d72a5baf56693cd340",
+      "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+    },
+    {
+      "path": "frames/00015667.jpg",
+      "timestamp_ms": 15667,
+      "frame_sha256": "0e280dce8aaa44a098f0a448eee1440d7b5dd5b7801ed1bb62e862700f51c1e3",
+      "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+    },
+    {
+      "path": "frames/00018000.jpg",
+      "timestamp_ms": 18000,
+      "frame_sha256": "a87eefff312776c75c42feabd051ca9f6e84526f4a59e5944c5af6805f7210b9",
+      "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+    },
+    {
+      "path": "frames/00019000.jpg",
+      "timestamp_ms": 19000,
+      "frame_sha256": "9b97ff476b988b2e218a65841fbaa8fa2dfbe47055087cd6b0dddcf1f3f787e6",
+      "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+    },
+    {
+      "path": "frames/00019625.jpg",
+      "timestamp_ms": 19625,
+      "frame_sha256": "8c779603084356403d245f06317b641b39e763eb832a1e525640d09c1f36622c",
+      "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+    },
+    {
+      "path": "frames/00019667.jpg",
+      "timestamp_ms": 19667,
+      "frame_sha256": "ef5168eaa26aac8b656b65e9602fb526096b6bbb6f2e330bb7f206b6d81f4560",
+      "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+    },
+    {
+      "path": "frames/00020000.jpg",
+      "timestamp_ms": 20000,
+      "frame_sha256": "22fa4a5c71f8c08306b577d6845ee128088d647ee68ace9a032a28212d7934a0",
+      "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+    },
+    {
+      "path": "frames/00021000.jpg",
+      "timestamp_ms": 21000,
+      "frame_sha256": "130a09f73206605ba89947e9b4c2a54dc37ccfeaaf50098fd6e466cecbe0baa6",
+      "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+    },
+    {
+      "path": "frames/00022000.jpg",
+      "timestamp_ms": 22000,
+      "frame_sha256": "838701f0c065c16f4b0627f72a62192df402eb1b50fe45747f9ac932777d9b25",
+      "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+    },
+    {
+      "path": "frames/00023000.jpg",
+      "timestamp_ms": 23000,
+      "frame_sha256": "990daad64eafa1bac85803cc72f5dd4b1d1eb6ba4af9bccc62d971d43da2d1e9",
+      "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+    },
+    {
+      "path": "frames/00024500.jpg",
+      "timestamp_ms": 24500,
+      "frame_sha256": "5b2f2e252d90d923c19969ca1b31210d88bd531775e58cf84bb84043084b8647",
+      "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+    },
+    {
+      "path": "frames/00025600.jpg",
+      "timestamp_ms": 25600,
+      "frame_sha256": "225497e1989a0f9569ffdc034f28fa65b5fe8f06900a9681ba9a671bc025c7ad",
+      "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+    }
+  ],
+  "content_kind": "drama",
+  "goal_binding": {
+    "path": "creative/goal-binding.json",
+    "sha256": "24cbbcf1bd395d45cdab77651e0d22a7d676eb27768f8416d8d3f1dc06b49cf2",
+    "creative_input": {
+      "path": "creative-input.txt",
+      "sha256": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a"
+    },
+    "coverage": {
+      "path": "director-coverage.json",
+      "sha256": "81eec9964d35ceb0a0d83c1145d55d8cf3b2583cfa6a6e1f7772a9017df364e2"
+    },
+    "final_output_contract": {
+      "path": "final-output-contract.json",
+      "sha256": "ec9914305918d8ba5e5ad2de581f1cd15333e11ef15a21e0602714078f68b6f2"
+    }
+  },
+  "timeline_snapshot": {
+    "path": "timeline.json",
+    "sha256": "4ceef001fad3b2b686ebad64b91ea984d71ad9c4b166d3160e8874e6151bcd3e",
+    "content_hash": "b3cea679ec452376c511368f657c0cdbd48d03904b43a86f8ea74bfd81d36796",
+    "composition_fingerprint": "21a107183251ddc4e3f913d588b46cb83598c6440ad75c8ccbec79a77ba109fc",
+    "total_frames": 616,
+    "fps": 24,
+    "sample_rate": 48000
+  },
+  "render_report_snapshot": {
+    "path": "render-report.json",
+    "sha256": "66d8e47b46d2121e9bab6b2c8564fbd4bff929ce6dc4dfdcafd1215349910dc8",
+    "video_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870",
+    "timeline_fingerprint": "21a107183251ddc4e3f913d588b46cb83598c6440ad75c8ccbec79a77ba109fc",
+    "duration_frames": 616,
+    "fps_num": 24,
+    "fps_den": 1
+  },
+  "junction_inventory": [
+    {
+      "junction_id": "8d4ea3b874ff9e414c7dd46886d808b76ce28a99b7535d83b5230e568e9b915c",
+      "from_shot_id": "CITY",
+      "to_shot_id": "ROAD",
+      "transition_kind": "cut",
+      "transition_duration_frames": 0,
+      "frame": 126,
+      "time_ms": 5250,
+      "sample": 252000,
+      "visual_spans": [
+        {
+          "layer_id": "visual-CITY",
+          "shot_id": "CITY",
+          "asset_id": "stock-city",
+          "asset_sha256": "7f5a44e30e843f698b0c85a3bc14caa8eb4ad49db6216afb21226a61982af7ef",
+          "start_frame": 0,
+          "duration_frames": 126,
+          "trim_start_frame": 24,
+          "trim_duration_frames": 126,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        {
+          "layer_id": "visual-ROAD",
+          "shot_id": "ROAD",
+          "asset_id": "stock-road",
+          "asset_sha256": "71ca20a1310ef799392994540f180576b1adbf978811b1797ece4016c404a781",
+          "start_frame": 126,
+          "duration_frames": 66,
+          "trim_start_frame": 144,
+          "trim_duration_frames": 66,
+          "opacity_milli": 1000,
+          "z_index": 0
+        }
+      ],
+      "audio_window_start_sample": 204000,
+      "audio_window_end_sample": 300000,
+      "audio_spans": [
+        {
+          "track_id": "B-world",
+          "audio_kind": "bgm",
+          "asset_id": "two-passengers-missing-response-B",
+          "asset_sha256": "88585bd2a3a9d44680f1a1a2667145839fa5166363c36260d2963ed8bd05a425",
+          "start_sample": 0,
+          "duration_samples": 696000,
+          "source_start_sample": 0,
+          "source_duration_samples": 696000,
+          "gain_millidb": -6500,
+          "fade_in_samples": 48000,
+          "fade_out_samples": 16000
+        },
+        {
+          "track_id": "real-rain-bed",
+          "audio_kind": "ambience",
+          "asset_id": "rain-public-domain",
+          "asset_sha256": "a3194c0c98762ce713bfa30d052899b2fccbdf7b6e81de45c65de586ac58d76d",
+          "start_sample": 0,
+          "duration_samples": 1232000,
+          "source_start_sample": 96000,
+          "source_duration_samples": 1232000,
+          "gain_millidb": -24000,
+          "fade_in_samples": 96000,
+          "fade_out_samples": 24000
+        }
+      ]
+    },
+    {
+      "junction_id": "31d52e24729d8ec3a213c41f46a3124267bc2cc7538d2b74d5e9b353be7bc19e",
+      "from_shot_id": "ROAD",
+      "to_shot_id": "CO-A1",
+      "transition_kind": "cut",
+      "transition_duration_frames": 0,
+      "frame": 192,
+      "time_ms": 8000,
+      "sample": 384000,
+      "visual_spans": [
+        {
+          "layer_id": "visual-ROAD",
+          "shot_id": "ROAD",
+          "asset_id": "stock-road",
+          "asset_sha256": "71ca20a1310ef799392994540f180576b1adbf978811b1797ece4016c404a781",
+          "start_frame": 126,
+          "duration_frames": 66,
+          "trim_start_frame": 144,
+          "trim_duration_frames": 66,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        {
+          "layer_id": "visual-CO-A1",
+          "shot_id": "CO-A1",
+          "asset_id": "opening-CO-A1",
+          "asset_sha256": "b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd",
+          "start_frame": 192,
+          "duration_frames": 184,
+          "trim_start_frame": 8,
+          "trim_duration_frames": 184,
+          "opacity_milli": 1000,
+          "z_index": 0
+        }
+      ],
+      "audio_window_start_sample": 336000,
+      "audio_window_end_sample": 432000,
+      "audio_spans": [
+        {
+          "track_id": "B-world",
+          "audio_kind": "bgm",
+          "asset_id": "two-passengers-missing-response-B",
+          "asset_sha256": "88585bd2a3a9d44680f1a1a2667145839fa5166363c36260d2963ed8bd05a425",
+          "start_sample": 0,
+          "duration_samples": 696000,
+          "source_start_sample": 0,
+          "source_duration_samples": 696000,
+          "gain_millidb": -6500,
+          "fade_in_samples": 48000,
+          "fade_out_samples": 16000
+        },
+        {
+          "track_id": "real-rain-bed",
+          "audio_kind": "ambience",
+          "asset_id": "rain-public-domain",
+          "asset_sha256": "a3194c0c98762ce713bfa30d052899b2fccbdf7b6e81de45c65de586ac58d76d",
+          "start_sample": 0,
+          "duration_samples": 1232000,
+          "source_start_sample": 96000,
+          "source_duration_samples": 1232000,
+          "gain_millidb": -24000,
+          "fade_in_samples": 96000,
+          "fade_out_samples": 24000
+        }
+      ]
+    },
+    {
+      "junction_id": "8d0e98d01b60579f9f8178675c4e7091fa1bbd1b3720241aefe08d00f224360d",
+      "from_shot_id": "CO-A1",
+      "to_shot_id": "CO-A2",
+      "transition_kind": "cut",
+      "transition_duration_frames": 0,
+      "frame": 376,
+      "time_ms": 15666,
+      "sample": 752000,
+      "visual_spans": [
+        {
+          "layer_id": "visual-CO-A1",
+          "shot_id": "CO-A1",
+          "asset_id": "opening-CO-A1",
+          "asset_sha256": "b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd",
+          "start_frame": 192,
+          "duration_frames": 184,
+          "trim_start_frame": 8,
+          "trim_duration_frames": 184,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        {
+          "layer_id": "visual-CO-A2",
+          "shot_id": "CO-A2",
+          "asset_id": "opening-CO-A2",
+          "asset_sha256": "0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c",
+          "start_frame": 376,
+          "duration_frames": 96,
+          "trim_start_frame": 0,
+          "trim_duration_frames": 96,
+          "opacity_milli": 1000,
+          "z_index": 0
+        }
+      ],
+      "audio_window_start_sample": 704000,
+      "audio_window_end_sample": 800000,
+      "audio_spans": [
+        {
+          "track_id": "real-rain-bed",
+          "audio_kind": "ambience",
+          "asset_id": "rain-public-domain",
+          "asset_sha256": "a3194c0c98762ce713bfa30d052899b2fccbdf7b6e81de45c65de586ac58d76d",
+          "start_sample": 0,
+          "duration_samples": 1232000,
+          "source_start_sample": 96000,
+          "source_duration_samples": 1232000,
+          "gain_millidb": -24000,
+          "fade_in_samples": 96000,
+          "fade_out_samples": 24000
+        },
+        {
+          "track_id": "B-occluded",
+          "audio_kind": "bgm",
+          "asset_id": "two-passengers-missing-response-B",
+          "asset_sha256": "88585bd2a3a9d44680f1a1a2667145839fa5166363c36260d2963ed8bd05a425",
+          "start_sample": 696000,
+          "duration_samples": 144000,
+          "source_start_sample": 696000,
+          "source_duration_samples": 144000,
+          "gain_millidb": -18000,
+          "fade_in_samples": 1000,
+          "fade_out_samples": 1000
+        },
+        {
+          "track_id": "original-truck-reveal",
+          "audio_kind": "sfx",
+          "asset_id": "original-truck-pass",
+          "asset_sha256": "1d2744e055589c7bce382dbb8e0c3cef88cab6ea6b5891e417ac8176c13ea6d0",
+          "start_sample": 752000,
+          "duration_samples": 192000,
+          "source_start_sample": 0,
+          "source_duration_samples": 192000,
+          "gain_millidb": -10500,
+          "fade_in_samples": 2400,
+          "fade_out_samples": 14400
+        }
+      ]
+    },
+    {
+      "junction_id": "7ebdf8e2a4be97cf880f4318633e0e61c4b8d63117cc45ec2067edb0edd770a5",
+      "from_shot_id": "CO-A2",
+      "to_shot_id": "CO-A3",
+      "transition_kind": "cut",
+      "transition_duration_frames": 0,
+      "frame": 472,
+      "time_ms": 19666,
+      "sample": 944000,
+      "visual_spans": [
+        {
+          "layer_id": "visual-CO-A2",
+          "shot_id": "CO-A2",
+          "asset_id": "opening-CO-A2",
+          "asset_sha256": "0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c",
+          "start_frame": 376,
+          "duration_frames": 96,
+          "trim_start_frame": 0,
+          "trim_duration_frames": 96,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        {
+          "layer_id": "visual-CO-A3",
+          "shot_id": "CO-A3",
+          "asset_id": "opening-CO-A3",
+          "asset_sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+          "start_frame": 472,
+          "duration_frames": 144,
+          "trim_start_frame": 336,
+          "trim_duration_frames": 144,
+          "opacity_milli": 1000,
+          "z_index": 0
+        }
+      ],
+      "audio_window_start_sample": 896000,
+      "audio_window_end_sample": 992000,
+      "audio_spans": [
+        {
+          "track_id": "real-rain-bed",
+          "audio_kind": "ambience",
+          "asset_id": "rain-public-domain",
+          "asset_sha256": "a3194c0c98762ce713bfa30d052899b2fccbdf7b6e81de45c65de586ac58d76d",
+          "start_sample": 0,
+          "duration_samples": 1232000,
+          "source_start_sample": 96000,
+          "source_duration_samples": 1232000,
+          "gain_millidb": -24000,
+          "fade_in_samples": 96000,
+          "fade_out_samples": 24000
+        },
+        {
+          "track_id": "original-truck-reveal",
+          "audio_kind": "sfx",
+          "asset_id": "original-truck-pass",
+          "asset_sha256": "1d2744e055589c7bce382dbb8e0c3cef88cab6ea6b5891e417ac8176c13ea6d0",
+          "start_sample": 752000,
+          "duration_samples": 192000,
+          "source_start_sample": 0,
+          "source_duration_samples": 192000,
+          "gain_millidb": -10500,
+          "fade_in_samples": 2400,
+          "fade_out_samples": 14400
+        },
+        {
+          "track_id": "B-absence",
+          "audio_kind": "bgm",
+          "asset_id": "two-passengers-missing-response-B",
+          "asset_sha256": "88585bd2a3a9d44680f1a1a2667145839fa5166363c36260d2963ed8bd05a425",
+          "start_sample": 840000,
+          "duration_samples": 392000,
+          "source_start_sample": 840000,
+          "source_duration_samples": 392000,
+          "gain_millidb": -6500,
+          "fade_in_samples": 24000,
+          "fade_out_samples": 48000
+        }
+      ]
+    }
+  ],
+  "junction_inventory_sha256": "0c2007245e6a87191a22c8646b617748b6e8b83b1a9126ce1d99f372bfe4eb41",
+  "subject_hash": "77e54b0019b1646a9020e527969a682e9557be655ae80a49d587ae42c4c29445"
+}

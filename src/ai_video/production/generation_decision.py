@@ -424,6 +424,8 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
         return GenerationDecision(**base, disposition="EVIDENCE_GAP",
             rationale=("prepared-only work cannot replace the last submitted outcome and baseline",))
     goal_changed = False
+    authored_prospect = False
+    authored_retarget_prospect = False
     runtime_repair = None
     repair_candidate = None
     if inputs.abandoned_result is not None:
@@ -451,6 +453,18 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
         # compiled admission and the submit lock still require its sealed /3.
         prior_candidate = next((c for c in inputs.historical_recipes
                                 if c.scope_hash == latest.recipe_scope_hash), None)
+        from ai_video.production._generation_authored_prospect import is_same_rubric_authored_prospect
+
+        authored_prospect = is_same_rubric_authored_prospect(
+            inputs=inputs, projection=projection, policy=policy, latest=latest, prior=prior_candidate)
+        from ai_video.production._generation_authored_prospect import (
+            is_authored_generation_retarget_prospect,
+        )
+
+        authored_retarget_prospect = is_authored_generation_retarget_prospect(
+            inputs=inputs, projection=projection, policy=policy, latest=latest, prior=prior_candidate,
+        )
+        goal_changed = authored_prospect or authored_retarget_prospect
         if policy.execution_purpose == "qualification" and prior_candidate is not None and len(candidates) == 1:
             target_candidate = candidates[0]
             if (prior_candidate.candidate_id == target_candidate.candidate_id
@@ -757,7 +771,8 @@ def resolve_generation_decision(resolver, *, projection, context, policy, lifecy
                      or runtime_repair is not None and repair_candidate is not None
                         and a.candidate_id == repair_candidate.candidate_id
                      or intervention is None and runtime_repair is None and (a.fit == "supported" or
-                         a.fit == "unknown" and inputs.policy.allow_bounded_exploration))]
+                         a.fit == "unknown" and inputs.policy.allow_bounded_exploration
+                         or authored_prospect or authored_retarget_prospect))]
     if not eligible:
         if projection.requirement.voice_routing is not None and all(
             route_blockers(projection.requirement, c) for c in candidates

@@ -1,0 +1,39 @@
+{
+  "scope": "local typography study and production preparation only",
+  "rendered_media": [
+    {
+      "path": "outputs/shizhen-episode01/live-action-rebuild-20261026/typography/title-typography-study.mp4",
+      "sha256": "1ae8b6bf039a984bb9fee99a065c6b84ac3d8582dc313db724b5ef14042bae99"
+    },
+    {
+      "path": "outputs/shizhen-episode01/live-action-rebuild-20261026/typography/next-night-typography-study.mp4",
+      "sha256": "f0fd86c964d89d867aa26323e3780dda21683be4d5fbbd081f3c23405c2618ae"
+    }
+  ],
+  "visual_findings": {
+    "complete_chinese_glyphs": "PASS for local study",
+    "stable_geometry_at_sampled_frames": "PASS for local study",
+    "main_title_vs_time_card_hierarchy": "Implemented as separate studies; aesthetic acceptance PENDING",
+    "no_visible_CG_base": "PASS for sampled frames"
+  },
+  "full_opening_criteria": {
+    "macro_to_micro_progression": "NOT_EVALUATED: no new live-action story footage",
+    "distinctive_world_change": "NOT_EVALUATED: no new live-action story footage",
+    "old_shot_and_music_integration": "NOT_EVALUATED: no new live-action story footage",
+    "cinematic_type_in_story_context": "NOT_EVALUATED: no new live-action story footage",
+    "unified_final_picture_sound_transitions": "NOT_EVALUATED: no new live-action story footage",
+    "AI_artifacts_and_spoiler_boundaries": "NOT_EVALUATED: no new live-action story footage",
+    "viewer_curiosity_and_immersion": "NOT_EVALUATED: no new live-action story footage"
+  },
+  "audio": "Existing B source reused; new rendered mix human listening NOT_EVALUATED",
+  "new_paid_generation_calls": 0,
+  "production_activation": false,
+  "human_acceptance": "PENDING",
+  "publication_state": "NOT_PUBLISHED",
+  "blocking_prerequisite": [
+    "new live-action reference and video media",
+    "authorization for any new paid generation"
+  ],
+  "learning_evaluation": "no_candidate",
+  "commit_push": "DEFERRED_PENDING_USER_FILM_REVIEW"
+}

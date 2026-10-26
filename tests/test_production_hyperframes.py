@@ -909,6 +909,94 @@ def test_commercial_graphic_zero_suffix_width_keeps_60_percent(tmp_path):
     assert "width:6%" not in html
 
 
+@pytest.mark.parametrize("entrance,exit", [
+    (GraphicAnimation.NONE, GraphicAnimation.NONE),
+    (GraphicAnimation.NONE, GraphicAnimation.FADE),
+    (GraphicAnimation.FADE, GraphicAnimation.NONE),
+    (GraphicAnimation.SLIDE_UP, GraphicAnimation.NONE),
+    (GraphicAnimation.NONE, GraphicAnimation.SCALE_IN),
+])
+def test_graphics_are_hidden_outside_their_windows_in_chromium(tmp_path, entrance, exit):
+    browser = os.environ.get("P4_BROWSER_PATH")
+    if not browser:
+        pytest.skip("P4_BROWSER_PATH enables real Chromium opacity boundary verification")
+    timeline = _with_commercial_graphic(make_resolved_timeline())
+    graphic = timeline.commercial_graphics[0].model_copy(update={
+        "shot_id": "shot-2", "start_frame": 6, "end_frame_exclusive": 9,
+        "start_sample": 12_000, "end_sample": 18_000,
+        "entrance": entrance, "exit": exit,
+    })
+    spans = tuple(span.model_copy(update={"graphic_animation": GraphicLayerAnimation(
+        layer_id=span.layer_id, entrance=entrance, exit=exit,
+    )}) for span in timeline.visual_spans)
+    timeline = _reseal_timeline(timeline, commercial_graphics=(graphic,), visual_spans=spans)
+    materialized = _materialize(tmp_path, timeline)
+    audit_hyperframes_source(materialized.index_path, expected_timeline=timeline,
+                            expected_assets=materialized.asset_bindings)
+    # Probe a copy of the real materialized source. Never add scripts to the
+    # canonical source or replace the renderer's own timeline/animation clock.
+    script = """<script>
+    addEventListener('load', () => {
+      const rows = [];
+      for (const frame of [0, 3, 4, 5, 6, 7, 8, 9]) {
+        for (const animation of document.getAnimations()) {
+          animation.pause(); animation.currentTime = frame / 24 * 1000;
+        }
+        rows.push({frame, values: Array.from(document.querySelectorAll('.clip'))
+          .filter(el => el.dataset.layerId || el.dataset.commercialGraphicId)
+          .map(el => ({id: el.dataset.layerId || el.dataset.commercialGraphicId,
+                       opacity: Number(getComputedStyle(el).opacity)}))});
+      }
+      const result = document.createElement('pre');
+      result.id = 'opacity-probe'; result.textContent = JSON.stringify(rows);
+      document.body.append(result);
+    });</script>"""
+    probe = materialized.index_path.with_name("opacity-probe.html")
+    probe.write_text(materialized.index_path.read_text() + script, encoding="utf-8")
+    completed = subprocess.run([
+        browser, "--headless", "--no-sandbox", "--disable-gpu",
+        "--disable-background-networking", "--disable-component-update", "--disable-sync",
+        "--no-first-run", "--dump-dom", "--virtual-time-budget=1000", probe.as_uri(),
+    ], capture_output=True, text=True, check=True, timeout=30)
+    from html.parser import HTMLParser
+
+    class ProbeParser(HTMLParser):
+        selected = False
+        text = ""
+
+        def handle_starttag(self, tag, attrs):
+            self.selected = tag == "pre" and dict(attrs).get("id") == "opacity-probe"
+
+        def handle_data(self, data):
+            if self.selected:
+                self.text += data
+
+        def handle_endtag(self, tag):
+            if tag == "pre":
+                self.selected = False
+
+    parser = ProbeParser()
+    parser.feed(completed.stdout)
+    rows = json.loads(parser.text)
+    windows = {graphic.graphic_id: (6, 9, 1),
+               **{span.layer_id: (span.start_frame, span.start_frame + span.duration_frames,
+                                 span.opacity_milli / 1000)
+                  for span in timeline.visual_spans}}
+    assert rows and all(len(row["values"]) == len(windows) for row in rows)
+    for row in rows:
+        for value in row["values"]:
+            start, end, target_opacity = windows[value["id"]]
+            frame, opacity = row["frame"], value["opacity"]
+            if frame < start or frame >= end:
+                assert opacity == 0, (value["id"], frame, "outside window", opacity)
+            elif (entrance is GraphicAnimation.NONE and frame == start
+                  or exit is GraphicAnimation.NONE and frame == end - 1):
+                assert opacity == target_opacity, (value["id"], frame, "unrequested fade", opacity)
+            elif (entrance is not GraphicAnimation.NONE and start > 0 and frame == start
+                  or exit is not GraphicAnimation.NONE and frame == end - 1):
+                assert 0 < opacity < target_opacity, (value["id"], frame, "missing requested fade", opacity)
+
+
 @pytest.mark.parametrize("typography", [{"font_weight": 500}, {"letter_spacing_px": 1}])
 def test_audit_accepts_custom_text_layer_beside_default_commercial_graphic(tmp_path, typography):
     timeline = _with_commercial_graphic(make_resolved_timeline())
@@ -5773,3 +5861,28 @@ def test_recovery_resolves_candidate_prepared_render_by_exact_old_triple_and_pre
         path.is_file()
         for path in committer.render_attempt_paths(selection.attempt_id).attempt_root.rglob("*")
     )
+
+
+@pytest.mark.parametrize('mode', ['hardware', 'software'])
+def test_explicit_browser_gpu_mode_is_bound_to_controlled_environment(tmp_path, mode):
+    browser = _write_executable(tmp_path / 'chrome')
+    ip_path = _write_executable(tmp_path / 'ip')
+    default = _controlled_env(browser, ip_path)
+    selected = _controlled_env(browser, ip_path, browser_gpu_mode=mode)
+    assert selected == {**default, 'PRODUCER_BROWSER_GPU_MODE':mode}
+    runner = object.__new__(_NetworkIsolatedHyperFramesRunner)
+    runner._env = selected
+    runner._invoke = lambda *args, **kwargs: RendererCommandResult(returncode=0, stdout='{}', stderr='')
+    assert runner.run('check', (str(tmp_path), '--json'), cwd=tmp_path,
+        env=selected, timeout_seconds=1).returncode == 0
+    with pytest.raises(AiVideoError, match='controlled environment was altered'):
+        runner.run('check', (str(tmp_path), '--json'), cwd=tmp_path,
+            env=default, timeout_seconds=1)
+
+
+def test_browser_gpu_mode_rejects_unselected_or_injected_values(tmp_path):
+    browser = _write_executable(tmp_path / 'chrome')
+    ip_path = _write_executable(tmp_path / 'ip')
+    for value in ('auto', '--no-sandbox', '', False):
+        with pytest.raises(AiVideoError, match='GPU mode must be explicit'):
+            _controlled_env(browser, ip_path, browser_gpu_mode=value)

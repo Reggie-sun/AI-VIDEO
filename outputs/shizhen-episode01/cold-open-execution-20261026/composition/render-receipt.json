@@ -1,0 +1,50 @@
+{
+  "output": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-composition-v1/render-001/output/失帧-两位冷开场加S01-1080p审看版.mp4",
+  "sha256": "5ab3a929258db93606196ab537d89c795343899dba8616dbdd8905e55433e48a",
+  "bytes": 34615187,
+  "measured": {
+    "width": 1920,
+    "height": 1080,
+    "fps_num": 24,
+    "fps_den": 1,
+    "duration_frames": 868,
+    "codec_name": "h264",
+    "audio": {
+      "stream_count": 1,
+      "codec_name": "aac",
+      "sample_rate_hz": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "decoded_samples": 1736704,
+      "encoder_priming_samples": 1024,
+      "encoder_padding_samples": 704,
+      "measurement_method": "held-fd ffprobe packets plus pcm_s16le decode"
+    }
+  },
+  "checks": [
+    {
+      "command": "lint",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "f91a7f9e08658cf8daf815895c72ad59093b2920a6f4b6f0aecc6a36b1ee1e2d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "error_count": 0,
+      "warning_count": 0
+    },
+    {
+      "command": "check",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "f86773ac0a88224c16f967fd1fed4e19c5ec1203a04041288f1c833fe022abd4",
+      "stderr_sha256": "d307dee2a0b012cf36e66f31da96f0a4304ef70065eeb0ad3e63c1ee997e8a7a",
+      "error_count": 0,
+      "warning_count": 0
+    }
+  ],
+  "timeline_fingerprint": "34741f821a3ae1efe15796eddd81d42655158cde769edc7b91038d83f7a6c927",
+  "usage_scope": "development_audio_preview",
+  "production_activation": false,
+  "publication_state": "NOT_PUBLISHED",
+  "human_review": "PENDING",
+  "new_paid_calls": 0
+}

@@ -1,0 +1,7 @@
+{
+  "route": "filesystem.read_media_file plus native audio helper",
+  "source": "music-listening-excerpt.wav",
+  "actual_result": "audio content omitted because you do not support audio input",
+  "verdict": "UNSUPPORTED_THIS_SESSION",
+  "hearing_or_human_acceptance": "NOT_EVALUATED"
+}

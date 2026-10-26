@@ -1,0 +1,38 @@
+{
+  "protected_path_count": 26,
+  "old_A_B_focus_exact_sha_unchanged": true,
+  "source_native_audio_A1_A2_track_specs_equal": true,
+  "A3_original_source_id": "CO-A3-original-mix",
+  "A3_trim_start_sample": 722000,
+  "A3_trim_duration_samples": 334000,
+  "decoded_comparison": [
+    {
+      "output_frames": [
+        0,
+        250
+      ],
+      "focus002_frames": [
+        0,
+        250
+      ],
+      "mean_absolute_8bit_difference": 0.4512466666666667,
+      "proof": "decoded downscaled comparison; re-encode means not byte identity"
+    },
+    {
+      "output_frames": [
+        250,
+        417
+      ],
+      "focus002_frames": [
+        275,
+        442
+      ],
+      "mean_absolute_8bit_difference": 0.6957226519183854,
+      "proof": "decoded downscaled comparison; re-encode means not byte identity"
+    }
+  ],
+  "new_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc",
+  "paid_generation_calls": 0,
+  "audio_analysis_outcome": "UNKNOWN_NO_RETRY",
+  "final_acceptance": "NOT_EVALUATED"
+}

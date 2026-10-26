@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>失帧 · 真人视觉改版准备与字体测试</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#10171b;color:#dcd5c7;font:16px/1.7 system-ui,sans-serif}main{max-width:1180px;margin:auto;padding:48px 32px 80px}h1{font-size:32px;font-weight:500;letter-spacing:3px;margin:0 0 16px}h2{font-size:21px;font-weight:500}p{max-width:900px;color:#bbc3c7}a{color:#dcd5c7}section{margin:36px 0;padding-top:20px;border-top:1px solid #354047}.grid{display:grid;grid-template-columns:1fr 1fr;gap:24px}video{width:100%;background:#10171b;border:1px solid #354047}figure{margin:0}figcaption{font-size:14px;color:#bbc3c7;margin:10px 0 18px}.reference{width:min(440px,100%);display:block}.status{border-left:3px solid #8e9a9e;padding:4px 20px;margin:24px 0}li{margin:8px 0}@media(max-width:740px){.grid{grid-template-columns:1fr}main{padding:28px 18px}}
+</style>
+<main>
+<h1>失帧 · 真人视觉改版</h1>
+<p>目标：真实演员与真实摄影的观感。剧本、两位的关系、失踪规则、信息边界及原有Suno音乐保留。</p>
+<div class="status"><strong>尚无真人版剧情成片</strong><p>下面是独立字体测试与生产准备。没有新增付费生成，也没有用旧CG画面冒充真人版。字体测试尚未与新城市画面融合。</p></div>
+<section><h2>用户摄影质感参考</h2><img class="reference" src="reference/user-live-action-look.png" alt="用户提供的真人摄影质感参考：普通年轻男子与地铁金属空间"><p>只迁移自然肤质、骨相、衣物、光线与镜头可信度；不复制人物身份、地铁场景、蓝色挂绳或黑色边框。</p></section>
+<section><h2>中文字体与层级测试</h2><div class="grid">
+<figure><video controls preload="metadata" poster="typography/title-frame.png" src="typography/title-typography-study.mp4"></video><figcaption>失帧 · 3.5秒 / 1080p24。完整中文、独立光学间距；复用原有Suno B录音短段。当前只验证排版、稳定性和显现，不代表电影片头已完成。</figcaption></figure>
+<figure><video controls preload="metadata" poster="typography/next-night-frame.png" src="typography/next-night-typography-study.mp4"></video><figcaption>翌夜 · 3.5秒独立窗口研究，无音轨。正式入点和停留仍由真人成片决定，不将两段测试直接相加作为新片头。</figcaption></figure>
+</div></section>
+<section><h2>制作准备</h2><ul>
+<li><a href="director-and-art.md">真人美术、宏观到微观的导演方案、音乐与S01迁移</a></li>
+<li><a href="production-inputs/CO-WORLD.native.zh.txt">城市与社会空间：Seedance2.5中文输入草稿</a></li>
+<li><a href="production-inputs/CO-TWO.native.zh.txt">两位事件：真人版中文输入草稿</a></li>
+<li><a href="production-inputs/preparation.json">未满足的执行前提与禁止提交状态</a></li>
+<li><a href="qa/skill-installation.json">三项技能安装核验</a> · <a href="typography/render-receipt.json">实际P4渲染记录</a></li>
+</ul><p>真人演员身份与场景参考、动态城市和人物画面仍未生成；不能从字体测试推定真人视觉质量、口型或全片节奏已通过。</p></section>
+</main></html>

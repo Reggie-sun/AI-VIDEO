@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"error\": \"transport_unknown\",\n  \"outcome\": \"UNKNOWN\",\n  \"message\": \"The audio analyzer request outcome is unknown.\",\n  \"retryable\": false,\n  \"production_acceptance\": \"NOT_EVALUATED\"\n}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

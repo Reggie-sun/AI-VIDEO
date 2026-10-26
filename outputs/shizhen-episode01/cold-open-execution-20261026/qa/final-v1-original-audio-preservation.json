@@ -1,0 +1,41 @@
+{
+  "source": "P4 canonical WAV referenced by actual rendered HTML, before final AAC encoding",
+  "mixed_wav": "runs/shizhen-episode01-jimeng25-20261025-001/cold-open-composition-v1/render-001/source/assets/b7018b73f3f07625a3a5906190fd57cca4683885dd25fec1b10b5305d5f0919d.wav",
+  "mixed_sha256": "b7018b73f3f07625a3a5906190fd57cca4683885dd25fec1b10b5305d5f0919d",
+  "source_windows": [
+    {
+      "shot_id": "CO-A1",
+      "samples": 368000,
+      "source_start_sample": 16000,
+      "canonical_mix_start_sample": 0,
+      "bit_exact_pcm": true
+    },
+    {
+      "shot_id": "CO-A2",
+      "samples": 192000,
+      "source_start_sample": 0,
+      "canonical_mix_start_sample": 368000,
+      "bit_exact_pcm": true
+    },
+    {
+      "shot_id": "CO-A3",
+      "samples": 240000,
+      "source_start_sample": 722000,
+      "canonical_mix_start_sample": 560000,
+      "bit_exact_pcm": true
+    },
+    {
+      "shot_id": "S01",
+      "samples": 768000,
+      "source_start_sample": 0,
+      "canonical_mix_start_sample": 968000,
+      "bit_exact_pcm": true
+    }
+  ],
+  "music_only_title": [
+    800000,
+    968000
+  ],
+  "S01_music_overlap_samples": 0,
+  "proof_boundary": "Exact unmodified selected PCM reaches canonical mixer; final AAC is lossy and semantic/human review is separate"
+}

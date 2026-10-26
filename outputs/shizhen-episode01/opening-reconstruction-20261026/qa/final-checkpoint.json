@@ -1,0 +1,16 @@
+{
+  "exact_final_video_sha256": "f3c03c289bb770b209a355ffad5c59f732168d10d30553f249882c382a19faa9",
+  "protected_inputs": 23,
+  "protected_source_drift": [],
+  "server_syntax": "PASS",
+  "range_evidence": "qa/standalone-review/002/range-check.json",
+  "browser_seek_recheck": {
+    "actual_seconds": 16.25,
+    "seekable_start": 0,
+    "seekable_end": 18.416667,
+    "media_error": null
+  },
+  "artistic_acceptance": "NOT_EVALUATED",
+  "publication": "NOT_PUBLISHED",
+  "git": "DEFERRED_FILM_FIRST"
+}

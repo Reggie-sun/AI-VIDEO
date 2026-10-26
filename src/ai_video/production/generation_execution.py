@@ -355,6 +355,11 @@ class GenerationDecisionExecutionBinding(StrictModel):
             from ai_video.production.generation_resolution_revision import allows_authored_resolution_revision
 
             resolution_revision_trial = allows_authored_resolution_revision(self, selected)
+            from ai_video.production._qualification_authoring_revision import (
+                allows_authored_generation_revision,
+            )
+
+            authored_generation_revision_trial = allows_authored_generation_revision(self, selected)
             if (
                 len(self.inputs.candidates) != 1
                 or selected_variant is None
@@ -366,7 +371,8 @@ class GenerationDecisionExecutionBinding(StrictModel):
                 or limits.allowed_remote_candidates != (selected.candidate_id,)
                 or not (initial_trial or recovery_trial or recovery_trial_three
                         or recovery_trial_four or recovery_trial_five or quality_repair_trial
-                        or visual_revision_trial or coverage_revision_trial or resolution_revision_trial)
+                        or visual_revision_trial or coverage_revision_trial or resolution_revision_trial
+                        or authored_generation_revision_trial)
                 or not self.policy.remote_authorized
                 or not self.policy.budget_authorized
             ):

@@ -1,0 +1,386 @@
+{
+  "schema_version": "creative-goal-binding/1",
+  "authority": "development_only",
+  "creative_input": {
+    "path": "review-creative-input.txt",
+    "sha256": "ccbe5161bf4da0bfc265cffc2c94f07af84094061d892716767003baaa6f009f"
+  },
+  "coverage": {
+    "path": "director-coverage.json",
+    "sha256": "9dae932447d31a2c493814fb5685daeacddd51c491d20a68b7e9b4e9cade6da9"
+  },
+  "final_output_contract": {
+    "path": "final-output-contract.json",
+    "sha256": "e31c31e26080cbf040d3ece9f3650cc6afba0643b9e9fd2a0a22355fff38e4e2"
+  },
+  "bindings": [
+    {
+      "intent_item_id": "intent-01",
+      "constraint_ids": [
+        "intent-01"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-01"
+      ]
+    },
+    {
+      "intent_item_id": "intent-02",
+      "constraint_ids": [
+        "intent-02"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-02"
+      ]
+    },
+    {
+      "intent_item_id": "intent-03",
+      "constraint_ids": [
+        "intent-03"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-03"
+      ]
+    },
+    {
+      "intent_item_id": "intent-04",
+      "constraint_ids": [
+        "intent-04"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-04"
+      ]
+    },
+    {
+      "intent_item_id": "intent-05",
+      "constraint_ids": [
+        "intent-05"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-05"
+      ]
+    },
+    {
+      "intent_item_id": "intent-06",
+      "constraint_ids": [
+        "intent-06"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-06"
+      ]
+    },
+    {
+      "intent_item_id": "intent-07",
+      "constraint_ids": [
+        "intent-07"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-07"
+      ]
+    },
+    {
+      "intent_item_id": "intent-08",
+      "constraint_ids": [
+        "intent-08"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-08"
+      ]
+    },
+    {
+      "intent_item_id": "intent-09",
+      "constraint_ids": [
+        "intent-09"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-09"
+      ]
+    },
+    {
+      "intent_item_id": "intent-10",
+      "constraint_ids": [
+        "intent-10"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-10"
+      ]
+    },
+    {
+      "intent_item_id": "intent-11",
+      "constraint_ids": [
+        "intent-11"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-11"
+      ]
+    },
+    {
+      "intent_item_id": "intent-12",
+      "constraint_ids": [
+        "intent-12"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-12"
+      ]
+    },
+    {
+      "intent_item_id": "intent-13",
+      "constraint_ids": [
+        "intent-13"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-13"
+      ]
+    },
+    {
+      "intent_item_id": "intent-14",
+      "constraint_ids": [
+        "intent-14"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-14"
+      ]
+    },
+    {
+      "intent_item_id": "intent-15",
+      "constraint_ids": [
+        "intent-15"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-15"
+      ]
+    },
+    {
+      "intent_item_id": "intent-16",
+      "constraint_ids": [
+        "intent-16"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-16"
+      ]
+    },
+    {
+      "intent_item_id": "intent-17",
+      "constraint_ids": [
+        "intent-17"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-17"
+      ]
+    },
+    {
+      "intent_item_id": "intent-18",
+      "constraint_ids": [
+        "intent-18"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-18"
+      ]
+    },
+    {
+      "intent_item_id": "intent-19",
+      "constraint_ids": [
+        "intent-19"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-19"
+      ]
+    },
+    {
+      "intent_item_id": "intent-20",
+      "constraint_ids": [
+        "intent-20"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-20"
+      ]
+    },
+    {
+      "intent_item_id": "intent-21",
+      "constraint_ids": [
+        "intent-21"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-21"
+      ]
+    },
+    {
+      "intent_item_id": "intent-22",
+      "constraint_ids": [
+        "intent-22"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-22"
+      ]
+    },
+    {
+      "intent_item_id": "intent-23",
+      "constraint_ids": [
+        "intent-23"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-23"
+      ]
+    }
+  ]
+}

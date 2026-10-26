@@ -1,0 +1,271 @@
+{
+  "shot": {
+    "shot_id": "CO-A3",
+    "scene_id": "rain-stop",
+    "storyboard_beat_id": "complete-cold-open",
+    "intent": "开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。",
+    "dialogue": "罗敏：师傅，我们在站里，两位。高峥：让他别急，路滑。电话司机：就你一位？罗敏：嗯，就我一个。",
+    "duration_policy": {
+      "mode": "fixed",
+      "seconds": 22
+    },
+    "character_ids": [
+      "gaozheng",
+      "luomin",
+      "driver"
+    ],
+    "continuity_constraints": [
+      "前一夜单次03:17事件，无新机制或记忆保留者",
+      "先看见两位，再由完整车厢遮挡后只剩一位；角色不寻找",
+      "同站棚长镜头揭示，再自然切罗敏近景普通回答",
+      "左手手机左耳，人物脸衣包各自保持",
+      "无片名、字幕或准确数字；后期完成这些内容"
+    ],
+    "visual_strategy": "generated_video",
+    "required_asset_roles": [
+      {
+        "role": "primary_visual",
+        "asset_ids": [],
+        "allowed_asset_types": [
+          "video"
+        ]
+      }
+    ],
+    "generated_video_rationale": "User explicitly chooses one Seedance2.5 call for complete 22s dramatic event; can contain two camera setups, no 8–10s generation split"
+  },
+  "generation": {
+    "references": [
+      {
+        "role": "character_reference",
+        "asset_id": "CO-A3-ref-01-before",
+        "owner_id": "gaozheng"
+      },
+      {
+        "role": "scene_reference",
+        "asset_id": "CO-A3-ref-02-after"
+      },
+      {
+        "role": "character_reference",
+        "asset_id": "CO-A3-ref-03-close",
+        "owner_id": "luomin"
+      }
+    ],
+    "intent_evidence": {
+      "character_action_required": true,
+      "state_change_required": true,
+      "subject_motion_directive_present": true
+    },
+    "generation_intent": {
+      "open_state": {
+        "kind": "typed_text",
+        "state_text": "开画已在雨夜玻璃站棚：戴眼镜褐灰外套的成熟高峥在左，短卷发墨绿雨衣罗敏在右，左手手机贴左耳，各自的包保持，出口和脚边可见。"
+      },
+      "close_state": {
+        "kind": "typed_text",
+        "state_text": "同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。",
+        "required_change": true
+      },
+      "identity_continuity": {
+        "character_ids": [
+          "gaozheng",
+          "luomin"
+        ],
+        "preservation": "exact"
+      },
+      "scene_continuity": {
+        "scene_id": "rain-stop",
+        "mood": "前一夜雨夜普通候车，城市冷峻，人物不预知异常",
+        "state_constraints": [
+          "参考素材1只指导最初同框的高峥、罗敏身份服装、原站位和站棚；参考素材2只指导货车驶离后的同一站棚、右侧罗敏和左侧空位，不能作为开场；参考素材3只指导最后罗敏的近景脸、发型、衣服和左手手机，不能提前切走掩盖消失。",
+          "同一事件，无角色保留对消失者的记忆；司机不知道先前的两位说法被改写",
+          "高峥不主动走开、不上车，无人被拖走，不留衣物或包",
+          "完整遮挡后才揭示左侧为空；不可用溶解、灯闪、黑屏、透明或烟化代替",
+          "无音乐、鬼声、惊吓音效、额外对白、字幕、片名或准确数字"
+        ]
+      },
+      "space_continuity": {
+        "subject_position": "前段左高峥右罗敏，同一站棚；揭示后右侧罗敏原位，左侧明确为空",
+        "screen_direction": "不镜像，货车持续左向右",
+        "crossing_policy": "货车不进站、不停、不上下客，人物没有出入画面"
+      },
+      "axis_continuity": {
+        "camera_axis": "道路近侧正对站棚，近景保持同侧和手机手别",
+        "framing_continuity": "两位到一位的过程必须同一固定全景，完整揭出空位后才切到罗敏胸上近景",
+        "crossing_policy": "同侧切近景，不越轴"
+      },
+      "subject_action": {
+        "start_state": "开画已在雨夜玻璃站棚：戴眼镜褐灰外套的成熟高峥在左，短卷发墨绿雨衣罗敏在右，左手手机贴左耳，各自的包保持，出口和脚边可见。",
+        "progression": "开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。",
+        "endpoint": {
+          "state_text": "同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。",
+          "required_change": true
+        }
+      },
+      "motion_envelope": {
+        "onset": "开场已在自然说话，无空镜铺垫",
+        "peak": "货车完整遮挡后，同机位揭出空位",
+        "settle": "罗敏平常回答自己一位，继续听电话",
+        "direction": "货车持续左向右，人物原位",
+        "amplitude_class": "正常实时生活动作"
+      },
+      "pacing": {
+        "cadence": "先用简短对话让两人关系成立，随后完成异常。空位先读清，电话核对和日常回答作最后反差。按自然听说呼吸安排，不给逐句秒点，不拉长等待来填时长。",
+        "tempo_class": "克制但不拖延，正常语速",
+        "shot_duration_seconds": 22
+      },
+      "camera_intent": {
+        "movement": "前段固定；揭出空位之后自然切到同侧近景",
+        "stability": "稳定",
+        "framing_intent": "先固定中远景同时看两人、出口和脚边；货车完整遮挡后在同机位揭示一位，再切到罗敏胸上近景完成电话对答，近景保持完整脸、左手手机与墨绿雨衣",
+        "expression_strength": "semantic_prompt_allowed"
+      },
+      "camera_endpoint": {
+        "start_framing": "参考素材1的两人同框固定中远景",
+        "end_framing": "参考素材3同侧罗敏胸上近景，左手手机完整，继续听电话",
+        "position_lock": false,
+        "orientation_lock": false
+      },
+      "primary_camera_motion": {
+        "movement_kind": "locked",
+        "direction": "none",
+        "amplitude_class": "subtle",
+        "speed_class": "very_slow",
+        "start_motion_state": "stationary",
+        "end_motion_state": "settled"
+      },
+      "camera_subject_relation": {
+        "subject_id": "luomin",
+        "relation_kind": "fixed_frame",
+        "start_relation": "站棚两人同框和完整可见出口",
+        "end_relation": "同侧胸上近景，罗敏平常听电话"
+      },
+      "performance_intent": {
+        "trigger": "夜班结束，联系接车司机；人物始终觉得这是普通接车电话",
+        "visible_response": "先报两位、同伴关心湿路与听说目光；揭出空位后罗敏没有寻找反应；听见司机核对人数，她平常回答自己一位",
+        "gaze_target": "前段罗敏与高峥自然听说，后段罗敏只听电话，不向空位搜索或看镜头",
+        "body_behavior": "自然站立和重心，无集体摆动或慢动作；无预知惊恐",
+        "hand_behavior": "罗敏左手手机贴左耳，黑包保持；高峥褐包只在消失前属于他，消失后一起不在",
+        "terminal_performance_state": "同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。",
+        "character_directions": [
+          {
+            "character_id": "gaozheng",
+            "screen_identity": "前段左侧成熟眼镜褐衣男",
+            "role": "supporting",
+            "visibility": "visible",
+            "beats": [
+              {
+                "phase": "throughout",
+                "trigger": "夜班后等接车电话",
+                "emotion": "疲倦清醒、普通生活，没有异常认知",
+                "intensity": "moderate",
+                "facial_expression": "自然说话和倾听，不夸张，不呆滞",
+                "gaze_target": "生活中的电话、湿路与同伴，不看镜头",
+                "breathing": "自然",
+                "body_behavior": "先听见接车，再望湿路顺口提醒，包保持，不走开；只在完整车厢遮挡后不再出现"
+              }
+            ]
+          },
+          {
+            "character_id": "luomin",
+            "screen_identity": "右侧短卷发墨绿雨衣女人，左手手机",
+            "role": "principal",
+            "visibility": "visible",
+            "beats": [
+              {
+                "phase": "throughout",
+                "trigger": "夜班后等接车电话",
+                "emotion": "疲倦清醒、普通生活，没有异常认知",
+                "intensity": "moderate",
+                "facial_expression": "自然说话和倾听，不夸张，不呆滞",
+                "gaze_target": "生活中的电话、湿路与同伴，不看镜头",
+                "breathing": "自然",
+                "body_behavior": "开头普通通话，听见同伴后看他；后段不记得、不寻找；听见司机问一位后像一直独自候车一样自然回答，无迟疑、惊恐或神秘笑"
+              }
+            ]
+          }
+        ]
+      },
+      "visual_treatment": {
+        "medium_look": "同三张参考的原创成年3D国漫CG面部、细束发丝、克制皮肤高光；成熟比例，不转真人照片",
+        "palette": "冷灰雨城与微暖站棚灯",
+        "material_treatment": "真实湿布、玻璃、雨水、金属和朴素通勤道具",
+        "prohibited_visual_drift": [
+          "真人照片脸或蜡像",
+          "换脸、额外手、多人融合",
+          "用溶解、透明、残影、鬼怪替代完整遮挡后的缺席",
+          "错误文字、片名、字幕或数字"
+        ]
+      },
+      "lighting_intent": {
+        "motivated_source": "站棚实用灯和雨夜远城灯",
+        "direction": "同参考保持冷暖侧光",
+        "exposure_priority": "人脸、左手手机、空位、出口和脚边可读",
+        "continuity_state": "同一雨夜同一站棚，不熄灯闪灯"
+      },
+      "ambience_intent": {
+        "environment_bed": "持续近棚雨声、湿路车流和正常经过的货车；电话司机为普通窄频通话声。无配乐、怪声、惊吓冲击或全局静音",
+        "foley_cues": [
+          "普通衣料声",
+          "货车引擎与湿路轮胎声从左向右正常经过远离"
+        ]
+      },
+      "music_intent": {
+        "mode": "none"
+      },
+      "dialogue_intent": {
+        "mode": "conversation",
+        "language": "zh",
+        "turns": [
+          {
+            "speaker_id": "luomin",
+            "verbatim_text": "师傅，我们在站里，两位。",
+            "on_screen": true,
+            "lip_sync_required": true,
+            "response_obligation": "罗敏开场已经在通话；高峥听见才接话"
+          },
+          {
+            "speaker_id": "gaozheng",
+            "verbatim_text": "让他别急，路滑。",
+            "on_screen": true,
+            "lip_sync_required": true,
+            "response_obligation": "高峥顺口关心湿路，罗敏听见后自然看他一眼；随后货车完整遮挡，再揭示他不在"
+          },
+          {
+            "speaker_id": "driver",
+            "verbatim_text": "就你一位？",
+            "on_screen": false,
+            "lip_sync_required": false,
+            "response_obligation": "在同机位完整揭出只剩罗敏之后，近景中才从电话传来普通接车核对，无惊讶质问"
+          },
+          {
+            "speaker_id": "luomin",
+            "verbatim_text": "嗯，就我一个。",
+            "on_screen": true,
+            "lip_sync_required": true,
+            "response_obligation": "听完司机才自然确认，语气平常，无迟疑、困惑、恐惧或寻找；然后继续听电话"
+          }
+        ]
+      }
+    },
+    "output_need": {
+      "timing_mode": "content_driven",
+      "duration_seconds": 22,
+      "geometry_policy": "adaptive",
+      "width": null,
+      "height": null,
+      "aspect_ratio": "16:9",
+      "fps": null,
+      "container_mime": "video/mp4"
+    },
+    "audio_need": "required",
+    "quality_need": {
+      "objective_tier": "preview"
+    }
+  },
+  "composition": {
+    "muted": false,
+    "source_audio_policy": "KEEP"
+  },
+  "occurrence_id": "co-whole",
+  "adaptation_reason": "User: 可以直接用seedance2.5一次完成，最多30s。Use original remaining third call for complete22s event; title/time/S01 remain postproduction. Old A1/A2 preserved, no third short answer component."
+}

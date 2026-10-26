@@ -1,0 +1,51 @@
+{
+  "status": "USER_REJECTED_TRANSITION_DIRECTION",
+  "feedback": "不能是从左到右，这样太简单，高级一点",
+  "endpoint_remains_selected": true,
+  "image_edit_calls": 4,
+  "video_calls": 0,
+  "images": [
+    {
+      "path": "01-entry.png",
+      "sha256": "d9b913292dbae00acbf3136b7ae234cf37a1c06d5fa1f1688588b22882b2f506",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "path": "02-first-change.png",
+      "sha256": "2460e1b5345f9b59b2988ed9c407c3af6266293bd2cda732ec0c5673a6888a40",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "path": "03-crossing-empty-place.png",
+      "sha256": "78c84f89ae40afe998f4b24345678039cc7c895e8997cfa346b214959e5acbed",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "path": "04-title-resolving.png",
+      "sha256": "2ecd95fbbbd1ad8b48ec734950b287f5fd8d1488ef186d4e474ba6a5bfaf8dc7",
+      "dimensions": [
+        1672,
+        941
+      ]
+    },
+    {
+      "path": "05-selected-end.png",
+      "sha256": "beed983a552ff9331bdc111f5e4cc2f1668c85c46ebce2809c6aae153b831caa",
+      "dimensions": [
+        1672,
+        941
+      ]
+    }
+  ],
+  "replacement": "../B-states-depth/",
+  "scope": "static references only; directional wipe not approved"
+}

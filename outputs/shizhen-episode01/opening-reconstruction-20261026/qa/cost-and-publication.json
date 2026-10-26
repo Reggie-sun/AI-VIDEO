@@ -1,0 +1,17 @@
+{
+  "new_video_generation_calls": 0,
+  "new_image_generation_calls": 2,
+  "new_music_generation_calls": 0,
+  "audio_analysis_calls": 1,
+  "audio_analysis_outcome": "SUCCEEDED_HTTP_200",
+  "audio_analysis_provider": "gemini",
+  "internal_reserved_upper_bound_usd": 0.05,
+  "actual_audio_analysis_cost": "UNKNOWN_NOT_SETTLED",
+  "codex_cost": "UNKNOWN",
+  "public_publication": "NOT_PUBLISHED",
+  "production_activation": false,
+  "commit_push": "DEFERRED_FILM_FIRST_UNTIL_USER_APPROVAL",
+  "actual_image_generation_cost": "UNKNOWN_NOT_SETTLED",
+  "collaboration_final_cut_audio_analysis_calls": 1,
+  "collaboration_final_cut_audio_actual_cost": "UNKNOWN_NOT_SETTLED"
+}

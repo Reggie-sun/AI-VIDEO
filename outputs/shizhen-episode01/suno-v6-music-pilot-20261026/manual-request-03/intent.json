@@ -1,0 +1,39 @@
+{
+  "schema": "task-local-suno-manual-intent/1",
+  "recorded_at": "2026-10-25T20:56:49.946007+00:00",
+  "authorization": "Original max3 requests; explicit user repair instruction; user viewing logged-in official Create page",
+  "execution_mode": "official_UI_with_user_handled_challenge",
+  "logical_request_number": 3,
+  "automatic_generation_allowed": false,
+  "status": "prepared_not_clicked",
+  "model": "v6",
+  "instrumental": true,
+  "title": "失帧｜空位动机",
+  "style": "instrumental score. 当代都市心理悬疑的室内乐与极简电子声景，克制、亲近、未解决. 中低音单簧管用短小的两个相邻音构成犹疑动机，弱音中提琴维持薄层，柔暗模拟低音只在乐句间呼吸；乐器各留空间. 自由呼吸式稀疏脉冲，反复之间留不等长空隙，避免稳定舞曲鼓点. 开始几乎空白，两个音反复试探；中段增加轻微拍频与未解决的和声压力，随后抽去低音留下同一动机；几次乐句间明显退开；结尾自然衰减但不解决. 轻而清晰的干声细节，有限室内残响，保持中频对白空间，动态有余量. 同一两个音的轮廓贯穿整段，不每次起新旋律；为后续在同一录音中选取铺垫与不安段落保留可剪接的间隙",
+  "exclude": "vocals, lyrics, choir, spoken word, vocals, humming, choir, lyrics, drums, trailer hits, jump-scare stingers, heroic brass, pop chorus, triumphant ending",
+  "BPM": null,
+  "duration": null,
+  "sliders": "unset",
+  "max_mode": false,
+  "prior_CLI_jobs": [
+    {
+      "transaction_id": "a456e1a3-13c4-5130-9b8e-e6a2be438ea7",
+      "request_sha256": "d4bd144caf5df714a03db7ad0851276b73d3abd73c247595ae774b96663bed7b",
+      "state": "rejected",
+      "ids": []
+    },
+    {
+      "transaction_id": "68ae0257-5b71-5871-8c49-10d03fc658f7",
+      "request_sha256": "26531b630e768537e33f72ef8e32f48104d2179de52087f6b2506a110eb9de6f",
+      "state": "rejected",
+      "ids": []
+    }
+  ],
+  "library_before": {
+    "clips": 0,
+    "has_more": false
+  },
+  "historical_project_unknowns_preserved": true,
+  "budget_gate": "USER_DISABLED",
+  "no_further_requests_after_this": true
+}

@@ -1,0 +1,10 @@
+{
+  "command": "credits",
+  "exit_code": 0,
+  "status": "success",
+  "data": {
+    "total_credits_left": 2500,
+    "monthly_usage": 0
+  },
+  "error_code": null
+}

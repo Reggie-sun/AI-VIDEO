@@ -1,0 +1,55 @@
+{
+  "output": "outputs/shizhen-episode01/opening-A-revision-20261026/variant-R2/失帧-独立开场-接缝修订-R2.mp4",
+  "sha256": "f8e6b3ca544bdc7190ef7b238c0da04bb1c087744a957afe95755fd66b669221",
+  "bytes": 18108991,
+  "size_bytes": 18108991,
+  "timeline_frames": 417,
+  "timeline_fingerprint": "4ad22eb06290127254b25e2071abede36cf6efd4cf105a1c015daadebfcaeb47",
+  "measured": {
+    "width": 1920,
+    "height": 1080,
+    "fps_num": 24,
+    "fps_den": 1,
+    "duration_frames": 417,
+    "codec_name": "h264",
+    "audio": {
+      "stream_count": 1,
+      "codec_name": "aac",
+      "sample_rate_hz": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "decoded_samples": 834560,
+      "encoder_priming_samples": 1024,
+      "encoder_padding_samples": 560,
+      "measurement_method": "held-fd ffprobe packets plus pcm_s16le decode"
+    }
+  },
+  "checks": [
+    {
+      "command": "lint",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "f91a7f9e08658cf8daf815895c72ad59093b2920a6f4b6f0aecc6a36b1ee1e2d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "error_count": 0,
+      "warning_count": 0
+    },
+    {
+      "command": "check",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "424fe42d275e0a96203ce0dc9655ebe27971ac0e4988584ded826058e45400bf",
+      "stderr_sha256": "d307dee2a0b012cf36e66f31da96f0a4304ef70065eeb0ad3e63c1ee997e8a7a",
+      "error_count": 0,
+      "warning_count": 2
+    }
+  ],
+  "source_audio_matches_new_visual_windows": true,
+  "usage_scope": "development_audio_preview",
+  "native_dialogue": "KEEP exact native source sound; A3 starts at closeup frame361, trimming 25 pre-dialogue frames. No dialogue gain/fade changes",
+  "title_plate": "Not included: user delegated typography to Grok; optional source plate handed off separately",
+  "s01": "OUT_OF_SCOPE_NOT_INCLUDED",
+  "paid_generation_calls": 0,
+  "human_review": "PENDING",
+  "publication": "NOT_PUBLISHED"
+}

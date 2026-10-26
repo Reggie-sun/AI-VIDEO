@@ -1148,8 +1148,8 @@ def test_paid_dispatch_retains_native_frame_roles_without_prompt_markers(mode, n
 
 
 @pytest.mark.parametrize("mode", ["first_frame", "first_last_frame"])
-@pytest.mark.parametrize("untimed", [False, True])
-def test_frame_conditioning_survives_requirement_router_compiler_and_resolve(mode, monkeypatch, untimed):
+@pytest.mark.parametrize("model_id,untimed", [("seedance_2.0_vip", False), ("seedance_2.0_vip", True), ("seedance_2.5", True)])
+def test_frame_conditioning_survives_requirement_router_compiler_and_resolve(mode, monkeypatch, model_id, untimed):
     from test_production_shot_router import (
         _asset, _context, _first_frame_projection, _reseal_projection, _policy, _lifecycle,
     )
@@ -1159,7 +1159,7 @@ def test_frame_conditioning_survives_requirement_router_compiler_and_resolve(mod
     from ai_video.production.video_requirement import (
         AssetEvidence, SemanticReferenceRole, CapabilityNeed, AudioNeed, OutputNeed, DialogueIntent,
     )
-    profile, provider, expected = _frame_conditioned(mode, model_id="seedance_2.5" if untimed else "seedance_2.0_vip")
+    profile, provider, expected = _frame_conditioned(mode, model_id=model_id)
     assets = tuple(_asset(binding.role, binding.asset_id, binding.asset_sha256,
         width=binding.width, height=binding.height, size_bytes=binding.size_bytes)
         for binding in expected.image_bindings)

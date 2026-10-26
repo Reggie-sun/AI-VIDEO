@@ -1695,7 +1695,12 @@ def _validated_executable(path: Path, label: str) -> Path:
     return path
 
 
-def _controlled_env(browser_path: Path, ip_path: Path) -> dict[str, str]:
+def _controlled_env(
+    browser_path: Path, ip_path: Path, *,
+    browser_gpu_mode: Literal["hardware", "software"] | None = None,
+) -> dict[str, str]:
+    if browser_gpu_mode not in {None, "hardware", "software"}:
+        raise _renderer_unavailable("HyperFrames browser GPU mode must be explicit hardware or software.")
     browser = _validated_executable(browser_path, "browser")
     ip_binary = _validated_executable(ip_path, "ip")
     return {
@@ -1706,6 +1711,8 @@ def _controlled_env(browser_path: Path, ip_path: Path) -> dict[str, str]:
         **OFFLINE_ENV,
         "HYPERFRAMES_BROWSER_PATH": str(browser),
         "P3_IP_PATH": str(ip_binary),
+        **({"PRODUCER_BROWSER_GPU_MODE": browser_gpu_mode}
+           if browser_gpu_mode is not None else {}),
     }
 
 
@@ -1748,6 +1755,7 @@ class _NetworkIsolatedHyperFramesRunner:
         ip_path: Path,
         unshare_path: Path,
         bash_path: Path,
+        browser_gpu_mode: Literal["hardware", "software"] | None = None,
     ) -> None:
         self._project_root = Path(project_root).resolve()
         self._browser = _validated_executable(browser_path, "browser")
@@ -1755,7 +1763,7 @@ class _NetworkIsolatedHyperFramesRunner:
         self._unshare = _validated_executable(unshare_path, "unshare")
         self._bash = _validated_executable(bash_path, "bash")
         self._binary = self._validate_lock_owned_binary(binary)
-        self._env = _controlled_env(self._browser, self._ip)
+        self._env = _controlled_env(self._browser, self._ip, browser_gpu_mode=browser_gpu_mode)
         self._probe_namespace()
 
     def _validate_lock_owned_binary(self, binary: Path) -> Path:
@@ -2295,6 +2303,7 @@ class HyperFramesAdapter:
         native_audio_ffprobe_path: Path | None = None,
         browser_path: Path,
         ip_path: Path,
+        browser_gpu_mode: Literal["hardware", "software"] | None = None,
     ) -> None:
         if expected_version != _HYPERFRAMES_VERSION:
             raise _renderer_unavailable(
@@ -2308,7 +2317,7 @@ class HyperFramesAdapter:
         self._audio_measurement_method = audio_measurement_method
         self._native_audio_ffmpeg_path = native_audio_ffmpeg_path
         self._native_audio_ffprobe_path = native_audio_ffprobe_path
-        self._env = _controlled_env(browser_path, ip_path)
+        self._env = _controlled_env(browser_path, ip_path, browser_gpu_mode=browser_gpu_mode)
 
     def _check(
         self, command: Literal["lint", "check"], root: Path

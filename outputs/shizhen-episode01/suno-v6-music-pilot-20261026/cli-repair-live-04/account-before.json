@@ -1,0 +1,30 @@
+{
+  "recorded_at": "2026-10-25T21:32:24.838900+00:00",
+  "credits": {
+    "total_credits_left": 2490,
+    "monthly_usage": 10
+  },
+  "models": [
+    {
+      "name": "v6",
+      "id": null,
+      "key": null,
+      "model": null,
+      "can_use": true
+    },
+    {
+      "name": "v6-wild",
+      "id": null,
+      "key": null,
+      "model": null,
+      "can_use": true
+    },
+    {
+      "name": "v6-mini",
+      "id": null,
+      "key": null,
+      "model": null,
+      "can_use": true
+    }
+  ]
+}

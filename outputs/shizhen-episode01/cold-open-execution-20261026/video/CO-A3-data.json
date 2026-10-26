@@ -1,0 +1,124 @@
+{
+  "predecessor_gate": "CO-A2-post-media-gate.json",
+  "historical_video_calls": 9,
+  "objective": "一次生成完整22秒站棚事件：两位普通人→遮挡后只剩一位→平常回答；标题及S01不生成",
+  "scene_image": "CO-A3-ref-02-after",
+  "characters": [
+    {
+      "character_id": "gaozheng",
+      "name": "高峥",
+      "identity": "普通夜班设备维护工，罗敏同事",
+      "appearance_bible": "同参考1成熟宽脸、短发、细框眼镜、褐灰外套、深棕包",
+      "reference_asset_ids": [
+        "CO-A3-ref-01-before"
+      ]
+    },
+    {
+      "character_id": "luomin",
+      "name": "罗敏",
+      "identity": "普通夜班同事，联系接车司机",
+      "appearance_bible": "同参考1和3短卷发、墨绿雨衣、左手手机贴左耳、黑包",
+      "reference_asset_ids": [
+        "CO-A3-ref-01-before",
+        "CO-A3-ref-03-close"
+      ]
+    },
+    {
+      "character_id": "driver",
+      "name": "电话司机",
+      "identity": "普通接车司机，仅画外电话声，不知道任何异常",
+      "appearance_bible": "不出镜；不生成司机人物画面或车辆接客动作",
+      "reference_asset_ids": []
+    }
+  ],
+  "images": [
+    {
+      "asset_id": "CO-A3-ref-01-before",
+      "node_id": "CO-A3-ref-01-before-node",
+      "resource_id": "CO-A3-ref-01-before-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/cold-open-execution-20261026/art/master-firstframe-002.png",
+      "usage_license": "Original fictional CG assets generated for authorized Two Passengers cold-open; preserve exact original art",
+      "generated_source": {
+        "record_path": "art/master-firstframe-002.png.record.json",
+        "record_sha256": "0bf6b38ebc9ef589454e99cbda23ce6ff46a130a38dbbf6db239faf7d59b8554",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    },
+    {
+      "asset_id": "CO-A3-ref-02-after",
+      "node_id": "CO-A3-ref-02-after-node",
+      "resource_id": "CO-A3-ref-02-after-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/cold-open-execution-20261026/art/after-state-001.png",
+      "usage_license": "Original fictional CG assets generated for authorized Two Passengers cold-open; preserve exact original art",
+      "generated_source": {
+        "record_path": "art/after-state-001.png.record.json",
+        "record_sha256": "b16f6503e93e15a5784a3b6028b78c8416d54cdd5acc61f1ee6eb6362a9ab339",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    },
+    {
+      "asset_id": "CO-A3-ref-03-close",
+      "node_id": "CO-A3-ref-03-close-node",
+      "resource_id": "CO-A3-ref-03-close-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/cold-open-execution-20261026/art/luomin-close-001.png",
+      "usage_license": "Original fictional CG assets generated for authorized Two Passengers cold-open; preserve exact original art",
+      "generated_source": {
+        "record_path": "art/luomin-close-001.png.record.json",
+        "record_sha256": "12adfac865557ede1bcddd27769a6c62d984935b37b99f1230f63550d3773617",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    }
+  ],
+  "observations": {
+    "relationship": "先让观众明确两名普通同事和一次顺口关心，随后缺席造成情感反差，无额外关系或记忆保留者。",
+    "action": "开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。",
+    "identity": "高峥与罗敏维持三张参考的原身份衣物和各自包；罗敏始终左手手机左耳。失踪后高峥和包一起不在，罗敏不换脸衣或手。",
+    "camera": "先固定中远景同时看两人、出口和脚边；货车完整遮挡后在同机位揭示一位，再切到罗敏胸上近景完成电话对答，近景保持完整脸、左手手机与墨绿雨衣",
+    "performance": "高峥先听见再提醒，罗敏先听见再回应目光；消失后她不寻找，不困惑；司机核对后她自然确认一位，无惊恐或神秘笑。",
+    "sound": "四轮中文依序各一次：女报两位、男提醒路滑、消失后画外司机核对就你一位、女平常确认就我一个。声线角色正确、口型对人、正常语速；持续雨夜车流与货车声，无多余对白、配乐、惊吓冲击或突发全局静音。",
+    "story-scope": "只呈现一次前一夜的两位→一位事件。消失不等于走开、上车、烟化或透明渐隐；人物没有保留记忆；不泄露S01与终场反转，不加怪物、规则解释、字幕、片名或准确数字。",
+    "art": "全程保持同参考的原创成年3D国漫写实CG、细束发丝与真实湿材质，同一雨夜冷暖光；不变真人、蜡脸或风格分裂。"
+  },
+  "paths": {
+    "relationship": [
+      "generation_intent.subject_action.progression"
+    ],
+    "action": [
+      "generation_intent.subject_action.progression"
+    ],
+    "identity": [
+      "generation_intent.identity_continuity.preservation"
+    ],
+    "camera": [
+      "generation_intent.camera_intent.framing_intent"
+    ],
+    "performance": [
+      "generation_intent.performance_intent"
+    ],
+    "sound": [
+      "generation_intent.dialogue_intent.turns",
+      "generation_intent.ambience_intent.environment_bed",
+      "generation_intent.ambience_intent.foley_cues"
+    ],
+    "story-scope": [
+      "generation_intent.scene_continuity.state_constraints"
+    ],
+    "art": [
+      "generation_intent.visual_treatment.medium_look",
+      "generation_intent.visual_treatment.palette",
+      "generation_intent.visual_treatment.material_treatment",
+      "generation_intent.visual_treatment.prohibited_visual_drift"
+    ]
+  },
+  "user_change_quote": "可以直接用seedance 2.5一次完成.这个模型最多30s一次生成",
+  "scope_change": "replace planned6s answer-only third unit with one22s complete event, within original3-call and1500/4500CRD bounds; retainA1/A2 history"
+}

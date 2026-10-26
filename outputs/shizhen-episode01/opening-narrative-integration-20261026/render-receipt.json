@@ -1,0 +1,52 @@
+{
+  "output": "outputs/shizhen-episode01/opening-narrative-integration-20261026/失帧-两位-叙事衔接预演-001.mp4",
+  "sha256": "bf1ea78c064c0c92180779699f12ec01cc1531f3513ae8555d62ba106ae640ab",
+  "bytes": 34507129,
+  "measured": {
+    "width": 1920,
+    "height": 1080,
+    "fps_num": 24,
+    "fps_den": 1,
+    "duration_frames": 784,
+    "codec_name": "h264",
+    "audio": {
+      "stream_count": 1,
+      "codec_name": "aac",
+      "sample_rate_hz": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "decoded_samples": 1568768,
+      "encoder_priming_samples": 1024,
+      "encoder_padding_samples": 768,
+      "measurement_method": "held-fd ffprobe packets plus pcm_s16le decode"
+    }
+  },
+  "checks": [
+    {
+      "command": "lint",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "f91a7f9e08658cf8daf815895c72ad59093b2920a6f4b6f0aecc6a36b1ee1e2d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "error_count": 0,
+      "warning_count": 0
+    },
+    {
+      "command": "check",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "bbd3ad425aabed93fe6fb28a96af48d2baa524b31980789154e9c523aab75ac0",
+      "stderr_sha256": "d307dee2a0b012cf36e66f31da96f0a4304ef70065eeb0ad3e63c1ee997e8a7a",
+      "error_count": 0,
+      "warning_count": 0
+    }
+  ],
+  "source_audio_windows_unchanged": true,
+  "usage_scope": "development_audio_preview",
+  "native_dialogue": "KEEP: identical source intervals, no gain or fade changes",
+  "title_plate": "Removed independent static title plate; title over moving glass and next-night over existing S01 before dialogue",
+  "s01": "same 384 frames, original mix and bilingual captions",
+  "paid_generation_calls": 0,
+  "human_review": "PENDING",
+  "publication": "NOT_PUBLISHED"
+}

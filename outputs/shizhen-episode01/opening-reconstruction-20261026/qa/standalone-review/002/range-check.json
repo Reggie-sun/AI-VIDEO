@@ -1,0 +1,17 @@
+[
+  {
+    "range": "bytes=100-199",
+    "status": 206,
+    "content_range": "bytes 100-199/19099748",
+    "bytes_match": true
+  },
+  {
+    "range": "bytes=-100",
+    "status": 206,
+    "content_range": "bytes 19099648-19099747/19099748",
+    "bytes_match": true
+  },
+  {
+    "out_of_range_status": 416
+  }
+]

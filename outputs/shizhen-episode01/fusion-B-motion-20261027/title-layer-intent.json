@@ -1,0 +1,8 @@
+{
+  "scope": "one transparent title layer extraction, no video/music generation",
+  "max_calls": 1,
+  "retries": 0,
+  "source": "../fusion-title-trial-20261026/image-directions/B-states-depth/04-image-settles.png",
+  "source_role": "exact accepted-direction glyphs and layout; background not to transfer",
+  "prompt": "从输入的电影片头设计图中精确分离既有的两个黑色中文汉字“失帧”，制作供专业影视合成使用的字标透明图层。只提取已有字形，不重新设计字体。\n输出完整16:9画布，真正透明RGBA背景，保留原图中两个字的大小、非对称位置与构图：大“失”在左上，较小“帧”在左下偏右。保留锐利的高反差笔画、尖角、少量原有磨损和字内透光纹理；完整正确的简体中文“失帧”，不能缺笔或换字。\n画布里除这两个字外，任何内容都必须透明：删除人物、站棚立柱、横栏、长椅、玻璃雨点、城市、背景影像、AI角标、钟牌、灯光、白色底板和所有场景线条。尤其注意与“失”竖笔重叠的站棚立柱不是字的一部分，与“帧”相交的长椅横栏也不是字的一部分，必须分离干净。不要保留这些物体的轮廓或阴影。字的颜色为近黑色，磨损孔洞可透明。不要给字添加外发光、描边、立体挤压、额外阴影或新纹理。字标位置在完整画布内固定，不要紧贴边裁成字的包围盒，不把两个字重新排成一行。此资产是文字图层提取，并非新海报。"
+}

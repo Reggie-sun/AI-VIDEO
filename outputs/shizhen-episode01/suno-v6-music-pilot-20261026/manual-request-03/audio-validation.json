@@ -1,0 +1,109 @@
+{
+  "recorded_at": "2026-10-25T21:15:10.954115+00:00",
+  "files": [
+    {
+      "file": "audio/失帧-空位动机-6de433ab.mp3",
+      "sha256": "71ced529adab3501a17a6ff002919ae344433ffc1582fba9f855bc3ddf73d0e9",
+      "bytes": 3746125,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "48000",
+            "channels": 2
+          },
+          {
+            "codec_name": "mjpeg"
+          }
+        ],
+        "format": {
+          "duration": "174.024000",
+          "size": "3746125"
+        }
+      },
+      "full_decode_exit_code": 0,
+      "clip_id": "6de433ab-dab5-4ca4-a0f5-7665a0d48c01",
+      "source": "official UI third logical request, CLI readonly download",
+      "asset_state": "unregistered_external_generated_candidate",
+      "quality": "NOT_EVALUATED"
+    },
+    {
+      "file": "audio/失帧-空位动机-6de433ab.wav",
+      "sha256": "27e6e7a821c7913ace3f459b65680130042f909863fa7f85e4bade12806dcaaa",
+      "bytes": 33421840,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "pcm_s16le",
+            "sample_rate": "48000",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "174.000000",
+          "size": "33421840"
+        }
+      },
+      "full_decode_exit_code": 0,
+      "clip_id": "6de433ab-dab5-4ca4-a0f5-7665a0d48c01",
+      "source": "official UI third logical request, CLI readonly download",
+      "asset_state": "unregistered_external_generated_candidate",
+      "quality": "NOT_EVALUATED"
+    },
+    {
+      "file": "audio/失帧-空位动机-e61e327c.mp3",
+      "sha256": "9e68360462cd5f452543798f5c47d1cd02b2e6ae730d1b5560212877acb35af3",
+      "bytes": 4031976,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "mp3",
+            "sample_rate": "48000",
+            "channels": 2
+          },
+          {
+            "codec_name": "mjpeg"
+          }
+        ],
+        "format": {
+          "duration": "183.600000",
+          "size": "4031976"
+        }
+      },
+      "full_decode_exit_code": 0,
+      "clip_id": "e61e327c-4e53-4e68-9e52-118e3ac0cb64",
+      "source": "official UI third logical request, CLI readonly download",
+      "asset_state": "unregistered_external_generated_candidate",
+      "quality": "NOT_EVALUATED"
+    },
+    {
+      "file": "audio/失帧-空位动机-e61e327c.wav",
+      "sha256": "687dfcc219ebcba827d76d9344fa240c625058e31dd85cfef07ffd4738d4bce9",
+      "bytes": 35257360,
+      "probe": {
+        "programs": [],
+        "streams": [
+          {
+            "codec_name": "pcm_s16le",
+            "sample_rate": "48000",
+            "channels": 2
+          }
+        ],
+        "format": {
+          "duration": "183.560000",
+          "size": "35257360"
+        }
+      },
+      "full_decode_exit_code": 0,
+      "clip_id": "e61e327c-4e53-4e68-9e52-118e3ac0cb64",
+      "source": "official UI third logical request, CLI readonly download",
+      "asset_state": "unregistered_external_generated_candidate",
+      "quality": "NOT_EVALUATED"
+    }
+  ],
+  "listening": "NOT_EVALUATED; no usable model audio input",
+  "registry": "No canonical asset registration or activation; do not map UI results onto failed CLI request UUIDs"
+}

@@ -15,6 +15,7 @@ from ai_video.production.composition_contracts import (
     TransitionSpec,
 )
 from ai_video.production.models import (
+    AssetSourceKind,
     AssetType,
     AudioKind,
     LoadedProductionProject,
@@ -92,7 +93,10 @@ def resolve_preview_layer_ids(
                     or spec.voice_sources):
                 raise invalid("Replacement audio preview requires supported P4 audio tracks and no voice sources.")
             if dialogue_tracks:
-                if not _captured_dialogue_layout_valid(spec, dialogue_tracks):
+                if not _captured_dialogue_layout_valid(
+                    spec, dialogue_tracks,
+                    silent_image_shots=_speech_free_visual_shots(project, spec, shots_by_id),
+                ):
                     raise invalid("Captured dialogue preview requires one exact-source dialogue track per Shot with its captions bound to it.")
             elif spec.caption_tracks:
                 raise invalid("Development preview captions require the exact captured dialogue track.")
@@ -205,16 +209,64 @@ def validate_replacement_preview_narration(
             )
 
 
-def _captured_dialogue_layout_valid(spec, dialogue_tracks) -> bool:
-    """One video and original dialogue per Shot; optional captions never cross Shots."""
+def _silent_image_shots(project, spec, shots_by_id):
+    """Only authored, speech-free static images can omit captured video audio."""
+    assets = {asset.asset_id: asset for asset in project.registry.assets}
+    return frozenset(
+        shot_id for shot_id in spec.shot_ids
+        if (shot := shots_by_id.get(shot_id)) is not None
+        and getattr(shot, "visual_strategy", None) is VisualStrategy.STATIC_IMAGE
+        and not shot.dialogue.strip() and not shot.narration.strip()
+        and (layers := tuple(layer for layer in spec.layers if layer.shot_id == shot_id))
+        and all((asset := assets.get(layer.asset_id)) is not None
+                and asset.asset_type is AssetType.IMAGE for layer in layers)
+    )
+
+
+def _speech_free_visual_shots(project, spec, shots_by_id):
+    """Allow authored imported B-roll, never a muted captured/generated source."""
+    from ai_video.production.repair_input_admission import is_repair_input_record
+
+    silent = set(_silent_image_shots(project, spec, shots_by_id))
+    assets = {asset.asset_id: asset for asset in project.registry.assets}
+    for shot_id in spec.shot_ids:
+        shot = shots_by_id.get(shot_id)
+        if (shot is None
+                or getattr(shot, "visual_strategy", None) is not VisualStrategy.EXISTING_VIDEO
+                or shot.dialogue.strip() or shot.narration.strip()):
+            continue
+        layers = tuple(layer for layer in spec.layers if layer.shot_id == shot_id)
+        if len(layers) != 1:
+            continue
+        layer = layers[0]
+        asset = assets.get(layer.asset_id)
+        roles = {role.role: role for role in shot.required_asset_roles}
+        role = roles.get(layer.asset_role)
+        if (asset is not None and asset.asset_type is AssetType.VIDEO
+                and asset.source_kind is AssetSourceKind.IMPORTED
+                and not is_repair_input_record(asset, project.root)
+                and role is not None and asset.asset_id in role.asset_ids
+                and layer.source_audio_policy == "MUTE"
+                and layer.source_audio_reason and layer.source_audio_reason.strip()
+                and layer.source_time_map is None):
+            silent.add(shot_id)
+    return frozenset(silent)
+
+
+def _captured_dialogue_layout_valid(spec, dialogue_tracks, *, silent_image_shots=frozenset()) -> bool:
+    """Every captured video retains its exact dialogue; silent B-roll adds no voices."""
     count = len(spec.shot_ids)
+    captured_shots = set(spec.shot_ids) - silent_image_shots
     if (not count or len(set(spec.shot_ids)) != count
-            or len(spec.layers) != count or len(dialogue_tracks) != count
-            or len(spec.audio_tracks) != count or not spec.caption_tracks):
+            or len(spec.layers) != count or len(dialogue_tracks) != len(captured_shots)
+            or not captured_shots
+            or any(track.audio_kind not in {AudioKind.DIALOGUE, AudioKind.BGM,
+                                           AudioKind.SFX, AudioKind.AMBIENCE}
+                   for track in spec.audio_tracks)):
         return False
     tracks = {track.track_id: track for track in dialogue_tracks}
-    if (len(tracks) != count
-            or {track.shot_id for track in dialogue_tracks} != set(spec.shot_ids)
+    if (len(tracks) != len(captured_shots)
+            or {track.shot_id for track in dialogue_tracks} != captured_shots
             or {layer.shot_id for layer in spec.layers} != set(spec.shot_ids)):
         return False
     for binding in spec.caption_tracks:
@@ -239,7 +291,10 @@ def _validate_captured_dialogue_preview(
     """Bind review dialogue to the exact captured video and its full source window."""
     if (timeline.usage_scope != "development_audio_preview"
             or spec.schema_version != "2.3"
-            or not _captured_dialogue_layout_valid(spec, dialogue_tracks)):
+            or not _captured_dialogue_layout_valid(
+                spec, dialogue_tracks,
+                silent_image_shots=_speech_free_visual_shots(project, spec, shots_by_id),
+            )):
         raise invalid("Captured dialogue requires one exact source per Shot with captions bound to its own audio in a development audio preview.")
     intervals = sorted((span.start_sample, span.start_sample + span.duration_samples)
                        for span in timeline.visual_spans)

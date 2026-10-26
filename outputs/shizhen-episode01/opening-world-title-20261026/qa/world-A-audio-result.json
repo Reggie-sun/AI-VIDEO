@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"schema_version\": \"audio-understanding-evidence/1\",\n  \"source_sha256\": \"1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6\",\n  \"source_size_bytes\": 30975126,\n  \"audio_sha256\": \"a0a5791b081f99d637104941302fed57390d63756556c34a43b83459854e8180\",\n  \"audio_size_bytes\": 5267534,\n  \"duration_seconds\": 27.434666666666665,\n  \"audio_start_seconds\": 0.0,\n  \"request_fingerprint\": \"10bdd81237a1ba5ee19375586361c31ebd28983cc9d1bd00e3f21648d555db57\",\n  \"requested_model_id\": \"gemini-3.8-flash\",\n  \"response_model_id\": \"gemini-3.8-flash\",\n  \"response_sha256\": \"6df4f0a8808afb368d2bcf45a4ec011882fcebb153c298786df6ca2e7898287d\",\n  \"observations\": {\n    \"segments\": [\n      {\n        \"start_seconds\": 2.8,\n        \"end_seconds\": 5.4,\n        \"text\": \"师傅，我们在站里，两位。\",\n        \"speaker\": \"Speaker 1\"\n      },\n      {\n        \"start_seconds\": 5.7,\n        \"end_seconds\": 7.7,\n        \"text\": \"让他别急，路滑。\",\n        \"speaker\": \"Speaker 2\"\n      },\n      {\n        \"start_seconds\": 14.6,\n        \"end_seconds\": 16.2,\n        \"text\": \"就你一位？\",\n        \"speaker\": \"Speaker 3\"\n      },\n      {\n        \"start_seconds\": 16.8,\n        \"end_seconds\": 18.5,\n        \"text\": \"嗯，就我一个。\",\n        \"speaker\": \"Speaker 1\"\n      }\n    ],\n    \"voice_description\": \"Speaker 1 is a young adult female speaking clearly in Mandarin with a natural, conversational tone. Speaker 2 is an adult male with a deep, low, warm voice. Speaker 3 is an adult male whose voice has a slightly muffled quality consistent with speech over a speakerphone or intercom.\",\n    \"delivery_description\": \"Natural conversational pace with clear articulation, moderate volume, and calm emotional delivery throughout.\",\n    \"background_sounds\": [\n      \"rain\",\n      \"wet ground footsteps\",\n      \"outdoor ambience\",\n      \"soft piano music\"\n    ],\n    \"uncertainties\": []\n  },\n  \"proof_boundary\": \"analyzer observations; not QA/human/timing acceptance\",\n  \"media_path\": \"/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-world-title-20261026/variant-A/失帧-独立开场-A-结构预演.mp4\",\n  \"analysis_audio_derivation\": \"full_source_track_pcm_derivative\",\n  \"human_acceptance\": \"NOT_EVALUATED\"\n}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

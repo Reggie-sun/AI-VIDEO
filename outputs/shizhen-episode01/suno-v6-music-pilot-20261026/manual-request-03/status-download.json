@@ -1,0 +1,24 @@
+{
+  "recorded_at": "2026-10-25T21:14:13.796259+00:00",
+  "exit_code": 0,
+  "status": "success",
+  "error_code": null,
+  "clips": [
+    {
+      "id": "e61e327c-4e53-4e68-9e52-118e3ac0cb64",
+      "title": "失帧｜空位动机",
+      "status": "complete",
+      "model_name": "chirp-hawk",
+      "local_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/suno-v6-music-pilot-20261026/manual-request-03/audio/失帧-空位动机-e61e327c.mp3",
+      "duration": null
+    },
+    {
+      "id": "6de433ab-dab5-4ca4-a0f5-7665a0d48c01",
+      "title": "失帧｜空位动机",
+      "status": "complete",
+      "model_name": "chirp-hawk",
+      "local_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/suno-v6-music-pilot-20261026/manual-request-03/audio/失帧-空位动机-6de433ab.mp3",
+      "duration": null
+    }
+  ]
+}

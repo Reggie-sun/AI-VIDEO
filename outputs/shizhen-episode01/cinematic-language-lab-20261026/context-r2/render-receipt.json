@@ -1,0 +1,52 @@
+{
+  "output": "outputs/shizhen-episode01/cinematic-language-lab-20261026/context-r2/失帧-肖像与城市-前后语境研究.mp4",
+  "sha256": "6fef54d95030713e2db18d4eb2692c4bd1640d5a36cdcdabd0cc94625e03ecd2",
+  "bytes": 34845797,
+  "measured": {
+    "width": 1920,
+    "height": 1080,
+    "fps_num": 24,
+    "fps_den": 1,
+    "duration_frames": 868,
+    "codec_name": "h264",
+    "audio": {
+      "stream_count": 1,
+      "codec_name": "aac",
+      "sample_rate_hz": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "decoded_samples": 1736704,
+      "encoder_priming_samples": 1024,
+      "encoder_padding_samples": 704,
+      "measurement_method": "held-fd ffprobe packets plus pcm_s16le decode"
+    }
+  },
+  "checks": [
+    {
+      "command": "lint",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "f91a7f9e08658cf8daf815895c72ad59093b2920a6f4b6f0aecc6a36b1ee1e2d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "error_count": 0,
+      "warning_count": 0
+    },
+    {
+      "command": "check",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "cbf18f2b608577033097a0e1a309f671f984aed986eb376026b83f40ab091301",
+      "stderr_sha256": "d307dee2a0b012cf36e66f31da96f0a4304ef70065eeb0ad3e63c1ee997e8a7a",
+      "error_count": 0,
+      "warning_count": 0
+    }
+  ],
+  "audio_spans_identical_to_old": true,
+  "usage_scope": "development_audio_preview",
+  "native_dialogue": "KEEP: identical source intervals, no gain or fade changes",
+  "title_plate": "existing city image deliberately frozen inside portrait; no generated new shot",
+  "s01": "same 384 frames, original mix and bilingual captions",
+  "paid_generation_calls": 0,
+  "human_review": "PENDING",
+  "publication": "NOT_PUBLISHED"
+}

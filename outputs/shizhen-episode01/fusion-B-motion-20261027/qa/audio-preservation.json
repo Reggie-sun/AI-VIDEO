@@ -1,0 +1,9 @@
+{
+  "candidate_sha256": "2def03b0b76dc9397bff2949086e68d3ed9184f3d3ef824fe217b751845bf31b",
+  "comparison": "outputs/shizhen-episode01/fusion-title-trial-20261026/variant-F2/失帧-Fusion片名试片-F2.mp4",
+  "decoded_pcm_identical": true,
+  "new_pcm_sha256": "019d747eb6ef68779bb11a3b775b89f410f33c7881c95415f3850fc0dcd61640",
+  "prior_pcm_sha256": "019d747eb6ef68779bb11a3b775b89f410f33c7881c95415f3850fc0dcd61640",
+  "bytes": 577536,
+  "boundary": "Exact original environment/music mix preservation only; not human hearing or artistic acceptance."
+}

@@ -1,0 +1,30 @@
+{
+  "reviewer": "/root/opening_concept_check",
+  "profile": "reviewer_high",
+  "candidate_sha256": "2def03b0b76dc9397bff2949086e68d3ed9184f3d3ef824fe217b751845bf31b",
+  "findings": [
+    {
+      "id": "B2-01",
+      "severity": "blocking_candidate",
+      "finding": "负片亮暗反转出现硬色阶、灰白块及棕色描边，中间态偏平灰",
+      "parent": "CONFIRMED",
+      "status": "OPEN"
+    },
+    {
+      "id": "B2-02",
+      "severity": "blocking_candidate",
+      "finding": "真实立柱切中失的辨认骨架，帧亦与细框重叠",
+      "parent": "CONFIRMED",
+      "status": "OPEN"
+    },
+    {
+      "id": "B2-03",
+      "severity": "non_blocking",
+      "finding": "固定竖向软遮罩形成左右处理分区，延伸到地面",
+      "parent": "CONFIRMED",
+      "status": "OPEN"
+    }
+  ],
+  "boundary": "Exact video identity, frames and playback receipts examined; no human audio or full temporal-art acceptance",
+  "decision": "NOT_ACCEPTED; user requested immediate viewing so supplied diagnostic review candidate, not final completion; two local visual iterations consumed, no further unbounded iteration"
+}

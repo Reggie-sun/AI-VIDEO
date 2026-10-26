@@ -1,0 +1,90 @@
+[
+  {
+    "kind": "title",
+    "path": "outputs/shizhen-episode01/live-action-rebuild-20261026/typography/title-typography-study.mp4",
+    "sha256": "1ae8b6bf039a984bb9fee99a065c6b84ac3d8582dc313db724b5ef14042bae99",
+    "bytes": 159715,
+    "measured": {
+      "width": 1920,
+      "height": 1080,
+      "fps_num": 24,
+      "fps_den": 1,
+      "duration_frames": 84,
+      "codec_name": "h264",
+      "audio": {
+        "stream_count": 1,
+        "codec_name": "aac",
+        "sample_rate_hz": 48000,
+        "channels": 2,
+        "channel_layout": "stereo",
+        "decoded_samples": 168960,
+        "encoder_priming_samples": 1024,
+        "encoder_padding_samples": 960,
+        "measurement_method": "held-fd ffprobe packets plus pcm_s16le decode"
+      }
+    },
+    "checks": [
+      {
+        "command": "lint",
+        "tool_version": "0.7.103",
+        "exit_code": 0,
+        "stdout_sha256": "f91a7f9e08658cf8daf815895c72ad59093b2920a6f4b6f0aecc6a36b1ee1e2d",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "error_count": 0,
+        "warning_count": 0
+      },
+      {
+        "command": "check",
+        "tool_version": "0.7.103",
+        "exit_code": 0,
+        "stdout_sha256": "7314134c9a1dabddd6fb85f675ed22c2b54e46d1989368b5a8fa01b9956b3bd4",
+        "stderr_sha256": "d307dee2a0b012cf36e66f31da96f0a4304ef70065eeb0ad3e63c1ee997e8a7a",
+        "error_count": 0,
+        "warning_count": 0
+      }
+    ],
+    "scope": "TYPE_STUDY_ONLY",
+    "not_live_action_footage": true,
+    "new_paid_generation_calls": 0,
+    "production_activation": false
+  },
+  {
+    "kind": "next-night",
+    "path": "outputs/shizhen-episode01/live-action-rebuild-20261026/typography/next-night-typography-study.mp4",
+    "sha256": "f0fd86c964d89d867aa26323e3780dda21683be4d5fbbd081f3c23405c2618ae",
+    "bytes": 16252,
+    "measured": {
+      "width": 1920,
+      "height": 1080,
+      "fps_num": 24,
+      "fps_den": 1,
+      "duration_frames": 84,
+      "codec_name": "h264",
+      "audio": null
+    },
+    "checks": [
+      {
+        "command": "lint",
+        "tool_version": "0.7.103",
+        "exit_code": 0,
+        "stdout_sha256": "f91a7f9e08658cf8daf815895c72ad59093b2920a6f4b6f0aecc6a36b1ee1e2d",
+        "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "error_count": 0,
+        "warning_count": 0
+      },
+      {
+        "command": "check",
+        "tool_version": "0.7.103",
+        "exit_code": 0,
+        "stdout_sha256": "d4fa8a66b2caea03bc8583525e10c45908dd832191141f69b2435c2a4cd747ac",
+        "stderr_sha256": "d307dee2a0b012cf36e66f31da96f0a4304ef70065eeb0ad3e63c1ee997e8a7a",
+        "error_count": 0,
+        "warning_count": 0
+      }
+    ],
+    "scope": "TYPE_STUDY_ONLY",
+    "not_live_action_footage": true,
+    "new_paid_generation_calls": 0,
+    "production_activation": false
+  }
+]

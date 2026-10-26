@@ -1,0 +1,487 @@
+{
+  "artifact_id": "timeline-live-action-title-study",
+  "schema_version": "2.3",
+  "revision": 1,
+  "content_hash": "8d08ffcc55976cc7eff5a10789407e95d5091490c528ff4262f61882fc6a4f35",
+  "creation_receipt_id": "resolve-0b3ba2a463ecb117c089539df86213bd0ef2dae6264428c1eca9789e1b24b65f",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/2df25d507157bcdaf0a9cac2bdb2db48e51f7d3799b4dddef76932341a8cc216.json",
+      "content_hash": "2df25d507157bcdaf0a9cac2bdb2db48e51f7d3799b4dddef76932341a8cc216"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/28d10bf98a8649ed8ef3749ac381b473a4c5837ac1927195a60378f88a78d53c.json",
+      "content_hash": "28d10bf98a8649ed8ef3749ac381b473a4c5837ac1927195a60378f88a78d53c"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/356cde7d89c253767b93fda362cf802fe4a407fb46b0bd42170ff407646d7273.json",
+      "content_hash": "356cde7d89c253767b93fda362cf802fe4a407fb46b0bd42170ff407646d7273"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/4bda8294c48cf037edaa6e2cc4a34cd9e40a315cceb456d50aa53eb09016fa0e.json",
+      "content_hash": "4bda8294c48cf037edaa6e2cc4a34cd9e40a315cceb456d50aa53eb09016fa0e"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/6a6556ca1e2bf43eff1021d8a80eb8faaeeff881eb9b45e366c5a6a80cfdeb83.json",
+      "content_hash": "6a6556ca1e2bf43eff1021d8a80eb8faaeeff881eb9b45e366c5a6a80cfdeb83"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/0c8fcb8b248babc60b2512cc0ecc9ed07251cd2572b0bfe8956fc7030bcc3c59.json",
+      "content_hash": "0c8fcb8b248babc60b2512cc0ecc9ed07251cd2572b0bfe8956fc7030bcc3c59"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/57a035052ee5d1377d0adbdd8545829bd92db62b6d8deccd33a243cf5fb2d1d1.json",
+      "content_hash": "57a035052ee5d1377d0adbdd8545829bd92db62b6d8deccd33a243cf5fb2d1d1"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/73a868826ec432dd8a25e21f3b1ea1b7524808dd037396d68ee465e0bc851fda.json",
+      "content_hash": "73a868826ec432dd8a25e21f3b1ea1b7524808dd037396d68ee465e0bc851fda"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/8939e9ac54438686466cc75fa193f72cd4a14a4e664ff87c84653646bd16bcbd.json",
+      "content_hash": "8939e9ac54438686466cc75fa193f72cd4a14a4e664ff87c84653646bd16bcbd"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/a629e5d307f6b9274f0b495d6719f4dc2c4e3da4011c04625b9ce3179d87c8ab.json",
+      "content_hash": "a629e5d307f6b9274f0b495d6719f4dc2c4e3da4011c04625b9ce3179d87c8ab"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/e62641af9e3221cf97258c34690150a2378effa559d0f2e1efb73cca2e4c23d7.json",
+      "content_hash": "e62641af9e3221cf97258c34690150a2378effa559d0f2e1efb73cca2e4c23d7"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/ec9dfd41159f47c527ed6f0d3692dbb99d3a152d879b330a90a2a27e6652ea12.json",
+      "content_hash": "ec9dfd41159f47c527ed6f0d3692dbb99d3a152d879b330a90a2a27e6652ea12"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c957b4f60f5ea0159321a7d6cb87230424f1cb6b467e72ab93eeeea86cfa8337.json",
+      "content_hash": "c957b4f60f5ea0159321a7d6cb87230424f1cb6b467e72ab93eeeea86cfa8337"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/0efeccaef86667f4cb87e55750e58916a63ac18bdc263e84f125046c3feeab8f.json",
+      "content_hash": "0efeccaef86667f4cb87e55750e58916a63ac18bdc263e84f125046c3feeab8f"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/1877fa5b095704cbac48d3135a3143f1a416f0c6b3b4217d6db9c44404a74e78.json",
+      "content_hash": "1877fa5b095704cbac48d3135a3143f1a416f0c6b3b4217d6db9c44404a74e78"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/3f5a45fd5b56ddebaade7216efee316edf87739ca272610d7b7eb63ebbf09298.json",
+      "content_hash": "3f5a45fd5b56ddebaade7216efee316edf87739ca272610d7b7eb63ebbf09298"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/4272d2e212040a6f84e56e9d9877d91446f3635bba65322ebe524af68dba6b61.json",
+      "content_hash": "4272d2e212040a6f84e56e9d9877d91446f3635bba65322ebe524af68dba6b61"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/59d18bd4d99d95ce55ccdd3f6348a353fa4f54c3796e7f4d721fc46c2506463e.json",
+      "content_hash": "59d18bd4d99d95ce55ccdd3f6348a353fa4f54c3796e7f4d721fc46c2506463e"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/43ffb9dddeec9ae4c297877b81cbbdb8281f2e1a5dc9f83eb85c265355dec308.json",
+      "content_hash": "43ffb9dddeec9ae4c297877b81cbbdb8281f2e1a5dc9f83eb85c265355dec308"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/dd5c788a76c8bf722488be2fd8aa61b986f21ebdd47c9a70f6cf6ac0f34f9f30.json",
+      "content_hash": "dd5c788a76c8bf722488be2fd8aa61b986f21ebdd47c9a70f6cf6ac0f34f9f30"
+    },
+    {
+      "kind": "user_input",
+      "reference": "creative-input.txt",
+      "content_hash": "c2585d78d376e254e033aef097fc2c4d92178ada9650b36b12a3cd46f669a866"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/33f33291b3103cad1543a3d5b3312e2f9aff8b290e5edac426109da38e910471.json",
+      "content_hash": "33f33291b3103cad1543a3d5b3312e2f9aff8b290e5edac426109da38e910471"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/1ffa0f87002dd55a90d6e40c3f10d9b8cbe9c2e3cf22976ef24258a2ec176280.json",
+      "content_hash": "1ffa0f87002dd55a90d6e40c3f10d9b8cbe9c2e3cf22976ef24258a2ec176280"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/f77046a035fdc87b3384a7d8afb4465dc0a931db3b66598ca756e35ea0fadaba.json",
+      "content_hash": "f77046a035fdc87b3384a7d8afb4465dc0a931db3b66598ca756e35ea0fadaba"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/3a3e475fd51cc061655d3d9efddaf74486e79a90d1e3a64adfe52e7a9f1e022a.json",
+      "content_hash": "3a3e475fd51cc061655d3d9efddaf74486e79a90d1e3a64adfe52e7a9f1e022a"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/a7eec5150732286e384ba5b5afd8e73d1bcf499aa105429892ebaac77a407fd1.json",
+      "content_hash": "a7eec5150732286e384ba5b5afd8e73d1bcf499aa105429892ebaac77a407fd1"
+    }
+  ],
+  "usage_scope": "production",
+  "timeline_id": "timeline-live-action-title-study-r1",
+  "composition_spec_id": "live-action-title-type-study",
+  "composition_spec_revision": 1,
+  "composition_spec_hash": "0b3ba2a463ecb117c089539df86213bd0ef2dae6264428c1eca9789e1b24b65f",
+  "delivery_profile": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "codec_profile": "h264"
+  },
+  "sample_rate": 48000,
+  "renderer": {
+    "kind": "hyperframes",
+    "version": "0.7.103"
+  },
+  "visual_spans": [
+    {
+      "layer_id": "covered-base",
+      "shot_id": "TITLE",
+      "asset_role": "primary_visual",
+      "asset_id": "co-before-image",
+      "asset_sha256": "dd6cdb932eec157d9ab198f35bcd7b53e22127eb6a37fc6c574ae8c0ba6dbd8f",
+      "asset_mime_type": "image/png",
+      "materialized_path": "assets/dd6cdb932eec157d9ab198f35bcd7b53e22127eb6a37fc6c574ae8c0ba6dbd8f.png",
+      "start_frame": 0,
+      "duration_frames": 84,
+      "start_sample": 0,
+      "duration_samples": 168000,
+      "trim_start_frame": 0,
+      "trim_duration_frames": null,
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0,
+      "incoming_transition": null
+    }
+  ],
+  "audio_spans": [
+    {
+      "track_id": "existing-theme-study",
+      "audio_kind": "bgm",
+      "asset_id": "two-passengers-missing-response-B",
+      "asset_sha256": "88585bd2a3a9d44680f1a1a2667145839fa5166363c36260d2963ed8bd05a425",
+      "start_sample": 0,
+      "duration_samples": 168000,
+      "source_start_sample": 0,
+      "source_duration_samples": 168000,
+      "gain_millidb": -8500,
+      "fade_in_samples": 8000,
+      "fade_out_samples": 16000,
+      "ducking": null
+    }
+  ],
+  "caption_cues": [],
+  "commercial_graphics": [],
+  "text_layers": [
+    {
+      "graphic_id": "live-action-title-study",
+      "role": "headline",
+      "text": "失\n帧",
+      "shot_id": "TITLE",
+      "start_frame": 0,
+      "end_frame_exclusive": 84,
+      "start_sample": 0,
+      "end_sample": 168000,
+      "x_milli": 0,
+      "y_milli": 0,
+      "width_milli": 1000,
+      "font_size_px": 244,
+      "text_color": "#DCD5C7",
+      "background_color": null,
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 0,
+        "right_milli": 0,
+        "bottom_milli": 0,
+        "left_milli": 0
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [],
+      "brand_token_ids": [],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [],
+      "entrance": "none",
+      "exit": "none",
+      "z_index": 100,
+      "text_design": {
+        "schema_version": "text-design/1",
+        "intent": "Quiet independent cinematic typography study, not live-action story footage",
+        "hierarchy": "Main title has mass and an empty interval; the temporal card stays subordinate",
+        "reference_width_px": 1920,
+        "reference_height_px": 1080,
+        "fonts": [
+          {
+            "family": "Noto Serif CJK SC",
+            "sha256": "7ff19adfc4cc99c1f15bf0c526a81568a2711255c2c8076c578ef9dbb4e420a4",
+            "data_base64": "T1RUTwAPAIAAAwBwQkFTRULjT+4AAArAAAAA3kNGRiAwVaqcAAAGyAAAA/VHUE9TRHZMdQAAC6AAAAAgR1NVQtDOzMIAAAvAAAAASE9TLzK8T8PMAAABYAAAAGBWT1JHA3EAAAAADAgAAAAIY21hcGMvVJgAAAZsAAAAPGhlYWQlC7UaAAAA/AAAADZoaGVhCHAC3wAAATQAAAAkaG10eAQCAKUAAAwQAAAACG1heHAAA1AAAAABWAAAAAZuYW1lY+aDmAAAAcAAAASscG9zdP+4ADIAAAaoAAAAIHZoZWEF5BIRAAAMGAAAACR2bXR4BA0AIQAADDwAAAAIAAEAAAACAIM9zb1sXw889QADA+gAAAAA4QG4YgAAAADhAbhiABr/pAPVA08AAQADAAIAAAAAAAAAAQAABH/+4gAAA+gAGgATA9UAAQAAAAAAAAAAAAAAAAAAAAEAAFAAAAMAAAADA9wCvAAFAAACigJYAAAASwKKAlgAAAFeADIBNAAAAgIHAAAAAAAAAAAAAAAIAAAAAAAAAAAAAABHT09HACBZMV4nA3D/iAAABH8BHgAAAAEAAAAAAgIC2QAAACAABgAAAAkAcgADAAEECQAAAFQAAAADAAEECQABACIAVAADAAEECQACAAgAdgADAAEECQADAEgAfgADAAEECQAEACwAxgADAAEECQAFAFgA8gADAAEECQAGACYBSgADAAEECQANApYBcAADAAEECQAOADQEBgCpACAAMgAwADEANwAtADIAMAAyADMAIABBAGQAbwBiAGUAIAAoAGgAdAB0AHAAOgAvAC8AdwB3AHcALgBhAGQAbwBiAGUALgBjAG8AbQAvACkALgBOAG8AdABvACAAUwBlAHIAaQBmACAAQwBKAEsAIABTAEMAQgBvAGwAZAAyAC4AMAAwADIAOwBHAE8ATwBHADsATgBvAHQAbwBTAGUAcgBpAGYAQwBKAEsAcwBjAC0AQgBvAGwAZAA7AEEARABPAEIARQBOAG8AdABvACAAUwBlAHIAaQBmACAAQwBKAEsAIABTAEMAIABCAG8AbABkAFYAZQByAHMAaQBvAG4AIAAyAC4AMAAwADIAOwBoAG8AdABjAG8AbgB2ACAAMQAuADEALgAwADsAbQBhAGsAZQBvAHQAZgBlAHgAZQAgADIALgA2AC4AMABOAG8AdABvAFMAZQByAGkAZgBDAEoASwBzAGMALQBCAG8AbABkAFQAaABpAHMAIABGAG8AbgB0ACAAUwBvAGYAdAB3AGEAcgBlACAAaQBzACAAbABpAGMAZQBuAHMAZQBkACAAdQBuAGQAZQByACAAdABoAGUAIABTAEkATAAgAE8AcABlAG4AIABGAG8AbgB0ACAATABpAGMAZQBuAHMAZQAsACAAVgBlAHIAcwBpAG8AbgAgADEALgAxAC4AIABUAGgAaQBzACAARgBvAG4AdAAgAFMAbwBmAHQAdwBhAHIAZQAgAGkAcwAgAGQAaQBzAHQAcgBpAGIAdQB0AGUAZAAgAG8AbgAgAGEAbgAgACIAQQBTACAASQBTACIAIABCAEEAUwBJAFMALAAgAFcASQBUAEgATwBVAFQAIABXAEEAUgBSAEEATgBUAEkARQBTACAATwBSACAAQwBPAE4ARABJAFQASQBPAE4AUwAgAE8ARgAgAEEATgBZACAASwBJAE4ARAAsACAAZQBpAHQAaABlAHIAIABlAHgAcAByAGUAcwBzACAAbwByACAAaQBtAHAAbABpAGUAZAAuACAAUwBlAGUAIAB0AGgAZQAgAFMASQBMACAATwBwAGUAbgAgAEYAbwBuAHQAIABMAGkAYwBlAG4AcwBlACAAZgBvAHIAIAB0AGgAZQAgAHMAcABlAGMAaQBmAGkAYwAgAGwAYQBuAGcAdQBhAGcAZQAsACAAcABlAHIAbQBpAHMAcwBpAG8AbgBzACAAYQBuAGQAIABsAGkAbQBpAHQAYQB0AGkAbwBuAHMAIABnAG8AdgBlAHIAbgBpAG4AZwAgAHkAbwB1AHIAIAB1AHMAZQAgAG8AZgAgAHQAaABpAHMAIABGAG8AbgB0ACAAUwBvAGYAdAB3AGEAcgBlAC4AaAB0AHQAcAA6AC8ALwBzAGMAcgBpAHAAdABzAC4AcwBpAGwALgBvAHIAZwAvAE8ARgBMAAAAAgAAAAMAAAAUAAMAAQAAABQABAAoAAAABgAEAAEAAlkxXif//wAAWTFeJ///ptCh2wABAAAAAAAAAAMAAAAAAAD/tQAyAAAAAAAAAAAAAAAAAAAAAAAAAAABAAQCAAEBARROb3RvU2VyaWZDSktqcC1Cb2xkAAEBATP4G/gciwwe+B0B+B4C+B8D+BQEpS/6afnjBY0MHx0AAP//DCL3/g/4Awwl+dIMJPgHEQAHAQEGDmN5iqXDQWRvYmVJZGVudGl0eUNvcHlyaWdodCAyMDE3LTIwMjMgQWRvYmUgKGh0dHA6Ly93d3cuYWRvYmUuY29tLykuIE5vdG8gaXMgYSB0cmFkZW1hcmsgb2YgR29vZ2xlIEluYy5Ob3RvIFNlcmlmIENKSyBKUCBCb2xkTm90byBTZXJpZiBDSksgSlBOb3RvU2VyaWZDSktqcC1Cb2xkLUdlbmVyaWNOb3RvU2VyaWZDSktqcC1Cb2xkLUlkZW9ncmFwaHMACwEBBQsTGR0jKS0xNzwGk24LlpSYjx8LB56PmpORkwsGmpaQlgsgHQUL/wAhgAALBpqVkJYLwosaC5CWjgv/ACSAAAsjHY0fCwA29UF3AAABAQADAgABAAMAvQHBIA7396j3a6f3QCkdEvhG9xD7EPcSFMATyPdp+cgVefsrWPsoTymWgxjOuMTIudkI9z0GiT2HRH9JCPwGJB33+QZl+0Yp+x37jfsFk3wY9+Pt9wz3Jbf3XAiOBqj7M9n7T/d7J5LSsK3Jl4yYGPubzvsQ9wpj9xcI+BQmHY4fXLQ8x4saRTMFE9D7ewaXzZDSjdkI97YqHVyzP8WLGkY1BRPo+xEGjfdAKQr7OJoF+2z7Lgegsp62m7olCg73bJn3zae1qLWn6SsKzOSt5TzaPOWx6Lr0tfcANe7D9wAUArYUAEgTcrr5mPhvFRNytvscqYn70Y37Lfuo+wIZlHr3Wbvi1LTzGc5U2TevRPcLUr/3efvtxaXbju6Q9w0IE3K6IwoT+rp99/wgCvuoZgf7ArgF/HghCvgN92/8HJ0Hr8CgkYwf9+4HoJCZk5EiClD3BfdnLApD6QalkJSVjJkI/HT87hX4ELz8BCoK+zQyFfhsuP1Rlwetq54oCp6Gk4OQfQiSfI1xbhrkk5ex0Rr3/ycKE3Z6J9VgWQVv9zkGo4+Uk42aCBN3OvscmAX7YW4HLbQF/NGZBxP6urKvoJUfDgACAQEJEfggDCal+egS+CEMJqj6AhL7joscBUaLBrMKswuz2wwMs9sMDYwMEfrnFfuOixwFRosGqAr2C6ieDAzWq58MDYwMEfp8FKgTAA0BAQcPGBwjKDE1PERLUVoV+ySXBQubB7e4o5UfC5P7AN0YWFMFC6EkCguMlpSPlwgLCKMhHQsoHR9jsEgnHQsiHQgLkowf96oHC6OPlZWOmhkLB4GIhoEeC65pJR0SCwaZlSYKUDsFCwAAAAABAAAACABoAGQABAAHREZMVAAsY3lybAA+Z3JlawA+aGFuZwAsaGFuaQAsa2FuYQAsbGF0bgA+AAYAAAAAAAIABAAeACIAJgCYAAYAAAAAAAMABAAMABAAFACGAAH/pgABA1IAAf+IAAQAFgAEaWNmYmljZnRpZGVvcm9tbgAHREZMVAAsY3lybAA+Z3JlawA+aGFuZwAsaGFuaQAsa2FuYQAsbGF0bgA+AAYAAAAAAAIABAAeACIAJgAqAAYAAAAAAAMABAAMABAAFAAYAAEAHgABA8oAAQAAAAEAeAAAAAEAAAAKABwAHgABREZMVAAIAAQAAAAA//8AAAAAAAAAAQAAAAoARABGAAdERkxUACxjeXJsADZncmVrADZoYW5nADZoYW5pADZrYW5hADZsYXRuADYABAAAAAD//wAAAAAAAAAAAAAAAQAAA3AAAAPoAGQAGgBBAAEQAAH0/gwAAAPoACEAHAPMAAAAAQAAAAAAAAAAAAAAAAABA+gAAAAlACE=",
+            "license": "Noto CJK SIL OFL1.1 / DejaVu Bitstream Vera and public domain additions; system distribution font, subset only"
+          }
+        ],
+        "nodes": [
+          {
+            "node_id": "opaque-field",
+            "purpose": "Independent title field, no CG source visible",
+            "x_px": 0,
+            "y_px": 0,
+            "width_px": 1920,
+            "height_px": 1080,
+            "runs": [],
+            "path": "M0 0 L1920 0 L1920 1080 L0 1080 Z",
+            "fill": "#10171B",
+            "stroke": "none",
+            "stroke_width_px": 0,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": []
+          },
+          {
+            "node_id": "title-0",
+            "purpose": "Intact, stable Chinese glyph; the interval carries absence",
+            "x_px": 650,
+            "y_px": 364,
+            "width_px": 260,
+            "height_px": 340,
+            "runs": [
+              {
+                "text": "失",
+                "color": "#DCD5C7",
+                "font_family": "Noto Serif CJK SC",
+                "font_size_px": 244,
+                "font_weight": 700,
+                "italic": false,
+                "tracking_px": 0,
+                "baseline_shift_px": 0
+              }
+            ],
+            "path": null,
+            "fill": "#FFFFFF",
+            "stroke": "none",
+            "stroke_width_px": 0,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": [
+              {
+                "frame": 0,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  250,
+                  100,
+                  250,
+                  1000
+                ]
+              },
+              {
+                "frame": 14,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  250,
+                  100,
+                  250,
+                  1000
+                ]
+              },
+              {
+                "frame": 65,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  250,
+                  100,
+                  250,
+                  1000
+                ]
+              },
+              {
+                "frame": 83,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  250,
+                  100,
+                  250,
+                  1000
+                ]
+              }
+            ]
+          },
+          {
+            "node_id": "title-1",
+            "purpose": "Intact, stable Chinese glyph; the interval carries absence",
+            "x_px": 1010,
+            "y_px": 364,
+            "width_px": 260,
+            "height_px": 340,
+            "runs": [
+              {
+                "text": "帧",
+                "color": "#DCD5C7",
+                "font_family": "Noto Serif CJK SC",
+                "font_size_px": 244,
+                "font_weight": 700,
+                "italic": false,
+                "tracking_px": 0,
+                "baseline_shift_px": 0
+              }
+            ],
+            "path": null,
+            "fill": "#FFFFFF",
+            "stroke": "none",
+            "stroke_width_px": 0,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": [
+              {
+                "frame": 0,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  250,
+                  100,
+                  250,
+                  1000
+                ]
+              },
+              {
+                "frame": 14,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  250,
+                  100,
+                  250,
+                  1000
+                ]
+              },
+              {
+                "frame": 65,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  250,
+                  100,
+                  250,
+                  1000
+                ]
+              },
+              {
+                "frame": 83,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  250,
+                  100,
+                  250,
+                  1000
+                ]
+              }
+            ]
+          }
+        ],
+        "avoidance_regions": []
+      }
+    }
+  ],
+  "total_frames": 84,
+  "total_samples": 168000,
+  "composition_fingerprint": "79ec84f3e7abf4cf06c08957f5eea487af45536cb75acfe504f3a06148e87c79"
+}

@@ -1,0 +1,47 @@
+{
+  "project": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-opening-reconstruction-20261026/project-r2",
+  "rows": [
+    {
+      "shot_id": "CO-A1",
+      "asset_id": "opening-CO-A1",
+      "start": 8,
+      "frames": 184,
+      "transform": {
+        "video_fit": "cover"
+      },
+      "source_sha256": "b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd",
+      "source_manifest_sha256": "350c3b08292d1a6482e037996e3223bf44b3d43c6fc476001f90ead3d039e98a"
+    },
+    {
+      "shot_id": "CO-A2",
+      "asset_id": "opening-CO-A2",
+      "start": 0,
+      "frames": 96,
+      "transform": {},
+      "source_sha256": "0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c",
+      "source_manifest_sha256": "83a2f4f584967f66bd82023b508c5b9a3e2d631801c8cb22bc2e4cf064ba40bf"
+    },
+    {
+      "shot_id": "CO-A3",
+      "asset_id": "opening-CO-A3",
+      "start": 336,
+      "frames": 144,
+      "transform": {},
+      "source_sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+      "source_manifest_sha256": "5fc1b3078b43df0ee3750cc79c265757b2499467c6d5b2b9cd884574d645c4ef"
+    }
+  ],
+  "music_asset_id": "two-passengers-missing-response-B",
+  "source_music_sha256": "88585bd2a3a9d44680f1a1a2667145839fa5166363c36260d2963ed8bd05a425",
+  "order": [
+    "CITY",
+    "ROAD",
+    "CO-A1",
+    "CO-A2",
+    "CO-A3"
+  ],
+  "new_paid_video_calls": 0,
+  "production_activation": false,
+  "publication": "NOT_PUBLISHED",
+  "scope": "development_audio_preview"
+}

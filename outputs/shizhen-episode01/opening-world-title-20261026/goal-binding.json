@@ -1,0 +1,210 @@
+{
+  "schema_version": "creative-goal-binding/1",
+  "authority": "development_only",
+  "creative_input": {
+    "path": "creative-input.txt",
+    "sha256": "f840d5d0ff660dfcfc3039828b338a47956ed4c9586cd2176473fd206e6185a3"
+  },
+  "coverage": {
+    "path": "director-coverage.json",
+    "sha256": "cf24165cb1c39977e16f865fb3eef259a8ae79d03d6fe5b96015ee3ea5ed9058"
+  },
+  "final_output_contract": {
+    "path": "final-output-contract.json",
+    "sha256": "7099e2004396ae0207610b91bc2be15c02134a89a77760663700ec69d229f7d1"
+  },
+  "bindings": [
+    {
+      "intent_item_id": "intent-01",
+      "constraint_ids": [
+        "intent-01"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "WORLD-OUT"
+      ],
+      "requirement_ids": [
+        "intent-01"
+      ]
+    },
+    {
+      "intent_item_id": "intent-02",
+      "constraint_ids": [
+        "intent-02"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "WORLD-OUT"
+      ],
+      "requirement_ids": [
+        "intent-02"
+      ]
+    },
+    {
+      "intent_item_id": "intent-03",
+      "constraint_ids": [
+        "intent-03"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "WORLD-OUT"
+      ],
+      "requirement_ids": [
+        "intent-03"
+      ]
+    },
+    {
+      "intent_item_id": "intent-04",
+      "constraint_ids": [
+        "intent-04"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "WORLD-OUT"
+      ],
+      "requirement_ids": [
+        "intent-04"
+      ]
+    },
+    {
+      "intent_item_id": "intent-05",
+      "constraint_ids": [
+        "intent-05"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "WORLD-OUT"
+      ],
+      "requirement_ids": [
+        "intent-05"
+      ]
+    },
+    {
+      "intent_item_id": "intent-06",
+      "constraint_ids": [
+        "intent-06"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "WORLD-OUT"
+      ],
+      "requirement_ids": [
+        "intent-06"
+      ]
+    },
+    {
+      "intent_item_id": "intent-07",
+      "constraint_ids": [
+        "intent-07"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "WORLD-OUT"
+      ],
+      "requirement_ids": [
+        "intent-07"
+      ]
+    },
+    {
+      "intent_item_id": "intent-08",
+      "constraint_ids": [
+        "intent-08"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "WORLD-OUT"
+      ],
+      "requirement_ids": [
+        "intent-08"
+      ]
+    },
+    {
+      "intent_item_id": "intent-09",
+      "constraint_ids": [
+        "intent-09"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "WORLD-OUT"
+      ],
+      "requirement_ids": [
+        "intent-09"
+      ]
+    },
+    {
+      "intent_item_id": "intent-10",
+      "constraint_ids": [
+        "intent-10"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "WORLD-OUT"
+      ],
+      "requirement_ids": [
+        "intent-10"
+      ]
+    },
+    {
+      "intent_item_id": "intent-11",
+      "constraint_ids": [
+        "intent-11"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "WORLD-OUT"
+      ],
+      "requirement_ids": [
+        "intent-11"
+      ]
+    },
+    {
+      "intent_item_id": "intent-12",
+      "constraint_ids": [
+        "intent-12"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "WORLD-OUT"
+      ],
+      "requirement_ids": [
+        "intent-12"
+      ]
+    }
+  ]
+}

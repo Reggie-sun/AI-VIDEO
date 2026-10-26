@@ -1,0 +1,26 @@
+{
+  "errors": [],
+  "states": [
+    {
+      "src": "01-entry.png",
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "src": "02-depth-loss.png",
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "src": "03-latent-imprint.png",
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "src": "04-image-settles.png",
+      "width": 1672,
+      "height": 941
+    }
+  ],
+  "scope": "static image loading and navigation; not motion or artistic acceptance"
+}

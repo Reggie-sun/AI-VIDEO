@@ -1,0 +1,11 @@
+{
+  "issued_at": "2026-10-25T21:53:17.791487+00:00",
+  "operation": "builtin_imagegen_identity_age_repair",
+  "known_prior_outcome": "master-firstframe-001 generated and copied",
+  "diagnosis": "male face reads too young/too close to young protagonist identity",
+  "changed_variable": "male identity age morphology only",
+  "protected": "all scene geometry, wardrobe and female identity/actual LEFT hand phone",
+  "source_sha256": "ed0236749d6f09b035ec758ae9fb06c08c645ca7d11e190d3ad7a0ae367b69e3",
+  "one_call": true,
+  "unknown_policy": "STOP"
+}

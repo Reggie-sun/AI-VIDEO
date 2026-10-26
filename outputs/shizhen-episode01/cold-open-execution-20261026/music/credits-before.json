@@ -1,0 +1,68 @@
+{
+  "total_credits_left": 2480,
+  "monthly_usage": 20,
+  "monthly_limit": 2500,
+  "plan": {
+    "name": "Pro Plan",
+    "plan_key": "pro",
+    "usage_plan_features": [
+      {
+        "name": "v4"
+      },
+      {
+        "name": "cover"
+      },
+      {
+        "name": "edit_mode"
+      },
+      {
+        "name": "persona"
+      },
+      {
+        "name": "can_buy_credit_top_ups"
+      },
+      {
+        "name": "commercial_rights"
+      },
+      {
+        "name": "get_stems"
+      },
+      {
+        "name": "generate_song_image"
+      },
+      {
+        "name": "auk"
+      },
+      {
+        "name": "negative_tags"
+      },
+      {
+        "name": "remaster"
+      },
+      {
+        "name": "generate_song_video"
+      },
+      {
+        "name": "long_uploads"
+      },
+      {
+        "name": "convert_audio"
+      },
+      {
+        "name": "create_control_sliders"
+      },
+      {
+        "name": "playlist_condition"
+      },
+      {
+        "name": "tag_upsample"
+      },
+      {
+        "name": "custom_models"
+      },
+      {
+        "name": "max_mode"
+      }
+    ]
+  }
+}

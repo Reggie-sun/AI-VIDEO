@@ -1,0 +1,13 @@
+{
+  "operation": "audio_understand",
+  "provider": "gemini",
+  "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent",
+  "model_id": "gemini-3.8-flash",
+  "source_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870",
+  "source_size_bytes": 32158050,
+  "audio_sha256": "87679f3aa32035d37494972d337129b1c941c46ef5a092ba75304401cc07f741",
+  "audio_size_bytes": 4931662,
+  "duration_seconds": 25.685333333333332,
+  "audio_start_seconds": 0.0,
+  "request_fingerprint": "c0ffd59fa355b40e479b52ab074a5c7fb29f1a8efe8e165dc4cbe6e3747a591f"
+}

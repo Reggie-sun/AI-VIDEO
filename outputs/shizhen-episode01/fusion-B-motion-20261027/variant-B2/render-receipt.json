@@ -1,0 +1,55 @@
+{
+  "output": "outputs/shizhen-episode01/fusion-B-motion-20261027/variant-B2/失帧-Fusion片名试片-B2.mp4",
+  "sha256": "2def03b0b76dc9397bff2949086e68d3ed9184f3d3ef824fe217b751845bf31b",
+  "bytes": 3065233,
+  "size_bytes": 3065233,
+  "timeline_frames": 72,
+  "timeline_fingerprint": "c50f4cf878ab45cd7768a624d9057a8d565709cc0f505d0b6a77c35ab819c984",
+  "measured": {
+    "width": 1920,
+    "height": 1080,
+    "fps_num": 24,
+    "fps_den": 1,
+    "duration_frames": 72,
+    "codec_name": "h264",
+    "audio": {
+      "stream_count": 1,
+      "codec_name": "aac",
+      "sample_rate_hz": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "decoded_samples": 144384,
+      "encoder_priming_samples": 1024,
+      "encoder_padding_samples": 384,
+      "measurement_method": "held-fd ffprobe packets plus pcm_s16le decode"
+    }
+  },
+  "checks": [
+    {
+      "command": "lint",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "f91a7f9e08658cf8daf815895c72ad59093b2920a6f4b6f0aecc6a36b1ee1e2d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "error_count": 0,
+      "warning_count": 0
+    },
+    {
+      "command": "check",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "d4b6d29b29e474c33321d184b03a982c5af6779f8d05ff411084f46a23f5026d",
+      "stderr_sha256": "d307dee2a0b012cf36e66f31da96f0a4304ef70065eeb0ad3e63c1ee997e8a7a",
+      "error_count": 0,
+      "warning_count": 0
+    }
+  ],
+  "source_audio_matches_new_visual_windows": true,
+  "usage_scope": "production",
+  "native_dialogue": "No dialogue within this source window; exact original rain source samples576000..720000 preserved",
+  "title_plate": "Actual Fusion node composite, source A3 frames288..359, retained AI badge; clocks and audio from canonical P4; not full opening",
+  "s01": "OUT_OF_SCOPE_NOT_INCLUDED",
+  "paid_generation_calls": 0,
+  "human_review": "PENDING",
+  "publication": "NOT_PUBLISHED"
+}

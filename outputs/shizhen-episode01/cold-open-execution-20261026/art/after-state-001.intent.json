@@ -1,0 +1,9 @@
+{
+  "unit": "after-state-001",
+  "operation": "builtin_imagegen_remove_one_character",
+  "source_sha256": "dd6cdb932eec157d9ab198f35bcd7b53e22127eb6a37fc6c574ae8c0ba6dbd8f",
+  "one_call": true,
+  "unknown_policy": "STOP",
+  "state": "one visible woman, own belongings only",
+  "protected": "same camera, scene geometry, female identity, LEFT hand phone"
+}

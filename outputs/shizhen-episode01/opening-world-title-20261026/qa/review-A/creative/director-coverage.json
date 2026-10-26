@@ -1,0 +1,443 @@
+{
+  "schema_version": "4",
+  "request": {
+    "creative_input_kind": "direction",
+    "creative_input_evidence": "请将 `focus-002` 的 18.417 秒重剪版作为当前已验证的核心叙事素材，继续完成《失帧》独立冷开场。\n\n重要范围：只制作独立开场，不包含 S01，也不需要考虑与第一集的衔接。\n\n目前卡车遮挡、人物消失、幸存者毫无察觉的叙事机制已经成立，不要反复推翻这一部分。\n\n本轮重点解决尚未完成的三个问题：\n\n1. 建立真正具有叙事意义的宏观世界视觉表达，与公交站台的微观异常形成有机联系。不要简单增加城市航拍或故障特效，也不要让宏观段落削弱消失事件的悬念。\n2. 重新完成电影级片名揭示，使“失帧”的文字设计真正参与画面与情绪，而不只是覆盖在人物近景上的标题。\n3. 完成真人质感、声音结构和整体视听美术的一致性审查，并识别当前画面中的 AI 生成标识及正式素材使用限制。\n\n保留现有四句对白、音乐和已成立的关键事件，优先进行增量式创作。\n\n不强制固定时长或镜头数量，让导演根据观众注意力、悬念形成和情绪收束决定。\n\n请重点比较不同开场结构能否在更大的世界尺度和更快建立悬念之间取得平衡。\n\n继续调用现有专业 Skills，实际制作可观看的动态预演，不要只输出分析文档。\n\n未经授权不新增付费生成。明确区分预演完成、素材缺口和最终成片通过。\n\n最终以观众是否被真正吸引、是否感受到世界异常、是否记住消失事件与片名作为艺术评价重点，而不是技术测试是否通过。\n",
+    "creative_constraints": [
+      {
+        "constraint_id": "intent-01",
+        "scope": "global",
+        "source_text": "请将 `focus-002` 的 18.417 秒重剪版作为当前已验证的核心叙事素材，继续完成《失帧》独立冷开场。"
+      },
+      {
+        "constraint_id": "intent-02",
+        "scope": "global",
+        "source_text": "重要范围：只制作独立开场，不包含 S01，也不需要考虑与第一集的衔接。"
+      },
+      {
+        "constraint_id": "intent-03",
+        "scope": "global",
+        "source_text": "目前卡车遮挡、人物消失、幸存者毫无察觉的叙事机制已经成立，不要反复推翻这一部分。"
+      },
+      {
+        "constraint_id": "intent-04",
+        "scope": "global",
+        "source_text": "1. 建立真正具有叙事意义的宏观世界视觉表达，与公交站台的微观异常形成有机联系。不要简单增加城市航拍或故障特效，也不要让宏观段落削弱消失事件的悬念。"
+      },
+      {
+        "constraint_id": "intent-05",
+        "scope": "global",
+        "source_text": "2. 重新完成电影级片名揭示，使“失帧”的文字设计真正参与画面与情绪，而不只是覆盖在人物近景上的标题。"
+      },
+      {
+        "constraint_id": "intent-06",
+        "scope": "global",
+        "source_text": "3. 完成真人质感、声音结构和整体视听美术的一致性审查，并识别当前画面中的 AI 生成标识及正式素材使用限制。"
+      },
+      {
+        "constraint_id": "intent-07",
+        "scope": "global",
+        "source_text": "保留现有四句对白、音乐和已成立的关键事件，优先进行增量式创作。"
+      },
+      {
+        "constraint_id": "intent-08",
+        "scope": "global",
+        "source_text": "不强制固定时长或镜头数量，让导演根据观众注意力、悬念形成和情绪收束决定。"
+      },
+      {
+        "constraint_id": "intent-09",
+        "scope": "global",
+        "source_text": "请重点比较不同开场结构能否在更大的世界尺度和更快建立悬念之间取得平衡。"
+      },
+      {
+        "constraint_id": "intent-10",
+        "scope": "global",
+        "source_text": "继续调用现有专业 Skills，实际制作可观看的动态预演，不要只输出分析文档。"
+      },
+      {
+        "constraint_id": "intent-11",
+        "scope": "global",
+        "source_text": "未经授权不新增付费生成。明确区分预演完成、素材缺口和最终成片通过。"
+      },
+      {
+        "constraint_id": "intent-12",
+        "scope": "global",
+        "source_text": "最终以观众是否被真正吸引、是否感受到世界异常、是否记住消失事件与片名作为艺术评价重点，而不是技术测试是否通过。"
+      }
+    ],
+    "target_duration_seconds": 27.416666666666668,
+    "coverage_strategy": "multi_shot",
+    "strategy_source": "agent_directed",
+    "director_decision_rationale": "A城市日常→完整事件→城市照常；B事件→城市照常。素材地理/天气缺口不关闭宏观世界目标；固定核心以保护用户已经认可的事件。",
+    "strategy_request_evidence": null,
+    "director_skill": "open-video"
+  },
+  "coverage_units": [
+    {
+      "unit_id": "WORLD-IN",
+      "duration_seconds": 3.0,
+      "beat_function": "establish",
+      "objective": "建立社会常态：人群正常过街，出租车等待，没有先演第二次异常",
+      "open_state": "人群在斑马线上",
+      "close_state": "仍有人从容过街",
+      "shot_scale": "full",
+      "camera_treatment": "static",
+      "camera_intent": "以人的通行行为建立社会尺度；候选A使用，B省去以比较悬念速度",
+      "visible_change": "人流从一侧进入另一侧，出租车等候",
+      "constraint_ids": [
+        "intent-01",
+        "intent-02",
+        "intent-03",
+        "intent-04",
+        "intent-05",
+        "intent-06",
+        "intent-07",
+        "intent-08",
+        "intent-09",
+        "intent-10",
+        "intent-11",
+        "intent-12"
+      ],
+      "transition_out": "cut"
+    },
+    {
+      "unit_id": "CO-A1",
+      "duration_seconds": 7.666666666666667,
+      "beat_function": "establish",
+      "objective": "先让观众记住两人彼此注意的普通关系，再完整被车厢遮住",
+      "open_state": "男人与打电话的女人在同一站棚",
+      "close_state": "男人对女人的关注已发生，货车覆盖两人",
+      "shot_scale": "full",
+      "camera_treatment": "static",
+      "camera_intent": "保留已生成双人表演原速和相互视线，不加剪影或片名分散注意",
+      "visible_change": "男人转向，女人回看，然后普通货车进入并完整遮挡",
+      "constraint_ids": [
+        "intent-01",
+        "intent-02",
+        "intent-03",
+        "intent-04",
+        "intent-05",
+        "intent-06",
+        "intent-07",
+        "intent-08",
+        "intent-09",
+        "intent-10",
+        "intent-11",
+        "intent-12"
+      ],
+      "transition_out": "cut"
+    },
+    {
+      "unit_id": "CO-A2",
+      "duration_seconds": 2.75,
+      "beat_function": "reveal",
+      "objective": "实体完全遮挡内切去1.25秒空车厢；车尾揭示原位只剩一人",
+      "open_state": "车身覆盖视野",
+      "close_state": "左侧空位与右侧继续打电话的女人同框",
+      "shot_scale": "full",
+      "camera_treatment": "static",
+      "camera_intent": "切口放在实体完全遮挡区，保留正常车身移动，不增加闪屏或消失特效",
+      "visible_change": "完全遮挡持续缩短，车身向右揭开无人站立的左侧",
+      "constraint_ids": [
+        "intent-01",
+        "intent-02",
+        "intent-03",
+        "intent-04",
+        "intent-05",
+        "intent-06",
+        "intent-07",
+        "intent-08",
+        "intent-09",
+        "intent-10",
+        "intent-11",
+        "intent-12"
+      ],
+      "transition_out": "cut"
+    },
+    {
+      "unit_id": "CO-A3",
+      "duration_seconds": 8.0,
+      "beat_function": "reaction",
+      "objective": "完整保留司机与女人的一问一答及无察觉表演",
+      "open_state": "一人全景与空位继续存在",
+      "close_state": "近景中女人仍平静地通话，不再叠片名",
+      "shot_scale": "mixed_progression",
+      "camera_treatment": "static",
+      "camera_intent": "维持已验证原生切镜与完整声音窗口，仅撤去旧片名",
+      "visible_change": "一人全景继续约一秒后切近景，真实问答后仍保留两秒动态",
+      "constraint_ids": [
+        "intent-01",
+        "intent-02",
+        "intent-03",
+        "intent-04",
+        "intent-05",
+        "intent-06",
+        "intent-07",
+        "intent-08",
+        "intent-09",
+        "intent-10",
+        "intent-11",
+        "intent-12"
+      ],
+      "transition_out": "cut"
+    },
+    {
+      "unit_id": "WORLD-OUT",
+      "duration_seconds": 6.0,
+      "beat_function": "payoff",
+      "objective": "回到没有察觉缺席的城市；交通继续，片名留在撤去的画面边界",
+      "open_state": "同一stock机位的后续时刻，行人继续走离",
+      "close_state": "车辆正常通过，完整片名跨越影像与暗场",
+      "shot_scale": "full",
+      "camera_treatment": "static",
+      "camera_intent": "尾声以观众已经知道的缺席反衬旁人照常通行；不是城中又有人被删除",
+      "visible_change": "行人自然离开、出租车驶过，城市不中断，单次编辑平面改变揭示片名",
+      "constraint_ids": [
+        "intent-01",
+        "intent-02",
+        "intent-03",
+        "intent-04",
+        "intent-05",
+        "intent-06",
+        "intent-07",
+        "intent-08",
+        "intent-09",
+        "intent-10",
+        "intent-11",
+        "intent-12"
+      ],
+      "transition_out": "end"
+    }
+  ],
+  "intent_items": [
+    {
+      "intent_item_id": "intent-01",
+      "statement": "请将 `focus-002` 的 18.417 秒重剪版作为当前已验证的核心叙事素材，继续完成《失帧》独立冷开场。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "f840d5d0ff660dfcfc3039828b338a47956ed4c9586cd2176473fd206e6185a3",
+          "locator": "creative-input.txt#intent-01",
+          "intent_item_id": "intent-01",
+          "quote": "请将 `focus-002` 的 18.417 秒重剪版作为当前已验证的核心叙事素材，继续完成《失帧》独立冷开场。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "intent-02",
+      "statement": "重要范围：只制作独立开场，不包含 S01，也不需要考虑与第一集的衔接。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "f840d5d0ff660dfcfc3039828b338a47956ed4c9586cd2176473fd206e6185a3",
+          "locator": "creative-input.txt#intent-02",
+          "intent_item_id": "intent-02",
+          "quote": "重要范围：只制作独立开场，不包含 S01，也不需要考虑与第一集的衔接。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "intent-03",
+      "statement": "目前卡车遮挡、人物消失、幸存者毫无察觉的叙事机制已经成立，不要反复推翻这一部分。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "f840d5d0ff660dfcfc3039828b338a47956ed4c9586cd2176473fd206e6185a3",
+          "locator": "creative-input.txt#intent-03",
+          "intent_item_id": "intent-03",
+          "quote": "目前卡车遮挡、人物消失、幸存者毫无察觉的叙事机制已经成立，不要反复推翻这一部分。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "intent-04",
+      "statement": "1. 建立真正具有叙事意义的宏观世界视觉表达，与公交站台的微观异常形成有机联系。不要简单增加城市航拍或故障特效，也不要让宏观段落削弱消失事件的悬念。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "f840d5d0ff660dfcfc3039828b338a47956ed4c9586cd2176473fd206e6185a3",
+          "locator": "creative-input.txt#intent-04",
+          "intent_item_id": "intent-04",
+          "quote": "1. 建立真正具有叙事意义的宏观世界视觉表达，与公交站台的微观异常形成有机联系。不要简单增加城市航拍或故障特效，也不要让宏观段落削弱消失事件的悬念。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "intent-05",
+      "statement": "2. 重新完成电影级片名揭示，使“失帧”的文字设计真正参与画面与情绪，而不只是覆盖在人物近景上的标题。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "f840d5d0ff660dfcfc3039828b338a47956ed4c9586cd2176473fd206e6185a3",
+          "locator": "creative-input.txt#intent-05",
+          "intent_item_id": "intent-05",
+          "quote": "2. 重新完成电影级片名揭示，使“失帧”的文字设计真正参与画面与情绪，而不只是覆盖在人物近景上的标题。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "intent-06",
+      "statement": "3. 完成真人质感、声音结构和整体视听美术的一致性审查，并识别当前画面中的 AI 生成标识及正式素材使用限制。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "f840d5d0ff660dfcfc3039828b338a47956ed4c9586cd2176473fd206e6185a3",
+          "locator": "creative-input.txt#intent-06",
+          "intent_item_id": "intent-06",
+          "quote": "3. 完成真人质感、声音结构和整体视听美术的一致性审查，并识别当前画面中的 AI 生成标识及正式素材使用限制。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "intent-07",
+      "statement": "保留现有四句对白、音乐和已成立的关键事件，优先进行增量式创作。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "f840d5d0ff660dfcfc3039828b338a47956ed4c9586cd2176473fd206e6185a3",
+          "locator": "creative-input.txt#intent-07",
+          "intent_item_id": "intent-07",
+          "quote": "保留现有四句对白、音乐和已成立的关键事件，优先进行增量式创作。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "intent-08",
+      "statement": "不强制固定时长或镜头数量，让导演根据观众注意力、悬念形成和情绪收束决定。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "f840d5d0ff660dfcfc3039828b338a47956ed4c9586cd2176473fd206e6185a3",
+          "locator": "creative-input.txt#intent-08",
+          "intent_item_id": "intent-08",
+          "quote": "不强制固定时长或镜头数量，让导演根据观众注意力、悬念形成和情绪收束决定。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": [
+        "intent-09"
+      ]
+    },
+    {
+      "intent_item_id": "intent-09",
+      "statement": "请重点比较不同开场结构能否在更大的世界尺度和更快建立悬念之间取得平衡。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "f840d5d0ff660dfcfc3039828b338a47956ed4c9586cd2176473fd206e6185a3",
+          "locator": "creative-input.txt#intent-09",
+          "intent_item_id": "intent-09",
+          "quote": "请重点比较不同开场结构能否在更大的世界尺度和更快建立悬念之间取得平衡。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "intent-10",
+      "statement": "继续调用现有专业 Skills，实际制作可观看的动态预演，不要只输出分析文档。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "f840d5d0ff660dfcfc3039828b338a47956ed4c9586cd2176473fd206e6185a3",
+          "locator": "creative-input.txt#intent-10",
+          "intent_item_id": "intent-10",
+          "quote": "继续调用现有专业 Skills，实际制作可观看的动态预演，不要只输出分析文档。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "intent-11",
+      "statement": "未经授权不新增付费生成。明确区分预演完成、素材缺口和最终成片通过。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "f840d5d0ff660dfcfc3039828b338a47956ed4c9586cd2176473fd206e6185a3",
+          "locator": "creative-input.txt#intent-11",
+          "intent_item_id": "intent-11",
+          "quote": "未经授权不新增付费生成。明确区分预演完成、素材缺口和最终成片通过。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "intent-12",
+      "statement": "最终以观众是否被真正吸引、是否感受到世界异常、是否记住消失事件与片名作为艺术评价重点，而不是技术测试是否通过。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "f840d5d0ff660dfcfc3039828b338a47956ed4c9586cd2176473fd206e6185a3",
+          "locator": "creative-input.txt#intent-12",
+          "intent_item_id": "intent-12",
+          "quote": "最终以观众是否被真正吸引、是否感受到世界异常、是否记住消失事件与片名作为艺术评价重点，而不是技术测试是否通过。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    }
+  ],
+  "intent_groups": {
+    "must_happen": [
+      {
+        "intent_item_id": "intent-01"
+      },
+      {
+        "intent_item_id": "intent-03"
+      },
+      {
+        "intent_item_id": "intent-04"
+      },
+      {
+        "intent_item_id": "intent-05"
+      },
+      {
+        "intent_item_id": "intent-06"
+      },
+      {
+        "intent_item_id": "intent-07"
+      },
+      {
+        "intent_item_id": "intent-09"
+      },
+      {
+        "intent_item_id": "intent-10"
+      }
+    ],
+    "must_not_happen": [
+      {
+        "intent_item_id": "intent-02"
+      },
+      {
+        "intent_item_id": "intent-11"
+      }
+    ],
+    "preferred_performance": [
+      {
+        "intent_item_id": "intent-12"
+      }
+    ],
+    "timing_targets": [],
+    "acceptable_variation": [
+      {
+        "intent_item_id": "intent-08"
+      }
+    ]
+  }
+}

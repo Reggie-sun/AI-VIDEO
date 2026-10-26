@@ -1,0 +1,424 @@
+{
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-composition-v1/render-001/output/失帧-两位冷开场加S01-1080p审看版.mp4",
+  "probe": {
+    "file": {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-composition-v1/render-001/output/失帧-两位冷开场加S01-1080p审看版.mp4",
+      "size_bytes": 34615187,
+      "size_mb": 33.01,
+      "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "duration_seconds": 36.167,
+      "duration_hms": "00:00:36.167",
+      "bit_rate_kbps": 7657
+    },
+    "video_stream": {
+      "codec": "h264",
+      "profile": "High",
+      "width": 1920,
+      "height": 1080,
+      "aspect_ratio": "16:9",
+      "fps": 24.0,
+      "pixel_format": "yuv420p",
+      "bit_rate_kbps": 7458,
+      "frame_count": 868
+    },
+    "audio_stream": {
+      "codec": "aac",
+      "sample_rate": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "bit_rate_kbps": 194,
+      "language": "und"
+    },
+    "metadata": {
+      "major_brand": "isom",
+      "minor_version": "512",
+      "compatible_brands": "isomiso2avc1mp41",
+      "encoder": "Lavf62.12.102"
+    }
+  },
+  "frames": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-composition-v1/render-001/output/失帧-两位冷开场加S01-1080p审看版.mp4",
+    "total_frames_extracted": 40,
+    "interval_used": 0.25,
+    "frames": [
+      {
+        "timestamp_seconds": 0.0,
+        "timestamp_hms": "00:00:00.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 85538
+      },
+      {
+        "timestamp_seconds": 0.904,
+        "timestamp_hms": "00:00:00.904",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 85997
+      },
+      {
+        "timestamp_seconds": 1.808,
+        "timestamp_hms": "00:00:01.808",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 85570
+      },
+      {
+        "timestamp_seconds": 2.713,
+        "timestamp_hms": "00:00:02.713",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 85761
+      },
+      {
+        "timestamp_seconds": 3.617,
+        "timestamp_hms": "00:00:03.617",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 85342
+      },
+      {
+        "timestamp_seconds": 4.521,
+        "timestamp_hms": "00:00:04.521",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 83713
+      },
+      {
+        "timestamp_seconds": 5.425,
+        "timestamp_hms": "00:00:05.425",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 74720
+      },
+      {
+        "timestamp_seconds": 6.329,
+        "timestamp_hms": "00:00:06.329",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 41398
+      },
+      {
+        "timestamp_seconds": 7.233,
+        "timestamp_hms": "00:00:07.233",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 24666
+      },
+      {
+        "timestamp_seconds": 8.138,
+        "timestamp_hms": "00:00:08.138",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 23000
+      },
+      {
+        "timestamp_seconds": 9.042,
+        "timestamp_hms": "00:00:09.042",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 24067
+      },
+      {
+        "timestamp_seconds": 9.946,
+        "timestamp_hms": "00:00:09.946",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 52838
+      },
+      {
+        "timestamp_seconds": 10.85,
+        "timestamp_hms": "00:00:10.850",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 80433
+      },
+      {
+        "timestamp_seconds": 11.754,
+        "timestamp_hms": "00:00:11.754",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 65676
+      },
+      {
+        "timestamp_seconds": 12.658,
+        "timestamp_hms": "00:00:12.658",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 65946
+      },
+      {
+        "timestamp_seconds": 13.563,
+        "timestamp_hms": "00:00:13.563",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 65779
+      },
+      {
+        "timestamp_seconds": 14.467,
+        "timestamp_hms": "00:00:14.467",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 66085
+      },
+      {
+        "timestamp_seconds": 15.371,
+        "timestamp_hms": "00:00:15.371",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 65941
+      },
+      {
+        "timestamp_seconds": 16.275,
+        "timestamp_hms": "00:00:16.275",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 65866
+      },
+      {
+        "timestamp_seconds": 17.179,
+        "timestamp_hms": "00:00:17.179",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 7211
+      },
+      {
+        "timestamp_seconds": 18.084,
+        "timestamp_hms": "00:00:18.084",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 7211
+      },
+      {
+        "timestamp_seconds": 18.988,
+        "timestamp_hms": "00:00:18.988",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 6274
+      },
+      {
+        "timestamp_seconds": 19.892,
+        "timestamp_hms": "00:00:19.892",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 5969
+      },
+      {
+        "timestamp_seconds": 20.796,
+        "timestamp_hms": "00:00:20.796",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67031
+      },
+      {
+        "timestamp_seconds": 21.7,
+        "timestamp_hms": "00:00:21.700",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 65837
+      },
+      {
+        "timestamp_seconds": 22.604,
+        "timestamp_hms": "00:00:22.604",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 67840
+      },
+      {
+        "timestamp_seconds": 23.509,
+        "timestamp_hms": "00:00:23.509",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 68941
+      },
+      {
+        "timestamp_seconds": 24.413,
+        "timestamp_hms": "00:00:24.413",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 38567
+      },
+      {
+        "timestamp_seconds": 25.317,
+        "timestamp_hms": "00:00:25.317",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 42672
+      },
+      {
+        "timestamp_seconds": 26.221,
+        "timestamp_hms": "00:00:26.221",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 42028
+      },
+      {
+        "timestamp_seconds": 27.125,
+        "timestamp_hms": "00:00:27.125",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 54533
+      },
+      {
+        "timestamp_seconds": 28.029,
+        "timestamp_hms": "00:00:28.029",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 50687
+      },
+      {
+        "timestamp_seconds": 28.934,
+        "timestamp_hms": "00:00:28.934",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 51994
+      },
+      {
+        "timestamp_seconds": 29.838,
+        "timestamp_hms": "00:00:29.838",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 52094
+      },
+      {
+        "timestamp_seconds": 30.742,
+        "timestamp_hms": "00:00:30.742",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 51580
+      },
+      {
+        "timestamp_seconds": 31.646,
+        "timestamp_hms": "00:00:31.646",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 53414
+      },
+      {
+        "timestamp_seconds": 32.55,
+        "timestamp_hms": "00:00:32.550",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 57459
+      },
+      {
+        "timestamp_seconds": 33.454,
+        "timestamp_hms": "00:00:33.454",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 57237
+      },
+      {
+        "timestamp_seconds": 34.359,
+        "timestamp_hms": "00:00:34.359",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 30191
+      },
+      {
+        "timestamp_seconds": 35.263,
+        "timestamp_hms": "00:00:35.263",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 30562
+      }
+    ]
+  },
+  "transcription": null,
+  "scenes": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-composition-v1/render-001/output/失帧-两位冷开场加S01-1080p审看版.mp4",
+    "threshold": 0.4,
+    "total_scenes": 1,
+    "scenes": [
+      {
+        "scene_number": 1,
+        "start_time": 0.0,
+        "start_hms": "00:00:00.000",
+        "end_time": 36.167,
+        "end_hms": "00:00:36.167",
+        "duration_seconds": 36.167,
+        "confidence": null
+      }
+    ]
+  },
+  "analysis_summary": {
+    "duration_hms": "00:00:36.167",
+    "resolution": "1920x1080",
+    "has_audio": true,
+    "estimated_speaking_duration_seconds": 0.0,
+    "scene_count": 1,
+    "frames_extracted": 40
+  },
+  "audio_understanding": {
+    "schema_version": "audio-understanding-evidence/1",
+    "source_sha256": "5ab3a929258db93606196ab537d89c795343899dba8616dbdd8905e55433e48a",
+    "source_size_bytes": 34615187,
+    "audio_sha256": "310ebe14f0442c9fdb7aa50c23cd35e0a587a1b16f38bce999367d48231ab1c9",
+    "audio_size_bytes": 6946894,
+    "duration_seconds": 36.181333333333335,
+    "audio_start_seconds": 0.0,
+    "request_fingerprint": "b7fe5e6c09956886f09cbfc422b52085afa6aff414defefbc43055ec1c53d295",
+    "requested_model_id": "gemini-3.8-flash",
+    "response_model_id": "gemini-3.8-flash",
+    "response_sha256": "c64d44536a52d91271de7e84948470f1ec4789369302c8bf87b9e49859bf5c84",
+    "observations": {
+      "segments": [
+        {
+          "start_seconds": 0.0,
+          "end_seconds": 2.5,
+          "text": "师傅，我们在这里，两位。",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 2.7,
+          "end_seconds": 5.0,
+          "text": "让他别急，路滑。",
+          "speaker": "Speaker 2"
+        },
+        {
+          "start_seconds": 11.8,
+          "end_seconds": 13.2,
+          "text": "就你一位？",
+          "speaker": "Speaker 3"
+        },
+        {
+          "start_seconds": 13.6,
+          "end_seconds": 15.4,
+          "text": "嗯，就我一个。",
+          "speaker": "Speaker 1"
+        },
+        {
+          "start_seconds": 21.6,
+          "end_seconds": 23.5,
+          "text": "慢点，里面烫。",
+          "speaker": "Speaker 4"
+        },
+        {
+          "start_seconds": 23.8,
+          "end_seconds": 26.5,
+          "text": "谢了，袋子不用。",
+          "speaker": "Speaker 5"
+        },
+        {
+          "start_seconds": 30.7,
+          "end_seconds": 34.0,
+          "text": "垫着吧，上回有个人直接给扔地上了。",
+          "speaker": "Speaker 4"
+        }
+      ],
+      "voice_description": "Speaker 1 is a young adult female speaking clear standard Mandarin with a natural pitch. Speaker 2 is an adult male with a calm, steady tone. Speaker 3 is a male voice transmitted with slight acoustic filtering reminiscent of a phone or vehicle intercom. Speaker 4 has a mature, warm, colloquial tone. Speaker 5 is an adult male with a casual, polite voice.",
+      "delivery_description": "Natural everyday conversational delivery with realistic pacing, gentle pauses, and quiet, polite exchanges.",
+      "background_sounds": [
+        "vehicle sounds",
+        "wet ambient street noise",
+        "gentle instrumental piano background music",
+        "plastic bag rustling"
+      ],
+      "uncertainties": []
+    },
+    "proof_boundary": "analyzer observations; not QA/human/timing acceptance",
+    "media_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-composition-v1/render-001/output/失帧-两位冷开场加S01-1080p审看版.mp4",
+    "analysis_audio_derivation": "full_source_track_pcm_derivative",
+    "human_acceptance": "NOT_EVALUATED"
+  }
+}

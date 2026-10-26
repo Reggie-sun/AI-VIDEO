@@ -1,0 +1,14 @@
+{
+  "schema_version": "task-verification-receipt/1",
+  "level": "related",
+  "command": "PYTHONPATH=src .venv/bin/python -m pytest tests/test_caption_development_preview.py tests/test_repair_input_admission.py tests/test_production_composition_source_audio.py -q",
+  "result": "59 passed",
+  "junit": "p4-related-tests.xml",
+  "scope": "captured same-source audio/captions with silent static title and independent BGM; not full regression, no media or human acceptance",
+  "files": {
+    "src/ai_video/production/_composition_visual.py": "28667bb9371664d39413ba2c4082fea72995aec8cbab5604c72d10f080e93d69",
+    "tests/test_caption_development_preview.py": "d7dc0fc2c1152b88305fb2aba46b8e7e69cfd3a7972714f7ab27c0171eb54611"
+  },
+  "risk_gate": "NATIVE_REVIEW_NOT_REQUIRED: local reversible layout validation; retained exact source/window/no-gain/no-fade/no-duck, caption and activation checks; meaningful negative tests and actual render pending",
+  "commit_push": "WAIT_USER_FILM_APPROVAL_PER_FILM_FIRST"
+}

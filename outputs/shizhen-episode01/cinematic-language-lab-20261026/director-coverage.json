@@ -1,0 +1,383 @@
+{
+  "schema_version": "4",
+  "request": {
+    "creative_input_kind": "direction",
+    "creative_input_evidence": "当前的中文字体与层级测试在技术上基本成立，但艺术表现过于保守。\n“失帧”采用规整的大字居中排版，“翌夜”采用缩小的角落文字，整体仍是常规字体、标准布局与简单显现的组合。\n这可以作为技术验证，但不应成为最终的影视视觉设计。\n本轮重点不是修正字号、字距或者增加几个文字特效，而是突破当前过于规整、对称、静态和模板化的设计思路。\n请调用项目现有的导演、美术、Motion Design、Kinetic Typography 及必要的后期合成能力，重新探索《失帧》的影视视觉语言。\n不要默认采用居中标题、固定基线、均匀字距、完整字形和常规淡入淡出。\n文字不是独立于影像的装饰。\n“失帧”不仅是两个汉字，也是一种关于记忆、时间与现实缺失的视觉概念。\n“翌夜”应当承担时间转换和情绪过渡的作用，而不是简单缩小后放到画面角落。\n不要将实验性误解为随机错位、频繁闪烁、廉价 Glitch、粒子堆积或过度复杂的动画。\n原有 Shot 和音乐继续保留，并考虑如何通过宏观到微观的画面递进，让标题成为整个开场视听设计的一部分，而不是突然插入的黑底字卡。\n不要立即收敛到单一方案。\n先探索数个在视觉思路上真正不同的设计方向，其中至少一个应当明显突破传统电影字卡的构图与表现习惯。\n从影视艺术性、叙事作用、画面融合程度、情绪感染力和实际制作可行性进行比较，自主选择最有潜力的方向。\n现有 3.5 秒测试可以保留作为技术基准，但不得以文字清晰、字体稳定或渲染成功作为艺术设计通过的依据。\n在已有素材和无新增付费生成的范围内，尽量制作可观看的动态设计样片，而不只是输出字体截图或文字说明。\n重点检查真实运动中的构图、时间节奏、音乐同步、文字与环境互动，以及与前后镜头的衔接。\n最终目标是建立具有《失帧》自身辨识度的电影视觉语言，而不是制作一套通用的中文标题动画模板。\n",
+    "creative_constraints": [
+      {
+        "constraint_id": "compose",
+        "scope": "global",
+        "source_text": "不要默认采用居中标题、固定基线、均匀字距、完整字形和常规淡入淡出。"
+      },
+      {
+        "constraint_id": "image",
+        "scope": "global",
+        "source_text": "文字不是独立于影像的装饰。"
+      },
+      {
+        "constraint_id": "absence",
+        "scope": "global",
+        "source_text": "“失帧”不仅是两个汉字，也是一种关于记忆、时间与现实缺失的视觉概念。"
+      },
+      {
+        "constraint_id": "night",
+        "scope": "global",
+        "source_text": "“翌夜”应当承担时间转换和情绪过渡的作用，而不是简单缩小后放到画面角落。"
+      },
+      {
+        "constraint_id": "not-random",
+        "scope": "global",
+        "source_text": "不要将实验性误解为随机错位、频繁闪烁、廉价 Glitch、粒子堆积或过度复杂的动画。"
+      },
+      {
+        "constraint_id": "retain",
+        "scope": "global",
+        "source_text": "原有 Shot 和音乐继续保留，并考虑如何通过宏观到微观的画面递进，让标题成为整个开场视听设计的一部分，而不是突然插入的黑底字卡。"
+      },
+      {
+        "constraint_id": "alternatives",
+        "scope": "global",
+        "source_text": "不要立即收敛到单一方案。"
+      },
+      {
+        "constraint_id": "bold",
+        "scope": "global",
+        "source_text": "先探索数个在视觉思路上真正不同的设计方向，其中至少一个应当明显突破传统电影字卡的构图与表现习惯。"
+      },
+      {
+        "constraint_id": "compare",
+        "scope": "global",
+        "source_text": "从影视艺术性、叙事作用、画面融合程度、情绪感染力和实际制作可行性进行比较，自主选择最有潜力的方向。"
+      },
+      {
+        "constraint_id": "basis",
+        "scope": "global",
+        "source_text": "现有 3.5 秒测试可以保留作为技术基准，但不得以文字清晰、字体稳定或渲染成功作为艺术设计通过的依据。"
+      },
+      {
+        "constraint_id": "no-paid",
+        "scope": "global",
+        "source_text": "在已有素材和无新增付费生成的范围内，尽量制作可观看的动态设计样片，而不只是输出字体截图或文字说明。"
+      },
+      {
+        "constraint_id": "context",
+        "scope": "global",
+        "source_text": "重点检查真实运动中的构图、时间节奏、音乐同步、文字与环境互动，以及与前后镜头的衔接。"
+      },
+      {
+        "constraint_id": "unique",
+        "scope": "global",
+        "source_text": "最终目标是建立具有《失帧》自身辨识度的电影视觉语言，而不是制作一套通用的中文标题动画模板。"
+      }
+    ],
+    "target_duration_seconds": 9,
+    "coverage_strategy": "multi_shot",
+    "strategy_source": "agent_directed",
+    "director_decision_rationale": "三种不同构图逻辑先做相同来源和音乐窗口的动态图形研究；原车遮挡与后续城市运动参与文字，结尾另以一条新的曝光平面承担翌夜。不把抽象合成当成新灵异机制或真人正式成片。",
+    "strategy_request_evidence": null,
+    "director_skill": "open-video"
+  },
+  "coverage_units": [
+    {
+      "unit_id": "image-aperture",
+      "duration_seconds": 4,
+      "beat_function": "reveal",
+      "objective": "让车厢运动与空位进入排字或轮廓，保留各方案不同图像逻辑",
+      "open_state": "车厢遮挡视野",
+      "close_state": "站棚与缺席空间可读，字与图像发生关系",
+      "shot_scale": "mixed_progression",
+      "camera_treatment": "static",
+      "camera_intent": "复用实际A2镜头，不伪造宏观航拍",
+      "visible_change": "货车揭开站棚，同时文字/轮廓改变对影像的观看方式",
+      "transition_out": "cut",
+      "constraint_ids": [
+        "compose",
+        "image",
+        "absence",
+        "night",
+        "not-random",
+        "retain",
+        "alternatives",
+        "bold",
+        "compare",
+        "basis",
+        "no-paid",
+        "context",
+        "unique"
+      ]
+    },
+    {
+      "unit_id": "title-time-plane",
+      "duration_seconds": 5,
+      "beat_function": "transition",
+      "objective": "完整标题锚点可读后，以不同的空间平面转换至翌夜",
+      "open_state": "旧A3近景与城市的实际运动",
+      "close_state": "文字不是角落注脚，时间转换有自己的曝光与运动",
+      "shot_scale": "close_up",
+      "camera_treatment": "static",
+      "camera_intent": "复用实际近景，图形不冒充镜头内的物理现象",
+      "visible_change": "影像穿过字/身体/空位之后，新的时间平面覆盖旧曝光，只留一条城市影像的缝",
+      "transition_out": "end",
+      "constraint_ids": [
+        "compose",
+        "image",
+        "absence",
+        "night",
+        "not-random",
+        "retain",
+        "alternatives",
+        "bold",
+        "compare",
+        "basis",
+        "no-paid",
+        "context",
+        "unique"
+      ]
+    }
+  ],
+  "intent_items": [
+    {
+      "intent_item_id": "compose",
+      "statement": "不要默认采用居中标题、固定基线、均匀字距、完整字形和常规淡入淡出。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "e557429b1721438b974767365b8f66b219ca012e413966a1d66078a2c3d35758",
+          "locator": "creative-input.txt#compose",
+          "intent_item_id": "compose",
+          "quote": "不要默认采用居中标题、固定基线、均匀字距、完整字形和常规淡入淡出。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "image",
+      "statement": "文字不是独立于影像的装饰。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "e557429b1721438b974767365b8f66b219ca012e413966a1d66078a2c3d35758",
+          "locator": "creative-input.txt#image",
+          "intent_item_id": "image",
+          "quote": "文字不是独立于影像的装饰。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "absence",
+      "statement": "“失帧”不仅是两个汉字，也是一种关于记忆、时间与现实缺失的视觉概念。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "e557429b1721438b974767365b8f66b219ca012e413966a1d66078a2c3d35758",
+          "locator": "creative-input.txt#absence",
+          "intent_item_id": "absence",
+          "quote": "“失帧”不仅是两个汉字，也是一种关于记忆、时间与现实缺失的视觉概念。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "night",
+      "statement": "“翌夜”应当承担时间转换和情绪过渡的作用，而不是简单缩小后放到画面角落。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "e557429b1721438b974767365b8f66b219ca012e413966a1d66078a2c3d35758",
+          "locator": "creative-input.txt#night",
+          "intent_item_id": "night",
+          "quote": "“翌夜”应当承担时间转换和情绪过渡的作用，而不是简单缩小后放到画面角落。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "not-random",
+      "statement": "不要将实验性误解为随机错位、频繁闪烁、廉价 Glitch、粒子堆积或过度复杂的动画。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "e557429b1721438b974767365b8f66b219ca012e413966a1d66078a2c3d35758",
+          "locator": "creative-input.txt#not-random",
+          "intent_item_id": "not-random",
+          "quote": "不要将实验性误解为随机错位、频繁闪烁、廉价 Glitch、粒子堆积或过度复杂的动画。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "retain",
+      "statement": "原有 Shot 和音乐继续保留，并考虑如何通过宏观到微观的画面递进，让标题成为整个开场视听设计的一部分，而不是突然插入的黑底字卡。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "e557429b1721438b974767365b8f66b219ca012e413966a1d66078a2c3d35758",
+          "locator": "creative-input.txt#retain",
+          "intent_item_id": "retain",
+          "quote": "原有 Shot 和音乐继续保留，并考虑如何通过宏观到微观的画面递进，让标题成为整个开场视听设计的一部分，而不是突然插入的黑底字卡。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "alternatives",
+      "statement": "不要立即收敛到单一方案。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "e557429b1721438b974767365b8f66b219ca012e413966a1d66078a2c3d35758",
+          "locator": "creative-input.txt#alternatives",
+          "intent_item_id": "alternatives",
+          "quote": "不要立即收敛到单一方案。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "bold",
+      "statement": "先探索数个在视觉思路上真正不同的设计方向，其中至少一个应当明显突破传统电影字卡的构图与表现习惯。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "e557429b1721438b974767365b8f66b219ca012e413966a1d66078a2c3d35758",
+          "locator": "creative-input.txt#bold",
+          "intent_item_id": "bold",
+          "quote": "先探索数个在视觉思路上真正不同的设计方向，其中至少一个应当明显突破传统电影字卡的构图与表现习惯。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "compare",
+      "statement": "从影视艺术性、叙事作用、画面融合程度、情绪感染力和实际制作可行性进行比较，自主选择最有潜力的方向。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "e557429b1721438b974767365b8f66b219ca012e413966a1d66078a2c3d35758",
+          "locator": "creative-input.txt#compare",
+          "intent_item_id": "compare",
+          "quote": "从影视艺术性、叙事作用、画面融合程度、情绪感染力和实际制作可行性进行比较，自主选择最有潜力的方向。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "basis",
+      "statement": "现有 3.5 秒测试可以保留作为技术基准，但不得以文字清晰、字体稳定或渲染成功作为艺术设计通过的依据。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "e557429b1721438b974767365b8f66b219ca012e413966a1d66078a2c3d35758",
+          "locator": "creative-input.txt#basis",
+          "intent_item_id": "basis",
+          "quote": "现有 3.5 秒测试可以保留作为技术基准，但不得以文字清晰、字体稳定或渲染成功作为艺术设计通过的依据。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "no-paid",
+      "statement": "在已有素材和无新增付费生成的范围内，尽量制作可观看的动态设计样片，而不只是输出字体截图或文字说明。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "e557429b1721438b974767365b8f66b219ca012e413966a1d66078a2c3d35758",
+          "locator": "creative-input.txt#no-paid",
+          "intent_item_id": "no-paid",
+          "quote": "在已有素材和无新增付费生成的范围内，尽量制作可观看的动态设计样片，而不只是输出字体截图或文字说明。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "context",
+      "statement": "重点检查真实运动中的构图、时间节奏、音乐同步、文字与环境互动，以及与前后镜头的衔接。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "e557429b1721438b974767365b8f66b219ca012e413966a1d66078a2c3d35758",
+          "locator": "creative-input.txt#context",
+          "intent_item_id": "context",
+          "quote": "重点检查真实运动中的构图、时间节奏、音乐同步、文字与环境互动，以及与前后镜头的衔接。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "unique",
+      "statement": "最终目标是建立具有《失帧》自身辨识度的电影视觉语言，而不是制作一套通用的中文标题动画模板。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "e557429b1721438b974767365b8f66b219ca012e413966a1d66078a2c3d35758",
+          "locator": "creative-input.txt#unique",
+          "intent_item_id": "unique",
+          "quote": "最终目标是建立具有《失帧》自身辨识度的电影视觉语言，而不是制作一套通用的中文标题动画模板。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    }
+  ],
+  "intent_groups": {
+    "must_happen": [
+      {
+        "intent_item_id": "compose"
+      },
+      {
+        "intent_item_id": "image"
+      },
+      {
+        "intent_item_id": "absence"
+      },
+      {
+        "intent_item_id": "night"
+      },
+      {
+        "intent_item_id": "retain"
+      },
+      {
+        "intent_item_id": "alternatives"
+      },
+      {
+        "intent_item_id": "bold"
+      },
+      {
+        "intent_item_id": "compare"
+      },
+      {
+        "intent_item_id": "no-paid"
+      },
+      {
+        "intent_item_id": "context"
+      },
+      {
+        "intent_item_id": "unique"
+      }
+    ],
+    "must_not_happen": [
+      {
+        "intent_item_id": "not-random"
+      },
+      {
+        "intent_item_id": "basis"
+      }
+    ],
+    "preferred_performance": [],
+    "timing_targets": [],
+    "acceptable_variation": []
+  }
+}

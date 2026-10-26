@@ -1,0 +1,240 @@
+{
+  "evaluator_name": "pending",
+  "strength": "explicit_evaluator",
+  "observation": {
+    "contract_hash": "80cd86ccaae93824d7e94f972f34b6bb8c53e442a7a0e707da8ce0fa06361795",
+    "review_request_content_hash": "7cda7b7e4e9bf4e4a04ec9d56a487cfc8d4d440d06ff7f59a971dcb3c10e4093",
+    "viewing_mode": "sampled_frames",
+    "visual_frame_inventory": {
+      "duration_ms": 20375,
+      "frames": [
+        {
+          "timestamp_ms": 2000,
+          "frame_sha256": "c3022cf9ce15c6956bf5c4c4da0a3958bc4a1f7db478a9bdaae775e0e1b1ee03",
+          "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+        },
+        {
+          "timestamp_ms": 7600,
+          "frame_sha256": "096369c9dd2996875c364d7c65c29687d71c6e4304f4362901dbd82a80262835",
+          "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+        },
+        {
+          "timestamp_ms": 7700,
+          "frame_sha256": "e61a4e82e8febac64382bdc8a314acb0d12fd805da211515df4d67c1d3585ba4",
+          "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+        },
+        {
+          "timestamp_ms": 10000,
+          "frame_sha256": "d101bab448ade158d5b25da3d06a7f6d2a5d884d9a8102d7cce66550bbf7d6d1",
+          "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+        },
+        {
+          "timestamp_ms": 10375,
+          "frame_sha256": "880ec0ff6ac2da2f49d92a730d74a0a8ee2bb95ef0572e10886070008ab5b8bf",
+          "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+        },
+        {
+          "timestamp_ms": 10417,
+          "frame_sha256": "1acb5e5468c702d394d149b5f7a306e999cf19ee03cdbb13d883fc90c4acec5a",
+          "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+        },
+        {
+          "timestamp_ms": 11000,
+          "frame_sha256": "a10bb96929f9e1e8827ef417cabc8df2a0c3cd466d3ce39a51312f9ea215b081",
+          "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+        },
+        {
+          "timestamp_ms": 14000,
+          "frame_sha256": "2999bc15f5c909e404ed3b3aacceba64b99e22db6a4a040d9fc7e5beb309e413",
+          "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+        },
+        {
+          "timestamp_ms": 17333,
+          "frame_sha256": "7ab2a88a033086cdab132c08d5504739f8f2cd18cb06708765602ce55e079d9c",
+          "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+        },
+        {
+          "timestamp_ms": 17417,
+          "frame_sha256": "77299e1323ae88dec1d01b1a94b9b25a1f759c3aabd00b26bc6a03ba05fe2ceb",
+          "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+        },
+        {
+          "timestamp_ms": 18375,
+          "frame_sha256": "ef0cd0bf8643c4944f494d4c0792b733aa8133fecf45b700771b9eca50556ddd",
+          "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+        },
+        {
+          "timestamp_ms": 19375,
+          "frame_sha256": "b9c085db644e4e01db542eeb8d80e39deead58f832dabd6be6c853b1ad1f91aa",
+          "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+        },
+        {
+          "timestamp_ms": 20250,
+          "frame_sha256": "2b53da4a9651b0ddb85dafb2d5f6ca577a2b952b2c01c0d49e6b9e1302a0b813",
+          "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+        }
+      ]
+    },
+    "viewing_speed_milli": null,
+    "findings": [
+      {
+        "requirement_id": "intent-01",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-02",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-03",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-04",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-05",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-06",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-07",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-08",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-09",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-10",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-11",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-12",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-13",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-14",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "visual.drama.typography",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "visual.drama.palette",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "visual.drama.layout",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "visual.drama.style",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "visual.drama.holistic",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      }
+    ]
+  },
+  "junction_findings": [
+    {
+      "junction_id": "91c93c4daee88ec1c3b5737d1c5340ec06e5eea78c8a85137da02b4e4203e5b2",
+      "inventory_sha256": "aa19ee90b122be21147e8e5f4ecee0f227167d528fd46edc56c67391b4d0ca47",
+      "edit_decision": null,
+      "edit_reason": "尚未评审；需记录剪辑决定和依据。",
+      "visual_verdict": "not_evaluated",
+      "visual_observation": "未评审；1x完整播放该接点，记录动作/画面有无重复、停顿或跳变。",
+      "audio_verdict": "not_evaluated",
+      "audio_observation": "未聆听；实际监听接点前后音频，记录有无叠音、截断或异常空隙。",
+      "audio_basis": "not_listened",
+      "audio_reason": null,
+      "viewing_mode": null,
+      "viewing_speed_milli": null
+    },
+    {
+      "junction_id": "e789fd03054ca7b7438772e9b17ec8fa85fb0f67c4aad6f7af965f4edae7cac1",
+      "inventory_sha256": "aa19ee90b122be21147e8e5f4ecee0f227167d528fd46edc56c67391b4d0ca47",
+      "edit_decision": null,
+      "edit_reason": "尚未评审；需记录剪辑决定和依据。",
+      "visual_verdict": "not_evaluated",
+      "visual_observation": "未评审；1x完整播放该接点，记录动作/画面有无重复、停顿或跳变。",
+      "audio_verdict": "not_evaluated",
+      "audio_observation": "未聆听；实际监听接点前后音频，记录有无叠音、截断或异常空隙。",
+      "audio_basis": "not_listened",
+      "audio_reason": null,
+      "viewing_mode": null,
+      "viewing_speed_milli": null
+    },
+    {
+      "junction_id": "899f7c505f25dd4d8f4729e3c8f47ea82793e30c9f4a8ed8b101fb39953aae7e",
+      "inventory_sha256": "aa19ee90b122be21147e8e5f4ecee0f227167d528fd46edc56c67391b4d0ca47",
+      "edit_decision": null,
+      "edit_reason": "尚未评审；需记录剪辑决定和依据。",
+      "visual_verdict": "not_evaluated",
+      "visual_observation": "未评审；1x完整播放该接点，记录动作/画面有无重复、停顿或跳变。",
+      "audio_verdict": "not_evaluated",
+      "audio_observation": "未聆听；实际监听接点前后音频，记录有无叠音、截断或异常空隙。",
+      "audio_basis": "not_listened",
+      "audio_reason": null,
+      "viewing_mode": null,
+      "viewing_speed_milli": null
+    }
+  ]
+}

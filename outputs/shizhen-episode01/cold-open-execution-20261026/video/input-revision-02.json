@@ -1,0 +1,10 @@
+{
+  "manifest_revision": 7,
+  "project_revision": 2,
+  "new_video_calls": 0,
+  "reference": {
+    "kind": "user_input",
+    "reference": "evidence/authoring-input/0c8fcb8b248babc60b2512cc0ecc9ed07251cd2572b0bfe8956fc7030bcc3c59.json",
+    "content_hash": "0c8fcb8b248babc60b2512cc0ecc9ed07251cd2572b0bfe8956fc7030bcc3c59"
+  }
+}

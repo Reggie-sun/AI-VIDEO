@@ -266,17 +266,41 @@ def verify_generation_feedback(root, state, request):
         request_scope = request.activation_scope.request
         first_frames = tuple(item for item in request_scope.image_bindings
                              if item.role == "first_frame")
+        if receipt.schema_version in {
+            "generation-visual-supersession/4", "generation-visual-supersession/5",
+        }:
+            old_frame_matches = (
+                len(first_frames) <= 1
+                and receipt.old_first_frame_sha256
+                == (first_frames[0].asset_sha256 if first_frames else None)
+            )
+            target_frame_matches = (
+                receipt.authored_revision is not None
+                and receipt.target_first_frame_sha256 == receipt.authored_revision.first_frame_sha256
+                if receipt.schema_version == "generation-visual-supersession/4"
+                else receipt.authored_retarget is not None
+                and receipt.target_first_frame_sha256 is None
+            )
+        else:
+            old_frame_matches = (
+                len(first_frames) == 1
+                and receipt.old_first_frame_sha256 == first_frames[0].asset_sha256
+            )
+            target_frame_matches = (
+                (len(first_frames) == 1
+                 and receipt.schema_version == "generation-visual-supersession/1"
+                 and receipt.target_first_frame_sha256 != first_frames[0].asset_sha256)
+                or (receipt.schema_version in {
+                    "generation-visual-supersession/2", "generation-visual-supersession/3",
+                } and receipt.target_first_frame_sha256 == first_frames[0].asset_sha256)
+            )
         if (
             len(selected) != 1
             or experience.projection != binding.projection
             or experience.candidate != selected[0]
             or selected[0].final_output_goal != receipt.old_goal
-            or len(first_frames) != 1
-            or first_frames[0].asset_sha256 != receipt.old_first_frame_sha256
-            or (receipt.schema_version == "generation-visual-supersession/1"
-                and receipt.target_first_frame_sha256 == first_frames[0].asset_sha256)
-            or (receipt.schema_version in {"generation-visual-supersession/2", "generation-visual-supersession/3"}
-                and receipt.target_first_frame_sha256 != first_frames[0].asset_sha256)
+            or not old_frame_matches
+            or not target_frame_matches
             or receipt.attempt_id != state.visual_supersession.attempt_id
             or receipt.request_fingerprint != request.request_input_hash
             or receipt.request_fingerprint != request_scope.request_input_hash
@@ -304,7 +328,29 @@ def verify_generation_feedback(root, state, request):
         from ai_video.production.generation_visual_revision import validate_visual_revision_goal
 
         try:
-            validate_visual_revision_goal(receipt.old_goal, receipt.target_goal)
+            if receipt.schema_version == "generation-visual-supersession/4":
+                from ai_video.production.generation_authoring_revision import validate_authored_revision_goal
+
+                if receipt.authored_revision is None:
+                    raise ValueError("authored supersession has no exact target contract")
+                validate_authored_revision_goal(
+                    receipt.old_goal,
+                    receipt.target_goal,
+                    goal_requirement_revisions=receipt.authored_revision.goal_requirement_revisions,
+                    authorization_receipt_id=receipt.authorization_receipt_id,
+                )
+            elif receipt.schema_version == "generation-visual-supersession/5":
+                from ai_video.production.generation_authored_retarget import (
+                    _same_goal_with_new_version,
+                )
+
+                if (receipt.authored_retarget is None
+                        or not _same_goal_with_new_version(receipt.old_goal, receipt.target_goal)
+                        or receipt.authored_retarget.authorization_reference
+                            != receipt.authorization_receipt_id):
+                    raise ValueError("retarget supersession has a changed goal or authority")
+            else:
+                validate_visual_revision_goal(receipt.old_goal, receipt.target_goal)
             if receipt.coverage_revision is not None:
                 from ai_video.production.generation_coverage_revision import validate_coverage_target
 
@@ -313,6 +359,22 @@ def verify_generation_feedback(root, state, request):
                 from ai_video.production.generation_resolution_revision import validate_resolution_target
 
                 validate_resolution_target(binding, experience, receipt.resolution_revision)
+            if receipt.authored_revision is not None:
+                from ai_video.production.generation_authoring_revision import (
+                    validate_authored_generation_revision_target,
+                )
+
+                validate_authored_generation_revision_target(
+                    binding, experience, receipt.authored_revision
+                )
+            if receipt.authored_retarget is not None:
+                from ai_video.production.generation_authored_retarget import (
+                    validate_authored_generation_retarget_target,
+                )
+
+                validate_authored_generation_retarget_target(
+                    binding, experience, receipt.authored_retarget
+                )
             from ai_video.production.generation_evaluation import validate_generation_evaluation_sources
             from ai_video.production.project import load_qa_policy
 

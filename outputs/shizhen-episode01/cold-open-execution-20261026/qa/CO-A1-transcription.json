@@ -1,0 +1,9 @@
+{
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"video_path\": \"/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A1/state/video-generation/fetch/files/b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd.mp4\",\n  \"model\": \"medium\",\n  \"language\": \"zh\",\n  \"duration_seconds\": 8.065,\n  \"segments\": [\n    {\n      \"id\": 0,\n      \"start\": 0.64,\n      \"end\": 3.22,\n      \"start_hms\": \"00:00:00.640\",\n      \"end_hms\": \"00:00:03.220\",\n      \"text\": \"师父 我们在站里 两位\"\n    },\n    {\n      \"id\": 1,\n      \"start\": 3.22,\n      \"end\": 5.58,\n      \"start_hms\": \"00:00:03.220\",\n      \"end_hms\": \"00:00:05.580\",\n      \"text\": \"让他别急 路滑\"\n    }\n  ],\n  \"full_text\": \"师父 我们在站里 两位\\n让他别急 路滑\"\n}"
+    }
+  ],
+  "isError": false
+}

@@ -1,0 +1,88 @@
+[
+  {
+    "path": "outputs/shizhen-episode01/cold-open-execution-20261026/music/audio/cold-open-title-suspense-atmosphere-31d31b57.mp3",
+    "sha256": "a64af700e370160d8aa811834b20ce3991a6f2e67677e55dd4577ee31fd971c1",
+    "probe": {
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "mp3",
+          "sample_rate": "48000",
+          "channels": 2
+        },
+        {
+          "codec_name": "mjpeg"
+        }
+      ],
+      "format": {
+        "duration": "95.184000",
+        "size": "2086973"
+      }
+    },
+    "full_decode_exit": 0,
+    "listening": "NOT_EVALUATED"
+  },
+  {
+    "path": "outputs/shizhen-episode01/cold-open-execution-20261026/music/audio/cold-open-title-suspense-atmosphere-31d31b57.wav",
+    "sha256": "ea2fa22977e30853796ea7dd894178f28c397b5cb71c76d587080ecfa5b20e2f",
+    "probe": {
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "pcm_s16le",
+          "sample_rate": "48000",
+          "channels": 2
+        }
+      ],
+      "format": {
+        "duration": "95.160000",
+        "size": "18284560"
+      }
+    },
+    "full_decode_exit": 0,
+    "listening": "NOT_EVALUATED"
+  },
+  {
+    "path": "outputs/shizhen-episode01/cold-open-execution-20261026/music/audio/cold-open-title-suspense-atmosphere-fc0af846.mp3",
+    "sha256": "e86b2c0283480b5f374b48ec270fa10ec8ce2761928ea38e7b8402062ec2e706",
+    "probe": {
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "mp3",
+          "sample_rate": "48000",
+          "channels": 2
+        },
+        {
+          "codec_name": "mjpeg"
+        }
+      ],
+      "format": {
+        "duration": "88.824000",
+        "size": "2041531"
+      }
+    },
+    "full_decode_exit": 0,
+    "listening": "NOT_EVALUATED"
+  },
+  {
+    "path": "outputs/shizhen-episode01/cold-open-execution-20261026/music/audio/cold-open-title-suspense-atmosphere-fc0af846.wav",
+    "sha256": "88585bd2a3a9d44680f1a1a2667145839fa5166363c36260d2963ed8bd05a425",
+    "probe": {
+      "programs": [],
+      "streams": [
+        {
+          "codec_name": "pcm_s16le",
+          "sample_rate": "48000",
+          "channels": 2
+        }
+      ],
+      "format": {
+        "duration": "88.800000",
+        "size": "17063440"
+      }
+    },
+    "full_decode_exit": 0,
+    "listening": "NOT_EVALUATED"
+  }
+]

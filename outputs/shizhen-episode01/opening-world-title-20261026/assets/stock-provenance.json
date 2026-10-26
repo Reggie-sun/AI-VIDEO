@@ -1,0 +1,11 @@
+{
+  "kind": "stock-video-import-development/1",
+  "page": "https://www.pexels.com/video/nighttime-urban-life-in-china-36407445/",
+  "author": "LayG Traveller",
+  "license": "https://www.pexels.com/license/",
+  "original_sha256": "020be47136f4a5542aa73dca37ce5ed6b1eeef1c3577268662a3b9676e91490c",
+  "derivative_sha256": "a08d10ae18be81b8b9f1dc965a608f9262e12d91c5989e519a5ddef6aa2af8e8",
+  "processing": "1920x1080 normal-speed 24fps frame selection, no optical interpolation",
+  "usage": "Structure previs only: different location, dry street and evening crowd; NOT same rainy 03:17 street",
+  "metadata_semantics": "Legacy generation-named metadata fingerprints identify this import, not a generation"
+}

@@ -1,0 +1,242 @@
+{
+  "schema_version": "creative-goal-binding/1",
+  "authority": "development_only",
+  "creative_input": {
+    "path": "review-creative-input.txt",
+    "sha256": "03af24973eca403f3603590832e92e253b1f819f64cec634f73f752916193caa"
+  },
+  "coverage": {
+    "path": "director-coverage.json",
+    "sha256": "7099b921b5179712ce9dcd7bb5a66d26b4e100104448687cdad755b63ddc792a"
+  },
+  "final_output_contract": {
+    "path": "final-output-contract.json",
+    "sha256": "2668269bd30f4e3847c388095457227c824646eb902a073568d48837c0346787"
+  },
+  "bindings": [
+    {
+      "intent_item_id": "intent-01",
+      "constraint_ids": [
+        "intent-01"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-01"
+      ]
+    },
+    {
+      "intent_item_id": "intent-02",
+      "constraint_ids": [
+        "intent-02"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-02"
+      ]
+    },
+    {
+      "intent_item_id": "intent-03",
+      "constraint_ids": [
+        "intent-03"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-03"
+      ]
+    },
+    {
+      "intent_item_id": "intent-04",
+      "constraint_ids": [
+        "intent-04"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-04"
+      ]
+    },
+    {
+      "intent_item_id": "intent-05",
+      "constraint_ids": [
+        "intent-05"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-05"
+      ]
+    },
+    {
+      "intent_item_id": "intent-06",
+      "constraint_ids": [
+        "intent-06"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-06"
+      ]
+    },
+    {
+      "intent_item_id": "intent-07",
+      "constraint_ids": [
+        "intent-07"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-07"
+      ]
+    },
+    {
+      "intent_item_id": "intent-08",
+      "constraint_ids": [
+        "intent-08"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-08"
+      ]
+    },
+    {
+      "intent_item_id": "intent-09",
+      "constraint_ids": [
+        "intent-09"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-09"
+      ]
+    },
+    {
+      "intent_item_id": "intent-10",
+      "constraint_ids": [
+        "intent-10"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-10"
+      ]
+    },
+    {
+      "intent_item_id": "intent-11",
+      "constraint_ids": [
+        "intent-11"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-11"
+      ]
+    },
+    {
+      "intent_item_id": "intent-12",
+      "constraint_ids": [
+        "intent-12"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-12"
+      ]
+    },
+    {
+      "intent_item_id": "intent-13",
+      "constraint_ids": [
+        "intent-13"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-13"
+      ]
+    },
+    {
+      "intent_item_id": "intent-14",
+      "constraint_ids": [
+        "intent-14"
+      ],
+      "unit_ids": [
+        "WORLD-IN",
+        "CO-A1",
+        "CO-A2",
+        "CO-A3",
+        "CO-TAIL"
+      ],
+      "requirement_ids": [
+        "intent-14"
+      ]
+    }
+  ]
+}

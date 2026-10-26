@@ -1,0 +1,11 @@
+{
+  "unit_dir": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-world-title-20261026/qa/world-A-audio",
+  "intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-world-title-20261026/qa/world-A-audio/intent.json",
+  "intent_sha256": "18b8032617e51edec7920ab6da6c61be34c4f41fa23fee5f1c5e096243bbcda1",
+  "reservation_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-world-title-20261026/qa/world-A-audio/reservation.json",
+  "reservation_sha256": "0ee71c96b5943fe7fd5c51f845ee58b1e9ee4d12cfb20e016e6a2b639a47fdd0",
+  "source_sha256": "1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6",
+  "source_size_bytes": 30975126,
+  "submit_count": 1,
+  "upper_bound_microunits": 50000
+}

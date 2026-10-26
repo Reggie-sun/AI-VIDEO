@@ -793,6 +793,8 @@ categories:
     patterns:
       - src/ai_video/production/generation_visual_revision.py
       - src/ai_video/production/_qualification_visual_revision.py
+      - src/ai_video/production/generation_authoring_revision.py
+      - src/ai_video/production/_qualification_authoring_revision.py
       - src/ai_video/production/generation_coverage_revision.py
       - src/ai_video/production/generation_resolution_revision.py
       - tests/test_generation_visual_revision.py

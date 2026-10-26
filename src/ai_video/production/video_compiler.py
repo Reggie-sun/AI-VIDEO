@@ -408,7 +408,7 @@ def compile_provider_video_request(
     dialogue = requirement.generation_intent.dialogue_intent
     if dialogue is not None and dialogue.mode == "conversation":
         if (provider_bound.provider_kind != "jimeng"
-                or provider_bound.model_id != "seedance_2.5"
+                or provider_bound.model_id not in {"seedance_2.0_vip", "seedance_2.5"}
                 or provider_bound.voice_route is not None
                 or requirement.voice_routing is not None
                 or not provider_bound.output_requirement.native_audio

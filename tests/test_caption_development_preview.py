@@ -383,3 +383,51 @@ def test_cumulative_preview_validates_every_shots_exact_source(monkeypatch, fail
     else:
         with pytest.raises(ValueError):
             check()
+
+
+@pytest.mark.parametrize('failure', [None, 'missing_original', 'changed_source', 'gain_original', 'crossed_caption', 'title_video', 'title_speech', 'extra_speech'])
+def test_captured_dialogue_preview_can_add_silent_image_title_and_score(monkeypatch, failure):
+    import ai_video.production.repair_input_admission as admission
+    from ai_video.production.models import VisualStrategy
+    monkeypatch.setattr(admission, 'allows_repair_preview_layer', lambda *_: True)
+    monkeypatch.setattr(admission, 'verify_repair_input', lambda *_: SimpleNamespace(
+        preview_use=SimpleNamespace(scope='replacement_audio_preview')))
+    p, spec, timeline, shots = _two_captured_dialogue_previews()
+    title = SimpleNamespace(asset_id='title-image', asset_type=AssetType.IMAGE)
+    p.registry.assets += (title,)
+    shots['title'] = SimpleNamespace(shot_id='title', visual_strategy=VisualStrategy.STATIC_IMAGE,
+                                    dialogue='', narration='')
+    spec.shot_ids += ('title',)
+    spec.layers += (CompositionLayerSpec(layer_id='title-layer', shot_id='title',
+        asset_role='primary_visual', asset_id='title-image'),)
+    music = AudioTrackSpec(track_id='score', asset_id='original-score', audio_kind=AudioKind.BGM,
+                           start_sample=timeline.total_samples, trim_duration_samples=96_000)
+    original = spec.audio_tracks
+    spec.audio_tracks += (music,)
+    timeline.visual_spans += (SimpleNamespace(layer_id='title-layer', start_sample=timeline.total_samples,
+                                              duration_samples=96_000),)
+    timeline.total_samples += 96_000
+    if failure == 'missing_original':
+        spec.audio_tracks = (original[0], music)
+    elif failure == 'changed_source':
+        p.registry.assets[3].audio_metadata.source.input_fingerprint = 'f' * 64
+    elif failure == 'gain_original':
+        original[0].gain_millidb = -1
+    elif failure == 'crossed_caption':
+        spec.caption_tracks[-1].source_audio_track_id = original[0].track_id
+    elif failure == 'title_video':
+        title.asset_type = AssetType.VIDEO
+    elif failure == 'title_speech':
+        shots['title'].dialogue = 'An unverified new speaker'
+    elif failure == 'extra_speech':
+        spec.audio_tracks += (AudioTrackSpec(track_id='added-voice', asset_id='added-voice',
+            audio_kind=AudioKind.NARRATION, shot_id='title'),)
+    dialogue = tuple(t for t in spec.audio_tracks if t.audio_kind is AudioKind.DIALOGUE)
+    def check():
+        _validate_captured_dialogue_preview(p, spec, timeline, shots,
+            dialogue_tracks=dialogue, invalid=lambda message, *_: ValueError(message))
+    if failure is None:
+        check()
+    else:
+        with pytest.raises(ValueError):
+            check()

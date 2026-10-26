@@ -246,7 +246,11 @@ def _graphic_keyframes(
         GraphicAnimation.SLIDE_UP: "translateY(-24px)",
         GraphicAnimation.SCALE_IN: "scale(.92)",
     }[graphic.exit]
-    before = "" if graphic.start_frame == 0 else f"0%,{start}{{opacity:0;transform:{entrance_transform}}}"
+    # CSS merges duplicate offsets. Hold the pre-window state discretely so a
+    # NONE entrance cannot interpolate from invisible to visible before start.
+    before = "" if graphic.start_frame == 0 else (
+        f"0%,{start}{{opacity:0;transform:{entrance_transform};animation-timing-function:step-end}}"
+    )
     after = (
         ""
         if graphic.end_frame_exclusive == total_frames
@@ -254,8 +258,9 @@ def _graphic_keyframes(
     )
     body = (
         f"{before}{start}{{opacity:{0 if graphic.entrance is not GraphicAnimation.NONE else 1};"
-        f"transform:{entrance_transform}}}"
-        f"{entry},{exit_start}{{opacity:1;transform:none}}"
+        f"transform:{entrance_transform};animation-timing-function:linear}}"
+        f"{entry},{exit_start}{{opacity:1;transform:none;animation-timing-function:"
+        f"{'step-end' if graphic.exit is GraphicAnimation.NONE else 'linear'}}}"
         f"{end}{{opacity:{0 if graphic.exit is not GraphicAnimation.NONE else 1};"
         f"transform:{exit_transform}}}{after}"
     )
@@ -312,7 +317,9 @@ def _graphic_layer_keyframes(
         GraphicAnimation.SLIDE_UP: "translateY(-24px)",
         GraphicAnimation.SCALE_IN: "scale(.92)",
     }[exit]
-    before = "" if start_frame == 0 else f"0%,{start}{{opacity:0;transform:{entrance_transform}}}"
+    before = "" if start_frame == 0 else (
+        f"0%,{start}{{opacity:0;transform:{entrance_transform};animation-timing-function:step-end}}"
+    )
     after = (
         ""
         if end_frame == total_frames
@@ -320,8 +327,9 @@ def _graphic_layer_keyframes(
     )
     body = (
         f"{before}{start}{{opacity:{0 if entrance is not GraphicAnimation.NONE else target_opacity};"
-        f"transform:{entrance_transform}}}"
-        f"{entry},{exit_start}{{opacity:{target_opacity};transform:none}}"
+        f"transform:{entrance_transform};animation-timing-function:linear}}"
+        f"{entry},{exit_start}{{opacity:{target_opacity};transform:none;animation-timing-function:"
+        f"{'step-end' if exit is GraphicAnimation.NONE else 'linear'}}}"
         f"{end}{{opacity:{0 if exit is not GraphicAnimation.NONE else target_opacity};"
         f"transform:{exit_transform}}}{after}"
     )

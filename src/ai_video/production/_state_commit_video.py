@@ -207,6 +207,13 @@ class _StateCommitVideoMixin:
             from .generation_resolution_revision import require_authored_resolution_revision_predecessor
 
             require_authored_resolution_revision_predecessor(self, manifest, binding)
+            from ._qualification_authoring_revision import (
+                require_authored_generation_revision_predecessor,
+            )
+
+            require_authored_generation_revision_predecessor(
+                self, manifest, binding, loaded=loaded
+            )
             from ai_video.production.production_strategy_reader import production_family_shot_ids
 
             family_ids = production_family_shot_ids(loaded, binding.context.target_shot_id)

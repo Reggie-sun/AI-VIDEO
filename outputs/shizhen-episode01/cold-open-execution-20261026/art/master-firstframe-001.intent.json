@@ -1,0 +1,19 @@
+{
+  "recorded_at": "2026-10-25T21:49:58.953861+00:00",
+  "operation": "builtin_imagegen_new_scene_style_reference",
+  "unit": "master-firstframe-001",
+  "authorized_by": "用户：开始做吧；执行已接受Rhythm Revision 02",
+  "selected_skill": "imagegen",
+  "max_calls_this_unit": 1,
+  "prompt_file": "master-firstframe-prompt.zh.txt",
+  "prompt_sha256": "0cdf7e29ed3baa01a537f39861583c2516b027abeed4619ba90e7dab33229d01",
+  "references": [
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/assets/S01-opening.jpg",
+      "role": "style_only",
+      "sha256": "4bfb31d9f138f8277c5eaa662e4dcaa874ee7a5efa055aef518b764a9d046848"
+    }
+  ],
+  "unknown_policy": "STOP_NO_RETRY",
+  "outcome": "INTENT_ONLY"
+}

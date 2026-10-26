@@ -1,0 +1,41 @@
+{
+  "recorded_at": "2026-10-25T21:14:51.724683+00:00",
+  "exit_code": 0,
+  "status": "success",
+  "error_code": null,
+  "files": [],
+  "clip_info_readback": [
+    {
+      "id": "e61e327c-4e53-4e68-9e52-118e3ac0cb64",
+      "title": "失帧｜空位动机",
+      "status": "complete",
+      "model_name": "chirp-hawk",
+      "metadata": {
+        "tags": "Chamber music and minimalist electronic soundscape for contemporary urban psychological suspense; low-mid clarinet probes a recurring two-note hesitation, muted viola sustains a thin layer, and soft dark analog bass breathes between phrases. Sparse free-breathing pulses and uneven silences; faint beating and unresolved harmonic pressure gather mid-piece, then the bass falls away. Dry, clear detail, limited room reverb, open midrange and dynamic headroom; natural decay without resolution.",
+        "negative_tags": null,
+        "prompt": "",
+        "duration": 183.56,
+        "type": "gen"
+      }
+    },
+    {
+      "id": "6de433ab-dab5-4ca4-a0f5-7665a0d48c01",
+      "title": "失帧｜空位动机",
+      "status": "complete",
+      "model_name": "chirp-hawk",
+      "metadata": {
+        "tags": "Chamber minimal electronic soundscape, instrumental; sparse free-breathing pulses with uneven gaps; crisp dry details, limited room reverb, clear midrange space and dynamic headroom; low-mid clarinet repeats a hesitant two-note motif, muted viola sustains a thin layer, soft dark analog bass breathes between phrases. Nearly blank opening, subtle beating and unresolved harmonic pressure in the middle, bass withdraws, phrases leave edit-friendly gaps, motif fades without resolution.",
+        "negative_tags": null,
+        "prompt": "",
+        "duration": 174.0,
+        "type": "gen"
+      }
+    }
+  ],
+  "downloaded_files": [
+    "失帧-空位动机-6de433ab.wav",
+    "失帧-空位动机-6de433ab.mp3",
+    "失帧-空位动机-e61e327c.wav",
+    "失帧-空位动机-e61e327c.mp3"
+  ]
+}

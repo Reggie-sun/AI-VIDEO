@@ -1,0 +1,507 @@
+{
+  "schema_version": "visual-review-packet/4",
+  "authority": "development_only",
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-world-title-20261026/variant-A/失帧-独立开场-A-结构预演.mp4",
+  "video_sha256": "1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6",
+  "video_size_bytes": 30975126,
+  "duration_ms": 27417,
+  "contract": {
+    "goal_id": "shizhen-world-title",
+    "goal_version": "1",
+    "user_goal": "请将 `focus-002` 的 18.417 秒重剪版作为当前已验证的核心叙事素材，继续完成《失帧》独立冷开场。\n\n重要范围：只制作独立开场，不包含 S01，也不需要考虑与第一集的衔接。\n\n目前卡车遮挡、人物消失、幸存者毫无察觉的叙事机制已经成立，不要反复推翻这一部分。\n\n本轮重点解决尚未完成的三个问题：\n\n1. 建立真正具有叙事意义的宏观世界视觉表达，与公交站台的微观异常形成有机联系。不要简单增加城市航拍或故障特效，也不要让宏观段落削弱消失事件的悬念。\n2. 重新完成电影级片名揭示，使“失帧”的文字设计真正参与画面与情绪，而不只是覆盖在人物近景上的标题。\n3. 完成真人质感、声音结构和整体视听美术的一致性审查，并识别当前画面中的 AI 生成标识及正式素材使用限制。\n\n保留现有四句对白、音乐和已成立的关键事件，优先进行增量式创作。\n\n不强制固定时长或镜头数量，让导演根据观众注意力、悬念形成和情绪收束决定。\n\n请重点比较不同开场结构能否在更大的世界尺度和更快建立悬念之间取得平衡。\n\n继续调用现有专业 Skills，实际制作可观看的动态预演，不要只输出分析文档。\n\n未经授权不新增付费生成。明确区分预演完成、素材缺口和最终成片通过。\n\n最终以观众是否被真正吸引、是否感受到世界异常、是否记住消失事件与片名作为艺术评价重点，而不是技术测试是否通过。\n",
+    "requirements": [
+      {
+        "requirement_id": "intent-01",
+        "observable": "请将 `focus-002` 的 18.417 秒重剪版作为当前已验证的核心叙事素材，继续完成《失帧》独立冷开场。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-02",
+        "observable": "重要范围：只制作独立开场，不包含 S01，也不需要考虑与第一集的衔接。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-03",
+        "observable": "目前卡车遮挡、人物消失、幸存者毫无察觉的叙事机制已经成立，不要反复推翻这一部分。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-04",
+        "observable": "1. 建立真正具有叙事意义的宏观世界视觉表达，与公交站台的微观异常形成有机联系。不要简单增加城市航拍或故障特效，也不要让宏观段落削弱消失事件的悬念。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-05",
+        "observable": "2. 重新完成电影级片名揭示，使“失帧”的文字设计真正参与画面与情绪，而不只是覆盖在人物近景上的标题。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-06",
+        "observable": "3. 完成真人质感、声音结构和整体视听美术的一致性审查，并识别当前画面中的 AI 生成标识及正式素材使用限制。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-07",
+        "observable": "保留现有四句对白、音乐和已成立的关键事件，优先进行增量式创作。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-08",
+        "observable": "不强制固定时长或镜头数量，让导演根据观众注意力、悬念形成和情绪收束决定。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-09",
+        "observable": "请重点比较不同开场结构能否在更大的世界尺度和更快建立悬念之间取得平衡。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-10",
+        "observable": "继续调用现有专业 Skills，实际制作可观看的动态预演，不要只输出分析文档。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-11",
+        "observable": "未经授权不新增付费生成。明确区分预演完成、素材缺口和最终成片通过。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-12",
+        "observable": "最终以观众是否被真正吸引、是否感受到世界异常、是否记住消失事件与片名作为艺术评价重点，而不是技术测试是否通过。",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "visual.drama.typography",
+        "observable": "完整中文片名跨活动影像和撤去的画面边界；不压人物近景或说话，不装成路面实体，不用随机缺笔/glitch。",
+        "proof": "evaluator",
+        "visual_dimension": "typography"
+      },
+      {
+        "requirement_id": "visual.drama.palette",
+        "observable": "保留核心雨夜蓝黑与钨光，不强行用调色掩盖stock干地及非同地点；正式版仍须同雨夜摄影。",
+        "proof": "evaluator",
+        "visual_dimension": "palette"
+      },
+      {
+        "requirement_id": "visual.drama.layout",
+        "observable": "城市中人群的日常→两人同框与遮挡后的空位→平静回答→城市人流与车辆继续；文字只在最后介入。",
+        "proof": "evaluator",
+        "visual_dimension": "layout"
+      },
+      {
+        "requirement_id": "visual.drama.style",
+        "observable": "真人摄影目标保留；核心已认可叙事与其现有CG质感分开裁决，AI生成标识保留。",
+        "proof": "evaluator",
+        "visual_dimension": "style"
+      },
+      {
+        "requirement_id": "visual.drama.holistic",
+        "observable": "观众记住关系被抹去、旁人不知情、世界继续；听完四句对白及原音乐发展。预演不是最终艺术通过。",
+        "proof": "human",
+        "visual_dimension": "holistic"
+      }
+    ]
+  },
+  "frames": [
+    {
+      "path": "frames/00001000.jpg",
+      "timestamp_ms": 1000,
+      "frame_sha256": "7126fa941b0002468c0819c9cde90e68ea168d5a6567f5294df7fb7c180a02fc",
+      "render_output_sha256": "1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6"
+    },
+    {
+      "path": "frames/00002960.jpg",
+      "timestamp_ms": 2960,
+      "frame_sha256": "58359e16a8231de41ba408df6c86868f3924f94825f17935548335982402f397",
+      "render_output_sha256": "1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6"
+    },
+    {
+      "path": "frames/00003040.jpg",
+      "timestamp_ms": 3040,
+      "frame_sha256": "64dece9d9f16dc94a986e5716c461c7c16f76bb930cfc2cefe968610a1d6c613",
+      "render_output_sha256": "1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6"
+    },
+    {
+      "path": "frames/00010625.jpg",
+      "timestamp_ms": 10625,
+      "frame_sha256": "096369c9dd2996875c364d7c65c29687d71c6e4304f4362901dbd82a80262835",
+      "render_output_sha256": "1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6"
+    },
+    {
+      "path": "frames/00010710.jpg",
+      "timestamp_ms": 10710,
+      "frame_sha256": "6667a3dd337ff2eaf0462832ab3c0d5495c936022ed72155a2b380891d9caa30",
+      "render_output_sha256": "1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6"
+    },
+    {
+      "path": "frames/00013375.jpg",
+      "timestamp_ms": 13375,
+      "frame_sha256": "8b694b9d08b4ba8c5f4451c55633493c92ff91d03cefd50acc35da309aff65f1",
+      "render_output_sha256": "1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6"
+    },
+    {
+      "path": "frames/00013460.jpg",
+      "timestamp_ms": 13460,
+      "frame_sha256": "5b58fde9ef4babb2f024c83023a67cf6c075329e89cd0162a5e9d74dd2ded367",
+      "render_output_sha256": "1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6"
+    },
+    {
+      "path": "frames/00014420.jpg",
+      "timestamp_ms": 14420,
+      "frame_sha256": "2748ef8ed33e6bb057e72f9deab3e32c78925baf6ae9dfe2f98af1734d659f8b",
+      "render_output_sha256": "1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6"
+    },
+    {
+      "path": "frames/00014550.jpg",
+      "timestamp_ms": 14550,
+      "frame_sha256": "1fdf743792b252796761ef524c313406811e3c03f53c9e74ceb05114908b89d6",
+      "render_output_sha256": "1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6"
+    },
+    {
+      "path": "frames/00021375.jpg",
+      "timestamp_ms": 21375,
+      "frame_sha256": "722f6519d8c37bf1e80a005823570e76306f90ea78047fd592c0591212b53e9d",
+      "render_output_sha256": "1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6"
+    },
+    {
+      "path": "frames/00021460.jpg",
+      "timestamp_ms": 21460,
+      "frame_sha256": "f46cb3cc5bf48bb579b0a620007838cd0564a203b066d78f49070844a38a4323",
+      "render_output_sha256": "1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6"
+    },
+    {
+      "path": "frames/00024375.jpg",
+      "timestamp_ms": 24375,
+      "frame_sha256": "00abdad946ac4364ab7e3104124759bdf293162f98c8c30dc237ee2fa2bd239e",
+      "render_output_sha256": "1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6"
+    },
+    {
+      "path": "frames/00024460.jpg",
+      "timestamp_ms": 24460,
+      "frame_sha256": "879318dc91332c130fccdaf8a8df13df0a4bb35d292a3ad131a3e10eee0856be",
+      "render_output_sha256": "1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6"
+    },
+    {
+      "path": "frames/00026900.jpg",
+      "timestamp_ms": 26900,
+      "frame_sha256": "8c17d306b46845d44c202f02d6fa99c6f4204f3e0338edcd2f85eb4a114363f6",
+      "render_output_sha256": "1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6"
+    }
+  ],
+  "content_kind": "drama",
+  "goal_binding": {
+    "path": "creative/goal-binding.json",
+    "sha256": "5df365a810045526812ebcbac4c3f1dc6114ace6ffa82a3c1b5e82d541334bff",
+    "creative_input": {
+      "path": "creative-input.txt",
+      "sha256": "f840d5d0ff660dfcfc3039828b338a47956ed4c9586cd2176473fd206e6185a3"
+    },
+    "coverage": {
+      "path": "director-coverage.json",
+      "sha256": "cf24165cb1c39977e16f865fb3eef259a8ae79d03d6fe5b96015ee3ea5ed9058"
+    },
+    "final_output_contract": {
+      "path": "final-output-contract.json",
+      "sha256": "7099e2004396ae0207610b91bc2be15c02134a89a77760663700ec69d229f7d1"
+    }
+  },
+  "timeline_snapshot": {
+    "path": "timeline.json",
+    "sha256": "a495e220e59a525b2d96fbf9ff85166231be6bd127708c75f9d956310bbe1554",
+    "content_hash": "e2f4f7c64797a82c138de283bdb7d9c97d35da8a13e20d1f75c05027f63173ea",
+    "composition_fingerprint": "4e176464ce79a90aa05f43e59bb4d86c47e3b23521284e488313b944399f27b5",
+    "total_frames": 658,
+    "fps": 24,
+    "sample_rate": 48000
+  },
+  "render_report_snapshot": {
+    "path": "render-report.json",
+    "sha256": "6e68016f7261de23ca95089b755138a0d042f92eba0f47fb182605346306d42c",
+    "video_sha256": "1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6",
+    "timeline_fingerprint": "4e176464ce79a90aa05f43e59bb4d86c47e3b23521284e488313b944399f27b5",
+    "duration_frames": 658,
+    "fps_num": 24,
+    "fps_den": 1
+  },
+  "junction_inventory": [
+    {
+      "junction_id": "b74730b78353346b9e55b3c08a4f55706f2ca4a15f8da2ccad30b124da41af8b",
+      "from_shot_id": "WORLD-IN",
+      "to_shot_id": "CO-A1",
+      "transition_kind": "cut",
+      "transition_duration_frames": 0,
+      "frame": 72,
+      "time_ms": 3000,
+      "sample": 144000,
+      "visual_spans": [
+        {
+          "layer_id": "stock-WORLD-IN",
+          "shot_id": "WORLD-IN",
+          "asset_id": "stock-social-street",
+          "asset_sha256": "a08d10ae18be81b8b9f1dc965a608f9262e12d91c5989e519a5ddef6aa2af8e8",
+          "start_frame": 0,
+          "duration_frames": 72,
+          "trim_start_frame": 0,
+          "trim_duration_frames": 72,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        {
+          "layer_id": "original-visual-CO-A1",
+          "shot_id": "CO-A1",
+          "asset_id": "CO-A1-review-video",
+          "asset_sha256": "b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd",
+          "start_frame": 72,
+          "duration_frames": 184,
+          "trim_start_frame": 8,
+          "trim_duration_frames": 184,
+          "opacity_milli": 1000,
+          "z_index": 0
+        }
+      ],
+      "audio_window_start_sample": 96000,
+      "audio_window_end_sample": 192000,
+      "audio_spans": [
+        {
+          "track_id": "world-in-rain",
+          "audio_kind": "ambience",
+          "asset_id": "rain-public-domain",
+          "asset_sha256": "a3194c0c98762ce713bfa30d052899b2fccbdf7b6e81de45c65de586ac58d76d",
+          "start_sample": 0,
+          "duration_samples": 144000,
+          "source_start_sample": 0,
+          "source_duration_samples": 144000,
+          "gain_millidb": -16000,
+          "fade_in_samples": 12000,
+          "fade_out_samples": 12000
+        },
+        {
+          "track_id": "original-mix-CO-A1",
+          "audio_kind": "dialogue",
+          "asset_id": "CO-A1-original-mix",
+          "asset_sha256": "43744ec92c9143d139eb37254680c97b763fa8d0d269367b2ebccfb4c59eb254",
+          "start_sample": 144000,
+          "duration_samples": 368000,
+          "source_start_sample": 16000,
+          "source_duration_samples": 368000,
+          "gain_millidb": 0,
+          "fade_in_samples": 0,
+          "fade_out_samples": 0
+        }
+      ]
+    },
+    {
+      "junction_id": "4187742a9772954b5605fe54c1aa5cacdf0d47dba41e33c8d65b89d745720f99",
+      "from_shot_id": "CO-A1",
+      "to_shot_id": "CO-A2",
+      "transition_kind": "cut",
+      "transition_duration_frames": 0,
+      "frame": 256,
+      "time_ms": 10666,
+      "sample": 512000,
+      "visual_spans": [
+        {
+          "layer_id": "original-visual-CO-A1",
+          "shot_id": "CO-A1",
+          "asset_id": "CO-A1-review-video",
+          "asset_sha256": "b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd",
+          "start_frame": 72,
+          "duration_frames": 184,
+          "trim_start_frame": 8,
+          "trim_duration_frames": 184,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        {
+          "layer_id": "original-visual-CO-A2",
+          "shot_id": "CO-A2",
+          "asset_id": "CO-A2-review-video",
+          "asset_sha256": "0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c",
+          "start_frame": 256,
+          "duration_frames": 66,
+          "trim_start_frame": 30,
+          "trim_duration_frames": 66,
+          "opacity_milli": 1000,
+          "z_index": 0
+        }
+      ],
+      "audio_window_start_sample": 464000,
+      "audio_window_end_sample": 560000,
+      "audio_spans": [
+        {
+          "track_id": "original-mix-CO-A1",
+          "audio_kind": "dialogue",
+          "asset_id": "CO-A1-original-mix",
+          "asset_sha256": "43744ec92c9143d139eb37254680c97b763fa8d0d269367b2ebccfb4c59eb254",
+          "start_sample": 144000,
+          "duration_samples": 368000,
+          "source_start_sample": 16000,
+          "source_duration_samples": 368000,
+          "gain_millidb": 0,
+          "fade_in_samples": 0,
+          "fade_out_samples": 0
+        },
+        {
+          "track_id": "original-mix-CO-A2",
+          "audio_kind": "dialogue",
+          "asset_id": "CO-A2-original-mix",
+          "asset_sha256": "1d2744e055589c7bce382dbb8e0c3cef88cab6ea6b5891e417ac8176c13ea6d0",
+          "start_sample": 512000,
+          "duration_samples": 132000,
+          "source_start_sample": 60000,
+          "source_duration_samples": 132000,
+          "gain_millidb": 0,
+          "fade_in_samples": 0,
+          "fade_out_samples": 0
+        }
+      ]
+    },
+    {
+      "junction_id": "89b334896fd7f0e1639204fda9ccdc9ad245f6f34493740adcfad6200808bdd8",
+      "from_shot_id": "CO-A2",
+      "to_shot_id": "CO-A3",
+      "transition_kind": "cut",
+      "transition_duration_frames": 0,
+      "frame": 322,
+      "time_ms": 13416,
+      "sample": 644000,
+      "visual_spans": [
+        {
+          "layer_id": "original-visual-CO-A2",
+          "shot_id": "CO-A2",
+          "asset_id": "CO-A2-review-video",
+          "asset_sha256": "0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c",
+          "start_frame": 256,
+          "duration_frames": 66,
+          "trim_start_frame": 30,
+          "trim_duration_frames": 66,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        {
+          "layer_id": "original-visual-CO-A3",
+          "shot_id": "CO-A3",
+          "asset_id": "CO-A3-review-video",
+          "asset_sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+          "start_frame": 322,
+          "duration_frames": 192,
+          "trim_start_frame": 336,
+          "trim_duration_frames": 192,
+          "opacity_milli": 1000,
+          "z_index": 0
+        }
+      ],
+      "audio_window_start_sample": 596000,
+      "audio_window_end_sample": 692000,
+      "audio_spans": [
+        {
+          "track_id": "original-mix-CO-A2",
+          "audio_kind": "dialogue",
+          "asset_id": "CO-A2-original-mix",
+          "asset_sha256": "1d2744e055589c7bce382dbb8e0c3cef88cab6ea6b5891e417ac8176c13ea6d0",
+          "start_sample": 512000,
+          "duration_samples": 132000,
+          "source_start_sample": 60000,
+          "source_duration_samples": 132000,
+          "gain_millidb": 0,
+          "fade_in_samples": 0,
+          "fade_out_samples": 0
+        },
+        {
+          "track_id": "original-mix-CO-A3",
+          "audio_kind": "dialogue",
+          "asset_id": "CO-A3-original-mix",
+          "asset_sha256": "7bb88946466b0681a2d4d1b6f1f0303e3631a5574a51e919f557d248967ef4d7",
+          "start_sample": 644000,
+          "duration_samples": 384000,
+          "source_start_sample": 672000,
+          "source_duration_samples": 384000,
+          "gain_millidb": 0,
+          "fade_in_samples": 0,
+          "fade_out_samples": 0
+        }
+      ]
+    },
+    {
+      "junction_id": "e0dd5f50e9245e059774ec234e19c08cd4f957a8a9c224aafb985471e7b2d8c3",
+      "from_shot_id": "CO-A3",
+      "to_shot_id": "WORLD-OUT",
+      "transition_kind": "cut",
+      "transition_duration_frames": 0,
+      "frame": 514,
+      "time_ms": 21416,
+      "sample": 1028000,
+      "visual_spans": [
+        {
+          "layer_id": "original-visual-CO-A3",
+          "shot_id": "CO-A3",
+          "asset_id": "CO-A3-review-video",
+          "asset_sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+          "start_frame": 322,
+          "duration_frames": 192,
+          "trim_start_frame": 336,
+          "trim_duration_frames": 192,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        {
+          "layer_id": "stock-WORLD-OUT",
+          "shot_id": "WORLD-OUT",
+          "asset_id": "stock-social-street",
+          "asset_sha256": "a08d10ae18be81b8b9f1dc965a608f9262e12d91c5989e519a5ddef6aa2af8e8",
+          "start_frame": 514,
+          "duration_frames": 144,
+          "trim_start_frame": 94,
+          "trim_duration_frames": 144,
+          "opacity_milli": 1000,
+          "z_index": 0
+        }
+      ],
+      "audio_window_start_sample": 980000,
+      "audio_window_end_sample": 1076000,
+      "audio_spans": [
+        {
+          "track_id": "original-mix-CO-A3",
+          "audio_kind": "dialogue",
+          "asset_id": "CO-A3-original-mix",
+          "asset_sha256": "7bb88946466b0681a2d4d1b6f1f0303e3631a5574a51e919f557d248967ef4d7",
+          "start_sample": 644000,
+          "duration_samples": 384000,
+          "source_start_sample": 672000,
+          "source_duration_samples": 384000,
+          "gain_millidb": 0,
+          "fade_in_samples": 0,
+          "fade_out_samples": 0
+        },
+        {
+          "track_id": "missing-response-after-reveal",
+          "audio_kind": "bgm",
+          "asset_id": "two-passengers-missing-response-B",
+          "asset_sha256": "88585bd2a3a9d44680f1a1a2667145839fa5166363c36260d2963ed8bd05a425",
+          "start_sample": 900000,
+          "duration_samples": 416000,
+          "source_start_sample": 0,
+          "source_duration_samples": 416000,
+          "gain_millidb": -10000,
+          "fade_in_samples": 24000,
+          "fade_out_samples": 48000
+        },
+        {
+          "track_id": "world-out-rain",
+          "audio_kind": "ambience",
+          "asset_id": "rain-public-domain",
+          "asset_sha256": "a3194c0c98762ce713bfa30d052899b2fccbdf7b6e81de45c65de586ac58d76d",
+          "start_sample": 1028000,
+          "duration_samples": 288000,
+          "source_start_sample": 480000,
+          "source_duration_samples": 288000,
+          "gain_millidb": -18000,
+          "fade_in_samples": 12000,
+          "fade_out_samples": 48000
+        }
+      ]
+    }
+  ],
+  "junction_inventory_sha256": "7a97e7c8c7afaf5cfb9f7e96410cd878f62e895b081b06897494ac3186be1a8b",
+  "subject_hash": "aba0ec47aeeebcf7da6526f5d405688204250b5337a15dcbaf31f7ddeb496394"
+}

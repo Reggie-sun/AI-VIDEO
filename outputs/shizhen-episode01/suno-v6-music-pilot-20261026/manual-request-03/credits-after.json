@@ -1,0 +1,10 @@
+{
+  "recorded_at": "2026-10-25T21:14:30.614653+00:00",
+  "exit_code": 0,
+  "status": "success",
+  "data": {
+    "total_credits_left": 2490,
+    "monthly_usage": 10
+  },
+  "no_topup": true
+}

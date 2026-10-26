@@ -1,0 +1,11 @@
+{
+  "request_id": "2bb1b69e-5366-5a31-b413-95c938d4767f",
+  "payload_sha256": "3b18721b7b19a37467882c390528252bc985c460d75a3994911dd12464cf3483",
+  "submitted": false,
+  "charged": false,
+  "model_verified_live": false,
+  "external_model_key": "chirp-hawk",
+  "clip_ids": [],
+  "state": "dry_ran",
+  "detail": "离线校验完成，没有认证、提交或扣费。"
+}

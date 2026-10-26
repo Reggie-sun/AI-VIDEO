@@ -2,6 +2,10 @@
 
 Date: 2026-10-27
 
+## AOCI Supersession — 2026-10-27
+
+下方 AOCI stopped/blocked 状态为实现交付时的历史事实，现由[后续维护记录](2026-10-27-aoci-cognition-maintenance.md)取代：19 个 stale 条目已更新，observe 变化经复核，官方 Verify/Check/Guide 已证明当前共享工作区 aligned。此更新不改变原工程回归限制、真实媒体未验收状态，也不证明远端 clean checkout 对齐。
+
 ## Implemented Boundary
 
 本次新增规则已接入 Director/Canvas → VideoPlanner → neutral requirement → Router → native compiler → QA diagnosis。详细契约见 [Shot Reference Planning](../shot-reference-planning.md)，实现计划见 [plan](../superpowers/plans/2026-10-27-shot-reference-planning.md)。`GenerationIntent.reference_planning` 显式启用执行约束；历史缺省字段保持原序列化与执行路径，只输出 advisory 建议。

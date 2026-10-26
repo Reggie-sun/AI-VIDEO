@@ -1,0 +1,39 @@
+{
+  "nodes": [
+    {
+      "id": "co-before-image-node",
+      "type": "image",
+      "data": {
+        "resourceId": "co-before-local-generated"
+      }
+    },
+    {
+      "id": "co-truck-image-node",
+      "type": "image",
+      "data": {
+        "resourceId": "co-truck-local-generated"
+      }
+    },
+    {
+      "id": "co-before",
+      "type": "video",
+      "data": {
+        "generationDraft": {
+          "parts": [
+            {
+              "type": "text",
+              "text": "罗敏对电话自然说：“师傅，我们在站里，两位。”高峥听见接车，望湿路说：“让他别急，路滑。”她听完看他一眼，继续听电话，不重复转述。随后普通灰白厢式货车从镜头极近前景左向右经过，不停车不开门，车厢逐渐遮住两人和站棚，最后侧板完整填满画面。人物不走开、不上车、不消失或变透明。"
+            }
+          ],
+          "contentSettings": {
+            "resolution": "1080p",
+            "durationSeconds": 8,
+            "aspectRatio": "16:9"
+          },
+          "references": []
+        }
+      }
+    }
+  ],
+  "edges": []
+}

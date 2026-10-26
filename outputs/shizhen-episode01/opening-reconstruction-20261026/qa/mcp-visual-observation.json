@@ -1,0 +1,15 @@
+{
+  "authority": "derived_summary_of_actual_project_local_MCP_call",
+  "source_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870",
+  "tool": "video-analysis.video_review",
+  "parameters": {
+    "frame_interval": 0.25,
+    "max_frames": 110,
+    "transcribe_audio": false
+  },
+  "actual_frames_extracted": 103,
+  "actual_resolution": "1920x1080",
+  "actual_duration_seconds": 25.667,
+  "issues": [],
+  "proof_boundary": "Empty tool issues is not artistic or audio acceptance"
+}

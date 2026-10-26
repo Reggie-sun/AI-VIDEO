@@ -1,0 +1,27 @@
+{
+  "status": "ALTERNATIVE_STILL_DESIGN_ONLY",
+  "images": [
+    {
+      "path": "umbrella-study/before-001.png",
+      "sha256": "b922c90154912e3a84d7d373364abf518748e2edf04000b7a1cac31c355eac14",
+      "size_bytes": 2713803,
+      "source_surface": "codex_imagegen_tool",
+      "source_file": "exec-4a03786b-ecfc-41d5-a633-bc8d645df10c.png",
+      "media_type": "image/png",
+      "role": "before_state",
+      "video_motion_evidence": false
+    },
+    {
+      "path": "umbrella-study/after-001.png",
+      "sha256": "a7dd3e5af6db12cd9f1baaa5cc75af47dbada30bec0b89449bc9d34d72fe4621",
+      "size_bytes": 2585801,
+      "source_surface": "codex_imagegen_tool",
+      "source_file": "exec-23065460-980f-40b6-9d49-6876c87d28c2.png",
+      "media_type": "image/png",
+      "role": "after_state",
+      "video_motion_evidence": false
+    }
+  ],
+  "not_a_replacement_for_bus_stop": true,
+  "new_video_generation_calls": 0
+}

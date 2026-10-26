@@ -1,0 +1,184 @@
+{
+  "evaluator_name": "pending",
+  "strength": "explicit_evaluator",
+  "observation": {
+    "contract_hash": "b122983653acb8806923b36a9c98483412ad8480f90f46fe47976d1e7bf71630",
+    "review_request_content_hash": "304cd6666becc362d81607ca4ae8914da2833d0e9388a95a451aa03cb1727c2c",
+    "viewing_mode": "sampled_frames",
+    "visual_frame_inventory": {
+      "duration_ms": 3000,
+      "frames": [
+        {
+          "timestamp_ms": 0,
+          "frame_sha256": "dc5b6150d68e9712c5360d625943e89f1af73b1508fdc4f1f4f2f63f113eea39",
+          "render_output_sha256": "3628e4b755f48a5025e57cdc02cb37a4a258fa8a4de6e7eb8d89f4ae4659db65"
+        },
+        {
+          "timestamp_ms": 250,
+          "frame_sha256": "c097462cd65e5b04d5a5952519de5f55c942628d84bba3a6465ae4c7c1be2204",
+          "render_output_sha256": "3628e4b755f48a5025e57cdc02cb37a4a258fa8a4de6e7eb8d89f4ae4659db65"
+        },
+        {
+          "timestamp_ms": 500,
+          "frame_sha256": "b0f1ee5330f034da743fa6db5bb8dcaa717e89abb4131eec247aef0fb031ac49",
+          "render_output_sha256": "3628e4b755f48a5025e57cdc02cb37a4a258fa8a4de6e7eb8d89f4ae4659db65"
+        },
+        {
+          "timestamp_ms": 850,
+          "frame_sha256": "c35eb07bb3ec36496864d490dd4b67ac76afa7d4f3457dfa9a5b2ea12a9dc8cb",
+          "render_output_sha256": "3628e4b755f48a5025e57cdc02cb37a4a258fa8a4de6e7eb8d89f4ae4659db65"
+        },
+        {
+          "timestamp_ms": 1300,
+          "frame_sha256": "1f95325caebbed6c831526d3664d455beb4c30ab4ce46eb3eb7aa74ab89bda9d",
+          "render_output_sha256": "3628e4b755f48a5025e57cdc02cb37a4a258fa8a4de6e7eb8d89f4ae4659db65"
+        },
+        {
+          "timestamp_ms": 2000,
+          "frame_sha256": "d69578a88ae9582a8a67c9c9e6b6428ffd64521870d389349bef65fbc280748d",
+          "render_output_sha256": "3628e4b755f48a5025e57cdc02cb37a4a258fa8a4de6e7eb8d89f4ae4659db65"
+        },
+        {
+          "timestamp_ms": 2800,
+          "frame_sha256": "fcc742cdf548106cf74a616229fa876d4ba6c18802f96754c8ba90bdd0591e5f",
+          "render_output_sha256": "3628e4b755f48a5025e57cdc02cb37a4a258fa8a4de6e7eb8d89f4ae4659db65"
+        },
+        {
+          "timestamp_ms": 2958,
+          "frame_sha256": "36eea2265abda3a85389625fddd53672953f1cf101a642770a336be8dd55d76f",
+          "render_output_sha256": "3628e4b755f48a5025e57cdc02cb37a4a258fa8a4de6e7eb8d89f4ae4659db65"
+        }
+      ]
+    },
+    "viewing_speed_milli": null,
+    "findings": [
+      {
+        "requirement_id": "intent-01",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-02",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-03",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-04",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-05",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-06",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-07",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-08",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-09",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-10",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-11",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-12",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-13",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-14",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-15",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "intent-16",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "visual.drama.typography",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "visual.drama.palette",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "visual.drama.layout",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "visual.drama.style",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "visual.drama.holistic",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      }
+    ]
+  },
+  "junction_findings": []
+}

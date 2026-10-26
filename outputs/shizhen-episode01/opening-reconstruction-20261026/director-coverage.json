@@ -1,0 +1,746 @@
+{
+  "schema_version": "4",
+  "request": {
+    "creative_input_kind": "direction",
+    "creative_input_evidence": "https://vimeo.com/84017154?utm_source=chatgpt.com  https://www.youtube.com/watch?v=NmS3m0OG-Ug https://www.youtube.com/watch?v=rLSH-81yT7s\n# 《失帧》视觉开场重构：从静态概念片到电影级视听叙事\n\n请接管《失帧》当前视觉开场制作，先审看最新的 `失帧-视觉方向-C-概念片.mp4`、对应海报、现有 Shot、原音乐、剧本及导演设计。\n目前方向 C 已经具备一定的视觉设计基础，但整体仍缺少真正成熟的电影表现力。\n本次不是简单优化字体、双重曝光或转场，而是重新审视整段开场的视觉叙事。\n\n## 一、参考作品\n重点研究以下三部作品的片头设计：\n- 《真探》第一季：影像层次、人物与环境的关系、双重曝光、剪辑节奏。\n- 《人生切割术》第一季：超现实视觉事件、空间变化、连续运动和世界观的视觉呈现。\n- 《守望尘世》第二季：缺失、记忆、人物消失与日常影像之间的情绪关系。\n请主动研究其片头的镜头组织、构图、节奏、音乐与文字结合方法。\n参考的是创作方法和艺术水准，不是复刻镜头、使用原作素材或照搬视觉风格。\n\n## 二、当前版本存在的问题\n目前 9 秒概念片主要依靠人物剪影、雨夜纹理、双重曝光、中文标题及简单转场构成。\n它具有一定的平面设计感，但缺乏真正的镜头叙事推进。\n人物与环境之间没有发生足够有意义的变化，画面长时间停留在相似构图中，视觉表达停留在漂亮的概念包装层面。\n当前的“失帧”文字虽然进行了大小和位置上的变化，却仍然与画面事件相对独立。\n请不要把本次任务理解为继续增加文字动画、蒙版、噪点、镜头数量或者特效复杂度。\n真正的问题是：观众看到了设计，却没有经历一个正在发生的异常。\n\n## 三、重新建立核心创作方向\n《失帧》的开场应该让观众感觉到：\n世界表面上依然正常运转，但现实正在悄无声息地发生某种不合理的变化。\n希望从更大的世界尺度，逐渐收束到具体空间和极其细微的异常。\n让观众从感受到不协调，逐渐进入怀疑、困惑与不安。\n异常不仅需要被看见，还需要通过镜头前后的关系被感知。\n比如，一个正常场景发生了观众能够察觉、但画面中其他人完全没有意识到的变化，这可能比大量闪屏、噪点和视觉故障更具有力量。\n这只是导演思考方向，不要求机械实现这一示例。\n请根据《失帧》的剧本与信息揭示边界，自主寻找更具有表现力的电影语言。\n\n## 四、突破目前的视觉形式\n不再要求继续沿用白色背景、人物剪影、城市纹理、黑色宋体和水平线转场。\n方向 C 中有价值的素材可以保留，但不能让既有视觉形式限制新方案。\n允许探索真实摄影、空间异常、时间错位、光学表现、环境变化、非对称构图、视觉隐喻和实验性排字。\n重点是让不同镜头之间产生叙事联系，让画面本身推动观众理解这个世界，而不是一系列独立设计作品的展示。\n字体也应具有更强的电影美术品质，并与镜头事件、空间和剪辑节奏形成联系。\n不必追求所有镜头都有文字，也不要为了展现 Typography Skill 而制造无意义的文字动画。\n\n## 五、音乐与既有素材\n保留此前已确认的音乐，将其作为新版开场的核心声音素材。\n根据音乐的结构、情绪和节奏重新组织视觉内容，必要时进行合理延展、混音和环境音设计。\n现有 Shot 与方向 C 概念片中的有效画面也应作为可复用素材，而非全部废弃。\n但保留不意味着必须完整使用原来的 9 秒，可以根据新镜头结构进行拆分、重组与重新剪辑。\n希望新增宏观镜头、已有画面、关键文字和音乐形成统一的视听体验。\n\n## 六、导演与 Skill 协作\n优先调用当前项目和 Codex 已安装的专业 Skills。\n导演体系负责叙事、镜头与视听整体判断；Motion Design、Kinetic Typography、剪辑及合成能力负责对应的专业实现。\n不要重新开发一套重复的 Skill，不要为了调用某个 Skill 而改变作品应该采用的视觉形式。\n本次更重视导演判断、镜头表现和最终观看感受，而非技术模块数量。\n\n## 七、实际制作与审查\n请先分析原片为什么缺乏情绪感染力，找出真正的结构问题。\n随后探索具有明显艺术差异的视觉方案，选出最符合《失帧》的方向，实际推进制作。\n不预设固定镜头数量、精确时长或必须使用的特效。\n允许显著扩展开场，但时长必须由叙事节奏决定，不得单纯填充镜头。\n请在既有素材及已授权工具范围内完成尽可能充分的动态预演、剪辑、字体合成、音乐组织及可观看样片。\n对于尚无素材的镜头，准备可生产的导演设计和生成输入。未经明确授权不要产生新的视频生成费用；预演和最终成片必须清楚区分。\n最终请以真实的视频观看结果进行审查，特别关注：\n- 画面是否真正发生了有意义的事件。\n- 镜头之间是否有视觉、因果或情绪联系。\n- 是否具有宏观到微观的叙事纵深。\n- 是否产生足够强的悬疑感、陌生感和电影感。\n- 字体是否成为影像艺术的一部分。\n- 音乐是否真正参与了情绪和节奏构建。\n- 是否出现静态海报堆叠、廉价特效或过于模板化的 AI 视频设计。\n不得将技术测试通过、字体清晰或者渲染成功等同于艺术审查通过。\n最终目标：让观众不是在看一段关于“失帧”的视觉设计，而是在这段开场中亲眼经历某种无法解释的现实异常。\n请自主完成必要的导演分析、创作探索、可执行实施与验证，不要仅交付概念文档。\n",
+    "creative_constraints": [
+      {
+        "constraint_id": "source-review",
+        "scope": "global",
+        "source_text": "先审看最新的 `失帧-视觉方向-C-概念片.mp4`、对应海报、现有 Shot、原音乐、剧本及导演设计。"
+      },
+      {
+        "constraint_id": "references",
+        "scope": "global",
+        "source_text": "请主动研究其片头的镜头组织、构图、节奏、音乐与文字结合方法。"
+      },
+      {
+        "constraint_id": "originality",
+        "scope": "global",
+        "source_text": "参考的是创作方法和艺术水准，不是复刻镜头、使用原作素材或照搬视觉风格。"
+      },
+      {
+        "constraint_id": "structure",
+        "scope": "global",
+        "source_text": "真正的问题是：观众看到了设计，却没有经历一个正在发生的异常。"
+      },
+      {
+        "constraint_id": "ordinary-world",
+        "scope": "global",
+        "source_text": "世界表面上依然正常运转，但现实正在悄无声息地发生某种不合理的变化。"
+      },
+      {
+        "constraint_id": "scale",
+        "scope": "global",
+        "source_text": "希望从更大的世界尺度，逐渐收束到具体空间和极其细微的异常。"
+      },
+      {
+        "constraint_id": "emotion",
+        "scope": "global",
+        "source_text": "让观众从感受到不协调，逐渐进入怀疑、困惑与不安。"
+      },
+      {
+        "constraint_id": "relations",
+        "scope": "global",
+        "source_text": "异常不仅需要被看见，还需要通过镜头前后的关系被感知。"
+      },
+      {
+        "constraint_id": "reveal-boundary",
+        "scope": "global",
+        "source_text": "请根据《失帧》的剧本与信息揭示边界，自主寻找更具有表现力的电影语言。"
+      },
+      {
+        "constraint_id": "freedom",
+        "scope": "global",
+        "source_text": "不再要求继续沿用白色背景、人物剪影、城市纹理、黑色宋体和水平线转场。"
+      },
+      {
+        "constraint_id": "type",
+        "scope": "global",
+        "source_text": "字体也应具有更强的电影美术品质，并与镜头事件、空间和剪辑节奏形成联系。"
+      },
+      {
+        "constraint_id": "type-restraint",
+        "scope": "global",
+        "source_text": "不必追求所有镜头都有文字，也不要为了展现 Typography Skill 而制造无意义的文字动画。"
+      },
+      {
+        "constraint_id": "music",
+        "scope": "global",
+        "source_text": "保留此前已确认的音乐，将其作为新版开场的核心声音素材。"
+      },
+      {
+        "constraint_id": "mix",
+        "scope": "global",
+        "source_text": "根据音乐的结构、情绪和节奏重新组织视觉内容，必要时进行合理延展、混音和环境音设计。"
+      },
+      {
+        "constraint_id": "reuse",
+        "scope": "global",
+        "source_text": "现有 Shot 与方向 C 概念片中的有效画面也应作为可复用素材，而非全部废弃。"
+      },
+      {
+        "constraint_id": "skills",
+        "scope": "global",
+        "source_text": "不要重新开发一套重复的 Skill，不要为了调用某个 Skill 而改变作品应该采用的视觉形式。"
+      },
+      {
+        "constraint_id": "explore",
+        "scope": "global",
+        "source_text": "随后探索具有明显艺术差异的视觉方案，选出最符合《失帧》的方向，实际推进制作。"
+      },
+      {
+        "constraint_id": "timing",
+        "scope": "global",
+        "source_text": "不预设固定镜头数量、精确时长或必须使用的特效。"
+      },
+      {
+        "constraint_id": "dynamic",
+        "scope": "global",
+        "source_text": "请在既有素材及已授权工具范围内完成尽可能充分的动态预演、剪辑、字体合成、音乐组织及可观看样片。"
+      },
+      {
+        "constraint_id": "missing",
+        "scope": "global",
+        "source_text": "对于尚无素材的镜头，准备可生产的导演设计和生成输入。"
+      },
+      {
+        "constraint_id": "no-video-fee",
+        "scope": "global",
+        "source_text": "未经明确授权不要产生新的视频生成费用；预演和最终成片必须清楚区分。"
+      },
+      {
+        "constraint_id": "no-template",
+        "scope": "global",
+        "source_text": "是否出现静态海报堆叠、廉价特效或过于模板化的 AI 视频设计。"
+      },
+      {
+        "constraint_id": "art-review",
+        "scope": "global",
+        "source_text": "不得将技术测试通过、字体清晰或者渲染成功等同于艺术审查通过。"
+      }
+    ],
+    "target_duration_seconds": 25.666666666666668,
+    "coverage_strategy": "multi_shot",
+    "strategy_source": "agent_directed",
+    "director_decision_rationale": "由尺度、关系、遮挡和后态比较分镜；镜长来自已有完整动作与观察需要，不按模型上限或固定镜数。缺正式同街宏观/微距素材继续保留，不以预演关闭最终目标。",
+    "strategy_request_evidence": null,
+    "director_skill": "open-video"
+  },
+  "coverage_units": [
+    {
+      "unit_id": "CITY",
+      "duration_seconds": 5.25,
+      "beat_function": "establish",
+      "objective": "城市的交通与灯光正常延续，观众先接受现实秩序",
+      "open_state": "完整的夜间城市，尚无异常",
+      "close_state": "目光被道路连续灯带引向街面",
+      "shot_scale": "extreme_wide",
+      "camera_treatment": "tracking",
+      "camera_intent": "真实航拍临时动态预演；正式版需匹配临江市雨夜",
+      "visible_change": "航拍平移改变街区和道路的可见关系，不冻结或清空城市",
+      "transition_out": "cut",
+      "constraint_ids": [
+        "source-review",
+        "references",
+        "originality",
+        "structure",
+        "ordinary-world",
+        "scale",
+        "emotion",
+        "relations",
+        "reveal-boundary",
+        "freedom",
+        "type",
+        "type-restraint",
+        "music",
+        "mix",
+        "reuse",
+        "skills",
+        "explore",
+        "timing",
+        "dynamic",
+        "missing",
+        "no-video-fee",
+        "no-template",
+        "art-review"
+      ]
+    },
+    {
+      "unit_id": "ROAD",
+      "duration_seconds": 2.75,
+      "beat_function": "detail",
+      "objective": "将城市道路上的运动压缩到一次近距离横向车辆经过",
+      "open_state": "车辆沿道路前进",
+      "close_state": "横向车身建立下一次遮挡的普通性",
+      "shot_scale": "close_up",
+      "camera_treatment": "static",
+      "camera_intent": "低机位道路stock作temporary previs，不假称同街空间",
+      "visible_change": "实拍轮胎和车身经过，正常交通先于不正常的缺席",
+      "transition_out": "cut",
+      "constraint_ids": [
+        "source-review",
+        "references",
+        "originality",
+        "structure",
+        "ordinary-world",
+        "scale",
+        "emotion",
+        "relations",
+        "reveal-boundary",
+        "freedom",
+        "type",
+        "type-restraint",
+        "music",
+        "mix",
+        "reuse",
+        "skills",
+        "explore",
+        "timing",
+        "dynamic",
+        "missing",
+        "no-video-fee",
+        "no-template",
+        "art-review"
+      ]
+    },
+    {
+      "unit_id": "CO-A1",
+      "duration_seconds": 7.666666666666667,
+      "beat_function": "establish",
+      "objective": "先让观众记住两人彼此注意的普通关系，再完整被车厢遮住",
+      "open_state": "男人与打电话的女人在同一站棚",
+      "close_state": "男人对女人的关注已发生，货车覆盖两人",
+      "shot_scale": "full",
+      "camera_treatment": "static",
+      "camera_intent": "保留已生成双人表演原速和相互视线，不加剪影或片名分散注意",
+      "visible_change": "男人转向，女人回看，然后普通货车进入并完整遮挡",
+      "transition_out": "cut",
+      "constraint_ids": [
+        "source-review",
+        "references",
+        "originality",
+        "structure",
+        "ordinary-world",
+        "scale",
+        "emotion",
+        "relations",
+        "reveal-boundary",
+        "freedom",
+        "type",
+        "type-restraint",
+        "music",
+        "mix",
+        "reuse",
+        "skills",
+        "explore",
+        "timing",
+        "dynamic",
+        "missing",
+        "no-video-fee",
+        "no-template",
+        "art-review"
+      ]
+    },
+    {
+      "unit_id": "CO-A2",
+      "duration_seconds": 4,
+      "beat_function": "reveal",
+      "objective": "同一取景揭开后少一个人，女人与城市并未跟随观众震惊",
+      "open_state": "车身覆盖视野",
+      "close_state": "左侧空位与右侧继续打电话的女人同框",
+      "shot_scale": "full",
+      "camera_treatment": "static",
+      "camera_intent": "切口放在实体完全遮挡区，保留正常车身移动，不增加闪屏或消失特效",
+      "visible_change": "车尾逐步离开，原男子位置已经空了",
+      "transition_out": "cut",
+      "constraint_ids": [
+        "source-review",
+        "references",
+        "originality",
+        "structure",
+        "ordinary-world",
+        "scale",
+        "emotion",
+        "relations",
+        "reveal-boundary",
+        "freedom",
+        "type",
+        "type-restraint",
+        "music",
+        "mix",
+        "reuse",
+        "skills",
+        "explore",
+        "timing",
+        "dynamic",
+        "missing",
+        "no-video-fee",
+        "no-template",
+        "art-review"
+      ]
+    },
+    {
+      "unit_id": "CO-A3",
+      "duration_seconds": 6,
+      "beat_function": "reaction",
+      "objective": "先给空位完整观察时间，再让女人的平常状态和玻璃负空间承接片名",
+      "open_state": "一人全景与空位继续存在",
+      "close_state": "近景中女人继续生活，失帧进入她身旁负空间",
+      "shot_scale": "mixed_progression",
+      "camera_treatment": "static",
+      "camera_intent": "只用原A3的后态和原生近景切镜；不使用历史FAIL的双人前段，不伪造新微距",
+      "visible_change": "真实运动全景延续后切到近景，人物平常反应与观众记忆相冲突，最后才出现标题",
+      "transition_out": "end",
+      "constraint_ids": [
+        "source-review",
+        "references",
+        "originality",
+        "structure",
+        "ordinary-world",
+        "scale",
+        "emotion",
+        "relations",
+        "reveal-boundary",
+        "freedom",
+        "type",
+        "type-restraint",
+        "music",
+        "mix",
+        "reuse",
+        "skills",
+        "explore",
+        "timing",
+        "dynamic",
+        "missing",
+        "no-video-fee",
+        "no-template",
+        "art-review"
+      ]
+    }
+  ],
+  "intent_items": [
+    {
+      "intent_item_id": "source-review",
+      "statement": "先审看最新的 `失帧-视觉方向-C-概念片.mp4`、对应海报、现有 Shot、原音乐、剧本及导演设计。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#source-review",
+          "intent_item_id": "source-review",
+          "quote": "先审看最新的 `失帧-视觉方向-C-概念片.mp4`、对应海报、现有 Shot、原音乐、剧本及导演设计。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "references",
+      "statement": "请主动研究其片头的镜头组织、构图、节奏、音乐与文字结合方法。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#references",
+          "intent_item_id": "references",
+          "quote": "请主动研究其片头的镜头组织、构图、节奏、音乐与文字结合方法。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "originality",
+      "statement": "参考的是创作方法和艺术水准，不是复刻镜头、使用原作素材或照搬视觉风格。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#originality",
+          "intent_item_id": "originality",
+          "quote": "参考的是创作方法和艺术水准，不是复刻镜头、使用原作素材或照搬视觉风格。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "structure",
+      "statement": "真正的问题是：观众看到了设计，却没有经历一个正在发生的异常。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#structure",
+          "intent_item_id": "structure",
+          "quote": "真正的问题是：观众看到了设计，却没有经历一个正在发生的异常。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "ordinary-world",
+      "statement": "世界表面上依然正常运转，但现实正在悄无声息地发生某种不合理的变化。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#ordinary-world",
+          "intent_item_id": "ordinary-world",
+          "quote": "世界表面上依然正常运转，但现实正在悄无声息地发生某种不合理的变化。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "scale",
+      "statement": "希望从更大的世界尺度，逐渐收束到具体空间和极其细微的异常。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#scale",
+          "intent_item_id": "scale",
+          "quote": "希望从更大的世界尺度，逐渐收束到具体空间和极其细微的异常。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "emotion",
+      "statement": "让观众从感受到不协调，逐渐进入怀疑、困惑与不安。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#emotion",
+          "intent_item_id": "emotion",
+          "quote": "让观众从感受到不协调，逐渐进入怀疑、困惑与不安。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "relations",
+      "statement": "异常不仅需要被看见，还需要通过镜头前后的关系被感知。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#relations",
+          "intent_item_id": "relations",
+          "quote": "异常不仅需要被看见，还需要通过镜头前后的关系被感知。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "reveal-boundary",
+      "statement": "请根据《失帧》的剧本与信息揭示边界，自主寻找更具有表现力的电影语言。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#reveal-boundary",
+          "intent_item_id": "reveal-boundary",
+          "quote": "请根据《失帧》的剧本与信息揭示边界，自主寻找更具有表现力的电影语言。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "freedom",
+      "statement": "不再要求继续沿用白色背景、人物剪影、城市纹理、黑色宋体和水平线转场。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#freedom",
+          "intent_item_id": "freedom",
+          "quote": "不再要求继续沿用白色背景、人物剪影、城市纹理、黑色宋体和水平线转场。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "type",
+      "statement": "字体也应具有更强的电影美术品质，并与镜头事件、空间和剪辑节奏形成联系。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#type",
+          "intent_item_id": "type",
+          "quote": "字体也应具有更强的电影美术品质，并与镜头事件、空间和剪辑节奏形成联系。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "type-restraint",
+      "statement": "不必追求所有镜头都有文字，也不要为了展现 Typography Skill 而制造无意义的文字动画。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#type-restraint",
+          "intent_item_id": "type-restraint",
+          "quote": "不必追求所有镜头都有文字，也不要为了展现 Typography Skill 而制造无意义的文字动画。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "music",
+      "statement": "保留此前已确认的音乐，将其作为新版开场的核心声音素材。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#music",
+          "intent_item_id": "music",
+          "quote": "保留此前已确认的音乐，将其作为新版开场的核心声音素材。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "mix",
+      "statement": "根据音乐的结构、情绪和节奏重新组织视觉内容，必要时进行合理延展、混音和环境音设计。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#mix",
+          "intent_item_id": "mix",
+          "quote": "根据音乐的结构、情绪和节奏重新组织视觉内容，必要时进行合理延展、混音和环境音设计。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "reuse",
+      "statement": "现有 Shot 与方向 C 概念片中的有效画面也应作为可复用素材，而非全部废弃。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#reuse",
+          "intent_item_id": "reuse",
+          "quote": "现有 Shot 与方向 C 概念片中的有效画面也应作为可复用素材，而非全部废弃。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "skills",
+      "statement": "不要重新开发一套重复的 Skill，不要为了调用某个 Skill 而改变作品应该采用的视觉形式。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#skills",
+          "intent_item_id": "skills",
+          "quote": "不要重新开发一套重复的 Skill，不要为了调用某个 Skill 而改变作品应该采用的视觉形式。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "explore",
+      "statement": "随后探索具有明显艺术差异的视觉方案，选出最符合《失帧》的方向，实际推进制作。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#explore",
+          "intent_item_id": "explore",
+          "quote": "随后探索具有明显艺术差异的视觉方案，选出最符合《失帧》的方向，实际推进制作。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "timing",
+      "statement": "不预设固定镜头数量、精确时长或必须使用的特效。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#timing",
+          "intent_item_id": "timing",
+          "quote": "不预设固定镜头数量、精确时长或必须使用的特效。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "dynamic",
+      "statement": "请在既有素材及已授权工具范围内完成尽可能充分的动态预演、剪辑、字体合成、音乐组织及可观看样片。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#dynamic",
+          "intent_item_id": "dynamic",
+          "quote": "请在既有素材及已授权工具范围内完成尽可能充分的动态预演、剪辑、字体合成、音乐组织及可观看样片。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "missing",
+      "statement": "对于尚无素材的镜头，准备可生产的导演设计和生成输入。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#missing",
+          "intent_item_id": "missing",
+          "quote": "对于尚无素材的镜头，准备可生产的导演设计和生成输入。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "no-video-fee",
+      "statement": "未经明确授权不要产生新的视频生成费用；预演和最终成片必须清楚区分。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#no-video-fee",
+          "intent_item_id": "no-video-fee",
+          "quote": "未经明确授权不要产生新的视频生成费用；预演和最终成片必须清楚区分。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "no-template",
+      "statement": "是否出现静态海报堆叠、廉价特效或过于模板化的 AI 视频设计。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#no-template",
+          "intent_item_id": "no-template",
+          "quote": "是否出现静态海报堆叠、廉价特效或过于模板化的 AI 视频设计。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    },
+    {
+      "intent_item_id": "art-review",
+      "statement": "不得将技术测试通过、字体清晰或者渲染成功等同于艺术审查通过。",
+      "origin": "explicit_user",
+      "source_refs": [
+        {
+          "source_hash": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a",
+          "locator": "creative-input.txt#art-review",
+          "intent_item_id": "art-review",
+          "quote": "不得将技术测试通过、字体清晰或者渲染成功等同于艺术审查通过。",
+          "origin": "explicit_user"
+        }
+      ],
+      "related_intent_ids": []
+    }
+  ],
+  "intent_groups": {
+    "must_happen": [
+      {
+        "intent_item_id": "source-review"
+      },
+      {
+        "intent_item_id": "references"
+      },
+      {
+        "intent_item_id": "originality"
+      },
+      {
+        "intent_item_id": "structure"
+      },
+      {
+        "intent_item_id": "ordinary-world"
+      },
+      {
+        "intent_item_id": "scale"
+      },
+      {
+        "intent_item_id": "emotion"
+      },
+      {
+        "intent_item_id": "relations"
+      },
+      {
+        "intent_item_id": "reveal-boundary"
+      },
+      {
+        "intent_item_id": "freedom"
+      },
+      {
+        "intent_item_id": "type"
+      },
+      {
+        "intent_item_id": "type-restraint"
+      },
+      {
+        "intent_item_id": "music"
+      },
+      {
+        "intent_item_id": "mix"
+      },
+      {
+        "intent_item_id": "reuse"
+      },
+      {
+        "intent_item_id": "skills"
+      },
+      {
+        "intent_item_id": "explore"
+      },
+      {
+        "intent_item_id": "timing"
+      },
+      {
+        "intent_item_id": "dynamic"
+      },
+      {
+        "intent_item_id": "missing"
+      },
+      {
+        "intent_item_id": "no-video-fee"
+      },
+      {
+        "intent_item_id": "no-template"
+      },
+      {
+        "intent_item_id": "art-review"
+      }
+    ],
+    "must_not_happen": [],
+    "preferred_performance": [],
+    "timing_targets": [],
+    "acceptable_variation": []
+  }
+}

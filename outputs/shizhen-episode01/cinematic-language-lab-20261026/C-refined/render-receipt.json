@@ -1,0 +1,54 @@
+{
+  "variant": "C",
+  "output": "outputs/shizhen-episode01/cinematic-language-lab-20261026/C-refined/失帧-视觉方向-C-概念片.mp4",
+  "sha256": "49a65e9958575f5402cc53b000bbe4dfc2517b768d54ec2d9bb000c60c2f3ba3",
+  "bytes": 3867039,
+  "measured": {
+    "width": 1920,
+    "height": 1080,
+    "fps_num": 24,
+    "fps_den": 1,
+    "duration_frames": 216,
+    "codec_name": "h264",
+    "audio": {
+      "stream_count": 1,
+      "codec_name": "aac",
+      "sample_rate_hz": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "decoded_samples": 432128,
+      "encoder_priming_samples": 1024,
+      "encoder_padding_samples": 128,
+      "measurement_method": "held-fd ffprobe packets plus pcm_s16le decode"
+    }
+  },
+  "checks": [
+    {
+      "command": "lint",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "f91a7f9e08658cf8daf815895c72ad59093b2920a6f4b6f0aecc6a36b1ee1e2d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "error_count": 0,
+      "warning_count": 0
+    },
+    {
+      "command": "check",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "8a69fd9e422937ac4860488cf4552cdc6a69ca0877f7f85637f044b11149e949",
+      "stderr_sha256": "d307dee2a0b012cf36e66f31da96f0a4304ef70065eeb0ad3e63c1ee997e8a7a",
+      "error_count": 0,
+      "warning_count": 0
+    }
+  ],
+  "composition_fingerprint": "652d81d28a09432d65bbf2353f4e1466e4ad90f19b0f47bbb0d0ed6b4198c604",
+  "usage_scope": "development_audio_preview",
+  "research_only": true,
+  "live_action_acceptance": "NOT_EVALUATED",
+  "native_dialogue": "MUTED_IN_CONCEPT_ONLY",
+  "source_manifest_unchanged": true,
+  "paid_generation_calls": 0,
+  "publication": "NOT_PUBLISHED",
+  "design_source_sha256": "7846537d6340ef828dbe87a2e6036fb34326eaa75872a97660142f3cf62e3f93"
+}

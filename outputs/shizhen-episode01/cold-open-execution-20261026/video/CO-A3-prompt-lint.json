@@ -1,0 +1,11 @@
+{
+  "three_native_references": true,
+  "native_multimodal_markers": true,
+  "four_lines_each_once": true,
+  "no_music": true,
+  "left_hand": true,
+  "physical_occlusion_and_reveal": true,
+  "two_camera_setups": true,
+  "duration22": true,
+  "1080p": true
+}

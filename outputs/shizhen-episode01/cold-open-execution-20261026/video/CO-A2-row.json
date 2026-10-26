@@ -1,0 +1,211 @@
+{
+  "shot": {
+    "shot_id": "CO-A2",
+    "scene_id": "rain-stop",
+    "storyboard_beat_id": "after",
+    "intent": "灰白货车从镜头近前景继续向右驶过，侧板横向运动，尾缘从左向右扫过并离开画面，逐渐揭开后方同一站棚和右侧独自候车的罗敏。她自然听电话，不看空位、不寻找、不惊恐。车辆不停、不进站、不开门，人物不下车或出入画面。车驶离后让空位和正常反应同时可读。",
+    "dialogue": "",
+    "duration_policy": {
+      "mode": "fixed",
+      "seconds": 4
+    },
+    "character_ids": [
+      "luomin"
+    ],
+    "continuity_constraints": [
+      "同一站棚同一机位，右侧罗敏左手持手机",
+      "货车向右驶离，左侧原高峥及其包已不在；不展示离开或上车"
+    ],
+    "visual_strategy": "generated_video",
+    "required_asset_roles": [
+      {
+        "role": "primary_visual",
+        "asset_ids": [],
+        "allowed_asset_types": [
+          "video"
+        ]
+      }
+    ],
+    "generated_video_rationale": "Physical foreground truck reveal of the after-state for a concealed editorial cut"
+  },
+  "generation": {
+    "references": [
+      {
+        "role": "scene_reference",
+        "asset_id": "co-actual-truck-frame"
+      },
+      {
+        "role": "character_reference",
+        "asset_id": "co-after-image",
+        "owner_id": "luomin"
+      }
+    ],
+    "intent_evidence": {
+      "character_action_required": true,
+      "state_change_required": true,
+      "subject_motion_directive_present": true
+    },
+    "generation_intent": {
+      "open_state": {
+        "kind": "typed_text",
+        "state_text": "灰白配送货车的雨湿金属车厢在极近前景完整遮满画面，车仍向右经过。"
+      },
+      "close_state": {
+        "kind": "typed_text",
+        "state_text": "货车已经从右边驶出画面，恢复同一站棚固定中远景。右侧罗敏左手手机贴左耳，墨绿雨衣和黑包保持；左侧高峥与其包的位置为空，站棚出口和脚边完整可见。",
+        "required_change": true
+      },
+      "identity_continuity": {
+        "character_ids": [
+          "luomin"
+        ],
+        "preservation": "exact"
+      },
+      "scene_continuity": {
+        "scene_id": "rain-stop",
+        "mood": "前一夜2026-10-24雨夜的普通候车，疲惫但无异常预知",
+        "state_constraints": [
+          "同一机位，罗敏在右，左侧为空",
+          "左手手机贴左耳，衣服与黑包保持",
+          "车厢只朝右驶离，不停站、不开门；无上下车或人走开",
+          "不加入原不存在的人，不用透明、烟雾、闪光或渐隐",
+          "无对白、音乐、鬼声、字幕、片名或精确数字",
+          "参考素材1是上一段实际最后一帧，只指导开头满幅灰白车厢与横向运动；参考素材2指导车驶离后同一站棚、右侧罗敏、服装、脸与空位。不能将两图溶解；必须物理车厢尾缘持续向右离场。"
+        ]
+      },
+      "space_continuity": {
+        "subject_position": "罗敏同首图右侧，左侧为空",
+        "screen_direction": "同机位不镜像，货车持续左向右",
+        "crossing_policy": "不越轴，不展示任何人出入"
+      },
+      "axis_continuity": {
+        "camera_axis": "道路近侧正对站棚",
+        "framing_continuity": "近车厢遮挡自然揭开同一固定站棚中远景",
+        "crossing_policy": "不越轴"
+      },
+      "subject_action": {
+        "start_state": "灰白配送货车的雨湿金属车厢在极近前景完整遮满画面，车仍向右经过。",
+        "progression": "灰白货车从镜头近前景继续向右驶过，侧板横向运动，尾缘从左向右扫过并离开画面，逐渐揭开后方同一站棚和右侧独自候车的罗敏。她自然听电话，不看空位、不寻找、不惊恐。车辆不停、不进站、不开门，人物不下车或出入画面。车驶离后让空位和正常反应同时可读。",
+        "endpoint": {
+          "state_text": "货车已经从右边驶出画面，恢复同一站棚固定中远景。右侧罗敏左手手机贴左耳，墨绿雨衣和黑包保持；左侧高峥与其包的位置为空，站棚出口和脚边完整可见。",
+          "required_change": true
+        }
+      },
+      "motion_envelope": {
+        "onset": "车厢正持续向右经过",
+        "peak": "尾缘从左向右扫过，揭开站棚",
+        "settle": "货车驶离，正常候车与空位可读",
+        "direction": "货车持续向右",
+        "amplitude_class": "正常实时动作"
+      },
+      "pacing": {
+        "cadence": "货车自然驶过，不放慢，不停成灰色静帧；揭开后留一口正常呼吸",
+        "tempo_class": "正常实时",
+        "shot_duration_seconds": 4
+      },
+      "camera_intent": {
+        "movement": "固定",
+        "stability": "稳定",
+        "framing_intent": "全程同一固定机位。车厢自然驶离后，同时看见左侧空位、站棚出口和右侧罗敏；无推拉、切镜、溶解或黑屏",
+        "expression_strength": "semantic_prompt_allowed"
+      },
+      "camera_endpoint": {
+        "start_framing": "灰白配送货车的雨湿金属车厢在极近前景完整遮满画面，车仍向右经过。",
+        "end_framing": "货车已经从右边驶出画面，恢复同一站棚固定中远景。右侧罗敏左手手机贴左耳，墨绿雨衣和黑包保持；左侧高峥与其包的位置为空，站棚出口和脚边完整可见。",
+        "position_lock": true,
+        "orientation_lock": true
+      },
+      "primary_camera_motion": {
+        "movement_kind": "locked",
+        "direction": "none",
+        "amplitude_class": "subtle",
+        "speed_class": "very_slow",
+        "start_motion_state": "stationary",
+        "end_motion_state": "settled"
+      },
+      "camera_subject_relation": {
+        "subject_id": "luomin",
+        "relation_kind": "fixed_frame",
+        "start_relation": "同机位被车厢完整遮住",
+        "end_relation": "恢复站棚，罗敏在右，左侧为空"
+      },
+      "performance_intent": {
+        "trigger": "电话仍在继续，货车在前景经过",
+        "visible_response": "罗敏被揭出时自然听电话，不向左寻找或惊恐",
+        "gaze_target": "听电话，视线自然向前方路面",
+        "body_behavior": "正常站立和呼吸",
+        "hand_behavior": "左手手机贴左耳，黑包不交换",
+        "terminal_performance_state": "货车已经从右边驶出画面，恢复同一站棚固定中远景。右侧罗敏左手手机贴左耳，墨绿雨衣和黑包保持；左侧高峥与其包的位置为空，站棚出口和脚边完整可见。",
+        "character_directions": [
+          {
+            "character_id": "luomin",
+            "screen_identity": "右侧短卷发、墨绿雨衣、左手手机贴左耳的女人",
+            "role": "principal",
+            "visibility": "visible",
+            "beats": [
+              {
+                "phase": "throughout",
+                "trigger": "普通等待接车电话",
+                "emotion": "普通夜班疲倦而清醒，无预知恐惧",
+                "intensity": "moderate",
+                "facial_expression": "自然闭口倾听，无惊恐",
+                "gaze_target": "前方道路，不看左侧空位",
+                "breathing": "自然",
+                "body_behavior": "站在原位自然听电话，左手不换手"
+              }
+            ]
+          }
+        ]
+      },
+      "visual_treatment": {
+        "medium_look": "同实际首图的原创成年3D国漫CG面部、细束发丝、克制皮肤高光，非真人",
+        "palette": "冷灰雨城与微暖站棚灯",
+        "material_treatment": "湿布、金属、玻璃、雨水真实且不蜡亮",
+        "prohibited_visual_drift": [
+          "真人照片脸",
+          "换脸、额外手、重复人",
+          "怪物、残影、渐隐、字幕、片名或数字"
+        ]
+      },
+      "lighting_intent": {
+        "motivated_source": "站棚实用灯、远城灯光",
+        "direction": "保持首图冷暖曝光",
+        "exposure_priority": "脸、眼睛、手、出口可读",
+        "continuity_state": "同一雨夜站棚，不熄灯"
+      },
+      "ambience_intent": {
+        "environment_bed": "货车正常向右驶离，近雨棚雨声与远车流持续，无对白、音乐、异常冲击或全局静音",
+        "foley_cues": [
+          "货车轮胎湿路声自然远离，衣料轻响"
+        ]
+      },
+      "music_intent": {
+        "mode": "none"
+      },
+      "dialogue_intent": {
+        "mode": "none",
+        "lip_sync_required": false
+      }
+    },
+    "output_need": {
+      "timing_mode": "content_driven",
+      "duration_seconds": 4,
+      "geometry_policy": "adaptive",
+      "width": null,
+      "height": null,
+      "aspect_ratio": "16:9",
+      "fps": null,
+      "container_mime": "video/mp4"
+    },
+    "audio_need": "required",
+    "quality_need": {
+      "objective_tier": "preview"
+    }
+  },
+  "composition": {
+    "muted": false,
+    "source_audio_policy": "KEEP"
+  },
+  "occurrence_id": "co-after",
+  "adaptation_reason": "Approved after-state component; submit only after CO-A1 exact raw gate passes. Common full occlusion conceals the cut; actual physical reveal must be verified."
+}

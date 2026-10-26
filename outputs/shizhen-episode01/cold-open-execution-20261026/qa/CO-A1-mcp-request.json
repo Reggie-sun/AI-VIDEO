@@ -1,0 +1,10 @@
+{
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A1/state/video-generation/fetch/files/b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd.mp4",
+  "extract_frames": true,
+  "frame_interval": 0.25,
+  "max_frames": 40,
+  "transcribe_audio": false,
+  "detect_scenes": true,
+  "understand_audio": true,
+  "expected_sha256": "b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd"
+}

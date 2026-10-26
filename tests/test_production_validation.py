@@ -197,6 +197,34 @@ def test_generated_video_accepts_one_unbound_pre_generation_target_role(with_fir
     validate_shot_strategy(shot, {"frame.png": make_asset("frame.png", AssetType.IMAGE)})
 
 
+def test_generated_video_accepts_nonempty_bound_reference_image_tuple():
+    shot = make_shot(
+        VisualStrategy.GENERATED_VIDEO,
+        required_asset_roles=(
+            AssetRoleRequirement(
+                role="final_visual",
+                asset_ids=(),
+                allowed_asset_types=(AssetType.VIDEO,),
+            ),
+            AssetRoleRequirement(
+                role="reference",
+                asset_ids=("entrance.png", "ready.png", "landing.png"),
+                allowed_asset_types=(AssetType.IMAGE,),
+            ),
+            make_role("first_frame", "entry.png", AssetType.IMAGE),
+        ),
+        generated_video_rationale="The sealed Shot requires a generated performance.",
+    )
+
+    validate_shot_strategy(
+        shot,
+        {
+            asset_id: make_asset(asset_id, AssetType.IMAGE)
+            for asset_id in ("entrance.png", "ready.png", "landing.png", "entry.png")
+        },
+    )
+
+
 @pytest.mark.parametrize("with_last_frame", [False, True])
 def test_project_validation_accepts_pending_generated_video_with_optional_last_frame(
     with_last_frame: bool,
@@ -234,6 +262,9 @@ def test_project_validation_accepts_pending_generated_video_with_optional_last_f
 
 @pytest.mark.parametrize("role,asset_type,asset_ids", [
     ("scene_reference", AssetType.IMAGE, ("frame.png",)),
+    ("reference", AssetType.IMAGE, ()),
+    ("reference", AssetType.VIDEO, ("frame.mp4",)),
+    ("reference", AssetType.IMAGE, ("frame.png", "frame.png")),
     ("first_frame", AssetType.VIDEO, ("frame.png",)),
     ("first_frame", AssetType.IMAGE, ()),
     ("first_frame", AssetType.IMAGE, ("frame.png", "second.png")),
@@ -254,6 +285,28 @@ def test_pending_generated_video_rejects_invalid_adjuncts(role, asset_type, asse
     assets = {asset_id: make_asset(asset_id, asset_type) for asset_id in asset_ids}
     with pytest.raises(AiVideoError):
         validate_shot_strategy(shot, assets)
+
+
+def test_pending_generated_video_reference_role_must_allow_only_images():
+    shot = make_shot(
+        VisualStrategy.GENERATED_VIDEO,
+        required_asset_roles=(
+            AssetRoleRequirement(
+                role="final_visual",
+                asset_ids=(),
+                allowed_asset_types=(AssetType.VIDEO,),
+            ),
+            AssetRoleRequirement(
+                role="reference",
+                asset_ids=("frame.png",),
+                allowed_asset_types=(AssetType.IMAGE, AssetType.VIDEO),
+            ),
+        ),
+        generated_video_rationale="The sealed Shot requires a generated performance.",
+    )
+
+    with pytest.raises(AiVideoError):
+        validate_shot_strategy(shot, {"frame.png": make_asset("frame.png", AssetType.IMAGE)})
 
 
 @pytest.mark.parametrize(

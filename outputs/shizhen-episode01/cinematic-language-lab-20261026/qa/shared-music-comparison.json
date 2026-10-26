@@ -1,0 +1,18 @@
+{
+  "arms": [
+    {
+      "variant": "A",
+      "decoded_audio_hash": "SHA256=f917645548611883b81afbfff254ff36e987e7e68091f952c8a74f9e2927f7e2"
+    },
+    {
+      "variant": "B",
+      "decoded_audio_hash": "SHA256=f917645548611883b81afbfff254ff36e987e7e68091f952c8a74f9e2927f7e2"
+    },
+    {
+      "variant": "C-refined",
+      "decoded_audio_hash": "SHA256=f917645548611883b81afbfff254ff36e987e7e68091f952c8a74f9e2927f7e2"
+    }
+  ],
+  "same_actual_music_in_all_arms": true,
+  "human_listening": "NOT_EVALUATED"
+}

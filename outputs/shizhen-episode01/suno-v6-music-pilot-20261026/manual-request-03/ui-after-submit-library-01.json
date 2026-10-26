@@ -1,0 +1,20 @@
+{
+  "recorded_at": "2026-10-25T21:13:17.203767+00:00",
+  "exit_code": 0,
+  "status": "success",
+  "error_code": null,
+  "clips": [
+    {
+      "id": "e61e327c-4e53-4e68-9e52-118e3ac0cb64",
+      "title": "失帧｜空位动机",
+      "status": "streaming",
+      "model_name": "chirp-hawk"
+    },
+    {
+      "id": "6de433ab-dab5-4ca4-a0f5-7665a0d48c01",
+      "title": "失帧｜空位动机",
+      "status": "queued",
+      "model_name": "chirp-hawk"
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "pageErrors": [],
+  "films": [
+    {
+      "src": "typography/title-typography-study.mp4",
+      "width": 1920,
+      "height": 1080,
+      "duration": 3.5,
+      "advanced": true,
+      "mediaError": null
+    },
+    {
+      "src": "typography/next-night-typography-study.mp4",
+      "width": 1920,
+      "height": 1080,
+      "duration": 3.5,
+      "advanced": true,
+      "mediaError": null
+    }
+  ],
+  "scope": "Local playback and metadata only; no human listening, no story acceptance"
+}

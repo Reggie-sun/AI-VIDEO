@@ -1,0 +1,21 @@
+{
+  "core_sha256": "f3c03c289bb770b209a355ffad5c59f732168d10d30553f249882c382a19faa9",
+  "protected_source_files": 20,
+  "mismatches": [],
+  "composition_comparisons": [
+    {
+      "variant": "A",
+      "core_layers_exact_equal": true,
+      "dialogue_tracks_exact_equal": true,
+      "caption_binding_equal": true
+    },
+    {
+      "variant": "B",
+      "core_layers_exact_equal": true,
+      "dialogue_tracks_exact_equal": true,
+      "caption_binding_equal": true
+    }
+  ],
+  "paid_generation_calls": 0,
+  "s01_included": false
+}

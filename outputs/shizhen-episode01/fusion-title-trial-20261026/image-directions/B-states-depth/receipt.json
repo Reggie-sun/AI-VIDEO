@@ -1,0 +1,79 @@
+{
+  "status": "STATIC_REFERENCE_CANDIDATES_READY_FOR_USER_REVIEW",
+  "recommended_sequence": [
+    "01-entry.png",
+    "02-depth-loss.png",
+    "03-latent-imprint.png",
+    "04-image-settles.png"
+  ],
+  "new_endpoint": "04-image-settles.png",
+  "original_B": "05-selected-end.png, comparison only",
+  "images": [
+    {
+      "path": "01-entry.png",
+      "sha256": "d9b913292dbae00acbf3136b7ae234cf37a1c06d5fa1f1688588b22882b2f506",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "person_region_mae_0_255_vs_entry": 0.0
+    },
+    {
+      "path": "02-depth-loss.png",
+      "sha256": "31a9b6524fd65bd2741cfa17ac27ce3b85190911c1f6e9a4328fa5bb6ca3052f",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "person_region_mae_0_255_vs_entry": 3.5297
+    },
+    {
+      "path": "03-latent-imprint.png",
+      "sha256": "bf50da51dbbe6eb3780936ab96462249793f2c37056462b377b5e00271fb65c9",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "person_region_mae_0_255_vs_entry": 2.8356
+    },
+    {
+      "path": "04-image-settles.png",
+      "sha256": "b4c9a6562db3474b6abff3dd19ca9fa1f9a0aa534c9e27acacc66479ef289b70",
+      "dimensions": [
+        1672,
+        941
+      ],
+      "mode": "RGB",
+      "person_region_mae_0_255_vs_entry": 3.8171
+    }
+  ],
+  "review": {
+    "structure": "Same camera, station, woman and telephone stance visually retained; depth and tonal layers vary without a travelling vertical wipe boundary.",
+    "typography": "03 latent title and04 readable title share basic glyph placement; exact glyph pixels are not identical and require a single postproduction master.",
+    "repair": "White patch version02 rejected as condensation-like; repaired02 keeps recognizable city geometry with reduced color and depth contrast.",
+    "limitations": [
+      "Static images do not prove cinematic motion or rhythm",
+      "Not pixel-identical actor/background preservation; region metric is diagnostic only",
+      "Do not dissolve or morph these full frames as final video; use original moving plate, controlled luminance/depth masks and one title master",
+      "AI label retained; source realism limitations remain",
+      "Endpoint parent-selected only, human artistic acceptance pending"
+    ]
+  },
+  "calls": {
+    "initial_directional_chain": 4,
+    "revised_layered_transitions": 3,
+    "bounded_02_repair": 1,
+    "video": 0,
+    "music": 0
+  },
+  "billing": "Built-in image tool settlement not exposed",
+  "production_import": "NOT_IMPORTED",
+  "publication": "LOCAL_REVIEW_ONLY",
+  "prompts": [
+    "intent.json",
+    "repair-02-intent.json"
+  ]
+}

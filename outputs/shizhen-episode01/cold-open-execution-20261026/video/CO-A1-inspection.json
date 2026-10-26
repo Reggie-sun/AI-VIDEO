@@ -1,0 +1,249 @@
+{
+  "authority": "canvas_source_inspection_only_no_production_state",
+  "source_snapshot": {
+    "nodes": [
+      {
+        "id": "co-before-image-node",
+        "type": "image",
+        "data": {
+          "resourceId": "co-before-local-generated"
+        }
+      },
+      {
+        "id": "co-truck-image-node",
+        "type": "image",
+        "data": {
+          "resourceId": "co-truck-local-generated"
+        }
+      },
+      {
+        "id": "co-before",
+        "type": "video",
+        "data": {
+          "generationDraft": {
+            "parts": [
+              {
+                "type": "text",
+                "text": "罗敏对电话自然说：“师傅，我们在站里，两位。”高峥听见接车，望湿路说：“让他别急，路滑。”她听完看他一眼，继续听电话，不重复转述。随后普通灰白厢式货车从镜头极近前景左向右经过，不停车不开门，车厢逐渐遮住两人和站棚，最后侧板完整填满画面。人物不走开、不上车、不消失或变透明。"
+              }
+            ],
+            "contentSettings": {
+              "resolution": "1080p",
+              "durationSeconds": 8,
+              "aspectRatio": "16:9"
+            },
+            "references": []
+          }
+        }
+      }
+    ],
+    "edges": []
+  },
+  "source_snapshot_sha256": "5ad9653501628392c97464e8e6a8f25a049b6e4f5e24bd2e31cff1115484709e",
+  "source_bytes_sha256": null,
+  "source_format": "raw_graph",
+  "inventory": {
+    "nodes": [
+      {
+        "node_id": "co-before-image-node",
+        "node_type": "image",
+        "title": null,
+        "parent_id": null,
+        "source_kind": null,
+        "current_resource_id": "co-before-local-generated",
+        "resource_versions": [],
+        "version_selection": {
+          "status": "current_pointer_only_no_history",
+          "current_pointer_batch_ids": [],
+          "selected_version_id": null
+        },
+        "generation": {
+          "draft_kind": null,
+          "parts": [],
+          "parameters": null,
+          "output_count": null,
+          "references": [],
+          "observed_prompt": null,
+          "observed_prompt_sha256": null,
+          "observed_generation": null
+        },
+        "capability": "supported"
+      },
+      {
+        "node_id": "co-truck-image-node",
+        "node_type": "image",
+        "title": null,
+        "parent_id": null,
+        "source_kind": null,
+        "current_resource_id": "co-truck-local-generated",
+        "resource_versions": [],
+        "version_selection": {
+          "status": "current_pointer_only_no_history",
+          "current_pointer_batch_ids": [],
+          "selected_version_id": null
+        },
+        "generation": {
+          "draft_kind": null,
+          "parts": [],
+          "parameters": null,
+          "output_count": null,
+          "references": [],
+          "observed_prompt": null,
+          "observed_prompt_sha256": null,
+          "observed_generation": null
+        },
+        "capability": "supported"
+      },
+      {
+        "node_id": "co-before",
+        "node_type": "video",
+        "title": null,
+        "parent_id": null,
+        "source_kind": null,
+        "current_resource_id": null,
+        "resource_versions": [],
+        "version_selection": {
+          "status": "missing_current_pointer",
+          "current_pointer_batch_ids": [],
+          "selected_version_id": null
+        },
+        "generation": {
+          "draft_kind": null,
+          "parts": [
+            {
+              "type": "text",
+              "text": "罗敏对电话自然说：“师傅，我们在站里，两位。”高峥听见接车，望湿路说：“让他别急，路滑。”她听完看他一眼，继续听电话，不重复转述。随后普通灰白厢式货车从镜头极近前景左向右经过，不停车不开门，车厢逐渐遮住两人和站棚，最后侧板完整填满画面。人物不走开、不上车、不消失或变透明。"
+            }
+          ],
+          "parameters": {
+            "resolution": "1080p",
+            "durationSeconds": 8,
+            "aspectRatio": "16:9"
+          },
+          "output_count": null,
+          "references": [],
+          "observed_prompt": null,
+          "observed_prompt_sha256": null,
+          "observed_generation": null
+        },
+        "capability": "supported"
+      }
+    ],
+    "node_type_counts": {
+      "image": 2,
+      "video": 1
+    },
+    "edges": [],
+    "timelines": []
+  },
+  "issues": [
+    {
+      "code": "missing_resource_batches",
+      "message": "Media node has no readable resource batch history.",
+      "node_id": "co-before-image-node"
+    },
+    {
+      "code": "missing_resource_batches",
+      "message": "Media node has no readable resource batch history.",
+      "node_id": "co-truck-image-node"
+    },
+    {
+      "code": "missing_resource_id",
+      "message": "Media node has no current resource identity.",
+      "node_id": "co-before"
+    },
+    {
+      "code": "missing_resource_batches",
+      "message": "Media node has no readable resource batch history.",
+      "node_id": "co-before"
+    }
+  ],
+  "selection": {
+    "status": "BLOCKED_SOURCE_GAPS",
+    "requested": {
+      "node_ids": [
+        "co-before"
+      ]
+    },
+    "candidate_timeline_ids": [],
+    "selected_timeline_id": null,
+    "sequence_packet": {
+      "authority": "development_preparation_only_not_production_state",
+      "source_snapshot_sha256": "5ad9653501628392c97464e8e6a8f25a049b6e4f5e24bd2e31cff1115484709e",
+      "selection_sha256": "dcf7fe587dfb965a6d7ba0c1d01cb20a9258f9c9b1b61e56e2111ae722b4b62f",
+      "generation_defaults": {
+        "resolution": "480p"
+      },
+      "order_evidence": "explicit_selection",
+      "timeline_source": null,
+      "units": [
+        {
+          "occurrence_id": "co-before",
+          "node_id": "co-before",
+          "title": null,
+          "output_resource_id": null,
+          "prompt_source": {
+            "parts": [
+              {
+                "type": "text",
+                "text": "罗敏对电话自然说：“师傅，我们在站里，两位。”高峥听见接车，望湿路说：“让他别急，路滑。”她听完看他一眼，继续听电话，不重复转述。随后普通灰白厢式货车从镜头极近前景左向右经过，不停车不开门，车厢逐渐遮住两人和站棚，最后侧板完整填满画面。人物不走开、不上车、不消失或变透明。"
+              }
+            ],
+            "contentSettings": {
+              "resolution": "1080p",
+              "durationSeconds": 8,
+              "aspectRatio": "16:9"
+            },
+            "references": []
+          },
+          "source_text": "罗敏对电话自然说：“师傅，我们在站里，两位。”高峥听见接车，望湿路说：“让他别急，路滑。”她听完看他一眼，继续听电话，不重复转述。随后普通灰白厢式货车从镜头极近前景左向右经过，不停车不开门，车厢逐渐遮住两人和站棚，最后侧板完整填满画面。人物不走开、不上车、不消失或变透明。",
+          "source_text_sha256": "79d9d710c03135c875b069877937a920f0c4916f4bc1968858f6e93259ba8467",
+          "prompt_source_sha256": "f699c09e91c98c17f9bce437d9ca1bb9efe67fc73b62fb370af3057a11e6bd3e",
+          "observed_parameters": {
+            "resolution": "1080p",
+            "durationSeconds": 8,
+            "aspectRatio": "16:9"
+          },
+          "references": []
+        }
+      ],
+      "assets": [],
+      "boundaries": [],
+      "next_owner": "ai_video.planning.sequence_continuity.build_sequence_video_planning_request",
+      "required_before_execution": [
+        "approved Storyboard and Shot intents",
+        "exact registered reference bytes",
+        "accepted predecessor media and actual close-state evidence",
+        "current Planner/Router and paid authorization"
+      ],
+      "production_acceptance": "NOT_EVALUATED",
+      "selected_closure_sha256": "54cc0480994098894e267aef13db083ce4c1df4be40c1e3ec413d801b617088e"
+    },
+    "blockers": [
+      {
+        "code": "missing_resource_id",
+        "message": "Media node has no current resource identity.",
+        "node_id": "co-before"
+      },
+      {
+        "code": "missing_resource_batches",
+        "message": "Media node has no readable resource batch history.",
+        "node_id": "co-before"
+      }
+    ],
+    "related_issues": [
+      {
+        "code": "missing_resource_id",
+        "message": "Media node has no current resource identity.",
+        "node_id": "co-before"
+      },
+      {
+        "code": "missing_resource_batches",
+        "message": "Media node has no readable resource batch history.",
+        "node_id": "co-before"
+      }
+    ],
+    "sequence_packet_sha256": "228e3e0cce05569026e509bc77feefa80dcf51e658db9eda29c6d7dde3b6ecd6"
+  },
+  "production_acceptance": "NOT_EVALUATED"
+}

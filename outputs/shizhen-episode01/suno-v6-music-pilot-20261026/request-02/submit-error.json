@@ -1,0 +1,5 @@
+{
+  "code": "ErrorCode.PAID_PROVIDER_OUTCOME_UNKNOWN",
+  "message": "Suno 响应无法证明任务编号。已封存为未知结果，禁止重试。",
+  "stop": true
+}

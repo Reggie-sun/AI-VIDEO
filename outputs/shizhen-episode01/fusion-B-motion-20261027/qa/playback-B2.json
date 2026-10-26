@@ -1,0 +1,14 @@
+{
+  "errors": [],
+  "proof": {
+    "ended": true,
+    "rate": 1,
+    "duration": 3,
+    "muted": false,
+    "dropped": 0,
+    "total": 72,
+    "error": null
+  },
+  "controls": "replay verified",
+  "acceptance": "technical playback only, no human hearing claim"
+}

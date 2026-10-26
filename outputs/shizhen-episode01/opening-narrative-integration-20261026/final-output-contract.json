@@ -1,0 +1,157 @@
+{
+  "goal_id": "shizhen-opening-reconstruction",
+  "goal_version": "1",
+  "user_goal": "https://vimeo.com/84017154?utm_source=chatgpt.com  https://www.youtube.com/watch?v=NmS3m0OG-Ug https://www.youtube.com/watch?v=rLSH-81yT7s\n# 《失帧》视觉开场重构：从静态概念片到电影级视听叙事\n\n请接管《失帧》当前视觉开场制作，先审看最新的 `失帧-视觉方向-C-概念片.mp4`、对应海报、现有 Shot、原音乐、剧本及导演设计。\n目前方向 C 已经具备一定的视觉设计基础，但整体仍缺少真正成熟的电影表现力。\n本次不是简单优化字体、双重曝光或转场，而是重新审视整段开场的视觉叙事。\n\n## 一、参考作品\n重点研究以下三部作品的片头设计：\n- 《真探》第一季：影像层次、人物与环境的关系、双重曝光、剪辑节奏。\n- 《人生切割术》第一季：超现实视觉事件、空间变化、连续运动和世界观的视觉呈现。\n- 《守望尘世》第二季：缺失、记忆、人物消失与日常影像之间的情绪关系。\n请主动研究其片头的镜头组织、构图、节奏、音乐与文字结合方法。\n参考的是创作方法和艺术水准，不是复刻镜头、使用原作素材或照搬视觉风格。\n\n## 二、当前版本存在的问题\n目前 9 秒概念片主要依靠人物剪影、雨夜纹理、双重曝光、中文标题及简单转场构成。\n它具有一定的平面设计感，但缺乏真正的镜头叙事推进。\n人物与环境之间没有发生足够有意义的变化，画面长时间停留在相似构图中，视觉表达停留在漂亮的概念包装层面。\n当前的“失帧”文字虽然进行了大小和位置上的变化，却仍然与画面事件相对独立。\n请不要把本次任务理解为继续增加文字动画、蒙版、噪点、镜头数量或者特效复杂度。\n真正的问题是：观众看到了设计，却没有经历一个正在发生的异常。\n\n## 三、重新建立核心创作方向\n《失帧》的开场应该让观众感觉到：\n世界表面上依然正常运转，但现实正在悄无声息地发生某种不合理的变化。\n希望从更大的世界尺度，逐渐收束到具体空间和极其细微的异常。\n让观众从感受到不协调，逐渐进入怀疑、困惑与不安。\n异常不仅需要被看见，还需要通过镜头前后的关系被感知。\n比如，一个正常场景发生了观众能够察觉、但画面中其他人完全没有意识到的变化，这可能比大量闪屏、噪点和视觉故障更具有力量。\n这只是导演思考方向，不要求机械实现这一示例。\n请根据《失帧》的剧本与信息揭示边界，自主寻找更具有表现力的电影语言。\n\n## 四、突破目前的视觉形式\n不再要求继续沿用白色背景、人物剪影、城市纹理、黑色宋体和水平线转场。\n方向 C 中有价值的素材可以保留，但不能让既有视觉形式限制新方案。\n允许探索真实摄影、空间异常、时间错位、光学表现、环境变化、非对称构图、视觉隐喻和实验性排字。\n重点是让不同镜头之间产生叙事联系，让画面本身推动观众理解这个世界，而不是一系列独立设计作品的展示。\n字体也应具有更强的电影美术品质，并与镜头事件、空间和剪辑节奏形成联系。\n不必追求所有镜头都有文字，也不要为了展现 Typography Skill 而制造无意义的文字动画。\n\n## 五、音乐与既有素材\n保留此前已确认的音乐，将其作为新版开场的核心声音素材。\n根据音乐的结构、情绪和节奏重新组织视觉内容，必要时进行合理延展、混音和环境音设计。\n现有 Shot 与方向 C 概念片中的有效画面也应作为可复用素材，而非全部废弃。\n但保留不意味着必须完整使用原来的 9 秒，可以根据新镜头结构进行拆分、重组与重新剪辑。\n希望新增宏观镜头、已有画面、关键文字和音乐形成统一的视听体验。\n\n## 六、导演与 Skill 协作\n优先调用当前项目和 Codex 已安装的专业 Skills。\n导演体系负责叙事、镜头与视听整体判断；Motion Design、Kinetic Typography、剪辑及合成能力负责对应的专业实现。\n不要重新开发一套重复的 Skill，不要为了调用某个 Skill 而改变作品应该采用的视觉形式。\n本次更重视导演判断、镜头表现和最终观看感受，而非技术模块数量。\n\n## 七、实际制作与审查\n请先分析原片为什么缺乏情绪感染力，找出真正的结构问题。\n随后探索具有明显艺术差异的视觉方案，选出最符合《失帧》的方向，实际推进制作。\n不预设固定镜头数量、精确时长或必须使用的特效。\n允许显著扩展开场，但时长必须由叙事节奏决定，不得单纯填充镜头。\n请在既有素材及已授权工具范围内完成尽可能充分的动态预演、剪辑、字体合成、音乐组织及可观看样片。\n对于尚无素材的镜头，准备可生产的导演设计和生成输入。未经明确授权不要产生新的视频生成费用；预演和最终成片必须清楚区分。\n最终请以真实的视频观看结果进行审查，特别关注：\n- 画面是否真正发生了有意义的事件。\n- 镜头之间是否有视觉、因果或情绪联系。\n- 是否具有宏观到微观的叙事纵深。\n- 是否产生足够强的悬疑感、陌生感和电影感。\n- 字体是否成为影像艺术的一部分。\n- 音乐是否真正参与了情绪和节奏构建。\n- 是否出现静态海报堆叠、廉价特效或过于模板化的 AI 视频设计。\n不得将技术测试通过、字体清晰或者渲染成功等同于艺术审查通过。\n最终目标：让观众不是在看一段关于“失帧”的视觉设计，而是在这段开场中亲眼经历某种无法解释的现实异常。\n请自主完成必要的导演分析、创作探索、可执行实施与验证，不要仅交付概念文档。\n\n\nCurrent User Scope Correction\n先别衔接了,我现在就是要前面的,跟s01没关系\n",
+  "requirements": [
+    {
+      "requirement_id": "opening-only",
+      "observable": "先别衔接了,我现在就是要前面的,跟s01没关系",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "source-review",
+      "observable": "先审看最新的 `失帧-视觉方向-C-概念片.mp4`、对应海报、现有 Shot、原音乐、剧本及导演设计。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "references",
+      "observable": "请主动研究其片头的镜头组织、构图、节奏、音乐与文字结合方法。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "originality",
+      "observable": "参考的是创作方法和艺术水准，不是复刻镜头、使用原作素材或照搬视觉风格。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "structure",
+      "observable": "真正的问题是：观众看到了设计，却没有经历一个正在发生的异常。",
+      "proof": "human"
+    },
+    {
+      "requirement_id": "ordinary-world",
+      "observable": "世界表面上依然正常运转，但现实正在悄无声息地发生某种不合理的变化。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "scale",
+      "observable": "希望从更大的世界尺度，逐渐收束到具体空间和极其细微的异常。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "emotion",
+      "observable": "让观众从感受到不协调，逐渐进入怀疑、困惑与不安。",
+      "proof": "human"
+    },
+    {
+      "requirement_id": "relations",
+      "observable": "异常不仅需要被看见，还需要通过镜头前后的关系被感知。",
+      "proof": "human"
+    },
+    {
+      "requirement_id": "reveal-boundary",
+      "observable": "请根据《失帧》的剧本与信息揭示边界，自主寻找更具有表现力的电影语言。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "freedom",
+      "observable": "不再要求继续沿用白色背景、人物剪影、城市纹理、黑色宋体和水平线转场。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "type",
+      "observable": "字体也应具有更强的电影美术品质，并与镜头事件、空间和剪辑节奏形成联系。",
+      "proof": "human"
+    },
+    {
+      "requirement_id": "type-restraint",
+      "observable": "不必追求所有镜头都有文字，也不要为了展现 Typography Skill 而制造无意义的文字动画。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "music",
+      "observable": "保留此前已确认的音乐，将其作为新版开场的核心声音素材。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "mix",
+      "observable": "根据音乐的结构、情绪和节奏重新组织视觉内容，必要时进行合理延展、混音和环境音设计。",
+      "proof": "human"
+    },
+    {
+      "requirement_id": "reuse",
+      "observable": "现有 Shot 与方向 C 概念片中的有效画面也应作为可复用素材，而非全部废弃。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "skills",
+      "observable": "不要重新开发一套重复的 Skill，不要为了调用某个 Skill 而改变作品应该采用的视觉形式。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "explore",
+      "observable": "随后探索具有明显艺术差异的视觉方案，选出最符合《失帧》的方向，实际推进制作。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "timing",
+      "observable": "不预设固定镜头数量、精确时长或必须使用的特效。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "dynamic",
+      "observable": "请在既有素材及已授权工具范围内完成尽可能充分的动态预演、剪辑、字体合成、音乐组织及可观看样片。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "missing",
+      "observable": "对于尚无素材的镜头，准备可生产的导演设计和生成输入。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "no-video-fee",
+      "observable": "未经明确授权不要产生新的视频生成费用；预演和最终成片必须清楚区分。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "no-template",
+      "observable": "是否出现静态海报堆叠、廉价特效或过于模板化的 AI 视频设计。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "art-review",
+      "observable": "不得将技术测试通过、字体清晰或者渲染成功等同于艺术审查通过。",
+      "proof": "human"
+    },
+    {
+      "requirement_id": "visual.drama.typography",
+      "observable": "片名只在异常和后态成立之后进入真实玻璃负空间；字形清楚但不能靠读字解释异常，无无意义级联/闪烁或每镜字幕。",
+      "proof": "evaluator",
+      "visual_dimension": "typography"
+    },
+    {
+      "requirement_id": "visual.drama.palette",
+      "observable": "深蓝黑与原片局部钨灯暖光，保留暗部和雨夜层次；stock与旧CG只作清楚披露的预演，正式版须统一摄影。",
+      "proof": "evaluator",
+      "visual_dimension": "palette"
+    },
+    {
+      "requirement_id": "visual.drama.layout",
+      "observable": "先完整看见两人，再同构图看见一人和空位；全景后态有时间比较，最后视线收近人物与玻璃，不以大量独立海报替代。",
+      "proof": "evaluator",
+      "visual_dimension": "layout"
+    },
+    {
+      "requirement_id": "visual.drama.style",
+      "observable": "采用原创日常关系缺席机制，不使用参考片的镜头、素材或字体；无廉价glitch、随机粒子、身体残影或未经剧本建立的循环空间。",
+      "proof": "evaluator",
+      "visual_dimension": "style"
+    },
+    {
+      "requirement_id": "visual.drama.holistic",
+      "observable": "以正常速度完整听看：有意义的变化通过前后镜头成立，宏观到微观递进、悬疑情绪、字体和原音乐及关键对白形成整体；预演不能代签正式真人成片。",
+      "proof": "human",
+      "visual_dimension": "holistic"
+    }
+  ]
+}

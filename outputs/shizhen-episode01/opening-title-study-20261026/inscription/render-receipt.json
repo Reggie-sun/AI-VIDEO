@@ -1,0 +1,53 @@
+{
+  "output": "outputs/shizhen-episode01/opening-title-study-20261026/inscription/失帧-开场-玻璃.mp4",
+  "sha256": "db2ded12a4c7910729c82af46b4eab3197e533cd6f56c51a41371303b4165252",
+  "bytes": 19110346,
+  "measured": {
+    "width": 1920,
+    "height": 1080,
+    "fps_num": 24,
+    "fps_den": 1,
+    "duration_frames": 442,
+    "codec_name": "h264",
+    "audio": {
+      "stream_count": 1,
+      "codec_name": "aac",
+      "sample_rate_hz": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "decoded_samples": 884736,
+      "encoder_priming_samples": 1024,
+      "encoder_padding_samples": 736,
+      "measurement_method": "held-fd ffprobe packets plus pcm_s16le decode"
+    }
+  },
+  "checks": [
+    {
+      "command": "lint",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "f91a7f9e08658cf8daf815895c72ad59093b2920a6f4b6f0aecc6a36b1ee1e2d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "error_count": 0,
+      "warning_count": 0
+    },
+    {
+      "command": "check",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "c4c088e20949c63e83613c5935b93f6228d0640619d60a408925447c83c7e091",
+      "stderr_sha256": "d307dee2a0b012cf36e66f31da96f0a4304ef70065eeb0ad3e63c1ee997e8a7a",
+      "error_count": 0,
+      "warning_count": 0
+    }
+  ],
+  "predecessor": "outputs/shizhen-episode01/opening-narrative-integration-20261026/focus-002/失帧-两位-关键事件重剪-002.mp4",
+  "kind": "inscription",
+  "native_dialogue": "KEEP exact source windows; no speech gain or fade",
+  "music": "same Suno B, sample 756000, 128000 samples, -10 dB",
+  "s01": "OUT_OF_SCOPE_NOT_INCLUDED",
+  "paid_generation_calls": 0,
+  "human_review": "PENDING",
+  "publication": "NOT_PUBLISHED",
+  "title_note": "B candidate used only on title, no score over the event or S01; motif/style human review pending"
+}

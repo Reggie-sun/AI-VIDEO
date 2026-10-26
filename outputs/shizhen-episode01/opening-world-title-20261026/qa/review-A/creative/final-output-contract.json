@@ -1,0 +1,97 @@
+{
+  "goal_id": "shizhen-world-title",
+  "goal_version": "1",
+  "user_goal": "请将 `focus-002` 的 18.417 秒重剪版作为当前已验证的核心叙事素材，继续完成《失帧》独立冷开场。\n\n重要范围：只制作独立开场，不包含 S01，也不需要考虑与第一集的衔接。\n\n目前卡车遮挡、人物消失、幸存者毫无察觉的叙事机制已经成立，不要反复推翻这一部分。\n\n本轮重点解决尚未完成的三个问题：\n\n1. 建立真正具有叙事意义的宏观世界视觉表达，与公交站台的微观异常形成有机联系。不要简单增加城市航拍或故障特效，也不要让宏观段落削弱消失事件的悬念。\n2. 重新完成电影级片名揭示，使“失帧”的文字设计真正参与画面与情绪，而不只是覆盖在人物近景上的标题。\n3. 完成真人质感、声音结构和整体视听美术的一致性审查，并识别当前画面中的 AI 生成标识及正式素材使用限制。\n\n保留现有四句对白、音乐和已成立的关键事件，优先进行增量式创作。\n\n不强制固定时长或镜头数量，让导演根据观众注意力、悬念形成和情绪收束决定。\n\n请重点比较不同开场结构能否在更大的世界尺度和更快建立悬念之间取得平衡。\n\n继续调用现有专业 Skills，实际制作可观看的动态预演，不要只输出分析文档。\n\n未经授权不新增付费生成。明确区分预演完成、素材缺口和最终成片通过。\n\n最终以观众是否被真正吸引、是否感受到世界异常、是否记住消失事件与片名作为艺术评价重点，而不是技术测试是否通过。\n",
+  "requirements": [
+    {
+      "requirement_id": "intent-01",
+      "observable": "请将 `focus-002` 的 18.417 秒重剪版作为当前已验证的核心叙事素材，继续完成《失帧》独立冷开场。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "intent-02",
+      "observable": "重要范围：只制作独立开场，不包含 S01，也不需要考虑与第一集的衔接。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "intent-03",
+      "observable": "目前卡车遮挡、人物消失、幸存者毫无察觉的叙事机制已经成立，不要反复推翻这一部分。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "intent-04",
+      "observable": "1. 建立真正具有叙事意义的宏观世界视觉表达，与公交站台的微观异常形成有机联系。不要简单增加城市航拍或故障特效，也不要让宏观段落削弱消失事件的悬念。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "intent-05",
+      "observable": "2. 重新完成电影级片名揭示，使“失帧”的文字设计真正参与画面与情绪，而不只是覆盖在人物近景上的标题。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "intent-06",
+      "observable": "3. 完成真人质感、声音结构和整体视听美术的一致性审查，并识别当前画面中的 AI 生成标识及正式素材使用限制。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "intent-07",
+      "observable": "保留现有四句对白、音乐和已成立的关键事件，优先进行增量式创作。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "intent-08",
+      "observable": "不强制固定时长或镜头数量，让导演根据观众注意力、悬念形成和情绪收束决定。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "intent-09",
+      "observable": "请重点比较不同开场结构能否在更大的世界尺度和更快建立悬念之间取得平衡。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "intent-10",
+      "observable": "继续调用现有专业 Skills，实际制作可观看的动态预演，不要只输出分析文档。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "intent-11",
+      "observable": "未经授权不新增付费生成。明确区分预演完成、素材缺口和最终成片通过。",
+      "proof": "evaluator"
+    },
+    {
+      "requirement_id": "intent-12",
+      "observable": "最终以观众是否被真正吸引、是否感受到世界异常、是否记住消失事件与片名作为艺术评价重点，而不是技术测试是否通过。",
+      "proof": "human"
+    },
+    {
+      "requirement_id": "visual.drama.typography",
+      "observable": "完整中文片名跨活动影像和撤去的画面边界；不压人物近景或说话，不装成路面实体，不用随机缺笔/glitch。",
+      "proof": "evaluator",
+      "visual_dimension": "typography"
+    },
+    {
+      "requirement_id": "visual.drama.palette",
+      "observable": "保留核心雨夜蓝黑与钨光，不强行用调色掩盖stock干地及非同地点；正式版仍须同雨夜摄影。",
+      "proof": "evaluator",
+      "visual_dimension": "palette"
+    },
+    {
+      "requirement_id": "visual.drama.layout",
+      "observable": "城市中人群的日常→两人同框与遮挡后的空位→平静回答→城市人流与车辆继续；文字只在最后介入。",
+      "proof": "evaluator",
+      "visual_dimension": "layout"
+    },
+    {
+      "requirement_id": "visual.drama.style",
+      "observable": "真人摄影目标保留；核心已认可叙事与其现有CG质感分开裁决，AI生成标识保留。",
+      "proof": "evaluator",
+      "visual_dimension": "style"
+    },
+    {
+      "requirement_id": "visual.drama.holistic",
+      "observable": "观众记住关系被抹去、旁人不知情、世界继续；听完四句对白及原音乐发展。预演不是最终艺术通过。",
+      "proof": "human",
+      "visual_dimension": "holistic"
+    }
+  ]
+}

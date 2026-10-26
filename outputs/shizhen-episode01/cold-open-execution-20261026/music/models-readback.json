@@ -1,0 +1,14 @@
+[
+  {
+    "name": "v6",
+    "can_use": true
+  },
+  {
+    "name": "v6-wild",
+    "can_use": true
+  },
+  {
+    "name": "v6-mini",
+    "can_use": true
+  }
+]

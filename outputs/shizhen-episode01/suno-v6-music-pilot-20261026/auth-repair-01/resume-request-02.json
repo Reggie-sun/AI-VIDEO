@@ -1,0 +1,19 @@
+{
+  "authority": "user explicit repair instruction after auth_expired",
+  "old_request_id": "68ae0257-5b71-5871-8c49-10d03fc658f7",
+  "old_outcome": "CLI rejected, no IDs, no library clips; project unknown preserved",
+  "new_request_id": "a456e1a3-13c4-5130-9b8e-e6a2be438ea7",
+  "allowed_argv_sha256": "29bc1830c4b42f35e230cd889a28d3fc3ec105b6c5780612bbdf763b9c507bf3",
+  "stop_sha256": "1f7ec9b6357863a6954ed9afc1e0192472b0e4903666a7e090a076a1a526a6c2",
+  "evidence_sha256": {
+    "auth-repair-01/refresh-result.json": "66d907b8207c1fd99bb5ba3fb4f2e2c5f76f8d78ca4c0fd73f5fa470964ea4e0",
+    "auth-repair-01/old-transaction-readback.json": "3f3981d6c3485c25566af6d217f19276324c3be0868902f7424069ec533bfab2",
+    "auth-repair-01/old-request-identity-join.json": "950f3440eba369b177855917b03d0cad3f0119551d51f18c4d4705162ce8c61b",
+    "auth-repair-01/library-readback.json": "dc060b64da12b0b4ee4c17d43213617483439d1a9c43a07af6922a3b5aabf0c1",
+    "service-ledger/68ae0257-5b71-5871-8c49-10d03fc658f7.json": "2ba346bdf1378e73961ce922fab8b0484d5146cfb5c765215bf03060283d57b2"
+  },
+  "budget_gate": "USER_DISABLED",
+  "original_max_requests": 3,
+  "remaining_before_this_call": 2,
+  "old_receipt_mutated": false
+}

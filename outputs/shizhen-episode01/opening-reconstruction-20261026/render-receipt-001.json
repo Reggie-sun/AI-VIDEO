@@ -1,0 +1,56 @@
+{
+  "output": "outputs/shizhen-episode01/opening-reconstruction-20261026/失帧-开场重构-动态预演-001.mp4",
+  "sha256": "b66644e8501ca518cf51fde2bdfe9aca22c09188175b41729e7c58fff03ed1a6",
+  "bytes": 34768757,
+  "measured": {
+    "width": 1920,
+    "height": 1080,
+    "fps_num": 24,
+    "fps_den": 1,
+    "duration_frames": 688,
+    "codec_name": "h264",
+    "audio": {
+      "stream_count": 1,
+      "codec_name": "aac",
+      "sample_rate_hz": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "decoded_samples": 1376256,
+      "encoder_priming_samples": 1024,
+      "encoder_padding_samples": 256,
+      "measurement_method": "held-fd ffprobe packets plus pcm_s16le decode"
+    }
+  },
+  "checks": [
+    {
+      "command": "lint",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "f91a7f9e08658cf8daf815895c72ad59093b2920a6f4b6f0aecc6a36b1ee1e2d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "error_count": 0,
+      "warning_count": 0
+    },
+    {
+      "command": "check",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "4a19f36cf2038993d2261b76257e87ec3d74f4c2b367b965341e1f9249fb8534",
+      "stderr_sha256": "d307dee2a0b012cf36e66f31da96f0a4304ef70065eeb0ad3e63c1ee997e8a7a",
+      "error_count": 0,
+      "warning_count": 1
+    }
+  ],
+  "composition_fingerprint": "ba738204fe16344520cdc039e41c75769db71d24ad6b27695a0e3769266902d7",
+  "usage_scope": "development_audio_preview",
+  "source_manifest_unchanged": true,
+  "new_video_generation_calls": 0,
+  "new_image_generation_calls": 0,
+  "new_music_generation_calls": 0,
+  "native_dialogue": "Explicit MUTE in visual opening only; original source files retained",
+  "audio_semantics": "NOT_EVALUATED until actual exact mix observation",
+  "artistic_acceptance": "PENDING",
+  "production_activation": false,
+  "publication_state": "NOT_PUBLISHED",
+  "render_attempt": "001"
+}

@@ -1,0 +1,11 @@
+{
+  "source_sha256": "0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c",
+  "one_second_rms_dbfs": [
+    -29.07,
+    -29.81,
+    -33.42,
+    -35.39
+  ],
+  "whole_peak_dbfs": -17.6,
+  "proof_boundary": "Acoustic audibility/dynamics only, not semantic hearing"
+}

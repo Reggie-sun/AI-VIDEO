@@ -1,0 +1,18 @@
+{
+  "candidate": "variant-B2/失帧-Fusion片名试片-B2.mp4",
+  "sha256": "2def03b0b76dc9397bff2949086e68d3ed9184f3d3ef824fe217b751845bf31b",
+  "scope": "Title-motion review only; full independent cold opening still incomplete",
+  "checks": {
+    "72_frames_24fps": "PASS",
+    "normal_speed_browser_playback": "PASS: 72 total, 0 dropped, no error",
+    "unchanged_environment_music_pcm": "PASS: identical to prior exact 3s mix",
+    "original_moving_plate": "PASS: A3 288..359, no still-image interpolation",
+    "no_horizontal_wipe": "PASS: fixed masks, luminance-driven title development",
+    "reference_artistic_match": "NOT_ACCEPTED: still photographic density edges and pillar overlap need viewer review",
+    "human_hearing": "NOT_EVALUATED",
+    "full_cold_opening": "NOT_EVALUATED: scope exceeds title clip"
+  },
+  "paid_video_music_calls": 0,
+  "publication": "LOCAL_REVIEW_ONLY",
+  "production_activation": false
+}

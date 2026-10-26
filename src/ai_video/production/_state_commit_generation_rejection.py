@@ -29,6 +29,10 @@ def _artifact(path: Path, model) -> PreparedArtifact:
 
 
 class _StateCommitGenerationRejectionMixin:
+    def correct_unsubmitted_authored_timing(self, **kwargs):
+        from .generation_visual_revision import correct_unsubmitted_authored_timing
+        return correct_unsubmitted_authored_timing(self, **kwargs)
+
     def _reopen_generation_quality_rejection(self, pointer):
         from ai_video.production._generation_feedback_reader import (
             load_generation_quality_rejection,
@@ -70,6 +74,8 @@ class _StateCommitGenerationRejectionMixin:
         actor, authorization_receipt_id, reason, target_goal, target_first_frame_sha256,
         coverage_revision=None,
         resolution_revision=None,
+        authored_revision=None,
+        authored_retarget=None,
     ):
         """End a fetched version after explicit user authorization to revise its visuals."""
         from ai_video.production.generation_visual_revision import supersede_video_generation
@@ -86,6 +92,8 @@ class _StateCommitGenerationRejectionMixin:
             target_first_frame_sha256=target_first_frame_sha256,
             coverage_revision=coverage_revision,
             resolution_revision=resolution_revision,
+            authored_revision=authored_revision,
+            authored_retarget=authored_retarget,
         )
 
     def _close_video_quality_result(

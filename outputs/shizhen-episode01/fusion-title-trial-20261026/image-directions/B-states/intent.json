@@ -1,0 +1,25 @@
+{
+  "user_selection": "B 图：黑白负片方向",
+  "request": "不能只有一张，中间的过渡态也要几张图",
+  "scope": "5 static reference states, 4 new image edits and exact existing B endpoint; no video submission",
+  "max_image_calls": 4,
+  "retries": 0,
+  "base_sha256": "beed983a552ff9331bdc111f5e4cc2f1668c85c46ebce2809c6aae153b831caa",
+  "first_prompt": "为电影《失帧》已选片头美术制作起始关键帧。输入图片是已批准终态，也是唯一身份、构图、尺寸、场景和光照锚点。输出一张同画幅的干净画面，不是拼图，不增加序号、说明或新文字。\n仅做一项编辑：把左侧约60%的银白色负片乳剂及黑色“失帧”字标撤回，还原其下同一座公交站、同一片雨玻璃、同一条长椅、同一夜景的正常彩色摄影。左侧恢复暗冷青灰雨玻璃与真实暖色反光，透过玻璃能看到与右侧一致的城市，绝不能新增人、鬼影、车辆、海报、广告字或光源。\n严守不变量：右侧女人的脸、发型、站位、比例、左右手、握电话姿势、衣服、鞋及表情全部保持；相机不移不推不缩放，画面右侧和公交站立柱、长椅、顶部灯管、时钟面板的位置不变；前景地面反光与雨夜不变。已有左上“AI生成”标识保留。时钟面板保持输入状态，不生成时间。禁止重新设计场景，禁止把画面变成3D或插画。此图只负责无片名字标的开端状态，终态的字体之后在后期逐步揭示，此图不出现“失帧”任何笔画。优先精确保持源图的光学、构图及人物。",
+  "sequence": [
+    "01 normal-color entrance, no title",
+    "02 first silver exposure, boundary 15% width",
+    "03 empty space transformed, boundary 38%",
+    "04 title readable, boundary 52%",
+    "05 exact B endpoint, about60%"
+  ],
+  "state_change": "postproduction photographic positive/negative exposure partition only; not an additional diegetic disappearance",
+  "invariants": [
+    "camera and aspect",
+    "woman and telephone hand",
+    "station geometry",
+    "glyph design and final positions",
+    "AI source mark"
+  ],
+  "handoff": "Review images only; no claim that Seedance received them or will reproduce timing"
+}

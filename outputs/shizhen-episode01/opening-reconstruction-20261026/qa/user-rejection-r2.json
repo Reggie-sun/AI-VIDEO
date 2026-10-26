@@ -1,0 +1,16 @@
+{
+  "source": "current_user_message",
+  "verbatim": "我刚才看了那个html我觉得问题很大啊,你不会觉得这就可以了?",
+  "media_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870",
+  "assessment": "USER_REJECTED",
+  "not_acceptance": true,
+  "parent_diagnosis": [
+    "stock macro is detached setup",
+    "CG and photographic world mismatch",
+    "long occlusion permits ordinary exit explanation",
+    "final is still closeup with title instead of micro event"
+  ],
+  "next_action": "Reassess dramatic opening around existing action/reaction sources before another render; preserve no-new-video-fee restriction",
+  "historical_assessment_notice": "USER_REJECTED为当时Parent扩大解释；最新用户澄清下，不能据此否决整套候车创意。原话与历史诊断保留。",
+  "current_feedback_owner": "qa/user-feedback-clarification.json"
+}

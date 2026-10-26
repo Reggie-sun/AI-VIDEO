@@ -1,0 +1,14 @@
+{
+  "request_id": "2bb1b69e-5366-5a31-b413-95c938d4767f",
+  "payload_sha256": "3b18721b7b19a37467882c390528252bc985c460d75a3994911dd12464cf3483",
+  "submitted": true,
+  "charged": false,
+  "model_verified_live": false,
+  "external_model_key": null,
+  "clip_ids": [
+    "31d31b57-b210-4f14-b1dc-6199f99f6573",
+    "fc0af846-fba9-49ae-bd0c-d6c9e43e7740"
+  ],
+  "state": "submitted",
+  "detail": "提交回执已保存。是否扣费以账号账单为准，本回执不声称已结算。"
+}

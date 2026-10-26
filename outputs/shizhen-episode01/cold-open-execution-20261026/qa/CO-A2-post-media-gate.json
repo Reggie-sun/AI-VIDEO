@@ -1,0 +1,64 @@
+{
+  "shot_id": "CO-A2",
+  "attempt_id": "shizhen-CO-A2-qualification-001",
+  "artifact_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A2/state/video-generation/fetch/files/0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c.mp4",
+  "artifact_sha256": "0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c",
+  "verdict": "PASS",
+  "proof": "analyzer",
+  "required_findings": [
+    {
+      "requirement_id": "relationship",
+      "verdict": "PASS",
+      "reason": "同机位车尾揭开左侧空位，右侧罗敏普通候车，无寻找或异常认知。",
+      "evidence_ref": "CO-A2-mcp.json"
+    },
+    {
+      "requirement_id": "action",
+      "verdict": "PASS",
+      "reason": "0–1.25s满幅湿金属侧板仍向右运动，1.5–3.5s车尾从左向右揭开原棚，3.75–4s完全驶离，左侧人和包均不在；无人出入或上车。",
+      "evidence_ref": "CO-A2-mcp.json"
+    },
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "reason": "17帧样本中右侧罗敏的短卷发、墨绿雨衣、黑包和左手手机左耳保持，无高峥或多余包再出现。",
+      "evidence_ref": "CO-A2-mcp.json"
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "PASS",
+      "reason": "同一固定中远景，从满幅车厢到同一站棚恢复，连续向右尾缘揭示，出口与脚边可读，无溶解、切镜或黑屏。",
+      "evidence_ref": "CO-A2-mcp.json"
+    },
+    {
+      "requirement_id": "performance",
+      "verdict": "PASS",
+      "reason": "罗敏自然闭口听电话、正常站立，无向左寻找、惊恐或困惑。此为analyzer样本观察，不代替human原速审看。",
+      "evidence_ref": "CO-A2-mcp.json"
+    },
+    {
+      "requirement_id": "sound",
+      "verdict": "PASS",
+      "reason": "真实音频理解无可辨人声或音乐，背景为机械/引擎低滚动声；同bytes声学补证1秒窗RMS由-29.07降到-35.39dBFS、峰值-17.6dBFS，支持车声自然远离且没有全局归零。环境在雨夜视觉中成立；工具未单独列出棚雨滴声，不声称逐种foley已人类听审。",
+      "evidence_ref": "CO-A2-mcp.json"
+    },
+    {
+      "requirement_id": "story-scope",
+      "verdict": "PASS",
+      "reason": "只揭出已改写后的一位，不展示人走开、上车、透明或烟化，不留高峥衣物及包，无新规则、字幕、片名或准确数字。",
+      "evidence_ref": "CO-A2-mcp.json"
+    },
+    {
+      "requirement_id": "art",
+      "verdict": "PASS",
+      "reason": "17帧内同一成年原创CG罗敏、站棚玻璃金属和湿路材质及冷暖光保持，无照片真人化或蜡脸。",
+      "evidence_ref": "CO-A2-mcp.json"
+    }
+  ],
+  "source_frame_count": 97,
+  "observed_terminal_state": "同一站棚固定全景，罗敏在右自然听电话，左侧人和包不在",
+  "human_acceptance": "NOT_EVALUATED",
+  "production_activation": false,
+  "next_component": "User-requested one-call whole-event CO-A3; preserve split sources as history",
+  "actual_new_video_submits": 2
+}

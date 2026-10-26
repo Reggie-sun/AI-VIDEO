@@ -1,0 +1,17 @@
+{
+  "user_messages": [
+    "不是那个候车的cg有问题吗?本来就不是同一个人",
+    "我觉得很好啊",
+    "继续"
+  ],
+  "prior_assessment": "qa/user-rejection-r2.json",
+  "correction": "不同场景出现不同角色不构成角色连续性错误；撤销将整套候车创意判为用户否决的扩大解释。",
+  "working_direction": "保留候车创意和已有素材；只制作独立开场，恢复原对白，缩短遮挡并延长后态，共伞仅备选。",
+  "acceptance_scope": "积极反馈和继续制作指示不自动签署 exact R2/共伞视频/全片 Final Acceptance",
+  "production_activation": false,
+  "later_scope_handoff": {
+    "source_thread": "01a174d7-5a35-76d3-ae32-bf7a5e9f48be",
+    "reported_user_instruction": "先别衔接了，现在就是要前面的，跟S01没关系",
+    "action": "停止S01衔接，已制测试仅归档，不展示"
+  }
+}

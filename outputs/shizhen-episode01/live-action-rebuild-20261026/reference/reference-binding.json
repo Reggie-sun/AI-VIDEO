@@ -1,0 +1,22 @@
+{
+  "source": "User attachment /tmp/codex-clipboard-lRB8oR.png",
+  "copied_sha256": "9ca118596b594808dcc429c2b8dd7083ab03c448b2d1e094f59a6b083873dbaa",
+  "bytes": 2029514,
+  "reference_job": "live-action photographic look only",
+  "must_transfer": [
+    "natural adult facial anatomy",
+    "visible skin detail without beauty smoothing",
+    "ordinary fabric and wear",
+    "credible practical lighting",
+    "real lens and spatial perspective"
+  ],
+  "must_not_transfer": [
+    "person identity or exact face",
+    "metro location",
+    "blue lanyard",
+    "portrait aspect ratio and black sidebars"
+  ],
+  "new_paid_generation_calls": 0,
+  "production_import": "NOT_PERFORMED",
+  "image_authoring_acceptance": "NOT_EVALUATED"
+}

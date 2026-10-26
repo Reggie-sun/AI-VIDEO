@@ -1,0 +1,1976 @@
+{
+  "errors": [],
+  "playback": {
+    "ended": true,
+    "duration": 20.375,
+    "rate": 1,
+    "muted": false,
+    "error": null,
+    "dropped": 0,
+    "total": 489,
+    "samples": [
+      {
+        "t": 0,
+        "presented": 1
+      },
+      {
+        "t": 0.041667,
+        "presented": 2
+      },
+      {
+        "t": 0.083333,
+        "presented": 3
+      },
+      {
+        "t": 0.125,
+        "presented": 4
+      },
+      {
+        "t": 0.166667,
+        "presented": 5
+      },
+      {
+        "t": 0.208333,
+        "presented": 6
+      },
+      {
+        "t": 0.25,
+        "presented": 7
+      },
+      {
+        "t": 0.291667,
+        "presented": 8
+      },
+      {
+        "t": 0.333333,
+        "presented": 9
+      },
+      {
+        "t": 0.375,
+        "presented": 10
+      },
+      {
+        "t": 0.416667,
+        "presented": 11
+      },
+      {
+        "t": 0.458333,
+        "presented": 12
+      },
+      {
+        "t": 0.5,
+        "presented": 13
+      },
+      {
+        "t": 0.541667,
+        "presented": 14
+      },
+      {
+        "t": 0.583333,
+        "presented": 15
+      },
+      {
+        "t": 0.625,
+        "presented": 16
+      },
+      {
+        "t": 0.666667,
+        "presented": 17
+      },
+      {
+        "t": 0.708333,
+        "presented": 18
+      },
+      {
+        "t": 0.75,
+        "presented": 19
+      },
+      {
+        "t": 0.791667,
+        "presented": 20
+      },
+      {
+        "t": 0.833333,
+        "presented": 21
+      },
+      {
+        "t": 0.875,
+        "presented": 22
+      },
+      {
+        "t": 0.916667,
+        "presented": 23
+      },
+      {
+        "t": 0.958333,
+        "presented": 24
+      },
+      {
+        "t": 1,
+        "presented": 25
+      },
+      {
+        "t": 1.041667,
+        "presented": 26
+      },
+      {
+        "t": 1.083333,
+        "presented": 27
+      },
+      {
+        "t": 1.125,
+        "presented": 28
+      },
+      {
+        "t": 1.166667,
+        "presented": 29
+      },
+      {
+        "t": 1.208333,
+        "presented": 30
+      },
+      {
+        "t": 1.25,
+        "presented": 31
+      },
+      {
+        "t": 1.291667,
+        "presented": 32
+      },
+      {
+        "t": 1.333333,
+        "presented": 33
+      },
+      {
+        "t": 1.375,
+        "presented": 34
+      },
+      {
+        "t": 1.416667,
+        "presented": 35
+      },
+      {
+        "t": 1.458333,
+        "presented": 36
+      },
+      {
+        "t": 1.5,
+        "presented": 37
+      },
+      {
+        "t": 1.541667,
+        "presented": 38
+      },
+      {
+        "t": 1.583333,
+        "presented": 39
+      },
+      {
+        "t": 1.625,
+        "presented": 40
+      },
+      {
+        "t": 1.666667,
+        "presented": 41
+      },
+      {
+        "t": 1.708333,
+        "presented": 42
+      },
+      {
+        "t": 1.75,
+        "presented": 43
+      },
+      {
+        "t": 1.791667,
+        "presented": 44
+      },
+      {
+        "t": 1.833333,
+        "presented": 45
+      },
+      {
+        "t": 1.875,
+        "presented": 46
+      },
+      {
+        "t": 1.916667,
+        "presented": 47
+      },
+      {
+        "t": 1.958333,
+        "presented": 48
+      },
+      {
+        "t": 2,
+        "presented": 49
+      },
+      {
+        "t": 2.041667,
+        "presented": 50
+      },
+      {
+        "t": 2.083333,
+        "presented": 51
+      },
+      {
+        "t": 2.125,
+        "presented": 52
+      },
+      {
+        "t": 2.166667,
+        "presented": 53
+      },
+      {
+        "t": 2.208333,
+        "presented": 54
+      },
+      {
+        "t": 2.25,
+        "presented": 55
+      },
+      {
+        "t": 2.291667,
+        "presented": 56
+      },
+      {
+        "t": 2.333333,
+        "presented": 57
+      },
+      {
+        "t": 2.375,
+        "presented": 58
+      },
+      {
+        "t": 2.416667,
+        "presented": 59
+      },
+      {
+        "t": 2.458333,
+        "presented": 60
+      },
+      {
+        "t": 2.5,
+        "presented": 61
+      },
+      {
+        "t": 2.541667,
+        "presented": 62
+      },
+      {
+        "t": 2.583333,
+        "presented": 63
+      },
+      {
+        "t": 2.625,
+        "presented": 64
+      },
+      {
+        "t": 2.666667,
+        "presented": 65
+      },
+      {
+        "t": 2.708333,
+        "presented": 66
+      },
+      {
+        "t": 2.75,
+        "presented": 67
+      },
+      {
+        "t": 2.791667,
+        "presented": 68
+      },
+      {
+        "t": 2.833333,
+        "presented": 69
+      },
+      {
+        "t": 2.875,
+        "presented": 70
+      },
+      {
+        "t": 2.916667,
+        "presented": 71
+      },
+      {
+        "t": 2.958333,
+        "presented": 72
+      },
+      {
+        "t": 3,
+        "presented": 73
+      },
+      {
+        "t": 3.041667,
+        "presented": 74
+      },
+      {
+        "t": 3.083333,
+        "presented": 75
+      },
+      {
+        "t": 3.125,
+        "presented": 76
+      },
+      {
+        "t": 3.166667,
+        "presented": 77
+      },
+      {
+        "t": 3.208333,
+        "presented": 78
+      },
+      {
+        "t": 3.25,
+        "presented": 79
+      },
+      {
+        "t": 3.291667,
+        "presented": 80
+      },
+      {
+        "t": 3.333333,
+        "presented": 81
+      },
+      {
+        "t": 3.375,
+        "presented": 82
+      },
+      {
+        "t": 3.416667,
+        "presented": 83
+      },
+      {
+        "t": 3.458333,
+        "presented": 84
+      },
+      {
+        "t": 3.5,
+        "presented": 85
+      },
+      {
+        "t": 3.541667,
+        "presented": 86
+      },
+      {
+        "t": 3.583333,
+        "presented": 87
+      },
+      {
+        "t": 3.625,
+        "presented": 88
+      },
+      {
+        "t": 3.666667,
+        "presented": 89
+      },
+      {
+        "t": 3.708333,
+        "presented": 90
+      },
+      {
+        "t": 3.75,
+        "presented": 91
+      },
+      {
+        "t": 3.791667,
+        "presented": 92
+      },
+      {
+        "t": 3.833333,
+        "presented": 93
+      },
+      {
+        "t": 3.875,
+        "presented": 94
+      },
+      {
+        "t": 3.916667,
+        "presented": 95
+      },
+      {
+        "t": 3.958333,
+        "presented": 96
+      },
+      {
+        "t": 4,
+        "presented": 97
+      },
+      {
+        "t": 4.041667,
+        "presented": 98
+      },
+      {
+        "t": 4.083333,
+        "presented": 99
+      },
+      {
+        "t": 4.125,
+        "presented": 100
+      },
+      {
+        "t": 4.166667,
+        "presented": 101
+      },
+      {
+        "t": 4.208333,
+        "presented": 102
+      },
+      {
+        "t": 4.25,
+        "presented": 103
+      },
+      {
+        "t": 4.291667,
+        "presented": 104
+      },
+      {
+        "t": 4.333333,
+        "presented": 105
+      },
+      {
+        "t": 4.375,
+        "presented": 106
+      },
+      {
+        "t": 4.416667,
+        "presented": 107
+      },
+      {
+        "t": 4.458333,
+        "presented": 108
+      },
+      {
+        "t": 4.5,
+        "presented": 109
+      },
+      {
+        "t": 4.541667,
+        "presented": 110
+      },
+      {
+        "t": 4.583333,
+        "presented": 111
+      },
+      {
+        "t": 4.625,
+        "presented": 112
+      },
+      {
+        "t": 4.666667,
+        "presented": 113
+      },
+      {
+        "t": 4.708333,
+        "presented": 114
+      },
+      {
+        "t": 4.75,
+        "presented": 115
+      },
+      {
+        "t": 4.791667,
+        "presented": 116
+      },
+      {
+        "t": 4.833333,
+        "presented": 117
+      },
+      {
+        "t": 4.875,
+        "presented": 118
+      },
+      {
+        "t": 4.916667,
+        "presented": 119
+      },
+      {
+        "t": 4.958333,
+        "presented": 120
+      },
+      {
+        "t": 5,
+        "presented": 121
+      },
+      {
+        "t": 5.041667,
+        "presented": 122
+      },
+      {
+        "t": 5.083333,
+        "presented": 123
+      },
+      {
+        "t": 5.125,
+        "presented": 124
+      },
+      {
+        "t": 5.166667,
+        "presented": 125
+      },
+      {
+        "t": 5.208333,
+        "presented": 126
+      },
+      {
+        "t": 5.25,
+        "presented": 127
+      },
+      {
+        "t": 5.291667,
+        "presented": 128
+      },
+      {
+        "t": 5.333333,
+        "presented": 129
+      },
+      {
+        "t": 5.375,
+        "presented": 130
+      },
+      {
+        "t": 5.416667,
+        "presented": 131
+      },
+      {
+        "t": 5.458333,
+        "presented": 132
+      },
+      {
+        "t": 5.5,
+        "presented": 133
+      },
+      {
+        "t": 5.541667,
+        "presented": 134
+      },
+      {
+        "t": 5.583333,
+        "presented": 135
+      },
+      {
+        "t": 5.625,
+        "presented": 136
+      },
+      {
+        "t": 5.666667,
+        "presented": 137
+      },
+      {
+        "t": 5.708333,
+        "presented": 138
+      },
+      {
+        "t": 5.75,
+        "presented": 139
+      },
+      {
+        "t": 5.791667,
+        "presented": 140
+      },
+      {
+        "t": 5.833333,
+        "presented": 141
+      },
+      {
+        "t": 5.875,
+        "presented": 142
+      },
+      {
+        "t": 5.916667,
+        "presented": 143
+      },
+      {
+        "t": 5.958333,
+        "presented": 144
+      },
+      {
+        "t": 6,
+        "presented": 145
+      },
+      {
+        "t": 6.041667,
+        "presented": 146
+      },
+      {
+        "t": 6.083333,
+        "presented": 147
+      },
+      {
+        "t": 6.125,
+        "presented": 148
+      },
+      {
+        "t": 6.166667,
+        "presented": 149
+      },
+      {
+        "t": 6.208333,
+        "presented": 150
+      },
+      {
+        "t": 6.25,
+        "presented": 151
+      },
+      {
+        "t": 6.291667,
+        "presented": 152
+      },
+      {
+        "t": 6.333333,
+        "presented": 153
+      },
+      {
+        "t": 6.375,
+        "presented": 154
+      },
+      {
+        "t": 6.416667,
+        "presented": 155
+      },
+      {
+        "t": 6.458333,
+        "presented": 156
+      },
+      {
+        "t": 6.5,
+        "presented": 157
+      },
+      {
+        "t": 6.541667,
+        "presented": 158
+      },
+      {
+        "t": 6.583333,
+        "presented": 159
+      },
+      {
+        "t": 6.625,
+        "presented": 160
+      },
+      {
+        "t": 6.666667,
+        "presented": 161
+      },
+      {
+        "t": 6.708333,
+        "presented": 162
+      },
+      {
+        "t": 6.75,
+        "presented": 163
+      },
+      {
+        "t": 6.791667,
+        "presented": 164
+      },
+      {
+        "t": 6.833333,
+        "presented": 165
+      },
+      {
+        "t": 6.875,
+        "presented": 166
+      },
+      {
+        "t": 6.916667,
+        "presented": 167
+      },
+      {
+        "t": 6.958333,
+        "presented": 168
+      },
+      {
+        "t": 7,
+        "presented": 169
+      },
+      {
+        "t": 7.041667,
+        "presented": 170
+      },
+      {
+        "t": 7.083333,
+        "presented": 171
+      },
+      {
+        "t": 7.125,
+        "presented": 172
+      },
+      {
+        "t": 7.166667,
+        "presented": 173
+      },
+      {
+        "t": 7.208333,
+        "presented": 174
+      },
+      {
+        "t": 7.25,
+        "presented": 175
+      },
+      {
+        "t": 7.291667,
+        "presented": 176
+      },
+      {
+        "t": 7.333333,
+        "presented": 177
+      },
+      {
+        "t": 7.375,
+        "presented": 178
+      },
+      {
+        "t": 7.416667,
+        "presented": 179
+      },
+      {
+        "t": 7.458333,
+        "presented": 180
+      },
+      {
+        "t": 7.5,
+        "presented": 181
+      },
+      {
+        "t": 7.541667,
+        "presented": 182
+      },
+      {
+        "t": 7.583333,
+        "presented": 183
+      },
+      {
+        "t": 7.625,
+        "presented": 184
+      },
+      {
+        "t": 7.666667,
+        "presented": 185
+      },
+      {
+        "t": 7.708333,
+        "presented": 186
+      },
+      {
+        "t": 7.75,
+        "presented": 187
+      },
+      {
+        "t": 7.791667,
+        "presented": 188
+      },
+      {
+        "t": 7.833333,
+        "presented": 189
+      },
+      {
+        "t": 7.875,
+        "presented": 190
+      },
+      {
+        "t": 7.916667,
+        "presented": 191
+      },
+      {
+        "t": 7.958333,
+        "presented": 192
+      },
+      {
+        "t": 8,
+        "presented": 193
+      },
+      {
+        "t": 8.041667,
+        "presented": 194
+      },
+      {
+        "t": 8.083333,
+        "presented": 195
+      },
+      {
+        "t": 8.125,
+        "presented": 196
+      },
+      {
+        "t": 8.166667,
+        "presented": 197
+      },
+      {
+        "t": 8.208333,
+        "presented": 198
+      },
+      {
+        "t": 8.25,
+        "presented": 199
+      },
+      {
+        "t": 8.291667,
+        "presented": 200
+      },
+      {
+        "t": 8.333333,
+        "presented": 201
+      },
+      {
+        "t": 8.375,
+        "presented": 202
+      },
+      {
+        "t": 8.416667,
+        "presented": 203
+      },
+      {
+        "t": 8.458333,
+        "presented": 204
+      },
+      {
+        "t": 8.5,
+        "presented": 205
+      },
+      {
+        "t": 8.541667,
+        "presented": 206
+      },
+      {
+        "t": 8.583333,
+        "presented": 207
+      },
+      {
+        "t": 8.625,
+        "presented": 208
+      },
+      {
+        "t": 8.666667,
+        "presented": 209
+      },
+      {
+        "t": 8.708333,
+        "presented": 210
+      },
+      {
+        "t": 8.75,
+        "presented": 211
+      },
+      {
+        "t": 8.791667,
+        "presented": 212
+      },
+      {
+        "t": 8.833333,
+        "presented": 213
+      },
+      {
+        "t": 8.875,
+        "presented": 214
+      },
+      {
+        "t": 8.916667,
+        "presented": 215
+      },
+      {
+        "t": 8.958333,
+        "presented": 216
+      },
+      {
+        "t": 9,
+        "presented": 217
+      },
+      {
+        "t": 9.041667,
+        "presented": 218
+      },
+      {
+        "t": 9.083333,
+        "presented": 219
+      },
+      {
+        "t": 9.125,
+        "presented": 220
+      },
+      {
+        "t": 9.166667,
+        "presented": 221
+      },
+      {
+        "t": 9.208333,
+        "presented": 222
+      },
+      {
+        "t": 9.25,
+        "presented": 223
+      },
+      {
+        "t": 9.291667,
+        "presented": 224
+      },
+      {
+        "t": 9.333333,
+        "presented": 225
+      },
+      {
+        "t": 9.375,
+        "presented": 226
+      },
+      {
+        "t": 9.416667,
+        "presented": 227
+      },
+      {
+        "t": 9.458333,
+        "presented": 228
+      },
+      {
+        "t": 9.5,
+        "presented": 229
+      },
+      {
+        "t": 9.541667,
+        "presented": 230
+      },
+      {
+        "t": 9.583333,
+        "presented": 231
+      },
+      {
+        "t": 9.625,
+        "presented": 232
+      },
+      {
+        "t": 9.666667,
+        "presented": 233
+      },
+      {
+        "t": 9.708333,
+        "presented": 234
+      },
+      {
+        "t": 9.75,
+        "presented": 235
+      },
+      {
+        "t": 9.791667,
+        "presented": 236
+      },
+      {
+        "t": 9.833333,
+        "presented": 237
+      },
+      {
+        "t": 9.875,
+        "presented": 238
+      },
+      {
+        "t": 9.916667,
+        "presented": 239
+      },
+      {
+        "t": 9.958333,
+        "presented": 240
+      },
+      {
+        "t": 10,
+        "presented": 241
+      },
+      {
+        "t": 10.041667,
+        "presented": 242
+      },
+      {
+        "t": 10.083333,
+        "presented": 243
+      },
+      {
+        "t": 10.125,
+        "presented": 244
+      },
+      {
+        "t": 10.166667,
+        "presented": 245
+      },
+      {
+        "t": 10.208333,
+        "presented": 246
+      },
+      {
+        "t": 10.25,
+        "presented": 247
+      },
+      {
+        "t": 10.291667,
+        "presented": 248
+      },
+      {
+        "t": 10.333333,
+        "presented": 249
+      },
+      {
+        "t": 10.375,
+        "presented": 250
+      },
+      {
+        "t": 10.416667,
+        "presented": 251
+      },
+      {
+        "t": 10.458333,
+        "presented": 252
+      },
+      {
+        "t": 10.5,
+        "presented": 253
+      },
+      {
+        "t": 10.541667,
+        "presented": 254
+      },
+      {
+        "t": 10.583333,
+        "presented": 255
+      },
+      {
+        "t": 10.625,
+        "presented": 256
+      },
+      {
+        "t": 10.666667,
+        "presented": 257
+      },
+      {
+        "t": 10.708333,
+        "presented": 258
+      },
+      {
+        "t": 10.75,
+        "presented": 259
+      },
+      {
+        "t": 10.791667,
+        "presented": 260
+      },
+      {
+        "t": 10.833333,
+        "presented": 261
+      },
+      {
+        "t": 10.875,
+        "presented": 262
+      },
+      {
+        "t": 10.916667,
+        "presented": 263
+      },
+      {
+        "t": 10.958333,
+        "presented": 264
+      },
+      {
+        "t": 11,
+        "presented": 265
+      },
+      {
+        "t": 11.041667,
+        "presented": 266
+      },
+      {
+        "t": 11.083333,
+        "presented": 267
+      },
+      {
+        "t": 11.125,
+        "presented": 268
+      },
+      {
+        "t": 11.166667,
+        "presented": 269
+      },
+      {
+        "t": 11.208333,
+        "presented": 270
+      },
+      {
+        "t": 11.25,
+        "presented": 271
+      },
+      {
+        "t": 11.291667,
+        "presented": 272
+      },
+      {
+        "t": 11.333333,
+        "presented": 273
+      },
+      {
+        "t": 11.375,
+        "presented": 274
+      },
+      {
+        "t": 11.416667,
+        "presented": 275
+      },
+      {
+        "t": 11.458333,
+        "presented": 276
+      },
+      {
+        "t": 11.5,
+        "presented": 277
+      },
+      {
+        "t": 11.541667,
+        "presented": 278
+      },
+      {
+        "t": 11.583333,
+        "presented": 279
+      },
+      {
+        "t": 11.625,
+        "presented": 280
+      },
+      {
+        "t": 11.666667,
+        "presented": 281
+      },
+      {
+        "t": 11.708333,
+        "presented": 282
+      },
+      {
+        "t": 11.75,
+        "presented": 283
+      },
+      {
+        "t": 11.791667,
+        "presented": 284
+      },
+      {
+        "t": 11.833333,
+        "presented": 285
+      },
+      {
+        "t": 11.875,
+        "presented": 286
+      },
+      {
+        "t": 11.916667,
+        "presented": 287
+      },
+      {
+        "t": 11.958333,
+        "presented": 288
+      },
+      {
+        "t": 12,
+        "presented": 289
+      },
+      {
+        "t": 12.041667,
+        "presented": 290
+      },
+      {
+        "t": 12.083333,
+        "presented": 291
+      },
+      {
+        "t": 12.125,
+        "presented": 292
+      },
+      {
+        "t": 12.166667,
+        "presented": 293
+      },
+      {
+        "t": 12.208333,
+        "presented": 294
+      },
+      {
+        "t": 12.25,
+        "presented": 295
+      },
+      {
+        "t": 12.291667,
+        "presented": 296
+      },
+      {
+        "t": 12.333333,
+        "presented": 297
+      },
+      {
+        "t": 12.375,
+        "presented": 298
+      },
+      {
+        "t": 12.416667,
+        "presented": 299
+      },
+      {
+        "t": 12.458333,
+        "presented": 300
+      },
+      {
+        "t": 12.5,
+        "presented": 301
+      },
+      {
+        "t": 12.541667,
+        "presented": 302
+      },
+      {
+        "t": 12.583333,
+        "presented": 303
+      },
+      {
+        "t": 12.625,
+        "presented": 304
+      },
+      {
+        "t": 12.666667,
+        "presented": 305
+      },
+      {
+        "t": 12.708333,
+        "presented": 306
+      },
+      {
+        "t": 12.75,
+        "presented": 307
+      },
+      {
+        "t": 12.791667,
+        "presented": 308
+      },
+      {
+        "t": 12.833333,
+        "presented": 309
+      },
+      {
+        "t": 12.875,
+        "presented": 310
+      },
+      {
+        "t": 12.916667,
+        "presented": 311
+      },
+      {
+        "t": 12.958333,
+        "presented": 312
+      },
+      {
+        "t": 13,
+        "presented": 313
+      },
+      {
+        "t": 13.041667,
+        "presented": 314
+      },
+      {
+        "t": 13.083333,
+        "presented": 315
+      },
+      {
+        "t": 13.125,
+        "presented": 316
+      },
+      {
+        "t": 13.166667,
+        "presented": 317
+      },
+      {
+        "t": 13.208333,
+        "presented": 318
+      },
+      {
+        "t": 13.25,
+        "presented": 319
+      },
+      {
+        "t": 13.291667,
+        "presented": 320
+      },
+      {
+        "t": 13.333333,
+        "presented": 321
+      },
+      {
+        "t": 13.375,
+        "presented": 322
+      },
+      {
+        "t": 13.416667,
+        "presented": 323
+      },
+      {
+        "t": 13.458333,
+        "presented": 324
+      },
+      {
+        "t": 13.5,
+        "presented": 325
+      },
+      {
+        "t": 13.541667,
+        "presented": 326
+      },
+      {
+        "t": 13.583333,
+        "presented": 327
+      },
+      {
+        "t": 13.625,
+        "presented": 328
+      },
+      {
+        "t": 13.666667,
+        "presented": 329
+      },
+      {
+        "t": 13.708333,
+        "presented": 330
+      },
+      {
+        "t": 13.75,
+        "presented": 331
+      },
+      {
+        "t": 13.791667,
+        "presented": 332
+      },
+      {
+        "t": 13.833333,
+        "presented": 333
+      },
+      {
+        "t": 13.875,
+        "presented": 334
+      },
+      {
+        "t": 13.916667,
+        "presented": 335
+      },
+      {
+        "t": 13.958333,
+        "presented": 336
+      },
+      {
+        "t": 14,
+        "presented": 337
+      },
+      {
+        "t": 14.041667,
+        "presented": 338
+      },
+      {
+        "t": 14.083333,
+        "presented": 339
+      },
+      {
+        "t": 14.125,
+        "presented": 340
+      },
+      {
+        "t": 14.166667,
+        "presented": 341
+      },
+      {
+        "t": 14.208333,
+        "presented": 342
+      },
+      {
+        "t": 14.25,
+        "presented": 343
+      },
+      {
+        "t": 14.291667,
+        "presented": 344
+      },
+      {
+        "t": 14.333333,
+        "presented": 345
+      },
+      {
+        "t": 14.375,
+        "presented": 346
+      },
+      {
+        "t": 14.416667,
+        "presented": 347
+      },
+      {
+        "t": 14.458333,
+        "presented": 348
+      },
+      {
+        "t": 14.5,
+        "presented": 349
+      },
+      {
+        "t": 14.541667,
+        "presented": 350
+      },
+      {
+        "t": 14.583333,
+        "presented": 351
+      },
+      {
+        "t": 14.625,
+        "presented": 352
+      },
+      {
+        "t": 14.666667,
+        "presented": 353
+      },
+      {
+        "t": 14.708333,
+        "presented": 354
+      },
+      {
+        "t": 14.75,
+        "presented": 355
+      },
+      {
+        "t": 14.791667,
+        "presented": 356
+      },
+      {
+        "t": 14.833333,
+        "presented": 357
+      },
+      {
+        "t": 14.875,
+        "presented": 358
+      },
+      {
+        "t": 14.916667,
+        "presented": 359
+      },
+      {
+        "t": 14.958333,
+        "presented": 360
+      },
+      {
+        "t": 15,
+        "presented": 361
+      },
+      {
+        "t": 15.041667,
+        "presented": 362
+      },
+      {
+        "t": 15.083333,
+        "presented": 363
+      },
+      {
+        "t": 15.125,
+        "presented": 364
+      },
+      {
+        "t": 15.166667,
+        "presented": 365
+      },
+      {
+        "t": 15.208333,
+        "presented": 366
+      },
+      {
+        "t": 15.25,
+        "presented": 367
+      },
+      {
+        "t": 15.291667,
+        "presented": 368
+      },
+      {
+        "t": 15.333333,
+        "presented": 369
+      },
+      {
+        "t": 15.375,
+        "presented": 370
+      },
+      {
+        "t": 15.416667,
+        "presented": 371
+      },
+      {
+        "t": 15.458333,
+        "presented": 372
+      },
+      {
+        "t": 15.5,
+        "presented": 373
+      },
+      {
+        "t": 15.541667,
+        "presented": 374
+      },
+      {
+        "t": 15.583333,
+        "presented": 375
+      },
+      {
+        "t": 15.625,
+        "presented": 376
+      },
+      {
+        "t": 15.666667,
+        "presented": 377
+      },
+      {
+        "t": 15.708333,
+        "presented": 378
+      },
+      {
+        "t": 15.75,
+        "presented": 379
+      },
+      {
+        "t": 15.791667,
+        "presented": 380
+      },
+      {
+        "t": 15.833333,
+        "presented": 381
+      },
+      {
+        "t": 15.875,
+        "presented": 382
+      },
+      {
+        "t": 15.916667,
+        "presented": 383
+      },
+      {
+        "t": 15.958333,
+        "presented": 384
+      },
+      {
+        "t": 16,
+        "presented": 385
+      },
+      {
+        "t": 16.041667,
+        "presented": 386
+      },
+      {
+        "t": 16.083333,
+        "presented": 387
+      },
+      {
+        "t": 16.125,
+        "presented": 388
+      },
+      {
+        "t": 16.166667,
+        "presented": 389
+      },
+      {
+        "t": 16.208333,
+        "presented": 390
+      },
+      {
+        "t": 16.25,
+        "presented": 391
+      },
+      {
+        "t": 16.291667,
+        "presented": 392
+      },
+      {
+        "t": 16.333333,
+        "presented": 393
+      },
+      {
+        "t": 16.375,
+        "presented": 394
+      },
+      {
+        "t": 16.416667,
+        "presented": 395
+      },
+      {
+        "t": 16.458333,
+        "presented": 396
+      },
+      {
+        "t": 16.5,
+        "presented": 397
+      },
+      {
+        "t": 16.541667,
+        "presented": 398
+      },
+      {
+        "t": 16.583333,
+        "presented": 399
+      },
+      {
+        "t": 16.625,
+        "presented": 400
+      },
+      {
+        "t": 16.666667,
+        "presented": 401
+      },
+      {
+        "t": 16.708333,
+        "presented": 402
+      },
+      {
+        "t": 16.75,
+        "presented": 403
+      },
+      {
+        "t": 16.791667,
+        "presented": 404
+      },
+      {
+        "t": 16.833333,
+        "presented": 405
+      },
+      {
+        "t": 16.875,
+        "presented": 406
+      },
+      {
+        "t": 16.916667,
+        "presented": 407
+      },
+      {
+        "t": 16.958333,
+        "presented": 408
+      },
+      {
+        "t": 17,
+        "presented": 409
+      },
+      {
+        "t": 17.041667,
+        "presented": 410
+      },
+      {
+        "t": 17.083333,
+        "presented": 411
+      },
+      {
+        "t": 17.125,
+        "presented": 412
+      },
+      {
+        "t": 17.166667,
+        "presented": 413
+      },
+      {
+        "t": 17.208333,
+        "presented": 414
+      },
+      {
+        "t": 17.25,
+        "presented": 415
+      },
+      {
+        "t": 17.291667,
+        "presented": 416
+      },
+      {
+        "t": 17.333333,
+        "presented": 417
+      },
+      {
+        "t": 17.375,
+        "presented": 418
+      },
+      {
+        "t": 17.416667,
+        "presented": 419
+      },
+      {
+        "t": 17.458333,
+        "presented": 420
+      },
+      {
+        "t": 17.5,
+        "presented": 421
+      },
+      {
+        "t": 17.541667,
+        "presented": 422
+      },
+      {
+        "t": 17.583333,
+        "presented": 423
+      },
+      {
+        "t": 17.625,
+        "presented": 424
+      },
+      {
+        "t": 17.666667,
+        "presented": 425
+      },
+      {
+        "t": 17.708333,
+        "presented": 426
+      },
+      {
+        "t": 17.75,
+        "presented": 427
+      },
+      {
+        "t": 17.791667,
+        "presented": 428
+      },
+      {
+        "t": 17.833333,
+        "presented": 429
+      },
+      {
+        "t": 17.875,
+        "presented": 430
+      },
+      {
+        "t": 17.916667,
+        "presented": 431
+      },
+      {
+        "t": 17.958333,
+        "presented": 432
+      },
+      {
+        "t": 18,
+        "presented": 433
+      },
+      {
+        "t": 18.041667,
+        "presented": 434
+      },
+      {
+        "t": 18.083333,
+        "presented": 435
+      },
+      {
+        "t": 18.125,
+        "presented": 436
+      },
+      {
+        "t": 18.166667,
+        "presented": 437
+      },
+      {
+        "t": 18.208333,
+        "presented": 438
+      },
+      {
+        "t": 18.25,
+        "presented": 439
+      },
+      {
+        "t": 18.291667,
+        "presented": 440
+      },
+      {
+        "t": 18.333333,
+        "presented": 441
+      },
+      {
+        "t": 18.375,
+        "presented": 442
+      },
+      {
+        "t": 18.416667,
+        "presented": 443
+      },
+      {
+        "t": 18.458333,
+        "presented": 444
+      },
+      {
+        "t": 18.5,
+        "presented": 445
+      },
+      {
+        "t": 18.541667,
+        "presented": 446
+      },
+      {
+        "t": 18.583333,
+        "presented": 447
+      },
+      {
+        "t": 18.625,
+        "presented": 448
+      },
+      {
+        "t": 18.666667,
+        "presented": 449
+      },
+      {
+        "t": 18.708333,
+        "presented": 450
+      },
+      {
+        "t": 18.75,
+        "presented": 451
+      },
+      {
+        "t": 18.791667,
+        "presented": 452
+      },
+      {
+        "t": 18.833333,
+        "presented": 453
+      },
+      {
+        "t": 18.875,
+        "presented": 454
+      },
+      {
+        "t": 18.916667,
+        "presented": 455
+      },
+      {
+        "t": 18.958333,
+        "presented": 456
+      },
+      {
+        "t": 19,
+        "presented": 457
+      },
+      {
+        "t": 19.041667,
+        "presented": 458
+      },
+      {
+        "t": 19.083333,
+        "presented": 459
+      },
+      {
+        "t": 19.125,
+        "presented": 460
+      },
+      {
+        "t": 19.166667,
+        "presented": 461
+      },
+      {
+        "t": 19.208333,
+        "presented": 462
+      },
+      {
+        "t": 19.25,
+        "presented": 463
+      },
+      {
+        "t": 19.291667,
+        "presented": 464
+      },
+      {
+        "t": 19.333333,
+        "presented": 465
+      },
+      {
+        "t": 19.375,
+        "presented": 466
+      },
+      {
+        "t": 19.416667,
+        "presented": 467
+      },
+      {
+        "t": 19.458333,
+        "presented": 468
+      },
+      {
+        "t": 19.5,
+        "presented": 469
+      },
+      {
+        "t": 19.541667,
+        "presented": 470
+      },
+      {
+        "t": 19.583333,
+        "presented": 471
+      },
+      {
+        "t": 19.625,
+        "presented": 472
+      },
+      {
+        "t": 19.666667,
+        "presented": 473
+      },
+      {
+        "t": 19.708333,
+        "presented": 474
+      },
+      {
+        "t": 19.75,
+        "presented": 475
+      },
+      {
+        "t": 19.791667,
+        "presented": 476
+      },
+      {
+        "t": 19.833333,
+        "presented": 477
+      },
+      {
+        "t": 19.875,
+        "presented": 478
+      },
+      {
+        "t": 19.916667,
+        "presented": 479
+      },
+      {
+        "t": 19.958333,
+        "presented": 480
+      },
+      {
+        "t": 20,
+        "presented": 481
+      },
+      {
+        "t": 20.041667,
+        "presented": 482
+      },
+      {
+        "t": 20.083333,
+        "presented": 483
+      },
+      {
+        "t": 20.125,
+        "presented": 484
+      },
+      {
+        "t": 20.166667,
+        "presented": 485
+      },
+      {
+        "t": 20.208333,
+        "presented": 486
+      },
+      {
+        "t": 20.25,
+        "presented": 487
+      },
+      {
+        "t": 20.291667,
+        "presented": 488
+      },
+      {
+        "t": 20.333333,
+        "presented": 489
+      }
+    ]
+  },
+  "controls": {
+    "src": "http://127.0.0.1:8876/outputs/shizhen-episode01/opening-A-revision-20261026/variant-R2/%E5%A4%B1%E5%B8%A7-%E7%8B%AC%E7%AB%8B%E5%BC%80%E5%9C%BA-%E6%8E%A5%E7%BC%9D%E4%BF%AE%E8%AE%A2-R2.mp4",
+    "rate": 1,
+    "errors": []
+  },
+  "proof": "Independent actual Chromium 1x playback; not human hearing or artistic acceptance. MCP browser profiles occupied, not stopped."
+}

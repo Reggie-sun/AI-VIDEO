@@ -1,0 +1,12 @@
+{
+  "baseline_mix": "runs/shizhen-opening-A-revision-20261026/render-R3/source/assets/9f66a76a9eb67ee0e3968305f9a437eebb27ed6565681a171aefe6faf5e1cdf1.wav",
+  "new_mix": "runs/shizhen-fusion-title-trial-20261026/render-F2/source/assets/6b6dabf59969d2ae93aab254f6ac5388123e755e3c001522174b83f8194ccc0f.wav",
+  "source_window_samples": [
+    834000,
+    978000
+  ],
+  "sample_count": 144000,
+  "pcm_exact_equal": true,
+  "max_absolute_sample_delta": 0.0,
+  "note": "PCM comparison proves identical mixed audio samples for the tail, not subjective hearing."
+}

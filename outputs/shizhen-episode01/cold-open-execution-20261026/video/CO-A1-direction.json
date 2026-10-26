@@ -1,0 +1,327 @@
+{
+  "project_id": "shizhen-cold-open-CO-A1-20261026",
+  "title": "失帧 两位 CO-A1 前态",
+  "language": "zh",
+  "delivery_profile": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 24
+  },
+  "brief": {
+    "objective": "建立两名同事的普通关系，到车厢遮满画面为止",
+    "audience": "都市灵异短剧观众",
+    "format": "电影级原创3D国漫写实"
+  },
+  "story": {
+    "logline": "两名同事等车，随后将被城市遗忘一人",
+    "synopsis": "前一夜普通候车；此组件只到遮挡，消失与遗忘由后续素材和assembly实现",
+    "beats": [
+      {
+        "beat_id": "before",
+        "summary": "两位与路滑的生活关心，普通货车遮挡"
+      }
+    ]
+  },
+  "characters": [
+    {
+      "character_id": "gaozheng",
+      "name": "高峥",
+      "identity": "普通夜班设备维护工，罗敏同事",
+      "appearance_bible": "同首图成熟宽脸、短发、细框眼镜、褐灰外套、深棕包",
+      "reference_asset_ids": [
+        "co-before-image"
+      ]
+    },
+    {
+      "character_id": "luomin",
+      "name": "罗敏",
+      "identity": "普通夜班同事，联系接车司机",
+      "appearance_bible": "同首图短卷发、墨绿雨衣、左手手机贴左耳、黑包",
+      "reference_asset_ids": [
+        "co-before-image"
+      ]
+    }
+  ],
+  "scenes": [
+    {
+      "scene_id": "rain-stop",
+      "location": "临江玻璃接车站棚",
+      "time": "前一夜2026-10-24雨夜",
+      "mood": "真实生活与冷峻城市，无异常预知",
+      "visual_reference_asset_ids": [
+        "co-before-image"
+      ]
+    }
+  ],
+  "storyboard": {
+    "beats": [
+      {
+        "beat_id": "before",
+        "scene_id": "rain-stop",
+        "shot_ids": [
+          "CO-A1"
+        ],
+        "narrative_intent": "同一构图建立两人关系及后续空位比较"
+      }
+    ]
+  },
+  "shots": [
+    {
+      "shot": {
+        "shot_id": "CO-A1",
+        "scene_id": "rain-stop",
+        "storyboard_beat_id": "before",
+        "intent": "罗敏对电话自然说：“师傅，我们在站里，两位。”高峥听见接车，望湿路说：“让他别急，路滑。”她听完看他一眼，继续听电话，不重复转述。随后普通灰白厢式货车从镜头极近前景左向右经过，不停车不开门，车厢逐渐遮住两人和站棚，最后侧板完整填满画面。人物不走开、不上车、不消失或变透明。",
+        "dialogue": "罗敏：师傅，我们在站里，两位。高峥：让他别急，路滑。",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 8
+        },
+        "character_ids": [
+          "gaozheng",
+          "luomin"
+        ],
+        "continuity_constraints": [
+          "左男右女，手机始终在罗敏解剖左手左耳",
+          "两人留在站棚，直到灰白车厢完全遮满"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [
+          {
+            "role": "primary_visual",
+            "asset_ids": [],
+            "allowed_asset_types": [
+              "video"
+            ]
+          }
+        ],
+        "generated_video_rationale": "Original CG dialogue, then physical foreground truck occlusion for subsequent concealed cut"
+      },
+      "generation": {
+        "references": [
+          {
+            "role": "approved_keyframe",
+            "asset_id": "co-before-image"
+          },
+          {
+            "role": "terminal_frame",
+            "asset_id": "co-truck-image"
+          }
+        ],
+        "intent_evidence": {
+          "character_action_required": true,
+          "state_change_required": true,
+          "subject_motion_directive_present": true
+        },
+        "generation_intent": {
+          "open_state": {
+            "kind": "typed_text",
+            "state_text": "雨夜玻璃站棚，戴眼镜褐灰外套高峥在左，短卷发墨绿雨衣罗敏在右，解剖左手手机贴左耳，各自通勤包，出口和脚边地面可见。"
+          },
+          "close_state": {
+            "kind": "typed_text",
+            "state_text": "普通灰白配送车厢从镜头极近前景左向右经过，哑光金属侧板完全遮满画面，两人只是被遮住，未离开、上车或变透明。",
+            "required_change": true
+          },
+          "identity_continuity": {
+            "character_ids": [
+              "gaozheng",
+              "luomin"
+            ],
+            "preservation": "exact"
+          },
+          "scene_continuity": {
+            "scene_id": "rain-stop",
+            "mood": "前一夜2026-10-24雨夜的普通候车，疲惫但无异常预知",
+            "state_constraints": [
+              "左高峥右罗敏，各自包不交换",
+              "罗敏解剖左手手机贴左耳，不换手",
+              "人物不走开、上车、变透明，只在货车后遮住",
+              "无音乐、怪声、额外人物、字幕、片名或准确数字"
+            ]
+          },
+          "space_continuity": {
+            "subject_position": "左高峥右罗敏，出口与地面可见，近前景道路",
+            "screen_direction": "同首图不镜像，货车左向右",
+            "crossing_policy": "两人留在棚下，不越轴"
+          },
+          "axis_continuity": {
+            "camera_axis": "道路近侧正对站棚",
+            "framing_continuity": "同首图固定中远景，镜头不动，由前景货车遮满",
+            "crossing_policy": "不越轴"
+          },
+          "subject_action": {
+            "start_state": "雨夜玻璃站棚，戴眼镜褐灰外套高峥在左，短卷发墨绿雨衣罗敏在右，解剖左手手机贴左耳，各自通勤包，出口和脚边地面可见。",
+            "progression": "罗敏对电话自然说：“师傅，我们在站里，两位。”高峥听见接车，望湿路说：“让他别急，路滑。”她听完看他一眼，继续听电话，不重复转述。随后普通灰白厢式货车从镜头极近前景左向右经过，不停车不开门，车厢逐渐遮住两人和站棚，最后侧板完整填满画面。人物不走开、不上车、不消失或变透明。",
+            "endpoint": {
+              "state_text": "普通灰白配送车厢从镜头极近前景左向右经过，哑光金属侧板完全遮满画面，两人只是被遮住，未离开、上车或变透明。",
+              "required_change": true
+            }
+          },
+          "motion_envelope": {
+            "onset": "普通通话、倾听",
+            "peak": "听见同伴才看他，货车横穿",
+            "settle": "灰白侧板填满画面，车仍向右经过",
+            "direction": "自然听说、货车左向右",
+            "amplitude_class": "正常实时动作"
+          },
+          "pacing": {
+            "cadence": "两句自然顺序，不排台词秒点；说完再由货车遮住，不加速、不冻帧",
+            "tempo_class": "正常实时",
+            "shot_duration_seconds": 8
+          },
+          "camera_intent": {
+            "movement": "固定",
+            "stability": "稳定",
+            "framing_intent": "同首帧固定中远景看清两人、出口和脚边地面，随后极近前景车厢完整填满画面；无推拉与切镜",
+            "expression_strength": "semantic_prompt_allowed"
+          },
+          "camera_endpoint": {
+            "start_framing": "同首图两人在站棚",
+            "end_framing": "哑光灰白金属车厢完全遮满画面",
+            "position_lock": true,
+            "orientation_lock": true
+          },
+          "primary_camera_motion": {
+            "movement_kind": "locked",
+            "direction": "none",
+            "amplitude_class": "subtle",
+            "speed_class": "very_slow",
+            "start_motion_state": "stationary",
+            "end_motion_state": "settled"
+          },
+          "camera_subject_relation": {
+            "subject_id": "luomin",
+            "relation_kind": "fixed_frame",
+            "start_relation": "看两人关系及完整空间",
+            "end_relation": "同机位被近车厢完全遮挡"
+          },
+          "performance_intent": {
+            "trigger": "夜班结束，联系接车司机",
+            "visible_response": "罗敏普通通话，高峥先听见再关心湿路，她听完看他一眼",
+            "gaze_target": "彼此与路面，非镜头",
+            "body_behavior": "自然站立与听说，不同步摆动或惊恐",
+            "hand_behavior": "罗敏左手手机贴左耳；高峥不摘眼镜或交换包",
+            "terminal_performance_state": "普通灰白配送车厢从镜头极近前景左向右经过，哑光金属侧板完全遮满画面，两人只是被遮住，未离开、上车或变透明。",
+            "character_directions": [
+              {
+                "character_id": "gaozheng",
+                "screen_identity": "左侧成熟宽脸、细框眼镜、褐灰外套的男人",
+                "role": "supporting",
+                "visibility": "visible",
+                "beats": [
+                  {
+                    "phase": "throughout",
+                    "trigger": "听见接车",
+                    "emotion": "普通夜班疲倦而清醒，无预知恐惧",
+                    "intensity": "moderate",
+                    "facial_expression": "自然说话口型",
+                    "gaze_target": "湿路和同伴",
+                    "breathing": "自然",
+                    "body_behavior": "先听见再望湿路提醒，不迈向出口，包保持"
+                  }
+                ]
+              },
+              {
+                "character_id": "luomin",
+                "screen_identity": "右侧短卷发、墨绿雨衣、左手手机贴左耳的女人",
+                "role": "principal",
+                "visibility": "visible",
+                "beats": [
+                  {
+                    "phase": "throughout",
+                    "trigger": "接车司机在电话另一端",
+                    "emotion": "普通夜班疲倦而清醒，无预知恐惧",
+                    "intensity": "moderate",
+                    "facial_expression": "自然通话，听完同伴才回应目光",
+                    "gaze_target": "电话方向与高峥",
+                    "breathing": "自然",
+                    "body_behavior": "左手保持手机，说两位后听同伴再看他，不重复转述"
+                  }
+                ]
+              }
+            ]
+          },
+          "visual_treatment": {
+            "medium_look": "同实际首图的原创成年3D国漫CG面部、细束发丝、克制皮肤高光，非真人",
+            "palette": "冷灰雨城与微暖站棚灯",
+            "material_treatment": "湿布、金属、玻璃、雨水真实且不蜡亮",
+            "prohibited_visual_drift": [
+              "真人照片脸",
+              "换脸、额外手、重复人",
+              "怪物、残影、渐隐、字幕、片名或数字"
+            ]
+          },
+          "lighting_intent": {
+            "motivated_source": "站棚实用灯、远城灯光",
+            "direction": "保持首图冷暖曝光",
+            "exposure_priority": "脸、眼睛、手、出口可读",
+            "continuity_state": "同一雨夜站棚，不熄灯"
+          },
+          "ambience_intent": {
+            "environment_bed": "近雨棚雨声、远车流，随后一辆货车正常经过；无配乐、鬼声或全局静音",
+            "foley_cues": [
+              "衣料和真实车流"
+            ]
+          },
+          "music_intent": {
+            "mode": "none"
+          },
+          "dialogue_intent": {
+            "mode": "conversation",
+            "language": "zh",
+            "turns": [
+              {
+                "speaker_id": "luomin",
+                "verbatim_text": "师傅，我们在站里，两位。",
+                "on_screen": true,
+                "lip_sync_required": true,
+                "response_obligation": "右侧女性先说，高峥听见才接，不抢词串声"
+              },
+              {
+                "speaker_id": "gaozheng",
+                "verbatim_text": "让他别急，路滑。",
+                "on_screen": true,
+                "lip_sync_required": true,
+                "response_obligation": "左侧成熟男性顺口关心，罗敏听完看他一眼，无额外台词"
+              }
+            ]
+          }
+        },
+        "output_need": {
+          "timing_mode": "content_driven",
+          "duration_seconds": 8,
+          "geometry_policy": "adaptive",
+          "width": null,
+          "height": null,
+          "aspect_ratio": "16:9",
+          "fps": null,
+          "container_mime": "video/mp4"
+        },
+        "audio_need": "required",
+        "quality_need": {
+          "objective_tier": "preview"
+        },
+        "conditioning_compatibility": {
+          "lane": "fl2va",
+          "first_anchor_id": "co-before-image",
+          "last_anchor_id": "co-truck-image",
+          "same_subject_scale": true,
+          "composition_compatible": true,
+          "screen_order_compatible": true,
+          "axis_compatible": true,
+          "camera_path_reachable": true,
+          "character_prop_state_reachable": true,
+          "action_endpoint_reachable": true,
+          "available_duration_seconds": 8
+        }
+      },
+      "composition": {
+        "muted": false,
+        "source_audio_policy": "KEEP"
+      },
+      "occurrence_id": "co-before",
+      "adaptation_reason": "已批准Rhythm02第一构图的前态动态组件；只到车厢完全遮挡，失踪在后态及assembly裁决。"
+    }
+  ]
+}

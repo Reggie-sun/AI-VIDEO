@@ -1,0 +1,2596 @@
+{
+  "execution_binding": {
+    "schema_version": "1",
+    "projection": {
+      "requirement": {
+        "contract_version": "provider-neutral-video-requirement/4",
+        "requirement_id": "video-requirement-f0c382393072fc960dc925f0",
+        "requirement_hash": "f0c382393072fc960dc925f06c36cb4813bb2b9dec88318b8aa88d078c5dd729",
+        "source_request_content_hash": "b2562cf6cbbf01216f34db8ebdb1b913fa5923ff0e40b738e39e1101457547ea",
+        "intent_evidence_hash": "1c11fd4dd4d5ef68c52de2de0b57060a9411072eff8ee9b0be73c9c9739491d1",
+        "generation_intent_hash": "384e4a024869180197e286ffa2478f52a4d1de90d3548e5f2130ec10ff820908",
+        "target_shot": {
+          "artifact_id": "shizhen-CO-A3-shot",
+          "schema_version": "2.0",
+          "revision": 2,
+          "content_hash": "577609ab8d23f9c382e6983563d02e0c3ca4d411ef8bf1f06156fd97f330cd6f",
+          "creation_receipt_id": "shizhen-CO-A3-shot-authored",
+          "source_provenance": [
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/0efeccaef86667f4cb87e55750e58916a63ac18bdc263e84f125046c3feeab8f.json",
+              "content_hash": "0efeccaef86667f4cb87e55750e58916a63ac18bdc263e84f125046c3feeab8f"
+            },
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/1877fa5b095704cbac48d3135a3143f1a416f0c6b3b4217d6db9c44404a74e78.json",
+              "content_hash": "1877fa5b095704cbac48d3135a3143f1a416f0c6b3b4217d6db9c44404a74e78"
+            },
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/28d10bf98a8649ed8ef3749ac381b473a4c5837ac1927195a60378f88a78d53c.json",
+              "content_hash": "28d10bf98a8649ed8ef3749ac381b473a4c5837ac1927195a60378f88a78d53c"
+            },
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/3f5a45fd5b56ddebaade7216efee316edf87739ca272610d7b7eb63ebbf09298.json",
+              "content_hash": "3f5a45fd5b56ddebaade7216efee316edf87739ca272610d7b7eb63ebbf09298"
+            },
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/4272d2e212040a6f84e56e9d9877d91446f3635bba65322ebe524af68dba6b61.json",
+              "content_hash": "4272d2e212040a6f84e56e9d9877d91446f3635bba65322ebe524af68dba6b61"
+            },
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/59d18bd4d99d95ce55ccdd3f6348a353fa4f54c3796e7f4d721fc46c2506463e.json",
+              "content_hash": "59d18bd4d99d95ce55ccdd3f6348a353fa4f54c3796e7f4d721fc46c2506463e"
+            },
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/e62641af9e3221cf97258c34690150a2378effa559d0f2e1efb73cca2e4c23d7.json",
+              "content_hash": "e62641af9e3221cf97258c34690150a2378effa559d0f2e1efb73cca2e4c23d7"
+            },
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/dd5c788a76c8bf722488be2fd8aa61b986f21ebdd47c9a70f6cf6ac0f34f9f30.json",
+              "content_hash": "dd5c788a76c8bf722488be2fd8aa61b986f21ebdd47c9a70f6cf6ac0f34f9f30"
+            }
+          ],
+          "shot_id": "CO-A3",
+          "scene_id": "rain-stop",
+          "storyboard_beat_id": "complete-cold-open",
+          "intent": "开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。",
+          "dialogue": "罗敏：师傅，我们在站里，两位。高峥：让他别急，路滑。电话司机：就你一位？罗敏：嗯，就我一个。",
+          "narration": "",
+          "duration_policy": {
+            "mode": "fixed",
+            "seconds": 22.0,
+            "minimum_seconds": null,
+            "maximum_seconds": null
+          },
+          "character_ids": [
+            "gaozheng",
+            "luomin"
+          ],
+          "continuity_constraints": [
+            "前一夜单次03:17事件，无新机制或记忆保留者",
+            "先看见两位，再由完整车厢遮挡后只剩一位；角色不寻找",
+            "同站棚长镜头揭示，再自然切罗敏近景普通回答",
+            "左手手机左耳，人物脸衣包各自保持",
+            "无片名、字幕或准确数字；后期完成这些内容"
+          ],
+          "visual_strategy": "generated_video",
+          "required_asset_roles": [
+            {
+              "role": "primary_visual",
+              "asset_ids": [],
+              "allowed_asset_types": [
+                "video"
+              ]
+            }
+          ],
+          "motion_directives": [],
+          "generated_video_rationale": "User explicitly chooses one Seedance2.5 call for complete 22s dramatic event; can contain two camera setups, no 8–10s generation split",
+          "hybrid_layers": [],
+          "composition_directives": [],
+          "review_policy": {
+            "required_checks": []
+          }
+        },
+        "scene": {
+          "artifact_id": "shizhen-CO-A3-scene",
+          "schema_version": "2.0",
+          "revision": 1,
+          "content_hash": "c8290d31800556550526ec824a9a1622d63ac81be8be43b1d2eefeeabeb6fe52",
+          "creation_receipt_id": "shizhen-CO-A3-scene-authored",
+          "source_provenance": [
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/0efeccaef86667f4cb87e55750e58916a63ac18bdc263e84f125046c3feeab8f.json",
+              "content_hash": "0efeccaef86667f4cb87e55750e58916a63ac18bdc263e84f125046c3feeab8f"
+            },
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/1877fa5b095704cbac48d3135a3143f1a416f0c6b3b4217d6db9c44404a74e78.json",
+              "content_hash": "1877fa5b095704cbac48d3135a3143f1a416f0c6b3b4217d6db9c44404a74e78"
+            },
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/28d10bf98a8649ed8ef3749ac381b473a4c5837ac1927195a60378f88a78d53c.json",
+              "content_hash": "28d10bf98a8649ed8ef3749ac381b473a4c5837ac1927195a60378f88a78d53c"
+            },
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/3f5a45fd5b56ddebaade7216efee316edf87739ca272610d7b7eb63ebbf09298.json",
+              "content_hash": "3f5a45fd5b56ddebaade7216efee316edf87739ca272610d7b7eb63ebbf09298"
+            },
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/4272d2e212040a6f84e56e9d9877d91446f3635bba65322ebe524af68dba6b61.json",
+              "content_hash": "4272d2e212040a6f84e56e9d9877d91446f3635bba65322ebe524af68dba6b61"
+            },
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/59d18bd4d99d95ce55ccdd3f6348a353fa4f54c3796e7f4d721fc46c2506463e.json",
+              "content_hash": "59d18bd4d99d95ce55ccdd3f6348a353fa4f54c3796e7f4d721fc46c2506463e"
+            },
+            {
+              "kind": "user_input",
+              "reference": "evidence/authoring-input/e62641af9e3221cf97258c34690150a2378effa559d0f2e1efb73cca2e4c23d7.json",
+              "content_hash": "e62641af9e3221cf97258c34690150a2378effa559d0f2e1efb73cca2e4c23d7"
+            }
+          ],
+          "scene_id": "rain-stop",
+          "location": "临江玻璃接车站棚",
+          "time": "前一夜2026-10-24雨夜",
+          "mood": "雨夜普通候车，人物不预知异常",
+          "participant_ids": [],
+          "continuity_constraints": [],
+          "visual_reference_asset_ids": [
+            "CO-A3-ref-02-after"
+          ]
+        },
+        "characters": [
+          {
+            "artifact_id": "shizhen-CO-A3-character-gaozheng",
+            "schema_version": "2.0",
+            "revision": 1,
+            "content_hash": "8b44e45581516ac05b32116346612f90593b601c516600c237348c8c40ed37b1",
+            "creation_receipt_id": "shizhen-CO-A3-character-gaozheng-authored",
+            "source_provenance": [
+              {
+                "kind": "user_input",
+                "reference": "evidence/authoring-input/0efeccaef86667f4cb87e55750e58916a63ac18bdc263e84f125046c3feeab8f.json",
+                "content_hash": "0efeccaef86667f4cb87e55750e58916a63ac18bdc263e84f125046c3feeab8f"
+              },
+              {
+                "kind": "user_input",
+                "reference": "evidence/authoring-input/1877fa5b095704cbac48d3135a3143f1a416f0c6b3b4217d6db9c44404a74e78.json",
+                "content_hash": "1877fa5b095704cbac48d3135a3143f1a416f0c6b3b4217d6db9c44404a74e78"
+              },
+              {
+                "kind": "user_input",
+                "reference": "evidence/authoring-input/28d10bf98a8649ed8ef3749ac381b473a4c5837ac1927195a60378f88a78d53c.json",
+                "content_hash": "28d10bf98a8649ed8ef3749ac381b473a4c5837ac1927195a60378f88a78d53c"
+              },
+              {
+                "kind": "user_input",
+                "reference": "evidence/authoring-input/3f5a45fd5b56ddebaade7216efee316edf87739ca272610d7b7eb63ebbf09298.json",
+                "content_hash": "3f5a45fd5b56ddebaade7216efee316edf87739ca272610d7b7eb63ebbf09298"
+              },
+              {
+                "kind": "user_input",
+                "reference": "evidence/authoring-input/4272d2e212040a6f84e56e9d9877d91446f3635bba65322ebe524af68dba6b61.json",
+                "content_hash": "4272d2e212040a6f84e56e9d9877d91446f3635bba65322ebe524af68dba6b61"
+              },
+              {
+                "kind": "user_input",
+                "reference": "evidence/authoring-input/59d18bd4d99d95ce55ccdd3f6348a353fa4f54c3796e7f4d721fc46c2506463e.json",
+                "content_hash": "59d18bd4d99d95ce55ccdd3f6348a353fa4f54c3796e7f4d721fc46c2506463e"
+              },
+              {
+                "kind": "user_input",
+                "reference": "evidence/authoring-input/e62641af9e3221cf97258c34690150a2378effa559d0f2e1efb73cca2e4c23d7.json",
+                "content_hash": "e62641af9e3221cf97258c34690150a2378effa559d0f2e1efb73cca2e4c23d7"
+              }
+            ],
+            "character_id": "gaozheng",
+            "name": "高峥",
+            "identity": "普通夜班设备维护工，罗敏同事",
+            "appearance_bible": "同参考1成熟宽脸、短发、细框眼镜、褐灰外套、深棕包",
+            "wardrobe": [],
+            "voice_profile": null,
+            "reference_asset_ids": [
+              "CO-A3-ref-01-before"
+            ],
+            "allowed_variations": []
+          },
+          {
+            "artifact_id": "shizhen-CO-A3-character-luomin",
+            "schema_version": "2.0",
+            "revision": 1,
+            "content_hash": "0e72bd23f10ae93f1529531115d2e3b959b6c2c9a093e361e5f694e6faa05495",
+            "creation_receipt_id": "shizhen-CO-A3-character-luomin-authored",
+            "source_provenance": [
+              {
+                "kind": "user_input",
+                "reference": "evidence/authoring-input/0efeccaef86667f4cb87e55750e58916a63ac18bdc263e84f125046c3feeab8f.json",
+                "content_hash": "0efeccaef86667f4cb87e55750e58916a63ac18bdc263e84f125046c3feeab8f"
+              },
+              {
+                "kind": "user_input",
+                "reference": "evidence/authoring-input/1877fa5b095704cbac48d3135a3143f1a416f0c6b3b4217d6db9c44404a74e78.json",
+                "content_hash": "1877fa5b095704cbac48d3135a3143f1a416f0c6b3b4217d6db9c44404a74e78"
+              },
+              {
+                "kind": "user_input",
+                "reference": "evidence/authoring-input/28d10bf98a8649ed8ef3749ac381b473a4c5837ac1927195a60378f88a78d53c.json",
+                "content_hash": "28d10bf98a8649ed8ef3749ac381b473a4c5837ac1927195a60378f88a78d53c"
+              },
+              {
+                "kind": "user_input",
+                "reference": "evidence/authoring-input/3f5a45fd5b56ddebaade7216efee316edf87739ca272610d7b7eb63ebbf09298.json",
+                "content_hash": "3f5a45fd5b56ddebaade7216efee316edf87739ca272610d7b7eb63ebbf09298"
+              },
+              {
+                "kind": "user_input",
+                "reference": "evidence/authoring-input/4272d2e212040a6f84e56e9d9877d91446f3635bba65322ebe524af68dba6b61.json",
+                "content_hash": "4272d2e212040a6f84e56e9d9877d91446f3635bba65322ebe524af68dba6b61"
+              },
+              {
+                "kind": "user_input",
+                "reference": "evidence/authoring-input/59d18bd4d99d95ce55ccdd3f6348a353fa4f54c3796e7f4d721fc46c2506463e.json",
+                "content_hash": "59d18bd4d99d95ce55ccdd3f6348a353fa4f54c3796e7f4d721fc46c2506463e"
+              },
+              {
+                "kind": "user_input",
+                "reference": "evidence/authoring-input/e62641af9e3221cf97258c34690150a2378effa559d0f2e1efb73cca2e4c23d7.json",
+                "content_hash": "e62641af9e3221cf97258c34690150a2378effa559d0f2e1efb73cca2e4c23d7"
+              }
+            ],
+            "character_id": "luomin",
+            "name": "罗敏",
+            "identity": "普通夜班同事，联系接车司机",
+            "appearance_bible": "同参考1和3短卷发、墨绿雨衣、左手手机贴左耳、黑包",
+            "wardrobe": [],
+            "voice_profile": null,
+            "reference_asset_ids": [
+              "CO-A3-ref-01-before",
+              "CO-A3-ref-03-close"
+            ],
+            "allowed_variations": []
+          }
+        ],
+        "review_evidence": null,
+        "asset_evidence": [
+          {
+            "role": "identity",
+            "asset_id": "CO-A3-ref-01-before",
+            "asset_sha256": "dd6cdb932eec157d9ab198f35bcd7b53e22127eb6a37fc6c574ae8c0ba6dbd8f",
+            "canonical_owner_id": "gaozheng",
+            "canonical_owner_content_hash": "8b44e45581516ac05b32116346612f90593b601c516600c237348c8c40ed37b1",
+            "mime_type": "image/png",
+            "width": 1672,
+            "height": 941,
+            "size_bytes": 2442444,
+            "duration_millis": null,
+            "fps": null
+          },
+          {
+            "role": "identity",
+            "asset_id": "CO-A3-ref-03-close",
+            "asset_sha256": "53c21e36e6c9a5f75efab197211785d092f71af73ee2f776bf208508a90bb35d",
+            "canonical_owner_id": "luomin",
+            "canonical_owner_content_hash": "0e72bd23f10ae93f1529531115d2e3b959b6c2c9a093e361e5f694e6faa05495",
+            "mime_type": "image/png",
+            "width": 1672,
+            "height": 941,
+            "size_bytes": 2368596,
+            "duration_millis": null,
+            "fps": null
+          },
+          {
+            "role": "scene",
+            "asset_id": "CO-A3-ref-02-after",
+            "asset_sha256": "15543630bcc37bb9ca0b1e5457b20befa2a5ffd85e1e8c9845775a8c99126125",
+            "canonical_owner_id": "rain-stop",
+            "canonical_owner_content_hash": "c8290d31800556550526ec824a9a1622d63ac81be8be43b1d2eefeeabeb6fe52",
+            "mime_type": "image/png",
+            "width": 1672,
+            "height": 941,
+            "size_bytes": 2436237,
+            "duration_millis": null,
+            "fps": null
+          }
+        ],
+        "c4_multi_anchor_binding": null,
+        "generation_mode": "reference_to_video",
+        "continuity_mode": "none",
+        "motion_requirement": "character_action",
+        "generation_intent": {
+          "open_state": {
+            "kind": "typed_text",
+            "state_ref": null,
+            "state_text": "开画已在雨夜玻璃站棚：戴眼镜褐灰外套的成熟高峥在左，短卷发墨绿雨衣罗敏在右，左手手机贴左耳，各自的包保持，出口和脚边可见。",
+            "state_hash": null,
+            "required_change": false
+          },
+          "close_state": {
+            "kind": "typed_text",
+            "state_ref": null,
+            "state_text": "同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。",
+            "state_hash": null,
+            "required_change": true
+          },
+          "identity_continuity": {
+            "character_ids": [
+              "gaozheng",
+              "luomin"
+            ],
+            "preservation": "exact",
+            "allowed_variation": []
+          },
+          "scene_continuity": {
+            "scene_id": "rain-stop",
+            "time_of_day": null,
+            "mood": "前一夜雨夜普通候车，城市冷峻，人物不预知异常",
+            "state_constraints": [
+              "参考素材1只指导最初同框的高峥、罗敏身份服装、原站位和站棚；参考素材2只指导货车驶离后的同一站棚、右侧罗敏和左侧空位，不能作为开场；参考素材3只指导最后罗敏的近景脸、发型、衣服和左手手机，不能提前切走掩盖消失。",
+              "同一事件，无角色保留对消失者的记忆；司机不知道先前的两位说法被改写",
+              "高峥不主动走开、不上车，无人被拖走，不留衣物或包",
+              "完整遮挡后才揭示左侧为空；不可用溶解、灯闪、黑屏、透明或烟化代替",
+              "无音乐、鬼声、惊吓音效、额外对白、字幕、片名或准确数字"
+            ]
+          },
+          "space_continuity": {
+            "subject_position": "前段左高峥右罗敏，同一站棚；揭示后右侧罗敏原位，左侧明确为空",
+            "screen_direction": "不镜像，货车持续左向右",
+            "entrance_state": null,
+            "exit_state": null,
+            "crossing_policy": "货车不进站、不停、不上下客，人物没有出入画面"
+          },
+          "axis_continuity": {
+            "camera_axis": "道路近侧正对站棚，近景保持同侧和手机手别",
+            "framing_continuity": "两位到一位的过程必须同一固定全景，完整揭出空位后才切到罗敏胸上近景",
+            "crossing_policy": "同侧切近景，不越轴"
+          },
+          "subject_action": {
+            "start_state": "开画已在雨夜玻璃站棚：戴眼镜褐灰外套的成熟高峥在左，短卷发墨绿雨衣罗敏在右，左手手机贴左耳，各自的包保持，出口和脚边可见。",
+            "progression": "开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。",
+            "endpoint": {
+              "state_ref": null,
+              "state_text": "同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。",
+              "state_hash": null,
+              "required_change": true
+            }
+          },
+          "motion_envelope": {
+            "onset": "开场已在自然说话，无空镜铺垫",
+            "peak": "货车完整遮挡后，同机位揭出空位",
+            "settle": "罗敏平常回答自己一位，继续听电话",
+            "direction": "货车持续左向右，人物原位",
+            "amplitude_class": "正常实时生活动作"
+          },
+          "pacing": {
+            "cadence": "先用简短对话让两人关系成立，随后完成异常。空位先读清，电话核对和日常回答作最后反差。按自然听说呼吸安排，不给逐句秒点，不拉长等待来填时长。",
+            "tempo_class": "克制但不拖延，正常语速",
+            "shot_duration_seconds": 22.0
+          },
+          "camera_intent": {
+            "movement": "前段固定；揭出空位之后自然切到同侧近景",
+            "stability": "稳定",
+            "framing_intent": "先固定中远景同时看两人、出口和脚边；货车完整遮挡后在同机位揭示一位，再切到罗敏胸上近景完成电话对答，近景保持完整脸、左手手机与墨绿雨衣",
+            "expression_strength": "semantic_prompt_allowed"
+          },
+          "camera_endpoint": {
+            "start_framing": "参考素材1的两人同框固定中远景",
+            "end_framing": "参考素材3同侧罗敏胸上近景，左手手机完整，继续听电话",
+            "position_lock": false,
+            "orientation_lock": false
+          },
+          "performance_intent": {
+            "trigger": "夜班结束，联系接车司机；人物始终觉得这是普通接车电话",
+            "visible_response": "先报两位、同伴关心湿路与听说目光；揭出空位后罗敏没有寻找反应；听见司机核对人数，她平常回答自己一位",
+            "gaze_target": "前段罗敏与高峥自然听说，后段罗敏只听电话，不向空位搜索或看镜头",
+            "body_behavior": "自然站立和重心，无集体摆动或慢动作；无预知惊恐",
+            "hand_behavior": "罗敏左手手机贴左耳，黑包保持；高峥褐包只在消失前属于他，消失后一起不在",
+            "terminal_performance_state": "同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。",
+            "character_directions": [
+              {
+                "character_id": "gaozheng",
+                "screen_identity": "前段左侧成熟眼镜褐衣男",
+                "role": "supporting",
+                "visibility": "visible",
+                "offscreen_reason": null,
+                "beats": [
+                  {
+                    "phase": "throughout",
+                    "trigger": "夜班后等接车电话",
+                    "emotion": "疲倦清醒、普通生活，没有异常认知",
+                    "intensity": "moderate",
+                    "facial_expression": "自然说话和倾听，不夸张，不呆滞",
+                    "gaze_target": "生活中的电话、湿路与同伴，不看镜头",
+                    "breathing": "自然",
+                    "body_behavior": "先听见接车，再望湿路顺口提醒，包保持，不走开；只在完整车厢遮挡后不再出现"
+                  }
+                ]
+              },
+              {
+                "character_id": "luomin",
+                "screen_identity": "右侧短卷发墨绿雨衣女人，左手手机",
+                "role": "principal",
+                "visibility": "visible",
+                "offscreen_reason": null,
+                "beats": [
+                  {
+                    "phase": "throughout",
+                    "trigger": "夜班后等接车电话",
+                    "emotion": "疲倦清醒、普通生活，没有异常认知",
+                    "intensity": "moderate",
+                    "facial_expression": "自然说话和倾听，不夸张，不呆滞",
+                    "gaze_target": "生活中的电话、湿路与同伴，不看镜头",
+                    "breathing": "自然",
+                    "body_behavior": "开头普通通话，听见同伴后看他；后段不记得、不寻找；听见司机问一位后像一直独自候车一样自然回答，无迟疑、惊恐或神秘笑"
+                  }
+                ]
+              }
+            ]
+          },
+          "visual_treatment": {
+            "medium_look": "同三张参考的原创成年3D国漫CG面部、细束发丝、克制皮肤高光；成熟比例，不转真人照片",
+            "palette": "冷灰雨城与微暖站棚灯",
+            "material_treatment": "真实湿布、玻璃、雨水、金属和朴素通勤道具",
+            "prohibited_visual_drift": [
+              "真人照片脸或蜡像",
+              "换脸、额外手、多人融合",
+              "用溶解、透明、残影、鬼怪替代完整遮挡后的缺席",
+              "错误文字、片名、字幕或数字"
+            ]
+          },
+          "lighting_intent": {
+            "motivated_source": "站棚实用灯和雨夜远城灯",
+            "direction": "同参考保持冷暖侧光",
+            "exposure_priority": "人脸、左手手机、空位、出口和脚边可读",
+            "continuity_state": "同一雨夜同一站棚，不熄灯闪灯"
+          },
+          "ambience_intent": {
+            "environment_bed": "持续近棚雨声、湿路车流和正常经过的货车；电话司机为普通窄频通话声。无配乐、怪声、惊吓冲击或全局静音",
+            "foley_cues": [
+              "普通衣料声",
+              "货车引擎与湿路轮胎声从左向右正常经过远离"
+            ],
+            "explicitly_silent": false
+          },
+          "dialogue_intent": {
+            "mode": "conversation",
+            "language": "zh",
+            "turns": [
+              {
+                "speaker_id": "luomin",
+                "verbatim_text": "师傅，我们在站里，两位。",
+                "on_screen": true,
+                "response_obligation": "罗敏开场已经在通话；高峥听见才接话",
+                "lip_sync_required": true
+              },
+              {
+                "speaker_id": "gaozheng",
+                "verbatim_text": "让他别急，路滑。",
+                "on_screen": true,
+                "response_obligation": "高峥顺口关心湿路，罗敏听见后自然看他一眼；随后货车完整遮挡，再揭示他不在",
+                "lip_sync_required": true
+              },
+              {
+                "speaker_id": "driver",
+                "verbatim_text": "就你一位？",
+                "on_screen": false,
+                "response_obligation": "在同机位完整揭出只剩罗敏之后，近景中才从电话传来普通接车核对，无惊讶质问",
+                "lip_sync_required": false
+              },
+              {
+                "speaker_id": "luomin",
+                "verbatim_text": "嗯，就我一个。",
+                "on_screen": true,
+                "response_obligation": "听完司机才自然确认，语气平常，无迟疑、困惑、恐惧或寻找；然后继续听电话",
+                "lip_sync_required": true
+              }
+            ]
+          },
+          "music_intent": {
+            "mode": "none",
+            "instrumentation": null,
+            "tempo_rhythm": null,
+            "dynamics": null
+          },
+          "primary_camera_motion": {
+            "movement_kind": "locked",
+            "direction": "none",
+            "amplitude_class": "subtle",
+            "speed_class": "very_slow",
+            "start_motion_state": "stationary",
+            "end_motion_state": "settled"
+          },
+          "camera_subject_relation": {
+            "subject_id": "luomin",
+            "relation_kind": "fixed_frame",
+            "start_relation": "站棚两人同框和完整可见出口",
+            "end_relation": "同侧胸上近景，罗敏平常听电话"
+          }
+        },
+        "conditioning_compatibility": null,
+        "semantic_reference_roles": [
+          "identity",
+          "scene"
+        ],
+        "capability_need": {
+          "needs_identity_reference": true,
+          "needs_scene_reference": true,
+          "needs_first_frame": false,
+          "needs_last_frame": false,
+          "needs_terminal_reference": false,
+          "needs_native_audio": true,
+          "needs_continuity_state": false,
+          "max_reference_count": 3,
+          "accepts_local_execution": false,
+          "accepts_remote_execution": true
+        },
+        "output_need": {
+          "timing_mode": "content_driven",
+          "duration_seconds": 22.0,
+          "frame_count": null,
+          "geometry_policy": "adaptive",
+          "width": null,
+          "height": null,
+          "aspect_ratio": "16:9",
+          "fps": null,
+          "container_mime": "video/mp4"
+        },
+        "audio_need": "required",
+        "quality_need": {
+          "objective_tier": "preview",
+          "minimum_raster": null,
+          "minimum_codec": null,
+          "native_enforcement_required": false
+        }
+      },
+      "plan_hash": "02c57ccae5a42b01e876a34a57d578cb968061feb30c960bb7ee41722d025d53",
+      "verified_source_request_content_hash": "b2562cf6cbbf01216f34db8ebdb1b913fa5923ff0e40b738e39e1101457547ea",
+      "target_shot_id": "CO-A3",
+      "target_shot_revision": 2,
+      "target_shot_content_hash": "577609ab8d23f9c382e6983563d02e0c3ca4d411ef8bf1f06156fd97f330cd6f",
+      "projection_hash": "3ac9181fe3ade2c5d06cd5fecbf32c9126b0378c25452f07e90d2a8d8c916872"
+    },
+    "context": {
+      "activated_shot": {
+        "artifact_id": "shizhen-CO-A3-shot",
+        "schema_version": "2.0",
+        "revision": 2,
+        "content_hash": "577609ab8d23f9c382e6983563d02e0c3ca4d411ef8bf1f06156fd97f330cd6f",
+        "creation_receipt_id": "shizhen-CO-A3-shot-authored",
+        "source_provenance": [
+          {
+            "kind": "user_input",
+            "reference": "evidence/authoring-input/0efeccaef86667f4cb87e55750e58916a63ac18bdc263e84f125046c3feeab8f.json",
+            "content_hash": "0efeccaef86667f4cb87e55750e58916a63ac18bdc263e84f125046c3feeab8f"
+          },
+          {
+            "kind": "user_input",
+            "reference": "evidence/authoring-input/1877fa5b095704cbac48d3135a3143f1a416f0c6b3b4217d6db9c44404a74e78.json",
+            "content_hash": "1877fa5b095704cbac48d3135a3143f1a416f0c6b3b4217d6db9c44404a74e78"
+          },
+          {
+            "kind": "user_input",
+            "reference": "evidence/authoring-input/28d10bf98a8649ed8ef3749ac381b473a4c5837ac1927195a60378f88a78d53c.json",
+            "content_hash": "28d10bf98a8649ed8ef3749ac381b473a4c5837ac1927195a60378f88a78d53c"
+          },
+          {
+            "kind": "user_input",
+            "reference": "evidence/authoring-input/3f5a45fd5b56ddebaade7216efee316edf87739ca272610d7b7eb63ebbf09298.json",
+            "content_hash": "3f5a45fd5b56ddebaade7216efee316edf87739ca272610d7b7eb63ebbf09298"
+          },
+          {
+            "kind": "user_input",
+            "reference": "evidence/authoring-input/4272d2e212040a6f84e56e9d9877d91446f3635bba65322ebe524af68dba6b61.json",
+            "content_hash": "4272d2e212040a6f84e56e9d9877d91446f3635bba65322ebe524af68dba6b61"
+          },
+          {
+            "kind": "user_input",
+            "reference": "evidence/authoring-input/59d18bd4d99d95ce55ccdd3f6348a353fa4f54c3796e7f4d721fc46c2506463e.json",
+            "content_hash": "59d18bd4d99d95ce55ccdd3f6348a353fa4f54c3796e7f4d721fc46c2506463e"
+          },
+          {
+            "kind": "user_input",
+            "reference": "evidence/authoring-input/e62641af9e3221cf97258c34690150a2378effa559d0f2e1efb73cca2e4c23d7.json",
+            "content_hash": "e62641af9e3221cf97258c34690150a2378effa559d0f2e1efb73cca2e4c23d7"
+          },
+          {
+            "kind": "user_input",
+            "reference": "evidence/authoring-input/dd5c788a76c8bf722488be2fd8aa61b986f21ebdd47c9a70f6cf6ac0f34f9f30.json",
+            "content_hash": "dd5c788a76c8bf722488be2fd8aa61b986f21ebdd47c9a70f6cf6ac0f34f9f30"
+          }
+        ],
+        "shot_id": "CO-A3",
+        "scene_id": "rain-stop",
+        "storyboard_beat_id": "complete-cold-open",
+        "intent": "开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。",
+        "dialogue": "罗敏：师傅，我们在站里，两位。高峥：让他别急，路滑。电话司机：就你一位？罗敏：嗯，就我一个。",
+        "narration": "",
+        "duration_policy": {
+          "mode": "fixed",
+          "seconds": 22.0,
+          "minimum_seconds": null,
+          "maximum_seconds": null
+        },
+        "character_ids": [
+          "gaozheng",
+          "luomin"
+        ],
+        "continuity_constraints": [
+          "前一夜单次03:17事件，无新机制或记忆保留者",
+          "先看见两位，再由完整车厢遮挡后只剩一位；角色不寻找",
+          "同站棚长镜头揭示，再自然切罗敏近景普通回答",
+          "左手手机左耳，人物脸衣包各自保持",
+          "无片名、字幕或准确数字；后期完成这些内容"
+        ],
+        "visual_strategy": "generated_video",
+        "required_asset_roles": [
+          {
+            "role": "primary_visual",
+            "asset_ids": [],
+            "allowed_asset_types": [
+              "video"
+            ]
+          }
+        ],
+        "motion_directives": [],
+        "generated_video_rationale": "User explicitly chooses one Seedance2.5 call for complete 22s dramatic event; can contain two camera setups, no 8–10s generation split",
+        "hybrid_layers": [],
+        "composition_directives": [],
+        "review_policy": {
+          "required_checks": []
+        }
+      },
+      "target_shot_id": "CO-A3",
+      "target_shot_revision": 2,
+      "target_shot_content_hash": "577609ab8d23f9c382e6983563d02e0c3ca4d411ef8bf1f06156fd97f330cd6f",
+      "storyboard_revision": 1,
+      "storyboard_content_hash": "bd6f24622f523a5af2589dc071a44dccb2d1caba9edf1af4800af59a99e42c87",
+      "selected_registry_revision_id": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+      "character_bible_content_hashes": [
+        "8b44e45581516ac05b32116346612f90593b601c516600c237348c8c40ed37b1",
+        "0e72bd23f10ae93f1529531115d2e3b959b6c2c9a093e361e5f694e6faa05495"
+      ],
+      "scene_content_hash": "c8290d31800556550526ec824a9a1622d63ac81be8be43b1d2eefeeabeb6fe52",
+      "important_character_ids": [
+        "gaozheng",
+        "luomin"
+      ],
+      "canonical_character_references": [
+        {
+          "role": "character_reference",
+          "asset_id": "CO-A3-ref-01-before",
+          "asset_sha256": "dd6cdb932eec157d9ab198f35bcd7b53e22127eb6a37fc6c574ae8c0ba6dbd8f",
+          "source_registry_revision_id": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+          "canonical_owner_kind": "character",
+          "canonical_owner_id": "gaozheng",
+          "canonical_owner_content_hash": "8b44e45581516ac05b32116346612f90593b601c516600c237348c8c40ed37b1",
+          "mime_type": "image/png",
+          "size_bytes": 2442444,
+          "width": 1672,
+          "height": 941,
+          "duration_millis": null,
+          "fps": null
+        },
+        {
+          "role": "character_reference",
+          "asset_id": "CO-A3-ref-03-close",
+          "asset_sha256": "53c21e36e6c9a5f75efab197211785d092f71af73ee2f776bf208508a90bb35d",
+          "source_registry_revision_id": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+          "canonical_owner_kind": "character",
+          "canonical_owner_id": "luomin",
+          "canonical_owner_content_hash": "0e72bd23f10ae93f1529531115d2e3b959b6c2c9a093e361e5f694e6faa05495",
+          "mime_type": "image/png",
+          "size_bytes": 2368596,
+          "width": 1672,
+          "height": 941,
+          "duration_millis": null,
+          "fps": null
+        }
+      ],
+      "canonical_scene_reference": {
+        "role": "scene_reference",
+        "asset_id": "CO-A3-ref-02-after",
+        "asset_sha256": "15543630bcc37bb9ca0b1e5457b20befa2a5ffd85e1e8c9845775a8c99126125",
+        "source_registry_revision_id": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+        "canonical_owner_kind": "scene",
+        "canonical_owner_id": "rain-stop",
+        "canonical_owner_content_hash": "c8290d31800556550526ec824a9a1622d63ac81be8be43b1d2eefeeabeb6fe52",
+        "mime_type": "image/png",
+        "size_bytes": 2436237,
+        "width": 1672,
+        "height": 941,
+        "duration_millis": null,
+        "fps": null
+      },
+      "approved_existing_video": null,
+      "shot_keyframe": null,
+      "upstream_terminal": null,
+      "last_frame": null,
+      "reference_videos": [],
+      "reference_audios": [],
+      "motion_requirement": "character_action",
+      "continuity_mode": "none",
+      "semantic_continuity_state": null,
+      "allowed_visual_strategies": [
+        "generated_video"
+      ],
+      "allowed_generation_modes": [
+        "text_to_video",
+        "image_to_video",
+        "reference_to_video",
+        "video_edit",
+        "video_extend"
+      ]
+    },
+    "policy": {
+      "identity": {
+        "policy_id": "shizhen-cold-open-qualification",
+        "policy_version": "1",
+        "policy_sha256": "d0654647a74ce0ff333cd3f925fb2013d363c3213821fc7dec6533770224f602"
+      },
+      "local_resources_available": false,
+      "remote_authorized": true,
+      "budget_authorized": true,
+      "execution_purpose": "qualification"
+    },
+    "lifecycle": {
+      "generation_id": "canvas-generation-96f4533b6af2f6c37380d2ea98931e12",
+      "target_asset_role": "primary_visual",
+      "base_project": {
+        "path": "state/projects/project.3.6e4c78a938031739e78a6317791a86fd15720966acd0d7d8f9a0ccf5e599e2ff.yaml",
+        "revision": 3,
+        "content_hash": "6e4c78a938031739e78a6317791a86fd15720966acd0d7d8f9a0ccf5e599e2ff",
+        "file_sha256": "4b0c92e12a1730d948486805b52d9c709275a37b47d696c2612612725c97dccd"
+      },
+      "base_registry": {
+        "path": "assets/registry.0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25.json",
+        "revision_id": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+        "content_hash": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+        "file_sha256": "acecf34a234d80d1b90eefd2e471a2a3e69377b3f11df16513e1e58db42fcae5"
+      },
+      "base_dependency_graph": {
+        "revision_id": "86f7ac318e10a678ef14f27ec446c542c64747a50b10e33957dbd4ee79a27b55",
+        "content_hash": "86f7ac318e10a678ef14f27ec446c542c64747a50b10e33957dbd4ee79a27b55",
+        "path": "state/dependency_graph.86f7ac318e10a678ef14f27ec446c542c64747a50b10e33957dbd4ee79a27b55.json",
+        "file_sha256": "cd8673a2275d5f291720524018e5e091bcf4ece438918ed4c5735600353d7f79"
+      },
+      "input_artifact_ids": [
+        "shizhen-CO-A3-shot",
+        "shizhen-CO-A3-scene",
+        "shizhen-CO-A3-character-gaozheng",
+        "shizhen-CO-A3-character-luomin",
+        "CO-A3-ref-01-before",
+        "CO-A3-ref-02-after",
+        "CO-A3-ref-03-close"
+      ],
+      "output_asset_id": "canvas-video-96f4533b6af2f6c37380d2ea98931e12",
+      "continuity_binding": null,
+      "hard_cut_keyframe_binding": null,
+      "seal_terminal_frame": false
+    },
+    "inputs": {
+      "projection_hash": "3ac9181fe3ade2c5d06cd5fecbf32c9126b0378c25452f07e90d2a8d8c916872",
+      "facts_hash": "c14baa406a8cb5d83efa456e291659a3319038f802be8a55b0602cce84852efe",
+      "rubric_hash": "f2502147d3b596390c784bb41fc055aec2677d7987a1a874c518857b52611745",
+      "policy": {
+        "policy_id": "generation-decision",
+        "version": "3",
+        "repeated_failure_threshold": 3,
+        "max_resamples": 0,
+        "allow_bounded_exploration": true
+      },
+      "limits": {
+        "task_id": "shizhen-CO-A3-qualification",
+        "generation_forbidden": false,
+        "allowed_remote_candidates": [
+          "jimeng/jimeng-seedance-2.5-multimodal-v1"
+        ],
+        "paid_submit_ceiling": 1,
+        "paid_submits_used": 0,
+        "local_batch_limit": 1,
+        "local_batch_used": 0,
+        "local_total_limit": null,
+        "local_total_used": 0,
+        "local_resource_available": false,
+        "batch_review_evidence_hash": null
+      },
+      "candidates": [
+        {
+          "candidate_id": "jimeng/jimeng-seedance-2.5-multimodal-v1",
+          "provider_profile": {
+            "profile_id": "jimeng",
+            "profile_version": "canvas-seedance-2.5-v1",
+            "profile_path": "provider-profiles/a68d75af3cc4c56557aa2b011e0496e6a2a930afc1ae92eed9ff98a68fe4560b.json",
+            "profile_sha256": "a68d75af3cc4c56557aa2b011e0496e6a2a930afc1ae92eed9ff98a68fe4560b"
+          },
+          "capabilities": {
+            "provider_name": "jimeng",
+            "variants": [
+              {
+                "capability_id": "jimeng-seedance-2.5-multimodal-v1",
+                "provider_kind": "jimeng",
+                "model_id": "seedance_2.5",
+                "profile_version": "canvas-seedance-2.5-v1",
+                "execution_kind": "remote",
+                "billing_kind": "metered",
+                "mode": "reference_to_video",
+                "output": null,
+                "output_capability": {
+                  "min_duration_seconds": 4,
+                  "max_duration_seconds": 30,
+                  "provider_selected_duration": false,
+                  "timing_modes": [
+                    "nominal_seconds"
+                  ],
+                  "frame_count_min": null,
+                  "frame_count_max": null,
+                  "frame_count_step": null,
+                  "frame_count_remainder": null,
+                  "dimension_modes": [
+                    "adaptive"
+                  ],
+                  "resolution_labels": [
+                    "480p",
+                    "720p",
+                    "1080p"
+                  ],
+                  "ratios": [
+                    "16:9",
+                    "9:16",
+                    "1:1",
+                    "4:3",
+                    "3:4"
+                  ],
+                  "fps_values": [
+                    null
+                  ],
+                  "containers": [
+                    "mp4"
+                  ],
+                  "native_audio_options": [
+                    true
+                  ]
+                },
+                "allowed_image_roles": [
+                  "reference"
+                ],
+                "required_first_frame": false,
+                "max_reference_count": 30,
+                "allowed_image_mime_types": [
+                  "image/png",
+                  "image/jpeg",
+                  "image/webp"
+                ],
+                "max_image_bytes": 41943040,
+                "min_image_width": 300,
+                "min_image_height": 300,
+                "media_capabilities": [
+                  {
+                    "kind": "audio",
+                    "roles": [
+                      "reference_audio"
+                    ],
+                    "min_count": 0,
+                    "max_count": 10,
+                    "allowed_mime_types": [
+                      "audio/wav",
+                      "audio/mpeg",
+                      "audio/mp4"
+                    ],
+                    "max_size_bytes": 15728640,
+                    "min_duration_millis": 1800,
+                    "max_duration_millis": 30200
+                  },
+                  {
+                    "kind": "video",
+                    "roles": [
+                      "reference_video"
+                    ],
+                    "min_count": 0,
+                    "max_count": 10,
+                    "allowed_mime_types": [
+                      "video/mp4",
+                      "video/quicktime"
+                    ],
+                    "max_size_bytes": 104857600,
+                    "min_duration_millis": 1800,
+                    "max_duration_millis": 30200
+                  }
+                ],
+                "negative_prompt_supported": false,
+                "seed_supported": false,
+                "fps_supported": false,
+                "idempotent_submit": false,
+                "lookup_supported": true,
+                "output_recovery_strategy": "REQUERY_BY_EFFECT_ID",
+                "binding_cardinality_constraints": [],
+                "production_qualification": "UNQUALIFIED"
+              }
+            ],
+            "capabilities_fingerprint": "6dfd168c74807aab0d201945dba453b39c907c0fc0fd2b0a60f6e8757dcc9a9c"
+          },
+          "capability_id": "jimeng-seedance-2.5-multimodal-v1",
+          "compiler_contract": {
+            "compiler_id": "jimeng-seedance-2.5-video-compiler",
+            "compiler_version": "1",
+            "compiler_hash": "3ff8df22ff07ef4e6b2c0ec02474f1dc90aaaa5087dca4a60d7c5c05d478965f"
+          },
+          "output_requirement": {
+            "timing_mode": "nominal_seconds",
+            "duration_seconds": 22,
+            "frame_count": null,
+            "dimension_mode": "adaptive",
+            "width": null,
+            "height": null,
+            "resolution_label": "1080p",
+            "ratio": "16:9",
+            "fps": null,
+            "container": "mp4",
+            "mime_type": "video/mp4",
+            "native_audio": true
+          },
+          "recipe": {
+            "contract_version": "generation-recipe/1",
+            "seed": {
+              "kind": "uncontrolled",
+              "value": null
+            },
+            "profile_sha256": "a68d75af3cc4c56557aa2b011e0496e6a2a930afc1ae92eed9ff98a68fe4560b",
+            "compiler_hash": "3ff8df22ff07ef4e6b2c0ec02474f1dc90aaaa5087dca4a60d7c5c05d478965f",
+            "requirement_hash": "f0c382393072fc960dc925f06c36cb4813bb2b9dec88318b8aa88d078c5dd729",
+            "rubric_hash": "f2502147d3b596390c784bb41fc055aec2677d7987a1a874c518857b52611745",
+            "acceptance_policy": {
+              "domain_id": "original-drama",
+              "profile_id": "shizhen-CO-A3-raw",
+              "profile_version": "1",
+              "profile_content_hash": "f2502147d3b596390c784bb41fc055aec2677d7987a1a874c518857b52611745",
+              "profile_payload": {
+                "content_hash": "f2502147d3b596390c784bb41fc055aec2677d7987a1a874c518857b52611745",
+                "domain_id": "original-drama",
+                "generation_requirements": [
+                  {
+                    "dimension": "relationship",
+                    "intent_paths": [
+                      "generation_intent.subject_action.progression"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                    "observable": "先让观众明确两名普通同事和一次顺口关心，随后缺席造成情感反差，无额外关系或记忆保留者。",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "relationship",
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足；导演表演偏好不变成硬秒点"
+                  },
+                  {
+                    "dimension": "action",
+                    "intent_paths": [
+                      "generation_intent.subject_action.progression"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                    "observable": "开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "action",
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足；导演表演偏好不变成硬秒点"
+                  },
+                  {
+                    "dimension": "identity",
+                    "intent_paths": [
+                      "generation_intent.identity_continuity.preservation"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                    "observable": "高峥与罗敏维持三张参考的原身份衣物和各自包；罗敏始终左手手机左耳。失踪后高峥和包一起不在，罗敏不换脸衣或手。",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "identity",
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足；导演表演偏好不变成硬秒点"
+                  },
+                  {
+                    "dimension": "camera",
+                    "intent_paths": [
+                      "generation_intent.camera_intent.framing_intent"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                    "observable": "先固定中远景同时看两人、出口和脚边；货车完整遮挡后在同机位揭示一位，再切到罗敏胸上近景完成电话对答，近景保持完整脸、左手手机与墨绿雨衣",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "camera",
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足；导演表演偏好不变成硬秒点"
+                  },
+                  {
+                    "dimension": "performance",
+                    "intent_paths": [
+                      "generation_intent.performance_intent"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                    "observable": "高峥先听见再提醒，罗敏先听见再回应目光；消失后她不寻找，不困惑；司机核对后她自然确认一位，无惊恐或神秘笑。",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "performance",
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足；导演表演偏好不变成硬秒点"
+                  },
+                  {
+                    "dimension": "sound",
+                    "intent_paths": [
+                      "generation_intent.dialogue_intent.turns",
+                      "generation_intent.ambience_intent.environment_bed",
+                      "generation_intent.ambience_intent.foley_cues"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                    "observable": "四轮中文依序各一次：女报两位、男提醒路滑、消失后画外司机核对就你一位、女平常确认就我一个。声线角色正确、口型对人、正常语速；持续雨夜车流与货车声，无多余对白、配乐、惊吓冲击或突发全局静音。",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "sound",
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足；导演表演偏好不变成硬秒点"
+                  },
+                  {
+                    "dimension": "story-scope",
+                    "intent_paths": [
+                      "generation_intent.scene_continuity.state_constraints"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                    "observable": "只呈现一次前一夜的两位→一位事件。消失不等于走开、上车、烟化或透明渐隐；人物没有保留记忆；不泄露S01与终场反转，不加怪物、规则解释、字幕、片名或准确数字。",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "story-scope",
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足；导演表演偏好不变成硬秒点"
+                  },
+                  {
+                    "dimension": "art",
+                    "intent_paths": [
+                      "generation_intent.visual_treatment.medium_look",
+                      "generation_intent.visual_treatment.palette",
+                      "generation_intent.visual_treatment.material_treatment",
+                      "generation_intent.visual_treatment.prohibited_visual_drift"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                    "observable": "全程保持同参考的原创成年3D国漫写实CG、细束发丝与真实湿材质，同一雨夜冷暖光；不变真人、蜡脸或风格分裂。",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "art",
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足；导演表演偏好不变成硬秒点"
+                  }
+                ],
+                "measurement_contract_version": "1",
+                "profile_id": "shizhen-CO-A3-raw",
+                "profile_version": "1",
+                "required_requirement_ids": [
+                  "relationship",
+                  "action",
+                  "identity",
+                  "camera",
+                  "performance",
+                  "sound",
+                  "story-scope",
+                  "art"
+                ]
+              },
+              "measurement_contract_version": "1",
+              "required_requirement_ids": [
+                "relationship",
+                "action",
+                "identity",
+                "camera",
+                "performance",
+                "sound",
+                "story-scope",
+                "art"
+              ]
+            },
+            "expressions": [
+              {
+                "requirement_id": "action",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "action",
+                "observable": "开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。",
+                "tolerance": "逐项满足；导演表演偏好不变成硬秒点",
+                "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.subject_action.progression"
+                ],
+                "native_text": [
+                  "开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。"
+                ],
+                "production_owner": "shot_authoring"
+              },
+              {
+                "requirement_id": "art",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "art",
+                "observable": "全程保持同参考的原创成年3D国漫写实CG、细束发丝与真实湿材质，同一雨夜冷暖光；不变真人、蜡脸或风格分裂。",
+                "tolerance": "逐项满足；导演表演偏好不变成硬秒点",
+                "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.visual_treatment.medium_look",
+                  "generation_intent.visual_treatment.palette",
+                  "generation_intent.visual_treatment.material_treatment",
+                  "generation_intent.visual_treatment.prohibited_visual_drift"
+                ],
+                "native_text": [
+                  "同三张参考的原创成年3D国漫CG面部、细束发丝、克制皮肤高光；成熟比例，不转真人照片",
+                  "冷灰雨城与微暖站棚灯",
+                  "真实湿布、玻璃、雨水、金属和朴素通勤道具",
+                  "真人照片脸或蜡像",
+                  "换脸、额外手、多人融合",
+                  "用溶解、透明、残影、鬼怪替代完整遮挡后的缺席",
+                  "错误文字、片名、字幕或数字"
+                ],
+                "production_owner": "shot_authoring"
+              },
+              {
+                "requirement_id": "camera",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "camera",
+                "observable": "先固定中远景同时看两人、出口和脚边；货车完整遮挡后在同机位揭示一位，再切到罗敏胸上近景完成电话对答，近景保持完整脸、左手手机与墨绿雨衣",
+                "tolerance": "逐项满足；导演表演偏好不变成硬秒点",
+                "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.camera_intent.framing_intent"
+                ],
+                "native_text": [
+                  "先固定中远景同时看两人、出口和脚边；货车完整遮挡后在同机位揭示一位，再切到罗敏胸上近景完成电话对答，近景保持完整脸、左手手机与墨绿雨衣"
+                ],
+                "production_owner": "shot_authoring"
+              },
+              {
+                "requirement_id": "identity",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "identity",
+                "observable": "高峥与罗敏维持三张参考的原身份衣物和各自包；罗敏始终左手手机左耳。失踪后高峥和包一起不在，罗敏不换脸衣或手。",
+                "tolerance": "逐项满足；导演表演偏好不变成硬秒点",
+                "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.identity_continuity.preservation"
+                ],
+                "native_text": [],
+                "production_owner": "shot_authoring"
+              },
+              {
+                "requirement_id": "performance",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "performance",
+                "observable": "高峥先听见再提醒，罗敏先听见再回应目光；消失后她不寻找，不困惑；司机核对后她自然确认一位，无惊恐或神秘笑。",
+                "tolerance": "逐项满足；导演表演偏好不变成硬秒点",
+                "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.performance_intent"
+                ],
+                "native_text": [],
+                "production_owner": "shot_authoring"
+              },
+              {
+                "requirement_id": "relationship",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "relationship",
+                "observable": "先让观众明确两名普通同事和一次顺口关心，随后缺席造成情感反差，无额外关系或记忆保留者。",
+                "tolerance": "逐项满足；导演表演偏好不变成硬秒点",
+                "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.subject_action.progression"
+                ],
+                "native_text": [
+                  "开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。"
+                ],
+                "production_owner": "shot_authoring"
+              },
+              {
+                "requirement_id": "sound",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "sound",
+                "observable": "四轮中文依序各一次：女报两位、男提醒路滑、消失后画外司机核对就你一位、女平常确认就我一个。声线角色正确、口型对人、正常语速；持续雨夜车流与货车声，无多余对白、配乐、惊吓冲击或突发全局静音。",
+                "tolerance": "逐项满足；导演表演偏好不变成硬秒点",
+                "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.dialogue_intent.turns",
+                  "generation_intent.ambience_intent.environment_bed",
+                  "generation_intent.ambience_intent.foley_cues"
+                ],
+                "native_text": [
+                  "持续近棚雨声、湿路车流和正常经过的货车；电话司机为普通窄频通话声。无配乐、怪声、惊吓冲击或全局静音",
+                  "普通衣料声",
+                  "货车引擎与湿路轮胎声从左向右正常经过远离"
+                ],
+                "production_owner": "shot_authoring"
+              },
+              {
+                "requirement_id": "story-scope",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "story-scope",
+                "observable": "只呈现一次前一夜的两位→一位事件。消失不等于走开、上车、烟化或透明渐隐；人物没有保留记忆；不泄露S01与终场反转，不加怪物、规则解释、字幕、片名或准确数字。",
+                "tolerance": "逐项满足；导演表演偏好不变成硬秒点",
+                "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.scene_continuity.state_constraints"
+                ],
+                "native_text": [
+                  "参考素材1只指导最初同框的高峥、罗敏身份服装、原站位和站棚；参考素材2只指导货车驶离后的同一站棚、右侧罗敏和左侧空位，不能作为开场；参考素材3只指导最后罗敏的近景脸、发型、衣服和左手手机，不能提前切走掩盖消失。",
+                  "同一事件，无角色保留对消失者的记忆；司机不知道先前的两位说法被改写",
+                  "高峥不主动走开、不上车，无人被拖走，不留衣物或包",
+                  "完整遮挡后才揭示左侧为空；不可用溶解、灯闪、黑屏、透明或烟化代替",
+                  "无音乐、鬼声、惊吓音效、额外对白、字幕、片名或准确数字"
+                ],
+                "production_owner": "shot_authoring"
+              }
+            ],
+            "editorial_operations": [],
+            "comparison": null
+          },
+          "final_output_goal": {
+            "goal_id": "shizhen-episode01",
+            "goal_version": "4-HD1080",
+            "user_goal": "# 《失帧》第一集：消失的十一秒\n\n## 创作任务\n\n制作一集原创都市灵异悬疑 3D 动画短剧，目标时长约 3–5 分钟。\n\n作品追求《神秘复苏》式的未知恐惧、都市压迫感、诡异规则和悬疑吸引力，但故事、角色、灵异机制和视觉设计必须保持原创。\n\n这是一集真正有戏剧内容、有表演、有情绪递进的电视剧，而不是由炫技镜头组成的概念预告片。\n\n你同时担任编剧、导演、摄影指导和表演指导。根据剧情需要自主设计人物互动、对白、镜头组织和视听语言，不需要逐秒规划对白或固定每个动作的发生时间。\n\n## 核心故事\n\n临江市表面上是一座正常运转的现代城市，但最近不断出现无法解释的失踪事件。\n\n每天凌晨 03:17，这座城市都会无声无息地丢失十一秒。\n\n在这十一秒里消失的人，不仅会从现实中消失，还会被其他人的记忆和各种记录抹除。\n\n男主林序，26 岁，一名从事监控视频修复工作的年轻人。性格冷静、理性，观察敏锐，但并不是传统意义上的无所畏惧的英雄。\n\n某个深夜，他在一家便利店遭遇无法解释的异常。\n\n一个刚刚还在正常工作的店员突然消失。更加可怕的是，其他人完全不记得这里存在过这样一个人，甚至连相关监控记录都发生了变化。\n\n林序却清楚地记得店员。\n\n他开始怀疑自己的记忆，试图寻找证据，却发现身边越来越多的细节开始与自己的认知矛盾。\n\n当晚，他意外收到一个神秘视频文件。\n\n视频中的女孩是他四年前失踪的妹妹。\n\n妹妹明显处于极度恐惧之中。她似乎知道镜头外存在某种危险，警告哥哥不要寻找自己。\n\n而这个视频的创建时间，竟然来自明天。\n\n林序逐帧检查录像，发现妹妹身后有一个无法辨认的人影。\n\n经过修复，那个人的面部逐渐变得清晰。\n\n那竟然是他自己。\n\n第一集在强烈的不安和新的未知中结束。\n\n## 戏剧与表演要求\n\n把恐怖建立在普通生活逐渐失去合理性的过程之中。\n\n开场应尽快建立吸引观众的悬念，但不必使用直白旁白解释设定。可以从普通人的一次异常经历切入，也可以用其他更有戏剧冲击力的方式展开。\n\n人物首先必须像真实的人一样生活、观察、思考和反应。\n\n林序面对第一次异常时，不应立即接受超自然现象，也不应该像知道剧本的角色那样准确判断危险。他应当尝试用常识解释问题，在事实不断推翻判断后，才逐渐产生恐惧。\n\n恐惧反应要有层次：困惑、迟疑、试探、否认、紧张，以及意识到现实不再可信之后的真正恐惧。\n\n允许演员通过眼神、细微表情、呼吸、身体停顿和动作中的犹豫表达情绪。\n\n避免僵硬表演、无意义的缓慢转头、永远面无表情的人物和突兀的大喊大叫。\n\n对白应自然、口语化、符合人物身份，有信息价值和情绪目的。允许原创台词、临场反应、沉默和对话中的停顿。不要为了向观众解释世界观而让角色机械地介绍设定。\n\n**不为任何台词分配固定时间戳，不要求每一句对白严格对应特定秒数。** 由导演根据表演节奏和剧情需要自行组织。\n\n## 恐怖设计\n\n整集应有逐渐升级的诡异感。\n\n异常不依赖血腥、怪物突然扑脸或密集惊吓，而是优先表现现实中的细微错误，例如：\n\n- 一个应该存在的人被所有人遗忘。\n- 监控画面与亲眼所见出现矛盾。\n- 原本普通的空间突然产生难以解释的违和感。\n- 某个角色的行为在极短暂的瞬间失去正常逻辑。\n- 镜头里出现了不该存在的东西。\n\n这些只是创作方向，不要求全部使用。可以自主设计更有表现力的灵异现象。\n\n超自然现象应当具有隐约可感知的内部规律，但不要在第一集揭露完整答案。\n\n每次出现真正的异常，都要对剧情、人物判断或观众认知产生实际影响，不能只是装饰性的视觉特效。\n\n## 视觉风格\n\n采用电影级 3D 国漫写实风格，人物具有接近真人的人体比例、自然的动作规律和细腻的情绪表演，但从五官塑形、材质和渲染语言上能够明确辨认为原创 CG 动画角色，而非真实演员或真人影像。\n\n场景可以高度写实。现代中国城市、深夜便利店、监控工作室、雨夜街道、旧式住宅等环境，应有可信的空间结构和丰富的生活细节。\n\n整体以冷色、暗部层次、局部暖光和压抑的城市夜景建立视觉基调。灯光服务情绪，而不是单纯追求黑暗。\n\n摄影追求严肃悬疑影视剧质感，合理使用人物中近景、环境建立镜头、细节特写、空间调度和克制的主观视角。\n\n不要全程快速剪辑，也不要把缓慢推镜当成制造恐怖的唯一方式。\n\n人物外观、服装、空间、灯光逻辑保持连续。优先保证角色动作和表演完整，再考虑视觉炫技。\n\n## 声音设计\n\n声音是恐怖叙事的重要部分。\n\n利用便利店电器声、城市远处的车流、灯具电流声、脚步、呼吸、空调和环境突然变得安静等元素，建立真实的声音空间。\n\n灵异发生时，可以采用不自然的声音缺失、环境声变化或难以辨认的异常声音。\n\n配乐应克制，避免整集铺满恐怖音乐。\n\n声音变化要与戏剧行为形成因果关系，不要每次出现异常都使用相同的音效。\n\n## 叙事目标与结尾\n\n第一集必须让观众逐渐理解三个事实：\n\n这座城市正在发生无法解释的异常。\n\n林序能够察觉某些其他人已经遗忘的事物。\n\n他失踪多年的妹妹可能与这一切有关。\n\n不需要在本集解释异常的起源、能力体系、调查组织或者完整的世界规则。\n\n结尾揭示未来录像中的神秘人是林序本人，但应通过符合电影叙事的视觉手段完成，而不是依赖一大段解释性对白。\n\n最终让观众产生强烈疑问：妹妹究竟在什么地方？为什么明天的录像中会出现林序？他是否已经注定卷入某场无法逃脱的事件？\n\n## 创作自由与制作要求\n\n以上内容是剧情核心与审美边界，而不是固定分镜表。\n\n你可以自主调整事件顺序、加入合理的次要人物、增强角色冲突、设计更精彩的悬念和视觉表达。允许为了戏剧效果优化情节，但不能破坏关键因果关系和结尾反转。\n\n不要直接把大纲逐条转化为平铺直叙的镜头。\n\n先理解整集的戏剧目的，再完成完整剧本、自然对白、表演设计和导演拆镜，最后形成适合当前 AI 视频生成能力的可执行镜头提示词。\n\n生成方案应适应不同视频模型支持的片段长度，合理安排连续表演和镜头衔接，不为了固定时长强行截断动作或对白。\n\n确保成片是一个连贯、自然、有情感、有悬疑推进的完整故事，而非互不关联的精美镜头合集。\n\n**最终优先级：故事吸引力 > 人物表演与情绪真实感 > 叙事连续性 > 恐怖氛围 > 视觉精细度 > 技术特效。**\n\n请充分发挥专业创作判断，目标是让观众看完第一集后，主动想看第二集。\n\n---\n后续用户型号指令：\n用即梦provider seedance2.5\n\n用户后续选择D版：提高人物建模和画风质感；保留已认可的表演方向。\n用户要求按新导演规则重做开场：按戏剧关注点组织镜头，修复纸穿过饭团。\n用户认可480p试片方向，要求同方案生成1080p正式版并重新审片。",
+            "requirements": [
+              {
+                "requirement_id": "duration",
+                "observable": "制作一集原创都市灵异悬疑 3D 动画短剧，目标时长约 3–5 分钟。",
+                "proof": "evaluator"
+              },
+              {
+                "requirement_id": "original",
+                "observable": "但故事、角色、灵异机制和视觉设计必须保持原创。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "drama",
+                "observable": "这是一集真正有戏剧内容、有表演、有情绪递进的电视剧，而不是由炫技镜头组成的概念预告片。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "natural",
+                "observable": "人物首先必须像真实的人一样生活、观察、思考和反应。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "no-line-times",
+                "observable": "不为任何台词分配固定时间戳，不要求每一句对白严格对应特定秒数。",
+                "proof": "evaluator"
+              },
+              {
+                "requirement_id": "cg",
+                "observable": "但从五官塑形、材质和渲染语言上能够明确辨认为原创 CG 动画角色，而非真实演员或真人影像。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "continuity",
+                "observable": "人物外观、服装、空间、灯光逻辑保持连续。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "sound",
+                "observable": "声音变化要与戏剧行为形成因果关系，不要每次出现异常都使用相同的音效。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "no-gore",
+                "observable": "异常不依赖血腥、怪物突然扑脸或密集惊吓",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "no-lore",
+                "observable": "不需要在本集解释异常的起源、能力体系、调查组织或者完整的世界规则。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "model",
+                "observable": "用即梦provider seedance2.5",
+                "proof": "evaluator"
+              },
+              {
+                "requirement_id": "priority",
+                "observable": "故事吸引力 > 人物表演与情绪真实感 > 叙事连续性 > 恐怖氛围 > 视觉精细度 > 技术特效。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "rational",
+                "observable": "他应当尝试用常识解释问题，在事实不断推翻判断后，才逐渐产生恐惧。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "clerk",
+                "observable": "一个刚刚还在正常工作的店员突然消失。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "erased",
+                "observable": "其他人完全不记得这里存在过这样一个人，甚至连相关监控记录都发生了变化。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "remembers",
+                "observable": "林序却清楚地记得店员。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "city",
+                "observable": "每天凌晨 03:17，这座城市都会无声无息地丢失十一秒。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "sister",
+                "observable": "视频中的女孩是他四年前失踪的妹妹。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "warning",
+                "observable": "警告哥哥不要寻找自己。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "future",
+                "observable": "而这个视频的创建时间，竟然来自明天。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "face",
+                "observable": "结尾揭示未来录像中的神秘人是林序本人，但应通过符合电影叙事的视觉手段完成",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "refinement",
+                "observable": "整体以冷色、暗部层次、局部暖光和压抑的城市夜景建立视觉基调。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "dialogue-source",
+                "observable": "所有对白说话人、措辞、意图与本次剧本一致；实际语义、口型和听感对同一MP4验证，妹妹不回应现实林序。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "eleven-math",
+                "observable": "准确显示03:16:59→03:17:11，缺03:17:00–03:17:10十一完整秒；未来日期为2026-10-26而工作间为2026-10-25。",
+                "proof": "evaluator"
+              },
+              {
+                "requirement_id": "holistic-story",
+                "observable": "原速连贯听看三至五分钟；生活可信、求证反复失败、妹妹失踪情感与本人反转完整，愿看下一集；无幻灯片凑时长或已知基础缺陷。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "D-authored-art",
+                "observable": "采用用户选择的D版成年人物塑形与电影CG材质；全镜自然表演中保持同一造型、皮肤和织物层次，不能回退旧版低质建模。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "opening-coverage-and-contact",
+                "observable": "开场有服务于人物关系、回应与动作的可辨识切镜；保留D人物和三句对白，自然表演。纸先落空台面，再将明确离台的饭团移到纸上放稳、推近，不穿透或瞬移。",
+                "proof": "human"
+              },
+              {
+                "requirement_id": "formal-source-1080p",
+                "observable": "新Provider request实际选择1080p，原始fetched MP4实测短边1080像素且维持横版16:9；不是将旧480p放大、改标签或插帧。原声、对白、D人物、四机位和纸饭动作重新核验。",
+                "proof": "evaluator"
+              }
+            ]
+          }
+        }
+      ],
+      "evidence": [],
+      "latest_attempt_hash": null,
+      "interventions": [],
+      "conflicts": [],
+      "historical_recipes": [],
+      "baseline_request": null,
+      "user_fixed_candidates": [],
+      "experiences": [],
+      "feature_scope": {
+        "version": "generation-features/1",
+        "character_count": 2,
+        "motion_requirement": "character_action",
+        "camera_movement": "locked",
+        "camera_amplitude": "subtle",
+        "dialogue_length_band": "unknown",
+        "dialogue_window_band": "unknown",
+        "reference_structure": [
+          "identity",
+          "scene"
+        ],
+        "continuity": "none",
+        "identity_preservation": "exact",
+        "audio_need": "required",
+        "duration_band": "3",
+        "output_geometry": [
+          null,
+          null,
+          null
+        ],
+        "unknown_features": [
+          "action_complexity",
+          "hand_prop_interaction"
+        ]
+      },
+      "runtime_repairs": []
+    },
+    "decision": {
+      "snapshot_hash": "d96eca888af756636b01392f8f81d478a8633d76efede85a92e95e11747449d2",
+      "disposition": "GENERATE_ONCE",
+      "selected_candidate_id": "jimeng/jimeng-seedance-2.5-multimodal-v1",
+      "assessments": [
+        {
+          "candidate_id": "jimeng/jimeng-seedance-2.5-multimodal-v1",
+          "scope_hash": "5929555b6c0bc53d7f8b2a24dd8b9e8b9c374df70a14edd46e11811933544789",
+          "fit": "unknown",
+          "compatible": true,
+          "executable": true,
+          "supported_dimensions": [],
+          "failed_dimensions": [],
+          "unknown_dimensions": [
+            "action",
+            "art",
+            "camera",
+            "identity",
+            "performance",
+            "relationship",
+            "sound",
+            "story-scope"
+          ],
+          "evidence_hashes": [],
+          "ignored_evidence_hashes": [],
+          "sample_count": 0,
+          "pass_count": 0,
+          "fail_count": 0,
+          "not_evaluated_count": 0,
+          "runtime_failure_count": 0,
+          "unknown_outcome_count": 0,
+          "not_submitted_count": 0,
+          "reasons": [],
+          "empirical": {
+            "version": "generation-cohort/1",
+            "supported_artifacts": [],
+            "failed_artifacts": [],
+            "incomplete_artifacts": [],
+            "evidence_hashes": [],
+            "exclusions": [],
+            "failed_requirements": [],
+            "observed_success_fraction": null,
+            "interval_95": null,
+            "limitations": [
+              "observational cohort; selection and intervention confounding remain",
+              "unknown action complexity and hand/prop interaction are not matched",
+              "interval is binomial sampling uncertainty, not causal or calibrated prediction"
+            ]
+          }
+        }
+      ],
+      "diagnosis": null,
+      "intervention": null,
+      "runtime_repair": null,
+      "routing": {
+        "decision": {
+          "target_shot_id": "CO-A3",
+          "target_shot_revision": 2,
+          "target_shot_content_hash": "577609ab8d23f9c382e6983563d02e0c3ca4d411ef8bf1f06156fd97f330cd6f",
+          "continuity_mode": "none",
+          "semantic_continuity_state": null,
+          "required_mode": "reference_to_video",
+          "selected_mode": "reference_to_video",
+          "required_binding_roles": [
+            "reference",
+            "reference",
+            "reference"
+          ],
+          "input_assets": [
+            {
+              "role": "character_reference",
+              "asset_id": "CO-A3-ref-01-before",
+              "asset_sha256": "dd6cdb932eec157d9ab198f35bcd7b53e22127eb6a37fc6c574ae8c0ba6dbd8f",
+              "source_registry_revision_id": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+              "canonical_owner_kind": "character",
+              "canonical_owner_id": "gaozheng",
+              "canonical_owner_content_hash": "8b44e45581516ac05b32116346612f90593b601c516600c237348c8c40ed37b1",
+              "mime_type": "image/png",
+              "size_bytes": 2442444,
+              "width": 1672,
+              "height": 941,
+              "duration_millis": null,
+              "fps": null
+            },
+            {
+              "role": "character_reference",
+              "asset_id": "CO-A3-ref-03-close",
+              "asset_sha256": "53c21e36e6c9a5f75efab197211785d092f71af73ee2f776bf208508a90bb35d",
+              "source_registry_revision_id": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+              "canonical_owner_kind": "character",
+              "canonical_owner_id": "luomin",
+              "canonical_owner_content_hash": "0e72bd23f10ae93f1529531115d2e3b959b6c2c9a093e361e5f694e6faa05495",
+              "mime_type": "image/png",
+              "size_bytes": 2368596,
+              "width": 1672,
+              "height": 941,
+              "duration_millis": null,
+              "fps": null
+            },
+            {
+              "role": "scene_reference",
+              "asset_id": "CO-A3-ref-02-after",
+              "asset_sha256": "15543630bcc37bb9ca0b1e5457b20befa2a5ffd85e1e8c9845775a8c99126125",
+              "source_registry_revision_id": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+              "canonical_owner_kind": "scene",
+              "canonical_owner_id": "rain-stop",
+              "canonical_owner_content_hash": "c8290d31800556550526ec824a9a1622d63ac81be8be43b1d2eefeeabeb6fe52",
+              "mime_type": "image/png",
+              "size_bytes": 2436237,
+              "width": 1672,
+              "height": 941,
+              "duration_millis": null,
+              "fps": null
+            }
+          ],
+          "provider_name": "jimeng",
+          "provider_profile": {
+            "profile_id": "jimeng",
+            "profile_version": "canvas-seedance-2.5-v1",
+            "profile_path": "provider-profiles/a68d75af3cc4c56557aa2b011e0496e6a2a930afc1ae92eed9ff98a68fe4560b.json",
+            "profile_sha256": "a68d75af3cc4c56557aa2b011e0496e6a2a930afc1ae92eed9ff98a68fe4560b"
+          },
+          "provider_capabilities_fingerprint": "6dfd168c74807aab0d201945dba453b39c907c0fc0fd2b0a60f6e8757dcc9a9c",
+          "selected_capability_id": "jimeng-seedance-2.5-multimodal-v1",
+          "selected_capability_fingerprint": "ae90ac5380232f5b47ea3d27014db5da2a244aa16e239bf63b8c54ca8b6cd91c",
+          "requirement_hash": "f0c382393072fc960dc925f06c36cb4813bb2b9dec88318b8aa88d078c5dd729",
+          "continuity_transition_policy_hash": null,
+          "previous_provider_bound_request_hash": null,
+          "continuity_provider_route_binding_hash": null,
+          "execution_kind": "remote",
+          "output_requirement": {
+            "timing_mode": "nominal_seconds",
+            "duration_seconds": 22,
+            "frame_count": null,
+            "dimension_mode": "adaptive",
+            "width": null,
+            "height": null,
+            "resolution_label": "1080p",
+            "ratio": "16:9",
+            "fps": null,
+            "container": "mp4",
+            "mime_type": "video/mp4",
+            "native_audio": true
+          },
+          "reason_codes": [
+            "CANONICAL_REFERENCES_ENABLE_R2V"
+          ],
+          "rationale": "Bind the verified neutral requirement to the exact capability.",
+          "policy": {
+            "policy_id": "shizhen-cold-open-qualification",
+            "policy_version": "1",
+            "policy_sha256": "d0654647a74ce0ff333cd3f925fb2013d363c3213821fc7dec6533770224f602"
+          },
+          "outcome": "selected",
+          "semantic_routing_hash": "d547c5f5e78d75a7eb7be4deb1d2f153d5244a6c74c14bef0c96aadd5c0b749f",
+          "audit_decision_hash": "26eb39d030fc3bbaaa83d97f92da8c483d2060f35cd860b97a0a6a1d88315a5f"
+        },
+        "provider_bound_request": {
+          "plan_hash": "02c57ccae5a42b01e876a34a57d578cb968061feb30c960bb7ee41722d025d53",
+          "requirement_hash": "f0c382393072fc960dc925f06c36cb4813bb2b9dec88318b8aa88d078c5dd729",
+          "verified_projection_hash": "3ac9181fe3ade2c5d06cd5fecbf32c9126b0378c25452f07e90d2a8d8c916872",
+          "target_shot_id": "CO-A3",
+          "target_shot_revision": 2,
+          "target_shot_content_hash": "577609ab8d23f9c382e6983563d02e0c3ca4d411ef8bf1f06156fd97f330cd6f",
+          "semantic_routing_hash": "d547c5f5e78d75a7eb7be4deb1d2f153d5244a6c74c14bef0c96aadd5c0b749f",
+          "audit_decision_hash": "26eb39d030fc3bbaaa83d97f92da8c483d2060f35cd860b97a0a6a1d88315a5f",
+          "provider_name": "jimeng",
+          "provider_kind": "jimeng",
+          "model_id": "seedance_2.5",
+          "provider_profile": {
+            "profile_id": "jimeng",
+            "profile_version": "canvas-seedance-2.5-v1",
+            "profile_path": "provider-profiles/a68d75af3cc4c56557aa2b011e0496e6a2a930afc1ae92eed9ff98a68fe4560b.json",
+            "profile_sha256": "a68d75af3cc4c56557aa2b011e0496e6a2a930afc1ae92eed9ff98a68fe4560b"
+          },
+          "capability_id": "jimeng-seedance-2.5-multimodal-v1",
+          "capability_fingerprint": "ae90ac5380232f5b47ea3d27014db5da2a244aa16e239bf63b8c54ca8b6cd91c",
+          "execution_kind": "remote",
+          "billing_kind": "metered",
+          "mode": "reference_to_video",
+          "binding_roles": [
+            "reference",
+            "reference",
+            "reference"
+          ],
+          "input_assets": [
+            {
+              "role": "character_reference",
+              "asset_id": "CO-A3-ref-01-before",
+              "asset_sha256": "dd6cdb932eec157d9ab198f35bcd7b53e22127eb6a37fc6c574ae8c0ba6dbd8f",
+              "source_registry_revision_id": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+              "canonical_owner_kind": "character",
+              "canonical_owner_id": "gaozheng",
+              "canonical_owner_content_hash": "8b44e45581516ac05b32116346612f90593b601c516600c237348c8c40ed37b1",
+              "mime_type": "image/png",
+              "size_bytes": 2442444,
+              "width": 1672,
+              "height": 941,
+              "duration_millis": null,
+              "fps": null
+            },
+            {
+              "role": "character_reference",
+              "asset_id": "CO-A3-ref-03-close",
+              "asset_sha256": "53c21e36e6c9a5f75efab197211785d092f71af73ee2f776bf208508a90bb35d",
+              "source_registry_revision_id": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+              "canonical_owner_kind": "character",
+              "canonical_owner_id": "luomin",
+              "canonical_owner_content_hash": "0e72bd23f10ae93f1529531115d2e3b959b6c2c9a093e361e5f694e6faa05495",
+              "mime_type": "image/png",
+              "size_bytes": 2368596,
+              "width": 1672,
+              "height": 941,
+              "duration_millis": null,
+              "fps": null
+            },
+            {
+              "role": "scene_reference",
+              "asset_id": "CO-A3-ref-02-after",
+              "asset_sha256": "15543630bcc37bb9ca0b1e5457b20befa2a5ffd85e1e8c9845775a8c99126125",
+              "source_registry_revision_id": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+              "canonical_owner_kind": "scene",
+              "canonical_owner_id": "rain-stop",
+              "canonical_owner_content_hash": "c8290d31800556550526ec824a9a1622d63ac81be8be43b1d2eefeeabeb6fe52",
+              "mime_type": "image/png",
+              "size_bytes": 2436237,
+              "width": 1672,
+              "height": 941,
+              "duration_millis": null,
+              "fps": null
+            }
+          ],
+          "output_requirement": {
+            "timing_mode": "nominal_seconds",
+            "duration_seconds": 22,
+            "frame_count": null,
+            "dimension_mode": "adaptive",
+            "width": null,
+            "height": null,
+            "resolution_label": "1080p",
+            "ratio": "16:9",
+            "fps": null,
+            "container": "mp4",
+            "mime_type": "video/mp4",
+            "native_audio": true
+          },
+          "lifecycle": {
+            "generation_id": "canvas-generation-96f4533b6af2f6c37380d2ea98931e12",
+            "target_asset_role": "primary_visual",
+            "base_project": {
+              "path": "state/projects/project.3.6e4c78a938031739e78a6317791a86fd15720966acd0d7d8f9a0ccf5e599e2ff.yaml",
+              "revision": 3,
+              "content_hash": "6e4c78a938031739e78a6317791a86fd15720966acd0d7d8f9a0ccf5e599e2ff",
+              "file_sha256": "4b0c92e12a1730d948486805b52d9c709275a37b47d696c2612612725c97dccd"
+            },
+            "base_registry": {
+              "path": "assets/registry.0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25.json",
+              "revision_id": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+              "content_hash": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+              "file_sha256": "acecf34a234d80d1b90eefd2e471a2a3e69377b3f11df16513e1e58db42fcae5"
+            },
+            "base_dependency_graph": {
+              "revision_id": "86f7ac318e10a678ef14f27ec446c542c64747a50b10e33957dbd4ee79a27b55",
+              "content_hash": "86f7ac318e10a678ef14f27ec446c542c64747a50b10e33957dbd4ee79a27b55",
+              "path": "state/dependency_graph.86f7ac318e10a678ef14f27ec446c542c64747a50b10e33957dbd4ee79a27b55.json",
+              "file_sha256": "cd8673a2275d5f291720524018e5e091bcf4ece438918ed4c5735600353d7f79"
+            },
+            "input_artifact_ids": [
+              "shizhen-CO-A3-shot",
+              "shizhen-CO-A3-scene",
+              "shizhen-CO-A3-character-gaozheng",
+              "shizhen-CO-A3-character-luomin",
+              "CO-A3-ref-01-before",
+              "CO-A3-ref-02-after",
+              "CO-A3-ref-03-close"
+            ],
+            "output_asset_id": "canvas-video-96f4533b6af2f6c37380d2ea98931e12",
+            "continuity_binding": null,
+            "hard_cut_keyframe_binding": null,
+            "seal_terminal_frame": false
+          },
+          "compiler_contract": {
+            "compiler_id": "jimeng-seedance-2.5-video-compiler",
+            "compiler_version": "1",
+            "compiler_hash": "3ff8df22ff07ef4e6b2c0ec02474f1dc90aaaa5087dca4a60d7c5c05d478965f"
+          },
+          "expression_strength": "semantic_prompt_allowed",
+          "generation_recipe": {
+            "contract_version": "generation-recipe/1",
+            "seed": {
+              "kind": "uncontrolled",
+              "value": null
+            },
+            "profile_sha256": "a68d75af3cc4c56557aa2b011e0496e6a2a930afc1ae92eed9ff98a68fe4560b",
+            "compiler_hash": "3ff8df22ff07ef4e6b2c0ec02474f1dc90aaaa5087dca4a60d7c5c05d478965f",
+            "requirement_hash": "f0c382393072fc960dc925f06c36cb4813bb2b9dec88318b8aa88d078c5dd729",
+            "rubric_hash": "f2502147d3b596390c784bb41fc055aec2677d7987a1a874c518857b52611745",
+            "acceptance_policy": {
+              "domain_id": "original-drama",
+              "profile_id": "shizhen-CO-A3-raw",
+              "profile_version": "1",
+              "profile_content_hash": "f2502147d3b596390c784bb41fc055aec2677d7987a1a874c518857b52611745",
+              "profile_payload": {
+                "content_hash": "f2502147d3b596390c784bb41fc055aec2677d7987a1a874c518857b52611745",
+                "domain_id": "original-drama",
+                "generation_requirements": [
+                  {
+                    "dimension": "relationship",
+                    "intent_paths": [
+                      "generation_intent.subject_action.progression"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                    "observable": "先让观众明确两名普通同事和一次顺口关心，随后缺席造成情感反差，无额外关系或记忆保留者。",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "relationship",
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足；导演表演偏好不变成硬秒点"
+                  },
+                  {
+                    "dimension": "action",
+                    "intent_paths": [
+                      "generation_intent.subject_action.progression"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                    "observable": "开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "action",
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足；导演表演偏好不变成硬秒点"
+                  },
+                  {
+                    "dimension": "identity",
+                    "intent_paths": [
+                      "generation_intent.identity_continuity.preservation"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                    "observable": "高峥与罗敏维持三张参考的原身份衣物和各自包；罗敏始终左手手机左耳。失踪后高峥和包一起不在，罗敏不换脸衣或手。",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "identity",
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足；导演表演偏好不变成硬秒点"
+                  },
+                  {
+                    "dimension": "camera",
+                    "intent_paths": [
+                      "generation_intent.camera_intent.framing_intent"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                    "observable": "先固定中远景同时看两人、出口和脚边；货车完整遮挡后在同机位揭示一位，再切到罗敏胸上近景完成电话对答，近景保持完整脸、左手手机与墨绿雨衣",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "camera",
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足；导演表演偏好不变成硬秒点"
+                  },
+                  {
+                    "dimension": "performance",
+                    "intent_paths": [
+                      "generation_intent.performance_intent"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                    "observable": "高峥先听见再提醒，罗敏先听见再回应目光；消失后她不寻找，不困惑；司机核对后她自然确认一位，无惊恐或神秘笑。",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "performance",
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足；导演表演偏好不变成硬秒点"
+                  },
+                  {
+                    "dimension": "sound",
+                    "intent_paths": [
+                      "generation_intent.dialogue_intent.turns",
+                      "generation_intent.ambience_intent.environment_bed",
+                      "generation_intent.ambience_intent.foley_cues"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                    "observable": "四轮中文依序各一次：女报两位、男提醒路滑、消失后画外司机核对就你一位、女平常确认就我一个。声线角色正确、口型对人、正常语速；持续雨夜车流与货车声，无多余对白、配乐、惊吓冲击或突发全局静音。",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "sound",
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足；导演表演偏好不变成硬秒点"
+                  },
+                  {
+                    "dimension": "story-scope",
+                    "intent_paths": [
+                      "generation_intent.scene_continuity.state_constraints"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                    "observable": "只呈现一次前一夜的两位→一位事件。消失不等于走开、上车、烟化或透明渐隐；人物没有保留记忆；不泄露S01与终场反转，不加怪物、规则解释、字幕、片名或准确数字。",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "story-scope",
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足；导演表演偏好不变成硬秒点"
+                  },
+                  {
+                    "dimension": "art",
+                    "intent_paths": [
+                      "generation_intent.visual_treatment.medium_look",
+                      "generation_intent.visual_treatment.palette",
+                      "generation_intent.visual_treatment.material_treatment",
+                      "generation_intent.visual_treatment.prohibited_visual_drift"
+                    ],
+                    "level": "acceptance",
+                    "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                    "observable": "全程保持同参考的原创成年3D国漫写实CG、细束发丝与真实湿材质，同一雨夜冷暖光；不变真人、蜡脸或风格分裂。",
+                    "production_owner": "shot_authoring",
+                    "proof": "analyzer",
+                    "requirement_id": "art",
+                    "stage": "raw_generation",
+                    "tolerance": "逐项满足；导演表演偏好不变成硬秒点"
+                  }
+                ],
+                "measurement_contract_version": "1",
+                "profile_id": "shizhen-CO-A3-raw",
+                "profile_version": "1",
+                "required_requirement_ids": [
+                  "relationship",
+                  "action",
+                  "identity",
+                  "camera",
+                  "performance",
+                  "sound",
+                  "story-scope",
+                  "art"
+                ]
+              },
+              "measurement_contract_version": "1",
+              "required_requirement_ids": [
+                "relationship",
+                "action",
+                "identity",
+                "camera",
+                "performance",
+                "sound",
+                "story-scope",
+                "art"
+              ]
+            },
+            "expressions": [
+              {
+                "requirement_id": "action",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "action",
+                "observable": "开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。",
+                "tolerance": "逐项满足；导演表演偏好不变成硬秒点",
+                "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.subject_action.progression"
+                ],
+                "native_text": [
+                  "开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。"
+                ],
+                "production_owner": "shot_authoring"
+              },
+              {
+                "requirement_id": "art",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "art",
+                "observable": "全程保持同参考的原创成年3D国漫写实CG、细束发丝与真实湿材质，同一雨夜冷暖光；不变真人、蜡脸或风格分裂。",
+                "tolerance": "逐项满足；导演表演偏好不变成硬秒点",
+                "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.visual_treatment.medium_look",
+                  "generation_intent.visual_treatment.palette",
+                  "generation_intent.visual_treatment.material_treatment",
+                  "generation_intent.visual_treatment.prohibited_visual_drift"
+                ],
+                "native_text": [
+                  "同三张参考的原创成年3D国漫CG面部、细束发丝、克制皮肤高光；成熟比例，不转真人照片",
+                  "冷灰雨城与微暖站棚灯",
+                  "真实湿布、玻璃、雨水、金属和朴素通勤道具",
+                  "真人照片脸或蜡像",
+                  "换脸、额外手、多人融合",
+                  "用溶解、透明、残影、鬼怪替代完整遮挡后的缺席",
+                  "错误文字、片名、字幕或数字"
+                ],
+                "production_owner": "shot_authoring"
+              },
+              {
+                "requirement_id": "camera",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "camera",
+                "observable": "先固定中远景同时看两人、出口和脚边；货车完整遮挡后在同机位揭示一位，再切到罗敏胸上近景完成电话对答，近景保持完整脸、左手手机与墨绿雨衣",
+                "tolerance": "逐项满足；导演表演偏好不变成硬秒点",
+                "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.camera_intent.framing_intent"
+                ],
+                "native_text": [
+                  "先固定中远景同时看两人、出口和脚边；货车完整遮挡后在同机位揭示一位，再切到罗敏胸上近景完成电话对答，近景保持完整脸、左手手机与墨绿雨衣"
+                ],
+                "production_owner": "shot_authoring"
+              },
+              {
+                "requirement_id": "identity",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "identity",
+                "observable": "高峥与罗敏维持三张参考的原身份衣物和各自包；罗敏始终左手手机左耳。失踪后高峥和包一起不在，罗敏不换脸衣或手。",
+                "tolerance": "逐项满足；导演表演偏好不变成硬秒点",
+                "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.identity_continuity.preservation"
+                ],
+                "native_text": [],
+                "production_owner": "shot_authoring"
+              },
+              {
+                "requirement_id": "performance",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "performance",
+                "observable": "高峥先听见再提醒，罗敏先听见再回应目光；消失后她不寻找，不困惑；司机核对后她自然确认一位，无惊恐或神秘笑。",
+                "tolerance": "逐项满足；导演表演偏好不变成硬秒点",
+                "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.performance_intent"
+                ],
+                "native_text": [],
+                "production_owner": "shot_authoring"
+              },
+              {
+                "requirement_id": "relationship",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "relationship",
+                "observable": "先让观众明确两名普通同事和一次顺口关心，随后缺席造成情感反差，无额外关系或记忆保留者。",
+                "tolerance": "逐项满足；导演表演偏好不变成硬秒点",
+                "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.subject_action.progression"
+                ],
+                "native_text": [
+                  "开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。"
+                ],
+                "production_owner": "shot_authoring"
+              },
+              {
+                "requirement_id": "sound",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "sound",
+                "observable": "四轮中文依序各一次：女报两位、男提醒路滑、消失后画外司机核对就你一位、女平常确认就我一个。声线角色正确、口型对人、正常语速；持续雨夜车流与货车声，无多余对白、配乐、惊吓冲击或突发全局静音。",
+                "tolerance": "逐项满足；导演表演偏好不变成硬秒点",
+                "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.dialogue_intent.turns",
+                  "generation_intent.ambience_intent.environment_bed",
+                  "generation_intent.ambience_intent.foley_cues"
+                ],
+                "native_text": [
+                  "持续近棚雨声、湿路车流和正常经过的货车；电话司机为普通窄频通话声。无配乐、怪声、惊吓冲击或全局静音",
+                  "普通衣料声",
+                  "货车引擎与湿路轮胎声从左向右正常经过远离"
+                ],
+                "production_owner": "shot_authoring"
+              },
+              {
+                "requirement_id": "story-scope",
+                "level": "acceptance",
+                "stage": "raw_generation",
+                "dimension": "story-scope",
+                "observable": "只呈现一次前一夜的两位→一位事件。消失不等于走开、上车、烟化或透明渐隐；人物没有保留记忆；不泄露S01与终场反转，不加怪物、规则解释、字幕、片名或准确数字。",
+                "tolerance": "逐项满足；导演表演偏好不变成硬秒点",
+                "measurement": "Exact project-local video-analysis, qualified audio observations and frame sequence; no fabricated human review",
+                "proof": "analyzer",
+                "intent_paths": [
+                  "generation_intent.scene_continuity.state_constraints"
+                ],
+                "native_text": [
+                  "参考素材1只指导最初同框的高峥、罗敏身份服装、原站位和站棚；参考素材2只指导货车驶离后的同一站棚、右侧罗敏和左侧空位，不能作为开场；参考素材3只指导最后罗敏的近景脸、发型、衣服和左手手机，不能提前切走掩盖消失。",
+                  "同一事件，无角色保留对消失者的记忆；司机不知道先前的两位说法被改写",
+                  "高峥不主动走开、不上车，无人被拖走，不留衣物或包",
+                  "完整遮挡后才揭示左侧为空；不可用溶解、灯闪、黑屏、透明或烟化代替",
+                  "无音乐、鬼声、惊吓音效、额外对白、字幕、片名或准确数字"
+                ],
+                "production_owner": "shot_authoring"
+              }
+            ],
+            "editorial_operations": [],
+            "comparison": null
+          },
+          "provider_bound_request_hash": "5d7db16c6ba48819125c3c8f072b779d146535413ce733099a529c668679c9b0"
+        }
+      },
+      "rationale": [
+        "jimeng/jimeng-seedance-2.5-multimodal-v1: unknown; one bounded attempt, no quality guarantee",
+        "evidence and policy affect audit identity, not unrelated media semantics"
+      ],
+      "revalidate_requirements": [
+        "action",
+        "art",
+        "camera",
+        "identity",
+        "performance",
+        "relationship",
+        "sound",
+        "story-scope"
+      ]
+    },
+    "continuity_routing": null,
+    "compiled_request": {
+      "generation_id": "canvas-generation-96f4533b6af2f6c37380d2ea98931e12",
+      "request_input_hash": "f622865ad88c89a627d8ba2575bffc8443ac27753fd7c62a6275974b6b1a38b0",
+      "provider_name": "jimeng",
+      "provider_kind": "jimeng",
+      "model_id": "seedance_2.5",
+      "provider_profile": {
+        "profile_id": "jimeng",
+        "profile_version": "canvas-seedance-2.5-v1",
+        "profile_path": "provider-profiles/a68d75af3cc4c56557aa2b011e0496e6a2a930afc1ae92eed9ff98a68fe4560b.json",
+        "profile_sha256": "a68d75af3cc4c56557aa2b011e0496e6a2a930afc1ae92eed9ff98a68fe4560b"
+      },
+      "requirement_hash": "f0c382393072fc960dc925f06c36cb4813bb2b9dec88318b8aa88d078c5dd729",
+      "provider_bound_request_hash": "5d7db16c6ba48819125c3c8f072b779d146535413ce733099a529c668679c9b0",
+      "adapter_compiler_id": "jimeng-seedance-2.5-video-compiler",
+      "adapter_compiler_version": "1",
+      "adapter_compiler_hash": "3ff8df22ff07ef4e6b2c0ec02474f1dc90aaaa5087dca4a60d7c5c05d478965f",
+      "execution_stack_hash": null,
+      "capability_id": "jimeng-seedance-2.5-multimodal-v1",
+      "execution_kind": "remote",
+      "billing_kind": "metered",
+      "mode": "reference_to_video",
+      "prompt_text": "Opening state: 开画已在雨夜玻璃站棚：戴眼镜褐灰外套的成熟高峥在左，短卷发墨绿雨衣罗敏在右，左手手机贴左耳，各自的包保持，出口和脚边可见。. Closing state: 同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。. The closing state must be visibly reached during this shot. Keep the visible character identity exactly consistent. Scene mood: 前一夜雨夜普通候车，城市冷峻，人物不预知异常. Scene constraint: 参考素材1只指导最初同框的高峥、罗敏身份服装、原站位和站棚；参考素材2只指导货车驶离后的同一站棚、右侧罗敏和左侧空位，不能作为开场；参考素材3只指导最后罗敏的近景脸、发型、衣服和左手手机，不能提前切走掩盖消失。. Scene constraint: 同一事件，无角色保留对消失者的记忆；司机不知道先前的两位说法被改写. Scene constraint: 高峥不主动走开、不上车，无人被拖走，不留衣物或包. Scene constraint: 完整遮挡后才揭示左侧为空；不可用溶解、灯闪、黑屏、透明或烟化代替. Scene constraint: 无音乐、鬼声、惊吓音效、额外对白、字幕、片名或准确数字. Subject position: 前段左高峥右罗敏，同一站棚；揭示后右侧罗敏原位，左侧明确为空. Screen direction: 不镜像，货车持续左向右. Spatial crossing policy: 货车不进站、不停、不上下客，人物没有出入画面. Camera axis: 道路近侧正对站棚，近景保持同侧和手机手别. Framing continuity: 两位到一位的过程必须同一固定全景，完整揭出空位后才切到罗敏胸上近景. Axis crossing policy: 同侧切近景，不越轴. Action start: 开画已在雨夜玻璃站棚：戴眼镜褐灰外套的成熟高峥在左，短卷发墨绿雨衣罗敏在右，左手手机贴左耳，各自的包保持，出口和脚边可见。. Action progression: 开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。. Action endpoint: 同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。. The action must produce a visible state change. Motion onset: 开场已在自然说话，无空镜铺垫. Motion peak: 货车完整遮挡后，同机位揭出空位. Motion settle: 罗敏平常回答自己一位，继续听电话. Motion direction: 货车持续左向右，人物原位. Motion amplitude: 正常实时生活动作. Pacing cadence: 先用简短对话让两人关系成立，随后完成异常。空位先读清，电话核对和日常回答作最后反差。按自然听说呼吸安排，不给逐句秒点，不拉长等待来填时长。. Pacing tempo: 克制但不拖延，正常语速. Shot duration: 22 seconds. Camera movement: 前段固定；揭出空位之后自然切到同侧近景. Camera stability: 稳定. Camera framing intent: 先固定中远景同时看两人、出口和脚边；货车完整遮挡后在同机位揭示一位，再切到罗敏胸上近景完成电话对答，近景保持完整脸、左手手机与墨绿雨衣. Camera start framing: 参考素材1的两人同框固定中远景. Camera end framing: 参考素材3同侧罗敏胸上近景，左手手机完整，继续听电话. Performance trigger: 夜班结束，联系接车司机；人物始终觉得这是普通接车电话. Visible response: 先报两位、同伴关心湿路与听说目光；揭出空位后罗敏没有寻找反应；听见司机核对人数，她平常回答自己一位. Gaze target: 前段罗敏与高峥自然听说，后段罗敏只听电话，不向空位搜索或看镜头. Body behavior: 自然站立和重心，无集体摆动或慢动作；无预知惊恐. Hand behavior: 罗敏左手手机贴左耳，黑包保持；高峥褐包只在消失前属于他，消失后一起不在. Terminal performance state: 同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。. Visual medium: 同三张参考的原创成年3D国漫CG面部、细束发丝、克制皮肤高光；成熟比例，不转真人照片. Visual palette: 冷灰雨城与微暖站棚灯. Material treatment: 真实湿布、玻璃、雨水、金属和朴素通勤道具. Prohibit visual drift: 真人照片脸或蜡像, 换脸、额外手、多人融合, 用溶解、透明、残影、鬼怪替代完整遮挡后的缺席, 错误文字、片名、字幕或数字. Lighting source: 站棚实用灯和雨夜远城灯. Lighting direction: 同参考保持冷暖侧光. Lighting exposure priority: 人脸、左手手机、空位、出口和脚边可读. Lighting continuity: 同一雨夜同一站棚，不熄灯闪灯. Character performance directions. For 前段左侧成熟眼镜褐衣男 (supporting, visible): Throughout the shot, after 夜班后等接车电话, show 疲倦清醒、普通生活，没有异常认知 with moderate intensity; facial expression: 自然说话和倾听，不夸张，不呆滞; gaze target: 生活中的电话、湿路与同伴，不看镜头; breathing: 自然; body behavior: 先听见接车，再望湿路顺口提醒，包保持，不走开；只在完整车厢遮挡后不再出现. For 右侧短卷发墨绿雨衣女人，左手手机 (principal, visible): Throughout the shot, after 夜班后等接车电话, show 疲倦清醒、普通生活，没有异常认知 with moderate intensity; facial expression: 自然说话和倾听，不夸张，不呆滞; gaze target: 生活中的电话、湿路与同伴，不看镜头; breathing: 自然; body behavior: 开头普通通话，听见同伴后看他；后段不记得、不寻找；听见司机问一位后像一直独自候车一样自然回答，无迟疑、惊恐或神秘笑. Ambient sound is enabled. Ambience bed: 持续近棚雨声、湿路车流和正常经过的货车；电话司机为普通窄频通话声。无配乐、怪声、惊吓冲击或全局静音. Foley cue: 普通衣料声. Foley cue: 货车引擎与湿路轮胎声从左向右正常经过远离. 对话语言：Chinese。以下各轮按顺序自然交谈，每句只说一次；由表演安排停顿、倾听与接话，不指定台词时间点，不抢话或赶词。 第1轮，罗敏（luomin）在画面内说：“师傅，我们在站里，两位。”。听说反应：罗敏开场已经在通话；高峥听见才接话。可见口型与此人对白同步。 第2轮，高峥（gaozheng）在画面内说：“让他别急，路滑。”。听说反应：高峥顺口关心湿路，罗敏听见后自然看他一眼；随后货车完整遮挡，再揭示他不在。可见口型与此人对白同步。 第3轮，driver（driver）在画外说：“就你一位？”。听说反应：在同机位完整揭出只剩罗敏之后，近景中才从电话传来普通接车核对，无惊讶质问。不要求可见口型。 第4轮，罗敏（luomin）在画面内说：“嗯，就我一个。”。听说反应：听完司机才自然确认，语气平常，无迟疑、困惑、恐惧或寻找；然后继续听电话。可见口型与此人对白同步。 Music: none. Primary camera movement: locked. Primary camera direction: none. Primary camera amplitude: subtle. Primary camera speed: very slow. Primary camera starts stationary. Primary camera ends settled. Camera relation: fixed frame. Camera relation starts: 站棚两人同框和完整可见出口. Camera relation ends: 同侧胸上近景，罗敏平常听电话.\n参考素材1 {{image:0}}\n参考素材2 {{image:1}}\n参考素材3 {{image:2}}",
+      "image_bindings": [
+        {
+          "role": "reference",
+          "asset_id": "CO-A3-ref-01-before",
+          "asset_sha256": "dd6cdb932eec157d9ab198f35bcd7b53e22127eb6a37fc6c574ae8c0ba6dbd8f",
+          "mime_type": "image/png",
+          "width": 1672,
+          "height": 941,
+          "size_bytes": 2442444
+        },
+        {
+          "role": "reference",
+          "asset_id": "CO-A3-ref-02-after",
+          "asset_sha256": "15543630bcc37bb9ca0b1e5457b20befa2a5ffd85e1e8c9845775a8c99126125",
+          "mime_type": "image/png",
+          "width": 1672,
+          "height": 941,
+          "size_bytes": 2436237
+        },
+        {
+          "role": "reference",
+          "asset_id": "CO-A3-ref-03-close",
+          "asset_sha256": "53c21e36e6c9a5f75efab197211785d092f71af73ee2f776bf208508a90bb35d",
+          "mime_type": "image/png",
+          "width": 1672,
+          "height": 941,
+          "size_bytes": 2368596
+        }
+      ],
+      "c4_multi_anchor_binding": null,
+      "continuity_binding": null,
+      "hard_cut_keyframe_binding": null,
+      "seal_terminal_frame": false,
+      "media_bindings": [],
+      "effective_output": {
+        "timing_mode": "nominal_seconds",
+        "duration_seconds": 22,
+        "frame_count": null,
+        "dimension_mode": "adaptive",
+        "width": null,
+        "height": null,
+        "resolution_label": "1080p",
+        "ratio": "16:9",
+        "fps": null,
+        "container": "mp4",
+        "mime_type": "video/mp4",
+        "native_audio": true
+      },
+      "provider_task_binding": null,
+      "effective_seed": null,
+      "effective_negative_prompt_text": "",
+      "output_asset_id": "canvas-video-96f4533b6af2f6c37380d2ea98931e12",
+      "activation_scope": {
+        "request": {
+          "generation_id": "canvas-generation-96f4533b6af2f6c37380d2ea98931e12",
+          "provider_name": "jimeng",
+          "provider_kind": "jimeng",
+          "model_id": "seedance_2.5",
+          "provider_profile": {
+            "profile_id": "jimeng",
+            "profile_version": "canvas-seedance-2.5-v1",
+            "profile_path": "provider-profiles/a68d75af3cc4c56557aa2b011e0496e6a2a930afc1ae92eed9ff98a68fe4560b.json",
+            "profile_sha256": "a68d75af3cc4c56557aa2b011e0496e6a2a930afc1ae92eed9ff98a68fe4560b"
+          },
+          "requirement_hash": "f0c382393072fc960dc925f06c36cb4813bb2b9dec88318b8aa88d078c5dd729",
+          "provider_bound_request_hash": "5d7db16c6ba48819125c3c8f072b779d146535413ce733099a529c668679c9b0",
+          "adapter_compiler_id": "jimeng-seedance-2.5-video-compiler",
+          "adapter_compiler_version": "1",
+          "adapter_compiler_hash": "3ff8df22ff07ef4e6b2c0ec02474f1dc90aaaa5087dca4a60d7c5c05d478965f",
+          "execution_stack_hash": null,
+          "target_shot_id": "CO-A3",
+          "target_shot_revision": 2,
+          "target_shot_content_hash": "577609ab8d23f9c382e6983563d02e0c3ca4d411ef8bf1f06156fd97f330cd6f",
+          "target_asset_role": "primary_visual",
+          "target_visual_strategy": "generated_video",
+          "mode": "reference_to_video",
+          "prompt_text": "Opening state: 开画已在雨夜玻璃站棚：戴眼镜褐灰外套的成熟高峥在左，短卷发墨绿雨衣罗敏在右，左手手机贴左耳，各自的包保持，出口和脚边可见。. Closing state: 同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。. The closing state must be visibly reached during this shot. Keep the visible character identity exactly consistent. Scene mood: 前一夜雨夜普通候车，城市冷峻，人物不预知异常. Scene constraint: 参考素材1只指导最初同框的高峥、罗敏身份服装、原站位和站棚；参考素材2只指导货车驶离后的同一站棚、右侧罗敏和左侧空位，不能作为开场；参考素材3只指导最后罗敏的近景脸、发型、衣服和左手手机，不能提前切走掩盖消失。. Scene constraint: 同一事件，无角色保留对消失者的记忆；司机不知道先前的两位说法被改写. Scene constraint: 高峥不主动走开、不上车，无人被拖走，不留衣物或包. Scene constraint: 完整遮挡后才揭示左侧为空；不可用溶解、灯闪、黑屏、透明或烟化代替. Scene constraint: 无音乐、鬼声、惊吓音效、额外对白、字幕、片名或准确数字. Subject position: 前段左高峥右罗敏，同一站棚；揭示后右侧罗敏原位，左侧明确为空. Screen direction: 不镜像，货车持续左向右. Spatial crossing policy: 货车不进站、不停、不上下客，人物没有出入画面. Camera axis: 道路近侧正对站棚，近景保持同侧和手机手别. Framing continuity: 两位到一位的过程必须同一固定全景，完整揭出空位后才切到罗敏胸上近景. Axis crossing policy: 同侧切近景，不越轴. Action start: 开画已在雨夜玻璃站棚：戴眼镜褐灰外套的成熟高峥在左，短卷发墨绿雨衣罗敏在右，左手手机贴左耳，各自的包保持，出口和脚边可见。. Action progression: 开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。. Action endpoint: 同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。. The action must produce a visible state change. Motion onset: 开场已在自然说话，无空镜铺垫. Motion peak: 货车完整遮挡后，同机位揭出空位. Motion settle: 罗敏平常回答自己一位，继续听电话. Motion direction: 货车持续左向右，人物原位. Motion amplitude: 正常实时生活动作. Pacing cadence: 先用简短对话让两人关系成立，随后完成异常。空位先读清，电话核对和日常回答作最后反差。按自然听说呼吸安排，不给逐句秒点，不拉长等待来填时长。. Pacing tempo: 克制但不拖延，正常语速. Shot duration: 22 seconds. Camera movement: 前段固定；揭出空位之后自然切到同侧近景. Camera stability: 稳定. Camera framing intent: 先固定中远景同时看两人、出口和脚边；货车完整遮挡后在同机位揭示一位，再切到罗敏胸上近景完成电话对答，近景保持完整脸、左手手机与墨绿雨衣. Camera start framing: 参考素材1的两人同框固定中远景. Camera end framing: 参考素材3同侧罗敏胸上近景，左手手机完整，继续听电话. Performance trigger: 夜班结束，联系接车司机；人物始终觉得这是普通接车电话. Visible response: 先报两位、同伴关心湿路与听说目光；揭出空位后罗敏没有寻找反应；听见司机核对人数，她平常回答自己一位. Gaze target: 前段罗敏与高峥自然听说，后段罗敏只听电话，不向空位搜索或看镜头. Body behavior: 自然站立和重心，无集体摆动或慢动作；无预知惊恐. Hand behavior: 罗敏左手手机贴左耳，黑包保持；高峥褐包只在消失前属于他，消失后一起不在. Terminal performance state: 同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。. Visual medium: 同三张参考的原创成年3D国漫CG面部、细束发丝、克制皮肤高光；成熟比例，不转真人照片. Visual palette: 冷灰雨城与微暖站棚灯. Material treatment: 真实湿布、玻璃、雨水、金属和朴素通勤道具. Prohibit visual drift: 真人照片脸或蜡像, 换脸、额外手、多人融合, 用溶解、透明、残影、鬼怪替代完整遮挡后的缺席, 错误文字、片名、字幕或数字. Lighting source: 站棚实用灯和雨夜远城灯. Lighting direction: 同参考保持冷暖侧光. Lighting exposure priority: 人脸、左手手机、空位、出口和脚边可读. Lighting continuity: 同一雨夜同一站棚，不熄灯闪灯. Character performance directions. For 前段左侧成熟眼镜褐衣男 (supporting, visible): Throughout the shot, after 夜班后等接车电话, show 疲倦清醒、普通生活，没有异常认知 with moderate intensity; facial expression: 自然说话和倾听，不夸张，不呆滞; gaze target: 生活中的电话、湿路与同伴，不看镜头; breathing: 自然; body behavior: 先听见接车，再望湿路顺口提醒，包保持，不走开；只在完整车厢遮挡后不再出现. For 右侧短卷发墨绿雨衣女人，左手手机 (principal, visible): Throughout the shot, after 夜班后等接车电话, show 疲倦清醒、普通生活，没有异常认知 with moderate intensity; facial expression: 自然说话和倾听，不夸张，不呆滞; gaze target: 生活中的电话、湿路与同伴，不看镜头; breathing: 自然; body behavior: 开头普通通话，听见同伴后看他；后段不记得、不寻找；听见司机问一位后像一直独自候车一样自然回答，无迟疑、惊恐或神秘笑. Ambient sound is enabled. Ambience bed: 持续近棚雨声、湿路车流和正常经过的货车；电话司机为普通窄频通话声。无配乐、怪声、惊吓冲击或全局静音. Foley cue: 普通衣料声. Foley cue: 货车引擎与湿路轮胎声从左向右正常经过远离. 对话语言：Chinese。以下各轮按顺序自然交谈，每句只说一次；由表演安排停顿、倾听与接话，不指定台词时间点，不抢话或赶词。 第1轮，罗敏（luomin）在画面内说：“师傅，我们在站里，两位。”。听说反应：罗敏开场已经在通话；高峥听见才接话。可见口型与此人对白同步。 第2轮，高峥（gaozheng）在画面内说：“让他别急，路滑。”。听说反应：高峥顺口关心湿路，罗敏听见后自然看他一眼；随后货车完整遮挡，再揭示他不在。可见口型与此人对白同步。 第3轮，driver（driver）在画外说：“就你一位？”。听说反应：在同机位完整揭出只剩罗敏之后，近景中才从电话传来普通接车核对，无惊讶质问。不要求可见口型。 第4轮，罗敏（luomin）在画面内说：“嗯，就我一个。”。听说反应：听完司机才自然确认，语气平常，无迟疑、困惑、恐惧或寻找；然后继续听电话。可见口型与此人对白同步。 Music: none. Primary camera movement: locked. Primary camera direction: none. Primary camera amplitude: subtle. Primary camera speed: very slow. Primary camera starts stationary. Primary camera ends settled. Camera relation: fixed frame. Camera relation starts: 站棚两人同框和完整可见出口. Camera relation ends: 同侧胸上近景，罗敏平常听电话.\n参考素材1 {{image:0}}\n参考素材2 {{image:1}}\n参考素材3 {{image:2}}",
+          "negative_prompt_text": "",
+          "image_bindings": [
+            {
+              "role": "reference",
+              "asset_id": "CO-A3-ref-01-before",
+              "asset_sha256": "dd6cdb932eec157d9ab198f35bcd7b53e22127eb6a37fc6c574ae8c0ba6dbd8f",
+              "mime_type": "image/png",
+              "width": 1672,
+              "height": 941,
+              "size_bytes": 2442444
+            },
+            {
+              "role": "reference",
+              "asset_id": "CO-A3-ref-02-after",
+              "asset_sha256": "15543630bcc37bb9ca0b1e5457b20befa2a5ffd85e1e8c9845775a8c99126125",
+              "mime_type": "image/png",
+              "width": 1672,
+              "height": 941,
+              "size_bytes": 2436237
+            },
+            {
+              "role": "reference",
+              "asset_id": "CO-A3-ref-03-close",
+              "asset_sha256": "53c21e36e6c9a5f75efab197211785d092f71af73ee2f776bf208508a90bb35d",
+              "mime_type": "image/png",
+              "width": 1672,
+              "height": 941,
+              "size_bytes": 2368596
+            }
+          ],
+          "c4_multi_anchor_binding": null,
+          "continuity_binding": null,
+          "hard_cut_keyframe_binding": null,
+          "seal_terminal_frame": false,
+          "media_bindings": [],
+          "output_requirement": {
+            "timing_mode": "nominal_seconds",
+            "duration_seconds": 22,
+            "frame_count": null,
+            "dimension_mode": "adaptive",
+            "width": null,
+            "height": null,
+            "resolution_label": "1080p",
+            "ratio": "16:9",
+            "fps": null,
+            "container": "mp4",
+            "mime_type": "video/mp4",
+            "native_audio": true
+          },
+          "seed": null,
+          "base_project": {
+            "path": "state/projects/project.3.6e4c78a938031739e78a6317791a86fd15720966acd0d7d8f9a0ccf5e599e2ff.yaml",
+            "revision": 3,
+            "content_hash": "6e4c78a938031739e78a6317791a86fd15720966acd0d7d8f9a0ccf5e599e2ff",
+            "file_sha256": "4b0c92e12a1730d948486805b52d9c709275a37b47d696c2612612725c97dccd"
+          },
+          "base_registry": {
+            "path": "assets/registry.0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25.json",
+            "revision_id": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+            "content_hash": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+            "file_sha256": "acecf34a234d80d1b90eefd2e471a2a3e69377b3f11df16513e1e58db42fcae5"
+          },
+          "base_dependency_graph": {
+            "revision_id": "86f7ac318e10a678ef14f27ec446c542c64747a50b10e33957dbd4ee79a27b55",
+            "content_hash": "86f7ac318e10a678ef14f27ec446c542c64747a50b10e33957dbd4ee79a27b55",
+            "path": "state/dependency_graph.86f7ac318e10a678ef14f27ec446c542c64747a50b10e33957dbd4ee79a27b55.json",
+            "file_sha256": "cd8673a2275d5f291720524018e5e091bcf4ece438918ed4c5735600353d7f79"
+          },
+          "input_artifact_ids": [
+            "shizhen-CO-A3-shot",
+            "shizhen-CO-A3-scene",
+            "shizhen-CO-A3-character-gaozheng",
+            "shizhen-CO-A3-character-luomin",
+            "CO-A3-ref-01-before",
+            "CO-A3-ref-02-after",
+            "CO-A3-ref-03-close"
+          ],
+          "output_asset_id": "canvas-video-96f4533b6af2f6c37380d2ea98931e12",
+          "request_input_hash": "f622865ad88c89a627d8ba2575bffc8443ac27753fd7c62a6275974b6b1a38b0"
+        },
+        "usage_license": "provider-output",
+        "scope_fingerprint": "49080c6a41a4cf6f2b84be05cd908972435cdde69f238ae71b45382cab871a7e"
+      },
+      "resolved_generation_hash": "909ad8efd03b445b1e3e255b5efb4ce8dc3fb5a95a04b5396727ba7966edcec4",
+      "desired_generation_fingerprint": "909ad8efd03b445b1e3e255b5efb4ce8dc3fb5a95a04b5396727ba7966edcec4"
+    },
+    "binding_hash": "16a477ac08682e91c223cb8569486cac7d3142e4815b69ad94343a6b6f8c342b"
+  },
+  "compiled_request": {
+    "generation_id": "canvas-generation-96f4533b6af2f6c37380d2ea98931e12",
+    "provider_name": "jimeng",
+    "provider_kind": "jimeng",
+    "model_id": "seedance_2.5",
+    "provider_profile": {
+      "profile_id": "jimeng",
+      "profile_version": "canvas-seedance-2.5-v1",
+      "profile_path": "provider-profiles/a68d75af3cc4c56557aa2b011e0496e6a2a930afc1ae92eed9ff98a68fe4560b.json",
+      "profile_sha256": "a68d75af3cc4c56557aa2b011e0496e6a2a930afc1ae92eed9ff98a68fe4560b"
+    },
+    "requirement_hash": "f0c382393072fc960dc925f06c36cb4813bb2b9dec88318b8aa88d078c5dd729",
+    "provider_bound_request_hash": "5d7db16c6ba48819125c3c8f072b779d146535413ce733099a529c668679c9b0",
+    "adapter_compiler_id": "jimeng-seedance-2.5-video-compiler",
+    "adapter_compiler_version": "1",
+    "adapter_compiler_hash": "3ff8df22ff07ef4e6b2c0ec02474f1dc90aaaa5087dca4a60d7c5c05d478965f",
+    "execution_stack_hash": null,
+    "target_shot_id": "CO-A3",
+    "target_shot_revision": 2,
+    "target_shot_content_hash": "577609ab8d23f9c382e6983563d02e0c3ca4d411ef8bf1f06156fd97f330cd6f",
+    "target_asset_role": "primary_visual",
+    "target_visual_strategy": "generated_video",
+    "mode": "reference_to_video",
+    "prompt_text": "Opening state: 开画已在雨夜玻璃站棚：戴眼镜褐灰外套的成熟高峥在左，短卷发墨绿雨衣罗敏在右，左手手机贴左耳，各自的包保持，出口和脚边可见。. Closing state: 同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。. The closing state must be visibly reached during this shot. Keep the visible character identity exactly consistent. Scene mood: 前一夜雨夜普通候车，城市冷峻，人物不预知异常. Scene constraint: 参考素材1只指导最初同框的高峥、罗敏身份服装、原站位和站棚；参考素材2只指导货车驶离后的同一站棚、右侧罗敏和左侧空位，不能作为开场；参考素材3只指导最后罗敏的近景脸、发型、衣服和左手手机，不能提前切走掩盖消失。. Scene constraint: 同一事件，无角色保留对消失者的记忆；司机不知道先前的两位说法被改写. Scene constraint: 高峥不主动走开、不上车，无人被拖走，不留衣物或包. Scene constraint: 完整遮挡后才揭示左侧为空；不可用溶解、灯闪、黑屏、透明或烟化代替. Scene constraint: 无音乐、鬼声、惊吓音效、额外对白、字幕、片名或准确数字. Subject position: 前段左高峥右罗敏，同一站棚；揭示后右侧罗敏原位，左侧明确为空. Screen direction: 不镜像，货车持续左向右. Spatial crossing policy: 货车不进站、不停、不上下客，人物没有出入画面. Camera axis: 道路近侧正对站棚，近景保持同侧和手机手别. Framing continuity: 两位到一位的过程必须同一固定全景，完整揭出空位后才切到罗敏胸上近景. Axis crossing policy: 同侧切近景，不越轴. Action start: 开画已在雨夜玻璃站棚：戴眼镜褐灰外套的成熟高峥在左，短卷发墨绿雨衣罗敏在右，左手手机贴左耳，各自的包保持，出口和脚边可见。. Action progression: 开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。. Action endpoint: 同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。. The action must produce a visible state change. Motion onset: 开场已在自然说话，无空镜铺垫. Motion peak: 货车完整遮挡后，同机位揭出空位. Motion settle: 罗敏平常回答自己一位，继续听电话. Motion direction: 货车持续左向右，人物原位. Motion amplitude: 正常实时生活动作. Pacing cadence: 先用简短对话让两人关系成立，随后完成异常。空位先读清，电话核对和日常回答作最后反差。按自然听说呼吸安排，不给逐句秒点，不拉长等待来填时长。. Pacing tempo: 克制但不拖延，正常语速. Shot duration: 22 seconds. Camera movement: 前段固定；揭出空位之后自然切到同侧近景. Camera stability: 稳定. Camera framing intent: 先固定中远景同时看两人、出口和脚边；货车完整遮挡后在同机位揭示一位，再切到罗敏胸上近景完成电话对答，近景保持完整脸、左手手机与墨绿雨衣. Camera start framing: 参考素材1的两人同框固定中远景. Camera end framing: 参考素材3同侧罗敏胸上近景，左手手机完整，继续听电话. Performance trigger: 夜班结束，联系接车司机；人物始终觉得这是普通接车电话. Visible response: 先报两位、同伴关心湿路与听说目光；揭出空位后罗敏没有寻找反应；听见司机核对人数，她平常回答自己一位. Gaze target: 前段罗敏与高峥自然听说，后段罗敏只听电话，不向空位搜索或看镜头. Body behavior: 自然站立和重心，无集体摆动或慢动作；无预知惊恐. Hand behavior: 罗敏左手手机贴左耳，黑包保持；高峥褐包只在消失前属于他，消失后一起不在. Terminal performance state: 同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。. Visual medium: 同三张参考的原创成年3D国漫CG面部、细束发丝、克制皮肤高光；成熟比例，不转真人照片. Visual palette: 冷灰雨城与微暖站棚灯. Material treatment: 真实湿布、玻璃、雨水、金属和朴素通勤道具. Prohibit visual drift: 真人照片脸或蜡像, 换脸、额外手、多人融合, 用溶解、透明、残影、鬼怪替代完整遮挡后的缺席, 错误文字、片名、字幕或数字. Lighting source: 站棚实用灯和雨夜远城灯. Lighting direction: 同参考保持冷暖侧光. Lighting exposure priority: 人脸、左手手机、空位、出口和脚边可读. Lighting continuity: 同一雨夜同一站棚，不熄灯闪灯. Character performance directions. For 前段左侧成熟眼镜褐衣男 (supporting, visible): Throughout the shot, after 夜班后等接车电话, show 疲倦清醒、普通生活，没有异常认知 with moderate intensity; facial expression: 自然说话和倾听，不夸张，不呆滞; gaze target: 生活中的电话、湿路与同伴，不看镜头; breathing: 自然; body behavior: 先听见接车，再望湿路顺口提醒，包保持，不走开；只在完整车厢遮挡后不再出现. For 右侧短卷发墨绿雨衣女人，左手手机 (principal, visible): Throughout the shot, after 夜班后等接车电话, show 疲倦清醒、普通生活，没有异常认知 with moderate intensity; facial expression: 自然说话和倾听，不夸张，不呆滞; gaze target: 生活中的电话、湿路与同伴，不看镜头; breathing: 自然; body behavior: 开头普通通话，听见同伴后看他；后段不记得、不寻找；听见司机问一位后像一直独自候车一样自然回答，无迟疑、惊恐或神秘笑. Ambient sound is enabled. Ambience bed: 持续近棚雨声、湿路车流和正常经过的货车；电话司机为普通窄频通话声。无配乐、怪声、惊吓冲击或全局静音. Foley cue: 普通衣料声. Foley cue: 货车引擎与湿路轮胎声从左向右正常经过远离. 对话语言：Chinese。以下各轮按顺序自然交谈，每句只说一次；由表演安排停顿、倾听与接话，不指定台词时间点，不抢话或赶词。 第1轮，罗敏（luomin）在画面内说：“师傅，我们在站里，两位。”。听说反应：罗敏开场已经在通话；高峥听见才接话。可见口型与此人对白同步。 第2轮，高峥（gaozheng）在画面内说：“让他别急，路滑。”。听说反应：高峥顺口关心湿路，罗敏听见后自然看他一眼；随后货车完整遮挡，再揭示他不在。可见口型与此人对白同步。 第3轮，driver（driver）在画外说：“就你一位？”。听说反应：在同机位完整揭出只剩罗敏之后，近景中才从电话传来普通接车核对，无惊讶质问。不要求可见口型。 第4轮，罗敏（luomin）在画面内说：“嗯，就我一个。”。听说反应：听完司机才自然确认，语气平常，无迟疑、困惑、恐惧或寻找；然后继续听电话。可见口型与此人对白同步。 Music: none. Primary camera movement: locked. Primary camera direction: none. Primary camera amplitude: subtle. Primary camera speed: very slow. Primary camera starts stationary. Primary camera ends settled. Camera relation: fixed frame. Camera relation starts: 站棚两人同框和完整可见出口. Camera relation ends: 同侧胸上近景，罗敏平常听电话.\n参考素材1 {{image:0}}\n参考素材2 {{image:1}}\n参考素材3 {{image:2}}",
+    "negative_prompt_text": "",
+    "image_bindings": [
+      {
+        "role": "reference",
+        "asset_id": "CO-A3-ref-01-before",
+        "asset_sha256": "dd6cdb932eec157d9ab198f35bcd7b53e22127eb6a37fc6c574ae8c0ba6dbd8f",
+        "mime_type": "image/png",
+        "width": 1672,
+        "height": 941,
+        "size_bytes": 2442444
+      },
+      {
+        "role": "reference",
+        "asset_id": "CO-A3-ref-02-after",
+        "asset_sha256": "15543630bcc37bb9ca0b1e5457b20befa2a5ffd85e1e8c9845775a8c99126125",
+        "mime_type": "image/png",
+        "width": 1672,
+        "height": 941,
+        "size_bytes": 2436237
+      },
+      {
+        "role": "reference",
+        "asset_id": "CO-A3-ref-03-close",
+        "asset_sha256": "53c21e36e6c9a5f75efab197211785d092f71af73ee2f776bf208508a90bb35d",
+        "mime_type": "image/png",
+        "width": 1672,
+        "height": 941,
+        "size_bytes": 2368596
+      }
+    ],
+    "c4_multi_anchor_binding": null,
+    "continuity_binding": null,
+    "hard_cut_keyframe_binding": null,
+    "seal_terminal_frame": false,
+    "media_bindings": [],
+    "output_requirement": {
+      "timing_mode": "nominal_seconds",
+      "duration_seconds": 22,
+      "frame_count": null,
+      "dimension_mode": "adaptive",
+      "width": null,
+      "height": null,
+      "resolution_label": "1080p",
+      "ratio": "16:9",
+      "fps": null,
+      "container": "mp4",
+      "mime_type": "video/mp4",
+      "native_audio": true
+    },
+    "seed": null,
+    "base_project": {
+      "path": "state/projects/project.3.6e4c78a938031739e78a6317791a86fd15720966acd0d7d8f9a0ccf5e599e2ff.yaml",
+      "revision": 3,
+      "content_hash": "6e4c78a938031739e78a6317791a86fd15720966acd0d7d8f9a0ccf5e599e2ff",
+      "file_sha256": "4b0c92e12a1730d948486805b52d9c709275a37b47d696c2612612725c97dccd"
+    },
+    "base_registry": {
+      "path": "assets/registry.0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25.json",
+      "revision_id": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+      "content_hash": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+      "file_sha256": "acecf34a234d80d1b90eefd2e471a2a3e69377b3f11df16513e1e58db42fcae5"
+    },
+    "base_dependency_graph": {
+      "revision_id": "86f7ac318e10a678ef14f27ec446c542c64747a50b10e33957dbd4ee79a27b55",
+      "content_hash": "86f7ac318e10a678ef14f27ec446c542c64747a50b10e33957dbd4ee79a27b55",
+      "path": "state/dependency_graph.86f7ac318e10a678ef14f27ec446c542c64747a50b10e33957dbd4ee79a27b55.json",
+      "file_sha256": "cd8673a2275d5f291720524018e5e091bcf4ece438918ed4c5735600353d7f79"
+    },
+    "input_artifact_ids": [
+      "shizhen-CO-A3-shot",
+      "shizhen-CO-A3-scene",
+      "shizhen-CO-A3-character-gaozheng",
+      "shizhen-CO-A3-character-luomin",
+      "CO-A3-ref-01-before",
+      "CO-A3-ref-02-after",
+      "CO-A3-ref-03-close"
+    ],
+    "output_asset_id": "canvas-video-96f4533b6af2f6c37380d2ea98931e12",
+    "request_input_hash": "f622865ad88c89a627d8ba2575bffc8443ac27753fd7c62a6275974b6b1a38b0"
+  },
+  "resolved_request": {
+    "generation_id": "canvas-generation-96f4533b6af2f6c37380d2ea98931e12",
+    "request_input_hash": "f622865ad88c89a627d8ba2575bffc8443ac27753fd7c62a6275974b6b1a38b0",
+    "provider_name": "jimeng",
+    "provider_kind": "jimeng",
+    "model_id": "seedance_2.5",
+    "provider_profile": {
+      "profile_id": "jimeng",
+      "profile_version": "canvas-seedance-2.5-v1",
+      "profile_path": "provider-profiles/a68d75af3cc4c56557aa2b011e0496e6a2a930afc1ae92eed9ff98a68fe4560b.json",
+      "profile_sha256": "a68d75af3cc4c56557aa2b011e0496e6a2a930afc1ae92eed9ff98a68fe4560b"
+    },
+    "requirement_hash": "f0c382393072fc960dc925f06c36cb4813bb2b9dec88318b8aa88d078c5dd729",
+    "provider_bound_request_hash": "5d7db16c6ba48819125c3c8f072b779d146535413ce733099a529c668679c9b0",
+    "adapter_compiler_id": "jimeng-seedance-2.5-video-compiler",
+    "adapter_compiler_version": "1",
+    "adapter_compiler_hash": "3ff8df22ff07ef4e6b2c0ec02474f1dc90aaaa5087dca4a60d7c5c05d478965f",
+    "execution_stack_hash": null,
+    "capability_id": "jimeng-seedance-2.5-multimodal-v1",
+    "execution_kind": "remote",
+    "billing_kind": "metered",
+    "mode": "reference_to_video",
+    "prompt_text": "Opening state: 开画已在雨夜玻璃站棚：戴眼镜褐灰外套的成熟高峥在左，短卷发墨绿雨衣罗敏在右，左手手机贴左耳，各自的包保持，出口和脚边可见。. Closing state: 同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。. The closing state must be visibly reached during this shot. Keep the visible character identity exactly consistent. Scene mood: 前一夜雨夜普通候车，城市冷峻，人物不预知异常. Scene constraint: 参考素材1只指导最初同框的高峥、罗敏身份服装、原站位和站棚；参考素材2只指导货车驶离后的同一站棚、右侧罗敏和左侧空位，不能作为开场；参考素材3只指导最后罗敏的近景脸、发型、衣服和左手手机，不能提前切走掩盖消失。. Scene constraint: 同一事件，无角色保留对消失者的记忆；司机不知道先前的两位说法被改写. Scene constraint: 高峥不主动走开、不上车，无人被拖走，不留衣物或包. Scene constraint: 完整遮挡后才揭示左侧为空；不可用溶解、灯闪、黑屏、透明或烟化代替. Scene constraint: 无音乐、鬼声、惊吓音效、额外对白、字幕、片名或准确数字. Subject position: 前段左高峥右罗敏，同一站棚；揭示后右侧罗敏原位，左侧明确为空. Screen direction: 不镜像，货车持续左向右. Spatial crossing policy: 货车不进站、不停、不上下客，人物没有出入画面. Camera axis: 道路近侧正对站棚，近景保持同侧和手机手别. Framing continuity: 两位到一位的过程必须同一固定全景，完整揭出空位后才切到罗敏胸上近景. Axis crossing policy: 同侧切近景，不越轴. Action start: 开画已在雨夜玻璃站棚：戴眼镜褐灰外套的成熟高峥在左，短卷发墨绿雨衣罗敏在右，左手手机贴左耳，各自的包保持，出口和脚边可见。. Action progression: 开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。. Action endpoint: 同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。. The action must produce a visible state change. Motion onset: 开场已在自然说话，无空镜铺垫. Motion peak: 货车完整遮挡后，同机位揭出空位. Motion settle: 罗敏平常回答自己一位，继续听电话. Motion direction: 货车持续左向右，人物原位. Motion amplitude: 正常实时生活动作. Pacing cadence: 先用简短对话让两人关系成立，随后完成异常。空位先读清，电话核对和日常回答作最后反差。按自然听说呼吸安排，不给逐句秒点，不拉长等待来填时长。. Pacing tempo: 克制但不拖延，正常语速. Shot duration: 22 seconds. Camera movement: 前段固定；揭出空位之后自然切到同侧近景. Camera stability: 稳定. Camera framing intent: 先固定中远景同时看两人、出口和脚边；货车完整遮挡后在同机位揭示一位，再切到罗敏胸上近景完成电话对答，近景保持完整脸、左手手机与墨绿雨衣. Camera start framing: 参考素材1的两人同框固定中远景. Camera end framing: 参考素材3同侧罗敏胸上近景，左手手机完整，继续听电话. Performance trigger: 夜班结束，联系接车司机；人物始终觉得这是普通接车电话. Visible response: 先报两位、同伴关心湿路与听说目光；揭出空位后罗敏没有寻找反应；听见司机核对人数，她平常回答自己一位. Gaze target: 前段罗敏与高峥自然听说，后段罗敏只听电话，不向空位搜索或看镜头. Body behavior: 自然站立和重心，无集体摆动或慢动作；无预知惊恐. Hand behavior: 罗敏左手手机贴左耳，黑包保持；高峥褐包只在消失前属于他，消失后一起不在. Terminal performance state: 同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。. Visual medium: 同三张参考的原创成年3D国漫CG面部、细束发丝、克制皮肤高光；成熟比例，不转真人照片. Visual palette: 冷灰雨城与微暖站棚灯. Material treatment: 真实湿布、玻璃、雨水、金属和朴素通勤道具. Prohibit visual drift: 真人照片脸或蜡像, 换脸、额外手、多人融合, 用溶解、透明、残影、鬼怪替代完整遮挡后的缺席, 错误文字、片名、字幕或数字. Lighting source: 站棚实用灯和雨夜远城灯. Lighting direction: 同参考保持冷暖侧光. Lighting exposure priority: 人脸、左手手机、空位、出口和脚边可读. Lighting continuity: 同一雨夜同一站棚，不熄灯闪灯. Character performance directions. For 前段左侧成熟眼镜褐衣男 (supporting, visible): Throughout the shot, after 夜班后等接车电话, show 疲倦清醒、普通生活，没有异常认知 with moderate intensity; facial expression: 自然说话和倾听，不夸张，不呆滞; gaze target: 生活中的电话、湿路与同伴，不看镜头; breathing: 自然; body behavior: 先听见接车，再望湿路顺口提醒，包保持，不走开；只在完整车厢遮挡后不再出现. For 右侧短卷发墨绿雨衣女人，左手手机 (principal, visible): Throughout the shot, after 夜班后等接车电话, show 疲倦清醒、普通生活，没有异常认知 with moderate intensity; facial expression: 自然说话和倾听，不夸张，不呆滞; gaze target: 生活中的电话、湿路与同伴，不看镜头; breathing: 自然; body behavior: 开头普通通话，听见同伴后看他；后段不记得、不寻找；听见司机问一位后像一直独自候车一样自然回答，无迟疑、惊恐或神秘笑. Ambient sound is enabled. Ambience bed: 持续近棚雨声、湿路车流和正常经过的货车；电话司机为普通窄频通话声。无配乐、怪声、惊吓冲击或全局静音. Foley cue: 普通衣料声. Foley cue: 货车引擎与湿路轮胎声从左向右正常经过远离. 对话语言：Chinese。以下各轮按顺序自然交谈，每句只说一次；由表演安排停顿、倾听与接话，不指定台词时间点，不抢话或赶词。 第1轮，罗敏（luomin）在画面内说：“师傅，我们在站里，两位。”。听说反应：罗敏开场已经在通话；高峥听见才接话。可见口型与此人对白同步。 第2轮，高峥（gaozheng）在画面内说：“让他别急，路滑。”。听说反应：高峥顺口关心湿路，罗敏听见后自然看他一眼；随后货车完整遮挡，再揭示他不在。可见口型与此人对白同步。 第3轮，driver（driver）在画外说：“就你一位？”。听说反应：在同机位完整揭出只剩罗敏之后，近景中才从电话传来普通接车核对，无惊讶质问。不要求可见口型。 第4轮，罗敏（luomin）在画面内说：“嗯，就我一个。”。听说反应：听完司机才自然确认，语气平常，无迟疑、困惑、恐惧或寻找；然后继续听电话。可见口型与此人对白同步。 Music: none. Primary camera movement: locked. Primary camera direction: none. Primary camera amplitude: subtle. Primary camera speed: very slow. Primary camera starts stationary. Primary camera ends settled. Camera relation: fixed frame. Camera relation starts: 站棚两人同框和完整可见出口. Camera relation ends: 同侧胸上近景，罗敏平常听电话.\n参考素材1 {{image:0}}\n参考素材2 {{image:1}}\n参考素材3 {{image:2}}",
+    "image_bindings": [
+      {
+        "role": "reference",
+        "asset_id": "CO-A3-ref-01-before",
+        "asset_sha256": "dd6cdb932eec157d9ab198f35bcd7b53e22127eb6a37fc6c574ae8c0ba6dbd8f",
+        "mime_type": "image/png",
+        "width": 1672,
+        "height": 941,
+        "size_bytes": 2442444
+      },
+      {
+        "role": "reference",
+        "asset_id": "CO-A3-ref-02-after",
+        "asset_sha256": "15543630bcc37bb9ca0b1e5457b20befa2a5ffd85e1e8c9845775a8c99126125",
+        "mime_type": "image/png",
+        "width": 1672,
+        "height": 941,
+        "size_bytes": 2436237
+      },
+      {
+        "role": "reference",
+        "asset_id": "CO-A3-ref-03-close",
+        "asset_sha256": "53c21e36e6c9a5f75efab197211785d092f71af73ee2f776bf208508a90bb35d",
+        "mime_type": "image/png",
+        "width": 1672,
+        "height": 941,
+        "size_bytes": 2368596
+      }
+    ],
+    "c4_multi_anchor_binding": null,
+    "continuity_binding": null,
+    "hard_cut_keyframe_binding": null,
+    "seal_terminal_frame": false,
+    "media_bindings": [],
+    "effective_output": {
+      "timing_mode": "nominal_seconds",
+      "duration_seconds": 22,
+      "frame_count": null,
+      "dimension_mode": "adaptive",
+      "width": null,
+      "height": null,
+      "resolution_label": "1080p",
+      "ratio": "16:9",
+      "fps": null,
+      "container": "mp4",
+      "mime_type": "video/mp4",
+      "native_audio": true
+    },
+    "provider_task_binding": null,
+    "effective_seed": null,
+    "effective_negative_prompt_text": "",
+    "output_asset_id": "canvas-video-96f4533b6af2f6c37380d2ea98931e12",
+    "activation_scope": {
+      "request": {
+        "generation_id": "canvas-generation-96f4533b6af2f6c37380d2ea98931e12",
+        "provider_name": "jimeng",
+        "provider_kind": "jimeng",
+        "model_id": "seedance_2.5",
+        "provider_profile": {
+          "profile_id": "jimeng",
+          "profile_version": "canvas-seedance-2.5-v1",
+          "profile_path": "provider-profiles/a68d75af3cc4c56557aa2b011e0496e6a2a930afc1ae92eed9ff98a68fe4560b.json",
+          "profile_sha256": "a68d75af3cc4c56557aa2b011e0496e6a2a930afc1ae92eed9ff98a68fe4560b"
+        },
+        "requirement_hash": "f0c382393072fc960dc925f06c36cb4813bb2b9dec88318b8aa88d078c5dd729",
+        "provider_bound_request_hash": "5d7db16c6ba48819125c3c8f072b779d146535413ce733099a529c668679c9b0",
+        "adapter_compiler_id": "jimeng-seedance-2.5-video-compiler",
+        "adapter_compiler_version": "1",
+        "adapter_compiler_hash": "3ff8df22ff07ef4e6b2c0ec02474f1dc90aaaa5087dca4a60d7c5c05d478965f",
+        "execution_stack_hash": null,
+        "target_shot_id": "CO-A3",
+        "target_shot_revision": 2,
+        "target_shot_content_hash": "577609ab8d23f9c382e6983563d02e0c3ca4d411ef8bf1f06156fd97f330cd6f",
+        "target_asset_role": "primary_visual",
+        "target_visual_strategy": "generated_video",
+        "mode": "reference_to_video",
+        "prompt_text": "Opening state: 开画已在雨夜玻璃站棚：戴眼镜褐灰外套的成熟高峥在左，短卷发墨绿雨衣罗敏在右，左手手机贴左耳，各自的包保持，出口和脚边可见。. Closing state: 同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。. The closing state must be visibly reached during this shot. Keep the visible character identity exactly consistent. Scene mood: 前一夜雨夜普通候车，城市冷峻，人物不预知异常. Scene constraint: 参考素材1只指导最初同框的高峥、罗敏身份服装、原站位和站棚；参考素材2只指导货车驶离后的同一站棚、右侧罗敏和左侧空位，不能作为开场；参考素材3只指导最后罗敏的近景脸、发型、衣服和左手手机，不能提前切走掩盖消失。. Scene constraint: 同一事件，无角色保留对消失者的记忆；司机不知道先前的两位说法被改写. Scene constraint: 高峥不主动走开、不上车，无人被拖走，不留衣物或包. Scene constraint: 完整遮挡后才揭示左侧为空；不可用溶解、灯闪、黑屏、透明或烟化代替. Scene constraint: 无音乐、鬼声、惊吓音效、额外对白、字幕、片名或准确数字. Subject position: 前段左高峥右罗敏，同一站棚；揭示后右侧罗敏原位，左侧明确为空. Screen direction: 不镜像，货车持续左向右. Spatial crossing policy: 货车不进站、不停、不上下客，人物没有出入画面. Camera axis: 道路近侧正对站棚，近景保持同侧和手机手别. Framing continuity: 两位到一位的过程必须同一固定全景，完整揭出空位后才切到罗敏胸上近景. Axis crossing policy: 同侧切近景，不越轴. Action start: 开画已在雨夜玻璃站棚：戴眼镜褐灰外套的成熟高峥在左，短卷发墨绿雨衣罗敏在右，左手手机贴左耳，各自的包保持，出口和脚边可见。. Action progression: 开画就是两位夜班同事等接车，没有城市空镜铺垫。罗敏向电话司机报两位，高峥听见后顺口关心湿路，她听完自然看他一眼。普通灰白配送货车从摄影机极近前景左向右经过，不停车不开门，车厢短暂完整遮满全幅。货车尾缘继续向右驶离后，仍是原机位、原站棚和右侧原位的罗敏，左侧高峥和他的包已经不在；没有任何人出入、上车或透明消失过程。先让观众读到空位，罗敏仍在听电话。然后自然切到参考素材3的罗敏胸上近景，司机只从电话里平常核对一位，她没有迟疑、困惑或惊吓，像一直独自候车那样平常回答，继续听电话。. Action endpoint: 同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。. The action must produce a visible state change. Motion onset: 开场已在自然说话，无空镜铺垫. Motion peak: 货车完整遮挡后，同机位揭出空位. Motion settle: 罗敏平常回答自己一位，继续听电话. Motion direction: 货车持续左向右，人物原位. Motion amplitude: 正常实时生活动作. Pacing cadence: 先用简短对话让两人关系成立，随后完成异常。空位先读清，电话核对和日常回答作最后反差。按自然听说呼吸安排，不给逐句秒点，不拉长等待来填时长。. Pacing tempo: 克制但不拖延，正常语速. Shot duration: 22 seconds. Camera movement: 前段固定；揭出空位之后自然切到同侧近景. Camera stability: 稳定. Camera framing intent: 先固定中远景同时看两人、出口和脚边；货车完整遮挡后在同机位揭示一位，再切到罗敏胸上近景完成电话对答，近景保持完整脸、左手手机与墨绿雨衣. Camera start framing: 参考素材1的两人同框固定中远景. Camera end framing: 参考素材3同侧罗敏胸上近景，左手手机完整，继续听电话. Performance trigger: 夜班结束，联系接车司机；人物始终觉得这是普通接车电话. Visible response: 先报两位、同伴关心湿路与听说目光；揭出空位后罗敏没有寻找反应；听见司机核对人数，她平常回答自己一位. Gaze target: 前段罗敏与高峥自然听说，后段罗敏只听电话，不向空位搜索或看镜头. Body behavior: 自然站立和重心，无集体摆动或慢动作；无预知惊恐. Hand behavior: 罗敏左手手机贴左耳，黑包保持；高峥褐包只在消失前属于他，消失后一起不在. Terminal performance state: 同一雨夜站棚内只剩罗敏一人，左手手机贴左耳，她已平常回答司机自己一人，继续听电话，不寻找、不回头、不惊恐。高峥及他的包不在场。. Visual medium: 同三张参考的原创成年3D国漫CG面部、细束发丝、克制皮肤高光；成熟比例，不转真人照片. Visual palette: 冷灰雨城与微暖站棚灯. Material treatment: 真实湿布、玻璃、雨水、金属和朴素通勤道具. Prohibit visual drift: 真人照片脸或蜡像, 换脸、额外手、多人融合, 用溶解、透明、残影、鬼怪替代完整遮挡后的缺席, 错误文字、片名、字幕或数字. Lighting source: 站棚实用灯和雨夜远城灯. Lighting direction: 同参考保持冷暖侧光. Lighting exposure priority: 人脸、左手手机、空位、出口和脚边可读. Lighting continuity: 同一雨夜同一站棚，不熄灯闪灯. Character performance directions. For 前段左侧成熟眼镜褐衣男 (supporting, visible): Throughout the shot, after 夜班后等接车电话, show 疲倦清醒、普通生活，没有异常认知 with moderate intensity; facial expression: 自然说话和倾听，不夸张，不呆滞; gaze target: 生活中的电话、湿路与同伴，不看镜头; breathing: 自然; body behavior: 先听见接车，再望湿路顺口提醒，包保持，不走开；只在完整车厢遮挡后不再出现. For 右侧短卷发墨绿雨衣女人，左手手机 (principal, visible): Throughout the shot, after 夜班后等接车电话, show 疲倦清醒、普通生活，没有异常认知 with moderate intensity; facial expression: 自然说话和倾听，不夸张，不呆滞; gaze target: 生活中的电话、湿路与同伴，不看镜头; breathing: 自然; body behavior: 开头普通通话，听见同伴后看他；后段不记得、不寻找；听见司机问一位后像一直独自候车一样自然回答，无迟疑、惊恐或神秘笑. Ambient sound is enabled. Ambience bed: 持续近棚雨声、湿路车流和正常经过的货车；电话司机为普通窄频通话声。无配乐、怪声、惊吓冲击或全局静音. Foley cue: 普通衣料声. Foley cue: 货车引擎与湿路轮胎声从左向右正常经过远离. 对话语言：Chinese。以下各轮按顺序自然交谈，每句只说一次；由表演安排停顿、倾听与接话，不指定台词时间点，不抢话或赶词。 第1轮，罗敏（luomin）在画面内说：“师傅，我们在站里，两位。”。听说反应：罗敏开场已经在通话；高峥听见才接话。可见口型与此人对白同步。 第2轮，高峥（gaozheng）在画面内说：“让他别急，路滑。”。听说反应：高峥顺口关心湿路，罗敏听见后自然看他一眼；随后货车完整遮挡，再揭示他不在。可见口型与此人对白同步。 第3轮，driver（driver）在画外说：“就你一位？”。听说反应：在同机位完整揭出只剩罗敏之后，近景中才从电话传来普通接车核对，无惊讶质问。不要求可见口型。 第4轮，罗敏（luomin）在画面内说：“嗯，就我一个。”。听说反应：听完司机才自然确认，语气平常，无迟疑、困惑、恐惧或寻找；然后继续听电话。可见口型与此人对白同步。 Music: none. Primary camera movement: locked. Primary camera direction: none. Primary camera amplitude: subtle. Primary camera speed: very slow. Primary camera starts stationary. Primary camera ends settled. Camera relation: fixed frame. Camera relation starts: 站棚两人同框和完整可见出口. Camera relation ends: 同侧胸上近景，罗敏平常听电话.\n参考素材1 {{image:0}}\n参考素材2 {{image:1}}\n参考素材3 {{image:2}}",
+        "negative_prompt_text": "",
+        "image_bindings": [
+          {
+            "role": "reference",
+            "asset_id": "CO-A3-ref-01-before",
+            "asset_sha256": "dd6cdb932eec157d9ab198f35bcd7b53e22127eb6a37fc6c574ae8c0ba6dbd8f",
+            "mime_type": "image/png",
+            "width": 1672,
+            "height": 941,
+            "size_bytes": 2442444
+          },
+          {
+            "role": "reference",
+            "asset_id": "CO-A3-ref-02-after",
+            "asset_sha256": "15543630bcc37bb9ca0b1e5457b20befa2a5ffd85e1e8c9845775a8c99126125",
+            "mime_type": "image/png",
+            "width": 1672,
+            "height": 941,
+            "size_bytes": 2436237
+          },
+          {
+            "role": "reference",
+            "asset_id": "CO-A3-ref-03-close",
+            "asset_sha256": "53c21e36e6c9a5f75efab197211785d092f71af73ee2f776bf208508a90bb35d",
+            "mime_type": "image/png",
+            "width": 1672,
+            "height": 941,
+            "size_bytes": 2368596
+          }
+        ],
+        "c4_multi_anchor_binding": null,
+        "continuity_binding": null,
+        "hard_cut_keyframe_binding": null,
+        "seal_terminal_frame": false,
+        "media_bindings": [],
+        "output_requirement": {
+          "timing_mode": "nominal_seconds",
+          "duration_seconds": 22,
+          "frame_count": null,
+          "dimension_mode": "adaptive",
+          "width": null,
+          "height": null,
+          "resolution_label": "1080p",
+          "ratio": "16:9",
+          "fps": null,
+          "container": "mp4",
+          "mime_type": "video/mp4",
+          "native_audio": true
+        },
+        "seed": null,
+        "base_project": {
+          "path": "state/projects/project.3.6e4c78a938031739e78a6317791a86fd15720966acd0d7d8f9a0ccf5e599e2ff.yaml",
+          "revision": 3,
+          "content_hash": "6e4c78a938031739e78a6317791a86fd15720966acd0d7d8f9a0ccf5e599e2ff",
+          "file_sha256": "4b0c92e12a1730d948486805b52d9c709275a37b47d696c2612612725c97dccd"
+        },
+        "base_registry": {
+          "path": "assets/registry.0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25.json",
+          "revision_id": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+          "content_hash": "0bc605b5c93476bc4fac1b77d1e4cbf358f57708642745119ba30f29454c5f25",
+          "file_sha256": "acecf34a234d80d1b90eefd2e471a2a3e69377b3f11df16513e1e58db42fcae5"
+        },
+        "base_dependency_graph": {
+          "revision_id": "86f7ac318e10a678ef14f27ec446c542c64747a50b10e33957dbd4ee79a27b55",
+          "content_hash": "86f7ac318e10a678ef14f27ec446c542c64747a50b10e33957dbd4ee79a27b55",
+          "path": "state/dependency_graph.86f7ac318e10a678ef14f27ec446c542c64747a50b10e33957dbd4ee79a27b55.json",
+          "file_sha256": "cd8673a2275d5f291720524018e5e091bcf4ece438918ed4c5735600353d7f79"
+        },
+        "input_artifact_ids": [
+          "shizhen-CO-A3-shot",
+          "shizhen-CO-A3-scene",
+          "shizhen-CO-A3-character-gaozheng",
+          "shizhen-CO-A3-character-luomin",
+          "CO-A3-ref-01-before",
+          "CO-A3-ref-02-after",
+          "CO-A3-ref-03-close"
+        ],
+        "output_asset_id": "canvas-video-96f4533b6af2f6c37380d2ea98931e12",
+        "request_input_hash": "f622865ad88c89a627d8ba2575bffc8443ac27753fd7c62a6275974b6b1a38b0"
+      },
+      "usage_license": "provider-output",
+      "scope_fingerprint": "49080c6a41a4cf6f2b84be05cd908972435cdde69f238ae71b45382cab871a7e"
+    },
+    "resolved_generation_hash": "909ad8efd03b445b1e3e255b5efb4ce8dc3fb5a95a04b5396727ba7966edcec4",
+    "desired_generation_fingerprint": "909ad8efd03b445b1e3e255b5efb4ce8dc3fb5a95a04b5396727ba7966edcec4"
+  },
+  "paid_provider_preview": {
+    "attempt_id": "shizhen-CO-A3-qualification-001",
+    "operation": "video_generation",
+    "provider_kind": "jimeng",
+    "model_id": "seedance_2.5",
+    "request_fingerprint": "909ad8efd03b445b1e3e255b5efb4ce8dc3fb5a95a04b5396727ba7966edcec4",
+    "billing_mode": "remote_metered",
+    "currency": "CRD",
+    "estimated_cost_upper_bound_microunits": 1500000000,
+    "destination": "https://jimeng.jianying.com",
+    "method": "POST",
+    "egress_items": [
+      {
+        "item_id": "prompt",
+        "sha256": "064190de90a5d62062afddb11b3b8802b61b8aa9c3d2bde8df864d7e8ccae491",
+        "size_bytes": 8495,
+        "mime_type": "text/plain",
+        "purpose": "prompt"
+      },
+      {
+        "item_id": "CO-A3-ref-01-before",
+        "sha256": "dd6cdb932eec157d9ab198f35bcd7b53e22127eb6a37fc6c574ae8c0ba6dbd8f",
+        "size_bytes": 2442444,
+        "mime_type": "image/png",
+        "purpose": "reference"
+      },
+      {
+        "item_id": "CO-A3-ref-02-after",
+        "sha256": "15543630bcc37bb9ca0b1e5457b20befa2a5ffd85e1e8c9845775a8c99126125",
+        "size_bytes": 2436237,
+        "mime_type": "image/png",
+        "purpose": "reference"
+      },
+      {
+        "item_id": "CO-A3-ref-03-close",
+        "sha256": "53c21e36e6c9a5f75efab197211785d092f71af73ee2f776bf208508a90bb35d",
+        "size_bytes": 2368596,
+        "mime_type": "image/png",
+        "purpose": "reference"
+      }
+    ],
+    "retention_mode": "provider_standard",
+    "provider_policy_snapshot_id": "shizhen-cold-open-CO-A3",
+    "secret_reference": {
+      "kind": "secret_store",
+      "reference_id": "JIMENG_BROWSER_SESSION"
+    },
+    "preview_fingerprint": "fc3735d0b7f6d4c1e784258d81a86495bd579f2c465d4738196e51a211a32e7b"
+  },
+  "historical_video_calls": 9,
+  "new_video_calls": 0
+}

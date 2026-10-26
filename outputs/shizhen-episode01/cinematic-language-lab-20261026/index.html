@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>失帧｜城市留在空位里 · 视觉研究02</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0a1115;color:#deded4;font:16px/1.65 system-ui,sans-serif}main{max-width:1260px;padding:38px 42px 80px;margin:auto}header{display:flex;align-items:baseline;justify-content:space-between;gap:24px}h1{font-family:serif;font-size:34px;font-weight:500;letter-spacing:5px;margin:0 0 4px}h2{font-size:23px;font-weight:500;margin:8px 0}p{color:#a8b3b4;max-width:950px;margin:10px 0 18px}.eyebrow{color:#b8b7a4;font-size:13px;letter-spacing:2px}.scope{font-size:13px;color:#8e9c9e;margin:12px 0 24px}.hero{display:block;width:100%;background:#0a1115;border:1px solid #293437}.bar{display:flex;flex-wrap:wrap;gap:10px;margin:16px 0}.bar button{cursor:pointer;background:transparent;border:1px solid #667174;color:#deded4;padding:10px 18px;font:inherit}.bar button:hover,.bar button:focus-visible{background:#d6d8d0;color:#0a1115;outline:2px solid #b8b7a4}section{margin-top:44px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:28px}.grid video{width:100%;display:block;background:#0a1115;border:1px solid #293437}figure{margin:0}figcaption{color:#a8b3b4;font-size:14px;margin-top:12px}.rule{border-top:1px solid #354047;margin-top:34px;padding-top:22px}a{color:#deded4}footer{font-size:13px;color:#8e9c9e;margin-top:48px}summary{cursor:pointer}details p{font-size:14px}@media(max-width:760px){main{padding:24px 18px 50px}.grid{grid-template-columns:1fr}header{display:block}h1{font-size:27px}}
+</style>
+<main>
+<header><div><div class="eyebrow">失帧 / 视觉研究 02</div><h1>C · 城市留在空位里</h1></div><span class="eyebrow">推荐方向 C</span></header>
+<div class="scope">合成研究使用既有CG素材，最终真人视觉目标不变 · 本轮没有新增付费生成</div>
+<video id="hero" class="hero" controls preload="metadata" playsinline poster="context-r2/poster.png" src="context-r2/失帧-肖像与城市-前后语境研究.mp4"></video>
+<div class="bar"><button id="after">从回答后看衔接</button><button id="whole">从完整事件看</button><button id="concept">看C版9秒动态图形</button></div>
+<p id="hero-caption">36.167秒前后语境：完整“两位”事件 → 肖像与城市片名 → 翌夜 → 原S01。原声、音乐及字幕时间保持，默认展示片名画面，可从回答后或完整事件开始播放。</p>
+<p>一个普通人被忘记后，他在画面里占过的位置还留给观众。城市构成他的肖像，片名错开尺度和基线；“翌夜”换成新的曝光平面，旧城市只留一条缝。</p>
+<section><div class="eyebrow">A / B / C · 三个独立方向</div><div class="grid">
+<figure><video controls preload="metadata" playsinline poster="A/poster.png" src="A/失帧-视觉方向-A-概念片.mp4"></video><h2>A · 破开的字</h2><figcaption>9秒。巨大裁切字成为观看雨夜的孔隙，真实车厢和城市运动穿过笔画。构图最激进；代价是它容易压过人物的情绪，保留为备选。</figcaption></figure>
+<figure><video controls preload="metadata" playsinline poster="B/poster.png" src="B/失帧-视觉方向-B-概念片.mp4"></video><h2>B · 空位的边界</h2><figcaption>9秒。一次字形错开顺着车向离开原位。实看仍有大字覆盖底片的问题，不推荐作为主方向，不继续靠增加特效补救。</figcaption></figure>
+<figure id="direction-c"><h2>C · 城市留在空位里（推荐）</h2><video controls preload="metadata" playsinline poster="C-refined/poster.png" src="C-refined/失帧-视觉方向-C-概念片.mp4"></video><figcaption>9秒。消失者的肖像由雨夜城市构成；这是上方36秒语境版所采用方向的独立动态图形研究。</figcaption></figure>
+</div><p class="scope">9秒独立概念片用于比较图形与同一Suno短句，未纳入原对白；上方36秒语境版完整保留原声。</p></section>
+<section class="rule"><h2>这轮解决了什么</h2><p>从独立字卡推进到影像孔隙、空间边界和人物肖像三种不同逻辑，并实际比较了运动。推荐版重新绘制了初版过于符号化的人形，修正了背景裁取带来的人物重新出现歧义。</p><p>这些仍是视觉研究。真人肖像与动态城市新镜头尚未生成，宏观开场没有完成；轮廓材质和最终音画感受仍需真人素材及用户审片。此处没有用技术检查代替电影审美通过。</p>
+<details><summary>查看设计比较与制作证据</summary><p><a href="design-review.md">艺术取舍、参考方法与制作边界</a> · <a href="qa/context-r2-audio-preservation.json">原声逐样本核对</a> · <a href="context-r2/render-receipt.json">实际语境渲染记录</a> · <a href="../live-action-rebuild-20261026/typography/title-typography-study.mp4">旧3.5秒技术基准</a></p></details></section>
+<footer>所有原片与音乐保留 · 未发布 · 真人最终版尚未完成</footer>
+</main>
+<script>
+const hero=document.querySelector('#hero'),caption=document.querySelector('#hero-caption');
+const context='context-r2/失帧-肖像与城市-前后语境研究.mp4';
+const concept='C-refined/失帧-视觉方向-C-概念片.mp4';
+function loadMovie(src,time,text){
+  const seek=()=>{hero.currentTime=time;hero.play().catch(()=>{});};
+  caption.textContent=text;
+  if(hero.getAttribute('src')===src&&hero.readyState>=1)seek();
+  else{hero.src=src;hero.addEventListener('loadedmetadata',seek,{once:true});hero.load();}
+}
+document.querySelector('#after').onclick=()=>loadMovie(context,16,'36.167秒语境版，从平静回答之后开始：片名、翌夜、原S01；全部原声保留');
+document.querySelector('#whole').onclick=()=>loadMovie(context,0,'36.167秒语境版，从完整“两位”事件开始审看；原声、音乐、字幕时间保持');
+document.querySelector('#concept').onclick=()=>loadMovie(concept,0,'9秒C方向：真实视频运动进入肖像轮廓；此段只研究图形与音乐，不是对白剪辑');
+hero.addEventListener('loadedmetadata',()=>{hero.currentTime=17.5;},{once:true});
+document.querySelectorAll('video').forEach(v=>v.addEventListener('play',()=>document.querySelectorAll('video').forEach(other=>{if(other!==v)other.pause();})));
+</script></html>

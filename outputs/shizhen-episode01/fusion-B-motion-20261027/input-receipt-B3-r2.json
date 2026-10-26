@@ -1,0 +1,38 @@
+{
+  "project": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-fusion-B-motion-20261027/project-r2",
+  "sources": [
+    {
+      "shot_id": "CO-TAIL",
+      "asset_id": "fusion-title-composite",
+      "start": 0,
+      "frames": 144,
+      "audio_id": "CO-TAIL-original-mix",
+      "audio_start": 288,
+      "transform": {}
+    }
+  ],
+  "music_asset_id": "two-passengers-missing-response-B",
+  "scope": "local compositing review only",
+  "origin": {
+    "kind": "local-shot-composite-review/1",
+    "request": "B 图：黑白负片方向；不能从左到右；确实并且太快了；应该慢一点,有个过程",
+    "brief": "# Shizhen B Motion Production\n\n## Goal And Scope\n\n用户“开始制作”：将当前4态参考变成实际动态片名样片。片段独立，不含S01；保护已有事件与四句对白、原片、原音乐。此轮完成片名动态局部及必要的原事件上下文，不宣称宏观新镜头和真人整集重制已完成。\n\n## Production Decision\n\n使用同一A3运动底片，原速24fps，不把生成静态图逐张溶解或变形。检查252帧发现卡车仍遮住右侧，不宜用于片名段重复出场，因此采用已核验的288..359，共72帧3秒；早先4.5秒候选保留为否决记录。参考只控制字形、影调层次和终态观感。先远景中间调分离，再按原画面亮度而非横向坐标显影，字标位置固定，原雨水高光与人物继续运动。无横向擦除、无云雾白斑、无新增灵异规则。源AI标识保留，准确时钟仍归后期。\n\n## Owners And Files\n\nParent仅写 `outputs/shizhen-episode01/fusion-B-motion-20261027/`、独立 `runs/shizhen-fusion-B-motion-20261027/`、此计划与任务记录。复用davinci-resolve-fusion为单镜合成，HyperFrames与ResolvedTimeline独占最终帧/样本与输出。无共享引擎修改，无新付费视频/音乐调用。既有参考目录及F2失败证据不覆盖。\n\n## Milestones\n\n1. 核对4态、源连续宽景、音乐；从选定美术建立稳定字标与合成层，复用现有owner形成局部goal binding。独立concept check核对方案不退回普通淡入或横扫。\n2. 用Fusion制作原运动底片的分层显影。先检查初始、变化中、终态，再渲染72帧。初始最多两轮有归因的本地修订；未知结果不重跑，不自动新增生成。\n3. 经既有ProductionStateCommitter建立隔离审看项目，HyperFrames保留原环境声与Suno B并编码。实际MP4逐帧与正常速播放，显式video-analysis、独立审片；审查文字、主体连续性、无横扫、音乐与终态。\n4. 提供可观看文件/页面及实际限制。原事件上下文若加入，按同一CompositionSpec保留已有trim/caption/audio，并验证新接点。按媒体优先规则先交片，待用户效果认可再全套工程验证与commit/push。\n\n## Acceptance Boundaries\n\n参考风格与叙事目的必须在实际画面中可见；渲染成功不代表艺术通过。原速人物运动、雨痕及声音不能退化为静态图插值。字标须准确可读且稳定。最终仅按实际证据分别报告技术、局部视觉和人工审看状态。\n\n## Slower Process Revision — B3\n\n用户对B2明确反馈“确实并且太快了”“应该慢一点，有个过程”，授权本轮节奏修订。保留B2失败与真实消耗，追加一个有界B3候选（一次静帧检查、一次144帧输出；发现技术输入错误可修，不盲目迭代审美）。原源wide在后面转近景，无法直接延展六秒同构图；本轮局部片名采用明确披露的2倍时长光流慢镜，原三秒动作不重复、不反放、无新收费生成；慢镜只作用于片名段，不改核心事件/四句对白。图形重新按六秒分阶段设计，不以最终MP4半速播放冒充过程。声音独立保持原速，使用既有音乐更长片段及原环境声交叉接续，须披露不能再宣称PCM等同B2。\n\n针对 B2-01：连续平滑负片曲线，取消颜色/亮度硬阈值；B2-02：字组缩小并左移，让主识字骨架避开立柱；B2-03：局部椭圆密度区及地面保护，避免垂直整幅分割。更新底片时间变换provenance；B3不自动接受。\n",
+    "source_mp4_sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+    "source_frames": [
+      288,
+      359
+    ],
+    "local_visual_retime": {
+      "source_fps": 24,
+      "source_frames": 72,
+      "output_fps": 24,
+      "output_frames": 144,
+      "duration_scale": 2,
+      "method": "local ffmpeg motion-compensated optical-flow interpolation; source untouched; title segment only"
+    },
+    "fusion_comp_sha256": "944f5c2599ae5c9e8c7f507771ee12f928b54230e53de7c1331f0835051dbf47",
+    "fusion_version": "21.1.1.10",
+    "full_goal_status": "Macro footage and live-action consistency remain unfulfilled",
+    "authority": "Shot-compositing review only. No qualification, activation, publication or final acceptance."
+  }
+}

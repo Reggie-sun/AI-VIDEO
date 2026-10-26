@@ -1,0 +1,1621 @@
+{
+  "artifact_id": "shizhen-language-arm-C",
+  "schema_version": "2.3",
+  "revision": 1,
+  "content_hash": "75b9b67b226f580f4b57f36b2ba02deb00577a7247a26841495ef5c1ffc0d6a7",
+  "creation_receipt_id": "no-paid-motion-concept-C",
+  "source_provenance": [
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/2df25d507157bcdaf0a9cac2bdb2db48e51f7d3799b4dddef76932341a8cc216.json",
+      "content_hash": "2df25d507157bcdaf0a9cac2bdb2db48e51f7d3799b4dddef76932341a8cc216"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/28d10bf98a8649ed8ef3749ac381b473a4c5837ac1927195a60378f88a78d53c.json",
+      "content_hash": "28d10bf98a8649ed8ef3749ac381b473a4c5837ac1927195a60378f88a78d53c"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/356cde7d89c253767b93fda362cf802fe4a407fb46b0bd42170ff407646d7273.json",
+      "content_hash": "356cde7d89c253767b93fda362cf802fe4a407fb46b0bd42170ff407646d7273"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/4bda8294c48cf037edaa6e2cc4a34cd9e40a315cceb456d50aa53eb09016fa0e.json",
+      "content_hash": "4bda8294c48cf037edaa6e2cc4a34cd9e40a315cceb456d50aa53eb09016fa0e"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/6a6556ca1e2bf43eff1021d8a80eb8faaeeff881eb9b45e366c5a6a80cfdeb83.json",
+      "content_hash": "6a6556ca1e2bf43eff1021d8a80eb8faaeeff881eb9b45e366c5a6a80cfdeb83"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/0c8fcb8b248babc60b2512cc0ecc9ed07251cd2572b0bfe8956fc7030bcc3c59.json",
+      "content_hash": "0c8fcb8b248babc60b2512cc0ecc9ed07251cd2572b0bfe8956fc7030bcc3c59"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/57a035052ee5d1377d0adbdd8545829bd92db62b6d8deccd33a243cf5fb2d1d1.json",
+      "content_hash": "57a035052ee5d1377d0adbdd8545829bd92db62b6d8deccd33a243cf5fb2d1d1"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/73a868826ec432dd8a25e21f3b1ea1b7524808dd037396d68ee465e0bc851fda.json",
+      "content_hash": "73a868826ec432dd8a25e21f3b1ea1b7524808dd037396d68ee465e0bc851fda"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/8939e9ac54438686466cc75fa193f72cd4a14a4e664ff87c84653646bd16bcbd.json",
+      "content_hash": "8939e9ac54438686466cc75fa193f72cd4a14a4e664ff87c84653646bd16bcbd"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/a629e5d307f6b9274f0b495d6719f4dc2c4e3da4011c04625b9ce3179d87c8ab.json",
+      "content_hash": "a629e5d307f6b9274f0b495d6719f4dc2c4e3da4011c04625b9ce3179d87c8ab"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/e62641af9e3221cf97258c34690150a2378effa559d0f2e1efb73cca2e4c23d7.json",
+      "content_hash": "e62641af9e3221cf97258c34690150a2378effa559d0f2e1efb73cca2e4c23d7"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/ec9dfd41159f47c527ed6f0d3692dbb99d3a152d879b330a90a2a27e6652ea12.json",
+      "content_hash": "ec9dfd41159f47c527ed6f0d3692dbb99d3a152d879b330a90a2a27e6652ea12"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/c957b4f60f5ea0159321a7d6cb87230424f1cb6b467e72ab93eeeea86cfa8337.json",
+      "content_hash": "c957b4f60f5ea0159321a7d6cb87230424f1cb6b467e72ab93eeeea86cfa8337"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/0efeccaef86667f4cb87e55750e58916a63ac18bdc263e84f125046c3feeab8f.json",
+      "content_hash": "0efeccaef86667f4cb87e55750e58916a63ac18bdc263e84f125046c3feeab8f"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/1877fa5b095704cbac48d3135a3143f1a416f0c6b3b4217d6db9c44404a74e78.json",
+      "content_hash": "1877fa5b095704cbac48d3135a3143f1a416f0c6b3b4217d6db9c44404a74e78"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/3f5a45fd5b56ddebaade7216efee316edf87739ca272610d7b7eb63ebbf09298.json",
+      "content_hash": "3f5a45fd5b56ddebaade7216efee316edf87739ca272610d7b7eb63ebbf09298"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/4272d2e212040a6f84e56e9d9877d91446f3635bba65322ebe524af68dba6b61.json",
+      "content_hash": "4272d2e212040a6f84e56e9d9877d91446f3635bba65322ebe524af68dba6b61"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/59d18bd4d99d95ce55ccdd3f6348a353fa4f54c3796e7f4d721fc46c2506463e.json",
+      "content_hash": "59d18bd4d99d95ce55ccdd3f6348a353fa4f54c3796e7f4d721fc46c2506463e"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/43ffb9dddeec9ae4c297877b81cbbdb8281f2e1a5dc9f83eb85c265355dec308.json",
+      "content_hash": "43ffb9dddeec9ae4c297877b81cbbdb8281f2e1a5dc9f83eb85c265355dec308"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/dd5c788a76c8bf722488be2fd8aa61b986f21ebdd47c9a70f6cf6ac0f34f9f30.json",
+      "content_hash": "dd5c788a76c8bf722488be2fd8aa61b986f21ebdd47c9a70f6cf6ac0f34f9f30"
+    },
+    {
+      "kind": "user_input",
+      "reference": "creative-input.txt",
+      "content_hash": "c2585d78d376e254e033aef097fc2c4d92178ada9650b36b12a3cd46f669a866"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/33f33291b3103cad1543a3d5b3312e2f9aff8b290e5edac426109da38e910471.json",
+      "content_hash": "33f33291b3103cad1543a3d5b3312e2f9aff8b290e5edac426109da38e910471"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/1ffa0f87002dd55a90d6e40c3f10d9b8cbe9c2e3cf22976ef24258a2ec176280.json",
+      "content_hash": "1ffa0f87002dd55a90d6e40c3f10d9b8cbe9c2e3cf22976ef24258a2ec176280"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/f77046a035fdc87b3384a7d8afb4465dc0a931db3b66598ca756e35ea0fadaba.json",
+      "content_hash": "f77046a035fdc87b3384a7d8afb4465dc0a931db3b66598ca756e35ea0fadaba"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/3a3e475fd51cc061655d3d9efddaf74486e79a90d1e3a64adfe52e7a9f1e022a.json",
+      "content_hash": "3a3e475fd51cc061655d3d9efddaf74486e79a90d1e3a64adfe52e7a9f1e022a"
+    },
+    {
+      "kind": "user_input",
+      "reference": "evidence/authoring-input/a7eec5150732286e384ba5b5afd8e73d1bcf499aa105429892ebaac77a407fd1.json",
+      "content_hash": "a7eec5150732286e384ba5b5afd8e73d1bcf499aa105429892ebaac77a407fd1"
+    }
+  ],
+  "composition_id": "shizhen-cinematic-language-C",
+  "shot_ids": [
+    "CO-A2",
+    "CO-A3"
+  ],
+  "layers": [
+    {
+      "layer_id": "concept-source-CO-A2",
+      "shot_id": "CO-A2",
+      "asset_role": "primary_visual",
+      "asset_id": "CO-A2-review-video",
+      "trim_start_frame": 0,
+      "trim_duration_frames": 96,
+      "source_audio_policy": "MUTE",
+      "source_audio_reason": "MOTION_CONCEPT_ONLY: these abstract image/type arms are not a dialogue edit; protected original dialogue remains untouched",
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0
+    },
+    {
+      "layer_id": "concept-source-CO-A3",
+      "shot_id": "CO-A3",
+      "asset_role": "primary_visual",
+      "asset_id": "CO-A3-review-video",
+      "trim_start_frame": 361,
+      "trim_duration_frames": 120,
+      "source_audio_policy": "MUTE",
+      "source_audio_reason": "MOTION_CONCEPT_ONLY: these abstract image/type arms are not a dialogue edit; protected original dialogue remains untouched",
+      "transform": {
+        "translate_x_px": 0,
+        "translate_y_px": 0,
+        "scale_x_milli": 1000,
+        "scale_y_milli": 1000,
+        "rotation_millidegrees": 0
+      },
+      "opacity_milli": 1000,
+      "z_index": 0
+    }
+  ],
+  "transitions": [
+    {
+      "from_shot_id": "CO-A2",
+      "to_shot_id": "CO-A3",
+      "kind": "cut",
+      "duration_frames": 0
+    }
+  ],
+  "delivery_profile": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 24,
+    "codec_profile": "h264"
+  },
+  "sample_rate": 48000,
+  "requested_renderer": "hyperframes",
+  "audio_tracks": [
+    {
+      "track_id": "same-original-B-phrase",
+      "audio_kind": "bgm",
+      "asset_id": "two-passengers-missing-response-B",
+      "shot_id": null,
+      "start_sample": 0,
+      "trim_start_sample": 0,
+      "trim_duration_samples": 432000,
+      "gain_millidb": -8500,
+      "fade_in_samples": 8000,
+      "fade_out_samples": 24000,
+      "ducking": null
+    }
+  ],
+  "caption_tracks": [],
+  "graphic_layer_ids": [],
+  "graphic_layer_animations": [],
+  "commercial_graphics": [],
+  "text_layers": [
+    {
+      "graphic_id": "language-C-CO-A2",
+      "role": "headline",
+      "text": "失\n帧\n翌\n夜",
+      "shot_id": "CO-A2",
+      "start_frame_offset": 0,
+      "duration_frames": 96,
+      "x_milli": 0,
+      "y_milli": 0,
+      "width_milli": 1000,
+      "font_size_px": 236,
+      "text_color": "#DAD9CF",
+      "background_color": null,
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 0,
+        "right_milli": 0,
+        "bottom_milli": 0,
+        "left_milli": 0
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [],
+      "brand_token_ids": [],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [],
+      "entrance": "none",
+      "exit": "none",
+      "z_index": 100,
+      "caption_binding_id": null,
+      "text_design": {
+        "schema_version": "text-design/1",
+        "intent": "Source-specific cinematic language study C; abstract titles, no new supernatural rule",
+        "hierarchy": "Image and absence first; complete readable title anchors; then a separate temporal exposure",
+        "reference_width_px": 1920,
+        "reference_height_px": 1080,
+        "fonts": [
+          {
+            "family": "Noto Sans CJK SC",
+            "sha256": "dcf6290f6a85031c6891dea398d297c97c83beada3d85ddab021adc6d2b6cbc8",
+            "data_base64": "T1RUTwAPAIAAAwBwQkFTRULjT+4AABCMAAAA3kNGRiDPqlX+AAAG3AAACa1HUE9TRHZMdQAAEWwAAAAgR1NVQrziqrQAABGMAAABMk9TLzK8WuaOAAABYAAAAGBWT1JHA3EAAAAAEsAAAAAIY21hcPrUlgUAAAZwAAAATGhlYWQcX2UKAAAA/AAAADZoaGVhCG8C2wAAATQAAAAkaG10eASbAOEAABLIAAAAFm1heHAAClAAAAABWAAAAAZuYW1lY1qD0wAAAcAAAASwcG9zdP+GADIAAAa8AAAAIHZoZWEF1xISAAAS4AAAACR2bXR4BM4AvQAAEwQAAAAWAAEAAAACAQYHyk0EXw889QADA+gAAAAA3LCQEgAAAADcsJASAA7/pQPXA1sAAQADAAIAAAAAAAAAAQAABIj+4AAAA+gADgARA9cAAQAAAAAAAAAAAAAAAAAAAAEAAFAAAAoAAAADA9MCvAAFAAACigJYAAAASwKKAlgAAAFeADIBRQAAAgsIAAAAAAAAAAAAAAAIAAAAAAAAAAAAAABHT09HACBZHH/MA3D/iAAABIgBIAAAAAEAAAAAAh8C3QAAACAABgAAAAkAcgADAAEECQAAAFQAAAADAAEECQABACAAVAADAAEECQACAAgAdAADAAEECQADAEYAfAADAAEECQAEACoAwgADAAEECQAFAGQA7AADAAEECQAGACQBUAADAAEECQANApYBdAADAAEECQAOADQECgCpACAAMgAwADEANAAtADIAMAAyADEAIABBAGQAbwBiAGUAIAAoAGgAdAB0AHAAOgAvAC8AdwB3AHcALgBhAGQAbwBiAGUALgBjAG8AbQAvACkALgBOAG8AdABvACAAUwBhAG4AcwAgAEMASgBLACAAUwBDAEIAbwBsAGQAMgAuADAAMAA0ADsARwBPAE8ARwA7AE4AbwB0AG8AUwBhAG4AcwBDAEoASwBzAGMALQBCAG8AbABkADsAQQBEAE8AQgBFAE4AbwB0AG8AIABTAGEAbgBzACAAQwBKAEsAIABTAEMAIABCAG8AbABkAFYAZQByAHMAaQBvAG4AIAAyAC4AMAAwADQAOwBoAG8AdABjAG8AbgB2ACAAMQAuADAALgAxADEAOAA7AG0AYQBrAGUAbwB0AGYAZQB4AGUAIAAyAC4ANQAuADYANQA2ADAAMwBOAG8AdABvAFMAYQBuAHMAQwBKAEsAcwBjAC0AQgBvAGwAZABUAGgAaQBzACAARgBvAG4AdAAgAFMAbwBmAHQAdwBhAHIAZQAgAGkAcwAgAGwAaQBjAGUAbgBzAGUAZAAgAHUAbgBkAGUAcgAgAHQAaABlACAAUwBJAEwAIABPAHAAZQBuACAARgBvAG4AdAAgAEwAaQBjAGUAbgBzAGUALAAgAFYAZQByAHMAaQBvAG4AIAAxAC4AMQAuACAAVABoAGkAcwAgAEYAbwBuAHQAIABTAG8AZgB0AHcAYQByAGUAIABpAHMAIABkAGkAcwB0AHIAaQBiAHUAdABlAGQAIABvAG4AIABhAG4AIAAiAEEAUwAgAEkAUwAiACAAQgBBAFMASQBTACwAIABXAEkAVABIAE8AVQBUACAAVwBBAFIAUgBBAE4AVABJAEUAUwAgAE8AUgAgAEMATwBOAEQASQBUAEkATwBOAFMAIABPAEYAIABBAE4AWQAgAEsASQBOAEQALAAgAGUAaQB0AGgAZQByACAAZQB4AHAAcgBlAHMAcwAgAG8AcgAgAGkAbQBwAGwAaQBlAGQALgAgAFMAZQBlACAAdABoAGUAIABTAEkATAAgAE8AcABlAG4AIABGAG8AbgB0ACAATABpAGMAZQBuAHMAZQAgAGYAbwByACAAdABoAGUAIABzAHAAZQBjAGkAZgBpAGMAIABsAGEAbgBnAHUAYQBnAGUALAAgAHAAZQByAG0AaQBzAHMAaQBvAG4AcwAgAGEAbgBkACAAbABpAG0AaQB0AGEAdABpAG8AbgBzACAAZwBvAHYAZQByAG4AaQBuAGcAIAB5AG8AdQByACAAdQBzAGUAIABvAGYAIAB0AGgAaQBzACAARgBvAG4AdAAgAFMAbwBmAHQAdwBhAHIAZQAuAGgAdAB0AHAAOgAvAC8AcwBjAHIAaQBwAHQAcwAuAHMAaQBsAC4AbwByAGcALwBPAEYATAAAAAIAAAADAAAAFAADAAEAAAAUAAQAOAAAAAoACAACAAJZHFkxXid/zP//AABZHFkxXid/zP//puam06HegDwAAQAAAAAAAAAAAAAAAwAAAAAAAP+DADIAAAAAAAAAAAAAAAAAAAAAAAAAAAEABAIAAQEBE05vdG9TYW5zQ0pLanAtQm9sZAABAQE9+Bv4HIsMHvgdAfge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",
+            "license": "Noto CJK SIL OFL1.1 / DejaVu Bitstream Vera and public domain additions; system distribution font, subset only"
+          }
+        ],
+        "nodes": [
+          {
+            "node_id": "city-body",
+            "purpose": "The missing ordinary worker becomes an aperture containing continuing city motion",
+            "x_px": 0,
+            "y_px": 0,
+            "width_px": 1920,
+            "height_px": 1080,
+            "runs": [],
+            "path": "M0 0 H1920 V1080 H0 Z M657.0 28.0C610.0 25.0 574.0 68.0 575.0 118.0C575.0 163.0 591.0 185.0 607.0 198.0L594.0 230.0C533.0 244.0 493.0 279.0 474.0 342.0L453.0 555.0L468.0 637.0L484.0 666.0L479.0 742.0L517.0 759.0L540.0 1030.0L511.0 1066.0H644.0L659.0 1017.0V784.0H678.0L705.0 1026.0V1066.0H841.0L805.0 1021.0L806.0 743.0L841.0 683.0V611.0L861.0 543.0L844.0 351.0C835.0 282.0 789.0 246.0 725.0 228.0L713.0 201.0C743.0 176.0 757.0 149.0 752.0 109.0C746.0 59.0 712.0 27.0 657.0 28.0Z",
+            "fill": "#D6D8D0",
+            "stroke": "none",
+            "stroke_width_px": 0,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": [
+              {
+                "frame": 0,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 28,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 95,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              }
+            ]
+          },
+          {
+            "node_id": "body-border",
+            "purpose": "An ink edge separates memory from the world without an electric outline",
+            "x_px": 0,
+            "y_px": 0,
+            "width_px": 1920,
+            "height_px": 1080,
+            "runs": [],
+            "path": "M657 28 C610 25 574 68 575 118 C575 163 591 185 607 198 L594 230 C533 244 493 279 474 342 L453 555 L468 637 L484 666 L479 742 L517 759 L540 1030 L511 1066 L644 1066 L659 1017 L659 784 L678 784 L705 1026 L705 1066 L841 1066 L805 1021 L806 743 L841 683 L841 611 L861 543 L844 351 C835 282 789 246 725 228 L713 201 C743 176 757 149 752 109 C746 59 712 27 657 28 Z",
+            "fill": "none",
+            "stroke": "#0A1115",
+            "stroke_width_px": 1,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": [
+              {
+                "frame": 0,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 34,
+                "opacity_milli": 550,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 95,
+                "opacity_milli": 550,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              }
+            ]
+          },
+          {
+            "node_id": "body-shi",
+            "purpose": "A complete readable anchor within an experimental image",
+            "x_px": 1060,
+            "y_px": 358,
+            "width_px": 360,
+            "height_px": 354,
+            "runs": [
+              {
+                "text": "失",
+                "color": "#0A1115",
+                "font_family": "Noto Sans CJK SC",
+                "font_size_px": 236,
+                "font_weight": 700,
+                "italic": false,
+                "tracking_px": 0,
+                "baseline_shift_px": 0
+              }
+            ],
+            "path": null,
+            "fill": "#FFFFFF",
+            "stroke": "none",
+            "stroke_width_px": 0,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": [
+              {
+                "frame": 0,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 1000,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 44,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 1000,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 72,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 95,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              }
+            ]
+          },
+          {
+            "node_id": "body-zhen",
+            "purpose": "A complete readable anchor within an experimental image",
+            "x_px": 1324,
+            "y_px": 614,
+            "width_px": 300,
+            "height_px": 255,
+            "runs": [
+              {
+                "text": "帧",
+                "color": "#0A1115",
+                "font_family": "Noto Sans CJK SC",
+                "font_size_px": 170,
+                "font_weight": 700,
+                "italic": false,
+                "tracking_px": 0,
+                "baseline_shift_px": 0
+              }
+            ],
+            "path": null,
+            "fill": "#FFFFFF",
+            "stroke": "none",
+            "stroke_width_px": 0,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": [
+              {
+                "frame": 0,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 1000,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 66,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 1000,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 95,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              }
+            ]
+          },
+          {
+            "node_id": "body-interval",
+            "purpose": "A single broad missing slice refers to absence instead of a digital error effect",
+            "x_px": 0,
+            "y_px": 0,
+            "width_px": 1920,
+            "height_px": 1080,
+            "runs": [],
+            "path": "M445 554 H864 V578 H445 Z",
+            "fill": "#D6D8D0",
+            "stroke": "none",
+            "stroke_width_px": 0,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": [
+              {
+                "frame": 0,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 81,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 82,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 95,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              }
+            ]
+          },
+          {
+            "node_id": "night-plane",
+            "purpose": "A new exposure crosses the image; a narrow strip keeps the city alive",
+            "x_px": 0,
+            "y_px": 0,
+            "width_px": 1920,
+            "height_px": 1080,
+            "runs": [],
+            "path": "M0 0 H1920 V1080 H0 Z M0 522 V552 H1920 V522 Z",
+            "fill": "#0A1115",
+            "stroke": "none",
+            "stroke_width_px": 0,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": [
+              {
+                "frame": 0,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 1000,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 95,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 1000,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              }
+            ]
+          },
+          {
+            "node_id": "next-yi",
+            "purpose": "A complete readable anchor within an experimental image",
+            "x_px": 205,
+            "y_px": 267,
+            "width_px": 340,
+            "height_px": 336,
+            "runs": [
+              {
+                "text": "翌",
+                "color": "#D6D8D0",
+                "font_family": "Noto Sans CJK SC",
+                "font_size_px": 224,
+                "font_weight": 700,
+                "italic": false,
+                "tracking_px": 0,
+                "baseline_shift_px": 0
+              }
+            ],
+            "path": null,
+            "fill": "#FFFFFF",
+            "stroke": "none",
+            "stroke_width_px": 0,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": [
+              {
+                "frame": 0,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 1000,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 95,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 1000,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              }
+            ]
+          },
+          {
+            "node_id": "next-ye",
+            "purpose": "A complete readable anchor within an experimental image",
+            "x_px": 1350,
+            "y_px": 634,
+            "width_px": 340,
+            "height_px": 336,
+            "runs": [
+              {
+                "text": "夜",
+                "color": "#D6D8D0",
+                "font_family": "Noto Sans CJK SC",
+                "font_size_px": 224,
+                "font_weight": 700,
+                "italic": false,
+                "tracking_px": 0,
+                "baseline_shift_px": 0
+              }
+            ],
+            "path": null,
+            "fill": "#FFFFFF",
+            "stroke": "none",
+            "stroke_width_px": 0,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": [
+              {
+                "frame": 0,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 1000,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 95,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 1000,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              }
+            ]
+          }
+        ],
+        "avoidance_regions": []
+      }
+    },
+    {
+      "graphic_id": "language-C-CO-A3",
+      "role": "headline",
+      "text": "失\n帧\n翌\n夜",
+      "shot_id": "CO-A3",
+      "start_frame_offset": 0,
+      "duration_frames": 120,
+      "x_milli": 0,
+      "y_milli": 0,
+      "width_milli": 1000,
+      "font_size_px": 236,
+      "text_color": "#DAD9CF",
+      "background_color": null,
+      "claim_reference_ids": [],
+      "safe_area": {
+        "top_milli": 0,
+        "right_milli": 0,
+        "bottom_milli": 0,
+        "left_milli": 0
+      },
+      "avoidance_target_ids": [],
+      "keyword_emphasis": [],
+      "brand_token_ids": [],
+      "synchronized_event_id": null,
+      "sound_cue_ids": [],
+      "entrance": "none",
+      "exit": "none",
+      "z_index": 100,
+      "caption_binding_id": null,
+      "text_design": {
+        "schema_version": "text-design/1",
+        "intent": "Source-specific cinematic language study C; abstract titles, no new supernatural rule",
+        "hierarchy": "Image and absence first; complete readable title anchors; then a separate temporal exposure",
+        "reference_width_px": 1920,
+        "reference_height_px": 1080,
+        "fonts": [
+          {
+            "family": "Noto Sans CJK SC",
+            "sha256": "dcf6290f6a85031c6891dea398d297c97c83beada3d85ddab021adc6d2b6cbc8",
+            "data_base64": "T1RUTwAPAIAAAwBwQkFTRULjT+4AABCMAAAA3kNGRiDPqlX+AAAG3AAACa1HUE9TRHZMdQAAEWwAAAAgR1NVQrziqrQAABGMAAABMk9TLzK8WuaOAAABYAAAAGBWT1JHA3EAAAAAEsAAAAAIY21hcPrUlgUAAAZwAAAATGhlYWQcX2UKAAAA/AAAADZoaGVhCG8C2wAAATQAAAAkaG10eASbAOEAABLIAAAAFm1heHAAClAAAAABWAAAAAZuYW1lY1qD0wAAAcAAAASwcG9zdP+GADIAAAa8AAAAIHZoZWEF1xISAAAS4AAAACR2bXR4BM4AvQAAEwQAAAAWAAEAAAACAQYHyk0EXw889QADA+gAAAAA3LCQEgAAAADcsJASAA7/pQPXA1sAAQADAAIAAAAAAAAAAQAABIj+4AAAA+gADgARA9cAAQAAAAAAAAAAAAAAAAAAAAEAAFAAAAoAAAADA9MCvAAFAAACigJYAAAASwKKAlgAAAFeADIBRQAAAgsIAAAAAAAAAAAAAAAIAAAAAAAAAAAAAABHT09HACBZHH/MA3D/iAAABIgBIAAAAAEAAAAAAh8C3QAAACAABgAAAAkAcgADAAEECQAAAFQAAAADAAEECQABACAAVAADAAEECQACAAgAdAADAAEECQADAEYAfAADAAEECQAEACoAwgADAAEECQAFAGQA7AADAAEECQAGACQBUAADAAEECQANApYBdAADAAEECQAOADQECgCpACAAMgAwADEANAAtADIAMAAyADEAIABBAGQAbwBiAGUAIAAoAGgAdAB0AHAAOgAvAC8AdwB3AHcALgBhAGQAbwBiAGUALgBjAG8AbQAvACkALgBOAG8AdABvACAAUwBhAG4AcwAgAEMASgBLACAAUwBDAEIAbwBsAGQAMgAuADAAMAA0ADsARwBPAE8ARwA7AE4AbwB0AG8AUwBhAG4AcwBDAEoASwBzAGMALQBCAG8AbABkADsAQQBEAE8AQgBFAE4AbwB0AG8AIABTAGEAbgBzACAAQwBKAEsAIABTAEMAIABCAG8AbABkAFYAZQByAHMAaQBvAG4AIAAyAC4AMAAwADQAOwBoAG8AdABjAG8AbgB2ACAAMQAuADAALgAxADEAOAA7AG0AYQBrAGUAbwB0AGYAZQB4AGUAIAAyAC4ANQAuADYANQA2ADAAMwBOAG8AdABvAFMAYQBuAHMAQwBKAEsAcwBjAC0AQgBvAGwAZABUAGgAaQBzACAARgBvAG4AdAAgAFMAbwBmAHQAdwBhAHIAZQAgAGkAcwAgAGwAaQBjAGUAbgBzAGUAZAAgAHUAbgBkAGUAcgAgAHQAaABlACAAUwBJAEwAIABPAHAAZQBuACAARgBvAG4AdAAgAEwAaQBjAGUAbgBzAGUALAAgAFYAZQByAHMAaQBvAG4AIAAxAC4AMQAuACAAVABoAGkAcwAgAEYAbwBuAHQAIABTAG8AZgB0AHcAYQByAGUAIABpAHMAIABkAGkAcwB0AHIAaQBiAHUAdABlAGQAIABvAG4AIABhAG4AIAAiAEEAUwAgAEkAUwAiACAAQgBBAFMASQBTACwAIABXAEkAVABIAE8AVQBUACAAVwBBAFIAUgBBAE4AVABJAEUAUwAgAE8AUgAgAEMATwBOAEQASQBUAEkATwBOAFMAIABPAEYAIABBAE4AWQAgAEsASQBOAEQALAAgAGUAaQB0AGgAZQByACAAZQB4AHAAcgBlAHMAcwAgAG8AcgAgAGkAbQBwAGwAaQBlAGQALgAgAFMAZQBlACAAdABoAGUAIABTAEkATAAgAE8AcABlAG4AIABGAG8AbgB0ACAATABpAGMAZQBuAHMAZQAgAGYAbwByACAAdABoAGUAIABzAHAAZQBjAGkAZgBpAGMAIABsAGEAbgBnAHUAYQBnAGUALAAgAHAAZQByAG0AaQBzAHMAaQBvAG4AcwAgAGEAbgBkACAAbABpAG0AaQB0AGEAdABpAG8AbgBzACAAZwBvAHYAZQByAG4AaQBuAGcAIAB5AG8AdQByACAAdQBzAGUAIABvAGYAIAB0AGgAaQBzACAARgBvAG4AdAAgAFMAbwBmAHQAdwBhAHIAZQAuAGgAdAB0AHAAOgAvAC8AcwBjAHIAaQBwAHQAcwAuAHMAaQBsAC4AbwByAGcALwBPAEYATAAAAAIAAAADAAAAFAADAAEAAAAUAAQAOAAAAAoACAACAAJZHFkxXid/zP//AABZHFkxXid/zP//puam06HegDwAAQAAAAAAAAAAAAAAAwAAAAAAAP+DADIAAAAAAAAAAAAAAAAAAAAAAAAAAAEABAIAAQEBE05vdG9TYW5zQ0pLanAtQm9sZAABAQE9+Bv4HIsMHvgdAfge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",
+            "license": "Noto CJK SIL OFL1.1 / DejaVu Bitstream Vera and public domain additions; system distribution font, subset only"
+          }
+        ],
+        "nodes": [
+          {
+            "node_id": "city-body",
+            "purpose": "The missing ordinary worker becomes an aperture containing continuing city motion",
+            "x_px": 0,
+            "y_px": 0,
+            "width_px": 1920,
+            "height_px": 1080,
+            "runs": [],
+            "path": "M0 0 H1920 V1080 H0 Z M657.0 28.0C610.0 25.0 574.0 68.0 575.0 118.0C575.0 163.0 591.0 185.0 607.0 198.0L594.0 230.0C533.0 244.0 493.0 279.0 474.0 342.0L453.0 555.0L468.0 637.0L484.0 666.0L479.0 742.0L517.0 759.0L540.0 1030.0L511.0 1066.0H644.0L659.0 1017.0V784.0H678.0L705.0 1026.0V1066.0H841.0L805.0 1021.0L806.0 743.0L841.0 683.0V611.0L861.0 543.0L844.0 351.0C835.0 282.0 789.0 246.0 725.0 228.0L713.0 201.0C743.0 176.0 757.0 149.0 752.0 109.0C746.0 59.0 712.0 27.0 657.0 28.0Z",
+            "fill": "#D6D8D0",
+            "stroke": "none",
+            "stroke_width_px": 0,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": [
+              {
+                "frame": 0,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 56,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 119,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              }
+            ]
+          },
+          {
+            "node_id": "body-border",
+            "purpose": "An ink edge separates memory from the world without an electric outline",
+            "x_px": 0,
+            "y_px": 0,
+            "width_px": 1920,
+            "height_px": 1080,
+            "runs": [],
+            "path": "M657 28 C610 25 574 68 575 118 C575 163 591 185 607 198 L594 230 C533 244 493 279 474 342 L453 555 L468 637 L484 666 L479 742 L517 759 L540 1030 L511 1066 L644 1066 L659 1017 L659 784 L678 784 L705 1026 L705 1066 L841 1066 L805 1021 L806 743 L841 683 L841 611 L861 543 L844 351 C835 282 789 246 725 228 L713 201 C743 176 757 149 752 109 C746 59 712 27 657 28 Z",
+            "fill": "none",
+            "stroke": "#0A1115",
+            "stroke_width_px": 1,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": [
+              {
+                "frame": 0,
+                "opacity_milli": 550,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 119,
+                "opacity_milli": 550,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              }
+            ]
+          },
+          {
+            "node_id": "body-shi",
+            "purpose": "A complete readable anchor within an experimental image",
+            "x_px": 1060,
+            "y_px": 358,
+            "width_px": 360,
+            "height_px": 354,
+            "runs": [
+              {
+                "text": "失",
+                "color": "#0A1115",
+                "font_family": "Noto Sans CJK SC",
+                "font_size_px": 236,
+                "font_weight": 700,
+                "italic": false,
+                "tracking_px": 0,
+                "baseline_shift_px": 0
+              }
+            ],
+            "path": null,
+            "fill": "#FFFFFF",
+            "stroke": "none",
+            "stroke_width_px": 0,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": [
+              {
+                "frame": 0,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 119,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              }
+            ]
+          },
+          {
+            "node_id": "body-zhen",
+            "purpose": "A complete readable anchor within an experimental image",
+            "x_px": 1324,
+            "y_px": 614,
+            "width_px": 300,
+            "height_px": 255,
+            "runs": [
+              {
+                "text": "帧",
+                "color": "#0A1115",
+                "font_family": "Noto Sans CJK SC",
+                "font_size_px": 170,
+                "font_weight": 700,
+                "italic": false,
+                "tracking_px": 0,
+                "baseline_shift_px": 0
+              }
+            ],
+            "path": null,
+            "fill": "#FFFFFF",
+            "stroke": "none",
+            "stroke_width_px": 0,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": [
+              {
+                "frame": 0,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 119,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              }
+            ]
+          },
+          {
+            "node_id": "body-interval",
+            "purpose": "A single broad missing slice refers to absence instead of a digital error effect",
+            "x_px": 0,
+            "y_px": 0,
+            "width_px": 1920,
+            "height_px": 1080,
+            "runs": [],
+            "path": "M445 554 H864 V578 H445 Z",
+            "fill": "#D6D8D0",
+            "stroke": "none",
+            "stroke_width_px": 0,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": [
+              {
+                "frame": 0,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 119,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              }
+            ]
+          },
+          {
+            "node_id": "night-plane",
+            "purpose": "A new exposure crosses the image; a narrow strip keeps the city alive",
+            "x_px": 0,
+            "y_px": 0,
+            "width_px": 1920,
+            "height_px": 1080,
+            "runs": [],
+            "path": "M0 0 H1920 V1080 H0 Z M0 522 V552 H1920 V522 Z",
+            "fill": "#0A1115",
+            "stroke": "none",
+            "stroke_width_px": 0,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": [
+              {
+                "frame": 0,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 1000,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 67,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 1000,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 68,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 1000,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 91,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 119,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              }
+            ]
+          },
+          {
+            "node_id": "next-yi",
+            "purpose": "A complete readable anchor within an experimental image",
+            "x_px": 205,
+            "y_px": 267,
+            "width_px": 340,
+            "height_px": 336,
+            "runs": [
+              {
+                "text": "翌",
+                "color": "#D6D8D0",
+                "font_family": "Noto Sans CJK SC",
+                "font_size_px": 224,
+                "font_weight": 700,
+                "italic": false,
+                "tracking_px": 0,
+                "baseline_shift_px": 0
+              }
+            ],
+            "path": null,
+            "fill": "#FFFFFF",
+            "stroke": "none",
+            "stroke_width_px": 0,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": [
+              {
+                "frame": 0,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 1000,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 85,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 1000,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 98,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 119,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              }
+            ]
+          },
+          {
+            "node_id": "next-ye",
+            "purpose": "A complete readable anchor within an experimental image",
+            "x_px": 1350,
+            "y_px": 634,
+            "width_px": 340,
+            "height_px": 336,
+            "runs": [
+              {
+                "text": "夜",
+                "color": "#D6D8D0",
+                "font_family": "Noto Sans CJK SC",
+                "font_size_px": 224,
+                "font_weight": 700,
+                "italic": false,
+                "tracking_px": 0,
+                "baseline_shift_px": 0
+              }
+            ],
+            "path": null,
+            "fill": "#FFFFFF",
+            "stroke": "none",
+            "stroke_width_px": 0,
+            "align": "left",
+            "line_height_milli": 1200,
+            "writing_mode": "horizontal-tb",
+            "outline_color": "#000000",
+            "outline_milli_px": 0,
+            "motion": [
+              {
+                "frame": 0,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 1000,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 93,
+                "opacity_milli": 0,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 1000,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 106,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              },
+              {
+                "frame": 119,
+                "opacity_milli": 1000,
+                "translate_x_px": 0,
+                "translate_y_px": 0,
+                "scale_milli": 1000,
+                "rotation_millidegrees": 0,
+                "blur_milli_px": 0,
+                "reveal_top_milli": 0,
+                "reveal_right_milli": 0,
+                "reveal_bottom_milli": 0,
+                "reveal_left_milli": 0,
+                "easing": [
+                  333,
+                  333,
+                  667,
+                  667
+                ]
+              }
+            ]
+          }
+        ],
+        "avoidance_regions": []
+      }
+    }
+  ],
+  "advertising_sound_cues": [],
+  "ad_creative_plan_id": null,
+  "ad_creative_plan_hash": null
+}

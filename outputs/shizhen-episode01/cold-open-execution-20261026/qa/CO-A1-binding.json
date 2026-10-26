@@ -1,0 +1,11 @@
+{
+  "unit_dir": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/cold-open-execution-20261026/qa/CO-A1",
+  "intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/cold-open-execution-20261026/qa/CO-A1/intent.json",
+  "intent_sha256": "b656eeeba29615bcade61fb1ebdb708ae2116c6528feec7dfd9e515014b9d6e7",
+  "reservation_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/cold-open-execution-20261026/qa/CO-A1/reservation.json",
+  "reservation_sha256": "07117dda2d867ae8ff9b5cd325860baa140dc31e28a9a845a4ea02f40ca8b1b0",
+  "source_sha256": "b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd",
+  "source_size_bytes": 29400940,
+  "submit_count": 1,
+  "upper_bound_microunits": 50000
+}

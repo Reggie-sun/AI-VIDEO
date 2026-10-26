@@ -1,0 +1,19 @@
+{
+  "failure_classes": [],
+  "failed_requirements": [],
+  "preserved_requirements": [
+    "action",
+    "art",
+    "camera",
+    "identity",
+    "performance",
+    "relationship",
+    "sound",
+    "story-scope"
+  ],
+  "evidence_hashes": [
+    "6e05d150d96b9a7216e841d841c27227a77e0e6e7aa328783f0f95907bffa9da"
+  ],
+  "next_owner": "review_owner",
+  "all_required_observed_pass": true
+}

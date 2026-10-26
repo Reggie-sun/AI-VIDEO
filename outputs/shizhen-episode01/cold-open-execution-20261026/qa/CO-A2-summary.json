@@ -1,0 +1,223 @@
+{
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A2/state/video-generation/fetch/files/0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c.mp4",
+  "probe": {
+    "file": {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A2/state/video-generation/fetch/files/0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c.mp4",
+      "size_bytes": 14559142,
+      "size_mb": 13.88,
+      "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "duration_seconds": 4.065,
+      "duration_hms": "00:00:04.065",
+      "bit_rate_kbps": 28653
+    },
+    "video_stream": {
+      "codec": "h264",
+      "profile": "High",
+      "width": 1920,
+      "height": 1080,
+      "aspect_ratio": "16:9",
+      "fps": 60.0,
+      "pixel_format": "yuv420p",
+      "bit_rate_kbps": 28854,
+      "frame_count": 97
+    },
+    "audio_stream": {
+      "codec": "aac",
+      "sample_rate": 44100,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "bit_rate_kbps": 130,
+      "language": "und"
+    },
+    "metadata": {
+      "major_brand": "isom",
+      "minor_version": "512",
+      "compatible_brands": "isomiso2avc1mp41",
+      "LvMetaInfo": "{\"data\":{\"os\":\"\",\"product\":\"dreamina\",\"exportType\":\"generation\",\"videoId\":\"0\"}}",
+      "UserComment": "{\"aigc_label_type\":0,\"source_info\":\"dreamina\"}",
+      "com.apple.quicktime.artwork": "{\"data\":{\"os\":\"\",\"product\":\"dreamina\",\"exportType\":\"generation\",\"videoId\":\"0\"}}",
+      "comment": "vid:v02870g10004dbf89ki7dlda21b22m9g",
+      "encoder": "Lavf58.76.100"
+    }
+  },
+  "frames": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A2/state/video-generation/fetch/files/0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c.mp4",
+    "total_frames_extracted": 17,
+    "interval_used": 0.25,
+    "frames": [
+      {
+        "timestamp_seconds": 0.0,
+        "timestamp_hms": "00:00:00.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 27374
+      },
+      {
+        "timestamp_seconds": 0.25,
+        "timestamp_hms": "00:00:00.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 23901
+      },
+      {
+        "timestamp_seconds": 0.5,
+        "timestamp_hms": "00:00:00.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 23613
+      },
+      {
+        "timestamp_seconds": 0.75,
+        "timestamp_hms": "00:00:00.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 24047
+      },
+      {
+        "timestamp_seconds": 1.0,
+        "timestamp_hms": "00:00:01.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 23511
+      },
+      {
+        "timestamp_seconds": 1.25,
+        "timestamp_hms": "00:00:01.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 23818
+      },
+      {
+        "timestamp_seconds": 1.5,
+        "timestamp_hms": "00:00:01.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 24645
+      },
+      {
+        "timestamp_seconds": 1.75,
+        "timestamp_hms": "00:00:01.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 31797
+      },
+      {
+        "timestamp_seconds": 2.0,
+        "timestamp_hms": "00:00:02.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 42014
+      },
+      {
+        "timestamp_seconds": 2.25,
+        "timestamp_hms": "00:00:02.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 54079
+      },
+      {
+        "timestamp_seconds": 2.5,
+        "timestamp_hms": "00:00:02.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 61541
+      },
+      {
+        "timestamp_seconds": 2.75,
+        "timestamp_hms": "00:00:02.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 68783
+      },
+      {
+        "timestamp_seconds": 3.0,
+        "timestamp_hms": "00:00:03.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 75660
+      },
+      {
+        "timestamp_seconds": 3.25,
+        "timestamp_hms": "00:00:03.250",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 84047
+      },
+      {
+        "timestamp_seconds": 3.5,
+        "timestamp_hms": "00:00:03.500",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 88696
+      },
+      {
+        "timestamp_seconds": 3.75,
+        "timestamp_hms": "00:00:03.750",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 91886
+      },
+      {
+        "timestamp_seconds": 4.0,
+        "timestamp_hms": "00:00:04.000",
+        "format": "jpeg",
+        "width": 1280,
+        "size_bytes": 92086
+      }
+    ]
+  },
+  "transcription": null,
+  "scenes": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A2/state/video-generation/fetch/files/0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c.mp4",
+    "threshold": 0.4,
+    "total_scenes": 1,
+    "scenes": [
+      {
+        "scene_number": 1,
+        "start_time": 0.0,
+        "start_hms": "00:00:00.000",
+        "end_time": 4.065,
+        "end_hms": "00:00:04.065",
+        "duration_seconds": 4.065,
+        "confidence": null
+      }
+    ]
+  },
+  "analysis_summary": {
+    "duration_hms": "00:00:04.065",
+    "resolution": "1920x1080",
+    "has_audio": true,
+    "estimated_speaking_duration_seconds": 0.0,
+    "scene_count": 1,
+    "frames_extracted": 17
+  },
+  "audio_understanding": {
+    "schema_version": "audio-understanding-evidence/1",
+    "source_sha256": "0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c",
+    "source_size_bytes": 14559142,
+    "audio_sha256": "1b489947f73ced0d454283e5acf04e03457e30336bf7b820daccd3d7667c2549",
+    "audio_size_bytes": 721020,
+    "duration_seconds": 4.08671201814059,
+    "audio_start_seconds": 0.0,
+    "request_fingerprint": "c50b9fdab458ed37f841324be042e820706ead8ea6bc3cc87340a6ea75345a00",
+    "requested_model_id": "gemini-3.8-flash",
+    "response_model_id": "gemini-3.8-flash",
+    "response_sha256": "049612af6a6ab1cc991d8b9d2ff64407c50691c1dd037f3ed7cbe09ac937da76",
+    "observations": {
+      "segments": [],
+      "voice_description": "not discernible",
+      "delivery_description": "not discernible",
+      "background_sounds": [
+        "rhythmic mechanical clicking",
+        "freewheel buzzing or engine idling sound",
+        "low rumbling noise"
+      ],
+      "uncertainties": []
+    },
+    "proof_boundary": "analyzer observations; not QA/human/timing acceptance",
+    "media_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-episode01-jimeng25-20261025-001/cold-open-execution/CO-A2/state/video-generation/fetch/files/0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c.mp4",
+    "analysis_audio_derivation": "full_source_track_pcm_derivative",
+    "human_acceptance": "NOT_EVALUATED"
+  }
+}

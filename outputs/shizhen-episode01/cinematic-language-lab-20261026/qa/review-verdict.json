@@ -1,0 +1,45 @@
+{
+  "status": "DIRECTION_STUDIES_DELIVERED",
+  "recommendation": "C: source-led portrait containing the continuing city",
+  "artistic_basis": {
+    "A": "Strongest departure from conventional layout; image apertures work, but large type risks dominating human drama",
+    "B": "Not recommended: still reads as an overlay; no further effect polishing justified",
+    "C": "Recommended for continued direction: ties the missing ordinary person to an inhabited city; portrait edges and material still need refinement"
+  },
+  "media_scope": {
+    "concepts": "Three distinct 9-second directions; concept C refined after a rejected generic pictogram",
+    "context": "36.167s exact original narrative windows, new pictorial title and time transition, original S01",
+    "live_action": "NOT_EVALUATED: old CG used only for compositing research",
+    "macro_to_micro_new_shots": "NOT_PRODUCED: no new paid generation authorized"
+  },
+  "actual_checks": {
+    "local_P4_lint_and_check": "PASS for delivered media",
+    "concept_MCP_sampling": "0.5s intervals, 18 frames per selected 9s arm",
+    "context_R2_MCP_sampling": "0.25s intervals, 145 frames",
+    "original_sources": "4 MP4s and Suno B SHA verified unchanged",
+    "context_audio": "Full decoded audio bit-identical to old reviewed MP4",
+    "concept_music": "Same decoded music in A/B/C-refined",
+    "S01_captions": "Four actual bilingual frames at23/26/31/33s visually inspected",
+    "browser": "Actual Chrome DevTools switching and 1x playback of9sC and36.167scontext to end"
+  },
+  "artistically_rejected_versions": [
+    {
+      "path": "C/",
+      "reason": "Generic full-body icon, refined to portrait"
+    },
+    {
+      "path": "context/",
+      "sha256": "ad5fd8a6e80097cbd692bcdef5bc9841489d0773020040e49e7b373cd791a2af",
+      "reason": "Wrong still-image crop let original people return in title field; R2 corrects crop"
+    }
+  ],
+  "manual_audio_listening": "NOT_EVALUATED; exact old mix preservation is separately proven",
+  "user_aesthetic_acceptance": "PENDING",
+  "final_film": "NOT_COMPLETE",
+  "new_paid_generation_calls": 0,
+  "production_activation": false,
+  "publication": "NOT_PUBLISHED",
+  "engineering_full_regression": "NOT_RUN: film-first pending review; no shared source changed",
+  "commit_push": "DEFERRED_PENDING_USER_FILM_REVIEW",
+  "learning_evaluation": "no_candidate"
+}

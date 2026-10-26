@@ -1,0 +1,108 @@
+{
+  "src": "context-r2/失帧-肖像与城市-前后语境研究.mp4",
+  "width": 1920,
+  "height": 1080,
+  "duration": 36.166667,
+  "rate": 1,
+  "samples": [
+    {
+      "wallStep": 0,
+      "time": 0.021947,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 3,
+      "time": 3.022112,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 6,
+      "time": 6.022284,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 9,
+      "time": 9.022433,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 12,
+      "time": 12.022598,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 15,
+      "time": 15.022734,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 18,
+      "time": 18.022816,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 21,
+      "time": 21.023013,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 24,
+      "time": 24.023034,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 27,
+      "time": 27.023361,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 30,
+      "time": 30.023567,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 33,
+      "time": 33.023709,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 36,
+      "time": 36.023843,
+      "paused": false,
+      "ended": false,
+      "error": null
+    },
+    {
+      "wallStep": 39,
+      "time": 36.166667,
+      "paused": true,
+      "ended": true,
+      "error": null
+    }
+  ],
+  "scope": "normal-speed full-context playback, no human listening assertion"
+}

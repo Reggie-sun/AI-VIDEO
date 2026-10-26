@@ -1,0 +1,20 @@
+{
+  "scope": "3-second Fusion trial only",
+  "video_sha256": "3628e4b755f48a5025e57cdc02cb37a4a258fa8a4de6e7eb8d89f4ae4659db65",
+  "user_verdict": "REJECTED",
+  "user_feedback": "这个效果太差了",
+  "parent_verdict": "ART_DIRECTION_FAIL",
+  "findings": [
+    "文字仍主要是错落宋体叠字和淡入，未充分参与叙事",
+    "纹理和竖框遮挡的空间融合在实际观看中不明显",
+    "技术成功不代表艺术通过"
+  ],
+  "technical_evidence": [
+    "playback-F2.json",
+    "audio-preservation.json",
+    "video-analysis-F2.json"
+  ],
+  "production_acceptance": "NOT_ACCEPTED",
+  "next_action": "Video paused at user request. Two image directions for visual review.",
+  "paid_video_music_generations": 0
+}

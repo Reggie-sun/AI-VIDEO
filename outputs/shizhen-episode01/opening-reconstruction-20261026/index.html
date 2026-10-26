@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="zh-CN">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>失帧 · 开场重构审看</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,sans-serif;background:#080f16;color:#dce2e5}
+body{max-width:1180px;margin:auto;padding:34px 24px 64px}header{display:flex;align-items:baseline;gap:22px;flex-wrap:wrap}
+h1{font-family:serif;font-weight:400;letter-spacing:.12em;font-size:34px;margin:0}p{line-height:1.8;color:#aebbc5;max-width:980px}
+video{width:100%;background:#000;display:block;aspect-ratio:16/9;border:1px solid #34414c;box-sizing:border-box}
+nav,.markers{display:flex;gap:10px;flex-wrap:wrap;margin:18px 0}button,a.link{font:inherit;color:#dce2e5;background:#14212b;border:1px solid #344651;padding:10px 16px;border-radius:3px;cursor:pointer;text-decoration:none}
+button:hover,a:hover{background:#253744}button.active{border-color:#b5ab90;background:#26343a}button:focus-visible,a:focus-visible{outline:2px solid #ddc79f;outline-offset:3px}
+.meta{font-size:13px;color:#c6b798;letter-spacing:.04em}.note{padding:16px 20px;border-left:2px solid #907d5e;background:#101b23;margin:22px 0;line-height:1.8}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:28px}h2{font-size:17px;font-weight:500;color:#cdd7dd}li{line-height:1.9;color:#adbac4}a{color:#d7c7a8}code{overflow-wrap:anywhere;font-size:12px}details{margin:22px 0}summary{cursor:pointer;color:#b6c3cb}
+@media(max-width:700px){body{padding:24px 12px}.grid{grid-template-columns:1fr}h1{font-size:28px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto}}
+</style>
+<header><h1>失帧</h1><span class="meta">候车开场 · 关键事件重剪预演 · 18.4 秒</span></header>
+<p>保留既有候车人物与原对白，重新组织遮挡、空位、音乐和片名。本版只看开场，不接 S01。</p>
+<nav aria-label="版本选择">
+<button id="focus" class="active" onclick="choose('focus')">当前 · 关键事件重剪</button>
+<button id="new" onclick="choose('new')">R2 视觉预演 · 对照</button>
+<button id="old" onclick="choose('old')">原方向 C · 9 秒</button>
+<a class="link" href="../opening-narrative-integration-20261026/focus-002/失帧-两位-关键事件重剪-002.mp4" download>下载当前 MP4</a>
+</nav>
+<video id="film" controls playsinline preload="metadata" poster="poster-focus.jpg" src="../opening-narrative-integration-20261026/focus-002/失帧-两位-关键事件重剪-002.mp4"></video>
+<div class="markers" aria-label="新版观看位置">
+<button onclick="seekTo(0)">两人关系</button><button onclick="seekTo(6)">车辆经过</button>
+<button onclick="seekTo(7.667)">遮挡与揭示</button><button onclick="seekTo(10.417)">留下的空位</button><button onclick="seekTo(16.25)">片名与玻璃</button>
+</div>
+<div class="note">这是已有素材的关键事件剪辑预演，尚未补齐匹配的宏观城市与微观镜头。候车本来就是另一组人物，人物不同不构成连续性错误。原音乐保留，未新增视频生成费用。</div>
+<div class="grid"><section><h2>这版如何改变观看</h2><ul>
+<li>保留普通关照与电话问答，让声音参与前后关系</li><li>缩短完整遮挡，保留车尾连续揭开空间的过程</li>
+<li>增加后态观察时间，再进入人物近景</li><li>片名在回答后进入玻璃负空间，不再另停一张字卡</li>
+</ul></section><section><h2>制作与审查材料</h2><ul>
+<li><a href="research/reference-study.md">参考研究、结构诊断与方案取舍</a></li>
+<li><a href="production-handoff.md">缺失镜头的导演设计与中文生成输入</a></li>
+<li><a href="qa/standalone-review/002/verdict.json">当前编码片复核与剩余缺口</a> · <a href="../opening-narrative-integration-20261026/focus-002/render-receipt.json">渲染记录</a></li>
+<li><a href="qa/director-review.md">导演判断与反馈纠正</a> · <a href="qa/full-review/report.html">R2 原始目标审查包</a></li>
+</ul></section></div>
+<details><summary>共伞备选 · 两张静帧设计，未生成视频</summary><p>男同事为她撑伞，随后缺席；同一把伞变成她自己握着。这里只检查前后态设计，不能据此判断动作自然或动态异常成立，也不替代当前候车段。</p><div class="grid"><img src="umbrella-study/before-001.png" alt="共伞前态：两名候车者，男子持伞" style="width:100%"><img src="umbrella-study/after-001.png" alt="共伞后态：男子缺席，女人自己持伞" style="width:100%"></div></details>
+<details><summary>来源与版本说明</summary><p>R2 由同一 CompositionSpec → ResolvedTimeline → HyperFrames 输出。原片、原音乐、旧 FAIL/UNKNOWN 与原 Production 状态保留。R1 曾在接点重复车尾，已退役并保留失败诊断。与S01衔接的测试版本只作历史归档，不在本轮展示。</p>
+<p>R2 对照版的临时城市：陈权威 / Pexels 5907129；道路：LayG Traveller / Pexels 36407440，<a href="https://www.pexels.com/license/">Pexels License</a>。R2 雨声：ezwa / PDSounds，<a href="https://commons.wikimedia.org/wiki/File:Rain_(1).ogg">Public domain</a>。当前重剪使用原候车素材与原音乐，参考作品素材未进入影片。未公开发布。</p></details>
+<script>
+const film=document.querySelector('#film');
+const sources={focus:'../opening-narrative-integration-20261026/focus-002/失帧-两位-关键事件重剪-002.mp4',new:'失帧-开场重构-动态预演-002.mp4',old:'../cinematic-language-lab-20261026/C-refined/失帧-视觉方向-C-概念片.mp4'};
+let selected='focus';window.playbackEvidence=[];
+function choose(which){film.pause();selected=which;film.src=sources[which];film.poster=which==='focus'?'poster-focus.jpg':which==='new'?'poster.jpg':'../cinematic-language-lab-20261026/C-refined/poster.png';film.load();document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active',b.id===which))}
+function seekTo(t){if(selected!=='focus'){choose('focus');film.addEventListener('loadedmetadata',()=>{film.currentTime=t},{once:true})}else film.currentTime=t}
+for(const type of ['loadedmetadata','play','pause','ended','error'])film.addEventListener(type,()=>window.playbackEvidence.push({event:type,source:selected,time:film.currentTime,speed:film.playbackRate,error:film.error?.code??null,at:Date.now()}));
+</script>
+</html>

@@ -1,0 +1,28 @@
+[
+  {
+    "id": "e3599d34-c24a-4750-ad48-69825671da9b",
+    "model_name": "chirp-hawk",
+    "status": "complete",
+    "metadata": {
+      "tags": "instrumental score. 克制的当代室内乐与极简电子质感，理性表面下逐渐失去稳定感. 弱音中提琴的薄层泛音缓慢分离，低音单簧管偶尔用相邻两音作不完整回答；轻微暗色电子底层只衔接呼吸，不以低频重击制造恐怖. 没有稳定鼓点，自由呼吸和不等长空隙，音符之间容许环境声独立存在. 近乎空白的起始，先出现孤立而清楚的音；温和的声部逐渐失去同一重心，压力来自缓慢偏离而非越来越响；随后减少声音，让未解决的尾音变薄并自行消失. 干而近的细节，有限室内残响，稀疏中频与动态余量，避免盖住人物呼吸和设备操作. 保留空位与未完成回答的系列写作意图；不声称与未审听的既有A/B拥有同一旋律",
+      "prompt": "",
+      "make_instrumental": true,
+      "duration": 199.2
+    },
+    "tags_match_submitted": true,
+    "exclude_echo": "not exposed by CLI ClipMetadata; not evidence of exclusion failure"
+  },
+  {
+    "id": "1c3f82de-fa9e-43e7-abf0-e366de84caa9",
+    "model_name": "chirp-hawk",
+    "status": "complete",
+    "metadata": {
+      "tags": "instrumental score. 克制的当代室内乐与极简电子质感，理性表面下逐渐失去稳定感. 弱音中提琴的薄层泛音缓慢分离，低音单簧管偶尔用相邻两音作不完整回答；轻微暗色电子底层只衔接呼吸，不以低频重击制造恐怖. 没有稳定鼓点，自由呼吸和不等长空隙，音符之间容许环境声独立存在. 近乎空白的起始，先出现孤立而清楚的音；温和的声部逐渐失去同一重心，压力来自缓慢偏离而非越来越响；随后减少声音，让未解决的尾音变薄并自行消失. 干而近的细节，有限室内残响，稀疏中频与动态余量，避免盖住人物呼吸和设备操作. 保留空位与未完成回答的系列写作意图；不声称与未审听的既有A/B拥有同一旋律",
+      "prompt": "",
+      "make_instrumental": true,
+      "duration": 214.8
+    },
+    "tags_match_submitted": true,
+    "exclude_echo": "not exposed by CLI ClipMetadata; not evidence of exclusion failure"
+  }
+]

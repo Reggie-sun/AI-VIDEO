@@ -1,0 +1,32 @@
+[
+  {
+    "asset_id": "co-before-image",
+    "node_id": "co-before-image-node",
+    "resource_id": "co-before-local-generated",
+    "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/cold-open-execution-20261026/art/master-firstframe-002.png",
+    "usage_license": "Original fictional CG asset for user-authorized film",
+    "generated_source": {
+      "record_path": "art/master-firstframe-002.png.record.json",
+      "record_sha256": "0bf6b38ebc9ef589454e99cbda23ce6ff46a130a38dbbf6db239faf7d59b8554",
+      "tool": {
+        "name": "codex-generated-image",
+        "version": "builtin-current-session"
+      }
+    }
+  },
+  {
+    "asset_id": "co-truck-image",
+    "node_id": "co-truck-image-node",
+    "resource_id": "co-truck-local-generated",
+    "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/cold-open-execution-20261026/art/truck-occlusion-001.png",
+    "usage_license": "Original fictional CG asset for user-authorized film",
+    "generated_source": {
+      "record_path": "art/truck-occlusion-001.png.record.json",
+      "record_sha256": "029a109036692335e53ecace6cabd6330d8d59a9a1fb538eb6636a6f64fb77d1",
+      "tool": {
+        "name": "codex-generated-image",
+        "version": "builtin-current-session"
+      }
+    }
+  }
+]

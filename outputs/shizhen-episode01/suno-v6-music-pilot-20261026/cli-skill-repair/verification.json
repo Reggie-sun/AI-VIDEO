@@ -1,0 +1,40 @@
+{
+  "recorded_at": "2026-10-25T21:27:26.153695+00:00",
+  "upstream_commit": "6d28c67a733b32183a80d81306bf0013f46b00b7",
+  "cli_version": "0.10.1",
+  "dry_run": {
+    "exit_code": 0,
+    "status": "success",
+    "submitted": false,
+    "model_verified_live": false,
+    "model": "chirp-hawk",
+    "native_captcha_preflight_preserved": true,
+    "browser_solver_allowed": false
+  },
+  "live_readonly_preflight": {
+    "ready": true,
+    "reason": "ready",
+    "detail": "认证读取及当前无验证码要求已核实，不代表生成或音乐质量已通过。"
+  },
+  "new_generation_requests": 0,
+  "remaining_pilot_requests": 0,
+  "historical_unknowns_preserved": true,
+  "rea": {
+    "operation": "list_browser_targets",
+    "endpoint": "http://127.0.0.1:34537",
+    "result": "invalid_endpoint_response",
+    "no_cdp_repair_or_configuration_mutation": true,
+    "interpretation": "REA browser evidence unavailable; no captured request or root-cause proof claimed"
+  },
+  "focused_tests": {
+    "passed": 37,
+    "junit": ".agent/harness/runs/suno-cli-skill-repair-focused.xml"
+  },
+  "hashes": {
+    "src/ai_video/production/suno_music.py": "2751fbe373bea3eab125552f30f46d2bec3ba450f2d1e0f93f03db7a834f0a75",
+    "tests/test_suno_music.py": "66ec978871ffd663a6dcea5a71cd1ca62a91bbbbac3001a53b5d02ab060183f5",
+    "/home/reggie/.agents/skills/suno/SKILL.md": "897a171b567fab95f616deeb637fcf959c82fe4402ea245126f795f245ffaa14",
+    "/home/reggie/.codex/skills/suno/SKILL.md": "897a171b567fab95f616deeb637fcf959c82fe4402ea245126f795f245ffaa14"
+  },
+  "native_review": "NOT_REQUIRED: local deny-only preflight and preservation of CLI check; failure paths covered, no credential/store mutation or retry"
+}

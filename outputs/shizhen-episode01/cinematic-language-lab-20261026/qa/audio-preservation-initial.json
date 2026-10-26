@@ -1,0 +1,7 @@
+{
+  "old_encoded_mix_pcm_hash": "SHA256=52e1613d305eff2b96ff5a0b61c118b1b5f3825bfc95181609b3ca7957633255",
+  "first_context_mix_pcm_hash": "SHA256=52e1613d305eff2b96ff5a0b61c118b1b5f3825bfc95181609b3ca7957633255",
+  "old_mp4_sha256": "5ab3a929258db93606196ab537d89c795343899dba8616dbdd8905e55433e48a",
+  "new_mp4_sha256": "ad5fd8a6e80097cbd692bcdef5bc9841489d0773020040e49e7b373cd791a2af",
+  "scope": "audio preservation only; first context visual crop rejected and superseded"
+}

@@ -1,0 +1,19 @@
+{
+  "candidate": "variant-B3/失帧-Fusion片名试片-B3.mp4",
+  "sha256": "c35cc24125963c4a0015d514cb8f66ca4e97c55709290a9bf3add5f15218435e",
+  "scope": "Slower six-second title process candidate; no S01 or core-event modification",
+  "checks": {
+    "144_frames_24fps_six_seconds": "PASS",
+    "normal_speed_player": "PASS: 144 total frames, 0 dropped, ended, no errors",
+    "stage_progression": "Observed in exact frames: original view -> grey/negative density -> latent glyphs -> readable title -> hold; temporal artistic quality still user review",
+    "no_horizontal_wipe": "PASS: stationary spatial region; luminance-driven reveal",
+    "retiming": "Declared 2x visual duration, local motion-compensated interpolation of original A3 288..359; no new paid generation",
+    "audio": "Original music extended from existing source at 1x; original rain 0.2s crossfade repeat at 1x; no B2 PCM identity claim",
+    "audio_levels": "mean -31.9 dBFS; max -16.2 dBFS; no decoded clipping detected; not human listening",
+    "artistic_acceptance": "PENDING_USER; grey density field still visible, do not claim final cinematic match",
+    "full_opening": "NOT_EVALUATED"
+  },
+  "paid_video_music_calls": 0,
+  "publication": "LOCAL_REVIEW_ONLY",
+  "production_activation": false
+}

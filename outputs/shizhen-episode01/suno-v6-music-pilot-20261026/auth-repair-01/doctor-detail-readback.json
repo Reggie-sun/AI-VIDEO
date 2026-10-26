@@ -1,0 +1,25 @@
+{
+  "exit_code": 0,
+  "checks": [
+    {
+      "name": "jwt",
+      "status": "pass",
+      "detail": "present and fresh"
+    },
+    {
+      "name": "studio_api",
+      "status": "pass",
+      "detail": "reachable — plan Pro Plan"
+    },
+    {
+      "name": "credits",
+      "status": "pass",
+      "detail": "2500 left (v5.5 generation ≈ 70 per call; `lyrics` is free)"
+    },
+    {
+      "name": "captcha_preflight",
+      "status": "pass",
+      "detail": "required: true — generation uses the captcha provider selected by Suno"
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+<!doctype html><html lang="zh-CN"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>失帧 · Fusion 片名试片</title>
+<style>body{margin:0;background:#0b1013;color:#dfe2dd;font:17px/1.65 system-ui,sans-serif}main{max-width:1250px;margin:40px auto;padding:0 24px}h1{font-size:28px;font-weight:500;margin:8px 0 20px}small{letter-spacing:2px;color:#9da9aa}video{display:block;width:100%;background:#000;border:1px solid #354246}button,a{color:inherit}button{cursor:pointer;background:transparent;border:1px solid #647275;padding:10px 18px;margin:16px 10px 0 0;font:inherit}p{max-width:970px;color:#aeb9bb}.note{border-left:2px solid #9c9980;padding-left:18px}details{margin-top:30px}a{color:#b5d3d0}</style>
+<main><small>失帧 / FUSION COMPOSITING STUDY</small><h1>F2 · 已否决的技术试片</h1>
+<video id="film" controls playsinline preload="metadata" src="variant-F2/失帧-Fusion片名试片-F2.mp4"></video>
+<button id="replay">重看三秒试片</button><button id="prior">看上一版完整开场</button>
+<p id="status">当前：3 秒 Fusion 片尾试片 F2 · 1080p / 24fps · 带原雨声与原音乐</p>
+<p>保留同一站台、右侧通话人物及流动的雨夜。片名落在左侧空位，字内带有原画面的亮暗变化，原有细立框位于文字前方。时钟继续走，场景中的人没有察觉。</p>
+<p class="note">用户已否决此版艺术效果，保留仅用于失败对照。视频制作暂停，先做静态视觉方向。此片不是新版完整开场。已保留 AI 生成标识；宏观新镜头、真人质感和最终艺术验收仍未完成。上一版完整开场为对照，未被覆盖。此处的字形与构图仍需观看判断，工具渲染成功不代表艺术通过。</p>
+<details><summary>制作文件与验证</summary><p><a href="variant-F2/失帧-Fusion片名试片-F2.mp4">下载带声音试片</a> · <a href="title-trial-F2.comp">Fusion 合成工程</a> · <a href="qa/review.json">审查记录</a></p><p>Fusion 负责镜头合成，HyperFrames 负责本片段的连续时钟、原声与原音乐编排和输出。没有新付费生成。</p></details></main>
+<script>
+const v=document.getElementById('film'),s=document.getElementById('status');
+document.getElementById('replay').onclick=()=>{v.src='variant-F2/失帧-Fusion片名试片-F2.mp4';v.currentTime=0;v.play();s.textContent='当前：3 秒 Fusion 片尾试片 F2 · 带原雨声与原音乐'};
+document.getElementById('prior').onclick=()=>{v.src='../opening-A-revision-20261026/variant-R3/失帧-独立开场-空位片名-R3.mp4';v.currentTime=0;v.play();s.textContent='当前：上一版 R3，20.375 秒 · 旧片名保留用于对照，未替换为本轮试片'};
+</script></html>

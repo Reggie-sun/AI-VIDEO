@@ -1,0 +1,23 @@
+{
+  "authority": "current-task-parent-bounded-operator",
+  "authorization_quote": "开始做吧",
+  "model_id": "seedance_2.5",
+  "provider": "jimeng",
+  "old_video_submit_count": 6,
+  "old_film_video_ceiling": 6,
+  "new_film_video_ceiling": 9,
+  "new_cold_open_submit_ceiling": 3,
+  "per_shot_initial_submit_ceiling": 1,
+  "automatic_retries": 0,
+  "initial_submit_ceiling": 1,
+  "per_call_credit_upper_bound": 1500,
+  "project_credit_upper_bound": 4500,
+  "historical_internal_bound_CRD": 5000,
+  "combined_internal_bound_CRD": 9500,
+  "currency": "CRD",
+  "credit_microunits": 1000000,
+  "issued_at": "2026-10-25T22:08:05.051819+00:00",
+  "expires_at": "2026-10-26T01:08:05.051819+00:00",
+  "settled_cost": "UNKNOWN",
+  "scope": "Three new logical cold-open components, one call each; all six ancestors retained and counted; no Production qualification claim"
+}

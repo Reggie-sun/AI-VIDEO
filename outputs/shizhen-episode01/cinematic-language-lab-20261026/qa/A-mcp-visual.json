@@ -1,0 +1,183 @@
+{
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/cinematic-language-lab-20261026/A/失帧-视觉方向-A-概念片.mp4",
+  "probe": {
+    "file": {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/cinematic-language-lab-20261026/A/失帧-视觉方向-A-概念片.mp4",
+      "size_bytes": 3815848,
+      "size_mb": 3.64,
+      "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "duration_seconds": 9,
+      "duration_hms": "00:00:09.000",
+      "bit_rate_kbps": 3392
+    },
+    "video_stream": {
+      "codec": "h264",
+      "profile": "High",
+      "width": 1920,
+      "height": 1080,
+      "aspect_ratio": "16:9",
+      "fps": 24,
+      "pixel_format": "yuv420p",
+      "bit_rate_kbps": 3194,
+      "frame_count": 216
+    },
+    "audio_stream": {
+      "codec": "aac",
+      "sample_rate": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "bit_rate_kbps": 192,
+      "language": "und"
+    },
+    "metadata": {
+      "major_brand": "isom",
+      "minor_version": "512",
+      "compatible_brands": "isomiso2avc1mp41",
+      "encoder": "Lavf62.12.102"
+    }
+  },
+  "frames": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/cinematic-language-lab-20261026/A/失帧-视觉方向-A-概念片.mp4",
+    "total_frames_extracted": 18,
+    "interval_used": 0.5,
+    "frames": [
+      {
+        "timestamp_seconds": 0,
+        "timestamp_hms": "00:00:00.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 8614
+      },
+      {
+        "timestamp_seconds": 0.5,
+        "timestamp_hms": "00:00:00.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 9090
+      },
+      {
+        "timestamp_seconds": 1,
+        "timestamp_hms": "00:00:01.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 9419
+      },
+      {
+        "timestamp_seconds": 1.5,
+        "timestamp_hms": "00:00:01.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 9527
+      },
+      {
+        "timestamp_seconds": 2,
+        "timestamp_hms": "00:00:02.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 12518
+      },
+      {
+        "timestamp_seconds": 2.5,
+        "timestamp_hms": "00:00:02.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 14041
+      },
+      {
+        "timestamp_seconds": 3,
+        "timestamp_hms": "00:00:03.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 15753
+      },
+      {
+        "timestamp_seconds": 3.5,
+        "timestamp_hms": "00:00:03.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 17370
+      },
+      {
+        "timestamp_seconds": 4,
+        "timestamp_hms": "00:00:04.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 15058
+      },
+      {
+        "timestamp_seconds": 4.5,
+        "timestamp_hms": "00:00:04.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 15153
+      },
+      {
+        "timestamp_seconds": 5,
+        "timestamp_hms": "00:00:05.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 15182
+      },
+      {
+        "timestamp_seconds": 5.5,
+        "timestamp_hms": "00:00:05.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 15158
+      },
+      {
+        "timestamp_seconds": 6,
+        "timestamp_hms": "00:00:06.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 15191
+      },
+      {
+        "timestamp_seconds": 6.5,
+        "timestamp_hms": "00:00:06.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 15205
+      },
+      {
+        "timestamp_seconds": 7,
+        "timestamp_hms": "00:00:07.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 13688
+      },
+      {
+        "timestamp_seconds": 7.5,
+        "timestamp_hms": "00:00:07.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 9420
+      },
+      {
+        "timestamp_seconds": 8,
+        "timestamp_hms": "00:00:08.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 4489
+      },
+      {
+        "timestamp_seconds": 8.5,
+        "timestamp_hms": "00:00:08.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 5818
+      }
+    ]
+  },
+  "transcription": null,
+  "scenes": null,
+  "analysis_summary": {
+    "duration_hms": "00:00:09.000",
+    "resolution": "1920x1080",
+    "has_audio": true,
+    "estimated_speaking_duration_seconds": 0,
+    "scene_count": 0,
+    "frames_extracted": 18
+  }
+}

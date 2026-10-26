@@ -1,0 +1,49 @@
+{
+  "operation": "read_only_cli_doctor",
+  "recorded_at": "2026-10-25T20:43:27.747050+00:00",
+  "exit_code": 0,
+  "report": {
+    "status": "success",
+    "data": {
+      "checks": [
+        {
+          "name": "config_file",
+          "status": "warn"
+        },
+        {
+          "name": "config_parse",
+          "status": "pass"
+        },
+        {
+          "name": "auth_file",
+          "status": "pass"
+        },
+        {
+          "name": "jwt",
+          "status": "pass"
+        },
+        {
+          "name": "chrome",
+          "status": "pass"
+        },
+        {
+          "name": "solver_chrome",
+          "status": "pass"
+        },
+        {
+          "name": "studio_api",
+          "status": "pass"
+        },
+        {
+          "name": "credits",
+          "status": "pass"
+        },
+        {
+          "name": "captcha_preflight",
+          "status": "pass"
+        }
+      ]
+    }
+  },
+  "raw_saved": false
+}

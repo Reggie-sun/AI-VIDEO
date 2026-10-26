@@ -1,0 +1,159 @@
+{
+  "tool": "project-local video-analysis MCP",
+  "evidence": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-world-title-20261026/variant-A/失帧-独立开场-A-结构预演.mp4",
+    "probe": {
+      "file": {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-world-title-20261026/variant-A/失帧-独立开场-A-结构预演.mp4",
+        "size_bytes": 30975126,
+        "size_mb": 29.54,
+        "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+        "format_long_name": "QuickTime / MOV",
+        "duration_seconds": 27.417,
+        "duration_hms": "00:00:27.417",
+        "bit_rate_kbps": 9038
+      },
+      "video_stream": {
+        "codec": "h264",
+        "profile": "High",
+        "width": 1920,
+        "height": 1080,
+        "aspect_ratio": "16:9",
+        "fps": 24,
+        "pixel_format": "yuv420p",
+        "bit_rate_kbps": 8840,
+        "frame_count": 658
+      },
+      "audio_stream": {
+        "codec": "aac",
+        "sample_rate": 48000,
+        "channels": 2,
+        "channel_layout": "stereo",
+        "bit_rate_kbps": 194,
+        "language": "und"
+      },
+      "metadata": {
+        "major_brand": "isom",
+        "minor_version": "512",
+        "compatible_brands": "isomiso2avc1mp41",
+        "encoder": "Lavf62.12.102"
+      }
+    },
+    "frames": {
+      "video_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-world-title-20261026/variant-A/失帧-独立开场-A-结构预演.mp4",
+      "total_frames_extracted": 14,
+      "interval_used": 2,
+      "frames": [
+        {
+          "timestamp_seconds": 0,
+          "timestamp_hms": "00:00:00.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 12976
+        },
+        {
+          "timestamp_seconds": 2,
+          "timestamp_hms": "00:00:02.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 12887
+        },
+        {
+          "timestamp_seconds": 4,
+          "timestamp_hms": "00:00:04.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 31298
+        },
+        {
+          "timestamp_seconds": 6,
+          "timestamp_hms": "00:00:06.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 30993
+        },
+        {
+          "timestamp_seconds": 8,
+          "timestamp_hms": "00:00:08.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 29747
+        },
+        {
+          "timestamp_seconds": 10,
+          "timestamp_hms": "00:00:10.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 8830
+        },
+        {
+          "timestamp_seconds": 12,
+          "timestamp_hms": "00:00:12.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 21835
+        },
+        {
+          "timestamp_seconds": 14,
+          "timestamp_hms": "00:00:14.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 29975
+        },
+        {
+          "timestamp_seconds": 16,
+          "timestamp_hms": "00:00:16.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 24037
+        },
+        {
+          "timestamp_seconds": 18,
+          "timestamp_hms": "00:00:18.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 24177
+        },
+        {
+          "timestamp_seconds": 20,
+          "timestamp_hms": "00:00:20.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 24173
+        },
+        {
+          "timestamp_seconds": 22,
+          "timestamp_hms": "00:00:22.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 13740
+        },
+        {
+          "timestamp_seconds": 24,
+          "timestamp_hms": "00:00:24.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 12079
+        },
+        {
+          "timestamp_seconds": 26,
+          "timestamp_hms": "00:00:26.000",
+          "format": "jpeg",
+          "width": 640,
+          "size_bytes": 13618
+        }
+      ]
+    },
+    "transcription": null,
+    "scenes": null,
+    "analysis_summary": {
+      "duration_hms": "00:00:27.417",
+      "resolution": "1920x1080",
+      "has_audio": true,
+      "estimated_speaking_duration_seconds": 0,
+      "scene_count": 0,
+      "frames_extracted": 14
+    }
+  },
+  "scope": "probe and extracted frames viewed by parent; not human real-time acceptance"
+}

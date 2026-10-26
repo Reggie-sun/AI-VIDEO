@@ -1,0 +1,11 @@
+{
+  "unit_dir": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-narrative-integration-20261026/qa/focus-002-audio",
+  "intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-narrative-integration-20261026/qa/focus-002-audio/intent.json",
+  "intent_sha256": "29ac2a65e6c90c8ad296c9b945a2c8cd1e0f1961253e777cbe895aecf8d2daa6",
+  "reservation_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-narrative-integration-20261026/qa/focus-002-audio/reservation.json",
+  "reservation_sha256": "c0e91197108fcba8dff3791428b66a1d2b40f1bf89971507b6ab453d04c331be",
+  "source_sha256": "f3c03c289bb770b209a355ffad5c59f732168d10d30553f249882c382a19faa9",
+  "source_size_bytes": 19099748,
+  "submit_count": 1,
+  "upper_bound_microunits": 50000
+}

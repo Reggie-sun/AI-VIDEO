@@ -1,0 +1,24 @@
+{
+  "reviewer": "/root/opening_concept_check",
+  "profile": "reviewer_high",
+  "candidate_sha256": "c35cc24125963c4a0015d514cb8f66ca4e97c55709290a9bf3add5f15218435e",
+  "findings": [
+    {
+      "id": "B3-01",
+      "severity": "non_blocking",
+      "finding": "阶段已展开，但2.4秒中间态仍偏均匀灰幕、纵深不足",
+      "parent": "CONFIRMED",
+      "status": "RETAINED_FOR_USER_REVIEW"
+    },
+    {
+      "id": "B3-02",
+      "severity": "non_blocking",
+      "finding": "字标骨架识读改善，失右侧笔画仍与粗立柱竞争",
+      "parent": "CONFIRMED",
+      "status": "RETAINED_FOR_USER_REVIEW"
+    }
+  ],
+  "prior_findings": "B2 hard tonal edges and main glyph skeleton obstruction materially reduced in inspected B3 frames",
+  "boundary": "Exact SHA, actual playback captures and playback metrics reviewed; no human listening or complete motion/art acceptance",
+  "decision": "Eligible for user review as B3 candidate, not final acceptance"
+}

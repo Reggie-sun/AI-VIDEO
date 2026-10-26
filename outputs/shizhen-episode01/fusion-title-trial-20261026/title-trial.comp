@@ -1,0 +1,278 @@
+Composition {
+	CurrentTime = 0,
+	RenderRange = { 0, 71 },
+	GlobalRange = { 0, 71 },
+	CurrentID = 13,
+	HiQ = true,
+	PlaybackUpdateMode = 0,
+	StereoMode = false,
+	Version = "DaVinci Resolve 21.1.1.0010",
+	SavedOutputs = 0,
+	HeldTools = 0,
+	DisabledTools = 0,
+	LockedTools = 0,
+	AudioOffset = 0,
+	Resumable = true,
+	OutputClips = {
+		"/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/fusion-title-trial-20261026/fusion-render/title_0000.png"
+	},
+	CustomData = {
+		TEMPLATE_ID = "Fusion Generator"
+	},
+	Tools = {
+		OriginalRainPlate = Loader {
+			Clips = {
+				Clip {
+					ID = "Clip1",
+					Filename = "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/fusion-title-trial-20261026/source-frames/plate_0000.png",
+					FormatID = "PNGFormat",
+					Length = 72,
+					LengthSetManually = true,
+					TrimIn = 0,
+					TrimOut = 71,
+					ExtendFirst = 0,
+					ExtendLast = 0,
+					Loop = 1,
+					AspectMode = 0,
+					Depth = 0,
+					TimeCode = 0,
+					GlobalStart = 0,
+					GlobalEnd = 71
+				}
+			},
+			Inputs = {
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				["Clip1.PNGFormat.PostMultiply"] = Input { Value = 1, }
+			},
+		},
+		EmptyPlaceExposure = RectangleMask {
+			Inputs = {
+				Filter = Input { Value = FuID { "Fast Gaussian" }, },
+				SoftEdge = Input { Value = 0.2, },
+				MaskWidth = Input { Value = 1920, },
+				MaskHeight = Input { Value = 1080, },
+				PixelAspect = Input { Value = { 1, 1 }, },
+				UseFrameFormatSettings = Input { Value = 1, },
+				ClippingMode = Input { Value = FuID { "None" }, },
+				Center = Input { Value = { 0.365, 0.54 }, },
+				Width = Input { Value = 0.35, },
+				Height = Input { Value = 0.6, }
+			},
+		},
+		RetainTheEmptyPlace = BrightnessContrast {
+			Inputs = {
+				Blend = Input {
+					Value = 0,
+					Expression = "min(1,max(0,(time-2)/22))",
+				},
+				Gain = Input { Value = 0.65, },
+				Input = Input {
+					SourceOp = "OriginalRainPlate",
+					Source = "Output",
+				},
+				EffectMask = Input {
+					SourceOp = "EmptyPlaceExposure",
+					Source = "Mask",
+				}
+			},
+		},
+		Shi = TextPlus {
+			Inputs = {
+				GlobalOut = Input { Value = 71, },
+				Width = Input { Value = 1920, },
+				Height = Input { Value = 1080, },
+				UseFrameFormatSettings = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				Wrap = Input { Value = 1, },
+				Center = Input { Value = { 0.285, 0.65 }, },
+				LayoutRotation = Input { Value = 1, },
+				TransformRotation = Input { Value = 1, },
+				Red1 = Input { Value = 0.78, },
+				Green1 = Input { Value = 0.82, },
+				Blue1 = Input { Value = 0.81, },
+				Alpha1 = Input {
+					Value = 0,
+					Expression = "0.92*min(1,max(0,(time-5)/17))",
+				},
+				Softness1 = Input { Value = 1, },
+				StyledText = Input { Value = "失", },
+				Font = Input { Value = "Noto Serif CJK SC", },
+				Style = Input { Value = "Bold", },
+				Size = Input { Value = 0.175, },
+				VerticalJustificationNew = Input { Value = 3, },
+				HorizontalJustificationNew = Input { Value = 3, }
+			},
+			Version = 1
+		},
+		Zhen = TextPlus {
+			Inputs = {
+				GlobalOut = Input { Value = 71, },
+				Width = Input { Value = 1920, },
+				Height = Input { Value = 1080, },
+				UseFrameFormatSettings = Input { Value = 1, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				Wrap = Input { Value = 1, },
+				Center = Input { Value = { 0.425, 0.405 }, },
+				LayoutRotation = Input { Value = 1, },
+				TransformRotation = Input { Value = 1, },
+				Red1 = Input { Value = 0.78, },
+				Green1 = Input { Value = 0.82, },
+				Blue1 = Input { Value = 0.81, },
+				Alpha1 = Input {
+					Value = 0,
+					Expression = "0.92*min(1,max(0,(time-12)/18))",
+				},
+				Softness1 = Input { Value = 1, },
+				StyledText = Input { Value = "帧", },
+				Font = Input { Value = "Noto Serif CJK SC", },
+				Style = Input { Value = "Bold", },
+				Size = Input { Value = 0.145, },
+				VerticalJustificationNew = Input { Value = 3, },
+				HorizontalJustificationNew = Input { Value = 3, }
+			},
+			Version = 1
+		},
+		StaggeredTitle = Merge {
+			Inputs = {
+				Background = Input {
+					SourceOp = "Shi",
+					Source = "Output",
+				},
+				Foreground = Input {
+					SourceOp = "Zhen",
+					Source = "Output",
+				},
+				PerformDepthMerge = Input { Value = 0, }
+			},
+		},
+		RainInsideLetters = Merge {
+			Inputs = {
+				Blend = Input { Value = 0.28, },
+				Background = Input {
+					SourceOp = "StaggeredTitle",
+					Source = "Output",
+				},
+				Foreground = Input {
+					SourceOp = "OriginalRainPlate",
+					Source = "Output",
+				},
+				PerformDepthMerge = Input { Value = 0, },
+				EffectMask = Input {
+					SourceOp = "StaggeredTitle",
+					Source = "Output",
+				}
+			},
+		},
+		TitleInEmptySpace = Merge {
+			Inputs = {
+				Background = Input {
+					SourceOp = "RetainTheEmptyPlace",
+					Source = "Output",
+				},
+				Foreground = Input {
+					SourceOp = "RainInsideLetters",
+					Source = "Output",
+				},
+				PerformDepthMerge = Input { Value = 0, }
+			},
+		},
+		ActualVerticalMullion = RectangleMask {
+			Inputs = {
+				Filter = Input { Value = FuID { "Fast Gaussian" }, },
+				SoftEdge = Input { Value = 0.0005, },
+				MaskWidth = Input { Value = 1920, },
+				MaskHeight = Input { Value = 1080, },
+				PixelAspect = Input { Value = { 1, 1 }, },
+				UseFrameFormatSettings = Input { Value = 1, },
+				ClippingMode = Input { Value = FuID { "None" }, },
+				Center = Input { Value = { 0.3905, 0.52 }, },
+				Width = Input { Value = 0.007, },
+				Height = Input { Value = 0.88, }
+			},
+		},
+		KeepExistingMullionInFront = Merge {
+			Inputs = {
+				Background = Input {
+					SourceOp = "TitleInEmptySpace",
+					Source = "Output",
+				},
+				Foreground = Input {
+					SourceOp = "OriginalRainPlate",
+					Source = "Output",
+				},
+				PerformDepthMerge = Input { Value = 0, },
+				EffectMask = Input {
+					SourceOp = "ActualVerticalMullion",
+					Source = "Mask",
+				}
+			},
+		},
+		FusionRenderedFrames = Saver {
+			Inputs = {
+				ProcessWhenBlendIs00 = Input { Value = 0, },
+				Clip = Input {
+					Value = Clip {
+						Filename = "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/fusion-title-trial-20261026/fusion-render/title_0000.png",
+						FormatID = "PNGFormat",
+						Length = 0,
+						Saving = true,
+						LengthSetManually = true,
+						AspectMode = 0,
+						Depth = 0,
+						GlobalStart = -2000000000,
+						GlobalEnd = -2000000000
+					},
+				},
+				OutputFormat = Input { Value = FuID { "PNGFormat" }, },
+				["Gamut.SLogVersion"] = Input { Value = FuID { "SLog2" }, },
+				Input = Input {
+					SourceOp = "KeepExistingMullionInFront",
+					Source = "Output",
+				},
+				["OpenEXRFormat.ZipCompressionLevel"] = Input { Value = 4, },
+				["PNGFormat.PreDivide"] = Input { Value = 1, }
+			},
+		},
+		MediaOut1 = Saver {
+			Inputs = {
+				Index = Input { Value = "0", },
+				Input = Input {
+					SourceOp = "KeepExistingMullionInFront",
+					Source = "Output",
+				}
+			},
+			ViewInfo = OperatorInfo { Pos = { 440, 49.5 } },
+		}
+	},
+	Frames = {
+	},
+	Prefs = {
+		Comp = {
+			Interactive = {
+				Proxy = {
+					Scale = 1,
+				},
+			},
+			Views = {
+				View1 = {
+				},
+			},
+			Paths = {
+				Map = {
+					["ResolveCaches:"] = "/home/reggie/Videos/CacheClip/07656015-5296-4942-b18a-0d672732969b/5b76b01c-8e1a-4b91-b283-0e0f860fee7b/50ed16f0-c708-401c-9c83-2801c89b42a3/Fusion",
+				},
+			},
+			FrameFormat = {
+				Rate = 24,
+				DepthFull = 3,
+				DepthPreview = 3,
+				DepthInteractive = 3,
+			},
+			Unsorted = {
+				GlobalEnd = 71
+			},
+			SpellCheck = {
+			},
+		}
+	},
+}

@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"schema_version\": \"audio-understanding-evidence/1\",\n  \"source_sha256\": \"f3c03c289bb770b209a355ffad5c59f732168d10d30553f249882c382a19faa9\",\n  \"source_size_bytes\": 19099748,\n  \"audio_sha256\": \"9164e0a26fbb629b6dba414070fe344759db8dc7e91a32164ae887499aead94d\",\n  \"audio_size_bytes\": 3539022,\n  \"duration_seconds\": 18.432,\n  \"audio_start_seconds\": 0.0,\n  \"request_fingerprint\": \"54fbf92dddfa40c9b71c2fb0d1b20c5564df37239aad3b84a5f9e93803233d92\",\n  \"requested_model_id\": \"gemini-3.8-flash\",\n  \"response_model_id\": \"gemini-3.8-flash\",\n  \"response_sha256\": \"b08a2e2a11e41576b6663f78c790a0beb5282a6e6ae34cf49278e89354ce4279\",\n  \"observations\": {\n    \"segments\": [\n      {\n        \"start_seconds\": 0.0,\n        \"end_seconds\": 2.2,\n        \"text\": \"师傅，我们在站里，两位。\",\n        \"speaker\": \"Speaker 1\"\n      },\n      {\n        \"start_seconds\": 2.7,\n        \"end_seconds\": 4.8,\n        \"text\": \"让他别急，路滑。\",\n        \"speaker\": \"Speaker 2\"\n      },\n      {\n        \"start_seconds\": 11.8,\n        \"end_seconds\": 13.0,\n        \"text\": \"就你一位？\",\n        \"speaker\": \"Speaker 3\"\n      },\n      {\n        \"start_seconds\": 13.8,\n        \"end_seconds\": 15.6,\n        \"text\": \"嗯，就我一个。\",\n        \"speaker\": \"Speaker 1\"\n      }\n    ],\n    \"voice_description\": \"Speaker 1 is female with a clear, calm, and mid-range tone. Speaker 2 is male speaking in a quiet, low-pitched, subdued voice. Speaker 3 is male with a slightly deeper, conversational tone.\",\n    \"delivery_description\": \"The dialogue is delivered casually and naturally with a relaxed pace, with pauses between exchanges.\",\n    \"background_sounds\": [\n      \"rain pattering\",\n      \"soft ambient water dripping\"\n    ],\n    \"uncertainties\": []\n  },\n  \"proof_boundary\": \"analyzer observations; not QA/human/timing acceptance\",\n  \"media_path\": \"/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-narrative-integration-20261026/focus-002/失帧-两位-关键事件重剪-002.mp4\",\n  \"analysis_audio_derivation\": \"full_source_track_pcm_derivative\",\n  \"human_acceptance\": \"NOT_EVALUATED\"\n}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

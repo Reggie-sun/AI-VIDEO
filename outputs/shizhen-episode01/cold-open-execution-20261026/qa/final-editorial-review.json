@@ -1,0 +1,80 @@
+{
+  "schema_version": "cold-open-editorial-review/1",
+  "artifact_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/cold-open-execution-20261026/失帧-两位冷开场加S01-1080p审看版.mp4",
+  "artifact_sha256": "5ab3a929258db93606196ab537d89c795343899dba8616dbdd8905e55433e48a",
+  "verdict": "REVIEW_READY",
+  "scope": "Cold-open including title20.1667s plus approved nominal16sS01; not complete episode or Production acceptance",
+  "findings": [
+    {
+      "id": "narrative",
+      "verdict": "PASS",
+      "proof": "analyzer_and_technical",
+      "observation": "开画就是两位普通同事通话候车，遮挡后原位只剩罗敏；最后日常确认一位，未变成无叙事片头。"
+    },
+    {
+      "id": "disappearance",
+      "verdict": "PASS",
+      "proof": "analyzer_and_technical",
+      "observation": "两人、随身包和完整站棚空间在遮挡前可见；修复后采用A1有包原片、A2无人后态，高峥不走开或上车，无烟化透明和遗留衣包。"
+    },
+    {
+      "id": "time",
+      "verdict": "PASS",
+      "proof": "analyzer_and_technical",
+      "observation": "后期站棚板读数03:16:53自然推进到03:16:59；遮挡后03:17:11。前一夜到翌夜S01口径保持；非同夜第二事件，不预泄最终反转。"
+    },
+    {
+      "id": "cut_and_title",
+      "verdict": "PASS",
+      "proof": "analyzer_and_technical",
+      "observation": "满幅金属处切接A1/A2，A2空位读清后切A3实际近景；失帧及翌夜为后期准确文字，接已认可S01。"
+    },
+    {
+      "id": "sound",
+      "verdict": "PASS",
+      "proof": "analyzer_and_technical",
+      "observation": "最终exact MP4的Gemini观察四轮开场对白齐全，男女及电话滤波声音可辨，叙事顺序正确；声音平常自然，有湿街环境，无额外恐怖对白。"
+    },
+    {
+      "id": "original_audio",
+      "verdict": "PASS",
+      "proof": "analyzer_and_technical",
+      "observation": "四段被选原声PCM与实际P4 canonical WAV相应窗口逐样本一致，0增益/无fade/无duck/无句子挪移；S01无BGM覆盖。最终AAC有正常编码损耗，不宣称字节无损。"
+    },
+    {
+      "id": "music",
+      "verdict": "TECHNICAL_PASS_HUMAN_PENDING",
+      "proof": "analyzer_and_technical",
+      "observation": "真实Suno v6 cue B，只在片名3.5秒使用，片名前人间对话无铺乐，S01前完全退出。工具描述为器乐钢琴配乐；高级冷峻气质及主题审美仍待用户听审，不虚称低音单簧管已实现。"
+    },
+    {
+      "id": "S01_preservation",
+      "verdict": "PASS",
+      "proof": "analyzer_and_technical",
+      "observation": "保护源MP4 SHA不变，使用先前认可的0..16秒名义完整区间及同一双语字幕/原声，实际抽看四组字幕、人物及动作正常；原文件含16秒后的endpoint/AAC空尾保留在源文件，不说编码padding全部进入交片。"
+    },
+    {
+      "id": "visual",
+      "verdict": "PASS",
+      "proof": "analyzer_and_technical",
+      "observation": "新站棚人物与原S01同为原创3D国漫写实，雨夜冷暖光和湿材质保持；画面1920x1080/24fps/868帧。"
+    }
+  ],
+  "evidence": [
+    "final-v1-mcp.json",
+    "final-v1-summary.json",
+    "final-v1-original-audio-preservation.json",
+    "final-v1-boundaries/",
+    "../composition/render-receipt.json",
+    "p4-verification-receipt.json"
+  ],
+  "raw_source_truth": "CO-A3 full22s raw identityFAIL/soundNE history retained; editorial repair uses only its actual closeup response. No new generation after third unit, no retroactive raw PASS.",
+  "human_acceptance": "NOT_EVALUATED",
+  "publication_state": "NOT_PUBLISHED",
+  "production_activation": false,
+  "new_video_submits": 3,
+  "new_suno_credits": 10,
+  "imagegen_calls": 5,
+  "other_actual_cost": "UNSETTLED",
+  "commit_push": "WAIT_USER_FILM_APPROVAL_PER_FILM_FIRST"
+}

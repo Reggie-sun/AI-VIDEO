@@ -8,6 +8,10 @@ evidence_index_version: "1"
 
 Date: 2026-10-25
 
+## Supersession Notice — 2026-10-26 Live-Action Direction
+
+用户后来明确要求全剧改真人实拍感，并重做S01/S02/S03；下文CG造型与视觉认可均保留为历史。新S03 CG原片已因悬枪等问题判FAIL，CG试剪未接受且不再是当前视觉目标；当前原始调用、真实验收边界及真人重做进度见[后续记录](2026-10-26-shizhen-s03-witness-and-live-action-override.md)。不要把旧CG认可或旧连续版接受倒填为真人版本已通过。
+
 ## Current Checkpoint — Continuity Repair And Skill Discovery
 
 2026-10-26，用户拒绝先前连续版的接点，并要求“那就加入规则避免这种情况,然后拼接好了给我”，随后指定“或者改这两个skill的description”。本轮采用后者：只扩展open-video与hell-grind-aigc-skill的frontmatter description，保留原description全部既有触发语义与Skill正文，不再增加AGENTS规则。open-video明确已认可Shots的拼接、剪辑、连续审看也要判断叙事/表演/节奏/声画接点；hell-grind明确比较actual predecessor close state与successor open state的人物、道具、位置/轴线、动作与声音。两个Skill的原正文其实已经要求相邻镜头及成片审查；此次是纠正discovery漏触发，不能声称description自动拦截一切旁路。全局hell-grind路径不在Git仓库内，仅已更新本机；旧/新描述及SHA保存在 `continuity-repair-002/skill-description-changes*.json` 与 `final-skill-identities.json`，不虚称该全局文件已被Git提交。

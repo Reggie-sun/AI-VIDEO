@@ -1,0 +1,9 @@
+{
+  "request_id": "68ae0257-5b71-5871-8c49-10d03fc658f7",
+  "project_generation_identity": "b386f921219eda58c767caa5c24cce938e5ede507db9c0749de0f5f31bfe00ca",
+  "CLI_request_sha256": "26531b630e768537e33f72ef8e32f48104d2179de52087f6b2506a110eb9de6f",
+  "matches_rejected_job": true,
+  "job_state": "rejected",
+  "job_ids": [],
+  "offline_preview_only": true
+}

@@ -1,0 +1,575 @@
+{
+  "authority": "development_only",
+  "verdict": "not_evaluated",
+  "review_scope": "full_contract",
+  "goal_chain": "verified",
+  "production_acceptance": "not_evaluated",
+  "subject_hash": "ea8cc51a1ced1ee7558d82bcbb2aeef82230b4df9980181376f4207fc3811700",
+  "video_sha256": "ee6eab33fe6790757e326e0c49f998ef707de733a13ba173305eb3adb0fb6002",
+  "answers_sha256": "098d2531b465aca84d68c9b460182d5643c60c0c19462f65c6f9f4eefa91f9c2",
+  "evaluator_name": "pending",
+  "strength": "explicit_evaluator",
+  "findings": [
+    {
+      "requirement_id": "intent-01",
+      "verdict": "not_evaluated",
+      "observation": "尚未评审；不得从抽帧成功推断通过。",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "intent-02",
+      "verdict": "not_evaluated",
+      "observation": "尚未评审；不得从抽帧成功推断通过。",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "intent-03",
+      "verdict": "not_evaluated",
+      "observation": "尚未评审；不得从抽帧成功推断通过。",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "intent-04",
+      "verdict": "not_evaluated",
+      "observation": "尚未评审；不得从抽帧成功推断通过。",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "intent-05",
+      "verdict": "not_evaluated",
+      "observation": "尚未评审；不得从抽帧成功推断通过。",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "intent-06",
+      "verdict": "not_evaluated",
+      "observation": "尚未评审；不得从抽帧成功推断通过。",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "intent-07",
+      "verdict": "not_evaluated",
+      "observation": "尚未评审；不得从抽帧成功推断通过。",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "intent-08",
+      "verdict": "not_evaluated",
+      "observation": "尚未评审；不得从抽帧成功推断通过。",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "intent-09",
+      "verdict": "not_evaluated",
+      "observation": "尚未评审；不得从抽帧成功推断通过。",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "intent-10",
+      "verdict": "not_evaluated",
+      "observation": "尚未评审；不得从抽帧成功推断通过。",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "intent-11",
+      "verdict": "not_evaluated",
+      "observation": "尚未评审；不得从抽帧成功推断通过。",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "intent-12",
+      "verdict": "not_evaluated",
+      "observation": "尚未评审；不得从抽帧成功推断通过。",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "visual.drama.typography",
+      "verdict": "not_evaluated",
+      "observation": "尚未评审；不得从抽帧成功推断通过。",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "visual.drama.palette",
+      "verdict": "not_evaluated",
+      "observation": "尚未评审；不得从抽帧成功推断通过。",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "visual.drama.layout",
+      "verdict": "not_evaluated",
+      "observation": "尚未评审；不得从抽帧成功推断通过。",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "visual.drama.style",
+      "verdict": "not_evaluated",
+      "observation": "尚未评审；不得从抽帧成功推断通过。",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "visual.drama.holistic",
+      "verdict": "not_evaluated",
+      "observation": "尚未评审；不得从抽帧成功推断通过。",
+      "visual_frames": []
+    }
+  ],
+  "effective_requirements": [
+    {
+      "requirement_id": "intent-01",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "not_evaluated_observation"
+      ]
+    },
+    {
+      "requirement_id": "intent-02",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "not_evaluated_observation"
+      ]
+    },
+    {
+      "requirement_id": "intent-03",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "not_evaluated_observation"
+      ]
+    },
+    {
+      "requirement_id": "intent-04",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "not_evaluated_observation"
+      ]
+    },
+    {
+      "requirement_id": "intent-05",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "not_evaluated_observation"
+      ]
+    },
+    {
+      "requirement_id": "intent-06",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "not_evaluated_observation"
+      ]
+    },
+    {
+      "requirement_id": "intent-07",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "not_evaluated_observation"
+      ]
+    },
+    {
+      "requirement_id": "intent-08",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "not_evaluated_observation"
+      ]
+    },
+    {
+      "requirement_id": "intent-09",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "not_evaluated_observation"
+      ]
+    },
+    {
+      "requirement_id": "intent-10",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "not_evaluated_observation"
+      ]
+    },
+    {
+      "requirement_id": "intent-11",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "not_evaluated_observation"
+      ]
+    },
+    {
+      "requirement_id": "intent-12",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "invalid_human_proof",
+        "missing_observation"
+      ]
+    },
+    {
+      "requirement_id": "visual.drama.typography",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "invalid_visual_proof",
+        "missing_observation"
+      ]
+    },
+    {
+      "requirement_id": "visual.drama.palette",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "invalid_visual_proof",
+        "missing_observation"
+      ]
+    },
+    {
+      "requirement_id": "visual.drama.layout",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "invalid_visual_proof",
+        "missing_observation"
+      ]
+    },
+    {
+      "requirement_id": "visual.drama.style",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "invalid_visual_proof",
+        "missing_observation"
+      ]
+    },
+    {
+      "requirement_id": "visual.drama.holistic",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "invalid_visual_proof",
+        "missing_observation"
+      ]
+    }
+  ],
+  "evidence_gaps": [
+    "normal_speed_human_playback_unverified",
+    "missing_edit_decision",
+    "visual_not_evaluated",
+    "audio_not_listened",
+    "audio_not_evaluated"
+  ],
+  "junction_review": {
+    "verdict": "not_evaluated",
+    "evidence_gaps": [
+      "normal_speed_human_playback_unverified",
+      "missing_edit_decision",
+      "visual_not_evaluated",
+      "audio_not_listened",
+      "audio_not_evaluated"
+    ],
+    "cuts": [
+      {
+        "junction_id": "6ae074009588d48b28a47d844b962edb27d9dd7472c1557617346c14650b3a25",
+        "from_shot_id": "CO-A1",
+        "to_shot_id": "CO-A2",
+        "frame": 184,
+        "verdict": "not_evaluated",
+        "edit_decision": null,
+        "edit_reason": "尚未评审；需记录剪辑决定和依据。",
+        "visual_verdict": "not_evaluated",
+        "visual_observation": "未评审；1x完整播放该接点，记录动作/画面有无重复、停顿或跳变。",
+        "audio_verdict": "not_evaluated",
+        "audio_observation": "未聆听；实际监听接点前后音频，记录有无叠音、截断或异常空隙。",
+        "audio_basis": "not_listened",
+        "audio_reason": null,
+        "viewing_mode": null,
+        "viewing_speed_milli": null,
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "missing_edit_decision",
+          "visual_not_evaluated",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ]
+      },
+      {
+        "junction_id": "288a599cf9d61039d5a0e023f77aa5e9465d70b8736c70b7cf59c6f94ddb0289",
+        "from_shot_id": "CO-A2",
+        "to_shot_id": "CO-A3",
+        "frame": 250,
+        "verdict": "not_evaluated",
+        "edit_decision": null,
+        "edit_reason": "尚未评审；需记录剪辑决定和依据。",
+        "visual_verdict": "not_evaluated",
+        "visual_observation": "未评审；1x完整播放该接点，记录动作/画面有无重复、停顿或跳变。",
+        "audio_verdict": "not_evaluated",
+        "audio_observation": "未聆听；实际监听接点前后音频，记录有无叠音、截断或异常空隙。",
+        "audio_basis": "not_listened",
+        "audio_reason": null,
+        "viewing_mode": null,
+        "viewing_speed_milli": null,
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "missing_edit_decision",
+          "visual_not_evaluated",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ]
+      },
+      {
+        "junction_id": "1606d2fd014576199926476780b0fde647e3bf1adae33778c6d521c1626e23fc",
+        "from_shot_id": "CO-A3",
+        "to_shot_id": "WORLD-OUT",
+        "frame": 442,
+        "verdict": "not_evaluated",
+        "edit_decision": null,
+        "edit_reason": "尚未评审；需记录剪辑决定和依据。",
+        "visual_verdict": "not_evaluated",
+        "visual_observation": "未评审；1x完整播放该接点，记录动作/画面有无重复、停顿或跳变。",
+        "audio_verdict": "not_evaluated",
+        "audio_observation": "未聆听；实际监听接点前后音频，记录有无叠音、截断或异常空隙。",
+        "audio_basis": "not_listened",
+        "audio_reason": null,
+        "viewing_mode": null,
+        "viewing_speed_milli": null,
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "missing_edit_decision",
+          "visual_not_evaluated",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ]
+      }
+    ]
+  },
+  "completion_summary": {
+    "video_sha256": "ee6eab33fe6790757e326e0c49f998ef707de733a13ba173305eb3adb0fb6002",
+    "review_scope": "full_contract",
+    "goal_chain": "verified",
+    "viewing_mode": "sampled_frames",
+    "viewing_speed_milli": null,
+    "requirements_to_address": [
+      {
+        "requirement_id": "intent-01",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "not_evaluated_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "intent-02",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "not_evaluated_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "intent-03",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "not_evaluated_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "intent-04",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "not_evaluated_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "intent-05",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "not_evaluated_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "intent-06",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "not_evaluated_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "intent-07",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "not_evaluated_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "intent-08",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "not_evaluated_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "intent-09",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "not_evaluated_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "intent-10",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "not_evaluated_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "intent-11",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "not_evaluated_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "intent-12",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "invalid_human_proof",
+          "missing_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "visual.drama.typography",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "invalid_visual_proof",
+          "missing_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "visual.drama.palette",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "invalid_visual_proof",
+          "missing_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "visual.drama.layout",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "invalid_visual_proof",
+          "missing_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "visual.drama.style",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "invalid_visual_proof",
+          "missing_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "visual.drama.holistic",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "invalid_visual_proof",
+          "missing_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "junction.6ae074009588d48b28a47d844b962edb27d9dd7472c1557617346c14650b3a25",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "missing_edit_decision",
+          "visual_not_evaluated",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "junction.288a599cf9d61039d5a0e023f77aa5e9465d70b8736c70b7cf59c6f94ddb0289",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "missing_edit_decision",
+          "visual_not_evaluated",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "junction.1606d2fd014576199926476780b0fde647e3bf1adae33778c6d521c1626e23fc",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "missing_edit_decision",
+          "visual_not_evaluated",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ],
+        "next_action": "evidence_repair"
+      }
+    ],
+    "evidence_gaps": [
+      "normal_speed_human_playback_unverified",
+      "missing_edit_decision",
+      "visual_not_evaluated",
+      "audio_not_listened",
+      "audio_not_evaluated"
+    ],
+    "user_feedback": {
+      "assessment": "parent_review_required",
+      "source": {
+        "path": "creative/creative-input.txt",
+        "sha256": "f840d5d0ff660dfcfc3039828b338a47956ed4c9586cd2176473fd206e6185a3"
+      },
+      "note": "Parent 须核对有效用户反馈并披露未解决的拒绝；工具不判断用户是否撤回意见。"
+    },
+    "junctions_to_address": [
+      {
+        "requirement_id": "junction.6ae074009588d48b28a47d844b962edb27d9dd7472c1557617346c14650b3a25",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "missing_edit_decision",
+          "visual_not_evaluated",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "junction.288a599cf9d61039d5a0e023f77aa5e9465d70b8736c70b7cf59c6f94ddb0289",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "missing_edit_decision",
+          "visual_not_evaluated",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "junction.1606d2fd014576199926476780b0fde647e3bf1adae33778c6d521c1626e23fc",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "missing_edit_decision",
+          "visual_not_evaluated",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ],
+        "next_action": "evidence_repair"
+      }
+    ]
+  },
+  "content_kind": "drama"
+}

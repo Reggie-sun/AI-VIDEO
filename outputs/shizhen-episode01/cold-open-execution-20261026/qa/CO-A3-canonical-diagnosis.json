@@ -1,0 +1,22 @@
+{
+  "failure_classes": [
+    "EVIDENCE_GAP",
+    "QUALITY_FAILURE"
+  ],
+  "failed_requirements": [
+    "identity"
+  ],
+  "preserved_requirements": [
+    "action",
+    "art",
+    "camera",
+    "performance",
+    "relationship",
+    "story-scope"
+  ],
+  "evidence_hashes": [
+    "53edcc369834df821d7ca79647638c27f5f52b7ca1e885821b2aa024584201e7"
+  ],
+  "next_owner": "evidence_owner",
+  "all_required_observed_pass": false
+}

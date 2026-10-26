@@ -1,0 +1,55 @@
+{
+  "output": "outputs/shizhen-episode01/opening-world-title-20261026/variant-A/失帧-独立开场-A-结构预演.mp4",
+  "sha256": "1a2efa795beba621d962ac9c2cf817a2f697c95489bcac756d39f204f0d7ecd6",
+  "bytes": 30975126,
+  "size_bytes": 30975126,
+  "timeline_frames": 658,
+  "timeline_fingerprint": "4e176464ce79a90aa05f43e59bb4d86c47e3b23521284e488313b944399f27b5",
+  "measured": {
+    "width": 1920,
+    "height": 1080,
+    "fps_num": 24,
+    "fps_den": 1,
+    "duration_frames": 658,
+    "codec_name": "h264",
+    "audio": {
+      "stream_count": 1,
+      "codec_name": "aac",
+      "sample_rate_hz": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "decoded_samples": 1316864,
+      "encoder_priming_samples": 1024,
+      "encoder_padding_samples": 864,
+      "measurement_method": "held-fd ffprobe packets plus pcm_s16le decode"
+    }
+  },
+  "checks": [
+    {
+      "command": "lint",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "f91a7f9e08658cf8daf815895c72ad59093b2920a6f4b6f0aecc6a36b1ee1e2d",
+      "stderr_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "error_count": 0,
+      "warning_count": 0
+    },
+    {
+      "command": "check",
+      "tool_version": "0.7.103",
+      "exit_code": 0,
+      "stdout_sha256": "03186ccbabbab57e0b46ddd0f6933f13d04244090b37de4fcfdcec2343de8e97",
+      "stderr_sha256": "d307dee2a0b012cf36e66f31da96f0a4304ef70065eeb0ad3e63c1ee997e8a7a",
+      "error_count": 0,
+      "warning_count": 0
+    }
+  ],
+  "source_audio_matches_new_visual_windows": true,
+  "usage_scope": "development_audio_preview",
+  "native_dialogue": "KEEP exact native source sound for each revised window; no speech removed, no gain/fade changes",
+  "title_plate": "Title exits survivor closeup; city motion continues over one withdrawn lower picture field",
+  "s01": "OUT_OF_SCOPE_NOT_INCLUDED",
+  "paid_generation_calls": 0,
+  "human_review": "PENDING",
+  "publication": "NOT_PUBLISHED"
+}

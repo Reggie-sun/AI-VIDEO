@@ -1,0 +1,11 @@
+{
+  "unit_dir": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-A-revision-20261026/qa/final-R3-audio",
+  "intent_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-A-revision-20261026/qa/final-R3-audio/intent.json",
+  "intent_sha256": "3888b4fc4d6c0e8910ce71e803d75779d8632768edcd8c3c1942ade51b4f9791",
+  "reservation_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-A-revision-20261026/qa/final-R3-audio/reservation.json",
+  "reservation_sha256": "0b1cd9d7249e8ac91c0687ba4f300a42752888e3b0aeff8463f16ccf97626b6e",
+  "source_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc",
+  "source_size_bytes": 20591265,
+  "submit_count": 1,
+  "upper_bound_microunits": 50000
+}

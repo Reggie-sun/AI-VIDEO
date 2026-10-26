@@ -1,0 +1,9 @@
+{
+  "consumed_at": "2026-10-25T21:32:28.302193+00:00",
+  "logical_request_number": 4,
+  "previous_maximum": 3,
+  "new_maximum": 4,
+  "intent_sha256": "74de8b85832172806f64b273d492ad0088833c5089cfd148def425bee55ae337",
+  "argv_sha256": "5f611396156c866cbddf0edf3102352543da54852a2056070c933cb1ce6af9ca",
+  "no_further_submissions": true
+}

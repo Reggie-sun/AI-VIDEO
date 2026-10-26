@@ -1,0 +1,12 @@
+{
+  "cue_id": "missing-response-ending-reprise",
+  "source_asset_id": "two-passengers-missing-response-B",
+  "suno_clip_id": "fc0af846-fba9-49ae-bd0c-d6c9e43e7740",
+  "source_wav_sha256": "88585bd2a3a9d44680f1a1a2667145839fa5166363c36260d2963ed8bd05a425",
+  "source_wav": "audio/cold-open-title-suspense-atmosphere-fc0af846.wav",
+  "rule": "Reuse the actual title0..3.5s phrase and, if the ending needs breath, its natural continuation within the same recording. Enter only after the original final reversal, never cue the identity before reveal. Original ending images and native sound remain protected.",
+  "placement_owner": "ResolvedTimeline",
+  "current_placement": "UNRESOLVED_until_final_episode_timeline",
+  "extra_generation_calls": 0,
+  "human_music_review": "PENDING"
+}

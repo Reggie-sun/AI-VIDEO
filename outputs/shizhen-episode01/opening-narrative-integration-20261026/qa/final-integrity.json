@@ -1,0 +1,11 @@
+{
+  "exact_sha256": "f3c03c289bb770b209a355ffad5c59f732168d10d30553f249882c382a19faa9",
+  "protected_source_count": 20,
+  "protected_sources_unchanged": true,
+  "no_s01": true,
+  "frames": 442,
+  "samples": 884000,
+  "script_syntax": "PASS",
+  "proof_boundary": "local integrity only, not artistic or human acceptance",
+  "published": false
+}

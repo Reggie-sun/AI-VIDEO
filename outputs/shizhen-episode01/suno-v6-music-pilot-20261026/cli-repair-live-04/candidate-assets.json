@@ -1,0 +1,180 @@
+[
+  {
+    "clip_id": "1c3f82de-fa9e-43e7-abf0-e366de84caa9",
+    "probe": {
+      "mime_type": "audio/wav",
+      "container_name": "wav",
+      "file_sha256": "7cadb2b2bd16e554e92dead6c29c405e7ec4a48e622b4a935a59cb60fda366e7",
+      "size_bytes": 41255440,
+      "file_device": 66312,
+      "file_inode": 50826321,
+      "codec_name": "pcm_s16le",
+      "duration_samples": 10310400,
+      "sample_rate_hz": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "decoded_pcm_sha256": "e384a5e648d091b9c675b31f146ff8d13c649274c24a01345cc46cbbe3078a81",
+      "loudness": {
+        "integrated_lufs_milli": -16400,
+        "true_peak_dbfs_milli": -4100,
+        "measurement_standard": "ebu_r128"
+      },
+      "loudness_receipt_id": "e3541f5d33a028ac753c7c793417dc8855382492d0553a4eabd1a4017a82c934",
+      "ffmpeg": {
+        "name": "ffmpeg",
+        "version": "ffmpeg version 9c33b2f Copyright (c) 2000-2021 the FFmpeg developers"
+      },
+      "ffprobe": {
+        "name": "ffprobe",
+        "version": "ffprobe version 9c33b2f Copyright (c) 2007-2021 the FFmpeg developers"
+      },
+      "content_fingerprint": "a787a2f0e6a8459db1ab5db152852144afa072caa75713b529b56c2efc0c4568"
+    },
+    "asset_record": {
+      "asset_id": "suno-1c3f82de-fa9e-43e7-abf0-e366de84caa9",
+      "asset_type": "music",
+      "artifact_path": "assets/audio/7cadb2b2bd16e554e92dead6c29c405e7ec4a48e622b4a935a59cb60fda366e7.wav",
+      "sha256": "7cadb2b2bd16e554e92dead6c29c405e7ec4a48e622b4a935a59cb60fda366e7",
+      "size_bytes": 41255440,
+      "mime_type": "audio/wav",
+      "duration_seconds": null,
+      "width": null,
+      "height": null,
+      "source_kind": "generated",
+      "tool": {
+        "name": "suno",
+        "version": "0.10.1"
+      },
+      "input_artifact_ids": [],
+      "input_fingerprint": "8b6e6eff934dcd3972dff8563357ace9e874c240cbd97a2e18b6087490007492",
+      "creation_receipt_id": "ebd95316-1986-51d9-8c10-d65b6465b7e2",
+      "usage_license": "suno-account-terms-unverified",
+      "egress": {
+        "remote": false,
+        "destination": null,
+        "authorization_receipt_id": null
+      },
+      "cost_receipt_id": null,
+      "audio_metadata": {
+        "audio_kind": "bgm",
+        "source": {
+          "kind": "generated",
+          "provider_or_tool": {
+            "name": "suno",
+            "version": "0.10.1"
+          },
+          "input_artifact_ids": [],
+          "input_fingerprint": "8b6e6eff934dcd3972dff8563357ace9e874c240cbd97a2e18b6087490007492",
+          "original_reference": "ebd95316-1986-51d9-8c10-d65b6465b7e2"
+        },
+        "speaker_id": null,
+        "voice_id": null,
+        "language": null,
+        "script_hash": null,
+        "duration_samples": 10310400,
+        "sample_rate_hz": 48000,
+        "channels": 2,
+        "channel_layout": "stereo",
+        "codec_name": "pcm_s16le",
+        "loudness": {
+          "integrated_lufs_milli": -16400,
+          "true_peak_dbfs_milli": -4100,
+          "measurement_standard": "ebu_r128"
+        },
+        "provenance_receipt_id": "ebd95316-1986-51d9-8c10-d65b6465b7e2",
+        "alignment_receipt_id": null
+      }
+    },
+    "state": "candidate_only_not_registry_committed",
+    "quality": "NOT_EVALUATED"
+  },
+  {
+    "clip_id": "e3599d34-c24a-4750-ad48-69825671da9b",
+    "probe": {
+      "mime_type": "audio/wav",
+      "container_name": "wav",
+      "file_sha256": "41b3d40095cd82559d3c37cedcdcff4890d74b6f4298c1e9b2b39226b263ba8c",
+      "size_bytes": 38260240,
+      "file_device": 66312,
+      "file_inode": 50826320,
+      "codec_name": "pcm_s16le",
+      "duration_samples": 9561600,
+      "sample_rate_hz": 48000,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "decoded_pcm_sha256": "7bad8b574c443b1039cebff9ea0e5e873ae16503b2815ce028ccc8bc37ad7bff",
+      "loudness": {
+        "integrated_lufs_milli": -16200,
+        "true_peak_dbfs_milli": -4200,
+        "measurement_standard": "ebu_r128"
+      },
+      "loudness_receipt_id": "9fe22163035d1b9699e13cbeff5a0c06423ff29abd3d4e2fa0248e0d1d65fd8b",
+      "ffmpeg": {
+        "name": "ffmpeg",
+        "version": "ffmpeg version 9c33b2f Copyright (c) 2000-2021 the FFmpeg developers"
+      },
+      "ffprobe": {
+        "name": "ffprobe",
+        "version": "ffprobe version 9c33b2f Copyright (c) 2007-2021 the FFmpeg developers"
+      },
+      "content_fingerprint": "5828081ed5cd6ef21ba6381c388cbabdb6650f9cad2736272d9a0d42749db855"
+    },
+    "asset_record": {
+      "asset_id": "suno-e3599d34-c24a-4750-ad48-69825671da9b",
+      "asset_type": "music",
+      "artifact_path": "assets/audio/41b3d40095cd82559d3c37cedcdcff4890d74b6f4298c1e9b2b39226b263ba8c.wav",
+      "sha256": "41b3d40095cd82559d3c37cedcdcff4890d74b6f4298c1e9b2b39226b263ba8c",
+      "size_bytes": 38260240,
+      "mime_type": "audio/wav",
+      "duration_seconds": null,
+      "width": null,
+      "height": null,
+      "source_kind": "generated",
+      "tool": {
+        "name": "suno",
+        "version": "0.10.1"
+      },
+      "input_artifact_ids": [],
+      "input_fingerprint": "8b6e6eff934dcd3972dff8563357ace9e874c240cbd97a2e18b6087490007492",
+      "creation_receipt_id": "ebd95316-1986-51d9-8c10-d65b6465b7e2",
+      "usage_license": "suno-account-terms-unverified",
+      "egress": {
+        "remote": false,
+        "destination": null,
+        "authorization_receipt_id": null
+      },
+      "cost_receipt_id": null,
+      "audio_metadata": {
+        "audio_kind": "bgm",
+        "source": {
+          "kind": "generated",
+          "provider_or_tool": {
+            "name": "suno",
+            "version": "0.10.1"
+          },
+          "input_artifact_ids": [],
+          "input_fingerprint": "8b6e6eff934dcd3972dff8563357ace9e874c240cbd97a2e18b6087490007492",
+          "original_reference": "ebd95316-1986-51d9-8c10-d65b6465b7e2"
+        },
+        "speaker_id": null,
+        "voice_id": null,
+        "language": null,
+        "script_hash": null,
+        "duration_samples": 9561600,
+        "sample_rate_hz": 48000,
+        "channels": 2,
+        "channel_layout": "stereo",
+        "codec_name": "pcm_s16le",
+        "loudness": {
+          "integrated_lufs_milli": -16200,
+          "true_peak_dbfs_milli": -4200,
+          "measurement_standard": "ebu_r128"
+        },
+        "provenance_receipt_id": "ebd95316-1986-51d9-8c10-d65b6465b7e2",
+        "alignment_receipt_id": null
+      }
+    },
+    "state": "candidate_only_not_registry_committed",
+    "quality": "NOT_EVALUATED"
+  }
+]

@@ -1,0 +1,5 @@
+{
+  "origin": "locally authored Director instruction graph, not platform readback",
+  "image_source_binding": "director_declared, platform_bytes_verified=false",
+  "native_target": "actual account/canvas/node independently bound by CO-A1-profile.json"
+}

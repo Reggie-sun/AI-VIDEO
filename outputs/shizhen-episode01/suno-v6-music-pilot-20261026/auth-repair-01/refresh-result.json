@@ -1,0 +1,16 @@
+{
+  "operation": "supported_cli_auth_refresh",
+  "recorded_at": "2026-10-25T20:38:49.655777+00:00",
+  "exit_code": 0,
+  "status": "success",
+  "error_code": null,
+  "authenticated": true,
+  "data_field_names": [
+    "authenticated",
+    "plan",
+    "credits"
+  ],
+  "no_browser": true,
+  "raw_output_saved": false,
+  "generation_requests": 0
+}

@@ -1,0 +1,251 @@
+{
+  "schema_version": "text-design/1",
+  "intent": "Quiet independent cinematic typography study, not live-action story footage",
+  "hierarchy": "Main title has mass and an empty interval; the temporal card stays subordinate",
+  "reference_width_px": 1920,
+  "reference_height_px": 1080,
+  "fonts": [
+    {
+      "family": "Noto Serif CJK SC",
+      "sha256": "7ff19adfc4cc99c1f15bf0c526a81568a2711255c2c8076c578ef9dbb4e420a4",
+      "data_base64": "T1RUTwAPAIAAAwBwQkFTRULjT+4AAArAAAAA3kNGRiAwVaqcAAAGyAAAA/VHUE9TRHZMdQAAC6AAAAAgR1NVQtDOzMIAAAvAAAAASE9TLzK8T8PMAAABYAAAAGBWT1JHA3EAAAAADAgAAAAIY21hcGMvVJgAAAZsAAAAPGhlYWQlC7UaAAAA/AAAADZoaGVhCHAC3wAAATQAAAAkaG10eAQCAKUAAAwQAAAACG1heHAAA1AAAAABWAAAAAZuYW1lY+aDmAAAAcAAAASscG9zdP+4ADIAAAaoAAAAIHZoZWEF5BIRAAAMGAAAACR2bXR4BA0AIQAADDwAAAAIAAEAAAACAIM9zb1sXw889QADA+gAAAAA4QG4YgAAAADhAbhiABr/pAPVA08AAQADAAIAAAAAAAAAAQAABH/+4gAAA+gAGgATA9UAAQAAAAAAAAAAAAAAAAAAAAEAAFAAAAMAAAADA9wCvAAFAAACigJYAAAASwKKAlgAAAFeADIBNAAAAgIHAAAAAAAAAAAAAAAIAAAAAAAAAAAAAABHT09HACBZMV4nA3D/iAAABH8BHgAAAAEAAAAAAgIC2QAAACAABgAAAAkAcgADAAEECQAAAFQAAAADAAEECQABACIAVAADAAEECQACAAgAdgADAAEECQADAEgAfgADAAEECQAEACwAxgADAAEECQAFAFgA8gADAAEECQAGACYBSgADAAEECQANApYBcAADAAEECQAOADQEBgCpACAAMgAwADEANwAtADIAMAAyADMAIABBAGQAbwBiAGUAIAAoAGgAdAB0AHAAOgAvAC8AdwB3AHcALgBhAGQAbwBiAGUALgBjAG8AbQAvACkALgBOAG8AdABvACAAUwBlAHIAaQBmACAAQwBKAEsAIABTAEMAQgBvAGwAZAAyAC4AMAAwADIAOwBHAE8ATwBHADsATgBvAHQAbwBTAGUAcgBpAGYAQwBKAEsAcwBjAC0AQgBvAGwAZAA7AEEARABPAEIARQBOAG8AdABvACAAUwBlAHIAaQBmACAAQwBKAEsAIABTAEMAIABCAG8AbABkAFYAZQByAHMAaQBvAG4AIAAyAC4AMAAwADIAOwBoAG8AdABjAG8AbgB2ACAAMQAuADEALgAwADsAbQBhAGsAZQBvAHQAZgBlAHgAZQAgADIALgA2AC4AMABOAG8AdABvAFMAZQByAGkAZgBDAEoASwBzAGMALQBCAG8AbABkAFQAaABpAHMAIABGAG8AbgB0ACAAUwBvAGYAdAB3AGEAcgBlACAAaQBzACAAbABpAGMAZQBuAHMAZQBkACAAdQBuAGQAZQByACAAdABoAGUAIABTAEkATAAgAE8AcABlAG4AIABGAG8AbgB0ACAATABpAGMAZQBuAHMAZQAsACAAVgBlAHIAcwBpAG8AbgAgADEALgAxAC4AIABUAGgAaQBzACAARgBvAG4AdAAgAFMAbwBmAHQAdwBhAHIAZQAgAGkAcwAgAGQAaQBzAHQAcgBpAGIAdQB0AGUAZAAgAG8AbgAgAGEAbgAgACIAQQBTACAASQBTACIAIABCAEEAUwBJAFMALAAgAFcASQBUAEgATwBVAFQAIABXAEEAUgBSAEEATgBUAEkARQBTACAATwBSACAAQwBPAE4ARABJAFQASQBPAE4AUwAgAE8ARgAgAEEATgBZACAASwBJAE4ARAAsACAAZQBpAHQAaABlAHIAIABlAHgAcAByAGUAcwBzACAAbwByACAAaQBtAHAAbABpAGUAZAAuACAAUwBlAGUAIAB0AGgAZQAgAFMASQBMACAATwBwAGUAbgAgAEYAbwBuAHQAIABMAGkAYwBlAG4AcwBlACAAZgBvAHIAIAB0AGgAZQAgAHMAcABlAGMAaQBmAGkAYwAgAGwAYQBuAGcAdQBhAGcAZQAsACAAcABlAHIAbQBpAHMAcwBpAG8AbgBzACAAYQBuAGQAIABsAGkAbQBpAHQAYQB0AGkAbwBuAHMAIABnAG8AdgBlAHIAbgBpAG4AZwAgAHkAbwB1AHIAIAB1AHMAZQAgAG8AZgAgAHQAaABpAHMAIABGAG8AbgB0ACAAUwBvAGYAdAB3AGEAcgBlAC4AaAB0AHQAcAA6AC8ALwBzAGMAcgBpAHAAdABzAC4AcwBpAGwALgBvAHIAZwAvAE8ARgBMAAAAAgAAAAMAAAAUAAMAAQAAABQABAAoAAAABgAEAAEAAlkxXif//wAAWTFeJ///ptCh2wABAAAAAAAAAAMAAAAAAAD/tQAyAAAAAAAAAAAAAAAAAAAAAAAAAAABAAQCAAEBARROb3RvU2VyaWZDSktqcC1Cb2xkAAEBATP4G/gciwwe+B0B+B4C+B8D+BQEpS/6afnjBY0MHx0AAP//DCL3/g/4Awwl+dIMJPgHEQAHAQEGDmN5iqXDQWRvYmVJZGVudGl0eUNvcHlyaWdodCAyMDE3LTIwMjMgQWRvYmUgKGh0dHA6Ly93d3cuYWRvYmUuY29tLykuIE5vdG8gaXMgYSB0cmFkZW1hcmsgb2YgR29vZ2xlIEluYy5Ob3RvIFNlcmlmIENKSyBKUCBCb2xkTm90byBTZXJpZiBDSksgSlBOb3RvU2VyaWZDSktqcC1Cb2xkLUdlbmVyaWNOb3RvU2VyaWZDSktqcC1Cb2xkLUlkZW9ncmFwaHMACwEBBQsTGR0jKS0xNzwGk24LlpSYjx8LB56PmpORkwsGmpaQlgsgHQUL/wAhgAALBpqVkJYLwosaC5CWjgv/ACSAAAsjHY0fCwA29UF3AAABAQADAgABAAMAvQHBIA7396j3a6f3QCkdEvhG9xD7EPcSFMATyPdp+cgVefsrWPsoTymWgxjOuMTIudkI9z0GiT2HRH9JCPwGJB33+QZl+0Yp+x37jfsFk3wY9+Pt9wz3Jbf3XAiOBqj7M9n7T/d7J5LSsK3Jl4yYGPubzvsQ9wpj9xcI+BQmHY4fXLQ8x4saRTMFE9D7ewaXzZDSjdkI97YqHVyzP8WLGkY1BRPo+xEGjfdAKQr7OJoF+2z7Lgegsp62m7olCg73bJn3zae1qLWn6SsKzOSt5TzaPOWx6Lr0tfcANe7D9wAUArYUAEgTcrr5mPhvFRNytvscqYn70Y37Lfuo+wIZlHr3Wbvi1LTzGc5U2TevRPcLUr/3efvtxaXbju6Q9w0IE3K6IwoT+rp99/wgCvuoZgf7ArgF/HghCvgN92/8HJ0Hr8CgkYwf9+4HoJCZk5EiClD3BfdnLApD6QalkJSVjJkI/HT87hX4ELz8BCoK+zQyFfhsuP1Rlwetq54oCp6Gk4OQfQiSfI1xbhrkk5ex0Rr3/ycKE3Z6J9VgWQVv9zkGo4+Uk42aCBN3OvscmAX7YW4HLbQF/NGZBxP6urKvoJUfDgACAQEJEfggDCal+egS+CEMJqj6AhL7joscBUaLBrMKswuz2wwMs9sMDYwMEfrnFfuOixwFRosGqAr2C6ieDAzWq58MDYwMEfp8FKgTAA0BAQcPGBwjKDE1PERLUVoV+ySXBQubB7e4o5UfC5P7AN0YWFMFC6EkCguMlpSPlwgLCKMhHQsoHR9jsEgnHQsiHQgLkowf96oHC6OPlZWOmhkLB4GIhoEeC65pJR0SCwaZlSYKUDsFCwAAAAABAAAACABoAGQABAAHREZMVAAsY3lybAA+Z3JlawA+aGFuZwAsaGFuaQAsa2FuYQAsbGF0bgA+AAYAAAAAAAIABAAeACIAJgCYAAYAAAAAAAMABAAMABAAFACGAAH/pgABA1IAAf+IAAQAFgAEaWNmYmljZnRpZGVvcm9tbgAHREZMVAAsY3lybAA+Z3JlawA+aGFuZwAsaGFuaQAsa2FuYQAsbGF0bgA+AAYAAAAAAAIABAAeACIAJgAqAAYAAAAAAAMABAAMABAAFAAYAAEAHgABA8oAAQAAAAEAeAAAAAEAAAAKABwAHgABREZMVAAIAAQAAAAA//8AAAAAAAAAAQAAAAoARABGAAdERkxUACxjeXJsADZncmVrADZoYW5nADZoYW5pADZrYW5hADZsYXRuADYABAAAAAD//wAAAAAAAAAAAAAAAQAAA3AAAAPoAGQAGgBBAAEQAAH0/gwAAAPoACEAHAPMAAAAAQAAAAAAAAAAAAAAAAABA+gAAAAlACE=",
+      "license": "Noto CJK SIL OFL1.1 / DejaVu Bitstream Vera and public domain additions; system distribution font, subset only"
+    }
+  ],
+  "nodes": [
+    {
+      "node_id": "opaque-field",
+      "purpose": "Independent title field, no CG source visible",
+      "x_px": 0,
+      "y_px": 0,
+      "width_px": 1920,
+      "height_px": 1080,
+      "runs": [],
+      "path": "M0 0 L1920 0 L1920 1080 L0 1080 Z",
+      "fill": "#10171B",
+      "stroke": "none",
+      "stroke_width_px": 0,
+      "align": "left",
+      "line_height_milli": 1200,
+      "writing_mode": "horizontal-tb",
+      "outline_color": "#000000",
+      "outline_milli_px": 0,
+      "motion": []
+    },
+    {
+      "node_id": "title-0",
+      "purpose": "Intact, stable Chinese glyph; the interval carries absence",
+      "x_px": 650,
+      "y_px": 364,
+      "width_px": 260,
+      "height_px": 340,
+      "runs": [
+        {
+          "text": "失",
+          "color": "#DCD5C7",
+          "font_family": "Noto Serif CJK SC",
+          "font_size_px": 244,
+          "font_weight": 700,
+          "italic": false,
+          "tracking_px": 0,
+          "baseline_shift_px": 0
+        }
+      ],
+      "path": null,
+      "fill": "#FFFFFF",
+      "stroke": "none",
+      "stroke_width_px": 0,
+      "align": "left",
+      "line_height_milli": 1200,
+      "writing_mode": "horizontal-tb",
+      "outline_color": "#000000",
+      "outline_milli_px": 0,
+      "motion": [
+        {
+          "frame": 0,
+          "opacity_milli": 0,
+          "translate_x_px": 0,
+          "translate_y_px": 0,
+          "scale_milli": 1000,
+          "rotation_millidegrees": 0,
+          "blur_milli_px": 0,
+          "reveal_top_milli": 0,
+          "reveal_right_milli": 0,
+          "reveal_bottom_milli": 0,
+          "reveal_left_milli": 0,
+          "easing": [
+            250,
+            100,
+            250,
+            1000
+          ]
+        },
+        {
+          "frame": 14,
+          "opacity_milli": 1000,
+          "translate_x_px": 0,
+          "translate_y_px": 0,
+          "scale_milli": 1000,
+          "rotation_millidegrees": 0,
+          "blur_milli_px": 0,
+          "reveal_top_milli": 0,
+          "reveal_right_milli": 0,
+          "reveal_bottom_milli": 0,
+          "reveal_left_milli": 0,
+          "easing": [
+            250,
+            100,
+            250,
+            1000
+          ]
+        },
+        {
+          "frame": 65,
+          "opacity_milli": 1000,
+          "translate_x_px": 0,
+          "translate_y_px": 0,
+          "scale_milli": 1000,
+          "rotation_millidegrees": 0,
+          "blur_milli_px": 0,
+          "reveal_top_milli": 0,
+          "reveal_right_milli": 0,
+          "reveal_bottom_milli": 0,
+          "reveal_left_milli": 0,
+          "easing": [
+            250,
+            100,
+            250,
+            1000
+          ]
+        },
+        {
+          "frame": 83,
+          "opacity_milli": 0,
+          "translate_x_px": 0,
+          "translate_y_px": 0,
+          "scale_milli": 1000,
+          "rotation_millidegrees": 0,
+          "blur_milli_px": 0,
+          "reveal_top_milli": 0,
+          "reveal_right_milli": 0,
+          "reveal_bottom_milli": 0,
+          "reveal_left_milli": 0,
+          "easing": [
+            250,
+            100,
+            250,
+            1000
+          ]
+        }
+      ]
+    },
+    {
+      "node_id": "title-1",
+      "purpose": "Intact, stable Chinese glyph; the interval carries absence",
+      "x_px": 1010,
+      "y_px": 364,
+      "width_px": 260,
+      "height_px": 340,
+      "runs": [
+        {
+          "text": "帧",
+          "color": "#DCD5C7",
+          "font_family": "Noto Serif CJK SC",
+          "font_size_px": 244,
+          "font_weight": 700,
+          "italic": false,
+          "tracking_px": 0,
+          "baseline_shift_px": 0
+        }
+      ],
+      "path": null,
+      "fill": "#FFFFFF",
+      "stroke": "none",
+      "stroke_width_px": 0,
+      "align": "left",
+      "line_height_milli": 1200,
+      "writing_mode": "horizontal-tb",
+      "outline_color": "#000000",
+      "outline_milli_px": 0,
+      "motion": [
+        {
+          "frame": 0,
+          "opacity_milli": 0,
+          "translate_x_px": 0,
+          "translate_y_px": 0,
+          "scale_milli": 1000,
+          "rotation_millidegrees": 0,
+          "blur_milli_px": 0,
+          "reveal_top_milli": 0,
+          "reveal_right_milli": 0,
+          "reveal_bottom_milli": 0,
+          "reveal_left_milli": 0,
+          "easing": [
+            250,
+            100,
+            250,
+            1000
+          ]
+        },
+        {
+          "frame": 14,
+          "opacity_milli": 1000,
+          "translate_x_px": 0,
+          "translate_y_px": 0,
+          "scale_milli": 1000,
+          "rotation_millidegrees": 0,
+          "blur_milli_px": 0,
+          "reveal_top_milli": 0,
+          "reveal_right_milli": 0,
+          "reveal_bottom_milli": 0,
+          "reveal_left_milli": 0,
+          "easing": [
+            250,
+            100,
+            250,
+            1000
+          ]
+        },
+        {
+          "frame": 65,
+          "opacity_milli": 1000,
+          "translate_x_px": 0,
+          "translate_y_px": 0,
+          "scale_milli": 1000,
+          "rotation_millidegrees": 0,
+          "blur_milli_px": 0,
+          "reveal_top_milli": 0,
+          "reveal_right_milli": 0,
+          "reveal_bottom_milli": 0,
+          "reveal_left_milli": 0,
+          "easing": [
+            250,
+            100,
+            250,
+            1000
+          ]
+        },
+        {
+          "frame": 83,
+          "opacity_milli": 0,
+          "translate_x_px": 0,
+          "translate_y_px": 0,
+          "scale_milli": 1000,
+          "rotation_millidegrees": 0,
+          "blur_milli_px": 0,
+          "reveal_top_milli": 0,
+          "reveal_right_milli": 0,
+          "reveal_bottom_milli": 0,
+          "reveal_left_milli": 0,
+          "easing": [
+            250,
+            100,
+            250,
+            1000
+          ]
+        }
+      ]
+    }
+  ],
+  "avoidance_regions": []
+}

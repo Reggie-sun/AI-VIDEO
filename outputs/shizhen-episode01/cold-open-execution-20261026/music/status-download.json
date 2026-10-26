@@ -1,0 +1,21 @@
+{
+  "exit_code": 0,
+  "status": "success",
+  "clips": [
+    {
+      "id": "31d31b57-b210-4f14-b1dc-6199f99f6573",
+      "title": "cold-open-title suspense_atmosphere",
+      "status": "complete",
+      "model_name": "chirp-hawk",
+      "local_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/cold-open-execution-20261026/music/audio/cold-open-title-suspense-atmosphere-31d31b57.mp3"
+    },
+    {
+      "id": "fc0af846-fba9-49ae-bd0c-d6c9e43e7740",
+      "title": "cold-open-title suspense_atmosphere",
+      "status": "complete",
+      "model_name": "chirp-hawk",
+      "local_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/cold-open-execution-20261026/music/audio/cold-open-title-suspense-atmosphere-fc0af846.mp3"
+    }
+  ],
+  "error_code": null
+}

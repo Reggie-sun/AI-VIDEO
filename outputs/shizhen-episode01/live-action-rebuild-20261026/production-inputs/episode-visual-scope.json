@@ -1,0 +1,441 @@
+{
+  "source_sha256": "46c2f253c44ea87dd382af48bb28b69c5b0304adba637d03698318de88850464",
+  "scope_reason": "User changed all visuals from CG realism to live-action feel; no story rewrite",
+  "units": [
+    {
+      "unit_id": "S01",
+      "old_budget_seconds": 16,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S02",
+      "old_budget_seconds": 6,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S03",
+      "old_budget_seconds": 8,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S04",
+      "old_budget_seconds": 8,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S05",
+      "old_budget_seconds": 14,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S06",
+      "old_budget_seconds": 12,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S07",
+      "old_budget_seconds": 10,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S08",
+      "old_budget_seconds": 10,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S09",
+      "old_budget_seconds": 10,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S10",
+      "old_budget_seconds": 10,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S11",
+      "old_budget_seconds": 8,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S12",
+      "old_budget_seconds": 10,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S13",
+      "old_budget_seconds": 10,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S14",
+      "old_budget_seconds": 6,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S15",
+      "old_budget_seconds": 12,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S16",
+      "old_budget_seconds": 8,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S17",
+      "old_budget_seconds": 4,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S18",
+      "old_budget_seconds": 6,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S19",
+      "old_budget_seconds": 10,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S20",
+      "old_budget_seconds": 8,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S21",
+      "old_budget_seconds": 8,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S22",
+      "old_budget_seconds": 10,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S23",
+      "old_budget_seconds": 10,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S24",
+      "old_budget_seconds": 8,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S25",
+      "old_budget_seconds": 9,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S26",
+      "old_budget_seconds": 8,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S27",
+      "old_budget_seconds": 8,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S28",
+      "old_budget_seconds": 7,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S29",
+      "old_budget_seconds": 6,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S30",
+      "old_budget_seconds": 8,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    },
+    {
+      "unit_id": "S31",
+      "old_budget_seconds": 8,
+      "visual_target": "live-action photographic feel",
+      "new_media_status": "NOT_GENERATED",
+      "protected_content_source": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "preserve": [
+        "narrative reveal order",
+        "approved dialogue and actions",
+        "character relationships",
+        "identity reveal anchors"
+      ],
+      "old_media": "retain originals and historical verdicts"
+    }
+  ],
+  "runtime_state_mutated": false
+}

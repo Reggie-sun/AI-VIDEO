@@ -1,0 +1,12 @@
+{
+  "sha256": "b66644e8501ca518cf51fde2bdfe9aca22c09188175b41729e7c58fff03ed1a6",
+  "verdict": "FAIL",
+  "evaluator": "parent_explicit_evaluator",
+  "observed_at_seconds": [
+    19.625,
+    19.667,
+    20.0
+  ],
+  "finding": "Truck tail reappears after A2 clears; A3 source11s repeats vehicle exit. Repair choose A3 after truck and after repeated head turn.",
+  "static_review_not_audio_acceptance": true
+}

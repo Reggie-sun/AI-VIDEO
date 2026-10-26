@@ -1,0 +1,22 @@
+{
+  "recorded_at": "2026-10-25T21:33:10.734702+00:00",
+  "exit_code": 0,
+  "status": "success",
+  "error_code": null,
+  "clips": [
+    {
+      "id": "e3599d34-c24a-4750-ad48-69825671da9b",
+      "title": "Scene04 修复台：两个源文件的缺口 instrumental_bed",
+      "status": "complete",
+      "model_name": "chirp-hawk",
+      "local_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/suno-v6-music-pilot-20261026/cli-repair-live-04/audio/scene04-修复台-两个源文件的缺口-instrumental-bed-e3599d34.mp3"
+    },
+    {
+      "id": "1c3f82de-fa9e-43e7-abf0-e366de84caa9",
+      "title": "Scene04 修复台：两个源文件的缺口 instrumental_bed",
+      "status": "complete",
+      "model_name": "chirp-hawk",
+      "local_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/suno-v6-music-pilot-20261026/cli-repair-live-04/audio/scene04-修复台-两个源文件的缺口-instrumental-bed-1c3f82de.mp3"
+    }
+  ]
+}

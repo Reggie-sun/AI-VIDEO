@@ -1,0 +1,445 @@
+{
+  "schema_version": "visual-review-packet/4",
+  "authority": "development_only",
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-A-revision-20261026/variant-R3/失帧-独立开场-空位片名-R3.mp4",
+  "video_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc",
+  "video_size_bytes": 20591265,
+  "duration_ms": 20375,
+  "contract": {
+    "goal_id": "shizhen-world-title",
+    "goal_version": "1",
+    "user_goal": "请将 `focus-002` 的 18.417 秒重剪版作为当前已验证的核心叙事素材，继续完成《失帧》独立冷开场。\n\n重要范围：只制作独立开场，不包含 S01，也不需要考虑与第一集的衔接。\n\n目前卡车遮挡、人物消失、幸存者毫无察觉的叙事机制已经成立，不要反复推翻这一部分。\n\n本轮重点解决尚未完成的三个问题：\n\n1. 建立真正具有叙事意义的宏观世界视觉表达，与公交站台的微观异常形成有机联系。不要简单增加城市航拍或故障特效，也不要让宏观段落削弱消失事件的悬念。\n2. 重新完成电影级片名揭示，使“失帧”的文字设计真正参与画面与情绪，而不只是覆盖在人物近景上的标题。\n3. 完成真人质感、声音结构和整体视听美术的一致性审查，并识别当前画面中的 AI 生成标识及正式素材使用限制。\n\n保留现有四句对白、音乐和已成立的关键事件，优先进行增量式创作。\n\n不强制固定时长或镜头数量，让导演根据观众注意力、悬念形成和情绪收束决定。\n\n请重点比较不同开场结构能否在更大的世界尺度和更快建立悬念之间取得平衡。\n\n继续调用现有专业 Skills，实际制作可观看的动态预演，不要只输出分析文档。\n\n未经授权不新增付费生成。明确区分预演完成、素材缺口和最终成片通过。\n\n最终以观众是否被真正吸引、是否感受到世界异常、是否记住消失事件与片名作为艺术评价重点，而不是技术测试是否通过。\n\n当前继续指令：完成之前的任务\n最新字体分工：对了现在字体也给你做吧\n",
+    "requirements": [
+      {
+        "requirement_id": "intent-01",
+        "observable": "请将 `focus-002` 的 18.417 秒重剪版作为当前已验证的核心叙事素材，继续完成《失帧》独立冷开场。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-02",
+        "observable": "重要范围：只制作独立开场，不包含 S01，也不需要考虑与第一集的衔接。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-03",
+        "observable": "目前卡车遮挡、人物消失、幸存者毫无察觉的叙事机制已经成立，不要反复推翻这一部分。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-04",
+        "observable": "1. 建立真正具有叙事意义的宏观世界视觉表达，与公交站台的微观异常形成有机联系。不要简单增加城市航拍或故障特效，也不要让宏观段落削弱消失事件的悬念。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-05",
+        "observable": "2. 重新完成电影级片名揭示，使“失帧”的文字设计真正参与画面与情绪，而不只是覆盖在人物近景上的标题。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-06",
+        "observable": "3. 完成真人质感、声音结构和整体视听美术的一致性审查，并识别当前画面中的 AI 生成标识及正式素材使用限制。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-07",
+        "observable": "保留现有四句对白、音乐和已成立的关键事件，优先进行增量式创作。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-08",
+        "observable": "不强制固定时长或镜头数量，让导演根据观众注意力、悬念形成和情绪收束决定。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-09",
+        "observable": "请重点比较不同开场结构能否在更大的世界尺度和更快建立悬念之间取得平衡。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-10",
+        "observable": "继续调用现有专业 Skills，实际制作可观看的动态预演，不要只输出分析文档。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-11",
+        "observable": "未经授权不新增付费生成。明确区分预演完成、素材缺口和最终成片通过。",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-12",
+        "observable": "最终以观众是否被真正吸引、是否感受到世界异常、是否记住消失事件与片名作为艺术评价重点，而不是技术测试是否通过。",
+        "proof": "human"
+      },
+      {
+        "requirement_id": "intent-13",
+        "observable": "当前继续指令：完成之前的任务",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "intent-14",
+        "observable": "最新字体分工：对了现在字体也给你做吧",
+        "proof": "evaluator"
+      },
+      {
+        "requirement_id": "visual.drama.typography",
+        "observable": "片名留在原空位的活动雨夜中，右侧幸存者继续通话；字体完整、异基线与异尺度，无随机glitch，源AI标识保留。",
+        "proof": "evaluator",
+        "visual_dimension": "typography"
+      },
+      {
+        "requirement_id": "visual.drama.palette",
+        "observable": "保留核心雨夜蓝黑与钨光，不强行用调色掩盖stock干地及非同地点；正式版仍须同雨夜摄影。",
+        "proof": "evaluator",
+        "visual_dimension": "palette"
+      },
+      {
+        "requirement_id": "visual.drama.layout",
+        "observable": "目标为同地宏观→完整异常→同站台尾声；当前宏观素材缺失，局部版本以两人同框开始，不能将该目标签通过。",
+        "proof": "evaluator",
+        "visual_dimension": "layout"
+      },
+      {
+        "requirement_id": "visual.drama.style",
+        "observable": "真人摄影目标保留；核心已认可叙事与其现有CG质感分开裁决，AI生成标识保留。",
+        "proof": "evaluator",
+        "visual_dimension": "style"
+      },
+      {
+        "requirement_id": "visual.drama.holistic",
+        "observable": "观众记住关系被抹去、旁人不知情、世界继续；听完四句对白及原音乐发展。预演不是最终艺术通过。",
+        "proof": "human",
+        "visual_dimension": "holistic"
+      }
+    ]
+  },
+  "frames": [
+    {
+      "path": "frames/00002000.jpg",
+      "timestamp_ms": 2000,
+      "frame_sha256": "c3022cf9ce15c6956bf5c4c4da0a3958bc4a1f7db478a9bdaae775e0e1b1ee03",
+      "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+    },
+    {
+      "path": "frames/00007600.jpg",
+      "timestamp_ms": 7600,
+      "frame_sha256": "096369c9dd2996875c364d7c65c29687d71c6e4304f4362901dbd82a80262835",
+      "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+    },
+    {
+      "path": "frames/00007700.jpg",
+      "timestamp_ms": 7700,
+      "frame_sha256": "e61a4e82e8febac64382bdc8a314acb0d12fd805da211515df4d67c1d3585ba4",
+      "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+    },
+    {
+      "path": "frames/00010000.jpg",
+      "timestamp_ms": 10000,
+      "frame_sha256": "d101bab448ade158d5b25da3d06a7f6d2a5d884d9a8102d7cce66550bbf7d6d1",
+      "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+    },
+    {
+      "path": "frames/00010375.jpg",
+      "timestamp_ms": 10375,
+      "frame_sha256": "880ec0ff6ac2da2f49d92a730d74a0a8ee2bb95ef0572e10886070008ab5b8bf",
+      "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+    },
+    {
+      "path": "frames/00010417.jpg",
+      "timestamp_ms": 10417,
+      "frame_sha256": "1acb5e5468c702d394d149b5f7a306e999cf19ee03cdbb13d883fc90c4acec5a",
+      "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+    },
+    {
+      "path": "frames/00011000.jpg",
+      "timestamp_ms": 11000,
+      "frame_sha256": "a10bb96929f9e1e8827ef417cabc8df2a0c3cd466d3ce39a51312f9ea215b081",
+      "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+    },
+    {
+      "path": "frames/00014000.jpg",
+      "timestamp_ms": 14000,
+      "frame_sha256": "2999bc15f5c909e404ed3b3aacceba64b99e22db6a4a040d9fc7e5beb309e413",
+      "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+    },
+    {
+      "path": "frames/00017333.jpg",
+      "timestamp_ms": 17333,
+      "frame_sha256": "7ab2a88a033086cdab132c08d5504739f8f2cd18cb06708765602ce55e079d9c",
+      "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+    },
+    {
+      "path": "frames/00017417.jpg",
+      "timestamp_ms": 17417,
+      "frame_sha256": "77299e1323ae88dec1d01b1a94b9b25a1f759c3aabd00b26bc6a03ba05fe2ceb",
+      "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+    },
+    {
+      "path": "frames/00018375.jpg",
+      "timestamp_ms": 18375,
+      "frame_sha256": "ef0cd0bf8643c4944f494d4c0792b733aa8133fecf45b700771b9eca50556ddd",
+      "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+    },
+    {
+      "path": "frames/00019375.jpg",
+      "timestamp_ms": 19375,
+      "frame_sha256": "b9c085db644e4e01db542eeb8d80e39deead58f832dabd6be6c853b1ad1f91aa",
+      "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+    },
+    {
+      "path": "frames/00020250.jpg",
+      "timestamp_ms": 20250,
+      "frame_sha256": "2b53da4a9651b0ddb85dafb2d5f6ca577a2b952b2c01c0d49e6b9e1302a0b813",
+      "render_output_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc"
+    }
+  ],
+  "content_kind": "drama",
+  "goal_binding": {
+    "path": "creative/goal-binding.json",
+    "sha256": "0f993813cca5511938ec23e1fd0f9a145fd0c0a7e1980735c3bcbd879340c695",
+    "creative_input": {
+      "path": "review-creative-input.txt",
+      "sha256": "03af24973eca403f3603590832e92e253b1f819f64cec634f73f752916193caa"
+    },
+    "coverage": {
+      "path": "director-coverage.json",
+      "sha256": "7099b921b5179712ce9dcd7bb5a66d26b4e100104448687cdad755b63ddc792a"
+    },
+    "final_output_contract": {
+      "path": "final-output-contract.json",
+      "sha256": "2668269bd30f4e3847c388095457227c824646eb902a073568d48837c0346787"
+    }
+  },
+  "timeline_snapshot": {
+    "path": "timeline.json",
+    "sha256": "4c12cc3c8df6ce0234429ed2e29f571490986b1a5ad71d7acf03afab40d401bc",
+    "content_hash": "cde375700763e9d71fae76cb7e38efbe09ac55f39a52ebb14843288516796f9c",
+    "composition_fingerprint": "fcde179771424b98772bc23bc42dfab425ff63ea8bcec9d9d4d320aeb16e2309",
+    "total_frames": 489,
+    "fps": 24,
+    "sample_rate": 48000
+  },
+  "render_report_snapshot": {
+    "path": "render-report.json",
+    "sha256": "71c1c7e9e20fbf4a88aac6e8651c2e540b01ac6a7af60b3120740049835d9d3b",
+    "video_sha256": "587352b307d19c995ba5f8f0de7f5bbe5de5e889e00dafd0d6339d99bd6323dc",
+    "timeline_fingerprint": "fcde179771424b98772bc23bc42dfab425ff63ea8bcec9d9d4d320aeb16e2309",
+    "duration_frames": 489,
+    "fps_num": 24,
+    "fps_den": 1
+  },
+  "junction_inventory": [
+    {
+      "junction_id": "91c93c4daee88ec1c3b5737d1c5340ec06e5eea78c8a85137da02b4e4203e5b2",
+      "from_shot_id": "CO-A1",
+      "to_shot_id": "CO-A2",
+      "transition_kind": "cut",
+      "transition_duration_frames": 0,
+      "frame": 184,
+      "time_ms": 7666,
+      "sample": 368000,
+      "visual_spans": [
+        {
+          "layer_id": "original-visual-CO-A1",
+          "shot_id": "CO-A1",
+          "asset_id": "CO-A1-review-video",
+          "asset_sha256": "b42b27040a62c6c303079e9f582534ec5d7ff7dcf9fb6c88c781de53dcde02fd",
+          "start_frame": 0,
+          "duration_frames": 184,
+          "trim_start_frame": 8,
+          "trim_duration_frames": 184,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        {
+          "layer_id": "original-visual-CO-A2",
+          "shot_id": "CO-A2",
+          "asset_id": "CO-A2-review-video",
+          "asset_sha256": "0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c",
+          "start_frame": 184,
+          "duration_frames": 66,
+          "trim_start_frame": 30,
+          "trim_duration_frames": 66,
+          "opacity_milli": 1000,
+          "z_index": 0
+        }
+      ],
+      "audio_window_start_sample": 320000,
+      "audio_window_end_sample": 416000,
+      "audio_spans": [
+        {
+          "track_id": "original-mix-CO-A1",
+          "audio_kind": "dialogue",
+          "asset_id": "CO-A1-original-mix",
+          "asset_sha256": "43744ec92c9143d139eb37254680c97b763fa8d0d269367b2ebccfb4c59eb254",
+          "start_sample": 0,
+          "duration_samples": 368000,
+          "source_start_sample": 16000,
+          "source_duration_samples": 368000,
+          "gain_millidb": 0,
+          "fade_in_samples": 0,
+          "fade_out_samples": 0
+        },
+        {
+          "track_id": "original-mix-CO-A2",
+          "audio_kind": "dialogue",
+          "asset_id": "CO-A2-original-mix",
+          "asset_sha256": "1d2744e055589c7bce382dbb8e0c3cef88cab6ea6b5891e417ac8176c13ea6d0",
+          "start_sample": 368000,
+          "duration_samples": 132000,
+          "source_start_sample": 60000,
+          "source_duration_samples": 132000,
+          "gain_millidb": 0,
+          "fade_in_samples": 0,
+          "fade_out_samples": 0
+        }
+      ]
+    },
+    {
+      "junction_id": "e789fd03054ca7b7438772e9b17ec8fa85fb0f67c4aad6f7af965f4edae7cac1",
+      "from_shot_id": "CO-A2",
+      "to_shot_id": "CO-A3",
+      "transition_kind": "cut",
+      "transition_duration_frames": 0,
+      "frame": 250,
+      "time_ms": 10416,
+      "sample": 500000,
+      "visual_spans": [
+        {
+          "layer_id": "original-visual-CO-A2",
+          "shot_id": "CO-A2",
+          "asset_id": "CO-A2-review-video",
+          "asset_sha256": "0dabb72c98edcc3550c91d2e23292740044a193bee7079f8751bb0fb43a2060c",
+          "start_frame": 184,
+          "duration_frames": 66,
+          "trim_start_frame": 30,
+          "trim_duration_frames": 66,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        {
+          "layer_id": "original-visual-CO-A3",
+          "shot_id": "CO-A3",
+          "asset_id": "CO-A3-review-video",
+          "asset_sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+          "start_frame": 250,
+          "duration_frames": 167,
+          "trim_start_frame": 361,
+          "trim_duration_frames": 167,
+          "opacity_milli": 1000,
+          "z_index": 0
+        }
+      ],
+      "audio_window_start_sample": 452000,
+      "audio_window_end_sample": 548000,
+      "audio_spans": [
+        {
+          "track_id": "original-mix-CO-A2",
+          "audio_kind": "dialogue",
+          "asset_id": "CO-A2-original-mix",
+          "asset_sha256": "1d2744e055589c7bce382dbb8e0c3cef88cab6ea6b5891e417ac8176c13ea6d0",
+          "start_sample": 368000,
+          "duration_samples": 132000,
+          "source_start_sample": 60000,
+          "source_duration_samples": 132000,
+          "gain_millidb": 0,
+          "fade_in_samples": 0,
+          "fade_out_samples": 0
+        },
+        {
+          "track_id": "original-mix-CO-A3",
+          "audio_kind": "dialogue",
+          "asset_id": "CO-A3-original-mix",
+          "asset_sha256": "7bb88946466b0681a2d4d1b6f1f0303e3631a5574a51e919f557d248967ef4d7",
+          "start_sample": 500000,
+          "duration_samples": 334000,
+          "source_start_sample": 722000,
+          "source_duration_samples": 334000,
+          "gain_millidb": 0,
+          "fade_in_samples": 0,
+          "fade_out_samples": 0
+        }
+      ]
+    },
+    {
+      "junction_id": "899f7c505f25dd4d8f4729e3c8f47ea82793e30c9f4a8ed8b101fb39953aae7e",
+      "from_shot_id": "CO-A3",
+      "to_shot_id": "CO-TAIL",
+      "transition_kind": "cut",
+      "transition_duration_frames": 0,
+      "frame": 417,
+      "time_ms": 17375,
+      "sample": 834000,
+      "visual_spans": [
+        {
+          "layer_id": "original-visual-CO-A3",
+          "shot_id": "CO-A3",
+          "asset_id": "CO-A3-review-video",
+          "asset_sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+          "start_frame": 250,
+          "duration_frames": 167,
+          "trim_start_frame": 361,
+          "trim_duration_frames": 167,
+          "opacity_milli": 1000,
+          "z_index": 0
+        },
+        {
+          "layer_id": "original-visual-CO-TAIL",
+          "shot_id": "CO-TAIL",
+          "asset_id": "CO-TAIL-review-video",
+          "asset_sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+          "start_frame": 417,
+          "duration_frames": 72,
+          "trim_start_frame": 288,
+          "trim_duration_frames": 72,
+          "opacity_milli": 1000,
+          "z_index": 0
+        }
+      ],
+      "audio_window_start_sample": 786000,
+      "audio_window_end_sample": 882000,
+      "audio_spans": [
+        {
+          "track_id": "original-mix-CO-A3",
+          "audio_kind": "dialogue",
+          "asset_id": "CO-A3-original-mix",
+          "asset_sha256": "7bb88946466b0681a2d4d1b6f1f0303e3631a5574a51e919f557d248967ef4d7",
+          "start_sample": 500000,
+          "duration_samples": 334000,
+          "source_start_sample": 722000,
+          "source_duration_samples": 334000,
+          "gain_millidb": 0,
+          "fade_in_samples": 0,
+          "fade_out_samples": 0
+        },
+        {
+          "track_id": "missing-response-after-reveal",
+          "audio_kind": "bgm",
+          "asset_id": "two-passengers-missing-response-B",
+          "asset_sha256": "88585bd2a3a9d44680f1a1a2667145839fa5166363c36260d2963ed8bd05a425",
+          "start_sample": 706000,
+          "duration_samples": 272000,
+          "source_start_sample": 0,
+          "source_duration_samples": 272000,
+          "gain_millidb": -10000,
+          "fade_in_samples": 24000,
+          "fade_out_samples": 48000
+        },
+        {
+          "track_id": "original-mix-CO-TAIL",
+          "audio_kind": "dialogue",
+          "asset_id": "CO-TAIL-original-mix",
+          "asset_sha256": "7bb88946466b0681a2d4d1b6f1f0303e3631a5574a51e919f557d248967ef4d7",
+          "start_sample": 834000,
+          "duration_samples": 144000,
+          "source_start_sample": 576000,
+          "source_duration_samples": 144000,
+          "gain_millidb": 0,
+          "fade_in_samples": 0,
+          "fade_out_samples": 0
+        }
+      ]
+    }
+  ],
+  "junction_inventory_sha256": "aa19ee90b122be21147e8e5f4ecee0f227167d528fd46edc56c67391b4d0ca47",
+  "subject_hash": "7cda7b7e4e9bf4e4a04ec9d56a487cfc8d4d440d06ff7f59a971dcb3c10e4093"
+}

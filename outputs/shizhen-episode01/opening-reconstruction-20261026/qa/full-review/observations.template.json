@@ -1,0 +1,333 @@
+{
+  "evaluator_name": "pending",
+  "strength": "explicit_evaluator",
+  "observation": {
+    "contract_hash": "b9fcdf144d0bfb72079de70fd2a8f18f2aff14a0700b1bc9f24c6d731e18bb3c",
+    "review_request_content_hash": "77e54b0019b1646a9020e527969a682e9557be655ae80a49d587ae42c4c29445",
+    "viewing_mode": "sampled_frames",
+    "visual_frame_inventory": {
+      "duration_ms": 25667,
+      "frames": [
+        {
+          "timestamp_ms": 0,
+          "frame_sha256": "1b9249a38be5657652279c94af4e7850c7ec75a51dc354724ff31e28f3b26fec",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 4000,
+          "frame_sha256": "28b12bc47ae5615e36c8786feb89404a4488195182a14efa6bb2b7139c0a3b3d",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 5250,
+          "frame_sha256": "7929ced2f8e690f0db707d764c47ffb154f4b19dd8038ad628bc019ab054da3e",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 7000,
+          "frame_sha256": "4b9b8718553288ebc065750f2d48f94e9c52923ee0c18c46af2b6c3503b70454",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 8000,
+          "frame_sha256": "16f19407a076f0c0d5d97f98ee0e7d8cb1b11b8a8f4c1cc7e173bf52f8ddcbc9",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 12000,
+          "frame_sha256": "3330552a49f0582a8828a31bf04ec6b631799b8584abfddd15046b325189fc69",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 15500,
+          "frame_sha256": "7507aac6c7bdde3520cb95bde53e76a74553b37a1d4d92d72a5baf56693cd340",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 15667,
+          "frame_sha256": "0e280dce8aaa44a098f0a448eee1440d7b5dd5b7801ed1bb62e862700f51c1e3",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 18000,
+          "frame_sha256": "a87eefff312776c75c42feabd051ca9f6e84526f4a59e5944c5af6805f7210b9",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 19000,
+          "frame_sha256": "9b97ff476b988b2e218a65841fbaa8fa2dfbe47055087cd6b0dddcf1f3f787e6",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 19625,
+          "frame_sha256": "8c779603084356403d245f06317b641b39e763eb832a1e525640d09c1f36622c",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 19667,
+          "frame_sha256": "ef5168eaa26aac8b656b65e9602fb526096b6bbb6f2e330bb7f206b6d81f4560",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 20000,
+          "frame_sha256": "22fa4a5c71f8c08306b577d6845ee128088d647ee68ace9a032a28212d7934a0",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 21000,
+          "frame_sha256": "130a09f73206605ba89947e9b4c2a54dc37ccfeaaf50098fd6e466cecbe0baa6",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 22000,
+          "frame_sha256": "838701f0c065c16f4b0627f72a62192df402eb1b50fe45747f9ac932777d9b25",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 23000,
+          "frame_sha256": "990daad64eafa1bac85803cc72f5dd4b1d1eb6ba4af9bccc62d971d43da2d1e9",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 24500,
+          "frame_sha256": "5b2f2e252d90d923c19969ca1b31210d88bd531775e58cf84bb84043084b8647",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 25600,
+          "frame_sha256": "225497e1989a0f9569ffdc034f28fa65b5fe8f06900a9681ba9a671bc025c7ad",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        }
+      ]
+    },
+    "viewing_speed_milli": null,
+    "findings": [
+      {
+        "requirement_id": "source-review",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "references",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "originality",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "structure",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "ordinary-world",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "scale",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "emotion",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "relations",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "reveal-boundary",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "freedom",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "type",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "type-restraint",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "music",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "mix",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "reuse",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "skills",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "explore",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "timing",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "dynamic",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "missing",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "no-video-fee",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "no-template",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "art-review",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "visual.drama.typography",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "visual.drama.palette",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "visual.drama.layout",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "visual.drama.style",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      },
+      {
+        "requirement_id": "visual.drama.holistic",
+        "verdict": "not_evaluated",
+        "observation": "尚未评审；不得从抽帧成功推断通过。",
+        "visual_frames": []
+      }
+    ]
+  },
+  "junction_findings": [
+    {
+      "junction_id": "8d4ea3b874ff9e414c7dd46886d808b76ce28a99b7535d83b5230e568e9b915c",
+      "inventory_sha256": "0c2007245e6a87191a22c8646b617748b6e8b83b1a9126ce1d99f372bfe4eb41",
+      "edit_decision": null,
+      "edit_reason": "尚未评审；需记录剪辑决定和依据。",
+      "visual_verdict": "not_evaluated",
+      "visual_observation": "未评审；1x完整播放该接点，记录动作/画面有无重复、停顿或跳变。",
+      "audio_verdict": "not_evaluated",
+      "audio_observation": "未聆听；实际监听接点前后音频，记录有无叠音、截断或异常空隙。",
+      "audio_basis": "not_listened",
+      "audio_reason": null,
+      "viewing_mode": null,
+      "viewing_speed_milli": null
+    },
+    {
+      "junction_id": "31d52e24729d8ec3a213c41f46a3124267bc2cc7538d2b74d5e9b353be7bc19e",
+      "inventory_sha256": "0c2007245e6a87191a22c8646b617748b6e8b83b1a9126ce1d99f372bfe4eb41",
+      "edit_decision": null,
+      "edit_reason": "尚未评审；需记录剪辑决定和依据。",
+      "visual_verdict": "not_evaluated",
+      "visual_observation": "未评审；1x完整播放该接点，记录动作/画面有无重复、停顿或跳变。",
+      "audio_verdict": "not_evaluated",
+      "audio_observation": "未聆听；实际监听接点前后音频，记录有无叠音、截断或异常空隙。",
+      "audio_basis": "not_listened",
+      "audio_reason": null,
+      "viewing_mode": null,
+      "viewing_speed_milli": null
+    },
+    {
+      "junction_id": "8d0e98d01b60579f9f8178675c4e7091fa1bbd1b3720241aefe08d00f224360d",
+      "inventory_sha256": "0c2007245e6a87191a22c8646b617748b6e8b83b1a9126ce1d99f372bfe4eb41",
+      "edit_decision": null,
+      "edit_reason": "尚未评审；需记录剪辑决定和依据。",
+      "visual_verdict": "not_evaluated",
+      "visual_observation": "未评审；1x完整播放该接点，记录动作/画面有无重复、停顿或跳变。",
+      "audio_verdict": "not_evaluated",
+      "audio_observation": "未聆听；实际监听接点前后音频，记录有无叠音、截断或异常空隙。",
+      "audio_basis": "not_listened",
+      "audio_reason": null,
+      "viewing_mode": null,
+      "viewing_speed_milli": null
+    },
+    {
+      "junction_id": "7ebdf8e2a4be97cf880f4318633e0e61c4b8d63117cc45ec2067edb0edd770a5",
+      "inventory_sha256": "0c2007245e6a87191a22c8646b617748b6e8b83b1a9126ce1d99f372bfe4eb41",
+      "edit_decision": null,
+      "edit_reason": "尚未评审；需记录剪辑决定和依据。",
+      "visual_verdict": "not_evaluated",
+      "visual_observation": "未评审；1x完整播放该接点，记录动作/画面有无重复、停顿或跳变。",
+      "audio_verdict": "not_evaluated",
+      "audio_observation": "未聆听；实际监听接点前后音频，记录有无叠音、截断或异常空隙。",
+      "audio_basis": "not_listened",
+      "audio_reason": null,
+      "viewing_mode": null,
+      "viewing_speed_milli": null
+    }
+  ]
+}

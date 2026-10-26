@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"schema_version\": \"audio-understanding-evidence/1\",\n  \"source_sha256\": \"72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870\",\n  \"source_size_bytes\": 32158050,\n  \"audio_sha256\": \"87679f3aa32035d37494972d337129b1c941c46ef5a092ba75304401cc07f741\",\n  \"audio_size_bytes\": 4931662,\n  \"duration_seconds\": 25.685333333333332,\n  \"audio_start_seconds\": 0.0,\n  \"request_fingerprint\": \"c0ffd59fa355b40e479b52ab074a5c7fb29f1a8efe8e165dc4cbe6e3747a591f\",\n  \"requested_model_id\": \"gemini-3.8-flash\",\n  \"response_model_id\": \"gemini-3.8-flash\",\n  \"response_sha256\": \"699994155a09f28ed3c4c938adaa42d8b7986f0ce3dd1086653485e69e89e1bd\",\n  \"observations\": {\n    \"segments\": [],\n    \"voice_description\": \"not discernible\",\n    \"delivery_description\": \"not discernible\",\n    \"background_sounds\": [\n      \"gentle melancholic piano melody\",\n      \"quiet footsteps and floor movement sounds\",\n      \"ambient string and synth pads\"\n    ],\n    \"uncertainties\": []\n  },\n  \"proof_boundary\": \"analyzer observations; not QA/human/timing acceptance\",\n  \"media_path\": \"/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/opening-reconstruction-20261026/失帧-开场重构-动态预演-002.mp4\",\n  \"analysis_audio_derivation\": \"full_source_track_pcm_derivative\",\n  \"human_acceptance\": \"NOT_EVALUATED\"\n}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

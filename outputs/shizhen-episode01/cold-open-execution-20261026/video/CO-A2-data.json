@@ -1,0 +1,89 @@
+{
+  "predecessor_gate": "CO-A1-post-media-gate.json",
+  "historical_video_calls": 7,
+  "objective": "货车驶离，普通站棚里只剩一人；观众发现缺席，角色没有寻找反应",
+  "scene_image": "co-after-image",
+  "characters": [
+    {
+      "character_id": "luomin",
+      "name": "罗敏",
+      "identity": "普通夜班同事，正在等接车电话",
+      "appearance_bible": "同后态图短卷发、墨绿雨衣、左手手机左耳、黑包",
+      "reference_asset_ids": [
+        "co-after-image"
+      ]
+    }
+  ],
+  "images": [
+    {
+      "asset_id": "co-actual-truck-frame",
+      "node_id": "co-actual-truck-frame-node",
+      "resource_id": "co-actual-truck-frame-local-derived",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/cold-open-execution-20261026/art/CO-A1-terminal-frame-192.png",
+      "usage_license": "Original fictional project assets; exact video terminal frame or generated after-state, for authorized cold-open qualification",
+      "generated_source": {
+        "record_path": "art/CO-A1-terminal-frame-192.png.record.json",
+        "record_sha256": "63afaa9f65be1863d195460adbf2327461f46357fd3db708b164f4f60f31acb2",
+        "tool": {
+          "name": "ffmpeg-frame-extraction",
+          "version": "video-frame-import-v1"
+        }
+      }
+    },
+    {
+      "asset_id": "co-after-image",
+      "node_id": "co-after-image-node",
+      "resource_id": "co-after-image-local-derived",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/cold-open-execution-20261026/art/after-state-001.png",
+      "usage_license": "Original fictional project assets; exact video terminal frame or generated after-state, for authorized cold-open qualification",
+      "generated_source": {
+        "record_path": "art/after-state-001.png.record.json",
+        "record_sha256": "b16f6503e93e15a5784a3b6028b78c8416d54cdd5acc61f1ee6eb6362a9ab339",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    }
+  ],
+  "observations": {
+    "relationship": "同一空间恢复后，左侧明确为空，右侧罗敏自然等车，不记得、不寻找或惊恐。",
+    "action": "灰白货车从镜头近前景继续向右驶过，侧板横向运动，尾缘从左向右扫过并离开画面，逐渐揭开后方同一站棚和右侧独自候车的罗敏。她自然听电话，不看空位、不寻找、不惊恐。车辆不停、不进站、不开门，人物不下车或出入画面。车驶离后让空位和正常反应同时可读。",
+    "identity": "同后态图右侧罗敏、墨绿雨衣、黑包和左手手机左耳保持，不能多出人或包。",
+    "camera": "全程同一固定机位。车厢自然驶离后，同时看见左侧空位、站棚出口和右侧罗敏；无推拉、切镜、溶解或黑屏",
+    "performance": "罗敏平常听电话，眼神不向左找，不夸张反应，正常实时。",
+    "sound": "正常湿路货车声驶离，持续雨夜城市环境，无对白、音乐、惊吓或全局静音。",
+    "story-scope": "仅从遮挡揭出一人的后态，不展示人走开、上车或透明消失；不加新机制、片名、字幕或准确数字。",
+    "art": "保持同一原创成年3D国漫写实、同灯光和湿材质，不变真人照片或蜡脸。"
+  },
+  "paths": {
+    "relationship": [
+      "generation_intent.subject_action.progression"
+    ],
+    "action": [
+      "generation_intent.subject_action.progression"
+    ],
+    "identity": [
+      "generation_intent.identity_continuity.preservation"
+    ],
+    "camera": [
+      "generation_intent.camera_intent.framing_intent"
+    ],
+    "performance": [
+      "generation_intent.performance_intent"
+    ],
+    "sound": [
+      "generation_intent.ambience_intent.environment_bed",
+      "generation_intent.ambience_intent.foley_cues"
+    ],
+    "story-scope": [
+      "generation_intent.scene_continuity.state_constraints"
+    ],
+    "art": [
+      "generation_intent.visual_treatment.medium_look",
+      "generation_intent.visual_treatment.palette",
+      "generation_intent.visual_treatment.material_treatment",
+      "generation_intent.visual_treatment.prohibited_visual_drift"
+    ]
+  }
+}

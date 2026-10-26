@@ -1,0 +1,11 @@
+{
+  "source_sha256": "750326c44ba58ecd0093c52ff8c7337cb8942f4e3efd9bd61634d3cfe3b119cf",
+  "decoded_frames": 529,
+  "large_change_frame_index": [
+    [
+      361,
+      46.68
+    ]
+  ],
+  "method": "consecutive thumbnail RGB MAE, manual visual confirmation required"
+}

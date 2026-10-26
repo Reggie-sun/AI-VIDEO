@@ -1,0 +1,9 @@
+{
+  "consumed_at": "2026-10-25T22:02:42.093918+00:00",
+  "intent_sha256": "ddfe791c89d06620cf6103d328f523c560b8350f25bdc7d1ab34c58cbf183322",
+  "logical_music_request_number": 5,
+  "old_maximum": 4,
+  "new_finite_maximum": 5,
+  "new_task_remaining_after_this": 0,
+  "automatic_retries": 0
+}

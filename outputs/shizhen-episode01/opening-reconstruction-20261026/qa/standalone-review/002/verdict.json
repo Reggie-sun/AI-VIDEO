@@ -1,0 +1,45 @@
+{
+  "media": "outputs/shizhen-episode01/opening-narrative-integration-20261026/focus-002/失帧-两位-关键事件重剪-002.mp4",
+  "sha256": "f3c03c289bb770b209a355ffad5c59f732168d10d30553f249882c382a19faa9",
+  "frames": 442,
+  "duration_seconds": 18.416666666666668,
+  "scope": "standalone_event_edit_previs",
+  "display_decision": "REVIEW_READY_NOT_FINAL_ACCEPTANCE",
+  "parent_visual_review": "密集实际编码帧核对，002不再单帧露出站棚；原站位、后态时钟、片名空间已核对",
+  "independent_visual_review": {
+    "reviewer": "/root/opening_review",
+    "decision": "没有发现仍须阻止展示的已证实视觉问题；可交用户观看",
+    "observations": [
+      "7.667秒frame183→184仍全车厢，随后左缘逐步揭开",
+      "车尾后保留全景，11.458秒切近景",
+      "10.417秒位置与几何保持，轻微头肩手姿态重置仍在",
+      "后态03:17:11可辨，16.25秒片名进入左负空间"
+    ]
+  },
+  "remaining_limits": [
+    "宏观城市与真正微观镜头未完成",
+    "沿既有CG/生成素材剪辑，不证明最终真人摄影质量",
+    "同构图A2/A3有轻微头肩手动作接缝",
+    "没有人类原速完整听审"
+  ],
+  "audio_observation": {
+    "state": "MODEL_OBSERVED_HUMAN_NOT_EVALUATED",
+    "evidence": "outputs/shizhen-episode01/opening-narrative-integration-20261026/qa/focus-002-audio-result.json",
+    "source_sha256": "f3c03c289bb770b209a355ffad5c59f732168d10d30553f249882c382a19faa9",
+    "recognized_dialogue": [
+      "师傅，我们在站里，两位。",
+      "让他别急，路滑。",
+      "就你一位？",
+      "嗯，就我一个。"
+    ],
+    "delivery": "The dialogue is delivered casually and naturally with a relaxed pace, with pauses between exchanges.",
+    "limit": "未提及音乐或货车不证明它们不存在，也不证明音乐审美或接缝听感通过"
+  },
+  "artistic_acceptance": "NOT_EVALUATED",
+  "production_activation": false,
+  "publication": "NOT_PUBLISHED",
+  "new_paid_video_generation_calls": 0,
+  "project_local_mcp": "outputs/shizhen-episode01/opening-narrative-integration-20261026/qa/focus-002-mcp.json",
+  "browser_original_speed_evidence": "outputs/shizhen-episode01/opening-narrative-integration-20261026/qa/browser-playback-002.json",
+  "integrity_evidence": "outputs/shizhen-episode01/opening-narrative-integration-20261026/qa/final-integrity.json"
+}

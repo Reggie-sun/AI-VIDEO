@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"schema_version\": \"audio-understanding-evidence/1\",\n  \"source_sha256\": \"be7df8ab6e89bf446735de792c86a5a04dc702f637787491d8c54d8097610d46\",\n  \"source_size_bytes\": 8524972,\n  \"audio_sha256\": \"be7df8ab6e89bf446735de792c86a5a04dc702f637787491d8c54d8097610d46\",\n  \"audio_size_bytes\": 8524972,\n  \"duration_seconds\": 88.8,\n  \"audio_start_seconds\": 0.0,\n  \"request_fingerprint\": \"c95272d8c0e315e524e2df8b4687b76dcf72f406a50aa202795917ba1d12575d\",\n  \"requested_model_id\": \"gemini-3.8-flash\",\n  \"response_model_id\": \"gemini-3.8-flash\",\n  \"response_sha256\": \"28776a2413943382be70743af61d35719bf655cce748abef4895b404b41389c5\",\n  \"observations\": {\n    \"segments\": [],\n    \"voice_description\": \"not discernible\",\n    \"delivery_description\": \"not discernible\",\n    \"background_sounds\": [\n      \"gentle piano melody\",\n      \"orchestral string ensemble\",\n      \"ambient atmospheric synth pads\"\n    ],\n    \"uncertainties\": []\n  },\n  \"proof_boundary\": \"analyzer observations; not QA/human/timing acceptance\",\n  \"media_path\": \"/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/cold-open-execution-20261026/qa/music-B-analysis.wav\",\n  \"analysis_audio_derivation\": \"exact_pcm_wav\",\n  \"human_acceptance\": \"NOT_EVALUATED\"\n}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

@@ -1,0 +1,18 @@
+{
+  "recorded_at": "2026-10-25T21:12:28.463561+00:00",
+  "credits": {
+    "exit_code": 0,
+    "status": "success",
+    "error_code": null,
+    "data": {
+      "total_credits_left": 2500,
+      "monthly_usage": 0
+    }
+  },
+  "list": {
+    "exit_code": 0,
+    "status": "no_results",
+    "error_code": null,
+    "clips": []
+  }
+}

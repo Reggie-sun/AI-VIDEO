@@ -103,12 +103,13 @@ def test_h3_rejects_untimed_conversation_instead_of_silently_discarding_speech()
     assert "generation_intent.dialogue_intent.mode" in result.unsupported_field_paths
 
 
-def test_native_conversation_retains_turn_order_and_has_no_fixed_speech_window():
+@pytest.mark.parametrize("model_id", ["seedance_2.0_vip", "seedance_2.5"])
+def test_native_conversation_retains_turn_order_and_has_no_fixed_speech_window(model_id):
     from types import SimpleNamespace
     from ai_video.production._remote_video_native_prompt import compile_remote_video_prompt
 
     result = compile_remote_video_prompt(_untimed_conversation_requirement(),
-        provider_bound=SimpleNamespace(provider_kind="jimeng", model_id="seedance_2.5",
+        provider_bound=SimpleNamespace(provider_kind="jimeng", model_id=model_id,
                                        output_requirement=SimpleNamespace(native_audio=True)))
     assert result.outcome == "compiled"
     assert result.prompt_text.index("hero") < result.prompt_text.index("有人吗？")
@@ -118,7 +119,7 @@ def test_native_conversation_retains_turn_order_and_has_no_fixed_speech_window()
     assert "generation_intent.dialogue_intent.turns" in result.expressed_control_paths
 
 
-@pytest.mark.parametrize("kind,model", [("seedance", "seedance_2.5"), ("jimeng", "seedance_2.0_vip"), ("vidu", "q3")])
+@pytest.mark.parametrize("kind,model", [("seedance", "seedance_2.5"), ("jimeng", "unsupported_model"), ("vidu", "q3")])
 def test_native_conversation_refuses_unadapted_provider_or_model(kind, model):
     from types import SimpleNamespace
     from ai_video.production._remote_video_native_prompt import compile_remote_video_prompt
@@ -129,12 +130,13 @@ def test_native_conversation_refuses_unadapted_provider_or_model(kind, model):
     assert "generation_intent.dialogue_intent.mode" in result.unsupported_field_paths
 
 
+@pytest.mark.parametrize("model_id", ["seedance_2.0_vip", "seedance_2.5"])
 @pytest.mark.parametrize("fault", ("muted", "separate-voice", "missing-bound"))
-def test_native_conversation_cannot_discard_or_separate_untimed_speech(fault):
+def test_native_conversation_cannot_discard_or_separate_untimed_speech(fault, model_id):
     from types import SimpleNamespace
     from ai_video.production._remote_video_native_prompt import compile_remote_video_prompt
 
-    bound = SimpleNamespace(provider_kind="jimeng", model_id="seedance_2.5",
+    bound = SimpleNamespace(provider_kind="jimeng", model_id=model_id,
                             output_requirement=SimpleNamespace(native_audio=fault != "muted"))
     result = compile_remote_video_prompt(_untimed_conversation_requirement(),
         provider_bound=None if fault == "missing-bound" else bound,

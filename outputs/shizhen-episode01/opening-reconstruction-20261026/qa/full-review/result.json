@@ -1,0 +1,1046 @@
+{
+  "authority": "development_only",
+  "verdict": "not_evaluated",
+  "review_scope": "full_contract",
+  "goal_chain": "verified",
+  "production_acceptance": "not_evaluated",
+  "subject_hash": "77e54b0019b1646a9020e527969a682e9557be655ae80a49d587ae42c4c29445",
+  "video_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870",
+  "answers_sha256": "7c4fea1e1324991c5c59a82573397cfc8f945b4c0ca28049bf48f3ff85dd7f36",
+  "evaluator_name": "Codex Parent explicit evaluator plus independent native creative context",
+  "strength": "explicit_evaluator",
+  "findings": [
+    {
+      "requirement_id": "source-review",
+      "verdict": "not_evaluated",
+      "observation": "已核对C/海报/剧本/导演设计并检查S01-S03抽帧；原音乐真实身份已核验，完整人工聆听尚缺",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "references",
+      "verdict": "pass",
+      "observation": "研究三部片头的组织方法；真探/Severance有实际时间戳图像，Leftovers媒体受阻，依据创作方说明；边界见reference-study",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "originality",
+      "verdict": "pass",
+      "observation": "最终timeline只引用许可stock、原Shot、原音乐和公有领域雨声；未包含任何参考作品素材",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "structure",
+      "verdict": "not_evaluated",
+      "observation": "两人互看→实体遮挡→一人/空位在抽帧中可读；长遮挡仍容许普通离开解释，未获人类完整观感判断",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "ordinary-world",
+      "verdict": "pass",
+      "observation": "城市交通、候车互动、车身离开及女性继续电话在实际编码样本中成立；不宣称全城规则",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "scale",
+      "verdict": "not_evaluated",
+      "observation": "已有城市→道路→站棚→人物近景；真正原位玻璃微距缺素材，不能把胸上近景当作微观阶段完成",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "emotion",
+      "verdict": "not_evaluated",
+      "observation": "视觉关系比C更可比较，但最终悬疑强度需正常速度完整听看及用户判断",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "relations",
+      "verdict": "not_evaluated",
+      "observation": "候车前后构图有对应，后态约19.5–20.5s继续可读；不以样本代签完整观看体验",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "reveal-boundary",
+      "verdict": "pass",
+      "observation": "未引入妹妹、未来日期、林序身份、循环空间或全城同步异变",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "freedom",
+      "verdict": "pass",
+      "observation": "未再使用白底人形容器或水平线转场；复用雨夜素材建立前后关系",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "type",
+      "verdict": "not_evaluated",
+      "observation": "约22.75s后标题在玻璃负空间可读、不遮脸；是否成为影像艺术的一部分仍属整体观感",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "type-restraint",
+      "verdict": "pass",
+      "observation": "主要段落无叙事排字；片名只在后态成立后一次进入，无随机级联/闪烁",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "music",
+      "verdict": "pass",
+      "observation": "相同Suno B SHA与timeline source_start/source_duration核验，原速未重生成；不是新音乐替换原录音",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "mix",
+      "verdict": "not_evaluated",
+      "observation": "exact25.667s音频模型真实观察为忧郁钢琴、轻微脚步/地面声与弦乐合成器垫，无可辨人声；未清楚识别雨/车声，不据遗漏断言缺失，人工听感及匹配未验收",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "reuse",
+      "verdict": "pass",
+      "observation": "C所用A2/A3雨夜原素材及A1关系镜实际进入新timeline，原片及旧C未覆盖",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "skills",
+      "verdict": "pass",
+      "observation": "仅使用现有专业Skill与canonical renderer/committer；未开发新Skill或共享引擎",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "explore",
+      "verdict": "pass",
+      "observation": "比较城市关系缺席/照片关系缺席/连续建筑断裂三个机制，独立context复核后选择第一条并实际渲染",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "timing",
+      "verdict": "pass",
+      "observation": "镜长来自已有完整互动、遮挡和后态观察；R1失败接点修复后A3缩至6s，总时长25.667s，无冻结尾帧凑时长",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "dynamic",
+      "verdict": "pass",
+      "observation": "已渲染实际1080p24fps MP4，非静态海报；本项只证明动态预演交付，不证明最终艺术完成",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "missing",
+      "verdict": "pass",
+      "observation": "production-handoff包含CITY/ROAD/RELATION/ABSENCE/DETAIL的中文生成草案、参考职责、门槛与S01衔接缺口",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "no-video-fee",
+      "verdict": "pass",
+      "observation": "本任务新视频生成0次；无submit/permit或新图像/音乐生成；画面与审看页标明预演",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "no-template",
+      "verdict": "pass",
+      "observation": "样本中未见轮廓海报、粒子、Glitch或重复文字动画；保留真实视频运动与关系事件",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "art-review",
+      "verdict": "pass",
+      "observation": "技术检查与艺术判断明确分开；最终整体、人审与缺素材目标均保留NOT_EVALUATED",
+      "visual_frames": []
+    },
+    {
+      "requirement_id": "visual.drama.typography",
+      "verdict": "pass",
+      "observation": "22.75–25.5s可读失帧，实际字形无缺字、不挡脸，片名在事件后进入负空间",
+      "visual_frames": [
+        {
+          "timestamp_ms": 22000,
+          "frame_sha256": "838701f0c065c16f4b0627f72a62192df402eb1b50fe45747f9ac932777d9b25",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 23000,
+          "frame_sha256": "990daad64eafa1bac85803cc72f5dd4b1d1eb6ba4af9bccc62d971d43da2d1e9",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 24500,
+          "frame_sha256": "5b2f2e252d90d923c19969ca1b31210d88bd531775e58cf84bb84043084b8647",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 25600,
+          "frame_sha256": "225497e1989a0f9569ffdc034f28fa65b5fe8f06900a9681ba9a671bc025c7ad",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        }
+      ]
+    },
+    {
+      "requirement_id": "visual.drama.palette",
+      "verdict": "not_evaluated",
+      "observation": "夜色/暖灯关系可见；stock摄影与旧CG、地理和雨量未统一，正式摄影目标仍缺素材",
+      "visual_frames": [
+        {
+          "timestamp_ms": 0,
+          "frame_sha256": "1b9249a38be5657652279c94af4e7850c7ec75a51dc354724ff31e28f3b26fec",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 4000,
+          "frame_sha256": "28b12bc47ae5615e36c8786feb89404a4488195182a14efa6bb2b7139c0a3b3d",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 5250,
+          "frame_sha256": "7929ced2f8e690f0db707d764c47ffb154f4b19dd8038ad628bc019ab054da3e",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 7000,
+          "frame_sha256": "4b9b8718553288ebc065750f2d48f94e9c52923ee0c18c46af2b6c3503b70454",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 8000,
+          "frame_sha256": "16f19407a076f0c0d5d97f98ee0e7d8cb1b11b8a8f4c1cc7e173bf52f8ddcbc9",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 12000,
+          "frame_sha256": "3330552a49f0582a8828a31bf04ec6b631799b8584abfddd15046b325189fc69",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 15500,
+          "frame_sha256": "7507aac6c7bdde3520cb95bde53e76a74553b37a1d4d92d72a5baf56693cd340",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 15667,
+          "frame_sha256": "0e280dce8aaa44a098f0a448eee1440d7b5dd5b7801ed1bb62e862700f51c1e3",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 18000,
+          "frame_sha256": "a87eefff312776c75c42feabd051ca9f6e84526f4a59e5944c5af6805f7210b9",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 19000,
+          "frame_sha256": "9b97ff476b988b2e218a65841fbaa8fa2dfbe47055087cd6b0dddcf1f3f787e6",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 19625,
+          "frame_sha256": "8c779603084356403d245f06317b641b39e763eb832a1e525640d09c1f36622c",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 19667,
+          "frame_sha256": "ef5168eaa26aac8b656b65e9602fb526096b6bbb6f2e330bb7f206b6d81f4560",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 20000,
+          "frame_sha256": "22fa4a5c71f8c08306b577d6845ee128088d647ee68ace9a032a28212d7934a0",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 21000,
+          "frame_sha256": "130a09f73206605ba89947e9b4c2a54dc37ccfeaaf50098fd6e466cecbe0baa6",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 22000,
+          "frame_sha256": "838701f0c065c16f4b0627f72a62192df402eb1b50fe45747f9ac932777d9b25",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 23000,
+          "frame_sha256": "990daad64eafa1bac85803cc72f5dd4b1d1eb6ba4af9bccc62d971d43da2d1e9",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 24500,
+          "frame_sha256": "5b2f2e252d90d923c19969ca1b31210d88bd531775e58cf84bb84043084b8647",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 25600,
+          "frame_sha256": "225497e1989a0f9569ffdc034f28fa65b5fe8f06900a9681ba9a671bc025c7ad",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        }
+      ]
+    },
+    {
+      "requirement_id": "visual.drama.layout",
+      "verdict": "pass",
+      "observation": "前双人全景、后空位全景及女近景有可比较关系；无标题抢在事件前解释",
+      "visual_frames": [
+        {
+          "timestamp_ms": 0,
+          "frame_sha256": "1b9249a38be5657652279c94af4e7850c7ec75a51dc354724ff31e28f3b26fec",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 4000,
+          "frame_sha256": "28b12bc47ae5615e36c8786feb89404a4488195182a14efa6bb2b7139c0a3b3d",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 5250,
+          "frame_sha256": "7929ced2f8e690f0db707d764c47ffb154f4b19dd8038ad628bc019ab054da3e",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 7000,
+          "frame_sha256": "4b9b8718553288ebc065750f2d48f94e9c52923ee0c18c46af2b6c3503b70454",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 8000,
+          "frame_sha256": "16f19407a076f0c0d5d97f98ee0e7d8cb1b11b8a8f4c1cc7e173bf52f8ddcbc9",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 12000,
+          "frame_sha256": "3330552a49f0582a8828a31bf04ec6b631799b8584abfddd15046b325189fc69",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 15500,
+          "frame_sha256": "7507aac6c7bdde3520cb95bde53e76a74553b37a1d4d92d72a5baf56693cd340",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 15667,
+          "frame_sha256": "0e280dce8aaa44a098f0a448eee1440d7b5dd5b7801ed1bb62e862700f51c1e3",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 18000,
+          "frame_sha256": "a87eefff312776c75c42feabd051ca9f6e84526f4a59e5944c5af6805f7210b9",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 19000,
+          "frame_sha256": "9b97ff476b988b2e218a65841fbaa8fa2dfbe47055087cd6b0dddcf1f3f787e6",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 19625,
+          "frame_sha256": "8c779603084356403d245f06317b641b39e763eb832a1e525640d09c1f36622c",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 19667,
+          "frame_sha256": "ef5168eaa26aac8b656b65e9602fb526096b6bbb6f2e330bb7f206b6d81f4560",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 20000,
+          "frame_sha256": "22fa4a5c71f8c08306b577d6845ee128088d647ee68ace9a032a28212d7934a0",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 21000,
+          "frame_sha256": "130a09f73206605ba89947e9b4c2a54dc37ccfeaaf50098fd6e466cecbe0baa6",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 22000,
+          "frame_sha256": "838701f0c065c16f4b0627f72a62192df402eb1b50fe45747f9ac932777d9b25",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 23000,
+          "frame_sha256": "990daad64eafa1bac85803cc72f5dd4b1d1eb6ba4af9bccc62d971d43da2d1e9",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 24500,
+          "frame_sha256": "5b2f2e252d90d923c19969ca1b31210d88bd531775e58cf84bb84043084b8647",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 25600,
+          "frame_sha256": "225497e1989a0f9569ffdc034f28fa65b5fe8f06900a9681ba9a671bc025c7ad",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        }
+      ]
+    },
+    {
+      "requirement_id": "visual.drama.style",
+      "verdict": "pass",
+      "observation": "未见原作素材、身体残影、随机Glitch或循环空间；正式真人材质仍待替换",
+      "visual_frames": [
+        {
+          "timestamp_ms": 0,
+          "frame_sha256": "1b9249a38be5657652279c94af4e7850c7ec75a51dc354724ff31e28f3b26fec",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 4000,
+          "frame_sha256": "28b12bc47ae5615e36c8786feb89404a4488195182a14efa6bb2b7139c0a3b3d",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 5250,
+          "frame_sha256": "7929ced2f8e690f0db707d764c47ffb154f4b19dd8038ad628bc019ab054da3e",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 7000,
+          "frame_sha256": "4b9b8718553288ebc065750f2d48f94e9c52923ee0c18c46af2b6c3503b70454",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 8000,
+          "frame_sha256": "16f19407a076f0c0d5d97f98ee0e7d8cb1b11b8a8f4c1cc7e173bf52f8ddcbc9",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 12000,
+          "frame_sha256": "3330552a49f0582a8828a31bf04ec6b631799b8584abfddd15046b325189fc69",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 15500,
+          "frame_sha256": "7507aac6c7bdde3520cb95bde53e76a74553b37a1d4d92d72a5baf56693cd340",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 15667,
+          "frame_sha256": "0e280dce8aaa44a098f0a448eee1440d7b5dd5b7801ed1bb62e862700f51c1e3",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 18000,
+          "frame_sha256": "a87eefff312776c75c42feabd051ca9f6e84526f4a59e5944c5af6805f7210b9",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 19000,
+          "frame_sha256": "9b97ff476b988b2e218a65841fbaa8fa2dfbe47055087cd6b0dddcf1f3f787e6",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 19625,
+          "frame_sha256": "8c779603084356403d245f06317b641b39e763eb832a1e525640d09c1f36622c",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 19667,
+          "frame_sha256": "ef5168eaa26aac8b656b65e9602fb526096b6bbb6f2e330bb7f206b6d81f4560",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 20000,
+          "frame_sha256": "22fa4a5c71f8c08306b577d6845ee128088d647ee68ace9a032a28212d7934a0",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 21000,
+          "frame_sha256": "130a09f73206605ba89947e9b4c2a54dc37ccfeaaf50098fd6e466cecbe0baa6",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 22000,
+          "frame_sha256": "838701f0c065c16f4b0627f72a62192df402eb1b50fe45747f9ac932777d9b25",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 23000,
+          "frame_sha256": "990daad64eafa1bac85803cc72f5dd4b1d1eb6ba4af9bccc62d971d43da2d1e9",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 24500,
+          "frame_sha256": "5b2f2e252d90d923c19969ca1b31210d88bd531775e58cf84bb84043084b8647",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 25600,
+          "frame_sha256": "225497e1989a0f9569ffdc034f28fa65b5fe8f06900a9681ba9a671bc025c7ad",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        }
+      ]
+    },
+    {
+      "requirement_id": "visual.drama.holistic",
+      "verdict": "not_evaluated",
+      "observation": "仅有抽帧、1x播放器执行与模型音频观察，不能伪造human/full audiovisual viewing",
+      "visual_frames": [
+        {
+          "timestamp_ms": 0,
+          "frame_sha256": "1b9249a38be5657652279c94af4e7850c7ec75a51dc354724ff31e28f3b26fec",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 4000,
+          "frame_sha256": "28b12bc47ae5615e36c8786feb89404a4488195182a14efa6bb2b7139c0a3b3d",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 5250,
+          "frame_sha256": "7929ced2f8e690f0db707d764c47ffb154f4b19dd8038ad628bc019ab054da3e",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 7000,
+          "frame_sha256": "4b9b8718553288ebc065750f2d48f94e9c52923ee0c18c46af2b6c3503b70454",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 8000,
+          "frame_sha256": "16f19407a076f0c0d5d97f98ee0e7d8cb1b11b8a8f4c1cc7e173bf52f8ddcbc9",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 12000,
+          "frame_sha256": "3330552a49f0582a8828a31bf04ec6b631799b8584abfddd15046b325189fc69",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 15500,
+          "frame_sha256": "7507aac6c7bdde3520cb95bde53e76a74553b37a1d4d92d72a5baf56693cd340",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 15667,
+          "frame_sha256": "0e280dce8aaa44a098f0a448eee1440d7b5dd5b7801ed1bb62e862700f51c1e3",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 18000,
+          "frame_sha256": "a87eefff312776c75c42feabd051ca9f6e84526f4a59e5944c5af6805f7210b9",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 19000,
+          "frame_sha256": "9b97ff476b988b2e218a65841fbaa8fa2dfbe47055087cd6b0dddcf1f3f787e6",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 19625,
+          "frame_sha256": "8c779603084356403d245f06317b641b39e763eb832a1e525640d09c1f36622c",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 19667,
+          "frame_sha256": "ef5168eaa26aac8b656b65e9602fb526096b6bbb6f2e330bb7f206b6d81f4560",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 20000,
+          "frame_sha256": "22fa4a5c71f8c08306b577d6845ee128088d647ee68ace9a032a28212d7934a0",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 21000,
+          "frame_sha256": "130a09f73206605ba89947e9b4c2a54dc37ccfeaaf50098fd6e466cecbe0baa6",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 22000,
+          "frame_sha256": "838701f0c065c16f4b0627f72a62192df402eb1b50fe45747f9ac932777d9b25",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 23000,
+          "frame_sha256": "990daad64eafa1bac85803cc72f5dd4b1d1eb6ba4af9bccc62d971d43da2d1e9",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 24500,
+          "frame_sha256": "5b2f2e252d90d923c19969ca1b31210d88bd531775e58cf84bb84043084b8647",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        },
+        {
+          "timestamp_ms": 25600,
+          "frame_sha256": "225497e1989a0f9569ffdc034f28fa65b5fe8f06900a9681ba9a671bc025c7ad",
+          "render_output_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870"
+        }
+      ]
+    }
+  ],
+  "effective_requirements": [
+    {
+      "requirement_id": "source-review",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "not_evaluated_observation"
+      ]
+    },
+    {
+      "requirement_id": "references",
+      "verdict": "pass",
+      "evidence_gaps": []
+    },
+    {
+      "requirement_id": "originality",
+      "verdict": "pass",
+      "evidence_gaps": []
+    },
+    {
+      "requirement_id": "structure",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "invalid_human_proof",
+        "missing_observation"
+      ]
+    },
+    {
+      "requirement_id": "ordinary-world",
+      "verdict": "pass",
+      "evidence_gaps": []
+    },
+    {
+      "requirement_id": "scale",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "not_evaluated_observation"
+      ]
+    },
+    {
+      "requirement_id": "emotion",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "invalid_human_proof",
+        "missing_observation"
+      ]
+    },
+    {
+      "requirement_id": "relations",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "invalid_human_proof",
+        "missing_observation"
+      ]
+    },
+    {
+      "requirement_id": "reveal-boundary",
+      "verdict": "pass",
+      "evidence_gaps": []
+    },
+    {
+      "requirement_id": "freedom",
+      "verdict": "pass",
+      "evidence_gaps": []
+    },
+    {
+      "requirement_id": "type",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "invalid_human_proof",
+        "missing_observation"
+      ]
+    },
+    {
+      "requirement_id": "type-restraint",
+      "verdict": "pass",
+      "evidence_gaps": []
+    },
+    {
+      "requirement_id": "music",
+      "verdict": "pass",
+      "evidence_gaps": []
+    },
+    {
+      "requirement_id": "mix",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "invalid_human_proof",
+        "missing_observation"
+      ]
+    },
+    {
+      "requirement_id": "reuse",
+      "verdict": "pass",
+      "evidence_gaps": []
+    },
+    {
+      "requirement_id": "skills",
+      "verdict": "pass",
+      "evidence_gaps": []
+    },
+    {
+      "requirement_id": "explore",
+      "verdict": "pass",
+      "evidence_gaps": []
+    },
+    {
+      "requirement_id": "timing",
+      "verdict": "pass",
+      "evidence_gaps": []
+    },
+    {
+      "requirement_id": "dynamic",
+      "verdict": "pass",
+      "evidence_gaps": []
+    },
+    {
+      "requirement_id": "missing",
+      "verdict": "pass",
+      "evidence_gaps": []
+    },
+    {
+      "requirement_id": "no-video-fee",
+      "verdict": "pass",
+      "evidence_gaps": []
+    },
+    {
+      "requirement_id": "no-template",
+      "verdict": "pass",
+      "evidence_gaps": []
+    },
+    {
+      "requirement_id": "art-review",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "invalid_human_proof",
+        "missing_observation"
+      ]
+    },
+    {
+      "requirement_id": "visual.drama.typography",
+      "verdict": "pass",
+      "evidence_gaps": []
+    },
+    {
+      "requirement_id": "visual.drama.palette",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "not_evaluated_observation"
+      ]
+    },
+    {
+      "requirement_id": "visual.drama.layout",
+      "verdict": "pass",
+      "evidence_gaps": []
+    },
+    {
+      "requirement_id": "visual.drama.style",
+      "verdict": "pass",
+      "evidence_gaps": []
+    },
+    {
+      "requirement_id": "visual.drama.holistic",
+      "verdict": "not_evaluated",
+      "evidence_gaps": [
+        "invalid_human_proof",
+        "missing_observation"
+      ]
+    }
+  ],
+  "evidence_gaps": [
+    "normal_speed_human_playback_unverified",
+    "visual_pass_unverified",
+    "audio_not_listened",
+    "audio_not_evaluated"
+  ],
+  "junction_review": {
+    "verdict": "not_evaluated",
+    "evidence_gaps": [
+      "normal_speed_human_playback_unverified",
+      "visual_pass_unverified",
+      "audio_not_listened",
+      "audio_not_evaluated"
+    ],
+    "cuts": [
+      {
+        "junction_id": "8d4ea3b874ff9e414c7dd46886d808b76ce28a99b7535d83b5230e568e9b915c",
+        "from_shot_id": "CITY",
+        "to_shot_id": "ROAD",
+        "frame": 126,
+        "verdict": "not_evaluated",
+        "edit_decision": "retain_with_reason",
+        "edit_reason": "以道路灯带切近前景车辆，临时摄影源承担尺度收束；正式同街匹配仍缺素材",
+        "visual_verdict": "not_evaluated",
+        "visual_observation": "实际样本为航拍切道路车辆，没有字幕/淡化掩盖",
+        "audio_verdict": "not_evaluated",
+        "audio_observation": "实际模型观察覆盖完整mix但未逐刀评估；没有human实际监听，保留接点声音NOT_EVALUATED",
+        "audio_basis": "not_listened",
+        "audio_reason": "Native audio input unsupported this session; model observation is not human 1x listening",
+        "viewing_mode": "sampled_frames",
+        "viewing_speed_milli": null,
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "visual_pass_unverified",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ]
+      },
+      {
+        "junction_id": "31d52e24729d8ec3a213c41f46a3124267bc2cc7538d2b74d5e9b353be7bc19e",
+        "from_shot_id": "ROAD",
+        "to_shot_id": "CO-A1",
+        "frame": 192,
+        "verdict": "not_evaluated",
+        "edit_decision": "retain_with_reason",
+        "edit_reason": "车辆横向运动带入站棚全景，先建立两人互相注意",
+        "visual_verdict": "not_evaluated",
+        "visual_observation": "是明确景别切换；stock与CG材质差异作为预演限制披露",
+        "audio_verdict": "not_evaluated",
+        "audio_observation": "实际模型观察覆盖完整mix但未逐刀评估；没有human实际监听，保留接点声音NOT_EVALUATED",
+        "audio_basis": "not_listened",
+        "audio_reason": "Native audio input unsupported this session; model observation is not human 1x listening",
+        "viewing_mode": "sampled_frames",
+        "viewing_speed_milli": null,
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "visual_pass_unverified",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ]
+      },
+      {
+        "junction_id": "8d0e98d01b60579f9f8178675c4e7091fa1bbd1b3720241aefe08d00f224360d",
+        "from_shot_id": "CO-A1",
+        "to_shot_id": "CO-A2",
+        "frame": 376,
+        "verdict": "not_evaluated",
+        "edit_decision": "retain_with_reason",
+        "edit_reason": "切在实体车厢完整遮挡区，让前后空间可比较，不使用人体消失效果",
+        "visual_verdict": "not_evaluated",
+        "visual_observation": "车身运动后揭开一人；未见男子返回/遗留物",
+        "audio_verdict": "not_evaluated",
+        "audio_observation": "实际模型观察覆盖完整mix但未逐刀评估；没有human实际监听，保留接点声音NOT_EVALUATED",
+        "audio_basis": "not_listened",
+        "audio_reason": "Native audio input unsupported this session; model observation is not human 1x listening",
+        "viewing_mode": "sampled_frames",
+        "viewing_speed_milli": null,
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "visual_pass_unverified",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ]
+      },
+      {
+        "junction_id": "7ebdf8e2a4be97cf880f4318633e0e61c4b8d63117cc45ec2067edb0edd770a5",
+        "from_shot_id": "CO-A2",
+        "to_shot_id": "CO-A3",
+        "frame": 472,
+        "verdict": "not_evaluated",
+        "edit_decision": "retain_with_reason",
+        "edit_reason": "R1曾重复车尾，R2改到source14s车尾离开且女性已转头的位置，保留后态观察再切近景",
+        "visual_verdict": "not_evaluated",
+        "visual_observation": "19.625/19.667/20/21s样本未见车尾重现；女性身份、持电话手与同侧轴线保持",
+        "audio_verdict": "not_evaluated",
+        "audio_observation": "实际模型观察覆盖完整mix但未逐刀评估；没有human实际监听，保留接点声音NOT_EVALUATED",
+        "audio_basis": "not_listened",
+        "audio_reason": "Native audio input unsupported this session; model observation is not human 1x listening",
+        "viewing_mode": "sampled_frames",
+        "viewing_speed_milli": null,
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "visual_pass_unverified",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ]
+      }
+    ]
+  },
+  "completion_summary": {
+    "video_sha256": "72cb6125ac5afbfb5ac3e5915d38cb88ad0b4d28353fd2e01111c8182a1b9870",
+    "review_scope": "full_contract",
+    "goal_chain": "verified",
+    "viewing_mode": "sampled_frames",
+    "viewing_speed_milli": null,
+    "requirements_to_address": [
+      {
+        "requirement_id": "source-review",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "not_evaluated_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "structure",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "invalid_human_proof",
+          "missing_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "scale",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "not_evaluated_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "emotion",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "invalid_human_proof",
+          "missing_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "relations",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "invalid_human_proof",
+          "missing_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "type",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "invalid_human_proof",
+          "missing_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "mix",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "invalid_human_proof",
+          "missing_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "art-review",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "invalid_human_proof",
+          "missing_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "visual.drama.palette",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "not_evaluated_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "visual.drama.holistic",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "invalid_human_proof",
+          "missing_observation"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "junction.8d4ea3b874ff9e414c7dd46886d808b76ce28a99b7535d83b5230e568e9b915c",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "visual_pass_unverified",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "junction.31d52e24729d8ec3a213c41f46a3124267bc2cc7538d2b74d5e9b353be7bc19e",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "visual_pass_unverified",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "junction.8d0e98d01b60579f9f8178675c4e7091fa1bbd1b3720241aefe08d00f224360d",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "visual_pass_unverified",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "junction.7ebdf8e2a4be97cf880f4318633e0e61c4b8d63117cc45ec2067edb0edd770a5",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "visual_pass_unverified",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ],
+        "next_action": "evidence_repair"
+      }
+    ],
+    "evidence_gaps": [
+      "normal_speed_human_playback_unverified",
+      "visual_pass_unverified",
+      "audio_not_listened",
+      "audio_not_evaluated"
+    ],
+    "user_feedback": {
+      "assessment": "parent_review_required",
+      "source": {
+        "path": "creative/creative-input.txt",
+        "sha256": "b6b8723fdc02a38cb3b8ca20d757b564bd74211446e6fbc3e1a5b1283b57201a"
+      },
+      "note": "Parent 须核对有效用户反馈并披露未解决的拒绝；工具不判断用户是否撤回意见。"
+    },
+    "junctions_to_address": [
+      {
+        "requirement_id": "junction.8d4ea3b874ff9e414c7dd46886d808b76ce28a99b7535d83b5230e568e9b915c",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "visual_pass_unverified",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "junction.31d52e24729d8ec3a213c41f46a3124267bc2cc7538d2b74d5e9b353be7bc19e",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "visual_pass_unverified",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "junction.8d0e98d01b60579f9f8178675c4e7091fa1bbd1b3720241aefe08d00f224360d",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "visual_pass_unverified",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ],
+        "next_action": "evidence_repair"
+      },
+      {
+        "requirement_id": "junction.7ebdf8e2a4be97cf880f4318633e0e61c4b8d63117cc45ec2067edb0edd770a5",
+        "verdict": "not_evaluated",
+        "evidence_gaps": [
+          "normal_speed_human_playback_unverified",
+          "visual_pass_unverified",
+          "audio_not_listened",
+          "audio_not_evaluated"
+        ],
+        "next_action": "evidence_repair"
+      }
+    ]
+  },
+  "content_kind": "drama"
+}

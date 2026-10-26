@@ -1,0 +1,5 @@
+{
+  "ready": false,
+  "reason": "captcha_required",
+  "detail": "Suno 要求生成人机验证；请通过官方正常流程处理。本次没有提交，也不会自动求解验证码。"
+}

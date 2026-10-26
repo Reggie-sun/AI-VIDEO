@@ -1,0 +1,8 @@
+{
+  "old_mp4_sha256": "5ab3a929258db93606196ab537d89c795343899dba8616dbdd8905e55433e48a",
+  "new_mp4_sha256": "6fef54d95030713e2db18d4eb2692c4bd1640d5a36cdcdabd0cc94625e03ecd2",
+  "decoded_old_audio_hash": "SHA256=52e1613d305eff2b96ff5a0b61c118b1b5f3825bfc95181609b3ca7957633255",
+  "decoded_new_audio_hash": "SHA256=52e1613d305eff2b96ff5a0b61c118b1b5f3825bfc95181609b3ca7957633255",
+  "identical_encoded_mix_after_decode": true,
+  "scope": "audio preservation, not new human listening or artistic audiovisual acceptance"
+}
