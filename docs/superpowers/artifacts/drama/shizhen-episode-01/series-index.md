@@ -21,11 +21,11 @@
 
 | Document | Sole responsibility |
 | --- | --- |
-| [World Bible](world-bible.md) | W01–W12：底层现实、冲突、每日缺口、校正、保存、候选未来、出城与终止机制；16问的答案入口 |
-| [Ability Bible](ability-bible.md) | A01–A06：六能力的使用边界、累积代价、训练、合作、对抗、普通人的反制 |
+| [World Bible](world-bible.md) | W01–W15：底层现实、冲突、每日缺口、校正、保存、候选未来、出城与终止机制，V2三体系分工、帧债与失控成因；16问的答案入口 |
+| [Ability Bible](ability-bible.md) | A01–A06与P0–P5：六能力的使用边界、深度判据、独立成长、累积代价、训练、合作、对抗、普通人的反制 |
 | [Character Bible](character-bible.md) | 人物背景、知识、秘密、行动、关系、独立成长；既有身份仍以原剧本及当前制作 owner 为准 |
 | [Faction Bible](faction-bible.md) | 五种利益立场、资源、人员、组织分裂与具体行动 |
-| [Anomaly Bible](anomaly-bible.md) | N01–N08：后来生命及其他异常的危险、识别、局部生路和失败后果 |
+| [Anomaly Bible](anomaly-bible.md) | N01–N08与R1–R5：后来生命及其他异常的危险、评估、识别、局部生路、遗帧表现和失败后果 |
 | [Timeline](timeline.md) | 作者历史顺序、实际历史与候选段的时间关系；不是制作 ResolvedTimeline |
 | [Series Outline](series-outline.md) | 第一季定位、四段结构、季内闭合与配角终态；不规划后续季 |
 | [Season 1 Outline](season-01-outline.md) | 12集短季的完整因果、求生行动、损失、信息与伏笔回收 |
@@ -33,7 +33,7 @@
 | [Canon Review](canon-review.md) | 来源目录、批准粒度、现有连续性、历史方案与冲突审查 |
 | [Creative Decisions](creative-decisions.md) | V1全部输入对照、重大变更、开放选择、可持续性与交叉审查结果 |
 
-规则只在 World Bible 定义；能力只引用 W 编号，个案只引用 W/A 编号，分集只使用已定义规则。人物介绍、组织口号和故事里的研究结论不能自行增添例外。观众误解与组织谎言必须能由作者层既定真相反证。
+底层规则只在 World Bible 定义；P完整判据归Ability，R完整判据归Anomaly。能力引用W编号，个案引用W/A编号，分集只使用已定义规则。人物介绍、组织口号和故事里的研究结论不能自行增添例外。观众误解与组织谎言必须能由作者层既定真相反证。
 
 ## Existing Production And Style Boundary
 
@@ -50,3 +50,11 @@
 ## Naming Delivery
 
 用户后续指令“直接改命吧”按当前命名任务理解为直接改名：第一季开发正文已使用选定名，林序锁定。此授权只作用于称谓；备选名、命名来源推测及世界／能力／剧情提案不自动确认。命名依据见 [Naming Review](naming-review.md)，完整新旧名与备选见 [Naming Candidates](naming-candidates.md)，声音与作品检索见 [Naming Checks](naming-checks.md)。前轮series-bible-verification.json仅证明改名前快照，当前命名快照见 [Naming Verification](naming-verification.json)。
+
+## Ability And Hazard V2
+
+用户随后提供六阶／五级／帧债／遗帧方案，本轮已实质整合为 **PROPOSED CANON**，继续使用上一轮名称，不覆盖第一集。W13说明三套体系各问什么，W14定义代价与有限同源转移，W15定义失控后残留事件的条件；分类不是宇宙数值，不授权处决或牺牲。
+
+第一季林序从P0走到可核验的P2，E12仅一次有共同来源与外部支撑的P3类接应，失去老许的旧合作关系确认。六人各有独立成长，不要求都获得攻击或P5；R不与P配对，后来人的认知类型仍独立。完整取舍见 [V2 Decisions](creative-decisions.md#v2-integration-decisions)，当季落点见 [Progression Ledger](season-01-outline.md#season-one-v2-progression-ledger)。不新增未来季剧情、Provider调用或媒体替换。
+
+本轮文本核对身份见 [V2 Verification](v2-verification.json)。前轮命名／世界Bible核对JSON均保留历史身份，不证明这批V2字节或任何成片已被接受。

@@ -10,6 +10,14 @@
 
 阅读包含第一集全文、制作设计、原始brief、Director coverage与提示词，冷开场剧情／音乐／交接，相关计划与制作／反馈记录。对历史反馈优先打开保存的原话；缺少原对话时明确使用记录转述。本轮通过project-local video-analysis实际重读S01 HD-005与《两位》组合片抽帧；帧样本不等于全片原速观看或声音聆听。没有调用付费／remote识音，也没有重试任何旧UNKNOWN。
 
+## V2 Continuity Addendum
+
+P0–P5、R1–R5、帧债与遗帧是后续用户提出的待确认扩展。本轮只写开发文档，不改原第一集、冷开场、coverage、字幕与媒体；编号和名称不成为角色已知事实。林序第一集仍是亲历留忆、职业核查与普通自救，暗帧中的脸仍须原本存在。
+
+E05在本轮细分为P1主动读取，E06才有P2类当下门动作，替代前轮模糊的“可控小拼接”描述。E12条件性P3类接应只补充现有有限公共节点行动，仍是何淑兰／冯有年自主返回、赵明霞源耗散不能救回、高峥去向未定；没有把源已失者复活。E10遗帧属于新增收容段，不能倒推小程、高峥或所有异常都是能力者失控。
+
+等级记录不等于真实操作已被观察，更不等于场景已拍。当前V2文件身份见`v2-verification.json`；原`series-bible-verification.json`和`naming-verification.json`继续保存各自历史轮次身份，不能作为新稿的fresh proof。
+
 ## Source Register
 
 | Source | Role / current use | Authority limit |
