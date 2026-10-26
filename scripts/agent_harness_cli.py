@@ -38,7 +38,36 @@ def main(argv: Sequence[str] | None = None, *, harness) -> int:
     verify_parser.add_argument("--run-id")
     receipt_parser.add_argument("receipt", type=Path)
     receipt_parser.add_argument("--require-level", choices=("related", "full"))
+    for command in ("prepare-assembly-review", "verify-assembly"):
+        assembly = subparsers.add_parser(command, help="Bind existing media and per-cut review evidence; no Production acceptance.")
+        assembly.add_argument("--video", type=Path, required=True)
+        assembly.add_argument("--timeline", type=Path, required=True)
+        assembly.add_argument("--render-report", type=Path, required=True)
+        if command == "prepare-assembly-review":
+            assembly.add_argument("--output", type=Path, required=True)
+        else:
+            assembly.add_argument("--answers", type=Path)
     args = parser.parse_args(argv)
+
+    if args.command in {"prepare-assembly-review", "verify-assembly"}:
+        from scripts.agent_harness_assembly import prepare_assembly, verify_assembly
+
+        try:
+            paths = dict(video=args.video, timeline=args.timeline, render_report=args.render_report)
+            if args.command == "prepare-assembly-review":
+                template = prepare_assembly(**paths)
+                with args.output.open("x", encoding="utf-8") as stream:
+                    stream.write(json.dumps(template, ensure_ascii=False, indent=2) + "\n")
+                report = dict(verdict="not_evaluated", template=str(args.output),
+                    production_acceptance="NOT_EVALUATED")
+            else:
+                report = verify_assembly(**paths, answers=args.answers)
+        except (OSError, ValueError, KeyError):
+            print(json.dumps(dict(verdict="not_evaluated", error="assembly_review_input_invalid",
+                production_acceptance="NOT_EVALUATED")))
+            return 2
+        print(json.dumps(report, ensure_ascii=False, sort_keys=True, indent=2))
+        return 0 if args.command == "prepare-assembly-review" or report["verdict"] == "pass" else 1
 
     if args.command == "verify-receipt":
         receipt = json.loads(args.receipt.read_text(encoding="utf-8"))

@@ -5,6 +5,11 @@ description: "Use for AI-VIDEO Director review of selected source plans, or Dire
 
 # open-video — autonomous director skill
 
+> **Assembly delivery:** 拼接或剪辑后的连续片交付前，必须执行 Harness
+> `verify-assembly` 核对exact输出与每个接点的重复动作、状态连续性、节奏和声音证据。
+> 未通过不得称接点已验证；用户要求先看时如实交未验证审看片。
+> [命令、模板与证据边界](../../../docs/visual-quality-gate.md#assembly-harness-entry)
+
 > **AI-VIDEO routing:** Classify the task purpose before deciding whether to optimize raw creative input.
 > Selected-source reproduction uses source-preserving review; new creation or authorized optimization
 > uses Director design, even for one short clip. Missing project artifacts alone do not authorize redesign.

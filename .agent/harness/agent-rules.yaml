@@ -13,6 +13,10 @@ documents:
 
 # Only proof references; argv and changed-path ownership stay in policy.yaml.
 rules:
+  - id: assembled-media-junction-evidence
+    checks: [assembly_review_tests]
+    proof: offline_regression
+    remaining: verify-assembly reopens exact media/timeline/report and declared cut observations; tests cannot detect repeated actions in arbitrary videos or establish actual human playback or acceptance.
   - id: legacy-validate-resume
     checks: [agent_rule_invariants, cli_config_tests, legacy_runtime_tests]
     proof: offline_regression

@@ -60,6 +60,24 @@ class JunctionInventory(StrictModel):
     audio_spans: tuple[JunctionAudioSpan, ...]
 
 
+class JunctionActionObservation(StrictModel):
+    verdict: Literal["pass", "fail", "not_evaluated"]
+    observation: str = Field(min_length=1)
+
+    @field_validator("observation")
+    @classmethod
+    def _nonblank(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("action observation must not be blank")
+        return value
+
+
+class JunctionActionReview(StrictModel):
+    repetition: JunctionActionObservation
+    state_continuity: JunctionActionObservation
+    pacing: JunctionActionObservation
+
+
 class JunctionFinding(StrictModel):
     """One evaluator's explicit decision and separate audio/visual observations."""
 
@@ -75,6 +93,7 @@ class JunctionFinding(StrictModel):
     audio_reason: str | None = None
     viewing_mode: Literal["sampled_frames", "full_playback"] | None = None
     viewing_speed_milli: int | None = Field(default=None, strict=True, gt=0)
+    action_review: JunctionActionReview | None = None
 
     @field_validator("edit_reason", "visual_observation", "audio_observation")
     @classmethod
@@ -140,7 +159,7 @@ class HyperFramesRenderReport(StrictModel):
     size_bytes: int = Field(strict=True, gt=0)
     measured: RenderMeasurement
     timeline_fingerprint: str = Field(pattern=_SHA256)
-    timeline_frames: int = Field(strict=True, gt=0)
+    timeline_frames: int | None = Field(default=None, strict=True, gt=0)
     checks: tuple[HyperFramesCheck, ...] = Field(min_length=2)
 
 
@@ -305,7 +324,7 @@ def validate_timeline_and_report(
         or report.sha256 != video_sha256
         or report.size_bytes != video_size_bytes
         or report.timeline_fingerprint != timeline.composition_fingerprint
-        or report.timeline_frames != timeline.total_frames
+        or report.timeline_frames is not None and report.timeline_frames != timeline.total_frames
         or measured.width != timeline.delivery_profile.width
         or measured.height != timeline.delivery_profile.height
         or rate != Fraction(timeline.delivery_profile.fps, 1)
@@ -348,6 +367,7 @@ def evaluate_junction_review(
     *,
     inventory_sha256: str,
     strength: EvidenceStrength,
+    require_action_review: bool = False,
 ) -> JunctionReviewResult:
     """Adjudicate only explicit per-cut answers; technical bindings never imply a pass."""
 
@@ -432,6 +452,17 @@ def evaluate_junction_review(
                     "audio_not_evaluated" if finding.audio_verdict == "not_evaluated"
                     else "audio_pass_unverified"
                 )
+            if require_action_review:
+                if finding.action_review is None:
+                    gaps.append("missing_action_review")
+                else:
+                    for name in ("repetition", "state_continuity", "pacing"):
+                        observation = getattr(finding.action_review, name)
+                        if observation.verdict == "fail":
+                            visual = "fail"
+                            gaps.append(f"action_{name}_failed")
+                        elif observation.verdict != "pass":
+                            gaps.append(f"action_{name}_not_evaluated")
         if decision == "trim" or visual == "fail" or audio == "fail":
             verdict = "fail"
         elif (

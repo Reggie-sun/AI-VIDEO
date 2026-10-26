@@ -242,6 +242,13 @@ packet 不被提升成完整作品验收，报告不自动检测叙事/音频或
 `tests/test_production_visual_quality.py`、`tests/test_visual_quality_report.py`，
 mandatory routing 由 Harness `visual_quality_tests` 独占。
 
+连续片开发侧交付前的 Harness `prepare-assembly-review` / `verify-assembly` 由
+`scripts/agent_harness_assembly.py` 适配既有 `junction_review.py`；仅重开当前MP4、唯一
+ResolvedTimeline、HyperFrames report与逐刀观察绑定，严格要求重复动作、状态连续性、节奏和声音证据。
+不生成媒体、推导第二时间线或写Product state；缺失/陈旧/FAIL/NOT_EVALUATED不能签接点PASS。
+它不自动识别动作或证明人实际观看，旧visual-review默认语义保留，具体用法归
+[Assembly Harness Entry](visual-quality-gate.md#assembly-harness-entry)。
+
 ## Creative Goal Development Binding
 
 `scripts/creative_goal_binding.py` 是 development-only 的只读引用检查 owner，显式加载既有

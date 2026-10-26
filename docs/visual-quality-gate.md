@@ -128,7 +128,48 @@ python -m scripts.visual_quality_report check \
 防止换片后旧 PASS 报告继续留下。报告是可重算的开发侧观察，不是受控 human
 host，也不具备签发 Production 验收的权限。
 
-## Verification
+## Assembly Harness Entry
+
+拼接或修剪连续片后、交付前，运行以下现有 Harness CLI 入口。它复用 `junction_review.py`
+从唯一 `ResolvedTimeline` 推导全部相邻Shot接点（包括未标transition的硬切），不新增时间线或验收状态。
+
+```bash
+python -m scripts.agent_harness prepare-assembly-review \
+  --video /absolute/path/rendered.mp4 \
+  --timeline /absolute/path/resolved-timeline.json \
+  --render-report /absolute/path/render-receipt.json \
+  --output /absolute/path/new-observations.json
+
+python -m scripts.agent_harness verify-assembly \
+  --video /absolute/path/rendered.mp4 \
+  --timeline /absolute/path/resolved-timeline.json \
+  --render-report /absolute/path/render-receipt.json \
+  --answers /absolute/path/observations.json
+```
+
+`prepare-assembly-review` 只生成默认全部NOT_EVALUATED的待填模板，独占创建文件且不覆盖旧文件；
+不能把该命令退出0当成验证通过。逐刀检查前后完整行动与回应，不能只看切点一帧；
+`action_review` 明确记录 `repetition`（动作是否无意重复）、`state_continuity`（持物、接触支撑、
+视线与动作阶段）、`pacing`（停顿、速度与反应时机）的 verdict/observation；有意重演须说明叙事理由。
+同时保留原Gate的剪辑决定、画面、声音、实际观看速度与观察依据。重复动作、连续性或节奏项明确FAIL
+即阻断，其他证据缺失不掩盖已见FAIL；仅抽帧或未听声音不能签接点PASS。改剪辑后重渲染，
+新MP4、timeline、report和inventory均须重新绑定，旧记录不能直接用于新输出。
+
+`verify-assembly` 退出0只表示exact当前绑定和全部逐刀声明满足开发侧Gate；FAIL或NOT_EVALUATED退出1，
+无效输入/陈旧绑定退出2。输出绑定回答文件SHA、当前视频SHA及timeline/report原字节SHA；
+运行中变化也拒绝。report必须匹配选中的实际renderer输出路径，复制到交付目录的同bytes副本由SHA另核对。
+本地report未重复提供 `timeline_frames` 时，仍须由 `measured.duration_frames` 匹配时间线；显式矛盾拒绝。
+
+这不是视觉模型，不能自动识别任意影片中的重复扫码，也不能证明填写者确实看过/听过；
+继续沿原Gate验证正常速度人工观看及声音声明，不自动填human，不新设用户审批流程。
+它不运行生成、解码/抽帧或远程分析，不写Production state，不授予QA接受、发布或下一镜提交。
+用户明确要求先看时可交标明未验证的审看片，验证结果必须如实披露；未通过不得称“接点已验收”。
+这项入口是Agent交付前的必做检查，Harness不拦截任意shell或文件复制。
+
+`assembly_review_tests` 验证该CLI与旧接点owner的正反例；单镜或同Shot内部镜头仍需原速审看，
+Shot级inventory不自动发现生成视频内部的所有摄影切镜。
+
+## Regression Checks
 
 `python -m pytest -p no:cacheprovider tests/test_production_visual_quality.py
 tests/test_visual_quality_report.py -q` 验证逐项阻断、真实 committer/strict reopen、

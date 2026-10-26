@@ -94,6 +94,10 @@ fallback_check_ids:
   - task_architecture_gate
 
 checks:
+  assembly_review_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_agent_harness_assembly.py, tests/test_junction_review_gate.py, -q]
+    cwd: .
+    description: Verify exact assembled-media bindings and mandatory per-cut repetition, state, pacing and audio evidence; no automatic semantic detection or Product acceptance.
   seedream_image_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_seedream_remote_image.py, tests/test_grok_remote_image_lifecycle.py, tests/test_image_candidate_frontier.py, tests/test_remote_image_materialization.py, -q]
     cwd: .
@@ -430,6 +434,7 @@ checks:
     execution_priority: 30
     covers_check_ids:
       - agent_rule_invariants
+      - assembly_review_tests
       - visual_quality_tests
       - creative_goal_binding_tests
       - canvas_reference_packet_tests
@@ -503,6 +508,12 @@ checks:
     description: Report repository health against the version-controlled architecture baseline.
 
 categories:
+  assembly_review:
+    patterns:
+      - scripts/agent_harness_assembly.py
+      - tests/test_agent_harness_assembly.py
+    focused_check_ids: [assembly_review_tests]
+    check_ids: [assembly_review_tests, visual_quality_tests, harness_tests]
   grok_media_provider:
     patterns:
       - src/ai_video/production/grok*.py
