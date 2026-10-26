@@ -1,0 +1,37 @@
+{
+  "status": "STATIC_REVIEWED_CANDIDATE",
+  "artifact": "referces/shizhen/lin-xu/expanded-20261027/boards/lin-xu-identity-board-v2.png",
+  "sha256": "4e1cb3e98b83c50659dffad669c92f9cd0365ee59f775f8d35827aa65296b746",
+  "bytes": 5318330,
+  "width": 3200,
+  "height": 2048,
+  "actual_verification": {
+    "png_decode": true,
+    "all_7_input_hashes": true,
+    "html_local_links": true,
+    "layout_hash": true,
+    "repaired_back_original_copy_hash": true,
+    "visual_full_body_heads_and_feet_complete": true,
+    "visual_face_angles_complete": true,
+    "visual_no_panel_overlap": true,
+    "visual_horizontal_back_yoke_consistent": true
+  },
+  "purpose": "character identity reference board",
+  "limits": [
+    "Trousers/shoes and complete back construction remain supplementary design",
+    "Cuff detail is enlarged from existing full-body photo; source detail resolution is limited",
+    "Human acceptance and actual downstream model consumption NOT_EVALUATED"
+  ],
+  "provider_generation_calls_this_continuation": 1,
+  "provider_generation_outcome_this_continuation": "KNOWN_RETURNED_BACK_REPAIR",
+  "provider_retry_of_unknown": 0,
+  "cost": "NOT_EXPOSED",
+  "historical_unknowns_preserved": 4,
+  "production_state_mutation": false,
+  "publication": "PNG local only; source layout and provenance tracked in Git",
+  "engineering_harness": "NOT_EVALUATED: image archive metadata has no focused module mapping; no runtime code changed",
+  "native_review": {
+    "decision": "NATIVE_REVIEW_NOT_REQUIRED",
+    "basis": "Reversible advisory assets and static document rendering only; no runtime or Production lifecycle changes"
+  }
+}

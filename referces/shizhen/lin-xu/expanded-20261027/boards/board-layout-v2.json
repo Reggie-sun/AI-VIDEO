@@ -1,0 +1,129 @@
+{
+  "operation": "render_existing_photos_as_reference_document",
+  "renderer": "local headless Google Chrome screenshot of fixed HTML/CSS/SVG layout",
+  "output": "boards/lin-xu-identity-board-v2.png",
+  "width": 3200,
+  "height": 2048,
+  "inputs": [
+    {
+      "path": "images/01-front-portrait.png",
+      "sha256": "62889df9d13375f5c18c2c90e142196957fd3c9ed98edbd3d0a1d839aaa3a006"
+    },
+    {
+      "path": "images/02-left-three-quarter.png",
+      "sha256": "d35e15e9632382a9ba03ac1b9e11a047c8aa7b8288a52b481bd2802145cca2af"
+    },
+    {
+      "path": "images/03-right-three-quarter.png",
+      "sha256": "18a6495fa7ab1b76e5436ced8a3a31e9052900f40245e049de338f4fdc09bc7c"
+    },
+    {
+      "path": "images/05-right-profile.png",
+      "sha256": "b6ac82b211b0af19637f7e756bf18b6fb7b586b03403564c7a9c1f6d699a7cb2"
+    },
+    {
+      "path": "images/07-full-body-front.png",
+      "sha256": "f2dbe24c7deb56bb5faf1e0267176f01ffe8e72bba12e87264060b7502b4bd4a"
+    },
+    {
+      "path": "images/08-full-body-side.png",
+      "sha256": "db6ccf3a71789e1e21a253913a571e3ac72d07ac9fa7138939c30c2d8d3e8be1"
+    },
+    {
+      "path": "images/09-full-body-back-r2.png",
+      "sha256": "ce7fab81cfe7b24e6ebb3403fa23a4ad10da0926cacb592457d7d1fe780cbb5b"
+    }
+  ],
+  "layout_source_sha256": "6c9df698120bf8818044c3395aa76bec34a62611f1e4106b28dc5a450923a34f",
+  "body_views": [
+    [
+      "07-full-body-front.png",
+      "正面",
+      "FRONT"
+    ],
+    [
+      "08-full-body-side.png",
+      "侧面",
+      "SIDE"
+    ],
+    [
+      "09-full-body-back-r2.png",
+      "背面",
+      "BACK"
+    ]
+  ],
+  "face_views": [
+    [
+      "01-front-portrait.png",
+      "正脸",
+      "FRONT FACE"
+    ],
+    [
+      "02-left-three-quarter.png",
+      "左向 45°",
+      "LEFT 3/4"
+    ],
+    [
+      "03-right-three-quarter.png",
+      "右向 45°",
+      "RIGHT 3/4"
+    ],
+    [
+      "05-right-profile.png",
+      "右向 90°",
+      "PROFILE"
+    ]
+  ],
+  "detail_viewboxes": [
+    [
+      "01-front-portrait.png",
+      "发型",
+      "HAIR",
+      [
+        160,
+        50,
+        730,
+        250
+      ]
+    ],
+    [
+      "01-front-portrait.png",
+      "衣领与内搭",
+      "COLLAR",
+      [
+        170,
+        930,
+        680,
+        240
+      ]
+    ],
+    [
+      "07-full-body-front.png",
+      "袖口",
+      "CUFF",
+      [
+        600,
+        650,
+        180,
+        140
+      ]
+    ],
+    [
+      "07-full-body-front.png",
+      "鞋型",
+      "SHOES",
+      [
+        330,
+        1320,
+        360,
+        160
+      ]
+    ]
+  ],
+  "body_display": "Uniform photo scaling; horizontal empty-background crop only; no person or body-part crop intended",
+  "face_display": "Uniform scale and top-aligned framing; visible upper-body photo extended beneath panel crop",
+  "prior_board_generation_unknown_preserved": true,
+  "production_import": "NOT_PERFORMED",
+  "human_acceptance": "NOT_EVALUATED",
+  "detail_display": "SVG source viewbox, xMidYMid slice into detail panel; exact source image remains unchanged"
+}

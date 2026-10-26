@@ -1,0 +1,37 @@
+{
+  "status": "STATIC_REVIEWED_CANDIDATE",
+  "reason": "Known jacket panel mismatch in returned image09; user requested continuation and consolidated board",
+  "target": "images/09-full-body-back.png",
+  "generation_call_limit": 1,
+  "retry_limit": 0,
+  "inputs": [
+    {
+      "path": "referces/shizhen/lin-xu/expanded-20261027/images/09-full-body-back.png",
+      "sha256": "a00756d8ad8ce2a8667a6c470ef19fe9ef7f8f329c92c6369a92195c7b8eec6a"
+    },
+    {
+      "path": "referces/shizhen/lin-xu/expanded-20261027/images/06-rear-head-shoulders.png",
+      "sha256": "e2addf89a5a57ea7523a1a24c95ece05d66e786d8234618b8a014276ff546bb7"
+    },
+    {
+      "path": "referces/shizhen/lin-xu/expanded-20261027/images/07-full-body-front.png",
+      "sha256": "f2dbe24c7deb56bb5faf1e0267176f01ffe8e72bba12e87264060b7502b4bd4a"
+    }
+  ],
+  "prior_unknowns_preserved": true,
+  "production_state_mutation": false,
+  "human_acceptance": "NOT_EVALUATED",
+  "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-a4d601f5-5d35-4e2e-8e20-1177cce8ddc9.png",
+  "output": "referces/shizhen/lin-xu/expanded-20261027/images/09-full-body-back-r2.png",
+  "sha256": "ce7fab81cfe7b24e6ebb3403fa23a4ad10da0926cacb592457d7d1fe780cbb5b",
+  "width": 1024,
+  "height": 1536,
+  "actual_generation_calls": 1,
+  "actual_cost": "NOT_EXPOSED",
+  "review": {
+    "garment": "Horizontal rear yoke present; central vertical seam removed; matches source06 panel arrangement",
+    "pose": "Full head and both shoes retained; rear standing pose retained",
+    "human_acceptance": "NOT_EVALUATED",
+    "limitation": "Complete rear construction and trousers/shoes remain supplementary design"
+  }
+}
