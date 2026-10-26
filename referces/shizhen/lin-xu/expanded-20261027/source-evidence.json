@@ -1,0 +1,90 @@
+[
+  {
+    "shot": "S04",
+    "video": "outputs/shizhen-episode01/失帧-第一集-S04-接点剪辑修正版-1080p-9.875秒-原声.mp4",
+    "video_sha256": "e40d40218902300f5bde4c9365fbc5a09a06e5e893f97378f1f917b182125fa4",
+    "requested_timestamp_seconds": 1.0,
+    "frame": "referces/shizhen/lin-xu/expanded-20261027/source-frames/S04-01.0s.png",
+    "frame_sha256": "9358e2237f84741fbda67674d5425d57052f826df694b203d89650d4fb5f8648",
+    "derivation": "ffmpeg decoded source frame, no resize/crop/retouch",
+    "role": "on-screen identity, hair and wardrobe only; exclude background and gesture inheritance",
+    "bound_for_generation": true
+  },
+  {
+    "shot": "S04",
+    "video": "outputs/shizhen-episode01/失帧-第一集-S04-接点剪辑修正版-1080p-9.875秒-原声.mp4",
+    "video_sha256": "e40d40218902300f5bde4c9365fbc5a09a06e5e893f97378f1f917b182125fa4",
+    "requested_timestamp_seconds": 4.0,
+    "frame": "referces/shizhen/lin-xu/expanded-20261027/source-frames/S04-04.0s.png",
+    "frame_sha256": "ecc7baced053afeb7fbf73afcd34717db1150b65a12232b4856a0465c6cb0c49",
+    "derivation": "ffmpeg decoded source frame, no resize/crop/retouch",
+    "role": "on-screen identity, hair and wardrobe only; exclude background and gesture inheritance",
+    "bound_for_generation": false
+  },
+  {
+    "shot": "S04",
+    "video": "outputs/shizhen-episode01/失帧-第一集-S04-接点剪辑修正版-1080p-9.875秒-原声.mp4",
+    "video_sha256": "e40d40218902300f5bde4c9365fbc5a09a06e5e893f97378f1f917b182125fa4",
+    "requested_timestamp_seconds": 8.0,
+    "frame": "referces/shizhen/lin-xu/expanded-20261027/source-frames/S04-08.0s.png",
+    "frame_sha256": "b8a89ff5c8978287b933a13a76dcc545c6e9a0db37a747a324349401dff556b9",
+    "derivation": "ffmpeg decoded source frame, no resize/crop/retouch",
+    "role": "on-screen identity, hair and wardrobe only; exclude background and gesture inheritance",
+    "bound_for_generation": true
+  },
+  {
+    "shot": "S01",
+    "video": "outputs/shizhen-episode01/失帧-第一集-S01-真人版-1080p原片-16秒-006.mp4",
+    "video_sha256": "27b065ee05b87622265b76484f98cd4390110d375256f26fe304781993f83252",
+    "requested_timestamp_seconds": 3.0,
+    "frame": "referces/shizhen/lin-xu/expanded-20261027/source-frames/S01-03.0s.png",
+    "frame_sha256": "8bc54b34a0233af1fcd9a31d2500f5265fbec9d80a58f2777c758f34c0dfcc5e",
+    "derivation": "ffmpeg decoded source frame, no resize/crop/retouch",
+    "role": "on-screen identity, hair and wardrobe only; exclude background and gesture inheritance",
+    "bound_for_generation": false
+  },
+  {
+    "shot": "S01",
+    "video": "outputs/shizhen-episode01/失帧-第一集-S01-真人版-1080p原片-16秒-006.mp4",
+    "video_sha256": "27b065ee05b87622265b76484f98cd4390110d375256f26fe304781993f83252",
+    "requested_timestamp_seconds": 12.0,
+    "frame": "referces/shizhen/lin-xu/expanded-20261027/source-frames/S01-12.0s.png",
+    "frame_sha256": "f23817c184ee4254c7394a61d3aaea4d65da7af897a3e08b5e62997f27408d14",
+    "derivation": "ffmpeg decoded source frame, no resize/crop/retouch",
+    "role": "on-screen identity, hair and wardrobe only; exclude background and gesture inheritance",
+    "bound_for_generation": false
+  },
+  {
+    "shot": "S01",
+    "video": "outputs/shizhen-episode01/失帧-第一集-S01-真人版-1080p原片-16秒-006.mp4",
+    "video_sha256": "27b065ee05b87622265b76484f98cd4390110d375256f26fe304781993f83252",
+    "requested_timestamp_seconds": 5.0,
+    "frame": "referces/shizhen/lin-xu/expanded-20261027/source-frames/S01-05.0s.png",
+    "frame_sha256": "1c8197efc1cdbad9c33a9a95cde05aceda0e0ea6bd7bf452dd4d86dff01be799",
+    "derivation": "ffmpeg decoded source frame, no resize/crop/retouch",
+    "role": "on-screen identity and wardrobe; no background inheritance",
+    "bound_for_generation": true
+  },
+  {
+    "shot": "S01",
+    "video": "outputs/shizhen-episode01/失帧-第一集-S01-真人版-1080p原片-16秒-006.mp4",
+    "video_sha256": "27b065ee05b87622265b76484f98cd4390110d375256f26fe304781993f83252",
+    "requested_timestamp_seconds": 6.0,
+    "frame": "referces/shizhen/lin-xu/expanded-20261027/source-frames/S01-06.0s.png",
+    "frame_sha256": "29aa76fb84b9ceac41b62fedae8d8896365140d3c4f0381091a9ce6ea8d27f46",
+    "derivation": "ffmpeg decoded source frame, no resize/crop/retouch",
+    "role": "on-screen identity and wardrobe; no background inheritance",
+    "bound_for_generation": false
+  },
+  {
+    "shot": "S01",
+    "video": "outputs/shizhen-episode01/失帧-第一集-S01-真人版-1080p原片-16秒-006.mp4",
+    "video_sha256": "27b065ee05b87622265b76484f98cd4390110d375256f26fe304781993f83252",
+    "requested_timestamp_seconds": 14.0,
+    "frame": "referces/shizhen/lin-xu/expanded-20261027/source-frames/S01-14.0s.png",
+    "frame_sha256": "cc025eb3981e8c85c72681d08bac6b99f54d8e0f35260ca6f2a33a1e63342fe4",
+    "derivation": "ffmpeg decoded source frame, no resize/crop/retouch",
+    "role": "on-screen identity and wardrobe; no background inheritance",
+    "bound_for_generation": false
+  }
+]

@@ -1,0 +1,79 @@
+{
+  "verification_kind": "local_image_files_and_provenance",
+  "generated_files_verified": 8,
+  "source_frames_verified": 8,
+  "checks": [
+    {
+      "id": "01-front-portrait",
+      "sha256": "62889df9d13375f5c18c2c90e142196957fd3c9ed98edbd3d0a1d839aaa3a006",
+      "saved_copy_exists": true,
+      "tool_original_exists": true,
+      "hash_match": true,
+      "decode_valid": true
+    },
+    {
+      "id": "02-left-three-quarter",
+      "sha256": "d35e15e9632382a9ba03ac1b9e11a047c8aa7b8288a52b481bd2802145cca2af",
+      "saved_copy_exists": true,
+      "tool_original_exists": true,
+      "hash_match": true,
+      "decode_valid": true
+    },
+    {
+      "id": "03-right-three-quarter",
+      "sha256": "18a6495fa7ab1b76e5436ced8a3a31e9052900f40245e049de338f4fdc09bc7c",
+      "saved_copy_exists": true,
+      "tool_original_exists": true,
+      "hash_match": true,
+      "decode_valid": true
+    },
+    {
+      "id": "05-right-profile",
+      "sha256": "b6ac82b211b0af19637f7e756bf18b6fb7b586b03403564c7a9c1f6d699a7cb2",
+      "saved_copy_exists": true,
+      "tool_original_exists": true,
+      "hash_match": true,
+      "decode_valid": true
+    },
+    {
+      "id": "06-rear-head-shoulders",
+      "sha256": "e2addf89a5a57ea7523a1a24c95ece05d66e786d8234618b8a014276ff546bb7",
+      "saved_copy_exists": true,
+      "tool_original_exists": true,
+      "hash_match": true,
+      "decode_valid": true
+    },
+    {
+      "id": "07-full-body-front",
+      "sha256": "f2dbe24c7deb56bb5faf1e0267176f01ffe8e72bba12e87264060b7502b4bd4a",
+      "saved_copy_exists": true,
+      "tool_original_exists": true,
+      "hash_match": true,
+      "decode_valid": true
+    },
+    {
+      "id": "08-full-body-side",
+      "sha256": "db6ccf3a71789e1e21a253913a571e3ac72d07ac9fa7138939c30c2d8d3e8be1",
+      "saved_copy_exists": true,
+      "tool_original_exists": true,
+      "hash_match": true,
+      "decode_valid": true
+    },
+    {
+      "id": "09-full-body-back",
+      "sha256": "a00756d8ad8ce2a8667a6c470ef19fe9ef7f8f329c92c6369a92195c7b8eec6a",
+      "saved_copy_exists": true,
+      "tool_original_exists": true,
+      "hash_match": true,
+      "decode_valid": true
+    }
+  ],
+  "manifest_sha256": "8c5d1f3a728f3f4570450c3a008808a407a5fd02ab4acdaef160fa172ea20d1a",
+  "human_acceptance": "NOT_EVALUATED",
+  "production_import": "NOT_PERFORMED",
+  "engineering_harness": "NOT_EVALUATED: archive metadata has no focused module mapping; no runtime code changed",
+  "native_review": {
+    "decision": "NATIVE_REVIEW_NOT_REQUIRED",
+    "basis": "Standalone advisory image assets and provenance only; no runtime, credentials, Production state or acceptance changes; local bytes and source bindings verified."
+  }
+}

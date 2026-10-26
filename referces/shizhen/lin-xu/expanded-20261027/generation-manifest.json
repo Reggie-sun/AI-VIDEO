@@ -1,0 +1,249 @@
+{
+  "project": "失帧",
+  "character": "林序",
+  "scope": "reference_asset_preparation_only",
+  "basis": "exact frames decoded from existing S01 live-action and user-accepted S04 edit; no early CG identity sheets bound",
+  "input_images": [
+    {
+      "path": "referces/shizhen/lin-xu/expanded-20261027/source-frames/S04-08.0s.png",
+      "sha256": "b8a89ff5c8978287b933a13a76dcc545c6e9a0db37a747a324349401dff556b9"
+    },
+    {
+      "path": "referces/shizhen/lin-xu/expanded-20261027/source-frames/S01-05.0s.png",
+      "sha256": "1c8197efc1cdbad9c33a9a95cde05aceda0e0ea6bd7bf452dd4d86dff01be799"
+    },
+    {
+      "path": "referces/shizhen/lin-xu/expanded-20261027/source-frames/S04-01.0s.png",
+      "sha256": "9358e2237f84741fbda67674d5425d57052f826df694b203d89650d4fb5f8648"
+    }
+  ],
+  "finite_bounds": {
+    "planned_generation_calls": 12,
+    "known_failure_repair_max": 2,
+    "unknown_retry": 0,
+    "unit": "each named single-image intent; independent views are not retries of a failed view"
+  },
+  "production_state_mutation": false,
+  "human_acceptance": "NOT_EVALUATED",
+  "assets": [
+    {
+      "id": "01-front-portrait",
+      "dimension": "脸部正面",
+      "prompt": "referces/shizhen/lin-xu/expanded-20261027/prompts/01-front-portrait.txt",
+      "planned_output": "referces/shizhen/lin-xu/expanded-20261027/images/01-front-portrait.png",
+      "status": "STATIC_REVIEWED_CANDIDATE",
+      "supplemental_unseen_design": false,
+      "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-6a88f3c5-3b62-4cd1-8e85-fe102659dfad.png",
+      "sha256": "62889df9d13375f5c18c2c90e142196957fd3c9ed98edbd3d0a1d839aaa3a006",
+      "width": 1024,
+      "height": 1536,
+      "review": {
+        "observation": "正面中性，头发完整，肤质/五官/夹克与成片锚点视觉相符",
+        "reviewer": "Codex visual inspection against source frames and outputs",
+        "human_acceptance": "NOT_EVALUATED",
+        "production_qualification": "NOT_EVALUATED"
+      },
+      "usage": "identity_reference_candidate",
+      "prompt_sha256": "27a6d15ab75eef8cc889a2f97545378bdf523882aea4465677b93be6b50c8ae5"
+    },
+    {
+      "id": "02-left-three-quarter",
+      "dimension": "左侧45度",
+      "prompt": "referces/shizhen/lin-xu/expanded-20261027/prompts/02-left-three-quarter.txt",
+      "planned_output": "referces/shizhen/lin-xu/expanded-20261027/images/02-left-three-quarter.png",
+      "status": "STATIC_REVIEWED_CANDIDATE",
+      "supplemental_unseen_design": false,
+      "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-1f466ded-507a-4be4-b28d-ccdd3b97c234.png",
+      "sha256": "d35e15e9632382a9ba03ac1b9e11a047c8aa7b8288a52b481bd2802145cca2af",
+      "width": 1024,
+      "height": 1536,
+      "review": {
+        "observation": "鼻尖朝画面左侧的45度中性单图，身份和上衣未见明显漂移",
+        "reviewer": "Codex visual inspection against source frames and outputs",
+        "human_acceptance": "NOT_EVALUATED",
+        "production_qualification": "NOT_EVALUATED"
+      },
+      "usage": "identity_reference_candidate",
+      "prompt_sha256": "0a55e08d616e7a2f2a92444dab929cf9f0d12993d08bc2fb484a18465a3cbedf"
+    },
+    {
+      "id": "03-right-three-quarter",
+      "dimension": "右侧45度",
+      "prompt": "referces/shizhen/lin-xu/expanded-20261027/prompts/03-right-three-quarter.txt",
+      "planned_output": "referces/shizhen/lin-xu/expanded-20261027/images/03-right-three-quarter.png",
+      "status": "STATIC_REVIEWED_CANDIDATE",
+      "supplemental_unseen_design": false,
+      "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-df186c79-8a8a-4a7b-9389-479780fdd4f9.png",
+      "sha256": "18a6495fa7ab1b76e5436ced8a3a31e9052900f40245e049de338f4fdc09bc7c",
+      "width": 1024,
+      "height": 1536,
+      "review": {
+        "observation": "鼻尖朝画面右侧的45度中性单图，身份和上衣未见明显漂移",
+        "reviewer": "Codex visual inspection against source frames and outputs",
+        "human_acceptance": "NOT_EVALUATED",
+        "production_qualification": "NOT_EVALUATED"
+      },
+      "usage": "identity_reference_candidate",
+      "prompt_sha256": "add9c9d45aa95df9f21ac2bd5238f4b2e9385900d9a2f3c7aa59d178ce4f4ee8"
+    },
+    {
+      "id": "04-left-profile",
+      "dimension": "左侧90度",
+      "prompt": "referces/shizhen/lin-xu/expanded-20261027/prompts/04-left-profile.txt",
+      "planned_output": "referces/shizhen/lin-xu/expanded-20261027/images/04-left-profile.png",
+      "status": "UNKNOWN",
+      "supplemental_unseen_design": false,
+      "error": "image generation failed: connection failed: error sending request",
+      "retry_count": 0,
+      "prompt_sha256": "fb4c7f5416e3cd11fdb774363dd95b98a4cd73cb97769601816f9737bb9e0521"
+    },
+    {
+      "id": "05-right-profile",
+      "dimension": "右侧90度",
+      "prompt": "referces/shizhen/lin-xu/expanded-20261027/prompts/05-right-profile.txt",
+      "planned_output": "referces/shizhen/lin-xu/expanded-20261027/images/05-right-profile.png",
+      "status": "STATIC_REVIEWED_CANDIDATE",
+      "supplemental_unseen_design": false,
+      "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-293ec890-3bdc-41e1-9547-ea07c13ede59.png",
+      "sha256": "b6ac82b211b0af19637f7e756bf18b6fb7b586b03403564c7a9c1f6d699a7cb2",
+      "width": 1024,
+      "height": 1536,
+      "review": {
+        "observation": "鼻尖朝画面右侧的严格侧面，近侧眼与侧脸轮廓清楚",
+        "reviewer": "Codex visual inspection against source frames and outputs",
+        "human_acceptance": "NOT_EVALUATED",
+        "production_qualification": "NOT_EVALUATED"
+      },
+      "usage": "identity_reference_candidate",
+      "prompt_sha256": "7d2c807cd68e1811be8d45569353442c800717750f2961a625e7eb5bdcf2d66f"
+    },
+    {
+      "id": "06-rear-head-shoulders",
+      "dimension": "后脑与肩背",
+      "prompt": "referces/shizhen/lin-xu/expanded-20261027/prompts/06-rear-head-shoulders.txt",
+      "planned_output": "referces/shizhen/lin-xu/expanded-20261027/images/06-rear-head-shoulders.png",
+      "status": "STATIC_REVIEWED_CANDIDATE",
+      "supplemental_unseen_design": true,
+      "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-f87130f3-6ca0-467d-8105-fa36d320732f.png",
+      "sha256": "e2addf89a5a57ea7523a1a24c95ece05d66e786d8234618b8a014276ff546bb7",
+      "width": 1024,
+      "height": 1536,
+      "review": {
+        "observation": "后脑/后颈/肩背，无扭头；完整后部发型与横向肩背裁片属补全候选",
+        "reviewer": "Codex visual inspection against source frames and outputs",
+        "human_acceptance": "NOT_EVALUATED",
+        "production_qualification": "NOT_EVALUATED"
+      },
+      "usage": "identity_reference_candidate",
+      "prompt_sha256": "fb81b27046af57bcdbede31009c5dfefd36f73c08c71f3339a2f8eb78c5ca547"
+    },
+    {
+      "id": "07-full-body-front",
+      "dimension": "全身正面比例",
+      "prompt": "referces/shizhen/lin-xu/expanded-20261027/prompts/07-full-body-front.txt",
+      "planned_output": "referces/shizhen/lin-xu/expanded-20261027/images/07-full-body-front.png",
+      "status": "STATIC_REVIEWED_CANDIDATE",
+      "supplemental_unseen_design": true,
+      "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-a5a5b43d-28de-4363-ae67-e90b1c08e994.png",
+      "sha256": "f2dbe24c7deb56bb5faf1e0267176f01ffe8e72bba12e87264060b7502b4bd4a",
+      "width": 1024,
+      "height": 1536,
+      "review": {
+        "observation": "正面全身、头脚完整、双手自然；裤鞋及精确全身比例为补全候选",
+        "reviewer": "Codex visual inspection against source frames and outputs",
+        "human_acceptance": "NOT_EVALUATED",
+        "production_qualification": "NOT_EVALUATED"
+      },
+      "usage": "identity_reference_candidate",
+      "prompt_sha256": "b0a019981bb872e5598f2bf19fea5ae2cd5bc4c07c70cb8c8f1367e5b4c15570"
+    },
+    {
+      "id": "08-full-body-side",
+      "dimension": "全身侧面比例",
+      "prompt": "referces/shizhen/lin-xu/expanded-20261027/prompts/08-full-body-side.txt",
+      "planned_output": "referces/shizhen/lin-xu/expanded-20261027/images/08-full-body-side.png",
+      "status": "STATIC_REVIEWED_CANDIDATE",
+      "supplemental_unseen_design": true,
+      "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-a35bd620-9bbe-4304-8882-88987043e974.png",
+      "sha256": "db6ccf3a71789e1e21a253913a571e3ac72d07ac9fa7138939c30c2d8d3e8be1",
+      "width": 1024,
+      "height": 1536,
+      "review": {
+        "observation": "左向侧面全身、头脚完整；裤鞋及精确全身比例为补全候选",
+        "reviewer": "Codex visual inspection against source frames and outputs",
+        "human_acceptance": "NOT_EVALUATED",
+        "production_qualification": "NOT_EVALUATED"
+      },
+      "usage": "identity_reference_candidate",
+      "prompt_sha256": "dfc8a862954a42617f82edeebc09ad592697d0c4c980796e343b9a290b66e7ba"
+    },
+    {
+      "id": "09-full-body-back",
+      "dimension": "全身背面比例",
+      "prompt": "referces/shizhen/lin-xu/expanded-20261027/prompts/09-full-body-back.txt",
+      "planned_output": "referces/shizhen/lin-xu/expanded-20261027/images/09-full-body-back.png",
+      "status": "KNOWN_STRUCTURE_MISMATCH",
+      "supplemental_unseen_design": true,
+      "original_output_path": "/home/reggie/.codex/generated_images/01a17a08-b2f7-7331-a8b6-79b65a1d3c2b/exec-b6390e06-ca30-4ce8-95fe-dbb7685fe011.png",
+      "sha256": "a00756d8ad8ce2a8667a6c470ef19fe9ef7f8f329c92c6369a92195c7b8eec6a",
+      "width": 1024,
+      "height": 1536,
+      "issue": "Back jacket has vertical central seam and lacks the horizontal shoulder yoke present in image06; do not bind both as exact garment structure.",
+      "review": {
+        "observation": "背面全身完整，但夹克为中间竖缝，缺少06的横向肩背裁片；待修，不作为一致服装结构参考",
+        "reviewer": "Codex visual inspection against source frames and outputs",
+        "human_acceptance": "NOT_EVALUATED",
+        "production_qualification": "NOT_EVALUATED"
+      },
+      "usage": "review_only_do_not_bind",
+      "prompt_sha256": "c685fa6532cacadfbbd64d8f914822dc209efc71a300e8cdd712fd164ff36812"
+    },
+    {
+      "id": "10-anxious-proof-close",
+      "dimension": "焦急求证表情",
+      "prompt": "referces/shizhen/lin-xu/expanded-20261027/prompts/10-anxious-proof-close.txt",
+      "planned_output": "referces/shizhen/lin-xu/expanded-20261027/images/10-anxious-proof-close.png",
+      "status": "UNKNOWN",
+      "supplemental_unseen_design": false,
+      "error": "image generation failed: network error: error sending request",
+      "retry_count": 0,
+      "prompt_sha256": "825c16cdf53e59536fcff8061ddb9d0b606f793abd24f9b552143974b51d505b"
+    },
+    {
+      "id": "11-restrained-fear-close",
+      "dimension": "压抑恐惧表情",
+      "prompt": "referces/shizhen/lin-xu/expanded-20261027/prompts/11-restrained-fear-close.txt",
+      "planned_output": "referces/shizhen/lin-xu/expanded-20261027/images/11-restrained-fear-close.png",
+      "status": "UNKNOWN",
+      "supplemental_unseen_design": false,
+      "error": "image generation failed: connection failed: error sending request",
+      "retry_count": 0,
+      "prompt_sha256": "09739c64f4e5a8f56bdecea5ad2e41f828b5c0c98070d07a687beb908ac28912"
+    },
+    {
+      "id": "12-right-hand-phone",
+      "dimension": "右手手机与站姿",
+      "prompt": "referces/shizhen/lin-xu/expanded-20261027/prompts/12-right-hand-phone.txt",
+      "planned_output": "referces/shizhen/lin-xu/expanded-20261027/images/12-right-hand-phone.png",
+      "status": "NOT_SUBMITTED",
+      "supplemental_unseen_design": false,
+      "reason": "Paused remaining remote generation after repeated transport failures; no retry of UNKNOWN intents.",
+      "prompt_sha256": "12d48e868d3c8766265debff417ad3e7f7ede0c4e2d9805d1faa0864b5613802"
+    }
+  ],
+  "summary": {
+    "tool": "image_gen.imagegen",
+    "actual_generation_calls": 11,
+    "returned_images": 8,
+    "static_reference_candidates": 7,
+    "known_structure_mismatch": 1,
+    "unknown_outcomes": 3,
+    "not_submitted": 1,
+    "automatic_retry_count": 0,
+    "repair_calls": 0,
+    "actual_cost": "NOT_EXPOSED; UNKNOWN calls may have incurred usage",
+    "human_acceptance": "NOT_EVALUATED",
+    "production_state_mutation": false,
+    "status": "PARTIAL_NETWORK_BLOCKED"
+  }
+}
