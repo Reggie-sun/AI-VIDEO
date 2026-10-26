@@ -53,6 +53,9 @@ for action-state images and clean keyframes. Assess and prepare missing referenc
 one complete opening image does not by itself cover contact, release, landing or reaction states.
 These specialists keep approved coverage and return assets to the existing authoring/Registry owners;
 they do not add a generation workflow or require a fixed image count.
+When preparing, reusing or handing off reference images, apply the shared
+[Reference Continuity Review](references/reference-continuity.md), including approved state changes,
+physical space versus screen direction, POV and prop relations, and review-only versus model-input images.
 
 For object handling, placement, transfer, loss of support or collision, apply
 [Physical Action Continuity](references/event-led-timing.md#physical-action-continuity)

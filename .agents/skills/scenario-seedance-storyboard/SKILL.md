@@ -15,6 +15,10 @@ references；来源固定在 [SOURCE.json](SOURCE.json)，保留 [LICENSE](LICEN
 
 ## Reference Preparation Before Video Authoring
 
+制作与复用参考时，沿 Director 的 [Reference Continuity Review](../open-video/references/reference-continuity.md)
+核对实际空间、视角、道具与动作状态；分清允许的剧情变化和意外漂移。其审看图/模型输入区分及结果记录
+同样适用于下列步骤，不增加独立审批状态或自动重生成规则。
+
 1. 对照前镜实际末态、approved Shot 和失败成片，区分已有、可复用及缺失的参考。
    单张开场能覆盖人物外观，不自动代表动作过程已有视觉依据；关键接触、支撑转换、释放、
    落点或反应不清楚时，先补相应状态图或适用的运动参考，不能只反复加长文字后提交。

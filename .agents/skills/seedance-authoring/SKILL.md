@@ -128,6 +128,8 @@ support、role cardinality 与 transport mapping 仍是 deterministic runtime fa
    [action-state/storyboard preparation](../scenario-seedance-storyboard/SKILL.md)，返回实际图片后
    再绑定。不得只给现有单图分配角色就假定参考充分；制图素材不等于实际视频输入，按当前
    首帧/首尾帧/全模态模式核验真正的素材列表与顺序，不以画布摆放或文字提及代替绑定。
+   复核上述参考制作 specialist 返回的连续性与输入适用性检查；将已观察的空间/姿态冲突和
+   审看标记污染返回对应 owner。本层不自行改剧情或自动重生成，不重复接管参考图审查。
 3. 来源保留任务输出封存原 prompt，按 `references/authoring-common.md` 的 Generation Input Boundary
    核对实际输入与差异；结构化 Shot 不自动授权扩写。仅已授权创作/优化才从 approved Shot 起草
    subject、visible action、scene、spatial relation、camera、lighting、audio intent、chronology 与

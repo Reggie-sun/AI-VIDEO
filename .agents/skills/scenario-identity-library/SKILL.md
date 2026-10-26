@@ -28,6 +28,9 @@ license: MIT
 
 ## Handoff And Exclusions
 
+交接前按共享 [Reference Continuity Review](../open-video/references/reference-continuity.md) 区分身份属性
+与不应迁移的姿态、背景、视角和注释；有标注的多视图表可供审看，但不自动成为干净的视频输入。
+
 动作状态与端点交给 [storyboard specialist](../scenario-seedance-storyboard/SKILL.md)；
 最终视频提示词和输入职责交给 [seedance-authoring](../seedance-authoring/SKILL.md)。
 Registry 独占素材身份，ProductionStateCommitter 独占生产写入，不建第二套 Scenario collection
