@@ -51,6 +51,11 @@ For object handling, placement, transfer, loss of support or collision, apply
 [Physical Action Continuity](references/event-led-timing.md#physical-action-continuity)
 before authoring, even when duration and generation grouping are unchanged.
 
+For editing or assembling footage, including approved sources, apply
+[Cut Relationships And Reused Footage](references/creative-completion.md#cut-relationships-and-reused-footage):
+establish a perceptible reason for the cut and review actual action continuity, including internal cuts;
+source approval and technically smooth playback do not approve the assembled sequence.
+
 For music spotting, thematic development, score prompts or music repair, read
 [Music Direction](references/music-direction.md). Codex acts as the existing Music Director;
 choose music from the narrative and actual performance before using a selected music tool.
