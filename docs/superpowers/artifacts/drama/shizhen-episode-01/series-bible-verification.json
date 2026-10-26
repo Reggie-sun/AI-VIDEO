@@ -1,0 +1,160 @@
+{
+  "schema": "shizhen-creative-document-check/1",
+  "authority": "text_and_structure_only",
+  "verification_level": "focused_document_checks",
+  "documents": [
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/series-index.md",
+      "sha256": "59d79a29fd860be160b23a7453afbf5fa989df0eb814fcff098dddfbef244c55",
+      "characters": 2519,
+      "lines": 46
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/world-bible.md",
+      "sha256": "cbac09fbba6bf6e2a2d7b56a07723f774fc8dae087d84e2e6643f949302c5e35",
+      "characters": 7067,
+      "lines": 146
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/ability-bible.md",
+      "sha256": "51d00dd6c6cc2b85ac23e4baec657c3c37772e90655d6b6dc196eea743815352",
+      "characters": 5869,
+      "lines": 119
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/character-bible.md",
+      "sha256": "89629813de358c4bdefd8f1d39b974decff88a465d88d5e34e47b511b4661c65",
+      "characters": 7105,
+      "lines": 129
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/faction-bible.md",
+      "sha256": "316bee465a01d8345a2bdc470813f8e44a392c08442e5edb00e4353f02c3b9f7",
+      "characters": 4509,
+      "lines": 98
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/anomaly-bible.md",
+      "sha256": "7a478bc1c3ef53d59ec49305f13770df9734f4f5fff68e419111b6a236d83001",
+      "characters": 4717,
+      "lines": 111
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/timeline.md",
+      "sha256": "03881775b7607d3c3dba9c5032fcce4eb2a70ad12b48f7c945b38f01c1b43f3e",
+      "characters": 3488,
+      "lines": 73
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/series-outline.md",
+      "sha256": "46b65111d162e2d2f31600163deb1d4eef22687755c65705acba0065e58fee5b",
+      "characters": 2251,
+      "lines": 52
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/season-01-outline.md",
+      "sha256": "dc3c3cd7903cae64de2040a4a9564fc33c28fc846af9889f08999bb65caec570",
+      "characters": 7608,
+      "lines": 180
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/episode-01-survival-revision.md",
+      "sha256": "5506f6a7f1b47288d15cfc9684307fb065c9eac364e9d8255924f850c8280d53",
+      "characters": 3065,
+      "lines": 93
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/canon-review.md",
+      "sha256": "5e0a93303e0869d71ca5739e596ae3c8ed7e879f66b906fd3ad78f0a033b1597",
+      "characters": 6083,
+      "lines": 85
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/creative-decisions.md",
+      "sha256": "564995a97d533c1db6499ae0bf45627c15fe50b681f114a1f66398fcca217688",
+      "characters": 7227,
+      "lines": 119
+    },
+    {
+      "path": "docs/superpowers/plans/2026-10-27-shizhen-series-bible.md",
+      "sha256": "a2729f3c68ac94b8e86f3a5608bea35a2bb463fe3f6a94b03a41b62f5cde64f6"
+    }
+  ],
+  "package_sha256": "f8af9ece8b338eb3c74ffecd9b2f326a9520c902d483ed5b6d4ab6973680186f",
+  "checks": {
+    "local_file_links": {
+      "count": 61,
+      "issues": []
+    },
+    "required_world_rules": 12,
+    "logic_questions": 16,
+    "abilities": 6,
+    "factions": 5,
+    "anomalies": 8,
+    "season_one_episodes": 12,
+    "placeholder_scan": "PASS",
+    "docs_contract_gate": "PASS",
+    "policy_audit": "BLOCKED_EXISTING_UNMAPPED_PATHS",
+    "protected_original_sources": {
+      "count": 47,
+      "changed": 0
+    },
+    "future_season_story_sections": "NONE",
+    "named_returnees": [
+      "何萍",
+      "冯有年"
+    ],
+    "named_unrecoverable_person": "赵芸",
+    "full_harness_first_attempt": {
+      "status": "FAILED",
+      "at_check": "agent_rules_check",
+      "error": "document budget exceeded: AGENTS.md",
+      "full_suite_executed": false,
+      "receipt": ".agent/harness/runs/shizhen-season01-bible-full-20261027/receipt.json"
+    }
+  },
+  "media_acceptance": "NOT_EVALUATED",
+  "proposed_canon_promotion": false,
+  "new_paid_generation_calls": 0,
+  "limitations": [
+    "文本结构不证明逻辑完美、媒体质量或用户创作接受",
+    "policy audit有13个未映射既有工程路径，未修改policy或他人文件"
+  ],
+  "review": {
+    "round_1": {
+      "candidate_sha256": "e10132b7e27f4561a7b3cf6f4fd434160ad0855b9791c1f32b085260cf72a074",
+      "agent": "/root/creative_cross_review",
+      "profile": "reviewer_high",
+      "findings": [
+        {
+          "id": "SZ-C01",
+          "severity": "non_blocking",
+          "parent_adjudication": "CONFIRMED",
+          "fix": "N01普通外勤观察与电台派单，E04确认，E05回收"
+        }
+      ]
+    },
+    "round_2": {
+      "status": "FINDING_SET_EMPTY",
+      "candidate_sha256": "b2a09435066f078eb53fbbf17eb1ccd251ec1192398edf1015bc0564b748e44f",
+      "scope": "SZ-C01识别链定向复审",
+      "agent": "/root/creative_cross_review",
+      "profile": "reviewer_high"
+    },
+    "round_3": {
+      "status": "FINDING_SET_EMPTY",
+      "candidate_sha256": "f8af9ece8b338eb3c74ffecd9b2f326a9520c902d483ed5b6d4ab6973680186f",
+      "scope": "用户收窄仅第一季；删除未来季剧情；明确E10/E12三名收容者结果",
+      "agent": "/root/creative_cross_review",
+      "profile": "reviewer_high",
+      "findings": []
+    }
+  },
+  "current_scope": "first_season_only",
+  "harness_receipt_paths": {
+    "final_staged_focused": ".agent/harness/runs/shizhen-season01-bible-focused-final-r2-20261027/receipt.json",
+    "staged_full_attempt": ".agent/harness/runs/shizhen-season01-bible-full-r2-20261027/receipt.json",
+    "committed_focused": ".agent/harness/runs/shizhen-season01-bible-commit-focused-20261027/receipt.json"
+  },
+  "receipt_note": "路径为本轮验证入口；实际结果、级别与freshness以各receipt及verify-receipt读回为准，不由本文自签完整回归。"
+}
