@@ -34,3 +34,13 @@ Parent自审：复用唯一接点owner，新增模块只读，旧默认路径、
 首次exact staged Harness在测试前拒绝：policy/matrix同时有本任务已stage hunk与其他未stage hunk。没有覆盖或stage其他改动，也没有放松隔离检查；改用只含本任务内容的稳定commit range执行隔离验证，具体receipt和结果在交付报告披露。该失败与源码测试、成片验证分开记录。
 
 学习评估 `no_candidate`：本次是用户直接授权的确定性合同修复，两个真实文件用于验证绑定/阻断，不能推出通用模型视觉检测能力或声画质量结论；没有自动学习adoption。旧媒体和并行dirty改动全部保留。
+
+## Exact Commit Verification
+
+实现commit `6389094b7a13675f23fd5e495cdcd7515655ee7d` 已正常push至origin/main。
+该commit range的focused Harness receipt为 `.agent/harness/runs/assembly-review-range-focused-20261027/receipt.json`：
+docs_contract_check通过；assembly_review_tests完整49 passed；harness_tests为319 passed、2 failed，
+仍为原 `authored_visual_revision_tests` full覆盖缺项和相同7个未映射路径，后续visual/Skill check按既有fail-fast跳过。
+整体receipt为failed、closure_eligible=false，不能称完整Harness通过。
+此前手动相关组合中的visual/Skill/runtime测试不被该隔离receipt冒认。
+本段仅补充已执行结果，不改变已验证实现bytes；源代码证据精确绑定6389094，媒体证明另见runtime-proof。
