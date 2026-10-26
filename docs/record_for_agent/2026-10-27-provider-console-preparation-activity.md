@@ -38,6 +38,14 @@ no-follow 验证与 opaque media token；公开结果不携带本机绝对路径
 - 本轮 receipts：`.agent/harness/runs/20261027-console-preparation-focused/receipt.json`、
   `.agent/harness/runs/20261027-console-preparation-related/receipt.json`、
   `.agent/harness/runs/20261027-console-preparation-full/receipt.json`；各自级别与结果以 receipt 为准。
+- 实现 commit `64b198876670ce61e0d7b4f5fceec1601c54a8b2` 的独立 `git archive` 快照：
+  83 项 Python、113 项 Node 测试及 offline Vite build 全部通过。桌面准备图放大、Escape
+  关闭及焦点返回也已实测。日志：`/tmp/console-prep-exact-verification.log`（本机临时证据）。
+- Harness focused 在策略自检中失败：`full_tests.covers_check_ids` 缺少既有
+  `reference_planning_tests`、`authored_visual_revision_tests`，另有 7 个既有未映射路径；
+  已在修改前 `e45a40ed8fd1f270259e44275fa5b9c9ab230463` 的独立 archive 上复现相同两项失败。
+  related/full 仍被根 AGENTS.md 14,185/14,000 bytes 阻断。本任务新增模块已映射；
+  没有扩大范围去修复或隐藏这些基线问题，不声称 Harness 完整通过。
 
 ## Review And Publication Boundary
 
