@@ -1,5 +1,7 @@
 # Lost Frames — Creative Decisions And Review
 
+> **Naming History Boundary — 2026-10-27：** 本文保留原V1、来源与前轮审查使用的旧名，避免改写历史输入。当前第一季称谓已按用户“直接改名”落实，见 [Naming Candidates](naming-candidates.md)。新旧名指同一A/F/N对象，不改变本页保护的原剧本／媒体，也不代表其他提案获批。
+
 ## Recommendation
 
 本轮推荐以“被借来的现实”解释世界，以“活过今晚”驱动每个阶段：**恢复事实不是自动救人，记住事实也可能让自己失去生路。** 保留V1六个能力人物、五种组织利益，按用户最新指令只完成第一季，实质调整起源因果、未来来源、风险机制与第一季发动机。全部新增为PROPOSED CANON；AUTHOR SECRET同样待确认。

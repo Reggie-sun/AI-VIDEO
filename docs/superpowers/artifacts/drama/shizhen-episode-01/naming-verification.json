@@ -1,0 +1,372 @@
+{
+  "schema": "shizhen-naming-check/1",
+  "date": "2026-10-27",
+  "scope": "season_one_nomenclature_only",
+  "authority": "text_and_structure_only_not_audience_acceptance",
+  "status": "selected_names_applied_alternatives_not_adopted",
+  "locked": [
+    "失帧",
+    "林序"
+  ],
+  "documents": [
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/series-index.md",
+      "sha256": "26d50260b30e286d34e2ecdb84125b55ca7cafa733cb06eb7b8d2d570adb02d8"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/world-bible.md",
+      "sha256": "2fdfcc6dc0e7b36da1f0242fb1a4a22929c031fc97ae4e2b701192554fe9f761"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/ability-bible.md",
+      "sha256": "6aa624a57acd6116778d1c07b6f0596f7a1c26216371ea5f0db67fb15d778704"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/character-bible.md",
+      "sha256": "865b5ace5322c69c2008639fac1cc5f1bdd8a0d117282856202b0b307a959814"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/faction-bible.md",
+      "sha256": "f230daceacb5501ab02c73bcb0dc6969978282f2baee997992e7d20bf92b5c1c"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/anomaly-bible.md",
+      "sha256": "611baf39e66f1781393218b0c9ae2f756f96e7d80348b309c1e847b75627a052"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/timeline.md",
+      "sha256": "d20b3f4766c909d3e9ae1e8721a7a350bd605462d5793e673fd74d22ec886ea1"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/series-outline.md",
+      "sha256": "d127da0b2d194fdaaa0ad57c8b91752425cc4472d46b327e7efdcbb56dcd9821"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/season-01-outline.md",
+      "sha256": "f3bdcd604a4f5bb79acb73f348447c4392ff67cd5df5a10f7d1465af215e499a"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/episode-01-survival-revision.md",
+      "sha256": "a6a16574deb45b5a7f9e7d0b414450162470ede90cada18b02e87d00f3200598"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/canon-review.md",
+      "sha256": "828e801e0831ad2aca8e82d8c0cd19e2e2684ac736443f2a24b4235124a26f2e"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/creative-decisions.md",
+      "sha256": "e87aacf80baf962b85c5ec6128d46640b546c34065fab7f4fe3c70eb9f3b7188"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/naming-review.md",
+      "sha256": "b030cda8bbb40d92fd5e7b554a9794c9dfa74294f4a6f92aaa3eb74d7b2c5d7f"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/naming-candidates.md",
+      "sha256": "0e79fa2a4a49a584d40c497d9815acca449bde536457164fc6200fdf6763d6b0"
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/naming-checks.md",
+      "sha256": "18aef1a22747143f50c9def1c059bed479df9e0896c15e5006442a2d7ade3725"
+    },
+    {
+      "path": "docs/research/2026-10-27-shizhen-naming-skills.md",
+      "sha256": "ea71a9a70ca1f21c2e7357b98cd4a67af5d956cf11299fd7791bd2d1be00694b"
+    }
+  ],
+  "checks": {
+    "local_links_checked": 96,
+    "missing_links": [],
+    "old_names_in_current_development": [],
+    "abilities": 6,
+    "factions": 5,
+    "anomalies": 8,
+    "main_character_identity_preserved": true,
+    "protected_sources_verified": 47,
+    "protected_sources_unchanged": true,
+    "documentation_contract": "PASS",
+    "public_similarity_search": "bounded_manual_search_with_primary_sources_and_flagged_clues",
+    "human_voice_and_blind_testing": "NOT_EVALUATED",
+    "baseline_documents_reconstructed_and_compared": 12,
+    "non_naming_story_changes": 0
+  },
+  "protected_sources": [
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/S02-preparation/README.md",
+      "sha256": "2cded3d08034a2cd179b626bb803fc5af8d95eb194a7fa1c35d691f7d1ebd933",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/S02-preparation/director-coverage.json",
+      "sha256": "ba483e4c2b40e3f0fdaad5e2c0f589a5763077a5bd857243dd2a406ca76ff2dc",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/S02-preparation/native-prompt.zh.txt",
+      "sha256": "e4f0b86ea8dc2a93f1a65e67c1ebd37ee5026f16ceb5f5d8b3cd4ccaed6b6c36",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/S03-preparation/README.md",
+      "sha256": "52c4c636498c1af539a05860766d67ef15215311215b8c650aa3e64c56a71095",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/S03-preparation/director-coverage.json",
+      "sha256": "790b9c70f1c25ffa6b3936b8b06856f865828cf121d88c1dff1773a18fb547ee",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/S03-preparation/native-prompt.zh.txt",
+      "sha256": "c2ed9aa150a874bae26d0a7356386326310882cce2d94bce0f8b4743b323d4e2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/S03-revision-02/README.md",
+      "sha256": "83ba0d5e8ec229833d3ad87ee587e6d2840dd46779e42837ff74df94d9e344fb",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/S03-revision-02/native-prompt.zh.txt",
+      "sha256": "2fe4af16123bfbc663dd4bc91c0962846680753635a5f266c3c35d668dc35860",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/README.md",
+      "sha256": "ef40a02bbead8104e5d0f39ed8363e0d8d5d19dbe6b6c2f37179f8874fe95b00",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/assets/S01-frame-provenance.json",
+      "sha256": "21b989a6879059d528d5dc3e50331fd14bca070c5efaf7da8320fc25b97f98c5",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/assets/title-provenance.json",
+      "sha256": "03099a5acd1eef4cbfc42d0986e592fe4c3e88ca139f7abd07b1ccfe74488ad2",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/composition-handoff.md",
+      "sha256": "1175f374aeaf4e88f90be304a61403d6f7389ff77d84e1b40b124c080b94d15c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/creative-input.txt",
+      "sha256": "2b1c4bc7b3205ecf575a76b25df53de419d2cf08582351189186237bf8fca8d5",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/director-coverage.json",
+      "sha256": "3aac019401b2cd8e98af36f972794d21c98cdf945472206a9ee0c282783f9f70",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/director-treatment.md",
+      "sha256": "fdd92cb5737cf04410925c9a0d24e95119a0b903b87b9a0fa56443fa46a42f4c",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/briefs.json",
+      "sha256": "01f27db01361b864258131e74897b8190882846660c4cef07328f65fe28714bb",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/co-missing-response/dry-run.argv.json",
+      "sha256": "4d72c6b6510a3a3396107f26a0384be45aa1cc711041702f79ac56a74bbf1222",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/co-missing-response/dry-run.result.json",
+      "sha256": "d87581ee66c8a2957d67b27d6ea2fdcc464ffa6584a4ddc081bbdd45fc2fca38",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/co-missing-response/exclude.txt",
+      "sha256": "a35646b52c3ee69881a6d582be78e1395252483cd32db865328b809c7edab424",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/co-missing-response/handoff.json",
+      "sha256": "c6ffb5e63db1a085137e16f54cd0200906a055443932d27ccbeae455aac8f671",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/co-missing-response/qa-preparation.json",
+      "sha256": "7324ca5eac56bb87598c238a09157ea803b284f84f6474280f24382b5a2bff4d",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/co-missing-response/style.txt",
+      "sha256": "6489351a9493eb8ec7711c9206bb6c54f7fa6d058f0a2e4313c7938c333cd46a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music/directions.json",
+      "sha256": "8a618f9844c212861c0d78c88eacedabd9ab5d1936483c49cb6f0b0ecc25c01d",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/music-and-sound.md",
+      "sha256": "07b7f1a18300867d95533f2e79b00adba7493515fe85f7c5d77c20e8ba2cdabd",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/rhythm-revision-02/creative-input.txt",
+      "sha256": "edf940b8f79ecbc0afbf8f12d6bfe1d07ff237e6a5b8167b5849d703ff6bfb2a",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/rhythm-revision-02/director-coverage.json",
+      "sha256": "8d3f05e827e56b00e2956b1a120a89c220577a60a3f048c9eb7e8d2e8d443806",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/rhythm-revision-02/director-revision.md",
+      "sha256": "1379bc2f96b37258f43790550ea37a5b0ac1bb06da19ecbc7de79e7c3fdf97b5",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/rhythm-revision-02/verification.json",
+      "sha256": "0d9bfffca43f17af2861e695eb712d925d448e026d190d641e9cd0b74009e8cb",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/shot-cards.md",
+      "sha256": "c560e36fd489a5fbc8057ea1bb67908ca868c6cc368c1d680a6cd8b9764dde34",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/verification/S01-mcp-observation.json",
+      "sha256": "0c6a19acc4e2fd6e3193f262649e3f422b15c9a87c2e8213b1067326e600ffe5",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/verification/S01-probe.json",
+      "sha256": "fe28821a6d0dad2b05be90af9e3be5f7758e2a0c91cc4422e65e01d9c1452e05",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/verification/coverage-validation.json",
+      "sha256": "e0008adaa9af53d11b2a00a705dc65f4495d5cb21cb4dc917b691b27990f2aa8",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/verification/existing-engineering-blockers.json",
+      "sha256": "49c8e347a20fecf654f420e1bcc572cfe9563337ba09b84d7df803199d35c7dd",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/verification/preparation-receipt.json",
+      "sha256": "91d4b46702be68f3944bd8312b8dc6de13340e49c6d314b190d1823e4ac33cb3",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/cold-open-preparation/verification/source-identities.json",
+      "sha256": "a45972ca9ac2dd40f07768c0ec018638de775980124a93959ee7bf26c0260c72",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/creative-input.txt",
+      "sha256": "c2585d78d376e254e033aef097fc2c4d92178ada9650b36b12a3cd46f669a866",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/director-coverage.json",
+      "sha256": "46c2f253c44ea87dd382af48bb28b69c5b0304adba637d03698318de88850464",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/final-output-contract.json",
+      "sha256": "b235b3e167ab6b9aa2b4fdf63fa2b7c920d6eb88a570b425314bd98866740e98",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/goal-binding.json",
+      "sha256": "d0851133f9d5a5b567b182088af76c33684d77952e284114e8a25ba591f959e7",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/music-pilot-20261026/cli-skill-repair-verification.json",
+      "sha256": "e0905b33b682cca65d082baa30810a9dbdd82e86be97309847f953a356420eea",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/music-pilot-20261026/spotting-and-evaluation.md",
+      "sha256": "501e12da6c717642f2169f00f7ed7ca0a3119966f2dd62e14f5059be66581d5e",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/production-design.md",
+      "sha256": "4e36e38762bfd55ae6a4ae449c2f07dcb2b572f062058f79f3155ac9e33b0d87",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/screenplay.md",
+      "sha256": "3635c7d177cba5dcf2c814ccb6d1e1e46b93e44d51476e067fa1dafca288d46f",
+      "unchanged": true
+    },
+    {
+      "path": "docs/superpowers/artifacts/drama/shizhen-episode-01/shot-prompts.md",
+      "sha256": "14e34cb0368ea4611cc6b8f67e8239e5b7e8f9825580c9eb26973c70a0832c53",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S01-1080p高清版-Seedance2.5-16秒.mp4",
+      "sha256": "15c7c21ea8ef526d641d5a1565cbb4ec93ea4ee63b34fc9c7a0d73f2b21efb0b",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/cold-open-execution-20261026/失帧-两位冷开场加S01-1080p审看版.mp4",
+      "sha256": "5ab3a929258db93606196ab537d89c795343899dba8616dbdd8905e55433e48a",
+      "unchanged": true
+    },
+    {
+      "path": "outputs/shizhen-episode01/失帧-第一集-S04-接点剪辑修正版-1080p-9.875秒-原声.mp4",
+      "sha256": "e40d40218902300f5bde4c9365fbc5a09a06e5e893f97378f1f917b182125fa4",
+      "unchanged": true
+    }
+  ],
+  "name_mapping": {
+    "许澜": "董文慧",
+    "谢沉": "谢振宇",
+    "闻荻": "闻素芬",
+    "陆衡": "陆建平",
+    "宋岚": "宋秋萍",
+    "邵祁": "邵庆国",
+    "梁素": "梁秀琴",
+    "韩骁": "韩启良",
+    "何照": "何志刚",
+    "邹宁": "邹美玲",
+    "乔安": "乔立文",
+    "许诚": "许家良",
+    "何萍": "何淑兰",
+    "赵芸": "赵明霞",
+    "零帧研究组": "未然组",
+    "封时处": "堤务处",
+    "归秒会": "望归社",
+    "旧帧馆": "存照馆",
+    "余像群": "新邻",
+    "留帧者": "留底人",
+    "补帧者": "后来人",
+    "补帧生命": "后来生命",
+    "空白层": "夹页",
+    "拼帧": "拾遗",
+    "闻缺": "余响",
+    "定帧": "守更",
+    "借帧": "借步",
+    "索帧": "验契",
+    "留帧": "留影",
+    "接人者": "领路客",
+    "截步者": "错脚",
+    "呼名井": "旧人声"
+  },
+  "upstream_execution": {
+    "skills_installed": 0,
+    "scripts_run": 0,
+    "dependencies_added": 0,
+    "paid_generation_calls": 0
+  },
+  "history": "series-bible-verification.json retains pre-rename evidence; current hashes are not attributed to the earlier reviewer",
+  "document_package_sha256": "2df675966c500e9eedcca5809fce4aa63dd2fdc4633dc2684b89c92d74dc86fd"
+}

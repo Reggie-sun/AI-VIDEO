@@ -1,5 +1,7 @@
 # Lost Frames — Canon And Continuity Review
 
+> **Naming History Boundary — 2026-10-27：** 本文保留原V1、来源与前轮审查使用的旧名，避免改写历史输入。当前第一季称谓已按用户“直接改名”落实，见 [Naming Candidates](naming-candidates.md)。新旧名指同一A/F/N对象，不改变本页保护的原剧本／媒体，也不代表其他提案获批。
+
 ## Review Boundary
 
 状态：既有事实为注明来源的 CONFIRMED CANON；本轮新设定为 PROPOSED CANON，AUTHOR SECRET 不改变待确认等级。

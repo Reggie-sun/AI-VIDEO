@@ -1,5 +1,7 @@
 # Lost Frames — Series Development Index
 
+> **Naming Update — 2026-10-27：** 用户已要求直接改名。本文采用本轮选定名称；只落实称谓，不升级原有背景、机制或剧情提案的Canon等级。林序不改；原剧本、已制作媒体与历史来源保留原字节。新旧名与读音见 [Naming Candidates](naming-candidates.md)，原A/F/N编号不变。
+
 ## Status And Reading Contract
 
 版本：2026-10-27，整合完整世界观 V1 与后续“活过今晚”创作修订，按用户最新指令仅写第一季。核心命题：**每一个消失的人，都在替这座城市偿还一段不存在的时间。** 叙事发动机：**当整个世界决定你不应该存在时，你要怎样活过今晚？**
@@ -23,7 +25,7 @@
 | [Ability Bible](ability-bible.md) | A01–A06：六能力的使用边界、累积代价、训练、合作、对抗、普通人的反制 |
 | [Character Bible](character-bible.md) | 人物背景、知识、秘密、行动、关系、独立成长；既有身份仍以原剧本及当前制作 owner 为准 |
 | [Faction Bible](faction-bible.md) | 五种利益立场、资源、人员、组织分裂与具体行动 |
-| [Anomaly Bible](anomaly-bible.md) | N01–N08：补帧生命及其他异常的危险、识别、局部生路和失败后果 |
+| [Anomaly Bible](anomaly-bible.md) | N01–N08：后来生命及其他异常的危险、识别、局部生路和失败后果 |
 | [Timeline](timeline.md) | 作者历史顺序、实际历史与候选段的时间关系；不是制作 ResolvedTimeline |
 | [Series Outline](series-outline.md) | 第一季定位、四段结构、季内闭合与配角终态；不规划后续季 |
 | [Season 1 Outline](season-01-outline.md) | 12集短季的完整因果、求生行动、损失、信息与伏笔回收 |
@@ -43,4 +45,8 @@
 
 先让观众在一间便利店失去常识，再让主角在一条巷子失去安全。能力解决的是“从哪里多争取一个选择”，而非“终于可以打赢世界”。第一季结束必须让林序活过他拒绝牺牲别人换来的那一夜，同时失去一个不能用下次胜利补回的人际位置。
 
-五个阵营都必须有救人的事实和伤人的选择。自觉体陆衡是第一季具体的主要灵异对手；余像群不因他的犯罪失去存在权。林晚在哥哥之外有必须保护的人，最终救援不能默认所有失踪者愿意回到原来的生活。
+五个阵营都必须有救人的事实和伤人的选择。自觉体陆建平是第一季具体的主要灵异对手；新邻不因他的犯罪失去存在权。林晚在哥哥之外有必须保护的人，最终救援不能默认所有失踪者愿意回到原来的生活。
+
+## Naming Delivery
+
+用户后续指令“直接改命吧”按当前命名任务理解为直接改名：第一季开发正文已使用选定名，林序锁定。此授权只作用于称谓；备选名、命名来源推测及世界／能力／剧情提案不自动确认。命名依据见 [Naming Review](naming-review.md)，完整新旧名与备选见 [Naming Candidates](naming-candidates.md)，声音与作品检索见 [Naming Checks](naming-checks.md)。前轮series-bible-verification.json仅证明改名前快照，当前命名快照见 [Naming Verification](naming-verification.json)。

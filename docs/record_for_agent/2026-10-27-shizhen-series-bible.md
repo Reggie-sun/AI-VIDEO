@@ -6,6 +6,10 @@ learning_eligibility: ineligible
 
 # Lost Frames Season One Creative Bible Record
 
+## Naming Supersession — 2026-10-27
+
+下文保留前轮输入、旧名称与原快照身份。用户随后要求直接改名，第一季正文的现用称谓和验证入口已更新，见 [Naming Record](2026-10-27-shizhen-naming-design.md)。原世界机制、人物身份、剧情与媒体接受边界不变；下文旧名称不再代表当前开发正文称谓，前轮审读不冒充新名称的人类验收。
+
 ## Scope And Current Creative State
 
 用户提供完整世界观V1，随后明确要求补足现实校正、主动猎杀、规则求生、能力实战、势力围捕与具体主要对手；最终收窄为“就写第一季就够了”。本轮按最终范围完成第一季创作开发，不展开以后各季，不执行付费图片、视频或音乐生成。
