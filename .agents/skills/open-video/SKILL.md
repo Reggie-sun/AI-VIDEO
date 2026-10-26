@@ -47,6 +47,10 @@ For staging, performance or physical action, load only the relevant section of
 to the same approved story and coverage; they do not dispatch one another or execute production.
 Skip upstream development for an already approved source or a bounded local repair.
 
+For object handling, placement, transfer, loss of support or collision, apply
+[Physical Action Continuity](references/event-led-timing.md#physical-action-continuity)
+before authoring, even when duration and generation grouping are unchanged.
+
 For music spotting, thematic development, score prompts or music repair, read
 [Music Direction](references/music-direction.md). Codex acts as the existing Music Director;
 choose music from the narrative and actual performance before using a selected music tool.

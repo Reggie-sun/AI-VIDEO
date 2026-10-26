@@ -116,6 +116,11 @@ handoff 前确认：
 - first/last/reference roles 未被混淆；
 - 每条 transfer 与 `must_not_transfer` rule 都可追溯到 approved intent；
 - prompt chronology 不存在 impossible overlap 或 contradictory state；
+- 涉及持物、放置、交接、失去支撑或碰撞时，按 Director 的
+  [Physical Action Continuity](../../open-video/references/event-led-timing.md#physical-action-continuity)
+  核对实际参考、前态、支撑转移、释放与退手、运动路径、落点及邻近物体后果；必要关系须保留在
+  actual native preview 的动作描述中，不能只留在 Shot/检查记录或用“物理正确、保持不动”概括。
+  顺序前提不得改成同时发生；输入互相矛盾时先回到原 authoring owner 修订，不靠追加负面词掩盖；
 - edit/extend 直接说明 operation；
 - 未猜测 runtime limits、file formats、reference counts、mode tokens 或 node/API fields；
 - 所有来自 community 的 heuristic 都标注为 advisory。
