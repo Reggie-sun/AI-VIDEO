@@ -434,7 +434,7 @@ def test_production_detail_uses_strict_readers_and_returns_only_whitelisted_data
         root=project_path.parent,
         project=_ns(project_id="demo", title="Demo", revision=7, content_hash=ZERO),
         manifest=_ns(schema_version="2.8", manifest_revision=34, attempts=(attempt,)),
-        shots=(shot,), scenes=(_ns(scene_id="cafe", title="Cafe"),),
+        shots=(shot,), scenes=(_ns(scene_id="cafe", title="Cafe", visual_reference_asset_ids=()),),
         registry=_ns(assets=(first_record, video_record, next_video_record)),
         asset_paths={
             "first-frame": first_frame,
@@ -1237,6 +1237,48 @@ def test_production_detail_keeps_valid_workspace_readable_without_video_attempts
     assert str(tmp_path) not in serialized_public
 
 
+def test_authored_references_are_visible_before_generation_using_strict_project(tmp_path: Path):
+    from production_project_factory import write_production_project
+
+    runs = tmp_path / "runs"
+    root = runs / "prepared"
+    write_production_project(root)
+    before = {p.relative_to(root): p.read_bytes() for p in root.rglob("*") if p.is_file()}
+    result = provider_console.project_workspace_detail(runs, "prepared/project.yaml")
+
+    assert result["status"] == "valid"
+    assert result["attempts"] == []
+    references = result["shots"][0]["authored_references"]
+    assert {r["source_kind"] for r in references} >= {"character", "scene", "shot"}
+    assert all(r["asset_id"] == "image-hero-1" for r in references)
+    assert all(r["media"]["token"] in result["_media"] for r in references)
+    assert all(r["binding_status"] == "authored" for r in references)
+    assert result["shots"][0]["authored_references_truncated"] is False
+    assert before == {p.relative_to(root): p.read_bytes() for p in root.rglob("*") if p.is_file()}
+    assert str(root) not in json.dumps({k: v for k, v in result.items() if k != "_media"})
+
+    # Changed bytes must fail strict reopen, not expose stale authored references.
+    loaded = provider_console.load_production_project(root / "project.yaml")
+    image = loaded.asset_paths["image-hero-1"]
+    image.write_bytes(b"x" * image.stat().st_size)
+    invalid = provider_console.project_workspace_detail(runs, "prepared/project.yaml")
+    assert invalid["status"] == "invalid"
+    assert not invalid.get("shots")
+
+
+def test_authored_references_keep_each_shot_asset_assignment(tmp_path: Path):
+    from production_project_factory import write_and_load_two_shot_project
+
+    runs = tmp_path / "runs"
+    write_and_load_two_shot_project(runs / "two-shots")
+    result = provider_console.project_workspace_detail(runs, "two-shots/project.yaml")
+    assert result["status"] == "valid"
+    for index, shot in enumerate(result["shots"], start=1):
+        own = [r for r in shot["authored_references"] if r["source_kind"] == "shot"]
+        assert {r["asset_id"] for r in own} == {f"image-shot-{index}"}
+        assert all(r["source_id"] == shot["shot_id"] for r in own)
+
+
 def test_production_workspace_media_projection_is_bounded_and_sanitized(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ):
@@ -1276,7 +1318,9 @@ def test_production_workspace_media_projection_is_bounded_and_sanitized(
             manifest_revision=9,
             attempts=(_ns(operation="asset_registration"),),
         ),
-        shots=(),
+        shots=(_ns(shot_id="prepared", required_asset_roles=(
+            _ns(role="reference", asset_ids=tuple(f"image-{i:02d}" for i in range(33))),
+        )),),
         registry=_ns(assets=tuple(reversed(assets))),
         asset_paths=asset_paths,
     )
@@ -1292,6 +1336,8 @@ def test_production_workspace_media_projection_is_bounded_and_sanitized(
         {"operation": "asset_registration", "count": 1}
     ]
     assert len(result["workspace_media"]) == 32
+    assert len(result["shots"][0]["authored_references"]) == 32
+    assert result["shots"][0]["authored_references_truncated"] is True
     assert [item["asset_id"] for item in result["workspace_media"]] == [
         f"image-{index:02d}" for index in range(32)
     ]

@@ -36,6 +36,7 @@ import { AudibleVideo } from "./media-player.jsx";
 import { LibraryBrowser } from "./library-browser.jsx";
 import { ExternalShotBreakdown, ProjectShotBreakdown } from "./shot-breakdown.jsx";
 import { shotTiming } from "./shot-time-contract.js";
+import { ReferenceMedia } from "./reference-media.jsx";
 
 const NAV_ITEMS = [
   ["projects", "项目", FolderSimple],
@@ -199,7 +200,7 @@ function BindingMediaCard({ binding }) {
       <header><span>{label}</span><code>{binding?.role || "input"}</code></header>
       {url ? (isVideo
         ? <AudibleVideo compact src={url} preload="metadata" aria-label={`${label} ${binding?.asset_id || ""}`} />
-        : <img src={url} alt={`${label} ${binding?.asset_id || ""}`} />)
+        : <ReferenceMedia media={media} label={`${label} ${binding?.asset_id || ""}`} />)
         : <div className="binding-media-empty"><ImageSquare size={22} /><span>已绑定，暂无浏览器预览</span></div>}
       <div className="binding-meta">
         <strong title={binding?.asset_id}>{binding?.asset_id || media?.asset_id || "已注册输入"}</strong>
@@ -255,7 +256,7 @@ function WorkspaceMediaThumb({ item }) {
   if (failed) return <div className="workspace-media-unavailable"><ImageSquare size={22} /><span>浏览器无法解码</span></div>;
   return video
     ? <AudibleVideo compact src={url} preload="none" aria-label={`已注册视频 ${item.asset_id || ""}`} onError={() => setFailed(true)} />
-    : <img src={url} alt={`已注册图片 ${item.asset_id || ""}`} onError={() => setFailed(true)} />;
+    : <ReferenceMedia media={item} label={`已注册图片 ${item.asset_id || ""}`} onError={() => setFailed(true)} />;
 }
 
 function WorkspaceMediaGrid({ media = [], limit = 12 }) {

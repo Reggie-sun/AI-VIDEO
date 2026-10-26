@@ -76,7 +76,9 @@ test("Runs attempt keeps the inline player and Project Shot breakdown in the mai
       workspace: "demo/project.yaml",
       manifest: { revision: 1 },
       project: { title: "Demo" },
-      shots: [{ shot_id: "shot-1", intent: "Show the result", revision: 1 }],
+      shots: [{ shot_id: "shot-1", intent: "Show the result", revision: 1,
+        authored_references: [{ asset_id: "prepared-reference", source_kind: "scene", source_id: "scene-1", role: "scene_reference", binding_status: "authored", media: { asset_id: "prepared-reference", token: "prepared-reference-token", mime_type: "image/png" } }],
+      }],
       attempts: [attempt],
     };
     const markup = renderToStaticMarkup(React.createElement(RunsAttemptView, {
@@ -99,6 +101,20 @@ test("Runs attempt keeps the inline player and Project Shot breakdown in the mai
     }));
     assert.match(workspaceMarkup, /<section class="workspace-overview">[\s\S]*<section class="shot-breakdown"/);
     assert.doesNotMatch(workspaceMarkup, /<section class="action-bar workspace-action-bar">[\s\S]*<section class="shot-breakdown"/);
+    assert.match(workspaceMarkup, /生成前创作参考与素材/);
+    assert.match(workspaceMarkup, /不代表已提交给模型/);
+    assert.match(workspaceMarkup, /放大 prepared-reference/);
+    assert.match(workspaceMarkup, /src="\/api\/runs\/media\/prepared-reference-token"/);
+    assert.doesNotMatch(workspaceMarkup, /本次生成请求参考/);
+    const { RequestReferences, ReferenceMedia } = await server.ssrLoadModule("/src/reference-media.jsx");
+    const requestMarkup = renderToStaticMarkup(React.createElement(RequestReferences, { attempt: {
+      mode: "image_to_video", input_bindings: [{ asset_id: "sealed-input", role: "first_frame", media: { asset_id: "sealed-input", token: "sealed-input-token", mime_type: "image/png" } }],
+    } }));
+    assert.match(requestMarkup, /本次生成请求参考/);
+    assert.match(requestMarkup, /sealed-input-token/);
+    assert.doesNotMatch(requestMarkup, /prepared-reference/);
+    const unavailable = renderToStaticMarkup(React.createElement(ReferenceMedia, { media: { token: "https://foreign/image.png", mime_type: "image/png" } }));
+    assert.doesNotMatch(unavailable, /<img|https:/);
   } finally {
     await server.close();
   }

@@ -14,6 +14,8 @@ Provider Console 的 runtime 数据必须来自本机 `runs/` 的只读 canonica
 
 供人观看的媒体须在实际前端核验可发现、可播放且颜色正常，制作母版默认保留在诊断入口。
 
+Shot 的已登记创作参考须在生成前可见，并与生成请求绑定分别标注；参考图完整显示且可站内放大，不得将未绑定的 Registry 素材推断为该 Shot 的生成输入。
+
 `artifacts/`、server allowlist 中的 ComfyUI output 与 repository 外项目目录只能进入独立的只读 External Media Library，不得伪装成 `runs/` runtime workspace。Browser 不得提交任意 filesystem root，也不得收到绝对路径；媒体按 exact SHA-256 去重并保留 source-relative locations。只有受支持的 `ai-video-external-media-metadata/1` evidence 或完整 cross-fingerprint chain 同时绑定 exact media bytes 时，才能投影 Prompt、Shot identity、generation type 或 external reported status；未知 schema 只保留 evidence reference，缺失字段必须显示 `NOT_EVALUATED`。External reported status 不得提升为 Manifest lifecycle、candidate、QA、P6、Final Acceptance 或 activation truth。
 
 对受支持且 exact-bound 的实验视频，detail 必须把 generation references、Shot/experiment-arm 脚本、sealed Prompt、output materialization、technical Gate 与 human verdict 关联在同一判断面；Reference 只有被 content-hash/upload receipt 绑定到 submitted input 时才能标为实际生成输入，否则必须在同一判断面显示 `NOT_EVALUATED` 及缺失原因。这些 proof layers 必须分别标注，任何一层缺失、冲突或 stale 都不得由邻近文件、文件名或另一层 verdict 补造。

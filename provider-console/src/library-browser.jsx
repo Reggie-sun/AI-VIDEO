@@ -8,6 +8,7 @@ import { attemptId } from "./run-detail-contract.js";
 import { libraryLiveStatus } from "./library-refresh-contract.js";
 import { MediaFolderButton } from "./media-folder.jsx";
 import { GenerationActivity } from "./generation-activity.jsx";
+import { AuthoredReferences, RequestReferences } from "./reference-media.jsx";
 import "./library-browser.css";
 
 export function ExactPlayer({ entry, measurement, onMeasured, onUnavailable }) {
@@ -61,6 +62,8 @@ function Preview({ entry, measurements, onMeasured, onUnavailable, entries, rend
     <ExactPlayer key={`${entry.id}:${entry.url}`} entry={entry} measurement={measurement} onMeasured={onMeasured} onUnavailable={onUnavailable} />
     <StatusSummary context={context} available={entry.available} playbackError={measurement?.playbackError} />
     <ContextPicker entry={entry} value={contextId} onChange={setContextId} />
+    {context?.attempt && <RequestReferences attempt={context.attempt} />}
+    {context?.detail?.shots?.filter((shot) => !context.attempt || shot.shot_id === context.attempt.target_shot_id).map((shot) => <AuthoredReferences key={shot.shot_id} shot={shot} />)}
     <details className="library-sources"><summary>全部来源与 exact identity（{entry.contexts.length}）</summary><code>{entry.sha256} · {entry.bytes} bytes</code>{entry.contexts.map((item) => <p key={item.id}>{item.workspace || item.sourceId} · {item.role}<br />{item.media?.asset_id || item.media?.relative_path || item.group?.preview?.relative_path || "相对文件标识未提供"}</p>)}</details>
     <details><summary>版本（仅限严格验证的同 Project / Shot）</summary>{members.length ? members.map(({ entry: video, context: binding }) => <button type="button" key={`${video.id}:${binding.id}`} onClick={() => onSelect(video.id)}>{entryTitle(video)} · revision {binding.attempt.target_shot_revision} · {binding.model || "模型未提供"} · {binding.startedAt || "时间未提供"} · {binding.role}</button>) : <p>没有可归组的版本。独立 Project 保持独立，可手动选择比较。</p>}</details>
     {context ? <details className="library-diagnostics"><summary>创作意图 / 生成详情 / 证据</summary><div className="library-diagnostic-content">{renderContext(context)}</div></details> : <p>请选择一个来源上下文后查看 Prompt、生成详情和证据。</p>}

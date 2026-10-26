@@ -1,5 +1,6 @@
-import React, { useEffect, useId, useRef, useState } from "react";
-import { CheckCircle, FilmStrip, WarningCircle, X } from "@phosphor-icons/react";
+import React, { useState } from "react";
+import { CheckCircle, FilmStrip, WarningCircle } from "@phosphor-icons/react";
+import { AuthoredReferences, ReferenceLightbox } from "./reference-media.jsx";
 
 import {
   attemptOutcome,
@@ -65,6 +66,7 @@ export function ProjectShotBreakdown({ detail, selectedAttemptId, onSelectAttemp
                 <div><dt>{timing.label}</dt><dd>{timing.value}</dd></div>
                 <div><dt>Revision</dt><dd>{shot?.revision || "—"}</dd></div>
               </dl>
+              <AuthoredReferences shot={shot} />
               <div className="shot-breakdown__attempts">
                 {attempts.length
                   ? attempts.map((attempt, index) => <AttemptEvidence key={attemptKey(attempt, index)} detail={detail} attempt={attempt} index={index} selected={attemptKey(attempt, index) === selectedAttemptId} onSelect={onSelectAttempt} />)
@@ -96,29 +98,6 @@ function ResultLayers({ shot }) {
   return <dl className="external-result-layers">{layers.map(([label, value]) => <div key={label}><dt>{label}</dt><dd className={`external-verdict external-verdict--${verdictTone(value)}`}>{String(value)}</dd></div>)}</dl>;
 }
 
-function ReferenceLightbox({ reference, url, onClose }) {
-  const titleId = useId();
-  const closeRef = useRef(null);
-  useEffect(() => {
-    const previous = document.activeElement;
-    const keydown = (event) => {
-      if (event.key === "Escape") onClose();
-      if (event.key === "Tab") { event.preventDefault(); closeRef.current?.focus(); }
-    };
-    document.addEventListener("keydown", keydown);
-    closeRef.current?.focus();
-    return () => { document.removeEventListener("keydown", keydown); previous?.focus?.(); };
-  }, [onClose]);
-  return (
-    <div className="reference-lightbox" onMouseDown={onClose}>
-      <figure role="dialog" aria-modal="true" aria-labelledby={titleId} onMouseDown={(event) => event.stopPropagation()}>
-        <button ref={closeRef} type="button" onClick={onClose} aria-label="关闭 Reference 图片预览"><X size={20} /></button>
-        <img src={url} alt={`${reference.role || "reference"} ${reference.asset_id || ""}`} />
-        <figcaption id={titleId}><strong>{reference.role || "reference"}</strong><span>{reference.asset_id || "未标注 asset"}</span><small>点击遮罩、关闭按钮或按 Esc 退出</small></figcaption>
-      </figure>
-    </div>
-  );
-}
 
 function ReferenceInputs({ references = [], bindingStatus, bindingReason }) {
   const [selectedReference, setSelectedReference] = useState(null);

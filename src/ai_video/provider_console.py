@@ -366,6 +366,41 @@ def _shot_projection(shot: object) -> dict[str, object]:
     }
 
 
+def _authored_shot_projection(shot, loaded, workspace, assets, media_map):
+    """Current authored selections, independent of any submitted request."""
+    sources = [
+        ("character", character.character_id, "character_reference", character.reference_asset_ids)
+        for character in getattr(loaded, "characters", ())
+        if character.character_id in getattr(shot, "character_ids", ())
+    ] + [
+        ("scene", scene.scene_id, "scene_reference", scene.visual_reference_asset_ids)
+        for scene in getattr(loaded, "scenes", ())
+        if scene.scene_id == getattr(shot, "scene_id", None)
+    ] + [
+        ("shot", shot.shot_id, requirement.role, requirement.asset_ids)
+        for requirement in getattr(shot, "required_asset_roles", ())
+    ]
+    references = []
+    truncated = False
+    for kind, owner, role, asset_ids in sources:
+        for asset_id in asset_ids:
+            if len(references) == _MAX_WORKSPACE_MEDIA:
+                truncated = True
+                break
+            references.append({
+                "source_kind": kind, "source_id": owner, "role": role,
+                "asset_id": asset_id, "binding_status": "authored",
+                "media": _media_projection(
+                    workspace=workspace, asset=_asset_by_id(assets, asset_id),
+                    asset_paths=loaded.asset_paths, root=loaded.root, media_map=media_map,
+                ),
+            })
+        if truncated:
+            break
+    return {**_shot_projection(shot), "authored_references": references,
+            "authored_references_truncated": truncated}
+
+
 def _attempt_shot_snapshot(
     *,
     loaded: object, attempt: object, sealed_request: object,
@@ -752,7 +787,7 @@ def _production_detail(
             "schema_version": loaded.manifest.schema_version,
             "revision": loaded.manifest.manifest_revision,
         },
-        "shots": [_shot_projection(shot) for shot in loaded.shots],
+        "shots": [_authored_shot_projection(shot, loaded, workspace, assets, media_map) for shot in loaded.shots],
         "attempts": attempts,
         "operation_summary": [
             {"operation": operation, "count": count}
