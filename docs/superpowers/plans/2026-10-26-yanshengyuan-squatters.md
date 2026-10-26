@@ -1,5 +1,9 @@
 # Yanshengyuan Squatters Film Production Plan
 
+## Human Review Update — 2026-10-26
+
+用户明确认可6.5秒720p诊断片的画面和声音，绑定 `cumulative-review-003` MP4 SHA-256 `0dc52da4df8211f56687e4ca7d27dab6aa014971c08ee06c3d532d52a8ce3e6a`。本节取代下文“正常速度人审未发生”的当前解释；后续保留这版已认可效果。该认可不扩大为完整广告验收，也不抹去MC-01包装比对、raw Gate FAIL与消费历史。广告固定720p规则见 `16390fd`；18次/A12上限已耗尽，未获新增次数授权前不得submit。精确人审范围与证据见主记录 `Human Review Update`。
+
 **Goal:** 将用户已确认的《斑点钉子户》做成约50秒、40–60秒范围内的单条颜生源广告，以人物主动护理、镜中租客的反应及同份续住合同回扣形成因果。
 
 **Scope:** 只推进本片，使用 Jimeng / Seedance 2.0 VIP、9:16；前三秒商品可见，完整品名入声，真实商品落版及“栖澜百货商贸”低存在感慢水印。旧全城警报稿已被用户否决，不作为新剧情基础。
