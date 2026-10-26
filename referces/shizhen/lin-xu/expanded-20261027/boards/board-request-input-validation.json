@@ -1,0 +1,51 @@
+{
+  "purpose": "consolidated_character_reference_sheet",
+  "authorization": "User provided example character sheet and requested combining references for model input",
+  "status": "REJECTED_BEFORE_GENERATION",
+  "tool": "image_gen.imagegen",
+  "generation_call_limit": 1,
+  "retry_limit": 0,
+  "inputs": [
+    {
+      "path": "referces/shizhen/lin-xu/expanded-20261027/images/07-full-body-front.png",
+      "sha256": "f2dbe24c7deb56bb5faf1e0267176f01ffe8e72bba12e87264060b7502b4bd4a"
+    },
+    {
+      "path": "referces/shizhen/lin-xu/expanded-20261027/images/08-full-body-side.png",
+      "sha256": "db6ccf3a71789e1e21a253913a571e3ac72d07ac9fa7138939c30c2d8d3e8be1"
+    },
+    {
+      "path": "referces/shizhen/lin-xu/expanded-20261027/images/01-front-portrait.png",
+      "sha256": "62889df9d13375f5c18c2c90e142196957fd3c9ed98edbd3d0a1d839aaa3a006"
+    },
+    {
+      "path": "referces/shizhen/lin-xu/expanded-20261027/images/02-left-three-quarter.png",
+      "sha256": "d35e15e9632382a9ba03ac1b9e11a047c8aa7b8288a52b481bd2802145cca2af"
+    },
+    {
+      "path": "referces/shizhen/lin-xu/expanded-20261027/images/03-right-three-quarter.png",
+      "sha256": "18a6495fa7ab1b76e5436ced8a3a31e9052900f40245e049de338f4fdc09bc7c"
+    },
+    {
+      "path": "referces/shizhen/lin-xu/expanded-20261027/images/05-right-profile.png",
+      "sha256": "b6ac82b211b0af19637f7e756bf18b6fb7b586b03403564c7a9c1f6d699a7cb2"
+    },
+    {
+      "path": "referces/shizhen/lin-xu/expanded-20261027/images/06-rear-head-shoulders.png",
+      "sha256": "e2addf89a5a57ea7523a1a24c95ece05d66e786d8234618b8a014276ff546bb7"
+    }
+  ],
+  "prompt_sha256": "6640f77de83357fa345821b83cc496899b7291651a81ac1075f45c622eaf0f32",
+  "excluded_image": "09-full-body-back: inconsistent jacket seams",
+  "unseen_design": "Full back and trousers/shoes are supplementary design, not independently established by footage",
+  "intended_input_role": "identity_reference_only; not a first frame or scene composition",
+  "prior_unknown_outcomes_preserved": [
+    "04-left-profile",
+    "10-anxious-proof-close",
+    "11-restrained-fear-close"
+  ],
+  "production_import": "NOT_PERFORMED",
+  "human_acceptance": "NOT_EVALUATED",
+  "actual_generation_calls": 0,
+  "validation_error": "referenced_image_paths must contain at most 5 paths"
+}

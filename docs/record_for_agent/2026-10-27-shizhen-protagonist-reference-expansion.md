@@ -17,3 +17,7 @@ learning_eligibility: ineligible
 ## Assessment
 
 这是单组身份参考准备，不能从图片数、技术解码或主观静态检查看作通用模型效果、视频身份保持或人工接受。按 `record-ai-video-session` 记录此有界网络阻断检查点；`distill-ai-video-learning` 评估 `no_candidate`，没有可归因独立对照或新的人工接受证据。不修改 Skill、Policy 或 Gate。
+
+## Reference Board Request
+
+用户随后提供角色开发板示例，要求把素材整合为模型参考输入。新增 `expanded-20261027/boards/` 的输入／提示词记录：最初7图在工具本地参数校验被拒绝（最多5张，生图0次），改为5张后一次有效合板请求网络失败、结果UNKNOWN，零重试，未返回合板。旧8张图未变；未使用已知服装结构错误的09图，没有Production写入或新验收。合板保留UNKNOWN，不能把已有HTML总览当作新增合板成图。本次仍为 `no_candidate`。
