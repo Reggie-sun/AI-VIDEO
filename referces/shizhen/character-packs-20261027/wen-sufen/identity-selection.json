@@ -1,0 +1,21 @@
+{
+  "character": "闻素芬",
+  "decision": "SELECTED_FOR_CREATIVE_CONTINUITY",
+  "authority": "用户委托：那你自己看着办呗；开始",
+  "decider": "Codex",
+  "identity": {
+    "path": "identity/identity-v1.png",
+    "sha256": "46efde5271929d11131d08c1a46943936e78a9bd70e58f6d1c03e90575e24c73"
+  },
+  "scene_reference": {
+    "path": "scene/scene-v1.png",
+    "sha256": "3f5c815d8a4a8eb10ffb672dbe0d599d8eae7b05a63f41bbc7d5c78f9c10de9e",
+    "scope": "第五集存照馆视觉参考；服装物件和动作不永久绑定身份"
+  },
+  "visual_review": "已实际查看两张完整图；四视角脸部关系、发际线、成熟皮肤与体型一致；场次面容延续身份图，照片和纸袋握持可辨",
+  "binding_rule": "后续图像请求实际绑定身份底图；只继承身份属性，换装、伤势、年龄变化另存状态版本",
+  "human_image_review": "NOT_EVALUATED",
+  "production_activation": "NOT_PERFORMED",
+  "runtime_model_consumption": "NOT_EVALUATED",
+  "new_generation_calls": 0
+}

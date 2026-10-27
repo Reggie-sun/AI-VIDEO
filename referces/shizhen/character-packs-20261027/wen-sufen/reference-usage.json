@@ -13,8 +13,9 @@
   "change_policy": "可换衣服、受伤、变老；新状态需对照同一身份底图，保留可识别的面部结构与可解释变化，另存版本，不用一次湿发或服装反向更换演员",
   "scene_scope": "第五集存照馆候选：接收两组资料 → 核对来源 → 分开归置并收手",
   "temporary_state": "深褐开衫、石白衬衫、规整袖口；两组照片与纸质寄存袋；干燥、无新伤",
-  "visual_status": "暂无既定人像，外观补全候选",
+  "visual_status": "受用户委托自主选定 identity-v1 为后续身份锚点",
   "new_visual_choices_not_canon": true,
   "identity": "wen-sufen/identity/identity-v1.png",
-  "scene": "wen-sufen/scene/scene-v1.png"
+  "scene": "wen-sufen/scene/scene-v1.png",
+  "selection_record": "wen-sufen/identity-selection.json"
 }

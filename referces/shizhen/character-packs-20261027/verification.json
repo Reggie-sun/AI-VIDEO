@@ -110,7 +110,7 @@
     "gao-zheng/reference-usage.json": "dfaa8e463a8cded7bae259d78f46f4263856a573537ca514614c5a2934f70ab8",
     "gao-zheng/scene/scene-source.json": "1572c3835d054e3e27dcf3f7c8385e3cabe6fb8b5c4bb222dc2cc2fe31dae6ef",
     "gao-zheng/scene/scene-v1.html": "62641d49019a317e57a34fbf8ca8c703c1addbf31b90853d9332af8ebd7fb5c7",
-    "index.html": "b5237ed2c350f2944af6d860ee3af2acb7863ad91b24a5ee45ccd740fbc8408d",
+    "index.html": "f561c1051a4193155a78948ee200329f6527d3673704bf6eb48829380c57aeaf",
     "luo-min/README.md": "308bf9fe21dc3d4233591030c985796e92a007e92168b6e9736af31891dfab66",
     "luo-min/prompts/identity-v1.txt": "d3b8e3646edf7800583cfc04fcef4866dfa1598186def8f8ef55eef5bde2305d",
     "luo-min/reference-usage.json": "a10594f9d75aaac14256dd207d2d20078bb98612e396ac78e86371fb13eab15b",
@@ -118,9 +118,17 @@
     "luo-min/scene/scene-v1.html": "b9615ec8cb75b03d43905318eb25ec0a915ab522697188c055c7f26a4ef0be2a",
     "package-manifest.json": "ef0b04fb6155f77ac9142070f5488e6295e29baaddf0e6fac67be55bbe851bc2",
     "source-evidence.json": "a7859fab5f875ed9e4d3be7d8ad2b403cb30ba8bdc8049fa7b7d7a9250f4fc9b",
-    "wen-sufen/README.md": "39cd991d24c24eca64e3e5d058cc062c2795a5cf22145683dc9b9a2bde0067e1",
+    "wen-sufen/README.md": "6b243f0131d797d8dd20674a36a560964f94daa4a232565ecc17e8660fc1bf91",
     "wen-sufen/prompts/identity-v1.txt": "9cacb4cf49b2409e9f32e37445fcf14f4b84dfd0a264a27162e2e0b615905282",
     "wen-sufen/prompts/scene-v1.txt": "330f41ee8d842528b7693ea4efbf2489938bdde39e047a032e21f273eed14ee1",
-    "wen-sufen/reference-usage.json": "a1eaa05449ebe0859581e1c28958276c9d24f2386195bfe38273077b5d49e435"
+    "wen-sufen/reference-usage.json": "43fb47ca0d1a5a8a1eea21b54e4219e4d8c1c3d00e865952d1c5ade7bfa78f98",
+    "wen-sufen/identity-selection.json": "76d4c0797118e5e36cda0f88ed750f31208ff57787ff29581110cb9e6421ae28"
+  },
+  "identity_selection_update": {
+    "role": "闻素芬",
+    "record": "wen-sufen/identity-selection.json",
+    "creative_selection": "SELECTED_BY_DELEGATED_JUDGMENT",
+    "human_visual_acceptance": "NOT_EVALUATED",
+    "new_generation_calls": 0
   }
 }
