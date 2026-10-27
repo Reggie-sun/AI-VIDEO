@@ -70,6 +70,7 @@ test("default browser offers one cross-source search, records and explicit follo
     const markup = renderToStaticMarkup(React.createElement(LibraryBrowser, { renderContext() {}, renderRecord() {} }));
     assert.match(markup, /视频库/);
     assert.match(markup, /生成记录/);
+    assert.match(markup, /参考素材/);
     assert.equal((markup.match(/id="video-source-select"/g) || []).length, 1);
     assert.match(markup, /搜索已加载视频/);
     assert.match(markup, /全部证据状态/);

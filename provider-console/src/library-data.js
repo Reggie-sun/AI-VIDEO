@@ -14,6 +14,8 @@ async function readJson(url, signal) {
 
 export function useLibraryData() {
   const [catalog, setCatalog] = useState({ workspaces: [] });
+  const [referenceRevision, setReferenceRevision] = useState(0);
+  const refreshReferences = useCallback(() => setReferenceRevision((value) => value + 1), []);
   const [details, setDetails] = useState({});
   const [external, setExternal] = useState(null);
   const [runsLoading, setRunsLoading] = useState(true);
@@ -129,8 +131,8 @@ export function useLibraryData() {
     };
   }, [refreshRuns, refreshExternal]);
   const refreshRunsAndIndex = useCallback(() => Promise.all([refreshRuns(), ...(indexEnabled.current ? [refreshIndex()] : [])]), [refreshRuns, refreshIndex]);
-  const connection = useLibraryLiveUpdates({ refreshRuns: refreshRunsAndIndex, refreshExternal });
+  const connection = useLibraryLiveUpdates({ refreshRuns: refreshRunsAndIndex, refreshExternal, refreshReferences });
   const loaded = useMemo(() => Object.values(details).flatMap((result) => result.detail ? [result.detail] : []), [details]);
   const enrichedExternal = useMemo(() => attachRunsMediaIndex(external, mediaIndex), [external, mediaIndex]);
-  return { catalog, details, loaded, external: enrichedExternal, runsLoading, externalLoading, runsError, externalError, indexLoading, indexNotice, connection, refreshRuns: refreshRunsAndIndex, refreshExternal, refreshIndex, loadMoreRuns, loadWorkspace };
+  return { catalog, details, loaded, external: enrichedExternal, runsLoading, externalLoading, runsError, externalError, indexLoading, indexNotice, connection, referenceRevision, refreshReferences, refreshRuns: refreshRunsAndIndex, refreshExternal, refreshIndex, loadMoreRuns, loadWorkspace };
 }

@@ -93,7 +93,8 @@ function StatusIcon({ tone, size = 18 }) {
   return <Circle size={size} />;
 }
 
-function Sidebar() {
+function Sidebar({ view, onViewChange }) {
+  const activeId = view === "references" ? "assets" : "providers";
   return (
     <nav className="sidebar" aria-label="主导航">
       <div className="brand"><Play size={22} weight="fill" /><span>AI-VIDEO</span></div>
@@ -101,7 +102,7 @@ function Sidebar() {
         {NAV_ITEMS.map(([id, label, Icon]) => (
           <li key={id}>{id === "modules"
             ? <a className="nav-item" href="/src/project-modules.html" style={{ textDecoration: "none" }}><Icon size={17} /><span>{label}</span></a>
-            : <button type="button" className={`nav-item${id === "providers" ? " is-active" : ""}`} aria-current={id === "providers" ? "page" : undefined}><Icon size={17} /><span>{label}</span></button>}</li>
+            : <button type="button" className={`nav-item${id === activeId ? " is-active" : ""}`} aria-current={id === activeId ? "page" : undefined} onClick={() => { if (id === "assets") onViewChange?.("references"); else if (id === "providers") onViewChange?.("library"); }}><Icon size={17} /><span>{label}</span></button>}</li>
         ))}
       </ul>
       <div className="sidebar-bottom">
@@ -552,7 +553,7 @@ function RecordDetail({ detail, selectedId, onSelect, hidePlayer = false }) {
 }
 
 export function App() {
-  return <LibraryBrowser sidebar={<Sidebar />}
+  return <LibraryBrowser sidebar={(view, onViewChange) => <Sidebar view={view} onViewChange={onViewChange} />}
     renderRecord={(detail, id, onSelect) => <RecordDetail key={`${detail.workspace}:${id}`} detail={detail} selectedId={id} onSelect={onSelect} />}
     renderContext={(context) => context.runBinding
       ? <section><p>Runs exact SHA + bytes 旁证；不表示当前 workspace strict reopen、lifecycle 或质量已通过。</p><ExternalShotBreakdown group={{ run_bindings: [context.runBinding] }} /></section>

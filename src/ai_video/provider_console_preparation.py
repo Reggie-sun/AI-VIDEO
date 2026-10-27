@@ -94,3 +94,58 @@ def project_preparations(paths: list[Path], root: Path) -> dict[str, object]:
                 "binding_status": "unbound_local_files",
             })
     return {"preparations": preparations, "preparations_truncated": truncated, "_media": media_map}
+
+
+def catalog_reference_library(root: Path, *, query: str = "", offset: int = 0) -> dict[str, object]:
+    """Browse the configured local image archive, with bounded scans and page reads."""
+    if len(query) > 256 or offset < 0 or offset > 100_000:
+        raise ValueError("reference library query is invalid")
+    result = {"source": "referces", "status": "available", "items": [], "total": 0,
+              "offset": 0, "page_size": 12, "truncated": False, "_media": {}}
+    try:
+        if root.is_symlink() or not root.is_dir() or root.resolve(strict=True) != root:
+            raise ValueError("reference root unavailable")
+    except (OSError, ValueError, RuntimeError):
+        return {**result, "status": "unavailable"}
+    pending, files, scanned = [(root, 0)], [], 0
+    while pending and scanned < 4096:
+        directory, depth = pending.pop()
+        try:
+            with os.scandir(directory) as entries:
+                for entry in entries:
+                    if scanned >= 4096:
+                        result["truncated"] = True
+                        break
+                    scanned += 1
+                    if entry.name.startswith(".") or entry.is_symlink():
+                        continue
+                    path = Path(entry.path)
+                    if entry.is_dir(follow_symlinks=False):
+                        if depth < 12:
+                            pending.append((path, depth + 1))
+                        else:
+                            result["truncated"] = True
+                    elif entry.is_file(follow_symlinks=False) and path.suffix.lower() in _IMAGE_TYPES:
+                        relative = path.relative_to(root).as_posix()
+                        if query.casefold() in relative.casefold():
+                            files.append((entry.stat(follow_symlinks=False).st_mtime, relative, path))
+        except OSError:
+            result["truncated"] = True
+    result["truncated"] |= bool(pending)
+    files.sort(key=lambda row: (-row[0], row[1]))
+    result["total"] = len(files)
+    offset = min(offset, max(0, (len(files) - 1) // 12 * 12))
+    result["offset"] = offset
+    budget = [_MAX_TOTAL_BYTES]
+    for _, relative, path in files[offset:offset + 12]:
+        item = {"file_name": path.name, "relative_path": relative, "media": None}
+        try:
+            sha256, size, mtime = _read_image(path, root, budget)
+            token = hashlib.sha256(f"reference-library\0{relative}\0{sha256}".encode()).hexdigest()[:40]
+            media = {"token": token, "mime_type": _IMAGE_TYPES[path.suffix.lower()], "bytes": size, "sha256": sha256}
+            result["_media"][token] = {"source_path": str(path), **{key: value for key, value in media.items() if key != "token"}}
+            item.update(media=media, updated_at=datetime.fromtimestamp(mtime, timezone.utc).isoformat())
+        except (OSError, ValueError, RuntimeError):
+            item["availability"] = "unavailable"
+        result["items"].append(item)
+    return result

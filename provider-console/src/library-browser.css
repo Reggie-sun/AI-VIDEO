@@ -30,6 +30,11 @@
 .shot-reference-grid article { min-width: 0; overflow: hidden; border: 1px solid var(--border); border-radius: 5px; }
 .shot-reference-grid strong, .shot-reference-grid small { display: block; margin: 7px 9px; overflow-wrap: anywhere; font-size: 11px; }
 .shot-reference-grid small { color: var(--muted); }
+.reference-library { flex: 1; min-height: 240px; overflow: auto; padding: 20px 24px; }
+.reference-library h2 { margin-top: 0; }
+.reference-library p { color: var(--muted); font-size: 12px; line-height: 1.6; }
+.reference-library-search { display: grid; gap: 8px; max-width: 520px; }
+.reference-library .shot-reference-grid { grid-template-columns: repeat(auto-fill, minmax(min(240px, 100%), 1fr)); }
 .generation-activity { padding: 12px 24px; border-bottom: 1px solid var(--border-soft); flex-shrink: 0; }
 .generation-activity header { display: flex; gap: 16px; align-items: baseline; flex-wrap: wrap; font-size: 13px; }
 .generation-activity header span, .generation-activity p { color: var(--muted); font-size: 12px; }

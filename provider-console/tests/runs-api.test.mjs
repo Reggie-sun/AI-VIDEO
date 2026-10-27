@@ -1091,6 +1091,38 @@ test("catalog and detail are GET-only, no-store, and sanitize internal media pat
   assert.equal(method.res.headers.get("allow"), "GET");
 });
 
+test("reference library is read-only, fixed-root, query bounded and registers exact image previews", async () => {
+  const root = await mkdtemp(path.join(tmpdir(), "provider-console-reference-library-"));
+  const source = path.join(root, "referces/character/frame.png");
+  const outside = path.join(root, "outside.png");
+  const bytes = Buffer.from("archive-image");
+  await mkdir(path.dirname(source), { recursive: true });
+  await Promise.all([writeFile(source, bytes), writeFile(outside, bytes)]);
+  const media = { token: "archive-image-token", mime_type: "image/png", bytes: bytes.length, sha256: createHash("sha256").update(bytes).digest("hex") };
+  let received;
+  const handler = createRunsApiHandler({ repoRoot: root, runProjector: async (...args) => {
+    received = args;
+    return { source: "referces", total: 2, items: [{ media }, { media: { ...media, token: "outside-image-token" } }], _media: {
+      [media.token]: { ...media, source_path: source }, "outside-image-token": { ...media, source_path: outside },
+    } };
+  } });
+  const catalog = await invoke(handler, request("GET", "/api/reference-library?query=character&offset=12"));
+  assert.equal(catalog.res.statusCode, 200);
+  assert.equal(catalog.res.headers.get("cache-control"), "no-store");
+  assert.deepEqual(received, ["references", null, null, { query: "character", offset: 12 }]);
+  assert.equal(JSON.parse(catalog.res.body).items[1].media.token, undefined);
+  assert.equal(catalog.res.body.toString().includes(root), false);
+  const image = await invoke(handler, request("GET", `/api/runs/media/${media.token}`));
+  assert.equal(image.res.statusCode, 200);
+  assert.deepEqual(image.res.body, bytes);
+  for (const query of ["offset=-1", "offset=100001", "root=/tmp", "offset=0&offset=1", `query=${"x".repeat(257)}`]) {
+    assert.equal((await invoke(handler, request("GET", `/api/reference-library?${query}`))).res.statusCode, 400);
+  }
+  assert.equal((await invoke(handler, request("POST", "/api/reference-library"))).res.statusCode, 405);
+  assert.equal((await invoke(handler, { ...request("GET", "/api/reference-library"), socket: { remoteAddress: "192.168.1.2" } })).res.statusCode, 403);
+  handler.close();
+});
+
 test("preparation catalog registers exact image previews without a Project and rejects changed bytes", async () => {
   const root = await mkdtemp(path.join(tmpdir(), "provider-console-preparation-"));
   const source = path.join(root, "runs/demo/S05/references/frame.png");

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 const EMPTY_CONNECTION = { state: "connecting", expectedSources: [], watchedSources: [] };
 
-export function connectLibraryLiveUpdates({ refreshRuns, refreshExternal, setConnection, EventSourceClass = globalThis.EventSource }) {
+export function connectLibraryLiveUpdates({ refreshRuns, refreshExternal, refreshReferences = () => {}, setConnection, EventSourceClass = globalThis.EventSource }) {
   if (typeof EventSourceClass !== "function") {
     setConnection({ state: "unavailable", expectedSources: [], watchedSources: [] });
     return undefined;
@@ -28,6 +28,7 @@ export function connectLibraryLiveUpdates({ refreshRuns, refreshExternal, setCon
     if (message.type === "ready") {
       refreshRuns();
       refreshExternal();
+      refreshReferences();
     }
   };
   const update = (message) => {
@@ -35,7 +36,8 @@ export function connectLibraryLiveUpdates({ refreshRuns, refreshExternal, setCon
     try { event = JSON.parse(message.data); } catch { return; }
     const sources = Array.isArray(event?.sources) ? event.sources : [];
     if (sources.includes("runs")) refreshRuns();
-    if (sources.some((source) => source !== "runs")) refreshExternal();
+    if (sources.includes("references")) refreshReferences();
+    if (sources.some((source) => source !== "runs" && source !== "references")) refreshExternal();
   };
   events.addEventListener("ready", sourceStatus);
   events.addEventListener("source-status", sourceStatus);
@@ -48,8 +50,8 @@ export function connectLibraryLiveUpdates({ refreshRuns, refreshExternal, setCon
   };
 }
 
-export function useLibraryLiveUpdates({ refreshRuns, refreshExternal }) {
+export function useLibraryLiveUpdates({ refreshRuns, refreshExternal, refreshReferences }) {
   const [connection, setConnection] = useState(EMPTY_CONNECTION);
-  useEffect(() => connectLibraryLiveUpdates({ refreshRuns, refreshExternal, setConnection }), [refreshExternal, refreshRuns]);
+  useEffect(() => connectLibraryLiveUpdates({ refreshRuns, refreshExternal, refreshReferences, setConnection }), [refreshExternal, refreshRuns, refreshReferences]);
   return connection;
 }

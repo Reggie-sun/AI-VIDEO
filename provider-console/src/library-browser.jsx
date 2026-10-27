@@ -9,6 +9,7 @@ import { libraryLiveStatus } from "./library-refresh-contract.js";
 import { MediaFolderButton } from "./media-folder.jsx";
 import { GenerationActivity, PreparationActivityDetail } from "./generation-activity.jsx";
 import { AuthoredReferences, RequestReferences } from "./reference-media.jsx";
+import { ReferenceLibrary } from "./reference-library.jsx";
 import "./library-browser.css";
 
 export function ExactPlayer({ entry, measurement, onMeasured, onUnavailable }) {
@@ -85,7 +86,7 @@ function Comparison({ entries, measurements, onMeasured, onUnavailable, onClose 
 export function LibraryBrowser({ sidebar, renderContext, renderRecord }) {
   const data = useLibraryData();
   const target = useRef(libraryTargetFromSearch(typeof window === "undefined" ? "" : window.location.search));
-  const [view, setView] = useState("library");
+  const [view, setView] = useState(() => typeof window !== "undefined" && new URLSearchParams(window.location.search).get("view") === "references" ? "references" : "library");
   const [query, setQuery] = useState("");
   const [source, setSource] = useState("all");
   const [model, setModel] = useState("all");
@@ -132,7 +133,7 @@ export function LibraryBrowser({ sidebar, renderContext, renderRecord }) {
   const canCompare = compareEntries.length === 2 && compareEntries.every((entry) => entry.available);
   const closeComparison = useCallback(() => setComparing(false), []);
   useEffect(() => { if (!comparing && listScroll.current) listScroll.current.scrollTop = savedScroll.current; }, [comparing]);
-  const refresh = () => { setUnavailable(new Set()); setMeasurements((current) => Object.fromEntries(Object.entries(current).map(([id, value]) => [id, { ...value, playbackError: null }]))); data.refreshRuns(); data.refreshExternal({ force: true }); };
+  const refresh = () => { if (view === "references") { data.refreshReferences(); return; } setUnavailable(new Set()); setMeasurements((current) => Object.fromEntries(Object.entries(current).map(([id, value]) => [id, { ...value, playbackError: null }]))); data.refreshRuns(); data.refreshExternal({ force: true }); };
   const failed = Object.values(data.details).filter((item) => item.error);
   const pendingWorkspaces = (data.catalog.workspaces || []).filter((item) => !data.details[item.workspace]);
   const partial = pendingWorkspaces.length || data.runsError || data.externalError || data.indexNotice || data.catalog.truncated || data.loaded.some((item) => item.workspace_media_truncated || item.status === "recovered_video_evidence" || item.attempts?.some((attempt) => attempt.candidate_media_truncated)) || (data.external?.sources || []).some((item) => item.truncated || item.status !== "available");
@@ -140,9 +141,9 @@ export function LibraryBrowser({ sidebar, renderContext, renderRecord }) {
   const recordItems = (data.catalog.workspaces || []).filter((item) => `${item.workspace} ${data.details[item.workspace]?.detail?.project?.title || ""}`.toLowerCase().includes(recordQuery.toLowerCase()));
   const recordDetail = record && data.details[record.workspace]?.detail;
   const preparations = data.catalog.preparations || [];
-  return <div className="library-shell" onVolumeChangeCapture={(event) => keepOneAudio(event.target, event.currentTarget)}>{sidebar}<main className="library-main">
-    <header className="library-header"><div><span className="library-eyebrow">AI-VIDEO / 本地媒体</span><h1>视频库</h1></div><div className="library-view-tabs"><button type="button" aria-pressed={view === "library"} onClick={() => { setView("library"); setComparing(false); }}>视频库</button><button type="button" aria-pressed={view === "records"} onClick={() => { setView("records"); setComparing(false); }}>生成记录</button></div><button type="button" onClick={refresh}>刷新</button></header>
-    <details className="library-coverage"><summary><span role="status">已加载 {filtered.length} 段（当前筛选） · {data.loaded.length} / {(data.catalog.workspaces || []).length} 个工作区 · {data.runsLoading || data.externalLoading || data.indexLoading ? "扫描 / 关联进行中" : partial || failed.length ? "扫描结束 · 覆盖不完整" : "已完成当前允许范围扫描"} · {liveStatus === "live" ? "实时更新已连接" : liveStatus === "partial" ? "部分来源未实时监视，可手动刷新" : "实时更新连接中、过期或不可用，可手动刷新"}</span><span className="library-coverage-toggle">扫描详情与加载选项</span></summary>
+  return <div className="library-shell" onVolumeChangeCapture={(event) => keepOneAudio(event.target, event.currentTarget)}>{typeof sidebar === "function" ? sidebar(view, setView) : sidebar}<main className="library-main">
+    <header className="library-header"><div><span className="library-eyebrow">AI-VIDEO / 本地媒体</span><h1>{view === "references" ? "参考素材" : "视频库"}</h1></div><div className="library-view-tabs"><button type="button" aria-pressed={view === "library"} onClick={() => { setView("library"); setComparing(false); }}>视频库</button><button type="button" aria-pressed={view === "records"} onClick={() => { setView("records"); setComparing(false); }}>生成记录</button><button type="button" aria-pressed={view === "references"} onClick={() => { setView("references"); setComparing(false); }}>参考素材</button></div><button type="button" onClick={refresh}>刷新</button></header>
+    {view !== "references" && <><details className="library-coverage"><summary><span role="status">已加载 {filtered.length} 段（当前筛选） · {data.loaded.length} / {(data.catalog.workspaces || []).length} 个工作区 · {data.runsLoading || data.externalLoading || data.indexLoading ? "扫描 / 关联进行中" : partial || failed.length ? "扫描结束 · 覆盖不完整" : "已完成当前允许范围扫描"} · {liveStatus === "live" ? "实时更新已连接" : liveStatus === "partial" ? "部分来源未实时监视，可手动刷新" : "实时更新连接中、过期或不可用，可手动刷新"}</span><span className="library-coverage-toggle">扫描详情与加载选项</span></summary>
       {(data.runsError || data.externalError) && <p className="library-warning">刷新失败，保留的结果可能已过期：{data.runsError} {data.externalError}</p>}
       {Boolean(failed.length) && <details><summary>{failed.length} 个工作区不可用</summary>{Object.entries(data.details).filter(([, item]) => item.error).map(([key, item]) => <p key={key}>{key} · {item.error}</p>)}</details>}
       {data.indexNotice && <p>Runs 证据关联：{data.indexNotice}</p>}
@@ -152,6 +153,8 @@ export function LibraryBrowser({ sidebar, renderContext, renderRecord }) {
       {(data.external?.sources || []).filter((item) => item.status !== "available" || item.truncated).map((item) => <p key={item.id}>{item.label || item.id} · {item.status}{item.truncated ? " · 扫描截断" : ""}</p>)}
     </details>
     <GenerationActivity details={data.loaded} preparations={preparations} preparationsTruncated={data.catalog.preparations_truncated} loading={data.runsLoading} stale={Boolean(data.runsError) || data.connection.state !== "connected" || !data.connection.watchedSources.includes("runs")} onSelect={(item) => { setRecord(item.kind === "local_preparation" ? { preparationId: item.preparation.id } : { workspace: item.workspace, attemptId: item.attemptId }); setView("records"); setComparing(false); }} />
+    </>}
+    {view === "references" && <ReferenceLibrary revision={data.referenceRevision} live={data.connection.state === "connected" && data.connection.watchedSources.includes("references")} />}
     {view === "library" && <>
       <div className="library-filters"><label>搜索已加载视频<input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="作品 / Run / Shot / 模型 / 文件名" /></label><label>来源<select id="video-source-select" value={source} onChange={(event) => setSource(event.target.value)}><option value="all">全部视频来源</option><option value="runs">Runs</option>{(data.external?.sources || []).map((item) => <option key={item.id} value={item.id}>{item.label || item.id}</option>)}</select></label><label>模型<select value={model} onChange={(event) => setModel(event.target.value)}><option value="all">全部模型</option>{[...new Set(entries.flatMap((entry) => entry.contexts.map((item) => item.model)).filter(Boolean))].sort().map((value) => <option key={value}>{value}</option>)}</select></label><label>媒体状态<select value={availability} onChange={(event) => setAvailability(event.target.value)}><option value="all">全部状态</option><option value="available">可预览</option><option value="unavailable">文件不可用</option></select></label><details className="library-advanced"><summary>高级证据筛选</summary><select aria-label="证据筛选" value={evidence} onChange={(event) => setEvidence(event.target.value)}><option value="all">全部证据状态</option><option value="linked">已关联</option><option value="unbound">无绑定证据</option><option value="unparsed">旁证待解析</option><option value="incomplete">Runs 待恢复</option></select><label><input type="checkbox" checked={includeMasters} onChange={(event) => setIncludeMasters(event.target.checked)} />显示修补母版</label></details></div>
       <div className="library-selection-bar"><label><input type="checkbox" checked={followLatest} onChange={(event) => setFollowLatest(event.target.checked)} />跟随最新</label><span>已选择 {compareIds.length} / 2 段比较</span>{compareIds.length > 0 && <button type="button" onClick={() => { setCompareIds([]); setComparing(false); }}>清空比较选择</button>}<button type="button" disabled={!canCompare} onClick={() => { savedScroll.current = listScroll.current?.scrollTop || 0; setComparing(true); }}>比较所选视频</button>{notice && <span role="status">{notice}</span>}</div>

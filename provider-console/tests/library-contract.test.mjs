@@ -7,6 +7,7 @@ test("SSE ready reconciles missed updates on initial connection and reconnection
   let events;
   let runs = 0;
   let external = 0;
+  let references = 0;
   let state;
   class FakeEvents {
     listeners = new Map();
@@ -18,6 +19,7 @@ test("SSE ready reconciles missed updates on initial connection and reconnection
   }
   const close = connectLibraryLiveUpdates({ EventSourceClass: FakeEvents,
     refreshRuns: () => runs++, refreshExternal: () => external++,
+    refreshReferences: () => references++,
     setConnection: (value) => { state = typeof value === "function" ? value(state) : value; },
   });
   events.emit("ready", { sources: ["runs"] });
@@ -28,6 +30,9 @@ test("SSE ready reconciles missed updates on initial connection and reconnection
   assert.deepEqual([runs, external], [2, 2]);
   events.emit("catalog-change", { sources: ["runs"] });
   assert.deepEqual([runs, external], [3, 2]);
+  assert.equal(references, 2);
+  events.emit("catalog-change", { sources: ["references"] });
+  assert.deepEqual([runs, external, references], [3, 2, 3], "reference updates do not rescan unrelated video sources");
   events.emit("source-status", { sources: [] });
   assert.deepEqual(state.watchedSources, []);
   close();

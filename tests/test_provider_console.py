@@ -163,6 +163,62 @@ def test_preparation_changed_during_read_is_rejected_and_charges_read_budget(tmp
     assert budget == [0]
 
 
+def test_reference_library_lists_all_folders_with_search_and_pagination(tmp_path):
+    from ai_video.provider_console_preparation import catalog_reference_library
+
+    root = tmp_path / "referces"
+    for index in range(15):
+        image = _write(root / f"characters/lin-xu/{index:02}.png", bytes([index + 1]))
+        os.utime(image, (100 + index, 100 + index))
+    _write(root / "profile.json", b'{"secret":"NEVER_READ"}')
+    first = catalog_reference_library(root)
+    second = catalog_reference_library(root, offset=12)
+    assert first["total"] == 15
+    assert len(first["items"]) == 12
+    assert len(second["items"]) == 3
+    assert {item["relative_path"] for item in first["items"]}.isdisjoint(item["relative_path"] for item in second["items"])
+    assert catalog_reference_library(root, query="LIN-XU/14")["total"] == 1
+    assert catalog_reference_library(root, query="no-match")["total"] == 0
+    assert catalog_reference_library(root, offset=999)["offset"] == 12
+    assert "NEVER_READ" not in json.dumps(first)
+    for offset in (-1, 100001):
+        with pytest.raises(ValueError):
+            catalog_reference_library(root, offset=offset)
+
+
+def test_reference_library_rejects_missing_linked_and_changed_media(tmp_path):
+    from ai_video.provider_console_preparation import catalog_reference_library
+
+    root = tmp_path / "referces"
+    assert catalog_reference_library(root)["status"] == "unavailable"
+    outside = _write(tmp_path / "outside/frame.png", b"outside")
+    root.symlink_to(outside.parent, target_is_directory=True)
+    assert catalog_reference_library(root)["status"] == "unavailable"
+    root.unlink()
+    root.mkdir()
+    (root / "link.png").symlink_to(outside)
+    (root / "linked-directory").symlink_to(outside.parent, target_is_directory=True)
+    image = _write(root / "real.png", b"first")
+    first = catalog_reference_library(root)
+    assert first["total"] == 1
+    image.write_bytes(b"changed")
+    second = catalog_reference_library(root)
+    assert first["items"][0]["media"]["token"] != second["items"][0]["media"]["token"]
+
+
+def test_reference_library_keeps_unpreviewable_rows_visible(tmp_path, monkeypatch):
+    from ai_video import provider_console_preparation as preparation
+
+    root = tmp_path / "referces"
+    _write(root / "large.png", b"abcdef")
+    monkeypatch.setattr(preparation, "_MAX_IMAGE_BYTES", 3)
+    result = preparation.catalog_reference_library(root)
+    assert result["total"] == 1
+    assert result["items"][0]["availability"] == "unavailable"
+    assert result["items"][0]["media"] is None
+    assert result["_media"] == {}
+
+
 def _ns(**values):
     return SimpleNamespace(**values)
 

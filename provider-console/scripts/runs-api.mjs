@@ -190,9 +190,10 @@ function continuityIdentityArgs() {
 function createPythonProjector(repoRoot) {
   const runsRoot = path.join(repoRoot, "runs");
   const python = process.env.AI_VIDEO_PYTHON || "python";
-  return async (command, workspace, attemptId) => {
+  return async (command, workspace, attemptId, options = {}) => {
     const args = ["-m", "ai_video.provider_console", command, "--runs-root", runsRoot];
     if (workspace) args.push("--workspace", workspace);
+    if (command === "references") args.push("--query", options.query || "", "--offset", String(options.offset || 0));
     if (command === "continuity-review") {
       args.push("--attempt-id", attemptId, ...continuityIdentityArgs());
     }
@@ -561,7 +562,7 @@ export function createRunsApiHandler({
     const isRunsRequest = parsed.pathname.startsWith("/api/runs");
     const isExternalRequest = parsed.pathname.startsWith("/api/external-media");
     const isEventsRequest = parsed.pathname === "/api/library-events";
-    if (!isRunsRequest && !isExternalRequest && !isEventsRequest) {
+    if (!isRunsRequest && !isExternalRequest && !isEventsRequest && parsed.pathname !== "/api/reference-library") {
       next();
       return;
     }
@@ -659,6 +660,21 @@ export function createRunsApiHandler({
         if (req.method !== "GET") return methodNotAllowed(res, "GET");
         const result = await readRunsMediaIndex();
         send(res, 200, publicProjection(result));
+        return;
+      }
+
+      if (parsed.pathname === "/api/reference-library") {
+        if (req.method !== "GET") return methodNotAllowed(res, "GET");
+        const query = parsed.searchParams.get("query") || "";
+        const offset = parsed.searchParams.get("offset") || "0";
+        if (query.length > 256 || !/^\d{1,6}$/.test(offset) || Number(offset) > 100000
+          || [...parsed.searchParams.keys()].some((key) => !["query", "offset"].includes(key))
+          || parsed.searchParams.getAll("query").length > 1 || parsed.searchParams.getAll("offset").length > 1) {
+          return send(res, 400, { error: { code: "INVALID_REFERENCE_QUERY", message: "参考素材查询无效。" } });
+        }
+        const result = await runProjector("references", null, null, { query, offset: Number(offset) });
+        const unavailableTokens = await registerRunsMedia(result, path.join(repoRoot, "referces"), mediaCache);
+        send(res, 200, publicProjection(unavailableMediaDescriptors(result, unavailableTokens)));
         return;
       }
 
@@ -775,6 +791,7 @@ export function createRunsApiPlugin(options) {
   const install = (server) => {
     const roots = [
       { id: "runs", root: path.join(options.repoRoot, "runs") },
+      { id: "references", root: path.join(options.repoRoot, "referces") },
       ...(options.externalSources || []).map((source) => ({ id: source.id, root: source.root })),
     ];
     const changeFeed = createCatalogChangeFeed({ roots });

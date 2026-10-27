@@ -1,7 +1,8 @@
 """Sanitized, read-only projections of local ``runs/`` workspaces.
 
-This module deliberately depends only on canonical readers.  It never imports a
-state committer or Provider adapter and never writes to a workspace.
+Production workspaces use canonical readers; local reference observations are
+explicitly separate. It never imports a state committer or Provider adapter and
+never writes to a workspace or reference directory.
 """
 
 from __future__ import annotations
@@ -33,7 +34,7 @@ from ai_video.provider_console_manifest import (
     read_production_manifest_nofollow as _read_production_manifest_nofollow,
 )
 from ai_video.provider_console_render import active_render_media
-from ai_video.provider_console_preparation import preparation_directory, project_preparations
+from ai_video.provider_console_preparation import catalog_reference_library, preparation_directory, project_preparations
 
 
 _BOUNDARY = {"read_only": True, "local_only": True, "network": False}
@@ -862,9 +863,12 @@ def project_continuity_review(
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m ai_video.provider_console")
     subparsers = parser.add_subparsers(dest="command", required=True)
-    for command in ("catalog", "detail", "continuity-review"):
+    for command in ("catalog", "detail", "continuity-review", "references"):
         child = subparsers.add_parser(command)
         child.add_argument("--runs-root", required=True, type=Path)
+        if command == "references":
+            child.add_argument("--query", default="")
+            child.add_argument("--offset", type=int, default=0)
         if command in {"detail", "continuity-review"}:
             child.add_argument("--workspace", required=True)
         if command == "continuity-review":
@@ -881,6 +885,8 @@ def main(argv: list[str] | None = None) -> int:
     try:
         if args.command == "catalog":
             result = catalog_runs(args.runs_root)
+        elif args.command == "references":
+            result = catalog_reference_library(args.runs_root.absolute().parent / "referces", query=args.query, offset=args.offset)
         elif args.command == "detail":
             result = project_workspace_detail(args.runs_root, args.workspace)
         else:

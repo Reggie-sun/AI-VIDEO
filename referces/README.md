@@ -4,6 +4,7 @@
 
 ## Browse
 
+- 本机前端：[参考素材库](http://127.0.0.1:5174/?view=references)，或点击左侧“素材”／顶部“参考素材”。支持文件名和目录搜索、分页、完整图片放大；直接读取本目录的 PNG/JPEG/WebP，新图片落盘后自动更新。只读浏览不建立 Shot 绑定或质量验收。
 - 主角合板见 [林序人物参考板 PNG](shizhen/lin-xu/expanded-20261027/boards/lin-xu-identity-board-v2.png)；独立单图见 [图片总览](shizhen/lin-xu/expanded-20261027/index.html)，来源与状态见 [Lin Xu Reference Expansion](shizhen/lin-xu/expanded-20261027/README.md)。本组以已生成成片帧为身份依据。
 - 图片按原来源目录结构存放在 `runs/shizhen-*/` 和 `outputs/shizhen-episode01/` 子目录下。
 - [index.csv](index.csv) 列出每个原路径、当前副本相对路径、SHA-256、大小和收录原因；同一 SHA-256 的图片只保存一份，多个来源指向同一副本。
