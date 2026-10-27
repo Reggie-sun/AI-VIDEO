@@ -8,7 +8,7 @@
 - 新增 [董文慧、罗敏、高峥、闻素芬四人总览](shizhen/character-packs-20261027/index.html)：每套独立存放人物身份底图和当前场次参考，取材、职业／性格依据及候选状态见 [说明](shizhen/character-packs-20261027/README.md)。
 - 第一集快递员见 [简单三视图进度](shizhen/courier/three-views-20261027/README.md)：正面、侧面已返回；背面调用UNKNOWN，未重复提交。
 - 本机前端：[参考素材库](http://127.0.0.1:5174/?view=references)，或点击左侧“素材”／顶部“参考素材”。支持文件名和目录搜索、分页、完整图片放大；直接读取本目录的 PNG/JPEG/WebP，新图片落盘后自动更新。只读浏览不建立 Shot 绑定或质量验收。
-- 主角合板见 [林序人物参考板 PNG](shizhen/lin-xu/expanded-20261027/boards/lin-xu-identity-board-v2.png)；独立单图见 [图片总览](shizhen/lin-xu/expanded-20261027/index.html)，来源与状态见 [Lin Xu Reference Expansion](shizhen/lin-xu/expanded-20261027/README.md)。本组以已生成成片帧为身份依据。
+- 主角合板见 [林序人物参考板 PNG](shizhen/character-packs-20261027/lin-xu/expanded-20261027/boards/lin-xu-identity-board-v2.png)；独立单图见 [图片总览](shizhen/character-packs-20261027/lin-xu/expanded-20261027/index.html)，来源与状态见 [Lin Xu Reference Expansion](shizhen/character-packs-20261027/lin-xu/expanded-20261027/README.md)。本组以已生成成片帧为身份依据。
 - 图片按原来源目录结构存放在 `runs/shizhen-*/` 和 `outputs/shizhen-episode01/` 子目录下。
 - [index.csv](index.csv) 列出每个原路径、当前副本相对路径、SHA-256、大小和收录原因；同一 SHA-256 的图片只保存一份，多个来源指向同一副本。
 - [verification.json](verification.json) 保存本次整理的计数及完整性核验结果。
