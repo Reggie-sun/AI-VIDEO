@@ -1,0 +1,79 @@
+{
+  "shot_id": "MC01-02",
+  "attempt_id": "shizhen-macro-MC01-02-1080p-approved-003",
+  "artifact_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC01-02-1080p-v3/state/video-generation/fetch/files/88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52.mp4",
+  "artifact_sha256": "88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52",
+  "artifact_size_bytes": 30452488,
+  "resolution": [
+    1920,
+    1080
+  ],
+  "baseline": {
+    "kind": "explicit-user-selected-source-approval/1",
+    "user_quote": "这个没问题,用1080p再做一次",
+    "scope": "720p试片02的实际画面、表演与接镜作为本轮升档基线；不代表新1080p片已获认可、声音技术结论或Production验收",
+    "source_root": "runs/shizhen-macro-opening-20261027/MC01-02-720p-v2",
+    "source_attempt_id": "shizhen-macro-MC01-02-720p-preview-002",
+    "source_artifact_sha256": "d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424",
+    "source_review_page": "index-720p-v2.html",
+    "accepted_creative_baseline": true,
+    "prior_ai_findings_retained": true,
+    "new_media_acceptance": "NOT_EVALUATED",
+    "recorded_at": "2026-10-27T07:20:08.341801+00:00"
+  },
+  "required_findings": [
+    {
+      "requirement_id": "action",
+      "verdict": "PASS",
+      "evidence": "qa/frames; accepted-720p-source.json",
+      "reason": "保留用户认可基线的停机后门继续右移、到限位后连接有限渐进变化；旧固定端几何意见不作为新的改片要求"
+    },
+    {
+      "requirement_id": "identity",
+      "verdict": "PASS",
+      "evidence": "qa/frames",
+      "reason": "工人、安全帽工作服与同一设备保持；转场叠影单独归camera，不冒充新增角色"
+    },
+    {
+      "requirement_id": "space",
+      "verdict": "PASS",
+      "evidence": "qa/frames/frame-01.png through frame-09.png",
+      "reason": "门向右与两段索路、工人安全距离保留，未见改设备或反向受力"
+    },
+    {
+      "requirement_id": "camera",
+      "verdict": "FAIL",
+      "evidence": "qa/independent-media-review.json; qa/frames/frame-10.png and frame-11.png",
+      "reason": "约4.5–5.5秒新增远近景叠化与双重人／设备，和已认可720p直接切换不同；这是新生成退步，不是重开旧构图偏好"
+    },
+    {
+      "requirement_id": "performance",
+      "verdict": "PASS",
+      "evidence": "qa/frames",
+      "reason": "操作停止、收手及观察设备基本行动保留；不代表人工对自然表演的最终认可"
+    },
+    {
+      "requirement_id": "art",
+      "verdict": "PASS",
+      "evidence": "qa/video-analysis.json; qa/technical-probe.json",
+      "reason": "1920x1080输出，雨夜真人摄影质感与实用光保留；新增转场问题归camera"
+    },
+    {
+      "requirement_id": "sound",
+      "verdict": "NOT_EVALUATED",
+      "evidence": "qa/native-audio-result.json",
+      "reason": "盲分析有风声、机械重响和低频撞击，无语音片段；未可靠证明停马达／持续雨车流摩擦的完整时序与无新增惊吓重击，human listening未完成"
+    }
+  ],
+  "verdict": "FAIL",
+  "execution_disposition": "STOP_CURRENT_UNIT_NO_NEXT_SHOT",
+  "reason": "HD generation completed but new transition differs from approved source; new clip acceptance remains pending",
+  "human_acceptance_of_this_HD": "NOT_EVALUATED",
+  "prior720p_user_acceptance": true,
+  "old_ai_findings_retained": true,
+  "new_video_calls_this_unit": 1,
+  "macro_video_calls_cumulative": 3,
+  "new_audio_analysis_calls": 1,
+  "actual_charges": "NOT_CONFIRMED",
+  "production_activation": false
+}

@@ -1,0 +1,14 @@
+{
+  "user_quote": "顺便把seedance 2.0的改了默认1080p,2.5不变",
+  "seedance2_default": "1080p",
+  "seedance25_unchanged": "480p preview, user-approved1080p upgrade",
+  "explicit_current_user_resolution_overrides_default": true,
+  "sealed_requests_unchanged": true,
+  "runtime_schema_or_API_defaults_changed": false,
+  "tests": "8 seedance authoring tests PASS",
+  "docs_contract": "PASS",
+  "files_sha256": {
+    ".agents/skills/seedance-authoring/SKILL.md": "b505951ed46285eb74ae27bca93442e46e26e5fec8b4f0840837d7c869e63124",
+    "docs/canvas-continuous-production.md": "fb206a2e0b499f2718b0c96b7204ad06e41a11c590420412218773f2ecff0b08"
+  }
+}

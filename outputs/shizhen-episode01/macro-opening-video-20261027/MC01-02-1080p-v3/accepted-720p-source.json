@@ -1,0 +1,13 @@
+{
+  "kind": "explicit-user-selected-source-approval/1",
+  "user_quote": "这个没问题,用1080p再做一次",
+  "scope": "720p试片02的实际画面、表演与接镜作为本轮升档基线；不代表新1080p片已获认可、声音技术结论或Production验收",
+  "source_root": "runs/shizhen-macro-opening-20261027/MC01-02-720p-v2",
+  "source_attempt_id": "shizhen-macro-MC01-02-720p-preview-002",
+  "source_artifact_sha256": "d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424",
+  "source_review_page": "index-720p-v2.html",
+  "accepted_creative_baseline": true,
+  "prior_ai_findings_retained": true,
+  "new_media_acceptance": "NOT_EVALUATED",
+  "recorded_at": "2026-10-27T07:20:08.341801+00:00"
+}

@@ -1,0 +1,84 @@
+{
+  "user_quote": "这个没问题,用1080p再做一次",
+  "selected_skill": "seedance-authoring shared +2.0 overlay; open-video source-preserving branch",
+  "accepted_baseline_sha256": "d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424",
+  "selected_model": "seedance_2.0_vip",
+  "resolution": "1080p",
+  "duration_seconds": 8,
+  "mode": "multimodal",
+  "native_audio": true,
+  "semantic_open_state": {
+    "kind": "typed_text",
+    "state_ref": null,
+    "state_text": "雨夜市政检修入口，工作灯亮着，工人站在控制箱旁，绞盘沿正确索路牵引滑门向右靠近固定限位。",
+    "state_hash": null,
+    "required_change": false
+  },
+  "semantic_close_state": {
+    "kind": "typed_text",
+    "state_ref": null,
+    "state_text": "工作灯熄灭、马达停止；门已抵住右侧固定限位，索仍绷紧，四螺栓底板中部有限拱起而不断裂。",
+    "state_hash": null,
+    "required_change": true
+  },
+  "axis": {
+    "camera_axis": "设备斜侧同侧",
+    "framing_continuity": "切前后连接耳维持画面中右、索向朝右、门边限位同框；切后继承门已到限位阶段再呈现底板拱起",
+    "crossing_policy": "同侧切近景，不越轴"
+  },
+  "camera_endpoint": {
+    "start_framing": "斜侧中远景",
+    "end_framing": "同侧连接近景，连接耳中右，门边限位同框",
+    "position_lock": false,
+    "orientation_lock": false
+  },
+  "native_prompt_equal_approved720": true,
+  "reference_bindings_equal_approved720": true,
+  "native_prompt_sha256": "c5e202a8c7bd13ae8e23722666fb764a610e73f6e5bd10ffea19a680370e078a",
+  "actual_refs": [
+    {
+      "asset_id": "MC01-02-ref-1",
+      "asset_sha256": "797c56885e9474d62031ddb0dd12182ceb86303bc24290609c3ac447a8f06f33",
+      "size_bytes": 2689606
+    },
+    {
+      "asset_id": "MC01-02-ref-2",
+      "asset_sha256": "8d1379aa3d587416bf2a2cf8b483e16ff4d4e57544a4b5b1b75278a9940fe254",
+      "size_bytes": 2714219
+    },
+    {
+      "asset_id": "MC01-02-ref-3",
+      "asset_sha256": "a3b844b5f6a51a3b6b8ac6cdff8d983fa3c75a5cb474add840d9fd9688340008",
+      "size_bytes": 2808301
+    },
+    {
+      "asset_id": "MC01-02-ref-4",
+      "asset_sha256": "db9c0c09df94376df46345bbb39474bb66cbe111e94bd303feaab4f83c3f8077",
+      "size_bytes": 2988617
+    },
+    {
+      "asset_id": "MC01-02-ref-5",
+      "asset_sha256": "9561834dff4a53e0e932f8e7de7d358dc83e5c756e8ef571fe4e8f1fd915f46d",
+      "size_bytes": 2850279
+    }
+  ],
+  "prompt_adaptation": "none; preserve exact approved-source native text",
+  "lint": {
+    "five_exact_references": true,
+    "five_bound_markers": true,
+    "pure_chinese_body": true,
+    "exact_authored_prompt": true,
+    "exact_approved720_prompt": true,
+    "no_dialogue_music": true,
+    "correct_cable": true,
+    "duration8": true,
+    "1080p": true,
+    "native_audio": true
+  },
+  "new_approved_hd_calls": 1,
+  "macro_calls_before": 2,
+  "macro_cumulative_ceiling": 3,
+  "automatic_retries": 0,
+  "new_film_post_media_review_required": true,
+  "production_activation": false
+}

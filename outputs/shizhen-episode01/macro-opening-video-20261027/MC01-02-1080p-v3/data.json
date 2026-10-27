@@ -1,0 +1,254 @@
+{
+  "objective": "依据用户认可的720p试片02，以相同Seedance2.0、纯中文正文、五张参考顺序、时长和原声意图生成1080p新片；原画面和声音重新审看，保护B6、字体与音乐",
+  "images": [
+    {
+      "asset_id": "MC01-02-ref-1",
+      "node_id": "MC01-02-ref-1-node",
+      "resource_id": "MC01-02-ref-1-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/repair-02/M01-r3.png",
+      "usage_license": "Original fictional references generated for authorized Shizhen independent macro opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02/reference-1-source.json",
+        "record_sha256": "56df8ceac4615b69d182be573b0210826e48898cbe6918c144c3abbf7ffbd457",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    },
+    {
+      "asset_id": "MC01-02-ref-2",
+      "node_id": "MC01-02-ref-2-node",
+      "resource_id": "MC01-02-ref-2-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/repair-02/M02.png",
+      "usage_license": "Original fictional references generated for authorized Shizhen independent macro opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02/reference-2-source.json",
+        "record_sha256": "adbea934f29009f157e152d4d5fcfcfa2b707f9a8411be9b921a46dd0d9bd53b",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    },
+    {
+      "asset_id": "MC01-02-ref-3",
+      "node_id": "MC01-02-ref-3-node",
+      "resource_id": "MC01-02-ref-3-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/repair-02/M03.png",
+      "usage_license": "Original fictional references generated for authorized Shizhen independent macro opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02/reference-3-source.json",
+        "record_sha256": "20b04ff18653a1929df5054e7cb39c93f21cad56f6c1f64e6f988476fecf9892",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    },
+    {
+      "asset_id": "MC01-02-ref-4",
+      "node_id": "MC01-02-ref-4-node",
+      "resource_id": "MC01-02-ref-4-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/repair-02/M03-D0.png",
+      "usage_license": "Original fictional references generated for authorized Shizhen independent macro opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02/reference-4-source.json",
+        "record_sha256": "2d93fa488e1fce3af977167b7e7264353f60ada1e771b3d65dbd9d08241a73d6",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    },
+    {
+      "asset_id": "MC01-02-ref-5",
+      "node_id": "MC01-02-ref-5-node",
+      "resource_id": "MC01-02-ref-5-local-generated",
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/repair-02/M03-D1-r1.png",
+      "usage_license": "Original fictional references generated for authorized Shizhen independent macro opening",
+      "generated_source": {
+        "record_path": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02/reference-5-source.json",
+        "record_sha256": "8811e353934377991dc57eae655537ec890153637605a6f59a950d87bb2f0bd5",
+        "tool": {
+          "name": "builtin-imagegen",
+          "version": "tool-interface"
+        }
+      }
+    }
+  ],
+  "characters": [
+    {
+      "character_id": "municipal-worker",
+      "name": "市政检修工",
+      "identity": "普通市政工人，只经历当前设备异常",
+      "appearance_bible": "以参考素材1同一中年中国男性、黄色安全帽、深蓝雨工作服与手套为身份和服装锚点",
+      "reference_asset_ids": [
+        "MC01-02-ref-1"
+      ]
+    }
+  ],
+  "scene_images": [
+    "MC01-02-ref-1",
+    "MC01-02-ref-2",
+    "MC01-02-ref-3",
+    "MC01-02-ref-4",
+    "MC01-02-ref-5"
+  ],
+  "observations": {
+    "action": "停灯后门仍同镜右移至限位，连接处呈现用户认可720p基线的渐进有限变化；不出现相对基线新增的断裂、飞脱、爆炸或运动倒跳",
+    "identity": "同一工人、服装、设备及五张参考对应状态，无换脸或设备漂移",
+    "space": "绞盘到右侧滑轮再折返到门的两段索路，门始终向右，工人不跨索",
+    "camera": "保持用户认可720p基线的中远景到同侧连接近景、受力方向和行动阶段；不以旧构图偏好重新改片，检查新片有无新增跳变或切错对象",
+    "performance": "工人右手停止，先确认控制箱再看牵引点，保持安全距离，反应自然",
+    "art": "真人摄影质感、雨夜光线连续，无慢动作、黑屏、鬼影、火花爆炸、片名字幕拼格",
+    "sound": "马达停止；雨、车流及受力金属摩擦持续，无对白、配乐或惊吓重击"
+  },
+  "paths": {
+    "identity": [
+      "generation_intent.identity_continuity.character_ids.0",
+      "generation_intent.identity_continuity.preservation"
+    ],
+    "action": [
+      "generation_intent.open_state.kind",
+      "generation_intent.open_state.state_text",
+      "generation_intent.open_state.required_change",
+      "generation_intent.close_state.kind",
+      "generation_intent.close_state.state_text",
+      "generation_intent.close_state.required_change",
+      "generation_intent.scene_continuity.scene_id",
+      "generation_intent.scene_continuity.time_of_day",
+      "generation_intent.scene_continuity.mood",
+      "generation_intent.scene_continuity.state_constraints.0",
+      "generation_intent.scene_continuity.state_constraints.1",
+      "generation_intent.scene_continuity.state_constraints.2",
+      "generation_intent.subject_action.start_state",
+      "generation_intent.subject_action.progression",
+      "generation_intent.subject_action.endpoint.state_text",
+      "generation_intent.subject_action.endpoint.required_change",
+      "generation_intent.motion_envelope.onset",
+      "generation_intent.motion_envelope.peak",
+      "generation_intent.motion_envelope.settle",
+      "generation_intent.motion_envelope.direction",
+      "generation_intent.motion_envelope.amplitude_class",
+      "generation_intent.pacing.cadence",
+      "generation_intent.pacing.tempo_class",
+      "generation_intent.pacing.shot_duration_seconds"
+    ],
+    "camera": [
+      "generation_intent.axis_continuity.camera_axis",
+      "generation_intent.axis_continuity.framing_continuity",
+      "generation_intent.axis_continuity.crossing_policy",
+      "generation_intent.camera_intent.movement",
+      "generation_intent.camera_intent.stability",
+      "generation_intent.camera_intent.framing_intent",
+      "generation_intent.camera_intent.expression_strength",
+      "generation_intent.camera_endpoint.start_framing",
+      "generation_intent.camera_endpoint.end_framing",
+      "generation_intent.camera_endpoint.position_lock",
+      "generation_intent.camera_endpoint.orientation_lock",
+      "generation_intent.primary_camera_motion.movement_kind",
+      "generation_intent.primary_camera_motion.direction",
+      "generation_intent.primary_camera_motion.amplitude_class",
+      "generation_intent.primary_camera_motion.speed_class",
+      "generation_intent.primary_camera_motion.start_motion_state",
+      "generation_intent.primary_camera_motion.end_motion_state",
+      "generation_intent.camera_subject_relation.subject_id",
+      "generation_intent.camera_subject_relation.relation_kind",
+      "generation_intent.camera_subject_relation.start_relation",
+      "generation_intent.camera_subject_relation.end_relation"
+    ],
+    "performance": [
+      "generation_intent.performance_intent.trigger",
+      "generation_intent.performance_intent.visible_response",
+      "generation_intent.performance_intent.gaze_target",
+      "generation_intent.performance_intent.body_behavior",
+      "generation_intent.performance_intent.hand_behavior",
+      "generation_intent.performance_intent.terminal_performance_state",
+      "generation_intent.performance_intent.character_directions.0.character_id",
+      "generation_intent.performance_intent.character_directions.0.screen_identity",
+      "generation_intent.performance_intent.character_directions.0.role",
+      "generation_intent.performance_intent.character_directions.0.visibility",
+      "generation_intent.performance_intent.character_directions.0.beats.0.phase",
+      "generation_intent.performance_intent.character_directions.0.beats.0.trigger",
+      "generation_intent.performance_intent.character_directions.0.beats.0.emotion",
+      "generation_intent.performance_intent.character_directions.0.beats.0.intensity",
+      "generation_intent.performance_intent.character_directions.0.beats.0.facial_expression",
+      "generation_intent.performance_intent.character_directions.0.beats.0.gaze_target",
+      "generation_intent.performance_intent.character_directions.0.beats.0.breathing",
+      "generation_intent.performance_intent.character_directions.0.beats.0.body_behavior"
+    ],
+    "space": [
+      "generation_intent.space_continuity.subject_position",
+      "generation_intent.space_continuity.screen_direction",
+      "generation_intent.space_continuity.crossing_policy"
+    ],
+    "sound": [
+      "generation_intent.ambience_intent.environment_bed",
+      "generation_intent.ambience_intent.foley_cues.0",
+      "generation_intent.ambience_intent.explicitly_silent",
+      "generation_intent.dialogue_intent.mode",
+      "generation_intent.dialogue_intent.lip_sync_required",
+      "generation_intent.music_intent.mode"
+    ],
+    "art": [
+      "generation_intent.visual_treatment.medium_look",
+      "generation_intent.visual_treatment.palette",
+      "generation_intent.visual_treatment.material_treatment",
+      "generation_intent.visual_treatment.prohibited_visual_drift.0",
+      "generation_intent.visual_treatment.prohibited_visual_drift.1",
+      "generation_intent.lighting_intent.motivated_source",
+      "generation_intent.lighting_intent.direction",
+      "generation_intent.lighting_intent.exposure_priority",
+      "generation_intent.lighting_intent.continuity_state"
+    ]
+  },
+  "fragments": {
+    "identity": [
+      "参考素材1{{image:0}}负责同一工人、设备、工作灯亮着的起态与中远景构图；素材2{{image:1}}负责停机后灯灭而门继续右移；素材3{{image:2}}负责门到右侧限位后的设备位置。素材4{{image:3}}与素材5{{image:4}}只指导同一四螺栓底板由平直到有限拱起的几何差异，不照搬两张细节图的取景，不拼图。\n"
+    ],
+    "action": [
+      "门接近限位，工人右手按下停止按钮，亮着的工作灯熄灭、马达停声，随后收回手。保持这个画面，让观众清楚看见灯灭之后门仍沿导轨向右滑动，直到抵住固定限位。",
+      "近景起初四螺栓底板仍平直；绷紧钢索继续拉住牵引耳，底板上、下螺栓固定，中部在镜内缓慢但清楚地向外拱起，边缘出现可辨的阴影间隙，有限形变而不断裂。形变是金属几何发生改变，不只是灯光反射或雨水流动，不能用一张静止连接图结束。\n"
+    ],
+    "camera": [
+      "等门确已抵住限位、工人视线落到牵引点，再顺着他的注视切入同侧连接近景，不按固定秒数切。连接耳仍在画面中右，钢索仍朝右延伸，门边固定限位与部分门体同框，能立即认出前镜的同一处；不突然换到反侧，不把连接耳跳到画面左边。切前后的门处于同一个已到限位的阶段，不重新滑动或重复反应。\n"
+    ],
+    "performance": [
+      "工人眉头稍收，呼吸平稳，先确认控制箱，再将视线转向被拉紧的牵引连接，停在安全距离，不再反复按按钮，也不走向钢索。\n"
+    ],
+    "space": [
+      "钢索只有绞盘到右侧滑轮、右滑轮折返到门牵引耳两段，不增加绞盘直接连门的第三条索。"
+    ],
+    "sound": [
+      "雨声和正常车流一直存在，按停止后马达保持安静，受力金属低沉摩擦继续；无对白、配乐或惊吓重击。"
+    ],
+    "art": [
+      "雨夜市政检修入口，真人实拍质感。先以稳定斜侧中远景看清控制箱旁戴黄色安全帽的深蓝工作服工人、左前固定绞盘、右侧滑轮、滑门与后景正常车流。",
+      "全程自然原速、同一人物设备与雨夜灯光，不慢动作、闪屏、黑屏、鬼影、火花、爆炸、片名、字幕或说明文字。"
+    ]
+  },
+  "intent_sha256": "ac7297c14c0681fbcb1765361e88fc5b87884b806eaf958239c9b4de600d235c",
+  "accepted_source": {
+    "kind": "explicit-user-selected-source-approval/1",
+    "user_quote": "这个没问题,用1080p再做一次",
+    "scope": "720p试片02的实际画面、表演与接镜作为本轮升档基线；不代表新1080p片已获认可、声音技术结论或Production验收",
+    "source_root": "runs/shizhen-macro-opening-20261027/MC01-02-720p-v2",
+    "source_attempt_id": "shizhen-macro-MC01-02-720p-preview-002",
+    "source_artifact_sha256": "d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424",
+    "source_review_page": "index-720p-v2.html",
+    "accepted_creative_baseline": true,
+    "prior_ai_findings_retained": true,
+    "new_media_acceptance": "NOT_EVALUATED",
+    "recorded_at": "2026-10-27T07:20:08.341801+00:00"
+  },
+  "original_720p_observations": {
+    "action": "控制灯与马达停止后门同镜继续右移，到限位后底板在近景内由平直向外有限拱起，边缘间隙可辨、螺栓固定而不裂",
+    "identity": "同一工人、服装、设备及五张参考对应状态，无换脸或设备漂移",
+    "space": "绞盘到右侧滑轮再折返到门的两段索路，门始终向右，工人不跨索",
+    "camera": "工人手收回、视线交到牵引点后切；连接耳仍中右、钢索朝右，门已到限位阶段连续，不发生原片5.2167秒的突兀空间重置",
+    "performance": "工人右手停止，先确认控制箱再看牵引点，保持安全距离，反应自然",
+    "art": "真人摄影质感、雨夜光线连续，无慢动作、黑屏、鬼影、火花爆炸、片名字幕拼格",
+    "sound": "马达停止；雨、车流及受力金属摩擦持续，无对白、配乐或惊吓重击"
+  }
+}

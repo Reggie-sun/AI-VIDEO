@@ -1,0 +1,195 @@
+{
+  "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC01-02-1080p-v3/state/video-generation/fetch/files/88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52.mp4",
+  "probe": {
+    "file": {
+      "path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC01-02-1080p-v3/state/video-generation/fetch/files/88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52.mp4",
+      "size_bytes": 30452488,
+      "size_mb": 29.04,
+      "format_name": "mov,mp4,m4a,3gp,3g2,mj2",
+      "format_long_name": "QuickTime / MOV",
+      "duration_seconds": 8.058,
+      "duration_hms": "00:00:08.058",
+      "bit_rate_kbps": 30233
+    },
+    "video_stream": {
+      "codec": "h264",
+      "profile": "High",
+      "width": 1920,
+      "height": 1080,
+      "aspect_ratio": "16:9",
+      "fps": 60,
+      "pixel_format": "yuv420p",
+      "bit_rate_kbps": 30250,
+      "frame_count": 193
+    },
+    "audio_stream": {
+      "codec": "aac",
+      "sample_rate": 44100,
+      "channels": 2,
+      "channel_layout": "stereo",
+      "bit_rate_kbps": 129,
+      "language": "und"
+    },
+    "metadata": {
+      "major_brand": "isom",
+      "minor_version": "512",
+      "compatible_brands": "isomiso2avc1mp41",
+      "LvMetaInfo": "{\"data\":{\"os\":\"\",\"product\":\"dreamina\",\"exportType\":\"generation\",\"videoId\":\"0\"}}",
+      "UserComment": "{\"aigc_label_type\":0,\"source_info\":\"dreamina\"}",
+      "com.apple.quicktime.artwork": "{\"data\":{\"os\":\"\",\"product\":\"dreamina\",\"exportType\":\"generation\",\"videoId\":\"0\"}}",
+      "comment": "vid:v02870g10004dbg55la7dld0p6t62hj0",
+      "encoder": "Lavf58.76.100"
+    }
+  },
+  "frames": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC01-02-1080p-v3/state/video-generation/fetch/files/88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52.mp4",
+    "total_frames_extracted": 17,
+    "interval_used": 0.5,
+    "frames": [
+      {
+        "timestamp_seconds": 0,
+        "timestamp_hms": "00:00:00.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 38289
+      },
+      {
+        "timestamp_seconds": 0.5,
+        "timestamp_hms": "00:00:00.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 37680
+      },
+      {
+        "timestamp_seconds": 1,
+        "timestamp_hms": "00:00:01.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 37564
+      },
+      {
+        "timestamp_seconds": 1.5,
+        "timestamp_hms": "00:00:01.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 35654
+      },
+      {
+        "timestamp_seconds": 2,
+        "timestamp_hms": "00:00:02.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 35921
+      },
+      {
+        "timestamp_seconds": 2.5,
+        "timestamp_hms": "00:00:02.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 35843
+      },
+      {
+        "timestamp_seconds": 3,
+        "timestamp_hms": "00:00:03.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 36493
+      },
+      {
+        "timestamp_seconds": 3.5,
+        "timestamp_hms": "00:00:03.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 36714
+      },
+      {
+        "timestamp_seconds": 4,
+        "timestamp_hms": "00:00:04.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 37123
+      },
+      {
+        "timestamp_seconds": 4.5,
+        "timestamp_hms": "00:00:04.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 33579
+      },
+      {
+        "timestamp_seconds": 5,
+        "timestamp_hms": "00:00:05.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 33184
+      },
+      {
+        "timestamp_seconds": 5.5,
+        "timestamp_hms": "00:00:05.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 38360
+      },
+      {
+        "timestamp_seconds": 6,
+        "timestamp_hms": "00:00:06.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 38850
+      },
+      {
+        "timestamp_seconds": 6.5,
+        "timestamp_hms": "00:00:06.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 39074
+      },
+      {
+        "timestamp_seconds": 7,
+        "timestamp_hms": "00:00:07.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 39222
+      },
+      {
+        "timestamp_seconds": 7.5,
+        "timestamp_hms": "00:00:07.500",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 39362
+      },
+      {
+        "timestamp_seconds": 8,
+        "timestamp_hms": "00:00:08.000",
+        "format": "jpeg",
+        "width": 640,
+        "size_bytes": 39280
+      }
+    ]
+  },
+  "transcription": null,
+  "scenes": {
+    "video_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC01-02-1080p-v3/state/video-generation/fetch/files/88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52.mp4",
+    "threshold": 0.1,
+    "total_scenes": 1,
+    "scenes": [
+      {
+        "scene_number": 1,
+        "start_time": 0,
+        "start_hms": "00:00:00.000",
+        "end_time": 8.058,
+        "end_hms": "00:00:08.058",
+        "duration_seconds": 8.058,
+        "confidence": null
+      }
+    ]
+  },
+  "analysis_summary": {
+    "duration_hms": "00:00:08.058",
+    "resolution": "1920x1080",
+    "has_audio": true,
+    "estimated_speaking_duration_seconds": 0,
+    "scene_count": 1,
+    "frames_extracted": 17
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "meta": null,
+  "content": [
+    {
+      "type": "text",
+      "text": "{\n  \"schema_version\": \"audio-understanding-evidence/1\",\n  \"source_sha256\": \"88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52\",\n  \"source_size_bytes\": 30452488,\n  \"audio_sha256\": \"ba16ec94d7854e1ac6f4918e558947319d05869f487a6b4af702784041f11b93\",\n  \"audio_size_bytes\": 1421436,\n  \"duration_seconds\": 8.057324263038549,\n  \"audio_start_seconds\": 0.0,\n  \"request_fingerprint\": \"a029222ebb2c1762640d3d007a06e6a600a379b37a3121719599b36415573f78\",\n  \"requested_model_id\": \"gemini-3.8-flash\",\n  \"response_model_id\": \"gemini-3.8-flash\",\n  \"response_sha256\": \"8032cf707fc2f68d65b52f1073313cfaa917a91ecc57faae0b9e3d6354c04a74\",\n  \"observations\": {\n    \"segments\": [],\n    \"voice_description\": \"not discernible\",\n    \"delivery_description\": \"not discernible\",\n    \"background_sounds\": [\n      \"wind noise\",\n      \"heavy mechanical thuds\",\n      \"low-frequency impact sounds\"\n    ],\n    \"uncertainties\": []\n  },\n  \"proof_boundary\": \"analyzer observations; not QA/human/timing acceptance\",\n  \"media_path\": \"/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC01-02-1080p-v3/state/video-generation/fetch/files/88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52.mp4\",\n  \"analysis_audio_derivation\": \"full_source_track_pcm_derivative\",\n  \"human_acceptance\": \"NOT_EVALUATED\"\n}",
+      "annotations": null,
+      "meta": null
+    }
+  ],
+  "structuredContent": null,
+  "isError": false
+}

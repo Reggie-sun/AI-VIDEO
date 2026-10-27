@@ -8,7 +8,7 @@ learning_eligibility: ineligible
 
 Date: 2026-10-27
 
-> **Current Update:** 六镜12项静态职责已补齐。随后实际完成首段1080p试片及用户明确选择的720p／Seedance2.0试片02；两版均有已知媒体质量失败，720p版切镜和固定底板形变仍未通过，声音语义未完整确认。下文检查点按时间保留，最新事实见末尾720p段；未提交后续Shot、未改B6、未作人工/Production验收。
+> **Current Update:** 用户已明确认可720p试片02并要求同方案1080p，本轮1080p版03已真实生成、可播放。新片约4.5–5.5秒出现基线没有的叠化，已标注新片未通过项，待用户审看；旧AI意见与720p用户认可分别保留。另按用户指令改为Seedance2.0默认1080p，2.5保持480p先审。未提交下一Shot、未改B6或签Production验收。
 
 ## Initial Scope And Result
 
@@ -127,3 +127,24 @@ MC01/MC02镜头依据已修订：停机与继续滑移同镜不变；待手收�
 验证包括源／副本SHA、1280×720输出、全声画decode、17张实际源PTS帧、Range206、独立Chromium1.0x原声开启播放到结尾、B6保护SHA不变。receipt为`outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-720p-v2/verification.json`，逐项裁决为`qa/post-media-gate.json`。任务调用脚本py_compile、docs_contract_gate通过，无共享实现变更，不追加完整工程回归，也不把技术成功当媒体PASS。候选仍FAIL，Production activation/P6/Final Acceptance均无。下一修复应先解决参考主导的近景构图及固定端几何，声音走EVIDENCE_REPAIR_FIRST，不再仅改秒点或重复同Prompt。
 
 record-ai-video-session记录本稳定交付／失败检查点；distill-ai-video-learning评估no_candidate：同一来源修复链中同时改变了分辨率与创作表达，不能归因于版本或分辨率，也没有足够独立证据采纳通用规则。代码Implementation Risk Gate为NATIVE_REVIEW_NOT_REQUIRED；媒体所需独立只读复核已完成，但未解决blocker，不能称镜头或完整开场已完成验收。
+
+
+## Approved 720p Source To 1080p And New Model Defaults
+
+用户对试片02明确说“这个没问题,用1080p再做一次”，将该exact720p成片作为本轮视觉、表演、接镜对照。用户认可属于创作选择，不以旧AI构图／底板偏好继续改片；旧FAIL/NE和独立意见保留，未倒写成技术PASS或伪造听音证据。新的认可封套位于`MC01-02-1080p-v3/accepted-720p-source.json`，绑定源SHA `d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424`及原话，新1080p本身仍须重新审看。
+
+同轮用户另外要求“顺便把seedance 2.0的改了默认1080p,2.5不变”。Agent规则owner `seedance-authoring/SKILL.md`及canonical制作规格`docs/canvas-continuous-production.md`同步为：2.0新生成／修复默认1080p，当前用户另有规格或审批指令时优先；2.5维持480p试片、认可后才1080p。15秒及以内用2.0的选择原则不变。这是用户直接规则，不是媒体学习adoption；不改原生平台／API默认、历史sealed请求、型号能力或Product Gate。默认规格仍由每次exact selected profile显式落实，variant不支持时报告，不换型号或假放大。
+
+本轮保留720p实际请求的751字纯中文正文、全部GenerationIntent、五张exact图片bytes／顺序／角色、模型2.0VIP、multimodal、8秒、16:9和原生环境声音。native prompt SHA、image_bindings逐字段相等；仅输出规格、commercial selector、新空节点及技术rationale变化，见`source-preservation-diff.json`和`pre-submit-preflight.json`。本轮eval context明确以用户认可基线核对回归，原plan的action/camera观察仍保存在data.json的original_720p_observations，不谎称旧AI逐项技术通过。B6、字体与配乐未改。
+
+新1080p有界qualification单元root：`runs/shizhen-macro-opening-20261027/MC01-02-1080p-v3`；输出metadata/caller归`outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-1080p-v3`。沿既有committer bootstrap、feedback编译、VideoGenerationService、Paid Gate／reservation／一用permit执行，未改共享实现或模型资格。新节点`node_45y3tdf66j`，actual native config、compiled/resolved output均1080p。07:21:56.162074Z一次submit被接受，随后poll成功并fetch；没有retry、旧permit复用或scope外提交。封套保留前两宏观paid attempt／fetch／Manifest SHA，宏观计数由2增到3、本轮上限1；预配置单次内部保护上限1500CRD、三个单元累计4500CRD，均非报价，实际结算未确认。历史S05 UNKNOWN未动，没有清零历史或退款。
+
+新原片SHA `88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52`，30,452,488字节，1920×1080，约8.058秒，193帧，AAC44.1kHz双声道。审看副本`outputs/shizhen-episode01/macro-opening-video-20261027/失帧-市政异常-1080p-2.0-认可方案03.mp4`与fetched bytes完全一致。入口`http://127.0.0.1:8883/outputs/shizhen-episode01/macro-opening-video-20261027/index-1080p-v3.html`，另保留720p对照和全部旧片，不做本地升采样、retime或direct mux冒充1080p生成。
+
+显式project-local video-analysis MCP、17张actual PTS帧和全声画decode已完成；独立Chromium1.0x原声开启播放到结尾、Range206、B6保护SHA不变。MCP与本地scene阈值未检测到hard cut，Parent实际序列见约4.5–5.5秒的远近景叠化，不能把漏报/无硬切当作无转场。新片保留停灯后门继续右移和用户认可的连接有限变化，但叠化出现双重人物与设备，和720p直接切换不同，属于新生成差异，未声称保留相同像素或自动合格。
+
+沿同一个native只读`/root/macro720_review`、profile `reviewer_high`完成第3轮actual HD对照审查，无新增reviewer或nested delegation。提供用户新的认可与原片SHA，要求比较新增回归而不重开旧R01/R02。独立发现SHZ-HD-R03：4.5–5.5秒新增叠化、两处人物和两套受力连接重影；Parent CONFIRMED。限于17张取帧，reviewer未连续原速观看或听音，不签human或完整成片认可。七项Gate camera FAIL、sound NOT_EVALUATED，余项仅按用户已认可基线的有界观察；`qa/independent-media-review.json`及`qa/post-media-gate.json`保留。第3轮后没有自动第四轮或重复生成，下一Shot未提交，Production activation/P6/Final Acceptance均无。
+
+同一新MP4完整音轨仅盲分析一次，source/audio SHA绑定独立development operator unit，Gemini3.8Flash HTTP200。返回风声、机械重响、低频撞击，无语音片段；不足以可靠证明完整声场及马达停声／受力摩擦时序，无human listening结论。内部0.05USD上限不是报价，结算待确认。旧音频unit与UNKNOWN无重试，声音仍走EVIDENCE_REPAIR_FIRST，不生成新视频来补声音证据。
+
+核验receipt `MC01-02-1080p-v3/verification.json`、规则receipt `rule-verification.json`。8项seedance-authoring精准检查、docs_contract_gate和本轮operator脚本py_compile通过，无共享runtime行为变更，不宣称完整工程回归或媒体通过。record-ai-video-session记录本稳定原片交付／差异检查点；distill-ai-video-learning为no_candidate：单次1080p与720p对照仍受uncontrolled seed影响，不能归因为普遍分辨率或版本规律，且默认规格来自用户直接选择。Implementation Risk Gate为NATIVE_REVIEW_NOT_REQUIRED；实际媒体所需的单名独立复核已完成，新增blocker未解决，明确保留HD待审状态。

@@ -1,0 +1,34 @@
+{
+  "artifact_sha256": "88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52",
+  "size_bytes": 30452488,
+  "source_path": "/home/reggie/vscode_folder/AI-VIDEO/runs/shizhen-macro-opening-20261027/MC01-02-1080p-v3/state/video-generation/fetch/files/88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52.mp4",
+  "review_copy": "/home/reggie/vscode_folder/AI-VIDEO/outputs/shizhen-episode01/macro-opening-video-20261027/失帧-市政异常-1080p-2.0-认可方案03.mp4",
+  "resolution": [
+    1920,
+    1080
+  ],
+  "duration_seconds": 8.057007,
+  "full_video_audio_decode": true,
+  "exact_copy": true,
+  "Range_seek_status": 206,
+  "normal_speed_browser_playback": {
+    "rate": 1,
+    "ended": true,
+    "muted": false,
+    "human_hearing": "NOT_EVALUATED"
+  },
+  "source_prompt_and_five_refs_equal_approved720p": true,
+  "post_media_gate": "qa/post-media-gate.json",
+  "independent_review": "qa/independent-media-review.json",
+  "quality": "FAIL_NEW_DISSOLVE_PENDING_USER_REVIEW",
+  "human_acceptance_HD": "NOT_EVALUATED",
+  "source720p_user_approval": true,
+  "B6_sha256_unchanged": true,
+  "video_calls_this_unit": 1,
+  "macro_video_calls_cumulative": 3,
+  "audio_analysis_calls_this_unit": 1,
+  "actual_charges": "NOT_CONFIRMED",
+  "publication": "local originalHD review only; no activation/P6/Final Acceptance",
+  "rule_verification": "rule-verification.json",
+  "next_shot_submitted": false
+}

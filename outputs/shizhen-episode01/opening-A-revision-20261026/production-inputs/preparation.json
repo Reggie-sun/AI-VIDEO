@@ -2,21 +2,20 @@
   "selected_provider": "jimeng",
   "selected_model_family": "seedance_2.0",
   "surface": "existing Jimeng workflow",
-  "resolution": "720p",
+  "resolution": "1080p",
   "aspect_ratio": "16:9",
   "native_prompt_language": "zh",
   "director_input": "MACRO-SHOTBOARD-20261027.md",
   "references": "macro-reference-review-20261027/preparation-report.json",
   "mode": "multimodal",
-  "runtime_profile": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-720p-v2/profile.json",
+  "runtime_profile": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-1080p-v3/profile.json",
   "execute_ready": false,
   "blocking_prerequisites": [
-    "720p试片02切点3.71667秒，近景仍重置连接耳位置，切镜问题未通过",
-    "底板出现渐进变化但更像整体翘离；需固定端与中部曲率的清楚区别",
-    "声音语义仍NOT_EVALUATED，先EVIDENCE_REPAIR_FIRST",
-    "本轮有界一次720p已消费，后续Shot未提交；1080p仍须用户明确认可"
+    "1080p已生成；约4.5–5.5秒新增叠化与已认可720p不同，待重新审看",
+    "新HD声音完整时序尚未可靠确认；先补同源证据，不重复生成来修证据",
+    "未提交下一Shot；本轮一次1080p已消费，全部旧消费和媒体保留"
   ],
-  "paid_generation_calls": 2,
+  "paid_generation_calls": 3,
   "production_activation": false,
   "previous_preparation": {
     "selected_provider": "jimeng",
@@ -56,11 +55,11 @@
     ],
     "paid_generation_calls": 0
   },
-  "execution_status": "USER_720P_PREVIEW_FETCHED_POST_MEDIA_FAIL",
+  "execution_status": "APPROVED_SOURCE_HD_FETCHED_NEW_TRANSITION_FAIL",
   "execution_root": "outputs/shizhen-episode01/macro-opening-video-20261027",
   "authorization_quote": "生成視頻",
-  "first_event_gate": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-720p-v2/qa/post-media-gate.json",
-  "first_event_review": "http://127.0.0.1:8883/outputs/shizhen-episode01/macro-opening-video-20261027/index-720p-v2.html",
+  "first_event_gate": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-1080p-v3/qa/post-media-gate.json",
+  "first_event_review": "http://127.0.0.1:8883/outputs/shizhen-episode01/macro-opening-video-20261027/index-1080p-v3.html",
   "previous_resolution_preparation": {
     "resolution": "1080p",
     "runtime_profile": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02/profile.json",
@@ -72,7 +71,7 @@
     ]
   },
   "model_switch_authorized": false,
-  "hd_upgrade_authorized": false,
+  "hd_upgrade_authorized": true,
   "cut_revision": "outputs/shizhen-episode01/macro-opening-video-20261027/cut-repair-02/cut-review.json",
   "last_generated_profile": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02/profile.json",
   "previous_480p_readiness": {
@@ -86,5 +85,24 @@
     ]
   },
   "user_resolution_exception": "那你就用720p,2.0",
-  "current_attempt_evidence": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-720p-v2"
+  "current_attempt_evidence": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-1080p-v3",
+  "previous_720p_readiness": {
+    "resolution": "720p",
+    "runtime_profile": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-720p-v2/profile.json",
+    "execution_status": "USER_720P_PREVIEW_FETCHED_POST_MEDIA_FAIL",
+    "blocking_prerequisites": [
+      "720p试片02切点3.71667秒，近景仍重置连接耳位置，切镜问题未通过",
+      "底板出现渐进变化但更像整体翘离；需固定端与中部曲率的清楚区别",
+      "声音语义仍NOT_EVALUATED，先EVIDENCE_REPAIR_FIRST",
+      "本轮有界一次720p已消费，后续Shot未提交；1080p仍须用户明确认可"
+    ],
+    "first_event_gate": "outputs/shizhen-episode01/macro-opening-video-20261027/MC01-02-720p-v2/qa/post-media-gate.json",
+    "first_event_review": "http://127.0.0.1:8883/outputs/shizhen-episode01/macro-opening-video-20261027/index-720p-v2.html"
+  },
+  "user_approval_quote": "这个没问题,用1080p再做一次",
+  "accepted_720p_source_sha256": "d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424",
+  "seedance_defaults": {
+    "2.0": "1080p unless current user explicitly chooses another resolution",
+    "2.5": "480p preview then user-approved1080p, unchanged"
+  }
 }

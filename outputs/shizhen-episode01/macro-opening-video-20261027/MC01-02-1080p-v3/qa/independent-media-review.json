@@ -1,0 +1,29 @@
+{
+  "agent_task": "/root/macro720_review",
+  "profile": "reviewer_high",
+  "round": 3,
+  "authority": "read_only_advisory",
+  "source_sha256": "88564a7f7399edc432dbe25778c762f48f65217524ddad67c913331628eb0e52",
+  "accepted_baseline_sha256": "d427e9eeee1cdd17d181fc76055984997637ce9b916e78dcd7b7077523d72424",
+  "scope": "HDregression comparison against explicitly user-approved720p, not re-opened old creative preferences",
+  "findings": [
+    {
+      "id": "SHZ-HD-R03",
+      "severity": "blocking_candidate",
+      "window_seconds": [
+        4.5,
+        5.5
+      ],
+      "evidence": [
+        "qa/frames/frame-10.png",
+        "qa/frames/frame-11.png"
+      ],
+      "observation": "New dissolve overlaps wide and close views, creating two worker/connection/cable positions; absent from approved720p hard cut",
+      "impact": "New transition drift reduces target recognizability during the load event",
+      "parent_disposition": "CONFIRMED",
+      "parent_reason": "Actual HDframe sequence shows superimposed views; exact input equality does not establish media equality"
+    }
+  ],
+  "limits": "Verified SHA and17 frames; no continuous normal-speed viewing or hearing; no acceptance",
+  "further_review_rounds_requested": 0
+}
