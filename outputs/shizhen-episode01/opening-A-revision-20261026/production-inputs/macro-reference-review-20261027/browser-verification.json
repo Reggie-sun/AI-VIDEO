@@ -1,105 +1,99 @@
 {
   "method": "isolated headless Chromium via existing Playwright",
-  "chrome_mcp": "profile busy; no shared browser changed",
   "images": [
     {
-      "path": "../../../../../referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
-      "loaded": true,
-      "width": 1536,
-      "height": 1024
-    },
-    {
-      "path": "../../../../../referces/shizhen/character-packs-20261027/gao-zheng/identity/identity-v1.png",
-      "loaded": true,
+      "path": "../../../../../referces/shizhen/macro-opening-20261027/repair-02/M01-r3.png",
+      "complete": true,
       "width": 1672,
       "height": 941
     },
     {
-      "path": "../../../../../referces/shizhen/character-packs-20261027/luo-min/identity/identity-v1.png",
-      "loaded": true,
+      "path": "../../../../../referces/shizhen/macro-opening-20261027/repair-02/M02.png",
+      "complete": true,
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "path": "../../../../../referces/shizhen/macro-opening-20261027/repair-02/M03.png",
+      "complete": true,
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "path": "../../../../../referces/shizhen/macro-opening-20261027/repair-02/M03-D0.png",
+      "complete": true,
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "path": "../../../../../referces/shizhen/macro-opening-20261027/repair-02/M03-D1-r1.png",
+      "complete": true,
       "width": 1672,
       "height": 941
     },
     {
       "path": "../../../../../referces/shizhen/macro-opening-20261027/L01-r1.png",
-      "loaded": true,
+      "complete": true,
       "width": 1672,
       "height": 941
     },
     {
       "path": "../../../../../referces/shizhen/macro-opening-20261027/L01-X.png",
-      "loaded": true,
+      "complete": true,
       "width": 1672,
       "height": 941
     },
     {
       "path": "../../../../../referces/shizhen/macro-opening-20261027/L02.png",
-      "loaded": true,
-      "width": 1672,
-      "height": 941
-    },
-    {
-      "path": "../../../../../referces/shizhen/macro-opening-20261027/T01.png",
-      "loaded": true,
+      "complete": true,
       "width": 1672,
       "height": 941
     },
     {
       "path": "../../../../../referces/shizhen/macro-opening-20261027/L02-O-r1.png",
-      "loaded": true,
+      "complete": true,
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "path": "../../../../../referces/shizhen/macro-opening-20261027/repair-02/L03-r2.png",
+      "complete": true,
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "path": "../../../../../referces/shizhen/macro-opening-20261027/repair-02/L04.png",
+      "complete": true,
+      "width": 1672,
+      "height": 941
+    },
+    {
+      "path": "../../../../../referces/shizhen/macro-opening-20261027/T01.png",
+      "complete": true,
       "width": 1672,
       "height": 941
     },
     {
       "path": "../references/station-entry.png",
-      "loaded": true,
+      "complete": true,
       "width": 1918,
       "height": 1080
     },
     {
       "path": "B6-exact-first-frame.png",
-      "loaded": true,
+      "complete": true,
       "width": 1920,
       "height": 1080
     },
     {
-      "path": "../../../../../referces/shizhen/macro-opening-20261027/M01-v0.png",
-      "loaded": true,
-      "width": 1672,
-      "height": 941
-    },
-    {
-      "path": "../../../../../referces/shizhen/macro-opening-20261027/L01-v0.png",
-      "loaded": true,
-      "width": 1672,
-      "height": 941
-    },
-    {
-      "path": "../../../../../referces/shizhen/macro-opening-20261027/M01-r1.png",
-      "loaded": true,
-      "width": 1672,
-      "height": 941
-    },
-    {
-      "path": "../../../../../referces/shizhen/macro-opening-20261027/L02-O.png",
-      "loaded": true,
-      "width": 1672,
-      "height": 941
-    },
-    {
-      "path": "../../../../../referces/shizhen/macro-opening-20261027/M01-r2.png",
-      "loaded": true,
-      "width": 1672,
-      "height": 941
-    },
-    {
-      "path": "../../../../../referces/shizhen/macro-opening-20261027/L03.png",
-      "loaded": true,
-      "width": 1672,
-      "height": 941
+      "path": "../../../../../referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+      "complete": true,
+      "width": 1536,
+      "height": 1024
     }
   ],
   "errors": [],
-  "original_link": "file:///home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L01-r1.png",
+  "original_L03_link": "PASS",
+  "video_acceptance": "NOT_EVALUATED",
   "human_acceptance": "NOT_EVALUATED"
 }

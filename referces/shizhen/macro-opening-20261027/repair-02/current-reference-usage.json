@@ -1,0 +1,135 @@
+{
+  "scope": "当前静态参考映射，非Registry或Production状态",
+  "selected": [
+    {
+      "reference_role": "M01",
+      "shot_purpose": "MC01 正常任务",
+      "path": "referces/shizhen/macro-opening-20261027/repair-02/M01-r3.png",
+      "sha256": "797c56885e9474d62031ddb0dd12182ceb86303bc24290609c3ac447a8f06f33",
+      "observation_state": "STATIC_REQUIREMENTS_OBSERVED",
+      "human_acceptance": "NOT_EVALUATED",
+      "video_acceptance": "NOT_EVALUATED",
+      "input_binding_for_video": "NOT_YET_BOUND"
+    },
+    {
+      "reference_role": "M02",
+      "shot_purpose": "MC01 控制已停止",
+      "path": "referces/shizhen/macro-opening-20261027/repair-02/M02.png",
+      "sha256": "8d1379aa3d587416bf2a2cf8b483e16ff4d4e57544a4b5b1b75278a9940fe254",
+      "observation_state": "STATIC_REQUIREMENTS_OBSERVED",
+      "human_acceptance": "NOT_EVALUATED",
+      "video_acceptance": "NOT_EVALUATED",
+      "input_binding_for_video": "NOT_YET_BOUND"
+    },
+    {
+      "reference_role": "M03",
+      "shot_purpose": "MC01 门抵限位",
+      "path": "referces/shizhen/macro-opening-20261027/repair-02/M03.png",
+      "sha256": "a3b844b5f6a51a3b6b8ac6cdff8d983fa3c75a5cb474add840d9fd9688340008",
+      "observation_state": "STATIC_REQUIREMENTS_OBSERVED",
+      "human_acceptance": "NOT_EVALUATED",
+      "video_acceptance": "NOT_EVALUATED",
+      "input_binding_for_video": "NOT_YET_BOUND"
+    },
+    {
+      "reference_role": "M03-D0",
+      "shot_purpose": "MC02 受力细节前态",
+      "path": "referces/shizhen/macro-opening-20261027/repair-02/M03-D0.png",
+      "sha256": "db9c0c09df94376df46345bbb39474bb66cbe111e94bd303feaab4f83c3f8077",
+      "observation_state": "STATIC_REQUIREMENTS_OBSERVED",
+      "human_acceptance": "NOT_EVALUATED",
+      "video_acceptance": "NOT_EVALUATED",
+      "input_binding_for_video": "NOT_YET_BOUND"
+    },
+    {
+      "reference_role": "M03-D1",
+      "shot_purpose": "MC02 有限弯曲后态",
+      "path": "referces/shizhen/macro-opening-20261027/repair-02/M03-D1-r1.png",
+      "sha256": "9561834dff4a53e0e932f8e7de7d358dc83e5c756e8ef571fe4e8f1fd915f46d",
+      "observation_state": "STATIC_REQUIREMENTS_OBSERVED",
+      "human_acceptance": "NOT_EVALUATED",
+      "video_acceptance": "NOT_EVALUATED",
+      "input_binding_for_video": "NOT_YET_BOUND"
+    },
+    {
+      "reference_role": "L01",
+      "shot_purpose": "MC03 上平台下行起态",
+      "path": "referces/shizhen/macro-opening-20261027/L01-r1.png",
+      "sha256": "bd479afcec50483bf539489fae3be74cf908305f29ea2ba24471b4836aae19ea",
+      "observation_state": "STATIC_REQUIREMENTS_OBSERVED",
+      "human_acceptance": "NOT_EVALUATED",
+      "video_acceptance": "NOT_EVALUATED",
+      "input_binding_for_video": "NOT_YET_BOUND"
+    },
+    {
+      "reference_role": "L01-X",
+      "shot_purpose": "MC03 转向继续下行",
+      "path": "referces/shizhen/macro-opening-20261027/L01-X.png",
+      "sha256": "9a0be93cec6dbeaf460686c1d140156a7390bf1a200ffbfd45b8423d1e5b5f50",
+      "observation_state": "STATIC_REQUIREMENTS_OBSERVED",
+      "human_acceptance": "NOT_EVALUATED",
+      "video_acceptance": "NOT_EVALUATED",
+      "input_binding_for_video": "NOT_YET_BOUND"
+    },
+    {
+      "reference_role": "L02",
+      "shot_purpose": "MC04 到达、右手接触把手",
+      "path": "referces/shizhen/macro-opening-20261027/L02.png",
+      "sha256": "d844a00b053d2fedb7aae07843b0d03751fe969186edd5ab7a61524b0cefb039",
+      "observation_state": "STATIC_REQUIREMENTS_OBSERVED",
+      "human_acceptance": "NOT_EVALUATED",
+      "video_acceptance": "NOT_EVALUATED",
+      "input_binding_for_video": "NOT_YET_BOUND"
+    },
+    {
+      "reference_role": "L02-O",
+      "shot_purpose": "MC04 向内半开、线索显露",
+      "path": "referces/shizhen/macro-opening-20261027/L02-O-r1.png",
+      "sha256": "4af82ec9f76de8a783fc0686a9254dd0a61e48ef723ed7554de31befdec89bff",
+      "observation_state": "STATIC_REQUIREMENTS_OBSERVED",
+      "human_acceptance": "NOT_EVALUATED",
+      "video_acceptance": "NOT_EVALUATED",
+      "input_binding_for_video": "NOT_YET_BOUND"
+    },
+    {
+      "reference_role": "L03",
+      "shot_purpose": "MC04 门已开、未跨门槛",
+      "path": "referces/shizhen/macro-opening-20261027/repair-02/L03-r2.png",
+      "sha256": "c5716f4a6ee2c1ca92723596c23910410a1db4a3d398c6f8da5b9a1c6181fdec",
+      "observation_state": "STATIC_REQUIREMENTS_OBSERVED",
+      "human_acceptance": "NOT_EVALUATED",
+      "video_acceptance": "NOT_EVALUATED",
+      "input_binding_for_video": "NOT_YET_BOUND"
+    },
+    {
+      "reference_role": "L04",
+      "shot_purpose": "MC05 同次停步的侧脸核对",
+      "path": "referces/shizhen/macro-opening-20261027/repair-02/L04.png",
+      "sha256": "fb9fbda5bc6e3dd9babfbc0098b0c6cad83c2b422e98e3d1ade70e1b69ec3491",
+      "observation_state": "STATIC_REQUIREMENTS_OBSERVED",
+      "human_acceptance": "NOT_EVALUATED",
+      "video_acceptance": "NOT_EVALUATED",
+      "input_binding_for_video": "NOT_YET_BOUND"
+    },
+    {
+      "reference_role": "T01",
+      "shot_purpose": "MC06 同站棚较远双人入口",
+      "path": "referces/shizhen/macro-opening-20261027/T01.png",
+      "sha256": "e922c151f9b4532cf5d5ec26546efe03c3f0d5c299e36c229b62d4cd2d98a270",
+      "observation_state": "STATIC_REQUIREMENTS_OBSERVED",
+      "human_acceptance": "NOT_EVALUATED",
+      "video_acceptance": "NOT_EVALUATED",
+      "input_binding_for_video": "NOT_YET_BOUND"
+    }
+  ],
+  "reused_identity": "referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+  "protected_B6_sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a",
+  "remaining_dynamic_checks": [
+    "断控后持续运动与声音因果",
+    "牵引时有限渐进形变",
+    "同一灭火器凹痕在运动和切镜中可辨",
+    "右手/门/身体无穿透且自然步速",
+    "跨镜动作、轴线、声音和B6时钟推进",
+    "平台输入准入、实际绑定与逐镜QA"
+  ]
+}

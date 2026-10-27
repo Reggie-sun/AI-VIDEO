@@ -1,0 +1,210 @@
+[
+  {
+    "id": "L03-r2",
+    "prompt_request": "referces/shizhen/macro-opening-20261027/repair-02/requests/L03-r2.json",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-4a6218b3-f63d-40ee-89a7-03919fe16128.png",
+    "path": "referces/shizhen/macro-opening-20261027/repair-02/L03-r2.png",
+    "sha256": "c5716f4a6ee2c1ca92723596c23910410a1db4a3d398c6f8da5b9a1c6181fdec",
+    "request_sha256": "a4d48ef09ccad77cb503cd168ff61d98c81a629cd5e29a38205444b54c5628c8",
+    "prompt": "延续第一张同一楼梯、同一女人和同一推门动作，制作门已打开到足以看清门后线索的一张干净照片。第一张是场景与角色唯一底图；第二张只负责同一个红灭火器的瓶形和浅凹痕，不复制第二张的人或楼梯。保持左侧门轴固定、门向远离摄影机方向打开。女子解剖右手始终真实握住门扇上的银色水平把手，把手必须牢固装在门扇自由边附近，与门一起转动，不能浮在空气里或留在原位置。她可以向门轴方向侧移半步、靠近门槛并自然前倾伸臂，跟随真实把手的位置，膝肘自然弯曲，不要求脚位完全不动；但两只脚和躯干都仍在门槛外。左手空手放松。门开到大约五十五至六十度即可，不强求九十度，重点是右肩到肘到腕再到把手到门板连接完整、动作可实现。镜头从她身后偏左略接近，保留完整右臂与门扇自由边、脚下门槛和门后墙面，门边、把手和右手不得相互遮住看不清。门后红色灭火器比原半开图更清楚，瓶身上半部有第二张同样的左上到右下斜向浅压凹，红漆完整封闭、不裂开；灭火器右侧没有水管，只有上下两个旧卡箍印和浅竖痕。保持灰褐短外套、炭灰内搭、深灰裤黑鞋、低束发、同一身份与湿度，不加包、本、耳机或其他人。她在准备跨门槛时刚停住、看向凹痕与旧印，不回头看相机，不做夸张惊恐。保留旧墙、深绿墙裙、原窗和顶灯。只输出一张正常透视的横向真人照片，不要分格、标号、文字、箭头。",
+    "actual_references": [
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L02-O-r1.png",
+        "sha256": "4af82ec9f76de8a783fc0686a9254dd0a61e48ef723ed7554de31befdec89bff"
+      },
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/L01-r1.png",
+        "sha256": "bd479afcec50483bf539489fae3be74cf908305f29ea2ba24471b4836aae19ea"
+      }
+    ],
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "verdict": "STATIC_REQUIREMENTS_OBSERVED",
+    "observation": "右手、把手和门板连接可辨；自然前倾随门，双脚仍门槛外；凹痕与旧印显露",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "video_model_bound": false
+  },
+  {
+    "id": "M01-r3",
+    "prompt_request": "referces/shizhen/macro-opening-20261027/repair-02/requests/M01-r3.json",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-bcd522bd-b8a9-4869-a2a1-c366e3480bba.png",
+    "path": "referces/shizhen/macro-opening-20261027/repair-02/M01-r3.png",
+    "sha256": "797c56885e9474d62031ddb0dd12182ceb86303bc24290609c3ac447a8f06f33",
+    "request_sha256": "62eabcea0b34ee0e95dc9cae32cc0dc39dd0680c3f50e330c769d20ae74a0f0e",
+    "prompt": "对所附雨夜检修照片只做一项局部删除：删除画面中从左侧绞盘直接连到门上牵引耳的那条上方近水平钢索。它从画面左侧鼓轮右端出发，横过画面中部，终止在门上圆形牵引耳；整段删除并自然补回它后面的道路、混凝土和门板纹理。牵引耳本体保留。其余两段钢索都必须保留：下方从左绞盘通到右下转向滑轮的去程索，以及从右下转向滑轮斜向左上连到门牵引耳的回程索。最终是一根索绕右滑轮后拉门，只有这两段可见，不存在左绞盘直连门的第三条捷径。不要移动、重画或增加任何其他钢索，不改变现有门、限位、滑轮、绞盘、地脚、工人、控制箱、工作灯、道路、雨水、光线、相机或画幅。不要给工人增加手，也不要改变脸。只输出原照片的局部修正版，不添加线条、标签、文字或拼图。",
+    "actual_references": [
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/M01-r2.png",
+        "sha256": "7c120beb84433c3852176c848d21fdd8e75d09c532f34128b5c24c23f9ce205a"
+      }
+    ],
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "verdict": "STATIC_REQUIREMENTS_OBSERVED",
+    "observation": "删除多余直连索后，两段构成绞盘经右滑轮到门的单索路径",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "video_model_bound": false
+  },
+  {
+    "id": "L04",
+    "prompt_request": "referces/shizhen/macro-opening-20261027/repair-02/requests/L04.json",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-343a373d-4643-40a9-8c3f-3ad47d637106.png",
+    "path": "referces/shizhen/macro-opening-20261027/repair-02/L04.png",
+    "sha256": "fb9fbda5bc6e3dd9babfbc0098b0c6cad83c2b422e98e3d1ade70e1b69ec3491",
+    "request_sha256": "f6ad127f8e892a7270baade0cfd45be55b5ecc789c2adf9cfe39545ea995f545",
+    "prompt": "把第一张同一次持门停步换成同侧的侧面中近景，制作一张干净横向真人照片，不重新演一次开门。第一张负责已打开的门、右手接触、身体停步状态、场景和灰褐短外套；第二张只负责同一个董文慧的脸、黑色低束发、发际线与二十八岁年龄感，不复制四格或灰打底服。摄影机在原门槛外观察侧，向她身体左侧靠近，让她的左侧脸或三分之四侧脸清楚可辨，取景从头顶到髋部，并保留完整解剖右肩—右肘—右腕—右手—银色把手—门扇的连接，手不能出画或被门挡住。她仍用右手握同一门把手，把手固定在向内打开的门板自由边附近，门角度、门轴和手的位置与第一张一致，左手空手放松，身躯仍在门槛外。她先停住，再看门后斜向浅凹的红灭火器与右侧两个旧卡箍印，略微抬头听环境，眼神认真核对却没有答案；不要猛回头、瞪眼、张嘴喊叫、摸耳朵或看相机。画面右方保留一部分门后空间，足以看出红灭火器和它旁边没有水管的墙痕；焦点在脸与手，不把背景虚成无关光斑。普通住宅米灰旧墙、深绿墙裙与暖顶灯承接原图，不变成棚拍，不加其他人、包、本、耳机、能力光效、分格、箭头或文字。",
+    "actual_references": [
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/repair-02/L03-r2.png",
+        "sha256": "c5716f4a6ee2c1ca92723596c23910410a1db4a3d398c6f8da5b9a1c6181fdec"
+      },
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/character-packs-20261027/dong-wenhui/identity/identity-v1.png",
+        "sha256": "53075b370bc0dd00285d4384e74cd521d8672243a417801f177f807776e69458"
+      }
+    ],
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "verdict": "STATIC_REQUIREMENTS_OBSERVED",
+    "observation": "同次停步的侧面中近景，右手持门与侧脸、凹痕和旧印同画面；左手垂下",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "video_model_bound": false
+  },
+  {
+    "id": "M02",
+    "prompt_request": "referces/shizhen/macro-opening-20261027/repair-02/requests/M02.json",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-fd372438-7d69-4da7-a59c-cfe26be1b7b7.png",
+    "path": "referces/shizhen/macro-opening-20261027/repair-02/M02.png",
+    "sha256": "8d1379aa3d587416bf2a2cf8b483e16ff4d4e57544a4b5b1b75278a9940fe254",
+    "request_sha256": "0a3085b7d555b5512985f88c9b850237f1a72a62ab02e9e040effbf0c70c566b",
+    "prompt": "延续所附同一雨夜市政场景，只制作停止控制后的下一状态，保持原相机、构图、同一工人、控制箱、两段正确钢索路线、绞盘、右侧固定转向滑轮、同一门和右侧限位、道路与天气。工人解剖右手刚按下控制箱上现有红色停止按钮，左手自然停在身体旁，不靠近钢索。左上独立工作灯熄灭，灯具仍原位可见但不再发光；后景路灯、车辆和城市照明继续亮，环境不是全街断电，金属与钢索仍能靠路灯反光看清。铁门沿原导轨向画面右方继续移动了少许，但尚未抵右侧固定机械限位，仍留清楚空隙；保持门宽和面板接缝，不缩放门体或变形。只有一根钢索：左绞盘到右下固定滑轮的去程，以及右滑轮返回门上牵引耳的回程，回程随门向右移动保持接触；绝不新增左绞盘直接连门的第三条索。保持工人在索范围之外，脸、黄色安全帽、藏蓝工装、手套、雨湿状态与路面锥桶不变。此图只示控制停止但门稍有位移的静态状态，不添加运动线、火花、鬼影或文字，不把门画成突然弯曲。输出一张干净单幅横向照片。",
+    "actual_references": [
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/repair-02/M01-r3.png",
+        "sha256": "797c56885e9474d62031ddb0dd12182ceb86303bc24290609c3ac447a8f06f33"
+      }
+    ],
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "verdict": "STATIC_REQUIREMENTS_OBSERVED",
+    "observation": "工作灯熄灭，路灯仍亮；同一门已向右小幅位移，右手在红停止钮",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "video_model_bound": false
+  },
+  {
+    "id": "M03",
+    "prompt_request": "referces/shizhen/macro-opening-20261027/repair-02/requests/M03.json",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-a17a5728-432c-4f1e-a910-7a5b625af9b0.png",
+    "path": "referces/shizhen/macro-opening-20261027/repair-02/M03.png",
+    "sha256": "a3b844b5f6a51a3b6b8ac6cdff8d983fa3c75a5cb474add840d9fd9688340008",
+    "request_sha256": "1aca1f477441b8f87938ccb1ff05d7cf3103e738eea81d20a3b6d350a3b4f4cc",
+    "prompt": "延续所附已断控的雨夜市政场景，制作铁门沿导轨向右继续滑动并已抵到右侧固定机械限位的下一状态。相机、画幅、雨夜、同一工人、控制箱、绞盘、右侧转向滑轮与道路固定不动，工作灯保持熄灭，路灯和车辆继续亮。整扇门保持原宽、原面板、原牵引耳和轮子，只沿导轨水平向画面右方平移，直到门的右侧竖边与右柱上固定的机械限位挡块真实接触；门不能缩短、变成铰链门、进入墙里，限位挡块固定在右柱上、不随门移动。右柱的粗螺栓钢制限位块与门边接触点清楚可读。门上牵引耳随门一起右移；钢索仍只是一根经右下固定滑轮折返：下方从左绞盘去右滑轮，上方从右滑轮回到门牵引耳，两段绷紧、起终点清楚，没有左绞盘直接连门的第三条索。门已不能继续右移，牵引耳的螺栓底板出现很轻微、逐渐受力的翘起，尺度克制，无断裂或整门弯曲。工人右手已离开停止按钮少许、停在控制箱附近，身体不向钢索靠近，视线从控制箱转到门上的牵引点，像发现有点不对，不做夸张惊恐。保持工人黄安全帽、藏蓝工装和手套，手数正常。不要增加火花、悬空、爆炸、光效、运动线、文字或分格。输出一张干净同机位横向照片，只用于抵限位后态参考。",
+    "actual_references": [
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/repair-02/M02.png",
+        "sha256": "8d1379aa3d587416bf2a2cf8b483e16ff4d4e57544a4b5b1b75278a9940fe254"
+      }
+    ],
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "verdict": "STATIC_REQUIREMENTS_OBSERVED",
+    "observation": "同一门向右抵到右柱限位，工作灯熄灭，钢索路线承接M02",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "video_model_bound": false
+  },
+  {
+    "id": "M03-D0",
+    "prompt_request": "referces/shizhen/macro-opening-20261027/repair-02/requests/M03-D0.json",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-8c735846-2c48-47e7-8a27-0dfb9b9650a9.png",
+    "path": "referces/shizhen/macro-opening-20261027/repair-02/M03-D0.png",
+    "sha256": "db9c0c09df94376df46345bbb39474bb66cbe111e94bd303feaab4f83c3f8077",
+    "request_sha256": "c8d1fa1232e9c6e7cae09e51ed5e94323841c3b8877cdfc34283aaf0510317dd",
+    "prompt": "从所附市政全景中的同一牵引连接处制作同侧近景初态，干净横向真人摄影照片，不是简单裁切放大的模糊图。保持原设备真实结构：同一扇深灰钢制滑门、同一四螺栓矩形底板上的D形牵引环、同一根从右下固定滑轮方向斜向左上连到牵引环的回程钢索、门右边缘和固定在右柱上的限位块。摄影机沿原观察侧靠近，正常中长焦透视，画面左部是清楚的钢索端头与D形牵引环和四螺栓底板，中右部保留足够门板、门的右侧竖边与右柱限位接触点，观众能理解这是已经抵住限位的一扇检修门。钢索只从牵引环向画面右下方离开，指向原右滑轮；不能从左边又出现一根拉牵引环的索。回程钢索端头真实连接在原牵引环上，钢丝纹理、端头、螺栓与金属接触清楚，不画成绳子插进钢板。此刻是门刚抵限位、尚未进一步受力变形的基准态：底板平直、贴紧门面，四螺栓原位，牵引环结构完整，门边与固定限位块接触。保留深灰旧金属、雨滴、螺栓锈迹、道路冷暖反光，工作灯仍熄灭；不要凭空在近景加一盏新灯。若背景出现工人，只在原左后方安全位置远远停住，不靠近钢索、不增加第二个人。足够景深看清牵引件和限位，不拍成抽象金属纹理，不加文字、箭头、标号、火花、裂口或夸张弯曲。输出同一设备、同一受力侧的近景前态单图。",
+    "actual_references": [
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/repair-02/M03.png",
+        "sha256": "a3b844b5f6a51a3b6b8ac6cdff8d983fa3c75a5cb474add840d9fd9688340008"
+      }
+    ],
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "verdict": "STATIC_REQUIREMENTS_OBSERVED",
+    "observation": "同侧近景，实际端头/牵引环/四螺栓底板及门边限位同画面，前态平直",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "video_model_bound": false
+  },
+  {
+    "id": "M03-D1",
+    "prompt_request": "referces/shizhen/macro-opening-20261027/repair-02/requests/M03-D1.json",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-9f77c369-078a-4ced-8948-6136074d704b.png",
+    "path": "referces/shizhen/macro-opening-20261027/repair-02/M03-D1.png",
+    "sha256": "8aca950de2e1c7c1fdb313d6ced9e4274dacc565ac943c75804089c89d02e612",
+    "request_sha256": "05f4281b011e53c38fa48be05f54bc2d986c15ffddb3f014ea8ab262826b3294",
+    "prompt": "只修改所附同机位牵引连接近景的有限受力形变，制作紧接的后态单图。保持全部画幅、相机透视、门边与右侧固定限位的接触位置、工人、背景、雨滴光线、钢索的方向和真实端头连接、同一个D形牵引环与四个原螺栓。门已被固定限位挡住，不再右移，钢索继续向画面右下方拉牵引环。让牵引环背后的同一矩形钢底板中部向钢索拉力方向拱起约一厘米，产生明显但小尺度的弯曲侧面与下方阴影缝；四角螺栓仍固定在原孔位，底板边角没有脱落，牵引环仍牢固连接。门板局部在底板右侧有很轻微的受力鼓起，不能整扇门弯折。钢索更绷直，不变粗，不增加另一根索。前态底板平贴门面，后态必须能在这张近景正常大小看出钢板中央被拉起和新增的阴影间隙，而不是只换雨滴或换灯光。不要断裂、松脱螺栓、金属液化、火花、爆炸或大幅破坏；不要改变原牵引结构、增加设备、移动工人或重做构图。不加文字、箭头、拼图或分格，只输出同机位同设备的一张有限形变后态照片。",
+    "actual_references": [
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/repair-02/M03-D0.png",
+        "sha256": "db9c0c09df94376df46345bbb39474bb66cbe111e94bd303feaab4f83c3f8077"
+      }
+    ],
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "verdict": "FAIL",
+    "observation": "主要改变反光和螺栓外观，实际弯曲不清楚；不采用",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "video_model_bound": false
+  },
+  {
+    "id": "M03-D1-r1",
+    "prompt_request": "referces/shizhen/macro-opening-20261027/repair-02/requests/M03-D1-r1.json",
+    "source_output": "/home/reggie/.codex/generated_images/01a17af4-f496-77d0-a660-ced3634b088e/exec-b4d23ce3-8321-4d25-a68a-8ae380aee64e.png",
+    "path": "referces/shizhen/macro-opening-20261027/repair-02/M03-D1-r1.png",
+    "sha256": "9561834dff4a53e0e932f8e7de7d358dc83e5c756e8ef571fe4e8f1fd915f46d",
+    "request_sha256": "6d7b772e706d378c31101c36cb40c22836e82573957e108af9eb6b2686f8a770",
+    "prompt": "只把照片里的牵引环矩形安装底板做出真实可见的受力弯曲，其他全部保留，输出原照片同构图横向单图。原图中四螺栓底板现在平直，后态必须变成浅弧形钢板：四角螺栓仍锚固在原门面孔位，底板中央承载D形环的部位被钢索拉得朝右前方凸出约两厘米，右侧板边的中段也离开门面形成清楚的弓形轮廓，门面与拱起钢板之间可见真实空气缝隙和阴影。上缘与下缘也随中央弯曲产生轻微弧度，不再是原来完全平直的四边矩形平面。保留四角，中央凸起，像一块被拉弯而没有断裂的钢板；不能只是整块板平移、加厚或换一道反光。D形牵引环、钢索端头与底板中央一起向右前受拉很少量，仍真实连接，四角没有脱落，钢索方向不变，不加另一根索。原门边和限位固定不动，不弯整扇门、不撕裂、不松掉螺栓。保持雨滴、灯光亮度、金属颜色、背景工人、道路、相机与所有其他区域，不通过打亮底板或改变螺栓外观冒充形变。只需要这一处可辨认的有限弯曲，不要火花、爆炸、标签、箭头、分格或文字。",
+    "actual_references": [
+      {
+        "path": "/home/reggie/vscode_folder/AI-VIDEO/referces/shizhen/macro-opening-20261027/repair-02/M03-D0.png",
+        "sha256": "db9c0c09df94376df46345bbb39474bb66cbe111e94bd303feaab4f83c3f8077"
+      }
+    ],
+    "dimensions": [
+      1672,
+      941
+    ],
+    "mode": "RGB",
+    "verdict": "STATIC_REQUIREMENTS_OBSERVED",
+    "observation": "四角仍有固定件，底板可见弧形轮廓与间隙；同机位有限弯曲，非断裂",
+    "human_acceptance": "NOT_EVALUATED",
+    "video_acceptance": "NOT_EVALUATED",
+    "video_model_bound": false
+  }
+]

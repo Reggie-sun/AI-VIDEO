@@ -1,70 +1,65 @@
 {
-  "level": "local_reference_asset_check",
-  "engineering_full_regression": "NOT_RUN_NO_SOFTWARE_CHANGE",
-  "human_acceptance": "NOT_EVALUATED",
-  "video_acceptance": "NOT_EVALUATED",
-  "state_attempts": 11,
-  "builtin_calls_total": 12,
-  "static_candidates": 5,
-  "failed_states": 6,
-  "actual_reference_hashes_verified": true,
-  "source_mp4_hashes_verified": true,
-  "protected_B6_hash_unchanged": true,
+  "level": "local_static_reference_asset_check",
+  "continuation_builtin_calls": 8,
+  "cumulative_builtin_calls": 20,
+  "new_paid_provider_calls": 0,
+  "video_calls": 0,
+  "new_output_identities_and_input_hashes_verified": true,
+  "selected_state_roles": 12,
+  "static_coverage": "ALL_REQUESTED_ROLES_HAVE_REVIEWABLE_IMAGES",
+  "current_static_blockers": [],
+  "known_failure_not_selected_this_continuation": [
+    "M03-D1"
+  ],
   "docs_contract_gate": "PASS",
-  "browser_images_loaded": 16,
-  "browser_errors": [],
+  "browser_images_loaded": 15,
+  "browser_original_L03_link": "PASS",
+  "protected_B6_sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a",
+  "video_model_binding": "NOT_EVALUATED",
+  "video_motion_sound_continuity": "NOT_EVALUATED",
+  "human_acceptance": "NOT_EVALUATED",
+  "engineering_full_regression": "NOT_RUN_NO_SOFTWARE_BEHAVIOR_CHANGE",
   "harness_focused_mapping": "MISSING_FOR_GENERATED_REFERENCE_METADATA; no silent full-suite fallback",
   "files": [
     {
-      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-reference-review-20261027/B6-exact-first-frame.png",
-      "sha256": "854712841c1f3f13b94288f79ea4f4dfae748a1e985a7bd17d00265e5722c812",
-      "bytes": 3762207
+      "path": "referces/shizhen/macro-opening-20261027/repair-02/attempts.json",
+      "sha256": "e29e2ea135cbdf085341d8eec1fbb7f10c2fa7bd0893323798fc03b348d62051",
+      "bytes": 19817
     },
     {
-      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-reference-review-20261027/README.md",
-      "sha256": "315b5d1c997b7152de9cb87cae52d36dc6fcaeb4fca976f6a0b2b3e6b5dddfd4",
-      "bytes": 3303
+      "path": "referces/shizhen/macro-opening-20261027/repair-02/continuation-intent.json",
+      "sha256": "41a153718d718e8e1454d3fdb1af637623eb7ad62680c9484e00f278ce0e1ff1",
+      "bytes": 954
     },
     {
-      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-reference-review-20261027/browser-verification.json",
-      "sha256": "383790d2b20fc72f42dcb8b584ccb5bc2ae0a0dfe136e0e08155a06fabe5e2fa",
-      "bytes": 2858
-    },
-    {
-      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-reference-review-20261027/index-board.png",
-      "sha256": "9a6323c946acd3958bee53ab48478a99f45d846276db7ecab2dcf535808f4f40",
-      "bytes": 5527964
+      "path": "referces/shizhen/macro-opening-20261027/repair-02/current-reference-usage.json",
+      "sha256": "533e84642cd0b36218a43527d6c786beff634682bc34f97c542ad65b8228961c",
+      "bytes": 5985
     },
     {
       "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-reference-review-20261027/index.html",
-      "sha256": "137708f86012e0c074e23bcba56381595f2c8d17135aa14a65d48d8ffd631316",
-      "bytes": 5979
+      "sha256": "cc17394c08fbffea89389b714a2a177547b2e3af17c109a27553604e31e01a2f",
+      "bytes": 5667
     },
     {
-      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-reference-review-20261027/mother-candidate-board.png",
-      "sha256": "c2c6a4667821fbbb225600e53938d25dca07c8bc20f8ac007c76e9178bb865e8",
-      "bytes": 754441
+      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-reference-review-20261027/index-board.png",
+      "sha256": "aea660a461df522d289d43e6a3099e8fe688e3d95c13c2708978ce4e87ee22fa",
+      "bytes": 3524853
     },
     {
-      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-reference-review-20261027/mother-candidate-review.html",
-      "sha256": "19201b5397f1f169589852f7cb595983681b1687f2469f57a1bfc78f9e5962bc",
-      "bytes": 2075
+      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-reference-review-20261027/browser-verification.json",
+      "sha256": "6b58291fc1009bc2375e22a35549b346baba38e16472552daa09f4ad66868e39",
+      "bytes": 2642
     },
     {
       "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-reference-review-20261027/preparation-report.json",
-      "sha256": "4a8a46bbcd9cad808a92b2674caeff40bc33df24bd5e4a036c0318fc4a8611ea",
-      "bytes": 11723
+      "sha256": "bc92279902b636fe7f48482bc37c1d341cf084bc88c5a0f2360eac99c050aac1",
+      "bytes": 17544
     },
     {
-      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-reference-review-20261027/source-review-board.png",
-      "sha256": "6c549abbea73cb51b55348fc2596391fc2a216800384a922a9151f872b97fee9",
-      "bytes": 1299432
-    },
-    {
-      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-reference-review-20261027/source-review.html",
-      "sha256": "b6ac66e77a57040352a940f07dc13b9b67f7a78dd0e6c035c02b3de733b7dd49",
-      "bytes": 1387
+      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/macro-reference-review-20261027/README.md",
+      "sha256": "1101ccd0a6a0027885cd45c732ae5c4c77692376b0692a2d6cddc335762296f9",
+      "bytes": 5526
     }
-  ],
-  "attempts_sha256": "2aa47f5d86bdda4849bfdd0c37c7f548cb626b71329627a173931bc2990ec788"
+  ]
 }

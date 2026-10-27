@@ -27,5 +27,8 @@
     "M03-D0",
     "M03-D1",
     "L04"
-  ]
+  ],
+  "historical_unit_only": true,
+  "continued_by": "referces/shizhen/macro-opening-20261027/repair-02/continuation-intent.json",
+  "current_usage_record": "referces/shizhen/macro-opening-20261027/repair-02/current-reference-usage.json"
 }

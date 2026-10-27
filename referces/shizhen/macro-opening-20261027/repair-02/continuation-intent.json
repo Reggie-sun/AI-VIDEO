@@ -1,0 +1,33 @@
+{
+  "predecessor_commit": "fe658e8d98563e782d507411c006afd8f03c7f98",
+  "predecessor_total_builtin_calls": 12,
+  "predecessor_known_outcomes": 12,
+  "predecessor_unknown_outcomes": 0,
+  "new_max_calls": 12,
+  "paid_provider_calls": 0,
+  "video_calls": 0,
+  "unknown_retry": false,
+  "authority": "用户明确要求继续完成未通过参考",
+  "scope": [
+    "修复L03接触并延展L04",
+    "删除M01多余直连索后补M02/M03与受力近景"
+  ],
+  "removed_agent_added_constraints": [
+    "脚位完全冻结",
+    "门必须固定七十度"
+  ],
+  "preserved": [
+    "同一既有角色身份",
+    "向内开门",
+    "右手持续接触把手",
+    "人物留在门槛外",
+    "同一钢索经右滑轮牵引门向右",
+    "B6/字体/音乐原样"
+  ],
+  "calls_consumed": 8,
+  "outcome": "KNOWN_OUTPUTS_SAVED",
+  "static_coverage": "ALL_TWELVE_STATE_ROLES_HAVE_REVIEWABLE_IMAGES",
+  "current_failures_not_selected": [
+    "M03-D1"
+  ]
+}
