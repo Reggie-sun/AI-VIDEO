@@ -1,0 +1,44 @@
+{
+  "authority": "advisory_creative_draft_review",
+  "user_request": "還少一個那種鏡頭串連起來,就是一個鏡頭到底,這個鏡頭覆蓋城市",
+  "draft_scope": "Proposed standalone MC00 city single take, followed by retained six shots and B6",
+  "extent_clarification": "PENDING: standalone city shot vs all three events in one take; no assumed approval",
+  "files": [
+    {
+      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/MACRO-SHOTBOARD-20261027.md",
+      "sha256": "542d615e47be0fb6f5f79e4200d7ea72384ba0b56b5a30b97bd775f54964d3f3",
+      "relative_links": "PASS"
+    },
+    {
+      "path": "outputs/shizhen-episode01/opening-A-revision-20261026/production-inputs/MACRO-CREATIVE-DISCUSSION-20261027.md",
+      "sha256": "f47f25f449dc9009cce5a5f5cae64d2862599a6377a301c8019c1b40201a0570",
+      "relative_links": "PASS"
+    }
+  ],
+  "b6_path": "outputs/shizhen-episode01/fusion-B-motion-20261027/variant-ASSEMBLY-B6/失帧-独立开场-ASSEMBLY-B6.mp4",
+  "b6_sha256": "d64aef43ddb97df8387adc03bd2a6ec71d6f1d5d901942a1d97082abc84a532a",
+  "b6_bytes_unchanged": true,
+  "independent_concept_review": {
+    "agent": "/root/macro720_review",
+    "actual_profile": "reviewer_high",
+    "scope": "one new bounded text-only concept check; existing11 media review rounds retained",
+    "findings": [],
+    "parent_adjudication": "No concrete textual defect; city geography legibility, velocity, source handoff and actual feasibility remain NOT_EVALUATED",
+    "snapshot_identity": "matches file SHAs above"
+  },
+  "static_checks": {
+    "docs_contract": "PASS",
+    "relative_file_links": "PASS",
+    "git_diff_check": "PASS"
+  },
+  "runtime_or_media_validation": "NOT_EVALUATED: no media generated or tested",
+  "actual_reference_binding": false,
+  "approved_production_shot_created": false,
+  "new_image_calls": 0,
+  "new_video_calls": 0,
+  "new_music_calls": 0,
+  "new_paid_calls": 0,
+  "publication": "DRAFT_ONLY_NOT_PUBLISHED_FILM",
+  "risk_gate": "NATIVE_REVIEW_NOT_REQUIRED for engineering; open-video independent concept check separately completed",
+  "learning_outcome": "no_candidate"
+}

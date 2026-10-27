@@ -8,7 +8,9 @@ learning_eligibility: ineligible
 
 Date: 2026-10-27
 
-> **Current Update — Isolated Stair Reference:** 用户用两张截图指出先前露出的梯级本身弯曲，明确要求“把楼梯作为一个单独的白底图作为referces”。本轮已生成一张独立白底直梯结构候选，包含上下平台与单侧栏杆，归 `referces/shizhen/macro-opening-20261027/stair-structure-white-20261027/`。这纠正了Parent此前将需求理解为尾部补片、随后又交原片截图的偏离；既有补片不能解决前段结构错误，不记为视频通过。新增内置生图1次、视频0次，尚未绑定新视频。详见 Isolated Stair Geometry Reference。
+> **Current Update — City Long Take Draft:** 用户要求增加覆盖城市并串联场景的一镜到底镜头。已在既有讨论稿和唯一分镜稿补MC00候选：城市全景沿主路下降，辨认住宅与公交路线所在纵深，再减速落至市政现场外。当前按新增独立城市长镜头展开，三处事件是否也合并为一镜仍待澄清；没有将此范围选择记为批准，没有生成媒体。六镜及B6保持，旧约40秒总长基准退为历史估计。详见 City Long Take Draft。
+
+> **Previous Update — Isolated Stair Reference:** 用户用两张截图指出先前露出的梯级本身弯曲，明确要求“把楼梯作为一个单独的白底图作为referces”。已生成一张独立白底直梯结构候选，包含上下平台与单侧栏杆，归 `referces/shizhen/macro-opening-20261027/stair-structure-white-20261027/`。这纠正了Parent此前将需求理解为尾部补片、随后又交原片截图的偏离；既有补片不能解决前段结构错误，不记为视频通过。该轮新增内置生图1次、视频0次，尚未绑定新视频。详见 Isolated Stair Geometry Reference。
 
 > **Historical Update — Static Stair Image:** 用户“那個樓梯你就不能給一個image嗎”后，Parent曾以同源台阶PNG覆盖末两秒背景并导出8秒／1080p全景修订04。该方案保留人物、全景和原声，但并未处理用户随后指出的前段梯级弯曲，不能作为结构修复通过；未提交推门源。该阶段新增生成／远程音频调用均为0，只有1次本地HyperFrames渲染。详见 Static Stair Image Repair。
 
@@ -304,3 +306,15 @@ Parent先尝试不新增生成的静态背景补片：同源frame144／6秒、�
 当前图仅实际绑定本次制图输入，未绑定Seedance新请求、未提交新视频或激活Production。对旧片新增用户几何反馈，与已有抖动FAIL历史共同保留；尾部补片没有改变前六秒，因此不能作为该几何目标通过。主来源／用途与静态观察归新目录`generation-intent.json`、`verification.json`及README；审看图片已直接展示给用户。新增builtin生图1次，macro累计builtin图片26→27；macro真实视频仍6，UNKNOWN及旧计数不改。工具未提供本次图像结算金额，不推断为免费。
 
 此轮不改共享工程，不追加工程测试；核验PNG解码、RGB/尺寸/SHA、exact copy和实际图像几何，未作动态质量、真实视频输入或human接受结论。沿同一record-ai-video-session记录检查点；distill-ai-video-learning评估no_candidate，单个静态候选及同源失败链不能升级为模型通用规律或自动采用新的Skill/Gate。本轮Git提交范围仅新白底参考的说明、提示词、来源核验与本记录；PNG和用户截图留本地。前轮共享合成源码及其staged测试不纳入本次提交，既有工程验证阻断及原速声画未验收状态保留。
+
+## City Long Take Draft
+
+用户读宏观剧本后提出“還少一個那種鏡頭串連起來，就是一個鏡頭到底，這個鏡頭覆蓋城市”。本轮只补创作稿，不因这句话直接提交新视频、改写既有事件或重做B6。已询问这是新增城市长镜头还是将三处事件本身也合并为一条摄影轨迹，当前未收到选择；先按可审查的新增MC00候选展开，明确标记范围未定，不把沉默记为批准。
+
+逐镜内容仍归`MACRO-SHOTBOARD-20261027.md`，讨论依据归`MACRO-CREATIVE-DISCUSSION-20261027.md`，没有再建第三份脚本。MC00候选从城市大全景沿主路连续下降，途中用住宅与公交线路所在纵深建立空间记忆，最后在市政正常作业阶段减速落到街侧观察方向，再明确切入MC01；城市镜头内部不插六镜，不预演停控或复制工人反应。视野覆盖城区不等于短时间飞遍全城，新增外部位置关系是美术地理设计，不声称既有源片已经证明地点相邻。楼梯仍按独立白底结构修复，MC06/B6精确入点、两人在场、原声和片名保护不变。
+
+城市镜头暂估12–18秒仅表示移动／理解容量；未测飞行、未选模型／提交时长。旧35–45秒总长不再压缩新增内容，结合既有市政6.833秒、下楼8秒候选及尚未完成的事件，整段先按约一分钟上下讨论。路线过长先收敛距离或调整单镜时长，不偷偷加速、插切、冻结或删B6对白。城市总图、同城起幅／沿途／末态与连续相机预演是待补参考职责，不承诺静图、文字或白模必然控制生成。
+
+本轮没有图像／视频／音乐生成、没有新付费调用、Production mutation或媒体Gate通过；原楼梯几何FAIL及前轮staged工程阻断保留。本文仍是草稿，没有编造approved Shot、Provider prompt、封存输入或实际绑定。工程Risk Gate为NATIVE_REVIEW_NOT_REQUIRED；匹配open-video所需的独立concept check另派原native reviewer_high进行一次只读审查，具体结果归同目录`macro-city-shot-review-20261027.json`。单次文本审查不记为新媒体审看，不重置历史11轮媒体复核，不把文档校验当成运动、接点或human接受。
+
+沿record-ai-video-session更新同一topic，distill-ai-video-learning评估no_candidate：这是用户直接新增的创作要求及候选文字，没有新的受控媒体实验或跨尝试结论，不创建学习占位、不修改Skill/Policy/Gate。
