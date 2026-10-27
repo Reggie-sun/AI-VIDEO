@@ -98,7 +98,9 @@ P0 的 `compile_request` 支持普通 Shot requirement 的显式素材绑定。�
 
 提交前先取得页面内独占 fence，再同步原生编辑器，避免其他 Worker 先改同一页面。超时或宿主失联时，未结束的原生异步动作仍受关闭的 fence 约束；只有原生 promise 结束后才恢复原方法，避免延迟 POST 穿透。同一个 fence 还保护当前原生 HTTP client 使用的页面 `fetch`，核对经过 admission 的完整 body 并限一次发送；即使 CDP 路由随 Worker 退出而消失、HTTP owner 被替换，延迟请求仍须经过该发送边界。此实现依赖当前客户端使用页面 `fetch` 的源码事实，不宣称覆盖未来任意客户端重写。正常清理仅移除自身路由与 exposed function，不覆盖已被其他逻辑替换的方法。若原生 promise 永不结束，该页面会保持阻断；保持原 attempt UNKNOWN，只读核对后再刷新页面，不重交。不同浏览器实例之间不共享页面锁，部署须独占该账号/project/node 的执行端；不能用此锁替代 Paid permit 或 committer。
 
-`JimengSubmitNotDispatched` 仅代表可证明原生提交尚未启动（例如进程未创建、依赖/连接/编辑器 preflight 失败，且 Worker 明确返回、干净结束），由既有 Paid Owner 记录 `KNOWN_NO_EFFECT`。异常退出、无完整消息、启动后失败、dispatch 后拒绝/失联一律 UNKNOWN；不按“没看到请求”释放预算。宿主使用增量协议读取，半行、超时、重复 dispatch 与尾随消息均 fail closed；UNKNOWN 不携带重交授权。`KeyboardInterrupt` / `SystemExit` 等取消也在 `finally` 中终止并回收本次子进程及管道，保留原取消异常；已持久化的意图仍须经现有 committer 恢复，不因取消自动归零。
+`JimengSubmitNotDispatched` 仅代表本次可以证明未发送生成请求：进程未创建、依赖/连接/编辑器 preflight 失败，或本次原生 HTTP wrapper 明确在 admission 前校验拒绝。后者须同时证明native promise已经终止、页面lease已关闭、HTTP/fetch guard仍由本次拥有、没有启动admission/调用原HTTP/实际wire，且host没有宣布或批准dispatch；Worker明确返回并干净结束后，才由既有 Paid Owner 记录 `KNOWN_NO_EFFECT`。该拒绝会保留关闭的页面发送锁，防止promise之外的迟到continuation穿透；后续新授权尝试前必须刷新该页面并重新验证账号、project/node及全部准入，不能只删除锁或复用permit。
+
+异常退出、无完整消息、泛化native错误、缺失/陈旧proof、仍pending、guard owner变化或dispatch后拒绝/失联一律UNKNOWN；不按“没看到请求”、空resource查询或错误文本释放预算。新增本次proof不能追认缺失原始证据的历史UNKNOWN，历史恢复仍只经原committer的verified reconciliation。宿主使用增量协议读取，半行、超时、重复dispatch与尾随消息均fail closed；UNKNOWN不携带重交授权。`KeyboardInterrupt` / `SystemExit`等取消也在`finally`中终止并回收本次子进程及管道，保留原取消异常；已持久化的意图仍须经现有committer恢复，不因取消自动归零。
 
 已证实的平台状态仅 `200`（运行中）、`1000` + `vid`（完成）、`1001`（任务失败）；未知状态和缺失 `vid` 不产生 FAILED 观察、不重置任务或预算。发送后的 ACK 要求实际通过网络 fence，且 resource/submit/task 和服务端参数 hash 精确匹配。素材上传失败停止，不跳过或替换；源字节、canonical index、storage identity、native params、dispatch、画布快照和 Paid 回执沿既有 owner 串联。
 

@@ -876,6 +876,21 @@ def test_shipped_worker_fault_boundaries(scenario):
     assert result.returncode == 0, result.stderr
 
 
+@pytest.mark.parametrize("scenario", ["mutated_request", "quote_precondition_changed",
+    "host_reject", "response_lost", "guard_rejection_pending", "unknown_native_error",
+    "replaced_http", "guard_rejection_owner_changed", "guard_rejection_instance_changed",
+    "guard_rejection_account_changed"])
+def test_worker_terminal_protocol_requires_positive_pre_dispatch_proof(scenario):
+    import subprocess
+    from pathlib import Path
+
+    root = Path(__file__).parents[1]
+    result = subprocess.run(["node", str(root / "tests/fixtures/generated_video/jimeng_worker_faults.cjs"),
+        str(root / "src/ai_video/production/jimeng_browser.cjs"), "protocol_" + scenario],
+        capture_output=True, text=True, timeout=10)
+    assert result.returncode == 0, result.stderr
+
+
 def test_native_quote_binding_preserves_params_and_rejects_supplied_drift():
     import subprocess
     from pathlib import Path

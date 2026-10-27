@@ -22,6 +22,7 @@ const canon = value => JSON.stringify(ordered(value));
 const origin = 'https://jimeng.jianying.com';
 let nativeStarted = false;
 let dispatchAnnounced = false;
+let fencedNoEffect = false;
 
 // This function is serialized into the page, including its lexical helpers.
 // Retain owners for ONE operation, then compare them with fresh React context.
@@ -66,6 +67,9 @@ function createSession(profile) {
       if (window.__aiVideoJimengFence) throw Error('native fence already active');
       const fence = {owner, used: false, closed: false, pending: false, expires: Date.now() + 120000};
       fence.release = () => {
+        // Keep the closed sending boundary after a proven guard rejection.
+        // Refresh/revalidate the page before a fresh authorized attempt.
+        if (fence.retainBlockedTarget) {clearTimeout(fence.timer); return;}
         if (fence.pending) return; // Late native continuations must still hit a closed fence.
         clearTimeout(fence.timer);
         if (fence.proto && fence.proto.postEnvelope === fence.wrapper) fence.proto.postEnvelope = fence.original;
@@ -539,17 +543,29 @@ async function submit(page, command, session) {
         if (body.initial?.node_id !== profile.node_id) return original.call(this, path, body, options);
         if (fence.closed || fence.used || Date.now() >= fence.expires) throw Error('native fence closed');
         fence.used = true;
-        await session.check();
-        if (!editorMatches()) throw Error('native editor changed before dispatch');
-        body = quoteBinder(body, profile, quote.credits);
-        const row = body.initial?.items?.[0];
-        if (body.project_id !== profile.project_id || body.op !== 1 ||
+        let row;
+        try {
+          await session.check();
+          if (!editorMatches()) throw Error('native editor changed before dispatch');
+          body = quoteBinder(body, profile, quote.credits);
+          row = body.initial?.items?.[0];
+          if (body.project_id !== profile.project_id || body.op !== 1 ||
             body.initial?.node_id !== profile.node_id ||
             body.initial?.items?.length !== 1 || row.type !== 2 ||
             JSON.stringify(normalize(row.params?.video_params)) !== JSON.stringify(normalize(params)) ||
             row.commerce_selection?.benefit_type !== profile.benefit_type ||
             row.commerce_selection?.quote_precondition?.expected_benefit_amount !== profile.benefit_amount ||
             (row.reference_sources?.length || 0) !== 0) throw Error('native request changed');
+        } catch (_) {
+          // Positive evidence from THIS guarded call before admission/original
+          // HTTP. A generic native error or empty lookup cannot set it.
+          if (!fence.admissionStarted && !fence.wireUsed) {
+            fence.blockedBeforeDispatch = true;
+            fence.retainBlockedTarget = true;
+          }
+          throw Error('native pre-dispatch guard rejected');
+        }
+        fence.admissionStarted = true;
         const approved = await window[admissionName]({
           submit_id: body.initial.submit_id, resource_id: row.resource_id,
           quote_credits: row.commerce_selection.quote_precondition?.expected_credits_amount,
@@ -583,17 +599,33 @@ async function submit(page, command, session) {
         window[resultName] = {state: 'settled', status: value?.status};
       }, () => {
         window[resultName] = {state: 'error'};
-      }).finally(() => {
+      }).finally(async () => {
         fence.pending = false;
         fence.close();
+        const result = window[resultName];
+        if (result) {
+          let sameOwner = false;
+          if (fence.blockedBeforeDispatch) {
+            try {sameOwner = (await session.check()).http === http;} catch (_) {}
+          }
+          result.preDispatchNoEffect = !!(fence.blockedBeforeDispatch &&
+            fence.retainBlockedTarget && fence.closed && !fence.admissionStarted &&
+            !fence.wireUsed && sameOwner && http.postEnvelope === fence.wrapper &&
+            proto.postEnvelope === fence.wrapper &&
+            window.fetch === fence.fetchWrapper);
+          result.finalized = true;
+        }
       });
       return true;
     }, {profile, params, action, commerceContext, editorDraft, admissionName, resultName, session, quoteBinder});
+    let result;
     for (let i = 0; i < 120; i++) {
-      const result = await page.evaluate(name => window[name], resultName);
-      if (result?.state !== 'running') break;
+      result = await page.evaluate(name => window[name], resultName);
+      if (!result || result.finalized) break;
       await page.waitForTimeout(1000);
     }
+    fencedNoEffect = !!(routed && !dispatched && !admitted && !dispatchAnnounced &&
+      !ids && result?.finalized && result.preDispatchNoEffect);
     if (!dispatched || !admitted || !ids) throw Error('native dispatch was not durably admitted and sent');
     const resource = await readResource(page, profile, ids.resource_id, session);
     if (resource.submit_id !== ids.submit_id || !/^[0-9]{1,32}$/.test(resource.task_id || '') ||
@@ -638,7 +670,7 @@ async function main() {
 module.exports = {createSession, buildVideoAction, buildVideoCommerceContext, buildVideoEditorDraft, createVideoQuoteBinder, syncVideoEditor};
 if (require.main === module) {
   main().catch(() => {
-    emit({ok: false, no_effect: !nativeStarted && !dispatchAnnounced});
+    emit({ok: false, no_effect: (!nativeStarted || fencedNoEffect) && !dispatchAnnounced});
     process.exitCode = 1;
     process.stdin.destroy();
   });

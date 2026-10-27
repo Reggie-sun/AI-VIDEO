@@ -5,7 +5,8 @@ const vm = require('node:vm');
 const assert = require('node:assert/strict');
 const crypto = require('node:crypto');
 const workerPath = process.argv[2];
-const scenario = process.argv[3];
+const protocol = process.argv[3].startsWith('protocol_');
+const scenario = protocol ? process.argv[3].slice('protocol_'.length) : process.argv[3];
 const profile = {account_sha256: crypto.createHash('sha256').update('account-a').digest('hex'),
   project_id:'f0ed223b-090e-4ed6-b394-283f8b7dbd07',node_id:'node_bq6wajb5xe',
   model_id:'seedance_2.5',resolution:'720p',duration_seconds:5,
@@ -71,6 +72,43 @@ const host=vm.createContext({require:fixtureRequire,module:{exports:{}},process:
   Buffer,setTimeout,clearTimeout,console});
 vm.runInContext(fs.readFileSync(workerPath,'utf8')+'\nmodule.exports.__submit=submit; module.exports.__connect=connect;',host);
 const {__submit:submit,__connect:connect}=host.module.exports;
+async function runWorkerProtocol() {
+  // Run the actual executable entry/catch, not a copy of its classifier.
+  const frames=[];
+  let finish, reads=0;
+  const finished=new Promise(resolve=>{finish=resolve;});
+  const fakeProcess={stdin:{destroy:()=>finish()},stdout:{write:line=>frames.push(JSON.parse(line))}};
+  const fakeBrowser={contexts:()=>[{pages:()=>[{...page,url:()=>browser.location.href}]}],close:async()=>{}};
+  const command={operation:'submit',profile,video_params:params,materials,
+    profile_dir:'/fixture',playwright_module:'fixture-playwright'};
+  const runRequire=id=>id==='node:readline'?{createInterface:()=>({[Symbol.asyncIterator]:()=>({
+    next:async()=>({done:false,value:JSON.stringify(reads++===0?command:{approved:scenario!=='host_reject'})})})})}:
+    id==='node:fs'?{...fs,readFileSync:()=> '9222\n'}:
+    id==='fixture-playwright'?{chromium:{connectOverCDP:async()=>fakeBrowser}}:require(id);
+  const runModule={exports:{}};runRequire.main=runModule;
+  const runHost=vm.createContext({require:runRequire,module:runModule,process:fakeProcess,
+    Buffer,setTimeout,clearTimeout,console});
+  vm.runInContext(fs.readFileSync(workerPath,'utf8'),runHost);
+  await finished;
+  const terminal=frames.at(-1);
+  const proven=['mutated_request','quote_precondition_changed'].includes(scenario);
+  assert.equal(terminal.ok,false);
+  assert.equal(terminal.no_effect,proven,JSON.stringify({scenario,frames,calls}));
+  assert.equal(calls,scenario==='response_lost'?1:0);
+  assert.equal(frames.filter(x=>x.event==='dispatch').length,
+    ['response_lost','host_reject'].includes(scenario)?1:0);
+  assert.equal(fakeProcess.exitCode,1);
+  assert(!JSON.stringify(frames).includes('PRIVATE_ERROR_PAYLOAD'));
+  if(proven){
+    // A native continuation detached from its promise must remain fenced too.
+    assert.equal(browser.window.__aiVideoJimengFence.closed,true);
+    await assert.rejects(http.postEnvelope('/octo_api/v1/node_generate',{
+      initial:{node_id:profile.node_id}},{}));
+    await assert.rejects(browser.window.fetch('/octo_api/v1/node_generate',{
+      method:'POST',body:JSON.stringify({initial:{node_id:profile.node_id}})}));
+    assert.equal(calls,0);
+  }
+}
 async function session(){
   if(!host.module.exports.createSession) return undefined;
   return page.evaluateHandle(host.module.exports.createSession,profile);
@@ -93,20 +131,40 @@ async function main(){
   }
   const s=await session();
   if(scenario==='preflight_cleanup') canvas.generationRuntime.videoGenerationConfigStore.validate=()=>({status:'invalid'});
-  if(['native_no_quote','success','duplicate_post','host_reject','after_approval_identity_drift','quote_change','mutated_request','quote_precondition_changed','duplicate_wire','replaced_http'].includes(scenario)){
+  if(['native_no_quote','success','duplicate_post','host_reject','after_approval_identity_drift','quote_change','mutated_request','quote_precondition_changed','duplicate_wire','replaced_http','response_lost','guard_rejection_pending','guard_rejection_owner_changed','guard_rejection_instance_changed','guard_rejection_account_changed','unknown_native_error'].includes(scenario)){
     canvas.generationRuntime.actions.submitVideo=async()=>{
+      if(scenario==='unknown_native_error')throw Error('PRIVATE_ERROR_PAYLOAD');
       const body={project_id:profile.project_id,op:1,initial:{node_id:profile.node_id,...ids,
         items:[{resource_id:ids.resource_id,type:2,params:{video_params:params},commerce_selection:{benefit_type:profile.benefit_type,quote_precondition:{expected_benefit_amount:5,expected_credits_amount:30}}}]}};
       if(scenario==='native_no_quote') delete body.initial.items[0].commerce_selection.quote_precondition;
       if(scenario==='quote_precondition_changed') body.initial.items[0].commerce_selection.quote_precondition.expected_credits_amount=31;
       if(scenario==='mutated_request') body.initial.items[0].params.video_params={...params,resolution:'480p'};
+      if(['guard_rejection_pending','guard_rejection_owner_changed','guard_rejection_instance_changed','guard_rejection_account_changed'].includes(scenario)){
+        body.initial.items[0].params.video_params={...params,resolution:'480p'};
+        await assert.rejects(http.postEnvelope('/octo_api/v1/node_generate',body,{}));
+        if(scenario==='guard_rejection_owner_changed'){
+          httpProto.postEnvelope=async()=>{throw Error('PRIVATE_ERROR_PAYLOAD');};
+          return {status:'error'};
+        }
+        if(scenario==='guard_rejection_instance_changed'){
+          http.postEnvelope=async()=>{throw Error('PRIVATE_ERROR_PAYLOAD');};
+          return {status:'error'};
+        }
+        if(scenario==='guard_rejection_account_changed'){
+          account={uid:'account-b'};
+          return {status:'error'};
+        }
+        return new Promise(resolve=>{resolveNative=resolve;});
+      }
       if(scenario==='replaced_http') {foreignEnvelope=async()=>browser.window.fetch('/octo_api/v1/node_generate',{method:'POST',body:JSON.stringify(body)});httpProto.postEnvelope=foreignEnvelope;}
       await http.postEnvelope('/octo_api/v1/node_generate',body,{});
+      if(scenario==='response_lost')throw Error('PRIVATE_ERROR_PAYLOAD');
       if(scenario==='duplicate_wire') await assert.rejects(browser.window.fetch('/octo_api/v1/node_generate',{method:'POST',body:JSON.stringify(body)}));
       if(scenario==='duplicate_post') await assert.rejects(http.postEnvelope('/octo_api/v1/node_generate',body,{}));
       return {status:'success'};
     };
   }
+  if(protocol){await runWorkerProtocol();return;}
   const submitting=submit(page,{profile,video_params:params,materials},s);
   submitting.catch(()=>{});
   if(scenario==='binding_unavailable'){
@@ -121,7 +179,9 @@ async function main(){
   }
   if(['host_reject','after_approval_identity_drift','quote_change','mutated_request','preflight_cleanup','quote_precondition_changed','replaced_http'].includes(scenario)){
     await assert.rejects(submitting);assert.equal(calls,0);
-    assert.equal(browser.window.__aiVideoJimengFence,null);
+    if(['mutated_request','quote_precondition_changed'].includes(scenario))
+      assert.equal(browser.window.__aiVideoJimengFence.closed,true);
+    else assert.equal(browser.window.__aiVideoJimengFence,null);
     assert.equal(Object.keys(exposed).length,0);assert.equal(routes.length,0);
     if(scenario==='replaced_http') assert.equal(httpProto.postEnvelope,foreignEnvelope);
     return;
