@@ -6,11 +6,16 @@ license: MIT
 
 # Blender blockout for a render-to-real video pass
 
-The blockout is the guide clip: the video model copies the camera path, framing, lens feel, easing,
+本项目先按 [Shot Reference Plan](../../../docs/shot-reference-planning.md) 和
+[Blender routing](../../../docs/blender-routing.md) 判断制作收益；优先复用已审查素材，
+只制作未解决的空间/接触/摄影约束所需的最小可编辑几何。下文上游方法中的模型复制与 authority
+是指导目标，不是服从保证；白模不能代替身份/材质参考、声音或 exact 输出 QA。
+
+The blockout is the guide clip: it is intended to guide camera path, framing, lens feel, easing,
 cut points, shot lengths, the position and scale of every mass, figure facing and every trajectory,
-and it invents the rest from text and images (materials, light, weather, what each proxy really is,
-faces, wardrobe, extras, sound). So the blockout has full authority over motion and layout and none
-over look. Ambiguity ruins the pass; crudeness does not: a bent lamppost comes back as a snake,
+while text and images guide the rest (materials, light, weather, what each proxy really is,
+faces, wardrobe, extras, sound). Treat this as intended guidance for motion and layout, never proof
+that the selected model obeys it. Ambiguity can harm the pass: a bent lamppost can read as a snake,
 loose limb blocks as extra people, an unmarked car driving backward. Fix identity in geometry first,
 in prompt text second, and judge the result on a synced side-by-side of playblast and video, never
 in the viewport alone. If a sibling skill named here is missing from your available skills, ask the

@@ -62,6 +62,12 @@ When preparing, reusing or handing off reference images, apply the shared
 [Reference Continuity Review](references/reference-continuity.md), including approved state changes,
 physical space versus screen direction, POV and prop relations, and review-only versus model-input images.
 
+制作前消费既有 [Shot Reference Plan](../../../docs/shot-reference-planning.md)，结合身份、表演、动作、
+空间与摄影风险，比较最小方案和更高控制方案，并给出 motion 等级与具体白模理由。
+单独接触、高速或环绕标签不强制连续视频或 Blender；持续接触、支撑转换与事件因果确有必要时显式表达。
+每个 review-only 状态不自动要求作图，先复用匹配的已认可实际状态/素材；选中输入仍须审源片并核对 exact compiled bindings。
+selected surface 不支持必要控制时交回既有 Director/Provider Selection，不静默丢图、拆镜、fallback 或改验收。
+
 For object handling, placement, transfer, loss of support or collision, apply
 [Physical Action Continuity](references/event-led-timing.md#physical-action-continuity)
 before authoring, even when duration and generation grouping are unchanged.

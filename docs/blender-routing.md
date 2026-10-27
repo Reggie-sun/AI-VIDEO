@@ -2,6 +2,10 @@
 
 按每 Shot 的空间、动作、接触与摄影目标及所选模型的输入能力，判断是否需要制作或复用白模；不使用白模无需申请例外。选用后执行[白模参考工作流](canvas-production-harness.md#per-shot-whitebox-reference)，核验参考并证明模型请求实际绑定了对应素材。
 
+先消费既有 [Shot Reference Plan](shot-reference-planning.md#compositional-motion-and-whitebox-decisions) 的组合风险、`whitebox_decision` 和理由：稳定对白/简单触碰通常无需白模；静态位置/产品结构疑点先比较现有图片与最小静态 blockout；摄影与人物同时移动、持续受力/支撑转换/遮挡耦合才优先连续预演。不能由单个 contact/high-speed/camera 标签决定。已有匹配动作、方向、速度且经审查的实际素材可直接复用，无须重建；选中视频尚不证明适用，先看 exact source QA 与原速动作。
+
+制作范围以尚未解决的约束为准：只需定布局就不做动画，只需接触/轨迹就不做最终人物美术。导演 animatic 可含定格与 burn-in，模型 motion 输入须是实际连续的 clean playblast；不能把审看宫格或定格 animatic 当连续受力证据。场景、rig、几何优先复用，白模不替代人物身份、材质、声音或最终动态 QA。
+
 制作白模时先读 `scenario-blender-expert`；blockout/proxy几何/送视频模型渲染的playblast读 `scenario-blender-blockout`；staging/camera/shots读 `scenario-blender-previs-storyboard`，motion/timing/contact读 `scenario-blender-animation`，确需rig/IK/FK才读 `scenario-blender-rigging`。用最小proxy geometry表达目标，交付可编辑 `.blend` 和核验后的clean参考。原Shot画幅、镜头、时长及剧情优先于Skill默认值；动作guide须呈现连续动作，不能以定格storyboard冒充。
 
 ### Execution Channels

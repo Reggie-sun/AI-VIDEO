@@ -6,9 +6,38 @@ from ai_video.production.reference_planning_contracts import (
     ShotFacet as Facet, ShotReferencePlan,
 )
 
-_MOTION = {Facet.HIGH_SPEED, Facet.CONTACT, Facet.PHYSICS, Facet.COMPLEX_CAMERA}
+_MOTION = {Facet.HIGH_SPEED, Facet.PHYSICS, Facet.COMPLEX_CAMERA,
+           Facet.SUSTAINED_CONTACT, Facet.SUPPORT_TRANSFER}
 _SPATIAL = {Facet.BLOCKING, Facet.OCCLUSION, Facet.SPATIAL}
 _TRANSITIONS = {Facet.TRANSFORMATION, Facet.DISAPPEARANCE, Facet.ENVIRONMENT_CHANGE}
+
+
+def _motion_decision(facets, authored):
+    """Classify coupled controls, not clip duration or an isolated contact label."""
+    if authored.motion_reference_policy == "required":
+        return "required", ("Director explicitly requires a continuous guide for this Shot; model capacity or isolated states cannot waive the declared control.",)
+    ancestors, kinds = {}, {e.event_id: e.kind for e in authored.events}
+    causal_contact = False
+    for event in authored.events:
+        prior = set(event.after_event_ids)
+        for predecessor in event.after_event_ids:
+            prior.update(ancestors[predecessor])
+        ancestors[event.event_id] = prior
+        if event.kind in {"force", "impact"} and any(kinds[p] == "contact" for p in prior):
+            causal_contact = True
+    coupled_space = {Facet.BLOCKING, Facet.OCCLUSION}.issubset(facets)
+    support = {Facet.SUSTAINED_CONTACT, Facet.SUPPORT_TRANSFER}.issubset(facets)
+    if support or (causal_contact and Facet.PHYSICS in facets
+                   and (coupled_space or Facet.HIGH_SPEED in facets)):
+        return "required", ("Continuous contact/force must remain coherent through support transfer, occlusion or high-speed impact; isolated poses leave the trajectory unconstrained.",)
+    if ((Facet.COMPLEX_CAMERA in facets and facets & _SPATIAL)
+            or (Facet.PHYSICS in facets and facets & {Facet.SUSTAINED_CONTACT, Facet.SUPPORT_TRANSFER})):
+        return "previs_priority", ("Coupled camera/subject geometry or sustained force merits continuous rehearsal; this recommendation alone is not a missing-input blocker.",)
+    if any(s.need_id == "auto:motion" for s in authored.selections):
+        return "recommended", ("Director selected an explicit motion duty; validate its source and selected mode without treating selection as a quality verdict.",)
+    if facets & _MOTION:
+        return "recommended", ("Review a suitable continuous guide if trajectory is uncertain; a single risk dimension does not make it mandatory.",)
+    return "none", ("Ordinary dialogue, isolated contact or static state changes can use existing anchors and state review without an additional motion clip.",)
 
 
 def plan_shot_references(intent) -> ShotReferencePlan:
@@ -129,21 +158,29 @@ def plan_shot_references(intent) -> ShotReferencePlan:
            for facet, kinds in spatial_coverage.items()):
         risks.append("SPATIAL_EVENT_STATES_REQUIRED")
 
-    if facets & _MOTION:
+    motion_level, motion_reasons = _motion_decision(facets, authored)
+    if motion_level != "none":
         add("auto:motion", Role.MOTION, "continuous_motion",
-            "Constrain continuous camera/action trajectory and causal contact order; isolated poses are insufficient.",
-            "reference_video", "required")
-        add("auto:previs", Role.BLOCKING, "preparation",
-            "Prepare continuous physical/camera blocking if suitable motion footage is unavailable.",
-            "previsualization")
+            motion_reasons[0], "reference_video",
+            "required" if motion_level == "required" else "preferred")
         risks.append("MOTION_REFERENCE_IS_GUIDANCE_NOT_PHYSICS_PROOF")
         alternatives.extend(("Use an authorized motion video or rendered physical/camera previsualization.",
                              "Consider the existing video-edit or controlled animation path; retain continuous Shot intent."))
-    elif facets & _SPATIAL:
+    if motion_level in {"previs_priority", "required"}:
+        whitebox, whitebox_reasons = "reuse_motion_first", (
+            "First review existing footage for the same action, axis, contact, camera and accepted source timing; availability or selection alone does not qualify it.",
+            "If no suitable guide survives review, build only the editable proxy geometry and continuous playblast needed to expose the coupled constraint; retain separate identity references.")
+        add("auto:previs", Role.BLOCKING, "preparation", whitebox_reasons[1], "previsualization")
+    elif facets & (_SPATIAL | {Facet.PRODUCT_ROTATION}):
+        whitebox, whitebox_reasons = "optional_static", (
+            "Static layout/pose or product views may resolve geometry without animation; reuse verified scene/product assets before building a minimal blockout.",)
         add("auto:blocking", Role.BLOCKING, "preparation",
             "Review crossings, relative positions and occlusions before selecting reference inputs.",
             "previsualization")
         alternatives.append("Evaluate a blocking video when static spatial states do not constrain the trajectory.")
+    else:
+        whitebox, whitebox_reasons = "not_needed", (
+            "No coupled geometry/trajectory constraint establishes a benefit over current anchors, state review and the selected model; do not build whitebox solely for a contact, speed or camera label.",)
     if Facet.EXACT_GRAPHICS in facets:
         if not any(n.role is Role.GRAPHICS for n in needs):
             add("auto:graphics", Role.GRAPHICS, "postproduction",
@@ -165,11 +202,18 @@ def plan_shot_references(intent) -> ShotReferencePlan:
     return ShotReferencePlan(source_intent_hash=canonical_sha256(intent.model_dump(mode="json")),
         facets=tuple(sorted(facets, key=lambda f: f.value)), structure=authored.structure,
         needs=tuple(needs), natural_generation=natural, omitted=tuple(omitted),
-        risks=tuple(sorted(set(risks))), alternatives=tuple(dict.fromkeys(alternatives)))
+        risks=tuple(sorted(set(risks))), alternatives=tuple(dict.fromkeys(alternatives)),
+        motion_reference_level=motion_level, motion_reference_reasons=motion_reasons,
+        whitebox_decision=whitebox, whitebox_reasons=whitebox_reasons)
 
 
 def reference_plan_report(intent):
     plan = plan_shot_references(intent)
     return {**plan.model_dump(mode="json"), "keyframe_count": len(plan.keyframes),
             "image_reference_needed": plan.image_reference_needed,
+            "minimum_viable_plan": {"need_ids": [n.need_id for n in plan.needs if n.priority == "required"
+                and n.scope not in {"preparation", "postproduction"}],
+                "rationale": "Reuse suitable current assets; prepare only unbound mandatory inputs. Review states remain intent, not an image-generation order."},
+            "higher_control_plan": {"need_ids": [n.need_id for n in plan.needs if n.priority == "preferred"],
+                "rationale": "Add a preferred input only for a named unresolved control risk, after checking selected mode compatibility and preparation cost."},
             "enforcement": "authored" if intent.reference_planning is not None else "legacy_advisory"}

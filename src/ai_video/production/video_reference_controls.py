@@ -329,7 +329,7 @@ def video_reference_control_report(*, request=None, native_parameters=None, requ
         compilation_projection["input_expression_report"] = diagnostic.model_dump(mode="json")
     return {
         "schema_version": "video-reference-control-preview/2",
-        "reference_planning": _planning_report(requirement),
+        "reference_planning": _planning_report(requirement, request=request),
         "performance_control": (performance_authoring_report(
             intent=requirement.generation_intent, characters=requirement.characters,
             rules=expressions, required_ids=tuple(item.requirement_id for item in expressions
@@ -374,13 +374,17 @@ def video_reference_control_report(*, request=None, native_parameters=None, requ
     }
 
 
-def _planning_report(requirement, variant=None):
+def _planning_report(requirement, variant=None, request=None):
     from ai_video.production.reference_strategy import reference_strategy_report
     from ai_video.production.video_requirement import GenerationIntent
 
     if requirement is None or not isinstance(requirement.generation_intent, GenerationIntent):
         return _NOT_EVALUATED
-    return reference_strategy_report(requirement, variant)
+    report = reference_strategy_report(requirement, variant)
+    if request is not None:
+        report["actual_model_inputs"] = [binding.model_dump(mode="json")
+            for binding in (*request.image_bindings, *request.media_bindings)]
+    return report
 
 
 def prepared_generation_report(prepared):
@@ -406,7 +410,7 @@ def prepared_generation_report(prepared):
             expressions=expressions, compilation=prepared.compilation)
     variant = next((v for v in selected.capabilities.variants
         if v.capability_id == selected.capability_id), None) if selected is not None else None
-    reference_control["reference_planning"] = _planning_report(requirement, variant)
+    reference_control["reference_planning"] = _planning_report(requirement, variant, prepared.resolved_request)
     return {"inputs": dump(prepared.inputs), "decision": dump(prepared.decision),
         "compilation": dump(prepared.compilation), "resolved_request": dump(prepared.resolved_request),
         "execution_binding": dump(prepared.execution_binding), "target_shot_id": prepared.target_shot_id,

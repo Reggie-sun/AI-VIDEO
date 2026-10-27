@@ -19,6 +19,13 @@ references；来源固定在 [SOURCE.json](SOURCE.json)，保留 [LICENSE](LICEN
 核对实际空间、视角、道具与动作状态；分清允许的剧情变化和意外漂移。其审看图/模型输入区分及结果记录
 同样适用于下列步骤，不增加独立审批状态或自动重生成规则。
 
+消费同一 [Shot Reference Plan](../../../docs/shot-reference-planning.md) 的 needs、motion 等级、
+白模理由和已选/缺失输入；只为尚不能可靠判断的视觉状态补图。`review_only` 可仅是需审查的状态，
+不是每项必须生成一张图。按持久锚点、干净首尾帧、中间引导图、连续视频分别交接；中间图没有精确时间保证。
+motion 为建议时不阻断简单镜头；required 缺失则返回控制缺口，不用多张静态姿态充数。
+多人遮挡/接触轨迹需预演时先核对已有真实素材，再沿 [Blender routing](../../../docs/blender-routing.md)
+选择静态布局或连续 playblast，不替 Director 重做 coverage，不默认所有 Shot 都制作白模。
+
 1. 对照前镜实际末态、approved Shot 和失败成片，区分已有、可复用及缺失的参考。
    单张开场能覆盖人物外观，不自动代表动作过程已有视觉依据；关键接触、支撑转换、释放、
    落点或反应不清楚时，先补相应状态图或适用的运动参考，不能只反复加长文字后提交。

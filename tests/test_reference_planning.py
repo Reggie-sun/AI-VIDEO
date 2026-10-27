@@ -74,7 +74,8 @@ def test_composable_visual_events_have_purpose_and_motion_is_not_replaced_by_sti
     assert len(plan.keyframes) == frames
     assert all(n.purpose and n.at_seconds is None for n in plan.keyframes)
     assert any(n.role is ReferenceRole.MOTION for n in plan.needs) is motion
-    assert any(n.role is ReferenceRole.BLOCKING for n in plan.needs) is (motion or "multi_subject_blocking" in facets)
+    assert any(n.role is ReferenceRole.BLOCKING for n in plan.needs) is (
+        plan.motion_reference_level in {"previs_priority", "required"} or "multi_subject_blocking" in facets)
     assert plan == plan_shot_references(directed)
 
 
@@ -141,7 +142,7 @@ def test_multishot_is_authored_not_guessed_from_duration_and_reports_control_gap
     assert "MULTI_SHOT_NATIVE_CONTROL_UNDECLARED" in result.reference_plan["execution_gaps"]
 
 
-@pytest.mark.parametrize("facet", ["exact_graphics", "contact_timing", "visual_transformation", "multi_subject_blocking"])
+@pytest.mark.parametrize("facet", ["exact_graphics", "visual_transformation", "multi_subject_blocking"])
 def test_unfulfilled_control_requirements_block_actual_planner(facet):
     req = request_for(intent(facets=(facet,)))
     plan = VideoPlanner().plan(req)
@@ -159,7 +160,7 @@ def test_motion_selection_requires_video_and_exact_duty_not_extra_stills():
     chosen, gaps, bindings = select_reference_inputs(directed, (video,))
     assert chosen == (video,) and gaps == () and bindings == (("auto:motion", "motion"),)
     unassigned = intent(facets=("contact_timing",))
-    assert select_reference_inputs(unassigned, (video,))[1]  # availability is not responsibility
+    assert select_reference_inputs(unassigned, (video,)) == ((), (), ())  # availability is not responsibility
     result = VideoPlanner().plan(request_for(directed, assets=(video,)))
     assert result.outcome is PlanOutcome.PROPOSED
     assert result.generation_mode.value == "reference_to_video"
@@ -330,3 +331,95 @@ def test_composition_events_preserve_existing_typed_performance_beats():
         "auto:performance:hero:response", "auto:performance:hero:settle"]
     assert "PERFORMANCE_BEATS_REQUIRED" not in plan.risks
     assert all(n.at_seconds is None for n in plan.keyframes)
+
+
+@pytest.mark.parametrize("facets,events,level", [
+    (("contact_timing",), (event("touch", "contact"),), "none"),
+    (("high_speed",), (), "recommended"),
+    (("complex_camera",), (), "recommended"),
+    (("continuous_physics",), (), "recommended"),
+    (("contact_timing", "continuous_physics"),
+     (event("grip", "contact"), event("push", "force", after_event_ids=("grip",))), "recommended"),
+    (("complex_camera", "multi_subject_blocking", "occlusion_change"),
+     (event("cross", "blocking"), event("hide", "occlusion")), "previs_priority"),
+    (("sustained_contact", "support_transfer"),
+     (event("grip", "contact"), event("lift", "force", after_event_ids=("grip",))), "required"),
+    (("continuous_physics", "multi_subject_blocking", "occlusion_change"),
+     (event("touch", "contact"), event("force", "force", after_event_ids=("touch",)),
+      event("cross", "blocking"), event("hide", "occlusion")), "required"),
+])
+def test_motion_risk_is_compositional_and_only_necessary_control_blocks(facets, events, level):
+    directed = intent(facets=facets, events=events)
+    plan = VideoPlanner().plan(request_for(directed))
+    report = plan.reference_plan
+    assert report["motion_reference_level"] == level
+    assert bool(report["motion_reference_reasons"])
+    assert (plan.outcome is PlanOutcome.BLOCKED) is (level == "required")
+    motion = [n for n in report["needs"] if n["role"] == "motion_camera_video"]
+    assert bool(motion) is (level != "none")
+    assert all(n["priority"] == ("required" if level == "required" else "preferred") for n in motion)
+
+
+def test_whitebox_has_specific_positive_and_negative_decisions_without_forcing_assets():
+    simple = plan_shot_references(intent(facets=("dialogue",)))
+    assert simple.whitebox_decision == "not_needed"
+    assert simple.whitebox_reasons
+    spatial = plan_shot_references(intent(facets=("spatial_precision",), events=(event("layout", "composition"),)))
+    assert spatial.whitebox_decision == "optional_static"
+    coupled = plan_shot_references(intent(facets=("complex_camera", "multi_subject_blocking", "occlusion_change"),
+        events=(event("cross", "blocking"), event("hide", "occlusion"))))
+    assert coupled.whitebox_decision == "reuse_motion_first"
+    assert all(n.priority == "preferred" for n in coupled.needs if n.scope == "preparation")
+
+
+def test_report_separates_review_states_missing_inputs_and_actual_selection():
+    from ai_video.production.reference_strategy import reference_strategy_report
+    directed = intent(events=(event("review", "composition"),
+        event("first", "composition", phase="end", control="endpoint")))
+    result = VideoPlanner().plan(request_for(directed))
+    report = reference_strategy_report(result.generation_requirement)
+    assert report["image_preparation"]["review_only_state_ids"] == ["review"]
+    assert report["image_preparation"]["unbound_model_image_need_ids"] == ["first"]
+    assert report["image_preparation"]["new_image_count_if_no_reuse"] == 1
+    assert report["planned_model_inputs"] == []
+    assert report["actual_model_inputs"] == "NOT_EVALUATED"
+    assert report["whitebox_decision"] == "not_needed"
+    assert report["minimum_viable_plan"] and report["higher_control_plan"]
+
+
+def test_explicit_motion_control_is_sealed_but_auto_preserves_existing_intent_shape():
+    auto = intent(facets=("contact_timing",))
+    required = intent(facets=("contact_timing",), motion_reference_policy="required")
+    assert "motion_reference_policy" not in auto.model_dump(mode="json")["reference_planning"]
+    assert canonical_sha256(auto.model_dump(mode="json")) != canonical_sha256(required.model_dump(mode="json"))
+    assert GenerationIntent.model_validate_json(required.model_dump_json()) == required
+    plan = VideoPlanner().plan(request_for(required))
+    assert plan.outcome is PlanOutcome.BLOCKED
+    assert "MISSING_REFERENCE:auto:motion" in plan.reference_plan["execution_gaps"]
+
+
+def test_review_board_cannot_be_selected_as_clean_endpoint_or_silently_uploaded():
+    asset = make_available_asset(role=AssetRole.SCENE_REFERENCE, asset_id="board")
+    review = intent(events=(event("board", "composition"),), selections=(dict(need_id="board", asset_id="board"),))
+    assert select_reference_inputs(review, (asset,))[1] == ("NON_PROVIDER_REFERENCE_SELECTION:board",)
+    endpoint = intent(events=(event("opening", "composition", phase="start", control="endpoint"),),
+        selections=(dict(need_id="opening", asset_id="board"),))
+    assert select_reference_inputs(endpoint, (asset,))[1] == ("MISSING_REFERENCE:opening",)
+
+
+def test_independent_characters_cannot_share_identity_bytes_even_with_different_asset_ids():
+    shot = make_shot(visual_strategy=VisualStrategy.GENERATED_VIDEO, character_ids=("hero", "villain"))
+    assets = tuple(make_available_asset(role=AssetRole.CHARACTER_REFERENCE, asset_id=name + "-photo",
+        canonical_owner_id=name, canonical_owner_content_hash=make_character(character_id=name).content_hash,
+        asset_sha256="d" * 64) for name in shot.character_ids)
+    directed = intent().model_copy(update={"identity_continuity": IdentityContinuity(character_ids=shot.character_ids)})
+    result = VideoPlanner().plan(request_for(directed, shot=shot, assets=assets))
+    assert result.outcome is PlanOutcome.BLOCKED
+    assert "INDEPENDENT_IDENTITY_BYTES_CONFLICT" in result.reference_plan["execution_gaps"]
+
+
+def test_sustained_contact_is_not_equated_with_support_transfer_without_coupling():
+    for facet in ("sustained_contact", "support_transfer"):
+        result = VideoPlanner().plan(request_for(intent(facets=(facet,))))
+        assert result.outcome is PlanOutcome.PROPOSED
+        assert result.reference_plan["motion_reference_level"] == "recommended"

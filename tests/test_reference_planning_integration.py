@@ -68,11 +68,22 @@ def test_director_reference_events_survive_loader_planner_router_and_real_compil
     assert report["execution_asset_count"] == 0
     assert report["capability_id"] == candidate.capability_id
     assert report["actual_quality"] == "NOT_EVALUATED"
+    assert report["actual_model_inputs"] == []  # compiled text-only request, not an uncompiled estimate
     assert current["planning_request"].generation_intent.generation_intent.reference_planning.events[1].event_id == "response"
 
 
+@pytest.mark.parametrize("facet", ["contact_timing", "high_speed", "complex_camera", "continuous_physics"])
+def test_isolated_motion_labels_do_not_force_new_media_in_real_loading_seam(tmp_path, facet):
+    loaded, row, _ = load_canvas(tmp_path, {"facets": [facet]})
+    current = canvas_feedback_context(loaded=loaded, row=row, policy=setup_decision()["policy"])
+    plan = VideoPlanner().plan(current["planning_request"])
+    assert plan.outcome.value == "proposed"
+    assert not plan.generation_requirement.asset_evidence
+    assert plan.reference_plan["motion_reference_level"] in {"none", "recommended"}
+
+
 @pytest.mark.parametrize("planning", [
-    {"facets": ["contact_timing"]},
+    {"facets": ["sustained_contact", "support_transfer"]},
     {"facets": ["exact_graphics"]},
     {"events": [{"event_id": "timed", "kind": "composition", "visual_state": "定点",
                  "purpose": "定时", "control": "exact_time", "at_seconds": 2}]},
@@ -161,6 +172,10 @@ def test_motion_reference_respects_real_provider_capability_and_cardinality(supp
         assert prepared.compilation.outcome == "compiled", prepared.compilation
         assert len(prepared.resolved_request.media_bindings) == 1
         assert not prepared.resolved_request.image_bindings
+        report = prepared_generation_report(prepared)["reference_control"]["reference_planning"]
+        assert report["actual_model_inputs"] == [prepared.resolved_request.media_bindings[0].model_dump(mode="json")]
+        assert report["whitebox_decision"] == "not_needed"  # selected real footage doesn't require a new Blender build
+        assert report["reuse_quality"] == "NOT_EVALUATED"
     else:
         assert prepared.decision.disposition != "GENERATE_ONCE"
         assert prepared.resolved_request is None

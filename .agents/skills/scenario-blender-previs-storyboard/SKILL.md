@@ -6,6 +6,11 @@ license: MIT
 
 # Previs, layout and storyboarding
 
+本项目先消费 [Shot Reference Plan](../../../docs/shot-reference-planning.md) 的风险与白模理由；
+稳定对白/简单接触可不制作。优先复用场景及已验证的实际运动素材，只有静态布局不足以表达摄影与人物
+耦合关系时才做连续预演。导演审看 animatic 与模型 motion 输入分开；定格、burn-in 或宫格不能证明
+连续受力，模型输入沿 [Blender routing](../../../docs/blender-routing.md) 交 clean playblast。
+
 Expert previs conveys an idea well enough to be judged, as cheaply as possible: one fact per beat, every shot designed for what the audience must feel, timing found in the edit from stills. The camera is the audience's body; where it stands, how high and through which lens decides the emotion, so every non-neutral choice needs a stated reason. If a sibling skill named here is missing from your available skills, ask the user to install it (`npx skills add scenario-labs/skills --skill <name>`); unattended, proceed from tool schemas and flag the gap.
 
 **REQUIRED BACKGROUND:** scenario-blender-expert (execution channel, review loop, 5.2 API changes).

@@ -138,11 +138,33 @@ def reference_execution_gaps(requirement, variant=None):
 
 def reference_strategy_report(requirement, variant=None):
     report = reference_plan_report(requirement.generation_intent)
-    _, _, bindings = _requirement_selection(requirement)
+    _, missing, bindings = _requirement_selection(requirement)
+    bound = dict(bindings)
+    needs = plan_shot_references(requirement.generation_intent).needs
+    images = [n for n in needs if n.scope in {"persistent", "shot_state"}
+              and n.mechanism in {"reference", "first_frame", "last_frame", "exact_time"}]
+    unbound = [n for n in images if n.need_id not in bound]
     report.update(selected_inputs=[{"need_id": need, "asset_id": asset} for need, asset in bindings],
+        planned_model_inputs=[{"asset_id": a.asset_id, "sha256": a.asset_sha256,
+            "mime_type": a.mime_type, "native_role": native_role(a),
+            "need_ids": [n for n, asset_id in bindings if asset_id == a.asset_id]}
+            for a in requirement.asset_evidence],
+        actual_model_inputs="NOT_EVALUATED",
+        image_preparation={"review_only_state_ids": [n.need_id for n in needs if n.mechanism == "review_only"],
+            "model_image_need_ids": [n.need_id for n in images],
+            "unbound_model_image_need_ids": [n.need_id for n in unbound],
+            "new_image_count_if_no_reuse": len(unbound),
+            "count_basis": "One candidate per unbound model-image duty, not an order to generate. Reuse or a compatible shared anchor can reduce this count; review states need drawings only when visual uncertainty warrants them."},
+        reusable_selected_asset_ids=list(dict.fromkeys(asset for _, asset in bindings)),
+        reuse_quality="NOT_EVALUATED",
+        missing_references=list(missing),
+        unbound_reference_need_ids=[n.need_id for n in needs if n.need_id not in bound
+            and n.mechanism in {"reference", "first_frame", "last_frame", "reference_video", "exact_time"}],
         execution_asset_count=len(requirement.asset_evidence),
         capability_id=variant.capability_id if variant is not None else None,
         capability_evaluation="evaluated" if variant is not None else "NOT_EVALUATED",
+        selected_capability=variant.model_dump(mode="json") if variant is not None else "NOT_EVALUATED",
+        capability_boundary="Semantic role/media checks only; Router owns full selected model/profile/mode/cardinality constraints. Multi-image guidance supplies no exact intermediate timestamps; native request must confirm actual bindings.",
         execution_gaps=list(reference_execution_gaps(requirement, variant)))
     return report
 
@@ -181,6 +203,9 @@ def reference_revision_advice(diagnosis, expressions, intent):
     paths = {p for expression in expressions if expression.requirement_id in diagnosis.failed_requirements
              for p in expression.intent_paths}
     advice = []
+    if diagnosis.failed_requirements:
+        advice.append("Compare exact MP4 and QA spans against source reference bytes, actual native bindings/roles/order and prompt before attributing failure to reference quantity.")
+        advice.append("Distinguish absent coverage, conflicting transferred attributes, unsupported mode/model control, omitted prompt intent, action/coverage design and source-trim/edit errors; change only the evidenced variable, not the image count by default.")
     for prefix, recommendation in (
         ("generation_intent.identity_continuity", "Revise the exact identity anchor selection and independent subject coverage."),
         ("generation_intent.performance_intent", "Review key performance beats; preserve successful expressions and gaze."),

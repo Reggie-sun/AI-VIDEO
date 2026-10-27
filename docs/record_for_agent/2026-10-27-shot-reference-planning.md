@@ -2,6 +2,12 @@
 
 Date: 2026-10-27
 
+## Reference Decision Supersession — 2026-10-27
+
+下文规则/1 的 motion 前置现由 [组合风险增强](2026-10-27-shot-reference-risk-assessment.md) 的规则/2 细化：
+单独 contact/high-speed/physics/complex-camera 不再一律要求视频，必要连续控制仍严格阻断。
+原实现、审查轮次与工程/媒体证明边界作为历史保留；本次不追溯修改任何请求、QA 或验收。
+
 ## AOCI Supersession — 2026-10-27
 
 下方 AOCI stopped/blocked 状态为实现交付时的历史事实，现由[后续维护记录](2026-10-27-aoci-cognition-maintenance.md)取代：19 个 stale 条目已更新，observe 变化经复核，官方 Verify/Check/Guide 已证明当前共享工作区 aligned。此更新不改变原工程回归限制、真实媒体未验收状态，也不证明远端 clean checkout 对齐。

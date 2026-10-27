@@ -3,7 +3,7 @@
 from enum import Enum
 from typing import Annotated, Literal
 
-from pydantic import Field, StringConstraints, field_validator, model_validator
+from pydantic import Field, StringConstraints, field_validator, model_validator, model_serializer
 
 from ai_video.production.artifact_contracts import StrictModel
 
@@ -34,6 +34,8 @@ class ShotFacet(str, Enum):
     OCCLUSION = "occlusion_change"
     HIGH_SPEED = "high_speed"
     CONTACT = "contact_timing"
+    SUSTAINED_CONTACT = "sustained_contact"
+    SUPPORT_TRANSFER = "support_transfer"
     PHYSICS = "continuous_physics"
     TRANSFORMATION = "visual_transformation"
     DISAPPEARANCE = "disappearance"
@@ -102,6 +104,14 @@ class ReferencePlanningIntent(StrictModel):
     anchors: tuple[ReferenceAnchor, ...] = ()
     selections: tuple[ReferenceSelection, ...] = ()
     natural_generation: tuple[Text, ...] = ()
+    motion_reference_policy: Literal["auto", "required"] = "auto"
+
+    @model_serializer(mode="wrap")
+    def _serialize(self, handler):
+        payload = handler(self)
+        if self.motion_reference_policy == "auto":
+            payload.pop("motion_reference_policy", None)
+        return payload
 
     @field_validator("facets")
     @classmethod
@@ -166,7 +176,7 @@ class ReferenceNeed(StrictModel):
 
 
 class ShotReferencePlan(StrictModel):
-    rule_version: Literal["shot-reference-rules/1"] = "shot-reference-rules/1"
+    rule_version: Literal["shot-reference-rules/1", "shot-reference-rules/2"] = "shot-reference-rules/2"
     source_intent_hash: str
     facets: tuple[ShotFacet, ...]
     structure: Literal["continuous", "multi_shot"]
@@ -175,6 +185,10 @@ class ShotReferencePlan(StrictModel):
     omitted: tuple[str, ...]
     risks: tuple[str, ...]
     alternatives: tuple[str, ...]
+    motion_reference_level: Literal["none", "recommended", "previs_priority", "required"] = "none"
+    motion_reference_reasons: tuple[str, ...] = ()
+    whitebox_decision: Literal["not_needed", "optional_static", "reuse_motion_first"] = "not_needed"
+    whitebox_reasons: tuple[str, ...] = ()
     actual_quality: Literal["NOT_EVALUATED"] = "NOT_EVALUATED"
 
     @property
