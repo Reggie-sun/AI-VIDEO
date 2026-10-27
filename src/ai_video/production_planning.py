@@ -140,8 +140,9 @@ class ProductionPlanningService:
                 or selected.coverage.coverage_id != shot.production_lineage.coverage_id
                 or selected.allocation_hash != shot.production_lineage.allocation_hash):
             raise _invalid("Production inputs changed; reassess and materialize the current strategy first.")
-        if salvage and (shot.production_lineage.salvage_review_hash != salvage.review_hash
-                        or shot.production_lineage.salvage_plan_key != candidate_plan_key(selected)):
+        if (salvage is not None or shot.production_lineage.salvage_review_hash is not None) and (
+                salvage is None or shot.production_lineage.salvage_review_hash != salvage.review_hash
+                or shot.production_lineage.salvage_plan_key != candidate_plan_key(selected)):
             raise _invalid("Generation requires the current materialized salvage plan.")
 
         def selected_context(current):

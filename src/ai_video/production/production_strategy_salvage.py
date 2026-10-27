@@ -21,6 +21,12 @@ def salvage_review_for(policy, parent):
                  and r.task_id == parent.production_intent.task_id), None)
 
 
+def has_materialized_salvage(bundle, parent):
+    return any(s.production_lineage is not None
+               and s.production_lineage.parent_shot_id == parent.shot_id
+               and s.production_lineage.salvage_review_hash is not None for s in bundle.shots)
+
+
 def validate_salvage_policy(policy):
     """QA owns observations; post-edit obligations stay in its final contract."""
     reviews = policy.production_salvage_reviews
@@ -104,6 +110,21 @@ def _candidate_sources(candidate):
     return tuple((selected, source) for selected in candidate.units
                  for source in ((selected.source,) if selected.source else ())
                  + selected.component.additional_sources if source.timebase == "frames")
+
+
+def require_current_salvage_lineage(bundle, parent, lineage):
+    """Shared composition and pre-effect generation eligibility, including removal."""
+    from ai_video.errors import AiVideoError, ErrorCode
+
+    review = salvage_review_for(bundle.qa_policy, parent)
+    if review is None and lineage.salvage_review_hash is None:
+        return
+    plan = next((p for p in review.candidate_plans if p.plan_key == lineage.salvage_plan_key), None) if review else None
+    if (review is None or lineage.salvage_review_hash != review.review_hash
+            or plan is None or plan.viability != "feasible"
+            or review_context_blockers(bundle, parent, review)):
+        raise AiVideoError(ErrorCode.PRODUCTION_PROJECT_INVALID,
+            "Production execution requires the current exact salvage review and materialized plan.")
 
 
 def assess_salvage_candidate(loaded, parent, candidate, review):
@@ -207,30 +228,53 @@ def preferred_salvage_candidates(feasible, review):
                     and x.upper <= y.lower for x, y in estimates)
                 and any(x.upper < y.lower for x, y in estimates))
 
-    # A quality-qualified existing-footage solution is considered before paying
-    # for a replacement. High/unknown risks remain visible and incomparable.
-    zero_generation = tuple(c for c in feasible if c.new_generation_count == 0)
-    pool = zero_generation or feasible
-    return tuple(c for c in pool if not any(dominates(other, c) for other in pool if other != c))
+    # Risk comes first. Equal known risk prefers fewer generated components;
+    # unknown or conflicting dimensions cannot be resolved by cheap editing.
+    return tuple(c for c in feasible if not any(dominates(other, c) for other in feasible if other != c))
 
 
-def repeated_failure_requirements(experiences, parent, review):
+def _same_generation_design(shot, parent, unit, fps):
+    """Compare authored action/coverage, excluding revisions, receipts and seeds."""
+    from ai_video.production.composition import _frames_for_fixed_seconds
+
+    first_frames = tuple(a for r in shot.required_asset_roles if r.role == "first_frame" for a in r.asset_ids)
+    return (shot.intent == unit.intent and shot.dialogue == unit.dialogue
+        and shot.scene_id == parent.scene_id and shot.storyboard_beat_id == parent.storyboard_beat_id
+        and shot.narration == unit.narration and shot.character_ids == parent.character_ids
+        and shot.continuity_constraints == parent.continuity_constraints
+        and shot.preserved_source_expression == unit.preserved_source_expression
+        and shot.duration_policy.mode == "fixed" and shot.duration_policy.seconds is not None
+        and _frames_for_fixed_seconds(shot.duration_policy.seconds, fps) == unit.duration_frames
+        and first_frames == ((unit.first_frame_asset_id,) if unit.first_frame_asset_id else ()))
+
+
+def repeated_failure_requirements(experiences, parent, review, *, candidate=None, fps=None):
     """Use canonical diagnoses, counting distinct requests rather than reviews."""
     from ai_video.production.generation_diagnosis import diagnose_exact_result
 
     family = {parent.shot_id, *(u.shot_id for c in parent.production_intent.coverage_options for u in c.units)}
     entries = {}
     for experience in experiences:
+        design = None
+        if candidate is not None:
+            matches = tuple(u.component.component_id for u in candidate.units
+                if u.source is None and _same_generation_design(
+                    experience.projection.requirement.target_shot, parent, u.component, fps))
+            if not matches:
+                continue
+            design = matches[0]
         for entry in experience.evidence:
-            if entry.task_id == review.task_id and entry.shot_id in family and entry.outcome == "media":
-                entries[(entry.shot_id, entry.request_hash)] = (experience, entry)
+            if (entry.task_id == review.task_id and entry.outcome == "media"
+                    and (design is not None or entry.shot_id in family)):
+                entries[(entry.shot_id, entry.request_hash)] = (experience, entry, design or entry.shot_id)
     counts = {}
     all_evidence = tuple(e for x in experiences for e in x.evidence)
     sources = tuple(s for x in experiences for s in x.evaluation_sources)
-    for experience, entry in entries.values():
+    for experience, entry, key in entries.values():
         diagnosis = diagnose_exact_result(entry, all_evidence, experience.candidate.recipe,
             evaluation_sources=sources, requirement=experience.projection.requirement)
-        key = (entry.shot_id, entry.recipe_scope_hash)
+        # New seeds/recipe scopes do not clear repeated failure of the same
+        # authored action. A confirmed success or a changed design does.
         previous = counts.get(key, {})
         counts[key] = {requirement: previous.get(requirement, 0) + 1
                        for requirement in diagnosis.failed_requirements}

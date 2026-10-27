@@ -41,7 +41,7 @@ from ai_video.production.production_strategy_contracts import (
     ProductionStrategyDecision,
 )
 from ai_video.production.production_strategy_salvage import (
-    assess_salvage_candidate, candidate_plan_key, salvage_review_for,
+    assess_salvage_candidate, candidate_plan_key, salvage_review_for, has_materialized_salvage,
 )
 
 
@@ -329,7 +329,8 @@ def prepare_strategy_commit(
     """Build a P2 project/registry commit from one already-selected strategy."""
     parent = _current_parent(loaded, decision)
     salvage = salvage_review_for(loaded.qa_policy, parent)
-    if salvage and (decision.selected is None or assess_salvage_candidate(loaded, parent, decision.selected, salvage)):
+    if (salvage is None and has_materialized_salvage(loaded, parent)) or (
+            salvage and (decision.selected is None or assess_salvage_candidate(loaded, parent, decision.selected, salvage))):
         raise _project_invalid("Production salvage candidate is stale, unreviewed or infeasible.")
     coverage, selected_units = _selected_coverage(
         decision=decision, coverage_options=parent.production_intent.coverage_options  # type: ignore[union-attr]

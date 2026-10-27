@@ -32,7 +32,7 @@
 4. 七维逐项审查，不用美观平均掉动作、因果、身份、表演或剪辑可用性。genre/scene intent 保持显式，悬疑等待可成为保护事件或保护区间，不设通用时长裁切规则。
 5. 十类 repair 标签可以组合；具体 executor 以现有 ProductionOperation/adapter 能力为准。未支持的 V2V、mask/tracking 等返回 capability gap，分类不等于承诺任意后期能力。
 6. Provider、local render 和时间估计分别保留范围、单位与依据，unknown 原样保留，不编造成功率，不互换货币，不从估计铸造 paid permit。
-7. 全部可行剪辑/复用候选优先；仍有未审的低生成候选时补证，不花费掩盖证据缺口。可行候选内只用逐维风险偏序；不同风险或 unknown 不能比较时返回 unresolved。
+7. 质量风险相同的可行剪辑/复用候选优先；仍有未审的低生成候选时补证，不花费掩盖证据缺口。可行候选内先用逐维风险偏序，不能先排除生成方案；不同风险或 unknown 不能比较时返回 unresolved。
 8. 生成仅替换被选 coverage 的缺失组件；对全场的失效传播继续由原 P5 resolver 决定，不 blanket invalidation。连续同类失败必须更新 Shot/覆盖设计，历史计数不重置。
 9. 候选只能成为 EDIT_CANDIDATE/NEEDS_GENERATION/NEEDS_REPLAN 等；`VERIFIED` 只能来自同一实际物化方案、当前 exact render 与原 P6 acceptance 链。前后投诉消失不足以证明修复。
 

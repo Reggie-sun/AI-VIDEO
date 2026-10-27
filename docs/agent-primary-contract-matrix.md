@@ -401,6 +401,14 @@ machine-readable changed-path routing 仍由 `.agent/harness/policy.yaml` 独占
 
 ## Production Strategy
 
+### Footage Salvage
+
+`QaPolicy.production_salvage_reviews` 保存 immutable Take 观察、完整源身份、半开帧窗口、七维裁决、缺陷及候选修复依据；`production_strategy_salvage_contracts.py` 只拥有该合同，Registry 仍拥有素材身份。
+`production_strategy_salvage.py` 仅为原 `ProductionStrategyResolver` 提供 eligibility、逐维风险偏序和解释投影，不能选择第二条执行链、赋予 paid 权限或签媒体 PASS。未审动作/声音、陈旧素材、保护区被删除、仍在使用的结构性失败、未评估替代 Take 均阻断；十类操作标签不扩张现有 executor 能力。
+`ProductionPlanningService.prepare(include_salvage_report=True)` 与 Canvas 同名参数输出所有候选及原因；物化沿原 committer，把 review/plan identity 放入已有 component lineage，原 composition 与 generation 准入重验。闭合质量修复必须先有该评估；本地 timeline render 与 Provider generation 独立核算。重复失败只读 canonical GenerationExperience，保留旧计数与 UNKNOWN recovery。
+转场/Scene 要求沿原 assembly allocation 和 `FinalOutputContract`，P6 `FinalOutputObservation` 对这些要求必须有 full_playback、1000 速度及 audio_reviewed；before/after 沿原 repair baseline/outcome 重开。报告 `VERIFIED` 只投影 standard loader 已重验的同方案 current FinalAcceptance，不以计划、测量或单镜 PASS 替代成片审看。
+研究与局限见 [Footage Salvage Audit](research/2026-10-27-footage-salvage.md)，实现入口见 [Footage Salvage](footage-salvage.md)；checks 归 Harness `footage_salvage_tests` 和原 ProductionStrategy/P6 suites。
+
 `planning/production_strategy.py::ProductionStrategyResolver` 是 Director intent 到生产手段的唯一选择
 owner；从 selected Shot 的 `ProductionIntent`、QA allocation、Registry 与 exact source-use evidence
 枚举 coverage/source/generation 候选。候选持平、证据不足、范围禁止和 capability gap 均显式返回。

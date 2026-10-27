@@ -23,7 +23,7 @@ from ai_video.production.source_use_evidence import assess_source_use
 from ai_video.production.visual_media import resolved_video_trim_duration
 from ai_video.production.production_strategy_salvage import (
     assess_salvage_candidate, preferred_salvage_candidates, salvage_review_for,
-    repeated_failure_requirements,
+    repeated_failure_requirements, has_materialized_salvage,
 )
 
 
@@ -239,6 +239,9 @@ class ProductionStrategyResolver:
         })
         common = dict(input_hash=input_hash, parent_shot_id=parent.shot_id,
             parent_shot_content_hash=parent.content_hash, task_id=intent.task_id)
+        if salvage is None and has_materialized_salvage(loaded, parent):
+            return ProductionStrategyDecision(**common, candidates=(), disposition="evidence_required",
+                reasons=("evidence_required:salvage_review_removed",))
         # Global unresolved lifecycle blocks planning changes as well as submit.
         if any(a.status.value in {"outcome_unknown", "interrupted"} for a in loaded.manifest.attempts):
             return ProductionStrategyDecision(**common, candidates=(), disposition="recovery_required",
@@ -251,11 +254,15 @@ class ProductionStrategyResolver:
             for coverage in intent.coverage_options
             for units in product(*(_unit_options(u) for u in coverage.units)))
         if salvage is not None:
-            repeated = repeated_failure_requirements(experiences, parent, salvage)
+            def failure_blockers(candidate):
+                repeated = repeated_failure_requirements(experiences, parent, salvage,
+                    candidate=candidate, fps=loaded.project.delivery_profile.fps)
+                return (("needs_authoring_revision:salvage_repeated_failure:" + ",".join(repeated),)
+                        if repeated and candidate.new_generation_count else ())
+
             candidates = tuple(c.model_copy(update={"blockers": tuple(dict.fromkeys((
                 *c.blockers, *assess_salvage_candidate(loaded, parent, c, salvage),
-                *(("needs_authoring_revision:salvage_repeated_failure:" + ",".join(repeated),)
-                  if repeated and c.new_generation_count else ()),
+                *failure_blockers(c),
             )))}) for c in candidates)
         feasible = tuple(c for c in candidates if not c.blockers)
         if feasible:
@@ -295,7 +302,7 @@ class ProductionStrategyResolver:
                     selected=preferred[0], disposition="selected",
                     reasons=(("Evidence-qualified existing footage preserves the required events; new output still needs P6 review",)
                              if salvage and preferred[0].new_generation_count == 0 else
-                             ("All lower-generation alternatives are infeasible; generate only selected missing components",)
+                             ("Lower-generation alternatives are infeasible or carry higher evidenced quality risks; generate only selected missing components",)
                              if salvage else ()))
             return ProductionStrategyDecision(**common, candidates=candidates,
                 disposition="unresolved_choice", reasons=("equally preferred production alternatives",))

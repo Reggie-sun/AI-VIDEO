@@ -381,6 +381,10 @@ checks:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_strategy_contracts.py, tests/test_production_requirement_allocation.py, tests/test_production_responsibility_admission.py, tests/test_production_responsibility_preview.py, tests/test_production_source_use_evidence.py, tests/test_production_strategy_resolver.py, tests/test_production_strategy_materialization.py, tests/test_production_strategy_reader.py, tests/test_production_strategy_dependency.py, tests/test_production_planning_service.py, tests/test_production_planning_generation.py, -q]
     cwd: .
     description: Verify production-means decisions, exact source use, component lineage and canonical materialization without Provider effects.
+  footage_salvage_tests:
+    argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_production_strategy_salvage_contracts.py, tests/test_production_strategy_salvage.py, tests/test_production_strategy_salvage_review.py, tests/test_production_strategy_salvage_decisions.py, -q]
+    cwd: .
+    description: Verify exact Take windows, protected performance, edit-or-generation candidates and continuous scene proof through existing QA and Planning; no Provider effects or media acceptance.
   s01_strategy_regression_tests:
     argv: [python, -m, pytest, -p, no:cacheprovider, tests/test_s01_strategy_regression.py, -q]
     cwd: .
@@ -478,6 +482,7 @@ checks:
       - production_contract_tests
       - production_reader_tests
       - production_strategy_tests
+      - footage_salvage_tests
       - s01_strategy_regression_tests
       - production_state_tests
       - production_composition_audio_tests
@@ -677,6 +682,17 @@ categories:
       - production_strategy_tests
       - generation_feedback_tests
       - production_shot_router_tests
+      - task_architecture_gate
+  footage_salvage:
+    patterns:
+      - src/ai_video/production/production_strategy_salvage*.py
+      - tests/test_production_strategy_salvage*.py
+    focused_check_ids: [footage_salvage_tests]
+    check_ids:
+      - footage_salvage_tests
+      - production_strategy_tests
+      - final_output_no_regression_tests
+      - visual_quality_tests
       - task_architecture_gate
   drama_authoring_source_binding:
     patterns:

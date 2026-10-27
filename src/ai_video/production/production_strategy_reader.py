@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from collections import defaultdict
-from decimal import Decimal
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -540,6 +539,9 @@ def require_production_source_eligibility(
         lineage = child.production_lineage
         parent = _parent_for_lineage(bundle, lineage)
         coverage, unit = _coverage_unit(parent, lineage)
+        from ai_video.production.production_strategy_salvage import require_current_salvage_lineage
+
+        require_current_salvage_lineage(bundle, parent, lineage)
         try:
             allocation = bundle.qa_policy.require_production_allocation(allocation_hash=lineage.allocation_hash,
                 parent_shot_id=parent.shot_id, parent_shot_content_hash=parent.content_hash,
